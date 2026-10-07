@@ -251,6 +251,39 @@
   "analytics.group-by.month": {
     "message": "Bulan"
   },
+  "analytics.group-by.week": {
+    "message": "Pekan"
+  },
+  "analytics.group-by.year": {
+    "message": "Tahun"
+  },
+  "analytics.options.loading": {
+    "message": "Memuat..."
+  },
+  "analytics.project-event.project-approved": {
+    "message": "Proyek disetujui"
+  },
+  "analytics.project-status.approved": {
+    "message": "Disetujui"
+  },
+  "analytics.project-status.archived": {
+    "message": "Diarsipkan"
+  },
+  "analytics.project-status.draft": {
+    "message": "Draf"
+  },
+  "analytics.project-status.other": {
+    "message": "Lainnya"
+  },
+  "analytics.project-status.rejected": {
+    "message": "Ditolak"
+  },
+  "analytics.project.all": {
+    "message": "Semua proyek"
+  },
+  "analytics.project.select": {
+    "message": "Pilih proyek"
+  },
   "app-marketing.download.description": {
     "message": "Aplikasi destop kami tersedia pada semua platform, pilih versi yang Anda inginkan."
   },

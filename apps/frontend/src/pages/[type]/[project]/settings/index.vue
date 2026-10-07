@@ -107,7 +107,7 @@
 						<div class="flex flex-col gap-2">
 							<FileButton
 								id="project-icon"
-								:max-size="262144000"
+								:max-size="524288"
 								accept="image/png,image/jpeg,image/gif,image/webp"
 								class="button-like choose-image"
 								prompt="Upload icon"

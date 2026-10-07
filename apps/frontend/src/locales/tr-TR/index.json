@@ -875,17 +875,11 @@
   "auth.sign-in.launcher.callback.title": {
     "message": "Modrinth Uygulaması oturum açma geri çağırma"
   },
-  "auth.sign-in.launcher.complete.description": {
-    "message": "Sizi Modrinth App'e yönlendiriyoruz. Eğer hiçbir şey yaşanmazsa, aşağıdaki butonu kullanın."
-  },
   "auth.sign-in.launcher.complete.go-to-website": {
     "message": "Modrinth.com'a git"
   },
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Modrinth App'i aç"
-  },
-  "auth.sign-in.launcher.complete.title": {
-    "message": "Oturum açtınız"
   },
   "auth.sign-in.launcher.opening.description": {
     "message": "Uygulama açılmazsa, oturum açma işlemini tamamlamak için aşağıdaki düğmeyi kullanın."

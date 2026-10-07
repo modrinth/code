@@ -7,7 +7,6 @@
 		"binding": "ASSETS",
 		"directory": "./.output/public/"
 	},
-	"routes": ["modrinth.com/*"],
 	"preview_urls": true,
 	"workers_dev": true,
 	"upload_source_maps": true,

@@ -20,6 +20,10 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/prod' }}
 
+env:
+  TURBO_TELEMETRY_DISABLED: 1
+  pnpm_config_color: always
+
 jobs:
   build:
     name: Build frontend
@@ -50,10 +54,13 @@ jobs:
         run: corepack enable
 
       - name: Set up caches
-        uses: namespacelabs/nscloud-cache-action@c5f8dab7560444c4bf8dbc64f1b203431873c547 # v1.6.1
+        uses: namespacelabs/nscloud-cache-action@1124a6f3ce44e5cf84cc22111530961f4d2a15f9 # v1.7.0
         with:
           cache: |
             pnpm
+
+      - name: Set up Turborepo caching
+        uses: namespace-actions/setup-turbocache@a94b84c111f2cc781a4a83c4d07a99f2c63e33d6 # v0.0.3
 
       - name: Inject build variables
         working-directory: ./apps/frontend
@@ -97,3 +104,19 @@ jobs:
       image-name: frontend
       dockerfile-path: apps/frontend/Dockerfile
       artifacts-name: frontend-docker-context
+
+  deploy:
+    name: Roll out to Magic Containers
+    needs: [docker-build]
+    if: ${{ github.ref == 'refs/heads/prod' && github.event_name == 'push' }}
+    runs-on: namespace-profile-tiny-arm64
+    permissions:
+      contents: read
+    steps:
+      - name: Update container image
+        uses: BunnyWay/actions/container-update-image@4b22fe0b319386b3913117daf97729409dd0a6ef # main
+        with:
+          api_key: ${{ secrets.BUNNY_API_KEY }}
+          app_id: ${{ vars.BUNNY_FRONTEND_APP_ID }}
+          container: app
+          image_tag: gh${{ github.run_id }}

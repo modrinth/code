@@ -10,6 +10,7 @@ use serde::Serialize;
 use uuid::Uuid;
 
 pub const KAFKA_OPERATION_INTERVAL: Duration = Duration::from_secs(5);
+pub const KAFKA_DELIVERY_TIMEOUT: Duration = Duration::from_secs(30);
 pub const DELPHI_FILE_SCAN_TASK: &str = "delphi-file-scan";
 pub const INCREMENTAL_INDEX_SEARCH_TASK: &str = "incremental-index-search";
 
@@ -27,7 +28,7 @@ impl KafkaClientState {
             .set("acks", "all")
             .set(
                 "delivery.timeout.ms",
-                KAFKA_OPERATION_INTERVAL.as_millis().to_string(),
+                KAFKA_DELIVERY_TIMEOUT.as_millis().to_string(),
             )
             .set("broker.address.family", "v4")
             .create()

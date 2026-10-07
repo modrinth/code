@@ -37,7 +37,8 @@ export type StoredAccount = {
 
 type AccountPreview = Omit<StoredAccount, 'token' | 'appearance'>
 
-const STORAGE_KEY = 'auth-stored-accounts'
+const STORAGE_KEY = 'auth-stored-accounts-v2'
+const LEGACY_STORAGE_KEY = 'auth-stored-accounts'
 const COOKIE_OPTIONS = {
 	maxAge: 60 * 60 * 24 * 365 * 10,
 	sameSite: 'lax',
@@ -184,8 +185,21 @@ const setAccounts = (accounts: StoredAccount[]) => {
 	accountsCookie().value = accounts.map(toPreview)
 }
 
+const forgetLegacyAccounts = () => {
+	try {
+		window.localStorage.removeItem(LEGACY_STORAGE_KEY)
+	} catch {
+		// storage blocked, nothing to clear
+	}
+
+	const legacyCookie = useCookie(LEGACY_STORAGE_KEY, { path: '/' })
+	if (legacyCookie.value) legacyCookie.value = null
+}
+
 export const hydrateStoredAccounts = () => {
 	if (!import.meta.client) return
+
+	forgetLegacyAccounts()
 
 	const local = readLocal()
 	if (local.length > 0) {
@@ -248,6 +262,24 @@ export const rememberStoredAccountAppearance = (
 	}
 
 	setAccounts(accounts.map((stored) => (stored.id === id ? { ...stored, appearance } : stored)))
+}
+
+export const updateStoredAccountAuthMethod = (
+	account: StoredAccount,
+	authMethod: StoredAccountAuthMethod,
+) => {
+	if (!import.meta.client) {
+		return
+	}
+
+	const accounts = readLocal()
+	const stored = accounts.find((stored) => stored.id === account.id)
+	if (!stored) {
+		setAccounts([...accounts, { ...account, authMethod }])
+		return
+	}
+
+	setAccounts(accounts.map((item) => (item.id === account.id ? { ...item, authMethod } : item)))
 }
 
 export const forgetStoredAccount = (id: string) => {

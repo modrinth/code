@@ -1,17 +1,5 @@
 <template>
 	<div class="flex flex-col gap-6">
-		<Teleport to="body">
-			<div class="relative z-[100]">
-				<ConfirmModal
-					ref="resetToOnboardingModal"
-					:title="formatMessage(messages.resetToOnboardingModalTitle)"
-					:description="formatMessage(messages.resetToOnboardingModalDescription)"
-					:proceed-label="formatMessage(messages.resetToOnboardingButton)"
-					@proceed="confirmResetToOnboarding"
-				/>
-			</div>
-		</Teleport>
-
 		<InstallationSettingsLayout
 			ref="installationSettingsLayout"
 			@reset-server="showResetServerModal"
@@ -52,24 +40,6 @@
 				</Teleport>
 			</template>
 		</InstallationSettingsLayout>
-
-		<div v-if="isSiteAdmin" class="flex flex-col gap-2.5">
-			<span class="text-lg font-semibold text-contrast">
-				{{ formatMessage(messages.supportOptionsTitle) }}
-			</span>
-			<div>
-				<Button
-					v-tooltip="supportResetToOnboardingTooltip"
-					type="colored"
-					color="red"
-					:disabled="supportResetToOnboardingDisabled"
-					@click="showResetToOnboardingModal"
-				>
-					<RotateCounterClockwiseIcon class="size-5" />
-					{{ formatMessage(messages.resetToOnboardingButton) }}
-				</Button>
-			</div>
-		</div>
 	</div>
 </template>
 
@@ -78,7 +48,6 @@ import type { Archon, Labrinth } from '@modrinth/api-client'
 import { RotateCounterClockwiseIcon } from '@modrinth/assets'
 import {
 	commonMessages,
-	ConfirmModal,
 	defineMessages,
 	formatLoaderLabel,
 	type GameVersionOption,
@@ -174,35 +143,6 @@ const messages = defineMessages({
 		id: 'hosting.loader.failed-to-unlink',
 		defaultMessage: 'Failed to unlink modpack',
 	},
-	supportOptionsTitle: {
-		id: 'hosting.loader.support-options-title',
-		defaultMessage: 'Support options',
-	},
-	resetToOnboardingButton: {
-		id: 'hosting.loader.reset-to-onboarding-button',
-		defaultMessage: 'Reset to onboarding',
-	},
-	resetToOnboardingModalTitle: {
-		id: 'hosting.loader.reset-to-onboarding-modal-title',
-		defaultMessage: 'Reset to onboarding',
-	},
-	resetToOnboardingModalDescription: {
-		id: 'hosting.loader.reset-to-onboarding-modal-description',
-		defaultMessage:
-			'This will send the server back into onboarding so setup can be completed again. Are you sure you want to continue?',
-	},
-	resetToOnboardingSuccessTitle: {
-		id: 'hosting.loader.reset-to-onboarding-success-title',
-		defaultMessage: 'Server reset to onboarding',
-	},
-	resetToOnboardingSuccessDescription: {
-		id: 'hosting.loader.reset-to-onboarding-success-description',
-		defaultMessage: 'The server has been returned to the onboarding flow.',
-	},
-	failedToResetToOnboarding: {
-		id: 'hosting.loader.failed-to-reset-to-onboarding',
-		defaultMessage: 'Failed to reset server to onboarding',
-	},
 })
 
 const emit = defineEmits<{
@@ -266,23 +206,8 @@ const modpackVersionsQuery = useQuery({
 	enabled: computed(() => !!modpackProjectId.value),
 })
 
-const isSiteAdmin = computed(() => serverSettings.currentUserRole.value === 'admin')
-
 const editingPlatform = ref(server.value?.loader?.toLowerCase() ?? 'vanilla')
 const editingGameVersion = ref(server.value?.mc_version ?? '')
-const resetToOnboardingModal = ref<InstanceType<typeof ConfirmModal>>()
-const isResettingToOnboarding = ref(false)
-const supportResetToOnboardingDisabled = computed(
-	() => !worldId.value || isResettingToOnboarding.value || !canResetServer.value,
-)
-const supportResetToOnboardingTooltip = computed(() =>
-	!canResetServer.value ? permissionDeniedMessage.value : undefined,
-)
-
-function showResetToOnboardingModal() {
-	if (supportResetToOnboardingDisabled.value) return
-	resetToOnboardingModal.value?.show()
-}
 
 const modLoaders = ['fabric', 'forge', 'quilt', 'neoforge']
 const loaderGameVersionPlaceholder = '${modrinth.gameVersion}'
@@ -1049,38 +974,5 @@ function onBrowseModpacks() {
 		worldId: worldId.value,
 		from: 'reset-server',
 	})
-}
-
-async function confirmResetToOnboarding() {
-	if (supportResetToOnboardingDisabled.value || !worldId.value) return
-
-	try {
-		isResettingToOnboarding.value = true
-		await client.archon.servers_v1.resetToOnboarding(serverId, worldId.value)
-		modrinthServersConsole.clear()
-		try {
-			await client.kyros.logs_v1.clear()
-		} catch (error) {
-			console.error('Failed to clear server logs:', error)
-		}
-		server.value.flows = { intro: true }
-		await Promise.all([
-			queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] }),
-			queryClient.invalidateQueries({ queryKey: ['servers', 'v1', 'detail', serverId] }),
-		])
-		addNotification({
-			type: 'success',
-			title: formatMessage(messages.resetToOnboardingSuccessTitle),
-			text: formatMessage(messages.resetToOnboardingSuccessDescription),
-		})
-		serverSettings.closeModal?.()
-	} catch (err) {
-		addNotification({
-			type: 'error',
-			text: err instanceof Error ? err.message : formatMessage(messages.failedToResetToOnboarding),
-		})
-	} finally {
-		isResettingToOnboarding.value = false
-	}
 }
 </script>

@@ -581,11 +581,23 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
+  "app-marketing.features.importing.description": {
+    "message": "이전 런처에서 사용하던 모든 게임 인스턴스를 가져오고, Modrinth App에서 바로 시작하세요!"
+  },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
   },
   "app-marketing.features.importing.multimc-alt": {
     "message": "MultiMC"
+  },
+  "app-marketing.features.importing.title": {
+    "message": "인스턴스 가져오기"
+  },
+  "app-marketing.features.manage-skins.description": {
+    "message": "앱 내에서 마인크래프트 스킨을 변경할 수 있습니다."
+  },
+  "app-marketing.features.manage-skins.title": {
+    "message": "스킨 선택"
   },
   "app-marketing.features.mod-management.actions": {
     "message": "작업"
@@ -611,6 +623,9 @@
   "app-marketing.features.mod-management.version": {
     "message": "버전"
   },
+  "app-marketing.features.open-source.description": {
+    "message": "Modrinth App은 완전히 오픈 소스입니다. <github-link>Github</github-link>에서 소스 코드를 확인하세요!"
+  },
   "app-marketing.features.open-source.title": {
     "message": "오픈 소스"
   },
@@ -619,6 +634,9 @@
   },
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
+  },
+  "app-marketing.features.performance.description": {
+    "message": "Modrinth 앱은 기타 모드 관리자보다 더 나은 성능을 발휘합니다!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -652,6 +670,12 @@
   },
   "app-marketing.features.play.title": {
     "message": "좋아하는 모드를 플레이하세요"
+  },
+  "app-marketing.features.settings-sync.description": {
+    "message": "모든 인스턴스에서 같은 옵션, 리소스 팩 등을 사용하세요."
+  },
+  "app-marketing.features.settings-sync.title": {
+    "message": "설정 동기화"
   },
   "app-marketing.features.sharing.description": {
     "message": "Modrinth에 있는 수천 개의 모드와 모드팩으로 모드팩을 만들고, 공유하고, 플레이하세요."
@@ -749,6 +773,9 @@
   "auth.create-account.date-of-birth.label": {
     "message": "생년월일"
   },
+  "auth.create-account.date-of-birth.not-meet-age-requirement": {
+    "message": "Modrinth 회원가입에 필요한 연령 기준을 충족하지 않습니다."
+  },
   "auth.create-account.date-of-birth.placeholder": {
     "message": "당신의 생일을 선택해주세요"
   },
@@ -757,6 +784,9 @@
   },
   "auth.create-account.date-of-birth.required.title": {
     "message": "생년월일은 필수 입력 항목입니다"
+  },
+  "auth.create-account.date-of-birth.under13-helper": {
+    "message": "13세 이상이 아니라면 Modrinth 계정을 만들 수 없습니다."
   },
   "auth.create-account.info-panel.source-code-link": {
     "message": "관련 소스 코드"
@@ -866,8 +896,8 @@
   "auth.sign-in.last-sign-in": {
     "message": "마지막으로 사용됨"
   },
-  "auth.sign-in.launcher.complete.description": {
-    "message": "Modrinth App으로 돌아갑니다. 아무 일도 일어나지 않으면 아래 버튼을 누르세요."
+  "auth.sign-in.launcher.callback.title": {
+    "message": "Modrinth 앱 로그인 콜백"
   },
   "auth.sign-in.launcher.complete.go-to-website": {
     "message": "Modrinth.com으로 이동"
@@ -875,8 +905,11 @@
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Modrinth App 열기"
   },
-  "auth.sign-in.launcher.complete.title": {
-    "message": "로그인되었습니다"
+  "auth.sign-in.launcher.opening.description": {
+    "message": "앱이 열리지 않았다면, 아래 버튼을 통해 로그인을 마치세요."
+  },
+  "auth.sign-in.launcher.opening.title": {
+    "message": "Modrinth App을 실행 중..."
   },
   "auth.sign-in.no-account": {
     "message": "계정이 없으신가요?"
@@ -910,6 +943,9 @@
   },
   "auth.sign-up.title.sign-up-with": {
     "message": "회원가입"
+  },
+  "auth.two-factor.incorrect-code": {
+    "message": "이중 인증 코드가 잘못되었습니다. 다시 시도하거나 백업 코드를 사용하세요."
   },
   "auth.verify-email.action.account-settings": {
     "message": "계정 설정"
@@ -2297,6 +2333,9 @@
   "hosting-marketing.faq.cpu-kind": {
     "message": "Modrinth 호스팅 서버는 어떤 종류의 CPU를 사용하나요?"
   },
+  "hosting-marketing.faq.cpu-kind.answer": {
+    "message": "Modrinth 호스팅 서버는 AMD Ryzen 7950X 및 9950X급 CPU와 DDR5 메모리로 구동됩니다."
+  },
   "hosting-marketing.faq.currency": {
     "message": "가격은 어떤 통화로 표시되나요?"
   },
@@ -2927,6 +2966,9 @@
   "layout.publish.email-verification-required.title": {
     "message": "이메일 승인이 필요합니다"
   },
+  "messages.noResults": {
+    "message": "검색어에 대한 결과가 없습니다!"
+  },
   "modal.shared-instance.open-in-app.benefit.install": {
     "message": "친구들이 플레이 중인 모든 콘텐츠 자동 설치"
   },
@@ -2956,6 +2998,9 @@
   },
   "moderation.moderate": {
     "message": "관리"
+  },
+  "moderation.page.delphi-rules": {
+    "message": "델파이 규칙"
   },
   "moderation.page.external-projects": {
     "message": "외부 프로젝트"
@@ -3358,6 +3403,9 @@
   },
   "project-member-header.success-join": {
     "message": "프로젝트 팀에 참여했습니다"
+  },
+  "project-moderation-nags.project-submitted-for-review": {
+    "message": "프로젝트가 검토를 위해 제출되었습니다!"
   },
   "project-moderation-nags.publishing-checklist": {
     "message": "게시 체크리스트"
@@ -4003,6 +4051,12 @@
   },
   "project.settings.general.url.title": {
     "message": "URL"
+  },
+  "project.settings.license.url": {
+    "message": "라이선스 URL"
+  },
+  "project.settings.license.url-placeholder": {
+    "message": "라이선스 URL"
   },
   "project.settings.monetization.description": {
     "message": "Modrinth 프로젝트들은 자동으로 <rewards-program-link>보상 프로그램</rewards-program-link>에 등록됩니다. 수익 창출을 원하지 않거나 법적인 이유로 수익을 창출할 수 없는 경우 여기에서 비활성화할 수 있습니다."

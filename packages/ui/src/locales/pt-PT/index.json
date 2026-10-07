@@ -83,6 +83,9 @@
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Renovar Servidor"
   },
+  "browse.filter-results": {
+    "defaultMessage": "Filtrar resultados..."
+  },
   "browse.view-prefix": {
     "defaultMessage": "Exibição:"
   },

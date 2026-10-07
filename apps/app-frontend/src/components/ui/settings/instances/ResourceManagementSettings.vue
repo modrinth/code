@@ -1,5 +1,12 @@
 <script setup>
-import { BoxIcon, FolderOpenIcon, FolderSearchIcon, TrashIcon } from '@modrinth/assets'
+import {
+	BoxIcon,
+	DownloadIcon,
+	FolderOpenIcon,
+	FolderSearchIcon,
+	LoaderCircleIcon,
+	TrashIcon,
+} from '@modrinth/assets'
 import {
 	Button,
 	defineMessages,
@@ -13,6 +20,10 @@ import {
 import { open } from '@tauri-apps/plugin-dialog'
 import { ref, watch } from 'vue'
 
+import {
+	exportDebugInfo,
+	exportingDebugInfo,
+} from '@/components/ui/download-manager/debug-info-export'
 import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
 import ContentStorageSettings from '@/components/ui/settings/instances/ContentStorageSettings.vue'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
@@ -27,6 +38,19 @@ const settings = ref(await get())
 const purgeCacheConfirmModal = ref(null)
 
 const messages = defineMessages({
+	debugInfoTitle: {
+		id: 'app.settings.resource-management.debug-info.title',
+		defaultMessage: 'Debug info',
+	},
+	debugInfoDescription: {
+		id: 'app.settings.resource-management.debug-info.description',
+		defaultMessage:
+			'Export app logs and diagnostic data to a ZIP file to share with Modrinth support.',
+	},
+	exportDebugInfo: {
+		id: 'app.settings.resource-management.debug-info.export',
+		defaultMessage: 'Export debug info',
+	},
 	appDirectoryTitle: {
 		id: 'app.settings.resource-management.app-directory.title',
 		defaultMessage: 'App directory',
@@ -155,6 +179,10 @@ function handlePurgeCacheClick() {
 
 async function openDbBackupsFolder() {
 	await showAppDbBackupsFolder().catch(handleError)
+}
+
+async function handleExportDebugInfo() {
+	await exportDebugInfo(formatMessage(messages.exportDebugInfo)).catch(handleError)
 }
 
 async function findLauncherDir() {
@@ -286,6 +314,30 @@ async function findLauncherDir() {
 			</Button>
 			<p class="m-0 leading-tight text-secondary">
 				{{ formatMessage(messages.appDatabaseBackupsDescription) }}
+			</p>
+		</div>
+
+		<div class="flex flex-col gap-2.5">
+			<h2 class="m-0 text-lg font-semibold text-contrast">
+				{{ formatMessage(messages.debugInfoTitle) }}
+			</h2>
+			<Button
+				id="export-debug-info"
+				class="w-fit"
+				:disabled="exportingDebugInfo"
+				:loading="exportingDebugInfo"
+				@click="handleExportDebugInfo"
+			>
+				<LoaderCircleIcon
+					v-if="exportingDebugInfo"
+					class="motion-safe:animate-spin"
+					aria-hidden="true"
+				/>
+				<DownloadIcon v-else aria-hidden="true" />
+				{{ formatMessage(messages.exportDebugInfo) }}
+			</Button>
+			<p class="m-0 leading-tight text-secondary">
+				{{ formatMessage(messages.debugInfoDescription) }}
 			</p>
 		</div>
 	</div>

@@ -509,7 +509,21 @@ where
     Ok((size, hasher.digest().to_string()))
 }
 
-pub(crate) async fn install_zipped_mrpack_files_with_reporter(
+pub(crate) fn install_zipped_mrpack_files_with_reporter(
+    create_pack: CreatePack,
+    ignore_lock: bool,
+    reason: DownloadReason,
+    reporter: InstallProgressReporter,
+) -> impl Future<Output = crate::Result<String>> + Send + 'static {
+    Box::pin(install_zipped_mrpack_files_with_reporter_inner(
+        create_pack,
+        ignore_lock,
+        reason,
+        reporter,
+    ))
+}
+
+async fn install_zipped_mrpack_files_with_reporter_inner(
     create_pack: CreatePack,
     ignore_lock: bool,
     reason: DownloadReason,

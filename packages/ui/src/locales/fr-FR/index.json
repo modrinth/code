@@ -1238,9 +1238,6 @@
   "external-files.permissions-card.editor.save": {
     "defaultMessage": "Sauvegarder"
   },
-  "external-files.permissions-card.editor.select-license-label": {
-    "defaultMessage": "Sélectionnez une licence..."
-  },
   "external-files.permissions-card.editor.type-label": {
     "defaultMessage": "Motif de l'autorisation"
   },
@@ -2047,9 +2044,6 @@
   },
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Serveur réinitialisé à l'intégration"
-  },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "Options de prise en charge"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Jusqu'à {cpus} processeurs"
@@ -3340,6 +3334,12 @@
   },
   "profile.error.not-found": {
     "defaultMessage": "Utilisateur introuvable"
+  },
+  "profile.force-password-reset.button": {
+    "defaultMessage": "Réinitialiser le mot de passe"
+  },
+  "profile.force-password-reset.email-label": {
+    "defaultMessage": "Adresse email du compte"
   },
   "profile.label.affiliate": {
     "defaultMessage": "Affilié"
@@ -6787,6 +6787,27 @@
   },
   "unknown-file-warning-modal.unrecognized-files": {
     "defaultMessage": "Fichiers non reconnus"
+  },
+  "update-all-modal.new-version": {
+    "defaultMessage": "Nouvelle version"
+  },
+  "update-all-modal.no-changelog": {
+    "defaultMessage": "Aucun journal des modifications n'est fourni pour cette version."
+  },
+  "update-all-modal.project": {
+    "defaultMessage": "Projet"
+  },
+  "update-all-modal.project-list": {
+    "defaultMessage": "MàJ des projets"
+  },
+  "update-all-modal.results": {
+    "defaultMessage": "{count, plural, one {# projet prêt à être mis à jour} other {# projets prêts à être mis à jour}}"
+  },
+  "update-all-modal.update": {
+    "defaultMessage": "Mettre {count, plural, one {# projet} other {# projets}} à jour"
+  },
+  "update-all-modal.view": {
+    "defaultMessage": "Voir"
   },
   "user.profile.badge.alpha.about.1": {
     "defaultMessage": "Cet utilisateur existe depuis Modrinth Alpha, qui s'est terminé en novembre 2020."

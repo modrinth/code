@@ -582,7 +582,7 @@
     "message": "Windows"
   },
   "app-marketing.features.importing.description": {
-    "message": "Importiere all deine existierenden Instanzen von einem zuvor benutzten Launcher und starte in Sekunden!"
+    "message": "Importiere alle deine bestehenden Spielinstanzen aus dem Launcher, den du zuvor verwendet hast, und leg in Sekundenschnelle mit der Modrinth App los!"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -899,17 +899,11 @@
   "auth.sign-in.launcher.callback.title": {
     "message": "Callback für die Anmeldung bei der Modrinth App"
   },
-  "auth.sign-in.launcher.complete.description": {
-    "message": "Wir leiten dich zurück zur Modrinth-App. Sollte nichts passieren, klicke bitte auf die Schaltfläche unten."
-  },
   "auth.sign-in.launcher.complete.go-to-website": {
     "message": "Gehe zu Modrinth.com"
   },
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Modrinth App öffnen"
-  },
-  "auth.sign-in.launcher.complete.title": {
-    "message": "Du bist angemeldet"
   },
   "auth.sign-in.launcher.opening.description": {
     "message": "Falls sich die App nicht öffnet, klicke auf den Button unten, um die Anmeldung abzuschließen."
@@ -2972,6 +2966,9 @@
   "layout.publish.email-verification-required.title": {
     "message": "E-Mail-Bestätigung erforderlich"
   },
+  "messages.noResults": {
+    "message": "Keine Ergebnisse für deine Suche gefunden!"
+  },
   "modal.shared-instance.open-in-app.benefit.install": {
     "message": "Installiere automatisch alles, was gerade gespielt wird"
   },
@@ -4118,8 +4115,14 @@
   "project.settings.license.custom": {
     "message": "Benutzerdefiniert"
   },
+  "project.settings.license.custom-name-required": {
+    "message": "Gib einen Namen für deine benutzerdefinierte Lizenz ein."
+  },
   "project.settings.license.custom-url-description": {
-    "message": "Die Webadresse des vollständigen Lizenztextes. Du musst einen Link angeben, da es sich um eine benutzerdefinierte Lizenz handelt."
+    "message": "Die Web-Adresse des vollständigen Lizenztextes."
+  },
+  "project.settings.license.intro": {
+    "message": "Es ist wichtig, eine geeignete Lizenz für dein {type} auszuwählen. Du kannst eine Lizenz aus unserer Liste auswählen oder eine benutzerdefinierte Lizenz angeben. Du kannst auch eine benutzerdefinierte URL zu deiner ausgewählten Lizenz angeben; andernfalls wird der Lizenztext angezeigt. Weitere Informationen findest du in unserem <guide>Leitfaden zur Lizenzierung</guide>."
   },
   "project.settings.license.later": {
     "message": "Später Ausgaben"
@@ -4133,6 +4136,9 @@
   "project.settings.license.name": {
     "message": "Lizenzname"
   },
+  "project.settings.license.name-description": {
+    "message": "Der vollständige Name der benutzerdefinierten Lizenz."
+  },
   "project.settings.license.name-placeholder": {
     "message": "Lizenzname"
   },
@@ -4140,10 +4146,10 @@
     "message": "Optional"
   },
   "project.settings.license.select": {
-    "message": "Eine Lizenz auswählen"
+    "message": "Lizenz"
   },
   "project.settings.license.select-placeholder": {
-    "message": "Lizenz auswählen..."
+    "message": "Lizenzen suchen..."
   },
   "project.settings.license.title": {
     "message": "Lizenz"
@@ -4159,6 +4165,9 @@
   },
   "project.settings.license.url-description": {
     "message": "Die Webadresse des vollständigen Lizenztextes. Falls du keinen Link angibst, wird stattdessen der Lizenztext angezeigt."
+  },
+  "project.settings.license.url-placeholder": {
+    "message": "Lizenz-URL"
   },
   "project.settings.links.add-link": {
     "message": "Link hinzufügen"
@@ -4187,8 +4196,29 @@
   "project.settings.links.donations": {
     "message": "Spenden-Links"
   },
+  "project.settings.links.donations-description": {
+    "message": "Füge Spendenlinks hinzu, über die Benutzer dich direkt unterstützen können."
+  },
+  "project.settings.links.issues": {
+    "message": "Issue-Tracker"
+  },
+  "project.settings.links.issues-description": {
+    "message": "Ein Ort, an dem Benutzer Fehler, Probleme und Anliegen zu deinem Projekt melden können."
+  },
+  "project.settings.links.link-type": {
+    "message": "Linktyp"
+  },
+  "project.settings.links.remove-donation-link": {
+    "message": "Spendenlink entfernen"
+  },
   "project.settings.links.server-discord": {
     "message": "Discord"
+  },
+  "project.settings.links.server-updated": {
+    "message": "Deine Serverlinks wurden aktualisiert."
+  },
+  "project.settings.links.server-wiki-description": {
+    "message": "Eine Seite mit Informationen, Dokumentation und Hilfe zum Server."
   },
   "project.settings.links.site": {
     "message": "Webseite"

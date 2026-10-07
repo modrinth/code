@@ -1,9 +1,9 @@
 {
   "app.action-bar.downloading-java": {
-    "message": "Đang tải xuống Java {version}"
+    "message": "Đang tải Java {version}"
   },
   "app.action-bar.downloading-update": {
-    "message": "Đang tải xuống bản cập nhật"
+    "message": "Đang tải bản cập nhật"
   },
   "app.action-bar.downloads": {
     "message": "Tải xuống"
@@ -12,7 +12,7 @@
     "message": "Ẩn các lượt tải xuống đang hoạt động"
   },
   "app.action-bar.hide-more-running-instances": {
-    "message": "Đóng các phiên bản đang chạy"
+    "message": "Ẩn bớt các bản cài đặt đang chạy"
   },
   "app.action-bar.install.copied-details": {
     "message": "Đã sao chép"
@@ -24,85 +24,88 @@
     "message": "Bỏ qua"
   },
   "app.action-bar.install.open-instance": {
-    "message": "Xem phiên bản"
+    "message": "Mở bản cài đặt"
   },
   "app.action-bar.install.retry": {
     "message": "Thử lại"
   },
   "app.action-bar.install.summary.app-closing": {
-    "message": "Đã hủy do đóng ứng dụng"
+    "message": "Đã hủy do ứng dụng đang đóng"
   },
   "app.action-bar.install.summary.bad-modpack-file": {
-    "message": "Không đọc được modpack"
+    "message": "Không thể đọc modpack"
   },
   "app.action-bar.install.summary.canceled": {
     "message": "Đã hủy"
   },
   "app.action-bar.install.summary.cleanup-incomplete": {
-    "message": "Dọn dẹp không hoàn thện"
+    "message": "Dọn dẹp chưa hoàn tất"
   },
   "app.action-bar.install.summary.content-download-failed": {
-    "message": "Không tải được tệp"
+    "message": "Không thể tải các tệp"
   },
   "app.action-bar.install.summary.corrupt-download": {
-    "message": "Tệp được tải bị hỏng"
+    "message": "Tệp đã tải xuống bị hỏng"
   },
   "app.action-bar.install.summary.could-not-save-files": {
-    "message": "Không lưu được tệp"
+    "message": "Không thể lưu các tệp"
   },
   "app.action-bar.install.summary.download-failed": {
-    "message": "Không hoàn tất tải xuống"
+    "message": "Không thể hoàn tất tải xuống"
+  },
+  "app.action-bar.install.summary.instance-error": {
+    "message": "Không thể chuẩn bị bản cài đặt"
   },
   "app.action-bar.install.summary.invalid-file-path": {
-    "message": "Đường dẫn tệp tin không hợp lệ"
+    "message": "Đường dẫn tệp không hợp lệ"
   },
   "app.action-bar.install.summary.invalid-modpack": {
     "message": "Dữ liệu modpack không hợp lệ"
   },
   "app.action-bar.install.summary.invalid-modpack-files": {
-    "message": "Tệp modpack có metadata không hợp lệ"
+    "message": "Các tệp modpack có siêu dữ liệu không hợp lệ"
   },
   "app.action-bar.install.summary.java-setup-failed": {
-    "message": "Quá trình cài đặt Java không thể hoàn thành"
+    "message": "Không thể hoàn tất thiết lập Java"
   },
   "app.action-bar.install.summary.loader-setup-failed": {
-    "message": "Cài đặt Loader thất bại"
+    "message": "Thiết lập bộ nạp thất bại"
   },
   "app.action-bar.install.summary.local-data-error": {
     "message": "Không thể cập nhật dữ liệu cục bộ"
   },
   "app.action-bar.install.summary.minecraft-setup-failed": {
-    "message": "Cài đặt Minecraft thất bại"
+    "message": "Thiết lập Minecraft thất bại"
   },
   "app.action-bar.install.summary.modrinth-unreachable": {
-    "message": "Không thể kết nối được với Modrinth"
+    "message": "Không thể kết nối tới Modrinth"
   },
   "app.action-bar.install.summary.no-write-permission": {
-    "message": "Không có quyền để viết"
+    "message": "Không có quyền ghi"
   },
   "app.action-bar.install.summary.pack-download-failed": {
-    "message": "Không thể tải xuống gói"
+    "message": "Không thể tải gói"
   },
   "app.action-bar.install.summary.unexpected-error": {
     "message": "Đã xảy ra lỗi"
   },
   "app.action-bar.install.unknown-instance": {
-    "message": "Instance không rõ"
+    "message": "Bản cài đặt không xác định"
   },
   "app.action-bar.install.updating-shared-content": {
     "message": "Đang cập nhật nội dung được chia sẻ"
   },
   "app.action-bar.make-primary-instance": {
-    "message": "Đặt làm bản instance chính"
+    "message": "Đặt làm bản cài đặt chính"
   },
   "app.action-bar.no-instances-running": {
-    "message": "Không có phiên bản nào đang chạy"
+    "message": "Không có bản cài đặt nào đang chạy"
   },
   "app.action-bar.offline": {
     "message": "Ngoại tuyến"
   },
   "app.action-bar.primary-instance": {
-    "message": "Bản instance chính"
+    "message": "Bản cài đặt chính"
   },
   "app.action-bar.reload-to-update": {
     "message": "Tải lại để cập nhật"
@@ -111,28 +114,28 @@
     "message": "Hiển thị các lượt tải xuống đang hoạt động"
   },
   "app.action-bar.show-more-running-instances": {
-    "message": "Hiện thêm các phiên bản đang chạy"
+    "message": "Hiển thị thêm các bản cài đặt đang chạy"
   },
   "app.action-bar.stop-instance": {
-    "message": "Dừng instance"
+    "message": "Dừng bản cài đặt"
   },
   "app.action-bar.update": {
     "message": "Cập nhật"
   },
   "app.action-bar.view-active-downloads": {
-    "message": "Xem các lượt tải xuống"
+    "message": "Xem các lượt tải xuống đang hoạt động"
   },
   "app.action-bar.view-instance": {
-    "message": "Xem phiên bản"
+    "message": "Xem bản cài đặt"
   },
   "app.action-bar.view-logs": {
-    "message": "Xem logs"
+    "message": "Xem nhật ký"
   },
   "app.ads-consent.accept": {
     "message": "Chấp nhận tất cả"
   },
   "app.ads-consent.body": {
-    "message": "Quảng cáo giúp Modrinth hoạt động và tài trợ cho việc thanh toán cho người sáng tạo nội dung. Các đối tác của chúng tôi có thể lưu trữ hoặc truy cập cookie trong ứng dụng để cá nhân hóa quảng cáo và đo lường hiệu suất."
+    "message": "Quảng cáo giúp Modrinth duy trì hoạt động và chi trả cho nhà sáng tạo. Các đối tác của chúng tôi có thể lưu trữ hoặc truy cập cookie trong ứng dụng để cá nhân hóa quảng cáo và đo lường hiệu quả."
   },
   "app.ads-consent.manage": {
     "message": "Quản lý tùy chọn"
@@ -144,10 +147,10 @@
     "message": "Quyền riêng tư của bạn và cách quảng cáo hỗ trợ Modrinth"
   },
   "app.appearance-settings.compact-mode.description": {
-    "message": "Hiển thị thư viện phiên bản theo bố cục hàng nhỏ gọn."
+    "message": "Hiển thị các bản cài đặt trong thư viện theo bố cục hàng thu gọn."
   },
   "app.appearance-settings.compact-mode.title": {
-    "message": "Chế độ nhỏ gọn"
+    "message": "Chế độ thu gọn"
   },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Trang chủ"
@@ -156,40 +159,40 @@
     "message": "Thư viện"
   },
   "app.appearance-settings.hide-nametag.description": {
-    "message": "Ẩn tên người dùng của bạn phía trên phần xem trước nhân vật tại trang chọn giao diện skin."
+    "message": "Ẩn tên người dùng phía trên phần xem trước nhân vật trên trang chọn skin."
   },
   "app.appearance-settings.hide-nametag.title": {
-    "message": "Ẩn thẻ tên"
+    "message": "Ẩn tên người chơi"
   },
   "app.appearance-settings.minimize-launcher.description": {
-    "message": "Thu nhỏ ứng dụng Modrinth khi Minecraft khởi động."
+    "message": "Thu nhỏ Ứng dụng Modrinth khi Minecraft khởi động."
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "Thu nhỏ ứng dụng"
   },
   "app.appearance-settings.show-play-time.description": {
-    "message": "Hiển thị thời gian bạn đã chơi mỗi phiên."
+    "message": "Hiển thị thời gian bạn đã chơi trên từng bản cài đặt."
   },
   "app.appearance-settings.show-play-time.title": {
-    "message": "Hiện thời gian chơi"
+    "message": "Hiển thị thời gian chơi"
   },
   "app.appearance-settings.skip-non-essential-warnings.description": {
-    "message": "Bỏ qua bước xác nhận đối với các thao tác ít rủi ro như cài đặt lại, xóa nội dung thông thường, cập nhật hàng loạt, hủy liên kết và sửa chữa. Các cảnh báo cho những thao tác nguy hiểm sẽ luôn được hiển thị."
+    "message": "Bỏ qua bước xác nhận cho các thao tác ít rủi ro như cài bản sao, xóa nội dung thông thường, cập nhật hàng loạt, gỡ liên kết và sửa lỗi. Cảnh báo cho các thao tác nguy hiểm luôn được hiển thị."
   },
   "app.appearance-settings.skip-non-essential-warnings.title": {
-    "message": "Bỏ qua các cảnh báo không quan trọng"
+    "message": "Bỏ qua cảnh báo không thiết yếu"
   },
   "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Ẩn thanh bên phải theo mặc định và thêm nút để hiển thị hoặc ẩn nó."
+    "message": "Mặc định ẩn thanh bên phải và thêm nút để hiển thị hoặc ẩn thanh này."
   },
   "app.appearance-settings.toggle-sidebar.title": {
-    "message": "Ẩn thanh bên"
+    "message": "Ẩn thanh bên phải"
   },
   "app.appearance-settings.unknown-pack-warning.description": {
-    "message": "Hiển thị cảnh báo an toàn trước khi cài đặt một gói Modrinth (.mrpack) không được lưu trữ trên Modrinth."
+    "message": "Hiển thị cảnh báo an toàn trước khi cài Modrinth Pack (.mrpack) không được lưu trữ trên Modrinth."
   },
   "app.appearance-settings.unknown-pack-warning.title": {
-    "message": "Cảnh báo tôi trước khi cài đặt các modpacks không rõ nguồn gốc"
+    "message": "Cảnh báo trước khi cài modpack không xác định"
   },
   "app.auth-servers.unreachable.body": {
     "message": "Máy chủ xác thực của Minecraft có thể đang bị sập. Hãy kiểm tra kết nối Internet của bạn và thử lại sau."
@@ -198,31 +201,37 @@
     "message": "Không thể kết nối đến máy chủ xác thực"
   },
   "app.behavior-settings.confirmations.title": {
-    "message": "Các xác nhận"
+    "message": "Xác nhận"
   },
   "app.behavior-settings.content.title": {
-    "message": "Nhà và nội dung"
+    "message": "Trang chủ và nội dung"
+  },
+  "app.behavior-settings.refocus-on-game-close.description": {
+    "message": "Đưa Ứng dụng Modrinth ra phía trước khi Minecraft thoát."
+  },
+  "app.behavior-settings.refocus-on-game-close.title": {
+    "message": "Đưa ứng dụng ra trước khi Minecraft đóng"
   },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Khởi động và điều hướng"
   },
   "app.behavior-settings.sync-across-devices.description": {
-    "message": "Sử dụng các cài đặt hành vi này ở mọi nơi bạn đăng nhập. Hãy tắt tùy chọn này nếu muốn duy trì các cài đặt riêng cho thiết bị này."
+    "message": "Dùng các cài đặt hành vi này ở mọi nơi bạn đăng nhập. Tắt tùy chọn này để giữ cài đặt riêng trên thiết bị này."
   },
   "app.behavior-settings.sync-across-devices.signed-out-tooltip": {
-    "message": "Đăng nhập vào tài khoản Modrinth để đồng bộ hóa cài đặt."
+    "message": "Đăng nhập tài khoản Modrinth để đồng bộ cài đặt."
   },
   "app.behavior-settings.sync-across-devices.title": {
-    "message": "Đồng bộ hóa hành vi trên các thiết bị"
+    "message": "Đồng bộ hành vi giữa các thiết bị"
   },
   "app.browse.add-servers-to-instance": {
-    "message": "Thêm máy chủ vào phiên bản"
+    "message": "Đang thêm máy chủ vào bản cài đặt"
   },
   "app.browse.add-to-an-instance": {
-    "message": "Thêm vào phiên bản"
+    "message": "Thêm vào một bản cài đặt"
   },
   "app.browse.add-to-instance": {
-    "message": "Thêm vào hồ sơ"
+    "message": "Thêm vào bản cài đặt"
   },
   "app.browse.add-to-instance-name": {
     "message": "Thêm vào {instanceName}"
@@ -234,7 +243,7 @@
     "message": "Đã được thêm"
   },
   "app.browse.back-to-instance": {
-    "message": "Quay lại phiên bản"
+    "message": "Quay lại bản cài đặt"
   },
   "app.browse.discover-project-type": {
     "message": "Khám phá {projectType}"
@@ -243,13 +252,13 @@
     "message": "Khám phá máy chủ"
   },
   "app.browse.hide-added-servers": {
-    "message": "Ẩn máy chủ đã thêm vào"
+    "message": "Ẩn các máy chủ đã thêm"
   },
   "app.browse.hide-installed-modpacks": {
-    "message": "Ẩn modpacks đã cài đặt"
+    "message": "Ẩn nội dung đã cài"
   },
   "app.browse.project-actions.label": {
-    "message": "Hành động cho dự án"
+    "message": "Thao tác với dự án"
   },
   "app.browse.project-type.data-packs": {
     "message": "Các gói dữ liệu"
@@ -258,46 +267,139 @@
     "message": "Modpack"
   },
   "app.browse.project-type.mods": {
-    "message": "Mods"
+    "message": "Mod"
   },
   "app.browse.project-type.resource-packs": {
-    "message": "Các gói tài nguyên"
+    "message": "Gói tài nguyên"
   },
   "app.browse.project-type.servers": {
     "message": "Máy chủ"
   },
   "app.browse.project-type.shaders": {
-    "message": "Shaders"
+    "message": "Shader"
   },
   "app.browse.server-instance-content-warning": {
-    "message": "Việc thêm nội dung có thể khiến bạn không thể tham gia máy chủ này. Mọi nội dung bạn thêm vào sẽ bị xóa khi nội dung do máy chủ quản lý được cập nhật."
+    "message": "Việc thêm nội dung có thể khiến bạn không thể tham gia máy chủ này. Mọi nội dung bạn thêm sẽ bị gỡ khi nội dung máy chủ được quản lý được cập nhật."
   },
   "app.browse.server.installing": {
     "message": "Đang cài đặt"
   },
   "app.content-install.no-compatible-versions": {
-    "message": "Không có phiên bản nào phù hợp với {compatibilityLabel}. Nếu vẫn chọn một phiên bản để cài đặt, các gói phụ thuộc sẽ không được tải tự động."
+    "message": "Không có phiên bản khả dụng nào phù hợp với {compatibilityLabel}. Hãy chọn một phiên bản nếu vẫn muốn cài đặt. Các phần phụ thuộc sẽ không được cài tự động."
   },
   "app.content.desync-pack": {
-    "message": "Bỏ đồng bộ"
+    "message": "Ngừng đồng bộ"
+  },
+  "app.content.sync-data-packs-disabled": {
+    "message": "Trước tiên hãy bật đồng bộ gói dữ liệu trong cài đặt ứng dụng."
   },
   "app.content.sync-pack": {
     "message": "Đồng bộ"
+  },
+  "app.content.sync-packs-override": {
+    "message": "Trước tiên hãy tắt tùy chọn ghi đè đồng bộ gói trong cài đặt của bản cài đặt này."
+  },
+  "app.content.sync-resource-packs-disabled": {
+    "message": "Trước tiên hãy bật đồng bộ gói tài nguyên trong cài đặt ứng dụng."
+  },
+  "app.download-manager.active": {
+    "message": "Hoạt động"
+  },
+  "app.download-manager.attention": {
+    "message": "Cần chú ý"
+  },
+  "app.download-manager.bulk-update-content": {
+    "message": "Đang cập nhật {count, plural, one {# mục} other {# mục}}"
+  },
+  "app.download-manager.cancel": {
+    "message": "Hủy cài đặt"
+  },
+  "app.download-manager.canceling": {
+    "message": "Đang hủy cài đặt…"
+  },
+  "app.download-manager.clear-all": {
+    "message": "Xóa tất cả"
+  },
+  "app.download-manager.clear-completed": {
+    "message": "Xóa tất cả tác vụ đã hoàn tất"
+  },
+  "app.download-manager.complete": {
+    "message": "Hoàn tất"
+  },
+  "app.download-manager.duplicated-instance": {
+    "message": "Đã nhân bản bản cài đặt"
+  },
+  "app.download-manager.empty": {
+    "message": "Không có tác vụ cài đặt"
+  },
+  "app.download-manager.estimated-rate": {
+    "message": "Tốc độ tải xuống ước tính"
+  },
+  "app.download-manager.eta": {
+    "message": "Thời gian tải xuống còn lại ước tính"
+  },
+  "app.download-manager.hide": {
+    "message": "Ẩn tác vụ cài đặt"
+  },
+  "app.download-manager.imported-instance": {
+    "message": "Đã nhập bản cài đặt"
+  },
+  "app.download-manager.instance-installation": {
+    "message": "Cài đặt bản cài đặt"
+  },
+  "app.download-manager.modpack": {
+    "message": "Modpack"
+  },
+  "app.download-manager.modpack-installation": {
+    "message": "Cài đặt modpack"
+  },
+  "app.download-manager.new-instance": {
+    "message": "Bản cài đặt mới"
+  },
+  "app.download-manager.pause": {
+    "message": "Tạm dừng cài đặt"
+  },
+  "app.download-manager.paused": {
+    "message": "Đã tạm dừng"
+  },
+  "app.download-manager.remove": {
+    "message": "Xóa khỏi lịch sử"
+  },
+  "app.download-manager.resume": {
+    "message": "Tiếp tục cài đặt"
+  },
+  "app.download-manager.shared-instance": {
+    "message": "Bản cài đặt được chia sẻ"
+  },
+  "app.download-manager.shared-instance-update": {
+    "message": "Cập nhật bản cài đặt được chia sẻ"
+  },
+  "app.download-manager.show": {
+    "message": "Hiển thị tác vụ cài đặt"
+  },
+  "app.download-manager.tasks": {
+    "message": "Tác vụ"
+  },
+  "app.download-manager.title": {
+    "message": "Trình quản lý tải xuống"
+  },
+  "app.download-manager.verifying": {
+    "message": "Đang xác minh"
   },
   "app.error.state-init.open-backups-folder": {
     "message": "Mở thư mục sao lưu"
   },
   "app.export-modal.description-placeholder": {
-    "message": "Thêm miêu tả cho gói modpack..."
+    "message": "Nhập mô tả modpack..."
   },
   "app.export-modal.export-button": {
     "message": "Xuất"
   },
   "app.export-modal.export-complete": {
-    "message": "Hoàn thành xuất"
+    "message": "Xuất hoàn tất"
   },
   "app.export-modal.export-complete-description": {
-    "message": "{name} đã được xuất thành công."
+    "message": "Đã xuất {name} thành công."
   },
   "app.export-modal.header": {
     "message": "Xuất modpack"
@@ -309,49 +411,100 @@
     "message": "Tên modpack"
   },
   "app.export-modal.version-number-label": {
-    "message": "Phiên bản"
+    "message": "Số phiên bản"
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
   },
+  "app.features-settings.instance-pages.title": {
+    "message": "Bản cài đặt"
+  },
+  "app.features-settings.play-page.title": {
+    "message": "Trang Chơi"
+  },
+  "app.features-settings.quick-instances.description": {
+    "message": "Chọn số lượng tối đa các bản cài đặt gần đây hiển thị trên thanh bên trái. Bạn cũng có thể điều chỉnh bằng cách kéo đường phân cách."
+  },
+  "app.features-settings.quick-instances.title": {
+    "message": "Bản cài đặt nhanh trên thanh bên"
+  },
+  "app.features-settings.show-all-screenshots.description": {
+    "message": "Hiển thị nút ở thanh bên trái để xem ảnh chụp màn hình từ tất cả bản cài đặt."
+  },
+  "app.features-settings.show-all-screenshots.title": {
+    "message": "Hiển thị tất cả ảnh chụp màn hình trên thanh bên"
+  },
+  "app.features-settings.show-files-tab.title": {
+    "message": "Hiển thị thẻ Tệp trong các bản cài đặt"
+  },
+  "app.features-settings.show-jump-in.description": {
+    "message": "Hiển thị các thế giới và bản cài đặt chơi gần đây ở đầu trang Chơi."
+  },
+  "app.features-settings.show-jump-in.title": {
+    "message": "Hiển thị mục Chơi tiếp"
+  },
+  "app.features-settings.show-screenshots-tab.title": {
+    "message": "Hiển thị thẻ Ảnh chụp màn hình trong các bản cài đặt"
+  },
+  "app.features-settings.show-skin-selector.description": {
+    "message": "Hiển thị nút ở thanh bên trái để mở trình chọn skin."
+  },
   "app.features-settings.show-skin-selector.title": {
-    "message": "Hiển thị phần chọn skin ở thanh bên"
+    "message": "Hiển thị trình chọn skin trên thanh bên"
+  },
+  "app.features-settings.show-worlds-tab.title": {
+    "message": "Hiển thị thẻ Thế giới trong các bản cài đặt"
   },
   "app.features-settings.sidebar.title": {
     "message": "Thanh bên"
   },
+  "app.features-settings.sync-across-devices.description": {
+    "message": "Dùng các cài đặt tính năng này ở mọi nơi bạn đăng nhập. Tắt tùy chọn này để giữ cài đặt riêng trên thiết bị này."
+  },
+  "app.features-settings.sync-across-devices.signed-out-tooltip": {
+    "message": "Đăng nhập tài khoản Modrinth để đồng bộ cài đặt."
+  },
+  "app.features-settings.sync-across-devices.title": {
+    "message": "Đồng bộ tính năng giữa các thiết bị"
+  },
+  "app.home.jump-back-in.actions.label": {
+    "message": "Thao tác với bản cài đặt"
+  },
   "app.home.jump-back-in.instance-locked": {
-    "message": "Phiên bản này đã bị khóa"
+    "message": "Bản cài đặt này đã bị khóa"
   },
   "app.home.jump-back-in.instance-open": {
-    "message": "Phiên bản đã được mở"
+    "message": "Bản cài đặt đã được mở"
   },
   "app.home.jump-back-in.more-options": {
-    "message": "Thêm lựa chọn"
+    "message": "Tùy chọn khác"
   },
   "app.home.jump-back-in.never-played": {
     "message": "Chưa từng chơi"
   },
   "app.home.jump-back-in.new-instance": {
-    "message": "Thêm phiên bản"
+    "message": "Bản cài đặt mới"
   },
   "app.home.jump-back-in.resize": {
     "message": "Kéo để thay đổi kích thước"
   },
   "app.home.jump-back-in.title": {
-    "message": "Tham gia ngay"
+    "message": "Chơi tiếp"
   },
   "app.home.jump-back-in.view-instance": {
-    "message": "Xem phiên bản"
+    "message": "Xem bản cài đặt"
   },
   "app.hosting.update-required.description": {
-    "message": "Bạn cần cập nhật để sử dụng Modrinth Hosting thông qua ứng dụng Modrinth"
+    "message": "Bạn cần cập nhật để sử dụng Modrinth Hosting qua Ứng dụng Modrinth"
   },
   "app.hosting.update-required.download": {
     "message": "Tải xuống để cập nhật"
   },
+  "app.hosting.update-required.rinthbot-alt": {
+    "message": "Bot Modrinth đang phấn khích"
+  },
   "app.hosting.update-required.title": {
-    "message": "Yêu cầu cập nhật ứng dụng Modrinth"
+    "message": "Yêu cầu cập nhật Ứng dụng Modrinth"
   },
   "app.install.phase.downloading_content": {
     "message": "Đang tải nội dung"
@@ -363,13 +516,13 @@
     "message": "Đang tải tệp gói"
   },
   "app.install.phase.extracting_overrides": {
-    "message": "Trích xuất ghi đè"
+    "message": "Đang giải nén tệp ghi đè"
   },
   "app.install.phase.finalizing": {
-    "message": "Hoàn tất"
+    "message": "Đang hoàn tất"
   },
   "app.install.phase.preparing_instance": {
-    "message": "Đã thêm vào hàng chờ tải"
+    "message": "Đã xếp hàng chờ cài đặt"
   },
   "app.install.phase.preparing_java": {
     "message": "Đang chuẩn bị Java"
@@ -378,13 +531,40 @@
     "message": "Đang tải Java {version}"
   },
   "app.install.phase.preparing_java.extracting": {
-    "message": "Trích xuất Java {version}"
+    "message": "Đang giải nén Java {version}"
   },
   "app.install.phase.preparing_java.fetching-metadata": {
-    "message": "Đang tìm Java {version}"
+    "message": "Đang lấy siêu dữ liệu Java {version}"
   },
   "app.install.phase.preparing_java.resolving": {
     "message": "Đang chuẩn bị Java {version}"
+  },
+  "app.install.phase.preparing_java.validating": {
+    "message": "Đang kiểm tra Java {version}"
+  },
+  "app.install.phase.reading_pack_manifest": {
+    "message": "Đang đọc tệp manifest của gói"
+  },
+  "app.install.phase.resolving_loader": {
+    "message": "Đang xác định bộ nạp"
+  },
+  "app.install.phase.resolving_minecraft": {
+    "message": "Đang xác định Minecraft"
+  },
+  "app.install.phase.resolving_pack": {
+    "message": "Đang xác định nội dung"
+  },
+  "app.install.phase.rolling_back": {
+    "message": "Đang hoàn tác"
+  },
+  "app.install.phase.running_loader_processors": {
+    "message": "Đang chạy trình xử lý của bộ nạp"
+  },
+  "app.instance.action.add-content": {
+    "message": "Thêm nội dung"
+  },
+  "app.instance.action.copy-path": {
+    "message": "Sao chép đường dẫn"
   },
   "app.instance.action.edit": {
     "message": "Chỉnh sửa"
@@ -398,35 +578,107 @@
   "app.instance.action.stop": {
     "message": "Dừng"
   },
+  "app.instance.actions.label": {
+    "message": "Thao tác với bản cài đặt"
+  },
   "app.instance.add-server.add": {
     "message": "Thêm"
   },
+  "app.instance.add-server.added": {
+    "message": "Đã thêm"
+  },
+  "app.instance.add-server.adding": {
+    "message": "Đang thêm..."
+  },
+  "app.instance.add-server.cancel": {
+    "message": "Hủy"
+  },
+  "app.instance.add-server.compatibility-warning": {
+    "message": "Máy chủ này có thể không tương thích với tất cả bản cài đặt."
+  },
+  "app.instance.add-server.search-placeholder": {
+    "message": "Tìm bản cài đặt"
+  },
+  "app.instance.add-server.title": {
+    "message": "Thêm máy chủ vào bản cài đặt"
+  },
+  "app.instance.admonitions.shared-instance.added-label": {
+    "message": "Đã thêm"
+  },
+  "app.instance.admonitions.shared-instance.changes-body": {
+    "message": "Bản cài đặt trên máy của bạn có các thay đổi mới hơn bản của những người được chia sẻ."
+  },
+  "app.instance.admonitions.shared-instance.changes-header": {
+    "message": "Các thay đổi của bạn chưa được chia sẻ"
+  },
+  "app.instance.admonitions.shared-instance.publish-button": {
+    "message": "Gửi bản cập nhật"
+  },
+  "app.instance.admonitions.shared-instance.publishing-button": {
+    "message": "Đang gửi bản cập nhật..."
+  },
+  "app.instance.admonitions.shared-instance.removed-label": {
+    "message": "Đã gỡ"
+  },
+  "app.instance.admonitions.shared-instance.review-admonition-header": {
+    "message": "Gửi bản cập nhật"
+  },
+  "app.instance.admonitions.shared-instance.review-description": {
+    "message": "Xem lại các thay đổi nội dung sẽ được chia sẻ với mọi người đang dùng bản cài đặt này."
+  },
   "app.instance.admonitions.shared-instance.review-header": {
-    "message": "Xem lại các thay đổi"
+    "message": "Xem lại thay đổi"
   },
   "app.instance.admonitions.shared-instance.reviewing-button": {
-    "message": "Đang xem xét..."
+    "message": "Đang xem lại..."
+  },
+  "app.instance.card.icon-alt": {
+    "message": "Biểu tượng bản cài đặt"
+  },
+  "app.instance.card.installing": {
+    "message": "Đang cài đặt..."
   },
   "app.instance.card.loading": {
-    "message": "Đang tải phiên bản..."
+    "message": "Bản cài đặt đang tải..."
+  },
+  "app.instance.card.never-played": {
+    "message": "Chưa từng chơi"
+  },
+  "app.instance.card.play": {
+    "message": "Chơi"
+  },
+  "app.instance.card.played": {
+    "message": "Đã chơi {relativeTime}"
+  },
+  "app.instance.card.repair": {
+    "message": "Sửa lỗi"
+  },
+  "app.instance.card.stop": {
+    "message": "Dừng"
   },
   "app.instance.confirm-delete.admonition-body": {
-    "message": "Tất cả dữ liệu trong gói hồ sơ này sẽ bị xoá, bao gồm thế giới của bạn, cấu hình, và tất cả nội dung đã được tải xuống."
+    "message": "Toàn bộ dữ liệu của bản cài đặt sẽ bị xóa vĩnh viễn, bao gồm thế giới, cấu hình và mọi nội dung đã cài."
   },
   "app.instance.confirm-delete.admonition-header": {
-    "message": "Hành động này sẽ không thể huỷ bỏ"
+    "message": "Không thể hoàn tác thao tác này"
   },
   "app.instance.confirm-delete.bulk-admonition-body": {
-    "message": "Tất cả dữ liệu của {count} phiên bản này sẽ bị xóa vĩnh viễn, bao gồm thế giới, cấu hình và toàn bộ nội dung đã cài đặt."
+    "message": "Toàn bộ dữ liệu của {count} bản cài đặt này sẽ bị xóa vĩnh viễn, bao gồm thế giới, cấu hình và mọi nội dung đã cài."
   },
   "app.instance.confirm-delete.bulk-delete-button": {
-    "message": "Xóa {count} mục"
+    "message": "Xóa {count} bản cài đặt"
+  },
+  "app.instance.confirm-delete.bulk-header": {
+    "message": "Xóa {count} bản cài đặt"
   },
   "app.instance.confirm-delete.delete-button": {
-    "message": "Xoá hồ sơ"
+    "message": "Xóa bản cài đặt"
   },
   "app.instance.confirm-delete.header": {
-    "message": "Xoá hồ sơ"
+    "message": "Xóa bản cài đặt"
+  },
+  "app.instance.confirm-delete.instances-label": {
+    "message": "{count, plural, one {Bản cài đặt} other {Bản cài đặt ({count})}}"
   },
   "app.instance.content.managed-content.modpack-header": {
     "message": "Nội dung modpack"
@@ -435,64 +687,76 @@
     "message": "Nội dung được chia sẻ"
   },
   "app.instance.modpack-already-installed.body": {
-    "message": "Gói modpack này đã được cài đặt trong hồ sơ <bold>{instanceName}</bold> rồi. Bạn có chắc chắn muốn sao chép nó không?"
+    "message": "Modpack này đã được cài trong bản cài đặt <bold>{instanceName}</bold>. Bạn có chắc muốn tạo thêm một bản sao không?"
   },
   "app.instance.modpack-already-installed.create": {
-    "message": "Khởi tạo"
+    "message": "Tạo"
   },
   "app.instance.modpack-already-installed.header": {
-    "message": "Modpack đã được cài đặt"
+    "message": "Modpack đã được cài"
   },
   "app.instance.modpack-already-installed.instance": {
-    "message": "Hồ sơ"
+    "message": "Bản cài đặt"
   },
   "app.instance.mods.content-type-project": {
-    "message": "Dự án"
+    "message": "dự án"
   },
   "app.instance.mods.freeze-content": {
-    "message": "Phiên bản cố định"
+    "message": "Cố định phiên bản"
   },
   "app.instance.mods.locked-content": {
-    "message": "Không thể thay đổi nội dung trong các instance bị khóa."
+    "message": "Không thể thay đổi nội dung trong bản cài đặt đã khóa."
   },
   "app.instance.mods.project-was-added": {
-    "message": "\"{name}\" đã được thêm"
+    "message": "Đã thêm \"{name}\""
   },
   "app.instance.mods.projects-were-added": {
-    "message": "{count} dự án đã được thêm"
+    "message": "Đã thêm {count} dự án"
   },
   "app.instance.mods.share-text": {
-    "message": "Kiểm tra dự án tôi đang sử dụng trong modpack của mình!"
+    "message": "Xem các dự án mình đang dùng trong modpack này!"
   },
   "app.instance.mods.share-title": {
-    "message": "Chia sẻ hồ sơ modpack"
+    "message": "Chia sẻ nội dung modpack"
   },
   "app.instance.mods.successfully-uploaded": {
-    "message": "Tải lên thành công"
+    "message": "Đã tải lên thành công"
   },
   "app.instance.mods.unfreeze-content": {
-    "message": "Hủy đóng băng phiên bản"
+    "message": "Bỏ cố định phiên bản"
+  },
+  "app.instance.navigation.back-to-instance": {
+    "message": "Quay lại bản cài đặt"
   },
   "app.instance.share.empty.description": {
-    "message": "Bạn có thể chia sẻ phiên bản này với bạn bè của mình!"
+    "message": "Bạn có thể chia sẻ bản cài đặt này với bạn bè!"
   },
   "app.instance.share.empty.heading": {
-    "message": "Không có bạn để mời"
+    "message": "Chưa mời bạn bè"
+  },
+  "app.instance.share.empty.invite-friends-button": {
+    "message": "Mời bạn bè"
+  },
+  "app.instance.share.invite-modal.heading": {
+    "message": "Chia sẻ {name}"
   },
   "app.instance.share.invite-modal.user-limit-reached": {
-    "message": "Phiên bản này đã đạt đến giới hạn {limit} người dùng."
+    "message": "Bản cài đặt này đã đạt giới hạn {limit} người dùng."
   },
   "app.instance.share.locked.empty-description-prefix": {
-    "message": "Bạn cần đăng nhập với tư cách là"
+    "message": "Bạn cần đăng nhập bằng"
   },
   "app.instance.share.locked.empty-description-suffix": {
     "message": "để truy cập trang này."
   },
   "app.instance.share.locked.linked-account-fallback": {
-    "message": "tài khoản được liên kết"
+    "message": "tài khoản đã liên kết"
+  },
+  "app.instance.share.locked.signed-out-heading": {
+    "message": "Chưa đăng nhập"
   },
   "app.instance.share.locked.switch-account-button": {
-    "message": "Đổi tài khoản"
+    "message": "Chuyển tài khoản"
   },
   "app.instance.share.locked.wrong-account-heading": {
     "message": "Sai tài khoản"
@@ -500,11 +764,110 @@
   "app.instance.share.members.empty": {
     "message": "Chưa có người dùng nào tham gia"
   },
+  "app.instance.share.members.no-filter-results": {
+    "message": "Không có người dùng nào khớp với bộ lọc."
+  },
+  "app.instance.share.remove-user-modal.effect-access": {
+    "message": "Họ sẽ không còn nhận được cập nhật cho bản cài đặt được chia sẻ này"
+  },
+  "app.instance.share.remove-user-modal.effect-installed-copy": {
+    "message": "Các bản sao họ đã cài vẫn sẽ ở trên thiết bị của họ"
+  },
+  "app.instance.share.remove-user-modal.effect-invite-again": {
+    "message": "Bạn có thể mời lại họ sau"
+  },
+  "app.instance.share.remove-user-modal.effect-last-user": {
+    "message": "Đây là người dùng cuối cùng; tính năng chia sẻ sẽ bị tắt cho bản cài đặt này"
+  },
+  "app.instance.share.remove-user-modal.effects-label": {
+    "message": "Điều gì sẽ xảy ra?"
+  },
+  "app.instance.share.remove-user-modal.header": {
+    "message": "Thu hồi quyền truy cập"
+  },
+  "app.instance.share.remove-user-modal.remove-button": {
+    "message": "Thu hồi quyền truy cập"
+  },
+  "app.instance.share.remove-user-modal.user-avatar-alt": {
+    "message": "Ảnh đại diện của {username}"
+  },
+  "app.instance.share.remove-user-modal.warning-body": {
+    "message": "Nếu bạn thu hồi quyền truy cập của {username} vào bản cài đặt được chia sẻ này, bạn sẽ phải mời lại họ trước khi họ có thể nhận cập nhật."
+  },
+  "app.instance.share.sign-in.button": {
+    "message": "Đăng nhập"
+  },
+  "app.instance.share.unable-to-connect.description": {
+    "message": "Dịch vụ bản cài đặt được chia sẻ hiện không thể truy cập. Vui lòng thử lại sau"
+  },
+  "app.instance.share.unable-to-connect.heading": {
+    "message": "Không thể kết nối"
+  },
+  "app.instance.share.unlink.body": {
+    "message": "Bạn phải gỡ liên kết modpack này để chia sẻ bản cài đặt của mình"
+  },
+  "app.instance.share.unlink.header": {
+    "message": "Cần gỡ liên kết để chia sẻ"
+  },
+  "app.instance.shared-instance-already-installed.body": {
+    "message": "Bản cài đặt được chia sẻ này đã được cài dưới tên <bold>{instanceName}</bold>. Bạn có chắc muốn cài thêm một bản sao không?"
+  },
+  "app.instance.shared-instance-already-installed.header": {
+    "message": "Bản cài đặt được chia sẻ đã được cài"
+  },
+  "app.instance.shared-instance-already-installed.install-anyway": {
+    "message": "Vẫn cài đặt"
+  },
+  "app.instance.shared-instance-already-installed.instance": {
+    "message": "Bản cài đặt"
+  },
+  "app.instance.shared-instance-wrong-account.fallback-username": {
+    "message": "tài khoản đã liên kết"
+  },
+  "app.instance.shared-instance-wrong-account.owner-admonition-body-v2": {
+    "message": "để quản lý bản cài đặt được chia sẻ này. Bạn sẽ không thể gửi cập nhật cho người dùng."
+  },
+  "app.instance.shared-instance-wrong-account.sign-in-as-label": {
+    "message": "Đăng nhập bằng"
+  },
+  "app.instance.shared-instance-wrong-account.signed-out-header": {
+    "message": "Bạn cần đăng nhập vào Modrinth"
+  },
+  "app.instance.shared-instance-wrong-account.user-admonition-body-v2": {
+    "message": "để nhận cập nhật cho bản cài đặt được chia sẻ này."
+  },
+  "app.instance.shared-instance-wrong-account.warning-header": {
+    "message": "Bạn đang dùng sai tài khoản Modrinth"
+  },
+  "app.instance.shortcut.created": {
+    "message": "Đã tạo lối tắt"
+  },
+  "app.instance.shortcut.creation-error": {
+    "message": "Lỗi khi tạo lối tắt"
+  },
+  "app.instance.tab.content": {
+    "message": "Nội dung"
+  },
+  "app.instance.tab.files": {
+    "message": "Tệp"
+  },
+  "app.instance.tab.logs": {
+    "message": "Nhật ký"
+  },
+  "app.instance.tab.screenshots": {
+    "message": "Ảnh chụp màn hình"
+  },
+  "app.instance.tab.share": {
+    "message": "Chia sẻ"
+  },
+  "app.instance.tab.worlds": {
+    "message": "Thế giới"
+  },
   "app.instance.worlds.add-server": {
     "message": "Thêm máy chủ"
   },
   "app.instance.worlds.browse-servers": {
-    "message": "Tìm kiếm máy chủ"
+    "message": "Duyệt máy chủ"
   },
   "app.instance.worlds.delete-world-modal.delete-button": {
     "message": "Xóa thế giới"
@@ -512,11 +875,14 @@
   "app.instance.worlds.delete-world-modal.title": {
     "message": "Xóa thế giới"
   },
+  "app.instance.worlds.delete-world-modal.warning-body": {
+    "message": "Thế giới này sẽ bị xóa vĩnh viễn khỏi bản cài đặt này. Không thể hoàn tác thao tác này."
+  },
   "app.instance.worlds.delete-world-modal.warning-header": {
     "message": "Đang xóa {name}"
   },
   "app.instance.worlds.filter-modded": {
-    "message": "Modded"
+    "message": "Có mod"
   },
   "app.instance.worlds.filter-offline": {
     "message": "Ngoại tuyến"
@@ -528,94 +894,805 @@
     "message": "Vanilla"
   },
   "app.instance.worlds.no-worlds-description": {
-    "message": "Thêm một máy chủ hoặc tìm kiếm để bắt đầu"
+    "message": "Thêm máy chủ hoặc duyệt để bắt đầu"
   },
   "app.instance.worlds.no-worlds-heading": {
-    "message": "Không có máy chủ hay thế giới nào đã được thêm"
+    "message": "Chưa thêm máy chủ hoặc thế giới nào"
+  },
+  "app.instance.worlds.refreshing": {
+    "message": "Đang làm mới..."
   },
   "app.instance.worlds.remove-server-modal.remove-button": {
     "message": "Bỏ khỏi danh sách"
   },
+  "app.instance.worlds.remove-server-modal.remove-everywhere": {
+    "message": "Xóa ở mọi nơi"
+  },
+  "app.instance.worlds.remove-server-modal.remove-here": {
+    "message": "Chỉ xóa ở đây"
+  },
+  "app.instance.worlds.remove-server-modal.synced-description": {
+    "message": "Bạn có thể chỉ xóa máy chủ này khỏi bản cài đặt hiện tại hoặc khỏi tất cả bản cài đặt đã đồng bộ. Nếu chỉ xóa khỏi bản cài đặt này, chế độ ghi đè sẽ được bật và bản cài đặt này sẽ không còn nhận các thay đổi máy chủ đã đồng bộ."
+  },
+  "app.instance.worlds.remove-server-modal.synced-header": {
+    "message": "Máy chủ này đang được đồng bộ"
+  },
   "app.instance.worlds.remove-server-modal.title": {
     "message": "Xóa máy chủ"
   },
+  "app.instance.worlds.remove-server-modal.warning-body": {
+    "message": "Máy chủ này sẽ bị xóa khỏi danh sách máy chủ của bạn và danh sách máy chủ trong trò chơi. Bạn có thể thêm lại sau nếu biết địa chỉ."
+  },
   "app.instance.worlds.remove-server-modal.warning-header": {
-    "message": "{name} sẽ bị xóa"
+    "message": "Đang xóa {name}"
   },
   "app.instance.worlds.search-worlds-placeholder": {
-    "message": "Tìm kiếm {count} world..."
+    "message": "Tìm kiếm trong {count} thế giới..."
+  },
+  "app.java-detection.cancel": {
+    "message": "Hủy"
+  },
+  "app.java-detection.columns.actions": {
+    "message": "Thao tác"
+  },
+  "app.java-detection.columns.path": {
+    "message": "Đường dẫn"
+  },
+  "app.java-detection.columns.version": {
+    "message": "Phiên bản"
+  },
+  "app.java-detection.no-installations-found": {
+    "message": "Không tìm thấy bản cài đặt Java nào."
   },
   "app.java-detection.select": {
     "message": "Chọn"
   },
+  "app.java-detection.selected": {
+    "message": "Đã chọn"
+  },
+  "app.java-detection.title": {
+    "message": "Chọn bản cài đặt Java"
+  },
+  "app.java-selector.already-installed": {
+    "message": "Đã được cài đặt"
+  },
+  "app.java-selector.browse": {
+    "message": "Duyệt"
+  },
+  "app.java-selector.detect": {
+    "message": "Dò tìm"
+  },
+  "app.java-selector.install-recommended": {
+    "message": "Cài bản được đề xuất"
+  },
+  "app.java-selector.installing": {
+    "message": "Đang cài đặt..."
+  },
+  "app.java-selector.path.placeholder": {
+    "message": "/đường/dẫn/đến/java"
+  },
+  "app.java-selector.test-installation": {
+    "message": "Kiểm tra bản cài đặt Java"
+  },
+  "app.library.actions.label": {
+    "message": "Thao tác thư viện"
+  },
+  "app.library.context-menu.create-instance": {
+    "message": "Bản cài đặt mới"
+  },
+  "app.library.filter.add": {
+    "message": "Thêm bộ lọc"
+  },
+  "app.library.filter.clear": {
+    "message": "Xóa bộ lọc"
+  },
   "app.library.filter.game-version": {
     "message": "Phiên bản trò chơi"
+  },
+  "app.library.filter.instance-type": {
+    "message": "Loại bản cài đặt"
+  },
+  "app.library.filter.instance-type.custom": {
+    "message": "Tùy chỉnh"
+  },
+  "app.library.filter.instance-type.modpack": {
+    "message": "Modpack"
   },
   "app.library.filter.instance-type.server": {
     "message": "Máy chủ"
   },
+  "app.library.filter.label": {
+    "message": "Lọc theo"
+  },
+  "app.library.filter.loader": {
+    "message": "Bộ nạp"
+  },
+  "app.library.group-by.custom-group": {
+    "message": "Nhóm tùy chỉnh"
+  },
+  "app.library.group-by.game-version": {
+    "message": "Phiên bản trò chơi"
+  },
+  "app.library.group-by.instance-type": {
+    "message": "Loại bản cài đặt"
+  },
+  "app.library.group-by.label": {
+    "message": "Nhóm theo"
+  },
+  "app.library.group-by.loader": {
+    "message": "Bộ nạp"
+  },
+  "app.library.group-by.none": {
+    "message": "Không nhóm"
+  },
+  "app.library.group.actions.label": {
+    "message": "Thao tác nhóm"
+  },
+  "app.library.group.collapse": {
+    "message": "Thu gọn nhóm"
+  },
+  "app.library.group.context-menu.add-to-group": {
+    "message": "Thêm vào nhóm"
+  },
+  "app.library.group.create": {
+    "message": "Tạo nhóm"
+  },
+  "app.library.group.create.cancel": {
+    "message": "Hủy"
+  },
+  "app.library.group.delete": {
+    "message": "Xóa nhóm"
+  },
+  "app.library.group.delete-description": {
+    "message": "Các bản cài đặt trong nhóm này sẽ không còn thuộc nhóm nào."
+  },
+  "app.library.group.edit-name": {
+    "message": "Đổi tên nhóm"
+  },
+  "app.library.group.empty": {
+    "message": "Kéo và thả để thêm bản cài đặt."
+  },
+  "app.library.group.expand": {
+    "message": "Mở rộng nhóm"
+  },
+  "app.library.group.favorites": {
+    "message": "Yêu thích"
+  },
+  "app.library.group.instance.add": {
+    "message": "Thêm"
+  },
+  "app.library.group.instance.added": {
+    "message": "Đã thêm"
+  },
+  "app.library.group.instances-modal.add": {
+    "message": "Thêm"
+  },
+  "app.library.group.instances-modal.added": {
+    "message": "Đã thêm"
+  },
+  "app.library.group.instances-modal.no-instances-found": {
+    "message": "Không tìm thấy bản cài đặt nào"
+  },
+  "app.library.group.instances-modal.search-placeholder": {
+    "message": "Tìm bản cài đặt"
+  },
+  "app.library.group.instances-modal.title": {
+    "message": "Thêm bản cài đặt vào \"{groupName}\""
+  },
+  "app.library.group.move-down": {
+    "message": "Di chuyển nhóm xuống"
+  },
+  "app.library.group.move-up": {
+    "message": "Di chuyển nhóm lên"
+  },
+  "app.library.group.name": {
+    "message": "Tên nhóm"
+  },
+  "app.library.group.name-empty": {
+    "message": "Tên nhóm không được để trống."
+  },
+  "app.library.group.name-placeholder": {
+    "message": "Nhập tên nhóm"
+  },
+  "app.library.group.name-reserved": {
+    "message": "\"None\" là tên dành riêng và không thể dùng làm tên nhóm."
+  },
+  "app.library.group.name-too-long": {
+    "message": "Tên nhóm không được dài quá {maxLength} ký tự."
+  },
+  "app.library.group.new": {
+    "message": "Nhóm mới"
+  },
+  "app.library.group.no-instances-found": {
+    "message": "Không tìm thấy bản cài đặt nào"
+  },
+  "app.library.group.rename-failed": {
+    "message": "Không thể đổi tên nhóm"
+  },
+  "app.library.group.search-instance": {
+    "message": "Tìm bản cài đặt"
+  },
+  "app.library.group.ungrouped": {
+    "message": "Chưa nhóm"
+  },
+  "app.library.group.unknown": {
+    "message": "Nhóm không xác định"
+  },
+  "app.library.instance.action.add-content": {
+    "message": "Thêm nội dung"
+  },
+  "app.library.instance.action.add-to-favorites": {
+    "message": "Thêm vào mục yêu thích"
+  },
+  "app.library.instance.action.copy-path": {
+    "message": "Sao chép đường dẫn"
+  },
   "app.library.instance.action.delete": {
-    "message": "Xoá"
+    "message": "Xóa"
+  },
+  "app.library.instance.action.duplicate": {
+    "message": "Nhân bản bản cài đặt"
+  },
+  "app.library.instance.action.open-folder": {
+    "message": "Mở thư mục"
+  },
+  "app.library.instance.action.play": {
+    "message": "Chơi"
+  },
+  "app.library.instance.action.remove-from-favorites": {
+    "message": "Xóa khỏi mục yêu thích"
+  },
+  "app.library.instance.action.remove-from-group": {
+    "message": "Xóa khỏi nhóm"
+  },
+  "app.library.instance.action.stop": {
+    "message": "Dừng"
+  },
+  "app.library.instance.action.view-instance": {
+    "message": "Xem bản cài đặt"
+  },
+  "app.library.instance.actions.label": {
+    "message": "Thao tác với bản cài đặt"
+  },
+  "app.library.instance.deselect": {
+    "message": "Bỏ chọn bản cài đặt"
+  },
+  "app.library.instance.deselect-with-name": {
+    "message": "Bỏ chọn {name}"
+  },
+  "app.library.instance.installing": {
+    "message": "Đang cài đặt..."
+  },
+  "app.library.instance.loading": {
+    "message": "Bản cài đặt đang tải..."
+  },
+  "app.library.instance.new": {
+    "message": "Bản cài đặt mới"
+  },
+  "app.library.instance.open-with-name": {
+    "message": "Mở {name}"
+  },
+  "app.library.instance.play": {
+    "message": "Chơi"
+  },
+  "app.library.instance.repair": {
+    "message": "Sửa lỗi"
+  },
+  "app.library.instance.select": {
+    "message": "Chọn bản cài đặt"
+  },
+  "app.library.instance.select-with-name": {
+    "message": "Chọn {name}"
+  },
+  "app.library.instance.stop": {
+    "message": "Dừng"
+  },
+  "app.library.search.no-results.title": {
+    "message": "Không có bản cài đặt nào khớp với tìm kiếm của bạn."
+  },
+  "app.library.search.placeholder": {
+    "message": "Tìm kiếm"
+  },
+  "app.library.selection.aria-label": {
+    "message": "Các bản cài đặt đã chọn"
+  },
+  "app.library.selection.deleting": {
+    "message": "Đang xóa các bản cài đặt đã chọn"
+  },
+  "app.library.selection.new-group": {
+    "message": "Nhóm mới"
+  },
+  "app.library.selection.remove-from-group": {
+    "message": "Xóa khỏi nhóm"
+  },
+  "app.library.selection.selected-count": {
+    "message": "Đã chọn {count}"
+  },
+  "app.library.sort.date-created": {
+    "message": "Ngày tạo"
+  },
+  "app.library.sort.date-modified": {
+    "message": "Ngày sửa đổi"
+  },
+  "app.library.sort.game-version": {
+    "message": "Phiên bản trò chơi"
+  },
+  "app.library.sort.hours-played": {
+    "message": "Số giờ đã chơi"
+  },
+  "app.library.sort.label": {
+    "message": "Sắp xếp theo"
+  },
+  "app.library.sort.last-played": {
+    "message": "Lần chơi gần nhất"
+  },
+  "app.library.sort.loader": {
+    "message": "Bộ nạp"
+  },
+  "app.library.sort.name": {
+    "message": "Tên"
+  },
+  "app.library.title": {
+    "message": "Thư viện"
+  },
+  "app.modal.install-to-play.additional-context": {
+    "message": "Thông tin bổ sung"
+  },
+  "app.modal.install-to-play.additional-context-placeholder": {
+    "message": "Nếu có thể và phù hợp, hãy kèm liên kết và hình ảnh"
+  },
+  "app.modal.install-to-play.block-user": {
+    "message": "Chặn người dùng"
+  },
+  "app.modal.install-to-play.content-you-are-reporting": {
+    "message": "Bản cài đặt bạn đang báo cáo"
+  },
+  "app.modal.install-to-play.delete-instance": {
+    "message": "Xóa bản cài đặt"
+  },
+  "app.modal.install-to-play.external-files-dont-install": {
+    "message": "Không cài đặt"
   },
   "app.modal.install-to-play.header": {
-    "message": "Tải xuống để chơi"
+    "message": "Cài đặt để chơi"
   },
   "app.modal.install-to-play.install-anyway": {
-    "message": "Tải tiếp"
+    "message": "Vẫn cài đặt"
   },
   "app.modal.install-to-play.install-button": {
-    "message": "Tải xuống"
+    "message": "Cài đặt"
+  },
+  "app.modal.install-to-play.invite-warning": {
+    "message": "Lời mời này được tạo bởi một người dùng Modrinth khác, không phải Modrinth. Chỉ chấp nhận lời mời từ những người bạn tin tưởng."
+  },
+  "app.modal.install-to-play.invite-warning-with-creator": {
+    "message": "Lời mời này được tạo bởi <creator>{username}</creator>, không phải Modrinth. Chỉ chấp nhận lời mời từ những người bạn tin tưởng."
+  },
+  "app.modal.install-to-play.managed-content.modpack-header": {
+    "message": "Nội dung modpack"
   },
   "app.modal.install-to-play.mod-count": {
-    "message": "{count, plural, other {# mod}}"
+    "message": "{count, plural, one {# mod} other {# mod}}"
+  },
+  "app.modal.install-to-play.report-description": {
+    "message": "Dùng biểu mẫu này để báo cáo các bản cài đặt có thể vi phạm <rules-link>Quy tắc</rules-link> hoặc <terms-link>Điều khoản sử dụng</terms-link> của chúng tôi."
+  },
+  "app.modal.install-to-play.report-image-invalid-type": {
+    "message": "Tệp không thuộc loại hình ảnh được hỗ trợ"
+  },
+  "app.modal.install-to-play.report-image-too-large": {
+    "message": "Tệp vượt quá giới hạn kích thước 1 MiB"
+  },
+  "app.modal.install-to-play.report-legal-claims": {
+    "message": "Đối với thông báo DMCA hoặc các khiếu nại pháp lý khác, hãy xem <copyright-link>Chính sách bản quyền</copyright-link> của chúng tôi."
+  },
+  "app.modal.install-to-play.report-reason": {
+    "message": "Bản cài đặt này vi phạm quy tắc nào?"
+  },
+  "app.modal.install-to-play.report-shared-instance-header": {
+    "message": "Báo cáo bản cài đặt được chia sẻ"
+  },
+  "app.modal.install-to-play.report-submitted": {
+    "message": "Đã gửi báo cáo"
+  },
+  "app.modal.install-to-play.report-support-and-bugs": {
+    "message": "Nếu cần hỗ trợ, hãy liên hệ <support-link>đội ngũ hỗ trợ</support-link> của chúng tôi. Nếu muốn báo lỗi, hãy mở một <github-link>issue trên GitHub</github-link>."
+  },
+  "app.modal.install-to-play.reviewed-files": {
+    "message": "Các tệp chưa được xuất bản trên Modrinth sẽ không được kiểm duyệt."
   },
   "app.modal.install-to-play.shared-instance": {
-    "message": "Chia sẻ hồ sơ"
+    "message": "Bản cài đặt được chia sẻ"
+  },
+  "app.modal.install-to-play.shared-instance-content": {
+    "message": "Nội dung bản cài đặt được chia sẻ"
+  },
+  "app.modal.install-to-play.shared-instance-unknown-files-description": {
+    "message": "Bản cài đặt được chia sẻ này chứa các tệp chưa được xuất bản trên Modrinth. Chúng tôi đặc biệt khuyên bạn chỉ cài tệp từ những nguồn mà bạn tin tưởng."
+  },
+  "app.modal.install-to-play.unknown-files-description": {
+    "message": "Modpack của máy chủ này chứa các tệp chưa được xuất bản trên Modrinth. Chúng tôi đặc biệt khuyên bạn chỉ cài tệp từ những nguồn mà bạn tin tưởng."
+  },
+  "app.modal.install-to-play.unknown-files-warning": {
+    "message": "Cảnh báo tệp không xác định"
+  },
+  "app.modal.install-to-play.unrecognized-files": {
+    "message": "Tệp không được nhận dạng"
+  },
+  "app.modal.install-to-play.user-blocked": {
+    "message": "Đã chặn người dùng"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "Xem nội dung"
   },
   "app.modal.update-to-play.header": {
-    "message": "Cập nhật và bắt đầu chơi"
+    "message": "Cập nhật để chơi"
   },
   "app.modal.update-to-play.removed": {
-    "message": "Đã bỏ"
+    "message": "Đã gỡ"
+  },
+  "app.modal.update-to-play.server-modpack-unknown-files-description": {
+    "message": "Bản cập nhật modpack của máy chủ này chứa các tệp chưa được xuất bản trên Modrinth. Chúng tôi đặc biệt khuyên bạn chỉ cài tệp từ những nguồn mà bạn tin tưởng."
+  },
+  "app.modal.update-to-play.shared-instance-added-label": {
+    "message": "Đã thêm"
+  },
+  "app.modal.update-to-play.shared-instance-removed-label": {
+    "message": "Đã gỡ"
+  },
+  "app.modal.update-to-play.shared-instance-unknown-files-description": {
+    "message": "Bản cập nhật của bản cài đặt được chia sẻ này chứa các tệp chưa được xuất bản trên Modrinth. Chúng tôi đặc biệt khuyên bạn chỉ cài tệp từ những nguồn mà bạn tin tưởng."
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "Yêu cầu cập nhật"
+  },
+  "app.modal.update-to-play.update-required-description": {
+    "message": "Cần cập nhật để chơi {name}. Vui lòng cập nhật lên phiên bản mới nhất để khởi chạy trò chơi."
+  },
+  "app.nav.add-account": {
+    "message": "Thêm tài khoản"
+  },
+  "app.nav.create-new-instance": {
+    "message": "Tạo bản cài đặt mới"
+  },
+  "app.nav.home": {
+    "message": "Trang chủ"
+  },
+  "app.nav.loading-profile": {
+    "message": "Đang tải hồ sơ..."
+  },
+  "app.nav.modrinth-account": {
+    "message": "Tài khoản Modrinth"
+  },
+  "app.nav.modrinth-hosting": {
+    "message": "Modrinth Hosting"
+  },
+  "app.nav.remove-account": {
+    "message": "Xóa tài khoản"
+  },
+  "app.nav.screenshots": {
+    "message": "Ảnh chụp màn hình"
+  },
+  "app.nav.sign-in-to-modrinth-account": {
+    "message": "Đăng nhập vào Modrinth"
+  },
+  "app.nav.switch-account": {
+    "message": "Chuyển tài khoản"
+  },
+  "app.nav.upgrade-to-modrinth-plus": {
+    "message": "Nâng cấp lên Modrinth+"
+  },
+  "app.nav.view-profile": {
+    "message": "Xem hồ sơ"
+  },
+  "app.navigation.go-back": {
+    "message": "Quay lại"
+  },
+  "app.navigation.go-forward": {
+    "message": "Tiến tới"
+  },
+  "app.navigation.home": {
+    "message": "Trang chủ"
+  },
+  "app.navigation.next-image": {
+    "message": "Ảnh tiếp theo"
+  },
+  "app.news.title": {
+    "message": "Tin tức"
+  },
+  "app.news.view-all": {
+    "message": "Xem tất cả tin tức"
+  },
+  "app.notification.warning": {
+    "message": "Cảnh báo"
+  },
+  "app.project.actions.label": {
+    "message": "Thao tác với dự án"
+  },
+  "app.project.coming-soon": {
+    "message": "Sắp ra mắt"
   },
   "app.project.install-button.already-installed": {
     "message": "Dự án này đã được cài đặt"
   },
   "app.project.install-button.switch-version": {
-    "message": "Đổi phiên bản"
+    "message": "Chuyển phiên bản"
   },
   "app.project.install-context.back-to-browse": {
-    "message": "Quay lại trang Khám Phá"
+    "message": "Quay lại Khám phá"
+  },
+  "app.project.install-context.back-to-instance": {
+    "message": "Quay lại bản cài đặt"
+  },
+  "app.project.load-error": {
+    "message": "Không thể tải dữ liệu dự án."
+  },
+  "app.project.more-options": {
+    "message": "Tùy chọn khác"
+  },
+  "app.project.tab.description": {
+    "message": "Mô tả"
+  },
+  "app.project.tab.gallery": {
+    "message": "Thư viện ảnh"
+  },
+  "app.project.tab.versions": {
+    "message": "Phiên bản"
   },
   "app.project.version.all-versions": {
     "message": "Tất cả phiên bản"
   },
   "app.project.version.download-in-browser": {
-    "message": "Tải trong trình duyệt"
+    "message": "Tải xuống trong trình duyệt"
   },
   "app.project.version.installing": {
-    "message": "Đang tải"
+    "message": "Đang cài đặt"
   },
   "app.project.versions.already-installed": {
-    "message": "Đã có sẵn"
+    "message": "Đã được cài đặt"
+  },
+  "app.quick-instance-switcher.actions.label": {
+    "message": "Thao tác với bản cài đặt"
+  },
+  "app.quick-instance-switcher.drag-show-tooltip": {
+    "message": "Kéo để hiển thị các bản cài đặt gần đây"
+  },
+  "app.quick-instance-switcher.drag-tooltip": {
+    "message": "Kéo để thay đổi kích thước"
+  },
+  "app.quick-instance-switcher.instance-locked": {
+    "message": "Bản cài đặt này đã bị khóa"
+  },
+  "app.quick-instance-switcher.title": {
+    "message": "Bản cài đặt gần đây"
+  },
+  "app.quick-instance-switcher.view-instance": {
+    "message": "Xem bản cài đặt"
+  },
+  "app.restarting": {
+    "message": "Đang khởi động lại..."
+  },
+  "app.screenshots.copied": {
+    "message": "Đã sao chép"
+  },
+  "app.screenshots.copy": {
+    "message": "Sao chép ảnh"
+  },
+  "app.screenshots.delete-description": {
+    "message": "Xóa vĩnh viễn {name}? Không thể hoàn tác thao tác này."
+  },
+  "app.screenshots.delete-success": {
+    "message": "Đã xóa ảnh chụp màn hình"
+  },
+  "app.screenshots.delete-title": {
+    "message": "Xóa ảnh chụp màn hình"
+  },
+  "app.screenshots.deselect": {
+    "message": "Bỏ chọn {name}"
+  },
+  "app.screenshots.edit": {
+    "message": "Chỉnh sửa ảnh chụp màn hình"
+  },
+  "app.screenshots.empty-description": {
+    "message": "Ảnh chụp màn hình bạn chụp trong trò chơi sẽ xuất hiện tại đây."
+  },
+  "app.screenshots.empty-heading": {
+    "message": "Chưa có ảnh chụp màn hình"
+  },
+  "app.screenshots.error-heading": {
+    "message": "Không thể tải ảnh chụp màn hình"
+  },
+  "app.screenshots.go-to-instance": {
+    "message": "Đi tới bản cài đặt"
+  },
+  "app.screenshots.group-by": {
+    "message": "Nhóm theo"
+  },
+  "app.screenshots.group.all-screenshots": {
+    "message": "Tất cả ảnh chụp màn hình"
+  },
+  "app.screenshots.group.collapse": {
+    "message": "Thu gọn nhóm"
+  },
+  "app.screenshots.group.custom": {
+    "message": "Nhóm tùy chỉnh"
+  },
+  "app.screenshots.group.date": {
+    "message": "Ngày"
+  },
+  "app.screenshots.group.delete": {
+    "message": "Xóa nhóm"
+  },
+  "app.screenshots.group.delete-description": {
+    "message": "Các ảnh chụp màn hình trong nhóm này sẽ không còn thuộc nhóm nào."
+  },
+  "app.screenshots.group.edit": {
+    "message": "Đổi tên nhóm"
+  },
+  "app.screenshots.group.empty": {
+    "message": "Kéo và thả để thêm ảnh chụp màn hình."
+  },
+  "app.screenshots.group.expand": {
+    "message": "Mở rộng nhóm"
+  },
+  "app.screenshots.group.instance": {
+    "message": "Bản cài đặt"
+  },
+  "app.screenshots.group.new": {
+    "message": "Nhóm mới"
+  },
+  "app.screenshots.group.none": {
+    "message": "Không nhóm"
+  },
+  "app.screenshots.group.this-month": {
+    "message": "Tháng này"
+  },
+  "app.screenshots.group.this-week": {
+    "message": "Tuần này"
+  },
+  "app.screenshots.group.today": {
+    "message": "Hôm nay"
+  },
+  "app.screenshots.group.ungrouped": {
+    "message": "Chưa nhóm"
+  },
+  "app.screenshots.group.yesterday": {
+    "message": "Hôm qua"
+  },
+  "app.screenshots.heading": {
+    "message": "Ảnh chụp màn hình"
+  },
+  "app.screenshots.more-actions": {
+    "message": "Thao tác khác"
+  },
+  "app.screenshots.no-results-description": {
+    "message": "Hãy thử tìm kiếm hoặc bộ lọc khác."
+  },
+  "app.screenshots.no-results-heading": {
+    "message": "Không có ảnh chụp màn hình phù hợp"
+  },
+  "app.screenshots.preview.instance-and-date": {
+    "message": "{instance} · {date}"
+  },
+  "app.screenshots.search": {
+    "message": "Tìm kiếm"
+  },
+  "app.screenshots.select": {
+    "message": "Chọn {name}"
+  },
+  "app.screenshots.selection.aria-label": {
+    "message": "Các ảnh chụp màn hình đã chọn"
+  },
+  "app.screenshots.selection.delete-description": {
+    "message": "Xóa {count, plural, one {# ảnh chụp màn hình} other {# ảnh chụp màn hình}}? Không thể hoàn tác thao tác này."
+  },
+  "app.screenshots.selection.delete-success": {
+    "message": "{count, plural, one {Đã xóa # ảnh chụp màn hình} other {Đã xóa # ảnh chụp màn hình}}"
+  },
+  "app.screenshots.selection.delete-title": {
+    "message": "Xóa các ảnh chụp màn hình đã chọn"
+  },
+  "app.screenshots.selection.export-zip": {
+    "message": "Xuất tệp ZIP"
+  },
+  "app.screenshots.selection.global-export-filename": {
+    "message": "Modrinth screenshots.zip"
+  },
+  "app.screenshots.selection.instance-export-filename": {
+    "message": "{instance} screenshots.zip"
+  },
+  "app.screenshots.selection.remove-from-group": {
+    "message": "Xóa khỏi nhóm"
+  },
+  "app.screenshots.selection.selected-count": {
+    "message": "Đã chọn {count}"
+  },
+  "app.screenshots.selection.zip-archive": {
+    "message": "Tệp lưu trữ ZIP"
+  },
+  "app.screenshots.show-in-folder": {
+    "message": "Hiển thị trong thư mục"
+  },
+  "app.screenshots.sort-by": {
+    "message": "Sắp xếp theo"
+  },
+  "app.screenshots.sort.name": {
+    "message": "Tên"
+  },
+  "app.screenshots.sort.newest": {
+    "message": "Mới nhất"
+  },
+  "app.screenshots.sort.oldest": {
+    "message": "Cũ nhất"
+  },
+  "app.settings.app-version": {
+    "message": "Ứng dụng Modrinth {version}"
+  },
+  "app.settings.default-instance-options.environment-variables.description": {
+    "message": "Các biến môi trường được thiết lập khi khởi chạy một bản cài đặt."
+  },
+  "app.settings.default-instance-options.environment-variables.placeholder": {
+    "message": "Nhập biến môi trường..."
+  },
+  "app.settings.default-instance-options.environment-variables.title": {
+    "message": "Biến môi trường"
+  },
+  "app.settings.default-instance-options.fullscreen.description": {
+    "message": "Khởi chạy các bản cài đặt ở chế độ toàn màn hình bằng cách cập nhật tệp options.txt của chúng."
   },
   "app.settings.default-instance-options.fullscreen.title": {
     "message": "Toàn màn hình"
   },
+  "app.settings.default-instance-options.height.description": {
+    "message": "Chiều cao của cửa sổ trò chơi khi khởi chạy."
+  },
+  "app.settings.default-instance-options.height.placeholder": {
+    "message": "Nhập chiều cao..."
+  },
+  "app.settings.default-instance-options.height.title": {
+    "message": "Chiều cao"
+  },
+  "app.settings.default-instance-options.java-and-memory.title": {
+    "message": "Java và bộ nhớ"
+  },
+  "app.settings.default-instance-options.java-arguments.description": {
+    "message": "Các đối số được truyền cho Java khi khởi chạy một bản cài đặt."
+  },
   "app.settings.default-instance-options.java-arguments.placeholder": {
     "message": "Nhập đối số Java..."
   },
+  "app.settings.default-instance-options.java-arguments.title": {
+    "message": "Đối số Java"
+  },
+  "app.settings.default-instance-options.launch-hooks.title": {
+    "message": "Hook khởi chạy"
+  },
+  "app.settings.default-instance-options.memory-allocation.description": {
+    "message": "Dung lượng bộ nhớ tối đa dành cho mỗi bản cài đặt."
+  },
   "app.settings.default-instance-options.memory-allocation.title": {
-    "message": "Cấp phát bộ nhớ"
+    "message": "Phân bổ bộ nhớ"
   },
   "app.settings.default-instance-options.post-exit-hook.description": {
-    "message": "Chạy sau khi trò chơi đóng lại."
+    "message": "Chạy sau khi trò chơi đóng."
   },
   "app.settings.default-instance-options.post-exit-hook.placeholder": {
     "message": "Nhập lệnh sau khi thoát..."
+  },
+  "app.settings.default-instance-options.post-exit-hook.title": {
+    "message": "Hook sau khi thoát"
+  },
+  "app.settings.default-instance-options.pre-launch-hook.description": {
+    "message": "Chạy trước khi bản cài đặt khởi động."
+  },
+  "app.settings.default-instance-options.pre-launch-hook.placeholder": {
+    "message": "Nhập lệnh trước khi khởi chạy..."
+  },
+  "app.settings.default-instance-options.pre-launch-hook.title": {
+    "message": "Hook trước khi khởi chạy"
+  },
+  "app.settings.default-instance-options.width.description": {
+    "message": "Chiều rộng của cửa sổ trò chơi khi khởi chạy."
   },
   "app.settings.default-instance-options.width.placeholder": {
     "message": "Nhập chiều rộng..."
@@ -627,25 +1704,1414 @@
     "message": "Cửa sổ"
   },
   "app.settings.default-instance-options.wrapper-hook.description": {
-    "message": "Lệnh dùng để bọc tiến trình chạy Minecraft."
+    "message": "Lệnh dùng để bọc tiến trình khởi chạy Minecraft."
   },
   "app.settings.default-instance-options.wrapper-hook.placeholder": {
     "message": "Nhập lệnh bọc..."
   },
+  "app.settings.default-instance-options.wrapper-hook.title": {
+    "message": "Hook bọc lệnh"
+  },
   "app.settings.developer-mode-button.label": {
-    "message": "Bật tắt chế độ nhà phát triển"
+    "message": "Bật/tắt chế độ nhà phát triển"
   },
   "app.settings.developer-mode-enabled": {
-    "message": "Chế độ nhà phát triển đã được bật."
+    "message": "Đã bật chế độ nhà phát triển."
   },
   "app.settings.downloading": {
-    "message": "Đang tải về v{version}"
+    "message": "Đang tải v{version}"
+  },
+  "app.settings.game-options.category.accessibility.description": {
+    "message": "Tùy chọn trợ năng"
+  },
+  "app.settings.game-options.category.accessibility.label": {
+    "message": "Trợ năng"
+  },
+  "app.settings.game-options.category.chat.description": {
+    "message": "Khả năng hiển thị và giao diện trò chuyện"
+  },
+  "app.settings.game-options.category.chat.label": {
+    "message": "Trò chuyện"
+  },
+  "app.settings.game-options.category.controls.description": {
+    "message": "Chuột, di chuyển và gán phím"
+  },
+  "app.settings.game-options.category.controls.label": {
+    "message": "Điều khiển"
+  },
+  "app.settings.game-options.category.custom.description": {
+    "message": "Các cài đặt được thêm bởi mod"
+  },
+  "app.settings.game-options.category.custom.label": {
+    "message": "Cài đặt tùy chỉnh"
+  },
+  "app.settings.game-options.category.language.description": {
+    "message": "Ngôn ngữ trò chơi"
+  },
+  "app.settings.game-options.category.language.label": {
+    "message": "Ngôn ngữ"
+  },
+  "app.settings.game-options.category.music-and-sound.description": {
+    "message": "Âm lượng và tùy chọn âm thanh"
+  },
+  "app.settings.game-options.category.music-and-sound.label": {
+    "message": "Nhạc và âm thanh"
+  },
+  "app.settings.game-options.category.online.description": {
+    "message": "Tùy chọn trực tuyến và Realms"
+  },
+  "app.settings.game-options.category.online.label": {
+    "message": "Trực tuyến"
+  },
+  "app.settings.game-options.category.skin-customization.description": {
+    "message": "Các lớp skin và tay thuận"
+  },
+  "app.settings.game-options.category.skin-customization.label": {
+    "message": "Tùy chỉnh skin"
+  },
+  "app.settings.game-options.category.video.description": {
+    "message": "Cài đặt camera và hiển thị"
+  },
+  "app.settings.game-options.category.video.label": {
+    "message": "Hình ảnh"
+  },
+  "app.settings.game-options.choice.all": {
+    "message": "Tất cả"
+  },
+  "app.settings.game-options.choice.balanced": {
+    "message": "Cân bằng"
+  },
+  "app.settings.game-options.choice.by-player": {
+    "message": "Theo người chơi"
+  },
+  "app.settings.game-options.choice.chat": {
+    "message": "Trò chuyện"
+  },
+  "app.settings.game-options.choice.commands-only": {
+    "message": "Chỉ lệnh"
+  },
+  "app.settings.game-options.choice.constant": {
+    "message": "Liên tục"
+  },
+  "app.settings.game-options.choice.crosshair": {
+    "message": "Tâm ngắm"
+  },
+  "app.settings.game-options.choice.custom": {
+    "message": "Tùy chỉnh"
+  },
+  "app.settings.game-options.choice.decreased": {
+    "message": "Giảm"
+  },
+  "app.settings.game-options.choice.default": {
+    "message": "Mặc định"
+  },
+  "app.settings.game-options.choice.fabulous": {
+    "message": "Tuyệt đẹp"
+  },
+  "app.settings.game-options.choice.fancy": {
+    "message": "Đẹp"
+  },
+  "app.settings.game-options.choice.far": {
+    "message": "Xa"
+  },
+  "app.settings.game-options.choice.fast": {
+    "message": "Nhanh"
+  },
+  "app.settings.game-options.choice.frequent": {
+    "message": "Thường xuyên"
+  },
+  "app.settings.game-options.choice.hidden": {
+    "message": "Ẩn"
+  },
+  "app.settings.game-options.choice.hotbar": {
+    "message": "Thanh vật phẩm"
+  },
+  "app.settings.game-options.choice.left": {
+    "message": "Trái"
+  },
+  "app.settings.game-options.choice.limited": {
+    "message": "Giới hạn"
+  },
+  "app.settings.game-options.choice.max-fps": {
+    "message": "FPS tối đa"
+  },
+  "app.settings.game-options.choice.maximum": {
+    "message": "Tối đa"
+  },
+  "app.settings.game-options.choice.minimal": {
+    "message": "Tối thiểu"
+  },
+  "app.settings.game-options.choice.minimum": {
+    "message": "Tối thiểu"
+  },
+  "app.settings.game-options.choice.nearby": {
+    "message": "Ở gần"
+  },
+  "app.settings.game-options.choice.never": {
+    "message": "Không bao giờ"
+  },
+  "app.settings.game-options.choice.none": {
+    "message": "Không"
+  },
+  "app.settings.game-options.choice.normal": {
+    "message": "Bình thường"
+  },
+  "app.settings.game-options.choice.off": {
+    "message": "Tắt"
+  },
+  "app.settings.game-options.choice.on": {
+    "message": "Bật"
+  },
+  "app.settings.game-options.choice.opengl": {
+    "message": "OpenGL"
+  },
+  "app.settings.game-options.choice.pause": {
+    "message": "Trình đơn tạm dừng"
+  },
+  "app.settings.game-options.choice.pause-and-toast": {
+    "message": "Trình đơn tạm dừng và thông báo"
+  },
+  "app.settings.game-options.choice.power-saver": {
+    "message": "Tiết kiệm điện"
+  },
+  "app.settings.game-options.choice.right": {
+    "message": "Phải"
+  },
+  "app.settings.game-options.choice.short": {
+    "message": "Ngắn"
+  },
+  "app.settings.game-options.choice.shown": {
+    "message": "Hiển thị"
+  },
+  "app.settings.game-options.choice.system": {
+    "message": "Hệ thống"
+  },
+  "app.settings.game-options.choice.tiny": {
+    "message": "Rất nhỏ"
+  },
+  "app.settings.game-options.choice.vulkan": {
+    "message": "Vulkan"
+  },
+  "app.settings.game-options.choice.when-minimized": {
+    "message": "Khi thu nhỏ"
+  },
+  "app.settings.game-options.choice.while-afk": {
+    "message": "Khi AFK"
+  },
+  "app.settings.game-options.compatibility.none": {
+    "message": "Một số bản cài đặt của bạn không thể dùng cài đặt này"
+  },
+  "app.settings.game-options.compatibility.reason.launcher-controlled": {
+    "message": "Cài đặt này được quản lý bởi cài đặt khởi chạy của Modrinth."
+  },
+  "app.settings.game-options.custom-value.placeholder": {
+    "message": "Nhập giá trị"
+  },
+  "app.settings.game-options.keybind.assigned-status": {
+    "message": "{setting} hiện được gán cho {binding}."
+  },
+  "app.settings.game-options.keybind.cancelled-status": {
+    "message": "Đã hủy thay đổi gán phím."
+  },
+  "app.settings.game-options.keybind.change": {
+    "message": "{setting}: {binding}. Kích hoạt để thay đổi phím gán."
+  },
+  "app.settings.game-options.keybind.choose": {
+    "message": "Chọn một phím"
+  },
+  "app.settings.game-options.keybind.conflict-description": {
+    "message": "Phím này đã được dùng cho {settings}."
+  },
+  "app.settings.game-options.keybind.key.arrow-down": {
+    "message": "Mũi tên xuống"
+  },
+  "app.settings.game-options.keybind.key.arrow-left": {
+    "message": "Mũi tên trái"
+  },
+  "app.settings.game-options.keybind.key.arrow-right": {
+    "message": "Mũi tên phải"
+  },
+  "app.settings.game-options.keybind.key.arrow-up": {
+    "message": "Mũi tên lên"
+  },
+  "app.settings.game-options.keybind.key.backspace": {
+    "message": "Backspace"
+  },
+  "app.settings.game-options.keybind.key.caps-lock": {
+    "message": "Caps Lock"
+  },
+  "app.settings.game-options.keybind.key.delete": {
+    "message": "Delete"
+  },
+  "app.settings.game-options.keybind.key.end": {
+    "message": "End"
+  },
+  "app.settings.game-options.keybind.key.enter": {
+    "message": "Enter"
+  },
+  "app.settings.game-options.keybind.key.escape": {
+    "message": "Escape"
+  },
+  "app.settings.game-options.keybind.key.home": {
+    "message": "Home"
+  },
+  "app.settings.game-options.keybind.key.insert": {
+    "message": "Insert"
+  },
+  "app.settings.game-options.keybind.key.keypad-key": {
+    "message": "Phím số {key}"
+  },
+  "app.settings.game-options.keybind.key.left-alt": {
+    "message": "Alt trái"
+  },
+  "app.settings.game-options.keybind.key.left-command": {
+    "message": "Command trái"
+  },
+  "app.settings.game-options.keybind.key.left-control": {
+    "message": "Ctrl trái"
+  },
+  "app.settings.game-options.keybind.key.left-shift": {
+    "message": "Shift trái"
+  },
+  "app.settings.game-options.keybind.key.left-super": {
+    "message": "Super trái"
+  },
+  "app.settings.game-options.keybind.key.menu": {
+    "message": "Menu"
+  },
+  "app.settings.game-options.keybind.key.num-lock": {
+    "message": "Num Lock"
+  },
+  "app.settings.game-options.keybind.key.page-down": {
+    "message": "Page Down"
+  },
+  "app.settings.game-options.keybind.key.page-up": {
+    "message": "Page Up"
+  },
+  "app.settings.game-options.keybind.key.pause": {
+    "message": "Pause"
+  },
+  "app.settings.game-options.keybind.key.print-screen": {
+    "message": "Print Screen"
+  },
+  "app.settings.game-options.keybind.key.right-alt": {
+    "message": "Alt phải"
+  },
+  "app.settings.game-options.keybind.key.right-command": {
+    "message": "Command phải"
+  },
+  "app.settings.game-options.keybind.key.right-control": {
+    "message": "Ctrl phải"
+  },
+  "app.settings.game-options.keybind.key.right-shift": {
+    "message": "Shift phải"
+  },
+  "app.settings.game-options.keybind.key.right-super": {
+    "message": "Super phải"
+  },
+  "app.settings.game-options.keybind.key.scroll-lock": {
+    "message": "Scroll Lock"
+  },
+  "app.settings.game-options.keybind.key.space": {
+    "message": "Space"
+  },
+  "app.settings.game-options.keybind.key.tab": {
+    "message": "Tab"
+  },
+  "app.settings.game-options.keybind.key.unbound": {
+    "message": "Chưa gán"
+  },
+  "app.settings.game-options.keybind.key.unknown": {
+    "message": "Phím không xác định"
+  },
+  "app.settings.game-options.keybind.listen": {
+    "message": "Nhấn một phím…"
+  },
+  "app.settings.game-options.keybind.listening-status": {
+    "message": "Đang chờ một phím hoặc nút chuột. Nhấn Escape để xóa phím gán này."
+  },
+  "app.settings.game-options.keybind.mixed": {
+    "message": "Khác nhau giữa các bản cài đặt"
+  },
+  "app.settings.game-options.keybind.modifier.alt": {
+    "message": "Alt"
+  },
+  "app.settings.game-options.keybind.modifier.command": {
+    "message": "Command"
+  },
+  "app.settings.game-options.keybind.modifier.control": {
+    "message": "Ctrl"
+  },
+  "app.settings.game-options.keybind.modifier.shift": {
+    "message": "Shift"
+  },
+  "app.settings.game-options.keybind.modifier.super": {
+    "message": "Super"
+  },
+  "app.settings.game-options.keybind.mouse.button": {
+    "message": "Chuột {button}"
+  },
+  "app.settings.game-options.keybind.mouse.left": {
+    "message": "Chuột trái"
+  },
+  "app.settings.game-options.keybind.mouse.middle": {
+    "message": "Chuột giữa"
+  },
+  "app.settings.game-options.keybind.mouse.right": {
+    "message": "Chuột phải"
+  },
+  "app.settings.game-options.keybind.recording-label": {
+    "message": "{setting}: đang chờ một phím hoặc nút chuột. Nhấn Escape để xóa phím gán này."
+  },
+  "app.settings.game-options.keybind.scancode": {
+    "message": "Mã quét {code}"
+  },
+  "app.settings.game-options.keybind.unsupported-status": {
+    "message": "Đầu vào này không thể dùng trong Minecraft. Hãy nhấn phím khác."
+  },
+  "app.settings.game-options.setting.advanced-opengl.label": {
+    "message": "OpenGL nâng cao"
+  },
+  "app.settings.game-options.setting.allow-cursor-changes.label": {
+    "message": "Cho phép thay đổi con trỏ"
+  },
+  "app.settings.game-options.setting.allow-server-listing.description": {
+    "message": "Cho phép tên người chơi xuất hiện trong danh sách máy chủ."
+  },
+  "app.settings.game-options.setting.allow-server-listing.label": {
+    "message": "Danh sách máy chủ"
+  },
+  "app.settings.game-options.setting.alternate-blocks.label": {
+    "message": "Biến thể khối"
+  },
+  "app.settings.game-options.setting.ambient-occlusion.label": {
+    "message": "Ánh sáng mượt"
+  },
+  "app.settings.game-options.setting.ambient-volume.label": {
+    "message": "Âm thanh môi trường"
+  },
+  "app.settings.game-options.setting.anaglyph-3d.label": {
+    "message": "3D anaglyph"
+  },
+  "app.settings.game-options.setting.anisotropic-filtering.label": {
+    "message": "Lọc bất đẳng hướng"
+  },
+  "app.settings.game-options.setting.anisotropy.label": {
+    "message": "Độ bất đẳng hướng"
+  },
+  "app.settings.game-options.setting.attack-indicator.label": {
+    "message": "Chỉ báo tấn công"
+  },
+  "app.settings.game-options.setting.auto-jump.description": {
+    "message": "Tự động nhảy qua các chướng ngại vật cao một khối."
+  },
+  "app.settings.game-options.setting.auto-jump.label": {
+    "message": "Tự động nhảy"
+  },
+  "app.settings.game-options.setting.auto-suggestions.label": {
+    "message": "Gợi ý lệnh"
+  },
+  "app.settings.game-options.setting.autosave-indicator.label": {
+    "message": "Chỉ báo tự động lưu"
+  },
+  "app.settings.game-options.setting.biome-blend-radius.description": {
+    "message": "Khoảng cách chuyển tiếp màu giữa các quần xã."
+  },
+  "app.settings.game-options.setting.biome-blend-radius.label": {
+    "message": "Pha trộn quần xã"
+  },
+  "app.settings.game-options.setting.blocks-volume.label": {
+    "message": "Khối"
+  },
+  "app.settings.game-options.setting.brightness.label": {
+    "message": "Độ sáng"
+  },
+  "app.settings.game-options.setting.cape.description": {
+    "message": "Hiển thị áo choàng của người chơi, bao gồm cả họa tiết elytra của áo choàng."
+  },
+  "app.settings.game-options.setting.cape.label": {
+    "message": "Áo choàng"
+  },
+  "app.settings.game-options.setting.chat-background-only.label": {
+    "message": "Chỉ nền trò chuyện"
+  },
+  "app.settings.game-options.setting.chat-colors.label": {
+    "message": "Màu trò chuyện"
+  },
+  "app.settings.game-options.setting.chat-delay.label": {
+    "message": "Độ trễ trò chuyện"
+  },
+  "app.settings.game-options.setting.chat-line-spacing.label": {
+    "message": "Khoảng cách dòng trò chuyện"
+  },
+  "app.settings.game-options.setting.chat-links-prompt.description": {
+    "message": "Hỏi trước khi mở liên kết từ trò chuyện."
+  },
+  "app.settings.game-options.setting.chat-links-prompt.label": {
+    "message": "Hỏi trước khi mở liên kết"
+  },
+  "app.settings.game-options.setting.chat-links.description": {
+    "message": "Cho phép mở liên kết web trong trò chuyện."
+  },
+  "app.settings.game-options.setting.chat-links.label": {
+    "message": "Liên kết web"
+  },
+  "app.settings.game-options.setting.chat-opacity.description": {
+    "message": "Độ trong suốt của văn bản trò chuyện."
+  },
+  "app.settings.game-options.setting.chat-opacity.label": {
+    "message": "Độ trong suốt trò chuyện"
+  },
+  "app.settings.game-options.setting.chat-preview.label": {
+    "message": "Xem trước trò chuyện"
+  },
+  "app.settings.game-options.setting.chat-scale.label": {
+    "message": "Tỷ lệ trò chuyện"
+  },
+  "app.settings.game-options.setting.chat-visibility.label": {
+    "message": "Hiển thị trò chuyện"
+  },
+  "app.settings.game-options.setting.chat-width.label": {
+    "message": "Chiều rộng trò chuyện"
+  },
+  "app.settings.game-options.setting.chunk-fade-time.label": {
+    "message": "Thời gian hiện dần chunk"
+  },
+  "app.settings.game-options.setting.cloud-range.label": {
+    "message": "Khoảng cách mây"
+  },
+  "app.settings.game-options.setting.clouds.label": {
+    "message": "Mây"
+  },
+  "app.settings.game-options.setting.ctrl-click-right-click.label": {
+    "message": "Dùng Control + nhấp chuột như nhấp chuột phải"
+  },
+  "app.settings.game-options.setting.cutout-leaves.label": {
+    "message": "Lá trong suốt"
+  },
+  "app.settings.game-options.setting.damage-tilt.label": {
+    "message": "Độ nghiêng khi nhận sát thương"
+  },
+  "app.settings.game-options.setting.dark-splash.description": {
+    "message": "Đổi màn hình tải Mojang Studios từ màu đỏ sang màu đen."
+  },
+  "app.settings.game-options.setting.dark-splash.label": {
+    "message": "Logo đơn sắc"
+  },
+  "app.settings.game-options.setting.darkness-pulsing.label": {
+    "message": "Hiệu ứng tối nhấp nháy"
+  },
+  "app.settings.game-options.setting.debug-gui-scale.label": {
+    "message": "Tỷ lệ GUI gỡ lỗi"
+  },
+  "app.settings.game-options.setting.directional-audio.label": {
+    "message": "Âm thanh định hướng"
+  },
+  "app.settings.game-options.setting.discrete-mouse-scroll.description": {
+    "message": "Xử lý mỗi lần lăn bánh xe chuột như một nấc cuộn."
+  },
+  "app.settings.game-options.setting.discrete-mouse-scroll.label": {
+    "message": "Cuộn theo nấc"
+  },
+  "app.settings.game-options.setting.entity-distance.label": {
+    "message": "Khoảng cách thực thể"
+  },
+  "app.settings.game-options.setting.entity-shadows.label": {
+    "message": "Bóng thực thể"
+  },
+  "app.settings.game-options.setting.exclusive-fullscreen.label": {
+    "message": "Toàn màn hình độc quyền"
+  },
+  "app.settings.game-options.setting.extra-telemetry.label": {
+    "message": "Dữ liệu đo từ xa tùy chọn"
+  },
+  "app.settings.game-options.setting.focused-chat-height.label": {
+    "message": "Chiều cao trò chuyện khi đang mở"
+  },
+  "app.settings.game-options.setting.force-unicode-font.label": {
+    "message": "Buộc dùng phông Unicode"
+  },
+  "app.settings.game-options.setting.fov-effects.label": {
+    "message": "Hiệu ứng FOV"
+  },
+  "app.settings.game-options.setting.fov.label": {
+    "message": "Góc nhìn"
+  },
+  "app.settings.game-options.setting.fullscreen.label": {
+    "message": "Toàn màn hình"
+  },
+  "app.settings.game-options.setting.glint-speed.label": {
+    "message": "Tốc độ hiệu ứng lấp lánh"
+  },
+  "app.settings.game-options.setting.glint-strength.label": {
+    "message": "Độ mạnh hiệu ứng lấp lánh"
+  },
+  "app.settings.game-options.setting.graphics-backend.label": {
+    "message": "Backend đồ họa"
+  },
+  "app.settings.game-options.setting.graphics.description": {
+    "message": "Điều chỉnh chất lượng hình ảnh và hiệu năng."
+  },
+  "app.settings.game-options.setting.graphics.label": {
+    "message": "Đồ họa"
+  },
+  "app.settings.game-options.setting.gui-scale.description": {
+    "message": "Kích thước giao diện trò chơi và HUD."
+  },
+  "app.settings.game-options.setting.gui-scale.label": {
+    "message": "Tỷ lệ GUI"
+  },
+  "app.settings.game-options.setting.hat.description": {
+    "message": "Hiển thị lớp skin mũ."
+  },
+  "app.settings.game-options.setting.hat.label": {
+    "message": "Mũ"
+  },
+  "app.settings.game-options.setting.held-item-tooltips.label": {
+    "message": "Chú thích vật phẩm đang cầm"
+  },
+  "app.settings.game-options.setting.hide-lightning-flashes.label": {
+    "message": "Ẩn chớp sét"
+  },
+  "app.settings.game-options.setting.hide-matched-names.label": {
+    "message": "Ẩn tên khớp"
+  },
+  "app.settings.game-options.setting.hide-server-address.label": {
+    "message": "Ẩn địa chỉ máy chủ"
+  },
+  "app.settings.game-options.setting.hide-splash-texts.label": {
+    "message": "Ẩn dòng chữ splash"
+  },
+  "app.settings.game-options.setting.high-contrast-outline.label": {
+    "message": "Viền khối tương phản cao"
+  },
+  "app.settings.game-options.setting.high-contrast.description": {
+    "message": "Tăng độ tương phản của các thành phần giao diện."
+  },
+  "app.settings.game-options.setting.high-contrast.label": {
+    "message": "Tương phản cao"
+  },
+  "app.settings.game-options.setting.hostile-volume.label": {
+    "message": "Sinh vật thù địch"
+  },
+  "app.settings.game-options.setting.improved-transparency.label": {
+    "message": "Cải thiện độ trong suốt"
+  },
+  "app.settings.game-options.setting.in-game-notifications.label": {
+    "message": "Thông báo trong trò chơi"
+  },
+  "app.settings.game-options.setting.inactivity-framerate-limit.label": {
+    "message": "Giảm tốc độ khung hình"
+  },
+  "app.settings.game-options.setting.invert-horizontal-mouse.label": {
+    "message": "Đảo chuột theo chiều ngang"
+  },
+  "app.settings.game-options.setting.invert-mouse.description": {
+    "message": "Đảo chuyển động chuột theo chiều dọc."
+  },
+  "app.settings.game-options.setting.invert-mouse.label": {
+    "message": "Đảo chuột"
+  },
+  "app.settings.game-options.setting.jacket.description": {
+    "message": "Hiển thị lớp skin áo khoác."
+  },
+  "app.settings.game-options.setting.jacket.label": {
+    "message": "Áo khoác"
+  },
+  "app.settings.game-options.setting.japanese-glyph-variants.label": {
+    "message": "Biến thể ký tự tiếng Nhật"
+  },
+  "app.settings.game-options.setting.key-advancements.label": {
+    "message": "Thành tựu"
+  },
+  "app.settings.game-options.setting.key-attack.label": {
+    "message": "Tấn công"
+  },
+  "app.settings.game-options.setting.key-back.label": {
+    "message": "Đi lùi"
+  },
+  "app.settings.game-options.setting.key-chat.label": {
+    "message": "Mở trò chuyện"
+  },
+  "app.settings.game-options.setting.key-command.label": {
+    "message": "Lệnh"
+  },
+  "app.settings.game-options.setting.key-debug-advanced-tooltips.label": {
+    "message": "Hiển thị chú thích nâng cao"
+  },
+  "app.settings.game-options.setting.key-debug-chunk-borders.label": {
+    "message": "Hiển thị đường biên chunk"
+  },
+  "app.settings.game-options.setting.key-debug-clear-chat.label": {
+    "message": "Xóa trò chuyện"
+  },
+  "app.settings.game-options.setting.key-debug-copy-location.label": {
+    "message": "Sao chép vị trí"
+  },
+  "app.settings.game-options.setting.key-debug-copy-recreate-command.label": {
+    "message": "Sao chép lệnh tái tạo"
+  },
+  "app.settings.game-options.setting.key-debug-crash.label": {
+    "message": "Kích hoạt crash gỡ lỗi"
+  },
+  "app.settings.game-options.setting.key-debug-dump-dynamic-textures.label": {
+    "message": "Xuất texture động"
+  },
+  "app.settings.game-options.setting.key-debug-dump-version.label": {
+    "message": "Xuất thông tin phiên bản"
+  },
+  "app.settings.game-options.setting.key-debug-focus-pause.label": {
+    "message": "Tạm dừng khi mất tiêu điểm"
+  },
+  "app.settings.game-options.setting.key-debug-fps-charts.label": {
+    "message": "Biểu đồ FPS"
+  },
+  "app.settings.game-options.setting.key-debug-hitboxes.label": {
+    "message": "Hiển thị hitbox"
+  },
+  "app.settings.game-options.setting.key-debug-improved-transparency.label": {
+    "message": "Chế độ gỡ lỗi độ trong suốt cải tiến"
+  },
+  "app.settings.game-options.setting.key-debug-lightmap-texture.label": {
+    "message": "Texture lightmap"
+  },
+  "app.settings.game-options.setting.key-debug-modifier.label": {
+    "message": "Phím bổ trợ gỡ lỗi"
+  },
+  "app.settings.game-options.setting.key-debug-network-charts.label": {
+    "message": "Biểu đồ mạng"
+  },
+  "app.settings.game-options.setting.key-debug-options.label": {
+    "message": "Tùy chọn gỡ lỗi"
+  },
+  "app.settings.game-options.setting.key-debug-overlay.label": {
+    "message": "Lớp phủ gỡ lỗi"
+  },
+  "app.settings.game-options.setting.key-debug-profiling-chart.label": {
+    "message": "Biểu đồ phân tích hiệu năng"
+  },
+  "app.settings.game-options.setting.key-debug-profiling.label": {
+    "message": "Bắt đầu phân tích hiệu năng"
+  },
+  "app.settings.game-options.setting.key-debug-reload-chunks.label": {
+    "message": "Tải lại chunk"
+  },
+  "app.settings.game-options.setting.key-debug-reload-resource-packs.label": {
+    "message": "Tải lại gói tài nguyên"
+  },
+  "app.settings.game-options.setting.key-debug-spectate.label": {
+    "message": "Theo dõi thực thể"
+  },
+  "app.settings.game-options.setting.key-debug-switch-game-mode.label": {
+    "message": "Chuyển chế độ chơi"
+  },
+  "app.settings.game-options.setting.key-drop.label": {
+    "message": "Thả vật phẩm"
+  },
+  "app.settings.game-options.setting.key-forward.label": {
+    "message": "Đi tới"
+  },
+  "app.settings.game-options.setting.key-friends.label": {
+    "message": "Bạn bè"
+  },
+  "app.settings.game-options.setting.key-fullscreen.label": {
+    "message": "Bật/tắt toàn màn hình"
+  },
+  "app.settings.game-options.setting.key-hotbar-1.label": {
+    "message": "Ô vật phẩm 1"
+  },
+  "app.settings.game-options.setting.key-hotbar-2.label": {
+    "message": "Ô vật phẩm 2"
+  },
+  "app.settings.game-options.setting.key-hotbar-3.label": {
+    "message": "Ô vật phẩm 3"
+  },
+  "app.settings.game-options.setting.key-hotbar-4.label": {
+    "message": "Ô vật phẩm 4"
+  },
+  "app.settings.game-options.setting.key-hotbar-5.label": {
+    "message": "Ô vật phẩm 5"
+  },
+  "app.settings.game-options.setting.key-hotbar-6.label": {
+    "message": "Ô vật phẩm 6"
+  },
+  "app.settings.game-options.setting.key-hotbar-7.label": {
+    "message": "Ô vật phẩm 7"
+  },
+  "app.settings.game-options.setting.key-hotbar-8.label": {
+    "message": "Ô vật phẩm 8"
+  },
+  "app.settings.game-options.setting.key-hotbar-9.label": {
+    "message": "Ô vật phẩm 9"
+  },
+  "app.settings.game-options.setting.key-inventory.label": {
+    "message": "Túi đồ"
+  },
+  "app.settings.game-options.setting.key-jump.label": {
+    "message": "Nhảy"
+  },
+  "app.settings.game-options.setting.key-left.label": {
+    "message": "Đi ngang sang trái"
+  },
+  "app.settings.game-options.setting.key-load-toolbar.label": {
+    "message": "Tải thanh công cụ"
+  },
+  "app.settings.game-options.setting.key-perspective.label": {
+    "message": "Đổi góc nhìn"
+  },
+  "app.settings.game-options.setting.key-pick-item.label": {
+    "message": "Chọn khối"
+  },
+  "app.settings.game-options.setting.key-player-list.label": {
+    "message": "Danh sách người chơi"
+  },
+  "app.settings.game-options.setting.key-quick-actions.label": {
+    "message": "Thao tác nhanh"
+  },
+  "app.settings.game-options.setting.key-right.label": {
+    "message": "Đi ngang sang phải"
+  },
+  "app.settings.game-options.setting.key-save-toolbar.label": {
+    "message": "Lưu thanh công cụ"
+  },
+  "app.settings.game-options.setting.key-screenshot.label": {
+    "message": "Chụp màn hình"
+  },
+  "app.settings.game-options.setting.key-smooth-camera.label": {
+    "message": "Bật/tắt camera điện ảnh"
+  },
+  "app.settings.game-options.setting.key-sneak.label": {
+    "message": "Đi lén"
+  },
+  "app.settings.game-options.setting.key-social-interactions.label": {
+    "message": "Tương tác xã hội"
+  },
+  "app.settings.game-options.setting.key-spectator-hotbar.label": {
+    "message": "Thanh vật phẩm khán giả"
+  },
+  "app.settings.game-options.setting.key-spectator-outlines.label": {
+    "message": "Làm nổi bật khán giả"
+  },
+  "app.settings.game-options.setting.key-sprint.label": {
+    "message": "Chạy nước rút"
+  },
+  "app.settings.game-options.setting.key-swap-offhand.label": {
+    "message": "Đổi tay phụ"
+  },
+  "app.settings.game-options.setting.key-toggle-gui.label": {
+    "message": "Bật/tắt HUD"
+  },
+  "app.settings.game-options.setting.key-toggle-spectator-shader.label": {
+    "message": "Bật/tắt shader khán giả"
+  },
+  "app.settings.game-options.setting.key-use.label": {
+    "message": "Dùng vật phẩm"
+  },
+  "app.settings.game-options.setting.language.label": {
+    "message": "Ngôn ngữ"
+  },
+  "app.settings.game-options.setting.left-pants-leg.label": {
+    "message": "Ống quần trái"
+  },
+  "app.settings.game-options.setting.left-sleeve.label": {
+    "message": "Tay áo trái"
+  },
+  "app.settings.game-options.setting.legacy-framerate-limit.label": {
+    "message": "Giới hạn tốc độ khung hình"
+  },
+  "app.settings.game-options.setting.legacy-view-distance.label": {
+    "message": "Khoảng cách nhìn"
+  },
+  "app.settings.game-options.setting.mac-fullscreen-menu.label": {
+    "message": "Hiển thị menu macOS khi toàn màn hình"
+  },
+  "app.settings.game-options.setting.main-hand.description": {
+    "message": "Chọn tay chính là tay trái hay tay phải."
+  },
+  "app.settings.game-options.setting.main-hand.label": {
+    "message": "Tay chính"
+  },
+  "app.settings.game-options.setting.master-volume.label": {
+    "message": "Âm lượng chính"
+  },
+  "app.settings.game-options.setting.max-framerate.label": {
+    "message": "Tốc độ khung hình tối đa"
+  },
+  "app.settings.game-options.setting.menu-background-blur.label": {
+    "message": "Làm mờ nền menu"
+  },
+  "app.settings.game-options.setting.mipmap-levels.description": {
+    "message": "Làm mượt texture ở khoảng cách xa."
+  },
+  "app.settings.game-options.setting.mipmap-levels.label": {
+    "message": "Mức mipmap"
+  },
+  "app.settings.game-options.setting.mouse-wheel-sensitivity.label": {
+    "message": "Độ nhạy con lăn chuột"
+  },
+  "app.settings.game-options.setting.music-frequency.label": {
+    "message": "Tần suất phát nhạc"
+  },
+  "app.settings.game-options.setting.music-toast.description": {
+    "message": "Chọn việc tên bản nhạc có hiển thị trong menu tạm dừng và dưới dạng thông báo hay không."
+  },
+  "app.settings.game-options.setting.music-toast.label": {
+    "message": "Thông báo nhạc"
+  },
+  "app.settings.game-options.setting.music-volume.label": {
+    "message": "Nhạc"
+  },
+  "app.settings.game-options.setting.narrator-hotkey.label": {
+    "message": "Phím tắt trình đọc"
+  },
+  "app.settings.game-options.setting.narrator.description": {
+    "message": "Chọn nội dung trình đọc sẽ đọc."
+  },
+  "app.settings.game-options.setting.narrator.label": {
+    "message": "Trình đọc"
+  },
+  "app.settings.game-options.setting.neutral-volume.label": {
+    "message": "Sinh vật thân thiện"
+  },
+  "app.settings.game-options.setting.notification-time.description": {
+    "message": "Khoảng thời gian thông báo dạng toast được hiển thị."
+  },
+  "app.settings.game-options.setting.notification-time.label": {
+    "message": "Thời gian hiển thị thông báo"
+  },
+  "app.settings.game-options.setting.operator-items-tab.label": {
+    "message": "Thẻ vật phẩm quản trị"
+  },
+  "app.settings.game-options.setting.panorama-speed.label": {
+    "message": "Tốc độ panorama"
+  },
+  "app.settings.game-options.setting.particles.label": {
+    "message": "Hạt"
+  },
+  "app.settings.game-options.setting.players-volume.label": {
+    "message": "Người chơi"
+  },
+  "app.settings.game-options.setting.prioritize-chunk-updates.label": {
+    "message": "Ưu tiên cập nhật chunk"
+  },
+  "app.settings.game-options.setting.quit-shortcuts.label": {
+    "message": "Phím tắt thoát"
+  },
+  "app.settings.game-options.setting.raw-mouse-input.label": {
+    "message": "Đầu vào chuột thô"
+  },
+  "app.settings.game-options.setting.realms-notifications.label": {
+    "message": "Thông báo Realms"
+  },
+  "app.settings.game-options.setting.record-volume.label": {
+    "message": "Máy phát nhạc/Khối nốt nhạc"
+  },
+  "app.settings.game-options.setting.reduced-debug-info.label": {
+    "message": "Giảm thông tin gỡ lỗi"
+  },
+  "app.settings.game-options.setting.render-distance.label": {
+    "message": "Khoảng cách render"
+  },
+  "app.settings.game-options.setting.right-pants-leg.label": {
+    "message": "Ống quần phải"
+  },
+  "app.settings.game-options.setting.right-sleeve.label": {
+    "message": "Tay áo phải"
+  },
+  "app.settings.game-options.setting.rotate-with-minecart.label": {
+    "message": "Xoay theo xe mỏ"
+  },
+  "app.settings.game-options.setting.save-chat-drafts.label": {
+    "message": "Lưu bản nháp trò chuyện"
+  },
+  "app.settings.game-options.setting.screen-effects.label": {
+    "message": "Hiệu ứng màn hình"
+  },
+  "app.settings.game-options.setting.secure-chat-only.label": {
+    "message": "Chỉ hiển thị trò chuyện an toàn"
+  },
+  "app.settings.game-options.setting.sensitivity.label": {
+    "message": "Độ nhạy chuột"
+  },
+  "app.settings.game-options.setting.server-textures.label": {
+    "message": "Texture máy chủ"
+  },
+  "app.settings.game-options.setting.share-presence.label": {
+    "message": "Chia sẻ trạng thái hoạt động"
+  },
+  "app.settings.game-options.setting.simulation-distance.description": {
+    "message": "Khoảng cách mà thực thể được cập nhật và khối/chất lỏng tiếp tục tick."
+  },
+  "app.settings.game-options.setting.simulation-distance.label": {
+    "message": "Khoảng cách mô phỏng"
+  },
+  "app.settings.game-options.setting.snooper.label": {
+    "message": "Thu thập dữ liệu"
+  },
+  "app.settings.game-options.setting.sprint-window.label": {
+    "message": "Cửa sổ chạy nước rút"
+  },
+  "app.settings.game-options.setting.subtitles.description": {
+    "message": "Hiển thị phụ đề cho âm thanh phát trong trò chơi."
+  },
+  "app.settings.game-options.setting.subtitles.label": {
+    "message": "Phụ đề"
+  },
+  "app.settings.game-options.setting.text-background-opacity.label": {
+    "message": "Độ trong suốt nền văn bản"
+  },
+  "app.settings.game-options.setting.texture-filtering.label": {
+    "message": "Lọc texture"
+  },
+  "app.settings.game-options.setting.toggle-attack.label": {
+    "message": "Bật/tắt tấn công"
+  },
+  "app.settings.game-options.setting.toggle-crouch.description": {
+    "message": "Nhấn một lần để giữ trạng thái cúi."
+  },
+  "app.settings.game-options.setting.toggle-crouch.label": {
+    "message": "Bật/tắt cúi"
+  },
+  "app.settings.game-options.setting.toggle-sprint.description": {
+    "message": "Nhấn một lần để tiếp tục chạy nước rút."
+  },
+  "app.settings.game-options.setting.toggle-sprint.label": {
+    "message": "Bật/tắt chạy nước rút"
+  },
+  "app.settings.game-options.setting.toggle-use.label": {
+    "message": "Bật/tắt sử dụng"
+  },
+  "app.settings.game-options.setting.touchscreen.label": {
+    "message": "Chế độ màn hình cảm ứng"
+  },
+  "app.settings.game-options.setting.ui-volume.label": {
+    "message": "Giao diện"
+  },
+  "app.settings.game-options.setting.unfocused-chat-height.label": {
+    "message": "Chiều cao trò chuyện khi không được chọn"
+  },
+  "app.settings.game-options.setting.use-vbo.label": {
+    "message": "Sử dụng VBO"
+  },
+  "app.settings.game-options.setting.view-bobbing.description": {
+    "message": "Thêm chuyển động lắc cho camera khi đi bộ."
+  },
+  "app.settings.game-options.setting.view-bobbing.label": {
+    "message": "Lắc góc nhìn"
+  },
+  "app.settings.game-options.setting.vignette.label": {
+    "message": "Tối góc"
+  },
+  "app.settings.game-options.setting.voice-volume.label": {
+    "message": "Giọng nói và lời thoại"
+  },
+  "app.settings.game-options.setting.vsync.description": {
+    "message": "Giới hạn tốc độ khung hình theo tần số quét màn hình để tránh xé hình."
+  },
+  "app.settings.game-options.setting.vsync.label": {
+    "message": "VSync"
+  },
+  "app.settings.game-options.setting.weather-radius.label": {
+    "message": "Bán kính thời tiết"
+  },
+  "app.settings.game-options.setting.weather-volume.label": {
+    "message": "Thời tiết"
+  },
+  "app.settings.game-options.validation.changed-since-opened": {
+    "message": "Cài đặt này đã được thay đổi ở nơi khác. Hãy kiểm tra rồi thử lại."
+  },
+  "app.settings.game-options.validation.invalid-value": {
+    "message": "Hãy chọn giá trị hợp lệ."
+  },
+  "app.settings.game-options.validation.missing-value": {
+    "message": "Trước tiên hãy chọn một giá trị."
+  },
+  "app.settings.game-options.validation.no-compatible-instances": {
+    "message": "Một số bản cài đặt của bạn không thể dùng cài đặt này"
+  },
+  "app.settings.java-installations.location.title": {
+    "message": "Vị trí Java {version, number}"
+  },
+  "app.settings.operating-system.macos": {
+    "message": "macOS"
+  },
+  "app.settings.privacy.ads-consent.intro": {
+    "message": "Quảng cáo giúp Modrinth duy trì hoạt động và chi trả cho nhà sáng tạo. Các đối tác của chúng tôi có thể lưu trữ hoặc truy cập cookie trong ứng dụng để cá nhân hóa quảng cáo và đo lường hiệu quả. Bạn có thể từ chối hoặc quản lý tùy chọn bên dưới."
+  },
+  "app.settings.privacy.discord-rich-presence.description": {
+    "message": "Hiển thị Ứng dụng Modrinth là hoạt động hiện tại của bạn trên Discord. Tùy chọn này không ảnh hưởng đến Rich Presence do mod thêm vào bản cài đặt. Cần khởi động lại ứng dụng."
+  },
+  "app.settings.privacy.discord-rich-presence.title": {
+    "message": "Discord Rich Presence"
+  },
+  "app.settings.privacy.telemetry.description": {
+    "message": "Modrinth thu thập dữ liệu phân tích và sử dụng đã được ẩn danh để cải thiện và cá nhân hóa trải nghiệm người dùng. Khi tắt tùy chọn này, bạn sẽ từ chối tham gia và dữ liệu của bạn sẽ không còn được thu thập."
+  },
+  "app.settings.privacy.telemetry.title": {
+    "message": "Dữ liệu đo từ xa"
+  },
+  "app.settings.resource-management.always-show-copy-details.description": {
+    "message": "Hiển thị thao tác Sao chép chi tiết khi một lượt cài đặt đang chờ hoặc đang chạy. Thao tác này luôn có sẵn với các lượt cài đặt thất bại hoặc bị gián đoạn."
+  },
+  "app.settings.resource-management.always-show-copy-details.title": {
+    "message": "Luôn hiển thị sao chép chi tiết"
+  },
+  "app.settings.resource-management.app-cache.confirm.description": {
+    "message": "Ứng dụng có thể tải chậm hơn cho tới khi bộ nhớ đệm được tạo lại."
+  },
+  "app.settings.resource-management.app-cache.confirm.title": {
+    "message": "Xóa bộ nhớ đệm ứng dụng?"
+  },
+  "app.settings.resource-management.app-cache.description": {
+    "message": "Xóa dữ liệu đã lưu trong bộ nhớ đệm và tải lại từ Modrinth. Ứng dụng có thể tải chậm hơn cho tới khi bộ nhớ đệm được tạo lại."
+  },
+  "app.settings.resource-management.app-cache.purge": {
+    "message": "Xóa bộ nhớ đệm"
+  },
+  "app.settings.resource-management.app-cache.title": {
+    "message": "Bộ nhớ đệm ứng dụng"
+  },
+  "app.settings.resource-management.app-database-backups.description": {
+    "message": "Các bản sao lưu dữ liệu quan trọng của ứng dụng được lưu tại đây để bạn có thể khôi phục khi cần."
+  },
+  "app.settings.resource-management.app-database-backups.open-folder": {
+    "message": "Mở thư mục sao lưu"
+  },
+  "app.settings.resource-management.app-database-backups.title": {
+    "message": "Bản sao lưu cơ sở dữ liệu ứng dụng"
+  },
+  "app.settings.resource-management.app-directory.browse": {
+    "message": "Chọn thư mục ứng dụng"
+  },
+  "app.settings.resource-management.app-directory.description": {
+    "message": "Nơi Ứng dụng Modrinth lưu các bản cài đặt và tệp khác. Thay đổi có hiệu lực sau khi khởi động lại ứng dụng."
+  },
+  "app.settings.resource-management.app-directory.select": {
+    "message": "Chọn thư mục ứng dụng mới"
+  },
+  "app.settings.resource-management.app-directory.title": {
+    "message": "Thư mục ứng dụng"
+  },
+  "app.settings.resource-management.maximum-concurrent-downloads.description": {
+    "message": "Số tệp ứng dụng có thể tải cùng lúc. Hãy giảm giá trị này nếu việc tải xuống không ổn định với kết nối của bạn. Cần khởi động lại ứng dụng."
+  },
+  "app.settings.resource-management.maximum-concurrent-downloads.title": {
+    "message": "Số lượt tải đồng thời tối đa"
+  },
+  "app.settings.resource-management.maximum-concurrent-writes.description": {
+    "message": "Số tệp ứng dụng có thể ghi vào ổ đĩa cùng lúc. Hãy giảm giá trị này nếu bạn thường gặp lỗi I/O. Cần khởi động lại ứng dụng."
+  },
+  "app.settings.resource-management.maximum-concurrent-writes.title": {
+    "message": "Số lượt ghi đồng thời tối đa"
+  },
+  "app.settings.resource-management.store.attention": {
+    "message": "Một số tệp vẫn cần xử lý"
+  },
+  "app.settings.resource-management.store.cache-limit.description": {
+    "message": "Giữ tối đa lượng nội dung không dùng này cho các lần cài sau. Giữ nhiều hơn có thể tiết kiệm thời gian tải xuống."
+  },
+  "app.settings.resource-management.store.cache-limit.label": {
+    "message": "Giữ nội dung tải xuống chưa dùng"
+  },
+  "app.settings.resource-management.store.cache-limit.unit": {
+    "message": "GiB"
+  },
+  "app.settings.resource-management.store.calculating": {
+    "message": "Đang tính toán"
+  },
+  "app.settings.resource-management.store.clear": {
+    "message": "Xóa nội dung không dùng"
+  },
+  "app.settings.resource-management.store.clear.description": {
+    "message": "Xóa nội dung đã tải xuống nhưng không dùng"
+  },
+  "app.settings.resource-management.store.cleared": {
+    "message": "Đã giải phóng {size} dung lượng ổ đĩa."
+  },
+  "app.settings.resource-management.store.clearing": {
+    "message": "Đang dọn dẹp…"
+  },
+  "app.settings.resource-management.store.description": {
+    "message": "Tiết kiệm dung lượng bằng cách tái sử dụng tệp trò chơi, mod và gói giữa các bản cài đặt."
+  },
+  "app.settings.resource-management.store.empty": {
+    "message": "Cài mod hoặc gói để xem mức sử dụng dung lượng tại đây."
+  },
+  "app.settings.resource-management.store.issues": {
+    "message": "Xem {count, plural, one {# vấn đề} other {# vấn đề}}"
+  },
+  "app.settings.resource-management.store.nothing-to-clear": {
+    "message": "Không có nội dung không dùng để xóa."
+  },
+  "app.settings.resource-management.store.repair": {
+    "message": "Xác minh và sửa chữa"
+  },
+  "app.settings.resource-management.store.repair.running-description": {
+    "message": "Thao tác này sẽ đóng mọi bản cài đặt đang chạy."
+  },
+  "app.settings.resource-management.store.repair.verify-description": {
+    "message": "Kiểm tra các tệp bị thiếu hoặc hỏng và sửa chúng."
+  },
+  "app.settings.resource-management.store.repairing": {
+    "message": "Đang xác minh và sửa chữa…"
+  },
+  "app.settings.resource-management.store.shared.label": {
+    "message": "Dùng chung"
+  },
+  "app.settings.resource-management.store.title": {
+    "message": "Kho nội dung"
+  },
+  "app.settings.resource-management.store.total": {
+    "message": "Đã lưu {size}"
+  },
+  "app.settings.resource-management.store.unique.label": {
+    "message": "Riêng"
+  },
+  "app.settings.resource-management.store.unused.label": {
+    "message": "Không còn được sử dụng"
+  },
+  "app.settings.resource-management.store.verification-result": {
+    "message": "Đã kiểm tra {checked, plural, one {# tệp} other {# tệp}} và thực hiện {repaired, plural, one {# lần sửa} other {# lần sửa}}."
+  },
+  "app.settings.resource-management.store.verified": {
+    "message": "Xác minh hoàn tất"
+  },
+  "app.settings.sidebar.label.instances": {
+    "message": "Bản cài đặt"
+  },
+  "app.settings.synced-options.choose-sync-source.command-history-description": {
+    "message": "Chọn bản cài đặt để sao chép lịch sử lệnh. Lịch sử này chỉ được dùng cho lần đồng bộ đầu tiên và sau đó bạn có thể chỉnh sửa từ bất kỳ bản cài đặt nào."
+  },
+  "app.settings.synced-options.choose-sync-source.command-history-title": {
+    "message": "Chọn nguồn lịch sử lệnh"
+  },
+  "app.settings.synced-options.choose-sync-source.creative-hotbars-description": {
+    "message": "Chọn bản cài đặt để sao chép các thanh vật phẩm Sáng tạo đã lưu. Chúng chỉ được dùng cho lần đồng bộ đầu tiên và sau đó bạn có thể chỉnh sửa từ bất kỳ bản cài đặt nào."
+  },
+  "app.settings.synced-options.choose-sync-source.creative-hotbars-title": {
+    "message": "Chọn nguồn thanh vật phẩm Sáng tạo"
+  },
+  "app.settings.synced-options.choose-sync-source.data-packs-title": {
+    "message": "Chọn nguồn gói dữ liệu"
+  },
+  "app.settings.synced-options.choose-sync-source.game-settings-description": {
+    "message": "Chọn bản cài đặt để sao chép cài đặt trò chơi. Các cài đặt này chỉ được dùng cho lần đồng bộ đầu tiên và sau đó bạn có thể chỉnh sửa từ bất kỳ bản cài đặt nào."
+  },
+  "app.settings.synced-options.choose-sync-source.game-settings-title": {
+    "message": "Chọn nguồn cài đặt trò chơi"
+  },
+  "app.settings.synced-options.choose-sync-source.ineligible": {
+    "message": "Bạn không thể chọn bản cài đặt này làm nguồn đồng bộ"
+  },
+  "app.settings.synced-options.choose-sync-source.load-error": {
+    "message": "Không thể tải các nguồn đồng bộ. Vui lòng thử lại."
+  },
+  "app.settings.synced-options.choose-sync-source.multiplayer-servers-description": {
+    "message": "Chọn bản cài đặt để sao chép danh sách máy chủ nhiều người chơi. Danh sách này chỉ được dùng cho lần đồng bộ đầu tiên và sau đó bạn có thể chỉnh sửa từ bất kỳ bản cài đặt nào."
+  },
+  "app.settings.synced-options.choose-sync-source.multiplayer-servers-title": {
+    "message": "Chọn nguồn máy chủ nhiều người chơi"
+  },
+  "app.settings.synced-options.choose-sync-source.no-instances-found": {
+    "message": "Không tìm thấy bản cài đặt nào"
+  },
+  "app.settings.synced-options.choose-sync-source.resource-packs-title": {
+    "message": "Chọn nguồn gói tài nguyên"
+  },
+  "app.settings.synced-options.choose-sync-source.retry": {
+    "message": "Thử lại"
+  },
+  "app.settings.synced-options.choose-sync-source.search-placeholder": {
+    "message": "Tìm bản cài đặt"
+  },
+  "app.settings.synced-options.choose-sync-source.sync": {
+    "message": "Đồng bộ"
+  },
+  "app.settings.synced-options.command-history": {
+    "message": "Đồng bộ lịch sử lệnh"
+  },
+  "app.settings.synced-options.command-history.description": {
+    "message": "Dùng cùng một lịch sử lệnh trên các bản cài đặt."
+  },
+  "app.settings.synced-options.command-history.editor-title": {
+    "message": "Chỉnh sửa lịch sử lệnh"
+  },
+  "app.settings.synced-options.creative-hotbars": {
+    "message": "Đồng bộ thanh vật phẩm Sáng tạo đã lưu"
+  },
+  "app.settings.synced-options.creative-hotbars.description": {
+    "message": "Dùng cùng các thanh vật phẩm Sáng tạo đã lưu trên các bản cài đặt."
+  },
+  "app.settings.synced-options.data-packs": {
+    "message": "Đồng bộ gói dữ liệu"
+  },
+  "app.settings.synced-options.data-packs.description": {
+    "message": "Dùng cùng các gói dữ liệu trên các bản cài đặt"
+  },
+  "app.settings.synced-options.data-packs.none-synced-yet": {
+    "message": "Bạn chưa đồng bộ gói dữ liệu nào"
+  },
+  "app.settings.synced-options.edit.no-instances": {
+    "message": "Hãy thêm một bản cài đặt trước khi chỉnh sửa dữ liệu đồng bộ."
+  },
+  "app.settings.synced-options.edit.no-synced-data": {
+    "message": "Hãy chọn nguồn đồng bộ trước khi chỉnh sửa cài đặt này."
+  },
+  "app.settings.synced-options.game-settings": {
+    "message": "Đồng bộ tùy chọn trò chơi"
+  },
+  "app.settings.synced-options.game-settings.button": {
+    "message": "Chỉnh sửa cài đặt trò chơi"
+  },
+  "app.settings.synced-options.game-settings.conflict-text": {
+    "message": "Chúng tôi đã tải cài đặt mới nhất. Hãy kiểm tra thay đổi của bạn rồi lưu lại."
+  },
+  "app.settings.synced-options.game-settings.conflict-title": {
+    "message": "Các cài đặt này đã được thay đổi ở nơi khác"
+  },
+  "app.settings.synced-options.game-settings.custom-empty": {
+    "message": "Các cài đặt do mod thêm sẽ xuất hiện tại đây sau khi Modrinth tìm thấy chúng trong một bản cài đặt."
+  },
+  "app.settings.synced-options.game-settings.description": {
+    "message": "Dùng cùng các tùy chọn trò chơi trên các bản cài đặt."
+  },
+  "app.settings.synced-options.game-settings.disable-all": {
+    "message": "Ngừng đồng bộ tất cả"
+  },
+  "app.settings.synced-options.game-settings.disabled-tooltip": {
+    "message": "Bật đồng bộ cài đặt trò chơi trước khi chọn từng cài đặt riêng."
+  },
+  "app.settings.synced-options.game-settings.empty": {
+    "message": "Không có cài đặt nào khớp với tìm kiếm hoặc bộ lọc."
+  },
+  "app.settings.synced-options.game-settings.enable-all": {
+    "message": "Đồng bộ tất cả"
+  },
+  "app.settings.synced-options.game-settings.load-failed": {
+    "message": "Không thể tải cài đặt trò chơi của bạn."
+  },
+  "app.settings.synced-options.game-settings.loading": {
+    "message": "Đang tải cài đặt..."
+  },
+  "app.settings.synced-options.game-settings.no-options-to-edit": {
+    "message": "Bạn chưa có tùy chọn nào để chỉnh sửa"
+  },
+  "app.settings.synced-options.game-settings.not-being-synced": {
+    "message": "Không được đồng bộ"
+  },
+  "app.settings.synced-options.game-settings.retry": {
+    "message": "Thử lại"
+  },
+  "app.settings.synced-options.game-settings.save": {
+    "message": "Lưu cài đặt"
+  },
+  "app.settings.synced-options.game-settings.search": {
+    "message": "Tìm cài đặt..."
+  },
+  "app.settings.synced-options.game-settings.sync-description": {
+    "message": "Các tùy chọn được đồng bộ sẽ áp dụng cho mọi bản cài đặt và ghi đè các giá trị đi kèm modpack."
+  },
+  "app.settings.synced-options.game-settings.sync-setting": {
+    "message": "Đồng bộ {setting} giữa các bản cài đặt"
+  },
+  "app.settings.synced-options.game-settings.sync-title": {
+    "message": "Đồng bộ cài đặt trò chơi"
+  },
+  "app.settings.synced-options.game-settings.synced-across-instances": {
+    "message": "Được đồng bộ giữa các bản cài đặt"
+  },
+  "app.settings.synced-options.game-settings.title": {
+    "message": "Cài đặt trò chơi"
+  },
+  "app.settings.synced-options.game-settings.unsaved-changes": {
+    "message": "Bạn có thay đổi chưa được lưu."
+  },
+  "app.settings.synced-options.game-settings.unsync-setting": {
+    "message": "Ngừng đồng bộ {setting} giữa các bản cài đặt"
+  },
+  "app.settings.synced-options.game-settings.value-mixed": {
+    "message": "Khác nhau giữa các bản cài đặt"
+  },
+  "app.settings.synced-options.game-settings.value-off": {
+    "message": "Tắt"
+  },
+  "app.settings.synced-options.game-settings.value-on": {
+    "message": "Bật"
+  },
+  "app.settings.synced-options.game-settings.value-unset": {
+    "message": "Chọn một giá trị"
+  },
+  "app.settings.synced-options.multiplayer-servers": {
+    "message": "Đồng bộ máy chủ nhiều người chơi"
+  },
+  "app.settings.synced-options.multiplayer-servers.address": {
+    "message": "Địa chỉ máy chủ"
+  },
+  "app.settings.synced-options.multiplayer-servers.copy-address": {
+    "message": "Sao chép địa chỉ"
+  },
+  "app.settings.synced-options.multiplayer-servers.count": {
+    "message": "{count, plural, one {# máy chủ} other {# máy chủ}}"
+  },
+  "app.settings.synced-options.multiplayer-servers.description": {
+    "message": "Dùng cùng danh sách máy chủ nhiều người chơi trên các bản cài đặt."
+  },
+  "app.settings.synced-options.multiplayer-servers.editor-title": {
+    "message": "Chỉnh sửa máy chủ đã đồng bộ"
+  },
+  "app.settings.synced-options.multiplayer-servers.empty": {
+    "message": "Hiện chưa có máy chủ do người dùng thêm nào được đồng bộ."
+  },
+  "app.settings.synced-options.multiplayer-servers.filter-offline": {
+    "message": "Ngoại tuyến"
+  },
+  "app.settings.synced-options.multiplayer-servers.filter-online": {
+    "message": "Trực tuyến"
+  },
+  "app.settings.synced-options.multiplayer-servers.more-options": {
+    "message": "Tùy chọn máy chủ khác"
+  },
+  "app.settings.synced-options.multiplayer-servers.name": {
+    "message": "Tên máy chủ"
+  },
+  "app.settings.synced-options.multiplayer-servers.no-results": {
+    "message": "Không có máy chủ đã đồng bộ nào khớp với tìm kiếm hoặc bộ lọc."
+  },
+  "app.settings.synced-options.multiplayer-servers.none-synced-yet": {
+    "message": "Bạn chưa đồng bộ máy chủ nào"
+  },
+  "app.settings.synced-options.multiplayer-servers.players-online": {
+    "message": "{count, number} đang trực tuyến"
+  },
+  "app.settings.synced-options.multiplayer-servers.search": {
+    "message": "Tìm trong {count, number} {count, plural, one {máy chủ đã đồng bộ} other {máy chủ đã đồng bộ}}..."
+  },
+  "app.settings.synced-options.multiplayer-servers.status": {
+    "message": "Trạng thái"
+  },
+  "app.settings.synced-options.packs.disabled": {
+    "message": "Hãy bật đồng bộ trước khi chỉnh sửa các gói dùng chung."
+  },
+  "app.settings.synced-options.resource-packs": {
+    "message": "Đồng bộ gói tài nguyên"
+  },
+  "app.settings.synced-options.resource-packs.description": {
+    "message": "Dùng cùng các gói tài nguyên trên các bản cài đặt."
+  },
+  "app.settings.synced-options.resource-packs.none-synced-yet": {
+    "message": "Bạn chưa đồng bộ gói tài nguyên nào"
   },
   "app.settings.tabs.appearance": {
     "message": "Giao diện"
   },
+  "app.settings.tabs.behavior": {
+    "message": "Hành vi"
+  },
+  "app.settings.tabs.features": {
+    "message": "Tính năng"
+  },
   "app.settings.tabs.java-installations": {
-    "message": "Các bản cài Java"
+    "message": "Bản cài đặt Java"
   },
   "app.settings.tabs.language": {
     "message": "Ngôn ngữ"
@@ -656,8 +3122,14 @@
   "app.settings.tabs.resource-management": {
     "message": "Quản lý tài nguyên"
   },
+  "app.settings.tabs.synced-options": {
+    "message": "Cài đặt đồng bộ"
+  },
+  "app.sidebar.playing-as": {
+    "message": "Đang chơi với tên"
+  },
   "app.skins.add-button": {
-    "message": "Skin tự tạo"
+    "message": "Thêm skin"
   },
   "app.skins.add-button.drag-and-drop": {
     "message": "Kéo và thả"
@@ -669,55 +3141,70 @@
     "message": "Xóa skin"
   },
   "app.skins.delete-modal.description": {
-    "message": "Hành động này sẽ xóa skin trên vĩnh viễn. Hành động này không thể khôi phục lại."
+    "message": "Skin đã chọn sẽ bị xóa vĩnh viễn. Không thể hoàn tác thao tác này."
   },
   "app.skins.delete-modal.title": {
-    "message": "Bạn hoàn toàn muốn xóa skin này chứ?"
+    "message": "Bạn có chắc muốn xóa skin này?"
+  },
+  "app.skins.demo.apply-tooltip": {
+    "message": "Đăng nhập để áp dụng skin."
+  },
+  "app.skins.demo.description": {
+    "message": "Đăng nhập tài khoản Minecraft để lưu và áp dụng skin!"
+  },
+  "app.skins.demo.title": {
+    "message": "Đang chỉnh sửa bằng tài khoản demo"
   },
   "app.skins.dropped-file-error.text": {
-    "message": "Không đọc được file thả."
+    "message": "Không thể đọc tệp được thả vào."
   },
   "app.skins.dropped-file-error.title": {
-    "message": "Có lỗi khi đọc file"
+    "message": "Lỗi xử lý tệp"
+  },
+  "app.skins.ears-feature-notice": {
+    "message": "Skin này sử dụng các tính năng từ mod {ears}"
   },
   "app.skins.edit-button": {
-    "message": "Sửa skin"
+    "message": "Chỉnh sửa skin"
   },
   "app.skins.modal.add-skin-button": {
-    "message": "Tạo skin"
+    "message": "Thêm skin"
   },
   "app.skins.modal.add-title": {
-    "message": "Tạo skin"
+    "message": "Đang thêm skin"
   },
   "app.skins.modal.arm-style-section": {
-    "message": "Độ rộng cánh tay"
+    "message": "Kiểu cánh tay"
   },
   "app.skins.modal.arm-style-slim": {
-    "message": "Gầy"
+    "message": "Mảnh"
   },
   "app.skins.modal.arm-style-wide": {
-    "message": "Béo"
+    "message": "Rộng"
   },
   "app.skins.modal.cape-fallback-name": {
-    "message": "Cape"
+    "message": "Áo choàng"
   },
   "app.skins.modal.cape-section": {
-    "message": "Cape"
+    "message": "Áo choàng"
+  },
+  "app.skins.modal.demo-save-tooltip": {
+    "message": "Đăng nhập để lưu skin."
   },
   "app.skins.modal.edit-title": {
-    "message": "Sửa skin"
+    "message": "Đang chỉnh sửa skin"
   },
   "app.skins.modal.make-edit-first-tooltip": {
-    "message": "Sửa skin trước đã!"
+    "message": "Hãy chỉnh sửa skin trước!"
   },
   "app.skins.modal.no-cape-tooltip": {
-    "message": "Không cape"
+    "message": "Không có áo choàng"
   },
   "app.skins.modal.none-cape-option": {
     "message": "Không"
   },
   "app.skins.modal.replace-texture-button": {
-    "message": "Đổi skin"
+    "message": "Thay texture"
   },
   "app.skins.modal.save-skin-button": {
     "message": "Lưu skin"
@@ -726,28 +3213,28 @@
     "message": "Đang lưu..."
   },
   "app.skins.modal.texture-section": {
-    "message": "Skin"
+    "message": "Texture"
   },
   "app.skins.modal.upload-skin-first-tooltip": {
-    "message": "Nhập skin vào trước đã!"
+    "message": "Hãy tải skin lên trước!"
   },
   "app.skins.preview.edit-button": {
-    "message": "Sửa skin"
+    "message": "Chỉnh sửa skin"
   },
   "app.skins.previewing-badge": {
-    "message": "Xem trước"
+    "message": "Đang xem trước"
   },
   "app.skins.rate-limit.text": {
-    "message": "Bạn đang chỉnh skin quá thường xuyên. Mãy chủ của Mojang đã tạm thời chặn lại các yêu cầu hiện thời. Đợi một lúc trước khi thử lại lần nữa."
+    "message": "Bạn đang thay đổi skin quá thường xuyên. Máy chủ Mojang đã tạm thời chặn các yêu cầu tiếp theo. Vui lòng chờ một lúc rồi thử lại."
   },
   "app.skins.rate-limit.title": {
-    "message": "Bình tĩnh lại!"
+    "message": "Chậm lại một chút!"
   },
   "app.skins.reorder-error.text": {
     "message": "Không thể lưu thứ tự skin của bạn."
   },
   "app.skins.reorder-error.title": {
-    "message": "Sắp xếp lại skin thất bại"
+    "message": "Không thể sắp xếp lại skin"
   },
   "app.skins.section.builders-and-biomes": {
     "message": "Builders & Biomes"
@@ -761,6 +3248,12 @@
   "app.skins.section.default-skins": {
     "message": "Skin mặc định"
   },
+  "app.skins.section.dungeons-hero": {
+    "message": "Dungeons Hero"
+  },
+  "app.skins.section.dungeons-ii-hero": {
+    "message": "Dungeons II Hero"
+  },
   "app.skins.section.minecon-earth-2017": {
     "message": "MINECON Earth 2017"
   },
@@ -771,7 +3264,7 @@
     "message": "Modrinth Pride"
   },
   "app.skins.section.modrinth-pride.tooltip": {
-    "message": "Bạn đã được tặng những skin này sau khi quyên góp cho Modrinth trong tháng tự hào LGBT thế giới."
+    "message": "Bạn nhận được các skin này vì đã quyên góp cho chiến dịch gây quỹ Modrinth Pride trong Tháng Tự hào."
   },
   "app.skins.section.mounts-of-mayhem": {
     "message": "Mounts of Mayhem"
@@ -791,17 +3284,173 @@
   "app.skins.section.tiny-takeover": {
     "message": "Tiny Takeover"
   },
+  "app.skins.section.wilderness-bound": {
+    "message": "Wilderness Bound"
+  },
+  "app.skins.sign-in.button": {
+    "message": "Đăng nhập Microsoft"
+  },
   "app.skins.title": {
-    "message": "Đổi skin"
+    "message": "Trình chọn skin"
+  },
+  "app.skins.toggle-ears-features-off": {
+    "message": "Tắt"
+  },
+  "app.skins.toggle-ears-features-on": {
+    "message": "Bật"
+  },
+  "app.survey.body": {
+    "message": "Bạn có thể dành chút thời gian trả lời vài câu hỏi về trải nghiệm với Ứng dụng Modrinth không?"
+  },
+  "app.survey.footer": {
+    "message": "Phản hồi này sẽ được gửi trực tiếp tới đội ngũ Modrinth và giúp định hướng các bản cập nhật trong tương lai!"
+  },
+  "app.survey.no-thanks": {
+    "message": "Không, cảm ơn"
+  },
+  "app.survey.take-survey": {
+    "message": "Tham gia khảo sát"
+  },
+  "app.survey.title": {
+    "message": "Xin chào người dùng Modrinth!"
+  },
+  "app.sync-instances-update.badge": {
+    "message": "Mới trong bản cập nhật này"
+  },
+  "app.sync-instances-update.choose-source.all": {
+    "message": "Chọn bản cài đặt để sao chép cài đặt trò chơi, gói tài nguyên, lịch sử lệnh, thanh vật phẩm Sáng tạo và máy chủ nhiều người chơi. Các dữ liệu này chỉ được dùng cho lần đồng bộ đầu tiên và sau đó bạn có thể chỉnh sửa từ bất kỳ bản cài đặt nào."
+  },
+  "app.sync-instances-update.choose-source.all-title": {
+    "message": "Chọn nguồn đồng bộ"
+  },
+  "app.sync-instances-update.choose-source.data-packs": {
+    "message": "Chọn bản cài đặt để sao chép các gói dữ liệu. Các gói này chỉ được dùng cho lần đồng bộ đầu tiên và sau đó bạn có thể chỉnh sửa từ bất kỳ bản cài đặt nào."
+  },
+  "app.sync-instances-update.choose-source.resource-packs": {
+    "message": "Chọn bản cài đặt để sao chép các gói tài nguyên. Các gói này chỉ được dùng cho lần đồng bộ đầu tiên và sau đó bạn có thể chỉnh sửa từ bất kỳ bản cài đặt nào."
+  },
+  "app.sync-instances-update.creative-hotbars": {
+    "message": "Đồng bộ thanh vật phẩm Sáng tạo"
+  },
+  "app.sync-instances-update.description": {
+    "message": "Giờ đây bạn có thể đồng bộ cài đặt trò chơi, máy chủ, gói tài nguyên và nhiều thứ khác giữa các bản cài đặt để mọi thứ luôn nhất quán mỗi lần chơi!"
+  },
+  "app.sync-instances-update.load-error": {
+    "message": "Không thể tải cài đặt đồng bộ của bạn. Vui lòng thử lại."
+  },
+  "app.sync-instances-update.manage-later": {
+    "message": "Bạn có thể bật đồng bộ ngay bây giờ và quản lý sau trong cài đặt ứng dụng."
+  },
+  "app.sync-instances-update.notification.description": {
+    "message": "Giữ cài đặt trò chơi, máy chủ, gói tài nguyên và nhiều nội dung khác được đồng bộ giữa các bản cài đặt."
+  },
+  "app.sync-instances-update.notification.dismiss": {
+    "message": "Bỏ qua"
+  },
+  "app.sync-instances-update.notification.title": {
+    "message": "Đồng bộ các bản cài đặt"
+  },
+  "app.sync-instances-update.notification.view-update": {
+    "message": "Xem cập nhật"
+  },
+  "app.sync-instances-update.retry": {
+    "message": "Thử lại"
+  },
+  "app.sync-instances-update.skip": {
+    "message": "Bỏ qua"
+  },
+  "app.sync-instances-update.sync-all": {
+    "message": "Đồng bộ tất cả"
+  },
+  "app.sync-instances-update.title": {
+    "message": "Đồng bộ các bản cài đặt"
+  },
+  "app.synced-content.change.disable-description": {
+    "message": "Tắt nội dung này trên tất cả bản cài đặt đã đồng bộ hoặc chỉ trong bản cài đặt này. Nếu chỉ tắt tại đây, chế độ ghi đè sẽ được bật cho bản cài đặt này."
+  },
+  "app.synced-content.change.disable-everywhere": {
+    "message": "Tắt ở mọi nơi"
+  },
+  "app.synced-content.change.disable-everywhere-description": {
+    "message": "Tắt nội dung này trên tất cả bản cài đặt đã đồng bộ."
+  },
+  "app.synced-content.change.disable-here": {
+    "message": "Chỉ tắt ở đây"
+  },
+  "app.synced-content.change.disable-title": {
+    "message": "Tắt nội dung?"
+  },
+  "app.synced-content.change.enable-description": {
+    "message": "Bật nội dung này trên tất cả bản cài đặt đã đồng bộ hoặc chỉ trong bản cài đặt này. Nếu chỉ bật tại đây, chế độ ghi đè sẽ được bật cho bản cài đặt này."
+  },
+  "app.synced-content.change.enable-everywhere": {
+    "message": "Bật ở mọi nơi"
+  },
+  "app.synced-content.change.enable-everywhere-description": {
+    "message": "Bật nội dung này trên tất cả bản cài đặt đã đồng bộ."
+  },
+  "app.synced-content.change.enable-here": {
+    "message": "Chỉ bật ở đây"
+  },
+  "app.synced-content.change.enable-title": {
+    "message": "Bật nội dung?"
+  },
+  "app.synced-content.delete.delete-everywhere": {
+    "message": "Xóa ở mọi nơi"
+  },
+  "app.synced-content.delete.delete-here": {
+    "message": "Chỉ xóa ở đây"
+  },
+  "app.synced-content.delete.description": {
+    "message": "Xóa nội dung này sẽ xóa nó khỏi tất cả bản cài đặt của bạn"
+  },
+  "app.synced-content.delete.mixed": {
+    "message": "Nội dung đã chọn nhưng không được đồng bộ sẽ chỉ bị xóa khỏi bản cài đặt này."
+  },
+  "app.synced-content.delete.override-description": {
+    "message": "Bạn có thể chỉ xóa nội dung này khỏi bản cài đặt hiện tại hoặc khỏi tất cả bản cài đặt đã đồng bộ. Nếu chỉ xóa khỏi bản cài đặt này, chế độ ghi đè sẽ được bật và bản cài đặt này sẽ không còn nhận các thay đổi đồng bộ cho loại nội dung này."
+  },
+  "app.synced-content.delete.resource-pack-description": {
+    "message": "Bạn có thể xóa {count, plural, one {gói này} other {các gói này}} chỉ khỏi bản cài đặt hiện tại hoặc khỏi tất cả bản cài đặt đã đồng bộ. Nếu chỉ xóa {count, plural, one {gói này} other {các gói này}} khỏi bản cài đặt này, chế độ ghi đè sẽ được bật và bản cài đặt này sẽ không còn nhận các thay đổi gói tài nguyên đã đồng bộ."
+  },
+  "app.synced-content.delete.resource-pack-header": {
+    "message": "{count, plural, one {Gói tài nguyên này đang được đồng bộ} other {Các gói tài nguyên này đang được đồng bộ}}"
+  },
+  "app.synced-content.desync.description": {
+    "message": "Bản cài đặt này sẽ giữ bản sao riêng. Bạn muốn tiếp tục đồng bộ nội dung này trên các bản cài đặt khác hay xóa nó khỏi chúng?"
+  },
+  "app.synced-content.desync.keep": {
+    "message": "Giữ lại"
+  },
+  "app.synced-content.desync.remove": {
+    "message": "Xóa"
+  },
+  "app.synced-content.desync.title": {
+    "message": "Ngừng đồng bộ nội dung"
+  },
+  "app.synced-content.warning.title": {
+    "message": "Nội dung này đang được đồng bộ"
+  },
+  "app.synced-packs.data-packs.title": {
+    "message": "Gói dữ liệu đã đồng bộ"
+  },
+  "app.synced-packs.empty": {
+    "message": "Thêm gói từ trang nội dung của một bản cài đặt để bắt đầu đồng bộ."
+  },
+  "app.synced-packs.load-failed": {
+    "message": "Không thể tải các gói. Hãy thử làm mới."
+  },
+  "app.synced-packs.resource-packs.title": {
+    "message": "Gói tài nguyên đã đồng bộ"
   },
   "app.update-popup.body.download-complete": {
-    "message": "Phiên bản v{version} của Modrinth đã sẵn sàng để có thể cài đặt. Khởi động lại ứng dụng để cập nhật ngay bây giờ, hoặc tự động cập nhật sau khi bạn tắt Modrinth."
+    "message": "Ứng dụng Modrinth v{version} đã tải xong. Tải lại để cập nhật ngay hoặc ứng dụng sẽ tự cập nhật khi bạn đóng Modrinth."
   },
   "app.update-popup.body.linux": {
-    "message": "Phiên bản v{version} của Modrinth hiện đang khả dụng. Hãy sử dụng trình quản lý gói của bạn để cập nhật các tính năng và bản vá lỗi mới nhất!"
+    "message": "Ứng dụng Modrinth v{version} đã có sẵn. Hãy dùng trình quản lý gói để cập nhật và nhận các tính năng cùng bản sửa lỗi mới nhất!"
   },
   "app.update-popup.body.metered": {
-    "message": "Phiên bản v{version} của Modrinth hiện đang khả dụng ngay bây giờ! Vì bạn đang sử dụng mạng có tính phí theo dung lượng nên chúng tôi không tự động tải xuống."
+    "message": "Ứng dụng Modrinth v{version} hiện đã có sẵn! Vì bạn đang dùng mạng tính phí theo lưu lượng nên chúng tôi không tự động tải xuống."
   },
   "app.update-popup.changelog": {
     "message": "Nhật ký thay đổi"
@@ -810,67 +3459,130 @@
     "message": "Tải xuống ({size})"
   },
   "app.update-popup.download-complete": {
-    "message": "Cài đặt thành công"
+    "message": "Tải xuống hoàn tất"
   },
   "app.update-popup.reload": {
     "message": "Tải lại để cập nhật"
   },
   "app.update-popup.title": {
-    "message": "Cập nhật mới hiện đang khả dụng"
+    "message": "Có bản cập nhật"
   },
   "app.update.complete-toast.text": {
-    "message": "Nhấn vào đây để xem nhật kí thay đổi."
+    "message": "Nhấp vào đây để xem nhật ký thay đổi."
   },
   "app.update.complete-toast.title": {
-    "message": "Phiên bản {version} đã được cài đặt thành công!"
+    "message": "Đã cài đặt thành công phiên bản {version}!"
+  },
+  "app.update.download-error.missing-version": {
+    "message": "Không thể tải bản cập nhật: không có phiên bản khả dụng"
+  },
+  "app.user.project.install-to-instance": {
+    "message": "Cài vào bản cài đặt"
+  },
+  "app.welcome-screen.create-instance": {
+    "message": "Tạo bản cài đặt"
+  },
+  "app.welcome-screen.description": {
+    "message": "Sẵn sàng bắt đầu chơi chưa?"
+  },
+  "app.welcome-screen.import-from-launcher": {
+    "message": "Nhập từ launcher"
+  },
+  "app.welcome-screen.import-prompt": {
+    "message": "Đang chuyển từ launcher khác?"
+  },
+  "app.welcome-screen.quick-create-hint": {
+    "message": "Nhấn <shortcut>N</shortcut> để tạo nhanh một bản cài đặt"
+  },
+  "app.welcome-screen.title": {
+    "message": "Chào mừng đến với Modrinth"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
   },
   "app.world.server-modal.select-an-option": {
-    "message": "Chọn một tuỳ chọn"
+    "message": "Chọn một tùy chọn"
   },
   "app.world.world-item.incompatible-version": {
-    "message": "Không phù hợp với phiên bản {version}"
+    "message": "Phiên bản {version} không tương thích"
   },
   "app.world.world-item.not-played-yet": {
-    "message": "Chưa từng được chơi"
+    "message": "Chưa chơi"
   },
   "app.world.world-item.offline": {
     "message": "Ngoại tuyến"
   },
+  "app.world.world-item.players-online": {
+    "message": "{count} đang trực tuyến"
+  },
+  "content.shared-instance.change-version-body": {
+    "message": "Thay đổi phiên bản chỉ ảnh hưởng đến bản sao trên máy của bạn. Các bản cập nhật của bản cài đặt được chia sẻ trong tương lai có thể khôi phục hoặc thay đổi lại."
+  },
+  "content.shared-instance.delete-bulk-body": {
+    "message": "Một số dự án đã chọn là một phần của bản cài đặt được chia sẻ. Xóa chúng chỉ ảnh hưởng đến bản sao trên máy của bạn; các bản cập nhật trong tương lai có thể khôi phục hoặc thay đổi lại."
+  },
+  "content.shared-instance.delete-button": {
+    "message": "Vẫn xóa"
+  },
+  "content.shared-instance.delete-many-button": {
+    "message": "Vẫn xóa {count, number} dự án"
+  },
+  "content.shared-instance.delete-single-body": {
+    "message": "Xóa nội dung này chỉ ảnh hưởng đến bản sao trên máy của bạn. Các bản cập nhật của bản cài đặt được chia sẻ trong tương lai có thể khôi phục hoặc thay đổi lại."
+  },
+  "content.shared-instance.disable-bulk-body": {
+    "message": "Một số dự án đã chọn là một phần của bản cài đặt được chia sẻ. Tắt chúng chỉ ảnh hưởng đến bản sao trên máy của bạn; các bản cập nhật trong tương lai có thể bật lại, khôi phục hoặc thay đổi chúng."
+  },
+  "content.shared-instance.disable-button": {
+    "message": "Vẫn tắt"
+  },
+  "content.shared-instance.disable-many-button": {
+    "message": "Vẫn tắt {count, number} dự án"
+  },
+  "content.shared-instance.disable-single-body": {
+    "message": "Tắt nội dung này chỉ ảnh hưởng đến bản sao trên máy của bạn. Các bản cập nhật của bản cài đặt được chia sẻ trong tương lai có thể bật lại, khôi phục hoặc thay đổi nó."
+  },
+  "content.shared-instance.unlink-body": {
+    "message": "Gỡ liên kết chỉ ảnh hưởng đến bản sao trên máy của bạn. Các bản cập nhật của bản cài đặt được chia sẻ trong tương lai có thể khôi phục hoặc thay đổi lại."
+  },
+  "content.shared-instance.warning-header": {
+    "message": "Nội dung này thuộc bản cài đặt được chia sẻ"
+  },
   "friends.action.add-friend": {
-    "message": "Thêm một người bạn"
+    "message": "Thêm bạn"
   },
   "friends.action.view-friend-requests": {
-    "message": "{count} {count, plural, other {yêu cầu kết bạn}}"
+    "message": "{count} {count, plural, one {lời mời kết bạn} other {lời mời kết bạn}}"
   },
   "friends.add-friend.submit": {
-    "message": "Gửi yêu cầu kết bạn"
+    "message": "Gửi lời mời kết bạn"
   },
   "friends.add-friend.title": {
-    "message": "Thêm một người bạn"
+    "message": "Đang thêm bạn"
   },
   "friends.add-friend.username.description": {
-    "message": "Nó có thể khác với tên người dùng Minecraft của họ!"
+    "message": "Tên này có thể khác tên người dùng Minecraft của họ!"
   },
   "friends.add-friend.username.placeholder": {
     "message": "Nhập tên người dùng Modrinth..."
   },
   "friends.add-friend.username.title": {
-    "message": "Tên người dùng Modrinth của bạn của bạn là gì?"
+    "message": "Tên người dùng Modrinth của bạn bè bạn là gì?"
   },
   "friends.add-friends-to-share": {
-    "message": "Hãy <link>thêm bạn bè</link> để biết họ đang chơi gì!"
+    "message": "<link>Thêm bạn</link> để xem họ đang chơi gì!"
+  },
+  "friends.friend.actions.label": {
+    "message": "Thao tác với bạn bè"
   },
   "friends.friend.cancel-request": {
-    "message": "Huỷ yêu cầu"
+    "message": "Hủy lời mời"
   },
   "friends.friend.remove-friend": {
-    "message": "Xoá bạn bè"
+    "message": "Xóa bạn"
   },
   "friends.friend.request-sent": {
-    "message": "Đã gửi yêu cầu kết bạn"
+    "message": "Đã gửi lời mời kết bạn"
   },
   "friends.friend.view-profile": {
     "message": "Xem thông tin"
@@ -891,16 +3603,85 @@
     "message": "Đang chờ"
   },
   "friends.no-friends-match": {
-    "message": "Không có người bạn nào phù hợp với ''{query}''"
+    "message": "Không có bạn bè nào khớp với ''{query}''"
   },
   "friends.search-friends-placeholder": {
-    "message": "Tìm kiếm bạn bè..."
+    "message": "Tìm bạn bè..."
   },
   "friends.section.heading": {
     "message": "{title} - {count}"
   },
   "friends.sign-in-to-add-friends": {
-    "message": "<link>Đăng nhập bằng tài khoản Modrinth</link> để kết bạn và xem họ đang chơi gì!"
+    "message": "<link>Đăng nhập tài khoản Modrinth</link> để thêm bạn và xem họ đang chơi gì!"
+  },
+  "installation-settings.shared-instance.linked-title": {
+    "message": "Bản cài đặt được chia sẻ đã liên kết"
+  },
+  "installation-settings.shared-instance.title": {
+    "message": "Gỡ xuất bản bản cài đặt"
+  },
+  "installation-settings.shared-instance.unlink-button": {
+    "message": "Gỡ liên kết bản cài đặt được chia sẻ"
+  },
+  "installation-settings.shared-instance.unlink-description": {
+    "message": "Ngắt bản cài đặt trên máy này khỏi các bản cập nhật chia sẻ trong tương lai."
+  },
+  "installation-settings.shared-instance.unlinking-button": {
+    "message": "Đang gỡ liên kết..."
+  },
+  "installation-settings.shared-instance.unpublish-button": {
+    "message": "Gỡ xuất bản bản cài đặt được chia sẻ"
+  },
+  "installation-settings.shared-instance.unpublish-description": {
+    "message": "Xóa bản cài đặt được chia sẻ này khỏi Modrinth và ngừng gửi cập nhật cho những người đang dùng nó. Bản cài đặt trên máy của bạn sẽ không bị ảnh hưởng."
+  },
+  "installation-settings.shared-instance.unpublishing-button": {
+    "message": "Đang gỡ xuất bản..."
+  },
+  "installation-settings.unlink-shared-instance.modal.admonition-body": {
+    "message": "Thao tác này chỉ ảnh hưởng đến bản cài đặt trên máy của bạn. Nội dung đã cài vẫn được giữ trên thiết bị này; bản cài đặt được chia sẻ và những người khác đang dùng nó sẽ không bị ảnh hưởng."
+  },
+  "installation-settings.unlink-shared-instance.modal.admonition-header": {
+    "message": "Gỡ liên kết bản cài đặt được chia sẻ"
+  },
+  "installation-settings.unlink-shared-instance.modal.header": {
+    "message": "Gỡ liên kết bản cài đặt được chia sẻ"
+  },
+  "installation-settings.unpublish-shared-instance.modal.admonition-body": {
+    "message": "Thao tác này sẽ xóa bản cài đặt được chia sẻ khỏi máy chủ Modrinth. Những người đang dùng nó trong Ứng dụng Modrinth sẽ ngừng nhận cập nhật, nhưng bản cài đặt trên máy và nội dung của bạn vẫn được giữ trên thiết bị này."
+  },
+  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
+    "message": "Gỡ xuất bản bản cài đặt được chia sẻ"
+  },
+  "installation-settings.unpublish-shared-instance.modal.header": {
+    "message": "Gỡ xuất bản bản cài đặt được chia sẻ"
+  },
+  "instance.action.create-shortcut": {
+    "message": "Tạo lối tắt"
+  },
+  "instance.action.export-modpack": {
+    "message": "Xuất modpack"
+  },
+  "instance.action.launch-instance": {
+    "message": "Khởi chạy bản cài đặt"
+  },
+  "instance.action.more-actions": {
+    "message": "Thao tác khác"
+  },
+  "instance.action.open-folder": {
+    "message": "Mở thư mục"
+  },
+  "instance.action.repair": {
+    "message": "Sửa lỗi"
+  },
+  "instance.action.settings": {
+    "message": "Cài đặt bản cài đặt"
+  },
+  "instance.action.starting": {
+    "message": "Đang khởi động..."
+  },
+  "instance.action.stopping": {
+    "message": "Đang dừng..."
   },
   "instance.add-server.add-and-play": {
     "message": "Thêm và chơi"
@@ -915,13 +3696,13 @@
     "message": "Bật"
   },
   "instance.add-server.resource-pack.prompt": {
-    "message": "Nhắc nhở"
+    "message": "Hỏi"
   },
   "instance.add-server.title": {
     "message": "Thêm máy chủ"
   },
   "instance.edit-server.title": {
-    "message": "Sửa máy chủ"
+    "message": "Chỉnh sửa máy chủ"
   },
   "instance.edit-world.hide-from-home": {
     "message": "Ẩn khỏi trang chủ"
@@ -939,10 +3720,238 @@
     "message": "Chỉnh sửa thế giới"
   },
   "instance.files.adding-files": {
-    "message": "Đang thêm dữ liệu ({completed}/{total})"
+    "message": "Đang thêm tệp ({completed}/{total})"
+  },
+  "instance.files.managed-content-read-only": {
+    "message": "Quản lý nội dung đã cài qua thẻ Nội dung"
   },
   "instance.files.save-as": {
-    "message": "Lưu như..."
+    "message": "Lưu thành..."
+  },
+  "instance.icon-editor.background": {
+    "message": "Nền"
+  },
+  "instance.icon-editor.background.blue": {
+    "message": "Xanh dương"
+  },
+  "instance.icon-editor.background.dark-gray": {
+    "message": "Xám đậm"
+  },
+  "instance.icon-editor.background.dark-green": {
+    "message": "Xanh lá đậm"
+  },
+  "instance.icon-editor.background.gray": {
+    "message": "Xám"
+  },
+  "instance.icon-editor.background.green": {
+    "message": "Xanh lá"
+  },
+  "instance.icon-editor.background.indigo": {
+    "message": "Chàm"
+  },
+  "instance.icon-editor.background.lavender": {
+    "message": "Oải hương"
+  },
+  "instance.icon-editor.background.light-gray": {
+    "message": "Xám nhạt"
+  },
+  "instance.icon-editor.background.lime": {
+    "message": "Xanh chanh"
+  },
+  "instance.icon-editor.background.orange": {
+    "message": "Cam"
+  },
+  "instance.icon-editor.background.pink": {
+    "message": "Hồng"
+  },
+  "instance.icon-editor.background.purple": {
+    "message": "Tím"
+  },
+  "instance.icon-editor.background.red": {
+    "message": "Đỏ"
+  },
+  "instance.icon-editor.background.rose": {
+    "message": "Hồng đỏ"
+  },
+  "instance.icon-editor.background.yellow": {
+    "message": "Vàng"
+  },
+  "instance.icon-editor.description": {
+    "message": "Kết hợp các thành phần để tạo biểu tượng tùy chỉnh."
+  },
+  "instance.icon-editor.recents": {
+    "message": "Gần đây"
+  },
+  "instance.icon-editor.save": {
+    "message": "Lưu biểu tượng"
+  },
+  "instance.icon-editor.surprise-me": {
+    "message": "Ngẫu nhiên"
+  },
+  "instance.icon-editor.symbol": {
+    "message": "Biểu tượng"
+  },
+  "instance.icon-editor.symbol.backpack": {
+    "message": "Ba lô"
+  },
+  "instance.icon-editor.symbol.beacon": {
+    "message": "Đèn hiệu"
+  },
+  "instance.icon-editor.symbol.blue-shark": {
+    "message": "Cá mập xanh"
+  },
+  "instance.icon-editor.symbol.bookshelf": {
+    "message": "Kệ sách"
+  },
+  "instance.icon-editor.symbol.brown-bear": {
+    "message": "Gấu nâu"
+  },
+  "instance.icon-editor.symbol.cake": {
+    "message": "Bánh kem"
+  },
+  "instance.icon-editor.symbol.campfire": {
+    "message": "Lửa trại"
+  },
+  "instance.icon-editor.symbol.chest": {
+    "message": "Rương"
+  },
+  "instance.icon-editor.symbol.cogwheel": {
+    "message": "Bánh răng"
+  },
+  "instance.icon-editor.symbol.command-block": {
+    "message": "Khối lệnh"
+  },
+  "instance.icon-editor.symbol.cooking-pot": {
+    "message": "Nồi nấu"
+  },
+  "instance.icon-editor.symbol.couch": {
+    "message": "Ghế sofa"
+  },
+  "instance.icon-editor.symbol.crafting-table": {
+    "message": "Bàn chế tạo"
+  },
+  "instance.icon-editor.symbol.create-wrench": {
+    "message": "Cờ lê"
+  },
+  "instance.icon-editor.symbol.creeper": {
+    "message": "Creeper"
+  },
+  "instance.icon-editor.symbol.enchanting-table": {
+    "message": "Bàn phù phép"
+  },
+  "instance.icon-editor.symbol.ender-chest": {
+    "message": "Rương Ender"
+  },
+  "instance.icon-editor.symbol.ender-dragon": {
+    "message": "Rồng Ender"
+  },
+  "instance.icon-editor.symbol.engine": {
+    "message": "Động cơ"
+  },
+  "instance.icon-editor.symbol.fabric": {
+    "message": "Fabric"
+  },
+  "instance.icon-editor.symbol.forge": {
+    "message": "Forge"
+  },
+  "instance.icon-editor.symbol.furnace": {
+    "message": "Lò nung"
+  },
+  "instance.icon-editor.symbol.gizmo": {
+    "message": "Gizmo"
+  },
+  "instance.icon-editor.symbol.globe": {
+    "message": "Quả địa cầu"
+  },
+  "instance.icon-editor.symbol.grass-block": {
+    "message": "Khối cỏ"
+  },
+  "instance.icon-editor.symbol.lantern": {
+    "message": "Đèn lồng"
+  },
+  "instance.icon-editor.symbol.moobloom": {
+    "message": "Moobloom"
+  },
+  "instance.icon-editor.symbol.mr-pack": {
+    "message": "Mr Pack"
+  },
+  "instance.icon-editor.symbol.neoforge": {
+    "message": "NeoForge"
+  },
+  "instance.icon-editor.symbol.orb": {
+    "message": "Quả cầu"
+  },
+  "instance.icon-editor.symbol.oxygen-distributor": {
+    "message": "Máy phân phối oxy"
+  },
+  "instance.icon-editor.symbol.pancakes": {
+    "message": "Bánh pancake"
+  },
+  "instance.icon-editor.symbol.pickaxe": {
+    "message": "Cuốc chim"
+  },
+  "instance.icon-editor.symbol.poke-ball": {
+    "message": "Poké Ball"
+  },
+  "instance.icon-editor.symbol.quilt": {
+    "message": "Quilt"
+  },
+  "instance.icon-editor.symbol.redstone-block": {
+    "message": "Khối Redstone"
+  },
+  "instance.icon-editor.symbol.sculk-sensor": {
+    "message": "Cảm biến Sculk"
+  },
+  "instance.icon-editor.symbol.skeleton": {
+    "message": "Bộ xương"
+  },
+  "instance.icon-editor.symbol.skillet": {
+    "message": "Chảo"
+  },
+  "instance.icon-editor.symbol.slime-block": {
+    "message": "Khối slime"
+  },
+  "instance.icon-editor.symbol.space-helmet": {
+    "message": "Mũ phi hành gia"
+  },
+  "instance.icon-editor.symbol.sticky-piston": {
+    "message": "Piston dính"
+  },
+  "instance.icon-editor.symbol.sword": {
+    "message": "Kiếm"
+  },
+  "instance.icon-editor.symbol.terminal": {
+    "message": "Terminal"
+  },
+  "instance.icon-editor.symbol.tiny-potato": {
+    "message": "Khoai tây tí hon"
+  },
+  "instance.icon-editor.symbol.tire": {
+    "message": "Lốp xe"
+  },
+  "instance.icon-editor.symbol.tnt": {
+    "message": "TNT"
+  },
+  "instance.icon-editor.symbol.wrenth-rinth": {
+    "message": "Cờ lê Modrinth"
+  },
+  "instance.icon-editor.symbol.zombie": {
+    "message": "Zombie"
+  },
+  "instance.icon-editor.title": {
+    "message": "Trình chỉnh sửa biểu tượng"
+  },
+  "instance.last-played": {
+    "message": "Lần chơi gần nhất"
+  },
+  "instance.locked.delete-button": {
+    "message": "Xóa bản cài đặt"
+  },
+  "instance.locked.play-tooltip": {
+    "message": "Bản cài đặt này đã bị khóa"
+  },
+  "instance.playtime.never-played": {
+    "message": "Chưa từng chơi"
   },
   "instance.server-modal.address": {
     "message": "Địa chỉ"
@@ -956,44 +3965,134 @@
   "instance.server-modal.resource-pack": {
     "message": "Gói tài nguyên"
   },
+  "instance.settings.sharing.active-invites.actions": {
+    "message": "Thao tác"
+  },
+  "instance.settings.sharing.active-invites.code": {
+    "message": "Liên kết mời"
+  },
+  "instance.settings.sharing.active-invites.description": {
+    "message": "Bất kỳ ai có một trong các liên kết mời này đều có thể tham gia khi liên kết còn hiệu lực."
+  },
+  "instance.settings.sharing.active-invites.empty": {
+    "message": "Không có lời mời nào đang hoạt động."
+  },
+  "instance.settings.sharing.active-invites.expires": {
+    "message": "Hết hạn"
+  },
+  "instance.settings.sharing.active-invites.revoke": {
+    "message": "Thu hồi lời mời"
+  },
+  "instance.settings.sharing.active-invites.revoke-with-code": {
+    "message": "Thu hồi lời mời {code}"
+  },
+  "instance.settings.sharing.active-invites.title": {
+    "message": "Lời mời đang hoạt động"
+  },
+  "instance.settings.sharing.active-invites.uses": {
+    "message": "Lượt dùng"
+  },
+  "instance.settings.sharing.revoke-invite.admonition-body": {
+    "message": "Liên kết mời <monospace>{code}</monospace> sẽ ngừng hoạt động ngay lập tức. Những người đã tham gia vẫn giữ quyền truy cập."
+  },
+  "instance.settings.sharing.revoke-invite.admonition-header": {
+    "message": "Không thể hoàn tác thao tác này"
+  },
+  "instance.settings.sharing.revoke-invite.confirm": {
+    "message": "Thu hồi lời mời"
+  },
+  "instance.settings.sharing.revoke-invite.header": {
+    "message": "Thu hồi lời mời"
+  },
+  "instance.settings.synced-options.data-override": {
+    "message": "Tắt ghi đè này để chỉnh sửa dữ liệu đã đồng bộ."
+  },
+  "instance.settings.synced-options.data-packs": {
+    "message": "Ngừng đồng bộ gói dữ liệu"
+  },
+  "instance.settings.synced-options.data-packs.description": {
+    "message": "Giữ các gói dữ liệu của bản cài đặt này tách biệt khỏi các gói đã đồng bộ."
+  },
+  "instance.settings.synced-options.data-packs.disabled": {
+    "message": "Đồng bộ gói dữ liệu đang bị tắt trong cài đặt ứng dụng."
+  },
+  "instance.settings.synced-options.edit-packs": {
+    "message": "Chỉnh sửa gói đã đồng bộ"
+  },
+  "instance.settings.synced-options.packs-override": {
+    "message": "Tắt ghi đè này để chỉnh sửa các gói đã đồng bộ. Các gói độc lập có thể được quản lý trong thẻ Nội dung."
+  },
+  "instance.settings.synced-options.resource-packs": {
+    "message": "Ngừng đồng bộ gói tài nguyên"
+  },
+  "instance.settings.synced-options.resource-packs.description": {
+    "message": "Giữ các gói tài nguyên của bản cài đặt này tách biệt khỏi các gói đã đồng bộ."
+  },
+  "instance.settings.synced-options.resource-packs.disabled": {
+    "message": "Đồng bộ gói tài nguyên đang bị tắt trong cài đặt ứng dụng."
+  },
+  "instance.settings.tabs.behavior.description": {
+    "message": "Chọn các thẻ sẽ hiển thị trên bản cài đặt này."
+  },
+  "instance.settings.tabs.behavior.files": {
+    "message": "Hiển thị thẻ Tệp"
+  },
+  "instance.settings.tabs.behavior.screenshots": {
+    "message": "Hiển thị thẻ Ảnh chụp màn hình"
+  },
+  "instance.settings.tabs.behavior.screenshots.required": {
+    "message": "Không thể ẩn thẻ Ảnh chụp màn hình khi trang Ảnh chụp màn hình toàn cục đang bị tắt."
+  },
+  "instance.settings.tabs.behavior.worlds": {
+    "message": "Hiển thị thẻ Thế giới"
+  },
   "instance.settings.tabs.general": {
-    "message": "Tổng quát"
+    "message": "Chung"
   },
   "instance.settings.tabs.general.delete": {
-    "message": "Xoá hồ sơ"
+    "message": "Xóa bản cài đặt"
   },
   "instance.settings.tabs.general.delete.button": {
-    "message": "Xoá hồ sơ"
+    "message": "Xóa bản cài đặt"
   },
   "instance.settings.tabs.general.delete.description": {
-    "message": "Xoá vĩnh viễn sẽ xoá toàn bộ thế giới, cài đặt, và các nội dung được cài đặt khỏi thiết bị của bạn. Hãy cân nhắc và chắc chắn vì bạn không thể khôi phục các tệp dữ liệt sau khi xoá."
+    "message": "Xóa vĩnh viễn bản cài đặt khỏi thiết bị, bao gồm thế giới, cấu hình và mọi nội dung đã cài. Hãy cẩn thận vì sau khi xóa sẽ không thể khôi phục."
   },
   "instance.settings.tabs.general.deleting.button": {
-    "message": "Đang xoá..."
+    "message": "Đang xóa..."
   },
   "instance.settings.tabs.general.duplicate-button": {
     "message": "Nhân bản"
   },
   "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
-    "message": "Không thể nhân bản trong khi đang cài đặt."
+    "message": "Không thể nhân bản khi đang cài đặt."
   },
   "instance.settings.tabs.general.duplicate-instance": {
-    "message": "Nhân bản hồ sơ"
+    "message": "Nhân bản bản cài đặt"
   },
   "instance.settings.tabs.general.duplicate-instance.description": {
-    "message": "Tạo ra một bản sao của hồ sơ này, bao gồm các thế giới, cấu hình, mod, v.v."
+    "message": "Tạo một bản sao của bản cài đặt này, bao gồm thế giới, cấu hình, mod và các dữ liệu khác."
   },
   "instance.settings.tabs.general.edit-icon": {
-    "message": "Sửa biểu tượng"
+    "message": "Chỉnh sửa biểu tượng"
+  },
+  "instance.settings.tabs.general.edit-icon.create": {
+    "message": "Tạo biểu tượng"
+  },
+  "instance.settings.tabs.general.edit-icon.edit-created": {
+    "message": "Chỉnh sửa biểu tượng"
   },
   "instance.settings.tabs.general.edit-icon.remove": {
-    "message": "Loại bỏ biểu tượng"
+    "message": "Xóa biểu tượng"
   },
   "instance.settings.tabs.general.edit-icon.replace": {
-    "message": "Thay thế biểu tượng"
+    "message": "Thay biểu tượng"
   },
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "Chọn biểu tượng"
+  },
+  "instance.settings.tabs.general.icon": {
+    "message": "Biểu tượng"
   },
   "instance.settings.tabs.general.name": {
     "message": "Tên"
@@ -1002,52 +4101,79 @@
     "message": "Kênh cập nhật"
   },
   "instance.settings.tabs.general.update-channel.alpha": {
-    "message": "Sơ khai"
+    "message": "Alpha"
   },
   "instance.settings.tabs.general.update-channel.alpha.description": {
-    "message": "Các phiên bản chính thức, thử nghiệm và sơ khai sẽ hiển thị trong danh sách cập nhật có sẵn."
+    "message": "Các phiên bản ổn định, beta và alpha sẽ được hiển thị là bản cập nhật khả dụng."
   },
   "instance.settings.tabs.general.update-channel.beta": {
-    "message": "Thử nghiệm"
+    "message": "Beta"
   },
   "instance.settings.tabs.general.update-channel.beta.description": {
-    "message": "Các phiên bản chính thức và thử nghiệm sẽ hiển thị trong danh sách cập nhật có sẵn."
+    "message": "Các phiên bản ổn định và beta sẽ được hiển thị là bản cập nhật khả dụng."
   },
   "instance.settings.tabs.general.update-channel.release": {
-    "message": "Chính thức"
+    "message": "Ổn định"
   },
   "instance.settings.tabs.general.update-channel.release.description": {
-    "message": "Chỉ phiên bản chính thức sẽ hiển thị trong danh sách cập nhật có sẵn."
+    "message": "Chỉ các phiên bản ổn định được hiển thị là bản cập nhật khả dụng."
   },
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Chọn kênh cập nhật"
+  },
+  "instance.settings.tabs.hooks.description": {
+    "message": "Chạy các lệnh hệ thống riêng cho bản cài đặt trước và sau khi khởi chạy trò chơi."
   },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Sau khi thoát"
   },
   "instance.settings.tabs.hooks.post-exit.description": {
-    "message": "Chạy sau khi trò chơi đóng lại."
+    "message": "Chạy sau khi trò chơi đóng."
   },
   "instance.settings.tabs.hooks.post-exit.enter": {
     "message": "Nhập lệnh sau khi thoát..."
   },
   "instance.settings.tabs.hooks.pre-launch": {
-    "message": "Trước khi chạy"
+    "message": "Trước khi khởi chạy"
   },
   "instance.settings.tabs.hooks.pre-launch.description": {
-    "message": "Chạy trước khi hiện thể được khởi chạy."
+    "message": "Chạy trước khi bản cài đặt được khởi chạy."
   },
   "instance.settings.tabs.hooks.pre-launch.enter": {
-    "message": "Nhập câu lệnh trước khi chạy..."
+    "message": "Nhập lệnh trước khi khởi chạy..."
+  },
+  "instance.settings.tabs.hooks.title": {
+    "message": "Hook khởi chạy trò chơi tùy chỉnh"
+  },
+  "instance.settings.tabs.hooks.variables.description": {
+    "message": "Hook chạy trong thư mục làm việc của bản cài đặt với các biến sau:"
+  },
+  "instance.settings.tabs.hooks.variables.inst-dir.description": {
+    "message": "$INST_DIR: Đường dẫn tuyệt đối tới thư mục bản cài đặt"
+  },
+  "instance.settings.tabs.hooks.variables.inst-id.description": {
+    "message": "$INST_ID: Tên thư mục của bản cài đặt"
+  },
+  "instance.settings.tabs.hooks.variables.inst-java-args.description": {
+    "message": "$INST_JAVA_ARGS: Các đối số JVM được truyền cho trò chơi"
+  },
+  "instance.settings.tabs.hooks.variables.inst-java.description": {
+    "message": "$INST_JAVA: Đường dẫn tuyệt đối tới tệp thực thi Java"
+  },
+  "instance.settings.tabs.hooks.variables.inst-mc-dir.description": {
+    "message": "$INST_MC_DIR: Bí danh của $INST_DIR"
+  },
+  "instance.settings.tabs.hooks.variables.inst-name.description": {
+    "message": "$INST_NAME: Tên bản cài đặt"
   },
   "instance.settings.tabs.hooks.wrapper": {
-    "message": "Lệnh bao bọc (Wrapper)"
+    "message": "Lệnh bọc"
   },
   "instance.settings.tabs.hooks.wrapper.description": {
-    "message": "Lệnh bao bọc (Wrapper) để khởi chạy Minecraft."
+    "message": "Lệnh bọc dùng để khởi chạy Minecraft."
   },
   "instance.settings.tabs.hooks.wrapper.enter": {
-    "message": "Nhập lệnh bao bọc..."
+    "message": "Nhập lệnh bọc..."
   },
   "instance.settings.tabs.installation": {
     "message": "Cài đặt"
@@ -1055,23 +4181,119 @@
   "instance.settings.tabs.installation.loader-version": {
     "message": "Phiên bản {loader}"
   },
+  "instance.settings.tabs.installation.locked": {
+    "message": "Các tùy chọn cài đặt không khả dụng khi bản cài đặt này đang bị khóa."
+  },
+  "instance.settings.tabs.java.custom-environment-variables": {
+    "message": "Thiết lập biến môi trường riêng cho bản cài đặt này."
+  },
+  "instance.settings.tabs.java.custom-java-arguments": {
+    "message": "Thiết lập đối số Java riêng cho bản cài đặt này."
+  },
+  "instance.settings.tabs.java.custom-java-installation": {
+    "message": "Chọn bản cài đặt Java khác cho bản cài đặt này."
+  },
+  "instance.settings.tabs.java.custom-memory-allocation": {
+    "message": "Thiết lập phân bổ bộ nhớ riêng cho bản cài đặt này."
+  },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Nhập biến môi trường..."
   },
   "instance.settings.tabs.java.enter-java-arguments": {
-    "message": "Nhập tham số Java..."
+    "message": "Nhập đối số Java..."
+  },
+  "instance.settings.tabs.java.environment-variables": {
+    "message": "Biến môi trường tùy chỉnh"
   },
   "instance.settings.tabs.java.hooks": {
-    "message": "Hooks"
+    "message": "Hook"
+  },
+  "instance.settings.tabs.java.java-arguments": {
+    "message": "Đối số Java tùy chỉnh"
+  },
+  "instance.settings.tabs.java.java-installation": {
+    "message": "Bản cài đặt Java tùy chỉnh"
+  },
+  "instance.settings.tabs.java.java-memory": {
+    "message": "Phân bổ bộ nhớ tùy chỉnh"
   },
   "instance.settings.tabs.java.java-path-placeholder": {
-    "message": "/đường_dẫn/tới/java"
+    "message": "/đường/dẫn/đến/java"
+  },
+  "instance.settings.tabs.settings-overrides": {
+    "message": "Ghi đè đồng bộ"
+  },
+  "instance.settings.tabs.sharing": {
+    "message": "Chia sẻ"
+  },
+  "instance.settings.tabs.synced-options.command-history": {
+    "message": "Ngừng đồng bộ lịch sử lệnh"
+  },
+  "instance.settings.tabs.synced-options.command-history.disabled-in-app": {
+    "message": "Đồng bộ lịch sử lệnh đang bị tắt trong cài đặt ứng dụng."
+  },
+  "instance.settings.tabs.synced-options.command-history.override-description": {
+    "message": "Giữ lịch sử lệnh của bản cài đặt này tách biệt khỏi lịch sử lệnh đã đồng bộ."
+  },
+  "instance.settings.tabs.synced-options.creative-hotbars": {
+    "message": "Ngừng đồng bộ thanh vật phẩm Sáng tạo đã lưu"
+  },
+  "instance.settings.tabs.synced-options.creative-hotbars.disabled-in-app": {
+    "message": "Đồng bộ thanh vật phẩm Sáng tạo đã lưu đang bị tắt trong cài đặt ứng dụng."
+  },
+  "instance.settings.tabs.synced-options.creative-hotbars.override-description": {
+    "message": "Giữ các thanh vật phẩm Sáng tạo đã lưu của bản cài đặt này tách biệt khỏi các thanh đã đồng bộ."
+  },
+  "instance.settings.tabs.synced-options.game-settings": {
+    "message": "Ngừng đồng bộ cài đặt trò chơi"
+  },
+  "instance.settings.tabs.synced-options.game-settings.description": {
+    "message": "Giữ tệp options.txt của bản cài đặt này tách biệt khỏi bản đã đồng bộ."
+  },
+  "instance.settings.tabs.synced-options.game-settings.disabled-in-app": {
+    "message": "Đồng bộ cài đặt trò chơi đang bị tắt trong cài đặt ứng dụng."
+  },
+  "instance.settings.tabs.synced-options.hotbars-conflict.backup-description": {
+    "message": "Phiên bản bị thay thế sẽ được sao lưu trước khi có thay đổi."
+  },
+  "instance.settings.tabs.synced-options.hotbars-conflict.description": {
+    "message": "{instance} và phiên bản đã đồng bộ của bạn có các thanh vật phẩm Sáng tạo khác nhau. Hãy chọn phiên bản sẽ dùng trên các bản cài đặt."
+  },
+  "instance.settings.tabs.synced-options.hotbars-conflict.title": {
+    "message": "Chọn thanh vật phẩm Sáng tạo"
+  },
+  "instance.settings.tabs.synced-options.hotbars-conflict.use-instance": {
+    "message": "Dùng bản này và ghi đè"
+  },
+  "instance.settings.tabs.synced-options.hotbars-conflict.use-synced": {
+    "message": "Dùng bản đã đồng bộ"
+  },
+  "instance.settings.tabs.synced-options.multiplayer-servers": {
+    "message": "Ngừng đồng bộ máy chủ nhiều người chơi"
+  },
+  "instance.settings.tabs.synced-options.multiplayer-servers.disabled-in-app": {
+    "message": "Đồng bộ máy chủ nhiều người chơi đang bị tắt trong cài đặt ứng dụng."
+  },
+  "instance.settings.tabs.synced-options.multiplayer-servers.override-description": {
+    "message": "Giữ danh sách máy chủ nhiều người chơi của bản cài đặt này tách biệt khỏi danh sách đã đồng bộ."
+  },
+  "instance.settings.tabs.synced-options.open-app-settings": {
+    "message": "Quản lý cài đặt đồng bộ"
+  },
+  "instance.settings.tabs.synced-options.shared-settings.description": {
+    "message": "Bật ghi đè để giữ một cài đặt đã đồng bộ riêng cho bản cài đặt này."
+  },
+  "instance.settings.tabs.window": {
+    "message": "Cài đặt cửa sổ tùy chỉnh"
+  },
+  "instance.settings.tabs.window.custom-window-settings": {
+    "message": "Thiết lập chế độ toàn màn hình và độ phân giải khởi chạy riêng cho bản cài đặt này."
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Toàn màn hình"
   },
   "instance.settings.tabs.window.fullscreen.description": {
-    "message": "Làm cho trò chơi bắt đầu ở dạng toàn màn hình khi khởi chạy (sử dụng options.txt)."
+    "message": "Khởi động trò chơi ở chế độ toàn màn hình khi chạy (dùng options.txt)."
   },
   "instance.settings.tabs.window.height": {
     "message": "Chiều cao"
@@ -1086,16 +4308,76 @@
     "message": "Chiều rộng"
   },
   "instance.settings.tabs.window.width.description": {
-    "message": "Chiều dài cửa sổ trò chơi khi khởi chạy."
+    "message": "Chiều rộng cửa sổ trò chơi khi khởi chạy."
   },
   "instance.settings.tabs.window.width.enter": {
-    "message": "Nhập chiều dài..."
+    "message": "Nhập chiều rộng..."
+  },
+  "instance.shared-instance.error.title": {
+    "message": "Đã xảy ra lỗi"
+  },
+  "instance.shared-instance.network-error.text": {
+    "message": "Không thể kết nối tới API bản cài đặt được chia sẻ"
+  },
+  "instance.shared-instance.network-error.title": {
+    "message": "Lỗi mạng"
+  },
+  "instance.shared-instance.owner-tooltip": {
+    "message": "Nội dung của bản cài đặt này đang được chia sẻ với người dùng khác."
+  },
+  "instance.shared-instance.publish-review.added-label": {
+    "message": "Đã thêm"
+  },
+  "instance.shared-instance.publish-review.admonition-header": {
+    "message": "Gửi bản cập nhật tới người chơi"
+  },
+  "instance.shared-instance.publish-review.config-title-v2": {
+    "message": "Chọn tệp cấu hình"
+  },
+  "instance.shared-instance.publish-review.description": {
+    "message": "Xem lại các thay đổi nội dung và chọn các tệp cấu hình cần đưa vào bản cập nhật này."
+  },
+  "instance.shared-instance.publish-review.header": {
+    "message": "Xem lại thay đổi"
+  },
+  "instance.shared-instance.publish-review.publish-button": {
+    "message": "Gửi bản cập nhật"
+  },
+  "instance.shared-instance.publish-review.removed-label": {
+    "message": "Đã gỡ"
+  },
+  "instance.shared-instance.tooltip": {
+    "message": "Nội dung của bản cài đặt này đang được người khác quản lý."
+  },
+  "instance.shared-instance.unavailable.access-revoked-text": {
+    "message": "Quyền truy cập của bạn vào bản cài đặt được chia sẻ đã bị thu hồi. Bản cài đặt này vẫn còn trên máy nhưng không còn liên kết và sẽ không nhận cập nhật nữa."
+  },
+  "instance.shared-instance.unavailable.deleted-text": {
+    "message": "Bản cài đặt chính đã bị xóa. Bản cài đặt này vẫn còn trên máy nhưng không còn liên kết và sẽ không nhận cập nhật nữa."
+  },
+  "instance.shared-instance.unavailable.locked-text": {
+    "message": "Bản cài đặt được chia sẻ này đã bị đội ngũ Kiểm duyệt Nội dung khóa. Nó sẽ không còn nhận cập nhật từ bản cài đặt chính và không thể chơi."
+  },
+  "instance.shared-instance.unavailable.locked-title": {
+    "message": "Bản cài đặt đã bị khóa"
+  },
+  "instance.shared-instance.unavailable.manager-fallback": {
+    "message": "người quản lý bản cài đặt"
+  },
+  "instance.shared-instance.unavailable.text": {
+    "message": "Bản cài đặt trên máy của bạn vẫn còn nhưng không còn liên kết và sẽ không nhận cập nhật."
+  },
+  "instance.shared-instance.unavailable.title": {
+    "message": "Bản cài đặt được chia sẻ không còn khả dụng"
   },
   "instance.worlds.a_minecraft_server": {
-    "message": "Một máy chủ Minecraft"
+    "message": "Máy chủ Minecraft"
+  },
+  "instance.worlds.actions.label": {
+    "message": "Thao tác với thế giới"
   },
   "instance.worlds.cant_connect": {
-    "message": "Không thể kết nối đến máy chủ"
+    "message": "Không thể kết nối tới máy chủ"
   },
   "instance.worlds.copy_address": {
     "message": "Sao chép địa chỉ"
@@ -1103,38 +4385,71 @@
   "instance.worlds.create_shortcut": {
     "message": "Tạo lối tắt"
   },
+  "instance.worlds.desync-server.description": {
+    "message": "Bạn muốn giữ máy chủ này trong các bản cài đặt đã đồng bộ khác hay xóa nó khỏi chúng?"
+  },
+  "instance.worlds.desync-server.keep": {
+    "message": "Giữ lại"
+  },
+  "instance.worlds.desync-server.remove": {
+    "message": "Xóa"
+  },
+  "instance.worlds.desync-server.title": {
+    "message": "Ngừng đồng bộ máy chủ"
+  },
+  "instance.worlds.desync_server": {
+    "message": "Ngừng đồng bộ"
+  },
   "instance.worlds.dont_show_on_home": {
-    "message": "Không hiện ở Trang chủ"
+    "message": "Không hiển thị trên Trang chủ"
   },
   "instance.worlds.game_already_open": {
-    "message": "Bản này đã mở sẵn"
+    "message": "Bản cài đặt đã được mở"
   },
   "instance.worlds.hardcore": {
-    "message": "Chế độ siêu khó"
+    "message": "Chế độ Hardcore"
   },
   "instance.worlds.incompatible_server": {
     "message": "Máy chủ không tương thích"
   },
+  "instance.worlds.instance-locked": {
+    "message": "Bản cài đặt này đã bị khóa"
+  },
   "instance.worlds.linked_server": {
-    "message": "Quản lý dự án máy chủ"
+    "message": "Được quản lý bởi dự án máy chủ"
+  },
+  "instance.worlds.more-options": {
+    "message": "Tùy chọn khác"
   },
   "instance.worlds.no_contact": {
-    "message": "Không thể liên lạc với máy chủ"
+    "message": "Không thể liên hệ máy chủ"
   },
   "instance.worlds.no_server_quick_play": {
-    "message": "Bạn chỉ có thể nhảy thẳng vào servers trên phiên bản Minecraft Alpha 1.0.5+"
+    "message": "Bạn chỉ có thể vào thẳng máy chủ từ Minecraft Alpha 1.0.5 trở lên"
   },
   "instance.worlds.no_singleplayer_quick_play": {
-    "message": "Bạn chỉ có thể nhảy thẳng vào thế giới người chơi đơn trên phiên bản Minecraft 1.20+"
+    "message": "Bạn chỉ có thể vào thẳng thế giới chơi đơn từ Minecraft 1.20 trở lên"
   },
   "instance.worlds.play_instance": {
-    "message": "Chơi phiên bản này"
+    "message": "Chơi bản cài đặt"
+  },
+  "instance.worlds.play_world": {
+    "message": "Chơi thế giới"
+  },
+  "instance.worlds.shortcut-created": {
+    "message": "Đã tạo lối tắt"
+  },
+  "instance.worlds.shortcut-creation-failed": {
+    "message": "Không thể tạo lối tắt"
+  },
+  "instance.worlds.synced_server": {
+    "message": "Được đồng bộ giữa các bản cài đặt"
   },
   "instance.worlds.view_instance": {
-    "message": "Xem phiên bản"
+    "message": "Xem bản cài đặt"
   },
   "instance.worlds.world_in_use": {
-    "message": "Thế giới đang mở"
+    "message": "Thế giới đang được sử dụng"
   },
   "minecraft-account.add-account": {
     "message": "Thêm tài khoản"
@@ -1146,27 +4461,99 @@
     "message": "Chưa đăng nhập"
   },
   "minecraft-account.remove-account": {
-    "message": "Xoá tài khoản"
+    "message": "Xóa tài khoản"
   },
   "minecraft-account.select-account": {
     "message": "Chọn tài khoản"
   },
   "minecraft-account.sign-in": {
-    "message": "Đăng nhập vào Minecraft"
+    "message": "Đăng nhập Minecraft"
+  },
+  "minecraft-required.description": {
+    "message": "Bạn cần tài khoản Microsoft sở hữu Minecraft trước khi có thể khởi chạy và chơi."
+  },
+  "minecraft-required.description-header": {
+    "message": "Đăng nhập tài khoản Microsoft"
+  },
+  "minecraft-required.dont-have-account": {
+    "message": "Chưa có tài khoản?"
+  },
+  "minecraft-required.get-minecraft": {
+    "message": "Mua Minecraft"
+  },
+  "minecraft-required.get-support": {
+    "message": "Nhận hỗ trợ"
+  },
+  "minecraft-required.header": {
+    "message": "Yêu cầu Minecraft"
+  },
+  "minecraft-required.sign-in": {
+    "message": "Đăng nhập Microsoft"
+  },
+  "modal.modrinth-account-required.browser-description": {
+    "message": "Một thẻ mới đã được mở để đăng nhập. Hoàn tất đăng nhập tại đó rồi quay lại ứng dụng."
+  },
+  "modal.modrinth-account-required.continue-in-browser-heading": {
+    "message": "Tiếp tục trong trình duyệt"
+  },
+  "modal.modrinth-account-required.create-account-button": {
+    "message": "Tạo tài khoản"
+  },
+  "modal.modrinth-account-required.description": {
+    "message": "Bạn cần đăng nhập tài khoản Modrinth trước khi có thể dùng tính năng này."
+  },
+  "modal.modrinth-account-required.header": {
+    "message": "Yêu cầu tài khoản"
+  },
+  "modal.modrinth-account-required.open-browser-again-button": {
+    "message": "Mở lại trình duyệt"
+  },
+  "modal.modrinth-account-required.sign-in-button": {
+    "message": "Đăng nhập Modrinth"
+  },
+  "modal.modrinth-account-required.sign-in-heading": {
+    "message": "Đăng nhập tài khoản Modrinth"
+  },
+  "modal.modrinth-account-required.signing-in-header": {
+    "message": "Đang đăng nhập"
+  },
+  "modal.modrinth-account-required.support-prompt": {
+    "message": "Gặp sự cố khi đăng nhập? <support>Nhận hỗ trợ</support>"
+  },
+  "modal.modrinth-account-required.waiting-for-browser": {
+    "message": "Đang chờ xác nhận từ trình duyệt..."
+  },
+  "onboarding-checklist.create-instance": {
+    "message": "Tạo bản cài đặt đầu tiên"
+  },
+  "onboarding-checklist.login-minecraft": {
+    "message": "Đăng nhập Minecraft"
+  },
+  "onboarding-checklist.login-modrinth": {
+    "message": "Đăng nhập Modrinth"
+  },
+  "onboarding-checklist.title": {
+    "message": "Bắt đầu"
   },
   "search.filter.locked.instance": {
-    "message": "Được cung cấp bởi phiên bản"
+    "message": "Do bản cài đặt cung cấp"
   },
   "search.filter.locked.instance-game-version.title": {
-    "message": "Phiên bản trò chơi được cung cấp bởi hồ sơ này"
+    "message": "Phiên bản trò chơi do bản cài đặt cung cấp"
   },
   "search.filter.locked.instance-loader.title": {
-    "message": "Loader được cung cấp bởi hồ sơ"
+    "message": "Bộ nạp do bản cài đặt cung cấp"
   },
   "search.filter.locked.instance.sync": {
-    "message": "Đồng bộ với phiên bản"
+    "message": "Đồng bộ với bản cài đặt"
   },
   "search.filter.locked.server-environment.title": {
-    "message": "Chỉ các mod chạy phía client mới có thể thêm hồ sơ máy chủ"
+    "message": "Chỉ có thể thêm mod phía client vào bản cài đặt máy chủ"
+  },
+  "settings.sidebar.label.account": {
+    "message": "Tài khoản"
+  },
+  "settings.sidebar.label.display": {
+    "message": "Hiển thị"
   }
 }
