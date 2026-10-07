@@ -1,10 +1,15 @@
-use anyhow::{Context, Result, bail};
+use std::collections::{HashMap, HashSet};
+
+use anyhow::{Context, Result, bail, ensure};
 use futures::{StreamExt, stream::FuturesUnordered};
 use tracing::{Instrument, debug, info, info_span, warn};
 use tracing_anyhow::FutureContext;
 
 use crate::{
-    AppState, model, store::BlobCas, upstream::mojang, util::from_json_slice,
+    AppState, model,
+    store::BlobCas,
+    upstream::mojang,
+    util::{Sha1, from_json_slice},
 };
 
 pub const FORMAT_VERSION: u32 = 0;
@@ -22,8 +27,17 @@ pub async fn export(app: &AppState) -> Result<()> {
         .await?;
     info!("found {} downloaded catalogs", catalog_rows.len());
 
+    // fetch runs, so we can prioritze the latest catalog later
+    let runs = model::DownloadRun::all()
+        .exec(&mut conn)
+        .context(info_span!("fetching download runs"))
+        .await?
+        .into_iter()
+        .map(|run| (run.id, run.started_at))
+        .collect::<HashMap<_, _>>();
+
     // read each catalog from its blob in the store
-    let catalogs = catalog_rows
+    let mut catalogs = catalog_rows
         .into_iter()
         .map(|catalog_row| {
             let sha256 = catalog_row.sha256;
@@ -54,25 +68,58 @@ pub async fn export(app: &AppState) -> Result<()> {
         catalogs.len()
     );
 
-    // now we start:
-    // - making the uber catalog
-    // - making all version manifests
-    let mut uber_versions = Vec::<mojang::Version>::new();
-    let mut version_manifests = Vec::<mojang::VersionManifest>::new();
+    catalogs.sort_by_key(|(row, _)| {
+        (
+            std::cmp::Reverse(runs.get(&row.download_run_id).copied()),
+            row.id.0,
+        )
+    });
+    let latest = catalogs
+        .first()
+        .context("no valid Mojang catalogs")?
+        .1
+        .latest
+        .clone();
+    let mut seen = HashSet::new();
+
+    // now we make all the version manifests
+    let mut processed_versions = Vec::new();
     for (catalog_row, catalog_data) in catalogs {
         for version in catalog_data.versions {
+            if !seen.insert(version.id.clone()) {
+                continue;
+            }
             let span = info_span!(
                 "making version manifest",
                 catalog_sha256 = %catalog_row.sha256,
                 %version.id,
             );
-            match make_version_manifest(&mut conn, &app.cas, &version)
+            match make_version_manifest(&mut conn, &app.cas, version)
                 .context(span)
                 .await
             {
-                Ok(manifest) => {
-                    uber_versions.push(version);
-                    version_manifests.push(manifest);
+                Ok((mut version, version_manifest, version_manifest_str)) => {
+                    let mut url = app.config.public_base_url.clone();
+                    url.set_query(None);
+                    url.set_fragment(None);
+                    url.path_segments_mut()
+                        .map_err(|()| {
+                            anyhow::anyhow!(
+                                "public_base_url must support path segments"
+                            )
+                        })?
+                        .pop_if_empty()
+                        .extend([
+                            "minecraft",
+                            &format!("v{FORMAT_VERSION}"),
+                            "versions",
+                            &format!("{}.json", version.id),
+                        ]);
+                    version.url = url;
+                    processed_versions.push((
+                        version,
+                        (version_manifest, version_manifest_str),
+                    ));
                 }
                 Err(err) => warn!("error: {err:?}"),
             }
@@ -80,61 +127,35 @@ pub async fn export(app: &AppState) -> Result<()> {
     }
 
     // dedup and sort by latest-first
-    uber_versions.sort_by_key(|version| version.id.clone());
-    uber_versions.dedup_by_key(|version| version.id.clone());
-    uber_versions
-        .sort_by_key(|version| std::cmp::Reverse(version.release_time));
+    processed_versions.sort_by_key(|(version, _)| version.id.clone());
+    processed_versions.dedup_by_key(|(version, _)| version.id.clone());
+    processed_versions
+        .sort_by_key(|(version, _)| std::cmp::Reverse(version.release_time));
+    info!("found {} unique versions", processed_versions.len());
 
-    // find latest release/snapshot game versions
-    let latest_release = uber_versions
-        .iter()
-        .find(|version| version.ty == mojang::VersionType::Release)
-        .map(|version| version.id.clone())
-        .context("no latest release")?;
-    let latest_snapshot = uber_versions
-        .iter()
-        .find(|version| version.ty == mojang::VersionType::Snapshot)
-        .map(|version| version.id.clone())
-        .context("no latest snapshot")?;
-    info!(
-        %latest_release,
-        %latest_snapshot,
-        "found {} unique versions",
-        uber_versions.len()
-    );
+    // make the uber catalog
+    let (uber_versions, version_manifests): (Vec<_>, Vec<_>) =
+        processed_versions.into_iter().unzip();
 
-    // write manifest (uber catalog)
-    {
-        let uber_catalog = mojang::Catalog {
-            latest: mojang::Latest {
-                release: latest_release,
-                snapshot: latest_snapshot,
-            },
-            versions: uber_versions,
-        };
-        let manifest = serde_json::to_string(&uber_catalog)
-            .expect("serialization should never fail");
-        let path = format!("minecraft/v{FORMAT_VERSION}/manifest.json");
-        app.public_blobs
-            .put(&path, manifest.as_bytes())
-            .context(info_span!("writing manifest to blob store", %path))
-            .await?;
-        info!(%path, "wrote uber catalog (manifest) to blob store");
+    for id in [&latest.release, &latest.snapshot] {
+        ensure!(
+            uber_versions.iter().any(|version| &version.id == id),
+            "latest version {id} was not exported"
+        );
     }
+    info!(release = %latest.release, snapshot = %latest.snapshot, "found latest versions");
 
     // write processed version manifests
     {
         let num_total = version_manifests.len();
         let mut num_done = 0usize;
-        for version_manifest in version_manifests {
+        for (version_manifest, data) in version_manifests {
             let game_version = version_manifest.id.clone();
-            let version_manifest = serde_json::to_string(&version_manifest)
-                .expect("serialization should never fail");
             let path = format!(
                 "minecraft/v{FORMAT_VERSION}/versions/{game_version}.json"
             );
             app.public_blobs
-                .put(&path, version_manifest.as_bytes())
+                .put(&path, data.as_bytes())
                 .context(info_span!("writing manifest to blob store", %path))
                 .await?;
             debug!(%path, "wrote version manifest to blob store");
@@ -146,17 +167,38 @@ pub async fn export(app: &AppState) -> Result<()> {
         }
     }
 
+    // write manifest (uber catalog)
+    {
+        let uber_catalog = mojang::Catalog {
+            latest,
+            versions: uber_versions,
+        };
+        let data = serde_json::to_string(&uber_catalog)
+            .expect("serialization should never fail");
+        let path = format!("minecraft/v{FORMAT_VERSION}/manifest.json");
+        app.public_blobs
+            .put(&path, data.as_bytes())
+            .context(info_span!("writing manifest to blob store", %path))
+            .await?;
+        info!(%path, "wrote uber catalog (manifest) to blob store");
+    }
+
     Ok(())
 }
 
 /// Takes a [`mojang::Version`] reference in a [`mojang::Catalog`], pulls the
 /// version manifest blob, post-processes it, and makes a full
 /// [`mojang::VersionManifest`] which we can export.
+///
+/// Returns:
+/// - a post-processed version of the `version` you pass in
+/// - the `VersionManifest` we fetch from the blob, with post-processing
+/// - the version manifest, encoded as JSON
 async fn make_version_manifest(
     conn: &mut toasty::Connection,
     cas: &BlobCas,
-    version: &mojang::Version,
-) -> Result<mojang::VersionManifest> {
+    mut version: mojang::Version,
+) -> Result<(mojang::Version, mojang::VersionManifest, String)> {
     let matching_hashes = model::BlobHash::all()
         .select(model::BlobHash::fields().sha256())
         .filter(model::BlobHash::fields().sha1().eq(version.sha1))
@@ -196,5 +238,19 @@ async fn make_version_manifest(
         .flat_map(mojang::patch_library)
         .collect();
 
-    Ok(version_manifest)
+    // adjust the version ref that goes into the uber catalog
+    let version_manifest_str = serde_json::to_string(&version_manifest)
+        .expect("serialization should not fail");
+    let version_manifest_sha1 =
+        Sha1::from_digest(version_manifest_str.as_bytes());
+    version.sha1 = version_manifest_sha1;
+
+    // legacy Daedalus also changed:
+    // - `complianceLevel`: always set to `1`
+    // - `time`: set to `version_manifest.time`
+    //
+    // I haven't kept these in since app-lib doesn't use them,
+    // and I have no clue why these got changed.
+
+    Ok((version, version_manifest, version_manifest_str))
 }

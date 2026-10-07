@@ -36,7 +36,8 @@ pub struct PartialLibrary {
 
 /// Bundled copy of PrismLauncher's library patches.
 ///
-/// Source: https://github.com/PrismLauncher/meta/blob/main/meta/common/mojang-library-patches.json
+/// Sourced from <https://github.com/PrismLauncher/meta/blob/main/meta/common/mojang-library-patches.json>
+///
 /// The upstream repository is licensed under the Microsoft Public License (Ms-PL).
 static LIBRARY_PATCHES: LazyLock<Vec<LibraryPatch>> = LazyLock::new(|| {
     from_json_slice(include_bytes!("library-patches.json"))
