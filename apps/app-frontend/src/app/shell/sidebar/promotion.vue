@@ -64,7 +64,10 @@ function updateAdPosition() {
 		<ArrowBigUpDashIcon class="text-2xl" />
 		{{ formatMessage(messages.upgradeToModrinthPlus) }}
 	</a>
-	<div ref="adsWrapper" class="ad-parent relative flex w-full justify-center cursor-pointer bg-surface-1">
+	<div
+		ref="adsWrapper"
+		class="ad-parent relative flex w-full justify-center cursor-pointer bg-surface-1"
+	>
 		<a
 			href="https://modrinth.host/medal?from=app-placeholder"
 			target="_blank"
