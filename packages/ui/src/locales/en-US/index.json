@@ -464,6 +464,12 @@
   "content.confirm-environment.disable-server-title": {
     "defaultMessage": "Disable for your server?"
   },
+  "content.confirm-environment.distant-horizons-server-body": {
+    "defaultMessage": "Distant Horizons can significantly increase CPU usage on your server and cause lag. It's recommended to only keep it enabled on the player side."
+  },
+  "content.confirm-environment.performance-admonition-title": {
+    "defaultMessage": "Performance warning"
+  },
   "content.confirm-environment.player-body": {
     "defaultMessage": "{project} isn’t intended to run on players’ clients. Enabling it could cause errors or prevent their game from starting."
   },

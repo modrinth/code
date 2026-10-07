@@ -15,8 +15,8 @@ import { useEventListener } from '@vueuse/core'
 import { computed, ref, useTemplateRef } from 'vue'
 import { useRouter } from 'vue-router'
 
-import videoPoster from '@/assets/modrinth-hosting-server-play-demo.webp'
 import videoUrl from '@/assets/modrinth-hosting-server-play-demo.webm'
+import videoPoster from '@/assets/modrinth-hosting-server-play-demo.webp'
 import { config } from '@/config'
 
 import { useNewUpdateNotification } from './use-notification'
