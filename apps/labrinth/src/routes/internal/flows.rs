@@ -1351,11 +1351,6 @@ pub async fn auth_callback(
             .await
             .wrap_err("failed to get user from provider")?;
 
-        let user_id_opt = provider
-            .get_user_id(&oauth_user.id, &**client)
-            .await
-            .wrap_err("failed to get user ID from provider")?;
-
         let mut transaction = client
             .begin()
             .await
@@ -1374,6 +1369,22 @@ pub async fn auth_callback(
 
             if DBUserLock::exists(existing_user_id, &mut transaction).await? {
                 return Err(AuthenticationError::AccountLocked);
+            }
+
+            crate::database::advisory_lock::AdvisoryLock::PayPalAccount(
+                oauth_user.id.clone(),
+            )
+            .acquire(&mut transaction)
+            .await
+            .wrap_err("failed to lock PayPal account for linking")?;
+
+            let linked_user_id = provider
+                .get_user_id(&oauth_user.id, &mut transaction)
+                .await
+                .wrap_err("failed to get linked user ID from PayPal")?;
+
+            if linked_user_id.is_some_and(|id| id != existing_user_id) {
+                return Err(AuthenticationError::ProviderAlreadyLinked);
             }
 
             sqlx::query!(
@@ -1406,6 +1417,11 @@ pub async fn auth_callback(
                 .append_header(("Location", url.as_str()))
                 .json(serde_json::json!({ "url": url })));
         }
+
+        let user_id_opt = provider
+            .get_user_id(&oauth_user.id, &**client)
+            .await
+            .wrap_err("failed to get user ID from provider")?;
 
         if let Some(id) = user_id {
             if user_id_opt.is_some() {
