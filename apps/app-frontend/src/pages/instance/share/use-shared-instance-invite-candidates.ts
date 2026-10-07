@@ -5,7 +5,7 @@ import {
 } from '@modrinth/ui'
 import { computed, type Ref } from 'vue'
 
-import { useFriends } from '@/composables/use-friends'
+import { useFriends } from '@/features/friends/use-friends'
 import { getFriendUserId } from '@/helpers/friends.ts'
 import { get as getCredentials } from '@/helpers/mr_auth.ts'
 import { search_user } from '@/helpers/users.ts'
