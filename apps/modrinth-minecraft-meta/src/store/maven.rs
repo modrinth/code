@@ -1,6 +1,9 @@
 use anyhow::Result;
 
-use crate::{store::BlobStore, util::MavenCoordinate};
+use crate::{
+	store::{BlobStore, ContentType},
+	util::MavenCoordinate,
+};
 
 #[derive(Debug, Clone)]
 pub struct MavenStore {
@@ -19,6 +22,6 @@ impl MavenStore {
 		data: &[u8],
 	) -> Result<()> {
 		let path = coordinate.to_maven_path();
-		self.imp.put(&path, data).await
+		self.imp.put(&path, data, ContentType::Binary).await
 	}
 }

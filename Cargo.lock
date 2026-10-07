@@ -8042,6 +8042,7 @@ dependencies = [
  "modrinth-log",
  "regex",
  "reqwest 0.12.24",
+ "rust-s3",
  "serde",
  "serde_json",
  "serde_path_to_error",

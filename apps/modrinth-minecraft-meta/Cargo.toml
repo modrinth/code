@@ -19,7 +19,7 @@ dotenvy = { workspace = true }
 directories = { workspace = true }
 bon = { workspace = true }
 url = { workspace = true, features = ["serde"] }
-derive_more = { workspace = true, features = ["deref", "display"] }
+derive_more = { workspace = true, features = ["deref", "display", "debug"] }
 reqwest = { workspace = true, features = ["default"] }
 jiff = { workspace = true, features = ["serde"] }
 clap = { workspace = true, features = ["derive"] }
@@ -33,3 +33,4 @@ regex = { workspace = true }
 futures = { workspace = true }
 serde_json = { workspace = true }
 async_zip = { workspace = true, features = ["deflate"] }
+rust-s3 = { workspace = true }
