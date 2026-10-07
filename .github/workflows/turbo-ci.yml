@@ -53,11 +53,15 @@ jobs:
         with:
           fetch-depth: 2
 
+      # Fork PRs start services later, only if the labrinth tests need them. The internal check
+      # lives in the command because `wait` steps cannot be skipped with `if`.
       - name: Start services
         id: services
-        if: env.INTERNAL == 'true'
         background: true
-        run: docker compose --profile clustered-redis up --wait
+        run: |
+          if [ "$INTERNAL" = 'true' ]; then
+            docker compose --profile clustered-redis up --wait
+          fi
 
       - name: Setup Node
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
@@ -168,7 +172,6 @@ jobs:
         run: docker compose --profile clustered-redis up --wait
 
       - name: Wait for services
-        if: env.INTERNAL == 'true'
         wait: [services]
 
       - name: Setup labrinth environment and database
