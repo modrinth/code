@@ -1,5 +1,8 @@
+use std::sync::atomic::{self, AtomicUsize};
+
 use anyhow::Result;
 use derive_more::Display;
+use futures::{StreamExt, stream};
 use serde::{Deserialize, Serialize};
 use tracing::{info, info_span};
 use tracing_anyhow::FutureContext;
@@ -108,15 +111,16 @@ pub async fn download(cx: &mut DownloadRunContext<'_>) -> Result<()> {
         download_run_id: cx.download_run_id,
         sha256,
     })
-    .exec(cx.conn)
+    .exec(*cx.conn().await)
     .context(info_span!("inserting catalog"))
     .await?;
 
-    let mut num_done = 0usize;
-    for loader in catalog.loader {
-        let loader_version = &loader.version;
+    let num_total = catalog.loader.len();
+    let num_done = AtomicUsize::new(0);
+    let task = async |loader_version: LoaderVersion| {
+        let version_name = &loader_version.version;
         let url = format!(
-            "{CATALOG_URL}/loader/{GAME_VERSION}/{loader_version}/profile/json"
+            "{CATALOG_URL}/loader/{GAME_VERSION}/{version_name}/profile/json"
         );
 
         cx.download_json::<GameLoaderProfile>(&url)
@@ -124,11 +128,14 @@ pub async fn download(cx: &mut DownloadRunContext<'_>) -> Result<()> {
             .inspect_err(|err| cx.errors.push(err))
             .ok();
 
-        num_done += 1;
-        if num_done.is_multiple_of(10) {
-            info!("downloaded {num_done} loader profiles");
+        let num_done = num_done.fetch_add(1, atomic::Ordering::SeqCst) + 1;
+        if num_done.is_multiple_of(10) || num_done == num_total {
+            info!("downloaded {num_done}/{num_total} loader profiles");
         }
-    }
+    };
+    stream::iter(catalog.loader)
+        .for_each_concurrent(cx.download_concurrency, task)
+        .await;
 
     Ok(())
 }

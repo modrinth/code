@@ -41,7 +41,7 @@ pub async fn download(cx: &mut DownloadRunContext<'_>) -> Result<()> {
         forge_sha256,
         neoforge_sha256,
     })
-    .exec(cx.conn)
+    .exec(*cx.conn().await)
     .context(info_span!("inserting catalog"))
     .await?;
 

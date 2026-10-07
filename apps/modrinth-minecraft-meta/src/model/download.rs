@@ -4,6 +4,7 @@ use uuid::Uuid;
 
 use crate::util::{ErrorVec, Sha1, Sha256};
 
+/// Hashes for blobs stored in our [`BlobStore`].
 #[derive(Debug, Clone, Model)]
 #[table = "blob_hashes"]
 pub struct BlobHash {

@@ -1,5 +1,5 @@
 [migration]
-path = "apps/modrinth-minecraft-meta/toasty"
+path = "toasty"
 prefix_style = "Timestamp"
 checksums = true
 statement_breakpoints = true

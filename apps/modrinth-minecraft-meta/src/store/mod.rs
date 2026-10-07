@@ -1,59 +1,66 @@
+mod cas;
 mod fs;
+mod maven;
+
+pub use cas::BlobCas;
+pub use maven::MavenStore;
 
 use std::{fmt::Debug, pin::Pin, sync::Arc};
 
 use anyhow::Result;
-use tracing::info_span;
-use tracing_anyhow::FutureContext;
 
-use crate::{
-    config::Config,
-    model,
-    util::{Sha1, Sha256},
-};
+use crate::config::Config;
 
-#[derive(Debug)]
+/// Stores arbitrary binary [`Vec<u8>`] blobs at a string `path`.
+///
+/// If you're looking for content-addressed storage (store by a SHA256 hash),
+/// see [`ContentStore`].
+#[derive(Debug, Clone)]
 pub struct BlobStore {
     imp: Arc<dyn StoreOps>,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum StoreVisibility {
+    Public,
+    Private,
+}
+
 impl BlobStore {
-    pub async fn new(config: &Config) -> Result<Self> {
-        let imp = fs::new(config).await?;
-        Ok(Self { imp: Arc::new(imp) })
+    pub async fn new(
+        config: &Config,
+        visibility: StoreVisibility,
+    ) -> Result<Self> {
+        _ = config;
+        fs::new(visibility).await.map(|store| Self {
+            imp: Arc::new(store),
+        })
     }
 
-    pub async fn get(&self, sha256: Sha256) -> Result<Vec<u8>> {
-        self.imp.get(sha256).await
+    /// Get a blob at a `path`.
+    ///
+    /// The `path` here may be vulnerable to directory traversal if using the
+    /// filesystem store; it is the caller's responsibility to ensure this is
+    /// a well-formed path with no traversal.
+    pub async fn get(&self, path: &str) -> Result<Vec<u8>> {
+        self.imp.get(path).await
     }
 
-    pub async fn put(
-        &self,
-        exec: &mut dyn toasty::Executor,
-        data: &[u8],
-    ) -> Result<Sha256> {
-        let sha256 = Sha256::from_digest(data);
-        let sha1 = Sha1::from_digest(data);
-        model::BlobHash::upsert_by_sha256(sha256)
-            .sha1(sha1)
-            .or_ignore()
-            .exec(exec)
-            .context(info_span!("inserting blob hash row"))
-            .await?;
-        self.imp.put(sha256, data).await?;
-        Ok(sha256)
+    /// Put a blob `data` at `path`.
+    pub async fn put(&self, path: &str, data: &[u8]) -> Result<()> {
+        self.imp.put(path, data).await
     }
 }
 
 trait StoreOps: Send + Sync + Debug + 'static {
-    fn get(
+    fn get<'a>(
         &self,
-        sha256: Sha256,
-    ) -> Pin<Box<dyn Future<Output = Result<Vec<u8>>>>>;
+        path: &'a str,
+    ) -> Pin<Box<dyn Future<Output = Result<Vec<u8>>> + 'a>>;
 
     fn put<'a>(
         &self,
-        sha256: Sha256,
+        path: &'a str,
         data: &'a [u8],
     ) -> Pin<Box<dyn Future<Output = Result<()>> + 'a>>;
 }

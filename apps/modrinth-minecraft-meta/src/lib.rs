@@ -9,7 +9,10 @@ use tracing_subscriber::{
     EnvFilter, Layer, layer::SubscriberExt, util::SubscriberInitExt,
 };
 
-use crate::{config::Config, store::BlobStore};
+use crate::{
+    config::Config,
+    store::{BlobCas, BlobStore, MavenStore, StoreVisibility},
+};
 
 mod config;
 mod export;
@@ -94,11 +97,22 @@ pub async fn main() -> Result<()> {
         .await?;
     info!("applied {} migrations", report.applied());
 
-    let blobs = BlobStore::new(&config)
-        .context(info_span!("creating blob store"))
+    let public_blobs = BlobStore::new(&config, StoreVisibility::Public)
+        .context(info_span!("creating public blob store"))
         .await?;
+    let private_blobs = BlobStore::new(&config, StoreVisibility::Private)
+        .context(info_span!("creating private blob store"))
+        .await?;
+    let cas = BlobCas::new(private_blobs.clone());
+    let maven = MavenStore::new(public_blobs.clone());
 
-    let mut state = AppState { http, blobs, db };
+    let mut app = AppState {
+        config,
+        http,
+        cas,
+        maven,
+        db,
+    };
 
     match cli.command {
         Command::Download {
@@ -117,19 +131,19 @@ pub async fn main() -> Result<()> {
                 neoforge: all_upstreams || neoforge,
                 quilt: all_upstreams || quilt,
             };
-            task::download_from_upstreams(&state, upstreams).await
+            task::download_from_upstreams(&app, upstreams).await
         }
-        Command::ExtractInstallers => {
-            task::extract_installers(&mut state).await
-        }
+        Command::ExtractInstallers => task::extract_installers(&mut app).await,
     }
 }
 
 #[derive(Debug)]
 struct AppState {
+    config: Config,
     http: reqwest::Client,
     db: toasty::Db,
-    blobs: BlobStore,
+    cas: BlobCas,
+    maven: MavenStore,
 }
 
 pub fn create_config() -> Result<Config> {

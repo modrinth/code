@@ -4,15 +4,18 @@ use anyhow::{Context, Result, anyhow};
 use jiff::Timestamp;
 use reqwest::IntoUrl;
 use serde::de::DeserializeOwned;
+use tokio::sync::Mutex;
 use tracing::{info, info_span};
 use tracing_anyhow::FutureContext;
 
 use crate::{
     AppState,
     model::{self, DownloadRunId},
-    store::BlobStore,
+    store::BlobCas,
     upstream,
-    util::{ErrorVec, ResponseExt, Sha256, from_json_str, from_json_value},
+    util::{
+        ErrorAccumulator, ResponseExt, Sha256, from_json_str, from_json_value,
+    },
 };
 
 #[derive(Debug, Clone, Copy)]
@@ -38,17 +41,18 @@ impl Default for Upstreams {
 
 pub struct DownloadRunContext<'cx> {
     pub http: &'cx reqwest::Client,
-    pub blobs: &'cx BlobStore,
-    pub conn: &'cx mut toasty::Connection,
+    pub cas: &'cx BlobCas,
+    pub conn: Mutex<&'cx mut toasty::Connection>,
     pub download_run_id: DownloadRunId,
-    pub errors: ErrorVec,
+    pub download_concurrency: usize,
+    pub errors: ErrorAccumulator,
 }
 
 pub async fn download_from_upstreams(
-    state: &AppState,
+    app: &AppState,
     upstreams: Upstreams,
 ) -> Result<()> {
-    let mut conn = state
+    let mut conn = app
         .db
         .connection()
         .context(info_span!("acquiring db connection"))
@@ -63,11 +67,12 @@ pub async fn download_from_upstreams(
     info!(?download_run.id, "starting download run");
 
     let mut cx = DownloadRunContext {
-        http: &state.http,
-        blobs: &state.blobs,
-        conn: &mut conn,
+        http: &app.http,
+        cas: &app.cas,
+        conn: Mutex::new(&mut conn),
         download_run_id: download_run.id,
-        errors: ErrorVec::new(),
+        download_concurrency: app.config.concurrency.download.get(),
+        errors: ErrorAccumulator::new(),
     };
 
     if upstreams.mojang {
@@ -107,7 +112,7 @@ pub async fn download_from_upstreams(
 
     toasty::update!(download_run {
         completed_at: Timestamp::now(),
-        errors: toasty::Json(cx.errors),
+        errors: toasty::Json(cx.errors.finish()),
     })
     .exec(&mut conn)
     .context(info_span!("marking download run as completed"))
@@ -116,8 +121,14 @@ pub async fn download_from_upstreams(
     Ok(())
 }
 
-impl DownloadRunContext<'_> {
-    pub async fn download_blob(&mut self, url: impl IntoUrl) -> Result<Sha256> {
+impl<'cx> DownloadRunContext<'cx> {
+    pub async fn conn(
+        &self,
+    ) -> tokio::sync::MutexGuard<'_, &'cx mut toasty::Connection> {
+        self.conn.lock().await
+    }
+
+    pub async fn download_blob(&self, url: impl IntoUrl) -> Result<Sha256> {
         let url = url.into_url().context("converting to URL")?;
         let bytes = async {
             self.http
@@ -138,7 +149,7 @@ impl DownloadRunContext<'_> {
     }
 
     pub async fn download_json<T: DeserializeOwned>(
-        &mut self,
+        &self,
         url: impl IntoUrl,
     ) -> Result<(T, Sha256)> {
         let url = url.into_url().context("converting to URL")?;
@@ -165,15 +176,15 @@ impl DownloadRunContext<'_> {
         Ok((t, sha256))
     }
 
-    async fn insert_blob(&mut self, url: &str, data: &[u8]) -> Result<Sha256> {
-        let mut txn = self
-            .conn
+    async fn insert_blob(&self, url: &str, data: &[u8]) -> Result<Sha256> {
+        let mut conn = self.conn.lock().await;
+        let mut txn = conn
             .transaction()
             .context(info_span!("starting transaction"))
             .await?;
 
         let sha256 = self
-            .blobs
+            .cas
             .put(&mut txn, data)
             .context(info_span!("storing blob"))
             .await?;

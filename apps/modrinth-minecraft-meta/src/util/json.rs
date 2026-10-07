@@ -24,3 +24,10 @@ pub fn from_json_str<T: DeserializeOwned>(str: &str) -> anyhow::Result<T> {
         .with_context(|| anyhow!("invalid JSON\n\n{str}"))?;
     from_json_value(&value)
 }
+
+pub fn de_error<'de, D: serde::Deserializer<'de>>(
+    err: impl Into<anyhow::Error>,
+) -> D::Error {
+    let err = err.into();
+    serde::de::Error::custom(format!("{err:#}"))
+}

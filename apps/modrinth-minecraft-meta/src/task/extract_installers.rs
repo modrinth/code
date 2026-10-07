@@ -1,6 +1,10 @@
-use std::{any::type_name, collections::HashMap};
+use std::{
+    any::type_name,
+    collections::{HashMap, HashSet},
+};
 
 use anyhow::{Context, Result, anyhow};
+use futures::{TryStreamExt, stream};
 use jiff::Timestamp;
 use serde::{Deserialize, de::DeserializeOwned};
 use tracing::{debug, info, info_span, warn};
@@ -9,12 +13,19 @@ use tracing_anyhow::FutureContext;
 use crate::{
     AppState, model,
     upstream::mojang::{self},
-    util::{from_json_slice, from_json_value},
+    util::{MavenCoordinate, from_json_slice, from_json_value},
 };
 
 pub async fn extract_installers(app: &mut AppState) -> Result<()> {
+    let extracted_hashes = model::ForgelikeExtract::all()
+        .select(model::ForgelikeExtract::fields().installer_sha256());
     let unprocessed_installers = model::ForgelikeInstaller::all()
-        .filter(model::ForgelikeInstaller::fields().processed_at().is_none())
+        .filter(
+            model::ForgelikeInstaller::fields()
+                .sha256()
+                .in_query(extracted_hashes)
+                .not(),
+        )
         .exec(&mut app.db)
         .context(info_span!("fetching unprocessed Forge-like installers"))
         .await?;
@@ -109,7 +120,7 @@ async fn extract_from_installer(
     installer: model::ForgelikeInstaller,
 ) -> Result<()> {
     let installer_blob = app
-        .blobs
+        .cas
         .get(installer.sha256)
         .context(info_span!("fetching installer blob"))
         .await?;
@@ -128,8 +139,8 @@ async fn extract_from_installer(
             .await?
         {
             Some(mut version) => {
-                let profile: ModernInstallProfile =
-                    from_json_value(&install_profile)
+                let profile =
+                    from_json_value::<ModernInstallProfile>(&install_profile)
                         .context("parsing modern install profile")?;
                 version.data = Some(profile.data);
                 version.processors = Some(profile.processors);
@@ -142,38 +153,87 @@ async fn extract_from_installer(
                 version
             }
             None => {
-                let profile: LegacyInstallProfile =
-                    from_json_value(&install_profile).context(
+                let profile =
+                    from_json_value::<LegacyInstallProfile>(&install_profile)
+                        .context(
                         "parsing legacy install profile without version.json",
                     )?;
                 profile.into_metadata()
             }
         };
-    let embedded_maven_artifacts = zip
+    let referenced_artifacts = referenced_maven_artifacts(&version.libraries)?;
+    let embedded_paths = zip
         .file()
         .entries()
         .iter()
         .map(|entry| entry.filename().as_str())
-        .collect::<std::result::Result<Vec<_>, _>>()?
+        .collect::<Result<HashSet<_>, _>>()?;
+    let embedded_maven_artifacts = referenced_artifacts
         .into_iter()
-        .filter(|path| path.starts_with("maven/") && !path.ends_with('/'))
-        .map(str::to_owned)
+        .filter(|path| embedded_paths.contains(path.as_str()))
         .collect::<Vec<_>>();
 
     debug!(
-        ?install_profile,
-        ?version,
-        ?embedded_maven_artifacts,
+        %version.id,
+        num_embedded_maven_artifacts = embedded_maven_artifacts.len(),
         "read installer metadata"
     );
+
+    stream::iter(embedded_maven_artifacts.iter().map(anyhow::Ok))
+        .try_for_each_concurrent(
+            app.config.concurrency.extract_files.get(),
+            |path| {
+                let zip = &zip;
+                async move {
+                    let coordinate = MavenCoordinate::from_maven_path(path)
+                        .with_context(|| {
+                            anyhow!(
+                                "parsing embedded Maven artifact path '{path}'"
+                            )
+                        })?;
+                    let bytes = read_file(zip, path)
+                        .context(info_span!(
+                            "extracting embedded Maven artifact",
+                            path
+                        ))
+                        .await?
+                        .context(
+                            "embedded Maven artifact is missing from installer",
+                        )?;
+                    app.maven
+						.put(&coordinate, &bytes)
+						.context(
+							info_span!("storing embedded Maven artifact", path, %coordinate),
+						)
+						.await?;
+                    Ok(())
+                }
+            },
+        )
+        .await?;
 
     Ok(())
 }
 
-async fn read_json<T: DeserializeOwned>(
-    zip: &ZipFileReader,
-    path: &str,
-) -> Result<Option<T>> {
+fn referenced_maven_artifacts(
+    libraries: &[mojang::Library],
+) -> Result<Vec<String>> {
+    let mut seen = HashSet::new();
+    let mut paths = Vec::new();
+    for library in libraries {
+        let coordinate: MavenCoordinate =
+            library.name.parse().with_context(|| {
+                format!("parsing referenced library {}", library.name)
+            })?;
+        let path = coordinate.to_maven_path();
+        if seen.insert(path.clone()) {
+            paths.push(path);
+        }
+    }
+    Ok(paths)
+}
+
+async fn read_file(zip: &ZipFileReader, path: &str) -> Result<Option<Vec<u8>>> {
     let index = zip
         .file()
         .entries()
@@ -192,8 +252,52 @@ async fn read_json<T: DeserializeOwned>(
         .read_to_end_checked(&mut bytes)
         .context(info_span!("reading installer entry", path))
         .await?;
+    Ok(Some(bytes))
+}
+
+async fn read_json<T: DeserializeOwned>(
+    zip: &ZipFileReader,
+    path: &str,
+) -> Result<Option<T>> {
+    let Some(bytes) = read_file(zip, path).await? else {
+        return Ok(None);
+    };
     let t = from_json_slice::<T>(&bytes).with_context(|| {
         anyhow!("entry {path} must be a `{}`", type_name::<T>())
     })?;
     Ok(Some(t))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::referenced_maven_artifacts;
+    use crate::upstream::mojang::Library;
+
+    #[test]
+    fn referenced_artifacts_preserve_suffixes_and_deduplicate() {
+        let libraries: Vec<Library> =
+            serde_json::from_value(serde_json::json!([
+                {"name": "com.example:tool:1:client@lzma"},
+                {"name": "com.example:tool:1"},
+                {"name": "com.example:tool:1@jar"}
+            ]))
+            .unwrap();
+        assert_eq!(
+            referenced_maven_artifacts(&libraries).unwrap(),
+            [
+                "maven/com/example/tool/1/tool-1-client.lzma",
+                "maven/com/example/tool/1/tool-1.jar",
+            ]
+        );
+    }
+
+    #[test]
+    fn invalid_referenced_coordinates_are_rejected() {
+        let libraries: Vec<Library> =
+            serde_json::from_value(serde_json::json!([
+                {"name": "com.example:../tool:1"}
+            ]))
+            .unwrap();
+        assert!(referenced_maven_artifacts(&libraries).is_err());
+    }
 }

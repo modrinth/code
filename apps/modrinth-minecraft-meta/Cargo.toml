@@ -14,8 +14,9 @@ tracing-subscriber = { workspace = true, features = ["chrono", "env-filter"] }
 toasty = { workspace = true, features = ["postgresql", "serde", "jiff"] }
 modrinth-log = { workspace = true }
 figment = { workspace = true, features = ["env"] }
-uuid = { workspace = true }
+uuid = { workspace = true, features = ["v7"] }
 dotenvy = { workspace = true }
+directories = { workspace = true }
 bon = { workspace = true }
 url = { workspace = true, features = ["serde"] }
 derive_more = { workspace = true, features = ["deref", "display"] }
@@ -28,5 +29,7 @@ sha1 = { workspace = true }
 sha2 = { workspace = true }
 tracing-anyhow = { workspace = true }
 hex = { workspace = true }
+regex = { workspace = true }
+futures = { workspace = true }
 serde_json = { workspace = true }
 async_zip = { workspace = true, features = ["deflate"] }

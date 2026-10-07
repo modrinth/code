@@ -7,6 +7,8 @@ use toasty::{
     stmt::{Assign, Assignment, Expr, IntoExpr, List, Path, Type, Value},
 };
 
+use crate::util::de_error;
+
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Sha256(pub [u8; 32]);
 
@@ -47,8 +49,7 @@ impl<'de> Deserialize<'de> for Sha256 {
     {
         let value = String::deserialize(deserializer)?;
         let mut bytes = [0; 32];
-        hex::decode_to_slice(value, &mut bytes)
-            .map_err(serde::de::Error::custom)?;
+        hex::decode_to_slice(value, &mut bytes).map_err(de_error::<D>)?;
         Ok(Self(bytes))
     }
 }

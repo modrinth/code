@@ -35,7 +35,17 @@ pub enum ForgelikeLoader {
 /// Forge uses `<minecraft version>-<loader version>`; modern NeoForge uses
 /// its loader version alone.
 #[derive(
-    Debug, Display, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, Embed,
+    Debug,
+    Display,
+    Clone,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Serialize,
+    Deserialize,
+    Embed,
 )]
 pub struct ForgelikeInstallerName(pub String);
 
@@ -49,7 +59,6 @@ pub struct ForgelikeInstaller {
     pub download_run: toasty::Deferred<DownloadRun>,
     #[index]
     pub sha256: Sha256,
-    pub processed_at: Option<Timestamp>,
 }
 
 /// Parsed metadata and embedded artifact paths from a Forge or NeoForge installer.
@@ -62,6 +71,10 @@ pub struct ForgelikeExtract {
     /// not a specific installer record.
     #[key]
     pub installer_sha256: Sha256,
+    /// When this installer was extracted, and the extraction record was
+    /// created.
+    #[auto]
+    pub created_at: Timestamp,
     #[column(type = json)]
     pub metadata: toasty::Json<ProfileMetadata>,
     /// Paths inside the installer, not references to extracted blobs.

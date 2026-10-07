@@ -1,19 +1,29 @@
 use std::{path::PathBuf, pin::Pin};
 
-use anyhow::Result;
-use tokio::fs;
-use tracing::info_span;
+use anyhow::{Context, Result};
+use tokio::{fs, io::AsyncWriteExt};
+use tracing::{info_span, warn};
 use tracing_anyhow::FutureContext;
+use uuid::Uuid;
 
-use crate::{config::Config, store::StoreOps, util::Sha256};
+use crate::store::{StoreOps, StoreVisibility};
 
 #[derive(Debug)]
 pub struct FsStore {
     root: PathBuf,
 }
 
-pub async fn new(config: &Config) -> Result<FsStore> {
-    let root = config.data_directory.join("blobs");
+pub async fn new(visibility: StoreVisibility) -> Result<FsStore> {
+    let dirs = directories::ProjectDirs::from(
+        "com.modrinth",
+        "Modrinth",
+        "modrinth-minecraft-meta",
+    )
+    .context("fetching project dirs")?;
+    let root = dirs.data_dir().join(match visibility {
+        StoreVisibility::Public => "public",
+        StoreVisibility::Private => "private",
+    });
     fs::create_dir_all(&root)
         .context(info_span!("creating blobs dir"))
         .await?;
@@ -21,13 +31,14 @@ pub async fn new(config: &Config) -> Result<FsStore> {
 }
 
 impl StoreOps for FsStore {
-    fn get(
+    fn get<'a>(
         &self,
-        sha256: Sha256,
-    ) -> Pin<Box<dyn Future<Output = Result<Vec<u8>>>>> {
-        let sha256 = sha256.to_string();
-        let (first, _) = sha256.split_at(2);
-        let path = self.root.join(first).join(&sha256);
+        path: &'a str,
+    ) -> Pin<Box<dyn Future<Output = Result<Vec<u8>>> + 'a>> {
+        // this is vulnerable to path traversal,
+        // but we always use wrappers on top of `StoreOps`,
+        // which must create well-formed, non-malicious paths.
+        let path = self.root.join(path);
         Box::pin(async move {
             let data = fs::read(&path)
                 .context(info_span!("reading file", ?path))
@@ -38,21 +49,42 @@ impl StoreOps for FsStore {
 
     fn put<'a>(
         &self,
-        sha256: Sha256,
+        path: &'a str,
         data: &'a [u8],
     ) -> Pin<Box<dyn Future<Output = Result<()>> + 'a>> {
-        let sha256 = sha256.to_string();
-        let (first, _) = sha256.split_at(2);
-        let parent = self.root.join(first);
-        let path = parent.join(&sha256);
+        let path = self.root.join(path);
         Box::pin(async move {
+            let parent = path.parent().context("path has no parent")?;
             fs::create_dir_all(&parent)
                 .context(info_span!("creating parent dir", ?parent))
                 .await?;
-            fs::write(&path, data)
-                .context(info_span!("writing file", ?path))
+            let temp_path = parent.join(format!(".{}.tmp", Uuid::now_v7()));
+            let mut file = fs::OpenOptions::new()
+                .write(true)
+                .create_new(true)
+                .open(&temp_path)
+                .context(info_span!("creating temporary file", ?temp_path))
                 .await?;
-            Ok(())
+            let result = async {
+                file.write_all(data)
+                    .context(info_span!("writing temporary file", ?temp_path))
+                    .await?;
+                file.flush()
+                    .context(info_span!("flushing temporary file", ?temp_path))
+                    .await?;
+                drop(file);
+                fs::rename(&temp_path, &path)
+                    .context(info_span!("publishing file", ?temp_path, ?path))
+                    .await?;
+                Ok(())
+            }
+            .await;
+            if result.is_err()
+                && let Err(err) = fs::remove_file(&temp_path).await
+            {
+                warn!(?temp_path, ?err, "failed to remove temporary file");
+            }
+            result
         })
     }
 }

@@ -1,7 +1,10 @@
-use std::collections::HashMap;
+use std::{
+    collections::HashMap,
+    sync::atomic::{self, AtomicUsize},
+};
 
 use anyhow::Result;
-use derive_more::Display;
+use futures::{StreamExt, stream};
 use jiff::Timestamp;
 use serde::{Deserialize, Serialize};
 use tracing::{info, info_span};
@@ -11,7 +14,7 @@ use url::Url;
 use crate::{
     model::{self, MinecraftVersionName},
     task::DownloadRunContext,
-    util::Sha1,
+    util::{Sha1, de_error},
 };
 
 pub const CATALOG_URL: &str =
@@ -248,9 +251,7 @@ where
     let value = Option::<String>::deserialize(deserializer)?;
     match value.as_deref() {
         None | Some("") => Ok(None),
-        Some(value) => Url::parse(value)
-            .map(Some)
-            .map_err(serde::de::Error::custom),
+        Some(value) => Url::parse(value).map(Some).map_err(de_error::<D>),
     }
 }
 
@@ -305,7 +306,7 @@ pub async fn download(cx: &mut DownloadRunContext<'_>) -> Result<()> {
         download_run_id: cx.download_run_id,
         sha256,
     })
-    .exec(cx.conn)
+    .exec(*cx.conn().await)
     .context(info_span!("inserting catalog"))
     .await?;
 
@@ -317,33 +318,37 @@ pub async fn download(cx: &mut DownloadRunContext<'_>) -> Result<()> {
     let existing_sha1s = model::BlobHash::all()
         .select(model::BlobHash::fields().sha1())
         .filter(model::BlobHash::fields().sha1().in_list(cataloged_sha1s))
-        .exec(cx.conn)
+        .exec(*cx.conn().await)
         .context(info_span!("fetching existing sha1s"))
         .await?;
+    let num_versions = catalog.versions.len();
     let missing_versions = catalog
         .versions
-        .iter()
+        .into_iter()
         .filter(|version| !existing_sha1s.contains(&version.sha1))
         .collect::<Vec<_>>();
     info!(
-        "catalog contains {} versions, of which {} are missing; downloading",
-        catalog.versions.len(),
+        "catalog contains {num_versions} versions, of which {} are missing; downloading",
         missing_versions.len()
     );
 
-    let mut num_done = 0usize;
-    for version in missing_versions {
+    let num_total = missing_versions.len();
+    let num_done = AtomicUsize::new(0);
+    let task = async |version: Version| {
         cx.download_blob(version.url.clone())
             .context(info_span!("downloading version", %version.id))
             .await
             .inspect_err(|err| cx.errors.push(err))
             .ok();
 
-        num_done += 1;
-        if num_done.is_multiple_of(100) {
-            info!("downloaded {num_done} versions");
+        let num_done = num_done.fetch_add(1, atomic::Ordering::SeqCst) + 1;
+        if num_done.is_multiple_of(100) || num_done == num_total {
+            info!("downloaded {num_done}/{num_total} versions");
         }
-    }
+    };
+    stream::iter(missing_versions)
+        .for_each_concurrent(cx.download_concurrency, task)
+        .await;
 
     Ok(())
 }
