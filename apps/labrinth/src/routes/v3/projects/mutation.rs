@@ -3,7 +3,7 @@ use xredis::RedisPool;
 
 use crate::database::models::project_item::ProjectQueryResult;
 use crate::database::models::{
-    DBProjectId, DBTeamId, DBThreadIssue, DBThreadIssueId, DBUserId,
+    DBProjectId, DBTeamId, DBThreadIssue, DBThreadIssueFacetId, DBUserId,
     DBVersionId,
 };
 use crate::database::{PgTransaction, models as db_models};
@@ -32,9 +32,9 @@ pub(crate) struct SyncedProjectState {
 }
 
 impl SyncedProjectState {
-    pub(crate) fn can_address_issue(
+    pub(crate) fn can_address_facet(
         &self,
-        issue_id: DBThreadIssueId,
+        facet_id: DBThreadIssueFacetId,
     ) -> Option<bool> {
         let context = ThreadIssueContext {
             project: &self.project,
@@ -44,13 +44,12 @@ impl SyncedProjectState {
         };
         self.thread_issues
             .iter()
-            .find(|issue| issue.id == issue_id)
-            .map(|issue| {
-                issue.facets.iter().all(|facet| {
-                    matches!(&facet.what, ThreadIssueTarget::Acknowledge { .. })
-                        || facet.what.value_state(&context, false)
-                            != ThreadIssueValueState::SameAsOriginal
-                })
+            .flat_map(|issue| &issue.facets)
+            .find(|facet| facet.id == facet_id.into())
+            .map(|facet| {
+                matches!(&facet.what, ThreadIssueTarget::Acknowledge { .. })
+                    || facet.what.value_state(&context, false)
+                        != ThreadIssueValueState::SameAsOriginal
             })
     }
 }
@@ -291,9 +290,10 @@ pub(crate) async fn finalize_project_edit(
             )));
         }
 
-        for issue in &state.thread_issues {
-            DBThreadIssue::update_flags(
-                issue.id,
+        for facet in state.thread_issues.iter().flat_map(|issue| &issue.facets)
+        {
+            DBThreadIssue::update_facet_flags(
+                facet.id.into(),
                 None,
                 Some(true),
                 &mut transaction,

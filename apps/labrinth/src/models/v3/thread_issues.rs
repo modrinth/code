@@ -31,7 +31,7 @@ pub struct ThreadIssueTeamMember {
 /// Issue that a moderator has flagged on a project in its moderation thread.
 ///
 /// An issue groups related actionable facets under one reason. The creator
-/// addresses the issue as a whole, and a moderator verifies it as a whole.
+/// addresses each facet independently, and a moderator verifies each facet.
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct ThreadIssue {
     pub id: ThreadIssueId,
@@ -42,15 +42,6 @@ pub struct ThreadIssue {
     /// This is treated as an opaque JSON blob by the backend; it is up to the
     /// frontend to define a schema for it, and to render/localize it properly.
     pub why: serde_json::Value,
-    /// Has the user confirmed that they've seen this issue and (attempted to)
-    /// resolve it?
-    pub user_addressed: bool,
-    /// Has a moderator seen the user's resolution and explicitly marked it as
-    /// resolved?
-    ///
-    /// If a moderator marks this issue as verified, then it will be locked to
-    /// [`ThreadIssueVerdict::Resolved`].
-    pub moderator_verified: bool,
     /// The immutable project parts that must be changed to resolve this issue.
     pub facets: Vec<ThreadIssueFacet>,
     /// Verdict derived from all facet verdicts.
@@ -64,7 +55,16 @@ pub struct ThreadIssueFacet {
     pub id: ThreadIssueFacetId,
     /// What part of a project this facet applies to.
     pub what: ThreadIssueTarget,
-    /// Verdict derived from the current project state and issue-level flags.
+    /// Has the user confirmed that they've seen this facet and (attempted to)
+    /// resolve it?
+    pub user_addressed: bool,
+    /// Has a moderator seen the user's resolution and explicitly marked it as
+    /// resolved?
+    ///
+    /// If a moderator marks this facet as verified, then it will be locked to
+    /// [`ThreadIssueVerdict::Resolved`].
+    pub moderator_verified: bool,
+    /// Verdict derived from the current project state and facet-level flags.
     pub verdict: ThreadIssueVerdict,
 }
 
@@ -340,19 +340,14 @@ impl ThreadIssueTarget {
                 }
             }
             Self::RemoveTags { tags } => {
-                let remaining = tags
-                    .iter()
-                    .filter(|tag| {
-                        project.categories.contains(tag)
-                            || project.additional_categories.contains(tag)
-                    })
-                    .count();
-                if remaining == 0 {
-                    ThreadIssueValueState::SameAsSuggested
-                } else if remaining == tags.len() {
+                let remaining = tags.iter().any(|tag| {
+                    project.categories.contains(tag)
+                        || project.additional_categories.contains(tag)
+                });
+                if remaining {
                     ThreadIssueValueState::SameAsOriginal
                 } else {
-                    ThreadIssueValueState::DifferentToOriginal
+                    ThreadIssueValueState::SameAsSuggested
                 }
             }
             Self::ModifyLinks { links } => {
@@ -757,8 +752,6 @@ impl ThreadIssue {
             id: data.id.into(),
             created_by: user.role.is_mod().then(|| data.created_by.into()),
             why: data.why,
-            user_addressed: data.user_addressed,
-            moderator_verified: data.moderator_verified,
             facets: data.facets,
             verdict: data.verdict,
             created_at: data.created_at,
@@ -1061,13 +1054,21 @@ mod tests {
         );
         assert_eq!(
             tags.value_state(&context(&project), false),
-            ThreadIssueValueState::DifferentToOriginal
+            ThreadIssueValueState::SameAsOriginal
+        );
+        assert_eq!(
+            tags.verdict(&context(&project), true, false),
+            ThreadIssueVerdict::Open
         );
 
         project.categories.clear();
         assert_eq!(
             tags.value_state(&context(&project), false),
             ThreadIssueValueState::SameAsSuggested
+        );
+        assert_eq!(
+            tags.verdict(&context(&project), false, false),
+            ThreadIssueVerdict::Resolved
         );
     }
 
@@ -1298,16 +1299,27 @@ mod tests {
 
     #[test]
     fn issue_verdict_aggregates_facet_verdicts() {
-        let facets = |verdicts: &[ThreadIssueVerdict]| {
-            verdicts
+        let project = project();
+        let facets = |flags: &[(bool, bool)]| {
+            flags
                 .iter()
                 .enumerate()
-                .map(|(id, verdict)| ThreadIssueFacet {
-                    id: ThreadIssueFacetId(id as u64),
-                    what: ThreadIssueTarget::Acknowledge {
-                        mode: ThreadIssueAcknowledgement::Checkbox,
-                    },
-                    verdict: *verdict,
+                .map(|(id, &(user_addressed, moderator_verified))| {
+                    let what = ThreadIssueTarget::Acknowledge {
+                        mode: ThreadIssueAcknowledgement::Reply,
+                    };
+                    let verdict = what.verdict(
+                        &context(&project),
+                        user_addressed,
+                        moderator_verified,
+                    );
+                    ThreadIssueFacet {
+                        id: ThreadIssueFacetId(id as u64),
+                        what,
+                        user_addressed,
+                        moderator_verified,
+                        verdict,
+                    }
                 })
                 .collect::<Vec<_>>()
         };
@@ -1318,22 +1330,22 @@ mod tests {
         );
         assert_eq!(
             ThreadIssueVerdict::from_facets(&facets(&[
-                ThreadIssueVerdict::Resolved,
-                ThreadIssueVerdict::Resolved,
+                (false, true),
+                (true, true),
             ])),
             ThreadIssueVerdict::Resolved
         );
         assert_eq!(
             ThreadIssueVerdict::from_facets(&facets(&[
-                ThreadIssueVerdict::Addressed,
-                ThreadIssueVerdict::Resolved,
+                (true, false),
+                (false, true),
             ])),
             ThreadIssueVerdict::Addressed
         );
         assert_eq!(
             ThreadIssueVerdict::from_facets(&facets(&[
-                ThreadIssueVerdict::Open,
-                ThreadIssueVerdict::Resolved,
+                (false, false),
+                (false, true),
             ])),
             ThreadIssueVerdict::Open
         );

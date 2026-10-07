@@ -196,7 +196,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 		threads::threads_get_route,
 		threads::thread_send_message_route,
 		threads::thread_issues_create,
-		threads::thread_issue_edit,
+		threads::thread_issue_facet_edit,
 		threads::thread_issue_delete,
 		threads::message_delete_route,
 		users::all_projects,

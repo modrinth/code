@@ -7,7 +7,9 @@ use crate::database::models::thread_issue_item::ThreadIssueBuilder;
 use crate::database::models::thread_item::ThreadMessageBuilder;
 use crate::env::ENV;
 use crate::file_hosting::{FileHost, FileHostPublicity};
-use crate::models::ids::{ThreadId, ThreadIssueId, ThreadMessageId};
+use crate::models::ids::{
+    ThreadId, ThreadIssueFacetId, ThreadIssueId, ThreadMessageId,
+};
 use crate::models::images::{Image, ImageContext};
 use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
@@ -30,7 +32,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(thread_get_route)
         .service(thread_send_message_route)
         .service(thread_issues_create)
-        .service(thread_issue_edit)
+        .service(thread_issue_facet_edit)
         .service(thread_issue_delete)
         .service(message_delete_route)
         .service(threads_get_route);
@@ -424,7 +426,7 @@ pub struct NewThreadIssues {
 }
 
 #[derive(Deserialize, utoipa::ToSchema)]
-pub struct EditThreadIssue {
+pub struct EditThreadIssueFacet {
     pub user_addressed: Option<bool>,
     pub moderator_verified: Option<bool>,
 }
@@ -456,6 +458,27 @@ async fn thread_issue_project_id(
         WHERE issue.id = $1
         "#,
         issue_id as database::models::DBThreadIssueId,
+    )
+    .fetch_optional(pool)
+    .await
+    .wrap_internal_err("fetching thread issue project")?
+    .flatten()
+    .map(database::models::DBProjectId))
+}
+
+async fn thread_issue_facet_project_id(
+    facet_id: database::models::DBThreadIssueFacetId,
+    pool: &PgPool,
+) -> Result<Option<database::models::DBProjectId>, ApiError> {
+    Ok(sqlx::query_scalar!(
+        r#"
+		SELECT thread.mod_id
+		FROM threads_issue_facets facet
+		INNER JOIN threads_issues issue ON issue.id = facet.issue_id
+		INNER JOIN threads thread ON thread.id = issue.thread_id
+		WHERE facet.id = $1
+		"#,
+        facet_id as database::models::DBThreadIssueFacetId,
     )
     .fetch_optional(pool)
     .await
@@ -609,17 +632,17 @@ pub async fn thread_issues_create(
 
 #[utoipa::path(
     tag = "threads",
-    request_body = EditThreadIssue,
+    request_body = EditThreadIssueFacet,
     responses((status = NO_CONTENT))
 )]
-#[patch("/thread/issue/{id}")]
-pub async fn thread_issue_edit(
+#[patch("/thread/issue/facet/{id}")]
+pub async fn thread_issue_facet_edit(
     req: HttpRequest,
-    info: web::Path<(ThreadIssueId,)>,
+    info: web::Path<(ThreadIssueFacetId,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    web::Json(edit): web::Json<EditThreadIssue>,
+    web::Json(edit): web::Json<EditThreadIssueFacet>,
 ) -> Result<(), ApiError> {
     if edit.user_addressed.is_none() && edit.moderator_verified.is_none() {
         return Err(ApiError::Request(eyre::eyre!(
@@ -642,9 +665,9 @@ pub async fn thread_issue_edit(
     .await
     .wrap_auth_err("authenticating API request")?
     .1;
-    let issue_id: database::models::DBThreadIssueId =
+    let facet_id: database::models::DBThreadIssueFacetId =
         info.into_inner().0.into();
-    let project_id = thread_issue_project_id(issue_id, &pool)
+    let project_id = thread_issue_facet_project_id(facet_id, &pool)
         .await?
         .wrap_not_found_err("resource not found")?;
     let project_exists = project_exists(project_id, &pool).await?;
@@ -678,7 +701,7 @@ pub async fn thread_issue_edit(
         )
         .await?;
         if !state
-            .can_address_issue(issue_id)
+            .can_address_facet(facet_id)
             .wrap_not_found_err("resource not found")?
         {
             return Err(ApiError::Request(eyre::eyre!(
@@ -686,8 +709,8 @@ pub async fn thread_issue_edit(
             )));
         }
     }
-    let updated = database::models::DBThreadIssue::update_flags(
-        issue_id,
+    let updated = database::models::DBThreadIssue::update_facet_flags(
+        facet_id,
         edit.user_addressed,
         edit.moderator_verified,
         &mut transaction,

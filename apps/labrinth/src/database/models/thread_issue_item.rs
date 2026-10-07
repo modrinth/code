@@ -10,7 +10,6 @@ use chrono::{DateTime, Utc};
 use eyre::{Result, WrapErr, eyre};
 use serde::{Deserialize, Serialize};
 use sqlx::types::Json;
-use std::collections::HashSet;
 
 pub struct ThreadIssueBuilder {
     pub facets: Vec<ThreadIssueTarget>,
@@ -23,8 +22,6 @@ pub struct DBThreadIssue {
     pub thread_id: DBThreadId,
     pub created_by: DBUserId,
     pub why: serde_json::Value,
-    pub user_addressed: bool,
-    pub moderator_verified: bool,
     pub facets: Vec<ThreadIssueFacet>,
     pub verdict: ThreadIssueVerdict,
     pub created_at: DateTime<Utc>,
@@ -50,8 +47,8 @@ impl DBThreadIssue {
                 issue.thread_id,
                 issue.created_by,
                 issue.why,
-                issue.user_addressed,
-                issue.moderator_verified,
+                facet.user_addressed,
+                facet.moderator_verified,
                 issue.created_at,
                 facet.id AS "facet_id!",
                 facet.what AS "what: Json<ThreadIssueTarget>",
@@ -80,8 +77,6 @@ impl DBThreadIssue {
                     thread_id: DBThreadId(row.thread_id),
                     created_by: DBUserId(row.created_by),
                     why: row.why,
-                    user_addressed: row.user_addressed,
-                    moderator_verified: row.moderator_verified,
                     facets: Vec::new(),
                     verdict: ThreadIssueVerdict::Open,
                     created_at: row.created_at,
@@ -95,6 +90,8 @@ impl DBThreadIssue {
                 .push(ThreadIssueFacet {
                     id: DBThreadIssueFacetId(row.facet_id).into(),
                     what,
+                    user_addressed: row.user_addressed,
+                    moderator_verified: row.moderator_verified,
                     verdict: facet_verdict,
                 });
         }
@@ -128,11 +125,9 @@ impl DBThreadIssue {
                     id,
                     thread_id,
                     created_by,
-                    why,
-                    user_addressed,
-                    moderator_verified
+                    why
                 )
-                VALUES ($1, $2, $3, $4, FALSE, FALSE)
+                VALUES ($1, $2, $3, $4)
                 "#,
                 id as DBThreadIssueId,
                 thread_id as DBThreadId,
@@ -191,42 +186,28 @@ impl DBThreadIssue {
         Ok(ids)
     }
 
-    pub async fn update_flags(
-        id: DBThreadIssueId,
+    pub async fn update_facet_flags(
+        id: DBThreadIssueFacetId,
         user_addressed: Option<bool>,
         moderator_verified: Option<bool>,
         transaction: &mut PgTransaction<'_>,
     ) -> Result<bool> {
         let result = sqlx::query!(
             r#"
-            UPDATE threads_issues
+            UPDATE threads_issue_facets
             SET
                 user_addressed = COALESCE($2, user_addressed),
-                moderator_verified = COALESCE($3, moderator_verified)
+                moderator_verified = COALESCE($3, moderator_verified),
+                verdict = CASE WHEN $3 = TRUE THEN 'resolved' ELSE verdict END
             WHERE id = $1
             "#,
-            id as DBThreadIssueId,
+            id as DBThreadIssueFacetId,
             user_addressed,
             moderator_verified,
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("updating thread issue")?;
-
-        if result.rows_affected() > 0 && moderator_verified == Some(true) {
-            sqlx::query!(
-                r#"
-                UPDATE threads_issue_facets
-                SET verdict = $2
-                WHERE issue_id = $1
-                "#,
-                id as DBThreadIssueId,
-                ThreadIssueVerdict::Resolved.as_str(),
-            )
-            .execute(&mut *transaction)
-            .await
-            .wrap_err("resolving verified thread issue facets")?;
-        }
+        .wrap_err("updating thread issue facet")?;
 
         Ok(result.rows_affected() > 0)
     }
@@ -257,8 +238,8 @@ impl DBThreadIssue {
                 issue.thread_id,
                 issue.created_by,
                 issue.why,
-                issue.user_addressed,
-                issue.moderator_verified,
+                facet.user_addressed,
+                facet.moderator_verified,
                 issue.created_at,
                 facet.id AS "facet_id!",
                 facet.what AS "what: Json<ThreadIssueTarget>",
@@ -278,48 +259,30 @@ impl DBThreadIssue {
             "locking project thread issues for verdict synchronization",
         )?;
 
-        let reset_issue_ids = rows
-            .iter()
-            .filter(|row| {
-                row.user_addressed
-                    && row.what.0.verdict(
-                        context,
-                        row.user_addressed,
-                        row.moderator_verified,
-                    ) == ThreadIssueVerdict::Open
-            })
-            .map(|row| row.id)
-            .collect::<HashSet<_>>();
-        for issue_id in &reset_issue_ids {
-            Self::update_flags(
-                DBThreadIssueId(*issue_id),
-                Some(false),
-                None,
-                transaction,
-            )
-            .await
-            .wrap_err("resetting open thread issue addressed state")?;
-        }
-
         let mut issues = Vec::<Self>::new();
         for row in rows {
             let stored_verdict =
                 parse_verdict(row.id, row.facet_id, &row.verdict)?;
             let what = row.what.0;
-            let user_addressed =
-                row.user_addressed && !reset_issue_ids.contains(&row.id);
+            let mut user_addressed = row.user_addressed;
             let verdict =
                 what.verdict(context, user_addressed, row.moderator_verified);
 
-            if verdict != stored_verdict {
+            if verdict == ThreadIssueVerdict::Open {
+                user_addressed = false;
+            }
+
+            if verdict != stored_verdict || user_addressed != row.user_addressed
+            {
                 sqlx::query!(
                     r#"
                     UPDATE threads_issue_facets
-                    SET verdict = $2
+                    SET verdict = $2, user_addressed = $3
                     WHERE id = $1
                     "#,
                     row.facet_id,
                     verdict.as_str(),
+                    user_addressed,
                 )
                 .execute(&mut *transaction)
                 .await
@@ -332,8 +295,6 @@ impl DBThreadIssue {
                     thread_id: DBThreadId(row.thread_id),
                     created_by: DBUserId(row.created_by),
                     why: row.why,
-                    user_addressed,
-                    moderator_verified: row.moderator_verified,
                     facets: Vec::new(),
                     verdict: ThreadIssueVerdict::Open,
                     created_at: row.created_at,
@@ -347,6 +308,8 @@ impl DBThreadIssue {
                 .push(ThreadIssueFacet {
                     id: DBThreadIssueFacetId(row.facet_id).into(),
                     what,
+                    user_addressed,
+                    moderator_verified: row.moderator_verified,
                     verdict,
                 });
         }
