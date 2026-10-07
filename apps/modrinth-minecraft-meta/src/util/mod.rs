@@ -1,4 +1,5 @@
 mod error;
+pub mod fastly;
 mod http;
 mod json;
 mod maven;

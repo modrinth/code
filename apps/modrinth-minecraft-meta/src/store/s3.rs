@@ -8,7 +8,7 @@ use tracing_anyhow::FutureContext;
 use url::Url;
 
 use crate::{
-    config::S3Config,
+    config::S3,
     store::{ContentType, StoreOps},
 };
 
@@ -19,7 +19,7 @@ pub struct S3Store {
     base_url: Url,
 }
 
-pub fn new(config: &S3Config) -> Result<S3Store> {
+pub fn new(config: &S3) -> Result<S3Store> {
     ensure!(!config.bucket.is_empty(), "S3 bucket must not be empty");
 
     for (name, url) in [

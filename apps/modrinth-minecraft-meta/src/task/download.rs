@@ -71,7 +71,7 @@ pub async fn download_from_upstreams(
         cas: &app.cas,
         conn: Mutex::new(&mut conn),
         download_run_id: download_run.id,
-        download_concurrency: app.config.concurrency.download.get(),
+        download_concurrency: app.concurrency.download.get(),
         errors: ErrorAccumulator::new(),
     };
 

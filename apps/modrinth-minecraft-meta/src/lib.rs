@@ -1,4 +1,4 @@
-use std::time::Duration;
+use std::{sync::Arc, time::Duration};
 
 use anyhow::{Context, Result};
 use figment::Figment;
@@ -12,6 +12,7 @@ use tracing_subscriber::{
 use crate::{
     config::Config,
     store::{BlobCas, BlobStore, MavenStore, StoreVisibility},
+    util::fastly,
 };
 
 mod config;
@@ -100,19 +101,33 @@ pub async fn main() -> Result<()> {
         .await?;
     info!("applied {} migrations", report.applied());
 
-    let public_blobs = BlobStore::new(&config, StoreVisibility::Public)
-        .context(info_span!("creating public blob store"))
-        .await?;
-    let private_blobs = BlobStore::new(&config, StoreVisibility::Private)
-        .context(info_span!("creating private blob store"))
-        .await?;
+    let fastly = if let Some(config) = config.fastly {
+        fastly::Client::new(http.clone(), config.base_url, config.key)
+            .map(|client| Some(Arc::new(client)))
+            .context("creating Fastly client")?
+    } else {
+        None
+    };
+
+    let public_blobs = BlobStore::new(
+        config.public_s3,
+        fastly.clone(),
+        StoreVisibility::Public,
+    )
+    .context(info_span!("creating public blob store"))
+    .await?;
+    // private store is never behind a CDN, so we don't need to purge with Fastly
+    let private_blobs =
+        BlobStore::new(config.private_s3, None, StoreVisibility::Private)
+            .context(info_span!("creating private blob store"))
+            .await?;
     let cas = BlobCas::new(private_blobs.clone());
     let maven = MavenStore::new(public_blobs.clone());
 
     let mut app = AppState {
-        config,
         http,
         db,
+        concurrency: config.concurrency,
         cas,
         public_blobs,
         maven,
@@ -144,9 +159,9 @@ pub async fn main() -> Result<()> {
 
 #[derive(Debug)]
 struct AppState {
-    config: Config,
     http: reqwest::Client,
     db: toasty::Db,
+    concurrency: config::Concurrency,
     cas: BlobCas,
     public_blobs: BlobStore,
     maven: MavenStore,

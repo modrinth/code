@@ -185,7 +185,7 @@ async fn extract_from_installer(
 
     stream::iter(embedded_maven_artifacts.iter().map(anyhow::Ok))
         .try_for_each_concurrent(
-            app.config.concurrency.extract_files.get(),
+            app.concurrency.extract_files.get(),
             |coordinate| {
                 let zip = &zip;
                 async move {
