@@ -324,50 +324,50 @@ async fn project_redirect_cache_respects_visibility() {
 
 #[actix_rt::test]
 async fn project_slug_edit_invalidates_redirect_cache() {
-	with_test_environment_all(None, |env| async move {
-		let target_id = &env.dummy.project_beta.project_id;
-		let project_id = &env.dummy.project_alpha.project_id;
-		let alias = "redirect-claimed-slug";
-		let mut redis = env.db.redis_pool.connect().await.unwrap();
-		let key = redis.key().entity(PROJECT_REDIRECTS_NAMESPACE, alias);
-		redis
-			.set_serialized(
-				&key,
-				&Some(parse_base62(target_id).unwrap() as i64),
-				Some(300),
-			)
-			.await
-			.unwrap();
+    with_test_environment_all(None, |env| async move {
+        let target_id = &env.dummy.project_beta.project_id;
+        let project_id = &env.dummy.project_alpha.project_id;
+        let alias = "redirect-claimed-slug";
+        let mut redis = env.db.redis_pool.connect().await.unwrap();
+        let key = redis.key().entity(PROJECT_REDIRECTS_NAMESPACE, alias);
+        redis
+            .set_serialized(
+                &key,
+                &Some(parse_base62(target_id).unwrap() as i64),
+                Some(300),
+            )
+            .await
+            .unwrap();
 
-		let response = env.api.get_project(alias, USER_USER_PAT).await;
-		assert_status!(&response, StatusCode::PERMANENT_REDIRECT);
-		assert!(
-			response
-				.headers()
-				.get("location")
-				.unwrap()
-				.to_str()
-				.unwrap()
-				.ends_with(target_id)
-		);
+        let response = env.api.get_project(alias, USER_USER_PAT).await;
+        assert_status!(&response, StatusCode::PERMANENT_REDIRECT);
+        assert!(
+            response
+                .headers()
+                .get("location")
+                .unwrap()
+                .to_str()
+                .unwrap()
+                .ends_with(target_id)
+        );
 
-		let response = env
-			.api
-			.edit_project(
-				project_id,
-				json!({ "slug": alias.to_uppercase() }),
-				USER_USER_PAT,
-			)
-			.await;
-		assert_status!(&response, StatusCode::NO_CONTENT);
+        let response = env
+            .api
+            .edit_project(
+                project_id,
+                json!({ "slug": alias.to_uppercase() }),
+                USER_USER_PAT,
+            )
+            .await;
+        assert_status!(&response, StatusCode::NO_CONTENT);
 
-		let response = env.api.get_project(alias, USER_USER_PAT).await;
-		assert_status!(&response, StatusCode::OK);
-		assert!(!response.headers().contains_key("location"));
-		let project: CommonProject = test::read_body_json(response).await;
-		assert_eq!(project.id.to_string(), *project_id);
-	})
-	.await;
+        let response = env.api.get_project(alias, USER_USER_PAT).await;
+        assert_status!(&response, StatusCode::OK);
+        assert!(!response.headers().contains_key("location"));
+        let project: CommonProject = test::read_body_json(response).await;
+        assert_eq!(project.id.to_string(), *project_id);
+    })
+    .await;
 }
 
 #[actix_rt::test]

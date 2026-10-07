@@ -1454,15 +1454,15 @@ pub async fn project_edit_internal(
         .await
         .wrap_internal_err("committing database transaction")?;
 
-	let mut project_refs =
-		vec![ProjectId::from(project_item.inner.id).to_string()];
-	if let Some(slug) = &project_item.inner.slug {
-		project_refs.push(slug.clone());
-	}
-	if let Some(slug) = &new_project.slug {
-		project_refs.push(slug.to_lowercase());
-	}
-	crate::routes::clear_project_redirect_cache(&project_refs, &redis).await?;
+    let mut project_refs =
+        vec![ProjectId::from(project_item.inner.id).to_string()];
+    if let Some(slug) = &project_item.inner.slug {
+        project_refs.push(slug.clone());
+    }
+    if let Some(slug) = &new_project.slug {
+        project_refs.push(slug.to_lowercase());
+    }
+    crate::routes::clear_project_redirect_cache(&project_refs, &redis).await?;
 
     if became_unsearchable {
         db_models::DBProject::clear_cache(
