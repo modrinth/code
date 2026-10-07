@@ -14,7 +14,7 @@ Create app-wide values, such as the API client and file picker, once during root
 
 Keep registration visible in root setup rather than hiding it inside another feature. For example, starting installation should not also register the app's file picker. The root can use named setup functions when it has several providers to connect.
 
-Creating a value and providing it are separate steps. This example uses the existing client factory from its proposed platform location:
+Creating a value and providing it are separate steps. The client factory belongs in `platform/modrinth-client.ts`; root setup provides its result:
 
 ```ts
 import { provideModrinthClient } from '@modrinth/ui'
@@ -38,6 +38,8 @@ An app-only context belongs with its feature, page, or component. A contract alr
 Use the existing `createContext` pattern for new component contexts. Keep the type and injection functions separate from lengthy feature behavior. Choose a unique context name, and preserve its key when moving an existing definition. The factory uses `Symbol.for`, so matching names identify the same context.
 
 Share the state and actions that children need, such as `openSettings()` or `requestSignIn()`. Keep component refs inside the component that manages them. Children should not need to know which modal implements an action.
+
+Keep account actions in a typed feature context when callers outside the sidebar need them. The shell can forward calls to its account component through that interface. If the provided value depends on a component ref, derive it reactively so consumers see the component when it mounts or is replaced. Treat the value as unavailable while an async component is still loading.
 
 A small interface and object are usually enough for an app-only context. Keep existing shared manager classes when their contracts require them. Adding more fields to a context does not, by itself, require another class.
 

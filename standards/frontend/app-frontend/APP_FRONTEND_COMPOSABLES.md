@@ -12,6 +12,8 @@ Keep small, clear state in the component. A single open flag rarely needs anothe
 
 Functions that only parse, format, or transform values remain ordinary functions. The same applies to app-lib wrappers and functions that return query options. Reserve the `use` prefix for functions that need Vue state or setup. Use `create` for factories that can run without component context.
 
+Keep layout in the component: wrappers, sizing, overflow, and overlay placement. A composable can track scroll position without deciding where the sidebar or its promotion belongs.
+
 ## Keep it near the code that uses it
 
 A composable used by one component belongs in that component's folder. If several parts of a feature use it, keep it in the feature. Only move it to `shared/composables/` when it has no feature-specific behavior.
@@ -46,6 +48,10 @@ Vue's [composable conventions and best practices](https://vuejs.org/guide/reusab
 ## Make setup and cleanup part of the job
 
 Call a composable that uses injection or lifecycle hooks during setup, before asynchronous work starts. It can inject an existing context there. Ordinary functions and query-option factories should receive their dependencies as arguments instead.
+
+Create DOM-dependent composables during setup with a nullable element ref, then assign the element after mount. For OverlayScrollbars, connect `useScrollIndicator` to `elements().viewport` and recheck when the scrollbar instance updates. Keep the scroll container constrained by its flex layout; fades can sit outside the viewport as absolute overlays with pointer events disabled.
+
+If a control overlays scrolling content, reserve space equal to its rendered height. Measure controls whose text can wrap. When a fade also provides the background behind that control, keep it visible while the control is shown, including at the end of the scroll area.
 
 Create listeners when the composable runs, rather than when its module loads. Remove external listeners and timers with `onScopeDispose`, and cancel pending work when the API allows it. Vue stops setup-owned watchers automatically, but external subscriptions need their own cleanup.
 

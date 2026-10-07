@@ -2,7 +2,7 @@
 
 This standard applies only to `apps/app-frontend`. It describes how to organise the desktop frontend as we add features and refactor existing code. The website and `packages/ui` keep their existing structures.
 
-The aim is to keep related code together and make each folder's purpose clear. Someone changing friends should find the friend list, its state, and its actions in the same place. They should not need to search several general folders to understand how that feature works.
+Keep the friend list, its state, and its actions together. Someone changing friends should be able to find that code under one feature.
 
 Use this structure for new work and refactors in the area you are changing. Existing files can move gradually as those areas change.
 
@@ -12,31 +12,37 @@ The `app/`, `platform/`, `features/`, and `shared/` folders are our project conv
 src/
 ├── main.js
 ├── app/
-│	├── App.vue
-│	├── router.ts
-│	├── providers.ts
-│	├── runtime/
-│	└── shell/
+│   ├── App.vue
+│   ├── router.ts
+│   ├── providers.ts
+│   ├── runtime/            # startup flow, auth handling, etc. anything core to the app frontend working
+│   └── shell/              # sidebar, title bar, navigation etc.
 ├── platform/
-│	├── app-lib/
-│	│	├── instances/
-│	│	├── friends/
-│	│	└── settings/
-│	├── events/
-│	└── adapters/
-├── features/
-│	├── instances/
-│	├── installation/
-│	├── library/
-│	├── friends/
-│	└── settings/
+│   ├── modrinth-client.ts  # packages/api-client impl
+│   ├── app-lib/            # invoke stuff
+│   │   ├── instances/
+│   │   ├── friends/
+│   │   └── settings/
+│   ├── events/             # app events/listeners
+│   └── adapters/           # any cross platform pages get implemented here
+├── features/               # pages, flows, modals, etc.
+│   ├── instances/
+│   ├── installation/
+│   ├── library/
+│   ├── friends/
+│   ├── settings/
+│   └── skins/
+│       ├── pages/
+│       │   └── skins-page.vue
+│       ├── skin-preview.vue
+│       └── queries.ts
 ├── shared/
-│	├── components/
-│	├── composables/
-│	└── utils/
-├── generated/
-├── assets/
-└── locales/
+│   ├── components/
+│   ├── composables/
+│   └── utils/
+├── generated/...
+├── assets/...
+└── locales/...
 ```
 
 This tree shows the intended structure, rather than a completed migration. The feature names are examples, and a small feature may need only a few files. Create a directory when it helps organise code, rather than creating empty folders in advance.
@@ -49,7 +55,9 @@ Within a feature, keep a component's supporting files beside that component. A c
 
 Vue's [guide to extracting composables](https://vuejs.org/guide/reusability/composables.html#extracting-composables-for-code-organization) explains how separating related behavior can make a component easier to read, even when that behavior is not reused.
 
-Desktop route views belong in the feature's `pages/` folder, with their routes registered in `app/router.ts`. A page can also render an existing layout from `@modrinth/ui`. Using that layout does not mean moving its shared implementation into the app.
+Desktop route views belong in the feature's `pages/` folder, with their routes registered in `app/router.ts`. For example, the skins route renders `features/skins/pages/skins-page.vue`, with skin previews and queries beside the page folder. A feature used only in the sidebar does not need a page.
+
+A page can also render an existing layout from `@modrinth/ui`. Keep the route component in its feature and the shared layout in `packages/ui`. The adapters entry in the tree refers to the desktop implementations of the contracts those pages use.
 
 ## Let app connect the pieces
 
@@ -57,13 +65,19 @@ The `app/` folder contains startup, route registration, and the code that connec
 
 Keep the behavior behind those controls with the feature it serves. An update button belongs in the shell, while the update workflow belongs in `features/updates/`. The shell can call that workflow without containing all its rules.
 
-Use `app/runtime/` for work that coordinates the whole app, such as startup order or commands that open different features. Root setup creates app-wide services and registers their providers before loading data. The installation feature should not quietly register an unrelated file picker or user-country provider.
+The sidebar arranges feature components such as accounts, friends, onboarding, and news. Those components stay in their features; sidebar layout and promotion placement belong in the shell.
+
+Use `app/runtime/` for work that coordinates the whole app, such as startup order, session restoration, route loading, or commands that open different features. Root setup creates app-wide services and registers their providers before loading data. The installation feature should not quietly register an unrelated file picker or user-country provider.
 
 Root setup can contain several calls, as long as someone reading it can see how the app starts and which values it shares. [Dependency Injection](APP_FRONTEND_DEPENDENCY_INJECTION.md) explains how those values reach child components.
+
+When moving shell code, preserve its props, events, exposed actions, provider scope, and loading behavior. Check remaining script references before removing imports, including icons used in computed menu options. A signed-in menu can fail to render even after authentication succeeds.
 
 ## Put native access in platform
 
 The `platform/` folder is where the frontend talks to app-lib and the computer. Typed app-lib calls belong in `platform/app-lib/`, grouped by the area they serve. Native file dialogs, window operations, updates, and the desktop API client also belong under `platform/`.
+
+Use `platform/modrinth-client.ts` to configure the client from `packages/api-client`, including URLs, auth, and logging. Root setup creates and provides that client.
 
 An app-lib wrapper should call a command and return its typed result. The feature decides how to use that result, whether to show a notification, or which modal to open. For example, the settings command can move to `platform/app-lib/settings/commands.ts`:
 
