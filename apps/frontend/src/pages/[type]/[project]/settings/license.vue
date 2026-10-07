@@ -24,6 +24,8 @@
 						</template>
 					</IntlFormatted>
 				</p>
+
+				<ProjectIssueCard target="modify_license" class="-mb-2 max-w-[600px]" />
 			</div>
 
 			<div class="flex min-w-0 max-w-[600px] flex-col gap-2">
@@ -59,7 +61,6 @@
 						]"
 						class="mt-2"
 					/>
-					<ProjectIssueCard target="modify_license" class="mt-2" />
 				</div>
 			</div>
 
@@ -170,18 +171,19 @@
 					/>
 				</div>
 			</div>
+			<ValidationMessage
+				:check="
+					saveValidation.withoutFields([
+						'license',
+						['source-availability', 'source'],
+						['license-url', 'license'],
+						['custom-license', 'license'],
+					])
+				"
+				class="my-4"
+			/>
 		</section>
-		<ValidationMessage
-			:check="
-				saveValidation.withoutFields([
-					'license',
-					['source-availability', 'source'],
-					['license-url', 'license'],
-					['custom-license', 'license'],
-				])
-			"
-			class="my-4"
-		/>
+
 		<UnsavedChangesPopup
 			:original="saved"
 			:modified="current"

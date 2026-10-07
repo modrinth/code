@@ -72,6 +72,7 @@ import { IssuePriority } from '@modrinth/moderation/src/data/issues'
 import { Accordion, Button, defineMessages, useVIntl } from '@modrinth/ui'
 import { computed } from 'vue'
 
+import { isThreadIssueVerified } from '~/helpers/thread-issues'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 import { injectReviewPanels, type ReviewIssue } from '~/providers/project-review/review-panels'
 import { injectReviewPreviousIssues } from '~/providers/project-review/review-previous-issues'
@@ -98,8 +99,8 @@ function compareIssues(
 	b: ReviewIssue | Labrinth.Threads.v3.ThreadIssue,
 ) {
 	return (
-		Number('moderator_verified' in a && a.moderator_verified) -
-			Number('moderator_verified' in b && b.moderator_verified) || priority(a) - priority(b)
+		Number(!('controls' in a) && isThreadIssueVerified(a)) -
+			Number(!('controls' in b) && isThreadIssueVerified(b)) || priority(a) - priority(b)
 	)
 }
 const resolvedIssues = computed(() => [...previousIssues.resolvedIssues.value].sort(compareIssues))

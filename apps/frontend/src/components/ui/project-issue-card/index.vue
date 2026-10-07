@@ -55,7 +55,11 @@
 							v-html="renderString(issueMessage(issue))"
 						/>
 						<div
-							v-if="issue.verdict !== 'resolved'"
+							v-if="
+								issue.verdict !== 'resolved' &&
+								((showProjectAreaLink && issueActions(issue).length) ||
+									addressableFacets(issue).length)
+							"
 							class="flex w-full flex-wrap items-center justify-between gap-3"
 						>
 							<div
@@ -97,32 +101,53 @@
 									+{{ issueActions(issue).length - 2 }}
 								</TeleportOverflowMenu>
 							</div>
-							<Tooltip
-								v-if="
-									hasAcknowledgment(issue) || !showProjectAreaLink || !issueActions(issue).length
-								"
-								:disabled="allActionsComplete(issue) || isAddressed(issue)"
-								:text="formatMessage(messages.completeActionsFirst)"
-								class="ml-auto"
+							<div
+								v-if="addressableFacets(issue).length"
+								class="ml-auto flex flex-wrap justify-end gap-2"
 							>
-								<Button
-									:loading="
-										addressMutation.isPending.value && addressMutation.variables.value === issue.id
-									"
-									:disabled="
-										isAddressed(issue) ||
-										!allActionsComplete(issue) ||
-										(!canAddress && !isStaff(auth.user)) ||
-										addressMutation.isPending.value
-									"
-									@click="addressMutation.mutate(issue.id)"
+								<ButtonLink
+									v-if="replyFacets(issue).length"
+									:to="replyLink(issue)"
+									type="outlined"
+									:disabled="!canAddress && !isStaff(auth.user)"
 								>
-									<CheckIcon class="size-4" aria-hidden="true" />
-									{{
-										formatMessage(isAddressed(issue) ? messages.addressed : messages.markAddressed)
-									}}
-								</Button>
-							</Tooltip>
+									{{ formatMessage(messages.replyToAddress) }}
+								</ButtonLink>
+								<Tooltip
+									v-else
+									:disabled="facetsToAddress(issue).length > 0 || isAddressed(issue)"
+									:text="formatMessage(messages.changeFacetFirst)"
+								>
+									<Button
+										:loading="
+											addressMutation.isPending.value &&
+											addressMutation.variables.value?.issueId === issue.id
+										"
+										:disabled="
+											addressMutation.isPending.value ||
+											(!canAddress && !isStaff(auth.user)) ||
+											!facetsToAddress(issue).length
+										"
+										@click="
+											addressMutation.mutate({
+												issueId: issue.id,
+												facetIds: facetsToAddress(issue).map(({ id }) => id),
+												threadId: thread?.id,
+												projectId: project.id,
+											})
+										"
+									>
+										<CheckIcon class="size-4" aria-hidden="true" />
+										{{
+											formatMessage(
+												addressableFacets(issue).every((facet) => facet.verdict !== 'open')
+													? messages.addressed
+													: messages.markAddressed,
+											)
+										}}
+									</Button>
+								</Tooltip>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -168,6 +193,8 @@ import {
 import { isStaff, renderString } from '@modrinth/utils'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { computed, reactive } from 'vue'
+
+import { isThreadIssueFacetReadyToAddress, isThreadIssueVerified } from '~/helpers/thread-issues'
 
 import FilledCheckIcon from './filled-check-icon.vue'
 import { threadIssueField, threadIssueSettingsArea } from './issue-targets'
@@ -215,25 +242,47 @@ const messages = defineMessages({
 	hideResolved: { id: 'thread-issues.hide-resolved', defaultMessage: 'Hide resolved' },
 	editName: { id: 'thread-issues.target.edit-name', defaultMessage: 'Edit name' },
 	editUrl: { id: 'thread-issues.target.edit-url', defaultMessage: 'Edit URL' },
-	editSummary: { id: 'thread-issues.target.edit-summary', defaultMessage: 'Edit summary' },
-	moreActions: { id: 'thread-issues.more-actions', defaultMessage: 'More required actions' },
-	completeActionsFirst: {
-		id: 'thread-issues.complete-actions-first',
-		defaultMessage:
-			'You must complete all required actions from the issue to mark it as addressed.',
+	editSummary: {
+		id: 'thread-issues.target.edit-summary',
+		defaultMessage: 'Edit summary',
+	},
+	moreActions: {
+		id: 'thread-issues.more-actions',
+		defaultMessage: 'More required actions',
+	},
+	changeFacetFirst: {
+		id: 'thread-issues.change-facet-first',
+		defaultMessage: 'Please make the requested changes before marking it as addressed.',
+	},
+	replyToAddress: {
+		id: 'thread-issues.reply-to-address',
+		defaultMessage: 'Reply to address',
 	},
 })
 
 const addressMutation = useMutation({
-	mutationFn: async (id: string) => {
-		await client.labrinth.threads_v3.user_addressed(id)
+	mutationFn: async ({
+		facetIds,
+	}: {
+		issueId: string
+		facetIds: string[]
+		threadId?: string
+		projectId: string
+	}) => {
+		const results = await Promise.allSettled(
+			facetIds.map((id) => client.labrinth.threads_v3.user_addressed(id)),
+		)
+		const failure = results.find((result) => result.status === 'rejected')
+		if (failure?.status === 'rejected') throw failure.reason
 	},
-	onSuccess: async () => {
+	onSettled: async (_, __, { threadId, projectId }) => {
 		await Promise.all([
-			thread.value?.id
-				? queryClient.invalidateQueries({ queryKey: ['thread', thread.value.id] })
+			threadId
+				? queryClient.invalidateQueries({ queryKey: ['thread', threadId] })
 				: Promise.resolve(),
-			refreshProjectValidation(),
+			queryClient.invalidateQueries({ queryKey: ['project', 'v2', projectId] }),
+			queryClient.invalidateQueries({ queryKey: ['project', 'v3', projectId] }),
+			project.value.id === projectId ? refreshProjectValidation() : Promise.resolve(),
 		])
 	},
 	onError: (error) =>
@@ -324,7 +373,7 @@ const matchingIssues = computed(() =>
 	(props.issues ?? thread.value?.issues ?? [])
 		.filter(
 			(issue) =>
-				!issue.moderator_verified &&
+				!isThreadIssueVerified(issue) &&
 				(props.issues !== undefined ||
 					matchesLocation(issue) ||
 					issue.facets.some(({ what }) => matchesTarget(what))),
@@ -366,7 +415,7 @@ interface IssueAction {
 
 function issueActions(issue: ThreadIssue): IssueAction[] {
 	const locations = readIssueLocations(issueDetails(issue).locations)
-	const facets = issue.facets.filter(({ what }) => what.type !== 'acknowledge')
+	const facets = visibleFacets(issue).filter(({ what }) => what.type !== 'acknowledge')
 	const facetFields = new Set(facets.map(({ what }) => threadIssueField(what)))
 	const actions: IssueAction[] = facets.map((facet) => {
 		const label = locations.find(({ field }) => field === threadIssueField(facet.what))?.label
@@ -374,7 +423,7 @@ function issueActions(issue: ThreadIssue): IssueAction[] {
 			id: facet.id,
 			to: settingsLink(facet.what),
 			label: label ? formatMessage(label) : targetButtonLabel(facet.what),
-			complete: isFacetComplete(facet),
+			complete: facet.verdict !== 'open',
 		}
 	})
 	for (const location of locations) {
@@ -393,80 +442,48 @@ function issueActions(issue: ThreadIssue): IssueAction[] {
 	)
 }
 
-function hasAcknowledgment(issue: ThreadIssue): boolean {
-	return issue.facets.some(({ what }) => what.type === 'acknowledge')
+function visibleFacets(issue: ThreadIssue): Labrinth.Threads.v3.ThreadIssueFacet[] {
+	if (props.issues !== undefined || props.showProjectAreaLink) return issue.facets
+	return issue.facets.filter(
+		({ what }) =>
+			matchesTarget(what) ||
+			(what.type === 'acknowledge' && matchesLocation(issue)) ||
+			(props.location !== undefined && threadIssueField(what) === props.location),
+	)
 }
 
-function isFacetComplete(facet: ThreadIssue['facets'][number]): boolean {
-	if (facet.verdict !== 'open') return true
-	const current = projectV3.value
-	const target = facet.what
-	if (!current) return facet.verdict !== 'open'
-	switch (target.type) {
-		case 'modify_title':
-			return current.name !== target.value.original
-		case 'modify_slug':
-			return (current.slug ?? '') !== target.value.original
-		case 'modify_summary':
-			return current.summary !== target.value.original
-		case 'modify_description':
-			return current.description !== target.value.original
-		case 'modify_license':
-			return (
-				current.license.id !== target.value.license.original ||
-				(current.license.url ?? '') !== target.value.url.original
-			)
-		case 'modify_icon':
-			return (current.icon_url ?? null) !== target.value.original_url
-		case 'modify_links':
-			return (
-				Object.keys(target.value.links).length > 0 &&
-				Object.entries(target.value.links).every(
-					([platform, { original }]) => (current.link_urls[platform]?.url ?? '') !== original,
-				)
-			)
-		case 'add_gallery_images':
-			return current.gallery.length > target.value.original_count
-		case 'remove_tags':
-			return target.value.tags.every(
-				(tag) => !current.categories.includes(tag) && !current.additional_categories.includes(tag),
-			)
-		case 'remove_gallery_images':
-			return target.value.image_ids.every((id) => !current.gallery.some((image) => image.id === id))
-		case 'modify_gallery_image': {
-			const image = current.gallery.find(({ id }) => id === target.value.image_id)
-			if (!image) return false
-			return (
-				(target.value.name !== undefined &&
-					(image.name ?? '') !== (target.value.name?.original ?? '')) ||
-				(target.value.description !== undefined &&
-					(image.description ?? '') !== (target.value.description?.original ?? ''))
-			)
-		}
-		case 'modify_team_member_role': {
-			const member = allMembers.value.find(
-				({ user, team_id }) => user.id === target.value.user_id && team_id === target.value.team_id,
-			)
-			return member ? member.role !== target.value.role.original : false
-		}
-		case 'modify_server_languages':
-			return (
-				JSON.stringify([...(current.minecraft_server?.languages ?? [])].sort()) !==
-				JSON.stringify([...target.value.original].sort())
-			)
-		case 'modify_server_address':
-			return (
-				((target.value.platform === 'minecraft_java'
-					? current.minecraft_java_server?.address
-					: current.minecraft_bedrock_server?.address) ?? '') !== target.value.address.original
-			)
-		default:
-			return facet.verdict !== 'open'
-	}
+function addressableFacets(issue: ThreadIssue): Labrinth.Threads.v3.ThreadIssueFacet[] {
+	return issue.facets.filter(
+		(facet) =>
+			facet.verdict !== 'resolved' &&
+			(facet.what.type === 'acknowledge' || matchesTarget(facet.what)),
+	)
 }
 
-function allActionsComplete(issue: ThreadIssue): boolean {
-	return issue.facets.every((facet) => facet.what.type === 'acknowledge' || isFacetComplete(facet))
+function facetsToAddress(issue: ThreadIssue): Labrinth.Threads.v3.ThreadIssueFacet[] {
+	return addressableFacets(issue).filter(
+		(facet) =>
+			facet.verdict === 'open' && (isFacetReadyToAddress(facet) || isStaff(auth.value.user)),
+	)
+}
+
+function replyFacets(issue: ThreadIssue): Labrinth.Threads.v3.ThreadIssueFacet[] {
+	return issue.facets.filter(
+		(facet) =>
+			facet.verdict === 'open' &&
+			facet.what.type === 'acknowledge' &&
+			facet.what.value.mode === 'reply',
+	)
+}
+
+function replyLink(issue: ThreadIssue): string {
+	const query = new URLSearchParams()
+	for (const facet of replyFacets(issue)) query.append('reply_to_facet', facet.id)
+	return `/${project.value.project_type}/${project.value.slug ?? project.value.id}/moderation?${query}#messages`
+}
+
+function isFacetReadyToAddress(facet: Labrinth.Threads.v3.ThreadIssueFacet): boolean {
+	return isThreadIssueFacetReadyToAddress(facet, projectV3.value, allMembers.value)
 }
 
 function overflowOptions(issue: ThreadIssue): ButtonMenuOption[] {
@@ -506,7 +523,7 @@ function targetButtonLabel(target: Target): string {
 }
 
 function isAddressed(issue: ThreadIssue): boolean {
-	return issue.user_addressed
+	return issue.verdict === 'addressed'
 }
 
 function isComplete(issue: ThreadIssue): boolean {

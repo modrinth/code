@@ -165,6 +165,31 @@ export const issueTargets = {
 			type: 'add_gallery_images',
 			value: { original_count: projectV3.gallery.length },
 		}),
+	modifyDisclosure:
+		(disclosureType: Labrinth.Projects.v3.ProjectDisclosureType): IssueFacet =>
+		({ disclosures }) => {
+			const disclosure = disclosures.find(
+				(disclosure) => disclosure.type === disclosureType && !disclosure.deleted_at,
+			)
+			let original: Labrinth.Threads.v3.ModifyDisclosureTarget['value']['metadata']['original'] =
+				null
+			if (disclosure) {
+				const {
+					type,
+					set_by_moderator,
+					lock_status,
+					updated_at,
+					updated_by,
+					deleted_at,
+					...metadata
+				} = disclosure
+				original = metadata
+			}
+			return {
+				type: 'modify_project_disclosure',
+				value: { disclosure_type: disclosureType, metadata: { original } },
+			} as Labrinth.Threads.v3.ModifyDisclosureTarget
+		},
 	modifyServerLanguages:
 		(suggestion?: WithContext<string[] | null | undefined>): IssueFacet =>
 		(ctx) => {

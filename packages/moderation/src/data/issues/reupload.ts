@@ -14,6 +14,7 @@ import reuploadMessage from '../messages/checklist/messages/reupload/reupload.md
 import unclearForkMessage from '../messages/checklist/messages/reupload/unclear-fork.md'
 import { issue, markdown, panel, section, text, toggle } from './component-builders/builders'
 import { issueLocation } from './component-builders/locations'
+import { issueTargets } from './component-builders/targets'
 
 export const reuploadReuploadIssue = issue({
 	id: 'reupload-reupload',
@@ -47,6 +48,7 @@ export const reuploadUnclearForkIssue = issue({
 	category: 'Project wide',
 	message: unclearForkMessage,
 	suggestedStatus: 'rejected',
+	facets: [issueTargets.acknowledge('reply')],
 })
 
 export const reuploadInsufficientForkIssue = issue({

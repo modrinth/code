@@ -10,7 +10,8 @@
 				!canSubmit ||
 				generating ||
 				advancingAction !== undefined ||
-				(project.status === action.status && pendingDecisionStatus !== action.status)
+				(action.color === 'green' && !canApprove) ||
+				project.status === action.status
 			"
 			@click="submitDecisionAndContinue(action.status)"
 		>
@@ -37,7 +38,7 @@ import { injectReviewSubmission } from '~/providers/project-review/review-submis
 
 const { project, navigation, queue } = injectProjectReviewPageContext()
 const settings = useModerationSettings()
-const { canSubmit, loadingAction, pendingDecisionStatus, submitDecision } = injectReviewSubmission()
+const { canSubmit, canApprove, loadingAction, submitDecision } = injectReviewSubmission()
 const { generating } = injectReviewMessages()
 const advancingAction = ref<Parameters<typeof submitDecision>[0]>()
 const { formatMessage } = useVIntl()
@@ -51,7 +52,9 @@ const messages = defineMessages({
 })
 const actions = computed(() => [
 	{
-		status: project.value?.requested_status ?? 'approved',
+		status: ['approved', 'unlisted', 'private'].includes(project.value?.requested_status ?? '')
+			? project.value!.requested_status!
+			: ('approved' as const),
 		label: messages.approve,
 		type: 'colored' as const,
 		color: 'green' as const,

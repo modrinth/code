@@ -43,12 +43,12 @@
 			/>
 		</div>
 		<div class="flex shrink-0 flex-wrap justify-end gap-2">
-			<Button :disabled="!canSubmit || !draft.trim()" @click="submit('note')">
+			<Button :disabled="!canSubmit || pending || !draft.trim()" @click="submit('note')">
 				<SpinnerIcon v-if="loadingAction === 'note'" class="animate-spin" aria-hidden="true" />
 				<StickyNotePlusIcon v-else aria-hidden="true" />
 				{{ formatMessage(messages.addNote) }}
 			</Button>
-			<Button :disabled="!canSubmit || !draft.trim()" @click="submit('reply')">
+			<Button :disabled="!canSubmit || pending || !draft.trim()" @click="submit('reply')">
 				<SpinnerIcon v-if="loadingAction === 'reply'" class="animate-spin" aria-hidden="true" />
 				<ReplyIcon v-else aria-hidden="true" />
 				{{ formatMessage(messages.reply) }}

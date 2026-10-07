@@ -11,9 +11,11 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { computed, onScopeDispose, ref, watch } from 'vue'
 
 import { useAuthState } from '~/composables/auth'
+import { sendThreadReply, type ThreadReply } from '~/helpers/thread-issues'
 import { isStaff } from '~/helpers/users.js'
 
 import { injectProjectReviewPageContext } from './index'
+import { applyReviewDecision, type ReviewDecision } from './review-decision'
 import type { createReviewMessages } from './review-messages'
 import type { createReviewPanels } from './review-panels'
 import type { createReviewPreviousIssues } from './review-previous-issues'
@@ -22,7 +24,6 @@ import type { createReviewSession } from './review-session'
 type ProjectStatus = Labrinth.Projects.v2.ProjectStatus
 type ReviewEditorMode = 'reply' | 'note'
 type NewThreadIssues = Labrinth.Threads.v3.NewThreadIssues
-type IssueUpdate = { id: string; data: Labrinth.Threads.v3.EditThreadIssue }
 
 export const [injectReviewSubmission, provideReviewSubmission] =
 	createContext<ReturnType<typeof createReviewSubmission>>('ReviewSubmission')
@@ -40,12 +41,6 @@ export function createReviewSubmission(
 	const auth = useAuthState()
 	const { project, threadQuery, disclosures } = injectProjectReviewPageContext()
 	const draft = ref('')
-	const pendingDecision = ref<{
-		id: string
-		status: ProjectStatus
-		issues?: NewThreadIssues
-		issueUpdates: IssueUpdate[]
-	}>()
 	const uploadedImages = ref<string[]>([])
 	let disposed = false
 	watch(
@@ -53,7 +48,6 @@ export function createReviewSubmission(
 		() => {
 			draft.value = ''
 			uploadedImages.value = []
-			pendingDecision.value = undefined
 		},
 		{ flush: 'sync' },
 	)
@@ -62,6 +56,11 @@ export function createReviewSubmission(
 	})
 
 	const errors = defineMessages({
+		unresolved: {
+			id: 'project-review.decision.unresolved',
+			defaultMessage:
+				'Verify all remaining fixes and remove new findings before approving this project.',
+		},
 		unsaved: {
 			id: 'project-review.disclosures.unsaved',
 			defaultMessage: 'Save or reset your disclosure changes before changing the project status.',
@@ -112,68 +111,27 @@ export function createReviewSubmission(
 	const submission = useMutation({
 		mutationFn: async ({
 			id,
-			threadId,
-			body,
-			images = [],
-			privateMessage = false,
-			status,
-			statusAlreadyApplied = false,
-			issues,
-			issueUpdates = [],
+			decision,
+			reply,
 		}: {
 			id: string
 			threadId: string
-			body?: string
-			images?: string[]
-			privateMessage?: boolean
-			status?: ProjectStatus
-			statusAlreadyApplied?: boolean
-			issues?: NewThreadIssues
-			issueUpdates?: IssueUpdate[]
+			decision?: ReviewDecision
+			reply?: ThreadReply
 		}) => {
 			assertCurrent(id)
-			if (status && !statusAlreadyApplied) {
-				if (disclosures.hasChanges.value || disclosures.saving.value)
-					throw new Error(formatMessage(errors.unsaved))
-				if (panels.validationErrors.value.length) throw new Error(formatMessage(errors.missing))
+			const clearMessage = () => {
+				assertCurrent(id)
+				draft.value = ''
+				uploadedImages.value = []
 			}
-			assertCurrent(id)
-			if (status && !statusAlreadyApplied) {
-				await client.labrinth.projects_v3.edit(id, { status })
-				pendingDecision.value = { id, status, issues, issueUpdates }
+			if (decision) {
+				await applyReviewDecision(decision, client, () => assertCurrent(id), clearMessage)
+				session.clearProject(id)
+			} else if (reply) {
+				await sendThreadReply(reply, client, () => assertCurrent(id))
+				clearMessage()
 			}
-			assertCurrent(id)
-			if (body?.trim()) {
-				await client.labrinth.threads_v3.sendMessage(threadId, {
-					body: {
-						type: 'text',
-						body,
-						private: privateMessage,
-						associated_images: images,
-					},
-				})
-				if (!disposed && project.value?.id === id) {
-					draft.value = ''
-					uploadedImages.value = []
-				}
-			}
-			assertCurrent(id)
-			if (status) {
-				for (const issue of issueUpdates) {
-					assertCurrent(id)
-					await client.labrinth.threads_v3.editIssue(issue.id, issue.data)
-					assertCurrent(id)
-					if (pendingDecision.value) {
-						pendingDecision.value.issueUpdates = pendingDecision.value.issueUpdates.filter(
-							({ id }) => id !== issue.id,
-						)
-					}
-				}
-			}
-			assertCurrent(id)
-			if (status && issues) await client.labrinth.threads_v3.createIssues(threadId, issues)
-			if (status) pendingDecision.value = undefined
-			if (status) session.clearProject(id)
 		},
 		onError: (error) =>
 			addNotification({
@@ -207,6 +165,12 @@ export function createReviewSubmission(
 			uploadedImages.value = [...uploadedImages.value, response.id].slice(-10)
 			return response.url
 		},
+		onError: (error) =>
+			addNotification({
+				title: formatMessage(commonMessages.errorNotificationTitle),
+				text: error instanceof Error ? error.message : String(error),
+				type: 'error',
+			}),
 	})
 	const pending = computed(() => submission.isPending.value || upload.isPending.value)
 	const canSubmit = computed(
@@ -214,21 +178,15 @@ export function createReviewSubmission(
 			isStaff(auth.value.user) &&
 			!!project.value &&
 			threadQuery.data.value?.id === project.value.thread_id &&
-			!pending.value,
+			!submission.isPending.value &&
+			!upload.isPending.value,
 	)
 	const loadingAction = computed(() =>
 		submission.isPending.value
-			? (submission.variables.value?.status ??
-				(submission.variables.value?.privateMessage ? 'note' : 'reply'))
+			? (submission.variables.value?.decision?.status ??
+				(submission.variables.value?.reply?.privateMessage ? 'note' : 'reply'))
 			: undefined,
 	)
-	const pendingDecisionStatus = computed(() => {
-		const currentPendingDecision = pendingDecision.value
-		return currentPendingDecision?.id === project.value?.id
-			? currentPendingDecision?.status
-			: undefined
-	})
-
 	async function submit(mode: ReviewEditorMode = 'reply') {
 		const current = project.value
 		if (!canSubmit.value || !current || !draft.value.trim()) return
@@ -236,34 +194,55 @@ export function createReviewSubmission(
 			.mutateAsync({
 				id: current.id,
 				threadId: current.thread_id,
-				body: draft.value,
-				images: [...uploadedImages.value],
-				privateMessage: mode === 'note',
+				reply: {
+					threadId: current.thread_id,
+					body: draft.value,
+					images: [...uploadedImages.value],
+					privateMessage: mode === 'note',
+				},
 			})
 			.catch(() => undefined)
 	}
 
+	const canApprove = computed(
+		() => !previousIssues.hasUnresolvedFacets.value && panels.activeIssues.value.length === 0,
+	)
+
 	async function submitDecision(status: ProjectStatus) {
 		const current = project.value
-		if (!canSubmit.value || !current || messages.generating.value) return
-		const currentPendingDecision = pendingDecision.value
-		const statusAlreadyApplied =
-			currentPendingDecision?.id === current.id && currentPendingDecision.status === status
+		const thread = threadQuery.data.value
+		if (!canSubmit.value || !current || !thread || messages.generating.value) return
+		let mutationStarted = false
 		try {
-			await submission.mutateAsync({
-				id: current.id,
+			if (disclosures.hasChanges.value || disclosures.saving.value)
+				throw new Error(formatMessage(errors.unsaved))
+			if (panels.validationErrors.value.length) throw new Error(formatMessage(errors.missing))
+			if (['approved', 'unlisted', 'private'].includes(status) && !canApprove.value)
+				throw new Error(formatMessage(errors.unresolved))
+			const decision: ReviewDecision = {
+				projectId: current.id,
 				threadId: current.thread_id,
 				status,
 				body: draft.value,
 				images: [...uploadedImages.value],
-				statusAlreadyApplied,
-				issues: statusAlreadyApplied ? currentPendingDecision.issues : selectedIssues(),
-				issueUpdates: statusAlreadyApplied
-					? currentPendingDecision.issueUpdates
-					: previousIssues.issueUpdates.value,
+				privateMessage: false,
+				facetUpdates: [...previousIssues.facetUpdates.value],
+				issues: selectedIssues(),
+			}
+			mutationStarted = true
+			await submission.mutateAsync({
+				id: current.id,
+				threadId: current.thread_id,
+				decision,
 			})
 			return true
-		} catch {
+		} catch (error) {
+			if (!mutationStarted)
+				addNotification({
+					title: formatMessage(commonMessages.errorNotificationTitle),
+					text: error instanceof Error ? error.message : String(error),
+					type: 'error',
+				})
 			return false
 		}
 	}
@@ -272,8 +251,8 @@ export function createReviewSubmission(
 		draft,
 		pending,
 		canSubmit,
+		canApprove,
 		loadingAction,
-		pendingDecisionStatus,
 		submit,
 		submitDecision,
 		uploadImage: (file: File) => upload.mutateAsync({ file, id: project.value?.id ?? '' }),

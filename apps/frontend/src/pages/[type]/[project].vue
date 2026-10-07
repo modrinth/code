@@ -659,6 +659,7 @@ import { useProjectLinkValidation } from '~/composables/link-network-validation'
 import {
 	canResubmitProjectForReview,
 	canSubmitProjectForReview,
+	submitProjectForReview,
 	PROJECT_REVIEW_VALIDATION_ERROR,
 } from '~/composables/link-network-validation/submission'
 import { notifyCopied } from '~/composables/moderation.ts'
@@ -666,7 +667,7 @@ import { STALE_TIME, STALE_TIME_LONG, warmProjectCheckCaches } from '~/composabl
 import { versionQueryOptions } from '~/composables/queries/version'
 import { useServerInstallContent } from '~/composables/use-server-install-content'
 import { userCollectProject, userFollowProject } from '~/composables/user.js'
-import { isRejected } from '~/helpers/projects.js'
+import { isApproved, isRejected } from '~/helpers/projects.js'
 import { injectCurrentProjectId } from '~/providers/current-project.ts'
 import { loadChecklistState } from '~/services/moderation/checklist-storage.ts'
 import { useModerationQueue } from '~/services/moderation/queue.ts'
@@ -856,6 +857,15 @@ const messages = defineMessages({
 	projectNotFound: {
 		id: 'project.error.project-not-found',
 		defaultMessage: 'Project not found',
+	},
+	projectSubmitted: {
+		id: 'project.review.submitted',
+		defaultMessage: 'Your project has been submitted for review.',
+	},
+	projectApproved: {
+		id: 'project.review.approved',
+		defaultMessage:
+			'Your project has been approved{status, select, unlisted { as unlisted} private { as private} other {}}.',
 	},
 	projectUpdated: {
 		id: 'project.notification.updated.title',
@@ -1479,40 +1489,20 @@ const patchProjectMutation = useMutation({
 	},
 })
 
-// Mutation for changing project status (setProcessing)
 const patchStatusMutation = useMutation({
-	mutationFn: async (variables) => {
-		await client.labrinth.projects_v2.edit(variables.projectId, { status: variables.status })
+	mutationFn: async ({ projectId }) => {
+		const updated = await submitProjectForReview(projectId, client)
+		queryClient.setQueryData(['project', 'v3', projectId], updated)
+		return updated
 	},
-
-	onMutate: async ({ projectId, status }) => {
-		await queryClient.cancelQueries({ queryKey: ['project', 'v2', projectId] })
-
-		const previousProject = queryClient.getQueryData(['project', 'v2', projectId])
-
-		queryClient.setQueryData(['project', 'v2', projectId], (old) => {
-			if (!old) return old
-			return { ...old, status }
-		})
-
-		return { previousProject, projectId }
-	},
-
-	onSuccess: async (_data, { threadId }) => {
-		if (threadId) {
-			await queryClient.invalidateQueries({ queryKey: ['thread', threadId] })
-		}
-	},
-
-	onError: (err, _variables, context) => {
-		if (context?.previousProject) {
-			queryClient.setQueryData(['project', 'v2', context.projectId], context.previousProject)
-		}
-		addProjectMutationErrorNotification(err)
-	},
-
-	onSettled: async () => {
-		await invalidateProject()
+	onError: (error) => addProjectMutationErrorNotification(error),
+	onSettled: async (_, __, { projectId, threadId }) => {
+		await Promise.all([
+			queryClient.invalidateQueries({ queryKey: ['project', 'v2', projectId] }),
+			queryClient.invalidateQueries({ queryKey: ['project', 'v3', projectId] }),
+			queryClient.invalidateQueries({ queryKey: ['project', projectId] }),
+			queryClient.invalidateQueries({ queryKey: ['thread', threadId] }),
+		])
 	},
 })
 
@@ -2246,11 +2236,21 @@ async function setProcessing() {
 		) {
 			return false
 		}
-		await patchStatusMutation.mutateAsync({
+		const updated = await patchStatusMutation.mutateAsync({
 			projectId: project.value.id,
-			status: 'processing',
 			threadId: project.value.thread_id,
 		})
+		if (project.value.id === updated.id)
+			addNotification({
+				title: formatMessage(commonMessages.successLabel),
+				text: formatMessage(
+					isApproved(updated) ? messages.projectApproved : messages.projectSubmitted,
+					{
+						status: updated.status,
+					},
+				),
+				type: 'success',
+			})
 		return true
 	} catch {
 		return false

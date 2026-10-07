@@ -401,6 +401,7 @@
 </template>
 
 <script lang="ts" setup>
+import type { Labrinth } from '@modrinth/api-client'
 import {
 	BrushCleaningIcon,
 	CheckIcon,
@@ -450,6 +451,7 @@ import {
 	ButtonLink,
 	Collapsible,
 	ConfirmModal,
+	defineMessage,
 	IconButton,
 	injectModrinthClient,
 	injectNotificationManager,
@@ -458,8 +460,8 @@ import {
 	TeleportOverflowMenu,
 	Textarea,
 	useDebugLogger,
+	useVIntl,
 } from '@modrinth/ui'
-import type { ProjectStatus } from '@modrinth/utils'
 import { renderHighlightedString } from '@modrinth/utils'
 import { useQueryClient } from '@tanstack/vue-query'
 import { useDebounceFn } from '@vueuse/core'
@@ -471,6 +473,7 @@ import McVersionPicker from '~/components/ui/create-project-version/components/M
 import { useGeneratedState } from '~/composables/generated'
 import { useImageUpload } from '~/composables/image-upload.ts'
 import { getProjectTypeForUrlShorthand } from '~/helpers/projects.js'
+import { verifyThreadIssuesForApproval } from '~/helpers/thread-issues'
 import {
 	clearSessionChecklistState,
 	getSessionChecklistState,
@@ -492,6 +495,13 @@ import {
 
 import { type LiveNode, STATE_KEY } from './checklist-context'
 
+type ProjectStatus = Labrinth.Projects.v2.ProjectStatus
+
+const { formatMessage } = useVIntl()
+const changedProjectMessage = defineMessage({
+	id: 'moderation.checklist.project-changed',
+	defaultMessage: 'The selected project changed. Review it again.',
+})
 const notifications = injectNotificationManager()
 const { addNotification } = notifications
 const debug = useDebugLogger('ModerationChecklist')
@@ -728,7 +738,7 @@ const moderationDecision = ref<ProjectStatus | null>(null)
 const loadingModerationDecision = computed(() => moderationDecision.value !== null)
 const approveSendStatus = computed<ProjectStatus>(() => {
 	const requested = projectV2.value.requested_status
-	return requested ?? 'approved'
+	return requested && ['approved', 'unlisted', 'private'].includes(requested) ? requested : 'approved'
 })
 const done = ref(false)
 const messageText = computed({
@@ -1659,6 +1669,10 @@ async function sendMessage(status: ProjectStatus) {
 
 	moderationDecision.value = status
 	try {
+		if (threadId && ['approved', 'unlisted', 'private'].includes(status))
+			await verifyThreadIssuesForApproval(threadId, client, () => {
+				if (projectV2.value.id !== projectId) throw new Error(formatMessage(changedProjectMessage))
+			})
 		await useBaseFetch(`project/${projectId}`, {
 			method: 'PATCH',
 			body: { status },

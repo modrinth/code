@@ -13,7 +13,11 @@
 			<div class="flex max-w-[35rem] flex-col gap-3">
 				<p class="m-0">
 					<IntlFormatted
-						:message-id="messages.resubmitModalDescription"
+						:message-id="
+							isRejected(project)
+								? messages.resubmitModalDescription
+								: messages.submitModalDescription
+						"
 						:values="{ projectTitle: project.title }"
 					>
 						<template #project-title="{ children }">
@@ -136,6 +140,8 @@
 			<template v-else-if="!report || !report.closed">
 				<div class="mx-4 mt-2">
 					<MarkdownEditor
+						ref="replyEditor"
+						:disabled="isLoading"
 						v-model="replyBody"
 						:placeholder="
 							formatMessage(
@@ -147,13 +153,28 @@
 						:on-image-upload="onUploadImage"
 					/>
 				</div>
+				<div v-if="replyFacets.length" class="mx-4 mt-3 flex flex-col gap-2">
+					<p class="m-0 text-sm text-secondary">
+						{{ formatMessage(messages.replyAddresses) }}
+					</p>
+					<Checkbox
+						v-for="facet in replyFacets"
+						:key="facet.id"
+						:model-value="selectedReplyFacetIds.includes(facet.id)"
+						:disabled="isLoading"
+						@update:model-value="selectReplyFacet(facet.id, $event)"
+					>
+						{{ facet.label }}
+					</Checkbox>
+				</div>
+
 				<div class="flex flex-wrap items-center justify-between gap-4 p-4 pt-2">
 					<div class="flex flex-wrap items-center gap-2">
 						<Button
 							v-if="sortedMessages.length > 0"
 							type="colored"
 							color="brand"
-							:disabled="!replyBody || isLoading"
+							:disabled="!replyBody.trim() || isLoading"
 							@click="
 								isApproved(project) && !isStaff(auth.user)
 									? openReplyModal()
@@ -170,7 +191,7 @@
 						</Button>
 						<Button
 							v-else
-							:disabled="!replyBody || isLoading"
+							:disabled="!replyBody.trim() || isLoading"
 							@click="
 								isApproved(project) && !isStaff(auth.user)
 									? openReplyModal()
@@ -187,7 +208,7 @@
 						</Button>
 						<Button
 							v-if="isStaff(auth.user)"
-							:disabled="!replyBody || isLoading"
+							:disabled="!replyBody.trim() || isLoading"
 							@click="runBlockingAction('private-note', () => sendReply(null, true))"
 						>
 							<SpinnerIcon
@@ -456,6 +477,7 @@ import {
 	CopyCode,
 	defineMessages,
 	ImageViewerEditor,
+	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,
 	MarkdownEditor,
@@ -464,17 +486,38 @@ import {
 	Tooltip,
 	useVIntl,
 } from '@modrinth/ui'
-import { nextTick, watch } from 'vue'
+import { useMutation, useQueryClient } from '@tanstack/vue-query'
+import { computed, nextTick, ref, watch } from 'vue'
 
 import ThreadMessage from '~/components/ui/thread/ThreadMessage.vue'
 import { useImageUpload } from '~/composables/image-upload.ts'
 import { isApproved, isRejected } from '~/helpers/projects.js'
+import { sendThreadReply } from '~/helpers/thread-issues'
 import { isStaff } from '~/helpers/users.js'
 
+const client = injectModrinthClient()
+const queryClient = useQueryClient()
+const route = useRoute()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
+	replyAddresses: {
+		id: 'conversation-thread.reply.addresses',
+		defaultMessage: 'This reply addresses the following requested explanations:',
+	},
+	replyFacet: {
+		id: 'conversation-thread.reply.facet',
+		defaultMessage: 'Explanation for {issue}',
+	},
+	unknownIssue: {
+		id: 'conversation-thread.reply.unknown-issue',
+		defaultMessage: 'Moderation issue',
+	},
+	changedThread: {
+		id: 'conversation-thread.reply.changed-thread',
+		defaultMessage: 'The selected thread changed. Open it again before replying.',
+	},
 	openImageExternally: {
 		id: 'conversation-thread.image.open-externally',
 		defaultMessage: 'Open externally',
@@ -488,9 +531,14 @@ const messages = defineMessages({
 		defaultMessage: 'Submitting for review',
 	},
 	resubmitModalDescription: {
-		id: 'conversation-thread.resubmit-modal.description',
+		id: 'conversation-thread.resubmit-modal.description.auto-approval',
 		defaultMessage:
-			"You're submitting <project-title>{projectTitle}</project-title> to be reviewed again by the moderators.",
+			"You're resubmitting <project-title>{projectTitle}</project-title>. If all moderation issues are resolved, it may be approved automatically. Otherwise, it will be sent to the moderators for review.",
+	},
+	submitModalDescription: {
+		id: 'conversation-thread.submit-modal.description',
+		defaultMessage:
+			"You're submitting <project-title>{projectTitle}</project-title> to be reviewed by the moderators.",
 	},
 	resubmitModalReminder: {
 		id: 'conversation-thread.resubmit-modal.reminder',
@@ -623,10 +671,6 @@ const messages = defineMessages({
 		id: 'conversation-thread.action.send-to-review',
 		defaultMessage: 'Send to review',
 	},
-	errorSendingMessage: {
-		id: 'conversation-thread.error.sending-message',
-		defaultMessage: 'Error sending message',
-	},
 	errorClosingReport: {
 		id: 'conversation-thread.error.closing-report',
 		defaultMessage: 'Error closing report',
@@ -687,6 +731,53 @@ const members = computed(() => {
 })
 
 const replyBody = ref('')
+const replyEditor = ref(null)
+const selectedReplyFacetIds = ref([])
+const replyFacets = computed(() =>
+	props.project && (props.currentMember?.accepted || isStaff(props.auth.user))
+		? (props.thread.issues ?? []).flatMap((issue) =>
+				issue.facets
+					.filter(
+						(facet) =>
+							facet.verdict === 'open' &&
+							facet.what.type === 'acknowledge' &&
+							facet.what.value.mode === 'reply',
+					)
+					.map((facet) => ({
+						id: facet.id,
+						label: formatMessage(messages.replyFacet, {
+							issue: issue.why?.title ?? formatMessage(messages.unknownIssue),
+						}),
+					})),
+			)
+		: [],
+)
+function selectReplyFacet(id, selected) {
+	selectedReplyFacetIds.value = selected
+		? [...new Set([...selectedReplyFacetIds.value, id])]
+		: selectedReplyFacetIds.value.filter((entry) => entry !== id)
+}
+watch(
+	[() => route.query.reply_to_facet, replyFacets, replyEditor],
+	async ([id, facets]) => {
+		const ids = (Array.isArray(id) ? id : [id]).filter(
+			(id) => typeof id === 'string' && facets.some((facet) => facet.id === id),
+		)
+		if (!ids.length) return
+		for (const id of ids) selectReplyFacet(id, true)
+		await nextTick()
+		await replyEditor.value?.focus?.()
+	},
+	{ immediate: true, flush: 'post' },
+)
+watch(
+	() => props.thread.id,
+	() => {
+		replyBody.value = ''
+		selectedReplyFacetIds.value = []
+		imageIDs.value = []
+	},
+)
 
 const imageViewer = ref(null)
 const imageItems = ref([])
@@ -740,78 +831,118 @@ async function runBlockingAction(actionId, action) {
 	}
 }
 
-async function updateThreadLocal() {
-	let threadId = null
-	if (props.project) {
-		threadId = props.project.thread_id
-	} else if (props.report) {
-		threadId = props.report.thread_id
-	}
-	let thread = null
-	if (threadId) {
-		thread = await useBaseFetch(`thread/${threadId}`)
-	}
-	emit('update-thread', thread)
+async function updateThreadLocal(threadId = props.thread.id) {
+	const thread = await queryClient.fetchQuery({
+		queryKey: ['thread', threadId],
+		queryFn: () => client.labrinth.threads_v3.getThread(threadId),
+		staleTime: 0,
+	})
+	if (props.thread.id === threadId) emit('update-thread', thread)
 }
 
 const imageIDs = ref([])
 
 async function onUploadImage(file) {
-	const response = await useImageUpload(file, { context: 'thread_message' })
+	try {
+		const response = await useImageUpload(file, { context: 'thread_message' })
 
-	imageIDs.value.push(response.id)
-	// Keep the last 10 entries of image IDs
-	imageIDs.value = imageIDs.value.slice(-10)
+		imageIDs.value.push(response.id)
+		imageIDs.value = imageIDs.value.slice(-10)
 
-	return response.url
+		return response.url
+	} catch (error) {
+		addNotification({
+			title: formatMessage(commonMessages.errorNotificationTitle),
+			text: error instanceof Error ? error.message : String(error),
+			type: 'error',
+		})
+		throw error
+	}
 }
 
+const replyMutation = useMutation({
+	mutationFn: async ({ threadId, projectId, status, privateMessage }) => {
+		const assertCurrent = () => {
+			if (props.thread.id !== threadId) throw new Error(formatMessage(messages.changedThread))
+		}
+		if (replyBody.value.trim()) {
+			const reply = {
+				threadId,
+				body: replyBody.value,
+				images: [...imageIDs.value],
+				privateMessage,
+			}
+			const facetIds = privateMessage
+				? []
+				: (props.thread.issues ?? []).flatMap((issue) =>
+						issue.facets.some((facet) => selectedReplyFacetIds.value.includes(facet.id))
+							? issue.facets
+									.filter(
+										(facet) =>
+											facet.verdict === 'open' &&
+											facet.what.type === 'acknowledge' &&
+											(facet.what.value.mode === 'checkbox' ||
+												selectedReplyFacetIds.value.includes(facet.id)),
+									)
+									.map(({ id }) => id)
+							: [],
+					)
+			await sendThreadReply(reply, client, assertCurrent)
+			replyBody.value = ''
+			imageIDs.value = []
+			selectedReplyFacetIds.value = []
+			for (const facetId of facetIds) {
+				assertCurrent()
+				await client.labrinth.threads_v3.user_addressed(facetId)
+			}
+		}
+		assertCurrent()
+		await updateThreadLocal(threadId)
+		if (projectId)
+			await queryClient.invalidateQueries({
+				queryKey: ['project', projectId, 'validation'],
+			})
+		assertCurrent()
+		if (status !== null) return (await props.setStatus(status)) !== false
+		return true
+	},
+	onError: (error) =>
+		addNotification({
+			title: formatMessage(commonMessages.errorNotificationTitle),
+			text: error instanceof Error ? error.message : String(error),
+			type: 'error',
+		}),
+	onSettled: async (_, __, { threadId, projectId }) => {
+		await Promise.all([
+			queryClient.invalidateQueries({ queryKey: ['thread', threadId] }),
+			projectId
+				? queryClient.invalidateQueries({
+						queryKey: ['project', projectId, 'validation'],
+					})
+				: Promise.resolve(),
+		])
+	},
+})
+
 async function sendReplyFromModal(status = null, privateMessage = false) {
-	await sendReply(status, privateMessage)
-	modalReply.value.hide()
+	if (await sendReply(status, privateMessage)) modalReply.value.hide()
 }
 
 async function sendReply(status = null, privateMessage = false) {
-	if (status === 'processing' && props.reviewSubmissionDisabled) return
-	try {
-		const body = {
-			body: {
-				type: 'text',
-				body: replyBody.value,
-				private: privateMessage,
-			},
-		}
-
-		if (imageIDs.value.length > 0) {
-			body.body = {
-				...body.body,
-				uploaded_images: imageIDs.value,
-			}
-		}
-
-		await useBaseFetch(`thread/${props.thread.id}`, {
-			method: 'POST',
-			body,
+	if (status === 'processing' && props.reviewSubmissionDisabled) return false
+	return await replyMutation
+		.mutateAsync({
+			threadId: props.thread.id,
+			projectId: props.project?.id,
+			status,
+			privateMessage,
 		})
-
-		replyBody.value = ''
-
-		await updateThreadLocal()
-		if (status !== null) {
-			await props.setStatus(status)
-		}
-	} catch (err) {
-		addNotification({
-			title: formatMessage(messages.errorSendingMessage),
-			text: err.data ? err.data.description : err,
-			type: 'error',
-		})
-	}
+		.catch(() => false)
 }
 
 async function closeReport(reply) {
 	if (reply) {
-		await sendReply()
+		if (!(await sendReply())) return
 	}
 
 	try {
@@ -867,14 +998,18 @@ function openReplyModal() {
 async function resubmit() {
 	if (props.reviewSubmissionDisabled) return
 	if (replyWithSubmission.value) {
-		await sendReply('processing')
+		if (!(await sendReply('processing'))) return
 	} else {
-		await props.setStatus('processing')
+		if ((await props.setStatus('processing')) === false) return
 	}
 	modalSubmit.value.hide()
 }
 
-const requestedStatus = computed(() => props.project.requested_status ?? 'approved')
+const requestedStatus = computed(() =>
+	['approved', 'unlisted', 'private'].includes(props.project?.requested_status)
+		? props.project.requested_status
+		: 'approved',
+)
 
 defineOptions({
 	inheritAttrs: false,

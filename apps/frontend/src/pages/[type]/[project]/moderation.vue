@@ -165,6 +165,7 @@ import {
 	canSubmitProjectForReview,
 } from '~/composables/link-network-validation/submission'
 import { getProjectLink, isApproved, isRejected, isUnderReview } from '~/helpers/projects.js'
+import { isThreadIssueVerified, verifyThreadIssuesForApproval } from '~/helpers/thread-issues'
 
 defineEmits(['on-download', 'delete-version'])
 
@@ -182,6 +183,10 @@ type ModerationAdmonitionSection =
 	  }
 
 const messages = defineMessages({
+	projectChanged: {
+		id: 'project.moderation.project-changed',
+		defaultMessage: 'The selected project changed. Review it again.',
+	},
 	admonitionRejectedSpamNotice: {
 		id: 'project.moderation.admonition.rejected.spam-notice',
 		defaultMessage:
@@ -261,7 +266,7 @@ const prefixedThread = computed(() => {
 })
 
 const visibleIssues = computed(() =>
-	(thread.value?.issues ?? []).filter((issue) => !issue.moderator_verified),
+	(thread.value?.issues ?? []).filter((issue) => !isThreadIssueVerified(issue)),
 )
 
 const projectApproved = computed(() => isApproved(project.value))
@@ -505,26 +510,32 @@ function updateThread(newThread: Labrinth.Threads.v3.Thread | null | undefined) 
 
 async function setStatus(status: Labrinth.Projects.v2.ProjectStatus) {
 	if (status === 'processing') {
-		await setProcessing()
-		return
+		return await setProcessing()
 	}
 	startLoading()
+	const projectId = project.value.id
+	const threadId = project.value.thread_id
 
 	try {
-		await client.labrinth.projects_v2.edit(project.value.id, { status })
-
-		project.value.status = status
+		if (['approved', 'unlisted', 'private'].includes(status))
+			await verifyThreadIssuesForApproval(threadId, client, () => {
+				if (project.value.id !== projectId) throw new Error(formatMessage(messages.projectChanged))
+			})
+		await client.labrinth.projects_v3.edit(projectId, { status })
 		await invalidate()
-		await queryClient.invalidateQueries({ queryKey: ['thread', project.value?.thread_id] })
+		await queryClient.invalidateQueries({ queryKey: ['thread', threadId] })
+		return true
 	} catch (err) {
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
 			text: getErrorDescription(err),
 			type: 'error',
 		})
+		return false
+	} finally {
+		await queryClient.invalidateQueries({ queryKey: ['thread', threadId] })
+		stopLoading()
 	}
-
-	stopLoading()
 }
 
 function getErrorDescription(err: unknown): string {

@@ -14,6 +14,7 @@ import type {
 import type { createReviewSession } from './review-session'
 
 type ThreadIssue = Labrinth.Threads.v3.ThreadIssue
+type ThreadIssueFacet = Labrinth.Threads.v3.ThreadIssueFacet
 
 export const [injectReviewPreviousIssues, provideReviewPreviousIssues] =
 	createContext<ReturnType<typeof createReviewPreviousIssues>>('ReviewPreviousIssues')
@@ -68,6 +69,28 @@ export function createReviewPreviousIssues(
 		const projectId = project.value?.id
 		if (!projectId) return false
 		return session.read(projectId, 'previous-issue-applicability')[issue.id] === true
+	}
+
+	function isFacetApplicable(issue: ThreadIssue, facet: ThreadIssueFacet): boolean {
+		const projectId = project.value?.id
+		if (!projectId) return false
+		const stored = session.read(projectId, 'previous-facet-applicability')[facet.id]
+		return typeof stored === 'boolean'
+			? stored
+			: isApplicable(issue) && (isResolved(issue) || facet.verdict !== 'resolved')
+	}
+
+	function setFacetApplicable(issue: ThreadIssue, facet: ThreadIssueFacet, applicable: boolean) {
+		const projectId = project.value?.id
+		if (!projectId || !issue.facets.some(({ id }) => id === facet.id)) return
+		const selections = issue.facets.map((entry) => ({
+			id: entry.id,
+			applicable: entry.id === facet.id ? applicable : isFacetApplicable(issue, entry),
+		}))
+		if (applicable && !isApplicable(issue)) restoreIssue(issue)
+		for (const entry of selections)
+			session.write(projectId, 'previous-facet-applicability', entry.id, entry.applicable)
+		if (!selections.some((entry) => entry.applicable)) markNoLongerApplicable(issue)
 	}
 
 	function cardIssue(issue: ThreadIssue): ReviewIssue {
@@ -219,6 +242,8 @@ export function createReviewPreviousIssues(
 		const id = project.value?.id
 		if (!id || !issues.value.some(({ id }) => id === issue.id)) return
 		session.write(id, 'previous-issue-applicability', issue.id, false)
+		for (const facet of issue.facets)
+			session.write(id, 'previous-facet-applicability', facet.id, false)
 		const definition = reviewIssue(issue)
 		if (
 			definition &&
@@ -234,6 +259,13 @@ export function createReviewPreviousIssues(
 		const projectId = project.value?.id
 		if (!projectId || !issues.value.some(({ id }) => id === issue.id)) return
 		session.write(projectId, 'previous-issue-applicability', issue.id, true)
+		for (const facet of issue.facets)
+			session.write(
+				projectId,
+				'previous-facet-applicability',
+				facet.id,
+				isResolved(issue) || facet.verdict !== 'resolved',
+			)
 		const definition = reviewIssue(issue)
 		if (!definition) return
 		if (panels.activeIssues.value.some(({ id }) => id === definition.id)) {
@@ -307,10 +339,10 @@ export function createReviewPreviousIssues(
 	}
 
 	const reReviewIssues = computed(() =>
-		issues.value.filter((issue) => !isApplicable(issue) && !isResolved(issue)),
+		issues.value.filter((issue) => !isResolved(issue)),
 	)
 	const resolvedIssues = computed(() =>
-		issues.value.filter((issue) => !isApplicable(issue) && isResolved(issue)),
+		issues.value.filter(isResolved),
 	)
 
 	const appliedIssues = computed(() => issues.value.filter(isApplicable))
@@ -322,13 +354,68 @@ export function createReviewPreviousIssues(
 					.map((issue) => cardIssue(issue).id),
 			),
 	)
+	function needsReplacement(issue: ThreadIssue): boolean {
+		if (!isApplicable(issue)) return false
+		const id = reviewIssue(issue)?.id
+		return (
+			isResolved(issue) ||
+			messages.hasIssueOverride(messageKey(issue)) ||
+			(panels.activeIssues.value.some((active) => active.id === id) &&
+				!panels.isRestoredIssue(id ?? '')) ||
+			issue.facets.some((facet) => isFacetApplicable(issue, facet) && facet.verdict === 'resolved')
+		)
+	}
+
+	function targetKey(what: Labrinth.Threads.v3.ThreadIssueTarget): string {
+		switch (what.type) {
+			case 'version':
+				return `${what.type}:${what.value.version_id}:${what.value.target.type}:${
+					what.value.target.type === 'modify_additional_file_type'
+						? what.value.target.value.file_id
+						: what.value.target.type === 'remove_additional_files'
+							? [...what.value.target.value.file_ids].sort().join(',')
+							: ''
+				}`
+			case 'modify_gallery_image':
+				return `${what.type}:${what.value.image_id}`
+			case 'modify_team_member_role':
+				return `${what.type}:${what.value.team_id}:${what.value.user_id}`
+			case 'modify_server_address':
+				return `${what.type}:${what.value.platform}`
+			case 'modify_project_disclosure':
+			case 'modify_project_disclosure_note':
+				return `${what.type}:${what.value.disclosure_type}`
+			case 'modify_links':
+				return `${what.type}:${Object.keys(what.value.links).sort().join(',')}`
+			case 'remove_tags':
+				return `${what.type}:${[...what.value.tags].sort().join(',')}`
+			case 'remove_gallery_images':
+				return `${what.type}:${[...what.value.image_ids].sort((a, b) => a - b).join(',')}`
+			case 'remove_project_disclosures':
+				return `${what.type}:${[...what.value.disclosure_types].sort().join(',')}`
+			case 'acknowledge':
+				return `${what.type}:${what.value.mode}`
+			default:
+				return what.type
+		}
+	}
+
 	const recreatedIssues = computed(() =>
 		appliedIssues.value
-			.filter(isResolved)
+			.filter(needsReplacement)
 			.flatMap((issue): Labrinth.Threads.v3.NewThreadIssue[] => {
 				const id = reviewIssue(issue)?.id
 				const active = panels.activeIssues.value.find((active) => active.id === id)
-				const facets = active?.facets ?? issue.facets.map(({ what }) => ({ what }))
+				const changed = !!active && !panels.isRestoredIssue(active.id)
+				const previousFacets = new Map(issue.facets.map((facet) => [targetKey(facet.what), facet]))
+				const facets = active
+					? active.facets.filter(({ what }) => {
+							const previous = previousFacets.get(targetKey(what))
+							return changed || !previous || isFacetApplicable(issue, previous)
+						})
+					: issue.facets
+							.filter((facet) => isFacetApplicable(issue, facet))
+							.map(({ what }) => ({ what }))
 				const [first, ...rest] = facets
 				if (!first) return []
 				return [
@@ -345,30 +432,17 @@ export function createReviewPreviousIssues(
 				]
 			}),
 	)
-	const issueUpdates = computed(() =>
-		issues.value
-			.filter((issue) => !issue.moderator_verified || isApplicable(issue))
-			.map((issue) => {
-				if (isResolved(issue)) return { id: issue.id, data: { moderator_verified: true } }
-				const applicable = isApplicable(issue)
-				const id = reviewIssue(issue)?.id
-				const active = panels.activeIssues.value.find((active) => active.id === id)
-				const changed = applicable && !!active && !panels.isRestoredIssue(active.id)
-				const data: Labrinth.Threads.v3.EditThreadIssue = applicable
-					? { user_addressed: false }
-					: { moderator_verified: true }
-				if ((applicable && active) || messages.hasIssueOverride(messageKey(issue))) {
-					data.why = {
-						...issueDetails(issue),
-						message: reviewMessage(issue),
-						...(changed
-							? { selection: panels.issueSelection(active.id), locations: active.locations }
-							: {}),
-					}
-				}
-				if (changed && active.facets) data.facets = active.facets
-				return { id: issue.id, data }
-			}),
+	const facetUpdates = computed(() =>
+		issues.value.flatMap((issue) =>
+			issue.facets.flatMap(
+				(facet): { id: string; data: Labrinth.Threads.v3.EditThreadIssueFacet }[] => {
+					if (facet.moderator_verified) return []
+					if (!needsReplacement(issue) && isFacetApplicable(issue, facet))
+						return facet.user_addressed ? [{ id: facet.id, data: { user_addressed: false } }] : []
+					return [{ id: facet.id, data: { moderator_verified: true } }]
+				},
+			),
+		),
 	)
 
 	return {
@@ -389,7 +463,12 @@ export function createReviewPreviousIssues(
 					).length,
 				0,
 			),
-		issueUpdates,
+		facetUpdates,
+		hasUnresolvedFacets: computed(() =>
+			issues.value.some((issue) => issue.facets.some((facet) => isFacetApplicable(issue, facet))),
+		),
+		isFacetApplicable,
+		setFacetApplicable,
 		messageKey,
 		reviewMessage,
 		cardIssue,

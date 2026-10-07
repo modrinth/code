@@ -2126,6 +2126,26 @@ export namespace Labrinth {
 				suggestion?: string | null
 			}
 
+			export type DisclosureMetadata<T extends Projects.v3.ProjectDisclosureType> = Omit<
+				Extract<Projects.v3.ProjectDisclosure, { type: T }>,
+				'type'
+			>
+
+			export type DisclosureMetadataTarget<T extends Projects.v3.ProjectDisclosureType> = {
+				original: DisclosureMetadata<T> | null
+				suggestion?: DisclosureMetadata<T> | null
+			}
+
+			export type ModifyDisclosureTarget = {
+				[T in Projects.v3.ProjectDisclosureType]: {
+					type: 'modify_project_disclosure'
+					value: {
+						disclosure_type: T
+						metadata: DisclosureMetadataTarget<T>
+					}
+				}
+			}[Projects.v3.ProjectDisclosureType]
+
 			export type VersionIssueTarget =
 				| { type: 'remove' }
 				| { type: 'modify_environment'; value: TextTarget }
@@ -2173,13 +2193,7 @@ export namespace Labrinth {
 				  }
 				| { type: 'remove_gallery_images'; value: { image_ids: number[] } }
 				| { type: 'remove_project_disclosures'; value: { disclosure_types: string[] } }
-				| {
-						type: 'modify_project_disclosure'
-						value: {
-							disclosure_type: string
-							metadata: { original: unknown; suggestion?: unknown }
-						}
-				  }
+				| ModifyDisclosureTarget
 				| {
 						type: 'modify_project_disclosure_note'
 						value: { disclosure_type: string; note: OptionalTextTarget }
@@ -2258,24 +2272,24 @@ export namespace Labrinth {
 
 			export type ThreadIssueVerdict = 'open' | 'addressed' | 'resolved'
 
+			export type ThreadIssueFacet = {
+				id: string
+				what: ThreadIssueTarget
+				user_addressed: boolean
+				moderator_verified: boolean
+				verdict: ThreadIssueVerdict
+			}
+
 			export type ThreadIssue = {
 				id: string
 				created_by: string | null
 				created_at: string
 				why: ThreadIssueWhy
-				user_addressed: boolean
-				moderator_verified: boolean
-				facets: {
-					id: string
-					what: ThreadIssueTarget
-					verdict: ThreadIssueVerdict
-				}[]
+				facets: ThreadIssueFacet[]
 				verdict: ThreadIssueVerdict
 			}
 
-			export type EditThreadIssue = {
-				why?: ThreadIssueWhy
-				facets?: [NewThreadIssueFacet, ...NewThreadIssueFacet[]]
+			export type EditThreadIssueFacet = {
 				user_addressed?: boolean
 				moderator_verified?: boolean
 			}
@@ -2290,6 +2304,11 @@ export namespace Labrinth {
 				  }
 				| {
 						type: 'status_change'
+						new_status: Projects.v2.ProjectStatus
+						old_status: Projects.v2.ProjectStatus
+				  }
+				| {
+						type: 'auto_approval'
 						new_status: Projects.v2.ProjectStatus
 						old_status: Projects.v2.ProjectStatus
 				  }

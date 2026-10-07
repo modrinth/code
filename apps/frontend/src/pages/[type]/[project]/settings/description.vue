@@ -15,19 +15,22 @@
 					</IntlFormatted>
 				</span>
 			</div>
+
+			<div class="mb-4 flex flex-col gap-2.5">
+				<ProjectIssueCard target="modify_description" />
+				<ValidationMessage
+					:check="descriptionValidation"
+					:project-field="saved.description"
+					:current-field="current.description"
+				/>
+				<ValidationMessage :check="saveValidation.forField('description')" />
+			</div>
+
 			<MarkdownEditor
 				v-model="current.description"
 				:disabled="saving || !hasPermission"
 				:on-image-upload="onUploadHandler"
 			/>
-			<ValidationMessage
-				:check="descriptionValidation"
-				:project-field="saved.description"
-				:current-field="current.description"
-				class="mt-2"
-			/>
-			<ValidationMessage :check="saveValidation.forField('description')" class="mt-2" />
-			<ProjectIssueCard target="modify_description" class="mt-2" />
 		</div>
 		<UnsavedChangesPopup
 			:original="saved"

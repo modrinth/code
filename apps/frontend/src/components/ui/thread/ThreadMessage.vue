@@ -56,6 +56,7 @@
 				:class="{
 					raised: raised,
 					'system-message-icon': [
+						'auto_approval',
 						'legacy_project_message',
 						'tech_review_entered',
 						'tech_review_exited',
@@ -64,6 +65,7 @@
 				}"
 			>
 				<InfoIcon v-if="message.body.type === 'legacy_project_message'" class="text-blue" />
+				<ModrinthIcon v-else-if="message.body.type === 'auto_approval'" />
 				<ScaleIcon v-else />
 			</div>
 			<span
@@ -77,8 +79,13 @@
 				"
 				class="message__author moderation-color"
 			>
-				Moderator
-				<ScaleIcon v-tooltip="'Moderator'" />
+				{{
+					formatMessage(
+						message.body.type === 'auto_approval' ? imageMessages.system : imageMessages.moderator,
+					)
+				}}
+				<ModrinthIcon v-if="message.body.type === 'auto_approval'" />
+				<ScaleIcon v-else v-tooltip="formatMessage(imageMessages.moderator)" />
 			</span>
 		</template>
 		<div
@@ -96,6 +103,12 @@
 				moderation history.
 			</span>
 			<span v-if="message.body.type === 'deleted'"> posted a message that has been deleted. </span>
+			<IntlFormatted
+				v-else-if="message.body.type === 'auto_approval'"
+				:message-id="imageMessages.autoApproval"
+			>
+				<template #status><Badge :type="message.body.new_status" /></template>
+			</IntlFormatted>
 			<template v-else-if="message.body.type === 'status_change'">
 				<span v-if="message.body.new_status === 'processing'">
 					submitted the project for review.
@@ -171,6 +184,8 @@ import {
 	Avatar,
 	Badge,
 	defineMessages,
+	injectModrinthClient,
+	IntlFormatted,
 	TeleportOverflowMenu,
 	useFormatDateTime,
 	useRelativeTime,
@@ -217,8 +232,16 @@ const props = defineProps({
 
 const emit = defineEmits(['update-thread', 'open-image'])
 const settings = useModerationSettings()
+const client = injectModrinthClient()
 const { formatMessage } = useVIntl()
 const imageMessages = defineMessages({
+	system: { id: 'thread.message.system', defaultMessage: 'Modrinth' },
+	moderator: { id: 'thread.message.moderator', defaultMessage: 'Moderator' },
+	autoApproval: {
+		id: 'thread.message.auto-approval',
+		defaultMessage:
+			'automatically approved the project with status <status>approved</status> because all moderation issues were resolved.',
+	},
 	openImage: {
 		id: 'thread.message.open-image',
 		defaultMessage: 'Open image',
@@ -295,9 +318,7 @@ const isPrivateMessage = computed(() => {
 })
 
 async function deleteMessage() {
-	await useBaseFetch(`message/${props.message.id}`, {
-		method: 'DELETE',
-	})
+	await client.labrinth.threads_v3.deleteMessage(props.message.id)
 	emit('update-thread')
 }
 </script>

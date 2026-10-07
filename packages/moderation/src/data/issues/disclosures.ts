@@ -1,3 +1,4 @@
+import type { Labrinth } from '@modrinth/api-client'
 import { TriangleAlertIcon } from '@modrinth/assets'
 
 import disclosuresHeaderMessage from '../messages/checklist/messages/disclosures/header.md'
@@ -36,12 +37,32 @@ import misusedTelemetryMessage from '../messages/checklist/messages/disclosures/
 import nonEnglishMessage from '../messages/checklist/messages/disclosures/non-english.md'
 import { issue, panel, section, toggle } from './component-builders/builders'
 import { issueLocation } from './component-builders/locations'
+import { issueTargets } from './component-builders/targets'
+
+const disclosureTypes = {
+	ai: 'ai_content',
+	'ai-functionality': 'ai_functionality',
+	ads: 'advertisements',
+	'paid-features': 'paid_features',
+	telemetry: 'telemetry',
+	'derivative-content': 'derivative_work',
+	photosensitivity: 'epilepsy_triggers',
+	'system-interactions': 'system_interactions',
+	archive: 'archived',
+} satisfies Record<string, Labrinth.Projects.v3.ProjectDisclosureType>
 
 export const disclosuresIssue = issue({
 	id: 'disclosures',
 	locations: [issueLocation('disclosures')],
 	title: 'Invalid disclosures',
 	category: 'Disclosures',
+	facets: ({ selected }) =>
+		Object.entries(disclosureTypes).flatMap(([field, type]) =>
+			selected.toggleIds.includes(`disclosures-missing-${field}`) ||
+			selected.toggleIds.includes(`disclosures-misused-${field}`)
+				? [issueTargets.modifyDisclosure(type)]
+				: [],
+		),
 	message: ({ selected }) => {
 		const toggleIds = new Set(selected.toggleIds)
 		const missingParts: string[] = []

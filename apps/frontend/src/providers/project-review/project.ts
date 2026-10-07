@@ -4,6 +4,7 @@ import { computed, type Ref } from 'vue'
 
 import { useCreatorProjectStats } from '~/composables/creator-project-stats'
 import { projectQueryOptions } from '~/composables/queries/project'
+import { isThreadIssueStatusChange } from '~/helpers/thread-issues'
 
 export function useReviewProject(selection: Ref<string>) {
 	const client = injectModrinthClient()
@@ -72,7 +73,7 @@ export function useReviewProject(selection: Ref<string>) {
 		const rejected = ['rejected', 'withheld']
 		const lastApproval = messages.findLastIndex(
 			(message) =>
-				message.body.type === 'status_change' && approved.includes(message.body.new_status),
+				isThreadIssueStatusChange(message.body) && approved.includes(message.body.new_status),
 		)
 		return messages
 			.slice(lastApproval + 1)
@@ -111,7 +112,8 @@ export function useReviewProject(selection: Ref<string>) {
 		() =>
 			threadQuery.data.value?.messages.filter(
 				(message) =>
-					message.body.type === 'status_change' && message.body.new_status === 'processing',
+					message.body.type === 'auto_approval' ||
+					(message.body.type === 'status_change' && message.body.new_status === 'processing'),
 			).length,
 	)
 

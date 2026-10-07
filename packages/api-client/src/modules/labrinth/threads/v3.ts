@@ -71,6 +71,7 @@ export class LabrinthThreadsV3Module extends AbstractModule {
 			version: 3,
 			method: 'POST',
 			body: message,
+			retry: false,
 		})
 	}
 
@@ -81,12 +82,16 @@ export class LabrinthThreadsV3Module extends AbstractModule {
 			version: 3,
 			method: 'PUT',
 			body: data,
+			retry: false,
 		})
 	}
 
-	/** Update a thread issue's content, facets, or addressed and verified state. */
-	public async editIssue(id: string, data: Labrinth.Threads.v3.EditThreadIssue): Promise<void> {
-		return this.client.request<void>(`/thread/issue/${id}`, {
+	/** Update a thread issue facet's addressed or verified state. */
+	public async editIssueFacet(
+		id: string,
+		data: Labrinth.Threads.v3.EditThreadIssueFacet,
+	): Promise<void> {
+		return this.client.request<void>(`/thread/issue/facet/${id}`, {
 			api: 'labrinth',
 			version: 3,
 			method: 'PATCH',
@@ -94,14 +99,14 @@ export class LabrinthThreadsV3Module extends AbstractModule {
 		})
 	}
 
-	/** Mark a thread issue as addressed by the project member. */
-	public async user_addressed(issueId: string): Promise<void> {
-		return this.editIssue(issueId, { user_addressed: true })
+	/** Mark a thread issue facet as addressed by the project member. */
+	public async user_addressed(facetId: string): Promise<void> {
+		return this.editIssueFacet(facetId, { user_addressed: true })
 	}
 
-	/** Mark a thread issue as verified by a moderator. */
-	public async moderator_verified(issueId: string): Promise<void> {
-		return this.editIssue(issueId, { moderator_verified: true })
+	/** Mark a thread issue facet as verified by a moderator. */
+	public async moderator_verified(facetId: string): Promise<void> {
+		return this.editIssueFacet(facetId, { moderator_verified: true })
 	}
 
 	/**

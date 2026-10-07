@@ -52,7 +52,7 @@
 							>
 								<template v-if="resolved">
 									<PlusIcon aria-hidden="true" />
-									Not resolved
+									{{ formatMessage(messages.notResolved) }}
 								</template>
 								<XIcon v-else aria-hidden="true" />
 							</Button>
@@ -257,6 +257,10 @@ watch(
 )
 const { formatMessage } = useVIntl()
 const messages = defineMessages({
+	notResolved: {
+		id: 'project-review.issues.not-resolved',
+		defaultMessage: 'Not resolved',
+	},
 	reReview: {
 		id: 'project-review.previous-issues.re-review',
 		defaultMessage: 'Re-review',
