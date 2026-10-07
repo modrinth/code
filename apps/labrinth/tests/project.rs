@@ -26,8 +26,11 @@ use labrinth::database::models::project_item::{
     PROJECTS_NAMESPACE, PROJECTS_SLUGS_NAMESPACE, ProjectQueryResult,
 };
 use labrinth::models::ids::ProjectId;
+use labrinth::models::pats::Scopes;
 use labrinth::models::projects::ProjectStatus;
 use labrinth::models::teams::ProjectPermissions;
+use labrinth::routes::PROJECT_REDIRECTS_NAMESPACE;
+use labrinth::test::pats::create_test_pat;
 use labrinth::util::actix::{MultipartSegment, MultipartSegmentData};
 use serde_json::json;
 use sha1::Digest;
@@ -124,7 +127,7 @@ async fn project_redirect_cache_respects_visibility() {
         for (alias, target) in
             [(public_alias, public_id), (private_alias, private_id)]
         {
-            let key = redis.key().entity("project_redirects:v2", alias);
+            let key = redis.key().entity(PROJECT_REDIRECTS_NAMESPACE, alias);
             redis
                 .set_serialized(
                     &key,
@@ -186,6 +189,45 @@ async fn project_redirect_cache_respects_visibility() {
                 ]
             );
         }
+
+        let write_pat = create_test_pat(
+            Scopes::PROJECT_WRITE,
+            USER_USER_ID_PARSED,
+            &env.db,
+        )
+        .await;
+        let response = env
+            .api
+            .edit_project(private_id, json!({}), Some(&write_pat))
+            .await;
+        assert_status!(&response, StatusCode::NO_CONTENT);
+        let response = env
+            .api
+            .edit_project(private_alias, json!({}), Some(&write_pat))
+            .await;
+        assert_status!(&response, StatusCode::PERMANENT_REDIRECT);
+        let response = env
+            .api
+            .edit_project_bulk(&[private_alias], json!({}), Some(&write_pat))
+            .await;
+        assert_status!(&response, StatusCode::PERMANENT_REDIRECT);
+        let response =
+            env.api.get_project(private_alias, Some(&write_pat)).await;
+        assert_status!(&response, StatusCode::NOT_FOUND);
+        assert!(!response.headers().contains_key("location"));
+
+        let enemy_write_pat = create_test_pat(
+            Scopes::PROJECT_WRITE,
+            ENEMY_USER_ID_PARSED,
+            &env.db,
+        )
+        .await;
+        let response = env
+            .api
+            .edit_project(private_alias, json!({}), Some(&enemy_write_pat))
+            .await;
+        assert_status!(&response, StatusCode::NOT_FOUND);
+        assert!(!response.headers().contains_key("location"));
 
         for pat in [USER_USER_PAT, MOD_USER_PAT, ADMIN_USER_PAT] {
             let response = env.api.get_project(private_alias, pat).await;
@@ -281,6 +323,54 @@ async fn project_redirect_cache_respects_visibility() {
 }
 
 #[actix_rt::test]
+async fn project_slug_edit_invalidates_redirect_cache() {
+	with_test_environment_all(None, |env| async move {
+		let target_id = &env.dummy.project_beta.project_id;
+		let project_id = &env.dummy.project_alpha.project_id;
+		let alias = "redirect-claimed-slug";
+		let mut redis = env.db.redis_pool.connect().await.unwrap();
+		let key = redis.key().entity(PROJECT_REDIRECTS_NAMESPACE, alias);
+		redis
+			.set_serialized(
+				&key,
+				&Some(parse_base62(target_id).unwrap() as i64),
+				Some(300),
+			)
+			.await
+			.unwrap();
+
+		let response = env.api.get_project(alias, USER_USER_PAT).await;
+		assert_status!(&response, StatusCode::PERMANENT_REDIRECT);
+		assert!(
+			response
+				.headers()
+				.get("location")
+				.unwrap()
+				.to_str()
+				.unwrap()
+				.ends_with(target_id)
+		);
+
+		let response = env
+			.api
+			.edit_project(
+				project_id,
+				json!({ "slug": alias.to_uppercase() }),
+				USER_USER_PAT,
+			)
+			.await;
+		assert_status!(&response, StatusCode::NO_CONTENT);
+
+		let response = env.api.get_project(alias, USER_USER_PAT).await;
+		assert_status!(&response, StatusCode::OK);
+		assert!(!response.headers().contains_key("location"));
+		let project: CommonProject = test::read_body_json(response).await;
+		assert_eq!(project.id.to_string(), *project_id);
+	})
+	.await;
+}
+
+#[actix_rt::test]
 async fn project_redirect_cache_preserves_case_sensitive_ids() {
     with_test_environment_all(None, |env| async move {
         let project_id = &env.dummy.project_beta.project_id;
@@ -303,8 +393,8 @@ async fn project_redirect_cache_preserves_case_sensitive_ids() {
 
         let mut redis = env.db.redis_pool.connect().await.unwrap();
         let keys = [
-            redis.key().entity("project_redirects:v2", project_id),
-            redis.key().entity("project_redirects:v2", &alias),
+            redis.key().entity(PROJECT_REDIRECTS_NAMESPACE, project_id),
+            redis.key().entity(PROJECT_REDIRECTS_NAMESPACE, &alias),
         ];
         for alias_first in [false, true] {
             redis.delete_many(&keys).await.unwrap();

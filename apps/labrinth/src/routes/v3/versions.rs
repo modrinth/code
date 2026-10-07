@@ -74,6 +74,7 @@ pub async fn version_project_get(
         pool.as_ref(),
         redis.as_ref(),
         session_queue.as_ref(),
+        Scopes::PROJECT_READ | Scopes::VERSION_READ,
     )
     .await?
     {
@@ -1065,6 +1066,7 @@ pub async fn version_list(
         pool.as_ref(),
         redis.as_ref(),
         session_queue.as_ref(),
+        Scopes::PROJECT_READ | Scopes::VERSION_READ,
     )
     .await?
     {

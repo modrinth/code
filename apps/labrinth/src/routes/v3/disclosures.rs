@@ -52,6 +52,7 @@ pub async fn get_project_disclosures(
         pool.as_ref(),
         redis.as_ref(),
         session_queue.as_ref(),
+        Scopes::PROJECT_READ,
     )
     .await?
     {
@@ -144,6 +145,7 @@ pub async fn modify_project_disclosures(
         pool.as_ref(),
         redis.as_ref(),
         session_queue.as_ref(),
+        Scopes::PROJECT_WRITE,
     )
     .await?
     {

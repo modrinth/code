@@ -35,7 +35,7 @@ mod updates;
 
 pub use self::not_found::not_found;
 
-const PROJECT_REDIRECTS_NAMESPACE: &str = "project_redirects:v1";
+pub const PROJECT_REDIRECTS_NAMESPACE: &str = "project_redirects:v1";
 const PROJECT_REDIRECT_CACHE_TTL_SECONDS: i64 = 300;
 
 pub async fn resolve_ref(
@@ -199,17 +199,13 @@ async fn resolve_visible_refs(
     pool: &PgPool,
     redis: &RedisPool,
     session_queue: &AuthQueue,
+    required_scopes: Scopes,
 ) -> Result<Vec<Option<ProjectId>>, ApiError> {
-    let user = get_user_from_headers(
-        req,
-        pool,
-        redis,
-        session_queue,
-        Scopes::PROJECT_READ,
-    )
-    .await
-    .map(|(_, user)| user)
-    .ok();
+    let user =
+        get_user_from_headers(req, pool, redis, session_queue, required_scopes)
+            .await
+            .map(|(_, user)| user)
+            .ok();
     resolve_visible_refs_for_user(project_refs, &user, pool, redis).await
 }
 
@@ -258,10 +254,17 @@ pub async fn redirect_query_refs(
     pool: &PgPool,
     redis: &RedisPool,
     session_queue: &AuthQueue,
+    required_scopes: Scopes,
 ) -> Result<Option<HttpResponse>, ApiError> {
-    let resolved_refs =
-        resolve_visible_refs(req, project_refs, pool, redis, session_queue)
-            .await?;
+    let resolved_refs = resolve_visible_refs(
+        req,
+        project_refs,
+        pool,
+        redis,
+        session_queue,
+        required_scopes,
+    )
+    .await?;
     if resolved_refs.iter().all(Option::is_none) {
         return Ok(None);
     }
@@ -305,6 +308,7 @@ pub async fn redirect_query_ref(
     pool: &PgPool,
     redis: &RedisPool,
     session_queue: &AuthQueue,
+    required_scopes: Scopes,
 ) -> Result<Option<HttpResponse>, ApiError> {
     let Some(target_project_id) = resolve_visible_refs(
         req,
@@ -312,6 +316,7 @@ pub async fn redirect_query_ref(
         pool,
         redis,
         session_queue,
+        required_scopes,
     )
     .await?
     .into_iter()
@@ -347,6 +352,7 @@ pub async fn redirect_ref(
     pool: &PgPool,
     redis: &RedisPool,
     session_queue: &AuthQueue,
+    required_scopes: Scopes,
 ) -> Result<Option<HttpResponse>, ApiError> {
     let Some(project_ref) = req.match_info().get(parameter_name) else {
         return Ok(None);
@@ -357,6 +363,7 @@ pub async fn redirect_ref(
         pool,
         redis,
         session_queue,
+        required_scopes,
     )
     .await?
     .into_iter()

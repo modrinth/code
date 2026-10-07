@@ -1120,6 +1120,7 @@ pub async fn organization_projects_remove(
         pool.as_ref(),
         redis.as_ref(),
         session_queue.as_ref(),
+        Scopes::PROJECT_WRITE | Scopes::ORGANIZATION_WRITE,
     )
     .await?
     {

@@ -141,6 +141,7 @@ pub async fn validate(
         pool.as_ref(),
         redis.as_ref(),
         session_queue.as_ref(),
+        Scopes::PROJECT_READ,
     )
     .await?
     {

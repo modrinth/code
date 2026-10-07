@@ -1,5 +1,6 @@
 use crate::database::PgPool;
 use crate::models::ids::TeamId;
+use crate::models::pats::Scopes;
 use crate::models::teams::{
     OrganizationPermissions, ProjectPermissions, TeamMember,
 };
@@ -62,6 +63,7 @@ pub async fn team_members_get_project(
         pool.as_ref(),
         redis.as_ref(),
         session_queue.as_ref(),
+        Scopes::PROJECT_READ,
     )
     .await?
     {

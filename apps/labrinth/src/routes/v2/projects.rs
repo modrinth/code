@@ -4,6 +4,7 @@ use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::file_hosting::FileHost;
 use crate::models::disclosures::ProjectDisclosureType;
 use crate::models::link_platform::LinkPlatform;
+use crate::models::pats::Scopes;
 use crate::models::projects::{
     Link, MonetizationStatus, Project, ProjectStatus, Version,
 };
@@ -250,6 +251,7 @@ pub async fn projects_get(
         pool.as_ref(),
         redis.as_ref(),
         session_queue.as_ref(),
+        Scopes::PROJECT_READ,
     )
     .await?
     {
@@ -315,6 +317,7 @@ pub async fn project_get(
         pool.as_ref(),
         redis.as_ref(),
         session_queue.as_ref(),
+        Scopes::PROJECT_READ,
     )
     .await?
     {
@@ -396,6 +399,7 @@ pub async fn project_get_check(
         pool.as_ref(),
         redis.as_ref(),
         session_queue.as_ref(),
+        Scopes::PROJECT_READ,
     )
     .await?
     {
@@ -446,6 +450,7 @@ pub async fn dependency_list(
         pool.as_ref(),
         redis.as_ref(),
         session_queue.as_ref(),
+        Scopes::PROJECT_READ,
     )
     .await?
     {
@@ -634,6 +639,7 @@ pub async fn project_edit(
         pool.as_ref(),
         redis.as_ref(),
         session_queue.as_ref(),
+        Scopes::PROJECT_WRITE,
     )
     .await?
     {
@@ -913,6 +919,7 @@ pub async fn projects_edit(
         pool.as_ref(),
         redis.as_ref(),
         session_queue.as_ref(),
+        Scopes::PROJECT_WRITE,
     )
     .await?
     {
@@ -1066,6 +1073,7 @@ pub async fn project_icon_edit(
         pool.as_ref(),
         redis.as_ref(),
         session_queue.as_ref(),
+        Scopes::PROJECT_WRITE,
     )
     .await?
     {
@@ -1123,6 +1131,7 @@ pub async fn delete_project_icon(
         pool.as_ref(),
         redis.as_ref(),
         session_queue.as_ref(),
+        Scopes::PROJECT_WRITE,
     )
     .await?
     {
@@ -1211,6 +1220,7 @@ pub async fn add_gallery_item(
         pool.as_ref(),
         redis.as_ref(),
         session_queue.as_ref(),
+        Scopes::PROJECT_WRITE,
     )
     .await?
     {
@@ -1303,6 +1313,7 @@ pub async fn edit_gallery_item(
         pool.as_ref(),
         redis.as_ref(),
         session_queue.as_ref(),
+        Scopes::PROJECT_WRITE,
     )
     .await?
     {
@@ -1369,6 +1380,7 @@ pub async fn delete_gallery_item(
         pool.as_ref(),
         redis.as_ref(),
         session_queue.as_ref(),
+        Scopes::PROJECT_WRITE,
     )
     .await?
     {
@@ -1423,6 +1435,7 @@ pub async fn project_delete(
         pool.as_ref(),
         redis.as_ref(),
         session_queue.as_ref(),
+        Scopes::PROJECT_DELETE,
     )
     .await?
     {
@@ -1476,6 +1489,7 @@ pub async fn project_follow(
         pool.as_ref(),
         redis.as_ref(),
         session_queue.as_ref(),
+        Scopes::USER_WRITE,
     )
     .await?
     {
@@ -1521,6 +1535,7 @@ pub async fn project_unfollow(
         pool.as_ref(),
         redis.as_ref(),
         session_queue.as_ref(),
+        Scopes::USER_WRITE,
     )
     .await?
     {
