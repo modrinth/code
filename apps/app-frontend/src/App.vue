@@ -37,6 +37,7 @@ import {
 	NewsArticleCard,
 	NotificationPanel,
 	PopupNotificationPanel,
+	provideLoadingState,
 	provideModalBehavior,
 	provideModrinthClient,
 	provideNotificationManager,
@@ -63,6 +64,7 @@ import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
 import { computed, nextTick, onMounted, onUnmounted, provide, ref, watch } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 
+import { useRouteLoading } from '@/app/runtime/use-route-loading'
 import AppTitleBar from '@/app/shell/title-bar/index.vue'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
 import ErrorModal from '@/components/ui/ErrorModal.vue'
@@ -184,7 +186,6 @@ import { createServerInstall, provideServerInstall } from '@/providers/server-in
 import { setupProviders } from '@/providers/setup'
 import { setupAppEventsProvider } from '@/providers/setup/app-events'
 import { setupAuthProvider } from '@/providers/setup/auth'
-import { setupLoadingStateProvider } from '@/providers/setup/loading-state'
 import { setupAppUserPreferencesProvider } from '@/providers/setup/user-preferences.ts'
 import { createBreadcrumbManager, provideBreadcrumbManager } from '@/shared/breadcrumbs'
 import { appMessages } from '@/utils/app-messages'
@@ -206,15 +207,6 @@ const { channel: appEventChannel, events: appEvents } = setupAppEventsProvider()
 useInstanceMetadataRefresh(appEvents)
 const breadcrumbManager = createBreadcrumbManager()
 provideBreadcrumbManager(breadcrumbManager)
-const canNavigateBack = ref(false)
-const canNavigateForward = ref(false)
-
-function updateHistoryNavigationState() {
-	const historyState = window.history.state
-	canNavigateBack.value = historyState?.back != null
-	canNavigateForward.value = historyState?.forward != null
-}
-
 let fullscreenAdsWindowHold = false
 
 async function handleFullscreenChange() {
@@ -233,8 +225,6 @@ async function handleFullscreenChange() {
 		handleError(error)
 	}
 }
-
-updateHistoryNavigationState()
 
 const APP_LEFT_NAV_WIDTH = '4rem'
 const APP_SIDEBAR_WIDTH = 300
@@ -894,6 +884,10 @@ async function setupApp() {
 }
 
 const stateFailed = ref(false)
+const { loading, canNavigateBack, canNavigateForward, onSuspensePending, onSuspenseResolve } =
+	useRouteLoading({ stateInitialized, stateFailed })
+provideLoadingState(loading)
+
 traceStartupStep('Initialize backend state', () => initialize_state(appEventChannel))
 	.then(() => {
 		traceStartupStep('Initialize frontend state', setupApp).catch((err) => {
@@ -913,21 +907,6 @@ const handleClose = async () => {
 	await getCurrentWindow().close()
 }
 
-const loading = setupLoadingStateProvider(() => ({
-	stateInitialized: stateInitialized.value,
-	stateFailed: stateFailed.value,
-	initialStatePending: !!initialLoadToken,
-	navigationPending: !!routerToken,
-	routeSuspensePending: !!suspenseToken,
-	route: route.path,
-}))
-loading.setEnabled(false)
-let initialLoadToken = loading.begin('Initial app state')
-let routerToken = null
-let suspenseToken = null
-
-let suspensePending = false
-
 const sidebarOverlayScrollbarsOptions = Object.freeze({
 	overflow: {
 		x: 'hidden',
@@ -935,72 +914,10 @@ const sidebarOverlayScrollbarsOptions = Object.freeze({
 	},
 })
 
-router.beforeEach((to, from) => {
-	debugStartup('Route navigation started', { to: to.path, from: from.path })
-	suspensePending = false
-	if (routerToken) loading.end(routerToken)
-	routerToken = loading.begin(`Route navigation: ${to.path}`)
-})
-router.afterEach((to, from, failure) => {
-	debugStartup('Route navigation settled', { to: to.path, failed: !!failure })
-	updateHistoryNavigationState()
-	trackEvent('PageView', {
-		path: to.path,
-		fromPath: from.path,
-		failed: !!failure,
-	})
-	setTimeout(() => {
-		debugStartup('Route loading release check', {
-			route: to.path,
-			suspensePending,
-			stateInitialized: stateInitialized.value,
-		})
-		if (!suspensePending && stateInitialized.value) {
-			if (initialLoadToken) {
-				loading.end(initialLoadToken)
-				initialLoadToken = null
-			}
-			if (routerToken) {
-				loading.end(routerToken)
-				routerToken = null
-			}
-		}
-	}, 100)
-})
-
-function onSuspensePending() {
-	debugStartup('Route Suspense pending', { route: route.path })
-	suspensePending = true
-	if (suspenseToken) loading.end(suspenseToken)
-	suspenseToken = loading.begin(`Route Suspense: ${route.path}`)
-}
-
-function onSuspenseResolve() {
-	debugStartup('Route Suspense resolved', { route: route.path })
-	if (suspenseToken) {
-		loading.end(suspenseToken)
-		suspenseToken = null
-	}
-	if (routerToken) {
-		loading.end(routerToken)
-		routerToken = null
-	}
-}
-
 const queryClient = useQueryClient()
 
 watch(stateInitialized, (ready) => {
-	debugStartup('State readiness changed', { ready })
 	if (ready) {
-		if (initialLoadToken) {
-			loading.end(initialLoadToken)
-			initialLoadToken = null
-		}
-		if (routerToken) {
-			loading.end(routerToken)
-			routerToken = null
-		}
-
 		queryClient.prefetchQuery({
 			queryKey: ['servers'],
 			queryFn: async () => {

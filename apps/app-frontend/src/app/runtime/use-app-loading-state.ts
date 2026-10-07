@@ -1,8 +1,4 @@
-import {
-	createLoadingStateCore,
-	type LoadingStateProvider,
-	provideLoadingState,
-} from '@modrinth/ui'
+import { createLoadingStateCore, type LoadingStateProvider } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 import { getCurrentInstance, onScopeDispose } from 'vue'
 
@@ -12,21 +8,11 @@ type AppLoadingStateProvider = Omit<LoadingStateProvider, 'begin'> & {
 	begin(label?: string): symbol
 }
 
-/**
- * Source of truth for the desktop app's loading state.
- *
- * Owns the token-based ref-counter directly. Consumers
- * obtain the same reactive state via `injectLoadingState()` from `@modrinth/ui`.
- *
- * Returns the provider so the call site (App.vue) can also use it directly
- * without a second injection round-trip.
- */
-export function setupLoadingStateProvider(
+export function useAppLoadingState(
 	getContext: () => Record<string, unknown> = () => ({}),
 ): AppLoadingStateProvider {
 	const core = createLoadingStateCore({ barEnabled: false })
 	if (!import.meta.env.DEV) {
-		provideLoadingState(core)
 		return core
 	}
 	const queryClient = useQueryClient()
@@ -114,6 +100,5 @@ export function setupLoadingStateProvider(
 		},
 	}
 	onScopeDispose(stopReporting)
-	provideLoadingState(provider)
 	return provider
 }
