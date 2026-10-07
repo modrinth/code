@@ -651,7 +651,6 @@ import { monthsInInterval } from '@modrinth/ui/src/utils/billing.ts'
 import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
-import MedalPlanPromotion from '~/components/ui/servers/marketing/MedalPlanPromotion.vue'
 import ServerPlanSelector from '~/components/ui/servers/marketing/ServerPlanSelector.vue'
 import { products } from '~/generated/state.json'
 
@@ -679,7 +678,6 @@ if (affiliateCode.value) {
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const formatPrice = useFormatPrice()
-const flags = useFeatureFlags()
 
 const messages = defineMessages({
 	errorFetchingPaymentDataTitle: {

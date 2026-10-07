@@ -28,8 +28,6 @@
 <script setup>
 import { AutoLink } from '@modrinth/ui'
 
-const flags = useFeatureFlags()
-
 useHead({
 	script: [
 		// {
