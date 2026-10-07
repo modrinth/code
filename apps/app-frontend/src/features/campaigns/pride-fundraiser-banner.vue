@@ -48,10 +48,7 @@ function formatUsd(amount: string | number) {
 }
 
 function daysLeft() {
-	return Math.max(
-		0,
-		Math.ceil((PRIDE_FUNDRAISER_END_DATE - Date.now()) / (24 * 60 * 60 * 1000)),
-	)
+	return Math.max(0, Math.ceil((PRIDE_FUNDRAISER_END_DATE - Date.now()) / (24 * 60 * 60 * 1000)))
 }
 </script>
 
