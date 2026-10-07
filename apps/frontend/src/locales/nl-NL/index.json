@@ -1106,9 +1106,6 @@
   "conversation-thread.error.reopening-report": {
     "message": "Fout tijdens het heropenen van rapport"
   },
-  "conversation-thread.error.sending-message": {
-    "message": "Fout tijdens het versturen van bericht"
-  },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Reageer op het thread..."
   },
@@ -1135,9 +1132,6 @@
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "Ik conformeer dat ik de opmerking van de moderator heb geadresseerd."
-  },
-  "conversation-thread.resubmit-modal.description": {
-    "message": "Je verstuurd <project-title>{projectTitle}</project-title> om opnieuw door de moderators gereviewd te laten worden."
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "Heropsturen voor beoordeling"
@@ -3400,9 +3394,6 @@
   },
   "project-member-header.success-join": {
     "message": "Je doet mee met het project team"
-  },
-  "project-moderation-nags.project-submitted-for-review": {
-    "message": "Je project is ingediend ter beoordeling!"
   },
   "project-moderation-nags.publishing-checklist": {
     "message": "Controlelijst publiceren"

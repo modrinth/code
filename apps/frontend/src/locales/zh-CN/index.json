@@ -1118,9 +1118,6 @@
   "conversation-thread.error.reopening-report": {
     "message": "重开举报出错"
   },
-  "conversation-thread.error.sending-message": {
-    "message": "发送消息出错"
-  },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "回复对话消息……"
   },
@@ -1147,9 +1144,6 @@
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "我确认我已妥善处理了管理员的评论。"
-  },
-  "conversation-thread.resubmit-modal.description": {
-    "message": "这将会把 <project-title>{projectTitle}</project-title> 提交给管理员重新审核。"
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "重新提交审核"
@@ -3412,9 +3406,6 @@
   },
   "project-member-header.success-join": {
     "message": "你加入了项目团队"
-  },
-  "project-moderation-nags.project-submitted-for-review": {
-    "message": "您的项目已提交审核！"
   },
   "project-moderation-nags.publishing-checklist": {
     "message": "发布前检查单"

@@ -1094,9 +1094,6 @@
   "conversation-thread.error.reopening-report": {
     "message": "Rapor yeniden açılırken hata oluştu"
   },
-  "conversation-thread.error.sending-message": {
-    "message": "Mesaj gönderilirken hata oluştu"
-  },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Konuya yanıt ver..."
   },
@@ -1123,9 +1120,6 @@
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "Moderatörlerin yorumlarını uygun şekilde yanıtladığımı onaylıyorum."
-  },
-  "conversation-thread.resubmit-modal.description": {
-    "message": "<project-title>{projectTitle}</project-title> projesini moderatörler tarafından yeniden incelenmek üzere gönderiyorsunuz."
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "İnceleme için yeniden gönderiliyor"
@@ -3388,9 +3382,6 @@
   },
   "project-member-header.success-join": {
     "message": "Proje ekibine katıldınız"
-  },
-  "project-moderation-nags.project-submitted-for-review": {
-    "message": "Projeniz değerlendirme için gönderilmiştir!"
   },
   "project-moderation-nags.publishing-checklist": {
     "message": "Yayımlama kontrol listesi"

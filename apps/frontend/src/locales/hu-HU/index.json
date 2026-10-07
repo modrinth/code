@@ -1118,9 +1118,6 @@
   "conversation-thread.error.reopening-report": {
     "message": "Hiba a jelentés újranyitásában"
   },
-  "conversation-thread.error.sending-message": {
-    "message": "Hiba történt az üzenet elküldésekor"
-  },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Válasz a beszélgetésre..."
   },
@@ -1147,9 +1144,6 @@
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "Megerősítem, hogy a moderátorok észrevételeit megfelelően figyelembe vettem."
-  },
-  "conversation-thread.resubmit-modal.description": {
-    "message": "A(z) <project-title>{projectTitle}</project-title> projektet újra benyújtod a moderátorok felülvizsgálatára."
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "Benyújtás újra felülvizsgálatra"
@@ -3403,9 +3397,6 @@
   },
   "project-member-header.success-join": {
     "message": "Csatlakoztál a projekt csapatához"
-  },
-  "project-moderation-nags.project-submitted-for-review": {
-    "message": "A projektedet sikeresen beküldtük ellenőrzésre!"
   },
   "project-moderation-nags.publishing-checklist": {
     "message": "Közzétételi ellenőrzőlista"

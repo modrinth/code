@@ -1034,9 +1034,6 @@
   "conversation-thread.error.reopening-report": {
     "message": "Erro ao reabrir relatório"
   },
-  "conversation-thread.error.sending-message": {
-    "message": "Erro ao enviar mensagem"
-  },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Os ficheiros suplementares destinam-se a recursos de apoio, como código-fonte, e não a versões alternativas ou variantes"
   },

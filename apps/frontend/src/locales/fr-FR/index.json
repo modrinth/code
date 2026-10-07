@@ -1115,9 +1115,6 @@
   "conversation-thread.error.reopening-report": {
     "message": "Erreur lors de la réouverture du signalement"
   },
-  "conversation-thread.error.sending-message": {
-    "message": "Impossible d'envoyer le message"
-  },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Répondre au fil..."
   },
@@ -1144,9 +1141,6 @@
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "Je confirme que j'ai bel et bien adressé les messages des modérateurs."
-  },
-  "conversation-thread.resubmit-modal.description": {
-    "message": "Vous soumettez <project-title>{projectTitle}</project-title> à revoir de nouveau par les modérateurs."
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "Soumettre de nouveau à la révision"
@@ -3409,9 +3403,6 @@
   },
   "project-member-header.success-join": {
     "message": "Vous avez rejoint l’équipe du projet"
-  },
-  "project-moderation-nags.project-submitted-for-review": {
-    "message": "Votre projet a été soumis pour vérification !"
   },
   "project-moderation-nags.publishing-checklist": {
     "message": "Liste de contrôle de publication"

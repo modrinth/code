@@ -965,9 +965,6 @@
   "conversation-thread.error.reopening-report": {
     "message": "Chyba při opětovném otevření reportu"
   },
-  "conversation-thread.error.sending-message": {
-    "message": "Chyba při odeslání zprávy"
-  },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Odpovědět vláknu..."
   },

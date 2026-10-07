@@ -1073,9 +1073,6 @@
   "conversation-thread.error.reopening-report": {
     "message": "Fel vid öppning av rapport"
   },
-  "conversation-thread.error.sending-message": {
-    "message": "Kunde inte skicka meddelande"
-  },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Svara tråden..."
   },
@@ -1102,9 +1099,6 @@
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "Jag bekräftar att jag ordentligt tagit itu med moderatorernas kommentarer."
-  },
-  "conversation-thread.resubmit-modal.description": {
-    "message": "Du skickar in <project-title>{projectTitle}</project-title> för att granskas igen av moderatorerna."
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "Skickar in igen för granskning"
@@ -3115,9 +3109,6 @@
   },
   "project-member-header.success-join": {
     "message": "Du har gått med i projektteamet"
-  },
-  "project-moderation-nags.project-submitted-for-review": {
-    "message": "Ditt projekt har skickats in för granskning!"
   },
   "project-moderation-nags.publishing-checklist": {
     "message": "Publicerings-checklista"

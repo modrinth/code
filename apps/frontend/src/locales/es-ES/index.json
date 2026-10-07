@@ -1118,9 +1118,6 @@
   "conversation-thread.error.reopening-report": {
     "message": "Error reabriendo reporte"
   },
-  "conversation-thread.error.sending-message": {
-    "message": "Error al enviar el mensaje"
-  },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Responder al hilo..."
   },
@@ -1147,9 +1144,6 @@
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "Confirmo que he respondido debidamente los comentarios de los moderadores."
-  },
-  "conversation-thread.resubmit-modal.description": {
-    "message": "Estás subiendo <project-title>{projectTitle}</project-title> para que sea revisado nuevamente por los moderadores."
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "Resubiendo para revisión"
@@ -3406,9 +3400,6 @@
   },
   "project-member-header.success-join": {
     "message": "Te has unido al equipo del proyecto"
-  },
-  "project-moderation-nags.project-submitted-for-review": {
-    "message": "¡Tu proyecto fue enviado a revisión!"
   },
   "project-moderation-nags.publishing-checklist": {
     "message": "Lista de verificación para la publicación"

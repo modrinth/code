@@ -1154,14 +1154,26 @@
   "conversation-thread.reply-modal.help-center-note": {
     "message": "If you need to get in contact with the moderation team, please use the <help-center-link>Modrinth Help Center</help-center-link> and click the blue bubble in the bottom right corner to contact support."
   },
+  "conversation-thread.reply.addresses": {
+    "message": "This reply addresses the following requested explanations:"
+  },
+  "conversation-thread.reply.changed-thread": {
+    "message": "The selected thread changed. Open it again before replying."
+  },
+  "conversation-thread.reply.facet": {
+    "message": "Explanation for {issue}"
+  },
+  "conversation-thread.reply.unknown-issue": {
+    "message": "Moderation issue"
+  },
   "conversation-thread.resubmit-modal.confirmation.description": {
     "message": "Confirm I have addressed the messages from the moderators"
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "I confirm that I have properly addressed the moderators' comments."
   },
-  "conversation-thread.resubmit-modal.description": {
-    "message": "You're submitting <project-title>{projectTitle}</project-title> to be reviewed again by the moderators."
+  "conversation-thread.resubmit-modal.description.auto-approval": {
+    "message": "You're resubmitting <project-title>{projectTitle}</project-title>. If all moderation issues are resolved, it may be approved automatically. Otherwise, it will be sent to the moderators for review."
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "Resubmitting for review"
@@ -1177,6 +1189,9 @@
   },
   "conversation-thread.resubmit-required-actions-tooltip": {
     "message": "You must complete all required actions above to resubmit"
+  },
+  "conversation-thread.submit-modal.description": {
+    "message": "You're submitting <project-title>{projectTitle}</project-title> to be reviewed by the moderators."
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Supplementary files are for supporting resources like source code, not for alternative versions or variants."
@@ -3032,6 +3047,9 @@
   "modal.shared-instance.open-in-app.why-use": {
     "message": "Why use the Modrinth App"
   },
+  "moderation.checklist.project-changed": {
+    "message": "The selected project changed. Review it again."
+  },
   "moderation.exclude-technical-review": {
     "message": "Exclude TR"
   },
@@ -4175,6 +4193,9 @@
   "project-review.issues.no-results": {
     "message": "No matching issues."
   },
+  "project-review.issues.not-resolved": {
+    "message": "Not resolved"
+  },
   "project-review.issues.open-panel": {
     "message": "Open {panel} review panel"
   },
@@ -4586,6 +4607,9 @@
   "project.moderation.error.unauthorized": {
     "message": "Unauthorized"
   },
+  "project.moderation.project-changed": {
+    "message": "The selected project changed. Review it again."
+  },
   "project.moderation.thread.approved-warning": {
     "message": "This thread is not actively monitored, but may be reviewed for information about your project if needed."
   },
@@ -4639,6 +4663,9 @@
   },
   "project.notification.updated.title": {
     "message": "Project updated"
+  },
+  "project.review.approved": {
+    "message": "Your project has been approved{status, select, unlisted { as unlisted} private { as private} other {}}."
   },
   "project.settings.back-to-all-projects": {
     "message": "Back to all projects"
@@ -6488,8 +6515,35 @@
   "thread-issues.addressed": {
     "message": "Marked as addressed"
   },
-  "thread-issues.complete-actions-first": {
-    "message": "You must complete all required actions from the issue to mark it as addressed."
+  "thread-issues.change-facet-first": {
+    "message": "Please make the requested changes before marking it as addressed."
+  },
+  "thread-issues.facet.acknowledge-checkbox": {
+    "message": "Acknowledge this request"
+  },
+  "thread-issues.facet.acknowledge-reply": {
+    "message": "Explain your changes in a reply"
+  },
+  "thread-issues.facet.version.changelog": {
+    "message": "Change the version changelog"
+  },
+  "thread-issues.facet.version.dependencies": {
+    "message": "Change the version dependencies"
+  },
+  "thread-issues.facet.version.environment": {
+    "message": "Change the version environment"
+  },
+  "thread-issues.facet.version.file-type": {
+    "message": "Change the additional file type"
+  },
+  "thread-issues.facet.version.game-versions": {
+    "message": "Change the supported game versions"
+  },
+  "thread-issues.facet.version.remove": {
+    "message": "Remove this version"
+  },
+  "thread-issues.facet.version.remove-files": {
+    "message": "Remove the requested additional files"
   },
   "thread-issues.hide-addressed": {
     "message": "Hide addressed"
@@ -6502,6 +6556,9 @@
   },
   "thread-issues.more-actions": {
     "message": "More required actions"
+  },
+  "thread-issues.reply-to-address": {
+    "message": "Reply to address"
   },
   "thread-issues.resolved": {
     "message": "Resolved"
@@ -6521,8 +6578,17 @@
   "thread-issues.target.edit-url": {
     "message": "Edit URL"
   },
+  "thread.message.auto-approval": {
+    "message": "automatically approved the project with status <status>approved</status> because all moderation issues were resolved."
+  },
+  "thread.message.moderator": {
+    "message": "Moderator"
+  },
   "thread.message.open-image": {
     "message": "Open image"
+  },
+  "thread.message.system": {
+    "message": "Modrinth"
   },
   "ui.latest-news-row.latest-news": {
     "message": "Latest news from Modrinth"

@@ -1118,9 +1118,6 @@
   "conversation-thread.error.reopening-report": {
     "message": "Fehler beim erneuten Öffnen der Meldung"
   },
-  "conversation-thread.error.sending-message": {
-    "message": "Fehler beim Senden der Nachricht"
-  },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Dem Thread antworten..."
   },
@@ -1147,9 +1144,6 @@
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "Ich bestätige, dass ich die Anmerkungen der Moderatoren entsprechend berücksichtigt habe."
-  },
-  "conversation-thread.resubmit-modal.description": {
-    "message": "Du schickst <project-title>{projectTitle}</project-title> zur Wiederprüfung."
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "Erneut zur Überprüfung einreichen"
@@ -3412,9 +3406,6 @@
   },
   "project-member-header.success-join": {
     "message": "Du bist dem Projektteam beigetreten"
-  },
-  "project-moderation-nags.project-submitted-for-review": {
-    "message": "Dein Projekt wurde zur Überprüfung eingereicht!"
   },
   "project-moderation-nags.publishing-checklist": {
     "message": "Checkliste für die Veröffentlichung"

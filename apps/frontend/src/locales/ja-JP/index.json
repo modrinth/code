@@ -1112,9 +1112,6 @@
   "conversation-thread.error.reopening-report": {
     "message": "報告を再開する際にエラーが発生しました。\n"
   },
-  "conversation-thread.error.sending-message": {
-    "message": "メッセージの送信中にエラーが発生しました。\n"
-  },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "スレッドに返信…\n"
   },
@@ -1141,9 +1138,6 @@
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "モデレーターからのコメントに適切に対応したことを確認します。\n"
-  },
-  "conversation-thread.resubmit-modal.description": {
-    "message": "<project-title>{projectTitle}</project-title>をモデレーターによる再審査に提出します。\n"
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "再審査に再提出しています…\n"

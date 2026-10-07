@@ -1055,9 +1055,6 @@
   "conversation-thread.error.reopening-report": {
     "message": "حدث خطأ أثناء إعادة فتح البلاغ"
   },
-  "conversation-thread.error.sending-message": {
-    "message": "حدث خطأ أثناء إرسال الرسالة"
-  },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "الرد على سلسلة المحادثة..."
   },
@@ -1084,9 +1081,6 @@
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "أؤكد أنني تعاملت بشكل مناسب مع ملاحظات المشرفين."
-  },
-  "conversation-thread.resubmit-modal.description": {
-    "message": "أنت تعيد إرسال <project-title>{projectTitle}</project-title> لمراجعته مرة أخرى من قِبل المشرفين."
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "إعادة الإرسال للمراجعة"

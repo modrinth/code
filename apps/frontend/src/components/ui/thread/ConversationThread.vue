@@ -141,8 +141,8 @@
 				<div class="mx-4 mt-2">
 					<MarkdownEditor
 						ref="replyEditor"
-						:disabled="isLoading"
 						v-model="replyBody"
+						:disabled="isLoading"
 						:placeholder="
 							formatMessage(
 								sortedMessages.length > 0
@@ -671,6 +671,10 @@ const messages = defineMessages({
 		id: 'conversation-thread.action.send-to-review',
 		defaultMessage: 'Send to review',
 	},
+	errorSendingMessage: {
+		id: 'conversation-thread.error.sending-message',
+		defaultMessage: 'Error sending message',
+	},
 	errorClosingReport: {
 		id: 'conversation-thread.error.closing-report',
 		defaultMessage: 'Error closing report',
@@ -908,7 +912,7 @@ const replyMutation = useMutation({
 	},
 	onError: (error) =>
 		addNotification({
-			title: formatMessage(commonMessages.errorNotificationTitle),
+			title: formatMessage(messages.errorSendingMessage),
 			text: error instanceof Error ? error.message : String(error),
 			type: 'error',
 		}),

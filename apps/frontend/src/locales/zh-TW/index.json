@@ -1118,9 +1118,6 @@
   "conversation-thread.error.reopening-report": {
     "message": "重新開啟檢舉時發生錯誤"
   },
-  "conversation-thread.error.sending-message": {
-    "message": "傳送訊息時發生錯誤"
-  },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "回覆討論串..."
   },
@@ -1147,9 +1144,6 @@
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "我確認管理員所提到的問題皆已解決。"
-  },
-  "conversation-thread.resubmit-modal.description": {
-    "message": "你即將提交 <project-title>{projectTitle}</project-title> 以供管理員再次審查。"
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "重新提交審查"
@@ -3412,9 +3406,6 @@
   },
   "project-member-header.success-join": {
     "message": "你加入了專案團隊"
-  },
-  "project-moderation-nags.project-submitted-for-review": {
-    "message": "你的專案已提交審查！"
   },
   "project-moderation-nags.publishing-checklist": {
     "message": "發布檢查清單"

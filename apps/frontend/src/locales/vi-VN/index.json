@@ -917,9 +917,6 @@
   "conversation-thread.error.reopening-report": {
     "message": "Lỗi khi mở lại báo cáo"
   },
-  "conversation-thread.error.sending-message": {
-    "message": "Lỗi khi gửi tin nhắn"
-  },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Đang phản hồi vào luồng..."
   },
@@ -946,9 +943,6 @@
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "Tôi đã chắc chắn rằng tôi đã trả lời đúng cách các bình luận từ bên kiểm duyệt."
-  },
-  "conversation-thread.resubmit-modal.description": {
-    "message": "Bạn sẽ gửi <project-title>{projectTitle}</project-title> để được xem lại từ bên kiểm duyệt."
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "Gửi lại để kiểm duyệt"

@@ -738,7 +738,9 @@ const moderationDecision = ref<ProjectStatus | null>(null)
 const loadingModerationDecision = computed(() => moderationDecision.value !== null)
 const approveSendStatus = computed<ProjectStatus>(() => {
 	const requested = projectV2.value.requested_status
-	return requested && ['approved', 'unlisted', 'private'].includes(requested) ? requested : 'approved'
+	return requested && ['approved', 'unlisted', 'private'].includes(requested)
+		? requested
+		: 'approved'
 })
 const done = ref(false)
 const messageText = computed({

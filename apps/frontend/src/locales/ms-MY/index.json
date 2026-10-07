@@ -830,9 +830,6 @@
   "conversation-thread.error.reopening-report": {
     "message": "Ralat semasa membuka semula laporan"
   },
-  "conversation-thread.error.sending-message": {
-    "message": "Ralat semasa menghantar mesej"
-  },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Balas bebenang..."
   },
@@ -856,9 +853,6 @@
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "Saya mengesahkan bahawa saya telah menjawab ulasan-ulasan penyederhana dengan betul."
-  },
-  "conversation-thread.resubmit-modal.description": {
-    "message": "Anda sedang menghantar <project-title>{projectTitle}</project-title> untuk disemak semula oleh penyederhana."
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "Sedang menyerahkan semula untuk semakan"

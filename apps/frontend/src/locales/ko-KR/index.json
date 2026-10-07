@@ -1076,9 +1076,6 @@
   "conversation-thread.error.reopening-report": {
     "message": "신고 다시 열기 오류"
   },
-  "conversation-thread.error.sending-message": {
-    "message": "메시지 전송 오류"
-  },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "스레드에 답글 게시..."
   },
@@ -1105,9 +1102,6 @@
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "운영진의 지적 사항을 적절히 반영했음을 확인합니다."
-  },
-  "conversation-thread.resubmit-modal.description": {
-    "message": "<project-title>{projectTitle}</project-title> 프로젝트를 운영진의 재검토를 위해 제출하려고 합니다."
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "검토를 위해 다시 제출"

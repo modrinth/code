@@ -659,8 +659,8 @@ import { useProjectLinkValidation } from '~/composables/link-network-validation'
 import {
 	canResubmitProjectForReview,
 	canSubmitProjectForReview,
-	submitProjectForReview,
 	PROJECT_REVIEW_VALIDATION_ERROR,
+	submitProjectForReview,
 } from '~/composables/link-network-validation/submission'
 import { notifyCopied } from '~/composables/moderation.ts'
 import { STALE_TIME, STALE_TIME_LONG, warmProjectCheckCaches } from '~/composables/queries/project'
@@ -859,8 +859,8 @@ const messages = defineMessages({
 		defaultMessage: 'Project not found',
 	},
 	projectSubmitted: {
-		id: 'project.review.submitted',
-		defaultMessage: 'Your project has been submitted for review.',
+		id: 'project-moderation-nags.project-submitted-for-review',
+		defaultMessage: 'Your project has been submitted for review!',
 	},
 	projectApproved: {
 		id: 'project.review.approved',

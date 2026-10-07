@@ -338,12 +338,8 @@ export function createReviewPreviousIssues(
 			: Array.isArray(selection?.toggle_ids) && selection.toggle_ids.includes(control.id)
 	}
 
-	const reReviewIssues = computed(() =>
-		issues.value.filter((issue) => !isResolved(issue)),
-	)
-	const resolvedIssues = computed(() =>
-		issues.value.filter(isResolved),
-	)
+	const reReviewIssues = computed(() => issues.value.filter((issue) => !isResolved(issue)))
+	const resolvedIssues = computed(() => issues.value.filter(isResolved))
 
 	const appliedIssues = computed(() => issues.value.filter(isApplicable))
 	const associatedIssueIds = computed(

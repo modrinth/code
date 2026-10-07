@@ -1112,9 +1112,6 @@
   "conversation-thread.error.reopening-report": {
     "message": "Ошибка возобновления жалобы"
   },
-  "conversation-thread.error.sending-message": {
-    "message": "Ошибка отправки сообщения"
-  },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Ответьте в ветке..."
   },
@@ -1141,9 +1138,6 @@
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "Я подтверждаю, что я надлежащим образом ответил на комментарии модерации."
-  },
-  "conversation-thread.resubmit-modal.description": {
-    "message": "Вы отправляете <project-title>{projectTitle}</project-title> модераторам на повторную проверку."
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "Запрос на повторную проверку"
@@ -3403,9 +3397,6 @@
   },
   "project-member-header.success-join": {
     "message": "Вы присоединились к команде проекта"
-  },
-  "project-moderation-nags.project-submitted-for-review": {
-    "message": "Проект отправлен на проверку!"
   },
   "project-moderation-nags.publishing-checklist": {
     "message": "Контрольный список для публикации"

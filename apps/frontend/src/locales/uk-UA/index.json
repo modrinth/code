@@ -1115,9 +1115,6 @@
   "conversation-thread.error.reopening-report": {
     "message": "Помилка повторного відкриття звіту"
   },
-  "conversation-thread.error.sending-message": {
-    "message": "Помилка надсилання повідомлення"
-  },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Відповісти до потоку…"
   },
@@ -1144,9 +1141,6 @@
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "Я підтверджую, що я правильно розглянув коментарі модераторів."
-  },
-  "conversation-thread.resubmit-modal.description": {
-    "message": "Ви надсилаєте <project-title>{projectTitle}</project-title> на повторний розгляд модераторам."
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "Повторне подання на розгляд"
@@ -3409,9 +3403,6 @@
   },
   "project-member-header.success-join": {
     "message": "Ви доєдналися до команди проєкту"
-  },
-  "project-moderation-nags.project-submitted-for-review": {
-    "message": "Проєкт відправлено на перевірку!"
   },
   "project-moderation-nags.publishing-checklist": {
     "message": "Контрольний список для публікації"
