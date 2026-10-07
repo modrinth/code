@@ -14,8 +14,8 @@ import {
 	ServerSettingsInstallationPage,
 	ServerSettingsNetworkPage,
 	ServerSettingsPropertiesPage,
-	ServerSettingsSupportPage,
 	ServerSettingsSharingPage,
+	ServerSettingsSupportPage,
 	serverSettingsTabDefinitions,
 	type ServerSettingsTabId,
 } from '#ui/layouts/shared/server-settings'

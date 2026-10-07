@@ -326,17 +326,11 @@
   "app.download-manager.duplicated-instance": {
     "message": "Duplikovaná instance"
   },
-  "app.download-manager.empty": {
-    "message": "Žádné instalační úkoly"
-  },
   "app.download-manager.estimated-rate": {
     "message": "Odhadovaná rychlost stahování"
   },
   "app.download-manager.eta": {
     "message": "Odhadovaný zbývající čas"
-  },
-  "app.download-manager.hide": {
-    "message": "Skrýt instalační úkoly"
   },
   "app.download-manager.imported-instance": {
     "message": "Importovaná instance"
@@ -370,9 +364,6 @@
   },
   "app.download-manager.shared-instance-update": {
     "message": "Aktualizace sdílené instance"
-  },
-  "app.download-manager.show": {
-    "message": "Zobrazit instalační úkoly"
   },
   "app.download-manager.tasks": {
     "message": "Úkoly"
