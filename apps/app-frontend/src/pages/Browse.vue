@@ -56,7 +56,7 @@ import {
 	instanceKeys,
 	instanceLinkedProjectQueryOptions,
 } from '@/pages/instance/query-options'
-import { type BreadcrumbDefinition, injectBreadcrumbManager } from '@/providers/breadcrumbs'
+import { type BreadcrumbDefinition, injectBreadcrumbManager } from '@/shared/breadcrumbs'
 import { injectContentInstall } from '@/providers/content-install'
 import { injectServerInstall } from '@/providers/server-install'
 import {

@@ -54,7 +54,7 @@ import {
 	set_custom_skin_order,
 } from '@/helpers/skins.ts'
 import { hasPride26Badge } from '@/helpers/user-campaigns.ts'
-import { useRootBreadcrumb } from '@/providers/breadcrumbs'
+import { useRootBreadcrumb } from '@/shared/breadcrumbs'
 import { appMessages } from '@/utils/app-messages'
 
 useRootBreadcrumb({
