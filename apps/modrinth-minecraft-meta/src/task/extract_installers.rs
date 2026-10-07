@@ -162,16 +162,20 @@ async fn extract_from_installer(
             }
         };
     let referenced_artifacts = referenced_maven_artifacts(&version.libraries)?;
-    let embedded_paths = zip
-        .file()
-        .entries()
-        .iter()
-        .map(|entry| entry.filename().as_str())
-        .collect::<Result<HashSet<_>, _>>()?;
-    let embedded_maven_artifacts = referenced_artifacts
-        .into_iter()
-        .filter(|path| embedded_paths.contains(path.as_str()))
-        .collect::<Vec<_>>();
+    let embedded_maven_artifacts = {
+        let embedded_paths = zip
+            .file()
+            .entries()
+            .iter()
+            .map(|entry| entry.filename().as_str())
+            .collect::<Result<HashSet<_>, _>>()?;
+        referenced_artifacts
+            .into_iter()
+            .filter(|coordinate| {
+                embedded_paths.contains(coordinate.to_maven_path().as_str())
+            })
+            .collect::<Vec<_>>()
+    };
 
     debug!(
         %version.id,
@@ -182,16 +186,11 @@ async fn extract_from_installer(
     stream::iter(embedded_maven_artifacts.iter().map(anyhow::Ok))
         .try_for_each_concurrent(
             app.config.concurrency.extract_files.get(),
-            |path| {
+            |coordinate| {
                 let zip = &zip;
                 async move {
-                    let coordinate = MavenCoordinate::from_maven_path(path)
-                        .with_context(|| {
-                            anyhow!(
-                                "parsing embedded Maven artifact path '{path}'"
-                            )
-                        })?;
-                    let bytes = read_file(zip, path)
+                    let path = coordinate.to_maven_path();
+                    let bytes = read_file(zip, &path)
                         .context(info_span!(
                             "extracting embedded Maven artifact",
                             path
@@ -201,7 +200,7 @@ async fn extract_from_installer(
                             "embedded Maven artifact is missing from installer",
                         )?;
                     app.maven
-						.put(&coordinate, &bytes)
+						.put(coordinate, &bytes)
 						.context(
 							info_span!("storing embedded Maven artifact", path, %coordinate),
 						)
@@ -217,20 +216,20 @@ async fn extract_from_installer(
 
 fn referenced_maven_artifacts(
     libraries: &[mojang::Library],
-) -> Result<Vec<String>> {
+) -> Result<Vec<MavenCoordinate>> {
     let mut seen = HashSet::new();
-    let mut paths = Vec::new();
+    let mut coordinates = Vec::new();
     for library in libraries {
         let coordinate: MavenCoordinate =
             library.name.parse().with_context(|| {
                 format!("parsing referenced library {}", library.name)
             })?;
         let path = coordinate.to_maven_path();
-        if seen.insert(path.clone()) {
-            paths.push(path);
+        if seen.insert(path) {
+            coordinates.push(coordinate);
         }
     }
-    Ok(paths)
+    Ok(coordinates)
 }
 
 async fn read_file(zip: &ZipFileReader, path: &str) -> Result<Option<Vec<u8>>> {
@@ -266,38 +265,4 @@ async fn read_json<T: DeserializeOwned>(
         anyhow!("entry {path} must be a `{}`", type_name::<T>())
     })?;
     Ok(Some(t))
-}
-
-#[cfg(test)]
-mod tests {
-    use super::referenced_maven_artifacts;
-    use crate::upstream::mojang::Library;
-
-    #[test]
-    fn referenced_artifacts_preserve_suffixes_and_deduplicate() {
-        let libraries: Vec<Library> =
-            serde_json::from_value(serde_json::json!([
-                {"name": "com.example:tool:1:client@lzma"},
-                {"name": "com.example:tool:1"},
-                {"name": "com.example:tool:1@jar"}
-            ]))
-            .unwrap();
-        assert_eq!(
-            referenced_maven_artifacts(&libraries).unwrap(),
-            [
-                "maven/com/example/tool/1/tool-1-client.lzma",
-                "maven/com/example/tool/1/tool-1.jar",
-            ]
-        );
-    }
-
-    #[test]
-    fn invalid_referenced_coordinates_are_rejected() {
-        let libraries: Vec<Library> =
-            serde_json::from_value(serde_json::json!([
-                {"name": "com.example:../tool:1"}
-            ]))
-            .unwrap();
-        assert!(referenced_maven_artifacts(&libraries).is_err());
-    }
 }

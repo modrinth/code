@@ -50,6 +50,9 @@ enum Command {
     },
     /// Extract downloaded installer JARs for their manifests and libraries
     ExtractInstallers,
+    /// Take processed information from the database, produce JSON manifests
+    /// from them, and upload them to the public file store.
+    Export,
 }
 
 #[derive(Debug, Clone, Copy, clap::ValueEnum)]
@@ -109,9 +112,10 @@ pub async fn main() -> Result<()> {
     let mut app = AppState {
         config,
         http,
-        cas,
-        maven,
         db,
+        cas,
+        public_blobs,
+        maven,
     };
 
     match cli.command {
@@ -134,6 +138,7 @@ pub async fn main() -> Result<()> {
             task::download_from_upstreams(&app, upstreams).await
         }
         Command::ExtractInstallers => task::extract_installers(&mut app).await,
+        Command::Export => task::export(&mut app).await,
     }
 }
 
@@ -143,6 +148,7 @@ struct AppState {
     http: reqwest::Client,
     db: toasty::Db,
     cas: BlobCas,
+    public_blobs: BlobStore,
     maven: MavenStore,
 }
 

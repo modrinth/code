@@ -4,7 +4,9 @@ use uuid::Uuid;
 
 use crate::util::{ErrorVec, Sha1, Sha256};
 
-/// Hashes for blobs stored in our [`BlobStore`].
+/// Hashes for blobs stored in our [`BlobCas`].
+///
+/// [`BlobCas`]: crate::store::BlobCas
 #[derive(Debug, Clone, Model)]
 #[table = "blob_hashes"]
 pub struct BlobHash {
@@ -41,6 +43,9 @@ pub struct DownloadRun {
     pub errors: Option<toasty::Json<ErrorVec>>,
 }
 
+/// During one [`DownloadRun`], what blobs were downloaded, and from where?
+///
+/// Blobs are represented as [`Sha256`].
 #[derive(Debug, Clone, Model)]
 #[key(download_run_id, url)]
 pub struct BlobDownload {

@@ -13,6 +13,16 @@ pub enum MinecraftLoader {
 }
 
 #[derive(
-    Debug, Display, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, Embed,
+    Debug,
+    Display,
+    Clone,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Serialize,
+    Deserialize,
+    Embed,
 )]
 pub struct MinecraftVersionName(pub String);

@@ -89,13 +89,6 @@ pub async fn download_from_upstreams(
         result.inspect_err(|err| cx.errors.push(err)).ok();
     }
 
-    if upstreams.forge {
-        let result = upstream::forge::download(&mut cx)
-            .context(info_span!("downloading Forge upstream"))
-            .await;
-        result.inspect_err(|err| cx.errors.push(err)).ok();
-    }
-
     if upstreams.neoforge {
         let result = upstream::neoforge::download(&mut cx)
             .context(info_span!("downloading NeoForge upstream"))
@@ -106,6 +99,14 @@ pub async fn download_from_upstreams(
     if upstreams.quilt {
         let result = upstream::quilt::download(&mut cx)
             .context(info_span!("downloading Quilt upstream"))
+            .await;
+        result.inspect_err(|err| cx.errors.push(err)).ok();
+    }
+
+    // do Forge last since we have to download a lot of installers
+    if upstreams.forge {
+        let result = upstream::forge::download(&mut cx)
+            .context(info_span!("downloading Forge upstream"))
             .await;
         result.inspect_err(|err| cx.errors.push(err)).ok();
     }

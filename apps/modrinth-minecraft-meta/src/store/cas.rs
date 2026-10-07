@@ -24,7 +24,7 @@ impl BlobCas {
     }
 
     pub async fn get(&self, sha256: Sha256) -> Result<Vec<u8>> {
-        self.imp.get(&path_of(sha256)).await
+        self.imp.get(&path_for(sha256)).await
     }
 
     pub async fn put(
@@ -40,12 +40,12 @@ impl BlobCas {
             .exec(exec)
             .context(info_span!("upserting blob hash record"))
             .await?;
-        self.imp.put(&path_of(sha256), data).await?;
+        self.imp.put(&path_for(sha256), data).await?;
         Ok(sha256)
     }
 }
 
-fn path_of(sha256: Sha256) -> String {
+fn path_for(sha256: Sha256) -> String {
     let sha256 = sha256.to_string();
     let (first, _) = sha256.split_at(2);
     format!("blobs/{first}/{sha256}")

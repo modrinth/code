@@ -1,3 +1,7 @@
+mod library;
+
+pub use library::*;
+
 use std::{
     collections::HashMap,
     sync::atomic::{self, AtomicUsize},
