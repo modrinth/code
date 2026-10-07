@@ -25,6 +25,11 @@ export class ModrinthApiError extends Error {
 	 */
 	readonly context?: string
 
+	/**
+	 * Full URL of the request that failed (if available)
+	 */
+	url?: string
+
 	constructor(message: string, data?: ApiErrorData) {
 		super(message)
 		this.name = 'ModrinthApiError'
@@ -70,14 +75,7 @@ export class ModrinthServerError extends ModrinthApiError {
 	readonly v1Error?: ModrinthErrorResponse
 
 	constructor(message: string, data?: ApiErrorData & { v1Error?: ModrinthErrorResponse }) {
-		// If we have a V1 error, format the message nicely
-		let errorMessage = message
-		if (data?.v1Error) {
-			errorMessage = `[${data.v1Error.error}] ${data.v1Error.description}`
-			if (data.v1Error.context) {
-				errorMessage = `${data.v1Error.context}: ${errorMessage}`
-			}
-		}
+		const errorMessage = data?.v1Error ? formatV1ErrorMessage(data.v1Error) : message
 
 		super(errorMessage, data)
 		this.name = 'ModrinthServerError'
@@ -97,17 +95,15 @@ export class ModrinthServerError extends ModrinthApiError {
 		context?: string,
 	): ModrinthServerError {
 		const v1Error = isModrinthErrorResponse(responseData) ? responseData : undefined
+		const isHtmlPage =
+			typeof responseData === 'string' && /<!doctype html|<html/i.test(responseData)
 
-		let message = `HTTP ${statusCode}`
-		if (v1Error) {
-			message = v1Error.description
-		} else if (typeof responseData === 'string') {
-			message = responseData
-		}
+		const message =
+			typeof responseData === 'string' && !isHtmlPage ? responseData : `HTTP ${statusCode}`
 
 		return new ModrinthServerError(message, {
 			statusCode,
-			responseData,
+			responseData: isHtmlPage ? undefined : responseData,
 			context,
 			v1Error,
 		})
@@ -139,4 +135,29 @@ export class ModrinthServerError extends ModrinthApiError {
 
 		return new ModrinthServerError(String(error), { context })
 	}
+}
+
+function formatV1ErrorMessage(error: ModrinthErrorResponse): string {
+	return readableErrorDetail(error.details) ?? error.description
+}
+
+function readableErrorDetail(details: unknown): string | undefined {
+	if (typeof details === 'string') {
+		const trimmed = details.trim()
+		return trimmed || undefined
+	}
+
+	if (!Array.isArray(details)) {
+		return undefined
+	}
+
+	return details
+		.findLast((detail): detail is string => {
+			if (typeof detail !== 'string') {
+				return false
+			}
+			const trimmed = detail.trim()
+			return Boolean(trimmed)
+		})
+		?.trim()
 }

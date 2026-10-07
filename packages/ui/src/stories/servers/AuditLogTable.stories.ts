@@ -684,6 +684,11 @@ const loaderVersionEntries = toAuditEntries({
 			metadata: { new_loader: null, new_version: null },
 			minutesAgo: 3,
 		}),
+		rawEntry({
+			action: 'loader_version_edited',
+			metadata: { new_loader: 'neo_forge', new_version: '21.1.65' },
+			minutesAgo: 4,
+		}),
 	],
 })
 const fallbackEntries = toAuditEntries(missingLookupActionLogResponse, {

@@ -13,6 +13,8 @@ concurrency:
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/prod' }}
 
 env:
+  TURBO_TELEMETRY_DISABLED: 1
+  pnpm_config_color: always
   INTERNAL: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
 
 jobs:
@@ -21,7 +23,7 @@ jobs:
     runs-on: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && 'namespace-profile-modrinth-turbo' || 'ubuntu-latest' }}
 
     env:
-      # Ensure pnpm output is colored in GitHub Actions logs
+      # Color the output of Node tools run by Turborepo tasks in GitHub Actions logs
       FORCE_COLOR: 3
       # Make cargo nextest successfully ignore projects without tests
       NEXTEST_NO_TESTS: pass
@@ -42,13 +44,24 @@ jobs:
         if: env.INTERNAL != 'true'
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          fetch-depth: 2
+          fetch-depth: 0
+          filter: blob:none
 
       - name: Check out code (Namespace)
         if: env.INTERNAL == 'true'
         uses: namespacelabs/nscloud-checkout-action@66f2dc6f6c42a8ac6c4e53473c4840006822831e # v9.0.1
         with:
           fetch-depth: 2
+
+      # Fork PRs start services later, only if the labrinth tests need them. The internal check
+      # lives in the command because `wait` steps cannot be skipped with `if`.
+      - name: Start services
+        id: services
+        background: true
+        run: |
+          if [ "$INTERNAL" = 'true' ]; then
+            docker compose --profile clustered-redis up --wait
+          fi
 
       - name: Setup Node
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
@@ -60,7 +73,7 @@ jobs:
 
       - name: Set up caches
         if: env.INTERNAL == 'true'
-        uses: namespacelabs/nscloud-cache-action@c5f8dab7560444c4bf8dbc64f1b203431873c547 # v1.6.1
+        uses: namespacelabs/nscloud-cache-action@1124a6f3ce44e5cf84cc22111530961f4d2a15f9 # v1.7.0
         with:
           cache: |
             rust
@@ -69,7 +82,7 @@ jobs:
 
       - name: Set up Turborepo caching
         if: env.INTERNAL == 'true'
-        uses: namespace-actions/setup-turbocache@f96bd6befa13ae74b2858a5be49573640d4636f5 # v0.0.2
+        uses: namespace-actions/setup-turbocache@a94b84c111f2cc781a4a83c4d07a99f2c63e33d6 # v0.0.3
 
       - name: Install apt dependencies
         run: |
@@ -109,34 +122,86 @@ jobs:
         working-directory: packages/app-lib
         run: cp .env.staging .env
 
-      # check if labrinth tests will actually run (cache miss)
+      # labrinth integration tests require a lot of disk space, so in the standard GitHub Actions
+      # runners we must remove useless development tools from the base image, which frees up ~20 GiB.
+      # The following command can be used to debug what is taking up space:
+      # sudo du -xh --max-depth=4 / | sort -rh | curl -X POST --data-urlencode content@/dev/fd/0 https://api.mclo.gs/1/log
+      - name: Free disk space for labrinth tests
+        if: env.INTERNAL != 'true'
+        run: sudo rm -rf /usr/local/lib/android /usr/local/.ghcup /opt/hostedtoolcache/CodeQL /usr/share/swift
+
+      # Runners without the Namespace remote cache (fork PRs) restore the local Turborepo
+      # cache saved by the latest main build. Pull requests can read caches from the default
+      # branch, but whatever they save stays scoped to their own ref.
+      - name: Restore Turborepo cache from main
+        if: env.INTERNAL != 'true'
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .turbo/cache
+          key: turbo-ci-${{ runner.os }}-${{ runner.arch }}-${{ github.sha }}
+          restore-keys: turbo-ci-${{ runner.os }}-${{ runner.arch }}-
+
+      # Fork PRs only lint and test packages affected since the base branch, as the merge queue
+      # still runs everything. Turborepo does not attribute the root files below to any crate,
+      # so changing one of them falls back to a full run.
+      #
+      # Services are only started when the labrinth tests will actually run, which is
+      # neither when they are unaffected nor when they are a cache hit.
       - name: Check if labrinth tests need to run
         id: check-labrinth
+        if: env.INTERNAL != 'true'
+        env:
+          TURBO_SCM_BASE: origin/${{ github.base_ref }}
         run: |
-          LABRINTH_TEST_STATUS=$(pnpm turbo run test --filter=@modrinth/labrinth --dry-run=json | jq -r '.tasks[] | select(.task == "test") | .cache.status')
-          echo "Labrinth test cache status: $LABRINTH_TEST_STATUS"
-          if [ "$LABRINTH_TEST_STATUS" = "HIT" ]; then
-            echo "needs_services=false" >> $GITHUB_OUTPUT
+          CI_ARGS=''
+          if git diff --quiet "$TURBO_SCM_BASE...HEAD" -- Cargo.toml rust-toolchain.toml .cargo docker-compose.yml .github/workflows/turbo-ci.yml; then
+            CI_ARGS='--affected'
+          fi
+          echo "CI_ARGS=$CI_ARGS" >> "$GITHUB_ENV"
+
+          LABRINTH_TEST_STATUS=$(pnpm turbo run test --filter=labrinth $CI_ARGS --dry-run=json | jq -r '.tasks[] | select(.taskId == "labrinth#test") | .cache.status')
+          echo "Labrinth test cache status: ${LABRINTH_TEST_STATUS:-not affected}"
+          if [ -n "$LABRINTH_TEST_STATUS" ] && [ "$LABRINTH_TEST_STATUS" != 'HIT' ]; then
+            echo "needs_services=true" >> "$GITHUB_OUTPUT"
           else
-            echo "needs_services=true" >> $GITHUB_OUTPUT
+            echo "needs_services=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Start services
+      - name: Start services (fork)
         if: steps.check-labrinth.outputs.needs_services == 'true'
         run: docker compose --profile clustered-redis up --wait
 
+      - name: Wait for services
+        wait: [services]
+
       - name: Setup labrinth environment and database
-        if: steps.check-labrinth.outputs.needs_services == 'true'
+        if: env.INTERNAL == 'true' || steps.check-labrinth.outputs.needs_services == 'true'
         working-directory: apps/labrinth
         run: |
           cp .env.local .env
           sqlx database setup
 
+      # `pnpm run ci` excludes the `modrinth-rust` Cargo workspace package so Rust lint and
+      # tests run and cache per crate. Otherwise any Rust change would invalidate the single
+      # workspace-wide task and rerun the labrinth tests, which need the services above.
       - name: Lint and test
-        run: pnpm run ci
+        env:
+          TURBO_SCM_BASE: origin/${{ github.base_ref }}
+        run: pnpm run ci $CI_ARGS
+
+      - name: Check Rust formatting
+        run: cargo fmt --all --check
 
       - name: Verify intl:extract has been run
         run: |
           pnpm turbo run intl:extract --force
           pnpm scripts i18n-icu-contract prune-local --check
           git diff --exit-code --color */*/src/locales/*/index.json
+
+      # Remote cache hits are also written to the local cache, so this holds every task from the run
+      - name: Save Turborepo cache for fork builds
+        if: ${{ !cancelled() && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .turbo/cache
+          key: turbo-ci-${{ runner.os }}-${{ runner.arch }}-${{ github.sha }}

@@ -1,3 +1,17 @@
 Cargo.lock
 pnpm-lock.yaml
 .github/**/*.png
+**/*.rs
+**/*.svg
+**/.sqlx
+
+# Migrations existing before Prettier formatted them shall always be ignored,
+# as any changes to them will break existing deployments
+apps/labrinth/migrations/**
+packages/app-lib/migrations/**
+
+# Prettier reformats some of the PostgreSQL-specific COPY syntax here,
+# which is very likely to break things
+apps/labrinth/fixtures/**
+
+packages/app-lib/java/build

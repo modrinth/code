@@ -698,6 +698,12 @@
   "content.page-layout.failed-to-load": {
     "defaultMessage": "Errore nel caricamento dei contenuti"
   },
+  "content.page-layout.failed-to-load-changelog": {
+    "defaultMessage": "Impossibile caricare le novità"
+  },
+  "content.page-layout.failed-to-load-updates": {
+    "defaultMessage": "Impossibile caricare gli aggiornamenti disponibili"
+  },
   "content.page-layout.filter.add": {
     "defaultMessage": "Filtro"
   },
@@ -966,7 +972,7 @@
     "defaultMessage": "Personalizzato ({pathName})"
   },
   "creation-flow.modal.import-instance.detecting-launcher-instances": {
-    "defaultMessage": "Rilevando le istanze dei launcher..."
+    "defaultMessage": "Rilevazione delle istanze dei launcher..."
   },
   "creation-flow.modal.import-instance.launcher-instances.title": {
     "defaultMessage": "Istanze dei launcher"
@@ -1200,7 +1206,7 @@
     "defaultMessage": "Salva attribuzione"
   },
   "external-files.permissions-card.editor.select-license-label": {
-    "defaultMessage": "Seleziona la licenza..."
+    "defaultMessage": "Cerca una licenza..."
   },
   "external-files.permissions-card.editor.type-label": {
     "defaultMessage": "Motivo del permesso"
@@ -1243,6 +1249,9 @@
   },
   "external-files.permissions-card.last-updated": {
     "defaultMessage": "Ultimo aggiornamento il {date} da {user}"
+  },
+  "external-files.permissions-card.license.all-rights": {
+    "defaultMessage": "Tutti i diritti riservati/Nessuna licenza"
   },
   "external-files.permissions-card.license.unknown": {
     "defaultMessage": "Sconosciuta"
@@ -1647,7 +1656,7 @@
     "defaultMessage": "Crea ZIP"
   },
   "files.row.item-count": {
-    "defaultMessage": "{count, plural, one {# oggetto} other {# oggetti}}"
+    "defaultMessage": "{count, plural, one {# elemento} other {# elementi}}"
   },
   "files.row.parent-folder": {
     "defaultMessage": "Indietro"
@@ -1999,9 +2008,6 @@
   },
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Server reinizializzato"
-  },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "Opzioni di assistenza"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Fino a {cpus} CPU in supercarica"
@@ -2580,7 +2586,7 @@
     "defaultMessage": "Installazione..."
   },
   "label.installing-content": {
-    "defaultMessage": "Installazione dei contenuti"
+    "defaultMessage": "Installazione contenuti"
   },
   "label.loading": {
     "defaultMessage": "Caricamento..."
@@ -3221,14 +3227,26 @@
   "profile.button.create-project": {
     "defaultMessage": "Crea un progetto"
   },
+  "profile.button.force-password-reset": {
+    "defaultMessage": "Forza reimposta password"
+  },
   "profile.button.info": {
     "defaultMessage": "Mostra info utente"
+  },
+  "profile.button.lock": {
+    "defaultMessage": "Blocca account"
   },
   "profile.button.manage-projects": {
     "defaultMessage": "Gestisci progetti"
   },
   "profile.button.remove-affiliate": {
     "defaultMessage": "Rimuovi da affiliato"
+  },
+  "profile.button.reset-2fa": {
+    "defaultMessage": "Reimposta 2FA"
+  },
+  "profile.button.revoke-sessions": {
+    "defaultMessage": "Revoca tutte le sessioni"
   },
   "profile.button.set-affiliate": {
     "defaultMessage": "Imposta come affiliato"
@@ -3238,6 +3256,9 @@
   },
   "profile.button.unblock": {
     "defaultMessage": "Sblocca"
+  },
+  "profile.button.unlock": {
+    "defaultMessage": "Sblocca account"
   },
   "profile.collection.projects-count": {
     "defaultMessage": "{count, plural, one {# progetto} other {# progetti}}"
@@ -3287,6 +3308,36 @@
   "profile.error.not-found": {
     "defaultMessage": "Utente non trovato"
   },
+  "profile.force-password-reset.admonition-body": {
+    "defaultMessage": "La password di {username} sarà rimossa immediatamente, disconnettendo ogni dispositivo, e verrà inviato un link per impostarne una nuova all'email sottostante. Cambiare email sostituisce quella dell'account. Il link scadrà dopo 24 ore e potrà essere usato anche se l'account è bloccato."
+  },
+  "profile.force-password-reset.admonition-title": {
+    "defaultMessage": "La password attuale non funzionerà più"
+  },
+  "profile.force-password-reset.button": {
+    "defaultMessage": "Reimposta password"
+  },
+  "profile.force-password-reset.email-label": {
+    "defaultMessage": "Email"
+  },
+  "profile.force-password-reset.email-placeholder": {
+    "defaultMessage": "Lascia vuoto per usare l'email dell'account"
+  },
+  "profile.force-password-reset.error-description": {
+    "defaultMessage": "Sì è verificato un errore nel reimpostare la password. Riprova più tardi."
+  },
+  "profile.force-password-reset.error-title": {
+    "defaultMessage": "Impossibile reimpostare la password"
+  },
+  "profile.force-password-reset.success-description": {
+    "defaultMessage": "Un link di reimpostazione della password è stato inviato a {username}."
+  },
+  "profile.force-password-reset.success-title": {
+    "defaultMessage": "Password reimpostata"
+  },
+  "profile.force-password-reset.title": {
+    "defaultMessage": "Forza la reimpostazione della password per {username}"
+  },
   "profile.label.affiliate": {
     "defaultMessage": "Affiliato"
   },
@@ -3301,6 +3352,9 @@
   },
   "profile.label.joined": {
     "defaultMessage": "Iscrizione"
+  },
+  "profile.label.locked": {
+    "defaultMessage": "Bloccato"
   },
   "profile.label.no-collections": {
     "defaultMessage": "Nessuna raccolta"
@@ -3326,6 +3380,54 @@
   "profile.official-account.bio": {
     "defaultMessage": "L'account ufficiale di Modrinth. Ricevi assistenza presso <support-link></support-link> o tramite mail presso <email></email>"
   },
+  "profile.reset-2fa.admonition-body": {
+    "defaultMessage": "L'app di autenticazione e i codici di backup di {username} saranno rimossi e riceverà una notifica. Fallo solo dopo aver verificato la sua identità."
+  },
+  "profile.reset-2fa.admonition-title": {
+    "defaultMessage": "Vuoi davvero reimpostare l'autenticazione a due fattori?"
+  },
+  "profile.reset-2fa.button": {
+    "defaultMessage": "Reimposta 2FA"
+  },
+  "profile.reset-2fa.error-description": {
+    "defaultMessage": "Sì è verificato un errore nel reimpostare il 2FA. Riprova più tardi."
+  },
+  "profile.reset-2fa.error-title": {
+    "defaultMessage": "Impossibile reimpostare il 2FA"
+  },
+  "profile.reset-2fa.success-description": {
+    "defaultMessage": "Il 2FA di {username} è stato rimosso."
+  },
+  "profile.reset-2fa.success-title": {
+    "defaultMessage": "2FA reimpostato"
+  },
+  "profile.reset-2fa.title": {
+    "defaultMessage": "Il 2FA di {username} è stato reimpostato"
+  },
+  "profile.revoke-sessions.admonition-body": {
+    "defaultMessage": "{username} sarà disconnesso su ogni dispositivo e dovrà rieffettuare l'accesso. Ciò non conta i token di accesso personale."
+  },
+  "profile.revoke-sessions.admonition-title": {
+    "defaultMessage": "Vuoi davvero revocare tutte le sessioni?"
+  },
+  "profile.revoke-sessions.button": {
+    "defaultMessage": "Revoca sessioni"
+  },
+  "profile.revoke-sessions.error-description": {
+    "defaultMessage": "Sì è verificato un errore nel revocare le sessioni. Riprova più tardi."
+  },
+  "profile.revoke-sessions.error-title": {
+    "defaultMessage": "Impossibile revocare le sessioni"
+  },
+  "profile.revoke-sessions.success-description": {
+    "defaultMessage": "Ogni dispositivo di {username} è stato disconnesso."
+  },
+  "profile.revoke-sessions.success-title": {
+    "defaultMessage": "Sessioni revocate"
+  },
+  "profile.revoke-sessions.title": {
+    "defaultMessage": "Revoca sessioni per {username}"
+  },
   "profile.unblock-user.error-description": {
     "defaultMessage": "Sì è verificato un errore nello sbloccare l'utente. Riprova più tardi."
   },
@@ -3337,6 +3439,18 @@
   },
   "profile.unblock-user.success-title": {
     "defaultMessage": "Utente sbloccato"
+  },
+  "profile.unlock-user.error-description": {
+    "defaultMessage": "Sì è verificato un errore nel bloccare l'account. Riprova più tardi."
+  },
+  "profile.unlock-user.error-title": {
+    "defaultMessage": "Impossibile sbloccare l'account"
+  },
+  "profile.unlock-user.success-description": {
+    "defaultMessage": "L'account di {username} è stato sbloccato."
+  },
+  "profile.unlock-user.success-title": {
+    "defaultMessage": "Account sbloccato"
   },
   "project-card.date.published.tooltip": {
     "defaultMessage": "Pubblicato {date}"
@@ -4140,7 +4254,7 @@
     "defaultMessage": "Canale"
   },
   "project.versions.filter.selected-count": {
-    "defaultMessage": "{count, plural, one {# selezionata} other {# selezionate}}"
+    "defaultMessage": "{count, plural, one {# selezionato} other {# selezionati}}"
   },
   "project.versions.filter.toggle-tooltip": {
     "defaultMessage": "Abilita filtro per {filter}"
@@ -5052,13 +5166,13 @@
     "defaultMessage": "Ripristinando dal backup..."
   },
   "servers.backups.bulk-bar.aria-label": {
-    "defaultMessage": "Operazioni su {count} backup selezionat{count, plural, one {o} other {i}}"
+    "defaultMessage": "{count, plural, one {Operazioni su un backup selezionato} other {Operazioni su # backup selezionati}}"
   },
   "servers.backups.bulk-bar.deleting": {
-    "defaultMessage": "Eliminando {total} backup..."
+    "defaultMessage": "Eliminazione di {total} backup..."
   },
   "servers.backups.bulk-bar.selected-count": {
-    "defaultMessage": "{count} backup selezionat{count, plural, one {o} other {i}}"
+    "defaultMessage": "{count, plural, one {# backup selezionato} other {# backup selezionati}}"
   },
   "servers.backups.delete-modal.admonition-body": {
     "defaultMessage": "Una volta {count, plural, one {eliminato, questo backup non potrà essere ripristinato} other {eliminati, questi backup non potranno essere ripristinati}}. L'eliminazione è permanente."
@@ -5136,7 +5250,7 @@
     "defaultMessage": "Installazione del server in corso"
   },
   "servers.download.failed.description": {
-    "defaultMessage": "Si è verificato un errore scaricando i file del mondo."
+    "defaultMessage": "Si è verificato un errore nel download dei file del mondo."
   },
   "servers.download.failed.title": {
     "defaultMessage": "Download non riuscito"
@@ -5349,7 +5463,7 @@
     "defaultMessage": "Foto profilo di {username}"
   },
   "servers.listing.owner-tooltip": {
-    "defaultMessage": "Proprietà di {username}"
+    "defaultMessage": "Appartenente a {username}"
   },
   "servers.listing.resubscribe-label": {
     "defaultMessage": "Riabbonati"
@@ -5481,7 +5595,7 @@
     "defaultMessage": "Foto profilo di {username}"
   },
   "servers.medal-listing.owner-tooltip": {
-    "defaultMessage": "Proprietà di {username}"
+    "defaultMessage": "Appartenente a {username}"
   },
   "servers.medal-listing.server-icon-alt": {
     "defaultMessage": "Icona del server"
@@ -6600,10 +6714,10 @@
     "defaultMessage": "Aumenta quantità"
   },
   "time-frame-picker.last-timeframe": {
-    "defaultMessage": "{unit, select, hours {{amount, plural, one {Nell'ultima ora} other {Nelle ultime # ore}}} days {{amount, plural, one {Nell'ultimo giorno} other {Negli ultimi # giorni}}} weeks {{amount, plural, one {Nell'ultima settimana} other {Nelle ultime # settimane}}} months {{amount, plural, one {Nell'ultimo mese} other {Negli ultimi # mesi}}} other {Negli ultimi {amount} giorni}}"
+    "defaultMessage": "Fino a {amount} {unit, select, hours {{amount, plural, one {ora} other {ore}}} days {{amount, plural, one {giorno} other {giorni}}} weeks {{amount, plural, one {settimana} other {settimane}}} months {{amount, plural, one {mese} other {mesi}}} other {giorni}} fa"
   },
   "time-frame-picker.last-timeframe-prefix": {
-    "defaultMessage": "Negli ultimi"
+    "defaultMessage": "Fino a"
   },
   "time-frame-picker.option.all-time": {
     "defaultMessage": "Di sempre"
@@ -6693,7 +6807,7 @@
     "defaultMessage": "{count, plural, one {# avvertimento} other {# avvertimenti}}"
   },
   "ui.stacked-admonitions.dismiss-all": {
-    "defaultMessage": "Cancella tutto"
+    "defaultMessage": "Ignora tutto"
   },
   "unknown-file-warning-modal.dont-install": {
     "defaultMessage": "Non installare"
@@ -6727,6 +6841,78 @@
   },
   "unknown-file-warning-modal.unrecognized-files": {
     "defaultMessage": "File non riconosciuti"
+  },
+  "update-all-modal.changelog-for": {
+    "defaultMessage": "Novità per {project}"
+  },
+  "update-all-modal.changelog-loaded": {
+    "defaultMessage": "Novità caricate."
+  },
+  "update-all-modal.close-changelog": {
+    "defaultMessage": "Chiudi le novità"
+  },
+  "update-all-modal.current-version": {
+    "defaultMessage": "Versione attuale"
+  },
+  "update-all-modal.empty": {
+    "defaultMessage": "Nessun aggiornamento disponibile."
+  },
+  "update-all-modal.header": {
+    "defaultMessage": "Aggiorna i progetti"
+  },
+  "update-all-modal.loading": {
+    "defaultMessage": "Caricamento aggiornamenti…"
+  },
+  "update-all-modal.loading-changelog": {
+    "defaultMessage": "Caricamento novità…"
+  },
+  "update-all-modal.new-version": {
+    "defaultMessage": "Nuova versione"
+  },
+  "update-all-modal.no-changelog": {
+    "defaultMessage": "Nessuna novità elencata per questa versione."
+  },
+  "update-all-modal.no-compatible-updates": {
+    "defaultMessage": "Nessun aggiornamento compatibile disponibile."
+  },
+  "update-all-modal.no-version": {
+    "defaultMessage": "Nessun aggiornamento compatibile"
+  },
+  "update-all-modal.project": {
+    "defaultMessage": "Progetto"
+  },
+  "update-all-modal.project-list": {
+    "defaultMessage": "Aggiornamenti"
+  },
+  "update-all-modal.results": {
+    "defaultMessage": "{count, plural, one {# progetto pronto} other {# progetti pronti}} all'aggiornamento"
+  },
+  "update-all-modal.select-all": {
+    "defaultMessage": "Seleziona tutti i progetti"
+  },
+  "update-all-modal.select-project": {
+    "defaultMessage": "Seleziona {project} da aggiornare"
+  },
+  "update-all-modal.select-version": {
+    "defaultMessage": "Nuova versione per {project}"
+  },
+  "update-all-modal.update": {
+    "defaultMessage": "Aggiorna {count, plural, one {# progetto} other {# progetti}}"
+  },
+  "update-all-modal.versions": {
+    "defaultMessage": "Versione attuale / Nuova versione"
+  },
+  "update-all-modal.view": {
+    "defaultMessage": "Mostra"
+  },
+  "update-all-modal.view-changelog": {
+    "defaultMessage": "Mostra le novità per {project}"
+  },
+  "update-all-modal.warning": {
+    "defaultMessage": "Non garantiamo che gli aggiornamenti siano sicuri per i tuoi mondi. Controlla le novità e fai un backup."
+  },
+  "update-all-modal.warning-server": {
+    "defaultMessage": "Non garantiamo che gli aggiornamenti siano sicuri per il server. Controlla le novità e fai un backup."
   },
   "user.profile.badge.alpha.about.1": {
     "defaultMessage": "Quest'utente è qui dai tempi dell'alpha di Modrinth, conclusasi a novembre 2020."

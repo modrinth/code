@@ -155,6 +155,8 @@ vars! {
     REDIS_ACTUAL_EXPIRY: i64 = 60 * 30;
     REDIS_VERSION_DEFAULT_EXPIRY: i64 = 60 * 60 * 12;
     REDIS_VERSION_ACTUAL_EXPIRY: i64 = 60 * 30;
+    REDIS_SESSION_DEFAULT_EXPIRY: i64 = 60 * 10;
+    REDIS_SESSION_ACTUAL_EXPIRY: i64 = 60 * 5;
 
     // Minimum and maximum number of connections when Redis is in Cluster topology, Pooled connection type.
     REDIS_CLUSTER_MAX_CONNECTIONS: u32 = 16u32;

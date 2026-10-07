@@ -136,11 +136,14 @@ pub async fn version_project_get_helper(
                 .wrap_api_err("checking version visibility")?
         {
             let version_id = version.inner.id;
+            let project_id = version.inner.project_id;
             let mut v = models::projects::Version::from(version);
-            let missing =
-                get_files_missing_attribution(&***ro_pool, &[version_id])
-                    .await
-                    .unwrap_or_default();
+            let missing = get_files_missing_attribution(
+                &***ro_pool,
+                &[(version_id, project_id)],
+            )
+            .await
+            .unwrap_or_default();
             v.files_missing_attribution = missing
                  .get(&version_id)
                  .map(|entries| {
@@ -323,10 +326,14 @@ pub async fn version_get_helper(
             .wrap_api_err("checking version visibility")?
     {
         let version_id = data.inner.id;
+        let project_id = data.inner.project_id;
         let mut version = models::projects::Version::from(data);
-        let missing = get_files_missing_attribution(&***ro_pool, &[version_id])
-            .await
-            .unwrap_or_default();
+        let missing = get_files_missing_attribution(
+            &***ro_pool,
+            &[(version_id, project_id)],
+        )
+        .await
+        .unwrap_or_default();
         version.files_missing_attribution = missing
             .get(&version_id)
             .map(|entries| {

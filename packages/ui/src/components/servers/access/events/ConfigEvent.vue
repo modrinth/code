@@ -137,6 +137,6 @@ function formatLoader(loader: string | null | undefined): string {
 		.split(/[-_]/)
 		.filter(Boolean)
 		.map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-		.join(' ')
+		.join('')
 }
 </script>

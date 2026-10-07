@@ -157,8 +157,7 @@ pub fn emit_loading(
 // emit_warning(message)
 pub async fn emit_warning(message: &str) -> crate::Result<()> {
     #[cfg(feature = "tauri")]
-    {
-        let event_state = crate::EventState::get();
+    if let Some(event_state) = crate::EventState::try_get() {
         event_state.send(AppEvent::Warning(WarningPayload {
             message: message.to_string(),
         }))?;

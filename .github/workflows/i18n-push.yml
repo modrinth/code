@@ -18,6 +18,9 @@ on:
 concurrency:
   group: i18n-management
 
+env:
+  pnpm_config_color: always
+
 jobs:
   push_translations:
     name: Push sources to Crowdin
