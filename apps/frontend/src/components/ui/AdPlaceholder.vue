@@ -60,23 +60,15 @@ useHead({
 })
 
 const AD_PRESETS = {
-	medal: {
-		light: 'https://cdn.modrinth.com/modrinth-hosting-medal-light.webp',
-		dark: 'https://cdn.modrinth.com/modrinth-hosting-medal-dark.webp',
-		description: 'Host your next server with Modrinth Hosting',
-		link: '/hosting?plan&ref=medal',
-	},
 	'modrinth-hosting': {
-		light: 'https://cdn.modrinth.com/modrinth-hosting-light.webp',
-		dark: 'https://cdn.modrinth.com/modrinth-hosting-dark.webp',
-		description: 'Host your next server with Modrinth Hosting',
+		light: 'https://cdn.modrinth.com/hosting-oct-26-light.webp',
+		dark: 'https://cdn.modrinth.com/hosting-oct-26-dark.webp',
+		description: 'Get your next server on Modrinth.',
 		link: '/hosting',
 	},
 }
 
-const currentAd = computed(() =>
-	flags.value.enableMedalPromotion ? AD_PRESETS.medal : AD_PRESETS['modrinth-hosting'],
-)
+const currentAd = computed(() => AD_PRESETS['modrinth-hosting'])
 
 onMounted(() => {
 	window.tude = window.tude || { cmd: [] }

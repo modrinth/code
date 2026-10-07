@@ -542,9 +542,6 @@
 					</template>
 					<span v-else></span>
 				</div>
-
-				<MedalPlanPromotion v-if="flags.enableMedalPromotion" />
-
 				<ul class="m-0 flex w-full grid-cols-3 flex-col gap-8 p-0 lg:grid">
 					<ServerPlanSelector
 						:capacity="capacityStatuses?.small?.available"
