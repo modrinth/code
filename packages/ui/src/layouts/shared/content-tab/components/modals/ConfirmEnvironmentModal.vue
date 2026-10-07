@@ -65,6 +65,15 @@ const messages = defineMessages({
 		id: 'content.confirm-environment.required-admonition-title',
 		defaultMessage: 'This content is required here',
 	},
+	performanceAdmonitionTitle: {
+		id: 'content.confirm-environment.performance-admonition-title',
+		defaultMessage: 'Performance warning',
+	},
+	distantHorizonsServerBody: {
+		id: 'content.confirm-environment.distant-horizons-server-body',
+		defaultMessage:
+			"Distant Horizons can significantly increase CPU usage on your server and cause lag. It's recommended to only keep it enabled on the player side.",
+	},
 	serverBody: {
 		id: 'content.confirm-environment.server-body',
 		defaultMessage:
@@ -97,15 +106,18 @@ const project = ref('')
 const side = ref<ContentSide>('server')
 const enabled = ref(true)
 const singleplayer = ref(false)
+const performanceWarning = ref(false)
 let pendingConfirmation: ((confirmed: boolean) => void) | undefined
 const titleMessage = computed(() => {
 	if (enabled.value) return side.value === 'server' ? messages.serverTitle : messages.playerTitle
 	return side.value === 'server' ? messages.disableServerTitle : messages.disablePlayerTitle
 })
-const admonitionMessage = computed(() =>
-	enabled.value ? messages.admonitionTitle : messages.requiredAdmonitionTitle,
-)
+const admonitionMessage = computed(() => {
+	if (performanceWarning.value) return messages.performanceAdmonitionTitle
+	return enabled.value ? messages.admonitionTitle : messages.requiredAdmonitionTitle
+})
 const bodyMessage = computed(() => {
+	if (performanceWarning.value) return messages.distantHorizonsServerBody
 	if (!enabled.value)
 		return side.value === 'server' ? messages.disableServerBody : messages.disablePlayerBody
 	if (side.value === 'player') return messages.playerBody
@@ -129,12 +141,14 @@ function show(
 	targetSide: ContentSide,
 	targetEnabled: boolean,
 	isSingleplayer: boolean,
+	isPerformanceWarning = false,
 ) {
 	if (pendingConfirmation) return Promise.resolve(false)
 	project.value = name
 	side.value = targetSide
 	enabled.value = targetEnabled
 	singleplayer.value = isSingleplayer
+	performanceWarning.value = isPerformanceWarning
 	return new Promise<boolean>((resolve) => {
 		pendingConfirmation = resolve
 		modal.value?.show()

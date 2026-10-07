@@ -820,17 +820,21 @@ async function handleSetEnabledFor(item: ContentItem, side: ContentSide, enabled
 	const addon = getAddonForItem(item)
 	if (!addon || (side === 'server' && isPlayerOnlyContent(addon))) return
 	const targetWorldId = worldId.value
+	const showPerformanceWarning = enabled && side === 'server' && addon.project_id === 'uCdwusMi'
 	if (
 		userPreferences.value.warnOnIncompatibleContent &&
-		(enabled
-			? !(side === 'server' && addon.pack_client_depends) && isIncompatibleEnvironment(addon, side)
-			: isRequiredEnvironment(addon, side))
+		(showPerformanceWarning ||
+			(enabled
+				? !(side === 'server' && addon.pack_client_depends) &&
+					isIncompatibleEnvironment(addon, side)
+				: isRequiredEnvironment(addon, side)))
 	) {
 		const confirmed = await environmentWarningModal.value?.show(
 			item.project.title,
 			side,
 			enabled,
 			getAddonEnvironment(addon) === 'singleplayer_only',
+			showPerformanceWarning,
 		)
 		if (!confirmed || contentActionDisabled.value || worldId.value !== targetWorldId) return
 	}

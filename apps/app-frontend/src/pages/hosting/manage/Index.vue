@@ -27,15 +27,11 @@
 				}
 			"
 		>
-			<template #default="{ onReinstall, onReinstallFailed }">
+			<template #default>
 				<RouterView v-slot="{ Component }">
 					<template v-if="Component">
 						<Suspense>
-							<component
-								:is="Component"
-								@reinstall="onReinstall"
-								@reinstall-failed="onReinstallFailed"
-							/>
+							<component :is="Component" />
 						</Suspense>
 					</template>
 				</RouterView>

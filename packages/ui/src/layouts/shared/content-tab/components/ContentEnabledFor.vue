@@ -3,6 +3,7 @@ import { TriangleAlertIcon } from '@modrinth/assets'
 import { computed } from 'vue'
 
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { commonMessages } from '#ui/utils/common-messages'
 
 import type { ContentEnabledForState, ContentSide } from '../types'
 
@@ -36,11 +37,13 @@ const messages = defineMessages({
 const props = withDefaults(
 	defineProps<{
 		modelValue: ContentEnabledForState
+		loading?: boolean
 		reserveStatusSpace?: boolean
 		disabled?: boolean
 		disabledTooltip?: string | null
 	}>(),
 	{
+		loading: false,
 		reserveStatusSpace: false,
 		disabled: false,
 		disabledTooltip: undefined,
@@ -80,7 +83,24 @@ function toggle(side: ContentSide) {
 </script>
 
 <template>
-	<div class="flex w-max shrink-0 items-center gap-1.5">
+	<div
+		v-if="loading"
+		class="flex w-max shrink-0 items-center gap-1.5"
+		role="status"
+		:aria-label="formatMessage(commonMessages.installingLabel)"
+		aria-busy="true"
+	>
+		<span
+			v-for="side in sides"
+			:key="side"
+			aria-hidden="true"
+			class="flex h-8 animate-pulse items-center rounded-xl border border-solid border-transparent bg-surface-4 px-3 text-sm font-medium"
+		>
+			<span class="invisible">{{ formatMessage(messages[side]) }}</span>
+		</span>
+		<span v-if="reserveStatusSpace" aria-hidden="true" class="size-5 shrink-0" />
+	</div>
+	<div v-else class="flex w-max shrink-0 items-center gap-1.5">
 		<button
 			v-for="side in sides"
 			:key="side"
