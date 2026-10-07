@@ -78,6 +78,7 @@ ENV NODE_ENV=production
 ENV HOST=0.0.0.0
 ENV PORT=3000
 ENV NODE_COMPILE_CACHE=/app/.node-compile-cache
+ENV NO_COLOR=1
 
 WORKDIR /app
 
