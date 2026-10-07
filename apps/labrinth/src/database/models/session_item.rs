@@ -1,5 +1,6 @@
 use super::ids::*;
 use crate::database::PgTransaction;
+use crate::env::ENV;
 use ariadne::ids::base62_impl::parse_base62;
 use chrono::{DateTime, Utc};
 use dashmap::DashMap;
@@ -269,7 +270,11 @@ impl DBSession {
         let key = redis.key().entity(SESSIONS_USERS_NAMESPACE, user_id.0);
 
         redis
-            .set_serialized(&key, &db_sessions, None)
+            .set_serialized(
+                &key,
+                &db_sessions,
+                Some(ENV.REDIS_SESSION_DEFAULT_EXPIRY),
+            )
             .await
             .wrap_err("caching user sessions")?;
 
