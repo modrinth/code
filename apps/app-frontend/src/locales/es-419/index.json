@@ -3299,56 +3299,11 @@
   "app.survey.title": {
     "message": "¡Hola, usuario de Modrinth!"
   },
-  "app.sync-instances-update.badge": {
-    "message": "Nuevo en esta actualización"
-  },
-  "app.sync-instances-update.choose-source.all": {
-    "message": "Elija de qué instancia copiar la configuración del juego, los paquetes de recursos, el historial de comandos, las barras de acceso creativas y los servidores multijugador. Estos ajustes sólo se utilizan para la sincronización inicial, y puede editarlos desde cualquier instancia posterior."
-  },
-  "app.sync-instances-update.choose-source.all-title": {
-    "message": "Elegir origen de sincronización"
-  },
   "app.sync-instances-update.choose-source.data-packs": {
     "message": "Elija desde qué instancia copiar tus ajustes del juego guardados. Estos ajustes solo son usados para la sincronización inicial, y puedes editarlos desde cualquier instancia después."
   },
   "app.sync-instances-update.choose-source.resource-packs": {
     "message": "Elija desde qué instancia copiar tus ajustes del juego guardados. Estos ajustes solo son usados para la sincronización inicial, y puedes editarlos desde cualquier instancia después."
-  },
-  "app.sync-instances-update.creative-hotbars": {
-    "message": "Sincronizar barras del modo creativo"
-  },
-  "app.sync-instances-update.description": {
-    "message": "Ahora puedes sincronizar opciones como ajustes de juego, servidores, paquetes de recursos y más entre tus instancias, ¡para que todo se mantenga igual cada vez que juegas!"
-  },
-  "app.sync-instances-update.load-error": {
-    "message": "No se pudo cargar la configuración de sincronización. Por favor, inténtelo de nuevo."
-  },
-  "app.sync-instances-update.manage-later": {
-    "message": "Puedes activar la sincronización ahora y administrarla más tarde en los ajustes de tu aplicación."
-  },
-  "app.sync-instances-update.notification.description": {
-    "message": "Mantén los ajustes de juego, servidores, paquetes de recursos y más sincronizados entre tus instancias."
-  },
-  "app.sync-instances-update.notification.dismiss": {
-    "message": "Descartar"
-  },
-  "app.sync-instances-update.notification.title": {
-    "message": "Sincronizar tus instancias"
-  },
-  "app.sync-instances-update.notification.view-update": {
-    "message": "Ver la actualización"
-  },
-  "app.sync-instances-update.retry": {
-    "message": "Volver a intentar"
-  },
-  "app.sync-instances-update.skip": {
-    "message": "Omitir"
-  },
-  "app.sync-instances-update.sync-all": {
-    "message": "Sincronizar todo"
-  },
-  "app.sync-instances-update.title": {
-    "message": "Sincronizar tus instancias"
   },
   "app.synced-content.change.disable-description": {
     "message": "Deshabilitarlo en todas las instancias sincronizadas, o solo en esta instancia. Desactivarlo solo aquí se activará en sobreescritos para esta instancia."

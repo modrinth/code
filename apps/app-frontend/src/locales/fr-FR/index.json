@@ -3167,27 +3167,6 @@
   "app.survey.title": {
     "message": "Salut, utilisateur de Modrinth !"
   },
-  "app.sync-instances-update.badge": {
-    "message": "Nouveautés de cette mise à jour"
-  },
-  "app.sync-instances-update.notification.title": {
-    "message": "Synchroniser vos instances"
-  },
-  "app.sync-instances-update.notification.view-update": {
-    "message": "Voir la mise à jour"
-  },
-  "app.sync-instances-update.retry": {
-    "message": "Réessayer"
-  },
-  "app.sync-instances-update.skip": {
-    "message": "Passer"
-  },
-  "app.sync-instances-update.sync-all": {
-    "message": "Tout synchroniser"
-  },
-  "app.sync-instances-update.title": {
-    "message": "Synchroniser vos instances"
-  },
   "app.synced-content.change.disable-everywhere": {
     "message": "Désactiver partout"
   },

@@ -273,8 +273,9 @@ async function confirmResetToOnboarding() {
 		} catch (error) {
 			console.error('Failed to clear server logs:', error)
 		}
-		queryClient.setQueryData<Archon.Servers.v0.Server>(['servers', 'detail', serverId], (current) =>
-			current ? { ...current, flows: { ...current.flows, intro: true } } : current,
+		queryClient.setQueryData<Archon.Servers.v0.Server>(
+			['servers', 'detail', serverId],
+			(current) => (current ? { ...current, flows: { ...current.flows, intro: true } } : current),
 		)
 		await Promise.all([
 			queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] }),

@@ -111,7 +111,9 @@ const instanceLink = computed(() =>
 					class="flex size-9 shrink-0 items-center justify-center rounded-xl border border-solid border-surface-5 bg-purple/10"
 				>
 					<component
-						:is="job.kind === 'external-file' || job.kind === 'debug-export' ? DownloadIcon : BoxIcon"
+						:is="
+							job.kind === 'external-file' || job.kind === 'debug-export' ? DownloadIcon : BoxIcon
+						"
 						class="size-6 text-primary"
 						aria-hidden="true"
 					/>

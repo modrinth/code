@@ -3278,56 +3278,11 @@
   "app.survey.title": {
     "message": "Привет, пользователь Modrinth!"
   },
-  "app.sync-instances-update.badge": {
-    "message": "Новинка"
-  },
-  "app.sync-instances-update.choose-source.all": {
-    "message": "Выберите, из какой сборки копировать настройки игры наборы ресурсов, сохранённые инструменты и серверы. Эти настройки нужны только для первоначальной синхронизации, после чего их можно изменить."
-  },
-  "app.sync-instances-update.choose-source.all-title": {
-    "message": "Выбор исходной синхронизации"
-  },
   "app.sync-instances-update.choose-source.data-packs": {
     "message": "Выберете, из какой сборки копировать наборы данных. Эти наборы нужны только для первоначальной синхронизации, после чего их можно изменить."
   },
   "app.sync-instances-update.choose-source.resource-packs": {
     "message": "Выберете, из какой сборки копировать наборы ресурсов. Эти наборы нужны только для первоначальной синхронизации, после чего их можно изменить."
-  },
-  "app.sync-instances-update.creative-hotbars": {
-    "message": "Синхронизация инструментов"
-  },
-  "app.sync-instances-update.description": {
-    "message": "Теперь можно синхронизировать настройки игры, серверы, наборы ресурсов и многое другое между сборками и играть с одинаковыми настройками!"
-  },
-  "app.sync-instances-update.load-error": {
-    "message": "Не удалось загрузить настройки синхронизации. Повторите попытку."
-  },
-  "app.sync-instances-update.manage-later": {
-    "message": "Вы можете включить синхронизацию сейчас и настроить её позже в настройках приложения."
-  },
-  "app.sync-instances-update.notification.description": {
-    "message": "Синхронизируйте настройки игры, серверы, наборы ресурсов и многое другое между сборками."
-  },
-  "app.sync-instances-update.notification.dismiss": {
-    "message": "Закрыть"
-  },
-  "app.sync-instances-update.notification.title": {
-    "message": "Синхронизируйте сборки"
-  },
-  "app.sync-instances-update.notification.view-update": {
-    "message": "Подробнее"
-  },
-  "app.sync-instances-update.retry": {
-    "message": "Повторить"
-  },
-  "app.sync-instances-update.skip": {
-    "message": "Пропустить"
-  },
-  "app.sync-instances-update.sync-all": {
-    "message": "Синхронизировать всё"
-  },
-  "app.sync-instances-update.title": {
-    "message": "Синхронизируйте сборки"
   },
   "app.synced-content.change.disable-description": {
     "message": "Отключить эту настройку во всех синхронизированных экземплярах или только в этом экземпляре. Отключение только здесь включит переопределения для этого экземпляра."

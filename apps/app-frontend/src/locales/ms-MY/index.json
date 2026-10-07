@@ -1595,9 +1595,6 @@
   "app.skins.title": {
     "message": "Pemilih kekulit"
   },
-  "app.sync-instances-update.skip": {
-    "message": "Langkau"
-  },
   "app.synced-content.delete.resource-pack-description": {
     "message": "Anda boleh menghapuskannya daripada pemasangan ini sahaja atau daripada semua pemasangan yang disegerakkan. Menghapuskannya hanya daripada pemasangan ini akan mendayakan penggantian, dan pemasangan ini tidak akan lagi menerima perubahan pek sumber yang disegerakkan."
   },

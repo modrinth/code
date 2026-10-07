@@ -2744,9 +2744,6 @@
   "app.survey.title": {
     "message": "Merhaba Modrinth kullanıcısı!"
   },
-  "app.sync-instances-update.skip": {
-    "message": "Atla"
-  },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} indirildi. Güncellemek için yeniden başlatın veya Modrinth App’i kapattığınızda otomatik olarak güncellenecektir."
   },

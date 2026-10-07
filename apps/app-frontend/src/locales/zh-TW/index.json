@@ -3299,56 +3299,11 @@
   "app.survey.title": {
     "message": "你好啊，Modrinth 使用者！"
   },
-  "app.sync-instances-update.badge": {
-    "message": "更新內容"
-  },
-  "app.sync-instances-update.choose-source.all": {
-    "message": "選擇要從哪個實例複製遊戲設定、資源包、指令紀錄、創造模式快捷欄、多人遊戲伺服器。這些設定僅用於初始同步，你之後可以從任何實例中進行編輯。"
-  },
-  "app.sync-instances-update.choose-source.all-title": {
-    "message": "選擇同步來源"
-  },
   "app.sync-instances-update.choose-source.data-packs": {
     "message": "選擇要從哪個實例複製資料包。這些資料包僅用於初始同步，你之後可以從任何實例中進行編輯。"
   },
   "app.sync-instances-update.choose-source.resource-packs": {
     "message": "選擇要從哪個實例複製資源包。這些資源包僅用於初始同步，你之後可以從任何實例中進行編輯。"
-  },
-  "app.sync-instances-update.creative-hotbars": {
-    "message": "同步創造模式快捷欄"
-  },
-  "app.sync-instances-update.description": {
-    "message": "你現在可以跨實例同步遊戲設定、伺服器、資源包等，讓你每次的遊玩體驗都能保持一致！"
-  },
-  "app.sync-instances-update.load-error": {
-    "message": "無法載入你的同步設定，請再試一次。"
-  },
-  "app.sync-instances-update.manage-later": {
-    "message": "你可以現在啟用同步功能，並稍後在應用程式設定中管理。"
-  },
-  "app.sync-instances-update.notification.description": {
-    "message": "跨實例同步你的遊戲設定、伺服器、資源包等。"
-  },
-  "app.sync-instances-update.notification.dismiss": {
-    "message": "忽略"
-  },
-  "app.sync-instances-update.notification.title": {
-    "message": "同步你的實例"
-  },
-  "app.sync-instances-update.notification.view-update": {
-    "message": "查看更新"
-  },
-  "app.sync-instances-update.retry": {
-    "message": "再試一次"
-  },
-  "app.sync-instances-update.skip": {
-    "message": "跳過"
-  },
-  "app.sync-instances-update.sync-all": {
-    "message": "全部同步"
-  },
-  "app.sync-instances-update.title": {
-    "message": "同步你的實例"
   },
   "app.synced-content.change.disable-description": {
     "message": "在所有已同步的實例中停用，或只在這個實例中停用。如果只在這個實例中停用，將啟用覆寫設定。"

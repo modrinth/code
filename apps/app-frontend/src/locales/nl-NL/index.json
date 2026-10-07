@@ -2990,51 +2990,6 @@
   "app.survey.title": {
     "message": "Hoi, Modrinth-gebruiker!"
   },
-  "app.sync-instances-update.badge": {
-    "message": "Nieuw deze update"
-  },
-  "app.sync-instances-update.choose-source.all": {
-    "message": "Kies vanuit welke instantie uw spelinstellingen, bronpakketten, opdrachtgeschiedenis, creatieve werkbalken, en multiplayer servers gekopieerd worden. Deze instellingen worden alleen gebruikt voor de initiële synchronisatie, en U kunt deze hierna vanuit elke instantie aanpassen."
-  },
-  "app.sync-instances-update.choose-source.all-title": {
-    "message": "Kies synchronisatiebron"
-  },
-  "app.sync-instances-update.creative-hotbars": {
-    "message": "Sync creatieve werkbalken"
-  },
-  "app.sync-instances-update.description": {
-    "message": "U kunt nu opties zoals spelinstellingen, servers, bronpakketten, en meer synchroniseren tussen uw instanties, zodat alles hetzelfde blijft elke keer dat u speelt!"
-  },
-  "app.sync-instances-update.load-error": {
-    "message": "Kon uw synchronisatieinstellingen niet laden. Probeer het opnieuw."
-  },
-  "app.sync-instances-update.manage-later": {
-    "message": "Je kunt nu synchroniseren inschakelen en het later beheren in je app-instellingen."
-  },
-  "app.sync-instances-update.notification.description": {
-    "message": "Houd spelinstellingen, servers, bronpakketten en meer gesynchroniseerd over je instanties."
-  },
-  "app.sync-instances-update.notification.dismiss": {
-    "message": "Negeer"
-  },
-  "app.sync-instances-update.notification.title": {
-    "message": "Synchroniseer uw instanties"
-  },
-  "app.sync-instances-update.notification.view-update": {
-    "message": "Bekijk de update"
-  },
-  "app.sync-instances-update.retry": {
-    "message": "Probeer opnieuw"
-  },
-  "app.sync-instances-update.skip": {
-    "message": "Sla over"
-  },
-  "app.sync-instances-update.sync-all": {
-    "message": "Synchroniseer alles"
-  },
-  "app.sync-instances-update.title": {
-    "message": "Synchroniseer uw instanties"
-  },
   "app.synced-content.change.disable-everywhere": {
     "message": "Overal uitschakelen"
   },

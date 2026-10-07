@@ -1453,29 +1453,30 @@ async fn run_request(
                 "bulk_update_content",
                 || async move {
                     lock_instance(&instance_id, state).await?;
-            update_progress(
-                job_id,
-                job_state,
-                state,
-                InstallPhaseId::ResolvingPack,
-                InstallPhaseDetails::Empty,
-            )
-            .await?;
-            let plan =
-                Box::pin(crate::state::instances::commands::plan_bulk_update(
-                    &instance_id,
-                    &updates,
-                    state,
-                ))
-                .await?;
-            prepare_update_backup(job_id, job_state, state).await?;
-            crate::state::instances::commands::apply_bulk_update(
-                &instance_id,
-                plan,
-                InstallProgressReporter::new(job_id, job_state.clone()),
-                state,
-            )
-            .await?;
+                    update_progress(
+                        job_id,
+                        job_state,
+                        state,
+                        InstallPhaseId::ResolvingPack,
+                        InstallPhaseDetails::Empty,
+                    )
+                    .await?;
+                    let plan = Box::pin(
+                        crate::state::instances::commands::plan_bulk_update(
+                            &instance_id,
+                            &updates,
+                            state,
+                        ),
+                    )
+                    .await?;
+                    prepare_update_backup(job_id, job_state, state).await?;
+                    crate::state::instances::commands::apply_bulk_update(
+                        &instance_id,
+                        plan,
+                        InstallProgressReporter::new(job_id, job_state.clone()),
+                        state,
+                    )
+                    .await?;
                     Ok(Some(instance_id))
                 },
             )

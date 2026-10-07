@@ -329,17 +329,11 @@
   "app.download-manager.duplicated-instance": {
     "message": "Duplicera instans"
   },
-  "app.download-manager.empty": {
-    "message": "Inga installationsuppgifter"
-  },
   "app.download-manager.estimated-rate": {
     "message": "Uppskattad nedladdningshastighet"
   },
   "app.download-manager.eta": {
     "message": "Uppskattad tid kvar för den här nedladdningen"
-  },
-  "app.download-manager.hide": {
-    "message": "Dölj installationsuppgifter"
   },
   "app.download-manager.imported-instance": {
     "message": "Importerad instans"
@@ -373,9 +367,6 @@
   },
   "app.download-manager.shared-instance-update": {
     "message": "Delad instansuppdatering"
-  },
-  "app.download-manager.show": {
-    "message": "Visa installationsuppgifter"
   },
   "app.download-manager.tasks": {
     "message": "Uppgifter"
@@ -2869,42 +2860,6 @@
   },
   "app.survey.title": {
     "message": "Hej där Modrinth-användare!"
-  },
-  "app.sync-instances-update.badge": {
-    "message": "Nytt den här uppdateringen"
-  },
-  "app.sync-instances-update.choose-source.all-title": {
-    "message": "Välj synkroniseringskälla"
-  },
-  "app.sync-instances-update.load-error": {
-    "message": "Kunde inte läsa in dina synkroniseringsinställningar. Vänligen försök igen."
-  },
-  "app.sync-instances-update.manage-later": {
-    "message": "Du kan aktivera synkronisering nu och hantera det senare i appinställningarna."
-  },
-  "app.sync-instances-update.notification.description": {
-    "message": "Håll spelinställningar, servrar, resurspaket och mer synkroniserat mellan dina instanser."
-  },
-  "app.sync-instances-update.notification.dismiss": {
-    "message": "Avfärda"
-  },
-  "app.sync-instances-update.notification.title": {
-    "message": "Synkronisera dina instanser"
-  },
-  "app.sync-instances-update.notification.view-update": {
-    "message": "Visa uppdatering"
-  },
-  "app.sync-instances-update.retry": {
-    "message": "Försök igen"
-  },
-  "app.sync-instances-update.skip": {
-    "message": "Hoppa över"
-  },
-  "app.sync-instances-update.sync-all": {
-    "message": "Synkronisera alla"
-  },
-  "app.sync-instances-update.title": {
-    "message": "Synkronisera dina instanser"
   },
   "app.synced-content.change.disable-everywhere": {
     "message": "Inaktivera överallt"

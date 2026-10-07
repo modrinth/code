@@ -57,6 +57,7 @@ import {
 	provideServerOnboardingFlow,
 	provideServerPlay,
 	serverIconQueryOptions,
+	serverListQueryOptions,
 	ServerOnboardingModal,
 	TeleportOverflowMenu,
 	TextLogo,
@@ -792,6 +793,8 @@ async function setupApp() {
 	}
 
 	Object.assign(appSettings.featureFlags, feature_flags)
+	// TODO: remove for prod
+	appSettings.featureFlags.show_server_sharing_update_modal = true
 	isMaximized.value = await traceStartupStep('Read window maximized state', () =>
 		getCurrentWindow().isMaximized(),
 	)
@@ -1021,28 +1024,7 @@ watch(
 		if (!session) return
 
 		queryClient
-			.prefetchQuery({
-				queryKey: ['servers'],
-				queryFn: async () => {
-					const response = await tauriApiClient.archon.servers_v0.list({ limit: 100 })
-					const hasMedalServers = response.servers.some((s) => s.is_medal)
-					if (hasMedalServers) {
-						const subscriptions = await tauriApiClient.labrinth.billing_internal.getSubscriptions()
-						for (const server of response.servers) {
-							if (server.is_medal) {
-								const sub = subscriptions.find((s) => s.metadata?.id === server.server_id)
-								if (sub) {
-									server.medal_expires = new Date(
-										new Date(sub.created).getTime() + 5 * 86400000,
-									).toISOString()
-								}
-							}
-						}
-					}
-					return response
-				},
-				staleTime: 30_000,
-			})
+			.prefetchQuery(serverListQueryOptions(tauriApiClient))
 			.then(() => {
 				if (credentials.value?.session !== session) return
 				const response = queryClient.getQueryData(['servers'])

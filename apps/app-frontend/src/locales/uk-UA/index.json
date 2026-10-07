@@ -3290,56 +3290,11 @@
   "app.survey.title": {
     "message": "Привіт, користувачу Modrinth!"
   },
-  "app.sync-instances-update.badge": {
-    "message": "У цьому оновленні"
-  },
-  "app.sync-instances-update.choose-source.all": {
-    "message": "Виберіть із якого примірника копіювати ваші налаштування, пакети ресурсів, історію команд, ПШД режиму творчости та сервери мережевої гри. Їх буде використано лише для первинної синхронізації, опісля ви можете редагувати її з будь-якого примірника."
-  },
-  "app.sync-instances-update.choose-source.all-title": {
-    "message": "Виберіть джерело синхронізації"
-  },
   "app.sync-instances-update.choose-source.data-packs": {
     "message": "Виберіть із якого примірника копіювати ваші пакети даних. Їх буде використано лише для первинної синхронізації, опісля ви можете редагувати її з будь-якого примірника."
   },
   "app.sync-instances-update.choose-source.resource-packs": {
     "message": "Виберіть із якого примірника копіювати ваші пакети ресурсів. Їх буде використано лише для первинної синхронізації, опісля ви можете редагувати її з будь-якого примірника."
-  },
-  "app.sync-instances-update.creative-hotbars": {
-    "message": "Синхронізувати ПШД творчости"
-  },
-  "app.sync-instances-update.description": {
-    "message": "Тепер ви можете синхронізувати налаштування гри, сервери, пакети ресурсів і багато іншого між вашими примірниками, щоб усе залишалося однаковим щоразу, коли ви граєте!"
-  },
-  "app.sync-instances-update.load-error": {
-    "message": "Не вдалося завантажити ваші налаштування синхронізації. Будь ласка, спробуйте ще раз."
-  },
-  "app.sync-instances-update.manage-later": {
-    "message": "Ви можете увімкнути синхронізацію зараз, або ж пізніше в налаштуваннях застосунку."
-  },
-  "app.sync-instances-update.notification.description": {
-    "message": "Зберігайте налаштування гри, сервери, пакети ресурсів й інше між примірниками."
-  },
-  "app.sync-instances-update.notification.dismiss": {
-    "message": "Відхилити"
-  },
-  "app.sync-instances-update.notification.title": {
-    "message": "Синхронізуйте ваші примірники"
-  },
-  "app.sync-instances-update.notification.view-update": {
-    "message": "Переглянути оновлення"
-  },
-  "app.sync-instances-update.retry": {
-    "message": "Спробувати ще раз"
-  },
-  "app.sync-instances-update.skip": {
-    "message": "Пропустити"
-  },
-  "app.sync-instances-update.sync-all": {
-    "message": "Синхронізувати все"
-  },
-  "app.sync-instances-update.title": {
-    "message": "Синхронізуйте ваші примірники"
   },
   "app.synced-content.change.disable-description": {
     "message": "Вимкне його між усіма синхронізованими примірниками, або ж тільки в цьому. Якщо вимкнути лише тут, для цього примірника увімкнуться перевизначення."

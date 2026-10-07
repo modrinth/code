@@ -2471,9 +2471,6 @@
   "app.survey.title": {
     "message": "Modrinthユーザーのみなさん、こんにちは！"
   },
-  "app.sync-instances-update.skip": {
-    "message": "スキップ"
-  },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} のダウンロードが完了しました。今すぐ更新するには再読み込みするか、Modrinth Appを閉じる際に自動更新されます。"
   },

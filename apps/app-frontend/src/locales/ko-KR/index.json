@@ -3272,56 +3272,11 @@
   "app.survey.title": {
     "message": "안녕하세요, Modrinth 사용자님!"
   },
-  "app.sync-instances-update.badge": {
-    "message": "이번 업데이트로 추가됨"
-  },
-  "app.sync-instances-update.choose-source.all": {
-    "message": "게임 설정, 리소스 팩, 명령어 기록, 크리에이티브 단축바, 멀티플레이 서버를 복사할 인스턴스를 선택하세요. 이 설정들은 초기 동기화에만 사용되며, 이후에는 아무 인스턴스에서 편집할 수 있습니다."
-  },
-  "app.sync-instances-update.choose-source.all-title": {
-    "message": "동기화 원본 선택"
-  },
   "app.sync-instances-update.choose-source.data-packs": {
     "message": "데이터 팩을 복사할 인스턴스를 선택합니다. 팩은 초기 동기화에만 사용되며, 이후에는 아무 인스턴스에서 편집할 수 있습니다."
   },
   "app.sync-instances-update.choose-source.resource-packs": {
     "message": "리소스 팩을 복사할 인스턴스를 선택합니다. 팩은 초기 동기화에만 사용되며, 이후에는 아무 인스턴스에서 편집할 수 있습니다."
-  },
-  "app.sync-instances-update.creative-hotbars": {
-    "message": "크리에이티브 단축바 동기화"
-  },
-  "app.sync-instances-update.description": {
-    "message": "이제 게임 설정, 서버, 리소스 팩 등의 옵션을 인스턴스 간에 동기화할 수 있습니다. 무엇을 플레이하든 전부 유지하세요!"
-  },
-  "app.sync-instances-update.load-error": {
-    "message": "동기화 설정을 불러올 수 없습니다. 다시 시도해 주세요."
-  },
-  "app.sync-instances-update.manage-later": {
-    "message": "이제 동기화를 활성화할 수 있으며 후에 앱 설정에서 관리할 수 있습니다."
-  },
-  "app.sync-instances-update.notification.description": {
-    "message": "게임 설정, 서버, 리소스 팩 등을 동기화하여 인스턴스 간에 유지하세요."
-  },
-  "app.sync-instances-update.notification.dismiss": {
-    "message": "닫기"
-  },
-  "app.sync-instances-update.notification.title": {
-    "message": "인스턴스 동기화"
-  },
-  "app.sync-instances-update.notification.view-update": {
-    "message": "업데이트 보기"
-  },
-  "app.sync-instances-update.retry": {
-    "message": "다시 시도"
-  },
-  "app.sync-instances-update.skip": {
-    "message": "건너뛰기"
-  },
-  "app.sync-instances-update.sync-all": {
-    "message": "모두 동기화"
-  },
-  "app.sync-instances-update.title": {
-    "message": "인스턴스 동기화"
   },
   "app.synced-content.change.disable-description": {
     "message": "비활성화를 이 인스턴스에서만 하는지, 아니면 모든 인스턴스에서 하는지 선택하세요. 여기서만 비활성화하면 이 인스턴스는 재정의가 활성화됩니다."

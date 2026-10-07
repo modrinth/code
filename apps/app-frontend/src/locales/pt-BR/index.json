@@ -3299,56 +3299,11 @@
   "app.survey.title": {
     "message": "Ei, usuário do Modrinth!"
   },
-  "app.sync-instances-update.badge": {
-    "message": "Novidade de atualização"
-  },
-  "app.sync-instances-update.choose-source.all": {
-    "message": "Escolha qual instância copiar configurações de jogo, pacotes de recursos, histórico de comandos, barras de item do criativo e servidores multijogador. Essas configurações são usadas apenas para sincronização inicial, você pode editá-las em qualquer instância depois."
-  },
-  "app.sync-instances-update.choose-source.all-title": {
-    "message": "Escolher fonte de sincronização"
-  },
   "app.sync-instances-update.choose-source.data-packs": {
     "message": "Escolha qual instância copiar seus pacotes de dados. Esses pacotes são usados apenas para sincronização inicial, você pode editá-los de qualquer instância depois."
   },
   "app.sync-instances-update.choose-source.resource-packs": {
     "message": "Escolha de qual instância copiar seus pacotes de recursos. Esses pacotes são usados ​​apenas para a sincronização inicial e você poderá editá-los em qualquer instância posteriormente."
-  },
-  "app.sync-instances-update.creative-hotbars": {
-    "message": "Sincronizar barras rápidas do criativo"
-  },
-  "app.sync-instances-update.description": {
-    "message": "Você agora pode sincronizar opções como configurações de jogo, servidores, pacotes de recursos e mais através de suas instâncias, então tudo fica igual quando for jogar!"
-  },
-  "app.sync-instances-update.load-error": {
-    "message": "Não foi possível carregar suas configurações de sincronização. Por favor, tente novamente."
-  },
-  "app.sync-instances-update.manage-later": {
-    "message": "Você pode habilitar a sincronização agora e configurar mais tarde nas configurações do app."
-  },
-  "app.sync-instances-update.notification.description": {
-    "message": "Mantém configurações de jogo, servidores, pacotes de recursos e outros em sincronização através das instâncias."
-  },
-  "app.sync-instances-update.notification.dismiss": {
-    "message": "Dispensar"
-  },
-  "app.sync-instances-update.notification.title": {
-    "message": "Sincronizar suas instâncias"
-  },
-  "app.sync-instances-update.notification.view-update": {
-    "message": "Visualizar atualização"
-  },
-  "app.sync-instances-update.retry": {
-    "message": "Tentar novamente"
-  },
-  "app.sync-instances-update.skip": {
-    "message": "Pular"
-  },
-  "app.sync-instances-update.sync-all": {
-    "message": "Sincronizar tudo"
-  },
-  "app.sync-instances-update.title": {
-    "message": "Sincronizar suas instâncias"
   },
   "app.synced-content.change.disable-description": {
     "message": "Desative-o em todas as instâncias sincronizadas ou apenas nesta instância. Desativá-lo apenas aqui ativará as substituições para esta instância."

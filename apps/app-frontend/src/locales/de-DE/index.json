@@ -3299,56 +3299,11 @@
   "app.survey.title": {
     "message": "Hey, Modrinth Nutzer!"
   },
-  "app.sync-instances-update.badge": {
-    "message": "Neu in diesem Update"
-  },
-  "app.sync-instances-update.choose-source.all": {
-    "message": "Wähle aus, aus welcher Instanz du Spieleinstellungen, Ressourcenpakete, den Befehlsverlauf, Kreativ-Schnellzugriffleisten und Merhspieler-Server kopieren möchtest. Diese Einstellungen werden nur für die erste Synchronisierung verwendet, danach kannst du sie von jeder Instanz aus bearbeiten."
-  },
-  "app.sync-instances-update.choose-source.all-title": {
-    "message": "Synchronisierungsquelle auswählen"
-  },
   "app.sync-instances-update.choose-source.data-packs": {
     "message": "Wähle aus, aus welcher Instanz du deine Datenpakete kopieren möchtest. Diese Pakete werden nur für die erste Synchronisierung verwendet, danach kannst du sie von jeder Instanz aus bearbeiten."
   },
   "app.sync-instances-update.choose-source.resource-packs": {
     "message": "Wähle aus, aus welcher Instanz du deine Ressourcenpakete kopieren möchtest. Diese Pakete werden nur für die erste Synchronisierung verwendet, danach kannst du sie von jeder Instanz aus bearbeiten."
-  },
-  "app.sync-instances-update.creative-hotbars": {
-    "message": "Kreativ-Schnellzugriffleisten synchronisieren"
-  },
-  "app.sync-instances-update.description": {
-    "message": "Du kannst nun Optionen wie Spieleinstellungen, Server, Ressourcenpakete und vieles mehr zwischen deinen Instanzen synchronisieren, sodass beim Spielen immer alles gleich bleibt!"
-  },
-  "app.sync-instances-update.load-error": {
-    "message": "Deine Synchronisierungseinstellungen konnten nicht geladen werden. Bitte versuche es erneut."
-  },
-  "app.sync-instances-update.manage-later": {
-    "message": "Du kannst die Synchronisierung jetzt aktivieren und später in den Einstellungen der App verwalten."
-  },
-  "app.sync-instances-update.notification.description": {
-    "message": "Halte Spieleinstellungen, Server, Ressourcenpakete und mehr in allen deinen Instanzen synchron."
-  },
-  "app.sync-instances-update.notification.dismiss": {
-    "message": "Ausblenden"
-  },
-  "app.sync-instances-update.notification.title": {
-    "message": "Synchronisiere deine Instanzen"
-  },
-  "app.sync-instances-update.notification.view-update": {
-    "message": "Update ansehen"
-  },
-  "app.sync-instances-update.retry": {
-    "message": "Erneut versuchen"
-  },
-  "app.sync-instances-update.skip": {
-    "message": "Überspringen"
-  },
-  "app.sync-instances-update.sync-all": {
-    "message": "Alles synchronisieren"
-  },
-  "app.sync-instances-update.title": {
-    "message": "Synchronisiere deine Instanzen"
   },
   "app.synced-content.change.disable-description": {
     "message": "Deaktiviere diese Einstellung entweder für alle synchronisierten Instanzen oder nur für diese Instanz. Wenn du sie nur hier deaktivierst, werden für diese Instanz eigene Einstellungen aktiviert."

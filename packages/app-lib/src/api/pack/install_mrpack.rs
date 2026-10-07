@@ -514,12 +514,16 @@ pub(crate) fn install_zipped_mrpack_files_with_reporter(
     ignore_lock: bool,
     reason: DownloadReason,
     reporter: InstallProgressReporter,
+    ignore_modpack_servers: bool,
+    preserve_icon: bool,
 ) -> impl Future<Output = crate::Result<String>> + Send + 'static {
     Box::pin(install_zipped_mrpack_files_with_reporter_inner(
         create_pack,
         ignore_lock,
         reason,
         reporter,
+        ignore_modpack_servers,
+        preserve_icon,
     ))
 }
 

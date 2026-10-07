@@ -1005,39 +1005,4 @@ function onBrowseModpacks() {
 		from: 'reset-server',
 	})
 }
-
-async function confirmResetToOnboarding() {
-	if (supportResetToOnboardingDisabled.value || !worldId.value) return
-
-	try {
-		isResettingToOnboarding.value = true
-		await client.archon.servers_v1.resetToOnboarding(serverId, worldId.value)
-		modrinthServersConsole.clear()
-		try {
-			await client.kyros.logs_v1.clear()
-		} catch (error) {
-			console.error('Failed to clear server logs:', error)
-		}
-		queryClient.setQueryData<Archon.Servers.v0.Server>(serverDetailQueryKey, (current) =>
-			current ? { ...current, flows: { ...current.flows, intro: true } } : current,
-		)
-		await Promise.all([
-			queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] }),
-			queryClient.invalidateQueries({ queryKey: ['servers', 'v1', 'detail', serverId] }),
-		])
-		addNotification({
-			type: 'success',
-			title: formatMessage(messages.resetToOnboardingSuccessTitle),
-			text: formatMessage(messages.resetToOnboardingSuccessDescription),
-		})
-		serverSettings.closeModal?.()
-	} catch (err) {
-		addNotification({
-			type: 'error',
-			text: err instanceof Error ? err.message : formatMessage(messages.failedToResetToOnboarding),
-		})
-	} finally {
-		isResettingToOnboarding.value = false
-	}
-}
 </script>

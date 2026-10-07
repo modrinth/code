@@ -1658,6 +1658,36 @@
   "app.screenshots.sort.oldest": {
     "message": "Oldest"
   },
+  "app.server-sharing-update.badge": {
+    "message": "New this update"
+  },
+  "app.server-sharing-update.blog": {
+    "message": "Read more about this release in the <link>server sharing</link> blog."
+  },
+  "app.server-sharing-update.description": {
+    "message": "You can now share your server directly with friends in the app. When they accept, we’ll create an instance for them that is managed by your server."
+  },
+  "app.server-sharing-update.invite": {
+    "message": "Invite players"
+  },
+  "app.server-sharing-update.notification.description": {
+    "message": "Invite friends to play with an instance managed by your server."
+  },
+  "app.server-sharing-update.notification.dismiss": {
+    "message": "Dismiss"
+  },
+  "app.server-sharing-update.notification.view-update": {
+    "message": "View update"
+  },
+  "app.server-sharing-update.skip": {
+    "message": "Skip"
+  },
+  "app.server-sharing-update.title": {
+    "message": "Share servers with friends"
+  },
+  "app.server-sharing-update.watch": {
+    "message": "Watch"
+  },
   "app.settings.app-version": {
     "message": "Modrinth App {version}"
   },
@@ -3356,56 +3386,11 @@
   "app.survey.title": {
     "message": "Hey there Modrinth user!"
   },
-  "app.sync-instances-update.badge": {
-    "message": "New this update"
-  },
-  "app.sync-instances-update.choose-source.all": {
-    "message": "Choose which instance to copy game settings, resource packs, command history, creative hotbars and multiplayer servers from. These settings are only used for the initial sync, and you can edit them from any instance afterward."
-  },
-  "app.sync-instances-update.choose-source.all-title": {
-    "message": "Choose sync source"
-  },
   "app.sync-instances-update.choose-source.data-packs": {
     "message": "Choose which instance to copy your data packs from. These packs are only used for the initial sync, and you can edit them from any instance afterward."
   },
   "app.sync-instances-update.choose-source.resource-packs": {
     "message": "Choose which instance to copy your resource packs from. These packs are only used for the initial sync, and you can edit them from any instance afterward."
-  },
-  "app.sync-instances-update.creative-hotbars": {
-    "message": "Sync creative hotbars"
-  },
-  "app.sync-instances-update.description": {
-    "message": "You can now sync options like game settings, servers, resource packs, and more across your instances, so everything stays the same every time you play!"
-  },
-  "app.sync-instances-update.load-error": {
-    "message": "Could not load your sync settings. Please try again."
-  },
-  "app.sync-instances-update.manage-later": {
-    "message": "You can enable syncing now and manage it later in your app settings."
-  },
-  "app.sync-instances-update.notification.description": {
-    "message": "Keep game settings, servers, resource packs, and more in sync across your instances."
-  },
-  "app.sync-instances-update.notification.dismiss": {
-    "message": "Dismiss"
-  },
-  "app.sync-instances-update.notification.title": {
-    "message": "Sync your instances"
-  },
-  "app.sync-instances-update.notification.view-update": {
-    "message": "View update"
-  },
-  "app.sync-instances-update.retry": {
-    "message": "Try again"
-  },
-  "app.sync-instances-update.skip": {
-    "message": "Skip"
-  },
-  "app.sync-instances-update.sync-all": {
-    "message": "Sync all"
-  },
-  "app.sync-instances-update.title": {
-    "message": "Sync your instances"
   },
   "app.synced-content.change.disable-description": {
     "message": "Disable it across all synced instances, or only in this instance. Disabling it only here will turn on overrides for this instance."

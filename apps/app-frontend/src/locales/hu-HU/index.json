@@ -329,17 +329,11 @@
   "app.download-manager.duplicated-instance": {
     "message": "Példány megkettőzése"
   },
-  "app.download-manager.empty": {
-    "message": "Nincs telepítési feladat"
-  },
   "app.download-manager.estimated-rate": {
     "message": "A letöltés becsült sebessége"
   },
   "app.download-manager.eta": {
     "message": "A letöltés becsült hátralévő ideje"
-  },
-  "app.download-manager.hide": {
-    "message": "Telepítési folyamatok elrejtése"
   },
   "app.download-manager.imported-instance": {
     "message": "Importált példány"
@@ -373,9 +367,6 @@
   },
   "app.download-manager.shared-instance-update": {
     "message": "Megosztott példány frissítése"
-  },
-  "app.download-manager.show": {
-    "message": "Telepítési feladatok megjelenítése"
   },
   "app.download-manager.tasks": {
     "message": "Feladatok"
@@ -3308,56 +3299,11 @@
   "app.survey.title": {
     "message": "Hali, Modrinth-felhasználó!"
   },
-  "app.sync-instances-update.badge": {
-    "message": "Új ebben a frissítésben"
-  },
-  "app.sync-instances-update.choose-source.all": {
-    "message": "Válaszd ki, hogy melyik példányból másolja át a játékbeállításokat, erőforráscsomagokat, parancselőzményeket, kreatív gyorselérési sávokat és többjátékos szervereket. Ezeket a beállításokat csak a kezdeti szinkronizáláshoz használja, ezt követően bármelyik példányból szerkesztheted őket."
-  },
-  "app.sync-instances-update.choose-source.all-title": {
-    "message": "Szinkronizálási forrás kiválasztása"
-  },
   "app.sync-instances-update.choose-source.data-packs": {
     "message": "Válaszd ki, hogy melyik példányból másolja át az adatcsomagjaidat. Ezeket a csomagokat csak a kezdeti szinkronizáláshoz használja, ezt követően bármelyik példányból szerkesztheted őket."
   },
   "app.sync-instances-update.choose-source.resource-packs": {
     "message": "Válaszd ki, hogy melyik példányból másolja át az erőforráscsomagjaidat. Ezeket a csomagokat csak a kezdeti szinkronizáláshoz használja, ezt követően bármelyik példányból szerkesztheted őket."
-  },
-  "app.sync-instances-update.creative-hotbars": {
-    "message": "Kreatív gyorselérési sávok szinkronizálása"
-  },
-  "app.sync-instances-update.description": {
-    "message": "Mostantól szinkronizálhatod a példányaid között az olyan beállításokat, mint a játékbeállítások, szerverek, erőforráscsomagok és még sok más, így minden alkalommal ugyanazokkal a beállításokkal játszhatsz!"
-  },
-  "app.sync-instances-update.load-error": {
-    "message": "Nem sikerült betölteni a szinkronizálási beállításaidat. Próbáld újra."
-  },
-  "app.sync-instances-update.manage-later": {
-    "message": "Most engedélyezheted a szinkronizálást, később pedig kezelheted az alkalmazás beállításaiban."
-  },
-  "app.sync-instances-update.notification.description": {
-    "message": "Tartsd szinkronban a játékbeállításokat, szervereket, erőforráscsomagokat és még sok mást a példányaid között."
-  },
-  "app.sync-instances-update.notification.dismiss": {
-    "message": "Elvétés"
-  },
-  "app.sync-instances-update.notification.title": {
-    "message": "Példányok szinkronizálása"
-  },
-  "app.sync-instances-update.notification.view-update": {
-    "message": "Frissítés megtekintése"
-  },
-  "app.sync-instances-update.retry": {
-    "message": "Próbáld újra"
-  },
-  "app.sync-instances-update.skip": {
-    "message": "Kihagyás"
-  },
-  "app.sync-instances-update.sync-all": {
-    "message": "Összes szinkronizálása"
-  },
-  "app.sync-instances-update.title": {
-    "message": "Példányaid szinkronizálása"
   },
   "app.synced-content.change.disable-description": {
     "message": "Letiltás az összes szinkronizált példányban, vagy csak ebben a példányban. Ha csak itt tiltod le, engedélyezve lesznek a felülbírálások ennél a példánynál."

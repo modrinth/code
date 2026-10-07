@@ -3260,56 +3260,11 @@
   "app.survey.title": {
     "message": "Cześć, użytkowniku Modrinth!"
   },
-  "app.sync-instances-update.badge": {
-    "message": "Nowość w tej aktualizacji"
-  },
-  "app.sync-instances-update.choose-source.all": {
-    "message": "Wybierz instancję, z której zostaną skopiowane ustawienia gry, paczki zasobów, historia poleceń, paski szybkiego wyboru trybu kreatywnego i serwery trybu wieloosobowego. Posłużą one jako punkt wyjścia do synchronizacji. Później możesz je edytować w dowolnej instancji."
-  },
-  "app.sync-instances-update.choose-source.all-title": {
-    "message": "Wybierz źródło synchronizacji"
-  },
   "app.sync-instances-update.choose-source.data-packs": {
     "message": "Wybierz instancję, z której zostaną skopiowane paczki danych. Posłużą one jako punkt wyjścia do synchronizacji. Później możesz je edytować w dowolnej instancji."
   },
   "app.sync-instances-update.choose-source.resource-packs": {
     "message": "Wybierz instancję, z której zostaną skopiowane paczki zasobów. Posłużą one jako punkt wyjścia do synchronizacji. Później możesz je edytować w dowolnej instancji."
-  },
-  "app.sync-instances-update.creative-hotbars": {
-    "message": "Synchronizuj paski szybkiego wyboru trybu kreatywnego"
-  },
-  "app.sync-instances-update.description": {
-    "message": "Możesz teraz synchronizować ustawienia gry, serwery, paczki zasobów i inne elementy między instancjami, aby przy każdej rozgrywce korzystać z tych samych ustawień i zasobów!"
-  },
-  "app.sync-instances-update.load-error": {
-    "message": "Nie udało się wczytać ustawień synchronizacji. Spróbuj ponownie."
-  },
-  "app.sync-instances-update.manage-later": {
-    "message": "Możesz włączyć synchronizację teraz i zarządzać nią później w ustawieniach aplikacji."
-  },
-  "app.sync-instances-update.notification.description": {
-    "message": "Synchronizuj ustawienia gry, serwery, paczki zasobów i inne elementy między instancjami."
-  },
-  "app.sync-instances-update.notification.dismiss": {
-    "message": "Odrzuć"
-  },
-  "app.sync-instances-update.notification.title": {
-    "message": "Synchronizuj instancje"
-  },
-  "app.sync-instances-update.notification.view-update": {
-    "message": "Zobacz nowości"
-  },
-  "app.sync-instances-update.retry": {
-    "message": "Spróbuj ponownie"
-  },
-  "app.sync-instances-update.skip": {
-    "message": "Pomiń"
-  },
-  "app.sync-instances-update.sync-all": {
-    "message": "Synchronizuj wszystko"
-  },
-  "app.sync-instances-update.title": {
-    "message": "Synchronizuj instancje"
   },
   "app.synced-content.change.disable-description": {
     "message": "Wyłącz tę zawartość we wszystkich synchronizowanych instancjach lub tylko w tej instancji. Wyłączenie jej tylko tutaj włączy wyjątki synchronizacji dla tej instancji."

@@ -377,9 +377,6 @@
   "content.card.synced": {
     "defaultMessage": "Sincronizate între instanțe"
   },
-  "content.card.uploaded": {
-    "defaultMessage": "Încărcat"
-  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Esti sigur că vrei să actualizezi {count, plural, one {# proiect} other {# proiecte}} la cea mai recentă versiune compatibilă? Recomandăm sa le actualizezi pe rând."
   },
@@ -535,9 +532,6 @@
   },
   "content.managed-card.view-content": {
     "defaultMessage": "Vizualizează conținutul"
-  },
-  "content.metadata-filter.author": {
-    "defaultMessage": "Autorul"
   },
   "content.page-layout.share.label": {
     "defaultMessage": "Distribuie"
