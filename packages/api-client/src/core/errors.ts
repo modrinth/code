@@ -95,7 +95,8 @@ export class ModrinthServerError extends ModrinthApiError {
 		context?: string,
 	): ModrinthServerError {
 		const v1Error = isModrinthErrorResponse(responseData) ? responseData : undefined
-		const isHtmlPage = typeof responseData === 'string' && /<!doctype html|<html/i.test(responseData)
+		const isHtmlPage =
+			typeof responseData === 'string' && /<!doctype html|<html/i.test(responseData)
 
 		const message =
 			typeof responseData === 'string' && !isHtmlPage ? responseData : `HTTP ${statusCode}`
