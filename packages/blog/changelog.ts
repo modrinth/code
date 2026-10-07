@@ -11,6 +11,21 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-10-07T19:34:12+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed how download modal's compatible version selector completely disappears if a version with no additional files is selected.
+- Fixed project icon appearing set even when the file size is too large.`,
+	},
+	{
+		date: `2026-10-07T19:34:12+00:00`,
+		product: 'app',
+		version: '0.21.9',
+		body: `## Fixed
+- Improved Modrinth sign-in to support deeplinking, improve security, and fix random sign-outs due to shared tokens with the website.
+- Fixed \`missing field synced_options\` error.`,
+	},
+	{
 		date: `2026-10-06T19:48:42+00:00`,
 		product: 'app',
 		version: '0.21.8',
