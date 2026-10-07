@@ -1,4 +1,6 @@
 // File extension constants
+import {getFileTypeInfo, getLanguageFromFile} from "#ui/helpers/toolbox/file";
+
 export const FILE_CODE_EXTENSIONS = [
 	'json',
 	'json5',
@@ -93,15 +95,23 @@ export function isEditableFile(ext: string): boolean {
  * Check if a file can be opened in the file editor
  */
 export function canOpenInFileEditor(filename: string): boolean {
-	const ext = getFileExtension(filename)
+	const fileInfo = getFileTypeInfo(filename);
+	if (fileInfo != null && (getLanguageFromFile(fileInfo) || fileInfo.mime.startsWith("text/"))) return true;
+	const ext = getFileExtension(filename);
 	return !filename.includes('.') || isEditableFile(ext) || isImageFile(ext)
 }
 
 /**
  * Get Ace editor language mode for a file extension
  */
-export function getEditorLanguage(ext: string): string {
-	const lowered = ext.toLowerCase()
+export function getEditorLanguage(filename: string): string {
+	const fileInfo = getFileTypeInfo(filename);
+	if (fileInfo != null) {
+		const language = getLanguageFromFile(fileInfo);
+		if (language) return language;
+	}
+	const lowered = getFileExtension(filename);
+
 	switch (lowered) {
 		// Code files
 		case 'json':
