@@ -7,7 +7,6 @@ import {
 	ImageIcon,
 	LogInIcon,
 	LogOutIcon,
-	NewspaperIcon,
 	PlayIcon,
 	PlusIcon,
 	RefreshCwIcon,
@@ -24,7 +23,6 @@ import {
 	AccountSwitchOverlay,
 	Admonition,
 	Avatar,
-	ButtonLink,
 	commonMessages,
 	commonSettingsMessages,
 	ContentInstallModal,
@@ -34,7 +32,6 @@ import {
 	I18nDebugPanel,
 	IconButton,
 	LoadingBar,
-	NewsArticleCard,
 	NotificationPanel,
 	PopupNotificationPanel,
 	provideLoadingState,
@@ -65,10 +62,9 @@ import { computed, nextTick, onMounted, onUnmounted, provide, ref, watch } from 
 import { RouterView, useRoute, useRouter } from 'vue-router'
 
 import { useRouteLoading } from '@/app/runtime/use-route-loading'
+import AppSidebar from '@/app/shell/sidebar/index.vue'
 import AppTitleBar from '@/app/shell/title-bar/index.vue'
-import AccountsCard from '@/components/ui/AccountsCard.vue'
 import ErrorModal from '@/components/ui/ErrorModal.vue'
-import FriendsList from '@/components/ui/friends/FriendsList.vue'
 import HostingUpdateRequired from '@/components/ui/HostingUpdateRequired.vue'
 import AddServerToInstanceModal from '@/components/ui/install_flow/AddServerToInstanceModal.vue'
 import UnknownPackWarningModal from '@/components/ui/install_flow/UnknownPackWarningModal.vue'
@@ -81,9 +77,6 @@ import ModpackAlreadyInstalledModal from '@/components/ui/modal/ModpackAlreadyIn
 import ModrinthAccountRequiredModal from '@/components/ui/modal/ModrinthAccountRequiredModal.vue'
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import NavButton from '@/components/ui/NavButton.vue'
-import OnboardingChecklist from '@/components/ui/onboarding-checklist/index.vue'
-import PrideFundraiserBanner from '@/components/ui/PrideFundraiserBanner.vue'
-import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
 import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
 import SharedInstanceInviteHandler from '@/components/ui/shared-instances/shared-instance-invite-handler/index.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
@@ -101,6 +94,7 @@ import { useInstanceMetadataRefresh } from '@/composables/use-instance-metadata-
 import { useQuickInstanceLimit } from '@/composables/use-quick-instance-limit.ts'
 import { isDarkTheme, useTheme } from '@/composables/use-theme.ts'
 import { config } from '@/config'
+import { provideMinecraftAccounts } from '@/features/minecraft-accounts/context'
 import { getAccountAppearance, rememberAccountAppearance } from '@/helpers/account-appearance.ts'
 import {
 	hide_ads_window,
@@ -229,7 +223,6 @@ async function handleFullscreenChange() {
 const APP_LEFT_NAV_WIDTH = '4rem'
 const APP_SIDEBAR_WIDTH = 300
 const INTERCOM_BUBBLE_DEFAULT_PADDING = 20
-const PRIDE_FUNDRAISER_END_DATE = new Date('2026-07-01T00:00:00Z').getTime()
 const credentials = ref()
 const storedModrinthAccounts = ref([])
 let credentialsRefreshId = 0
@@ -253,9 +246,6 @@ const hostingUpdateRequired = computed(
 		hostingRouteActive.value &&
 		!!appUpdateState.availableUpdate.value &&
 		appUpdateState.updatesEnabled.value,
-)
-const prideFundraiserEnabled = computed(
-	() => appSettings.getFeatureFlag('pride_fundraiser') && Date.now() < PRIDE_FUNDRAISER_END_DATE,
 )
 const hostingIntercomIdentityKey = computed(() => {
 	const rawServerId = route.params.id
@@ -373,8 +363,6 @@ const {
 	(iconPath) =>
 		creationGeneratedIcon.value?.path === iconPath ? creationGeneratedIcon.value.config : null,
 )
-const { hasLoggedIntoMinecraft, hasLoggedIntoModrinth, showChecklist } = onboardingChecklist
-const showFriendsList = computed(() => !showChecklist.value || hasLoggedIntoModrinth.value)
 
 async function randomizeCreationIcon() {
 	const generated = await creationIconEditorModal.value?.randomizeAndSave()
@@ -412,7 +400,6 @@ function onCreationIconSaved(iconPath, config) {
 	context.instanceIconPath.value = iconPath
 }
 
-const news = ref([])
 const displayedServerInviteNotifications = new Set()
 const serverInvitePopupNotificationIds = new Set()
 let liveNotificationGeneration = 0
@@ -651,18 +638,6 @@ const messages = defineMessages({
 		id: 'app.nav.upgrade-to-modrinth-plus',
 		defaultMessage: 'Upgrade to Modrinth+',
 	},
-	news: {
-		id: 'app.news.title',
-		defaultMessage: 'News',
-	},
-	viewAllNews: {
-		id: 'app.news.view-all',
-		defaultMessage: 'View all news',
-	},
-	playingAs: {
-		id: 'app.sidebar.playing-as',
-		defaultMessage: 'Playing as',
-	},
 })
 
 function handleAdsConsentRequired(required) {
@@ -854,22 +829,6 @@ async function setupApp() {
 			)
 		})
 
-	fetch(`https://modrinth.com/news/feed/articles.json`)
-		.then((response) => response.json())
-		.then((res) => {
-			if (res && res.articles) {
-				news.value = res.articles
-					.map((article) => ({
-						...article,
-						path: article.link,
-					}))
-					.slice(0, 4)
-			}
-		})
-		.catch((error) => {
-			console.error('Failed to fetch news articles', error)
-		})
-
 	traceStartupStep('Read opening command', get_opening_command).then(handleCommand)
 	traceStartupStep('Refresh startup credentials', fetchCredentials)
 
@@ -906,13 +865,6 @@ const handleClose = async () => {
 	await saveWindowState(StateFlags.ALL)
 	await getCurrentWindow().close()
 }
-
-const sidebarOverlayScrollbarsOptions = Object.freeze({
-	overflow: {
-		x: 'hidden',
-		y: 'scroll',
-	},
-})
 
 const queryClient = useQueryClient()
 
@@ -1442,7 +1394,7 @@ const modrinthAccountMenuOptions = computed(() => [
 		id: 'add-friend',
 		label: formatMessage(messages.addFriend),
 		icon: UserPlusIcon,
-		action: () => friendsList.value?.showAddFriendModal(),
+		action: () => sidebar.value?.showAddFriendModal(),
 	},
 	{
 		id: 'flags',
@@ -1530,9 +1482,8 @@ onMounted(() => {
 	setServerUpdateToPlayModal(updateToPlayModal.value)
 })
 
-const accounts = ref(null)
-const friendsList = ref(null)
-provide('accountsCard', accounts)
+const sidebar = ref(null)
+provideMinecraftAccounts(computed(() => sidebar.value?.minecraftAccounts ?? null))
 
 useAppEvent('command', handleCommand, appEvents)
 useAppEvent('notification', handleLiveNotification, appEvents)
@@ -2339,87 +2290,16 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				</template>
 			</RouterView>
 		</div>
-		<div
-			class="app-sidebar mt-px shrink-0 flex flex-col border-0 border-l-[1px] border-[--brand-gradient-border] border-solid"
-			:class="{ 'has-plus': hasPlus }"
-		>
-			<div
-				v-overlay-scrollbars="sidebarOverlayScrollbarsOptions"
-				class="app-sidebar-scrollable flex-grow shrink relative"
-				:class="{ 'pb-12': !hasPlus }"
-				data-overlayscrollbars-initialize
-			>
-				<OnboardingChecklist
-					@create-instance="installationModal?.show()"
-					@login-minecraft="accounts?.login()"
-					@login-modrinth="signIn"
-				/>
-				<div id="sidebar-teleport-target" class="sidebar-teleport-content"></div>
-				<div class="sidebar-default-content" :class="{ 'sidebar-enabled': sidebarVisible }">
-					<div
-						v-show="hasLoggedIntoMinecraft"
-						class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid"
-					>
-						<h3 class="text-base text-primary font-medium m-0">
-							{{ formatMessage(messages.playingAs) }}
-						</h3>
-						<suspense>
-							<AccountsCard ref="accounts" />
-						</suspense>
-					</div>
-					<div
-						v-show="showFriendsList"
-						class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid"
-					>
-						<suspense>
-							<FriendsList
-								ref="friendsList"
-								:credentials="credentials"
-								:sign-in="() => requestSignIn()"
-							/>
-						</suspense>
-					</div>
-					<PrideFundraiserBanner
-						v-if="prideFundraiserEnabled"
-						class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid"
-					/>
-					<div v-if="news && news.length > 0" class="p-4 flex flex-col items-center">
-						<h3 class="text-base mb-4 text-primary font-medium m-0 text-left w-full">
-							{{ formatMessage(messages.news) }}
-						</h3>
-						<div class="space-y-4 flex flex-col items-center w-full">
-							<NewsArticleCard
-								v-for="(item, index) in news"
-								:key="`news-${index}`"
-								:article="item"
-							/>
-							<ButtonLink
-								type="colored"
-								color="brand"
-								size="xl"
-								href="https://modrinth.com/news"
-								target="_blank"
-								class="my-4"
-							>
-								<NewspaperIcon />
-								{{ formatMessage(messages.viewAllNews) }}
-							</ButtonLink>
-						</div>
-					</div>
-				</div>
-			</div>
-			<template v-if="showAd">
-				<a
-					href="https://modrinth.plus?app"
-					class="absolute bottom-[250px] w-full flex justify-center items-center gap-1 px-4 py-3 text-purple font-medium hover:underline z-10"
-					target="_blank"
-				>
-					<ArrowBigUpDashIcon class="text-2xl" />
-					{{ formatMessage(messages.upgradeToModrinthPlus) }}
-				</a>
-				<PromotionWrapper />
-			</template>
-		</div>
+		<AppSidebar
+			ref="sidebar"
+			:credentials="credentials"
+			:has-plus="hasPlus"
+			:show-ad="showAd"
+			:visible="sidebarVisible"
+			:request-sign-in="() => requestSignIn()"
+			@create-instance="installationModal?.show()"
+			@login-modrinth="signIn"
+		/>
 	</div>
 	<I18nDebugPanel />
 	<NotificationPanel :has-sidebar="sidebarVisible" />
@@ -2536,41 +2416,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	overflow: hidden;
 }
 
-.app-sidebar {
-	overflow: visible;
-	width: 300px;
-	position: relative;
-	height: calc(100vh - var(--top-bar-height));
-	background: var(--brand-gradient-bg);
-
-	--color-button-bg: var(--brand-gradient-button);
-	--surface-4: var(--brand-gradient-button);
-	--color-button-bg-hover: var(--brand-gradient-border);
-	--surface-5: var(--brand-gradient-border);
-	--color-divider: var(--brand-gradient-border);
-	--color-divider-dark: var(--brand-gradient-border);
-}
-
-.app-sidebar::after {
-	content: '';
-	position: absolute;
-	bottom: 250px;
-	left: 0;
-	right: 0;
-	height: 5rem;
-	background: var(--brand-gradient-fade-out-color);
-	pointer-events: none;
-}
-
-.app-sidebar.has-plus::after {
-	display: none;
-}
-
 .disable-advanced-rendering {
-	.app-sidebar::before {
-		box-shadow: none;
-	}
-
 	&.app-contents::before {
 		box-shadow: none;
 	}
@@ -2580,17 +2426,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		box-shadow: none !important;
 		--tw-drop-shadow:;
 	}
-}
-
-.app-sidebar::before {
-	content: '';
-	box-shadow: -15px 0 15px -15px rgba(0, 0, 0, 0.1) inset;
-	top: 0;
-	bottom: 0;
-	left: -2rem;
-	width: 2rem;
-	position: absolute;
-	pointer-events: none;
 }
 
 .app-viewport {
@@ -2615,18 +2450,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	border-width: 1px;
 	border-style: solid;
 	pointer-events: none;
-}
-
-.sidebar-teleport-content {
-	display: contents;
-}
-
-.sidebar-default-content {
-	display: none;
-}
-
-.sidebar-teleport-content:empty + .sidebar-default-content.sidebar-enabled {
-	display: contents;
 }
 
 @media (prefers-reduced-motion: no-preference) {

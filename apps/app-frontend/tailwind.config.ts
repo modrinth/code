@@ -5,6 +5,7 @@ const config: Config = {
 	content: [
 		'./src/app/**/*.{js,vue,ts}',
 		'./src/components/**/*.{js,vue,ts}',
+		'./src/features/**/*.{js,vue,ts}',
 		'./src/layouts/**/*.vue',
 		'./src/pages/**/*.vue',
 		'./src/plugins/**/*.{js,ts}',
