@@ -393,6 +393,7 @@ const installTooltip = computed(() => {
 				v-if="enabledFor"
 				:reserve-status-space="enabledForColumn"
 				:model-value="enabledFor"
+				:loading="installing"
 				:disabled="isDisabled"
 				:disabled-tooltip="isDisabled ? disabledTooltip : undefined"
 				@update:model-value="(side, value) => emit('update:enabled-for', side, value)"

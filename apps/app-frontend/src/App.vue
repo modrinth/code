@@ -1023,22 +1023,20 @@ watch(
 	(session) => {
 		if (!session) return
 
-		queryClient
-			.prefetchQuery(serverListQueryOptions(tauriApiClient))
-			.then(() => {
-				if (credentials.value?.session !== session) return
-				const response = queryClient.getQueryData(['servers'])
-				return Promise.allSettled(
-					(response?.servers ?? [])
-						.filter((server) => server.status === 'available' && !server.is_medal)
-						.map(async (server) => {
-							const icon = await queryClient.fetchQuery(
-								serverIconQueryOptions(server.server_id, tauriApiClient),
-							)
-							if (icon) await iconCache.cacheIcon(icon)
-						}),
-				)
-			})
+		queryClient.prefetchQuery(serverListQueryOptions(tauriApiClient)).then(() => {
+			if (credentials.value?.session !== session) return
+			const response = queryClient.getQueryData(['servers'])
+			return Promise.allSettled(
+				(response?.servers ?? [])
+					.filter((server) => server.status === 'available' && !server.is_medal)
+					.map(async (server) => {
+						const icon = await queryClient.fetchQuery(
+							serverIconQueryOptions(server.server_id, tauriApiClient),
+						)
+						if (icon) await iconCache.cacheIcon(icon)
+					}),
+			)
+		})
 		queryClient.prefetchQuery({
 			queryKey: ['billing', 'subscriptions'],
 			queryFn: () => tauriApiClient.labrinth.billing_internal.getSubscriptions(),

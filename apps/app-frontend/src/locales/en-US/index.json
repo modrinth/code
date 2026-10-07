@@ -1679,6 +1679,12 @@
   "app.server-sharing-update.notification.view-update": {
     "message": "View update"
   },
+  "app.server-sharing-update.pause": {
+    "message": "Pause video"
+  },
+  "app.server-sharing-update.resume": {
+    "message": "Resume"
+  },
   "app.server-sharing-update.skip": {
     "message": "Skip"
   },

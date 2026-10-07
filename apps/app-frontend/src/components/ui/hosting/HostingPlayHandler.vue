@@ -192,10 +192,13 @@ async function playExisting(
 }
 
 function invalidateInstanceQueries() {
-	return queryClient.invalidateQueries({
-		queryKey: instanceKeys.all,
-		predicate: (query) => !query.queryKey.includes('shared-update-preview'),
-	})
+	return queryClient.invalidateQueries(
+		{
+			queryKey: instanceKeys.all,
+			predicate: (query) => !query.queryKey.includes('shared-update-preview'),
+		},
+		{ cancelRefetch: false },
+	)
 }
 
 async function launchInstalledInstance(target: LaunchTarget, instanceId: string) {

@@ -26,12 +26,6 @@ export function useStickyObserver(target: Ref<HTMLElement | null | undefined>, l
 			sentinel = null
 
 			if (el) {
-				debug(
-					'setting up sentinel, parent:',
-					el.parentElement,
-					'parentClasses:',
-					el.parentElement?.className,
-				)
 				debug('el classes:', el.className)
 				debug('el computed overflow:', getComputedStyle(el).overflow)
 				debug(
