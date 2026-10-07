@@ -3,7 +3,10 @@
 		ref="outerRef"
 		data-tauri-drag-region
 		class="min-w-0 overflow-hidden pl-4"
-		:class="{ 'breadcrumb-fade-mask': isOverflowing }"
+		:class="{
+			'[mask-image:linear-gradient(to_right,transparent,black_12px,black_calc(100%_-_12px),transparent)]':
+				isOverflowing,
+		}"
 		:style="isOverflowing ? { '--scroll-distance': `-${overflowAmount}px` } : undefined"
 		@mouseenter="onMouseEnter"
 		@mouseleave="onMouseLeave"
@@ -64,7 +67,7 @@ import { Avatar } from '@modrinth/ui'
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { RouterLink } from 'vue-router'
 
-import { injectBreadcrumbManager } from '@/providers/breadcrumbs'
+import { injectBreadcrumbManager } from '@/shared/breadcrumbs'
 
 const { entries: breadcrumbs } = injectBreadcrumbManager()
 
@@ -130,16 +133,6 @@ watch(breadcrumbs, () => {
 </script>
 
 <style scoped>
-.breadcrumb-fade-mask {
-	mask-image: linear-gradient(
-		to right,
-		transparent,
-		black 12px,
-		black calc(100% - 12px),
-		transparent
-	);
-}
-
 .breadcrumbs-scroll {
 	animation: breadcrumb-scroll 10s ease-in-out infinite;
 }
