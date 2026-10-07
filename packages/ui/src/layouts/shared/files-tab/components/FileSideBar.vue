@@ -25,6 +25,7 @@
 			@find="() => ui.toggleFind()"
 			@toggle-sidebar="() => ui.setSidebarOpen(!ui.sidebarOpen.value)"
 		/>
+		<FileSearch :loaded-only-notice="ui.searchLoadedOnlyNotice.value" />
 		<div
 			:class="[
 				scrollFileEntries ? 'overflow-y-auto' : '',
@@ -40,6 +41,7 @@
 <script setup lang="ts">
 import { injectFileBrowserUI } from '../providers/file-browser-ui'
 import FileActionBar from './FileActionBar.vue'
+import FileSearch from './FileSearch.vue'
 import FileTree from './FileTree.vue'
 
 const ui = injectFileBrowserUI()

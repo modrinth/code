@@ -30,6 +30,8 @@ export interface FileBrowserUIContext extends FileManagerContext {
 	baseId: string
 	showDebugInfo: ComputedRef<boolean>
 	showRefreshButton: ComputedRef<boolean>
+	/** Whether the sidebar search notes that it only covers folders opened so far. */
+	searchLoadedOnlyNotice: ComputedRef<boolean>
 	/** Whether the files tab rework feature flag is on, which offers the view settings. */
 	reworkEnabled: ComputedRef<boolean>
 	/** Whether the advanced view (sidebar tree, tabs and column picker) is in use. */
@@ -84,9 +86,9 @@ export interface FileBrowserUIContext extends FileManagerContext {
 	handleItemPrefetch: (item: FileInfo) => void
 
 	showCreateModal: (type: 'file' | 'directory') => void
-	showRenameModal: (item: FileItem) => void
-	showMoveModal: (item: FileItem) => void
-	showDeleteModal: (item: FileItem) => void
+	showRenameModal: (item: FileInfo) => void
+	showMoveModal: (item: FileInfo) => void
+	showDeleteModal: (item: FileInfo) => void
 	showBulkDeleteModal: () => void
 	showUnzipFromUrlModal: (cf: boolean) => void
 

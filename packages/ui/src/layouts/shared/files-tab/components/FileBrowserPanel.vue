@@ -43,6 +43,7 @@
 				@share="() => ui.shareEditorToMclogs()"
 				@find="() => ui.toggleFind()"
 				@toggle-sidebar="() => ui.setSidebarOpen(!sidebarOpen)"
+				@contextmenu="openBreadcrumbMenu"
 			/>
 		</div>
 		<div
@@ -60,15 +61,16 @@
 			>
 				<FileTabs />
 			</div>
+			<FileEmptyWorkspace v-if="!hasTabs" />
 			<FileManagerError
-				v-if="!isFileActive && ui.error.value"
+				v-else-if="!isFileActive && ui.error.value"
 				class="rounded-b-[20px]"
 				:title="formatMessage(messages.errorTitle)"
 				:message="formatMessage(messages.errorMessage)"
 				@refetch="ui.refresh"
 				@home="() => ui.navigateToSegment(0)"
 			/>
-			<div v-show="!isFileActive && !ui.error.value">
+			<div v-show="hasTabs && !isFileActive && !ui.error.value" @contextmenu="openFolderMenu">
 				<FileUploadDragAndDrop
 					ref="fileUploadRef"
 					:disabled="ui.isBusy.value"
@@ -148,8 +150,11 @@ import { useStickyObserver } from '#ui/composables/sticky-observer'
 import { findScrollableAncestor, useVirtualScroll } from '#ui/composables/virtual-scroll.ts'
 import { injectLoadingState } from '#ui/providers/loading-state'
 
+import { useEntryMenu } from '../composables/entry-menu'
 import { useFileColumns } from '../composables/file-columns'
 import { injectFileBrowserUI } from '../providers/file-browser-ui'
+import { parentInfoFrom } from '../utils'
+import FileEmptyWorkspace from './FileEmptyWorkspace.vue'
 import FileManagerError from './FileManagerError.vue'
 import FileNavbar from './FileNavbar.vue'
 import FileRow from './FileRow.vue'
@@ -191,6 +196,23 @@ const props = withDefaults(
 
 const sidebarOpen = computed(() => ui.sidebarOpen.value)
 const isFileActive = computed(() => ui.fileTabs.activeLocation.value.type === 'file')
+/** In the advanced view every tab can be closed, which leaves an empty workspace. */
+const hasTabs = computed(() => ui.fileTabs.tabs.value.length > 0)
+
+const { openMenu } = useEntryMenu()
+
+/** Right-click on the folder's empty space (rows open their own menu and prevent this one). */
+function openFolderMenu(event: MouseEvent) {
+	if (event.defaultPrevented) return
+	openMenu(event, ui.currentDirectory.value)
+}
+
+/** Right-click on a breadcrumb, `depth` segments deep (the last one is the active location). */
+function openBreadcrumbMenu(event: MouseEvent, depth: number) {
+	const location = ui.activeLocation.value
+	const segments = location.path.split('/').filter(Boolean)
+	openMenu(event, depth >= segments.length ? location : parentInfoFrom(location, depth))
+}
 
 const filteredItems = computed(() => ui.filteredItems.value)
 

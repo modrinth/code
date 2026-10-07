@@ -9,6 +9,7 @@ import {
 	onScopeDispose,
 	type Ref,
 	ref,
+	shallowReactive,
 	watch,
 } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -591,7 +592,9 @@ function cancelUpload() {
 	fileUploadSession.cancelUpload()
 }
 
-const fileQueries = new Map<string, FileItemResultFrom<'file' | 'directory'> & FileQueryResult>()
+const fileQueries = shallowReactive(
+	new Map<string, FileItemResultFrom<'file' | 'directory'> & FileQueryResult>(),
+)
 
 /** Files and directories are cached apart, so a lookup can never return the other kind's result. */
 function queryCacheKey(info: FileInfo) {
@@ -626,6 +629,11 @@ const directoryTree = {
 		return query as FileItemResultFrom<T> & FileQueryResult
 	},
 	expandedEntries: expandedDirectories,
+	loadedEntries: computed(() =>
+		[...fileQueries.values()].flatMap((entry) =>
+			entry.type === 'directory' ? (entry as DirectoryResult).data.value : [],
+		),
+	),
 } satisfies DirectoryTree
 
 // Provide the file manager context

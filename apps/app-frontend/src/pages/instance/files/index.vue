@@ -182,6 +182,11 @@ const directoryTree = {
 		)
 	},
 	expandedEntries: expandedDirectories,
+	loadedEntries: computed(() =>
+		[...fileQueries.values()].flatMap((entry) =>
+			entry.type === 'directory' ? (entry as DirectoryResult).data.value : [],
+		),
+	),
 } satisfies DirectoryTree
 
 /** Paths of every loaded entry marked read-only, so lookups don't rescan all listings per row. */

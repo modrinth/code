@@ -3,7 +3,7 @@
 		:delay="{ hover: 850, unhover: 100 }"
 		:hoverable="true"
 		:allow-transfer="false"
-		:disabled="hiddenDetails.length === 0"
+		:disabled="hiddenDetails.length === 0 && customDetails.length === 0"
 	>
 		<li
 			role="option"
@@ -133,40 +133,33 @@
 						{{ columnValues[key] }}
 					</span>
 				</div>
+				<div
+					v-for="detail in customDetails"
+					:key="detail.id"
+					class="gap-1 grid grid-cols-2 items-center"
+				>
+					<span class="text-nowrap text-sm text-secondary">{{ detail.label }}</span>
+					<FileDetailValue :detail="detail" :entry="file" />
+				</div>
 			</div>
 		</template>
 	</Tooltip>
 </template>
 
 <script setup lang="ts">
-import {
-	ChevronRightIcon,
-	ClipboardCopyIcon,
-	DownloadIcon,
-	EditIcon,
-	FileIcon,
-	FolderArchiveIcon,
-	FolderOpenIcon,
-	MoreHorizontalIcon,
-	PackageOpenIcon,
-	PlusIcon,
-	RightArrowIcon,
-	TrashIcon,
-} from '@modrinth/assets'
-import { computed, ref, toValue } from 'vue'
+import { ChevronRightIcon, EditIcon, MoreHorizontalIcon } from '@modrinth/assets'
+import { computed, ref } from 'vue'
 
 import { Tooltip } from '#ui/components'
-import type { ButtonMenuLeafOption, ButtonMenuOption } from '#ui/components/base/buttons'
 import { TeleportOverflowMenu } from '#ui/components/base/buttons'
 import Checkbox from '#ui/components/base/Checkbox.vue'
 import { useFormatBytes } from '#ui/composables'
 import { useFormatDateTime } from '#ui/composables/format-date-time'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { useFileActions } from '#ui/layouts/shared/files-tab/composables/folder-actions.ts'
-import { injectNotificationManager } from '#ui/providers/web-notifications'
 import { commonMessages } from '#ui/utils/common-messages'
-import { canOpenInFileEditor, getFileExtension } from '#ui/utils/file-extensions'
+import { canOpenInFileEditor } from '#ui/utils/file-extensions'
 
+import { useEntryMenu } from '../composables/entry-menu'
 import { FILE_COLUMNS, FILE_COLUMNS_ORDER, type FileColumn } from '../composables/file-columns'
 import {
 	fileDragActive,
@@ -177,11 +170,12 @@ import {
 } from '../composables/file-drag-state'
 import { injectFileBrowserUI } from '../providers/file-browser-ui'
 import type { FileItem } from '../types'
-import { childPath, fileIconFor, infoFrom, joinDisplayPath } from '../utils'
+import { childPath, fileIconFor } from '../utils'
+import FileDetailValue from './FileDetailValue.vue'
 
 const { formatMessage } = useVIntl()
-const { addNotification } = injectNotificationManager()
 const ui = injectFileBrowserUI()
+const { menuFor, openMenu } = useEntryMenu()
 
 const basePaddingFactor = 0.75
 
@@ -189,10 +183,6 @@ const messages = defineMessages({
 	itemCount: {
 		id: 'files.row.item-count',
 		defaultMessage: '{count, plural, one {# item} other {# items}}',
-	},
-	createZip: {
-		id: 'files.row.create-zip',
-		defaultMessage: 'Create ZIP',
 	},
 	size: {
 		id: 'files.table-header.size',
@@ -213,14 +203,6 @@ const messages = defineMessages({
 	modified: {
 		id: 'files.table-header.modified',
 		defaultMessage: 'Modified',
-	},
-	openInNewTab: {
-		id: 'files.row.open-in-new-tab',
-		defaultMessage: 'Open in new tab',
-	},
-	newOrUpload: {
-		id: 'files.row.upload-or-create',
-		defaultMessage: 'New Entry',
 	},
 	expandFolder: {
 		id: 'files.row.expand-folder',
@@ -267,11 +249,6 @@ const emit = defineEmits<{
 }>()
 
 const selected = computed(() => ui.selectedItems.value.has(props.file.path))
-const readOnly = computed(() => !!ui.isReadOnly?.(props.file))
-const writeDisabled = computed(() => ui.isBusy.value || readOnly.value)
-const writeDisabledTooltip = computed(() =>
-	readOnly.value ? toValue(ui.readOnlyReason) : ui.busyTooltip.value,
-)
 
 const canExpand = computed(
 	() => !!props.isTreeRow && props.file.type === 'directory' && props.expandable !== false,
@@ -328,129 +305,13 @@ const containerClasses = computed(() => {
 	]
 })
 
-const fileExtension = computed(() => getFileExtension(props.file.name))
-
-const canExtract = computed(() => fileExtension.value === 'zip' && !!ui.extractFile)
-
-function getFullPath() {
-	return joinDisplayPath(toValue(ui.basePath), props.file.path)
-}
-
-const { options } = useFileActions(
-	(type) => ui.showCreateModal(type),
-	() => ui.initiateFileUpload(),
+const menuOptions = computed(() =>
+	menuFor(props.file, { selectable: props.selectionWithinActionMenu }),
 )
 
-const menuOptions = computed<ButtonMenuOption[]>(() => {
-	const item = infoFrom(props.file)
-	const wd = writeDisabled.value
-	const wdTooltip = writeDisabledTooltip.value
-	return [
-		{
-			type: 'submenu',
-			id: 'upload-create',
-			label: formatMessage(messages.newOrUpload),
-			icon: FileIcon,
-			options: options.value as ButtonMenuLeafOption[],
-		},
-		{
-			id: 'select-entry',
-			label: formatMessage(commonMessages.selectEntryLabel),
-			icon: iconStyle.value.icon,
-			action: () => ui.toggleItemSelection(props.file),
-			shown: props.selectionWithinActionMenu,
-		},
-		{
-			id: 'open-in-new-tab',
-			label: formatMessage(messages.openInNewTab),
-			icon: PlusIcon,
-			shown: canOpenInTab.value,
-			action: () => ui.handleOpenInNewTab(item),
-		},
-		{ type: 'divider' },
-		{
-			id: 'copy-filename',
-			label: formatMessage(commonMessages.copyFilenameButton),
-			icon: ClipboardCopyIcon,
-			action: () => {
-				navigator.clipboard.writeText(props.file.name)
-				addNotification({
-					title: formatMessage(commonMessages.copiedFilenameLabel),
-					type: 'success',
-				})
-			},
-		},
-		{
-			id: 'copy-full-path',
-			label: formatMessage(commonMessages.copyFullPathButton),
-			icon: ClipboardCopyIcon,
-			action: () => {
-				navigator.clipboard.writeText(getFullPath())
-				addNotification({ title: formatMessage(commonMessages.copiedPathLabel), type: 'success' })
-			},
-		},
-		{
-			id: 'open-in-folder',
-			label: formatMessage(commonMessages.openInFolderButton),
-			icon: FolderOpenIcon,
-			shown: !!ui.openInFolder,
-			action: () => ui.openInFolder?.(getFullPath()),
-		},
-		{ type: 'divider' },
-		{
-			id: 'extract',
-			label: formatMessage(commonMessages.extractButton),
-			icon: PackageOpenIcon,
-			shown: canExtract.value,
-			disabled: wd,
-			tooltip: wd ? wdTooltip : undefined,
-			action: () => ui.handleExtractItem(item),
-		},
-		{ type: 'divider', shown: canExtract.value },
-		{
-			id: 'zip',
-			label: formatMessage(messages.createZip),
-			icon: FolderArchiveIcon,
-			shown: props.file.type === 'directory' && !!ui.zipFolder,
-			disabled: wd,
-			tooltip: wd ? wdTooltip : undefined,
-			action: () => ui.zipFolder?.(item),
-		},
-		{ type: 'divider', shown: props.file.type === 'directory' && !!ui.zipFolder },
-		{
-			id: 'rename',
-			label: formatMessage(commonMessages.renameButton),
-			icon: EditIcon,
-			disabled: wd,
-			tooltip: wd ? wdTooltip : undefined,
-			action: () => ui.showRenameModal(props.file),
-		},
-		{
-			id: 'move',
-			label: formatMessage(commonMessages.moveButton),
-			icon: RightArrowIcon,
-			disabled: wd,
-			tooltip: wd ? wdTooltip : undefined,
-			action: () => ui.showMoveModal(props.file),
-		},
-		{
-			id: 'download',
-			label: ui.downloadButtonLabel ?? formatMessage(commonMessages.downloadButton),
-			icon: DownloadIcon,
-			action: () => ui.downloadFile(item),
-			shown: props.file.type !== 'directory',
-		},
-		{
-			id: 'delete',
-			label: formatMessage(commonMessages.deleteLabel),
-			icon: TrashIcon,
-			disabled: wd,
-			tooltip: wd ? wdTooltip : undefined,
-			action: () => ui.showDeleteModal(props.file),
-			tone: 'red',
-		},
-	]
-})
+const customDetails = computed(() =>
+	(ui.entryDetails ?? []).filter((detail) => detail.shown?.(props.file) ?? true),
+)
 
 const iconStyle = computed(() => fileIconFor(props.file))
 
@@ -496,8 +357,7 @@ const hiddenDetails = computed(() => {
 })
 
 function openContextMenu(event: MouseEvent) {
-	event.preventDefault()
-	ui.handleContextMenu(event, menuOptions.value)
+	openMenu(event, props.file, { selectable: props.selectionWithinActionMenu })
 }
 
 function handleMouseEnter() {

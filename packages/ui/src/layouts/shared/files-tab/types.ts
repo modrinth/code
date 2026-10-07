@@ -1,3 +1,6 @@
+import type { Component } from 'vue'
+
+import type { ButtonMenuItemBase } from '#ui/components/base/buttons/types'
 import type { FileInfo } from '#ui/layouts/shared/files-tab/providers/file-manager.ts'
 
 export interface FileItem {
@@ -49,6 +52,29 @@ export interface RenameOperation extends UndoableOperation {
 }
 
 export type Operation = MoveOperation | RenameOperation
+
+/** A custom action offered in the menus of files and folders, next to the built-in ones. */
+export interface FileEntryAction {
+	id: string
+	label: string
+	icon?: Component
+	tone?: ButtonMenuItemBase['tone']
+	/** Whether the action applies to the entry; offered for every entry when omitted. */
+	shown?: (entry: FileInfo) => boolean
+	/** Whether the action changes files, which disables it while busy or for read-only entries. */
+	writes?: boolean
+	action: (entry: FileInfo) => void | Promise<void>
+}
+
+/** A custom detail listed after the built-in ones (size, items, dates) in an entry's details. */
+export interface FileEntryDetail {
+	id: string
+	label: string
+	/** Whether the detail applies to the entry; listed for every entry when omitted. */
+	shown?: (entry: FileItem) => boolean
+	/** The entry's value, or `null` when it has none. Promises are awaited once the details show. */
+	value: (entry: FileItem) => string | null | Promise<string | null>
+}
 
 export interface ExtractDryRunResult {
 	modpack_name: string | null

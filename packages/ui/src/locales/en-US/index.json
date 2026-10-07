@@ -1538,6 +1538,18 @@
   "files.editor.save-failed-title": {
     "defaultMessage": "Save failed"
   },
+  "files.empty-workspace.description": {
+    "defaultMessage": "Open a folder or file to get started."
+  },
+  "files.empty-workspace.open-home": {
+    "defaultMessage": "Open home folder"
+  },
+  "files.empty-workspace.recently-closed": {
+    "defaultMessage": "Recently closed"
+  },
+  "files.empty-workspace.title": {
+    "defaultMessage": "No open tabs"
+  },
   "files.error.go-to-home": {
     "defaultMessage": "Go to home folder"
   },
@@ -1739,6 +1751,15 @@
   "files.row.upload-or-create": {
     "defaultMessage": "New Entry"
   },
+  "files.search.loaded-only": {
+    "defaultMessage": "Searching folders that have been opened"
+  },
+  "files.search.no-results": {
+    "defaultMessage": "No matching files or folders"
+  },
+  "files.search.placeholder": {
+    "defaultMessage": "Go to file or folder"
+  },
   "files.table-header.advanced-view": {
     "defaultMessage": "Advanced view"
   },
@@ -1769,8 +1790,20 @@
   "files.table-header.view-settings": {
     "defaultMessage": "View settings"
   },
+  "files.tabs.all-tabs": {
+    "defaultMessage": "All tabs"
+  },
+  "files.tabs.close-all-tabs": {
+    "defaultMessage": "Close all tabs"
+  },
+  "files.tabs.close-other-tabs": {
+    "defaultMessage": "Close other tabs"
+  },
   "files.tabs.close-tab": {
     "defaultMessage": "Close {name}"
+  },
+  "files.tabs.close-this-tab": {
+    "defaultMessage": "Close tab"
   },
   "files.tabs.home": {
     "defaultMessage": "Home"

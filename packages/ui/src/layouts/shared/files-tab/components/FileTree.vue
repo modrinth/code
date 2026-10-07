@@ -98,7 +98,6 @@ function activeGuideLevel(path: string) {
 	return path.startsWith(`${activeDirectory.value.path}/`) ? activeDirectoryDepth.value : undefined
 }
 const expandedPaths = computed(() => new Set(tree.expandedEntries.value))
-const query = computed(() => ui.searchQuery.value.trim().toLowerCase())
 
 /** Directories known to be empty can't be expanded; an unknown count stays expandable. */
 function isExpandable(item: FileItem) {
@@ -118,7 +117,7 @@ function collectRows(path: string, depth: number): TreeRow[] {
 
 	if (items.length === 0) {
 		if (entries.isLoading.value) return [{ type: 'loading', key: `loading:${path}`, depth }]
-		return query.value ? [] : [{ type: 'empty', key: `empty:${path}`, depth }]
+		return [{ type: 'empty', key: `empty:${path}`, depth }]
 	}
 
 	const rows: TreeRow[] = []
@@ -126,12 +125,6 @@ function collectRows(path: string, depth: number): TreeRow[] {
 		const expandable = isExpandable(item)
 		const expanded = expandable && expandedPaths.value.has(item.path)
 		const children = expanded ? collectRows(item.path, depth + 1) : []
-
-		if (query.value) {
-			const matches = item.name.toLowerCase().includes(query.value)
-			const hasMatchingChild = children.some((child) => child.type === 'item')
-			if (!matches && !hasMatchingChild) continue
-		}
 
 		rows.push(
 			{ type: 'item', key: item.path, item, path: item.path, depth, expanded, expandable },

@@ -8,6 +8,8 @@
 			:right-header-actions-component="FileTabsActions"
 			default-renderer="always"
 			disable-floating-groups
+			disable-tabs-overflow-list
+			no-panels-overlay="emptyGroup"
 			@ready="ui.fileTabs.onReady"
 		/>
 	</div>

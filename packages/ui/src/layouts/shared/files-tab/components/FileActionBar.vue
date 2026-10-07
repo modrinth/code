@@ -86,19 +86,6 @@
 				</IconButton>
 			</div>
 		</div>
-		<div v-if="!hasNav && !isEditing" class="flex items-center gap-2">
-			<Input
-				:model-value="searchQuery"
-				:icon="SearchIcon"
-				type="search"
-				name="search"
-				autocomplete="off"
-				:placeholder="formatMessage(messages.searchFiles)"
-				size="medium"
-				wrapper-class="flex-1 min-w-0"
-				@update:model-value="$emit('update:searchQuery', $event)"
-			/>
-		</div>
 	</header>
 </template>
 
@@ -213,6 +200,7 @@ export type Properties = {
 }
 
 const props = withDefaults(defineProps<Properties>(), {
+	disabledTooltip: undefined,
 	hasNav: false,
 	smallMode: false,
 	sidebarToggleable: true,

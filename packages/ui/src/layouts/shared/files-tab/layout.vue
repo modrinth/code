@@ -248,11 +248,19 @@ const messages = defineMessages({
 	},
 })
 
-const props = defineProps<{
-	showDebugInfo?: boolean
-	showRefreshButton?: boolean
-	constrainWidth?: boolean
-}>()
+const props = withDefaults(
+	defineProps<{
+		showDebugInfo?: boolean
+		showRefreshButton?: boolean
+		constrainWidth?: boolean
+		/**
+		 * Whether the sidebar search notes that it only covers folders opened so far. Hosts whose
+		 * `loadedEntries` cover the whole file system can turn it off.
+		 */
+		searchLoadedOnlyNotice?: boolean
+	}>(),
+	{ searchLoadedOnlyNotice: true },
+)
 
 const { addNotification } = injectNotificationManager()
 const ctx = injectFileManager()
@@ -396,7 +404,7 @@ const uploadZipUrlModal = ref<InstanceType<typeof FileUploadZipUrlModal>>()
 const contextMenuRef = ref<InstanceType<typeof ContextMenu>>()
 
 const newItemType = ref<'file' | 'directory'>('file')
-const selectedItem = ref<FileItem | null>(null)
+const selectedItem = ref<FileInfo | null>(null)
 
 const unsavedChangesModal = ref<InstanceType<typeof FileUnsavedChangesModal>>()
 
@@ -696,19 +704,19 @@ function showUnzipFromUrlModal(cf: boolean) {
 	uploadZipUrlModal.value?.show(cf)
 }
 
-function showRenameModal(item: FileItem) {
+function showRenameModal(item: FileInfo) {
 	if (isBusy.value || ctx.isReadOnly?.(item)) return
 	selectedItem.value = item
 	renameItemModal.value?.show(item)
 }
 
-function showMoveModal(item: FileItem) {
+function showMoveModal(item: FileInfo) {
 	if (isBusy.value || ctx.isReadOnly?.(item)) return
 	selectedItem.value = item
 	moveItemModal.value?.show()
 }
 
-function showDeleteModal(item: FileItem) {
+function showDeleteModal(item: FileInfo) {
 	if (isBusy.value || ctx.isReadOnly?.(item)) return
 	selectedItem.value = item
 	deleteItemModal.value?.show()
@@ -804,6 +812,7 @@ provideFileBrowserUI({
 	baseId,
 	showDebugInfo: computed(() => props.showDebugInfo ?? false),
 	showRefreshButton: computed(() => props.showRefreshButton ?? false),
+	searchLoadedOnlyNotice: computed(() => props.searchLoadedOnlyNotice),
 	reworkEnabled,
 	advancedView,
 	setAdvancedView,

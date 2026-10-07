@@ -3,6 +3,7 @@ import type { ComputedRef, MaybeRefOrGetter, Ref } from 'vue'
 import { computed, ref, shallowReactive, shallowRef, toValue, watch } from 'vue'
 
 import {
+	infoFrom,
 	isSameInfo,
 	isWithinPath,
 	parentInfoFrom,
@@ -19,6 +20,10 @@ const MAX_HISTORY_LENGTH = 50
 const PENDING_LOCATION_TIMEOUT = 1000
 const WORKSPACE_STORAGE_PREFIX = 'files-workspace:'
 const WORKSPACE_VERSION = 1
+const MAX_RECENTLY_CLOSED = 10
+
+/** Where the workspace points while every tab is closed. */
+const ROOT_LOCATION = infoFrom('/')
 
 /** A browser-like tab: its own history of visited directories and files. */
 export interface FileTab {
@@ -54,14 +59,15 @@ export interface FileTabsOptions {
 	 * workspace's tabs; `null` keeps the tabs in memory only.
 	 */
 	workspaceId: MaybeRefOrGetter<string | null>
-	/** Whether the tab strip is shown and further tabs can be opened. */
+	/** Whether the tab strip is shown, further tabs can be opened and every tab can be closed. */
 	enabled: MaybeRefOrGetter<boolean>
 }
 
 export interface FileTabs {
 	tabs: Ref<FileTab[]>
 	activeTabId: Ref<string>
-	activeTab: ComputedRef<FileTab>
+	/** The active tab, or `null` while every tab is closed. */
+	activeTab: ComputedRef<FileTab | null>
 	activeLocation: ComputedRef<FileInfo>
 	canGoBack: ComputedRef<boolean>
 	canGoForward: ComputedRef<boolean>
@@ -75,6 +81,13 @@ export interface FileTabs {
 	openTab: (location: FileInfo) => void
 	activateTab: (id: string) => void
 	closeTab: (id: string) => Promise<void>
+	closeOtherTabs: (id: string) => Promise<void>
+	closeAllTabs: () => Promise<void>
+	/** Whether the tab can be closed; the last tab only can while tabs are enabled. */
+	canClose: ComputedRef<boolean>
+	/** Recently closed tabs, most recent first, with their history intact. */
+	recentlyClosed: Ref<FileTab[]>
+	reopenTab: (tab: FileTab) => void
 	closeFile: (tabId: string) => void
 	/** Prompts about unsaved changes in editors of files at or beneath any of `paths`. */
 	confirmDiscardWithin: (paths: string[]) => Promise<boolean>
@@ -120,10 +133,9 @@ function loadWorkspace(workspaceId: string | null): FileWorkspaceState | null {
 		const state = JSON.parse(raw) as Partial<FileWorkspaceState>
 		if (state.version !== WORKSPACE_VERSION || !Array.isArray(state.tabs)) return null
 		const tabs = state.tabs.filter(isFileTab)
-		if (tabs.length === 0) return null
 		const activeTabId = tabs.some((tab) => tab.id === state.activeTabId)
 			? state.activeTabId!
-			: tabs[0].id
+			: (tabs[0]?.id ?? '')
 		return { version: WORKSPACE_VERSION, tabs, activeTabId }
 	} catch {
 		return null
@@ -179,12 +191,20 @@ export function useFileTabs(options: FileTabsOptions): FileTabs {
 	const tabs = ref<FileTab[]>([initialTab])
 	const activeTabId = ref(initialTab.id)
 
+	const recentlyClosed = ref<FileTab[]>([])
+
 	const activeTab = computed(
-		() => tabs.value.find((tab) => tab.id === activeTabId.value) ?? tabs.value[0],
+		() => tabs.value.find((tab) => tab.id === activeTabId.value) ?? tabs.value[0] ?? null,
 	)
-	const activeLocation = computed(() => currentLocation(activeTab.value))
-	const canGoBack = computed(() => activeTab.value.index > 0)
-	const canGoForward = computed(() => activeTab.value.index < activeTab.value.history.length - 1)
+	const activeLocation = computed(() =>
+		activeTab.value ? currentLocation(activeTab.value) : ROOT_LOCATION,
+	)
+	const canGoBack = computed(() => (activeTab.value?.index ?? 0) > 0)
+	const canGoForward = computed(() => {
+		const tab = activeTab.value
+		return !!tab && tab.index < tab.history.length - 1
+	})
+	const canClose = computed(() => tabs.value.length > 1 || toValue(options.enabled))
 
 	const editors = shallowReactive(new Map<string, FileEditorBridge>())
 	const activeEditor = computed(() => editors.get(activeTabId.value) ?? null)
@@ -228,13 +248,20 @@ export function useFileTabs(options: FileTabsOptions): FileTabs {
 
 	watch(
 		contextLocation,
-		(location) => {
+		(location, previous) => {
+			// Hosts may hand back an equal location as a new object (e.g. echoed from the router).
+			if (previous && isSameInfo(location, previous)) return
 			if (pendingLocation) {
 				if (!isSameInfo(location, pendingLocation)) return
 				pendingLocation = null
 				clearTimeout(pendingTimeout)
+				return
 			}
-			pushLocation(activeTab.value, location)
+			if (activeTab.value) {
+				pushLocation(activeTab.value, location)
+			} else {
+				openTab(location)
+			}
 		},
 		{ flush: 'post' },
 	)
@@ -255,9 +282,16 @@ export function useFileTabs(options: FileTabsOptions): FileTabs {
 		activeTabId.value = state.activeTabId
 
 		const location = contextLocation.value
+		const tab = activeTab.value
 		if (!isRootDirectory(location)) {
-			pushLocation(activeTab.value, location)
-		} else {
+			if (tab) {
+				pushLocation(tab, location)
+			} else {
+				const opened = createTab(location)
+				tabs.value = [opened]
+				activeTabId.value = opened.id
+			}
+		} else if (tab) {
 			applyToContext(activeLocation.value)
 		}
 	}
@@ -286,6 +320,10 @@ export function useFileTabs(options: FileTabsOptions): FileTabs {
 
 	async function navigate(location: FileInfo) {
 		const tab = activeTab.value
+		if (!tab) {
+			openTab(location)
+			return
+		}
 		if (!isSameInfo(currentLocation(tab), location)) {
 			if (!(await confirmLeave(tab))) return
 			pushLocation(tab, location)
@@ -295,6 +333,7 @@ export function useFileTabs(options: FileTabsOptions): FileTabs {
 
 	async function go(delta: number) {
 		const tab = activeTab.value
+		if (!tab) return
 		const target = tab.index + delta
 		if (target < 0 || target >= tab.history.length) return
 		if (!(await confirmLeave(tab))) return
@@ -332,6 +371,8 @@ export function useFileTabs(options: FileTabsOptions): FileTabs {
 		try {
 			dockview.clear()
 			for (const tab of tabs.value) addPanel(tab, true)
+			if (tabs.value.length === 0) dockview.addGroup()
+			applyHeaderVisibility()
 			dockview.getPanel(activeTabId.value)?.api.setActive()
 		} finally {
 			renderingPanels = false
@@ -369,19 +410,65 @@ export function useFileTabs(options: FileTabsOptions): FileTabs {
 		activateTab(tab.id)
 	}
 
-	async function closeTab(id: string) {
-		if (tabs.value.length <= 1) return
-		const index = tabs.value.findIndex((tab) => tab.id === id)
-		const tab = tabs.value[index]
-		if (!tab || !(await confirmLeave(tab))) return
+	/** Removes a tab without asking about unsaved changes, remembering it to reopen later. */
+	function removeTab(tab: FileTab) {
+		const index = tabs.value.indexOf(tab)
+		if (index === -1) return
 
 		tabs.value.splice(index, 1)
-		editors.delete(id)
-		api.value?.getPanel(id)?.api.close()
+		editors.delete(tab.id)
+		api.value?.getPanel(tab.id)?.api.close()
+		recentlyClosed.value = [tab, ...recentlyClosed.value].slice(0, MAX_RECENTLY_CLOSED)
 
-		if (activeTabId.value === id) {
-			activateTab((tabs.value[index] ?? tabs.value[index - 1]).id)
+		if (activeTabId.value !== tab.id) return
+		const next = tabs.value[index] ?? tabs.value[index - 1]
+		if (next) {
+			activateTab(next.id)
+		} else {
+			activeTabId.value = ''
+			applyToContext(ROOT_LOCATION)
 		}
+	}
+
+	/** Closes the given tabs, asking about all of their unsaved changes at once. */
+	async function closeTabs(ids: string[]) {
+		const closing = tabs.value.filter((tab) => ids.includes(tab.id))
+		if (closing.length === 0) return
+		if (closing.length === tabs.value.length && !toValue(options.enabled)) return
+
+		const dirty = closing.flatMap((tab) => {
+			const editor = editors.get(tab.id)
+			return currentLocation(tab).type === 'file' && editor ? [editor] : []
+		})
+		if (!(await options.confirmDiscard(dirty))) return
+
+		for (const tab of closing) removeTab(tab)
+	}
+
+	async function closeTab(id: string) {
+		const tab = getTab(id)
+		if (!tab || !canClose.value || !(await confirmLeave(tab))) return
+		removeTab(tab)
+	}
+
+	async function closeOtherTabs(id: string) {
+		await closeTabs(tabs.value.filter((tab) => tab.id !== id).map((tab) => tab.id))
+		activateTab(id)
+	}
+
+	async function closeAllTabs() {
+		await closeTabs(tabs.value.map((tab) => tab.id))
+	}
+
+	function reopenTab(tab: FileTab) {
+		recentlyClosed.value = recentlyClosed.value.filter((closed) => closed !== tab)
+		if (!toValue(options.enabled)) {
+			navigate(currentLocation(tab))
+			return
+		}
+		tabs.value.push(tab)
+		addPanel(tab)
+		activateTab(tab.id)
 	}
 
 	function closeFile(tabId: string) {
@@ -410,7 +497,7 @@ export function useFileTabs(options: FileTabsOptions): FileTabs {
 
 	/** Rewrites every tab's history through `map`, collapsing neighbouring entries that end up the same. */
 	function remapLocations(map: (location: FileInfo) => FileInfo) {
-		for (const tab of tabs.value) {
+		for (const tab of [...tabs.value, ...recentlyClosed.value]) {
 			const history: FileInfo[] = []
 			let index = 0
 			tab.history.forEach((entry, entryIndex) => {
@@ -422,7 +509,7 @@ export function useFileTabs(options: FileTabsOptions): FileTabs {
 			tab.history = history
 			tab.index = index
 		}
-		applyToContext(activeLocation.value)
+		if (activeTab.value) applyToContext(activeLocation.value)
 	}
 
 	function relocate(from: FileInfo, to: FileInfo) {
@@ -484,6 +571,11 @@ export function useFileTabs(options: FileTabsOptions): FileTabs {
 		openTab,
 		activateTab,
 		closeTab,
+		closeOtherTabs,
+		closeAllTabs,
+		canClose,
+		recentlyClosed,
+		reopenTab,
 		closeFile,
 		confirmDiscardWithin,
 		relocate,

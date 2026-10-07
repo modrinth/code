@@ -3,7 +3,14 @@ import type { ComputedRef, MaybeRefOrGetter, Ref } from 'vue'
 
 import { createContext } from '#ui/providers/create-context'
 
-import type { ExtractDryRunResult, FileItem, FileOperation, UploadState } from '../types'
+import type {
+	ExtractDryRunResult,
+	FileEntryAction,
+	FileEntryDetail,
+	FileItem,
+	FileOperation,
+	UploadState,
+} from '../types'
 
 export type FileInfo<T extends FileTypes = FileTypes> = Pick<FileItem, 'path'> & {
 	name: string
@@ -42,6 +49,8 @@ export interface DirectoryTree {
 	prefetch: <T extends FileTypes>(file: FileInfo<T>) => void
 	/** Absolute paths of the directories expanded in the tree. Owned by the host so it survives remounts. */
 	expandedEntries: Ref<string[]>
+	/** Every entry of the listings loaded so far, which the sidebar search looks through. */
+	loadedEntries?: ComputedRef<FileItem[]>
 }
 
 export interface FileManagerContext {
@@ -109,6 +118,11 @@ export interface FileManagerContext {
 	restartServer?: () => Promise<void>
 	canShareToMclogs?: boolean
 	shareToMclogs?: (content: string) => Promise<void>
+
+	/** Extra actions offered in the menus of files and folders. */
+	entryActions?: FileEntryAction[]
+	/** Extra details listed in an entry's details, e.g. a hash. */
+	entryDetails?: FileEntryDetail[]
 }
 
 export const [injectFileManager, provideFileManager] = createContext<FileManagerContext>(

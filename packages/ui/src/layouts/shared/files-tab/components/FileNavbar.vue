@@ -56,6 +56,7 @@
 								:class="{ '!text-contrast': breadcrumbs.length == 0 }"
 								@click="$emit('navigateHome')"
 								@mouseenter="$emit('prefetchHome')"
+								@contextmenu.prevent="$emit('contextmenu', $event, 0)"
 							>
 								<HomeIcon />
 								<span>Home</span>
@@ -83,6 +84,7 @@
 										if (index < breadcrumbs.length - 1) $emit('navigate', index + 1)
 									}
 								"
+								@contextmenu.prevent="$emit('contextmenu', $event, index + 1)"
 							>
 								{{ segment || '' }}
 							</Button>
@@ -165,6 +167,8 @@ defineEmits<{
 	prefetchHome?: []
 	back: []
 	forward: []
+	/** Right-click on a breadcrumb; `depth` is how many path segments it covers (0 for home). */
+	contextmenu: [event: MouseEvent, depth: number]
 }>()
 
 const breadcrumbOuter = ref<HTMLElement | null>(null)

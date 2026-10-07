@@ -4,6 +4,7 @@
 		:class="canClose ? 'pr-1' : 'pr-3'"
 		:title="location?.path"
 		@auxclick.prevent="(event) => event.button === 1 && close()"
+		@contextmenu.prevent.stop="openMenu"
 	>
 		<component :is="iconStyle.icon" class="size-4 shrink-0" :class="iconStyle.color" />
 		<span class="truncate" :class="isActive ? 'font-semibold text-contrast' : 'text-secondary'">
@@ -66,6 +67,18 @@ const messages = defineMessages({
 		id: 'files.tabs.home',
 		defaultMessage: 'Home',
 	},
+	closeThisTab: {
+		id: 'files.tabs.close-this-tab',
+		defaultMessage: 'Close tab',
+	},
+	closeOtherTabs: {
+		id: 'files.tabs.close-other-tabs',
+		defaultMessage: 'Close other tabs',
+	},
+	closeAllTabs: {
+		id: 'files.tabs.close-all-tabs',
+		defaultMessage: 'Close all tabs',
+	},
 })
 
 const ui = injectFileBrowserUI()
@@ -87,8 +100,33 @@ const iconStyle = computed(() => {
 	return ui.coloredIcons.value ? style : { ...style, color: 'text-secondary' }
 })
 const isActive = computed(() => ui.fileTabs.activeTabId.value === tabId)
-const canClose = computed(() => ui.fileTabs.tabs.value.length > 1)
+const canClose = computed(() => ui.fileTabs.canClose.value)
 const isDirty = computed(() => ui.fileTabs.editors.get(tabId)?.hasUnsavedChanges.value ?? false)
+
+function openMenu(event: MouseEvent) {
+	const hasOthers = ui.fileTabs.tabs.value.length > 1
+	ui.handleContextMenu(event, [
+		{
+			id: 'close-tab',
+			label: formatMessage(messages.closeThisTab),
+			icon: XIcon,
+			disabled: !canClose.value,
+			action: close,
+		},
+		{
+			id: 'close-other-tabs',
+			label: formatMessage(messages.closeOtherTabs),
+			disabled: !hasOthers,
+			action: () => ui.fileTabs.closeOtherTabs(tabId),
+		},
+		{
+			id: 'close-all-tabs',
+			label: formatMessage(messages.closeAllTabs),
+			disabled: !canClose.value,
+			action: () => ui.fileTabs.closeAllTabs(),
+		},
+	])
+}
 
 function close() {
 	ui.fileTabs.closeTab(tabId)
