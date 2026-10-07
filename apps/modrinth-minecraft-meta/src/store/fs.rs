@@ -4,6 +4,7 @@ use anyhow::{Context, Result};
 use tokio::{fs, io::AsyncWriteExt};
 use tracing::{info_span, warn};
 use tracing_anyhow::FutureContext;
+use url::Url;
 use uuid::Uuid;
 
 use crate::store::{StoreOps, StoreVisibility};
@@ -27,10 +28,18 @@ pub async fn new(visibility: StoreVisibility) -> Result<FsStore> {
     fs::create_dir_all(&root)
         .context(info_span!("creating blobs dir"))
         .await?;
+    let root = fs::canonicalize(root)
+        .context(info_span!("canonicalizing root dir"))
+        .await?;
     Ok(FsStore { root })
 }
 
 impl StoreOps for FsStore {
+    fn url_for(&self, path: &str) -> Url {
+        let path = self.root.join(path);
+        Url::from_file_path(path).expect("path should be absolute")
+    }
+
     fn get<'a>(
         &self,
         path: &'a str,

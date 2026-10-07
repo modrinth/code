@@ -4,6 +4,7 @@ mod maven;
 
 pub use cas::BlobCas;
 pub use maven::MavenStore;
+use url::Url;
 
 use std::{fmt::Debug, pin::Pin, sync::Arc};
 
@@ -37,6 +38,11 @@ impl BlobStore {
         })
     }
 
+    /// Get the [`Url`] for a file at a specific `path`.
+    pub fn url_for(&self, path: &str) -> Url {
+        self.imp.url_for(path)
+    }
+
     /// Get a blob at a `path`.
     ///
     /// The `path` here may be vulnerable to directory traversal if using the
@@ -53,6 +59,8 @@ impl BlobStore {
 }
 
 trait StoreOps: Send + Sync + Debug + 'static {
+    fn url_for(&self, path: &str) -> Url;
+
     fn get<'a>(
         &self,
         path: &'a str,

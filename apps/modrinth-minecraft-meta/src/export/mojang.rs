@@ -7,12 +7,19 @@ use tracing_anyhow::FutureContext;
 
 use crate::{
     AppState, model,
-    store::BlobCas,
+    store::{BlobCas, BlobStore},
     upstream::mojang,
     util::{Sha1, from_json_slice},
 };
 
 pub const FORMAT_VERSION: u32 = 0;
+
+struct VersionManifestExport {
+    version: mojang::Version,
+    manifest: mojang::VersionManifest,
+    json: String,
+    url: url::Url,
+}
 
 pub async fn export(app: &AppState) -> Result<()> {
     let mut conn = app
@@ -94,52 +101,33 @@ pub async fn export(app: &AppState) -> Result<()> {
                 catalog_sha256 = %catalog_row.sha256,
                 %version.id,
             );
-            match make_version_manifest(&mut conn, &app.cas, version)
-                .context(span)
-                .await
+            match make_version_manifest(
+                &mut conn,
+                &app.cas,
+                &app.public_blobs,
+                version,
+            )
+            .context(span)
+            .await
             {
-                Ok((mut version, version_manifest, version_manifest_str)) => {
-                    let mut url = app.config.public_base_url.clone();
-                    url.set_query(None);
-                    url.set_fragment(None);
-                    url.path_segments_mut()
-                        .map_err(|()| {
-                            anyhow::anyhow!(
-                                "public_base_url must support path segments"
-                            )
-                        })?
-                        .pop_if_empty()
-                        .extend([
-                            "minecraft",
-                            &format!("v{FORMAT_VERSION}"),
-                            "versions",
-                            &format!("{}.json", version.id),
-                        ]);
-                    version.url = url;
-                    processed_versions.push((
-                        version,
-                        (version_manifest, version_manifest_str),
-                    ));
-                }
+                Ok(export) => processed_versions.push(export),
                 Err(err) => warn!("error: {err:?}"),
             }
         }
     }
 
     // dedup and sort by latest-first
-    processed_versions.sort_by_key(|(version, _)| version.id.clone());
-    processed_versions.dedup_by_key(|(version, _)| version.id.clone());
+    processed_versions.sort_by_key(|export| export.version.id.clone());
+    processed_versions.dedup_by_key(|export| export.version.id.clone());
     processed_versions
-        .sort_by_key(|(version, _)| std::cmp::Reverse(version.release_time));
+        .sort_by_key(|export| std::cmp::Reverse(export.version.release_time));
     info!("found {} unique versions", processed_versions.len());
-
-    // make the uber catalog
-    let (uber_versions, version_manifests): (Vec<_>, Vec<_>) =
-        processed_versions.into_iter().unzip();
 
     for id in [&latest.release, &latest.snapshot] {
         ensure!(
-            uber_versions.iter().any(|version| &version.id == id),
+            processed_versions
+                .iter()
+                .any(|export| &export.version.id == id),
             "latest version {id} was not exported"
         );
     }
@@ -147,17 +135,19 @@ pub async fn export(app: &AppState) -> Result<()> {
 
     // write processed version manifests
     {
-        let num_total = version_manifests.len();
+        let num_total = processed_versions.len();
         let mut num_done = 0usize;
-        for (version_manifest, data) in version_manifests {
-            let game_version = version_manifest.id.clone();
+        for export in &processed_versions {
+            let game_version = &export.manifest.id;
             let path = format!(
                 "minecraft/v{FORMAT_VERSION}/versions/{game_version}.json"
             );
             app.public_blobs
-                .put(&path, data.as_bytes())
-                .context(info_span!("writing manifest to blob store", %path))
-                .await?;
+				.put(&path, export.json.as_bytes())
+				.context(
+					info_span!("writing manifest to blob store", %path, url = %export.url),
+				)
+				.await?;
             debug!(%path, "wrote version manifest to blob store");
 
             num_done += 1;
@@ -171,7 +161,10 @@ pub async fn export(app: &AppState) -> Result<()> {
     {
         let uber_catalog = mojang::Catalog {
             latest,
-            versions: uber_versions,
+            versions: processed_versions
+                .into_iter()
+                .map(|export| export.version)
+                .collect(),
         };
         let data = serde_json::to_string(&uber_catalog)
             .expect("serialization should never fail");
@@ -190,15 +183,13 @@ pub async fn export(app: &AppState) -> Result<()> {
 /// version manifest blob, post-processes it, and makes a full
 /// [`mojang::VersionManifest`] which we can export.
 ///
-/// Returns:
-/// - a post-processed version of the `version` you pass in
-/// - the `VersionManifest` we fetch from the blob, with post-processing
-/// - the version manifest, encoded as JSON
+/// Returns the processed catalog entry, manifest, serialized JSON, and store URL.
 async fn make_version_manifest(
     conn: &mut toasty::Connection,
     cas: &BlobCas,
+    public_blobs: &BlobStore,
     mut version: mojang::Version,
-) -> Result<(mojang::Version, mojang::VersionManifest, String)> {
+) -> Result<VersionManifestExport> {
     let matching_hashes = model::BlobHash::all()
         .select(model::BlobHash::fields().sha256())
         .filter(model::BlobHash::fields().sha1().eq(version.sha1))
@@ -252,5 +243,15 @@ async fn make_version_manifest(
     // I haven't kept these in since app-lib doesn't use them,
     // and I have no clue why these got changed.
 
-    Ok((version, version_manifest, version_manifest_str))
+    let path =
+        format!("minecraft/v{FORMAT_VERSION}/versions/{}.json", version.id);
+    let url = public_blobs.url_for(&path);
+    version.url = url.clone();
+
+    Ok(VersionManifestExport {
+        version,
+        manifest: version_manifest,
+        json: version_manifest_str,
+        url,
+    })
 }
