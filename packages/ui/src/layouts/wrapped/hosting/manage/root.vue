@@ -237,7 +237,7 @@
 						:style="{ '--si': 1 }"
 					/>
 					<IconButton
-						v-if="allowConstrainWidthToggle"
+						v-if="showConstrainWidthToggle"
 						v-tooltip="constrainWidth ? 'Expand View' : 'Collapse View'"
 						size="md"
 						:label="constrainWidth ? 'Expand View' : 'Collapse View'"
@@ -495,10 +495,10 @@ const DISABLE_LOADING_ANIM = true
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
 const serverDataContainer = ref<InstanceType<typeof HTMLDivElement>>()
-const allowConstrainWidthToggle = ref<boolean>(false)
+const showConstrainWidthToggle = ref<boolean>(false)
 useResizeObserver(serverDataContainer, (entries) => {
 	const entry = entries[0]
-	allowConstrainWidthToggle.value = entry.contentRect.width > 1200 && props.allowConstrainWidthToggle
+	showConstrainWidthToggle.value = entry.contentRect.width > 1200 && props.allowConstrainWidthToggle
 })
 const constrainWidth = useLocalStorage(
 	'server-layout-constrained-width',

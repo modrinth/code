@@ -13,7 +13,7 @@
 	>
 		<div
 			ref="navbarWrapper"
-			class="sticky top-[var(--files-sticky-top,0px)] z-[29] bg-surface-1 py-1 before:pointer-events-none before:top-[calc(-1.5rem_+_1px)] before:absolute  before:inset-x-0  before:h-[var(--files-sticky-top,0px)] before:bg-[var(--color-bg,_var(--surface-1))] before:content-['']"
+			class="sticky top-[var(--files-sticky-top,0px)] z-[29] bg-surface-1 py-1 before:pointer-events-none before:top-[calc(-1.5rem_+_1px)] before:absolute before:inset-x-0 before:h-[var(--files-sticky-top,0px)] before:bg-[var(--color-bg,_var(--surface-1))] before:content-['']"
 		>
 			<FileNavbar
 				:sidebar-open="sidebarOpen"

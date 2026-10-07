@@ -1,13 +1,14 @@
 import {
 	BoxIcon,
 	BracesIcon,
+	ClipboardListIcon,
 	FolderCogIcon,
 	FolderOpenIcon,
 	GlassesIcon,
 	GlobeIcon,
-	PaintbrushIcon,
 	ImagesIcon,
-	SquareTextIcon, ClipboardListIcon
+	PaintbrushIcon,
+	SquareTextIcon,
 } from '@modrinth/assets'
 import type { Component } from 'vue'
 
@@ -26,7 +27,7 @@ const DEFAULT_DIRECTORY_ICON: FileIconStyle = { icon: FolderOpenIcon, color: 'te
 const DIRECTORY_ICON_STYLES: Record<string, FileIconStyle> = {
 	config: { icon: FolderCogIcon, color: 'text-purple' },
 	'crash-reports': { icon: ClipboardListIcon, color: 'text-red-400' },
-	logs: { icon: SquareTextIcon, color: 'text-red-400'},
+	logs: { icon: SquareTextIcon, color: 'text-red-400' },
 	world: { icon: GlobeIcon, color: 'text-blue' },
 	saves: { icon: GlobeIcon, color: 'text-blue' },
 	datapacks: { icon: BracesIcon, color: 'text-brand' },
