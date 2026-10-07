@@ -25,6 +25,11 @@ export class ModrinthApiError extends Error {
 	 */
 	readonly context?: string
 
+	/**
+	 * Full URL of the request that failed (if available)
+	 */
+	url?: string
+
 	constructor(message: string, data?: ApiErrorData) {
 		super(message)
 		this.name = 'ModrinthApiError'
@@ -90,12 +95,14 @@ export class ModrinthServerError extends ModrinthApiError {
 		context?: string,
 	): ModrinthServerError {
 		const v1Error = isModrinthErrorResponse(responseData) ? responseData : undefined
+		const isHtmlPage = typeof responseData === 'string' && /<!doctype html|<html/i.test(responseData)
 
-		const message = typeof responseData === 'string' ? responseData : `HTTP ${statusCode}`
+		const message =
+			typeof responseData === 'string' && !isHtmlPage ? responseData : `HTTP ${statusCode}`
 
 		return new ModrinthServerError(message, {
 			statusCode,
-			responseData,
+			responseData: isHtmlPage ? undefined : responseData,
 			context,
 			v1Error,
 		})
