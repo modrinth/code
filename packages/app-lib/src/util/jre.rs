@@ -7,7 +7,7 @@ use std::process::Command;
 use std::{collections::HashSet, path::Path};
 use tokio::task::JoinError;
 
-use crate::{State, get_resource_file};
+use crate::get_resource_file;
 #[cfg(target_os = "windows")]
 use winreg::{
     RegKey,
@@ -18,12 +18,14 @@ use winreg::{
 // Returns a Vec of unique JavaVersions from the PATH, Windows Registry Keys and common Java locations
 #[cfg(target_os = "windows")]
 #[tracing::instrument]
-pub async fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
+pub async fn get_all_jre(
+    java_versions_dir: &Path,
+) -> Result<Vec<JavaVersion>, JREError> {
     let mut jre_paths = HashSet::new();
 
     // Add JRES directly on PATH
     jre_paths.extend(get_all_jre_path().await);
-    jre_paths.extend(get_all_autoinstalled_jre_path().await?);
+    jre_paths.extend(get_all_autoinstalled_jre_path(java_versions_dir));
     if let Ok(java_home) = env::var("JAVA_HOME") {
         jre_paths.insert(PathBuf::from(java_home));
     }
@@ -105,13 +107,15 @@ pub fn get_paths_from_jre_winregkey(jre_key: RegKey) -> HashSet<PathBuf> {
 // Returns a Vec of unique JavaVersions from the PATH, and common Java locations
 #[cfg(target_os = "macos")]
 #[tracing::instrument]
-pub async fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
+pub async fn get_all_jre(
+    java_versions_dir: &Path,
+) -> Result<Vec<JavaVersion>, JREError> {
     // Use HashSet to avoid duplicates
     let mut jre_paths = HashSet::new();
 
     // Add JREs directly on PATH
     jre_paths.extend(get_all_jre_path().await);
-    jre_paths.extend(get_all_autoinstalled_jre_path().await?);
+    jre_paths.extend(get_all_autoinstalled_jre_path(java_versions_dir));
 
     // Hard paths for locations for commonly installed .exes
     let java_paths = [
@@ -143,13 +147,15 @@ pub async fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
 // Returns a Vec of unique JavaVersions from the PATH, and common Java locations
 #[cfg(target_os = "linux")]
 #[tracing::instrument]
-pub async fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
+pub async fn get_all_jre(
+    java_versions_dir: &Path,
+) -> Result<Vec<JavaVersion>, JREError> {
     // Use HashSet to avoid duplicates
     let mut jre_paths = HashSet::new();
 
     // Add JREs directly on PATH
     jre_paths.extend(get_all_jre_path().await);
-    jre_paths.extend(get_all_autoinstalled_jre_path().await?);
+    jre_paths.extend(get_all_autoinstalled_jre_path(java_versions_dir));
 
     // Hard paths for locations for commonly installed locations
     let java_paths = [
@@ -183,37 +189,31 @@ pub async fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
 
 // Gets all JREs from the PATH env variable
 #[tracing::instrument]
-async fn get_all_autoinstalled_jre_path() -> Result<HashSet<PathBuf>, JREError>
-{
-    Box::pin(async move {
-        let state = State::get().await.map_err(|_| JREError::StateError)?;
+fn get_all_autoinstalled_jre_path(
+    base_path: &Path,
+) -> HashSet<PathBuf> {
+    let mut jre_paths = HashSet::new();
 
-        let mut jre_paths = HashSet::new();
-        let base_path = state.directories.java_versions_dir();
+    if base_path.is_dir()
+        && let Ok(dir) = std::fs::read_dir(base_path)
+    {
+        for entry in dir.flatten() {
+            let file_path = entry.path().join("bin");
 
-        if base_path.is_dir()
-            && let Ok(dir) = std::fs::read_dir(base_path)
-        {
-            for entry in dir.flatten() {
-                let file_path = entry.path().join("bin");
-
-                if let Ok(contents) = std::fs::read_to_string(file_path.clone())
+            if let Ok(contents) = std::fs::read_to_string(file_path.clone()) {
+                let entry = entry.path().join(contents);
+                jre_paths.insert(entry);
+            } else {
+                #[cfg(not(target_os = "macos"))]
                 {
-                    let entry = entry.path().join(contents);
-                    jre_paths.insert(entry);
-                } else {
-                    #[cfg(not(target_os = "macos"))]
-                    {
-                        let file_path = file_path.join(JAVA_BIN);
-                        jre_paths.insert(file_path);
-                    }
+                    let file_path = file_path.join(JAVA_BIN);
+                    jre_paths.insert(file_path);
                 }
             }
         }
+    }
 
-        Ok(jre_paths)
-    })
-    .await
+    jre_paths
 }
 
 // Gets all JREs from the PATH env variable
@@ -356,7 +356,4 @@ pub enum JREError {
 
     #[error("No stored tag for Minecraft version {0}")]
     NoMinecraftVersionFound(String),
-
-    #[error("Error getting launcher state")]
-    StateError,
 }
