@@ -1,13 +1,5 @@
 <script setup>
-import {
-	AuthFeature,
-	ModrinthApiError,
-	NodeAuthFeature,
-	nodeAuthState,
-	PanelVersionFeature,
-	TauriModrinthClient,
-	VerboseLoggingFeature,
-} from '@modrinth/api-client'
+import { ModrinthApiError } from '@modrinth/api-client'
 import {
 	ArrowBigUpDashIcon,
 	ArrowLeftRightIcon,
@@ -172,6 +164,7 @@ import {
 	instanceListQueryOptions,
 	screenshotKeys,
 } from '@/pages/instance/query-options'
+import { createAppClient } from '@/platform/modrinth-client'
 import {
 	appUpdateState,
 	downloadAvailableAppUpdate,
@@ -315,28 +308,7 @@ const { addPopupNotification } = popupNotificationManager
 let adsConsentPopupId = null
 useAppEvent('ads_consent_required', handleAdsConsentRequired, appEvents)
 
-const appVersion = getVersion()
-const tauriApiClient = new TauriModrinthClient({
-	userAgent: async () => `modrinth/theseus/${await appVersion} (support@modrinth.com)`,
-	labrinthBaseUrl: config.labrinthBaseUrl,
-	archonBaseUrl: config.archonBaseUrl,
-	sharedInstancesBaseUrl: config.sharedInstancesBaseUrl,
-	features: [
-		new NodeAuthFeature({
-			getAuth: () => nodeAuthState.getAuth?.() ?? null,
-			refreshAuth: async () => {
-				if (nodeAuthState.refreshAuth) {
-					await nodeAuthState.refreshAuth()
-				}
-			},
-		}),
-		new AuthFeature({
-			token: async () => (await getCreds())?.session,
-		}),
-		new PanelVersionFeature(),
-		new VerboseLoggingFeature(),
-	],
-})
+const tauriApiClient = createAppClient()
 provideModrinthClient(tauriApiClient)
 const { data: authenticatedModrinthUser } = useQuery({
 	queryKey: computed(() => ['authenticated-user', 'campaigns', credentials.value?.user?.id]),
