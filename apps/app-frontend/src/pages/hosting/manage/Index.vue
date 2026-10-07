@@ -64,7 +64,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { get_user } from '@/helpers/cache'
 import { get as getCreds } from '@/helpers/mr_auth'
-import { provideBreadcrumbParent, useBreadcrumb } from '@/providers/breadcrumbs'
+import { provideBreadcrumbParent, useBreadcrumb } from '@/shared/breadcrumbs'
 
 const route = useRoute()
 const router = useRouter()

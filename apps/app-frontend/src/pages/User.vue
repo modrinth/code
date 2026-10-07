@@ -64,7 +64,7 @@ import {
 	unblock_user,
 } from '@/helpers/users'
 import { appSettingsModalOpenProfileKey } from '@/providers/app-settings-modal'
-import { useBreadcrumb } from '@/providers/breadcrumbs'
+import { useBreadcrumb } from '@/shared/breadcrumbs'
 import { injectContentInstall } from '@/providers/content-install'
 
 const route = useRoute()

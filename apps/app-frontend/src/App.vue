@@ -11,8 +11,6 @@ import {
 import {
 	ArrowBigUpDashIcon,
 	ArrowLeftRightIcon,
-	ChevronLeftIcon,
-	ChevronRightIcon,
 	CompassIcon,
 	ImageIcon,
 	LogInIcon,
@@ -21,7 +19,6 @@ import {
 	PlayIcon,
 	PlusIcon,
 	RefreshCwIcon,
-	RightArrowIcon,
 	ServerStackIcon,
 	SettingsIcon,
 	ShirtIcon,
@@ -54,7 +51,6 @@ import {
 	providePageContext,
 	providePopupNotificationManager,
 	TeleportOverflowMenu,
-	TextLogo,
 	TooltipDirective,
 	useDebugLogger,
 	useFormatBytes,
@@ -75,9 +71,8 @@ import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
 import { computed, nextTick, onMounted, onUnmounted, provide, ref, watch } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 
+import AppTitleBar from '@/app/shell/title-bar/index.vue'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
-import AppActionBar from '@/components/ui/AppActionBar.vue'
-import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
 import ErrorModal from '@/components/ui/ErrorModal.vue'
 import FriendsList from '@/components/ui/friends/FriendsList.vue'
 import HostingUpdateRequired from '@/components/ui/HostingUpdateRequired.vue'
@@ -104,7 +99,6 @@ import {
 	markSyncInstancesUpdateNotificationShown,
 	shouldShowSyncInstancesUpdateNotification,
 } from '@/components/ui/sync-instances-update-modal/show-notification'
-import WindowControls from '@/components/ui/WindowControls.vue'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
 import { useAppEvent } from '@/composables/use-app-event'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
@@ -188,7 +182,7 @@ import {
 	openAppUpdateChangelog,
 	setAppUpdateActions,
 } from '@/providers/app-update.ts'
-import { createBreadcrumbManager, provideBreadcrumbManager } from '@/providers/breadcrumbs'
+import { createBreadcrumbManager, provideBreadcrumbManager } from '@/shared/breadcrumbs'
 import { createContentInstall, provideContentInstall } from '@/providers/content-install'
 import {
 	provideAppUpdateDownloadProgress,
@@ -597,9 +591,6 @@ const messages = defineMessages({
 		defaultMessage: 'Dismiss',
 	},
 	warning: { id: 'app.notification.warning', defaultMessage: 'Warning' },
-	goBack: { id: 'app.navigation.go-back', defaultMessage: 'Go back' },
-	goForward: { id: 'app.navigation.go-forward', defaultMessage: 'Go forward' },
-	nextImage: { id: 'app.navigation.next-image', defaultMessage: 'Next image' },
 	updateDownloadMissingVersion: {
 		id: 'app.update.download-error.missing-version',
 		defaultMessage: 'Failed to download update: no version available',
@@ -2390,56 +2381,13 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				<LogInIcon class="text-brand" />
 			</NavButton>
 		</div>
-		<div data-tauri-drag-region class="app-grid-statusbar bg-bg-raised h-[--top-bar-height] flex">
-			<div data-tauri-drag-region class="flex min-w-0 flex-1 items-center overflow-hidden p-2">
-				<TextLogo class="h-7 w-auto shrink-0 text-contrast pointer-events-none" />
-				<div data-tauri-drag-region class="ml-2 flex shrink-0 items-center gap-2">
-					<IconButton
-						type="outlined"
-						:label="formatMessage(messages.goBack)"
-						class="!h-7 !min-w-7 !w-7 !border !border-surface-4 !p-0 !opacity-100"
-						:disabled="!canNavigateBack"
-						@click="router.back()"
-					>
-						<ChevronLeftIcon
-							class="!size-4 !text-primary"
-							:class="{ 'opacity-20': !canNavigateBack }"
-						/>
-					</IconButton>
-					<IconButton
-						type="outlined"
-						:label="formatMessage(messages.goForward)"
-						class="!h-7 !min-w-7 !w-7 !border !border-surface-4 !p-0 !opacity-100"
-						:disabled="!canNavigateForward"
-						@click="router.forward()"
-					>
-						<ChevronRightIcon
-							class="!size-4 !text-primary"
-							:class="{ 'opacity-20': !canNavigateForward }"
-						/>
-					</IconButton>
-				</div>
-				<Breadcrumbs />
-			</div>
-			<section data-tauri-drag-region class="flex shrink-0 ml-auto items-center">
-				<IconButton
-					v-if="!forceSidebar && appSettings.toggleSidebar"
-					:type="sidebarToggled ? 'base' : 'quiet'"
-					:label="formatMessage(messages.nextImage)"
-					class="mr-3 transition-transform"
-					:class="{ 'rotate-180': !sidebarToggled }"
-					@click="sidebarToggled = !sidebarToggled"
-				>
-					<RightArrowIcon />
-				</IconButton>
-				<div class="flex mr-3">
-					<Suspense>
-						<AppActionBar />
-					</Suspense>
-				</div>
-				<WindowControls />
-			</section>
-		</div>
+		<AppTitleBar
+			:can-navigate-back="canNavigateBack"
+			:can-navigate-forward="canNavigateForward"
+			:show-sidebar-toggle="!forceSidebar && appSettings.toggleSidebar"
+			:sidebar-toggled="sidebarToggled"
+			@toggle-sidebar="sidebarToggled = !sidebarToggled"
+		/>
 	</div>
 	<div
 		v-if="stateInitialized"
@@ -2670,13 +2618,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	}
 }
 
-.app-grid-statusbar {
-	grid-area: status;
-	padding-right: var(--window-controls-width, 0px);
-	position: relative;
-	z-index: 2;
-}
-
 [data-tauri-drag-region-exclude] {
 	-webkit-app-region: no-drag;
 }
@@ -2860,16 +2801,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	--os-handle-bg: var(--color-scrollbar) !important;
 	--os-handle-bg-hover: var(--color-scrollbar) !important;
 	--os-handle-bg-active: var(--color-scrollbar) !important;
-}
-
-.app-grid-statusbar {
-	padding-left: 0.25rem;
-}
-
-.mac-traffic-lights {
-	.app-grid-statusbar {
-		padding-left: 5rem;
-	}
 }
 
 .windows {
