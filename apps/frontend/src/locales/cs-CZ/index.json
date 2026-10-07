@@ -1691,9 +1691,6 @@
   "error.generic.default.list_item.1": {
     "message": "Zkontrolujte, zda je Modrinth offline, na naší <status-link>Stránce statusu</status-link>."
   },
-  "error.generic.default.list_item.2": {
-    "message": "Pokud se to bude dít i nadále, můžete dát vědět týmu Modrinth připojením se k našemu <discord-link>Discord serveru</discord-link>."
-  },
   "error.generic.default.list_title": {
     "message": "Prosím zkuste znovu za pár minut."
   },

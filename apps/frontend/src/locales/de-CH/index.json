@@ -2255,9 +2255,6 @@
   "error.generic.default.list_item.1": {
     "message": "Überprüfe auf unserer <status-link>Status Seite</status-link> ob Modrinth unerreichbar ist."
   },
-  "error.generic.default.list_item.2": {
-    "message": "Sollte dies weiterhin passieren, solltest du das Modrinth-Team darüber informieren, indem du unserem <discord-link>Discord Server</discord-link> beitittst."
-  },
   "error.generic.default.list_title": {
     "message": "Bitte versuch es in ein paar Minuten erneut."
   },

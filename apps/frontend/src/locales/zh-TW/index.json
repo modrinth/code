@@ -2255,9 +2255,6 @@
   "error.generic.default.list_item.1": {
     "message": "前往我們的<status-link>狀態頁面</status-link>，查看 Modrinth 是不是停機了。"
   },
-  "error.generic.default.list_item.2": {
-    "message": "如果這個問題持續發生，你可以考慮加入我們的 <discord-link>Discord 伺服器</discord-link>，通知 Modrinth 團隊。"
-  },
   "error.generic.default.list_title": {
     "message": "請在幾分鐘後再試一次。"
   },

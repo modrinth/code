@@ -2249,9 +2249,6 @@
   "error.generic.default.list_item.1": {
     "message": "Sprawdź na naszej <status-link>stronie statusu</status-link>, czy Modrinth jest niedostępny."
   },
-  "error.generic.default.list_item.2": {
-    "message": "Jeśli problem będzie się powtarzał, możesz powiadomić o tym zespół Modrinth, dołączając do naszego <discord-link>serwera Discord</discord-link>."
-  },
   "error.generic.default.list_title": {
     "message": "Spróbuj ponownie za kilka minut."
   },

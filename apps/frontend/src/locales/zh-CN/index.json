@@ -2255,9 +2255,6 @@
   "error.generic.default.list_item.1": {
     "message": "前往我们的<status-link>状态页面</status-link>，查看 Modrinth 服务是否中断。"
   },
-  "error.generic.default.list_item.2": {
-    "message": "如果问题持续存在，不妨加入我们的<discord-link>Discord 服务器</discord-link>来告知 Modrinth 团队。"
-  },
   "error.generic.default.list_title": {
     "message": "请在几分钟后再试。"
   },

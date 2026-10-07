@@ -2255,9 +2255,6 @@
   "error.generic.default.list_item.1": {
     "message": "Schaue auf unserer <status-link>Statusseite</status-link> nach, ob Modrinth offline ist."
   },
-  "error.generic.default.list_item.2": {
-    "message": "Falls dies weiterhin auftritt, solltest du das Modrinth-Team darüber informieren, indem du unserem <discord-link>Discord-Server</discord-link> beitrittst."
-  },
   "error.generic.default.list_title": {
     "message": "Bitte versuch es in ein paar Minuten erneut."
   },

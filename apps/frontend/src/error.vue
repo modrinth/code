@@ -78,8 +78,8 @@
 										<component :is="() => normalizeChildren(children)" />
 									</a>
 								</template>
-								<template #discord-link="{ children }">
-									<a href="https://discord.modrinth.com" target="_blank" rel="noopener">
+								<template #support-link="{ children }">
+									<a href="https://support.modrinth.com" target="_blank" rel="noopener">
 										<component :is="() => normalizeChildren(children)" />
 									</a>
 								</template>
@@ -250,9 +250,9 @@ const messages = {
 				defaultMessage: 'Check if Modrinth is down on our <status-link>Status page</status-link>.',
 			}),
 			defineMessage({
-				id: 'error.generic.default.list_item.2',
+				id: 'error.generic.default.list_item.support',
 				defaultMessage:
-					'If this keeps happening, you may want to let the Modrinth Team know by joining our <discord-link>Discord server</discord-link>.',
+					'If this keeps happening, you may want to let the Modrinth Team know through our <support-link>support portal</support-link>.',
 			}),
 		],
 	},

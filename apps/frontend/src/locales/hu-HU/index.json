@@ -2246,9 +2246,6 @@
   "error.generic.default.list_item.1": {
     "message": "Ellenőrizd, hogy a Modrinth elérhető-e az <status-link>állapotoldalon</status-link>."
   },
-  "error.generic.default.list_item.2": {
-    "message": "Ha ez továbbra is történik, valószínűleg tudatni szeretnéd a Modrinth csapatával. Ezt úgy tehetet meg, hogy csatlakozol a <discord-link>Discord szerverünkre</discord-link>."
-  },
   "error.generic.default.list_title": {
     "message": "Kerjük próbáld újra pár perc múlva."
   },

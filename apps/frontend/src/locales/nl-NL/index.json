@@ -2243,9 +2243,6 @@
   "error.generic.default.list_item.1": {
     "message": "Controleer of Modrinth een storing heeft op onze <status-link>Status pagina</status-link>."
   },
-  "error.generic.default.list_item.2": {
-    "message": "Als dit blijft gebeuren, kun je dit het beste aan het Modrinth-team laten weten door lid te worden van onze <discord-link>Discord-server</discord-link>."
-  },
   "error.generic.default.list_title": {
     "message": "Probeer alstublieft opnieuw in een paar minuten."
   },

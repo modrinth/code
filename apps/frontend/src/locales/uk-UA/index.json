@@ -2252,9 +2252,6 @@
   "error.generic.default.list_item.1": {
     "message": "Перевірте, чи працює Modrinth на нашій <status-link>сторінці статусу</status-link>."
   },
-  "error.generic.default.list_item.2": {
-    "message": "Якщо таке продовжує відбуватися, дайте знати команді Modrinth, приєднавшися до нашого <discord-link>Discord-сервера</discord-link>."
-  },
   "error.generic.default.list_title": {
     "message": "Спробуйте знову за кілька хвилин."
   },

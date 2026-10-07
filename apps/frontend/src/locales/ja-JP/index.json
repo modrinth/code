@@ -2192,9 +2192,6 @@
   "error.generic.default.list_item.1": {
     "message": "Modrinthがダウンしていないか、<status-link>ステータスページ</status-link>で確認してください。"
   },
-  "error.generic.default.list_item.2": {
-    "message": "この問題が繰り返し発生する場合は、<discord-link>Discordサーバー</discord-link>に参加して、Modrinthチームにお知らせください。"
-  },
   "error.generic.default.list_title": {
     "message": "数分後に再度試してください。"
   },

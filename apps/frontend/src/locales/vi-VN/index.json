@@ -1865,9 +1865,6 @@
   "error.generic.default.list_item.1": {
     "message": "Kiểm tra xem Modrinth có đang gặp sự cố không trên <status-link>Trang trạng thái</status-link> của chúng tôi."
   },
-  "error.generic.default.list_item.2": {
-    "message": "Nếu điều này tiếp tục xảy ra, bạn có thể thông báo cho Đội ngũ Modrinth bằng cách tham gia <discord-link>máy chủ Discord</discord-link> của chúng tôi."
-  },
   "error.generic.default.list_title": {
     "message": "Vui lòng thử lại sau vài phút."
   },
