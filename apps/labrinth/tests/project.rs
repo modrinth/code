@@ -124,7 +124,7 @@ async fn project_redirect_cache_respects_visibility() {
         for (alias, target) in
             [(public_alias, public_id), (private_alias, private_id)]
         {
-            let key = redis.key().entity("project_redirects:v1", alias);
+            let key = redis.key().entity("project_redirects:v2", alias);
             redis
                 .set_serialized(
                     &key,
@@ -133,6 +133,58 @@ async fn project_redirect_cache_respects_visibility() {
                 )
                 .await
                 .unwrap();
+        }
+
+        for user_id in [
+            None,
+            Some(ENEMY_USER_ID_PARSED),
+            Some(USER_USER_ID_PARSED),
+            Some(MOD_USER_ID_PARSED),
+            Some(ADMIN_USER_ID_PARSED),
+        ] {
+            let user = if let Some(user_id) = user_id {
+                Some(labrinth::models::users::User::from(
+                    labrinth::database::models::DBUser::get_id(
+                        labrinth::database::models::DBUserId(user_id),
+                        &*env.db.pool,
+                        &env.db.redis_pool,
+                    )
+                    .await
+                    .unwrap()
+                    .unwrap(),
+                ))
+            } else {
+                None
+            };
+            let mut body_refs = [
+                public_alias.to_string(),
+                private_alias.to_string(),
+                public_id.clone(),
+                "missing".to_string(),
+                private_alias.to_string(),
+            ];
+            labrinth::routes::resolve_body_refs(
+                body_refs.iter_mut().collect(),
+                &user,
+                &env.db.pool,
+                &env.db.redis_pool,
+            )
+            .await
+            .unwrap();
+            let expected_private = match user_id {
+                None | Some(ENEMY_USER_ID_PARSED) => private_alias,
+                _ => private_id.as_str(),
+            };
+            assert_eq!(
+                body_refs,
+                [
+                    public_id.as_str(),
+                    expected_private,
+                    public_id.as_str(),
+                    "missing",
+                    expected_private,
+                ]
+            );
         }
 
         for pat in [USER_USER_PAT, MOD_USER_PAT, ADMIN_USER_PAT] {
@@ -223,6 +275,92 @@ async fn project_redirect_cache_respects_visibility() {
                 response.headers().get("cache-control").unwrap(),
                 "private, no-store"
             );
+        }
+    })
+    .await;
+}
+
+#[actix_rt::test]
+async fn project_redirect_cache_preserves_case_sensitive_ids() {
+    with_test_environment_all(None, |env| async move {
+        let project_id = &env.dummy.project_beta.project_id;
+        let target_id = &env.dummy.project_alpha.project_id;
+        let alias = project_id.to_lowercase();
+        assert_ne!(
+            project_id, &alias,
+            "fixture ID must contain uppercase letters"
+        );
+        assert_ne!(project_id, target_id);
+        let target = parse_base62(target_id).unwrap();
+        let fixture_sql = format!(
+            r#"INSERT INTO project_redirects (slug, target_project_id)
+			VALUES ('{alias}', {target})"#
+        );
+        sqlx::raw_sql(&fixture_sql)
+            .execute(&env.db.pool)
+            .await
+            .unwrap();
+
+        let mut redis = env.db.redis_pool.connect().await.unwrap();
+        let keys = [
+            redis.key().entity("project_redirects:v2", project_id),
+            redis.key().entity("project_redirects:v2", &alias),
+        ];
+        for alias_first in [false, true] {
+            redis.delete_many(&keys).await.unwrap();
+            let refs = if alias_first {
+                [alias.as_str(), project_id.as_str()]
+            } else {
+                [project_id.as_str(), alias.as_str()]
+            };
+            for project_ref in refs {
+                let response =
+                    env.api.get_project(project_ref, USER_USER_PAT).await;
+                if project_ref == alias {
+                    assert_status!(&response, StatusCode::PERMANENT_REDIRECT);
+                    assert!(
+                        response
+                            .headers()
+                            .get("location")
+                            .unwrap()
+                            .to_str()
+                            .unwrap()
+                            .ends_with(target_id)
+                    );
+                } else {
+                    assert_status!(&response, StatusCode::OK);
+                    assert!(!response.headers().contains_key("location"));
+                    let project: CommonProject =
+                        test::read_body_json(response).await;
+                    assert_eq!(project.id.to_string(), *project_id);
+                }
+            }
+
+            assert_eq!(
+                redis
+                    .get_deserialized::<Option<i64>>(&keys[0])
+                    .await
+                    .unwrap(),
+                Some(None)
+            );
+            assert_eq!(
+                redis
+                    .get_deserialized::<Option<i64>>(&keys[1])
+                    .await
+                    .unwrap(),
+                Some(Some(target as i64))
+            );
+
+            let mut body_refs = [project_id.clone(), alias.clone()];
+            labrinth::routes::resolve_body_refs(
+                body_refs.iter_mut().collect(),
+                &None,
+                &env.db.pool,
+                &env.db.redis_pool,
+            )
+            .await
+            .unwrap();
+            assert_eq!(body_refs, [project_id.clone(), target_id.clone()]);
         }
     })
     .await;

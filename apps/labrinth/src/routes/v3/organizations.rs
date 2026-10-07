@@ -947,6 +947,7 @@ pub async fn organization_projects_add(
     let mut project_info = project_info.into_inner();
     crate::routes::resolve_body_refs(
         vec![&mut project_info.project_id],
+        &Some(current_user.clone()),
         &pool,
         &redis,
     )

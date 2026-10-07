@@ -248,10 +248,7 @@ async fn version_create_inner(
                     data.extend_from_slice(&chunk?);
                 }
 
-                let mut version_create_data: InitialVersionData = serde_json::from_slice(&data)?;
-                let mut ids = version_create_data.project_id.iter_mut().collect::<Vec<_>>();
-                ids.extend(version_create_data.dependencies.iter_mut().filter_map(|dependency| dependency.project_id.as_mut()));
-                crate::routes::resolve_body_project_ids(ids, pool, redis).await?;
+                let version_create_data: InitialVersionData = serde_json::from_slice(&data)?;
                 initial_version_data = Some(version_create_data);
                 let version_create_data = initial_version_data.as_ref().unwrap();
                 if version_create_data.project_id.is_none() {

@@ -67,9 +67,7 @@ pub async fn resolve_refs(
     let keys = project_refs
         .iter()
         .map(|project_ref| {
-            redis
-                .key()
-                .entity(PROJECT_REDIRECTS_NAMESPACE, project_ref.to_lowercase())
+            redis.key().entity(PROJECT_REDIRECTS_NAMESPACE, project_ref)
         })
         .collect::<Vec<_>>();
     let cached_targets = redis
@@ -150,6 +148,7 @@ pub async fn resolve_refs(
 /// Rewrites body references without redirecting the HTTP request or changing unresolved values.
 pub async fn resolve_body_refs(
     mut project_refs: Vec<&mut String>,
+    user: &Option<crate::models::users::User>,
     pool: &PgPool,
     redis: &RedisPool,
 ) -> Result<(), ApiError> {
@@ -157,29 +156,11 @@ pub async fn resolve_body_refs(
         .iter()
         .map(|value| (**value).clone())
         .collect::<Vec<_>>();
-    let targets = resolve_refs(&refs, pool, redis).await?;
+    let targets =
+        resolve_visible_refs_for_user(&refs, user, pool, redis).await?;
     for (value, target) in project_refs.iter_mut().zip(targets) {
         if let Some(target) = target {
             **value = target.to_string();
-        }
-    }
-    Ok(())
-}
-
-/// Resolves redirect aliases accepted by typed project ID fields.
-pub async fn resolve_body_project_ids(
-    project_ids: Vec<&mut ProjectId>,
-    pool: &PgPool,
-    redis: &RedisPool,
-) -> Result<(), ApiError> {
-    let refs = project_ids
-        .iter()
-        .map(|id| id.to_string())
-        .collect::<Vec<_>>();
-    let targets = resolve_refs(&refs, pool, redis).await?;
-    for (id, target) in project_ids.into_iter().zip(targets) {
-        if let Some(target) = target {
-            *id = target;
         }
     }
     Ok(())
@@ -200,9 +181,7 @@ pub async fn clear_project_redirect_cache(
     let keys = project_refs
         .iter()
         .map(|project_ref| {
-            redis
-                .key()
-                .entity(PROJECT_REDIRECTS_NAMESPACE, project_ref.to_lowercase())
+            redis.key().entity(PROJECT_REDIRECTS_NAMESPACE, project_ref)
         })
         .collect::<Vec<_>>();
     redis
@@ -221,6 +200,25 @@ async fn resolve_visible_refs(
     redis: &RedisPool,
     session_queue: &AuthQueue,
 ) -> Result<Vec<Option<ProjectId>>, ApiError> {
+    let user = get_user_from_headers(
+        req,
+        pool,
+        redis,
+        session_queue,
+        Scopes::PROJECT_READ,
+    )
+    .await
+    .map(|(_, user)| user)
+    .ok();
+    resolve_visible_refs_for_user(project_refs, &user, pool, redis).await
+}
+
+async fn resolve_visible_refs_for_user(
+    project_refs: &[String],
+    user: &Option<crate::models::users::User>,
+    pool: &PgPool,
+    redis: &RedisPool,
+) -> Result<Vec<Option<ProjectId>>, ApiError> {
     let mut targets = resolve_refs(project_refs, pool, redis).await?;
     if targets.iter().all(Option::is_none) {
         return Ok(targets);
@@ -234,19 +232,9 @@ async fn resolve_visible_refs(
     let projects = DBProject::get_many(&target_refs, pool, redis)
         .await
         .wrap_internal_err("fetching project redirect targets")?;
-    let user = get_user_from_headers(
-        req,
-        pool,
-        redis,
-        session_queue,
-        Scopes::PROJECT_READ,
-    )
-    .await
-    .map(|(_, user)| user)
-    .ok();
     let visible_ids = filter_visible_project_ids(
         projects.iter().map(|project| &project.inner).collect(),
-        &user,
+        user,
         pool,
         false,
     )

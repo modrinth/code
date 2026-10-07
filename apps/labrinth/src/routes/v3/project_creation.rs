@@ -566,14 +566,7 @@ async fn project_create_inner(
                 &chunk.map_err(CreateError::MultipartError)?,
             );
         }
-        let mut create_data: ProjectCreateData = serde_json::from_slice(&data)?;
-        let ids = create_data
-            .initial_versions
-            .iter_mut()
-            .flat_map(|version| version.dependencies.iter_mut())
-            .filter_map(|dependency| dependency.project_id.as_mut())
-            .collect();
-        crate::routes::resolve_body_project_ids(ids, pool, redis).await?;
+        let create_data: ProjectCreateData = serde_json::from_slice(&data)?;
 
         create_data.validate().map_err(|err| {
             CreateError::InvalidInput(validation_errors_to_string(err, None))

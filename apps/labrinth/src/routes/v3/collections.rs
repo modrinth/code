@@ -93,6 +93,7 @@ pub async fn collection_create(
 
     crate::routes::resolve_body_refs(
         collection_create_data.projects.iter_mut().collect(),
+        &Some(current_user.clone()),
         &client,
         &redis,
     )
@@ -289,6 +290,7 @@ pub async fn collection_edit(
     if let Some(projects) = &mut new_collection.new_projects {
         crate::routes::resolve_body_refs(
             projects.iter_mut().collect(),
+            &Some(user.clone()),
             &pool,
             &redis,
         )
