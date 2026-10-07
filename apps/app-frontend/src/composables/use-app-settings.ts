@@ -7,7 +7,7 @@ export const DEFAULT_FEATURE_FLAGS = {
 	show_version_environment_column: false,
 	server_ram_as_bytes_always_on: false,
 	always_show_app_controls: false,
-	show_sync_instances_update_modal: false,
+	show_server_sharing_update_modal: false,
 	pride_fundraiser: true,
 	i18n_debug: false,
 	localhost_sign_in: false,

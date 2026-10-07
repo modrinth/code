@@ -3293,56 +3293,11 @@
   "app.survey.title": {
     "message": "Ciao, utente di Modrinth!"
   },
-  "app.sync-instances-update.badge": {
-    "message": "Novità"
-  },
-  "app.sync-instances-update.choose-source.all": {
-    "message": "Seleziona da quale istanze copiare le impostazioni di gioco, i pacchetti di risorse, la cronologia comandi, le barre rapide e i server multigiocatore. Saranno usate solo per la sincronizzazione iniziale, poi potrai modificarle in qualsiasi istanza."
-  },
-  "app.sync-instances-update.choose-source.all-title": {
-    "message": "Seleziona una fonte"
-  },
   "app.sync-instances-update.choose-source.data-packs": {
     "message": "Scegli da quale istanza copiare i pacchetti di dati. Saranno usati solo per la sincronizzazione iniziale, poi potrai modificarli in qualsiasi istanza."
   },
   "app.sync-instances-update.choose-source.resource-packs": {
     "message": "Scegli da quale istanza copiare i pacchetti di risorse. Saranno usati solo per la sincronizzazione iniziale, poi potrai modificarli in qualsiasi istanza."
-  },
-  "app.sync-instances-update.creative-hotbars": {
-    "message": "Sincronizza le barre rapide"
-  },
-  "app.sync-instances-update.description": {
-    "message": "Ora puoi sincronizzare opzioni come le impostazioni di gioco, i server, i pacchetti di risorse e altro ancora tra le istanze, così tutto rimane uguale ogni volta che giochi!"
-  },
-  "app.sync-instances-update.load-error": {
-    "message": "Impossibile caricare le impostazioni di sincronizzazione. Riprova più tardi."
-  },
-  "app.sync-instances-update.manage-later": {
-    "message": "Puoi abilitare la sincronizzazione ora e gestirla più tardi nelle impostazioni."
-  },
-  "app.sync-instances-update.notification.description": {
-    "message": "Tieni le impostazioni di gioco, i server, i pacchetti di risorse e altro sincronizzate tra le istanze."
-  },
-  "app.sync-instances-update.notification.dismiss": {
-    "message": "Ignora"
-  },
-  "app.sync-instances-update.notification.title": {
-    "message": "Sincronizza le istanze"
-  },
-  "app.sync-instances-update.notification.view-update": {
-    "message": "Scopri di più"
-  },
-  "app.sync-instances-update.retry": {
-    "message": "Riprova"
-  },
-  "app.sync-instances-update.skip": {
-    "message": "Salta"
-  },
-  "app.sync-instances-update.sync-all": {
-    "message": "Sincronizza tutto"
-  },
-  "app.sync-instances-update.title": {
-    "message": "Sincronizza le istanze"
   },
   "app.synced-content.change.disable-description": {
     "message": "Disabilitalo tra tutte le istanze sincronizzate o solo da questa. La seconda scelta abiliterà le sovrascritture."

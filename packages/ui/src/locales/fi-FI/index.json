@@ -395,9 +395,6 @@
   "content.card.synced": {
     "defaultMessage": "Synkronoitu instansseihin"
   },
-  "content.card.uploaded": {
-    "defaultMessage": "Ladattu palvelimelle"
-  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Haluatko varmasti päivittää {count, plural, one {# projekti} other {# projektia}} uusimpaan yhteensopivaan versioon? Suosittelemme päivittämään sisältöä yksitellen."
   },
@@ -656,9 +653,6 @@
   "content.managed-card.view-content": {
     "defaultMessage": "Sisältö"
   },
-  "content.metadata-filter.author": {
-    "defaultMessage": "Tekijä"
-  },
   "content.metadata-filter.environment": {
     "defaultMessage": "Ympäristö"
   },
@@ -683,17 +677,8 @@
   "content.metadata-filter.update.available": {
     "defaultMessage": "Päivitys saatavilla"
   },
-  "content.metadata-filter.warning.client-depends": {
-    "defaultMessage": "Käyttäjä on riippuvainen tiedostosta"
-  },
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "Vain käyttäjän tarvitsema sisältö"
-  },
-  "content.metadata-filter.warning.client-retained": {
-    "defaultMessage": "Käyttäjätiedosto säilytetty"
-  },
-  "content.metadata-filter.warning.none": {
-    "defaultMessage": "Ei varoituksia"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "Varoitukset"
@@ -730,9 +715,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Suodatin"
-  },
-  "content.page-layout.filter.author-count": {
-    "defaultMessage": "{count, plural, one {# tekijä} other {# tekijät}}"
   },
   "content.page-layout.loading": {
     "defaultMessage": "Ladataan sisältöä..."
@@ -1248,4 +1230,3 @@
     "defaultMessage": "Sinulla on tallentamattomia muutoksia."
   }
 }
-
