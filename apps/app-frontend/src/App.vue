@@ -178,7 +178,6 @@ import {
 	openAppUpdateChangelog,
 	setAppUpdateActions,
 } from '@/providers/app-update.ts'
-import { createBreadcrumbManager, provideBreadcrumbManager } from '@/shared/breadcrumbs'
 import { createContentInstall, provideContentInstall } from '@/providers/content-install'
 import {
 	provideAppUpdateDownloadProgress,
@@ -190,6 +189,7 @@ import { setupAppEventsProvider } from '@/providers/setup/app-events'
 import { setupAuthProvider } from '@/providers/setup/auth'
 import { setupLoadingStateProvider } from '@/providers/setup/loading-state'
 import { setupAppUserPreferencesProvider } from '@/providers/setup/user-preferences.ts'
+import { createBreadcrumbManager, provideBreadcrumbManager } from '@/shared/breadcrumbs'
 import { appMessages } from '@/utils/app-messages'
 
 import { AppNotificationManager } from './providers/app-notifications'
