@@ -3,7 +3,7 @@ use std::{
     sync::atomic::{self, AtomicUsize},
 };
 
-use anyhow::Result;
+use anyhow::{Context, Result, bail, ensure};
 use derive_more::Display;
 use futures::{StreamExt, stream};
 use serde::{Deserialize, Serialize};
@@ -37,17 +37,25 @@ pub async fn download(cx: &mut DownloadRunContext<'_>) -> Result<()> {
         .await?;
     let raw_cataloged_versions =
         catalog.0.values().map(Vec::len).sum::<usize>();
-    let mut cataloged_versions = catalog
-        .0
-        .into_values()
-        .flatten()
-        // certain version manifests are broken;
-        // we have to explicitly exclude them
-        .filter(|name| !BLACKLIST.contains(&name.0.as_str()))
-        .collect::<Vec<_>>();
+
+    let mut cataloged_versions = Vec::new();
+    let mut skipped_pre_installer_versions = 0usize;
+    for name in catalog.0.into_values().flatten() {
+        if !has_supported_installer(&name)
+            .with_context(|| format!("checking installer support for {name}"))?
+        {
+            skipped_pre_installer_versions += 1;
+            continue;
+        }
+        if !BLACKLIST.contains(&name.0.as_str()) {
+            cataloged_versions.push(name);
+        }
+    }
+
     cataloged_versions.sort();
     info!(
         raw_cataloged_versions,
+        skipped_pre_installer_versions,
         num_cataloged_versions = cataloged_versions.len(),
         "downloaded Forge catalog"
     );
@@ -121,6 +129,40 @@ pub async fn download(cx: &mut DownloadRunContext<'_>) -> Result<()> {
     Ok(())
 }
 
+/// If this installer version has an installer JAR which we can process.
+///
+/// Very old Forge versions don't have an installer JAR, so we don't support
+/// them.
+fn has_supported_installer(name: &ForgelikeInstallerName) -> Result<bool> {
+    let (minecraft, remaining) = name
+        .0
+        .split_once('-')
+        .context("missing Forge version separator")?;
+    ensure!(!minecraft.is_empty(), "missing Minecraft version");
+    let version = remaining
+        .split('-')
+        .next()
+        .context("missing Forge version")?;
+    let components = version
+        .split('.')
+        .map(|part| {
+            part.parse::<u32>()
+                .context("invalid numeric Forge version component")
+        })
+        .collect::<Result<Vec<_>>>()?;
+
+    let version_parts = match (
+        <[u32; 4]>::try_from(components.as_slice()),
+        <[u32; 3]>::try_from(components.as_slice()),
+    ) {
+        (Ok([a, b, c, d]), _) => [a, b, c, d],
+        (Err(_), Ok([a, b, c])) => [a, b, c, 0],
+        (Err(_), Err(_)) => bail!("expected 3 or 4 Forge version components"),
+    };
+    Ok(version_parts >= [7, 8, 0, 684])
+}
+
+/// Specific Forge installer versions which we can't download or process.
 const BLACKLIST: &[&str] = &[
     // Not supported due to `data` field being `[]` even though the type is a map
     "1.12.2-14.23.5.2851",
@@ -132,3 +174,30 @@ const BLACKLIST: &[&str] = &[
     "1.6.4-9.11.1.963",
     "1.6.4-9.11.1.964",
 ];
+
+#[cfg(test)]
+mod tests {
+    use super::{ForgelikeInstallerName, has_supported_installer};
+
+    #[test]
+    fn installer_support_uses_numeric_release_boundary() {
+        for (name, supported) in [
+            ("1.1-1.3.3.26", false),
+            ("1.5.2-7.8.0.683", false),
+            ("1.5.2-7.8.0.684", true),
+            ("1.5.2-7.8.1.1", true),
+            ("1.7.10-10.13.4.1614-1.7.10", true),
+            ("1.10.2-12.18.1.2016-failtests", true),
+            ("1.21.8-58.1.22", true),
+        ] {
+            assert_eq!(
+                has_supported_installer(&ForgelikeInstallerName(
+                    name.to_owned()
+                ))
+                .unwrap(),
+                supported,
+                "{name}"
+            );
+        }
+    }
+}
