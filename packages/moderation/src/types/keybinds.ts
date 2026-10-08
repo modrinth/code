@@ -1,5 +1,7 @@
 import type { Labrinth } from '@modrinth/api-client'
 
+import type { MiscReviewPanelKey } from '../data/issues'
+
 export interface ModerationActions {
 	tryGoNext: () => void
 	tryGoBack: () => void
@@ -101,9 +103,7 @@ export type ReviewShortcutAction =
 	| 'edit'
 	| 'collapse'
 	| 're-review'
-	| 'reupload'
-	| 'rules'
-	| 'post-approval'
+	| MiscReviewPanelKey
 
 export type ModerationReviewActionsContext = {
 	scope: 'review-actions'

@@ -1,5 +1,7 @@
 import type {
+	EachPanel,
 	Issue,
+	LabeledReviewPanel,
 	Panel,
 	PanelNode,
 	PanelRegistration,
@@ -7,6 +9,10 @@ import type {
 	ReviewPanelItem,
 	WithContext,
 } from './types'
+
+function isPanelGroup(definition: PanelRegistration): definition is readonly LabeledReviewPanel[] {
+	return Array.isArray(definition)
+}
 
 function resolve<T>(value: WithContext<T>, context: ReviewContext): T {
 	return typeof value === 'function' ? (value as (ctx: ReviewContext) => T)(context) : value
@@ -50,7 +56,17 @@ export function expandItemReviewPanels(
 	const issues = new Map<string, Issue>()
 	const itemIssues = new Map<ReviewPanelItem, Map<string, Issue>>()
 	const itemToggleIds = new Map<ReviewPanelItem, Map<string, string[]>>()
+	const registrations = new Map<string, Panel | EachPanel>()
 	for (const [key, definition] of Object.entries(definitions)) {
+		const entries = isPanelGroup(definition)
+			? definition.map(({ key, panel }) => [key, panel] as const)
+			: [[key, definition] as const]
+		for (const [panelKey, panel] of entries) {
+			if (registrations.has(panelKey)) throw new Error(`Duplicate review panel "${panelKey}"`)
+			registrations.set(panelKey, panel)
+		}
+	}
+	for (const [key, definition] of registrations) {
 		if (!('type' in definition)) {
 			panels[key] = definition
 			continue

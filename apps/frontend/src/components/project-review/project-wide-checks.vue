@@ -19,11 +19,11 @@
 				@update:value="selectedTarget = $event as ActionTarget"
 			/>
 			<ReviewPanel
-				v-if="visibleTargets.includes(selectedTarget)"
+				v-if="selectedTarget !== undefined && visibleTargets.includes(selectedTarget)"
 				:key="selectedTarget"
 				mode="inline"
 				class="min-w-0 shrink-0"
-				:target="{ kind: selectedTarget }"
+				:target="{ kind: 'panel', key: selectedTarget }"
 			/>
 		</div>
 		<div
@@ -49,6 +49,7 @@
 </template>
 
 <script setup lang="ts">
+import { type MiscReviewPanelKey, reviewPanels } from '@modrinth/moderation/src/data/issues'
 import { defineMessages, Tabs, useVIntl } from '@modrinth/ui'
 import { useElementSize } from '@vueuse/core'
 import { computed, onScopeDispose, ref, watch } from 'vue'
@@ -101,12 +102,11 @@ function stopActionsResize(event: PointerEvent) {
 }
 
 const { resolve } = injectReviewPanels()
-const targets = ['reupload', 'rules', 'post-approval'] as const
-type ActionTarget = (typeof targets)[number]
-const selectedTarget = ref<ActionTarget>('reupload')
+type ActionTarget = MiscReviewPanelKey
+const selectedTarget = ref<ActionTarget | undefined>(reviewPanels.misc[0]?.key)
 const shortcuts = injectReviewShortcuts()
 const { registerRoute } = injectReviewContext()
-for (const target of targets) {
+for (const { key: target } of reviewPanels.misc) {
 	useReviewShortcut(
 		target,
 		() => {
@@ -121,24 +121,18 @@ for (const target of targets) {
 		}),
 	)
 }
-const visibleTargets = computed(() => targets.filter((kind) => resolve({ kind })))
+const visiblePanels = computed(() =>
+	reviewPanels.misc.filter(({ key }) => resolve({ kind: 'panel', key })),
+)
+const visibleTargets = computed(() => visiblePanels.value.map(({ key }) => key))
 const tabs = computed(() =>
-	visibleTargets.value.map((kind) => {
-		const panel = resolve({ kind })!.panel
-		return {
-			value: kind,
-			label:
-				panel.title ??
-				panel.sections.flatMap((section) => section.controls)[0]?.issue.category ??
-				kind,
-		}
-	}),
+	visiblePanels.value.map(({ key, label }) => ({ value: key, label })),
 )
 
 watch(
 	visibleTargets,
 	(visible) => {
-		if (!visible.includes(selectedTarget.value) && visible[0]) {
+		if (selectedTarget.value === undefined || !visible.includes(selectedTarget.value)) {
 			selectedTarget.value = visible[0]
 		}
 	},

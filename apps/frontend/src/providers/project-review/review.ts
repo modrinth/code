@@ -23,3 +23,4 @@ export type ReviewTarget =
 				| 'rules'
 	  }
 	| { kind: 'link' | 'gallery-image' | 'version' | 'disclosure'; key: string }
+	| { kind: 'panel'; key: string }

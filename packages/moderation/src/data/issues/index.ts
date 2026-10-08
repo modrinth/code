@@ -86,14 +86,30 @@ export const reviewPanels = {
 	metadata: metadataReviewPanel,
 	server: serverReviewPanel,
 	permissions: permissionsReviewPanel,
-	'post-approval': postApprovalReviewPanel,
 	're-review': reReviewReviewPanel,
-	reupload: reuploadReviewPanel,
-	rules: rulesReviewPanel,
+	misc: [
+		{
+			key: 'reupload',
+			label: 'Reupload',
+			panel: reuploadReviewPanel,
+		},
+		{
+			key: 'rules',
+			label: 'Rule Following',
+			panel: rulesReviewPanel,
+		},
+		{
+			key: 'post-approval',
+			label: 'Post-Approval',
+			panel: postApprovalReviewPanel,
+		},
+	],
 	'undefined-project': undefinedProjectReviewPanel,
 	versions: versionsReviewPanel,
 } satisfies Record<string, PanelRegistration>
 
 export { IssuePriority } from './component-builders/priority'
 
-export type ReviewPanelKey = keyof typeof reviewPanels
+export type MiscReviewPanelKey = (typeof reviewPanels.misc)[number]['key']
+
+export type ReviewPanelKey = Exclude<keyof typeof reviewPanels, 'misc'> | MiscReviewPanelKey

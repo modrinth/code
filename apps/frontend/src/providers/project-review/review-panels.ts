@@ -400,6 +400,7 @@ export function createReviewPanels(
 	})
 
 	function resolve(target: ReviewTarget) {
+		if (target.kind === 'panel') return panels.value.get(target.key)
 		const aliases: Partial<Record<ReviewTarget['kind'], string>> = {
 			tags: 'categories',
 			compatibility: 'metadata',

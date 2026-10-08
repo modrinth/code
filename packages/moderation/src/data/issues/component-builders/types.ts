@@ -155,7 +155,11 @@ export interface EachPanel {
 	items: (ctx: ReviewContext) => readonly ReviewPanelItem[]
 }
 
-export type PanelRegistration = Panel | EachPanel
+export interface LabeledReviewPanel extends ReviewPanelItem {
+	label: string
+}
+
+export type PanelRegistration = Panel | EachPanel | readonly LabeledReviewPanel[]
 
 export type PanelConfig = Omit<Panel, 'children'>
 
