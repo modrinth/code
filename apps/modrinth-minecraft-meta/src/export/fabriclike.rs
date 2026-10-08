@@ -15,7 +15,7 @@ use url::Url;
 
 use crate::{
     AppState,
-    model::{self, Processor, SidedDataEntry},
+    model::{self, FabriclikeLoader, Processor, SidedDataEntry},
     store::ContentType,
     upstream::mojang::{
         Argument, ArgumentType, LibraryDownloads, LibraryExtract,
@@ -159,11 +159,15 @@ fn profile_source(
 }
 
 fn profile_path(
-    loader: &str,
+    loader: FabriclikeLoader,
     format_version: u32,
     group: Option<&str>,
     version: &str,
 ) -> String {
+    let loader = match loader {
+        FabriclikeLoader::Fabric => "fabric",
+        FabriclikeLoader::Quilt => "quilt",
+    };
     match group {
         None => format!("{loader}/v{format_version}/versions/{version}.json"),
         Some(group) => format!(
@@ -231,7 +235,7 @@ fn make_manifest(
 /// Publishes profiles and a catalog from snapshots ordered newest-first.
 pub async fn export_catalogs(
     app: &AppState,
-    loader: &str,
+    loader: FabriclikeLoader,
     format_version: u32,
     fallback_maven: &Url,
     catalogs: Vec<CatalogSnapshot>,
@@ -263,7 +267,7 @@ pub async fn export_catalogs(
     }
     ensure!(
         !games.is_empty() && !loaders.is_empty() && !groups.is_empty(),
-        "no {loader} game versions, loaders, or profile groups to export"
+        "no game versions, loaders, or profile groups to export"
     );
     let mut profile_urls = Vec::new();
     for group in &groups {
@@ -285,7 +289,7 @@ pub async fn export_catalogs(
     let mut downloads = model::BlobDownload::all()
         .filter(model::BlobDownload::fields().url().in_list(profile_urls))
         .exec(&mut conn)
-        .context(info_span!("fetching downloaded profiles", loader))
+        .context(info_span!("fetching downloaded profiles"))
         .await?;
     downloads.sort_by_key(|row| {
         (
@@ -318,12 +322,12 @@ pub async fn export_catalogs(
             }
             let (template, source, sha256) = selected.with_context(|| {
                 format!(
-                    "no downloaded {loader} profile for {} in group {:?}",
+                    "no downloaded {loader:?} profile for {} in group {:?}",
                     version.id, group.id
                 )
             })?;
             let bytes = app.cas.get(sha256)
-				.context(info_span!("fetching loader profile", loader, loader_version = %version.id, %source))
+				.context(info_span!("fetching loader profile", loader_version = %version.id, %source))
 				.await?;
             let profile = from_json_slice::<ProfileMetadata>(&bytes)
                 .context("parsing loader profile")?;
@@ -335,10 +339,7 @@ pub async fn export_catalogs(
                 &public_maven,
             )
             .with_context(|| {
-                format!(
-                    "normalizing {loader} profile {} from {source}",
-                    version.id
-                )
+                format!("normalizing profile {} from {source}", version.id)
             })?;
             for mut artifact in dependencies {
                 artifact.source =
@@ -367,11 +368,7 @@ pub async fn export_catalogs(
         }
     }
     let num_total = artifacts.len();
-    info!(
-        loader,
-        num_artifacts = num_total,
-        "mirroring loader dependencies"
-    );
+    info!(num_artifacts = num_total, "mirroring loader dependencies");
     let num_done = AtomicUsize::new(0);
     stream::iter(artifacts.into_values().map(Ok::<_, anyhow::Error>))
         .try_for_each_concurrent(
@@ -380,33 +377,31 @@ pub async fn export_catalogs(
                 mirror_artifact(app, artifact).await?;
                 let num_done = num_done.fetch_add(1, Ordering::Relaxed) + 1;
                 if num_done.is_multiple_of(100) || num_done == num_total {
-                    info!(
-                        loader,
-                        "mirrored {num_done}/{num_total} dependencies"
-                    );
+                    info!("mirrored {num_done}/{num_total} dependencies");
                 }
                 anyhow::Ok(())
             },
         )
-        .context(info_span!("mirroring loader dependencies", loader))
+        .context(info_span!("mirroring loader dependencies"))
         .await?;
     for profile in &profiles {
         app.public_blobs
-			.put(&profile.path, &profile.json, ContentType::Json)
-			.context(
-				info_span!("writing loader profile", loader, path = %profile.path),
-			)
-			.await?;
+            .put(&profile.path, &profile.json, ContentType::Json)
+            .context(info_span!("writing loader profile", path = %profile.path))
+            .await?;
     }
-    info!(
-        loader,
-        num_profiles = profiles.len(),
-        "wrote loader profiles"
-    );
+    info!(num_profiles = profiles.len(), "wrote loader profiles");
     let manifest = make_manifest(games, &groups, profiles)?;
     let json =
         serde_json::to_vec(&manifest).context("serializing loader manifest")?;
-    let path = format!("{loader}/v{format_version}/manifest.json");
+    let path = match loader {
+        FabriclikeLoader::Fabric => {
+            format!("fabric/v{format_version}/manifest.json")
+        }
+        FabriclikeLoader::Quilt => {
+            format!("quilt/v{format_version}/manifest.json")
+        }
+    };
     app.public_blobs
         .put(&path, &json, ContentType::Json)
         .context(info_span!("writing loader manifest", %path))
@@ -664,11 +659,11 @@ mod tests {
     #[test]
     fn profile_locations_match_published_formats_and_source_encoding() {
         assert_eq!(
-            profile_path("fabric", 0, None, "0.19.5"),
+            profile_path(FabriclikeLoader::Fabric, 0, None, "0.19.5"),
             "fabric/v0/versions/0.19.5.json"
         );
         assert_eq!(
-            profile_path("quilt", 1, Some("v2"), "0.30.0"),
+            profile_path(FabriclikeLoader::Quilt, 1, Some("v2"), "0.30.0"),
             "quilt/v1/version-group/v2/loader-version/0.30.0"
         );
         assert_eq!(

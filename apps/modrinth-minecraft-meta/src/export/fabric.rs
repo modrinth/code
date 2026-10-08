@@ -12,7 +12,7 @@ use crate::{
         self, Artifact, CatalogGame, CatalogLoader, CatalogSnapshot,
         ProfileGroup,
     },
-    model,
+    model::{self, FabriclikeLoader},
     upstream::fabric,
     util::from_json_slice,
 };
@@ -106,11 +106,15 @@ pub async fn export(app: &AppState) -> Result<()> {
     };
     fabriclike::export_catalogs(
         app,
-        "fabric",
+        FabriclikeLoader::Fabric,
         FORMAT_VERSION,
         &repository,
         catalogs,
         vec![group],
     )
+    .context(info_span!(
+        "exporting catalogs",
+        loader = ?FabriclikeLoader::Fabric
+    ))
     .await
 }

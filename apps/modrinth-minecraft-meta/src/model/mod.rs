@@ -2,6 +2,7 @@
 
 mod download;
 mod fabric;
+mod fabriclike;
 mod forgelike;
 mod minecraft;
 mod mojang;
@@ -11,6 +12,7 @@ mod quilt;
 
 pub use download::*;
 pub use fabric::*;
+pub use fabriclike::*;
 pub use forgelike::*;
 pub use minecraft::*;
 pub use mojang::*;

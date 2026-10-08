@@ -53,7 +53,23 @@ enum Command {
     ExtractInstallers,
     /// Take processed information from the database, produce JSON manifests
     /// from them, and upload them to the public file store.
-    Export,
+    Export {
+        /// Export Minecraft game versions?
+        #[arg(long)]
+        mojang: bool,
+        /// Export Fabric loader profiles?
+        #[arg(long)]
+        fabric: bool,
+        /// Export Forge loader profiles?
+        #[arg(long)]
+        forge: bool,
+        /// Export NeoForge loader profiles?
+        #[arg(long)]
+        neoforge: bool,
+        /// Export Quilt loader profiles?
+        #[arg(long)]
+        quilt: bool,
+    },
 }
 
 #[derive(Debug, Clone, Copy, clap::ValueEnum)]
@@ -133,6 +149,21 @@ pub async fn main() -> Result<()> {
         maven,
     };
 
+    let select_upstreams = |mojang: bool,
+                            fabric: bool,
+                            forge: bool,
+                            neoforge: bool,
+                            quilt: bool| {
+        let all_upstreams = !mojang && !fabric && !forge && !neoforge && !quilt;
+        task::Upstreams {
+            mojang: all_upstreams || mojang,
+            fabric: all_upstreams || fabric,
+            forge: all_upstreams || forge,
+            neoforge: all_upstreams || neoforge,
+            quilt: all_upstreams || quilt,
+        }
+    };
+
     match cli.command {
         Command::Download {
             mojang,
@@ -141,19 +172,22 @@ pub async fn main() -> Result<()> {
             neoforge,
             quilt,
         } => {
-            let all_upstreams =
-                !mojang && !fabric && !forge && !neoforge && !quilt;
-            let upstreams = task::Upstreams {
-                mojang: all_upstreams || mojang,
-                fabric: all_upstreams || fabric,
-                forge: all_upstreams || forge,
-                neoforge: all_upstreams || neoforge,
-                quilt: all_upstreams || quilt,
-            };
+            let upstreams =
+                select_upstreams(mojang, fabric, forge, neoforge, quilt);
             task::download_from_upstreams(&app, upstreams).await
         }
         Command::ExtractInstallers => task::extract_installers(&mut app).await,
-        Command::Export => task::export(&mut app).await,
+        Command::Export {
+            mojang,
+            fabric,
+            forge,
+            neoforge,
+            quilt,
+        } => {
+            let upstreams =
+                select_upstreams(mojang, fabric, forge, neoforge, quilt);
+            task::export(&mut app, upstreams).await
+        }
     }
 }
 
