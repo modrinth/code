@@ -40,6 +40,7 @@ import {
 	commonSettingsMessages,
 	ContentInstallModal,
 	ContentUpdaterModal,
+	createServerInviteHandoff,
 	createServerOnboardingFlow,
 	CreationFlowModal,
 	defineMessages,
@@ -54,6 +55,7 @@ import {
 	provideNotificationManager,
 	providePageContext,
 	providePopupNotificationManager,
+	provideServerInviteHandoff,
 	provideServerOnboardingFlow,
 	provideServerPlay,
 	serverIconQueryOptions,
@@ -348,6 +350,7 @@ const tauriApiClient = new TauriModrinthClient({
 })
 provideModrinthClient(tauriApiClient)
 provideServerOnboardingFlow(createServerOnboardingFlow())
+provideServerInviteHandoff(createServerInviteHandoff())
 const { data: authenticatedModrinthUser } = useQuery({
 	queryKey: computed(() => ['authenticated-user', 'campaigns', credentials.value?.user?.id]),
 	queryFn: () => tauriApiClient.labrinth.users_v3.getAuthenticated(),

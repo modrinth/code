@@ -143,6 +143,8 @@ import {
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
+	injectServerInviteHandoff,
+	type ServerInviteBinding,
 	type ServerPlayTarget,
 } from '#ui/providers'
 import { injectPageContext } from '#ui/providers/page-context'
@@ -186,6 +188,8 @@ const sharedInstanceId = computed(() => world.value?.content?.shared_instance_id
 const needsUpdate = computed(() => world.value?.content?.shared_instance_needs_update ?? false)
 const players = useServerPlayers(sharedInstanceId, canSetup)
 const invitePlayersModal = ref<InstanceType<typeof InvitePlayersModal>>()
+const inviteHandoff = injectServerInviteHandoff(null)
+let inviteHandoffStarted = false
 const shareReview = useServerShareReview<Action>({
 	execute: performAction,
 	disabled: computed(() => players.linkMutation.isPending.value),
@@ -203,6 +207,28 @@ const removeModal = ref<InstanceType<typeof ConfirmModal>>()
 const playerToRemove = ref<ServerPlayerRow>()
 const previewAction = ref<'play' | 'push'>('push')
 const preferences = useServerPreferences(serverId)
+const inviteBinding = computed<ServerInviteBinding>(() => ({
+	header: formatMessage(messages.inviteHeader, { name: server.value.name }),
+	props: {
+		friends: players.candidates.value,
+		searchUsers: players.search,
+		link: players.link.value
+			? `${props.siteUrl}/share/${encodeURIComponent(players.link.value.id)}`
+			: undefined,
+		linkExpiresAt: players.link.value?.expiration,
+		linkMaxUses: players.link.value?.max_uses,
+		linkMaxUsesLimit: players.remaining.value,
+		updateInviteLink,
+		canInvite:
+			canSetup.value &&
+			!actionsLocked.value &&
+			!players.membershipMutation.isPending.value &&
+			players.remaining.value > 0,
+		inviteDisabledMessage: formatMessage(messages.invitesUnavailable),
+	},
+	onInvite: invitePlayer,
+	onCancel: (user) => changeMember(user.id, true),
+}))
 const serverAddress = computed(() =>
 	getHostingServerAddress(server.value?.net, serverFull.value?.subdomain),
 )
@@ -233,7 +259,9 @@ async function performAction(action: Action, target: ServerShareActionTarget) {
 		const members = await players.members.refetch({ throwOnError: true })
 		if (!sameContext()) return
 		await players.ensureLink(id, members.data?.remaining)
-		if (sameContext()) invitePlayersModal.value?.show()
+		if (!sameContext()) return
+		if (inviteHandoff?.requested.value) inviteHandoff.provide(inviteBinding)
+		else invitePlayersModal.value?.show()
 	} else if (action === 'download') {
 		const latest = await client.sharedinstances.instances_v1.getLatestVersion(id)
 		if (!latest.ready) throw new Error(formatMessage(messages.notReady))
@@ -325,6 +353,23 @@ async function updateInviteLink(settings: InviteLinkSettings) {
 		replaceId: players.link.value?.id,
 	})
 }
+watch(
+	[worldId, canSetup, () => inviteHandoff?.requested.value],
+	async () => {
+		if (!inviteHandoff?.requested.value) {
+			inviteHandoffStarted = false
+			return
+		}
+		if (!worldId.value || inviteHandoffStarted) return
+		inviteHandoffStarted = true
+		if (canSetup.value) await perform('invite')
+		if (!inviteHandoff.binding.value) inviteHandoff.cancel()
+	},
+	{ immediate: true },
+)
+onScopeDispose(() => {
+	if (inviteHandoff?.binding.value === inviteBinding.value) inviteHandoff.cancel()
+})
 watch([worldId, sharedInstanceId, () => auth.user.value?.id], () => {
 	invitePlayersModal.value?.hide()
 	removeModal.value?.hide()

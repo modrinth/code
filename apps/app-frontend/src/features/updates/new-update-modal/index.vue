@@ -1,5 +1,13 @@
 <script setup lang="ts">
-import { CircleSlashIcon, PlayIcon, UserPlusIcon, XIcon } from '@modrinth/assets'
+import {
+	CircleSlashIcon,
+	PlayIcon,
+	SpinnerIcon,
+	UserPlusIcon,
+	Volume2Icon,
+	VolumeXIcon,
+	XIcon,
+} from '@modrinth/assets'
 import {
 	AutoLink,
 	Button,
@@ -7,12 +15,14 @@ import {
 	defineMessages,
 	IconButton,
 	injectNotificationManager,
+	injectServerInviteHandoff,
 	IntlFormatted,
+	InvitePlayersContent,
 	NewModal,
 	useVIntl,
 } from '@modrinth/ui'
 import { useEventListener } from '@vueuse/core'
-import { computed, ref, useTemplateRef } from 'vue'
+import { computed, ref, shallowRef, useTemplateRef, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 import videoUrl from '@/assets/modrinth-hosting-server-play-demo.webm'
@@ -23,9 +33,16 @@ import { useNewUpdateNotification } from './use-notification'
 
 const modal = useTemplateRef<InstanceType<typeof NewModal>>('modal')
 const video = useTemplateRef<HTMLVideoElement>('video')
+const inviting = ref(false)
+const stage = ref<'intro' | 'invite'>('intro')
+const inviteHandoff = injectServerInviteHandoff()
+const inviteBinding = computed(() => inviteHandoff.binding.value?.value ?? null)
+const lastBinding = shallowRef<typeof inviteBinding.value>(null)
+const displayBinding = computed(() => inviteBinding.value ?? lastBinding.value)
 const videoStarted = ref(false)
 const videoPlaying = ref(false)
 const videoLoading = ref(false)
+const videoMuted = ref(false)
 const videoDuration = ref(16)
 const videoCurrentTime = ref(0)
 const remainingTime = computed(() => {
@@ -78,9 +95,19 @@ const messages = defineMessages({
 		id: 'app.server-sharing-update.pause',
 		defaultMessage: 'Pause video',
 	},
+	mute: {
+		id: 'app.server-sharing-update.mute',
+		defaultMessage: 'Mute video',
+	},
+	unmute: {
+		id: 'app.server-sharing-update.unmute',
+		defaultMessage: 'Unmute video',
+	},
 })
 
 function show() {
+	stage.value = 'intro'
+	inviting.value = false
 	stopVideo()
 	videoStarted.value = false
 	videoPlaying.value = false
@@ -117,6 +144,13 @@ function stopVideo() {
 	syncVideoState()
 }
 
+function toggleMute() {
+	const player = video.value
+	if (!player) return
+	player.muted = !player.muted
+	videoMuted.value = player.muted
+}
+
 function hasVideoEnded(player: HTMLVideoElement) {
 	return (
 		player.ended ||
@@ -147,9 +181,43 @@ useEventListener(document, 'visibilitychange', () => {
 	if (document.visibilityState === 'visible') syncVideoState()
 })
 
+function onHide() {
+	stopVideo()
+	inviteHandoff.cancel()
+}
+
+watch(inviteBinding, async (binding) => {
+	if (!binding || !inviting.value) return
+	lastBinding.value = binding
+	await modal.value?.transitionContent(() => {
+		stage.value = 'invite'
+		inviting.value = false
+	})
+})
+
+watch(
+	() => inviteHandoff.requested.value,
+	(requested) => {
+		if (!requested && stage.value === 'intro') inviting.value = false
+	},
+)
+
 async function invitePlayers() {
-	await router.push(invitePath.value)
-	hide()
+	if (inviting.value) return
+	if (!invitePath.value.endsWith('/play')) {
+		await router.push(invitePath.value)
+		hide()
+		return
+	}
+	inviting.value = true
+	inviteHandoff.request()
+	try {
+		await router.push(invitePath.value)
+	} catch (error) {
+		inviteHandoff.cancel()
+		inviting.value = false
+		handleError(error as Error)
+	}
 }
 
 defineExpose({ show, hide, notifyForVersion })
@@ -163,10 +231,10 @@ defineExpose({ show, hide, notifyForVersion })
 		width="546px"
 		max-width="calc(100vw - 2rem)"
 		:aria-label="formatMessage(messages.title)"
-		:on-hide="stopVideo"
+		:on-hide="onHide"
 		class="!overflow-y-auto !rounded-[20px] !bg-surface-3"
 	>
-		<div class="w-[544px] max-w-full">
+		<div v-if="stage === 'intro'" class="w-[544px] max-w-full">
 			<div class="relative aspect-video overflow-hidden rounded-t-[19px] bg-black">
 				<video
 					ref="video"
@@ -226,11 +294,28 @@ defineExpose({ show, hide, notifyForVersion })
 						</Button>
 					</div>
 				</Transition>
+				<Transition
+					enter-active-class="transition-opacity duration-300 ease-out motion-reduce:transition-none"
+					leave-active-class="transition-opacity duration-300 ease-out motion-reduce:transition-none"
+					enter-from-class="opacity-0"
+					leave-to-class="opacity-0"
+				>
+					<Button
+						v-if="videoPlaying"
+						size="sm"
+						:aria-label="formatMessage(videoMuted ? messages.unmute : messages.mute)"
+						class="!absolute bottom-5 right-5 z-10 !size-8 !rounded-full !bg-[rgba(52,54,60,0.7)] !p-0 !text-white !shadow-[inset_0_0_0_1px_rgba(66,68,74,0.7)] [&>svg]:!text-[#b0bac5]"
+						@click="toggleMute"
+					>
+						<VolumeXIcon v-if="videoMuted" aria-hidden="true" />
+						<Volume2Icon v-else aria-hidden="true" />
+					</Button>
+				</Transition>
 				<IconButton
 					type="quiet"
 					size="sm"
 					:label="formatMessage(commonMessages.closeButton)"
-					class="!absolute right-5 top-5 z-10"
+					class="!absolute right-5 top-5 z-10 !size-8 !rounded-full !p-0 hover:!bg-[rgba(52,54,60,0.7)] hover:!text-white hover:!shadow-[inset_0_0_0_1px_rgba(66,68,74,0.7)] [&>svg]:hover:!text-[#b0bac5]"
 					@click="hide"
 				>
 					<XIcon aria-hidden="true" />
@@ -268,16 +353,34 @@ defineExpose({ show, hide, notifyForVersion })
 				</div>
 
 				<div class="flex flex-wrap items-center gap-2.5">
-					<Button size="lg" @click="hide">
+					<Button size="lg" :disabled="inviting" @click="hide">
 						<CircleSlashIcon aria-hidden="true" />
 						{{ formatMessage(messages.skip) }}
 					</Button>
-					<Button type="colored" color="brand" size="lg" @click="invitePlayers">
-						<UserPlusIcon aria-hidden="true" />
+					<Button type="colored" color="brand" size="lg" :loading="inviting" @click="invitePlayers">
+						<SpinnerIcon v-if="inviting" class="animate-spin" aria-hidden="true" />
+						<UserPlusIcon v-else aria-hidden="true" />
 						{{ formatMessage(messages.invite) }}
 					</Button>
 				</div>
 			</section>
+		</div>
+		<div v-else-if="displayBinding" class="w-[544px] max-w-full">
+			<div
+				class="flex items-center justify-between gap-4 border-0 border-b border-solid border-surface-5 p-6"
+			>
+				<h2 class="m-0 min-w-0 text-2xl font-semibold text-contrast">
+					{{ displayBinding.header }}
+				</h2>
+				<IconButton :label="formatMessage(commonMessages.closeButton)" @click="hide">
+					<XIcon aria-hidden="true" />
+				</IconButton>
+			</div>
+			<InvitePlayersContent
+				v-bind="displayBinding.props"
+				@invite="displayBinding.onInvite"
+				@cancel="displayBinding.onCancel"
+			/>
 		</div>
 	</NewModal>
 </template>
