@@ -28,6 +28,7 @@ use crate::state::{
     ModLoader, State,
 };
 use crate::util::fetch::DownloadReason;
+use sqlx::SqlitePool;
 use std::collections::{HashMap, HashSet};
 use std::future::Future;
 use std::path::PathBuf;
@@ -161,15 +162,17 @@ pub async fn install_existing_instance(
     start(InstallRequest::InstallExistingInstance { instance_id, force }).await
 }
 
-pub(crate) async fn wait_for_job(job_id: Uuid) -> crate::Result<()> {
-    let state = State::get().await?;
+pub(crate) async fn wait_for_job(
+    job_id: Uuid,
+    pool: &SqlitePool,
+) -> crate::Result<()> {
     let completion = store::completion_notification(job_id);
     loop {
         // Register before reading so completion during the query cannot be missed.
         let notified = completion.notified();
         tokio::pin!(notified);
         notified.as_mut().enable();
-        let job = store::get_required(job_id, &state.pool).await?;
+        let job = store::get_required(job_id, pool).await?;
         if job.status == InstallJobStatus::Succeeded {
             return Ok(());
         }

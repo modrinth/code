@@ -1057,7 +1057,7 @@ pub async fn launch_minecraft(
         let job_id = uuid::Uuid::parse_str(&job.job_id).map_err(|error| {
             crate::ErrorKind::LauncherError(error.to_string())
         })?;
-        crate::install::runner::wait_for_job(job_id).await?;
+        crate::install::runner::wait_for_job(job_id, &state.pool).await?;
         runtime_lease = state.content_store.runtime_cache_lock.read().await;
     }
     let _runtime_lease = runtime_lease;
