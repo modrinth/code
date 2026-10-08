@@ -3,7 +3,7 @@ import { expandVariables } from '@modrinth/moderation/src/utils'
 import { createContext } from '@modrinth/ui'
 import { computed, reactive, type Ref, watch } from 'vue'
 
-import type { createReviewPanels, ReviewIssueSelection } from './review-panels'
+import type { createReviewPanels } from './review-panels'
 
 export const [injectReviewMessages, provideReviewMessages] =
 	createContext<ReturnType<typeof createReviewMessages>>('ProjectReviewMessages')
@@ -31,13 +31,6 @@ export function createReviewMessages(
 		const custom = panels.customIssues.value.find((issue) => issue.id === id)?.custom
 		if (custom) return custom.message
 		return overrides.get(id) ?? issueMessages.value.get(id) ?? defaults.get(id) ?? ''
-	}
-	function generatedIssueMessage(id: string, selection: ReviewIssueSelection) {
-		const current = project.value
-		const legacy = projectV2.value
-		if (!current || !legacy || current.id !== legacy.id) return undefined
-		const message = panels.generateIssueMessage(id, selection)
-		return message === undefined ? undefined : expandVariables(message.trim(), legacy, current)
 	}
 	function editIssueMessage(id: string, message: string) {
 		if (panels.customIssues.value.some((issue) => issue.id === id)) {
@@ -68,7 +61,6 @@ export function createReviewMessages(
 	return {
 		generating,
 		issueMessage,
-		generatedIssueMessage,
 		setIssueDefault: (id: string, message: string) => {
 			defaults.set(id, message)
 		},

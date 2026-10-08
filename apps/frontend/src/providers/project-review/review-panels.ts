@@ -114,6 +114,30 @@ export const customIssueActions = {
 	modify_server_languages: issueTargets.modifyServerLanguages(),
 } satisfies Record<string, IssueAction>
 
+function customIssueActionKey(what: Labrinth.Threads.v3.ThreadIssueTarget) {
+	if (what.type === 'acknowledge')
+		return what.value.mode === 'checkbox' ? 'acknowledge_checkbox' : 'acknowledge_reply'
+	return Object.hasOwn(customIssueActions, what.type)
+		? (what.type as keyof typeof customIssueActions)
+		: undefined
+}
+
+function customIssueActionKeys(
+	keys: ReadonlySet<string>,
+	previous?: Labrinth.Threads.v3.ThreadIssue,
+) {
+	return [
+		...new Set(
+			[...keys].flatMap((key) => {
+				if (Object.hasOwn(customIssueActions, key)) return [key]
+				const facet = previous?.facets.find((facet) => key === `previous-facet:${facet.id}`)
+				const action = facet ? customIssueActionKey(facet.what) : undefined
+				return action ? [action] : []
+			}),
+		),
+	]
+}
+
 function customIssuePriority(value: unknown): keyof typeof IssuePriority {
 	const priority = String(value ?? 'Bottom')
 	if (priority === 'TOP' || priority === 'First') return 'Top'
@@ -152,6 +176,10 @@ export function createReviewPanels(
 		return Object.entries(session.read(project.value.id, 'custom-issues')).flatMap(
 			([id, value]) => {
 				if (!value || typeof value !== 'object' || value instanceof Set) return []
+				const previous =
+					typeof value.previous === 'string'
+						? (JSON.parse(value.previous) as Labrinth.Threads.v3.ThreadIssue)
+						: undefined
 				return [
 					{
 						id,
@@ -163,11 +191,9 @@ export function createReviewPanels(
 							id: String(value.id ?? id),
 							priority: customIssuePriority(value.priority),
 							message: String(value.message ?? ''),
-							facets: value.facets instanceof Set ? [...value.facets] : [],
-							previous:
-								typeof value.previous === 'string'
-									? (JSON.parse(value.previous) as Labrinth.Threads.v3.ThreadIssue)
-									: undefined,
+							facets:
+								value.facets instanceof Set ? customIssueActionKeys(value.facets, previous) : [],
+							previous,
 						},
 					},
 				]
@@ -195,7 +221,12 @@ export function createReviewPanels(
 				id: previous.why.issue_id ?? id,
 				priority: customIssuePriority(previous.why.custom?.priority),
 				message: previous.why.message ?? '',
-				facets: new Set(previous.facets.map((facet) => `previous-facet:${facet.id}`)),
+				facets: new Set(
+					previous.facets.flatMap(({ what }) => {
+						const action = customIssueActionKey(what)
+						return action ? [action] : []
+					}),
+				),
 				previous: JSON.stringify(previous),
 			})
 		}
@@ -666,38 +697,6 @@ export function createReviewPanels(
 		})
 	}
 
-	function generateIssueMessage(id: string, selection: ReviewIssueSelection) {
-		const projectV3 = project.value
-		const definition = availableIssues.value.find((issue) => issue.id === id && !issue.custom)
-		if (!projectV3 || !definition) return undefined
-		const issue = definition.controls[0]?.control.issue
-		if (!issue) return undefined
-		const text = (key: string) => {
-			const control = definition.controls.find(
-				({ control }) => control.type !== 'toggle' && control.key === key,
-			)?.control
-			return (
-				selection.text_values[key] ??
-				(control && control.type !== 'toggle' && control.type !== 'select' ? control.initial : '')
-			)
-		}
-		const selects = (key: string) => {
-			const control = definition.controls.find(
-				({ control }) => control.type === 'select' && control.key === key,
-			)?.control
-			return selection.select_values[key] ?? (control?.type === 'select' ? control.initial : [])
-		}
-		return resolveWithContext(issue.message, {
-			projectV3,
-			...reviewData.value,
-			selected: { items: {}, issueIds: [id], toggleIds: selection.toggle_ids },
-			getMarkdownValue: text,
-			getTextValue: text,
-			getSelectValue: (key) => selects(key)[0] ?? '',
-			getSelectValues: selects,
-		})
-	}
-
 	function removeIssue(id: string) {
 		if (!project.value) return
 		for (const scope of [
@@ -727,15 +726,11 @@ export function createReviewPanels(
 							priority: entry.priority,
 							message: entry.custom.message,
 							locations: entry.custom.previous?.why.locations,
-							actions: entry.custom.facets.flatMap((type): IssueAction[] => {
-								const previous = entry.custom?.previous?.facets.find(
-									(facet) => type === `previous-facet:${facet.id}`,
-								)
-								if (previous) return [() => previous.what]
-								return Object.hasOwn(customIssueActions, type)
+							actions: entry.custom.facets.flatMap((type) =>
+								Object.hasOwn(customIssueActions, type)
 									? [customIssueActions[type as keyof typeof customIssueActions]]
-									: []
-							}),
+									: [],
+							),
 						}
 					: entry.controls[0].control.issue,
 				active: true,
@@ -862,7 +857,6 @@ export function createReviewPanels(
 		addIssue,
 		issueSelection,
 		issueSnapshot,
-		generateIssueMessage,
 		isRestoredIssue,
 		removeIssue,
 		resolve,

@@ -35,6 +35,7 @@ export function useReReviewIssues(
 				'previous-issue-applicability',
 				'previous-facet-applicability',
 				'previous-issue-selection',
+				'previous-issue-copy',
 			]) {
 				for (const id of Object.keys(session.read(current.id, scope))) {
 					session.write(current.id, scope, id, undefined)

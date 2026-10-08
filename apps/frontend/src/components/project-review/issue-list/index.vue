@@ -59,7 +59,6 @@
 				:key="issue.id"
 				:issue="issue"
 				resolved
-				@add="emit('add')"
 			/>
 		</Accordion>
 	</div>
@@ -105,7 +104,12 @@ function compareIssues(
 }
 const resolvedIssues = computed(() => [...previousIssues.resolvedIssues.value].sort(compareIssues))
 const issues = computed(() => {
-	if (props.reReview) return [...previousIssues.reReviewIssues.value].sort(compareIssues)
+	if (props.reReview) {
+		const addedIds = new Set(previousIssues.appliedIssues.value.map(({ id }) => id))
+		return previousIssues.reReviewIssues.value
+			.filter(({ id }) => !addedIds.has(id))
+			.sort(compareIssues)
+	}
 	const available = new Map(panels.availableIssues.value.map((issue) => [issue.id, issue]))
 	const previousIds = previousIssues.associatedIssueIds.value
 	const activeIssues = panels.activeIssues.value.flatMap(({ id }) => {

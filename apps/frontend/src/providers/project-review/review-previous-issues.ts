@@ -69,15 +69,7 @@ export function createReviewPreviousIssues(
 		if (!definition || !isApplicable(issue)) return issueMessage(issue)
 		if (!panels.activeIssues.value.some((active) => active.id === definition.id))
 			return issueMessage(issue)
-		if (definition.custom) return messages.issueMessage(definition.id)
-		if (messages.hasIssueOverride(definition.id)) return messages.issueMessage(definition.id)
-		const selection = issue.why.selection
-		const generated = selection
-			? messages.generatedIssueMessage(definition.id, selection)
-			: undefined
-		return generated !== undefined && issueMessage(issue) === generated
-			? messages.issueMessage(definition.id)
-			: issueMessage(issue)
+		return messages.issueMessage(definition.id)
 	}
 
 	function isApplicable(issue: ThreadIssue) {
@@ -261,6 +253,7 @@ export function createReviewPreviousIssues(
 		const id = project.value?.id
 		if (!id || !issues.value.some(({ id }) => id === issue.id)) return
 		session.write(id, 'previous-issue-applicability', issue.id, false)
+		session.write(id, 'previous-issue-copy', issue.id, undefined)
 		for (const facet of issue.facets)
 			session.write(id, 'previous-facet-applicability', facet.id, false)
 		const definition = reviewIssue(issue)
@@ -278,15 +271,16 @@ export function createReviewPreviousIssues(
 		const projectId = project.value?.id
 		if (!projectId || !issues.value.some(({ id }) => id === issue.id)) return
 		session.write(projectId, 'previous-issue-applicability', issue.id, true)
+		session.write(projectId, 'previous-issue-copy', issue.id, true)
+		messages.resetIssueMessage(messageKey(issue))
 		for (const facet of issue.facets)
-			session.write(
-				projectId,
-				'previous-facet-applicability',
-				facet.id,
-				isResolved(issue) || facet.verdict !== 'resolved',
-			)
+			session.write(projectId, 'previous-facet-applicability', facet.id, true)
 		const definition = reviewIssue(issue) ?? panels.restoreCustomIssue(issue)
 		if (!definition) return
+		if (!definition.custom) {
+			messages.resetIssueMessage(definition.id)
+			panels.removeIssue(definition.id)
+		}
 		if (definition.custom) {
 			panels.addIssue(definition.id)
 			session.write(
@@ -297,55 +291,32 @@ export function createReviewPreviousIssues(
 			)
 			return
 		}
-		if (panels.activeIssues.value.some(({ id }) => id === definition.id)) {
+		panels.addIssue(definition.id)
+		const selection = issue.why.selection
+		if (selection) {
+			session.write(projectId, 'issues', definition.id, new Set(selection.toggle_ids ?? []))
+			session.write(projectId, 'issue-text', definition.id, { ...selection.text_values })
 			session.write(
 				projectId,
-				'previous-issue-selection',
-				issue.id,
-				panels.issueSnapshot(definition.id),
+				'issue-select',
+				definition.id,
+				Object.fromEntries(
+					Object.entries(selection.select_values ?? {}).map(([key, values]) => [
+						key,
+						new Set(values),
+					]),
+				),
 			)
-			return
-		}
-		panels.addIssue(definition.id)
-		const stored = issueDetails(issue).selection
-		const selection =
-			stored && typeof stored === 'object' && !Array.isArray(stored)
-				? (stored as Record<string, unknown>)
-				: undefined
-		const toggleIds = Array.isArray(selection?.toggle_ids)
-			? new Set(selection.toggle_ids.filter((value): value is string => typeof value === 'string'))
-			: undefined
-		const bindings = toggleIds
-			? [...new Map(definition.controls.map(({ binding }) => [binding.key, binding])).values()]
-			: issueBindings(issue)
-		for (const binding of bindings) {
-			const toggles = binding.panel.sections
-				.flatMap((section) => section.controls)
-				.filter(
-					(control) =>
-						control.issueId === definition.id && control.type === 'toggle' && !control.disabled,
-				)
-			for (const control of toggles) {
-				if (control.type !== 'toggle') continue
-				if (
-					toggleIds ? control.id !== undefined && toggleIds.has(control.id) : toggles.length === 1
-				)
-					panels.write(binding, control, true)
+		} else {
+			for (const binding of issueBindings(issue)) {
+				const toggles = binding.panel.sections
+					.flatMap((section) => section.controls)
+					.filter(
+						(control) =>
+							control.issueId === definition.id && control.type === 'toggle' && !control.disabled,
+					)
+				if (toggles.length === 1) panels.write(binding, toggles[0], true)
 			}
-		}
-		for (const { binding, control } of reviewIssue(issue)?.controls ?? []) {
-			if (control.type === 'toggle' || control.disabled) continue
-			const values = control.type === 'select' ? selection?.select_values : selection?.text_values
-			if (!values || typeof values !== 'object' || Array.isArray(values)) continue
-			const value = (values as Record<string, unknown>)[control.key]
-			if (
-				control.type === 'select' &&
-				Array.isArray(value) &&
-				value.every((entry) => typeof entry === 'string')
-			)
-				panels.write(binding, control, value)
-			else if (control.type !== 'select' && typeof value === 'string')
-				panels.write(binding, control, value)
 		}
 		session.write(
 			projectId,
@@ -384,6 +355,7 @@ export function createReviewPreviousIssues(
 		if (!isApplicable(issue)) return false
 		const id = reviewIssue(issue)?.id
 		return (
+			session.read(project.value!.id, 'previous-issue-copy')[issue.id] === true ||
 			isResolved(issue) ||
 			messages.hasIssueOverride(messageKey(issue)) ||
 			reviewMessage(issue) !== issueMessage(issue) ||

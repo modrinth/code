@@ -891,9 +891,9 @@ const messages = defineMessages({
 		id: 'project.actions.project-page',
 		defaultMessage: 'Project page',
 	},
-	reviewProject: {
-		id: 'project.actions.review-project',
-		defaultMessage: 'Review project',
+	openInModview: {
+		id: 'project.actions.open-in-modview',
+		defaultMessage: 'Open in modview',
 	},
 	viewDependents: {
 		id: 'project.actions.view-dependents',
@@ -2060,12 +2060,17 @@ const projectHeaderMoreActions = computed(() => {
 		},
 		{ type: 'divider' },
 		{
-			id: 'moderation-checklist',
-			label: formatMessage(messages.reviewProject),
+			id: 'open-in-modview',
+			label: formatMessage(messages.openInModview),
 			icon: ScaleIcon,
-			action: openModerationChecklistFromMenu,
+			type: 'link',
+			target: '_blank',
+			rel: 'noopener noreferrer',
+			to: {
+				path: '/moderation/project-review',
+				query: { project: projectId },
+			},
 			tone: 'orange',
-			shown: !!auth.value.user && isStaff && !showModerationChecklist.value,
 		},
 		{
 			id: 'tech-review',
@@ -2424,14 +2429,6 @@ function consumeShowChecklistHistoryState() {
 
 function setModerationChecklistOpen(open) {
 	showModerationChecklist.value = open
-}
-
-async function openModerationChecklistFromMenu() {
-	const projectId = project.value?.id
-	if (!projectId) return
-
-	await moderationQueue.ready
-	setModerationChecklistOpen(true)
 }
 
 watch(

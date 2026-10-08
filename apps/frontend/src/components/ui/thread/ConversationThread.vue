@@ -346,10 +346,7 @@
 															runBlockingAction('send-to-review-reply', () =>
 																sendReply('processing', true),
 															),
-														disabled:
-															project.status === 'processing' ||
-															isLoading ||
-															reviewSubmissionDisabled,
+														disabled: project.status === 'processing' || isLoading,
 													},
 												]
 											: [
@@ -378,10 +375,7 @@
 														hoverFilled: true,
 														action: () =>
 															runBlockingAction('send-to-review', () => setStatus('processing')),
-														disabled:
-															project.status === 'processing' ||
-															isLoading ||
-															reviewSubmissionDisabled,
+														disabled: project.status === 'processing' || isLoading,
 													},
 												]
 									"
@@ -933,7 +927,8 @@ async function sendReplyFromModal(status = null, privateMessage = false) {
 }
 
 async function sendReply(status = null, privateMessage = false) {
-	if (status === 'processing' && props.reviewSubmissionDisabled) return false
+	if (status === 'processing' && props.reviewSubmissionDisabled && !isStaff(props.auth.user))
+		return false
 	return await replyMutation
 		.mutateAsync({
 			threadId: props.thread.id,

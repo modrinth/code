@@ -40,7 +40,7 @@
 					</Tooltip>
 					<slot name="action">
 						<Button
-							v-if="resolved"
+							v-if="resolved && previousIssue?.verdict !== 'resolved'"
 							size="sm"
 							type="quiet"
 							class="-my-1 -mb-2 -mr-1.5"
@@ -52,7 +52,7 @@
 							{{ formatMessage(messages.notResolved) }}
 						</Button>
 						<Button
-							v-else
+							v-else-if="!resolved"
 							size="sm"
 							type="quiet"
 							circular
@@ -458,19 +458,7 @@ const facetOptions = computed(() =>
 						? messages.acknowledgeReply
 						: issueTargetLabels[value as keyof typeof issueTargetLabels],
 			),
-		}))
-		.concat(
-			(issue.value.custom?.previous?.facets ?? []).map((facet) => ({
-				value: `previous-facet:${facet.id}`,
-				label: formatMessage(
-					facet.what.type === 'acknowledge'
-						? facet.what.value.mode === 'checkbox'
-							? messages.acknowledgeCheckbox
-							: messages.acknowledgeReply
-						: issueTargetLabels[facet.what.type],
-				),
-			})),
-		),
+		})),
 )
 const customIdInvalid = computed(() =>
 	panels.validationErrors.value.some(
