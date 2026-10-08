@@ -46,6 +46,9 @@ export function createReviewMessages(
 		overrides.delete(id)
 		panels.updateCustomIssue(id, { message: '' })
 	}
+	function resetAllIssueMessages() {
+		overrides.clear()
+	}
 	watch(
 		() => project.value?.id,
 		() => {
@@ -63,6 +66,7 @@ export function createReviewMessages(
 		},
 		editIssueMessage,
 		resetIssueMessage,
+		resetAllIssueMessages,
 		hasIssueOverride: (id: string) => overrides.has(id),
 	}
 }

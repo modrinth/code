@@ -1,12 +1,41 @@
 <template>
 	<ClientOnly>
-		<ConfirmModal
+		<NewModal
 			ref="resetIssuesModal"
-			:title="formatMessage(reviewTabMessages.resetAllIssues)"
-			:description="formatMessage(reviewTabMessages.resetIssuesDescription)"
-			:proceed-label="formatMessage(reviewTabMessages.resetIssues)"
-			@proceed="resetIssues"
-		/>
+			:header="formatMessage(reviewTabMessages.resetAllIssues)"
+			max-width="800px"
+			danger
+		>
+			<div class="flex max-w-[35rem] flex-col gap-4">
+				<p class="m-0">{{ formatMessage(reviewTabMessages.resetIssuesDescription) }}</p>
+				<p class="m-0">{{ formatMessage(reviewTabMessages.revertCustomizationsDescription) }}</p>
+			</div>
+			<template #actions>
+				<div class="flex flex-wrap justify-end gap-2">
+					<Button @click="resetIssuesModal?.hide()">
+						<XIcon />
+						{{ formatMessage(commonMessages.cancelButton) }}
+					</Button>
+					<Button
+						type="colored"
+						color="orange"
+						:disabled="pending || resetting"
+						@click="revertCustomizations"
+					>
+						{{ formatMessage(reviewTabMessages.revertAllCustomizations) }}
+					</Button>
+					<Button
+						type="colored"
+						color="red"
+						:disabled="pending || resetting"
+						@click="resetIssuesModal?.hide(); resetIssues()"
+					>
+						<TrashIcon />
+						{{ formatMessage(reviewTabMessages.resetIssues) }}
+					</Button>
+				</div>
+			</template>
+		</NewModal>
 		<ProjectReviewLayout :tabs="visibleTabs" :reset-key="selection">
 			<template #left><ProjectInfo /></template>
 			<template #right>
@@ -61,12 +90,13 @@
 </template>
 
 <script setup lang="ts">
-import { RotateCounterClockwiseIcon } from '@modrinth/assets'
+import { RotateCounterClockwiseIcon, TrashIcon, XIcon } from '@modrinth/assets'
 import {
 	Button,
-	ConfirmModal,
+	commonMessages,
 	defineMessages,
 	injectLoadingState,
+	NewModal,
 	Tabs,
 	Tooltip,
 	useVIntl,
@@ -214,7 +244,7 @@ onScopeDispose(
 		activeReviewTab.value = hasPreviousIssues.value ? 're-review' : 'thread'
 	}),
 )
-const resetIssuesModal = ref<InstanceType<typeof ConfirmModal>>()
+const resetIssuesModal = ref<InstanceType<typeof NewModal>>()
 const messageThread = ref<InstanceType<typeof MessageThread>>()
 const auth = useAuthState()
 const keybinds = useModerationKeybinds()
@@ -241,7 +271,22 @@ const reviewTabMessages = defineMessages({
 		defaultMessage:
 			'This will discard your issue changes and move all previous issues back to Re-rev. issues.',
 	},
+	revertAllCustomizations: {
+		id: 'project-review.issues.revert-all-customizations',
+		defaultMessage: 'Revert all customizations',
+	},
+	revertCustomizationsDescription: {
+		id: 'project-review.issues.revert-customizations-description',
+		defaultMessage:
+			'Revert all customizations restores default issue messages while keeping custom issue messages and all issue toggles and selections.',
+	},
 })
+
+function revertCustomizations() {
+	if (!project.value || pending.value || resetting.value) return
+	messages.resetAllIssueMessages()
+	resetIssuesModal.value?.hide()
+}
 
 const rightPanelTabs = computed(() => [
 	...(hasPreviousIssues.value
