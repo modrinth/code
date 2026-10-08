@@ -83,7 +83,7 @@ pub fn remove_log_buffer(instance_id: &str) {
 }
 
 async fn clear_persisted_process(
-    state: &crate::State,
+    pool: &SqlitePool,
     process: Option<(i64, i64)>,
 ) {
     let Some((pid, start_time)) = process else {
@@ -94,7 +94,7 @@ async fn clear_persisted_process(
         pid,
         start_time,
     )
-    .execute(&state.pool)
+    .execute(pool)
     .await
     {
         tracing::warn!("Failed to clear persisted process {pid}: {error}");
@@ -141,7 +141,7 @@ pub(crate) async fn instance_has_running_process(
             running = true;
         } else {
             clear_persisted_process(
-                state,
+                &state.pool,
                 Some((process.pid, process.start_time)),
             )
             .await;
@@ -281,7 +281,7 @@ impl ProcessManager {
             post_process_init(&process.metadata, &process.rpc_server).await
         {
             tracing::error!("Failed to run post-process init: {e}");
-            clear_persisted_process(state, persisted_process).await;
+            clear_persisted_process(&state.pool, persisted_process).await;
             let _ = process.child.kill().await;
             return Err(e);
         }
@@ -944,7 +944,7 @@ impl Process {
         }
 
         state.process_manager.remove(uuid);
-        clear_persisted_process(&state, persisted_process).await;
+        clear_persisted_process(&state.pool, persisted_process).await;
         let sync_instance_id = instance_id.clone();
         tokio::spawn(async move {
             if let Err(error) =
