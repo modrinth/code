@@ -58,6 +58,10 @@ import { Button } from '#ui/components/base/buttons'
 import FileTreeSelect, { type FileTreeSelectItem } from '#ui/components/base/FileTreeSelect.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useScrollIndicator } from '#ui/composables/scroll-indicator'
+import {
+	hasShareableConfigExtension,
+	isShareableConfigEntryName,
+} from '#ui/layouts/shared/server-sharing/config-files'
 import { injectAuth, injectModrinthClient } from '#ui/providers'
 
 const props = defineProps<{ serverId: string; worldId: string; disabled?: boolean }>()
@@ -70,22 +74,6 @@ const includedPaths = ref<string[]>([])
 const excludedPaths = ref<string[]>([])
 const container = ref<HTMLElement | null>(null)
 const { showTopFade, showBottomFade, forceCheck } = useScrollIndicator(container)
-const extensions = new Set([
-	'json',
-	'json5',
-	'jsonc',
-	'yml',
-	'yaml',
-	'css',
-	'toml',
-	'txt',
-	'ini',
-	'cfg',
-	'conf',
-	'properties',
-	'xml',
-	'nbt',
-])
 
 function directoryOptions(path: string) {
 	const worldId = props.worldId
@@ -106,14 +94,9 @@ function directoryOptions(path: string) {
 				const result = await client.kyros.files_v0.listDirectory(directoryPath, page, 2000)
 				pages = result.total
 				for (const item of result.items) {
-					if (item.name.startsWith('.') || /[/\\:]/.test(item.name) || /[. ]$/.test(item.name))
-						continue
+					if (!isShareableConfigEntryName(item.name)) continue
 					if (item.type !== 'directory' && item.type !== 'file') continue
-					if (
-						item.type === 'file' &&
-						!extensions.has(item.name.split('.').pop()?.toLowerCase() ?? '')
-					)
-						continue
+					if (item.type === 'file' && !hasShareableConfigExtension(item.name)) continue
 					items.push({
 						path: path ? `${path}/${item.name}` : item.name,
 						type: item.type,
