@@ -551,9 +551,6 @@
   "collection.title": {
     "message": "{name} - Colecție"
   },
-  "conversation-thread.resubmit-modal.description": {
-    "message": "Trimiți <project-title>{projectTitle}</project-title> pentru a fi revizuit din nou de moderatori."
-  },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "Retrimite pentru revizuire"
   },

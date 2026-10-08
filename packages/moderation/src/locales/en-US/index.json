@@ -440,6 +440,9 @@
   "project-review.issue-target.add-gallery-images": {
     "defaultMessage": "Add gallery images"
   },
+  "project-review.issue-target.mark-addressed": {
+    "defaultMessage": "Mark addressed"
+  },
   "project-review.issue-target.modify-description": {
     "defaultMessage": "Change description"
   },

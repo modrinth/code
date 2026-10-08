@@ -2178,6 +2178,7 @@ export namespace Labrinth {
 				  }
 
 			export type ThreadIssueTarget =
+				| { type: 'mark_addressed' }
 				| { type: 'modify_title'; value: TextTarget }
 				| { type: 'modify_slug'; value: TextTarget }
 				| { type: 'modify_summary'; value: TextTarget }

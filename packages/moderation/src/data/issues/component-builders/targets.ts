@@ -4,6 +4,10 @@ import { defineMessages, type MessageDescriptor } from '@modrinth/ui'
 import type { IssueFacet, ReviewContext, WithContext } from './types'
 
 export const issueTargetLabels = defineMessages({
+	mark_addressed: {
+		id: 'project-review.issue-target.mark-addressed',
+		defaultMessage: 'Mark addressed',
+	},
 	modify_title: {
 		id: 'project-review.issue-target.modify-title',
 		defaultMessage: 'Change title',
@@ -93,6 +97,7 @@ function textTarget(original: string, suggestion: string | null | undefined) {
 }
 
 export const issueTargets = {
+	markAddressed: (): IssueFacet => () => ({ type: 'mark_addressed' }),
 	modifyTitle:
 		(suggestion?: Suggestion): IssueFacet =>
 		(ctx) => ({
@@ -215,6 +220,6 @@ export function resolveIssueFacets(
 	ctx: ReviewContext,
 ): Labrinth.Threads.v3.NewThreadIssue['facets'] {
 	const [first, ...rest] = (typeof facets === 'function' ? facets(ctx) : facets) ?? []
-	if (!first) return [{ what: issueTargets.acknowledge('checkbox')(ctx) }]
+	if (!first) return [{ what: issueTargets.markAddressed()(ctx) }]
 	return [{ what: first(ctx) }, ...rest.map((facet) => ({ what: facet(ctx) }))]
 }

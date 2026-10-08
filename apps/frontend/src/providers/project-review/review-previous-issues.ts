@@ -108,7 +108,7 @@ export function createReviewPreviousIssues(
 					? details.title
 					: typeof details.issue_id === 'string'
 						? details.issue_id.replaceAll('-', ' ')
-						: formatMessage(issueTargetLabels[issue.facets[0]?.what.type ?? 'acknowledge'])),
+						: formatMessage(issueTargetLabels[issue.facets[0]?.what.type ?? 'mark_addressed'])),
 			category: '',
 			controls: [],
 		}

@@ -38,6 +38,7 @@ export function threadIssueField(
 		case 'modify_server_languages':
 		case 'modify_server_address':
 			return 'server'
+		case 'mark_addressed':
 		case 'acknowledge':
 			return undefined
 	}

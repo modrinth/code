@@ -3,7 +3,7 @@
 		class="flex min-w-0 flex-col gap-2 rounded-xl border border-solid border-surface-3 bg-surface-2 p-2.5 py-2 text-sm"
 	>
 		<div class="min-w-0">
-			<div class="flex flex-col gap-1.5">
+			<div class="flex flex-col gap-1">
 				<div class="flex items-center gap-2">
 					<button
 						type="button"
@@ -59,18 +59,29 @@
 						</slot>
 					</div>
 				</div>
-				<div v-if="issueBindings.length" class="flex flex-wrap gap-1">
+				<div v-if="issueBindings.length || facetLabels.length" class="flex flex-wrap gap-1">
 					<Button
 						v-for="binding in issueBindings"
 						:key="binding.key"
 						size="xs"
 						type="quiet"
-						class="!h-auto !min-h-0 !rounded-full !bg-surface-3 !px-2 !py-0.5 !text-xs hover:!bg-surface-4"
+						class="!h-auto !min-h-0 !rounded-full !bg-surface-3 !px-2.5 !py-1 !text-xs !font-medium hover:!bg-surface-4"
 						:aria-label="formatMessage(messages.openPanel, { panel: binding.panel.title })"
 						@click="revealPanel(binding.key)"
 					>
+						<PanelTopIcon
+							class="!mb-px -ml-px !size-3.5 !min-h-0 !min-w-0 shrink-0"
+							aria-hidden="true"
+						/>
 						{{ binding.panel.title }}
 					</Button>
+					<span
+						v-for="facet in facetLabels"
+						:key="facet.type"
+						class="inline-flex min-w-0 items-center rounded-full bg-surface-3 px-2.5 py-1 text-xs font-medium [overflow-wrap:anywhere]"
+					>
+						{{ facet.label }}
+					</span>
 				</div>
 			</div>
 
@@ -177,12 +188,14 @@ import type { Labrinth } from '@modrinth/api-client'
 import {
 	ChevronDownIcon,
 	EditIcon,
+	PanelTopIcon,
 	PlusIcon,
 	RefreshCwIcon,
 	TagCategoryRefreshCcwIcon,
 	XIcon,
 } from '@modrinth/assets'
 import { moderationSettings } from '@modrinth/moderation'
+import { issueTargetLabels } from '@modrinth/moderation/src/data/issues/component-builders/targets'
 import {
 	Button,
 	commonMessages,
@@ -297,6 +310,15 @@ const messages = defineMessages({
 		id: 'project-review.issues.choose-option',
 		defaultMessage: 'Choose at least one option for this issue.',
 	},
+})
+const facetLabels = computed(() => {
+	const facets =
+		previousIssue.value?.facets ??
+		panels.activeIssues.value.find((entry) => entry.id === issue.value.id)?.facets ??
+		[]
+	return [...new Set(facets.map(({ what }) => what.type))]
+		.filter((type) => type !== 'mark_addressed')
+		.map((type) => ({ type, label: formatMessage(issueTargetLabels[type]) }))
 })
 const displayMessage = computed(() => {
 	if (props.disabled && props.previewMessage !== undefined) return props.previewMessage

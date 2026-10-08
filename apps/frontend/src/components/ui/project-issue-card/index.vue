@@ -142,7 +142,13 @@
 											formatMessage(
 												addressableFacets(issue).every((facet) => facet.verdict !== 'open')
 													? messages.addressed
-													: messages.markAddressed,
+													: addressableFacets(issue).every(
+																(facet) =>
+																	facet.what.type === 'acknowledge' &&
+																	facet.what.value.mode === 'checkbox',
+														  )
+														? issueTargetLabels.acknowledge
+														: messages.markAddressed,
 											)
 										}}
 									</Button>
@@ -397,7 +403,7 @@ function issueTitle(issue: ThreadIssue): string {
 			? why.title
 			: typeof why.issue_id === 'string'
 				? why.issue_id.replaceAll('-', ' ')
-				: formatMessage(issueTargetLabels[issue.facets[0]?.what.type ?? 'acknowledge']))
+				: formatMessage(issueTargetLabels[issue.facets[0]?.what.type ?? 'mark_addressed']))
 	)
 }
 
@@ -415,7 +421,9 @@ interface IssueAction {
 
 function issueActions(issue: ThreadIssue): IssueAction[] {
 	const locations = readIssueLocations(issueDetails(issue).locations)
-	const facets = visibleFacets(issue).filter(({ what }) => what.type !== 'acknowledge')
+	const facets = visibleFacets(issue).filter(
+		({ what }) => what.type !== 'acknowledge' && what.type !== 'mark_addressed',
+	)
 	const facetFields = new Set(facets.map(({ what }) => threadIssueField(what)))
 	const actions: IssueAction[] = facets.map((facet) => {
 		const label = locations.find(({ field }) => field === threadIssueField(facet.what))?.label
@@ -447,7 +455,7 @@ function visibleFacets(issue: ThreadIssue): Labrinth.Threads.v3.ThreadIssueFacet
 	return issue.facets.filter(
 		({ what }) =>
 			matchesTarget(what) ||
-			(what.type === 'acknowledge' && matchesLocation(issue)) ||
+			((what.type === 'acknowledge' || what.type === 'mark_addressed') && matchesLocation(issue)) ||
 			(props.location !== undefined && threadIssueField(what) === props.location),
 	)
 }
@@ -456,7 +464,9 @@ function addressableFacets(issue: ThreadIssue): Labrinth.Threads.v3.ThreadIssueF
 	return issue.facets.filter(
 		(facet) =>
 			facet.verdict !== 'resolved' &&
-			(facet.what.type === 'acknowledge' || matchesTarget(facet.what)),
+			(facet.what.type === 'acknowledge' ||
+				facet.what.type === 'mark_addressed' ||
+				matchesTarget(facet.what)),
 	)
 }
 

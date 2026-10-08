@@ -243,6 +243,7 @@ import _PanelRightCloseIcon from './icons/panel-right-close.svg?component'
 import _PanelRightOpenIcon from './icons/panel-right-open.svg?component'
 import _PanelTopCloseIcon from './icons/panel-top-close.svg?component'
 import _PanelTopOpenIcon from './icons/panel-top-open.svg?component'
+import _PanelTopIcon from './icons/panel-top.svg?component'
 import _PauseIcon from './icons/pause.svg?component'
 import _PencilIcon from './icons/pencil.svg?component'
 import _PickaxeIcon from './icons/pickaxe.svg?component'
@@ -718,6 +719,7 @@ export const PanelRightCloseIcon = _PanelRightCloseIcon
 export const PanelRightOpenIcon = _PanelRightOpenIcon
 export const PanelTopCloseIcon = _PanelTopCloseIcon
 export const PanelTopOpenIcon = _PanelTopOpenIcon
+export const PanelTopIcon = _PanelTopIcon
 export const PauseIcon = _PauseIcon
 export const PencilIcon = _PencilIcon
 export const PickaxeIcon = _PickaxeIcon

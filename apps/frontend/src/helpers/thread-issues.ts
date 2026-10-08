@@ -58,6 +58,7 @@ export function isThreadIssueFacetReadyToAddress(
 ): boolean {
 	if (facet.verdict !== 'open') return true
 	const target = facet.what
+	if (target.type === 'mark_addressed') return true
 	if (!current) return facet.verdict !== 'open'
 	switch (target.type) {
 		case 'acknowledge':
