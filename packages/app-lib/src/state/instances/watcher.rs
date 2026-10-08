@@ -9,6 +9,7 @@ use crate::worlds::WorldType;
 use dashmap::{DashMap, mapref::entry::Entry};
 use notify::{RecommendedWatcher, RecursiveMode};
 use notify_debouncer_mini::{DebounceEventResult, Debouncer, new_debouncer};
+use sqlx::SqlitePool;
 use std::sync::LazyLock;
 use std::{
     collections::{HashMap, HashSet},
@@ -196,7 +197,7 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                     .as_ref()
                                     .is_some_and(|x| *x == "txt")
                             {
-                                crash_task(instance_id, Arc::clone(&state));
+                                crash_task(instance_id, state.pool.clone());
                             } else if (is_screenshot_event
                                 && !visited_screenshot_instances
                                     .contains(&instance_id))
@@ -242,13 +243,13 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                     if !e.path.is_file() {
                                         let instance_id = instance_id.clone();
                                         let world = world.clone();
-                                        let state = Arc::clone(&state);
+                                        let pool = state.pool.clone();
                                         tokio::spawn(async move {
                                             if let Err(e) = attached_world_data::AttachedWorldData::remove_for_world(
 												&instance_id,
 												WorldType::Singleplayer,
 												&world,
-												&state.pool
+												&pool
 											).await {
 												tracing::warn!("Failed to remove AttachedWorldData for '{world}': {e}")
 											}
@@ -446,12 +447,11 @@ pub(crate) async fn watch_instance_folder(
         .insert(instance_path.to_string(), instance_id.to_string());
 }
 
-fn crash_task(instance_id: String, state: Arc<State>) {
+fn crash_task(instance_id: String, pool: SqlitePool) {
     tokio::task::spawn(async move {
         let res = async {
             let Some(instance) =
-                instance_rows::get_instance_by_id(&instance_id, &state.pool)
-                    .await?
+                instance_rows::get_instance_by_id(&instance_id, &pool).await?
             else {
                 return Ok(());
             };
