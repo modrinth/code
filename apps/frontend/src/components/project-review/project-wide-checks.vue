@@ -125,9 +125,7 @@ const visiblePanels = computed(() =>
 	reviewPanels.misc.filter(({ key }) => resolve({ kind: 'panel', key })),
 )
 const visibleTargets = computed(() => visiblePanels.value.map(({ key }) => key))
-const tabs = computed(() =>
-	visiblePanels.value.map(({ key, label }) => ({ value: key, label })),
-)
+const tabs = computed(() => visiblePanels.value.map(({ key, label }) => ({ value: key, label })))
 
 watch(
 	visibleTargets,

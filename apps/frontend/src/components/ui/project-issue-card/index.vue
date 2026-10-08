@@ -361,11 +361,15 @@ function panelIssues(nodes: readonly PanelNode[]): Issue[] {
 }
 
 const issuePriorities = new Map(
-	Object.values(reviewPanels).flatMap((panel) =>
-		('type' in panel ? [] : panelIssues(panel.children)).map(
-			(issue) => [issue.id, issue.priority ?? IssuePriority.Default] as const,
+	Object.values(reviewPanels)
+		.flatMap((registration) =>
+			Array.isArray(registration) ? registration.map(({ panel }) => panel) : [registration],
+		)
+		.flatMap((panel) =>
+			('type' in panel ? [] : panelIssues(panel.children)).map(
+				(issue) => [issue.id, issue.priority ?? IssuePriority.Default] as const,
+			),
 		),
-	),
 )
 
 function issuePriority(issue: ThreadIssue) {
