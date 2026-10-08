@@ -534,28 +534,6 @@ pub async fn fetch_file(
     }
 }
 
-pub async fn fetch_file_mirrors(
-    mirrors: &[&str],
-    sha1: Option<&str>,
-    download_meta: Option<&DownloadMeta>,
-    uri_path: Option<&'static str>,
-    semaphore: &FetchSemaphore,
-    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
-    progress: Option<&mut FetchProgressFn<'_>>,
-) -> crate::Result<DownloadedFile> {
-    fetch_file_mirrors_in(
-        mirrors,
-        sha1,
-        download_meta,
-        uri_path,
-        semaphore,
-        exec,
-        progress,
-        None,
-    )
-    .await
-}
-
 #[allow(clippy::too_many_arguments)]
 pub(crate) async fn fetch_file_mirrors_in(
     mirrors: &[&str],
