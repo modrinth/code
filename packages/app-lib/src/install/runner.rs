@@ -267,7 +267,7 @@ async fn retry_job_inner(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
         job.state.paths.staging_dir = None;
         store::update_status(job_id, job.status, &job.state, &state.pool)
             .await?;
-        recovery::clear_staging_dir(&recovered, &state).await;
+        recovery::clear_staging_dir(&recovered, &state.content_store).await;
     }
 
     drop(cleanup_target_guard);
@@ -889,7 +889,8 @@ async fn run_job_inner(
 						&instance_id,
 					)).await;
                 }
-                recovery::clear_staging_dir(&job_state, state).await;
+                recovery::clear_staging_dir(&job_state, &state.content_store)
+                    .await;
                 if let Err(error) =
                     emit_instance(&instance_id, InstancePayloadType::Edited)
                         .await
@@ -1021,7 +1022,7 @@ async fn terminalize_failed_job_inner(
     .await?
     {
         if cleanup_succeeded {
-            recovery::clear_staging_dir(&job_state, state).await;
+            recovery::clear_staging_dir(&job_state, &state.content_store).await;
         }
         emit_install_job(&record.snapshot()).await?;
     }

@@ -7,6 +7,7 @@ use super::model::{
 use super::store;
 use crate::event::InstancePayloadType;
 use crate::event::emit::emit_instance;
+use crate::state::content_store::ContentStore;
 use crate::state::instances::adapters::sqlite::{content_rows, instance_rows};
 use crate::state::{
     ContentEntry, ContentSetRemoteRef, ContentSetRemoteRefType,
@@ -212,7 +213,7 @@ async fn recover_unrecorded_instance_update_backup(
 
 pub(super) async fn clear_staging_dir(
     job_state: &InstallJobState,
-    state: &State,
+    content_store: &ContentStore,
 ) {
     let Some(staging_dir) = &job_state.paths.staging_dir else {
         return;
@@ -227,7 +228,7 @@ pub(super) async fn clear_staging_dir(
         return;
     }
     if let Some(owner) = staging_dir.file_name().and_then(|name| name.to_str())
-        && let Err(error) = state.content_store.release("rollback", owner).await
+        && let Err(error) = content_store.release("rollback", owner).await
     {
         tracing::warn!(
             "Could not release rollback content references: {error}"
@@ -584,7 +585,7 @@ async fn recover_interrupted_job_inner(
         .await?
         {
             store::dismiss(job.id, &state.pool).await?;
-            clear_staging_dir(&job.state, state).await;
+            clear_staging_dir(&job.state, &state.content_store).await;
             emit_install_job(&record.snapshot()).await?;
         }
 
@@ -643,7 +644,7 @@ async fn recover_interrupted_job_inner(
     .await?
     {
         if cleanup_succeeded {
-            clear_staging_dir(&job.state, state).await;
+            clear_staging_dir(&job.state, &state.content_store).await;
         }
         emit_install_job(&record.snapshot()).await?;
     }
