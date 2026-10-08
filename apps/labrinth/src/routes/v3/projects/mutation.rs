@@ -70,9 +70,12 @@ impl SyncedProjectState {
             .flat_map(|issue| &issue.facets)
             .find(|facet| facet.id == facet_id.into())
             .map(|facet| {
-                matches!(&facet.what, ThreadIssueTarget::Acknowledge { .. })
-                    || facet.what.value_state(&context, false)
-                        != ThreadIssueValueState::SameAsOriginal
+                matches!(
+                    &facet.what,
+                    ThreadIssueTarget::Acknowledge { .. }
+                        | ThreadIssueTarget::MarkAddressed
+                ) || facet.what.value_state(&context, false)
+                    != ThreadIssueValueState::SameAsOriginal
             })
     }
 }

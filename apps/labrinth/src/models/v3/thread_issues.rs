@@ -135,6 +135,7 @@ pub enum ThreadIssueTarget {
     Acknowledge {
         mode: ThreadIssueAcknowledgement,
     },
+    MarkAddressed,
 }
 
 #[derive(
@@ -706,6 +707,13 @@ impl ThreadIssueTarget {
                     ThreadIssueValueState::DifferentToOriginal,
                     |current| value_state(address, current),
                 )
+            }
+            Self::MarkAddressed => {
+                if user_addressed {
+                    ThreadIssueValueState::DifferentToOriginal
+                } else {
+                    ThreadIssueValueState::SameAsOriginal
+                }
             }
             Self::Acknowledge { mode } => match (mode, user_addressed) {
                 (_, false) => ThreadIssueValueState::SameAsOriginal,
