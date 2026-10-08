@@ -48,7 +48,7 @@ export const reuploadUnclearForkIssue = issue({
 	category: 'Project wide',
 	message: unclearForkMessage,
 	suggestedStatus: 'rejected',
-	facets: [issueTargets.acknowledge('reply')],
+	actions: [issueTargets.acknowledge('reply')],
 })
 
 export const reuploadInsufficientForkIssue = issue({

@@ -275,7 +275,7 @@ import { computed, nextTick, ref, useId, watch } from 'vue'
 import { useModerationSettings } from '~/composables/moderation'
 import { injectReviewMessages } from '~/providers/project-review/review-messages'
 import {
-	customIssueFacets,
+	customIssueActions,
 	injectReviewPanels,
 	type ReviewIssue,
 	type ReviewPanelBinding,
@@ -438,7 +438,7 @@ const priorityOptions = Object.keys(IssuePriority).map((value) => ({
 	label: value.charAt(0).toUpperCase() + value.slice(1).toLowerCase(),
 }))
 const facetOptions = computed(() =>
-	Object.keys(customIssueFacets)
+	Object.keys(customIssueActions)
 		.filter((type) => type !== 'mark_addressed')
 		.filter((type) => type !== 'modify_server_languages' || panels.hasServer.value)
 		.map((value) => ({

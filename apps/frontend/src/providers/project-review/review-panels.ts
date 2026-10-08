@@ -3,11 +3,11 @@ import { IssuePriority, reviewPanels } from '@modrinth/moderation/src/data/issue
 import { expandItemReviewPanels } from '@modrinth/moderation/src/data/issues/component-builders/item-panels'
 import {
 	issueTargets,
-	resolveIssueFacets,
+	resolveIssueActions,
 } from '@modrinth/moderation/src/data/issues/component-builders/targets'
 import type {
 	Issue,
-	IssueFacet,
+	IssueAction,
 	Panel,
 	PanelNode,
 	PanelRegistration,
@@ -99,7 +99,7 @@ export interface ReviewIssue {
 	custom?: { id: string; priority: string; message: string; facets: string[] }
 }
 
-export const customIssueFacets = {
+export const customIssueActions = {
 	mark_addressed: issueTargets.markAddressed(),
 	acknowledge_checkbox: issueTargets.acknowledge('checkbox'),
 	acknowledge_reply: issueTargets.acknowledge('reply'),
@@ -111,7 +111,7 @@ export const customIssueFacets = {
 	modify_icon: issueTargets.modifyIcon(),
 	add_gallery_images: issueTargets.addGalleryImages(),
 	modify_server_languages: issueTargets.modifyServerLanguages(),
-} satisfies Record<string, IssueFacet>
+} satisfies Record<string, IssueAction>
 
 function customIssuePriority(value: unknown): keyof typeof IssuePriority {
 	const priority = String(value ?? 'Bottom')
@@ -651,9 +651,9 @@ export function createReviewPanels(
 							category: entry.category,
 							priority: entry.priority,
 							message: entry.custom.message,
-							facets: entry.custom.facets.flatMap((type) =>
-								Object.hasOwn(customIssueFacets, type)
-									? [customIssueFacets[type as keyof typeof customIssueFacets]]
+							actions: entry.custom.facets.flatMap((type) =>
+								Object.hasOwn(customIssueActions, type)
+									? [customIssueActions[type as keyof typeof customIssueActions]]
 									: [],
 							),
 						}
@@ -743,7 +743,7 @@ export function createReviewPanels(
 					id,
 					missing: [...new Set(missing)],
 					locations: [...(resolveWithContext(issue.locations, context) ?? [])],
-					facets: resolveIssueFacets(issue.facets, context),
+					facets: resolveIssueActions(issue.actions, context),
 					issue: {
 						message: resolveWithContext(issue.message, context),
 						suggestedStatus: resolveWithContext(issue.suggestedStatus, context),

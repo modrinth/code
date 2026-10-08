@@ -16,7 +16,7 @@ export const linksIssue = issue({
 	id: 'links',
 	title: 'Invalid project links',
 	category: 'Links',
-	facets: [issueTargets.modifySelectedLinks()],
+	actions: [issueTargets.modifySelectedLinks()],
 	suggestedStatus: 'flagged',
 	message: ({ projectV3, selected }) => {
 		const toggleIds = new Set(selected.toggleIds)

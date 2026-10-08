@@ -24,7 +24,7 @@ export interface ReviewContext {
 		issueIds: readonly string[]
 		/** Selected toggle IDs for the current issue; panel and section callbacks receive all selected toggle IDs. */
 		toggleIds: readonly string[]
-		/** Message and facet callbacks receive selected items for the current issue, grouped by their registry key. */
+		/** Message and action callbacks receive selected items for the current issue, grouped by their registry key. */
 		items: Readonly<Record<string, readonly { key: string; context: ReviewContext }[]>>
 	}
 	/**
@@ -41,7 +41,7 @@ export interface ReviewContext {
 
 export type WithContext<T> = T | ((ctx: ReviewContext) => T)
 
-export type IssueFacet = (ctx: ReviewContext) => Labrinth.Threads.v3.ThreadIssueTarget
+export type IssueAction = (ctx: ReviewContext) => Labrinth.Threads.v3.ThreadIssueTarget
 
 export interface Issue {
 	id: string
@@ -50,9 +50,9 @@ export interface Issue {
 	/** Orders selected issues; omitted priorities use the default group. */
 	priority?: IssuePriority | number
 	message: WithContext<string>
-	/** Targets to change, resolved from current context. Omitted or empty facets require checkbox acknowledgment. */
-	facets?: WithContext<readonly IssueFacet[]>
-	/** Additional navigation destinations and field placement, independent of facet completion. Locations sharing a field with a facet reuse its button; a custom location label overrides the button label. */
+	/** Targets to change, resolved from current context. Omitted or empty actions require checkbox acknowledgment. */
+	actions?: WithContext<readonly IssueAction[]>
+	/** Additional navigation destinations and field placement, independent of action completion. Locations sharing a field with an action reuse its button; a custom location label overrides the button label. */
 	locations?: WithContext<readonly Labrinth.Threads.v3.ThreadIssueLocation[]>
 	suggestedStatus?: WithContext<ModerationStatus | undefined>
 }

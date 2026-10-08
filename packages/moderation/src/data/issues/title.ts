@@ -12,7 +12,7 @@ export const titleUselessInfoIssue = issue({
 	id: 'title-useless-info',
 	title: 'Unnecessary title information',
 	category: 'Title',
-	facets: [issueTargets.modifyTitle()],
+	actions: [issueTargets.modifyTitle()],
 	suggestedStatus: 'flagged',
 	message: uselessInfo,
 })
@@ -21,7 +21,7 @@ export const minecraftTitleIssue = issue({
 	id: 'title-minecraft-branding',
 	title: 'Minecraft branding in title',
 	category: 'Title',
-	facets: [issueTargets.modifyTitle()],
+	actions: [issueTargets.modifyTitle()],
 	suggestedStatus: 'flagged',
 	message: minecraftBranding,
 })
@@ -30,7 +30,7 @@ export const titleSimilaritiesIssue = issue({
 	id: 'title-similarities',
 	title: 'Misuse of project name',
 	category: 'Title',
-	facets: [issueTargets.modifyTitle()],
+	actions: [issueTargets.modifyTitle()],
 	suggestedStatus: 'flagged',
 	message: ({ selected }) => {
 		if (selected.toggleIds.includes('title-similarities-fork')) {
@@ -45,7 +45,7 @@ export const modpackTitleSimilaritiesIssue = issue({
 	id: 'title-similarities-modpack',
 	title: 'Modpack uses another project’s name',
 	category: 'Title',
-	facets: [issueTargets.modifyTitle()],
+	actions: [issueTargets.modifyTitle()],
 	suggestedStatus: 'flagged',
 	message: [similarities.trim(), modpackSimilarities.trim()].join('\n\n'),
 })

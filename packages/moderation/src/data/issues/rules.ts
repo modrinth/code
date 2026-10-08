@@ -29,7 +29,7 @@ import serverSideOptOutMessage from '../messages/checklist/messages/rules/server
 import { removalImageEntry } from '../messages/gallery-images'
 import { issue, panel, section, toggle } from './component-builders/builders'
 import { IssuePriority } from './component-builders/priority'
-import type { IssueFacet } from './component-builders/types'
+import type { IssueAction } from './component-builders/types'
 
 export const rulesPaidAccessServerIssue = issue({
 	id: 'rules-paid-access-server',
@@ -68,28 +68,28 @@ export const rulesAiImagesIssue = issue({
 	id: 'rules-ai-images',
 	title: 'Prohibited images',
 	category: 'Project wide',
-	facets: ({ projectV3, selected }) => {
+	actions: ({ projectV3, selected }) => {
 		const keys = new Set((selected.items['gallery-image'] ?? []).map(({ key }) => key))
 		const imageIds = projectV3.gallery.flatMap((image) =>
 			image.id !== undefined && keys.has(String(image.id)) ? [image.id] : [],
 		)
-		const facets: IssueFacet[] = []
+		const actions: IssueAction[] = []
 		if (selected.toggleIds.includes('description-ai-images')) {
-			facets.push(() => ({
+			actions.push(() => ({
 				type: 'modify_description',
 				value: { original: projectV3.description },
 			}))
 		}
 		if (selected.toggleIds.includes('icon-ai-images')) {
-			facets.push(() => ({
+			actions.push(() => ({
 				type: 'modify_icon',
 				value: { original_url: projectV3.icon_url ?? null },
 			}))
 		}
 		if (imageIds.length) {
-			facets.push(() => ({ type: 'remove_gallery_images', value: { image_ids: imageIds } }))
+			actions.push(() => ({ type: 'remove_gallery_images', value: { image_ids: imageIds } }))
 		}
-		return facets
+		return actions
 	},
 	message: ({ projectV3, selected }) => {
 		const entries: string[] = []

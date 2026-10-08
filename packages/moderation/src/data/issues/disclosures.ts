@@ -56,7 +56,7 @@ export const disclosuresIssue = issue({
 	locations: [issueLocation('disclosures')],
 	title: 'Invalid disclosures',
 	category: 'Disclosures',
-	facets: ({ selected }) =>
+	actions: ({ selected }) =>
 		Object.entries(disclosureTypes).flatMap(([field, type]) =>
 			selected.toggleIds.includes(`disclosures-missing-${field}`) ||
 			selected.toggleIds.includes(`disclosures-misused-${field}`)

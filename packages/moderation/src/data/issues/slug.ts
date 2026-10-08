@@ -9,7 +9,7 @@ export const misusedSlugIssue = issue({
 	id: 'slug-misused',
 	title: 'Misused project URL',
 	category: 'Slug',
-	facets: [
+	actions: [
 		issueTargets.modifySlug(({ getTextValue }) => {
 			const suggestion = getTextValue('correct-slug').toLowerCase()
 			return suggestion.trim() ? suggestion : undefined

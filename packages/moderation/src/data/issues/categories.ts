@@ -22,7 +22,7 @@ export const categoriesInaccurateIssue = issue({
 	id: 'categories-inaccurate',
 	title: 'Inaccurate tags',
 	category: 'Tags',
-	facets: [issueTargets.removeTags(removedTags)],
+	actions: [issueTargets.removeTags(removedTags)],
 	message: (ctx) => {
 		const tags = removedTags(ctx)
 		return [

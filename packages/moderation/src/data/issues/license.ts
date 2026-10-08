@@ -13,7 +13,7 @@ export const licenseInvalidLinkIssue = issue({
 	id: 'license-invalid-link',
 	title: 'Invalid license link',
 	category: 'License',
-	facets: [issueTargets.modifyLicense()],
+	actions: [issueTargets.modifyLicense()],
 	message: ({ selected }) =>
 		[
 			invalidLinkMessage,

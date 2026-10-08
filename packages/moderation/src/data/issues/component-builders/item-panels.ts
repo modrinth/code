@@ -137,9 +137,9 @@ export function expandItemReviewPanels(
 				return [...messages].join('\n\n')
 			},
 			locations: (ctx) => resolve(original.locations, selectedContext(ctx)) ?? [],
-			facets: (ctx) => {
+			actions: (ctx) => {
 				const context = selectedContext(ctx)
-				return (resolve(original.facets, context) ?? []).map((facet) => () => facet(context))
+				return (resolve(original.actions, context) ?? []).map((action) => () => action(context))
 			},
 		}
 		issues.set(original.id, issue)

@@ -1,7 +1,7 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { defineMessages, type MessageDescriptor } from '@modrinth/ui'
 
-import type { IssueFacet, ReviewContext, WithContext } from './types'
+import type { IssueAction, ReviewContext, WithContext } from './types'
 
 export const issueTargetLabels = defineMessages({
 	mark_addressed: {
@@ -97,33 +97,33 @@ function textTarget(original: string, suggestion: string | null | undefined) {
 }
 
 export const issueTargets = {
-	markAddressed: (): IssueFacet => () => ({ type: 'mark_addressed' }),
+	markAddressed: (): IssueAction => () => ({ type: 'mark_addressed' }),
 	modifyTitle:
-		(suggestion?: Suggestion): IssueFacet =>
+		(suggestion?: Suggestion): IssueAction =>
 		(ctx) => ({
 			type: 'modify_title',
 			value: textTarget(ctx.projectV3.name, resolveSuggestion(suggestion, ctx)),
 		}),
 	modifySlug:
-		(suggestion?: Suggestion): IssueFacet =>
+		(suggestion?: Suggestion): IssueAction =>
 		(ctx) => ({
 			type: 'modify_slug',
 			value: textTarget(ctx.projectV3.slug ?? '', resolveSuggestion(suggestion, ctx)),
 		}),
 	modifySummary:
-		(suggestion?: Suggestion): IssueFacet =>
+		(suggestion?: Suggestion): IssueAction =>
 		(ctx) => ({
 			type: 'modify_summary',
 			value: textTarget(ctx.projectV3.summary, resolveSuggestion(suggestion, ctx)),
 		}),
 	modifyDescription:
-		(suggestion?: Suggestion): IssueFacet =>
+		(suggestion?: Suggestion): IssueAction =>
 		(ctx) => ({
 			type: 'modify_description',
 			value: textTarget(ctx.projectV3.description, resolveSuggestion(suggestion, ctx)),
 		}),
 	modifyLicense:
-		(licenseSuggestion?: Suggestion, urlSuggestion?: Suggestion): IssueFacet =>
+		(licenseSuggestion?: Suggestion, urlSuggestion?: Suggestion): IssueAction =>
 		(ctx) => {
 			const license = resolveSuggestion(licenseSuggestion, ctx)
 			const url = resolveSuggestion(urlSuggestion, ctx)
@@ -136,19 +136,19 @@ export const issueTargets = {
 			}
 		},
 	modifyIcon:
-		(): IssueFacet =>
+		(): IssueAction =>
 		({ projectV3 }) => ({
 			type: 'modify_icon',
 			value: { original_url: projectV3.icon_url ?? null },
 		}),
 	removeTags:
-		(tags: WithContext<string[]>): IssueFacet =>
+		(tags: WithContext<string[]>): IssueAction =>
 		(ctx) => ({
 			type: 'remove_tags',
 			value: { tags: typeof tags === 'function' ? tags(ctx) : tags },
 		}),
 	modifySelectedLinks:
-		(): IssueFacet =>
+		(): IssueAction =>
 		({ projectV3, selected }) => {
 			const platforms = new Set(
 				selected.toggleIds
@@ -165,13 +165,13 @@ export const issueTargets = {
 			return { type: 'modify_links', value: { links } }
 		},
 	addGalleryImages:
-		(): IssueFacet =>
+		(): IssueAction =>
 		({ projectV3 }) => ({
 			type: 'add_gallery_images',
 			value: { original_count: projectV3.gallery.length },
 		}),
 	modifyDisclosure:
-		(disclosureType: Labrinth.Projects.v3.ProjectDisclosureType): IssueFacet =>
+		(disclosureType: Labrinth.Projects.v3.ProjectDisclosureType): IssueAction =>
 		({ disclosures }) => {
 			const disclosure = disclosures.find(
 				(disclosure) => disclosure.type === disclosureType && !disclosure.deleted_at,
@@ -196,7 +196,7 @@ export const issueTargets = {
 			} as Labrinth.Threads.v3.ModifyDisclosureTarget
 		},
 	modifyServerLanguages:
-		(suggestion?: WithContext<string[] | null | undefined>): IssueFacet =>
+		(suggestion?: WithContext<string[] | null | undefined>): IssueAction =>
 		(ctx) => {
 			const suggested = typeof suggestion === 'function' ? suggestion(ctx) : suggestion
 			return {
@@ -208,18 +208,18 @@ export const issueTargets = {
 			}
 		},
 	acknowledge:
-		(mode: 'checkbox' | 'reply'): IssueFacet =>
+		(mode: 'checkbox' | 'reply'): IssueAction =>
 		() => ({
 			type: 'acknowledge',
 			value: { mode },
 		}),
 }
 
-export function resolveIssueFacets(
-	facets: WithContext<readonly IssueFacet[]> | undefined,
+export function resolveIssueActions(
+	actions: WithContext<readonly IssueAction[]> | undefined,
 	ctx: ReviewContext,
 ): Labrinth.Threads.v3.NewThreadIssue['facets'] {
-	const [first, ...rest] = (typeof facets === 'function' ? facets(ctx) : facets) ?? []
+	const [first, ...rest] = (typeof actions === 'function' ? actions(ctx) : actions) ?? []
 	if (!first) return [{ what: issueTargets.markAddressed()(ctx) }]
-	return [{ what: first(ctx) }, ...rest.map((facet) => ({ what: facet(ctx) }))]
+	return [{ what: first(ctx) }, ...rest.map((action) => ({ what: action(ctx) }))]
 }

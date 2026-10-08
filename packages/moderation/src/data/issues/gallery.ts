@@ -14,7 +14,7 @@ export const galleryInsufficientIssue = issue({
 	id: 'gallery-insufficient',
 	title: 'Insufficient gallery images',
 	category: 'Gallery',
-	facets: [
+	actions: [
 		({ projectV3 }) => ({
 			type: 'add_gallery_images',
 			value: { original_count: projectV3.gallery.length },
@@ -29,7 +29,7 @@ export const galleryNotRelevantIssue = issue({
 	id: 'gallery-not-relevant',
 	title: 'Irrelevant gallery images',
 	category: 'Gallery',
-	facets: ({ projectV3, selected }) => {
+	actions: ({ projectV3, selected }) => {
 		const keys = new Set((selected.items['gallery-image'] ?? []).map(({ key }) => key))
 		const imageIds = projectV3.gallery.flatMap((image) =>
 			image.id !== undefined && keys.has(String(image.id)) ? [image.id] : [],

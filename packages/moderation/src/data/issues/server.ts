@@ -16,7 +16,7 @@ export const serversExcessiveLanguagesIssue = issue({
 	id: 'servers-excessive-languages',
 	title: 'Excessive languages',
 	category: 'Server details',
-	facets: [issueTargets.modifyServerLanguages()],
+	actions: [issueTargets.modifyServerLanguages()],
 	message: excessiveLanguagesMessage,
 	suggestedStatus: 'flagged',
 })
