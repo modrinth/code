@@ -5,10 +5,14 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import ReadyTransition from '#ui/components/base/ReadyTransition.vue'
+import ConfigPushPromptModal from '#ui/components/servers/ConfigPushPromptModal.vue'
 import { useReadyState } from '#ui/composables'
 import { useUploadSessionUpload } from '#ui/composables/hosting/kyros-session-upload'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerPermissions } from '#ui/composables/server-permissions'
+import { toShareableConfigPath } from '#ui/layouts/shared/server-sharing/config-files'
+import { useServerShareReview } from '#ui/layouts/shared/server-sharing/use-server-share-review'
+import { useServerPlayerMembers } from '#ui/layouts/wrapped/hosting/manage/[id]/play/use-server-players'
 import {
 	injectAuth,
 	injectFileDownload,
@@ -48,7 +52,9 @@ const fileUploadSession = useUploadSessionUpload({
 })
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
-const { canWriteFiles, canUsePowerActions, permissionDeniedMessage } = useServerPermissions()
+const { canWriteFiles, canUsePowerActions, canSetup, permissionDeniedMessage } =
+	useServerPermissions()
+const { pending: sharePending, runAction: runShareAction } = useServerShareReview()
 
 const route = useRoute()
 const router = useRouter()
@@ -99,6 +105,30 @@ const busyWarning = computed(() =>
 		? formatMessage(nonBackupBusyReasons.value[0].reason)
 		: null,
 )
+
+const shareWorld = computed(() =>
+	serverContext.serverFull.value?.worlds.find((world) => world.id === worldId.value),
+)
+const sharedInstanceId = computed(() => shareWorld.value?.content?.shared_instance_id ?? null)
+const sharedInstanceMembers = useServerPlayerMembers(sharedInstanceId)
+const configPushModal = ref<InstanceType<typeof ConfigPushPromptModal>>()
+const configPushDeferredPaths = new Set<string>()
+
+async function promptConfigPush(path: string) {
+	const configPath = toShareableConfigPath(path)
+	if (
+		!configPath ||
+		configPushDeferredPaths.has(configPath) ||
+		!canSetup.value ||
+		sharePending.value ||
+		!sharedInstanceId.value ||
+		!sharedInstanceMembers.data.value?.rows.length
+	)
+		return
+	const choice = await configPushModal.value?.show(configPath)
+	if (choice === 'push') await runShareAction('push', false, [configPath])
+	else if (choice === 'later') configPushDeferredPaths.add(configPath)
+}
 
 // Path & navigation
 const currentPath = computed(() => (typeof route.query.path === 'string' ? route.query.path : '/'))
@@ -388,6 +418,7 @@ async function writeFile(path: string, content: string): Promise<void> {
 	if (fileWriteDisabled.value) return
 	await client.kyros.files_v0.updateFile(path, content)
 	queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
+	void promptConfigPush(path)
 }
 
 async function downloadFile(path: string, fileName: string): Promise<void> {
@@ -479,6 +510,13 @@ async function zipPaths(parent: string, include: string[], target: string): Prom
 		`${parent}/${target}`.replace('//', '/'),
 	)
 }
+
+watch(
+	() => editingFile.value?.path,
+	() => configPushDeferredPaths.clear(),
+)
+
+watch(worldId, () => configPushModal.value?.hide())
 
 watch(
 	() => fsOps.value,
@@ -584,4 +622,10 @@ provideFileManager({
 			:show-refresh-button="props.showRefreshButton"
 		/>
 	</ReadyTransition>
+	<ConfigPushPromptModal
+		ref="configPushModal"
+		:action-disabled="!canSetup || sharePending"
+		:includes-other-changes="shareWorld?.content?.shared_instance_needs_update ?? false"
+		:server-running="serverContext.isServerRunning.value"
+	/>
 </template>

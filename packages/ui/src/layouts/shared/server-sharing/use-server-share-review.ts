@@ -139,10 +139,15 @@ export function useServerShareReview<Action extends string = 'push'>(options?: {
 		return shared
 	}
 
-	async function runAction(action: Action, reviewed = false) {
+	/**
+	 * Runs `action` for the current world. Reviewed actions take their config files from the
+	 * picker in the diff review, so `configPaths` only applies when `reviewed` is false.
+	 */
+	async function runAction(action: Action, reviewed = false, configPaths: string[] = []) {
 		if (pending.value) return
 		const target = currentTarget()
 		if (!target) return
+		target.configPaths = configPaths
 		await executeAction(action, target, reviewed)
 	}
 
