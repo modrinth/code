@@ -88,7 +88,7 @@ const title = computed(() =>
 			<div v-if="showViewContent || showSettings" class="flex shrink-0 items-center gap-2">
 				<Button
 					v-if="showViewContent"
-					type="outlined"
+					type="base"
 					size="lg"
 					:disabled="disabled"
 					@click="emit('view-content')"
@@ -98,7 +98,7 @@ const title = computed(() =>
 				</Button>
 				<IconButton
 					v-if="showSettings"
-					type="base"
+					type="outlined"
 					size="lg"
 					:disabled="disabled"
 					:label="formatMessage(messages.settings)"

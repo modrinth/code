@@ -14,7 +14,6 @@ export interface SharingSettingsContext {
 	revokeInvite: (inviteId: string, targetKey: string) => Promise<void>
 	unpublish: (targetKey: string) => Promise<void>
 	onError: (error: unknown) => void
-	reviewChangesBeforePlaying?: Ref<boolean>
 }
 
 export const [injectSharingSettings, provideSharingSettings] =

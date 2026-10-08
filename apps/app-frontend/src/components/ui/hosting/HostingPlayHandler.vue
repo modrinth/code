@@ -347,7 +347,6 @@ const prepareMutation = useMutation({
 				client.archon.servers_v0.get(serverId),
 			])
 			target.name = remote.name
-			target.icon ??= remote.icon
 			if (legacyServer.owner_id === credentials.user_id) {
 				await launchMutation.mutateAsync({ target }).catch(() => {})
 				return

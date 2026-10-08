@@ -66,7 +66,11 @@
 			ref="diffModal"
 			:header="formatMessage(messages.pushUpdate)"
 			:admonition-header="formatMessage(messages.shareChanges)"
-			:description="formatMessage(messages.shareChangesBody)"
+			:description="
+				formatMessage(
+					previewAction === 'play' ? messages.shareChangesPlayBody : messages.shareChangesBody,
+				)
+			"
 			:diffs="previewQuery.data.value?.items ?? []"
 			:confirm-label="
 				formatMessage(previewAction === 'play' ? messages.pushAndPlay : messages.pushUpdate)
@@ -130,7 +134,6 @@ import {
 } from '#ui/components/sharing'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerPermissions } from '#ui/composables/server-permissions'
-import { useServerPreferences } from '#ui/composables/server-preferences'
 import ContentDiffModal from '#ui/layouts/shared/installation-settings/components/ContentDiffModal.vue'
 import InvitedPlayersTableLayout from '#ui/layouts/shared/invited-players/layout.vue'
 import {
@@ -206,7 +209,6 @@ const {
 const removeModal = ref<InstanceType<typeof ConfirmModal>>()
 const playerToRemove = ref<ServerPlayerRow>()
 const previewAction = ref<'play' | 'push'>('push')
-const preferences = useServerPreferences(serverId)
 const inviteBinding = computed<ServerInviteBinding>(() => ({
 	header: formatMessage(messages.inviteHeader, { name: server.value.name }),
 	props: {
@@ -310,13 +312,7 @@ async function ensureServerRunning(sameContext: () => boolean) {
 }
 async function perform(action: Action, reviewed = false) {
 	if (!worldId.value || actionsLocked.value) return
-	if (
-		action === 'play' &&
-		!reviewed &&
-		canSetup.value &&
-		needsUpdate.value &&
-		preferences.value.reviewChangesBeforePlaying
-	) {
+	if (action === 'play' && !reviewed && canSetup.value && needsUpdate.value) {
 		void showPreview(true)
 		return
 	}
@@ -393,6 +389,11 @@ const messages = defineMessages({
 	shareChangesBody: {
 		id: 'servers.play.share-changes-body',
 		defaultMessage: 'These changes will be available to players when they update their instance.',
+	},
+	shareChangesPlayBody: {
+		id: 'servers.play.share-changes-play-body',
+		defaultMessage:
+			'Starting the server will push these changes to all invited players. They will be asked to update their instance the next time they play.',
 	},
 	inviteHeader: { id: 'servers.play.invite-header', defaultMessage: 'Invite players to {name}' },
 	refreshingPreview: {

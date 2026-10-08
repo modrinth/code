@@ -4994,12 +4994,6 @@
   "server.settings.sharing.retry": {
     "defaultMessage": "Retry"
   },
-  "server.settings.sharing.review-changes-before-playing": {
-    "defaultMessage": "Review changes before playing"
-  },
-  "server.settings.sharing.review-changes-before-playing-description": {
-    "defaultMessage": "Review content updates before sharing them with players. Saved on this device."
-  },
   "server.settings.sharing.unpublish-confirmation": {
     "defaultMessage": "This deletes the shared instance and disables its invite links. Players will stop receiving shared content updates. Your server and its content will remain available."
   },
@@ -6331,6 +6325,9 @@
   },
   "servers.play.share-changes-body": {
     "defaultMessage": "These changes will be available to players when they update their instance."
+  },
+  "servers.play.share-changes-play-body": {
+    "defaultMessage": "Starting the server will push these changes to all invited players. They will be asked to update their instance the next time they play."
   },
   "servers.play.start-failed": {
     "defaultMessage": "The server stopped before it was ready. Check the console before trying again."
