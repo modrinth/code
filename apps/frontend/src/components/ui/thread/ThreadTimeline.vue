@@ -43,7 +43,7 @@ const props = withDefaults(
 		imagePreviews?: boolean
 		messageClass?: string
 	}>(),
-	{ issues: () => [], report: null, raised: false, imagePreviews: false, messageClass: undefined },
+	{ issues: () => [], report: null, raised: false, imagePreviews: false, messageClass: '' },
 )
 
 const emit = defineEmits<{

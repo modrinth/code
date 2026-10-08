@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="message group/thread relative grid min-w-0 grid-cols-[2rem_minmax(0,1fr)] items-start gap-x-2 break-words px-4 py-2 [overflow-wrap:anywhere] before:pointer-events-none before:absolute before:inset-0 before:opacity-5 before:content-[''] [&>.message__icon:focus-visible+.message__content_.message__author_a]:underline [&>.message__icon:hover+.message__content_.message__author_a]:underline"
+		class="message group/thread relative grid min-w-0 grid-cols-[2rem_minmax(0,1fr)] items-start gap-x-2 break-words px-4 py-3 before:pointer-events-none before:absolute before:inset-0 before:opacity-5 before:content-[''] [&>.message__icon:focus-visible+.message__content_.message__author_a]:underline [&>.message__icon:hover+.message__content_.message__author_a]:underline"
 		:class="[
 			noLinks ? '!p-0' : 'focus-within:bg-surface-2.5 hover:bg-surface-2.5',
 			isPrivateMessage ? 'text-[var(--color-icon)]' : '',
