@@ -28,6 +28,7 @@ use daedalus::modded::{LoaderVersion, Manifest};
 use serde::Deserialize;
 use std::future::Future;
 use std::path::{Path, PathBuf};
+use std::sync::Arc;
 use tokio::process::Command;
 
 mod args;
@@ -894,7 +895,7 @@ pub async fn launch_minecraft(
     post_exit_hook: Option<String>,
     context: &InstanceLaunchContext,
     mut quick_play_type: QuickPlayType,
-    state: &State,
+    state: &Arc<State>,
 ) -> crate::Result<ProcessMetadata> {
     let instance = &context.instance;
     let content_set = &context.applied_content_set;
@@ -1289,6 +1290,7 @@ pub async fn launch_minecraft(
             version_info.logging.is_some(),
             main_class_keep_alive,
             rpc_server,
+            state,
             async |process: &ProcessMetadata, rpc_server| {
                 let process_start_time = process.start_time.to_rfc3339();
                 let instance_created_time = instance.created.to_rfc3339();
