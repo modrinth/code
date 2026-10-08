@@ -21,9 +21,9 @@ pub struct ModrinthSandboxCommandView {
     pub allow_network: bool,
     pub is_jvm: bool,
     pub die_with_parent: bool,
-    pub stdin: u32,
-    pub stdout: u32,
-    pub stderr: u32,
+    pub child_stdin: u32,
+    pub child_stdout: u32,
+    pub child_stderr: u32,
     pub app_container_name: ModrinthSandboxString,
     pub app_container_description: ModrinthSandboxString,
 }
@@ -106,12 +106,12 @@ pub unsafe extern "C" fn modrinth_sandbox_prepare_command(
                 .try_to_owned()
                 .wrap_err("converting `app_container_description`")?;
 
-            let stdin =
-                stdio(command_view.stdin).wrap_err("converting `stdin`")?;
-            let stdout =
-                stdio(command_view.stdout).wrap_err("converting `stdout`")?;
-            let stderr =
-                stdio(command_view.stderr).wrap_err("converting `stderr`")?;
+            let stdin = stdio(command_view.child_stdin)
+                .wrap_err("converting `child_stdin`")?;
+            let stdout = stdio(command_view.child_stdout)
+                .wrap_err("converting `child_stdout`")?;
+            let stderr = stdio(command_view.child_stderr)
+                .wrap_err("converting `child_stderr`")?;
 
             let command = crate::SandboxCommand {
                 executable: executable.as_ref().into(),

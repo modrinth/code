@@ -86,9 +86,9 @@ int main(int argc, char **argv)
 	}
 	view.allow_network = true;
 	view.die_with_parent = true;
-	view.stdin = MODRINTH_SANDBOX_STDIO_NULL;
-	view.stdout = MODRINTH_SANDBOX_STDIO_INHERIT;
-	view.stderr = MODRINTH_SANDBOX_STDIO_INHERIT;
+	view.child_stdin = MODRINTH_SANDBOX_STDIO_NULL;
+	view.child_stdout = MODRINTH_SANDBOX_STDIO_INHERIT;
+	view.child_stderr = MODRINTH_SANDBOX_STDIO_INHERIT;
 	view.app_container_name = string_view("ModrinthMinecraftSandbox");
 	view.app_container_description = string_view("Sandbox for Minecraft instances created by modrinth-sandbox");
 
