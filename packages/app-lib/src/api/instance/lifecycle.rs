@@ -106,7 +106,7 @@ pub async fn edit(
             instance.install_stage,
         )?;
     }
-    crate::state::edit_instance(instance_id, patch, &state.pool).await?;
+    crate::state::edit_instance(instance_id, patch, &state).await?;
 
     let instance = crate::state::get_instance(instance_id, &state.pool)
         .await?

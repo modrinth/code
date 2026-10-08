@@ -82,7 +82,7 @@ pub(super) async fn detach_local_shared_instance(
                 }),
                 ..Default::default()
             },
-            &state.pool,
+            state,
         )
         .await?;
     }
