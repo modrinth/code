@@ -27,6 +27,10 @@ use std::collections::{HashMap, HashSet};
 use std::path::PathBuf;
 use uuid::Uuid;
 
+/// Icon used for linked-server instances whose server has no icon of its own.
+const DEFAULT_SERVER_ICON: &[u8] = include_bytes!(
+    "../../../assets/external/illustrations/minecraft_server_icon.png"
+);
 const MAX_SHARED_INSTANCE_EXTERNAL_FILE_SIZE: u64 = 500 * 1024 * 1024;
 const MAX_SHARED_INSTANCE_INITIAL_BUFFER_SIZE: u64 = 8 * 1024 * 1024;
 
@@ -59,20 +63,30 @@ pub(super) async fn finalize_shared_instance_attachment(
     state: &State,
 ) -> crate::Result<()> {
     if let Some(server) = &data.linked_server {
-        if let Some(icon) = data.server_manager_icon_url.as_deref() {
-            let icon_path =
+        let icon_path = match data.server_manager_icon_url.as_deref() {
+            Some(icon) => {
                 crate::state::instances::commands::resolve_icon_path(
                     Some(icon),
                     false,
                     state,
                 )
-                .await?;
-            crate::api::instance::edit_icon(
-                instance_id,
-                icon_path.as_deref().map(std::path::Path::new),
-            )
-            .await?;
-        }
+                .await?
+            }
+            None => Some(
+                crate::api::instance::cache_icon(
+                    bytes::Bytes::from_static(DEFAULT_SERVER_ICON),
+                    state,
+                )
+                .await?
+                .to_string_lossy()
+                .to_string(),
+            ),
+        };
+        crate::api::instance::edit_icon(
+            instance_id,
+            icon_path.as_deref().map(std::path::Path::new),
+        )
+        .await?;
         crate::api::worlds::ensure_managed_server_in_instance(
             instance_id,
             data.server_manager_name

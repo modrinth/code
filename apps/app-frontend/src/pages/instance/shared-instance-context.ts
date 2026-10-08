@@ -1,3 +1,4 @@
+import { MinecraftServerIcon } from '@modrinth/assets'
 import { createContext, injectAuth } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, type Ref, ref, watch } from 'vue'
@@ -63,9 +64,7 @@ export function createSharedInstanceContext(
 			return {
 				type: 'server',
 				name: attachment.server_manager_name,
-				avatarUrl:
-					getInstanceIconUrl(attachment.server_manager_icon_url ?? instance.value?.icon_path) ??
-					undefined,
+				avatarUrl: getInstanceIconUrl(attachment.server_manager_icon_url) ?? MinecraftServerIcon,
 				tintBy: attachment.server_manager_name,
 			}
 		}

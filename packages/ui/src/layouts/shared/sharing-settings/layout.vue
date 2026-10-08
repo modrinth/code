@@ -2,7 +2,7 @@
 import { SpinnerIcon, UnlinkIcon } from '@modrinth/assets'
 import { computed, ref, watch } from 'vue'
 
-import { Button, Toggle } from '#ui/components/base'
+import { Button } from '#ui/components/base'
 import { defineMessages, type MessageDescriptor, useVIntl } from '#ui/composables/i18n'
 
 import ActiveInvites from './components/active-invites.vue'
@@ -18,7 +18,6 @@ defineProps<{
 
 const ctx = injectSharingSettings()
 const { formatMessage } = useVIntl()
-const { reviewChangesBeforePlaying } = ctx
 const revokeModal = ref<InstanceType<typeof RevokeInviteModal>>()
 const unpublishModal = ref<InstanceType<typeof UnpublishModal>>()
 const revokeTarget = ref<{ key: string; inviteId: string }>()
@@ -81,15 +80,6 @@ watch(
 )
 
 const messages = defineMessages({
-	reviewChangesBeforePlaying: {
-		id: 'server.settings.sharing.review-changes-before-playing',
-		defaultMessage: 'Review changes before playing',
-	},
-	reviewChangesBeforePlayingDescription: {
-		id: 'server.settings.sharing.review-changes-before-playing-description',
-		defaultMessage:
-			'Review content updates before sharing them with players. Saved on this device.',
-	},
 	unpublishTitle: {
 		id: 'installation-settings.shared-instance.title',
 		defaultMessage: 'Unpublish instance',
@@ -107,22 +97,6 @@ const messages = defineMessages({
 
 <template>
 	<div class="flex flex-col gap-8">
-		<div
-			v-if="reviewChangesBeforePlaying !== undefined"
-			class="flex items-center justify-between gap-2"
-		>
-			<label for="review-changes-before-playing" class="flex flex-col gap-1">
-				<span class="text-lg font-semibold text-contrast">
-					{{ formatMessage(messages.reviewChangesBeforePlaying) }}
-				</span>
-				<span>{{ formatMessage(messages.reviewChangesBeforePlayingDescription) }}</span>
-			</label>
-			<Toggle
-				id="review-changes-before-playing"
-				v-model="reviewChangesBeforePlaying"
-				class="flex-none"
-			/>
-		</div>
 		<ActiveInvites
 			:site-url="siteUrl"
 			:busy="busy"

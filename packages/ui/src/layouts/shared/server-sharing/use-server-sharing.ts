@@ -3,7 +3,6 @@ import { useIsMutating, useMutation, useQuery, useQueryClient } from '@tanstack/
 import { computed } from 'vue'
 
 import { useServerPermissions } from '#ui/composables/server-permissions'
-import { useServerPreferences } from '#ui/composables/server-preferences'
 import {
 	injectAuth,
 	injectModrinthClient,
@@ -22,7 +21,6 @@ export function useServerSharingSettings() {
 	const { handleError } = injectNotificationManager()
 	const { serverId, worldId, serverFull, busyReasons } = injectModrinthServerContext()
 	const { canSetup, permissionDeniedMessage } = useServerPermissions()
-	const preferences = useServerPreferences(serverId)
 	const userId = computed(() => auth.user.value?.id)
 	const sharedInstanceId = computed(
 		() =>
@@ -113,12 +111,6 @@ export function useServerSharingSettings() {
 			if (target) await unpublishMutation.mutateAsync(target)
 		},
 		onError: (error) => handleError(error),
-		reviewChangesBeforePlaying: computed({
-			get: () => preferences.value.reviewChangesBeforePlaying,
-			set: (value) => {
-				preferences.value.reviewChangesBeforePlaying = value
-			},
-		}),
 	}
 
 	return { settings, canSetup, permissionDeniedMessage, sharedInstanceId }
