@@ -314,6 +314,7 @@ async fn import_mmc_unmanaged(
         })
         .collect();
 
+    let state = State::get().await?;
     install_from::set_instance_information(
         instance_id.to_string(),
         &description,
@@ -321,11 +322,11 @@ async fn import_mmc_unmanaged(
         None,
         &dependencies,
         false,
+        &state,
     )
     .await?;
 
     // Moves .minecraft folder over (ie: overrides such as resourcepacks, mods, etc)
-    let state = State::get().await?;
     finish_import(instance_id, minecraft_folder, &state, reporter, details)
         .await?;
     Ok(())

@@ -699,6 +699,7 @@ async fn install_zipped_mrpack_files_with_reporter_inner(
         Some(&pack.version_id),
         &pack.dependencies,
         ignore_lock,
+        state,
     )
     .await?;
 

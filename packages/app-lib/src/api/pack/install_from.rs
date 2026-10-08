@@ -532,6 +532,7 @@ pub async fn set_instance_information(
     pack_version_id: Option<&str>,
     dependencies: &HashMap<PackDependency, String>,
     _ignore_lock: bool,
+    state: &State,
 ) -> crate::Result<()> {
     let mut game_version: Option<&String> = None;
     let mut mod_loader = None;
@@ -572,6 +573,7 @@ pub async fn set_instance_information(
             game_version,
             mod_loader,
             loader_version.cloned().as_deref(),
+            state,
         )
         .await?
     } else {

@@ -158,6 +158,7 @@ pub async fn get_loader_version_from_profile(
     game_version: &str,
     loader: ModLoader,
     loader_version: Option<&str>,
+    state: &State,
 ) -> crate::Result<Option<LoaderVersion>> {
     if loader == ModLoader::Vanilla {
         return Ok(None);
@@ -196,7 +197,6 @@ pub async fn get_loader_version_from_profile(
         return Ok(None);
     }
 
-    let state = State::get().await?;
     Ok(installed_loader_version(
         &state.directories.versions_dir(),
         game_version,
@@ -288,6 +288,7 @@ pub(crate) async fn resolve_java_for_launch(
         &content_set.game_version,
         content_set.loader,
         content_set.loader_version.as_deref(),
+        state,
     )
     .await?;
 
@@ -296,6 +297,7 @@ pub(crate) async fn resolve_java_for_launch(
             &content_set.game_version,
             content_set.loader,
             Some("stable"),
+            state,
         )
         .await?;
     }
@@ -468,6 +470,7 @@ async fn install_minecraft_inner(
         &content_set.game_version,
         content_set.loader,
         content_set.loader_version.as_deref(),
+        state,
     )
     .await?;
 
@@ -477,6 +480,7 @@ async fn install_minecraft_inner(
             &content_set.game_version,
             content_set.loader,
             Some("stable"),
+            state,
         )
         .await?;
 
@@ -929,6 +933,7 @@ pub async fn launch_minecraft(
         &content_set.game_version,
         content_set.loader,
         content_set.loader_version.as_deref(),
+        &state,
     )
     .await?;
 
