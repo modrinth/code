@@ -1219,7 +1219,7 @@ pub async fn launch_minecraft(
     crate::install::store::ensure_no_pending_recovery(
         &instance.id,
         None,
-        &state,
+        &state.pool,
     )
     .await?;
     let _store_lock = state.content_store.files_lock.lock().await;

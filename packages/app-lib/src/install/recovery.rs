@@ -483,7 +483,7 @@ async fn copy_symlink(source: &Path, target: &Path) -> crate::Result<()> {
 }
 
 pub async fn recover_interrupted_jobs(state: &State) -> crate::Result<()> {
-    let jobs = store::list_interrupted_candidates(state).await?;
+    let jobs = store::list_interrupted_candidates(&state.pool).await?;
 
     for job in jobs {
         let job_id = job.id;
@@ -503,7 +503,7 @@ pub async fn recover_interrupted_jobs(state: &State) -> crate::Result<()> {
 }
 
 async fn recover_orphaned_install_stages(state: &State) -> crate::Result<()> {
-    let jobs = store::list_all(state).await?;
+    let jobs = store::list_all(&state.pool).await?;
     for instance in instance_rows::list_instances(&state.pool).await? {
         let needs_recovery = jobs.iter().any(|job| {
             job.instance_id.as_deref() == Some(instance.id.as_str())
@@ -578,11 +578,11 @@ async fn recover_interrupted_job_inner(
             job.id,
             InstallJobStatus::Canceled,
             &job.state,
-            state,
+            &state.pool,
         )
         .await?
         {
-            store::dismiss(job.id, state).await?;
+            store::dismiss(job.id, &state.pool).await?;
             clear_staging_dir(&job.state).await;
             emit_install_job(&record.snapshot()).await?;
         }
@@ -637,7 +637,7 @@ async fn recover_interrupted_job_inner(
         job.id,
         InstallJobStatus::Interrupted,
         &job.state,
-        state,
+        &state.pool,
     )
     .await?
     {

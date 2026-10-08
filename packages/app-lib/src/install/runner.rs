@@ -169,7 +169,7 @@ pub(crate) async fn wait_for_job(job_id: Uuid) -> crate::Result<()> {
         let notified = completion.notified();
         tokio::pin!(notified);
         notified.as_mut().enable();
-        let job = store::get_required(job_id, &state).await?;
+        let job = store::get_required(job_id, &state.pool).await?;
         if job.status == InstallJobStatus::Succeeded {
             return Ok(());
         }
@@ -206,7 +206,7 @@ pub async fn list_jobs(
     include_finished: bool,
 ) -> crate::Result<Vec<InstallJobSnapshot>> {
     let state = State::get().await?;
-    Ok(store::list(include_finished, &state)
+    Ok(store::list(include_finished, &state.pool)
         .await?
         .into_iter()
         .map(|job| job.snapshot())
@@ -215,12 +215,12 @@ pub async fn list_jobs(
 
 pub async fn get_job(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
     let state = State::get().await?;
-    Ok(store::get_required(job_id, &state).await?.snapshot())
+    Ok(store::get_required(job_id, &state.pool).await?.snapshot())
 }
 
 pub async fn job_support_details(job_id: Uuid) -> crate::Result<String> {
     let state = State::get().await?;
-    let job = store::get_required(job_id, &state).await?;
+    let job = store::get_required(job_id, &state.pool).await?;
     diagnostics::build_job_support_details(&job, &state).await
 }
 
@@ -233,7 +233,7 @@ pub fn retry_job(
 async fn retry_job_inner(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
     let _admission = INSTALL_ADMISSION.lock().await;
     let state = State::get().await?;
-    let mut job = store::get_required(job_id, &state).await?;
+    let mut job = store::get_required(job_id, &state.pool).await?;
 
     if !matches!(
         job.status,
@@ -247,8 +247,12 @@ async fn retry_job_inner(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
     }
 
     if let Some(instance_id) = current_instance_id(&job.state) {
-        store::ensure_no_pending_recovery(&instance_id, Some(job_id), &state)
-            .await?;
+        store::ensure_no_pending_recovery(
+            &instance_id,
+            Some(job_id),
+            &state.pool,
+        )
+        .await?;
     }
 
     let cleanup_target_guard = reserve_target(&job.state.target)?;
@@ -258,7 +262,8 @@ async fn retry_job_inner(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
         let recovered = job.state.clone();
         job.state.rollback_error = None;
         job.state.paths.staging_dir = None;
-        store::update_status(job_id, job.status, &job.state, &state).await?;
+        store::update_status(job_id, job.status, &job.state, &state.pool)
+            .await?;
         recovery::clear_staging_dir(&recovered).await;
     }
 
@@ -282,7 +287,7 @@ async fn retry_job_inner(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
         job_id,
         InstallJobStatus::Queued,
         &job.state,
-        &state,
+        &state.pool,
     )
     .await
     {
@@ -315,7 +320,9 @@ async fn retry_job_inner(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
         }
         return Err(error);
     }
-    let record = match store::update_state(job_id, &job.state, &state).await {
+    let record = match store::update_state(job_id, &job.state, &state.pool)
+        .await
+    {
         Ok(record) => record,
         Err(error) => {
             let error_view = install_error_view(
@@ -372,7 +379,7 @@ async fn set_job_paused(
     paused: bool,
 ) -> crate::Result<InstallJobSnapshot> {
     let state = State::get().await?;
-    let job = store::get_required(job_id, &state).await?;
+    let job = store::get_required(job_id, &state.pool).await?;
     if !job.snapshot().can_pause {
         return Err(ErrorKind::InputError(
             "Install job cannot be paused or resumed".to_string(),
@@ -383,14 +390,14 @@ async fn set_job_paused(
         ErrorKind::InputError("Install worker is unavailable".to_string())
     })?;
     control.set_paused(paused)?;
-    let snapshot = store::get_required(job_id, &state).await?.snapshot();
+    let snapshot = store::get_required(job_id, &state.pool).await?.snapshot();
     emit_install_job(&snapshot).await?;
     Ok(snapshot)
 }
 
 pub async fn cancel_job(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
     let state = State::get().await?;
-    let job = store::get_required(job_id, &state).await?;
+    let job = store::get_required(job_id, &state.pool).await?;
     if job.snapshot().canceling {
         return Ok(job.snapshot());
     }
@@ -404,7 +411,7 @@ pub async fn cancel_job(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
         ErrorKind::InputError("Install worker is unavailable".to_string())
     })?;
     control.cancel()?;
-    let snapshot = store::get_required(job_id, &state).await?.snapshot();
+    let snapshot = store::get_required(job_id, &state.pool).await?.snapshot();
     emit_install_job(&snapshot).await?;
     Ok(snapshot)
 }
@@ -416,7 +423,8 @@ pub(crate) async fn cancel_jobs_for_instance_deletion(
     state: &State,
 ) -> crate::Result<(MutexGuard<'static, ()>, OwnedMutexGuard<()>)> {
     let admission = INSTALL_ADMISSION.lock().await;
-    let jobs = store::list_active_for_instance(instance_id, state).await?;
+    let jobs =
+        store::list_active_for_instance(instance_id, &state.pool).await?;
     for job in &jobs {
         if let Some(control) = super::control::get(job.id) {
             // A finishing worker cannot be canceled, but must still finish before deletion.
@@ -424,7 +432,9 @@ pub(crate) async fn cancel_jobs_for_instance_deletion(
         }
     }
     let target_guard = target_lock(instance_id).lock_owned().await;
-    for mut job in store::list_active_for_instance(instance_id, state).await? {
+    for mut job in
+        store::list_active_for_instance(instance_id, &state.pool).await?
+    {
         let canceled_phase = job.state.progress.phase;
         job.state.error = Some(InstallErrorView::from_message(
             "canceled",
@@ -439,26 +449,26 @@ pub(crate) async fn cancel_jobs_for_instance_deletion(
             job.id,
             InstallJobStatus::Canceled,
             &job.state,
-            state,
+            &state.pool,
         )
         .await?
         else {
             continue;
         };
 
-        store::dismiss(job.id, state).await?;
+        store::dismiss(job.id, &state.pool).await?;
         emit_install_job(&record.snapshot()).await?;
     }
 
     for job in jobs {
-        store::dismiss(job.id, state).await?;
+        store::dismiss(job.id, &state.pool).await?;
     }
     Ok((admission, target_guard))
 }
 
 pub async fn dismiss_job(job_id: Uuid) -> crate::Result<()> {
     let state = State::get().await?;
-    store::dismiss(job_id, &state).await
+    store::dismiss(job_id, &state.pool).await
 }
 
 fn start(
@@ -474,13 +484,15 @@ async fn start_inner(
     let mut target_guard = reserve_target(&request.target())?;
     let state = State::get().await?;
     if let InstallTarget::ExistingInstance { instance_id } = request.target() {
-        store::ensure_no_pending_recovery(&instance_id, None, &state).await?;
+        store::ensure_no_pending_recovery(&instance_id, None, &state.pool)
+            .await?;
     }
     let id = Uuid::new_v4();
     let mut job_state = InstallJobState::new(request);
     set_initial_display(&mut job_state);
     let record =
-        store::insert(id, &job_state, InstallJobStatus::Queued, &state).await?;
+        store::insert(id, &job_state, InstallJobStatus::Queued, &state.pool)
+            .await?;
     emit_install_job(&record.snapshot()).await?;
 
     if let Err(error) = prepare_initial_instance(&mut job_state, &state).await {
@@ -498,7 +510,7 @@ async fn start_inner(
         }
         return Err(error);
     }
-    let record = match store::update_state(id, &job_state, &state).await {
+    let record = match store::update_state(id, &job_state, &state.pool).await {
         Ok(record) => record,
         Err(error) => {
             let error_view = install_error_view(
@@ -765,7 +777,7 @@ async fn run_job_inner(
     control: &std::sync::Arc<super::control::InstallControl>,
 ) -> crate::Result<()> {
     let state = State::get().await?;
-    let mut job = store::get_required(job_id, &state).await?;
+    let mut job = store::get_required(job_id, &state.pool).await?;
 
     if job.status != InstallJobStatus::Queued {
         return Ok(());
@@ -779,7 +791,7 @@ async fn run_job_inner(
     } else {
         None
     };
-    job = store::get_required(job_id, &state).await?;
+    job = store::get_required(job_id, &state.pool).await?;
 
     if job.status != InstallJobStatus::Queued {
         return Ok(());
@@ -792,7 +804,7 @@ async fn run_job_inner(
         InstallJobStatus::Queued,
         InstallJobStatus::Running,
         &job_state,
-        &state,
+        &state.pool,
     )
     .await?
     else {
@@ -818,7 +830,7 @@ async fn run_job_inner(
     } else {
         control.finish_failed();
     }
-    if let Ok(record) = store::get_required(job_id, &state).await {
+    if let Ok(record) = store::get_required(job_id, &state.pool).await {
         let status = record.status;
         job_state = record.state;
         if status != InstallJobStatus::Running {
@@ -850,7 +862,7 @@ async fn run_job_inner(
             job_state.rollback_error = None;
             job_state.context = None;
             if let Some(record) =
-                store::complete_success(job_id, &job_state, &state).await?
+                store::complete_success(job_id, &job_state, &state.pool).await?
             {
                 if let Err(error) =
                     crate::api::instance::reconcile_instance_synced_options(
@@ -910,7 +922,7 @@ async fn terminalize_stranded_job(
     message: String,
 ) -> crate::Result<()> {
     let state = State::get().await?;
-    let job = store::get_required(job_id, &state).await?;
+    let job = store::get_required(job_id, &state.pool).await?;
     if !matches!(
         job.status,
         InstallJobStatus::Queued | InstallJobStatus::Running
@@ -997,7 +1009,7 @@ async fn terminalize_failed_job_inner(
             InstallJobStatus::Failed
         },
         &job_state,
-        state,
+        &state.pool,
     )
     .await?
     {
@@ -1070,7 +1082,11 @@ async fn run_request_inner(
             crate::launcher::install_minecraft_with_reporter(
                 &context,
                 false,
-                Some(InstallProgressReporter::new(job_id, job_state.clone())),
+                Some(InstallProgressReporter::new(
+                    job_id,
+                    job_state.clone(),
+                    state.pool.clone(),
+                )),
             )
             .await?;
             Ok(Some(instance_id))
@@ -1153,7 +1169,11 @@ async fn run_request_inner(
                 launcher_type,
                 base_path,
                 instance_folder,
-                InstallProgressReporter::new(job_id, job_state.clone()),
+                InstallProgressReporter::new(
+                    job_id,
+                    job_state.clone(),
+                    state.pool.clone(),
+                ),
             )
             .await?;
             Ok(Some(instance_id))
@@ -1179,7 +1199,11 @@ async fn run_request_inner(
                 crate::api::instance::get_full_path(&source_instance_id)
                     .await?,
                 &state.io_semaphore,
-                InstallProgressReporter::new(job_id, job_state.clone()),
+                InstallProgressReporter::new(
+                    job_id,
+                    job_state.clone(),
+                    state.pool.clone(),
+                ),
                 InstallPhaseDetails::Empty,
             )
             .await?;
@@ -1195,7 +1219,11 @@ async fn run_request_inner(
             crate::launcher::install_minecraft_with_reporter(
                 &context,
                 false,
-                Some(InstallProgressReporter::new(job_id, job_state.clone())),
+                Some(InstallProgressReporter::new(
+                    job_id,
+                    job_state.clone(),
+                    state.pool.clone(),
+                )),
             )
             .await?;
             emit_instance(&instance_id, InstancePayloadType::Edited).await?;
@@ -1224,7 +1252,11 @@ async fn run_request_inner(
             crate::launcher::install_minecraft_with_reporter(
                 &context,
                 force,
-                Some(InstallProgressReporter::new(job_id, job_state.clone())),
+                Some(InstallProgressReporter::new(
+                    job_id,
+                    job_state.clone(),
+                    state.pool.clone(),
+                )),
             )
             .await?;
             Ok(Some(instance_id))
@@ -1286,7 +1318,11 @@ async fn run_request_inner(
             crate::state::instances::commands::apply_bulk_update(
                 &instance_id,
                 plan,
-                InstallProgressReporter::new(job_id, job_state.clone()),
+                InstallProgressReporter::new(
+                    job_id,
+                    job_state.clone(),
+                    state.pool.clone(),
+                ),
                 state,
             )
             .await?;
@@ -1417,7 +1453,11 @@ async fn remove_existing_pack_content(
         .into_iter()
         .filter_map(|file| (!file.enabled).then_some(file.project_id?))
         .collect::<HashSet<_>>();
-    let reporter = InstallProgressReporter::new(job_id, job_state.clone());
+    let reporter = InstallProgressReporter::new(
+        job_id,
+        job_state.clone(),
+        state.pool.clone(),
+    );
     let old_pack = generate_pack_from_version_id_with_reporter(
         project_id.clone(),
         version_id.clone(),
@@ -1530,7 +1570,12 @@ async fn install_pack_inner(
     instance_id: String,
     reason: DownloadReason,
 ) -> crate::Result<()> {
-    let reporter = InstallProgressReporter::new(job_id, job_state.clone());
+    let state = State::get().await?;
+    let reporter = InstallProgressReporter::new(
+        job_id,
+        job_state.clone(),
+        state.pool.clone(),
+    );
     reporter
         .update(
             InstallPhaseId::DownloadingPackFile,
@@ -1652,7 +1697,7 @@ async fn prepare_update_backup(
     )
     .await?;
     job_state.paths.staging_dir = Some(staging_dir);
-    let record = store::update_state(job_id, job_state, state).await?;
+    let record = store::update_state(job_id, job_state, &state.pool).await?;
     emit_install_job(&record.snapshot()).await?;
     super::control::checkpoint(job_id).await
 }
@@ -1701,7 +1746,7 @@ pub(super) async fn update_progress(
 ) -> crate::Result<()> {
     super::control::checkpoint(job_id).await?;
     job_state.set_progress(phase, None, details);
-    let record = store::update_state(job_id, job_state, state).await?;
+    let record = store::update_state(job_id, job_state, &state.pool).await?;
     emit_install_job(&record.snapshot()).await?;
     Ok(())
 }
@@ -1721,7 +1766,7 @@ pub(super) async fn update_content_progress(
         secondary: None,
     });
     job_state.progress.details = InstallPhaseDetails::Empty;
-    let record = store::update_state(job_id, job_state, state).await?;
+    let record = store::update_state(job_id, job_state, &state.pool).await?;
     emit_install_job(&record.snapshot()).await?;
     Ok(())
 }
