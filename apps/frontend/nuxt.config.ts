@@ -28,6 +28,7 @@ export default defineNuxtConfig({
 		'@modrinth/api-client': API_CLIENT_SOURCE,
 	},
 	app: {
+		buildAssetsDir: '/_assets/',
 		head: {
 			htmlAttrs: {
 				lang: 'en',
