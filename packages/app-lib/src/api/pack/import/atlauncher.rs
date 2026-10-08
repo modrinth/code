@@ -218,7 +218,7 @@ async fn import_atlauncher_unmanaged(
             &game_version,
             mod_loader,
             Some(&atinstance.launcher.loader_version.version),
-            &state,
+            &state.directories,
         )
         .await?
     } else {

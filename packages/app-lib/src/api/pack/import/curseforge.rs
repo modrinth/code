@@ -119,7 +119,7 @@ pub async fn import_curseforge(
                 &game_version,
                 mod_loader,
                 loader_version.as_deref(),
-                &state,
+                &state.directories,
             )
             .await?
         } else {

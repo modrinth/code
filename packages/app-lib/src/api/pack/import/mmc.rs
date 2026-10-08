@@ -322,7 +322,7 @@ async fn import_mmc_unmanaged(
         None,
         &dependencies,
         false,
-        &state,
+        &state.directories,
     )
     .await?;
 

@@ -15,8 +15,8 @@ use crate::launcher::quick_play_version::{
 use crate::server_address::{ServerAddress, parse_server_address};
 use crate::state::server_join_log::JoinLogEntry;
 use crate::state::{
-    Credentials, InstanceInstallStage, InstanceLaunchContext, InstanceLink,
-    JavaVersion, MemorySettings, ProcessMetadata, WindowSize,
+    Credentials, DirectoryInfo, InstanceInstallStage, InstanceLaunchContext,
+    InstanceLink, JavaVersion, MemorySettings, ProcessMetadata, WindowSize,
 };
 use crate::util::io;
 use crate::util::rpc::RpcServerBuilder;
@@ -160,7 +160,7 @@ pub async fn get_loader_version_from_profile(
     game_version: &str,
     loader: ModLoader,
     loader_version: Option<&str>,
-    state: &State,
+    directories: &DirectoryInfo,
 ) -> crate::Result<Option<LoaderVersion>> {
     if loader == ModLoader::Vanilla {
         return Ok(None);
@@ -200,7 +200,7 @@ pub async fn get_loader_version_from_profile(
     }
 
     Ok(installed_loader_version(
-        &state.directories.versions_dir(),
+        &directories.versions_dir(),
         game_version,
         version,
     ))
@@ -290,7 +290,7 @@ pub(crate) async fn resolve_java_for_launch(
         &content_set.game_version,
         content_set.loader,
         content_set.loader_version.as_deref(),
-        state,
+        &state.directories,
     )
     .await?;
 
@@ -299,7 +299,7 @@ pub(crate) async fn resolve_java_for_launch(
             &content_set.game_version,
             content_set.loader,
             Some("stable"),
-            state,
+            &state.directories,
         )
         .await?;
     }
@@ -476,7 +476,7 @@ async fn install_minecraft_inner(
         &content_set.game_version,
         content_set.loader,
         content_set.loader_version.as_deref(),
-        state,
+        &state.directories,
     )
     .await?;
 
@@ -486,7 +486,7 @@ async fn install_minecraft_inner(
             &content_set.game_version,
             content_set.loader,
             Some("stable"),
-            state,
+            &state.directories,
         )
         .await?;
 
@@ -943,7 +943,7 @@ pub async fn launch_minecraft(
         &content_set.game_version,
         content_set.loader,
         content_set.loader_version.as_deref(),
-        state,
+        &state.directories,
     )
     .await?;
 
