@@ -382,9 +382,9 @@ pub async fn resolve_minecraft_manifest(
 
 fn get_instance_full_path(
     instance_path: &str,
-    state: &State,
+    directories: &DirectoryInfo,
 ) -> crate::Result<PathBuf> {
-    let instances_dir = state.directories.instances_dir();
+    let instances_dir = directories.instances_dir();
     let full_path = io::canonicalize(instances_dir.join(instance_path))?;
     Ok(full_path)
 }
@@ -440,7 +440,8 @@ async fn install_minecraft_inner(
     emit_instance(&instance.id, InstancePayloadType::Edited).await?;
 
     let result = Box::pin(async {
-    let instance_path = get_instance_full_path(&instance.path, state)?;
+    let instance_path =
+        get_instance_full_path(&instance.path, &state.directories)?;
     if let Some(reporter) = &reporter {
         reporter
             .update(
@@ -927,7 +928,8 @@ pub async fn launch_minecraft(
 
     let mut runtime_lease = state.content_store.runtime_cache_lock.read().await;
 
-    let instance_path = get_instance_full_path(&instance.path, state)?;
+    let instance_path =
+        get_instance_full_path(&instance.path, &state.directories)?;
 
     let (minecraft, version_index) =
         resolve_minecraft_manifest(&content_set.game_version, state).await?;
