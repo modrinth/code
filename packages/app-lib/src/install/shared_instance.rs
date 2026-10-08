@@ -674,7 +674,7 @@ async fn apply_shared_instance_content_inner(
             location,
             instance_id.to_string(),
             DownloadReason::Modpack,
-            state,
+            &state.pool,
         )
         .await?;
     } else {
