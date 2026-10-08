@@ -133,6 +133,7 @@ macro_rules! processor_rules {
 pub async fn get_java_version_from_launch_context(
     context: &InstanceLaunchContext,
     version_info: &VersionInfo,
+    state: &State,
 ) -> crate::Result<Option<JavaVersion>> {
     if let Some(java) = context.launch_overrides.java_path.as_ref() {
         let java =
@@ -147,8 +148,6 @@ pub async fn get_java_version_from_launch_context(
         .java_version
         .as_ref()
         .map_or(8, |it| it.major_version);
-
-    let state = State::get().await?;
 
     let java_version = JavaVersion::get(key, &state.pool).await?;
 
@@ -277,12 +276,12 @@ fn loader_versions_for_game_version<'a>(
 
 pub(crate) async fn resolve_java_for_launch(
     context: &InstanceLaunchContext,
+    state: &State,
 ) -> crate::Result<JavaVersion> {
-    let state = State::get().await?;
     let _runtime_lease = state.content_store.runtime_cache_lock.read().await;
     let content_set = &context.applied_content_set;
     let (minecraft, version_index) =
-        resolve_minecraft_manifest(&content_set.game_version, &state).await?;
+        resolve_minecraft_manifest(&content_set.game_version, state).await?;
     let version = &minecraft.versions[version_index];
 
     let mut loader_version = get_loader_version_from_profile(
@@ -302,7 +301,7 @@ pub(crate) async fn resolve_java_for_launch(
     }
 
     let version_info = download::download_version_info(
-        &state,
+        state,
         version,
         loader_version.as_ref(),
         None,
@@ -316,7 +315,8 @@ pub(crate) async fn resolve_java_for_launch(
         .as_ref()
         .map_or(8, |it| it.major_version);
     let (java_path, set_java) = if let Some(java_version) =
-        get_java_version_from_launch_context(context, &version_info).await?
+        get_java_version_from_launch_context(context, &version_info, state)
+            .await?
     {
         (PathBuf::from(java_version.path), false)
     } else {
@@ -525,7 +525,8 @@ async fn install_minecraft_inner(
             .await?;
     }
     let (java_version, set_java) = if let Some(java_version) =
-        get_java_version_from_launch_context(context, &version_info).await?
+        get_java_version_from_launch_context(context, &version_info, state)
+            .await?
     {
         (std::path::PathBuf::from(java_version.path), false)
     } else {
@@ -977,7 +978,7 @@ pub async fn launch_minecraft(
         download_log_config(&state, &version_info, None, false, None).await?;
 
     let java_version =
-        get_java_version_from_launch_context(context, &version_info)
+        get_java_version_from_launch_context(context, &version_info, &state)
             .await?
             .ok_or_else(|| {
                 crate::ErrorKind::LauncherError(
