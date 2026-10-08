@@ -891,7 +891,7 @@ impl Process {
             last_updated_playtime: &mut Instant,
             instance_id: &str,
             force_update: bool,
-            state: &State,
+            pool: &SqlitePool,
         ) {
             let elapsed = last_updated_playtime.elapsed().as_secs();
             if elapsed == 0 || (!force_update && elapsed < 60) {
@@ -902,7 +902,7 @@ impl Process {
                 crate::state::instances::commands::add_instance_recent_playtime(
                     instance_id,
                     elapsed,
-                    &state.pool,
+                    pool,
                 )
                 .await
             {
@@ -938,7 +938,7 @@ impl Process {
                 &mut last_updated_playtime,
                 &instance_id,
                 false,
-                &state,
+                &state.pool,
             )
             .await;
         }
@@ -967,8 +967,13 @@ impl Process {
         .await?;
 
         // Now fully complete- update playtime one last time
-        update_playtime(&mut last_updated_playtime, &instance_id, true, &state)
-            .await;
+        update_playtime(
+            &mut last_updated_playtime,
+            &instance_id,
+            true,
+            &state.pool,
+        )
+        .await;
 
         // Publish play time update
         // Allow failure, it will be stored locally and sent next time
