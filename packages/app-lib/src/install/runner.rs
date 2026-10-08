@@ -361,7 +361,7 @@ async fn retry_job_inner(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
     }
     let registration = super::control::register(job_id);
     emit_install_job(&record.snapshot()).await?;
-    spawn_job(job_id, registration, target_guard);
+    spawn_job(job_id, registration, target_guard, Arc::clone(&state));
 
     Ok(record.snapshot())
 }
@@ -548,7 +548,7 @@ async fn start_inner(
     }
     let registration = super::control::register(id);
     emit_install_job(&record.snapshot()).await?;
-    spawn_job(id, registration, target_guard);
+    spawn_job(id, registration, target_guard, Arc::clone(&state));
     Ok(record.snapshot())
 }
 
@@ -749,13 +749,16 @@ fn spawn_job(
     job_id: Uuid,
     registration: super::control::Registration,
     target_guard: Option<OwnedMutexGuard<()>>,
+    state: Arc<State>,
 ) {
     tokio::spawn(async move {
         let _target_guard = target_guard;
-        if let Err(error) = run_job(job_id, &registration.control).await {
+        if let Err(error) = run_job(job_id, &registration.control, &state).await
+        {
             let failure = error.to_string();
             tracing::error!("Install job {job_id} terminated: {failure}");
-            if let Err(error) = terminalize_stranded_job(job_id, failure).await
+            if let Err(error) =
+                terminalize_stranded_job(job_id, failure, &state).await
             {
                 tracing::error!(
                     "Failed to terminalize stranded install job {job_id}: {error}"
@@ -768,15 +771,16 @@ fn spawn_job(
 fn run_job<'a>(
     job_id: Uuid,
     control: &'a std::sync::Arc<super::control::InstallControl>,
+    state: &'a State,
 ) -> impl Future<Output = crate::Result<()>> + Send + 'a {
-    Box::pin(run_job_inner(job_id, control))
+    Box::pin(run_job_inner(job_id, control, state))
 }
 
 async fn run_job_inner(
     job_id: Uuid,
     control: &std::sync::Arc<super::control::InstallControl>,
+    state: &State,
 ) -> crate::Result<()> {
-    let state = State::get().await?;
     let mut job = store::get_required(job_id, &state.pool).await?;
 
     if job.status != InstallJobStatus::Queued {
@@ -817,7 +821,7 @@ async fn run_job_inner(
             super::control::CURRENT_INSTALL
                 .scope(
                     control.clone(),
-                    run_request(job_id, &mut job_state, &state),
+                    run_request(job_id, &mut job_state, state),
                 )
                 .await
         }
@@ -882,7 +886,7 @@ async fn run_job_inner(
 						&instance_id,
 					)).await;
                 }
-                recovery::clear_staging_dir(&job_state, &state).await;
+                recovery::clear_staging_dir(&job_state, state).await;
                 if let Err(error) =
                     emit_instance(&instance_id, InstancePayloadType::Edited)
                         .await
@@ -909,7 +913,7 @@ async fn run_job_inner(
                     job_state.context.clone(),
                 )
             };
-            terminalize_failed_job(job_id, job_state, error_view, &state)
+            terminalize_failed_job(job_id, job_state, error_view, state)
                 .await?;
         }
     }
@@ -920,8 +924,8 @@ async fn run_job_inner(
 async fn terminalize_stranded_job(
     job_id: Uuid,
     message: String,
+    state: &State,
 ) -> crate::Result<()> {
-    let state = State::get().await?;
     let job = store::get_required(job_id, &state.pool).await?;
     if !matches!(
         job.status,
@@ -935,7 +939,7 @@ async fn terminalize_stranded_job(
         job.state.progress.phase,
         message,
     );
-    terminalize_failed_job(job_id, job.state, error_view, &state).await
+    terminalize_failed_job(job_id, job.state, error_view, state).await
 }
 
 fn terminalize_failed_job<'a>(
@@ -1118,7 +1122,8 @@ async fn run_request_inner(
                 state,
             )
             .await?;
-            apply_post_install_edit(&instance_id, post_install_edit).await?;
+            apply_post_install_edit(&instance_id, post_install_edit, state)
+                .await?;
             Ok(Some(instance_id))
         }
         InstallRequest::CreateSharedInstance { data } => {
@@ -1194,7 +1199,6 @@ async fn run_request_inner(
                 InstallPhaseDetails::Empty,
             )
             .await?;
-            let state = State::get().await?;
             crate::api::pack::import::copy_dotminecraft_with_reporter(
                 &instance_id,
                 crate::api::instance::get_full_path(&source_instance_id)
@@ -1293,7 +1297,8 @@ async fn run_request_inner(
                 state,
             )
             .await?;
-            apply_post_install_edit(&instance_id, post_install_edit).await?;
+            apply_post_install_edit(&instance_id, post_install_edit, state)
+                .await?;
             Ok(Some(instance_id))
         }
         InstallRequest::BulkUpdateContent {
@@ -1361,6 +1366,7 @@ async fn run_request_inner(
 async fn apply_post_install_edit(
     instance_id: &str,
     edit: Option<InstallPostInstallEdit>,
+    state: &State,
 ) -> crate::Result<()> {
     let Some(mut edit) = edit else {
         return Ok(());
@@ -1373,8 +1379,7 @@ async fn apply_post_install_edit(
     if let Some(icon_path) = edit.icon_path.take() {
         let icon_path = match icon_path {
             Some(icon_path) => {
-                let state = State::get().await?;
-                resolve_icon_path(Some(&icon_path), false, &state).await?
+                resolve_icon_path(Some(&icon_path), false, state).await?
             }
             None => None,
         };
