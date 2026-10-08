@@ -234,7 +234,8 @@ export default defineNuxtConfig({
 	},
 	modules: [
 		// Sentry causes rollup-plugin-inject errors in dev, only enable in production
-		...(isProduction() ? ['@sentry/nuxt/module'] : []),
+		// The module picks up sentry.server.config.ts, which uses @sentry/node and only works on the Node server
+		...(isProduction() && isNodeServer() ? ['@sentry/nuxt/module'] : []),
 	],
 	floatingVue: {
 		themes: {
@@ -257,6 +258,7 @@ export default defineNuxtConfig({
 			external: ['cloudflare:workers'],
 		},
 		preset: 'cloudflare_module',
+		plugins: isNodeServer() ? [] : ['sentry-cloudflare-plugin.ts'],
 		noExternals: getNoExternals(),
 		cloudflare: {
 			nodeCompat: true,
@@ -334,6 +336,10 @@ function getSharedInstancesApiUrl() {
 
 function isProduction() {
 	return process.env.NODE_ENV === 'production'
+}
+
+function isNodeServer() {
+	return process.env.NITRO_PRESET?.startsWith('node') ?? false
 }
 
 function getNoExternals() {

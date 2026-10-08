@@ -85,6 +85,19 @@ jobs:
           CF_PAGES_BRANCH: ${{ github.ref_name }}
           CF_PAGES_COMMIT_SHA: ${{ github.sha }}
 
+      # Runs before staging so the injected debug IDs end up in the image
+      - name: Create Sentry release and upload sourcemaps
+        uses: getsentry/action-release@ff07929a6537bac57790c3451cf4d364aca38528 # v3.7.0
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: modrinth
+          SENTRY_PROJECT: frontend-server
+        with:
+          environment: ${{ steps.meta.outputs.env }}
+          sourcemaps: ./apps/frontend/.output/server
+          url_prefix: '~/'
+          set_commits: skip
+
       - name: Stage Docker context
         run: |
           mkdir -p apps/frontend/docker-stage

@@ -79,6 +79,8 @@ ENV HOST=0.0.0.0
 ENV PORT=3000
 ENV NODE_COMPILE_CACHE=/app/.node-compile-cache
 ENV NO_COLOR=1
+# Sentry has to load before the server so its instrumentation can patch modules as they are imported.
+ENV NODE_OPTIONS=--import=/app/.output/server/sentry.server.config.mjs
 
 WORKDIR /app
 
