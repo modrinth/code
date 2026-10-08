@@ -60,7 +60,9 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
         .service(project_search_post)
         .service(projects_get_route)
         .service(projects_edit_route)
-        .service(random_projects_get_route);
+        .service(random_projects_get_route)
+        .service(edit_gallery_item)
+        .service(delete_gallery_item);
 }
 
 pub fn project_config(cfg: &mut actix_web::web::ServiceConfig) {
@@ -71,8 +73,6 @@ pub fn project_config(cfg: &mut actix_web::web::ServiceConfig) {
         .service(project_icon_edit)
         .service(delete_project_icon)
         .service(add_gallery_item)
-        .service(edit_gallery_item)
-        .service(delete_gallery_item)
         .service(project_follow)
         .service(project_unfollow)
         .service(project_get_organization)
@@ -90,6 +90,12 @@ pub async fn clear_project_cache_and_queue_search(
     slug: Option<String>,
     clear_dependencies: Option<bool>,
 ) -> Result<(), ApiError> {
+    let mut project_refs = vec![ProjectId::from(project_id).to_string()];
+    if let Some(slug) = &slug {
+        project_refs.push(slug.clone());
+    }
+    crate::routes::clear_project_redirect_cache(&project_refs, redis).await?;
+
     db_models::DBProject::clear_cache(
         project_id,
         slug,
@@ -244,6 +250,22 @@ pub async fn projects_get_route(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    let project_refs = serde_json::from_str::<Vec<String>>(&ids.ids)
+        .wrap_request_err("deserializing project references")?;
+    if let Some(response) = crate::routes::redirect_query_refs(
+        &req,
+        "ids",
+        &project_refs,
+        pool.as_ref(),
+        redis.as_ref(),
+        session_queue.as_ref(),
+        Scopes::PROJECT_READ,
+    )
+    .await?
+    {
+        return Ok(response);
+    }
+
     projects_get(req, ids, pool, redis, session_queue).await
 }
 
@@ -291,8 +313,23 @@ pub async fn project_get(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<web::Json<Project>, ApiError> {
-    project_get_internal(req, info, pool, redis, session_queue).await
+) -> Result<HttpResponse, ApiError> {
+    if let Some(response) = crate::routes::redirect_ref(
+        &req,
+        "id",
+        pool.as_ref(),
+        redis.as_ref(),
+        session_queue.as_ref(),
+        Scopes::PROJECT_READ,
+    )
+    .await?
+    {
+        return Ok(response);
+    }
+
+    let project =
+        project_get_internal(req, info, pool, redis, session_queue).await?;
+    Ok(HttpResponse::Ok().json(project.into_inner()))
 }
 
 pub async fn project_get_internal(
@@ -429,6 +466,19 @@ pub async fn project_edit(
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
+    if let Some(response) = crate::routes::redirect_ref(
+        &req,
+        "id",
+        pool.as_ref(),
+        redis.as_ref(),
+        session_queue.as_ref(),
+        Scopes::PROJECT_WRITE,
+    )
+    .await?
+    {
+        return Ok(response);
+    }
+
     project_edit_internal(
         req,
         info,
@@ -1404,6 +1454,16 @@ pub async fn project_edit_internal(
         .await
         .wrap_internal_err("committing database transaction")?;
 
+    let mut project_refs =
+        vec![ProjectId::from(project_item.inner.id).to_string()];
+    if let Some(slug) = &project_item.inner.slug {
+        project_refs.push(slug.clone());
+    }
+    if let Some(slug) = &new_project.slug {
+        project_refs.push(slug.to_lowercase());
+    }
+    crate::routes::clear_project_redirect_cache(&project_refs, &redis).await?;
+
     if became_unsearchable {
         db_models::DBProject::clear_cache(
             project_item.inner.id,
@@ -1691,10 +1751,25 @@ pub async fn project_search_post(
 )]
 #[get("/{id}/check")]
 pub async fn project_get_check(
+    req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    if let Some(response) = crate::routes::redirect_ref(
+        &req,
+        "id",
+        pool.as_ref(),
+        redis.as_ref(),
+        session_queue.as_ref(),
+        Scopes::PROJECT_READ,
+    )
+    .await?
+    {
+        return Ok(response);
+    }
+
     project_get_check_internal(info, pool, redis).await
 }
 
@@ -1738,6 +1813,19 @@ pub async fn dependency_list(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    if let Some(response) = crate::routes::redirect_ref(
+        &req,
+        "project_id",
+        pool.as_ref(),
+        redis.as_ref(),
+        session_queue.as_ref(),
+        Scopes::PROJECT_READ,
+    )
+    .await?
+    {
+        return Ok(response);
+    }
+
     dependency_list_internal(req, info, pool, ro_pool, redis, session_queue)
         .await
 }
@@ -1893,6 +1981,22 @@ pub async fn projects_edit_route(
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
+    let project_refs = serde_json::from_str::<Vec<String>>(&ids.ids)
+        .wrap_request_err("deserializing project references")?;
+    if let Some(response) = crate::routes::redirect_query_refs(
+        &req,
+        "ids",
+        &project_refs,
+        pool.as_ref(),
+        redis.as_ref(),
+        session_queue.as_ref(),
+        Scopes::PROJECT_WRITE,
+    )
+    .await?
+    {
+        return Ok(response);
+    }
+
     projects_edit(
         req,
         ids,
@@ -2291,6 +2395,19 @@ pub async fn project_icon_edit(
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
+    if let Some(response) = crate::routes::redirect_ref(
+        &req,
+        "id",
+        pool.as_ref(),
+        redis.as_ref(),
+        session_queue.as_ref(),
+        Scopes::PROJECT_WRITE,
+    )
+    .await?
+    {
+        return Ok(response);
+    }
+
     project_icon_edit_internal(
         web::Query(ext),
         req,
@@ -2447,6 +2564,19 @@ pub async fn delete_project_icon(
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
+    if let Some(response) = crate::routes::redirect_ref(
+        &req,
+        "id",
+        pool.as_ref(),
+        redis.as_ref(),
+        session_queue.as_ref(),
+        Scopes::PROJECT_WRITE,
+    )
+    .await?
+    {
+        return Ok(response);
+    }
+
     delete_project_icon_internal(
         req,
         info,
@@ -2600,6 +2730,19 @@ pub async fn add_gallery_item(
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
+    if let Some(response) = crate::routes::redirect_ref(
+        &req,
+        "id",
+        pool.as_ref(),
+        redis.as_ref(),
+        session_queue.as_ref(),
+        Scopes::PROJECT_WRITE,
+    )
+    .await?
+    {
+        return Ok(response);
+    }
+
     add_gallery_item_internal(
         web::Query(ext),
         req,
@@ -2822,7 +2965,6 @@ pub struct GalleryEditQuery {
 
 /// Update a gallery item.
 #[utoipa::path(
-	context_path = "/project",
 	tag = "projects",
 	params(
 		("url" = String, Query),
@@ -2833,7 +2975,7 @@ pub struct GalleryEditQuery {
 	),
 	responses((status = NO_CONTENT))
 )]
-#[patch("/{id}/gallery")]
+#[patch("/project-gallery")]
 pub async fn edit_gallery_item(
     req: HttpRequest,
     web::Query(item): web::Query<GalleryEditQuery>,
@@ -3054,14 +3196,13 @@ pub struct GalleryDeleteQuery {
 
 /// Delete a gallery item.
 #[utoipa::path(
-	context_path = "/project",
 	tag = "projects",
 	params(
 		("url" = String, Query)
 	),
 	responses((status = NO_CONTENT))
 )]
-#[delete("/{id}/gallery")]
+#[delete("/project-gallery")]
 pub async fn delete_gallery_item(
     req: HttpRequest,
     web::Query(item): web::Query<GalleryDeleteQuery>,
@@ -3230,9 +3371,30 @@ pub async fn project_delete(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
-) -> Result<(), ApiError> {
-    project_delete_internal(req, info, pool, redis, session_queue, search_state)
-        .await
+) -> Result<HttpResponse, ApiError> {
+    if let Some(response) = crate::routes::redirect_ref(
+        &req,
+        "id",
+        pool.as_ref(),
+        redis.as_ref(),
+        session_queue.as_ref(),
+        Scopes::PROJECT_DELETE,
+    )
+    .await?
+    {
+        return Ok(response);
+    }
+
+    project_delete_internal(
+        req,
+        info,
+        pool,
+        redis,
+        session_queue,
+        search_state,
+    )
+    .await?;
+    Ok(HttpResponse::NoContent().finish())
 }
 
 pub async fn project_delete_internal(
@@ -3543,6 +3705,19 @@ pub async fn project_follow(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    if let Some(response) = crate::routes::redirect_ref(
+        &req,
+        "id",
+        pool.as_ref(),
+        redis.as_ref(),
+        session_queue.as_ref(),
+        Scopes::USER_WRITE,
+    )
+    .await?
+    {
+        return Ok(response);
+    }
+
     project_follow_internal(req, info, pool, redis, session_queue).await
 }
 
@@ -3648,6 +3823,19 @@ pub async fn project_unfollow(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    if let Some(response) = crate::routes::redirect_ref(
+        &req,
+        "id",
+        pool.as_ref(),
+        redis.as_ref(),
+        session_queue.as_ref(),
+        Scopes::USER_WRITE,
+    )
+    .await?
+    {
+        return Ok(response);
+    }
+
     project_unfollow_internal(req, info, pool, redis, session_queue).await
 }
 
@@ -3745,6 +3933,19 @@ pub async fn project_get_organization(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    if let Some(response) = crate::routes::redirect_ref(
+        &req,
+        "id",
+        pool.as_ref(),
+        redis.as_ref(),
+        session_queue.as_ref(),
+        Scopes::PROJECT_READ | Scopes::ORGANIZATION_READ,
+    )
+    .await?
+    {
+        return Ok(response);
+    }
+
     let current_user = get_user_from_headers(
         &req,
         &**pool,

@@ -1,10 +1,15 @@
-use crate::auth::AuthenticationError;
+use crate::auth::{
+    AuthenticationError, filter_visible_project_ids, get_user_from_headers,
+};
 use crate::database::PgPool;
+use crate::database::models::DBProject;
 use crate::database::models::DBProjectId;
 use crate::env::ENV;
 use crate::models::ids::ProjectId;
+use crate::models::pats::Scopes;
+use crate::queue::session::AuthQueue;
 use crate::util::cors::default_cors;
-use crate::util::error::Context;
+use crate::util::error::{ApiContext, Context};
 use actix_cors::Cors;
 use actix_files::Files;
 use actix_web::http::{StatusCode, header};
@@ -30,7 +35,7 @@ mod updates;
 
 pub use self::not_found::not_found;
 
-const PROJECT_REDIRECTS_NAMESPACE: &str = "project_redirects:v1";
+pub const PROJECT_REDIRECTS_NAMESPACE: &str = "project_redirects:v1";
 const PROJECT_REDIRECT_CACHE_TTL_SECONDS: i64 = 300;
 
 pub async fn resolve_ref(
@@ -140,14 +145,126 @@ pub async fn resolve_refs(
     Ok(resolved)
 }
 
+/// Rewrites body references without redirecting the HTTP request or changing unresolved values.
+pub async fn resolve_body_refs(
+    mut project_refs: Vec<&mut String>,
+    user: &Option<crate::models::users::User>,
+    pool: &PgPool,
+    redis: &RedisPool,
+) -> Result<(), ApiError> {
+    let refs = project_refs
+        .iter()
+        .map(|value| (**value).clone())
+        .collect::<Vec<_>>();
+    let targets =
+        resolve_visible_refs_for_user(&refs, user, pool, redis).await?;
+    for (value, target) in project_refs.iter_mut().zip(targets) {
+        if let Some(target) = target {
+            **value = target.to_string();
+        }
+    }
+    Ok(())
+}
+
+pub async fn clear_project_redirect_cache(
+    project_refs: &[String],
+    redis: &RedisPool,
+) -> Result<(), ApiError> {
+    if project_refs.is_empty() {
+        return Ok(());
+    }
+
+    let mut redis = redis
+        .connect()
+        .await
+        .wrap_internal_err("connecting to Redis to clear project redirects")?;
+    let keys = project_refs
+        .iter()
+        .map(|project_ref| {
+            redis.key().entity(PROJECT_REDIRECTS_NAMESPACE, project_ref)
+        })
+        .collect::<Vec<_>>();
+    redis
+        .delete_many(&keys)
+        .await
+        .wrap_internal_err("clearing cached project redirects")?;
+
+    Ok(())
+}
+
+/// Checks visibility after alias resolution, keeping the alias cache caller-independent.
+async fn resolve_visible_refs(
+    req: &HttpRequest,
+    project_refs: &[String],
+    pool: &PgPool,
+    redis: &RedisPool,
+    session_queue: &AuthQueue,
+    required_scopes: Scopes,
+) -> Result<Vec<Option<ProjectId>>, ApiError> {
+    let user =
+        get_user_from_headers(req, pool, redis, session_queue, required_scopes)
+            .await
+            .map(|(_, user)| user)
+            .ok();
+    resolve_visible_refs_for_user(project_refs, &user, pool, redis).await
+}
+
+async fn resolve_visible_refs_for_user(
+    project_refs: &[String],
+    user: &Option<crate::models::users::User>,
+    pool: &PgPool,
+    redis: &RedisPool,
+) -> Result<Vec<Option<ProjectId>>, ApiError> {
+    let mut targets = resolve_refs(project_refs, pool, redis).await?;
+    if targets.iter().all(Option::is_none) {
+        return Ok(targets);
+    }
+
+    let target_refs = targets
+        .iter()
+        .flatten()
+        .map(ToString::to_string)
+        .collect::<Vec<_>>();
+    let projects = DBProject::get_many(&target_refs, pool, redis)
+        .await
+        .wrap_internal_err("fetching project redirect targets")?;
+    let visible_ids = filter_visible_project_ids(
+        projects.iter().map(|project| &project.inner).collect(),
+        user,
+        pool,
+        false,
+    )
+    .await
+    .wrap_api_err("checking project redirect visibility")?
+    .into_iter()
+    .map(ProjectId::from)
+    .collect::<HashSet<_>>();
+    for target in &mut targets {
+        if target.is_some_and(|id| !visible_ids.contains(&id)) {
+            *target = None;
+        }
+    }
+    Ok(targets)
+}
+
 pub async fn redirect_query_refs(
     req: &HttpRequest,
     parameter_name: &str,
     project_refs: &[String],
     pool: &PgPool,
     redis: &RedisPool,
+    session_queue: &AuthQueue,
+    required_scopes: Scopes,
 ) -> Result<Option<HttpResponse>, ApiError> {
-    let resolved_refs = resolve_refs(project_refs, pool, redis).await?;
+    let resolved_refs = resolve_visible_refs(
+        req,
+        project_refs,
+        pool,
+        redis,
+        session_queue,
+        required_scopes,
+    )
+    .await?;
     if resolved_refs.iter().all(Option::is_none) {
         return Ok(None);
     }
@@ -179,6 +296,52 @@ pub async fn redirect_query_refs(
     Ok(Some(
         HttpResponse::PermanentRedirect()
             .append_header((header::LOCATION, location))
+            .append_header((header::CACHE_CONTROL, "private, no-store"))
+            .finish(),
+    ))
+}
+
+pub async fn redirect_query_ref(
+    req: &HttpRequest,
+    parameter_name: &str,
+    project_ref: &str,
+    pool: &PgPool,
+    redis: &RedisPool,
+    session_queue: &AuthQueue,
+    required_scopes: Scopes,
+) -> Result<Option<HttpResponse>, ApiError> {
+    let Some(target_project_id) = resolve_visible_refs(
+        req,
+        &[project_ref.to_string()],
+        pool,
+        redis,
+        session_queue,
+        required_scopes,
+    )
+    .await?
+    .into_iter()
+    .next()
+    .flatten() else {
+        return Ok(None);
+    };
+
+    let target_project_id = target_project_id.to_string();
+    let mut query = url::form_urlencoded::Serializer::new(String::new());
+    for (name, value) in
+        url::form_urlencoded::parse(req.query_string().as_bytes())
+    {
+        if name == parameter_name {
+            query.append_pair(&name, &target_project_id);
+        } else {
+            query.append_pair(&name, &value);
+        }
+    }
+    let location = format!("{}?{}", req.path(), query.finish());
+
+    Ok(Some(
+        HttpResponse::PermanentRedirect()
+            .append_header((header::LOCATION, location))
+            .append_header((header::CACHE_CONTROL, "private, no-store"))
             .finish(),
     ))
 }
@@ -188,12 +351,24 @@ pub async fn redirect_ref(
     parameter_name: &str,
     pool: &PgPool,
     redis: &RedisPool,
+    session_queue: &AuthQueue,
+    required_scopes: Scopes,
 ) -> Result<Option<HttpResponse>, ApiError> {
     let Some(project_ref) = req.match_info().get(parameter_name) else {
         return Ok(None);
     };
-    let Some(target_project_id) = resolve_ref(project_ref, pool, redis).await?
-    else {
+    let Some(target_project_id) = resolve_visible_refs(
+        req,
+        &[project_ref.to_string()],
+        pool,
+        redis,
+        session_queue,
+        required_scopes,
+    )
+    .await?
+    .into_iter()
+    .next()
+    .flatten() else {
         return Ok(None);
     };
 
@@ -227,6 +402,7 @@ pub async fn redirect_ref(
     Ok(Some(
         HttpResponse::PermanentRedirect()
             .append_header((header::LOCATION, location))
+            .append_header((header::CACHE_CONTROL, "private, no-store"))
             .finish(),
     ))
 }
