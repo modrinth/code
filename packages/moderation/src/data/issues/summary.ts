@@ -37,7 +37,16 @@ export const summaryFormattingIssue = issue({
 		}),
 	],
 	suggestedStatus: 'flagged',
-	message: formatting,
+	message: ({ getTextValue }) => {
+		const suggestion = getTextValue('suggestion')
+		return formatting
+			.replaceAll('%SUGGESTION%', () =>
+				suggestion.trim()
+					? `You may use the following suggested summary\n\n\`\`\`\n${suggestion}\n\`\`\``
+					: '',
+			)
+			.trim()
+	},
 })
 
 export const nonEnglishSummaryIssue = issue({
