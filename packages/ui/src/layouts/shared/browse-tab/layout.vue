@@ -142,6 +142,7 @@ function getProjectCardTags(result: Labrinth.Search.v3.ResultSearchProject, disp
 		v-if="ctx.showProjectTypeTabs.value"
 		:links="ctx.selectableProjectTypes.value"
 		:replace="ctx.variant === 'app'"
+		:show-single-tab="!!ctx.showServerEnvironment?.value"
 	/>
 
 	<Input

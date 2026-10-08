@@ -1,3 +1,4 @@
+import { ModrinthApiError } from '@modrinth/api-client'
 import {
 	useIsFetching,
 	useIsMutating,
@@ -102,14 +103,21 @@ export function useServerShareReview<Action extends string = 'push'>(options?: {
 		}
 	}
 
-	async function showPreview() {
+	/**
+	 * Opens the diff review for the current world. When the shared instance has no ready
+	 * version yet there is nothing to diff against, so `action` runs straight away instead.
+	 */
+	async function showPreview(action = 'push' as Action) {
 		if (!canSetup.value || pending.value) return
 		const target = currentTarget()
 		if (!target) return
 		previewOpen.value = true
 		const result = await previewQuery.refetch()
 		if (!previewOpen.value || !target.isCurrent()) return
-		if (result.error) {
+		if (result.error instanceof ModrinthApiError && result.error.statusCode === 404) {
+			previewOpen.value = false
+			await executeAction(action, target)
+		} else if (result.error) {
 			previewOpen.value = false
 			handleError(result.error)
 		} else diffModal.value?.show()
@@ -135,6 +143,10 @@ export function useServerShareReview<Action extends string = 'push'>(options?: {
 		if (pending.value) return
 		const target = currentTarget()
 		if (!target) return
+		await executeAction(action, target, reviewed)
+	}
+
+	async function executeAction(action: Action, target: ServerShareActionTarget, reviewed = false) {
 		try {
 			await actionMutation.mutateAsync({ action, reviewed, target })
 			if (target.isCurrent()) previewOpen.value = false
