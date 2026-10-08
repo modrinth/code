@@ -2197,7 +2197,13 @@ export namespace Labrinth {
 							description?: OptionalTextTarget | null
 						}
 				  }
-				| { type: 'remove_gallery_images'; value: { image_ids: number[] } }
+				| {
+						type: 'remove_gallery_images'
+						value: {
+							image_ids: number[]
+							original_images?: { id: number; url: string; name?: string }[]
+						}
+				  }
 				| { type: 'remove_project_disclosures'; value: { disclosure_types: string[] } }
 				| ModifyDisclosureTarget
 				| {
@@ -2256,11 +2262,17 @@ export namespace Labrinth {
 			 */
 			export type ThreadIssueWhy = {
 				issue_id?: string
+				/**
+				 * this is to indicate where to show issue card if the issue facet(action) does not have a specific location.
+				 */
 				locations?: ThreadIssueLocation[]
 				title?: string
 				message?: string
+				custom?: { priority: string }
+				/**
+				 * this is the state of the issue, at creation time.used for re - rev
+				 */
 				selection?: {
-					active: boolean
 					toggle_ids: string[]
 					text_values: Record<string, string>
 					select_values: Record<string, string[]>

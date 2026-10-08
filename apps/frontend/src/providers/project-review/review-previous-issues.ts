@@ -1,4 +1,5 @@
 import type { Labrinth } from '@modrinth/api-client'
+import { IssuePriority } from '@modrinth/moderation/src/data/issues'
 import { issueTargetLabels } from '@modrinth/moderation/src/data/issues/component-builders/targets'
 import { createContext, useVIntl } from '@modrinth/ui'
 import { computed, type Ref, watch } from 'vue'
@@ -35,7 +36,12 @@ export function createReviewPreviousIssues(
 	)
 
 	function reviewIssue(issue: ThreadIssue) {
+		const restored = panels.customIssues.value.find(
+			(entry) => entry.custom?.previous?.id === issue.id,
+		)
+		if (restored) return restored
 		const why = issue.why
+		if (why?.custom) return undefined
 		const id = why && typeof why === 'object' && 'issue_id' in why ? why.issue_id : undefined
 		return panels.availableIssues.value.find((entry) => !entry.custom && entry.id === id)
 	}
@@ -59,9 +65,18 @@ export function createReviewPreviousIssues(
 	function reviewMessage(issue: ThreadIssue) {
 		const key = messageKey(issue)
 		if (messages.hasIssueOverride(key)) return messages.issueMessage(key)
-		const id = reviewIssue(issue)?.id
-		return id && isApplicable(issue) && panels.activeIssues.value.some((active) => active.id === id)
-			? messages.issueMessage(id)
+		const definition = reviewIssue(issue)
+		if (!definition || !isApplicable(issue)) return issueMessage(issue)
+		if (!panels.activeIssues.value.some((active) => active.id === definition.id))
+			return issueMessage(issue)
+		if (definition.custom) return messages.issueMessage(definition.id)
+		if (messages.hasIssueOverride(definition.id)) return messages.issueMessage(definition.id)
+		const selection = issue.why.selection
+		const generated = selection
+			? messages.generatedIssueMessage(definition.id, selection)
+			: undefined
+		return generated !== undefined && issueMessage(issue) === generated
+			? messages.issueMessage(definition.id)
 			: issueMessage(issue)
 	}
 
@@ -110,6 +125,10 @@ export function createReviewPreviousIssues(
 						? details.issue_id.replaceAll('-', ' ')
 						: formatMessage(issueTargetLabels[issue.facets[0]?.what.type ?? 'mark_addressed'])),
 			category: '',
+			priority: issue.why.custom
+				? (IssuePriority[issue.why.custom.priority as keyof typeof IssuePriority] ??
+					IssuePriority.Bottom)
+				: undefined,
 			controls: [],
 		}
 	}
@@ -266,14 +285,24 @@ export function createReviewPreviousIssues(
 				facet.id,
 				isResolved(issue) || facet.verdict !== 'resolved',
 			)
-		const definition = reviewIssue(issue)
+		const definition = reviewIssue(issue) ?? panels.restoreCustomIssue(issue)
 		if (!definition) return
+		if (definition.custom) {
+			panels.addIssue(definition.id)
+			session.write(
+				projectId,
+				'previous-issue-selection',
+				issue.id,
+				panels.issueSnapshot(definition.id),
+			)
+			return
+		}
 		if (panels.activeIssues.value.some(({ id }) => id === definition.id)) {
 			session.write(
 				projectId,
 				'previous-issue-selection',
 				issue.id,
-				JSON.stringify({ id: definition.id, ...panels.issueSelection(definition.id) }),
+				panels.issueSnapshot(definition.id),
 			)
 			return
 		}
@@ -322,7 +351,7 @@ export function createReviewPreviousIssues(
 			projectId,
 			'previous-issue-selection',
 			issue.id,
-			JSON.stringify({ id: definition.id, ...panels.issueSelection(definition.id) }),
+			panels.issueSnapshot(definition.id),
 		)
 	}
 
@@ -333,9 +362,10 @@ export function createReviewPreviousIssues(
 	function wasControlSelected(issue: ThreadIssue, control: ResolvedIssueControl) {
 		if (control.type !== 'toggle' || issue.why?.issue_id !== control.issueId) return false
 		const selection = issue.why?.selection
-		return control.id === undefined
-			? selection?.active === true
-			: Array.isArray(selection?.toggle_ids) && selection.toggle_ids.includes(control.id)
+		return (
+			control.id === undefined ||
+			(Array.isArray(selection?.toggle_ids) && selection.toggle_ids.includes(control.id))
+		)
 	}
 
 	const reReviewIssues = computed(() => issues.value.filter((issue) => !isResolved(issue)))
@@ -356,6 +386,7 @@ export function createReviewPreviousIssues(
 		return (
 			isResolved(issue) ||
 			messages.hasIssueOverride(messageKey(issue)) ||
+			reviewMessage(issue) !== issueMessage(issue) ||
 			(panels.activeIssues.value.some((active) => active.id === id) &&
 				!panels.isRestoredIssue(id ?? '')) ||
 			issue.facets.some((facet) => isFacetApplicable(issue, facet) && facet.verdict === 'resolved')
@@ -403,6 +434,7 @@ export function createReviewPreviousIssues(
 				const id = reviewIssue(issue)?.id
 				const active = panels.activeIssues.value.find((active) => active.id === id)
 				const changed = !!active && !panels.isRestoredIssue(active.id)
+				const custom = panels.customIssues.value.find((entry) => entry.id === id)?.custom
 				const previousFacets = new Map(issue.facets.map((facet) => [targetKey(facet.what), facet]))
 				const facets = active
 					? active.facets.filter(({ what }) => {
@@ -419,8 +451,17 @@ export function createReviewPreviousIssues(
 						why: {
 							...issueDetails(issue),
 							message: reviewMessage(issue),
+							...(custom
+								? {
+										issue_id: custom.id.trim(),
+										custom: { priority: custom.priority },
+									}
+								: {}),
 							...(active
-								? { selection: panels.issueSelection(active.id), locations: active.locations }
+								? {
+										selection: panels.issueSelection(active.id),
+										locations: active.locations,
+									}
 								: {}),
 						},
 						facets: [first, ...rest],

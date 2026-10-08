@@ -78,12 +78,7 @@ export interface ReviewPanelBinding {
 	}
 }
 
-export interface ReviewIssueSelection {
-	active: boolean
-	toggle_ids: string[]
-	text_values: Record<string, string>
-	select_values: Record<string, string[]>
-}
+export type ReviewIssueSelection = NonNullable<Labrinth.Threads.v3.ThreadIssueWhy['selection']>
 
 export interface ReviewIssueControl {
 	binding: ReviewPanelBinding
@@ -96,7 +91,13 @@ export interface ReviewIssue {
 	category: string
 	priority?: Issue['priority']
 	controls: ReviewIssueControl[]
-	custom?: { id: string; priority: string; message: string; facets: string[] }
+	custom?: {
+		id: string
+		priority: string
+		message: string
+		facets: string[]
+		previous?: Labrinth.Threads.v3.ThreadIssue
+	}
 }
 
 export const customIssueActions = {
@@ -163,6 +164,10 @@ export function createReviewPanels(
 							priority: customIssuePriority(value.priority),
 							message: String(value.message ?? ''),
 							facets: value.facets instanceof Set ? [...value.facets] : [],
+							previous:
+								typeof value.previous === 'string'
+									? (JSON.parse(value.previous) as Labrinth.Threads.v3.ThreadIssue)
+									: undefined,
 						},
 					},
 				]
@@ -174,7 +179,28 @@ export function createReviewPanels(
 		const current = customIssues.value.find((issue) => issue.id === id)?.custom
 		if (!project.value || !current) return
 		const next = { ...current, ...changes }
-		session.write(project.value.id, 'custom-issues', id, { ...next, facets: new Set(next.facets) })
+		const { previous, ...values } = next
+		session.write(project.value.id, 'custom-issues', id, {
+			...values,
+			facets: new Set(next.facets),
+			...(previous ? { previous: JSON.stringify(previous) } : {}),
+		})
+	}
+
+	function restoreCustomIssue(previous: Labrinth.Threads.v3.ThreadIssue) {
+		if (!project.value) return
+		const id = `restored-custom:${previous.id}`
+		if (!customIssues.value.some((issue) => issue.id === id)) {
+			session.write(project.value.id, 'custom-issues', id, {
+				id: previous.why.issue_id ?? id,
+				priority: customIssuePriority(previous.why.custom?.priority),
+				message: previous.why.message ?? '',
+				facets: new Set(previous.facets.map((facet) => `previous-facet:${facet.id}`)),
+				previous: JSON.stringify(previous),
+			})
+		}
+		addIssue(id)
+		return customIssues.value.find((issue) => issue.id === id)
 	}
 
 	function addCustomIssue() {
@@ -593,10 +619,9 @@ export function createReviewPanels(
 
 	function issueSelection(id: string): ReviewIssueSelection {
 		const projectId = project.value?.id
-		if (!projectId) return { active: false, toggle_ids: [], text_values: {}, select_values: {} }
+		if (!projectId) return { toggle_ids: [], text_values: {}, select_values: {} }
 		const selects = session.read(projectId, 'issue-select')[id]
 		return {
-			active: session.read(projectId, 'issue-active')[id] === true,
 			toggle_ids: [...selectedToggleIds(projectId, id)].sort(),
 			text_values: Object.fromEntries(
 				Object.entries(textValues(projectId, id)).sort(([a], [b]) => a.localeCompare(b)),
@@ -617,10 +642,60 @@ export function createReviewPanels(
 	function isRestoredIssue(id: string) {
 		const projectId = project.value?.id
 		if (!projectId) return false
-		const selection = JSON.stringify({ id, ...issueSelection(id) })
+		const selection = issueSnapshot(id)
 		return Object.values(session.read(projectId, 'previous-issue-selection')).some(
 			(saved) => saved === selection,
 		)
+	}
+
+	function issueSnapshot(id: string) {
+		const custom = customIssues.value.find((issue) => issue.id === id)?.custom
+		return JSON.stringify({
+			id,
+			...issueSelection(id),
+			...(custom
+				? {
+						custom: {
+							id: custom.id,
+							priority: custom.priority,
+							message: custom.message,
+							facets: [...custom.facets].sort(),
+						},
+					}
+				: {}),
+		})
+	}
+
+	function generateIssueMessage(id: string, selection: ReviewIssueSelection) {
+		const projectV3 = project.value
+		const definition = availableIssues.value.find((issue) => issue.id === id && !issue.custom)
+		if (!projectV3 || !definition) return undefined
+		const issue = definition.controls[0]?.control.issue
+		if (!issue) return undefined
+		const text = (key: string) => {
+			const control = definition.controls.find(
+				({ control }) => control.type !== 'toggle' && control.key === key,
+			)?.control
+			return (
+				selection.text_values[key] ??
+				(control && control.type !== 'toggle' && control.type !== 'select' ? control.initial : '')
+			)
+		}
+		const selects = (key: string) => {
+			const control = definition.controls.find(
+				({ control }) => control.type === 'select' && control.key === key,
+			)?.control
+			return selection.select_values[key] ?? (control?.type === 'select' ? control.initial : [])
+		}
+		return resolveWithContext(issue.message, {
+			projectV3,
+			...reviewData.value,
+			selected: { items: {}, issueIds: [id], toggleIds: selection.toggle_ids },
+			getMarkdownValue: text,
+			getTextValue: text,
+			getSelectValue: (key) => selects(key)[0] ?? '',
+			getSelectValues: selects,
+		})
 	}
 
 	function removeIssue(id: string) {
@@ -651,11 +726,16 @@ export function createReviewPanels(
 							category: entry.category,
 							priority: entry.priority,
 							message: entry.custom.message,
-							actions: entry.custom.facets.flatMap((type) =>
-								Object.hasOwn(customIssueActions, type)
+							locations: entry.custom.previous?.why.locations,
+							actions: entry.custom.facets.flatMap((type): IssueAction[] => {
+								const previous = entry.custom?.previous?.facets.find(
+									(facet) => type === `previous-facet:${facet.id}`,
+								)
+								if (previous) return [() => previous.what]
+								return Object.hasOwn(customIssueActions, type)
 									? [customIssueActions[type as keyof typeof customIssueActions]]
-									: [],
-							),
+									: []
+							}),
 						}
 					: entry.controls[0].control.issue,
 				active: true,
@@ -732,7 +812,8 @@ export function createReviewPanels(
 					if (!custom.message.trim()) missing.push('message')
 					if (
 						!custom.id.trim() ||
-						reviewData.value.previousIssueIds?.includes(custom.id.trim()) ||
+						(custom.id.trim() !== custom.previous?.why.issue_id &&
+							reviewData.value.previousIssueIds?.includes(custom.id.trim())) ||
 						availableIssues.value.some(
 							(entry) => entry.id !== id && (entry.custom?.id ?? entry.id) === custom.id.trim(),
 						)
@@ -776,9 +857,12 @@ export function createReviewPanels(
 		customIssues,
 		addCustomIssue,
 		updateCustomIssue,
+		restoreCustomIssue,
 		availableIssues,
 		addIssue,
 		issueSelection,
+		issueSnapshot,
+		generateIssueMessage,
 		isRestoredIssue,
 		removeIssue,
 		resolve,

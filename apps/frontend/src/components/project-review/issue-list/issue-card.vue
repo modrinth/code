@@ -317,13 +317,16 @@ const active = computed(() =>
 )
 const { revealPanel } = injectReviewContext()
 const issueBindings = computed(() =>
-	previousIssue.value && (!active.value || panels.isRestoredIssue(issue.value.id))
+	previousIssue.value &&
+	(issue.value.custom || !active.value || panels.isRestoredIssue(issue.value.id))
 		? previousIssues.issueBindings(previousIssue.value)
 		: panels.issueBindings(issue.value.id),
 )
 const reviewMessages = injectReviewMessages()
 const messageKey = computed(() =>
-	previousIssue.value ? previousIssues.messageKey(previousIssue.value) : issue.value.id,
+	previousIssue.value && !issue.value.custom
+		? previousIssues.messageKey(previousIssue.value)
+		: issue.value.id,
 )
 const { generating } = reviewMessages
 const { pending } = injectReviewSubmission()
@@ -450,7 +453,19 @@ const facetOptions = computed(() =>
 						? messages.acknowledgeReply
 						: issueTargetLabels[value as keyof typeof issueTargetLabels],
 			),
-		})),
+		}))
+		.concat(
+			(issue.value.custom?.previous?.facets ?? []).map((facet) => ({
+				value: `previous-facet:${facet.id}`,
+				label: formatMessage(
+					facet.what.type === 'acknowledge'
+						? facet.what.value.mode === 'checkbox'
+							? messages.acknowledgeCheckbox
+							: messages.acknowledgeReply
+						: issueTargetLabels[facet.what.type],
+				),
+			})),
+		),
 )
 const customIdInvalid = computed(() =>
 	panels.validationErrors.value.some(
@@ -459,8 +474,8 @@ const customIdInvalid = computed(() =>
 )
 const facetLabels = computed(() => {
 	const facets =
-		previousIssue.value?.facets ??
 		panels.activeIssues.value.find((entry) => entry.id === issue.value.id)?.facets ??
+		previousIssue.value?.facets ??
 		[]
 	return [...new Set(facets.map(({ what }) => what.type))]
 		.filter((type) => type !== 'mark_addressed')

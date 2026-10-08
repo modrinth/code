@@ -93,10 +93,11 @@ export function createReviewSubmission(
 		const titles = new Map(panels.availableIssues.value.map(({ id, title }) => [id, title]))
 		for (const { id, facets, locations } of panels.activeIssues.value) {
 			if (previousIds.has(id)) continue
+			const custom = panels.customIssues.value.find((issue) => issue.id === id)?.custom
 			selected.push({
 				why: {
-					issue_id:
-						panels.customIssues.value.find((issue) => issue.id === id)?.custom?.id.trim() ?? id,
+					issue_id: custom?.id.trim() ?? id,
+					...(custom ? { custom: { priority: custom.priority } } : {}),
 					locations,
 					title: titles.get(id) ?? id,
 					message: messages.issueMessage(id),
