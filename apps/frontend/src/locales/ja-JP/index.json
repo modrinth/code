@@ -3305,9 +3305,6 @@
   "project.actions.rescan-modpack": {
     "message": "Modパックリスキャン"
   },
-  "project.actions.review-project": {
-    "message": "プロジェクトを評価"
-  },
   "project.actions.servers-promo.description": {
     "message": "Modrinth Hostingは手間を掛けず、簡単に友達と遊べます！"
   },

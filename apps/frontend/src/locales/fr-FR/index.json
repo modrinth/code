@@ -3515,9 +3515,6 @@
   "project.actions.rescan-modpack": {
     "message": "Rescanne le modpack"
   },
-  "project.actions.review-project": {
-    "message": "Vérifier le projet"
-  },
   "project.actions.servers-promo.description": {
     "message": "Les serveurs Modrinth Hosting sont la solution la plus facile pour jouer entre amis facilement !"
   },

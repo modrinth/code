@@ -2288,9 +2288,6 @@
   "project.actions.dont-show-again": {
     "message": "Znovu nezobrazovat"
   },
-  "project.actions.review-project": {
-    "message": "Zkontrolovat projekt"
-  },
   "project.actions.servers-promo.description": {
     "message": "Modrinth Hosting je nejjednodušší způsob, jak hrát s přáteli bez starostí!"
   },

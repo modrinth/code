@@ -3521,9 +3521,6 @@
   "project.actions.rescan-modpack": {
     "message": "重新扫描整合包"
   },
-  "project.actions.review-project": {
-    "message": "审核项目"
-  },
   "project.actions.servers-promo.description": {
     "message": "Modrinth Hosting，让你轻松和朋友联机，毫无烦恼！"
   },

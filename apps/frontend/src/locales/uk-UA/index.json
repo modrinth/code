@@ -3518,9 +3518,6 @@
   "project.actions.rescan-modpack": {
     "message": "Пересканувати збірку"
   },
-  "project.actions.review-project": {
-    "message": "Переглянути проєкт"
-  },
   "project.actions.servers-promo.description": {
     "message": "Modrinth Hosting — це найпростіший спосіб грати з друзями без клопоту!"
   },

@@ -56,12 +56,7 @@
 					/>
 				</span>
 			</template>
-			<IssueCard
-				v-for="issue in resolvedIssues"
-				:key="issue.id"
-				:issue="issue"
-				resolved
-			/>
+			<IssueCard v-for="issue in resolvedIssues" :key="issue.id" :issue="issue" resolved />
 		</Accordion>
 	</div>
 </template>

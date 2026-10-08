@@ -2912,9 +2912,6 @@
   "project.actions.dont-show-again": {
     "message": "Không hiển thị lại"
   },
-  "project.actions.review-project": {
-    "message": "Xem xét dự án"
-  },
   "project.actions.servers-promo.description": {
     "message": "Modrinth Hosting là cách đơn giản nhất để chơi cùng bạn bè mà không gặp rắc rối!"
   },

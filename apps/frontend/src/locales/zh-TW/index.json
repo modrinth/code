@@ -3521,9 +3521,6 @@
   "project.actions.rescan-modpack": {
     "message": "重新掃描模組包"
   },
-  "project.actions.review-project": {
-    "message": "審查專案"
-  },
   "project.actions.servers-promo.description": {
     "message": "Modrinth Hosting 是讓你與朋友輕鬆遊玩的最佳方式！"
   },

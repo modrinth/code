@@ -2666,9 +2666,6 @@
   "project.actions.dont-show-again": {
     "message": "Ikke vis igjen"
   },
-  "project.actions.review-project": {
-    "message": "Anmeld prosjekt"
-  },
   "project.actions.servers-promo.description": {
     "message": "Modrinth Hosting er den letteste måten å spille med vennene dine uten problem!"
   },

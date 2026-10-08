@@ -3521,9 +3521,6 @@
   "project.actions.rescan-modpack": {
     "message": "Modpack erneut scannen"
   },
-  "project.actions.review-project": {
-    "message": "Projekt überprüfen"
-  },
   "project.actions.servers-promo.description": {
     "message": "Modrinth Hosting ist der einfachste Weg, ohne Aufwand mit deinen Freunden zu spielen!"
   },

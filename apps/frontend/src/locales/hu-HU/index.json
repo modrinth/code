@@ -3512,9 +3512,6 @@
   "project.actions.rescan-modpack": {
     "message": "Modcsomag újbóli vizsgálata"
   },
-  "project.actions.review-project": {
-    "message": "Tekintsd át a projektet"
-  },
   "project.actions.servers-promo.description": {
     "message": "A Modrinth Hosting a legegyszerűbb módja annak, hogy gond nélkül játszhass a barátaiddal!"
   },

@@ -4175,6 +4175,12 @@
   "project-review.decision.reject": {
     "message": "Reject"
   },
+  "project-review.decision.send-to-review": {
+    "message": "Send to review"
+  },
+  "project-review.decision.set-to-draft": {
+    "message": "Set to draft"
+  },
   "project-review.decision.withhold": {
     "message": "Withhold"
   },
@@ -4275,7 +4281,7 @@
     "message": "Reset message"
   },
   "project-review.issues.resolved": {
-    "message": "Resolved issues"
+    "message": "Auto resolved ({count})"
   },
   "project-review.issues.revert-all-customizations": {
     "message": "Revert all customizations"
@@ -4382,14 +4388,14 @@
   "project.actions.edit-project": {
     "message": "Edit project"
   },
+  "project.actions.open-in-modview": {
+    "message": "Open in modview"
+  },
   "project.actions.project-page": {
     "message": "Project page"
   },
   "project.actions.rescan-modpack": {
     "message": "Rescan modpack"
-  },
-  "project.actions.review-project": {
-    "message": "Review project"
   },
   "project.actions.servers-promo.description": {
     "message": "Modrinth Hosting is the easiest way to play with your friends without hassle!"
@@ -6611,6 +6617,9 @@
   "thread-issues.hide-addressed": {
     "message": "Hide addressed"
   },
+  "thread-issues.hide-issue": {
+    "message": "Hide issue"
+  },
   "thread-issues.hide-resolved": {
     "message": "Hide resolved"
   },
@@ -6629,6 +6638,9 @@
   "thread-issues.show-addressed": {
     "message": "Show addressed"
   },
+  "thread-issues.show-issue": {
+    "message": "Show issue"
+  },
   "thread-issues.show-resolved": {
     "message": "Show resolved"
   },
@@ -6641,11 +6653,20 @@
   "thread-issues.target.edit-url": {
     "message": "Edit URL"
   },
+  "thread.issue-history.flagged": {
+    "message": "flagged {count, plural, one {# issue} other {# issues}}"
+  },
+  "thread.issue-history.private-note": {
+    "message": "Only visible to moderators"
+  },
   "thread.message.auto-approval": {
-    "message": "automatically approved the project with status <status>approved</status> because all moderation issues were resolved."
+    "message": "All moderation issues have been resolved and your project is automatically approved with status <status>approved</status>"
   },
   "thread.message.moderator": {
     "message": "Moderator"
+  },
+  "thread.message.modrinth-team": {
+    "message": "Modrinth Team"
   },
   "thread.message.open-image": {
     "message": "Open image"

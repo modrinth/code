@@ -3515,9 +3515,6 @@
   "project.actions.rescan-modpack": {
     "message": "Riscansiona pacchetto"
   },
-  "project.actions.review-project": {
-    "message": "Rivedi progetto"
-  },
   "project.actions.servers-promo.description": {
     "message": "Modrinth Hosting è il modo più facile per giocare insieme spensieratamente!"
   },

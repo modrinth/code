@@ -3524,9 +3524,6 @@
   "project.actions.rescan-modpack": {
     "message": "모드팩 재검사"
   },
-  "project.actions.review-project": {
-    "message": "프로젝트 검토"
-  },
   "project.actions.servers-promo.description": {
     "message": "Modrinth 호스팅은 친구들과 번거로움 없이 플레이할 수 있는 가장 쉬운 방법입니다!"
   },

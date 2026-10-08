@@ -2906,9 +2906,6 @@
   "project.actions.dont-show-again": {
     "message": "Não mostrar novamente"
   },
-  "project.actions.review-project": {
-    "message": "Rever projeto"
-  },
   "project.actions.servers-promo.description": {
     "message": "O Modrinth Hosting é a maneira mais fácil de jogar com os teus amigos sem complicações!"
   },

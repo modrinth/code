@@ -3494,9 +3494,6 @@
   "project.actions.rescan-modpack": {
     "message": "Mod paketini yeniden incele"
   },
-  "project.actions.review-project": {
-    "message": "Projeyi incele"
-  },
   "project.actions.servers-promo.description": {
     "message": "Modrinth Hosting arkadaşlarınla uğraşsız oynamanın en kolay yolu!"
   },

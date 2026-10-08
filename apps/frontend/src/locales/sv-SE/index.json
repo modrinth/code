@@ -3233,9 +3233,6 @@
   "project.actions.rescan-modpack": {
     "message": "Skanna projekt igen"
   },
-  "project.actions.review-project": {
-    "message": "Granska projekt"
-  },
   "project.actions.servers-promo.description": {
     "message": "Modrinth Hosting är det lättaste sättet att spela med dina vänner utan svårigheter!"
   },
