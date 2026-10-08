@@ -79,8 +79,6 @@ ENV HOST=0.0.0.0
 ENV PORT=3000
 ENV NODE_COMPILE_CACHE=/app/.node-compile-cache
 ENV NO_COLOR=1
-# Sentry has to load before the server so its instrumentation can patch modules as they are imported.
-ENV NODE_OPTIONS=--import=/app/.output/server/sentry.server.config.mjs
 
 WORKDIR /app
 
@@ -93,7 +91,7 @@ COPY --chown=node:node .output ./.output
 RUN bash <<'EOF'
 set -eum
 
-node /app/.output/server/index.mjs &
+node --import /app/.output/server/sentry.server.config.mjs /app/.output/server/index.mjs &
 server_pid=$!
 
 waited=0
@@ -122,4 +120,6 @@ EOF
 EXPOSE 3000
 
 ENTRYPOINT ["dumb-init", "--", "/usr/local/bin/entrypoint.sh"]
-CMD ["node", "/app/.output/server/index.mjs"]
+# Sentry has to load before the server so its instrumentation can patch modules as they are imported.
+# It goes on the command line rather than NODE_OPTIONS, so NODE_OPTIONS stays free for runtime flags.
+CMD ["node", "--import", "/app/.output/server/sentry.server.config.mjs", "/app/.output/server/index.mjs"]
