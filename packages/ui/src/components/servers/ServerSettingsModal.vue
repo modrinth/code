@@ -124,6 +124,7 @@ const tabs = computed<TabbedModalTab[]>(() =>
 			return {
 				name,
 				icon: tab.icon,
+				color: tab.color,
 				href: tab.href ? `https://modrinth.com${tab.href(ctx)}` : undefined,
 				shown,
 			}
@@ -132,6 +133,7 @@ const tabs = computed<TabbedModalTab[]>(() =>
 		return {
 			name,
 			icon: tab.icon,
+			color: tab.color,
 			content: serverSettingsTabComponentMap[tab.id as keyof typeof serverSettingsTabComponentMap],
 			shown,
 		}
