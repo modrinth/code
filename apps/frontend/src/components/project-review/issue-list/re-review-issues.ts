@@ -30,6 +30,8 @@ export function useReReviewIssues(
 				'issue-text',
 				'issue-select',
 				'issue-order',
+				'custom-issues',
+				'custom-issue-counter',
 				'previous-issue-applicability',
 				'previous-facet-applicability',
 				'previous-issue-selection',

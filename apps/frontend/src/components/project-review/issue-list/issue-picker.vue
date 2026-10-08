@@ -40,11 +40,13 @@ import { injectReviewMessages } from '~/providers/project-review/review-messages
 import { injectReviewPanels, type ReviewIssue } from '~/providers/project-review/review-panels'
 import { injectReviewSubmission } from '~/providers/project-review/review-submission'
 
+const emit = defineEmits<{ custom: [] }>()
 const panels = injectReviewPanels()
 const reviewMessages = injectReviewMessages()
 const { pending } = injectReviewSubmission()
 const { formatMessage } = useVIntl()
 const messages = defineMessages({
+	custom: { id: 'project-review.issues.custom', defaultMessage: 'Custom issue' },
 	add: { id: 'project-review.issues.add', defaultMessage: 'Issue' },
 	search: {
 		id: 'project-review.issues.search',
@@ -60,11 +62,13 @@ const picker = ref<{ close: () => void }>()
 const draft = ref([...selected.value])
 const isOpen = ref(false)
 const options = computed<MultiSelectItem<string>[]>(() => {
-	const items: MultiSelectItem<string>[] = []
+	const items: MultiSelectItem<string>[] = [
+		{ value: 'add-custom-issue', label: formatMessage(messages.custom) },
+	]
 	const selectedIds = new Set(selected.value)
 	const categories = new Map<string, ReviewIssue[]>()
 	for (const issue of panels.availableIssues.value) {
-		if (selectedIds.has(issue.id)) continue
+		if (issue.custom || selectedIds.has(issue.id)) continue
 		const group = categories.get(issue.category) ?? []
 		group.push(issue)
 		categories.set(issue.category, group)
@@ -106,7 +110,11 @@ function updateIssues(value: string[]) {
 }
 
 function selectIssues(value: string[]) {
-	draft.value = value
+	if (value.includes('add-custom-issue')) {
+		panels.addCustomIssue()
+		draft.value = [...selected.value]
+		emit('custom')
+	} else draft.value = value
 	picker.value?.close()
 }
 

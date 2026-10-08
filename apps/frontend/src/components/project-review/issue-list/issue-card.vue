@@ -23,7 +23,7 @@
 							<TagCategoryRefreshCcwIcon class="size-4" aria-hidden="true" />
 						</span>
 					</Tooltip>
-					{{ issue.title }}
+					{{ issueTitle }}
 					<ChevronDownIcon
 						class="size-4 shrink-0 transition-transform duration-150 ease-in-out motion-reduce:transition-none"
 						:class="{ 'rotate-180': expanded }"
@@ -46,7 +46,7 @@
 							:disabled="pending || disabled"
 							:aria-label="
 								formatMessage(resolved ? messages.add : messages.remove, {
-									issue: issue.title,
+									issue: issueTitle,
 								})
 							"
 							@click="resolved ? restoreIssue() : removeIssue()"
@@ -70,10 +70,55 @@
 					:id="contentId"
 					class="issue-content"
 					role="group"
-					:aria-label="formatMessage(messages.message, { issue: issue.title })"
+					:aria-label="formatMessage(messages.message, { issue: issueTitle })"
 				>
 					<div class="min-h-0 min-w-0">
 						<div class="flex flex-col gap-2">
+							<fieldset
+								v-if="issue.custom && !resolved"
+								:disabled="pending || disabled"
+								class="m-0 flex min-w-0 flex-col gap-2 border-0 p-0"
+							>
+								<label class="flex min-w-0 flex-col gap-1">
+									{{ formatMessage(messages.customId) }}
+									<Input
+										:model-value="issue.custom.id"
+										:disabled="pending || disabled"
+										:aria-invalid="customIdInvalid"
+										@update:model-value="
+											panels.updateCustomIssue(issue.id, { id: String($event ?? '') })
+										"
+									/>
+								</label>
+								<p v-if="customIdInvalid" class="m-0 text-xs text-orange" role="status">
+									{{ formatMessage(messages.customIdInvalid) }}
+								</p>
+								<div class="flex min-w-0 flex-col gap-1">
+									<span>{{ formatMessage(messages.customPriority) }}</span>
+									<Combobox
+										:model-value="issue.custom.priority"
+										:options="priorityOptions"
+										:aria-label="formatMessage(messages.customPriority)"
+										:disabled="pending || disabled"
+										trigger-class="!text-primary pl-3.5"
+										@update:model-value="panels.updateCustomIssue(issue.id, { priority: $event })"
+									/>
+								</div>
+								<div class="flex min-w-0 flex-col gap-1">
+									<span>{{ formatMessage(messages.actions) }}</span>
+									<MultiSelect
+										:model-value="issue.custom.facets"
+										:options="facetOptions"
+										searchable
+										:max-tag-rows="4"
+										:search-placeholder="formatMessage(messages.searchFacets)"
+										:disabled="pending || disabled"
+										:placeholder="formatMessage(messages.addFacets)"
+										:aria-label="formatMessage(messages.actions)"
+										@update:model-value="panels.updateCustomIssue(issue.id, { facets: $event })"
+									/>
+								</div>
+							</fieldset>
 							<fieldset
 								v-if="!resolved && fields.length"
 								:disabled="pending || disabled || resolved"
@@ -83,12 +128,20 @@
 								<Controls v-for="binding in fields" :key="binding.key" :binding="binding" />
 							</fieldset>
 							<div class="flex min-w-0 flex-col gap-1">
-								<div class="relative min-w-0" :class="{ 'issue-message-editor': editingMessage }">
+								<div
+									class="relative min-w-0"
+									:class="{ 'issue-message-editor': editingMessage }"
+									@keydown.capture="onMessageKeydown"
+								>
 									<MarkdownEditor
 										v-if="editingMessage"
+										ref="messageEditor"
 										:model-value="displayMessage"
 										:disabled="pending || disabled || generating"
 										:heading-buttons="false"
+										:placeholder="
+											issue.custom ? formatMessage(messages.customPlaceholder) : undefined
+										"
 										:hide-formatting-buttons="
 											settings.get(moderationSettings.General.HideMarkdownFormattingButtons)
 										"
@@ -175,6 +228,13 @@
 					{{ facet.label }}
 				</span>
 			</div>
+			<p
+				v-if="issue.custom && !issue.custom.message.trim() && !resolved"
+				class="m-0 text-xs text-orange"
+				role="status"
+			>
+				{{ formatMessage(messages.customMessageRequired) }}
+			</p>
 		</div>
 		<IssueToggles v-if="!resolved" :issue="issue" :disabled="disabled" @remove="removeIssue" />
 		<p v-if="!resolved && needsToggle" class="m-0 text-xs text-orange" role="status">
@@ -195,9 +255,13 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import { moderationSettings } from '@modrinth/moderation'
+import { IssuePriority } from '@modrinth/moderation/src/data/issues'
 import { issueTargetLabels } from '@modrinth/moderation/src/data/issues/component-builders/targets'
 import {
 	Button,
+	Combobox,
+	Input,
+	MultiSelect,
 	commonMessages,
 	defineMessages,
 	MarkdownEditor,
@@ -205,11 +269,12 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { renderHighlightedString } from '@modrinth/utils/highlightjs/index'
-import { computed, ref, useId, watch } from 'vue'
+import { computed, nextTick, ref, useId, watch } from 'vue'
 
 import { useModerationSettings } from '~/composables/moderation'
 import { injectReviewMessages } from '~/providers/project-review/review-messages'
 import {
+	customIssueFacets,
 	injectReviewPanels,
 	type ReviewIssue,
 	type ReviewPanelBinding,
@@ -244,6 +309,7 @@ const previousIssue = computed(() => {
 const issue = computed(() =>
 	'controls' in props.issue ? props.issue : previousIssues.cardIssue(props.issue),
 )
+const issueTitle = computed(() => issue.value.custom?.id ?? issue.value.title)
 const active = computed(() =>
 	panels.activeIssues.value.some((entry) => entry.id === issue.value.id),
 )
@@ -259,8 +325,18 @@ const messageKey = computed(() =>
 )
 const { generating } = reviewMessages
 const { pending } = injectReviewSubmission()
-const expanded = ref(false)
-const editingMessage = ref(false)
+const expanded = ref(!!issue.value.custom && !props.resolved)
+const editingMessage = ref(!!issue.value.custom && !props.disabled && !props.resolved)
+const messageEditor = ref<{ focus: () => Promise<void> }>()
+watch(
+	[messageEditor, expanded, editingMessage, generating, pending, () => props.disabled],
+	async ([editor, isExpanded, isEditing, isGenerating, isPending, disabled]) => {
+		if (!editor || !isExpanded || !isEditing || isGenerating || isPending || disabled) return
+		await nextTick()
+		await editor.focus()
+	},
+	{ flush: 'post' },
+)
 const contentId = useId()
 watch(
 	() => props.disabled,
@@ -270,6 +346,34 @@ watch(
 )
 const { formatMessage } = useVIntl()
 const messages = defineMessages({
+	customId: { id: 'project-review.issues.custom-id', defaultMessage: 'Issue ID' },
+	customPriority: { id: 'project-review.issues.custom-priority', defaultMessage: 'Priority' },
+	customPlaceholder: {
+		id: 'project-review.issues.custom-placeholder',
+		defaultMessage: 'Enter custom issue message...',
+	},
+	customIdInvalid: {
+		id: 'project-review.issues.custom-id-invalid',
+		defaultMessage: 'Enter a unique, non-empty issue ID.',
+	},
+	customMessageRequired: {
+		id: 'project-review.issues.custom-message-required',
+		defaultMessage: 'Enter a message for this custom issue.',
+	},
+	acknowledgeCheckbox: {
+		id: 'project-review.issues.custom-acknowledge-checkbox',
+		defaultMessage: 'Acknowledge checkbox',
+	},
+	acknowledgeReply: {
+		id: 'project-review.issues.custom-acknowledge-reply',
+		defaultMessage: 'Acknowledge reply',
+	},
+	searchFacets: {
+		id: 'project-review.issues.custom-search-facets',
+		defaultMessage: 'Search actions…',
+	},
+	actions: { id: 'project-review.issues.custom-actions', defaultMessage: 'Actions' },
+	addFacets: { id: 'project-review.issues.custom-add-facets', defaultMessage: 'Add actions' },
 	notResolved: {
 		id: 'project-review.issues.not-resolved',
 		defaultMessage: 'Not resolved',
@@ -311,6 +415,30 @@ const messages = defineMessages({
 		defaultMessage: 'Choose at least one option for this issue.',
 	},
 })
+const priorityOptions = Object.keys(IssuePriority).map((value) => ({
+	value,
+	label: value.charAt(0).toUpperCase() + value.slice(1).toLowerCase(),
+}))
+const facetOptions = computed(() =>
+	Object.keys(customIssueFacets)
+		.filter((type) => type !== 'mark_addressed')
+		.filter((type) => type !== 'modify_server_languages' || panels.hasServer.value)
+		.map((value) => ({
+			value,
+			label: formatMessage(
+				value === 'acknowledge_checkbox'
+					? messages.acknowledgeCheckbox
+					: value === 'acknowledge_reply'
+						? messages.acknowledgeReply
+						: issueTargetLabels[value as keyof typeof issueTargetLabels],
+			),
+		})),
+)
+const customIdInvalid = computed(() =>
+	panels.validationErrors.value.some(
+		({ issueId, key }) => issueId === issue.value.id && key === 'id',
+	),
+)
 const facetLabels = computed(() => {
 	const facets =
 		previousIssue.value?.facets ??
@@ -343,6 +471,26 @@ const needsToggle = computed(() =>
 		({ issueId, key }) => issueId === issue.value.id && key === 'toggle',
 	),
 )
+function onMessageKeydown(event: KeyboardEvent) {
+	if (
+		event.defaultPrevented ||
+		event.repeat ||
+		event.isComposing ||
+		!editingMessage.value ||
+		pending.value ||
+		props.disabled ||
+		generating.value ||
+		event.key !== 'Enter' ||
+		!(event.ctrlKey || event.metaKey) ||
+		event.altKey ||
+		event.shiftKey
+	)
+		return
+	event.preventDefault()
+	event.stopPropagation()
+	editingMessage.value = false
+}
+
 function removeIssue() {
 	if (pending.value || props.disabled) return
 	if (previousIssue.value) previousIssues.markNoLongerApplicable(previousIssue.value)

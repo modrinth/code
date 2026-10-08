@@ -1,9 +1,13 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { IssuePriority, reviewPanels } from '@modrinth/moderation/src/data/issues'
 import { expandItemReviewPanels } from '@modrinth/moderation/src/data/issues/component-builders/item-panels'
-import { resolveIssueFacets } from '@modrinth/moderation/src/data/issues/component-builders/targets'
+import {
+	issueTargets,
+	resolveIssueFacets,
+} from '@modrinth/moderation/src/data/issues/component-builders/targets'
 import type {
 	Issue,
+	IssueFacet,
 	Panel,
 	PanelNode,
 	PanelRegistration,
@@ -92,6 +96,30 @@ export interface ReviewIssue {
 	category: string
 	priority?: Issue['priority']
 	controls: ReviewIssueControl[]
+	custom?: { id: string; priority: string; message: string; facets: string[] }
+}
+
+export const customIssueFacets = {
+	mark_addressed: issueTargets.markAddressed(),
+	acknowledge_checkbox: issueTargets.acknowledge('checkbox'),
+	acknowledge_reply: issueTargets.acknowledge('reply'),
+	modify_title: issueTargets.modifyTitle(),
+	modify_slug: issueTargets.modifySlug(),
+	modify_summary: issueTargets.modifySummary(),
+	modify_description: issueTargets.modifyDescription(),
+	modify_license: issueTargets.modifyLicense(),
+	modify_icon: issueTargets.modifyIcon(),
+	add_gallery_images: issueTargets.addGalleryImages(),
+	modify_server_languages: issueTargets.modifyServerLanguages(),
+} satisfies Record<string, IssueFacet>
+
+function customIssuePriority(value: unknown): keyof typeof IssuePriority {
+	const priority = String(value ?? 'Bottom')
+	if (priority === 'TOP' || priority === 'First') return 'Top'
+	if (priority === 'BOTTOM' || priority === 'Last') return 'Bottom'
+	return Object.hasOwn(IssuePriority, priority)
+		? (priority as keyof typeof IssuePriority)
+		: 'Bottom'
 }
 
 function resolveWithContext<T>(value: WithContext<T>, context: ReviewContext): T {
@@ -114,10 +142,61 @@ export function createReviewPanels(
 			| 'organizationMembers'
 			| 'wasReviewed'
 			| 'permissions'
-		> & { previousLinks: ReadonlyMap<string, string> }
+		> & { previousLinks: ReadonlyMap<string, string>; previousIssueIds?: readonly string[] }
 	>,
 	definitions: Record<string, PanelRegistration> = reviewPanels,
 ) {
+	const customIssues = computed<ReviewIssue[]>(() => {
+		if (!project.value) return []
+		return Object.entries(session.read(project.value.id, 'custom-issues')).flatMap(
+			([id, value]) => {
+				if (!value || typeof value !== 'object' || value instanceof Set) return []
+				return [
+					{
+						id,
+						title: 'Custom issue',
+						category: 'Project wide',
+						priority: IssuePriority[customIssuePriority(value.priority)],
+						controls: [],
+						custom: {
+							id: String(value.id ?? id),
+							priority: customIssuePriority(value.priority),
+							message: String(value.message ?? ''),
+							facets: value.facets instanceof Set ? [...value.facets] : [],
+						},
+					},
+				]
+			},
+		)
+	})
+
+	function updateCustomIssue(id: string, changes: Partial<NonNullable<ReviewIssue['custom']>>) {
+		const current = customIssues.value.find((issue) => issue.id === id)?.custom
+		if (!project.value || !current) return
+		const next = { ...current, ...changes }
+		session.write(project.value.id, 'custom-issues', id, { ...next, facets: new Set(next.facets) })
+	}
+
+	function addCustomIssue() {
+		if (!project.value) return
+		const sequence = Number(session.read(project.value.id, 'custom-issue-counter').value ?? 0) + 1
+		let number = sequence
+		const used = new Set([
+			...availableIssues.value.flatMap((issue) => [issue.id, issue.custom?.id?.trim()]),
+			...(reviewData.value.previousIssueIds ?? []),
+		])
+		while (used.has(`custom-issue-${number}`)) number++
+		const id = `custom-issue-${number}`
+		session.write(project.value.id, 'custom-issue-counter', 'value', number)
+		session.write(project.value.id, 'custom-issues', id, {
+			id,
+			priority: 'Bottom',
+			message: '',
+			facets: new Set<string>(),
+		})
+		addIssue(id)
+	}
+
 	function selectedToggleIds(projectId: string, issueId: string): Set<string> {
 		const keys = session.read(projectId, 'issues')[issueId]
 		return keys instanceof Set ? keys : new Set()
@@ -495,9 +574,12 @@ export function createReviewPanels(
 				}
 			}
 		}
-		return [...issues.values()].filter((issue) =>
-			issue.controls.some(({ control }) => control.type === 'toggle' && !control.disabled),
-		)
+		return [
+			...customIssues.value,
+			...[...issues.values()].filter((issue) =>
+				issue.controls.some(({ control }) => control.type === 'toggle' && !control.disabled),
+			),
+		]
 	})
 
 	function addIssue(id: string) {
@@ -542,7 +624,14 @@ export function createReviewPanels(
 
 	function removeIssue(id: string) {
 		if (!project.value) return
-		for (const scope of ['issue-active', 'issues', 'issue-text', 'issue-select', 'issue-order']) {
+		for (const scope of [
+			'issue-active',
+			'issues',
+			'issue-text',
+			'issue-select',
+			'issue-order',
+			'custom-issues',
+		]) {
 			session.write(project.value.id, scope, id, undefined)
 		}
 	}
@@ -554,7 +643,20 @@ export function createReviewPanels(
 		for (const entry of availableIssues.value) {
 			if (session.read(projectV3.id, 'issue-active')[entry.id] !== true) continue
 			issues.set(entry.id, {
-				issue: entry.controls[0].control.issue,
+				issue: entry.custom
+					? {
+							id: entry.id,
+							title: entry.title,
+							category: entry.category,
+							priority: entry.priority,
+							message: entry.custom.message,
+							facets: entry.custom.facets.flatMap((type) =>
+								Object.hasOwn(customIssueFacets, type)
+									? [customIssueFacets[type as keyof typeof customIssueFacets]]
+									: [],
+							),
+						}
+					: entry.controls[0].control.issue,
 				active: true,
 				keys: new Set(),
 				textValues: {},
@@ -622,7 +724,19 @@ export function createReviewPanels(
 					!keys.size &&
 					!controls.some(({ control }) => control.type === 'toggle' && control.id === undefined)
 				) {
-					missing.push('toggle')
+					if (!customIssues.value.some((entry) => entry.id === id)) missing.push('toggle')
+				}
+				const custom = customIssues.value.find((entry) => entry.id === id)?.custom
+				if (custom) {
+					if (!custom.message.trim()) missing.push('message')
+					if (
+						!custom.id.trim() ||
+						reviewData.value.previousIssueIds?.includes(custom.id.trim()) ||
+						availableIssues.value.some(
+							(entry) => entry.id !== id && (entry.custom?.id ?? entry.id) === custom.id.trim(),
+						)
+					)
+						missing.push('id')
 				}
 				return {
 					id,
@@ -657,6 +771,10 @@ export function createReviewPanels(
 					),
 				),
 			),
+		hasServer: computed(() => !!project.value?.minecraft_server),
+		customIssues,
+		addCustomIssue,
+		updateCustomIssue,
 		availableIssues,
 		addIssue,
 		issueSelection,

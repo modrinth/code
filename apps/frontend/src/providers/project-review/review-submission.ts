@@ -95,7 +95,8 @@ export function createReviewSubmission(
 			if (previousIds.has(id)) continue
 			selected.push({
 				why: {
-					issue_id: id,
+					issue_id:
+						panels.customIssues.value.find((issue) => issue.id === id)?.custom?.id.trim() ?? id,
 					locations,
 					title: titles.get(id) ?? id,
 					message: messages.issueMessage(id),

@@ -18,7 +18,7 @@
 					<section class="flex min-h-0 min-w-0 flex-1 flex-col">
 						<div class="flex shrink-0 flex-wrap items-center gap-2 pb-2.5">
 							<Tabs v-model:value="activeReviewTab" wrap :tabs="rightPanelTabs" />
-							<div v-if="activeReviewTab !== 'thread'" class="ml-auto flex items-center gap-1">
+							<div class="ml-auto flex items-center gap-1">
 								<Tooltip
 									v-if="!pending && project"
 									:text="formatMessage(reviewTabMessages.resetIssues)"
@@ -34,7 +34,7 @@
 										<RotateCounterClockwiseIcon aria-hidden="true" />
 									</Button>
 								</Tooltip>
-								<IssuePicker v-if="activeReviewTab === 'issues'" />
+								<IssuePicker @custom="activeReviewTab = 'issues'" />
 							</div>
 						</div>
 						<IssueList v-show="activeReviewTab === 'issues'" />
@@ -153,6 +153,14 @@ const panels = provideReviewPanels(
 			organizationMembers: organizationMembers.value,
 			wasReviewed: wasReviewed.value,
 			permissions: permissions.value,
+			previousIssueIds: (project.value?.thread_id === threadQuery.data.value?.id
+				? (threadQuery.data.value?.issues ?? [])
+				: []
+			).flatMap(({ why }) =>
+				why && typeof why === 'object' && 'issue_id' in why && typeof why.issue_id === 'string'
+					? [why.issue_id]
+					: [],
+			),
 			previousLinks: previousReviewLinkUrls(
 				wasReviewed.value && project.value?.thread_id === threadQuery.data.value?.id
 					? (threadQuery.data.value?.issues ?? [])

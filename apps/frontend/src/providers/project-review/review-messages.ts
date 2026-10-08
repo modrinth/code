@@ -28,9 +28,15 @@ export function createReviewMessages(
 		)
 	})
 	function issueMessage(id: string) {
+		const custom = panels.customIssues.value.find((issue) => issue.id === id)?.custom
+		if (custom) return custom.message
 		return overrides.get(id) ?? issueMessages.value.get(id) ?? defaults.get(id) ?? ''
 	}
 	function editIssueMessage(id: string, message: string) {
+		if (panels.customIssues.value.some((issue) => issue.id === id)) {
+			panels.updateCustomIssue(id, { message })
+			return
+		}
 		if (message === issueMessage(id)) return
 		const defaultMessage = issueMessages.value.get(id) ?? defaults.get(id)
 		if (message === defaultMessage) overrides.delete(id)
@@ -38,6 +44,7 @@ export function createReviewMessages(
 	}
 	function resetIssueMessage(id: string) {
 		overrides.delete(id)
+		panels.updateCustomIssue(id, { message: '' })
 	}
 	watch(
 		() => project.value?.id,

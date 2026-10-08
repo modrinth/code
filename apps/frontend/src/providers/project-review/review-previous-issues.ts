@@ -37,7 +37,7 @@ export function createReviewPreviousIssues(
 	function reviewIssue(issue: ThreadIssue) {
 		const why = issue.why
 		const id = why && typeof why === 'object' && 'issue_id' in why ? why.issue_id : undefined
-		return panels.availableIssues.value.find((entry) => entry.id === id)
+		return panels.availableIssues.value.find((entry) => !entry.custom && entry.id === id)
 	}
 
 	function issueDetails(issue: ThreadIssue) {

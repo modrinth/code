@@ -18,7 +18,6 @@ import prohibitedContentObjectionableMessage from '../messages/checklist/message
 import prohibitedContentProfanityMessage from '../messages/checklist/messages/rules/prohibited-content/profanity.md'
 import prohibitedContentUndisclosedUploadMessage from '../messages/checklist/messages/rules/prohibited-content/undisclosed-upload.md'
 import prohibitedContentHeaderMessage from '../messages/checklist/messages/rules/prohibited-content-header.md'
-import ruleBreakingOtherMessage from '../messages/checklist/messages/rules/rule-breaking-other.md'
 import serverSideOptInAimBotMessage from '../messages/checklist/messages/rules/server-side-opt-in/aim-bot.md'
 import serverSideOptInHidingModsMessage from '../messages/checklist/messages/rules/server-side-opt-in/hiding-mods.md'
 import serverSideOptInItemDuplicationMessage from '../messages/checklist/messages/rules/server-side-opt-in/item-duplication.md'
@@ -28,7 +27,7 @@ import serverSideOptInXRayMessage from '../messages/checklist/messages/rules/ser
 import serverSideOptInHeaderMessage from '../messages/checklist/messages/rules/server-side-opt-in-header.md'
 import serverSideOptOutMessage from '../messages/checklist/messages/rules/server-side-opt-out.md'
 import { removalImageEntry } from '../messages/gallery-images'
-import { issue, markdown, panel, section, toggle } from './component-builders/builders'
+import { issue, panel, section, toggle } from './component-builders/builders'
 import { IssuePriority } from './component-builders/priority'
 import type { IssueFacet } from './component-builders/types'
 
@@ -179,15 +178,6 @@ export const rulesServerSideOptInIssue = issue({
 	suggestedStatus: 'flagged',
 })
 
-export const rulesRuleBreakingOtherIssue = issue({
-	id: 'rules-rule-breaking-other',
-	title: 'Other content rule violation',
-	category: 'Project wide',
-	message: ({ getMarkdownValue }) =>
-		ruleBreakingOtherMessage.replaceAll('%MESSAGE%', () => getMarkdownValue('message')),
-	suggestedStatus: 'rejected',
-})
-
 export const rulesReviewPanel = panel({
 	title: 'Rule Following',
 	hint: 'Does this project violate the rules?',
@@ -224,10 +214,6 @@ export const rulesReviewPanel = panel({
 		toggle({
 			issue: rulesServerSideOptInIssue,
 			label: 'Opt-in',
-		}),
-		toggle({
-			issue: rulesRuleBreakingOtherIssue,
-			label: 'Other',
 		}),
 	),
 	section({
@@ -328,16 +314,6 @@ export const rulesReviewPanel = panel({
 			issue: rulesServerSideOptInIssue,
 			label: 'Dupe',
 			id: 'rules-server-side-opt-in-item-duplication',
-		}),
-	),
-	section({
-		shown: (ctx) => ctx.selected.issueIds.includes(rulesRuleBreakingOtherIssue.id),
-	}).content(
-		markdown({
-			issue: rulesRuleBreakingOtherIssue,
-			id: 'message',
-			label: 'Explain how it infringes on content rules.',
-			required: true,
 		}),
 	),
 )
