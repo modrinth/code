@@ -92,7 +92,6 @@ pub async fn import_curseforge(
     }
 
     // base mod loader is always None for vanilla
-    let state = State::get().await?;
     if let Some(instance_mod_loader) = minecraft_instance.base_mod_loader {
         let game_version = minecraft_instance.game_version;
 
