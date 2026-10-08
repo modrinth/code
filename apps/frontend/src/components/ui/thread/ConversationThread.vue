@@ -109,12 +109,13 @@
 			<CopyCode :text="thread.id" />
 		</div>
 		<div v-bind="$attrs" class="flex flex-col">
-			<div v-if="sortedMessages.length > 0" class="flex flex-col pt-2">
-				<ThreadMessage
-					v-for="message in sortedMessages"
-					:key="'message-' + message.id"
-					:thread="thread"
-					:message="message"
+			<div
+				v-if="sortedMessages.length > 0 || (isStaff(auth.user) && thread.issues?.length)"
+				class="flex flex-col pt-2"
+			>
+				<ThreadTimeline
+					:messages="thread.messages"
+					:issues="thread.issues"
 					:members="members"
 					:report="report"
 					:auth="auth"
@@ -483,7 +484,7 @@ import {
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, ref, watch } from 'vue'
 
-import ThreadMessage from '~/components/ui/thread/ThreadMessage.vue'
+import ThreadTimeline from '~/components/ui/thread/ThreadTimeline.vue'
 import { useImageUpload } from '~/composables/image-upload.ts'
 import { isApproved, isRejected } from '~/helpers/projects.js'
 import { sendThreadReply } from '~/helpers/thread-issues'

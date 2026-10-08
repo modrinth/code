@@ -46,7 +46,9 @@
 		>
 			<template #button="{ open }">
 				<span class="flex items-center gap-1 text-primary">
-					<span> {{ formatMessage(messages.resolved) }} ({{ resolvedIssues.length }}) </span>
+					<span>
+						{{ formatMessage(messages.resolved, { count: resolvedIssues.length }) }}
+					</span>
 					<DropdownIcon
 						class="size-5 shrink-0 text-primary transition-transform duration-300 motion-reduce:transition-none"
 						:class="{ 'rotate-180': open }"
@@ -102,7 +104,11 @@ function compareIssues(
 			Number(!('controls' in b) && isThreadIssueVerified(b)) || priority(a) - priority(b)
 	)
 }
-const resolvedIssues = computed(() => [...previousIssues.resolvedIssues.value].sort(compareIssues))
+const resolvedIssues = computed(() =>
+	previousIssues.resolvedIssues.value
+		.filter((issue) => !isThreadIssueVerified(issue))
+		.sort(compareIssues),
+)
 const issues = computed(() => {
 	if (props.reReview) {
 		const addedIds = new Set(previousIssues.appliedIssues.value.map(({ id }) => id))
@@ -125,7 +131,7 @@ const { formatMessage } = useVIntl()
 const messages = defineMessages({
 	resolved: {
 		id: 'project-review.issues.resolved',
-		defaultMessage: 'Resolved issues',
+		defaultMessage: 'Auto resolved ({count})',
 	},
 	emptyReReview: {
 		id: 'project-review.issues.empty-re-review',

@@ -1,169 +1,194 @@
 <template>
 	<div
-		class="message px-4 py-3"
-		:class="{
-			'has-body': message.body.type === 'text' && !forceCompact,
-			'no-actions': noLinks,
-			private: isPrivateMessage,
-			'show-private-bg': settings.get(moderationSettings.General.PrivateMessageHighlight),
-			'show-info-bg mb-2 !flex-nowrap py-6': message.body.type === 'legacy_project_message',
-		}"
+		class="message group/thread relative grid min-w-0 grid-cols-[2rem_minmax(0,1fr)] items-start gap-x-2 break-words px-4 py-2 [overflow-wrap:anywhere] before:pointer-events-none before:absolute before:inset-0 before:opacity-5 before:content-[''] [&>.message__icon:focus-visible+.message__content_.message__author_a]:underline [&>.message__icon:hover+.message__content_.message__author_a]:underline"
+		:class="[
+			noLinks ? '!p-0' : 'focus-within:bg-surface-2.5 hover:bg-surface-2.5',
+			isPrivateMessage ? 'text-[var(--color-icon)]' : '',
+			message.body.type === 'legacy_project_message'
+				? 'mb-2 !py-6 before:bg-blue'
+				: isPrivateMessage && settings.get(moderationSettings.General.PrivateMessageHighlight)
+					? 'before:bg-orange'
+					: '',
+		]"
 	>
-		<template v-if="members[message.author_id]">
-			<AutoLink
-				class="message__icon"
-				:to="noLinks ? '' : `/user/${members[message.author_id].username}`"
-				tabindex="-1"
-				aria-hidden="true"
-			>
-				<Avatar
-					class="message__icon"
-					:src="members[message.author_id].avatar_url"
-					circle
-					:raised="raised"
-				/>
-			</AutoLink>
-			<span :class="`message__author role-${members[message.author_id].role}`">
-				<AutoLink :to="noLinks ? '' : `/user/${members[message.author_id].username}`">
-					{{ members[message.author_id].username }}
-				</AutoLink>
-				<ScaleIcon v-if="members[message.author_id].role === 'moderator'" v-tooltip="'Moderator'" />
-				<ModrinthIcon
-					v-else-if="members[message.author_id].role === 'admin'"
-					v-tooltip="'Modrinth Team'"
-				/>
-				<EyeOffIcon
-					v-if="isPrivateMessage"
-					v-tooltip="'Only visible to moderators'"
-					class="ml-1 text-orange"
-				/>
-				<MicrophoneIcon
-					v-if="report && message.author_id === report.reporter_user?.id"
-					v-tooltip="'Reporter'"
-					class="reporter-icon"
-				/>
-				<span
-					v-if="message.preview"
-					class="border-blue/60 rounded-full border border-solid bg-highlight-blue px-2 py-0.5 text-xs font-semibold text-blue"
-				>
-					Preview
-				</span>
-			</span>
-		</template>
-		<template v-else>
-			<div
-				class="message__icon backed-svg circle moderation-color shrink-0"
-				:class="{
-					raised: raised,
-					'system-message-icon': [
-						'auto_approval',
-						'legacy_project_message',
-						'tech_review_entered',
-						'tech_review_exited',
-						'tech_review_exit_file_deleted',
-					].includes(message.body.type),
-				}"
-			>
-				<InfoIcon v-if="message.body.type === 'legacy_project_message'" class="text-blue" />
-				<ModrinthIcon v-else-if="message.body.type === 'auto_approval'" />
-				<ScaleIcon v-else />
-			</div>
-			<span
-				v-if="
-					![
-						'legacy_project_message',
-						'tech_review_entered',
-						'tech_review_exited',
-						'tech_review_exit_file_deleted',
-					].includes(message.body.type)
-				"
-				class="message__author moderation-color"
-			>
-				{{
-					formatMessage(
-						message.body.type === 'auto_approval' ? imageMessages.system : imageMessages.moderator,
-					)
-				}}
-				<ModrinthIcon v-if="message.body.type === 'auto_approval'" />
-				<ScaleIcon v-else v-tooltip="formatMessage(imageMessages.moderator)" />
-			</span>
-		</template>
+		<AutoLink
+			v-if="members[message.author_id]"
+			class="message__icon flex min-w-0 max-w-full items-center no-underline"
+			:to="noLinks ? '' : `/user/${members[message.author_id].username}`"
+			tabindex="-1"
+			aria-hidden="true"
+		>
+			<Avatar size="2rem" :src="members[message.author_id].avatar_url" circle :raised="raised" />
+		</AutoLink>
 		<div
-			v-if="message.body.type === 'text'"
-			v-image-previews="imagePreviews ? formatMessage(imageMessages.openImage) : null"
-			class="message__body markdown-body"
-			:class="{ 'image-previews': imagePreviews }"
-			@click="openImage"
-			@keydown="handleImageKeydown"
-			v-html="formattedMessage"
-		/>
-		<div v-else class="message__body status-message">
-			<span v-if="message.body.type === 'legacy_project_message'">
-				This project was published on Modrinth before moderation threads existed and may be missing
-				moderation history.
-			</span>
-			<span v-if="message.body.type === 'deleted'"> posted a message that has been deleted. </span>
-			<IntlFormatted
-				v-else-if="message.body.type === 'auto_approval'"
-				:message-id="imageMessages.autoApproval"
-			>
-				<template #status><Badge :type="message.body.new_status" /></template>
-			</IntlFormatted>
-			<template v-else-if="message.body.type === 'status_change'">
-				<span v-if="message.body.new_status === 'processing'">
-					submitted the project for review.
-				</span>
-				<span v-else-if="message.body.old_status === 'processing'">
-					reviewed the project and set its status to <Badge :type="message.body.new_status" />.
-				</span>
-				<span v-else-if="message.body.new_status === 'draft'">
-					reverted this project back to a <Badge :type="message.body.new_status" />.
-				</span>
-				<span v-else>
-					changed the project's status from <Badge :type="message.body.old_status" /> to
-					<Badge :type="message.body.new_status" />.
+			v-else
+			class="message__icon inline-flex size-8 shrink-0 items-center justify-center rounded-full text-orange [&>svg]:h-3/5 [&>svg]:w-3/5"
+			:class="raised ? 'bg-surface-3' : 'bg-surface-2'"
+		>
+			<InfoIcon v-if="message.body.type === 'legacy_project_message'" class="text-blue" />
+			<ThreadRoleBadge
+				v-else
+				:role="message.body.type === 'auto_approval' ? 'system' : 'moderator'"
+				avatar
+			/>
+		</div>
+		<div class="message__content min-w-0">
+			<template v-if="members[message.author_id]">
+				<span
+					class="message__author min-w-0 max-w-full font-bold"
+					:class="[
+						authorClasses,
+						members[message.author_id].role === 'admin'
+							? 'text-green'
+							: members[message.author_id].role === 'moderator'
+								? 'text-orange'
+								: '',
+					]"
+				>
+					<AutoLink
+						:to="noLinks ? '' : `/user/${members[message.author_id].username}`"
+						class="inline min-w-0 max-w-full items-center no-underline hover:underline hover:[filter:var(--hover-filter)] focus-visible:underline focus-visible:[filter:var(--hover-filter)] active:[filter:var(--active-filter)]"
+					>
+						{{ members[message.author_id].username }}
+					</AutoLink>
+					<ThreadRoleBadge :role="members[message.author_id].role" />
+					<EyeOffIcon
+						v-if="isPrivateMessage"
+						v-tooltip="'Only visible to moderators'"
+						class="ml-1 text-orange"
+					/>
+					<MicrophoneIcon
+						v-if="report && message.author_id === report.reporter_user?.id"
+						v-tooltip="'Reporter'"
+						class="text-purple"
+					/>
+					<span
+						v-if="message.preview"
+						class="border-blue/60 rounded-full border border-solid bg-highlight-blue px-2 py-0.5 text-xs font-semibold text-blue"
+					>
+						Preview
+					</span>
 				</span>
 			</template>
-			<span v-else-if="message.body.type === 'thread_closure'">closed the thread.</span>
-			<span v-else-if="message.body.type === 'thread_reopen'">reopened the thread.</span>
-			<span v-else-if="message.body.type === 'tech_review'">
-				completed technical review and marked project as
-				<Badge :type="message.body.verdict" />.
-			</span>
-			<span v-else-if="message.body.type === 'tech_review_entered'">
-				The project has entered the technical review queue.
-			</span>
-			<span v-else-if="message.body.type === 'tech_review_exited'">
-				The project has left the technical review queue as all pending traces have been resolved.
-			</span>
-			<span v-else-if="message.body.type === 'tech_review_exit_file_deleted'">
-				The project has left the technical review queue as all files pending review were deleted by
-				the user.
-			</span>
-		</div>
-		<span class="message__date shrink-0">
-			<span v-tooltip="formatDateTime(message.created)">
-				{{ timeSincePosted }}
-			</span>
-		</span>
-		<div v-if="isStaff(auth.user) && message.author_id === auth.user.id" class="message__actions">
-			<TeleportOverflowMenu
-				type="quiet"
-				label="More options"
-				class="btn-dropdown-animation"
-				:options="[
-					{
-						id: 'delete',
-						label: 'Delete',
-						action: () => deleteMessage(),
-						tone: 'red',
-						hoverFilled: true,
-					},
+			<template v-else>
+				<span
+					v-if="
+						![
+							'legacy_project_message',
+							'tech_review_entered',
+							'tech_review_exited',
+							'tech_review_exit_file_deleted',
+						].includes(message.body.type)
+					"
+					class="message__author min-w-0 max-w-full font-bold text-orange"
+					:class="authorClasses"
+				>
+					{{
+						formatMessage(
+							message.body.type === 'auto_approval'
+								? imageMessages.system
+								: imageMessages.moderator,
+						)
+					}}
+					<ThreadRoleBadge :role="message.body.type === 'auto_approval' ? 'system' : 'moderator'" />
+				</span>
+			</template>
+			<div
+				v-if="message.body.type === 'text'"
+				v-image-previews="imagePreviews ? formatMessage(imageMessages.openImage) : null"
+				class="message__body markdown-body min-w-0 max-w-full leading-5 [&>:first-child]:mt-0 [&>:last-child]:mb-0"
+				:class="[
+					bodyClasses,
+					imagePreviews
+						? '[&_img[role=button]:focus-visible]:outline [&_img[role=button]:focus-visible]:outline-2 [&_img[role=button]:focus-visible]:outline-offset-2 [&_img[role=button]:focus-visible]:outline-brand [&_img[role=button]]:cursor-zoom-in'
+						: '',
 				]"
+				@click="openImage"
+				@keydown="handleImageKeydown"
+				v-html="formattedMessage"
+			/>
+			<div
+				v-else
+				class="message__body min-w-0 max-w-full leading-5 [&_.version-badge]:relative [&_.version-badge]:top-0.5 [&_.version-badge]:!inline-flex [&_.version-badge]:align-baseline"
+				:class="bodyClasses"
 			>
-				<MoreHorizontalIcon />
-				<template #delete> <TrashIcon /> Delete </template>
-			</TeleportOverflowMenu>
+				<span v-if="message.body.type === 'legacy_project_message'">
+					This project was published on Modrinth before moderation threads existed and may be
+					missing moderation history.
+				</span>
+				<span v-if="message.body.type === 'deleted'">
+					posted a message that has been deleted.
+				</span>
+				<IntlFormatted
+					v-else-if="message.body.type === 'auto_approval'"
+					:message-id="imageMessages.autoApproval"
+				>
+					<template #status><Badge :type="message.body.new_status" /></template>
+				</IntlFormatted>
+				<template v-else-if="message.body.type === 'status_change'">
+					<span v-if="message.body.new_status === 'processing'">
+						submitted the project for review.
+					</span>
+					<span v-else-if="message.body.old_status === 'processing'" class="-ml-[3px]">
+						reviewed the project and set its status to
+						<span class="whitespace-nowrap"><Badge :type="message.body.new_status" />.</span>
+					</span>
+					<span v-else-if="message.body.new_status === 'draft'">
+						reverted this project back to a
+						<span class="whitespace-nowrap"><Badge :type="message.body.new_status" />.</span>
+					</span>
+					<span v-else>
+						changed the project's status from <Badge :type="message.body.old_status" /> to
+						<span class="whitespace-nowrap"><Badge :type="message.body.new_status" />.</span>
+					</span>
+				</template>
+				<span v-else-if="message.body.type === 'thread_closure'">closed the thread.</span>
+				<span v-else-if="message.body.type === 'thread_reopen'">reopened the thread.</span>
+				<span v-else-if="message.body.type === 'tech_review'">
+					completed technical review and marked project as
+					<span class="whitespace-nowrap"><Badge :type="message.body.verdict" />.</span>
+				</span>
+				<span v-else-if="message.body.type === 'tech_review_entered'">
+					The project has entered the technical review queue.
+				</span>
+				<span v-else-if="message.body.type === 'tech_review_exited'">
+					The project has left the technical review queue as all pending traces have been resolved.
+				</span>
+				<span v-else-if="message.body.type === 'tech_review_exit_file_deleted'">
+					The project has left the technical review queue as all files pending review were deleted
+					by the user.
+				</span>
+			</div>
+			<div class="mt-1 flex items-center gap-2">
+				<span class="message__date block text-xs text-secondary">
+					<span v-tooltip="formatDateTime(message.created)">
+						{{ timeSincePosted }}
+					</span>
+				</span>
+				<div
+					v-if="isStaff(auth.user) && message.author_id === auth.user.id"
+					class="message__actions ml-auto group-focus-within/thread:opacity-100 group-hover/thread:opacity-100 [@media(hover:hover)]:opacity-0"
+					:class="{ hidden: noLinks }"
+				>
+					<TeleportOverflowMenu
+						type="quiet"
+						label="More options"
+						class="btn-dropdown-animation !size-6 !min-h-0 !p-1"
+						:options="[
+							{
+								id: 'delete',
+								label: 'Delete',
+								action: () => deleteMessage(),
+								tone: 'red',
+								hoverFilled: true,
+							},
+						]"
+					>
+						<MoreHorizontalIcon />
+						<template #delete> <TrashIcon /> Delete </template>
+					</TeleportOverflowMenu>
+				</div>
+			</div>
 		</div>
 	</div>
 </template>
@@ -173,9 +198,7 @@ import {
 	EyeOffIcon,
 	InfoIcon,
 	MicrophoneIcon,
-	ModrinthIcon,
 	MoreHorizontalIcon,
-	ScaleIcon,
 	TrashIcon,
 } from '@modrinth/assets'
 import { moderationSettings } from '@modrinth/moderation'
@@ -194,6 +217,8 @@ import {
 import { renderString } from '@modrinth/utils'
 
 import { isStaff } from '~/helpers/users.js'
+
+import ThreadRoleBadge from './ThreadRoleBadge.vue'
 
 const props = defineProps({
 	message: {
@@ -230,6 +255,10 @@ const props = defineProps({
 	},
 })
 
+const hasBody = computed(() => props.message.body.type === 'text' && !props.forceCompact)
+const authorClasses = 'inline [&>svg]:ms-1 [&>svg]:me-1 [&>svg]:inline-block [&>svg]:align-middle'
+const bodyClasses = computed(() => (hasBody.value ? 'mt-1' : 'inline'))
+
 const emit = defineEmits(['update-thread', 'open-image'])
 const settings = useModerationSettings()
 const client = injectModrinthClient()
@@ -240,7 +269,7 @@ const imageMessages = defineMessages({
 	autoApproval: {
 		id: 'thread.message.auto-approval',
 		defaultMessage:
-			'automatically approved the project with status <status>approved</status> because all moderation issues were resolved.',
+			'All moderation issues have been resolved and your project is automatically approved with status <status>approved</status>',
 	},
 	openImage: {
 		id: 'thread.message.open-image',
@@ -322,194 +351,3 @@ async function deleteMessage() {
 	emit('update-thread')
 }
 </script>
-
-<style lang="scss" scoped>
-.message {
-	display: flex;
-	flex-direction: row;
-	gap: var(--spacing-card-sm);
-	flex-wrap: wrap;
-	align-items: center;
-	word-break: break-word;
-	position: relative;
-
-	.avatar,
-	.backed-svg {
-		--size: 1.5rem;
-	}
-
-	&.has-body {
-		display: grid;
-		grid-template:
-			'icon author actions'
-			'icon body actions'
-			'date date date';
-		grid-template-columns: min-content auto 1fr;
-		row-gap: var(--spacing-card-xs);
-
-		.message__icon {
-			margin-bottom: auto;
-		}
-
-		.avatar,
-		.backed-svg {
-			--size: 3rem;
-		}
-	}
-
-	&:not(.no-actions):hover,
-	&:not(.no-actions):focus-within {
-		background-color: var(--surface-2-5);
-
-		.message__actions {
-			opacity: 1;
-		}
-	}
-
-	&.private.show-private-bg::before {
-		content: '';
-		inset: 0;
-		position: absolute;
-		background-color: var(--color-orange);
-		opacity: 0.05;
-		pointer-events: none;
-	}
-
-	&.show-info-bg::before {
-		content: '';
-		inset: 0;
-		position: absolute;
-		background-color: var(--color-blue);
-		opacity: 0.05;
-		pointer-events: none;
-	}
-
-	&.no-actions {
-		padding: 0;
-
-		.message__actions {
-			display: none;
-		}
-	}
-}
-
-.message__icon {
-	grid-area: icon;
-}
-
-.message__author {
-	grid-area: author;
-	font-weight: bold;
-	display: flex;
-	gap: var(--spacing-card-xs);
-	flex-wrap: wrap;
-	flex-shrink: 0;
-}
-
-.message__date {
-	grid-area: date;
-	font-size: var(--font-size-xs);
-	color: var(--color-text-secondary);
-}
-
-.message__actions {
-	grid-area: actions;
-	margin-left: auto;
-
-	@media (hover: hover) {
-		opacity: 0;
-	}
-}
-
-.message__body {
-	grid-area: body;
-}
-
-.image-previews :deep(img[role='button']) {
-	cursor: zoom-in;
-
-	&:focus-visible {
-		outline: 2px solid var(--color-brand);
-		outline-offset: 2px;
-	}
-}
-
-.status-message > span {
-	display: flex;
-	align-items: center;
-	gap: var(--spacing-card-xs);
-	flex-wrap: wrap;
-}
-a {
-	display: flex;
-	align-items: center;
-	text-decoration: none;
-}
-
-a:focus-visible + .message__author a,
-a:hover + .message__author a,
-.message__author a:focus-visible,
-.message__author a:hover {
-	text-decoration: underline;
-	filter: var(--hover-filter);
-}
-
-a:active + .message__author a,
-.message__author a:active {
-	filter: var(--active-filter);
-}
-
-.moderation-color,
-.role-moderator {
-	color: var(--color-orange);
-}
-
-.role-admin {
-	color: var(--color-green);
-}
-
-.reporter-icon {
-	color: var(--color-purple);
-}
-
-@media screen and (min-width: 600px) {
-	.message {
-		//grid-template:
-		//  'icon author body'
-		//  'date date date';
-		//grid-template-columns: min-content auto 1fr;
-
-		&.has-body {
-			grid-template:
-				'icon author actions'
-				'icon body actions'
-				'date date date';
-			grid-template-columns: min-content auto 1fr;
-			grid-template-rows: min-content 1fr auto;
-		}
-	}
-}
-
-@media screen and (min-width: 1024px) {
-	.message {
-		//grid-template: 'icon author body date';
-		//grid-template-columns: min-content auto 1fr auto;
-
-		&.has-body {
-			grid-template:
-				'icon author date actions'
-				'icon body body actions';
-			grid-template-columns: min-content auto 1fr;
-			grid-template-rows: min-content 1fr;
-		}
-	}
-}
-
-.private {
-	color: var(--color-icon);
-}
-
-.system-message-icon {
-	--size: 2rem !important;
-}
-</style>

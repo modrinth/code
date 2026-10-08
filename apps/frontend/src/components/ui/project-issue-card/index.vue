@@ -1,54 +1,70 @@
 <template>
-	<div v-if="matchingIssues.length" :id="fieldAnchor" class="flex flex-col gap-2">
+	<div
+		v-if="matchingIssues.length && (!threadHistory || isStaff(auth.user))"
+		:id="fieldAnchor"
+		class="flex flex-col gap-2"
+	>
 		<div
 			v-for="issue in matchingIssues"
 			:key="issue.id"
-			class="min-w-0 rounded-2xl border border-solid border-surface-5 bg-surface-2 p-4"
+			class="min-w-0 rounded-2xl border border-solid border-surface-5 bg-surface-2"
+			:class="threadHistory ? 'p-2.5 py-3 pr-1.5' : 'p-4'"
 		>
-			<div class="flex items-center justify-between gap-3">
-				<h2 class="m-0 flex min-w-0 items-center gap-2 text-base font-semibold text-contrast">
+			<div class="flex flex-wrap items-start justify-between gap-1">
+				<h2
+					class="m-0 flex min-w-0 flex-1 basis-[150px] flex-wrap items-start text-contrast"
+					:class="threadHistory ? 'gap-1.5' : 'mt-[3px] gap-2'"
+				>
 					<CheckCircleIcon
 						v-if="isComplete(issue)"
-						class="size-5 shrink-0 text-primary"
+						class="mt-0.5 shrink-0 text-primary"
+						:class="threadHistory ? 'size-4' : 'size-5'"
 						aria-hidden="true"
 					/>
 					<TriangleAlertIcon v-else class="size-5 shrink-0 text-red" aria-hidden="true" />
-					<span class="min-w-0 break-words">{{ issueTitle(issue) }}</span>
-					<span v-if="issue.verdict === 'resolved'" class="text-sm font-normal text-primary">
-						{{ formatMessage(messages.resolved) }}
-					</span>
+					<span
+						class="min-w-0 flex-1 [overflow-wrap:anywhere]"
+						:class="threadHistory ? 'text-sm font-medium' : 'text-base font-semibold'"
+						>{{ issueTitle(issue) }}</span
+					>
 				</h2>
 				<Button
-					v-if="isComplete(issue)"
+					v-if="threadHistory || isComplete(issue)"
+					class="ml-auto max-w-full shrink-0 !whitespace-normal"
+					:class="threadHistory ? '-my-1.5 w-28' : 'p-4'"
 					type="quiet"
 					size="sm"
 					:aria-expanded="isExpanded(issue)"
-					:aria-controls="`project-issue-${issue.id}`"
+					:aria-controls="issueContentId(issue)"
 					@click="toggle(issue.id)"
 				>
 					<FoldVerticalIcon v-if="isExpanded(issue)" aria-hidden="true" />
 					<UnfoldVerticalIcon v-else aria-hidden="true" />
 					{{
 						formatMessage(
-							issue.verdict === 'resolved'
+							threadHistory
 								? isExpanded(issue)
-									? messages.hideResolved
-									: messages.showResolved
-								: isExpanded(issue)
-									? messages.hideAddressed
-									: messages.showAddressed,
+									? messages.hideIssue
+									: messages.showIssue
+								: issue.verdict === 'resolved'
+									? isExpanded(issue)
+										? messages.hideResolved
+										: messages.showResolved
+									: isExpanded(issue)
+										? messages.hideAddressed
+										: messages.showAddressed,
 						)
 					}}
 				</Button>
 			</div>
 			<div
-				:id="`project-issue-${issue.id}`"
+				:id="issueContentId(issue)"
 				class="project-issue-content"
 				:class="{ open: isExpanded(issue), expanded: isFullyExpanded(issue) }"
 				@transitionend.self="onContentTransitionEnd($event, issue)"
 			>
-				<div :inert="!isExpanded(issue)">
-					<div class="flex flex-col gap-3 pt-3">
+				<div :inert="!isExpanded(issue)" class="min-w-0">
+					<div class="flex flex-col gap-3" :class="threadHistory ? 'pt-2' : 'pt-3'">
 						<div
 							v-if="issueMessage(issue)"
 							class="markdown-body min-w-0 text-sm text-primary"
@@ -56,6 +72,7 @@
 						/>
 						<div
 							v-if="
+								!threadHistory &&
 								issue.verdict !== 'resolved' &&
 								((showProjectAreaLink && issueActions(issue).length) ||
 									addressableFacets(issue).length)
@@ -220,16 +237,21 @@ const props = defineProps<{
 	userId?: string
 	teamId?: string
 	disclosureType?: string
+	threadHistory?: boolean
 }>()
 
-const {
-	thread,
-	currentMember,
-	projectV2: project,
-	projectV3,
-	allMembers,
-	refreshProjectValidation,
-} = injectProjectPageContext()
+const projectContext = props.threadHistory ? null : injectProjectPageContext()
+const thread = computed(() => projectContext?.thread.value)
+const currentMember = computed(() => projectContext?.currentMember.value)
+const project = computed(() => requireProjectContext().projectV2.value)
+const projectV3 = computed(() => requireProjectContext().projectV3.value)
+const allMembers = computed(() => requireProjectContext().allMembers.value)
+
+function requireProjectContext() {
+	if (!projectContext) throw new Error('Project issue actions require project-page context')
+	return projectContext
+}
+
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
 const { addNotification } = injectNotificationManager()
@@ -239,6 +261,8 @@ const canAddress = computed(() => !!currentMember.value?.accepted)
 const expandedAddressed = reactive(new Set<string>())
 const finishedExpanding = reactive(new Set<string>())
 const messages = defineMessages({
+	showIssue: { id: 'thread-issues.show-issue', defaultMessage: 'Show issue' },
+	hideIssue: { id: 'thread-issues.hide-issue', defaultMessage: 'Hide issue' },
 	markAddressed: { id: 'thread-issues.mark-addressed', defaultMessage: 'Mark as addressed' },
 	addressed: { id: 'thread-issues.addressed', defaultMessage: 'Marked as addressed' },
 	showAddressed: { id: 'thread-issues.show-addressed', defaultMessage: 'Show addressed' },
@@ -288,7 +312,9 @@ const addressMutation = useMutation({
 				: Promise.resolve(),
 			queryClient.invalidateQueries({ queryKey: ['project', 'v2', projectId] }),
 			queryClient.invalidateQueries({ queryKey: ['project', 'v3', projectId] }),
-			project.value.id === projectId ? refreshProjectValidation() : Promise.resolve(),
+			project.value.id === projectId
+				? requireProjectContext().refreshProjectValidation()
+				: Promise.resolve(),
 		])
 	},
 	onError: (error) =>
@@ -383,7 +409,7 @@ const matchingIssues = computed(() =>
 	(props.issues ?? thread.value?.issues ?? [])
 		.filter(
 			(issue) =>
-				!isThreadIssueVerified(issue) &&
+				(props.threadHistory || !isThreadIssueVerified(issue)) &&
 				(props.issues !== undefined ||
 					matchesLocation(issue) ||
 					issue.facets.some(({ what }) => matchesTarget(what))),
@@ -544,12 +570,16 @@ function isComplete(issue: ThreadIssue): boolean {
 	return isAddressed(issue) || issue.verdict === 'resolved'
 }
 
+function issueContentId(issue: ThreadIssue): string {
+	return `${props.threadHistory ? 'thread' : 'project'}-issue-${issue.id}`
+}
+
 function isExpanded(issue: ThreadIssue): boolean {
-	return !isComplete(issue) || expandedAddressed.has(issue.id)
+	return (!props.threadHistory && !isComplete(issue)) || expandedAddressed.has(issue.id)
 }
 
 function isFullyExpanded(issue: ThreadIssue): boolean {
-	return !isComplete(issue) || finishedExpanding.has(issue.id)
+	return (!props.threadHistory && !isComplete(issue)) || finishedExpanding.has(issue.id)
 }
 
 function onContentTransitionEnd(event: TransitionEvent, issue: ThreadIssue) {

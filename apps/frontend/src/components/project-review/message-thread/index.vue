@@ -7,15 +7,14 @@
 		>
 			<div ref="content" class="flex min-h-full flex-col justify-end">
 				<template v-if="thread">
-					<ThreadMessage
-						v-for="(message, index) in sortedMessages"
-						:key="message.id ?? `${message.created}:${index}`"
-						:message="message"
+					<ThreadTimeline
+						:messages="thread.messages"
+						:issues="thread.issues"
 						:members="members"
 						:auth="auth"
 						raised
 						image-previews
-						class="shrink-0 text-xs"
+						message-class="shrink-0 !px-2 text-xs"
 						@update-thread="() => refetch()"
 						@open-image="openImage"
 					/>
@@ -53,7 +52,7 @@ import { Button, ImageViewerEditor, useVIntl } from '@modrinth/ui'
 import { useResizeObserver } from '@vueuse/core'
 import { computed, nextTick, ref, watch } from 'vue'
 
-import ThreadMessage from '~/components/ui/thread/ThreadMessage.vue'
+import ThreadTimeline from '~/components/ui/thread/ThreadTimeline.vue'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
 import ImageViewerActions from '../image-viewer-actions.vue'
@@ -87,9 +86,6 @@ function restoreImageFocus() {
 	if (imageTrigger?.isConnected) imageTrigger.focus({ preventScroll: true })
 	imageTrigger = undefined
 }
-const sortedMessages = computed(() =>
-	[...(thread.value?.messages ?? [])].sort((a, b) => Date.parse(a.created) - Date.parse(b.created)),
-)
 const members = computed(() =>
 	Object.fromEntries((thread.value?.members ?? []).map((member) => [member.id, member])),
 )

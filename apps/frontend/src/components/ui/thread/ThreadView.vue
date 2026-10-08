@@ -5,12 +5,13 @@
 			<CopyCode :text="thread.id" />
 		</div>
 
-		<div v-if="sortedMessages.length > 0" class="flex flex-col rounded-xl">
-			<ThreadMessage
-				v-for="message in sortedMessages"
-				:key="'message-' + message.id"
-				:thread="thread"
-				:message="message"
+		<div
+			v-if="sortedMessages.length > 0 || (isStaff(auth.user) && thread.issues?.length)"
+			class="flex flex-col rounded-xl"
+		>
+			<ThreadTimeline
+				:messages="thread.messages"
+				:issues="thread.issues"
 				:members="members"
 				:auth="auth"
 				raised
@@ -114,6 +115,7 @@
 </template>
 
 <script setup lang="ts" generic="T">
+import type { Labrinth } from '@modrinth/api-client'
 import {
 	ArrowUpFromLineIcon,
 	ChevronDownIcon,
@@ -136,13 +138,13 @@ import dayjs from 'dayjs'
 import { useImageUpload } from '~/composables/image-upload.ts'
 import { isStaff } from '~/helpers/users.js'
 
-import ThreadMessage from './ThreadMessage.vue'
+import ThreadTimeline from './ThreadTimeline.vue'
 
 const { addNotification } = injectNotificationManager()
 
 const props = withDefaults(
 	defineProps<{
-		thread: Thread
+		thread: Thread & { issues?: Labrinth.Threads.v3.ThreadIssue[] }
 		quickReplies?: ReadonlyArray<QuickReply<T>>
 		quickReplyContext?: T
 		closed?: boolean
