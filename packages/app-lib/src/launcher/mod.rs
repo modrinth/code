@@ -26,6 +26,7 @@ use daedalus as d;
 use daedalus::minecraft::{LoggingSide, RuleAction, VersionInfo};
 use daedalus::modded::{LoaderVersion, Manifest};
 use serde::Deserialize;
+use sqlx::SqlitePool;
 use std::future::Future;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
@@ -134,7 +135,7 @@ macro_rules! processor_rules {
 pub async fn get_java_version_from_launch_context(
     context: &InstanceLaunchContext,
     version_info: &VersionInfo,
-    state: &State,
+    pool: &SqlitePool,
 ) -> crate::Result<Option<JavaVersion>> {
     if let Some(java) = context.launch_overrides.java_path.as_ref() {
         let java =
@@ -150,7 +151,7 @@ pub async fn get_java_version_from_launch_context(
         .as_ref()
         .map_or(8, |it| it.major_version);
 
-    let java_version = JavaVersion::get(key, &state.pool).await?;
+    let java_version = JavaVersion::get(key, pool).await?;
 
     Ok(java_version)
 }
@@ -318,8 +319,12 @@ pub(crate) async fn resolve_java_for_launch(
         .as_ref()
         .map_or(8, |it| it.major_version);
     let (java_path, set_java) = if let Some(java_version) =
-        get_java_version_from_launch_context(context, &version_info, state)
-            .await?
+        get_java_version_from_launch_context(
+            context,
+            &version_info,
+            &state.pool,
+        )
+        .await?
     {
         (PathBuf::from(java_version.path), false)
     } else {
@@ -530,8 +535,12 @@ async fn install_minecraft_inner(
             .await?;
     }
     let (java_version, set_java) = if let Some(java_version) =
-        get_java_version_from_launch_context(context, &version_info, state)
-            .await?
+        get_java_version_from_launch_context(
+            context,
+            &version_info,
+            &state.pool,
+        )
+        .await?
     {
         (std::path::PathBuf::from(java_version.path), false)
     } else {
@@ -983,14 +992,17 @@ pub async fn launch_minecraft(
     let _ =
         download_log_config(state, &version_info, None, false, None).await?;
 
-    let java_version =
-        get_java_version_from_launch_context(context, &version_info, state)
-            .await?
-            .ok_or_else(|| {
-                crate::ErrorKind::LauncherError(
-                    "Missing correct java installation".to_string(),
-                )
-            })?;
+    let java_version = get_java_version_from_launch_context(
+        context,
+        &version_info,
+        &state.pool,
+    )
+    .await?
+    .ok_or_else(|| {
+        crate::ErrorKind::LauncherError(
+            "Missing correct java installation".to_string(),
+        )
+    })?;
 
     // Test jre version
     let java_version =

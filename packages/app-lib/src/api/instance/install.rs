@@ -42,7 +42,7 @@ pub async fn get_optimal_jre_key(
     crate::launcher::get_java_version_from_launch_context(
         &context,
         &version_info,
-        &state,
+        &state.pool,
     )
     .await
 }
