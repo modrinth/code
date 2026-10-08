@@ -5771,6 +5771,24 @@
   "servers.download.unavailable.title": {
     "defaultMessage": "Download unavailable"
   },
+  "servers.files.config-push.admonition-body": {
+    "defaultMessage": "You edited {path}. Push an update so players get this change next time they play."
+  },
+  "servers.files.config-push.admonition-header": {
+    "defaultMessage": "Share this config with players"
+  },
+  "servers.files.config-push.header": {
+    "defaultMessage": "Push config to players?"
+  },
+  "servers.files.config-push.later": {
+    "defaultMessage": "Later"
+  },
+  "servers.files.config-push.other-changes-body": {
+    "defaultMessage": "Your other unshared content changes will be included too."
+  },
+  "servers.files.config-push.restart-body": {
+    "defaultMessage": "Pushing an update will restart your server, and players who are online will be disconnected."
+  },
   "servers.files.server-locked": {
     "defaultMessage": "This server is locked and its files are read-only."
   },
