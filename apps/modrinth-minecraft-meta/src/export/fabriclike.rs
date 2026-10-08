@@ -1,20 +1,27 @@
 use anyhow::{Context, Result, anyhow, ensure};
-use std::collections::HashMap;
+use std::{
+    collections::HashMap,
+    sync::atomic::{AtomicUsize, Ordering},
+};
+
+use futures::{TryStreamExt, stream};
+use indexmap::IndexMap;
 
 use jiff::Timestamp;
 use serde::{Deserialize, Serialize};
-use tracing::{info_span, warn};
+use tracing::{info, info_span, warn};
 use tracing_anyhow::FutureContext;
 use url::Url;
 
 use crate::{
     AppState,
-    model::{Processor, SidedDataEntry},
+    model::{self, Processor, SidedDataEntry},
+    store::ContentType,
     upstream::mojang::{
         Argument, ArgumentType, LibraryDownloads, LibraryExtract,
         OperatingSystem, Rule, VersionType,
     },
-    util::{MavenCoordinate, ResponseExt},
+    util::{MavenCoordinate, ResponseExt, Sha256, from_json_slice},
 };
 
 pub const GAME_VERSION_PLACEHOLDER: &str = "${modrinth.gameVersion}";
@@ -72,6 +79,340 @@ pub struct Artifact {
     pub repository: Url,
     pub source: Option<String>,
     pub repository_source: &'static str,
+}
+
+pub struct CatalogGame {
+    pub id: String,
+    pub stable: bool,
+}
+
+pub struct CatalogLoader {
+    pub id: String,
+    pub stable: bool,
+}
+
+pub struct CatalogSnapshot {
+    pub download_run_id: model::DownloadRunId,
+    pub sha256: Sha256,
+    pub games: Vec<CatalogGame>,
+    pub loaders: Vec<CatalogLoader>,
+    pub mappings: Vec<Artifact>,
+}
+
+pub struct ProfileGroup {
+    pub id: Option<String>,
+    pub template: String,
+    pub fallback_templates: Vec<String>,
+    pub games: Vec<String>,
+    pub profile_base_url: Url,
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct Manifest {
+    game_versions: Vec<GameVersion>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    version_groups: Vec<VersionGroup>,
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct GameVersion {
+    id: String,
+    stable: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    version_group: Option<String>,
+    loaders: Vec<LoaderVersion>,
+}
+
+#[derive(Debug, Serialize)]
+struct LoaderVersion {
+    id: String,
+    url: Url,
+    stable: bool,
+}
+
+#[derive(Debug, Serialize)]
+struct VersionGroup {
+    id: String,
+    loaders: Vec<LoaderVersion>,
+}
+
+struct ProfileExport {
+    loader: LoaderVersion,
+    group: Option<String>,
+    path: String,
+    json: Vec<u8>,
+}
+
+fn profile_source(
+    group: &ProfileGroup,
+    template: &str,
+    loader_version: &str,
+) -> Result<Url> {
+    let mut url = group.profile_base_url.clone();
+    url.path_segments_mut()
+        .map_err(|()| anyhow!("profile base URL cannot contain path segments"))?
+        .pop_if_empty()
+        .extend([template, loader_version, "profile", "json"]);
+    Ok(url)
+}
+
+fn profile_path(
+    loader: &str,
+    format_version: u32,
+    group: Option<&str>,
+    version: &str,
+) -> String {
+    match group {
+        None => format!("{loader}/v{format_version}/versions/{version}.json"),
+        Some(group) => format!(
+            "{loader}/v{format_version}/version-group/{group}/loader-version/{version}"
+        ),
+    }
+}
+
+fn make_manifest(
+    games: IndexMap<String, CatalogGame>,
+    groups: &[ProfileGroup],
+    profiles: Vec<ProfileExport>,
+) -> Result<Manifest> {
+    let mut manifest = Manifest {
+        game_versions: Vec::new(),
+        version_groups: Vec::new(),
+    };
+    let mut grouped_loaders: IndexMap<Option<String>, Vec<LoaderVersion>> =
+        IndexMap::new();
+    for profile in profiles {
+        grouped_loaders
+            .entry(profile.group)
+            .or_default()
+            .push(profile.loader);
+    }
+    let mut game_groups = HashMap::new();
+    for group in groups {
+        let loaders =
+            grouped_loaders.shift_remove(&group.id).unwrap_or_default();
+        if let Some(id) = &group.id {
+            manifest.version_groups.push(VersionGroup {
+                id: id.clone(),
+                loaders,
+            });
+        } else {
+            manifest.game_versions.push(GameVersion {
+                id: GAME_VERSION_PLACEHOLDER.to_owned(),
+                stable: true,
+                version_group: None,
+                loaders,
+            });
+        }
+        for game in &group.games {
+            ensure!(
+                game_groups.insert(game.clone(), group.id.clone()).is_none(),
+                "game version {game} belongs to multiple profile groups"
+            );
+        }
+    }
+    for game in games.into_values() {
+        let version_group =
+            game_groups.remove(&game.id).with_context(|| {
+                format!("game version {} has no profile group", game.id)
+            })?;
+        manifest.game_versions.push(GameVersion {
+            id: game.id,
+            stable: game.stable,
+            version_group,
+            loaders: Vec::new(),
+        });
+    }
+    Ok(manifest)
+}
+
+/// Publishes profiles and a catalog from snapshots ordered newest-first.
+pub async fn export_catalogs(
+    app: &AppState,
+    loader: &str,
+    format_version: u32,
+    fallback_maven: &Url,
+    catalogs: Vec<CatalogSnapshot>,
+    groups: Vec<ProfileGroup>,
+) -> Result<()> {
+    let mut games = IndexMap::new();
+    let mut loaders = IndexMap::new();
+    let mut artifacts = IndexMap::new();
+    let mut run_priority = HashMap::new();
+    for (priority, snapshot) in catalogs.into_iter().enumerate() {
+        run_priority
+            .entry(snapshot.download_run_id)
+            .or_insert(priority);
+        for game in snapshot.games {
+            games.entry(game.id.clone()).or_insert(game);
+        }
+        for version in snapshot.loaders {
+            loaders.entry(version.id.clone()).or_insert(version);
+        }
+        for mut artifact in snapshot.mappings {
+            if artifact.source.is_none() {
+                artifact.source =
+                    Some(format!("catalog SHA256 {}", snapshot.sha256));
+            }
+            artifacts
+                .entry(artifact.coordinate.to_maven_path())
+                .or_insert(artifact);
+        }
+    }
+    ensure!(
+        !games.is_empty() && !loaders.is_empty() && !groups.is_empty(),
+        "no {loader} game versions, loaders, or profile groups to export"
+    );
+    let mut profile_urls = Vec::new();
+    for group in &groups {
+        for version in loaders.keys() {
+            for template in std::iter::once(&group.template)
+                .chain(&group.fallback_templates)
+            {
+                profile_urls.push(
+                    profile_source(group, template, version)?.to_string(),
+                );
+            }
+        }
+    }
+    let mut conn = app
+        .db
+        .connection()
+        .context(info_span!("acquiring connection"))
+        .await?;
+    let mut downloads = model::BlobDownload::all()
+        .filter(model::BlobDownload::fields().url().in_list(profile_urls))
+        .exec(&mut conn)
+        .context(info_span!("fetching downloaded profiles", loader))
+        .await?;
+    downloads.sort_by_key(|row| {
+        (
+            run_priority
+                .get(&row.download_run_id)
+                .copied()
+                .unwrap_or(usize::MAX),
+            row.download_run_id.0,
+        )
+    });
+    let mut profile_hashes = HashMap::new();
+    for download in downloads {
+        profile_hashes
+            .entry(download.url)
+            .or_insert(download.sha256);
+    }
+    let public_maven = app.public_blobs.url_for("maven/");
+    let mut profiles = Vec::new();
+    for group in &groups {
+        for version in loaders.values() {
+            let mut selected = None;
+            for template in std::iter::once(&group.template)
+                .chain(&group.fallback_templates)
+            {
+                let source = profile_source(group, template, &version.id)?;
+                if let Some(sha256) = profile_hashes.get(source.as_str()) {
+                    selected = Some((template, source, *sha256));
+                    break;
+                }
+            }
+            let (template, source, sha256) = selected.with_context(|| {
+                format!(
+                    "no downloaded {loader} profile for {} in group {:?}",
+                    version.id, group.id
+                )
+            })?;
+            let bytes = app.cas.get(sha256)
+				.context(info_span!("fetching loader profile", loader, loader_version = %version.id, %source))
+				.await?;
+            let profile = from_json_slice::<ProfileMetadata>(&bytes)
+                .context("parsing loader profile")?;
+            let (profile, dependencies) = normalize_profile(
+                profile,
+                template,
+                &group.games,
+                fallback_maven,
+                &public_maven,
+            )
+            .with_context(|| {
+                format!(
+                    "normalizing {loader} profile {} from {source}",
+                    version.id
+                )
+            })?;
+            for mut artifact in dependencies {
+                artifact.source =
+                    Some(format!("{source} (profile SHA256 {sha256})"));
+                artifacts
+                    .entry(artifact.coordinate.to_maven_path())
+                    .or_insert(artifact);
+            }
+            let path = profile_path(
+                loader,
+                format_version,
+                group.id.as_deref(),
+                &version.id,
+            );
+            profiles.push(ProfileExport {
+                loader: LoaderVersion {
+                    id: version.id.clone(),
+                    url: app.public_blobs.url_for(&path),
+                    stable: version.stable,
+                },
+                group: group.id.clone(),
+                path,
+                json: serde_json::to_vec(&profile)
+                    .context("serializing loader profile")?,
+            });
+        }
+    }
+    let num_total = artifacts.len();
+    info!(
+        loader,
+        num_artifacts = num_total,
+        "mirroring loader dependencies"
+    );
+    let num_done = AtomicUsize::new(0);
+    stream::iter(artifacts.into_values().map(Ok::<_, anyhow::Error>))
+        .try_for_each_concurrent(
+            app.concurrency.download.get(),
+            |artifact| async {
+                mirror_artifact(app, artifact).await?;
+                let num_done = num_done.fetch_add(1, Ordering::Relaxed) + 1;
+                if num_done.is_multiple_of(100) || num_done == num_total {
+                    info!(
+                        loader,
+                        "mirrored {num_done}/{num_total} dependencies"
+                    );
+                }
+                anyhow::Ok(())
+            },
+        )
+        .context(info_span!("mirroring loader dependencies", loader))
+        .await?;
+    for profile in &profiles {
+        app.public_blobs
+			.put(&profile.path, &profile.json, ContentType::Json)
+			.context(
+				info_span!("writing loader profile", loader, path = %profile.path),
+			)
+			.await?;
+    }
+    info!(
+        loader,
+        num_profiles = profiles.len(),
+        "wrote loader profiles"
+    );
+    let manifest = make_manifest(games, &groups, profiles)?;
+    let json =
+        serde_json::to_vec(&manifest).context("serializing loader manifest")?;
+    let path = format!("{loader}/v{format_version}/manifest.json");
+    app.public_blobs
+        .put(&path, &json, ContentType::Json)
+        .context(info_span!("writing loader manifest", %path))
+        .await?;
+    info!(%path, "wrote loader manifest");
+    Ok(())
 }
 
 /// Normalizes a Fabric or Quilt profile for multiple game versions.
@@ -241,6 +582,106 @@ mod tests {
     use serde_json::{Value, json};
 
     use super::*;
+
+    fn group(id: Option<&str>, template: &str, games: &[&str]) -> ProfileGroup {
+        ProfileGroup {
+            id: id.map(str::to_owned),
+            template: template.into(),
+            fallback_templates: Vec::new(),
+            games: games.iter().map(|game| (*game).into()).collect(),
+            profile_base_url: "https://meta.example.com/versions/loader/"
+                .parse()
+                .unwrap(),
+        }
+    }
+
+    fn exported(group: Option<&str>, version: &str) -> ProfileExport {
+        ProfileExport {
+            loader: LoaderVersion {
+                id: version.into(),
+                url: "https://example.com/profile.json".parse().unwrap(),
+                stable: true,
+            },
+            group: group.map(str::to_owned),
+            path: String::new(),
+            json: vec![],
+        }
+    }
+
+    fn catalog_games(ids: &[&str]) -> IndexMap<String, CatalogGame> {
+        ids.iter()
+            .map(|id| {
+                (
+                    (*id).into(),
+                    CatalogGame {
+                        id: (*id).into(),
+                        stable: true,
+                    },
+                )
+            })
+            .collect()
+    }
+
+    #[test]
+    fn universal_manifest_preserves_fabric_shape() {
+        let manifest = make_manifest(
+            catalog_games(&["1.21", "26.3"]),
+            &[group(None, "1.21", &["1.21", "26.3"])],
+            vec![exported(None, "0.19.5")],
+        )
+        .unwrap();
+        let json = serde_json::to_value(manifest).unwrap();
+        assert_eq!(json["gameVersions"][0]["id"], GAME_VERSION_PLACEHOLDER);
+        assert_eq!(json["gameVersions"][0]["loaders"][0]["id"], "0.19.5");
+        assert_eq!(json["gameVersions"][1]["loaders"], json!([]));
+        assert!(json["gameVersions"][1].get("versionGroup").is_none());
+        assert!(json.get("versionGroups").is_none());
+    }
+
+    #[test]
+    fn grouped_manifest_has_quilt_group_references() {
+        let manifest = make_manifest(
+            catalog_games(&["26.3", "1.21"]),
+            &[
+                group(Some("v1"), "1.21", &["1.21"]),
+                group(Some("v2"), "26.3", &["26.3"]),
+            ],
+            vec![
+                exported(Some("v1"), "0.30.0"),
+                exported(Some("v2"), "0.30.0"),
+            ],
+        )
+        .unwrap();
+        let json = serde_json::to_value(manifest).unwrap();
+        assert_eq!(json["gameVersions"].as_array().unwrap().len(), 2);
+        assert_eq!(json["gameVersions"][0]["versionGroup"], "v2");
+        assert_eq!(json["gameVersions"][1]["versionGroup"], "v1");
+        assert_eq!(json["versionGroups"][0]["id"], "v1");
+        assert_eq!(json["versionGroups"][1]["loaders"][0]["id"], "0.30.0");
+        assert_eq!(json["gameVersions"][0]["loaders"], json!([]));
+    }
+
+    #[test]
+    fn profile_locations_match_published_formats_and_source_encoding() {
+        assert_eq!(
+            profile_path("fabric", 0, None, "0.19.5"),
+            "fabric/v0/versions/0.19.5.json"
+        );
+        assert_eq!(
+            profile_path("quilt", 1, Some("v2"), "0.30.0"),
+            "quilt/v1/version-group/v2/loader-version/0.30.0"
+        );
+        assert_eq!(
+            profile_source(
+                &group(None, "1.14 Pre-Release 1", &[]),
+                "1.14 Pre-Release 1",
+                "0.4.1+build.128"
+            )
+            .unwrap()
+            .as_str(),
+            "https://meta.example.com/versions/loader/1.14%20Pre-Release%201/0.4.1+build.128/profile/json"
+        );
+    }
 
     fn normalize(
         mut profile: Value,

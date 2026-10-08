@@ -4,3 +4,4 @@
 pub mod fabric;
 mod fabriclike;
 pub mod mojang;
+pub mod quilt;

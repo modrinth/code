@@ -17,5 +17,11 @@ pub async fn export(app: &mut AppState) -> Result<()> {
 		.inspect_err(|err| warn!("error: {err:?}"))
 		.ok();
 
+	export::quilt::export(app)
+		.context(info_span!("exporting Quilt artifacts"))
+		.await
+		.inspect_err(|err| warn!("error: {err:?}"))
+		.ok();
+
 	Ok(())
 }
