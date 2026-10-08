@@ -26,8 +26,11 @@ use labrinth::database::models::project_item::{
     PROJECTS_NAMESPACE, PROJECTS_SLUGS_NAMESPACE, ProjectQueryResult,
 };
 use labrinth::models::ids::ProjectId;
+use labrinth::models::pats::Scopes;
 use labrinth::models::projects::ProjectStatus;
 use labrinth::models::teams::ProjectPermissions;
+use labrinth::routes::PROJECT_REDIRECTS_NAMESPACE;
+use labrinth::test::pats::create_test_pat;
 use labrinth::util::actix::{MultipartSegment, MultipartSegmentData};
 use serde_json::json;
 use sha1::Digest;
@@ -109,6 +112,346 @@ async fn test_get_project() {
         // Similarly, request should fail on non-authorized user, on a yet-to-be-approved or hidden project, with a 404 (hiding the existence of the project)
         let resp = api.get_project(beta_project_id, ENEMY_USER_PAT).await;
         assert_status!(&resp, StatusCode::NOT_FOUND);
+    })
+    .await;
+}
+
+#[actix_rt::test]
+async fn project_redirect_cache_respects_visibility() {
+    with_test_environment_all(None, |env| async move {
+        let public_id = &env.dummy.project_alpha.project_id;
+        let private_id = &env.dummy.project_beta.project_id;
+        let public_alias = "redirect-public-alias";
+        let private_alias = "redirect-private-alias";
+        let mut redis = env.db.redis_pool.connect().await.unwrap();
+        for (alias, target) in
+            [(public_alias, public_id), (private_alias, private_id)]
+        {
+            let key = redis.key().entity(PROJECT_REDIRECTS_NAMESPACE, alias);
+            redis
+                .set_serialized(
+                    &key,
+                    &Some(parse_base62(target).unwrap() as i64),
+                    Some(300),
+                )
+                .await
+                .unwrap();
+        }
+
+        for user_id in [
+            None,
+            Some(ENEMY_USER_ID_PARSED),
+            Some(USER_USER_ID_PARSED),
+            Some(MOD_USER_ID_PARSED),
+            Some(ADMIN_USER_ID_PARSED),
+        ] {
+            let user = if let Some(user_id) = user_id {
+                Some(labrinth::models::users::User::from(
+                    labrinth::database::models::DBUser::get_id(
+                        labrinth::database::models::DBUserId(user_id),
+                        &*env.db.pool,
+                        &env.db.redis_pool,
+                    )
+                    .await
+                    .unwrap()
+                    .unwrap(),
+                ))
+            } else {
+                None
+            };
+            let mut body_refs = [
+                public_alias.to_string(),
+                private_alias.to_string(),
+                public_id.clone(),
+                "missing".to_string(),
+                private_alias.to_string(),
+            ];
+            labrinth::routes::resolve_body_refs(
+                body_refs.iter_mut().collect(),
+                &user,
+                &env.db.pool,
+                &env.db.redis_pool,
+            )
+            .await
+            .unwrap();
+            let expected_private = match user_id {
+                None | Some(ENEMY_USER_ID_PARSED) => private_alias,
+                _ => private_id.as_str(),
+            };
+            assert_eq!(
+                body_refs,
+                [
+                    public_id.as_str(),
+                    expected_private,
+                    public_id.as_str(),
+                    "missing",
+                    expected_private,
+                ]
+            );
+        }
+
+        let write_pat = create_test_pat(
+            Scopes::PROJECT_WRITE,
+            USER_USER_ID_PARSED,
+            &env.db,
+        )
+        .await;
+        let response = env
+            .api
+            .edit_project(private_id, json!({}), Some(&write_pat))
+            .await;
+        assert_status!(&response, StatusCode::NO_CONTENT);
+        let response = env
+            .api
+            .edit_project(private_alias, json!({}), Some(&write_pat))
+            .await;
+        assert_status!(&response, StatusCode::PERMANENT_REDIRECT);
+        let response = env
+            .api
+            .edit_project_bulk(&[private_alias], json!({}), Some(&write_pat))
+            .await;
+        assert_status!(&response, StatusCode::PERMANENT_REDIRECT);
+        let response =
+            env.api.get_project(private_alias, Some(&write_pat)).await;
+        assert_status!(&response, StatusCode::NOT_FOUND);
+        assert!(!response.headers().contains_key("location"));
+
+        let enemy_write_pat = create_test_pat(
+            Scopes::PROJECT_WRITE,
+            ENEMY_USER_ID_PARSED,
+            &env.db,
+        )
+        .await;
+        let response = env
+            .api
+            .edit_project(private_alias, json!({}), Some(&enemy_write_pat))
+            .await;
+        assert_status!(&response, StatusCode::NOT_FOUND);
+        assert!(!response.headers().contains_key("location"));
+
+        for pat in [USER_USER_PAT, MOD_USER_PAT, ADMIN_USER_PAT] {
+            let response = env.api.get_project(private_alias, pat).await;
+            assert_status!(&response, StatusCode::PERMANENT_REDIRECT);
+            assert!(
+                response
+                    .headers()
+                    .get("location")
+                    .unwrap()
+                    .to_str()
+                    .unwrap()
+                    .ends_with(private_id)
+            );
+            assert_eq!(
+                response.headers().get("cache-control").unwrap(),
+                "private, no-store"
+            );
+        }
+
+        for pat in [None, ENEMY_USER_PAT, FRIEND_USER_PAT] {
+            let response = env.api.get_project(private_alias, pat).await;
+            assert_status!(&response, StatusCode::NOT_FOUND);
+            assert!(!response.headers().contains_key("location"));
+            let response = env.api.get_projects(&[private_alias], pat).await;
+            assert_status!(&response, StatusCode::OK);
+            assert!(!response.headers().contains_key("location"));
+            let projects: Vec<CommonProject> =
+                test::read_body_json(response).await;
+            assert!(projects.is_empty());
+        }
+
+        let response = env.api.get_project(public_alias, None).await;
+        assert_status!(&response, StatusCode::PERMANENT_REDIRECT);
+        assert!(
+            response
+                .headers()
+                .get("location")
+                .unwrap()
+                .to_str()
+                .unwrap()
+                .ends_with(public_id)
+        );
+
+        for pat in [None, ENEMY_USER_PAT, USER_USER_PAT] {
+            let response = env
+                .api
+                .get_projects(
+                    &[
+                        public_alias,
+                        private_alias,
+                        public_id,
+                        "missing",
+                        private_alias,
+                    ],
+                    pat,
+                )
+                .await;
+            assert_status!(&response, StatusCode::PERMANENT_REDIRECT);
+            let location = response
+                .headers()
+                .get("location")
+                .unwrap()
+                .to_str()
+                .unwrap();
+            let (_, query) = location.split_once('?').unwrap();
+            let ids = url::form_urlencoded::parse(query.as_bytes())
+                .find(|(name, _)| name == "ids")
+                .unwrap()
+                .1;
+            let ids: Vec<String> = serde_json::from_str(&ids).unwrap();
+            let expected_private = if pat == USER_USER_PAT {
+                private_id.as_str()
+            } else {
+                private_alias
+            };
+            assert_eq!(
+                ids,
+                [
+                    public_id.as_str(),
+                    expected_private,
+                    public_id.as_str(),
+                    "missing",
+                    expected_private
+                ]
+            );
+            assert_eq!(
+                response.headers().get("cache-control").unwrap(),
+                "private, no-store"
+            );
+        }
+    })
+    .await;
+}
+
+#[actix_rt::test]
+async fn project_slug_edit_invalidates_redirect_cache() {
+    with_test_environment_all(None, |env| async move {
+        let target_id = &env.dummy.project_beta.project_id;
+        let project_id = &env.dummy.project_alpha.project_id;
+        let alias = "redirect-claimed-slug";
+        let mut redis = env.db.redis_pool.connect().await.unwrap();
+        let key = redis.key().entity(PROJECT_REDIRECTS_NAMESPACE, alias);
+        redis
+            .set_serialized(
+                &key,
+                &Some(parse_base62(target_id).unwrap() as i64),
+                Some(300),
+            )
+            .await
+            .unwrap();
+
+        let response = env.api.get_project(alias, USER_USER_PAT).await;
+        assert_status!(&response, StatusCode::PERMANENT_REDIRECT);
+        assert!(
+            response
+                .headers()
+                .get("location")
+                .unwrap()
+                .to_str()
+                .unwrap()
+                .ends_with(target_id)
+        );
+
+        let response = env
+            .api
+            .edit_project(
+                project_id,
+                json!({ "slug": alias.to_uppercase() }),
+                USER_USER_PAT,
+            )
+            .await;
+        assert_status!(&response, StatusCode::NO_CONTENT);
+
+        let response = env.api.get_project(alias, USER_USER_PAT).await;
+        assert_status!(&response, StatusCode::OK);
+        assert!(!response.headers().contains_key("location"));
+        let project: CommonProject = test::read_body_json(response).await;
+        assert_eq!(project.id.to_string(), *project_id);
+    })
+    .await;
+}
+
+#[actix_rt::test]
+async fn project_redirect_cache_preserves_case_sensitive_ids() {
+    with_test_environment_all(None, |env| async move {
+        let project_id = &env.dummy.project_beta.project_id;
+        let target_id = &env.dummy.project_alpha.project_id;
+        let alias = project_id.to_lowercase();
+        assert_ne!(
+            project_id, &alias,
+            "fixture ID must contain uppercase letters"
+        );
+        assert_ne!(project_id, target_id);
+        let target = parse_base62(target_id).unwrap();
+        let fixture_sql = format!(
+            r#"INSERT INTO project_redirects (slug, target_project_id)
+			VALUES ('{alias}', {target})"#
+        );
+        sqlx::raw_sql(&fixture_sql)
+            .execute(&env.db.pool)
+            .await
+            .unwrap();
+
+        let mut redis = env.db.redis_pool.connect().await.unwrap();
+        let keys = [
+            redis.key().entity(PROJECT_REDIRECTS_NAMESPACE, project_id),
+            redis.key().entity(PROJECT_REDIRECTS_NAMESPACE, &alias),
+        ];
+        for alias_first in [false, true] {
+            redis.delete_many(&keys).await.unwrap();
+            let refs = if alias_first {
+                [alias.as_str(), project_id.as_str()]
+            } else {
+                [project_id.as_str(), alias.as_str()]
+            };
+            for project_ref in refs {
+                let response =
+                    env.api.get_project(project_ref, USER_USER_PAT).await;
+                if project_ref == alias {
+                    assert_status!(&response, StatusCode::PERMANENT_REDIRECT);
+                    assert!(
+                        response
+                            .headers()
+                            .get("location")
+                            .unwrap()
+                            .to_str()
+                            .unwrap()
+                            .ends_with(target_id)
+                    );
+                } else {
+                    assert_status!(&response, StatusCode::OK);
+                    assert!(!response.headers().contains_key("location"));
+                    let project: CommonProject =
+                        test::read_body_json(response).await;
+                    assert_eq!(project.id.to_string(), *project_id);
+                }
+            }
+
+            assert_eq!(
+                redis
+                    .get_deserialized::<Option<i64>>(&keys[0])
+                    .await
+                    .unwrap(),
+                Some(None)
+            );
+            assert_eq!(
+                redis
+                    .get_deserialized::<Option<i64>>(&keys[1])
+                    .await
+                    .unwrap(),
+                Some(Some(target as i64))
+            );
+
+            let mut body_refs = [project_id.clone(), alias.clone()];
+            labrinth::routes::resolve_body_refs(
+                body_refs.iter_mut().collect(),
+                &None,
+                &env.db.pool,
+                &env.db.redis_pool,
+            )
+            .await
+            .unwrap();
+            assert_eq!(body_refs, [project_id.clone(), target_id.clone()]);
+        }
     })
     .await;
 }

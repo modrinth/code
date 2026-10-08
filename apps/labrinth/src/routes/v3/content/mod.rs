@@ -66,7 +66,14 @@ pub async fn resolve_content(
         user_option: &user_option,
         trace: ResolveContentTrace::default(),
     };
-    let request = request.into_inner();
+    let mut request = request.into_inner();
+    crate::routes::resolve_body_refs(
+        vec![&mut request.project_id],
+        &user_option,
+        &pool,
+        &redis,
+    )
+    .await?;
     let plan = if cache_public_result {
         resolve_content_with_cache(&mut provider, request).await
     } else {

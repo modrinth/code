@@ -374,11 +374,15 @@ pub async fn project_create_internal(
         }
     } else {
         transaction.commit().await?;
+        let slug =
+            models::DBProject::get_id(project_id.into(), &**client, &redis)
+                .await?
+                .and_then(|project| project.inner.slug);
         super::projects::clear_project_cache_and_queue_search(
             &redis,
             &search_state,
             project_id.into(),
-            None,
+            slug,
             None,
         )
         .await?;
@@ -440,11 +444,15 @@ pub async fn project_create_with_id(
         }
     } else {
         transaction.commit().await?;
+        let slug =
+            models::DBProject::get_id(project_id.into(), &**client, &redis)
+                .await?
+                .and_then(|project| project.inner.slug);
         super::projects::clear_project_cache_and_queue_search(
             &redis,
             &search_state,
             project_id.into(),
-            None,
+            slug,
             None,
         )
         .await?;
