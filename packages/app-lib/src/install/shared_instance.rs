@@ -9,9 +9,10 @@ use super::runner::{
     install_pack, modpack_details, update_content_progress, update_progress,
 };
 use crate::api::instance::{
-    CONFIG_BUNDLE_FILE_TYPE, CONFIG_DIRECTORY, CONFIG_FILE_EXTENSIONS,
-    CONFIG_FILE_TYPE, CONFIG_SYNC_ENABLED, MAX_CONFIG_BUNDLE_ENTRIES,
-    MAX_CONFIG_BUNDLE_FILE_SIZE, read_bounded_config_bundle_entry,
+    CONFIG_BUNDLE_FILE_TYPE, CONFIG_DIRECTORY, CONFIG_FILE_TYPE,
+    CONFIG_SYNC_ENABLED, MAX_CONFIG_BUNDLE_ENTRIES,
+    MAX_CONFIG_BUNDLE_FILE_SIZE, is_shareable_config_path,
+    is_supported_config_file, read_bounded_config_bundle_entry,
     shared_modpack_files,
 };
 use crate::api::pack::install_from::CreatePackLocation;
@@ -377,8 +378,10 @@ async fn reinstall_shared_instance(
                 "The shared instance was updated, but its local options.txt could not be restored after removing the previous pack: {error}"
             );
         }
-        crate::api::instance::reconcile_instance_after_pack_update(instance_id)
-            .await?;
+        Box::pin(crate::api::instance::reconcile_instance_after_pack_update(
+            instance_id,
+        ))
+        .await?;
     }
     Ok(())
 }
@@ -1216,9 +1219,7 @@ async fn install_shared_instance_external_file(
     }
 
     if file.file_type == CONFIG_FILE_TYPE {
-        crate::state::content_store::validate_relative(&file.file_name)?;
-        if file.file_name.split('/').any(|part| part.starts_with('.'))
-            || !is_supported_config_file(std::path::Path::new(&file.file_name))
+        if !is_shareable_config_path(&file.file_name)
             || file.file_size > MAX_CONFIG_BUNDLE_FILE_SIZE
         {
             return Err(crate::ErrorKind::InputError(format!(
@@ -1449,14 +1450,4 @@ fn read_config_bundle(bytes: &[u8]) -> crate::Result<Vec<(PathBuf, Vec<u8>)>> {
     }
 
     Ok(files)
-}
-
-fn is_supported_config_file(path: &std::path::Path) -> bool {
-    path.extension()
-        .and_then(|extension| extension.to_str())
-        .is_some_and(|extension| {
-            CONFIG_FILE_EXTENSIONS
-                .iter()
-                .any(|candidate| extension.eq_ignore_ascii_case(candidate))
-        })
 }

@@ -53,7 +53,7 @@ pub(super) struct ExternalFileCandidate {
 #[derive(Clone, Debug)]
 pub(super) enum ExternalFileSource {
     InstanceFile(String),
-    ConfigBundle(std::sync::Arc<tempfile::TempPath>),
+    ConfigFile(std::path::PathBuf),
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -460,6 +460,32 @@ pub(super) async fn get_latest_remote_version_optional_unavailable_with_auth(
         auth,
     )
     .await
+}
+
+/// Returns `None` for versions that never became ready.
+pub(super) async fn get_remote_version(
+    shared_instance_id: &str,
+    version: i32,
+    state: &State,
+) -> crate::Result<Option<InstanceVersionResponse>> {
+    match request_json_optional_unavailable(
+        "get_instance_version",
+        Method::GET,
+        &format!("/instances/{shared_instance_id}/versions/{version}"),
+        None,
+        state,
+        SharedInstancesRequestAuth::ModrinthSession,
+    )
+    .await?
+    {
+        SharedInstanceRemoteResponse::Available(version) => Ok(Some(version)),
+        SharedInstanceRemoteResponse::Unavailable(
+            SharedInstanceUnavailableReason::Deleted,
+        ) => Ok(None),
+        SharedInstanceRemoteResponse::Unavailable(reason) => {
+            Err(shared_instance_unavailable_error(reason))
+        }
+    }
 }
 
 pub(super) async fn add_remote_users(

@@ -30,7 +30,6 @@ use std::collections::BTreeSet;
 use std::collections::{HashMap, HashSet};
 use std::io::Read;
 
-pub(crate) const CONFIG_BUNDLE_FILE_NAME: &str = "configs.zip";
 pub(crate) const CONFIG_BUNDLE_FILE_TYPE: &str = "configs";
 pub(crate) const CONFIG_FILE_TYPE: &str = "config";
 pub(crate) const CONFIG_SYNC_ENABLED: bool = true;
@@ -54,6 +53,23 @@ pub(crate) const CONFIG_FILE_EXTENSIONS: [&str; 14] = [
     "xml",
     "nbt",
 ];
+
+pub(crate) fn is_supported_config_file(path: &std::path::Path) -> bool {
+    path.extension()
+        .and_then(|extension| extension.to_str())
+        .is_some_and(|extension| {
+            CONFIG_FILE_EXTENSIONS
+                .iter()
+                .any(|candidate| extension.eq_ignore_ascii_case(candidate))
+        })
+}
+
+/// Whether members can install a shared config at this instance-relative path.
+pub(crate) fn is_shareable_config_path(path: &str) -> bool {
+    crate::state::content_store::validate_relative(path).is_ok()
+        && !path.split('/').any(|part| part.starts_with('.'))
+        && is_supported_config_file(std::path::Path::new(path))
+}
 
 pub(crate) fn read_bounded_config_bundle_entry(
     reader: impl Read,

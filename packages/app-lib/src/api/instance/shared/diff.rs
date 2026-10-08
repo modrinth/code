@@ -14,6 +14,7 @@ struct SharedContentSnapshot {
 pub(super) async fn shared_instance_update_diffs(
     metadata: &crate::state::InstanceMetadata,
     version: &InstanceVersionResponse,
+    config_files: &[ExternalFileResponse],
     state: &State,
 ) -> crate::Result<Vec<SharedInstanceUpdateDiff>> {
     let before_configuration = local_configuration(metadata);
@@ -43,8 +44,7 @@ pub(super) async fn shared_instance_update_diffs(
         state,
     )
     .await?;
-    let config_file_count = version
-        .external_files
+    let config_file_count = config_files
         .iter()
         .filter(|file| file.file_type == CONFIG_FILE_TYPE)
         .count();

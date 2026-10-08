@@ -1,5 +1,5 @@
 use super::client::*;
-use super::content::remote_shared_content;
+use super::content::{remote_shared_config_files, remote_shared_content};
 use super::diff::*;
 use super::icons::shared_instance_server_icon;
 use super::publish::*;
@@ -46,6 +46,7 @@ async fn install_shared_instance_inner(
         instance_icon_url,
         name,
         version,
+        None,
         &state,
     )
     .await?;
@@ -267,7 +268,15 @@ async fn get_shared_instance_update_preview_inner(
         .applied_version
         .is_none_or(|current| current < version.version);
     let diffs = if update_available {
-        shared_instance_update_diffs(&metadata, &version, &state).await?
+        let config_files = remote_shared_config_files(
+            &attachment.id,
+            attachment.applied_version,
+            &version,
+            &state,
+        )
+        .await?;
+        shared_instance_update_diffs(&metadata, &version, &config_files, &state)
+            .await?
     } else {
         Vec::new()
     };
@@ -365,6 +374,7 @@ async fn update_shared_instance_inner(
         None,
         metadata.instance.name,
         version,
+        attachment.applied_version,
         &state,
     )
     .await?;
@@ -588,6 +598,7 @@ pub(super) async fn shared_instance_install_data(
     instance_icon_url: Option<String>,
     name: String,
     version: InstanceVersionResponse,
+    applied_version: Option<i32>,
     state: &State,
 ) -> crate::Result<SharedInstanceInstallData> {
     version.validate_removed_files()?;
@@ -605,6 +616,13 @@ pub(super) async fn shared_instance_install_data(
                 return Err(shared_instance_unavailable_error(reason));
             }
         };
+    let config_files = remote_shared_config_files(
+        shared_instance_id,
+        applied_version,
+        &version,
+        state,
+    )
+    .await?;
     let (manager_id, server_manager_name, server_manager_icon_url) = if remote
         .linked_server
         .is_some()
@@ -652,28 +670,6 @@ pub(super) async fn shared_instance_install_data(
         })
         .collect();
 
-    let mut config_count = 0;
-    let mut config_size = 0_u64;
-    for file in &version.external_files {
-        if file.file_type == CONFIG_FILE_TYPE {
-            config_count += 1;
-            config_size = config_size.saturating_add(
-                file.file_size
-                    .and_then(|size| u64::try_from(size).ok())
-                    .unwrap_or(u64::MAX),
-            );
-        }
-    }
-    if config_count > MAX_CONFIG_BUNDLE_ENTRIES
-        || config_size > MAX_CONFIG_BUNDLE_TOTAL_SIZE
-    {
-        return Err(crate::ErrorKind::InputError(
-            "Shared instance config files exceed the size or file count limit"
-                .to_string(),
-        )
-        .into());
-    }
-
     Ok(SharedInstanceInstallData {
         linked_server: remote.linked_server,
         shared_instance_id: shared_instance_id.to_string(),
@@ -689,6 +685,13 @@ pub(super) async fn shared_instance_install_data(
         external_files: version
             .external_files
             .into_iter()
+            .filter(|file| {
+                !matches!(
+                    file.file_type.as_str(),
+                    CONFIG_BUNDLE_FILE_TYPE | CONFIG_FILE_TYPE
+                )
+            })
+            .chain(config_files)
             .map(shared_instance_external_file_data)
             .collect::<crate::Result<Vec<_>>>()?,
         modpack,

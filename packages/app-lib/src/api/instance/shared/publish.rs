@@ -6,9 +6,6 @@ use super::*;
 use async_walkdir::WalkDir;
 use futures::StreamExt;
 use sha2::Digest;
-use std::collections::BTreeMap;
-use std::path::{Path, PathBuf};
-use std::sync::Arc;
 
 #[tracing::instrument]
 pub async fn unpublish_shared_instance(instance_id: &str) -> crate::Result<()> {
@@ -671,42 +668,20 @@ pub(super) async fn publish_current_content(
     .await?;
     let modpack_id = shared_modpack_id(&metadata.link);
     let snapshot = collect_publish_snapshot(&metadata, state).await?;
-    let previous_version = if CONFIG_SYNC_ENABLED
-        && metadata
-            .shared_instance
-            .as_ref()
-            .and_then(|attachment| attachment.applied_version)
-            .is_some()
-    {
-        match get_latest_remote_version_optional_unavailable(
-            shared_instance_id,
-            state,
-        )
-        .await?
-        {
-            SharedInstanceRemoteResponse::Available(version) => Some(version),
-            SharedInstanceRemoteResponse::Unavailable(_) => None,
-        }
-    } else {
-        None
-    };
-    let config_bundle = if CONFIG_SYNC_ENABLED {
-        build_config_bundle_candidate(
+    let config_files = if CONFIG_SYNC_ENABLED {
+        config_file_candidates(
             &metadata.instance.path,
             &snapshot.config_files,
             config_paths,
-            previous_version.as_ref(),
             state,
         )
         .await?
     } else {
-        None
+        Vec::new()
     };
     let modrinth_ids = snapshot.version_ids;
     let mut external_files = snapshot.external_files;
-    if let Some(config_bundle) = config_bundle {
-        external_files.push(config_bundle);
-    }
+    external_files.extend(config_files);
     tracing::debug!(
         instance_id,
         shared_instance_id,
@@ -792,15 +767,16 @@ pub(super) async fn collect_config_files(
                 "Failed to read config directory: {error}"
             ))
         })?;
-        if !entry.file_type().await?.is_file()
-            || !is_supported_config_file(&entry.path())
-        {
+        if !entry.file_type().await?.is_file() {
             continue;
         }
 
         let entry_path = entry.path();
         let relative_path = entry_path.strip_prefix(&config_path)?;
         let path = relative_path.to_string_lossy().replace('\\', "/");
+        if !is_shareable_config_path(&format!("{CONFIG_DIRECTORY}/{path}")) {
+            continue;
+        }
         files.push(ConfigFile { path });
     }
 
@@ -808,245 +784,91 @@ pub(super) async fn collect_config_files(
     Ok(files)
 }
 
-fn is_supported_config_file(path: &std::path::Path) -> bool {
-    path.extension()
-        .and_then(|extension| extension.to_str())
-        .is_some_and(|extension| {
-            CONFIG_FILE_EXTENSIONS
-                .iter()
-                .any(|candidate| extension.eq_ignore_ascii_case(candidate))
-        })
-}
-
-async fn build_config_bundle_candidate(
+/// Each selected config is uploaded as its own file under the instance root,
+/// matching how linked servers publish configs.
+async fn config_file_candidates(
     instance_path: &str,
     local_files: &[ConfigFile],
     selected_paths: &[String],
-    previous_version: Option<&InstanceVersionResponse>,
     state: &State,
-) -> crate::Result<Option<ExternalFileCandidate>> {
+) -> crate::Result<Vec<ExternalFileCandidate>> {
+    let local_paths = local_files
+        .iter()
+        .map(|file| file.path.as_str())
+        .collect::<HashSet<_>>();
     let selected_paths = selected_paths
         .iter()
         .map(String::as_str)
-        .collect::<HashSet<_>>();
-    let local_files_by_path = local_files
+        .collect::<BTreeSet<_>>();
+    if let Some(missing) = selected_paths
         .iter()
-        .map(|file| (file.path.as_str(), file))
-        .collect::<HashMap<_, _>>();
-    for selected_path in &selected_paths {
-        if !local_files_by_path.contains_key(selected_path) {
-            return Err(crate::ErrorKind::InputError(format!(
-                "Config file is unavailable for sharing: {selected_path}"
-            ))
-            .into());
-        }
+        .find(|path| !local_paths.contains(*path))
+    {
+        return Err(crate::ErrorKind::InputError(format!(
+            "Config file is unavailable for sharing: {missing}"
+        ))
+        .into());
     }
+    ensure_config_file_count(&selected_paths)?;
 
-    let previous_bundle = previous_version.and_then(|version| {
-        version
-            .external_files
-            .iter()
-            .find(|file| file.file_type == CONFIG_BUNDLE_FILE_TYPE)
-    });
-    if previous_bundle.is_none() && selected_paths.is_empty() {
-        return Ok(None);
-    }
-
-    let previous_bundle = if let Some(previous_bundle) = previous_bundle {
-        let url = previous_bundle
-            .url
-            .as_deref()
-            .filter(|url| !url.is_empty())
-            .ok_or_else(|| {
-                crate::ErrorKind::InputError(
-                    "Shared instance config bundle is missing its download URL"
-                        .to_string(),
-                )
-            })?;
-        Some(
-            crate::util::fetch::fetch_file_mirrors(
-                &[url],
-                None,
-                None,
-                None,
-                &state.fetch_semaphore,
-                &state.pool,
-                None,
-            )
-            .await?,
-        )
-    } else {
-        None
-    };
     let config_path = state
         .directories
         .instances_dir()
         .join(instance_path)
         .join(CONFIG_DIRECTORY);
-    let selected_files = selected_paths
-        .into_iter()
-        .map(|path| (path.to_string(), config_path.join(path)))
-        .collect::<BTreeMap<_, _>>();
-    let bundle = tokio::task::spawn_blocking(move || {
-        let directory = tempfile::tempdir()?;
-        let mut entries = match &previous_bundle {
-            Some(bundle) => {
-                read_config_bundle(bundle.path(), directory.path())?
-            }
-            None => BTreeMap::new(),
-        };
-        entries.extend(selected_files);
-        config_bundle_file(&entries)
-    })
-    .await??;
+    let mut total_size = 0_u64;
+    let mut candidates = Vec::with_capacity(selected_paths.len());
+    for path in selected_paths {
+        let source = config_path.join(path);
+        let size = crate::util::io::metadata(&source).await?.len();
+        total_size = total_size.saturating_add(size);
+        if size > MAX_CONFIG_BUNDLE_FILE_SIZE
+            || total_size > MAX_CONFIG_BUNDLE_TOTAL_SIZE
+        {
+            return Err(crate::ErrorKind::InputError(
+                "Selected config files exceed the size limit for sharing"
+                    .to_string(),
+            )
+            .into());
+        }
+        candidates.push(ExternalFileCandidate {
+            file_name: format!("{CONFIG_DIRECTORY}/{path}"),
+            file_type: CONFIG_FILE_TYPE.to_string(),
+            source: ExternalFileSource::ConfigFile(source),
+        });
+    }
 
-    Ok(Some(ExternalFileCandidate {
-        file_name: CONFIG_BUNDLE_FILE_NAME.to_string(),
-        file_type: CONFIG_BUNDLE_FILE_TYPE.to_string(),
-        source: ExternalFileSource::ConfigBundle(Arc::new(bundle)),
-    }))
+    Ok(candidates)
 }
 
-fn config_bundle_file(
-    entries: &BTreeMap<String, PathBuf>,
-) -> crate::Result<tempfile::TempPath> {
-    if entries.len() > MAX_CONFIG_BUNDLE_ENTRIES {
-        let mut folder_entry_counts = HashMap::new();
-        for path in entries.keys() {
-            if let Some((folder, _)) = path.split_once('/') {
-                *folder_entry_counts.entry(folder).or_insert(0_usize) += 1;
-            }
-        }
+fn ensure_config_file_count(paths: &BTreeSet<&str>) -> crate::Result<()> {
+    if paths.len() <= MAX_CONFIG_BUNDLE_ENTRIES {
+        return Ok(());
+    }
 
-        if let Some((folder, count)) = folder_entry_counts
-            .into_iter()
-            .filter(|(_, count)| *count > MAX_CONFIG_BUNDLE_ENTRIES)
-            .max_by_key(|(_, count)| *count)
-        {
-            return Err(crate::ErrorKind::InputError(format!(
-				"The \"{folder}\" config folder has too many files to share ({count}; maximum {MAX_CONFIG_BUNDLE_ENTRIES}). Select fewer files from this folder."
-			))
-			.into());
+    let mut folder_entry_counts = HashMap::new();
+    for path in paths {
+        if let Some((folder, _)) = path.split_once('/') {
+            *folder_entry_counts.entry(folder).or_insert(0_usize) += 1;
         }
+    }
 
+    if let Some((folder, count)) = folder_entry_counts
+        .into_iter()
+        .filter(|(_, count)| *count > MAX_CONFIG_BUNDLE_ENTRIES)
+        .max_by_key(|(_, count)| *count)
+    {
         return Err(crate::ErrorKind::InputError(format!(
-			"Too many config files were selected to share ({}; maximum {MAX_CONFIG_BUNDLE_ENTRIES}). Select fewer files.",
-			entries.len()
+			"The \"{folder}\" config folder has too many files to share ({count}; maximum {MAX_CONFIG_BUNDLE_ENTRIES}). Select fewer files from this folder."
 		))
 		.into());
     }
-    let temporary = tempfile::NamedTempFile::new()?;
-    let mut writer = zip::ZipWriter::new(temporary);
-    let options = zip::write::SimpleFileOptions::default()
-        .compression_method(zip::CompressionMethod::Deflated);
-    let mut total_size = 0;
-    for (path, source) in entries {
-        let file = std::fs::File::open(source)?;
-        let declared_size = file.metadata()?.len();
-        writer
-            .start_file(path, options)
-            .map_err(std::io::Error::from)?;
-        copy_config_bundle_entry(
-            file,
-            declared_size,
-            &mut total_size,
-            &mut writer,
-        )?;
-    }
-    Ok(writer
-        .finish()
-        .map_err(std::io::Error::from)?
-        .into_temp_path())
-}
 
-fn copy_config_bundle_entry(
-    reader: impl std::io::Read,
-    declared_size: u64,
-    total_size: &mut u64,
-    writer: &mut impl std::io::Write,
-) -> crate::Result<()> {
-    let limit = MAX_CONFIG_BUNDLE_FILE_SIZE
-        .min(MAX_CONFIG_BUNDLE_TOTAL_SIZE.saturating_sub(*total_size));
-    if declared_size > limit {
-        return Err(crate::ErrorKind::InputError(
-            "Shared instance config bundle exceeds the uncompressed size limit"
-                .to_string(),
-        )
-        .into());
-    }
-    let size = std::io::copy(&mut reader.take(limit + 1), writer)?;
-    if size > limit {
-        return Err(crate::ErrorKind::InputError(
-            "Shared instance config bundle exceeds the uncompressed size limit"
-                .to_string(),
-        )
-        .into());
-    }
-    *total_size += size;
-    Ok(())
-}
-
-fn read_config_bundle(
-    path: &Path,
-    directory: &Path,
-) -> crate::Result<BTreeMap<String, PathBuf>> {
-    let mut archive = zip::ZipArchive::new(std::fs::File::open(path)?)
-        .map_err(|error| {
-            crate::ErrorKind::InputError(format!(
-                "Invalid shared instance config bundle: {error}"
-            ))
-        })?;
-    if archive.len() > MAX_CONFIG_BUNDLE_ENTRIES {
-        return Err(crate::ErrorKind::InputError(
-            "Shared instance config bundle contains too many entries"
-                .to_string(),
-        )
-        .into());
-    }
-    let mut entries = BTreeMap::new();
-    let mut total_size = 0;
-
-    for index in 0..archive.len() {
-        let file = archive.by_index(index).map_err(|error| {
-            crate::ErrorKind::InputError(format!(
-                "Invalid shared instance config bundle entry: {error}"
-            ))
-        })?;
-        if file.is_dir() {
-            continue;
-        }
-        let path = file.enclosed_name().ok_or_else(|| {
-            crate::ErrorKind::InputError(
-                "Shared instance config bundle contains an unsafe path"
-                    .to_string(),
-            )
-        })?;
-        if !is_supported_config_file(&path) {
-            return Err(crate::ErrorKind::InputError(format!(
-                "Shared instance config bundle contains unsupported file {}",
-                path.display()
-            ))
-            .into());
-        }
-        let path = path.to_string_lossy().replace('\\', "/");
-        let declared_size = file.size();
-        let destination = directory.join(index.to_string());
-        let mut output = std::fs::File::create(&destination)?;
-        copy_config_bundle_entry(
-            file,
-            declared_size,
-            &mut total_size,
-            &mut output,
-        )?;
-        if entries.insert(path.clone(), destination).is_some() {
-            return Err(crate::ErrorKind::InputError(format!(
-                "Shared instance config bundle contains duplicate file {path}"
-            ))
-            .into());
-        }
-    }
-
-    Ok(entries)
+    Err(crate::ErrorKind::InputError(format!(
+		"Too many config files were selected to share ({}; maximum {MAX_CONFIG_BUNDLE_ENTRIES}). Select fewer files.",
+		paths.len()
+	))
+	.into())
 }
 
 pub(super) fn shared_modpack_id(link: &InstanceLink) -> Option<String> {
@@ -1103,9 +925,9 @@ pub(super) async fn upload_external_files(
 					.ok_or_else(|| crate::state::content_store::input("Shared content file is not registered"))?;
                 state.content_store.read_path(&file, instance_path).await?
             }
-            ExternalFileSource::ConfigBundle(path) => {
+            ExternalFileSource::ConfigFile(path) => {
                 crate::state::content_store::ReadableContent::Local(
-                    path.as_ref().to_path_buf(),
+                    path.clone(),
                 )
             }
         };
