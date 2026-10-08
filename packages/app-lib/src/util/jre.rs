@@ -189,9 +189,7 @@ pub async fn get_all_jre(
 
 // Gets all JREs from the PATH env variable
 #[tracing::instrument]
-fn get_all_autoinstalled_jre_path(
-    base_path: &Path,
-) -> HashSet<PathBuf> {
+fn get_all_autoinstalled_jre_path(base_path: &Path) -> HashSet<PathBuf> {
     let mut jre_paths = HashSet::new();
 
     if base_path.is_dir()
