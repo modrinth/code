@@ -11,6 +11,7 @@ use quick_xml::Reader;
 use quick_xml::events::Event;
 use serde::Deserialize;
 use serde::Serialize;
+use sqlx::SqlitePool;
 use std::collections::VecDeque;
 use std::fmt::Debug;
 use std::fs::OpenOptions;
@@ -292,6 +293,7 @@ impl ProcessManager {
 
             let instance_id = metadata.instance_id.clone();
             let instance_path = metadata.instance_path.clone();
+            let pool = state.pool.clone();
             tokio::spawn(async move {
                 Process::process_output(
                     &instance_id,
@@ -299,6 +301,7 @@ impl ProcessManager {
                     stdout,
                     log_path_clone,
                     xml_logging,
+                    &pool,
                 )
                 .await;
             });
@@ -309,6 +312,7 @@ impl ProcessManager {
 
             let instance_id = metadata.instance_id.clone();
             let instance_path = metadata.instance_path.clone();
+            let pool = state.pool.clone();
             tokio::spawn(async move {
                 Process::process_output(
                     &instance_id,
@@ -316,6 +320,7 @@ impl ProcessManager {
                     stderr,
                     log_path_clone,
                     xml_logging,
+                    &pool,
                 )
                 .await;
             });
@@ -428,6 +433,7 @@ impl Process {
         reader: R,
         log_path: impl AsRef<Path>,
         xml_logging: bool,
+        pool: &SqlitePool,
     ) where
         R: tokio::io::AsyncRead + Unpin,
     {
@@ -588,6 +594,7 @@ impl Process {
 											instance_id,
 											&timestamp,
 											message,
+											pool,
                                         ).await {
                                             tracing::error!("Failed to handle server join logging: {e}");
                                         }
@@ -652,6 +659,7 @@ impl Process {
                     if let Err(e) = Self::maybe_handle_old_server_join_logging(
                         instance_id,
                         line.trim_ascii_end(),
+                        pool,
                     )
                     .await
                     {
@@ -765,6 +773,7 @@ impl Process {
         instance_id: &str,
         timestamp: &str,
         message: &str,
+        pool: &SqlitePool,
     ) -> crate::Result<()> {
         let timestamp = timestamp
             .parse::<i64>()
@@ -781,13 +790,19 @@ impl Process {
                     )
                 })
             })?;
-        Self::parse_and_insert_server_join(instance_id, message, timestamp)
-            .await
+        Self::parse_and_insert_server_join(
+            instance_id,
+            message,
+            timestamp,
+            pool,
+        )
+        .await
     }
 
     async fn maybe_handle_old_server_join_logging(
         instance_id: &str,
         line: &str,
+        pool: &SqlitePool,
     ) -> crate::Result<()> {
         if let Some((timestamp, message)) = line.split_once(" [CLIENT] [INFO] ")
         {
@@ -797,11 +812,21 @@ impl Process {
                     .map(|x| x.to_utc())
                     .single()
                     .unwrap_or_else(Utc::now);
-            Self::parse_and_insert_server_join(instance_id, message, timestamp)
-                .await
+            Self::parse_and_insert_server_join(
+                instance_id,
+                message,
+                timestamp,
+                pool,
+            )
+            .await
         } else {
-            Self::parse_and_insert_server_join(instance_id, line, Utc::now())
-                .await
+            Self::parse_and_insert_server_join(
+                instance_id,
+                line,
+                Utc::now(),
+                pool,
+            )
+            .await
         }
     }
 
@@ -809,6 +834,7 @@ impl Process {
         instance_id: &str,
         message: &str,
         timestamp: DateTime<Utc>,
+        pool: &SqlitePool,
     ) -> crate::Result<()> {
         let Some(host_port_string) = message.strip_prefix("Connecting to ")
         else {
@@ -822,14 +848,13 @@ impl Process {
             return Ok(());
         };
 
-        let state = crate::State::get().await?;
         crate::state::server_join_log::JoinLogEntry {
             instance_id: instance_id.to_owned(),
             host: host.to_string(),
             port,
             join_time: timestamp,
         }
-        .upsert(&state.pool)
+        .upsert(pool)
         .await?;
         {
             let instance_id = instance_id.to_owned();
