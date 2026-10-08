@@ -32,6 +32,7 @@ tracing-anyhow = { workspace = true }
 hex = { workspace = true }
 regex = { workspace = true }
 futures = { workspace = true }
+indexmap = { workspace = true }
 serde_json = { workspace = true }
 async_zip = { workspace = true, features = ["deflate"] }
 rust-s3 = { workspace = true }

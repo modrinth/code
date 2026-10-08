@@ -8038,6 +8038,7 @@ dependencies = [
  "figment",
  "futures",
  "hex",
+ "indexmap 2.14.2",
  "jiff",
  "modrinth-log",
  "regex",
