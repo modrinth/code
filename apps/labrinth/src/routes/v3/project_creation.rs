@@ -192,7 +192,10 @@ impl actix_web::ResponseError for CreateError {
                 | CreateError::ProjectVersionLimitReached
                 | CreateError::DailyVersionLimitReached => "limit_reached",
             },
-            description: self.to_string(),
+            description: match self {
+                Self::InternalError(error) => format!("{error:#}"),
+                _ => self.to_string(),
+            },
             details: None,
         })
     }
@@ -703,7 +706,7 @@ async fn project_create_inner(
             })?;
 
             let (file_name, file_extension) =
-                super::version_creation::get_name_ext(&content_disposition)?;
+                super::version_creation::get_name_and_extension(&content_disposition)?;
 
             if name == "icon" {
                 if icon_data.is_some() {
@@ -739,7 +742,7 @@ async fn project_create_inner(
                     .await?;
 
                     let (_, file_extension) =
-                        super::version_creation::get_name_ext(&content_disposition)?;
+                        super::version_creation::get_name_and_extension(&content_disposition)?;
 
                     let url = format!("data/{project_id}/images");
                     let upload_result = upload_image_optimized(
