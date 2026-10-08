@@ -45,6 +45,7 @@ export class Keybinds {
 	handle(event: KeyboardEvent, ctx: ModerationContext): boolean {
 		if (
 			ctx.scope !== 'global' &&
+			ctx.scope !== 'review-composer' &&
 			(event.target instanceof HTMLInputElement ||
 				event.target instanceof HTMLTextAreaElement ||
 				(event.target as HTMLElement)?.closest('.cm-editor') ||
@@ -55,14 +56,19 @@ export class Keybinds {
 		}
 
 		for (const [id, keybind] of Object.entries(keybinds)) {
-			if (ctx.scope !== keybind.scope) {
+			const reviewAction = ctx.scope === 'review-actions' ? keybind.reviewAction : undefined
+			if (ctx.scope !== keybind.scope && !reviewAction) {
 				continue
 			}
 
 			// The scope check above guarantees ctx matches keybind's expected context shape,
 			// but TS can't correlate that narrowing across these two independently-typed variables.
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			if (keybind.enabled && !keybind.enabled(ctx as any)) {
+			if (
+				reviewAction && ctx.scope === 'review-actions'
+					? !ctx.available(reviewAction)
+					: keybind.enabled && !keybind.enabled(ctx as any)
+			) {
 				continue
 			}
 
@@ -70,18 +76,24 @@ export class Keybinds {
 			const matches = definitions.some((def) => matchesKeybind(event, def))
 
 			if (matches) {
-				if (document.activeElement instanceof HTMLElement) {
+				if (
+					ctx.scope !== 'review-composer' &&
+					ctx.scope !== 'review-actions' &&
+					document.activeElement instanceof HTMLElement
+				) {
 					document.activeElement.blur()
 				}
 
 				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				keybind.action(ctx as any)
+				if (reviewAction && ctx.scope === 'review-actions') ctx.run(reviewAction)
+				else keybind.action(ctx as any)
 
 				const shouldPrevent = definitions.some((def) => def.preventDefault !== false)
 				if (shouldPrevent) {
 					event.preventDefault()
 				}
 
+				event.stopPropagation()
 				return true
 			}
 		}

@@ -6,13 +6,7 @@
 			class="grow"
 			:type="action.type"
 			:color="action.color"
-			:disabled="
-				!canSubmit ||
-				generating ||
-				advancingAction !== undefined ||
-				(action.color === 'green' && !canApprove) ||
-				project.status === action.status
-			"
+			:disabled="!actionAvailable(action.status)"
 			@click="submitDecisionAndContinue(action.status)"
 		>
 			<SpinnerIcon
@@ -35,6 +29,8 @@ import { useModerationSettings } from '~/composables/moderation'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 import { injectReviewMessages } from '~/providers/project-review/review-messages'
 import { injectReviewSubmission } from '~/providers/project-review/review-submission'
+
+import { useReviewShortcut } from './shortcuts'
 
 const { project, navigation, queue } = injectProjectReviewPageContext()
 const settings = useModerationSettings()
@@ -73,7 +69,27 @@ const actions = computed(() => [
 	},
 ])
 
+function actionAvailable(status: Parameters<typeof submitDecision>[0]) {
+	return (
+		canSubmit.value &&
+		!generating.value &&
+		advancingAction.value === undefined &&
+		project.value?.status !== status &&
+		(!['approved', 'unlisted', 'private'].includes(status) || canApprove.value)
+	)
+}
+for (const [index, action] of (['approve', 'withhold', 'reject'] as const).entries()) {
+	useReviewShortcut(
+		action,
+		() => {
+			void submitDecisionAndContinue(actions.value[index].status)
+		},
+		() => actionAvailable(actions.value[index].status),
+	)
+}
+
 async function submitDecisionAndContinue(status: Parameters<typeof submitDecision>[0]) {
+	if (!actionAvailable(status)) return
 	const id = project.value?.id
 	if (!id) return
 	advancingAction.value = status

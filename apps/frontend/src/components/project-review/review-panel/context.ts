@@ -1,5 +1,5 @@
 import { createContext } from '@modrinth/ui'
-import { useActiveElement, useEventListener, useRafFn } from '@vueuse/core'
+import { useEventListener, useRafFn } from '@vueuse/core'
 import {
 	computed,
 	nextTick,
@@ -103,12 +103,12 @@ export const [injectReviewContext, provideReviewContext] =
 export function createReviewContext(
 	projectId: Ref<string | undefined>,
 	isAvailable: (target: ReviewTarget) => boolean,
+	keyboardFocusedElement: Ref<HTMLElement | undefined>,
 ) {
 	const panelId = useId()
 	const activeAnchor = shallowRef<ReviewAnchor>()
 	const pendingAnchor = shallowRef<ReviewAnchor>()
 	const panel = shallowRef<HTMLElement | null>(null)
-	const focusedElement = useActiveElement()
 	const pinned = ref(false)
 	const revealedPanelId = ref<string>()
 	const popoverHovered = ref(false)
@@ -208,8 +208,8 @@ export function createReviewContext(
 	useActionKeybinds(activePanelElement)
 
 	function hasVisibleFocus(element: HTMLElement | null) {
-		const focused = focusedElement.value
-		return !!focused && !!element?.contains(focused) && focused.matches(':focus-visible')
+		const focused = keyboardFocusedElement.value
+		return !!focused && !!element?.contains(focused)
 	}
 
 	function registerInlinePanel(panel: InlineReviewPanel) {
@@ -510,6 +510,7 @@ export function createReviewContext(
 	return {
 		active,
 		activePanelId,
+		keyboardFocusedElement,
 		panel,
 		panelId,
 		pinned,

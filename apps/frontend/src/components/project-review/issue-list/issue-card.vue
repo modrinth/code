@@ -1,5 +1,6 @@
 <template>
 	<article
+		ref="card"
 		class="flex min-w-0 flex-col gap-2 rounded-xl border border-solid border-surface-3 bg-surface-2 p-2.5 text-sm"
 	>
 		<div class="flex min-w-0 flex-col gap-2">
@@ -284,6 +285,7 @@ import { injectReviewSubmission } from '~/providers/project-review/review-submis
 
 import { injectReviewContext } from '../review-panel/context'
 import Controls from '../review-panel/controls/index.vue'
+import { useReviewInteraction } from '../shortcuts'
 import IssueToggles from './issue-toggles.vue'
 
 const props = withDefaults(
@@ -325,8 +327,27 @@ const messageKey = computed(() =>
 )
 const { generating } = reviewMessages
 const { pending } = injectReviewSubmission()
+const card = ref<HTMLElement>()
 const expanded = ref(!!issue.value.custom && !props.resolved)
-const editingMessage = ref(!!issue.value.custom && !props.disabled && !props.resolved)
+const editingMessage = ref(
+	!!issue.value.custom &&
+		!issue.value.custom.message.trim() &&
+		!props.disabled &&
+		!props.resolved,
+)
+useReviewInteraction({
+	element: () => card.value,
+	collapse: () => {
+		expanded.value = !expanded.value
+	},
+	editable: () => !props.disabled && !props.resolved && !pending.value && !generating.value,
+	async edit() {
+		expanded.value = true
+		editingMessage.value = true
+		await nextTick()
+		await messageEditor.value?.focus()
+	},
+})
 const messageEditor = ref<{ focus: () => Promise<void> }>()
 watch(
 	[messageEditor, expanded, editingMessage, generating, pending, () => props.disabled],

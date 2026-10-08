@@ -1,5 +1,6 @@
 <template>
 	<article
+		ref="card"
 		class="version-card flex min-w-0 flex-col gap-3 overflow-clip rounded-2xl border border-solid bg-surface-2 p-2.5 pb-0.5 @container/review-version"
 		:class="withheld ? 'border-orange' : 'border-transparent'"
 	>
@@ -99,6 +100,7 @@
 				</div>
 			</div>
 			<Accordion
+				ref="detailsAccordion"
 				button-class="w-fit cursor-pointer border-0 bg-transparent py-2 text-left text-sm font-medium hover:[&>div]:brightness-125 [&>div>svg]:ml-0 [&>div>svg]:size-4"
 				:open-by-default="expanded"
 				overflow-visible
@@ -157,7 +159,7 @@
 						</dl>
 					</section>
 					<section class="min-w-0">
-						<div class="min-w-0">
+						<div ref="dependenciesSection" class="min-w-0">
 							<h3 class="sticky top-0 z-10 m-0 bg-surface-2 py-2 text-sm font-medium text-primary">
 								<button
 									v-if="version.dependencies.length > 6"
@@ -249,6 +251,7 @@
 							</div>
 						</div>
 						<Accordion
+							ref="changelogAccordion"
 							v-if="detailQuery.data.value?.changelog"
 							open-by-default
 							button-class="sticky top-0 z-10 w-full cursor-pointer border-0 bg-surface-2 py-2 text-left text-sm font-medium hover:[&>div]:brightness-125 [&>div>svg]:ml-0 [&>div>svg]:size-4"
@@ -330,6 +333,7 @@ import { injectProjectReviewPageContext } from '~/providers/project-review'
 import type { EditVersionStage } from '~/providers/version/manage-version-modal'
 
 import { projectReviewMessages as messages } from '../messages'
+import { useReviewInteraction } from '../shortcuts'
 
 const props = defineProps<{
 	version: Labrinth.Versions.v3.Version
@@ -350,6 +354,34 @@ const client = injectModrinthClient()
 const tags = injectTags(null)
 const { project, members } = injectProjectReviewPageContext()
 const dependenciesOpen = ref(false)
+const card = ref<HTMLElement>()
+const dependenciesSection = ref<HTMLElement>()
+const detailsAccordion = ref<InstanceType<typeof Accordion>>()
+const changelogAccordion = ref<InstanceType<typeof Accordion>>()
+function toggleAccordion(accordion: InstanceType<typeof Accordion> | undefined) {
+	if (!accordion) return
+	if (accordion.isOpen) accordion.close()
+	else accordion.open()
+}
+useReviewInteraction({
+	element: () => card.value,
+	editable: () => props.editable,
+	edit: () => emit('edit', 'metadata'),
+	collapse: () => toggleAccordion(detailsAccordion.value),
+})
+useReviewInteraction({
+	element: () =>
+		props.expanded && props.version.dependencies.length > 6 ? dependenciesSection.value : null,
+	collapse: () => {
+		dependenciesOpen.value = !dependenciesOpen.value
+	},
+})
+useReviewInteraction({
+	element: () => (props.expanded ? changelogAccordion.value?.$el : null),
+	editable: () => props.editable,
+	edit: () => emit('edit', 'add-details'),
+	collapse: () => toggleAccordion(changelogAccordion.value),
+})
 const withheld = computed(() => !!props.version.files_missing_attribution?.length)
 const platforms = computed(() =>
 	props.version.loaders.includes('mrpack')

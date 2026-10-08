@@ -1,5 +1,6 @@
 <template>
 	<button
+		ref="button"
 		v-tooltip="{ text: label, delay: 500 }"
 		type="button"
 		class="section-edit-button"
@@ -14,12 +15,19 @@
 <script setup lang="ts">
 import { EditIcon } from '@modrinth/assets'
 import { useVIntl } from '@modrinth/ui'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
+import { useReviewInteraction } from '../../shortcuts'
 
 import { projectReviewMessages as messages } from '../../messages'
 
 const props = defineProps<{ section: string }>()
 const emit = defineEmits<{ click: [] }>()
+const button = ref<HTMLButtonElement>()
+useReviewInteraction({
+	element: () => button.value?.closest<HTMLElement>('.editable-review-section'),
+	edit: () => button.value?.click(),
+	editable: () => !!button.value && !button.value.disabled,
+})
 const { formatMessage } = useVIntl()
 const label = computed(() => formatMessage(messages.editSection, { section: props.section }))
 </script>

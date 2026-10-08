@@ -100,6 +100,7 @@ import ModerationSettings from '~/components/ui/moderation/settings/ModerationSe
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
 import { injectProjectReviewContext } from './layout/context'
+import { useReviewShortcut } from './shortcuts'
 import { projectReviewMessages as messages } from './messages'
 
 const settingsModal = ref<InstanceType<typeof TabbedModal> | null>(null)
@@ -131,6 +132,27 @@ const {
 } = navigation
 const { formatMessage } = useVIntl()
 const disabled = computed(() => busy.value || isLoading.value || !queue.hydrated)
+useReviewShortcut(
+	'back',
+	() => {
+		void back()
+	},
+	() => !disabled.value && canGoBack.value,
+)
+useReviewShortcut(
+	'next',
+	() => {
+		void next()
+	},
+	() => !disabled.value && (inQueue.value || completed.value),
+)
+useReviewShortcut(
+	'exit',
+	() => {
+		void exit()
+	},
+	() => !busy.value,
+)
 </script>
 
 <style scoped>

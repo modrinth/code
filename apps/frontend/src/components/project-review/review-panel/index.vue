@@ -107,7 +107,7 @@
 import { InfoIcon } from '@modrinth/assets'
 import { moderationSettings } from '@modrinth/moderation'
 import { Tooltip, useVIntl } from '@modrinth/ui'
-import { useActiveElement, useElementHover } from '@vueuse/core'
+import { useElementHover } from '@vueuse/core'
 import { computed, nextTick, onScopeDispose, shallowRef, useId, watch } from 'vue'
 
 import { useModerationSettings } from '~/composables/moderation'
@@ -145,9 +145,14 @@ const inlineDropdowns = shallowRef(new Set<string>())
 const panelHovered = useElementHover(inlinePanel)
 const scopeHovered = useElementHover(() => props.interactionScope)
 const reviewContext = injectReviewContext()
-const { active, activePanelId, registerInlinePanel, registerDestination, setDropdownOpen } =
-	reviewContext
-const focusedElement = useActiveElement()
+const {
+	active,
+	activePanelId,
+	keyboardFocusedElement,
+	registerInlinePanel,
+	registerDestination,
+	setDropdownOpen,
+} = reviewContext
 const inlineActive = computed(() => activePanelId.value === id)
 const { formatMessage } = useVIntl()
 const settings = useModerationSettings()
@@ -168,9 +173,8 @@ watch(
 				scopeHovered: () => scopeHovered.value,
 				scopeElement: () => props.interactionScope ?? null,
 				focused: () =>
-					focusedElement.value !== inlinePanel.value &&
-					!!inlinePanel.value?.contains(focusedElement.value ?? null) &&
-					!!focusedElement.value?.matches(':focus-visible'),
+					keyboardFocusedElement.value !== inlinePanel.value &&
+					!!inlinePanel.value?.contains(keyboardFocusedElement.value ?? null),
 				dropdownOpen: () => inlineDropdowns.value.size > 0,
 			}),
 		)

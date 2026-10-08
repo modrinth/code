@@ -5,6 +5,7 @@
 			:header="formatMessage(reviewTabMessages.resetAllIssues)"
 			max-width="800px"
 			danger
+			:initial-focus="() => resetCancelButton?.element ?? null"
 		>
 			<div class="flex max-w-[35rem] flex-col gap-4">
 				<p class="m-0">{{ formatMessage(reviewTabMessages.resetIssuesDescription) }}</p>
@@ -12,7 +13,7 @@
 			</div>
 			<template #actions>
 				<div class="flex flex-wrap justify-end gap-2">
-					<Button @click="resetIssuesModal?.hide()">
+					<Button ref="resetCancelButton" @click="resetIssuesModal?.hide()">
 						<XIcon />
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</Button>
@@ -28,7 +29,7 @@
 						type="colored"
 						color="red"
 						:disabled="pending || resetting"
-						@click="resetIssuesModal?.hide(); resetIssues()"
+						@click="resetAllIssues"
 					>
 						<TrashIcon />
 						{{ formatMessage(reviewTabMessages.resetIssues) }}
@@ -63,7 +64,7 @@
 										<RotateCounterClockwiseIcon aria-hidden="true" />
 									</Button>
 								</Tooltip>
-								<IssuePicker @custom="activeReviewTab = 'issues'" />
+								<IssuePicker ref="issuePicker" @selected="activeReviewTab = 'issues'" />
 							</div>
 						</div>
 						<IssueList v-show="activeReviewTab === 'issues'" />
@@ -102,7 +103,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { useEventListener } from '@vueuse/core'
-import { computed, nextTick, onScopeDispose, ref, watch } from 'vue'
+import { computed, onScopeDispose, ref, watch } from 'vue'
 
 import { useModerationKeybinds } from '~/composables/moderation'
 import { isStaff } from '~/helpers/users.js'
@@ -142,9 +143,14 @@ import ProjectWideChecks from './project-wide-checks.vue'
 import QueueBar from './queue-bar.vue'
 import ReviewOutcomeButtons from './review-outcome-buttons.vue'
 import { createReviewContext, provideReviewContext } from './review-panel/context'
+import { createReviewShortcuts, provideReviewShortcuts, reviewShortcutBlocked } from './shortcuts'
 import TechReview from './tech-review/index.vue'
 import Versions from './versions/index.vue'
 
+const shortcuts = provideReviewShortcuts(createReviewShortcuts())
+function useShortcut(...args: Parameters<typeof shortcuts.register>) {
+	onScopeDispose(shortcuts.register(...args))
+}
 const { formatMessage } = useVIntl()
 const {
 	projectId,
@@ -211,7 +217,11 @@ const issueCount = computed(() => {
 	)
 })
 const reviewContext = provideReviewContext(
-	createReviewContext(reviewProjectId, (target) => !!panels.resolve(target)),
+	createReviewContext(
+		reviewProjectId,
+		(target) => !!panels.resolve(target),
+		shortcuts.keyboardFocusedElement,
+	),
 )
 const { pending, loadingAction } = provideReviewSubmission(
 	createReviewSubmission(messages, panels, session, previousIssues),
@@ -245,6 +255,8 @@ onScopeDispose(
 	}),
 )
 const resetIssuesModal = ref<InstanceType<typeof NewModal>>()
+const resetCancelButton = ref<InstanceType<typeof Button>>()
+const issuePicker = ref<InstanceType<typeof IssuePicker>>()
 const messageThread = ref<InstanceType<typeof MessageThread>>()
 const auth = useAuthState()
 const keybinds = useModerationKeybinds()
@@ -282,6 +294,11 @@ const reviewTabMessages = defineMessages({
 	},
 })
 
+function resetAllIssues() {
+	resetIssuesModal.value?.hide()
+	void resetIssues()
+}
+
 function revertCustomizations() {
 	if (!project.value || pending.value || resetting.value) return
 	messages.resetAllIssueMessages()
@@ -318,22 +335,34 @@ watch(projectId, () => {
 	resetIssuesModal.value?.hide()
 })
 
-async function openEditor() {
-	activeReviewTab.value = 'thread'
-	await nextTick()
-	await messageThread.value?.openEditor()
-}
+useShortcut('cycle-conversation', () => {
+	const tabs = ['issues', 'thread', ...(hasPreviousIssues.value ? ['re-review'] : [])]
+	activeReviewTab.value = tabs[(tabs.indexOf(activeReviewTab.value) + 1) % tabs.length]
+	shortcuts.run('reveal-right')
+})
+useShortcut(
+	'new-issue',
+	() => {
+		void issuePicker.value?.openPicker()
+	},
+	() => !!project.value && !isLoading.value && !pending.value,
+)
+useShortcut(
+	'reset',
+	() => resetIssuesModal.value?.show(),
+	() => !!project.value && !pending.value && !resetting.value,
+)
+useShortcut(
+	're-review',
+	() => {
+		activeReviewTab.value = 're-review'
+		shortcuts.run('reveal-right')
+	},
+	() => hasPreviousIssues.value,
+)
 
 useEventListener('keydown', (event) => {
-	if (!isStaff(auth.value.user) || event.defaultPrevented || event.repeat || event.isComposing)
-		return
-	const target = event.target
-	if (
-		target instanceof HTMLElement &&
-		(target.isContentEditable ||
-			target.closest('input, textarea, select, [role="textbox"], [role="dialog"]'))
-	)
-		return
-	keybinds.value.handle(event, { scope: 'review-conversation', openEditor })
+	if (!isStaff(auth.value.user) || reviewShortcutBlocked(event)) return
+	keybinds.value.handle(event, { scope: 'review-actions', ...shortcuts })
 })
 </script>

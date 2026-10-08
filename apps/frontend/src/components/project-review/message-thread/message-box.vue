@@ -64,12 +64,13 @@ import { Button, defineMessages, useVIntl } from '@modrinth/ui'
 import { useElementSize } from '@vueuse/core'
 import { computed, nextTick, ref } from 'vue'
 
-import { useModerationSettings } from '~/composables/moderation'
+import { useModerationKeybinds, useModerationSettings } from '~/composables/moderation'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 import { injectReviewSubmission } from '~/providers/project-review/review-submission'
 
 import TemplateMarkdownEditor from './template-markdown-editor.vue'
 
+const keybinds = useModerationKeybinds()
 const settings = useModerationSettings()
 const { project, projectV2 } = injectProjectReviewPageContext()
 const { formatMessage } = useVIntl()
@@ -129,15 +130,14 @@ function onKeydown(event: KeyboardEvent) {
 		event.preventDefault()
 		event.stopPropagation()
 		event.target.blur()
-	} else if (
-		event.key === 'Enter' &&
-		(event.ctrlKey || event.metaKey) &&
-		!event.altKey &&
-		!event.shiftKey
-	) {
-		event.preventDefault()
-		event.stopPropagation()
-		void submit('reply')
+	} else {
+		keybinds.value.handle(event, {
+			scope: 'review-composer',
+			canSend: () => canSubmit.value && !pending.value && !!draft.value.trim(),
+			send: (mode) => {
+				void submit(mode)
+			},
+		})
 	}
 }
 defineExpose({ openEditor })

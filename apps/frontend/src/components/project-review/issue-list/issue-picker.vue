@@ -40,7 +40,9 @@ import { injectReviewMessages } from '~/providers/project-review/review-messages
 import { injectReviewPanels, type ReviewIssue } from '~/providers/project-review/review-panels'
 import { injectReviewSubmission } from '~/providers/project-review/review-submission'
 
-const emit = defineEmits<{ custom: [] }>()
+import { injectReviewShortcuts } from '../shortcuts'
+
+const emit = defineEmits<{ selected: [] }>()
 const panels = injectReviewPanels()
 const reviewMessages = injectReviewMessages()
 const { pending } = injectReviewSubmission()
@@ -58,7 +60,8 @@ const messages = defineMessages({
 	},
 })
 const selected = computed(() => panels.activeIssues.value.map(({ id }) => id))
-const picker = ref<{ close: () => void }>()
+const picker = ref<{ close: () => void; open: () => Promise<void> }>()
+const shortcuts = injectReviewShortcuts()
 const draft = ref([...selected.value])
 const isOpen = ref(false)
 const options = computed<MultiSelectItem<string>[]>(() => {
@@ -113,8 +116,11 @@ function selectIssues(value: string[]) {
 	if (value.includes('add-custom-issue')) {
 		panels.addCustomIssue()
 		draft.value = [...selected.value]
-		emit('custom')
-	} else draft.value = value
+		emit('selected')
+	} else {
+		draft.value = value
+		emit('selected')
+	}
 	picker.value?.close()
 }
 
@@ -134,4 +140,10 @@ function close() {
 watch(selected, (value) => {
 	if (!isOpen.value) draft.value = [...value]
 })
+async function openPicker() {
+	if (pending.value) return
+	shortcuts.run('reveal-right')
+	await picker.value?.open()
+}
+defineExpose({ openPicker })
 </script>

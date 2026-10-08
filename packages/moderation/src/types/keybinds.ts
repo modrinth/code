@@ -76,14 +76,50 @@ export type ModerationContext =
 	| ModerationGlobalContext
 	| ModerationProjectReviewContext
 	| ModerationConversationContext
+	| ModerationReviewActionsContext
+	| ModerationReviewComposerContext
 
 export type ModerationConversationContext = {
 	scope: 'review-conversation'
 	openEditor: (mode: 'reply' | 'note') => void
 }
 
+export type ReviewShortcutAction =
+	| 'cycle-conversation'
+	| 'new-issue'
+	| 'toggle-left'
+	| 'toggle-right'
+	| 'reveal-right'
+	| 'toggle-bottom'
+	| 'back'
+	| 'next'
+	| 'exit'
+	| 'reset'
+	| 'approve'
+	| 'withhold'
+	| 'reject'
+	| 'edit'
+	| 'collapse'
+	| 're-review'
+	| 'reupload'
+	| 'rules'
+	| 'post-approval'
+
+export type ModerationReviewActionsContext = {
+	scope: 'review-actions'
+	available: (action: ReviewShortcutAction) => boolean
+	run: (action: ReviewShortcutAction) => void
+}
+
+export type ModerationReviewComposerContext = {
+	scope: 'review-composer'
+	canSend: () => boolean
+	send: (mode: 'reply' | 'note') => void
+}
+
 export interface KeybindDefinition {
 	key: string
+	mod?: boolean
 	ctrl?: boolean
 	shift?: boolean
 	alt?: boolean
@@ -114,20 +150,30 @@ export type KeybindGlobalListener = BaseKeybindListener<ModerationGlobalContext>
 export type KeybindProjectReviewListener = BaseKeybindListener<ModerationProjectReviewContext> & {
 	scope: 'project-review'
 }
-export type KeybindListener =
+export type KeybindListener = (
 	| KeybindProjectListener
 	| KeybindChecklistListener
 	| KeybindTechReviewListener
 	| KeybindGlobalListener
 	| KeybindProjectReviewListener
-	| (BaseKeybindListener<ModerationConversationContext> & { scope: 'review-conversation' })
+	| (BaseKeybindListener<ModerationConversationContext> & {
+			scope: 'review-conversation'
+	  })
+	| (BaseKeybindListener<ModerationReviewActionsContext> & {
+			scope: 'review-actions'
+	  })
+	| (BaseKeybindListener<ModerationReviewComposerContext> & {
+			scope: 'review-composer'
+	  })
+) & { reviewAction?: ReviewShortcutAction }
 
 export function parseKeybind(keybindString: string): KeybindDefinition {
 	const parts = keybindString.split('+').map((p) => p.trim().toLowerCase())
 
 	return {
 		key: parts.find((p) => !['ctrl', 'shift', 'alt', 'meta', 'cmd'].includes(p)) || '',
-		ctrl: parts.includes('ctrl') || parts.includes('cmd'),
+		mod: parts.includes('ctrl'),
+		ctrl: false,
 		shift: parts.includes('shift'),
 		alt: parts.includes('alt'),
 		meta: parts.includes('meta') || parts.includes('cmd'),
@@ -141,11 +187,14 @@ export function normalizeKeybind(keybind: KeybindDefinition | string): KeybindDe
 
 export function matchesKeybind(event: KeyboardEvent, keybind: KeybindDefinition | string): boolean {
 	const def = normalizeKeybind(keybind)
-	const wantsMod = !!(def.ctrl || def.meta)
-	const hasMod = event.ctrlKey || event.metaKey
+	const portableMod = def.mod || (def.ctrl && (def.meta || def.meta === undefined))
+	const modifiersMatch = portableMod
+		? event.ctrlKey || event.metaKey
+		: event.ctrlKey === !!def.ctrl && event.metaKey === !!def.meta
 	return (
-		event.key.toLowerCase() === def.key.toLowerCase() &&
-		hasMod === wantsMod &&
+		(event.key.toLowerCase() === def.key.toLowerCase() ||
+			(event.altKey && /^[a-z]$/i.test(def.key) && event.code === `Key${def.key.toUpperCase()}`)) &&
+		!!modifiersMatch &&
 		event.shiftKey === (def.shift ?? false) &&
 		event.altKey === (def.alt ?? false)
 	)
@@ -153,11 +202,38 @@ export function matchesKeybind(event: KeyboardEvent, keybind: KeybindDefinition 
 
 export function toKeybindDefinition(event: KeyboardEvent): KeybindDefinition {
 	return {
-		key: event.key.toLowerCase(),
+		key:
+			event.altKey && /^Key[A-Z]$/.test(event.code)
+				? event.code.slice(3).toLowerCase()
+				: event.key.toLowerCase(),
 		ctrl: event.ctrlKey,
 		shift: event.shiftKey,
 		alt: event.altKey,
 		meta: event.metaKey,
 		preventDefault: true,
 	}
+}
+
+export function formatKeybind(definition: KeybindDefinition, isMac: boolean): string {
+	const keys = []
+	if (definition.mod || (definition.ctrl && (definition.meta || definition.meta === undefined))) {
+		keys.push(isMac ? '⌘' : 'Ctrl')
+	} else {
+		if (definition.ctrl) keys.push(isMac ? '⌃' : 'Ctrl')
+		if (definition.meta) keys.push(isMac ? '⌘' : 'Meta')
+	}
+	if (definition.shift) keys.push(isMac ? '⇧' : 'Shift')
+	if (definition.alt) keys.push(isMac ? '⌥' : 'Alt')
+	const key = definition.key.toUpperCase()
+	const labels: Record<string, string> = {
+		ARROWLEFT: '←',
+		ARROWRIGHT: '→',
+		ARROWUP: '↑',
+		ARROWDOWN: '↓',
+		ENTER: '↵',
+		ESCAPE: 'Esc',
+		' ': 'Space',
+	}
+	keys.push(labels[key] ?? key)
+	return keys.join(' + ')
 }

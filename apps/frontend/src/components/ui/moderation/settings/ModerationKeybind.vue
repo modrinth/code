@@ -1,24 +1,18 @@
 <template>
 	<div>
 		<span class="flex flex-row items-center gap-2 text-sm text-secondary">
-			<BoxIcon
-				v-if="props.scope === 'project'"
-				v-tooltip="'Can be used without the checklist open if setting enabled.'"
-			/>
-			<GlobeIcon
-				v-if="props.scope === 'global'"
-				v-tooltip="'Can be used anywhere on the website.'"
-			/>
+			<BoxIcon v-if="props.scope === 'project'" v-tooltip="formatMessage(messages.projectScope)" />
+			<GlobeIcon v-if="props.scope === 'global'" v-tooltip="formatMessage(messages.globalScope)" />
 			<ShieldCheckIcon
 				v-if="props.scope === 'tech-review'"
-				v-tooltip="'Used within the tech review pages'"
+				v-tooltip="formatMessage(messages.techScope)"
 			/>
 			{{ props.title }}
 			<IconButton
 				type="quiet"
 				size="xs"
 				class="!size-6"
-				label="Reset to default"
+				:label="formatMessage(messages.reset)"
 				:disabled="!hasChanged"
 				@click="resetToDefault"
 			>
@@ -33,7 +27,7 @@
 				:class="{ editing: editing === 0 }"
 				@click="startEditing(0)"
 			>
-				Not Bound
+				{{ formatMessage(messages.notBound) }}
 			</kbd>
 			<kbd
 				v-for="(definition, index) in definitions"
@@ -54,9 +48,9 @@
 
 <script setup lang="ts">
 import { BoxIcon, GlobeIcon, RotateCounterClockwiseIcon, ShieldCheckIcon } from '@modrinth/assets'
-import { type KeybindDefinition, toKeybindDefinition } from '@modrinth/moderation'
-import { IconButton } from '@modrinth/ui'
-import { onUnmounted } from 'vue'
+import { type KeybindDefinition, formatKeybind, toKeybindDefinition } from '@modrinth/moderation'
+import { defineMessages, IconButton, useVIntl } from '@modrinth/ui'
+import { onMounted, onUnmounted } from 'vue'
 
 const props = defineProps<{
 	title: string
@@ -73,24 +67,49 @@ const hasChanged = computed(
 	() => JSON.stringify(definitions.value) !== JSON.stringify(props.default),
 )
 const isMac = ref(false)
+const { formatMessage } = useVIntl()
+const messages = defineMessages({
+	projectScope: {
+		id: 'moderation.keybinds.scope-project',
+		defaultMessage: 'Can be used without the checklist open if setting enabled.',
+	},
+	globalScope: {
+		id: 'moderation.keybinds.scope-global',
+		defaultMessage: 'Can be used anywhere on the website.',
+	},
+	techScope: {
+		id: 'moderation.keybinds.scope-tech',
+		defaultMessage: 'Used within the tech review pages.',
+	},
+	reset: {
+		id: 'moderation.keybinds.reset-default',
+		defaultMessage: 'Reset to default',
+	},
+	notBound: {
+		id: 'moderation.keybinds.not-bound',
+		defaultMessage: 'Not bound',
+	},
+})
 
 function startEditing(index: number) {
 	if (editing.value === index) {
 		stopEditing()
 	} else {
+		stopEditing()
 		editing.value = index
-		window.addEventListener('keyup', handleKeybinds)
+		window.addEventListener('keydown', handleKeybinds, true)
 		window.addEventListener('click', handleMouse)
 	}
 }
 
 function stopEditing() {
 	editing.value = -1
-	window.removeEventListener('keyup', handleKeybinds)
+	window.removeEventListener('keydown', handleKeybinds, true)
 	window.removeEventListener('click', handleMouse)
 }
 
 function resetToDefault() {
+	stopEditing()
 	definitions.value = JSON.parse(JSON.stringify(props.default))
 	props.onChange(definitions.value)
 }
@@ -109,6 +128,10 @@ function handleMouse(event: MouseEvent) {
 }
 
 function handleKeybinds(event: KeyboardEvent) {
+	event.preventDefault()
+	event.stopImmediatePropagation()
+	if (event.repeat || event.isComposing || ['Control', 'Meta', 'Alt', 'Shift'].includes(event.key))
+		return
 	if (event.key === 'Escape') {
 		definitions.value.splice(editing.value, 1)
 	} else if (definitions.value && definitions.value.length > 0) {
@@ -118,37 +141,16 @@ function handleKeybinds(event: KeyboardEvent) {
 	}
 	props.onChange(definitions.value)
 	stopEditing()
-
-	event.preventDefault()
-	event.stopPropagation()
 }
 
 function toDisplay(definition: KeybindDefinition): string {
-	const keys = []
-
-	if (definition.ctrl || definition.meta) {
-		keys.push(isMac.value ? 'CMD' : 'CTRL')
-	}
-	if (definition.shift) keys.push('SHIFT')
-	if (definition.alt) keys.push('ALT')
-
-	const mainKey = definition.key
-		.toUpperCase()
-		.replace('ARROWLEFT', '←')
-		.replace('ARROWRIGHT', '→')
-		.replace('ARROWUP', '↑')
-		.replace('ARROWDOWN', '↓')
-		.replace('ENTER', '↵')
-
-	keys.push(mainKey)
-
-	return keys.join(' + ')
+	return formatKeybind(definition, isMac.value)
 }
 
-onUnmounted(() => {
-	stopEditing()
+onMounted(() => {
 	isMac.value = navigator.platform.toUpperCase().includes('MAC')
 })
+onUnmounted(stopEditing)
 
 defineExpose({
 	setDefinitions(newDefinitions: KeybindDefinition[]) {

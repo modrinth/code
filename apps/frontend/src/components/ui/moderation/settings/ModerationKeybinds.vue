@@ -11,6 +11,7 @@ defineProps<{
 const keybinds = useModerationKeybinds()
 const { formatMessage } = useVIntl()
 const messages = defineMessages({
+	keybinds: { id: 'moderation.keybinds.title', defaultMessage: 'Keybinds' },
 	general: {
 		id: 'moderation.keybinds.general',
 		defaultMessage: 'General',
@@ -23,17 +24,21 @@ const messages = defineMessages({
 const groups = computed(() => {
 	const bindings = [...keybinds.value]
 	const isProjectReview = (scope: string) =>
-		scope === 'project-review' || scope === 'review-conversation'
+		scope === 'project-review' || scope === 'review-actions' || scope === 'review-composer'
 	return [
 		{
 			id: 'project-review',
 			title: formatMessage(messages.projectReview),
-			bindings: bindings.filter(([, binding]) => isProjectReview(binding.scope)),
+			bindings: bindings.filter(
+				([, binding]) => isProjectReview(binding.scope) || !!binding.reviewAction,
+			),
 		},
 		{
 			id: 'general',
 			title: formatMessage(messages.general),
-			bindings: bindings.filter(([, binding]) => !isProjectReview(binding.scope)),
+			bindings: bindings.filter(
+				([, binding]) => !isProjectReview(binding.scope) && !binding.reviewAction,
+			),
 		},
 	]
 })
@@ -41,7 +46,7 @@ const groups = computed(() => {
 
 <template>
 	<div :class="{ 'universal-card': !embedded }">
-		<h2 class="text-2xl">Keybinds</h2>
+		<h2 class="text-2xl">{{ formatMessage(messages.keybinds) }}</h2>
 		<section v-for="group in groups" :key="group.id" class="mt-6">
 			<h3 class="mb-4 text-lg font-semibold">{{ group.title }}</h3>
 			<div class="grid grid-cols-2 gap-x-12 gap-y-4">

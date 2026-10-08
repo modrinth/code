@@ -57,6 +57,7 @@ import { injectReviewPanels } from '~/providers/project-review/review-panels'
 
 import { injectReviewContext } from './review-panel/context'
 import ReviewPanel from './review-panel/index.vue'
+import { injectReviewShortcuts, useReviewShortcut } from './shortcuts'
 
 const { formatMessage } = useVIntl()
 const messages = defineMessages({
@@ -103,8 +104,17 @@ const { resolve } = injectReviewPanels()
 const targets = ['reupload', 'rules', 'post-approval'] as const
 type ActionTarget = (typeof targets)[number]
 const selectedTarget = ref<ActionTarget>('reupload')
+const shortcuts = injectReviewShortcuts()
 const { registerRoute } = injectReviewContext()
 for (const target of targets) {
+	useReviewShortcut(
+		target,
+		() => {
+			selectedTarget.value = target
+			shortcuts.run('reveal-right')
+		},
+		() => visibleTargets.value.includes(target),
+	)
 	onScopeDispose(
 		registerRoute(target, () => {
 			selectedTarget.value = target

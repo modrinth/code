@@ -1120,7 +1120,13 @@ function closeDropdown() {
 	})
 }
 
-defineExpose({ close: closeDropdown })
+defineExpose({
+	close: closeDropdown,
+	async open() {
+		await openDropdown()
+		if (isOpen.value) (searchInputRef.value as unknown as { focus: () => void } | null)?.focus()
+	},
+})
 
 function handleTriggerClick(event: MouseEvent) {
 	if (event.detail === 0) return
@@ -1430,6 +1436,12 @@ onUnmounted(() => {
 watch(isOpen, (value) => {
 	if (value) {
 		updateDropdownPosition()
+	}
+})
+
+watch(searchQuery, () => {
+	if (isOpen.value) {
+		focusedIndex.value = shouldShowSelectAll.value ? -2 : getFirstFocusableOptionIndex()
 	}
 })
 

@@ -26,6 +26,7 @@ import { useModerationKeybinds } from '~/composables/moderation'
 
 import { projectReviewMessages as messages } from '../messages'
 import { injectReviewContext } from '../review-panel/context'
+import { reviewShortcutBlocked, useReviewShortcut } from '../shortcuts'
 import ProjectReviewColumns from './columns.vue'
 import { provideProjectReviewContext } from './context'
 import { workspacePanelSizes } from './layout-storage'
@@ -63,17 +64,14 @@ watch(
 
 provideProjectReviewContext({ ...layout, slots })
 
+useReviewShortcut('toggle-left', () => layout.toggleSidebar('left'))
+useReviewShortcut('toggle-right', () => layout.toggleSidebar('right'))
+useReviewShortcut('reveal-right', () => layout.revealSlot('right'))
+useReviewShortcut('toggle-bottom', layout.toggleToolsPanel)
+
 const keybinds = useModerationKeybinds()
 useEventListener('keydown', (event) => {
-	if (event.defaultPrevented || event.repeat || event.isComposing) return
-	const target = event.target
-	if (
-		target instanceof HTMLElement &&
-		(target.isContentEditable ||
-			target.closest('input, textarea, select, [role="textbox"], [role="dialog"]'))
-	) {
-		return
-	}
+	if (reviewShortcutBlocked(event)) return
 	keybinds.value.handle(event, {
 		scope: 'project-review',
 		openTab: (tab) => {
