@@ -1091,6 +1091,7 @@ async fn run_request_inner(
                     job_state.clone(),
                     state.pool.clone(),
                 )),
+                state,
             )
             .await?;
             Ok(Some(instance_id))
@@ -1229,6 +1230,7 @@ async fn run_request_inner(
                     job_state.clone(),
                     state.pool.clone(),
                 )),
+                state,
             )
             .await?;
             emit_instance(&instance_id, InstancePayloadType::Edited).await?;
@@ -1262,6 +1264,7 @@ async fn run_request_inner(
                     job_state.clone(),
                     state.pool.clone(),
                 )),
+                state,
             )
             .await?;
             Ok(Some(instance_id))

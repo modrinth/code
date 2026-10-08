@@ -118,7 +118,7 @@ pub async fn import_gdlauncher(
     finish_import(
         instance_id,
         gdlauncher_instance_folder,
-        &state.io_semaphore,
+        &state,
         reporter,
         details,
     )

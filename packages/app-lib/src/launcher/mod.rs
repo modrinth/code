@@ -372,8 +372,10 @@ pub async fn resolve_minecraft_manifest(
     Ok((refreshed, idx))
 }
 
-async fn get_instance_full_path(instance_path: &str) -> crate::Result<PathBuf> {
-    let state = State::get().await?;
+fn get_instance_full_path(
+    instance_path: &str,
+    state: &State,
+) -> crate::Result<PathBuf> {
     let instances_dir = state.directories.instances_dir();
     let full_path = io::canonicalize(instances_dir.join(instance_path))?;
     Ok(full_path)
@@ -384,14 +386,16 @@ pub fn install_minecraft_with_reporter(
     context: &InstanceLaunchContext,
     repairing: bool,
     reporter: Option<InstallProgressReporter>,
-) -> impl Future<Output = crate::Result<()>> + Send + '_ {
-    Box::pin(install_minecraft_inner(context, repairing, reporter))
+    state: &State,
+) -> impl Future<Output = crate::Result<()>> + Send {
+    Box::pin(install_minecraft_inner(context, repairing, reporter, state))
 }
 
 async fn install_minecraft_inner(
     context: &InstanceLaunchContext,
     repairing: bool,
     reporter: Option<InstallProgressReporter>,
+    state: &State,
 ) -> crate::Result<()> {
     let instance = &context.instance;
     let content_set = &context.applied_content_set;
@@ -416,7 +420,6 @@ async fn install_minecraft_inner(
         None
     };
 
-    let state = State::get().await?;
     let _runtime_lease = state.content_store.runtime_cache_lock.read().await;
     let previous_install_stage = instance.install_stage;
 
@@ -429,7 +432,7 @@ async fn install_minecraft_inner(
     emit_instance(&instance.id, InstancePayloadType::Edited).await?;
 
     let result = Box::pin(async {
-    let instance_path = get_instance_full_path(&instance.path).await?;
+    let instance_path = get_instance_full_path(&instance.path, state)?;
     if let Some(reporter) = &reporter {
         reporter
             .update(
@@ -440,7 +443,7 @@ async fn install_minecraft_inner(
             .await?;
     }
     let (minecraft, version_index) =
-        resolve_minecraft_manifest(&content_set.game_version, &state).await?;
+        resolve_minecraft_manifest(&content_set.game_version, state).await?;
     let version = &minecraft.versions[version_index];
     let minecraft_updated = version_index
         <= minecraft
@@ -492,7 +495,7 @@ async fn install_minecraft_inner(
 
     // Download version info (5)
     let mut version_info = download::download_version_info(
-        &state,
+        state,
         version,
         loader_version.as_ref(),
         Some(repairing),
@@ -573,7 +576,7 @@ async fn install_minecraft_inner(
             .await?;
     }
 	download::download_minecraft(
-		&state,
+		state,
 		&version_info,
 		loading_bar.as_ref(),
 		&java_version.architecture,
@@ -795,8 +798,8 @@ pub async fn install_minecraft_for_instance_id_with_reporter(
     instance_id: &str,
     repairing: bool,
     reporter: Option<InstallProgressReporter>,
+    state: &State,
 ) -> crate::Result<()> {
-    let state = State::get().await?;
     let context =
         crate::state::instances::commands::get_instance_launch_context(
             instance_id,
@@ -809,7 +812,7 @@ pub async fn install_minecraft_for_instance_id_with_reporter(
             ))
         })?;
 
-    install_minecraft_with_reporter(&context, repairing, reporter).await
+    install_minecraft_with_reporter(&context, repairing, reporter, state).await
 }
 
 pub async fn read_protocol_version_from_jar(
@@ -909,7 +912,7 @@ pub async fn launch_minecraft(
     let state = State::get().await?;
     let mut runtime_lease = state.content_store.runtime_cache_lock.read().await;
 
-    let instance_path = get_instance_full_path(&instance.path).await?;
+    let instance_path = get_instance_full_path(&instance.path, &state)?;
 
     let (minecraft, version_index) =
         resolve_minecraft_manifest(&content_set.game_version, &state).await?;

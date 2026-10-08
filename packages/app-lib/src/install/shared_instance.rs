@@ -720,6 +720,7 @@ async fn apply_shared_instance_content_inner(
                 job_state.clone(),
                 state.pool.clone(),
             )),
+            state,
         )
         .await?;
     }

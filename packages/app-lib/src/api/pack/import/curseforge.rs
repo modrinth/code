@@ -177,7 +177,7 @@ pub async fn import_curseforge(
     finish_import(
         instance_id,
         curseforge_instance_folder,
-        &state.io_semaphore,
+        &state,
         reporter,
         details,
     )
