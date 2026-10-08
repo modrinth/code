@@ -100,8 +100,8 @@ import ModerationSettings from '~/components/ui/moderation/settings/ModerationSe
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
 import { injectProjectReviewContext } from './layout/context'
-import { useReviewShortcut } from './shortcuts'
 import { projectReviewMessages as messages } from './messages'
+import { useReviewShortcut } from './shortcuts'
 
 const settingsModal = ref<InstanceType<typeof TabbedModal> | null>(null)
 const settingsTabs: TabbedModalTab[] = [

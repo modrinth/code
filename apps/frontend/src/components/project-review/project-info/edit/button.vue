@@ -16,9 +16,9 @@
 import { EditIcon } from '@modrinth/assets'
 import { useVIntl } from '@modrinth/ui'
 import { computed, ref } from 'vue'
-import { useReviewInteraction } from '../../shortcuts'
 
 import { projectReviewMessages as messages } from '../../messages'
+import { useReviewInteraction } from '../../shortcuts'
 
 const props = defineProps<{ section: string }>()
 const emit = defineEmits<{ click: [] }>()

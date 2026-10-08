@@ -1,5 +1,6 @@
 import keybinds from '../data/keybinds.ts'
 import {
+	type BaseKeybindListener,
 	type KeybindDefinition,
 	type KeybindListener,
 	matchesKeybind,
@@ -11,6 +12,41 @@ function normalizeKeybinds(
 	keybind: KeybindDefinition | KeybindDefinition[] | string | string[],
 ): KeybindDefinition[] {
 	return Array.isArray(keybind) ? keybind.map(normalizeKeybind) : [normalizeKeybind(keybind)]
+}
+
+function bindKeybind<T>(keybind: BaseKeybindListener<T>, ctx: T) {
+	return {
+		enabled: () => keybind.enabled?.(ctx) ?? true,
+		run: () => keybind.action(ctx),
+	}
+}
+
+function scopedKeybind(keybind: KeybindListener, ctx: ModerationContext) {
+	if (ctx.scope === 'review-actions' && keybind.reviewAction) {
+		const action = keybind.reviewAction
+		return {
+			enabled: () => ctx.available(action),
+			run: () => ctx.run(action),
+		}
+	}
+	switch (ctx.scope) {
+		case 'project':
+			return keybind.scope === 'project' ? bindKeybind(keybind, ctx) : undefined
+		case 'checklist':
+			return keybind.scope === 'checklist' ? bindKeybind(keybind, ctx) : undefined
+		case 'tech-review':
+			return keybind.scope === 'tech-review' ? bindKeybind(keybind, ctx) : undefined
+		case 'global':
+			return keybind.scope === 'global' ? bindKeybind(keybind, ctx) : undefined
+		case 'project-review':
+			return keybind.scope === 'project-review' ? bindKeybind(keybind, ctx) : undefined
+		case 'review-conversation':
+			return keybind.scope === 'review-conversation' ? bindKeybind(keybind, ctx) : undefined
+		case 'review-actions':
+			return keybind.scope === 'review-actions' ? bindKeybind(keybind, ctx) : undefined
+		case 'review-composer':
+			return keybind.scope === 'review-composer' ? bindKeybind(keybind, ctx) : undefined
+	}
 }
 
 export type KeybindListenerWithDefault = KeybindListener & {
@@ -56,21 +92,8 @@ export class Keybinds {
 		}
 
 		for (const [id, keybind] of Object.entries(keybinds)) {
-			const reviewAction = ctx.scope === 'review-actions' ? keybind.reviewAction : undefined
-			if (ctx.scope !== keybind.scope && !reviewAction) {
-				continue
-			}
-
-			// The scope check above guarantees ctx matches keybind's expected context shape,
-			// but TS can't correlate that narrowing across these two independently-typed variables.
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			if (
-				reviewAction && ctx.scope === 'review-actions'
-					? !ctx.available(reviewAction)
-					: keybind.enabled && !keybind.enabled(ctx as any)
-			) {
-				continue
-			}
+			const binding = scopedKeybind(keybind, ctx)
+			if (!binding?.enabled()) continue
 
 			const definitions = this.configured[id] ?? normalizeKeybinds(keybind.keybind)
 			const matches = definitions.some((def) => matchesKeybind(event, def))
@@ -84,9 +107,7 @@ export class Keybinds {
 					document.activeElement.blur()
 				}
 
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				if (reviewAction && ctx.scope === 'review-actions') ctx.run(reviewAction)
-				else keybind.action(ctx as any)
+				binding.run()
 
 				const shouldPrevent = definitions.some((def) => def.preventDefault !== false)
 				if (shouldPrevent) {

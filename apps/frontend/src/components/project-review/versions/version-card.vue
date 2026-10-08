@@ -251,8 +251,8 @@
 							</div>
 						</div>
 						<Accordion
-							ref="changelogAccordion"
 							v-if="detailQuery.data.value?.changelog"
+							ref="changelogAccordion"
 							open-by-default
 							button-class="sticky top-0 z-10 w-full cursor-pointer border-0 bg-surface-2 py-2 text-left text-sm font-medium hover:[&>div]:brightness-125 [&>div>svg]:ml-0 [&>div>svg]:size-4"
 						>

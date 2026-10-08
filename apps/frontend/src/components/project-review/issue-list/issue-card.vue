@@ -261,11 +261,11 @@ import { issueTargetLabels } from '@modrinth/moderation/src/data/issues/componen
 import {
 	Button,
 	Combobox,
-	Input,
-	MultiSelect,
 	commonMessages,
 	defineMessages,
+	Input,
 	MarkdownEditor,
+	MultiSelect,
 	Tooltip,
 	useVIntl,
 } from '@modrinth/ui'
@@ -330,10 +330,7 @@ const { pending } = injectReviewSubmission()
 const card = ref<HTMLElement>()
 const expanded = ref(!!issue.value.custom && !props.resolved)
 const editingMessage = ref(
-	!!issue.value.custom &&
-		!issue.value.custom.message.trim() &&
-		!props.disabled &&
-		!props.resolved,
+	!!issue.value.custom && !issue.value.custom.message.trim() && !props.disabled && !props.resolved,
 )
 useReviewInteraction({
 	element: () => card.value,

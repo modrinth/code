@@ -48,7 +48,7 @@
 
 <script setup lang="ts">
 import { BoxIcon, GlobeIcon, RotateCounterClockwiseIcon, ShieldCheckIcon } from '@modrinth/assets'
-import { type KeybindDefinition, formatKeybind, toKeybindDefinition } from '@modrinth/moderation'
+import { formatKeybind, type KeybindDefinition, toKeybindDefinition } from '@modrinth/moderation'
 import { defineMessages, IconButton, useVIntl } from '@modrinth/ui'
 import { onMounted, onUnmounted } from 'vue'
 

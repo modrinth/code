@@ -3062,8 +3062,26 @@
   "moderation.keybinds.general": {
     "message": "General"
   },
+  "moderation.keybinds.not-bound": {
+    "message": "Not bound"
+  },
   "moderation.keybinds.project-review": {
     "message": "Project review page"
+  },
+  "moderation.keybinds.reset-default": {
+    "message": "Reset to default"
+  },
+  "moderation.keybinds.scope-global": {
+    "message": "Can be used anywhere on the website."
+  },
+  "moderation.keybinds.scope-project": {
+    "message": "Can be used without the checklist open if setting enabled."
+  },
+  "moderation.keybinds.scope-tech": {
+    "message": "Used within the tech review pages."
+  },
+  "moderation.keybinds.title": {
+    "message": "Keybinds"
   },
   "moderation.moderate": {
     "message": "Moderate"
@@ -4178,6 +4196,39 @@
   "project-review.issues.choose-option": {
     "message": "Choose at least one option for this issue."
   },
+  "project-review.issues.custom": {
+    "message": "Custom issue"
+  },
+  "project-review.issues.custom-acknowledge-checkbox": {
+    "message": "Acknowledge checkbox"
+  },
+  "project-review.issues.custom-acknowledge-reply": {
+    "message": "Acknowledge reply"
+  },
+  "project-review.issues.custom-actions": {
+    "message": "Actions"
+  },
+  "project-review.issues.custom-add-facets": {
+    "message": "Add actions"
+  },
+  "project-review.issues.custom-id": {
+    "message": "Issue ID"
+  },
+  "project-review.issues.custom-id-invalid": {
+    "message": "Enter a unique, non-empty issue ID."
+  },
+  "project-review.issues.custom-message-required": {
+    "message": "Enter a message for this custom issue."
+  },
+  "project-review.issues.custom-placeholder": {
+    "message": "Enter custom issue message..."
+  },
+  "project-review.issues.custom-priority": {
+    "message": "Priority"
+  },
+  "project-review.issues.custom-search-facets": {
+    "message": "Search actions…"
+  },
   "project-review.issues.edited": {
     "message": "(Edited)"
   },
@@ -4225,6 +4276,12 @@
   },
   "project-review.issues.resolved": {
     "message": "Resolved issues"
+  },
+  "project-review.issues.revert-all-customizations": {
+    "message": "Revert all customizations"
+  },
+  "project-review.issues.revert-customizations-description": {
+    "message": "Revert all customizations restores default issue messages while keeping custom issue messages and all issue toggles and selections."
   },
   "project-review.issues.search": {
     "message": "Search issues…"
