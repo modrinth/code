@@ -210,7 +210,10 @@ async fn recover_unrecorded_instance_update_backup(
     Ok(())
 }
 
-pub(super) async fn clear_staging_dir(job_state: &InstallJobState) {
+pub(super) async fn clear_staging_dir(
+    job_state: &InstallJobState,
+    state: &State,
+) {
     let Some(staging_dir) = &job_state.paths.staging_dir else {
         return;
     };
@@ -223,9 +226,7 @@ pub(super) async fn clear_staging_dir(job_state: &InstallJobState) {
         );
         return;
     }
-    if let Some(state) = State::get_if_initialized()
-        && let Some(owner) =
-            staging_dir.file_name().and_then(|name| name.to_str())
+    if let Some(owner) = staging_dir.file_name().and_then(|name| name.to_str())
         && let Err(error) = state.content_store.release("rollback", owner).await
     {
         tracing::warn!(
@@ -583,7 +584,7 @@ async fn recover_interrupted_job_inner(
         .await?
         {
             store::dismiss(job.id, &state.pool).await?;
-            clear_staging_dir(&job.state).await;
+            clear_staging_dir(&job.state, state).await;
             emit_install_job(&record.snapshot()).await?;
         }
 
@@ -642,7 +643,7 @@ async fn recover_interrupted_job_inner(
     .await?
     {
         if cleanup_succeeded {
-            clear_staging_dir(&job.state).await;
+            clear_staging_dir(&job.state, state).await;
         }
         emit_install_job(&record.snapshot()).await?;
     }
