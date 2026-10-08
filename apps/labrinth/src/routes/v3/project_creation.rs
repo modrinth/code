@@ -248,7 +248,7 @@ pub struct ProjectCreateData {
     #[serde(default)]
     pub link_urls: HashMap<String, String>,
 
-    /// An optional boolean. If true, the project will be created as a draft.
+    /// Projects are always created as drafts; explicitly setting false is rejected.
     pub is_draft: Option<bool>,
 
     /// The license id that the project follows
@@ -559,6 +559,12 @@ async fn project_create_inner(
             );
         }
         let create_data: ProjectCreateData = serde_json::from_slice(&data)?;
+
+        if create_data.is_draft == Some(false) {
+            return Err(CreateError::InvalidInput(String::from(
+                "projects must be created as drafts; `is_draft` cannot be false",
+            )));
+        }
 
         create_data.validate().map_err(|err| {
             CreateError::InvalidInput(validation_errors_to_string(err, None))
@@ -914,17 +920,7 @@ async fn project_create_inner(
 
         let team_id = team.insert(&mut *transaction).await?;
 
-        let status;
-        if project_create_data.is_draft.unwrap_or(false) {
-            status = ProjectStatus::Draft;
-        } else {
-            status = ProjectStatus::Processing;
-            if project_create_data.initial_versions.is_empty() {
-                return Err(CreateError::InvalidInput(String::from(
-                    "Project submitted for review with no initial versions",
-                )));
-            }
-        }
+        let status = ProjectStatus::Draft;
 
         let license_id = spdx::Expression::parse(
             &project_create_data.license_id,
