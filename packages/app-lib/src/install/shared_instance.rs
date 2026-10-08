@@ -177,6 +177,7 @@ struct SharedInstanceApplyPlan {
     config_bundle: Option<SharedInstanceExternalFileData>,
     config_files: Vec<SharedInstanceExternalFileData>,
     modpack_toggles: Vec<(String, bool)>,
+    modpack_removals: Vec<String>,
 }
 
 impl SharedInstanceApplyPlan {
@@ -194,9 +195,9 @@ impl SharedInstanceApplyPlan {
 
         let current = current_shared_instance_content(metadata, state).await?;
         let desired = desired_shared_instance_content(data, state).await?;
-        let (modpack_toggles, missing_inherited_file) =
+        let modpack_changes =
             shared_modpack_toggles(metadata, data, state).await?;
-        if missing_inherited_file {
+        if modpack_changes.missing {
             return Ok(Self {
                 configuration_changed: true,
                 ..Default::default()
@@ -221,7 +222,8 @@ impl SharedInstanceApplyPlan {
             external_removals,
             config_bundle: desired.config_bundle,
             config_files: desired.config_files,
-            modpack_toggles,
+            modpack_toggles: modpack_changes.toggles,
+            modpack_removals: modpack_changes.removals,
             ..Default::default()
         };
 
@@ -425,6 +427,15 @@ async fn apply_shared_instance_changes(
         crate::state::instances::commands::remove_project(
             instance_id,
             &file.relative_path,
+            state,
+        )
+        .await?;
+    }
+
+    for path in plan.modpack_removals {
+        crate::state::instances::commands::remove_project(
+            instance_id,
+            &path,
             state,
         )
         .await?;
@@ -647,7 +658,7 @@ async fn shared_modpack_toggles(
     metadata: &crate::state::InstanceMetadata,
     data: &SharedInstanceInstallData,
     state: &State,
-) -> crate::Result<(Vec<(String, bool)>, bool)> {
+) -> crate::Result<SharedModpackChanges> {
     for removed in &data.removed_files {
         removed.validate()?;
     }
@@ -658,7 +669,7 @@ async fn shared_modpack_toggles(
             )
             .into());
         }
-        return Ok((Vec::new(), false));
+        return Ok(SharedModpackChanges::default());
     };
     let inherited = shared_modpack_files(&modpack.version_id, state).await?;
     let entries = content_rows::get_content_entries(
@@ -672,8 +683,7 @@ async fn shared_modpack_toggles(
             .into_iter()
             .map(|file| (file.id.clone(), file))
             .collect::<HashMap<_, _>>();
-    let mut toggles = Vec::new();
-    let mut missing = false;
+    let mut changes = SharedModpackChanges::default();
     for inherited in inherited {
         let overridden = data.external_files.iter().any(|file| {
             ProjectType::from_name(&file.file_type).is_some_and(|kind| {
@@ -681,7 +691,8 @@ async fn shared_modpack_toggles(
                     == format!("{}/{}", kind.get_folder(), file.file_name)
             })
         });
-        let enabled = !inherited.is_removed(&data.removed_files) && !overridden;
+        let removed = inherited.is_removed(&data.removed_files);
+        let enabled = !removed && !overridden;
         let current = entries
             .iter()
             .filter(|entry| {
@@ -702,18 +713,30 @@ async fn shared_modpack_toggles(
                 .then_some((entry, file))
             });
         if let Some((entry, file)) = current {
-            if file.enabled != enabled
+            if removed {
+                changes.removals.push(file.relative_path.clone());
+            } else if file.enabled != enabled
                 || entry.enabled != enabled
                 || (enabled && file.missing)
             {
-                toggles.push((file.relative_path.clone(), enabled));
+                changes.toggles.push((file.relative_path.clone(), enabled));
             }
         } else if enabled {
             // An explicit file can replace the pack's entry at the same path. Reinstall the pack to restore its bytes.
-            missing = true;
+            changes.missing = true;
         }
     }
-    Ok((toggles, missing))
+    Ok(changes)
+}
+
+/// Inherited modpack file changes needed to match what the server shares.
+///
+/// Files the server does not share with players are removed rather than disabled.
+#[derive(Default)]
+struct SharedModpackChanges {
+    toggles: Vec<(String, bool)>,
+    removals: Vec<String>,
+    missing: bool,
 }
 
 async fn ensure_shared_instance_additions_enabled(
@@ -1021,15 +1044,22 @@ async fn install_shared_instance_additions(
     .ok_or_else(|| {
         crate::ErrorKind::InputError("Unknown instance".to_string())
     })?;
-    let (toggles, missing) =
-        shared_modpack_toggles(&metadata, data, state).await?;
-    if missing {
+    let changes = shared_modpack_toggles(&metadata, data, state).await?;
+    if changes.missing {
         return Err(crate::ErrorKind::InputError(
             "Shared modpack content is missing after installation".to_string(),
         )
         .into());
     }
-    for (path, enabled) in toggles {
+    for path in changes.removals {
+        crate::state::instances::commands::remove_project(
+            instance_id,
+            &path,
+            state,
+        )
+        .await?;
+    }
+    for (path, enabled) in changes.toggles {
         crate::state::instances::commands::toggle_disable_project(
             instance_id,
             &path,

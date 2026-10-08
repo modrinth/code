@@ -1,15 +1,22 @@
 <script setup lang="ts">
 import { InfoIcon, XIcon } from '@modrinth/assets'
-import { computed, nextTick, toValue, useTemplateRef, watch } from 'vue'
+import { computed, nextTick, ref, toValue, useTemplateRef, watch } from 'vue'
 
 import { IconButton } from '#ui/components/base/buttons'
 import Toggle from '#ui/components/base/Toggle.vue'
 import PhotosensitivityWarningModal from '#ui/components/modal/PhotosensitivityWarningModal.vue'
 import SearchSidebarFilter from '#ui/components/search/SearchSidebarFilter.vue'
-import { useVIntl } from '#ui/composables/i18n'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useAdvancedPrefs } from '#ui/utils/advanced-filter-preferences'
 import { commonMessages } from '#ui/utils/common-messages'
-import { LOADER_FILTER_TYPES } from '#ui/utils/search'
+import {
+	type FilterType,
+	type FilterValue,
+	LOADER_FILTER_TYPES,
+	parseServerContentEnvironment,
+	SERVER_CONTENT_ENVIRONMENTS,
+	type ServerContentEnvironment,
+} from '#ui/utils/search'
 
 import AdvancedFiltersPersistenceNote from './components/AdvancedFiltersPersistenceNote.vue'
 import { injectBrowseManager } from './providers/browse-manager'
@@ -20,7 +27,72 @@ const ctx = injectBrowseManager()
 const { formatMessage } = useVIntl()
 const advancedPrefs = useAdvancedPrefs()
 
+const messages = defineMessages({
+	serverEnvironment: {
+		id: 'search.server-environment.title',
+		defaultMessage: 'Environment',
+	},
+	playerAndServer: {
+		id: 'search.server-environment.player-and-server',
+		defaultMessage: 'Player and server',
+	},
+	playerOnly: {
+		id: 'search.server-environment.player-only',
+		defaultMessage: 'Player only',
+	},
+})
+
 const isApp = computed(() => ctx.variant === 'app')
+
+const SERVER_ENVIRONMENT_FILTER_ID = 'server_environment'
+
+function getServerEnvironmentLabel(environment: ServerContentEnvironment) {
+	switch (environment) {
+		case 'server_and_player':
+			return formatMessage(messages.playerAndServer)
+		case 'server':
+			return formatMessage(commonMessages.serverOnlyLabel)
+		case 'player':
+			return formatMessage(messages.playerOnly)
+	}
+}
+
+const serverEnvironmentFilterType = computed<FilterType>(() => ({
+	id: SERVER_ENVIRONMENT_FILTER_ID,
+	formatted_name: formatMessage(messages.serverEnvironment),
+	options: SERVER_CONTENT_ENVIRONMENTS.map((environment) => ({
+		id: environment,
+		formatted_name: getServerEnvironmentLabel(environment),
+		method: 'or',
+		value: environment,
+	})),
+	supported_project_types: [],
+	query_param: '',
+	supports: ['include'],
+	searchable: false,
+	display: 'all',
+}))
+
+const serverEnvironmentToggledGroups = ref<string[]>([])
+
+/** Bridges the single-select server environment onto the multi-select sidebar filter model. */
+const serverEnvironmentSelection = computed<FilterValue[]>({
+	get: () =>
+		ctx.serverEnvironment?.value
+			? [
+					{
+						type: SERVER_ENVIRONMENT_FILTER_ID,
+						option: ctx.serverEnvironment.value,
+						negative: false,
+					},
+				]
+			: [],
+	set: (filters) => {
+		if (!ctx.serverEnvironment) return
+		ctx.serverEnvironment.value = parseServerContentEnvironment(filters.at(-1)?.option)
+		ctx.onFilterChange()
+	},
+})
 const lockedMessages = computed(() => toValue(ctx.lockedFilterMessages))
 const hiddenFilterTypes = computed(() => ctx.hiddenFilterTypes?.value ?? [])
 const visibleFilters = computed(() => {
@@ -172,27 +244,13 @@ function getFilterOpenByDefault(filterId: string): boolean {
 		</div>
 
 		<div
-			v-if="
-				ctx.showHideInstalled?.value || ctx.showHideSelected?.value || ctx.showServerOnly?.value
-			"
+			v-if="ctx.showHideInstalled?.value || ctx.showHideSelected?.value"
 			:class="
 				isApp
 					? 'flex flex-col gap-3 border-0 border-b-[1px] p-4 last:border-b-0 border-[--brand-gradient-border] border-solid'
 					: 'card-shadow flex flex-col gap-3 rounded-2xl bg-bg-raised border-solid border-surface-4 border p-4'
 			"
 		>
-			<label
-				v-if="ctx.showServerOnly?.value"
-				class="flex cursor-pointer items-center justify-between gap-3 text-contrast font-medium"
-			>
-				{{ ctx.serverOnlyLabel?.value ?? formatMessage(commonMessages.serverOnlyLabel) }}
-				<Toggle
-					v-model="ctx.serverOnly!.value"
-					small
-					class="shrink-0"
-					@update:model-value="ctx.onFilterChange()"
-				/>
-			</label>
 			<label
 				v-if="ctx.showHideInstalled?.value"
 				class="flex cursor-pointer items-center justify-between gap-3 text-contrast font-medium"
@@ -220,6 +278,27 @@ function getFilterOpenByDefault(filterId: string): boolean {
 				/>
 			</label>
 		</div>
+
+		<SearchSidebarFilter
+			v-if="ctx.showServerEnvironment?.value"
+			v-model:selected-filters="serverEnvironmentSelection"
+			v-model:toggled-groups="serverEnvironmentToggledGroups"
+			:provided-filters="[]"
+			:filter-type="serverEnvironmentFilterType"
+			:project-type="ctx.projectType.value"
+			:class="filterClass"
+			:button-class="buttonClass"
+			:content-class="contentClass"
+			:inner-panel-class="innerPanelClass"
+			:selected-project-class="selectedProjectClass"
+			:open-by-default="true"
+		>
+			<template #header>
+				<h3 :class="isApp ? 'text-base m-0' : 'm-0 text-lg font-semibold'">
+					{{ serverEnvironmentFilterType.formatted_name }}
+				</h3>
+			</template>
+		</SearchSidebarFilter>
 
 		<template v-if="ctx.isServerType.value">
 			<SearchSidebarFilter

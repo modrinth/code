@@ -9,7 +9,13 @@ import {
 	ServerStackIcon,
 	SpinnerIcon,
 } from '@modrinth/assets'
-import type { BrowseInstallContentType, CardAction, ProjectType, Tags } from '@modrinth/ui'
+import type {
+	BrowseInstallContentType,
+	CardAction,
+	ProjectType,
+	ServerContentEnvironment,
+	Tags,
+} from '@modrinth/ui'
 import {
 	BrowsePageLayout,
 	BrowseSidebar,
@@ -23,6 +29,8 @@ import {
 	getSelectedInstallPreferences,
 	getTargetInstallPreferences,
 	injectNotificationManager,
+	isServerContentEnvironmentProjectType,
+	parseServerContentEnvironment,
 	preferencesDiffer,
 	provideBrowseManager,
 	requestInstall,
@@ -443,19 +451,21 @@ const instanceFilters = computed(() => {
 	return filters
 })
 
-const serverOnly = ref(route.query.so === 'true')
+const showServerEnvironment = computed(() => isServerContext.value && !isSetupServerContext.value)
+const serverEnvironment = ref<ServerContentEnvironment | null>(
+	parseServerContentEnvironment(route.query.env),
+)
 watch(
-	() => route.query.so,
+	() => route.query.env,
 	(value) => {
-		serverOnly.value = value === 'true'
+		serverEnvironment.value = parseServerContentEnvironment(value)
 	},
 )
-const showServerOnly = computed(() => isServerContext.value && projectType.value === 'mod')
 const serverEnvironmentOverride = computed(() =>
-	showServerOnly.value
-		? getHostingModEnvironmentOverride(serverOnly.value)
+	showServerEnvironment.value && projectType.value === 'mod'
+		? getHostingModEnvironmentOverride(serverEnvironment.value)
 		: isSetupServerContext.value
-			? getHostingModEnvironmentOverride(false)
+			? getHostingModEnvironmentOverride(null)
 			: undefined,
 )
 const serverHideInstalled = ref(false)
@@ -690,6 +700,19 @@ watch(
 )
 
 watch(
+	[serverEnvironment, projectType, showServerEnvironment],
+	([environment, type, show]) => {
+		if (!show || !browseRouteActive.value) return
+		if (type !== 'modpack' && isServerContentEnvironmentProjectType(environment, type)) return
+		router.replace({
+			path: '/browse/mod',
+			query: { ...route.query, env: environment ?? undefined },
+		})
+	},
+	{ immediate: true },
+)
+
+watch(
 	() => route.query.i,
 	async (nextInstanceId, previousInstanceId) => {
 		if (!route.path.startsWith('/browse') || nextInstanceId === previousInstanceId) return
@@ -738,6 +761,7 @@ const selectableProjectTypes = computed(() => {
 	if (route.query.from) params.from = route.query.from
 	if (route.query.sid) params.sid = route.query.sid
 	if (effectiveServerWorldId.value) params.wid = effectiveServerWorldId.value
+	if (showServerEnvironment.value && serverEnvironment.value) params.env = serverEnvironment.value
 
 	const queryString = new URLSearchParams(params as Record<string, string>).toString()
 	const suffix = queryString ? `?${queryString}` : ''
@@ -752,24 +776,36 @@ const selectableProjectTypes = computed(() => {
 	}
 
 	if (isServerContext.value) {
+		const shownForEnvironment = (type: string) =>
+			isServerContentEnvironmentProjectType(serverEnvironment.value, type)
 		return [
 			{ label: formatMessage(messages.modsProjectType), href: `/browse/mod${suffix}` },
 			{
 				label: formatMessage(messages.pluginsProjectType),
 				href: `/browse/plugin${suffix}`,
-				shown: tags.value.loaders.some(
-					(loader) =>
-						loader.name === serverContextServerData.value?.loader?.toLowerCase() &&
-						loader.supported_project_types.includes('plugin'),
-				),
+				shown:
+					shownForEnvironment('plugin') &&
+					tags.value.loaders.some(
+						(loader) =>
+							loader.name === serverContextServerData.value?.loader?.toLowerCase() &&
+							loader.supported_project_types.includes('plugin'),
+					),
 			},
 			{
 				label: formatMessage(messages.resourcePacksProjectType),
 				href: `/browse/resourcepack${suffix}`,
+				shown: shownForEnvironment('resourcepack'),
 			},
-			{ label: formatMessage(messages.dataPacksProjectType), href: `/browse/datapack${suffix}` },
-			{ label: formatMessage(messages.shadersProjectType), href: `/browse/shader${suffix}` },
-			{ label: formatMessage(messages.modpacksProjectType), href: `/browse/modpack${suffix}` },
+			{
+				label: formatMessage(messages.dataPacksProjectType),
+				href: `/browse/datapack${suffix}`,
+				shown: shownForEnvironment('datapack'),
+			},
+			{
+				label: formatMessage(messages.shadersProjectType),
+				href: `/browse/shader${suffix}`,
+				shown: shownForEnvironment('shader'),
+			},
 		]
 	}
 
@@ -1240,13 +1276,13 @@ const searchState = useBrowseSearch({
 	providedFilters: combinedProvidedFilters,
 	environmentOverride: serverEnvironmentOverride,
 	search,
-	persistentQueryParams: ['i', 'ai', 'shi', 'so', 'sid', 'wid', 'from'],
+	persistentQueryParams: ['i', 'ai', 'shi', 'env', 'sid', 'wid', 'from'],
 	getExtraQueryParams: () => ({
 		sid: serverIdQuery.value || undefined,
 		wid: effectiveServerWorldId.value || undefined,
 		ai: instanceHideInstalled.value ? 'true' : undefined,
 		shi: serverHideInstalled.value ? 'true' : undefined,
-		so: showServerOnly.value && serverOnly.value ? 'true' : undefined,
+		env: (showServerEnvironment.value && serverEnvironment.value) || undefined,
 	}),
 })
 
@@ -1363,9 +1399,9 @@ provideBrowseManager({
 	getCardActions,
 	installContext,
 	providedFilters: combinedProvidedFilters,
-	serverOnly,
-	showServerOnly,
-	hiddenFilterTypes: computed(() => (showServerOnly.value ? ['environment'] : [])),
+	serverEnvironment,
+	showServerEnvironment,
+	hiddenFilterTypes: computed(() => (showServerEnvironment.value ? ['environment'] : [])),
 	hideInstalled: computed({
 		get: () => {
 			if (projectType.value === 'modpack') return hideInstalledModpacks.value

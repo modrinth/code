@@ -113,20 +113,57 @@ pub(super) enum InstanceInviteManagerResponse {
 }
 
 #[derive(Clone, Debug, Deserialize)]
+#[serde(from = "RawInstanceVersionResponse")]
 pub(super) struct InstanceVersionResponse {
     pub(super) version: i32,
-    #[serde(default)]
     pub(super) modrinth_ids: Vec<String>,
     pub(super) ready: bool,
-    #[serde(default)]
     pub(super) external_files: Vec<ExternalFileResponse>,
-    #[serde(default)]
     pub(super) modpack_id: Option<String>,
-    #[serde(default)]
     pub(super) removed_files: Vec<SharedInstanceRemovedFile>,
     pub(super) game_version: String,
     pub(super) loader: ModLoader,
     pub(super) loader_version: String,
+}
+
+#[derive(Deserialize)]
+struct RawInstanceVersionResponse {
+    version: i32,
+    #[serde(default)]
+    modrinth_ids: Vec<String>,
+    ready: bool,
+    #[serde(default)]
+    external_files: Vec<ExternalFileResponse>,
+    #[serde(default)]
+    modpack_id: Option<String>,
+    #[serde(default)]
+    removed_files: Vec<SharedInstanceRemovedFile>,
+    game_version: String,
+    loader: String,
+    loader_version: String,
+}
+
+impl From<RawInstanceVersionResponse> for InstanceVersionResponse {
+    /// Servers without a client loader (vanilla, Paper, Purpur) are installed
+    /// as Fabric so players can add client-side mods on top.
+    fn from(raw: RawInstanceVersionResponse) -> Self {
+        let (loader, loader_version) = match ModLoader::from_string(&raw.loader)
+        {
+            ModLoader::Vanilla => (ModLoader::Fabric, String::new()),
+            loader => (loader, raw.loader_version),
+        };
+        Self {
+            version: raw.version,
+            modrinth_ids: raw.modrinth_ids,
+            ready: raw.ready,
+            external_files: raw.external_files,
+            modpack_id: raw.modpack_id,
+            removed_files: raw.removed_files,
+            game_version: raw.game_version,
+            loader,
+            loader_version,
+        }
+    }
 }
 
 impl InstanceVersionResponse {
