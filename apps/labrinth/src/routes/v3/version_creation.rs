@@ -946,7 +946,8 @@ pub async fn upload_file(
     transaction: &mut PgTransaction<'_>,
     redis: &RedisPool,
 ) -> Result<(), CreateError> {
-    let (file_name, file_extension) = get_name_ext(content_disposition)?;
+    let (file_name, file_extension) =
+        get_name_and_extension(content_disposition)?;
 
     if other_file_names.iter().any(|name| name == file_name) {
         return Err(CreateError::InvalidInput(
@@ -1143,12 +1144,17 @@ pub async fn upload_file(
     Ok(())
 }
 
-pub fn get_name_ext(
+pub fn get_name_and_extension(
     content_disposition: &actix_web::http::header::ContentDisposition,
 ) -> Result<(&str, &str), CreateError> {
     let file_name = content_disposition.get_filename().ok_or_else(|| {
         CreateError::MissingValueError("Missing content file name".to_string())
     })?;
+    // trim start/end whitespace
+    // our S3 provider may not support spaces at the start/end of file names
+    // or key names
+    let file_name = file_name.trim();
+
     let file_extension = if let Some(last_period) = file_name.rfind('.') {
         file_name.get((last_period + 1)..).unwrap_or("")
     } else {

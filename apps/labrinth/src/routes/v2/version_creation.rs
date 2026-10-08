@@ -237,7 +237,9 @@ pub async fn version_create(
                 for content_disposition in content_dispositions {
                     // Uses version_create functions to get the file name and extension
                     let (_, file_extension) =
-                        version_creation::get_name_ext(&content_disposition)?;
+                        version_creation::get_name_and_extension(
+                            &content_disposition,
+                        )?;
                     crate::util::ext::project_file_type(file_extension)
                         .ok_or_else(|| {
                             CreateError::InvalidFileType(
