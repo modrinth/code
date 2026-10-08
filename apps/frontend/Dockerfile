@@ -82,7 +82,7 @@ ENV NO_COLOR=1
 
 WORKDIR /app
 
-# Nitro traces every runtime dependency into .output/server/node_modules, so no install step is needed.
+# Nitro bundles every runtime dependency into .output, so no node_modules is needed.
 COPY --chown=node:node .output ./.output
 
 # Boot the server once and render the index page so the compile cache ships warm.
@@ -91,7 +91,7 @@ COPY --chown=node:node .output ./.output
 RUN bash <<'EOF'
 set -eum
 
-node --import /app/.output/server/sentry.server.config.mjs /app/.output/server/index.mjs &
+node /app/.output/server/index.mjs &
 server_pid=$!
 
 waited=0
@@ -120,6 +120,4 @@ EOF
 EXPOSE 3000
 
 ENTRYPOINT ["dumb-init", "--", "/usr/local/bin/entrypoint.sh"]
-# Sentry has to load before the server so its instrumentation can patch modules as they are imported.
-# It goes on the command line rather than NODE_OPTIONS, so NODE_OPTIONS stays free for runtime flags.
-CMD ["node", "--import", "/app/.output/server/sentry.server.config.mjs", "/app/.output/server/index.mjs"]
+CMD ["node", "/app/.output/server/index.mjs"]
