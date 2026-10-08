@@ -984,7 +984,10 @@ impl Process {
             tracing::warn!("Failed to write exit status to log file: {}", e);
         }
 
-        let _ = state.discord_rpc.clear_to_default(true).await;
+        let _ = state
+            .discord_rpc
+            .clear_to_default(true, &state.pool, &state.process_manager)
+            .await;
 
         let _ = state.friends_socket.update_status(None).await;
 
