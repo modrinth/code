@@ -1,19 +1,22 @@
-use std::{ptr::NonNull, slice, str};
+use std::{ffi::c_char, ptr::NonNull, slice, str};
 
 use eyre::{Context, ContextCompat, Result, ensure};
 use libc::size_t;
 
+/// A borrowed UTF-8 string. `len` counts bytes; no trailing NUL is required.
 #[derive(Clone, Copy)]
 #[repr(C)]
 pub struct ModrinthSandboxString {
-    pub ptr: *const u8,
+    pub ptr: *const c_char,
     pub len: size_t,
 }
 
+/// An optional borrowed UTF-8 string. `len` counts bytes; no trailing NUL is
+/// required. A null pointer with zero length represents an absent string.
 #[derive(Clone, Copy)]
 #[repr(C)]
 pub struct ModrinthSandboxStringOption {
-    pub ptr: *const u8,
+    pub ptr: *const c_char,
     pub len: size_t,
 }
 
@@ -47,7 +50,9 @@ impl ModrinthSandboxString {
         // SAFETY: The caller guarantees that `ptr` is valid for reading
         // `len` bytes. The pointer was checked for null above, and `u8` has
         // alignment 1, including for an empty slice.
-        let bytes = unsafe { slice::from_raw_parts(ptr.as_ptr(), self.len) };
+        let bytes = unsafe {
+            slice::from_raw_parts(ptr.as_ptr().cast::<u8>(), self.len)
+        };
 
         let value = str::from_utf8(bytes).wrap_err("string is not UTF-8")?;
         Ok(value.into())

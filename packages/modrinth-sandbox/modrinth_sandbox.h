@@ -40,8 +40,11 @@ typedef struct ModrinthSandboxExitStatus {
   int32_t code;
 } ModrinthSandboxExitStatus;
 
+/**
+ * A borrowed UTF-8 string. `len` counts bytes; no trailing NUL is required.
+ */
 typedef struct ModrinthSandboxString {
-  const uint8_t *ptr;
+  const char *ptr;
   size_t len;
 } ModrinthSandboxString;
 
@@ -50,8 +53,12 @@ typedef struct ModrinthSandboxStringSlice {
   size_t len;
 } ModrinthSandboxStringSlice;
 
+/**
+ * An optional borrowed UTF-8 string. `len` counts bytes; no trailing NUL is
+ * required. A null pointer with zero length represents an absent string.
+ */
 typedef struct ModrinthSandboxStringOption {
-  const uint8_t *ptr;
+  const char *ptr;
   size_t len;
 } ModrinthSandboxStringOption;
 

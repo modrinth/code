@@ -11,7 +11,7 @@
 
 static ModrinthSandboxString string_view(const char *value)
 {
-	return (ModrinthSandboxString){(const uint8_t *)value, strlen(value)};
+	return (ModrinthSandboxString){value, strlen(value)};
 }
 
 static void report_error(const char *operation)
