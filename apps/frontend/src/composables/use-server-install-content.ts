@@ -6,6 +6,7 @@ import type {
 	CreationFlowContextValue,
 	EnvironmentSearchOverride,
 	FilterValue,
+	ServerContentEnvironment,
 } from '@modrinth/ui'
 import {
 	commonMessages,
@@ -18,6 +19,7 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	injectServerOnboardingFlow,
+	parseServerContentEnvironment,
 	readStoredServerInstallQueue,
 	requestInstall,
 	resolveServerAddonInstallPlans,
@@ -149,7 +151,9 @@ export function useServerInstallContent({
 	const { icon: serverIcon } = useServerIcon(() => currentServerId.value ?? '')
 
 	const serverHideInstalled = ref(false)
-	const serverContentServerOnly = ref(false)
+	const serverEnvironment = ref<ServerContentEnvironment | null>(
+		parseServerContentEnvironment(route.query.env),
+	)
 	const hideSelectedServerInstalls = ref(false)
 	const installingProjectIds = ref<Set<string>>(new Set())
 	const optimisticallyInstalledProjectIds = ref<Set<string>>(new Set())
@@ -292,13 +296,15 @@ export function useServerInstallContent({
 		return filters
 	})
 
-	const showServerOnlyToggle = computed(() => !!serverData.value && projectType.value?.id === 'mod')
+	const showServerEnvironment = computed(
+		() => !!currentServerId.value && !isSetupServerContext.value,
+	)
 
 	const serverEnvironmentOverride = computed<EnvironmentSearchOverride | undefined>(() => {
-		if (!showServerOnlyToggle.value) {
-			return isSetupServerContext.value ? getHostingModEnvironmentOverride(false) : undefined
+		if (showServerEnvironment.value && projectType.value?.id === 'mod') {
+			return getHostingModEnvironmentOverride(serverEnvironment.value)
 		}
-		return getHostingModEnvironmentOverride(serverContentServerOnly.value)
+		return isSetupServerContext.value ? getHostingModEnvironmentOverride(null) : undefined
 	})
 
 	function getCurrentServerInstallType(): BrowseInstallContentType {
@@ -703,10 +709,6 @@ export function useServerInstallContent({
 		serverHideInstalled.value = route.query.shi === 'true'
 	}
 
-	if (route.query.so && projectType.value?.id === 'mod') {
-		serverContentServerOnly.value = route.query.so === 'true'
-	}
-
 	watch(serverHideInstalled, (hideInstalled) => {
 		if (hideInstalled) {
 			syncHiddenInstalledProjectIds()
@@ -734,8 +736,8 @@ export function useServerInstallContent({
 		serverContentData,
 		serverFilters,
 		serverHideInstalled,
-		serverContentServerOnly,
-		showServerOnlyToggle,
+		serverEnvironment,
+		showServerEnvironment,
 		serverEnvironmentOverride,
 		hideSelectedServerInstalls,
 		installingProjectIds,

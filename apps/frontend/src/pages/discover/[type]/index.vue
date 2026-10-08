@@ -21,6 +21,8 @@ import {
 	formatProjectTypeSentence,
 	injectModrinthClient,
 	injectUserPreferences,
+	isServerContentEnvironmentProjectType,
+	NavTabs,
 	PROJECT_DEP_MARKER_QUERY,
 	provideBrowseManager,
 	SelectedProjectsFloatingBar,
@@ -40,6 +42,7 @@ import LogoAnimated from '~/components/brand/LogoAnimated.vue'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import { projectQueryOptions, warmProjectCheckCaches } from '~/composables/queries/project'
 import { versionQueryOptions } from '~/composables/queries/version'
+import { useDiscoverProjectTypeLinks } from '~/composables/use-discover-project-type-links'
 import type {
 	ServerInstallModalHandle,
 	ServerInstallSearchResult,
@@ -58,6 +61,7 @@ const { updatePreferences } = injectUserPreferences()
 const queryClient = useQueryClient()
 
 const filtersMenuOpen = ref(false)
+const { projectTypeLinks, isServerContext, isServerSetup } = useDiscoverProjectTypeLinks()
 const route = useRoute()
 
 const cosmetics = useCosmetics()
@@ -182,8 +186,8 @@ const {
 	serverContentData,
 	serverFilters,
 	serverHideInstalled,
-	serverContentServerOnly,
-	showServerOnlyToggle,
+	serverEnvironment,
+	showServerEnvironment,
 	serverEnvironmentOverride,
 	hideSelectedServerInstalls,
 	installingProjectIds,
@@ -204,6 +208,23 @@ const {
 	onboardingModalRef,
 	debug,
 })
+
+watch(
+	[serverEnvironment, currentType, showServerEnvironment],
+	([environment, type, show]) => {
+		if (!show) return
+		const allowed = type !== 'modpack' && isServerContentEnvironmentProjectType(environment, type)
+		if (allowed && (route.query.env ?? null) === environment) return
+		navigateTo(
+			{
+				path: allowed ? route.path : '/discover/mods',
+				query: { ...route.query, env: environment ?? undefined },
+			},
+			{ replace: true },
+		)
+	},
+	{ immediate: true },
+)
 
 function getServerModpackContent(project: Labrinth.Search.v3.ResultSearchProject) {
 	const content = project.minecraft_java_server?.content
@@ -464,10 +485,10 @@ const searchState = useBrowseSearch({
 	providedFilters: serverFilters,
 	environmentOverride: serverEnvironmentOverride,
 	search,
-	persistentQueryParams: ['sid', 'wid', 'shi', 'so', 'from'],
+	persistentQueryParams: ['sid', 'wid', 'shi', 'env', 'from'],
 	getExtraQueryParams: () => ({
 		shi: serverHideInstalled.value ? 'true' : undefined,
-		so: showServerOnlyToggle.value && serverContentServerOnly.value ? 'true' : undefined,
+		env: (showServerEnvironment.value && serverEnvironment.value) || undefined,
 	}),
 	maxResultsOptions: currentMaxResultsOptions,
 	displayMode: resultsDisplayMode,
@@ -566,10 +587,9 @@ provideBrowseManager({
 			queuedServerInstallCount.value > 0,
 	),
 	hideSelectedLabel: computed(() => formatMessage(commonMessages.hideSelectedContentLabel)),
-	serverOnly: serverContentServerOnly,
-	showServerOnly: showServerOnlyToggle,
-	serverOnlyLabel: computed(() => formatMessage(commonMessages.serverOnlyLabel)),
-	hiddenFilterTypes: computed(() => (showServerOnlyToggle.value ? ['environment'] : [])),
+	serverEnvironment,
+	showServerEnvironment,
+	hiddenFilterTypes: computed(() => (showServerEnvironment.value ? ['environment'] : [])),
 	advancedFiltersCollapsed,
 	dismissedPhotosensitivityFilterWarning,
 	displayMode: resultsDisplayMode,
@@ -609,6 +629,14 @@ const { isStuck: isInstallHeaderStuck } = useStickyObserver(
 	>
 		<BrowseInstallHeader divider bottom-padding />
 	</div>
+
+	<NavTabs
+		v-if="isServerContext"
+		:links="projectTypeLinks"
+		replace
+		:show-single-tab="!isServerSetup"
+		class="flex"
+	/>
 
 	<SelectedProjectsFloatingBar v-if="installContext" :install-context="installContext" />
 

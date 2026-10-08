@@ -4979,6 +4979,15 @@
   "search.photosensitivity-warning-modal.title": {
     "defaultMessage": "Results are not guaranteed to be safe"
   },
+  "search.server-environment.player-and-server": {
+    "defaultMessage": "Player and server"
+  },
+  "search.server-environment.player-only": {
+    "defaultMessage": "Player only"
+  },
+  "search.server-environment.title": {
+    "defaultMessage": "Environment"
+  },
   "search.server_content_type.modpack": {
     "defaultMessage": "Modded"
   },

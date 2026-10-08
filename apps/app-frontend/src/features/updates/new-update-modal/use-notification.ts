@@ -85,10 +85,12 @@ export function useNewUpdateNotification(showModal: () => void) {
 				return
 			}
 
-			const server = response.servers[0]
+			const activeServers = response.servers.filter(
+				(server) => server.owner_id === userId && server.status === 'available',
+			)
 			invitePath.value =
-				response.pagination.total_items === 1 && server.status === 'available'
-					? `/hosting/manage/${server.server_id}/play`
+				activeServers.length === 1
+					? `/hosting/manage/${activeServers[0].server_id}/play`
 					: '/hosting/manage'
 
 			if (

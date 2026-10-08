@@ -321,7 +321,7 @@ async function perform(action: Action, reviewed = false) {
 async function showPreview(playAfter = false) {
 	if (actionsLocked.value) return
 	previewAction.value = playAfter ? 'play' : 'push'
-	await shareReview.showPreview()
+	await shareReview.showPreview(previewAction.value)
 }
 function changeMember(userId: string, remove: boolean, user?: InvitePlayersUser) {
 	if (!sharedInstanceId.value || players.membershipMutation.isPending.value || !canSetup.value)
