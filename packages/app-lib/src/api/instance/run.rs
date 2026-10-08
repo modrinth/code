@@ -303,6 +303,7 @@ async fn run_credentials(
         post_exit_hook,
         &context,
         quick_play_type,
+        &state,
     )
     .await
 }

@@ -894,6 +894,7 @@ pub async fn launch_minecraft(
     post_exit_hook: Option<String>,
     context: &InstanceLaunchContext,
     mut quick_play_type: QuickPlayType,
+    state: &State,
 ) -> crate::Result<ProcessMetadata> {
     let instance = &context.instance;
     let content_set = &context.applied_content_set;
@@ -914,13 +915,12 @@ pub async fn launch_minecraft(
         .into());
     }
 
-    let state = State::get().await?;
     let mut runtime_lease = state.content_store.runtime_cache_lock.read().await;
 
-    let instance_path = get_instance_full_path(&instance.path, &state)?;
+    let instance_path = get_instance_full_path(&instance.path, state)?;
 
     let (minecraft, version_index) =
-        resolve_minecraft_manifest(&content_set.game_version, &state).await?;
+        resolve_minecraft_manifest(&content_set.game_version, state).await?;
     let version = &minecraft.versions[version_index];
     let minecraft_updated = version_index
         <= minecraft
@@ -933,7 +933,7 @@ pub async fn launch_minecraft(
         &content_set.game_version,
         content_set.loader,
         content_set.loader_version.as_deref(),
-        &state,
+        state,
     )
     .await?;
 
@@ -951,7 +951,7 @@ pub async fn launch_minecraft(
         });
 
     let mut version_info = download::download_version_info(
-        &state,
+        state,
         version,
         loader_version.as_ref(),
         None,
@@ -968,7 +968,7 @@ pub async fn launch_minecraft(
                 .unwrap_or(0);
         if requires_logging_info {
             version_info = download::download_version_info(
-                &state,
+                state,
                 version,
                 loader_version.as_ref(),
                 Some(true),
@@ -980,10 +980,10 @@ pub async fn launch_minecraft(
     }
 
     let _ =
-        download_log_config(&state, &version_info, None, false, None).await?;
+        download_log_config(state, &version_info, None, false, None).await?;
 
     let java_version =
-        get_java_version_from_launch_context(context, &version_info, &state)
+        get_java_version_from_launch_context(context, &version_info, state)
             .await?
             .ok_or_else(|| {
                 crate::ErrorKind::LauncherError(
@@ -1033,7 +1033,7 @@ pub async fn launch_minecraft(
         ))
         .as_error());
     }
-    if crate::state::instance_has_running_process(&instance.id, &state).await? {
+    if crate::state::instance_has_running_process(&instance.id, state).await? {
         return Err(crate::ErrorKind::LauncherError(format!(
             "Instance {} is already running",
             instance.id
@@ -1042,7 +1042,7 @@ pub async fn launch_minecraft(
     }
 
     if let Some(path) = download::missing_runtime_file(
-        &state,
+        state,
         &version_info,
         &java_version.architecture,
         minecraft_updated,
@@ -1209,7 +1209,7 @@ pub async fn launch_minecraft(
     )
     .await?;
 
-    crate::state::instances::commands::sync_content_files(&instance.id, &state)
+    crate::state::instances::commands::sync_content_files(&instance.id, state)
         .await?;
     let _instance_content_lock =
         state.lock_instance_content(&instance.id).await;
@@ -1235,7 +1235,7 @@ pub async fn launch_minecraft(
     let _store_lease = state.content_store.lease().await;
     state.content_store.recover(Some(&instance.id)).await?;
     // state.content_store.validate_instance(instance).await?;
-    if crate::state::instance_has_running_process(&instance.id, &state).await? {
+    if crate::state::instance_has_running_process(&instance.id, state).await? {
         return Err(crate::ErrorKind::LauncherError(format!(
             "Instance {} is already running",
             instance.id
