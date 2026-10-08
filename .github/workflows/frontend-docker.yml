@@ -93,6 +93,7 @@ jobs:
           SENTRY_ORG: modrinth
           SENTRY_PROJECT: frontend-server
         with:
+          release: ${{ github.sha }}
           environment: ${{ steps.meta.outputs.env }}
           sourcemaps: ./apps/frontend/.output/server
           url_prefix: '~/'
