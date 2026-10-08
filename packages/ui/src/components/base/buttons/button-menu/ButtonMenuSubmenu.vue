@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ChevronRightIcon } from '@modrinth/assets'
-import { computed, ref, toRef, useId } from 'vue'
+import { computed, ref, toRef, toValue, useId } from 'vue'
 
 import { useAnchoredTeleport } from '../../../../utils/use-anchored-teleport'
 import type {
@@ -76,7 +76,7 @@ const { handleMouseEnter, handleMouseLeave, cancelLeave } = useHoverIntent({
 
 async function openSubmenu(focus = true) {
 	cancelLeave()
-	if (props.option.disabled) return
+	if (toValue(toValue(props.option.disabled))) return
 	if (!isOpen.value) await open()
 	if (focus) focusItem(0)
 }
@@ -136,7 +136,7 @@ function handlePanelKeydown(event: KeyboardEvent) {
 		v-tooltip="props.option.tooltip"
 		v-bind="triggerAttrs"
 		type="button"
-		:aria-disabled="props.option.disabled || undefined"
+		:aria-disabled="toValue(props.option.disabled) || undefined"
 		:aria-expanded="isOpen"
 		:aria-controls="panelId"
 		aria-haspopup="menu"

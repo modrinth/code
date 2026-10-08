@@ -51,11 +51,12 @@ impl FileStamp {
             let mut information = BY_HANDLE_FILE_INFORMATION::default();
             let mut basic = FILE_BASIC_INFO::default();
             unsafe {
-                GetFileInformationByHandle(handle, &mut information).ok()?;
+                GetFileInformationByHandle(handle, &raw mut information)
+                    .ok()?;
                 GetFileInformationByHandleEx(
                     handle,
                     FileBasicInfo,
-                    (&mut basic as *mut FILE_BASIC_INFO).cast(),
+                    (&raw mut basic).cast(),
                     size_of::<FILE_BASIC_INFO>() as u32,
                 )
                 .ok()?;

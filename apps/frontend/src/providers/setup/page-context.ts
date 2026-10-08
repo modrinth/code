@@ -13,6 +13,7 @@ export function setupPageContextProvider() {
 		adConsentAvailable: ref(false),
 		featureFlags: {
 			serverRamAsBytesAlwaysOn: computed(() => featureFlags.value.serverRamAsBytesAlwaysOn),
+			filesTabRework: computed(() => featureFlags.value.filesTabRework),
 		},
 		openExternalUrl: (url) => window.open(url, '_blank'),
 	})

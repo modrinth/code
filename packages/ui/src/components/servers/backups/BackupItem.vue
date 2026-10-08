@@ -189,121 +189,123 @@ const creatorAvatarSrc = computed(() =>
 </script>
 <template>
 	<div
-		class="flex items-center gap-4 rounded-[20px] border border-solid bg-surface-3 p-4 shadow-[0px_1px_2px_0px_rgba(0,0,0,0.3),0px_1px_3px_0px_rgba(0,0,0,0.15)]"
+		class="flex items-center justify-center gap-4 rounded-[20px] border border-solid bg-surface-3 p-4 shadow-[0px_1px_2px_0px_rgba(0,0,0,0.3),0px_1px_3px_0px_rgba(0,0,0,0.15)]"
 		:class="itemBorderClass"
 	>
-		<div class="flex min-w-0 flex-1 items-center gap-4">
-			<!-- Icon tile -->
-			<div
-				class="flex shrink-0 items-center justify-center rounded-2xl border border-solid border-surface-5 bg-surface-4"
-				:class="preview ? 'size-10' : 'size-14'"
-			>
-				<component
-					:is="backupIcon"
-					class="text-secondary"
-					:class="preview ? 'size-6' : 'size-10'"
-				/>
-			</div>
-
-			<!-- Name + badge + subtitle -->
-			<div class="flex min-w-0 flex-col gap-1.5">
-				<div class="flex min-w-0 items-center gap-2">
-					<span
-						ref="nameRef"
-						v-tooltip="truncatedTooltip(nameRef, backup.name)"
-						class="min-w-0 truncate font-semibold text-contrast"
-					>
-						{{ backup.name }}
-					</span>
-					<span
-						v-if="backup.automated"
-						class="shrink-0 rounded-full border border-solid border-surface-5 bg-surface-4 px-2.5 py-1 text-sm font-medium text-secondary"
-					>
-						{{ formatMessage(messages.auto) }}
-					</span>
+		<div class="flex items-center gap-4" :class="[showDebugInfo ? 'flex-col' : '']">
+			<div class="flex min-w-0 flex-1 items-center gap-4">
+				<!-- Icon tile -->
+				<div
+					class="flex shrink-0 items-center justify-center rounded-2xl border border-solid border-surface-5 bg-surface-4"
+					:class="preview ? 'size-10' : 'size-14'"
+				>
+					<component
+						:is="backupIcon"
+						class="text-secondary"
+						:class="preview ? 'size-6' : 'size-10'"
+					/>
 				</div>
-				<div class="flex items-center gap-2 text-sm font-medium text-secondary">
-					<template v-if="preview">
-						<span>{{ formatDateTime(backup.created_at) }}</span>
-					</template>
-					<template v-else-if="backupCreator">
-						<AutoLink
-							:to="creatorProfileLink"
-							class="group flex min-w-0 items-center gap-1.5"
-							:class="creatorProfileLink ? 'text-secondary hover:underline' : 'text-primary'"
+
+				<!-- Name + badge + subtitle -->
+				<div class="flex min-w-0 flex-col gap-1.5">
+					<div class="flex min-w-0 items-center gap-2">
+						<span
+							ref="nameRef"
+							v-tooltip="truncatedTooltip(nameRef, backup.name)"
+							class="min-w-0 truncate font-semibold text-contrast"
 						>
-							<Avatar
-								:src="creatorAvatarSrc"
-								:alt="formatMessage(messages.creatorAvatarAlt, { username: creatorName })"
-								:tint-by="creatorName"
-								size="24px"
-								circle
-								no-shadow
-								class="shrink-0 transition"
-								:class="creatorProfileLink ? 'group-hover:brightness-125' : ''"
-							/>
-							<span
-								class="min-w-0 truncate font-medium"
-								:class="backupCreator.id === 'support' ? 'text-blue' : ''"
-							>
-								{{ creatorName }}
-							</span>
-						</AutoLink>
-					</template>
-					<template v-else>
-						<span>
-							{{
-								formatMessage(backup.automated ? messages.backupSchedule : messages.manualBackup)
-							}}
+							{{ backup.name }}
 						</span>
-					</template>
+						<span
+							v-if="backup.automated"
+							class="shrink-0 rounded-full border border-solid border-surface-5 bg-surface-4 px-2.5 py-1 text-sm font-medium text-secondary"
+						>
+							{{ formatMessage(messages.auto) }}
+						</span>
+					</div>
+					<div class="flex items-center gap-2 text-sm font-medium text-secondary">
+						<template v-if="preview">
+							<span>{{ formatDateTime(backup.created_at) }}</span>
+						</template>
+						<template v-else-if="backupCreator">
+							<AutoLink
+								:to="creatorProfileLink"
+								class="group flex min-w-0 items-center gap-1.5"
+								:class="creatorProfileLink ? 'text-secondary hover:underline' : 'text-primary'"
+							>
+								<Avatar
+									:src="creatorAvatarSrc"
+									:alt="formatMessage(messages.creatorAvatarAlt, { username: creatorName })"
+									:tint-by="creatorName"
+									size="24px"
+									circle
+									no-shadow
+									class="shrink-0 transition"
+									:class="creatorProfileLink ? 'group-hover:brightness-125' : ''"
+								/>
+								<span
+									class="min-w-0 truncate font-medium"
+									:class="backupCreator.id === 'support' ? 'text-blue' : ''"
+								>
+									{{ creatorName }}
+								</span>
+							</AutoLink>
+						</template>
+						<template v-else>
+							<span>
+								{{
+									formatMessage(backup.automated ? messages.backupSchedule : messages.manualBackup)
+								}}
+							</span>
+						</template>
+					</div>
 				</div>
+			</div>
+
+			<!-- Date (middle column) -->
+			<div v-if="!preview" class="flex shrink-0 items-center">
+				<span class="whitespace-nowrap font-medium text-contrast">{{
+					formatDateTime(backup.created_at)
+				}}</span>
+			</div>
+
+			<!-- Right side actions -->
+			<div v-if="!preview" class="flex min-w-0 flex-1 items-center justify-end gap-2">
+				<Button
+					v-tooltip="props.restoreDisabled"
+					type="outlined"
+					class="!border !text-brand [&>svg]:!text-brand !shadow-[inset_0_0_0_1px_var(--color-brand)]"
+					:disabled="!!props.restoreDisabled"
+					@click="() => emit('restore')"
+				>
+					<RotateCounterClockwiseIcon class="size-5" />
+					{{ formatMessage(messages.restore) }}
+				</Button>
+				<TeleportOverflowMenu
+					type="quiet"
+					label="More options"
+					:options="overflowMenuOptions"
+					@select="(option) => option.id === 'download' && emit('download')"
+				>
+					<MoreVerticalIcon class="size-5" />
+					<template #copy-id>
+						<ClipboardCopyIcon class="size-5" />
+						{{ formatMessage(commonMessages.copyIdButton) }}
+					</template>
+					<template #download>
+						<DownloadIcon class="size-5" /> {{ formatMessage(commonMessages.downloadButton) }}
+					</template>
+					<template #rename>
+						<EditIcon class="size-5" /> {{ formatMessage(messages.rename) }}
+					</template>
+					<template #delete>
+						<TrashIcon class="size-5" /> {{ formatMessage(commonMessages.deleteLabel) }}
+					</template>
+				</TeleportOverflowMenu>
 			</div>
 		</div>
 
-		<!-- Date (middle column) -->
-		<div v-if="!preview" class="flex shrink-0 items-center">
-			<span class="whitespace-nowrap font-medium text-contrast">{{
-				formatDateTime(backup.created_at)
-			}}</span>
-		</div>
-
-		<!-- Right side actions -->
-		<div v-if="!preview" class="flex min-w-0 flex-1 items-center justify-end gap-2">
-			<Button
-				v-tooltip="props.restoreDisabled"
-				type="outlined"
-				class="!border !text-brand [&>svg]:!text-brand !shadow-[inset_0_0_0_1px_var(--color-brand)]"
-				:disabled="!!props.restoreDisabled"
-				@click="() => emit('restore')"
-			>
-				<RotateCounterClockwiseIcon class="size-5" />
-				{{ formatMessage(messages.restore) }}
-			</Button>
-			<TeleportOverflowMenu
-				type="quiet"
-				label="More options"
-				:options="overflowMenuOptions"
-				@select="(option) => option.id === 'download' && emit('download')"
-			>
-				<MoreVerticalIcon class="size-5" />
-				<template #copy-id>
-					<ClipboardCopyIcon class="size-5" />
-					{{ formatMessage(commonMessages.copyIdButton) }}
-				</template>
-				<template #download>
-					<DownloadIcon class="size-5" /> {{ formatMessage(commonMessages.downloadButton) }}
-				</template>
-				<template #rename>
-					<EditIcon class="size-5" /> {{ formatMessage(messages.rename) }}
-				</template>
-				<template #delete>
-					<TrashIcon class="size-5" /> {{ formatMessage(commonMessages.deleteLabel) }}
-				</template>
-			</TeleportOverflowMenu>
-		</div>
-
-		<pre v-if="!preview && showDebugInfo" class="w-full rounded-xl bg-surface-4 p-2 text-xs">{{
+		<pre v-if="!preview && showDebugInfo" class="w-fit rounded-xl bg-surface-4 p-2 text-xs">{{
 			backup
 		}}</pre>
 	</div>

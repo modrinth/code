@@ -383,6 +383,7 @@ providePageContext({
 		serverRamAsBytesAlwaysOn: computed(() =>
 			appSettings.getFeatureFlag('server_ram_as_bytes_always_on'),
 		),
+		filesTabRework: computed(() => appSettings.getFeatureFlag('files_tab_rework')),
 	},
 	openExternalUrl: (url) => void openUrl(url),
 })

@@ -203,13 +203,23 @@ defineExpose({ open: openMenu, close: closeMenu })
 					>
 						<template #trigger>
 							<slot :name="option.id" :option="option">
-								<component :is="option.icon" v-if="option.icon" aria-hidden="true" />
+								<component
+									:is="option.icon"
+									v-if="option.icon"
+									:class="option.iconClass?.value ?? ''"
+									aria-hidden="true"
+								/>
 								{{ option.label }}
 							</slot>
 						</template>
 						<template #item="{ option: child }">
 							<slot :name="child.id" :option="child">
-								<component :is="child.icon" v-if="child.icon" aria-hidden="true" />
+								<component
+									:is="child.icon"
+									v-if="child.icon"
+									:class="child.iconClass?.value ?? ''"
+									aria-hidden="true"
+								/>
 								{{ child.label }}
 							</slot>
 						</template>
@@ -222,7 +232,12 @@ defineExpose({ open: openMenu, close: closeMenu })
 						@focus="focusedIndex = getItems().indexOf($event)"
 					>
 						<slot :name="option.id" :option="option">
-							<component :is="option.icon" v-if="option.icon" aria-hidden="true" />
+							<component
+								:is="option.icon"
+								v-if="option.icon"
+								:class="option.iconClass?.value ?? ''"
+								aria-hidden="true"
+							/>
 							{{ option.label }}
 						</slot>
 					</ButtonMenuItem>

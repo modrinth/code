@@ -7,23 +7,31 @@ export type TooltipProps = string | { text: string } | null | undefined
 export type TooltipDirective = Directive<HTMLElement, TooltipProps>
 export type TooltipContent = () => unknown
 
-interface TooltipSource {
-	placement: TooltipPlacement
-	getText: () => string | null
-	render?: TooltipContent
+export interface TooltipBaseProps {
+	reference?: HTMLElement | null
+	text?: (() => string | null) | string | null
+	placement?: TooltipPlacement
 	theme?: string
-	pinned?: boolean
+	content?: TooltipContent | null
 	panelClass?: string
+	delay?: DelayTimes | null
+	hoverable?: boolean
+	pinned?: boolean
+	allowTransfer?: boolean
 }
 
-interface TooltipState {
-	reference: HTMLElement | null
-	text: string | null
-	placement: TooltipPlacement
-	theme: string
-	content: TooltipContent | null
-	panelClass?: string
-}
+type RequiredFor<T, K extends keyof T> = Required<Pick<T, K>> & Pick<T, Exclude<keyof T, K>>
+
+type TooltipState = RequiredFor<
+	Omit<TooltipBaseProps, 'pinned'>,
+	'placement' | 'theme' | 'reference'
+>
+
+type TimeoutId = ReturnType<typeof setTimeout>
+
+type ToggledTooltipData = { id: TimeoutId | undefined; el: HTMLElement }
+
+type DelayTimes = { hover?: number; unhover?: number } | number
 
 declare module 'vue' {
 	export interface GlobalDirectives {
@@ -43,23 +51,35 @@ export const activeTooltip = ref<TooltipState>({
 	panelClass: undefined,
 })
 
-const sources = new WeakMap<HTMLElement, TooltipSource>()
-let showTimer: ReturnType<typeof setTimeout> | undefined
-let hideTimer: ReturnType<typeof setTimeout> | undefined
-let pending: HTMLElement | undefined
+const sources = new WeakMap<HTMLElement, TooltipBaseProps>()
+let showTimer: ToggledTooltipData | undefined
+let hideTimer: ToggledTooltipData | undefined
 let hovered: HTMLElement | undefined
 let focused: HTMLElement | undefined
 let lastOpen = 0
 
 function stopShow() {
-	clearTimeout(showTimer)
+	if (showTimer == null) return
+	clearTimeout(showTimer.id)
 	showTimer = undefined
-	pending = undefined
 }
 
 function stopHide() {
-	clearTimeout(hideTimer)
+	if (hideTimer == null) return
+	clearTimeout(hideTimer.id)
 	hideTimer = undefined
+}
+
+function hideWaiting(el?: HTMLElement) {
+	if (hideTimer == null) return false
+
+	const hidingEl = hideTimer.el
+	stopHide()
+
+	const isHidingElement = hidingEl == el
+	if (!isHidingElement) hide(hidingEl, true)
+
+	return isHidingElement
 }
 
 function clear() {
@@ -75,14 +95,13 @@ function clear() {
 
 function hasTooltipContent(el: HTMLElement) {
 	const source = sources.get(el)
-	return !!(source?.getText() || source?.render)
+	return !!((typeof source?.text === 'function' ? source.text() : source?.text) || source?.content)
 }
 
 function open(el: HTMLElement) {
 	const source = sources.get(el)
-	pending = undefined
-	const text = source?.getText() ?? null
-	const content = source?.render ?? null
+	const text = (typeof source?.text === 'function' ? source.text() : source?.text) ?? null
+	const content = source?.content ?? null
 	if (!text && !content) {
 		if (activeTooltip.value.reference === el) {
 			clear()
@@ -96,35 +115,48 @@ function open(el: HTMLElement) {
 		theme: source?.theme ?? 'tooltip',
 		content,
 		panelClass: source?.panelClass,
+		delay: source?.delay,
+		hoverable: source?.hoverable,
 	}
 	lastOpen = Date.now()
 }
 
-function show(immediate: boolean) {
+function show(immediate: boolean, delay: number = SHOW_DELAY) {
 	const el = focused ?? hovered
 	if (!el || !hasTooltipContent(el)) {
 		return
 	}
-	stopShow()
-	stopHide()
-	if (immediate || activeTooltip.value.reference || Date.now() - lastOpen <= SHOW_DELAY) {
+	if (hideWaiting(el)) return
+	if (showTimer) stopShow()
+	const source = sources.get(el)
+	if (
+		immediate ||
+		((activeTooltip.value.reference || Date.now() - lastOpen <= delay) && source?.allowTransfer)
+	) {
 		open(el)
 		return
 	}
-	pending = el
-	showTimer = setTimeout(() => open(el), SHOW_DELAY)
+	showTimer = {
+		id: setTimeout(() => {
+			open(el)
+			stopShow()
+		}, delay),
+		el: el,
+	}
 }
 
-function hide(el: HTMLElement, immediate: boolean) {
-	if (sources.get(el)?.pinned) {
+function hide(el: HTMLElement, immediate: boolean, delay: number = HIDE_DELAY) {
+	if (showTimer?.el === el) stopShow()
+
+	const source = sources.get(el)
+
+	if (source?.pinned) {
 		return
 	}
-	if (focused ?? hovered) {
+
+	if (source?.allowTransfer && (focused ?? hovered)) {
 		show(true)
 		return
-	}
-	if (pending === el) {
-		stopShow()
 	}
 	if (activeTooltip.value.reference !== el) {
 		return
@@ -135,19 +167,22 @@ function hide(el: HTMLElement, immediate: boolean) {
 		return
 	}
 	stopHide()
-	hideTimer = setTimeout(() => {
-		if ((focused ?? hovered) || sources.get(el)?.pinned) {
-			return
-		}
-		if (activeTooltip.value.reference !== el) {
-			return
-		}
-		clear()
-		stopHide()
-	}, HIDE_DELAY)
+	hideTimer = {
+		id: setTimeout(() => {
+			if ((focused ?? hovered) || sources.get(el)?.pinned) {
+				return
+			}
+			if (activeTooltip.value.reference !== el) {
+				return
+			}
+			clear()
+			stopHide()
+		}, delay),
+		el: el,
+	}
 }
 
-export function bindTooltipSource(el: HTMLElement, source: TooltipSource) {
+export function bindTooltipSource(el: HTMLElement, source: TooltipBaseProps) {
 	const wasPinned = sources.get(el)?.pinned
 	sources.set(el, source)
 	if (source.pinned || activeTooltip.value.reference === el) {
@@ -160,7 +195,7 @@ export function bindTooltipSource(el: HTMLElement, source: TooltipSource) {
 
 export function unbindTooltipSource(el: HTMLElement) {
 	sources.delete(el)
-	if (pending === el) {
+	if (showTimer?.el === el) {
 		stopShow()
 	}
 	if (hovered === el) {
@@ -183,22 +218,29 @@ function isFocusVisible(el: HTMLElement) {
 	return active.matches(':focus-visible')
 }
 
-export function tooltipEnter(el: HTMLElement) {
+export function tooltipEnter(el: HTMLElement, delay?: number): void {
 	if (!hasTooltipContent(el)) {
 		return
 	}
+	console.log('tooltipEnter', delay)
 	hovered = el
-	show(false)
+	show(false, delay)
 }
 
-export function tooltipLeave(el: HTMLElement) {
+export function preventHide(el: HTMLElement) {
+	if (hideTimer?.el == el) {
+		stopHide()
+	}
+}
+
+export function tooltipLeave(el: HTMLElement, delay?: number): void {
 	if (hovered === el) {
 		hovered = undefined
 	}
 	if (focused === el && !isFocusVisible(el)) {
 		focused = undefined
 	}
-	hide(el, false)
+	hide(el, false, delay)
 }
 
 export function tooltipFocusIn(el: HTMLElement) {
@@ -260,7 +302,7 @@ export function installTooltipDirective(app: App) {
 		},
 	} satisfies TooltipDirective)
 
-	function sync(el: HTMLElement, value: TooltipProps, modifiers: Record<string, boolean>) {
+	function sync(el: HTMLElement, value: TooltipProps, modifiers: Partial<Record<string, boolean>>) {
 		const text = tooltipText(value)
 		if (!text) {
 			releaseFocusable(el, addedTabIndex)
@@ -272,7 +314,7 @@ export function installTooltipDirective(app: App) {
 		ensureAriaLabel(el, text, addedAriaLabel)
 		bindTooltipSource(el, {
 			placement: tooltipPlacement(modifiers),
-			getText: () => tooltipText(value),
+			text: () => tooltipText(value),
 		})
 	}
 }

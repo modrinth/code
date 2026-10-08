@@ -2840,6 +2840,9 @@
   "layout.footer.developer-mode-deactivated.title": {
     "message": "Developer mode deactivated"
   },
+  "layout.footer.hide": {
+    "message": "Hide footer"
+  },
   "layout.footer.legal": {
     "message": "Legal"
   },
@@ -2893,6 +2896,9 @@
   },
   "layout.footer.resources.translate": {
     "message": "Translate"
+  },
+  "layout.footer.show": {
+    "message": "Show footer"
   },
   "layout.footer.social.bluesky": {
     "message": "Bluesky"

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { RadioButtonCheckedIcon, RadioButtonIcon } from '@modrinth/assets'
-import { computed, ref } from 'vue'
+import { computed, ref, toValue } from 'vue'
 import { RouterLink } from 'vue-router'
 
 import type { ButtonMenuAction, ButtonMenuLink } from '../types'
@@ -46,7 +46,7 @@ const itemAttrs = computed(() => ({
 }))
 
 function handleClick(event: MouseEvent) {
-	if (props.option.disabled) {
+	if (toValue(props.option.disabled)) {
 		event.preventDefault()
 		return
 	}
@@ -65,7 +65,7 @@ function handleKeydown(event: KeyboardEvent) {
 	// links don't fire on space the way buttons do
 	if (event.key !== ' ' || !isLink(props.option)) return
 	event.preventDefault()
-	if (props.option.disabled) return
+	if (toValue(props.option.disabled)) return
 	;(event.currentTarget as HTMLElement).click()
 }
 
@@ -92,7 +92,9 @@ function handleFocus(event: FocusEvent) {
 <template>
 	<div ref="wrapperElement" class="group/button-menu-item flex items-center">
 		<RouterLink
-			v-if="isLink(props.option) && props.option.to !== undefined && !props.option.disabled"
+			v-if="
+				isLink(props.option) && props.option.to !== undefined && !toValue(props.option.disabled)
+			"
 			v-tooltip="props.option.tooltip"
 			v-bind="itemAttrs"
 			:to="props.option.to"
@@ -118,13 +120,13 @@ function handleFocus(event: FocusEvent) {
 			v-else-if="isLink(props.option)"
 			v-tooltip="props.option.tooltip"
 			v-bind="itemAttrs"
-			:href="props.option.disabled ? undefined : props.option.href"
+			:href="toValue(props.option.disabled) ? undefined : props.option.href"
 			:target="props.option.target"
 			:rel="
 				props.option.rel ?? (props.option.target === '_blank' ? 'noopener noreferrer' : undefined)
 			"
 			:download="props.option.download"
-			:aria-disabled="props.option.disabled || undefined"
+			:aria-disabled="toValue(props.option.disabled) || undefined"
 			:class="[buttonMenuItemClasses, 'flex-1']"
 			@click="handleClick"
 			@keydown="handleKeydown"
@@ -148,7 +150,7 @@ function handleFocus(event: FocusEvent) {
 			v-tooltip="props.option.tooltip"
 			v-bind="itemAttrs"
 			type="button"
-			:aria-disabled="props.option.disabled || undefined"
+			:aria-disabled="toValue(props.option.disabled) || undefined"
 			:class="[buttonMenuItemClasses, 'flex-1']"
 			@click="handleClick"
 			@keydown="handleKeydown"

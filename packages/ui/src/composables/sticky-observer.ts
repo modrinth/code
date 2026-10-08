@@ -3,12 +3,21 @@ import { onUnmounted, ref, watch } from 'vue'
 
 import { useDebugLogger } from './debug-logger'
 
+export interface StickyObserverOptions {
+	/** Distance in px from the top of the viewport at which the target sticks (its CSS `top`). */
+	topOffset?: Ref<number>
+}
+
 /**
  * Observes when a target element becomes "stuck" (i.e. its natural position has scrolled out of view).
  * Injects a zero-height sentinel element before the target and uses IntersectionObserver to detect
- * when the sentinel leaves the viewport.
+ * when the sentinel scrolls past the target's sticky offset.
  */
-export function useStickyObserver(target: Ref<HTMLElement | null | undefined>, label?: string) {
+export function useStickyObserver(
+	target: Ref<HTMLElement | null | undefined>,
+	label?: string,
+	options: StickyObserverOptions = {},
+) {
 	const debug = useDebugLogger(`sticky-observer${label ? `:${label}` : ''}`)
 	const isStuck = ref(false)
 	let sentinel: HTMLElement | null = null
@@ -17,8 +26,8 @@ export function useStickyObserver(target: Ref<HTMLElement | null | undefined>, l
 	debug('init, target value:', target.value)
 
 	watch(
-		target,
-		(el, oldEl) => {
+		[target, () => Math.round(options.topOffset?.value ?? 0)],
+		([el, topOffset], [oldEl]) => {
 			debug('watch fired, el:', el, 'oldEl:', oldEl)
 			observer?.disconnect()
 			sentinel?.remove()
@@ -63,7 +72,7 @@ export function useStickyObserver(target: Ref<HTMLElement | null | undefined>, l
 							)
 						}
 					},
-					{ threshold: 0, rootMargin: '-1px 0px 0px 0px' },
+					{ threshold: 0, rootMargin: `-${topOffset + 1}px 0px 0px 0px` },
 				)
 				observer.observe(sentinel)
 				debug('observer started')

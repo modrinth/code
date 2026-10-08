@@ -1,4 +1,7 @@
+import { useScrollLock } from '@vueuse/core'
 import { computed, type Ref, ref } from 'vue'
+
+import { injectAppRoot } from '#ui/providers/app-root.ts'
 
 import { dismissFloatingMenus } from '../providers/floating-menu'
 import { dismissTooltip } from '../providers/tooltip'
@@ -35,12 +38,20 @@ export function getModalStackZBase(stackDepth: number) {
 export function useModalStack() {
 	const id = Symbol()
 
+	let isLocked: ReturnType<typeof useScrollLock> | undefined = undefined
+
+	if (isClient) {
+		const ctx = injectAppRoot(null)!
+		if (ctx) isLocked = useScrollLock(ctx.root)
+	}
+
 	function push() {
 		if (isClient && !stack.includes(id)) {
 			dismissTooltip()
 			dismissFloatingMenus()
 			stack.push(id)
 			stackSizeRef.value = stack.length
+			if (isLocked) isLocked.value = true
 		}
 	}
 
@@ -51,6 +62,7 @@ export function useModalStack() {
 			stack.splice(idx, 1)
 			stackSizeRef.value = stack.length
 		}
+		if (stackSizeRef.value <= 0 && isLocked) isLocked.value = false
 	}
 
 	function isTopmost() {

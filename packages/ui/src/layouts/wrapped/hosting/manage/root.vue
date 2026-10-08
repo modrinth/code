@@ -2,9 +2,6 @@
 	<div
 		v-if="filteredNotices.length > 0"
 		class="relative mx-auto mb-4 flex w-full min-w-0 flex-col gap-3 px-6"
-		:class="{
-			'max-w-[1280px]': constrainWidth,
-		}"
 	>
 		<ServerNotice
 			v-for="notice in filteredNotices"
@@ -98,6 +95,7 @@
 	<!-- SERVER START -->
 	<div
 		v-else-if="serverData"
+		ref="serverDataContainer"
 		data-pyro-server-manager-root
 		class="relative mx-auto box-border flex w-full min-w-0 flex-col gap-4 px-6 transition-all duration-300"
 		:style="{
@@ -108,10 +106,10 @@
 		:class="[
 			'server-panel-' + revealState,
 			containedLayout
-				? 'h-full min-h-0 overflow-hidden pb-6'
+				? 'h-full min-h-0 overflow-hidden'
 				: constrainWidth
-					? 'min-h-[100svh] max-w-[1280px] pb-16'
-					: 'min-h-[calc(100svh-100px)] pb-6',
+					? ['min-h-[100svh] max-w-[1280px]']
+					: 'min-h-[calc(100svh-100px)]',
 		]"
 	>
 		<template v-if="revealState !== 'pending' || isOnboarding">
@@ -190,7 +188,7 @@
 							<PanelServerActionButton />
 							<Tooltip
 								theme="dismissable-prompt"
-								:open="showSettingsHint"
+								:pinned="showSettingsHint"
 								:disabled="!showSettingsHint"
 								placement="bottom-end"
 							>
@@ -241,15 +239,34 @@
 			<ServerOnboardingPanelPage v-if="isOnboarding" :browse-modpacks="handleBrowseModpacks" />
 
 			<template v-else>
-				<div class="server-stagger-item -mb-3">
+				<div class="server-stagger-item flex items-center">
 					<NavTabs
 						:links="navLinks"
 						replace
 						page-nav
+						:no-padding="true"
+						:no-margin="true"
 						data-pyro-navigation
-						:class="containedLayout ? 'shrink-0' : ''"
+						:class="[containedLayout ? 'shrink-0' : '', 'px-0 py-0']"
 						:style="{ '--si': 1 }"
 					/>
+					<IconButton
+						v-if="showConstrainWidthToggle"
+						v-tooltip="constrainWidth ? 'Expand View' : 'Collapse View'"
+						size="md"
+						:label="constrainWidth ? 'Expand View' : 'Collapse View'"
+						native-type="button"
+						class="ml-2"
+						:style="{ '--si': 1 }"
+						@click="
+							() => {
+								$emit('toggleConstrainWidth', (constrainWidth = !constrainWidth))
+							}
+						"
+					>
+						<ExpandIcon v-if="constrainWidth" />
+						<CollapseIcon v-else />
+					</IconButton>
 				</div>
 
 				<div
@@ -308,7 +325,11 @@
 						class="mb-4 shrink-0"
 						@installation-retry="handleInstallationRetry"
 					/>
-					<slot :on-reinstall="onReinstall" :on-reinstall-failed="onReinstallFailed" />
+					<slot
+						:on-reinstall="onReinstall"
+						:on-reinstall-failed="onReinstallFailed"
+						:constrain-width="constrainWidth"
+					/>
 				</div>
 			</template>
 		</template>
@@ -343,8 +364,10 @@ import type { Archon, Labrinth } from '@modrinth/api-client'
 import { ModrinthApiError, NuxtModrinthClient } from '@modrinth/api-client'
 import {
 	BoxesIcon,
+	CollapseIcon,
 	CopyIcon,
 	DatabaseBackupIcon,
+	ExpandIcon,
 	FolderOpenIcon,
 	IssuesIcon,
 	LayoutTemplateIcon,
@@ -361,7 +384,7 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { useStorage } from '@vueuse/core'
+import { useLocalStorage, useResizeObserver, useStorage } from '@vueuse/core'
 import DOMPurify from 'dompurify'
 import { computed, nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, watch } from 'vue'
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
@@ -450,6 +473,7 @@ const props = withDefaults(
 			type: 'mod' | 'plugin' | 'datapack'
 		}) => void | Promise<void>
 		constrainWidth?: boolean
+		allowConstrainWidthToggle?: boolean
 		layoutMode?: 'page' | 'contained'
 	}>(),
 	{
@@ -465,10 +489,15 @@ const props = withDefaults(
 		navigateToServers: undefined,
 		browseModpacks: undefined,
 		browseContent: undefined,
-		constrainWidth: false,
+		constrainWidth: undefined,
+		allowConstrainWidthToggle: false,
 		layoutMode: 'page',
 	},
 )
+
+defineEmits<{
+	toggleConstrainWidth: [value: boolean]
+}>()
 
 const { formatMessage } = useVIntl()
 
@@ -503,7 +532,24 @@ const DISABLE_LOADING_ANIM = true
 
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
-const constrainWidth = computed(() => props.constrainWidth)
+const serverDataContainer = ref<InstanceType<typeof HTMLDivElement>>()
+const showConstrainWidthToggle = ref<boolean>(false)
+useResizeObserver(serverDataContainer, (entries) => {
+	const entry = entries[0]
+	showConstrainWidthToggle.value = entry.contentRect.width > 1200 && props.allowConstrainWidthToggle
+})
+const constrainWidth = useLocalStorage(
+	'server-layout-constrained-width',
+	props.constrainWidth ?? true,
+	{
+		initOnMounted: true,
+		listenToStorageChanges: true,
+	},
+)
+if (props.constrainWidth != constrainWidth.value) {
+	constrainWidth.value = props.constrainWidth
+}
+
 const containedLayout = computed(() => props.layoutMode === 'contained')
 const isNuxt = computed(() => client instanceof NuxtModrinthClient)
 const queryClient = useQueryClient()

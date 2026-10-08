@@ -1538,6 +1538,18 @@
   "files.editor.save-failed-title": {
     "defaultMessage": "Save failed"
   },
+  "files.empty-workspace.description": {
+    "defaultMessage": "Open a folder or file to get started."
+  },
+  "files.empty-workspace.open-home": {
+    "defaultMessage": "Open home folder"
+  },
+  "files.empty-workspace.recently-closed": {
+    "defaultMessage": "Recently closed"
+  },
+  "files.empty-workspace.title": {
+    "defaultMessage": "No open tabs"
+  },
   "files.error.go-to-home": {
     "defaultMessage": "Go to home folder"
   },
@@ -1604,11 +1616,17 @@
   "files.layout.extraction-started-title": {
     "defaultMessage": "Extraction started"
   },
+  "files.layout.resize-sidebar": {
+    "defaultMessage": "Resize sidebar"
+  },
   "files.layout.selected-count": {
     "defaultMessage": "{count} selected"
   },
   "files.layout.unsaved-changes": {
     "defaultMessage": "You have unsaved changes."
+  },
+  "files.layout.zip-mixed-folders": {
+    "defaultMessage": "Only entries from the same folder can be zipped together"
   },
   "files.move-modal.current-location": {
     "defaultMessage": "Current location"
@@ -1622,20 +1640,32 @@
   "files.move-modal.header": {
     "defaultMessage": "Move {type}"
   },
+  "files.navbar.back": {
+    "defaultMessage": "Back"
+  },
   "files.navbar.back-to-home": {
     "defaultMessage": "Back to home"
   },
   "files.navbar.breadcrumb-navigation": {
     "defaultMessage": "Breadcrumb navigation"
   },
+  "files.navbar.collapse": {
+    "defaultMessage": "Collapse"
+  },
   "files.navbar.create-new": {
     "defaultMessage": "Create new..."
+  },
+  "files.navbar.expand": {
+    "defaultMessage": "Expand"
   },
   "files.navbar.file-navigation": {
     "defaultMessage": "File navigation"
   },
   "files.navbar.find-in-file": {
     "defaultMessage": "Find in file"
+  },
+  "files.navbar.forward": {
+    "defaultMessage": "Forward"
   },
   "files.navbar.home": {
     "defaultMessage": "Home"
@@ -1700,17 +1730,50 @@
   "files.rename-modal.new-name-label": {
     "defaultMessage": "New name"
   },
+  "files.row.collapse-folder": {
+    "defaultMessage": "Collapse folder"
+  },
   "files.row.create-zip": {
     "defaultMessage": "Create ZIP"
+  },
+  "files.row.expand-folder": {
+    "defaultMessage": "Expand folder"
   },
   "files.row.item-count": {
     "defaultMessage": "{count, plural, one {# item} other {# items}}"
   },
+  "files.row.open-in-new-tab": {
+    "defaultMessage": "Open in new tab"
+  },
   "files.row.parent-folder": {
     "defaultMessage": "Parent folder"
   },
+  "files.row.upload-or-create": {
+    "defaultMessage": "New Entry"
+  },
+  "files.search.loaded-only": {
+    "defaultMessage": "Searching folders that have been opened"
+  },
+  "files.search.no-results": {
+    "defaultMessage": "No matching files or folders"
+  },
+  "files.search.placeholder": {
+    "defaultMessage": "Go to file or folder"
+  },
+  "files.table-header.advanced-view": {
+    "defaultMessage": "Advanced view"
+  },
+  "files.table-header.colored-icons": {
+    "defaultMessage": "Colored icons"
+  },
   "files.table-header.created": {
     "defaultMessage": "Created"
+  },
+  "files.table-header.details": {
+    "defaultMessage": "Details"
+  },
+  "files.table-header.items": {
+    "defaultMessage": "Items"
   },
   "files.table-header.modified": {
     "defaultMessage": "Modified"
@@ -1718,8 +1781,50 @@
   "files.table-header.name": {
     "defaultMessage": "Name"
   },
+  "files.table-header.show-details": {
+    "defaultMessage": "Show details"
+  },
   "files.table-header.size": {
     "defaultMessage": "Size"
+  },
+  "files.table-header.view-settings": {
+    "defaultMessage": "View settings"
+  },
+  "files.tabs.all-tabs": {
+    "defaultMessage": "All tabs"
+  },
+  "files.tabs.close-all-tabs": {
+    "defaultMessage": "Close all tabs"
+  },
+  "files.tabs.close-other-tabs": {
+    "defaultMessage": "Close other tabs"
+  },
+  "files.tabs.close-tab": {
+    "defaultMessage": "Close {name}"
+  },
+  "files.tabs.close-this-tab": {
+    "defaultMessage": "Close tab"
+  },
+  "files.tabs.home": {
+    "defaultMessage": "Home"
+  },
+  "files.tabs.new-tab": {
+    "defaultMessage": "New tab"
+  },
+  "files.tabs.unsaved-changes": {
+    "defaultMessage": "Unsaved changes"
+  },
+  "files.tree.empty-folder": {
+    "defaultMessage": "This folder is empty"
+  },
+  "files.tree.empty-subfolder": {
+    "defaultMessage": "Empty"
+  },
+  "files.tree.label": {
+    "defaultMessage": "File tree"
+  },
+  "files.tree.loading": {
+    "defaultMessage": "Loading..."
   },
   "files.unsaved-changes-modal.body": {
     "defaultMessage": "You have unsaved changes that will be lost if you leave. Would you like to save before leaving?"
@@ -2734,6 +2839,9 @@
   },
   "label.select-all": {
     "defaultMessage": "Select all"
+  },
+  "label.select-entry": {
+    "defaultMessage": "Select Entry"
   },
   "label.selected": {
     "defaultMessage": "Selected"

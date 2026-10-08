@@ -1,5 +1,5 @@
 import type { DefaultError, UseQueryReturnType } from '@tanstack/vue-query'
-import type { Ref } from 'vue'
+import type { ComputedRef } from 'vue'
 import { computed } from 'vue'
 
 /** Subset of {@link UseQueryReturnType} passed to {@link useReadyState}. */
@@ -19,6 +19,6 @@ export type ReadyStateQuery<TData, TError = DefaultError> = Pick<
  */
 export function useReadyState<TData, TError = DefaultError>(
 	query: ReadyStateQuery<TData, TError>,
-): Readonly<Ref<boolean>> {
+): ComputedRef<boolean> {
 	return computed(() => query.isLoading.value && query.data.value === undefined)
 }

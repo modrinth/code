@@ -11,7 +11,6 @@
 		:auth-user="authUser"
 		:navigate-to-billing="() => router.push('/settings/billing')"
 		:navigate-to-servers="() => router.push('/hosting/manage')"
-		constrain-width
 		:browse-modpacks="
 			({ serverId: sid, worldId: wid, from }) => {
 				navigateTo({
@@ -28,9 +27,21 @@
 				})
 			}
 		"
+		:constrain-width="constrainWidth"
+		:allow-constrain-width-toggle="true"
+		@toggle-constrain-width="
+			(value: boolean) => {
+				constrainWidth = value
+			}
+		"
 	>
-		<template #default="{ onReinstall, onReinstallFailed }">
-			<NuxtPage :route="route" @reinstall="onReinstall" @reinstall-failed="onReinstallFailed" />
+		<template #default="{ onReinstall, onReinstallFailed, constrainWidth }">
+			<NuxtPage
+				:route="route"
+				:constrain-width="constrainWidth"
+				@reinstall="onReinstall"
+				@reinstall-failed="onReinstallFailed"
+			/>
 		</template>
 	</ServersManageRootLayout>
 </template>
@@ -85,6 +96,11 @@ async function resolveViewer(): Promise<{ userId: string | null; userRole: strin
 
 definePageMeta({
 	middleware: 'auth',
+})
+
+const constrainWidth = useCookie('server-layout-constrained-width', {
+	default: () => true,
+	maxAge: 60 * 60 * 24 * 365,
 })
 
 useHead({

@@ -6,19 +6,20 @@ import {
 	onBeforeUnmount,
 	type PropType,
 	ref,
-	useSlots,
 	useTemplateRef,
+	type VNode,
 	watch,
 } from 'vue'
 
 import {
 	bindTooltipSource,
+	preventHide,
+	type TooltipBaseProps,
 	type TooltipContent,
 	tooltipEnter,
 	tooltipFocusIn,
 	tooltipFocusOut,
 	tooltipLeave,
-	type TooltipPlacement,
 	unbindTooltipSource,
 } from '../../providers/tooltip'
 
@@ -26,10 +27,10 @@ defineOptions({ inheritAttrs: false })
 
 const TooltipSlot = defineComponent({
 	props: {
-		render: { type: Function as PropType<TooltipContent>, required: true },
+		content: { type: Function as PropType<TooltipContent>, required: true },
 	},
 	setup(props) {
-		return () => props.render()
+		return () => props.content()
 	},
 })
 
@@ -41,20 +42,15 @@ const SIDES = {
 } as const
 
 const props = withDefaults(
-	defineProps<{
-		disabled?: boolean
-		open?: boolean
-		theme?: string
-		placement?: TooltipPlacement
-		reference?: HTMLElement | null
-		text?: string | null
-		content?: TooltipContent | null
-		panelClass?: string
-	}>(),
-	{ disabled: false, theme: 'tooltip', placement: 'top' },
+	defineProps<
+		TooltipBaseProps & {
+			disabled?: boolean
+		}
+	>(),
+	{ disabled: false, theme: 'tooltip', placement: 'top', allowTransfer: true },
 )
 
-const slots = useSlots()
+const slots = defineSlots<{ popper?: () => VNode }>()
 const trigger = useTemplateRef<HTMLElement>('trigger')
 const floating = useTemplateRef<HTMLElement>('floating')
 const arrowEl = useTemplateRef<HTMLElement>('arrowEl')
@@ -86,6 +82,22 @@ watch(
 	{ flush: 'post' },
 )
 
+const isDisabled = computed(() => props.disabled)
+
+watch(isDisabled, (value) => {
+	if (trigger.value) {
+		if (value) {
+			if (trigger.value.matches(':hover')) {
+				onLeave()
+			}
+		} else {
+			if (trigger.value.matches(':hover')) {
+				onEnter()
+			}
+		}
+	}
+})
+
 watch(
 	referenceEl,
 	(el, prev, onCleanup) => {
@@ -114,7 +126,7 @@ watch(
 	[
 		trigger,
 		() => props.disabled,
-		() => props.open,
+		() => props.pinned,
 		() => props.placement,
 		() => props.theme,
 		() => props.text,
@@ -160,12 +172,8 @@ function syncSource() {
 		return
 	}
 	bindTooltipSource(el, {
-		placement: props.placement,
-		theme: props.theme,
-		getText: () => props.text ?? null,
-		render: slots.popper ? () => slots.popper?.() : undefined,
-		pinned: !!props.open,
-		panelClass: props.panelClass,
+		...props,
+		content: slots.popper ? () => slots.popper?.() : undefined,
 	})
 }
 
@@ -201,12 +209,23 @@ function onEnter() {
 	if (props.disabled || !trigger.value) {
 		return
 	}
-	tooltipEnter(trigger.value)
+	const delay = props.delay
+	tooltipEnter(trigger.value, delay ? (typeof delay === 'number' ? delay : delay.hover) : undefined)
+}
+
+function onTooltipEnter() {
+	console.log('WWWWWWWWWWWWWWWWWWWW')
+	if ((props.hoverable || props.pinned) && props.reference) {
+		console.log('WEEEEEEEE')
+		preventHide(props.reference)
+	}
 }
 
 function onLeave() {
-	if (trigger.value) {
-		tooltipLeave(trigger.value)
+	const triggerEl = trigger.value ?? props.reference
+	const delay = props.delay
+	if (triggerEl) {
+		tooltipLeave(triggerEl, delay ? (typeof delay === 'number' ? delay : delay.unhover) : undefined)
 	}
 }
 
@@ -247,11 +266,18 @@ function onFocusOut(event: FocusEvent) {
 				v-if="isOpen"
 				:key="jumpKey"
 				ref="floating"
-				class="v-popper__inner pointer-events-none z-[100010] rounded-lg border border-solid border-surface-5 bg-surface-3 px-3 py-1.5 text-sm font-medium text-contrast card-shadow"
-				:class="[`v-popper--theme-${theme}`, moving && 'tooltip-moving', panelClass]"
+				class="v-popper__inner z-[100010] rounded-lg border border-solid border-surface-5 bg-surface-3 px-3 py-1.5 text-sm font-medium text-contrast card-shadow"
+				:class="[
+					`v-popper--theme-${theme}`,
+					moving && 'tooltip-moving',
+					panelClass,
+					!!(hoverable || pinned) ? '' : 'pointer-events-none',
+				]"
 				:style="[floatingStyles, { transformOrigin }]"
+				@mouseenter="onTooltipEnter"
+				@mouseleave="onLeave"
 			>
-				<TooltipSlot v-if="content" :render="content" />
+				<TooltipSlot v-if="content" :content="content" />
 				<template v-else>{{ text }}</template>
 				<div
 					ref="arrowEl"

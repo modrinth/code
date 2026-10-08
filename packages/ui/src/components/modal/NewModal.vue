@@ -27,14 +27,22 @@
 				:style="{ zIndex: stackOverlayZ }"
 				@click="() => (closeOnClickOutside && closable ? hide() : {})"
 			/>
-			<div class="modal-container" :class="{ shown: visible }" :style="{ zIndex: stackContainerZ }">
+			<div
+				class="modal-container"
+				:class="[
+					{ shown: visible },
+					pulloutContainerClass,
+					fillWidthWhenSmall ? 'fill-width-when-small' : '',
+				]"
+				:style="{ zIndex: stackContainerZ }"
+			>
 				<div
 					ref="modalBodyRef"
 					role="dialog"
 					aria-modal="true"
 					tabindex="-1"
 					:aria-labelledby="headerId"
-					class="modal-body flex flex-col bg-bg-raised rounded-2xl border border-solid border-surface-5 outline-none"
+					:class="['modal-body flex flex-col bg-bg-raised outline-none', pulloutBorderClass]"
 					v-bind="$attrs"
 				>
 					<div
@@ -196,12 +204,15 @@ const props = withDefaults(
 		noPadding?: boolean
 		/** Max width for the modal (e.g., '460px', '600px'). Defaults to '60rem'. */
 		maxWidth?: string
+		maxWidthMinCheck?: boolean
 		/** Width for the modal body (e.g., '460px', '600px'). */
 		width?: string
 		animateResize?: boolean
 		/** Disables all close actions (close button, ESC key, click outside). */
 		disableClose?: boolean
 		actionsDivider?: boolean
+		pulloutDirection?: 'left' | 'right' | 'top' | 'bottom'
+		fillWidthWhenSmall?: boolean
 	}>(),
 	{
 		type: true,
@@ -225,10 +236,13 @@ const props = withDefaults(
 		maxContentHeight: '70vh',
 		noPadding: false,
 		maxWidth: undefined,
+		maxWidthMinCheck: true,
 		width: undefined,
 		animateResize: true,
 		disableClose: false,
 		actionsDivider: false,
+		pulloutDirection: undefined,
+		fillWidthWhenSmall: true,
 	},
 )
 
@@ -511,9 +525,42 @@ const stackOverlayZ = computed(() => stackZBase.value + MODAL_OVERLAY_Z_OFFSET)
 const stackTauriZ = computed(() => stackZBase.value + MODAL_TAURI_Z_OFFSET)
 const stackContainerZ = computed(() => stackZBase.value + MODAL_CONTAINER_Z_OFFSET)
 const resolvedMaxWidth = computed(() => props.maxWidth ?? '60rem')
+const modelBodyMaxWidth = computed(() =>
+	props.maxWidthMinCheck
+		? `min(${resolvedMaxWidth.value}, calc(100% - 2 * var(--gap-lg)))`
+		: resolvedMaxWidth.value,
+)
 const resolvedWidth = computed(() => props.width ?? 'fit-content')
-const mouseXOffset = computed(() => `calc((-50vw + ${mouseX.value}px) / 16)`)
-const mouseYOffset = computed(() => `calc((-50vh + ${mouseY.value}px) / 16)`)
+
+// The mouse-tilt parallax only makes sense for a centered, floating modal - a pulled-out
+// drawer stays pinned flush to its edge, so keep the offset inert while pulloutDirection is set.
+const mouseXOffset = computed(() =>
+	props.pulloutDirection ? '0px' : `calc((-50vw + ${mouseX.value}px) / 16)`,
+)
+const mouseYOffset = computed(() =>
+	props.pulloutDirection ? '0px' : `calc((-50vh + ${mouseY.value}px) / 16)`,
+)
+
+const pulloutContainerClass = computed(() =>
+	props.pulloutDirection ? `pullout-${props.pulloutDirection}` : '',
+)
+
+// Only the edge facing into the screen (opposite the pullout direction) keeps a border -
+// the other edges sit flush against the viewport, so a border/radius there would look broken.
+const pulloutBorderClass = computed(() => {
+	switch (props.pulloutDirection) {
+		case 'left':
+			return 'border-0 border-r border-solid border-surface-5'
+		case 'right':
+			return 'border-0 border-l border-solid border-surface-5'
+		case 'top':
+			return 'border-0 border-b border-solid border-surface-5'
+		case 'bottom':
+			return 'border-0 border-t border-solid border-surface-5'
+		default:
+			return 'rounded-2xl border border-solid border-surface-5'
+	}
+})
 
 function updateMousePosition(event: { clientX: number; clientY: number }) {
 	mouseX.value = event.clientX
@@ -532,6 +579,7 @@ onUnmounted(() => {
 		hideTimeout = null
 	}
 	if (open.value) {
+		props.onHide?.()
 		popModal()
 		window.removeEventListener('keydown', handleWindowKeyDown)
 		window.removeEventListener('mousedown', updateMousePosition)
@@ -677,6 +725,30 @@ defineOptions({
 	transform: translate(v-bind(mouseXOffset), v-bind(mouseYOffset));
 	transition: none;
 
+	// Pull the main axis toward the target edge so the (fixed-position) modal body's static
+	// position sits flush against it instead of centered. top/bottom flip the main axis to
+	// vertical so justify-content controls top/bottom instead of left/right.
+	&.pullout-top,
+	&.pullout-bottom {
+		flex-direction: column;
+	}
+
+	&.pullout-left {
+		justify-content: flex-start;
+	}
+
+	&.pullout-right {
+		justify-content: flex-end;
+	}
+
+	&.pullout-top {
+		justify-content: flex-start;
+	}
+
+	&.pullout-bottom {
+		justify-content: flex-end;
+	}
+
 	&.shown {
 		visibility: visible;
 		transform: translate(0, 0);
@@ -686,6 +758,23 @@ defineOptions({
 			opacity: 1;
 			visibility: visible;
 			scale: 1;
+			translate: 0 0;
+		}
+
+		&.pullout-left > .modal-body {
+			translate: 0 0;
+		}
+
+		&.pullout-right > .modal-body {
+			translate: 0 0;
+		}
+
+		&.pullout-top > .modal-body {
+			translate: 0 0;
+		}
+
+		&.pullout-bottom > .modal-body {
+			translate: 0 0;
 		}
 	}
 
@@ -693,7 +782,7 @@ defineOptions({
 		position: fixed;
 		box-shadow: 4px 4px 26px 10px rgba(0, 0, 0, 0.08);
 		max-height: calc(100% - 2 * var(--gap-lg));
-		max-width: min(v-bind(resolvedMaxWidth), calc(100% - 2 * var(--gap-lg)));
+		max-width: v-bind(modelBodyMaxWidth);
 		overflow-y: hidden;
 		overflow-x: hidden;
 		width: v-bind(resolvedWidth);
@@ -707,10 +796,44 @@ defineOptions({
 		@media (prefers-reduced-motion) {
 			transition: none !important;
 		}
+	}
 
+	&.fill-width-when-small > .modal-body {
 		@media screen and (max-width: 640px) {
 			width: calc(100% - 2 * var(--gap-lg));
 		}
+	}
+
+	// Pulled-out panels don't zoom in - they slide in flush from their edge, and are
+	// full-height (left/right) or full-width (top/bottom) with no gap along that axis.
+	&.pullout-left > .modal-body,
+	&.pullout-right > .modal-body {
+		height: 100%;
+		max-height: 100%;
+		scale: 1;
+	}
+
+	&.pullout-top > .modal-body,
+	&.pullout-bottom > .modal-body {
+		width: 100%;
+		max-width: 100%;
+		scale: 1;
+	}
+
+	&.pullout-left > .modal-body {
+		translate: -100% 0;
+	}
+
+	&.pullout-right > .modal-body {
+		translate: 100% 0;
+	}
+
+	&.pullout-top > .modal-body {
+		translate: 0 -100%;
+	}
+
+	&.pullout-bottom > .modal-body {
+		translate: 0 100%;
 	}
 }
 </style>

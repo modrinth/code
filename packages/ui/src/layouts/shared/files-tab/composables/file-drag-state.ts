@@ -1,12 +1,8 @@
 import { ref } from 'vue'
 
-export interface FileDragData {
-	name: string
-	type: string
-	path: string
-}
+import type { FileInfo } from '#ui/layouts/shared/files-tab/providers/file-manager.ts'
 
-const activeDrag = ref<FileDragData | null>(null)
+const activeDrag = ref<FileInfo | null>(null)
 const dragTarget = ref<string | null>(null)
 const ghostEl = ref<HTMLElement | null>(null)
 const pointerStartX = ref(0)
@@ -84,7 +80,7 @@ function cleanup() {
 	}
 }
 
-let onDropCallback: ((source: FileDragData, destination: string) => void) | null = null
+let onDropCallback: ((source: FileInfo, destination: string) => void) | null = null
 
 function onPointerCancel() {
 	cleanup()
@@ -104,9 +100,9 @@ function onPointerUp() {
 }
 
 export function startFileDrag(
-	data: FileDragData,
+	data: FileInfo,
 	e: PointerEvent,
-	onDrop: (source: FileDragData, destination: string) => void,
+	onDrop: (source: FileInfo, destination: string) => void,
 ) {
 	activeDrag.value = data
 	pointerStartX.value = e.clientX

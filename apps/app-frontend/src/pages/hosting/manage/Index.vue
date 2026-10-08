@@ -28,6 +28,7 @@
 					})
 				}
 			"
+			:constrain-width="false"
 		>
 			<template #default="{ onReinstall, onReinstallFailed }">
 				<RouterView v-slot="{ Component }">

@@ -1,16 +1,18 @@
 <template>
-	<NuxtLayout>
-		<NuxtRouteAnnouncer />
-		<ClientOnly>
-			<LoadingBar />
-		</ClientOnly>
-		<NotificationPanel />
-		<AccountSwitchOverlay :show="isSwitchingAccount" />
-		<AdsConsentNotification />
-		<I18nDebugPanel />
-		<NuxtPage />
-		<div id="teleports"></div>
-	</NuxtLayout>
+	<div id="root" ref="root">
+		<NuxtLayout>
+			<NuxtRouteAnnouncer />
+			<ClientOnly>
+				<LoadingBar />
+			</ClientOnly>
+			<NotificationPanel />
+			<AccountSwitchOverlay :show="isSwitchingAccount" />
+			<AdsConsentNotification />
+			<I18nDebugPanel />
+			<NuxtPage />
+			<div id="teleports"></div>
+		</NuxtLayout>
+	</div>
 </template>
 <script setup lang="ts">
 import {
@@ -20,6 +22,8 @@ import {
 	LoadingBar,
 	NotificationPanel,
 } from '@modrinth/ui'
+import { provideAppRoot } from '@modrinth/ui/src/providers/app-root'
+import { computed, ref, watch } from 'vue'
 
 import AdsConsentNotification from '~/components/ui/AdsConsentNotification.vue'
 import { setupProviders } from '~/providers/setup.ts'
@@ -31,6 +35,12 @@ import {
 	useIsSwitchingAccount,
 } from './composables/accounts'
 import { useAuth } from './composables/auth'
+
+const root = ref<HTMLElement | null>(null)
+
+provideAppRoot({
+	root: computed(() => root.value),
+})
 
 const auth = await useAuth()
 const { userPreferences } = setupProviders(auth)
