@@ -1676,6 +1676,9 @@
   "app.server-sharing-update.invite": {
     "message": "Invite players"
   },
+  "app.server-sharing-update.mute": {
+    "message": "Mute video"
+  },
   "app.server-sharing-update.notification.description": {
     "message": "Invite friends to play with an instance managed by your server."
   },
@@ -1696,6 +1699,9 @@
   },
   "app.server-sharing-update.title": {
     "message": "Share servers with friends"
+  },
+  "app.server-sharing-update.unmute": {
+    "message": "Unmute video"
   },
   "app.server-sharing-update.watch": {
     "message": "Watch"

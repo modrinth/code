@@ -36,6 +36,7 @@ export interface ServerSettingsTabDefinition {
 	id: ServerSettingsTabId
 	label: string
 	icon: Component
+	color?: 'orange'
 	href?: (ctx: ServerSettingsTabContext) => string
 	external?: boolean
 	shown?: (ctx: ServerSettingsTabContext) => boolean
@@ -75,12 +76,6 @@ export const serverSettingsTabDefinitions: ServerSettingsTabDefinition[] = [
 		icon: TextQuoteIcon,
 	},
 	{
-		id: 'support',
-		label: 'Support',
-		icon: ShieldIcon,
-		shown: ({ isAdmin }) => isAdmin,
-	},
-	{
 		id: 'billing',
 		label: 'Billing',
 		icon: CardIcon,
@@ -92,8 +87,16 @@ export const serverSettingsTabDefinitions: ServerSettingsTabDefinition[] = [
 		id: 'admin-billing',
 		label: 'Admin Billing',
 		icon: ModrinthIcon,
+		color: 'orange',
 		href: ({ ownerId }) => `/admin/billing/${ownerId}`,
 		external: true,
+		shown: ({ isAdmin }) => isAdmin,
+	},
+	{
+		id: 'support',
+		label: 'Support',
+		icon: ShieldIcon,
+		color: 'orange',
 		shown: ({ isAdmin }) => isAdmin,
 	},
 ]
