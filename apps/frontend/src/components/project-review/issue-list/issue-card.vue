@@ -40,23 +40,28 @@
 					</Tooltip>
 					<slot name="action">
 						<Button
+							v-if="resolved"
+							size="sm"
+							type="quiet"
+							class="-my-1 -mb-2 -mr-1.5"
+							:disabled="pending || disabled"
+							:aria-label="formatMessage(messages.add, { issue: issueTitle })"
+							@click="restoreIssue()"
+						>
+							<PlusIcon aria-hidden="true" />
+							{{ formatMessage(messages.notResolved) }}
+						</Button>
+						<Button
+							v-else
 							size="sm"
 							type="quiet"
 							circular
 							class="-my-1 -mb-2 -mr-1.5 size-8"
 							:disabled="pending || disabled"
-							:aria-label="
-								formatMessage(resolved ? messages.add : messages.remove, {
-									issue: issueTitle,
-								})
-							"
-							@click="resolved ? restoreIssue() : removeIssue()"
+							:aria-label="formatMessage(messages.remove, { issue: issueTitle })"
+							@click="removeIssue()"
 						>
-							<template v-if="resolved">
-								<PlusIcon aria-hidden="true" />
-								{{ formatMessage(messages.notResolved) }}
-							</template>
-							<XIcon v-else aria-hidden="true" />
+							<XIcon aria-hidden="true" />
 						</Button>
 					</slot>
 				</div>
