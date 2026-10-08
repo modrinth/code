@@ -82,7 +82,7 @@ ENV NO_COLOR=1
 
 WORKDIR /app
 
-# Nitro bundles every runtime dependency into .output, so no node_modules is needed.
+# Nitro traces every runtime dependency into .output/server/node_modules, so no install step is needed.
 COPY --chown=node:node .output ./.output
 
 # Boot the server once and render the index page so the compile cache ships warm.

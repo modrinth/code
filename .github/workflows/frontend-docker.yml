@@ -81,6 +81,8 @@ jobs:
         run: pnpm web:build
         env:
           NITRO_PRESET: node_cluster
+          # Sentry's Node SDK hooks the module loader and breaks when bundled, so dependencies are traced into .output/server/node_modules instead
+          NITRO_NO_EXTERNALS: 'false'
           BUILD_ENV: ${{ steps.meta.outputs.env }}
           CF_PAGES_BRANCH: ${{ github.ref_name }}
           CF_PAGES_COMMIT_SHA: ${{ github.sha }}
