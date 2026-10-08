@@ -1,87 +1,63 @@
 <template>
 	<article
-		class="flex min-w-0 flex-col gap-2 rounded-xl border border-solid border-surface-3 bg-surface-2 p-2.5 py-2 text-sm"
+		class="flex min-w-0 flex-col gap-2 rounded-xl border border-solid border-surface-3 bg-surface-2 p-2.5 text-sm"
 	>
-		<div class="min-w-0">
-			<div class="flex flex-col gap-1">
-				<div class="flex items-center gap-2">
-					<button
-						type="button"
-						class="text-normal flex min-w-0 flex-1 items-center gap-1 border-0 bg-transparent p-0 text-left font-medium text-contrast"
-						:aria-expanded="expanded"
-						:aria-controls="contentId"
-						@click="expanded = !expanded"
+		<div class="flex min-w-0 flex-col gap-2">
+			<div class="flex items-center gap-2">
+				<button
+					type="button"
+					class="text-normal flex min-w-0 flex-1 items-center gap-1 border-0 bg-transparent p-0 text-left font-medium text-contrast"
+					:aria-expanded="expanded"
+					:aria-controls="contentId"
+					@click="expanded = !expanded"
+				>
+					<Tooltip
+						v-if="previousIssue && previousIssue.verdict !== 'resolved'"
+						:text="formatMessage(messages.reReview)"
 					>
-						<Tooltip
-							v-if="previousIssue && previousIssue.verdict !== 'resolved'"
-							:text="formatMessage(messages.reReview)"
+						<span
+							class="flex shrink-0 items-center text-orange"
+							role="img"
+							:aria-label="formatMessage(messages.reReview)"
 						>
-							<span
-								class="flex shrink-0 items-center text-orange"
-								role="img"
-								:aria-label="formatMessage(messages.reReview)"
-							>
-								<TagCategoryRefreshCcwIcon class="size-4" aria-hidden="true" />
-							</span>
-						</Tooltip>
-						{{ issue.title }}
-						<ChevronDownIcon
-							class="size-4 shrink-0 transition-transform duration-150 ease-in-out motion-reduce:transition-none"
-							:class="{ 'rotate-180': expanded }"
-							aria-hidden="true"
-						/>
-					</button>
-					<div class="flex items-center gap-1">
-						<Tooltip
-							v-if="reviewMessages.hasIssueOverride(messageKey)"
-							:text="formatMessage(messages.editedTooltip)"
+							<TagCategoryRefreshCcwIcon class="size-4" aria-hidden="true" />
+						</span>
+					</Tooltip>
+					{{ issue.title }}
+					<ChevronDownIcon
+						class="size-4 shrink-0 transition-transform duration-150 ease-in-out motion-reduce:transition-none"
+						:class="{ 'rotate-180': expanded }"
+						aria-hidden="true"
+					/>
+				</button>
+				<div class="flex items-center gap-1">
+					<Tooltip
+						v-if="reviewMessages.hasIssueOverride(messageKey)"
+						:text="formatMessage(messages.editedTooltip)"
+					>
+						<span class="text-xs">{{ formatMessage(messages.edited) }}</span>
+					</Tooltip>
+					<slot name="action">
+						<Button
+							size="sm"
+							type="quiet"
+							circular
+							class="-my-1 -mb-2 -mr-1.5 size-8"
+							:disabled="pending || disabled"
+							:aria-label="
+								formatMessage(resolved ? messages.add : messages.remove, {
+									issue: issue.title,
+								})
+							"
+							@click="resolved ? restoreIssue() : removeIssue()"
 						>
-							<span class="text-xs">{{ formatMessage(messages.edited) }}</span>
-						</Tooltip>
-						<slot name="action">
-							<Button
-								size="sm"
-								type="quiet"
-								:disabled="pending || disabled"
-								:aria-label="
-									formatMessage(resolved ? messages.add : messages.remove, {
-										issue: issue.title,
-									})
-								"
-								@click="resolved ? restoreIssue() : removeIssue()"
-							>
-								<template v-if="resolved">
-									<PlusIcon aria-hidden="true" />
-									{{ formatMessage(messages.notResolved) }}
-								</template>
-								<XIcon v-else aria-hidden="true" />
-							</Button>
-						</slot>
-					</div>
-				</div>
-				<div v-if="issueBindings.length || facetLabels.length" class="flex flex-wrap gap-1">
-					<Button
-						v-for="binding in issueBindings"
-						:key="binding.key"
-						size="xs"
-						type="quiet"
-						class="!h-auto !min-h-0 !rounded-full !bg-surface-3 !px-2.5 !py-1 !text-xs !font-medium hover:!bg-surface-4"
-						:aria-label="formatMessage(messages.openPanel, { panel: binding.panel.title })"
-						@click="revealPanel(binding.key)"
-					>
-						<PanelTopIcon
-							class="!mb-px -ml-px !size-3.5 !min-h-0 !min-w-0 shrink-0"
-							aria-hidden="true"
-						/>
-						{{ binding.panel.title }}
-					</Button>
-					<span
-						v-for="facet in facetLabels"
-						:key="facet.type"
-						class="inline-flex min-w-0 items-center rounded-full bg-surface-3 px-2.5 py-1 text-xs font-medium [overflow-wrap:anywhere]"
-					>
-						{{ facet.label }}
-					</span>
+							<template v-if="resolved">
+								<PlusIcon aria-hidden="true" />
+								{{ formatMessage(messages.notResolved) }}
+							</template>
+							<XIcon v-else aria-hidden="true" />
+						</Button>
+					</slot>
 				</div>
 			</div>
 
@@ -97,7 +73,7 @@
 					:aria-label="formatMessage(messages.message, { issue: issue.title })"
 				>
 					<div class="min-h-0 min-w-0">
-						<div class="flex flex-col gap-2 pt-2">
+						<div class="flex flex-col gap-2">
 							<fieldset
 								v-if="!resolved && fields.length"
 								:disabled="pending || disabled || resolved"
@@ -175,6 +151,30 @@
 					</div>
 				</div>
 			</Transition>
+			<div v-if="issueBindings.length || facetLabels.length" class="flex flex-wrap gap-1">
+				<Button
+					v-for="binding in issueBindings"
+					:key="binding.key"
+					size="xs"
+					type="quiet"
+					class="!h-auto !min-h-0 !rounded-full !bg-surface-3 !px-2.5 !py-1 !text-xs !font-medium hover:!bg-surface-4"
+					:aria-label="formatMessage(messages.openPanel, { panel: binding.panel.title })"
+					@click="revealPanel(binding.key)"
+				>
+					<PanelTopIcon
+						class="!mb-px -ml-px !size-3.5 !min-h-0 !min-w-0 shrink-0"
+						aria-hidden="true"
+					/>
+					{{ binding.panel.title }}
+				</Button>
+				<span
+					v-for="facet in facetLabels"
+					:key="facet.type"
+					class="inline-flex min-w-0 items-center rounded-full bg-surface-3 px-2.5 py-1 text-xs font-medium [overflow-wrap:anywhere]"
+				>
+					{{ facet.label }}
+				</span>
+			</div>
 		</div>
 		<IssueToggles v-if="!resolved" :issue="issue" :disabled="disabled" @remove="removeIssue" />
 		<p v-if="!resolved && needsToggle" class="m-0 text-xs text-orange" role="status">
