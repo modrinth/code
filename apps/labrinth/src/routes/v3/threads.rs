@@ -14,7 +14,9 @@ use crate::models::images::{Image, ImageContext};
 use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
 use crate::models::projects::ProjectStatus;
-use crate::models::thread_issues::ThreadIssueTarget;
+use crate::models::thread_issues::{
+    ThreadIssueAcknowledgement, ThreadIssueTarget,
+};
 use crate::models::threads::{MessageBody, Thread, ThreadType};
 use crate::models::users::User;
 use crate::queue::session::AuthQueue;
@@ -466,13 +468,21 @@ async fn thread_issue_project_id(
     .map(database::models::DBProjectId))
 }
 
-async fn thread_issue_facet_project_id(
+struct ThreadIssueFacetContext {
+    project_id: database::models::DBProjectId,
+    thread_id: database::models::DBThreadId,
+    created_at: chrono::DateTime<chrono::Utc>,
+    what: ThreadIssueTarget,
+}
+
+async fn thread_issue_facet_context(
     facet_id: database::models::DBThreadIssueFacetId,
     pool: &PgPool,
-) -> Result<Option<database::models::DBProjectId>, ApiError> {
-    Ok(sqlx::query_scalar!(
+) -> Result<Option<ThreadIssueFacetContext>, ApiError> {
+    Ok(sqlx::query!(
         r#"
-		SELECT thread.mod_id
+		SELECT thread.mod_id, issue.thread_id, issue.created_at,
+			facet.what AS "what: sqlx::types::Json<ThreadIssueTarget>"
 		FROM threads_issue_facets facet
 		INNER JOIN threads_issues issue ON issue.id = facet.issue_id
 		INNER JOIN threads thread ON thread.id = issue.thread_id
@@ -482,9 +492,15 @@ async fn thread_issue_facet_project_id(
     )
     .fetch_optional(pool)
     .await
-    .wrap_internal_err("fetching thread issue project")?
-    .flatten()
-    .map(database::models::DBProjectId))
+    .wrap_internal_err("fetching thread issue facet context")?
+    .and_then(|row| {
+        row.mod_id.map(|project_id| ThreadIssueFacetContext {
+            project_id: database::models::DBProjectId(project_id),
+            thread_id: database::models::DBThreadId(row.thread_id),
+            created_at: row.created_at,
+            what: row.what.0,
+        })
+    }))
 }
 
 async fn project_exists(
@@ -667,9 +683,10 @@ pub async fn thread_issue_facet_edit(
     .1;
     let facet_id: database::models::DBThreadIssueFacetId =
         info.into_inner().0.into();
-    let project_id = thread_issue_facet_project_id(facet_id, &pool)
+    let facet_context = thread_issue_facet_context(facet_id, &pool)
         .await?
         .wrap_not_found_err("resource not found")?;
+    let project_id = facet_context.project_id;
     let project_exists = project_exists(project_id, &pool).await?;
 
     if edit.moderator_verified.is_some() && !user.role.is_mod() {
@@ -691,6 +708,26 @@ pub async fn thread_issue_facet_edit(
     {
         return Err(ApiError::Auth(eyre::eyre!(
             "only project team members or moderators can address thread issues"
+        )));
+    }
+    if edit.user_addressed == Some(true)
+        && matches!(
+            facet_context.what,
+            ThreadIssueTarget::Acknowledge {
+                mode: ThreadIssueAcknowledgement::Reply
+            }
+        )
+        && !database::models::DBThread::has_project_member_reply(
+            facet_context.thread_id,
+            project_id,
+            facet_context.created_at,
+            &mut transaction,
+        )
+        .await
+        .wrap_internal_err("checking project team reply requirement")?
+    {
+        return Err(ApiError::Request(eyre::eyre!(
+            "a project team member must send a message in the thread before addressing this issue"
         )));
     }
     if edit.user_addressed == Some(true) && !user.role.is_mod() {

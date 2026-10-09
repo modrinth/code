@@ -123,6 +123,45 @@ impl ThreadBuilder {
 }
 
 impl DBThread {
+    /// Whether an accepted project or organization team member has posted a
+    /// public, nonempty text message in the thread after the given time.
+    pub async fn has_project_member_reply(
+        thread_id: DBThreadId,
+        project_id: DBProjectId,
+        after: DateTime<Utc>,
+        transaction: &mut PgTransaction<'_>,
+    ) -> Result<bool> {
+        sqlx::query_scalar!(
+            r#"
+			SELECT EXISTS (
+				SELECT 1
+				FROM threads_messages message
+				WHERE message.thread_id = $1
+					AND message.created > $3
+					AND message.body->>'type' = 'text'
+					AND COALESCE(message.body->>'private', 'false') = 'false'
+					AND LENGTH(TRIM(message.body->>'body')) > 0
+					AND message.author_id IN (
+						SELECT member.user_id
+						FROM mods project
+						LEFT JOIN organizations organization
+							ON organization.id = project.organization_id
+						INNER JOIN team_members member
+							ON member.team_id = project.team_id
+								OR member.team_id = organization.team_id
+						WHERE project.id = $2 AND member.accepted
+					)
+			) AS "has_reply!"
+			"#,
+            thread_id as DBThreadId,
+            project_id as DBProjectId,
+            after,
+        )
+        .fetch_one(&mut *transaction)
+        .await
+        .wrap_err("checking whether a project team member has replied")
+    }
+
     pub async fn get<'a, E>(id: DBThreadId, exec: E) -> Result<Option<DBThread>>
     where
         E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
