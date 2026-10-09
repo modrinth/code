@@ -36,9 +36,6 @@ use std::sync::{Arc, LazyLock, Mutex, Weak};
 use tokio::sync::{Mutex as AsyncMutex, MutexGuard, OwnedMutexGuard};
 use uuid::Uuid;
 
-/// Admission covers setup and deletion. A target reservation stays with its worker
-/// until cleanup finishes, so backups and rollback cannot overlap another install.
-static INSTALL_ADMISSION: AsyncMutex<()> = AsyncMutex::const_new(());
 static INSTALL_TARGETS: LazyLock<Mutex<HashMap<String, Weak<AsyncMutex<()>>>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
 
@@ -234,8 +231,8 @@ pub fn retry_job(
 }
 
 async fn retry_job_inner(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
-    let _admission = INSTALL_ADMISSION.lock().await;
     let state = State::get().await?;
+    let _admission = state.installs.admission.lock().await;
     let mut job = store::get_required(job_id, &state.pool).await?;
 
     if !matches!(
@@ -421,11 +418,11 @@ pub async fn cancel_job(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
 
 /// The caller must retain both guards until the instance has been removed.
 /// This prevents a new install from starting after cancellation has finished.
-pub(crate) async fn cancel_jobs_for_instance_deletion(
+pub(crate) async fn cancel_jobs_for_instance_deletion<'a>(
     instance_id: &str,
-    state: &State,
-) -> crate::Result<(MutexGuard<'static, ()>, OwnedMutexGuard<()>)> {
-    let admission = INSTALL_ADMISSION.lock().await;
+    state: &'a State,
+) -> crate::Result<(MutexGuard<'a, ()>, OwnedMutexGuard<()>)> {
+    let admission = state.installs.admission.lock().await;
     let jobs =
         store::list_active_for_instance(instance_id, &state.pool).await?;
     for job in &jobs {
@@ -483,9 +480,9 @@ fn start(
 async fn start_inner(
     request: InstallRequest,
 ) -> crate::Result<InstallJobSnapshot> {
-    let _admission = INSTALL_ADMISSION.lock().await;
-    let mut target_guard = reserve_target(&request.target())?;
     let state = State::get().await?;
+    let _admission = state.installs.admission.lock().await;
+    let mut target_guard = reserve_target(&request.target())?;
     if let InstallTarget::ExistingInstance { instance_id } = request.target() {
         store::ensure_no_pending_recovery(&instance_id, None, &state.pool)
             .await?;
@@ -792,7 +789,7 @@ async fn run_job_inner(
 
     let _install_permit = if control.checkpoint().await.is_ok() {
         tokio::select! {
-            permit = state.install_job_semaphore.acquire() => Some(permit?),
+            permit = state.installs.job_semaphore.acquire() => Some(permit?),
             () = control.canceled() => None,
         }
     } else {

@@ -1197,7 +1197,7 @@ async fn install_zipped_mrpack_files_with_reporter_inner(
             crate::state::file_modified_at_ns(&io::metadata(&path).await?)?;
 
         {
-            let _permit = state.install_db_semaphore.acquire().await?;
+            let _permit = state.installs.db_semaphore.acquire().await?;
             let record_context =
                 InstallErrorContext::new("record modpack override")
                     .maybe_project_id(project_id.clone())

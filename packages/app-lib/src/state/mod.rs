@@ -54,6 +54,9 @@ pub(crate) mod runtime_cache;
 mod friends;
 pub use self::friends::*;
 
+mod installs;
+pub(crate) use self::installs::Installs;
+
 mod tunnel;
 pub use self::tunnel::*;
 
@@ -78,7 +81,6 @@ static LAUNCHER_STATE: OnceCell<Arc<State>> = OnceCell::const_new();
 static STATE_STARTUP: LazyLock<Sender<StartupPhase>> =
     LazyLock::new(|| Sender::new(StartupPhase::Pending));
 static STATE_STARTUP_LOCK: Mutex<()> = Mutex::const_new(());
-const MAX_CONCURRENT_INSTALL_JOBS: usize = 3;
 pub struct State {
     startup_complete: AtomicBool,
     /// Information on the location of files used in the launcher
@@ -92,8 +94,7 @@ pub struct State {
     /// Semaphore to limit concurrent API requests. This is separate from the fetch semaphore
     /// to keep API functionality while the app is performing intensive tasks.
     pub api_semaphore: FetchSemaphore,
-    pub(crate) install_job_semaphore: Semaphore,
-    pub(crate) install_db_semaphore: Semaphore,
+    pub(crate) installs: Installs,
     /// Serializes filesystem reconciliation and content mutations per instance.
     instance_content_locks: DashMap<String, Arc<Mutex<()>>>,
     /// Serializes screenshot filesystem reconciliation per instance.
@@ -413,8 +414,7 @@ impl State {
             fetch_semaphore,
             io_semaphore,
             api_semaphore,
-            install_job_semaphore: Semaphore::new(MAX_CONCURRENT_INSTALL_JOBS),
-            install_db_semaphore: Semaphore::new(1),
+            installs: Installs::new(),
             instance_content_locks: DashMap::new(),
             instance_screenshot_locks: DashMap::new(),
             shared_instance_locks: DashMap::new(),
