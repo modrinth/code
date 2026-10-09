@@ -97,7 +97,7 @@ function readQueryString(value: unknown): string | null {
 	return typeof value === 'string' && value.length > 0 ? value : null
 }
 
-export function createServerInstallContent(opts: {
+export function useServerInstallContent(opts: {
 	serverSetupModalRef: Ref<ServerSetupModalHandle | null>
 }) {
 	const { serverSetupModalRef } = opts

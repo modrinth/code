@@ -24,23 +24,23 @@ import {
 	injectAuth,
 	injectModrinthClient,
 	injectNotificationManager,
+	injectPopupNotificationManager,
 	type ServerPlayTarget,
 	useServerIcon,
 	useVIntl,
 } from '@modrinth/ui'
-import { injectPopupNotificationManager } from '@modrinth/ui'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 import ModrinthAccountRequiredModal from '@/components/ui/modal/ModrinthAccountRequiredModal.vue'
 import SharedInstanceInstallModal from '@/components/ui/shared-instances/shared-instance-install-modal/index.vue'
+import { handleSevereError } from '@/composables/use-error.js'
 import {
 	hostingInstanceMetadata,
 	useHostingInstanceCache,
-} from '@/composables/instances/use-hosting-instance'
-import { useInstanceLaunchState } from '@/composables/instances/use-instance-launch-state'
-import { handleSevereError } from '@/composables/use-error.js'
+} from '@/features/instances/hosting/use-hosting-instance'
+import { injectInstanceLaunchState } from '@/features/instances/launch-state'
 import { toError } from '@/helpers/errors'
 import {
 	install_get_shared_instance_preview,
@@ -50,7 +50,7 @@ import {
 	type SharedInstanceUpdatePreview,
 	wait_for_install_job,
 } from '@/helpers/install'
-import { cache_icon, edit_icon, get, getInstanceIconUrl, list } from '@/helpers/instance'
+import { edit_icon, get, getInstanceIconUrl, list } from '@/helpers/instance'
 import { get as getCredentials, type ModrinthAuthFlow } from '@/helpers/mr_auth'
 import { get_by_instance_id } from '@/helpers/process'
 import { ensureManagedServerWorldExists, start_join_server } from '@/helpers/worlds'
@@ -58,6 +58,7 @@ import {
 	instanceKeys,
 	sharedInstanceUpdatePreviewQueryOptions,
 } from '@/pages/instance/query-options'
+import { cacheIconBytes } from '@/platform/app-lib/icons/commands'
 import { injectAppEvents } from '@/providers/app-events'
 
 type LaunchTarget = ServerPlayTarget & {
@@ -74,7 +75,7 @@ const queryClient = useQueryClient()
 const { fetchIcon } = useServerIcon('', { enabled: false })
 const router = useRouter()
 const hostingInstances = useHostingInstanceCache()
-const instanceLaunch = useInstanceLaunchState()
+const instanceLaunch = injectInstanceLaunchState()
 const { handleError } = injectNotificationManager()
 const popupNotificationManager = injectPopupNotificationManager()
 const { formatMessage } = useVIntl()
@@ -89,7 +90,7 @@ async function cacheServerIcon(serverId: string) {
 	const icon = await fetchIcon(serverId)
 	if (!icon) return null
 	const bytes = new Uint8Array(await icon.arrayBuffer())
-	return await cache_icon(Array.from(bytes))
+	return await cacheIconBytes(Array.from(bytes))
 }
 
 async function assertAccount(target: LaunchTarget) {

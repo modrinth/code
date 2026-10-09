@@ -3,8 +3,8 @@ import { createContext, injectAuth } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, type Ref, ref, watch } from 'vue'
 
-import { useInstanceLaunchState } from '@/composables/instances/use-instance-launch-state'
 import { useUserQuery } from '@/composables/users/use-user-query'
+import { injectInstanceLaunchState } from '@/features/instances/launch-state'
 import {
 	getSharedInstanceUnavailableReason,
 	isSharedInstanceUnavailableError,
@@ -36,7 +36,7 @@ export function createSharedInstanceContext(
 ) {
 	const auth = injectAuth()
 	const queryClient = useQueryClient()
-	const instanceLaunch = useInstanceLaunchState()
+	const instanceLaunch = injectInstanceLaunchState()
 	const forcedUnavailableReason = ref<SharedInstanceUnavailableReason | null>(null)
 
 	const expectedUserId = computed(() => instance.value?.shared_instance?.linked_user_id ?? null)

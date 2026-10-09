@@ -5,7 +5,8 @@ import { useStorage } from '@vueuse/core'
 import { computed, type Ref, watch } from 'vue'
 
 import type { GameInstance } from '@/helpers/types'
-import { get_instance_worlds } from '@/helpers/worlds'
+
+import { hostingInstanceWorldsQueryOptions, hostingLinkedServerQueryOptions } from './queries'
 
 type HostingInstanceMetadata = {
 	sharedInstanceId: string
@@ -29,6 +30,7 @@ export function hostingInstanceMetadata(
 	}
 }
 
+/** Last known hosting metadata per instance, used while offline or before the linked server loads. */
 export function useHostingInstanceCache() {
 	return useStorage<Record<string, HostingInstanceMetadata>>('hosting-instance-metadata', {})
 }
@@ -49,33 +51,17 @@ export function useHostingInstance(instance: Ref<GameInstance | undefined>, offl
 			!!auth.user.value?.id &&
 			auth.user.value.id === instance.value.shared_instance.linked_user_id,
 	)
-	const hostingQuery = useQuery({
-		queryKey: computed(() => [
-			'instances',
-			instance.value?.id,
-			'hosting',
-			instance.value?.shared_instance?.id,
-			auth.user.value?.id,
-		]),
-		enabled: canQuery,
-		queryFn: async () => {
-			const current = instance.value!
-			const sharedId = current.shared_instance!.id
-			const userId = auth.user.value?.id
-			const shared = await client.sharedinstances.instances_v1.get(sharedId, {
-				query_linked_server: true,
-			})
-			return {
-				instanceId: current.id,
-				sharedId,
-				userId,
-				linkedServer: shared.linked_server,
-			}
-		},
-		staleTime: 30_000,
-		refetchInterval: 30_000,
-		retry: false,
-	})
+	const hostingQuery = useQuery(
+		computed(() => ({
+			...hostingLinkedServerQueryOptions(
+				client,
+				instance.value?.id ?? '',
+				instance.value?.shared_instance?.id ?? '',
+				auth.user.value?.id,
+			),
+			enabled: canQuery.value,
+		})),
+	)
 	const liveServer = computed(() => {
 		const result = hostingQuery.data.value
 		if (!result) return undefined
@@ -111,14 +97,13 @@ export function useHostingInstance(instance: Ref<GameInstance | undefined>, offl
 		const result = await hostingQuery.refetch({ throwOnError: false })
 		return result.isError ? null : (result.data?.linkedServer?.online_status ?? null)
 	}
-	const worldsQuery = useQuery({
-		queryKey: computed(() => ['instances', instance.value?.id, 'hosting-worlds']),
-		enabled: computed(
-			() =>
+	const worldsQuery = useQuery(
+		computed(() => ({
+			...hostingInstanceWorldsQueryOptions(instance.value?.id ?? ''),
+			enabled:
 				isHostingInstance.value && !saved.value && instance.value?.install_stage === 'installed',
-		),
-		queryFn: () => get_instance_worlds(instance.value!.id),
-	})
+		})),
+	)
 	const address = computed(() => {
 		if (liveServer.value !== undefined) return liveServer.value?.domain
 		if (saved.value?.address) return saved.value.address
