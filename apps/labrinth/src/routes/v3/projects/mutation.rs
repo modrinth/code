@@ -295,7 +295,7 @@ pub(crate) async fn finalize_project_edit(
     }
 
     if validate_review_state
-		&& !project_editor.is_some_and(|user| user.role.is_mod())
+        && !project_editor.is_some_and(|user| user.role.is_mod())
         && state
             .thread_issues
             .iter()
