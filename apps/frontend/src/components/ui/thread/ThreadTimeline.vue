@@ -3,6 +3,7 @@
 		<ThreadMessage
 			v-if="entry.type === 'message'"
 			:message="entry.message"
+			:issues="issues"
 			:project-owner-id="projectOwnerId ?? undefined"
 			:members="members"
 			:auth="auth"

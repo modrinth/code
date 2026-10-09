@@ -12,6 +12,7 @@
 				v-for="message in displayMessages"
 				:key="message.id"
 				:message="message"
+				:issues="thread.issues"
 				:project-owner-id="projectOwner?.id"
 				:report="report"
 				:members="members"

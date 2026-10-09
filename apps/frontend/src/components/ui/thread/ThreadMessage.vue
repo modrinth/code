@@ -51,19 +51,19 @@
 					<ThreadRoleBadge :role="author.role" />
 					<EyeOffIcon
 						v-if="isPrivateMessage"
-						v-tooltip="'Only visible to moderators'"
+						v-tooltip="formatMessage(imageMessages.privateMessage)"
 						class="mb-px ml-1 text-orange"
 					/>
 					<MicrophoneIcon
 						v-if="report && message.author_id === report.reporter_user?.id"
-						v-tooltip="'Reporter'"
+						v-tooltip="formatMessage(imageMessages.reporter)"
 						class="text-purple"
 					/>
 					<span
 						v-if="message.preview"
 						class="border-blue/60 rounded-full border border-solid bg-highlight-blue px-2 py-0.5 text-xs font-semibold text-blue"
 					>
-						Preview
+						{{ formatMessage(imageMessages.preview) }}
 					</span>
 				</span>
 			</template>
@@ -104,49 +104,73 @@
 				:class="bodyClasses"
 			>
 				<span v-if="message.body.type === 'legacy_project_message'">
-					This project was published on Modrinth before moderation threads existed and may be
-					missing moderation history.
+					{{ formatMessage(imageMessages.legacyProjectMessage) }}
 				</span>
 				<span v-if="message.body.type === 'deleted'">
-					posted a message that has been deleted.
+					{{ formatMessage(imageMessages.deletedMessage) }}
 				</span>
-				<span v-else-if="isAutoApproval" class="ml-1">
+				<span v-else-if="isAutoApproval">
 					<IntlFormatted :message-id="imageMessages.autoApproval">
 						<template #status><Badge :type="message.body.new_status" /></template>
 					</IntlFormatted>
 				</span>
 				<template v-else-if="message.body.type === 'status_change'">
 					<span v-if="message.body.new_status === 'processing'">
-						submitted the project for review.
+						{{ formatMessage(imageMessages.submittedForReview) }}
 					</span>
-					<span v-else-if="message.body.old_status === 'processing'" class="-ml-[3px]">
-						reviewed the project and set its status to
-						<span class="whitespace-nowrap"><Badge :type="message.body.new_status" />.</span>
+					<span v-else-if="message.body.old_status === 'processing'">
+						<IntlFormatted
+							:message-id="
+								reviewIssueCount > 0 ? imageMessages.reviewWithIssues : imageMessages.review
+							"
+							:values="{ count: reviewIssueCount }"
+						>
+							<template #status><Badge :type="message.body.new_status" /></template>
+						</IntlFormatted>
 					</span>
 					<span v-else-if="message.body.new_status === 'draft'">
-						reverted this project back to a
-						<span class="whitespace-nowrap"><Badge :type="message.body.new_status" />.</span>
+						<IntlFormatted :message-id="imageMessages.revertedToDraft">
+							<template #status="{ children }">
+								<span class="whitespace-nowrap"
+									><Badge :type="message.body.new_status" /><component :is="() => children"
+								/></span>
+							</template>
+						</IntlFormatted>
 					</span>
 					<span v-else>
-						changed the project's status from <Badge :type="message.body.old_status" /> to
-						<span class="whitespace-nowrap"><Badge :type="message.body.new_status" />.</span>
+						<IntlFormatted :message-id="imageMessages.statusChanged">
+							<template #old-status><Badge :type="message.body.old_status" /></template>
+							<template #status="{ children }">
+								<span class="whitespace-nowrap"
+									><Badge :type="message.body.new_status" /><component :is="() => children"
+								/></span>
+							</template>
+						</IntlFormatted>
 					</span>
 				</template>
-				<span v-else-if="message.body.type === 'thread_closure'">closed the thread.</span>
-				<span v-else-if="message.body.type === 'thread_reopen'">reopened the thread.</span>
+				<span v-else-if="message.body.type === 'thread_closure'">
+					{{ formatMessage(imageMessages.threadClosed) }}
+				</span>
+				<span v-else-if="message.body.type === 'thread_reopen'">
+					{{ formatMessage(imageMessages.threadReopened) }}
+				</span>
 				<span v-else-if="message.body.type === 'tech_review'">
-					completed technical review and marked project as
-					<span class="whitespace-nowrap"><Badge :type="message.body.verdict" />.</span>
+					<IntlFormatted :message-id="imageMessages.techReviewCompleted">
+						<template #status="{ children }">
+							<span class="whitespace-nowrap"
+								><Badge :type="message.body.verdict" /><component :is="() => children"
+							/></span>
+						</template>
+					</IntlFormatted>
 				</span>
 				<span v-else-if="message.body.type === 'tech_review_entered'">
-					The project has entered the technical review queue.
+					{{ formatMessage(imageMessages.techReviewEntered) }}
 				</span>
 				<span v-else-if="message.body.type === 'tech_review_exited'">
-					The project has left the technical review queue as all pending traces have been resolved.
+					{{ formatMessage(imageMessages.techReviewExited) }}
 				</span>
 				<span v-else-if="message.body.type === 'tech_review_exit_file_deleted'">
-					The project has left the technical review queue as all files pending review were deleted
-					by the user.
+					{{ formatMessage(imageMessages.techReviewExitFileDeleted) }}
 				</span>
 			</div>
 			<div class="mt-1 flex items-center gap-2">
@@ -162,12 +186,12 @@
 				>
 					<TeleportOverflowMenu
 						type="quiet"
-						label="More options"
+						:label="formatMessage(imageMessages.moreOptions)"
 						class="btn-dropdown-animation !size-6 !min-h-0 !p-1"
 						:options="[
 							{
 								id: 'delete',
-								label: 'Delete',
+								label: formatMessage(imageMessages.delete),
 								action: () => deleteMessage(),
 								tone: 'red',
 								hoverFilled: true,
@@ -175,7 +199,7 @@
 						]"
 					>
 						<MoreHorizontalIcon />
-						<template #delete> <TrashIcon /> Delete </template>
+						<template #delete> <TrashIcon /> {{ formatMessage(imageMessages.delete) }} </template>
 					</TeleportOverflowMenu>
 				</div>
 			</div>
@@ -215,6 +239,12 @@ const props = defineProps({
 		type: Object,
 		required: true,
 	},
+	issues: {
+		type: /** @type {import('vue').PropType<readonly import('@modrinth/api-client').Labrinth.Threads.v3.ThreadIssue[]>} */ (
+			Array
+		),
+		default: () => [],
+	},
 	projectOwnerId: {
 		type: String,
 		default: null,
@@ -251,12 +281,19 @@ const props = defineProps({
 
 const hasBody = computed(() => props.message.body.type === 'text' && !props.forceCompact)
 const authorClasses = 'inline [&>svg]:ms-1 [&>svg]:me-1 [&>svg]:inline-block [&>svg]:align-middle'
-const bodyClasses = computed(() => (hasBody.value ? 'mt-1' : 'inline'))
+const bodyClasses = computed(() => (hasBody.value ? 'mt-1' : 'ms-1 inline'))
 
 const emit = defineEmits(['update-thread', 'open-image'])
 const settings = useModerationSettings()
 const client = injectModrinthClient()
 const isAutoApproval = computed(() => props.message.body.type === 'auto_approval')
+const reviewIssueCount = computed(() => {
+	const eventTime = new Date(props.message.created).getTime()
+	const reviewWindow = 10 * 60 * 1000
+	return props.issues.filter(
+		(issue) => Math.abs(new Date(issue.created_at).getTime() - eventTime) <= reviewWindow,
+	).length
+})
 const author = computed(
 	() => props.members[isAutoApproval.value ? props.projectOwnerId : props.message.author_id],
 )
@@ -277,10 +314,77 @@ const imageMessages = defineMessages({
 		defaultMessage:
 			'resolved all issues and the project status has been automatically set to <status>approved</status>.',
 	},
+	review: {
+		id: 'thread.message.review',
+		defaultMessage: 'reviewed the project and set its status to <status>status</status>.',
+	},
+	reviewWithIssues: {
+		id: 'thread.message.review-with-issues',
+		defaultMessage:
+			'reviewed the project and set its status to <status>status</status> with {count, plural, one {# issue} other {# issues}}.',
+	},
 	openImage: {
 		id: 'thread.message.open-image',
 		defaultMessage: 'Open image',
 	},
+	privateMessage: {
+		id: 'thread.message.private-message',
+		defaultMessage: 'Only visible to moderators',
+	},
+	reporter: { id: 'thread.message.reporter', defaultMessage: 'Reporter' },
+	preview: { id: 'thread.message.preview', defaultMessage: 'Preview' },
+	legacyProjectMessage: {
+		id: 'thread.message.legacy-project-message',
+		defaultMessage:
+			'This project was published on Modrinth before moderation threads existed and may be missing moderation history.',
+	},
+	deletedMessage: {
+		id: 'thread.message.deleted-message',
+		defaultMessage: 'posted a message that has been deleted.',
+	},
+	submittedForReview: {
+		id: 'thread.message.submitted-for-review',
+		defaultMessage: 'submitted the project for review.',
+	},
+	revertedToDraft: {
+		id: 'thread.message.reverted-to-draft',
+		defaultMessage: 'reverted this project back to a <status>.</status>',
+	},
+	statusChanged: {
+		id: 'thread.message.status-changed',
+		defaultMessage:
+			"changed the project's status from <old-status>status</old-status> to <status>.</status>",
+	},
+	threadClosed: {
+		id: 'thread.message.thread-closed',
+		defaultMessage: 'closed the thread.',
+	},
+	threadReopened: {
+		id: 'thread.message.thread-reopened',
+		defaultMessage: 'reopened the thread.',
+	},
+	techReviewCompleted: {
+		id: 'thread.message.tech-review-completed',
+		defaultMessage: 'completed technical review and marked project as <status>.</status>',
+	},
+	techReviewEntered: {
+		id: 'thread.message.tech-review-entered',
+		defaultMessage: 'The project has entered the technical review queue.',
+	},
+	techReviewExited: {
+		id: 'thread.message.tech-review-exited',
+		defaultMessage:
+			'The project has left the technical review queue as all pending traces have been resolved.',
+	},
+	techReviewExitFileDeleted: {
+		id: 'thread.message.tech-review-exit-file-deleted',
+		defaultMessage:
+			'The project has left the technical review queue as all files pending review were deleted by the user.',
+	},
+	moreOptions: { id: 'thread.message.more-options', defaultMessage: 'More options' },
+	delete: { id: 'thread.message.delete', defaultMessage: 'Delete' },
+	sentImage: { id: 'thread.message.sent-image', defaultMessage: 'sent an image.' },
+	sentMessage: { id: 'thread.message.sent-message', defaultMessage: 'sent a message.' },
 })
 
 function prepareImagePreviews(element, binding) {
@@ -324,9 +428,9 @@ const formattedMessage = computed(() => {
 		if (noHtml.trim()) {
 			return noHtml
 		} else if (hasImage) {
-			return 'sent an image.'
+			return formatMessage(imageMessages.sentImage)
 		} else {
-			return 'sent a message.'
+			return formatMessage(imageMessages.sentMessage)
 		}
 	}
 	return body

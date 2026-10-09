@@ -5,7 +5,7 @@
 		v-tooltip="label"
 		:aria-label="label"
 		:class="[
-			avatar ? 'h-3/5 w-3/5' : '!mb-1 !ml-0 inline-block align-middle',
+			avatar ? 'h-3/5 w-3/5' : '!mb-1 !ml-0.5 !mr-0 inline-block align-middle',
 			role === 'admin' ? 'text-green' : 'text-orange',
 		]"
 	/>
