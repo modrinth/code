@@ -57,6 +57,9 @@ pub use self::friends::*;
 mod installs;
 pub(crate) use self::installs::Installs;
 
+mod presence;
+pub use self::presence::Presence;
+
 mod tunnel;
 pub use self::tunnel::*;
 
@@ -106,8 +109,7 @@ pub struct State {
     pub(crate) game_locale_indexer: crate::api::instance::GameLocaleIndexer,
     pub(crate) pack_sync_worker: crate::api::instance::PackSyncWorker,
 
-    /// Discord RPC
-    pub discord_rpc: DiscordGuard,
+    pub presence: Presence,
 
     /// Process manager
     pub process_manager: ProcessManager,
@@ -118,9 +120,6 @@ pub struct State {
     //
     // /// App identifier string (like com.modrinth.ModrinthApp)
     // pub app_identifier: String,
-    /// Friends socket
-    pub friends_socket: FriendsSocket,
-
     pub restart_after_pending_update: AtomicBool,
 
     pub(crate) pool: SqlitePool,
@@ -287,7 +286,7 @@ impl State {
             }
 
             let res = tokio::try_join!(
-                state.discord_rpc.clear_to_default(
+                state.presence.discord_rpc.clear_to_default(
                     true,
                     &state.pool,
                     &state.process_manager,
@@ -305,6 +304,7 @@ impl State {
             }
 
             let _ = state
+                .presence
                 .friends_socket
                 .connect(
                     &state.pool,
@@ -398,14 +398,12 @@ impl State {
         )
         .await?;
 
-        let discord_rpc = DiscordGuard::init()?;
+        let presence = Presence::init()?;
 
         tracing::info!("Initializing file watcher");
         let file_watcher = instances::watcher::init_watcher().await?;
 
         let process_manager = ProcessManager::new();
-
-        let friends_socket = FriendsSocket::new();
 
         Ok(Arc::new(Self {
             startup_complete: AtomicBool::new(false),
@@ -422,9 +420,8 @@ impl State {
             game_locale_indexer:
                 crate::api::instance::GameLocaleIndexer::default(),
             pack_sync_worker: crate::api::instance::PackSyncWorker::default(),
-            discord_rpc,
+            presence,
             process_manager,
-            friends_socket,
             restart_after_pending_update: AtomicBool::new(false),
             pool,
             file_watcher,

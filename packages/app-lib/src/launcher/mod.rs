@@ -1280,11 +1280,13 @@ pub async fn launch_minecraft(
     }
 
     let _ = state
+        .presence
         .discord_rpc
         .set_activity(&format!("Playing {}", instance.name), true, &state.pool)
         .await;
 
     let _ = state
+        .presence
         .friends_socket
         .update_status(Some(instance.name.clone()))
         .await;

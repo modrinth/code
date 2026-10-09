@@ -296,7 +296,8 @@ impl FriendsSocket {
             let mut last_ping = Utc::now();
 
             loop {
-                let connected = state.friends_socket.is_connected().await;
+                let connected =
+                    state.presence.friends_socket.is_connected().await;
 
                 if !connected
                     && Utc::now().signed_duration_since(last_connection)
@@ -305,6 +306,7 @@ impl FriendsSocket {
                     last_connection = Utc::now();
                     last_ping = Utc::now();
                     let _ = state
+                        .presence
                         .friends_socket
                         .connect(
                             &state.pool,
@@ -317,7 +319,8 @@ impl FriendsSocket {
                         > chrono::Duration::seconds(10)
                 {
                     last_ping = Utc::now();
-                    let mut write = state.friends_socket.write.write().await;
+                    let mut write =
+                        state.presence.friends_socket.write.write().await;
                     if let Some(write) = write.as_mut() {
                         let _ = write.send(Message::Ping(Bytes::new())).await;
                     }

@@ -1007,11 +1007,12 @@ impl Process {
         }
 
         let _ = state
+            .presence
             .discord_rpc
             .clear_to_default(true, &state.pool, &state.process_manager)
             .await;
 
-        let _ = state.friends_socket.update_status(None).await;
+        let _ = state.presence.friends_socket.update_status(None).await;
 
         #[cfg(feature = "tauri")]
         {
