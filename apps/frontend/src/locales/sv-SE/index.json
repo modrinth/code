@@ -2123,9 +2123,6 @@
   "error.generic.default.list_item.1": {
     "message": "Se om Modrinth ligger nere på vår <status-link>statussida</status-link>."
   },
-  "error.generic.default.list_item.2": {
-    "message": "Om det här fortsätter hända borde du kanske kontakta Modrinth-teamet genom vår <discord-link>Discord server</discord-link>."
-  },
   "error.generic.default.list_title": {
     "message": "Vänligen försök igen om några minuter."
   },

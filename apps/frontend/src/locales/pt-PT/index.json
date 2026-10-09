@@ -1871,9 +1871,6 @@
   "error.generic.default.list_item.1": {
     "message": "Verifica se o Modrinth está em baixo na nossa <status-link>página de Status</status-link>."
   },
-  "error.generic.default.list_item.2": {
-    "message": "Se isto continuar a acontecer, podes informar a Equipa do Modrinth através do nosso <discord-link>servidor de Discord</discord-link>."
-  },
   "error.generic.default.list_title": {
     "message": "Por favor tenta novamente em alguns minutos."
   },

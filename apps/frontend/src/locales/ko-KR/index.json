@@ -2255,9 +2255,6 @@
   "error.generic.default.list_item.1": {
     "message": "<status-link>서버 상태</status-link>에서 Modrinth 서버가 다운되었는지 확인해 보세요."
   },
-  "error.generic.default.list_item.2": {
-    "message": "계속해서 문제가 발생하는 경우, <discord-link>디스코드 서버</discord-link>에 접속해 Modrinth 팀과 연락할 수 있습니다."
-  },
   "error.generic.default.list_title": {
     "message": "몇 분 뒤에 다시 시도해 보세요."
   },

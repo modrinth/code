@@ -2249,9 +2249,6 @@
   "error.generic.default.list_item.1": {
     "message": "Verifica se Modrinth è fuori uso sulla nostra <status-link>pagina Stato</status-link>."
   },
-  "error.generic.default.list_item.2": {
-    "message": "Se questo continua, potresti informare il team di Modrinth entrando nel nostro <discord-link>server Discord</discord-link>."
-  },
   "error.generic.default.list_title": {
     "message": "Riprova tra qualche minuto."
   },

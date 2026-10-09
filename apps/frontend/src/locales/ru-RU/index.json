@@ -2249,9 +2249,6 @@
   "error.generic.default.list_item.1": {
     "message": "Проверьте доступность Modrinth на <status-link>странице статуса</status-link>."
   },
-  "error.generic.default.list_item.2": {
-    "message": "Если проблема не исчезает, сообщите о ней команде Modrinth в <discord-link>Discord</discord-link>."
-  },
   "error.generic.default.list_title": {
     "message": "Повторите попытку через несколько минут."
   },

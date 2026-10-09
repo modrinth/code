@@ -2255,9 +2255,6 @@
   "error.generic.default.list_item.1": {
     "message": "Revisa si Modrinth está caído en nuestra <status-link>Página de estado</status-link>."
   },
-  "error.generic.default.list_item.2": {
-    "message": "Si esto sigue ocurriendo, quizás quieras informar al equipo de Modrinth uniéndote a nuestro <discord-link>servidor de Discord</discord-link>."
-  },
   "error.generic.default.list_title": {
     "message": "Vuelve a intentarlo en unos minutos."
   },

@@ -2252,9 +2252,6 @@
   "error.generic.default.list_item.1": {
     "message": "Vérifiez si Modrinth est hors ligne sur notre <status-link>page de statut</status-link>."
   },
-  "error.generic.default.list_item.2": {
-    "message": "Si cela continue, vous pouvez informer l’équipe de Modrinth en rejoignant notre <discord-link>serveur Discord</discord-link>."
-  },
   "error.generic.default.list_title": {
     "message": "Veuillez réessayer dans quelques minutes."
   },
