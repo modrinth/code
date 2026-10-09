@@ -319,7 +319,7 @@ pub(in crate::api::instance) async fn initialize_from_source_instance(
 pub async fn list_sync_sources()
 -> crate::Result<Vec<GameOptionsSourceCandidate>> {
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     let instances = crate::state::list_instances(&state.pool).await?;
     let mut sources = Vec::with_capacity(instances.len());
     for metadata in instances {

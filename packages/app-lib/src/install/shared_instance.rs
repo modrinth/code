@@ -21,6 +21,7 @@ use crate::state::{
 use crate::util::fetch::{DownloadReason, REQWEST_CLIENT};
 use futures::StreamExt;
 use path_util::SafeRelativeUtf8UnixPathBuf;
+use sqlx::SqlitePool;
 use std::collections::{HashMap, HashSet};
 use std::future::Future;
 use std::path::PathBuf;
@@ -32,7 +33,7 @@ const MAX_SHARED_INSTANCE_INITIAL_BUFFER_SIZE: u64 = 8 * 1024 * 1024;
 pub(super) async fn attach_pending_shared_instance(
     instance_id: &str,
     data: &SharedInstanceInstallData,
-    state: &State,
+    pool: &SqlitePool,
 ) -> crate::Result<()> {
     crate::state::attach_shared_instance(
         instance_id,
@@ -47,7 +48,7 @@ pub(super) async fn attach_pending_shared_instance(
             applied_version: None,
             latest_version: Some(data.version),
         },
-        &state.pool,
+        pool,
     )
     .await
 }
@@ -55,7 +56,7 @@ pub(super) async fn attach_pending_shared_instance(
 pub(super) async fn finalize_shared_instance_attachment(
     instance_id: &str,
     data: &SharedInstanceInstallData,
-    state: &State,
+    pool: &SqlitePool,
 ) -> crate::Result<()> {
     crate::state::attach_shared_instance(
         instance_id,
@@ -70,7 +71,7 @@ pub(super) async fn finalize_shared_instance_attachment(
             applied_version: Some(data.version),
             latest_version: Some(data.version),
         },
-        &state.pool,
+        pool,
     )
     .await
 }
@@ -296,7 +297,7 @@ async fn apply_shared_instance_update_inner(
     update_progress(
         job_id,
         job_state,
-        state,
+        &state.pool,
         InstallPhaseId::PreparingInstance,
         InstallPhaseDetails::Instance {
             name: data.name.clone(),
@@ -309,7 +310,7 @@ async fn apply_shared_instance_update_inner(
         update_content_progress(
             job_id,
             job_state,
-            state,
+            &state.pool,
             0,
             content_change_count,
         )
@@ -359,7 +360,7 @@ async fn apply_shared_instance_update_inner(
         update_content_progress(
             job_id,
             job_state,
-            state,
+            &state.pool,
             completed_content_changes,
             content_change_count,
         )
@@ -380,7 +381,7 @@ async fn apply_shared_instance_update_inner(
         update_content_progress(
             job_id,
             job_state,
-            state,
+            &state.pool,
             completed_content_changes,
             content_change_count,
         )
@@ -398,7 +399,7 @@ async fn apply_shared_instance_update_inner(
         update_content_progress(
             job_id,
             job_state,
-            state,
+            &state.pool,
             completed_content_changes,
             content_change_count,
         )
@@ -416,7 +417,7 @@ async fn apply_shared_instance_update_inner(
         update_content_progress(
             job_id,
             job_state,
-            state,
+            &state.pool,
             completed_content_changes,
             content_change_count,
         )
@@ -642,7 +643,7 @@ async fn apply_shared_instance_content_inner(
     update_progress(
         job_id,
         job_state,
-        state,
+        &state.pool,
         InstallPhaseId::PreparingInstance,
         InstallPhaseDetails::Instance {
             name: data.name.clone(),
@@ -663,7 +664,7 @@ async fn apply_shared_instance_content_inner(
         update_progress(
             job_id,
             job_state,
-            state,
+            &state.pool,
             InstallPhaseId::ResolvingPack,
             modpack_details(&location),
         )
@@ -695,7 +696,7 @@ async fn apply_shared_instance_content_inner(
         update_progress(
             job_id,
             job_state,
-            state,
+            &state.pool,
             InstallPhaseId::DownloadingMinecraft,
             InstallPhaseDetails::Minecraft {
                 game_version: data.game_version.clone(),
@@ -731,7 +732,7 @@ async fn apply_shared_instance_content_inner(
         update_content_progress(
             job_id,
             job_state,
-            state,
+            &state.pool,
             0,
             content_change_count,
         )
@@ -751,7 +752,7 @@ async fn apply_shared_instance_content_inner(
             update_content_progress(
                 job_id,
                 job_state,
-                state,
+                &state.pool,
                 completed_content_changes,
                 content_change_count,
             )
@@ -765,7 +766,7 @@ async fn apply_shared_instance_content_inner(
             update_content_progress(
                 job_id,
                 job_state,
-                state,
+                &state.pool,
                 completed_content_changes,
                 content_change_count,
             )

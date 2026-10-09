@@ -1,10 +1,9 @@
 //! Theseus state management system
 use crate::util::fetch::{FetchSemaphore, IoSemaphore};
-use dashmap::DashMap;
 use std::sync::atomic::AtomicBool;
 use std::sync::{Arc, LazyLock};
 use tokio::sync::watch::Sender;
-use tokio::sync::{Mutex, MutexGuard, OnceCell, OwnedMutexGuard, Semaphore};
+use tokio::sync::{Mutex, OnceCell, Semaphore};
 
 use crate::state::instances::watcher::FileWatcher;
 use sqlx::SqlitePool;
@@ -54,6 +53,18 @@ pub(crate) mod runtime_cache;
 mod friends;
 pub use self::friends::*;
 
+mod installs;
+pub(crate) use self::installs::Installs;
+
+mod instance_locks;
+pub(crate) use self::instance_locks::InstanceLocks;
+
+mod presence;
+pub use self::presence::Presence;
+
+mod synced_options;
+pub(crate) use self::synced_options::SyncedOptions;
+
 mod tunnel;
 pub use self::tunnel::*;
 
@@ -78,7 +89,6 @@ static LAUNCHER_STATE: OnceCell<Arc<State>> = OnceCell::const_new();
 static STATE_STARTUP: LazyLock<Sender<StartupPhase>> =
     LazyLock::new(|| Sender::new(StartupPhase::Pending));
 static STATE_STARTUP_LOCK: Mutex<()> = Mutex::const_new(());
-const MAX_CONCURRENT_INSTALL_JOBS: usize = 3;
 pub struct State {
     startup_complete: AtomicBool,
     /// Information on the location of files used in the launcher
@@ -92,21 +102,11 @@ pub struct State {
     /// Semaphore to limit concurrent API requests. This is separate from the fetch semaphore
     /// to keep API functionality while the app is performing intensive tasks.
     pub api_semaphore: FetchSemaphore,
-    pub(crate) install_job_semaphore: Semaphore,
-    pub(crate) install_db_semaphore: Semaphore,
-    /// Serializes filesystem reconciliation and content mutations per instance.
-    instance_content_locks: DashMap<String, Arc<Mutex<()>>>,
-    /// Serializes screenshot filesystem reconciliation per instance.
-    instance_screenshot_locks: DashMap<String, Arc<Mutex<()>>>,
-    /// Serializes shared instance attachment and recipient mutations per instance.
-    shared_instance_locks: DashMap<String, Arc<Mutex<()>>>,
-    /// Serializes canonical synced-option mutations and checkpoint updates.
-    synced_options_lock: Mutex<()>,
-    pub(crate) game_locale_indexer: crate::api::instance::GameLocaleIndexer,
-    pub(crate) pack_sync_worker: crate::api::instance::PackSyncWorker,
+    pub(crate) installs: Installs,
+    pub(crate) instance_locks: InstanceLocks,
+    pub(crate) synced_options: SyncedOptions,
 
-    /// Discord RPC
-    pub discord_rpc: DiscordGuard,
+    pub presence: Presence,
 
     /// Process manager
     pub process_manager: ProcessManager,
@@ -117,9 +117,6 @@ pub struct State {
     //
     // /// App identifier string (like com.modrinth.ModrinthApp)
     // pub app_identifier: String,
-    /// Friends socket
-    pub friends_socket: FriendsSocket,
-
     pub restart_after_pending_update: AtomicBool,
 
     pub(crate) pool: SqlitePool,
@@ -128,55 +125,6 @@ pub struct State {
 }
 
 impl State {
-    pub(crate) async fn lock_synced_options(&self) -> MutexGuard<'_, ()> {
-        self.synced_options_lock.lock().await
-    }
-
-    pub(crate) async fn lock_instance_content(
-        &self,
-        instance_id: &str,
-    ) -> OwnedMutexGuard<()> {
-        let lock = self
-            .instance_content_locks
-            .entry(instance_id.to_string())
-            .or_insert_with(|| Arc::new(Mutex::new(())))
-            .clone();
-
-        lock.lock_owned().await
-    }
-
-    pub(crate) async fn lock_shared_instance(
-        &self,
-        instance_id: &str,
-    ) -> OwnedMutexGuard<()> {
-        let lock = self
-            .shared_instance_locks
-            .entry(instance_id.to_string())
-            .or_insert_with(|| Arc::new(Mutex::new(())))
-            .clone();
-
-        lock.lock_owned().await
-    }
-
-    pub(crate) async fn lock_instance_screenshots(
-        &self,
-        instance_id: &str,
-    ) -> OwnedMutexGuard<()> {
-        let lock = self
-            .instance_screenshot_locks
-            .entry(instance_id.to_string())
-            .or_insert_with(|| Arc::new(Mutex::new(())))
-            .clone();
-
-        lock.lock_owned().await
-    }
-
-    pub(crate) fn remove_instance_locks(&self, instance_id: &str) {
-        let _ = self.instance_content_locks.remove(instance_id);
-        let _ = self.instance_screenshot_locks.remove(instance_id);
-        let _ = self.shared_instance_locks.remove(instance_id);
-    }
-
     pub async fn init(app_identifier: String) -> crate::Result<()> {
         let _startup = STATE_STARTUP_LOCK.lock().await;
         let result = LAUNCHER_STATE
@@ -286,7 +234,7 @@ impl State {
             }
 
             let res = tokio::try_join!(
-                state.discord_rpc.clear_to_default(
+                state.presence.discord_rpc.clear_to_default(
                     true,
                     &state.pool,
                     &state.process_manager,
@@ -304,6 +252,7 @@ impl State {
             }
 
             let _ = state
+                .presence
                 .friends_socket
                 .connect(
                     &state.pool,
@@ -397,14 +346,12 @@ impl State {
         )
         .await?;
 
-        let discord_rpc = DiscordGuard::init()?;
+        let presence = Presence::init()?;
 
         tracing::info!("Initializing file watcher");
         let file_watcher = instances::watcher::init_watcher().await?;
 
         let process_manager = ProcessManager::new();
-
-        let friends_socket = FriendsSocket::new();
 
         Ok(Arc::new(Self {
             startup_complete: AtomicBool::new(false),
@@ -413,18 +360,11 @@ impl State {
             fetch_semaphore,
             io_semaphore,
             api_semaphore,
-            install_job_semaphore: Semaphore::new(MAX_CONCURRENT_INSTALL_JOBS),
-            install_db_semaphore: Semaphore::new(1),
-            instance_content_locks: DashMap::new(),
-            instance_screenshot_locks: DashMap::new(),
-            shared_instance_locks: DashMap::new(),
-            synced_options_lock: Mutex::new(()),
-            game_locale_indexer:
-                crate::api::instance::GameLocaleIndexer::default(),
-            pack_sync_worker: crate::api::instance::PackSyncWorker::default(),
-            discord_rpc,
+            installs: Installs::new(),
+            instance_locks: InstanceLocks::default(),
+            synced_options: SyncedOptions::default(),
+            presence,
             process_manager,
-            friends_socket,
             restart_after_pending_update: AtomicBool::new(false),
             pool,
             file_watcher,

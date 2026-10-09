@@ -103,7 +103,7 @@ impl<'a> InstanceContent<'a> {
         instance_id: &str,
         state: &'a State,
     ) -> crate::Result<Self> {
-        let content_lock = state.lock_instance_content(instance_id).await;
+        let content_lock = state.instance_locks.lock_content(instance_id).await;
         let store_lock = state.content_store.files_lock.lock().await;
         let instance =
             instance_rows::get_instance_by_id(instance_id, &state.pool)

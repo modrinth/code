@@ -33,7 +33,8 @@ pub(crate) struct PackSyncWorker {
 pub(crate) fn queue_reconciliation(instance_id: &str) {
     if let Some(state) = State::get_if_initialized() {
         state
-            .pack_sync_worker
+            .synced_options
+            .packs
             .queue
             .lock()
             .instances
@@ -44,7 +45,7 @@ pub(crate) fn queue_reconciliation(instance_id: &str) {
 
 pub(super) fn queue_all() {
     if let Some(state) = State::get_if_initialized() {
-        state.pack_sync_worker.queue.lock().all = true;
+        state.synced_options.packs.queue.lock().all = true;
         start(state);
     }
 }
@@ -53,7 +54,7 @@ pub(crate) async fn flush(instance_id: &str) -> crate::Result<()> {
     let state = State::get().await?;
     let (sender, receiver) = oneshot::channel();
     {
-        let mut queue = state.pack_sync_worker.queue.lock();
+        let mut queue = state.synced_options.packs.queue.lock();
         if let Some(retry_at) = queue.retry_at.get(instance_id) {
             let remaining = retry_at.saturating_duration_since(Instant::now());
             if !remaining.is_zero() {
@@ -82,7 +83,7 @@ pub(crate) async fn flush(instance_id: &str) -> crate::Result<()> {
 
 fn start(state: Arc<State>) {
     {
-        let mut queue = state.pack_sync_worker.queue.lock();
+        let mut queue = state.synced_options.packs.queue.lock();
         if queue.running {
             return;
         }
@@ -91,29 +92,36 @@ fn start(state: Arc<State>) {
     tokio::spawn(async move {
         loop {
             tokio::time::sleep(std::time::Duration::from_millis(100)).await;
-            let all =
-                std::mem::take(&mut state.pack_sync_worker.queue.lock().all);
+            let all = std::mem::take(
+                &mut state.synced_options.packs.queue.lock().all,
+            );
             if all {
                 match crate::state::list_instances(&state.pool).await {
                     Ok(instances) => {
-                        state.pack_sync_worker.queue.lock().instances.extend(
-                            instances
-                                .into_iter()
-                                .map(|metadata| metadata.instance.id),
-                        );
+                        state
+                            .synced_options
+                            .packs
+                            .queue
+                            .lock()
+                            .instances
+                            .extend(
+                                instances
+                                    .into_iter()
+                                    .map(|metadata| metadata.instance.id),
+                            );
                     }
                     Err(error) => {
                         tracing::warn!(
                             "Could not enumerate pack sync targets: {error}"
                         );
-                        state.pack_sync_worker.queue.lock().all = true;
+                        state.synced_options.packs.queue.lock().all = true;
                         tokio::time::sleep(std::time::Duration::from_secs(1))
                             .await;
                     }
                 }
             }
             let (instance_id, mut pending) = {
-                let mut queue = state.pack_sync_worker.queue.lock();
+                let mut queue = state.synced_options.packs.queue.lock();
                 let next = queue
                     .waiters
                     .keys()
@@ -137,7 +145,7 @@ fn start(state: Arc<State>) {
             if let Err(error) = &result {
                 match error.raw.as_ref() {
                     crate::ErrorKind::PackSyncChanged => {
-                        let mut queue = state.pack_sync_worker.queue.lock();
+                        let mut queue = state.synced_options.packs.queue.lock();
                         queue.instances.insert(instance_id.clone());
                         if !pending.is_empty() {
                             queue
@@ -152,7 +160,8 @@ fn start(state: Arc<State>) {
                         let retry_at = Instant::now()
                             + Duration::from_secs((*retry_in_seconds).max(1));
                         {
-                            let mut queue = state.pack_sync_worker.queue.lock();
+                            let mut queue =
+                                state.synced_options.packs.queue.lock();
                             queue.instances.insert(instance_id.clone());
                             queue
                                 .retry_at
@@ -168,7 +177,8 @@ fn start(state: Arc<State>) {
                         tokio::spawn(async move {
                             tokio::time::sleep_until(retry_at).await;
                             state
-                                .pack_sync_worker
+                                .synced_options
+                                .packs
                                 .queue
                                 .lock()
                                 .retry_at
@@ -208,7 +218,7 @@ impl<'a> Preparation<'a> {
         Self {
             state,
             metadata,
-            guard: Some(state.lock_synced_options().await),
+            guard: Some(state.synced_options.lock().await),
         }
     }
 
@@ -218,15 +228,24 @@ impl<'a> Preparation<'a> {
         work: impl Future<Output = crate::Result<T>>,
     ) -> crate::Result<T> {
         write_library(library, self.state).await?;
-        let revision =
-            self.state.pack_sync_worker.revision.load(Ordering::Acquire);
+        let revision = self
+            .state
+            .synced_options
+            .packs
+            .revision
+            .load(Ordering::Acquire);
         self.validate_metadata().await?;
         let before = fingerprint(self.metadata, self.state).await?;
         self.guard.take();
         let result = work.await;
-        self.guard = Some(self.state.lock_synced_options().await);
+        self.guard = Some(self.state.synced_options.lock().await);
         self.validate_metadata().await?;
-        if self.state.pack_sync_worker.revision.load(Ordering::Acquire)
+        if self
+            .state
+            .synced_options
+            .packs
+            .revision
+            .load(Ordering::Acquire)
             != revision
             || fingerprint(self.metadata, self.state).await? != before
         {

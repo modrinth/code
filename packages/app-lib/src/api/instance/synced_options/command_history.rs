@@ -15,7 +15,7 @@ const COMMAND_HISTORY_LIMIT: usize = 50;
 
 pub async fn get_command_history() -> crate::Result<String> {
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     let path = command_history_path(&state);
     if !path.exists() {
         return Ok(String::new());
@@ -25,7 +25,7 @@ pub async fn get_command_history() -> crate::Result<String> {
 
 pub async fn set_command_history(contents: &str) -> crate::Result<String> {
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     create_synced_directories(&state).await?;
     let normalized = normalize_command_history(contents);
     io::write(command_history_path(&state), normalized.as_bytes()).await?;

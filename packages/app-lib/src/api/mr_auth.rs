@@ -63,7 +63,7 @@ pub async fn authenticate_finish_flow(
 pub async fn logout() -> crate::Result<()> {
     let state = crate::State::get().await?;
     ModrinthCredentials::deactivate_all(&state.pool).await?;
-    state.friends_socket.disconnect().await?;
+    state.presence.friends_socket.disconnect().await?;
 
     Ok(())
 }
@@ -101,17 +101,18 @@ pub async fn remove_user(user_id: &str) -> crate::Result<()> {
     ModrinthCredentials::remove(user_id, &state.pool).await?;
 
     if current.is_some_and(|creds| creds.user_id == user_id) {
-        state.friends_socket.disconnect().await?;
+        state.presence.friends_socket.disconnect().await?;
     }
 
     Ok(())
 }
 
 async fn reconnect_friends(state: &crate::State) -> crate::Result<()> {
-    if let Err(error) = state.friends_socket.disconnect().await {
+    if let Err(error) = state.presence.friends_socket.disconnect().await {
         tracing::warn!("Failed to disconnect friends socket: {error}");
     }
     if let Err(error) = state
+        .presence
         .friends_socket
         .connect(&state.pool, &state.api_semaphore, &state.process_manager)
         .await
@@ -129,7 +130,7 @@ pub async fn get_credentials() -> crate::Result<Option<ModrinthCredentials>> {
         ModrinthCredentials::get_and_refresh(&state.pool, &state.api_semaphore)
             .await?;
     if current.is_none() {
-        state.friends_socket.disconnect().await?;
+        state.presence.friends_socket.disconnect().await?;
     }
 
     Ok(current)

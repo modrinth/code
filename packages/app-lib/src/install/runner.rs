@@ -36,9 +36,6 @@ use std::sync::{Arc, LazyLock, Mutex, Weak};
 use tokio::sync::{Mutex as AsyncMutex, MutexGuard, OwnedMutexGuard};
 use uuid::Uuid;
 
-/// Admission covers setup and deletion. A target reservation stays with its worker
-/// until cleanup finishes, so backups and rollback cannot overlap another install.
-static INSTALL_ADMISSION: AsyncMutex<()> = AsyncMutex::const_new(());
 static INSTALL_TARGETS: LazyLock<Mutex<HashMap<String, Weak<AsyncMutex<()>>>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
 
@@ -234,8 +231,8 @@ pub fn retry_job(
 }
 
 async fn retry_job_inner(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
-    let _admission = INSTALL_ADMISSION.lock().await;
     let state = State::get().await?;
+    let _admission = state.installs.admission.lock().await;
     let mut job = store::get_required(job_id, &state.pool).await?;
 
     if !matches!(
@@ -421,11 +418,11 @@ pub async fn cancel_job(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
 
 /// The caller must retain both guards until the instance has been removed.
 /// This prevents a new install from starting after cancellation has finished.
-pub(crate) async fn cancel_jobs_for_instance_deletion(
+pub(crate) async fn cancel_jobs_for_instance_deletion<'a>(
     instance_id: &str,
-    state: &State,
-) -> crate::Result<(MutexGuard<'static, ()>, OwnedMutexGuard<()>)> {
-    let admission = INSTALL_ADMISSION.lock().await;
+    state: &'a State,
+) -> crate::Result<(MutexGuard<'a, ()>, OwnedMutexGuard<()>)> {
+    let admission = state.installs.admission.lock().await;
     let jobs =
         store::list_active_for_instance(instance_id, &state.pool).await?;
     for job in &jobs {
@@ -483,9 +480,9 @@ fn start(
 async fn start_inner(
     request: InstallRequest,
 ) -> crate::Result<InstallJobSnapshot> {
-    let _admission = INSTALL_ADMISSION.lock().await;
-    let mut target_guard = reserve_target(&request.target())?;
     let state = State::get().await?;
+    let _admission = state.installs.admission.lock().await;
+    let mut target_guard = reserve_target(&request.target())?;
     if let InstallTarget::ExistingInstance { instance_id } = request.target() {
         store::ensure_no_pending_recovery(&instance_id, None, &state.pool)
             .await?;
@@ -686,7 +683,8 @@ async fn prepare_initial_instance_inner(
             );
             let instance_id = metadata.instance.id;
             set_instance_id(job_state, instance_id.clone());
-            attach_pending_shared_instance(&instance_id, &data, state).await?;
+            attach_pending_shared_instance(&instance_id, &data, &state.pool)
+                .await?;
             emit_instance(&instance_id, InstancePayloadType::Edited).await?;
         }
         InstallRequest::ImportInstance {
@@ -741,7 +739,8 @@ async fn prepare_initial_instance_inner(
         }
         | InstallRequest::BulkUpdateContent { instance_id, .. }
         | InstallRequest::UpdateSharedInstance { instance_id, .. } => {
-            prepare_existing_rollback(job_state, state, &instance_id).await?;
+            prepare_existing_rollback(job_state, &state.pool, &instance_id)
+                .await?;
         }
     }
 
@@ -792,7 +791,7 @@ async fn run_job_inner(
 
     let _install_permit = if control.checkpoint().await.is_ok() {
         tokio::select! {
-            permit = state.install_job_semaphore.acquire() => Some(permit?),
+            permit = state.installs.job_semaphore.acquire() => Some(permit?),
             () = control.canceled() => None,
         }
     } else {
@@ -1062,7 +1061,7 @@ async fn run_request_inner(
             update_progress(
                 job_id,
                 job_state,
-                state,
+                &state.pool,
                 InstallPhaseId::PreparingInstance,
                 InstallPhaseDetails::Instance { name: name.clone() },
             )
@@ -1070,7 +1069,7 @@ async fn run_request_inner(
             update_progress(
                 job_id,
                 job_state,
-                state,
+                &state.pool,
                 InstallPhaseId::DownloadingMinecraft,
                 InstallPhaseDetails::Minecraft {
                     game_version,
@@ -1113,7 +1112,7 @@ async fn run_request_inner(
             update_progress(
                 job_id,
                 job_state,
-                state,
+                &state.pool,
                 InstallPhaseId::ResolvingPack,
                 modpack_details(&location),
             )
@@ -1147,8 +1146,12 @@ async fn run_request_inner(
             )
             .await?;
 
-            finalize_shared_instance_attachment(&instance_id, &data, state)
-                .await?;
+            finalize_shared_instance_attachment(
+                &instance_id,
+                &data,
+                &state.pool,
+            )
+            .await?;
             emit_instance(&instance_id, InstancePayloadType::Edited).await?;
 
             Ok(Some(instance_id))
@@ -1167,7 +1170,7 @@ async fn run_request_inner(
             update_progress(
                 job_id,
                 job_state,
-                state,
+                &state.pool,
                 InstallPhaseId::PreparingInstance,
                 InstallPhaseDetails::Import {
                     launcher_type,
@@ -1199,7 +1202,7 @@ async fn run_request_inner(
             update_progress(
                 job_id,
                 job_state,
-                state,
+                &state.pool,
                 InstallPhaseId::PreparingInstance,
                 InstallPhaseDetails::Empty,
             )
@@ -1241,12 +1244,13 @@ async fn run_request_inner(
             Ok(Some(instance_id))
         }
         InstallRequest::InstallExistingInstance { instance_id, force } => {
-            prepare_existing_rollback(job_state, state, &instance_id).await?;
+            prepare_existing_rollback(job_state, &state.pool, &instance_id)
+                .await?;
             lock_instance(&instance_id, state).await?;
             update_progress(
                 job_id,
                 job_state,
-                state,
+                &state.pool,
                 InstallPhaseId::DownloadingMinecraft,
                 InstallPhaseDetails::Empty,
             )
@@ -1278,7 +1282,8 @@ async fn run_request_inner(
             location,
             post_install_edit,
         } => {
-            prepare_existing_rollback(job_state, state, &instance_id).await?;
+            prepare_existing_rollback(job_state, &state.pool, &instance_id)
+                .await?;
             lock_instance(&instance_id, state).await?;
             prepare_update_backup(job_id, job_state, state).await?;
             crate::api::instance::prepare_instance_update(&instance_id).await?;
@@ -1316,7 +1321,7 @@ async fn run_request_inner(
             update_progress(
                 job_id,
                 job_state,
-                state,
+                &state.pool,
                 InstallPhaseId::ResolvingPack,
                 InstallPhaseDetails::Empty,
             )
@@ -1343,7 +1348,8 @@ async fn run_request_inner(
             Ok(Some(instance_id))
         }
         InstallRequest::UpdateSharedInstance { instance_id, data } => {
-            prepare_existing_rollback(job_state, state, &instance_id).await?;
+            prepare_existing_rollback(job_state, &state.pool, &instance_id)
+                .await?;
             lock_instance(&instance_id, state).await?;
             prepare_update_backup(job_id, job_state, state).await?;
             let disabled_project_ids =
@@ -1362,8 +1368,12 @@ async fn run_request_inner(
                 state,
             )
             .await?;
-            finalize_shared_instance_attachment(&instance_id, &data, state)
-                .await?;
+            finalize_shared_instance_attachment(
+                &instance_id,
+                &data,
+                &state.pool,
+            )
+            .await?;
             emit_instance(&instance_id, InstancePayloadType::Edited).await?;
             Ok(Some(instance_id))
         }
@@ -1648,14 +1658,14 @@ async fn install_pack_inner(
 
 async fn prepare_existing_rollback(
     job_state: &mut InstallJobState,
-    state: &State,
+    pool: &SqlitePool,
     instance_id: &str,
 ) -> crate::Result<()> {
     if job_state.rollback.is_some() {
         return Ok(());
     }
 
-    let instance = crate::state::get_instance(instance_id, &state.pool)
+    let instance = crate::state::get_instance(instance_id, pool)
         .await?
         .ok_or_else(|| {
             crate::ErrorKind::InputError(format!(
@@ -1733,7 +1743,7 @@ async fn lock_install_target(
 }
 
 async fn lock_instance(instance_id: &str, state: &State) -> crate::Result<()> {
-    let _content_lock = state.lock_instance_content(instance_id).await;
+    let _content_lock = state.instance_locks.lock_content(instance_id).await;
     if crate::state::instance_has_running_process(instance_id, state).await? {
         return Err(crate::state::content_store::input(
             "Stop this instance before installing or updating its content",
@@ -1753,13 +1763,13 @@ async fn lock_instance(instance_id: &str, state: &State) -> crate::Result<()> {
 pub(super) async fn update_progress(
     job_id: Uuid,
     job_state: &mut InstallJobState,
-    state: &State,
+    pool: &SqlitePool,
     phase: InstallPhaseId,
     details: InstallPhaseDetails,
 ) -> crate::Result<()> {
     super::control::checkpoint(job_id).await?;
     job_state.set_progress(phase, None, details);
-    let record = store::update_state(job_id, job_state, &state.pool).await?;
+    let record = store::update_state(job_id, job_state, pool).await?;
     emit_install_job(&record.snapshot()).await?;
     Ok(())
 }
@@ -1767,7 +1777,7 @@ pub(super) async fn update_progress(
 pub(super) async fn update_content_progress(
     job_id: Uuid,
     job_state: &mut InstallJobState,
-    state: &State,
+    pool: &SqlitePool,
     current: u64,
     total: u64,
 ) -> crate::Result<()> {
@@ -1779,7 +1789,7 @@ pub(super) async fn update_content_progress(
         secondary: None,
     });
     job_state.progress.details = InstallPhaseDetails::Empty;
-    let record = store::update_state(job_id, job_state, &state.pool).await?;
+    let record = store::update_state(job_id, job_state, pool).await?;
     emit_install_job(&record.snapshot()).await?;
     Ok(())
 }
