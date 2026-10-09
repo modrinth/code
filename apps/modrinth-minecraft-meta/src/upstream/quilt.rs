@@ -10,7 +10,7 @@ use url::Url;
 
 use crate::{
     model,
-    task::DownloadRunContext,
+    upstream::DownloadRunContext,
     util::{MavenCoordinate, Sha1, Sha256},
 };
 

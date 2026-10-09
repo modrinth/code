@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use tracing::{info, info_span};
 use tracing_anyhow::FutureContext;
 
-use crate::{model, task::DownloadRunContext};
+use crate::{model, upstream::DownloadRunContext};
 
 pub const FORGE_CATALOG_URL: &str = "https://maven.neoforged.net/api/maven/versions/releases/net/neoforged/forge";
 pub const NEOFORGE_CATALOG_URL: &str = "https://maven.neoforged.net/api/maven/versions/releases/net/neoforged/neoforge";

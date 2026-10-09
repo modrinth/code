@@ -8,7 +8,7 @@ use tracing::{info, info_span};
 use tracing_anyhow::FutureContext;
 use url::Url;
 
-use crate::{model, task::DownloadRunContext, util::MavenCoordinate};
+use crate::{model, upstream::DownloadRunContext, util::MavenCoordinate};
 
 pub const CATALOG_URL: &str = "https://meta.fabricmc.net/v2/versions";
 pub const PROFILE_GAME_VERSION: &str = "1.21";

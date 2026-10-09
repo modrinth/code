@@ -12,7 +12,7 @@ use tracing_anyhow::FutureContext;
 
 use crate::{
     model::{self, ForgelikeInstallerName},
-    task::DownloadRunContext,
+    upstream::DownloadRunContext,
 };
 
 pub const CATALOG_URL: &str = "https://files.minecraftforge.net/net/minecraftforge/forge/maven-metadata.json";

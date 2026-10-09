@@ -6,9 +6,11 @@ use crate::{
     util::Sha256,
 };
 
+/// ID of a [`FabricCatalog`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Embed)]
 pub struct FabricCatalogId(pub Uuid);
 
+/// Fabric version catalog downloaded during some [`DownloadRun`].
 #[derive(Debug, Clone, Model)]
 pub struct FabricCatalog {
     #[key]

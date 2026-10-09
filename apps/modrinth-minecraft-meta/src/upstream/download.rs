@@ -12,32 +12,11 @@ use crate::{
     AppState,
     model::{self, DownloadRunId},
     store::BlobCas,
-    upstream,
+    upstream::{self, Upstreams},
     util::{
         ErrorAccumulator, ResponseExt, Sha256, from_json_str, from_json_value,
     },
 };
-
-#[derive(Debug, Clone, Copy)]
-pub struct Upstreams {
-    pub mojang: bool,
-    pub fabric: bool,
-    pub forge: bool,
-    pub neoforge: bool,
-    pub quilt: bool,
-}
-
-impl Default for Upstreams {
-    fn default() -> Self {
-        Self {
-            mojang: true,
-            fabric: true,
-            forge: true,
-            neoforge: true,
-            quilt: true,
-        }
-    }
-}
 
 pub struct DownloadRunContext<'cx> {
     pub http: &'cx reqwest::Client,

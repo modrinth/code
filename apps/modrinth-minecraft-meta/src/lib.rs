@@ -12,6 +12,7 @@ use tracing_subscriber::{
 use crate::{
     config::Config,
     store::{BlobCas, BlobStore, MavenStore, StoreVisibility},
+    upstream::Upstreams,
     util::fastly,
 };
 
@@ -49,12 +50,12 @@ struct Cli {
 enum Command {
     /// Download manifests and sources from upstreamms
     Download,
-    /// Extract downloaded Mojang metadata into normalized database rows
+    /// Extract downloaded metadata into normalized database rows
     ExtractToDb,
     /// Extract downloaded installer JARs for their manifests and libraries
     ExtractInstallers,
     /// Take processed information from the database, produce JSON manifests
-    /// from them, and upload them to the public file store.
+    /// from them, and upload them to the public file store
     Export,
 }
 
@@ -141,7 +142,7 @@ pub async fn main() -> Result<()> {
             && !cli.forge
             && !cli.neoforge
             && !cli.quilt;
-        task::Upstreams {
+        Upstreams {
             mojang: all_upstreams || cli.mojang,
             fabric: all_upstreams || cli.fabric,
             forge: all_upstreams || cli.forge,
@@ -152,11 +153,11 @@ pub async fn main() -> Result<()> {
 
     match cli.command {
         Command::Download => {
-            task::download_from_upstreams(&app, upstreams).await
+            upstream::download_from_upstreams(&app, upstreams).await
         }
-        Command::ExtractToDb => extract::extract(&app).await,
+        Command::ExtractToDb => extract::extract(&app, upstreams).await,
         Command::ExtractInstallers => task::extract_installers(&mut app).await,
-        Command::Export => task::export(&mut app, upstreams).await,
+        Command::Export => export::export(&mut app, upstreams).await,
     }
 }
 

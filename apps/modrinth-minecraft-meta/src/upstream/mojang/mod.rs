@@ -17,7 +17,7 @@ use url::Url;
 
 use crate::{
     model::{self, MinecraftVersionName},
-    task::DownloadRunContext,
+    upstream::DownloadRunContext,
     util::{Sha1, de_error},
 };
 
