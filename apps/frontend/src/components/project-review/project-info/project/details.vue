@@ -30,7 +30,7 @@
 					{{ project.name }}
 				</NuxtLink>
 			</dd>
-			<template v-if="project.requested_status">
+			<template v-if="project.status === 'processing' && project.requested_status">
 				<dt class="font-medium">{{ formatMessage(messages.requesting) }}</dt>
 				<dd class="m-0">
 					<ProjectStatusBadge
