@@ -86,23 +86,54 @@
 				{{ formatMessage(messages.monetizationValue, { status: monetizationStatus }) }}
 			</dd>
 
-			<dt class="self-center font-medium">{{ formatMessage(messages.actions) }}</dt>
-			<dd class="m-0 flex items-center gap-2">
-				<CopyCode :text="project.id" :display-text="formatMessage(messages.projectId)" />
-				<CopyCode
-					:text="`${config.public.siteUrl}/project/${project.id}`"
-					:display-text="formatMessage(messages.permalink)"
-				/>
+			<dt class="mt-0.5 self-start font-medium">{{ formatMessage(messages.actions) }}</dt>
+			<dd class="m-0 flex flex-wrap items-center gap-2">
+				<Button
+					type="outlined"
+					class="!text-primary"
+					size="sm"
+					:title="formatMessage(commonMessages.copyIdButton)"
+					@click="copyProjectId(project.id)"
+				>
+					{{ formatMessage(messages.projectId) }}
+					<CheckIcon v-if="projectIdCopied" aria-hidden="true" />
+					<CopyIcon v-else aria-hidden="true" />
+				</Button>
+				<Button
+					type="outlined"
+					class="!text-primary"
+					size="xs"
+					:title="formatMessage(commonMessages.copyPermalinkButton)"
+					@click="copyPermalink(`${config.public.siteUrl}/project/${project.id}`)"
+				>
+					{{ formatMessage(messages.permalink) }}
+					<CheckIcon v-if="permalinkCopied" aria-hidden="true" />
+					<CopyIcon v-else aria-hidden="true" />
+				</Button>
+				<ButtonLink
+					:to="analyticsUrl"
+					:disabled="!analyticsOwnerId"
+					target="_blank"
+					rel="noopener noreferrer"
+					type="outlined"
+					class="!text-primary"
+					size="xs"
+				>
+					{{ formatMessage(commonMessages.analyticsButton) }}
+					<ExternalIcon aria-hidden="true" />
+				</ButtonLink>
 			</dd>
 		</dl>
 	</Section>
 </template>
 
 <script setup lang="ts">
-import { ServerIcon } from '@modrinth/assets'
+import { CheckIcon, CopyIcon, ExternalIcon, ServerIcon } from '@modrinth/assets'
 import {
 	BulletDivider,
-	CopyCode,
+	Button,
+	ButtonLink,
+	commonMessages,
 	getProjectStatusColor,
 	getProjectStatusIcon,
 	getProjectTypeIcon,
@@ -114,6 +145,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { getPrimaryProjectType } from '@modrinth/utils'
+import { useClipboard } from '@vueuse/core'
 import { computed, useTemplateRef } from 'vue'
 
 import { injectProjectReviewPageContext } from '~/providers/project-review'
@@ -123,8 +155,11 @@ import EditButton from '../edit/button.vue'
 import EditModal from '../edit/details.vue'
 import Section from '../section.vue'
 
-const { project, projectV2, submissionCount } = injectProjectReviewPageContext()
+const { project, projectV2, submissionCount, members, organizationMembers } =
+	injectProjectReviewPageContext()
 const config = useRuntimeConfig()
+const { copy: copyProjectId, copied: projectIdCopied } = useClipboard({ copiedDuring: 2000 })
+const { copy: copyPermalink, copied: permalinkCopied } = useClipboard({ copiedDuring: 2000 })
 const editModal = useTemplateRef<InstanceType<typeof EditModal>>('editModal')
 const monetizationStatus = computed(() =>
 	project.value?.monetization_status === 'force-demonetized'
@@ -135,6 +170,15 @@ const projectUrl = computed(
 	() =>
 		`/${projectV2.value?.project_type ?? project.value?.project_types[0]}/${project.value?.slug ?? project.value?.id}`,
 )
+const analyticsOwnerId = computed(
+	() =>
+		members.value.find((member) => member.is_owner)?.user.id ??
+		organizationMembers.value.find((member) => member.is_owner)?.user.id,
+)
+const analyticsUrl = computed(() => ({
+	path: '/dashboard/analytics',
+	query: { user: analyticsOwnerId.value, a_projects: project.value?.id },
+}))
 const primaryProjectType = computed(() =>
 	project.value ? getPrimaryProjectType(project.value) : undefined,
 )

@@ -1,10 +1,14 @@
 <template>
-	<li class="flex min-w-0 items-start gap-2">
+	<li class="group/member flex min-w-0 items-start gap-2">
 		<button
 			v-if="avatarUrl"
 			type="button"
 			class="shrink-0 cursor-zoom-in rounded-full border-0 bg-transparent p-0"
-			:aria-label="formatMessage(messages.openMemberAvatar, { username: member.user.username })"
+			:aria-label="
+				formatMessage(messages.openMemberAvatar, {
+					username: member.user.username,
+				})
+			"
 			@click="viewer?.show(0)"
 		>
 			<Avatar
@@ -27,7 +31,7 @@
 				<ImageViewerActions v-model:pixelated="pixelated" :src="item.src" />
 			</template>
 		</ImageViewerEditor>
-		<div class="min-w-0">
+		<div class="min-w-0 flex-1">
 			<div class="flex items-center gap-1.5">
 				<NuxtLink
 					:to="`/user/${member.user.username}`"
@@ -44,6 +48,10 @@
 			<p class="m-0 text-xs">{{ member.role }}</p>
 			<ProjectStatusStats :stats="stats" />
 		</div>
+		<MemberActions
+			:user="member.user"
+			class="shrink-0 group-focus-within/member:opacity-100 group-hover/member:opacity-100 aria-expanded:opacity-100 [@media(hover:hover)]:opacity-0"
+		/>
 	</li>
 </template>
 
@@ -58,6 +66,7 @@ import { injectProjectReviewPageContext } from '~/providers/project-review'
 
 import ImageViewerActions from '../../image-viewer-actions.vue'
 import { projectReviewMessages as messages } from '../../messages'
+import MemberActions from './member-actions.vue'
 
 const props = defineProps<{
 	member: Labrinth.Projects.v3.TeamMember
@@ -69,7 +78,13 @@ const { pixelated } = injectProjectReviewPageContext()
 const avatarUrl = computed(() => props.member.user.raw_avatar_url || props.member.user.avatar_url)
 const viewerItems = computed(() =>
 	avatarUrl.value
-		? [{ id: avatarUrl.value, src: avatarUrl.value, alt: props.member.user.username }]
+		? [
+				{
+					id: avatarUrl.value,
+					src: avatarUrl.value,
+					alt: props.member.user.username,
+				},
+			]
 		: [],
 )
 </script>
