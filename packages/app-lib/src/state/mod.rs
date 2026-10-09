@@ -1,8 +1,9 @@
 //! Theseus state management system
 use crate::util::fetch::{FetchSemaphore, IoSemaphore};
 use dashmap::DashMap;
-use std::sync::Arc;
 use std::sync::atomic::AtomicBool;
+use std::sync::{Arc, LazyLock};
+use tokio::sync::watch::Sender;
 use tokio::sync::{Mutex, MutexGuard, OnceCell, OwnedMutexGuard, Semaphore};
 
 use crate::state::instances::watcher::FileWatcher;
@@ -67,9 +68,15 @@ mod legacy_converter;
 pub mod attached_world_data;
 pub mod server_join_log;
 
-// Global state
-// RwLock on state only has concurrent reads, except for config dir change which takes control of the State
+enum StartupPhase {
+    Pending,
+    Ready,
+    Failed(crate::Error),
+}
+
 static LAUNCHER_STATE: OnceCell<Arc<State>> = OnceCell::const_new();
+static STATE_STARTUP: LazyLock<Sender<StartupPhase>> =
+    LazyLock::new(|| Sender::new(StartupPhase::Pending));
 static STATE_STARTUP_LOCK: Mutex<()> = Mutex::const_new(());
 const MAX_CONCURRENT_INSTALL_JOBS: usize = 3;
 pub struct State {
@@ -172,9 +179,17 @@ impl State {
 
     pub async fn init(app_identifier: String) -> crate::Result<()> {
         let _startup = STATE_STARTUP_LOCK.lock().await;
-        let state = LAUNCHER_STATE
-            .get_or_try_init(move || Self::initialize_state(app_identifier))
-            .await?;
+        let result = LAUNCHER_STATE
+            .get_or_try_init(|| async {
+                STATE_STARTUP.send_replace(StartupPhase::Pending);
+                Self::initialize_state(app_identifier).await
+            })
+            .await;
+        STATE_STARTUP.send_replace(match &result {
+            Ok(_) => StartupPhase::Ready,
+            Err(error) => StartupPhase::Failed(error.clone()),
+        });
+        let state = result?;
 
         if state
             .startup_complete
@@ -297,18 +312,28 @@ impl State {
 
     /// Get the current launcher state, waiting for initialization.
     pub async fn get() -> crate::Result<Arc<Self>> {
-        if !LAUNCHER_STATE.initialized() {
-            tracing::error!(
-                "Attempted to get state before it is initialized - this should never happen!"
-            );
-            while !LAUNCHER_STATE.initialized() {
-                tokio::time::sleep(std::time::Duration::from_millis(100)).await;
-            }
+        if let Some(state) = LAUNCHER_STATE.get() {
+            return Ok(Arc::clone(state));
         }
 
-        Ok(Arc::clone(
-            LAUNCHER_STATE.get().expect("State is not initialized!"),
-        ))
+        let mut phases = STATE_STARTUP.subscribe();
+        let phase = phases
+            .wait_for(|phase| !matches!(phase, StartupPhase::Pending))
+            .await
+            .expect("the startup sender is static and never dropped");
+        match &*phase {
+            StartupPhase::Ready => Ok(Arc::clone(
+                LAUNCHER_STATE
+                    .get()
+                    .expect("state is set before startup is marked ready"),
+            )),
+            StartupPhase::Failed(error) => Err(error.clone()),
+            StartupPhase::Pending => {
+                unreachable!(
+                    "wait_for returns only once the phase has left Pending"
+                )
+            }
+        }
     }
 
     pub fn initialized() -> bool {
