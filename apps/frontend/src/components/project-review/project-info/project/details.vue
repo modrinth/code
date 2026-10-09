@@ -89,10 +89,11 @@
 			<dt class="mt-0.5 self-start font-medium">{{ formatMessage(messages.actions) }}</dt>
 			<dd class="m-0 flex flex-wrap items-center gap-2">
 				<Button
+					v-tooltip="formatMessage(messages.copyValue, { value: project.id })"
 					type="outlined"
 					class="!text-primary"
 					size="sm"
-					:title="formatMessage(commonMessages.copyIdButton)"
+					:aria-label="formatMessage(commonMessages.copyIdButton)"
 					@click="copyProjectId(project.id)"
 				>
 					{{ formatMessage(messages.projectId) }}
@@ -100,11 +101,12 @@
 					<CopyIcon v-else aria-hidden="true" />
 				</Button>
 				<Button
+					v-tooltip="formatMessage(messages.copyValue, { value: permalink })"
 					type="outlined"
 					class="!text-primary"
 					size="xs"
-					:title="formatMessage(commonMessages.copyPermalinkButton)"
-					@click="copyPermalink(`${config.public.siteUrl}/project/${project.id}`)"
+					:aria-label="formatMessage(commonMessages.copyPermalinkButton)"
+					@click="copyPermalink(permalink)"
 				>
 					{{ formatMessage(messages.permalink) }}
 					<CheckIcon v-if="permalinkCopied" aria-hidden="true" />
@@ -145,7 +147,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { getPrimaryProjectType } from '@modrinth/utils'
-import { useClipboard } from '@vueuse/core'
+import { useClipboard, useMagicKeys } from '@vueuse/core'
 import { computed, useTemplateRef } from 'vue'
 
 import { injectProjectReviewPageContext } from '~/providers/project-review'
@@ -158,6 +160,11 @@ import Section from '../section.vue'
 const { project, projectV2, submissionCount, members, organizationMembers } =
 	injectProjectReviewPageContext()
 const config = useRuntimeConfig()
+const { shift: shiftHeld } = useMagicKeys()
+const permalink = computed(
+	() =>
+		`${shiftHeld.value ? 'https://modrinth.com' : config.public.siteUrl}/project/${project.value?.id}`,
+)
 const { copy: copyProjectId, copied: projectIdCopied } = useClipboard({ copiedDuring: 2000 })
 const { copy: copyPermalink, copied: permalinkCopied } = useClipboard({ copiedDuring: 2000 })
 const editModal = useTemplateRef<InstanceType<typeof EditModal>>('editModal')

@@ -429,6 +429,10 @@ export const projectReviewMessages = defineMessages({
 		id: 'moderation.project-review.permalink',
 		defaultMessage: 'Perma link',
 	},
+	copyValue: {
+		id: 'moderation.project-review.copyValue',
+		defaultMessage: 'Copy: {value}',
+	},
 	project: {
 		id: 'moderation.project-review.project',
 		defaultMessage: 'Project',
