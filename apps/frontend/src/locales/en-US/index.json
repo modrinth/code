@@ -1232,8 +1232,14 @@
   "create-project-version.create-modal.stage.details.version-number-description": {
     "message": "The version number differentiates this specific version from others."
   },
+  "create-project-version.create-modal.stage.details.version-number-invalid": {
+    "message": "Version numbers cannot contain spaces. Use letters, numbers, and the symbols . - _ + ! @ $ ( ) , ` \" only."
+  },
   "create-project-version.create-modal.stage.details.version-number-placeholder": {
     "message": "Enter version number, e.g. 1.2.3-alpha.1"
+  },
+  "create-project-version.create-modal.stage.details.version-number-required": {
+    "message": "A version number is required."
   },
   "create-project-version.create-modal.stage.details.version-subtitle": {
     "message": "Version subtitle"
