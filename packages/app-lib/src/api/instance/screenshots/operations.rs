@@ -15,6 +15,7 @@ use super::reconciliation::{
 use crate::State;
 use crate::event::InstancePayloadType;
 use crate::event::emit::emit_instance;
+use crate::state::InstanceLocks;
 use crate::state::instances::adapters::sqlite::{
     instance_rows::{self, InstanceScreenshotSource},
     screenshot_rows,
@@ -104,12 +105,12 @@ async fn list_source_screenshot_sets(
 }
 
 async fn lock_instance_screenshots<'a>(
-    state: &State,
+    instance_locks: &InstanceLocks,
     instance_ids: impl IntoIterator<Item = &'a str>,
 ) -> Vec<OwnedMutexGuard<()>> {
     let mut locks = Vec::new();
     for instance_id in instance_ids {
-        locks.push(state.instance_locks.lock_screenshots(instance_id).await);
+        locks.push(instance_locks.lock_screenshots(instance_id).await);
     }
     locks
 }
@@ -123,7 +124,8 @@ pub async fn delete_screenshots(keys: &[ScreenshotKey]) -> crate::Result<()> {
         .collect::<Vec<_>>();
     instance_ids.sort_unstable();
     instance_ids.dedup();
-    let _locks = lock_instance_screenshots(&state, instance_ids).await;
+    let _locks =
+        lock_instance_screenshots(&state.instance_locks, instance_ids).await;
 
     for key in keys {
         io::remove_file(get_screenshot_path(key).await?).await?;
@@ -228,7 +230,8 @@ pub async fn move_screenshots(
         .collect::<Vec<_>>();
     instance_ids.sort_unstable();
     instance_ids.dedup();
-    let _locks = lock_instance_screenshots(&state, instance_ids).await;
+    let _locks =
+        lock_instance_screenshots(&state.instance_locks, instance_ids).await;
     let target_source = instance_rows::get_instance_screenshot_source(
         target_instance_id,
         &state.pool,
