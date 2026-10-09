@@ -3,7 +3,7 @@ use crate::util::fetch::{FetchSemaphore, IoSemaphore};
 use std::sync::atomic::AtomicBool;
 use std::sync::{Arc, LazyLock};
 use tokio::sync::watch::Sender;
-use tokio::sync::{Mutex, MutexGuard, OnceCell, Semaphore};
+use tokio::sync::{Mutex, OnceCell, Semaphore};
 
 use crate::state::instances::watcher::FileWatcher;
 use sqlx::SqlitePool;
@@ -62,6 +62,9 @@ pub(crate) use self::instance_locks::InstanceLocks;
 mod presence;
 pub use self::presence::Presence;
 
+mod synced_options;
+pub(crate) use self::synced_options::SyncedOptions;
+
 mod tunnel;
 pub use self::tunnel::*;
 
@@ -101,10 +104,7 @@ pub struct State {
     pub api_semaphore: FetchSemaphore,
     pub(crate) installs: Installs,
     pub(crate) instance_locks: InstanceLocks,
-    /// Serializes canonical synced-option mutations and checkpoint updates.
-    synced_options_lock: Mutex<()>,
-    pub(crate) game_locale_indexer: crate::api::instance::GameLocaleIndexer,
-    pub(crate) pack_sync_worker: crate::api::instance::PackSyncWorker,
+    pub(crate) synced_options: SyncedOptions,
 
     pub presence: Presence,
 
@@ -125,10 +125,6 @@ pub struct State {
 }
 
 impl State {
-    pub(crate) async fn lock_synced_options(&self) -> MutexGuard<'_, ()> {
-        self.synced_options_lock.lock().await
-    }
-
     pub async fn init(app_identifier: String) -> crate::Result<()> {
         let _startup = STATE_STARTUP_LOCK.lock().await;
         let result = LAUNCHER_STATE
@@ -366,10 +362,7 @@ impl State {
             api_semaphore,
             installs: Installs::new(),
             instance_locks: InstanceLocks::default(),
-            synced_options_lock: Mutex::new(()),
-            game_locale_indexer:
-                crate::api::instance::GameLocaleIndexer::default(),
-            pack_sync_worker: crate::api::instance::PackSyncWorker::default(),
+            synced_options: SyncedOptions::default(),
             presence,
             process_manager,
             restart_after_pending_update: AtomicBool::new(false),

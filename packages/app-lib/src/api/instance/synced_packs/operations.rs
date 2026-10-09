@@ -594,7 +594,7 @@ pub async fn upload_synced_pack(
     let size = bytes.len() as u64;
     let sha1 = crate::util::fetch::sha1_async(bytes.clone()).await?;
     let sha512 = cache_bytes(bytes, &state).await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     if !get_global_options().await?.get(option) {
         return Err(crate::ErrorKind::InputError(
             "Pack syncing was disabled while preparing the upload.".to_owned(),
@@ -648,7 +648,7 @@ pub async fn set_synced_pack_enabled(
     enabled: bool,
 ) -> crate::Result<()> {
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     let mut library = read_library(&state).await?;
     let pack = library.packs.get_mut(pack_id).ok_or_else(|| {
         crate::ErrorKind::InputError("Unknown synced pack.".to_string())
@@ -660,7 +660,7 @@ pub async fn set_synced_pack_enabled(
 
 pub async fn remove_synced_pack(pack_id: &str) -> crate::Result<()> {
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     let mut library = read_library(&state).await?;
     let pack = library.packs.get(pack_id).ok_or_else(|| {
         crate::ErrorKind::InputError("Unknown synced pack.".to_string())
@@ -676,7 +676,7 @@ pub async fn desync_pack(
     mode: DesyncServerMode,
 ) -> crate::Result<()> {
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
         .ok_or_else(|| {
