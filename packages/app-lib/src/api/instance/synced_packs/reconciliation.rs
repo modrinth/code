@@ -312,7 +312,7 @@ async fn prepare_pack(
             None,
         )
         .await?;
-        downloaded.store_file(state).await?
+        downloaded.store_file(&state.content_store).await?
     } else {
         read_stored_file(pack, state).await?
     };

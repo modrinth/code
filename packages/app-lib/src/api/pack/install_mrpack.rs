@@ -944,7 +944,8 @@ async fn install_zipped_mrpack_files_with_reporter_inner(
                         project.hashes.get(&PackFileHash::Sha1).and_then(
                             |hash| content_context.file_infos_by_hash.get(hash),
                         );
-                    let stored_file = file.store_file(state).await?;
+                    let stored_file =
+                        file.store_file(&state.content_store).await?;
                     content_context
                         .reporter
                         .preserve_failure_context(

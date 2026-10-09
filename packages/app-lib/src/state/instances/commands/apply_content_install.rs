@@ -491,7 +491,7 @@ pub(crate) async fn add_downloaded_project_version_with_enabled(
             "Invalid project filename",
         ));
     }
-    let stored_file = downloaded.file.store_file(state).await?;
+    let stored_file = downloaded.file.store_file(&state.content_store).await?;
     install_stored_file(
         instance_id,
         InstallContent {
