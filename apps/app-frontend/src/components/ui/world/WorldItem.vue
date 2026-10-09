@@ -492,8 +492,8 @@ function openContextMenu(event: MouseEvent) {
 					no-shadow
 					class="!rounded-[14px]"
 				/>
-				<div class="flex flex-col justify-center gap-0.5 h-full">
-					<div class="flex items-center gap-1.5">
+				<div class="flex flex-col justify-center gap-0.5 h-full min-w-0">
+					<div class="flex items-center gap-1.5 min-w-0">
 						<div class="text-base text-contrast font-semibold truncate">
 							{{ getWorldDisplayName(world) }}
 						</div>
@@ -527,7 +527,7 @@ function openContextMenu(event: MouseEvent) {
 						</div>
 						<div
 							v-else-if="world.type === 'server'"
-							class="text-sm text-secondary flex items-center gap-1 font-semibold flex-nowrap whitespace-nowrap"
+							class="text-sm text-secondary flex items-center gap-1 font-semibold flex-nowrap whitespace-nowrap min-w-0 truncate"
 						>
 							<template v-if="refreshing">
 								<SpinnerIcon aria-hidden="true" class="animate-spin shrink-0" />
@@ -548,9 +548,9 @@ function openContextMenu(event: MouseEvent) {
 										stroke-width="3px"
 										class="shrink-0 smart-clickable:allow-pointer-events"
 									/>
-									<Tooltip :disabled="!hasPlayersTooltip">
+									<Tooltip :disabled="!hasPlayersTooltip" class="min-w-0 truncate">
 										<span
-											class="smart-clickable:allow-pointer-events"
+											class="smart-clickable:allow-pointer-events min-w-0 truncate"
 											:class="{ 'cursor-help': hasPlayersTooltip }"
 										>
 											{{
@@ -571,15 +571,15 @@ function openContextMenu(event: MouseEvent) {
 							</template>
 							<template v-else>
 								<NoSignalIcon aria-hidden="true" stroke-width="3px" class="shrink-0" />
-								{{ formatMessage(messages.offline) }}
+								<span class="truncate">{{ formatMessage(messages.offline) }}</span>
 							</template>
 						</div>
 					</div>
-					<div class="flex items-center gap-1.5 text-sm text-secondary">
+					<div class="flex items-center gap-1.5 text-sm text-secondary min-w-0">
 						<template v-if="instanceId">
 							<router-link
 								data-no-card-click
-								class="flex items-center gap-1 truncate hover:underline text-secondary smart-clickable:allow-pointer-events"
+								class="flex items-center gap-1 truncate hover:underline text-secondary smart-clickable:allow-pointer-events min-w-0"
 								:to="`/instance/${instanceId}`"
 							>
 								<Avatar
@@ -622,10 +622,10 @@ function openContextMenu(event: MouseEvent) {
 							class="motd-renderer font-normal font-minecraft line-clamp-2 text-secondary leading-5"
 							v-html="renderedMotd"
 						/>
-						<div v-else-if="!serverStatus" class="font-normal font-minecraft text-red leading-5">
+						<div v-else-if="!serverStatus" class="font-normal font-minecraft text-red leading-5 truncate max-w-full">
 							{{ formatMessage(messages.cantConnect) }}
 						</div>
-						<div v-else class="font-normal font-minecraft text-secondary leading-5">
+						<div v-else class="font-normal font-minecraft text-secondary leading-5 truncate max-w-full">
 							{{ formatMessage(messages.aMinecraftServer) }}
 						</div>
 					</template>
