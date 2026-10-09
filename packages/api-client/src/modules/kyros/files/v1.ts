@@ -8,6 +8,34 @@ export class KyrosFilesV1Module extends AbstractModule {
 	}
 
 	/**
+	 * Authorize a short-lived, single-use file download.
+	 */
+	public async authorizeFileDownload(
+		nodeUrlHost: string,
+		worldId: string,
+		path: string,
+	): Promise<Kyros.Files.v1.FileDownloadAuthorization> {
+		return this.client.request<Kyros.Files.v1.FileDownloadAuthorization>(
+			`/worlds/${worldId}/files/contents-raw/authorize`,
+			{
+				api: getNodeBaseUrl(nodeUrlHost),
+				version: 'v1',
+				method: 'GET',
+				params: { path },
+			},
+		)
+	}
+
+	/**
+	 * Build the browser URL for a previously authorized file download.
+	 */
+	public getFileDownloadUrl(nodeUrlHost: string, worldId: string, token: string): string {
+		const url = new URL(`/v1/worlds/${worldId}/files/contents-raw`, getNodeBaseUrl(nodeUrlHost))
+		url.searchParams.set('token', token)
+		return url.toString()
+	}
+
+	/**
 	 * Authorize a short-lived, single-use full-world download.
 	 */
 	public async authorizeFullWorldDownload(
