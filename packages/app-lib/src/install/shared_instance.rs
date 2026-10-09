@@ -58,31 +58,37 @@ pub(super) async fn attach_pending_shared_instance(
     .await
 }
 
+/// The icon a linked-server instance should use: the server's own icon, or the
+/// default server icon when it has none.
+pub(super) async fn linked_server_icon(
+    data: &SharedInstanceInstallData,
+    state: &State,
+) -> crate::Result<String> {
+    match &data.server_manager_icon_url {
+        Some(icon) => Ok(icon.clone()),
+        None => Ok(crate::api::instance::cache_icon(
+            bytes::Bytes::from_static(DEFAULT_SERVER_ICON),
+            state,
+        )
+        .await?
+        .to_string_lossy()
+        .to_string()),
+    }
+}
+
 pub(super) async fn finalize_shared_instance_attachment(
     instance_id: &str,
     data: &SharedInstanceInstallData,
     state: &State,
 ) -> crate::Result<()> {
     if let Some(server) = &data.linked_server {
-        let icon_path = match data.server_manager_icon_url.as_deref() {
-            Some(icon) => {
-                crate::state::instances::commands::resolve_icon_path(
-                    Some(icon),
-                    false,
-                    state,
-                )
-                .await?
-            }
-            None => Some(
-                crate::api::instance::cache_icon(
-                    bytes::Bytes::from_static(DEFAULT_SERVER_ICON),
-                    state,
-                )
-                .await?
-                .to_string_lossy()
-                .to_string(),
-            ),
-        };
+        let icon = linked_server_icon(data, state).await?;
+        let icon_path = crate::state::instances::commands::resolve_icon_path(
+            Some(&icon),
+            false,
+            state,
+        )
+        .await?;
         crate::api::instance::edit_icon(
             instance_id,
             icon_path.as_deref().map(std::path::Path::new),

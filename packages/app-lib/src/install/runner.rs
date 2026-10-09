@@ -9,7 +9,7 @@ use super::model::{
 use super::shared_instance::{
     apply_shared_instance_content, apply_shared_instance_update,
     attach_pending_shared_instance, finalize_shared_instance_attachment,
-    shared_instance_link, shared_instance_pack_location,
+    linked_server_icon, shared_instance_link, shared_instance_pack_location,
 };
 use super::{diagnostics, recovery, store};
 use crate::ErrorKind;
@@ -670,6 +670,11 @@ async fn prepare_initial_instance(
                 || async move {
                     let shared_link =
                         shared_instance_link(data.modpack.as_ref());
+                    let linked_icon = if data.linked_server.is_some() {
+                        Some(linked_server_icon(&data, state).await?)
+                    } else {
+                        None
+                    };
                     let (game_version, loader, loader_version, icon_path) =
                         if let Some(modpack) = data.modpack.clone() {
                             let preview = get_instance_from_pack(
@@ -680,26 +685,22 @@ async fn prepare_initial_instance(
                                 preview.game_version,
                                 preview.modloader,
                                 preview.loader_version,
-                                if data.linked_server.is_some() {
-                                    data.instance_icon_url.clone()
-                                } else {
-                                    data.instance_icon_url
-                                        .clone()
-                                        .or_else(|| {
-                                            preview.icon.as_ref().map(|path| {
-                                                path.to_string_lossy()
-                                                    .to_string()
-                                            })
+                                linked_icon
+                                    .or_else(|| data.instance_icon_url.clone())
+                                    .or_else(|| {
+                                        preview.icon.as_ref().map(|path| {
+                                            path.to_string_lossy().to_string()
                                         })
-                                        .or_else(|| preview.icon_url.clone())
-                                },
+                                    })
+                                    .or_else(|| preview.icon_url.clone()),
                             )
                         } else {
                             (
                                 data.game_version.clone(),
                                 data.loader,
                                 data.loader_version.clone(),
-                                data.instance_icon_url.clone(),
+                                linked_icon
+                                    .or_else(|| data.instance_icon_url.clone()),
                             )
                         };
                     let metadata = Box::pin(crate::api::instance::create(
