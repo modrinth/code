@@ -1,8 +1,8 @@
 use crate::auth::get_user_from_headers;
-use crate::database::PgPool;
 use crate::database::models::blocked_user_item::DBBlockedUser;
 use crate::database::models::friend_item::DBFriend;
 use crate::database::models::{DBUser, DBUserId};
+use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::models::pats::Scopes;
 use crate::models::users::UserFriend;
 use crate::queue::session::AuthQueue;
@@ -237,13 +237,13 @@ pub async fn remove_friend(
 #[get("/friends")]
 pub async fn friends(
     req: HttpRequest,
-    pool: web::Data<PgPool>,
+    pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
-        &**pool,
+        &***pool,
         &redis,
         &session_queue,
         Scopes::USER_READ,
@@ -252,7 +252,7 @@ pub async fn friends(
     .wrap_auth_err("authenticating API request")?
     .1;
 
-    let friends = DBFriend::get_user_friends(user.id.into(), None, &**pool)
+    let friends = DBFriend::get_user_friends(user.id.into(), None, &***pool)
         .await
         .wrap_internal_err("fetching friends from database")?
         .into_iter()

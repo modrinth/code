@@ -131,10 +131,10 @@ pub struct RandomProjects {
 #[get("/projects_random")]
 pub async fn random_projects_get_route(
     count: web::Query<RandomProjects>,
-    pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
-    random_projects_get(count, pool, redis).await
+    random_projects_get(count, ro_pool, redis).await
 }
 
 // Filtered candidates are sparser and unevenly spaced, so the nearest-point pick
@@ -143,7 +143,7 @@ const RANDOM_PROJECT_TYPE_OVERSAMPLE_FACTOR: u32 = 20;
 
 pub async fn random_projects_get(
     web::Query(params): web::Query<RandomProjects>,
-    pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
     params
@@ -184,7 +184,7 @@ pub async fn random_projects_get(
             fetch_limit as i32,
             project_type,
         )
-        .fetch(&**pool)
+        .fetch(&***ro_pool)
         .map_ok(|m| db_ids::DBProjectId(m.id))
         .try_collect::<Vec<_>>()
         .await
@@ -204,7 +204,7 @@ pub async fn random_projects_get(
             &statuses,
             params.count as i32,
         )
-        .fetch(&**pool)
+        .fetch(&***ro_pool)
         .map_ok(|m| db_ids::DBProjectId(m.id))
         .try_collect::<Vec<_>>()
         .await
@@ -217,7 +217,7 @@ pub async fn random_projects_get(
     }
 
     let projects_data =
-        db_models::DBProject::get_many_ids(&project_ids, &**pool, &redis)
+        db_models::DBProject::get_many_ids(&project_ids, &***ro_pool, &redis)
             .await
             .wrap_internal_err("fetching projects by ID")?
             .into_iter()
@@ -246,7 +246,7 @@ pub struct ProjectCheckResponse {
 pub async fn projects_get_route(
     req: HttpRequest,
     ids: web::Query<ProjectIds>,
-    pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
@@ -256,7 +256,7 @@ pub async fn projects_get_route(
         &req,
         "ids",
         &project_refs,
-        pool.as_ref(),
+        &ro_pool,
         redis.as_ref(),
         session_queue.as_ref(),
         Scopes::PROJECT_READ,
@@ -266,25 +266,26 @@ pub async fn projects_get_route(
         return Ok(response);
     }
 
-    projects_get(req, ids, pool, redis, session_queue).await
+    projects_get(req, ids, ro_pool, redis, session_queue).await
 }
 
 pub async fn projects_get(
     req: HttpRequest,
     web::Query(ids): web::Query<ProjectIds>,
-    pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let ids = serde_json::from_str::<Vec<&str>>(&ids.ids)
         .wrap_request_err("deserializing JSON data")?;
-    let projects_data = db_models::DBProject::get_many(&ids, &**pool, &redis)
-        .await
-        .wrap_internal_err("fetching requested projects")?;
+    let projects_data =
+        db_models::DBProject::get_many(&ids, &***ro_pool, &redis)
+            .await
+            .wrap_internal_err("fetching requested projects")?;
 
     let user_option = get_user_from_headers(
         &req,
-        &**pool,
+        &***ro_pool,
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
@@ -294,7 +295,7 @@ pub async fn projects_get(
     .ok();
 
     let projects =
-        filter_visible_projects(projects_data, &user_option, &pool, false)
+        filter_visible_projects(projects_data, &user_option, &ro_pool, false)
             .await
             .wrap_api_err("filtering visible projects")?;
 
@@ -310,14 +311,14 @@ pub async fn projects_get(
 pub async fn project_get(
     req: HttpRequest,
     info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     if let Some(response) = crate::routes::redirect_ref(
         &req,
         "id",
-        pool.as_ref(),
+        &ro_pool,
         redis.as_ref(),
         session_queue.as_ref(),
         Scopes::PROJECT_READ,
@@ -328,25 +329,25 @@ pub async fn project_get(
     }
 
     let project =
-        project_get_internal(req, info, pool, redis, session_queue).await?;
+        project_get_internal(req, info, ro_pool, redis, session_queue).await?;
     Ok(HttpResponse::Ok().json(project.into_inner()))
 }
 
 pub async fn project_get_internal(
     req: HttpRequest,
     info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<Project>, ApiError> {
     let (string,) = info.into_inner();
 
-    let project_data = db_models::DBProject::get(&string, &**pool, &redis)
+    let project_data = db_models::DBProject::get(&string, &***ro_pool, &redis)
         .await
         .wrap_internal_err("failed to fetch project")?;
     let user_option = get_user_from_headers(
         &req,
-        &**pool,
+        &***ro_pool,
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
@@ -356,7 +357,7 @@ pub async fn project_get_internal(
     .ok();
 
     if let Some(data) = project_data
-        && is_visible_project(&data.inner, &user_option, &pool, false)
+        && is_visible_project(&data.inner, &user_option, &ro_pool, false)
             .await
             .wrap_internal_err("failed to check project visibility")?
     {
@@ -1921,7 +1922,6 @@ pub async fn dependency_list_internal(
         let mut versions = filter_visible_versions(
             versions_result,
             &user_option,
-            &pool,
             &ro_pool,
             &redis,
         )

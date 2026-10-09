@@ -1,5 +1,5 @@
 use crate::auth::validate::get_user_record_from_bearer_token;
-use crate::database::PgPool;
+use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::models::analytics::{Download, DownloadReason};
 use crate::models::ids::{ProjectId, VersionId};
 use crate::models::pats::Scopes;
@@ -159,7 +159,7 @@ async fn resolve_download_attribution_version(
 #[allow(clippy::too_many_arguments)]
 pub async fn count_download(
     req: HttpRequest,
-    pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     analytics_queue: web::Data<Arc<AnalyticsQueue>>,
     session_queue: web::Data<AuthQueue>,
@@ -174,7 +174,7 @@ pub async fn count_download(
     let user = get_user_record_from_bearer_token(
         &req,
         token,
-        &**pool,
+        &***ro_pool,
         &redis,
         &session_queue,
         false,
@@ -198,7 +198,7 @@ pub async fn count_download(
             ",
         download_body.url,
     )
-    .fetch_optional(pool.as_ref())
+    .fetch_optional(&***ro_pool)
     .await
     .wrap_internal_err("fetching version from database")?
     {
@@ -212,7 +212,7 @@ pub async fn count_download(
         project_id as crate::database::models::ids::DBProjectId,
         id_option
     )
-    .fetch_optional(pool.as_ref())
+    .fetch_optional(&***ro_pool)
     .await
     .wrap_internal_err("fetching version from database")?
     {
@@ -241,9 +241,10 @@ pub async fn count_download(
         };
 
     if let Some(meta) = &meta {
-        let valid_download_tags = valid_download_tags(&pool, &redis)
-            .await
-            .wrap_internal_err("failed to fetch valid download tags")?;
+        let valid_download_tags =
+            valid_download_tags(&ro_pool, &redis)
+                .await
+                .wrap_internal_err("failed to fetch valid download tags")?;
         if let Some(loader) = &meta.loader
             && !valid_download_tags.loaders.contains(loader)
         {
@@ -262,7 +263,7 @@ pub async fn count_download(
     }
 
     let dependent_on_version_id = resolve_download_attribution_version(
-        &pool,
+        &ro_pool,
         &redis,
         meta.as_ref().and_then(|m| m.dependent_on),
         "dependent_on",

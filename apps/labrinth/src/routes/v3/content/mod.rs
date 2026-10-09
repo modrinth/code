@@ -201,7 +201,6 @@ impl ContentMetadataProvider for &mut LabrinthContentProvider<'_> {
         let versions = visible_versions(
             versions,
             self.user_option,
-            self.pool,
             self.ro_pool,
             self.redis,
         )
@@ -576,11 +575,10 @@ fn parse_version_id(version_id: &str) -> Option<DBVersionId> {
 async fn visible_versions(
     versions: Vec<VersionQueryResult>,
     user_option: &Option<User>,
-    pool: &PgPool,
     ro_pool: &ReadOnlyPgPool,
     redis: &RedisPool,
 ) -> Result<Vec<Version>, ApiError> {
-    filter_visible_versions(versions, user_option, pool, ro_pool, redis).await
+    filter_visible_versions(versions, user_option, ro_pool, redis).await
 }
 
 fn version_to_resolver(
