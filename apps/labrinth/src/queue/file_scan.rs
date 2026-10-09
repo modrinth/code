@@ -1261,6 +1261,7 @@ where
         INNER JOIN attribution_enforced_versions aev ON aev.id = f.version_id
         WHERE EXISTS (SELECT 1 FROM problem_groups)
           AND f.version_id = ANY($1)
+          AND aev.id = ANY($1)
         "#,
         &versions.iter().map(|(v, _)| v.0).collect::<Vec<_>>(),
         &versions
@@ -1320,6 +1321,7 @@ where
         inner join project_attribution_files paf on paf.sha1 = ofs.sha1
         inner join project_attribution_groups pag on pag.id = paf.group_id
         where d.dependent_id = ANY($1)
+          and aev.id = ANY($1)
           and pag.project_id = v.mod_id
           and d.dependency_file_name is not null
           and (
