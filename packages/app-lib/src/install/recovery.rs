@@ -14,6 +14,7 @@ use crate::state::{
     ContentSetSyncProvider, ContentSetSyncState, DirectoryInfo, InstanceFile,
     InstanceMetadata, State,
 };
+use crate::util::fetch::IoSemaphore;
 use async_walkdir::WalkDir;
 use chrono::Utc;
 use futures::StreamExt;
@@ -141,7 +142,7 @@ pub(super) async fn prepare_instance_update_backup(
             &instance_path,
             &staging_dir.join(SHARED_INSTANCE_ROLLBACK_INSTANCE_DIR),
             &skipped,
-            state,
+            &state.io_semaphore,
         )
         .await?;
         crate::util::io::write(
@@ -311,7 +312,7 @@ async fn restore_instance_update(
         &backup_path,
         &instance_path,
         &std::collections::HashSet::new(),
-        state,
+        &state.io_semaphore,
     )
     .await?;
     content_rows::restore_instance_content_snapshot(
@@ -412,7 +413,7 @@ async fn copy_directory(
     source: &Path,
     target: &Path,
     skipped: &std::collections::HashSet<String>,
-    state: &State,
+    io_semaphore: &IoSemaphore,
 ) -> crate::Result<()> {
     crate::util::io::create_dir_all(target).await?;
     let mut walker = WalkDir::new(source);
@@ -437,12 +438,8 @@ async fn copy_directory(
         if file_type.is_dir() {
             crate::util::io::create_dir_all(&target_path).await?;
         } else if file_type.is_file() {
-            crate::util::fetch::copy(
-                &entry_path,
-                &target_path,
-                &state.io_semaphore,
-            )
-            .await?;
+            crate::util::fetch::copy(&entry_path, &target_path, io_semaphore)
+                .await?;
         } else if file_type.is_symlink() {
             copy_symlink(&entry_path, &target_path).await?;
         }
