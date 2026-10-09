@@ -19,7 +19,7 @@
 						{{ formatMessage(messages.addLink) }}
 					</TeleportOverflowMenu>
 				</div>
-				<Table
+				<LinkTable
 					:columns="section.columns"
 					:data="section.rows"
 					row-key="id"
@@ -117,12 +117,26 @@
 									:current-field="current[row.field]"
 								/>
 								<ValidationMessage :check="saveValidation.forField(row.field)" />
-								<ProjectIssueCard target="modify_links" :platform="row.field" class="mt-2" />
+								<ProjectIssueCard
+									target="modify_links"
+									:platform="row.field"
+									:field-action="linkIssueActions[row.field]?.value"
+									class="mt-2"
+								/>
 							</template>
-							<ValidationMessage v-else-if="row.donation" :check="donationMessages(row.donation)" />
+							<template v-else-if="row.donation">
+								<ValidationMessage :check="donationMessages(row.donation)" />
+								<ProjectIssueCard
+									v-if="row.donation.id"
+									target="modify_links"
+									:platform="row.donation.id"
+									:field-action="linkIssueActions[row.donation.id]?.value"
+									class="mt-2"
+								/>
+							</template>
 						</div>
 					</template>
-				</Table>
+				</LinkTable>
 				<ProjectIssueCard
 					v-if="section.id === 'donations'"
 					target="modify_links"
@@ -169,6 +183,7 @@ import { isAdmin } from '@modrinth/utils'
 
 import ValidationMessage from '@/components/ValidationMessage.vue'
 import ProjectIssueCard from '~/components/ui/project-issue-card/index.vue'
+import { useProjectIssueFieldAction } from '~/composables/project-issue-field-action'
 import { useProjectNagMessages } from '~/composables/project-nag-validation'
 import { useProjectSaveValidation } from '~/composables/project-save-validation'
 import {
@@ -197,6 +212,16 @@ type LinkTableRow = {
 	url: string
 	field?: EditableLinkField
 	donation?: DonationRow
+}
+
+const LinkTable = Table as unknown as new () => {
+	$props: Parameters<typeof Table<'name' | 'url', LinkTableRow>>[0]
+	$slots: {
+		'header-url'(props: { column: TableColumn<'name' | 'url'> }): unknown
+		'empty-state'(): unknown
+		'cell-name'(props: { row: LinkTableRow }): unknown
+		'cell-url'(props: { row: LinkTableRow }): unknown
+	}
 }
 
 const messages = defineMessages({
@@ -547,6 +572,56 @@ const canSave = computed(
 		!saveValidation.messages.value.some((message) => message.severity === 'error'),
 )
 const saving = ref(false)
+
+const linkIssueActions = Object.fromEntries(
+	[...visibleFields.value, ...tags.value.donationPlatforms.map((platform) => platform.short)].map(
+		(field) => {
+			const donation = tags.value.donationPlatforms.some((platform) => platform.short === field)
+			const editableField = visibleFields.value.find((linkField) => linkField === field)
+			const draftUrl = () =>
+				normalizeProjectUrl(
+					(donation
+						? currentDonations.value[field]
+						: editableField
+							? current.value[editableField]
+							: undefined) ?? '',
+				) || ''
+			return [
+				field,
+				useProjectIssueFieldAction({
+					draft: () => ({
+						link_urls: {
+							...project.value.link_urls,
+							[field]: { platform: field, donation, url: draftUrl() },
+						},
+					}),
+					canSave: () =>
+						hasPermission.value &&
+						!saveValidation.forField(field).some((message) => message.severity === 'error'),
+					saving,
+					validation: saveValidation,
+					save: async () => {
+						const row = donationLinks.value.find((row) => row.id === field)
+						const submitted = donation
+							? row?.url
+							: editableField
+								? current.value[editableField]
+								: undefined
+						const url = draftUrl()
+						if (url !== (project.value.link_urls[field]?.url ?? '')) {
+							await patchProjectV3({ link_urls: { [field]: url || null } }, true, true)
+						}
+						if (donation) {
+							if (row && row.url === submitted) row.url = url
+						} else if (editableField && current.value[editableField] === submitted) {
+							current.value[editableField] = url
+						}
+					},
+				}),
+			]
+		},
+	),
+)
 
 async function save() {
 	if (!canSave.value || saving.value) return

@@ -163,12 +163,14 @@
 										:disabled="
 											addressMutation.isPending.value ||
 											(!canAddress && !isStaff(auth.user)) ||
-											!facetsToAddress(issue).length
+											!facetsToAddress(issue).length ||
+											(fieldAction !== undefined && !fieldAction.canSave)
 										"
 										@click="
 											addressMutation.mutate({
 												issueId: issue.id,
-												facetIds: facetsToAddress(issue).map(({ id }) => id),
+												facets: facetsToAddress(issue),
+												saveField: fieldAction?.save,
 												threadId: thread?.id,
 												projectId: project.id,
 											})
@@ -238,6 +240,7 @@ import { isStaff, renderString } from '@modrinth/utils'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { computed, reactive } from 'vue'
 
+import type { ProjectIssueFieldAction } from '~/composables/project-issue-field-action'
 import { isThreadIssueFacetReadyToAddress, isThreadIssueVerified } from '~/helpers/thread-issues'
 
 import FilledCheckIcon from './filled-check-icon.vue'
@@ -259,6 +262,7 @@ const props = defineProps<{
 	teamId?: string
 	disclosureType?: string
 	threadHistory?: boolean
+	fieldAction?: ProjectIssueFieldAction
 }>()
 
 const emit = defineEmits<{
@@ -338,15 +342,25 @@ const messages = defineMessages({
 
 const addressMutation = useMutation({
 	mutationFn: async ({
-		facetIds,
+		facets,
+		saveField,
+		projectId,
 	}: {
 		issueId: string
-		facetIds: string[]
+		facets: Labrinth.Threads.v3.ThreadIssueFacet[]
+		saveField?: () => Promise<boolean>
 		threadId?: string
 		projectId: string
 	}) => {
+		if (saveField && !(await saveField())) return
+		const savedProject = saveField
+			? await client.labrinth.projects_v3.get(projectId)
+			: projectV3.value
+		const eligibleFacets = facets.filter(
+			(facet) => isStaff(auth.value.user) || isFacetReadyToAddress(facet, savedProject),
+		)
 		const results = await Promise.allSettled(
-			facetIds.map((id) => client.labrinth.threads_v3.user_addressed(id)),
+			eligibleFacets.map(({ id }) => client.labrinth.threads_v3.user_addressed(id)),
 		)
 		const failure = results.find((result) => result.status === 'rejected')
 		if (failure?.status === 'rejected') throw failure.reason
@@ -613,7 +627,12 @@ function addressableFacets(issue: ThreadIssue): Labrinth.Threads.v3.ThreadIssueF
 function facetsToAddress(issue: ThreadIssue): Labrinth.Threads.v3.ThreadIssueFacet[] {
 	return addressableFacets(issue).filter(
 		(facet) =>
-			facet.verdict === 'open' && (isFacetReadyToAddress(facet) || isStaff(auth.value.user)),
+			facet.verdict === 'open' &&
+			(isFacetReadyToAddress(
+				facet,
+				props.fieldAction ? { ...projectV3.value, ...props.fieldAction.draft } : projectV3.value,
+			) ||
+				isStaff(auth.value.user)),
 	)
 }
 
@@ -632,8 +651,27 @@ function replyLink(issue: ThreadIssue): string {
 	return `/${project.value.project_type}/${project.value.slug ?? project.value.id}/moderation?${query}#messages`
 }
 
-function isFacetReadyToAddress(facet: Labrinth.Threads.v3.ThreadIssueFacet): boolean {
-	return isThreadIssueFacetReadyToAddress(facet, projectV3.value, allMembers.value)
+function isFacetReadyToAddress(
+	facet: Labrinth.Threads.v3.ThreadIssueFacet,
+	current: Labrinth.Projects.v3.Project,
+): boolean {
+	if (facet.what.type === 'modify_links' && props.platform) {
+		const platforms = Array.isArray(props.platform) ? props.platform : [props.platform]
+		facet = {
+			...facet,
+			what: {
+				...facet.what,
+				value: {
+					links: Object.fromEntries(
+						Object.entries(facet.what.value.links).filter(([platform]) =>
+							platforms.includes(platform),
+						),
+					),
+				},
+			},
+		}
+	}
+	return isThreadIssueFacetReadyToAddress(facet, current, allMembers.value)
 }
 
 function overflowOptions(issue: ThreadIssue): ButtonMenuOption[] {

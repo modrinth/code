@@ -36,7 +36,7 @@
 						class="mt-2"
 					/>
 					<ValidationMessage :check="saveValidation.forField('name')" class="mt-2" />
-					<ProjectIssueCard target="modify_title" class="mt-2" />
+					<ProjectIssueCard target="modify_title" :field-action="nameIssueAction" class="mt-2" />
 				</div>
 
 				<div>
@@ -60,7 +60,7 @@
 						</template>
 					</Input>
 					<ValidationMessage :check="saveValidation.forField('slug')" class="mt-2" />
-					<ProjectIssueCard target="modify_slug" class="mt-2" />
+					<ProjectIssueCard target="modify_slug" :field-action="slugIssueAction" class="mt-2" />
 					<SlugSuggestions
 						:selected="slug"
 						:suggestions="slugSuggestions"
@@ -87,7 +87,11 @@
 						class="mt-2"
 					/>
 					<ValidationMessage :check="saveValidation.forField('summary')" class="mt-2" />
-					<ProjectIssueCard target="modify_summary" class="mt-2" />
+					<ProjectIssueCard
+						target="modify_summary"
+						:field-action="summaryIssueAction"
+						class="mt-2"
+					/>
 				</div>
 
 				<div>
@@ -365,6 +369,7 @@ import ProjectIssueCard from '~/components/ui/project-issue-card/index.vue'
 import SlugSuggestions from '~/components/ui/SlugSuggestions.vue'
 import ValidationMessage from '~/components/ValidationMessage.vue'
 import { useAuth } from '~/composables/auth.js'
+import { useProjectIssueFieldAction } from '~/composables/project-issue-field-action'
 import { useProjectNagMessages } from '~/composables/project-nag-validation'
 import { useProjectSaveValidation } from '~/composables/project-save-validation'
 import {
@@ -587,6 +592,34 @@ async function updateMonetizationStatus(status) {
 }
 
 const saveValidation = useProjectSaveValidation(() => modified.value)
+const issueClient = injectModrinthClient()
+
+function useTextIssueAction(field, input) {
+	return useProjectIssueFieldAction({
+		draft: () => ({ [field]: input.value.trim() }),
+		canSave: () =>
+			hasPermission.value &&
+			!saveValidation.forField(field).some((message) => message.severity === 'error'),
+		saving,
+		validation: saveValidation,
+		save: async () => {
+			const submitted = input.value
+			const value = submitted.trim()
+			if (value !== (project.value[field] ?? '')) {
+				if (field === 'slug') {
+					await issueClient.labrinth.projects_v3.edit(project.value.id, { slug: value })
+				} else {
+					await patchProjectV3({ [field]: value }, true, true)
+				}
+			}
+			if (input.value === submitted) input.value = value
+		},
+	})
+}
+
+const nameIssueAction = useTextIssueAction('name', name)
+const slugIssueAction = useTextIssueAction('slug', slug)
+const summaryIssueAction = useTextIssueAction('summary', summary)
 
 async function handleSave() {
 	if (!canSave.value || saving.value) return

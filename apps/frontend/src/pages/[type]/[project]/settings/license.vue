@@ -25,7 +25,11 @@
 					</IntlFormatted>
 				</p>
 
-				<ProjectIssueCard target="modify_license" class="-mb-2 max-w-[600px]" />
+				<ProjectIssueCard
+					target="modify_license"
+					:field-action="licenseIssueAction"
+					class="-mb-2 max-w-[600px]"
+				/>
 			</div>
 
 			<div class="flex min-w-0 max-w-[600px] flex-col gap-2">
@@ -224,6 +228,7 @@ import { computed } from 'vue'
 
 import ValidationMessage from '@/components/ValidationMessage.vue'
 import ProjectIssueCard from '~/components/ui/project-issue-card/index.vue'
+import { useProjectIssueFieldAction } from '~/composables/project-issue-field-action'
 import { useProjectNagMessages } from '~/composables/project-nag-validation'
 import { useProjectSaveValidation } from '~/composables/project-save-validation'
 import { normalizeProjectUrl } from '~/helpers/project-url'
@@ -482,6 +487,31 @@ const canSave = computed(
 		!missingCustomUrl.value &&
 		!saveValidation.messages.value.some((message) => message.severity === 'error'),
 )
+
+const licenseIssueAction = useProjectIssueFieldAction({
+	draft: () => ({
+		license: {
+			...project.value.license,
+			id: licenseId.value,
+			url: normalizeProjectUrl(current.value.licenseUrl) || undefined,
+		},
+	}),
+	canSave: () => canSave.value,
+	saving,
+	validation: saveValidation,
+	save: async () => {
+		const license_id = licenseId.value
+		const submittedUrl = current.value.licenseUrl
+		const license_url = normalizeProjectUrl(submittedUrl) || null
+		if (
+			license_id !== project.value.license.id ||
+			(license_url ?? '') !== (project.value.license.url ?? '')
+		) {
+			await patchProjectV3({ license_id, license_url }, true, true)
+		}
+		if (current.value.licenseUrl === submittedUrl) current.value.licenseUrl = license_url ?? ''
+	},
+})
 
 async function save() {
 	if (!canSave.value || saving.value) return

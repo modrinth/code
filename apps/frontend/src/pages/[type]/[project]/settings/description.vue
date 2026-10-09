@@ -17,7 +17,7 @@
 			</div>
 
 			<div class="mb-4 flex flex-col gap-2.5">
-				<ProjectIssueCard target="modify_description" />
+				<ProjectIssueCard target="modify_description" :field-action="descriptionIssueAction" />
 				<ValidationMessage
 					:check="descriptionValidation"
 					:project-field="saved.description"
@@ -64,6 +64,7 @@ import AiImageWarningModal from '~/components/ui/AiImageWarningModal.vue'
 import ProjectIssueCard from '~/components/ui/project-issue-card/index.vue'
 import ValidationMessage from '~/components/ValidationMessage.vue'
 import { useImageUpload } from '~/composables/image-upload.ts'
+import { useProjectIssueFieldAction } from '~/composables/project-issue-field-action'
 import { useProjectNagMessages } from '~/composables/project-nag-validation'
 import { useProjectSaveValidation } from '~/composables/project-save-validation'
 import { fileDeclaresAi } from '~/helpers/c2pa'
@@ -119,6 +120,19 @@ const canSave = computed(
 		hasPermission.value &&
 		!saveValidation.messages.value.some((message) => message.severity === 'error'),
 )
+
+const descriptionIssueAction = useProjectIssueFieldAction({
+	draft: () => ({ description: current.value.description }),
+	canSave: () => canSave.value,
+	saving,
+	validation: saveValidation,
+	save: async () => {
+		const description = current.value.description
+		if (description !== saved.value.description) {
+			await patchProjectV3({ description }, true, true)
+		}
+	},
+})
 
 async function save() {
 	if (!canSave.value || saving.value) return
