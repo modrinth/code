@@ -16,7 +16,7 @@ static ModrinthSandboxString string_view(const char *value)
 
 static void report_error(const char *operation)
 {
-	const uint8_t *message = NULL;
+	const char *message = NULL;
 	size_t length = 0;
 	modrinth_sandbox_get_last_error(&message, &length);
 	fprintf(stderr, "%s: ", operation);

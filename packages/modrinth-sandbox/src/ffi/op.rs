@@ -1,4 +1,5 @@
 use std::{
+    ffi::c_char,
     ptr::{self, NonNull},
     sync::Mutex,
 };
@@ -19,7 +20,7 @@ static LAST_ERROR: Mutex<Option<String>> = Mutex::new(None);
 /// writable pointers.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn modrinth_sandbox_get_last_error(
-    out_message: *mut *const u8,
+    out_message: *mut *const c_char,
     out_message_len: *mut size_t,
 ) {
     let error = LAST_ERROR.lock().expect("should never be poisoned");
@@ -27,7 +28,7 @@ pub unsafe extern "C" fn modrinth_sandbox_get_last_error(
         // SAFETY: The function's safety contract requires both output
         // parameters to point to valid, writable storage.
         unsafe {
-            out_message.write(error.as_ptr());
+            out_message.write(error.as_ptr().cast());
             out_message_len.write(error.len());
         }
     } else {

@@ -368,7 +368,7 @@ bool modrinth_sandbox_spawn(const struct ModrinthSandboxEnv *env,
  * `out_message` and `out_message_len` must be valid, properly aligned,
  * writable pointers.
  */
-void modrinth_sandbox_get_last_error(const uint8_t **out_message, size_t *out_message_len);
+void modrinth_sandbox_get_last_error(const char **out_message, size_t *out_message_len);
 
 #ifdef __cplusplus
 }  // extern "C"
