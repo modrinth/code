@@ -1,0 +1,24 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\t\tSELECT EXISTS (\n\t\t\t\tSELECT 1\n\t\t\t\tFROM threads_messages message\n\t\t\t\tWHERE message.thread_id = $1\n\t\t\t\t\tAND message.created > $3\n\t\t\t\t\tAND message.body->>'type' = 'text'\n\t\t\t\t\tAND COALESCE(message.body->>'private', 'false') = 'false'\n\t\t\t\t\tAND LENGTH(TRIM(message.body->>'body')) > 0\n\t\t\t\t\tAND message.author_id IN (\n\t\t\t\t\t\tSELECT member.user_id\n\t\t\t\t\t\tFROM mods project\n\t\t\t\t\t\tLEFT JOIN organizations organization\n\t\t\t\t\t\t\tON organization.id = project.organization_id\n\t\t\t\t\t\tINNER JOIN team_members member\n\t\t\t\t\t\t\tON member.team_id = project.team_id\n\t\t\t\t\t\t\t\tOR member.team_id = organization.team_id\n\t\t\t\t\t\tWHERE project.id = $2 AND member.accepted\n\t\t\t\t\t)\n\t\t\t) AS \"has_reply!\"\n\t\t\t",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "has_reply!",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8",
+        "Timestamptz"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "4bc29c1316daef64e05fd10b9c34dfcad8f45097d93f41597cb9bf906171cf51"
+}
