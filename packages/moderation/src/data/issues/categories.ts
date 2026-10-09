@@ -9,13 +9,17 @@ import type { ReviewContext } from './component-builders/types'
 
 const resolutionTags = new Set(['8x-', '16x', '32x', '48x', '64x', '128x', '256x', '512x+'])
 
-function removedTags({ projectV3, selected, getSelectValues }: ReviewContext) {
-	const tags = new Set(getSelectValues('remove-tags'))
+function automaticallyRemovedTags({ projectV3, selected }: ReviewContext) {
+	const tags = new Set<string>()
 	if (selected.toggleIds.includes('tags-optimization-misused')) tags.add('optimization')
 	if (selected.toggleIds.includes('tags-resolutions-misused'))
 		for (const tag of [...projectV3.categories, ...projectV3.additional_categories])
 			if (resolutionTags.has(tag)) tags.add(tag)
 	return [...tags]
+}
+
+function removedTags(ctx: ReviewContext) {
+	return [...new Set([...ctx.getSelectValues('remove-tags'), ...automaticallyRemovedTags(ctx)])]
 }
 
 export const categoriesInaccurateIssue = issue({
@@ -75,6 +79,7 @@ export const categoriesReviewPanel = panel({
 			id: 'remove-tags',
 			label: 'Remove inaccurate tags',
 			multiple: true,
+			required: (ctx) => automaticallyRemovedTags(ctx).length === 0,
 			options: ({ projectV3 }) =>
 				[...new Set([...projectV3.categories, ...projectV3.additional_categories])].map(
 					(value) => ({ value, label: value }),

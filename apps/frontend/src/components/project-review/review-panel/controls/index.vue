@@ -110,6 +110,14 @@
 							@close="setDropdownOpen(control, false)"
 							@update:model-value="writeControl(control, $event)"
 						/>
+						<p
+							v-if="panels.missing(panelBinding, control)"
+							:id="`${id}-${control.issueId}-${control.key}-required`"
+							class="m-0 ml-0.5 text-xs text-orange"
+							role="status"
+						>
+							{{ formatMessage(controlMessages.required) }}
+						</p>
 					</div>
 					<Tooltip v-else :disabled="!control.tooltip" :text="control.tooltip">
 						<ActionButton

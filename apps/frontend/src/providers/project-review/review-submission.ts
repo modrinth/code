@@ -10,6 +10,7 @@ import {
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { computed, onScopeDispose, ref, watch } from 'vue'
 
+import { projectReviewMessages } from '~/components/project-review/messages'
 import { useAuthState } from '~/composables/auth'
 import { sendThreadReply, type ThreadReply } from '~/helpers/thread-issues'
 import { isStaff } from '~/helpers/users.js'
@@ -233,6 +234,12 @@ export function createReviewSubmission(
 		try {
 			if (disclosures.hasChanges.value || disclosures.saving.value)
 				throw new Error(formatMessage(errors.unsaved))
+			if (
+				panels.validationErrors.value.some(
+					({ issueId, key }) => issueId === 'categories-inaccurate' && key === 'remove-tags',
+				)
+			)
+				throw new Error(formatMessage(projectReviewMessages.removalTagsRequired))
 			if (panels.validationErrors.value.length) throw new Error(formatMessage(errors.missing))
 			if (status && ['approved', 'unlisted', 'private'].includes(status) && !canApprove.value)
 				throw new Error(formatMessage(errors.unresolved))
