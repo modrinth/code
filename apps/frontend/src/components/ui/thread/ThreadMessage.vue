@@ -80,13 +80,7 @@
 					class="message__author min-w-0 max-w-full font-bold"
 					:class="[authorClasses, isAutoApproval ? '' : 'text-orange']"
 				>
-					{{
-						formatMessage(
-							isAutoApproval
-								? imageMessages.projectOwner
-								: imageMessages.moderator,
-						)
-					}}
+					{{ formatMessage(isAutoApproval ? imageMessages.projectOwner : imageMessages.moderator) }}
 					<ThreadRoleBadge v-if="!isAutoApproval" role="moderator" />
 				</span>
 			</template>
@@ -263,8 +257,8 @@ const emit = defineEmits(['update-thread', 'open-image'])
 const settings = useModerationSettings()
 const client = injectModrinthClient()
 const isAutoApproval = computed(() => props.message.body.type === 'auto_approval')
-const author = computed(() =>
-	props.members[isAutoApproval.value ? props.projectOwnerId : props.message.author_id],
+const author = computed(
+	() => props.members[isAutoApproval.value ? props.projectOwnerId : props.message.author_id],
 )
 
 const { formatMessage } = useVIntl()

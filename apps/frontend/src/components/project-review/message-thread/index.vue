@@ -61,8 +61,12 @@ import { injectProjectReviewContext } from '../layout/context'
 import { projectReviewMessages as messages } from '../messages'
 import MessageBox from './message-box.vue'
 
-const { threadQuery, pixelated, members: projectMembers, organizationMembers } =
-	injectProjectReviewPageContext()
+const {
+	threadQuery,
+	pixelated,
+	members: projectMembers,
+	organizationMembers,
+} = injectProjectReviewPageContext()
 const { rightVisible, toggleSidebar } = injectProjectReviewContext()
 const { data: thread, isError, refetch } = threadQuery
 const auth = useAuthState()
