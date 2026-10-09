@@ -71,5 +71,4 @@ function onPointerDown(event: PointerEvent) {
 		{ target: event.currentTarget as HTMLImageElement, type: 'dragend' },
 	])
 }
-
 </script>
