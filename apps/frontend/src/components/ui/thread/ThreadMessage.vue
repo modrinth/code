@@ -55,7 +55,7 @@
 					<EyeOffIcon
 						v-if="isPrivateMessage"
 						v-tooltip="'Only visible to moderators'"
-						class="ml-1 text-orange"
+						class="mb-px ml-1 text-orange"
 					/>
 					<MicrophoneIcon
 						v-if="report && message.author_id === report.reporter_user?.id"

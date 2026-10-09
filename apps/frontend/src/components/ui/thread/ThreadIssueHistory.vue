@@ -20,7 +20,7 @@
 			<ThreadRoleBadge role="moderator" avatar class="!size-6" aria-hidden="true" />
 		</div>
 		<div class="min-w-0 text-primary">
-			<div class="leading-5">
+			<div class="break-all align-middle leading-5">
 				<AutoLink
 					v-if="author"
 					:to="`/user/${author.username}`"
@@ -34,13 +34,11 @@
 				}}</span>
 				<ThreadRoleBadge :role="author ? author.role : 'moderator'" />
 				{{ ' ' }}
-				<span>
-					<IntlFormatted :message-id="messages.flagged" :values="{ count: entry.issues.length }" />
-				</span>
+				<IntlFormatted :message-id="messages.flagged" :values="{ count: entry.issues.length }" />
 				<EyeOffIcon
 					v-tooltip="formatMessage(messages.privateNote)"
 					:aria-label="formatMessage(messages.privateNote)"
-					class="ml-2 inline-block size-3 align-middle text-orange"
+					class="mb-0.5 ml-1.5 inline-block align-middle text-orange"
 				/>
 			</div>
 			<span v-tooltip="formatDateTime(entry.created)" class="mt-1 block text-xs text-secondary">{{

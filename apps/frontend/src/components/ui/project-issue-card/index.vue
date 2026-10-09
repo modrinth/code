@@ -64,7 +64,7 @@
 				@transitionend.self="onContentTransitionEnd($event, issue)"
 			>
 				<div :inert="!isExpanded(issue)" class="min-w-0">
-					<div class="flex flex-col gap-3" :class="threadHistory ? 'pt-2' : 'pt-3'">
+					<div class="flex flex-col gap-3 pt-2">
 						<div
 							v-if="issueMessage(issue)"
 							class="markdown-body min-w-0 text-sm text-primary"
