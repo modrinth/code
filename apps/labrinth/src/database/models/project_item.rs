@@ -680,12 +680,13 @@ impl DBProject {
 
                 let loader_field_enum_value_ids = DashSet::new();
                 let version_fields: DashMap<DBProjectId, Vec<QueryVersionField>> = sqlx::query!(
-                    "
-                    SELECT DISTINCT mod_id, version_id, field_id, int_value, enum_value, string_value
+                    r#"
+                    SELECT v.mod_id, MIN(vf.version_id) AS "version_id!", vf.field_id, vf.int_value, vf.enum_value, vf.string_value
                     FROM versions v
                     INNER JOIN version_fields vf ON v.id = vf.version_id
-                    WHERE v.id = ANY($1)
-                    ",
+                    WHERE v.id = ANY($1) AND vf.version_id = ANY($1)
+                    GROUP BY v.mod_id, vf.field_id, vf.int_value, vf.enum_value, vf.string_value
+                    "#,
                     &all_version_ids.iter().map(|x| x.0).collect::<Vec<_>>()
                 )
                     .fetch(&mut exec)
