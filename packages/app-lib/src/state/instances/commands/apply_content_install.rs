@@ -3,8 +3,8 @@ use crate::state::instances::{
     adapters::sqlite::{content_rows, instance_rows},
 };
 use crate::state::{
-    CacheBehaviour, CachedEntry, Dependency, DependencyType, ModLoader,
-    ProjectType, State, Version,
+    CacheBehaviour, CachedEntry, Dependency, DependencyType, DirectoryInfo,
+    ModLoader, ProjectType, State, Version,
 };
 use crate::util::fetch::{self, DownloadMeta, DownloadReason};
 use crate::util::io;
@@ -701,7 +701,7 @@ pub(crate) async fn rename_project_companion_file(
     let project_type = ProjectType::get_from_parent_folder(new_project_path);
     if project_type == Some(ProjectType::ShaderPack) {
         let scope = resolve_content_scope(instance_id, None, state).await?;
-        let base = instance_full_path(state, &scope.instance);
+        let base = instance_full_path(&state.directories, &scope.instance);
 
         let old_txt_path = base.join(format!(
             "{}.txt",
@@ -757,10 +757,10 @@ pub(crate) async fn list_project_files(
 }
 
 pub(crate) fn instance_full_path(
-    state: &State,
+    directories: &DirectoryInfo,
     instance: &Instance,
 ) -> PathBuf {
-    state.directories.instances_dir().join(&instance.path)
+    directories.instances_dir().join(&instance.path)
 }
 
 pub(super) async fn upsert_entry_for_file(

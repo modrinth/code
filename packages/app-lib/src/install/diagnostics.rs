@@ -4,7 +4,7 @@ use super::model::{
     InstallPhaseDetails, InstallPhaseId, InstallProgress,
 };
 use super::store;
-use crate::state::{ModrinthCredentials, State};
+use crate::state::{DirectoryInfo, ModrinthCredentials, State};
 use regex::{Captures, Regex};
 use sqlx::Row;
 use std::fmt::Write as _;
@@ -47,7 +47,7 @@ pub async fn build_job_support_details(
     write_content_summary(&mut details, &job.state.events);
     write_errors(&mut details, &snapshot);
     write_raw_snapshot(&mut details, &snapshot);
-    write_latest_log(&mut details, state).await;
+    write_latest_log(&mut details, &state.directories).await;
 
     censor_support_text(details, state).await
 }
@@ -411,10 +411,10 @@ fn write_raw_snapshot(details: &mut String, snapshot: &InstallJobSnapshot) {
     }
 }
 
-async fn write_latest_log(details: &mut String, state: &State) {
+async fn write_latest_log(details: &mut String, directories: &DirectoryInfo) {
     let _ = writeln!(details);
     let _ = writeln!(details, "Latest launcher log excerpt");
-    match latest_launcher_log_tail(state).await {
+    match latest_launcher_log_tail(directories).await {
         Ok(Some((path, output))) => {
             let _ = writeln!(details, "File: {}", path.display());
             details.push_str(&output);
@@ -540,9 +540,9 @@ fn json_string<T: serde::Serialize>(value: &T) -> String {
 }
 
 async fn latest_launcher_log_tail(
-    state: &State,
+    directories: &DirectoryInfo,
 ) -> crate::Result<Option<(PathBuf, String)>> {
-    let Some(logs_dir) = state.directories.launcher_logs_dir() else {
+    let Some(logs_dir) = directories.launcher_logs_dir() else {
         return Ok(None);
     };
 

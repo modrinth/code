@@ -11,7 +11,7 @@ use crate::state::content_store::ContentStore;
 use crate::state::instances::adapters::sqlite::{content_rows, instance_rows};
 use crate::state::{
     ContentEntry, ContentSetRemoteRef, ContentSetRemoteRefType,
-    ContentSetSyncProvider, ContentSetSyncState, InstanceFile,
+    ContentSetSyncProvider, ContentSetSyncState, DirectoryInfo, InstanceFile,
     InstanceMetadata, State,
 };
 use async_walkdir::WalkDir;
@@ -56,7 +56,7 @@ pub(super) async fn prepare_instance_update_backup(
         ));
     }
     let owner = job_id.to_string();
-    let staging_dir = instance_update_backup_dir(job_id, state);
+    let staging_dir = instance_update_backup_dir(job_id, &state.directories);
     if tokio::fs::try_exists(&staging_dir).await? {
         crate::util::io::remove_dir_all(&staging_dir).await?;
     }
@@ -165,11 +165,11 @@ pub(super) async fn prepare_instance_update_backup(
     Ok(staging_dir)
 }
 
-fn instance_update_backup_dir(job_id: Uuid, state: &State) -> PathBuf {
-    state
-        .directories
-        .install_backups_dir()
-        .join(job_id.to_string())
+fn instance_update_backup_dir(
+    job_id: Uuid,
+    directories: &DirectoryInfo,
+) -> PathBuf {
+    directories.install_backups_dir().join(job_id.to_string())
 }
 
 async fn recover_unrecorded_instance_update_backup(
@@ -186,7 +186,7 @@ async fn recover_unrecorded_instance_update_backup(
     {
         return Ok(());
     }
-    let staging_dir = instance_update_backup_dir(job.id, state);
+    let staging_dir = instance_update_backup_dir(job.id, &state.directories);
     if !tokio::fs::try_exists(&staging_dir).await? {
         return Ok(());
     }

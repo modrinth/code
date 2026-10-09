@@ -15,11 +15,11 @@ use super::reconciliation::{
 use crate::State;
 use crate::event::InstancePayloadType;
 use crate::event::emit::emit_instance;
-use crate::state::InstanceLocks;
 use crate::state::instances::adapters::sqlite::{
     instance_rows::{self, InstanceScreenshotSource},
     screenshot_rows,
 };
+use crate::state::{DirectoryInfo, InstanceLocks};
 use crate::util::fetch::sha1_file_async;
 use crate::util::io::{self, IOError};
 
@@ -240,7 +240,8 @@ pub async fn move_screenshots(
     .ok_or_else(|| {
         crate::ErrorKind::InputError("Unknown target instance".to_string())
     })?;
-    let target_dir = source_screenshots_dir(&state, &target_source).await?;
+    let target_dir =
+        source_screenshots_dir(&state.directories, &target_source).await?;
     io::create_dir_all(&target_dir).await?;
     ensure_directory_is_not_symlink(&target_dir).await?;
 
@@ -301,7 +302,8 @@ pub async fn get_screenshot_path(
     .ok_or_else(|| {
         crate::ErrorKind::InputError("Unknown instance".to_string())
     })?;
-    let screenshots_dir = source_screenshots_dir(&state, &source).await?;
+    let screenshots_dir =
+        source_screenshots_dir(&state.directories, &source).await?;
     let canonical_dir = tokio::fs::canonicalize(&screenshots_dir)
         .await
         .map_err(|error| IOError::with_path(error, &screenshots_dir))?;
@@ -349,7 +351,7 @@ pub async fn save_edited_screenshot(
     })?;
     let _lock = state.instance_locks.lock_screenshots(&source.id).await;
 
-    let scanned = scan_source_screenshots(&state, &source).await?;
+    let scanned = scan_source_screenshots(&state.directories, &source).await?;
     let current =
         reconcile_source_screenshots(&state, &source, scanned).await?;
     let source_screenshot = current
@@ -401,7 +403,8 @@ pub async fn save_edited_screenshot(
         .into());
     }
 
-    let screenshots_dir = source_screenshots_dir(&state, &source).await?;
+    let screenshots_dir =
+        source_screenshots_dir(&state.directories, &source).await?;
     let (target_path, copy_group) = match mode {
         ScreenshotEditSaveMode::CreateCopy => (
             available_target_path(&screenshots_dir, &source_row.file_name)
@@ -437,7 +440,7 @@ pub async fn save_edited_screenshot(
         screenshot_rows::update_screenshot(&source_row, &mut tx).await?;
         tx.commit().await?;
     }
-    let scanned = scan_source_screenshots(&state, &source).await?;
+    let scanned = scan_source_screenshots(&state.directories, &source).await?;
     let reconciled =
         reconcile_source_screenshots(&state, &source, scanned).await?;
     let mut saved = reconciled
@@ -514,10 +517,10 @@ pub async fn save_edited_screenshot(
 }
 
 pub(super) async fn source_screenshots_dir(
-    state: &State,
+    directories: &DirectoryInfo,
     source: &InstanceScreenshotSource,
 ) -> crate::Result<PathBuf> {
-    let instance_dir = state.directories.instances_dir().join(&source.path);
+    let instance_dir = directories.instances_dir().join(&source.path);
     let canonical_instance_dir =
         tokio::fs::canonicalize(&instance_dir)
             .await
