@@ -16,7 +16,7 @@
 				</span>
 			</div>
 
-			<div class="mb-4 flex flex-col gap-2.5">
+			<div class="mb-4 flex flex-col gap-2.5 empty:hidden">
 				<ProjectIssueCard target="modify_description" :field-action="descriptionIssueAction" />
 				<ValidationMessage
 					:check="descriptionValidation"
