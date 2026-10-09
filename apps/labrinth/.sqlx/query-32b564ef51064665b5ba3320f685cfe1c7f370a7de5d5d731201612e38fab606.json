@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                UPDATE mods\n                SET status = $1,\n                    approved = CASE WHEN $3 THEN COALESCE(approved, NOW()) ELSE approved END\n                WHERE (id = $2)\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Int8",
+        "Bool"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "32b564ef51064665b5ba3320f685cfe1c7f370a7de5d5d731201612e38fab606"
+}

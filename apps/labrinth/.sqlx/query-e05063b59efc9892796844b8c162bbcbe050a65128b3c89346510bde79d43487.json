@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE threads_issue_facets\n            SET\n                user_addressed = COALESCE($2, user_addressed),\n                moderator_verified = COALESCE($3, moderator_verified),\n                verdict = CASE WHEN $3 = TRUE THEN 'resolved' ELSE verdict END\n            WHERE id = $1\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Bool",
+        "Bool"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "e05063b59efc9892796844b8c162bbcbe050a65128b3c89346510bde79d43487"
+}

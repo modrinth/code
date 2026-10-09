@@ -112,7 +112,7 @@ struct ProjectCreateData {
     #[validate(nested)]
     pub donation_urls: Option<Vec<DonationLink>>,
 
-    /// An optional boolean. If true, the project will be created as a draft.
+    /// Must be true. Projects must be submitted for review after creation.
     pub is_draft: Option<bool>,
 
     /// The license id that the project follows
@@ -174,6 +174,13 @@ pub async fn project_create(
             let redirect_client = redirect_client.clone();
             let redirect_redis = redirect_redis.clone();
             async move {
+                if !legacy_create.is_draft.unwrap_or(false) {
+                    return Err(CreateError::InvalidInput(
+                        "projects must be created as drafts and submitted for review separately"
+                            .to_string(),
+                    ));
+                }
+
                 // Side types will be applied to each version
                 let client_side = legacy_create.client_side;
                 let server_side = legacy_create.server_side;

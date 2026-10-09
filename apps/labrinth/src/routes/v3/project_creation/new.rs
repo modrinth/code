@@ -371,20 +371,14 @@ pub async fn create(
     .await
     .wrap_internal_err("failed to insert thread")?;
 
-    // and commit!
-
-    txn.commit()
-        .await
-        .wrap_internal_err("failed to commit transaction")?;
-
-    super::super::projects::clear_project_cache_and_queue_search(
-        &redis,
-        &search_state,
+    super::super::projects::mutation::finalize_mutation(
         project_id.into(),
-        Some(slug),
-        None,
+        txn,
+        &redis,
+        Some(&user),
     )
     .await?;
+    search_state.queue.push_project_change(project_id).await;
 
     Ok(web::Json(project_id))
 }

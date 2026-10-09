@@ -863,10 +863,13 @@ pub async fn organization_delete(
     .await
     .wrap_internal_err("fetching query results from database")?;
 
-    transaction
-        .commit()
-        .await
-        .wrap_internal_err("committing database transaction")?;
+    super::projects::mutation::finalize_mutations(
+        &organization_project_ids,
+        transaction,
+        &redis,
+        Some(&user),
+    )
+    .await?;
 
     database::models::DBOrganization::clear_cache(
         organization.id,
@@ -883,17 +886,10 @@ pub async fn organization_delete(
     }
 
     for project_id in organization_project_ids {
-        super::projects::clear_project_cache_and_queue_search(
-            &redis,
-            &search_state,
-            project_id,
-            None,
-            None,
-        )
-        .await
-        .wrap_api_err(
-            "executing `projects::clear_project_cache_and_queue_search`",
-        )?;
+        search_state
+            .queue
+            .push_project_change(project_id.into())
+            .await;
     }
 
     if !organization_project_teams.is_empty() {
@@ -1060,10 +1056,13 @@ pub async fn organization_projects_add(
             "querying database for `organization_projects_add`",
         )?;
 
-        transaction
-            .commit()
-            .await
-            .wrap_internal_err("committing database transaction")?;
+        super::projects::mutation::finalize_mutation(
+            project_item.inner.id,
+            transaction,
+            &redis,
+            Some(&current_user),
+        )
+        .await?;
 
         database::models::DBUser::clear_project_cache(
             &[current_user.id.into()],
@@ -1077,17 +1076,10 @@ pub async fn organization_projects_add(
         )
         .await
         .wrap_internal_err("clearing cached data from Redis")?;
-        super::projects::clear_project_cache_and_queue_search(
-            &redis,
-            &search_state,
-            project_item.inner.id,
-            project_item.inner.slug,
-            None,
-        )
-        .await
-        .wrap_api_err(
-            "executing `projects::clear_project_cache_and_queue_search`",
-        )?;
+        search_state
+            .queue
+            .push_project_change(project_item.inner.id.into())
+            .await;
     } else {
         return Err(ApiError::Auth(eyre::eyre!(
             "You do not have permission to add projects to this organization!",
@@ -1283,10 +1275,13 @@ pub async fn organization_projects_remove(
             "querying database for `organization_projects_remove`",
         )?;
 
-        transaction
-            .commit()
-            .await
-            .wrap_internal_err("committing database transaction")?;
+        super::projects::mutation::finalize_mutation(
+            project_item.inner.id,
+            transaction,
+            &redis,
+            Some(&current_user),
+        )
+        .await?;
         database::models::DBUser::clear_project_cache(
             &[current_user.id.into()],
             &redis,
@@ -1299,17 +1294,10 @@ pub async fn organization_projects_remove(
         )
         .await
         .wrap_internal_err("clearing cached data from Redis")?;
-        super::projects::clear_project_cache_and_queue_search(
-            &redis,
-            &search_state,
-            project_item.inner.id,
-            project_item.inner.slug,
-            None,
-        )
-        .await
-        .wrap_api_err(
-            "executing `projects::clear_project_cache_and_queue_search`",
-        )?;
+        search_state
+            .queue
+            .push_project_change(project_item.inner.id.into())
+            .await;
     } else {
         return Err(ApiError::Auth(eyre::eyre!(
             "You do not have permission to add projects to this organization!",

@@ -10,7 +10,7 @@ use crate::models::pats::Scopes;
 use crate::models::projects::{ProjectStatus, VersionStatus, VersionType};
 use crate::models::teams::ProjectPermissions;
 use crate::queue::session::AuthQueue;
-use crate::routes::internal::delphi;
+
 use crate::routes::{FileHash, HashAlgorithm};
 use crate::util::error::ApiContext as _;
 use crate::util::error::Context;
@@ -1113,18 +1113,13 @@ pub async fn delete_file(
         database::models::version_item::cleanup_unused_attribution_files_and_groups(&mut transaction)
             .await.wrap_internal_err("deleting version item from database")?;
 
-        delphi::tech_review_queue::sync_projects(
-            &[row.project_id],
-            delphi::tech_review_queue::TechReviewRemovalReason::FileDeleted,
-            &mut transaction,
+        super::projects::mutation::finalize_mutation(
+            row.project_id,
+            transaction,
+            &redis,
+            Some(&user),
         )
-        .await
-        .wrap_api_err("executing `tech_review_queue::sync_projects`")?;
-
-        transaction
-            .commit()
-            .await
-            .wrap_internal_err("committing database transaction")?;
+        .await?;
 
         Ok(HttpResponse::NoContent().body(""))
     } else {
