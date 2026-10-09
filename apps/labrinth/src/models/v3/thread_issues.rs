@@ -85,6 +85,7 @@ pub enum ThreadIssueTarget {
     ModifyIcon {
         original_url: Option<String>,
     },
+    RemoveIcon,
     RemoveTags {
         tags: NonEmptyVec<String>,
     },
@@ -343,6 +344,13 @@ impl ThreadIssueTarget {
                     ThreadIssueValueState::DifferentToOriginal
                 }
             }
+            Self::RemoveIcon => {
+                if project.icon_url.is_none() {
+                    ThreadIssueValueState::SameAsSuggested
+                } else {
+                    ThreadIssueValueState::SameAsOriginal
+                }
+            }
             Self::RemoveTags { tags } => {
                 let remaining = tags.iter().any(|tag| {
                     project.categories.contains(tag)
@@ -421,22 +429,17 @@ impl ThreadIssueTarget {
                 }
             }
             Self::RemoveGalleryImages { image_ids } => {
-                let remaining = image_ids
-                    .iter()
-                    .filter(|id| {
-                        project
-                            .gallery
-                            .iter()
-                            .any(|image| image.id.as_ref() == Some(id))
-                    })
-                    .count();
+                let remaining = image_ids.iter().any(|id| {
+                    project
+                        .gallery
+                        .iter()
+                        .any(|image| image.id.as_ref() == Some(id))
+                });
 
-                if remaining == 0 {
-                    ThreadIssueValueState::SameAsSuggested
-                } else if remaining == image_ids.len() {
+                if remaining {
                     ThreadIssueValueState::SameAsOriginal
                 } else {
-                    ThreadIssueValueState::DifferentToOriginal
+                    ThreadIssueValueState::SameAsSuggested
                 }
             }
             Self::AddProjectDisclosures { disclosure_types } => {
@@ -460,23 +463,18 @@ impl ThreadIssueTarget {
                 }
             }
             Self::RemoveProjectDisclosures { disclosure_types } => {
-                let remaining = disclosure_types
-                    .iter()
-                    .filter(|target| {
-                        context.disclosures.iter().any(|disclosure| {
-                            disclosure.to_parts().is_ok_and(
-                                |(current_type, _)| current_type == *target,
-                            )
+                let remaining = disclosure_types.iter().any(|target| {
+                    context.disclosures.iter().any(|disclosure| {
+                        disclosure.to_parts().is_ok_and(|(current_type, _)| {
+                            current_type == target
                         })
                     })
-                    .count();
+                });
 
-                if remaining == 0 {
-                    ThreadIssueValueState::SameAsSuggested
-                } else if remaining == disclosure_types.len() {
+                if remaining {
                     ThreadIssueValueState::SameAsOriginal
                 } else {
-                    ThreadIssueValueState::DifferentToOriginal
+                    ThreadIssueValueState::SameAsSuggested
                 }
             }
             Self::ModifyProjectDisclosure {
@@ -559,7 +557,14 @@ impl ThreadIssueTarget {
                     }
                 } else {
                     let Some(version) = version else {
-                        return ThreadIssueValueState::DifferentToOriginal;
+                        return if matches!(
+                            target,
+                            VersionIssueTarget::RemoveAdditionalFiles { .. }
+                        ) {
+                            ThreadIssueValueState::SameAsSuggested
+                        } else {
+                            ThreadIssueValueState::DifferentToOriginal
+                        };
                     };
 
                     match target {
@@ -644,20 +649,16 @@ impl ThreadIssueTarget {
                         VersionIssueTarget::RemoveAdditionalFiles {
                             file_ids,
                         } => {
-                            let remaining = file_ids
-                                .iter()
-                                .filter(|id| {
-                                    version.files.iter().any(|file| {
-                                        file.id.as_ref() == Some(id)
-                                    })
-                                })
-                                .count();
-                            if remaining == 0 {
-                                ThreadIssueValueState::SameAsSuggested
-                            } else if remaining == file_ids.len() {
+                            let remaining = file_ids.iter().any(|id| {
+                                version
+                                    .files
+                                    .iter()
+                                    .any(|file| file.id.as_ref() == Some(id))
+                            });
+                            if remaining {
                                 ThreadIssueValueState::SameAsOriginal
                             } else {
-                                ThreadIssueValueState::DifferentToOriginal
+                                ThreadIssueValueState::SameAsSuggested
                             }
                         }
                         VersionIssueTarget::ModifyAdditionalFileType {
@@ -1084,6 +1085,10 @@ mod tests {
             ThreadIssueValueState::DifferentToOriginal
         );
         assert_eq!(
+            icon.verdict(&context(&project), false, false),
+            ThreadIssueVerdict::Open
+        );
+        assert_eq!(
             tags.value_state(&context(&project), false),
             ThreadIssueValueState::SameAsOriginal
         );
@@ -1099,6 +1104,29 @@ mod tests {
         );
         assert_eq!(
             tags.verdict(&context(&project), false, false),
+            ThreadIssueVerdict::Resolved
+        );
+    }
+
+    #[test]
+    fn icon_must_be_removed() {
+        let mut project = project();
+        let target = ThreadIssueTarget::RemoveIcon;
+
+        assert_eq!(
+            target.verdict(&context(&project), true, false),
+            ThreadIssueVerdict::Open
+        );
+
+        project.icon_url = Some("https://example.com/new-icon.png".to_string());
+        assert_eq!(
+            target.verdict(&context(&project), true, false),
+            ThreadIssueVerdict::Open
+        );
+
+        project.icon_url = None;
+        assert_eq!(
+            target.verdict(&context(&project), false, false),
             ThreadIssueVerdict::Resolved
         );
     }
@@ -1165,7 +1193,11 @@ mod tests {
         project.gallery.remove(0);
         assert_eq!(
             target.value_state(&context(&project), false),
-            ThreadIssueValueState::DifferentToOriginal
+            ThreadIssueValueState::SameAsOriginal
+        );
+        assert_eq!(
+            target.verdict(&context(&project), true, false),
+            ThreadIssueVerdict::Open
         );
 
         project.gallery.clear();
@@ -1173,16 +1205,43 @@ mod tests {
             target.value_state(&context(&project), false),
             ThreadIssueValueState::SameAsSuggested
         );
+        assert_eq!(
+            target.verdict(&context(&project), false, false),
+            ThreadIssueVerdict::Resolved
+        );
+    }
+
+    #[test]
+    fn removing_a_version_resolves_additional_file_removal() {
+        let project = project();
+        let target = ThreadIssueTarget::Version {
+            version_id: VersionId(1),
+            version_number: "1.0.0".to_string(),
+            target: VersionIssueTarget::RemoveAdditionalFiles {
+                file_ids: non_empty(vec![FileId(1), FileId(2)]),
+            },
+        };
+
+        assert_eq!(
+            target.verdict(&context(&project), false, false),
+            ThreadIssueVerdict::Resolved
+        );
     }
 
     #[test]
     fn disclosure_value_states() {
         let project = project();
-        let mut disclosures = vec![ProjectDisclosure::Advertisements {
-            note: Some("Original note".to_string()),
-        }];
+        let mut disclosures = vec![
+            ProjectDisclosure::Advertisements {
+                note: Some("Original note".to_string()),
+            },
+            ProjectDisclosure::Archived { note: None },
+        ];
         let remove = ThreadIssueTarget::RemoveProjectDisclosures {
-            disclosure_types: non_empty(vec!["advertisements".to_string()]),
+            disclosure_types: non_empty(vec![
+                "advertisements".to_string(),
+                "archived".to_string(),
+            ]),
         };
         let note = ThreadIssueTarget::ModifyProjectDisclosureNote {
             disclosure_type: "advertisements".to_string(),
@@ -1221,10 +1280,31 @@ mod tests {
             ThreadIssueValueState::SameAsSuggested
         );
 
+        disclosures.pop();
+        assert_eq!(
+            value_state(&remove, &disclosures),
+            ThreadIssueValueState::SameAsOriginal
+        );
+        assert_eq!(
+            remove.verdict(
+                &ThreadIssueContext {
+                    disclosures: &disclosures,
+                    ..context(&project)
+                },
+                true,
+                false,
+            ),
+            ThreadIssueVerdict::Open
+        );
+
         disclosures.clear();
         assert_eq!(
             value_state(&remove, &disclosures),
             ThreadIssueValueState::SameAsSuggested
+        );
+        assert_eq!(
+            remove.verdict(&context(&project), false, false),
+            ThreadIssueVerdict::Resolved
         );
     }
 
@@ -1397,7 +1477,7 @@ mod tests {
 
         assert_eq!(
             gallery.verdict(&context(&project), true, false),
-            ThreadIssueVerdict::Addressed
+            ThreadIssueVerdict::Open
         );
         project.gallery.remove(0);
         assert_eq!(
