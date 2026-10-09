@@ -29,6 +29,7 @@ pub async fn export(app: &AppState) -> Result<()> {
         .context(info_span!("fetching Quilt catalogs"))
         .await?;
     info!(num_catalogs = rows.len(), "found downloaded Quilt catalogs");
+	// fetch runs, so that newer catalogs take precedence over older ones
     let runs = model::DownloadRun::all()
         .exec(&mut conn)
         .context(info_span!("fetching download runs"))
@@ -43,6 +44,8 @@ pub async fn export(app: &AppState) -> Result<()> {
         )
     });
 
+	// read each catalog from its blob in the store;
+	// keep the first copy of each game version, in latest-catalog order
     let mut games = IndexMap::new();
     let mut catalogs = Vec::with_capacity(rows.len());
     for row in rows {
@@ -81,6 +84,8 @@ pub async fn export(app: &AppState) -> Result<()> {
             mappings: Vec::new(),
         });
     }
+	// older loaders may only have been downloaded with an older template;
+	// keep those templates as fallbacks, within the same version group
     let mut historical_templates: IndexMap<String, IndexMap<String, ()>> =
         IndexMap::new();
     for catalog in &catalogs {
@@ -102,6 +107,8 @@ pub async fn export(app: &AppState) -> Result<()> {
     }
     let games = games.into_values().collect::<Vec<_>>();
     let profile_base_url = Url::parse(quilt::PROFILE_BASE_URL)?;
+	// use the downloader's grouping rules;
+	// legacy and modern games need separate profiles for the same loader
     let groups = quilt::profile_groups(&games)
         .into_iter()
         .map(|group| ProfileGroup {

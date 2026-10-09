@@ -4,12 +4,14 @@ Game version and launcher version related metadata manifests.
 
 The general flow of the metadata service is:
 - Download metadata and manifests from upstream sources (Mojang, Fabric, NeoForge, etc.), and save them into our database, as raw JSON blobs.
-- Take the JSON blobs and turn them into more structured information, useful for our purposes, and save that in our database.
+- Take the JSON blobs and extract structured information out of them, useful for our purposes, and save that in our database.
+- Do other extraction, like reading JSON manifests embedded in installer JAR files, and save that in our database.
 - Upload our processed manifests into some publicly-accessible source, such as the local filesystem, or an S3-compatible service like Cloudflare R2.
 
 This means that:
 - Every time we run the service, we save the source manifests that we download - from this, we can derive any information that we want without needing to query the upstreams again.
 - We have a historical record of all upstream manifests - if an upstream goes down, we're not affected and can keep using old information until it's back up.
+- Operations are idempotent - so rerunning or running multiple operations concurrently isn't an issue.
 - Much of our data is effectively immutable, simplifying things a lot - no need to deal with missing versions if we never delete versions.
 - Given the immutability, we can track the provenance of each entity (game version, loader version, etc.)
 - We still have the option to hide information by not including it in the final manifest upload - e.g. if we no longer want to show a version, we can mark it as `unlisted` in our database, and the final manifest creation won't include it, but it'll still exist in the DB.

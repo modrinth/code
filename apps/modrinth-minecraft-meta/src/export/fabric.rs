@@ -30,6 +30,9 @@ pub async fn export(app: &AppState) -> Result<()> {
         .context(info_span!("fetching Fabric catalogs"))
         .await?;
     info!("found {} downloaded catalogs", rows.len());
+
+	// fetch download runs where we downloaded these catalogs from;
+	// newer catalogs take precedence over older ones
     let runs = model::DownloadRun::all()
         .exec(&mut conn)
         .context(info_span!("fetching download runs"))
@@ -43,6 +46,9 @@ pub async fn export(app: &AppState) -> Result<()> {
             row.id.0,
         )
     });
+
+	// read each catalog from its blob in the store,
+	// and start assembling the artifacts we'll export
     let repository = Url::parse(fabric::MAVEN_URL)?;
     let mut catalogs = Vec::new();
     let mut games = IndexMap::new();
@@ -56,9 +62,11 @@ pub async fn export(app: &AppState) -> Result<()> {
             .await?;
         let catalog = from_json_slice::<fabric::Catalog>(&bytes)
             .context("parsing Fabric catalog")?;
+
         for game in &catalog.game {
             games.entry(game.version.to_string()).or_insert(());
         }
+
         catalogs.push(CatalogSnapshot {
 			download_run_id: row.download_run_id,
 			sha256: row.sha256,
@@ -94,6 +102,11 @@ pub async fn export(app: &AppState) -> Result<()> {
 				.collect(),
 		});
     }
+
+	// setup version groups
+	// see README.md on what version groups are and why we need them
+	// Fabric only has one, since it takes a single version (`PROFILE_GAME_VERSION`)
+	// and templates that into all the json files. Quilt has more.
     let group = ProfileGroup {
         id: None,
         template: fabric::PROFILE_GAME_VERSION.to_owned(),
@@ -104,6 +117,8 @@ pub async fn export(app: &AppState) -> Result<()> {
             fabric::CATALOG_URL
         ))?,
     };
+
+	// shared Fabric/Quilt logic for exports
     fabriclike::export_catalogs(
         app,
         FabriclikeLoader::Fabric,

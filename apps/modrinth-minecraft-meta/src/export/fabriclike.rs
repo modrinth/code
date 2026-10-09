@@ -99,6 +99,8 @@ pub struct CatalogSnapshot {
     pub mappings: Vec<Artifact>,
 }
 
+/// Game versions which share a loader profile, templated from one game version.
+/// Fabric uses an unnamed group; Quilt publishes named version groups.
 pub struct ProfileGroup {
     pub id: Option<String>,
     pub template: String,
@@ -232,7 +234,11 @@ fn make_manifest(
     Ok(manifest)
 }
 
-/// Publishes profiles and a catalog from snapshots ordered newest-first.
+/// Takes catalogs ordered newest-first, pulls their downloaded profiles from
+/// the blob store, and post-processes them for the games in each profile group.
+///
+/// Mirrors their libraries, writes the processed profiles, then writes the
+/// overall catalog. Fabric and Quilt share this flow, but use different groups.
 pub async fn export_catalogs(
     app: &AppState,
     loader: FabriclikeLoader,
@@ -241,6 +247,8 @@ pub async fn export_catalogs(
     catalogs: Vec<CatalogSnapshot>,
     groups: Vec<ProfileGroup>,
 ) -> Result<()> {
+	// merge catalogs, keeping the newest metadata for each version;
+	// older catalogs can still contribute versions missing from newer ones
     let mut games = IndexMap::new();
     let mut loaders = IndexMap::new();
     let mut artifacts = IndexMap::new();
@@ -269,6 +277,8 @@ pub async fn export_catalogs(
         !games.is_empty() && !loaders.is_empty() && !groups.is_empty(),
         "no game versions, loaders, or profile groups to export"
     );
+	// only fetch download records for the profiles we're going to use;
+	// include historical templates in case a loader has no current profile
     let mut profile_urls = Vec::new();
     for group in &groups {
         for version in loaders.keys() {
@@ -306,10 +316,13 @@ pub async fn export_catalogs(
             .entry(download.url)
             .or_insert(download.sha256);
     }
+	// now we make all the loader profiles and collect their libraries
     let public_maven = app.public_blobs.url_for("maven/");
     let mut profiles = Vec::new();
     for group in &groups {
         for version in loaders.values() {
+			// prefer the current template, then try older ones from this group;
+			// normalize against the template we actually downloaded
             let mut selected = None;
             for template in std::iter::once(&group.template)
                 .chain(&group.fallback_templates)
@@ -367,6 +380,7 @@ pub async fn export_catalogs(
             });
         }
     }
+	// mirror libraries before publishing profiles which reference them
     let num_total = artifacts.len();
     info!(num_artifacts = num_total, "mirroring loader dependencies");
     let num_done = AtomicUsize::new(0);
@@ -384,6 +398,7 @@ pub async fn export_catalogs(
         )
         .context(info_span!("mirroring loader dependencies"))
         .await?;
+	// write processed loader profiles
     for profile in &profiles {
         app.public_blobs
             .put(&profile.path, &profile.json, ContentType::Json)
@@ -391,6 +406,7 @@ pub async fn export_catalogs(
             .await?;
     }
     info!(num_profiles = profiles.len(), "wrote loader profiles");
+	// write manifest (overall catalog), after all referenced files are uploaded
     let manifest = make_manifest(games, &groups, profiles)?;
     let json =
         serde_json::to_vec(&manifest).context("serializing loader manifest")?;
@@ -410,8 +426,11 @@ pub async fn export_catalogs(
     Ok(())
 }
 
-/// Normalizes a Fabric or Quilt profile for multiple game versions.
-/// Artifacts are concrete; callers should deduplicate them by Maven path.
+/// Takes a downloaded loader profile, replaces its game-specific metadata with
+/// placeholders, and points its libraries at our public Maven store.
+///
+/// Returns the processed profile and the concrete artifacts needed by its games.
+/// Callers should dedup artifacts by Maven path before mirroring them.
 pub fn normalize_profile(
     mut profile: ProfileMetadata,
     template: &str,
@@ -547,7 +566,8 @@ fn artifact_url(artifact: &Artifact) -> Result<Url> {
     Ok(url)
 }
 
-/// Downloads a concrete dependency and stores it in the public Maven mirror.
+/// Takes a concrete artifact, downloads it from its source repository, and
+/// writes it to the public Maven store. Its source is kept for error context.
 pub async fn mirror_artifact(app: &AppState, artifact: Artifact) -> Result<()> {
     let url = artifact_url(&artifact)?;
     let bytes = async {

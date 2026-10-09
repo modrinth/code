@@ -1,0 +1,500 @@
+version = 1
+
+[schema]
+
+[[schema.tables]]
+id = 0
+name = "neoforge_catalogs"
+primary_key = { columns = [{ table = 0, index = 0 }], index = { table = 0, index = 0 } }
+
+[[schema.tables.columns]]
+id = { table = 0, index = 0 }
+name = "id"
+ty = "Uuid"
+storage_ty = "Uuid"
+
+[[schema.tables.columns]]
+id = { table = 0, index = 1 }
+name = "download_run_id"
+ty = "Uuid"
+storage_ty = "Uuid"
+
+[[schema.tables.columns]]
+id = { table = 0, index = 2 }
+name = "forge_sha256"
+ty = "String"
+storage_ty = "Text"
+
+[[schema.tables.columns]]
+id = { table = 0, index = 3 }
+name = "neoforge_sha256"
+ty = "String"
+storage_ty = "Text"
+
+[[schema.tables.indices]]
+id = { table = 0, index = 0 }
+name = "index_neoforge_catalogs_by_id"
+on = 0
+columns = [{ column = { table = 0, index = 0 }, op = "Eq", scope = "Partition" }]
+unique = true
+primary_key = true
+
+[[schema.tables.indices]]
+id = { table = 0, index = 1 }
+name = "index_neoforge_catalogs_by_download_run_id"
+on = 0
+columns = [{ column = { table = 0, index = 1 }, op = "Eq", scope = "Partition" }]
+unique = true
+
+[[schema.tables]]
+id = 1
+name = "download_runs"
+primary_key = { columns = [{ table = 1, index = 0 }], index = { table = 1, index = 0 } }
+
+[[schema.tables.columns]]
+id = { table = 1, index = 0 }
+name = "id"
+ty = "Uuid"
+storage_ty = "Uuid"
+
+[[schema.tables.columns]]
+id = { table = 1, index = 1 }
+name = "started_at"
+ty = "Timestamp"
+storage_ty = { Timestamp = 6 }
+
+[[schema.tables.columns]]
+id = { table = 1, index = 2 }
+name = "completed_at"
+ty = "Timestamp"
+storage_ty = { Timestamp = 6 }
+nullable = true
+
+[[schema.tables.columns]]
+id = { table = 1, index = 3 }
+name = "errors"
+ty = "String"
+storage_ty = "Text"
+nullable = true
+
+[[schema.tables.indices]]
+id = { table = 1, index = 0 }
+name = "index_download_runs_by_id"
+on = 1
+columns = [{ column = { table = 1, index = 0 }, op = "Eq", scope = "Partition" }]
+unique = true
+primary_key = true
+
+[[schema.tables]]
+id = 2
+name = "mojang_catalogs"
+primary_key = { columns = [{ table = 2, index = 0 }], index = { table = 2, index = 0 } }
+
+[[schema.tables.columns]]
+id = { table = 2, index = 0 }
+name = "id"
+ty = "Uuid"
+storage_ty = "Uuid"
+
+[[schema.tables.columns]]
+id = { table = 2, index = 1 }
+name = "download_run_id"
+ty = "Uuid"
+storage_ty = "Uuid"
+
+[[schema.tables.columns]]
+id = { table = 2, index = 2 }
+name = "sha256"
+ty = "String"
+storage_ty = "Text"
+
+[[schema.tables.indices]]
+id = { table = 2, index = 0 }
+name = "index_mojang_catalogs_by_id"
+on = 2
+columns = [{ column = { table = 2, index = 0 }, op = "Eq", scope = "Partition" }]
+unique = true
+primary_key = true
+
+[[schema.tables.indices]]
+id = { table = 2, index = 1 }
+name = "index_mojang_catalogs_by_download_run_id"
+on = 2
+columns = [{ column = { table = 2, index = 1 }, op = "Eq", scope = "Partition" }]
+unique = true
+
+[[schema.tables]]
+id = 3
+name = "profiles"
+primary_key = { columns = [{ table = 3, index = 0 }, { table = 3, index = 1 }, { table = 3, index = 2 }], index = { table = 3, index = 0 } }
+
+[[schema.tables.columns]]
+id = { table = 3, index = 0 }
+name = "loader"
+ty = "String"
+storage_ty = { Enum = { name = "minecraft_loader", variants = [{ name = "fabric" }, { name = "forge" }, { name = "neoforge" }, { name = "quilt" }] } }
+
+[[schema.tables.columns]]
+id = { table = 3, index = 1 }
+name = "minecraft_version"
+ty = "String"
+storage_ty = "Text"
+
+[[schema.tables.columns]]
+id = { table = 3, index = 2 }
+name = "loader_version"
+ty = "String"
+storage_ty = "Text"
+
+[[schema.tables.columns]]
+id = { table = 3, index = 3 }
+name = "metadata"
+ty = "String"
+storage_ty = "Json"
+
+[[schema.tables.indices]]
+id = { table = 3, index = 0 }
+name = "index_profiles_by_loader_and_minecraft_version_and_loader__cb6a"
+on = 3
+columns = [{ column = { table = 3, index = 0 }, op = "Eq", scope = "Partition" }, { column = { table = 3, index = 1 }, op = "Eq", scope = "Local" }, { column = { table = 3, index = 2 }, op = "Eq", scope = "Local" }]
+unique = true
+primary_key = true
+
+[[schema.tables.indices]]
+id = { table = 3, index = 1 }
+name = "index_profiles_by_minecraft_version"
+on = 3
+columns = [{ column = { table = 3, index = 1 }, op = "Eq", scope = "Partition" }]
+
+[[schema.tables]]
+id = 4
+name = "blob_hashes"
+primary_key = { columns = [{ table = 4, index = 0 }], index = { table = 4, index = 0 } }
+
+[[schema.tables.columns]]
+id = { table = 4, index = 0 }
+name = "sha256"
+ty = "String"
+storage_ty = "Text"
+
+[[schema.tables.columns]]
+id = { table = 4, index = 1 }
+name = "sha1"
+ty = "String"
+storage_ty = "Text"
+
+[[schema.tables.indices]]
+id = { table = 4, index = 0 }
+name = "index_blob_hashes_by_sha256"
+on = 4
+columns = [{ column = { table = 4, index = 0 }, op = "Eq", scope = "Partition" }]
+unique = true
+primary_key = true
+
+[[schema.tables.indices]]
+id = { table = 4, index = 1 }
+name = "index_blob_hashes_by_sha1"
+on = 4
+columns = [{ column = { table = 4, index = 1 }, op = "Eq", scope = "Partition" }]
+
+[[schema.tables]]
+id = 5
+name = "blob_downloads"
+primary_key = { columns = [{ table = 5, index = 0 }, { table = 5, index = 1 }], index = { table = 5, index = 0 } }
+
+[[schema.tables.columns]]
+id = { table = 5, index = 0 }
+name = "download_run_id"
+ty = "Uuid"
+storage_ty = "Uuid"
+
+[[schema.tables.columns]]
+id = { table = 5, index = 1 }
+name = "url"
+ty = "String"
+storage_ty = "Text"
+
+[[schema.tables.columns]]
+id = { table = 5, index = 2 }
+name = "sha256"
+ty = "String"
+storage_ty = "Text"
+
+[[schema.tables.indices]]
+id = { table = 5, index = 0 }
+name = "index_blob_downloads_by_download_run_id_and_url"
+on = 5
+columns = [{ column = { table = 5, index = 0 }, op = "Eq", scope = "Partition" }, { column = { table = 5, index = 1 }, op = "Eq", scope = "Local" }]
+unique = true
+primary_key = true
+
+[[schema.tables.indices]]
+id = { table = 5, index = 1 }
+name = "index_blob_downloads_by_sha256"
+on = 5
+columns = [{ column = { table = 5, index = 2 }, op = "Eq", scope = "Partition" }]
+
+[[schema.tables]]
+id = 6
+name = "fabric_catalogs"
+primary_key = { columns = [{ table = 6, index = 0 }], index = { table = 6, index = 0 } }
+
+[[schema.tables.columns]]
+id = { table = 6, index = 0 }
+name = "id"
+ty = "Uuid"
+storage_ty = "Uuid"
+
+[[schema.tables.columns]]
+id = { table = 6, index = 1 }
+name = "download_run_id"
+ty = "Uuid"
+storage_ty = "Uuid"
+
+[[schema.tables.columns]]
+id = { table = 6, index = 2 }
+name = "sha256"
+ty = "String"
+storage_ty = "Text"
+
+[[schema.tables.indices]]
+id = { table = 6, index = 0 }
+name = "index_fabric_catalogs_by_id"
+on = 6
+columns = [{ column = { table = 6, index = 0 }, op = "Eq", scope = "Partition" }]
+unique = true
+primary_key = true
+
+[[schema.tables.indices]]
+id = { table = 6, index = 1 }
+name = "index_fabric_catalogs_by_download_run_id"
+on = 6
+columns = [{ column = { table = 6, index = 1 }, op = "Eq", scope = "Partition" }]
+unique = true
+
+[[schema.tables]]
+id = 7
+name = "quilt_catalogs"
+primary_key = { columns = [{ table = 7, index = 0 }], index = { table = 7, index = 0 } }
+
+[[schema.tables.columns]]
+id = { table = 7, index = 0 }
+name = "id"
+ty = "Uuid"
+storage_ty = "Uuid"
+
+[[schema.tables.columns]]
+id = { table = 7, index = 1 }
+name = "download_run_id"
+ty = "Uuid"
+storage_ty = "Uuid"
+
+[[schema.tables.columns]]
+id = { table = 7, index = 2 }
+name = "sha256"
+ty = "String"
+storage_ty = "Text"
+
+[[schema.tables.indices]]
+id = { table = 7, index = 0 }
+name = "index_quilt_catalogs_by_id"
+on = 7
+columns = [{ column = { table = 7, index = 0 }, op = "Eq", scope = "Partition" }]
+unique = true
+primary_key = true
+
+[[schema.tables.indices]]
+id = { table = 7, index = 1 }
+name = "index_quilt_catalogs_by_download_run_id"
+on = 7
+columns = [{ column = { table = 7, index = 1 }, op = "Eq", scope = "Partition" }]
+unique = true
+
+[[schema.tables]]
+id = 8
+name = "forgelike_installers"
+primary_key = { columns = [{ table = 8, index = 0 }, { table = 8, index = 1 }], index = { table = 8, index = 0 } }
+
+[[schema.tables.columns]]
+id = { table = 8, index = 0 }
+name = "loader"
+ty = "String"
+storage_ty = { Enum = { name = "forgelike_loader", variants = [{ name = "forge" }, { name = "neoforge" }] } }
+
+[[schema.tables.columns]]
+id = { table = 8, index = 1 }
+name = "name"
+ty = "String"
+storage_ty = "Text"
+
+[[schema.tables.columns]]
+id = { table = 8, index = 2 }
+name = "download_run_id"
+ty = "Uuid"
+storage_ty = "Uuid"
+
+[[schema.tables.columns]]
+id = { table = 8, index = 3 }
+name = "sha256"
+ty = "String"
+storage_ty = "Text"
+
+[[schema.tables.indices]]
+id = { table = 8, index = 0 }
+name = "index_forgelike_installers_by_loader_and_name"
+on = 8
+columns = [{ column = { table = 8, index = 0 }, op = "Eq", scope = "Partition" }, { column = { table = 8, index = 1 }, op = "Eq", scope = "Local" }]
+unique = true
+primary_key = true
+
+[[schema.tables.indices]]
+id = { table = 8, index = 1 }
+name = "index_forgelike_installers_by_sha256"
+on = 8
+columns = [{ column = { table = 8, index = 3 }, op = "Eq", scope = "Partition" }]
+
+[[schema.tables]]
+id = 9
+name = "forgelike_extracts"
+primary_key = { columns = [{ table = 9, index = 0 }], index = { table = 9, index = 0 } }
+
+[[schema.tables.columns]]
+id = { table = 9, index = 0 }
+name = "installer_sha256"
+ty = "String"
+storage_ty = "Text"
+
+[[schema.tables.columns]]
+id = { table = 9, index = 1 }
+name = "created_at"
+ty = "Timestamp"
+storage_ty = { Timestamp = 6 }
+
+[[schema.tables.columns]]
+id = { table = 9, index = 2 }
+name = "metadata"
+ty = "String"
+storage_ty = "Json"
+
+[[schema.tables.columns]]
+id = { table = 9, index = 3 }
+name = "embedded_maven_artifacts"
+ty = "String"
+storage_ty = "Json"
+
+[[schema.tables.indices]]
+id = { table = 9, index = 0 }
+name = "index_forgelike_extracts_by_installer_sha256"
+on = 9
+columns = [{ column = { table = 9, index = 0 }, op = "Eq", scope = "Partition" }]
+unique = true
+primary_key = true
+
+[[schema.tables]]
+id = 10
+name = "forge_catalogs"
+primary_key = { columns = [{ table = 10, index = 0 }], index = { table = 10, index = 0 } }
+
+[[schema.tables.columns]]
+id = { table = 10, index = 0 }
+name = "id"
+ty = "Uuid"
+storage_ty = "Uuid"
+
+[[schema.tables.columns]]
+id = { table = 10, index = 1 }
+name = "download_run_id"
+ty = "Uuid"
+storage_ty = "Uuid"
+
+[[schema.tables.columns]]
+id = { table = 10, index = 2 }
+name = "sha256"
+ty = "String"
+storage_ty = "Text"
+
+[[schema.tables.indices]]
+id = { table = 10, index = 0 }
+name = "index_forge_catalogs_by_id"
+on = 10
+columns = [{ column = { table = 10, index = 0 }, op = "Eq", scope = "Partition" }]
+unique = true
+primary_key = true
+
+[[schema.tables.indices]]
+id = { table = 10, index = 1 }
+name = "index_forge_catalogs_by_download_run_id"
+on = 10
+columns = [{ column = { table = 10, index = 1 }, op = "Eq", scope = "Partition" }]
+unique = true
+
+[[schema.tables]]
+id = 11
+name = "minecraft_versions"
+primary_key = { columns = [{ table = 11, index = 0 }], index = { table = 11, index = 0 } }
+
+[[schema.tables.columns]]
+id = { table = 11, index = 0 }
+name = "name"
+ty = "String"
+storage_ty = "Text"
+
+[[schema.tables.columns]]
+id = { table = 11, index = 1 }
+name = "catalog_entry"
+ty = "String"
+storage_ty = "Json"
+
+[[schema.tables.columns]]
+id = { table = 11, index = 2 }
+name = "manifest"
+ty = "String"
+storage_ty = "Json"
+
+[[schema.tables.columns]]
+id = { table = 11, index = 3 }
+name = "source_catalog_sha256"
+ty = "String"
+storage_ty = "Text"
+
+[[schema.tables.columns]]
+id = { table = 11, index = 4 }
+name = "source_manifest_sha256"
+ty = "String"
+storage_ty = "Text"
+
+[[schema.tables.columns]]
+id = { table = 11, index = 5 }
+name = "is_latest_release"
+ty = "Bool"
+storage_ty = "Boolean"
+nullable = true
+
+[[schema.tables.columns]]
+id = { table = 11, index = 6 }
+name = "is_latest_snapshot"
+ty = "Bool"
+storage_ty = "Boolean"
+nullable = true
+
+[[schema.tables.indices]]
+id = { table = 11, index = 0 }
+name = "index_minecraft_versions_by_name"
+on = 11
+columns = [{ column = { table = 11, index = 0 }, op = "Eq", scope = "Partition" }]
+unique = true
+primary_key = true
+
+[[schema.tables.indices]]
+id = { table = 11, index = 1 }
+name = "index_minecraft_versions_by_is_latest_release"
+on = 11
+columns = [{ column = { table = 11, index = 5 }, op = "Eq", scope = "Partition" }]
+unique = true
+
+[[schema.tables.indices]]
+id = { table = 11, index = 2 }
+name = "index_minecraft_versions_by_is_latest_snapshot"
+on = 11
+columns = [{ column = { table = 11, index = 6 }, op = "Eq", scope = "Partition" }]
+unique = true

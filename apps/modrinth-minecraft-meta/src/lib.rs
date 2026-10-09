@@ -17,6 +17,7 @@ use crate::{
 
 mod config;
 mod export;
+mod extract;
 mod model;
 mod store;
 mod task;
@@ -25,6 +26,21 @@ mod util;
 
 #[derive(Debug, clap::Parser)]
 struct Cli {
+    /// Process Minecraft game version info from Mojang?
+    #[arg(long)]
+    mojang: bool,
+    /// Process Fabric loader info?
+    #[arg(long)]
+    fabric: bool,
+    /// Process Forge loader info?
+    #[arg(long)]
+    forge: bool,
+    /// Process NeoForge loader info?
+    #[arg(long)]
+    neoforge: bool,
+    /// Process Quilt loader info?
+    #[arg(long)]
+    quilt: bool,
     #[command(subcommand)]
     command: Command,
 }
@@ -32,44 +48,14 @@ struct Cli {
 #[derive(Debug, clap::Subcommand)]
 enum Command {
     /// Download manifests and sources from upstreamms
-    Download {
-        /// Download Minecraft game version info from Mojang?
-        #[arg(long)]
-        mojang: bool,
-        /// Download Fabric loader info?
-        #[arg(long)]
-        fabric: bool,
-        /// Download Forge loader info?
-        #[arg(long)]
-        forge: bool,
-        /// Download NeoForge loader info?
-        #[arg(long)]
-        neoforge: bool,
-        /// Download Quilt loader info?
-        #[arg(long)]
-        quilt: bool,
-    },
+    Download,
+    /// Extract downloaded Mojang metadata into normalized database rows
+    ExtractToDb,
     /// Extract downloaded installer JARs for their manifests and libraries
     ExtractInstallers,
     /// Take processed information from the database, produce JSON manifests
     /// from them, and upload them to the public file store.
-    Export {
-        /// Export Minecraft game versions?
-        #[arg(long)]
-        mojang: bool,
-        /// Export Fabric loader profiles?
-        #[arg(long)]
-        fabric: bool,
-        /// Export Forge loader profiles?
-        #[arg(long)]
-        forge: bool,
-        /// Export NeoForge loader profiles?
-        #[arg(long)]
-        neoforge: bool,
-        /// Export Quilt loader profiles?
-        #[arg(long)]
-        quilt: bool,
-    },
+    Export,
 }
 
 #[derive(Debug, Clone, Copy, clap::ValueEnum)]
@@ -149,45 +135,28 @@ pub async fn main() -> Result<()> {
         maven,
     };
 
-    let select_upstreams = |mojang: bool,
-                            fabric: bool,
-                            forge: bool,
-                            neoforge: bool,
-                            quilt: bool| {
-        let all_upstreams = !mojang && !fabric && !forge && !neoforge && !quilt;
+    let upstreams = {
+        let all_upstreams = !cli.mojang
+            && !cli.fabric
+            && !cli.forge
+            && !cli.neoforge
+            && !cli.quilt;
         task::Upstreams {
-            mojang: all_upstreams || mojang,
-            fabric: all_upstreams || fabric,
-            forge: all_upstreams || forge,
-            neoforge: all_upstreams || neoforge,
-            quilt: all_upstreams || quilt,
+            mojang: all_upstreams || cli.mojang,
+            fabric: all_upstreams || cli.fabric,
+            forge: all_upstreams || cli.forge,
+            neoforge: all_upstreams || cli.neoforge,
+            quilt: all_upstreams || cli.quilt,
         }
     };
 
     match cli.command {
-        Command::Download {
-            mojang,
-            fabric,
-            forge,
-            neoforge,
-            quilt,
-        } => {
-            let upstreams =
-                select_upstreams(mojang, fabric, forge, neoforge, quilt);
+        Command::Download => {
             task::download_from_upstreams(&app, upstreams).await
         }
+        Command::ExtractToDb => extract::extract(&app).await,
         Command::ExtractInstallers => task::extract_installers(&mut app).await,
-        Command::Export {
-            mojang,
-            fabric,
-            forge,
-            neoforge,
-            quilt,
-        } => {
-            let upstreams =
-                select_upstreams(mojang, fabric, forge, neoforge, quilt);
-            task::export(&mut app, upstreams).await
-        }
+        Command::Export => task::export(&mut app, upstreams).await,
     }
 }
 
