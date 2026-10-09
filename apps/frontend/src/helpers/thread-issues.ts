@@ -81,7 +81,7 @@ export function isThreadIssueFacetReadyToAddress(
 		case 'modify_links':
 			return (
 				Object.keys(target.value.links).length > 0 &&
-				Object.entries(target.value.links).some(
+				Object.entries(target.value.links).every(
 					([platform, { original }]) => (current.link_urls[platform]?.url ?? '') !== original,
 				)
 			)
