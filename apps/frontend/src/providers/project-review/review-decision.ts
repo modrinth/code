@@ -9,12 +9,12 @@ export type FacetUpdate = {
 
 export interface ReviewDecision extends ThreadReply {
 	projectId: string
-	status: Labrinth.Projects.v2.ProjectStatus
+	status?: Labrinth.Projects.v2.ProjectStatus
 	facetUpdates: FacetUpdate[]
 	issues?: Labrinth.Threads.v3.NewThreadIssues
 }
 
-/** Applies a review's findings before its status. */
+/** Applies a review's findings and optional status change. */
 export async function applyReviewDecision(
 	decision: ReviewDecision,
 	client: Pick<AbstractModrinthClient, 'labrinth'>,
@@ -36,8 +36,10 @@ export async function applyReviewDecision(
 		await threads.editIssueFacet(facet.id, facet.data)
 	}
 	assertCurrent()
-	await client.labrinth.projects_v3.edit(decision.projectId, {
-		status: decision.status,
-	})
+	if (decision.status) {
+		await client.labrinth.projects_v3.edit(decision.projectId, {
+			status: decision.status,
+		})
+	}
 	assertCurrent()
 }

@@ -4169,6 +4169,9 @@
   "project-review.controls.text-placeholder": {
     "message": "Enter text…"
   },
+  "project-review.decision.add-issues": {
+    "message": "Add issues on project"
+  },
   "project-review.decision.approve": {
     "message": "Approve"
   },
@@ -6581,6 +6584,9 @@
   "shared-instance.invite.unavailable.title": {
     "message": "This invite isn't available"
   },
+  "thread-issues.address-failed": {
+    "message": "Failed to mark issue as addressed"
+  },
   "thread-issues.addressed": {
     "message": "Marked as addressed"
   },
@@ -6626,11 +6632,23 @@
   "thread-issues.mark-addressed": {
     "message": "Mark as addressed"
   },
+  "thread-issues.mark-resolved": {
+    "message": "Mark as resolved"
+  },
+  "thread-issues.mark-unresolved": {
+    "message": "Mark as unresolved"
+  },
   "thread-issues.more-actions": {
     "message": "More required actions"
   },
+  "thread-issues.options": {
+    "message": "Issue options"
+  },
   "thread-issues.reply-to-address": {
     "message": "Reply to address"
+  },
+  "thread-issues.resolve-failed": {
+    "message": "Failed to mark issue as resolved"
   },
   "thread-issues.resolved": {
     "message": "Resolved"
@@ -6653,6 +6671,9 @@
   "thread-issues.target.edit-url": {
     "message": "Edit URL"
   },
+  "thread-issues.unresolve-failed": {
+    "message": "Failed to mark issue as unresolved"
+  },
   "thread.issue-history.flagged": {
     "message": "flagged {count, plural, one {# issue} other {# issues}}"
   },
@@ -6660,7 +6681,7 @@
     "message": "Only visible to moderators"
   },
   "thread.message.auto-approval": {
-    "message": "All moderation issues have been resolved and your project is automatically approved with status <status>approved</status>"
+    "message": "automatically set the project status to <status>approved</status> as all issues have been resolved."
   },
   "thread.message.moderator": {
     "message": "Moderator"

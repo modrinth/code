@@ -47,7 +47,7 @@
 		</div>
 		<div class="col-span-2 flex min-w-0 flex-col gap-2 pt-2">
 			<div v-for="issue in entry.issues" :key="issue.id" class="min-w-0">
-				<ProjectIssueCard :issues="[issue]" thread-history />
+				<ProjectIssueCard :issues="[issue]" thread-history @update-thread="emit('update-thread')" />
 			</div>
 		</div>
 	</article>
@@ -77,6 +77,9 @@ defineProps<{
 }>()
 
 const settings = useModerationSettings()
+const emit = defineEmits<{
+	'update-thread': []
+}>()
 const { formatMessage } = useVIntl()
 const formatDateTime = useFormatDateTime({ timeStyle: 'short', dateStyle: 'long' })
 const relativeTime = useRelativeTime()

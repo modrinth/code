@@ -26,11 +26,7 @@
 			:class="raised ? 'bg-surface-3' : 'bg-surface-2'"
 		>
 			<InfoIcon v-if="message.body.type === 'legacy_project_message'" class="text-blue" />
-			<ThreadRoleBadge
-				v-else
-				:role="message.body.type === 'auto_approval' ? 'system' : 'moderator'"
-				avatar
-			/>
+			<ThreadRoleBadge v-else role="moderator" avatar />
 		</div>
 		<div class="message__content min-w-0">
 			<template v-if="members[message.author_id]">
@@ -83,14 +79,8 @@
 					class="message__author min-w-0 max-w-full font-bold text-orange"
 					:class="authorClasses"
 				>
-					{{
-						formatMessage(
-							message.body.type === 'auto_approval'
-								? imageMessages.system
-								: imageMessages.moderator,
-						)
-					}}
-					<ThreadRoleBadge :role="message.body.type === 'auto_approval' ? 'system' : 'moderator'" />
+					{{ formatMessage(imageMessages.moderator) }}
+					<ThreadRoleBadge role="moderator" />
 				</span>
 			</template>
 			<div
@@ -119,12 +109,11 @@
 				<span v-if="message.body.type === 'deleted'">
 					posted a message that has been deleted.
 				</span>
-				<IntlFormatted
-					v-else-if="message.body.type === 'auto_approval'"
-					:message-id="imageMessages.autoApproval"
-				>
-					<template #status><Badge :type="message.body.new_status" /></template>
-				</IntlFormatted>
+				<span v-else-if="message.body.type === 'auto_approval'">
+					<IntlFormatted :message-id="imageMessages.autoApproval">
+						<template #status><Badge :type="message.body.new_status" /></template>
+					</IntlFormatted>
+				</span>
 				<template v-else-if="message.body.type === 'status_change'">
 					<span v-if="message.body.new_status === 'processing'">
 						submitted the project for review.
@@ -264,12 +253,11 @@ const settings = useModerationSettings()
 const client = injectModrinthClient()
 const { formatMessage } = useVIntl()
 const imageMessages = defineMessages({
-	system: { id: 'thread.message.system', defaultMessage: 'Modrinth' },
 	moderator: { id: 'thread.message.moderator', defaultMessage: 'Moderator' },
 	autoApproval: {
 		id: 'thread.message.auto-approval',
 		defaultMessage:
-			'All moderation issues have been resolved and your project is automatically approved with status <status>approved</status>',
+			'automatically set the project status to <status>approved</status> as all issues have been resolved.',
 	},
 	openImage: {
 		id: 'thread.message.open-image',

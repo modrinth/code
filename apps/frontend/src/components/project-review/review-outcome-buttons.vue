@@ -35,7 +35,13 @@
 </template>
 
 <script setup lang="ts">
-import { FileTextIcon, MoreHorizontalIcon, ScaleIcon, SpinnerIcon } from '@modrinth/assets'
+import {
+	FileTextIcon,
+	MoreHorizontalIcon,
+	PlusIcon,
+	ScaleIcon,
+	SpinnerIcon,
+} from '@modrinth/assets'
 import { moderationSettings } from '@modrinth/moderation'
 import {
 	Button,
@@ -55,7 +61,15 @@ import { useReviewShortcut } from './shortcuts'
 
 const { project, navigation, queue } = injectProjectReviewPageContext()
 const settings = useModerationSettings()
-const { canSubmit, canApprove, pending, loadingAction, submitDecision } = injectReviewSubmission()
+const {
+	canSubmit,
+	canApprove,
+	canAddIssues,
+	pending,
+	loadingAction,
+	submitDecision,
+	submitIssues,
+} = injectReviewSubmission()
 const { generating } = injectReviewMessages()
 const advancingAction = ref<Parameters<typeof submitDecision>[0]>()
 const { formatMessage } = useVIntl()
@@ -71,6 +85,10 @@ const messages = defineMessages({
 		defaultMessage: 'Send to review',
 	},
 	setToDraft: { id: 'project-review.decision.set-to-draft', defaultMessage: 'Set to draft' },
+	addIssues: {
+		id: 'project-review.decision.add-issues',
+		defaultMessage: 'Add issues on project',
+	},
 })
 const actions = computed(() => [
 	{
@@ -95,6 +113,13 @@ const actions = computed(() => [
 	},
 ])
 const overflowActions = computed(() => [
+	{
+		id: 'add-issues',
+		label: formatMessage(messages.addIssues),
+		icon: PlusIcon,
+		action: () => submitIssues(),
+		disabled: !canAddIssues.value || generating.value || advancingAction.value !== undefined,
+	},
 	{
 		id: 'send-to-review',
 		label: formatMessage(messages.sendToReview),

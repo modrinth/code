@@ -18,6 +18,7 @@
 			:raised="raised"
 			:author="entry.authorId ? members[entry.authorId] : undefined"
 			:class="messageClass"
+			@update-thread="emit('update-thread')"
 		/>
 	</template>
 </template>

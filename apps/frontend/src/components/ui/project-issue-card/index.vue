@@ -13,15 +13,20 @@
 			<div class="flex flex-wrap items-start justify-between gap-1">
 				<h2
 					class="m-0 flex min-w-0 flex-1 basis-[150px] flex-wrap items-start text-contrast"
-					:class="threadHistory ? 'gap-1.5' : 'mt-[3px] gap-2'"
+					:class="threadHistory ? 'gap-1.5' : '!mt-[3px] gap-2'"
 				>
 					<CheckCircleIcon
 						v-if="isComplete(issue)"
-						class="mt-0.5 shrink-0 text-primary"
+						class="!mt-0.5 shrink-0 text-primary"
 						:class="threadHistory ? 'size-4' : 'size-5'"
 						aria-hidden="true"
 					/>
-					<TriangleAlertIcon v-else class="size-5 shrink-0 text-red" aria-hidden="true" />
+					<TriangleAlertIcon
+						v-else
+						class="!mt-0.5 shrink-0 text-red"
+						:class="threadHistory ? 'size-4' : 'size-5'"
+						aria-hidden="true"
+					/>
 					<span
 						class="min-w-0 flex-1 [overflow-wrap:anywhere]"
 						:class="threadHistory ? 'text-sm font-medium' : 'text-base font-semibold'"
@@ -31,7 +36,8 @@
 				<Button
 					v-if="threadHistory || isComplete(issue)"
 					class="ml-auto max-w-full shrink-0 !whitespace-normal"
-					:class="threadHistory ? '-my-1.5 w-28' : 'p-4'"
+					:class="threadHistory ? '-my-1.5 aspect-square' : ''"
+					:circular="threadHistory"
 					type="quiet"
 					size="sm"
 					:aria-expanded="isExpanded(issue)"
@@ -40,22 +46,36 @@
 				>
 					<FoldVerticalIcon v-if="isExpanded(issue)" aria-hidden="true" />
 					<UnfoldVerticalIcon v-else aria-hidden="true" />
-					{{
-						formatMessage(
-							threadHistory
-								? isExpanded(issue)
-									? messages.hideIssue
-									: messages.showIssue
-								: issue.verdict === 'resolved'
+					<template v-if="!threadHistory">
+						{{
+							formatMessage(
+								issue.verdict === 'resolved'
 									? isExpanded(issue)
 										? messages.hideResolved
 										: messages.showResolved
 									: isExpanded(issue)
 										? messages.hideAddressed
 										: messages.showAddressed,
-						)
-					}}
+							)
+						}}
+					</template>
 				</Button>
+				<TeleportOverflowMenu
+					v-if="isStaff(auth.user)"
+					:label="formatMessage(messages.issueOptions)"
+					:options="moderatorOptions(issue)"
+					:disabled="verifyMutation.isPending.value"
+					class="shrink-0"
+					:class="threadHistory ? '-my-1.5' : ''"
+					type="quiet"
+					size="sm"
+				>
+					<MoreHorizontalIcon aria-hidden="true" />
+					<template #moderator-verified="{ option }">
+						<component :is="option.icon" class="text-primary" aria-hidden="true" />
+						{{ option.label }}
+					</template>
+				</TeleportOverflowMenu>
 			</div>
 			<div
 				:id="issueContentId(issue)"
@@ -187,8 +207,10 @@ import {
 	ChevronRightIcon,
 	CircleIcon,
 	FoldVerticalIcon,
+	MoreHorizontalIcon,
 	TriangleAlertIcon,
 	UnfoldVerticalIcon,
+	XCircleIcon,
 } from '@modrinth/assets'
 import { IssuePriority, reviewPanels } from '@modrinth/moderation/src/data/issues'
 import {
@@ -204,7 +226,6 @@ import {
 	Button,
 	ButtonLink,
 	type ButtonMenuOption,
-	commonMessages,
 	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
@@ -240,6 +261,10 @@ const props = defineProps<{
 	threadHistory?: boolean
 }>()
 
+const emit = defineEmits<{
+	'update-thread': []
+}>()
+
 const projectContext = props.threadHistory ? null : injectProjectPageContext()
 const thread = computed(() => projectContext?.thread.value)
 const currentMember = computed(() => projectContext?.currentMember.value)
@@ -261,9 +286,30 @@ const canAddress = computed(() => !!currentMember.value?.accepted)
 const expandedAddressed = reactive(new Set<string>())
 const finishedExpanding = reactive(new Set<string>())
 const messages = defineMessages({
+	issueOptions: { id: 'thread-issues.options', defaultMessage: 'Issue options' },
+	markVerified: {
+		id: 'thread-issues.mark-resolved',
+		defaultMessage: 'Mark as resolved',
+	},
+	markUnresolved: {
+		id: 'thread-issues.mark-unresolved',
+		defaultMessage: 'Mark as unresolved',
+	},
+	verifyFailed: {
+		id: 'thread-issues.resolve-failed',
+		defaultMessage: 'Failed to mark issue as resolved',
+	},
+	unresolveFailed: {
+		id: 'thread-issues.unresolve-failed',
+		defaultMessage: 'Failed to mark issue as unresolved',
+	},
 	showIssue: { id: 'thread-issues.show-issue', defaultMessage: 'Show issue' },
 	hideIssue: { id: 'thread-issues.hide-issue', defaultMessage: 'Hide issue' },
 	markAddressed: { id: 'thread-issues.mark-addressed', defaultMessage: 'Mark as addressed' },
+	addressFailed: {
+		id: 'thread-issues.address-failed',
+		defaultMessage: 'Failed to mark issue as addressed',
+	},
 	addressed: { id: 'thread-issues.addressed', defaultMessage: 'Marked as addressed' },
 	showAddressed: { id: 'thread-issues.show-addressed', defaultMessage: 'Show addressed' },
 	hideAddressed: { id: 'thread-issues.hide-addressed', defaultMessage: 'Hide addressed' },
@@ -319,11 +365,75 @@ const addressMutation = useMutation({
 	},
 	onError: (error) =>
 		addNotification({
-			title: formatMessage(commonMessages.errorNotificationTitle),
+			title: formatMessage(messages.addressFailed),
 			text: error instanceof Error ? error.message : String(error),
 			type: 'error',
 		}),
 })
+
+const verifyMutation = useMutation({
+	mutationFn: async ({
+		facetIds,
+		verified,
+	}: {
+		facetIds: string[]
+		verified: boolean
+		threadId?: string
+		projectId?: string
+	}) => {
+		const results = await Promise.allSettled(
+			facetIds.map((id) =>
+				client.labrinth.threads_v3.editIssueFacet(id, { moderator_verified: verified }),
+			),
+		)
+		const failure = results.find((result) => result.status === 'rejected')
+		if (failure?.status === 'rejected') throw failure.reason
+	},
+	onSettled: async (_, __, { threadId, projectId }) => {
+		emit('update-thread')
+		await Promise.all([
+			queryClient.invalidateQueries({ queryKey: threadId ? ['thread', threadId] : ['thread'] }),
+			...(projectId
+				? [
+						queryClient.invalidateQueries({ queryKey: ['project', 'v2', projectId] }),
+						queryClient.invalidateQueries({ queryKey: ['project', 'v3', projectId] }),
+						projectContext?.projectV2.value.id === projectId
+							? projectContext.refreshProjectValidation()
+							: Promise.resolve(),
+					]
+				: []),
+		])
+	},
+	onError: (error, { verified }) =>
+		addNotification({
+			title: formatMessage(verified ? messages.verifyFailed : messages.unresolveFailed),
+			text: error instanceof Error ? error.message : String(error),
+			type: 'error',
+		}),
+})
+
+function moderatorOptions(issue: ThreadIssue): ButtonMenuOption[] {
+	const resolved = issue.verdict === 'resolved' || isThreadIssueVerified(issue)
+	return [
+		{
+			id: 'moderator-verified',
+			label: formatMessage(resolved ? messages.markUnresolved : messages.markVerified),
+			icon: resolved ? XCircleIcon : CheckCircleIcon,
+			disabled: !issue.facets.length || verifyMutation.isPending.value,
+			action: () => {
+				if (!isStaff(auth.value.user) || verifyMutation.isPending.value) return
+				verifyMutation.mutate({
+					facetIds: issue.facets
+						.filter((facet) => resolved || !facet.moderator_verified)
+						.map(({ id }) => id),
+					verified: !resolved,
+					threadId: thread.value?.id,
+					projectId: projectContext?.projectV2.value.id,
+				})
+			},
+		},
+	]
+}
 
 const fieldAnchor = computed(() => {
 	if (typeof props.target !== 'string' || hasItemSelector()) return undefined

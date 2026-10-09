@@ -185,8 +185,11 @@ export function createReviewSubmission(
 	)
 	const loadingAction = computed(() =>
 		submission.isPending.value
-			? (submission.variables.value?.decision?.status ??
-				(submission.variables.value?.reply?.privateMessage ? 'note' : 'reply'))
+			? submission.variables.value?.decision
+				? (submission.variables.value.decision.status ?? 'issues')
+				: submission.variables.value?.reply?.privateMessage
+					? 'note'
+					: 'reply'
 			: undefined,
 	)
 	async function submit(mode: ReviewEditorMode = 'reply') {
@@ -210,25 +213,28 @@ export function createReviewSubmission(
 		() => !previousIssues.hasUnresolvedFacets.value && panels.activeIssues.value.length === 0,
 	)
 
-	async function submitDecision(status: ProjectStatus) {
+	const canAddIssues = computed(() => canSubmit.value && !!selectedIssues())
+
+	async function submitReview(status?: ProjectStatus) {
 		const current = project.value
 		const thread = threadQuery.data.value
 		if (!canSubmit.value || !current || !thread || messages.generating.value) return
+		if (!status && !canAddIssues.value) return
 		let mutationStarted = false
 		try {
 			if (disclosures.hasChanges.value || disclosures.saving.value)
 				throw new Error(formatMessage(errors.unsaved))
 			if (panels.validationErrors.value.length) throw new Error(formatMessage(errors.missing))
-			if (['approved', 'unlisted', 'private'].includes(status) && !canApprove.value)
+			if (status && ['approved', 'unlisted', 'private'].includes(status) && !canApprove.value)
 				throw new Error(formatMessage(errors.unresolved))
 			const decision: ReviewDecision = {
 				projectId: current.id,
 				threadId: current.thread_id,
 				status,
-				body: draft.value,
-				images: [...uploadedImages.value],
+				body: status ? draft.value : '',
+				images: status ? [...uploadedImages.value] : [],
 				privateMessage: false,
-				facetUpdates: [...previousIssues.facetUpdates.value],
+				facetUpdates: status ? [...previousIssues.facetUpdates.value] : [],
 				issues: selectedIssues(),
 			}
 			mutationStarted = true
@@ -254,9 +260,11 @@ export function createReviewSubmission(
 		pending,
 		canSubmit,
 		canApprove,
+		canAddIssues,
 		loadingAction,
 		submit,
-		submitDecision,
+		submitDecision: (status: ProjectStatus) => submitReview(status),
+		submitIssues: () => submitReview(),
 		uploadImage: (file: File) => upload.mutateAsync({ file, id: project.value?.id ?? '' }),
 	}
 }
