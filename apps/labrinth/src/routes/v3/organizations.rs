@@ -944,6 +944,14 @@ pub async fn organization_projects_add(
                 "the specified organization does not exist!".to_string()
             })?;
 
+    let mut project_info = project_info.into_inner();
+    crate::routes::resolve_body_refs(
+        vec![&mut project_info.project_id],
+        &Some(current_user.clone()),
+        &pool,
+        &redis,
+    )
+    .await?;
     let project_item = database::models::DBProject::get(
         &project_info.project_id,
         &**pool,
@@ -1106,6 +1114,19 @@ pub async fn organization_projects_remove(
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
+    if let Some(response) = crate::routes::redirect_ref(
+        &req,
+        "project_id",
+        pool.as_ref(),
+        redis.as_ref(),
+        session_queue.as_ref(),
+        Scopes::PROJECT_WRITE | Scopes::ORGANIZATION_WRITE,
+    )
+    .await?
+    {
+        return Ok(response);
+    }
+
     let (organization_id, project_id) = info.into_inner();
     let current_user = get_user_from_headers(
         &req,

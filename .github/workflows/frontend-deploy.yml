@@ -138,17 +138,6 @@ jobs:
           BUILD_ENV: ${{ steps.meta.outputs.env }}
           PREVIEW: ${{ inputs.preview && 'true' || 'false' }}
 
-      - name: Create Sentry release and upload sourcemaps
-        uses: getsentry/action-release@ff07929a6537bac57790c3451cf4d364aca38528 # v3.7.0
-        env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: modrinth
-          SENTRY_PROJECT: knossos-server
-        with:
-          environment: ${{ steps.meta.outputs.env }}
-          sourcemaps: ./apps/frontend/.output/server
-          url_prefix: '~/'
-
       - name: Install Wrangler CLI
         uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
         with:

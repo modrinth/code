@@ -667,7 +667,7 @@ const uploadBanner = async () => {
 	try {
 		const existingBanner = project.value.gallery?.find((img) => img.name === MC_SERVER_BANNER_NAME)
 		if (existingBanner) {
-			await labrinth.projects_v3.deleteGalleryImage(project.value.id, existingBanner.url)
+			await labrinth.projects_v3.deleteGalleryImage(existingBanner.url)
 		}
 
 		const ext = bannerFile.value.type.split('/').pop() ?? 'png'
@@ -696,7 +696,7 @@ const deleteBanner = async () => {
 	try {
 		const bannerImage = project.value.gallery?.find((img) => img.name === MC_SERVER_BANNER_NAME)
 		if (bannerImage) {
-			await labrinth.projects_v3.deleteGalleryImage(project.value.id, bannerImage.url)
+			await labrinth.projects_v3.deleteGalleryImage(bannerImage.url)
 			await invalidate()
 			addNotification({
 				title: 'Banner removed',
