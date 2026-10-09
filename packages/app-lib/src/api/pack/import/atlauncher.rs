@@ -211,12 +211,14 @@ async fn import_atlauncher_unmanaged(
         })?;
 
     let game_version = atinstance.id;
+    let state = State::get().await?;
 
     let loader_version = if mod_loader != ModLoader::Vanilla {
         crate::launcher::get_loader_version_from_profile(
             &game_version,
             mod_loader,
             Some(&atinstance.launcher.loader_version.version),
+            &state.directories,
         )
         .await?
     } else {
@@ -262,14 +264,7 @@ async fn import_atlauncher_unmanaged(
     .await?;
 
     // Moves .minecraft folder over (ie: overrides such as resourcepacks, mods, etc)
-    let state = State::get().await?;
-    finish_import(
-        instance_id,
-        minecraft_folder,
-        &state.io_semaphore,
-        reporter,
-        details,
-    )
-    .await?;
+    finish_import(instance_id, minecraft_folder, &state, reporter, details)
+        .await?;
     Ok(())
 }

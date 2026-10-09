@@ -3,6 +3,7 @@ use super::model::{
     InstallJobState, InstallPhaseDetails, InstallPhaseId, InstallProgress,
 };
 use super::store;
+use sqlx::SqlitePool;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 use tokio::sync::Mutex;
@@ -14,6 +15,7 @@ const CONTENT_PROGRESS_PERSIST_STEPS: u64 = 25;
 #[derive(Clone, Debug)]
 pub struct InstallProgressReporter {
     job_id: Uuid,
+    pool: SqlitePool,
     state: Arc<Mutex<InstallProgressReporterState>>,
 }
 
@@ -25,9 +27,10 @@ struct InstallProgressReporterState {
 }
 
 impl InstallProgressReporter {
-    pub fn new(job_id: Uuid, state: InstallJobState) -> Self {
+    pub fn new(job_id: Uuid, state: InstallJobState, pool: SqlitePool) -> Self {
         Self {
             job_id,
+            pool,
             state: Arc::new(Mutex::new(InstallProgressReporterState {
                 job: state,
                 last_persisted_at: Instant::now(),
@@ -71,30 +74,24 @@ impl InstallProgressReporter {
         context: Option<InstallErrorContext>,
         persist: bool,
     ) -> crate::Result<()> {
-        let app_state = if persist {
-            Some(crate::State::get().await?)
-        } else {
-            None
-        };
         let mut state = self.state.lock().await;
         state.job.set_context(context);
 
-        let Some(app_state) = app_state else {
+        if !persist {
             return Ok(());
-        };
+        }
 
         let record =
-            store::update_state(self.job_id, &state.job, &app_state).await?;
+            store::update_state(self.job_id, &state.job, &self.pool).await?;
         state.mark_persisted();
         emit_install_job(&record.snapshot()).await
     }
 
     pub async fn persist(&self) -> crate::Result<InstallJobSnapshot> {
-        let app_state = crate::State::get().await?;
         let mut state = self.state.lock().await;
 
         let record =
-            store::update_state(self.job_id, &state.job, &app_state).await?;
+            store::update_state(self.job_id, &state.job, &self.pool).await?;
         state.mark_persisted();
         let snapshot = record.snapshot();
         emit_install_job(&snapshot).await?;
@@ -131,7 +128,6 @@ impl InstallProgressReporter {
         events: Vec<InstallJobEventKind>,
     ) -> crate::Result<()> {
         super::control::checkpoint(self.job_id).await?;
-        let app_state = crate::State::get().await?;
         let mut state = self.state.lock().await;
         let phase_started = state.job.progress.phase != phase
             || matches!(
@@ -149,7 +145,7 @@ impl InstallProgressReporter {
         }
 
         let record =
-            store::update_state(self.job_id, &state.job, &app_state).await?;
+            store::update_state(self.job_id, &state.job, &self.pool).await?;
         state.mark_persisted();
         emit_install_job(&record.snapshot()).await
     }

@@ -49,6 +49,7 @@ pub(crate) async fn create_instance(
                 &input.game_version,
                 input.loader,
                 input.loader_version.as_deref(),
+                &state.directories,
             )
             .await?
             .map(|value| value.id)

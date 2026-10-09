@@ -77,12 +77,14 @@ pub async fn import_gdlauncher(
     let game_version = config.loader.mc_version;
     let mod_loader = config.loader.loader_type;
     let loader_version = config.loader.loader_version;
+    let state = State::get().await?;
 
     let loader_version = if mod_loader != ModLoader::Vanilla {
         crate::launcher::get_loader_version_from_profile(
             &game_version,
             mod_loader,
             loader_version.as_deref(),
+            &state.directories,
         )
         .await?
     } else {
@@ -114,11 +116,10 @@ pub async fn import_gdlauncher(
     .await?;
 
     // Copy in contained folders as overrides
-    let state = State::get().await?;
     finish_import(
         instance_id,
         gdlauncher_instance_folder,
-        &state.io_semaphore,
+        &state,
         reporter,
         details,
     )

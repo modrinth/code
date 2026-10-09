@@ -674,6 +674,7 @@ async fn apply_shared_instance_content_inner(
             location,
             instance_id.to_string(),
             DownloadReason::Modpack,
+            &state.pool,
         )
         .await?;
     } else {
@@ -714,7 +715,12 @@ async fn apply_shared_instance_content_inner(
         crate::launcher::install_minecraft_with_reporter(
             &context,
             false,
-            Some(InstallProgressReporter::new(job_id, job_state.clone())),
+            Some(InstallProgressReporter::new(
+                job_id,
+                job_state.clone(),
+                state.pool.clone(),
+            )),
+            state,
         )
         .await?;
     }
