@@ -11,6 +11,16 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-10-09T22:49:09+00:00`,
+		product: 'web',
+		body: `## Changed
+- Changed the Discord link on the error page to a support link.
+- Updated graphics used for Modrinth Hosting ad.
+
+## Removed
+- Removed Modrinth Hosting x Medal five-day trial promo.`,
+	},
+	{
 		date: `2026-10-07T19:34:12+00:00`,
 		product: 'web',
 		body: `## Fixed
