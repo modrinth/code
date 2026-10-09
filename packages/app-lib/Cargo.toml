@@ -99,6 +99,7 @@ sqlx = { workspace = true, features = [
   "uuid",
 ] }
 sysinfo = { workspace = true, features = ["disk", "system"] }
+tar = { workspace = true }
 tauri = { workspace = true, features = ["unstable"], optional = true }
 tempfile = { workspace = true }
 thiserror = { workspace = true }
