@@ -1,11 +1,13 @@
-import { useRouter } from "vue-router";
-
-import type {DecompileHandler, DecompileInput, DecompilerResult} from "#ui/helpers/toolbox/decompile";
+import type {
+	DecompileHandler,
+	DecompilerMessages,
+} from "#ui/helpers/toolbox/decompile";
 import {
-	type ClientCompoundMessenger, type ClientMessenger,
+	type ClientMessenger,
 	createRegistry,
-	isWorker,
-	type MessengerType
+	type InputResolverMap,
+	type MessengerType,
+	resolveInputTransfers,
 } from '#ui/helpers/toolbox/messenger';
 // import { AtlasMessenger, handlerConstructor as atlasHandlerConstructor  } from "./atlas/common";
 import { handlerConstructor as zipHandlerConstructor,type ZipMessages } from "#ui/helpers/toolbox/workers/zip/api";
@@ -16,18 +18,18 @@ import ZipWorker from "./zip?worker";
 
 export const messengerRegistry = createRegistry();
 
-export type ZipHandlerMessenger = ClientCompoundMessenger<ZipMessages, ZipHandler>;
-export const zipHandlerType: MessengerType<ZipHandlerMessenger> = messengerRegistry.compoundMessenger<ZipMessages, ZipHandler>("zip-handler", {
+export type ZipHandlerMessenger = ClientMessenger<ZipMessages, ZipHandler>;
+
+export const zipHandlerType: MessengerType<ZipHandlerMessenger> = messengerRegistry.of<ZipMessages, ZipHandler>("zip-handler", {
     handlerConstructor: zipHandlerConstructor,
-    inputBypassHandler: import.meta.env.DEV ? (await import('./zip')).getMessageHandler() : undefined,
-    inputTransferHandler: ((input) => {
-        return input.resolve({
+    inputTransferHandler: (input) => {
+        return resolveInputTransfers(input, {
             node_write: (msg) => [msg.buffer],
             read_zip_tree: (msg) => [msg.buffer],
-        });
-    }),
-    forcedOutputHandler: (messenger, msg) => {
-        if (msg.type == "update_node_data") {
+        } as InputResolverMap<ZipMessages>);
+    },
+    independentOutputHandler: (messenger, msg) => {
+        if (msg.channel == "update_node_data") {
             const data = msg as ZipMessages['update_node_data']['output'];
 
             const root = messenger.handler.zipArchivesByHash.get(data.root);
@@ -59,23 +61,28 @@ export const zipHandlerType: MessengerType<ZipHandlerMessenger> = messengerRegis
 // });
 //
 
-type DecompileMessenger = ClientMessenger<DecompileInput, DecompilerResult, DecompileHandler>;
-export const decompileMessengerType: MessengerType<DecompileMessenger> = messengerRegistry.simpleMessenger("decompiler-vf", {
-    inputBypassHandler: import.meta.env.DEV ? async (messenger, input) => {
-		return (await import('../decompile/impl.ts')).decompileFileContent(messenger.logger, (await messengerRegistry.getMessenger(zipHandlerType)), input)
-	} : undefined,
-	handlerConstructor: (messenger) => messenger.sendMessage,
-    inputTransferHandler: (file) => [file.targetFile.content],
+type DecompileMessenger = ClientMessenger<DecompilerMessages, DecompileHandler>;
+
+export const decompileMessengerType: MessengerType<DecompileMessenger> = messengerRegistry.of<DecompilerMessages, DecompileHandler>("decompiler-vf", {
+	handlerConstructor: (messenger) => {
+		return {
+			decompile: async (input) => {
+				return await messenger.sendMessage({
+					...input,
+					channel: 'main'
+				})
+			}
+		};
+	},
+    inputTransferHandler: (input) => {
+		return resolveInputTransfers(input, {
+			main: (msg) => [msg.targetFile.content],
+		} as InputResolverMap<DecompilerMessages>)
+	},
 	shared: true,
 	timeout: 30000,
 	count: 1
 });
+
 messengerRegistry.setWorkerFactoryFor(decompileMessengerType, () => new DecompileWorker());
 messengerRegistry.setWorkerFactoryFor(zipHandlerType, () => new ZipWorker());
-
-if (!isWorker()) {
-	// TODO: IMPLEMENT CORRECT CLEANUP I.E. WHEN PROPERLY CHANGING ROOT PAGES?
-	useRouter().beforeEach((to, from, next) => {
-		if (to.params.project != from.params.project) messengerRegistry.closeAll(true);
-	})
-}

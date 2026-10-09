@@ -370,7 +370,7 @@ function reconstituteNodes<N extends ZipTreeNode>(handler: ZipHandler, root: Roo
         reconstitutedNode.parent = parent;
     }
 
-    if (node.type == "file") (node as unknown as DelegateFileZipTreeNode).finishNodeSetup(handler)
+    if (node.type == "file" || node.type == "zip") (node as unknown as DelegateFileZipTreeNode).finishNodeSetup(handler)
 
     return reconstitutedNode as N;
 }

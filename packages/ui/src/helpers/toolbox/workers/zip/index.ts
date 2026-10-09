@@ -3,7 +3,12 @@ import {
 	type FileContentPromise, type FileDetails, type FileTypeInfo,
 	type HashedFileContent, resolveContent
 } from "#ui/helpers/toolbox/file";
-import { type MessageTypes, type ServerCompoundInputHandler, setupAsCompoundServer } from "#ui/helpers/toolbox/messenger";
+import {
+	isWorker,
+	resolveOutput,
+	type ServerInputHandler,
+	setupAsServer
+} from "#ui/helpers/toolbox/messenger";
 import { zipHandlerType } from "#ui/helpers/toolbox/workers";
 import type {  ZipMessages } from "#ui/helpers/toolbox/workers/zip/api";
 import type {
@@ -56,10 +61,6 @@ function getZipNode(value: string) {
 	return undefined;
 }
 
-export function getMessageHandler<P = MessageTypes<ZipMessages>>(): ServerCompoundInputHandler<ZipMessages, P> {
-	return messageHandler as unknown as ServerCompoundInputHandler<ZipMessages, P>;
-}
-
 async function isValidFor(path: string, fileType: () => Promise<FileTypeInfo | null>, pathMatcher?: StringMatcher, mimeMatcher?: StringMatcher) {
 	if (pathMatcher) {
 		const negate = pathMatcher.negate;
@@ -83,8 +84,8 @@ async function isValidFor(path: string, fileType: () => Promise<FileTypeInfo | n
 	return true;
 }
 
-export const messageHandler: ServerCompoundInputHandler<ZipMessages> = function (messenger, msg, sender) {
-	return msg.resolve({
+export const messageHandler: ServerInputHandler<ZipMessages> = function (messenger, msg, sender) {
+	return resolveOutput(msg, {
 		lazy_read: async (msg) => {
 			const node = getNodeFrom(msg);
 
@@ -316,4 +317,5 @@ function copyNodeData<N extends ZipTreeNode>(clone: N, oldNode: N): N {
 	return clone;
 }
 
-setupAsCompoundServer(zipHandlerType, self as unknown as Worker, getMessageHandler());
+/** In development the handler is also loaded on the main thread as a bypass, where no server is set up. */
+if (isWorker()) setupAsServer(zipHandlerType, self as unknown as Worker, messageHandler);

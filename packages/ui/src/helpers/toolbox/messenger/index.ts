@@ -13,14 +13,12 @@ export interface MessengerType<M extends Messenger> {
 }
 
 export interface MessengerAccessor {
-    getMessenger: <M extends Messenger>(type: MessengerType<M>) => (M extends ClientMessenger<any, any, infer H> ? Promise<M & H> : Promise<M>) | undefined;
+    getMessenger: <M extends Messenger>(type: MessengerType<M>) => (M extends ClientMessenger<any, infer H> ? Promise<M & H> : Promise<M>) | undefined;
     getActiveMessengers: () => Messenger[];
 }
 
 export interface MessengerRegistry extends MessengerAccessor {
-    compoundMessenger<T extends MessageSchema, H, P = MessageTypes<T>>(id: string, extra?: CompoundMessengerOptions<T, H, P> & EntryOptions<ClientCompoundMessenger<T, H, P>>): MessengerType<ClientCompoundMessenger<T, H, P>>;
-
-    simpleMessenger<I, O, H>(id: string, extra?: MessengerOptions<I, O, H> & EntryOptions<ClientMessenger<I, O, H>>): MessengerType<ClientMessenger<I, O, H>>;
+    of<T extends MessageTypes, H>(id: string, extra?: MessengerOptions<T, H> & EntryOptions<ClientMessenger<T, H>>): MessengerType<ClientMessenger<T, H>>;
 
     getType<M extends Messenger>(id: string): MessengerType<M> | undefined;
 
@@ -37,26 +35,33 @@ export type EntryOptions<M extends Messenger> = { closeCallback?: (messenger: M)
 
 //--
 
-export interface Message<K extends string> { type: K }
+export type ValueBase = { [key: string]: any }
 
-// #region Compound Message Types
+export interface Message<K extends string> { channel: K }
 
-export type MessageSchema = Record<string, {input: any, output: any}>;
+type IOType<I extends ValueBase = ValueBase, O extends ValueBase = ValueBase> = { input: I, output: O }
 
-export type MessageTypes<T extends MessageSchema> =
-    T extends Record<infer K extends string, { input: any, output: any}>
-        ? { [E in K]: {type: E, input: T[E]["input"] /* & Message<E> */ /* & O */, output: T[E]["output"] /* & Message<E> */ /* & I */}; }
-        : never;
+type MessageIOType<K extends string, I extends ValueBase = ValueBase, O extends ValueBase = ValueBase> = IOType<I, O> & Message<K>
 
-export type InputMessageTypes<T extends MessageSchema, P = MessageTypes<T>> = P[Extract<keyof P, string>] extends { type: infer K extends string, input: infer I } ? I & Message<K> : never;
-export type OutputMessageTypes<T extends MessageSchema, P = MessageTypes<T>> = P[Extract<keyof P, string>] extends { type: infer K extends string, output: infer O } ? O & Message<K> : never;
-export type TypeMessageTypes<T extends MessageSchema, P = MessageTypes<T>> = P[Extract<keyof P, string>] extends { type: infer T } ? T : never;
+export type MessageSchema = Record<string, IOType>;
 
-export type InputMessageFor<T extends MessageSchema, K extends Extract<keyof P, string>, P = MessageTypes<T>> = P[K] extends { input: infer I } ? I & Message<K> : never;
-export type OutputMessageFor<T extends MessageSchema, K extends Extract<keyof P, string>, P = MessageTypes<T>> = P[K] extends { output: infer O } ? O & Message<K> : never;
+export type MessageTypes<T extends MessageSchema = MessageSchema> =
+    T extends Record<infer K extends string, IOType>
+        ? { [E in AsString<K>]: T[E] extends IOType<infer I, infer O> ? MessageIOType<E, I, O> : never; }// & { '_type_flag_fix': MessageIOType<'_type_flag_fix', {}, {}>}
+		: never;
 
-export type InputFor<T extends MessageSchema, K extends Extract<keyof P, string>, P = MessageTypes<T>> = P[K] extends { input: infer I } ? I : never;
-export type OutputFor<T extends MessageSchema, K extends Extract<keyof P, string>, P = MessageTypes<T>> = P[K] extends { output: infer O } ? O : never;
+export type AsString<T> = Extract<T, string>
+
+export type InputMessage<T extends MessageTypes, K extends AsString<keyof T> = AsString<keyof T>> =
+	T[K] extends MessageIOType<string, infer I> ? I & Message<K> : never;
+
+export type OutputMessage<T extends MessageTypes, K extends AsString<keyof T> = AsString<keyof T>> =
+	T[K] extends MessageIOType<string, object, infer O extends ValueBase> ? O & Message<K> : never;
+
+export type OutputBase<T extends MessageTypes, K extends AsString<keyof T>>  =
+	T[K] extends MessageIOType<string, object, infer O extends ValueBase> ? O : never;
+
+export type MessageChannels<T extends MessageTypes> = keyof T;
 
 // #endregion
 
@@ -71,8 +76,6 @@ export interface InstanceData {
 	timeout?: number;
 	shared: boolean;
 }
-
-export type InstanceTypes = "singleton-shared" | "temporary-exclusive" | "temporary-shared";
 
 export type InstanceKey = string;
 
@@ -91,71 +94,52 @@ export interface Messenger {
     logger: Logger;
 }
 
-export interface ServerMessenger<O = any> extends Messenger, MessengerAccessor {
+export interface ServerMessenger<O extends ValueBase> extends Messenger, MessengerAccessor {
     /**
      * @experimental TBD if this should be exposed better
      */
     sendOutputMessage(sender: Messenger, msg: Promise<PossibleTransferable<O>>): Promise<void>;
 }
 
-export interface ClientMessenger<I = any, O = any, H = never> extends Messenger  {
-    type: MessengerType<ClientMessenger<I, O, H>>,
+export interface ClientMessenger<T extends MessageTypes, H> extends Messenger {
 
-    sendMessage: (input: I) => Promise<O>;
+    type: MessengerType<ClientMessenger<T, H>>,
 
-    handler: H;
-}
-
-
-// @ts-expect-error - No worries as we are stating the the input will always have a tied to output but TS can't seem to resolve it for some reason
-export interface ClientCompoundMessenger<T extends MessageSchema, H, P = MessageTypes<T>> extends ClientMessenger<InputMessageTypes<T, P>, OutputMessageTypes<T,P>, H>/* , CompoundInputHandler<T, P> */ {
-    type: MessengerType<ClientCompoundMessenger<T, H, P>>,
-
-    sendMessage: <I_M extends InputMessageFor<T, K, P>, K extends Extract<keyof P, string>>(input: I_M) => Promise<OutputMessageFor<T, I_M["type"], P>>
+    sendMessage: <I_M extends InputMessage<T, K>, K extends AsString<keyof T>>(input: I_M) => Promise<OutputMessage<T, I_M['channel']>>
 
     handler: H;
 }
-
-export type MessengerHandlerConstructor<I, O, H = {}> = (messenger: ClientMessenger<I, O, H>) => H
-
-export type CompoundHandlerConstructor<T extends MessageSchema, H, P = MessageTypes<T>> =  (messenger: ClientCompoundMessenger<T, H, P>) => H
+export type MessengerHandlerConstructor<T extends MessageTypes, H> =  (messenger: ClientMessenger<T, H>) => H
 
 //--
 
 //--
-
 
 export type PossibleTransferable<T> = T | [T, Transferable[]];
 
-export type ClientInputUnpacker<I = any> = (input: I) => Transferable[] | undefined;
-
-
-export interface CompoundInputClientMessageExt<T extends MessageSchema, K extends Extract<keyof P, string>, P = MessageTypes<T>> extends Message<K> {
-    resolve(handlers: InputResolverMap<T, P>): Transferable[] | undefined;
+export type InputResolverMap<T extends MessageTypes> = {
+	[E in AsString<keyof T>]?: ((msg: InputMessage<T, E>) => Transferable[]) | undefined
 }
 
-export type InputResolverMap<T extends MessageSchema, P = MessageTypes<T>> = { [E in Extract<keyof P, string>]?: ((msg: InputMessageFor<T, E, P>) => Transferable[]) | undefined}
-
-export type CompoundInputClientMessage<T extends MessageSchema, K extends Extract<keyof P, string>, P = MessageTypes<T>> = CompoundInputClientMessageExt<T, K, P> & InputMessageFor<T, K, P>
-
-export type ClientCompoundInputUnpacker<T extends MessageSchema, P = MessageTypes<T>>
-    = <I_M extends CompoundInputClientMessage<T, K, P>, K extends Extract<keyof P, string>>(input: I_M) => Transferable[] | undefined;
+export type ClientInputUnpacker<T extends MessageTypes> =
+	<I_M extends InputMessage<T>>(input: I_M) => Transferable[] | undefined;
 
 // --
 
-export interface MessengerOptions<I = any, O = any, H = {}> {
-    handlerConstructor?: MessengerHandlerConstructor<I, O, H>,
-    inputBypassHandler?: ServerInputHandler<I, O>,
-    inputTransferHandler?: ClientInputUnpacker<I>;
-    forcedOutputHandler?: (messenger: ClientMessenger<I, O, H>, output: O) => boolean;
+export type ClientOutputHandler<T extends MessageTypes, H> = (messenger: ClientMessenger<T, H>, output: OutputMessage<T>) => boolean;
+
+export interface MessengerOptions<T extends MessageTypes, H> {
+    handlerConstructor?: MessengerHandlerConstructor<T, H>
+    inputBypassHandler?: ServerInputHandler<T>,
+    inputTransferHandler?: ClientInputUnpacker<T>;
+    independentOutputHandler?: ClientOutputHandler<T, H>;
 }
 
-// @ts-expect-error - No worries as we are stating the the input will always have a tied to output but TS can't seem to resolve it for some reason
-export interface CompoundMessengerOptions<T extends MessageSchema, H, P = MessageTypes<T>> extends MessengerOptions<InputMessageTypes<T, P>, OutputMessageTypes<T,P>, H> {
-    handlerConstructor?: CompoundHandlerConstructor<T, H, P>
-    inputBypassHandler?: ServerCompoundInputHandler<T, P>,
-    inputTransferHandler?: ClientCompoundInputUnpacker<T, P>;
-    forcedOutputHandler?: (messenger: ClientCompoundMessenger<T, H, P>, output: OutputMessageTypes<T, P>) => boolean;
+export interface MessengerOptionsBase<T extends MessageTypes, H> {
+	handlerConstructor?: MessengerHandlerConstructor<T, H>
+	inputBypassHandler?: ServerInputHandler<T>,
+	inputTransferHandler?: ClientInputUnpacker<T>;
+	independentOutputHandler?: ClientOutputHandler<T, H>;
 }
 
 export function createRegistry(): MessengerRegistry {
@@ -165,52 +149,41 @@ export function createRegistry(): MessengerRegistry {
 
 // WORKER SECTION
 
-export type ServerInputHandler<I = any, O = any> = (messenger: ServerMessenger<O>, input: I, sender?: Messenger) => Promise<PossibleTransferable<O>>;
+export type ServerSimpleInputHandler<I extends ValueBase, O extends ValueBase> =
+	(messenger: ServerMessenger<O>, input: I, sender?: Messenger) => Promise<PossibleTransferable<O>>;
 
+export type ServerInputHandler<T extends MessageTypes> =
+	<K extends AsString<keyof T>, I_M extends InputMessage<T, K>>(
+		messenger: ServerMessenger<OutputMessage<T>>, input: I_M, sender?: Messenger
+	) => Promise<PossibleTransferable<OutputMessage<T, K>>>
 
-export type ServerCompoundInputHandler<T extends MessageSchema, P = MessageTypes<T>>
-    = <I_M extends CompoundInputServerMessage<T, K, P>, K extends Extract<keyof P, string>>(messenger: ServerMessenger<OutputMessageTypes<T, P>>, input: I_M, sender?: Messenger) => Promise<PossibleTransferable<OutputMessageFor<T, K, P>>>
-
-
-export interface CompoundInputServerMessageExt<T extends MessageSchema, K extends Extract<keyof P, string>, P = MessageTypes<T>> extends Message<K> {
-    resolve(handlers: OutputResolverMap<T, P>): Promise<OutputMessageFor<T, K, P>>;
+export type OutputResolverMap<T extends MessageTypes> = {
+	[E in AsString<keyof T>]: (msg: InputMessage<T, E>) => Promise<PossibleTransferable<OutputBase<T, E>>>
 }
 
-export type OutputResolverMap<T extends MessageSchema, P = MessageTypes<T>> = { [E in Extract<keyof P, string>]: (msg: InputMessageFor<T, E, P>) => Promise<PossibleTransferable<OutputFor<T, E, P>>>}
-
-export type CompoundInputServerMessage<T extends MessageSchema, K extends Extract<keyof P, string>, P = MessageTypes<T>> = CompoundInputServerMessageExt<T, K, P> & InputMessageFor<T, K, P>;
-
-
-export function setupAsCompoundServer<T extends MessageSchema, P = MessageTypes<T>>(
-    type: MessengerType<Messenger>,
-    holder: ChannelHolder,
-    inputHandler: ServerCompoundInputHandler<T, P>
-): ServerMessenger {
-    // @ts-expect-error
-    return setupAsServer<InputMessageTypes<T, P>, OutputMessageTypes<T, P>>(type, holder, async (messenger, msg, sender) => {
-        const copiedMsg = {
-            ...msg,
-            resolve: (resolvers: any) => {
-                const result = (resolvers[msg.type] as ((msg: any) => any) | undefined)!(msg) as PossibleTransferable<object>;
-
-                return (Array.isArray(result)) ? [Object.assign(result[0], { type: msg.type }), result[1]] : Object.assign(result, { type: msg.type })
-            }
-        } as any;
-        return inputHandler(messenger, copiedMsg, sender);
-    });
-}
-
-export function setupAsServer<I, O>(
-    type: MessengerType<Messenger>,
-    holder: ChannelHolder,
-    inputHandler: ServerInputHandler<I, O>,
-): ServerMessenger {
-    return setupAsServerInternal(type, holder, inputHandler);
+export function setupAsServer<T extends MessageTypes>(
+    type: MessengerType<Messenger>, holder: ChannelHolder, inputHandler: ServerInputHandler<T>
+): ServerMessenger<OutputMessage<T>> {
+    return setupAsServerInternal<T>(type, holder, inputHandler);
 }
 
 export function isWorker() {
 	//@ts-expect-error TS2304: Cannot find name WorkerGlobalScope
 	return typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+}
+
+export async function resolveOutput<T extends MessageTypes, K extends AsString<keyof T>, I_M extends InputMessage<T, K>>(
+	msg: I_M, resolvers: OutputResolverMap<T>
+): Promise<PossibleTransferable<OutputMessage<T, K>>> {
+	const result = await (resolvers[msg.channel]!(msg))
+
+	return (Array.isArray(result) ? [Object.assign(result[0], { channel: msg.channel }), result[1]] : Object.assign(result, { channel: msg.channel })) as PossibleTransferable<OutputMessage<T, typeof msg['channel']>>
+}
+
+export function resolveInputTransfers<T extends MessageTypes, I_M extends InputMessage<T>>(
+	msg: I_M, resolvers: InputResolverMap<T>
+): Transferable[] | undefined {
+	return resolvers[msg.channel]?.(msg);
 }
 
 // --

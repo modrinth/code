@@ -8,57 +8,60 @@ import {
 	reconstituteRoot, type RootNodeTarget, type RootZipTreeNode, type Sha512, type SourceOptions,
 	type ZipHandler
 } from "#ui/helpers/toolbox/zip";
+import type {MessageTypes} from "#ui/helpers/toolbox/messenger";
 
 export interface DataInput {
     buffer: ArrayBuffer
 }
 
-export type ZipMessages = {
-    lazy_read: {
-		input: { key: keyof LazyDataAccess } & NodeTarget,
-		output: { value: Awaited<ReturnType<LazyDataAccess[keyof LazyDataAccess]["get"]>> }
-	},
-	source_read: {
-		input: NodeTarget & { options?: SourceOptions }
-		output: DecompilerResult
+export type ZipMessages = MessageTypes<
+	{
+		lazy_read: {
+			input: { key: keyof LazyDataAccess } & NodeTarget,
+			output: { value: Awaited<ReturnType<LazyDataAccess[keyof LazyDataAccess]["get"]>> }
+		},
+		source_read: {
+			input: NodeTarget & { options?: SourceOptions }
+			output: DecompilerResult
+		}
+		node_read: {
+			input: NodeTarget,
+			output: { buffer: ArrayBuffer }
+		},
+		node_write: {
+			input: NodeTarget & { nodeType?: "zip" | "file", options?: ZipWriterAddDataOptions } & DataInput,
+			output: { wasWritten: boolean }
+		},
+		read_zip_tree: {
+			input: { name?: string, url?: string, hash?: string } & DataInput,
+			output: { node: RootZipTreeNode }
+		},
+		get_zip_tree: {
+			input: { value: string | Sha512 },
+			output: { node: RootZipTreeNode | undefined }
+		},
+		collect_files: {
+			input: RootNodeTarget & { matcher?: FileMatcher },
+			output: { files: FileDetails[] }
+		},
+		collect_files_hashed: {
+			input: RootNodeTarget & { matcher?: FileMatcher, deduplicate?: boolean},
+			output: { files: HashedFileContent[] }
+		},
+		close_zip_tree: {
+			input: RootNodeTarget,
+			output: { err?: Error, wasClosed: boolean }
+		},
+		close_all_zip_trees: {
+			input: { },
+			output: { err?: Error, wasClosed: boolean }
+		},
+		update_node_data: {
+			input: NodeTarget,
+			output: NodeTarget
+		}
 	}
-    node_read: {
-		input: NodeTarget,
-		output: { buffer: ArrayBuffer }
-	},
-    node_write: {
-		input: NodeTarget & { nodeType?: "zip" | "file", options?: ZipWriterAddDataOptions } & DataInput,
-		output: { wasWritten: boolean }
-	},
-    read_zip_tree: {
-		input: { name?: string, url?: string, hash?: string } & DataInput,
-		output: { node: RootZipTreeNode }
-	},
-    get_zip_tree: {
-		input: { value: string | Sha512 },
-		output: { node: RootZipTreeNode | undefined }
-	},
-    collect_files: {
-		input: RootNodeTarget & { matcher?: FileMatcher },
-		output: { files: FileDetails[] }
-	},
-    collect_files_hashed: {
-		input: RootNodeTarget & { matcher?: FileMatcher, deduplicate?: boolean},
-		output: { files: HashedFileContent[] }
-	},
-    close_zip_tree: {
-		input: RootNodeTarget,
-		output: { err?: Error, wasClosed: boolean }
-	},
-    close_all_zip_trees: {
-		input: {},
-		output: { err?: Error, wasClosed: boolean }
-	},
-    update_node_data: {
-		input: NodeTarget,
-		output: NodeTarget
-	}
-}
+>
 
 export const handlerConstructor: (messenger: ZipHandlerMessenger) => ZipHandler = (messenger: ZipHandlerMessenger) => {
     const hashToUrls = new Map<string, string[]>();
@@ -66,13 +69,13 @@ export const handlerConstructor: (messenger: ZipHandlerMessenger) => ZipHandler 
         zipArchivesByHash: new Map(),
         urlToHash: new Map(),
         readLazyData: async function <K extends keyof LazyDataAccess = any>(target: FileZipTreeNode | NodeTarget, key: K): Promise<Awaited<ReturnType<LazyDataAccess[K]["get"]>>> {
-            return (await messenger.sendMessage({ type: "lazy_read", ...getAsTarget(target), key: key })).value as Awaited<ReturnType<LazyDataAccess[K]["get"]>>;
+            return (await messenger.sendMessage({ channel: "lazy_read", ...getAsTarget(target), key: key })).value as Awaited<ReturnType<LazyDataAccess[K]["get"]>>;
         },
 		readSource: async function (target: FileZipTreeNode | NodeTarget, options?: SourceOptions): Promise<DecompilerResult> {
-			return (await messenger.sendMessage({ type: 'source_read', ...getAsTarget(target), options: options}))
+			return (await messenger.sendMessage({ channel: 'source_read', ...getAsTarget(target), options: options}))
 		},
 		readNodeData: async (target: FileZipTreeNode | NodeTarget) => {
-            return (await messenger.sendMessage({ type: "node_read", ...getAsTarget(target)})).buffer
+            return (await messenger.sendMessage({ channel: "node_read", ...getAsTarget(target)})).buffer
         },
         getOrReadZipTree: async function (buffer, {name, url, hash} = {}) {
             let node: RootZipTreeNode | undefined;
@@ -94,7 +97,7 @@ export const handlerConstructor: (messenger: ZipHandlerMessenger) => ZipHandler 
                 if (node) return node;
             }
 
-            const node = reconstituteRoot(messenger.handler, (await messenger.sendMessage({ type: "read_zip_tree", buffer, name: name, url: url, hash: hash })).node);
+            const node = reconstituteRoot(messenger.handler, (await messenger.sendMessage({ channel: "read_zip_tree", buffer, name: name, url: url, hash: hash })).node);
 
             if (filteredURL) {
                 this.urlToHash.set(filteredURL, node.key);
@@ -110,17 +113,17 @@ export const handlerConstructor: (messenger: ZipHandlerMessenger) => ZipHandler 
             return node;
         },
         writeNodeData: async (target, buffer, type, options) => {
-            return (await messenger.sendMessage({type: "node_write", ...getAsTarget(target), buffer, nodeType: type, options})).wasWritten;
+            return (await messenger.sendMessage({ channel: "node_write", ...getAsTarget(target), buffer, nodeType: type, options})).wasWritten;
         },
         collectFiles: async (root, matcher) => {
-            return (await messenger.sendMessage({ type: "collect_files", matcher: matcher, root: (root as RootZipTreeNode).key ?? root})).files
+            return (await messenger.sendMessage({ channel: "collect_files", matcher: matcher, root: (root as RootZipTreeNode).key ?? root})).files
         },
         collectHashedFiles: async (root, matcher, deduplicate)=> {
-            return (await messenger.sendMessage({ type: "collect_files_hashed", matcher: matcher, root: (root as RootZipTreeNode).key ?? root, deduplicate: deduplicate})).files
+            return (await messenger.sendMessage({ channel: "collect_files_hashed", matcher: matcher, root: (root as RootZipTreeNode).key ?? root, deduplicate: deduplicate})).files
         },
         closeZipTree: async function (root){
             const hash: Sha512 = (root as RootZipTreeNode).key ?? root;
-            const value = await messenger.sendMessage({ type: "close_zip_tree", root: (root as RootZipTreeNode).key ?? root});
+            const value = await messenger.sendMessage({ channel: "close_zip_tree", root: (root as RootZipTreeNode).key ?? root});
 
             const urls = hashToUrls.get(hash);
             if (urls) for (const url of urls) this.urlToHash.delete(url);
@@ -129,7 +132,7 @@ export const handlerConstructor: (messenger: ZipHandlerMessenger) => ZipHandler 
             return value;
         },
         closeAllZipTrees: async function () {
-            const value = await messenger.sendMessage({ type: "close_all_zip_trees" });
+            const value = await messenger.sendMessage({ channel: "close_all_zip_trees" });
 
             this.zipArchivesByHash.clear();
             this.urlToHash.clear();
@@ -154,7 +157,7 @@ export const handlerConstructor: (messenger: ZipHandlerMessenger) => ZipHandler 
 
             if (localOnly) return undefined;
 
-            const rawNode = (await messenger.sendMessage({ type: "get_zip_tree", value: value })).node;
+            const rawNode = (await messenger.sendMessage({ channel: "get_zip_tree", value: value })).node;
 
             if (rawNode == undefined) return undefined;
 

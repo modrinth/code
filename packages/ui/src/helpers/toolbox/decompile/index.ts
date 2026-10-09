@@ -1,4 +1,5 @@
 import type { FileContent, FileDetails, FileTypeInfo } from "#ui/helpers/toolbox/file";
+import type {MessageTypes} from "#ui/helpers/toolbox/messenger";
 
 export const ALL_DECOMPILER_TYPES = ['cfr', 'vineflower', 'procyon', 'krakatau'] as const;
 
@@ -21,7 +22,15 @@ export const DEFAULT_DECOMPILE_OPTIONS = {
 	}
 } as const;
 
-export type DecompileHandler = (input: DecompileInput) => Promise<DecompilerResult>;
+export type DecompilerMessages = MessageTypes<
+	{
+		main: {input: DecompileInput, output: DecompilerResult}
+	}
+>
+
+export type DecompileHandler = {
+	decompile(input: DecompileInput): Promise<DecompilerResult>;
+};
 
 export interface DecompilerResult {
 	wasDecompiled: boolean,

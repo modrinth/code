@@ -1,27 +1,32 @@
-import { type EventSource,EventStream } from "#ui/helpers/toolbox/misc";
-import { type CounterCallbackData, logFactory, type Logger, type LoggerCallbackData, type LoggerFactory } from '#ui/helpers/toolbox/misc/logging';
+import {type EventSource, EventStream} from "#ui/helpers/toolbox/misc";
+import {
+	type CounterCallbackData,
+	logFactory,
+	type Logger,
+	type LoggerCallbackData,
+	type LoggerFactory
+} from '#ui/helpers/toolbox/misc/logging';
 
 import {
 	type ChannelHolder,
-	type ClientCompoundMessenger,
 	type ClientMessenger,
-	type CompoundMessengerOptions,
-	type EntryOptions,
-	type InputMessageTypes,
-type InstanceConfig,
+	type MessengerOptions,
+	type EntryOptions, type InputMessage,
+	type InstanceConfig,
 	type InstanceKey,
-	isWorker, 	type Message,
-	type MessageSchema,
+	isWorker,
+	type Message,
 	type MessageTypes,
 	type Messenger,
-	type MessengerOptions,
 	type MessengerRegistry,
 	type MessengerType,
-	type MessengerVariants,
-	type OutputMessageTypes,
-	type ServerInputHandler,
+	type MessengerVariants, type OutputMessage,
+	type OutputResolverMap,
+	type PossibleTransferable, type ServerInputHandler,
 	type ServerMessenger,
-	type TypeId} from '.';
+	type TypeId, type AsString, type InputResolverMap, type MessengerOptionsBase,
+	type ValueBase,
+} from '.';
 
 // #region MessengerType Types
 
@@ -33,13 +38,13 @@ interface MessengerTypeImpl<M extends Messenger> extends MessengerType<M> {
     instances?: (() => InternalMessenger<M>) | Map<InstanceKey, InternalMessenger<M>>;
     wrapWith: (channelHolder: () => ChannelHolder, key: InstanceKey) => InternalMessenger<M>;
 
-    getOrCreateWith: (baseMessenger?: () => ChannelHolder, instanceKey?: string) => M extends ClientMessenger<any, any, infer H> ? M & ChannelHolder & H : M & ChannelHolder;
+    getOrCreateWith: (baseMessenger?: () => ChannelHolder, instanceKey?: string) => M extends ClientMessenger<any, infer H> ? M & ChannelHolder & H : M & ChannelHolder;
     workerFactory?: () => Worker;
 
     getInstances: () => M[];
 }
 
-type WrapperFunc<M extends Messenger> = <C extends ChannelHolder>(type: MessengerTypeImpl<M>, key: InstanceKey, holder: C) => M & C & InternalMessenger;
+type WrapperFunc<M extends Messenger> = <C extends ChannelHolder>(type: MessengerTypeImpl<M>, key: InstanceKey, holder: C) => InternalMessenger<M, C>;
 
 function typeFor<M extends Messenger>(
     id: string, instanceConfig: InstanceConfig, closeCallback?: (messenger: M) => void) {
@@ -60,9 +65,7 @@ function typeFor<M extends Messenger>(
             if (instanceKey) {
                 if (holder == null) throw new Error(`Unable to create messenger for '${this.id}' as the entry used was found to be null! Did you setup the main thread worker factory or pass in the port to the call!`)
 
-                const wrappedMessenger = this.wrapWith(holder, instanceKey);
-
-                return wrappedMessenger;
+				return this.wrapWith(holder, instanceKey);
             }
 
             if (holder == null) throw new Error(`Unable to create messenger for '${this.id}' as the entry used was found to be null! Did you setup the main thread worker factory or pass in the port to the call!`)
@@ -88,7 +91,7 @@ function typeFor<M extends Messenger>(
                 (this.instances as Map<InstanceKey, M>).set(wrappedMessenger.key!, wrappedMessenger);
             }
 
-            wrappedMessenger.postMessage?.({ type: "set-key", key: wrappedMessenger.key} as SetOffThreadKeyMessage);
+            wrappedMessenger.postMessage?.({ channel: "set-key", key: wrappedMessenger.key} as SetOffThreadKeyMessage);
 
             return wrappedMessenger;
         },
@@ -97,13 +100,13 @@ function typeFor<M extends Messenger>(
                 if (this.instances != undefined) {
                     const instance = (this.instances as () => InternalMessenger<M>)();
                     closeCallback?.(instance);
-                    instance.postMessage({type: "force-close-root", forceClose: forceClosed }  as ForceCloseMessengerRootMessage)
+                    instance.postMessage({channel: "force-close-root", forceClose: forceClosed }  as ForceCloseMessengerRootMessage)
                 }
             } else {
                 const map = (this.instances as Map<InstanceKey, InternalMessenger<M>>);
                 map.values().forEach(entry => {
                     closeCallback?.(entry)
-                    entry.postMessage({type: "force-close-root", forceClose: forceClosed } as ForceCloseMessengerRootMessage)
+                    entry.postMessage({channel: "force-close-root", forceClose: forceClosed } as ForceCloseMessengerRootMessage)
                 })
                 map.clear();
             }
@@ -118,8 +121,6 @@ function typeFor<M extends Messenger>(
 // #region MessengerRegistry Types
 
 interface MessengerRegistryImpl extends MessengerRegistry {
-    setupMessengerType<I, O, H>(id: string, wrapWith: WrapperFunc<ClientMessenger<I, O, H>>, extra?: EntryOptions<ClientMessenger<I, O, H>>): MessengerType<ClientMessenger<I, O, H>>;
-
     serverMessenger?: ServerHandlerImpl,
     types: Map<string, MessengerType<any>>;
     logger: LoggerFactory;
@@ -130,31 +131,15 @@ export function createRegistryInternal(): MessengerRegistry {
     return {
         types: new Map(),
         logger: logFactory(),
-        compoundMessenger: function <T extends MessageSchema, H, P = MessageTypes<T>>(id: string, extra: CompoundMessengerOptions<T, H, P> & EntryOptions<ClientCompoundMessenger<T, H, P>>): MessengerType<ClientCompoundMessenger<T, H, P>> {
-            function wrapWith<C extends ChannelHolder>(type: MessengerTypeImpl<ClientCompoundMessenger<T, H, P>>, key: string, channelHolder: C) {
-                return setupAsCompoundClient(type, "client", key, channelHolder, extra)
-            };
-
-            // @ts-expect-error
-            return this.setupMessengerType(id, wrapWith, extra);
-        },
-        simpleMessenger: function <I, O, H>(id: string, extra: MessengerOptions<I, O, H> & EntryOptions<ClientMessenger<I, O, H>>): MessengerType<ClientMessenger<I, O, H>> {
-            function wrapWith<C extends ChannelHolder>(type: MessengerTypeImpl<ClientMessenger<I, O, H>>, key: string, channelHolder: C) {
-                return setupAsClient(type, "client", key, channelHolder, extra)
-            };
-
-            // @ts-expect-error
-            return this.setupMessengerType(id, wrapWith, extra);
-        },
-        setupMessengerType: function <I, O, H>(id: string, wrapWith: WrapperFunc<ClientMessenger<I, O, H>>, extra: MessengerOptions<I, O, H> & EntryOptions<Messenger>): MessengerType<ClientMessenger<I, O, H>> {
+		of: function <T extends MessageTypes, H>(id: string, extra: MessengerOptions<T, H> & EntryOptions<ClientMessenger<T, H>>): MessengerType<ClientMessenger<T, H>> {
             const instanceConfig: InstanceConfig = {
 				timeout: extra?.timeout ?? undefined,
 				shared: extra?.shared ?? true,
 				count: extra.count ?? 1,
 			};
-            const type = typeFor<ClientMessenger<I, O, H>>(id, instanceConfig);
+            const type = typeFor<ClientMessenger<T, H>>(id, instanceConfig);
 
-            type.wrapWith = (holder, key) => wrapWith(type, key, extra.inputBypassHandler ? {} as any : holder());
+            type.wrapWith = (holder, key) => setupAsClient(type, "client", key, extra.inputBypassHandler != null ? {} as any : holder(), extra);
 
             type.registry = this;
             type.instanceConfig = instanceConfig;
@@ -209,7 +194,7 @@ function handleInput(messenger: Messenger & ChannelHolder, taskHolder: TaskHolde
     const task = taskHolder.startTask();
 
     messenger.postMessage({
-        type: "input",
+        channel: "input",
         data: input,
         key: task.transactionKey,
     } as MessengerInputMessage, transfer ?? []);
@@ -260,19 +245,19 @@ function createTaskHolder(): TaskHolder{
     }
 }
 
-interface ClientHandlerImpl<I = any, O = any, H = {}> extends RootMessageHandler<ClientboundMessages>, ClientMessenger<I, O, H> {
+interface ClientHandlerImpl<T extends MessageTypes, H = {}> extends RootMessageHandler<ClientboundMessages>, ClientMessenger<T, H> {
     taskHolder: TaskHolder;
 }
 
 const FORCED_OUTPUT_KEY = "INTERNAL_FORCED_OUTPUT";
 
-function clientMessageHandler<I, O, H, C extends ChannelHolder>(
+function clientMessageHandler<T extends MessageTypes, H, C extends ChannelHolder>(
     messenger: InternalMessenger,
-    options: MessengerOptions<I, O, H>,
-): ClientHandlerImpl<I, O, H> & InternalMessenger<ClientHandlerImpl<I, O, H>, C> & (H extends Function ? {} : H) {
+    options: MessengerOptionsBase<T, H>,
+): ClientHandlerImpl<T, H> & InternalMessenger<ClientHandlerImpl<T, H>, C> & (H extends Function ? {} : H) {
     const taskHolder = createTaskHolder();
 
-    const sendMessage: ClientMessenger<I, O, H>["sendMessage"] = options.inputBypassHandler ? async (input) => {
+    const sendMessage: ClientMessenger<T, H>["sendMessage"] = options.inputBypassHandler ? async (input) => {
         const output = (await options.inputBypassHandler!(messenger as any, input));
         messenger.terminate();
         messenger.isAlive = false;
@@ -280,15 +265,13 @@ function clientMessageHandler<I, O, H, C extends ChannelHolder>(
         return Array.isArray(output) ? output[0] : output;
     } : (input) => handleInput(messenger, taskHolder, input, options.inputTransferHandler?.(input));
 
-    const handler = options.handlerConstructor?.(messenger as any) ?? ({} as any)
-
     const fullHandler = Object.assign(messenger, {
         taskHolder: taskHolder,
         async handleRootMessage(msg: ClientboundMessages){
-            if (msg.type == "operation-error" || msg.type == "output") {
-                handleOutputMessages(this, msg, messenger.logger, taskHolder, options.forcedOutputHandler)
+            if (msg.channel == "operation-error" || msg.channel == "output") {
+                handleOutputMessages(this, msg, messenger.logger, taskHolder, options.independentOutputHandler)
             } else if (messenger.variant == "client") {
-                if (msg.type == "logging") { // MAIN THREAD ONLY
+                if (msg.channel == "logging") { // MAIN THREAD ONLY
                     const factory = messenger.logger.factory;
                     if (msg.logMsg.type == 'callback') {
                         factory.log(...msg.logMsg.data)
@@ -298,15 +281,15 @@ function clientMessageHandler<I, O, H, C extends ChannelHolder>(
                         throw new Error(`Unknown type for logging '${(msg.logMsg as any).types}'!`)
                     }
 
-                } else if (msg.type == "setup-root") { // MAIN THREAD ONLY
+                } else if (msg.channel == "setup-root") { // MAIN THREAD ONLY
                     const registry = messenger.type.registry;
                     const newMessenger = await registry.getMessenger(registry.getType(msg.id)!) as InternalMessenger;
 
                     const channel = new MessageChannel();
 
-                    messenger.postMessage({ type: "setup-port", id: newMessenger.type.id, key: newMessenger.key, transactionKey: msg.transactionKey } as SetupMessengerPortMessage, [channel.port1])
-                    newMessenger.postMessage({ type: "setup-port", id: messenger.type.id, key: messenger.key, transactionKey: msg.transactionKey } as SetupMessengerPortMessage, [channel.port2])
-                } else if (msg.type == "close-root") {
+                    messenger.postMessage({ channel: "setup-port", id: newMessenger.type.id, key: newMessenger.key, transactionKey: msg.transactionKey } as SetupMessengerPortMessage, [channel.port1])
+                    newMessenger.postMessage({ channel: "setup-port", id: messenger.type.id, key: messenger.key, transactionKey: msg.transactionKey } as SetupMessengerPortMessage, [channel.port2])
+                } else if (msg.channel == "close-root") {
                     messenger.terminate();
                     messenger.isAlive = false;
                     messenger.onTerminate.stream.sink(true)
@@ -320,16 +303,19 @@ function clientMessageHandler<I, O, H, C extends ChannelHolder>(
             return true;
         },
         sendMessage: sendMessage,
-        handler: handler,
-    } as ClientHandlerImpl<I, O, H> & InternalMessenger);
+    } as ClientHandlerImpl<T, H> & InternalMessenger);
+
+	const handler = options.handlerConstructor?.(fullHandler as any) ?? (null as any)
+
+	fullHandler.handler = handler;
 
     if (typeof handler === "object") Object.assign(fullHandler, handler);
 
     return fullHandler as any;
 }
 
-function handleOutputMessages<I, O, H>(messenger: ClientHandlerImpl<I, O, H>, msg: MessengerOperationError | MessengerOutputMessage<any>, logger: Logger, taskHolder: TaskHolder, forcedOutputHandler?: (messenger: ClientHandlerImpl<I, O, H>, msg: O) => boolean) {
-    if (msg.type == "operation-error") {
+function handleOutputMessages<T extends MessageTypes, H>(messenger: ClientHandlerImpl<T, H>, msg: MessengerOperationError | MessengerOutputMessage, logger: Logger, taskHolder: TaskHolder, forcedOutputHandler?: (messenger: ClientHandlerImpl<T, H>, msg: OutputMessage<T>) => boolean) {
+    if (msg.channel == "operation-error") {
         if (taskHolder.hasTask(msg.key)) {
             logger.error("An error occurred when attempting to complete a task!", {err: msg.error, obj: msg.info})
         } else {
@@ -356,7 +342,7 @@ function handleOutputMessages<I, O, H>(messenger: ClientHandlerImpl<I, O, H>, ms
     }
 }
 
-interface ServerHandlerImpl<O = any> extends RootMessageHandler<ServerboundMessages>, ServerMessenger<O>, Messenger {
+interface ServerHandlerImpl<O extends ValueBase = ValueBase> extends RootMessageHandler<ServerboundMessages>, ServerMessenger<O>, Messenger {
     handleServerInput(sender: InternalMessenger, msg: MessengerInputMessage): Promise<void>;
     attemptTimeoutWait(): void;
     startShutDown(): void;
@@ -364,10 +350,10 @@ interface ServerHandlerImpl<O = any> extends RootMessageHandler<ServerboundMessa
     closePort(fullPortKey: string): void;
 }
 
-function serverMessageHandler<O = any>(
+function serverMessageHandler<T extends MessageTypes>(
     messenger: InternalMessenger,
-    onInput: ServerInputHandler
-): ServerHandlerImpl<O> & InternalMessenger  {
+    onInput: ServerInputHandler<T>
+): ServerHandlerImpl<OutputMessage<T>> & InternalMessenger  {
     let currentCloseFuncId: ReturnType<typeof setTimeout> | undefined = undefined;
     const currentInputKeys: Set<string> = new Set();
 
@@ -376,15 +362,15 @@ function serverMessageHandler<O = any>(
 
     const impl: ServerHandlerImpl & InternalMessenger = Object.assign(messenger, {
         async handleRootMessage(msg, ports) {
-            if (msg.type == "input") {
+            if (msg.channel == "input") {
                 this.handleServerInput(this, msg)
             } else if (this.variant == "server") {
-                if (msg.type == "set-key") {
+                if (msg.channel == "set-key") {
                     this.key = msg.key;
                     this.logger = this.type.registry.getLogFactory().loggerFor(debugKeyFrom(this));
-                } else if(msg.type == "setup-port") {
+                } else if(msg.channel == "setup-port") {
                     this.setupPort(msg.id, msg.transactionKey, msg.key, ports![0])
-                } else if(msg.type == "force-close-root") {
+                } else if(msg.channel == "force-close-root") {
                     if (this.instanceData.timeout != null || msg.forceClose) {
                         this.startShutDown()
                     } else {
@@ -407,18 +393,18 @@ function serverMessageHandler<O = any>(
             const logger = this.logger;
 
             try {
-                logger.debug(`Attempting to process '${msg.type}' on '${fullInstanceKeyFrom(this)}' for '${debugKeyFrom(sender)}' `, { obj: msg })
+                logger.debug(`Attempting to process '${msg.channel}' on '${fullInstanceKeyFrom(this)}' for '${debugKeyFrom(sender)}' `, { obj: msg })
 
                 const result = await onInput(this, msg.data, sender);
                 const tuple = (Array.isArray(result) ? result : [result, new Array<Transferable>()]) as [any, Transferable[]];
 
-                logger.debug(`Finished processing '${msg.type}' on '${fullInstanceKeyFrom(this)}' for '${debugKeyFrom(sender)}'!`, { obj: msg })
+                logger.debug(`Finished processing '${msg.channel}' on '${fullInstanceKeyFrom(this)}' for '${debugKeyFrom(sender)}'!`, { obj: msg })
 
-                sender.postMessage(...([{type: "output", data: tuple[0], key: msg.key} as MessengerOutputMessage, tuple[1]]))
+                sender.postMessage(...([{channel: "output", data: tuple[0], key: msg.key} as MessengerOutputMessage, tuple[1]]))
             } catch (err) {
-                logger.debug(`An error occurred when processing '${msg.type}' on '${fullInstanceKeyFrom(this)}' for '${debugKeyFrom(sender)}'!`, { obj: msg })
+                logger.debug(`An error occurred when processing '${msg.channel}' on '${fullInstanceKeyFrom(this)}' for '${debugKeyFrom(sender)}'!`, { obj: msg })
                 //logger.debug("Error has occurred on off-thread worker: ", { err: err, obj: msg})
-                sender.postMessage({ type: "operation-error", error: err, info: msg, key: msg.key} as MessengerOperationError)
+                sender.postMessage({ channel: "operation-error", error: err, info: msg, key: msg.key} as MessengerOperationError)
             }
 
             currentInputKeys.delete(transactionKey);
@@ -446,10 +432,10 @@ function serverMessageHandler<O = any>(
 
             this.isAlive = false;
 
-            peerPorts.values().forEach((messenger) => messenger.postMessage({ type: "close-port", id: messenger.type.id, key: messenger.key } as CloseMessengerPortMessage))
+            peerPorts.values().forEach((messenger) => messenger.postMessage({ channel: "close-port", id: messenger.type.id, key: messenger.key } as CloseMessengerPortMessage))
 
             setTimeout(() => {
-                this.postMessage({ type: "close-root", id: this.type.id, key: this.key } as CloseMessengerRootMessage)
+                this.postMessage({ channel: "close-root", id: this.type.id, key: this.key } as CloseMessengerRootMessage)
             }, 100)
         },
         setupPort(id, transactionKey, key, port) {
@@ -458,7 +444,8 @@ function serverMessageHandler<O = any>(
             const data = waitingForPeerPort.get(fullTransactionKey)!;
             waitingForPeerPort.delete(fullTransactionKey);
 
-            const portMessenger = ((data?.type ?? this.type.registry.getType(id)) as MessengerTypeImpl<Messenger>)!.getOrCreateWith(() => port as Messenger & MessagePort, key) as InternalMessenger<RootMessageHandler> & MessagePort;
+            const portMessenger = ((data?.type ?? this.type.registry.getType(id)) as MessengerTypeImpl<Messenger>)!
+				.getOrCreateWith(() => port as Messenger & MessagePort, key) as InternalMessenger<RootMessageHandler> & MessagePort;
 
             portMessenger.variant = "port"
 
@@ -469,9 +456,9 @@ function serverMessageHandler<O = any>(
             const portClientHandler = portClientMessageHandler(this);
 
             portMessenger.handleRootMessage = async (msg, ports) => {
-                if ((msg.type == "close-port" || msg.type == "output" || msg.type == "operation-error") && await portClientHandler(msg as ClientboundPortMessages, ports)) {
+                if ((msg.channel == "close-port" || msg.channel == "output" || msg.channel == "operation-error") && await portClientHandler(msg as ClientboundPortMessages, ports)) {
                     return true;
-                } else if (msg.type == "input") {
+                } else if (msg.channel == "input") {
                     this.handleServerInput(portMessenger, msg as MessengerInputMessage)
                 }
 
@@ -498,7 +485,7 @@ function serverMessageHandler<O = any>(
 
             waitingForPeerPort.set(`${type.id}:${transactionKey}`, { type: type, promiseHolder: holder});
 
-            this.postMessage({ type: "setup-root", id: type.id, transactionKey: transactionKey} as StartMessengerRootMessage)
+            this.postMessage({ channel: "setup-root", id: type.id, transactionKey: transactionKey} as StartMessengerRootMessage)
 
             return holder.promise as any;
         },
@@ -509,9 +496,9 @@ function serverMessageHandler<O = any>(
             const result = await msg;
             const tuple = (Array.isArray(result) ? result : [result, new Array<Transferable>()]) as [any, Transferable[]];
 
-            (sender as InternalMessenger).postMessage(...([{type: "output", data: tuple[0], key: FORCED_OUTPUT_KEY} as MessengerOutputMessage, tuple[1]]))
+            (sender as InternalMessenger).postMessage(...([{channel: "output", data: tuple[0], key: FORCED_OUTPUT_KEY} as MessengerOutputMessage, tuple[1]]))
         }
-    } as ServerHandlerImpl<O> & InternalMessenger);
+    } as ServerHandlerImpl<OutputMessage<T>> & InternalMessenger);
 
     // TODO: ADD WARNING TO PREVENT DOUBLE SERVER STUFF
     (impl.type.registry as MessengerRegistryImpl).serverMessenger = impl;
@@ -521,7 +508,7 @@ function serverMessageHandler<O = any>(
 
 function portClientMessageHandler(rootServerHandler: ServerHandlerImpl): RootMessageHandler<ClientboundPortMessages>["handleRootMessage"] {
     return async (msg) => {
-        if (msg.type == "close-port") {
+        if (msg.channel == "close-port") {
 
             rootServerHandler.closePort(fullInstanceKey(msg.id, msg.key));
             return true;
@@ -540,7 +527,7 @@ export function setupHolderAsImpl<C extends ChannelHolder, R extends RootMessage
     variant: MessengerVariants,
     key: InstanceKey | undefined,
     rootHandlerSetup: (holder: C & InternalMessenger) => C & InternalMessenger & R
-): C & Messenger & R {
+): InternalMessenger<R, C> & R {
     const infoHolder = holder as (C & InternalMessenger);
 
     if (key) infoHolder.key = key;
@@ -552,14 +539,20 @@ export function setupHolderAsImpl<C extends ChannelHolder, R extends RootMessage
 
     const messenger = rootHandlerSetup(holder as C & InternalMessenger);
 
-    if ((messenger as MessagePort).close) messenger.terminate = (messenger as MessagePort).close;
+	const close = (messenger as Partial<MessagePort>).close;
+
+    if (close != null) {
+		messenger.terminate = close.bind(messenger);
+	} else if (messenger.terminate == null) {
+		messenger.terminate = () => {};
+	}
 
     const registry = type.registry;
 
     if (variant == "server" && registry.getLogFactory() == null) {
         registry.setLogFactory(logFactory({
-            log: (level, loggerName, message, extra) => holder.postMessage({ type: "logging", logMsg: { type: 'callback', data: [level, loggerName, message, extra]}} as MessengerLogMessage),
-            counter: (level, loggerName, msg) => holder.postMessage({ type: "logging", logMsg: { type: 'counter', data: [level, loggerName, msg]}} as MessengerLogMessage)
+            log: (level, loggerName, message, extra) => holder.postMessage({ channel: "logging", logMsg: { type: 'callback', data: [level, loggerName, message, extra]}} as MessengerLogMessage),
+            counter: (level, loggerName, msg) => holder.postMessage({ channel: "logging", logMsg: { type: 'counter', data: [level, loggerName, msg]}} as MessengerLogMessage)
         }))
     }
 
@@ -567,10 +560,10 @@ export function setupHolderAsImpl<C extends ChannelHolder, R extends RootMessage
 
     messenger.onTerminate = new EventStream<OnTerminateCallback>((callbacks) => (forceClose) => callbacks.forEach((callback) => callback(forceClose))).source;
 
-    messenger.onmessage = function (e: MessageEvent<Message<string | MessengerLogMessage["type"]>>) {
+    messenger.onmessage = function (e: MessageEvent<Message<string | MessengerLogMessage["channel"]>>) {
         const msg = e.data;
 
-        if (msg.type != "logging") messenger.logger.debug(`Message '${msg.type}' received on '${debugKeyFrom(messenger)}'`, {obj: msg});
+        if (msg.channel != "logging") messenger.logger.debug(`Message '${msg.channel}' received on '${debugKeyFrom(messenger)}'`, {obj: msg});
 
         messenger.handleRootMessage(msg, e.ports);
     };
@@ -582,44 +575,48 @@ export function setupHolderAsImpl<C extends ChannelHolder, R extends RootMessage
     return messenger;
 }
 
-function setupAsCompoundClient<T extends MessageSchema, H, P = MessageTypes<T>>(
-    type: MessengerTypeImpl<Messenger>,
-    variant: MessengerVariants,
-    key: InstanceKey,
-    holder: ChannelHolder,
-    options: CompoundMessengerOptions<T, H, P>,
-): ClientCompoundMessenger<T, H, P> {
-    // @ts-expect-error
-    const extendOptions: MessengerOptions<InputMessageTypes<T, P>, OutputMessageTypes<T, P>, H> = {
-        ...options,
-        inputTransferHandler: options?.inputTransferHandler == null ? undefined : (msg) => {
-            const copied = {
-                ...msg,
-                resolve: (resolver: any) => resolver[msg.type]?.(msg) ?? []
-            }
-            return options.inputTransferHandler!(copied as any);
-        }
-    };
-    // @ts-expect-error
-    return setupAsClient<InputMessageTypes<T, P>, OutputMessageTypes<T, P>, H>(type, variant, key, holder, extendOptions) as ClientCompoundMessenger<T, H, P>;
-}
+type ServerInputHandlerBase<T extends MessageTypes>
+	= <I_M extends InputMessage<T, K>, K extends AsString<keyof T>>(
+	messenger: ServerMessenger<OutputMessage<T>>, input: I_M, sender?: Messenger
+) => Promise<PossibleTransferable<OutputMessage<T, K>>>
 
-function setupAsClient<I, O, H = {}, C extends ChannelHolder = ChannelHolder>(
+function setupAsClient<T extends MessageTypes, H, C extends ChannelHolder = ChannelHolder>(
     type: MessengerTypeImpl<Messenger>,
     variant: MessengerVariants,
     key: InstanceKey,
     holder: C,
-    options: MessengerOptions<I, O, H>,
-): ClientHandlerImpl<I, O, H> {
-    return setupHolderAsImpl<C, ClientHandlerImpl<I, O, H>>(holder, type, variant, key, (impl) => clientMessageHandler(impl, options));
+    options: MessengerOptions<T, H>,
+): InternalMessenger<ClientHandlerImpl<T, H>, C> {
+	return setupHolderAsImpl<C, ClientHandlerImpl<T, H>>(holder, type, variant, key, (impl) => clientMessageHandler(impl,
+		{
+			...options,
+			inputTransferHandler: options?.inputTransferHandler == null ? undefined : (msg) => {
+				const copied = {
+					...msg,
+					resolve: (resolver: InputResolverMap<T>) => resolver[msg.channel]?.(msg) ?? []
+				}
+				return options.inputTransferHandler!(copied);
+			},
+			inputBypassHandler: options.inputBypassHandler != null ? (
+				async (messenger, msg, sender) => {
+					const msgWithResolver = Object.assign(
+						{resolve: (resolvers: OutputResolverMap<T>) => (resolvers[msg.channel])(msg)[0]},
+						msg
+					)
+					return (await options.inputBypassHandler!(messenger, msgWithResolver, sender))[0];
+				}
+			) as ServerInputHandlerBase<T> : undefined,
+		}
+	));
 }
 
-export function setupAsServerInternal<I, O>(
-    type: MessengerType<Messenger>,
-    holder: ChannelHolder,
-    inputHandler: ServerInputHandler<I, O>,
-): ServerMessenger {
-    return setupHolderAsImpl<ChannelHolder, ServerHandlerImpl>(holder, type as MessengerTypeImpl<Messenger>, "server", undefined, (impl) => serverMessageHandler<O>(impl, inputHandler));
+export function setupAsServerInternal<T extends MessageTypes>(
+	type: MessengerType<Messenger>,
+	holder: ChannelHolder,
+	inputHandler: ServerInputHandler<T>,
+): ServerMessenger<OutputMessage<T>> {
+	return setupHolderAsImpl<ChannelHolder, ServerHandlerImpl>(holder, type as MessengerTypeImpl<Messenger>, "server", undefined,
+		(impl) => serverMessageHandler<T>(impl, inputHandler));
 }
 
 

@@ -76,7 +76,7 @@ export async function decompileFileContent(logger: Logger, zipHandler: ZipHandle
 
     try {
         // const pathParts = targetFile.fullPath.split('.jar'); \n const withoutClassSuffix = pathParts[pathParts.length - 1].slice(0, -6); \n
-        const pathParts = targetFile.fullPath.split('.jar');
+        const pathParts = targetFile.fullPath.split('.jar/');
         const withoutClassSuffix = pathParts[pathParts.length - 1].slice(0, -6);
         const buffer = targetFile.content;
         const decompiled = await (await getDecompiler(logger, options.decompiler!))

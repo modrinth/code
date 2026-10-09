@@ -226,10 +226,10 @@ class FileZipTreeNodeImpl extends ZipTreeNodeImpl implements FileZipTreeNode {
 							const lazyValue = this.arrayBuffer.lazyMap(async (buffer) => {
 								let error: string | undefined = undefined;
 
-								const decompilier = (await messengerRegistry?.getMessenger(decompileMessengerType))!;
+								const decompiler = (await messengerRegistry?.getMessenger(decompileMessengerType))!;
 
 								if (buffer != undefined) {
-									return decompilier({
+									return await decompiler.decompile({
 										targetFile: { fullPath: this.path, name: this.name, content: buffer, rootKey: this.root.key } as ZipFileContent,
 										resources: this.parent?.children.values().map(entry => { return { fullPath: entry.path, name: entry.name } }).toArray(),
 										options: options
