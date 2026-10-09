@@ -6,7 +6,7 @@ use super::model::{
 use super::store;
 use crate::state::{DirectoryInfo, ModrinthCredentials, State};
 use regex::{Captures, Regex};
-use sqlx::Row;
+use sqlx::{Row, SqlitePool};
 use std::fmt::Write as _;
 use std::io::{Read, Seek, SeekFrom};
 use std::net::{Ipv4Addr, Ipv6Addr};
@@ -49,7 +49,7 @@ pub async fn build_job_support_details(
     write_raw_snapshot(&mut details, &snapshot);
     write_latest_log(&mut details, &state.directories).await;
 
-    censor_support_text(details, state).await
+    censor_support_text(details, &state.pool).await
 }
 
 fn result_summary(
@@ -600,9 +600,9 @@ fn read_file_tail(path: &Path, max_bytes: u64) -> crate::Result<String> {
 
 async fn censor_support_text(
     mut text: String,
-    state: &State,
+    pool: &SqlitePool,
 ) -> crate::Result<String> {
-    for credentials in ModrinthCredentials::get_all(&state.pool).await? {
+    for credentials in ModrinthCredentials::get_all(pool).await? {
         replace_nonempty(
             &mut text,
             &credentials.session,
@@ -610,7 +610,7 @@ async fn censor_support_text(
         );
     }
 
-    for token in minecraft_tokens(&state.pool).await? {
+    for token in minecraft_tokens(pool).await? {
         replace_nonempty(&mut text, &token, "{MINECRAFT_TOKEN}");
     }
 

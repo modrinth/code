@@ -18,6 +18,7 @@ use async_walkdir::WalkDir;
 use chrono::Utc;
 use futures::StreamExt;
 use serde::{Deserialize, Serialize};
+use sqlx::SqlitePool;
 use std::future::Future;
 use std::path::{Path, PathBuf};
 use uuid::Uuid;
@@ -330,17 +331,17 @@ async fn restore_instance_update(
             &snapshot.copied_file_ids,
         )
         .await?;
-    restore_instance_metadata(&rollback.instance, state).await?;
+    restore_instance_metadata(&rollback.instance, &state.pool).await?;
 
     Ok(())
 }
 
 async fn restore_instance_metadata(
     metadata: &InstanceMetadata,
-    state: &State,
+    pool: &SqlitePool,
 ) -> crate::Result<()> {
     let content_set_id = metadata.applied_content_set.id.as_str();
-    let mut tx = state.pool.begin_with("BEGIN IMMEDIATE").await?;
+    let mut tx = pool.begin_with("BEGIN IMMEDIATE").await?;
     instance_rows::update_instance(&metadata.instance, &mut tx).await?;
     content_rows::update_content_set(&metadata.applied_content_set, &mut tx)
         .await?;

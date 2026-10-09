@@ -15,6 +15,7 @@ use modrinth_content_management::{
     ResolutionPreferences, ResolveContentPlan, ResolveContentRequest,
     ResolvedContent,
 };
+use sqlx::SqlitePool;
 use std::path::{Path, PathBuf};
 
 use super::content_mutation::{
@@ -325,9 +326,9 @@ async fn add_resolved_content(
 pub(crate) async fn resolve_content_scope(
     instance_id: &str,
     content_set_id: Option<&str>,
-    state: &State,
+    pool: &SqlitePool,
 ) -> crate::Result<ContentScope> {
-    let instance = instance_rows::get_instance_by_id(instance_id, &state.pool)
+    let instance = instance_rows::get_instance_by_id(instance_id, pool)
         .await?
         .ok_or_else(|| {
             crate::ErrorKind::InputError("Unknown instance".to_string())
@@ -395,7 +396,7 @@ pub(crate) async fn download_project_version_with_progress(
     state: &State,
     progress: Option<&mut fetch::FetchProgressFn<'_>>,
 ) -> crate::Result<DownloadedProjectVersion> {
-    let scope = resolve_content_scope(instance_id, None, state).await?;
+    let scope = resolve_content_scope(instance_id, None, &state.pool).await?;
     let content_set =
         content_rows::get_content_set(&scope.content_set_id, &state.pool)
             .await?
@@ -641,7 +642,7 @@ pub(crate) async fn content_source_kind_for_project_path(
     project_path: &str,
     state: &State,
 ) -> crate::Result<Option<ContentSourceKind>> {
-    let scope = resolve_content_scope(instance_id, None, state).await?;
+    let scope = resolve_content_scope(instance_id, None, &state.pool).await?;
     let Some(file) = content_rows::get_instance_file_by_relative_path(
         &scope.instance.id,
         project_path,
@@ -666,7 +667,7 @@ pub(crate) async fn is_project_locked(
     project_path: &str,
     state: &State,
 ) -> crate::Result<bool> {
-    let scope = resolve_content_scope(instance_id, None, state).await?;
+    let scope = resolve_content_scope(instance_id, None, &state.pool).await?;
     content_rows::is_instance_file_locked(
         &scope.instance.id,
         project_path,
@@ -682,7 +683,7 @@ pub(crate) async fn set_project_locked(
     state: &State,
 ) -> crate::Result<()> {
     let _content_lock = state.instance_locks.lock_content(instance_id).await;
-    let scope = resolve_content_scope(instance_id, None, state).await?;
+    let scope = resolve_content_scope(instance_id, None, &state.pool).await?;
     content_rows::set_instance_file_locked(
         &scope.instance.id,
         project_path,
@@ -700,7 +701,8 @@ pub(crate) async fn rename_project_companion_file(
 ) -> crate::Result<()> {
     let project_type = ProjectType::get_from_parent_folder(new_project_path);
     if project_type == Some(ProjectType::ShaderPack) {
-        let scope = resolve_content_scope(instance_id, None, state).await?;
+        let scope =
+            resolve_content_scope(instance_id, None, &state.pool).await?;
         let base = instance_full_path(&state.directories, &scope.instance);
 
         let old_txt_path = base.join(format!(
@@ -732,7 +734,7 @@ pub(crate) async fn list_project_files(
     instance_id: &str,
     state: &State,
 ) -> crate::Result<Vec<InstalledContentFile>> {
-    let scope = resolve_content_scope(instance_id, None, state).await?;
+    let scope = resolve_content_scope(instance_id, None, &state.pool).await?;
     let entries =
         content_rows::get_content_entries(&scope.content_set_id, &state.pool)
             .await?;
