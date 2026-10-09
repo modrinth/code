@@ -18,6 +18,7 @@ mod fabric;
 mod forge;
 mod metadata_groups;
 mod minecraft;
+mod ornithe;
 pub mod util;
 
 pub use error::{Error, ErrorKind, Result};
@@ -69,6 +70,13 @@ async fn main() -> Result<()> {
         match fabric::fetch_quilt(semaphore.clone()).await {
             Ok(fetched) => merge_fetch_result(&mut fetch_result, fetched),
             Err(err) => tracing::warn!(error = %err, "Quilt fetch failed"),
+        }
+    }
+
+    if should_fetch(only_loader.as_deref(), "ornithe") {
+        match ornithe::fetch(semaphore.clone()).await {
+            Ok(fetched) => merge_fetch_result(&mut fetch_result, fetched),
+            Err(err) => tracing::warn!(error = %err, "Ornithe fetch failed"),
         }
     }
 

@@ -274,6 +274,18 @@ async fn import_mmc_unmanaged(
     reporter: InstallProgressReporter,
     details: InstallPhaseDetails,
 ) -> crate::Result<()> {
+    // The Ornithe installer adds a regular Fabric Loader component, so only the intermediary patch tells its instances apart
+    let has_ornithe_intermediary = match minecraft_folder.parent() {
+        Some(instance_folder) => io::read(
+            instance_folder
+                .join("patches")
+                .join("net.fabricmc.intermediary.json"),
+        )
+        .await
+        .is_ok_and(|x| String::from_utf8_lossy(&x).contains("net.ornithemc")),
+        None => false,
+    };
+
     // Pack dependencies stored in mmc-pack.json, we convert to .mrpack pack dependencies
     let dependencies = mmc_pack
         .components
@@ -281,7 +293,11 @@ async fn import_mmc_unmanaged(
         .filter_map(|component| {
             if component.uid.starts_with("net.fabricmc.fabric-loader") {
                 return Some((
-                    PackDependency::FabricLoader,
+                    if has_ornithe_intermediary {
+                        PackDependency::OrnitheLoader
+                    } else {
+                        PackDependency::FabricLoader
+                    },
                     component.version.clone().unwrap_or_default(),
                 ));
             }
@@ -294,6 +310,12 @@ async fn import_mmc_unmanaged(
             if component.uid.starts_with("net.neoforged") {
                 return Some((
                     PackDependency::NeoForge,
+                    component.version.clone().unwrap_or_default(),
+                ));
+            }
+            if component.uid.starts_with("net.ornithemc.fabric-loader") {
+                return Some((
+                    PackDependency::OrnitheLoader,
                     component.version.clone().unwrap_or_default(),
                 ));
             }

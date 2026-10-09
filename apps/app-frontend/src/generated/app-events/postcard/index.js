@@ -821,6 +821,10 @@ function deserialize_MOD_LOADER(d) {
         return {
             tag: "neoforge"
         };
+    case 5:
+        return {
+            tag: "ornithe"
+        };
     default:
         throw "variant not implemented"
     }

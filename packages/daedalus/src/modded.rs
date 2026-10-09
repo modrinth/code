@@ -1,5 +1,6 @@
 use crate::minecraft::{
-    Argument, ArgumentType, Library, VersionInfo, VersionType,
+    Argument, ArgumentType, JavaVersion, Library, LoggingConfiguration,
+    LoggingSide, VersionInfo, VersionType,
 };
 use chrono::{DateTime, NaiveDateTime, Utc};
 use serde::{Deserialize, Deserializer, Serialize};
@@ -13,6 +14,8 @@ pub const CURRENT_FORGE_FORMAT_VERSION: usize = 0;
 pub const CURRENT_QUILT_FORMAT_VERSION: usize = 1;
 /// The latest version of the format the neoforge model structs deserialize to
 pub const CURRENT_NEOFORGE_FORMAT_VERSION: usize = 0;
+/// The latest version of the format the ornithe model structs deserialize to
+pub const CURRENT_ORNITHE_FORMAT_VERSION: usize = 0;
 
 /// Metadata for locating and caching a loader manifest.
 #[derive(Debug, Clone)]
@@ -73,6 +76,7 @@ fn current_loader_manifest_format_version(loader: &str) -> usize {
         "forge" => CURRENT_FORGE_FORMAT_VERSION,
         "quilt" => CURRENT_QUILT_FORMAT_VERSION,
         "neo" => CURRENT_NEOFORGE_FORMAT_VERSION,
+        "ornithe" => CURRENT_ORNITHE_FORMAT_VERSION,
         _ => 0,
     }
 }
@@ -105,6 +109,7 @@ where
     }
 
     DateTime::parse_from_rfc3339(&s)
+        .or_else(|_| DateTime::parse_from_str(&s, "%Y-%m-%dT%H:%M:%S%.f%z"))
         .map(|date| date.with_timezone(&Utc))
         .or_else(|_| {
             NaiveDateTime::parse_from_str(&s, "%Y-%m-%dT%H:%M:%S%.f")
@@ -138,6 +143,12 @@ pub struct PartialVersionInfo {
     pub arguments: Option<HashMap<ArgumentType, Vec<Argument>>>,
     /// Libraries that the version depends on
     pub libraries: Vec<Library>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    /// The Java version the loader prefers over the one the game asks for
+    pub java_version: Option<JavaVersion>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    /// The logging configuration the loader uses in place of the game's
+    pub logging: Option<HashMap<LoggingSide, LoggingConfiguration>>,
     #[serde(rename = "type")]
     /// The type of version
     pub type_: VersionType,
@@ -195,8 +206,27 @@ pub fn merge_partial_version(
         }
     }
 
+    let partial_arguments = partial.arguments.map(|args| {
+        args.into_iter()
+            .filter(|(_, arguments)| !arguments.is_empty())
+            .map(|(type_, arguments)| {
+                let arguments = arguments
+                    .into_iter()
+                    .map(|argument| match argument {
+                        Argument::Normal(value) => Argument::Normal(
+                            value.replace(DUMMY_REPLACE_STRING, &merge_id),
+                        ),
+                        ruled => ruled,
+                    })
+                    .collect();
+
+                (type_, arguments)
+            })
+            .collect::<HashMap<_, _>>()
+    });
+
     VersionInfo {
-        arguments: if let Some(partial_args) = partial.arguments {
+        arguments: if let Some(partial_args) = partial_arguments {
             if let Some(merge_args) = merge.arguments {
                 let mut new_map = HashMap::new();
 
@@ -229,7 +259,7 @@ pub fn merge_partial_version(
         assets: merge.assets,
         downloads: merge.downloads,
         id: partial.id.replace(DUMMY_REPLACE_STRING, &merge_id),
-        java_version: merge.java_version,
+        java_version: partial.java_version.or(merge.java_version),
         libraries: libraries
             .into_iter()
             .chain(partial.libraries)
@@ -239,13 +269,15 @@ pub fn merge_partial_version(
                 x
             })
             .collect::<Vec<_>>(),
-        logging: merge.logging,
+        logging: partial.logging.or(merge.logging),
         main_class: if let Some(main_class) = partial.main_class {
             main_class
         } else {
             merge.main_class
         },
-        minecraft_arguments: partial.minecraft_arguments,
+        minecraft_arguments: partial
+            .minecraft_arguments
+            .or(merge.minecraft_arguments),
         minimum_launcher_version: merge.minimum_launcher_version,
         release_time: partial.release_time,
         time: partial.time,
@@ -304,7 +336,8 @@ pub struct LoaderVersion {
 
 #[cfg(test)]
 mod tests {
-    use super::PartialVersionInfo;
+    use super::{PartialVersionInfo, merge_partial_version};
+    use crate::minecraft::{Argument, ArgumentType, VersionInfo};
     use chrono::{DateTime, Utc};
     use serde_json::json;
 
@@ -330,6 +363,8 @@ mod tests {
             ("2026-05-27T14:13:59.123+0:00", "2026-05-27T14:13:59.123Z"),
             ("2026-05-27T14:13:59+00:00", "2026-05-27T14:13:59Z"),
             ("2026-05-27T14:13:59+05:30", "2026-05-27T08:43:59Z"),
+            ("2026-05-27T14:13:59+0200", "2026-05-27T12:13:59Z"),
+            ("2026-05-27T14:13:59+0000", "2026-05-27T14:13:59Z"),
             ("2026-05-27T14:13:59Z", "2026-05-27T14:13:59Z"),
             ("2026-05-27T14:13:59", "2026-05-27T14:13:59Z"),
             ("2026-05-27T14:13:59.123", "2026-05-27T14:13:59.123Z"),
@@ -339,6 +374,85 @@ mod tests {
             assert_eq!(version.time, expected, "{input}");
             assert_eq!(version.release_time, expected, "{input}");
         }
+    }
+
+    #[test]
+    fn merge_loader_arguments_into_legacy_version() {
+        let partial: PartialVersionInfo = serde_json::from_value(json!({
+            "id": "fabric-loader-0.19.5-${modrinth.gameVersion}-ornithe-gen2",
+            "javaVersion": { "component": "java-runtime-epsilon", "majorVersion": 25 },
+            "inheritsFrom": "${modrinth.gameVersion}-vanilla",
+            "logging": { "client": {
+                "argument": "-Dlog4j.configurationFile=${path}",
+                "file": { "id": "client-1.12.xml", "sha1": "", "size": 888, "url": "" },
+                "type": "log4j2-xml"
+            } },
+            "time": "2026-05-27T14:13:59+0200",
+            "releaseTime": "2026-05-27T14:13:59+0200",
+            "arguments": {
+                "game": [],
+                "jvm": ["-Dfabric.gameVersion=${modrinth.gameVersion}"]
+            },
+            "libraries": [
+                { "name": "net.ornithemc:calamus-intermediary-gen2:${modrinth.gameVersion}" },
+                { "name": "com.google.code.gson:gson:2.10" },
+                { "name": "org.lwjgl.lwjgl:lwjgl:2.9.4+legacyfabric.15" },
+                {
+                    "name": "org.lwjgl.lwjgl:lwjgl-platform:2.9.4+legacyfabric.15",
+                    "natives": { "osx-arm64": "natives-osx" }
+                }
+            ],
+            "type": "release"
+        }))
+        .unwrap();
+        let vanilla: VersionInfo = serde_json::from_value(json!({
+            "assetIndex": { "id": "1.8", "sha1": "", "size": 0, "totalSize": 0, "url": "" },
+            "assets": "1.8",
+            "downloads": {},
+            "id": "1.8.9",
+            "javaVersion": { "component": "jre-legacy", "majorVersion": 8 },
+            "libraries": [
+                { "name": "com.google.code.gson:gson:2.2.4" },
+                { "name": "org.lwjgl.lwjgl:lwjgl:2.9.4-nightly-20150209" },
+                { "name": "org.lwjgl.lwjgl:lwjgl:2.9.2-nightly-20140822" },
+                { "name": "org.lwjgl.lwjgl:lwjgl-platform:2.9.2-nightly-20140822" }
+            ],
+            "mainClass": "net.minecraft.client.main.Main",
+            "minecraftArguments": "--username ${auth_player_name}",
+            "minimumLauncherVersion": 14,
+            "releaseTime": "2015-12-03T09:24:39+00:00",
+            "time": "2015-12-03T09:24:39+00:00",
+            "type": "release"
+        }))
+        .unwrap();
+
+        let merged = merge_partial_version(partial, vanilla);
+        let arguments = merged.arguments.unwrap();
+
+        assert!(!arguments.contains_key(&ArgumentType::Game));
+        assert!(matches!(
+            &arguments[&ArgumentType::Jvm][..],
+            [Argument::Normal(x)] if x == "-Dfabric.gameVersion=1.8.9"
+        ));
+        assert_eq!(
+            merged.minecraft_arguments.as_deref(),
+            Some("--username ${auth_player_name}")
+        );
+        assert_eq!(
+            merged
+                .libraries
+                .iter()
+                .map(|x| x.name.as_str())
+                .collect::<Vec<_>>(),
+            [
+                "net.ornithemc:calamus-intermediary-gen2:1.8.9",
+                "com.google.code.gson:gson:2.10",
+                "org.lwjgl.lwjgl:lwjgl:2.9.4+legacyfabric.15",
+                "org.lwjgl.lwjgl:lwjgl-platform:2.9.4+legacyfabric.15"
+            ]
+        );
+        assert_eq!(merged.java_version.unwrap().major_version, 25);
+        assert!(merged.logging.is_some());
     }
 
     #[test]

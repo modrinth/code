@@ -367,6 +367,9 @@ export function createLoaderParsers(
 			if ('quilt-loader' in metadata.dependencies) {
 				loaders.push('quilt')
 			}
+			if ('ornithe-loader' in metadata.dependencies) {
+				loaders.push('ornithe')
+			}
 
 			return {
 				name: `${project.title} ${metadata.versionId}`,

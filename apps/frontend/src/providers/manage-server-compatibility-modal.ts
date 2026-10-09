@@ -98,6 +98,7 @@ export function createServerCompatibilityContext(
 					if ('neoforge' in metadata.dependencies) loaders.push('neoforge')
 					if ('fabric-loader' in metadata.dependencies) loaders.push('fabric')
 					if ('quilt-loader' in metadata.dependencies) loaders.push('quilt')
+					if ('ornithe-loader' in metadata.dependencies) loaders.push('ornithe')
 					if (metadata.dependencies.minecraft) {
 						gameVersions = [metadata.dependencies.minecraft]
 					}
