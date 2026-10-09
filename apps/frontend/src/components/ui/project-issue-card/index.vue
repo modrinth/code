@@ -71,10 +71,6 @@
 					size="sm"
 				>
 					<MoreHorizontalIcon aria-hidden="true" />
-					<template #moderator-verified="{ option }">
-						<component :is="option.icon" class="text-primary" aria-hidden="true" />
-						{{ option.label }}
-					</template>
 				</TeleportOverflowMenu>
 			</div>
 			<div
@@ -433,6 +429,7 @@ function moderatorOptions(issue: ThreadIssue): ButtonMenuOption[] {
 			id: 'moderator-verified',
 			label: formatMessage(resolved ? messages.markUnresolved : messages.markVerified),
 			icon: resolved ? XCircleIcon : CheckCircleIcon,
+			tone: 'orange',
 			disabled: !issue.facets.length || verifyMutation.isPending.value,
 			action: () => {
 				if (!isStaff(auth.value.user) || verifyMutation.isPending.value) return
