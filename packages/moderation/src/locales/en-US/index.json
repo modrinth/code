@@ -440,6 +440,9 @@
   "project-review.issue-target.add-gallery-images": {
     "defaultMessage": "Add gallery images"
   },
+  "project-review.issue-target.add-project-disclosures": {
+    "defaultMessage": "Add disclosures"
+  },
   "project-review.issue-target.mark-addressed": {
     "defaultMessage": "Mark addressed"
   },
@@ -484,6 +487,9 @@
   },
   "project-review.issue-target.remove-gallery-images": {
     "defaultMessage": "Remove gallery images"
+  },
+  "project-review.issue-target.remove-icon": {
+    "defaultMessage": "Remove icon"
   },
   "project-review.issue-target.remove-project-disclosures": {
     "defaultMessage": "Remove disclosures"

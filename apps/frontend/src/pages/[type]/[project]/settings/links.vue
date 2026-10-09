@@ -551,10 +551,13 @@ const saving = ref(false)
 
 const linksIssueAction = useProjectIssueFieldAction({
 	draft: () => {
-		const linkUrls = { ...project.value.link_urls }
+		const linkUrls = Object.fromEntries(
+			Object.entries(project.value.link_urls).filter(
+				([platform]) => patchData.value[platform] !== null,
+			),
+		)
 		for (const [platform, url] of Object.entries(patchData.value)) {
-			if (url === null) delete linkUrls[platform]
-			else {
+			if (url !== null) {
 				linkUrls[platform] = {
 					platform,
 					donation: tags.value.donationPlatforms.some((tag) => tag.short === platform),

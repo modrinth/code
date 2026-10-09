@@ -3,6 +3,8 @@ import { fileURLToPath } from 'node:url'
 import type { StorybookConfig } from '@storybook/vue3-vite'
 import { mergeConfig } from 'vite'
 
+import moderationMessages from '../../moderation/vite-plugin.ts'
+
 const config: StorybookConfig = {
 	framework: {
 		name: '@storybook/vue3-vite',
@@ -17,6 +19,7 @@ const config: StorybookConfig = {
 	addons: ['@storybook/addon-themes', '@storybook/addon-a11y'],
 	viteFinal: async (config) =>
 		mergeConfig(config, {
+			plugins: [moderationMessages()],
 			build: {
 				reportCompressedSize: false,
 			},

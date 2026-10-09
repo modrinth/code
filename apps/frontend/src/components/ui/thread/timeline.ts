@@ -29,10 +29,7 @@ export function countThreadReviewIssues<T extends TimelineMessage>(
 				message.body.new_status !== 'processing',
 		)
 		.map((message) => ({ message, time: Date.parse(message.created) }))
-		.sort(
-			(a, b) =>
-				a.time - b.time || (a.message.id ?? '').localeCompare(b.message.id ?? ''),
-		)
+		.sort((a, b) => a.time - b.time || (a.message.id ?? '').localeCompare(b.message.id ?? ''))
 	const counts = new Map<T, number>()
 	const reviewWindow = 10 * 60 * 1000
 	for (const issue of issues) {

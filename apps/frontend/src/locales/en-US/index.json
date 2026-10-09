@@ -3155,6 +3155,9 @@
   "moderation.project-review.copyHash": {
     "message": "Copy {algorithm}"
   },
+  "moderation.project-review.copyValue": {
+    "message": "Copy: {value}"
+  },
   "moderation.project-review.created": {
     "message": "Created"
   },
@@ -6758,20 +6761,80 @@
   "thread.message.auto-approval": {
     "message": "resolved all issues and the project status has been automatically set to <status>approved</status>."
   },
+  "thread.message.delete": {
+    "message": "Delete"
+  },
+  "thread.message.deleted-message": {
+    "message": "posted a message that has been deleted."
+  },
+  "thread.message.legacy-project-message": {
+    "message": "This project was published on Modrinth before moderation threads existed and may be missing moderation history."
+  },
   "thread.message.moderator": {
     "message": "Moderator"
   },
   "thread.message.modrinth-team": {
     "message": "Modrinth Team"
   },
+  "thread.message.more-options": {
+    "message": "More options"
+  },
   "thread.message.open-image": {
     "message": "Open image"
+  },
+  "thread.message.preview": {
+    "message": "Preview"
+  },
+  "thread.message.private-message": {
+    "message": "Only visible to moderators"
   },
   "thread.message.project-owner": {
     "message": "Project owner"
   },
+  "thread.message.reporter": {
+    "message": "Reporter"
+  },
+  "thread.message.reverted-to-draft": {
+    "message": "reverted this project back to a <status>.</status>"
+  },
+  "thread.message.review": {
+    "message": "reviewed the project and set its status to <status>status</status>."
+  },
+  "thread.message.review-with-issues": {
+    "message": "reviewed the project and set its status to <status>status</status> with {count, plural, one {# issue} other {# issues}}."
+  },
+  "thread.message.sent-image": {
+    "message": "sent an image."
+  },
+  "thread.message.sent-message": {
+    "message": "sent a message."
+  },
+  "thread.message.status-changed": {
+    "message": "changed the project's status from <old-status>status</old-status> to <status>.</status>"
+  },
+  "thread.message.submitted-for-review": {
+    "message": "submitted the project for review."
+  },
   "thread.message.system": {
     "message": "Modrinth"
+  },
+  "thread.message.tech-review-completed": {
+    "message": "completed technical review and marked project as <status>.</status>"
+  },
+  "thread.message.tech-review-entered": {
+    "message": "The project has entered the technical review queue."
+  },
+  "thread.message.tech-review-exit-file-deleted": {
+    "message": "The project has left the technical review queue as all files pending review were deleted by the user."
+  },
+  "thread.message.tech-review-exited": {
+    "message": "The project has left the technical review queue as all pending traces have been resolved."
+  },
+  "thread.message.thread-closed": {
+    "message": "closed the thread."
+  },
+  "thread.message.thread-reopened": {
+    "message": "reopened the thread."
   },
   "ui.latest-news-row.latest-news": {
     "message": "Latest news from Modrinth"
