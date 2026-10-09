@@ -103,6 +103,9 @@ pub enum ThreadIssueTarget {
     RemoveGalleryImages {
         image_ids: NonEmptyVec<GalleryImageId>,
     },
+    AddProjectDisclosures {
+        disclosure_types: NonEmptyVec<String>,
+    },
     RemoveProjectDisclosures {
         disclosure_types: NonEmptyVec<String>,
     },
@@ -431,6 +434,26 @@ impl ThreadIssueTarget {
                 if remaining == 0 {
                     ThreadIssueValueState::SameAsSuggested
                 } else if remaining == image_ids.len() {
+                    ThreadIssueValueState::SameAsOriginal
+                } else {
+                    ThreadIssueValueState::DifferentToOriginal
+                }
+            }
+            Self::AddProjectDisclosures { disclosure_types } => {
+                let present = disclosure_types
+                    .iter()
+                    .filter(|target| {
+                        context.disclosures.iter().any(|disclosure| {
+                            disclosure.to_parts().is_ok_and(
+                                |(current_type, _)| current_type == *target,
+                            )
+                        })
+                    })
+                    .count();
+
+                if present == disclosure_types.len() {
+                    ThreadIssueValueState::SameAsSuggested
+                } else if present == 0 {
                     ThreadIssueValueState::SameAsOriginal
                 } else {
                     ThreadIssueValueState::DifferentToOriginal
