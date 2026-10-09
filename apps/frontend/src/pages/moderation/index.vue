@@ -42,7 +42,9 @@
 					<template #selected>
 						<span class="flex flex-row gap-2 align-middle font-semibold">
 							<SortAscIcon
-								v-if="currentSortType === 'Oldest' || currentSortType === 'Least external deps'"
+								v-if="
+									['Oldest', 'First submitted', 'Least external deps'].includes(currentSortType)
+								"
 								class="size-5 flex-shrink-0 text-secondary"
 							/>
 							<SortDescIcon v-else class="size-5 flex-shrink-0 text-secondary" />
@@ -270,6 +272,7 @@ const MODPACK_FILTER_TYPE = 'Modpacks'
 const baseSortTypes: ComboboxOption<string>[] = [
 	{ value: 'Oldest', label: 'Oldest' },
 	{ value: 'Newest', label: 'Newest' },
+	{ value: 'First submitted', label: 'First submitted' },
 ]
 const modpackSortTypes: ComboboxOption<string>[] = [
 	{ value: 'Most external deps', label: 'Most external deps' },
@@ -425,6 +428,8 @@ function toApiSort(label: string): Labrinth.Moderation.Internal.ProjectsSort {
 	switch (label) {
 		case 'Newest':
 			return 'newest'
+		case 'First submitted':
+			return 'oldest_initial'
 		case 'Most external deps':
 			return 'most_external_deps'
 		case 'Least external deps':
