@@ -36,6 +36,8 @@ import {
 	LoadingBar,
 	NotificationPanel,
 	PopupNotificationPanel,
+	provideFileDownload,
+	provideIconCache,
 	provideLoadingState,
 	provideModalBehavior,
 	provideModrinthClient,
@@ -45,8 +47,6 @@ import {
 	provideServerInviteHandoff,
 	provideServerOnboardingFlow,
 	provideServerPlay,
-	serverIconQueryOptions,
-	serverListQueryOptions,
 	ServerOnboardingModal,
 	TeleportOverflowMenu,
 	TooltipDirective,
@@ -72,8 +72,8 @@ import { RouterView, useRoute, useRouter } from 'vue-router'
 import { useRouteLoading } from '@/app/runtime/use-route-loading'
 import AppSidebar from '@/app/shell/sidebar/index.vue'
 import AppTitleBar from '@/app/shell/title-bar/index.vue'
+import { trackExternalFileDownload } from '@/components/ui/download-manager/external-file-downloads'
 import ErrorModal from '@/components/ui/ErrorModal.vue'
-import HostingPlayHandler from '@/components/ui/hosting/HostingPlayHandler.vue'
 import HostingUpdateRequired from '@/components/ui/HostingUpdateRequired.vue'
 import AddServerToInstanceModal from '@/components/ui/install_flow/AddServerToInstanceModal.vue'
 import UnknownPackWarningModal from '@/components/ui/install_flow/UnknownPackWarningModal.vue'
@@ -97,6 +97,12 @@ import { useInstanceMetadataRefresh } from '@/composables/use-instance-metadata-
 import { useQuickInstanceLimit } from '@/composables/use-quick-instance-limit.ts'
 import { isDarkTheme, useTheme } from '@/composables/use-theme.ts'
 import { config } from '@/config'
+import ServerPlayHandler from '@/features/hosting/play-handler.vue'
+import { prefetchHostingData } from '@/features/hosting/prefetch'
+import {
+	createInstanceLaunchState,
+	provideInstanceLaunchState,
+} from '@/features/instances/launch-state'
 import { provideMinecraftAccounts } from '@/features/minecraft-accounts/context'
 import AppSettingsModal from '@/features/settings/app-settings-modal/index.vue'
 import { provideSettingsActions } from '@/features/settings/settings-actions'
@@ -166,6 +172,8 @@ import {
 	instanceListQueryOptions,
 	screenshotKeys,
 } from '@/pages/instance/query-options'
+import { createFileDownload } from '@/platform/adapters/file-download'
+import { createIconCache } from '@/platform/adapters/icon-cache'
 import { createAppClient } from '@/platform/modrinth-client'
 import {
 	appUpdateState,
@@ -294,6 +302,10 @@ const tauriApiClient = createAppClient()
 provideModrinthClient(tauriApiClient)
 provideServerOnboardingFlow(createServerOnboardingFlow())
 provideServerInviteHandoff(createServerInviteHandoff())
+provideFileDownload(createFileDownload(tauriApiClient, trackExternalFileDownload))
+const iconCache = createIconCache()
+provideIconCache(iconCache)
+provideInstanceLaunchState(createInstanceLaunchState())
 const { data: authenticatedModrinthUser } = useQuery({
 	queryKey: computed(() => ['authenticated-user', 'campaigns', credentials.value?.user?.id]),
 	queryFn: () => tauriApiClient.labrinth.users_v3.getAuthenticated(),
@@ -358,7 +370,6 @@ const {
 	handleModpackDuplicateCreateAnyway,
 	handleModpackDuplicateGoToInstance,
 	onboardingChecklist,
-	iconCache,
 	tags,
 } = setupProviders(
 	tauriApiClient,
@@ -721,8 +732,6 @@ async function setupApp() {
 	}
 
 	Object.assign(appSettings.featureFlags, feature_flags)
-	// TODO: remove for prod
-	appSettings.featureFlags.show_server_sharing_update_modal = true
 	isMaximized.value = await traceStartupStep('Read window maximized state', () =>
 		getCurrentWindow().isMaximized(),
 	)
@@ -854,30 +863,12 @@ watch(
 	(session) => {
 		if (!session) return
 
-		queryClient.prefetchQuery(serverListQueryOptions(tauriApiClient)).then(() => {
-			if (credentials.value?.session !== session) return
-			const response = queryClient.getQueryData(['servers'])
-			return Promise.allSettled(
-				(response?.servers ?? [])
-					.filter((server) => server.status === 'available' && !server.is_medal)
-					.map(async (server) => {
-						const icon = await queryClient.fetchQuery(
-							serverIconQueryOptions(server.server_id, tauriApiClient),
-						)
-						if (icon) await iconCache.cacheIcon(icon)
-					}),
-			)
-		})
-		queryClient.prefetchQuery({
-			queryKey: ['billing', 'subscriptions'],
-			queryFn: () => tauriApiClient.labrinth.billing_internal.getSubscriptions(),
-			staleTime: 30_000,
-		})
-		queryClient.prefetchQuery({
-			queryKey: ['billing', 'payments'],
-			queryFn: () => tauriApiClient.labrinth.billing_internal.getPayments(),
-			staleTime: 30_000,
-		})
+		void prefetchHostingData(
+			queryClient,
+			tauriApiClient,
+			iconCache,
+			() => credentials.value?.session === session,
+		)
 	},
 )
 
@@ -969,13 +960,14 @@ const contentInstallModpackAlreadyInstalledModal = ref()
 const addServerToInstanceModal = ref()
 const incompatibilityWarningModal = ref()
 const installToPlayModal = ref()
-const hostingPlayHandler = ref()
-provideServerPlay({
+const serverPlayHandler = ref()
+const serverPlay = {
 	async play(target) {
-		if (!hostingPlayHandler.value) throw new Error('Server play handler is not ready.')
-		await hostingPlayHandler.value.play(target)
+		if (!serverPlayHandler.value) throw new Error('Server play handler is not ready.')
+		await serverPlayHandler.value.play(target)
 	},
-})
+}
+provideServerPlay(serverPlay)
 const sharedInstanceInviteHandler = ref()
 const updateToPlayModal = ref()
 
@@ -1558,7 +1550,7 @@ async function handleCommand(e) {
 			await run(e.id).catch(handleError)
 		}
 	} else if (e.event === 'PlayHostingServer') {
-		await hostingPlayHandler.value?.play({ serverId: e.server_id, worldId: e.world_id })
+		await serverPlay.play({ serverId: e.server_id, worldId: e.world_id }).catch(handleError)
 	} else if (e.event === 'InstallSharedInstanceInvite') {
 		await sharedInstanceInviteHandler.value?.installFromInviteId(e.invite_id)
 	} else if (e.event === 'InstallServer') {
@@ -2300,7 +2292,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		@create-anyway="handleContentInstallModpackDuplicateCreateAnyway"
 		@go-to-instance="handleContentInstallModpackDuplicateGoToInstance"
 	/>
-	<HostingPlayHandler ref="hostingPlayHandler" />
+	<ServerPlayHandler ref="serverPlayHandler" />
 	<SharedInstanceInviteHandler ref="sharedInstanceInviteHandler" />
 	<InstallToPlayModal ref="installToPlayModal" :show-external-warnings="false" />
 	<UpdateToPlayModal ref="updateToPlayModal" :show-external-warnings="false" />
