@@ -33,8 +33,11 @@
 					role="dialog"
 					aria-modal="true"
 					tabindex="-1"
-					:aria-labelledby="headerId"
+					:aria-labelledby="hideHeader ? undefined : headerId"
+					:aria-label="hideHeader ? header : undefined"
 					class="modal-body flex flex-col bg-bg-raised rounded-2xl border border-solid border-surface-5 outline-none"
+					:class="{ 'changing-stage': contentTransitioning }"
+					:inert="contentTransitioning"
 					v-bind="$attrs"
 				>
 					<div
@@ -63,16 +66,17 @@
 						</div>
 					</div>
 
-					<IconButton
-						v-if="props.mergeHeader && closable"
-						v-tooltip="closeLabel"
-						:label="closeLabel"
-						class="absolute top-4 right-4 z-10"
-						:disabled="disableClose"
-						@click="hide"
-					>
-						<XIcon aria-hidden="true" />
-					</IconButton>
+					<div v-if="props.mergeHeader && closable" class="absolute top-4 right-4 z-10">
+						<IconButton
+							v-tooltip="closeLabel"
+							:label="closeLabel"
+							type="quiet"
+							:disabled="disableClose"
+							@click="hide"
+						>
+							<XIcon aria-hidden="true" />
+						</IconButton>
+					</div>
 
 					<div v-if="scrollable" class="relative flex-1 min-h-0 flex flex-col">
 						<Transition
@@ -94,7 +98,8 @@
 							data-modal-content
 							:class="[
 								'flex-1 min-h-0 overflow-y-auto',
-								props.noPadding ? '' : 'p-6 !pb-1 sm:pb-6',
+								props.noPadding ? '' : 'p-6',
+								{ '!pb-0': $slots.actions && !actionsDivider && !props.noPadding },
 								{ 'pt-12': props.mergeHeader && closable && !props.noPadding },
 							]"
 							:style="{ maxHeight: maxContentHeight }"
@@ -124,6 +129,7 @@
 						:class="[
 							'min-h-0',
 							props.noPadding ? '' : 'overflow-y-auto p-6',
+							{ '!pb-0': $slots.actions && !actionsDivider && !props.noPadding },
 							{ 'pt-12': props.mergeHeader && closable && !props.noPadding },
 						]"
 					>
@@ -187,6 +193,7 @@ const props = withDefaults(
 		onHide?: () => void
 		onAfterHide?: () => void
 		onShow?: () => void
+		onAfterShow?: () => void
 		beforeHide?: () => boolean
 		initialFocus?: () => HTMLElement | null
 		mergeHeader?: boolean
@@ -217,6 +224,7 @@ const props = withDefaults(
 		onHide: () => {},
 		onAfterHide: () => {},
 		onShow: () => {},
+		onAfterShow: () => {},
 		beforeHide: undefined,
 		initialFocus: undefined,
 		mergeHeader: false,
@@ -276,6 +284,9 @@ const open = ref(false)
 const visible = ref(false)
 const stackDepth = ref(0)
 const modalBodyRef = ref<HTMLElement | null>(null)
+const contentTransitioning = ref(false)
+let contentTransitionRun = 0
+let contentAnimations: Animation[] = []
 const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
 let previousHeight: number | undefined
 let resizeAnimation: Animation | undefined
@@ -293,7 +304,7 @@ watch([modalBodyRef, visible, () => props.animateResize, prefersReducedMotion], 
 })
 
 useResizeObserver(modalBodyRef, ([entry]) => {
-	if (!entry || resizeAnimation) return
+	if (!entry || resizeAnimation || contentTransitioning.value) return
 
 	const height = entry.borderBoxSize[0]?.blockSize ?? modalBodyRef.value?.offsetHeight
 	if (height === undefined) return
@@ -422,7 +433,74 @@ function nextRenderedModalDepth(): number {
 		}, 0)
 }
 
+function cancelContentTransition() {
+	contentTransitionRun++
+	for (const animation of contentAnimations) animation.cancel()
+	contentAnimations = []
+	contentTransitioning.value = false
+}
+
+async function transitionContent(update: () => void) {
+	const body = modalBodyRef.value
+	if (!body || !visible.value || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+		update()
+		await nextTick()
+		checkScrollState()
+		return
+	}
+
+	const run = ++contentTransitionRun
+	const hadFocus = isFocusInsideModal()
+	resetResizeAnimation()
+	const before = { width: getComputedStyle(body).width, height: getComputedStyle(body).height }
+	contentTransitioning.value = true
+	const outgoing = Array.from(body.children, (element) =>
+		element.animate([{ opacity: 1 }, { opacity: 0 }], {
+			duration: 200,
+			easing: 'ease-in',
+			fill: 'both',
+		}),
+	)
+	contentAnimations = outgoing
+	await Promise.all(outgoing.map((animation) => animation.finished.catch(() => {})))
+	if (run !== contentTransitionRun) return
+
+	update()
+	await nextTick()
+	if (run !== contentTransitionRun) return
+	for (const animation of outgoing) animation.cancel()
+	const after = { width: getComputedStyle(body).width, height: getComputedStyle(body).height }
+	const timing: KeyframeAnimationOptions = {
+		duration: 200,
+		easing: 'cubic-bezier(0.2, 0, 0, 1)',
+		fill: 'both',
+	}
+	const incoming = Array.from(body.children, (element) => {
+		const style = getComputedStyle(element)
+		const layout = { width: style.width, height: style.height, flex: '0 0 auto' }
+		return element.animate(
+			[
+				{ ...layout, opacity: 0 },
+				{ ...layout, opacity: 1 },
+			],
+			timing,
+		)
+	})
+	contentAnimations = [...incoming, body.animate([before, after], timing)]
+	await Promise.all(contentAnimations.map((animation) => animation.finished.catch(() => {})))
+	if (run !== contentTransitionRun) return
+
+	contentTransitioning.value = false
+	await nextTick()
+	if (run !== contentTransitionRun) return
+	for (const animation of contentAnimations) animation.cancel()
+	contentAnimations = []
+	checkScrollState()
+	if (hadFocus && !isFocusInsideModal()) focusModal()
+}
+
 function show(event?: MouseEvent) {
+	cancelContentTransition()
 	if (hideTimeout) {
 		clearTimeout(hideTimeout)
 		hideTimeout = null
@@ -450,12 +528,13 @@ function show(event?: MouseEvent) {
 		visible.value = true
 		nextTick(() => {
 			scheduleFocus()
+			props.onAfterShow?.()
 		})
 	}, 50)
 }
 
 function hide(): boolean {
-	if (props.disableClose) {
+	if (props.disableClose || contentTransitioning.value) {
 		return false
 	}
 	if (props.beforeHide?.() === false) {
@@ -499,6 +578,7 @@ async function scrollToBottom(behavior: ScrollBehavior = 'smooth') {
 defineExpose({
 	show,
 	hide,
+	transitionContent,
 	checkScrollState,
 	scrollToBottom,
 })
@@ -527,6 +607,7 @@ function resetMousePosition() {
 
 onUnmounted(() => {
 	resetResizeAnimation()
+	cancelContentTransition()
 	if (hideTimeout) {
 		clearTimeout(hideTimeout)
 		hideTimeout = null
@@ -703,6 +784,14 @@ defineOptions({
 		visibility: hidden;
 		opacity: 0;
 		transition: all 0.2s ease-in-out;
+
+		&.changing-stage {
+			transition: none;
+
+			> * {
+				opacity: 0;
+			}
+		}
 
 		@media (prefers-reduced-motion) {
 			transition: none !important;

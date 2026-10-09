@@ -329,17 +329,11 @@
   "app.download-manager.duplicated-instance": {
     "message": "복제된 인스턴스"
   },
-  "app.download-manager.empty": {
-    "message": "설치 작업 없음"
-  },
   "app.download-manager.estimated-rate": {
     "message": "예상 다운로드 속도"
   },
   "app.download-manager.eta": {
     "message": "다운로드에 남은 예상 시간"
-  },
-  "app.download-manager.hide": {
-    "message": "설치 작업 숨기기"
   },
   "app.download-manager.imported-instance": {
     "message": "가져온 인스턴스"
@@ -373,9 +367,6 @@
   },
   "app.download-manager.shared-instance-update": {
     "message": "공유 인스턴스 업데이트"
-  },
-  "app.download-manager.show": {
-    "message": "설치 작업 보이기"
   },
   "app.download-manager.tasks": {
     "message": "작업"
@@ -760,39 +751,6 @@
   },
   "app.instance.share.locked.wrong-account-heading": {
     "message": "잘못된 계정"
-  },
-  "app.instance.share.members.empty": {
-    "message": "아직 참여한 사용자가 없습니다"
-  },
-  "app.instance.share.members.no-filter-results": {
-    "message": "필터에 일치하는 사용자가 없습니다."
-  },
-  "app.instance.share.remove-user-modal.effect-access": {
-    "message": "이들은 더 이상 해당 공유 인스턴스의 업데이트를 받지 않습니다"
-  },
-  "app.instance.share.remove-user-modal.effect-installed-copy": {
-    "message": "이미 설치한 사본은 해당 기기에 그대로 남아 있습니다"
-  },
-  "app.instance.share.remove-user-modal.effect-invite-again": {
-    "message": "나중에 다시 초대할 수 있습니다"
-  },
-  "app.instance.share.remove-user-modal.effect-last-user": {
-    "message": "마지막 사용자이며, 이 인스턴스의 공유가 비활성화됩니다"
-  },
-  "app.instance.share.remove-user-modal.effects-label": {
-    "message": "어떻게 되나요?"
-  },
-  "app.instance.share.remove-user-modal.header": {
-    "message": "접근 권한 제거"
-  },
-  "app.instance.share.remove-user-modal.remove-button": {
-    "message": "접근 권한 제거"
-  },
-  "app.instance.share.remove-user-modal.user-avatar-alt": {
-    "message": "{username}의 아바타"
-  },
-  "app.instance.share.remove-user-modal.warning-body": {
-    "message": "이 공유 인스턴스에서 {username} 사용자의 접근 권한을 제거하면, 해당 사용자가 업데이트를 받기 전에 다시 초대해야 합니다."
   },
   "app.instance.share.sign-in.button": {
     "message": "로그인"
@@ -3314,56 +3272,11 @@
   "app.survey.title": {
     "message": "안녕하세요, Modrinth 사용자님!"
   },
-  "app.sync-instances-update.badge": {
-    "message": "이번 업데이트로 추가됨"
-  },
-  "app.sync-instances-update.choose-source.all": {
-    "message": "게임 설정, 리소스 팩, 명령어 기록, 크리에이티브 단축바, 멀티플레이 서버를 복사할 인스턴스를 선택하세요. 이 설정들은 초기 동기화에만 사용되며, 이후에는 아무 인스턴스에서 편집할 수 있습니다."
-  },
-  "app.sync-instances-update.choose-source.all-title": {
-    "message": "동기화 원본 선택"
-  },
   "app.sync-instances-update.choose-source.data-packs": {
     "message": "데이터 팩을 복사할 인스턴스를 선택합니다. 팩은 초기 동기화에만 사용되며, 이후에는 아무 인스턴스에서 편집할 수 있습니다."
   },
   "app.sync-instances-update.choose-source.resource-packs": {
     "message": "리소스 팩을 복사할 인스턴스를 선택합니다. 팩은 초기 동기화에만 사용되며, 이후에는 아무 인스턴스에서 편집할 수 있습니다."
-  },
-  "app.sync-instances-update.creative-hotbars": {
-    "message": "크리에이티브 단축바 동기화"
-  },
-  "app.sync-instances-update.description": {
-    "message": "이제 게임 설정, 서버, 리소스 팩 등의 옵션을 인스턴스 간에 동기화할 수 있습니다. 무엇을 플레이하든 전부 유지하세요!"
-  },
-  "app.sync-instances-update.load-error": {
-    "message": "동기화 설정을 불러올 수 없습니다. 다시 시도해 주세요."
-  },
-  "app.sync-instances-update.manage-later": {
-    "message": "이제 동기화를 활성화할 수 있으며 후에 앱 설정에서 관리할 수 있습니다."
-  },
-  "app.sync-instances-update.notification.description": {
-    "message": "게임 설정, 서버, 리소스 팩 등을 동기화하여 인스턴스 간에 유지하세요."
-  },
-  "app.sync-instances-update.notification.dismiss": {
-    "message": "닫기"
-  },
-  "app.sync-instances-update.notification.title": {
-    "message": "인스턴스 동기화"
-  },
-  "app.sync-instances-update.notification.view-update": {
-    "message": "업데이트 보기"
-  },
-  "app.sync-instances-update.retry": {
-    "message": "다시 시도"
-  },
-  "app.sync-instances-update.skip": {
-    "message": "건너뛰기"
-  },
-  "app.sync-instances-update.sync-all": {
-    "message": "모두 동기화"
-  },
-  "app.sync-instances-update.title": {
-    "message": "인스턴스 동기화"
   },
   "app.synced-content.change.disable-description": {
     "message": "비활성화를 이 인스턴스에서만 하는지, 아니면 모든 인스턴스에서 하는지 선택하세요. 여기서만 비활성화하면 이 인스턴스는 재정의가 활성화됩니다."
@@ -3617,9 +3530,6 @@
   "installation-settings.shared-instance.linked-title": {
     "message": "연동된 공유 인스턴스"
   },
-  "installation-settings.shared-instance.title": {
-    "message": "인스턴스 게시 취소"
-  },
   "installation-settings.shared-instance.unlink-button": {
     "message": "공유 인스턴스 연동 해제"
   },
@@ -3629,14 +3539,8 @@
   "installation-settings.shared-instance.unlinking-button": {
     "message": "연동 해제 중..."
   },
-  "installation-settings.shared-instance.unpublish-button": {
-    "message": "공유 인스턴스 게시 취소"
-  },
   "installation-settings.shared-instance.unpublish-description": {
     "message": "Modrinth에서 이 공유 인스턴스를 삭제하고 이용자에게 업데이트 전송을 중단합니다. 본인의 로컬 인스턴스는 영향을 받지 않습니다."
-  },
-  "installation-settings.shared-instance.unpublishing-button": {
-    "message": "게시 취소 중..."
   },
   "installation-settings.unlink-shared-instance.modal.admonition-body": {
     "message": "이 작업은 본인의 로컬 인스턴스에만 영향을 미칩니다. 설치된 콘텐츠는 이 기기에 유지되며, 공유 인스턴스 및 이를 이용하는 다른 사용자에게는 영향을 미치지 않습니다."
@@ -3649,12 +3553,6 @@
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
     "message": "이 작업은 Modrinth 서버에서 공유 인스턴스를 삭제합니다. Modrinth 앱에서 이를 이용 중인 사용자는 더 이상 업데이트를 받지 않지만, 본인의 로컬 인스턴스 및 콘텐츠는 이 기기에 유지됩니다."
-  },
-  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
-    "message": "공유 인스턴스 게시 취소 중"
-  },
-  "installation-settings.unpublish-shared-instance.modal.header": {
-    "message": "공유 인스턴스 게시 취소"
   },
   "instance.action.create-shortcut": {
     "message": "바로가기 만들기"
@@ -3728,219 +3626,6 @@
   "instance.files.save-as": {
     "message": "다른 이름으로 저장..."
   },
-  "instance.icon-editor.background": {
-    "message": "배경"
-  },
-  "instance.icon-editor.background.blue": {
-    "message": "파랑"
-  },
-  "instance.icon-editor.background.dark-gray": {
-    "message": "진한 회색"
-  },
-  "instance.icon-editor.background.dark-green": {
-    "message": "진한 초록"
-  },
-  "instance.icon-editor.background.gray": {
-    "message": "회색"
-  },
-  "instance.icon-editor.background.green": {
-    "message": "초록"
-  },
-  "instance.icon-editor.background.indigo": {
-    "message": "남색"
-  },
-  "instance.icon-editor.background.lavender": {
-    "message": "라벤더"
-  },
-  "instance.icon-editor.background.light-gray": {
-    "message": "연한 회색"
-  },
-  "instance.icon-editor.background.lime": {
-    "message": "연두"
-  },
-  "instance.icon-editor.background.orange": {
-    "message": "주황"
-  },
-  "instance.icon-editor.background.pink": {
-    "message": "분홍"
-  },
-  "instance.icon-editor.background.purple": {
-    "message": "보라"
-  },
-  "instance.icon-editor.background.red": {
-    "message": "빨강"
-  },
-  "instance.icon-editor.background.rose": {
-    "message": "로즈"
-  },
-  "instance.icon-editor.background.yellow": {
-    "message": "노란색"
-  },
-  "instance.icon-editor.description": {
-    "message": "요소를 섞고 조합하여 맞춤 아이콘을 만드세요."
-  },
-  "instance.icon-editor.recents": {
-    "message": "최근"
-  },
-  "instance.icon-editor.save": {
-    "message": "아이콘 저장"
-  },
-  "instance.icon-editor.surprise-me": {
-    "message": "무작위"
-  },
-  "instance.icon-editor.symbol": {
-    "message": "문양"
-  },
-  "instance.icon-editor.symbol.backpack": {
-    "message": "배낭"
-  },
-  "instance.icon-editor.symbol.beacon": {
-    "message": "신호기"
-  },
-  "instance.icon-editor.symbol.blue-shark": {
-    "message": "파랑 상어"
-  },
-  "instance.icon-editor.symbol.bookshelf": {
-    "message": "책장"
-  },
-  "instance.icon-editor.symbol.brown-bear": {
-    "message": "갈색 곰"
-  },
-  "instance.icon-editor.symbol.cake": {
-    "message": "케이크"
-  },
-  "instance.icon-editor.symbol.campfire": {
-    "message": "모닥불"
-  },
-  "instance.icon-editor.symbol.chest": {
-    "message": "상자"
-  },
-  "instance.icon-editor.symbol.cogwheel": {
-    "message": "톱니바퀴"
-  },
-  "instance.icon-editor.symbol.command-block": {
-    "message": "명령 블록"
-  },
-  "instance.icon-editor.symbol.cooking-pot": {
-    "message": "요리 냄비"
-  },
-  "instance.icon-editor.symbol.couch": {
-    "message": "소파"
-  },
-  "instance.icon-editor.symbol.crafting-table": {
-    "message": "제작대"
-  },
-  "instance.icon-editor.symbol.create-wrench": {
-    "message": "렌치"
-  },
-  "instance.icon-editor.symbol.creeper": {
-    "message": "크리퍼"
-  },
-  "instance.icon-editor.symbol.enchanting-table": {
-    "message": "마법 부여대"
-  },
-  "instance.icon-editor.symbol.ender-chest": {
-    "message": "엔더 상자"
-  },
-  "instance.icon-editor.symbol.ender-dragon": {
-    "message": "엔더 드래곤"
-  },
-  "instance.icon-editor.symbol.engine": {
-    "message": "엔진"
-  },
-  "instance.icon-editor.symbol.fabric": {
-    "message": "Fabric"
-  },
-  "instance.icon-editor.symbol.forge": {
-    "message": "Forge"
-  },
-  "instance.icon-editor.symbol.furnace": {
-    "message": "화로"
-  },
-  "instance.icon-editor.symbol.gizmo": {
-    "message": "기즈모"
-  },
-  "instance.icon-editor.symbol.globe": {
-    "message": "지구본"
-  },
-  "instance.icon-editor.symbol.grass-block": {
-    "message": "잔디 블록"
-  },
-  "instance.icon-editor.symbol.lantern": {
-    "message": "랜턴"
-  },
-  "instance.icon-editor.symbol.moobloom": {
-    "message": "꽃소"
-  },
-  "instance.icon-editor.symbol.mr-pack": {
-    "message": "미스터 팩"
-  },
-  "instance.icon-editor.symbol.neoforge": {
-    "message": "NeoForge"
-  },
-  "instance.icon-editor.symbol.orb": {
-    "message": "구슬"
-  },
-  "instance.icon-editor.symbol.oxygen-distributor": {
-    "message": "산소 분사기"
-  },
-  "instance.icon-editor.symbol.pancakes": {
-    "message": "팬케이크"
-  },
-  "instance.icon-editor.symbol.pickaxe": {
-    "message": "곡괭이"
-  },
-  "instance.icon-editor.symbol.poke-ball": {
-    "message": "몬스터볼"
-  },
-  "instance.icon-editor.symbol.quilt": {
-    "message": "Quilt"
-  },
-  "instance.icon-editor.symbol.redstone-block": {
-    "message": "레드스톤 블록"
-  },
-  "instance.icon-editor.symbol.sculk-sensor": {
-    "message": "스컬크 감지체"
-  },
-  "instance.icon-editor.symbol.skeleton": {
-    "message": "스켈레톤"
-  },
-  "instance.icon-editor.symbol.skillet": {
-    "message": "프라이팬"
-  },
-  "instance.icon-editor.symbol.slime-block": {
-    "message": "슬라임 블록"
-  },
-  "instance.icon-editor.symbol.space-helmet": {
-    "message": "우주 헬멧"
-  },
-  "instance.icon-editor.symbol.sticky-piston": {
-    "message": "끈끈이 피스톤"
-  },
-  "instance.icon-editor.symbol.sword": {
-    "message": "검"
-  },
-  "instance.icon-editor.symbol.terminal": {
-    "message": "터미널"
-  },
-  "instance.icon-editor.symbol.tiny-potato": {
-    "message": "작은 감자"
-  },
-  "instance.icon-editor.symbol.tire": {
-    "message": "타이어"
-  },
-  "instance.icon-editor.symbol.tnt": {
-    "message": "TNT"
-  },
-  "instance.icon-editor.symbol.wrenth-rinth": {
-    "message": "Modrinth 렌치"
-  },
-  "instance.icon-editor.symbol.zombie": {
-    "message": "좀비"
-  },
-  "instance.icon-editor.title": {
-    "message": "아이콘 편집기"
-  },
   "instance.last-played": {
     "message": "마지막 플레이: "
   },
@@ -3964,45 +3649,6 @@
   },
   "instance.server-modal.resource-pack": {
     "message": "리소스 팩"
-  },
-  "instance.settings.sharing.active-invites.actions": {
-    "message": "작업"
-  },
-  "instance.settings.sharing.active-invites.code": {
-    "message": "초대 링크"
-  },
-  "instance.settings.sharing.active-invites.description": {
-    "message": "초대 링크가 유효한 동안 링크를 보유한 사람은 누구나 참여할 수 있습니다."
-  },
-  "instance.settings.sharing.active-invites.empty": {
-    "message": "활성화된 초대가 없습니다."
-  },
-  "instance.settings.sharing.active-invites.expires": {
-    "message": "만료일"
-  },
-  "instance.settings.sharing.active-invites.revoke": {
-    "message": "초대 철회"
-  },
-  "instance.settings.sharing.active-invites.revoke-with-code": {
-    "message": "초대 {code} 철회"
-  },
-  "instance.settings.sharing.active-invites.title": {
-    "message": "활성화된 초대"
-  },
-  "instance.settings.sharing.active-invites.uses": {
-    "message": "사용 횟수"
-  },
-  "instance.settings.sharing.revoke-invite.admonition-body": {
-    "message": "초대 링크 <monospace>{code}</monospace> 사용이 즉시 중단됩니다. 이미 참여한 사용자는 계속 접근 권한을 유지합니다."
-  },
-  "instance.settings.sharing.revoke-invite.admonition-header": {
-    "message": "이 작업은 되돌릴 수 없습니다"
-  },
-  "instance.settings.sharing.revoke-invite.confirm": {
-    "message": "초대 철회"
-  },
-  "instance.settings.sharing.revoke-invite.header": {
-    "message": "초대 철회"
   },
   "instance.settings.synced-options.data-override": {
     "message": "이 재정의를 꺼서 동기화된 데이터를 편집합니다."
@@ -4351,9 +3997,6 @@
   },
   "instance.shared-instance.unavailable.access-revoked-text": {
     "message": "공유 인스턴스 접근 권한이 취소되었습니다. 이 인스턴스는 계속 사용 가능하지만, 더 이상 연동되지 않으며 업데이트를 받지 않습니다."
-  },
-  "instance.shared-instance.unavailable.deleted-text": {
-    "message": "기본 인스턴스가 삭제되었습니다. 이 인스턴스는 계속 사용 가능하지만, 더 이상 연동되지 않으며 업데이트를 받지 않습니다."
   },
   "instance.shared-instance.unavailable.locked-text": {
     "message": "이 공유 인스턴스는 콘텐츠 조정 팀에 의해 잠겼습니다. 기본 인스턴스 업데이트를 받지 않으며 플레이할 수 없습니다."

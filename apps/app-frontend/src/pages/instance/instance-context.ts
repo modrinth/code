@@ -3,12 +3,16 @@ import { createContext } from '@modrinth/ui'
 import type { ComputedRef, Ref } from 'vue'
 
 import type { GameInstance } from '@/helpers/types'
+import type { ServerStatus } from '@/helpers/worlds'
 
 export interface InstancePageContext {
 	readonly instanceId: ComputedRef<string>
 	readonly instance: ComputedRef<GameInstance>
 	readonly linkedProject: ComputedRef<Labrinth.Projects.v3.Project | undefined>
 	readonly isServerInstance: ComputedRef<boolean>
+	readonly serverAddress: ComputedRef<string | null | undefined>
+	readonly serverStatus: ComputedRef<ServerStatus | undefined>
+	readonly serverStatusLoading: ComputedRef<boolean>
 	readonly sharedInstanceUpdateAvailable: ComputedRef<boolean>
 	readonly offline: Readonly<Ref<boolean>>
 	readonly playing: ComputedRef<boolean>
@@ -16,6 +20,7 @@ export interface InstancePageContext {
 	readonly stopping: Readonly<Ref<boolean>>
 	refreshInstance: () => Promise<void>
 	refreshPlayState: () => Promise<void>
+	refreshServerStatus: () => Promise<void>
 	play: (source: string) => Promise<void>
 	stop: (source: string) => Promise<void>
 	playServer: () => Promise<void>

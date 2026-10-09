@@ -22,7 +22,7 @@ import type { GameInstance } from '@/helpers/types'
 import GeneralSettings from './general-settings.vue'
 import InstallationSettings from './installation-settings.vue'
 import { provideInstanceSettings } from './instance-settings-context.ts'
-import SharingSettings from './sharing-settings.vue'
+import SharingSettings from './sharing-settings/index.vue'
 import SyncedOptionsSettings from './synced-options-settings.vue'
 
 const { formatMessage } = useVIntl()

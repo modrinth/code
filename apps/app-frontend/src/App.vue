@@ -40,6 +40,8 @@ import {
 	commonSettingsMessages,
 	ContentInstallModal,
 	ContentUpdaterModal,
+	createServerInviteHandoff,
+	createServerOnboardingFlow,
 	CreationFlowModal,
 	defineMessages,
 	I18nDebugPanel,
@@ -48,11 +50,17 @@ import {
 	NewsArticleCard,
 	NotificationPanel,
 	PopupNotificationPanel,
+	provideFileDownload,
+	provideIconCache,
 	provideModalBehavior,
 	provideModrinthClient,
 	provideNotificationManager,
 	providePageContext,
 	providePopupNotificationManager,
+	provideServerInviteHandoff,
+	provideServerOnboardingFlow,
+	provideServerPlay,
+	ServerOnboardingModal,
 	TeleportOverflowMenu,
 	TextLogo,
 	TooltipDirective,
@@ -78,6 +86,7 @@ import { RouterView, useRoute, useRouter } from 'vue-router'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
 import AppActionBar from '@/components/ui/AppActionBar.vue'
 import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
+import { trackExternalFileDownload } from '@/components/ui/download-manager/external-file-downloads'
 import ErrorModal from '@/components/ui/ErrorModal.vue'
 import FriendsList from '@/components/ui/friends/FriendsList.vue'
 import HostingUpdateRequired from '@/components/ui/HostingUpdateRequired.vue'
@@ -108,6 +117,12 @@ import { useInstanceMetadataRefresh } from '@/composables/use-instance-metadata-
 import { useQuickInstanceLimit } from '@/composables/use-quick-instance-limit.ts'
 import { isDarkTheme, useTheme } from '@/composables/use-theme.ts'
 import { config } from '@/config'
+import ServerPlayHandler from '@/features/hosting/play-handler.vue'
+import { prefetchHostingData } from '@/features/hosting/prefetch'
+import {
+	createInstanceLaunchState,
+	provideInstanceLaunchState,
+} from '@/features/instances/launch-state'
 import NewUpdateModal from '@/features/updates/new-update-modal/index.vue'
 import { getAccountAppearance, rememberAccountAppearance } from '@/helpers/account-appearance.ts'
 import {
@@ -174,6 +189,8 @@ import {
 	instanceListQueryOptions,
 	screenshotKeys,
 } from '@/pages/instance/query-options'
+import { createFileDownload } from '@/platform/adapters/file-download'
+import { createIconCache } from '@/platform/adapters/icon-cache'
 import {
 	appUpdateState,
 	downloadAvailableAppUpdate,
@@ -340,6 +357,12 @@ const tauriApiClient = new TauriModrinthClient({
 	],
 })
 provideModrinthClient(tauriApiClient)
+provideServerOnboardingFlow(createServerOnboardingFlow())
+provideServerInviteHandoff(createServerInviteHandoff())
+provideFileDownload(createFileDownload(tauriApiClient, trackExternalFileDownload))
+const iconCache = createIconCache()
+provideIconCache(iconCache)
+provideInstanceLaunchState(createInstanceLaunchState())
 const { data: authenticatedModrinthUser } = useQuery({
 	queryKey: computed(() => ['authenticated-user', 'campaigns', credentials.value?.user?.id]),
 	queryFn: () => tauriApiClient.labrinth.users_v3.getAuthenticated(),
@@ -928,6 +951,7 @@ let routerToken = null
 let suspenseToken = null
 
 let suspensePending = false
+const onboardingPageReady = ref(true)
 
 const sidebarOverlayScrollbarsOptions = Object.freeze({
 	overflow: {
@@ -970,6 +994,7 @@ router.afterEach((to, from, failure) => {
 })
 
 function onSuspensePending() {
+	onboardingPageReady.value = false
 	debugStartup('Route Suspense pending', { route: route.path })
 	suspensePending = true
 	if (suspenseToken) loading.end(suspenseToken)
@@ -977,6 +1002,7 @@ function onSuspensePending() {
 }
 
 function onSuspenseResolve() {
+	onboardingPageReady.value = true
 	debugStartup('Route Suspense resolved', { route: route.path })
 	if (suspenseToken) {
 		loading.end(suspenseToken)
@@ -1001,41 +1027,22 @@ watch(stateInitialized, (ready) => {
 			loading.end(routerToken)
 			routerToken = null
 		}
-
-		queryClient.prefetchQuery({
-			queryKey: ['servers'],
-			queryFn: async () => {
-				const response = await tauriApiClient.archon.servers_v0.list({ limit: 100 })
-				const hasMedalServers = response.servers.some((s) => s.is_medal)
-				if (hasMedalServers) {
-					const subscriptions = await tauriApiClient.labrinth.billing_internal.getSubscriptions()
-					for (const server of response.servers) {
-						if (server.is_medal) {
-							const sub = subscriptions.find((s) => s.metadata?.id === server.server_id)
-							if (sub) {
-								server.medal_expires = new Date(
-									new Date(sub.created).getTime() + 5 * 86400000,
-								).toISOString()
-							}
-						}
-					}
-				}
-				return response
-			},
-			staleTime: 30_000,
-		})
-		queryClient.prefetchQuery({
-			queryKey: ['billing', 'subscriptions'],
-			queryFn: () => tauriApiClient.labrinth.billing_internal.getSubscriptions(),
-			staleTime: 30_000,
-		})
-		queryClient.prefetchQuery({
-			queryKey: ['billing', 'payments'],
-			queryFn: () => tauriApiClient.labrinth.billing_internal.getPayments(),
-			staleTime: 30_000,
-		})
 	}
 })
+
+watch(
+	() => stateInitialized.value && credentials.value?.session,
+	(session) => {
+		if (!session) return
+
+		void prefetchHostingData(
+			queryClient,
+			tauriApiClient,
+			iconCache,
+			() => credentials.value?.session === session,
+		)
+	},
+)
 
 const error = useError()
 const errorModal = ref()
@@ -1125,6 +1132,14 @@ const contentInstallModpackAlreadyInstalledModal = ref()
 const addServerToInstanceModal = ref()
 const incompatibilityWarningModal = ref()
 const installToPlayModal = ref()
+const serverPlayHandler = ref()
+const serverPlay = {
+	async play(target) {
+		if (!serverPlayHandler.value) throw new Error('Server play handler is not ready.')
+		await serverPlayHandler.value.play(target)
+	},
+}
+provideServerPlay(serverPlay)
 const sharedInstanceInviteHandler = ref()
 const updateToPlayModal = ref()
 
@@ -1706,6 +1721,8 @@ async function handleCommand(e) {
 		} else {
 			await run(e.id).catch(handleError)
 		}
+	} else if (e.event === 'PlayHostingServer') {
+		await serverPlay.play({ serverId: e.server_id, worldId: e.world_id }).catch(handleError)
 	} else if (e.event === 'InstallSharedInstanceInvite') {
 		await sharedInstanceInviteHandler.value?.installFromInviteId(e.invite_id)
 	} else if (e.event === 'InstallServer') {
@@ -2172,6 +2189,12 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			@create="handleCreate"
 			@browse-modpacks="handleBrowseModpacks"
 		/>
+		<ServerOnboardingModal
+			browse-path="/browse/modpack"
+			:get-loader-manifest="getLoaderManifest"
+			:navigate="(to) => router.push(to)"
+			:page-ready="onboardingPageReady"
+		/>
 		<IconEditorModal
 			ref="creationIconEditorModal"
 			:config="creationGeneratedIcon?.config"
@@ -2555,6 +2578,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		@create-anyway="handleContentInstallModpackDuplicateCreateAnyway"
 		@go-to-instance="handleContentInstallModpackDuplicateGoToInstance"
 	/>
+	<ServerPlayHandler ref="serverPlayHandler" />
 	<SharedInstanceInviteHandler ref="sharedInstanceInviteHandler" />
 	<InstallToPlayModal ref="installToPlayModal" :show-external-warnings="false" />
 	<UpdateToPlayModal ref="updateToPlayModal" :show-external-warnings="false" />

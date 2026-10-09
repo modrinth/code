@@ -1,11 +1,34 @@
 use super::client::*;
+use super::content::{remote_shared_config_files, remote_shared_content};
 use super::diff::*;
+use super::icons::shared_instance_server_icon;
 use super::publish::*;
 use super::types::*;
 use super::*;
 
 #[tracing::instrument]
 pub async fn install_shared_instance(
+    shared_instance_id: &str,
+    name: String,
+    manager_id: Option<String>,
+    server_manager_name: Option<String>,
+    server_manager_icon_url: Option<String>,
+    instance_icon_url: Option<String>,
+) -> crate::Result<InstallJobSnapshot> {
+    crate::util::fetch::wait_for_local_api_rate_limit(Box::pin(
+        install_shared_instance_inner(
+            shared_instance_id,
+            name,
+            manager_id,
+            server_manager_name,
+            server_manager_icon_url,
+            instance_icon_url,
+        ),
+    ))
+    .await
+}
+
+async fn install_shared_instance_inner(
     shared_instance_id: &str,
     name: String,
     manager_id: Option<String>,
@@ -23,6 +46,7 @@ pub async fn install_shared_instance(
         instance_icon_url,
         name,
         version,
+        None,
         &state,
     )
     .await?;
@@ -47,6 +71,16 @@ pub async fn get_shared_instance_install_preview(
     shared_instance_id: &str,
     name: String,
 ) -> crate::Result<SharedInstanceInstallPreview> {
+    crate::util::fetch::wait_for_local_api_rate_limit(
+        get_shared_instance_install_preview_inner(shared_instance_id, name),
+    )
+    .await
+}
+
+async fn get_shared_instance_install_preview_inner(
+    shared_instance_id: &str,
+    name: String,
+) -> crate::Result<SharedInstanceInstallPreview> {
     let state = State::get().await?;
     let version = get_latest_remote_version(shared_instance_id, &state).await?;
     shared_instance_install_preview_from_version(
@@ -59,23 +93,25 @@ pub async fn get_shared_instance_install_preview(
 }
 
 #[tracing::instrument(skip(invite_id))]
-pub async fn accept_shared_instance_invite_for_install(
+pub async fn get_shared_instance_invite_install_preview(
     invite_id: &str,
 ) -> crate::Result<SharedInstanceInviteInstallPreview> {
     let state = State::get().await?;
     let invite = get_shared_instance_invite_info(invite_id, &state).await?;
     let shared_instance_id = invite.instance_id;
     let instance_icon_url = invite.instance_icon;
+    let inviter = invite.inviter;
     let (manager_id, server_manager_name, server_manager_icon_url) =
         shared_instance_invite_manager(invite.managers);
     let name = shared_instance_invite_install_name(
         &shared_instance_id,
         invite.instance_name,
     );
-    accept_shared_instance_invite(&shared_instance_id, invite_id, &state)
-        .await?;
-    let version =
-        get_latest_remote_version(&shared_instance_id, &state).await?;
+    let version = invite.version.ok_or_else(|| {
+        crate::ErrorKind::InputError(
+            "Invite preview has no ready version".to_string(),
+        )
+    })?;
     let mut preview = shared_instance_install_preview_from_version(
         shared_instance_id.clone(),
         name,
@@ -89,12 +125,33 @@ pub async fn accept_shared_instance_invite_for_install(
 
     Ok(SharedInstanceInviteInstallPreview {
         shared_instance_id,
+        inviter,
         manager_id,
         server_manager_name,
         server_manager_icon_url,
         instance_icon_url,
         preview,
     })
+}
+
+#[tracing::instrument(skip(invite_id))]
+pub async fn accept_shared_instance_invite_for_install(
+    shared_instance_id: &str,
+    invite_id: &str,
+) -> crate::Result<()> {
+    let state = State::get().await?;
+    match get_remote_instance_access(shared_instance_id, &state).await? {
+        SharedInstanceRemoteResponse::Available(_) => Ok(()),
+        SharedInstanceRemoteResponse::Unavailable(
+            SharedInstanceUnavailableReason::AccessRevoked,
+        ) => {
+            accept_shared_instance_invite(shared_instance_id, invite_id, &state)
+                .await
+        }
+        SharedInstanceRemoteResponse::Unavailable(reason) => {
+            Err(shared_instance_unavailable_error(reason))
+        }
+    }
 }
 
 pub(super) fn shared_instance_invite_manager(
@@ -121,31 +178,19 @@ pub(super) async fn shared_instance_install_preview_from_version(
         "" => "Shared instance".to_string(),
         name => name.to_string(),
     };
-    let mut content_version_ids = version.modrinth_ids.clone();
-    let mut seen_content_version_ids = HashSet::new();
-    content_version_ids
-        .retain(|id| seen_content_version_ids.insert(id.clone()));
     let modpack = shared_instance_install_modpack(&version, state).await?;
-    let modpack_dependency_count = modpack
-        .as_ref()
-        .map(|modpack| modpack.dependency_count)
-        .unwrap_or_default();
+    let (content_version_ids, effective_external_files) =
+        remote_shared_content(&version, state).await?;
     let modpack_version_id =
         modpack.as_ref().map(|modpack| modpack.version_id.clone());
-    if let Some(modpack_version_id) = modpack_version_id.as_deref() {
-        content_version_ids.retain(|id| id != modpack_version_id);
-    }
     let icon_url = modpack
         .as_ref()
         .and_then(|modpack| modpack.icon_url.clone());
-
-    let external_files = version
-        .external_files
-        .iter()
-        .filter(|file| file.file_type != CONFIG_BUNDLE_FILE_TYPE)
+    let external_files = effective_external_files
+        .into_iter()
         .map(|file| SharedInstanceExternalFilePreview {
-            file_name: file.file_name.clone(),
-            file_type: file.file_type.clone(),
+            file_name: file.path,
+            file_type: file.content_type.as_str().to_string(),
         })
         .collect::<Vec<_>>();
     let external_file_count = external_files.len();
@@ -157,18 +202,26 @@ pub(super) async fn shared_instance_install_preview_from_version(
         icon_url,
         game_version: version.game_version,
         loader: version.loader,
-        mod_count: modpack_dependency_count
-            + content_version_ids.len()
-            + external_file_count,
+        mod_count: content_version_ids.len() + external_file_count,
         external_file_count,
         modpack_version_id,
         content_version_ids,
         external_files,
+        removed_files: version.removed_files,
     })
 }
 
 #[tracing::instrument]
 pub async fn get_shared_instance_update_preview(
+    instance_id: &str,
+) -> crate::Result<Option<SharedInstanceUpdatePreview>> {
+    crate::util::fetch::wait_for_local_api_rate_limit(
+        get_shared_instance_update_preview_inner(instance_id),
+    )
+    .await
+}
+
+async fn get_shared_instance_update_preview_inner(
     instance_id: &str,
 ) -> crate::Result<Option<SharedInstanceUpdatePreview>> {
     let state = State::get().await?;
@@ -209,12 +262,21 @@ pub async fn get_shared_instance_update_preview(
             diffs: Vec::new(),
         }));
     }
+    version.validate_removed_files()?;
 
     let update_available = attachment
         .applied_version
         .is_none_or(|current| current < version.version);
     let diffs = if update_available {
-        shared_instance_update_diffs(&metadata, &version, &state).await?
+        let config_files = remote_shared_config_files(
+            &attachment.id,
+            attachment.applied_version,
+            &version,
+            &state,
+        )
+        .await?;
+        shared_instance_update_diffs(&metadata, &version, &config_files, &state)
+            .await?
     } else {
         Vec::new()
     };
@@ -273,6 +335,15 @@ pub(crate) async fn check_shared_instance_availability_before_launch(
 pub async fn update_shared_instance(
     instance_id: &str,
 ) -> crate::Result<InstallJobSnapshot> {
+    crate::util::fetch::wait_for_local_api_rate_limit(Box::pin(
+        update_shared_instance_inner(instance_id),
+    ))
+    .await
+}
+
+async fn update_shared_instance_inner(
+    instance_id: &str,
+) -> crate::Result<InstallJobSnapshot> {
     let state = State::get().await?;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
@@ -303,6 +374,7 @@ pub async fn update_shared_instance(
         None,
         metadata.instance.name,
         version,
+        attachment.applied_version,
         &state,
     )
     .await?;
@@ -439,6 +511,12 @@ pub(super) async fn handle_unavailable_shared_instance_if_current_user(
     reason: SharedInstanceUnavailableReason,
     state: &State,
 ) -> crate::Result<()> {
+    // A missing ID can belong to another API environment. Keep the attachment
+    // so opening a production instance in a staging build cannot unlink it.
+    if reason == SharedInstanceUnavailableReason::Deleted {
+        return Ok(());
+    }
+
     if reason != SharedInstanceUnavailableReason::Quarantined
         && !shared_attachment_matches_current_user(attachment, state).await?
     {
@@ -498,10 +576,16 @@ fn shared_instance_external_file_data(
         ))
     })?;
 
+    let url = file.url.filter(|url| !url.is_empty()).ok_or_else(|| {
+        crate::ErrorKind::InputError(format!(
+            "Shared instance external file {} is missing its download URL",
+            file.file_name
+        ))
+    })?;
     Ok(SharedInstanceExternalFileData {
         file_name: file.file_name,
         file_type: file.file_type,
-        url: file.url,
+        url,
         file_size,
     })
 }
@@ -514,8 +598,10 @@ pub(super) async fn shared_instance_install_data(
     instance_icon_url: Option<String>,
     name: String,
     version: InstanceVersionResponse,
+    applied_version: Option<i32>,
     state: &State,
 ) -> crate::Result<SharedInstanceInstallData> {
+    version.validate_removed_files()?;
     if !version.ready {
         return Err(crate::ErrorKind::InputError(
             "Shared instance version is not ready to install".to_string(),
@@ -523,18 +609,69 @@ pub(super) async fn shared_instance_install_data(
         .into());
     }
 
+    let remote =
+        match get_remote_instance_access(shared_instance_id, state).await? {
+            SharedInstanceRemoteResponse::Available(remote) => remote,
+            SharedInstanceRemoteResponse::Unavailable(reason) => {
+                return Err(shared_instance_unavailable_error(reason));
+            }
+        };
+    let config_files = remote_shared_config_files(
+        shared_instance_id,
+        applied_version,
+        &version,
+        state,
+    )
+    .await?;
+    let (manager_id, server_manager_name, server_manager_icon_url) = if remote
+        .linked_server
+        .is_some()
+    {
+        let icon = match shared_instance_server_icon(shared_instance_id, state)
+            .await
+        {
+            Ok(icon) => icon,
+            Err(error) => {
+                tracing::warn!(%error, "Could not fetch shared instance server icon");
+                server_manager_icon_url
+            }
+        };
+        (None, Some(remote.name), icon)
+    } else {
+        (manager_id, server_manager_name, server_manager_icon_url)
+    };
+    let instance_icon_url = if remote.linked_server.is_some() {
+        server_manager_icon_url.clone()
+    } else if server_manager_name.is_some() {
+        instance_icon_url.or(remote.icon)
+    } else {
+        remote.icon.or(instance_icon_url)
+    };
+
     let name = shared_instance_name(name);
     let linked_user_id = linked_modrinth_user_id(state).await?;
     let modpack = shared_instance_install_modpack(&version, state).await?;
     let modpack_version_id =
         modpack.as_ref().map(|modpack| modpack.version_id.as_str());
+    let inherited = if let Some(modpack_id) = modpack_version_id {
+        shared_modpack_files(modpack_id, state).await?
+    } else {
+        Vec::new()
+    };
     let modrinth_ids = version
         .modrinth_ids
         .into_iter()
-        .filter(|id| Some(id.as_str()) != modpack_version_id)
+        .filter(|id| {
+            Some(id.as_str()) != modpack_version_id
+                && !inherited.iter().any(|file| {
+                    file.version_id.as_deref() == Some(id.as_str())
+                        && !file.is_removed(&version.removed_files)
+                })
+        })
         .collect();
 
     Ok(SharedInstanceInstallData {
+        linked_server: remote.linked_server,
         shared_instance_id: shared_instance_id.to_string(),
         manager_id,
         server_manager_name,
@@ -544,9 +681,17 @@ pub(super) async fn shared_instance_install_data(
         name,
         version: version.version,
         modrinth_ids,
+        removed_files: version.removed_files,
         external_files: version
             .external_files
             .into_iter()
+            .filter(|file| {
+                !matches!(
+                    file.file_type.as_str(),
+                    CONFIG_BUNDLE_FILE_TYPE | CONFIG_FILE_TYPE
+                )
+            })
+            .chain(config_files)
             .map(shared_instance_external_file_data)
             .collect::<crate::Result<Vec<_>>>()?,
         modpack,

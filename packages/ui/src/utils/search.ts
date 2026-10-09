@@ -167,6 +167,51 @@ export type EnvironmentSearchOverride =
 	| { mode: 'include'; values: string[] }
 	| { mode: 'exclude'; values: string[] }
 
+export const SERVER_CONTENT_ENVIRONMENTS = ['server_and_player', 'server', 'player'] as const
+
+export type ServerContentEnvironment = (typeof SERVER_CONTENT_ENVIRONMENTS)[number]
+
+const SERVER_CONTENT_ENVIRONMENT_VALUES: Record<ServerContentEnvironment, string[]> = {
+	server_and_player: [
+		'client_and_server',
+		'client_only_server_optional',
+		'server_only_client_optional',
+		'client_or_server',
+		'client_or_server_prefers_both',
+	],
+	server: ['server_only', 'dedicated_server_only'],
+	player: ['client_only'],
+}
+
+const SERVER_CONTENT_ENVIRONMENT_PROJECT_TYPES: Record<ServerContentEnvironment, string[]> = {
+	server_and_player: ['mod'],
+	server: ['mod', 'plugin', 'datapack'],
+	player: ['mod', 'resourcepack', 'shader'],
+}
+
+export function parseServerContentEnvironment(value: unknown): ServerContentEnvironment | null {
+	return SERVER_CONTENT_ENVIRONMENTS.find((environment) => environment === value) ?? null
+}
+
+/**
+ * Whether a project type is shown in the server panel's browse flow for the selected environment.
+ * Every type is shown when no environment is selected.
+ */
+export function isServerContentEnvironmentProjectType(
+	environment: ServerContentEnvironment | null,
+	projectType: string,
+): boolean {
+	return !environment || SERVER_CONTENT_ENVIRONMENT_PROJECT_TYPES[environment].includes(projectType)
+}
+
+export function getHostingModEnvironmentOverride(
+	environment: ServerContentEnvironment | null,
+): EnvironmentSearchOverride {
+	return environment
+		? { mode: 'include', values: SERVER_CONTENT_ENVIRONMENT_VALUES[environment] }
+		: { mode: 'exclude', values: ['singleplayer_only'] }
+}
+
 export const LOADER_FILTER_TYPES = [
 	'mod_loader',
 	'plugin_loader',

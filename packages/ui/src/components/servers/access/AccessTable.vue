@@ -30,6 +30,19 @@
 			</AutoLink>
 		</template>
 
+		<template #cell-joined="{ row: member }">
+			<span
+				v-if="member.pending"
+				class="inline-flex h-7 items-center rounded-full border border-surface-4 border-solid bg-surface-4 px-2.5 py-1 text-sm font-semibold text-secondary"
+			>
+				{{ formatMessage(messages.pendingLabel) }}
+			</span>
+			<span v-else-if="member.joinedAt" v-tooltip="formatDate(member.joinedAt)">
+				{{ formatRelativeTime(member.joinedAt) }}
+			</span>
+			<span v-else>{{ formatMessage(messages.unknownJoinedDate) }}</span>
+		</template>
+
 		<template #cell-role="{ row: member }">
 			<span
 				v-if="member.isOwner"
@@ -57,19 +70,6 @@
 					</template>
 				</Combobox>
 			</div>
-		</template>
-
-		<template #cell-joined="{ row: member }">
-			<span
-				v-if="member.pending"
-				class="inline-flex h-7 items-center rounded-full border border-surface-4 border-solid bg-surface-4 px-2.5 py-1 text-sm font-semibold text-secondary"
-			>
-				{{ formatMessage(messages.pendingLabel) }}
-			</span>
-			<span v-else-if="member.joinedAt" v-tooltip="formatDate(member.joinedAt)">
-				{{ formatRelativeTime(member.joinedAt) }}
-			</span>
-			<span v-else>{{ formatMessage(messages.unknownJoinedDate) }}</span>
 		</template>
 
 		<template #cell-actions="{ row: member }">
@@ -105,7 +105,7 @@
 		class="overflow-hidden rounded-2xl border border-solid border-surface-4 sm:hidden"
 	>
 		<div
-			class="grid min-h-14 grid-cols-[minmax(0,1.35fr)_7.75rem_minmax(6rem,0.8fr)_4rem] bg-surface-3"
+			class="grid min-h-14 grid-cols-[minmax(0,1.35fr)_minmax(6rem,0.8fr)_7.75rem_4rem] bg-surface-3"
 		>
 			<div class="flex items-center pl-4 font-semibold text-secondary">
 				<button
@@ -122,22 +122,22 @@
 				<button
 					type="button"
 					class="flex cursor-pointer items-center gap-1 border-none bg-transparent p-0 font-semibold transition-colors hover:text-contrast"
-					:class="sortColumn === 'role' ? 'text-contrast' : 'text-secondary'"
-					@click="toggleSort('role')"
-				>
-					{{ formatMessage(messages.roleColumn) }}
-					<component :is="sortIcon('role')" v-if="sortIcon('role')" class="size-4" />
-				</button>
-			</div>
-			<div class="flex items-center justify-end font-semibold text-secondary">
-				<button
-					type="button"
-					class="flex cursor-pointer items-center gap-1 border-none bg-transparent p-0 font-semibold transition-colors hover:text-contrast"
 					:class="sortColumn === 'joined' ? 'text-contrast' : 'text-secondary'"
 					@click="toggleSort('joined')"
 				>
 					{{ formatMessage(messages.joinedColumn) }}
 					<component :is="sortIcon('joined')" v-if="sortIcon('joined')" class="size-4" />
+				</button>
+			</div>
+			<div class="flex items-center font-semibold text-secondary">
+				<button
+					type="button"
+					class="flex cursor-pointer items-center gap-1 border-none bg-transparent p-0 font-semibold transition-colors hover:text-contrast"
+					:class="sortColumn === 'role' ? 'text-contrast' : 'text-secondary'"
+					@click="toggleSort('role')"
+				>
+					{{ formatMessage(messages.roleColumn) }}
+					<component :is="sortIcon('role')" v-if="sortIcon('role')" class="size-4" />
 				</button>
 			</div>
 			<div class="flex items-center justify-end pr-4 font-semibold text-secondary">
@@ -147,7 +147,7 @@
 		<div
 			v-for="(member, index) in sortedMembers"
 			:key="member.id"
-			class="grid min-h-16 grid-cols-[minmax(0,1.35fr)_7.75rem_minmax(6rem,0.8fr)_4rem] items-center border-0 border-t border-solid border-surface-4"
+			class="grid min-h-16 grid-cols-[minmax(0,1.35fr)_minmax(6rem,0.8fr)_7.75rem_4rem] items-center border-0 border-t border-solid border-surface-4"
 			:class="index % 2 === 0 ? 'bg-surface-2' : 'bg-surface-1.5'"
 		>
 			<div class="flex min-w-0 items-center pl-4">
@@ -170,6 +170,22 @@
 						{{ member.user.username }}
 					</span>
 				</AutoLink>
+			</div>
+			<div class="min-w-0 py-3 pr-2 text-secondary">
+				<span
+					v-if="member.pending"
+					class="inline-flex h-7 max-w-full items-center rounded-full border border-surface-4 border-solid bg-surface-4 px-2.5 py-1 text-sm font-semibold text-secondary"
+				>
+					{{ formatMessage(messages.pendingLabel) }}
+				</span>
+				<span
+					v-else-if="member.joinedAt"
+					v-tooltip="formatDate(member.joinedAt)"
+					class="inline-block max-w-full truncate"
+				>
+					{{ formatRelativeTime(member.joinedAt) }}
+				</span>
+				<span v-else>{{ formatMessage(messages.unknownJoinedDate) }}</span>
 			</div>
 			<div class="min-w-0 py-3 pr-2">
 				<span
@@ -205,22 +221,6 @@
 					</Combobox>
 				</div>
 			</div>
-			<div class="min-w-0 py-3 pr-2 text-right text-secondary">
-				<span
-					v-if="member.pending"
-					class="inline-flex h-7 max-w-full items-center rounded-full border border-surface-4 border-solid bg-surface-4 px-2.5 py-1 text-sm font-semibold text-secondary"
-				>
-					{{ formatMessage(messages.pendingLabel) }}
-				</span>
-				<span
-					v-else-if="member.joinedAt"
-					v-tooltip="formatDate(member.joinedAt)"
-					class="inline-block max-w-full truncate"
-				>
-					{{ formatRelativeTime(member.joinedAt) }}
-				</span>
-				<span v-else>{{ formatMessage(messages.unknownJoinedDate) }}</span>
-			</div>
 			<div class="flex min-w-0 items-center justify-end pr-4">
 				<TeleportOverflowMenu
 					v-if="!member.isOwner"
@@ -252,16 +252,16 @@
 
 	<div v-else class="overflow-hidden rounded-2xl border border-solid border-surface-4">
 		<div
-			class="grid min-h-14 grid-cols-[3.75rem_7.25rem_minmax(0,1fr)_2.75rem] bg-surface-3 sm:h-14 sm:grid-cols-[32%_28%_28%_12%]"
+			class="grid min-h-14 grid-cols-[3.75rem_minmax(0,1fr)_7.25rem_2.75rem] bg-surface-3 sm:h-14 sm:grid-cols-[32%_28%_28%_12%]"
 		>
 			<div class="flex items-center pl-4 font-semibold text-secondary">
 				{{ formatMessage(messages.userColumn) }}
 			</div>
 			<div class="flex items-center font-semibold text-secondary">
-				{{ formatMessage(messages.roleColumn) }}
+				{{ formatMessage(messages.joinedColumn) }}
 			</div>
 			<div class="flex items-center font-semibold text-secondary">
-				{{ formatMessage(messages.joinedColumn) }}
+				{{ formatMessage(messages.roleColumn) }}
 			</div>
 			<div class="flex items-center justify-end pr-4 font-semibold text-secondary">
 				{{ formatMessage(messages.actionsColumn) }}
@@ -402,12 +402,12 @@ type AccessTableSortableColumn = Exclude<AccessTableColumn, 'actions'>
 type AccessTableRow = ServerAccessMember & Record<string, unknown>
 const columns = computed<TableColumn<AccessTableColumn>[]>(() => [
 	{ key: 'user', label: formatMessage(messages.userColumn), width: '32%', enableSorting: true },
-	{ key: 'role', label: formatMessage(messages.roleColumn), width: '28%', enableSorting: true },
 	{ key: 'joined', label: formatMessage(messages.joinedColumn), enableSorting: true },
+	{ key: 'role', label: formatMessage(messages.roleColumn), width: '28%', enableSorting: true },
 	{ key: 'actions', label: formatMessage(messages.actionsColumn), align: 'right', width: '7rem' },
 ])
 
-const sortColumn = ref<string | undefined>('role')
+const sortColumn = ref<string | undefined>('joined')
 const sortDirection = ref<SortDirection>('asc')
 const now = ref(Date.now())
 let nowInterval: ReturnType<typeof setInterval> | null = null

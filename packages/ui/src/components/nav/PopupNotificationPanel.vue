@@ -32,6 +32,7 @@
 					:progress-current="item.progressCurrent"
 					:progress-total="item.progressTotal"
 					@accept="handleToastAccept(item, item.onAccept)"
+					@review="handleToastReview(item)"
 					@decline="handleToastAction(item, item.onDecline)"
 					@dismiss="handleToastAction(item, item.onDismiss)"
 					@launch="handleToastAction(item, item.onLaunch)"
@@ -194,6 +195,7 @@ import {
 	type PopupNotificationButton,
 	type PopupNotificationProgressItem,
 	type PopupNotificationStandard,
+	type PopupNotificationToast,
 } from '../../providers'
 import ProgressBar from '../base/ProgressBar.vue'
 import NotificationToast from '../notifications/NotificationToast.vue'
@@ -212,7 +214,7 @@ const hasModalActive = computed(() => stackCount.value > 0)
 const notificationGroupStyle = computed(() => ({
 	zIndex: hasModalActive.value ? 100 + stackCount.value * 10 + 8 : 200,
 }))
-const activeToastActions = ref<Record<string, 'accept'>>({})
+const activeToastActions = ref<Record<string, 'accept' | 'review'>>({})
 
 const stopTimer = (n: PopupNotification) => popupNotificationManager.stopNotificationTimer(n)
 const setNotificationTimer = (n: PopupNotification) =>
@@ -307,6 +309,21 @@ async function handleStandardNotificationDismiss(item: PopupNotificationStandard
 async function handleToastAction(item: PopupNotification, action?: () => void | Promise<void>) {
 	popupNotificationManager.removeNotification(item.id)
 	await action?.()
+}
+
+async function handleToastReview(item: PopupNotificationToast) {
+	if (toastActionLoading(item.id) != null || !item.onReview) return
+	const actionId = String(item.id)
+	popupNotificationManager.stopNotificationTimer(item)
+	activeToastActions.value = { ...activeToastActions.value, [actionId]: 'review' }
+	try {
+		await item.onReview()
+	} finally {
+		activeToastActions.value = Object.fromEntries(
+			Object.entries(activeToastActions.value).filter(([key]) => key !== actionId),
+		)
+		popupNotificationManager.setNotificationTimer(item)
+	}
 }
 
 async function handleToastAccept(item: PopupNotification, action?: () => void | Promise<void>) {

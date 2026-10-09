@@ -386,6 +386,10 @@ pub enum CommandPayload {
         // run or install .mrpack
         path: String,
     },
+    PlayHostingServer {
+        server_id: String,
+        world_id: String,
+    },
 }
 
 #[derive(Serialize, Deserialize, Clone)]

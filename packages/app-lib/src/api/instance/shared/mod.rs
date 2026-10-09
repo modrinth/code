@@ -3,7 +3,7 @@ use crate::event::InstancePayloadType;
 use crate::event::emit::emit_instance;
 use crate::install::{
     InstallJobSnapshot, SharedInstanceExternalFileData,
-    SharedInstanceInstallData,
+    SharedInstanceInstallData, SharedInstanceRemovedFile,
 };
 use crate::state::instances::{InstanceLink, SharedInstanceAttachment};
 use crate::state::{
@@ -30,8 +30,8 @@ use std::collections::BTreeSet;
 use std::collections::{HashMap, HashSet};
 use std::io::Read;
 
-pub(crate) const CONFIG_BUNDLE_FILE_NAME: &str = "configs.zip";
 pub(crate) const CONFIG_BUNDLE_FILE_TYPE: &str = "configs";
+pub(crate) const CONFIG_FILE_TYPE: &str = "config";
 pub(crate) const CONFIG_SYNC_ENABLED: bool = true;
 pub(crate) const CONFIG_DIRECTORY: &str = "config";
 pub(crate) const MAX_CONFIG_BUNDLE_ENTRIES: usize = 4096;
@@ -53,6 +53,23 @@ pub(crate) const CONFIG_FILE_EXTENSIONS: [&str; 14] = [
     "xml",
     "nbt",
 ];
+
+pub(crate) fn is_supported_config_file(path: &std::path::Path) -> bool {
+    path.extension()
+        .and_then(|extension| extension.to_str())
+        .is_some_and(|extension| {
+            CONFIG_FILE_EXTENSIONS
+                .iter()
+                .any(|candidate| extension.eq_ignore_ascii_case(candidate))
+        })
+}
+
+/// Whether members can install a shared config at this instance-relative path.
+pub(crate) fn is_shareable_config_path(path: &str) -> bool {
+    crate::state::content_store::validate_relative(path).is_ok()
+        && !path.split('/').any(|part| part.starts_with('.'))
+        && is_supported_config_file(std::path::Path::new(path))
+}
 
 pub(crate) fn read_bounded_config_bundle_entry(
     reader: impl Read,
@@ -101,19 +118,25 @@ pub(crate) fn read_bounded_config_bundle_entry(
 }
 
 mod client;
+mod content;
 mod diff;
+mod icons;
 mod install;
 mod invites;
 mod publish;
 mod types;
 
+pub(crate) use self::content::shared_modpack_files;
+pub use self::icons::cache_shared_instance_server_icon;
 pub(crate) use self::install::check_shared_instance_availability_before_launch;
 pub(crate) use self::publish::sync_shared_instance_icon;
 
 pub use self::install::{
     accept_shared_instance_invite_for_install,
-    get_shared_instance_install_preview, get_shared_instance_update_preview,
-    install_shared_instance, update_shared_instance,
+    get_shared_instance_install_preview,
+    get_shared_instance_invite_install_preview,
+    get_shared_instance_update_preview, install_shared_instance,
+    update_shared_instance,
 };
 pub use self::invites::{
     accept_pending_shared_instance_invite, create_shared_instance_invite_link,
@@ -127,11 +150,11 @@ pub use self::publish::{
 };
 pub use self::types::{
     SharedInstanceExternalFilePreview, SharedInstanceInstallPreview,
-    SharedInstanceInvite, SharedInstanceInviteInstallPreview,
-    SharedInstanceInviteLink, SharedInstanceJoinType,
-    SharedInstancePublishPreview, SharedInstanceUpdateDiff,
-    SharedInstanceUpdateDiffType, SharedInstanceUpdatePreview,
-    SharedInstanceUser, SharedInstanceUsers,
+    SharedInstanceInvite, SharedInstanceInviteCreator,
+    SharedInstanceInviteInstallPreview, SharedInstanceInviteLink,
+    SharedInstanceJoinType, SharedInstancePublishPreview,
+    SharedInstanceUpdateDiff, SharedInstanceUpdateDiffType,
+    SharedInstanceUpdatePreview, SharedInstanceUser, SharedInstanceUsers,
 };
 
 pub async fn can_active_user_use_shared_instances() -> crate::Result<bool> {
