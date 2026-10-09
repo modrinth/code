@@ -19,9 +19,9 @@ use crate::{
 mod config;
 mod export;
 mod extract;
+mod import;
 mod model;
 mod store;
-mod task;
 mod upstream;
 mod util;
 
@@ -48,12 +48,9 @@ struct Cli {
 
 #[derive(Debug, clap::Subcommand)]
 enum Command {
-    /// Download manifests and sources from upstreamms
-    Download,
-    /// Extract downloaded metadata into normalized database rows
-    ExtractToDb,
-    /// Extract downloaded installer JARs for their manifests and libraries
-    ExtractInstallers,
+    /// Download manifests and sources from upstreams, and extract their
+    /// information into the local database
+    Import,
     /// Take processed information from the database, produce JSON manifests
     /// from them, and upload them to the public file store
     Export,
@@ -127,7 +124,7 @@ pub async fn main() -> Result<()> {
     let cas = BlobCas::new(private_blobs.clone());
     let maven = MavenStore::new(public_blobs.clone());
 
-    let mut app = AppState {
+    let app = AppState {
         http,
         db,
         concurrency: config.concurrency,
@@ -152,12 +149,8 @@ pub async fn main() -> Result<()> {
     };
 
     match cli.command {
-        Command::Download => {
-            upstream::download_from_upstreams(&app, upstreams).await
-        }
-        Command::ExtractToDb => extract::extract(&app, upstreams).await,
-        Command::ExtractInstallers => task::extract_installers(&mut app).await,
-        Command::Export => export::export(&mut app, upstreams).await,
+        Command::Import => import::run(app, upstreams).await,
+        Command::Export => export::run(app, upstreams).await,
     }
 }
 

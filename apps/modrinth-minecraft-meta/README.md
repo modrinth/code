@@ -3,10 +3,15 @@ Game version and launcher version related metadata manifests.
 # Architecture
 
 The general flow of the metadata service is:
-- Download metadata and manifests from upstream sources (Mojang, Fabric, NeoForge, etc.), and save them into our database, as raw JSON blobs.
-- Take the JSON blobs and extract structured information out of them, useful for our purposes, and save that in our database.
-- Do other extraction, like reading JSON manifests embedded in installer JAR files, and save that in our database.
-- Upload our processed manifests into some publicly-accessible source, such as the local filesystem, or an S3-compatible service like Cloudflare R2.
+- Import
+  - Download metadata and manifests from upstream sources (Mojang, Fabric, NeoForge, etc.), and save them into storage as raw JSON blobs.
+  - Take the JSON blobs and extract structured information out of them, useful for our purposes, and save that in our database.
+  - Do other extraction, like reading JSON manifests embedded in installer JAR files, and save that in our database.
+  - If any step fails, we handle it as gracefully, and skip/ignore/continue where possible.
+- Export
+  - Read all entries in our database, and turn them into manifests used by the app.
+  - Upload these manifests, and extracted Maven artifacts, into the local filesystem or S3.
+  - Since we never delete imported rows, this process is only additive, and old versions/info will never be removed.
 
 This means that:
 - Every time we run the service, we save the source manifests that we download - from this, we can derive any information that we want without needing to query the upstreams again.

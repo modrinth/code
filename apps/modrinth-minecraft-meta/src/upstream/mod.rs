@@ -1,7 +1,6 @@
 //! Schemas for files we download from our upstreams (e.g. Minecraft version
 //! catalog manifest).
 
-mod download;
 pub mod fabric;
 pub mod forge;
 pub mod mojang;
@@ -28,5 +27,3 @@ impl Default for Upstreams {
         }
     }
 }
-
-pub use download::{DownloadRunContext, download_from_upstreams};

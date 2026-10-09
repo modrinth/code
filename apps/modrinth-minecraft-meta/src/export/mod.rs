@@ -12,9 +12,9 @@ mod fabriclike;
 mod mojang;
 mod quilt;
 
-pub async fn export(app: &mut AppState, upstreams: Upstreams) -> Result<()> {
+pub async fn run(app: AppState, upstreams: Upstreams) -> Result<()> {
     if upstreams.mojang {
-        mojang::export(app)
+        mojang::export(&app)
             .context(info_span!("exporting Mojang artifacts"))
             .await
             .inspect_err(|err| warn!("error: {err:?}"))
@@ -22,7 +22,7 @@ pub async fn export(app: &mut AppState, upstreams: Upstreams) -> Result<()> {
     }
 
     if upstreams.fabric {
-        fabric::export(app)
+        fabric::export(&app)
             .context(info_span!("exporting Fabric artifacts"))
             .await
             .inspect_err(|err| warn!("error: {err:?}"))
@@ -30,7 +30,7 @@ pub async fn export(app: &mut AppState, upstreams: Upstreams) -> Result<()> {
     }
 
     if upstreams.quilt {
-        quilt::export(app)
+        quilt::export(&app)
             .context(info_span!("exporting Quilt artifacts"))
             .await
             .inspect_err(|err| warn!("error: {err:?}"))
