@@ -189,8 +189,8 @@ export class LabrinthAuthV2Module extends AbstractModule {
 	 */
 	public async authenticatePasskeyFinish(
 		data: Labrinth.Auth.v2.PasskeyAuthenticateFinishRequest,
-	): Promise<Labrinth.Sessions.v2.Session> {
-		return this.client.request<Labrinth.Sessions.v2.Session>(`/auth/passkey/finish`, {
+	): Promise<Labrinth.Auth.v2.AuthSessionResponse> {
+		return this.client.request<Labrinth.Auth.v2.AuthSessionResponse>(`/auth/passkey/finish`, {
 			api: 'labrinth',
 			version: 2,
 			method: 'POST',

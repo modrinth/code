@@ -28,6 +28,7 @@ export default defineNuxtConfig({
 		'@modrinth/api-client': API_CLIENT_SOURCE,
 	},
 	app: {
+		buildAssetsDir: '/_assets/',
 		head: {
 			htmlAttrs: {
 				lang: 'en',
@@ -231,10 +232,6 @@ export default defineNuxtConfig({
 			},
 		},
 	},
-	modules: [
-		// Sentry causes rollup-plugin-inject errors in dev, only enable in production
-		...(isProduction() ? ['@sentry/nuxt/module'] : []),
-	],
 	floatingVue: {
 		themes: {
 			'ribbit-popout': {
@@ -259,10 +256,6 @@ export default defineNuxtConfig({
 		noExternals: getNoExternals(),
 		cloudflare: {
 			nodeCompat: true,
-		},
-		replace: {
-			__SENTRY_RELEASE__: JSON.stringify(process.env.CF_PAGES_COMMIT_SHA || 'unknown'),
-			__SENTRY_ENVIRONMENT__: JSON.stringify(process.env.BUILD_ENV || 'development'),
 		},
 	},
 	devtools: {
@@ -310,11 +303,6 @@ export default defineNuxtConfig({
 		asyncContext: true,
 	},
 	sourcemap: { client: 'hidden' },
-	sentry: {
-		sourcemaps: {
-			disable: true,
-		},
-	},
 })
 
 function getApiUrl() {

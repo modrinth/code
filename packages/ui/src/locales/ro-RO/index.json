@@ -68,6 +68,9 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Detaliile abonamentului au eșuat sa se încarce."
   },
+  "billing.resubscribe-modal.next-charge": {
+    "defaultMessage": "Următoarea taxă va fi pe <charge-date>{date}</charge-date>."
+  },
   "billing.resubscribe-modal.plan-label": {
     "defaultMessage": "Plan"
   },
@@ -82,6 +85,15 @@
   },
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Reabonează-te la Server"
+  },
+  "browse.advanced-filters.apply-saved-preferences": {
+    "defaultMessage": "Aplică preferințele salvate"
+  },
+  "browse.advanced-filters.link-overriding-preferences": {
+    "defaultMessage": "Filtrele acestui link diferă de excluderile avansate pe care le-ai salvat"
+  },
+  "browse.advanced-filters.persistence-note": {
+    "defaultMessage": "Excluderile avansate sunt salvate între sesiuni. Deschiderea unui link partajat cu filtre va suprascrie aceste setări."
   },
   "browse.filter-results": {
     "defaultMessage": "Filtrează rezultatele..."
@@ -122,6 +134,9 @@
   "button.accept": {
     "defaultMessage": "Acceptă"
   },
+  "button.add-another": {
+    "defaultMessage": "Mai adauga unul"
+  },
   "button.add-server-to-instance": {
     "defaultMessage": "Adaugă server la instanță"
   },
@@ -149,6 +164,9 @@
   "button.continue": {
     "defaultMessage": "Continuă"
   },
+  "button.copied-to-clipboard": {
+    "defaultMessage": "Copiat în clipboard"
+  },
   "button.copy-filename": {
     "defaultMessage": "Copiază denumirea"
   },
@@ -175,6 +193,9 @@
   },
   "button.download": {
     "defaultMessage": "Descarcă"
+  },
+  "button.download-files": {
+    "defaultMessage": "Descarca fisier"
   },
   "button.downloading": {
     "defaultMessage": "Descărcare"
@@ -232,6 +253,9 @@
   },
   "button.reinstall-modpack": {
     "defaultMessage": "Reinstalează modpackul"
+  },
+  "button.remove": {
+    "defaultMessage": "Șterge"
   },
   "button.remove-image": {
     "defaultMessage": "Elimină imaginea"
@@ -314,8 +338,26 @@
   "changelog.product.web": {
     "defaultMessage": "Platformă"
   },
+  "collection-widget.empty-collection": {
+    "defaultMessage": "Această colecție este goală"
+  },
+  "collection-widget.loading-projects": {
+    "defaultMessage": "Încărcare proiecte..."
+  },
+  "collection-widget.no-search-results": {
+    "defaultMessage": "Niciun proiect nu a corespuns căutării"
+  },
+  "collection-widget.search-placeholder": {
+    "defaultMessage": "Caută proiecte"
+  },
   "collections.label.private": {
     "defaultMessage": "Privat"
+  },
+  "console.actions.expand": {
+    "defaultMessage": "Extinde"
+  },
+  "console.actions.share": {
+    "defaultMessage": "Trimiteți"
   },
   "content-type.content.lowercase": {
     "defaultMessage": "conținut"
@@ -323,8 +365,20 @@
   "content-type.item.lowercase": {
     "defaultMessage": "{count, plural, one {item} other {iteme}}"
   },
+  "content.card.frozen": {
+    "defaultMessage": "Acest proiect este blocat la versiunea actuală până la deblocare."
+  },
   "content.card.select-project": {
     "defaultMessage": "Selectează {project}"
+  },
+  "content.card.sync-update-pending": {
+    "defaultMessage": "Unele copii sincronizate așteaptă modificări. O instanță poate fi în execuție, poate avea o versiune blocată sau incompatibilă sau poate conține deja propria copie."
+  },
+  "content.card.synced": {
+    "defaultMessage": "Sincronizate între instanțe"
+  },
+  "content.card.uploaded": {
+    "defaultMessage": "Încărcat"
   },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Esti sigur că vrei să actualizezi {count, plural, one {# proiect} other {# proiecte}} la cea mai recentă versiune compatibilă? Recomandăm sa le actualizezi pe rând."
@@ -351,6 +405,9 @@
     "defaultMessage": "Șterge {count, number} {itemType}"
   },
   "content.confirm-deletion.header": {
+    "defaultMessage": "Șterge {itemType}"
+  },
+  "content.confirm-disable.header": {
     "defaultMessage": "Șterge {itemType}"
   },
   "content.confirm-modpack-update.admonition-body": {
@@ -404,6 +461,15 @@
   "content.diff-modal.unknown-content-body": {
     "defaultMessage": "Niște conținut in serverul tău nu poate fi analizat și poate fi afectat de această schimbare."
   },
+  "content.diff-modal.unknown-files-description": {
+    "defaultMessage": "Această actualizare conține fișiere care nu sunt publicate pe Modrinth. Vă recomandăm cu tărie să instalați numai fișiere din surse de încredere."
+  },
+  "content.diff-modal.unknown-files-warning": {
+    "defaultMessage": "Avertisment privind fișierele necunoscute"
+  },
+  "content.diff-modal.unknown-project": {
+    "defaultMessage": "Necunoscut"
+  },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} actualizat"
   },
@@ -439,6 +505,39 @@
   },
   "content.inline-backup.instance-label": {
     "defaultMessage": "instanță"
+  },
+  "content.inline-backup.shift-click-hint": {
+    "defaultMessage": "Țineți apăsată tasta Shift în timp ce faceți clic pentru a sări peste confirmare."
+  },
+  "content.inline-backup.warning-body": {
+    "defaultMessage": "Vă recomandăm să creați o copie de siguranță înainte de a continua, pentru a vă putea restaura {type} în cazul în care ceva se strică."
+  },
+  "content.managed-card.modpack-content": {
+    "defaultMessage": "Conținutul Modpack"
+  },
+  "content.managed-card.settings": {
+    "defaultMessage": "Setări de instalare"
+  },
+  "content.managed-card.summary.installing": {
+    "defaultMessage": "Se instalează conținutul..."
+  },
+  "content.managed-card.switch-version": {
+    "defaultMessage": "Schimbă versiunea"
+  },
+  "content.managed-card.update-available": {
+    "defaultMessage": "Actualizare disponibilă"
+  },
+  "content.managed-card.updated": {
+    "defaultMessage": "Actualizat {time}"
+  },
+  "content.managed-card.updating": {
+    "defaultMessage": "Se actualizează..."
+  },
+  "content.managed-card.view-content": {
+    "defaultMessage": "Vizualizează conținutul"
+  },
+  "content.metadata-filter.author": {
+    "defaultMessage": "Autorul"
   },
   "content.page-layout.share.label": {
     "defaultMessage": "Distribuie"

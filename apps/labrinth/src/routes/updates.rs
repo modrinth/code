@@ -99,7 +99,6 @@ pub async fn forge_updates(
             .filter(|x| x.loaders.iter().any(loaders))
             .collect(),
         &user_option,
-        &pool,
         &ro_pool,
         &redis,
     )

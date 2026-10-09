@@ -719,6 +719,12 @@
   "content.page-layout.failed-to-load": {
     "defaultMessage": "İçerik yüklemesi başarısız oldu"
   },
+  "content.page-layout.failed-to-load-changelog": {
+    "defaultMessage": "Yenilik günlüğü yüklenemedi"
+  },
+  "content.page-layout.failed-to-load-updates": {
+    "defaultMessage": "Kullanılabilir güncellemeler kontrol edilemedi"
+  },
   "content.page-layout.filter.add": {
     "defaultMessage": "Filtre"
   },
@@ -1236,7 +1242,7 @@
     "defaultMessage": "Kaynak gösterme bilgisini sakla"
   },
   "external-files.permissions-card.editor.select-license-label": {
-    "defaultMessage": "Lisans Seçiniz..."
+    "defaultMessage": "Lisans ara..."
   },
   "external-files.permissions-card.editor.type-label": {
     "defaultMessage": "İzin sebebi"
@@ -1279,6 +1285,9 @@
   },
   "external-files.permissions-card.last-updated": {
     "defaultMessage": "En son {date} {user} tarafından güncellendi"
+  },
+  "external-files.permissions-card.license.all-rights": {
+    "defaultMessage": "Tüm hakları saklıdır / Lisans yoktur"
   },
   "external-files.permissions-card.license.unknown": {
     "defaultMessage": "Bilinmeyen"
@@ -2050,9 +2059,6 @@
   },
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Sunucu, yeni başlayanlar için ayarlanmıştır."
-  },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "Destek seçenekleri"
   },
   "hosting.specs.burst": {
     "defaultMessage": "{cpus} CPUya kadar çıkar"
@@ -3278,14 +3284,26 @@
   "profile.button.create-project": {
     "defaultMessage": "Bir proje oluştur"
   },
+  "profile.button.force-password-reset": {
+    "defaultMessage": "Parola sıfırlamayı zorla"
+  },
   "profile.button.info": {
     "defaultMessage": "Kullanıcı detaylarını göster"
+  },
+  "profile.button.lock": {
+    "defaultMessage": "Hesabı kilitle"
   },
   "profile.button.manage-projects": {
     "defaultMessage": "Projeleri yönet"
   },
   "profile.button.remove-affiliate": {
     "defaultMessage": "Ortaklıktan çıkar"
+  },
+  "profile.button.reset-2fa": {
+    "defaultMessage": "İki Aşamalı Doğrulamayı Sıfırla"
+  },
+  "profile.button.revoke-sessions": {
+    "defaultMessage": "Tüm oturumlardan çık"
   },
   "profile.button.set-affiliate": {
     "defaultMessage": "Ortak olarak ayarla"
@@ -3295,6 +3313,9 @@
   },
   "profile.button.unblock": {
     "defaultMessage": "Engellemeyi kaldır"
+  },
+  "profile.button.unlock": {
+    "defaultMessage": "Hesabın kilidini aç"
   },
   "profile.collection.projects-count": {
     "defaultMessage": "{count, plural,one{# proje} other{# proje}}"
@@ -3344,6 +3365,36 @@
   "profile.error.not-found": {
     "defaultMessage": "Kullanıcı bulunamadı"
   },
+  "profile.force-password-reset.admonition-body": {
+    "defaultMessage": "{username} kullanıcısının şifresi silinecek tüm cihazlardaki oturumlardan çıkış yapılacak ve yeni şifre belirleme linki aşağıdaki linke gönderilecek. E-Postanı değiştirirsen hesaptaki de değişecek. Link 24 saat boyunca geçerlidir ve hesap kilitliyken dahi kullanılabilir."
+  },
+  "profile.force-password-reset.admonition-title": {
+    "defaultMessage": "Geçerli Şifre çalışmayacak"
+  },
+  "profile.force-password-reset.button": {
+    "defaultMessage": "Şifreyi sıfırla"
+  },
+  "profile.force-password-reset.email-label": {
+    "defaultMessage": "Hesap Maili"
+  },
+  "profile.force-password-reset.email-placeholder": {
+    "defaultMessage": "Hesabın kayıtlı postasını kullanmak için boş bırakın"
+  },
+  "profile.force-password-reset.error-description": {
+    "defaultMessage": "Şifre sıfırlanırken bir hata oluştu. Lütfen tekrar dene."
+  },
+  "profile.force-password-reset.error-title": {
+    "defaultMessage": "Şifre sıfırlanamadı"
+  },
+  "profile.force-password-reset.success-description": {
+    "defaultMessage": "{username} kullanıcısına bir şifre sıfırlama linki gönderildi."
+  },
+  "profile.force-password-reset.success-title": {
+    "defaultMessage": "Şifre sıfırlama"
+  },
+  "profile.force-password-reset.title": {
+    "defaultMessage": "{username} için zorla şifre sıfırlama"
+  },
   "profile.label.affiliate": {
     "defaultMessage": "Ortaklar"
   },
@@ -3358,6 +3409,9 @@
   },
   "profile.label.joined": {
     "defaultMessage": "Katıldı"
+  },
+  "profile.label.locked": {
+    "defaultMessage": "Kilitli"
   },
   "profile.label.no-collections": {
     "defaultMessage": "Bu kullanıcı koleksiyona sahip değil!"

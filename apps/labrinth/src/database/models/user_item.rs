@@ -3,6 +3,7 @@ use super::{DBCollectionId, DBReportId, DBThreadId};
 use crate::database::models::DBOrganizationId;
 use crate::database::models::charge_item::DBCharge;
 use crate::database::models::thread_item::ThreadMessageBuilder;
+use crate::database::models::user_lock_item::DBUserLock;
 use crate::database::models::user_subscription_item::DBUserSubscription;
 use crate::database::{PgTransaction, models};
 use crate::models::billing::ChargeStatus;
@@ -61,6 +62,9 @@ pub struct DBUser {
     pub is_subscribed_to_newsletter: bool,
 
     pub eligibility_verified_at: Option<DateTime<Utc>>,
+
+    #[serde(default)]
+    pub lock: Option<DBUserLock>,
 }
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
@@ -78,6 +82,10 @@ pub struct Pride26CampaignDonation {
 }
 
 impl DBUser {
+    pub fn is_locked(&self) -> bool {
+        self.lock.is_some()
+    }
+
     pub async fn insert(
         &self,
         transaction: &mut PgTransaction<'_>,
@@ -206,10 +214,10 @@ impl DBUser {
                     .collect::<Vec<_>>();
 
                 sqlx::query!(
-                    "
+                    r#"
                     SELECT id, email,
                         avatar_url, raw_avatar_url, username, bio,
-                        created, role, badges,
+                        users.created, role, badges,
                         (
                             SELECT MAX(campaign_donations.donated_at)
                             FROM campaign_donations
@@ -223,10 +231,14 @@ impl DBUser {
                         github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,
                         email_verified, password, totp_secret, paypal_id, paypal_country, paypal_email,
                         venmo_handle, stripe_customer_id, allow_friend_requests, is_subscribed_to_newsletter,
-                        eligibility_verified_at
+                        eligibility_verified_at,
+                        user_locks.locked_by AS "lock_locked_by?",
+                        user_locks.reason AS "lock_reason?",
+                        user_locks.created AS "lock_created?"
                     FROM users
+                    LEFT JOIN user_locks ON user_locks.user_id = users.id
                     WHERE id = ANY($1) OR LOWER(username) = ANY($2)
-                    ",
+                    "#,
                     &user_ids,
                     &slugs,
                 )
@@ -274,6 +286,16 @@ impl DBUser {
                             allow_friend_requests: u.allow_friend_requests,
                             is_subscribed_to_newsletter: u.is_subscribed_to_newsletter,
                             eligibility_verified_at: u.eligibility_verified_at,
+                            lock: u
+                                .lock_locked_by
+                                .zip(u.lock_reason)
+                                .zip(u.lock_created)
+                                .map(|((locked_by, reason), created)| DBUserLock {
+                                    user_id: DBUserId(u.id),
+                                    locked_by: DBUserId(locked_by),
+                                    reason,
+                                    created,
+                                }),
                         };
 
                         acc.insert(u.id, (Some(u.username), user));
@@ -579,6 +601,36 @@ impl DBUser {
         .await?;
 
         Ok(codes)
+    }
+
+    pub async fn remove_2fa(
+        user_id: DBUserId,
+        transaction: &mut PgTransaction<'_>,
+    ) -> Result<()> {
+        sqlx::query!(
+            "
+            UPDATE users
+            SET totp_secret = NULL
+            WHERE id = $1
+            ",
+            user_id as DBUserId,
+        )
+        .execute(&mut *transaction)
+        .await
+        .wrap_err("clearing TOTP secret")?;
+
+        sqlx::query!(
+            "
+            DELETE FROM user_backup_codes
+            WHERE user_id = $1
+            ",
+            user_id as DBUserId,
+        )
+        .execute(&mut *transaction)
+        .await
+        .wrap_err("deleting backup codes")?;
+
+        Ok(())
     }
 
     pub async fn clear_caches(
@@ -1126,6 +1178,19 @@ impl DBUser {
             .execute(&mut *transaction)
             .await
             .wrap_err("failed to update oauth_clients created_by")?;
+
+            sqlx::query!(
+                "
+				UPDATE user_locks
+				SET locked_by = $1
+				WHERE locked_by = $2
+				",
+                deleted_user as DBUserId,
+                id as DBUserId,
+            )
+            .execute(&mut *transaction)
+            .await
+            .wrap_err("failed to update user_locks locked_by")?;
 
             sqlx::query!(
                 "

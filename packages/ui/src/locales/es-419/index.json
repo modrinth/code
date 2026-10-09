@@ -722,6 +722,12 @@
   "content.page-layout.failed-to-load": {
     "defaultMessage": "Error al cargar contenido"
   },
+  "content.page-layout.failed-to-load-changelog": {
+    "defaultMessage": "Error al cargar registro"
+  },
+  "content.page-layout.failed-to-load-updates": {
+    "defaultMessage": "Error al cargar las actualizaciones disponibles"
+  },
   "content.page-layout.filter.add": {
     "defaultMessage": "Filtro"
   },
@@ -1239,7 +1245,7 @@
     "defaultMessage": "Guardar atribución"
   },
   "external-files.permissions-card.editor.select-license-label": {
-    "defaultMessage": "Selecciona una licencia..."
+    "defaultMessage": "Buscar licencias..."
   },
   "external-files.permissions-card.editor.type-label": {
     "defaultMessage": "Razón de permiso"
@@ -1282,6 +1288,9 @@
   },
   "external-files.permissions-card.last-updated": {
     "defaultMessage": "Última actualización el {date} por {user}"
+  },
+  "external-files.permissions-card.license.all-rights": {
+    "defaultMessage": "Todos los derechos reservados/Sin licencia"
   },
   "external-files.permissions-card.license.unknown": {
     "defaultMessage": "Desconocido"
@@ -2053,9 +2062,6 @@
   },
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Servidor restablecido a la configuración inicial"
-  },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "Opciones de soporte"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Aumenta hasta {cpus} CPUs"
@@ -3281,14 +3287,26 @@
   "profile.button.create-project": {
     "defaultMessage": "Crear un proyecto"
   },
+  "profile.button.force-password-reset": {
+    "defaultMessage": "Forzar restablecimiento de contraseña"
+  },
   "profile.button.info": {
     "defaultMessage": "Ver detalles del usuario"
+  },
+  "profile.button.lock": {
+    "defaultMessage": "Bloquear cuenta"
   },
   "profile.button.manage-projects": {
     "defaultMessage": "Gestionar proyectos"
   },
   "profile.button.remove-affiliate": {
     "defaultMessage": "Remover como afiliado"
+  },
+  "profile.button.reset-2fa": {
+    "defaultMessage": "Restablecer autenticación de dos factores"
+  },
+  "profile.button.revoke-sessions": {
+    "defaultMessage": "Revocar todas las sesiones"
   },
   "profile.button.set-affiliate": {
     "defaultMessage": "Configurar como afiliado"
@@ -3298,6 +3316,9 @@
   },
   "profile.button.unblock": {
     "defaultMessage": "Desbloquear"
+  },
+  "profile.button.unlock": {
+    "defaultMessage": "Desbloquear cuenta"
   },
   "profile.collection.projects-count": {
     "defaultMessage": "{count, plural, one {# proyecto} other {# proyectos}}"
@@ -3347,6 +3368,36 @@
   "profile.error.not-found": {
     "defaultMessage": "Usuario no encontrado"
   },
+  "profile.force-password-reset.admonition-body": {
+    "defaultMessage": "La contraseña de {username} se eliminará de inmediato; se cerrará la sesión en todos sus dispositivos y se enviará un enlace al correo electrónico a continuación para configurar una nueva. Si cambias el correo electrónico, este reemplazará al actual en la cuenta. El enlace expira en 24 horas y se puede utilizar incluso si la cuenta está bloqueada."
+  },
+  "profile.force-password-reset.admonition-title": {
+    "defaultMessage": "La contraseña actual dejará de funcionar"
+  },
+  "profile.force-password-reset.button": {
+    "defaultMessage": "Restablecer contraseña"
+  },
+  "profile.force-password-reset.email-label": {
+    "defaultMessage": "Correo electrónico de la cuenta"
+  },
+  "profile.force-password-reset.email-placeholder": {
+    "defaultMessage": "Dejar en blanco para usar el correo electrónico de la cuenta"
+  },
+  "profile.force-password-reset.error-description": {
+    "defaultMessage": "Ocurrió un error al restablecer la contraseña. Por favor, inténtalo de nuevo."
+  },
+  "profile.force-password-reset.error-title": {
+    "defaultMessage": "Error al restablecer la contraseña"
+  },
+  "profile.force-password-reset.success-description": {
+    "defaultMessage": "Un enlace para restablecer la contraseña se ha enviado a {username}."
+  },
+  "profile.force-password-reset.success-title": {
+    "defaultMessage": "Restablecimiento de contraseña"
+  },
+  "profile.force-password-reset.title": {
+    "defaultMessage": "Forzar restablecimiento de contraseña para {username}"
+  },
   "profile.label.affiliate": {
     "defaultMessage": "Afiliado"
   },
@@ -3361,6 +3412,9 @@
   },
   "profile.label.joined": {
     "defaultMessage": "Se unió"
+  },
+  "profile.label.locked": {
+    "defaultMessage": "Bloqueado"
   },
   "profile.label.no-collections": {
     "defaultMessage": "¡Este usuario no tiene colecciones!"
@@ -3386,6 +3440,54 @@
   "profile.official-account.bio": {
     "defaultMessage": "La cuenta oficial de Modrinth. Consigue ayuda en <support-link></support-link> o escríbenos por correo electrónico: <email></email>"
   },
+  "profile.reset-2fa.admonition-body": {
+    "defaultMessage": "Se eliminarán el autenticador y los códigos de respaldo de {username} y se le notificará. Haz esto solo después de verificar su identidad."
+  },
+  "profile.reset-2fa.admonition-title": {
+    "defaultMessage": "¿Estás seguro de que quieres restablecer la autenticación de dos factores?"
+  },
+  "profile.reset-2fa.button": {
+    "defaultMessage": "Restablecer 2FA"
+  },
+  "profile.reset-2fa.error-description": {
+    "defaultMessage": "Ocurrió un error al restablecer la autenticación de dos factores. Por favor, inténtalo de nuevo."
+  },
+  "profile.reset-2fa.error-title": {
+    "defaultMessage": "Error al restablecer la autenticación de dos factores"
+  },
+  "profile.reset-2fa.success-description": {
+    "defaultMessage": "Se ha eliminado la autenticación de dos factores de {username}."
+  },
+  "profile.reset-2fa.success-title": {
+    "defaultMessage": "Autenticación de dos factores restablecida"
+  },
+  "profile.reset-2fa.title": {
+    "defaultMessage": "Restablecer autenticación de dos factores para {username}"
+  },
+  "profile.revoke-sessions.admonition-body": {
+    "defaultMessage": "Se cerrará la sesión de {username} en todos los dispositivos y tendrá que iniciar sesión de nuevo. Los tokens de acceso personal no se verán afectados."
+  },
+  "profile.revoke-sessions.admonition-title": {
+    "defaultMessage": "¿Estás seguro de que quieres revocar todas las sesiones?"
+  },
+  "profile.revoke-sessions.button": {
+    "defaultMessage": "Revocar sesiones"
+  },
+  "profile.revoke-sessions.error-description": {
+    "defaultMessage": "Ocurrió un error al revocar las sesiones. Por favor, inténtalo de nuevo."
+  },
+  "profile.revoke-sessions.error-title": {
+    "defaultMessage": "Error al revocar las sesiones"
+  },
+  "profile.revoke-sessions.success-description": {
+    "defaultMessage": "Se ha cerrado la sesión de {username} en todas partes."
+  },
+  "profile.revoke-sessions.success-title": {
+    "defaultMessage": "Sesiones revocadas"
+  },
+  "profile.revoke-sessions.title": {
+    "defaultMessage": "Revocar sesiones para {username}"
+  },
   "profile.unblock-user.error-description": {
     "defaultMessage": "Ocurrió un error al desbloquear a este usuario. Por favor inténtalo otra vez."
   },
@@ -3397,6 +3499,18 @@
   },
   "profile.unblock-user.success-title": {
     "defaultMessage": "Usuario desbloqueado"
+  },
+  "profile.unlock-user.error-description": {
+    "defaultMessage": "Ocurrió un error al desbloquear esta cuenta. Por favor, inténtalo de nuevo."
+  },
+  "profile.unlock-user.error-title": {
+    "defaultMessage": "Error al desbloquear la cuenta"
+  },
+  "profile.unlock-user.success-description": {
+    "defaultMessage": "Se ha desbloqueado la cuenta de {username}."
+  },
+  "profile.unlock-user.success-title": {
+    "defaultMessage": "Cuenta desbloqueada"
   },
   "project-card.date.published.tooltip": {
     "defaultMessage": "Publicado el {date}"
@@ -6797,6 +6911,78 @@
   "unknown-file-warning-modal.unrecognized-files": {
     "defaultMessage": "Archivos no reconocidos"
   },
+  "update-all-modal.changelog-for": {
+    "defaultMessage": "Cambios para {project}"
+  },
+  "update-all-modal.changelog-loaded": {
+    "defaultMessage": "Registro cargado."
+  },
+  "update-all-modal.close-changelog": {
+    "defaultMessage": "Cerrar registro"
+  },
+  "update-all-modal.current-version": {
+    "defaultMessage": "Versión actual"
+  },
+  "update-all-modal.empty": {
+    "defaultMessage": "No hay actualizaciones disponibles."
+  },
+  "update-all-modal.header": {
+    "defaultMessage": "Actualizar proyectos"
+  },
+  "update-all-modal.loading": {
+    "defaultMessage": "Cargando actualizaciones…"
+  },
+  "update-all-modal.loading-changelog": {
+    "defaultMessage": "Cargando el registro de cambios..."
+  },
+  "update-all-modal.new-version": {
+    "defaultMessage": "Nueva versión"
+  },
+  "update-all-modal.no-changelog": {
+    "defaultMessage": "No se ha proporcionado ningún registro de cambios para esta versión."
+  },
+  "update-all-modal.no-compatible-updates": {
+    "defaultMessage": "No hay actualizaciones compatibles disponibles."
+  },
+  "update-all-modal.no-version": {
+    "defaultMessage": "No hay actualizaciones compatibles"
+  },
+  "update-all-modal.project": {
+    "defaultMessage": "Proyecto"
+  },
+  "update-all-modal.project-list": {
+    "defaultMessage": "Actualizaciones de proyecto"
+  },
+  "update-all-modal.results": {
+    "defaultMessage": "{count, plural,one {# proyecto seleccionado} other {# proyectos seleccionados}}"
+  },
+  "update-all-modal.select-all": {
+    "defaultMessage": "Seleccionar todos los proyectos"
+  },
+  "update-all-modal.select-project": {
+    "defaultMessage": "Seleccionar {project} para actualizar"
+  },
+  "update-all-modal.select-version": {
+    "defaultMessage": "Nueva versión para {project}"
+  },
+  "update-all-modal.update": {
+    "defaultMessage": "Actualizar {count, plural, one {# proyecto} other {# proyectos}}"
+  },
+  "update-all-modal.versions": {
+    "defaultMessage": "Versión actual / Nueva versión"
+  },
+  "update-all-modal.view": {
+    "defaultMessage": "Ver"
+  },
+  "update-all-modal.view-changelog": {
+    "defaultMessage": "Ver cambios para {project}"
+  },
+  "update-all-modal.warning": {
+    "defaultMessage": "No podemos garantizar que las actualizaciones sean seguras para tus mundos. Revisa el registro de cambios de todas las versiones intermedias y considera crear una copia de seguridad."
+  },
+  "update-all-modal.warning-server": {
+    "defaultMessage": "No podemos garantizar que las actualizaciones sean seguras para tu servidor. Revisa los cambios y considera crear una copia de seguridad."
+  },
   "user.profile.badge.alpha.about.1": {
     "defaultMessage": "Este usuario ha estado presente desde la Alpha de Modrinth, la cuál terminó en noviembre de 2020."
   },
@@ -6990,4 +7176,3 @@
     "defaultMessage": "Tipo"
   }
 }
-

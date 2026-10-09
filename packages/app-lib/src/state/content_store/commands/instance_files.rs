@@ -122,6 +122,8 @@ impl ContentStore {
         instance: &Instance,
         files: &[InstanceFile],
         bindings: &[InstanceFileStorage],
+        missing_file_ids: &std::collections::HashSet<String>,
+        copied_file_ids: &std::collections::HashSet<String>,
     ) -> crate::Result<()> {
         let files: HashMap<_, _> =
             files.iter().map(|file| (file.id.as_str(), file)).collect();
@@ -131,6 +133,22 @@ impl ContentStore {
                 files.get(binding.file_id.as_str()).ok_or_else(|| {
                     input("Rollback content reference has no file record")
                 })?;
+            if missing_file_ids.contains(&binding.file_id) {
+                restored.push((
+                    &binding.file_id,
+                    &binding.blob_sha512,
+                    binding.storage_kind,
+                ));
+                continue;
+            }
+            if copied_file_ids.contains(&binding.file_id) {
+                restored.push((
+                    &binding.file_id,
+                    &binding.blob_sha512,
+                    FileStorageKind::Copy,
+                ));
+                continue;
+            }
             let stored_file = self
                 .lookup(Some(&binding.blob_sha512), Some(file.size))
                 .await?

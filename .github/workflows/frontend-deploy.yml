@@ -38,6 +38,10 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-${{ inputs.preview && 'preview' || 'push' }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/prod' }}
 
+env:
+  TURBO_TELEMETRY_DISABLED: 1
+  pnpm_config_color: always
+
 jobs:
   deploy:
     runs-on: namespace-profile-modrinth-frontend
@@ -100,7 +104,7 @@ jobs:
         run: corepack enable
 
       - name: Set up caches
-        uses: namespacelabs/nscloud-cache-action@c5f8dab7560444c4bf8dbc64f1b203431873c547 # v1.6.1
+        uses: namespacelabs/nscloud-cache-action@1124a6f3ce44e5cf84cc22111530961f4d2a15f9 # v1.7.0
         with:
           cache: |
             rust
@@ -108,7 +112,7 @@ jobs:
             apt
 
       - name: Set up Turborepo caching
-        uses: namespace-actions/setup-turbocache@f96bd6befa13ae74b2858a5be49573640d4636f5 # v0.0.2
+        uses: namespace-actions/setup-turbocache@a94b84c111f2cc781a4a83c4d07a99f2c63e33d6 # v0.0.3
 
       - name: Inject build variables
         working-directory: ./apps/frontend
@@ -133,18 +137,6 @@ jobs:
           CF_PAGES_URL: ${{ steps.meta.outputs.url }}
           BUILD_ENV: ${{ steps.meta.outputs.env }}
           PREVIEW: ${{ inputs.preview && 'true' || 'false' }}
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-
-      - name: Create Sentry release and upload sourcemaps
-        uses: getsentry/action-release@ff07929a6537bac57790c3451cf4d364aca38528 # v3.7.0
-        env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: modrinth
-          SENTRY_PROJECT: knossos-server
-        with:
-          environment: ${{ steps.meta.outputs.env }}
-          sourcemaps: ./apps/frontend/.output/server
-          url_prefix: '~/'
 
       - name: Install Wrangler CLI
         uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0

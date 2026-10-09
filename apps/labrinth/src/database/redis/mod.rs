@@ -33,6 +33,8 @@ impl RedisConfig {
             actual_expiry: ENV.REDIS_ACTUAL_EXPIRY,
             version_default_expiry: ENV.REDIS_VERSION_DEFAULT_EXPIRY,
             version_actual_expiry: ENV.REDIS_VERSION_ACTUAL_EXPIRY,
+            session_default_expiry: ENV.REDIS_SESSION_DEFAULT_EXPIRY,
+            session_actual_expiry: ENV.REDIS_SESSION_ACTUAL_EXPIRY,
             encoding_format: ENV.REDIS_ENCODING_FORMAT,
             compression_algorithm: ENV.REDIS_COMPRESSION_ALGORITHM,
             compression_level: ENV.REDIS_COMPRESSION_LEVEL,

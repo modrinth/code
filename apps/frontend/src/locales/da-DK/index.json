@@ -629,9 +629,6 @@
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Åbn Modrinth-appen"
   },
-  "auth.sign-in.launcher.complete.title": {
-    "message": "Du er logget ind"
-  },
   "auth.sign-in.no-account": {
     "message": "Har du ikke en konto?"
   },

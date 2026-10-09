@@ -115,6 +115,12 @@ async fn set_restart_after_pending_update(
 // if Tauri app is called with arguments, then those arguments will be treated as commands
 // ie: deep links or filepaths for .mrpacks
 fn main() {
+    let runtime = tokio::runtime::Builder::new_multi_thread()
+        .enable_all()
+        .build()
+        .expect("failed to create app async runtime");
+    tauri::async_runtime::set(runtime.handle().clone());
+
     #[cfg(feature = "export-app-events")]
     theseus::export_app_event_bindings(
         std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
@@ -197,7 +203,7 @@ fn main() {
 
         // Refresh the hidden window's frame before window-state measures its client area.
         builder = builder.plugin(
-            tauri::plugin::Builder::new("window-frame")
+            tauri::plugin::Builder::<_, ()>::new("window-frame")
                 .on_window_ready(|window| {
                     if window.label() != "main" {
                         return;

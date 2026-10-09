@@ -15,6 +15,9 @@ permissions:
   contents: read
   id-token: write
 
+env:
+  pnpm_config_color: always
+
 jobs:
   release:
     if: github.repository_owner == 'modrinth' && github.ref == 'refs/heads/main'

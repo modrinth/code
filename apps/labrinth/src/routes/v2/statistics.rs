@@ -1,4 +1,4 @@
-use crate::database::PgPool;
+use crate::database::ReadOnlyPgPool;
 use crate::routes::{
     ApiError, v2_reroute,
     v3::{self, statistics::V3Stats},
@@ -33,9 +33,9 @@ pub struct V2Stats {
 )]
 #[get("/statistics")]
 pub async fn get_stats(
-    pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
 ) -> Result<HttpResponse, ApiError> {
-    let response = v3::statistics::get_stats(pool)
+    let response = v3::statistics::get_stats(ro_pool)
         .await
         .or_else(v2_reroute::flatten_404_error)
         .wrap_api_err("flattening v2 not-found response")?;

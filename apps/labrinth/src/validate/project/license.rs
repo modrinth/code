@@ -39,29 +39,7 @@ pub(super) fn validate_custom_license(
     id: &str,
     url: Option<&str>,
 ) -> Vec<ProjectNag> {
-    const BUILTIN_LICENSES: &[&str] = &[
-        "Apache-2.0",
-        "BSD-2-Clause",
-        "BSD-3-Clause",
-        "CC0-1.0",
-        "CC-BY-4.0",
-        "CC-BY-SA-4.0",
-        "CC-BY-NC-4.0",
-        "CC-BY-NC-SA-4.0",
-        "CC-BY-ND-4.0",
-        "CC-BY-NC-ND-4.0",
-        "AGPL-3.0",
-        "LGPL-2.1",
-        "LGPL-3.0",
-        "GPL-2.0",
-        "GPL-3.0",
-        "ISC",
-        "MIT",
-        "MPL-2.0",
-        "Zlib",
-    ];
-    let base_id = id.trim_end_matches("-only").trim_end_matches("-or-later");
-    let custom = !BUILTIN_LICENSES.contains(&base_id)
+    let custom = spdx::license_id(id).is_none()
         && !matches!(
             id,
             "LicenseRef-Unknown"
@@ -92,13 +70,18 @@ mod tests {
         for (id, url) in [
             ("LicenseRef-", Some("https://license.project.dev")),
             ("LicenseRef-Custom", None),
-            ("Unlicense", None),
+            ("LicenseRef-Custom", Some(" ")),
             ("", Some("https://license.project.dev")),
         ] {
             assert_eq!(validate_custom_license(id, url).len(), 1, "{id}");
         }
-        for id in ["MIT", "GPL-3.0-or-later", "LicenseRef-All-Rights-Reserved"]
-        {
+        for id in [
+            "MIT",
+            "GPL-3.0-or-later",
+            "Unlicense",
+            "0BSD",
+            "LicenseRef-All-Rights-Reserved",
+        ] {
             assert!(validate_custom_license(id, None).is_empty());
         }
         assert!(

@@ -692,6 +692,12 @@
   "content.page-layout.failed-to-load": {
     "defaultMessage": "Не удалось загрузить контент"
   },
+  "content.page-layout.failed-to-load-changelog": {
+    "defaultMessage": "Не удалось загрузить изменения"
+  },
+  "content.page-layout.failed-to-load-updates": {
+    "defaultMessage": "Не удалось загрузить обновления"
+  },
   "content.page-layout.filter.add": {
     "defaultMessage": "Фильтр"
   },
@@ -1179,7 +1185,7 @@
     "defaultMessage": "Сохранить атрибуцию"
   },
   "external-files.permissions-card.editor.select-license-label": {
-    "defaultMessage": "Выберите лицензию..."
+    "defaultMessage": "Поиск лицензий..."
   },
   "external-files.permissions-card.editor.type-label": {
     "defaultMessage": "Тип разрешения"
@@ -1222,6 +1228,9 @@
   },
   "external-files.permissions-card.last-updated": {
     "defaultMessage": "Последнее изменение {date} от {user}"
+  },
+  "external-files.permissions-card.license.all-rights": {
+    "defaultMessage": "Все права защищены/Без лицензии"
   },
   "external-files.permissions-card.license.unknown": {
     "defaultMessage": "Неизвестно"
@@ -1299,7 +1308,7 @@
     "defaultMessage": "Удалить группу"
   },
   "external-files.permissions-card.remove-group-confirmation.description": {
-    "defaultMessage": "Эта группа атрибуции и все находящиеся в ней файлы будут удалены навсегда. Это действие необратимо."
+    "defaultMessage": "Группа атрибуции и все её файлы будут удалены навсегда. Это действие необратимо."
   },
   "external-files.permissions-card.remove-group-confirmation.title": {
     "defaultMessage": "Удалить {title}?"
@@ -1395,10 +1404,10 @@
     "defaultMessage": "Удаление файла"
   },
   "files.delete-modal.warning.file": {
-    "defaultMessage": "Этот файл будет удалён навсегда. Это действие необратимо."
+    "defaultMessage": "Файл будет удалён навсегда. Это действие необратимо."
   },
   "files.delete-modal.warning.folder": {
-    "defaultMessage": "Эта папка и всё её содержимое будут удалены навсегда. Отменить это действие нельзя."
+    "defaultMessage": "Папка и всё её содержимое будут удалены навсегда. Это действие необратимо."
   },
   "files.editor.failed-to-open-text": {
     "defaultMessage": "Не удалось загрузить содержимое файла."
@@ -1976,9 +1985,6 @@
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Сервер сброшен до первого запуска"
   },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "Настройки поддержки"
-  },
   "hosting.specs.burst": {
     "defaultMessage": "Рост до {cpus} CPU"
   },
@@ -2418,7 +2424,7 @@
     "defaultMessage": "Загрузка версий..."
   },
   "instances.updater-modal.no-changelog": {
-    "defaultMessage": "У этой версии нет описания изменений."
+    "defaultMessage": "Список изменений отсутствует."
   },
   "instances.updater-modal.no-versions": {
     "defaultMessage": "Версии не найдены"
@@ -2451,7 +2457,7 @@
     "defaultMessage": "{amount} доступно."
   },
   "label.changelog": {
-    "defaultMessage": "Список изменений"
+    "defaultMessage": "Изменения"
   },
   "label.changes-saved": {
     "defaultMessage": "Изменения сохранены"
@@ -3197,14 +3203,26 @@
   "profile.button.create-project": {
     "defaultMessage": "Создать проект"
   },
+  "profile.button.force-password-reset": {
+    "defaultMessage": "Сбросить пароль"
+  },
   "profile.button.info": {
     "defaultMessage": "Посмотреть подробности"
+  },
+  "profile.button.lock": {
+    "defaultMessage": "Закрыть доступ"
   },
   "profile.button.manage-projects": {
     "defaultMessage": "Управление проектами"
   },
   "profile.button.remove-affiliate": {
     "defaultMessage": "Убрать из партнёров"
+  },
+  "profile.button.reset-2fa": {
+    "defaultMessage": "Сбросить двухфакторную аутентификацию"
+  },
+  "profile.button.revoke-sessions": {
+    "defaultMessage": "Завершить все сеансы"
   },
   "profile.button.set-affiliate": {
     "defaultMessage": "Сделать партнёром"
@@ -3214,6 +3232,9 @@
   },
   "profile.button.unblock": {
     "defaultMessage": "Разблокировать"
+  },
+  "profile.button.unlock": {
+    "defaultMessage": "Открыть доступ"
   },
   "profile.collection.projects-count": {
     "defaultMessage": "{count, plural, one {# проект} few {# проекта} other {# проектов}}"
@@ -3263,6 +3284,33 @@
   "profile.error.not-found": {
     "defaultMessage": "Пользователь не найден"
   },
+  "profile.force-password-reset.admonition-title": {
+    "defaultMessage": "Текущий пароль перестанет работать"
+  },
+  "profile.force-password-reset.button": {
+    "defaultMessage": "Сбросить пароль"
+  },
+  "profile.force-password-reset.email-label": {
+    "defaultMessage": "Почта аккаунта"
+  },
+  "profile.force-password-reset.email-placeholder": {
+    "defaultMessage": "Оставьте пустым, чтобы использовать электронную почту аккаунта"
+  },
+  "profile.force-password-reset.error-description": {
+    "defaultMessage": "Произошла ошибка при сбросе пароля. Повторите попытку."
+  },
+  "profile.force-password-reset.error-title": {
+    "defaultMessage": "Не удалось сбросить пароль"
+  },
+  "profile.force-password-reset.success-description": {
+    "defaultMessage": "Ссылка для сброса пароля была отправлена {username}."
+  },
+  "profile.force-password-reset.success-title": {
+    "defaultMessage": "Пароль сброшен"
+  },
+  "profile.force-password-reset.title": {
+    "defaultMessage": "Принудительный сброс пароля для {username}"
+  },
   "profile.label.affiliate": {
     "defaultMessage": "Партнёр"
   },
@@ -3277,6 +3325,9 @@
   },
   "profile.label.joined": {
     "defaultMessage": "Регистрация:"
+  },
+  "profile.label.locked": {
+    "defaultMessage": "Доступ закрыт"
   },
   "profile.label.no-collections": {
     "defaultMessage": "У этого пользователя нет коллекций!"
@@ -3302,6 +3353,48 @@
   "profile.official-account.bio": {
     "defaultMessage": "Официальный аккаунт Modrinth. Связь с поддержкой: <support-link></support-link> или по почте <email></email>"
   },
+  "profile.reset-2fa.admonition-title": {
+    "defaultMessage": "Вы действительно хотите сбросить двухфакторную аутентификацию?"
+  },
+  "profile.reset-2fa.button": {
+    "defaultMessage": "Сбросить двухфакторную аутентификацию"
+  },
+  "profile.reset-2fa.error-description": {
+    "defaultMessage": "Во время сброса двухфакторной аутентификации произошла ошибка. Пожалуйста, повторите попытку."
+  },
+  "profile.reset-2fa.error-title": {
+    "defaultMessage": "Не удалось сбросить двухфакторную аутентификацию"
+  },
+  "profile.reset-2fa.success-description": {
+    "defaultMessage": "Двухфакторная аутентификация {username} была удалена."
+  },
+  "profile.reset-2fa.success-title": {
+    "defaultMessage": "Сброс двухфакторной аутентификации"
+  },
+  "profile.reset-2fa.title": {
+    "defaultMessage": "Сбросить двухфакторную аутентификацию для {username}"
+  },
+  "profile.revoke-sessions.admonition-title": {
+    "defaultMessage": "Вы уверены, что хотите отозвать все сессии?"
+  },
+  "profile.revoke-sessions.button": {
+    "defaultMessage": "Завершить сеансы"
+  },
+  "profile.revoke-sessions.error-description": {
+    "defaultMessage": "Произошла ошибка при завершении сеансов. Повторите попытку."
+  },
+  "profile.revoke-sessions.error-title": {
+    "defaultMessage": "Не удалось завершить сеансы"
+  },
+  "profile.revoke-sessions.success-description": {
+    "defaultMessage": "{username} вышел из системы со всех устройств."
+  },
+  "profile.revoke-sessions.success-title": {
+    "defaultMessage": "Сессии завершены"
+  },
+  "profile.revoke-sessions.title": {
+    "defaultMessage": "Отменить сессии для {username}"
+  },
   "profile.unblock-user.error-description": {
     "defaultMessage": "Произошла ошибка при разблокировке пользователя. Попробуйте снова."
   },
@@ -3313,6 +3406,18 @@
   },
   "profile.unblock-user.success-title": {
     "defaultMessage": "Пользователь разблокирован"
+  },
+  "profile.unlock-user.error-description": {
+    "defaultMessage": "Произошла ошибка при открытии доступа к аккаунту. Повторите попытку."
+  },
+  "profile.unlock-user.error-title": {
+    "defaultMessage": "Не удалось открыть доступ"
+  },
+  "profile.unlock-user.success-description": {
+    "defaultMessage": "Доступ к аккаунту {username} открыт."
+  },
+  "profile.unlock-user.success-title": {
+    "defaultMessage": "Доступ открыт"
   },
   "project-card.date.published.tooltip": {
     "defaultMessage": "Опубликован {date}"
@@ -4128,7 +4233,7 @@
     "defaultMessage": "Версия недоступна из-за отсутствия разрешений"
   },
   "project.versions.withheld-versions-warning.resolve-button": {
-    "defaultMessage": "Решить"
+    "defaultMessage": "Исправить"
   },
   "project.visibility.archived": {
     "defaultMessage": "Архивирован"
@@ -4563,7 +4668,7 @@
     "defaultMessage": "Варианты не найдены."
   },
   "servers.access-page.activity-log-filter.instances": {
-    "defaultMessage": "Экземпляры"
+    "defaultMessage": "Сборки"
   },
   "servers.access-page.activity-log-filter.server-scoped-instance": {
     "defaultMessage": "Сервер"
@@ -4713,10 +4818,10 @@
     "defaultMessage": "Пользователь"
   },
   "servers.audit-log.column.world": {
-    "defaultMessage": "Экземпляр"
+    "defaultMessage": "Сборка"
   },
   "servers.audit-log.column.world.tooltip-description": {
-    "defaultMessage": "Экземпляры сервера — это изолированные среды со своим установленным контентом и файлами мира."
+    "defaultMessage": "Сборки сервера — это изолированные среды со своим установленным контентом и файлами мира."
   },
   "servers.audit-log.column.world.tooltip-title": {
     "defaultMessage": "Скоро будет доступно!"
@@ -5721,7 +5826,7 @@
     "defaultMessage": "Пожалуйста, не закрывайте страницу во время загрузки."
   },
   "servers.setup.uploading-modpack.header": {
-    "defaultMessage": "Загрузка сборки модов"
+    "defaultMessage": "Загрузка сборки"
   },
   "settings.account.title": {
     "defaultMessage": "Аккаунт и безопасность"
@@ -6706,6 +6811,78 @@
   },
   "unknown-file-warning-modal.unrecognized-files": {
     "defaultMessage": "Нераспознанные файлы"
+  },
+  "update-all-modal.changelog-for": {
+    "defaultMessage": "Список изменений {project}"
+  },
+  "update-all-modal.changelog-loaded": {
+    "defaultMessage": "Список изменений загружен."
+  },
+  "update-all-modal.close-changelog": {
+    "defaultMessage": "Закрыть список изменений"
+  },
+  "update-all-modal.current-version": {
+    "defaultMessage": "Текущая версия"
+  },
+  "update-all-modal.empty": {
+    "defaultMessage": "Обновления отсутствуют."
+  },
+  "update-all-modal.header": {
+    "defaultMessage": "Обновление проектов"
+  },
+  "update-all-modal.loading": {
+    "defaultMessage": "Загрузка обновлений..."
+  },
+  "update-all-modal.loading-changelog": {
+    "defaultMessage": "Загрузка списка изменений..."
+  },
+  "update-all-modal.new-version": {
+    "defaultMessage": "Новая версия"
+  },
+  "update-all-modal.no-changelog": {
+    "defaultMessage": "Список изменений отсутствует."
+  },
+  "update-all-modal.no-compatible-updates": {
+    "defaultMessage": "Совместимые обновления отсутствуют."
+  },
+  "update-all-modal.no-version": {
+    "defaultMessage": "Нет совместимых обновлений"
+  },
+  "update-all-modal.project": {
+    "defaultMessage": "Проект"
+  },
+  "update-all-modal.project-list": {
+    "defaultMessage": "Обновления проектов"
+  },
+  "update-all-modal.results": {
+    "defaultMessage": "{count, plural, one {# проект готов к обновлению} few {# проекта готовы к обновлению} other {# проектов готовы к обновлению}}"
+  },
+  "update-all-modal.select-all": {
+    "defaultMessage": "Выбрать все проекты"
+  },
+  "update-all-modal.select-project": {
+    "defaultMessage": "Выбрать {project} для обновления"
+  },
+  "update-all-modal.select-version": {
+    "defaultMessage": "Новая версия {project}"
+  },
+  "update-all-modal.update": {
+    "defaultMessage": "Обновить {count, plural, one {# проект} few {# проекта} other {# проектов}}"
+  },
+  "update-all-modal.versions": {
+    "defaultMessage": "Текущая версия / Новая версия"
+  },
+  "update-all-modal.view": {
+    "defaultMessage": "Посмотреть"
+  },
+  "update-all-modal.view-changelog": {
+    "defaultMessage": "Посмотреть список изменений {project}"
+  },
+  "update-all-modal.warning": {
+    "defaultMessage": "Чтобы избежать проблем, изучите изменения и сделайте резервную копию своих миров."
+  },
+  "update-all-modal.warning-server": {
+    "defaultMessage": "Чтобы избежать проблем, изучите изменения и сделайте резервную копию своего сервера."
   },
   "user.profile.badge.alpha.about.1": {
     "defaultMessage": "Этот пользователь присоединился к Modrinth до завершения альфа‑тестирования в ноябре 2020 года."

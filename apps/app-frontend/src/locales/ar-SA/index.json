@@ -206,6 +206,12 @@
   "app.behavior-settings.content.title": {
     "message": "الصفحة الرئيسية والمحتوى"
   },
+  "app.behavior-settings.refocus-on-game-close.description": {
+    "message": "اظهر تطبيق Modrinth عند الخروج من ماينكرافت."
+  },
+  "app.behavior-settings.refocus-on-game-close.title": {
+    "message": "اعد التركيز علي التطبيق عندما تغلق ماينكرافت"
+  },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "بدء التشغيل والتنقل"
   },
@@ -317,11 +323,26 @@
   "app.download-manager.estimated-rate": {
     "message": "سرعة التحميل المقدرة"
   },
+  "app.download-manager.modpack": {
+    "message": "حزمة مودات"
+  },
+  "app.download-manager.modpack-installation": {
+    "message": "تنزيل حزمة مودات"
+  },
+  "app.download-manager.paused": {
+    "message": "عُلقت"
+  },
+  "app.download-manager.remove": {
+    "message": "احذف من التاريخ"
+  },
   "app.download-manager.tasks": {
     "message": "المهام"
   },
   "app.download-manager.title": {
     "message": "مدير التحميل"
+  },
+  "app.download-manager.verifying": {
+    "message": "يتم التحقق"
   },
   "app.error.state-init.open-backups-folder": {
     "message": "فتح مجلد النسخ الاحتياطية"
@@ -358,6 +379,9 @@
   },
   "app.features-settings.play-page.title": {
     "message": "صفحة التشغيل"
+  },
+  "app.features-settings.show-all-screenshots.title": {
+    "message": "اظهر كل لقتات الشاشة في الشريط الجانبي"
   },
   "app.features-settings.sidebar.title": {
     "message": "الشريط الجانبي"
@@ -796,6 +820,12 @@
   },
   "app.instance.worlds.remove-server-modal.remove-button": {
     "message": "إزالة الخادم"
+  },
+  "app.instance.worlds.remove-server-modal.remove-everywhere": {
+    "message": "احذف في جميع الاماكن"
+  },
+  "app.instance.worlds.remove-server-modal.remove-here": {
+    "message": "احذف هنا"
   },
   "app.instance.worlds.remove-server-modal.title": {
     "message": "إزالة الخادم"

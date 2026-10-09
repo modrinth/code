@@ -102,7 +102,7 @@
 						<div class="flex flex-col gap-2">
 							<FileButton
 								id="project-icon"
-								:max-size="262144000"
+								:max-size="524288"
 								accept="image/png,image/jpeg,image/gif,image/webp"
 								class="button-like choose-image"
 								prompt="Upload icon"
@@ -660,7 +660,7 @@ const uploadBanner = async () => {
 	try {
 		const existingBanner = project.value.gallery?.find((img) => img.name === MC_SERVER_BANNER_NAME)
 		if (existingBanner) {
-			await labrinth.projects_v3.deleteGalleryImage(project.value.id, existingBanner.url)
+			await labrinth.projects_v3.deleteGalleryImage(existingBanner.url)
 		}
 
 		const ext = bannerFile.value.type.split('/').pop() ?? 'png'
@@ -689,7 +689,7 @@ const deleteBanner = async () => {
 	try {
 		const bannerImage = project.value.gallery?.find((img) => img.name === MC_SERVER_BANNER_NAME)
 		if (bannerImage) {
-			await labrinth.projects_v3.deleteGalleryImage(project.value.id, bannerImage.url)
+			await labrinth.projects_v3.deleteGalleryImage(bannerImage.url)
 			await invalidate()
 			addNotification({
 				title: 'Banner removed',

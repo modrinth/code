@@ -68,6 +68,11 @@ impl EventState {
     }
 
     #[cfg(feature = "tauri")]
+    pub(crate) fn try_get() -> Option<Arc<Self>> {
+        EVENT_STATE.get().cloned()
+    }
+
+    #[cfg(feature = "tauri")]
     pub fn send(&self, event: AppEvent) -> crate::Result<()> {
         let payload =
             postcard::to_allocvec(&event).map_err(EventError::from)?;

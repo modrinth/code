@@ -899,17 +899,11 @@
   "auth.sign-in.launcher.callback.title": {
     "message": "Devolver inicio de sesión en Modrinth"
   },
-  "auth.sign-in.launcher.complete.description": {
-    "message": "Te estamos devolviendo a la aplicación Modrinth. Si nada sucede, usa el botón de abajo."
-  },
   "auth.sign-in.launcher.complete.go-to-website": {
     "message": "Ir a Modrinth.com"
   },
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Abrir la aplicación de Modrinth"
-  },
-  "auth.sign-in.launcher.complete.title": {
-    "message": "Has iniciado sesión"
   },
   "auth.sign-in.launcher.opening.description": {
     "message": "Si la aplicación no se abre, utilice el botón de abajo para terminar de iniciar sesión."
@@ -2987,6 +2981,9 @@
   "layout.publish.email-verification-required.title": {
     "message": "Verificación de correo electrónico requerida"
   },
+  "messages.noResults": {
+    "message": "¡No se encontraron resultados para tu búsqueda!"
+  },
   "modal.shared-instance.open-in-app.benefit.install": {
     "message": "Instala automáticamente todo lo que estén jugando"
   },
@@ -4136,11 +4133,11 @@
   "project.settings.license.custom": {
     "message": "Personalizada"
   },
-  "project.settings.license.custom-url-description": {
-    "message": "La ubicación web del texto completo de la licencia. Debes proporcionar un link ya que se trata de una licencia personalizada."
+  "project.settings.license.custom-name-required": {
+    "message": "Ingresa un nombre para tu licencia personalizada."
   },
-  "project.settings.license.has-spdx": {
-    "message": "Usar identificador SPDX"
+  "project.settings.license.custom-url-description": {
+    "message": "La ubicación web del texto completo de la licencia."
   },
   "project.settings.license.intro": {
     "message": "Es importante elegir una licencia adecuada para tu {type}. Puedes elegir una de nuestra lista o proporcionar una licencia personalizada. También puede proporcionar una URL personalizada a su licencia elegida; de lo contrario, se mostrará el texto de la licencia. Consulte nuestra <guide>guía de licencias</guide> para obtener más información."
@@ -4151,9 +4148,6 @@
   "project.settings.license.later-description": {
     "message": "La licencia que seleccionó tiene una cláusula \"o posterior\". Si marca esta casilla, los usuarios pueden utilizar su proyecto bajo ediciones posteriores de la licencia."
   },
-  "project.settings.license.missing-name": {
-    "message": "Introduzca un nombre o identificador SPDX para su licencia personalizada."
-  },
   "project.settings.license.missing-url": {
     "message": "Introduzca una URL al texto completo de su licencia personalizada."
   },
@@ -4161,31 +4155,19 @@
     "message": "Nombre de la licencia"
   },
   "project.settings.license.name-description": {
-    "message": "El nombre completo de la licencia. Si la licencia tiene un identificador SPDX, por favor marque la casilla de verificación y utilice el identificador en su lugar."
+    "message": "El nombre completo de la licencia personalizada."
   },
   "project.settings.license.name-placeholder": {
     "message": "Nombre de la licencia"
   },
-  "project.settings.license.optional-url": {
-    "message": "URL de la licencia (opcional)"
+  "project.settings.license.optional-label": {
+    "message": "opcional"
   },
   "project.settings.license.select": {
-    "message": "Selecciona una licencia"
-  },
-  "project.settings.license.select-description": {
-    "message": "Cómo los usuarios son y no están autorizados a utilizar su proyecto."
+    "message": "Licencia"
   },
   "project.settings.license.select-placeholder": {
-    "message": "Seleccionar licencia..."
-  },
-  "project.settings.license.spdx": {
-    "message": "Identificador SPDX"
-  },
-  "project.settings.license.spdx-description": {
-    "message": "Si su licencia no tiene un <spdx>identificador oficial de licencia SPDX</spdx>, desmarque la casilla e introduzca el nombre de la licencia en su lugar."
-  },
-  "project.settings.license.spdx-placeholder": {
-    "message": "Identificador SPDX"
+    "message": "Buscar licencias..."
   },
   "project.settings.license.title": {
     "message": "Licencia"
@@ -4201,6 +4183,9 @@
   },
   "project.settings.license.url-description": {
     "message": "La ubicación web del texto completo de la licencia. Si no proporcionas un link, el texto de la licencia se mostrará en su lugar."
+  },
+  "project.settings.license.url-placeholder": {
+    "message": "URL de la licencia"
   },
   "project.settings.links.add-link": {
     "message": "Añadir link"

@@ -1,4 +1,4 @@
-use crate::util::fetch_json;
+use crate::util::{fetch_json, fetch_optional_json};
 use crate::{
     Error, FetchResult, UploadFile, util::download_file, util::format_url,
     util::sha1_async,
@@ -15,15 +15,14 @@ use tokio::sync::Semaphore;
 #[tracing::instrument(skip(semaphore))]
 pub async fn fetch(semaphore: Arc<Semaphore>) -> Result<FetchResult, Error> {
     let upload_files = DashMap::new();
-    let modrinth_manifest = fetch_json::<VersionManifest>(
+    let modrinth_manifest = fetch_optional_json::<VersionManifest>(
         &format_url(&format!(
             "minecraft/v{}/manifest.json",
             daedalus::minecraft::CURRENT_FORMAT_VERSION
         )),
         &semaphore,
     )
-    .await
-    .ok();
+    .await?;
     let mojang_manifest =
         fetch_json::<VersionManifest>(VERSION_MANIFEST_URL, &semaphore).await?;
 
@@ -59,6 +58,8 @@ pub async fn fetch(semaphore: Arc<Semaphore>) -> Result<FetchResult, Error> {
                     fetch_versions.push(version);
                 }
             }
+
+            existing_versions.extend(modrinth_manifest.versions);
 
             (fetch_versions, existing_versions)
         } else {

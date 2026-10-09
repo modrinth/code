@@ -349,7 +349,7 @@ pub async fn accept_or_reject_client_scopes(
         &**pool,
         &redis,
         &session_queue,
-        Scopes::SESSION_ACCESS,
+        Scopes::SESSION_ACCESS | Scopes::USER_AUTH_WRITE,
     )
     .await?
     .1;

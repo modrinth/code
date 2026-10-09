@@ -37,6 +37,7 @@ pub mod thread_issue_item;
 pub mod thread_item;
 pub mod user_item;
 pub mod user_limits;
+pub mod user_lock_item;
 pub mod user_preferences_item;
 pub mod user_subscription_item;
 pub mod users_compliance;
