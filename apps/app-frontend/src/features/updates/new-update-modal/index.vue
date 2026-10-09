@@ -25,10 +25,10 @@ import { useEventListener } from '@vueuse/core'
 import { computed, ref, shallowRef, useTemplateRef, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
-import videoUrl from '@/assets/modrinth-hosting-server-play-demo.webm'
-import videoPoster from '@/assets/modrinth-hosting-server-play-demo.webp'
 import { config } from '@/config'
 
+import videoUrl from './assets/server-play-demo.webm'
+import videoPoster from './assets/server-play-demo.webp'
 import { useNewUpdateNotification } from './use-notification'
 
 const modal = useTemplateRef<InstanceType<typeof NewModal>>('modal')

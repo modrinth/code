@@ -21,10 +21,10 @@ import {
 	recentWorldsQueryOptions,
 } from '@/components/ui/world/queries'
 import WorldItem from '@/components/ui/world/WorldItem.vue'
-import { serverStatusQueryOptions } from '@/composables/instances/use-server-status-query'
 import { useAppEvent } from '@/composables/use-app-event'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { handleSevereError } from '@/composables/use-error.js'
+import { serverStatusQueryOptions } from '@/features/servers/queries'
 import { trackEvent } from '@/helpers/analytics'
 import { kill, run } from '@/helpers/instance'
 import { get_all } from '@/helpers/process'

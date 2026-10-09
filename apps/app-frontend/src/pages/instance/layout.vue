@@ -132,13 +132,13 @@ import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInsta
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import SharedInstanceInstallModal from '@/components/ui/shared-instances/shared-instance-install-modal/index.vue'
 import SharedInstanceUpdateModal from '@/components/ui/shared-instances/SharedInstanceUpdateModal.vue'
-import { useHostingInstance } from '@/composables/instances/use-hosting-instance'
-import { useInstanceLaunchState } from '@/composables/instances/use-instance-launch-state'
-import { serverStatusQueryOptions } from '@/composables/instances/use-server-status-query'
 import { useAppEvent } from '@/composables/use-app-event'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { handleSevereError } from '@/composables/use-error.js'
 import { useInstanceConsole } from '@/composables/useInstanceConsole'
+import { useHostingInstance } from '@/features/instances/hosting/use-hosting-instance'
+import { injectInstanceLaunchState } from '@/features/instances/launch-state'
+import { serverStatusQueryOptions } from '@/features/servers/queries'
 import { trackEvent } from '@/helpers/analytics'
 import { toError } from '@/helpers/errors'
 import {
@@ -385,7 +385,7 @@ useRootBreadcrumb({
 })
 
 const loading = ref(false)
-const instanceLaunch = useInstanceLaunchState()
+const instanceLaunch = injectInstanceLaunchState()
 const checkingSharedInstanceLaunch = ref(false)
 const subpagePending = ref(false)
 const stopping = ref(false)

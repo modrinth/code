@@ -4,31 +4,46 @@ import {
 	getNodeBaseUrl,
 	ModrinthApiError,
 } from '@modrinth/api-client'
-import { provideFileDownload } from '@modrinth/ui'
-import { Channel, invoke } from '@tauri-apps/api/core'
+import type { FileDownloadProvider } from '@modrinth/ui'
+import { Channel } from '@tauri-apps/api/core'
 
 import {
-	type ExternalFileDownloadProgress,
-	trackExternalFileDownload,
-} from '@/components/ui/download-manager/external-file-downloads'
+	type ExternalFileError,
+	type ExternalFileProgress,
+	releaseExternal,
+	saveExternal,
+	selectExternal,
+} from '@/platform/app-lib/files/commands'
 
-interface NativeSaveError {
-	message?: string
-	statusCode?: number
+export interface FileDownloadTask {
+	update: (progress: ExternalFileProgress) => void
+	succeed: (filename: string) => void
+	fail: (error: string) => void
+	canceled: () => void
 }
 
-export function setupFileDownloadProvider(client: AbstractModrinthClient) {
-	provideFileDownload({
+/** Registers a running download so the app can display its progress and cancel it. */
+export type TrackFileDownload = (
+	saveId: string,
+	filename: string,
+	onCancel: () => Promise<void>,
+	server: { serverId?: string; serverName?: string },
+) => FileDownloadTask
+
+export function createFileDownload(
+	client: AbstractModrinthClient,
+	trackDownload: TrackFileDownload,
+): FileDownloadProvider {
+	return {
 		async download(file) {
-			const saveId = await invoke<string | null>('plugin:files|files_select_external', {
-				filename: file.filename,
-				filter:
-					file.type === 'mrpack'
-						? { name: 'Modrinth Modpack', extensions: ['mrpack'] }
-						: file.type === 'server-backup' || file.type === 'server-world'
-							? { name: 'ZIP archive', extensions: ['zip'] }
-							: null,
-			}).catch((error: NativeSaveError) => {
+			const saveId = await selectExternal(
+				file.filename,
+				file.type === 'mrpack'
+					? { name: 'Modrinth Modpack', extensions: ['mrpack'] }
+					: file.type === 'server-backup' || file.type === 'server-world'
+						? { name: 'ZIP archive', extensions: ['zip'] }
+						: null,
+			).catch((error: ExternalFileError) => {
 				throw new Error(error.message ?? String(error))
 			})
 			if (!saveId) return false
@@ -36,16 +51,16 @@ export function setupFileDownloadProvider(client: AbstractModrinthClient) {
 			let cancelled = false
 			let finished = false
 			let savedFilename = file.filename
-			const task = trackExternalFileDownload(
+			const task = trackDownload(
 				saveId,
 				file.filename,
 				async () => {
 					cancelled = true
-					await invoke('plugin:files|files_release_external', { saveId })
+					await releaseExternal(saveId)
 				},
 				{ serverId: file.serverId, serverName: file.serverName },
 			)
-			const onProgress = new Channel<ExternalFileDownloadProgress>((progress) => {
+			const onProgress = new Channel<ExternalFileProgress>((progress) => {
 				if (cancelled || finished) return
 				task.update(progress)
 			})
@@ -53,13 +68,13 @@ export function setupFileDownloadProvider(client: AbstractModrinthClient) {
 			const sink: DownloadSink = async (url, options) => {
 				if (cancelled) throw new Error('Download cancelled')
 				try {
-					savedFilename = await invoke<string>('plugin:files|files_save_external', {
+					savedFilename = await saveExternal(
 						saveId,
-						request: { url, headers: options.headers ?? {} },
+						{ url, headers: options.headers ?? {} },
 						onProgress,
-					})
+					)
 				} catch (error) {
-					const nativeError = error as NativeSaveError
+					const nativeError = error as ExternalFileError
 					throw new ModrinthApiError(nativeError.message ?? String(error), {
 						statusCode: nativeError.statusCode,
 					})
@@ -137,8 +152,8 @@ export function setupFileDownloadProvider(client: AbstractModrinthClient) {
 				throw error
 			} finally {
 				finished = true
-				await invoke('plugin:files|files_release_external', { saveId }).catch(() => undefined)
+				await releaseExternal(saveId).catch(() => undefined)
 			}
 		},
-	})
+	}
 }

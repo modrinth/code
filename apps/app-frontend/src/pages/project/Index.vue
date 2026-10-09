@@ -285,12 +285,9 @@ import { useRoute, useRouter } from 'vue-router'
 
 import { SwapIcon } from '@/assets/icons/index.js'
 import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
-import {
-	fetchCachedServerStatus,
-	getFreshCachedServerStatus,
-} from '@/composables/instances/use-server-status-query'
 import { useAppEvent } from '@/composables/use-app-event'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
+import { fetchCachedServerStatus, getFreshCachedServerStatus } from '@/features/servers/queries'
 import {
 	get_organization,
 	get_project,
@@ -310,10 +307,10 @@ import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata'
 import { get_by_instance_id } from '@/helpers/process'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import { getServerAddress } from '@/helpers/worlds'
+import { useServerInstallContent } from '@/platform/adapters/browse/server-install-content'
 import { provideBreadcrumbParent, useBreadcrumb } from '@/providers/breadcrumbs'
 import { injectContentInstall } from '@/providers/content-install'
 import { injectServerInstall } from '@/providers/server-install'
-import { createServerInstallContent } from '@/providers/setup/server-install-content'
 
 dayjs.extend(relativeTime)
 
@@ -434,7 +431,7 @@ const serverStatusOnline = ref(false)
 const serverInstancePath = ref(null)
 const serverPlaying = ref(false)
 const serverSetupModalRef = ref(null)
-const serverInstallContent = createServerInstallContent({ serverSetupModalRef })
+const serverInstallContent = useServerInstallContent({ serverSetupModalRef })
 
 serverInstallContent.watchServerContextChanges()
 await serverInstallContent.initServerContext()

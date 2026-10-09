@@ -47,10 +47,8 @@ import { computed, onBeforeUnmount, ref, shallowRef, watch } from 'vue'
 import type { LocationQuery } from 'vue-router'
 import { useRoute, useRouter } from 'vue-router'
 
-import { useAppServerBrowse } from '@/composables/browse/use-app-server-browse'
 import { useAppEvent } from '@/composables/use-app-event'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
-import { useCachedServerIcon } from '@/composables/use-cached-server-icon'
 import { get_project, get_search_results_v3, get_version_many } from '@/helpers/cache.js'
 import {
 	get_installed_project_ids as getInstalledProjectIds,
@@ -69,10 +67,10 @@ import {
 import { type BreadcrumbDefinition, injectBreadcrumbManager } from '@/providers/breadcrumbs'
 import { injectContentInstall } from '@/providers/content-install'
 import { injectServerInstall } from '@/providers/server-install'
-import {
-	createServerInstallContent,
-	provideServerInstallContent,
-} from '@/providers/setup/server-install-content'
+import { useCachedServerIcon } from '@/shared/composables/use-cached-server-icon'
+
+import { provideServerInstallContent, useServerInstallContent } from './server-install-content'
+import { useAppServerBrowse } from './use-app-server-browse'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -121,7 +119,7 @@ const breadcrumbLabel = computed(() => {
 const appSettings = useAppSettings()
 const browseRouteActive = computed(() => route.path.startsWith('/browse/'))
 const serverSetupModalRef = ref<InstanceType<typeof CreationFlowModal> | null>(null)
-const serverInstallContent = createServerInstallContent({ serverSetupModalRef })
+const serverInstallContent = useServerInstallContent({ serverSetupModalRef })
 provideServerInstallContent(serverInstallContent)
 const {
 	serverIdQuery,

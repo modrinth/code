@@ -56,11 +56,11 @@ import { computed, ref, shallowRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { useAppSettings } from '@/composables/use-app-settings.ts'
-import { useCachedServerIcon } from '@/composables/use-cached-server-icon'
 import { config } from '@/config'
 import { get_user } from '@/helpers/cache'
 import { get as getCreds } from '@/helpers/mr_auth'
 import { provideBreadcrumbParent, useBreadcrumb, useRootBreadcrumb } from '@/providers/breadcrumbs'
+import { useCachedServerIcon } from '@/shared/composables/use-cached-server-icon'
 
 const route = useRoute()
 const router = useRouter()

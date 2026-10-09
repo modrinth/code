@@ -1,21 +1,19 @@
-import { provideIconCache } from '@modrinth/ui'
-import { convertFileSrc, invoke } from '@tauri-apps/api/core'
+import type { IconCacheContext } from '@modrinth/ui'
+import { convertFileSrc } from '@tauri-apps/api/core'
 
-export function setupIconCacheProvider() {
+import { cacheIconBytes, cacheRemoteIcon } from '@/platform/app-lib/icons/commands'
+
+export function createIconCache(): IconCacheContext {
 	const pending = new Map<string, Promise<string>>()
 	const blobs = new WeakMap<Blob, Promise<string>>()
-	return provideIconCache({
+	return {
 		cacheIcon(source) {
 			if (typeof source !== 'string') {
 				const existing = blobs.get(source)
 				if (existing) return existing
 				const request = source
 					.arrayBuffer()
-					.then((buffer) =>
-						invoke<string>('plugin:instance|instance_cache_icon', {
-							iconBytes: Array.from(new Uint8Array(buffer)),
-						}),
-					)
+					.then((buffer) => cacheIconBytes(Array.from(new Uint8Array(buffer))))
 					.then(convertFileSrc)
 					.catch((error) => {
 						blobs.delete(source)
@@ -27,11 +25,11 @@ export function setupIconCacheProvider() {
 			if (!source.startsWith('https://')) return Promise.resolve(source)
 			const existing = pending.get(source)
 			if (existing) return existing
-			const request = invoke<string>('plugin:utils|cache_remote_icon', { source }).finally(() => {
+			const request = cacheRemoteIcon(source).finally(() => {
 				pending.delete(source)
 			})
 			pending.set(source, request)
 			return request
 		},
-	})
+	}
 }

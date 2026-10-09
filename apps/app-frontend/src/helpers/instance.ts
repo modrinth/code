@@ -622,10 +622,6 @@ export async function edit_icon(instanceId: string, iconPath: string | null): Pr
 	return await invoke('plugin:instance|instance_edit_icon', { instanceId, iconPath })
 }
 
-export async function cache_icon(iconBytes: number[]): Promise<string> {
-	return await invoke('plugin:instance|instance_cache_icon', { iconBytes })
-}
-
 export async function edit_generated_icon(
 	instanceId: string,
 	config: InstanceIconConfig,
