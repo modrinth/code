@@ -4,6 +4,8 @@ import { flattenProjectVariables, flattenStaticVariables } from '../utils'
 import warning from './messages/checklist/messages/post-approval/issue-warning.md'
 import deadline from './messages/checklist/messages/post-approval/missed-deadline.md'
 import account from './messages/checklist/messages/status-alerts/account-issues.md'
+import correctionsApplied from './messages/checklist/messages/status-alerts/corrections-applied.md'
+import correctionsAppliedApproved from './messages/checklist/messages/status-alerts/corrections-applied-approved.md'
 import demonetized from './messages/checklist/messages/status-alerts/demonetized.md'
 import demonetizedModpack from './messages/checklist/messages/status-alerts/demonetized-modpack.md'
 import privateProject from './messages/checklist/messages/status-alerts/private-use/project.md'
@@ -27,6 +29,16 @@ export interface MessageLibraryEntry extends MessageTemplate {
 }
 
 export const messageLibrary: readonly MessageLibraryEntry[] = [
+	{
+		label: 'Corrections applied',
+		body: correctionsApplied,
+		shown: ({ project }) => project.status !== 'approved',
+	},
+	{
+		label: 'Corrections applied',
+		body: correctionsAppliedApproved,
+		shown: ({ project }) => project.status === 'approved',
+	},
 	{
 		label: 'Private-use project',
 		body: privateProject,

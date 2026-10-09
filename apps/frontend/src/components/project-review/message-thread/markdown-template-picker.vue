@@ -1,15 +1,16 @@
 <template>
 	<Button
 		ref="trigger"
+		v-tooltip="formatMessage(messages.library)"
 		size="sm"
 		:disabled="disabled"
+		:aria-label="formatMessage(messages.library)"
 		:aria-expanded="open"
 		:aria-controls="listId"
 		aria-haspopup="listbox"
 		@click="toggle"
 	>
 		<LibraryIcon />
-		{{ formatMessage(messages.library) }}
 	</Button>
 	<Teleport to="body">
 		<div
@@ -105,7 +106,7 @@ const emit = defineEmits<{
 }>()
 const { formatMessage } = useVIntl()
 const messages = defineMessages({
-	library: { id: 'markdown-editor.templates.library', defaultMessage: 'Message library' },
+	library: { id: 'markdown-editor.templates.library', defaultMessage: 'Message Library' },
 	search: { id: 'markdown-editor.templates.search', defaultMessage: 'Search messages…' },
 	empty: { id: 'markdown-editor.templates.empty', defaultMessage: 'No matching messages.' },
 	insert: { id: 'markdown-editor.templates.insert', defaultMessage: 'Insert message' },
@@ -242,7 +243,12 @@ function handleKeydown(event: KeyboardEvent) {
 		if (count) active.value = (active.value + (event.key === 'ArrowDown' ? 1 : -1) + count) % count
 		return true
 	}
-	if (event.key === 'Enter' && !event.ctrlKey && !event.metaKey && !event.altKey) {
+	if (
+		(event.key === 'Enter' || event.key === 'Tab') &&
+		!event.ctrlKey &&
+		!event.metaKey &&
+		!event.altKey
+	) {
 		event.preventDefault()
 		event.stopPropagation()
 		if (activeTemplate.value) void choose(activeTemplate.value)

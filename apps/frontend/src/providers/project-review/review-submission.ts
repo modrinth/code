@@ -115,11 +115,13 @@ export function createReviewSubmission(
 			id,
 			decision,
 			reply,
+			clearIssues,
 		}: {
 			id: string
 			threadId: string
 			decision?: ReviewDecision
 			reply?: ThreadReply
+			clearIssues?: boolean
 		}) => {
 			assertCurrent(id)
 			const clearMessage = () => {
@@ -131,8 +133,12 @@ export function createReviewSubmission(
 				await applyReviewDecision(decision, client, () => assertCurrent(id), clearMessage)
 				session.clearProject(id)
 			} else if (reply) {
+				const issueIds = clearIssues ? panels.activeIssues.value.map(({ id }) => id) : []
+				const appliedIssues = clearIssues ? [...previousIssues.appliedIssues.value] : []
 				await sendThreadReply(reply, client, () => assertCurrent(id))
 				clearMessage()
+				for (const issue of appliedIssues) previousIssues.markNoLongerApplicable(issue)
+				for (const issueId of issueIds) panels.removeIssue(issueId)
 			}
 		},
 		onError: (error) =>
@@ -189,16 +195,19 @@ export function createReviewSubmission(
 				? (submission.variables.value.decision.status ?? 'issues')
 				: submission.variables.value?.reply?.privateMessage
 					? 'note'
-					: 'reply'
+					: submission.variables.value?.clearIssues
+						? 'reply-clear'
+						: 'reply'
 			: undefined,
 	)
-	async function submit(mode: ReviewEditorMode = 'reply') {
+	async function submit(mode: ReviewEditorMode = 'reply', clearIssues = false) {
 		const current = project.value
 		if (!canSubmit.value || !current || !draft.value.trim()) return
 		await submission
 			.mutateAsync({
 				id: current.id,
 				threadId: current.thread_id,
+				clearIssues: mode === 'reply' && clearIssues,
 				reply: {
 					threadId: current.thread_id,
 					body: draft.value,

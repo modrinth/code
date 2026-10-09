@@ -42,7 +42,10 @@ const props = defineProps<{
 	templates: MarkdownTemplate[]
 	disabled?: boolean
 }>()
-const emit = defineEmits<{ 'update:modelValue': [value: string] }>()
+const emit = defineEmits<{
+	'update:modelValue': [value: string]
+	'insert-template': [body: string]
+}>()
 const markdownEditor = ref<InstanceType<typeof MarkdownEditor>>()
 const editorView = shallowRef<EditorView>()
 const templatePicker = ref<InstanceType<typeof MarkdownTemplatePicker>>()
@@ -145,6 +148,7 @@ async function insertTemplate(body: string) {
 		userEvent: 'input.template',
 		annotations: isolateHistory.of('full'),
 	})
+	emit('insert-template', body)
 	await focus()
 }
 

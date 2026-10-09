@@ -4,7 +4,6 @@
 		class="relative flex min-h-0 shrink-0 flex-col gap-1.5 border-0 border-t border-solid border-divider py-2.5 pb-px"
 		:style="{
 			height: `${height ?? 300}px`,
-			maxHeight: 'max(180px, calc(100% - 300px))',
 		}"
 	>
 		<div
@@ -14,7 +13,6 @@
 			:aria-label="formatMessage(messages.resizeMessageBox)"
 			:aria-valuenow="Math.round(measuredHeight)"
 			:aria-valuemin="180"
-			:aria-valuemax="maxHeight"
 			class="message-box-resize absolute -top-2 left-0 z-10 h-4 w-full cursor-row-resize touch-none"
 			:class="{ 'is-resizing': resizeStart }"
 			@pointerdown="startResize"
@@ -40,6 +38,7 @@
 				"
 				:min-height="1"
 				hide-markdown-hint
+				@insert-template="onInsertTemplate"
 			/>
 		</div>
 		<div class="flex shrink-0 flex-wrap justify-end gap-2">
@@ -53,6 +52,15 @@
 				<ReplyIcon v-else aria-hidden="true" />
 				{{ formatMessage(messages.reply) }}
 			</Button>
+			<Button
+				v-if="showClearIssues"
+				:disabled="!canSubmit || pending || !draft.trim()"
+				@click="submit('reply', true)"
+			>
+				<SpinnerIcon v-if="loadingAction === 'reply-clear'" class="animate-spin" aria-hidden="true" />
+				<ReplyIcon v-else aria-hidden="true" />
+				{{ formatMessage(messages.replyAndClearIssues) }}
+			</Button>
 		</div>
 	</div>
 </template>
@@ -60,12 +68,16 @@
 <script setup lang="ts">
 import { ReplyIcon, SpinnerIcon, StickyNotePlusIcon } from '@modrinth/assets'
 import { getMessageTemplates, moderationSettings } from '@modrinth/moderation'
+import { IssuePriority } from '@modrinth/moderation/src/data/issues'
 import { Button, defineMessages, useVIntl } from '@modrinth/ui'
 import { useElementSize } from '@vueuse/core'
-import { computed, nextTick, ref } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 
 import { useModerationKeybinds, useModerationSettings } from '~/composables/moderation'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
+import { injectReviewMessages } from '~/providers/project-review/review-messages'
+import { injectReviewPanels } from '~/providers/project-review/review-panels'
+import { injectReviewPreviousIssues } from '~/providers/project-review/review-previous-issues'
 import { injectReviewSubmission } from '~/providers/project-review/review-submission'
 
 import TemplateMarkdownEditor from './template-markdown-editor.vue'
@@ -74,25 +86,68 @@ const keybinds = useModerationKeybinds()
 const settings = useModerationSettings()
 const { project, projectV2 } = injectProjectReviewPageContext()
 const { formatMessage } = useVIntl()
+const panels = injectReviewPanels()
+const reviewMessages = injectReviewMessages()
+const previousIssues = injectReviewPreviousIssues()
+const issueMessages = computed(() => {
+	const previousIds = previousIssues.associatedIssueIds.value
+	return [
+		...previousIssues.appliedIssues.value.map((issue) => ({
+			priority: previousIssues.cardIssue(issue).priority ?? IssuePriority.Default,
+			message: previousIssues.reviewMessage(issue),
+		})),
+		...panels.activeIssues.value
+			.filter(({ id }) => !previousIds.has(id))
+			.map(({ id, issue }) => ({
+				priority: issue.priority ?? IssuePriority.Default,
+				message: reviewMessages.issueMessage(id),
+			})),
+	]
+		.sort((a, b) => a.priority - b.priority)
+		.map(({ message }) => message.trim())
+		.filter(Boolean)
+})
+function hasCorrectionsHeading(body: string) {
+	return /^##[ \t]+Corrections Applied[ \t]*\r?$/m.test(body)
+}
 const templates = computed(() => {
 	const current = project.value
 	const legacy = projectV2.value
 	if (!current || !legacy || current.id !== legacy.id) return []
-	return getMessageTemplates({ project: current, projectV2: legacy })
+	return getMessageTemplates({ project: current, projectV2: legacy }).map((template) =>
+		hasCorrectionsHeading(template.body)
+			? { ...template, body: [template.body, ...issueMessages.value].join('\n\n') }
+			: template,
+	)
 })
 const { draft, pending, canSubmit, loadingAction, submit, uploadImage } = injectReviewSubmission()
+const correctionsInserted = ref(false)
+const showClearIssues = computed(() => correctionsInserted.value || hasCorrectionsHeading(draft.value))
+function onInsertTemplate(body: string) {
+	if (hasCorrectionsHeading(body)) correctionsInserted.value = true
+}
+watch(
+	[() => project.value?.id, () => !draft.value.trim()],
+	([id, empty], [previousId]) => {
+		if (empty || id !== previousId) correctionsInserted.value = false
+	},
+	{ flush: 'sync' },
+)
 const editor = ref<InstanceType<typeof TemplateMarkdownEditor>>()
 const messageBox = ref<HTMLElement | null>(null)
 const { height: measuredHeight } = useElementSize(messageBox)
 const height = ref<number | null>(null)
 const resizeStart = ref<{ y: number; height: number } | null>(null)
-const maxHeight = ref(400)
 const messages = defineMessages({
 	resizeMessageBox: {
 		id: 'project-review.message-box.resize',
 		defaultMessage: 'Resize message box',
 	},
 	reply: { id: 'project-review.composer.reply', defaultMessage: 'Reply' },
+	replyAndClearIssues: {
+		id: 'project-review.composer.reply-and-clear-issues',
+		defaultMessage: 'Reply and clear issues',
+	},
 	addNote: { id: 'project-review.composer.add-note', defaultMessage: 'Private note' },
 	replyPlaceholder: {
 		id: 'project-review.composer.reply-placeholder',
@@ -100,8 +155,7 @@ const messages = defineMessages({
 	},
 })
 function setHeight(value: number) {
-	maxHeight.value = Math.max(180, (messageBox.value?.parentElement?.clientHeight ?? 700) - 300)
-	height.value = Math.min(maxHeight.value, Math.max(180, value))
+	height.value = Math.max(180, value)
 }
 function startResize(event: PointerEvent) {
 	if (event.button !== 0) return

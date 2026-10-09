@@ -32,7 +32,7 @@
 				</p>
 			</div>
 		</div>
-		<MessageBox v-if="thread" ref="messageBox" />
+		<MessageBox v-if="thread" ref="messageBox" class="[&_.markdown-body]:text-xs" />
 		<ImageViewerEditor
 			ref="viewer"
 			:items="imageItems"
