@@ -1730,7 +1730,7 @@ async fn lock_install_target(
 }
 
 async fn lock_instance(instance_id: &str, state: &State) -> crate::Result<()> {
-    let _content_lock = state.lock_instance_content(instance_id).await;
+    let _content_lock = state.instance_locks.lock_content(instance_id).await;
     if crate::state::instance_has_running_process(instance_id, state).await? {
         return Err(crate::state::content_store::input(
             "Stop this instance before installing or updating its content",

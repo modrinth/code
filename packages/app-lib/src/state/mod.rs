@@ -1,10 +1,9 @@
 //! Theseus state management system
 use crate::util::fetch::{FetchSemaphore, IoSemaphore};
-use dashmap::DashMap;
 use std::sync::atomic::AtomicBool;
 use std::sync::{Arc, LazyLock};
 use tokio::sync::watch::Sender;
-use tokio::sync::{Mutex, MutexGuard, OnceCell, OwnedMutexGuard, Semaphore};
+use tokio::sync::{Mutex, MutexGuard, OnceCell, Semaphore};
 
 use crate::state::instances::watcher::FileWatcher;
 use sqlx::SqlitePool;
@@ -57,6 +56,9 @@ pub use self::friends::*;
 mod installs;
 pub(crate) use self::installs::Installs;
 
+mod instance_locks;
+pub(crate) use self::instance_locks::InstanceLocks;
+
 mod presence;
 pub use self::presence::Presence;
 
@@ -98,12 +100,7 @@ pub struct State {
     /// to keep API functionality while the app is performing intensive tasks.
     pub api_semaphore: FetchSemaphore,
     pub(crate) installs: Installs,
-    /// Serializes filesystem reconciliation and content mutations per instance.
-    instance_content_locks: DashMap<String, Arc<Mutex<()>>>,
-    /// Serializes screenshot filesystem reconciliation per instance.
-    instance_screenshot_locks: DashMap<String, Arc<Mutex<()>>>,
-    /// Serializes shared instance attachment and recipient mutations per instance.
-    shared_instance_locks: DashMap<String, Arc<Mutex<()>>>,
+    pub(crate) instance_locks: InstanceLocks,
     /// Serializes canonical synced-option mutations and checkpoint updates.
     synced_options_lock: Mutex<()>,
     pub(crate) game_locale_indexer: crate::api::instance::GameLocaleIndexer,
@@ -130,51 +127,6 @@ pub struct State {
 impl State {
     pub(crate) async fn lock_synced_options(&self) -> MutexGuard<'_, ()> {
         self.synced_options_lock.lock().await
-    }
-
-    pub(crate) async fn lock_instance_content(
-        &self,
-        instance_id: &str,
-    ) -> OwnedMutexGuard<()> {
-        let lock = self
-            .instance_content_locks
-            .entry(instance_id.to_string())
-            .or_insert_with(|| Arc::new(Mutex::new(())))
-            .clone();
-
-        lock.lock_owned().await
-    }
-
-    pub(crate) async fn lock_shared_instance(
-        &self,
-        instance_id: &str,
-    ) -> OwnedMutexGuard<()> {
-        let lock = self
-            .shared_instance_locks
-            .entry(instance_id.to_string())
-            .or_insert_with(|| Arc::new(Mutex::new(())))
-            .clone();
-
-        lock.lock_owned().await
-    }
-
-    pub(crate) async fn lock_instance_screenshots(
-        &self,
-        instance_id: &str,
-    ) -> OwnedMutexGuard<()> {
-        let lock = self
-            .instance_screenshot_locks
-            .entry(instance_id.to_string())
-            .or_insert_with(|| Arc::new(Mutex::new(())))
-            .clone();
-
-        lock.lock_owned().await
-    }
-
-    pub(crate) fn remove_instance_locks(&self, instance_id: &str) {
-        let _ = self.instance_content_locks.remove(instance_id);
-        let _ = self.instance_screenshot_locks.remove(instance_id);
-        let _ = self.shared_instance_locks.remove(instance_id);
     }
 
     pub async fn init(app_identifier: String) -> crate::Result<()> {
@@ -413,9 +365,7 @@ impl State {
             io_semaphore,
             api_semaphore,
             installs: Installs::new(),
-            instance_content_locks: DashMap::new(),
-            instance_screenshot_locks: DashMap::new(),
-            shared_instance_locks: DashMap::new(),
+            instance_locks: InstanceLocks::default(),
             synced_options_lock: Mutex::new(()),
             game_locale_indexer:
                 crate::api::instance::GameLocaleIndexer::default(),

@@ -43,8 +43,10 @@ pub(super) async fn prepare_instance_update_backup(
     state: &State,
 ) -> crate::Result<PathBuf> {
     let _lease = state.content_store.lease().await;
-    let _content_lock =
-        state.lock_instance_content(&metadata.instance.id).await;
+    let _content_lock = state
+        .instance_locks
+        .lock_content(&metadata.instance.id)
+        .await;
     let _store_lock = state.content_store.files_lock.lock().await;
     if crate::state::instance_has_running_process(&metadata.instance.id, state)
         .await?
@@ -242,7 +244,7 @@ async fn restore_instance_update(
     state: &State,
 ) -> crate::Result<()> {
     let instance_id = &rollback.instance.instance.id;
-    let _content_lock = state.lock_instance_content(instance_id).await;
+    let _content_lock = state.instance_locks.lock_content(instance_id).await;
     let _store_lock = state.content_store.files_lock.lock().await;
     let _lease = state.content_store.lease().await;
     if crate::state::instance_has_running_process(instance_id, state).await? {

@@ -109,7 +109,7 @@ async fn lock_instance_screenshots<'a>(
 ) -> Vec<OwnedMutexGuard<()>> {
     let mut locks = Vec::new();
     for instance_id in instance_ids {
-        locks.push(state.lock_instance_screenshots(instance_id).await);
+        locks.push(state.instance_locks.lock_screenshots(instance_id).await);
     }
     locks
 }
@@ -344,7 +344,7 @@ pub async fn save_edited_screenshot(
     .ok_or_else(|| {
         crate::ErrorKind::InputError("Unknown instance".to_string())
     })?;
-    let _lock = state.lock_instance_screenshots(&source.id).await;
+    let _lock = state.instance_locks.lock_screenshots(&source.id).await;
 
     let scanned = scan_source_screenshots(&state, &source).await?;
     let current =

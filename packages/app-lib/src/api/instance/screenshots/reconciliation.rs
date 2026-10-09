@@ -79,7 +79,7 @@ pub(super) async fn list_source_screenshots(
     state: &State,
     source: InstanceScreenshotSource,
 ) -> crate::Result<Vec<InstanceScreenshot>> {
-    let _lock = state.lock_instance_screenshots(&source.id).await;
+    let _lock = state.instance_locks.lock_screenshots(&source.id).await;
     let scanned = scan_source_screenshots(state, &source).await?;
     reconcile_source_screenshots(state, &source, scanned).await
 }

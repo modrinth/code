@@ -681,7 +681,7 @@ pub(crate) async fn set_project_locked(
     locked: bool,
     state: &State,
 ) -> crate::Result<()> {
-    let _content_lock = state.lock_instance_content(instance_id).await;
+    let _content_lock = state.instance_locks.lock_content(instance_id).await;
     let scope = resolve_content_scope(instance_id, None, state).await?;
     content_rows::set_instance_file_locked(
         &scope.instance.id,
