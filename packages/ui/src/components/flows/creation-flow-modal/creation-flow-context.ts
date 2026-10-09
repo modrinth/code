@@ -21,7 +21,7 @@ import { createServerOnboardingInvite } from './server-onboarding-invite'
 import { stageConfigs } from './stages'
 
 export type FlowType = 'world' | 'server-onboarding' | 'reset-server' | 'instance'
-export type SetupType = 'modpack' | 'custom' | 'vanilla'
+export type SetupType = 'modpack' | 'curseforge' | 'custom' | 'vanilla'
 export type Gamemode = 'survival' | 'creative' | 'hardcore'
 export type Difficulty = 'peaceful' | 'easy' | 'normal' | 'hard'
 export type LoaderVersionType = 'stable' | 'latest' | 'other'
@@ -206,6 +206,9 @@ export interface CreationFlowContextValue {
 	modpackSelection: Ref<ModpackSelection | null>
 	modpackFile: Ref<File | null>
 	modpackFilePath: Ref<string | null>
+	curseforgeUrl: Ref<string>
+	curseforgeModpackFile: Ref<File | null>
+	curseforgeServerPackFile: Ref<File | null>
 	projectInstall: Ref<ProjectInstallSelection | null>
 
 	// Project search state (persisted across stage navigation)
@@ -392,6 +395,9 @@ export function createCreationFlowContext(
 	const modpackSelection = ref<ModpackSelection | null>(null)
 	const modpackFile = ref<File | null>(null)
 	const modpackFilePath = ref<string | null>(null)
+	const curseforgeUrl = ref('')
+	const curseforgeModpackFile = ref<File | null>(null)
+	const curseforgeServerPackFile = ref<File | null>(null)
 	const projectInstall = ref<ProjectInstallSelection | null>(null)
 
 	// Project search state (persisted across stage navigation)
@@ -552,6 +558,9 @@ export function createCreationFlowContext(
 		modpackSelection.value = null
 		modpackFile.value = null
 		modpackFilePath.value = null
+		curseforgeUrl.value = ''
+		curseforgeModpackFile.value = null
+		curseforgeServerPackFile.value = null
 		projectInstall.value = null
 		projectSearchProjectId.value = undefined
 		projectSearchOptions.value = []
@@ -573,6 +582,16 @@ export function createCreationFlowContext(
 		isImportMode.value = false
 		projectInstall.value = null
 		setupType.value = type
+		if (type === 'curseforge') {
+			modpackSelection.value = null
+			modpackFile.value = null
+			modpackFilePath.value = null
+			selectedLoader.value = null
+			selectedLoaderVersion.value = null
+			selectedGameVersion.value = null
+			modal.value?.setStage('curseforge')
+			return
+		}
 		if (type === 'modpack') {
 			selectedLoader.value = null
 			selectedLoaderVersion.value = null
@@ -652,6 +671,8 @@ export function createCreationFlowContext(
 	}
 
 	function finish() {
+		// CurseForge installation is intentionally disconnected until backend support is added.
+		if (setupType.value === 'curseforge') return
 		if (finishDisabled.value) return
 
 		debug('finish() called, state:', {
@@ -797,6 +818,9 @@ export function createCreationFlowContext(
 		modpackSelection,
 		modpackFile,
 		modpackFilePath,
+		curseforgeUrl,
+		curseforgeModpackFile,
+		curseforgeServerPackFile,
 		projectInstall,
 		projectSearchProjectId,
 		projectSearchOptions,

@@ -7,6 +7,7 @@ export type IconComponent = FunctionalComponent<SVGAttributes>
 
 import _AffiliateIcon from './icons/affiliate.svg?component'
 import _AlignLeftIcon from './icons/align-left.svg?component'
+import _AnvilIcon from './icons/anvil.svg?component'
 import _ArchiveIcon from './icons/archive.svg?component'
 import _ArrowBigRightDashIcon from './icons/arrow-big-right-dash.svg?component'
 import _ArrowBigUpDashIcon from './icons/arrow-big-up-dash.svg?component'
@@ -477,6 +478,7 @@ import _ZoomOutIcon from './icons/zoom-out.svg?component'
 
 export const AffiliateIcon = _AffiliateIcon
 export const AlignLeftIcon = _AlignLeftIcon
+export const AnvilIcon = _AnvilIcon
 export const ArchiveIcon = _ArchiveIcon
 export const ArrowBigRightDashIcon = _ArrowBigRightDashIcon
 export const ArrowBigUpDashIcon = _ArrowBigUpDashIcon
