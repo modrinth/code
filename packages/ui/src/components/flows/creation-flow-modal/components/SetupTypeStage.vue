@@ -109,6 +109,15 @@
 					@click="setSetupType('custom')"
 				/>
 				<BigOptionButton
+					v-if="ctx.flowType === 'server-onboarding' || ctx.flowType === 'reset-server'"
+					v-tooltip="ctx.finishDisabled.value ? ctx.finishDisabledTooltip.value : undefined"
+					:disabled="ctx.navigating.value || ctx.finishDisabled.value"
+					:icon="AnvilIcon"
+					:title="formatMessage(curseforgeMessages.title)"
+					:description="formatMessage(curseforgeMessages.description)"
+					@click="ctx.setSetupType('curseforge')"
+				/>
+				<BigOptionButton
 					:disabled="ctx.navigating.value"
 					:icon="BoxIcon"
 					:title="formatMessage(messages.vanillaMinecraftTitle)"
@@ -122,6 +131,7 @@
 
 <script setup lang="ts">
 import {
+	AnvilIcon,
 	BoxesIcon,
 	BoxIcon,
 	BoxImportIcon,
@@ -139,6 +149,7 @@ import { injectFilePicker } from '../../../../providers'
 import BigOptionButton from '../../../base/BigOptionButton.vue'
 import Combobox from '../../../base/Combobox.vue'
 import { injectCreationFlowContext } from '../creation-flow-context'
+import { curseforgeMessages } from '../curseforge'
 
 const debug = useDebugLogger('SetupTypeStage')
 const ctx = injectCreationFlowContext()

@@ -19,14 +19,23 @@ import { useServerPlayerMembers } from '#ui/layouts/wrapped/hosting/manage/[id]/
 import { injectModrinthClient, injectModrinthServerContext } from '#ui/providers'
 
 import BackupAdmonition, { type BackupAdmonitionEntry } from './BackupAdmonition.vue'
+import CurseForgeFilesAdmonition from './CurseForgeFilesAdmonition.vue'
 import FileOperationAdmonition from './FileOperationAdmonition.vue'
 import ShareUpdateAdmonition from './ShareUpdateAdmonition.vue'
 import UploadAdmonition from './UploadAdmonition.vue'
 
 defineOptions({ inheritAttrs: false })
 
+const props = withDefaults(
+	defineProps<{
+		curseforgeFileWarningCount?: number
+	}>(),
+	{ curseforgeFileWarningCount: 0 },
+)
+
 const emit = defineEmits<{
 	'installation-retry': []
+	'review-curseforge-files': []
 }>()
 
 const { formatMessage } = useVIntl()
@@ -176,6 +185,7 @@ type ServerAdmonitionItem = StackedAdmonitionItem & {
 		| { kind: 'busy-content' }
 		| { kind: 'busy-files' }
 		| { kind: 'share-update' }
+		| { kind: 'curseforge-files' }
 	)
 
 const showInstallingBanner = computed(() => {
@@ -211,6 +221,17 @@ function backupPriority(entry: BackupAdmonitionEntry): number {
 const stackItems = computed<ServerAdmonitionItem[]>(() => {
 	const out: ServerAdmonitionItem[] = []
 	let sortIndex = 0
+	const curseforgeWarningId = `curseforge-files:${ctx.worldId.value}:${props.curseforgeFileWarningCount}`
+	if (props.curseforgeFileWarningCount > 0 && !dismissedIds.has(curseforgeWarningId)) {
+		out.push({
+			id: curseforgeWarningId,
+			type: 'warning',
+			dismissible: true,
+			kind: 'curseforge-files',
+			priority: 1,
+			sortIndex: sortIndex++,
+		})
+	}
 
 	if (showInstallingBanner.value) {
 		const failed = ctx.installation.value?.status === 'failed'
@@ -382,6 +403,8 @@ async function onDismissAll() {
 		if (!it.dismissible) continue
 		if (it.kind === 'installing') {
 			onInstallationDismiss()
+		} else if (it.kind === 'curseforge-files') {
+			dismissedIds.add(it.id)
 		} else if (it.kind === 'fs-op' && it.op.id) {
 			const { op } = it
 			if (op.state === 'done' || op.state?.startsWith('fail')) {
@@ -416,8 +439,15 @@ function onInstallationDismiss() {
 		@dismiss-all="onDismissAll"
 	>
 		<template #item="{ item, dismissible }">
+			<CurseForgeFilesAdmonition
+				v-if="item.kind === 'curseforge-files'"
+				:file-count="props.curseforgeFileWarningCount"
+				:dismissible="dismissible"
+				@review="emit('review-curseforge-files')"
+				@dismiss="dismissedIds.add(item.id)"
+			/>
 			<ShareUpdateAdmonition
-				v-if="item.kind === 'share-update'"
+				v-else-if="item.kind === 'share-update'"
 				:disabled="!canSetup || sharePending"
 				:publishing="shareActions > 0"
 				:reviewing="sharePreviews > 0"
