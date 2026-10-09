@@ -2185,6 +2185,7 @@ export namespace Labrinth {
 				| { type: 'modify_description'; value: TextTarget }
 				| { type: 'modify_license'; value: { license: TextTarget; url: TextTarget } }
 				| { type: 'modify_icon'; value: { original_url: string | null } }
+				| { type: 'remove_icon' }
 				| { type: 'remove_tags'; value: { tags: string[] } }
 				| { type: 'modify_links'; value: { links: Record<string, TextTarget> } }
 				| { type: 'add_gallery_images'; value: { original_count: number } }
@@ -2204,6 +2205,7 @@ export namespace Labrinth {
 							original_images?: { id: number; url: string; name?: string }[]
 						}
 				  }
+				| { type: 'add_project_disclosures'; value: { disclosure_types: string[] } }
 				| { type: 'remove_project_disclosures'; value: { disclosure_types: string[] } }
 				| ModifyDisclosureTarget
 				| {

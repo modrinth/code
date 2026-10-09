@@ -37,6 +37,7 @@ function reviewTitle(key: string): string | undefined {
 }
 
 const disclosureIssueTargets: Labrinth.Threads.v3.ThreadIssueTarget['type'][] = [
+	'add_project_disclosures',
 	'remove_project_disclosures',
 	'modify_project_disclosure',
 	'modify_project_disclosure_note',

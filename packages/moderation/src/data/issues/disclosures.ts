@@ -56,13 +56,19 @@ export const disclosuresIssue = issue({
 	locations: [issueLocation('disclosures')],
 	title: 'Invalid disclosures',
 	category: 'Disclosures',
-	actions: ({ selected }) =>
-		Object.entries(disclosureTypes).flatMap(([field, type]) =>
-			selected.toggleIds.includes(`disclosures-missing-${field}`) ||
-			selected.toggleIds.includes(`disclosures-misused-${field}`)
-				? [issueTargets.modifyDisclosure(type)]
-				: [],
-		),
+	actions: ({ selected }) => {
+		const missingTypes = Object.entries(disclosureTypes).flatMap(([field, type]) =>
+			selected.toggleIds.includes(`disclosures-missing-${field}`) ? [type] : [],
+		)
+		return [
+			...(missingTypes.length ? [issueTargets.addDisclosures(missingTypes)] : []),
+			...Object.entries(disclosureTypes).flatMap(([field, type]) =>
+				selected.toggleIds.includes(`disclosures-misused-${field}`)
+					? [issueTargets.modifyDisclosure(type)]
+					: [],
+			),
+		]
+	},
 	message: ({ selected }) => {
 		const toggleIds = new Set(selected.toggleIds)
 		const missingParts: string[] = []

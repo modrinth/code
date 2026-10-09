@@ -110,6 +110,7 @@ export const customIssueActions = {
 	modify_description: issueTargets.modifyDescription(),
 	modify_license: issueTargets.modifyLicense(),
 	modify_icon: issueTargets.modifyIcon(),
+	remove_icon: issueTargets.removeIcon(),
 	add_gallery_images: issueTargets.addGalleryImages(),
 	modify_server_languages: issueTargets.modifyServerLanguages(),
 } satisfies Record<string, IssueAction>

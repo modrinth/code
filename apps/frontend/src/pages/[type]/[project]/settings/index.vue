@@ -138,7 +138,7 @@
 						class="mt-2"
 					/>
 					<ValidationMessage :check="saveValidation.forField('icon')" class="mt-2" />
-					<ProjectIssueCard target="modify_icon" class="mt-2" />
+					<ProjectIssueCard :target="['modify_icon', 'remove_icon']" class="mt-2" />
 				</div>
 
 				<!-- Server Project Settings -->

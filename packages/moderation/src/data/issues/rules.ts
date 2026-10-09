@@ -82,8 +82,7 @@ export const rulesAiImagesIssue = issue({
 		}
 		if (selected.toggleIds.includes('icon-ai-images')) {
 			actions.push(() => ({
-				type: 'modify_icon',
-				value: { original_url: projectV3.icon_url ?? null },
+				type: 'remove_icon',
 			}))
 		}
 		if (imageIds.length) {

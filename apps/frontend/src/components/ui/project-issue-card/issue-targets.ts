@@ -18,6 +18,7 @@ export function threadIssueField(
 		case 'modify_license':
 			return 'license'
 		case 'modify_icon':
+		case 'remove_icon':
 			return 'icon'
 		case 'remove_tags':
 			return 'tags'
@@ -27,6 +28,7 @@ export function threadIssueField(
 		case 'modify_gallery_image':
 		case 'remove_gallery_images':
 			return 'gallery'
+		case 'add_project_disclosures':
 		case 'remove_project_disclosures':
 		case 'modify_project_disclosure':
 		case 'modify_project_disclosure_note':

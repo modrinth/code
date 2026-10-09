@@ -32,6 +32,10 @@ export const issueTargetLabels = defineMessages({
 		id: 'project-review.issue-target.modify-icon',
 		defaultMessage: 'Change icon',
 	},
+	remove_icon: {
+		id: 'project-review.issue-target.remove-icon',
+		defaultMessage: 'Remove icon',
+	},
 	remove_tags: {
 		id: 'project-review.issue-target.remove-tags',
 		defaultMessage: 'Remove tags',
@@ -51,6 +55,10 @@ export const issueTargetLabels = defineMessages({
 	remove_gallery_images: {
 		id: 'project-review.issue-target.remove-gallery-images',
 		defaultMessage: 'Remove gallery images',
+	},
+	add_project_disclosures: {
+		id: 'project-review.issue-target.add-project-disclosures',
+		defaultMessage: 'Add disclosures',
 	},
 	remove_project_disclosures: {
 		id: 'project-review.issue-target.remove-project-disclosures',
@@ -141,6 +149,7 @@ export const issueTargets = {
 			type: 'modify_icon',
 			value: { original_url: projectV3.icon_url ?? null },
 		}),
+	removeIcon: (): IssueAction => () => ({ type: 'remove_icon' }),
 	removeTags:
 		(tags: WithContext<string[]>): IssueAction =>
 		(ctx) => ({
@@ -169,6 +178,12 @@ export const issueTargets = {
 		({ projectV3 }) => ({
 			type: 'add_gallery_images',
 			value: { original_count: projectV3.gallery.length },
+		}),
+	addDisclosures:
+		(disclosureTypes: Labrinth.Projects.v3.ProjectDisclosureType[]): IssueAction =>
+		() => ({
+			type: 'add_project_disclosures',
+			value: { disclosure_types: disclosureTypes },
 		}),
 	modifyDisclosure:
 		(disclosureType: Labrinth.Projects.v3.ProjectDisclosureType): IssueAction =>

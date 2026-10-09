@@ -139,6 +139,7 @@ export function createReviewPreviousIssues(
 			modify_description: { kind: 'description' },
 			modify_license: { kind: 'license' },
 			modify_icon: { kind: 'icon' },
+			remove_icon: { kind: 'icon' },
 			remove_tags: { kind: 'tags' },
 			add_gallery_images: { kind: 'gallery' },
 			modify_gallery_image: { kind: 'gallery' },
@@ -166,7 +167,10 @@ export function createReviewPreviousIssues(
 			} else if (what.type === 'remove_gallery_images') {
 				for (const id of what.value.image_ids)
 					targets.push({ kind: 'gallery-image', key: String(id) })
-			} else if (what.type === 'remove_project_disclosures') {
+			} else if (
+				what.type === 'add_project_disclosures' ||
+				what.type === 'remove_project_disclosures'
+			) {
 				for (const type of what.value.disclosure_types) {
 					const key = disclosureKeys[type]
 					if (key) targets.push({ kind: 'disclosure', key })
@@ -390,6 +394,7 @@ export function createReviewPreviousIssues(
 				return `${what.type}:${[...what.value.tags].sort().join(',')}`
 			case 'remove_gallery_images':
 				return `${what.type}:${[...what.value.image_ids].sort((a, b) => a - b).join(',')}`
+			case 'add_project_disclosures':
 			case 'remove_project_disclosures':
 				return `${what.type}:${[...what.value.disclosure_types].sort().join(',')}`
 			case 'acknowledge':

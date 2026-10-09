@@ -76,6 +76,8 @@ export function isThreadIssueFacetReadyToAddress(
 				current.license.id !== target.value.license.original ||
 				(current.license.url ?? '') !== target.value.url.original
 			)
+		case 'remove_icon':
+			return current.icon_url == null
 		case 'modify_icon':
 			return (current.icon_url ?? null) !== target.value.original_url
 		case 'modify_links':
@@ -92,7 +94,11 @@ export function isThreadIssueFacetReadyToAddress(
 				(tag) => !current.categories.includes(tag) && !current.additional_categories.includes(tag),
 			)
 		case 'remove_gallery_images':
-			return target.value.image_ids.some((id) => !current.gallery.some((image) => image.id === id))
+			return target.value.image_ids.every((id) => !current.gallery.some((image) => image.id === id))
+		case 'remove_project_disclosures':
+			return false
+		case 'version':
+			return !['remove', 'remove_additional_files'].includes(target.value.target.type)
 		case 'modify_gallery_image': {
 			const image = current.gallery.find(({ id }) => id === target.value.image_id)
 			if (!image) return true

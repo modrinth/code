@@ -447,9 +447,11 @@ function moderatorOptions(issue: ThreadIssue): ButtonMenuOption[] {
 }
 
 const fieldAnchor = computed(() => {
-	if (typeof props.target !== 'string' || hasItemSelector()) return undefined
-	const field = threadIssueField({ type: props.target })
-	return field ? `project-issue-field-${field}` : undefined
+	if (!props.target || hasItemSelector()) return undefined
+	const targets = Array.isArray(props.target) ? props.target : [props.target]
+	const fields = new Set(targets.map((type) => threadIssueField({ type })))
+	const [field] = fields
+	return field && fields.size === 1 ? `project-issue-field-${field}` : undefined
 })
 
 function hasItemSelector(): boolean {
@@ -491,7 +493,10 @@ function matchesTarget(what: Target): boolean {
 			(!props.userId || what.value.user_id === props.userId) &&
 			(!props.teamId || what.value.team_id === props.teamId)
 		)
-	if (what.type === 'remove_project_disclosures' && props.disclosureType)
+	if (
+		(what.type === 'add_project_disclosures' || what.type === 'remove_project_disclosures') &&
+		props.disclosureType
+	)
 		return what.value.disclosure_types.includes(props.disclosureType)
 	if (
 		(what.type === 'modify_project_disclosure' || what.type === 'modify_project_disclosure_note') &&
