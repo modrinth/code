@@ -12,7 +12,7 @@
 				v-for="message in displayMessages"
 				:key="message.id"
 				:message="message"
-				:issues="thread.issues"
+				:review-issue-count="reviewIssueCounts.get(message) ?? 0"
 				:project-owner-id="projectOwner?.id"
 				:report="report"
 				:members="members"
@@ -30,6 +30,8 @@ import { ChevronRightIcon } from '@modrinth/assets'
 
 import ThreadMessage from '~/components/ui/thread/ThreadMessage.vue'
 import { useThreadProjectOwner } from '~/composables/thread-project-owner'
+
+import { countThreadReviewIssues } from './timeline'
 
 const props = defineProps({
 	thread: {
@@ -65,6 +67,9 @@ const props = defineProps({
 const app = useNuxtApp()
 
 const projectOwner = useThreadProjectOwner(computed(() => props.thread))
+const reviewIssueCounts = computed(() =>
+	countThreadReviewIssues(props.thread.messages, props.thread.issues ?? []),
+)
 
 const members = computed(() => {
 	const members = {}

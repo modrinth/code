@@ -3,7 +3,7 @@
 		<ThreadMessage
 			v-if="entry.type === 'message'"
 			:message="entry.message"
-			:issues="issues"
+			:review-issue-count="reviewIssueCounts.get(entry.message) ?? 0"
 			:project-owner-id="projectOwnerId ?? undefined"
 			:members="members"
 			:auth="auth"
@@ -33,7 +33,7 @@ import { isStaff } from '~/helpers/users.js'
 
 import ThreadIssueHistory from './ThreadIssueHistory.vue'
 import ThreadMessage from './ThreadMessage.vue'
-import { buildThreadTimeline } from './timeline'
+import { buildThreadTimeline, countThreadReviewIssues } from './timeline'
 
 const props = withDefaults(
 	defineProps<{
@@ -58,4 +58,5 @@ const emit = defineEmits<{
 const entries = computed(() =>
 	buildThreadTimeline(props.messages, props.issues, !!isStaff(props.auth.user)),
 )
+const reviewIssueCounts = computed(() => countThreadReviewIssues(props.messages, props.issues))
 </script>

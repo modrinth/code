@@ -239,11 +239,9 @@ const props = defineProps({
 		type: Object,
 		required: true,
 	},
-	issues: {
-		type: /** @type {import('vue').PropType<readonly import('@modrinth/api-client').Labrinth.Threads.v3.ThreadIssue[]>} */ (
-			Array
-		),
-		default: () => [],
+	reviewIssueCount: {
+		type: Number,
+		default: 0,
 	},
 	projectOwnerId: {
 		type: String,
@@ -287,13 +285,6 @@ const emit = defineEmits(['update-thread', 'open-image'])
 const settings = useModerationSettings()
 const client = injectModrinthClient()
 const isAutoApproval = computed(() => props.message.body.type === 'auto_approval')
-const reviewIssueCount = computed(() => {
-	const eventTime = new Date(props.message.created).getTime()
-	const reviewWindow = 10 * 60 * 1000
-	return props.issues.filter(
-		(issue) => Math.abs(new Date(issue.created_at).getTime() - eventTime) <= reviewWindow,
-	).length
-})
 const author = computed(
 	() => props.members[isAutoApproval.value ? props.projectOwnerId : props.message.author_id],
 )

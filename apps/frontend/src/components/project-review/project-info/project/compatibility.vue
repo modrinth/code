@@ -21,7 +21,11 @@
 					:key="loader"
 					:style="`--_color: var(--color-platform-${loader})`"
 				>
-					<component :is="getLoaderIcon(loader)" v-if="getLoaderIcon(loader)" aria-hidden="true" />
+					<component
+						:is="getLoaderIcon(loader)"
+						v-if="loader !== 'mrpack' && getLoaderIcon(loader)"
+						aria-hidden="true"
+					/>
 					{{ formatLoader(formatMessage, loader) }}
 				</TagItem>
 				<span v-if="!project?.loaders.length">{{ formatMessage(messages.emptyPlatforms) }}</span>
