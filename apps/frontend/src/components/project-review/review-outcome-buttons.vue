@@ -125,7 +125,7 @@ const overflowActions = computed(() => [
 		label: formatMessage(messages.sendToReview),
 		tone: 'orange' as const,
 		hoverFilled: true,
-		action: () => submitDecisionAndContinue('processing'),
+		action: () => submitDecisionAndContinue('processing', false),
 		disabled: !actionAvailable('processing'),
 	},
 	{
@@ -133,7 +133,7 @@ const overflowActions = computed(() => [
 		label: formatMessage(messages.setToDraft),
 		tone: 'orange' as const,
 		hoverFilled: true,
-		action: () => submitDecisionAndContinue('draft'),
+		action: () => submitDecisionAndContinue('draft', false),
 		disabled: !actionAvailable('draft'),
 	},
 ])
@@ -163,14 +163,17 @@ for (const [index, action] of (['approve', 'withhold', 'reject'] as const).entri
 	)
 }
 
-async function submitDecisionAndContinue(status: Parameters<typeof submitDecision>[0]) {
+async function submitDecisionAndContinue(
+	status: Parameters<typeof submitDecision>[0],
+	advance = true,
+) {
 	if (!actionAvailable(status) || advancingAction.value !== undefined) return
 	const id = project.value?.id
 	if (!id) return
 	advancingAction.value = status
 	try {
 		if (await submitDecision(status)) {
-			if (settings.value.get(moderationSettings.General.AutoGoNextOnReviewOutcome)) {
+			if (advance && settings.value.get(moderationSettings.General.AutoGoNextOnReviewOutcome)) {
 				await navigation.completeAndNext(id)
 			} else {
 				await queue.completeProject(id)
