@@ -1,16 +1,20 @@
 # Component Structure
 
+For `app-frontend`, choose the feature or shell folder using [Application Structure](app-frontend/APP_FRONTEND_STRUCTURE.md) before organising the component's own files. Keep its supporting code nearby, with larger feature behavior outside the component folder. [App Composables](app-frontend/APP_FRONTEND_COMPOSABLES.md) explains when it helps to separate reactive behavior.
+
+These app-specific placement rules do not change the website or shared UI folder structure.
+
 ## Component Folders
 
-Give each complex component its own folder:
+Give a component its own folder when it has local helpers, composables, types, or subcomponents. Do not create a folder containing only `index.vue`; keep that component as a named `.vue` file in its parent folder.
 
 ```
 components/
 └── analytics-chart/
 	├── index.vue
-	├── analytics-chart-header.vue
-	├── analytics-chart-plot.vue
-	├── analytics-chart-data.ts
+	├── header.vue
+	├── plot.vue
+	├── data.ts
 	└── use-analytics-chart.ts
 ```
 
@@ -37,9 +41,9 @@ Keep files for only one component in that component's folder:
 ```
 analytics-chart/
 ├── index.vue
-├── analytics-chart-header.vue
-├── analytics-chart-plot.vue
-├── analytics-chart-tooltip.vue
+├── header.vue
+├── plot.vue
+├── tooltip.vue
 ├── chart-ranges.ts
 └── use-chart-hover-state.ts
 ```
@@ -55,25 +59,16 @@ This structure prevents large script blocks that are difficult to review.
 
 ## Local Subcomponent Names
 
-Use clear names that show the relation between each subcomponent and its main component:
+Use short names that describe each local component's role. The parent folder already supplies the component name, so `header.vue` is enough inside `analytics-chart/`:
 
 ```
 analytics-chart/
 ├── index.vue
-├── analytics-chart-header.vue
-└── analytics-chart-plot.vue
+├── header.vue
+└── plot.vue
 ```
 
-Do not use names that make a local component look like a public component:
-
-```
-analytics-chart/
-├── index.vue
-├── events.vue
-└── header.vue
-```
-
-Add the `analytics-chart-` prefix to local filenames. This prefix shows the relation in search results, editor tabs, and imports.
+Use a more specific name when the role is unclear, such as `date-filter.vue` or `status-filter.vue`. There is no need to repeat the parent name in every filename.
 
 ## Nesting
 
@@ -84,19 +79,18 @@ Use this structure:
 ```
 analytics-chart/
 ├── index.vue
-├── analytics-chart-header.vue
-├── analytics-chart-plot.vue
+├── header.vue
+├── plot.vue
 ├── use-chart-hover-state.ts
 └── use-chart-selection.ts
 ```
 
-Do not use this structure unless a local area needs its own module boundary:
+Use a subfolder only when a local area needs its own module boundary and has supporting files:
 
 ```
 analytics-chart/
 ├── index.vue
-├── header/
-│	└── index.vue
+├── header.vue
 └── plot/
 	├── index.vue
 	└── use-plot-state.ts
@@ -117,15 +111,15 @@ components/
 └── project-status-pill.vue
 ```
 
-Move a component into a folder when it gets local helpers, composables, or subcomponents.
+Move a component into a folder when it gets local helpers, composables, types, or subcomponents. If only `index.vue` remains in a folder, move it back to a named file in the parent folder and update its imports. For example, use `app-shell/route-outlet.vue`, not `app-shell/route-outlet/index.vue`. This rule also applies to large components that have no supporting files.
 
 ## Public and Local Components
 
-Use only the main `index.vue` as the public entry point. Treat the other folder files as implementation details.
+For a component with its own folder, use the main `index.vue` as its public entry point. Treat the supporting files as implementation details. A standalone component uses its named `.vue` file as its entry point; it does not need a folder to be public.
 
 If another component imports a local subcomponent, use one of these solutions:
 
-- Move the subcomponent into its own component folder.
+- Promote the subcomponent to a standalone named `.vue` file, or give it its own component folder if it has supporting files.
 - Move the subcomponent to the nearest shared component area when it is reusable.
 - Keep it local and pass behavior through the main component.
 
