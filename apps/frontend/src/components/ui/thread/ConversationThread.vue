@@ -114,6 +114,7 @@
 				class="flex flex-col pt-2"
 			>
 				<ThreadTimeline
+					:project-owner-id="projectOwnerId"
 					:messages="thread.messages"
 					:issues="thread.issues"
 					:members="members"
@@ -681,6 +682,10 @@ const messages = defineMessages({
 })
 
 const props = defineProps({
+	projectOwnerId: {
+		type: String,
+		default: null,
+	},
 	reviewSubmissionDisabled: {
 		type: Boolean,
 		default: false,

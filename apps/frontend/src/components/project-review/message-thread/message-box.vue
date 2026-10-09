@@ -57,7 +57,11 @@
 				:disabled="!canSubmit || pending || !draft.trim()"
 				@click="submit('reply', true)"
 			>
-				<SpinnerIcon v-if="loadingAction === 'reply-clear'" class="animate-spin" aria-hidden="true" />
+				<SpinnerIcon
+					v-if="loadingAction === 'reply-clear'"
+					class="animate-spin"
+					aria-hidden="true"
+				/>
 				<ReplyIcon v-else aria-hidden="true" />
 				{{ formatMessage(messages.replyAndClearIssues) }}
 			</Button>
@@ -122,7 +126,9 @@ const templates = computed(() => {
 })
 const { draft, pending, canSubmit, loadingAction, submit, uploadImage } = injectReviewSubmission()
 const correctionsInserted = ref(false)
-const showClearIssues = computed(() => correctionsInserted.value || hasCorrectionsHeading(draft.value))
+const showClearIssues = computed(
+	() => correctionsInserted.value || hasCorrectionsHeading(draft.value),
+)
 function onInsertTemplate(body: string) {
 	if (hasCorrectionsHeading(body)) correctionsInserted.value = true
 }

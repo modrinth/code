@@ -8,6 +8,7 @@
 			<div ref="content" class="flex min-h-full flex-col justify-end">
 				<template v-if="thread">
 					<ThreadTimeline
+						:project-owner-id="projectOwner?.id"
 						:messages="thread.messages"
 						:issues="thread.issues"
 						:members="members"
@@ -60,7 +61,8 @@ import { injectProjectReviewContext } from '../layout/context'
 import { projectReviewMessages as messages } from '../messages'
 import MessageBox from './message-box.vue'
 
-const { threadQuery, pixelated } = injectProjectReviewPageContext()
+const { threadQuery, pixelated, members: projectMembers, organizationMembers } =
+	injectProjectReviewPageContext()
 const { rightVisible, toggleSidebar } = injectProjectReviewContext()
 const { data: thread, isError, refetch } = threadQuery
 const auth = useAuthState()
@@ -86,8 +88,17 @@ function restoreImageFocus() {
 	if (imageTrigger?.isConnected) imageTrigger.focus({ preventScroll: true })
 	imageTrigger = undefined
 }
+const projectOwner = computed(
+	() =>
+		projectMembers.value.find((member) => member.is_owner)?.user ??
+		organizationMembers.value.find((member) => member.is_owner)?.user,
+)
 const members = computed(() =>
-	Object.fromEntries((thread.value?.members ?? []).map((member) => [member.id, member])),
+	Object.fromEntries(
+		[...(thread.value?.members ?? []), ...(projectOwner.value ? [projectOwner.value] : [])].map(
+			(member) => [member.id, member],
+		),
+	),
 )
 const messageBox = ref<InstanceType<typeof MessageBox>>()
 const scrollContainer = ref<HTMLElement>()

@@ -114,6 +114,7 @@
 			<ConversationThread
 				v-if="prefixedThread"
 				:thread="prefixedThread"
+				:project-owner-id="projectOwner?.id"
 				:project="project"
 				:set-status="setStatus"
 				:review-submission-disabled="reviewSubmissionDisabled"
@@ -233,6 +234,7 @@ const {
 	currentMember,
 	invalidate,
 	allMembers,
+	organization,
 	thread,
 } = injectProjectPageContext()
 
@@ -247,10 +249,24 @@ const reviewSubmissionDisabled = computed(
 
 const THREADS_RELEASE_DATE = '2023-08-05T12:00:00-07:00'
 
+const projectOwner = computed(
+	() =>
+		allMembers.value.find((member) => member.is_owner)?.user ??
+		organization.value?.members.find((member) => member.is_owner)?.user,
+)
+
 const prefixedThread = computed(() => {
+	if (!thread.value) return thread.value
+	const owner = projectOwner.value
+	const ownerThread = {
+		...thread.value,
+		members: owner
+			? [...thread.value.members.filter((member) => member.id !== owner.id), owner]
+			: thread.value.members,
+	}
 	const projectDate = project.value?.queued ?? project.value?.approved ?? project.value?.published
-	if (thread.value && projectDate && dayjs(projectDate).isBefore(dayjs(THREADS_RELEASE_DATE))) {
-		const newThread = JSON.parse(JSON.stringify(thread.value))
+	if (projectDate && dayjs(projectDate).isBefore(dayjs(THREADS_RELEASE_DATE))) {
+		const newThread = { ...ownerThread, messages: [...ownerThread.messages] }
 		newThread.messages.unshift({
 			id: '69',
 			author_id: null,
@@ -262,7 +278,7 @@ const prefixedThread = computed(() => {
 		})
 		return newThread
 	}
-	return thread.value
+	return ownerThread
 })
 
 const visibleIssues = computed(() =>

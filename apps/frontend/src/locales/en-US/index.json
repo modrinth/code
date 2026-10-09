@@ -3021,7 +3021,7 @@
     "message": "Insert message"
   },
   "markdown-editor.templates.library": {
-    "message": "Message library"
+    "message": "Message Library"
   },
   "markdown-editor.templates.search": {
     "message": "Search messages…"
@@ -4076,6 +4076,75 @@
   "organization.projects.none-with-create-prompt": {
     "message": "This organization doesn't have any projects yet. Would you like to <create-link>create one</create-link>?"
   },
+  "profile.block-user.admonition-body": {
+    "message": "{username} will not be able to send you friend requests, invite you to shared instances or invite you to Modrinth Hosting servers."
+  },
+  "profile.block-user.admonition-title": {
+    "message": "Are you sure you want to block this user?"
+  },
+  "profile.button.analytics": {
+    "message": "View user analytics"
+  },
+  "profile.button.billing": {
+    "message": "Manage user billing"
+  },
+  "profile.button.block": {
+    "message": "Block"
+  },
+  "profile.button.edit-user": {
+    "message": "Edit user"
+  },
+  "profile.button.force-password-reset": {
+    "message": "Force password reset"
+  },
+  "profile.button.info": {
+    "message": "View user details"
+  },
+  "profile.button.lock": {
+    "message": "Lock account"
+  },
+  "profile.button.manage-projects": {
+    "message": "Manage projects"
+  },
+  "profile.button.remove-affiliate": {
+    "message": "Remove as affiliate"
+  },
+  "profile.button.reset-2fa": {
+    "message": "Reset two-factor authentication"
+  },
+  "profile.button.revoke-sessions": {
+    "message": "Revoke all sessions"
+  },
+  "profile.button.set-affiliate": {
+    "message": "Set as affiliate"
+  },
+  "profile.button.shared-instances": {
+    "message": "View shared instances"
+  },
+  "profile.button.unblock": {
+    "message": "Unblock"
+  },
+  "profile.button.unlock": {
+    "message": "Unlock account"
+  },
+  "profile.details.label.auth-providers": {
+    "message": "Auth providers"
+  },
+  "profile.details.label.email-verified": {
+    "message": "Email verified"
+  },
+  "profile.details.label.has-password": {
+    "message": "Has password"
+  },
+  "profile.details.label.has-totp": {
+    "message": "Has TOTP"
+  },
+  "profile.details.label.payment-methods": {
+    "message": "Payment methods"
+  },
+  "profile.details.title": {
+    "message": "User details"
+  },
   "project-member-header.error-decline": {
     "message": "Failed to decline team invitation"
   },
@@ -4138,6 +4207,9 @@
   },
   "project-review.composer.reply": {
     "message": "Reply"
+  },
+  "project-review.composer.reply-and-clear-issues": {
+    "message": "Reply and clear issues"
   },
   "project-review.composer.reply-placeholder": {
     "message": "Reply to thread…"
@@ -4294,6 +4366,9 @@
   },
   "project-review.issues.search": {
     "message": "Search issues…"
+  },
+  "project-review.members.revoke-sessions-body": {
+    "message": "{username} will be signed out on every device. They will need to sign in again."
   },
   "project-review.message-box.resize": {
     "message": "Resize message box"
@@ -6681,7 +6756,7 @@
     "message": "Only visible to moderators"
   },
   "thread.message.auto-approval": {
-    "message": "automatically set the project status to <status>approved</status> as all issues have been resolved."
+    "message": "resolved all issues and the project status has been automatically set to <status>approved</status>."
   },
   "thread.message.moderator": {
     "message": "Moderator"
@@ -6691,6 +6766,9 @@
   },
   "thread.message.open-image": {
     "message": "Open image"
+  },
+  "thread.message.project-owner": {
+    "message": "Project owner"
   },
   "thread.message.system": {
     "message": "Modrinth"

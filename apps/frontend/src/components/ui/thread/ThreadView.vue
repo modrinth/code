@@ -10,6 +10,7 @@
 			class="flex flex-col rounded-xl"
 		>
 			<ThreadTimeline
+				:project-owner-id="projectOwner?.id"
 				:messages="thread.messages"
 				:issues="thread.issues"
 				:members="members"
@@ -132,10 +133,11 @@ import {
 	injectNotificationManager,
 	MarkdownEditor,
 } from '@modrinth/ui'
-import type { Thread, User } from '@modrinth/utils'
+import type { Thread } from '@modrinth/utils'
 import dayjs from 'dayjs'
 
 import { useImageUpload } from '~/composables/image-upload.ts'
+import { useThreadProjectOwner } from '~/composables/thread-project-owner'
 import { isStaff } from '~/helpers/users.js'
 
 import ThreadTimeline from './ThreadTimeline.vue'
@@ -197,11 +199,18 @@ const emit = defineEmits<{
 
 const flags = useFeatureFlags()
 
+const projectOwner = useThreadProjectOwner(computed(() => props.thread))
+
 const members = computed(() => {
-	const membersMap: Record<string, User> = {}
+	const membersMap: Record<
+		string,
+		Pick<Labrinth.Threads.v3.ThreadMember, 'id' | 'username' | 'role'> &
+			Partial<Pick<Labrinth.Threads.v3.ThreadMember, 'avatar_url'>>
+	> = {}
 	for (const member of props.thread.members) {
 		membersMap[member.id] = member
 	}
+	if (projectOwner.value) membersMap[projectOwner.value.id] = projectOwner.value
 	return membersMap
 })
 

@@ -104,7 +104,6 @@ import {
 	TeleportOverflowMenu,
 	useVIntl,
 } from '@modrinth/ui'
-
 import EditUserModal from '@modrinth/ui/src/layouts/shared/user-profile/components/edit-user-modal.vue'
 import ForcePasswordResetModal from '@modrinth/ui/src/layouts/shared/user-profile/components/force-password-reset-modal.vue'
 import LockUserModal from '@modrinth/ui/src/layouts/shared/user-profile/components/lock-user-modal.vue'

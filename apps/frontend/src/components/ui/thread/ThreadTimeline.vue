@@ -3,6 +3,7 @@
 		<ThreadMessage
 			v-if="entry.type === 'message'"
 			:message="entry.message"
+			:project-owner-id="projectOwnerId ?? undefined"
 			:members="members"
 			:auth="auth"
 			:report="report ?? undefined"
@@ -35,6 +36,7 @@ import { buildThreadTimeline } from './timeline'
 
 const props = withDefaults(
 	defineProps<{
+		projectOwnerId?: string | null
 		messages: readonly T[]
 		issues?: readonly Labrinth.Threads.v3.ThreadIssue[]
 		members: Record<string, { username: string; avatar_url?: string | null; role?: string }>

@@ -12,13 +12,13 @@
 		]"
 	>
 		<AutoLink
-			v-if="members[message.author_id]"
+			v-if="author"
 			class="message__icon flex min-w-0 max-w-full items-center no-underline"
-			:to="noLinks ? '' : `/user/${members[message.author_id].username}`"
+			:to="noLinks ? '' : `/user/${author.username}`"
 			tabindex="-1"
 			aria-hidden="true"
 		>
-			<Avatar size="2rem" :src="members[message.author_id].avatar_url" circle :raised="raised" />
+			<Avatar size="2rem" :src="author.avatar_url" circle :raised="raised" />
 		</AutoLink>
 		<div
 			v-else
@@ -26,28 +26,29 @@
 			:class="raised ? 'bg-surface-3' : 'bg-surface-2'"
 		>
 			<InfoIcon v-if="message.body.type === 'legacy_project_message'" class="text-blue" />
+			<Avatar v-else-if="isAutoApproval" size="2rem" circle :raised="raised" />
 			<ThreadRoleBadge v-else role="moderator" avatar />
 		</div>
 		<div class="message__content min-w-0">
-			<template v-if="members[message.author_id]">
+			<template v-if="author">
 				<span
 					class="message__author min-w-0 max-w-full font-bold"
 					:class="[
 						authorClasses,
-						members[message.author_id].role === 'admin'
+						author.role === 'admin'
 							? 'text-green'
-							: members[message.author_id].role === 'moderator'
+							: author.role === 'moderator'
 								? 'text-orange'
 								: '',
 					]"
 				>
 					<AutoLink
-						:to="noLinks ? '' : `/user/${members[message.author_id].username}`"
+						:to="noLinks ? '' : `/user/${author.username}`"
 						class="inline min-w-0 max-w-full items-center no-underline hover:underline hover:[filter:var(--hover-filter)] focus-visible:underline focus-visible:[filter:var(--hover-filter)] active:[filter:var(--active-filter)]"
 					>
-						{{ members[message.author_id].username }}
+						{{ author.username }}
 					</AutoLink>
-					<ThreadRoleBadge :role="members[message.author_id].role" />
+					<ThreadRoleBadge :role="author.role" />
 					<EyeOffIcon
 						v-if="isPrivateMessage"
 						v-tooltip="'Only visible to moderators'"
@@ -76,11 +77,17 @@
 							'tech_review_exit_file_deleted',
 						].includes(message.body.type)
 					"
-					class="message__author min-w-0 max-w-full font-bold text-orange"
-					:class="authorClasses"
+					class="message__author min-w-0 max-w-full font-bold"
+					:class="[authorClasses, isAutoApproval ? '' : 'text-orange']"
 				>
-					{{ formatMessage(imageMessages.moderator) }}
-					<ThreadRoleBadge role="moderator" />
+					{{
+						formatMessage(
+							isAutoApproval
+								? imageMessages.projectOwner
+								: imageMessages.moderator,
+						)
+					}}
+					<ThreadRoleBadge v-if="!isAutoApproval" role="moderator" />
 				</span>
 			</template>
 			<div
@@ -109,7 +116,7 @@
 				<span v-if="message.body.type === 'deleted'">
 					posted a message that has been deleted.
 				</span>
-				<span v-else-if="message.body.type === 'auto_approval'">
+				<span v-else-if="isAutoApproval" class="ml-1">
 					<IntlFormatted :message-id="imageMessages.autoApproval">
 						<template #status><Badge :type="message.body.new_status" /></template>
 					</IntlFormatted>
@@ -214,6 +221,10 @@ const props = defineProps({
 		type: Object,
 		required: true,
 	},
+	projectOwnerId: {
+		type: String,
+		default: null,
+	},
 	report: {
 		type: Object,
 		default: null,
@@ -251,13 +262,26 @@ const bodyClasses = computed(() => (hasBody.value ? 'mt-1' : 'inline'))
 const emit = defineEmits(['update-thread', 'open-image'])
 const settings = useModerationSettings()
 const client = injectModrinthClient()
+const isAutoApproval = computed(() => props.message.body.type === 'auto_approval')
+const author = computed(() =>
+	props.members[isAutoApproval.value ? props.projectOwnerId : props.message.author_id],
+)
+
 const { formatMessage } = useVIntl()
+
 const imageMessages = defineMessages({
-	moderator: { id: 'thread.message.moderator', defaultMessage: 'Moderator' },
+	projectOwner: {
+		id: 'thread.message.project-owner',
+		defaultMessage: 'Project owner',
+	},
+	moderator: {
+		id: 'thread.message.moderator',
+		defaultMessage: 'Moderator',
+	},
 	autoApproval: {
 		id: 'thread.message.auto-approval',
 		defaultMessage:
-			'automatically set the project status to <status>approved</status> as all issues have been resolved.',
+			'resolved all issues and the project status has been automatically set to <status>approved</status>.',
 	},
 	openImage: {
 		id: 'thread.message.open-image',

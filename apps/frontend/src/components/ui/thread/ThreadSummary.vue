@@ -12,6 +12,7 @@
 				v-for="message in displayMessages"
 				:key="message.id"
 				:message="message"
+				:project-owner-id="projectOwner?.id"
 				:report="report"
 				:members="members"
 				:auth="auth"
@@ -27,6 +28,7 @@
 import { ChevronRightIcon } from '@modrinth/assets'
 
 import ThreadMessage from '~/components/ui/thread/ThreadMessage.vue'
+import { useThreadProjectOwner } from '~/composables/thread-project-owner'
 
 const props = defineProps({
 	thread: {
@@ -61,12 +63,15 @@ const props = defineProps({
 
 const app = useNuxtApp()
 
+const projectOwner = useThreadProjectOwner(computed(() => props.thread))
+
 const members = computed(() => {
 	const members = {}
 	for (const member of props.thread.members) {
 		members[member.id] = member
 	}
 	members[props.auth.user.id] = props.auth.user
+	if (projectOwner.value) members[projectOwner.value.id] = projectOwner.value
 	return members
 })
 
