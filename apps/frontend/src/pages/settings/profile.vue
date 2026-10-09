@@ -1,5 +1,6 @@
 <template>
 	<section v-if="auth.user" class="universal-card">
+		<RestrictedActionAlert scope="USER_WRITE" />
 		<AccountProfileSettings
 			ref="profileSettings"
 			:patch-user="patchUser"
@@ -27,6 +28,8 @@ import {
 	UnsavedChangesPopup,
 	useVIntl,
 } from '@modrinth/ui'
+
+import RestrictedActionAlert from '~/components/ui/create/RestrictedActionAlert.vue'
 
 definePageMeta({
 	middleware: 'auth',

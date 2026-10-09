@@ -108,7 +108,7 @@ pub enum CreateError {
 impl From<crate::routes::ApiError> for CreateError {
     fn from(value: crate::routes::ApiError) -> Self {
         match value {
-            err if err.is_account_locked() => Self::Request(err),
+            err if err.account_standing_error().is_some() => Self::Request(err),
             crate::routes::ApiError::Auth(err) => {
                 Self::CustomAuthenticationError(format!("{err:#}"))
             }

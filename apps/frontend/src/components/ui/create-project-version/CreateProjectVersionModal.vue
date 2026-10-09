@@ -8,7 +8,7 @@
 		@hide="() => (modalOpen = false)"
 	/>
 	<DropArea
-		v-if="!modalOpen"
+		v-if="!modalOpen && !isVersionCreateRestricted"
 		:accept="acceptFileFromProjectType(projectV2.project_type)"
 		@change="handleDropArea"
 	/>
@@ -17,11 +17,15 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import {
+	defineMessages,
 	DropArea,
+	injectAuth,
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
+	isScopeRemovedForUser,
 	MultiStageModal,
+	useVIntl,
 } from '@modrinth/ui'
 import { acceptFileFromProjectType } from '@modrinth/utils'
 import type { ComponentExposed } from 'vue-component-type-helpers'
@@ -46,6 +50,34 @@ const { newDraftVersion, editingVersion, handleNewFiles } = ctx
 const { projectV2 } = injectProjectPageContext()
 const { addNotification } = injectNotificationManager()
 const { labrinth } = injectModrinthClient()
+const auth = injectAuth()
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	restrictedTitle: {
+		id: 'create.version.restricted-title',
+		defaultMessage: 'Action restricted',
+	},
+	restrictedText: {
+		id: 'create.version.restricted-text',
+		defaultMessage:
+			'A moderator has removed this permission from your account. See Account standing in your account settings for details.',
+	},
+})
+
+const isVersionCreateRestricted = computed(() =>
+	isScopeRemovedForUser(auth.user.value, 'VERSION_CREATE'),
+)
+
+function rejectIfRestricted(scopeId: string): boolean {
+	if (!isScopeRemovedForUser(auth.user.value, scopeId)) return false
+	addNotification({
+		title: formatMessage(messages.restrictedTitle),
+		text: formatMessage(messages.restrictedText),
+		type: 'error',
+	})
+	return true
+}
 
 async function openEditVersionModal(versionId: string, projectId: string, stageId?: string | null) {
 	try {
@@ -80,6 +112,7 @@ function openCreateVersionModal(
 	version: Labrinth.Versions.v3.DraftVersion | null = null,
 	stageId: string | null = null,
 ) {
+	if (rejectIfRestricted(version?.version_id ? 'VERSION_WRITE' : 'VERSION_CREATE')) return
 	newDraftVersion(projectV2.value.id, version)
 	modal.value?.setStage(stageId ?? 0)
 	modal.value?.show()
@@ -87,6 +120,7 @@ function openCreateVersionModal(
 }
 
 async function handleDropArea(files: FileList) {
+	if (rejectIfRestricted('VERSION_CREATE')) return
 	newDraftVersion(projectV2.value.id, null)
 	modal.value?.setStage(0)
 	await handleNewFiles(Array.from(files))

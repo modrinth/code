@@ -104,6 +104,26 @@ export class LabrinthModerationInternalModule extends AbstractModule {
 		})
 	}
 
+	public async setUserRestrictions(
+		userId: string,
+		restriction: Labrinth.Moderation.Internal.RestrictUserRequest,
+	): Promise<void> {
+		return this.client.request<void>(`/moderation/user/${userId}/restrictions`, {
+			api: 'labrinth',
+			version: 'internal',
+			method: 'PUT',
+			body: restriction,
+		})
+	}
+
+	public async clearUserRestrictions(userId: string): Promise<void> {
+		return this.client.request<void>(`/moderation/user/${userId}/restrictions`, {
+			api: 'labrinth',
+			version: 'internal',
+			method: 'DELETE',
+		})
+	}
+
 	public async revokeUserSessions(userId: string): Promise<void> {
 		return this.client.request<void>(`/admin/user/${userId}/sessions`, {
 			api: 'labrinth',

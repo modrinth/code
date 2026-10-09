@@ -329,6 +329,7 @@ impl TempUser {
             is_subscribed_to_newsletter: sign_up_newsletter,
             eligibility_verified_at: Some(Utc::now()),
             lock: None,
+            restriction: None,
         }
         .insert(transaction)
         .await
@@ -2151,6 +2152,7 @@ impl ReadyAccountRegisterFlow {
             is_subscribed_to_newsletter: register_flow.sign_up_newsletter,
             eligibility_verified_at: Some(Utc::now()),
             lock: None,
+            restriction: None,
         }
         .insert(transaction)
         .await;
