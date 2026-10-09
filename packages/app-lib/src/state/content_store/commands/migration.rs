@@ -276,7 +276,7 @@ async fn migrate_file_copy(
                 sources = downloads::repair_sources(
                     &state.pool,
                     &stored.sha512,
-                    state,
+                    &state.api_semaphore,
                 )
                 .await;
             }
