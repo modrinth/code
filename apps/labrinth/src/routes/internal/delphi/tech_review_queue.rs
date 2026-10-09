@@ -145,37 +145,44 @@ pub async fn sync_projects(
 
     let rows = sqlx::query!(
         r#"
-        WITH current_details AS (
-            SELECT
-                detail.project_id,
-                detail.status,
-                detail.severity
-            FROM delphi_issue_details_with_statuses detail
-            INNER JOIN delphi_report_issues issue ON issue.id = detail.issue_id
-            INNER JOIN delphi_reports report
-                ON report.id = issue.report_id
-                AND NOT EXISTS (
-                    SELECT 1
-                    FROM delphi_reports newer_report
-                    WHERE
-                        newer_report.file_id = report.file_id
-                        AND newer_report.delphi_version > report.delphi_version
-                )
-        )
         SELECT
             requested.project_id AS "project_id!: DBProjectId",
-            BOOL_OR(current_details.project_id IS NOT NULL) AS "has_details!",
-            COALESCE(
-                BOOL_OR(
-                    current_details.status IN ('pending', 'unsafe')
-                    AND current_details.severity != 'hidden'
-                ),
-                FALSE
-            ) AS "needs_review!"
+            EXISTS (
+                SELECT 1
+                FROM versions version
+                INNER JOIN files file ON file.version_id = version.id
+                INNER JOIN delphi_reports report ON report.file_id = file.id
+                INNER JOIN delphi_report_issues issue ON issue.report_id = report.id
+                INNER JOIN delphi_report_issue_details detail ON detail.issue_id = issue.id
+                WHERE version.mod_id = requested.project_id
+                    AND NOT EXISTS (
+                        SELECT 1
+                        FROM delphi_reports newer_report
+                        WHERE newer_report.file_id = report.file_id
+                            AND newer_report.delphi_version > report.delphi_version
+                    )
+            ) AS "has_details!",
+            CASE WHEN EXISTS (
+                SELECT 1
+                FROM delphi_tech_review_queue queued
+                WHERE queued.project_id = requested.project_id
+            ) THEN FALSE
+            ELSE EXISTS (
+                SELECT 1
+                FROM delphi_issue_details_with_statuses detail
+                INNER JOIN delphi_report_issues issue ON issue.id = detail.issue_id
+                INNER JOIN delphi_reports report ON report.id = issue.report_id
+                WHERE detail.project_id = requested.project_id
+                    AND detail.status IN ('pending', 'unsafe')
+                    AND detail.severity != 'hidden'
+                    AND NOT EXISTS (
+                        SELECT 1
+                        FROM delphi_reports newer_report
+                        WHERE newer_report.file_id = report.file_id
+                            AND newer_report.delphi_version > report.delphi_version
+                    )
+            ) END AS "needs_review!"
         FROM unnest($1::bigint[]) AS requested(project_id)
-        LEFT JOIN current_details
-            ON current_details.project_id = requested.project_id
-        GROUP BY requested.project_id
         "#,
         &project_ids.iter().map(|id| id.0).collect::<Vec<_>>(),
     )
