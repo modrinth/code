@@ -1,4 +1,5 @@
 import type { AbstractModrinthClient, Archon, UploadProgress } from '@modrinth/api-client'
+import type { ContentDiffItem } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import { invoke } from '@tauri-apps/api/core'
 import { join, tempDir } from '@tauri-apps/api/path'
@@ -7,7 +8,7 @@ import { computed, type MaybeRefOrGetter, toValue } from 'vue'
 import { config } from '@/config'
 import { apiClient } from '@/services/api-client'
 
-import { export_instance_mrpack } from './instance'
+import { export_instance_mrpack, get_content_items } from './instance'
 import { get_server_status } from './worlds'
 
 export type LinkedServer = Archon.Servers.v0.Server & {
@@ -118,4 +119,56 @@ export async function pushPackToServer(
 		onProgress: options.onProgress,
 	}).promise
 	if (options.restart) await client.archon.content_v1.updateModpack(serverId, worldId)
+}
+
+/**
+ * What a push would change on a server: the instance's enabled mods compared with the mods the
+ * server last took from it. Config changes are not detected.
+ */
+export async function diffInstanceAgainstServer(
+	instanceId: string,
+	server: Archon.Servers.v0.Server,
+	client: AbstractModrinthClient = apiClient,
+): Promise<ContentDiffItem[]> {
+	const [items, content] = await Promise.all([
+		get_content_items(instanceId),
+		client.archon.content_v1.getAddons(server.server_id, server.server_id, {
+			from_modpack: true,
+		}),
+	])
+	const wanted = items.filter((item) => item.project_type === 'mod' && item.enabled)
+	const onServer = (content.addons ?? []).filter((addon) => addon.kind === 'mod')
+	// Modrinth content is matched by project, so a new version is an update, not add plus remove.
+	const key = (projectId: string | null | undefined, fileName: string) => projectId ?? fileName
+	const serverByKey = new Map(
+		onServer.map((addon) => [key(addon.project_id, addon.filename), addon]),
+	)
+	const wantedKeys = new Set<string>()
+	const diffs: ContentDiffItem[] = []
+	for (const item of wanted) {
+		const hasProject = item.project.id !== item.file_name
+		const itemKey = key(hasProject ? item.project.id : null, item.file_name)
+		wantedKeys.add(itemKey)
+		const existing = serverByKey.get(itemKey)
+		const names = { projectName: item.project.title, fileName: item.file_name }
+		if (!existing) {
+			diffs.push({ type: 'added', ...names, newVersionName: item.version?.version_number })
+		} else if (existing.filename !== item.file_name) {
+			diffs.push({
+				type: 'updated',
+				...names,
+				currentVersionName: existing.version?.name ?? existing.filename,
+				newVersionName: item.version?.version_number ?? item.file_name,
+			})
+		}
+	}
+	for (const addon of onServer) {
+		if (wantedKeys.has(key(addon.project_id, addon.filename))) continue
+		diffs.push({
+			type: 'removed',
+			projectName: addon.name ?? addon.filename,
+			fileName: addon.filename,
+		})
+	}
+	return diffs
 }

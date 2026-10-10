@@ -1,33 +1,12 @@
 <template>
-	<template v-if="servers.length > 0">
-		<Button
-			type="colored"
-			color="brand"
-			:size="size"
-			:disabled="disabled"
-			@click="push(true, $event)"
-		>
-			<SpinnerIcon v-if="busy" class="animate-spin" aria-hidden="true" />
-			<UploadIcon v-else aria-hidden="true" />
-			{{ formatMessage(messages.pushAndRestart) }}
-		</Button>
-		<Button
-			type="outlined"
-			:size="size"
-			class="!border"
-			:disabled="disabled"
-			@click="push(false, $event)"
-		>
-			{{ formatMessage(messages.pushUpdate) }}
-		</Button>
-	</template>
 	<Button
-		v-else-if="publishesToFriends"
-		type="outlined"
-		:size="size"
-		class="!border"
-		:disabled="disabled"
-		@click="push(false, $event)"
+		v-if="servers.length > 0 || publishesToFriends"
+		:type="primary ? 'colored' : 'outlined'"
+		:color="primary ? 'blue' : undefined"
+		size="lg"
+		:class="primary ? 'shrink-0' : 'shrink-0 !border'"
+		:disabled="isDisabled"
+		@click="review($event)"
 	>
 		<SpinnerIcon v-if="busy" class="animate-spin" aria-hidden="true" />
 		<UploadIcon v-else aria-hidden="true" />
@@ -35,10 +14,11 @@
 	</Button>
 
 	<SharedInstancePublishModal
-		v-if="publishesToFriends"
 		ref="publishModal"
 		:instance="instance"
-		@published="onPublished"
+		:servers="servers"
+		@published="emit('published')"
+		@push-servers="pushToServers"
 		@state-change="publishState = $event"
 	/>
 	<NewModal ref="playersModal" :header="formatMessage(messages.playersHeader)">
@@ -85,19 +65,16 @@ import {
 import type { GameInstance } from '@/helpers/types'
 
 /**
- * The push buttons of an instance. With a linked server: "Push and restart" and "Push update",
- * which update every server that follows the instance. If the instance is shared, the same push
- * also publishes to friends through the existing review. With no server it is the plain
- * "Push update" for friends, and with neither it renders nothing.
+ * The one "Push update" button of an instance. It always opens the review, which is where the
+ * push is chosen: "Push update", plus "Push and restart" when the instance has linked servers.
+ * Renders nothing for an instance that has neither friends nor servers to push to.
  */
-const props = withDefaults(
-	defineProps<{
-		instance: GameInstance
-		size?: 'md' | 'lg'
-		disabled?: boolean
-	}>(),
-	{ size: 'lg' },
-)
+const props = defineProps<{
+	instance: GameInstance
+	disabled?: boolean
+	/** Filled style, for the banner that prompts the push. */
+	primary?: boolean
+}>()
 
 const emit = defineEmits<{
 	published: []
@@ -113,59 +90,37 @@ const playersModal = ref<InstanceType<typeof NewModal>>()
 const publishState = ref<'idle' | 'reviewing' | 'publishing'>('idle')
 const pushing = ref(false)
 const playersOnlineCount = ref(0)
-// The restart choice of the push that is waiting on the players prompt or the friends review.
-let pendingRestart = false
-let pendingEvent: MouseEvent | undefined
 
 const publishesToFriends = computed(() => props.instance.shared_instance?.role === 'owner')
 const busy = computed(() => pushing.value || publishState.value !== 'idle')
-const disabled = computed(
+const isDisabled = computed(
 	() => props.disabled || busy.value || props.instance.install_stage !== 'installed',
 )
 
-async function push(restart: boolean, event?: MouseEvent) {
-	if (disabled.value) return
-	pendingEvent = event
-	if (restart && servers.value.length > 0) {
-		pushing.value = true
-		try {
-			const counts = await Promise.all(servers.value.map(playersOnline))
-			playersOnlineCount.value = counts.reduce((sum, count) => sum + count, 0)
-		} finally {
-			pushing.value = false
-		}
+function review(event?: MouseEvent) {
+	if (isDisabled.value) return
+	void publishModal.value?.show(event)
+}
+
+/** Called once the review is confirmed. A restart first asks when players are online. */
+async function pushToServers(restart: boolean) {
+	if (restart) {
+		const counts = await Promise.all(servers.value.map(playersOnline))
+		playersOnlineCount.value = counts.reduce((sum, count) => sum + count, 0)
 		if (playersOnlineCount.value > 0) {
-			playersModal.value?.show(event)
+			playersModal.value?.show()
 			return
 		}
 	}
-	start(restart)
+	await upload(restart)
 }
 
 function answerPlayers(restart: boolean) {
 	playersModal.value?.hide()
-	start(restart)
+	void upload(restart)
 }
 
-function start(restart: boolean) {
-	// Friends only need the review when the instance changed since it was last published.
-	const reviewForFriends =
-		publishesToFriends.value &&
-		(servers.value.length === 0 || props.instance.shared_instance?.status === 'stale')
-	if (reviewForFriends) {
-		pendingRestart = restart
-		publishModal.value?.show(pendingEvent)
-		return
-	}
-	void pushToServers(restart)
-}
-
-function onPublished() {
-	emit('published')
-	void pushToServers(pendingRestart)
-}
-
-async function pushToServers(restart: boolean) {
+async function upload(restart: boolean) {
 	const targets = servers.value
 	if (targets.length === 0 || pushing.value) return
 	pushing.value = true
@@ -211,10 +166,6 @@ async function pushToServers(restart: boolean) {
 }
 
 const messages = defineMessages({
-	pushAndRestart: {
-		id: 'instance.linked-servers.push-and-restart',
-		defaultMessage: 'Push and restart',
-	},
 	pushUpdate: {
 		id: 'instance.linked-servers.push-update',
 		defaultMessage: 'Push update',
@@ -254,8 +205,7 @@ const messages = defineMessages({
 	},
 	pushFailedText: {
 		id: 'instance.linked-servers.push-failed.text',
-		defaultMessage:
-			'Could not reach {servers}. Open its Content page and choose "Update from instance" to try again.',
+		defaultMessage: 'Could not reach {servers}. Push again once the server can be reached.',
 	},
 })
 </script>

@@ -41,7 +41,6 @@
 					"
 				/>
 				<div class="flex gap-2">
-					<InstancePushButtons :instance="instance" @published="instancePage.refreshInstance" />
 					<TeleportOverflowMenu
 						v-if="canCreateServer"
 						type="outlined"
@@ -59,12 +58,7 @@
 						<PlusIcon class="size-5" />
 						{{ formatMessage(messages.addServer) }}
 					</Button>
-					<Button
-						:type="linkedServers.length > 0 ? 'outlined' : 'colored'"
-						:color="linkedServers.length > 0 ? undefined : 'brand'"
-						size="lg"
-						@click="instancePage.browseServers"
-					>
+					<Button type="colored" color="brand" size="lg" @click="instancePage.browseServers">
 						<CompassIcon class="size-5" />
 						<span>{{ formatMessage(messages.browseServers) }}</span>
 					</Button>
@@ -199,7 +193,6 @@ import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 import CreateServerFromInstanceModal from '@/components/ui/linked-servers/CreateServerFromInstanceModal.vue'
-import InstancePushButtons from '@/components/ui/linked-servers/InstancePushButtons.vue'
 import LinkedServerItem from '@/components/ui/linked-servers/LinkedServerItem.vue'
 import AddServerModal from '@/components/ui/world/modal/AddServerModal.vue'
 import ConfirmRemoveWorldModal from '@/components/ui/world/modal/ConfirmRemoveWorldModal.vue'

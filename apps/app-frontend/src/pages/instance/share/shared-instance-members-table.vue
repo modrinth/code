@@ -11,7 +11,7 @@
 					clearable
 				/>
 				<template v-if="!actionsLocked">
-					<InstancePushButtons
+					<InstancePushButton
 						:instance="instance"
 						:disabled="pushUpdateDisabled"
 						@published="instancePage.refreshInstance"
@@ -155,7 +155,7 @@ import {
 } from '@modrinth/ui'
 import { computed, ref, watch } from 'vue'
 
-import InstancePushButtons from '@/components/ui/linked-servers/InstancePushButtons.vue'
+import InstancePushButton from '@/components/ui/linked-servers/InstancePushButton.vue'
 
 import { injectInstancePage } from '../instance-context'
 import { injectSharedInstanceManagement } from './shared-instance-management-context'
