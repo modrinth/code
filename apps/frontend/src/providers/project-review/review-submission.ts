@@ -236,10 +236,11 @@ export function createReviewSubmission(
 				throw new Error(formatMessage(errors.unsaved))
 			if (
 				panels.validationErrors.value.some(
-					({ issueId, key }) => issueId === 'categories-inaccurate' && key === 'remove-tags',
+					({ issueId, key }) =>
+						issueId === 'categories-inaccurate' && key === 'categories-remove-tags',
 				)
 			)
-				throw new Error(formatMessage(projectReviewMessages.removalTagsRequired))
+				throw new Error('Please select tags to remove for inaccurate tags issue.')
 			if (panels.validationErrors.value.length) throw new Error(formatMessage(errors.missing))
 			if (status && ['approved', 'unlisted', 'private'].includes(status) && !canApprove.value)
 				throw new Error(formatMessage(errors.unresolved))

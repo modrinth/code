@@ -23,20 +23,26 @@ export const reuploadReuploadIssue = issue({
 	message: ({ getTextValue }) => {
 		const msg = reuploadMessage
 
-		if (!getTextValue('original-project') && !getTextValue('original-author')) {
+		if (!getTextValue('reupload-original-project') && !getTextValue('reupload-original-author')) {
 			return msg.replaceAll('%ORIGINAL_PROJECT%%ORIGINAL_AUTHOR%', 'from other creators')
-		} else if (getTextValue('original-project') && !getTextValue('original-author')) {
+		} else if (
+			getTextValue('reupload-original-project') &&
+			!getTextValue('reupload-original-author')
+		) {
 			return msg
-				.replaceAll('%ORIGINAL_PROJECT%', () => `from ${getTextValue('original-project')}`)
+				.replaceAll('%ORIGINAL_PROJECT%', () => `from ${getTextValue('reupload-original-project')}`)
 				.replaceAll('%ORIGINAL_AUTHOR%', '')
-		} else if (!getTextValue('original-project') && getTextValue('original-author')) {
+		} else if (
+			!getTextValue('reupload-original-project') &&
+			getTextValue('reupload-original-author')
+		) {
 			return msg
 				.replaceAll('%ORIGINAL_PROJECT%', '')
-				.replaceAll('%ORIGINAL_AUTHOR%', () => `by ${getTextValue('original-author')}`)
+				.replaceAll('%ORIGINAL_AUTHOR%', () => `by ${getTextValue('reupload-original-author')}`)
 		} else {
 			return msg
-				.replaceAll('%ORIGINAL_PROJECT%', () => `from ${getTextValue('original-project')}`)
-				.replaceAll('%ORIGINAL_AUTHOR%', () => ` by ${getTextValue('original-author')}`)
+				.replaceAll('%ORIGINAL_PROJECT%', () => `from ${getTextValue('reupload-original-project')}`)
+				.replaceAll('%ORIGINAL_AUTHOR%', () => ` by ${getTextValue('reupload-original-author')}`)
 		}
 	},
 	suggestedStatus: 'rejected',
@@ -72,7 +78,7 @@ export const reuploadIdentityVerificationIssue = issue({
 	title: 'Identity verification',
 	category: 'Project wide',
 	message: ({ getTextValue }) =>
-		identityVerificationMessage.replaceAll('%PLATFORM%', () => getTextValue('platform')),
+		identityVerificationMessage.replaceAll('%PLATFORM%', () => getTextValue('reupload-platform')),
 	suggestedStatus: 'rejected',
 })
 
@@ -82,8 +88,9 @@ export const reuploadIdentityVerificationServerIssue = issue({
 	category: 'Project wide',
 	message: ({ getTextValue }) => {
 		const msg = identityVerificationServerMessage
-		if (getTextValue('contact').length > 0) {
-			return msg.replaceAll('%CONTACT%', () => `, such as \`${getTextValue('contact')}\``)
+		const contact = getTextValue('server-contact') || getTextValue('reupload-contact')
+		if (contact.length > 0) {
+			return msg.replaceAll('%CONTACT%', () => `, such as \`${contact}\``)
 		}
 		return msg.replaceAll('%CONTACT%', '')
 	},
@@ -103,7 +110,10 @@ export const reuploadCustomPackProhibitedIssue = issue({
 	title: 'Prohibited custom modpack',
 	category: 'Project wide',
 	message: ({ getMarkdownValue }) =>
-		customPackProhibitedMessage.replaceAll('%OVERRIDES%', () => getMarkdownValue('overrides')),
+		customPackProhibitedMessage.replaceAll(
+			'%OVERRIDES%',
+			() => getMarkdownValue('server-overrides') || getMarkdownValue('reupload-overrides'),
+		),
 	suggestedStatus: 'rejected',
 })
 
@@ -123,9 +133,10 @@ export const reuploadCustomPackVerificationIssue = issue({
 	message: ({ selected, getMarkdownValue }) =>
 		[
 			customPackVerificationMessage,
-			selected.toggleIds.includes('reupload-list')
-				? customPackVerificationListMessage.replaceAll('%OVERRIDES%', () =>
-						getMarkdownValue('overrides'),
+			selected.toggleIds.includes('reupload-list') || selected.toggleIds.includes('server-list')
+				? customPackVerificationListMessage.replaceAll(
+						'%OVERRIDES%',
+						() => getMarkdownValue('server-overrides') || getMarkdownValue('reupload-overrides'),
 					)
 				: '',
 		].join('\n'),
@@ -194,13 +205,13 @@ export const reuploadReviewPanel = panel({
 	}).content(
 		text({
 			issue: reuploadReuploadIssue,
-			id: 'original-project',
+			id: 'reupload-original-project',
 			label: 'Original Project Title',
 			required: false,
 		}),
 		text({
 			issue: reuploadReuploadIssue,
-			id: 'original-author',
+			id: 'reupload-original-author',
 			label: 'Original project Author',
 			required: false,
 		}),
@@ -212,7 +223,7 @@ export const reuploadReviewPanel = panel({
 	}).content(
 		text({
 			issue: reuploadIdentityVerificationIssue,
-			id: 'platform',
+			id: 'reupload-platform',
 			label: 'Where else can the project be found?',
 			required: true,
 		}),
@@ -224,7 +235,7 @@ export const reuploadReviewPanel = panel({
 	}).content(
 		text({
 			issue: reuploadIdentityVerificationServerIssue,
-			id: 'contact',
+			id: 'reupload-contact',
 			label: 'Known public contact method',
 			required: false,
 		}),
@@ -237,7 +248,7 @@ export const reuploadReviewPanel = panel({
 	}).content(
 		markdown({
 			issue: reuploadCustomPackProhibitedIssue,
-			id: 'overrides',
+			id: 'reupload-overrides',
 			label: 'Forbidden overrides list',
 			required: true,
 		}),
@@ -258,7 +269,7 @@ export const reuploadReviewPanel = panel({
 		}).content(
 			markdown({
 				issue: reuploadCustomPackVerificationIssue,
-				id: 'overrides',
+				id: 'reupload-overrides',
 				label: 'Add list of overrides.',
 				required: false,
 			}),

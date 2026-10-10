@@ -21,7 +21,7 @@ export const metadataEnvironmentIssue = issue({
 	title: 'Incorrect environment',
 	category: 'Metadata',
 	message: ({ getSelectValue }) => {
-		const environment = getSelectValue('correct-environment')
+		const environment = getSelectValue('metadata-correct-environment')
 		const correction =
 			environment === 'mixed'
 				? environmentMixedMessage
@@ -86,7 +86,7 @@ export const metadataReviewPanel = panel({
 		}).content(
 			select({
 				issue: metadataEnvironmentIssue,
-				id: 'correct-environment',
+				id: 'metadata-correct-environment',
 				label: 'Correct Environment',
 				placeholder: 'Unknown',
 				options: [

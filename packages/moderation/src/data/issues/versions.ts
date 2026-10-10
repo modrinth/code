@@ -65,7 +65,8 @@ export const versionsIncorrectProjectTypeIssue = issue({
 	title: 'Incorrect project type',
 	category: 'Versions',
 	locations: [issueLocation('versions')],
-	message: ({ getSelectValue }) => incorrectProjectTypeMessages[getSelectValue('type')] ?? '',
+	message: ({ getSelectValue }) =>
+		incorrectProjectTypeMessages[getSelectValue('versions-type')] ?? '',
 	suggestedStatus: 'rejected',
 })
 
@@ -83,7 +84,8 @@ export const versionsAlternateVersionsIssue = issue({
 	title: 'Alternate versions',
 	category: 'Versions',
 	locations: [issueLocation('versions')],
-	message: ({ getSelectValue }) => alternateVersionsMessages[getSelectValue('distribution')] ?? '',
+	message: ({ getSelectValue }) =>
+		alternateVersionsMessages[getSelectValue('versions-distribution')] ?? '',
 	suggestedStatus: 'rejected',
 })
 
@@ -93,7 +95,7 @@ export const versionsUnsupportedIssue = issue({
 	category: 'Versions',
 	locations: [issueLocation('versions')],
 	message: ({ getTextValue }) =>
-		unsupportedMessage.replaceAll('%INVALID_TYPE%', () => getTextValue('invalid-type')),
+		unsupportedMessage.replaceAll('%INVALID_TYPE%', () => getTextValue('versions-invalid-type')),
 	suggestedStatus: 'rejected',
 })
 
@@ -154,7 +156,7 @@ export const versionsReviewPanel = panel({
 	}).content(
 		select({
 			issue: versionsIncorrectProjectTypeIssue,
-			id: 'type',
+			id: 'versions-type',
 			label: 'Correct Project Type',
 			required: true,
 			placeholder: 'Unknown',
@@ -170,7 +172,7 @@ export const versionsReviewPanel = panel({
 	}).content(
 		select({
 			issue: versionsAlternateVersionsIssue,
-			id: 'distribution',
+			id: 'versions-distribution',
 			label: 'Distribution Type',
 			required: true,
 			placeholder: 'Unknown',
@@ -207,7 +209,7 @@ export const versionsReviewPanel = panel({
 	}).content(
 		text({
 			issue: versionsUnsupportedIssue,
-			id: 'invalid-type',
+			id: 'versions-invalid-type',
 			label: 'Unsupported Type',
 			required: true,
 		}),
