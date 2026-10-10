@@ -1,5 +1,4 @@
-//! Linked server sources. Mirrors "Linked servers" in
-//! `packages/api-client/src/modules/core/types.ts`.
+//! Linked server sources: the pack a server follows and what it provides.
 
 use serde::{Deserialize, Serialize};
 
@@ -9,11 +8,9 @@ use super::instance::ModLoader;
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum ServerSource {
-    Instance {
-        shared_instance_id: String,
-        name: String,
-        icon: Option<String>,
-    },
+    /// An App instance, exported and uploaded by the App as a `.mrpack`. `instance_id` is the
+    /// App's own id for it, which is how the App finds the servers of an instance.
+    Instance { instance_id: String, name: String },
     Modrinth {
         project_id: String,
         version_id: String,
@@ -56,7 +53,6 @@ impl SourceApplyState {
     }
 }
 
-/// GET /instances/:id/source
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ServerSourceStatus {
     pub source: ServerSource,
@@ -107,7 +103,7 @@ pub struct ServerContentItem {
     pub icon_url: Option<String>,
 }
 
-/// GET /instances/:id/content
+/// Everything listed on a server's Content page.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ServerContent {
     pub source: Option<ServerSourceStatus>,
@@ -115,7 +111,7 @@ pub struct ServerContent {
 }
 
 /// A complete, verified source version as produced by an adapter. Stored as `setup.json` next
-/// to the staged files; every adapter (mrpack, Modrinth, shared instance) produces this shape.
+/// to the staged files; every adapter (mrpack, Modrinth) produces this shape.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Setup {
     pub name: String,

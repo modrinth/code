@@ -4,7 +4,10 @@ use crate::{
     application::{backup_service::BackupRecord, mod_service::ModInfo},
     domain::{
         instance::{InstanceInstallStatus, InstanceRecord, ModLoader},
-        modpack::ModpackManifest,
+        server_source::{
+            ContentKind, ContentOrigin, ServerContentItem, ServerSource,
+            ServerSourceStatus,
+        },
     },
     presentation::error::ApiError,
 };
@@ -208,27 +211,62 @@ pub fn backup(b: &BackupRecord) -> Value {
         "ongoing": false, "locked": b.locked, "history": []})
 }
 
-pub fn addon(m: &ModInfo, filesize: u64) -> Value {
-    json!({"id": m.id.as_deref().unwrap_or(&m.filename), "filename": m.filename,
-        "filesize": filesize, "disabled": !m.enabled, "kind": "mod", "from_modpack": false,
+/// One row of the content list. `info` is Core's record of a mod it installed from Modrinth.
+/// `installed` is false for client-only pack content, which is listed but never written.
+pub fn addon(
+    item: &ServerContentItem,
+    info: Option<&ModInfo>,
+    filesize: u64,
+) -> Value {
+    let project_id = item
+        .project_id
+        .as_ref()
+        .or(info.and_then(|m| m.modrinth_project_id.as_ref()));
+    let version_id = item
+        .version_id
+        .as_ref()
+        .or(info.and_then(|m| m.modrinth_version_id.as_ref()));
+    let kind = match item.kind {
+        ContentKind::Datapack => "datapack",
+        _ => "mod",
+    };
+    json!({"id": info.and_then(|m| m.id.as_deref()).unwrap_or(&item.filename), "filename": item.filename,
+        "filesize": filesize, "disabled": item.disabled, "kind": kind,
+        "from_modpack": item.origin == ContentOrigin::Source, "installed": !item.client_only,
         "status": "installed", "pack_client_retained": false, "pack_client_depends": false,
-        "has_update": null, "name": m.display_name, "project_id": m.modrinth_project_id,
-        "version": m.modrinth_version_id.as_ref().map(|id| json!({"id": id, "name": m.version_number})),
+        "has_update": null, "name": info.and_then(|m| m.display_name.as_ref()), "project_id": project_id,
+        "version": version_id.map(|id| json!({"id": id, "name": info.and_then(|m| m.version_number.as_ref()),
+            "environment": if item.client_only { Some("client_only") } else { None }})),
         "owner": null, "icon_url": null})
 }
 
-pub fn modpack(m: &ModpackManifest) -> Value {
-    let spec = match (&m.modrinth_project_id, &m.modrinth_version_id) {
-        (Some(project), Some(version)) => {
-            json!({"platform": "modrinth", "project_id": project, "version_id": version})
-        }
-        _ => {
-            json!({"platform": "local_file", "filename": "modpack.mrpack", "name": m.pack_name, "description": null})
-        }
+/// The linked pack, in the shape of Modrinth's modpack card. An instance is a local pack named
+/// after the instance, with `instance_id` set; `state` and `error` report its last update.
+pub fn modpack(status: &ServerSourceStatus) -> Value {
+    let (spec, title, instance_id) = match &status.source {
+        ServerSource::Modrinth {
+            project_id,
+            version_id,
+        } => (
+            json!({"platform": "modrinth", "project_id": project_id, "version_id": version_id}),
+            None,
+            None,
+        ),
+        ServerSource::Mrpack { filename, name } => (
+            json!({"platform": "local_file", "filename": filename, "name": name, "description": null}),
+            Some(name),
+            None,
+        ),
+        ServerSource::Instance { instance_id, name } => (
+            json!({"platform": "local_file", "filename": "instance.mrpack", "name": name, "description": null}),
+            Some(name),
+            Some(instance_id),
+        ),
     };
-    json!({"spec": spec, "has_update": null, "title": m.pack_name, "description": null,
-        "icon_url": null, "owner": null, "version_number": m.pack_version,
-        "date_published": null, "downloads": null, "followers": null})
+    json!({"spec": spec, "has_update": null, "title": title, "description": null,
+        "icon_url": null, "owner": null, "version_number": null,
+        "date_published": null, "downloads": null, "followers": null,
+        "instance_id": instance_id, "state": status.state, "error": status.error})
 }
 
 pub const KNOWN_PROPERTIES: &[&str] = &[

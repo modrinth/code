@@ -10,15 +10,14 @@ use crate::{
     infrastructure::{
         db::{
             installation_repo::InstallationRepo, instance_repo::InstanceRepo,
-            java_repo::JavaRepo, modpack_repo::ModpackRepo,
+            java_repo::JavaRepo,
         },
         events::EventBroadcaster,
         process::{instance_actor::InstanceHandle, std_spawner::StdSpawner},
     },
     ports::{
         installation_store::InstallationStore, instance_store::InstanceStore,
-        java_store::JavaStore, modpack_store::ModpackStore,
-        process_spawner::AnySpawner,
+        java_store::JavaStore, process_spawner::AnySpawner,
     },
     presentation::extractors::Account,
 };
@@ -77,8 +76,6 @@ pub struct AppState {
     pub installation_store: Arc<dyn InstallationStore>,
     /// Java installation store.
     pub java_store: Arc<dyn JavaStore>,
-    /// Modpack manifest store.
-    pub modpack_store: Arc<dyn ModpackStore>,
     /// Process spawner — `StdSpawner` in production, `MockSpawner` in tests.
     pub spawner: Arc<dyn AnySpawner>,
 }
@@ -105,7 +102,6 @@ impl AppState {
         let instance_store = Arc::new(InstanceRepo::new(pool.clone()));
         let installation_store = Arc::new(InstallationRepo::new(pool.clone()));
         let java_store = Arc::new(JavaRepo::new(pool.clone()));
-        let modpack_store = Arc::new(ModpackRepo::new(pool.clone()));
         let core_id = load_or_create_core_id(&pool).await?;
 
         Ok(Arc::new(Self {
@@ -124,7 +120,6 @@ impl AppState {
             instance_store,
             installation_store,
             java_store,
-            modpack_store,
             spawner,
         }))
     }
