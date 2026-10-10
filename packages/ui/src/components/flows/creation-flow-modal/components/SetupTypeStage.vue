@@ -79,6 +79,35 @@
 
 		<template v-else>
 			<div class="flex flex-col gap-3">
+				<template v-if="ctx.flowType === 'server-onboarding' && instances.length > 0">
+					<BigOptionButton
+						:icon="BoxesIcon"
+						:title="formatMessage(messages.fromInstanceTitle)"
+						:description="formatMessage(messages.fromInstanceDescription)"
+						:selected="pickingInstance"
+						@click="pickingInstance = !pickingInstance"
+					/>
+					<div
+						v-if="pickingInstance"
+						class="flex max-h-52 flex-col gap-1 overflow-y-auto rounded-[20px] bg-surface-2 p-2"
+					>
+						<button
+							v-for="instance in instances"
+							:key="instance.id"
+							class="flex cursor-pointer items-center gap-2 rounded-xl border-none bg-transparent p-2 text-left font-semibold text-contrast hover:bg-surface-4"
+							@click="selectInstance(instance)"
+						>
+							<Avatar
+								:src="instance.iconUrl"
+								:alt="instance.name"
+								size="2rem"
+								:tint-by="instance.name"
+								no-shadow
+							/>
+							<span class="min-w-0 truncate">{{ instance.name }}</span>
+						</button>
+					</div>
+				</template>
 				<BigOptionButton
 					:icon="CompassIcon"
 					:title="formatMessage(messages.modpackBaseTitle)"
@@ -123,7 +152,12 @@ import { computed, defineAsyncComponent, h, onMounted, ref, watch } from 'vue'
 
 import { useDebugLogger } from '#ui/composables/debug-logger'
 
-import { injectFilePicker } from '../../../../providers'
+import {
+	injectFilePicker,
+	injectInstanceServerSource,
+	type ServerInstanceOption,
+} from '../../../../providers'
+import Avatar from '../../../base/Avatar.vue'
 import BigOptionButton from '../../../base/BigOptionButton.vue'
 import Combobox from '../../../base/Combobox.vue'
 import { injectCreationFlowContext } from '../creation-flow-context'
@@ -131,6 +165,10 @@ import { injectCreationFlowContext } from '../creation-flow-context'
 const debug = useDebugLogger('SetupTypeStage')
 const ctx = injectCreationFlowContext()
 const filePicker = injectFilePicker()
+// Only the App can create a server from an instance.
+const instanceSource = injectInstanceServerSource(null)
+const instances = ref<ServerInstanceOption[]>([])
+const pickingInstance = ref(false)
 const { setSetupType: _setSetupType } = ctx
 const { formatMessage } = useVIntl()
 
@@ -210,6 +248,14 @@ const messages = defineMessages({
 		id: 'creation-flow.modal.setup-type.option.vanilla-minecraft.description',
 		defaultMessage: 'Classic Minecraft with no mods or plugins.',
 	},
+	fromInstanceTitle: {
+		id: 'creation-flow.modal.setup-type.option.from-instance.title',
+		defaultMessage: 'From instance',
+	},
+	fromInstanceDescription: {
+		id: 'creation-flow.modal.setup-type.option.from-instance.description',
+		defaultMessage: 'Use one of your instances. The server keeps following it.',
+	},
 })
 
 const setupTypeTitle = computed(() => {
@@ -244,6 +290,14 @@ function proceedWithModpack() {
 	} else {
 		ctx.modal.value?.setStage('final-config')
 	}
+}
+
+function selectInstance(instance: ServerInstanceOption) {
+	if (ctx.finishDisabled.value) return
+
+	selectModpack()
+	ctx.instanceSelection.value = instance
+	proceedWithModpack()
 }
 
 function browseModpacks() {
@@ -313,6 +367,12 @@ async function handleSearch(query: string) {
 }
 
 onMounted(() => {
+	if (instanceSource && ctx.flowType === 'server-onboarding') {
+		instanceSource
+			.listInstances()
+			.then((list) => (instances.value = list))
+			.catch((error) => debug('failed to list instances:', error))
+	}
 	ctx.projectSearchProjectId.value = undefined
 	search('')
 	setTimeout(() => {

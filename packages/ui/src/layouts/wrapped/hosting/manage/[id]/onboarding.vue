@@ -81,6 +81,7 @@ import type { Archon } from '@modrinth/api-client'
 import { GlobeIcon, PackageIcon, RightArrowIcon, SpinnerIcon, UsersIcon } from '@modrinth/assets'
 import {
 	defineMessages,
+	injectInstanceServerSource,
 	injectModrinthClient,
 	injectNotificationManager,
 	useServerPermissions,
@@ -99,6 +100,7 @@ const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const { canSetup, permissionDeniedMessage } = useServerPermissions()
+const instanceSource = injectInstanceServerSource(null)
 
 const messages = defineMessages({
 	welcomeTitle: {
@@ -284,6 +286,39 @@ function toApiLoader(loader: string): Archon.Content.v1.Modloader {
 const onCreate = async (config: CreationFlowContextValue) => {
 	if (!canSetup.value) {
 		config.loading.value = false
+		return
+	}
+
+	// The server is created from an instance and keeps following it
+	if (config.instanceSelection.value && instanceSource) {
+		modalRef.value?.hide()
+		uploading.value = true
+		uploadedBytes.value = 0
+		totalBytes.value = 0
+
+		try {
+			await instanceSource.pushInstance({
+				serverId,
+				worldId: worldId.value!,
+				instanceId: config.instanceSelection.value.id,
+				properties: config.buildProperties(),
+				onProgress: ({ loaded, total }) => {
+					uploadedBytes.value = loaded
+					totalBytes.value = total
+				},
+			})
+			server.value.status = 'installing'
+			await finalizeSetup()
+		} catch (error) {
+			addNotification({
+				title: formatMessage(messages.installationFailedTitle),
+				text:
+					error instanceof Error ? error.message : formatMessage(messages.installationFailedText),
+				type: 'error',
+			})
+			config.loading.value = false
+			uploading.value = false
+		}
 		return
 	}
 

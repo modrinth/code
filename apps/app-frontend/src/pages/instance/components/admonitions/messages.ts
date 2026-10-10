@@ -9,18 +9,6 @@ export const instanceAdmonitionsMessages = defineMessages({
 		id: 'app.instance.admonitions.shared-instance.changes-body',
 		defaultMessage: "Your local instance is ahead of the users you've shared it with.",
 	},
-	sharedInstancePublishButton: {
-		id: 'app.instance.admonitions.shared-instance.publish-button',
-		defaultMessage: 'Push update',
-	},
-	sharedInstancePublishingButton: {
-		id: 'app.instance.admonitions.shared-instance.publishing-button',
-		defaultMessage: 'Pushing...',
-	},
-	sharedInstanceReviewingButton: {
-		id: 'app.instance.admonitions.shared-instance.reviewing-button',
-		defaultMessage: 'Reviewing...',
-	},
 	sharedInstanceReviewHeader: {
 		id: 'app.instance.admonitions.shared-instance.review-header',
 		defaultMessage: 'Review changes',
