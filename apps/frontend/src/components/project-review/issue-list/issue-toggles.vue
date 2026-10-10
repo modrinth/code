@@ -157,7 +157,7 @@ function rowOptionLabel(entry: ReviewIssueControl) {
 }
 
 function panelLabel(entry: ReviewIssueControl) {
-	return entry.binding.panel.title ?? entry.control.issue.category
+	return entry.binding.panel.title ?? props.issue.category
 }
 
 function optionValue({ control }: ReviewIssueControl) {

@@ -89,7 +89,7 @@ export function expandItemReviewPanels(
 				collectItemControls(node.children, item)
 				continue
 			}
-			definitions.set(node.issue.id, node.issue)
+			if (node.issue) definitions.set(node.issue.id, node.issue)
 			if (node.type === 'toggle') {
 				const ids = toggles.get(node.issue.id) ?? []
 				ids.push(node.id ?? node.issue.id)
@@ -164,11 +164,11 @@ export function expandItemReviewPanels(
 					},
 				]
 			}
-			const issue = issues.get(node.issue.id) ?? node.issue
+			const issue = node.issue ? (issues.get(node.issue.id) ?? node.issue) : undefined
 			if (!item) return [node]
 			const scoped = {
 				...node,
-				issue,
+				...(issue ? { issue } : {}),
 				id: `${item.key}:${node.type === 'toggle' ? (node.id ?? node.issue.id) : node.id}`,
 				label: (ctx: ReviewContext) => resolve(node.label, scopedContext(ctx, item)),
 				shown: (ctx: ReviewContext) => resolve(node.shown, scopedContext(ctx, item)) !== false,

@@ -23,7 +23,7 @@ import type { createReviewSession } from './review-session'
 interface ResolvedIssueControlOptions {
 	disabled: boolean
 	required: boolean
-	issue: Issue
+	issue?: Issue
 	issueId: string
 	childToggleIds?: string[]
 	label: string
@@ -32,7 +32,12 @@ interface ResolvedIssueControlOptions {
 
 export type ResolvedIssueControl = ResolvedIssueControlOptions &
 	(
-		| { type: 'toggle'; id?: string; issueListLabel?: string; issueListGroup?: string }
+		| {
+				type: 'toggle'
+				id?: string
+				issueListLabel?: string
+				issueListGroup?: string
+		  }
 		| {
 				type: 'markdown' | 'text' | 'textarea'
 				key: string
@@ -168,7 +173,10 @@ export function createReviewPanels(
 			| 'organizationMembers'
 			| 'wasReviewed'
 			| 'permissions'
-		> & { previousLinks: ReadonlyMap<string, string>; previousIssueIds?: readonly string[] }
+		> & {
+			previousLinks: ReadonlyMap<string, string>
+			previousIssueIds?: readonly string[]
+		}
 	>,
 	definitions: Record<string, PanelRegistration> = reviewPanels,
 ) {
@@ -277,6 +285,15 @@ export function createReviewPanels(
 		return result
 	}
 
+	function contextSelectValues(projectId: string, issueId: string, key: string): string[] {
+		const values = session.read(projectId, 'issue-select')[issueId]
+		const scope =
+			values && typeof values === 'object' && !(values instanceof Set) && key in values
+				? issueId
+				: ''
+		return readSelectValues(projectId, scope, key)
+	}
+
 	const selectedIssueIds = computed(() => {
 		const projectId = project.value?.id
 		if (!projectId) return []
@@ -299,13 +316,12 @@ export function createReviewPanels(
 		const context: ReviewContext = {
 			projectV3,
 			...reviewData.value,
-			getTextValue: (id, issueId) => (issueId ? (textValues(projectV3.id, issueId)[id] ?? '') : ''),
-			getSelectValue: (id, issueId) =>
-				issueId ? (readSelectValues(projectV3.id, issueId, id)[0] ?? '') : '',
-			getSelectValues: (id, issueId) =>
-				issueId ? readSelectValues(projectV3.id, issueId, id) : [],
-			getMarkdownValue: (id, issueId) =>
-				issueId ? (textValues(projectV3.id, issueId)[id] ?? '') : '',
+			getTextValue: (id, issueId = '') =>
+				textValues(projectV3.id, issueId)[id] ?? textValues(projectV3.id, '')[id] ?? '',
+			getSelectValue: (id, issueId = '') => contextSelectValues(projectV3.id, issueId, id)[0] ?? '',
+			getSelectValues: (id, issueId = '') => contextSelectValues(projectV3.id, issueId, id),
+			getMarkdownValue: (id, issueId = '') =>
+				textValues(projectV3.id, issueId)[id] ?? textValues(projectV3.id, '')[id] ?? '',
 			selected: {
 				items: {},
 				issueIds: selectedIssueIds.value,
@@ -347,19 +363,23 @@ export function createReviewPanels(
 						sections.push(...resolveNodes(node.children, resolveWithContext(node.label, context)))
 						continue
 					}
-					const issue = itemIssues.get(node.issue.id) ?? node.issue
-					const issueId = issue.id
+					const issue = node.issue ? (itemIssues.get(node.issue.id) ?? node.issue) : undefined
+					const issueId = issue?.id ?? ''
 					const issueContext: ReviewContext = {
 						...context,
-						getMarkdownValue: (id, scope = issueId) => textValues(projectV3.id, scope)[id] ?? '',
-						getTextValue: (id, scope = issueId) => textValues(projectV3.id, scope)[id] ?? '',
+						getMarkdownValue: (id, scope = issueId) =>
+							textValues(projectV3.id, scope)[id] ?? textValues(projectV3.id, '')[id] ?? '',
+						getTextValue: (id, scope = issueId) =>
+							textValues(projectV3.id, scope)[id] ?? textValues(projectV3.id, '')[id] ?? '',
 						getSelectValue: (id, scope = issueId) =>
-							readSelectValues(projectV3.id, scope, id)[0] ?? '',
-						getSelectValues: (id, scope = issueId) => readSelectValues(projectV3.id, scope, id),
+							contextSelectValues(projectV3.id, scope, id)[0] ?? '',
+						getSelectValues: (id, scope = issueId) => contextSelectValues(projectV3.id, scope, id),
 						selected: {
 							items: {},
 							issueIds: selectedIssueIds.value,
-							toggleIds: [...selectedToggleIds(projectV3.id, issueId)],
+							toggleIds: issue
+								? [...selectedToggleIds(projectV3.id, issueId)]
+								: context.selected.toggleIds,
 						},
 					}
 					if (resolveWithContext(node.shown, issueContext) === false) continue
@@ -609,7 +629,7 @@ export function createReviewPanels(
 		for (const binding of panels.value.values()) {
 			for (const section of binding.panel.sections) {
 				for (const control of section.controls) {
-					if (control.childToggleIds) continue
+					if (control.childToggleIds || !control.issue) continue
 					const issue: ReviewIssue = issues.get(control.issueId) ?? {
 						id: control.issueId,
 						title: control.issue.title,
@@ -716,6 +736,10 @@ export function createReviewPanels(
 		const projectV3 = project.value
 		if (!projectV3) return []
 		const issues = new Map<string, IssueSelection>()
+		const sharedInputs = {
+			textValues: {} as Record<string, string>,
+			selectValues: {} as Record<string, string[]>,
+		}
 		for (const entry of availableIssues.value) {
 			if (session.read(projectV3.id, 'issue-active')[entry.id] !== true) continue
 			issues.set(entry.id, {
@@ -733,7 +757,7 @@ export function createReviewPanels(
 									: [],
 							),
 						}
-					: entry.controls[0].control.issue,
+					: entry.controls[0].control.issue!,
 				active: true,
 				keys: new Set(),
 				textValues: {},
@@ -744,6 +768,14 @@ export function createReviewPanels(
 		for (const binding of panels.value.values()) {
 			for (const section of binding.panel.sections) {
 				for (const control of section.controls) {
+					if (!control.issue) {
+						if (control.disabled) continue
+						if (control.type === 'select')
+							sharedInputs.selectValues[control.key] = selectValues(binding, control)
+						else if (control.type !== 'toggle')
+							sharedInputs.textValues[control.key] = textValue(binding, control)
+						continue
+					}
 					if (
 						control.childToggleIds ||
 						control.disabled ||
@@ -791,10 +823,14 @@ export function createReviewPanels(
 						issueIds: selectedIssueIds.value,
 						toggleIds: [...keys],
 					},
-					getMarkdownValue: (key, scope = id) => issues.get(scope)?.textValues[key] ?? '',
-					getTextValue: (key, scope = id) => issues.get(scope)?.textValues[key] ?? '',
-					getSelectValue: (key, scope = id) => issues.get(scope)?.selectValues[key]?.[0] ?? '',
-					getSelectValues: (key, scope = id) => issues.get(scope)?.selectValues[key] ?? [],
+					getMarkdownValue: (key, scope = id) =>
+						issues.get(scope)?.textValues[key] ?? sharedInputs.textValues[key] ?? '',
+					getTextValue: (key, scope = id) =>
+						issues.get(scope)?.textValues[key] ?? sharedInputs.textValues[key] ?? '',
+					getSelectValue: (key, scope = id) =>
+						(issues.get(scope)?.selectValues[key] ?? sharedInputs.selectValues[key])?.[0] ?? '',
+					getSelectValues: (key, scope = id) =>
+						issues.get(scope)?.selectValues[key] ?? sharedInputs.selectValues[key] ?? [],
 				}
 				const controls = availableIssues.value.find((entry) => entry.id === id)?.controls ?? []
 				if (
@@ -829,11 +865,20 @@ export function createReviewPanels(
 			})
 	})
 
-	const validationErrors = computed(() =>
-		activeIssues.value
+	const validationErrors = computed(() => [
+		...activeIssues.value
 			.filter(({ id }) => !isRestoredIssue(id))
 			.flatMap(({ id, missing }) => missing.map((key) => ({ issueId: id, key }))),
-	)
+		...[...panels.value.values()].flatMap((binding) =>
+			binding.panel.sections.flatMap((section) =>
+				section.controls.flatMap((control) =>
+					!control.issue && control.type !== 'toggle' && missing(binding, control)
+						? [{ issueId: '', key: control.key }]
+						: [],
+				),
+			),
+		),
+	])
 
 	return {
 		previousLinks: computed(() => reviewData.value.previousLinks),

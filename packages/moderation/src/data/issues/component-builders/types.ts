@@ -28,8 +28,8 @@ export interface ReviewContext {
 		items: Readonly<Record<string, readonly { key: string; context: ReviewContext }[]>>
 	}
 	/**
-	 * Returns a markdown value for the current issue, or an empty string if unavailable.
-	 * Panel and section callbacks must supply an issue ID to read stored input values.
+	 * Returns an input value for the current issue, falling back to shared inputs, or empty if unavailable.
+	 * Panel and section callbacks read shared inputs unless an issue ID is supplied.
 	 * Only visible, enabled controls contribute when resolving messages.
 	 * UI callbacks read stored values; message callbacks also resolve defaults.
 	 */
@@ -60,7 +60,8 @@ export interface Issue {
 export type IssueConfig = Issue
 
 interface IssueControlOptions {
-	issue: Issue
+	/** Omit to share this input across issues by its control ID. */
+	issue?: Issue
 	label: WithContext<string>
 	shown?: WithContext<boolean>
 	tooltip?: WithContext<string>
@@ -69,6 +70,7 @@ interface IssueControlOptions {
 
 export interface IssueToggle extends IssueControlOptions {
 	type: 'toggle'
+	issue: Issue
 	/** Optional label for this toggle in the issue list. */
 	issueListLabel?: WithContext<string>
 	/** Optional issue-list row for this toggle. Defaults to the toggle label. */

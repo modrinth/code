@@ -286,7 +286,10 @@ const canAddress = computed(() => !!currentMember.value?.accepted)
 const expandedAddressed = reactive(new Set<string>())
 const finishedExpanding = reactive(new Set<string>())
 const messages = defineMessages({
-	issueOptions: { id: 'thread-issues.options', defaultMessage: 'Issue options' },
+	issueOptions: {
+		id: 'thread-issues.options',
+		defaultMessage: 'Issue options',
+	},
 	markVerified: {
 		id: 'thread-issues.mark-resolved',
 		defaultMessage: 'Mark as resolved',
@@ -305,18 +308,39 @@ const messages = defineMessages({
 	},
 	showIssue: { id: 'thread-issues.show-issue', defaultMessage: 'Show issue' },
 	hideIssue: { id: 'thread-issues.hide-issue', defaultMessage: 'Hide issue' },
-	markAddressed: { id: 'thread-issues.mark-addressed', defaultMessage: 'Mark as addressed' },
+	markAddressed: {
+		id: 'thread-issues.mark-addressed',
+		defaultMessage: 'Mark as addressed',
+	},
 	addressFailed: {
 		id: 'thread-issues.address-failed',
 		defaultMessage: 'Failed to mark issue as addressed',
 	},
-	addressed: { id: 'thread-issues.addressed', defaultMessage: 'Marked as addressed' },
-	showAddressed: { id: 'thread-issues.show-addressed', defaultMessage: 'Show addressed' },
-	hideAddressed: { id: 'thread-issues.hide-addressed', defaultMessage: 'Hide addressed' },
+	addressed: {
+		id: 'thread-issues.addressed',
+		defaultMessage: 'Marked as addressed',
+	},
+	showAddressed: {
+		id: 'thread-issues.show-addressed',
+		defaultMessage: 'Show addressed',
+	},
+	hideAddressed: {
+		id: 'thread-issues.hide-addressed',
+		defaultMessage: 'Hide addressed',
+	},
 	resolved: { id: 'thread-issues.resolved', defaultMessage: 'Resolved' },
-	showResolved: { id: 'thread-issues.show-resolved', defaultMessage: 'Show resolved' },
-	hideResolved: { id: 'thread-issues.hide-resolved', defaultMessage: 'Hide resolved' },
-	editName: { id: 'thread-issues.target.edit-name', defaultMessage: 'Edit name' },
+	showResolved: {
+		id: 'thread-issues.show-resolved',
+		defaultMessage: 'Show resolved',
+	},
+	hideResolved: {
+		id: 'thread-issues.hide-resolved',
+		defaultMessage: 'Hide resolved',
+	},
+	editName: {
+		id: 'thread-issues.target.edit-name',
+		defaultMessage: 'Edit name',
+	},
 	editUrl: { id: 'thread-issues.target.edit-url', defaultMessage: 'Edit URL' },
 	editSummary: {
 		id: 'thread-issues.target.edit-summary',
@@ -393,7 +417,9 @@ const verifyMutation = useMutation({
 	}) => {
 		const results = await Promise.allSettled(
 			facetIds.map((id) =>
-				client.labrinth.threads_v3.editIssueFacet(id, { moderator_verified: verified }),
+				client.labrinth.threads_v3.editIssueFacet(id, {
+					moderator_verified: verified,
+				}),
 			),
 		)
 		const failure = results.find((result) => result.status === 'rejected')
@@ -402,11 +428,17 @@ const verifyMutation = useMutation({
 	onSettled: async (_, __, { threadId, projectId }) => {
 		emit('update-thread')
 		await Promise.all([
-			queryClient.invalidateQueries({ queryKey: threadId ? ['thread', threadId] : ['thread'] }),
+			queryClient.invalidateQueries({
+				queryKey: threadId ? ['thread', threadId] : ['thread'],
+			}),
 			...(projectId
 				? [
-						queryClient.invalidateQueries({ queryKey: ['project', 'v2', projectId] }),
-						queryClient.invalidateQueries({ queryKey: ['project', 'v3', projectId] }),
+						queryClient.invalidateQueries({
+							queryKey: ['project', 'v2', projectId],
+						}),
+						queryClient.invalidateQueries({
+							queryKey: ['project', 'v3', projectId],
+						}),
 						projectContext?.projectV2.value.id === projectId
 							? projectContext.refreshProjectValidation()
 							: Promise.resolve(),
@@ -508,7 +540,7 @@ function matchesTarget(what: Target): boolean {
 
 function panelIssues(nodes: readonly PanelNode[]): Issue[] {
 	return nodes.flatMap((node) =>
-		node.type === 'section' ? panelIssues(node.children) : [node.issue],
+		node.type === 'section' ? panelIssues(node.children) : node.issue ? [node.issue] : [],
 	)
 }
 

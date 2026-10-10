@@ -107,7 +107,7 @@ export const summaryReviewPanel = panel({
 	}).content(
 		textarea({
 			issue: summaryFormattingIssue,
-			id: 'suggestion',
+			id: 'summary-suggestion',
 			label: 'Suggestion',
 			maxlength: 256,
 			rows: 3,
