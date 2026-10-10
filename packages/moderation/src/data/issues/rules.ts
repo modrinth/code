@@ -1,4 +1,5 @@
 import { ListBulletedIcon } from '@modrinth/assets'
+import { md } from '@modrinth/utils'
 
 import aiGeneratedMessage from '../messages/checklist/messages/rules/ai-generated.md'
 import aiImagesMessage from '../messages/checklist/messages/rules/ai-images.md'
@@ -26,10 +27,11 @@ import serverSideOptInPvpMessage from '../messages/checklist/messages/rules/serv
 import serverSideOptInXRayMessage from '../messages/checklist/messages/rules/server-side-opt-in/x-ray.md'
 import serverSideOptInHeaderMessage from '../messages/checklist/messages/rules/server-side-opt-in-header.md'
 import serverSideOptOutMessage from '../messages/checklist/messages/rules/server-side-opt-out.md'
-import { removalImageEntry } from '../messages/gallery-images'
 import { issue, panel, section, toggle } from './component-builders/builders'
 import { IssuePriority } from './component-builders/priority'
 import type { IssueAction } from './component-builders/types'
+
+const escapeHtml = md().utils.escapeHtml
 
 export const rulesPaidAccessServerIssue = issue({
 	id: 'rules-paid-access-server',
@@ -95,31 +97,28 @@ export const rulesAiImagesIssue = issue({
 		const settingsUrl = `https://modrinth.com/project/${encodeURIComponent(projectV3.id)}/settings`
 		if (selected.toggleIds.includes('icon-ai-images')) {
 			const image = projectV3.icon_url
-				? `<ul class="review-card-image-list">${removalImageEntry('', projectV3.icon_url)}</ul>`
+				? `<image-viewer src="${escapeHtml(projectV3.icon_url)}" alt="" />`
 				: ''
-			entries.push(
-				`<div class="review-card-image-target"><a class="review-card-image-heading" href="${settingsUrl}">Project icon</a>${image}</div>`,
-			)
+			entries.push(`[Project icon](${settingsUrl})\n${image}`)
 		}
 		const keys = new Set((selected.items['gallery-image'] ?? []).map(({ key }) => key))
 		const images = projectV3.gallery.filter(
 			(image) => image.id !== undefined && keys.has(String(image.id)),
 		)
 		if (images.length) {
-			const previews = images.map((image) =>
-				removalImageEntry(image.name ?? '', image.raw_url || image.url),
+			const previews = images.map(
+				(image) =>
+					`<image-viewer src="${escapeHtml(image.raw_url || image.url)}" alt="${escapeHtml(image.name ?? '')}" />`,
 			)
-			entries.push(
-				`<div class="review-card-image-target"><a class="review-card-image-heading" href="${settingsUrl}/gallery">Gallery</a><ul class="review-card-image-list">${previews.join('\n')}</ul></div>`,
-			)
+			entries.push(`[Gallery](${settingsUrl}/gallery)\n${previews.join('\n')}`)
 		}
 		if (selected.toggleIds.includes('description-ai-images')) {
 			entries.push(
-				`<div class="review-card-image-target"><a class="review-card-image-heading" href="${settingsUrl}/description">Description</a><p class="review-card-image-description">Remove any prohibited images in the description.</p></div>`,
+				`[Description](${settingsUrl}/description)\n\nRemove any prohibited images in the description.`,
 			)
 		}
 		if (!entries.length) return aiImagesMessage.trimEnd()
-		const locations = `:\n\n<div class="review-card-image-targets">\n${entries.join('\n')}\n</div>`
+		const locations = `:\n\n${entries.join('\n\n')}`
 		return aiImagesTargetedMessage.replace('%AI_IMAGE_LOCATIONS%', locations).trimEnd()
 	},
 	suggestedStatus: 'flagged',

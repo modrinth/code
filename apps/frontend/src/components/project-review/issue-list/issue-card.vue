@@ -156,10 +156,11 @@
 										hide-markdown-hint
 										@update:model-value="reviewMessages.editIssueMessage(messageKey, $event)"
 									/>
-									<div
+									<IssueMessage
 										v-else
 										class="issue-message markdown-body min-h-12 rounded-xl border border-solid border-surface-4 px-2.5 pb-2.5 text-xs [overflow-wrap:anywhere]"
-										v-html="renderHighlightedString(displayMessage)"
+										:message="displayMessage"
+										highlighted
 									/>
 									<div
 										v-if="!resolved"
@@ -274,9 +275,9 @@ import {
 	Tooltip,
 	useVIntl,
 } from '@modrinth/ui'
-import { renderHighlightedString } from '@modrinth/utils/highlightjs/index'
 import { computed, nextTick, ref, useId, watch } from 'vue'
 
+import IssueMessage from '~/components/ui/project-issue-card/issue-message.vue'
 import { useModerationSettings } from '~/composables/moderation'
 import { injectReviewMessages } from '~/providers/project-review/review-messages'
 import {

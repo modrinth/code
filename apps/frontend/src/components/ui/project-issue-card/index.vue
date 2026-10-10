@@ -81,10 +81,10 @@
 			>
 				<div :inert="!isExpanded(issue)" class="min-w-0">
 					<div class="flex flex-col gap-3 pt-2">
-						<div
+						<IssueMessage
 							v-if="issueMessage(issue)"
 							class="markdown-body min-w-0 text-sm text-primary"
-							v-html="renderString(issueMessage(issue))"
+							:message="issueMessage(issue)"
 						/>
 						<div
 							v-if="
@@ -232,7 +232,7 @@ import {
 	Tooltip,
 	useVIntl,
 } from '@modrinth/ui'
-import { isStaff, renderString } from '@modrinth/utils'
+import { isStaff } from '@modrinth/utils'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { computed, reactive } from 'vue'
 
@@ -240,6 +240,7 @@ import type { ProjectIssueFieldAction } from '~/composables/project-issue-field-
 import { isThreadIssueFacetReadyToAddress, isThreadIssueVerified } from '~/helpers/thread-issues'
 
 import FilledCheckIcon from './filled-check-icon.vue'
+import IssueMessage from './issue-message.vue'
 import { threadIssueField, threadIssueSettingsArea } from './issue-targets'
 
 type ThreadIssue = Labrinth.Threads.v3.ThreadIssue
@@ -805,64 +806,7 @@ function toggle(id: string) {
 		overflow: visible;
 	}
 }
-.markdown-body :deep(.review-card-image-targets) {
-	display: flex;
-	flex-direction: column;
-	gap: 1rem;
-}
-
-.markdown-body :deep(.review-card-image-target) {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-start;
-	gap: 0.5rem;
-}
-
-.markdown-body :deep(.review-card-image-heading) {
-	font-weight: 600;
-}
-
-.markdown-body :deep(.review-card-image-list) {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 0.75rem;
-	margin: 0;
-	padding: 0;
-	list-style: none;
-}
-
-.markdown-body :deep(.review-card-image-entry) {
-	width: 140px;
-	max-width: 100%;
-	margin: 0;
-	padding: 0;
-	list-style: none;
-}
-
-.markdown-body :deep(.review-card-image-entry > a) {
-	display: block;
-}
-
-.markdown-body :deep(.review-card-image-entry .review-card-gallery-image) {
-	display: block;
-	box-sizing: border-box;
-	width: 100%;
-	max-width: 140px;
-	height: 112px;
-	padding: 0.5rem;
-	border-radius: 0.5rem;
-	background: var(--surface-3);
-	object-fit: contain;
-}
-
-.markdown-body :deep(.review-card-image-caption) {
-	display: block;
-	margin-top: 0.375rem;
-	overflow-wrap: anywhere;
-	font-size: 0.875em;
-}
-
-.markdown-body :deep(.review-card-image-target .review-card-image-description) {
-	margin: 0;
+.markdown-body :deep(p) {
+	margin-bottom: 12px;
 }
 </style>

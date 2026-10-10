@@ -1,4 +1,5 @@
 import { AlignLeftIcon } from '@modrinth/assets'
+import { md } from '@modrinth/utils'
 
 import formatting from '../messages/checklist/messages/summary/formatting.md'
 import insufficient from '../messages/checklist/messages/summary/insufficient.md'
@@ -7,6 +8,8 @@ import repeatIp from '../messages/checklist/messages/summary/repeat-ip.md'
 import repeatTitle from '../messages/checklist/messages/summary/repeat-title.md'
 import { issue, panel, section, textarea, toggle } from './component-builders/builders'
 import { issueTargets } from './component-builders/targets'
+
+const escapeHtml = md().utils.escapeHtml
 
 export const insufficientSummaryIssue = issue({
 	id: 'summary-insufficient',
@@ -42,7 +45,7 @@ export const summaryFormattingIssue = issue({
 		return formatting
 			.replaceAll('%SUGGESTION%', () =>
 				suggestion.trim()
-					? `You may use the following suggested summary\n\n\`\`\`\n${suggestion}\n\`\`\``
+					? `You may use the following suggested summary\n<copy-code>\n<pre>${escapeHtml(suggestion)}</pre>\n</copy-code>`
 					: '',
 			)
 			.trim()

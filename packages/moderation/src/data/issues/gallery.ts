@@ -1,14 +1,16 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { ImageIcon } from '@modrinth/assets'
+import { md } from '@modrinth/utils'
 
 import insufficientMessage from '../messages/checklist/messages/gallery/insufficient.md'
 import notRelevantMessage from '../messages/checklist/messages/gallery/not-relevant.md'
 import showcaseClarityMessage from '../messages/checklist/messages/gallery/showcase-clarity.md'
-import { galleryImagesMessage } from '../messages/gallery-images'
 import { issue, panel, toggle } from './component-builders/builders'
 import { issueLocation } from './component-builders/locations'
 import { IssuePriority } from './component-builders/priority'
 import { rulesAiImagesIssue } from './rules'
+
+const escapeHtml = md().utils.escapeHtml
 
 export const galleryInsufficientIssue = issue({
 	id: 'gallery-insufficient',
@@ -38,7 +40,17 @@ export const galleryNotRelevantIssue = issue({
 			? [() => ({ type: 'remove_gallery_images', value: { image_ids: imageIds } })]
 			: []
 	},
-	message: (ctx) => galleryImagesMessage(notRelevantMessage, ctx),
+	message: ({ projectV3, selected }) => {
+		const keys = new Set((selected.items['gallery-image'] ?? []).map(({ key }) => key))
+		const entries = projectV3.gallery
+			.filter((image) => image.id !== undefined && keys.has(String(image.id)))
+			.map(
+				(image) =>
+					`<image-viewer src="${escapeHtml(image.raw_url || image.url)}" alt="${escapeHtml(image.name ?? '')}" />`,
+			)
+		const list = entries.length ? `Please remove the following images:\n${entries.join('\n')}` : ''
+		return notRelevantMessage.replace('%GALLERY_IMAGES%', list).trimEnd()
+	},
 	suggestedStatus: 'flagged',
 })
 
