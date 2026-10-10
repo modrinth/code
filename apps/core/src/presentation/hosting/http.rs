@@ -16,7 +16,9 @@ use crate::{
             InstanceId, InstanceInstallStatus, InstanceRecord, InstanceStatus,
             MemorySettings, ModLoader,
         },
-        server_source::{ContentKind, ContentOrigin, ServerSource},
+        server_source::{
+            ContentKind, ContentOrigin, ServerSource, SourceApplyState,
+        },
     },
     infrastructure::minecraft::server_properties,
     presentation::{
@@ -242,6 +244,14 @@ async fn v0(
         None => Value::Null,
     };
     server["power_state"] = json!(r.status);
+    // The first install of a linked pack sets the game version when it applies. Until then the
+    // server is installing, not waiting for setup.
+    if let (Some(status), true) = (&source, r.game_version.is_empty()) {
+        server["flows"]["intro"] = json!(false);
+        if status.state != SourceApplyState::Failed {
+            server["status"] = json!("installing");
+        }
+    }
     Ok(server)
 }
 
@@ -1006,6 +1016,16 @@ async fn get_addons(
         InstanceInstallStatus::Failed => {
             result["error"] =
                 json!({"message": "Server content installation failed"})
+        }
+        _ => {}
+    }
+    match content.source.as_ref().map(|status| status.state) {
+        Some(SourceApplyState::Downloading | SourceApplyState::Applying) => {
+            result["installing"] = json!("modpack")
+        }
+        Some(SourceApplyState::Failed) => {
+            result["error"] = json!({"message": content.source.as_ref().and_then(|status| status.error.clone())
+                .unwrap_or_else(|| "The update failed".into())})
         }
         _ => {}
     }

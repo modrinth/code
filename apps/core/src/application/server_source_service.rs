@@ -748,6 +748,7 @@ async fn stage_mrpack(
             file.env.as_ref().map(|env| &env.server),
             Some(EnvType::Unsupported)
         );
+        let ids = file.downloads.first().and_then(|url| modrinth_ids(url));
         let mut sha1 = file.hashes.sha1.clone().unwrap_or_default();
         if !client_only {
             let url = file.downloads.first().ok_or_else(|| {
@@ -767,8 +768,8 @@ async fn stage_mrpack(
                 kind,
                 sha1,
                 client_only,
-                project_id: file.project_id.clone(),
-                version_id: file.version_id.clone(),
+                project_id: file.project_id.clone().or(ids.clone().map(|i| i.0)),
+                version_id: file.version_id.clone().or(ids.map(|i| i.1)),
             },
         );
     }
@@ -846,6 +847,17 @@ async fn read_overrides(
     })
     .await
     .map_err(|e| SourceError::Invalid(e.to_string()))?
+}
+
+/// Project and version ids from a Modrinth CDN url
+/// (`https://cdn.modrinth.com/data/<project>/versions/<version>/<file>`). Standard packs carry
+/// no ids, and the content list needs them to show names and icons.
+pub(crate) fn modrinth_ids(url: &str) -> Option<(String, String)> {
+    let rest = url.strip_prefix("https://cdn.modrinth.com/data/")?;
+    let mut parts = rest.split('/');
+    let project = parts.next()?;
+    let version = (parts.next()? == "versions").then(|| parts.next())??;
+    Some((project.to_string(), version.to_string()))
 }
 
 /// Which content a setup path is, or `None` for files a server never installs.
@@ -1140,6 +1152,15 @@ mod tests {
         assert_eq!(local.origin, ContentOrigin::Server);
         assert!(local.disabled);
         assert_eq!(items.len(), 3);
+    }
+
+    #[test]
+    fn reads_ids_from_modrinth_cdn_urls() {
+        assert_eq!(
+            modrinth_ids("https://cdn.modrinth.com/data/AANobbMI/versions/abc123/sodium.jar"),
+            Some(("AANobbMI".into(), "abc123".into()))
+        );
+        assert_eq!(modrinth_ids("https://example.com/data/a/versions/b/c.jar"), None);
     }
 
     #[test]
