@@ -10,6 +10,7 @@ import {
 	MoreVerticalIcon,
 	NoSignalIcon,
 	PlayIcon,
+	SettingsIcon,
 	SignalIcon,
 	SkullIcon,
 	SpinnerIcon,
@@ -100,6 +101,10 @@ const props = withDefaults(
 		}
 
 		managed?: boolean
+		// A server on the user's Core that follows this instance. Clicking the row manages it.
+		linkedServerId?: string
+		// Replaces the MOTD, e.g. while an update from the instance is waiting or failed.
+		linkedNote?: { text: string; tone: 'blue' | 'orange' | 'red' }
 		showPlayButton?: boolean
 		cardBackground?: 'raised' | 'surface-2'
 
@@ -124,6 +129,8 @@ const props = withDefaults(
 
 		gameMode: undefined,
 		managed: false,
+		linkedServerId: undefined,
+		linkedNote: undefined,
 		showPlayButton: true,
 		cardBackground: 'raised',
 
@@ -263,6 +270,14 @@ const messages = defineMessages({
 		id: 'instance.worlds.linked_server',
 		defaultMessage: 'Managed by server project',
 	},
+	linkedToInstance: {
+		id: 'instance.worlds.linked_to_instance',
+		defaultMessage: 'Your server, linked to this instance',
+	},
+	manageServer: {
+		id: 'instance.worlds.manage_server',
+		defaultMessage: 'Manage server',
+	},
 	incompatibleVersion: {
 		id: 'app.world.world-item.incompatible-version',
 		defaultMessage: 'Incompatible version {version}',
@@ -325,6 +340,13 @@ const playTooltip = computed(() => {
 
 const overflowOptions = computed((): ButtonMenuOption[] => [
 	{
+		id: 'manage-server',
+		label: formatMessage(messages.manageServer),
+		icon: SettingsIcon,
+		shown: !!props.linkedServerId,
+		action: () => void router.push(`/hosting/manage/${props.linkedServerId}`),
+	},
+	{
 		id: 'play-instance',
 		label: formatMessage(messages.playInstance),
 		icon: PlayIcon,
@@ -372,7 +394,7 @@ const overflowOptions = computed((): ButtonMenuOption[] => [
 		label: formatMessage(commonMessages.editButton),
 		icon: EditIcon,
 		action: () => emit('edit'),
-		shown: !props.instanceId,
+		shown: !props.instanceId && !props.linkedServerId,
 		disabled: locked.value || managed.value,
 		tooltip: locked.value
 			? formatMessage(messages.worldInUse)
@@ -417,7 +439,7 @@ const overflowOptions = computed((): ButtonMenuOption[] => [
 	},
 	{
 		type: 'divider',
-		shown: !props.instanceId,
+		shown: !props.instanceId && !props.linkedServerId,
 	},
 	{
 		id: 'delete',
@@ -427,7 +449,7 @@ const overflowOptions = computed((): ButtonMenuOption[] => [
 		icon: TrashIcon,
 		tone: 'red',
 		action: () => emit('delete'),
-		shown: !props.instanceId,
+		shown: !props.instanceId && !props.linkedServerId,
 		disabled: locked.value || managed.value,
 		tooltip: locked.value
 			? formatMessage(messages.worldInUse)
@@ -468,7 +490,10 @@ function openContextMenu(event: MouseEvent) {
 <template>
 	<div @contextmenu.prevent.stop="openContextMenu">
 		<SmartClickable class="[--active-scale:0.985]">
-			<template v-if="instanceId" #clickable>
+			<template v-if="linkedServerId" #clickable>
+				<router-link class="no-click-animation" :to="`/hosting/manage/${linkedServerId}`" />
+			</template>
+			<template v-else-if="instanceId" #clickable>
 				<router-link
 					class="no-click-animation"
 					:to="`/instance/${encodeURIComponent(instanceId)}/worlds?highlight=${encodeURIComponent(getWorldIdentifier(world))}`"
@@ -506,7 +531,16 @@ function openContextMenu(event: MouseEvent) {
 							<LockIcon aria-hidden="true" class="h-5 w-5" />
 						</TagItem>
 						<span
-							v-if="world.type === 'server' && world.source === 'user_synced'"
+							v-if="linkedServerId"
+							v-tooltip="formatMessage(messages.linkedToInstance)"
+							role="img"
+							tabindex="0"
+							class="inline-flex shrink-0 cursor-help items-center justify-center rounded-full border border-solid border-brand-blue bg-highlight-blue px-2.5 py-1 text-brand-blue smart-clickable:allow-pointer-events focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-shadow"
+						>
+							<Link2Icon class="size-5" aria-hidden="true" />
+						</span>
+						<span
+							v-else-if="world.type === 'server' && world.source === 'user_synced'"
 							v-tooltip="formatMessage(messages.syncedServer)"
 							role="img"
 							tabindex="0"
@@ -612,7 +646,18 @@ function openContextMenu(event: MouseEvent) {
 					class="font-semibold flex items-center gap-1 justify-center text-center"
 					:class="world.type === 'singleplayer' && world.hardcore ? `text-red` : 'text-secondary'"
 				>
-					<template v-if="world.type === 'server'">
+					<span
+						v-if="linkedNote"
+						class="font-semibold"
+						:class="{
+							'text-blue': linkedNote.tone === 'blue',
+							'text-orange': linkedNote.tone === 'orange',
+							'text-red': linkedNote.tone === 'red',
+						}"
+					>
+						{{ linkedNote.text }}
+					</span>
+					<template v-else-if="world.type === 'server'">
 						<template v-if="refreshing">
 							<SpinnerIcon aria-hidden="true" class="animate-spin" />
 							{{ formatMessage(commonMessages.loadingLabel) }}
