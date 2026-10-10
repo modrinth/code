@@ -1,4 +1,7 @@
-![labrinth banner](/.github/assets/api_cover.png)
+<picture>
+	<source media="(prefers-color-scheme: light)" srcset="../../.github/assets/api_cover_light.png">
+	<img alt="Modrinth API Cover" src="../../.github/assets/api_cover.png">
+</picture>
 
 ## Modrinth's laboratory for its backend service & API!
 

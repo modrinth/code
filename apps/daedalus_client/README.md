@@ -1,3 +1,8 @@
+<picture>
+	<source media="(prefers-color-scheme: light)" srcset="../../.github/assets/meta_cover_light.png">
+	<img alt="Modrinth Meta Cover" src="../../.github/assets/meta_cover.png">
+</picture>
+
 # Daedalus
 
 Daedalus is a powerful tool which queries and generates metadata for the Minecraft (and other games in the future!) game
