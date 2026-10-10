@@ -1,38 +1,19 @@
 import { AlignLeftIcon } from '@modrinth/assets'
-import { md } from '@modrinth/utils'
 
 import formatting from '../messages/checklist/messages/summary/formatting.md'
 import insufficient from '../messages/checklist/messages/summary/insufficient.md'
 import nonEnglish from '../messages/checklist/messages/summary/non-english.md'
 import repeatIp from '../messages/checklist/messages/summary/repeat-ip.md'
-import repeatTitle from '../messages/checklist/messages/summary/repeat-title.md'
 import { issue, panel, section, textarea, toggle } from './component-builders/builders'
 import { issueTargets } from './component-builders/targets'
+import { messageWithOptionalSuggestion } from '../../utils'
 
-const escapeHtml = md().utils.escapeHtml
+const panelCategory = 'Summary'
 
 export const insufficientSummaryIssue = issue({
 	id: 'summary-insufficient',
 	title: 'Insufficient summary',
-	category: 'Summary',
-	actions: [issueTargets.modifySummary()],
-	suggestedStatus: 'flagged',
-	message: insufficient,
-})
-
-export const summaryRepeatsTitleIssue = issue({
-	id: 'summary-repeat-title',
-	title: 'Summary repeats the title',
-	category: 'Summary',
-	actions: [issueTargets.modifySummary()],
-	suggestedStatus: 'flagged',
-	message: repeatTitle,
-})
-
-export const summaryFormattingIssue = issue({
-	id: 'summary-formatting',
-	title: 'Invalid summary formatting',
-	category: 'Summary',
+	category: panelCategory,
 	actions: [
 		issueTargets.modifySummary(({ getTextValue }) => {
 			const suggestion = getTextValue('summary-suggestion')
@@ -40,38 +21,73 @@ export const summaryFormattingIssue = issue({
 		}),
 	],
 	suggestedStatus: 'flagged',
-	message: ({ getTextValue }) => {
-		const suggestion = getTextValue('summary-suggestion')
-		return formatting
-			.replaceAll('%SUGGESTION%', () =>
-				suggestion.trim()
-					? `You may use the following suggested summary\n<copy-code>\n<pre>${escapeHtml(suggestion)}</pre>\n</copy-code>`
-					: '',
-			)
-			.trim()
-	},
+	message: ({ getTextValue }) =>
+		messageWithOptionalSuggestion(
+			insufficient,
+			panelCategory.toLowerCase(),
+			getTextValue('summary-suggestion'),
+		),
+})
+
+export const summaryFormattingIssue = issue({
+	id: 'summary-formatting',
+	title: 'Invalid summary formatting',
+	category: panelCategory,
+	actions: [
+		issueTargets.modifySummary(({ getTextValue }) => {
+			const suggestion = getTextValue('summary-suggestion')
+			return suggestion.trim() ? suggestion : undefined
+		}),
+	],
+	suggestedStatus: 'flagged',
+	message: ({ getTextValue }) =>
+		messageWithOptionalSuggestion(
+			formatting,
+			panelCategory.toLowerCase(),
+			getTextValue('summary-suggestion'),
+		),
 })
 
 export const nonEnglishSummaryIssue = issue({
 	id: 'summary-non-english',
 	title: 'Non-English summary',
-	category: 'Summary',
-	actions: [issueTargets.modifySummary()],
+	category: panelCategory,
+	actions: [
+		issueTargets.modifySummary(({ getTextValue }) => {
+			const suggestion = getTextValue('summary-suggestion')
+			return suggestion.trim() ? suggestion : undefined
+		}),
+	],
 	suggestedStatus: 'flagged',
-	message: nonEnglish,
+	message: ({ getTextValue }) =>
+		messageWithOptionalSuggestion(
+			nonEnglish,
+			panelCategory.toLowerCase(),
+			getTextValue('summary-suggestion'),
+		),
 })
 
 export const summaryRepeatsIpIssue = issue({
 	id: 'summary-repeat-ip',
 	title: 'Summary repeats the server address',
-	category: 'Summary',
-	actions: [issueTargets.modifySummary()],
+	category: panelCategory,
+	actions: [
+		issueTargets.modifySummary(({ getTextValue }) => {
+			const suggestion = getTextValue('summary-suggestion')
+			return suggestion.trim() ? suggestion : undefined
+		}),
+	],
 	suggestedStatus: 'flagged',
-	message: repeatIp,
+	message: ({ getTextValue }) =>
+		messageWithOptionalSuggestion(
+			repeatIp,
+			panelCategory.toLowerCase(),
+			getTextValue('summary-suggestion'),
+		),
 })
 
 export const summaryReviewPanel = panel({
-	title: 'Summary',
+	title: panelCategory,
 	hint: "Is the project's summary sufficient?",
 	icon: AlignLeftIcon,
 	guidanceUrl:
@@ -81,12 +97,6 @@ export const summaryReviewPanel = panel({
 		toggle({
 			label: 'Insufficient',
 			issue: insufficientSummaryIssue,
-			disabled: ({ selected }) => selected.issueIds.includes(summaryRepeatsTitleIssue.id),
-		}),
-		toggle({
-			label: 'Repeat of Title',
-			issue: summaryRepeatsTitleIssue,
-			disabled: ({ selected }) => selected.issueIds.includes(insufficientSummaryIssue.id),
 		}),
 		toggle({
 			label: 'Formatting',
@@ -106,10 +116,17 @@ export const summaryReviewPanel = panel({
 		}),
 	),
 	section({
-		shown: ({ selected }) => selected.issueIds.includes(summaryFormattingIssue.id),
+		shown: ({ selected }) =>
+			selected.issueIds.some((id) =>
+				[
+					insufficientSummaryIssue.id,
+					summaryFormattingIssue.id,
+					nonEnglishSummaryIssue.id,
+					summaryRepeatsIpIssue.id,
+				].includes(id),
+			),
 	}).content(
 		textarea({
-			issue: summaryFormattingIssue,
 			id: 'summary-suggestion',
 			label: 'Suggestion',
 			maxlength: 256,

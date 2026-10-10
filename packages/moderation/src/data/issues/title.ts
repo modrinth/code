@@ -8,11 +8,21 @@ import uselessInfo from '../messages/checklist/messages/title-slug/title/useless
 import { issue, panel, section, text, toggle } from './component-builders/builders'
 import { issueTargets } from './component-builders/targets'
 
+export const issueTargetModifyTitleWithSuggestion = issueTargets.modifyTitle(({ getTextValue }) => {
+	const suggestion = getTextValue('title-suggestion')
+	return suggestion.trim() ? suggestion : undefined
+})
+
 export const titleSuggestion = issue({
 	id: 'title-suggestion',
 	title: 'Title suggestion',
 	category: 'Title',
-	actions: [issueTargets.modifyTitle()],
+	actions: [
+		issueTargets.modifyTitle(({ getTextValue }) => {
+			const suggestion = getTextValue('title-suggestion')
+			return suggestion.trim() ? suggestion : undefined
+		}),
+	],
 	suggestedStatus: 'flagged',
 	message: 'Consider suggesting a better title for the project.',
 })
@@ -21,7 +31,12 @@ export const titleUselessInfoIssue = issue({
 	id: 'title-useless-info',
 	title: 'Unnecessary title information',
 	category: 'Title',
-	actions: [issueTargets.modifyTitle()],
+	actions: [
+		issueTargets.modifyTitle(({ getTextValue }) => {
+			const suggestion = getTextValue('title-suggestion')
+			return suggestion.trim() ? suggestion : undefined
+		}),
+	],
 	suggestedStatus: 'flagged',
 	message: uselessInfo,
 })
@@ -30,7 +45,12 @@ export const minecraftTitleIssue = issue({
 	id: 'title-minecraft-branding',
 	title: 'Minecraft branding in title',
 	category: 'Title',
-	actions: [issueTargets.modifyTitle()],
+	actions: [
+		issueTargets.modifyTitle(({ getTextValue }) => {
+			const suggestion = getTextValue('title-suggestion')
+			return suggestion.trim() ? suggestion : undefined
+		}),
+	],
 	suggestedStatus: 'flagged',
 	message: minecraftBranding,
 })
@@ -39,7 +59,12 @@ export const titleSimilaritiesIssue = issue({
 	id: 'title-similarities',
 	title: 'Misuse of project name',
 	category: 'Title',
-	actions: [issueTargets.modifyTitle()],
+	actions: [
+		issueTargets.modifyTitle(({ getTextValue }) => {
+			const suggestion = getTextValue('title-suggestion')
+			return suggestion.trim() ? suggestion : undefined
+		}),
+	],
 	suggestedStatus: 'flagged',
 	message: ({ selected }) => {
 		if (selected.toggleIds.includes('title-similarities-fork')) {
@@ -54,7 +79,12 @@ export const modpackTitleSimilaritiesIssue = issue({
 	id: 'title-similarities-modpack',
 	title: 'Modpack uses another project’s name',
 	category: 'Title',
-	actions: [issueTargets.modifyTitle()],
+	actions: [
+		issueTargets.modifyTitle(({ getTextValue }) => {
+			const suggestion = getTextValue('title-suggestion')
+			return suggestion.trim() ? suggestion : undefined
+		}),
+	],
 	suggestedStatus: 'flagged',
 	message: [similarities.trim(), modpackSimilarities.trim()].join('\n\n'),
 })
