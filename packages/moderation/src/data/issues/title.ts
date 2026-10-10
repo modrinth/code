@@ -5,8 +5,17 @@ import similarities from '../messages/checklist/messages/title-slug/title/simila
 import forkSimilarities from '../messages/checklist/messages/title-slug/title/similarities/fork.md'
 import modpackSimilarities from '../messages/checklist/messages/title-slug/title/similarities/modpack.md'
 import uselessInfo from '../messages/checklist/messages/title-slug/title/useless-info.md'
-import { issue, panel, section, toggle } from './component-builders/builders'
+import { issue, panel, section, text, toggle } from './component-builders/builders'
 import { issueTargets } from './component-builders/targets'
+
+export const titleSuggestion = issue({
+	id: 'title-suggestion',
+	title: 'Title suggestion',
+	category: 'Title',
+	actions: [issueTargets.modifyTitle()],
+	suggestedStatus: 'flagged',
+	message: 'Consider suggesting a better title for the project.',
+})
 
 export const titleUselessInfoIssue = issue({
 	id: 'title-useless-info',
@@ -70,21 +79,32 @@ export const titleReviewPanel = panel({
 			label: 'Title Similarities',
 			issue: titleSimilaritiesIssue,
 		}),
-		toggle({
-			label: 'Modpack Named After Mod',
-			issue: modpackTitleSimilaritiesIssue,
-			shown: (ctx) => ctx.projectV3.project_types.includes('modpack'),
-		}),
 	),
 	section({
 		label: 'Similarities Additional Info',
-		shown: (ctx) =>
-			!ctx.projectV3.minecraft_server && ctx.selected.issueIds.includes('title-similarities'),
+		shown: (ctx) => ctx.selected.issueIds.includes('title-similarities'),
 	}).content(
 		toggle({
 			label: 'Forked Project',
 			id: 'title-similarities-fork',
 			issue: titleSimilaritiesIssue,
+			shown: (ctx) => !ctx.projectV3.minecraft_server,
+		}),
+		toggle({
+			label: 'Modpack Named After Mod',
+			id: 'title-similarities-modpack',
+			issue: modpackTitleSimilaritiesIssue,
+			shown: (ctx) => ctx.projectV3.project_types.includes('modpack'),
+		}),
+	),
+	section({
+		label: 'Name Suggestions',
+		shown: (ctx) => ctx.selected.issueIds.includes('title-useless-info'),
+	}).content(
+		text({
+			label: 'Suggest a Better Name',
+			id: 'title-name-suggestion',
+			issue: titleSuggestion,
 		}),
 	),
 )
