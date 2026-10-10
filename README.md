@@ -12,16 +12,23 @@
 
 ## Modrinth Monorepo
 
-Welcome to the Modrinth Monorepo, the primary codebase for the Modrinth web interface and app. It contains ![Lines of code](https://img.shields.io/endpoint?url=https://loctopus.creeperkatze.dev/github/modrinth/code/badge%3Fformat%3Dhuman&logoColor=white&color=black&label=) lines of code and has ![Contributors](https://img.shields.io/github/contributors/Modrinth/code?color=black&label=) contributors!
+Welcome to the Modrinth Monorepo, the primary codebase for the Modrinth website, app, API and documentation. It contains ![Lines of code](https://img.shields.io/endpoint?url=https://loctopus.creeperkatze.dev/github/modrinth/code/badge%3Fformat%3Dhuman&logoColor=white&color=black&label=) lines of code and has ![Contributors](https://img.shields.io/github/contributors/Modrinth/code?color=black&label=) contributors!
 
 If you're not a developer and you've stumbled upon this repository, you can access the web interface on the [Modrinth website](https://modrinth.com) and download the latest release of the app [here](https://modrinth.com/app).
 
 ## Development
 
-This repository contains two primary packages. For detailed development information, please refer to their respective guides:
+This repository contains several projects. For detailed development information, please refer to their respective guides:
 
-- [Website frontend](https://docs.modrinth.com/contributing/knossos/)
-- [Desktop app](https://docs.modrinth.com/contributing/theseus/)
+| Project       | Directory              | Guide                                                     |
+| ------------- | ---------------------- | --------------------------------------------------------- |
+| Website       | `apps/frontend`        | [Guide](https://docs.modrinth.com/contributing/knossos/)  |
+| App           | `apps/app`             | [Guide](https://docs.modrinth.com/contributing/theseus/)  |
+| API           | `apps/labrinth`        | [Guide](https://docs.modrinth.com/contributing/labrinth/) |
+| Meta          | `apps/daedalus_client` | [Guide](https://docs.modrinth.com/contributing/daedalus/) |
+| Documentation | `apps/docs`            | [Guide](https://docs.modrinth.com/contributing/docs/)     |
+
+Shared libraries live in `packages/`.
 
 ## Contributing
 
@@ -39,4 +46,4 @@ If you need help with the Modrinth web interface or app, please visit our [suppo
 
 ## License
 
-All packages in this repository are licensed under their respective licenses. Refer to the LICENSE file in each package for more information.
+All packages in this repository are licensed under their respective licenses. See the [copying guidelines](COPYING.md) for details, including restrictions on Modrinth branding.
