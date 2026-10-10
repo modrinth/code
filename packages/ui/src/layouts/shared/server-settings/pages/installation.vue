@@ -473,6 +473,7 @@ provideInstallationSettings({
 	}),
 	isBusy: setupActionDisabled,
 	busyMessage: setupActionDisabledMessage,
+	isLinkedInstance: computed(() => !!modpack.value?.instance_id),
 	modpack: computed(() => {
 		if (!modpack.value) return null
 		const isLocal = modpack.value.spec.platform === 'local_file'
@@ -482,7 +483,7 @@ provideInstallationSettings({
 				modpack.value.title ?? (isLocal ? modpack.value.spec.name : modpack.value.spec.project_id),
 			link: modpackProjectId.value ? `/project/${modpackProjectId.value}` : undefined,
 			versionNumber: modpack.value.version_number,
-			filename: isLocal ? modpack.value.spec.filename : undefined,
+			filename: isLocal && !modpack.value.instance_id ? modpack.value.spec.filename : undefined,
 			owner: modpack.value.owner
 				? {
 						id: modpack.value.owner.id,

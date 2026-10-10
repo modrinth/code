@@ -14,7 +14,6 @@ import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { waitForServerContextRuntimeReady } from '#ui/composables/server-context-runtime'
 import { useServerPermissions } from '#ui/composables/server-permissions'
 import {
-	injectInstanceServerSource,
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
@@ -114,13 +113,17 @@ const messages = defineMessages({
 		id: 'hosting.content.instance.content-header',
 		defaultMessage: 'Instance content',
 	},
-	updateFromInstance: {
-		id: 'hosting.content.instance.update',
-		defaultMessage: 'Update from instance',
+	restartToApply: {
+		id: 'hosting.content.instance.restart-to-apply',
+		defaultMessage: 'Restart to apply',
 	},
-	failedToUpdateFromInstance: {
-		id: 'hosting.content.instance.update-failed',
-		defaultMessage: 'Could not update from the instance',
+	retryUpdate: {
+		id: 'hosting.content.instance.retry-update',
+		defaultMessage: 'Retry update',
+	},
+	failedToApplyUpdate: {
+		id: 'hosting.content.instance.apply-failed',
+		defaultMessage: 'Could not apply the update',
 	},
 	unlinkFromInstance: {
 		id: 'hosting.content.instance.unlink',
@@ -156,8 +159,6 @@ let resolveUnknownFileConfirmation: ((confirmed: boolean) => void) | null = null
 const skipUnknownFileWarningKey = 'hosting-skip-unknown-file-warning'
 const { addNotification } = injectNotificationManager()
 const { openServerSettings, browseServerContent } = injectServerSettingsModal()
-// Only the App can push an instance; elsewhere a linked server is shown but not updated.
-const instanceSource = injectInstanceServerSource(null)
 const { canSetup, permissionDeniedMessage } = useServerPermissions()
 const route = useRoute()
 const router = useRouter()
@@ -194,7 +195,7 @@ const contentQuery = useQuery({
 
 /** The App instance this server follows, when its linked pack is one. */
 const linkedInstanceId = computed(() => contentQuery.data.value?.modpack?.instance_id ?? null)
-const updatingFromInstance = ref(false)
+const applyingInstanceUpdate = ref(false)
 
 const isModpackContentModalOpen = ref(false)
 const modpackContentQuery = useQuery({
@@ -340,8 +341,14 @@ const managedContent = computed<ManagedContentData | null>(() => {
 					: mp.state === 'failed'
 						? (mp.error ?? formatMessage(messages.updateFailed))
 						: undefined,
-			primaryActionLabel:
-				linkedInstance && instanceSource ? formatMessage(messages.updateFromInstance) : undefined,
+			// Only when a pushed update is waiting or failed; an up-to-date server has nothing to do.
+			primaryActionLabel: !linkedInstance
+				? undefined
+				: mp.state === 'pending'
+					? formatMessage(messages.restartToApply)
+					: mp.state === 'failed'
+						? formatMessage(messages.retryUpdate)
+						: undefined,
 			manager: {
 				name: title,
 				iconUrl: (isLocal ? mp.icon_url : (project?.icon_url ?? mp.icon_url)) ?? undefined,
@@ -359,7 +366,7 @@ const managedContent = computed<ManagedContentData | null>(() => {
 					: undefined,
 			updatedAt: isLocal ? undefined : (mp.date_published ?? undefined),
 		},
-		disabled: setupActionDisabled.value || updatingFromInstance.value,
+		disabled: setupActionDisabled.value || applyingInstanceUpdate.value,
 		disabledText: setupActionBusyMessage.value ?? formatMessage(commonMessages.installingLabel),
 	}
 })
@@ -378,22 +385,21 @@ const managedContentMenuOptions = computed<ButtonMenuOption[]>(() =>
 		: [],
 )
 
-/** Exports the instance again and sends it to this server. A running server takes it on its next stop. */
-async function handleUpdateFromInstance() {
-	const instanceId = linkedInstanceId.value
-	if (!instanceId || !instanceSource || !worldId.value || updatingFromInstance.value) return
-	updatingFromInstance.value = true
+/** Applies the update the instance pushed: restarts a running server, or retries a failed one. */
+async function handleApplyInstanceUpdate() {
+	if (!worldId.value || applyingInstanceUpdate.value) return
+	applyingInstanceUpdate.value = true
 	try {
-		await instanceSource.pushInstance({ serverId, worldId: worldId.value, instanceId })
+		await client.archon.content_v1.updateModpack(serverId, worldId.value)
 		await contentQuery.refetch()
 	} catch (err) {
 		addNotification({
 			type: 'error',
-			title: formatMessage(messages.failedToUpdateFromInstance),
+			title: formatMessage(messages.failedToApplyUpdate),
 			text: err instanceof Error ? err.message : undefined,
 		})
 	} finally {
-		updatingFromInstance.value = false
+		applyingInstanceUpdate.value = false
 	}
 }
 
@@ -1132,7 +1138,7 @@ async function handleSwitchVersion(item: ContentItem) {
 
 async function handleModpackUpdate() {
 	if (setupActionDisabled.value) return
-	if (linkedInstanceId.value) return handleUpdateFromInstance()
+	if (linkedInstanceId.value) return handleApplyInstanceUpdate()
 	const mp = contentQuery.data.value?.modpack
 	if (!mp || mp.spec.platform !== 'modrinth') return
 
