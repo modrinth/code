@@ -16,17 +16,17 @@ export const postApprovalMetadataIssueIssue = issue({
 			metadataIssueMessage,
 			selected.toggleIds.includes('post-approval-dependencies')
 				? metadataIssueDependenciesMessage
-						.replaceAll('%DEPENDENCY_NAME%', () => getTextValue('name'))
-						.replaceAll('%DEPENDENCY_LINK%', () => getTextValue('link'))
+						.replaceAll('%DEPENDENCY_NAME%', () => getTextValue('post-approval-name'))
+						.replaceAll('%DEPENDENCY_LINK%', () => getTextValue('post-approval-link'))
 				: '',
 			selected.toggleIds.includes('post-approval-mc-versions')
 				? metadataIssueMcVersionsMessage.replaceAll('%SPECIFICS%', () =>
-						getTextValue('mc-versions-specifics'),
+						getTextValue('post-approval-mc-versions-specifics'),
 					)
 				: '',
 			selected.toggleIds.includes('post-approval-loaders')
 				? metadataIssueLoadersMessage.replaceAll('%SPECIFICS%', () =>
-						getTextValue('loaders-specifics'),
+						getTextValue('post-approval-loaders-specifics'),
 					)
 				: '',
 			selected.toggleIds.includes('post-approval-license') ? metadataIssueLicenseMessage : '',
@@ -69,13 +69,13 @@ export const postApprovalReviewPanel = panel({
 		}).content(
 			text({
 				issue: postApprovalMetadataIssueIssue,
-				id: 'name',
+				id: 'post-approval-name',
 				label: 'Dependency name',
 				required: true,
 			}),
 			text({
 				issue: postApprovalMetadataIssueIssue,
-				id: 'link',
+				id: 'post-approval-link',
 				label: 'Dependency link',
 				required: true,
 			}),
@@ -85,7 +85,7 @@ export const postApprovalReviewPanel = panel({
 		}).content(
 			text({
 				issue: postApprovalMetadataIssueIssue,
-				id: 'mc-versions-specifics',
+				id: 'post-approval-mc-versions-specifics',
 				label: 'More details about the game versions issue?',
 				required: false,
 			}),
@@ -95,7 +95,7 @@ export const postApprovalReviewPanel = panel({
 		}).content(
 			text({
 				issue: postApprovalMetadataIssueIssue,
-				id: 'loaders-specifics',
+				id: 'post-approval-loaders-specifics',
 				label: 'More details about the loaders issue?',
 				required: false,
 			}),

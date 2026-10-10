@@ -32,13 +32,13 @@ export const summaryFormattingIssue = issue({
 	category: 'Summary',
 	actions: [
 		issueTargets.modifySummary(({ getTextValue }) => {
-			const suggestion = getTextValue('suggestion')
+			const suggestion = getTextValue('summary-suggestion')
 			return suggestion.trim() ? suggestion : undefined
 		}),
 	],
 	suggestedStatus: 'flagged',
 	message: ({ getTextValue }) => {
-		const suggestion = getTextValue('suggestion')
+		const suggestion = getTextValue('summary-suggestion')
 		return formatting
 			.replaceAll('%SUGGESTION%', () =>
 				suggestion.trim()

@@ -31,7 +31,7 @@ export const serverReviewPanel = panel({
 	toggle({
 		issue: serversExcessiveLanguagesIssue,
 		label: 'Excessive languages',
-		id: 'servers-excessive-languages',
+		id: 'server-excessive-languages',
 	}),
 	toggle({
 		issue: reuploadIdentityVerificationServerIssue,
@@ -48,7 +48,7 @@ export const serverReviewPanel = panel({
 	}).content(
 		text({
 			issue: reuploadIdentityVerificationServerIssue,
-			id: 'contact',
+			id: 'server-contact',
 			label: 'Known public contact method',
 			required: false,
 		}),
@@ -79,7 +79,7 @@ export const serverReviewPanel = panel({
 		}).content(
 			markdown({
 				issue: reuploadCustomPackProhibitedIssue,
-				id: 'overrides',
+				id: 'server-overrides',
 				label: 'Forbidden overrides list',
 				required: true,
 			}),
@@ -92,14 +92,14 @@ export const serverReviewPanel = panel({
 			toggle({
 				issue: reuploadCustomPackVerificationIssue,
 				label: 'List overrides?',
-				id: 'reupload-list',
+				id: 'server-list',
 			}),
 			section({
-				shown: ({ selected }) => selected.toggleIds.includes('reupload-list'),
+				shown: ({ selected }) => selected.toggleIds.includes('server-list'),
 			}).content(
 				markdown({
 					issue: reuploadCustomPackVerificationIssue,
-					id: 'overrides',
+					id: 'server-overrides',
 					label: 'Add list of overrides.',
 					required: false,
 				}),
