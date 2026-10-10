@@ -1061,9 +1061,6 @@
   "conversation-thread.action.approve": {
     "message": "Genehmigen"
   },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Genehmigen mit Antwort"
-  },
   "conversation-thread.action.close-report": {
     "message": "Meldung schließen"
   },
@@ -1072,9 +1069,6 @@
   },
   "conversation-thread.action.reject": {
     "message": "Ablehnen"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Ablehnen mit Antwort"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Thread wieder öffnen"
@@ -1109,9 +1103,6 @@
   "conversation-thread.action.withhold": {
     "message": "Zurückhalten"
   },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Zurückhalten mit Antwort"
-  },
   "conversation-thread.closed-thread.description": {
     "message": "Dieser Thread ist geschlossen und es können keine neuen Nachrichten gesendet werden."
   },
@@ -1120,9 +1111,6 @@
   },
   "conversation-thread.error.reopening-report": {
     "message": "Fehler beim erneuten Öffnen der Meldung"
-  },
-  "conversation-thread.error.sending-message": {
-    "message": "Fehler beim Senden der Nachricht"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Auf Thread antworten..."
@@ -1150,9 +1138,6 @@
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "Ich bestätige, dass ich die Kommentare der Moderatoren ordnungsgemäss bearbeitet habe."
-  },
-  "conversation-thread.resubmit-modal.description": {
-    "message": "Du reichst <project-title>{projectTitle}</project-title> ein, um es erneut von den Moderatoren überprüfen zu lassen."
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "Erneut zur Überprüfung einreichen"
@@ -3416,9 +3401,6 @@
   "project-member-header.success-join": {
     "message": "Du bist dem Projekt-Team beigetreten"
   },
-  "project-moderation-nags.project-submitted-for-review": {
-    "message": "Dein Projekt wurde zur Überprüfung eingereicht!"
-  },
   "project-moderation-nags.publishing-checklist": {
     "message": "Veröffentlichungs-Checkliste"
   },
@@ -3535,9 +3517,6 @@
   },
   "project.actions.rescan-modpack": {
     "message": "Modpack erneut scannen"
-  },
-  "project.actions.review-project": {
-    "message": "Projekt überprüfen"
   },
   "project.actions.servers-promo.description": {
     "message": "Modrinth Hosting ist der einfachste weg, ohne Aufwand mit deinen Freunden zu spielen!"

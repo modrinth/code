@@ -551,9 +551,6 @@
   "collection.title": {
     "message": "{name} - Colecție"
   },
-  "conversation-thread.resubmit-modal.description": {
-    "message": "Trimiți <project-title>{projectTitle}</project-title> pentru a fi revizuit din nou de moderatori."
-  },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "Retrimite pentru revizuire"
   },
@@ -1588,9 +1585,6 @@
   },
   "project.actions.dont-show-again": {
     "message": "Nu afișa din nou"
-  },
-  "project.actions.review-project": {
-    "message": "Revizuiește proiectul"
   },
   "project.actions.servers-promo.pricing": {
     "message": "Începând de la {price}<small> / lună</small>"

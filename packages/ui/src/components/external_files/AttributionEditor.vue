@@ -12,7 +12,7 @@ import {
 } from '@modrinth/assets'
 import { defaultLicenseIds } from '@modrinth/utils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
 
 import { Chips, Combobox, type ComboboxOption, Input, Textarea } from '#ui/components'
 import { FileInput } from '#ui/components/base'
@@ -169,6 +169,7 @@ const selectedKind = ref<Labrinth.Attribution.Internal.AttributionResolutionKind
 
 const licenseIdInput = ref('')
 const customLicenseInput = ref('')
+const customLicenseInputRef = useTemplateRef<InstanceType<typeof Input>>('customLicenseInputRef')
 const linkInput = ref('')
 const notesInput = ref('')
 const inputError = ref<string | null>(null)
@@ -214,9 +215,12 @@ function resetInputs() {
 
 resetInputs()
 
-watch(licenseIdInput, (value) => {
+watch(licenseIdInput, async (value) => {
 	if (value !== CUSTOM_LICENSE_VALUE) {
 		customLicenseInput.value = ''
+	} else {
+		await nextTick()
+		customLicenseInputRef.value?.focus()
 	}
 })
 
@@ -546,6 +550,7 @@ function cancelEditing() {
 				}}
 			</span>
 			<Input
+				ref="customLicenseInputRef"
 				v-model="customLicenseInput"
 				type="text"
 				class="max-w-[40rem]"

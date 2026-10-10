@@ -1058,9 +1058,6 @@
   "conversation-thread.action.approve": {
     "message": "Zatwierdź"
   },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Zatwierdź z odpowiedzią "
-  },
   "conversation-thread.action.close-report": {
     "message": "Zamknij zgłoszenie"
   },
@@ -1069,9 +1066,6 @@
   },
   "conversation-thread.action.reject": {
     "message": "Odrzuć"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Odrzuć z odpowiedzią"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Otwórz ponownie wątek "
@@ -1106,9 +1100,6 @@
   "conversation-thread.action.withhold": {
     "message": "Wstrzymaj"
   },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Wstrzymaj z odpowiedzią"
-  },
   "conversation-thread.closed-thread.description": {
     "message": "Ten wątek jest zamknięty i nie można wysyłać do niego nowych wiadomości."
   },
@@ -1117,9 +1108,6 @@
   },
   "conversation-thread.error.reopening-report": {
     "message": "Błąd podczas ponownego otwierania zgłoszenia"
-  },
-  "conversation-thread.error.sending-message": {
-    "message": "Błąd podczas wysyłania wiadomości"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Odpowiedz na wątek..."
@@ -1147,9 +1135,6 @@
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "Potwierdzam, że komentarze od zespołu moderacji zostały zaadresowane."
-  },
-  "conversation-thread.resubmit-modal.description": {
-    "message": "Wysyłasz <project-title>{projectTitle}</project-title> do ponownego przeglądu przez naszych moderatorów."
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "Ponowne wysyłanie do przeglądu"
@@ -3410,9 +3395,6 @@
   "project-member-header.success-join": {
     "message": "Zaakceptowano zaproszenie do zespołu"
   },
-  "project-moderation-nags.project-submitted-for-review": {
-    "message": "Twój projekt został przesłany do sprawdzenia!"
-  },
   "project-moderation-nags.publishing-checklist": {
     "message": "Lista kontrolna publikacji"
   },
@@ -3526,9 +3508,6 @@
   },
   "project.actions.rescan-modpack": {
     "message": "Ponownie skanuj paczkę modów"
-  },
-  "project.actions.review-project": {
-    "message": "Przegląd projektu"
   },
   "project.actions.servers-promo.description": {
     "message": "Modrinth Hosting to najprostszy sposób na zabawę z przyjaciółmi bez żadnych kłopotów!"

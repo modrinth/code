@@ -98,6 +98,7 @@
 		<NewModal
 			v-if="variant === 'web' && isStaffViewing"
 			ref="userDetailsModal"
+			:width="'500px'"
 			:header="formatMessage(messages.userDetailsTitle)"
 		>
 			<div class="flex flex-col gap-3">

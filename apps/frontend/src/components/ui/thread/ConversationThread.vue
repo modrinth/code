@@ -13,7 +13,11 @@
 			<div class="flex max-w-[35rem] flex-col gap-3">
 				<p class="m-0">
 					<IntlFormatted
-						:message-id="messages.resubmitModalDescription"
+						:message-id="
+							isRejected(project)
+								? messages.resubmitModalDescription
+								: messages.submitModalDescription
+						"
 						:values="{ projectTitle: project.title }"
 					>
 						<template #project-title="{ children }">
@@ -38,20 +42,25 @@
 						<XIcon aria-hidden="true" />
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</Button>
-					<Button
-						type="colored"
-						color="orange"
-						:disabled="!submissionConfirmation || isLoading || reviewSubmissionDisabled"
-						@click="runBlockingAction('resubmit-modal', resubmit)"
+					<Tooltip
+						:disabled="!reviewSubmissionDisabled"
+						:text="formatMessage(messages.resubmitRequiredActionsTooltip)"
 					>
-						<SpinnerIcon
-							v-if="loadingAction === 'resubmit-modal'"
-							class="animate-spin"
-							aria-hidden="true"
-						/>
-						<ScaleIcon v-else aria-hidden="true" />
-						{{ formatMessage(messages.actionResubmitForReview) }}
-					</Button>
+						<Button
+							type="colored"
+							color="orange"
+							:disabled="!submissionConfirmation || isLoading || reviewSubmissionDisabled"
+							@click="runBlockingAction('resubmit-modal', resubmit)"
+						>
+							<SpinnerIcon
+								v-if="loadingAction === 'resubmit-modal'"
+								class="animate-spin"
+								aria-hidden="true"
+							/>
+							<ScaleIcon v-else aria-hidden="true" />
+							{{ formatMessage(messages.actionResubmitForReview) }}
+						</Button>
+					</Tooltip>
 				</div>
 			</div>
 		</NewModal>
@@ -100,17 +109,21 @@
 			<CopyCode :text="thread.id" />
 		</div>
 		<div v-bind="$attrs" class="flex flex-col">
-			<div v-if="sortedMessages.length > 0" class="flex flex-col pt-2">
-				<ThreadMessage
-					v-for="message in sortedMessages"
-					:key="'message-' + message.id"
-					:thread="thread"
-					:message="message"
+			<div
+				v-if="sortedMessages.length > 0 || (isStaff(auth.user) && thread.issues?.length)"
+				class="flex flex-col pt-2"
+			>
+				<ThreadTimeline
+					:project-owner-id="projectOwnerId"
+					:messages="thread.messages"
+					:issues="thread.issues"
 					:members="members"
 					:report="report"
 					:auth="auth"
 					raised
+					image-previews
 					@update-thread="() => updateThreadLocal()"
+					@open-image="openImage"
 				/>
 			</div>
 			<div v-if="report && report.closed" class="m-4 mt-2 flex flex-col gap-4">
@@ -127,9 +140,11 @@
 				</Button>
 			</div>
 			<template v-else-if="!report || !report.closed">
-				<div class="mx-4 mb-2 mt-2">
+				<div class="mx-4 mt-2">
 					<MarkdownEditor
+						ref="replyEditor"
 						v-model="replyBody"
+						:disabled="isLoading"
 						:placeholder="
 							formatMessage(
 								sortedMessages.length > 0
@@ -140,13 +155,28 @@
 						:on-image-upload="onUploadImage"
 					/>
 				</div>
-				<div class="m-4 mt-3 flex flex-wrap items-center justify-between gap-4">
+				<div v-if="replyFacets.length" class="mx-4 mt-3 flex flex-col gap-2">
+					<p class="m-0 text-sm text-secondary">
+						{{ formatMessage(messages.replyAddresses) }}
+					</p>
+					<Checkbox
+						v-for="facet in replyFacets"
+						:key="facet.id"
+						:model-value="selectedReplyFacetIds.includes(facet.id)"
+						:disabled="isLoading"
+						@update:model-value="selectReplyFacet(facet.id, $event)"
+					>
+						{{ facet.label }}
+					</Checkbox>
+				</div>
+
+				<div class="flex flex-wrap items-center justify-between gap-4 p-4 pt-2">
 					<div class="flex flex-wrap items-center gap-2">
 						<Button
 							v-if="sortedMessages.length > 0"
 							type="colored"
 							color="brand"
-							:disabled="!replyBody || isLoading"
+							:disabled="!replyBody.trim() || isLoading"
 							@click="
 								isApproved(project) && !isStaff(auth.user)
 									? openReplyModal()
@@ -163,7 +193,7 @@
 						</Button>
 						<Button
 							v-else
-							:disabled="!replyBody || isLoading"
+							:disabled="!replyBody.trim() || isLoading"
 							@click="
 								isApproved(project) && !isStaff(auth.user)
 									? openReplyModal()
@@ -180,7 +210,7 @@
 						</Button>
 						<Button
 							v-if="isStaff(auth.user)"
-							:disabled="!replyBody || isLoading"
+							:disabled="!replyBody.trim() || isLoading"
 							@click="runBlockingAction('private-note', () => sendReply(null, true))"
 						>
 							<SpinnerIcon
@@ -193,24 +223,29 @@
 						</Button>
 						<template v-if="currentMember && !currentMember.staffOnly">
 							<template v-if="isRejected(project)">
-								<Button
-									v-if="replyBody"
-									type="colored"
-									color="orange"
-									:disabled="isLoading || reviewSubmissionDisabled"
-									@click="openResubmitModal(true)"
+								<Tooltip
+									:disabled="!reviewSubmissionDisabled"
+									:text="formatMessage(messages.resubmitRequiredActionsTooltip)"
 								>
-									<ScaleIcon aria-hidden="true" />
-									{{ formatMessage(messages.actionResubmitForReviewWithReply) }}
-								</Button>
-								<Button
-									v-else
-									:disabled="isLoading || reviewSubmissionDisabled"
-									@click="openResubmitModal(false)"
-								>
-									<ScaleIcon aria-hidden="true" />
-									{{ formatMessage(messages.actionResubmitForReview) }}
-								</Button>
+									<Button
+										v-if="replyBody"
+										type="colored"
+										color="orange"
+										:disabled="isLoading || reviewSubmissionDisabled"
+										@click="openResubmitModal(true)"
+									>
+										<ScaleIcon aria-hidden="true" />
+										{{ formatMessage(messages.actionResubmitForReviewWithReply) }}
+									</Button>
+									<Button
+										v-else
+										:disabled="isLoading || reviewSubmissionDisabled"
+										@click="openResubmitModal(false)"
+									>
+										<ScaleIcon aria-hidden="true" />
+										{{ formatMessage(messages.actionResubmitForReview) }}
+									</Button>
+								</Tooltip>
 							</template>
 						</template>
 					</div>
@@ -313,10 +348,7 @@
 															runBlockingAction('send-to-review-reply', () =>
 																sendReply('processing', true),
 															),
-														disabled:
-															project.status === 'processing' ||
-															isLoading ||
-															reviewSubmissionDisabled,
+														disabled: project.status === 'processing' || isLoading,
 													},
 												]
 											: [
@@ -345,10 +377,7 @@
 														hoverFilled: true,
 														action: () =>
 															runBlockingAction('send-to-review', () => setStatus('processing')),
-														disabled:
-															project.status === 'processing' ||
-															isLoading ||
-															reviewSubmissionDisabled,
+														disabled: project.status === 'processing' || isLoading,
 													},
 												]
 									"
@@ -400,6 +429,25 @@
 				</div>
 			</template>
 		</div>
+		<ImageViewerEditor
+			ref="imageViewer"
+			:items="imageItems"
+			editor="disabled"
+			@hide="restoreImageFocus"
+		>
+			<template #actions="{ item }">
+				<ButtonLink
+					v-tooltip="formatMessage(messages.openImageExternally)"
+					type="quiet"
+					class="!w-9 !rounded-full !p-0"
+					:aria-label="formatMessage(messages.openImageExternally)"
+					:href="item.src"
+					target="_blank"
+				>
+					<ExternalIcon aria-hidden="true" />
+				</ButtonLink>
+			</template>
+		</ImageViewerEditor>
 	</div>
 </template>
 
@@ -407,6 +455,7 @@
 import {
 	CheckCircleIcon,
 	CheckIcon,
+	ExternalIcon,
 	EyeOffIcon,
 	FileTextIcon,
 	ReplyIcon,
@@ -418,27 +467,57 @@ import {
 } from '@modrinth/assets'
 import {
 	Button,
+	ButtonLink,
 	Checkbox,
 	commonMessages,
 	CopyCode,
 	defineMessages,
+	ImageViewerEditor,
+	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,
 	MarkdownEditor,
 	NewModal,
 	SplitButton,
+	Tooltip,
 	useVIntl,
 } from '@modrinth/ui'
+import { useMutation, useQueryClient } from '@tanstack/vue-query'
+import { computed, nextTick, ref, watch } from 'vue'
 
-import ThreadMessage from '~/components/ui/thread/ThreadMessage.vue'
+import ThreadTimeline from '~/components/ui/thread/ThreadTimeline.vue'
 import { useImageUpload } from '~/composables/image-upload.ts'
 import { isApproved, isRejected } from '~/helpers/projects.js'
+import { sendThreadReply } from '~/helpers/thread-issues'
 import { isStaff } from '~/helpers/users.js'
 
+const client = injectModrinthClient()
+const queryClient = useQueryClient()
+const route = useRoute()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
+	replyAddresses: {
+		id: 'conversation-thread.reply.addresses',
+		defaultMessage: 'This reply addresses the following requested explanations:',
+	},
+	replyFacet: {
+		id: 'conversation-thread.reply.facet',
+		defaultMessage: 'Explanation for {issue}',
+	},
+	unknownIssue: {
+		id: 'conversation-thread.reply.unknown-issue',
+		defaultMessage: 'Moderation issue',
+	},
+	changedThread: {
+		id: 'conversation-thread.reply.changed-thread',
+		defaultMessage: 'The selected thread changed. Open it again before replying.',
+	},
+	openImageExternally: {
+		id: 'conversation-thread.image.open-externally',
+		defaultMessage: 'Open externally',
+	},
 	resubmitModalHeaderResubmitting: {
 		id: 'conversation-thread.resubmit-modal.header.resubmitting',
 		defaultMessage: 'Resubmitting for review',
@@ -448,9 +527,14 @@ const messages = defineMessages({
 		defaultMessage: 'Submitting for review',
 	},
 	resubmitModalDescription: {
-		id: 'conversation-thread.resubmit-modal.description',
+		id: 'conversation-thread.resubmit-modal.description.auto-approval',
 		defaultMessage:
-			"You're submitting <project-title>{projectTitle}</project-title> to be reviewed again by the moderators.",
+			"You're resubmitting <project-title>{projectTitle}</project-title>. If all moderation issues are resolved, it may be approved automatically. Otherwise, it will be sent to the moderators for review.",
+	},
+	submitModalDescription: {
+		id: 'conversation-thread.submit-modal.description',
+		defaultMessage:
+			"You're submitting <project-title>{projectTitle}</project-title> to be reviewed by the moderators.",
 	},
 	resubmitModalReminder: {
 		id: 'conversation-thread.resubmit-modal.reminder',
@@ -506,6 +590,10 @@ const messages = defineMessages({
 	actionResubmitForReview: {
 		id: 'conversation-thread.action.resubmit-for-review',
 		defaultMessage: 'Resubmit for review',
+	},
+	resubmitRequiredActionsTooltip: {
+		id: 'conversation-thread.resubmit-required-actions-tooltip',
+		defaultMessage: 'You must complete all required actions above to resubmit',
 	},
 	actionReplyToThread: {
 		id: 'conversation-thread.action.reply-to-thread',
@@ -594,6 +682,10 @@ const messages = defineMessages({
 })
 
 const props = defineProps({
+	projectOwnerId: {
+		type: String,
+		default: null,
+	},
 	reviewSubmissionDisabled: {
 		type: Boolean,
 		default: false,
@@ -643,6 +735,78 @@ const members = computed(() => {
 })
 
 const replyBody = ref('')
+const replyEditor = ref(null)
+const selectedReplyFacetIds = ref([])
+const replyFacets = computed(() =>
+	props.project && (props.currentMember?.accepted || isStaff(props.auth.user))
+		? (props.thread.issues ?? []).flatMap((issue) =>
+				issue.facets
+					.filter(
+						(facet) =>
+							facet.verdict === 'open' &&
+							facet.what.type === 'acknowledge' &&
+							facet.what.value.mode === 'reply',
+					)
+					.map((facet) => ({
+						id: facet.id,
+						label: formatMessage(messages.replyFacet, {
+							issue: issue.why?.title ?? formatMessage(messages.unknownIssue),
+						}),
+					})),
+			)
+		: [],
+)
+function selectReplyFacet(id, selected) {
+	selectedReplyFacetIds.value = selected
+		? [...new Set([...selectedReplyFacetIds.value, id])]
+		: selectedReplyFacetIds.value.filter((entry) => entry !== id)
+}
+watch(
+	[() => route.query.reply_to_facet, replyFacets, replyEditor],
+	async ([id, facets]) => {
+		const ids = (Array.isArray(id) ? id : [id]).filter(
+			(id) => typeof id === 'string' && facets.some((facet) => facet.id === id),
+		)
+		if (!ids.length) return
+		for (const id of ids) selectReplyFacet(id, true)
+		await nextTick()
+		await replyEditor.value?.focus?.()
+	},
+	{ immediate: true, flush: 'post' },
+)
+watch(
+	() => props.thread.id,
+	() => {
+		replyBody.value = ''
+		selectedReplyFacetIds.value = []
+		imageIDs.value = []
+	},
+)
+
+const imageViewer = ref(null)
+const imageItems = ref([])
+let imageTrigger
+
+async function openImage(image) {
+	imageTrigger = image.element
+	imageItems.value = [{ id: image.src, src: image.src, alt: image.alt }]
+	await nextTick()
+	imageViewer.value?.show(0)
+}
+
+function restoreImageFocus() {
+	if (imageTrigger?.isConnected) imageTrigger.focus({ preventScroll: true })
+	imageTrigger = undefined
+}
+
+watch(
+	() => props.thread?.id,
+	() => {
+		imageTrigger = undefined
+		imageViewer.value?.hide()
+		imageItems.value = []
+	},
+)
 
 const sortedMessages = computed(() => {
 	if (props.thread !== null) {
@@ -671,78 +835,119 @@ async function runBlockingAction(actionId, action) {
 	}
 }
 
-async function updateThreadLocal() {
-	let threadId = null
-	if (props.project) {
-		threadId = props.project.thread_id
-	} else if (props.report) {
-		threadId = props.report.thread_id
-	}
-	let thread = null
-	if (threadId) {
-		thread = await useBaseFetch(`thread/${threadId}`)
-	}
-	emit('update-thread', thread)
+async function updateThreadLocal(threadId = props.thread.id) {
+	const thread = await queryClient.fetchQuery({
+		queryKey: ['thread', threadId],
+		queryFn: () => client.labrinth.threads_v3.getThread(threadId),
+		staleTime: 0,
+	})
+	if (props.thread.id === threadId) emit('update-thread', thread)
 }
 
 const imageIDs = ref([])
 
 async function onUploadImage(file) {
-	const response = await useImageUpload(file, { context: 'thread_message' })
+	try {
+		const response = await useImageUpload(file, { context: 'thread_message' })
 
-	imageIDs.value.push(response.id)
-	// Keep the last 10 entries of image IDs
-	imageIDs.value = imageIDs.value.slice(-10)
+		imageIDs.value.push(response.id)
+		imageIDs.value = imageIDs.value.slice(-10)
 
-	return response.url
+		return response.url
+	} catch (error) {
+		addNotification({
+			title: formatMessage(commonMessages.errorNotificationTitle),
+			text: error instanceof Error ? error.message : String(error),
+			type: 'error',
+		})
+		throw error
+	}
 }
 
+const replyMutation = useMutation({
+	mutationFn: async ({ threadId, projectId, status, privateMessage }) => {
+		const assertCurrent = () => {
+			if (props.thread.id !== threadId) throw new Error(formatMessage(messages.changedThread))
+		}
+		if (replyBody.value.trim()) {
+			const reply = {
+				threadId,
+				body: replyBody.value,
+				images: [...imageIDs.value],
+				privateMessage,
+			}
+			const facetIds = privateMessage
+				? []
+				: (props.thread.issues ?? []).flatMap((issue) =>
+						issue.facets.some((facet) => selectedReplyFacetIds.value.includes(facet.id))
+							? issue.facets
+									.filter(
+										(facet) =>
+											facet.verdict === 'open' &&
+											facet.what.type === 'acknowledge' &&
+											(facet.what.value.mode === 'checkbox' ||
+												selectedReplyFacetIds.value.includes(facet.id)),
+									)
+									.map(({ id }) => id)
+							: [],
+					)
+			await sendThreadReply(reply, client, assertCurrent)
+			replyBody.value = ''
+			imageIDs.value = []
+			selectedReplyFacetIds.value = []
+			for (const facetId of facetIds) {
+				assertCurrent()
+				await client.labrinth.threads_v3.user_addressed(facetId)
+			}
+		}
+		assertCurrent()
+		await updateThreadLocal(threadId)
+		if (projectId)
+			await queryClient.invalidateQueries({
+				queryKey: ['project', projectId, 'validation'],
+			})
+		assertCurrent()
+		if (status !== null) return (await props.setStatus(status)) !== false
+		return true
+	},
+	onError: (error) =>
+		addNotification({
+			title: formatMessage(messages.errorSendingMessage),
+			text: error instanceof Error ? error.message : String(error),
+			type: 'error',
+		}),
+	onSettled: async (_, __, { threadId, projectId }) => {
+		await Promise.all([
+			queryClient.invalidateQueries({ queryKey: ['thread', threadId] }),
+			projectId
+				? queryClient.invalidateQueries({
+						queryKey: ['project', projectId, 'validation'],
+					})
+				: Promise.resolve(),
+		])
+	},
+})
+
 async function sendReplyFromModal(status = null, privateMessage = false) {
-	await sendReply(status, privateMessage)
-	modalReply.value.hide()
+	if (await sendReply(status, privateMessage)) modalReply.value.hide()
 }
 
 async function sendReply(status = null, privateMessage = false) {
-	if (status === 'processing' && props.reviewSubmissionDisabled) return
-	try {
-		const body = {
-			body: {
-				type: 'text',
-				body: replyBody.value,
-				private: privateMessage,
-			},
-		}
-
-		if (imageIDs.value.length > 0) {
-			body.body = {
-				...body.body,
-				uploaded_images: imageIDs.value,
-			}
-		}
-
-		await useBaseFetch(`thread/${props.thread.id}`, {
-			method: 'POST',
-			body,
+	if (status === 'processing' && props.reviewSubmissionDisabled && !isStaff(props.auth.user))
+		return false
+	return await replyMutation
+		.mutateAsync({
+			threadId: props.thread.id,
+			projectId: props.project?.id,
+			status,
+			privateMessage,
 		})
-
-		replyBody.value = ''
-
-		await updateThreadLocal()
-		if (status !== null) {
-			await props.setStatus(status)
-		}
-	} catch (err) {
-		addNotification({
-			title: formatMessage(messages.errorSendingMessage),
-			text: err.data ? err.data.description : err,
-			type: 'error',
-		})
-	}
+		.catch(() => false)
 }
 
 async function closeReport(reply) {
 	if (reply) {
-		await sendReply()
+		if (!(await sendReply())) return
 	}
 
 	try {
@@ -798,14 +1003,18 @@ function openReplyModal() {
 async function resubmit() {
 	if (props.reviewSubmissionDisabled) return
 	if (replyWithSubmission.value) {
-		await sendReply('processing')
+		if (!(await sendReply('processing'))) return
 	} else {
-		await props.setStatus('processing')
+		if ((await props.setStatus('processing')) === false) return
 	}
 	modalSubmit.value.hide()
 }
 
-const requestedStatus = computed(() => props.project.requested_status ?? 'approved')
+const requestedStatus = computed(() =>
+	['approved', 'unlisted', 'private'].includes(props.project?.requested_status)
+		? props.project.requested_status
+		: 'approved',
+)
 
 defineOptions({
 	inheritAttrs: false,

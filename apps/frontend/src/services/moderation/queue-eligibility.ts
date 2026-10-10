@@ -35,6 +35,7 @@ export async function batchCheckQueueCandidates(
 	client: AbstractModrinthClient,
 	moderationQueue: ModerationQueueService,
 	projectIds: string[],
+	strict = false,
 ): Promise<Map<string, QueueCandidateCheck>> {
 	const results = new Map<string, QueueCandidateCheck>()
 
@@ -48,7 +49,7 @@ export async function batchCheckQueueCandidates(
 				return { id, locked: false, isProcessing: false }
 			}
 
-			const lockResponse = await moderationQueue.checkLock(id)
+			const lockResponse = await moderationQueue.checkLock(id, strict)
 
 			return {
 				id,
@@ -67,6 +68,7 @@ export async function batchCheckQueueCandidates(
 		if (result.status === 'fulfilled') {
 			results.set(result.value.id, result.value)
 		} else {
+			if (strict) throw result.reason
 			results.set(projectIds[index], { locked: false, isProcessing: false })
 		}
 	})
@@ -78,6 +80,7 @@ export async function findNextEligibleQueueProject(
 	client: AbstractModrinthClient,
 	moderationQueue: ModerationQueueService,
 	candidateIds: string[],
+	strict = false,
 ): Promise<EligibleQueueProject | null> {
 	const excluded: string[] = []
 	let checkedCount = 0
@@ -86,7 +89,7 @@ export async function findNextEligibleQueueProject(
 		const batch = candidateIds.slice(checkedCount, checkedCount + BATCH_SIZE)
 		checkedCount += batch.length
 
-		const results = await batchCheckQueueCandidates(client, moderationQueue, batch)
+		const results = await batchCheckQueueCandidates(client, moderationQueue, batch, strict)
 
 		for (const id of batch) {
 			const result = results.get(id)

@@ -35,6 +35,7 @@ const props = defineProps<{
 	index: number
 	count: number
 	canEdit: boolean
+	pixelated: boolean
 	saving: boolean
 	loadData: (item: ImageViewerEditorItem) => Promise<ImageViewerEditorData>
 }>()
@@ -111,7 +112,7 @@ const canViewZoomIn = computed(() => canZoomIn.value && viewZoom.value < MAX_VIE
 const nativeImageView = computed(
 	() =>
 		props.mode === 'view' &&
-		[props.item.src, props.item.editorSource?.path].some(isGifOrWebpSource),
+		(props.pixelated || [props.item.src, props.item.editorSource?.path].some(isGifOrWebpSource)),
 )
 
 let resizeObserver: ResizeObserver | undefined
@@ -388,6 +389,7 @@ defineExpose({ markSaved })
 		class="editor-viewport absolute inset-0 flex min-h-0 min-w-0 select-none overflow-auto px-6 pb-[5.75rem] pt-[4.75rem] max-[900px]:px-4 max-[900px]:pb-[8.5rem] max-[900px]:pt-[4.5rem]"
 		:class="{
 			'is-view': mode === 'view',
+			'is-pixelated': mode === 'view' && pixelated,
 			'is-view-zoomed': mode === 'view' && viewZoomed,
 			'is-panning': panning,
 			'is-pan-ready': mode === 'edit' && spacePressed && !panning,
@@ -523,6 +525,10 @@ defineExpose({ markSaved })
 </template>
 
 <style scoped>
+.editor-viewport.is-pixelated img {
+	image-rendering: pixelated;
+}
+
 .editor-viewport {
 	scrollbar-width: none;
 

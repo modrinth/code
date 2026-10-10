@@ -8,7 +8,7 @@
 		@hide="() => (modalOpen = false)"
 	/>
 	<DropArea
-		v-if="!modalOpen"
+		v-if="enableDropArea && !modalOpen"
 		:accept="acceptFileFromProjectType(projectV2.project_type)"
 		@change="handleDropArea"
 	/>
@@ -28,8 +28,25 @@ import type { ComponentExposed } from 'vue-component-type-helpers'
 
 import {
 	createManageVersionContext,
+	type ManageVersionHost,
 	provideManageVersionContext,
 } from '~/providers/version/manage-version-modal'
+
+const props = withDefaults(
+	defineProps<{
+		host?: ManageVersionHost
+		enableDropArea?: boolean
+	}>(),
+	{ enableDropArea: true },
+)
+const projectPageContext = injectProjectPageContext(null)
+const host = props.host ?? projectPageContext
+if (!host) throw new Error('Version editor requires a project context')
+const { projectV2 } = host
+let editRequest = 0
+onBeforeUnmount(() => {
+	editRequest += 1
+})
 
 const emit = defineEmits<{
 	(e: 'save'): void
@@ -38,18 +55,20 @@ const emit = defineEmits<{
 const modal = useTemplateRef<ComponentExposed<typeof MultiStageModal>>('modal')
 const modalOpen = ref(false)
 
-const ctx = createManageVersionContext(modal, () => emit('save'))
+const ctx = createManageVersionContext(modal, host, () => emit('save'))
 provideManageVersionContext(ctx)
 
 const { newDraftVersion, editingVersion, handleNewFiles } = ctx
 
-const { projectV2 } = injectProjectPageContext()
 const { addNotification } = injectNotificationManager()
 const { labrinth } = injectModrinthClient()
 
 async function openEditVersionModal(versionId: string, projectId: string, stageId?: string | null) {
+	const request = ++editRequest
 	try {
 		const versionData = await labrinth.versions_v3.getVersion(versionId)
+
+		if (request !== editRequest || projectV2.value.id !== projectId) return
 
 		const draftVersionData: Labrinth.Versions.v3.DraftVersion = {
 			project_id: projectId,
@@ -68,6 +87,7 @@ async function openEditVersionModal(versionId: string, projectId: string, stageI
 
 		openCreateVersionModal(draftVersionData, stageId)
 	} catch (err: any) {
+		if (request !== editRequest) return
 		addNotification({
 			title: 'An error occurred',
 			text: err.data ? err.data.description : err,

@@ -1108,6 +1108,7 @@ export namespace Labrinth {
 				| 'unknown'
 
 			export type GalleryItem = {
+				id?: number
 				url: string
 				raw_url: string
 				featured: boolean
@@ -2119,6 +2120,200 @@ export namespace Labrinth {
 		export namespace v3 {
 			export type ThreadType = 'report' | 'project' | 'direct_message'
 
+			export type TextTarget = {
+				original: string
+				suggestion?: string | null
+			}
+
+			export type OptionalTextTarget = {
+				original?: string | null
+				/** Omitted means no suggestion; null suggests removing the value. */
+				suggestion?: string | null
+			}
+
+			export type DisclosureMetadata<T extends Projects.v3.ProjectDisclosureType> = Omit<
+				Extract<Projects.v3.ProjectDisclosure, { type: T }>,
+				'type'
+			>
+
+			export type DisclosureMetadataTarget<T extends Projects.v3.ProjectDisclosureType> = {
+				original: DisclosureMetadata<T> | null
+				suggestion?: DisclosureMetadata<T> | null
+			}
+
+			export type ModifyDisclosureTarget = {
+				[T in Projects.v3.ProjectDisclosureType]: {
+					type: 'modify_project_disclosure'
+					value: {
+						disclosure_type: T
+						metadata: DisclosureMetadataTarget<T>
+					}
+				}
+			}[Projects.v3.ProjectDisclosureType]
+
+			export type VersionIssueTarget =
+				| { type: 'remove' }
+				| { type: 'modify_environment'; value: TextTarget }
+				| {
+						type: 'modify_game_versions'
+						value: { original: string[]; suggestion?: string[] | null }
+				  }
+				| {
+						type: 'modify_dependencies'
+						value: {
+							original: Versions.v3.Dependency[]
+							suggestion?: Versions.v3.Dependency[] | null
+						}
+				  }
+				| { type: 'modify_changelog'; value: TextTarget }
+				| { type: 'remove_additional_files'; value: { file_ids: string[] } }
+				| {
+						type: 'modify_additional_file_type'
+						value: {
+							file_id: string
+							filename: string
+							original?: Versions.v3.FileType | null
+							suggestion?: Versions.v3.FileType | null
+						}
+				  }
+
+			export type ThreadIssueTarget =
+				| { type: 'mark_addressed' }
+				| { type: 'modify_title'; value: TextTarget }
+				| { type: 'modify_slug'; value: TextTarget }
+				| { type: 'modify_summary'; value: TextTarget }
+				| { type: 'modify_description'; value: TextTarget }
+				| { type: 'modify_license'; value: { license: TextTarget; url: TextTarget } }
+				| { type: 'modify_icon'; value: { original_url: string | null } }
+				| { type: 'remove_icon' }
+				| { type: 'remove_tags'; value: { tags: string[] } }
+				| { type: 'modify_links'; value: { links: Record<string, TextTarget> } }
+				| { type: 'add_gallery_images'; value: { original_count: number } }
+				| {
+						type: 'modify_gallery_image'
+						value: {
+							image_id: number
+							original_url: string
+							name?: OptionalTextTarget | null
+							description?: OptionalTextTarget | null
+						}
+				  }
+				| {
+						type: 'remove_gallery_images'
+						value: {
+							image_ids: number[]
+							original_images?: { id: number; url: string; name?: string }[]
+						}
+				  }
+				| { type: 'add_project_disclosures'; value: { disclosure_types: string[] } }
+				| { type: 'remove_project_disclosures'; value: { disclosure_types: string[] } }
+				| ModifyDisclosureTarget
+				| {
+						type: 'modify_project_disclosure_note'
+						value: { disclosure_type: string; note: OptionalTextTarget }
+				  }
+				| {
+						type: 'version'
+						value: {
+							version_id: string
+							version_number: string
+							target: VersionIssueTarget
+						}
+				  }
+				| {
+						type: 'modify_team_member_role'
+						value: { team_id: string; user_id: string; role: TextTarget }
+				  }
+				| {
+						type: 'modify_server_languages'
+						value: { original: string[]; suggestion?: string[] | null }
+				  }
+				| {
+						type: 'modify_server_address'
+						value: {
+							platform: 'minecraft_java' | 'minecraft_bedrock'
+							address: TextTarget
+						}
+				  }
+				| { type: 'acknowledge'; value: { mode: 'checkbox' | 'reply' } }
+
+			export type NewThreadIssueFacet = { what: ThreadIssueTarget }
+
+			export type ThreadIssueLocation = {
+				field:
+					| 'title'
+					| 'slug'
+					| 'summary'
+					| 'icon'
+					| 'description'
+					| 'license'
+					| 'tags'
+					| 'links'
+					| 'gallery'
+					| 'disclosures'
+					| 'versions'
+					| 'members'
+					| 'server'
+					| 'permissions'
+				label?: { id: string; defaultMessage?: string }
+			}
+
+			/**
+			 * The backend stores `why` as an arbitrary JSON blob; this schema is interpreted by the frontend.
+			 * Fields are optional to support issues created before review metadata was added.
+			 */
+			export type ThreadIssueWhy = {
+				issue_id?: string
+				/**
+				 * this is to indicate where to show issue card if the issue facet(action) does not have a specific location.
+				 */
+				locations?: ThreadIssueLocation[]
+				title?: string
+				message?: string
+				custom?: { priority: string }
+				/**
+				 * this is the state of the issue, at creation time.used for re - rev
+				 */
+				selection?: {
+					toggle_ids: string[]
+					text_values: Record<string, string>
+					select_values: Record<string, string[]>
+				}
+			}
+
+			export type NewThreadIssue = {
+				why: ThreadIssueWhy
+				facets: [NewThreadIssueFacet, ...NewThreadIssueFacet[]]
+			}
+
+			export type NewThreadIssues = {
+				issues: [NewThreadIssue, ...NewThreadIssue[]]
+			}
+
+			export type ThreadIssueVerdict = 'open' | 'addressed' | 'resolved'
+
+			export type ThreadIssueFacet = {
+				id: string
+				what: ThreadIssueTarget
+				user_addressed: boolean
+				moderator_verified: boolean
+				verdict: ThreadIssueVerdict
+			}
+
+			export type ThreadIssue = {
+				id: string
+				created_by: string | null
+				created_at: string
+				why: ThreadIssueWhy
+				facets: ThreadIssueFacet[]
+				verdict: ThreadIssueVerdict
+			}
+
+			export type EditThreadIssueFacet = {
+				user_addressed?: boolean
+				moderator_verified?: boolean
+			}
+
 			export type MessageBody =
 				| {
 						type: 'text'
@@ -2129,6 +2324,11 @@ export namespace Labrinth {
 				  }
 				| {
 						type: 'status_change'
+						new_status: Projects.v2.ProjectStatus
+						old_status: Projects.v2.ProjectStatus
+				  }
+				| {
+						type: 'auto_approval'
 						new_status: Projects.v2.ProjectStatus
 						old_status: Projects.v2.ProjectStatus
 				  }
@@ -2180,6 +2380,7 @@ export namespace Labrinth {
 				project_id: string | null
 				report_id: string | null
 				messages: ThreadMessage[]
+				issues: ThreadIssue[]
 				members: ThreadMember[]
 			}
 
@@ -2517,6 +2718,14 @@ export namespace Labrinth {
 
 	export namespace TechReview {
 		export namespace Internal {
+			export type FlaggedProject = {
+				project_id: string
+				thread_id: string
+				status: Projects.v3.Project['status']
+				message_id: string
+				reviewed: string
+			}
+
 			export type DelphiRule = {
 				id: number
 				name: string

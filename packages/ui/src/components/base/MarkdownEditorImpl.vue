@@ -219,10 +219,10 @@
 			</div>
 		</div>
 	</NewModal>
-	<div class="block grow w-full">
+	<div class="block box-border min-w-0 grow w-full p-1">
 		<div class="editor-action-row w-full">
 			<div class="w-full flex justify-between items-center flex-wrap gap-2">
-				<div class="editor-actions">
+				<div v-if="!hideFormattingButtons" class="editor-actions">
 					<template
 						v-for="(buttonGroup, _i) in Object.values(BUTTONS).filter((bg) => bg.display)"
 						:key="_i"
@@ -242,19 +242,25 @@
 						</template>
 					</template>
 				</div>
-				<div class="flex items-center gap-2">
+				<div class="flex items-center gap-2 flex-1">
 					<Toggle :id="previewId" v-model="previewMode" small />
 					<label class="label" :for="previewId">
 						{{ formatMessage(messages.editorPreviewToggleLabel) }}
 					</label>
+					<slot name="after-preview" :preview-mode="previewMode" />
 				</div>
 			</div>
 		</div>
-		<InputFrame :class="{ hide: previewMode }" :disabled="disabled" multiline>
+		<InputFrame
+			:class="{ hide: previewMode }"
+			:disabled="disabled"
+			multiline
+			@mousedown="focusEditorFrame"
+		>
 			<div ref="editorRef" class="min-w-0 w-full flex-1 self-stretch" />
 		</InputFrame>
-		<div v-if="!previewMode" class="info-blurb mt-2">
-			<div class="info-blurb">
+		<div v-if="!previewMode && (!hideMarkdownHint || maxLength)" class="info-blurb mt-2">
+			<div v-if="!hideMarkdownHint" class="info-blurb">
 				<InfoIcon />
 				<IntlFormatted :message-id="messages.editorMarkdownFormattingSupport">
 					<template #markdown-link="{ children }">
@@ -282,8 +288,9 @@
 				</span>
 			</div>
 		</div>
-		<div v-else>
+		<div v-if="previewMode">
 			<div class="markdown-body-wrapper">
+				<slot v-if="!currentValue?.trim()" name="empty-preview" />
 				<div
 					style="width: 100%"
 					:style="{
@@ -301,7 +308,7 @@
 <script setup lang="ts">
 import { history, historyKeymap, indentWithTab } from '@codemirror/commands'
 import { markdown } from '@codemirror/lang-markdown'
-import { Compartment, EditorState } from '@codemirror/state'
+import { Compartment, EditorState, type Extension } from '@codemirror/state'
 import { EditorView, keymap, placeholder as cm_placeholder } from '@codemirror/view'
 import {
 	AlignLeftIcon,
@@ -326,7 +333,17 @@ import {
 } from '@modrinth/assets'
 import { markdownCommands, modrinthMarkdownEditorKeymap } from '@modrinth/utils/codemirror'
 import { renderHighlightedString } from '@modrinth/utils/highlightjs/index'
-import { type Component, computed, onBeforeUnmount, onMounted, ref, toRef, useId, watch } from 'vue'
+import {
+	type Component,
+	computed,
+	nextTick,
+	onBeforeUnmount,
+	onMounted,
+	ref,
+	toRef,
+	useId,
+	watch,
+} from 'vue'
 
 import Button from '#ui/components/base/buttons/Button.vue'
 import IconButton from '#ui/components/base/buttons/IconButton.vue'
@@ -542,8 +559,12 @@ const messages = defineMessages({
 const props = withDefaults(
 	defineProps<{
 		modelValue: string
+		extensions?: Extension[]
 		disabled?: boolean
 		headingButtons?: boolean
+		hideFormattingButtons?: boolean
+		initialPreview?: boolean
+		hideMarkdownHint?: boolean
 		/**
 		 * @param file The file to upload
 		 * @throws If the file is invalid or the upload fails
@@ -558,6 +579,9 @@ const props = withDefaults(
 		modelValue: '',
 		disabled: false,
 		headingButtons: true,
+		hideFormattingButtons: false,
+		initialPreview: false,
+		hideMarkdownHint: false,
 		onImageUpload: undefined,
 		placeholder: undefined,
 		maxLength: undefined,
@@ -570,10 +594,30 @@ const editorRef = ref<HTMLDivElement>()
 let editor: EditorView | null = null
 let isDisabledCompartment: Compartment | null = null
 let editorThemeCompartment: Compartment | null = null
+const extensionsCompartment = new Compartment()
 
 const previewId = useId()
 
-const emit = defineEmits(['update:modelValue'])
+function focusEditorFrame(event: MouseEvent) {
+	if (
+		event.button !== 0 ||
+		props.disabled ||
+		previewMode.value ||
+		!editor ||
+		editor.contentDOM.contains(event.target as Node)
+	)
+		return
+	const position =
+		editor.posAtCoords({ x: event.clientX, y: event.clientY }) ?? editor.state.doc.length
+	editor.dispatch({ selection: { anchor: position } })
+	editor.focus()
+	event.preventDefault()
+}
+
+const emit = defineEmits<{
+	'update:modelValue': [value: string]
+	ready: [view: EditorView]
+}>()
 const resolvedPlaceholder = computed(
 	() => props.placeholder ?? formatMessage(messages.editorPlaceholder),
 )
@@ -588,7 +632,7 @@ function createEditorTheme(disabled = props.disabled) {
 			outline: 'none',
 		},
 		'.cm-content': {
-			minHeight: props.minHeight ? `${props.minHeight}px` : '200px',
+			minHeight: props.minHeight ? `max(100%, ${props.minHeight}px)` : 'max(100%, 200px)',
 			padding: '0',
 			caretColor: 'var(--color-contrast)',
 			width: '100%',
@@ -691,6 +735,8 @@ onMounted(() => {
 
 	const editorState = EditorState.create({
 		extensions: [
+			EditorView.lineWrapping,
+			extensionsCompartment.of(props.extensions ?? []),
 			eventHandlers,
 			updateListener,
 			keymap.of([indentWithTab]),
@@ -721,7 +767,15 @@ onMounted(() => {
 			insert: props.modelValue,
 		},
 	})
+	emit('ready', editor)
 })
+
+watch(
+	() => props.extensions,
+	(extensions) => {
+		editor?.dispatch({ effects: extensionsCompartment.reconfigure(extensions ?? []) })
+	},
+)
 
 onBeforeUnmount(() => {
 	editor?.destroy()
@@ -870,7 +924,16 @@ const updateCurrentValue = (newValue: string) => {
 	emit('update:modelValue', newValue)
 }
 
-const previewMode = ref(false)
+const previewMode = ref(props.initialPreview)
+
+async function focus() {
+	if (props.disabled) return
+	previewMode.value = false
+	await nextTick()
+	editor?.focus()
+}
+
+defineExpose({ focus })
 
 const linkText = ref('')
 const linkUrl = ref('')
@@ -1194,5 +1257,9 @@ function openVideoModal() {
 	opacity: 0.6;
 	pointer-events: none;
 	cursor: not-allowed;
+}
+
+:deep(.cm-line) {
+	padding: 0 !important;
 }
 </style>

@@ -66,6 +66,9 @@
 				</ul>
 			</template>
 		</Admonition>
+		<div v-if="visibleIssues.length && thread?.id" class="mb-6 flex flex-col gap-3">
+			<ProjectIssueCard :issues="visibleIssues" show-project-area-link />
+		</div>
 		<div class="card-shadow mb-6 rounded-2xl border border-solid border-surface-4 bg-surface-3">
 			<div class="flex flex-col p-4">
 				<div class="flex items-center justify-between">
@@ -100,7 +103,7 @@
 						</IntlFormatted>
 					</p>
 					<p
-						v-if="isApproved(project)"
+						v-if="projectApproved"
 						class="mb-0 mt-3 flex items-center gap-2 font-semibold text-orange"
 					>
 						<IssuesIcon class="shrink-0" />
@@ -111,6 +114,7 @@
 			<ConversationThread
 				v-if="prefixedThread"
 				:thread="prefixedThread"
+				:project-owner-id="projectOwner?.id"
 				:project="project"
 				:set-status="setStatus"
 				:review-submission-disabled="reviewSubmissionDisabled"
@@ -155,9 +159,14 @@ import { useQueryClient } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 import { computed, watch } from 'vue'
 
+import ProjectIssueCard from '~/components/ui/project-issue-card/index.vue'
 import ConversationThread from '~/components/ui/thread/ConversationThread.vue'
-import { canSubmitProjectForReview } from '~/composables/link-network-validation/submission'
+import {
+	canResubmitProjectForReview,
+	canSubmitProjectForReview,
+} from '~/composables/link-network-validation/submission'
 import { getProjectLink, isApproved, isRejected, isUnderReview } from '~/helpers/projects.js'
+import { isThreadIssueVerified, verifyThreadIssuesForApproval } from '~/helpers/thread-issues'
 
 defineEmits(['on-download', 'delete-version'])
 
@@ -175,6 +184,10 @@ type ModerationAdmonitionSection =
 	  }
 
 const messages = defineMessages({
+	projectChanged: {
+		id: 'project.moderation.project-changed',
+		defaultMessage: 'The selected project changed. Review it again.',
+	},
 	admonitionRejectedSpamNotice: {
 		id: 'project.moderation.admonition.rejected.spam-notice',
 		defaultMessage:
@@ -221,6 +234,7 @@ const {
 	currentMember,
 	invalidate,
 	allMembers,
+	organization,
 	thread,
 } = injectProjectPageContext()
 
@@ -229,15 +243,30 @@ const reviewSubmissionDisabled = computed(
 		!canSubmitProjectForReview(
 			projectValidation.value,
 			projectValidationLoading.value || projectLinksNetworkValidationLoading.value,
-		),
+		) ||
+		(isRejected(project.value) && !canResubmitProjectForReview(thread.value)),
 )
 
 const THREADS_RELEASE_DATE = '2023-08-05T12:00:00-07:00'
 
+const projectOwner = computed(
+	() =>
+		allMembers.value.find((member) => member.is_owner)?.user ??
+		organization.value?.members.find((member) => member.is_owner)?.user,
+)
+
 const prefixedThread = computed(() => {
+	if (!thread.value) return thread.value
+	const owner = projectOwner.value
+	const ownerThread = {
+		...thread.value,
+		members: owner
+			? [...thread.value.members.filter((member) => member.id !== owner.id), owner]
+			: thread.value.members,
+	}
 	const projectDate = project.value?.queued ?? project.value?.approved ?? project.value?.published
-	if (thread.value && projectDate && dayjs(projectDate).isBefore(dayjs(THREADS_RELEASE_DATE))) {
-		const newThread = JSON.parse(JSON.stringify(thread.value))
+	if (projectDate && dayjs(projectDate).isBefore(dayjs(THREADS_RELEASE_DATE))) {
+		const newThread = { ...ownerThread, messages: [...ownerThread.messages] }
 		newThread.messages.unshift({
 			id: '69',
 			author_id: null,
@@ -249,9 +278,14 @@ const prefixedThread = computed(() => {
 		})
 		return newThread
 	}
-	return thread.value
+	return ownerThread
 })
 
+const visibleIssues = computed(() =>
+	(thread.value?.issues ?? []).filter((issue) => !isThreadIssueVerified(issue)),
+)
+
+const projectApproved = computed(() => isApproved(project.value))
 const canAccess = computed(() => !!currentMember.value)
 const staff = computed(() => isStaff(currentMember.value?.user))
 const userFacingUiVisible = computed(
@@ -319,7 +353,7 @@ const moderationAdmonition = computed<{
 		}
 	}
 
-	if (isApproved(currentProject) && approvedAdmonitionMessage.value) {
+	if (projectApproved.value && approvedAdmonitionMessage.value) {
 		return {
 			type: 'success',
 			header: defineMessage({
@@ -492,26 +526,32 @@ function updateThread(newThread: Labrinth.Threads.v3.Thread | null | undefined) 
 
 async function setStatus(status: Labrinth.Projects.v2.ProjectStatus) {
 	if (status === 'processing') {
-		await setProcessing()
-		return
+		return await setProcessing()
 	}
 	startLoading()
+	const projectId = project.value.id
+	const threadId = project.value.thread_id
 
 	try {
-		await client.labrinth.projects_v2.edit(project.value.id, { status })
-
-		project.value.status = status
+		if (['approved', 'unlisted', 'private'].includes(status))
+			await verifyThreadIssuesForApproval(threadId, client, () => {
+				if (project.value.id !== projectId) throw new Error(formatMessage(messages.projectChanged))
+			})
+		await client.labrinth.projects_v3.edit(projectId, { status })
 		await invalidate()
-		await queryClient.invalidateQueries({ queryKey: ['thread', project.value?.thread_id] })
+		await queryClient.invalidateQueries({ queryKey: ['thread', threadId] })
+		return true
 	} catch (err) {
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
 			text: getErrorDescription(err),
 			type: 'error',
 		})
+		return false
+	} finally {
+		await queryClient.invalidateQueries({ queryKey: ['thread', threadId] })
+		stopLoading()
 	}
-
-	stopLoading()
 }
 
 function getErrorDescription(err: unknown): string {

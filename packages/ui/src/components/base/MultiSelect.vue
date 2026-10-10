@@ -266,7 +266,10 @@
 										>
 											<span class="min-w-0 truncate">{{ item.label }}</span>
 											<button
-												v-if="hasSelectableSectionHeaderOptions(item)"
+												v-if="
+													item.showSelectionActions !== false &&
+													hasSelectableSectionHeaderOptions(item)
+												"
 												type="button"
 												class="shrink-0 border-0 bg-transparent p-0 text-sm font-semibold text-secondary shadow-none transition-all hover:bg-transparent hover:text-contrast"
 												@click.stop="toggleSectionHeaderOptions(item)"
@@ -438,6 +441,7 @@ export interface MultiSelectSectionHeader {
 	label: string
 	key?: string
 	class?: string
+	showSelectionActions?: boolean
 }
 
 export type MultiSelectItem<T> = MultiSelectOption<T> | MultiSelectSectionHeader
@@ -459,6 +463,10 @@ type ViewportRect = {
 	height: number
 	offsetTop: number
 	offsetLeft: number
+}
+type DropdownSize = {
+	width: number
+	height: number
 }
 
 const DROPDOWN_VIEWPORT_MARGIN = 8
@@ -508,6 +516,10 @@ const props = withDefaults(
 		dropdownWidth?: string | number
 		/** Minimum width for the teleported dropdown */
 		dropdownMinWidth?: string | number
+		/** Edge of the trigger to align the dropdown with before viewport clamping */
+		dropdownAlign?: 'left' | 'right'
+		/** Keep the dropdown's opening horizontal position while it remains open */
+		lockDropdownHorizontalPosition?: boolean
 		forceDirection?: 'up' | 'down'
 		noOptionsMessage?: string
 		noResultsMessage?: string
@@ -590,6 +602,7 @@ const dropdownStyle = ref({
 	width: '0px',
 	minWidth: '0px',
 })
+const lockedDropdownLeft = ref<number | null>(null)
 
 const openDirection = ref<'down' | 'up'>('down')
 const hasCustomInputContent = computed(() => Boolean(slots['input-content']))
@@ -905,7 +918,7 @@ async function calculateVisibleTags() {
 
 function determineOpenDirection(
 	triggerRect: DOMRect,
-	dropdownRect: DOMRect,
+	dropdownRect: DropdownSize,
 	viewport: ViewportRect,
 ): 'up' | 'down' {
 	if (props.forceDirection) return props.forceDirection
@@ -924,7 +937,7 @@ function determineOpenDirection(
 
 function calculateVerticalPosition(
 	triggerRect: DOMRect,
-	dropdownRect: DOMRect,
+	dropdownRect: DropdownSize,
 	direction: 'up' | 'down',
 	viewport: ViewportRect,
 ): number {
@@ -938,17 +951,16 @@ function calculateVerticalPosition(
 
 function calculateHorizontalPosition(
 	triggerRect: DOMRect,
-	dropdownRect: DOMRect,
+	dropdownRect: DropdownSize,
 	viewport: ViewportRect,
 ): number {
 	const minLeft = viewport.offsetLeft + DROPDOWN_VIEWPORT_MARGIN
 	const maxRight = viewport.offsetLeft + viewport.width - DROPDOWN_VIEWPORT_MARGIN
-	let left = triggerRect.left + viewport.offsetLeft
+	const left =
+		(props.dropdownAlign === 'right' ? triggerRect.right - dropdownRect.width : triggerRect.left) +
+		viewport.offsetLeft
 
-	if (left + dropdownRect.width > maxRight) {
-		left = Math.max(minLeft, maxRight - dropdownRect.width)
-	}
-	return left
+	return Math.max(minLeft, Math.min(left, maxRight - dropdownRect.width))
 }
 
 function getViewportRect(): ViewportRect {
@@ -993,12 +1005,15 @@ async function updateDropdownPosition() {
 
 	await nextTick()
 
-	const dropdownRect = dropdown.getBoundingClientRect()
+	const dropdownRect = { width: dropdown.offsetWidth, height: dropdown.offsetHeight }
 	const viewport = getViewportRect()
 
 	const direction = determineOpenDirection(triggerRect, dropdownRect, viewport)
 	const top = calculateVerticalPosition(triggerRect, dropdownRect, direction, viewport)
-	const left = calculateHorizontalPosition(triggerRect, dropdownRect, viewport)
+	const left =
+		props.lockDropdownHorizontalPosition && lockedDropdownLeft.value !== null
+			? lockedDropdownLeft.value
+			: calculateHorizontalPosition(triggerRect, dropdownRect, viewport)
 
 	dropdownStyle.value = {
 		top: `${top}px`,
@@ -1006,6 +1021,7 @@ async function updateDropdownPosition() {
 		width,
 		minWidth,
 	}
+	lockedDropdownLeft.value = props.lockDropdownHorizontalPosition ? left : null
 
 	openDirection.value = direction
 }
@@ -1071,6 +1087,7 @@ async function openDropdown() {
 	if (props.disabled || isOpen.value) return
 
 	dismissTooltip()
+	lockedDropdownLeft.value = null
 	isOpen.value = true
 	emit('open')
 
@@ -1093,6 +1110,7 @@ function closeDropdown() {
 	stopPositionTracking()
 	destroyOptionsOverlayScrollbars()
 	isOpen.value = false
+	lockedDropdownLeft.value = null
 	searchQuery.value = ''
 	focusedIndex.value = -1
 	emit('close')
@@ -1101,6 +1119,14 @@ function closeDropdown() {
 		triggerElement.value?.focus()
 	})
 }
+
+defineExpose({
+	close: closeDropdown,
+	async open() {
+		await openDropdown()
+		if (isOpen.value) (searchInputRef.value as unknown as { focus: () => void } | null)?.focus()
+	},
+})
 
 function handleTriggerClick(event: MouseEvent) {
 	if (event.detail === 0) return
@@ -1410,6 +1436,12 @@ onUnmounted(() => {
 watch(isOpen, (value) => {
 	if (value) {
 		updateDropdownPosition()
+	}
+})
+
+watch(searchQuery, () => {
+	if (isOpen.value) {
+		focusedIndex.value = shouldShowSelectAll.value ? -2 : getFirstFocusableOptionIndex()
 	}
 })
 

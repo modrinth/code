@@ -311,4 +311,31 @@ export class LabrinthTechReviewInternalModule extends AbstractModule {
 			},
 		)
 	}
+
+	public async getUsersFlaggedProjects(
+		userIds: string[],
+	): Promise<Record<string, Labrinth.TechReview.Internal.FlaggedProject[]>> {
+		return this.client.request<Record<string, Labrinth.TechReview.Internal.FlaggedProject[]>>(
+			'/moderation/tech-review/users/flagged-projects',
+			{
+				api: 'labrinth',
+				version: 'internal',
+				method: 'GET',
+				params: { ids: JSON.stringify(userIds) },
+			},
+		)
+	}
+
+	public async getOrganizationFlaggedProjects(
+		organizationId: string,
+	): Promise<Labrinth.TechReview.Internal.FlaggedProject[]> {
+		return this.client.request<Labrinth.TechReview.Internal.FlaggedProject[]>(
+			`/moderation/tech-review/organization/${organizationId}/flagged-projects`,
+			{
+				api: 'labrinth',
+				version: 'internal',
+				method: 'GET',
+			},
+		)
+	}
 }

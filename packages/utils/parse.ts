@@ -37,6 +37,16 @@ const getImgurProxyUrl = (value: string) => {
 	}
 }
 
+const allowedClassesByTag: Record<string, readonly string[]> = {
+	div: ['review-card-image-targets', 'review-card-image-target'],
+	a: ['review-card-image-heading'],
+	ul: ['review-card-image-list'],
+	li: ['review-card-image-entry'],
+	span: ['review-card-image-caption'],
+	p: ['review-card-image-description'],
+	img: ['review-card-gallery-image'],
+}
+
 export const configuredXss = new FilterXSS({
 	whiteList: {
 		...whiteList,
@@ -103,6 +113,13 @@ export const configuredXss = new FilterXSS({
 			} catch {
 				// ..
 			}
+		}
+
+		if (name === 'class' && allowedClassesByTag[tag]) {
+			const classes = value
+				.split(/\s+/)
+				.filter((className) => allowedClassesByTag[tag].includes(className))
+			if (classes.length) return `class="${escapeAttrValue(classes.join(' '))}"`
 		}
 
 		// For Highlight.JS

@@ -1058,9 +1058,6 @@
   "conversation-thread.action.approve": {
     "message": "Approuver"
   },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Approuver avec réponse"
-  },
   "conversation-thread.action.close-report": {
     "message": "Fermer le signalement"
   },
@@ -1069,9 +1066,6 @@
   },
   "conversation-thread.action.reject": {
     "message": "Rejeter"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Rejeter avec réponse"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Rouvrir le fil"
@@ -1106,9 +1100,6 @@
   "conversation-thread.action.withhold": {
     "message": "Retenir"
   },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Retenir avec réponse"
-  },
   "conversation-thread.closed-thread.description": {
     "message": "Ce fil est fermé et aucun message ne peut y être envoyé."
   },
@@ -1117,9 +1108,6 @@
   },
   "conversation-thread.error.reopening-report": {
     "message": "Erreur lors de la réouverture du signalement"
-  },
-  "conversation-thread.error.sending-message": {
-    "message": "Impossible d'envoyer le message"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Répondre au fil..."
@@ -1147,9 +1135,6 @@
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "Je confirme que j'ai bel et bien adressé les messages des modérateurs."
-  },
-  "conversation-thread.resubmit-modal.description": {
-    "message": "Vous soumettez <project-title>{projectTitle}</project-title> à revoir de nouveau par les modérateurs."
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "Soumettre de nouveau à la révision"
@@ -3410,9 +3395,6 @@
   "project-member-header.success-join": {
     "message": "Vous avez rejoint l’équipe du projet"
   },
-  "project-moderation-nags.project-submitted-for-review": {
-    "message": "Votre projet a été soumis pour vérification !"
-  },
   "project-moderation-nags.publishing-checklist": {
     "message": "Liste de contrôle de publication"
   },
@@ -3529,9 +3511,6 @@
   },
   "project.actions.rescan-modpack": {
     "message": "Rescanne le modpack"
-  },
-  "project.actions.review-project": {
-    "message": "Vérifier le projet"
   },
   "project.actions.servers-promo.description": {
     "message": "Les serveurs Modrinth Hosting sont la solution la plus facile pour jouer entre amis facilement !"

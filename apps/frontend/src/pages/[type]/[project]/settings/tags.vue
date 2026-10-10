@@ -18,10 +18,12 @@ import {
 	useSavable,
 	useVIntl,
 } from '@modrinth/ui'
-import { capitalizeString, sortedCategories } from '@modrinth/utils'
+import { capitalizeString, isAdmin, sortedCategories } from '@modrinth/utils'
 import { computed } from 'vue'
 
+import ProjectIssueCard from '~/components/ui/project-issue-card/index.vue'
 import ValidationMessage from '~/components/ValidationMessage.vue'
+import { useProjectIssueFieldAction } from '~/composables/project-issue-field-action'
 import { useProjectNagMessages } from '~/composables/project-nag-validation'
 import { useProjectSaveValidation } from '~/composables/project-save-validation'
 
@@ -146,7 +148,7 @@ const groupDescriptionMessages: Record<string, MessageDescriptor> = {
 	'performance impact': messages.performanceImpactDescription,
 }
 
-const { projectV2: project, projectV3, patchProject } = injectProjectPageContext()
+const { projectV2: project, projectV3, patchProject, currentMember } = injectProjectPageContext()
 
 useProjectSettingsHeadTitle(messages.title)
 
@@ -313,6 +315,33 @@ const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)
 const saveValidation = useProjectSaveValidation(() => current.value)
 const canSave = computed(() => !saveValidation.hasErrors.value)
 
+const tagsIssueAction = useProjectIssueFieldAction({
+	draft: () => ({
+		categories: [...current.value.featuredTags],
+		additional_categories: current.value.selectedTags.filter(
+			(tag) => !current.value.featuredTags.includes(tag),
+		),
+	}),
+	canSave: () =>
+		canSave.value &&
+		(isAdmin(currentMember.value?.user) ||
+			((currentMember.value?.permissions ?? 0) & (1 << 2)) !== 0),
+	saving,
+	validation: saveValidation,
+	save: async () => {
+		const categories = [...current.value.featuredTags]
+		const additional_categories = current.value.selectedTags.filter(
+			(tag) => !categories.includes(tag),
+		)
+		if (
+			!hasSameTags(categories, project.value.categories) ||
+			!hasSameTags(additional_categories, project.value.additional_categories)
+		) {
+			await patchProject({ categories, additional_categories }, true, true)
+		}
+	},
+})
+
 async function save() {
 	if (!canSave.value || saving.value) return
 	const submittedState = saveValidation.snapshot()
@@ -429,6 +458,7 @@ const toggleFeatured = (tag: string) => {
 				:current-field="JSON.stringify(current)"
 			/>
 			<ValidationMessage :check="saveValidation.forField('tags')" />
+			<ProjectIssueCard target="remove_tags" :field-action="tagsIssueAction" class="mt-2" />
 		</div>
 		<ValidationMessage :check="saveValidation.withoutFields(['tags'])" class="my-4" />
 		<UnsavedChangesPopup

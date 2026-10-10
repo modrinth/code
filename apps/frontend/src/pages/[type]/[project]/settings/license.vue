@@ -9,7 +9,9 @@
 				<p class="m-0 text-base text-secondary">
 					<IntlFormatted
 						:message-id="messages.intro"
-						:values="{ type: formatProjectType(project.project_type).toLowerCase() }"
+						:values="{
+							type: formatProjectType(project.project_type).toLowerCase(),
+						}"
 					>
 						<template #guide="{ children }">
 							<NuxtLink
@@ -22,6 +24,12 @@
 						</template>
 					</IntlFormatted>
 				</p>
+
+				<ProjectIssueCard
+					target="modify_license"
+					:field-action="licenseIssueAction"
+					class="-mb-2 max-w-[600px]"
+				/>
 			</div>
 
 			<div class="flex min-w-0 max-w-[600px] flex-col gap-2">
@@ -112,7 +120,7 @@
 
 			<div v-if="current.license.friendly" class="flex min-w-0 max-w-[600px] flex-col gap-2">
 				<label for="license-url" class="w-fit text-lg font-semibold text-contrast">
-					{{ formatMessage(messages.url) }}
+					{{ formatMessage(licenseUrlMessages.url) }}
 					<span v-if="current.license.friendly !== 'Custom'" class="font-normal text-secondary">
 						({{ formatMessage(messages.optionalLabel) }})
 					</span>
@@ -124,8 +132,13 @@
 						v-model="current.licenseUrl"
 						type="url"
 						:maxlength="2048"
-						:placeholder="formatMessage(messages.urlPlaceholder)"
-						:required="current.license.friendly === 'Custom'"
+						:placeholder="
+							formatMessage(
+								current.license.friendly === 'Custom'
+									? licenseUrlMessages.url
+									: licenseUrlMessages.optionalUrl,
+							)
+						"
 						:disabled="saving || !hasPermission || licenseId === 'LicenseRef-Unknown'"
 						wrapper-class="w-full"
 					/>
@@ -133,8 +146,8 @@
 						{{
 							formatMessage(
 								current.license.friendly === 'Custom'
-									? messages.customUrlDescription
-									: messages.urlDescription,
+									? licenseUrlMessages.customUrlDescription
+									: licenseUrlMessages.urlDescription,
 							)
 						}}
 					</p>
@@ -162,18 +175,19 @@
 					/>
 				</div>
 			</div>
+			<ValidationMessage
+				:check="
+					saveValidation.withoutFields([
+						'license',
+						['source-availability', 'source'],
+						['license-url', 'license'],
+						['custom-license', 'license'],
+					])
+				"
+				class="my-4"
+			/>
 		</section>
-		<ValidationMessage
-			:check="
-				saveValidation.withoutFields([
-					'license',
-					['source-availability', 'source'],
-					['license-url', 'license'],
-					['custom-license', 'license'],
-				])
-			"
-			class="my-4"
-		/>
+
 		<UnsavedChangesPopup
 			:original="saved"
 			:modified="current"
@@ -213,9 +227,12 @@ import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
 import ValidationMessage from '@/components/ValidationMessage.vue'
+import ProjectIssueCard from '~/components/ui/project-issue-card/index.vue'
+import { useProjectIssueFieldAction } from '~/composables/project-issue-field-action'
 import { useProjectNagMessages } from '~/composables/project-nag-validation'
 import { useProjectSaveValidation } from '~/composables/project-save-validation'
 import { normalizeProjectUrl } from '~/helpers/project-url'
+import { licenseUrlMessages } from '~/utils/license-messages'
 
 const { projectV2: project, currentMember, patchProjectV3 } = injectProjectPageContext()
 const { labrinth } = injectModrinthClient()
@@ -470,6 +487,31 @@ const canSave = computed(
 		!missingCustomUrl.value &&
 		!saveValidation.messages.value.some((message) => message.severity === 'error'),
 )
+
+const licenseIssueAction = useProjectIssueFieldAction({
+	draft: () => ({
+		license: {
+			...project.value.license,
+			id: licenseId.value,
+			url: normalizeProjectUrl(current.value.licenseUrl) || undefined,
+		},
+	}),
+	canSave: () => canSave.value,
+	saving,
+	validation: saveValidation,
+	save: async () => {
+		const license_id = licenseId.value
+		const submittedUrl = current.value.licenseUrl
+		const license_url = normalizeProjectUrl(submittedUrl) || null
+		if (
+			license_id !== project.value.license.id ||
+			(license_url ?? '') !== (project.value.license.url ?? '')
+		) {
+			await patchProjectV3({ license_id, license_url }, true, true)
+		}
+		if (current.value.licenseUrl === submittedUrl) current.value.licenseUrl = license_url ?? ''
+	},
+})
 
 async function save() {
 	if (!canSave.value || saving.value) return

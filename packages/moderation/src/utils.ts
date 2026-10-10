@@ -1,4 +1,19 @@
 import type { Labrinth } from '@modrinth/api-client'
+import suggestionMessage from './data/messages/checklist/messages/text-suggestion.md'
+import { md } from '@modrinth/utils'
+
+export function isValidProjectSlug(value: string) {
+	return /^[a-zA-Z0-9._-]{3,64}$/.test(value)
+}
+
+export function generateUrlSlug(value: string) {
+	return value
+		.trim()
+		.toLowerCase()
+		.replaceAll(' ', '-')
+		.replaceAll(/[^a-zA-Z0-9._-]/g, '')
+		.replaceAll(/--+/gm, '-')
+}
 
 export function expandVariables(
 	template: string,
@@ -111,6 +126,34 @@ export function formatProjectTypes(type: string, lower: boolean = false) {
 
 export function requiresEnvironmentInfo(projectTypes): boolean {
 	return projectTypes.includes('mod') || projectTypes.includes('modpack')
+}
+
+export function projectHasCustomServerModpack(projectV3: Labrinth.Projects.v3.Project): boolean {
+	return (
+		!!projectV3.minecraft_server &&
+		projectV3.minecraft_java_server?.content?.kind === 'modpack' &&
+		projectV3.minecraft_java_server.content.project_id === projectV3.id
+	)
+}
+
+const escapeHtml = md().utils.escapeHtml
+
+export function messageWithOptionalSuggestion(message, fieldType: string, suggestion: string) {
+	if (!suggestion.trim()) {
+		return message
+	} else {
+		return (
+			message +
+			`\n` +
+			suggestionMessage
+				.replaceAll('%FIELD_TYPE%', () => fieldType)
+				.replaceAll(
+					'%SUGGESTION%',
+					() => `<copy-code>\n<pre>${escapeHtml(suggestion)}</pre>\n</copy-code>`,
+				)
+				.trim()
+		)
+	}
 }
 
 export function flattenStaticVariables(): Record<string, string> {

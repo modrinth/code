@@ -1055,9 +1055,6 @@
   "conversation-thread.action.approve": {
     "message": "Одобрить"
   },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Одобрить с ответом"
-  },
   "conversation-thread.action.close-report": {
     "message": "Закрыть жалобу"
   },
@@ -1066,9 +1063,6 @@
   },
   "conversation-thread.action.reject": {
     "message": "Отклонить"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Отклонить с ответом"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Возобновить ветку"
@@ -1103,9 +1097,6 @@
   "conversation-thread.action.withhold": {
     "message": "Удержать"
   },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Удержать с ответом"
-  },
   "conversation-thread.closed-thread.description": {
     "message": "Ветка закрыта. Отправка сообщений недоступна."
   },
@@ -1114,9 +1105,6 @@
   },
   "conversation-thread.error.reopening-report": {
     "message": "Ошибка возобновления жалобы"
-  },
-  "conversation-thread.error.sending-message": {
-    "message": "Ошибка отправки сообщения"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Ответьте в ветке..."
@@ -1144,9 +1132,6 @@
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "Я подтверждаю, что я надлежащим образом ответил на комментарии модерации."
-  },
-  "conversation-thread.resubmit-modal.description": {
-    "message": "Вы отправляете <project-title>{projectTitle}</project-title> модераторам на повторную проверку."
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "Запрос на повторную проверку"
@@ -3407,9 +3392,6 @@
   "project-member-header.success-join": {
     "message": "Вы присоединились к команде проекта"
   },
-  "project-moderation-nags.project-submitted-for-review": {
-    "message": "Проект отправлен на проверку!"
-  },
   "project-moderation-nags.publishing-checklist": {
     "message": "Контрольный список для публикации"
   },
@@ -3526,9 +3508,6 @@
   },
   "project.actions.rescan-modpack": {
     "message": "Пересканировать сборку"
-  },
-  "project.actions.review-project": {
-    "message": "Проверить проект"
   },
   "project.actions.servers-promo.description": {
     "message": "Modrinth Hosting — самый простой способ играть с друзьями без лишних хлопот!"

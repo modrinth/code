@@ -1,0 +1,370 @@
+<template>
+	<div v-if="panelBinding && hasControls" class="flex flex-col gap-3">
+		<div
+			v-for="(section, index) in panelBinding.panel.sections"
+			:key="`${panelBinding.projectId}:${panelBinding.key}:${index}`"
+			class="flex flex-col gap-2"
+		>
+			<p v-if="section.label" class="m-0 font-semibold text-contrast">
+				{{ section.label }}
+			</p>
+			<div class="flex flex-wrap gap-2">
+				<template
+					v-for="control in section.controls"
+					:key="`${control.type}:${control.issueId}:${control.type === 'toggle' ? (control.id ?? '') : control.key}`"
+				>
+					<div
+						v-if="control.type !== 'toggle'"
+						class="flex w-full flex-col gap-2"
+						role="group"
+						:aria-label="control.label"
+						:aria-describedby="
+							panels.missing(panelBinding, control)
+								? `${id}-${control.issueId}-${control.key}-required`
+								: undefined
+						"
+					>
+						<p class="m-0 font-semibold text-contrast">
+							{{ control.label }}
+							<span v-if="control.required" class="text-red" aria-hidden="true">*</span>
+						</p>
+						<MarkdownEditor
+							v-if="control.type === 'markdown'"
+							:ref="(field) => setFieldRef(fieldKey(control), field)"
+							:disabled="control.disabled"
+							:model-value="panels.textValue(panelBinding, control)"
+							:heading-buttons="false"
+							:hide-formatting-buttons="
+								settings.get(moderationSettings.General.HideMarkdownFormattingButtons)
+							"
+							:max-height="240"
+							:min-height="72"
+							:placeholder="
+								control.placeholder ?? formatMessage(controlMessages.markdownPlaceholder)
+							"
+							hide-markdown-hint
+							@update:model-value="writeControl(control, $event)"
+						/>
+						<SlugInput
+							v-else-if="control.type === 'text' && control.key === 'correct-slug'"
+							:ref="(field) => setFieldRef(fieldKey(control), field)"
+							:model-value="panels.textValue(panelBinding, control)"
+							:placeholder="control.placeholder || formatMessage(controlMessages.textPlaceholder)"
+							:disabled="control.disabled"
+							:label="control.label"
+							:required="control.required"
+							@update:model-value="writeControl(control, $event)"
+						/>
+						<Input
+							v-else-if="control.type === 'text'"
+							:ref="(field) => setFieldRef(fieldKey(control), field)"
+							:model-value="panels.textValue(panelBinding, control)"
+							:placeholder="control.placeholder || formatMessage(controlMessages.textPlaceholder)"
+							:disabled="control.disabled"
+							:aria-label="control.label"
+							:aria-required="control.required"
+							@update:model-value="writeControl(control, String($event ?? ''))"
+						/>
+						<Textarea
+							v-else-if="control.type === 'textarea'"
+							:ref="(field) => setFieldRef(fieldKey(control), field)"
+							:model-value="panels.textValue(panelBinding, control)"
+							:placeholder="control.placeholder || formatMessage(controlMessages.textPlaceholder)"
+							:disabled="control.disabled"
+							:aria-label="control.label"
+							:aria-required="control.required"
+							:maxlength="control.maxlength"
+							:rows="control.rows"
+							resize="vertical"
+							@update:model-value="writeControl(control, String($event ?? ''))"
+						/>
+						<MultiSelect
+							v-else-if="control.type === 'select' && control.multiple"
+							:model-value="panels.selectValues(panelBinding, control)"
+							:options="control.options"
+							:placeholder="control.placeholder ?? formatMessage(controlMessages.select)"
+							:disabled="control.disabled"
+							:aria-label="control.label"
+							:aria-required="control.required"
+							:dropdown-gap="0"
+							@open="setDropdownOpen(control, true)"
+							@close="setDropdownOpen(control, false)"
+							@update:model-value="writeControl(control, $event)"
+						/>
+						<Combobox
+							v-else-if="control.type === 'select'"
+							:model-value="panels.selectValues(panelBinding, control)[0] ?? ''"
+							:options="[
+								{
+									value: '',
+									label: control.placeholder ?? formatMessage(controlMessages.select),
+								},
+								...control.options,
+							]"
+							:placeholder="control.placeholder ?? formatMessage(controlMessages.select)"
+							:disabled="control.disabled"
+							:aria-label="control.label"
+							:aria-required="control.required"
+							:dropdown-gap="0"
+							@open="setDropdownOpen(control, true)"
+							@close="setDropdownOpen(control, false)"
+							@update:model-value="writeControl(control, $event)"
+						/>
+						<p
+							v-if="panels.missing(panelBinding, control)"
+							:id="`${id}-${control.issueId}-${control.key}-required`"
+							class="m-0 ml-0.5 text-xs text-orange"
+							role="status"
+						>
+							{{ formatMessage(controlMessages.required) }}
+						</p>
+					</div>
+					<Tooltip v-else :disabled="!control.tooltip" :text="control.tooltip">
+						<ActionButton
+							:label="control.label"
+							:keybind="keybinds.get(control)"
+							:show-keybind-hint="
+								settings.get(moderationSettings.General.ShowToggleIssueButtonShortcutHint)
+							"
+							:disabled="control.disabled"
+							:model-value="panels.selected(panelBinding, control)"
+							:re-review="previousIssues.isReReviewControl(control)"
+							:mixed="panels.mixed(panelBinding, control)"
+							@update:model-value="toggleAction(control, $event)"
+						/>
+					</Tooltip>
+				</template>
+				<Tooltip
+					v-if="
+						index === panelBinding.panel.sections.length - 1 &&
+						!panelBinding.panel.title &&
+						panelBinding.panel.hint
+					"
+					:text="panelBinding.panel.hint"
+					class="ml-px flex shrink-0 self-center text-secondary"
+				>
+					<a
+						:href="panelBinding.panel.guidanceUrl"
+						target="_blank"
+						rel="noopener noreferrer"
+						:aria-label="formatMessage(messages.openReviewGuidance)"
+						class="flex text-secondary hover:text-contrast"
+					>
+						<InfoIcon class="size-4" aria-hidden="true" />
+					</a>
+				</Tooltip>
+			</div>
+		</div>
+	</div>
+	<div v-else class="flex items-center gap-2 text-secondary">
+		<p class="m-0 text-base">
+			{{ formatMessage(panelBinding ? messages.noIssues : messages.noReviewActions) }}
+		</p>
+		<Tooltip
+			v-if="panelBinding && !panelBinding.panel.title && panelBinding.panel.hint"
+			:text="panelBinding.panel.hint"
+			class="flex shrink-0 text-secondary"
+		>
+			<a
+				:href="panelBinding.panel.guidanceUrl"
+				target="_blank"
+				rel="noopener noreferrer"
+				:aria-label="formatMessage(messages.openReviewGuidance)"
+				class="flex text-secondary hover:text-contrast"
+			>
+				<InfoIcon class="size-4" aria-hidden="true" />
+			</a>
+		</Tooltip>
+	</div>
+</template>
+
+<script setup lang="ts">
+import { InfoIcon } from '@modrinth/assets'
+import { moderationSettings } from '@modrinth/moderation'
+import ActionButton from '@modrinth/moderation/src/types/node/components/ActionButton.vue'
+import {
+	Combobox,
+	defineMessages,
+	Input,
+	MarkdownEditor,
+	MultiSelect,
+	Textarea,
+	Tooltip,
+	useVIntl,
+} from '@modrinth/ui'
+import {
+	type ComponentPublicInstance,
+	computed,
+	nextTick,
+	onBeforeUnmount,
+	useId,
+	watch,
+} from 'vue'
+
+import { useModerationSettings } from '~/composables/moderation'
+import type { ReviewTarget } from '~/providers/project-review/review'
+import {
+	injectReviewPanels,
+	type ReviewPanelBinding,
+} from '~/providers/project-review/review-panels'
+import { injectReviewPreviousIssues } from '~/providers/project-review/review-previous-issues'
+
+import { projectReviewMessages as messages } from '../../messages'
+import SlugInput from './slug-input.vue'
+
+const props = defineProps<{
+	target?: ReviewTarget
+	binding?: ReviewPanelBinding
+	keybindOffset?: number
+}>()
+const emit = defineEmits<{
+	'dropdown-open': [key: string]
+	'dropdown-close': [key: string]
+}>()
+const id = useId()
+const controlMessages = defineMessages({
+	textPlaceholder: {
+		id: 'project-review.controls.text-placeholder',
+		defaultMessage: 'Enter text…',
+	},
+	markdownPlaceholder: {
+		id: 'project-review.controls.markdown-placeholder',
+		defaultMessage: 'Explain what needs to change…',
+	},
+	select: {
+		id: 'project-review.controls.select',
+		defaultMessage: 'Select an option',
+	},
+	required: {
+		id: 'project-review.controls.required-value',
+		defaultMessage: 'Complete this required field.',
+	},
+})
+const { formatMessage } = useVIntl()
+const panels = injectReviewPanels()
+const previousIssues = injectReviewPreviousIssues()
+const settings = useModerationSettings()
+const panelBinding = computed(
+	() => props.binding ?? (props.target ? panels.resolve(props.target) : undefined),
+)
+type PanelControl = ReviewPanelBinding['panel']['sections'][number]['controls'][number]
+const openDropdowns = new Set<string>()
+const dropdownKeys = computed(
+	() =>
+		new Set(
+			panelBinding.value?.panel.sections.flatMap((section) =>
+				section.controls.flatMap((control) =>
+					control.type === 'select' && !control.disabled ? [dropdownKey(control)] : [],
+				),
+			),
+		),
+)
+
+function dropdownKey(control: Extract<PanelControl, { type: 'select' }>) {
+	return `${id}:${control.issueId}:${control.key}`
+}
+
+function closeDropdown(key: string) {
+	if (openDropdowns.delete(key)) emit('dropdown-close', key)
+}
+
+function setDropdownOpen(control: PanelControl, open: boolean) {
+	if (control.type !== 'select') return
+	const key = dropdownKey(control)
+	if (!open) closeDropdown(key)
+	else if (dropdownKeys.value.has(key) && !openDropdowns.has(key)) {
+		openDropdowns.add(key)
+		emit('dropdown-open', key)
+	}
+}
+
+watch(dropdownKeys, (keys) => {
+	for (const key of openDropdowns) {
+		if (!keys.has(key)) closeDropdown(key)
+	}
+})
+onBeforeUnmount(() => {
+	for (const key of openDropdowns) closeDropdown(key)
+})
+
+const fields = new Map<string, { focus: () => void }>()
+let pendingFocus: string | undefined
+
+function fieldKey(control: { issueId: string; key: string }) {
+	return `${control.issueId}:${control.key}`
+}
+
+async function focusPendingField() {
+	await nextTick()
+	if (!pendingFocus) return
+	const field = fields.get(pendingFocus)
+	if (!field) return
+	pendingFocus = undefined
+	field.focus()
+}
+
+function setFieldRef(key: string, field: Element | ComponentPublicInstance | null) {
+	if (field && 'focus' in field && typeof field.focus === 'function') {
+		fields.set(key, field as { focus: () => void })
+		if (pendingFocus === key) void focusPendingField()
+	} else {
+		fields.delete(key)
+	}
+}
+
+function textFields() {
+	return (
+		panelBinding.value?.panel.sections.flatMap((section) =>
+			section.controls.filter(
+				(control): control is Extract<PanelControl, { type: 'text' | 'markdown' | 'textarea' }> =>
+					(control.type === 'text' || control.type === 'markdown' || control.type === 'textarea') &&
+					!control.disabled,
+			),
+		) ?? []
+	)
+}
+
+function writeControl(control: PanelControl, value: boolean | string | string[]) {
+	const binding = panelBinding.value
+	if (!binding) return
+	panels.write(binding, control, value)
+}
+
+function toggleAction(control: PanelControl, value: boolean) {
+	const binding = panelBinding.value
+	if (!binding) return
+	const previousFields = new Set(textFields().map(fieldKey))
+	pendingFocus = undefined
+	writeControl(control, value)
+	const revealed = textFields().find((field) => !previousFields.has(fieldKey(field)))
+	if (!revealed) return
+	pendingFocus = fieldKey(revealed)
+	void focusPendingField()
+}
+
+function toggleControls(binding?: ReviewPanelBinding) {
+	return (
+		binding?.panel.sections.flatMap((section) =>
+			section.controls.filter((control) => control.type === 'toggle'),
+		) ?? []
+	)
+}
+const keybinds = computed(
+	() =>
+		new Map(
+			toggleControls(panelBinding.value).map((control, index) => [
+				control,
+				actionKeybind(index + (props.keybindOffset ?? 0)),
+			]),
+		),
+)
+function actionKeybind(index: number) {
+	if (index >= 27) return undefined
+	const modifier = index >= 18 ? 'Alt+' : index >= 9 ? 'Shift+' : ''
+	return `${modifier}${(index % 9) + 1}`
+}
+
+const hasControls = computed(() =>
+	panelBinding.value?.panel.sections.some((section) => section.controls.length > 0),
+)
+</script>

@@ -1,5 +1,6 @@
 <template>
 	<div>
+		<ProjectIssueCard location="server" class="mb-4" />
 		<ConfirmLeaveModal ref="confirmLeaveModal" />
 		<section class="universal-card">
 			<div class="flex flex-col gap-6">
@@ -58,6 +59,7 @@
 						class="mt-2"
 					/>
 					<ValidationMessage :check="saveValidation.forField('server-languages')" class="mt-2" />
+					<ProjectIssueCard target="modify_server_languages" class="mt-2" />
 				</div>
 
 				<!-- Java Address -->
@@ -154,6 +156,7 @@
 						class="mt-2"
 					/>
 					<ValidationMessage :check="saveValidation.forField('java-address')" class="mt-2" />
+					<ProjectIssueCard target="modify_server_address" platform="minecraft_java" class="mt-2" />
 				</div>
 
 				<!-- Bedrock Address -->
@@ -176,6 +179,11 @@
 							autocomplete="off"
 						/>
 					</div>
+					<ProjectIssueCard
+						target="modify_server_address"
+						platform="minecraft_bedrock"
+						class="mt-2"
+					/>
 				</div>
 
 				<div>
@@ -234,6 +242,7 @@ import {
 } from '@modrinth/ui'
 import { isAdmin } from '@modrinth/utils'
 
+import ProjectIssueCard from '~/components/ui/project-issue-card/index.vue'
 import CompatibilityCard from '~/components/ui/project-settings/CompatibilityCard.vue'
 import ValidationMessage from '~/components/ValidationMessage.vue'
 import { useProjectNagMessages } from '~/composables/project-nag-validation'

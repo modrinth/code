@@ -1058,9 +1058,6 @@
   "conversation-thread.action.approve": {
     "message": "承認"
   },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "送信して承認"
-  },
   "conversation-thread.action.close-report": {
     "message": "レポートを閉じる"
   },
@@ -1069,9 +1066,6 @@
   },
   "conversation-thread.action.reject": {
     "message": "却下済み"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "返信して拒否する"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "スレッドを再開する\n"
@@ -1106,9 +1100,6 @@
   "conversation-thread.action.withhold": {
     "message": "保留にする\n"
   },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "返信付きで保留にする\n"
-  },
   "conversation-thread.closed-thread.description": {
     "message": "このスレッドは閉じられているため、新しいメッセージを送信できません。\n"
   },
@@ -1117,9 +1108,6 @@
   },
   "conversation-thread.error.reopening-report": {
     "message": "報告を再開する際にエラーが発生しました。\n"
-  },
-  "conversation-thread.error.sending-message": {
-    "message": "メッセージの送信中にエラーが発生しました。\n"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "スレッドに返信…\n"
@@ -1147,9 +1135,6 @@
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "モデレーターからのコメントに適切に対応したことを確認します。\n"
-  },
-  "conversation-thread.resubmit-modal.description": {
-    "message": "<project-title>{projectTitle}</project-title>をモデレーターによる再審査に提出します。\n"
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "再審査に再提出しています…\n"
@@ -3316,9 +3301,6 @@
   },
   "project.actions.rescan-modpack": {
     "message": "Modパックリスキャン"
-  },
-  "project.actions.review-project": {
-    "message": "プロジェクトを評価"
   },
   "project.actions.servers-promo.description": {
     "message": "Modrinth Hostingは手間を掛けず、簡単に友達と遊べます！"

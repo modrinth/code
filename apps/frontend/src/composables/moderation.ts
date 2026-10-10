@@ -58,6 +58,16 @@ const useModerationOptions = () =>
 			keybindOutput[id] = definition
 		}
 
+		if (!('review-cycle-conversation' in keybindOutput)) {
+			const reply = keybindOutput['review-tab-reply']
+			const note = keybindOutput['review-tab-note']
+			if (reply?.length) keybindOutput['review-cycle-conversation'] = reply
+			else if (note?.length) keybindOutput['review-cycle-conversation'] = note
+			else if (reply || note) keybindOutput['review-cycle-conversation'] = []
+		}
+		delete keybindOutput['review-tab-reply']
+		delete keybindOutput['review-tab-note']
+
 		const settingsOutput: StoredSettings = {}
 		for (const [id, setting] of Object.entries(stored.settings || {})) {
 			settingsOutput[id] = setting

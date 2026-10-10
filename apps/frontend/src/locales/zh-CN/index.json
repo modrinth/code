@@ -1061,9 +1061,6 @@
   "conversation-thread.action.approve": {
     "message": "批准"
   },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "批准并回复"
-  },
   "conversation-thread.action.close-report": {
     "message": "关闭举报"
   },
@@ -1072,9 +1069,6 @@
   },
   "conversation-thread.action.reject": {
     "message": "驳回"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "驳回并回复"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "重开对话消息"
@@ -1109,9 +1103,6 @@
   "conversation-thread.action.withhold": {
     "message": "扣留"
   },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "扣留并回复"
-  },
   "conversation-thread.closed-thread.description": {
     "message": "此对话消息已关闭，无法发送新消息。"
   },
@@ -1120,9 +1111,6 @@
   },
   "conversation-thread.error.reopening-report": {
     "message": "重开举报出错"
-  },
-  "conversation-thread.error.sending-message": {
-    "message": "发送消息出错"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "回复对话消息……"
@@ -1150,9 +1138,6 @@
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "我确认我已妥善处理了管理员的评论。"
-  },
-  "conversation-thread.resubmit-modal.description": {
-    "message": "这将会把 <project-title>{projectTitle}</project-title> 提交给管理员重新审核。"
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "重新提交审核"
@@ -3416,9 +3401,6 @@
   "project-member-header.success-join": {
     "message": "你加入了项目团队"
   },
-  "project-moderation-nags.project-submitted-for-review": {
-    "message": "您的项目已提交审核！"
-  },
   "project-moderation-nags.publishing-checklist": {
     "message": "发布前检查单"
   },
@@ -3535,9 +3517,6 @@
   },
   "project.actions.rescan-modpack": {
     "message": "重新扫描整合包"
-  },
-  "project.actions.review-project": {
-    "message": "审核项目"
   },
   "project.actions.servers-promo.description": {
     "message": "Modrinth Hosting，让你轻松和朋友联机，毫无烦恼！"

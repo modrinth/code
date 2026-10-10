@@ -1,0 +1,179 @@
+import { injectModrinthClient } from '@modrinth/ui'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { computed, type Ref } from 'vue'
+
+import { useCreatorProjectStats } from '~/composables/creator-project-stats'
+import { projectQueryOptions } from '~/composables/queries/project'
+import { isThreadIssueStatusChange } from '~/helpers/thread-issues'
+
+export function useReviewProject(selection: Ref<string>) {
+	const client = injectModrinthClient()
+	const queryClient = useQueryClient()
+	const identity = useQuery(
+		computed(() => ({
+			...projectQueryOptions.check(selection.value, client),
+			enabled: import.meta.client && !!selection.value,
+		})),
+	)
+	const projectId = computed(() => identity.data.value?.id ?? '')
+	const projectQuery = useQuery(
+		computed(() => ({
+			...projectQueryOptions.v3(projectId.value, client),
+			enabled: !!projectId.value,
+		})),
+	)
+	const legacyQuery = useQuery(
+		computed(() => ({
+			...projectQueryOptions.v2(projectId.value, client),
+			enabled: !!projectId.value,
+		})),
+	)
+	const memberQuery = useQuery(
+		computed(() => ({
+			...projectQueryOptions.members(projectId.value, client),
+			enabled: !!projectId.value,
+		})),
+	)
+	const organizationQuery = useQuery(
+		computed(() => ({
+			...projectQueryOptions.organization(projectId.value, client),
+			enabled: !!projectId.value && !!projectQuery.data.value?.organization,
+		})),
+	)
+	const organization = computed(() =>
+		projectQuery.data.value?.organization ? (organizationQuery.data.value ?? null) : null,
+	)
+	const organizationId = computed(() => organization.value?.id ?? '')
+	const members = computed(() =>
+		(memberQuery.data.value ?? [])
+			.filter((member) => member.accepted)
+			.toSorted((a, b) => Number(b.is_owner) - Number(a.is_owner) || a.ordering - b.ordering),
+	)
+	const organizationMembers = computed(() =>
+		(organization.value?.members ?? [])
+			.filter((member) => member.accepted)
+			.toSorted((a, b) => Number(b.is_owner) - Number(a.is_owner) || a.ordering - b.ordering),
+	)
+	const creatorStats = useCreatorProjectStats(
+		computed(() =>
+			[...organizationMembers.value, ...members.value].map((member) => member.user.id),
+		),
+		organizationId,
+	)
+	const threadId = computed(() => projectQuery.data.value?.thread_id ?? '')
+	const threadQuery = useQuery({
+		queryKey: computed(() => ['thread', threadId.value]),
+		queryFn: () => client.labrinth.threads_v3.getThread(threadId.value),
+		enabled: computed(() => !!threadId.value),
+	})
+	const wasReviewed = computed(() => {
+		if (projectQuery.data.value?.status !== 'processing') return false
+		const messages = threadQuery.data.value?.messages ?? []
+		const approved = ['approved', 'archived', 'unlisted', 'private']
+		const rejected = ['rejected', 'withheld']
+		const lastApproval = messages.findLastIndex(
+			(message) =>
+				isThreadIssueStatusChange(message.body) && approved.includes(message.body.new_status),
+		)
+		return messages
+			.slice(lastApproval + 1)
+			.some(
+				(message) =>
+					message.body.type === 'status_change' && rejected.includes(message.body.new_status),
+			)
+	})
+	const attributionQuery = useQuery(
+		computed(() => ({
+			...projectQueryOptions.attribution(projectId.value, client),
+			enabled:
+				!!projectId.value &&
+				!!projectQuery.data.value?.project_types.includes('modpack') &&
+				!projectQuery.data.value.minecraft_server,
+		})),
+	)
+	const permissions = computed(() => ({
+		groups: attributionQuery.data.value ?? [],
+		awaitingReviewCount: (attributionQuery.data.value ?? []).filter(
+			({ attribution }) =>
+				attribution && attribution.kind !== 'globally_allowed' && !attribution.moderation_status,
+		).length,
+		unresolvedCount: (attributionQuery.data.value ?? []).filter(
+			({ attribution }) =>
+				!attribution ||
+				(attribution.kind !== 'globally_allowed' &&
+					attribution.moderation_status?.kind !== 'approved'),
+		).length,
+		loaded: attributionQuery.isSuccess.value,
+		loading: attributionQuery.isFetching.value,
+		error: attributionQuery.error.value,
+	}))
+
+	const submissionCount = computed(
+		() =>
+			threadQuery.data.value?.messages.filter(
+				(message) =>
+					message.body.type === 'auto_approval' ||
+					(message.body.type === 'status_change' && message.body.new_status === 'processing'),
+			).length,
+	)
+
+	async function refresh() {
+		await Promise.all([
+			queryClient.invalidateQueries({
+				queryKey: ['project', 'v3', projectId.value],
+			}),
+			queryClient.invalidateQueries({
+				queryKey: ['project', 'v2', projectId.value],
+			}),
+			queryClient.invalidateQueries({ queryKey: ['project', projectId.value] }),
+			queryClient.invalidateQueries({
+				queryKey: ['project-attribution', projectId.value],
+			}),
+			queryClient.invalidateQueries({
+				queryKey: ['tech-reviews', 'flagged-projects'],
+			}),
+			identity.refetch(),
+		])
+	}
+
+	return {
+		projectId,
+		gallery: computed(() =>
+			(projectQuery.data.value?.gallery ?? []).toSorted((a, b) => a.ordering - b.ordering),
+		),
+		project: projectQuery.data,
+		projectV2: legacyQuery.data,
+		organization,
+		organizationStats: creatorStats.organizationStats,
+		organizationMembers,
+		threadQuery,
+		wasReviewed,
+		permissions,
+		members,
+		memberStats: creatorStats.memberStats,
+		membersLoading: computed(
+			() => memberQuery.isPending.value || creatorStats.membersLoading.value,
+		),
+		membersError: computed(() => memberQuery.isError.value || creatorStats.membersError.value),
+		organizationLoading: computed(
+			() =>
+				!!projectQuery.data.value?.organization &&
+				(organizationQuery.isPending.value || creatorStats.organizationLoading.value),
+		),
+		organizationError: computed(
+			() =>
+				!!projectQuery.data.value?.organization &&
+				(organizationQuery.isError.value || creatorStats.organizationError.value),
+		),
+		compatibilityError: legacyQuery.isError,
+		submissionCount,
+		isLoading: computed(
+			() =>
+				!!selection.value &&
+				(identity.isPending.value || projectQuery.isPending.value) &&
+				!identity.isError.value,
+		),
+		error: computed(() => identity.error.value ?? projectQuery.error.value),
+		refresh,
+	}
+}

@@ -1,1 +1,1 @@
-It looks like this project is probably "%SUGGESTED_ENVIRONMENT%".
+It looks like this project is probably "%SUGGESTED_ENVIRONMENT%". [Apply environment to all versions](https://modrinth.com/project/%PROJECT_ID%/settings/versions?applyEnvironmentOnAllVersions=%SUGGESTED_ENVIRONMENT_ID%)

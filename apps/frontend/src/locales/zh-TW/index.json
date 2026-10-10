@@ -1061,9 +1061,6 @@
   "conversation-thread.action.approve": {
     "message": "核准"
   },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "回覆並核准"
-  },
   "conversation-thread.action.close-report": {
     "message": "關閉檢舉"
   },
@@ -1072,9 +1069,6 @@
   },
   "conversation-thread.action.reject": {
     "message": "拒絕"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "回覆並拒絕"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "重新開啟討論串"
@@ -1109,9 +1103,6 @@
   "conversation-thread.action.withhold": {
     "message": "保留"
   },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "回覆並保留"
-  },
   "conversation-thread.closed-thread.description": {
     "message": "這個討論串已關閉，無法再傳送新訊息。"
   },
@@ -1120,9 +1111,6 @@
   },
   "conversation-thread.error.reopening-report": {
     "message": "重新開啟檢舉時發生錯誤"
-  },
-  "conversation-thread.error.sending-message": {
-    "message": "傳送訊息時發生錯誤"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "回覆討論串..."
@@ -1150,9 +1138,6 @@
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "我確認管理員所提到的問題皆已解決。"
-  },
-  "conversation-thread.resubmit-modal.description": {
-    "message": "你即將提交 <project-title>{projectTitle}</project-title> 以供管理員再次審查。"
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "重新提交審查"
@@ -3416,9 +3401,6 @@
   "project-member-header.success-join": {
     "message": "你加入了專案團隊"
   },
-  "project-moderation-nags.project-submitted-for-review": {
-    "message": "你的專案已提交審查！"
-  },
   "project-moderation-nags.publishing-checklist": {
     "message": "發布檢查清單"
   },
@@ -3535,9 +3517,6 @@
   },
   "project.actions.rescan-modpack": {
     "message": "重新掃描模組包"
-  },
-  "project.actions.review-project": {
-    "message": "審查專案"
   },
   "project.actions.servers-promo.description": {
     "message": "Modrinth Hosting 是讓你與朋友輕鬆遊玩的最佳方式！"

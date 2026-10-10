@@ -1028,9 +1028,6 @@
   "conversation-thread.action.approve": {
     "message": "Godkänn"
   },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Godkänn med svar"
-  },
   "conversation-thread.action.close-report": {
     "message": "Stäng rapport"
   },
@@ -1039,9 +1036,6 @@
   },
   "conversation-thread.action.reject": {
     "message": "Avslå"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Avslå med svar"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Återuppta tråd"
@@ -1076,9 +1070,6 @@
   "conversation-thread.action.withhold": {
     "message": "Tillhandahåll"
   },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Tillbakahåll med svar"
-  },
   "conversation-thread.closed-thread.description": {
     "message": "Den här tråden är stängd och nya meddelanden kan inte skickas."
   },
@@ -1087,9 +1078,6 @@
   },
   "conversation-thread.error.reopening-report": {
     "message": "Fel vid öppning av rapport"
-  },
-  "conversation-thread.error.sending-message": {
-    "message": "Kunde inte skicka meddelande"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Svara tråden..."
@@ -1117,9 +1105,6 @@
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "Jag bekräftar att jag ordentligt tagit itu med moderatorernas kommentarer."
-  },
-  "conversation-thread.resubmit-modal.description": {
-    "message": "Du skickar in <project-title>{projectTitle}</project-title> för att granskas igen av moderatorerna."
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "Skickar in igen för granskning"
@@ -3131,9 +3116,6 @@
   "project-member-header.success-join": {
     "message": "Du har gått med i projektteamet"
   },
-  "project-moderation-nags.project-submitted-for-review": {
-    "message": "Ditt projekt har skickats in för granskning!"
-  },
   "project-moderation-nags.publishing-checklist": {
     "message": "Publicerings-checklista"
   },
@@ -3247,9 +3229,6 @@
   },
   "project.actions.rescan-modpack": {
     "message": "Skanna projekt igen"
-  },
-  "project.actions.review-project": {
-    "message": "Granska projekt"
   },
   "project.actions.servers-promo.description": {
     "message": "Modrinth Hosting är det lättaste sättet att spela med dina vänner utan svårigheter!"

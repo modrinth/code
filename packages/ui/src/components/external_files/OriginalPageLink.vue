@@ -20,6 +20,7 @@ const label = defineMessage({
 		target="_blank"
 		rel="noopener"
 		:href="href"
+		@click.stop
 	>
 		<span class="truncate">{{ formatMessage(label) }}</span>
 		<ExternalIcon class="size-3 shrink-0 mb-2 ml-1" />

@@ -62,6 +62,9 @@ export type DisclosureUpdatedByUser = {
 }
 
 export type DisclosureCardMetaProps = {
+	variant?: 'settings' | 'review'
+	title?: string
+	hideDescription?: boolean
 	disabled?: boolean
 	toggleDisabled?: boolean
 	updatedAt?: string | null
