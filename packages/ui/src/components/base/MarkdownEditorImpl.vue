@@ -65,7 +65,12 @@
 			</div>
 		</div>
 	</NewModal>
-	<NewModal ref="imageModal" :header="formatMessage(messages.imageModalHeader)" class="!w-[40rem]">
+	<NewModal
+		ref="imageModal"
+		:header="formatMessage(messages.imageModalHeader)"
+		class="!w-[40rem]"
+		scrollable
+	>
 		<div class="modal-insert">
 			<label class="label" for="insert-image-alt">
 				<span class="label__title">
@@ -161,7 +166,12 @@
 			</div>
 		</div>
 	</NewModal>
-	<NewModal ref="videoModal" :header="formatMessage(messages.videoModalHeader)" class="!w-[40rem]">
+	<NewModal
+		ref="videoModal"
+		:header="formatMessage(messages.videoModalHeader)"
+		class="!w-[40rem]"
+		scrollable
+	>
 		<div class="modal-insert">
 			<label class="label" for="insert-video-url">
 				<span class="label__title">
