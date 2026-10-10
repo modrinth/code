@@ -209,7 +209,6 @@ import EditWorldModal from '@/components/ui/world/modal/EditSingleplayerWorldMod
 import WorldItem from '@/components/ui/world/WorldItem.vue'
 import { useAppEvent } from '@/composables/use-app-event'
 import { handleSevereError } from '@/composables/use-error.js'
-import { config } from '@/config'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project, get_project_v3 } from '@/helpers/cache.js'
 import { set_synced_option } from '@/helpers/instance'
@@ -325,14 +324,15 @@ function play() {
 const selectedFilters = ref<string[]>([])
 const searchFilter = ref('')
 
-// Servers are created on the Core this App is connected to, which only its owner can reach.
+const { servers: linkedServers, query: serversQuery } = useLinkedServers(() => instance.value.id)
+// Servers are created on the Core this App is connected to. Core only answers its owner, so a
+// server list that loaded means this account can create one.
 const canCreateServer = computed(
 	() =>
-		Boolean(config.coreUrl) &&
+		serversQuery.isSuccess.value &&
 		!instance.value.quarantined &&
 		instance.value.install_stage === 'installed',
 )
-const { servers: linkedServers } = useLinkedServers(() => instance.value.id)
 const filteredLinkedServers = computed(() =>
 	linkedServers.value.filter(
 		(server) => !searchFilter.value || worldNameMatchesQuery(server.name, searchFilter.value),
