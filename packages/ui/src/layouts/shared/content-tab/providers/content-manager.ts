@@ -82,6 +82,8 @@ export interface ContentManagerContext {
 	viewManagedContent?: () => void
 	unlinkModpack?: () => void
 	openManagedContentSettings?: () => void
+	/** Extra actions in the managed content card's "more" menu. */
+	managedContentMenuOptions?: Ref<ButtonMenuOption[]> | ComputedRef<ButtonMenuOption[]>
 
 	// Switch version (optional)
 	switchVersion?: (item: ContentItem) => void

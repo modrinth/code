@@ -1,10 +1,15 @@
 <script setup lang="ts">
-import { EyeIcon, WrenchIcon } from '@modrinth/assets'
+import { EyeIcon, MoreVerticalIcon, WrenchIcon } from '@modrinth/assets'
 import { computed } from 'vue'
 
 import AutoLink from '#ui/components/base/AutoLink.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
-import { Button, IconButton } from '#ui/components/base/buttons'
+import {
+	Button,
+	type ButtonMenuOption,
+	IconButton,
+	TeleportOverflowMenu,
+} from '#ui/components/base/buttons'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 
 import type { ManagedContentCardData } from '../../types'
@@ -19,6 +24,8 @@ const props = withDefaults(
 		showViewContent?: boolean
 		showSettings?: boolean
 		showPrimaryAction?: boolean
+		/** Extra actions behind a "more" button, such as unlinking. */
+		menuOptions?: ButtonMenuOption[]
 	}>(),
 	{
 		disabled: false,
@@ -26,6 +33,7 @@ const props = withDefaults(
 		showViewContent: false,
 		showSettings: false,
 		showPrimaryAction: false,
+		menuOptions: undefined,
 	},
 )
 
@@ -54,10 +62,16 @@ const messages = defineMessages({
 		id: 'content.managed-card.settings',
 		defaultMessage: 'Installation settings',
 	},
+	moreActions: {
+		id: 'content.managed-card.more-actions',
+		defaultMessage: 'More actions',
+	},
 })
 
-const title = computed(() =>
-	formatMessage(props.data.kind === 'modpack' ? messages.modpackContent : messages.sharedContent),
+const title = computed(
+	() =>
+		props.data.title ??
+		formatMessage(props.data.kind === 'modpack' ? messages.modpackContent : messages.sharedContent),
 )
 </script>
 
@@ -86,7 +100,7 @@ const title = computed(() =>
 			</div>
 
 			<div
-				v-if="showViewContent || showSettings"
+				v-if="showViewContent || showSettings || menuOptions?.length"
 				class="flex shrink-0 items-center gap-2 self-start"
 			>
 				<Button
@@ -109,6 +123,16 @@ const title = computed(() =>
 				>
 					<WrenchIcon aria-hidden="true" />
 				</IconButton>
+				<TeleportOverflowMenu
+					v-if="menuOptions?.length"
+					type="outlined"
+					size="lg"
+					:disabled="disabled"
+					:label="formatMessage(messages.moreActions)"
+					:options="menuOptions"
+				>
+					<MoreVerticalIcon aria-hidden="true" />
+				</TeleportOverflowMenu>
 			</div>
 		</div>
 

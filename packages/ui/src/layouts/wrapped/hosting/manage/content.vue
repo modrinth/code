@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { type Archon, type Labrinth, ModrinthApiError } from '@modrinth/api-client'
-import { ClipboardCopyIcon } from '@modrinth/assets'
+import { ClipboardCopyIcon, UnlinkIcon } from '@modrinth/assets'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+import type { ButtonMenuOption } from '#ui/components/base/buttons'
 import ReadyTransition from '#ui/components/base/ReadyTransition.vue'
 import UnknownFileWarningModal from '#ui/components/modal/UnknownFileWarningModal.vue'
 import type { UpdateAllSelection } from '#ui/components/modal/update-all-modal/update-all-modal-types'
@@ -13,6 +14,7 @@ import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { waitForServerContextRuntimeReady } from '#ui/composables/server-context-runtime'
 import { useServerPermissions } from '#ui/composables/server-permissions'
 import {
+	injectInstanceServerSource,
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
@@ -108,6 +110,34 @@ const messages = defineMessages({
 		id: 'hosting.content.failed-to-install',
 		defaultMessage: 'Failed to install content',
 	},
+	instanceContent: {
+		id: 'hosting.content.instance.content-header',
+		defaultMessage: 'Instance content',
+	},
+	updateFromInstance: {
+		id: 'hosting.content.instance.update',
+		defaultMessage: 'Update from instance',
+	},
+	failedToUpdateFromInstance: {
+		id: 'hosting.content.instance.update-failed',
+		defaultMessage: 'Could not update from the instance',
+	},
+	unlinkFromInstance: {
+		id: 'hosting.content.instance.unlink',
+		defaultMessage: 'Unlink from instance',
+	},
+	updateWaiting: {
+		id: 'hosting.content.instance.update-waiting',
+		defaultMessage: 'Update applies when the server stops',
+	},
+	updateFailed: {
+		id: 'hosting.content.instance.update-failed-status',
+		defaultMessage: 'Last update failed',
+	},
+	notInstalledClientOnly: {
+		id: 'hosting.content.instance.not-installed-client-only',
+		defaultMessage: 'Not installed (client only)',
+	},
 })
 
 const client = injectModrinthClient()
@@ -126,6 +156,8 @@ let resolveUnknownFileConfirmation: ((confirmed: boolean) => void) | null = null
 const skipUnknownFileWarningKey = 'hosting-skip-unknown-file-warning'
 const { addNotification } = injectNotificationManager()
 const { openServerSettings, browseServerContent } = injectServerSettingsModal()
+// Only the App can push an instance; elsewhere a linked server is shown but not updated.
+const instanceSource = injectInstanceServerSource(null)
 const { canSetup, permissionDeniedMessage } = useServerPermissions()
 const route = useRoute()
 const router = useRouter()
@@ -153,7 +185,16 @@ const contentQuery = useQuery({
 		client.archon.content_v1.getAddons(serverId, worldId.value!, { from_modpack: false }),
 	enabled: computed(() => worldId.value !== null),
 	staleTime: 30_000,
+	// A linked pack installs in the background, so keep reading until it settles.
+	refetchInterval: (query) => {
+		const state = query.state.data?.modpack?.state
+		return state === 'downloading' || state === 'applying' ? 2_000 : false
+	},
 })
+
+/** The App instance this server follows, when its linked pack is one. */
+const linkedInstanceId = computed(() => contentQuery.data.value?.modpack?.instance_id ?? null)
+const updatingFromInstance = ref(false)
 
 const isModpackContentModalOpen = ref(false)
 const modpackContentQuery = useQuery({
@@ -165,6 +206,16 @@ const modpackContentQuery = useQuery({
 	enabled: computed(() => worldId.value !== null && !!contentQuery.data.value?.modpack),
 	staleTime: 30_000,
 })
+
+// The pack's content changes whenever an update finishes applying.
+watch(
+	() => contentQuery.data.value?.modpack?.state,
+	(state, previous) => {
+		if (previous && state !== previous) {
+			void queryClient.invalidateQueries({ queryKey: modpackContentQueryKey.value })
+		}
+	},
+)
 
 const setupActionDisabled = computed(() => !canSetup.value || busyReasons.value.length > 0)
 const isInstallingContent = computed(
@@ -276,14 +327,29 @@ const managedContent = computed<ManagedContentData | null>(() => {
 	const title = isLocal
 		? (mp.title ?? mp.spec.name)
 		: (project?.title ?? mp.title ?? projectId ?? '')
+	const linkedInstance = !!mp.instance_id
 	return {
 		card: {
 			kind: 'modpack',
-			installing: isInstallingContent.value,
+			installing:
+				isInstallingContent.value || mp.state === 'downloading' || mp.state === 'applying',
+			title: linkedInstance ? title : undefined,
+			status:
+				mp.state === 'pending'
+					? formatMessage(messages.updateWaiting)
+					: mp.state === 'failed'
+						? (mp.error ?? formatMessage(messages.updateFailed))
+						: undefined,
+			primaryActionLabel:
+				linkedInstance && instanceSource ? formatMessage(messages.updateFromInstance) : undefined,
 			manager: {
 				name: title,
 				iconUrl: (isLocal ? mp.icon_url : (project?.icon_url ?? mp.icon_url)) ?? undefined,
-				link: projectId ? `/project/${project?.slug ?? projectId}` : undefined,
+				link: linkedInstance
+					? `/instance/${encodeURIComponent(mp.instance_id!)}`
+					: projectId
+						? `/project/${project?.slug ?? projectId}`
+						: undefined,
 			},
 			summary,
 			versionNumber: isLocal ? undefined : (mp.version_number ?? undefined),
@@ -293,10 +359,43 @@ const managedContent = computed<ManagedContentData | null>(() => {
 					: undefined,
 			updatedAt: isLocal ? undefined : (mp.date_published ?? undefined),
 		},
-		disabled: setupActionDisabled.value,
+		disabled: setupActionDisabled.value || updatingFromInstance.value,
 		disabledText: setupActionBusyMessage.value ?? formatMessage(commonMessages.installingLabel),
 	}
 })
+
+const managedContentMenuOptions = computed<ButtonMenuOption[]>(() =>
+	linkedInstanceId.value
+		? [
+				{
+					id: 'unlink',
+					label: formatMessage(messages.unlinkFromInstance),
+					icon: UnlinkIcon,
+					tone: 'red',
+					action: () => handleModpackUnlink(),
+				},
+			]
+		: [],
+)
+
+/** Exports the instance again and sends it to this server. A running server takes it on its next stop. */
+async function handleUpdateFromInstance() {
+	const instanceId = linkedInstanceId.value
+	if (!instanceId || !instanceSource || !worldId.value || updatingFromInstance.value) return
+	updatingFromInstance.value = true
+	try {
+		await instanceSource.pushInstance({ serverId, worldId: worldId.value, instanceId })
+		await contentQuery.refetch()
+	} catch (err) {
+		addNotification({
+			type: 'error',
+			title: formatMessage(messages.failedToUpdateFromInstance),
+			text: err instanceof Error ? err.message : undefined,
+		})
+	} finally {
+		updatingFromInstance.value = false
+	}
+}
 
 function friendlyAddonName(addon: Archon.Content.v1.Addon): string {
 	if (addon.name) return addon.name
@@ -824,7 +923,10 @@ function addonToContentItem(addon: AddonWithUiState): ContentItem {
 		},
 		version: {
 			id: addon.version?.id ?? addon.filename,
-			version_number: addon.version?.name ?? formatMessage(commonMessages.unknownLabel),
+			version_number:
+				addon.installed === false
+					? formatMessage(messages.notInstalledClientOnly)
+					: (addon.version?.name ?? formatMessage(commonMessages.unknownLabel)),
 			file_name: addon.filename,
 		},
 		owner: addon.owner
@@ -1030,6 +1132,7 @@ async function handleSwitchVersion(item: ContentItem) {
 
 async function handleModpackUpdate() {
 	if (setupActionDisabled.value) return
+	if (linkedInstanceId.value) return handleUpdateFromInstance()
 	const mp = contentQuery.data.value?.modpack
 	if (!mp || mp.spec.platform !== 'modrinth') return
 
@@ -1231,6 +1334,7 @@ provideContentManager({
 	runManagedContentPrimaryAction: handleModpackUpdate,
 	viewManagedContent: handleViewModpackContent,
 	unlinkModpack: handleModpackUnlink,
+	managedContentMenuOptions,
 	openManagedContentSettings: () => openServerSettings({ tabId: 'installation' }),
 	switchVersion: handleSwitchVersion,
 	getOverflowOptions,
@@ -1282,8 +1386,10 @@ provideContentManager({
 					ref="modpackContentModal"
 					:source-name="managedContent?.card.manager.name"
 					:source-icon-url="managedContent?.card.manager.iconUrl"
-					:header="formatMessage(messages.modpackContent)"
-					enable-toggle
+					:header="
+						formatMessage(linkedInstanceId ? messages.instanceContent : messages.modpackContent)
+					"
+					:enable-toggle="!linkedInstanceId"
 					show-environment-warnings
 					:action-disabled="contentActionDisabled"
 					:action-disabled-tooltip="contentActionBusyMessage ?? undefined"

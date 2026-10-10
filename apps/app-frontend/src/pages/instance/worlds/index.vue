@@ -19,8 +19,13 @@
 		@confirm="proceedRemoveWorld"
 	/>
 	<DesyncServerModal ref="desyncServerModal" @confirm="confirmDesyncServer" />
+	<CreateServerFromInstanceModal
+		v-if="canCreateServer"
+		ref="createServerModal"
+		:instance="instance"
+	/>
 	<ReadyTransition :pending="worldsReadyPending">
-		<div v-if="dedupedWorlds.length > 0" class="flex flex-col gap-2">
+		<div v-if="dedupedWorlds.length > 0 || linkedServers.length > 0" class="flex flex-col gap-2">
 			<div class="flex flex-wrap items-center gap-2">
 				<Input
 					v-model="searchFilter"
@@ -36,11 +41,30 @@
 					"
 				/>
 				<div class="flex gap-2">
-					<Button type="outlined" size="lg" @click="addServerModal?.show()">
+					<InstancePushButtons :instance="instance" @published="instancePage.refreshInstance" />
+					<TeleportOverflowMenu
+						v-if="canCreateServer"
+						type="outlined"
+						size="lg"
+						:icon-only="false"
+						:circular="false"
+						:label="formatMessage(messages.addServer)"
+						:options="addServerOptions"
+					>
+						<PlusIcon class="size-5" />
+						{{ formatMessage(messages.addServer) }}
+						<DropdownIcon class="size-5" />
+					</TeleportOverflowMenu>
+					<Button v-else type="outlined" size="lg" @click="addServerModal?.show()">
 						<PlusIcon class="size-5" />
 						{{ formatMessage(messages.addServer) }}
 					</Button>
-					<Button type="colored" color="brand" size="lg" @click="instancePage.browseServers">
+					<Button
+						:type="linkedServers.length > 0 ? 'outlined' : 'colored'"
+						:color="linkedServers.length > 0 ? undefined : 'brand'"
+						size="lg"
+						@click="instancePage.browseServers"
+					>
 						<CompassIcon class="size-5" />
 						<span>{{ formatMessage(messages.browseServers) }}</span>
 					</Button>
@@ -69,6 +93,13 @@
 				</Button>
 			</div>
 			<div class="mt-2 flex w-full flex-col gap-2">
+				<LinkedServerItem
+					v-for="server in filteredLinkedServers"
+					:key="`linked-${server.server_id}`"
+					:server="server"
+					:play-disabled="instance.quarantined || playing || startingInstance"
+					@play="() => joinLinkedServer(server)"
+				/>
 				<WorldItem
 					v-for="world in filteredWorlds"
 					:key="`world-${world.type}-${world.type == 'singleplayer' ? world.path : `${world.address}-${world.index}`}`"
@@ -113,7 +144,20 @@
 			:description="formatMessage(messages.noWorldsDescription)"
 		>
 			<template #actions>
-				<Button type="outlined" size="lg" @click="addServerModal?.show()">
+				<TeleportOverflowMenu
+					v-if="canCreateServer"
+					type="outlined"
+					size="lg"
+					:icon-only="false"
+					:circular="false"
+					:label="formatMessage(messages.addServer)"
+					:options="addServerOptions"
+				>
+					<PlusIcon class="size-5" />
+					{{ formatMessage(messages.addServer) }}
+					<DropdownIcon class="size-5" />
+				</TeleportOverflowMenu>
+				<Button v-else type="outlined" size="lg" @click="addServerModal?.show()">
 					<PlusIcon class="size-5" />
 					{{ formatMessage(messages.addServer) }}
 				</Button>
@@ -126,8 +170,16 @@
 	</ReadyTransition>
 </template>
 <script setup lang="ts">
-import { CompassIcon, PlusIcon, RefreshCwIcon, SearchIcon } from '@modrinth/assets'
-import { Button } from '@modrinth/ui'
+import {
+	CompassIcon,
+	DropdownIcon,
+	GlobeIcon,
+	PlusIcon,
+	RefreshCwIcon,
+	SearchIcon,
+	ServerPlusIcon,
+} from '@modrinth/assets'
+import { Button, type ButtonMenuOption, TeleportOverflowMenu } from '@modrinth/ui'
 import {
 	commonMessages,
 	defineMessages,
@@ -146,6 +198,9 @@ import { platform } from '@tauri-apps/plugin-os'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
+import CreateServerFromInstanceModal from '@/components/ui/linked-servers/CreateServerFromInstanceModal.vue'
+import InstancePushButtons from '@/components/ui/linked-servers/InstancePushButtons.vue'
+import LinkedServerItem from '@/components/ui/linked-servers/LinkedServerItem.vue'
 import AddServerModal from '@/components/ui/world/modal/AddServerModal.vue'
 import ConfirmRemoveWorldModal from '@/components/ui/world/modal/ConfirmRemoveWorldModal.vue'
 import DesyncServerModal from '@/components/ui/world/modal/DesyncServerModal.vue'
@@ -154,9 +209,11 @@ import EditWorldModal from '@/components/ui/world/modal/EditSingleplayerWorldMod
 import WorldItem from '@/components/ui/world/WorldItem.vue'
 import { useAppEvent } from '@/composables/use-app-event'
 import { handleSevereError } from '@/composables/use-error.js'
+import { config } from '@/config'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project, get_project_v3 } from '@/helpers/cache.js'
 import { set_synced_option } from '@/helpers/instance'
+import { type LinkedServer, serverAddress, useLinkedServers } from '@/helpers/linked-servers'
 import { get_game_versions } from '@/helpers/tags'
 import {
 	delete_world,
@@ -199,6 +256,14 @@ const messages = defineMessages({
 	addServer: {
 		id: 'app.instance.worlds.add-server',
 		defaultMessage: 'Add server',
+	},
+	addByAddress: {
+		id: 'app.instance.worlds.add-by-address',
+		defaultMessage: 'Add by address',
+	},
+	createServer: {
+		id: 'app.instance.worlds.create-server',
+		defaultMessage: 'Create server',
 	},
 	browseServers: {
 		id: 'app.instance.worlds.browse-servers',
@@ -245,6 +310,7 @@ const editServerModal = ref<InstanceType<typeof EditServerModal>>()
 const editWorldModal = ref<InstanceType<typeof EditWorldModal>>()
 const removeWorldModal = ref<InstanceType<typeof ConfirmRemoveWorldModal>>()
 const desyncServerModal = ref<InstanceType<typeof DesyncServerModal>>()
+const createServerModal = ref<InstanceType<typeof CreateServerFromInstanceModal>>()
 
 const worldToRemove = ref<World | null>(null)
 
@@ -258,6 +324,34 @@ function play() {
 
 const selectedFilters = ref<string[]>([])
 const searchFilter = ref('')
+
+// Servers are created on the Core this App is connected to, which only its owner can reach.
+const canCreateServer = computed(
+	() =>
+		Boolean(config.coreUrl) &&
+		!instance.value.quarantined &&
+		instance.value.install_stage === 'installed',
+)
+const { servers: linkedServers } = useLinkedServers(() => instance.value.id)
+const filteredLinkedServers = computed(() =>
+	linkedServers.value.filter(
+		(server) => !searchFilter.value || worldNameMatchesQuery(server.name, searchFilter.value),
+	),
+)
+const addServerOptions = computed<ButtonMenuOption[]>(() => [
+	{
+		id: 'add-by-address',
+		label: formatMessage(messages.addByAddress),
+		icon: GlobeIcon,
+		action: () => addServerModal.value?.show(),
+	},
+	{
+		id: 'create-server',
+		label: formatMessage(messages.createServer),
+		icon: ServerPlusIcon,
+		action: () => void createServerModal.value?.show(),
+	},
+])
 
 function updateFilters(filters: string[]) {
 	const addedFilter = filters.find((id) => !selectedFilters.value.includes(id))
@@ -578,6 +672,14 @@ watch(
 		}
 	},
 )
+
+async function joinLinkedServer(server: LinkedServer) {
+	if (instance.value.quarantined) return
+	startingInstance.value = true
+	await start_join_server(instance.value.id, serverAddress(server)).catch(handleJoinError)
+	play()
+	startingInstance.value = false
+}
 
 function worldsMatch(world: World, other: World | undefined) {
 	if (world.type === 'server' && other?.type === 'server') {

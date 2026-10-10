@@ -1110,6 +1110,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 					:show-view-content="!!ctx.viewManagedContent"
 					:show-settings="!!ctx.openManagedContentSettings"
 					:show-primary-action="!!ctx.runManagedContentPrimaryAction"
+					:menu-options="ctx.managedContentMenuOptions?.value"
 					@view-content="ctx.viewManagedContent?.()"
 					@settings="ctx.openManagedContentSettings?.()"
 					@primary-action="ctx.runManagedContentPrimaryAction?.($event)"

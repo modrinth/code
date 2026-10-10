@@ -95,9 +95,10 @@ const timestampTooltip = computed(() =>
 const showAction = computed(
 	() =>
 		props.showPrimaryAction &&
-		(props.data.kind === 'modpack'
-			? !!props.data.versionNumber
-			: props.data.updateAvailable || props.disabled),
+		(!!props.data.primaryActionLabel ||
+			(props.data.kind === 'modpack'
+				? !!props.data.versionNumber
+				: props.data.updateAvailable || props.disabled)),
 )
 </script>
 
@@ -147,6 +148,11 @@ const showAction = computed(
 				</AutoLink>
 			</template>
 
+			<template v-if="data.status">
+				<BulletDivider class="!mx-0" />
+				<span class="whitespace-nowrap">{{ data.status }}</span>
+			</template>
+
 			<template v-if="timestampLabel">
 				<BulletDivider class="!mx-0" />
 				<div
@@ -175,9 +181,10 @@ const showAction = computed(
 				{{
 					disabled
 						? (disabledText ?? formatMessage(messages.updating))
-						: data.kind === 'modpack'
-							? formatMessage(messages.switchVersion)
-							: formatMessage(messages.updateAvailable)
+						: (data.primaryActionLabel ??
+							(data.kind === 'modpack'
+								? formatMessage(messages.switchVersion)
+								: formatMessage(messages.updateAvailable)))
 				}}
 			</span>
 		</Button>
