@@ -64,7 +64,15 @@ impl ContentStore {
                 "Cached content matches SHA-512 but differs from the declared size; using its actual size"
             );
         }
-        catalog::mark_file_used(&self.pool, &stored_file.sha512).await?;
+        // Every content sync looks up every file, so refresh at most every
+        // 30s. Cleanup's 60s grace on last_used_at still covers the gap.
+        if chrono::Utc::now()
+            .timestamp()
+            .saturating_sub(stored_file.last_used_at)
+            >= 30
+        {
+            catalog::mark_file_used(&self.pool, &stored_file.sha512).await?;
+        }
         Ok(Some(StoredFileHandle {
             path: self.path(&stored_file)?,
             metadata: stored_file,
