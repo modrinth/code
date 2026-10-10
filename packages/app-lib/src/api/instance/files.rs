@@ -103,6 +103,12 @@ pub async fn list_instance_files(
     let mut output = Vec::new();
     while let Some(entry) = entries.next_entry().await? {
         let name = entry.file_name().to_string_lossy().into_owned();
+
+        // exclude macOS .DS_Store files
+        if name == ".DS_Store" {
+            continue;
+        }
+
         let relative = if normalized(path).is_empty() {
             name.clone()
         } else {
