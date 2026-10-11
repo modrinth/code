@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { CheckIcon, RadioButtonIcon } from '@modrinth/assets'
+import { CheckIcon, RadioButtonIcon, XIcon } from '@modrinth/assets'
 import { Accordion, defineMessages, useVIntl } from '@modrinth/ui'
+import { useStorage } from '@vueuse/core'
 import { computed, onUnmounted, ref } from 'vue'
 
 import { injectOnboardingChecklist } from '@/providers/onboarding-checklist'
@@ -19,6 +20,8 @@ const {
 	isReady,
 	showChecklist,
 } = injectOnboardingChecklist()
+// Dismissing is local to this install; the checklist itself still completes in the background.
+const dismissed = useStorage('onboarding-checklist-dismissed', false)
 const collapsedCornersVisible = ref(false)
 let collapseTimer: ReturnType<typeof setTimeout> | undefined
 
@@ -26,6 +29,10 @@ const messages = defineMessages({
 	title: {
 		id: 'onboarding-checklist.title',
 		defaultMessage: 'Getting started',
+	},
+	dismiss: {
+		id: 'onboarding-checklist.dismiss',
+		defaultMessage: 'Dismiss',
 	},
 	createInstance: {
 		id: 'onboarding-checklist.create-instance',
@@ -84,8 +91,8 @@ onUnmounted(() => clearTimeout(collapseTimer))
 
 <template>
 	<div
-		v-if="isReady && showChecklist"
-		class="border-0 border-b-[1px] border-solid border-[--brand-gradient-border] px-3 p-4"
+		v-if="isReady && showChecklist && !dismissed"
+		class="relative border-0 border-b-[1px] border-solid border-[--brand-gradient-border] px-3 p-4"
 	>
 		<Accordion
 			open-by-default
@@ -126,5 +133,14 @@ onUnmounted(() => clearTimeout(collapseTimer))
 				</span>
 			</button>
 		</Accordion>
+		<button
+			v-tooltip="formatMessage(messages.dismiss)"
+			type="button"
+			class="absolute right-[3.25rem] top-[1.8125rem] flex size-6 cursor-pointer items-center justify-center rounded-md border-none bg-transparent p-0 text-secondary hover:text-contrast"
+			:aria-label="formatMessage(messages.dismiss)"
+			@click="dismissed = true"
+		>
+			<XIcon class="size-4" />
+		</button>
 	</div>
 </template>

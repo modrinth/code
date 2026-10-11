@@ -131,21 +131,6 @@
 	"app.action-bar.view-logs": {
 		"message": "View logs"
 	},
-	"app.ads-consent.accept": {
-		"message": "Accept all"
-	},
-	"app.ads-consent.body": {
-		"message": "Ads make Modrinth possible and fund creator payouts. Our partners may store or access cookies in the app to personalize ads and measure performance."
-	},
-	"app.ads-consent.manage": {
-		"message": "Manage preferences"
-	},
-	"app.ads-consent.reject": {
-		"message": "Reject all"
-	},
-	"app.ads-consent.title": {
-		"message": "Your privacy and how ads support Modrinth"
-	},
 	"app.appearance-settings.compact-mode.description": {
 		"message": "Display library instances in a compact row layout."
 	},
@@ -1391,9 +1376,6 @@
 	"app.nav.switch-account": {
 		"message": "Switch account"
 	},
-	"app.nav.upgrade-to-modrinth-plus": {
-		"message": "Upgrade to Modrinth+"
-	},
 	"app.nav.view-profile": {
 		"message": "View profile"
 	},
@@ -1409,8 +1391,8 @@
 	"app.navigation.next-image": {
 		"message": "Next image"
 	},
-	"app.news.title": {
-		"message": "News"
+	"app.news.modrinth-title": {
+		"message": "Modrinth news"
 	},
 	"app.news.view-all": {
 		"message": "View all news"
@@ -2746,9 +2728,6 @@
 	},
 	"app.settings.operating-system.macos": {
 		"message": "macOS"
-	},
-	"app.settings.privacy.ads-consent.intro": {
-		"message": "Ads make Modrinth possible and fund creator payouts. Our partners may store or access cookies in the app to personalize ads and measure performance. You can opt out or manage your preferences below."
 	},
 	"app.settings.privacy.discord-rich-presence.description": {
 		"message": "Show Modrinth App as your current activity on Discord. This does not affect Rich Presence added to instances by mods. Requires an app restart."
@@ -4546,6 +4525,9 @@
 	},
 	"onboarding-checklist.create-instance": {
 		"message": "Create first instance"
+	},
+	"onboarding-checklist.dismiss": {
+		"message": "Dismiss"
 	},
 	"onboarding-checklist.login-minecraft": {
 		"message": "Sign in to Minecraft"

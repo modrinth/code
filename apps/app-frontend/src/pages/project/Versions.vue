@@ -18,7 +18,7 @@
 								: formatMessage(messages.alreadyInstalled)
 					"
 					type="quiet"
-					:color="installed && version.id === installedVersion ? undefined : 'green'"
+					:color="installed && version.id === installedVersion ? undefined : 'brand'"
 					:label="
 						!installed
 							? formatMessage(commonMessages.installButton)

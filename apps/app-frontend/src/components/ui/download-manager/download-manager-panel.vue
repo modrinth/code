@@ -4,7 +4,6 @@ import {
 	Button,
 	Collapsible,
 	defineMessages,
-	injectPageContext,
 	useFormatNumber,
 	useScrollIndicator,
 	useVIntl,
@@ -32,7 +31,6 @@ defineEmits<{
 }>()
 
 const { formatMessage } = useVIntl()
-const { showAds } = injectPageContext()
 const formatNumber = useFormatNumber()
 const messages = defineMessages({
 	tasks: { id: 'app.download-manager.tasks', defaultMessage: 'Tasks' },
@@ -107,7 +105,7 @@ defineExpose({ focus: () => panel.value?.focus() })
 				ref="scroll-container"
 				class="min-h-0 overflow-y-auto overscroll-contain"
 				:style="{
-					maxHeight: `min(32rem, max(0px, calc(100dvh - 8rem - ${showAds ? 250 : 0}px)))`,
+					maxHeight: `min(32rem, max(0px, calc(100dvh - 8rem)))`,
 				}"
 			>
 				<div ref="scroll-content" class="flex flex-col gap-4 p-2.5">

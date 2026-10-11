@@ -11,6 +11,13 @@
 					aria-hidden="true"
 				/>
 			</Transition>
+			<div
+				v-if="showingEmptyState && emptyStateType"
+				class="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 text-secondary opacity-50"
+			>
+				<TerminalSquareIcon class="size-12" aria-hidden="true" />
+				<span class="font-medium">{{ EMPTY_STATE_MESSAGES[emptyStateType] }}</span>
+			</div>
 			<div v-if="!isAtBottom" class="absolute bottom-4 right-4 z-10">
 				<IconButton size="xl" label="Scroll to bottom" class="!shadow-2xl" @click="scrollToBottom">
 					<ChevronDownIcon />
@@ -68,30 +75,10 @@ const props = withDefaults(
 	},
 )
 
-const FROG = [
-	'\x1B[32m     _    _ \x1B[37m',
-	'\x1B[32m    (o)--(o)      \x1B[37m',
-	'\x1B[32m   /.______.\\\x1B[37m',
-	'\x1B[32m   \\________/     \x1B[37m',
-	'\x1B[32m  ./        \\.    \x1B[37m',
-	'\x1B[32m ( .        , )\x1B[37m',
-	'\x1B[32m  \\ \\_\\\\ //_/ /\x1B[37m',
-	'\x1B[32m   ~~  ~~  ~~\x1B[37m',
-]
-
-const EMPTY_STATE_BUBBLES: Record<string, string[]> = {
-	server: [
-		'   __________________________________________________',
-		' /  Welcome to your \x1B[32mModrinth Server\x1B[37m!                  \\',
-		'|   Press the green start button to start your server! |',
-		' \\____________________________________________________/',
-	],
-	instance: [
-		'   _____________________________________________________________',
-		' /  Start your instance in the top right to start               \\',
-		'|   receiving live logs!                                        |',
-		' \\_____________________________________________________________/',
-	],
+// Shown dimmed over the blank terminal while there is nothing to print yet.
+const EMPTY_STATE_MESSAGES = {
+	server: 'Start the server to see its console',
+	instance: 'Start the instance to see live logs',
 }
 
 const emit = defineEmits<{
@@ -132,12 +119,6 @@ const {
 function writeEmptyState() {
 	if (!terminal.value || !props.emptyStateType) return
 	terminal.value.reset()
-	const bubble = EMPTY_STATE_BUBBLES[props.emptyStateType]
-	if (bubble) {
-		for (const line of [...bubble, ...FROG]) {
-			terminal.value.writeln(line)
-		}
-	}
 	showingEmptyState.value = true
 }
 

@@ -21,11 +21,6 @@ mod thumbnails;
 pub mod users;
 pub mod utils;
 
-pub mod ads;
-#[cfg(target_os = "macos")]
-mod ads_occlusion_macos;
-#[cfg(windows)]
-mod ads_occlusion_windows;
 pub mod cache;
 pub mod files;
 pub mod friends;
