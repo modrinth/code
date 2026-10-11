@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type Archon, ModrinthApiError } from '@modrinth/api-client'
+import type { Archon } from '@modrinth/api-client'
 import { PlusIcon, SearchIcon, SettingsIcon, UpdatedIcon } from '@modrinth/assets'
 import {
 	Button,
@@ -38,25 +38,16 @@ const servers = computed(() =>
 	),
 )
 
-// Never show the raw error. A Core answers 403 to anyone but its owner; anything else means
-// it could not be reached.
-const problem = computed(() => {
-	if (!error.value) return null
-	if (error.value instanceof ModrinthApiError && error.value.statusCode === 403) {
-		return {
-			type: 'error' as const,
-			heading: 'This Core belongs to someone else',
-			description: 'Only the owner of a Core can see and manage its servers.',
-			retry: false,
-		}
-	}
-	return {
-		type: 'no-connection' as const,
-		heading: 'Your Core is offline',
-		description: 'Start your Core, or check its connection, then try again.',
-		retry: true,
-	}
-})
+// Never show the raw error: whatever went wrong, the Core could not be used.
+const problem = computed(() =>
+	error.value
+		? {
+				type: 'no-connection' as const,
+				heading: 'Your Core is offline',
+				description: 'Start your Core, or check its connection, then try again.',
+			}
+		: null,
+)
 
 async function searchModpacks(query: string, limit: number = 10) {
 	return client.labrinth.projects_v2.search({
@@ -211,9 +202,7 @@ async function browseModpacks() {
 				:description="problem.description"
 			>
 				<template #actions>
-					<Button v-if="problem.retry" :disabled="isFetching" @click="refetch()">
-						<UpdatedIcon /> Try again
-					</Button>
+					<Button :disabled="isFetching" @click="refetch()"> <UpdatedIcon /> Try again </Button>
 					<Button @click="openCoreSettings"><SettingsIcon /> Core settings</Button>
 				</template>
 			</EmptyState>
