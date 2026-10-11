@@ -57,22 +57,28 @@ async function show() {
 	ctx.modal.value?.setStage('final-config')
 }
 
+/**
+ * The server exists as soon as the Core makes it, linked to the instance. If the upload then
+ * fails the server stays, and the instance shows a banner to push again.
+ */
 async function create(ctx: CreationFlowContextValue) {
-	let serverId: string | undefined
+	const instance = { id: props.instance.id, name: props.instance.name }
 	try {
-		const pack = await exportInstancePack(props.instance.id)
-		serverId = (await client.archon.servers_v1.createLocal(props.instance.name)).id
-		await pushPackToServer(pack, { id: props.instance.id, name: props.instance.name }, serverId, {
-			properties: ctx.buildProperties(),
-		})
+		const { id } = await client.archon.servers_v1.createLocal(instance.name, instance)
 		flow.value?.hide()
+		await queryClient.invalidateQueries({ queryKey: serversQueryKey })
+		try {
+			const pack = await exportInstancePack(instance.id)
+			await pushPackToServer(pack, instance, id, { properties: ctx.buildProperties() })
+		} catch (error) {
+			console.error('Failed to upload the instance to its new server', error)
+		}
 	} catch (error) {
-		// Do not leave an empty server behind when the instance never reached it.
-		if (serverId) await client.archon.servers_v1.deleteLocal(serverId).catch(() => {})
+		console.error('Failed to create server', error)
 		addNotification({
 			type: 'error',
 			title: formatMessage(messages.failedTitle),
-			text: error instanceof Error ? error.message : String(error),
+			text: formatMessage(messages.failedText),
 		})
 	} finally {
 		ctx.loading.value = false
@@ -84,6 +90,10 @@ const messages = defineMessages({
 	failedTitle: {
 		id: 'instance.linked-servers.create.failed-title',
 		defaultMessage: 'Could not create the server',
+	},
+	failedText: {
+		id: 'instance.linked-servers.create.failed-text',
+		defaultMessage: 'Check that your Core is running, then try again.',
 	},
 })
 

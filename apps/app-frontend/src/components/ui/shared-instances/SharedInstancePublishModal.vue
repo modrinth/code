@@ -10,7 +10,9 @@
 		"
 		:confirm-icon="UploadIcon"
 		:secondary-confirm-label="hasServers ? formatMessage(messages.publishButton) : undefined"
-		:confirm-disabled="publishDiffs.length === 0 && selectedConfigPaths.length === 0"
+		:confirm-disabled="
+			publishDiffs.length === 0 && selectedConfigPaths.length === 0 && !serverFailed
+		"
 		:added-label="formatMessage(messages.addedLabel)"
 		:removed-label="formatMessage(messages.removedLabel)"
 		@confirm="publishChanges(hasServers)"
@@ -96,6 +98,10 @@ const includedConfigPaths = ref<string[]>([])
 const excludedConfigPaths = ref<string[]>([])
 const state = ref<SharedInstancePublishState>('idle')
 const hasServers = computed(() => (props.servers?.length ?? 0) > 0)
+// A server that failed to take the instance can always be pushed to again.
+const serverFailed = computed(
+	() => props.servers?.some((server) => server.linked_instance.state === 'failed') ?? false,
+)
 const sharesWithFriends = computed(() => props.instance.shared_instance?.role === 'owner')
 // Whether the changes on screen are ones friends have not received yet.
 const friendsBehind = ref(false)

@@ -395,6 +395,18 @@ async fn create_server(
         updated_at: now,
     };
     state.instance_store.create(&r).await?;
+    if let Some(instance) = body.instance {
+        server_source_service::link_awaiting_upload(
+            &state,
+            &id.to_string(),
+            ServerSource::Instance {
+                instance_id: instance.id,
+                name: instance.name,
+            },
+        )
+        .await
+        .map_err(|e| ApiError::Internal(e.to_string()))?;
+    }
     state
         .broadcaster
         .send(Event::InstanceCreated { instance: r });

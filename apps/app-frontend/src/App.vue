@@ -199,6 +199,7 @@ import { appMessages } from '@/utils/app-messages'
 import { AppNotificationManager } from './providers/app-notifications'
 import { AppPopupNotificationManager } from './providers/app-popup-notifications'
 import {
+	appSettingsModalOpenCoresKey,
 	appSettingsModalOpenProfileKey,
 	appSettingsModalOpenSyncedOptionsKey,
 } from './providers/app-settings-modal'
@@ -1183,6 +1184,7 @@ function showSyncInstancesUpdateNotification() {
 
 provide(appSettingsModalOpenProfileKey, () => appSettingsModal.value?.showProfile())
 provide(appSettingsModalOpenSyncedOptionsKey, () => appSettingsModal.value?.showSyncedOptions())
+provide(appSettingsModalOpenCoresKey, () => appSettingsModal.value?.showCores())
 
 watch(
 	() => appSettings.getFeatureFlag('show_sync_instances_update_modal'),

@@ -25,6 +25,14 @@ pub struct CreateServer {
     pub name: String,
     pub port: Option<u16>,
     pub memory_mb: Option<u32>,
+    /// The App instance this server is created from. Its pack is uploaded afterwards.
+    pub instance: Option<LinkedInstanceRef>,
+}
+
+#[derive(Deserialize)]
+pub struct LinkedInstanceRef {
+    pub id: String,
+    pub name: String,
 }
 
 #[derive(Deserialize)]

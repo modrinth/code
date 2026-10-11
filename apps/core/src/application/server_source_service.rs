@@ -135,6 +135,28 @@ pub async fn link(
     status.ok_or(SourceError::NotLinked)
 }
 
+/// Link a new server to an instance before the instance's pack has arrived, so the server shows
+/// as linked from the moment it exists. It stays failed, with nothing to apply, until the App
+/// uploads the pack with [`link_mrpack`].
+pub async fn link_awaiting_upload(
+    state: &Arc<AppState>,
+    instance_id: &str,
+    source: ServerSource,
+) -> Result<(), SourceError> {
+    sqlx::query("INSERT INTO server_sources (instance_id, source_json, desired_version, state, error, updated_at) VALUES (?, ?, '', ?, ?, ?)")
+        .bind(instance_id)
+        .bind(serde_json::to_string(&source).map_err(|e| SourceError::Invalid(e.to_string()))?)
+        .bind(SourceApplyState::Failed.as_str())
+        .bind(AWAITING_UPLOAD)
+        .bind(now())
+        .execute(&state.pool)
+        .await?;
+    Ok(())
+}
+
+const AWAITING_UPLOAD: &str =
+    "The instance has not reached this server yet. Push an update from the instance.";
+
 /// Unlink a server. Inherited files stay on disk and become server content.
 pub async fn unlink(
     state: &Arc<AppState>,
@@ -190,7 +212,9 @@ pub async fn apply_now(
     let row = load_row(state, instance_id)
         .await?
         .ok_or(SourceError::NotLinked)?;
-    if row.installed_version.as_deref() == Some(row.desired_version.as_str())
+    // An empty desired version is a server still waiting for its first upload: nothing to retry.
+    if row.desired_version.is_empty()
+        || row.installed_version.as_deref() == Some(row.desired_version.as_str())
     {
         return row.status();
     }

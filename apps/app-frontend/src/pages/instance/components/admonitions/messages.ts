@@ -5,6 +5,15 @@ export const instanceAdmonitionsMessages = defineMessages({
 		id: 'app.instance.admonitions.shared-instance.changes-header',
 		defaultMessage: "Your changes haven't been shared yet",
 	},
+	linkedServerFailedHeader: {
+		id: 'app.instance.admonitions.linked-server.failed-header',
+		defaultMessage: "Your server didn't get this instance",
+	},
+	linkedServerFailedBody: {
+		id: 'app.instance.admonitions.linked-server.failed-body',
+		defaultMessage:
+			'{count, plural, one {{name} could not be updated} other {# servers could not be updated}} from this instance. Push the update to try again.',
+	},
 	sharedInstanceChangesBody: {
 		id: 'app.instance.admonitions.shared-instance.changes-body',
 		defaultMessage: "Your local instance is ahead of the users you've shared it with.",

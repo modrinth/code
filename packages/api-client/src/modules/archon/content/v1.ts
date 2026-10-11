@@ -254,7 +254,8 @@ export class ArchonContentV1Module extends AbstractModule {
 		serverId: string,
 		worldId: string,
 		pack: File | Blob,
-		instance: { id: string; name: string },
+		/** `null` uploads a plain modpack file that is not linked to an instance. */
+		instance: { id: string; name: string } | null,
 		options?: {
 			/** World settings, used when the upload creates the server. */
 			properties?: Archon.Content.v1.PropertiesFields
@@ -262,9 +263,9 @@ export class ArchonContentV1Module extends AbstractModule {
 		},
 	): UploadHandle<void> {
 		const formData = new FormData()
-		formData.append('file', pack, 'instance.mrpack')
+		formData.append('file', pack, instance ? 'instance.mrpack' : 'modpack.mrpack')
 		formData.append('properties', JSON.stringify(options?.properties ?? {}))
-		formData.append('instance', JSON.stringify(instance))
+		if (instance) formData.append('instance', JSON.stringify(instance))
 
 		return this.client.upload<void>(`/worlds/${worldId}/content/upload-modpack-file`, {
 			api: 'archon',

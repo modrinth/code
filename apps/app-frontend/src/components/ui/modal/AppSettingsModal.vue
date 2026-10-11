@@ -268,7 +268,12 @@ function showSyncedOptions(): void {
 	modal.value?.show()
 }
 
-defineExpose({ show, showProfile, showFeatureFlags, showSyncedOptions })
+// The Cores tab does not exist yet. Until it does this opens settings; select the tab here later.
+function showCores(): void {
+	modal.value?.show()
+}
+
+defineExpose({ show, showProfile, showFeatureFlags, showSyncedOptions, showCores })
 
 const { progress, version: downloadingVersion } = injectAppUpdateDownloadProgress()
 
