@@ -5,7 +5,6 @@ import { invoke } from '@tauri-apps/api/core'
 import { join, tempDir } from '@tauri-apps/api/path'
 import { computed, type MaybeRefOrGetter, ref, toValue, watch } from 'vue'
 
-import { config } from '@/config'
 import { apiClient } from '@/services/api-client'
 
 import { export_instance_mrpack, get_content_items } from './instance'
@@ -29,7 +28,7 @@ export function fetchServers(client: AbstractModrinthClient = apiClient) {
 const serversQueryOptions = {
 	queryKey: serversQueryKey,
 	queryFn: () => fetchServers(),
-	enabled: () => Boolean(config.coreUrl),
+	enabled: () => apiClient.selfHostedHosting,
 	staleTime: 5_000,
 	refetchInterval: 5_000,
 	retry: false,

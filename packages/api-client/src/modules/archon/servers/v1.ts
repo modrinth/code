@@ -6,9 +6,9 @@ export class ArchonServersV1Module extends AbstractModule {
 		return 'archon_servers_v1'
 	}
 
-	/** Deletes a server on the local Core with its world, files, and backups. */
+	/** Deletes a server on its Core, with its world, files, and backups. */
 	public async deleteLocal(serverId: string): Promise<void> {
-		if (!this.client.selfHostedHosting) throw new Error('Local Core hosting is not configured')
+		if (!this.client.selfHostedHosting) throw new Error('Self-hosted hosting is not configured')
 		await this.client.request<void>(`/servers/${serverId}`, {
 			api: 'archon',
 			version: 'local',

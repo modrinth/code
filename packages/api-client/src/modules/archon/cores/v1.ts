@@ -171,13 +171,20 @@ export class ArchonCoresV1Module extends AbstractModule {
 		return merged
 	}
 
-	/** Create an unconfigured server on a Core, before the existing onboarding flow. */
-	public async createServer(name: string, core: Archon.Cores.v1.Core): Promise<{ id: string }> {
+	/**
+	 * Create an unconfigured server on a Core. Pass `instance` when it is created from an App
+	 * instance: the server is linked right away and waits for the instance to be uploaded.
+	 */
+	public async createServer(
+		name: string,
+		core: Archon.Cores.v1.Core,
+		instance?: { id: string; name: string },
+	): Promise<{ id: string }> {
 		const server = await this.client.request<{ id: string }>('/servers', {
 			api: `${core.address}/hosting`,
 			version: 'local',
 			method: 'POST',
-			body: { name },
+			body: { name, instance },
 		})
 		this.serverAddresses.set(server.id, core.address)
 		return server

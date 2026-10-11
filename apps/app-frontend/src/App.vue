@@ -80,6 +80,7 @@ import MinecraftAuthErrorModal from '@/components/ui/minecraft-auth-error-modal/
 import MinecraftRequiredModal from '@/components/ui/minecraft-required-modal/MinecraftRequiredModal.vue'
 import PairCoreModal from '@/components/ui/cores/PairCoreModal.vue'
 import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
+import { useCores } from '@/composables/use-cores'
 import { useCoreWatch } from '@/helpers/linked-servers'
 import InstallToPlayModal from '@/components/ui/modal/InstallToPlayModal.vue'
 import ModpackAlreadyInstalledModal from '@/components/ui/modal/ModpackAlreadyInstalledModal.vue'
@@ -322,6 +323,8 @@ let adsConsentPopupId = null
 useAppEvent('ads_consent_required', handleAdsConsentRequired, appEvents)
 
 provideModrinthClient(tauriApiClient)
+// Both are known before the Servers page opens, so it never has to wait or flash.
+useCores()
 useCoreWatch()
 
 const { data: authenticatedModrinthUser } = useQuery({

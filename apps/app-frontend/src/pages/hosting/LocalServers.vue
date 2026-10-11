@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
-import { PlusIcon, SearchIcon, SettingsIcon, UpdatedIcon } from '@modrinth/assets'
+import { LinkIcon, PlusIcon, SearchIcon, SettingsIcon, UpdatedIcon } from '@modrinth/assets'
 import {
 	Button,
 	type CreationFlowContextValue,
@@ -16,6 +16,8 @@ import { useQueryClient } from '@tanstack/vue-query'
 import { computed, inject, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
+import ChooseCoreModal from '@/components/ui/cores/ChooseCoreModal.vue'
+import { openPairCoreModal, useCores } from '@/composables/use-cores'
 import { coreOffline, useServers } from '@/helpers/linked-servers'
 import { appSettingsModalOpenCoresKey } from '@/providers/app-settings-modal'
 
@@ -27,6 +29,19 @@ const router = useRouter()
 const queryClient = useQueryClient()
 const searchInput = ref('')
 const setupModal = ref<InstanceType<typeof CreationFlowModal>>()
+const chooseCore = ref<InstanceType<typeof ChooseCoreModal>>()
+const coresQuery = useCores()
+// Only once the account's Cores are known, so a slow or failed lookup never asks to pair.
+const needsPairing = computed(
+	() => coresQuery.isSuccess.value && coresQuery.cores.value.length === 0,
+)
+// The Core the new server goes on, chosen before setup opens.
+let core: Archon.Cores.v1.Core | null = null
+
+async function newServer() {
+	core = (await chooseCore.value?.pick()) ?? null
+	if (core) setupModal.value?.show()
+}
 const { data, isFetching, refetch } = useServers()
 // The list is checked in the background, so the answer is normally already here. Ghost rows only
 // cover a cold start that has not answered within a moment.
@@ -124,8 +139,10 @@ async function install(serverId: string, config: CreationFlowContextValue) {
 async function createServer(config: CreationFlowContextValue) {
 	const instance = config.instanceSelection.value
 	try {
-		const { id } = await client.archon.servers_v1.createLocal(
+		if (!core) throw new Error('No Core was chosen')
+		const { id } = await client.archon.cores_v1.createServer(
 			serverName(config),
+			core,
 			instance ? { id: instance.id, name: instance.name } : undefined,
 		)
 		try {
@@ -158,7 +175,8 @@ async function createServer(config: CreationFlowContextValue) {
 /** Browsing modpacks installs onto a server, so this one path makes the server first. */
 async function browseModpacks() {
 	try {
-		const { id } = await client.archon.servers_v1.createLocal('New server')
+		if (!core) throw new Error('No Core was chosen')
+		const { id } = await client.archon.cores_v1.createServer('New server', core)
 		setupModal.value?.hide()
 		await queryClient.invalidateQueries({ queryKey: ['servers'] })
 		await router.push({ path: '/browse/modpack', query: { sid: id, wid: id, from: 'onboarding' } })
@@ -175,7 +193,10 @@ async function browseModpacks() {
 
 <template>
 	<div data-pyro-server-list-root class="relative mx-auto flex h-full w-full flex-col p-6">
-		<div v-if="!problem" class="mb-4 flex w-full flex-row items-center justify-between gap-2">
+		<div
+			v-if="!problem && !needsPairing"
+			class="mb-4 flex w-full flex-row items-center justify-between gap-2"
+		>
 			<h1 class="m-0 text-2xl font-extrabold text-contrast">Servers</h1>
 			<div class="flex items-center gap-2">
 				<Input
@@ -185,18 +206,26 @@ async function browseModpacks() {
 					placeholder="Search servers"
 				/>
 				<Button @click="openCoreSettings"><SettingsIcon /> Core settings</Button>
-				<Button
-					v-if="allServers.length > 0"
-					type="colored"
-					color="brand"
-					@click="setupModal?.show()"
-				>
+				<Button v-if="allServers.length > 0" type="colored" color="brand" @click="newServer">
 					<PlusIcon /> New server
 				</Button>
 			</div>
 		</div>
 
-		<div v-if="problem" class="flex min-h-[60vh] grow items-center justify-center">
+		<div v-if="needsPairing" class="flex min-h-[60vh] grow items-center justify-center">
+			<EmptyState
+				type="empty"
+				heading="Pair a Core to host servers"
+				description="A Core runs your servers on a computer you control."
+			>
+				<template #actions>
+					<Button type="colored" color="brand" size="lg" @click="openPairCoreModal()">
+						<LinkIcon /> Pair a Core
+					</Button>
+				</template>
+			</EmptyState>
+		</div>
+		<div v-else-if="problem" class="flex min-h-[60vh] grow items-center justify-center">
 			<EmptyState
 				:type="problem.type"
 				:heading="problem.heading"
@@ -232,7 +261,7 @@ async function browseModpacks() {
 				description="Create a server on your Core and play with your friends."
 			>
 				<template #actions>
-					<Button type="colored" color="brand" size="lg" @click="setupModal?.show()">
+					<Button type="colored" color="brand" size="lg" @click="newServer">
 						<PlusIcon /> New server
 					</Button>
 				</template>
@@ -247,6 +276,7 @@ async function browseModpacks() {
 			/>
 		</div>
 
+		<ChooseCoreModal ref="chooseCore" />
 		<CreationFlowModal
 			ref="setupModal"
 			type="server-onboarding"

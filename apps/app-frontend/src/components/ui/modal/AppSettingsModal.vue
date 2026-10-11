@@ -268,8 +268,11 @@ function showSyncedOptions(): void {
 	modal.value?.show()
 }
 
-// The Cores tab does not exist yet. Until it does this opens settings; select the tab here later.
 function showCores(): void {
+	const coresTabIndex = availableTabs.value.findIndex((tab) => tab.content === CoresSettings)
+	if (coresTabIndex >= 0) {
+		modal.value?.setTab(coresTabIndex)
+	}
 	modal.value?.show()
 }
 

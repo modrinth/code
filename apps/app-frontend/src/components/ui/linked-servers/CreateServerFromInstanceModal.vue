@@ -7,9 +7,11 @@
 		:on-back="() => flow?.hide()"
 		@create="create"
 	/>
+	<ChooseCoreModal ref="chooseCore" />
 </template>
 
 <script setup lang="ts">
+import type { Archon } from '@modrinth/api-client'
 import {
 	type CreationFlowContextValue,
 	CreationFlowModal,
@@ -21,6 +23,7 @@ import {
 import { useQueryClient } from '@tanstack/vue-query'
 import { nextTick, ref } from 'vue'
 
+import ChooseCoreModal from '@/components/ui/cores/ChooseCoreModal.vue'
 import { getInstanceIconUrl } from '@/helpers/instance'
 import { exportInstancePack, pushPackToServer, serversQueryKey } from '@/helpers/linked-servers'
 import type { GameInstance } from '@/helpers/types'
@@ -38,12 +41,17 @@ const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
 const flow = ref<InstanceType<typeof CreationFlowModal>>()
+const chooseCore = ref<InstanceType<typeof ChooseCoreModal>>()
+// The Core the server goes on, chosen before setup opens.
+let core: Archon.Cores.v1.Core | null = null
 
 // The project search belongs to the first step, which this flow skips.
 const noProjects = async () => ({ hits: [], total_hits: 0, offset: 0, limit: 0 })
 const noVersions = async () => []
 
 async function show() {
+	core = (await chooseCore.value?.pick()) ?? null
+	if (!core) return
 	await flow.value?.show()
 	await nextTick()
 	const ctx = flow.value?.ctx
@@ -64,7 +72,8 @@ async function show() {
 async function create(ctx: CreationFlowContextValue) {
 	const instance = { id: props.instance.id, name: props.instance.name }
 	try {
-		const { id } = await client.archon.servers_v1.createLocal(instance.name, instance)
+		if (!core) throw new Error('No Core was chosen')
+		const { id } = await client.archon.cores_v1.createServer(instance.name, core, instance)
 		flow.value?.hide()
 		await queryClient.invalidateQueries({ queryKey: serversQueryKey })
 		try {
