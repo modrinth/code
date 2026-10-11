@@ -14,18 +14,19 @@ import { get as getModrinthCredentials } from '@/helpers/mr_auth'
 
 const appVersion = getVersion()
 
-export const apiClient = new TauriModrinthClient({
+export const apiClient: TauriModrinthClient = new TauriModrinthClient({
 	userAgent: async () => `modrinth/theseus/${await appVersion}`,
 	labrinthBaseUrl: config.labrinthBaseUrl,
-	selfHostedHosting: Boolean(config.coreUrl),
-	archonBaseUrl: () => (config.coreUrl ? `${config.coreUrl}/hosting` : config.archonBaseUrl),
+	// With our own account backend, hosting is the account's paired Cores, found through it.
+	selfHostedHosting: Boolean(config.accountApiUrl),
+	archonBaseUrl: config.archonBaseUrl,
 	sharedInstancesBaseUrl: config.sharedInstancesBaseUrl,
 	features: [
 		...(config.accountApiUrl
 			? [
 					new SelfHostedFeature({
 						baseUrl: config.accountApiUrl,
-						hostingUrl: config.coreUrl ? `${config.coreUrl}/hosting` : undefined,
+						isCoreUrl: (url: string): boolean => apiClient.archon.cores_v1.isCoreUrl(url),
 						token: async () => (await getModrinthCredentials())?.session,
 					}),
 				]

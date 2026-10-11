@@ -6,7 +6,6 @@ export interface DevAppConfig {
 	authMode: 'dev' | 'real'
 	username: string | null
 	branch: string
-	coreUrl?: string
 	title: string
 	dataDir: string
 	backendUrl?: string

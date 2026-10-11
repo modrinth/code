@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import LocalServers from './hosting/LocalServers.vue'
-import { config as appConfig } from '@/config'
 
 import type { Labrinth } from '@modrinth/api-client'
 import { ServerStackIcon } from '@modrinth/assets'
@@ -34,7 +33,7 @@ const resolvedProducts = computed<Labrinth.Billing.Internal.Product[]>(() => pro
 </script>
 
 <template>
-	<LocalServers v-if="appConfig.coreUrl" />
+	<LocalServers v-if="client.selfHostedHosting" />
 	<ServersManagePageIndex
 		v-else
 		:stripe-publishable-key="stripePublishableKey"

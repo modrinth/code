@@ -78,6 +78,7 @@ import UnknownPackWarningModal from '@/components/ui/install_flow/UnknownPackWar
 import IconEditorModal from '@/components/ui/instance_settings/icon-editor-modal/index.vue'
 import MinecraftAuthErrorModal from '@/components/ui/minecraft-auth-error-modal/MinecraftAuthErrorModal.vue'
 import MinecraftRequiredModal from '@/components/ui/minecraft-required-modal/MinecraftRequiredModal.vue'
+import PairCoreModal from '@/components/ui/cores/PairCoreModal.vue'
 import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
 import InstallToPlayModal from '@/components/ui/modal/InstallToPlayModal.vue'
 import ModpackAlreadyInstalledModal from '@/components/ui/modal/ModpackAlreadyInstalledModal.vue'
@@ -1370,6 +1371,9 @@ async function fetchCredentials() {
 	}
 	credentials.value = creds ?? null
 	liveNotificationsEnabled = !!creds?.session
+	// Paired Cores and their servers belong to the signed-in account.
+	void queryClient.invalidateQueries({ queryKey: ['cores'] })
+	void queryClient.invalidateQueries({ queryKey: ['servers'] })
 	await traceStartupStep('Load stored account profiles', fetchStoredModrinthAccounts)
 }
 
@@ -2213,6 +2217,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			</div>
 		</Transition>
 		<AppSettingsModal ref="appSettingsModal" />
+		<PairCoreModal />
 		<SyncInstancesUpdateModal ref="syncInstancesUpdateModal" />
 		<Suspense>
 			<ModrinthAccountRequiredModal ref="modrinthLoginModal" :request-auth="requestModrinthAuth" />
