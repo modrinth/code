@@ -12,10 +12,11 @@ import {
 	Input,
 	ServerListing,
 } from '@modrinth/ui'
-import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, inject, ref } from 'vue'
+import { useQueryClient } from '@tanstack/vue-query'
+import { computed, inject, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
+import { coreOffline, useServers } from '@/helpers/linked-servers'
 import { appSettingsModalOpenCoresKey } from '@/providers/app-settings-modal'
 
 const client = injectModrinthClient()
@@ -26,11 +27,11 @@ const router = useRouter()
 const queryClient = useQueryClient()
 const searchInput = ref('')
 const setupModal = ref<InstanceType<typeof CreationFlowModal>>()
-const { data, error, isLoading, isFetching, refetch } = useQuery({
-	queryKey: ['servers'],
-	queryFn: () => client.archon.servers_v0.list({ limit: 100 }),
-	staleTime: 30_000,
-})
+const { data, isFetching, refetch } = useServers()
+// The list is checked in the background, so the answer is normally already here. Ghost rows only
+// cover a cold start that has not answered within a moment.
+const waitedForAnswer = ref(false)
+onMounted(() => setTimeout(() => (waitedForAnswer.value = true), 300))
 const allServers = computed(() => data.value?.servers ?? [])
 const servers = computed(() =>
 	allServers.value.filter((server) =>
@@ -40,7 +41,7 @@ const servers = computed(() =>
 
 // Never show the raw error: whatever went wrong, the Core could not be used.
 const problem = computed(() =>
-	error.value
+	coreOffline.value
 		? {
 				type: 'no-connection' as const,
 				heading: 'Your Core is offline',
@@ -208,7 +209,7 @@ async function browseModpacks() {
 			</EmptyState>
 		</div>
 		<!-- Ghost rows while the list loads. Static on purpose: no shimmer. -->
-		<div v-else-if="isLoading" class="flex flex-col gap-3" aria-busy="true">
+		<div v-else-if="!data && waitedForAnswer" class="flex flex-col gap-3" aria-busy="true">
 			<div
 				v-for="row in 3"
 				:key="row"
@@ -222,7 +223,7 @@ async function browseModpacks() {
 			</div>
 		</div>
 		<div
-			v-else-if="allServers.length === 0"
+			v-else-if="data && allServers.length === 0"
 			class="flex min-h-[60vh] grow items-center justify-center"
 		>
 			<EmptyState
@@ -237,7 +238,7 @@ async function browseModpacks() {
 				</template>
 			</EmptyState>
 		</div>
-		<div v-else class="flex flex-col gap-3">
+		<div v-else-if="data" class="flex flex-col gap-3">
 			<ServerListing v-for="server in servers" :key="server.server_id" v-bind="server" />
 			<EmptyState
 				v-if="servers.length === 0"

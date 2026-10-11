@@ -3,7 +3,7 @@ import type { ContentDiffItem } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import { invoke } from '@tauri-apps/api/core'
 import { join, tempDir } from '@tauri-apps/api/path'
-import { computed, type MaybeRefOrGetter, toValue } from 'vue'
+import { computed, type MaybeRefOrGetter, ref, toValue, watch } from 'vue'
 
 import { config } from '@/config'
 import { apiClient } from '@/services/api-client'
@@ -23,19 +23,56 @@ export function fetchServers(client: AbstractModrinthClient = apiClient) {
 }
 
 /**
+ * The one query for the Core's server list. It never retries: a Core that is down refuses the
+ * connection at once, and the next check is only seconds away.
+ */
+const serversQueryOptions = {
+	queryKey: serversQueryKey,
+	queryFn: () => fetchServers(),
+	enabled: () => Boolean(config.coreUrl),
+	staleTime: 5_000,
+	refetchInterval: 5_000,
+	retry: false,
+}
+
+const failedChecks = ref(0)
+const everAnswered = ref(false)
+
+/**
+ * Whether the Core counts as offline. One failed check is not enough once the Core has answered,
+ * so a dropped request does not flip the screen; the first success brings it straight back.
+ */
+export const coreOffline = computed(
+	() => failedChecks.value >= 2 || (failedChecks.value >= 1 && !everAnswered.value),
+)
+
+/**
+ * Keeps the server list checked for as long as the App is open, so pages that show it already
+ * know the answer when they open. Call once, from the App root.
+ */
+export function useCoreWatch() {
+	const query = useQuery(serversQueryOptions)
+	watch(query.dataUpdatedAt, (at) => {
+		if (!at) return
+		everAnswered.value = true
+		failedChecks.value = 0
+	})
+	watch(query.errorUpdatedAt, (at) => {
+		if (at) failedChecks.value += 1
+	})
+}
+
+/** The Core's server list, kept fresh by {@link useCoreWatch}. */
+export function useServers() {
+	return useQuery(serversQueryOptions)
+}
+
+/**
  * The servers that follow an instance, on the Core this App is connected to. Empty when there
- * is no Core or it cannot be reached. Refreshes on an interval while mounted, so running,
- * offline, and updating stay current.
+ * is no Core or it cannot be reached.
  */
 export function useLinkedServers(instanceId: MaybeRefOrGetter<string | undefined>) {
-	const query = useQuery({
-		queryKey: serversQueryKey,
-		queryFn: () => fetchServers(),
-		enabled: () => Boolean(config.coreUrl),
-		staleTime: 5_000,
-		refetchInterval: 5_000,
-		retry: false,
-	})
+	const query = useServers()
 	const servers = computed(() => {
 		const id = toValue(instanceId)
 		return (query.data.value?.servers ?? []).filter(
