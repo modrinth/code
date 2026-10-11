@@ -1,37 +1,33 @@
 <template>
-	<div class="flex flex-col gap-3">
-		<Input
-			v-model="searchFilter"
-			:icon="SearchIcon"
-			:placeholder="formatMessage(messages.searchPlaceholder)"
-		/>
+	<!-- Same panel as the "Existing instance" list of ContentInstallModal, edge to edge in the modal. -->
+	<div
+		class="-mx-6 -mt-6 flex flex-col gap-3 overflow-y-auto bg-surface-2 py-4"
+		style="height: 400px"
+	>
+		<div class="px-6">
+			<Input
+				v-model="searchFilter"
+				:icon="SearchIcon"
+				:placeholder="formatMessage(messages.searchPlaceholder)"
+			/>
+		</div>
+		<div v-if="loading" class="flex items-center justify-center py-12">
+			<LoadingIndicator />
+		</div>
 		<div
-			class="flex flex-col gap-1 overflow-y-auto rounded-[20px] bg-surface-2 py-2"
-			style="height: 400px"
+			v-else-if="filteredInstances.length === 0"
+			class="flex items-center justify-center py-12 text-secondary"
 		>
-			<div v-if="loading" class="flex items-center justify-center py-12">
-				<LoadingIndicator />
-			</div>
-			<div
-				v-else-if="filteredInstances.length === 0"
-				class="flex items-center justify-center py-12 text-secondary"
-			>
-				{{ formatMessage(messages.noInstances) }}
-			</div>
+			{{ formatMessage(messages.noInstances) }}
+		</div>
+		<div v-else class="flex flex-col gap-1">
 			<div
 				v-for="instance in filteredInstances"
-				v-else
 				:key="instance.id"
-				class="flex items-center justify-between gap-2 px-4 py-1.5 hover:bg-surface-3"
+				class="flex items-center justify-between gap-2 px-6 py-1.5 hover:bg-surface-3"
 			>
 				<div class="flex min-w-0 items-center gap-2.5 overflow-hidden">
-					<Avatar
-						:src="instance.iconUrl"
-						:alt="instance.name"
-						size="2rem"
-						:tint-by="instance.name"
-						pad-transparent-corners
-					/>
+					<Avatar :src="instance.iconUrl" size="2rem" rounded="md" pad-transparent-corners />
 					<span class="truncate font-semibold text-contrast">{{ instance.name }}</span>
 				</div>
 				<Button :disabled="ctx.finishDisabled.value" @click="select(instance)">
@@ -86,7 +82,7 @@ function select(instance: ServerInstanceOption) {
 const messages = defineMessages({
 	searchPlaceholder: {
 		id: 'creation-flow.modal.select-instance.search-placeholder',
-		defaultMessage: 'Search instances...',
+		defaultMessage: 'Search instance',
 	},
 	noInstances: {
 		id: 'creation-flow.modal.select-instance.no-instances',
