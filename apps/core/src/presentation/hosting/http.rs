@@ -1014,9 +1014,9 @@ async fn get_addons(
             .await
             .map(|m| m.len())
             .unwrap_or(0);
-        let info = mods.iter().find(|m| {
-            m.filename == item.filename || m.filename == on_disk
-        });
+        let info = mods
+            .iter()
+            .find(|m| m.filename == item.filename || m.filename == on_disk);
         addons.push(addon(item, info, size));
     }
     let mut result = json!({"modloader": r.loader.to_string(), "modloader_version": r.loader_version,

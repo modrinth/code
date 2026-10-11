@@ -10,7 +10,10 @@ use super::instance::ModLoader;
 pub enum ServerSource {
     /// An App instance, exported and uploaded by the App as a `.mrpack`. `instance_id` is the
     /// App's own id for it, which is how the App finds the servers of an instance.
-    Instance { instance_id: String, name: String },
+    Instance {
+        instance_id: String,
+        name: String,
+    },
     Modrinth {
         project_id: String,
         version_id: String,

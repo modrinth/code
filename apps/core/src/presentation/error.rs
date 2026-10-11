@@ -8,8 +8,7 @@ use serde_json::json;
 use crate::{
     application::{
         fs_service::FsError, instance_service::InstanceError,
-        mod_service::ModError,
-        server_source_service::SourceError,
+        mod_service::ModError, server_source_service::SourceError,
     },
     ports::instance_store::StoreError,
 };

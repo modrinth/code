@@ -214,7 +214,8 @@ pub async fn apply_now(
         .ok_or(SourceError::NotLinked)?;
     // An empty desired version is a server still waiting for its first upload: nothing to retry.
     if row.desired_version.is_empty()
-        || row.installed_version.as_deref() == Some(row.desired_version.as_str())
+        || row.installed_version.as_deref()
+            == Some(row.desired_version.as_str())
     {
         return row.status();
     }
@@ -260,7 +261,8 @@ pub async fn content(
         };
         while let Some(entry) = entries.next_entry().await? {
             let name = entry.file_name().to_string_lossy().to_string();
-            let is_mod = name.ends_with(".jar") || name.ends_with(".jar.disabled");
+            let is_mod =
+                name.ends_with(".jar") || name.ends_with(".jar.disabled");
             if kind == ContentKind::Mod && !is_mod {
                 continue;
             }
@@ -279,8 +281,10 @@ pub async fn provides(
     instance_id: &str,
     filename: &str,
 ) -> Result<bool, SourceError> {
-    let path =
-        format!("mods/{}", filename.strip_suffix(".disabled").unwrap_or(filename));
+    let path = format!(
+        "mods/{}",
+        filename.strip_suffix(".disabled").unwrap_or(filename)
+    );
     Ok(tracked_files(state, instance_id)
         .await?
         .iter()
@@ -359,8 +363,7 @@ async fn step(
     if current == SourceApplyState::Failed {
         return Ok(false);
     }
-    if row.installed_version.as_deref() == Some(row.desired_version.as_str())
-    {
+    if row.installed_version.as_deref() == Some(row.desired_version.as_str()) {
         if current != SourceApplyState::UpToDate {
             set_state(state, instance_id, SourceApplyState::UpToDate).await?;
         }
@@ -394,16 +397,23 @@ async fn step(
         return Ok(true);
     }
 
-    let iid: InstanceId = instance_id.parse().map_err(|_| SourceError::NotFound)?;
+    let iid: InstanceId =
+        instance_id.parse().map_err(|_| SourceError::NotFound)?;
     let running = state.instances.contains_key(&iid);
     // Only a server this update stopped is started again.
     let restart = running && row.restart_requested != 0;
     if running {
         if !restart {
             if current != SourceApplyState::Pending {
-                set_state(state, instance_id, SourceApplyState::Pending).await?;
+                set_state(state, instance_id, SourceApplyState::Pending)
+                    .await?;
             }
-            progress(state, instance_id, &version, SourceApplyPhase::WaitingForStop);
+            progress(
+                state,
+                instance_id,
+                &version,
+                SourceApplyPhase::WaitingForStop,
+            );
             return Ok(false);
         }
         progress(state, instance_id, &version, SourceApplyPhase::Stopping);
@@ -417,8 +427,12 @@ async fn step(
     }
     if restart {
         progress(state, instance_id, &version, SourceApplyPhase::Starting);
-        if let Err(err) = instance_status_service::start_instance(state, &iid).await {
-            warn!("Restart after source update failed for {instance_id}: {err}");
+        if let Err(err) =
+            instance_status_service::start_instance(state, &iid).await
+        {
+            warn!(
+                "Restart after source update failed for {instance_id}: {err}"
+            );
         }
     }
     Ok(true)
@@ -487,7 +501,10 @@ async fn apply(
     let mut existed = Vec::new();
     for path in plan.remove.iter().chain(&plan.write) {
         let target = data_dir.join(disk_path(path, &level));
-        if tokio::fs::metadata(&target).await.is_ok_and(|m| m.is_file()) {
+        if tokio::fs::metadata(&target)
+            .await
+            .is_ok_and(|m| m.is_file())
+        {
             copy_file(&target, &backup.join(path)).await?;
             existed.push(path.clone());
         }
@@ -495,7 +512,9 @@ async fn apply(
 
     let result = async {
         for path in &plan.remove {
-            match tokio::fs::remove_file(data_dir.join(disk_path(path, &level))).await {
+            match tokio::fs::remove_file(data_dir.join(disk_path(path, &level)))
+                .await
+            {
                 Err(err) if err.kind() != std::io::ErrorKind::NotFound => {
                     return Err(SourceError::Io(err))
                 }
@@ -580,7 +599,8 @@ async fn apply(
         tokio::fs::read_dir(staging_root(state, &instance_id)).await
     {
         while let Ok(Some(entry)) = entries.next_entry().await {
-            if desired.as_ref() != Some(&entry.path()) || entry.path() == staged {
+            if desired.as_ref() != Some(&entry.path()) || entry.path() == staged
+            {
                 let _ = tokio::fs::remove_dir_all(entry.path()).await;
             }
         }
@@ -693,11 +713,17 @@ async fn stage(
                 .find(|f| f.primary)
                 .or_else(|| pack.files.first())
                 .ok_or_else(|| {
-                    SourceError::Invalid("version has no downloadable file".into())
+                    SourceError::Invalid(
+                        "version has no downloadable file".into(),
+                    )
                 })?;
             validate_download_url(&file.url)?;
             let bytes = download(state, &file.url).await?;
-            verify(&file.filename, &sha1_hex(&bytes), file.hashes.sha1.as_deref())?;
+            verify(
+                &file.filename,
+                &sha1_hex(&bytes),
+                file.hashes.sha1.as_deref(),
+            )?;
             let archive = dir.join("pack.mrpack");
             tokio::fs::write(&archive, &bytes).await?;
             stage_mrpack(state, &archive, &files).await
@@ -759,7 +785,9 @@ async fn stage_mrpack(
         .filter(|v| index.game == "minecraft" && !v.trim().is_empty())
         .cloned()
         .ok_or_else(|| {
-            SourceError::Invalid("Modpack must specify a Minecraft version".into())
+            SourceError::Invalid(
+                "Modpack must specify a Minecraft version".into(),
+            )
         })?;
     let (loader, loader_version) = mrpack_loader(&index.dependencies);
     // A pack's own `env` is often missing or says "required" for client mods, so a mod is also
@@ -779,14 +807,19 @@ async fn stage_mrpack(
         .into_iter()
         .collect();
     let server_unsupported: BTreeSet<String> =
-        match ModrinthClient::new(state.http.clone()).get_projects(&project_ids).await {
+        match ModrinthClient::new(state.http.clone())
+            .get_projects(&project_ids)
+            .await
+        {
             Ok(projects) => projects
                 .into_iter()
                 .filter(|p| p.server_side.as_deref() == Some("unsupported"))
                 .map(|p| p.id)
                 .collect(),
             Err(error) => {
-                warn!("could not check which pack mods are client-only: {error}");
+                warn!(
+                    "could not check which pack mods are client-only: {error}"
+                );
                 BTreeSet::new()
             }
         };
@@ -954,14 +987,20 @@ fn clean_path(path: &str) -> Result<String, SourceError> {
     let bad = path.is_empty()
         || path.starts_with('/')
         || path.contains(':')
-        || path.split('/').any(|part| part.is_empty() || part == "." || part == "..");
+        || path
+            .split('/')
+            .any(|part| part.is_empty() || part == "." || part == "..");
     if bad {
-        return Err(SourceError::Invalid(format!("unsafe path in source: {path}")));
+        return Err(SourceError::Invalid(format!(
+            "unsafe path in source: {path}"
+        )));
     }
     Ok(path)
 }
 
-fn mrpack_loader(deps: &HashMap<String, String>) -> (ModLoader, Option<String>) {
+fn mrpack_loader(
+    deps: &HashMap<String, String>,
+) -> (ModLoader, Option<String>) {
     for (key, loader) in [
         ("fabric-loader", ModLoader::Fabric),
         ("quilt-loader", ModLoader::Quilt),
@@ -1021,13 +1060,23 @@ async fn copy_file(from: &Path, to: &Path) -> Result<(), SourceError> {
 }
 
 fn staging_root(state: &AppState, instance_id: &str) -> PathBuf {
-    state.config.data_dir.join("source_staging").join(instance_id)
+    state
+        .config
+        .data_dir
+        .join("source_staging")
+        .join(instance_id)
 }
 
 fn staging_dir(state: &AppState, instance_id: &str, version: &str) -> PathBuf {
     let safe: String = version
         .chars()
-        .map(|c| if c.is_ascii_alphanumeric() || c == '-' || c == '.' { c } else { '_' })
+        .map(|c| {
+            if c.is_ascii_alphanumeric() || c == '-' || c == '.' {
+                c
+            } else {
+                '_'
+            }
+        })
         .collect();
     staging_root(state, instance_id).join(safe)
 }
@@ -1036,7 +1085,8 @@ async fn instance_record(
     state: &Arc<AppState>,
     instance_id: &str,
 ) -> Result<crate::domain::instance::InstanceRecord, SourceError> {
-    let iid: InstanceId = instance_id.parse().map_err(|_| SourceError::NotFound)?;
+    let iid: InstanceId =
+        instance_id.parse().map_err(|_| SourceError::NotFound)?;
     state.instance_store.get(&iid).await.map_err(|e| match e {
         StoreError::NotFound(_) => SourceError::NotFound,
         other => SourceError::Store(other),
@@ -1066,17 +1116,19 @@ async fn tracked_files(
             .await?;
     Ok(rows
         .into_iter()
-        .map(|(path, kind, sha1, client_only, project_id, version_id)| SetupFile {
-            path,
-            kind: match kind.as_str() {
-                "mod" => ContentKind::Mod,
-                "datapack" => ContentKind::Datapack,
-                _ => ContentKind::Other,
-            },
-            sha1,
-            client_only: client_only != 0,
-            project_id,
-            version_id,
+        .map(|(path, kind, sha1, client_only, project_id, version_id)| {
+            SetupFile {
+                path,
+                kind: match kind.as_str() {
+                    "mod" => ContentKind::Mod,
+                    "datapack" => ContentKind::Datapack,
+                    _ => ContentKind::Other,
+                },
+                sha1,
+                client_only: client_only != 0,
+                project_id,
+                version_id,
+            }
         })
         .collect())
 }
@@ -1171,7 +1223,8 @@ mod tests {
             file("mods/kept.jar", "a2", false),
             file("mods/new.jar", "d", false),
         ];
-        let on_disk = HashMap::from([("mods/kept.jar".to_string(), "a".to_string())]);
+        let on_disk =
+            HashMap::from([("mods/kept.jar".to_string(), "a".to_string())]);
         let plan = plan(&previous, &next, &on_disk);
         assert_eq!(plan.remove, ["datapacks/old.zip", "mods/dropped.jar"]);
         assert_eq!(plan.write, ["mods/kept.jar", "mods/new.jar"]);
@@ -1181,7 +1234,8 @@ mod tests {
     fn server_added_files_are_never_planned() {
         let previous = [file("mods/source.jar", "a", false)];
         let next = [file("mods/source.jar", "a", false)];
-        let on_disk = HashMap::from([("mods/source.jar".to_string(), "a".to_string())]);
+        let on_disk =
+            HashMap::from([("mods/source.jar".to_string(), "a".to_string())]);
         // `mods/server.jar` exists on disk but was never provided by the source.
         assert_eq!(plan(&previous, &next, &on_disk), ApplyPlan::default());
     }
@@ -1203,7 +1257,10 @@ mod tests {
         let client = items.iter().find(|i| i.filename == "client.jar").unwrap();
         assert!(client.client_only);
         assert_eq!(client.origin, ContentOrigin::Source);
-        let local = items.iter().find(|i| i.filename == "local.jar.disabled").unwrap();
+        let local = items
+            .iter()
+            .find(|i| i.filename == "local.jar.disabled")
+            .unwrap();
         assert_eq!(local.origin, ContentOrigin::Server);
         assert!(local.disabled);
         assert_eq!(items.len(), 3);
@@ -1215,7 +1272,10 @@ mod tests {
             modrinth_ids("https://cdn.modrinth.com/data/AANobbMI/versions/abc123/sodium.jar"),
             Some(("AANobbMI".into(), "abc123".into()))
         );
-        assert_eq!(modrinth_ids("https://example.com/data/a/versions/b/c.jar"), None);
+        assert_eq!(
+            modrinth_ids("https://example.com/data/a/versions/b/c.jar"),
+            None
+        );
     }
 
     #[test]
@@ -1224,6 +1284,9 @@ mod tests {
         assert!(clean_path("mods/../../x").is_err());
         assert!(clean_path("C:/x").is_err());
         assert_eq!(clean_path("mods\\a.jar").unwrap(), "mods/a.jar");
-        assert_eq!(disk_path("datapacks/a.zip", "world"), "world/datapacks/a.zip");
+        assert_eq!(
+            disk_path("datapacks/a.zip", "world"),
+            "world/datapacks/a.zip"
+        );
     }
 }
