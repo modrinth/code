@@ -183,7 +183,7 @@ async function browseModpacks() {
 
 <template>
 	<div data-pyro-server-list-root class="relative mx-auto flex h-full w-full flex-col p-6">
-		<div class="mb-4 flex w-full flex-row items-center justify-between gap-2">
+		<div v-if="!problem" class="mb-4 flex w-full flex-row items-center justify-between gap-2">
 			<h1 class="m-0 text-2xl font-extrabold text-contrast">Servers</h1>
 			<div class="flex items-center gap-2">
 				<Input
@@ -192,7 +192,7 @@ async function browseModpacks() {
 					:icon="SearchIcon"
 					placeholder="Search servers"
 				/>
-				<Button v-if="!problem" @click="openCoreSettings"><SettingsIcon /> Core settings</Button>
+				<Button @click="openCoreSettings"><SettingsIcon /> Core settings</Button>
 				<Button
 					v-if="allServers.length > 0"
 					type="colored"
