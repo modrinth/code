@@ -8,7 +8,7 @@
 //! last-applied hash; anything else on disk is server content and is never touched.
 
 use std::{
-    collections::{BTreeMap, HashMap, HashSet},
+    collections::{BTreeMap, BTreeSet, HashMap, HashSet},
     io::Read,
     path::{Path, PathBuf},
     sync::{Arc, LazyLock},
@@ -738,17 +738,48 @@ async fn stage_mrpack(
             SourceError::Invalid("Modpack must specify a Minecraft version".into())
         })?;
     let (loader, loader_version) = mrpack_loader(&index.dependencies);
+    // A pack's own `env` is often missing or says "required" for client mods, so a mod is also
+    // left out when its Modrinth project says servers are unsupported, as for a mod added by hand.
+    let project_ids: Vec<String> = index
+        .files
+        .iter()
+        .filter_map(|file| {
+            file.project_id.clone().or_else(|| {
+                file.downloads
+                    .first()
+                    .and_then(|url| modrinth_ids(url))
+                    .map(|ids| ids.0)
+            })
+        })
+        .collect::<BTreeSet<_>>()
+        .into_iter()
+        .collect();
+    let server_unsupported: BTreeSet<String> =
+        match ModrinthClient::new(state.http.clone()).get_projects(&project_ids).await {
+            Ok(projects) => projects
+                .into_iter()
+                .filter(|p| p.server_side.as_deref() == Some("unsupported"))
+                .map(|p| p.id)
+                .collect(),
+            Err(error) => {
+                warn!("could not check which pack mods are client-only: {error}");
+                BTreeSet::new()
+            }
+        };
     let mut files = BTreeMap::new();
     for file in &index.files {
         let path = clean_path(&file.path)?;
         let Some(kind) = content_kind(&path) else {
             continue;
         };
+        let ids = file.downloads.first().and_then(|url| modrinth_ids(url));
+        let project_id = file.project_id.clone().or(ids.clone().map(|i| i.0));
         let client_only = matches!(
             file.env.as_ref().map(|env| &env.server),
             Some(EnvType::Unsupported)
-        );
-        let ids = file.downloads.first().and_then(|url| modrinth_ids(url));
+        ) || project_id
+            .as_ref()
+            .is_some_and(|id| server_unsupported.contains(id));
         let mut sha1 = file.hashes.sha1.clone().unwrap_or_default();
         if !client_only {
             let url = file.downloads.first().ok_or_else(|| {
@@ -768,7 +799,7 @@ async fn stage_mrpack(
                 kind,
                 sha1,
                 client_only,
-                project_id: file.project_id.clone().or(ids.clone().map(|i| i.0)),
+                project_id,
                 version_id: file.version_id.clone().or(ids.map(|i| i.1)),
             },
         );

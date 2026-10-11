@@ -4,9 +4,10 @@
 		class="-mx-6 -mt-6 flex flex-col gap-3 overflow-y-auto bg-surface-2 py-4"
 		style="height: 400px"
 	>
-		<div class="px-6">
+		<div class="flex px-6">
 			<Input
 				v-model="searchFilter"
+				class="flex-1"
 				:icon="SearchIcon"
 				:placeholder="formatMessage(messages.searchPlaceholder)"
 			/>
