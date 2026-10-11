@@ -1,3 +1,8 @@
+<picture>
+	<source media="(prefers-color-scheme: light)" srcset="../../.github/assets/docs_cover_light.png">
+	<img alt="Modrinth Docs Cover" src="../../.github/assets/docs_cover.png">
+</picture>
+
 # Modrinth Documentation
 
 Welcome to the Modrinth documentation!
