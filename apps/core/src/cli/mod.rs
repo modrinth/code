@@ -205,7 +205,7 @@ async fn check() -> Result<()> {
         "Owner   : {}",
         owner
             .as_deref()
-            .unwrap_or("none, the first account to connect")
+            .unwrap_or("none, start Core to get a pairing code")
     );
     Ok(())
 }

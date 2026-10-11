@@ -3,4 +3,5 @@ pub mod instance_control;
 pub mod instances;
 pub mod modpack;
 pub mod mods;
+pub mod pairing;
 pub mod properties;

@@ -5,7 +5,7 @@ use axum::{
         header::{AUTHORIZATION, CONTENT_TYPE},
         HeaderValue, Method,
     },
-    routing::get,
+    routing::{get, post},
     Json, Router,
 };
 use serde_json::{json, Value};
@@ -14,14 +14,15 @@ use tower_http::{
     trace::TraceLayer,
 };
 
-use crate::application::state::AppState;
+use crate::{application::state::AppState, presentation::handlers::pairing};
 
-/// Build the Axum router: the hosting API and a liveness probe.
+/// Build the Axum router: the hosting API, pairing, and a liveness probe.
 pub fn create_router(state: Arc<AppState>) -> Router {
     let cors = cors_layer(&state);
 
     Router::new()
         .nest("/hosting", crate::presentation::hosting::router())
+        .route("/pairing", post(pairing::pair).delete(pairing::unpair))
         .route("/health", get(health))
         .with_state(state)
         .layer(cors)
