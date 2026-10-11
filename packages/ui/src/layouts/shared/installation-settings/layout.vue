@@ -212,6 +212,8 @@ const isManagedModpack = computed(() => {
 })
 
 const isLinkedModpack = computed(() => showModpackVersionActions.value || isLocalFile.value)
+// An instance is updated by pushing from the instance, so it has no version to change or re-install.
+const isLinkedInstance = computed(() => ctx.isLinkedInstance?.value ?? false)
 
 function handleModpackUpdateRequest(version: Labrinth.Versions.v2.Version, event?: MouseEvent) {
 	debug('handleModpackUpdateRequest: start', {
@@ -444,6 +446,19 @@ const messages = defineMessages({
 		id: 'installation-settings.linked-instance.title',
 		defaultMessage: 'Linked {projectType}',
 	},
+	unlinkInstanceTitle: {
+		id: 'installation-settings.unlink-instance.title',
+		defaultMessage: 'Unlink from instance',
+	},
+	unlinkInstanceButton: {
+		id: 'installation-settings.unlink-instance.button',
+		defaultMessage: 'Unlink instance',
+	},
+	unlinkInstanceDescription: {
+		id: 'installation-settings.unlink-instance.description',
+		defaultMessage:
+			'Unlinking stops this server from following the instance. Its content stays on the server and you can change the loader and Minecraft version, but pushes from the instance no longer reach it.',
+	},
 	reinstallModpackTitle: {
 		id: 'installation-settings.reinstall-modpack.title',
 		defaultMessage: 'Re-install modpack',
@@ -607,7 +622,13 @@ const messages = defineMessages({
 				<!-- Installed Modpack -->
 				<div v-if="ctx.modpack.value" class="flex flex-col gap-2.5">
 					<span class="text-lg font-semibold text-contrast">
-						{{ formatMessage(commonMessages.installedModpackTitle) }}
+						{{
+							isLinkedInstance
+								? formatMessage(messages.linkedInstanceTitle, {
+										projectType: formatMessage(messages.instanceLabel),
+									})
+								: formatMessage(commonMessages.installedModpackTitle)
+						}}
 					</span>
 					<div
 						v-if="ctx.modpack.value"
@@ -668,7 +689,7 @@ const messages = defineMessages({
 					</div>
 					<div class="flex flex-wrap gap-2">
 						<Button
-							v-if="showModpackVersionActions || isLocalFile"
+							v-if="(showModpackVersionActions || isLocalFile) && !isLinkedInstance"
 							v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
 							:disabled="ctx.isBusy.value"
 							@click="handleModpackPrimaryAction"
@@ -690,11 +711,13 @@ const messages = defineMessages({
 				<div v-if="!isManagedModpack" class="flex flex-col gap-2.5">
 					<span class="text-lg font-semibold text-contrast">
 						{{
-							formatMessage(messages.linkedInstanceTitle, {
-								projectType: formatMessage(
-									isLinkedModpack ? messages.modpackLabel : messages.serverProjectLabel,
-								),
-							})
+							isLinkedInstance
+								? formatMessage(messages.unlinkInstanceTitle)
+								: formatMessage(messages.linkedInstanceTitle, {
+										projectType: formatMessage(
+											isLinkedModpack ? messages.modpackLabel : messages.serverProjectLabel,
+										),
+									})
 						}}
 					</span>
 					<div>
@@ -707,13 +730,18 @@ const messages = defineMessages({
 						>
 							<UnlinkIcon class="size-5" />
 							{{
-								formatMessage(
-									isLinkedModpack ? commonMessages.unlinkModpackButton : messages.unlinkButton,
-								)
+								isLinkedInstance
+									? formatMessage(messages.unlinkInstanceButton)
+									: formatMessage(
+											isLinkedModpack ? commonMessages.unlinkModpackButton : messages.unlinkButton,
+										)
 							}}
 						</Button>
 					</div>
-					<span class="text-primary">
+					<span v-if="isLinkedInstance" class="text-primary">
+						{{ formatMessage(messages.unlinkInstanceDescription) }}
+					</span>
+					<span v-else class="text-primary">
 						{{
 							formatMessage(messages.unlinkDescription, {
 								type: formatMessage(ctx.isServer ? messages.serverLabel : messages.instanceLabel),
@@ -726,7 +754,10 @@ const messages = defineMessages({
 				</div>
 
 				<!-- Reinstall -->
-				<div v-if="showModpackVersionActions || isLocalFile" class="flex flex-col gap-2.5">
+				<div
+					v-if="(showModpackVersionActions || isLocalFile) && !isLinkedInstance"
+					class="flex flex-col gap-2.5"
+				>
 					<span class="text-lg font-semibold text-contrast">
 						{{ formatMessage(messages.reinstallModpackTitle) }}
 					</span>

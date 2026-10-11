@@ -73,21 +73,6 @@ pub enum PackOverrideSideState {
     Removed,
 }
 
-/// Persisted modpack manifest for an instance.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct ModpackManifest {
-    pub id: String,
-    pub instance_id: String,
-    pub pack_name: String,
-    pub pack_version: String,
-    pub game_version: String,
-    pub loader: String,
-    pub loader_version: Option<String>,
-    pub modrinth_project_id: Option<String>,
-    pub modrinth_version_id: Option<String>,
-    pub installed_at: String,
-}
-
 #[cfg(test)]
 mod tests {
     use super::{PackFormat, PackOverrideSideState};

@@ -8,8 +8,7 @@ use serde_json::json;
 use crate::{
     application::{
         fs_service::FsError, instance_service::InstanceError,
-        mod_service::ModError, modpack_service::ModpackError,
-        server_source_service::SourceError,
+        mod_service::ModError, server_source_service::SourceError,
     },
     ports::instance_store::StoreError,
 };
@@ -68,12 +67,6 @@ impl From<InstanceError> for ApiError {
             }
             e => Self::Internal(e.to_string()),
         }
-    }
-}
-
-impl From<ModpackError> for ApiError {
-    fn from(e: ModpackError) -> Self {
-        Self::Internal(e.to_string())
     }
 }
 

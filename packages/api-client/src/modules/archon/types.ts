@@ -350,7 +350,12 @@ export namespace Archon {
 				version: AddonVersion | null
 				owner: ContentOwner | null
 				icon_url: string | null
+				/** Core only. False for client-only pack content: listed, never put on the server. */
+				installed?: boolean
 			}
+
+			/** Core only. Where a linked server is with the newest version pushed to it. */
+			export type LinkedPackState = 'up_to_date' | 'downloading' | 'pending' | 'applying' | 'failed'
 
 			export type Addons = {
 				modloader: string | null
@@ -424,6 +429,11 @@ export namespace Archon {
 				date_published: string | null
 				downloads: number | null
 				followers: number | null
+				/** Core only. Set when the pack is an App instance: the App's id for it. */
+				instance_id?: string | null
+				/** Core only. `pending` means the update applies when the server next stops. */
+				state?: LinkedPackState
+				error?: string | null
 			}
 
 			export type KnownPropertiesFields = {
@@ -682,6 +692,19 @@ export namespace Archon {
 				locked_since: string | null
 
 				medal_expires?: string
+
+				/** Core only. The App instance this server follows, if any. */
+				linked_instance?: LinkedInstance | null
+				/** Core only. Lets a list show running servers without opening a socket each. */
+				power_state?: 'offline' | 'starting' | 'running' | 'stopping' | 'crashed'
+			}
+
+			export type LinkedInstance = {
+				/** The App's id for the instance. */
+				id: string
+				name: string
+				state: Content.v1.LinkedPackState
+				error: string | null
 			}
 
 			export type UserScope = number

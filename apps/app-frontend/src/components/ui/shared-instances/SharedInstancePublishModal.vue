@@ -5,15 +5,21 @@
 		:admonition-header="formatMessage(messages.admonitionHeader)"
 		:description="formatMessage(messages.description)"
 		:diffs="publishDiffs"
-		:confirm-label="formatMessage(messages.publishButton)"
+		:confirm-label="
+			formatMessage(hasServers ? messages.pushAndRestartButton : messages.publishButton)
+		"
 		:confirm-icon="UploadIcon"
-		:confirm-disabled="publishDiffs.length === 0 && selectedConfigPaths.length === 0"
+		:secondary-confirm-label="hasServers ? formatMessage(messages.publishButton) : undefined"
+		:confirm-disabled="
+			publishDiffs.length === 0 && selectedConfigPaths.length === 0 && !serverFailed
+		"
 		:added-label="formatMessage(messages.addedLabel)"
 		:removed-label="formatMessage(messages.removedLabel)"
-		@confirm="publishChanges"
+		@confirm="publishChanges(hasServers)"
+		@secondary-confirm="publishChanges(false)"
 		@cancel="finishReview"
 	>
-		<template #additional-content>
+		<template v-if="configFilePaths.length > 0" #additional-content>
 			<Accordion
 				class="min-w-0"
 				overflow-visible
@@ -60,17 +66,25 @@ import {
 	isSharedInstanceUnavailableError,
 } from '@/helpers/install'
 import { get_shared_instance_publish_preview, publish_shared_instance } from '@/helpers/instance'
+import { diffInstanceAgainstServer, type LinkedServer } from '@/helpers/linked-servers'
 import { useSharedInstanceErrors } from '@/helpers/shared-instance-errors'
 import type { GameInstance } from '@/helpers/types'
 
 type SharedInstancePublishState = 'idle' | 'reviewing' | 'publishing'
 
+/**
+ * The review every push goes through. It lists what changed and only lets a push happen when
+ * something did. A shared instance publishes to friends; an instance with linked servers also
+ * offers "Push and restart" and emits `push-servers` for the caller to update them.
+ */
 const props = defineProps<{
 	instance: GameInstance
+	servers?: LinkedServer[]
 }>()
 
 const emit = defineEmits<{
 	published: []
+	'push-servers': [restart: boolean]
 	'state-change': [state: SharedInstancePublishState]
 }>()
 
@@ -83,6 +97,14 @@ const configFilePaths = ref<string[]>([])
 const includedConfigPaths = ref<string[]>([])
 const excludedConfigPaths = ref<string[]>([])
 const state = ref<SharedInstancePublishState>('idle')
+const hasServers = computed(() => (props.servers?.length ?? 0) > 0)
+// A server that failed to take the instance can always be pushed to again.
+const serverFailed = computed(
+	() => props.servers?.some((server) => server.linked_instance.state === 'failed') ?? false,
+)
+const sharesWithFriends = computed(() => props.instance.shared_instance?.role === 'owner')
+// Whether the changes on screen are ones friends have not received yet.
+const friendsBehind = ref(false)
 const configFileItems = computed<FileTreeSelectItem[]>(() =>
 	configFilePaths.value.map((path) => ({ path, type: 'file' })),
 )
@@ -101,23 +123,37 @@ async function show(e?: MouseEvent) {
 	setState('reviewing')
 	let reviewOpened = false
 	try {
-		const preview = await get_shared_instance_publish_preview(props.instance.id)
-		if (!preview) {
-			notifySharedInstanceUnavailable()
-			emit('published')
-			return
+		let friendDiffs: ContentDiffItem[] = []
+		configFilePaths.value = []
+		if (sharesWithFriends.value) {
+			const preview = await get_shared_instance_publish_preview(props.instance.id)
+			if (!preview) {
+				notifySharedInstanceUnavailable()
+				emit('published')
+				if (!hasServers.value) return
+			} else {
+				friendDiffs = preview.diffs.map((diff) => ({
+					type: diff.type,
+					projectName: diff.projectName ?? undefined,
+					fileName: diff.fileName ?? undefined,
+					currentVersionName: diff.currentVersionName ?? undefined,
+					newVersionName: diff.newVersionName ?? undefined,
+					fileCount: diff.configFileCount ?? undefined,
+					disabled: diff.disabled,
+				}))
+				configFilePaths.value = preview.configFiles
+			}
 		}
-
-		publishDiffs.value = preview.diffs.map((diff) => ({
-			type: diff.type,
-			projectName: diff.projectName ?? undefined,
-			fileName: diff.fileName ?? undefined,
-			currentVersionName: diff.currentVersionName ?? undefined,
-			newVersionName: diff.newVersionName ?? undefined,
-			fileCount: diff.configFileCount ?? undefined,
-			disabled: diff.disabled,
-		}))
-		configFilePaths.value = preview.configFiles
+		friendsBehind.value = friendDiffs.length > 0
+		// Friends can be up to date while a server is not, so fall back to what the server lacks.
+		let serverDiffs: ContentDiffItem[] = []
+		if (friendDiffs.length === 0) {
+			for (const server of props.servers ?? []) {
+				serverDiffs = await diffInstanceAgainstServer(props.instance.id, server)
+				if (serverDiffs.length > 0) break
+			}
+		}
+		publishDiffs.value = friendDiffs.length > 0 ? friendDiffs : serverDiffs
 		includedConfigPaths.value = []
 		excludedConfigPaths.value = []
 		if (!publishReviewModal.value) return
@@ -131,13 +167,16 @@ async function show(e?: MouseEvent) {
 	}
 }
 
-async function publishChanges() {
+async function publishChanges(restart: boolean) {
 	if (state.value !== 'reviewing') return
 
 	setState('publishing')
 	try {
-		await publish_shared_instance(props.instance.id, selectedConfigPaths.value)
-		emit('published')
+		if (sharesWithFriends.value && (friendsBehind.value || selectedConfigPaths.value.length > 0)) {
+			await publish_shared_instance(props.instance.id, selectedConfigPaths.value)
+			emit('published')
+		}
+		if (hasServers.value) emit('push-servers', restart)
 	} catch (error) {
 		handlePublishError(error)
 	} finally {
@@ -196,7 +235,7 @@ const messages = defineMessages({
 	},
 	admonitionHeader: {
 		id: 'instance.shared-instance.publish-review.admonition-header',
-		defaultMessage: 'Push update to players',
+		defaultMessage: 'Push update',
 	},
 	description: {
 		id: 'instance.shared-instance.publish-review.description',
@@ -206,6 +245,10 @@ const messages = defineMessages({
 	publishButton: {
 		id: 'instance.shared-instance.publish-review.publish-button',
 		defaultMessage: 'Push update',
+	},
+	pushAndRestartButton: {
+		id: 'instance.shared-instance.publish-review.push-and-restart-button',
+		defaultMessage: 'Push and restart',
 	},
 	addedLabel: {
 		id: 'instance.shared-instance.publish-review.added-label',

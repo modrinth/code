@@ -1028,6 +1028,12 @@ async fn upload_addons(
 }
 
 #[derive(Deserialize)]
+struct InstanceField {
+    id: String,
+    name: String,
+}
+
+#[derive(Deserialize)]
 struct ModpackUploadQuery {
     #[serde(default)]
     soft_override: bool,
@@ -1055,13 +1061,21 @@ async fn upload_modpack(
         .or_default()
         .clone();
     let _operation_guard = operation_lock.lock().await;
-    if state.instances.contains_key(&record.id) {
+    // A linked server takes an update while running; it applies when the server stops.
+    let linked = crate::application::server_source_service::get_status(
+        &state,
+        &record.id.to_string(),
+    )
+    .await?
+    .is_some();
+    if !linked && state.instances.contains_key(&record.id) {
         return Err(ApiError::Conflict(
             "Stop the server before installing a modpack".into(),
         ));
     }
     let mut pack = None;
     let mut updates = None;
+    let mut instance = None;
     while let Some(mut field) = multipart
         .next_field()
         .await
@@ -1132,6 +1146,20 @@ async fn upload_modpack(
                 }
                 updates = Some(values);
             }
+            // Set by the App when the pack is an export of one of its instances.
+            Some("instance") => {
+                let text = field
+                    .text()
+                    .await
+                    .map_err(|error| ApiError::BadRequest(error.to_string()))?;
+                let from: InstanceField =
+                    serde_json::from_str(&text).map_err(|error| {
+                        ApiError::BadRequest(format!(
+                            "invalid instance: {error}"
+                        ))
+                    })?;
+                instance = Some((from.id, from.name));
+            }
             _ => {
                 return Err(ApiError::BadRequest(
                     "unexpected multipart field".into(),
@@ -1199,7 +1227,7 @@ async fn upload_modpack(
         &state,
         &record.id.to_string(),
         pack.path(),
-        "modpack.mrpack",
+        instance,
     )
     .await?;
     if !updates.is_empty() {

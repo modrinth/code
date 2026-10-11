@@ -146,6 +146,12 @@ interface ManagedContentCardBase {
 	manager: ManagedContentManager
 	summary?: ManagedContentSummaryItem[]
 	installing?: boolean
+	/** Replaces the card's default heading, e.g. with the name of the instance a server follows. */
+	title?: string
+	/** Shown after the manager, in place of a version, e.g. that an update is waiting. */
+	status?: string
+	/** Replaces the default primary action label and shows the action whenever it is wired. */
+	primaryActionLabel?: string
 }
 
 export type ManagedContentCardData =

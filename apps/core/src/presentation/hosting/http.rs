@@ -6,7 +6,8 @@ mod backup_queue;
 use super::models::*;
 use crate::{
     application::{
-        backup_service, mod_service, modpack_service, server_source_service,
+        backup_service, instance_status_service, mod_service,
+        server_source_service,
         state::{AppState, WsTicket},
     },
     domain::{
@@ -15,14 +16,15 @@ use crate::{
             InstanceId, InstanceInstallStatus, InstanceRecord, InstanceStatus,
             MemorySettings, ModLoader,
         },
+        server_source::{
+            ContentKind, ContentOrigin, ServerSource, SourceApplyState,
+        },
     },
     infrastructure::minecraft::server_properties,
     presentation::{
         error::ApiError,
         extractors::{bearer_token, AuthUser},
-        handlers::{
-            backups, instance_control, instances, modpack, mods, properties,
-        },
+        handlers::{backups, instance_control, instances, mods, properties},
         instance_path::resolve_instance_path,
     },
 };
@@ -51,6 +53,7 @@ pub fn router() -> Router<Arc<AppState>> {
             get(download_backup),
         )
         .route("/local/servers", post(create_server))
+        .route("/local/servers/:id", delete(delete_server))
         .route("/modrinth/v0/servers", get(list_v0))
         .route("/modrinth/v0/servers/:id", get(get_v0))
         .route("/modrinth/v0/servers/:id/power", post(power))
@@ -143,7 +146,7 @@ pub fn router() -> Router<Arc<AppState>> {
         )
         .route(
             "/v1/servers/:id/worlds/:wid/content/modpack/update",
-            get(unsupported).post(unsupported),
+            get(get_modpack_update).post(update_modpack),
         )
         .route(
             "/v1/servers/:id/worlds/:wid/content/update-game-version",
@@ -201,8 +204,17 @@ async fn v0(
     user: &AuthUser,
     r: &InstanceRecord,
 ) -> Result<Value, ApiError> {
-    let pack = modpack_service::get_manifest(state, &r.id.to_string()).await?;
-    let upstream = pack.and_then(|p| Some(json!({"kind": "modpack", "project_id": p.modrinth_project_id?, "version_id": p.modrinth_version_id?}))).unwrap_or(Value::Null);
+    let source =
+        server_source_service::get_status(state, &r.id.to_string()).await?;
+    let upstream = match source.as_ref().map(|status| &status.source) {
+        Some(ServerSource::Modrinth {
+            project_id,
+            version_id,
+        }) => {
+            json!({"kind": "modpack", "project_id": project_id, "version_id": version_id})
+        }
+        _ => Value::Null,
+    };
     let count = backup_service::list_backups(state, &r.id.to_string())
         .await?
         .len();
@@ -212,7 +224,7 @@ async fn v0(
         state.config.public_url.trim_end_matches('/'),
         r.id
     );
-    Ok(server_v0(
+    let mut server = server_v0(
         r,
         &user.0.id,
         -32768,
@@ -220,7 +232,27 @@ async fn v0(
         &host(state),
         upstream,
         &node_url,
-    ))
+    );
+    // The App lists an instance's servers from these two fields, without opening a socket.
+    server["linked_instance"] = match &source {
+        Some(status) => match &status.source {
+            ServerSource::Instance { instance_id, name } => {
+                json!({"id": instance_id, "name": name, "state": status.state, "error": status.error})
+            }
+            _ => Value::Null,
+        },
+        None => Value::Null,
+    };
+    server["power_state"] = json!(r.status);
+    // The first install of a linked pack sets the game version when it applies. Until then the
+    // server is installing, not waiting for setup.
+    if let (Some(status), true) = (&source, r.game_version.is_empty()) {
+        server["flows"]["intro"] = json!(false);
+        if status.state != SourceApplyState::Failed {
+            server["status"] = json!("installing");
+        }
+    }
+    Ok(server)
 }
 
 async fn v1(
@@ -363,10 +395,74 @@ async fn create_server(
         updated_at: now,
     };
     state.instance_store.create(&r).await?;
+    if let Some(instance) = body.instance {
+        server_source_service::link_awaiting_upload(
+            &state,
+            &id.to_string(),
+            ServerSource::Instance {
+                instance_id: instance.id,
+                name: instance.name,
+            },
+        )
+        .await
+        .map_err(|e| ApiError::Internal(e.to_string()))?;
+    }
     state
         .broadcaster
         .send(Event::InstanceCreated { instance: r });
     Ok((StatusCode::CREATED, Json(json!({"id": id}))))
+}
+
+/// Deletes a server with its world, files, and backups. A running server is killed first.
+async fn delete_server(
+    _user: AuthUser,
+    State(state): State<Arc<AppState>>,
+    Path(id): Path<String>,
+) -> Result<StatusCode, ApiError> {
+    let r = record(&state, &id).await?;
+    let lock = state
+        .instance_operation_locks
+        .entry(r.id.clone())
+        .or_default()
+        .clone();
+    let _guard = lock.lock().await;
+    if state.instances.contains_key(&r.id) {
+        instance_status_service::kill_instance(&state, &r.id).await?;
+        let deadline = Instant::now() + Duration::from_secs(30);
+        while state.instances.contains_key(&r.id) {
+            if Instant::now() >= deadline {
+                return Err(ApiError::Conflict(
+                    "The server did not stop; try again".into(),
+                ));
+            }
+            tokio::time::sleep(Duration::from_millis(250)).await;
+        }
+    }
+    let key = r.id.to_string();
+    // Child rows (mods, backups, the linked source) go with the instance row.
+    sqlx::query("DELETE FROM instances WHERE id = ?")
+        .bind(&key)
+        .execute(&state.pool)
+        .await
+        .map_err(|e| ApiError::Internal(e.to_string()))?;
+    for dir in [
+        std::path::PathBuf::from(&r.data_dir),
+        state.config.data_dir.join("backups").join(&key),
+        state.config.data_dir.join("source_staging").join(&key),
+    ] {
+        match tokio::fs::remove_dir_all(&dir).await {
+            Err(e) if e.kind() != std::io::ErrorKind::NotFound => {
+                tracing::warn!("Could not remove {}: {e}", dir.display());
+            }
+            _ => {}
+        }
+    }
+    drop(_guard);
+    state.instance_operation_locks.remove(&r.id);
+    state
+        .broadcaster
+        .send(Event::InstanceDeleted { instance_id: r.id });
+    Ok(StatusCode::NO_CONTENT)
 }
 
 async fn power(
@@ -818,58 +914,113 @@ async fn install_modrinth_pack(
     let id = r.id.to_string();
     let linked = server_source_service::get_status(state, &id).await?;
     if linked.is_some() {
-        server_source_service::request_source_update(
-            state, &id, version, false,
-        )
-        .await?;
+        server_source_service::request_source_update(state, &id, version)
+            .await?;
     } else {
         server_source_service::link(
             state,
             &id,
-            server_source_service::LinkRequest {
-                source: crate::domain::server_source::ServerSource::Modrinth {
-                    project_id: project.to_string(),
-                    version_id: version.to_string(),
-                },
-                version: version.to_string(),
-                sharing: None,
-                properties: Default::default(),
+            ServerSource::Modrinth {
+                project_id: project.to_string(),
+                version_id: version.to_string(),
             },
+            version,
         )
         .await?;
     }
     Ok(())
 }
 
+/// The linked pack's files stay on the server and become its own content.
 async fn unlink_modpack(
     _user: AuthUser,
     State(state): State<Arc<AppState>>,
     Path((id, wid)): Path<(String, String)>,
 ) -> ApiResult {
-    modpack::remove_modpack(Path(world(id, wid)?), State(state)).await
+    let r = record(&state, &world(id, wid)?).await?;
+    server_source_service::unlink(&state, &r.id.to_string()).await?;
+    Ok(Json(json!({})))
 }
 
-async fn get_addons(
+async fn get_modpack_update(
     _user: AuthUser,
     State(state): State<Arc<AppState>>,
     Path((id, wid)): Path<(String, String)>,
 ) -> ApiResult {
+    let r = record(&state, &world(id, wid)?).await?;
+    let status = server_source_service::get_status(&state, &r.id.to_string())
+        .await?
+        .ok_or_else(|| ApiError::NotFound("no modpack is linked".into()))?;
+    Ok(Json(modpack(&status)))
+}
+
+/// Applies the newest pushed version now. A running server restarts; a stopped one stays
+/// stopped. This is also the retry for a failed update.
+async fn update_modpack(
+    _user: AuthUser,
+    State(state): State<Arc<AppState>>,
+    Path((id, wid)): Path<(String, String)>,
+) -> ApiResult {
+    let r = record(&state, &world(id, wid)?).await?;
+    let status =
+        server_source_service::apply_now(&state, &r.id.to_string()).await?;
+    Ok(Json(modpack(&status)))
+}
+
+#[derive(serde::Deserialize, Default)]
+struct AddonsQuery {
+    from_modpack: Option<bool>,
+}
+
+/// Mods and datapacks on the server. `from_modpack` selects the linked pack's content or the
+/// server's own additions. Client-only pack content is listed with `installed: false`.
+async fn get_addons(
+    _user: AuthUser,
+    State(state): State<Arc<AppState>>,
+    Path((id, wid)): Path<(String, String)>,
+    Query(query): Query<AddonsQuery>,
+) -> ApiResult {
     let id = world(id, wid)?;
     let r = record(&state, &id).await?;
+    let id = r.id.to_string();
+    let content = server_source_service::content(&state, &id).await?;
+    let mods = mod_service::list_mods(&state, &id).await?;
+    let data_dir = std::path::Path::new(&r.data_dir);
+    let level = server_properties::read_properties(data_dir)
+        .await
+        .ok()
+        .and_then(|props| props.get("level-name").cloned())
+        .unwrap_or_else(|| "world".into());
     let mut addons = Vec::new();
-    for m in mod_service::list_mods(&state, &id).await? {
-        let path = std::path::Path::new(&r.data_dir)
-            .join("mods")
-            .join(&m.filename);
+    for item in &content.items {
+        let from_pack = item.origin == ContentOrigin::Source;
+        if query.from_modpack.is_some_and(|wanted| wanted != from_pack) {
+            continue;
+        }
+        // Source items are listed by their enabled name; a disabled one has the suffix on disk.
+        let on_disk = if item.disabled && !item.filename.ends_with(".disabled")
+        {
+            format!("{}.disabled", item.filename)
+        } else {
+            item.filename.clone()
+        };
+        let path = match item.kind {
+            ContentKind::Datapack => {
+                data_dir.join(&level).join("datapacks").join(&on_disk)
+            }
+            _ => data_dir.join("mods").join(&on_disk),
+        };
         let size = tokio::fs::metadata(path)
             .await
             .map(|m| m.len())
             .unwrap_or(0);
-        addons.push(addon(&m, size));
+        let info = mods
+            .iter()
+            .find(|m| m.filename == item.filename || m.filename == on_disk);
+        addons.push(addon(item, info, size));
     }
-    let pack = modpack_service::get_manifest(&state, &id).await?;
     let mut result = json!({"modloader": r.loader.to_string(), "modloader_version": r.loader_version,
-        "game_version": r.game_version, "modpack": pack.as_ref().map(super::models::modpack), "addons": addons});
+        "game_version": r.game_version, "modpack": content.source.as_ref().map(modpack), "addons": addons});
     match r.install_status {
         InstanceInstallStatus::Installing if !r.game_version.is_empty() => {
             result["installing"] = json!("loader")
@@ -880,7 +1031,35 @@ async fn get_addons(
         }
         _ => {}
     }
+    match content.source.as_ref().map(|status| status.state) {
+        Some(SourceApplyState::Downloading | SourceApplyState::Applying) => {
+            result["installing"] = json!("modpack")
+        }
+        Some(SourceApplyState::Failed) => {
+            result["error"] = json!({"message": content.source.as_ref().and_then(|status| status.error.clone())
+                .unwrap_or_else(|| "The update failed".into())})
+        }
+        _ => {}
+    }
     Ok(Json(result))
+}
+
+/// Content the linked pack provides is read-only on the server: the next update would put it
+/// back, so it is changed on the instance instead.
+async fn require_own(
+    state: &Arc<AppState>,
+    id: &str,
+    filename: &str,
+) -> Result<(), ApiError> {
+    let r = record(state, id).await?;
+    if server_source_service::provides(state, &r.id.to_string(), filename)
+        .await?
+    {
+        return Err(ApiError::UnprocessableEntity(
+            "This comes from the linked pack. Change it there, or unlink the server.".into(),
+        ));
+    }
+    Ok(())
 }
 
 fn require_mod(kind: Option<&str>) -> Result<(), ApiError> {
@@ -936,11 +1115,9 @@ async fn delete_addon(
     Json(body): Json<AddonFile>,
 ) -> ApiResult {
     require_mod(Some(&body.kind))?;
-    mods::delete_mod_handler(
-        Path((world(id, wid)?, body.filename)),
-        State(state),
-    )
-    .await
+    let id = world(id, wid)?;
+    require_own(&state, &id, &body.filename).await?;
+    mods::delete_mod_handler(Path((id, body.filename)), State(state)).await
 }
 
 async fn delete_addons(
@@ -972,8 +1149,10 @@ async fn toggle(
     enabled: bool,
 ) -> ApiResult {
     require_mod(Some(&body.kind))?;
+    let id = world(pair.0, pair.1)?;
+    require_own(&state, &id, &body.filename).await?;
     mods::toggle_mod_handler(
-        Path((world(pair.0, pair.1)?, body.filename)),
+        Path((id, body.filename)),
         State(state),
         Json(mods::ToggleBody { enabled }),
     )

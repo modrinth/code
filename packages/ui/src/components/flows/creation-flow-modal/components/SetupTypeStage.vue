@@ -80,6 +80,13 @@
 		<template v-else>
 			<div class="flex flex-col gap-3">
 				<BigOptionButton
+					v-if="ctx.flowType === 'server-onboarding' && instanceSource"
+					:icon="BoxesIcon"
+					:title="formatMessage(messages.fromInstanceTitle)"
+					:description="formatMessage(messages.fromInstanceDescription)"
+					@click="selectFromInstance"
+				/>
+				<BigOptionButton
 					:icon="CompassIcon"
 					:title="formatMessage(messages.modpackBaseTitle)"
 					:description="formatMessage(messages.modpackBaseDescription)"
@@ -123,7 +130,7 @@ import { computed, defineAsyncComponent, h, onMounted, ref, watch } from 'vue'
 
 import { useDebugLogger } from '#ui/composables/debug-logger'
 
-import { injectFilePicker } from '../../../../providers'
+import { injectFilePicker, injectInstanceServerSource } from '../../../../providers'
 import BigOptionButton from '../../../base/BigOptionButton.vue'
 import Combobox from '../../../base/Combobox.vue'
 import { injectCreationFlowContext } from '../creation-flow-context'
@@ -131,6 +138,8 @@ import { injectCreationFlowContext } from '../creation-flow-context'
 const debug = useDebugLogger('SetupTypeStage')
 const ctx = injectCreationFlowContext()
 const filePicker = injectFilePicker()
+// Only the App can create a server from an instance.
+const instanceSource = injectInstanceServerSource(null)
 const { setSetupType: _setSetupType } = ctx
 const { formatMessage } = useVIntl()
 
@@ -210,6 +219,14 @@ const messages = defineMessages({
 		id: 'creation-flow.modal.setup-type.option.vanilla-minecraft.description',
 		defaultMessage: 'Classic Minecraft with no mods or plugins.',
 	},
+	fromInstanceTitle: {
+		id: 'creation-flow.modal.setup-type.option.from-instance.title',
+		defaultMessage: 'From instance',
+	},
+	fromInstanceDescription: {
+		id: 'creation-flow.modal.setup-type.option.from-instance.description',
+		defaultMessage: 'Use one of your instances. The server keeps following it.',
+	},
 })
 
 const setupTypeTitle = computed(() => {
@@ -244,6 +261,13 @@ function proceedWithModpack() {
 	} else {
 		ctx.modal.value?.setStage('final-config')
 	}
+}
+
+function selectFromInstance() {
+	if (ctx.finishDisabled.value) return
+
+	debug('selected: from instance')
+	ctx.setInstancePickMode()
 }
 
 function browseModpacks() {

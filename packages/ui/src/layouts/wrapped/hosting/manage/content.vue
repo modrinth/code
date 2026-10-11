@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { type Archon, type Labrinth, ModrinthApiError } from '@modrinth/api-client'
-import { ClipboardCopyIcon } from '@modrinth/assets'
+import { ClipboardCopyIcon, UnlinkIcon } from '@modrinth/assets'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+import type { ButtonMenuOption } from '#ui/components/base/buttons'
 import ReadyTransition from '#ui/components/base/ReadyTransition.vue'
 import UnknownFileWarningModal from '#ui/components/modal/UnknownFileWarningModal.vue'
 import type { UpdateAllSelection } from '#ui/components/modal/update-all-modal/update-all-modal-types'
@@ -108,6 +109,38 @@ const messages = defineMessages({
 		id: 'hosting.content.failed-to-install',
 		defaultMessage: 'Failed to install content',
 	},
+	instanceContent: {
+		id: 'hosting.content.instance.content-header',
+		defaultMessage: 'Instance content',
+	},
+	restartToApply: {
+		id: 'hosting.content.instance.restart-to-apply',
+		defaultMessage: 'Restart to apply',
+	},
+	retryUpdate: {
+		id: 'hosting.content.instance.retry-update',
+		defaultMessage: 'Retry update',
+	},
+	failedToApplyUpdate: {
+		id: 'hosting.content.instance.apply-failed',
+		defaultMessage: 'Could not apply the update',
+	},
+	unlinkFromInstance: {
+		id: 'hosting.content.instance.unlink',
+		defaultMessage: 'Unlink from instance',
+	},
+	updateWaiting: {
+		id: 'hosting.content.instance.update-waiting',
+		defaultMessage: 'Update applies when the server stops',
+	},
+	updateFailed: {
+		id: 'hosting.content.instance.update-failed-status',
+		defaultMessage: 'Last update failed',
+	},
+	notInstalledClientOnly: {
+		id: 'hosting.content.instance.not-installed-client-only',
+		defaultMessage: 'Not installed (client only)',
+	},
 })
 
 const client = injectModrinthClient()
@@ -153,7 +186,16 @@ const contentQuery = useQuery({
 		client.archon.content_v1.getAddons(serverId, worldId.value!, { from_modpack: false }),
 	enabled: computed(() => worldId.value !== null),
 	staleTime: 30_000,
+	// A linked pack installs in the background, so keep reading until it settles.
+	refetchInterval: (query) => {
+		const state = query.state.data?.modpack?.state
+		return state === 'downloading' || state === 'applying' ? 2_000 : false
+	},
 })
+
+/** The App instance this server follows, when its linked pack is one. */
+const linkedInstanceId = computed(() => contentQuery.data.value?.modpack?.instance_id ?? null)
+const applyingInstanceUpdate = ref(false)
 
 const isModpackContentModalOpen = ref(false)
 const modpackContentQuery = useQuery({
@@ -165,6 +207,16 @@ const modpackContentQuery = useQuery({
 	enabled: computed(() => worldId.value !== null && !!contentQuery.data.value?.modpack),
 	staleTime: 30_000,
 })
+
+// The pack's content changes whenever an update finishes applying.
+watch(
+	() => contentQuery.data.value?.modpack?.state,
+	(state, previous) => {
+		if (previous && state !== previous) {
+			void queryClient.invalidateQueries({ queryKey: modpackContentQueryKey.value })
+		}
+	},
+)
 
 const setupActionDisabled = computed(() => !canSetup.value || busyReasons.value.length > 0)
 const isInstallingContent = computed(
@@ -276,14 +328,35 @@ const managedContent = computed<ManagedContentData | null>(() => {
 	const title = isLocal
 		? (mp.title ?? mp.spec.name)
 		: (project?.title ?? mp.title ?? projectId ?? '')
+	const linkedInstance = !!mp.instance_id
 	return {
 		card: {
 			kind: 'modpack',
-			installing: isInstallingContent.value,
+			installing:
+				isInstallingContent.value || mp.state === 'downloading' || mp.state === 'applying',
+			title: linkedInstance ? title : undefined,
+			status:
+				mp.state === 'pending'
+					? formatMessage(messages.updateWaiting)
+					: mp.state === 'failed'
+						? (mp.error ?? formatMessage(messages.updateFailed))
+						: undefined,
+			// Only when a pushed update is waiting or failed; an up-to-date server has nothing to do.
+			primaryActionLabel: !linkedInstance
+				? undefined
+				: mp.state === 'pending'
+					? formatMessage(messages.restartToApply)
+					: mp.state === 'failed'
+						? formatMessage(messages.retryUpdate)
+						: undefined,
 			manager: {
 				name: title,
 				iconUrl: (isLocal ? mp.icon_url : (project?.icon_url ?? mp.icon_url)) ?? undefined,
-				link: projectId ? `/project/${project?.slug ?? projectId}` : undefined,
+				link: linkedInstance
+					? `/instance/${encodeURIComponent(mp.instance_id!)}`
+					: projectId
+						? `/project/${project?.slug ?? projectId}`
+						: undefined,
 			},
 			summary,
 			versionNumber: isLocal ? undefined : (mp.version_number ?? undefined),
@@ -293,10 +366,42 @@ const managedContent = computed<ManagedContentData | null>(() => {
 					: undefined,
 			updatedAt: isLocal ? undefined : (mp.date_published ?? undefined),
 		},
-		disabled: setupActionDisabled.value,
+		disabled: setupActionDisabled.value || applyingInstanceUpdate.value,
 		disabledText: setupActionBusyMessage.value ?? formatMessage(commonMessages.installingLabel),
 	}
 })
+
+const managedContentMenuOptions = computed<ButtonMenuOption[]>(() =>
+	linkedInstanceId.value
+		? [
+				{
+					id: 'unlink',
+					label: formatMessage(messages.unlinkFromInstance),
+					icon: UnlinkIcon,
+					tone: 'red',
+					action: () => handleModpackUnlink(),
+				},
+			]
+		: [],
+)
+
+/** Applies the update the instance pushed: restarts a running server, or retries a failed one. */
+async function handleApplyInstanceUpdate() {
+	if (!worldId.value || applyingInstanceUpdate.value) return
+	applyingInstanceUpdate.value = true
+	try {
+		await client.archon.content_v1.updateModpack(serverId, worldId.value)
+		await contentQuery.refetch()
+	} catch (err) {
+		addNotification({
+			type: 'error',
+			title: formatMessage(messages.failedToApplyUpdate),
+			text: err instanceof Error ? err.message : undefined,
+		})
+	} finally {
+		applyingInstanceUpdate.value = false
+	}
+}
 
 function friendlyAddonName(addon: Archon.Content.v1.Addon): string {
 	if (addon.name) return addon.name
@@ -824,7 +929,10 @@ function addonToContentItem(addon: AddonWithUiState): ContentItem {
 		},
 		version: {
 			id: addon.version?.id ?? addon.filename,
-			version_number: addon.version?.name ?? formatMessage(commonMessages.unknownLabel),
+			version_number:
+				addon.installed === false
+					? formatMessage(messages.notInstalledClientOnly)
+					: (addon.version?.name ?? formatMessage(commonMessages.unknownLabel)),
 			file_name: addon.filename,
 		},
 		owner: addon.owner
@@ -1030,6 +1138,7 @@ async function handleSwitchVersion(item: ContentItem) {
 
 async function handleModpackUpdate() {
 	if (setupActionDisabled.value) return
+	if (linkedInstanceId.value) return handleApplyInstanceUpdate()
 	const mp = contentQuery.data.value?.modpack
 	if (!mp || mp.spec.platform !== 'modrinth') return
 
@@ -1231,6 +1340,7 @@ provideContentManager({
 	runManagedContentPrimaryAction: handleModpackUpdate,
 	viewManagedContent: handleViewModpackContent,
 	unlinkModpack: handleModpackUnlink,
+	managedContentMenuOptions,
 	openManagedContentSettings: () => openServerSettings({ tabId: 'installation' }),
 	switchVersion: handleSwitchVersion,
 	getOverflowOptions,
@@ -1282,8 +1392,10 @@ provideContentManager({
 					ref="modpackContentModal"
 					:source-name="managedContent?.card.manager.name"
 					:source-icon-url="managedContent?.card.manager.iconUrl"
-					:header="formatMessage(messages.modpackContent)"
-					enable-toggle
+					:header="
+						formatMessage(linkedInstanceId ? messages.instanceContent : messages.modpackContent)
+					"
+					:enable-toggle="!linkedInstanceId"
 					show-environment-warnings
 					:action-disabled="contentActionDisabled"
 					:action-disabled-tooltip="contentActionBusyMessage ?? undefined"

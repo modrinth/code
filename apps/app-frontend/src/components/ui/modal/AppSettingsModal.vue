@@ -268,7 +268,15 @@ function showSyncedOptions(): void {
 	modal.value?.show()
 }
 
-defineExpose({ show, showProfile, showFeatureFlags, showSyncedOptions })
+function showCores(): void {
+	const coresTabIndex = availableTabs.value.findIndex((tab) => tab.content === CoresSettings)
+	if (coresTabIndex >= 0) {
+		modal.value?.setTab(coresTabIndex)
+	}
+	modal.value?.show()
+}
+
+defineExpose({ show, showProfile, showFeatureFlags, showSyncedOptions, showCores })
 
 const { progress, version: downloadingVersion } = injectAppUpdateDownloadProgress()
 

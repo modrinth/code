@@ -9,10 +9,8 @@ export interface SharedInstanceManagementContext {
 	readonly inviteDisabled: ComputedRef<boolean>
 	readonly invitePending: Ref<boolean>
 	readonly pushUpdateDisabled: ComputedRef<boolean>
-	readonly pushUpdatePending: ComputedRef<boolean>
 	invite: (event: MouseEvent) => void
 	remove: (row: ShareRow) => void
-	pushUpdate: (event: MouseEvent) => void
 }
 
 export const [injectSharedInstanceManagement, provideSharedInstanceManagement] =

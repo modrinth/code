@@ -181,6 +181,15 @@
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</Button>
 					<Button
+						v-if="secondaryConfirmLabel"
+						type="outlined"
+						class="!border"
+						:disabled="buttonsDisabled || confirmDisabled"
+						@click="handleSecondaryConfirm"
+					>
+						{{ secondaryConfirmLabel }}
+					</Button>
+					<Button
 						type="colored"
 						color="brand"
 						:disabled="buttonsDisabled || confirmDisabled"
@@ -224,6 +233,8 @@ const props = defineProps<{
 	hasUnknownContent?: boolean
 	confirmLabel?: string
 	confirmIcon?: Component
+	/** Adds a second way to confirm, next to the main one. Emits `secondary-confirm`. */
+	secondaryConfirmLabel?: string
 	showReportButton?: boolean
 	showBackupCreator?: boolean
 	addedLabel?: string
@@ -237,6 +248,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
 	confirm: []
+	'secondary-confirm': []
 	cancel: []
 	report: [event?: MouseEvent]
 }>()
@@ -357,6 +369,13 @@ function handleConfirm() {
 	closingFromAction.value = true
 	hide()
 	emit('confirm')
+	closingFromAction.value = false
+}
+
+function handleSecondaryConfirm() {
+	closingFromAction.value = true
+	hide()
+	emit('secondary-confirm')
 	closingFromAction.value = false
 }
 

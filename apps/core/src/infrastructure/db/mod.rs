@@ -1,7 +1,6 @@
 pub mod installation_repo;
 pub mod instance_repo;
 pub mod java_repo;
-pub mod modpack_repo;
 
 use std::{path::Path, time::Duration};
 

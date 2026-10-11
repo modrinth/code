@@ -1,4 +1,5 @@
 import { AbstractModule } from '../../../core/abstract-module'
+import type { UploadHandle, UploadProgress } from '../../../types/upload'
 import type { Archon } from '../types'
 
 export class ArchonContentV1Module extends AbstractModule {
@@ -241,7 +242,46 @@ export class ArchonContentV1Module extends AbstractModule {
 		)
 	}
 
-	/** POST /v1/:server_id/worlds/:world_id/content/modpack/update */
+	/**
+	 * Core only. Uploads an App instance, exported as a `.mrpack`, to a server on the Core. The
+	 * first upload installs it and links the server to the instance; later uploads update it,
+	 * changing only what the instance changed. A running server keeps running and takes the
+	 * update when it next stops; call `updateModpack` to restart it now instead.
+	 *
+	 * POST /servers/:server_id/v1/worlds/:world_id/content/upload-modpack-file
+	 */
+	public uploadInstance(
+		serverId: string,
+		worldId: string,
+		pack: File | Blob,
+		/** `null` uploads a plain modpack file that is not linked to an instance. */
+		instance: { id: string; name: string } | null,
+		options?: {
+			/** World settings, used when the upload creates the server. */
+			properties?: Archon.Content.v1.PropertiesFields
+			onProgress?: (progress: UploadProgress) => void
+		},
+	): UploadHandle<void> {
+		const formData = new FormData()
+		formData.append('file', pack, instance ? 'instance.mrpack' : 'modpack.mrpack')
+		formData.append('properties', JSON.stringify(options?.properties ?? {}))
+		if (instance) formData.append('instance', JSON.stringify(instance))
+
+		return this.client.upload<void>(`/worlds/${worldId}/content/upload-modpack-file`, {
+			api: 'archon',
+			version: `servers/${serverId}/v1`,
+			formData,
+			params: { soft_override: 'true' },
+			onProgress: options?.onProgress,
+		})
+	}
+
+	/**
+	 * POST /v1/:server_id/worlds/:world_id/content/modpack/update
+	 *
+	 * On Core this applies the newest version pushed to a linked server now, restarting it if
+	 * it is running, and retries an update that failed.
+	 */
 	public async updateModpack(serverId: string, worldId: string): Promise<void> {
 		await this.client.request<void>(
 			`/servers/${serverId}/worlds/${worldId}/content/modpack/update`,

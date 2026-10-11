@@ -15,6 +15,8 @@ export interface InstallationSettingsContext {
 	loading: Ref<boolean> | ComputedRef<boolean>
 	installationInfo: ComputedRef<InstallationInfoRow[]>
 	isLinked: ComputedRef<boolean>
+	/** The linked content is an App instance the server follows, not a modpack. */
+	isLinkedInstance?: ComputedRef<boolean>
 	isBusy: Ref<boolean> | ComputedRef<boolean>
 	busyMessage?: Ref<string | null> | ComputedRef<string | null>
 	skipNonEssentialWarnings?: Ref<boolean> | ComputedRef<boolean>

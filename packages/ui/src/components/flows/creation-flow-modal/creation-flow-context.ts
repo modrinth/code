@@ -14,6 +14,7 @@ import { formatLoaderLabel } from '#ui/utils/loaders'
 
 import { createContext, injectModrinthClient, injectNotificationManager } from '../../../providers'
 import type { ImportableLauncher } from '../../../providers/instance-import'
+import type { ServerInstanceOption } from '../../../providers/instance-server-source'
 import type { MultiStageModal, StageConfigInput } from '../../base'
 import type { ComboboxOption } from '../../base/Combobox.vue'
 import { stageConfigs } from './stages'
@@ -72,6 +73,10 @@ export const creationFlowMessages = defineMessages({
 	importInstanceTitle: {
 		id: 'creation-flow.title.import-instance',
 		defaultMessage: 'Import instance',
+	},
+	selectInstanceTitle: {
+		id: 'creation-flow.title.select-instance',
+		defaultMessage: 'Choose an instance',
 	},
 	importButton: {
 		id: 'creation-flow.button.import',
@@ -199,6 +204,10 @@ export interface CreationFlowContextValue {
 	modpackFile: Ref<File | null>
 	modpackFilePath: Ref<string | null>
 	projectInstall: Ref<ProjectInstallSelection | null>
+	/** Server setup only: the instance the server is created from and will follow. */
+	instanceSelection: Ref<ServerInstanceOption | null>
+	/** Server setup only: the user chose "From instance", so the instance list stage is shown. */
+	isInstancePickMode: Ref<boolean>
 
 	// Project search state (persisted across stage navigation)
 	projectSearchProjectId: Ref<string | undefined>
@@ -233,6 +242,7 @@ export interface CreationFlowContextValue {
 	reset: (instanceCount?: number) => Promise<void>
 	setSetupType: (type: SetupType) => void
 	setImportMode: () => void
+	setInstancePickMode: () => void
 	browseModpacks: () => void
 	selectProject: (projectId: string, projectType: string) => Promise<void>
 	finish: () => void
@@ -363,6 +373,8 @@ export function createCreationFlowContext(
 	const modpackFile = ref<File | null>(null)
 	const modpackFilePath = ref<string | null>(null)
 	const projectInstall = ref<ProjectInstallSelection | null>(null)
+	const instanceSelection = ref<ServerInstanceOption | null>(null)
+	const isInstancePickMode = ref(false)
 
 	// Project search state (persisted across stage navigation)
 	const projectSearchProjectId = ref<string | undefined>()
@@ -498,6 +510,8 @@ export function createCreationFlowContext(
 		modpackFile.value = null
 		modpackFilePath.value = null
 		projectInstall.value = null
+		instanceSelection.value = null
+		isInstancePickMode.value = false
 		projectSearchProjectId.value = undefined
 		projectSearchOptions.value = []
 		projectSearchHits.value = {}
@@ -517,6 +531,8 @@ export function createCreationFlowContext(
 		debug('setSetupType:', type)
 		isImportMode.value = false
 		projectInstall.value = null
+		instanceSelection.value = null
+		isInstancePickMode.value = false
 		setupType.value = type
 		if (type === 'modpack') {
 			selectedLoader.value = null
@@ -535,6 +551,12 @@ export function createCreationFlowContext(
 			// vanilla just hides loader chips via hideLoaderChips computed
 			modal.value?.setStage('custom-setup')
 		}
+	}
+
+	function setInstancePickMode() {
+		setSetupType('modpack')
+		isInstancePickMode.value = true
+		modal.value?.setStage('select-instance')
 	}
 
 	function setImportMode() {
@@ -674,6 +696,8 @@ export function createCreationFlowContext(
 		modpackFile,
 		modpackFilePath,
 		projectInstall,
+		instanceSelection,
+		isInstancePickMode,
 		projectSearchProjectId,
 		projectSearchOptions,
 		projectSearchHits,
@@ -692,6 +716,7 @@ export function createCreationFlowContext(
 		reset,
 		setSetupType,
 		setImportMode,
+		setInstancePickMode,
 		browseModpacks,
 		selectProject,
 		finish,

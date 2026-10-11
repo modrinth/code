@@ -74,6 +74,28 @@ impl ModrinthClient {
         self.get(&format!("/project/{id_or_slug}")).await
     }
 
+    /// Looks up many projects at once. Unknown ids are left out of the result.
+    pub async fn get_projects(
+        &self,
+        ids: &[String],
+    ) -> Result<Vec<ModrinthProject>, ModrinthError> {
+        let mut projects = Vec::new();
+        for chunk in ids.chunks(200) {
+            let resp = self
+                .http
+                .get(format!("{MODRINTH_API}/projects"))
+                .query(&[(
+                    "ids",
+                    serde_json::to_string(chunk).unwrap_or_default(),
+                )])
+                .send()
+                .await?
+                .error_for_status()?;
+            projects.extend(resp.json::<Vec<ModrinthProject>>().await?);
+        }
+        Ok(projects)
+    }
+
     pub async fn get_version(
         &self,
         version_id: &str,

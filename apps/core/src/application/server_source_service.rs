@@ -1,14 +1,14 @@
 //! Linked server sources: one engine that installs and updates a server from a full setup
-//! (game version, loader, files with hashes). Adapters turn a `.mrpack`, a Modrinth pack
-//! version, or a shared-instance version into a [`Setup`] staged on disk; [`apply`] then
-//! reconciles the server against it, only while the server is stopped.
+//! (game version, loader, files with hashes). Adapters turn an uploaded `.mrpack` (a pack
+//! file, or an instance the App exported) or a Modrinth pack version into a [`Setup`] staged
+//! on disk; [`apply`] then reconciles the server against it, only while the server is stopped.
 //!
 //! Durable state lives in `server_sources` / `server_source_files` (migration 023), so a Core
 //! restart resumes pending work. Files the source previously provided are tracked with their
 //! last-applied hash; anything else on disk is server content and is never touched.
 
 use std::{
-    collections::{BTreeMap, HashMap, HashSet},
+    collections::{BTreeMap, BTreeSet, HashMap, HashSet},
     io::Read,
     path::{Path, PathBuf},
     sync::{Arc, LazyLock},
@@ -16,7 +16,6 @@ use std::{
 };
 
 use dashmap::DashMap;
-use serde::Deserialize;
 use sha1::Digest;
 use tracing::{error, warn};
 
@@ -39,7 +38,7 @@ use crate::{
     infrastructure::minecraft::{
         modrinth_api::{ModrinthClient, ModrinthError},
         mrpack::{extract_metadata, validate_download_url, MrpackError},
-        server_properties::{patch_properties, read_properties},
+        server_properties::read_properties,
     },
     ports::instance_store::StoreError,
 };
@@ -52,8 +51,6 @@ pub enum SourceError {
     AlreadyLinked,
     #[error("server is not linked to a source")]
     NotLinked,
-    #[error("Server lost access to the instance")]
-    AccessLost,
     #[error("{0}")]
     Invalid(String),
     #[error("db: {0}")]
@@ -72,33 +69,9 @@ pub enum SourceError {
     Store(#[from] StoreError),
 }
 
-/// Link request built by the HTTP layer from `CoreLinkSourceBody`.
-pub struct LinkRequest {
-    pub source: ServerSource,
-    pub version: String,
-    /// Instance sources: sharing backend base URL and read-only server token.
-    pub sharing: Option<(String, String)>,
-    /// server.properties keys written once, on link.
-    pub properties: HashMap<String, String>,
-}
-
-/// An instance-linked server, for delivery's reconcile loop.
-#[derive(Debug, Clone)]
-#[allow(dead_code)] // Used by delivery's source_reconcile_service.
-pub struct InstanceSourceLink {
-    pub instance_id: String,
-    pub shared_instance_id: String,
-    pub desired_version: String,
-    pub sharing_url: String,
-    pub server_token: String,
-}
-
 #[derive(Debug, Clone, sqlx::FromRow)]
 struct SourceRow {
-    instance_id: String,
     source_json: String,
-    sharing_url: Option<String>,
-    server_token: Option<String>,
     desired_version: String,
     installed_version: Option<String>,
     staged_version: Option<String>,
@@ -142,32 +115,47 @@ pub async fn get_status(
 pub async fn link(
     state: &Arc<AppState>,
     instance_id: &str,
-    req: LinkRequest,
+    source: ServerSource,
+    version: &str,
 ) -> Result<ServerSourceStatus, SourceError> {
-    let record = instance_record(state, instance_id).await?;
+    instance_record(state, instance_id).await?;
     if load_row(state, instance_id).await?.is_some() {
         return Err(SourceError::AlreadyLinked);
     }
-    let (sharing_url, server_token) = req.sharing.unzip();
-    sqlx::query("INSERT INTO server_sources (instance_id, source_json, sharing_url, server_token, desired_version, state, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)")
+    sqlx::query("INSERT INTO server_sources (instance_id, source_json, desired_version, state, updated_at) VALUES (?, ?, ?, ?, ?)")
         .bind(instance_id)
-        .bind(serde_json::to_string(&req.source).map_err(|e| SourceError::Invalid(e.to_string()))?)
-        .bind(sharing_url.map(|url| url.trim_end_matches('/').to_string()))
-        .bind(server_token)
-        .bind(&req.version)
+        .bind(serde_json::to_string(&source).map_err(|e| SourceError::Invalid(e.to_string()))?)
+        .bind(version)
         .bind(SourceApplyState::Downloading.as_str())
         .bind(now())
         .execute(&state.pool)
         .await?;
-    if !req.properties.is_empty() {
-        patch_properties(Path::new(&record.data_dir), &req.properties)
-            .await
-            .map_err(|e| SourceError::Invalid(e.to_string()))?;
-    }
     let status = broadcast(state, instance_id).await?;
     spawn_process(state, instance_id);
     status.ok_or(SourceError::NotLinked)
 }
+
+/// Link a new server to an instance before the instance's pack has arrived, so the server shows
+/// as linked from the moment it exists. It stays failed, with nothing to apply, until the App
+/// uploads the pack with [`link_mrpack`].
+pub async fn link_awaiting_upload(
+    state: &Arc<AppState>,
+    instance_id: &str,
+    source: ServerSource,
+) -> Result<(), SourceError> {
+    sqlx::query("INSERT INTO server_sources (instance_id, source_json, desired_version, state, error, updated_at) VALUES (?, ?, '', ?, ?, ?)")
+        .bind(instance_id)
+        .bind(serde_json::to_string(&source).map_err(|e| SourceError::Invalid(e.to_string()))?)
+        .bind(SourceApplyState::Failed.as_str())
+        .bind(AWAITING_UPLOAD)
+        .bind(now())
+        .execute(&state.pool)
+        .await?;
+    Ok(())
+}
+
+const AWAITING_UPLOAD: &str =
+    "The instance has not reached this server yet. Push an update from the instance.";
 
 /// Unlink a server. Inherited files stay on disk and become server content.
 pub async fn unlink(
@@ -189,13 +177,11 @@ pub async fn unlink(
 }
 
 /// Record a newer desired version. Core downloads and verifies it now and applies it when the
-/// server is stopped. With `restart`, a running server is stopped, updated, and started again.
-/// Used by `POST /instances/:id/source/update` and delivery's reconcile loop.
+/// server is stopped; [`apply_now`] restarts a running server instead of waiting.
 pub async fn request_source_update(
     state: &Arc<AppState>,
     instance_id: &str,
     version: &str,
-    restart: bool,
 ) -> Result<ServerSourceStatus, SourceError> {
     let row = load_row(state, instance_id)
         .await?
@@ -205,9 +191,8 @@ pub async fn request_source_update(
     {
         return row.status();
     }
-    sqlx::query("UPDATE server_sources SET desired_version = ?, restart_requested = ?, state = ?, error = NULL, updated_at = ? WHERE instance_id = ?")
+    sqlx::query("UPDATE server_sources SET desired_version = ?, restart_requested = 0, state = ?, error = NULL, updated_at = ? WHERE instance_id = ?")
         .bind(version)
-        .bind(restart as i64)
         .bind(SourceApplyState::Downloading.as_str())
         .bind(now())
         .bind(instance_id)
@@ -218,28 +203,38 @@ pub async fn request_source_update(
     status.ok_or(SourceError::NotLinked)
 }
 
-#[allow(dead_code)] // Used by delivery's source_reconcile_service.
-pub async fn list_instance_sources(
+/// Apply the latest requested version without waiting for the next stop: a running server is
+/// stopped, updated, and started again. Also retries a failed update.
+pub async fn apply_now(
     state: &Arc<AppState>,
-) -> Result<Vec<InstanceSourceLink>, SourceError> {
-    let rows: Vec<SourceRow> = sqlx::query_as("SELECT * FROM server_sources")
-        .fetch_all(&state.pool)
+    instance_id: &str,
+) -> Result<ServerSourceStatus, SourceError> {
+    let row = load_row(state, instance_id)
+        .await?
+        .ok_or(SourceError::NotLinked)?;
+    // An empty desired version is a server still waiting for its first upload: nothing to retry.
+    if row.desired_version.is_empty()
+        || row.installed_version.as_deref()
+            == Some(row.desired_version.as_str())
+    {
+        return row.status();
+    }
+    let next = if row.staged_version.as_deref()
+        == Some(row.desired_version.as_str())
+    {
+        SourceApplyState::Pending
+    } else {
+        SourceApplyState::Downloading
+    };
+    sqlx::query("UPDATE server_sources SET restart_requested = 1, state = ?, error = NULL, updated_at = ? WHERE instance_id = ?")
+        .bind(next.as_str())
+        .bind(now())
+        .bind(instance_id)
+        .execute(&state.pool)
         .await?;
-    Ok(rows
-        .into_iter()
-        .filter_map(|row| match row.source().ok()? {
-            ServerSource::Instance {
-                shared_instance_id, ..
-            } => Some(InstanceSourceLink {
-                instance_id: row.instance_id,
-                shared_instance_id,
-                desired_version: row.desired_version,
-                sharing_url: row.sharing_url?,
-                server_token: row.server_token?,
-            }),
-            _ => None,
-        })
-        .collect())
+    let status = broadcast(state, instance_id).await?;
+    spawn_process(state, instance_id);
+    status.ok_or(SourceError::NotLinked)
 }
 
 /// Mods and datapacks on a server, from the source and added by the server.
@@ -266,7 +261,8 @@ pub async fn content(
         };
         while let Some(entry) = entries.next_entry().await? {
             let name = entry.file_name().to_string_lossy().to_string();
-            let is_mod = name.ends_with(".jar") || name.ends_with(".jar.disabled");
+            let is_mod =
+                name.ends_with(".jar") || name.ends_with(".jar.disabled");
             if kind == ContentKind::Mod && !is_mod {
                 continue;
             }
@@ -277,6 +273,22 @@ pub async fn content(
         source: row.map(|row| row.status()).transpose()?,
         items: content_items(&tracked, &disk),
     })
+}
+
+/// Whether the linked source provides this mod file (by its enabled or disabled name).
+pub async fn provides(
+    state: &Arc<AppState>,
+    instance_id: &str,
+    filename: &str,
+) -> Result<bool, SourceError> {
+    let path = format!(
+        "mods/{}",
+        filename.strip_suffix(".disabled").unwrap_or(filename)
+    );
+    Ok(tracked_files(state, instance_id)
+        .await?
+        .iter()
+        .any(|file| file.path == path))
 }
 
 /// Resume unfinished work after a Core restart.
@@ -351,8 +363,7 @@ async fn step(
     if current == SourceApplyState::Failed {
         return Ok(false);
     }
-    if row.installed_version.as_deref() == Some(row.desired_version.as_str())
-    {
+    if row.installed_version.as_deref() == Some(row.desired_version.as_str()) {
         if current != SourceApplyState::UpToDate {
             set_state(state, instance_id, SourceApplyState::UpToDate).await?;
         }
@@ -363,7 +374,8 @@ async fn step(
         set_state(state, instance_id, SourceApplyState::Downloading).await?;
         progress(state, instance_id, &version, SourceApplyPhase::Downloading);
         let dir = staging_dir(state, instance_id, &version);
-        let _ = tokio::fs::remove_dir_all(&dir).await;
+        // Only the extracted files are rebuilt; an uploaded archive in `dir` is the input.
+        let _ = tokio::fs::remove_dir_all(dir.join("files")).await;
         tokio::fs::create_dir_all(dir.join("files")).await?;
         let setup = stage(state, &row, &version, &dir).await?;
         progress(state, instance_id, &version, SourceApplyPhase::Verifying);
@@ -385,14 +397,23 @@ async fn step(
         return Ok(true);
     }
 
-    let iid: InstanceId = instance_id.parse().map_err(|_| SourceError::NotFound)?;
-    let restart = row.restart_requested != 0;
-    if state.instances.contains_key(&iid) {
+    let iid: InstanceId =
+        instance_id.parse().map_err(|_| SourceError::NotFound)?;
+    let running = state.instances.contains_key(&iid);
+    // Only a server this update stopped is started again.
+    let restart = running && row.restart_requested != 0;
+    if running {
         if !restart {
             if current != SourceApplyState::Pending {
-                set_state(state, instance_id, SourceApplyState::Pending).await?;
+                set_state(state, instance_id, SourceApplyState::Pending)
+                    .await?;
             }
-            progress(state, instance_id, &version, SourceApplyPhase::WaitingForStop);
+            progress(
+                state,
+                instance_id,
+                &version,
+                SourceApplyPhase::WaitingForStop,
+            );
             return Ok(false);
         }
         progress(state, instance_id, &version, SourceApplyPhase::Stopping);
@@ -406,8 +427,12 @@ async fn step(
     }
     if restart {
         progress(state, instance_id, &version, SourceApplyPhase::Starting);
-        if let Err(err) = instance_status_service::start_instance(state, &iid).await {
-            warn!("Restart after source update failed for {instance_id}: {err}");
+        if let Err(err) =
+            instance_status_service::start_instance(state, &iid).await
+        {
+            warn!(
+                "Restart after source update failed for {instance_id}: {err}"
+            );
         }
     }
     Ok(true)
@@ -476,7 +501,10 @@ async fn apply(
     let mut existed = Vec::new();
     for path in plan.remove.iter().chain(&plan.write) {
         let target = data_dir.join(disk_path(path, &level));
-        if tokio::fs::metadata(&target).await.is_ok_and(|m| m.is_file()) {
+        if tokio::fs::metadata(&target)
+            .await
+            .is_ok_and(|m| m.is_file())
+        {
             copy_file(&target, &backup.join(path)).await?;
             existed.push(path.clone());
         }
@@ -484,7 +512,9 @@ async fn apply(
 
     let result = async {
         for path in &plan.remove {
-            match tokio::fs::remove_file(data_dir.join(disk_path(path, &level))).await {
+            match tokio::fs::remove_file(data_dir.join(disk_path(path, &level)))
+                .await
+            {
                 Err(err) if err.kind() != std::io::ErrorKind::NotFound => {
                     return Err(SourceError::Io(err))
                 }
@@ -561,7 +591,20 @@ async fn apply(
         .execute(&mut *tx)
         .await?;
     tx.commit().await?;
-    let _ = tokio::fs::remove_dir_all(&staged).await;
+    // Also drops versions that were superseded before they applied, keeping a newer upload.
+    let desired = load_row(state, &instance_id)
+        .await?
+        .map(|row| staging_dir(state, &instance_id, &row.desired_version));
+    if let Ok(mut entries) =
+        tokio::fs::read_dir(staging_root(state, &instance_id)).await
+    {
+        while let Ok(Some(entry)) = entries.next_entry().await {
+            if desired.as_ref() != Some(&entry.path()) || entry.path() == staged
+            {
+                let _ = tokio::fs::remove_dir_all(entry.path()).await;
+            }
+        }
+    }
     broadcast(state, &instance_id).await?;
     Ok(true)
 }
@@ -670,70 +713,52 @@ async fn stage(
                 .find(|f| f.primary)
                 .or_else(|| pack.files.first())
                 .ok_or_else(|| {
-                    SourceError::Invalid("version has no downloadable file".into())
+                    SourceError::Invalid(
+                        "version has no downloadable file".into(),
+                    )
                 })?;
             validate_download_url(&file.url)?;
-            let bytes = download(state, &file.url, None).await?;
-            verify(&file.filename, &sha1_hex(&bytes), file.hashes.sha1.as_deref())?;
+            let bytes = download(state, &file.url).await?;
+            verify(
+                &file.filename,
+                &sha1_hex(&bytes),
+                file.hashes.sha1.as_deref(),
+            )?;
             let archive = dir.join("pack.mrpack");
             tokio::fs::write(&archive, &bytes).await?;
             stage_mrpack(state, &archive, &files).await
         }
-        ServerSource::Mrpack { .. } => {
+        ServerSource::Mrpack { .. } | ServerSource::Instance { .. } => {
             stage_mrpack(state, &dir.join("pack.mrpack"), &files).await
-        }
-        ServerSource::Instance {
-            shared_instance_id, ..
-        } => {
-            let (Some(url), Some(token)) = (&row.sharing_url, &row.server_token)
-            else {
-                return Err(SourceError::Invalid(
-                    "instance source has no sharing credentials".into(),
-                ));
-            };
-            let base = format!("{url}/v1/instances/{shared_instance_id}");
-            let info: SharedInstanceInfo =
-                fetch_json(state, &base, token).await?;
-            let shared: SharedVersion =
-                fetch_json(state, &format!("{base}/versions/{version}"), token)
-                    .await?;
-            if !shared.ready {
-                return Err(SourceError::Invalid(format!(
-                    "Instance version {version} is not ready yet"
-                )));
-            }
-            let setup = stage_shared(state, &shared, token, &files).await?;
-            let source = ServerSource::Instance {
-                shared_instance_id,
-                name: info.name,
-                icon: info.icon,
-            };
-            sqlx::query("UPDATE server_sources SET source_json = ? WHERE instance_id = ?")
-                .bind(serde_json::to_string(&source).map_err(|e| SourceError::Invalid(e.to_string()))?)
-                .bind(&row.instance_id)
-                .execute(&state.pool)
-                .await?;
-            Ok(setup)
         }
     }
 }
 
-/// Stage an uploaded `.mrpack` and link the server to it. The upload path stores the archive
-/// before the worker stages it, so a Core restart can still finish the install.
+/// Link the server to an uploaded `.mrpack`, or update it when it is already linked. The
+/// archive is stored before the worker stages it, so a Core restart can still finish the
+/// install. `instance` is the id and name of the App instance the pack was exported from.
 pub async fn link_mrpack(
     state: &Arc<AppState>,
     instance_id: &str,
     archive: &Path,
-    filename: &str,
+    instance: Option<(String, String)>,
 ) -> Result<ServerSourceStatus, SourceError> {
     let index = extract_metadata(archive).await?;
-    let version = index.version_id.clone();
+    // The version is the archive's hash, so every different upload is a new version even when
+    // the pack's own version string did not change.
+    let version = sha1_hex(&tokio::fs::read(archive).await?);
     let dir = staging_dir(state, instance_id, &version);
     tokio::fs::create_dir_all(&dir).await?;
     tokio::fs::copy(archive, dir.join("pack.mrpack")).await?;
-    let source = ServerSource::Mrpack {
-        filename: filename.to_string(),
-        name: index.name,
+    let source = match instance {
+        Some((id, name)) => ServerSource::Instance {
+            instance_id: id,
+            name,
+        },
+        None => ServerSource::Mrpack {
+            filename: "modpack.mrpack".to_string(),
+            name: index.name,
+        },
     };
     match load_row(state, instance_id).await? {
         Some(_) => {
@@ -742,21 +767,9 @@ pub async fn link_mrpack(
                 .bind(instance_id)
                 .execute(&state.pool)
                 .await?;
-            request_source_update(state, instance_id, &version, false).await
+            request_source_update(state, instance_id, &version).await
         }
-        None => {
-            link(
-                state,
-                instance_id,
-                LinkRequest {
-                    source,
-                    version,
-                    sharing: None,
-                    properties: HashMap::new(),
-                },
-            )
-            .await
-        }
+        None => link(state, instance_id, source, &version).await,
     }
 }
 
@@ -772,26 +785,65 @@ async fn stage_mrpack(
         .filter(|v| index.game == "minecraft" && !v.trim().is_empty())
         .cloned()
         .ok_or_else(|| {
-            SourceError::Invalid("Modpack must specify a Minecraft version".into())
+            SourceError::Invalid(
+                "Modpack must specify a Minecraft version".into(),
+            )
         })?;
     let (loader, loader_version) = mrpack_loader(&index.dependencies);
+    // A pack's own `env` is often missing or says "required" for client mods, so a mod is also
+    // left out when its Modrinth project says servers are unsupported, as for a mod added by hand.
+    let project_ids: Vec<String> = index
+        .files
+        .iter()
+        .filter_map(|file| {
+            file.project_id.clone().or_else(|| {
+                file.downloads
+                    .first()
+                    .and_then(|url| modrinth_ids(url))
+                    .map(|ids| ids.0)
+            })
+        })
+        .collect::<BTreeSet<_>>()
+        .into_iter()
+        .collect();
+    let server_unsupported: BTreeSet<String> =
+        match ModrinthClient::new(state.http.clone())
+            .get_projects(&project_ids)
+            .await
+        {
+            Ok(projects) => projects
+                .into_iter()
+                .filter(|p| p.server_side.as_deref() == Some("unsupported"))
+                .map(|p| p.id)
+                .collect(),
+            Err(error) => {
+                warn!(
+                    "could not check which pack mods are client-only: {error}"
+                );
+                BTreeSet::new()
+            }
+        };
     let mut files = BTreeMap::new();
     for file in &index.files {
         let path = clean_path(&file.path)?;
         let Some(kind) = content_kind(&path) else {
             continue;
         };
+        let ids = file.downloads.first().and_then(|url| modrinth_ids(url));
+        let project_id = file.project_id.clone().or(ids.clone().map(|i| i.0));
         let client_only = matches!(
             file.env.as_ref().map(|env| &env.server),
             Some(EnvType::Unsupported)
-        );
+        ) || project_id
+            .as_ref()
+            .is_some_and(|id| server_unsupported.contains(id));
         let mut sha1 = file.hashes.sha1.clone().unwrap_or_default();
         if !client_only {
             let url = file.downloads.first().ok_or_else(|| {
                 SourceError::Invalid(format!("{} has no download", file.path))
             })?;
             validate_download_url(url)?;
-            let bytes = download(state, url, None).await?;
+            let bytes = download(state, url).await?;
             let actual = sha1_hex(&bytes);
             verify(&path, &actual, file.hashes.sha1.as_deref())?;
             write_file(&files_dir.join(&path), &bytes).await?;
@@ -804,8 +856,8 @@ async fn stage_mrpack(
                 kind,
                 sha1,
                 client_only,
-                project_id: file.project_id.clone(),
-                version_id: file.version_id.clone(),
+                project_id,
+                version_id: file.version_id.clone().or(ids.map(|i| i.1)),
             },
         );
     }
@@ -836,173 +888,18 @@ async fn stage_mrpack(
     })
 }
 
-/// Shared-instance version JSON (`SharedInstances.Instances.v1.InstanceVersion`).
-#[derive(Debug, Deserialize)]
-pub(crate) struct SharedVersion {
-    #[serde(default)]
-    pub modrinth_ids: Vec<String>,
-    #[serde(default = "default_true")]
-    pub ready: bool,
-    #[serde(default)]
-    pub external_files: Vec<SharedFile>,
-    pub game_version: String,
-    pub loader: String,
-    #[serde(default)]
-    pub loader_version: String,
-}
-
-#[derive(Debug, Deserialize)]
-pub(crate) struct SharedFile {
-    pub file_name: String,
-    pub file_type: String,
-    pub url: String,
-    pub sha256: Option<String>,
-}
-
-#[derive(Debug, Deserialize)]
-struct SharedInstanceInfo {
-    name: String,
-    icon: Option<String>,
-}
-
-fn default_true() -> bool {
-    true
-}
-
-/// `modrinth_ids` already include the base pack's content (the publisher lists every enabled
-/// item), so `modpack_id` is not resolved again here.
-async fn stage_shared(
-    state: &Arc<AppState>,
-    shared: &SharedVersion,
-    token: &str,
-    files_dir: &Path,
-) -> Result<Setup, SourceError> {
-    let loader = match shared.loader.as_str() {
-        "" | "minecraft" | "vanilla" => ModLoader::Vanilla,
-        other => other.parse::<ModLoader>().map_err(SourceError::Invalid)?,
-    };
-    let modrinth = ModrinthClient::new(state.http.clone());
-    let mut files = BTreeMap::new();
-    for version_id in &shared.modrinth_ids {
-        let version = modrinth.get_version(version_id).await?;
-        let project = modrinth.get_project(&version.project_id).await?;
-        let kind = if version.loaders.iter().any(|l| l == "datapack") {
-            ContentKind::Datapack
-        } else if project.project_type == "mod" {
-            ContentKind::Mod
-        } else {
-            continue;
-        };
-        let file = version
-            .files
-            .iter()
-            .find(|f| f.primary)
-            .or_else(|| version.files.first())
-            .ok_or_else(|| {
-                SourceError::Invalid(format!("{version_id} has no file"))
-            })?;
-        let path = clean_path(&format!(
-            "{}/{}",
-            if kind == ContentKind::Mod { "mods" } else { "datapacks" },
-            file.filename
-        ))?;
-        let client_only = project.server_side.as_deref() == Some("unsupported");
-        let mut sha1 = file.hashes.sha1.clone().unwrap_or_default();
-        if !client_only {
-            validate_download_url(&file.url)?;
-            let bytes = download(state, &file.url, None).await?;
-            let actual = sha1_hex(&bytes);
-            verify(&path, &actual, file.hashes.sha1.as_deref())?;
-            write_file(&files_dir.join(&path), &bytes).await?;
-            sha1 = actual;
-        }
-        files.insert(
-            path.clone(),
-            SetupFile {
-                path,
-                kind,
-                sha1,
-                client_only,
-                project_id: Some(version.project_id.clone()),
-                version_id: Some(version.id.clone()),
-            },
-        );
-    }
-    for file in &shared.external_files {
-        let (dir, kind) = match file.file_type.as_str() {
-            "mod" => ("mods", ContentKind::Mod),
-            "datapack" => ("datapacks", ContentKind::Datapack),
-            // Resource packs, shaders, and config bundles are not installed on servers.
-            _ => continue,
-        };
-        let path = clean_path(&format!("{dir}/{}", file.file_name))?;
-        let bytes =
-            fetch_shared_file(state, &file.url, token, file.sha256.as_deref())
-                .await?;
-        write_file(&files_dir.join(&path), &bytes).await?;
-        files.insert(
-            path.clone(),
-            SetupFile {
-                path,
-                kind,
-                sha1: sha1_hex(&bytes),
-                client_only: false,
-                project_id: None,
-                version_id: None,
-            },
-        );
-    }
-    Ok(Setup {
-        name: String::new(),
-        version_number: String::new(),
-        game_version: shared.game_version.clone(),
-        loader,
-        loader_version: Some(shared.loader_version.clone())
-            .filter(|v| !v.is_empty()),
-        files: files.into_values().collect(),
-    })
-}
-
-/// Download one shared-instance file with the server's token and verify its sha256. This is
-/// the only seam to shared storage; it moves into Core later.
-pub async fn fetch_shared_file(
-    state: &Arc<AppState>,
-    url: &str,
-    token: &str,
-    sha256: Option<&str>,
-) -> Result<bytes::Bytes, SourceError> {
-    let bytes = download(state, url, Some(token)).await?;
-    let Some(expected) = sha256 else {
-        return Err(SourceError::Invalid(format!("{url} has no sha256")));
-    };
-    let actual = hex::encode(sha2::Sha256::digest(&bytes));
-    verify(url, &actual, Some(expected))?;
-    Ok(bytes)
-}
-
 async fn download(
     state: &Arc<AppState>,
     url: &str,
-    token: Option<&str>,
 ) -> Result<bytes::Bytes, SourceError> {
-    let mut request = state.http.get(url);
-    if let Some(token) = token {
-        request = request.bearer_auth(token);
-    }
-    let response = request.send().await?;
-    if matches!(response.status().as_u16(), 401 | 403) && token.is_some() {
-        return Err(SourceError::AccessLost);
-    }
-    Ok(response.error_for_status()?.bytes().await?)
-}
-
-async fn fetch_json<T: serde::de::DeserializeOwned>(
-    state: &Arc<AppState>,
-    url: &str,
-    token: &str,
-) -> Result<T, SourceError> {
-    serde_json::from_slice(&download(state, url, Some(token)).await?)
-        .map_err(|e| SourceError::Invalid(e.to_string()))
+    Ok(state
+        .http
+        .get(url)
+        .send()
+        .await?
+        .error_for_status()?
+        .bytes()
+        .await?)
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -1038,6 +935,17 @@ async fn read_overrides(
     })
     .await
     .map_err(|e| SourceError::Invalid(e.to_string()))?
+}
+
+/// Project and version ids from a Modrinth CDN url
+/// (`https://cdn.modrinth.com/data/<project>/versions/<version>/<file>`). Standard packs carry
+/// no ids, and the content list needs them to show names and icons.
+pub(crate) fn modrinth_ids(url: &str) -> Option<(String, String)> {
+    let rest = url.strip_prefix("https://cdn.modrinth.com/data/")?;
+    let mut parts = rest.split('/');
+    let project = parts.next()?;
+    let version = (parts.next()? == "versions").then(|| parts.next())??;
+    Some((project.to_string(), version.to_string()))
 }
 
 /// Which content a setup path is, or `None` for files a server never installs.
@@ -1079,14 +987,20 @@ fn clean_path(path: &str) -> Result<String, SourceError> {
     let bad = path.is_empty()
         || path.starts_with('/')
         || path.contains(':')
-        || path.split('/').any(|part| part.is_empty() || part == "." || part == "..");
+        || path
+            .split('/')
+            .any(|part| part.is_empty() || part == "." || part == "..");
     if bad {
-        return Err(SourceError::Invalid(format!("unsafe path in source: {path}")));
+        return Err(SourceError::Invalid(format!(
+            "unsafe path in source: {path}"
+        )));
     }
     Ok(path)
 }
 
-fn mrpack_loader(deps: &HashMap<String, String>) -> (ModLoader, Option<String>) {
+fn mrpack_loader(
+    deps: &HashMap<String, String>,
+) -> (ModLoader, Option<String>) {
     for (key, loader) in [
         ("fabric-loader", ModLoader::Fabric),
         ("quilt-loader", ModLoader::Quilt),
@@ -1146,13 +1060,23 @@ async fn copy_file(from: &Path, to: &Path) -> Result<(), SourceError> {
 }
 
 fn staging_root(state: &AppState, instance_id: &str) -> PathBuf {
-    state.config.data_dir.join("source_staging").join(instance_id)
+    state
+        .config
+        .data_dir
+        .join("source_staging")
+        .join(instance_id)
 }
 
 fn staging_dir(state: &AppState, instance_id: &str, version: &str) -> PathBuf {
     let safe: String = version
         .chars()
-        .map(|c| if c.is_ascii_alphanumeric() || c == '-' || c == '.' { c } else { '_' })
+        .map(|c| {
+            if c.is_ascii_alphanumeric() || c == '-' || c == '.' {
+                c
+            } else {
+                '_'
+            }
+        })
         .collect();
     staging_root(state, instance_id).join(safe)
 }
@@ -1161,7 +1085,8 @@ async fn instance_record(
     state: &Arc<AppState>,
     instance_id: &str,
 ) -> Result<crate::domain::instance::InstanceRecord, SourceError> {
-    let iid: InstanceId = instance_id.parse().map_err(|_| SourceError::NotFound)?;
+    let iid: InstanceId =
+        instance_id.parse().map_err(|_| SourceError::NotFound)?;
     state.instance_store.get(&iid).await.map_err(|e| match e {
         StoreError::NotFound(_) => SourceError::NotFound,
         other => SourceError::Store(other),
@@ -1191,17 +1116,19 @@ async fn tracked_files(
             .await?;
     Ok(rows
         .into_iter()
-        .map(|(path, kind, sha1, client_only, project_id, version_id)| SetupFile {
-            path,
-            kind: match kind.as_str() {
-                "mod" => ContentKind::Mod,
-                "datapack" => ContentKind::Datapack,
-                _ => ContentKind::Other,
-            },
-            sha1,
-            client_only: client_only != 0,
-            project_id,
-            version_id,
+        .map(|(path, kind, sha1, client_only, project_id, version_id)| {
+            SetupFile {
+                path,
+                kind: match kind.as_str() {
+                    "mod" => ContentKind::Mod,
+                    "datapack" => ContentKind::Datapack,
+                    _ => ContentKind::Other,
+                },
+                sha1,
+                client_only: client_only != 0,
+                project_id,
+                version_id,
+            }
         })
         .collect())
 }
@@ -1296,7 +1223,8 @@ mod tests {
             file("mods/kept.jar", "a2", false),
             file("mods/new.jar", "d", false),
         ];
-        let on_disk = HashMap::from([("mods/kept.jar".to_string(), "a".to_string())]);
+        let on_disk =
+            HashMap::from([("mods/kept.jar".to_string(), "a".to_string())]);
         let plan = plan(&previous, &next, &on_disk);
         assert_eq!(plan.remove, ["datapacks/old.zip", "mods/dropped.jar"]);
         assert_eq!(plan.write, ["mods/kept.jar", "mods/new.jar"]);
@@ -1306,7 +1234,8 @@ mod tests {
     fn server_added_files_are_never_planned() {
         let previous = [file("mods/source.jar", "a", false)];
         let next = [file("mods/source.jar", "a", false)];
-        let on_disk = HashMap::from([("mods/source.jar".to_string(), "a".to_string())]);
+        let on_disk =
+            HashMap::from([("mods/source.jar".to_string(), "a".to_string())]);
         // `mods/server.jar` exists on disk but was never provided by the source.
         assert_eq!(plan(&previous, &next, &on_disk), ApplyPlan::default());
     }
@@ -1328,30 +1257,25 @@ mod tests {
         let client = items.iter().find(|i| i.filename == "client.jar").unwrap();
         assert!(client.client_only);
         assert_eq!(client.origin, ContentOrigin::Source);
-        let local = items.iter().find(|i| i.filename == "local.jar.disabled").unwrap();
+        let local = items
+            .iter()
+            .find(|i| i.filename == "local.jar.disabled")
+            .unwrap();
         assert_eq!(local.origin, ContentOrigin::Server);
         assert!(local.disabled);
         assert_eq!(items.len(), 3);
     }
 
     #[test]
-    fn parses_shared_instance_version_fixture() {
-        let shared: SharedVersion = serde_json::from_value(serde_json::json!({
-            "version": 3,
-            "modrinth_ids": ["AABBCCDD"],
-            "ready": true,
-            "external_files": [
-                {"file_name": "custom.jar", "file_type": "mod", "url": "https://sharing.example/v1/downloads/t/custom.jar", "sha256": "00"},
-                {"file_name": "pack.zip", "file_type": "resourcepack", "url": "https://sharing.example/x"}
-            ],
-            "modpack_id": null,
-            "game_version": "1.21.1",
-            "loader": "fabric",
-            "loader_version": "0.16.5"
-        }))
-        .unwrap();
-        assert_eq!(shared.external_files.len(), 2);
-        assert_eq!(shared.loader, "fabric");
+    fn reads_ids_from_modrinth_cdn_urls() {
+        assert_eq!(
+            modrinth_ids("https://cdn.modrinth.com/data/AANobbMI/versions/abc123/sodium.jar"),
+            Some(("AANobbMI".into(), "abc123".into()))
+        );
+        assert_eq!(
+            modrinth_ids("https://example.com/data/a/versions/b/c.jar"),
+            None
+        );
     }
 
     #[test]
@@ -1360,6 +1284,9 @@ mod tests {
         assert!(clean_path("mods/../../x").is_err());
         assert!(clean_path("C:/x").is_err());
         assert_eq!(clean_path("mods\\a.jar").unwrap(), "mods/a.jar");
-        assert_eq!(disk_path("datapacks/a.zip", "world"), "world/datapacks/a.zip");
+        assert_eq!(
+            disk_path("datapacks/a.zip", "world"),
+            "world/datapacks/a.zip"
+        );
     }
 }

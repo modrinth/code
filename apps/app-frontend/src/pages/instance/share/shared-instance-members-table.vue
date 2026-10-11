@@ -11,17 +11,11 @@
 					clearable
 				/>
 				<template v-if="!actionsLocked">
-					<Button
-						type="outlined"
-						size="lg"
-						class="shrink-0 !border"
+					<InstancePushButton
+						:instance="instance"
 						:disabled="pushUpdateDisabled"
-						@click="management.pushUpdate($event)"
-					>
-						<SpinnerIcon v-if="pushUpdatePending" class="animate-spin" aria-hidden="true" />
-						<UploadIcon v-else aria-hidden="true" />
-						{{ formatMessage(messages.pushUpdate) }}
-					</Button>
+						@published="instancePage.refreshInstance"
+					/>
 					<Button
 						type="colored"
 						color="brand"
@@ -142,7 +136,6 @@ import {
 	LinkIcon,
 	SearchIcon,
 	SpinnerIcon,
-	UploadIcon,
 	UserPlusIcon,
 	XIcon,
 } from '@modrinth/assets'
@@ -162,6 +155,9 @@ import {
 } from '@modrinth/ui'
 import { computed, ref, watch } from 'vue'
 
+import InstancePushButton from '@/components/ui/linked-servers/InstancePushButton.vue'
+
+import { injectInstancePage } from '../instance-context'
 import { injectSharedInstanceManagement } from './shared-instance-management-context'
 import {
 	type MethodFilter,
@@ -172,14 +168,9 @@ import {
 } from './shared-instance-share-types'
 
 const management = injectSharedInstanceManagement()
-const {
-	rows,
-	actionsLocked,
-	inviteDisabled,
-	invitePending,
-	pushUpdateDisabled,
-	pushUpdatePending,
-} = management
+const { rows, actionsLocked, inviteDisabled, invitePending, pushUpdateDisabled } = management
+const instancePage = injectInstancePage()
+const instance = computed(() => instancePage.instance.value!)
 const search = ref('')
 const methodFilter = ref<MethodFilter>('all')
 const sortColumn = ref<string | undefined>('joined')
@@ -293,10 +284,6 @@ watch(hasMultipleMethods, (multiple) => {
 })
 
 const messages = defineMessages({
-	pushUpdate: {
-		id: 'app.instance.admonitions.shared-instance.publish-button',
-		defaultMessage: 'Push update',
-	},
 	noUsersJoined: {
 		id: 'app.instance.share.members.empty',
 		defaultMessage: 'No users have joined yet',

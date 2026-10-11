@@ -108,6 +108,35 @@
 					</div>
 				</div>
 
+				<!-- Delete server (self-hosted only; hosted servers end with their subscription) -->
+				<div v-if="client.selfHostedHosting" class="flex items-center justify-between gap-2">
+					<div class="flex flex-col gap-1">
+						<span class="text-lg font-semibold text-contrast">Delete server</span>
+						<span
+							>Removes the server with its world, files, and backups. This cannot be undone.</span
+						>
+					</div>
+					<Button
+						v-tooltip="advancedActionTooltip"
+						type="colored"
+						color="red"
+						:disabled="!canUseAdvancedSettings || deleting"
+						@click="deleteModal?.show()"
+					>
+						<TrashIcon aria-hidden="true" />
+						Delete server
+					</Button>
+				</div>
+				<ConfirmModal
+					ref="deleteModal"
+					title="Delete this server?"
+					:description="`${data.name} will be deleted with its world, files, and backups. This cannot be undone.`"
+					proceed-label="Delete server"
+					:has-to-type="true"
+					:confirmation-text="data.name"
+					@proceed="deleteServer"
+				/>
+
 				<!-- Info -->
 				<div class="flex flex-col gap-2.5 pb-10">
 					<div class="text-lg m-0 font-semibold text-contrast">Info</div>
@@ -146,11 +175,14 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
+import { TrashIcon } from '@modrinth/assets'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useStorage } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 
-import { CopyCode, Input, Toggle } from '#ui/components'
+import { ConfirmModal, CopyCode, Input, Toggle } from '#ui/components'
+import { Button } from '#ui/components/base/buttons'
 import EditServerIcon from '#ui/components/servers/edit-server-icon/EditServerIcon.vue'
 import SaveBanner from '#ui/components/servers/SaveBanner.vue'
 import { useServerPermissions } from '#ui/composables/server-permissions'
@@ -170,6 +202,28 @@ const { canUseAdvancedSettings, canWriteFiles, permissionDeniedMessage } = useSe
 const advancedActionTooltip = computed(() =>
 	canUseAdvancedSettings.value ? undefined : permissionDeniedMessage.value,
 )
+
+const router = useRouter()
+const deleteModal = ref<InstanceType<typeof ConfirmModal>>()
+const deleting = ref(false)
+
+async function deleteServer() {
+	if (deleting.value) return
+	deleting.value = true
+	try {
+		await client.archon.servers_v1.deleteLocal(serverId)
+		queryClient.removeQueries({ queryKey: ['servers', 'detail', serverId] })
+		await queryClient.invalidateQueries({ queryKey: ['servers'] })
+		await router.push('/hosting/manage')
+	} catch (error) {
+		addNotification({
+			type: 'error',
+			title: 'Could not delete the server',
+			text: error instanceof Error ? error.message : undefined,
+		})
+		deleting.value = false
+	}
+}
 
 const serverName = ref(data.value?.name)
 const serverSubdomain = ref(data.value?.net?.domain ?? '')

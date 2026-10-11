@@ -41,12 +41,6 @@
 			@confirm="removeMember"
 			@clear="pendingRemovalRow = null"
 		/>
-		<SharedInstancePublishModal
-			ref="publishModal"
-			:instance="instance"
-			@state-change="publishState = $event"
-		/>
-
 		<SharedInstanceShareEmptyState
 			v-if="unableToConnect"
 			:heading="formatMessage(messages.unableToConnectHeading)"
@@ -145,7 +139,6 @@ import { useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
 
 import ModrinthAccountRequiredModal from '@/components/ui/modal/ModrinthAccountRequiredModal.vue'
-import SharedInstancePublishModal from '@/components/ui/shared-instances/SharedInstancePublishModal.vue'
 import {
 	getSharedInstanceUnavailableReason,
 	isSharedInstancesApiError,
@@ -190,8 +183,6 @@ const accountRequiredModal = ref<InstanceType<typeof ModrinthAccountRequiredModa
 const invitePlayersModal = ref<InstanceType<typeof InvitePlayersModal>>()
 const unlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 const removeMemberModal = ref<InstanceType<typeof SharedInstanceRemoveMemberModal>>()
-const publishModal = ref<InstanceType<typeof SharedInstancePublishModal>>()
-const publishState = ref<'idle' | 'reviewing' | 'publishing'>('idle')
 const pendingRemovalRow = ref<ShareRow | null>(null)
 const importedModpackUnlinked = ref(false)
 
@@ -383,9 +374,6 @@ function showRemoveMemberModal(row: ShareRow) {
 		removeMemberModal.value?.show()
 	}
 }
-function reviewUpdate(event: MouseEvent) {
-	publishModal.value?.show(event)
-}
 function removeMember(row: ShareRow) {
 	members.remove(row.id)
 }
@@ -407,16 +395,9 @@ provideSharedInstanceManagement({
 	actionsLocked: sharedInstanceActionsLocked,
 	inviteDisabled: computed(() => !hasRemainingUserSlots.value),
 	invitePending: inviteLink.pending,
-	pushUpdateDisabled: computed(
-		() =>
-			instance.value.install_stage !== 'installed' ||
-			publishState.value !== 'idle' ||
-			offline.value,
-	),
-	pushUpdatePending: computed(() => publishState.value !== 'idle'),
+	pushUpdateDisabled: computed(() => offline.value),
 	invite: (event) => void showInvitePlayers(event),
 	remove: showRemoveMemberModal,
-	pushUpdate: reviewUpdate,
 })
 
 watch(

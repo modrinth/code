@@ -10,6 +10,7 @@ import { setupFileDropProvider } from './setup/file-drop'
 import { setupFilePickerProvider } from './setup/file-picker'
 import { setupImageViewerEditorProvider } from './setup/image-viewer-editor'
 import { setupInstanceImportProvider } from './setup/instance-import'
+import { setupInstanceServerSourceProvider } from './setup/instance-server-source'
 import { setupTagsProvider } from './setup/tags'
 import { setupUserCountryProvider } from './setup/user-country'
 
@@ -26,6 +27,7 @@ export function setupProviders(
 	setupFilePickerProvider()
 	setupImageViewerEditorProvider()
 	setupInstanceImportProvider(notificationManager)
+	setupInstanceServerSourceProvider()
 	const onboardingChecklist = setupOnboardingChecklistProvider(appEvents)
 
 	return {

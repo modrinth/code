@@ -5,7 +5,6 @@ pub mod instance_service;
 pub mod instance_status_service;
 pub mod mod_installer;
 pub mod mod_service;
-pub mod modpack_service;
 pub mod pairing_service;
 pub mod rcon_service;
 pub mod server_source_service;

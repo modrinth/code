@@ -69,20 +69,6 @@ CREATE TABLE IF NOT EXISTS mods (
     UNIQUE(instance_id, filename)
 );
 
-CREATE TABLE IF NOT EXISTS modpack_manifests (
-    id TEXT PRIMARY KEY,
-    instance_id TEXT NOT NULL REFERENCES instances(id) ON DELETE CASCADE,
-    pack_name TEXT NOT NULL,
-    pack_version TEXT NOT NULL,
-    game_version TEXT NOT NULL,
-    loader TEXT NOT NULL,
-    loader_version TEXT,
-    modrinth_project_id TEXT,
-    modrinth_version_id TEXT,
-    installed_at TEXT NOT NULL,
-    UNIQUE(instance_id)
-);
-
 CREATE TABLE IF NOT EXISTS backups (
     id TEXT PRIMARY KEY,
     instance_id TEXT NOT NULL REFERENCES instances(id) ON DELETE CASCADE,
@@ -97,11 +83,8 @@ CREATE TABLE IF NOT EXISTS backups (
 
 CREATE TABLE IF NOT EXISTS server_sources (
     instance_id TEXT PRIMARY KEY REFERENCES instances(id) ON DELETE CASCADE,
-    -- CoreServerSource JSON.
+    -- ServerSource JSON.
     source_json TEXT NOT NULL,
-    -- Instance sources only: sharing backend base URL and the read-only server token.
-    sharing_url TEXT,
-    server_token TEXT,
     desired_version TEXT NOT NULL,
     installed_version TEXT,
     -- Version whose files are downloaded and verified in Core's staging directory.
