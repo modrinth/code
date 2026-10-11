@@ -1,9 +1,12 @@
 <script setup lang="ts">
-import { PlusIcon, SearchIcon } from '@modrinth/assets'
-import { Button, ServerListing, Input, injectModrinthClient } from '@modrinth/ui'
+import type { Archon } from '@modrinth/api-client'
+import { LinkIcon, PlusIcon, SearchIcon } from '@modrinth/assets'
+import { Button, injectModrinthClient, Input, NewModal, ServerListing } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
+
+import { ensureCorePaired, openPairCoreModal, useCores } from '@/composables/use-cores'
 
 const client = injectModrinthClient()
 const router = useRouter()
@@ -11,6 +14,8 @@ const queryClient = useQueryClient()
 const searchInput = ref('')
 const creating = ref(false)
 const creationError = ref('')
+const chooseCore = ref<InstanceType<typeof NewModal> | null>(null)
+const { cores, needsPairing } = useCores()
 const { data, error, isLoading, refetch } = useQuery({
 	queryKey: ['servers'],
 	queryFn: () => client.archon.servers_v0.list({ limit: 100 }),
@@ -22,12 +27,21 @@ const servers = computed(() =>
 	),
 )
 
-async function createServer() {
+// Pairs a Core first when there is none, and asks which Core only when there are several.
+async function newServer() {
+	if (creating.value || !(await ensureCorePaired())) return
+	const paired = await client.archon.cores_v1.list()
+	if (paired.length > 1) chooseCore.value?.show()
+	else await createServer(paired[0])
+}
+
+async function createServer(core: Archon.Cores.v1.Core) {
+	chooseCore.value?.hide()
 	if (creating.value) return
 	creating.value = true
 	creationError.value = ''
 	try {
-		const server = await client.archon.servers_v1.createLocal('New server')
+		const server = await client.archon.cores_v1.createServer('New server', core)
 		await queryClient.invalidateQueries({ queryKey: ['servers'] })
 		await router.push(`/hosting/manage/${encodeURIComponent(server.id)}`)
 	} catch (error) {
@@ -40,16 +54,29 @@ async function createServer() {
 
 <template>
 	<div data-pyro-server-list-root class="relative mx-auto flex w-full flex-col p-6">
+		<NewModal ref="chooseCore" header="Choose a Core" max-width="460px" width="100%">
+			<div class="flex flex-col gap-2">
+				<Button v-for="core in cores" :key="core.id" class="w-full" @click="createServer(core)">
+					{{ core.name }}
+				</Button>
+			</div>
+		</NewModal>
 		<div class="flex w-full flex-row items-center justify-between gap-2 mb-4">
 			<h1 class="text-2xl m-0 font-extrabold text-contrast">Servers</h1>
 			<div class="flex items-center gap-2">
 				<Input v-model="searchInput" :icon="SearchIcon" placeholder="Search servers" />
-				<Button type="colored" color="brand" :disabled="creating" @click="createServer">
+				<Button type="colored" color="brand" :disabled="creating" @click="newServer">
 					<PlusIcon /> New server
 				</Button>
 			</div>
 		</div>
-		<div v-if="error" class="flex flex-col gap-3">
+		<div v-if="needsPairing" class="flex flex-col items-start gap-3">
+			<p class="m-0">Pair a Core to host servers.</p>
+			<Button type="colored" color="brand" @click="openPairCoreModal()">
+				<LinkIcon /> Pair a Core
+			</Button>
+		</div>
+		<div v-else-if="error" class="flex flex-col gap-3">
 			<p class="text-red">{{ error.message }}</p>
 			<Button @click="refetch()">Retry</Button>
 		</div>

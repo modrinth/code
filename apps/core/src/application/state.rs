@@ -29,6 +29,21 @@ pub struct WsTicket {
     pub expires_at: Instant,
 }
 
+/// The pairing code an unowned Core is showing.
+#[derive(Clone)]
+pub struct PairingCode {
+    pub code: String,
+    pub expires_at: Instant,
+}
+
+/// The account this Core belongs to.
+pub struct Owner {
+    pub user_id: String,
+    /// Key for this Core's own calls to the backend. Missing on a Core that was owned before
+    /// pairing existed; it keeps its owner and shows a code only that owner can use.
+    pub backend_key: Option<String>,
+}
+
 /// Central shared state — passed as `Arc<AppState>` through all layers.
 pub struct AppState {
     /// SQLite connection pool (kept for legacy/direct queries).
@@ -48,6 +63,12 @@ pub struct AppState {
     pub broadcaster: EventBroadcaster,
     /// Verified account tokens: token -> (account, expiry). See `AuthUser`.
     pub account_tokens: DashMap<String, (Account, Instant)>,
+    /// Code currently shown for pairing, if any. See `pairing_service`.
+    pub pairing_code: std::sync::Mutex<Option<PairingCode>>,
+    /// Wakes the pairing task when this Core is paired or unpaired.
+    pub pairing_changed: tokio::sync::Notify,
+    /// Wrong pairing codes per account: account id -> (count, window start).
+    pub pairing_guesses: DashMap<String, (u32, Instant)>,
     /// In-memory short-lived WebSocket tickets.
     pub ws_tickets: DashMap<String, WsTicket>,
     /// Instance data store.
@@ -96,6 +117,9 @@ impl AppState {
             instance_operation_locks: DashMap::new(),
             broadcaster,
             account_tokens: DashMap::new(),
+            pairing_code: std::sync::Mutex::new(None),
+            pairing_changed: tokio::sync::Notify::new(),
+            pairing_guesses: DashMap::new(),
             ws_tickets: DashMap::new(),
             instance_store,
             installation_store,
@@ -105,17 +129,45 @@ impl AppState {
         }))
     }
 
-    /// Make `user_id` the owner if this Core has none, then return the owner.
-    pub async fn claim_owner(&self, user_id: &str) -> sqlx::Result<String> {
+    /// The account this Core is paired to, if any.
+    pub async fn owner(&self) -> sqlx::Result<Option<Owner>> {
+        let row: Option<(String, Option<String>)> = sqlx::query_as(
+            "SELECT user_id, backend_key FROM core_owner WHERE id = 1",
+        )
+        .fetch_optional(&self.pool)
+        .await?;
+        Ok(row.map(|(user_id, backend_key)| Owner {
+            user_id,
+            backend_key,
+        }))
+    }
+
+    /// Store the owner and the key the backend issued, then stop showing a code.
+    pub async fn set_owner(
+        &self,
+        user_id: &str,
+        key: &str,
+    ) -> sqlx::Result<()> {
         sqlx::query(
-            "INSERT OR IGNORE INTO core_owner (id, user_id) VALUES (1, ?)",
+            "INSERT INTO core_owner (id, user_id, backend_key) VALUES (1, ?, ?) \
+             ON CONFLICT(id) DO UPDATE SET user_id = excluded.user_id, backend_key = excluded.backend_key",
         )
         .bind(user_id)
+        .bind(key)
         .execute(&self.pool)
         .await?;
-        sqlx::query_scalar("SELECT user_id FROM core_owner WHERE id = 1")
-            .fetch_one(&self.pool)
-            .await
+        self.pairing_changed.notify_one();
+        Ok(())
+    }
+
+    /// Forget the owner and the backend key. Servers and files stay. The caller wakes the
+    /// pairing task if it is not the one calling.
+    pub async fn forget_owner(&self) -> sqlx::Result<()> {
+        sqlx::query("DELETE FROM core_owner")
+            .execute(&self.pool)
+            .await?;
+        self.account_tokens.clear();
+        Ok(())
     }
 }
 

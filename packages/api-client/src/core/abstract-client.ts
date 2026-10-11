@@ -128,7 +128,7 @@ export abstract class AbstractModrinthClient extends AbstractUploadClient {
 		if (options.api === 'labrinth') {
 			baseUrl = this.resolveBaseUrl(this.config.labrinthBaseUrl!)
 		} else if (options.api === 'archon') {
-			baseUrl = this.resolveBaseUrl(this.config.archonBaseUrl!)
+			baseUrl = await this.resolveArchonBaseUrl(path, options)
 		} else if (options.api === 'sharedinstances') {
 			baseUrl = this.resolveBaseUrl(this.config.sharedInstancesBaseUrl!)
 		} else {
@@ -177,7 +177,7 @@ export abstract class AbstractModrinthClient extends AbstractUploadClient {
 		if (options.api === 'labrinth') {
 			baseUrl = this.resolveBaseUrl(this.config.labrinthBaseUrl!)
 		} else if (options.api === 'archon') {
-			baseUrl = this.resolveBaseUrl(this.config.archonBaseUrl!)
+			baseUrl = await this.resolveArchonBaseUrl(path, options)
 		} else if (options.api === 'sharedinstances') {
 			baseUrl = this.resolveBaseUrl(this.config.sharedInstancesBaseUrl!)
 		} else {
@@ -301,6 +301,12 @@ export abstract class AbstractModrinthClient extends AbstractUploadClient {
 
 	protected resolveBaseUrl(baseUrl: BaseUrlConfig): string {
 		return typeof baseUrl === 'function' ? baseUrl() : baseUrl
+	}
+
+	/** Self-hosted hosting has no single base URL: each request goes to the Core it is about. */
+	private async resolveArchonBaseUrl(path: string, options: RequestOptions): Promise<string> {
+		if (this.selfHostedHosting) return this.archon.cores_v1.hostingUrl(path, options.params)
+		return this.resolveBaseUrl(this.config.archonBaseUrl!)
 	}
 
 	/**

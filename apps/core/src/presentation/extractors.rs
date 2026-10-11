@@ -35,12 +35,15 @@ impl FromRequestParts<Arc<AppState>> for AuthUser {
             })?;
         let account = account(state, token).await?;
 
-        // Temporary until pairing exists: the first account to connect owns this Core.
+        // An unowned Core refuses everything except pairing.
         let owner = state
-            .claim_owner(&account.id)
+            .owner()
             .await
-            .map_err(|error| ApiError::Internal(error.to_string()))?;
-        if owner != account.id {
+            .map_err(|error| ApiError::Internal(error.to_string()))?
+            .ok_or_else(|| {
+                ApiError::Forbidden("this Core is not paired".into())
+            })?;
+        if owner.user_id != account.id {
             return Err(ApiError::Forbidden(
                 "this Core belongs to another account".into(),
             ));
@@ -63,7 +66,10 @@ pub struct Account {
 }
 
 /// Resolve an account token to its account by asking the backend (`GET /user`).
-async fn account(state: &AppState, token: &str) -> Result<Account, ApiError> {
+pub async fn account(
+    state: &AppState,
+    token: &str,
+) -> Result<Account, ApiError> {
     let now = Instant::now();
     if let Some(cached) = state.account_tokens.get(token) {
         if cached.1 > now {

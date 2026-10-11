@@ -8,7 +8,6 @@ pub struct DevAppConfig {
     pub credential_namespace: String,
     pub auth_mode: String,
     pub branch: String,
-    pub core_url: Option<String>,
     pub title: String,
     pub data_dir: String,
     pub backend_url: Option<String>,

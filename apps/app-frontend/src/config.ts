@@ -16,7 +16,6 @@ export const config = {
 	stripePublishableKey:
 		import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY ||
 		'pk_test_51JbFxJJygY5LJFfKV50mnXzz3YLvBVe2Gd1jn7ljWAkaBlRz3VQdxN9mXcPSrFbSqxwAb0svte9yhnsmm7qHfcWn00R611Ce7b',
-	coreUrl: import.meta.env.DEV ? trimTrailingSlash(import.meta.env.VITE_CORE_URL || '') : '',
 	accountApiUrl: trimTrailingSlash(import.meta.env.VITE_ACCOUNT_API_URL || ''),
 	accountWebUrl: trimTrailingSlash(import.meta.env.VITE_ACCOUNT_WEB_URL || ''),
 	labrinthBaseUrl,
@@ -24,8 +23,7 @@ export const config = {
 	sharedInstancesBaseUrl,
 }
 
-export function applyDevAppConfig(devConfig: { coreUrl?: string; backendUrl?: string }) {
+export function applyDevAppConfig(devConfig: { backendUrl?: string }) {
 	if (!import.meta.env.DEV) return
-	if (devConfig.coreUrl) config.coreUrl = trimTrailingSlash(devConfig.coreUrl)
 	if (devConfig.backendUrl) config.accountApiUrl = trimTrailingSlash(devConfig.backendUrl)
 }

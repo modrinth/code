@@ -6,17 +6,6 @@ export class ArchonServersV1Module extends AbstractModule {
 		return 'archon_servers_v1'
 	}
 
-	/** Creates an unconfigured server on the local dev Core, before the existing onboarding flow. */
-	public async createLocal(name: string): Promise<{ id: string }> {
-		if (!this.client.selfHostedHosting) throw new Error('Local Core hosting is not configured')
-		return this.client.request<{ id: string }>('/servers', {
-			api: 'archon',
-			version: 'local',
-			method: 'POST',
-			body: { name },
-		})
-	}
-
 	/**
 	 * Get list of servers for the authenticated user
 	 * GET /v1/servers

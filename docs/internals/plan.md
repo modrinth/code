@@ -114,10 +114,29 @@ Later:
 - Accounts work like Modrinth's, served by the backend.
 - Core checks account tokens against that same account system. The hosting API is always on and
   requires login.
-- For now, the first account to connect to a fresh Core becomes its owner. This is temporary
-  until pairing exists.
-- Pairing is later. The intent: a Core is linked to an account directly, and several Cores under
-  one account are managed as one.
+- A Core belongs to one account, its owner. Owner only: no members, roles, or invites.
+- Pairing is how a Core gets its owner. An unowned Core shows an 8-character code in its terminal,
+  valid 15 minutes, and makes a new one when it expires. You type the code into "Pair a Core" in
+  the App and that Core belongs to your account. An unowned Core refuses everything else.
+- The backend keeps each account's list of Cores and where they are, so the App finds them on any
+  computer you sign in on. After pairing the App still talks to the Core directly.
+- How a code is trusted: the App claims the code with the backend, then sends the code and the
+  account token to the Core. The Core checks the code itself and asks the backend whether that
+  account claimed it. Only then does it store the owner. In that answer the backend issues the
+  Core its own key (only the hash is stored), which the Core uses for its later calls.
+- A Core reports its own address, on every start. By default that is the address and port it
+  listens on, or the machine's local network address when it listens on every interface.
+  `AMBERITE_PUBLIC_URL` overrides it. Nobody types an address. It must be HTTPS unless it is
+  loopback or a private network address.
+- An account can have many Cores, treated as one: their servers form one list, and creating a
+  server asks which Core only when there is more than one.
+- Unpair is in the App under Settings, Cores. The Core leaves the account's list, forgets its
+  owner and key, and shows a new code. Its servers and files stay. If the Core is off at the
+  time, it finds out the next time it starts.
+- Wrong codes are limited to 5 per account in 10 minutes, on the backend and on the Core. A live
+  code cannot be registered by another Core.
+- A Core that was owned before pairing existed keeps its owner but must be paired once to be
+  listed. It shows a code that only that owner can use.
 
 ## Current state, 2026-10-10
 
@@ -127,11 +146,12 @@ Later:
   The last commit where everything worked on Convex is `762843d41`.
 - The website is upstream Modrinth, used only as the local sign-in page.
 - Not yet checked on screen by anyone: the merged result of the sharing and Core work together.
-- Known gaps: no way to delete a server; an over-limit push shows a generic error; the App only
-  knows a Core's address from a dev setting.
+- Core pairing is built: backend list of Cores, pairing by code, the "Pair a Core" modal, and
+  Settings, Cores. The dev setting that held the Core address is gone.
+- Known gaps: no way to delete a server; an over-limit push shows a generic error; the App's
+  network allowlist is opened to Core addresses only in the dev runner, not in a packaged build.
 
 ## Open questions
 
-- How Core proves itself to the backend before pairing exists.
 - Whether the free Workers plan is enough for R2, to check before hosting.
 - Enforcing who can join a server, beyond hiding its address.

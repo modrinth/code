@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import LocalServers from './hosting/LocalServers.vue'
-import { config as appConfig } from '@/config'
-
 import type { Labrinth } from '@modrinth/api-client'
 import { ServerStackIcon } from '@modrinth/assets'
 import { injectModrinthClient, ServersManagePageIndex } from '@modrinth/ui'
@@ -11,6 +8,7 @@ import { computed } from 'vue'
 import { useRootBreadcrumb } from '@/providers/breadcrumbs'
 
 import { config } from '../config'
+import LocalServers from './hosting/LocalServers.vue'
 
 const stripePublishableKey = (config.stripePublishableKey as string) || ''
 
@@ -34,7 +32,7 @@ const resolvedProducts = computed<Labrinth.Billing.Internal.Product[]>(() => pro
 </script>
 
 <template>
-	<LocalServers v-if="appConfig.coreUrl" />
+	<LocalServers v-if="client.selfHostedHosting" />
 	<ServersManagePageIndex
 		v-else
 		:stripe-publishable-key="stripePublishableKey"

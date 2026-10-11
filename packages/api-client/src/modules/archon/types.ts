@@ -1,6 +1,28 @@
 import type { Labrinth } from '../labrinth/types'
 
 export namespace Archon {
+	export namespace Cores {
+		export namespace v1 {
+			/** A Core paired to the signed-in account, as listed by the backend. */
+			export type Core = {
+				id: string
+				name: string
+				/** Where the App reaches this Core, reported by the Core itself. */
+				address: string
+				created: string
+				last_seen: string
+			}
+
+			export type PairingFailure =
+				| 'wrong_code'
+				| 'expired'
+				| 'too_many_attempts'
+				| 'already_paired'
+				| 'unreachable'
+				| 'failed'
+		}
+	}
+
 	export namespace Nodes {
 		export namespace Internal {
 			export type Node = {

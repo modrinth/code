@@ -55,6 +55,7 @@ pub(crate) async fn run_server() -> color_eyre::eyre::Result<()> {
         &state,
     )));
     tokio::spawn(gc_ws_tickets(Arc::clone(&state)));
+    tokio::spawn(application::pairing_service::run(Arc::clone(&state)));
     let router = presentation::router::create_router(state);
     let host: IpAddr = bind_host.parse()?;
     let addr = SocketAddr::new(host, port);

@@ -159,6 +159,8 @@ export function createRuntimeEnvironment(input: {
 	const env: NodeJS.ProcessEnv = { ...input.baseEnv }
 	delete env.HOST
 	delete env.PORT
+	// The dev Core reports the address it listens on, never one left in an env file.
+	delete env.AMBERITE_PUBLIC_URL
 	env.ACCOUNT_API_URL = `http://127.0.0.1:${input.ports.backend}`
 	env.VITE_ACCOUNT_API_URL = env.ACCOUNT_API_URL
 	env.ACCOUNT_WEB_URL = `http://127.0.0.1:${input.ports.accountWeb}`
@@ -167,7 +169,6 @@ export function createRuntimeEnvironment(input: {
 		AMBERITE_DATA_DIR: input.paths.data,
 		AMBERITE_DEV_MODE: 'true',
 		AMBERITE_LOCAL_CORE_DATA_DIR: input.paths.coreData,
-		VITE_CORE_URL: `http://127.0.0.1:${input.ports.core}`,
 	}
 }
 
@@ -465,7 +466,6 @@ export function createProcessSpecs(input: {
 	}
 	const connectSrc = tauri.app.security.csp['connect-src']
 	const backendUrl = `http://127.0.0.1:${input.ports.backend}`
-	const coreUrl = `http://127.0.0.1:${input.ports.core}`
 	const tauriOverride = {
 		app: {
 			security: {
@@ -477,14 +477,19 @@ export function createProcessSpecs(input: {
 						permissions: [
 							{
 								identifier: 'http:default',
-								allow: [{ url: `${backendUrl}/*` }, { url: `${coreUrl}/*` }],
+								// Paired Cores report their own address, so it is not known up front.
+								allow: [
+									{ url: `${backendUrl}/*` },
+									{ url: 'http://*:*/*' },
+									{ url: 'https://*:*/*' },
+								],
 							},
 						],
 					},
 				],
 				csp: {
 					'img-src': `${tauri.app.security.csp['img-src']} ${backendUrl}`,
-					'connect-src': `${connectSrc} http://localhost:${input.ports.app} ws://localhost:${input.ports.app} ${backendUrl} ${backendUrl.replace('http', 'ws')} ${coreUrl} ${coreUrl.replace('http', 'ws')}`,
+					'connect-src': `${connectSrc} http://localhost:${input.ports.app} ws://localhost:${input.ports.app} ${backendUrl} ${backendUrl.replace('http', 'ws')} http: https: ws: wss:`,
 				},
 			},
 		},
@@ -497,7 +502,6 @@ export function createProcessSpecs(input: {
 		...input.env,
 		ALLOWED_ORIGIN: `http://localhost:${input.ports.app}`,
 		AMBERITE_BIND_HOST: '127.0.0.1',
-		AMBERITE_PUBLIC_URL: `http://127.0.0.1:${input.ports.core}`,
 		CORE_DATA_DIR: input.paths.coreData,
 		PORT: String(input.ports.core),
 	}
@@ -561,7 +565,6 @@ export function createProcessSpecs(input: {
 		...input.scenarios.map((scenario) =>
 			createAppProcessSpec({
 				branch: input.branch,
-				coreUrl: `http://127.0.0.1:${input.ports.core}`,
 				backendUrl,
 				env: input.env,
 				paths: input.paths,
@@ -575,7 +578,6 @@ export function createProcessSpecs(input: {
 function createAppProcessSpec(input: {
 	readonly backendUrl: string
 	readonly branch: string
-	readonly coreUrl: string
 	readonly env: NodeJS.ProcessEnv
 	readonly paths: WorktreePaths
 	readonly scenario: number
@@ -587,7 +589,6 @@ function createAppProcessSpec(input: {
 		backendUrl: input.backendUrl,
 		authMode: 'dev',
 		branch: input.branch,
-		coreUrl: input.coreUrl,
 		credentialNamespace: namespace,
 		dataDir,
 		title: `Modrinth ${input.scenario} - ${input.branch}`,

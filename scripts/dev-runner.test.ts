@@ -135,7 +135,6 @@ describe('dev runner environment', () => {
 		expect(env.SHARED).toBe('kept')
 		expect(env.AMBERITE_DEV_MODE).toBe('true')
 		expect(env.ACCOUNT_API_URL).toBe('http://127.0.0.1:8790')
-		expect(env.VITE_CORE_URL).toBe('http://127.0.0.1:16665')
 	})
 })
 
@@ -220,7 +219,11 @@ describe('dev runner scenarios', () => {
 					permissions: [
 						{
 							identifier: 'http:default',
-							allow: [{ url: 'http://127.0.0.1:8787/*' }, { url: 'http://127.0.0.1:16662/*' }],
+							allow: [
+								{ url: 'http://127.0.0.1:8787/*' },
+								{ url: 'http://*:*/*' },
+								{ url: 'https://*:*/*' },
+							],
 						},
 					],
 				},
