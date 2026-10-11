@@ -6,7 +6,6 @@ import {
 	type CreationFlowContextValue,
 	CreationFlowModal,
 	EmptyState,
-	IconButton,
 	injectInstanceServerSource,
 	injectModrinthClient,
 	injectNotificationManager,
@@ -193,9 +192,7 @@ async function browseModpacks() {
 					:icon="SearchIcon"
 					placeholder="Search servers"
 				/>
-				<IconButton v-tooltip="'Core settings'" label="Core settings" @click="openCoreSettings">
-					<SettingsIcon />
-				</IconButton>
+				<Button v-if="!problem" @click="openCoreSettings"><SettingsIcon /> Core settings</Button>
 				<Button
 					v-if="allServers.length > 0"
 					type="colored"
@@ -207,20 +204,20 @@ async function browseModpacks() {
 			</div>
 		</div>
 
-		<EmptyState
-			v-if="problem"
-			class="my-auto"
-			:type="problem.type"
-			:heading="problem.heading"
-			:description="problem.description"
-		>
-			<template #actions>
-				<Button v-if="problem.retry" :disabled="isFetching" @click="refetch()">
-					<UpdatedIcon /> Try again
-				</Button>
-				<Button @click="openCoreSettings"><SettingsIcon /> Core settings</Button>
-			</template>
-		</EmptyState>
+		<div v-if="problem" class="flex min-h-[60vh] grow items-center justify-center">
+			<EmptyState
+				:type="problem.type"
+				:heading="problem.heading"
+				:description="problem.description"
+			>
+				<template #actions>
+					<Button v-if="problem.retry" :disabled="isFetching" @click="refetch()">
+						<UpdatedIcon /> Try again
+					</Button>
+					<Button @click="openCoreSettings"><SettingsIcon /> Core settings</Button>
+				</template>
+			</EmptyState>
+		</div>
 		<!-- Ghost rows while the list loads. Static on purpose: no shimmer. -->
 		<div v-else-if="isLoading" class="flex flex-col gap-3" aria-busy="true">
 			<div
@@ -235,19 +232,22 @@ async function browseModpacks() {
 				</div>
 			</div>
 		</div>
-		<EmptyState
+		<div
 			v-else-if="allServers.length === 0"
-			class="my-auto"
-			type="empty"
-			heading="No servers yet"
-			description="Create a server on your Core and play with your friends."
+			class="flex min-h-[60vh] grow items-center justify-center"
 		>
-			<template #actions>
-				<Button type="colored" color="brand" size="lg" @click="setupModal?.show()">
-					<PlusIcon /> New server
-				</Button>
-			</template>
-		</EmptyState>
+			<EmptyState
+				type="empty"
+				heading="No servers yet"
+				description="Create a server on your Core and play with your friends."
+			>
+				<template #actions>
+					<Button type="colored" color="brand" size="lg" @click="setupModal?.show()">
+						<PlusIcon /> New server
+					</Button>
+				</template>
+			</EmptyState>
+		</div>
 		<div v-else class="flex flex-col gap-3">
 			<ServerListing v-for="server in servers" :key="server.server_id" v-bind="server" />
 			<EmptyState
