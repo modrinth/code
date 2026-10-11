@@ -159,6 +159,8 @@ export function createRuntimeEnvironment(input: {
 	const env: NodeJS.ProcessEnv = { ...input.baseEnv }
 	delete env.HOST
 	delete env.PORT
+	// The dev Core reports the address it listens on, never one left in an env file.
+	delete env.AMBERITE_PUBLIC_URL
 	env.ACCOUNT_API_URL = `http://127.0.0.1:${input.ports.backend}`
 	env.VITE_ACCOUNT_API_URL = env.ACCOUNT_API_URL
 	env.ACCOUNT_WEB_URL = `http://127.0.0.1:${input.ports.accountWeb}`

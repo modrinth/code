@@ -219,7 +219,11 @@ describe('dev runner scenarios', () => {
 					permissions: [
 						{
 							identifier: 'http:default',
-							allow: [{ url: 'http://127.0.0.1:8787/*' }, { url: 'http://127.0.0.1:16662/*' }],
+							allow: [
+								{ url: 'http://127.0.0.1:8787/*' },
+								{ url: 'http://*:*/*' },
+								{ url: 'https://*:*/*' },
+							],
 						},
 					],
 				},

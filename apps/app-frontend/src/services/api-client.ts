@@ -3,9 +3,9 @@ import {
 	NodeAuthFeature,
 	nodeAuthState,
 	PanelVersionFeature,
+	SelfHostedFeature,
 	TauriModrinthClient,
 	VerboseLoggingFeature,
-	SelfHostedFeature,
 } from '@modrinth/api-client'
 import { getVersion } from '@tauri-apps/api/app'
 

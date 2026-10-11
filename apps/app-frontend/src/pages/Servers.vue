@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import LocalServers from './hosting/LocalServers.vue'
-
 import type { Labrinth } from '@modrinth/api-client'
 import { ServerStackIcon } from '@modrinth/assets'
 import { injectModrinthClient, ServersManagePageIndex } from '@modrinth/ui'
@@ -10,6 +8,7 @@ import { computed } from 'vue'
 import { useRootBreadcrumb } from '@/providers/breadcrumbs'
 
 import { config } from '../config'
+import LocalServers from './hosting/LocalServers.vue'
 
 const stripePublishableKey = (config.stripePublishableKey as string) || ''
 
