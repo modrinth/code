@@ -29,7 +29,10 @@ export type RequestHooks = {
  * Client configuration
  */
 export interface ClientConfig {
-	/** Local Core hosting has no commercial purchase or subscription flows. */
+	/**
+	 * Hosting is served by the account's paired Cores instead of Modrinth Hosting. Hosting requests
+	 * go to those Cores (see `archon.cores_v1`), and there are no purchase or subscription flows.
+	 */
 	selfHostedHosting?: boolean
 
 	/**

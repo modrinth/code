@@ -26,6 +26,8 @@ export class ArchonServersV0Module extends AbstractModule {
 	public async list(
 		options?: Archon.Servers.v0.GetServersOptions,
 	): Promise<Archon.Servers.v0.ServerGetResponse> {
+		if (this.client.selfHostedHosting) return this.client.archon.cores_v1.servers(options)
+
 		const params = new URLSearchParams()
 		if (options?.limit) params.set('limit', options.limit.toString())
 		if (options?.offset) params.set('offset', options.offset.toString())

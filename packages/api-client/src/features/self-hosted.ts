@@ -3,8 +3,8 @@ import type { RequestContext } from '../types/request'
 
 export interface SelfHostedConfig extends FeatureConfig {
 	baseUrl: string
-	/** The Core's hosting API. Requests to it carry the account token; Core checks it with the backend. */
-	hostingUrl?: string
+	/** Whether a URL is on a paired Core. Those requests carry the account token; Core checks it with the backend. */
+	isCoreUrl?: (url: string) => boolean
 	token: () => Promise<string | undefined>
 }
 
@@ -40,8 +40,7 @@ export async function routeSelfHostedRequest(
 		(context.options.api === 'labrinth' &&
 			context.options.accountSource !== 'modrinth' &&
 			isAccountPath(context.path))
-	const hostingRequest =
-		config.hostingUrl !== undefined && context.url.startsWith(config.hostingUrl)
+	const hostingRequest = config.isCoreUrl?.(context.url) ?? false
 	const skipAuth = context.options.skipAuth
 	context.options.skipAuth = true
 	const headers = new Headers(context.options.headers)
@@ -68,7 +67,7 @@ function isAccountPath(path: string): boolean {
 	const pathname = path.split('?')[0] ?? path
 	if (/^\/(?:_internal\/)?admin\/user(?:\/|$)/.test(pathname)) return true
 	if (['/user_email', '/user_discord'].includes(pathname)) return true
-	return /^\/(auth|globals|session|sessions|friend|friends|block|blocks|notification|notifications|pat|user|users)(\/|$)/.test(
+	return /^\/(auth|globals|session|sessions|friend|friends|block|blocks|notification|notifications|pat|user|users|cores)(\/|$)/.test(
 		pathname,
 	)
 }
