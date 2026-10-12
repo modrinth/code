@@ -358,6 +358,48 @@ bool modrinth_sandbox_spawn(const struct ModrinthSandboxEnv *env,
                             struct ModrinthSandboxChild **out_child);
 
 /**
+ * Handles a sandbox helper invocation for the default helper command.
+ *
+ * Call this near the beginning of the executable, before parsing application
+ * arguments or creating a sandbox environment. On success, `out_handled` is
+ * true when a helper invocation was handled; the caller should then exit
+ * successfully without continuing application initialization. Otherwise,
+ * normal application startup should continue.
+ *
+ * Returns false on failure and sets the last FFI error. A non-null
+ * `out_handled` is initialized to false before running the helper.
+ *
+ * # Safety
+ *
+ * If `out_handled` is non-null, it must be properly aligned and valid for
+ * writing one `bool`, and must not be concurrently accessed during this call.
+ */
+bool modrinth_sandbox_helper_run_default(bool *out_handled);
+
+/**
+ * Handles a sandbox helper invocation using the provided UTF-8 arguments.
+ *
+ * The argument list must not include the executable name or
+ * `--modrinth-sandbox-helper` argument. On success, `out_handled` is true
+ * when a helper invocation was handled; the caller should then exit
+ * successfully without continuing application initialization.
+ *
+ * Returns false on failure and sets the last FFI error. A non-null
+ * `out_handled` is initialized to false before converting arguments or
+ * running the helper. A null argument pointer with zero length is allowed.
+ *
+ * # Safety
+ *
+ * Every pointer reachable through `args` must uphold
+ * [`ModrinthSandboxStringSlice::try_to_owned`]'s safety contract for the
+ * duration of this call. If `out_handled` is non-null, it must be properly
+ * aligned and valid for writing one `bool`, and must not be concurrently
+ * accessed during this call or overlap the argument storage.
+ */
+bool modrinth_sandbox_helper_run_with_args(struct ModrinthSandboxStringSlice args,
+                                           bool *out_handled);
+
+/**
  * Returns the most recent FFI error message.
  *
  * The returned message is not null-terminated and remains valid until the

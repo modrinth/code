@@ -1,7 +1,7 @@
 /*
  * Arguments and paths must be UTF-8. Unlike run.rs, output is inherited
  * directly instead of being forwarded with a "child:" prefix.
- * Windows helper startup is not yet exposed through the C API.
+
  */
 #include "modrinth_sandbox.h"
 
@@ -28,12 +28,14 @@ static void report_error(const char *operation)
 
 int main(int argc, char **argv)
 {
-#ifdef _WIN32
-	(void)argc;
-	(void)argv;
-	fprintf(stderr, "This example requires a Windows helper startup FFI binding.\n");
-	return EXIT_FAILURE;
-#endif
+	bool handled = false;
+	if (!modrinth_sandbox_helper_run_default(&handled)) {
+		report_error("Running sandbox helper");
+		return EXIT_FAILURE;
+	}
+	if (handled) {
+		return EXIT_SUCCESS;
+	}
 
 	int result = EXIT_FAILURE;
 	ModrinthSandboxEnv *env = NULL;

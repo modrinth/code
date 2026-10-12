@@ -9,7 +9,7 @@
 //! [`crate::SandboxEnv::with_helper`] when another executable or additional
 //! command arguments are required.
 
-use std::ffi::OsStr;
+use std::ffi::{OsStr, OsString};
 
 use eyre::Result;
 
@@ -21,7 +21,7 @@ use crate::backend;
 /// describing the setup operation are appended to the command before launch.
 pub type MakeHelper = fn() -> std::process::Command;
 
-const HELPER_ARG: &str = "--modrinth-sandbox-helper";
+pub const HELPER_ARG: &str = "--modrinth-sandbox-helper";
 
 /// Handles a sandbox helper invocation for the default helper command.
 ///
@@ -33,6 +33,18 @@ pub fn run_default() -> Result<bool> {
     if args.next().as_deref() != Some(OsStr::new(HELPER_ARG)) {
         return Ok(false);
     }
+    run_with_args(args)
+}
+
+/// Handles a sandbox helper invocation using the arguments provided.
+///
+/// The argument list must not include the [`HELPER_ARG`]; if you don't want
+/// to deal with this complexity, use [`run_default`].
+///
+/// Returns `true` after handling a helper invocation and `false` during normal
+/// application startup. When this returns `true`, the caller should exit
+/// successfully without continuing application initialization.
+pub fn run_with_args(args: impl IntoIterator<Item = OsString>) -> Result<bool> {
     backend::run_helper(args)
 }
 
