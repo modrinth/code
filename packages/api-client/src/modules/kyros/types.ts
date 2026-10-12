@@ -1,4 +1,63 @@
+import type { Archon } from '../archon/types'
+
 export namespace Kyros {
+	export namespace FlameAnvil {
+		export namespace v1 {
+			export type SessionStatus = Kyros.UploadSessions.v1.UploadSessionStatus
+
+			export interface UploadedPack {
+				filename: string
+				size: number
+			}
+
+			export interface SessionResponse {
+				upload_id: string
+				status: SessionStatus
+				created_at: number
+				updated_at: number
+				expires_at: number
+				client_pack?: UploadedPack | null
+				server_pack?: UploadedPack | null
+			}
+
+			export interface GetSessionResponse {
+				session: SessionResponse | null
+			}
+
+			export interface LinkQueryRequest {
+				link: string
+			}
+
+			export interface LinkQueryFile {
+				id: number
+				display_name: string
+				file_name: string
+				file_date: string
+				file_length: number
+				game_versions: string[]
+			}
+
+			export interface LinkQueryResponse {
+				project_id: number
+				slug: string
+				name: string
+				summary?: string | null
+				icon_url?: string | null
+				authors: string[]
+				file: LinkQueryFile
+				server_pack?: LinkQueryFile | null
+				server_pack_missing: boolean
+			}
+
+			export interface ExecuteSessionRequest {
+				/** Mutually exclusive with uploaded packs. */
+				link?: string | null
+				soft_override?: boolean
+				properties: Archon.Content.v1.PropertiesFields
+			}
+		}
+	}
+
 	export namespace UploadSessions {
 		export namespace v1 {
 			export type Scope = 'content' | 'files'

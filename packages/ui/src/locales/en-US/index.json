@@ -950,9 +950,6 @@
   "creation-flow.curseforge.file-label": {
     "defaultMessage": "CurseForge Modpack file"
   },
-  "creation-flow.curseforge.installation-unavailable": {
-    "defaultMessage": "CurseForge installation is not available yet."
-  },
   "creation-flow.curseforge.invalid-link": {
     "defaultMessage": "Enter a CurseForge Minecraft modpack or modpack version link."
   },
@@ -5959,6 +5956,12 @@
   },
   "servers.busy.installing": {
     "defaultMessage": "Server is installing"
+  },
+  "servers.curseforge-files-review.body": {
+    "defaultMessage": "{count, plural, one {# file} other {# files}} in this modpack {count, plural, one {isn’t} other {aren’t}} published on Modrinth, or we can’t determine whether {count, plural, one {it} other {they}} should be installed on the server, available to players, or both. Review and complete {count, plural, one {it} other {these}} in the <bold>Enabled for</bold> column."
+  },
+  "servers.curseforge-files-review.header": {
+    "defaultMessage": "Review modpack files"
   },
   "servers.download.failed.description": {
     "defaultMessage": "An error occurred while trying to download the world's files."

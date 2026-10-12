@@ -10,10 +10,8 @@ import {
 	creationFlowMessages,
 	flowTypeHeadingMessages,
 } from '../creation-flow-context'
-import { curseforgeMessages } from '../curseforge'
 
 function isForwardBlocked(ctx: CreationFlowContextValue): boolean {
-	if (ctx.setupType.value === 'curseforge') return true
 	if (ctx.flowType === 'world' && !ctx.worldName.value.trim()) return true
 	if (ctx.setupType.value === 'vanilla' && !ctx.selectedGameVersion.value) return true
 	return false
@@ -65,12 +63,7 @@ export const stageConfig: StageConfigInput<CreationFlowContextValue> = {
 			disabled:
 				isForwardBlocked(ctx) || ctx.isBackingUp.value || (isFinish && ctx.finishDisabled.value),
 			loading: isFinish && ctx.loading.value,
-			tooltip:
-				ctx.setupType.value === 'curseforge'
-					? ctx.formatMessage(curseforgeMessages.installationUnavailable)
-					: isFinish && ctx.finishDisabled.value
-						? ctx.finishDisabledTooltip.value
-						: undefined,
+			tooltip: isFinish && ctx.finishDisabled.value ? ctx.finishDisabledTooltip.value : undefined,
 			onClick: () => {
 				if (isFinish) {
 					ctx.finish()

@@ -498,14 +498,19 @@ provideInstallationSettings({
 	busyMessage: setupActionDisabledMessage,
 	modpack: computed(() => {
 		if (!modpack.value) return null
-		const isLocal = modpack.value.spec.platform === 'local_file'
+		const spec = modpack.value.spec
 		return {
 			iconUrl: modpack.value.icon_url,
 			title:
-				modpack.value.title ?? (isLocal ? modpack.value.spec.name : modpack.value.spec.project_id),
+				modpack.value.title ??
+				(spec.platform === 'local_file'
+					? spec.name
+					: spec.platform === 'curseforge'
+						? spec.filename
+						: spec.project_id),
 			link: modpackProjectId.value ? `/project/${modpackProjectId.value}` : undefined,
 			versionNumber: modpack.value.version_number,
-			filename: isLocal ? modpack.value.spec.filename : undefined,
+			filename: spec.platform === 'modrinth' ? undefined : spec.filename,
 			owner: modpack.value.owner
 				? {
 						id: modpack.value.owner.id,

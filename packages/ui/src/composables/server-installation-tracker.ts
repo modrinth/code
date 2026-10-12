@@ -39,6 +39,8 @@ function installationKeyId(key: ServerInstallationKey) {
 			return `modrinth-modpack:${key.project_id}:${key.version_id}`
 		case 'local_modpack':
 			return `local-modpack:${key.filename}`
+		case 'curse_forge_modpack':
+			return `curseforge-modpack:${key.filename}`
 		case 'unknown':
 			return 'unknown'
 	}
@@ -81,6 +83,12 @@ function contentInstallationKey(content: Archon.Content.v1.Addons): ServerInstal
 		if (spec?.platform === 'local_file') {
 			return {
 				type: 'local_modpack',
+				filename: spec.filename,
+			}
+		}
+		if (spec?.platform === 'curseforge') {
+			return {
+				type: 'curse_forge_modpack',
 				filename: spec.filename,
 			}
 		}

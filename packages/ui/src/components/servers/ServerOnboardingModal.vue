@@ -28,6 +28,7 @@ import type {
 	CreationFlowContextValue,
 	LoaderManifestResolver,
 } from '#ui/components/flows/creation-flow-modal/creation-flow-context'
+import { installCurseForgeModpack } from '#ui/components/flows/creation-flow-modal/curseforge'
 import { useVIntl } from '#ui/composables/i18n'
 import { useDismissServerIntro } from '#ui/composables/server-onboarding'
 import { hasServerPermission } from '#ui/composables/server-permissions'
@@ -132,6 +133,16 @@ const install = useMutation({
 				},
 			)
 			await upload.promise
+		} else if (config.setupType.value === 'curseforge') {
+			const auth = await client.archon.servers_v0.getFilesystemAuth(serverId)
+			if (config.curseforgeModpackFile.value) config.uploadProgress.value = 0
+			await installCurseForgeModpack(client, worldId, config, {
+				auth,
+				softOverride: true,
+				onUploadProgress: ({ progress }) => {
+					config.uploadProgress.value = Math.round(progress * 100)
+				},
+			})
 		} else {
 			const selection = config.modpackSelection.value
 			const loader = config.selectedLoader.value

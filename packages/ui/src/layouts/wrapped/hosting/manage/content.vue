@@ -306,32 +306,34 @@ const newestModpackUpdateVersion = computed(() => {
 const managedContent = computed<ManagedContentData | null>(() => {
 	const mp = contentQuery.data.value?.modpack
 	if (!mp) return null
-	const isLocal = mp.spec.platform === 'local_file'
+	const spec = mp.spec
+	const isLocal = spec.platform === 'local_file'
 	const project = projectQuery.data.value
-	const projectId = isLocal ? null : mp.spec.project_id
+	const projectId = spec.platform === 'modrinth' ? spec.project_id : null
 	const addons = modpackContentQuery.data.value?.addons
 	const summary = addons
 		? summarizeManagedContent(addons.map(addonToContentItem))
 		: modpackContentQuery.isLoading.value
 			? undefined
 			: []
-	const title = isLocal
-		? (mp.title ?? mp.spec.name)
-		: (project?.title ?? mp.title ?? projectId ?? '')
+	const title =
+		spec.platform === 'modrinth'
+			? (project?.title ?? mp.title ?? spec.project_id)
+			: (mp.title ?? (spec.platform === 'local_file' ? spec.name : spec.filename))
 	return {
 		card: {
 			kind: 'modpack',
 			installing: isInstallingContent.value,
 			manager: {
 				name: title,
-				iconUrl: (isLocal ? mp.icon_url : (project?.icon_url ?? mp.icon_url)) ?? undefined,
+				iconUrl: (projectId ? (project?.icon_url ?? mp.icon_url) : mp.icon_url) ?? undefined,
 				link: projectId ? `/project/${project?.slug ?? projectId}` : undefined,
 			},
 			summary,
 			versionNumber: isLocal ? undefined : (mp.version_number ?? undefined),
 			versionLink:
-				projectId && mp.spec.platform === 'modrinth'
-					? `/project/${project?.slug ?? projectId}/version/${mp.spec.version_id}`
+				spec.platform === 'modrinth'
+					? `/project/${project?.slug ?? spec.project_id}/version/${spec.version_id}`
 					: undefined,
 			updatedAt: isLocal ? undefined : (mp.date_published ?? undefined),
 		},

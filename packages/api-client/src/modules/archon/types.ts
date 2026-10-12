@@ -387,6 +387,8 @@ export namespace Archon {
 				status: AddonStatus
 				pack_client_retained: boolean
 				pack_client_depends: boolean
+				/** Whether the sides were guessed when installing its modpack, and should be reviewed. */
+				needs_side_type_review: boolean
 				has_update: string | null
 				name: string | null
 				project_id: string | null
@@ -404,7 +406,19 @@ export namespace Archon {
 				error?: {
 					message: string
 				}
+				/** The number of addons whose sides should be reviewed, regardless of the addon filters. */
+				files_need_side_type_review: number
 				addons: Addon[] | null
+			}
+
+			export type ReviewedAddon = {
+				kind: AddonKind
+				filename: string
+			}
+
+			export type CompleteSideTypeReviewRequest = {
+				/** The addons whose side review is completed, or every addon when absent. */
+				addons?: ReviewedAddon[] | null
 			}
 
 			export type AddAddonRequest = {
@@ -455,7 +469,28 @@ export namespace Archon {
 				description: string | null
 			}
 
-			export type ModpackSpec = ModpackSpecModrinth | ModpackSpecLocalFile
+			export type CurseForgeModpackLink = {
+				project_id: number
+				file_id: number
+				slug: string
+				name: string
+				/** The display name of the client pack file, usually including the modpack version. */
+				version_name: string
+				summary?: string
+				icon_url?: string
+				author?: string
+				server_pack_file_id?: number
+			}
+
+			export type ModpackSpecCurseForge = {
+				platform: 'curseforge'
+				/** The client pack's filename. */
+				filename: string
+				/** Present when installed from a link rather than uploaded packs. */
+				link?: CurseForgeModpackLink
+			}
+
+			export type ModpackSpec = ModpackSpecModrinth | ModpackSpecLocalFile | ModpackSpecCurseForge
 
 			export type ModpackOwner = {
 				id: string
@@ -1170,8 +1205,24 @@ export namespace Archon {
 				game_version: string
 				platform_version: string | null
 			}
+			export type WorldContentCurseForgeModpackLink = {
+				project_id: number
+				file_id: number
+				slug: string
+				name: string
+				version_name: string
+				summary: string | null
+				icon_url: string | null
+				author: string | null
+				server_pack_file_id: number | null
+			}
 			export type WorldContentModpackSource =
-				| 'CurseForge'
+				| {
+						CurseForge: {
+							filename: string
+							link: WorldContentCurseForgeModpackLink | null
+						}
+				  }
 				| {
 						Modrinth: {
 							version_id: string
@@ -1204,6 +1255,7 @@ export namespace Archon {
 				disabled_server?: boolean
 				disabled_player?: boolean
 				side_toggle_unlocked?: boolean
+				needs_side_type_review?: boolean
 				parent_directory: string
 				file_sha1: string | null
 				filename: string
@@ -1409,6 +1461,12 @@ export namespace Archon {
 				filename: string
 			}
 
+			export type InstallProgressCurseForgeModpackKey = {
+				type: 'curse_forge_modpack'
+				/** The client pack's filename. */
+				filename: string
+			}
+
 			export type InstallProgressPlatformKey = {
 				type: 'platform'
 				platform: 'forge' | 'neoforge' | 'fabric' | 'quilt' | 'paper' | 'purpur' | 'vanilla'
@@ -1420,6 +1478,7 @@ export namespace Archon {
 				| InstallProgressFileKey
 				| InstallProgressModrinthModpackKey
 				| InstallProgressLocalModpackKey
+				| InstallProgressCurseForgeModpackKey
 				| InstallProgressPlatformKey
 
 			export type InstallProgressItem = {
