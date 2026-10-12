@@ -276,6 +276,7 @@
 
 					<ServerPanelAdmonitions
 						class="mb-4 shrink-0"
+						:curseforge-file-warning-count="serverContent?.files_need_side_type_review ?? 0"
 						@installation-retry="handleInstallationRetry"
 					/>
 					<slot :on-reinstall="onReinstall" :on-reinstall-failed="onReinstallFailed" />

@@ -58,6 +58,7 @@ export class ArchonContentV1Module extends AbstractModule {
 		options?: {
 			from_modpack?: boolean
 			disabled?: boolean
+			needs_side_type_review?: boolean
 			addons?: boolean
 			updates?: boolean
 		},
@@ -66,6 +67,8 @@ export class ArchonContentV1Module extends AbstractModule {
 		if (options?.from_modpack !== undefined)
 			params.set('from_modpack', String(options.from_modpack))
 		if (options?.disabled !== undefined) params.set('disabled', String(options.disabled))
+		if (options?.needs_side_type_review !== undefined)
+			params.set('needs_side_type_review', String(options.needs_side_type_review))
 		if (options?.addons !== undefined) params.set('addons', String(options.addons))
 		if (options?.updates !== undefined) params.set('updates', String(options.updates))
 		const query = params.toString()
@@ -192,6 +195,27 @@ export class ArchonContentV1Module extends AbstractModule {
 	): Promise<void> {
 		await this.client.request<void>(
 			`/servers/${serverId}/worlds/${worldId}/addons/set-locked-side-toggle`,
+			{
+				api: 'archon',
+				version: 1,
+				method: 'POST',
+				body: request,
+			},
+		)
+	}
+
+	/**
+	 * POST /v1/:server_id/worlds/:world_id/addons/complete-side-type-review
+	 *
+	 * Clears the side review flag of the listed addons, or of every addon when none are listed.
+	 */
+	public async completeSideTypeReview(
+		serverId: string,
+		worldId: string,
+		request: Archon.Content.v1.CompleteSideTypeReviewRequest = {},
+	): Promise<void> {
+		await this.client.request<void>(
+			`/servers/${serverId}/worlds/${worldId}/addons/complete-side-type-review`,
 			{
 				api: 'archon',
 				version: 1,

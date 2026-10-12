@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { UploadIcon } from '@modrinth/assets'
-import { computed, reactive, ref } from 'vue'
+import { computed, reactive, ref, useTemplateRef } from 'vue'
 import { useRoute } from 'vue-router'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import StackedAdmonitions, {
 	type StackedAdmonitionItem,
 } from '#ui/components/base/StackedAdmonitions.vue'
+import CurseForgeFilesReviewModal from '#ui/components/servers/CurseForgeFilesReviewModal.vue'
 import InstallingBanner from '#ui/components/servers/InstallingBanner.vue'
 import ServerConfigFilePicker from '#ui/components/servers/ServerConfigFilePicker.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
@@ -35,14 +36,16 @@ const props = withDefaults(
 
 const emit = defineEmits<{
 	'installation-retry': []
-	'review-curseforge-files': []
 }>()
 
 const { formatMessage } = useVIntl()
+const curseforgeReviewModal =
+	useTemplateRef<InstanceType<typeof CurseForgeFilesReviewModal>>('curseforgeReviewModal')
 const client = injectModrinthClient()
 const ctx = injectModrinthServerContext()
 const route = useRoute()
-const { canSetup, canManageBackups, permissionDeniedMessage } = useServerPermissions()
+const { canSetup, canManageBackups, canWriteFiles, permissionDeniedMessage } =
+	useServerPermissions()
 const {
 	diffModal,
 	configPicker,
@@ -120,6 +123,9 @@ const filesBusyHeader = computed(() =>
 )
 
 const dismissedIds = reactive(new Set<string>())
+const curseforgeFilesWarningId = computed(
+	() => `curseforge-files:${ctx.worldId.value}:${props.curseforgeFileWarningCount}`,
+)
 const cancellingIds = reactive(new Set<string>())
 const uploadCancelling = ref(false)
 
@@ -221,7 +227,7 @@ function backupPriority(entry: BackupAdmonitionEntry): number {
 const stackItems = computed<ServerAdmonitionItem[]>(() => {
 	const out: ServerAdmonitionItem[] = []
 	let sortIndex = 0
-	const curseforgeWarningId = `curseforge-files:${ctx.worldId.value}:${props.curseforgeFileWarningCount}`
+	const curseforgeWarningId = curseforgeFilesWarningId.value
 	if (props.curseforgeFileWarningCount > 0 && !dismissedIds.has(curseforgeWarningId)) {
 		out.push({
 			id: curseforgeWarningId,
@@ -404,7 +410,7 @@ async function onDismissAll() {
 		if (it.kind === 'installing') {
 			onInstallationDismiss()
 		} else if (it.kind === 'curseforge-files') {
-			dismissedIds.add(it.id)
+			tasks.push(onCurseForgeFilesDismiss(it.id))
 		} else if (it.kind === 'fs-op' && it.op.id) {
 			const { op } = it
 			if (op.state === 'done' || op.state?.startsWith('fail')) {
@@ -415,6 +421,24 @@ async function onDismissAll() {
 		}
 	}
 	await Promise.all(tasks)
+}
+
+function onCurseForgeFilesReviewed() {
+	dismissedIds.add(curseforgeFilesWarningId.value)
+}
+
+/**
+ * Completes the side review of every addon, so the warning stays dismissed across sessions.
+ */
+async function onCurseForgeFilesDismiss(id: string) {
+	dismissedIds.add(id)
+	const worldId = ctx.worldId.value
+	if (!worldId || !canWriteFiles.value) return
+	try {
+		await client.archon.content_v1.completeSideTypeReview(ctx.serverId, worldId)
+	} catch {
+		dismissedIds.delete(id)
+	}
 }
 
 function onFileOpDismiss(item: ServerAdmonitionItem) {
@@ -443,8 +467,8 @@ function onInstallationDismiss() {
 				v-if="item.kind === 'curseforge-files'"
 				:file-count="props.curseforgeFileWarningCount"
 				:dismissible="dismissible"
-				@review="emit('review-curseforge-files')"
-				@dismiss="dismissedIds.add(item.id)"
+				@review="curseforgeReviewModal?.show()"
+				@dismiss="onCurseForgeFilesDismiss(item.id)"
 			/>
 			<ShareUpdateAdmonition
 				v-else-if="item.kind === 'share-update'"
@@ -526,4 +550,5 @@ function onInstallationDismiss() {
 			/>
 		</template>
 	</ContentDiffModal>
+	<CurseForgeFilesReviewModal ref="curseforgeReviewModal" @reviewed="onCurseForgeFilesReviewed" />
 </template>

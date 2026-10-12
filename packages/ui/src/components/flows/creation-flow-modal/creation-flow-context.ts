@@ -671,8 +671,6 @@ export function createCreationFlowContext(
 	}
 
 	function finish() {
-		// CurseForge installation is intentionally disconnected until backend support is added.
-		if (setupType.value === 'curseforge') return
 		if (finishDisabled.value) return
 
 		debug('finish() called, state:', {

@@ -352,23 +352,41 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 			)
 		}
 
-		for (const key of [contentListKey(serverId), modpackContentListKey(serverId)]) {
+		const keys = [contentListKey(serverId), modpackContentListKey(serverId)]
+		const targetKey = addonToggleKey(identity)
+		const clearsReview =
+			event.type !== 'world.content.file.side.lock.updated' &&
+			keys.some((key) =>
+				queryClient
+					.getQueryData<Archon.Content.v1.Addons>(key)
+					?.addons?.some(
+						(addon) => addonToggleKey(addon) === targetKey && addon.needs_side_type_review,
+					),
+			)
+
+		for (const key of keys) {
 			queryClient.setQueryData<Archon.Content.v1.Addons>(key, (current) => {
 				if (!current?.addons) return current
-				const targetKey = addonToggleKey(identity)
 				let matched = false
 				const addons = current.addons.map((addon) => {
 					if (addonToggleKey(addon) !== targetKey) return addon
 					matched = true
 					const updated =
 						event.type === 'world.content.file.side.server.updated'
-							? { ...addon, disabled_server: !event.enabled }
+							? { ...addon, disabled_server: !event.enabled, needs_side_type_review: false }
 							: event.type === 'world.content.file.side.client.updated'
-								? { ...addon, disabled_player: !event.enabled }
+								? { ...addon, disabled_player: !event.enabled, needs_side_type_review: false }
 								: { ...addon, side_toggle_unlocked: !event.locked }
 					return applyPendingAddonToggle(queryClient, serverId, event.world_id, updated)
 				})
-				return matched ? { ...current, addons } : current
+				if (!matched && !clearsReview) return current
+				return {
+					...current,
+					files_need_side_type_review: clearsReview
+						? Math.max(0, current.files_need_side_type_review - 1)
+						: current.files_need_side_type_review,
+					addons: matched ? addons : current.addons,
+				}
 			})
 		}
 	}
@@ -421,6 +439,7 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 			modpack: worldContentModpackToModpackFields(event.linked_modpack),
 			installing: event.installing,
 			error: event.error,
+			files_need_side_type_review: addons.filter((addon) => addon.needs_side_type_review).length,
 			addons,
 		}
 	}
@@ -428,7 +447,7 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 	function worldContentModpackToModpackFields(
 		modpack: Archon.Sync.v1.WorldContentModpack | null,
 	): Archon.Content.v1.ModpackFields | null {
-		if (!modpack || modpack.spec === 'CurseForge') return null
+		if (!modpack) return null
 
 		const spec: Archon.Content.v1.ModpackSpec =
 			'Modrinth' in modpack.spec
@@ -437,12 +456,14 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 						project_id: modpack.spec.Modrinth.project_id,
 						version_id: modpack.spec.Modrinth.version_id,
 					}
-				: {
-						platform: 'local_file',
-						filename: modpack.spec.LocalMrPackFile.path,
-						name: modpack.spec.LocalMrPackFile.name,
-						description: modpack.spec.LocalMrPackFile.description,
-					}
+				: 'CurseForge' in modpack.spec
+					? curseForgeModpackSpec(modpack.spec.CurseForge)
+					: {
+							platform: 'local_file',
+							filename: modpack.spec.LocalMrPackFile.path,
+							name: modpack.spec.LocalMrPackFile.name,
+							description: modpack.spec.LocalMrPackFile.description,
+						}
 
 		return {
 			spec,
@@ -455,6 +476,32 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 			date_published: modpack.date_published,
 			downloads: modpack.downloads,
 			followers: modpack.followers,
+		}
+	}
+
+	function curseForgeModpackSpec({
+		filename,
+		link,
+	}: Extract<
+		Archon.Sync.v1.WorldContentModpackSource,
+		{ CurseForge: unknown }
+	>['CurseForge']): Archon.Content.v1.ModpackSpecCurseForge {
+		return {
+			platform: 'curseforge',
+			filename,
+			link: link
+				? {
+						project_id: link.project_id,
+						file_id: link.file_id,
+						slug: link.slug,
+						name: link.name,
+						version_name: link.version_name,
+						summary: link.summary ?? undefined,
+						icon_url: link.icon_url ?? undefined,
+						author: link.author ?? undefined,
+						server_pack_file_id: link.server_pack_file_id ?? undefined,
+					}
+				: undefined,
 		}
 	}
 
@@ -471,6 +518,8 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 			disabled_server: item.disabled_server ?? current?.disabled_server ?? false,
 			disabled_player: item.disabled_player ?? current?.disabled_player ?? false,
 			side_toggle_unlocked: item.side_toggle_unlocked ?? current?.side_toggle_unlocked ?? false,
+			needs_side_type_review:
+				item.needs_side_type_review ?? current?.needs_side_type_review ?? false,
 			manifest: item.manifest === undefined ? (current?.manifest ?? null) : item.manifest,
 			kind: parentDirectoryToAddonKind(item.parent_directory),
 			from_modpack: item.from_modpack,
