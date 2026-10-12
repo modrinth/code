@@ -3,7 +3,7 @@ use std::collections::{HashMap, HashSet};
 use anyhow::{Context, Result, anyhow, ensure};
 use futures::{StreamExt, TryStreamExt, stream};
 use indexmap::IndexMap;
-use tracing::{info, info_span, warn};
+use tracing::{debug, info, info_span, warn};
 use tracing_anyhow::FutureContext;
 use url::Url;
 
@@ -12,7 +12,7 @@ use crate::{
     model::{
         FabriclikeLoader, FabriclikeStoredArtifact, GAME_VERSION_PLACEHOLDER,
     },
-    util::{MavenCoordinate, ResponseExt, Sha256, from_json_slice},
+    util::{MavenCoordinate, ResponseExt, Sha1, Sha256, from_json_slice},
 };
 
 pub use crate::model::{
@@ -264,6 +264,76 @@ async fn download_artifact(
     artifact: Artifact,
 ) -> Result<FabriclikeStoredArtifact> {
     let url = artifact_url(&artifact)?;
+
+    let mut checksum_url = url.clone();
+    checksum_url.set_path(&format!("{}.sha256", url.path()));
+
+    let response = app.http.get(checksum_url.clone()).send()
+        .context(info_span!("fetching Maven artifact checksum", url = %checksum_url, coordinate = %artifact.coordinate))
+        .await?;
+    let use_sha1 = response.status() == reqwest::StatusCode::NOT_FOUND;
+    let response = if use_sha1 {
+        debug!(%url, coordinate = %artifact.coordinate, "Maven artifact SHA256 checksum unavailable; using SHA1");
+        checksum_url.set_path(&format!("{}.sha1", url.path()));
+        app.http.get(checksum_url.clone()).send()
+            .context(info_span!("fetching Maven artifact SHA1 checksum", url = %checksum_url, coordinate = %artifact.coordinate))
+            .await?
+    } else {
+        response
+    };
+
+    let checksum = async {
+        response
+            .error_for_status_ext()
+            .await?
+            .text()
+            .await
+            .map_err(anyhow::Error::from)
+    }
+    .context(info_span!("reading Maven artifact checksum", url = %checksum_url))
+    .await?;
+    let (expected_sha256, expected_sha1) = if use_sha1 {
+        let mut digest = [0; 20];
+        hex::decode_to_slice(checksum.trim(), &mut digest).with_context(
+            || format!("invalid Maven artifact SHA1 at {checksum_url}"),
+        )?;
+        (None, Some(Sha1(digest)))
+    } else {
+        let mut digest = [0; 32];
+        hex::decode_to_slice(checksum.trim(), &mut digest).with_context(
+            || format!("invalid Maven artifact SHA256 at {checksum_url}"),
+        )?;
+        (Some(Sha256(digest)), None)
+    };
+
+    let mut conn = app
+        .db
+        .connection()
+        .context(info_span!("acquiring connection"))
+        .await?;
+    let query = model::BlobHash::all();
+    let query = if let Some(sha256) = expected_sha256 {
+        query.filter(model::BlobHash::fields().sha256().eq(sha256))
+    } else {
+        query
+            .filter(model::BlobHash::fields().sha1().eq(expected_sha1.unwrap()))
+    };
+    let existing = query
+        .exec(&mut conn)
+        .context(info_span!("checking Maven artifact CAS hash"))
+        .await?;
+    drop(conn);
+    if let Some(existing) = existing.first() {
+        let expected_sha256 = existing.sha256;
+        app.cas.get(expected_sha256)
+            .context(info_span!("fetching cached Maven artifact", sha256 = %expected_sha256, coordinate = %artifact.coordinate))
+            .await?;
+        return Ok(FabriclikeStoredArtifact {
+            artifact,
+            sha256: expected_sha256,
+        });
+    }
+
     let bytes = async {
         app.http
             .get(url.clone())
@@ -281,6 +351,20 @@ async fn download_artifact(
         scheme = url.scheme()))
     .await?;
 
+    if let Some(expected) = expected_sha256 {
+        ensure!(
+            Sha256::from_digest(&bytes) == expected,
+            "Maven artifact SHA256 mismatch for {url}: expected {expected}, got {}",
+            Sha256::from_digest(&bytes)
+        );
+    }
+    if let Some(expected) = expected_sha1 {
+        ensure!(
+            Sha1::from_digest(&bytes) == expected,
+            "Maven artifact SHA1 mismatch for {url}: expected {expected}, got {}",
+            Sha1::from_digest(&bytes)
+        );
+    }
     let mut conn = app
         .db
         .connection()
