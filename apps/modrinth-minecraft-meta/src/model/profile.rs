@@ -27,7 +27,9 @@ pub struct Profile {
 pub struct ProfileMetadata {
     pub id: String,
     pub inherits_from: String,
+    #[serde(deserialize_with = "crate::util::deserialize_timestamp")]
     pub release_time: Timestamp,
+    #[serde(deserialize_with = "crate::util::deserialize_timestamp")]
     pub time: Timestamp,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub main_class: Option<String>,

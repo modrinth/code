@@ -31,18 +31,19 @@ pub async fn download(cx: &mut DownloadRunContext<'_>) -> Result<()> {
     );
 
     let mut seen = HashSet::new();
-    let cataloged_versions = forge_catalog
-        .versions
-        .into_iter()
-        .map(|version| (ForgelikeInstallerName(version.0), "forge"))
-        .chain(
-            neoforge_catalog
-                .versions
-                .into_iter()
-                .map(|version| (ForgelikeInstallerName(version.0), "neoforge")),
-        )
-        .filter(|(name, _)| seen.insert(name.clone()))
-        .collect::<Vec<_>>();
+    let cataloged_versions =
+        forge_catalog
+            .versions
+            .into_iter()
+            .map(|version| version.0.parse().map(|name| (name, "forge")))
+            .chain(neoforge_catalog.versions.into_iter().map(|version| {
+                version.0.parse().map(|name| (name, "neoforge"))
+            }))
+            .collect::<Result<Vec<(ForgelikeInstallerName, &str)>>>()?
+            .into_iter()
+            .filter(|(name, _)| !BLACKLIST.contains(&name.as_str()))
+            .filter(|(name, _)| seen.insert(name.clone()))
+            .collect::<Vec<_>>();
     let existing_versions = model::ForgelikeInstaller::all()
         .filter(
             model::ForgelikeInstaller::fields()
@@ -115,6 +116,16 @@ pub async fn download(cx: &mut DownloadRunContext<'_>) -> Result<()> {
     Ok(())
 }
 
+/// Specific NeoForge installer versions which we can't download or process.
+pub(crate) const BLACKLIST: &[&str] = &[
+    // listed upstream, but installer JARs and POMs return 404
+    "1.20.1-47.1.7",
+    "47.1.82",
+    // the installer references a missing universal JAR; upstream and launcher-meta
+    // return 404, although production publishes a manifest referencing that JAR
+    "21.4.31-beta",
+];
+
 fn installer_url(artifact: &str, name: &ForgelikeInstallerName) -> String {
     format!(
         "https://maven.neoforged.net/releases/net/neoforged/{artifact}/{name}/{artifact}-{name}-installer.jar"
@@ -147,7 +158,7 @@ mod tests {
             assert_eq!(
                 installer_url(
                     artifact,
-                    &ForgelikeInstallerName(version.to_owned())
+                    &version.parse::<ForgelikeInstallerName>().unwrap()
                 ),
                 expected
             );

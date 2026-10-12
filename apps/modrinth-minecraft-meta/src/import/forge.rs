@@ -29,7 +29,7 @@ pub async fn download(cx: &mut DownloadRunContext<'_>) -> Result<()> {
             skipped_pre_installer_versions += 1;
             continue;
         }
-        if !BLACKLIST.contains(&name.0.as_str()) {
+        if !BLACKLIST.contains(&name.as_str()) {
             cataloged_versions.push(name);
         }
     }
@@ -122,7 +122,7 @@ pub async fn download(cx: &mut DownloadRunContext<'_>) -> Result<()> {
 /// them.
 fn has_supported_installer(name: &ForgelikeInstallerName) -> Result<bool> {
     let (minecraft, remaining) = name
-        .0
+        .as_str()
         .split_once('-')
         .context("missing Forge version separator")?;
     ensure!(!minecraft.is_empty(), "missing Minecraft version");
@@ -178,9 +178,9 @@ mod tests {
             ("1.21.8-58.1.22", true),
         ] {
             assert_eq!(
-                has_supported_installer(&ForgelikeInstallerName(
-                    name.to_owned()
-                ))
+                has_supported_installer(
+                    &name.parse::<ForgelikeInstallerName>().unwrap()
+                )
                 .unwrap(),
                 supported,
                 "{name}"

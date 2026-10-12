@@ -1,4 +1,6 @@
-use derive_more::Display;
+mod name;
+pub use name::ForgelikeInstallerName;
+
 use jiff::Timestamp;
 use serde::{Deserialize, Serialize};
 use toasty::{Embed, Model};
@@ -30,25 +32,6 @@ pub enum ForgelikeLoader {
     Neoforge,
 }
 
-/// Full upstream version name identifying a Forge or NeoForge installer.
-///
-/// Forge uses `<minecraft version>-<loader version>`; modern NeoForge uses
-/// its loader version alone.
-#[derive(
-    Debug,
-    Display,
-    Clone,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    Hash,
-    Serialize,
-    Deserialize,
-    Embed,
-)]
-pub struct ForgelikeInstallerName(pub String);
-
 #[derive(Debug, Clone, Model)]
 #[key(loader, name)]
 pub struct ForgelikeInstaller {
@@ -61,14 +44,21 @@ pub struct ForgelikeInstaller {
     pub sha256: Sha256,
 }
 
-/// An embedded Maven artifact retained in content-addressed storage.
+impl ForgelikeInstaller {
+    pub fn is_blacklisted(&self) -> bool {
+        self.loader == ForgelikeLoader::Neoforge
+            && crate::import::neoforge::BLACKLIST.contains(&self.name.as_str())
+    }
+}
+
+/// An embedded or downloaded Maven artifact retained in content-addressed storage.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ForgelikeStoredArtifact {
     pub coordinate: MavenCoordinate,
     pub sha256: Sha256,
 }
 
-/// Parsed metadata and stored embedded artifacts from a Forge or NeoForge installer.
+/// Parsed metadata and stored dependencies from a Forge or NeoForge installer.
 #[derive(Debug, Clone, Model)]
 pub struct ForgelikeExtract {
     /// [`Sha256`] hash of the installer JAR file which we extracted this
@@ -84,7 +74,8 @@ pub struct ForgelikeExtract {
     pub created_at: Timestamp,
     #[column(type = json)]
     pub metadata: toasty::Json<ProfileMetadata>,
-    /// Referenced embedded artifacts, with Maven coordinates and CAS blob hashes.
+    /// Referenced embedded and downloaded artifacts, with coordinates and CAS hashes.
+    /// The field name is retained for compatibility with existing extraction records.
     #[column(type = json)]
     pub embedded_maven_artifacts: toasty::Json<Vec<ForgelikeStoredArtifact>>,
 }
