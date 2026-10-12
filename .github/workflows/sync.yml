@@ -1,0 +1,39 @@
+name: Sync with Upstream
+
+on:
+  schedule:
+    - cron: '30 12 * * *' # finishes daily at about 14:00 my timezone, about perfect for me
+  workflow_dispatch: # Allows manual trigger from GitHub UI
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout your fork
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Pull upstream changes
+        run: |
+          git remote add upstream https://github.com/modrinth/app.git
+          git fetch upstream
+          
+          # Try to merge upstream/main into your main branch
+          git checkout main
+          git merge upstream/main --no-edit || echo "CONFLICTS_DETECTED=true" >> $GITHUB_ENV
+
+      - name: Handle merge result
+        run: |
+          if [ "${{ env.CONFLICTS_DETECTED }}" = "true" ]; then
+            echo "::error::Merge conflicts detected during upstream sync! Manual intervention required."
+            exit 1
+          else
+            echo "Sync successful, pushing changes..."
+          fi
+
+      - name: Push to your fork
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: main
