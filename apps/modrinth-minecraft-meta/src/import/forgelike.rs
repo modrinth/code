@@ -107,8 +107,11 @@ struct LegacyInstallProfile {
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
 struct LegacyInstall {
     minecraft: String,
+    path: MavenCoordinate,
+    file_path: String,
 }
 
 #[derive(Debug, Deserialize)]
@@ -172,6 +175,7 @@ async fn extract_from_installer(
             .context(info_span!("reading install profile"))
             .await?
             .context("installer is missing install_profile.json")?;
+    let mut legacy_artifact = None;
     let version =
         match read_json::<model::ProfileMetadata>(&zip, "version.json")
             .context(info_span!("reading installer version"))
@@ -197,11 +201,15 @@ async fn extract_from_installer(
                         .context(
                         "parsing legacy install profile without version.json",
                     )?;
+                legacy_artifact = Some((
+                    profile.install.path.clone(),
+                    profile.install.file_path.clone(),
+                ));
                 profile.into_metadata()
             }
         };
     let referenced_artifacts = referenced_maven_artifacts(&version.libraries)?;
-    let embedded_maven_artifacts = {
+    let mut embedded_maven_artifacts = {
         let embedded_paths = zip
             .file()
             .entries()
@@ -213,8 +221,18 @@ async fn extract_from_installer(
             .filter(|coordinate| {
                 embedded_paths.contains(coordinate.to_maven_path().as_str())
             })
+            .map(|coordinate| {
+                let path = coordinate.to_maven_path();
+                (coordinate, path)
+            })
             .collect::<Vec<_>>()
     };
+    if let Some((coordinate, path)) = legacy_artifact {
+        embedded_maven_artifacts.retain(|(existing, _)| {
+            existing.to_maven_path() != coordinate.to_maven_path()
+        });
+        embedded_maven_artifacts.push((coordinate, path));
+    }
 
     debug!(
         %version.id,
@@ -222,29 +240,28 @@ async fn extract_from_installer(
         "read installer metadata"
     );
 
-    let stored_artifacts = stream::iter(embedded_maven_artifacts.into_iter())
-        .map(|coordinate| {
-                let zip = &zip;
-                async move {
-                    let path = coordinate.to_maven_path();
-                    let bytes = read_file(zip, &path)
-                        .context(info_span!(
-                            "extracting embedded Maven artifact",
-                            path
-                        ))
-                        .await?
-                        .context(
-                            "embedded Maven artifact is missing from installer",
-                        )?;
-                    let mut conn = app.db.connection()
-                        .context(info_span!("acquiring artifact connection"))
-                        .await?;
-                    let sha256 = app.cas
-                        .put(&mut conn, &bytes)
-                        .context(info_span!("storing embedded Maven artifact in CAS", path, %coordinate))
-                        .await?;
-                    anyhow::Ok(model::ForgelikeStoredArtifact { coordinate, sha256 })
-                }
+    let stored_artifacts = stream::iter(embedded_maven_artifacts)
+        .map(|(coordinate, path)| {
+            let zip = &zip;
+            async move {
+                let bytes = read_file(zip, &path)
+                    .context(info_span!(
+                        "extracting embedded Maven artifact",
+                        path
+                    ))
+                    .await?
+                    .context(
+                        "embedded Maven artifact is missing from installer",
+                    )?;
+                let mut conn = app.db.connection()
+                    .context(info_span!("acquiring artifact connection"))
+                    .await?;
+                let sha256 = app.cas
+                    .put(&mut conn, &bytes)
+                    .context(info_span!("storing embedded Maven artifact in CAS", path, %coordinate))
+                    .await?;
+                anyhow::Ok(model::ForgelikeStoredArtifact { coordinate, sha256 })
+            }
         })
         .buffered(app.concurrency.extract_files.get())
         .try_collect::<Vec<_>>()
@@ -316,4 +333,36 @@ async fn read_json<T: DeserializeOwned>(
         anyhow!("entry {path} must be a `{}`", type_name::<T>())
     })?;
     Ok(Some(t))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn legacy_install_has_explicit_source_path_and_coordinate() {
+        let install: LegacyInstall = serde_json::from_value(json!({
+            "minecraft": "1.7.10",
+            "path": "net.minecraftforge:forge:1.7.10-10.13.4.1614",
+            "filePath": "forge-universal.jar"
+        }))
+        .unwrap();
+        assert_eq!(install.file_path, "forge-universal.jar");
+        assert_eq!(
+            install.path.to_maven_path(),
+            "maven/net/minecraftforge/forge/1.7.10-10.13.4.1614/forge-1.7.10-10.13.4.1614.jar"
+        );
+    }
+
+    #[test]
+    fn legacy_install_requires_valid_coordinate_and_source_path() {
+        for value in [
+            json!({"minecraft": "1.7.10", "path": "invalid", "filePath": "forge.jar"}),
+            json!({"minecraft": "1.7.10", "path": "g:a:1"}),
+            json!({"minecraft": "1.7.10", "filePath": "forge.jar"}),
+        ] {
+            assert!(serde_json::from_value::<LegacyInstall>(value).is_err());
+        }
+    }
 }
