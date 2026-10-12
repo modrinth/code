@@ -93,7 +93,7 @@ pub enum ThreadIssueTarget {
         links: HashMap<String, TextTarget>,
     },
     AddGalleryImages {
-        original_count: u32,
+        original_image_ids: Vec<GalleryImageId>,
     },
     ModifyGalleryImage {
         image_id: GalleryImageId,
@@ -386,8 +386,10 @@ impl ThreadIssueTarget {
                     ThreadIssueValueState::DifferentToOriginal
                 }
             }
-            Self::AddGalleryImages { original_count } => {
-                if project.gallery.len() > *original_count as usize {
+            Self::AddGalleryImages { original_image_ids } => {
+                if project.gallery.iter().any(|image| {
+                    image.id.is_some_and(|id| !original_image_ids.contains(&id))
+                }) {
                     ThreadIssueValueState::DifferentToOriginal
                 } else {
                     ThreadIssueValueState::SameAsOriginal
@@ -1135,7 +1137,11 @@ mod tests {
     fn gallery_addition_and_metadata_value_states() {
         let mut project = project();
         let add = ThreadIssueTarget::AddGalleryImages {
-            original_count: project.gallery.len() as u32,
+            original_image_ids: project
+                .gallery
+                .iter()
+                .filter_map(|image| image.id)
+                .collect(),
         };
         let metadata = ThreadIssueTarget::ModifyGalleryImage {
             image_id: GalleryImageId(1),
@@ -1175,6 +1181,52 @@ mod tests {
         assert_eq!(
             metadata.value_state(&context(&project), false),
             ThreadIssueValueState::DifferentToOriginal
+        );
+    }
+
+    #[test]
+    fn gallery_addition_is_independent_of_removal() {
+        let mut project = project();
+        let add = ThreadIssueTarget::AddGalleryImages {
+            original_image_ids: project
+                .gallery
+                .iter()
+                .filter_map(|image| image.id)
+                .collect(),
+        };
+        let remove = ThreadIssueTarget::RemoveGalleryImages {
+            image_ids: non_empty(vec![GalleryImageId(1)]),
+        };
+        let mut added = project.gallery.remove(0);
+
+        assert_eq!(
+            add.verdict(&context(&project), true, false),
+            ThreadIssueVerdict::Open
+        );
+        assert_eq!(
+            remove.verdict(&context(&project), false, false),
+            ThreadIssueVerdict::Resolved
+        );
+
+        added.id = Some(GalleryImageId(3));
+        project.gallery.push(added);
+        assert_eq!(
+            add.verdict(&context(&project), false, false),
+            ThreadIssueVerdict::Open
+        );
+        assert_eq!(
+            add.verdict(&context(&project), true, false),
+            ThreadIssueVerdict::Addressed
+        );
+        assert_eq!(
+            remove.verdict(&context(&project), false, false),
+            ThreadIssueVerdict::Resolved
+        );
+
+        project.gallery.pop();
+        assert_eq!(
+            add.verdict(&context(&project), true, false),
+            ThreadIssueVerdict::Open
         );
     }
 
