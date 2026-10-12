@@ -420,7 +420,9 @@ pub fn normalize_profile(
     games: &[String],
     fallback_maven: &Url,
 ) -> Result<(ProfileMetadata, Vec<Artifact>)> {
-    profile.id = profile.id.replace(template, GAME_VERSION_PLACEHOLDER);
+    if let Some(prefix) = profile.id.strip_suffix(template) {
+        profile.id = format!("{prefix}{GAME_VERSION_PLACEHOLDER}");
+    }
     profile.inherits_from = profile
         .inherits_from
         .replace(template, GAME_VERSION_PLACEHOLDER);
@@ -771,10 +773,35 @@ mod tests {
     }
 
     #[test]
+    fn profile_id_substitution_preserves_loader_version() {
+        let profile: ProfileMetadata = serde_json::from_value(json!({
+            "id": "quilt-loader-0.26.3-26.3",
+            "inheritsFrom": "26.3",
+            "releaseTime": "2026-01-01T00:00:00Z",
+            "time": "2026-01-01T00:00:00Z",
+            "type": "release",
+            "libraries": []
+        }))
+        .unwrap();
+        let (profile, _) = normalize_profile(
+            profile,
+            "26.3",
+            &[],
+            &Url::parse("https://maven.quiltmc.org/repository/release/")
+                .unwrap(),
+        )
+        .unwrap();
+        assert_eq!(
+            profile.id,
+            format!("quilt-loader-0.26.3-{GAME_VERSION_PLACEHOLDER}")
+        );
+    }
+
+    #[test]
     fn substitutes_templates_and_expands_concrete_artifacts() {
         let (profile, artifacts) = normalize(
             json!({
-                "id": "fabric-GAME-loader",
+                "id": "fabric-loader-GAME",
                 "inheritsFrom": "GAME",
                 "libraries": [{"name": "net.fabricmc:intermediary:GAME"}]
             }),
@@ -783,7 +810,7 @@ mod tests {
         .unwrap();
         assert_eq!(
             profile["id"],
-            format!("fabric-{GAME_VERSION_PLACEHOLDER}-loader")
+            format!("fabric-loader-{GAME_VERSION_PLACEHOLDER}")
         );
         assert_eq!(profile["inheritsFrom"], GAME_VERSION_PLACEHOLDER);
         assert_eq!(
