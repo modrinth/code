@@ -56,28 +56,29 @@ jobs:
     env:
       VITE_STRIPE_PUBLISHABLE_KEY: pk_live_51JbFxJJygY5LJFfKLVVldb10HlLt24p421OWRsTOWc5sXYFOnFUXWieSc6HD3PHo25ktx8db1WcHr36XGFvZFVUz00V9ixrCs5
       RUSTC_WRAPPER: 'sccache'
+      SCCACHE_GHA_ENABLED: 'true'
     strategy:
       fail-fast: false
       matrix:
         platform:
           [
-            namespace-profile-medium-amd64-macos,
-            namespace-profile-medium-amd64-windows,
-            namespace-profile-medium-amd64,
+            macos-15,
+            windows-2025,
+            ubuntu-24.04,
           ]
         include:
-          - platform: namespace-profile-medium-amd64-macos
+          - platform: macos-15
             artifact-target-name: universal-apple-darwin
-          - platform: namespace-profile-medium-amd64-windows
+          - platform: windows-2025
             artifact-target-name: x86_64-pc-windows-msvc
-          - platform: namespace-profile-medium-amd64
+          - platform: ubuntu-24.04
             artifact-target-name: x86_64-unknown-linux-gnu
 
     runs-on: ${{ matrix.platform }}
 
     steps:
       - name: Check out code
-        uses: namespacelabs/nscloud-checkout-action@66f2dc6f6c42a8ac6c4e53473c4840006822831e # v9.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
@@ -86,6 +87,7 @@ jobs:
         with:
           rustflags: ''
           target: ${{ contains(matrix.artifact-target-name, 'darwin') && 'x86_64-apple-darwin' || '' }}
+          cache: true
 
       - name: Setup mold
         if: contains(matrix.artifact-target-name, 'linux')
@@ -102,15 +104,17 @@ jobs:
       - name: Enable Corepack
         run: corepack enable
 
-      - name: Set up caches
-        uses: namespacelabs/nscloud-cache-action@1124a6f3ce44e5cf84cc22111530961f4d2a15f9 # v1.7.0
-        with:
-          cache: |
-            rust
-            pnpm
+      - name: Get pnpm store path
+        id: pnpm-store
+        shell: bash
+        run: echo "path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
 
-      - name: Configure sccache
-        run: nsc cache sccache setup --cache_name default >> "$GITHUB_ENV"
+      - name: Cache pnpm store
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: pnpm-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: pnpm-${{ runner.os }}-${{ runner.arch }}-
 
       - name: Generate tauri-dev.conf.json
         shell: bash
