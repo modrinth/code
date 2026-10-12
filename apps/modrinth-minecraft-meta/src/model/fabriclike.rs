@@ -14,6 +14,8 @@ use crate::{
     util::{MavenCoordinate, Sha256},
 };
 
+pub const GAME_VERSION_PLACEHOLDER: &str = "${modrinth.gameVersion}";
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Embed)]
 pub enum FabriclikeLoader {
     Fabric,

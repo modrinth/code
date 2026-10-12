@@ -26,6 +26,10 @@ impl ErrorAccumulator {
         imp.0.push(err);
     }
 
+    pub fn len(&self) -> usize {
+        self.imp.lock().expect("should not be poisoned").0.len()
+    }
+
     pub fn finish(self) -> ErrorVec {
         self.imp.into_inner().expect("should not be poisoned")
     }

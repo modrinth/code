@@ -7,19 +7,39 @@ The general flow of the metadata service is:
   - Download metadata and manifests from upstream sources (Mojang, Fabric, NeoForge, etc.), and save them into storage as raw JSON blobs.
   - Take the JSON blobs and extract structured information out of them, useful for our purposes, and save that in our database.
   - Do other extraction, like reading JSON manifests embedded in installer JAR files, and save that in our database.
-  - If any step fails, we handle it as gracefully, and skip/ignore/continue where possible.
+  - Download required Maven artifacts, or extract them from installer JARs, into content-addressed storage. Record their hashes alongside the structured metadata.
+  - If an upstream's downloads fail, keep its previous structured metadata and continue with other upstreams. Commit new structured metadata only after its required artifacts are stored. Report failures at the end of the run.
 - Export
   - Read all entries in our database, and turn them into manifests used by the app.
-  - Upload these manifests, and extracted Maven artifacts, into the local filesystem or S3.
-  - Since we never delete imported rows, this process is only additive, and old versions/info will never be removed.
+  - Upload these manifests, and stored Maven artifacts, into the local filesystem or S3. Export never downloads from upstream sources.
+  - Publish referenced artifacts and version manifests before publishing the overall catalog.
+  - Historical catalogs can contribute versions absent from newer catalogs. Raw import history is retained, while selected structured metadata can be replaced when upstream information changes.
 
 This means that:
-- Every time we run the service, we save the source manifests that we download - from this, we can derive any information that we want without needing to query the upstreams again.
+- Every time we import, we save the source manifests that we download - from this, we can derive any information that we want without needing to query the upstreams again.
 - We have a historical record of all upstream manifests - if an upstream goes down, we're not affected and can keep using old information until it's back up.
-- Operations are idempotent - so rerunning or running multiple operations concurrently isn't an issue.
+- Imports and exports can be rerun. This does not guarantee that overlapping runs are safe; run them sequentially.
 - Much of our data is effectively immutable, simplifying things a lot - no need to deal with missing versions if we never delete versions.
 - Given the immutability, we can track the provenance of each entity (game version, loader version, etc.)
 - We still have the option to hide information by not including it in the final manifest upload - e.g. if we no longer want to show a version, we can mark it as `unlisted` in our database, and the final manifest creation won't include it, but it'll still exist in the DB.
+
+## Running
+
+From the repository root:
+
+```sh
+cargo run -p modrinth-minecraft-meta -- import
+cargo run -p modrinth-minecraft-meta -- export
+```
+
+Without upstream flags, all upstreams are selected. Put flags before the command to select specific upstreams:
+
+```sh
+cargo run -p modrinth-minecraft-meta -- --fabric --quilt import
+cargo run -p modrinth-minecraft-meta -- --fabric --quilt export
+```
+
+Forge and NeoForge currently import installer metadata and embedded artifacts, and export the embedded artifacts. Their launcher manifests are not implemented yet.
 
 ## Forge and NeoForge
 

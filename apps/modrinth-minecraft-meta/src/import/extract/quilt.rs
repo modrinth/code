@@ -8,7 +8,7 @@ use url::Url;
 
 use crate::{
     AppState,
-    extract::fabriclike::{
+    import::extract::fabriclike::{
         self, CatalogGame, CatalogLoader, CatalogSnapshot, ProfileGroup,
     },
     model::{self, FabriclikeLoader},
@@ -78,7 +78,10 @@ pub async fn extract(app: &AppState) -> Result<()> {
             loaders: catalog
                 .loader
                 .into_iter()
-                .filter(|loader| loader.version.0 != "0.17.5-beta.4")
+                .filter(|loader| {
+                    loader.version.0
+                        != crate::import::quilt::SKIPPED_LOADER_VERSION
+                })
                 .map(|loader| CatalogLoader {
                     id: loader.version.to_string(),
                     stable: loader.stable,
@@ -100,7 +103,7 @@ pub async fn extract(app: &AppState) -> Result<()> {
                 stable: game.stable,
             })
             .collect::<Vec<_>>();
-        for group in quilt::profile_groups(&snapshot_games) {
+        for group in crate::import::quilt::profile_groups(&snapshot_games) {
             historical_templates
                 .entry(group.id)
                 .or_default()
@@ -112,7 +115,7 @@ pub async fn extract(app: &AppState) -> Result<()> {
     let profile_base_url = Url::parse(quilt::PROFILE_BASE_URL)?;
     // use the downloader's grouping rules;
     // legacy and modern games need separate profiles for the same loader
-    let groups = quilt::profile_groups(&games)
+    let groups = crate::import::quilt::profile_groups(&games)
         .into_iter()
         .map(|group| ProfileGroup {
             fallback_templates: historical_templates

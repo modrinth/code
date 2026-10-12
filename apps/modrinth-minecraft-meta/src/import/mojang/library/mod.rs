@@ -124,7 +124,8 @@ pub fn merge_partial_library(
 
 #[cfg(test)]
 mod tests {
-    use crate::upstream::mojang::{Library, patch_library};
+    use super::patch_library;
+    use crate::upstream::mojang::Library;
 
     #[test]
     fn bundled_patches_load_and_add_missing_dependencies() {

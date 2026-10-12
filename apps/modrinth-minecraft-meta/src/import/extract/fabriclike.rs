@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use anyhow::{Context, Result, anyhow, ensure};
 use futures::{StreamExt, TryStreamExt, stream};
@@ -9,7 +9,9 @@ use url::Url;
 
 use crate::{
     AppState, model,
-    model::{FabriclikeLoader, FabriclikeStoredArtifact},
+    model::{
+        FabriclikeLoader, FabriclikeStoredArtifact, GAME_VERSION_PLACEHOLDER,
+    },
     util::{MavenCoordinate, ResponseExt, Sha256, from_json_slice},
 };
 
@@ -18,8 +20,6 @@ pub use crate::model::{
     FabriclikeProfileGroup as ProfileGroup,
     FabriclikeProfileMetadata as ProfileMetadata,
 };
-
-pub const GAME_VERSION_PLACEHOLDER: &str = "${modrinth.gameVersion}";
 
 /// Selects and normalizes downloaded profiles without publishing any files.
 /// Catalog state and profiles are replaced atomically after all dependencies
@@ -33,6 +33,13 @@ pub async fn extract_catalogs(
 ) -> Result<()> {
     // merge catalogs, keeping the newest metadata for each version;
     // older catalogs can still contribute versions missing from newer ones
+    let required_loaders = catalogs
+        .first()
+        .into_iter()
+        .flat_map(|snapshot| {
+            snapshot.loaders.iter().map(|version| version.id.clone())
+        })
+        .collect::<HashSet<_>>();
     let mut games = IndexMap::new();
     let mut loaders = IndexMap::new();
     let mut artifacts = IndexMap::new();
@@ -106,8 +113,22 @@ pub async fn extract_catalogs(
         for version in loaders.values() {
             // prefer the current template, then try older ones from this group;
             // normalize against the template we actually downloaded
-            let (template, source, sha256) =
-                select_profile(loader, group, &version.id, &profile_hashes)?;
+            let Some((template, source, sha256)) = select_profile(
+                loader,
+                group,
+                &version.id,
+                &profile_hashes,
+                required_loaders.contains(&version.id),
+            )?
+            else {
+                warn!(
+                    ?loader,
+                    loader_version = %version.id,
+                    group = ?group.id,
+                    "skipping historical loader without a downloaded profile"
+                );
+                continue;
+            };
             let bytes = app.cas.get(sha256)
 				.context(info_span!("fetching loader profile", loader_version = %version.id, %source))
 				.await?;
@@ -447,19 +468,22 @@ fn select_profile<'a>(
     group: &'a ProfileGroup,
     loader_version: &str,
     hashes: &HashMap<String, Sha256>,
-) -> Result<(&'a str, Url, Sha256)> {
+    required: bool,
+) -> Result<Option<(&'a str, Url, Sha256)>> {
     for template in
         std::iter::once(&group.template).chain(&group.fallback_templates)
     {
         let source = profile_source(group, template, loader_version)?;
         if let Some(sha256) = hashes.get(source.as_str()) {
-            return Ok((template.as_str(), source, *sha256));
+            return Ok(Some((template.as_str(), source, *sha256)));
         }
     }
-    Err(anyhow!(
+    ensure!(
+        !required,
         "no downloaded {loader:?} profile for {loader_version} in group {:?}",
         group.id,
-    ))
+    );
+    Ok(None)
 }
 
 #[cfg(test)]
@@ -505,18 +529,92 @@ mod tests {
         let historical_hash = Sha256::from_digest(b"historical");
         let mut hashes =
             HashMap::from([(historical.to_string(), historical_hash)]);
-        let selected =
-            select_profile(FabriclikeLoader::Quilt, &group, "0.30.0", &hashes)
-                .unwrap();
+        let selected = select_profile(
+            FabriclikeLoader::Quilt,
+            &group,
+            "0.30.0",
+            &hashes,
+            true,
+        )
+        .unwrap()
+        .unwrap();
         assert_eq!(selected, ("26.2", historical, historical_hash));
         hashes.insert(current.to_string(), current_hash);
-        let selected =
-            select_profile(FabriclikeLoader::Quilt, &group, "0.30.0", &hashes)
-                .unwrap();
+        let selected = select_profile(
+            FabriclikeLoader::Quilt,
+            &group,
+            "0.30.0",
+            &hashes,
+            true,
+        )
+        .unwrap()
+        .unwrap();
         assert_eq!(selected, ("26.3", current, current_hash));
         assert!(
-            select_profile(FabriclikeLoader::Quilt, &group, "missing", &hashes)
-                .is_err()
+            select_profile(
+                FabriclikeLoader::Quilt,
+                &group,
+                "missing",
+                &hashes,
+                true
+            )
+            .is_err()
+        );
+    }
+
+    #[test]
+    fn missing_profiles_are_optional_only_for_historical_loaders() {
+        let legacy = group(Some("v1"), "1.21", &[]);
+        let modern = group(Some("v2"), "26.3", &[]);
+        let sha256 = Sha256::from_digest(b"historical profile");
+        let hashes = HashMap::from([(
+            profile_source(&legacy, "1.21", "old").unwrap().to_string(),
+            sha256,
+        )]);
+        assert!(
+            select_profile(
+                FabriclikeLoader::Quilt,
+                &legacy,
+                "old",
+                &hashes,
+                false
+            )
+            .unwrap()
+            .is_some()
+        );
+        assert!(
+            select_profile(
+                FabriclikeLoader::Quilt,
+                &modern,
+                "old",
+                &hashes,
+                false
+            )
+            .unwrap()
+            .is_none()
+        );
+        assert!(
+            select_profile(
+                FabriclikeLoader::Quilt,
+                &modern,
+                "old",
+                &hashes,
+                true
+            )
+            .is_err()
+        );
+        let mut invalid = modern;
+        invalid.profile_base_url =
+            Url::parse("mailto:invalid@example.com").unwrap();
+        assert!(
+            select_profile(
+                FabriclikeLoader::Quilt,
+                &invalid,
+                "old",
+                &hashes,
+                false
+            )
+            .is_err()
         );
     }
 

@@ -6,7 +6,7 @@ use uuid::Uuid;
 
 use crate::{
     model::{DownloadRun, DownloadRunId, ProfileMetadata},
-    util::Sha256,
+    util::{MavenCoordinate, Sha256},
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Embed)]
@@ -61,7 +61,14 @@ pub struct ForgelikeInstaller {
     pub sha256: Sha256,
 }
 
-/// Parsed metadata and embedded artifact paths from a Forge or NeoForge installer.
+/// An embedded Maven artifact retained in content-addressed storage.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ForgelikeStoredArtifact {
+    pub coordinate: MavenCoordinate,
+    pub sha256: Sha256,
+}
+
+/// Parsed metadata and stored embedded artifacts from a Forge or NeoForge installer.
 #[derive(Debug, Clone, Model)]
 pub struct ForgelikeExtract {
     /// [`Sha256`] hash of the installer JAR file which we extracted this
@@ -77,7 +84,36 @@ pub struct ForgelikeExtract {
     pub created_at: Timestamp,
     #[column(type = json)]
     pub metadata: toasty::Json<ProfileMetadata>,
-    /// Paths inside the installer, not references to extracted blobs.
+    /// Referenced embedded artifacts, with Maven coordinates and CAS blob hashes.
     #[column(type = json)]
-    pub embedded_maven_artifacts: toasty::Json<Vec<String>>,
+    pub embedded_maven_artifacts: toasty::Json<Vec<ForgelikeStoredArtifact>>,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn stored_artifact_round_trips_and_requires_hash() {
+        let value = json!({
+            "coordinate": "net.example:library:1",
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+        });
+        let stored: ForgelikeStoredArtifact =
+            serde_json::from_value(value.clone()).unwrap();
+        assert_eq!(serde_json::to_value(stored).unwrap(), value);
+        assert!(
+            serde_json::from_value::<ForgelikeStoredArtifact>(json!({
+                "coordinate": "net.example:library:1"
+            }))
+            .is_err()
+        );
+        assert!(
+            serde_json::from_value::<Vec<ForgelikeStoredArtifact>>(json!([
+                "maven/net/example/library/1/library-1.jar"
+            ]))
+            .is_err()
+        );
+    }
 }

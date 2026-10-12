@@ -3,8 +3,8 @@ use std::{
     collections::{HashMap, HashSet},
 };
 
-use anyhow::{Context, Result, anyhow};
-use futures::{TryStreamExt, stream};
+use anyhow::{Context, Result, anyhow, ensure};
+use futures::{StreamExt, TryStreamExt, stream};
 use jiff::Timestamp;
 use serde::{Deserialize, de::DeserializeOwned};
 use tracing::{debug, info, info_span, warn};
@@ -12,11 +12,29 @@ use tracing_anyhow::FutureContext;
 
 use crate::{
     AppState, model,
-    upstream::mojang::{self},
+    upstream::{self, mojang},
     util::{MavenCoordinate, from_json_slice, from_json_value},
 };
 
-pub async fn extract_installers(app: &mut AppState) -> Result<()> {
+pub async fn extract_installers(
+    app: &AppState,
+    upstreams: upstream::Upstreams,
+) -> Result<()> {
+    let mut loaders = Vec::new();
+    if upstreams.forge {
+        loaders.push(model::ForgelikeLoader::Forge);
+    }
+    if upstreams.neoforge {
+        loaders.push(model::ForgelikeLoader::Neoforge);
+    }
+    if loaders.is_empty() {
+        return Ok(());
+    }
+    let mut conn = app
+        .db
+        .connection()
+        .context(info_span!("acquiring extraction connection"))
+        .await?;
     let extracted_hashes = model::ForgelikeExtract::all()
         .select(model::ForgelikeExtract::fields().installer_sha256());
     let unprocessed_installers = model::ForgelikeInstaller::all()
@@ -26,7 +44,12 @@ pub async fn extract_installers(app: &mut AppState) -> Result<()> {
                 .in_query(extracted_hashes)
                 .not(),
         )
-        .exec(&mut app.db)
+        .filter(
+            model::ForgelikeInstaller::fields()
+                .loader()
+                .in_list(loaders),
+        )
+        .exec(&mut conn)
         .context(info_span!("fetching unprocessed Forge-like installers"))
         .await?;
     info!(
@@ -34,15 +57,23 @@ pub async fn extract_installers(app: &mut AppState) -> Result<()> {
         unprocessed_installers.len()
     );
 
+    drop(conn);
     let mut num_done = 0usize;
+    let mut num_failed = 0usize;
+    let mut seen = HashSet::new();
     for installer in unprocessed_installers {
+        if !seen.insert(installer.sha256) {
+            continue;
+        }
         let name = installer.name.clone();
         let sha256 = installer.sha256;
-        extract_from_installer(app, installer)
+        if let Err(err) = extract_from_installer(app, installer)
             .context(info_span!("extracting from installer", %name, %sha256))
             .await
-            .inspect_err(|err| warn!("error: {err:?}"))
-            .ok();
+        {
+            num_failed += 1;
+            warn!(%name, %sha256, "installer extraction failed: {err:?}");
+        }
 
         num_done += 1;
         if num_done.is_multiple_of(10) {
@@ -50,6 +81,14 @@ pub async fn extract_installers(app: &mut AppState) -> Result<()> {
         }
     }
 
+    info!(
+        num_done,
+        num_failed, "finished Forge-like installer extraction"
+    );
+    ensure!(
+        num_failed == 0,
+        "failed to extract {num_failed} Forge-like installers"
+    );
     Ok(())
 }
 
@@ -183,10 +222,8 @@ async fn extract_from_installer(
         "read installer metadata"
     );
 
-    stream::iter(embedded_maven_artifacts.iter().map(anyhow::Ok))
-        .try_for_each_concurrent(
-            app.concurrency.extract_files.get(),
-            |coordinate| {
+    let stored_artifacts = stream::iter(embedded_maven_artifacts.into_iter())
+        .map(|coordinate| {
                 let zip = &zip;
                 async move {
                     let path = coordinate.to_maven_path();
@@ -199,18 +236,32 @@ async fn extract_from_installer(
                         .context(
                             "embedded Maven artifact is missing from installer",
                         )?;
-                    app.maven
-						.put(coordinate, &bytes)
-						.context(
-							info_span!("storing embedded Maven artifact", path, %coordinate),
-						)
-						.await?;
-                    Ok(())
+                    let mut conn = app.db.connection()
+                        .context(info_span!("acquiring artifact connection"))
+                        .await?;
+                    let sha256 = app.cas
+                        .put(&mut conn, &bytes)
+                        .context(info_span!("storing embedded Maven artifact in CAS", path, %coordinate))
+                        .await?;
+                    anyhow::Ok(model::ForgelikeStoredArtifact { coordinate, sha256 })
                 }
-            },
-        )
+        })
+        .buffered(app.concurrency.extract_files.get())
+        .try_collect::<Vec<_>>()
         .await?;
 
+    let mut conn = app
+        .db
+        .connection()
+        .context(info_span!("acquiring extract connection"))
+        .await?;
+    model::ForgelikeExtract::upsert_by_installer_sha256(installer.sha256)
+        .metadata(toasty::Json(version))
+        .embedded_maven_artifacts(toasty::Json(stored_artifacts))
+        .or_ignore()
+        .exec(&mut conn)
+        .context(info_span!("storing Forge-like installer extract"))
+        .await?;
     Ok(())
 }
 

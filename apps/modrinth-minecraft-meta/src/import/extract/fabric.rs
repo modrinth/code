@@ -8,7 +8,7 @@ use url::Url;
 
 use crate::{
     AppState,
-    extract::fabriclike::{
+    import::extract::fabriclike::{
         self, Artifact, CatalogGame, CatalogLoader, CatalogSnapshot,
         ProfileGroup,
     },
@@ -47,7 +47,7 @@ pub async fn extract(app: &AppState) -> Result<()> {
 
     // read each catalog from its blob in the store,
     // and start assembling the artifacts we'll extract
-    let repository = Url::parse(fabric::MAVEN_URL)?;
+    let repository = Url::parse(crate::import::fabric::MAVEN_URL)?;
     let mut catalogs = Vec::new();
     let mut games = IndexSet::new();
     for row in rows {
@@ -110,7 +110,7 @@ pub async fn extract(app: &AppState) -> Result<()> {
     // and templates that into all the json files. Quilt has more.
     let group = ProfileGroup {
         id: None,
-        template: fabric::PROFILE_GAME_VERSION.to_owned(),
+        template: crate::import::fabric::PROFILE_GAME_VERSION.to_owned(),
         fallback_templates: Vec::new(),
         games: games.into_iter().collect(),
         profile_base_url: Url::parse(&format!(

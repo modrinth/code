@@ -1,3 +1,19 @@
+use std::sync::atomic::{self, AtomicUsize};
+
+use anyhow::{Result, ensure};
+use futures::{StreamExt, stream};
+use tracing::{info, info_span};
+use tracing_anyhow::FutureContext;
+
+use crate::{
+    import::download::DownloadRunContext,
+    model,
+    upstream::fabric::{
+        CATALOG_URL, Catalog, GameLoaderProfile, LoaderVersion,
+        LoaderVersionName,
+    },
+};
+
 pub const PROFILE_GAME_VERSION: &str = "1.21";
 pub const MAVEN_URL: &str = "https://maven.fabricmc.net/";
 
@@ -8,6 +24,7 @@ pub fn profile_url(loader_version: &LoaderVersionName) -> String {
 }
 
 pub async fn download(cx: &mut DownloadRunContext<'_>) -> Result<()> {
+    let initial_errors = cx.errors.len();
     let (catalog, sha256) = cx
         .download_json::<Catalog>(CATALOG_URL)
         .context(info_span!("fetching catalog"))
@@ -17,14 +34,6 @@ pub async fn download(cx: &mut DownloadRunContext<'_>) -> Result<()> {
         num_loader_versions = catalog.loader.len(),
         "downloaded Fabric catalog"
     );
-
-    toasty::create!(model::FabricCatalog {
-        download_run_id: cx.download_run_id,
-        sha256,
-    })
-    .exec(*cx.conn().await)
-    .context(info_span!("inserting catalog"))
-    .await?;
 
     let num_total = catalog.loader.len();
     let num_done = AtomicUsize::new(0);
@@ -45,6 +54,19 @@ pub async fn download(cx: &mut DownloadRunContext<'_>) -> Result<()> {
     stream::iter(catalog.loader)
         .for_each_concurrent(cx.download_concurrency, task)
         .await;
+
+    ensure!(
+        cx.errors.len() == initial_errors,
+        "Fabric item downloads failed; catalog not registered"
+    );
+
+    toasty::create!(model::FabricCatalog {
+        download_run_id: cx.download_run_id,
+        sha256,
+    })
+    .exec(*cx.conn().await)
+    .context(info_span!("inserting catalog"))
+    .await?;
 
     Ok(())
 }

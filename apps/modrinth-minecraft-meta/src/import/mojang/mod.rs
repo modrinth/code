@@ -1,4 +1,22 @@
+use std::sync::atomic::{self, AtomicUsize};
+
+use anyhow::{Result, ensure};
+use futures::{StreamExt, stream};
+use tracing::{info, info_span};
+use tracing_anyhow::FutureContext;
+
+use crate::{
+    import::download::DownloadRunContext,
+    model,
+    upstream::mojang::{CATALOG_URL, Catalog, Version},
+};
+
+mod library;
+
+pub use library::patch_library;
+
 pub async fn download(cx: &mut DownloadRunContext<'_>) -> Result<()> {
+    let initial_errors = cx.errors.len();
     let (catalog, sha256) = cx
         .download_json::<Catalog>(CATALOG_URL)
         .context(info_span!("fetching catalog"))
@@ -7,14 +25,6 @@ pub async fn download(cx: &mut DownloadRunContext<'_>) -> Result<()> {
         num_versions = catalog.versions.len(),
         "downloaded Mojang catalog"
     );
-
-    toasty::create!(model::MojangCatalog {
-        download_run_id: cx.download_run_id,
-        sha256,
-    })
-    .exec(*cx.conn().await)
-    .context(info_span!("inserting catalog"))
-    .await?;
 
     let cataloged_sha1s = catalog
         .versions
@@ -55,6 +65,19 @@ pub async fn download(cx: &mut DownloadRunContext<'_>) -> Result<()> {
     stream::iter(missing_versions)
         .for_each_concurrent(cx.download_concurrency, task)
         .await;
+
+    ensure!(
+        cx.errors.len() == initial_errors,
+        "Mojang item downloads failed; catalog not registered"
+    );
+
+    toasty::create!(model::MojangCatalog {
+        download_run_id: cx.download_run_id,
+        sha256,
+    })
+    .exec(*cx.conn().await)
+    .context(info_span!("inserting catalog"))
+    .await?;
 
     Ok(())
 }

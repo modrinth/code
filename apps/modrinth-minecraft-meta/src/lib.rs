@@ -18,7 +18,7 @@ use crate::{
 
 mod config;
 mod export;
-mod extract;
+
 mod import;
 mod model;
 mod store;
@@ -54,15 +54,6 @@ enum Command {
     /// Take processed information from the database, produce JSON manifests
     /// from them, and upload them to the public file store
     Export,
-}
-
-#[derive(Debug, Clone, Copy, clap::ValueEnum)]
-enum Upstream {
-    Fabric,
-    Forge,
-    Mojang,
-    NeoForge,
-    Quilt,
 }
 
 pub async fn main() -> Result<()> {
@@ -177,4 +168,33 @@ pub async fn connect_to_db(config: &Config) -> Result<toasty::Db> {
         .connect(config.database_url.as_str())
         .context(info_span!("connecting to database"))
         .await
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use clap::Parser;
+
+    #[test]
+    fn cli_accepts_import_and_export_with_upstream_selection() {
+        let cli = Cli::try_parse_from([
+            "minecraft-meta",
+            "--fabric",
+            "--quilt",
+            "import",
+        ])
+        .unwrap();
+        assert!(matches!(cli.command, Command::Import));
+        assert!(cli.fabric && cli.quilt);
+        assert!(!cli.mojang && !cli.forge && !cli.neoforge);
+        let cli = Cli::try_parse_from(["minecraft-meta", "export"]).unwrap();
+        assert!(matches!(cli.command, Command::Export));
+    }
+
+    #[test]
+    fn cli_no_longer_exposes_internal_import_phases() {
+        for command in ["download", "extract-to-db", "extract-installers"] {
+            assert!(Cli::try_parse_from(["minecraft-meta", command]).is_err());
+        }
+    }
 }

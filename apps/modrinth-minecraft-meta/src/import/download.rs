@@ -10,9 +10,10 @@ use tracing_anyhow::FutureContext;
 
 use crate::{
     AppState,
+    import::{fabric, forge, mojang, neoforge, quilt},
     model::{self, DownloadRunId},
     store::BlobCas,
-    upstream::{self, Upstreams},
+    upstream::Upstreams,
     util::{
         ErrorAccumulator, ResponseExt, Sha256, from_json_str, from_json_value,
     },
@@ -30,7 +31,7 @@ pub struct DownloadRunContext<'cx> {
 pub async fn download_from_upstreams(
     app: &AppState,
     upstreams: Upstreams,
-) -> Result<()> {
+) -> Result<Upstreams> {
     let mut conn = app
         .db
         .connection()
@@ -54,40 +55,56 @@ pub async fn download_from_upstreams(
         errors: ErrorAccumulator::new(),
     };
 
+    let mut completed = Upstreams {
+        mojang: false,
+        fabric: false,
+        forge: false,
+        neoforge: false,
+        quilt: false,
+    };
+
     if upstreams.mojang {
-        let result = upstream::mojang::download(&mut cx)
+        let errors_before = cx.errors.len();
+        let result = mojang::download(&mut cx)
             .context(info_span!("downloading Mojang upstream"))
             .await;
-        result.inspect_err(|err| cx.errors.push(err)).ok();
+        completed.mojang =
+            download_succeeded(result, &cx.errors, errors_before);
     }
 
     if upstreams.fabric {
-        let result = upstream::fabric::download(&mut cx)
+        let errors_before = cx.errors.len();
+        let result = fabric::download(&mut cx)
             .context(info_span!("downloading Fabric upstream"))
             .await;
-        result.inspect_err(|err| cx.errors.push(err)).ok();
+        completed.fabric =
+            download_succeeded(result, &cx.errors, errors_before);
     }
 
     if upstreams.neoforge {
-        let result = upstream::neoforge::download(&mut cx)
+        let errors_before = cx.errors.len();
+        let result = neoforge::download(&mut cx)
             .context(info_span!("downloading NeoForge upstream"))
             .await;
-        result.inspect_err(|err| cx.errors.push(err)).ok();
+        completed.neoforge =
+            download_succeeded(result, &cx.errors, errors_before);
     }
 
     if upstreams.quilt {
-        let result = upstream::quilt::download(&mut cx)
+        let errors_before = cx.errors.len();
+        let result = quilt::download(&mut cx)
             .context(info_span!("downloading Quilt upstream"))
             .await;
-        result.inspect_err(|err| cx.errors.push(err)).ok();
+        completed.quilt = download_succeeded(result, &cx.errors, errors_before);
     }
 
     // do Forge last since we have to download a lot of installers
     if upstreams.forge {
-        let result = upstream::forge::download(&mut cx)
+        let errors_before = cx.errors.len();
+        let result = forge::download(&mut cx)
             .context(info_span!("downloading Forge upstream"))
             .await;
-        result.inspect_err(|err| cx.errors.push(err)).ok();
+        completed.forge = download_succeeded(result, &cx.errors, errors_before);
     }
 
     toasty::update!(download_run {
@@ -98,7 +115,19 @@ pub async fn download_from_upstreams(
     .context(info_span!("marking download run as completed"))
     .await?;
 
-    Ok(())
+    Ok(completed)
+}
+
+fn download_succeeded(
+    result: Result<()>,
+    errors: &ErrorAccumulator,
+    errors_before: usize,
+) -> bool {
+    if let Err(err) = result {
+        errors.push(&err);
+        return false;
+    }
+    errors.len() == errors_before
 }
 
 impl<'cx> DownloadRunContext<'cx> {
@@ -182,5 +211,26 @@ impl<'cx> DownloadRunContext<'cx> {
             .await?;
 
         Ok(sha256)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn download_success_requires_no_new_recorded_errors() {
+        let errors = ErrorAccumulator::new();
+        assert!(download_succeeded(Ok(()), &errors, 0));
+        errors.push(&anyhow!("failed to download a profile"));
+        assert!(!download_succeeded(Ok(()), &errors, 0));
+        let previous = errors.len();
+        assert!(download_succeeded(Ok(()), &errors, previous));
+        assert!(!download_succeeded(
+            Err(anyhow!("failed to fetch catalog")),
+            &errors,
+            previous
+        ));
+        assert_eq!(errors.len(), previous + 1);
     }
 }

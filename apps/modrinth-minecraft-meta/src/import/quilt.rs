@@ -1,21 +1,36 @@
+use std::sync::atomic::{self, AtomicUsize};
+
+use anyhow::{Result, ensure};
+use futures::{StreamExt, stream};
+use tracing::{info, info_span};
+use tracing_anyhow::FutureContext;
+use url::Url;
+
+use crate::{
+    import::download::DownloadRunContext,
+    model,
+    upstream::quilt::{
+        CATALOG_URL, Catalog, GameLoaderProfile, GameVersion, GameVersionName,
+        LoaderVersion, LoaderVersionName, MetadataGroup, PROFILE_BASE_URL,
+    },
+};
+
+pub const SKIPPED_LOADER_VERSION: &str = "0.17.5-beta.4";
+
 pub async fn download(cx: &mut DownloadRunContext<'_>) -> Result<()> {
-    let (catalog, sha256) = cx
+    let initial_errors = cx.errors.len();
+    let (mut catalog, sha256) = cx
         .download_json::<Catalog>(CATALOG_URL)
         .context(info_span!("fetching catalog"))
         .await?;
+    catalog
+        .loader
+        .retain(|loader| loader.version.0 != SKIPPED_LOADER_VERSION);
     info!(
         num_game_versions = catalog.game.len(),
         num_loader_versions = catalog.loader.len(),
         "downloaded Quilt catalog"
     );
-
-    toasty::create!(model::QuiltCatalog {
-        download_run_id: cx.download_run_id,
-        sha256,
-    })
-    .exec(*cx.conn().await)
-    .context(info_span!("inserting catalog"))
-    .await?;
 
     let groups = profile_groups(&catalog.game);
     let template_game_versions = groups
@@ -52,6 +67,19 @@ pub async fn download(cx: &mut DownloadRunContext<'_>) -> Result<()> {
     stream::iter(template_pairs)
         .for_each_concurrent(cx.download_concurrency, task)
         .await;
+
+    ensure!(
+        cx.errors.len() == initial_errors,
+        "Quilt item downloads failed; catalog not registered"
+    );
+
+    toasty::create!(model::QuiltCatalog {
+        download_run_id: cx.download_run_id,
+        sha256,
+    })
+    .exec(*cx.conn().await)
+    .context(info_span!("inserting catalog"))
+    .await?;
 
     Ok(())
 }

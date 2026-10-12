@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use anyhow::{Context, Result, bail, ensure};
 use futures::{StreamExt, TryStreamExt, stream};
@@ -10,7 +10,7 @@ use crate::{
     AppState, model,
     store::BlobCas,
     upstream::mojang,
-    util::{Sha256, from_json_slice},
+    util::{Sha1, Sha256, from_json_slice},
 };
 
 pub async fn extract(app: &AppState) -> Result<()> {
@@ -58,7 +58,23 @@ pub async fn extract(app: &AppState) -> Result<()> {
         .buffered(app.concurrency.download.get())
         .try_collect::<Vec<_>>()
         .await?;
-    let (latest, versions) = select_versions(catalogs)?;
+    let candidate_sha1s = catalogs
+        .iter()
+        .flat_map(|(_, catalog)| {
+            catalog.versions.iter().map(|version| version.sha1)
+        })
+        .collect::<HashSet<_>>()
+        .into_iter()
+        .collect::<Vec<_>>();
+    let available_sha1s = model::BlobHash::all()
+        .select(model::BlobHash::fields().sha1())
+        .filter(model::BlobHash::fields().sha1().in_list(candidate_sha1s))
+        .exec(&mut conn)
+        .context(info_span!("fetching available version manifest hashes"))
+        .await?
+        .into_iter()
+        .collect::<HashSet<_>>();
+    let (latest, versions) = select_versions(catalogs, &available_sha1s)?;
     info!("found {} unique versions", versions.len());
 
     // now we make all the version manifests;
@@ -144,17 +160,28 @@ pub async fn extract(app: &AppState) -> Result<()> {
 }
 
 /// Makes a list of versions from a list of catalogs (ordered newest-first), by
-/// taking the latest version for each unique version name.
+/// taking the newest available revision for each unique version name.
+/// Every version in the newest catalog must have a downloaded source blob.
 fn select_versions(
     catalogs: Vec<(Sha256, mojang::Catalog)>,
+    available_sha1s: &HashSet<Sha1>,
 ) -> Result<(mojang::Latest, Vec<(Sha256, mojang::Version)>)> {
     let (_, latest) =
         catalogs.first().context("no downloaded Mojang catalogs")?;
     let latest = latest.latest.clone();
 
     let mut versions = IndexMap::new();
-    for (sha256, catalog) in catalogs {
+    for (priority, (sha256, catalog)) in catalogs.into_iter().enumerate() {
         for version in catalog.versions {
+            if !available_sha1s.contains(&version.sha1) {
+                ensure!(
+                    priority != 0,
+                    "no stored version manifest for {} with SHA-1 {} in newest Mojang catalog",
+                    version.id,
+                    version.sha1
+                );
+                continue;
+            }
             versions
                 .entry(version.id.clone())
                 .or_insert((sha256, version));
@@ -221,8 +248,87 @@ async fn make_version_manifest(
     manifest.libraries = manifest
         .libraries
         .into_iter()
-        .flat_map(mojang::patch_library)
+        .flat_map(crate::import::mojang::patch_library)
         .collect();
 
     Ok((sha256, manifest))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn version(id: &str, bytes: &[u8]) -> mojang::Version {
+        serde_json::from_value(serde_json::json!({
+            "id": id,
+            "type": "release",
+            "url": "https://example.com/version.json",
+            "time": "2026-01-01T00:00:00Z",
+            "releaseTime": "2026-01-01T00:00:00Z",
+            "sha1": Sha1::from_digest(bytes).to_string(),
+            "complianceLevel": 1
+        }))
+        .unwrap()
+    }
+
+    fn catalog(versions: Vec<mojang::Version>) -> (Sha256, mojang::Catalog) {
+        (
+            Sha256::from_digest(b"catalog"),
+            mojang::Catalog {
+                latest: serde_json::from_value(serde_json::json!({
+                    "release": "current", "snapshot": "current"
+                }))
+                .unwrap(),
+                versions,
+            },
+        )
+    }
+
+    #[test]
+    fn historical_selection_uses_newest_available_revision() {
+        let current = version("current", b"current");
+        let missing = version("historical", b"missing revision");
+        let available = version("historical", b"available revision");
+        let older = version("historical", b"older revision");
+        let never_downloaded = version("absent", b"never downloaded");
+        let hashes = HashSet::from([current.sha1, available.sha1, older.sha1]);
+        let (latest, selected) = select_versions(
+            vec![
+                catalog(vec![current]),
+                catalog(vec![missing, never_downloaded]),
+                catalog(vec![available.clone()]),
+                catalog(vec![older]),
+            ],
+            &hashes,
+        )
+        .unwrap();
+        assert_eq!(latest.release, selected[0].1.id);
+        assert_eq!(latest.snapshot, selected[0].1.id);
+        assert_eq!(selected.len(), 2);
+        assert_eq!(selected[1].1.sha1, available.sha1);
+    }
+
+    #[test]
+    fn newest_catalog_cannot_fall_back_to_downloaded_historical_revision() {
+        let current = version("current", b"current");
+        let missing = version("required", b"missing new revision");
+        let old = version("required", b"downloaded old revision");
+        let hashes = HashSet::from([current.sha1, old.sha1]);
+        assert!(
+            select_versions(
+                vec![catalog(vec![current, missing]), catalog(vec![old]),],
+                &hashes
+            )
+            .is_err()
+        );
+    }
+
+    #[test]
+    fn latest_versions_must_exist_in_available_selection() {
+        assert!(
+            select_versions(vec![catalog(Vec::new())], &HashSet::new())
+                .is_err()
+        );
+        assert!(select_versions(Vec::new(), &HashSet::new()).is_err());
+    }
 }

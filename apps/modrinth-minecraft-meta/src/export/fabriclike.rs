@@ -11,7 +11,7 @@ use tracing::{info, info_span};
 use tracing_anyhow::FutureContext;
 use url::Url;
 
-use crate::extract::fabriclike::GAME_VERSION_PLACEHOLDER;
+use crate::model::GAME_VERSION_PLACEHOLDER;
 use crate::{
     AppState,
     model::{

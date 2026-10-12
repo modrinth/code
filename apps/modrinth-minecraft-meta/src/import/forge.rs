@@ -1,4 +1,18 @@
+use std::sync::atomic::{self, AtomicUsize};
+
+use anyhow::{Context, Result, bail, ensure};
+use futures::{StreamExt, stream};
+use tracing::{info, info_span};
+use tracing_anyhow::FutureContext;
+
+use crate::{
+    import::download::DownloadRunContext,
+    model::{self, ForgelikeInstallerName},
+    upstream::forge::{CATALOG_URL, Catalog},
+};
+
 pub async fn download(cx: &mut DownloadRunContext<'_>) -> Result<()> {
+    let initial_errors = cx.errors.len();
     let (catalog, sha256) = cx
         .download_json::<Catalog>(CATALOG_URL)
         .context(info_span!("fetching catalog"))
@@ -27,14 +41,6 @@ pub async fn download(cx: &mut DownloadRunContext<'_>) -> Result<()> {
         num_cataloged_versions = cataloged_versions.len(),
         "downloaded Forge catalog"
     );
-
-    toasty::create!(model::ForgeCatalog {
-        download_run_id: cx.download_run_id,
-        sha256,
-    })
-    .exec(*cx.conn().await)
-    .context(info_span!("inserting catalog"))
-    .await?;
 
     let existing_versions = model::ForgelikeInstaller::all()
         .filter(
@@ -93,6 +99,19 @@ pub async fn download(cx: &mut DownloadRunContext<'_>) -> Result<()> {
     stream::iter(missing_versions)
         .for_each_concurrent(cx.download_concurrency, task)
         .await;
+
+    ensure!(
+        cx.errors.len() == initial_errors,
+        "Forge item downloads failed; catalog not registered"
+    );
+
+    toasty::create!(model::ForgeCatalog {
+        download_run_id: cx.download_run_id,
+        sha256,
+    })
+    .exec(*cx.conn().await)
+    .context(info_span!("inserting catalog"))
+    .await?;
 
     Ok(())
 }
