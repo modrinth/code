@@ -1,0 +1,84 @@
+name: Modrinth App PR build
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - .github/workflows/theseus-pr-build.yml
+      - 'apps/app/**'
+      - 'apps/app-frontend/**'
+      - 'packages/**'
+      - '.cargo/**'
+      - '.nvmrc'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'rust-toolchain.toml'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - 'turbo.jsonc'
+      - 'scripts/coverage-i18n.ts'
+      - 'scripts/run.mjs'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build Linux App
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup Rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@166cdcfd11aee3cb47222f9ddb555ce30ddb9659 # v1.17.0
+        with:
+          rustflags: ''
+
+      - name: Install Linux build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev
+
+      - name: Setup Java
+        uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95 # v5.6.0
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Set app environment
+        run: cp packages/app-lib/.env.staging packages/app-lib/.env
+
+      - name: Generate unsigned Tauri config
+        shell: bash
+        run: |
+          GIT_HASH=$(git rev-parse --short HEAD)
+          cat > apps/app/tauri-dev.conf.json <<EOF
+          {
+            "productName": "Modrinth App (dev-${GIT_HASH})",
+            "mainBinaryName": "Modrinth App (dev-${GIT_HASH})",
+            "identifier": "ModrinthApp-dev-${GIT_HASH}",
+            "bundle": {
+              "fileAssociations": []
+            }
+          }
+          EOF
+
+      - name: Build Linux app
+        run: pnpm --filter=@modrinth/app run tauri build --config tauri-dev.conf.json

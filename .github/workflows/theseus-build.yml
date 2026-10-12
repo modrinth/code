@@ -9,11 +9,18 @@ on:
       - .github/workflows/theseus-build.yml
       - 'apps/app/**'
       - 'apps/app-frontend/**'
-      - 'packages/app-lib/**'
-      - 'packages/app-macros/**'
-      - 'packages/assets/**'
-      - 'packages/ui/**'
-      - 'packages/utils/**'
+      - 'packages/**'
+      - '.cargo/**'
+      - '.nvmrc'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'rust-toolchain.toml'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - 'turbo.jsonc'
+      - 'scripts/coverage-i18n.ts'
+      - 'scripts/run.mjs'
   workflow_dispatch:
     inputs:
       sign-windows-binaries:
