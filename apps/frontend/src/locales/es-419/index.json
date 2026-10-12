@@ -881,6 +881,9 @@
   "auth.sign-in.choose-account": {
     "message": "Elige una cuenta para usar en la aplicación de Modrinth"
   },
+  "auth.sign-in.choose-existing-account": {
+    "message": "Usar una cuenta existente"
+  },
   "auth.sign-in.continue-with-email": {
     "message": "Continuar con el correo electrónico"
   },
@@ -905,14 +908,23 @@
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Abrir la aplicación de Modrinth"
   },
+  "auth.sign-in.launcher.handoff-failed": {
+    "message": "No se pudo finalizar el inicio de sesión en la Modrinth App. Intenta nuevamente."
+  },
   "auth.sign-in.launcher.opening.description": {
     "message": "Si la aplicación no se abre, utilice el botón de abajo para terminar de iniciar sesión."
   },
   "auth.sign-in.launcher.opening.title": {
     "message": "Abriendo en la aplicación de Modrinth..."
   },
+  "auth.sign-in.launcher.reauthenticate.title": {
+    "message": "Iniciar sesión en la Modrinth App"
+  },
   "auth.sign-in.no-account": {
     "message": "¿No tienes una cuenta?"
+  },
+  "auth.sign-in.reauthenticate.use-different-account": {
+    "message": "Usar una cuenta diferente"
   },
   "auth.sign-in.sign-in-with": {
     "message": "Inicia sesión en Modrinth"

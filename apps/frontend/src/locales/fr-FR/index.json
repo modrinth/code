@@ -878,6 +878,9 @@
   "auth.sign-in.choose-account": {
     "message": "Choisissez un compte à utiliser dans l'application Modrinth"
   },
+  "auth.sign-in.choose-existing-account": {
+    "message": "Utiliser un compte existant"
+  },
   "auth.sign-in.continue-with-email": {
     "message": "Continuer avec un E-mail"
   },
@@ -902,14 +905,23 @@
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Ouvrir Modrinth App"
   },
+  "auth.sign-in.launcher.handoff-failed": {
+    "message": "La connexion a échoué. Réessayez."
+  },
   "auth.sign-in.launcher.opening.description": {
     "message": "Si l'application ne s'ouvre pas, utilisez le bouton ci-dessous pour terminer la connexion."
   },
   "auth.sign-in.launcher.opening.title": {
     "message": "Ouverture de Modrinth..."
   },
+  "auth.sign-in.launcher.reauthenticate.title": {
+    "message": "Se connecter à l'application Modrinth"
+  },
   "auth.sign-in.no-account": {
     "message": "Vous n'avez pas de compte ?"
+  },
+  "auth.sign-in.reauthenticate.use-different-account": {
+    "message": "Utiliser un autre compte"
   },
   "auth.sign-in.sign-in-with": {
     "message": "Se connecter à Modrinth"
@@ -2974,6 +2986,9 @@
   },
   "layout.publish.email-verification-required.title": {
     "message": "Vérification de l'adresse e-mail requise"
+  },
+  "messages.noResults": {
+    "message": "Aucun résultat trouvé pour votre requête !"
   },
   "modal.shared-instance.open-in-app.benefit.install": {
     "message": "Installez automatiquement tout ce à quoi ils jouent"

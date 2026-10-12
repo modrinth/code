@@ -878,6 +878,9 @@
   "auth.sign-in.choose-account": {
     "message": "Виберіть обліковий запис для Modrinth App"
   },
+  "auth.sign-in.choose-existing-account": {
+    "message": "Використати наявний обліковий запис"
+  },
   "auth.sign-in.continue-with-email": {
     "message": "Продовжити з електронною поштою"
   },
@@ -902,14 +905,23 @@
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Відкрити Modrinth App"
   },
+  "auth.sign-in.launcher.handoff-failed": {
+    "message": "Не вдалося завершити вхід у Modrinth App. Спробуйте знову."
+  },
   "auth.sign-in.launcher.opening.description": {
     "message": "Якщо застосунок не відкривається, натисніть на кнопку нижче."
   },
   "auth.sign-in.launcher.opening.title": {
     "message": "Відкриваємо Modrinth App…"
   },
+  "auth.sign-in.launcher.reauthenticate.title": {
+    "message": "Увійти в Modrinth App"
+  },
   "auth.sign-in.no-account": {
     "message": "Не маєте облікового запису?"
+  },
+  "auth.sign-in.reauthenticate.use-different-account": {
+    "message": "Використати інший обліковий запис"
   },
   "auth.sign-in.sign-in-with": {
     "message": "Увійти до Modrinth"

@@ -2015,6 +2015,15 @@
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Сервер скинуто до початкового стану"
   },
+  "hosting.save-banner.resolve-errors": {
+    "defaultMessage": "Виправте помилки у ваших змінах, перш ніж зберегти."
+  },
+  "hosting.settings.properties.motd-profanity": {
+    "defaultMessage": "Згідно з правилами використання Minecraft повідомлення дня сервера не може містити нецензурну лексику. Виявлено: «{value}»."
+  },
+  "hosting.settings.properties.motd-profanity-save-error": {
+    "defaultMessage": "Згідно з правилами використання Minecraft повідомлення дня сервера не може містити нецензурну лексику. Виявлено: «{value}»"
+  },
   "hosting.specs.burst": {
     "defaultMessage": "Короткочасно до {cpus} ЦП"
   },
@@ -4575,10 +4584,10 @@
     "defaultMessage": "Дії"
   },
   "servers.access-page.activity-log-filter.action-types-search": {
-    "defaultMessage": "Пошук дій..."
+    "defaultMessage": "Пошук дій…"
   },
   "servers.access-page.activity-log-filter.action.addon-added": {
-    "defaultMessage": "Доданий уміст"
+    "defaultMessage": "Додано вміст"
   },
   "servers.access-page.activity-log-filter.action.addon-deleted": {
     "defaultMessage": "Видалений уміст"
@@ -4684,6 +4693,9 @@
   },
   "servers.access-page.activity-log-filter.action.server-stopped": {
     "defaultMessage": "Зупинено сервер"
+  },
+  "servers.access-page.activity-log-filter.action.sftp-credentials-rolled": {
+    "defaultMessage": "Оновлено облікові дані SFTP"
   },
   "servers.access-page.activity-log-filter.action.sftp-login": {
     "defaultMessage": "Виконано вхід через SFTP"
@@ -5066,6 +5078,9 @@
   "servers.audit-log.event.server-subdomain-changed": {
     "defaultMessage": "Змінено піддомен сервера на <subdomain></subdomain>"
   },
+  "servers.audit-log.event.sftp-credentials-rolled": {
+    "defaultMessage": "Оновлено облікові дані SFTP"
+  },
   "servers.audit-log.event.sftp-login": {
     "defaultMessage": "Виконано вхід через SFTP"
   },
@@ -5272,6 +5287,9 @@
   },
   "servers.download.unavailable.title": {
     "defaultMessage": "Завантаження недоступне"
+  },
+  "servers.files.server-locked": {
+    "defaultMessage": "Сервер заблоковано, і його вміст доступний лише для читання."
   },
   "servers.files.zip-created": {
     "defaultMessage": "ZIP створено"
@@ -5489,6 +5507,36 @@
   "servers.listing.using-project-label": {
     "defaultMessage": "Використання {projectTitle}"
   },
+  "servers.lock.modal.error-text": {
+    "defaultMessage": "Виникла помилка під час блокування цього сервера. Спробуйте пізніше."
+  },
+  "servers.lock.modal.error-title": {
+    "defaultMessage": "Не вдалося заблокувати сервер"
+  },
+  "servers.lock.modal.header": {
+    "defaultMessage": "Заблокувати {name}"
+  },
+  "servers.lock.modal.lock-button": {
+    "defaultMessage": "Заблокувати сервер"
+  },
+  "servers.lock.modal.reason-label": {
+    "defaultMessage": "Причина"
+  },
+  "servers.lock.modal.reason-placeholder": {
+    "defaultMessage": "Видима іншим адміністраторам"
+  },
+  "servers.lock.modal.success-text": {
+    "defaultMessage": "{name} заблоковано."
+  },
+  "servers.lock.modal.success-title": {
+    "defaultMessage": "Сервер заблоковано"
+  },
+  "servers.lock.modal.warning-body": {
+    "defaultMessage": "{name} стане доступним лише для читання для власника й учасників, поки адміністратор його не розблокує."
+  },
+  "servers.lock.modal.warning-header": {
+    "defaultMessage": "Сервер стане доступним лише для читання"
+  },
   "servers.manage.checking-for-new-servers": {
     "defaultMessage": "Перевірка для нових серверів…"
   },
@@ -5524,6 +5572,21 @@
   },
   "servers.manage.handle-error.title": {
     "defaultMessage": "Виникла помилка"
+  },
+  "servers.manage.lock-server": {
+    "defaultMessage": "Заблокувати сервер"
+  },
+  "servers.manage.locked.badge": {
+    "defaultMessage": "Заблоковано"
+  },
+  "servers.manage.locked.badge-tooltip": {
+    "defaultMessage": "Заблоковано з {date}"
+  },
+  "servers.manage.locked.body": {
+    "defaultMessage": "Підтримка тимчасово заблокувала цей сервер, тому ви не можете змінювати його. <support-link>Зв'яжіться з підтримкою</support-link>, якщо вважаєте, що блокування здійснено помилково."
+  },
+  "servers.manage.locked.header": {
+    "defaultMessage": "Сервер заблоковано підтримкою"
   },
   "servers.manage.new-server-button": {
     "defaultMessage": "Новий сервер"
@@ -5581,6 +5644,21 @@
   },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Спільні сервери"
+  },
+  "servers.manage.unlock-server": {
+    "defaultMessage": "Розблокувати сервер"
+  },
+  "servers.manage.unlock.error-text": {
+    "defaultMessage": "Виникла помилка під час розблокування йього сервера. Спробуйте пізніше."
+  },
+  "servers.manage.unlock.error-title": {
+    "defaultMessage": "Не вдалося розблокувати сервер"
+  },
+  "servers.manage.unlock.success-text": {
+    "defaultMessage": "{name} розблоковано."
+  },
+  "servers.manage.unlock.success-title": {
+    "defaultMessage": "Сервер розблоковано"
   },
   "servers.manage.your-servers-title": {
     "defaultMessage": "Ваші сервери"
@@ -5812,6 +5890,27 @@
   },
   "servers.settings.advanced.sftp.roll-credentials-success-title": {
     "defaultMessage": "Облікові дані SFTP оновлено."
+  },
+  "servers.settings.support.action-log-title": {
+    "defaultMessage": "Журнал дій"
+  },
+  "servers.settings.support.clear-action-log-button": {
+    "defaultMessage": "Очистити журнал дій"
+  },
+  "servers.settings.support.clear-action-log-confirmation": {
+    "defaultMessage": "Це назавжди видалить усі записи журналу дій цього сервера. Продовжити?"
+  },
+  "servers.settings.support.clear-action-log-description": {
+    "defaultMessage": "Видалить усі записи журналу дій цього сервера."
+  },
+  "servers.settings.support.clear-action-log-error": {
+    "defaultMessage": "Не вдалося очистити журнал дій"
+  },
+  "servers.settings.support.clear-action-log-success": {
+    "defaultMessage": "Журнал дій очищено"
+  },
+  "servers.settings.support.clear-action-log-title": {
+    "defaultMessage": "Очистити журнал дій?"
   },
   "servers.setup.onboarding.installation-failed.text": {
     "defaultMessage": "Під час установлення сталася несподівана помилка. Спробуйте ще раз пізніше."

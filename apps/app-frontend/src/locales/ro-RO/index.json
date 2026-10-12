@@ -302,6 +302,18 @@
   "app.content.sync-resource-packs-disabled": {
     "message": "Activează mai întâi sincronizarea pachetelor de resurse din setările aplicației."
   },
+  "app.debug-export.canceling": {
+    "message": "Se anulează exportarea..."
+  },
+  "app.debug-export.exporting": {
+    "message": "Se exportă…"
+  },
+  "app.debug-export.finishing": {
+    "message": "Se finalizează..."
+  },
+  "app.debug-export.preparing": {
+    "message": "Se pregătesc fișierele..."
+  },
   "app.download-manager.active": {
     "message": "Activ"
   },
@@ -452,6 +464,9 @@
   "app.features-settings.show-skin-selector.title": {
     "message": "Afișează selectorul de teme în bara laterală"
   },
+  "app.features-settings.show-worlds-tab.title": {
+    "message": "Arată tab-ul Worlds în instanțe"
+  },
   "app.features-settings.sidebar.title": {
     "message": "Bară laterală"
   },
@@ -463,6 +478,9 @@
   },
   "app.features-settings.sync-across-devices.title": {
     "message": "Funcții de sincronizare între dispozitive"
+  },
+  "app.home.jump-back-in.actions.label": {
+    "message": "Acțiuni în instanță"
   },
   "app.home.jump-back-in.instance-locked": {
     "message": "Această instanță a fost blocată"
@@ -536,11 +554,41 @@
   "app.install.phase.reading_pack_manifest": {
     "message": "Citirea manifestului pachetului"
   },
+  "app.install.phase.resolving_loader": {
+    "message": "Se rezolvă loaderul"
+  },
+  "app.install.phase.resolving_minecraft": {
+    "message": "Se rezolvă Minecraftul"
+  },
+  "app.install.phase.resolving_pack": {
+    "message": "Se instalează conținutul"
+  },
+  "app.install.phase.rolling_back": {
+    "message": "Se anulează modificările"
+  },
+  "app.install.phase.running_loader_processors": {
+    "message": "Executarea procesoarelor de încărcare"
+  },
+  "app.instance.action.add-content": {
+    "message": "Adaugă conținut"
+  },
+  "app.instance.action.copy-path": {
+    "message": "Copiază calea"
+  },
+  "app.instance.action.edit": {
+    "message": "Editează"
+  },
+  "app.instance.action.open-folder": {
+    "message": "Deschide folder-ul"
+  },
   "app.instance.action.play": {
     "message": "Joacă"
   },
   "app.instance.action.stop": {
     "message": "Oprește"
+  },
+  "app.instance.actions.label": {
+    "message": "Acțiuni în instanță"
   },
   "app.instance.add-server.add": {
     "message": "Adaugă"
@@ -548,11 +596,74 @@
   "app.instance.add-server.added": {
     "message": "Adăugat"
   },
+  "app.instance.add-server.adding": {
+    "message": "Se adaugă..."
+  },
+  "app.instance.add-server.cancel": {
+    "message": "Anulează"
+  },
+  "app.instance.add-server.compatibility-warning": {
+    "message": "Acest server poate să nu fie compatibil cu toate instanțele."
+  },
+  "app.instance.add-server.search-placeholder": {
+    "message": "Caută o instanță"
+  },
+  "app.instance.add-server.title": {
+    "message": "Adaugă server la instanță"
+  },
   "app.instance.admonitions.shared-instance.added-label": {
     "message": "Adăugat"
   },
+  "app.instance.admonitions.shared-instance.changes-body": {
+    "message": "Instanța ta locală este mai avansată decât cea a utilizatorilor cu care ai partajat-o."
+  },
+  "app.instance.admonitions.shared-instance.changes-header": {
+    "message": "Modificările dvs. nu au fost încă partajate"
+  },
+  "app.instance.admonitions.shared-instance.publish-button": {
+    "message": "Actualizare push"
+  },
+  "app.instance.admonitions.shared-instance.publishing-button": {
+    "message": "Se încarcă..."
+  },
+  "app.instance.admonitions.shared-instance.removed-label": {
+    "message": "Eliminat"
+  },
+  "app.instance.admonitions.shared-instance.review-admonition-header": {
+    "message": "Actualizare push"
+  },
+  "app.instance.admonitions.shared-instance.review-header": {
+    "message": "Revizuieste modificariile"
+  },
+  "app.instance.admonitions.shared-instance.reviewing-button": {
+    "message": "Revizuirea..."
+  },
+  "app.instance.card.installing": {
+    "message": "Se instalează..."
+  },
+  "app.instance.card.loading": {
+    "message": "Instanța se încarcă..."
+  },
+  "app.instance.card.never-played": {
+    "message": "Nu s-a jucat niciodată"
+  },
+  "app.instance.card.play": {
+    "message": "Jucați"
+  },
+  "app.instance.card.played": {
+    "message": "Timp jucat {relativeTime}"
+  },
+  "app.instance.card.repair": {
+    "message": "Repară"
+  },
+  "app.instance.card.stop": {
+    "message": "Oprește"
+  },
   "app.instance.modpack-already-installed.create": {
     "message": "Creează"
+  },
+  "app.instance.mods.share-title": {
+    "message": "Partajare conținut modpack"
   },
   "app.instance.share.sign-in.button": {
     "message": "Conectează-te"

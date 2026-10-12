@@ -302,6 +302,18 @@
   "app.content.sync-resource-packs-disabled": {
     "message": "Ative a sincronização de pacote de recursos nas configurações do aplicativo primeiro."
   },
+  "app.debug-export.canceling": {
+    "message": "Cancelando exportação…"
+  },
+  "app.debug-export.exporting": {
+    "message": "Exportando…"
+  },
+  "app.debug-export.finishing": {
+    "message": "Finalizando…"
+  },
+  "app.debug-export.preparing": {
+    "message": "Preparando arquivos…"
+  },
   "app.download-manager.active": {
     "message": "Ativo"
   },
@@ -2791,6 +2803,15 @@
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "Diretório de aplicativo"
+  },
+  "app.settings.resource-management.debug-info.description": {
+    "message": "Exportar logs do app e dados de diagnóstico para um arquivo ZIP para compartilhar com o suporte do Modrinth."
+  },
+  "app.settings.resource-management.debug-info.export": {
+    "message": "Exportar informações de depuração"
+  },
+  "app.settings.resource-management.debug-info.title": {
+    "message": "Informações de depuração"
   },
   "app.settings.resource-management.maximum-concurrent-downloads.description": {
     "message": "O número de arquivos que o aplicativo pode baixar de uma só vez. Reduza se os downloads causam instabilidade em sua conexão. Exige a reinicialização do aplicativo."

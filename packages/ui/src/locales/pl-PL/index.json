@@ -2054,6 +2054,12 @@
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Serwer zresetowany do trybu onboardingu"
   },
+  "hosting.settings.properties.motd-profanity": {
+    "defaultMessage": "Ze względu na Wytyczne Minecraft'a, MOTD twojego serwera nie może zawierać wulgarności. Wykryto: „{value}”."
+  },
+  "hosting.settings.properties.motd-profanity-save-error": {
+    "defaultMessage": "Ze względu na Wytyczne Minecraft'a, MOTD twojego serwera nie może zawierać wulgarności. Wykryto: „{value}”."
+  },
   "hosting.specs.burst": {
     "defaultMessage": "Możliwość burstu do {cpus} procesorów"
   },
@@ -5312,6 +5318,9 @@
   "servers.download.unavailable.title": {
     "defaultMessage": "Pobieranie niedostępne"
   },
+  "servers.files.server-locked": {
+    "defaultMessage": "Ten serwer jest zablokowany, a jego pliki są tylko do odczytu."
+  },
   "servers.files.zip-created": {
     "defaultMessage": "Utworzono ZIP"
   },
@@ -5528,6 +5537,36 @@
   "servers.listing.using-project-label": {
     "defaultMessage": "Używa {projectTitle}"
   },
+  "servers.lock.modal.error-text": {
+    "defaultMessage": "Wystąpił błąd podczas blokowania tego serwera. Spróbuj ponownie."
+  },
+  "servers.lock.modal.error-title": {
+    "defaultMessage": "Nie udało się zablokować serwera"
+  },
+  "servers.lock.modal.header": {
+    "defaultMessage": "Zablokuj {name}"
+  },
+  "servers.lock.modal.lock-button": {
+    "defaultMessage": "Zablokuj serwer"
+  },
+  "servers.lock.modal.reason-label": {
+    "defaultMessage": "Powód"
+  },
+  "servers.lock.modal.reason-placeholder": {
+    "defaultMessage": "Widoczne dla innych administratorów"
+  },
+  "servers.lock.modal.success-text": {
+    "defaultMessage": "{name} został zablokowany"
+  },
+  "servers.lock.modal.success-title": {
+    "defaultMessage": "Serwer zablokowany"
+  },
+  "servers.lock.modal.warning-body": {
+    "defaultMessage": "{name} będzie dostępny tylko do odczytu dla jego właściciela i członków do momentu odblokowania przez administratora."
+  },
+  "servers.lock.modal.warning-header": {
+    "defaultMessage": "Ten serwer będzie dostępny tylko do odczytu"
+  },
   "servers.manage.checking-for-new-servers": {
     "defaultMessage": "Szukanie nowych serwerów..."
   },
@@ -5563,6 +5602,21 @@
   },
   "servers.manage.handle-error.title": {
     "defaultMessage": "Wystąpił błąd"
+  },
+  "servers.manage.lock-server": {
+    "defaultMessage": "Zablokuj serwer"
+  },
+  "servers.manage.locked.badge": {
+    "defaultMessage": "Zablokowany"
+  },
+  "servers.manage.locked.badge-tooltip": {
+    "defaultMessage": "Zablokowany od {date}"
+  },
+  "servers.manage.locked.body": {
+    "defaultMessage": "Obsługa Modrinth tymczasowo zablokowała ten serwer, więc nie możesz dokonywać żadnych zmian. <support-link>Skontaktuj się z obsługą Modrinth</support-link>, jeśli uważasz to za pomyłkę."
+  },
+  "servers.manage.locked.header": {
+    "defaultMessage": "Serwer zablokowany przez obsługę Modrinth"
   },
   "servers.manage.new-server-button": {
     "defaultMessage": "Nowy serwer"
@@ -5620,6 +5674,21 @@
   },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Współdzielone serwery"
+  },
+  "servers.manage.unlock-server": {
+    "defaultMessage": "Odblokuj serwer"
+  },
+  "servers.manage.unlock.error-text": {
+    "defaultMessage": "Wystąpił błąd podczas odblokowywania serwera. Spróbuj ponownie."
+  },
+  "servers.manage.unlock.error-title": {
+    "defaultMessage": "Nie udało się odblokować serwera"
+  },
+  "servers.manage.unlock.success-text": {
+    "defaultMessage": "{name} został odblokowany."
+  },
+  "servers.manage.unlock.success-title": {
+    "defaultMessage": "Serwer odblokowany"
   },
   "servers.manage.your-servers-title": {
     "defaultMessage": "Twoje serwery"
@@ -5851,6 +5920,27 @@
   },
   "servers.settings.advanced.sftp.roll-credentials-success-title": {
     "defaultMessage": "Wygenerowano nowe dane logowania SFTP"
+  },
+  "servers.settings.support.action-log-title": {
+    "defaultMessage": "Dziennik zdarzeń"
+  },
+  "servers.settings.support.clear-action-log-button": {
+    "defaultMessage": "Wyczyść dziennik zdarzeń"
+  },
+  "servers.settings.support.clear-action-log-confirmation": {
+    "defaultMessage": "To trwale usunie wszystkie wpisy dziennika zdarzeń dla tego serwera. Kontynuować?"
+  },
+  "servers.settings.support.clear-action-log-description": {
+    "defaultMessage": "Usuń wszystkie wpisy dziennika zdarzeń dla tego serwera."
+  },
+  "servers.settings.support.clear-action-log-error": {
+    "defaultMessage": "Nie udało się wyczyścić dziennika zdarzeń"
+  },
+  "servers.settings.support.clear-action-log-success": {
+    "defaultMessage": "Dziennik zdarzeń wyczyszczony"
+  },
+  "servers.settings.support.clear-action-log-title": {
+    "defaultMessage": "Wyczyść dziennik zdarzeń?"
   },
   "servers.setup.onboarding.installation-failed.text": {
     "defaultMessage": "Wystąpił nieoczekiwany błąd podczas instalacji. Spróbuj ponownie później."

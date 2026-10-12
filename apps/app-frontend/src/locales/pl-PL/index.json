@@ -302,6 +302,18 @@
   "app.content.sync-resource-packs-disabled": {
     "message": "Najpierw włącz synchronizację paczek zasobów w ustawieniach aplikacji."
   },
+  "app.debug-export.canceling": {
+    "message": "Anulowanie eksportu…"
+  },
+  "app.debug-export.exporting": {
+    "message": "Eksportowanie…"
+  },
+  "app.debug-export.finishing": {
+    "message": "Kończenie..."
+  },
+  "app.debug-export.preparing": {
+    "message": "Przygotowywanie plików…"
+  },
   "app.download-manager.active": {
     "message": "Aktywne"
   },
@@ -2779,6 +2791,15 @@
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "Katalog aplikacji"
+  },
+  "app.settings.resource-management.debug-info.description": {
+    "message": "Eksportuj logi aplikacji oraz dane diagnostyczne do pliku ZIP, aby udostępnić je zespołowi pomocy technicznej Modrinth."
+  },
+  "app.settings.resource-management.debug-info.export": {
+    "message": "Eksportuj informacje debugowania"
+  },
+  "app.settings.resource-management.debug-info.title": {
+    "message": "Informacje debugowania"
   },
   "app.settings.resource-management.maximum-concurrent-downloads.description": {
     "message": "Ilość plików, które aplikacja może pobierać na raz. Zmniejsz tę wartość, jeśli pobieranie jest niestabilne. Wymaga ponownego uruchomienia aplikacji."

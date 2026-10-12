@@ -881,6 +881,9 @@
   "auth.sign-in.choose-account": {
     "message": "Escolher uma conta para entrar no Modrinth"
   },
+  "auth.sign-in.choose-existing-account": {
+    "message": "Use uma conta existente"
+  },
   "auth.sign-in.continue-with-email": {
     "message": "Continuar com e-mail"
   },
@@ -905,14 +908,23 @@
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Abrir Modrinth App"
   },
+  "auth.sign-in.launcher.handoff-failed": {
+    "message": "Não foi possível terminar de iniciar a sessão no Modrinth App. Tente novamente."
+  },
   "auth.sign-in.launcher.opening.description": {
     "message": "Se o aplicativo não abrir, pressione o botão abaixo para iniciar sessão."
   },
   "auth.sign-in.launcher.opening.title": {
     "message": "Abrindo o aplicativo..."
   },
+  "auth.sign-in.launcher.reauthenticate.title": {
+    "message": "Conecte-se ao Modrinth"
+  },
   "auth.sign-in.no-account": {
     "message": "Não possui uma conta?"
+  },
+  "auth.sign-in.reauthenticate.use-different-account": {
+    "message": "Use uma conta diferente"
   },
   "auth.sign-in.sign-in-with": {
     "message": "Entrar no Modrinth"
@@ -2254,6 +2266,9 @@
   },
   "error.generic.default.list_item.1": {
     "message": "Veja se o Modrinth caiu em nossa <status-link>página de status</status-link>."
+  },
+  "error.generic.default.list_item.support": {
+    "message": "Se isso continuar acontecendo, você pode querer que a Equipe de Modrinth conheça através do nosso <support-link>portal de suporte</support-link>."
   },
   "error.generic.default.list_title": {
     "message": "Tente novamente em alguns minutos."

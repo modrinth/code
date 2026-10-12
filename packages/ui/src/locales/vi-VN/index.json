@@ -35,6 +35,12 @@
   "affiliate.viewAnalytics": {
     "defaultMessage": "Xem phân tích"
   },
+  "app.appearance-settings.native-decorations.description": {
+    "defaultMessage": "Dùng thanh tiêu đề và các nút điều khiển cửa sổ của hệ điều hành. Cần khởi động lại ứng dụng."
+  },
+  "app.appearance-settings.native-decorations.title": {
+    "defaultMessage": "Khung cửa sổ hệ thống"
+  },
   "app.server-settings.failed-to-load-server": {
     "defaultMessage": "Không thể tải cài đặt máy chủ"
   },
@@ -49,6 +55,9 @@
   },
   "badge.new": {
     "defaultMessage": "Mới"
+  },
+  "badge.release": {
+    "defaultMessage": "Bản phát hành"
   },
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Hủy"
@@ -89,6 +98,15 @@
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Đăng ký lại máy chủ"
   },
+  "browse.advanced-filters.apply-saved-preferences": {
+    "defaultMessage": "Áp dụng tùy chọn đã lưu"
+  },
+  "browse.advanced-filters.link-overriding-preferences": {
+    "defaultMessage": "Bộ lọc trong liên kết này khác với các mục loại trừ nâng cao bạn đã lưu"
+  },
+  "browse.advanced-filters.persistence-note": {
+    "defaultMessage": "Các mục loại trừ nâng cao được lưu giữa các phiên. Mở một liên kết được chia sẻ có bộ lọc sẽ ghi đè chúng."
+  },
   "browse.filter-results": {
     "defaultMessage": "Lọc kết quả..."
   },
@@ -128,6 +146,9 @@
   "button.accept": {
     "defaultMessage": "Chấp nhận"
   },
+  "button.add-another": {
+    "defaultMessage": "Thêm mục khác"
+  },
   "button.add-server-to-instance": {
     "defaultMessage": "Thếm máy chủ"
   },
@@ -154,6 +175,9 @@
   },
   "button.continue": {
     "defaultMessage": "Tiếp tục"
+  },
+  "button.copied-to-clipboard": {
+    "defaultMessage": "Đã sao chép vào bảng tạm"
   },
   "button.copy-filename": {
     "defaultMessage": "Sao chép tên tệp"
@@ -182,6 +206,9 @@
   "button.download": {
     "defaultMessage": "Tải xuống"
   },
+  "button.download-files": {
+    "defaultMessage": "Tải tệp xuống"
+  },
   "button.downloading": {
     "defaultMessage": "Đang tải xuống"
   },
@@ -199,6 +226,9 @@
   },
   "button.hide-snapshots": {
     "defaultMessage": "Ẩn các bản snapshot"
+  },
+  "button.i-understand": {
+    "defaultMessage": "Tôi hiểu"
   },
   "button.install": {
     "defaultMessage": "Cài đặt"
@@ -218,6 +248,9 @@
   "button.open-folder": {
     "defaultMessage": "Mở thư mục"
   },
+  "button.open-in-browser": {
+    "defaultMessage": "Mở trong trình duyệt"
+  },
   "button.open-in-folder": {
     "defaultMessage": "Mở thư mục"
   },
@@ -232,6 +265,9 @@
   },
   "button.reinstall-modpack": {
     "defaultMessage": "Cài đặt lại modpack"
+  },
+  "button.remove": {
+    "defaultMessage": "Xóa"
   },
   "button.remove-image": {
     "defaultMessage": "Xóa ảnh"
@@ -284,6 +320,9 @@
   "button.stop": {
     "defaultMessage": "Dừng"
   },
+  "button.switch-to-version": {
+    "defaultMessage": "Chuyển sang phiên bản"
+  },
   "button.switch-version": {
     "defaultMessage": "Đổi phiên bản"
   },
@@ -311,8 +350,32 @@
   "changelog.product.web": {
     "defaultMessage": "Nền tảng"
   },
+  "collection-widget.empty-collection": {
+    "defaultMessage": "Bộ sưu tập này đang trống."
+  },
+  "collection-widget.loading-projects": {
+    "defaultMessage": "Đang tải dự án..."
+  },
+  "collection-widget.no-search-results": {
+    "defaultMessage": "Không có dự án nào khớp với tìm kiếm của bạn."
+  },
+  "collection-widget.project-count": {
+    "defaultMessage": "{count, plural, one {# dự án} other {# dự án}}"
+  },
+  "collection-widget.search-placeholder": {
+    "defaultMessage": "Tìm dự án"
+  },
   "collections.label.private": {
     "defaultMessage": "Riêng tư"
+  },
+  "console.actions.collapse": {
+    "defaultMessage": "Thu gọn"
+  },
+  "console.actions.expand": {
+    "defaultMessage": "Mở rộng"
+  },
+  "console.actions.share": {
+    "defaultMessage": "Chia sẻ"
   },
   "content-type.content.lowercase": {
     "defaultMessage": "nội dung"
@@ -320,8 +383,20 @@
   "content-type.item.lowercase": {
     "defaultMessage": "{count, plural, other {vật phẩm}}"
   },
+  "content.card.frozen": {
+    "defaultMessage": "Dự án này bị khóa ở phiên bản hiện tại cho đến khi bỏ trạng thái đóng băng."
+  },
   "content.card.select-project": {
     "defaultMessage": "Chọn {project}"
+  },
+  "content.card.sync-update-pending": {
+    "defaultMessage": "Một số bản sao đã đồng bộ đang chờ thay đổi. Có thể một bản cài đặt đang chạy, đang dùng phiên bản bị đóng băng hoặc không tương thích, hoặc đã có bản sao riêng."
+  },
+  "content.card.synced": {
+    "defaultMessage": "Đã đồng bộ giữa các bản cài đặt"
+  },
+  "content.card.uploaded": {
+    "defaultMessage": "Đã tải lên"
   },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Bạn có chắc chắn muốn cập nhật {count, plural, other {# dự án}} lên phiên bản tương thích mới nhất không? Đề xuất: Bạn nên cập nhật từng cái một."
@@ -349,6 +424,9 @@
   },
   "content.confirm-deletion.header": {
     "defaultMessage": "Xóa {itemType}"
+  },
+  "content.confirm-disable.header": {
+    "defaultMessage": "Tắt {itemType}"
   },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select, downgrade {Việc hạ phiên bản} other {Việc cập nhật}} có thể gây ra lỗi tương thích. Những mod mà bạn thêm vào modpack sẽ được giữ lại nhưng chúng có thể sẽ không tương thích với phiên bản mới của modpack."
@@ -419,20 +497,77 @@
   "content.diff-modal.added-count": {
     "defaultMessage": "Đã thêm {count}"
   },
+  "content.diff-modal.config-files-updated": {
+    "defaultMessage": "Tệp cấu hình đã thay đổi"
+  },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Đã thêm (phụ thuộc)"
   },
   "content.diff-modal.diff-type.removed": {
     "defaultMessage": "Đã tắt"
   },
+  "content.diff-modal.diff-type.removed-disabled": {
+    "defaultMessage": "Đã gỡ (đã tắt)"
+  },
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "Đã cập nhật"
+  },
+  "content.diff-modal.dont-install": {
+    "defaultMessage": "Không cài đặt"
+  },
+  "content.diff-modal.external-diff-type.added": {
+    "defaultMessage": "Đã thêm"
+  },
+  "content.diff-modal.external-diff-type.removed": {
+    "defaultMessage": "Đã gỡ"
+  },
+  "content.diff-modal.external-diff-type.updated": {
+    "defaultMessage": "Đã cập nhật"
+  },
+  "content.diff-modal.file-count": {
+    "defaultMessage": "{count, plural, one {# tệp} other {# tệp}}"
+  },
+  "content.diff-modal.game-version-updated": {
+    "defaultMessage": "Phiên bản trò chơi"
+  },
+  "content.diff-modal.install-anyway": {
+    "defaultMessage": "Vẫn cài đặt"
+  },
+  "content.diff-modal.loader-updated": {
+    "defaultMessage": "Bộ nạp"
+  },
+  "content.diff-modal.modpack-linked": {
+    "defaultMessage": "Modpack đã liên kết"
+  },
+  "content.diff-modal.modpack-unlinked": {
+    "defaultMessage": "Modpack đã gỡ liên kết"
+  },
+  "content.diff-modal.modpack-updated": {
+    "defaultMessage": "Modpack đã cập nhật"
+  },
+  "content.diff-modal.no-content-changes": {
+    "defaultMessage": "Không có thay đổi nội dung"
   },
   "content.diff-modal.removed-count": {
     "defaultMessage": "Đã xoá {count}"
   },
+  "content.diff-modal.removed-disabled-count": {
+    "defaultMessage": "Đã gỡ {count} (đã tắt)"
+  },
+  "content.diff-modal.reviewed-files": {
+    "defaultMessage": "Các tệp chưa được xuất bản trên Modrinth sẽ không được kiểm duyệt."
+  },
   "content.diff-modal.unknown-content-body": {
     "defaultMessage": "Một số nội dung trên máy chủ của bạn không thể phân tích được và có thể bị ảnh hưởng bởi thay đổi này."
+  },
+  "content.diff-modal.unknown-files-description": {
+    "defaultMessage": "Bản cập nhật này chứa các tệp chưa được xuất bản trên Modrinth. Chúng tôi đặc biệt khuyên bạn chỉ cài đặt tệp từ những nguồn mà bạn tin tưởng."
+  },
+  "content.diff-modal.unknown-files-warning": {
+    "defaultMessage": "Cảnh báo tệp không xác định"
+  },
+  "content.diff-modal.unknown-project": {
+    "defaultMessage": "Không xác định"
   },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} đã được cập nhật"
@@ -479,6 +614,90 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "thế giới"
   },
+  "content.managed-card.modpack-content": {
+    "defaultMessage": "Nội dung modpack"
+  },
+  "content.managed-card.provided-by": {
+    "defaultMessage": "Được cung cấp bởi"
+  },
+  "content.managed-card.server-suffix": {
+    "defaultMessage": "máy chủ"
+  },
+  "content.managed-card.settings": {
+    "defaultMessage": "Cài đặt bản cài đặt"
+  },
+  "content.managed-card.shared-content": {
+    "defaultMessage": "Nội dung được chia sẻ"
+  },
+  "content.managed-card.summary.installing": {
+    "defaultMessage": "Đang cài đặt nội dung..."
+  },
+  "content.managed-card.summary.loading": {
+    "defaultMessage": "Đang tải tóm tắt nội dung được quản lý"
+  },
+  "content.managed-card.summary.no-provided-content": {
+    "defaultMessage": "Không có nội dung được cung cấp"
+  },
+  "content.managed-card.switch-version": {
+    "defaultMessage": "Chuyển phiên bản"
+  },
+  "content.managed-card.synced": {
+    "defaultMessage": "Đã đồng bộ {time}"
+  },
+  "content.managed-card.update-available": {
+    "defaultMessage": "Có bản cập nhật"
+  },
+  "content.managed-card.updated": {
+    "defaultMessage": "Đã cập nhật {time}"
+  },
+  "content.managed-card.updating": {
+    "defaultMessage": "Đang cập nhật..."
+  },
+  "content.managed-card.view-content": {
+    "defaultMessage": "Xem nội dung"
+  },
+  "content.metadata-filter.author": {
+    "defaultMessage": "Tác giả"
+  },
+  "content.metadata-filter.environment": {
+    "defaultMessage": "Môi trường"
+  },
+  "content.metadata-filter.open-source": {
+    "defaultMessage": "Mã nguồn mở"
+  },
+  "content.metadata-filter.shared-content": {
+    "defaultMessage": "Nội dung được chia sẻ"
+  },
+  "content.metadata-filter.source.external": {
+    "defaultMessage": "Bên ngoài"
+  },
+  "content.metadata-filter.state": {
+    "defaultMessage": "Trạng thái"
+  },
+  "content.metadata-filter.state.disabled": {
+    "defaultMessage": "Đã tắt"
+  },
+  "content.metadata-filter.state.enabled": {
+    "defaultMessage": "Đã bật"
+  },
+  "content.metadata-filter.update.available": {
+    "defaultMessage": "Có bản cập nhật"
+  },
+  "content.metadata-filter.warning.client-depends": {
+    "defaultMessage": "Client phụ thuộc vào tệp"
+  },
+  "content.metadata-filter.warning.client-only": {
+    "defaultMessage": "Nội dung chỉ dành cho client"
+  },
+  "content.metadata-filter.warning.client-retained": {
+    "defaultMessage": "Tệp client được giữ lại"
+  },
+  "content.metadata-filter.warning.none": {
+    "defaultMessage": "Không có cảnh báo"
+  },
+  "content.metadata-filter.warnings": {
+    "defaultMessage": "Cảnh báo"
+  },
   "content.page-layout.additional-content": {
     "defaultMessage": "Mod bổ sung"
   },
@@ -502,6 +721,18 @@
   },
   "content.page-layout.failed-to-load": {
     "defaultMessage": "Không thể tải nội dung"
+  },
+  "content.page-layout.failed-to-load-changelog": {
+    "defaultMessage": "Không thể tải nhật ký thay đổi"
+  },
+  "content.page-layout.failed-to-load-updates": {
+    "defaultMessage": "Không thể tải các bản cập nhật hiện có"
+  },
+  "content.page-layout.filter.add": {
+    "defaultMessage": "Bộ lọc"
+  },
+  "content.page-layout.filter.author-count": {
+    "defaultMessage": "{count, plural, one {# tác giả} other {# tác giả}}"
   },
   "content.page-layout.loading": {
     "defaultMessage": "Đang tải nội dung..."
@@ -530,6 +761,12 @@
   "content.page-layout.share.project-names": {
     "defaultMessage": "Tên dự án"
   },
+  "content.page-layout.sort.alphabetical-ascending": {
+    "defaultMessage": "Tên (A-Z)"
+  },
+  "content.page-layout.sort.alphabetical-descending": {
+    "defaultMessage": "Tên (Z-A)"
+  },
   "content.page-layout.sort.date-added-newest": {
     "defaultMessage": "Mới nhất"
   },
@@ -554,11 +791,17 @@
   "content.selection-bar.bulk.deleting": {
     "defaultMessage": "Đang xóa {progress}/{total} {contentType}..."
   },
+  "content.selection-bar.bulk.deleting-count": {
+    "defaultMessage": "Đang xóa {count, number} {contentType}"
+  },
   "content.selection-bar.bulk.deleting-waiting": {
     "defaultMessage": "Đang xóa {contentType}..."
   },
   "content.selection-bar.bulk.disabling": {
     "defaultMessage": "Đang tắt {progress}/{total} {contentType}..."
+  },
+  "content.selection-bar.bulk.disabling-count": {
+    "defaultMessage": "Đang tắt {count, number} {contentType}"
   },
   "content.selection-bar.bulk.disabling-waiting": {
     "defaultMessage": "Đang tắt {contentType}..."
@@ -566,11 +809,17 @@
   "content.selection-bar.bulk.enabling": {
     "defaultMessage": "Đang bật {progress}/{total} {contentType}..."
   },
+  "content.selection-bar.bulk.enabling-count": {
+    "defaultMessage": "Đang bật {count, number} {contentType}"
+  },
   "content.selection-bar.bulk.enabling-waiting": {
     "defaultMessage": "Dang bật {contentType}..."
   },
   "content.selection-bar.bulk.updating": {
     "defaultMessage": "Đang cập nhật {progress}/{total} {contentType}..."
+  },
+  "content.selection-bar.bulk.updating-count": {
+    "defaultMessage": "Đang cập nhật {count, number} {contentType}"
   },
   "content.selection-bar.bulk.updating-waiting": {
     "defaultMessage": "Đang cập nhật {contentType}..."
@@ -616,6 +865,15 @@
   },
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "Tìm phiên bản Game..."
+  },
+  "creation-flow.modal.custom-setup.icon.customize": {
+    "defaultMessage": "Tùy chỉnh"
+  },
+  "creation-flow.modal.custom-setup.icon.randomize": {
+    "defaultMessage": "Ngẫu nhiên"
+  },
+  "creation-flow.modal.custom-setup.icon.select": {
+    "defaultMessage": "Tải lên"
   },
   "creation-flow.modal.custom-setup.loader-version-type.latest": {
     "defaultMessage": "Mới nhất"
@@ -791,6 +1049,21 @@
   "creation-flow.modal.modpack.search.placeholder": {
     "defaultMessage": "Tìm modpack"
   },
+  "creation-flow.modal.project.known-project.prompt": {
+    "defaultMessage": "Đã biết bạn muốn chơi gì?"
+  },
+  "creation-flow.modal.project.search.create-instance": {
+    "defaultMessage": "Tạo bản cài đặt"
+  },
+  "creation-flow.modal.project.search.install-modpack": {
+    "defaultMessage": "Cài modpack"
+  },
+  "creation-flow.modal.project.search.no-results": {
+    "defaultMessage": "Không tìm thấy kết quả"
+  },
+  "creation-flow.modal.project.search.placeholder": {
+    "defaultMessage": "Tìm mod, modpack và nhiều nội dung khác..."
+  },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
     "defaultMessage": "Cài từ đầu bằng cách lựa chọn mod loader và phiên bản game."
   },
@@ -802,6 +1075,18 @@
   },
   "creation-flow.modal.setup-type.option.import-instance.title": {
     "defaultMessage": "Nhập cấu hình"
+  },
+  "creation-flow.modal.setup-type.option.modpack-base.description": {
+    "defaultMessage": "Chọn một dự án và chúng tôi sẽ dùng phiên bản mới nhất của dự án đó."
+  },
+  "creation-flow.modal.setup-type.option.modpack-base.title": {
+    "defaultMessage": "Bắt đầu từ mod hoặc modpack"
+  },
+  "creation-flow.modal.setup-type.option.upload-modpack.description": {
+    "defaultMessage": "Cài modpack từ tệp .mrpack trên thiết bị của bạn."
+  },
+  "creation-flow.modal.setup-type.option.upload-modpack.title": {
+    "defaultMessage": "Tải modpack lên"
   },
   "creation-flow.modal.setup-type.option.vanilla-minecraft.description": {
     "defaultMessage": "Minecraft thường, không mod hay plugin khác."
@@ -833,6 +1118,279 @@
   "creation-flow.title.set-up-server": {
     "defaultMessage": "Tạo máy chủ"
   },
+  "empty-state.upload-versions.description": {
+    "defaultMessage": "Hãy quay lại sau khi bạn đã tải các phiên bản lên."
+  },
+  "external-files.permissions-card.add-files-modal.confirm": {
+    "defaultMessage": "{count, plural, one {Thêm tệp} other {Thêm tệp}}"
+  },
+  "external-files.permissions-card.add-files-modal.description": {
+    "defaultMessage": "Chọn các tệp cần chuyển vào nhóm này."
+  },
+  "external-files.permissions-card.add-files-modal.empty": {
+    "defaultMessage": "Không có tệp nào trong các nhóm khác có thể chuyển vào đây."
+  },
+  "external-files.permissions-card.add-files-modal.load-error.title": {
+    "defaultMessage": "Không thể tải tệp"
+  },
+  "external-files.permissions-card.add-files-modal.no-search-results": {
+    "defaultMessage": "Không có tệp nào khớp với tìm kiếm của bạn."
+  },
+  "external-files.permissions-card.add-files-modal.search-placeholder": {
+    "defaultMessage": "Tìm tệp..."
+  },
+  "external-files.permissions-card.add-files-modal.selected-count": {
+    "defaultMessage": "{count, plural, one {Đã chọn # tệp} other {Đã chọn # tệp}}"
+  },
+  "external-files.permissions-card.add-files-modal.title": {
+    "defaultMessage": "Thêm tệp vào nhóm này"
+  },
+  "external-files.permissions-card.add-files-to-group": {
+    "defaultMessage": "Thêm tệp..."
+  },
+  "external-files.permissions-card.assign-files-error.title": {
+    "defaultMessage": "Không thể thêm tệp"
+  },
+  "external-files.permissions-card.attribution.moderation-status.content-not-allowed": {
+    "defaultMessage": "Nội dung không được phép"
+  },
+  "external-files.permissions-card.attribution.moderation-status.passed": {
+    "defaultMessage": "Đã đạt"
+  },
+  "external-files.permissions-card.attribution.moderation-status.rejected-proof": {
+    "defaultMessage": "Bằng chứng bị từ chối"
+  },
+  "external-files.permissions-card.badge.attributed": {
+    "defaultMessage": "Đã hoàn tất"
+  },
+  "external-files.permissions-card.badge.no-permission": {
+    "defaultMessage": "Không có quyền"
+  },
+  "external-files.permissions-card.badge.not-allowed": {
+    "defaultMessage": "Không được phép"
+  },
+  "external-files.permissions-card.badge.pending": {
+    "defaultMessage": "Đang chờ"
+  },
+  "external-files.permissions-card.badge.proof-rejected": {
+    "defaultMessage": "Thông tin bị từ chối"
+  },
+  "external-files.permissions-card.custom-license-option": {
+    "defaultMessage": "Khác"
+  },
+  "external-files.permissions-card.editor.add": {
+    "defaultMessage": "Thêm ghi công"
+  },
+  "external-files.permissions-card.editor.all-rights-reserved": {
+    "defaultMessage": "Bảo lưu mọi quyền/Không có giấy phép"
+  },
+  "external-files.permissions-card.editor.custom-license-label": {
+    "defaultMessage": "Liên kết đến giấy phép"
+  },
+  "external-files.permissions-card.editor.custom-license-my-project-label": {
+    "defaultMessage": "Tên giấy phép, ưu tiên mã định danh SPDX"
+  },
+  "external-files.permissions-card.editor.error.license-required": {
+    "defaultMessage": "Vui lòng chọn giấy phép."
+  },
+  "external-files.permissions-card.editor.error.link-invalid-url": {
+    "defaultMessage": "Liên kết phải là URL hợp lệ."
+  },
+  "external-files.permissions-card.editor.example-spdx-license": {
+    "defaultMessage": "ví dụ: MPL-1.1"
+  },
+  "external-files.permissions-card.editor.input-optional": {
+    "defaultMessage": "(tùy chọn)"
+  },
+  "external-files.permissions-card.editor.license-label": {
+    "defaultMessage": "Giấy phép"
+  },
+  "external-files.permissions-card.editor.link-label": {
+    "defaultMessage": "Liên kết đến tác phẩm"
+  },
+  "external-files.permissions-card.editor.link-to-license-url-placeholder": {
+    "defaultMessage": "liên-kết-đến-giấy-phép"
+  },
+  "external-files.permissions-card.editor.link-to-work-url-placeholder": {
+    "defaultMessage": "liên-kết-đến-tác-phẩm"
+  },
+  "external-files.permissions-card.editor.modrinth-link-to-work": {
+    "defaultMessage": "Đây có vẻ là liên kết Modrinth. Nếu nội dung này có trên Modrinth thì gói của bạn có thể đã được xuất không đúng cách. Nếu bạn tải nội dung từ trang khác, hãy thử tải phiên bản trên Modrinth thay thế; đôi khi chúng không phải là cùng một tệp."
+  },
+  "external-files.permissions-card.editor.notes-label": {
+    "defaultMessage": "Ghi chú"
+  },
+  "external-files.permissions-card.editor.notes-placeholder": {
+    "defaultMessage": "Viết gì đó tại đây..."
+  },
+  "external-files.permissions-card.editor.proof-image-alt": {
+    "defaultMessage": "Ảnh chụp bằng chứng {n}"
+  },
+  "external-files.permissions-card.editor.proof-image-remove": {
+    "defaultMessage": "Xóa ảnh"
+  },
+  "external-files.permissions-card.editor.proof-images-label": {
+    "defaultMessage": "Ảnh bằng chứng"
+  },
+  "external-files.permissions-card.editor.proof-images-upload-prompt": {
+    "defaultMessage": "Kéo thả để tải lên hoặc nhấp để chọn ảnh"
+  },
+  "external-files.permissions-card.editor.proof-warning.body": {
+    "defaultMessage": "Nếu bị phát hiện nói dối hoặc chỉnh sửa gian lận các ảnh đã tải lên, dự án và tài khoản của bạn có thể bị chấm dứt."
+  },
+  "external-files.permissions-card.editor.proof-warning.title": {
+    "defaultMessage": "Nhân viên Modrinth có thể xác minh bằng chứng đã gửi"
+  },
+  "external-files.permissions-card.editor.save": {
+    "defaultMessage": "Lưu ghi công"
+  },
+  "external-files.permissions-card.editor.select-license-label": {
+    "defaultMessage": "Tìm giấy phép..."
+  },
+  "external-files.permissions-card.editor.type-label": {
+    "defaultMessage": "Lý do có quyền"
+  },
+  "external-files.permissions-card.error.custom-license-required": {
+    "defaultMessage": "Vui lòng thêm liên kết đến giấy phép. Nếu không có giấy phép, bạn có thể nên chọn 'Bảo lưu mọi quyền/Không có giấy phép'"
+  },
+  "external-files.permissions-card.error.explanation-or-images-required": {
+    "defaultMessage": "Vui lòng cung cấp lời giải thích hoặc tải lên ít nhất một ảnh bằng chứng."
+  },
+  "external-files.permissions-card.error.link-required": {
+    "defaultMessage": "Vui lòng cung cấp liên kết."
+  },
+  "external-files.permissions-card.error.notes-or-images-required": {
+    "defaultMessage": "Vui lòng thêm ghi chú hoặc tải lên ít nhất một ảnh bằng chứng."
+  },
+  "external-files.permissions-card.error.proof-image-invalid-type": {
+    "defaultMessage": "Vui lòng tải lên ảnh PNG, JPEG, GIF, WebP hoặc BMP."
+  },
+  "external-files.permissions-card.error.proof-images-required": {
+    "defaultMessage": "Vui lòng tải lên ít nhất một ảnh bằng chứng."
+  },
+  "external-files.permissions-card.explanation-description": {
+    "defaultMessage": "Cần có lời giải thích ngắn hoặc ảnh bằng chứng."
+  },
+  "external-files.permissions-card.explanation-label": {
+    "defaultMessage": "Giải thích"
+  },
+  "external-files.permissions-card.fallback-group-title": {
+    "defaultMessage": "Nhóm ghi công {id}"
+  },
+  "external-files.permissions-card.file-count": {
+    "defaultMessage": "{count, plural, one {# tệp} other {# tệp}}"
+  },
+  "external-files.permissions-card.included-files": {
+    "defaultMessage": "Tệp được bao gồm:"
+  },
+  "external-files.permissions-card.included-in-versions": {
+    "defaultMessage": "Có trong {count, plural, one {# phiên bản} other {# phiên bản}}:"
+  },
+  "external-files.permissions-card.last-updated": {
+    "defaultMessage": "Cập nhật lần cuối vào {date} bởi {user}"
+  },
+  "external-files.permissions-card.license.all-rights": {
+    "defaultMessage": "Bảo lưu mọi quyền/Không có giấy phép"
+  },
+  "external-files.permissions-card.license.unknown": {
+    "defaultMessage": "Không xác định"
+  },
+  "external-files.permissions-card.licensed-as": {
+    "defaultMessage": "Giấy phép:"
+  },
+  "external-files.permissions-card.link-label": {
+    "defaultMessage": "Liên kết đến tác phẩm:"
+  },
+  "external-files.permissions-card.moderation-reason": {
+    "defaultMessage": "Lý do"
+  },
+  "external-files.permissions-card.moderation.error.title": {
+    "defaultMessage": "Không thể lưu kết quả kiểm duyệt"
+  },
+  "external-files.permissions-card.not-used-in-versions": {
+    "defaultMessage": "Các tệp này hiện không được phiên bản nào sử dụng."
+  },
+  "external-files.permissions-card.notes-label": {
+    "defaultMessage": "Ghi chú:"
+  },
+  "external-files.permissions-card.notes-none": {
+    "defaultMessage": "Không có"
+  },
+  "external-files.permissions-card.original-project-page": {
+    "defaultMessage": "Dự án gốc"
+  },
+  "external-files.permissions-card.proof-image-alt": {
+    "defaultMessage": "Ảnh chụp bằng chứng {n}"
+  },
+  "external-files.permissions-card.proof-images-label": {
+    "defaultMessage": "Ảnh bằng chứng:"
+  },
+  "external-files.permissions-card.reason.globally-allowed": {
+    "defaultMessage": "Tự động ghi công"
+  },
+  "external-files.permissions-card.reason.globally-allowed.description": {
+    "defaultMessage": "Chúng tôi đã gặp tệp này trước đây và đã chuẩn bị thông tin ghi công cho bạn. Nếu có gì không đúng, vui lòng liên hệ Hỗ trợ Modrinth qua Trung tâm trợ giúp"
+  },
+  "external-files.permissions-card.reason.license": {
+    "defaultMessage": "Giấy phép"
+  },
+  "external-files.permissions-card.reason.license.description": {
+    "defaultMessage": "Giấy phép của tác phẩm này cho phép bạn phân phối lại trong modpack."
+  },
+  "external-files.permissions-card.reason.license.proof-images-description": {
+    "defaultMessage": "Tải lên tài liệu hỗ trợ liên quan đến giấy phép này."
+  },
+  "external-files.permissions-card.reason.my-project": {
+    "defaultMessage": "Dự án của tôi"
+  },
+  "external-files.permissions-card.reason.my-project.description": {
+    "defaultMessage": "Tác phẩm gốc do bạn tạo."
+  },
+  "external-files.permissions-card.reason.my-project.proof-images-description": {
+    "defaultMessage": "Tải lên các tệp giúp xác minh rằng bạn đã tạo tác phẩm này."
+  },
+  "external-files.permissions-card.reason.no-permission": {
+    "defaultMessage": "Không có quyền"
+  },
+  "external-files.permissions-card.reason.no-permission.automatic.description": {
+    "defaultMessage": "Chúng tôi đã gặp tệp này trước đây và giấy phép của tệp thường không cho phép phân phối lại."
+  },
+  "external-files.permissions-card.reason.no-permission.description": {
+    "defaultMessage": "Bạn không có quyền sử dụng tác phẩm này."
+  },
+  "external-files.permissions-card.reason.special-permission": {
+    "defaultMessage": "Quyền đặc biệt"
+  },
+  "external-files.permissions-card.reason.special-permission.description": {
+    "defaultMessage": "Bạn đã nhận được quyền đặc biệt để phân phối lại tác phẩm này trong modpack."
+  },
+  "external-files.permissions-card.remove-group": {
+    "defaultMessage": "Xóa nhóm"
+  },
+  "external-files.permissions-card.remove-group-confirmation.description": {
+    "defaultMessage": "Thao tác này sẽ xóa vĩnh viễn nhóm ghi công này và tất cả tệp bên trong. Không thể hoàn tác."
+  },
+  "external-files.permissions-card.remove-group-confirmation.title": {
+    "defaultMessage": "Xóa {title}?"
+  },
+  "external-files.permissions-card.remove-group-error.title": {
+    "defaultMessage": "Không thể xóa nhóm"
+  },
+  "external-files.permissions-card.remove-group-shift-hint": {
+    "defaultMessage": "Giữ Shift khi nhấp để bỏ qua bước xác nhận."
+  },
+  "external-files.permissions-card.split-file": {
+    "defaultMessage": "Xóa khỏi nhóm"
+  },
+  "external-files.permissions-card.split-file-error.title": {
+    "defaultMessage": "Không thể tách tệp khỏi nhóm"
+  },
+  "external-files.permissions-card.unnamed-multi-group-title": {
+    "defaultMessage": "{filename} + thêm {count}"
+  },
+  "external-files.permissions-card.updated-by-moderator": {
+    "defaultMessage": "Kiểm duyệt viên"
+  },
   "external-project-license-status.no": {
     "defaultMessage": "Không"
   },
@@ -850,6 +1408,12 @@
   },
   "external-project-license-status.yes": {
     "defaultMessage": "Có"
+  },
+  "file-button.file-too-large.description": {
+    "defaultMessage": "Tệp {filename} quá lớn. Kích thước tệp tối đa là {maxSize}."
+  },
+  "file-button.file-too-large.title": {
+    "defaultMessage": "Tệp quá lớn"
   },
   "files.conflict-modal.header": {
     "defaultMessage": "Tóm tắt trích xuất"
@@ -883,6 +1447,27 @@
   },
   "files.create-modal.placeholder-file": {
     "defaultMessage": "v.d. config.yml"
+  },
+  "files.create-zip-modal.already-exists": {
+    "defaultMessage": "Đã tồn tại tệp có tên này."
+  },
+  "files.create-zip-modal.check-failed": {
+    "defaultMessage": "Không thể kiểm tra xem tệp này đã tồn tại hay chưa."
+  },
+  "files.create-zip-modal.create-button": {
+    "defaultMessage": "Tạo ZIP"
+  },
+  "files.create-zip-modal.header": {
+    "defaultMessage": "Tạo ZIP"
+  },
+  "files.create-zip-modal.invalid": {
+    "defaultMessage": "Tên tệp lưu trữ phải là một tên tệp duy nhất."
+  },
+  "files.create-zip-modal.name-label": {
+    "defaultMessage": "Tên tệp lưu trữ"
+  },
+  "files.create-zip-modal.required": {
+    "defaultMessage": "Nhập tên tệp lưu trữ."
   },
   "files.delete-modal.deleting-name": {
     "defaultMessage": "Đang xoá \"{name}\""
@@ -995,6 +1580,9 @@
   "files.layout.busy-warning": {
     "defaultMessage": "Các thao tác với tệp sẽ bị vô hiệu hóa trong khi thao tác đang diễn ra."
   },
+  "files.layout.create-zip": {
+    "defaultMessage": "Tạo ZIP"
+  },
   "files.layout.dry-run-failed-text": {
     "defaultMessage": "Lỗi khi chạy thử nghiệm không tải"
   },
@@ -1076,6 +1664,18 @@
   "files.navbar.upload-from-zip-url": {
     "defaultMessage": "Tải lên từ URL tệp .zip"
   },
+  "files.operations.compressed": {
+    "defaultMessage": "Đã nén {progress}%"
+  },
+  "files.operations.compressing": {
+    "defaultMessage": "Đang tạo {source}"
+  },
+  "files.operations.compressing-completed": {
+    "defaultMessage": "Đã tạo xong {source}"
+  },
+  "files.operations.compressing-failed": {
+    "defaultMessage": "Không thể tạo {source}"
+  },
   "files.operations.current-file": {
     "defaultMessage": "Tệp hiện tại: {file}"
   },
@@ -1100,8 +1700,14 @@
   "files.rename-modal.new-name-label": {
     "defaultMessage": "Tên mới"
   },
+  "files.row.create-zip": {
+    "defaultMessage": "Tạo ZIP"
+  },
   "files.row.item-count": {
     "defaultMessage": "{count, plural, other {# mục}}"
+  },
+  "files.row.parent-folder": {
+    "defaultMessage": "Thư mục cha"
   },
   "files.table-header.created": {
     "defaultMessage": "Thời gian tạo"
@@ -1225,6 +1831,30 @@
   },
   "files.zip-url-modal.zip-header": {
     "defaultMessage": "Đang tải lên nội dung .zip từ đường dẫn"
+  },
+  "filter-bar.add": {
+    "defaultMessage": "Thêm"
+  },
+  "filter-bar.clear": {
+    "defaultMessage": "Xóa bộ lọc"
+  },
+  "filter-bar.clear-named-filter": {
+    "defaultMessage": "Xóa bộ lọc {name}"
+  },
+  "filter-bar.filtered-by": {
+    "defaultMessage": "Đang lọc theo"
+  },
+  "filter-bar.no-options": {
+    "defaultMessage": "Không có tùy chọn nào."
+  },
+  "filter-bar.no-search-results": {
+    "defaultMessage": "Không tìm thấy tùy chọn."
+  },
+  "filter-bar.search-placeholder": {
+    "defaultMessage": "Tìm kiếm..."
+  },
+  "filter-bar.select-all": {
+    "defaultMessage": "Chọn tất cả"
   },
   "form.label.address-line": {
     "defaultMessage": "Dòng địa chỉ"
@@ -1379,6 +2009,9 @@
   "hosting.content.failed-to-upload": {
     "defaultMessage": "Thất bại trong việc tải file lên"
   },
+  "hosting.content.managed-content.modpack-header": {
+    "defaultMessage": "Nội dung modpack"
+  },
   "hosting.loader.failed-to-change-version": {
     "defaultMessage": "Không thể thay đổi phiên bản modpack"
   },
@@ -1430,6 +2063,15 @@
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Đã cài lại máy chủ"
   },
+  "hosting.save-banner.resolve-errors": {
+    "defaultMessage": "Vui lòng xử lý các lỗi trong thay đổi trước khi lưu."
+  },
+  "hosting.settings.properties.motd-profanity": {
+    "defaultMessage": "Theo Nguyên tắc sử dụng Minecraft, MOTD của máy chủ không được chứa từ tục tĩu. Phát hiện: “{value}”."
+  },
+  "hosting.settings.properties.motd-profanity-save-error": {
+    "defaultMessage": "Theo Nguyên tắc sử dụng Minecraft, MOTD của máy chủ không được chứa từ tục tĩu. Phát hiện: “{value}”"
+  },
   "hosting.specs.burst": {
     "defaultMessage": "Tăng tốc tối đa lên {cpus} CPU"
   },
@@ -1456,6 +2098,108 @@
   },
   "icon-select.select": {
     "defaultMessage": "Chọn biểu tượng"
+  },
+  "image-viewer.close": {
+    "defaultMessage": "Đóng"
+  },
+  "image-viewer.edit": {
+    "defaultMessage": "Chỉnh sửa"
+  },
+  "image-viewer.editor.colour": {
+    "defaultMessage": "Màu sắc"
+  },
+  "image-viewer.editor.crop.dimensions": {
+    "defaultMessage": "{width} × {height} px"
+  },
+  "image-viewer.editor.crop.reset": {
+    "defaultMessage": "Đặt lại vùng cắt"
+  },
+  "image-viewer.editor.delete-selection": {
+    "defaultMessage": "Xóa chú thích đã chọn"
+  },
+  "image-viewer.editor.eraser.area": {
+    "defaultMessage": "Vùng"
+  },
+  "image-viewer.editor.eraser.element": {
+    "defaultMessage": "Phần tử"
+  },
+  "image-viewer.editor.eraser.mode": {
+    "defaultMessage": "Chế độ tẩy"
+  },
+  "image-viewer.editor.image-editing-tools": {
+    "defaultMessage": "Công cụ chỉnh sửa ảnh"
+  },
+  "image-viewer.editor.more-save-options": {
+    "defaultMessage": "Tùy chọn lưu khác"
+  },
+  "image-viewer.editor.overwrite": {
+    "defaultMessage": "Ghi đè"
+  },
+  "image-viewer.editor.redo": {
+    "defaultMessage": "Làm lại"
+  },
+  "image-viewer.editor.save-as-new": {
+    "defaultMessage": "Lưu bản sao"
+  },
+  "image-viewer.editor.save-image": {
+    "defaultMessage": "Lưu ảnh"
+  },
+  "image-viewer.editor.size": {
+    "defaultMessage": "Kích thước"
+  },
+  "image-viewer.editor.tool.arrow": {
+    "defaultMessage": "Mũi tên"
+  },
+  "image-viewer.editor.tool.censor": {
+    "defaultMessage": "Che nội dung"
+  },
+  "image-viewer.editor.tool.crop": {
+    "defaultMessage": "Cắt"
+  },
+  "image-viewer.editor.tool.ellipse": {
+    "defaultMessage": "Hình elip"
+  },
+  "image-viewer.editor.tool.eraser": {
+    "defaultMessage": "Tẩy"
+  },
+  "image-viewer.editor.tool.highlight": {
+    "defaultMessage": "Tô sáng"
+  },
+  "image-viewer.editor.tool.pen": {
+    "defaultMessage": "Bút"
+  },
+  "image-viewer.editor.tool.rectangle": {
+    "defaultMessage": "Hình chữ nhật"
+  },
+  "image-viewer.editor.tool.select": {
+    "defaultMessage": "Chọn"
+  },
+  "image-viewer.editor.tool.text": {
+    "defaultMessage": "Văn bản"
+  },
+  "image-viewer.editor.undo": {
+    "defaultMessage": "Hoàn tác"
+  },
+  "image-viewer.editor.width": {
+    "defaultMessage": "Chiều rộng"
+  },
+  "image-viewer.editor.zoom-fit": {
+    "defaultMessage": "Vừa khung"
+  },
+  "image-viewer.editor.zoom-fit-workspace": {
+    "defaultMessage": "Vừa vùng làm việc"
+  },
+  "image-viewer.editor.zoom-in": {
+    "defaultMessage": "Phóng to"
+  },
+  "image-viewer.editor.zoom-out": {
+    "defaultMessage": "Thu nhỏ"
+  },
+  "image-viewer.next": {
+    "defaultMessage": "Ảnh tiếp theo"
+  },
+  "image-viewer.previous": {
+    "defaultMessage": "Ảnh trước"
   },
   "input.search-version.placeholder": {
     "defaultMessage": "Thay đổi phiên bản..."
@@ -1649,6 +2393,9 @@
   "instances.content-install.header": {
     "defaultMessage": "Cài đặt dự án"
   },
+  "instances.content-install.hide-unavailable": {
+    "defaultMessage": "Ẩn nội dung không khả dụng"
+  },
   "instances.content-install.incompatible-tooltip": {
     "defaultMessage": "Cấu hình này dùng trình tải hoặc phiên bản khác mà nội dung này hỗ trợ."
   },
@@ -1678,6 +2425,48 @@
   },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "Tìm phiên chơi"
+  },
+  "instances.content-install.show-unavailable": {
+    "defaultMessage": "Hiện nội dung không khả dụng"
+  },
+  "instances.managed-content-modal.disabled": {
+    "defaultMessage": "Đã tắt"
+  },
+  "instances.managed-content-modal.download-file": {
+    "defaultMessage": "Tải tệp xuống"
+  },
+  "instances.managed-content-modal.empty-description": {
+    "defaultMessage": "Nguồn này không có nội dung nào được quản lý."
+  },
+  "instances.managed-content-modal.empty-title": {
+    "defaultMessage": "Không tìm thấy nội dung"
+  },
+  "instances.managed-content-modal.enabled": {
+    "defaultMessage": "Đã bật"
+  },
+  "instances.managed-content-modal.external-content": {
+    "defaultMessage": "Bên ngoài"
+  },
+  "instances.managed-content-modal.external-content-description": {
+    "defaultMessage": "Tệp này chưa được xuất bản trên Modrinth."
+  },
+  "instances.managed-content-modal.header": {
+    "defaultMessage": "Nội dung được quản lý"
+  },
+  "instances.managed-content-modal.loading": {
+    "defaultMessage": "Đang tải nội dung..."
+  },
+  "instances.managed-content-modal.no-results": {
+    "defaultMessage": "Không có dự án nào khớp với tìm kiếm của bạn."
+  },
+  "instances.managed-content-modal.open-in-slicer": {
+    "defaultMessage": "Mở trong Slicer"
+  },
+  "instances.managed-content-modal.search-placeholder": {
+    "defaultMessage": "Tìm trong {count, number} {count, plural, one {dự án} other {dự án}}"
+  },
+  "instances.managed-content-modal.warnings": {
+    "defaultMessage": "Cảnh báo"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Hiện tại"
@@ -1811,6 +2600,9 @@
   "label.details": {
     "defaultMessage": "Chi tiết"
   },
+  "label.discover-content": {
+    "defaultMessage": "Khám phá nội dung"
+  },
   "label.done": {
     "defaultMessage": "Đã xong"
   },
@@ -1826,6 +2618,9 @@
   "label.error": {
     "defaultMessage": "Lỗi"
   },
+  "label.explanation": {
+    "defaultMessage": "Giải thích"
+  },
   "label.extract-failed": {
     "defaultMessage": "Giải nén không thành công"
   },
@@ -1840,6 +2635,9 @@
   },
   "label.game-version": {
     "defaultMessage": "Phiên bản trò chơi"
+  },
+  "label.hide-installed-content": {
+    "defaultMessage": "Ẩn nội dung đã cài đặt"
   },
   "label.hide-selected-content": {
     "defaultMessage": "Che nội dung được chọn"
@@ -1885,6 +2683,9 @@
   },
   "label.password": {
     "defaultMessage": "Mật khẩu"
+  },
+  "label.permissions": {
+    "defaultMessage": "Quyền"
   },
   "label.plan-custom": {
     "defaultMessage": "Tuỳ chỉnh"
@@ -1943,6 +2744,9 @@
   "label.server": {
     "defaultMessage": "Máy chủ"
   },
+  "label.server-only": {
+    "defaultMessage": "Chỉ dành cho máy chủ"
+  },
   "label.servers": {
     "defaultMessage": "Máy chủ"
   },
@@ -1996,6 +2800,9 @@
   },
   "label.yes": {
     "defaultMessage": "Có"
+  },
+  "layout.account-switcher.switching": {
+    "defaultMessage": "Đang chuyển tài khoản..."
   },
   "locale.cs-CZ": {
     "defaultMessage": "Tiếng Cộng hoà Séc"
@@ -2267,6 +3074,39 @@
   "notification.error.title": {
     "defaultMessage": "Đã xảy ra lỗi"
   },
+  "notifications.actor.unknown": {
+    "defaultMessage": "Ai đó"
+  },
+  "notifications.close": {
+    "defaultMessage": "Đóng"
+  },
+  "notifications.dismiss": {
+    "defaultMessage": "Bỏ thông báo"
+  },
+  "notifications.friend-request.body": {
+    "defaultMessage": "<actor>{actor}</actor> đã gửi cho bạn lời mời kết bạn."
+  },
+  "notifications.instance-invite.body": {
+    "defaultMessage": "<actor>{actor}</actor> đã mời bạn vào bản cài đặt <entity>{entity}</entity>."
+  },
+  "notifications.instance-ready.launch-game": {
+    "defaultMessage": "Khởi chạy trò chơi"
+  },
+  "notifications.instance-ready.open-instance": {
+    "defaultMessage": "Bản cài đặt"
+  },
+  "notifications.instance-ready.status": {
+    "defaultMessage": "Đã cài đặt và sẵn sàng chơi."
+  },
+  "notifications.invite.accept": {
+    "defaultMessage": "Chấp nhận"
+  },
+  "notifications.invite.decline": {
+    "defaultMessage": "Từ chối"
+  },
+  "notifications.server-invite.body": {
+    "defaultMessage": "<actor>{actor}</actor> đã mời bạn quản lý máy chủ <entity>{entity}</entity>."
+  },
   "omorphia.component.badge.label.accepted": {
     "defaultMessage": "Đã chấp nhận"
   },
@@ -2414,8 +3254,272 @@
   "payment-method.visa": {
     "defaultMessage": "Visa"
   },
+  "profile.bio.fallback.creator": {
+    "defaultMessage": "Một nhà sáng tạo trên Modrinth."
+  },
+  "profile.bio.fallback.user": {
+    "defaultMessage": "Một người dùng Modrinth."
+  },
+  "profile.block-user.admonition-body": {
+    "defaultMessage": "{username} sẽ không thể gửi lời mời kết bạn, mời bạn vào bản cài đặt được chia sẻ hoặc mời bạn vào máy chủ Modrinth Hosting."
+  },
+  "profile.block-user.admonition-title": {
+    "defaultMessage": "Bạn có chắc muốn chặn người dùng này không?"
+  },
+  "profile.block-user.error-description": {
+    "defaultMessage": "Đã xảy ra lỗi khi chặn người dùng này. Vui lòng thử lại."
+  },
+  "profile.block-user.error-title": {
+    "defaultMessage": "Không thể chặn người dùng"
+  },
+  "profile.block-user.success-description": {
+    "defaultMessage": "Đã chặn {username}."
+  },
+  "profile.block-user.success-title": {
+    "defaultMessage": "Đã chặn người dùng"
+  },
+  "profile.block-user.title": {
+    "defaultMessage": "Chặn {username}"
+  },
+  "profile.button.analytics": {
+    "defaultMessage": "Xem phân tích người dùng"
+  },
+  "profile.button.billing": {
+    "defaultMessage": "Quản lý thanh toán người dùng"
+  },
+  "profile.button.block": {
+    "defaultMessage": "Chặn"
+  },
+  "profile.button.create-collection": {
+    "defaultMessage": "Tạo bộ sưu tập"
+  },
+  "profile.button.create-project": {
+    "defaultMessage": "Tạo dự án"
+  },
+  "profile.button.force-password-reset": {
+    "defaultMessage": "Buộc đặt lại mật khẩu"
+  },
+  "profile.button.info": {
+    "defaultMessage": "Xem chi tiết người dùng"
+  },
+  "profile.button.lock": {
+    "defaultMessage": "Khóa tài khoản"
+  },
+  "profile.button.manage-projects": {
+    "defaultMessage": "Quản lý dự án"
+  },
+  "profile.button.remove-affiliate": {
+    "defaultMessage": "Xóa tư cách đối tác liên kết"
+  },
+  "profile.button.reset-2fa": {
+    "defaultMessage": "Đặt lại xác thực hai yếu tố"
+  },
+  "profile.button.revoke-sessions": {
+    "defaultMessage": "Thu hồi tất cả phiên đăng nhập"
+  },
+  "profile.button.set-affiliate": {
+    "defaultMessage": "Đặt làm đối tác liên kết"
+  },
+  "profile.button.shared-instances": {
+    "defaultMessage": "Xem bản cài đặt được chia sẻ"
+  },
+  "profile.button.unblock": {
+    "defaultMessage": "Bỏ chặn"
+  },
+  "profile.button.unlock": {
+    "defaultMessage": "Mở khóa tài khoản"
+  },
+  "profile.collection.projects-count": {
+    "defaultMessage": "{count, plural, one {# dự án} other {# dự án}}"
+  },
+  "profile.details.error.github-popup-blocked": {
+    "defaultMessage": "Hãy cho phép cửa sổ bật lên cho Modrinth rồi thử lại."
+  },
+  "profile.details.error.github-profile-message": {
+    "defaultMessage": "Không thể lấy hồ sơ GitHub. Vui lòng thử lại."
+  },
+  "profile.details.error.github-profile-title": {
+    "defaultMessage": "Không thể mở hồ sơ GitHub"
+  },
+  "profile.details.label.auth-providers": {
+    "defaultMessage": "Nhà cung cấp xác thực"
+  },
+  "profile.details.label.email-verified": {
+    "defaultMessage": "Email đã xác minh"
+  },
+  "profile.details.label.has-password": {
+    "defaultMessage": "Có mật khẩu"
+  },
+  "profile.details.label.has-totp": {
+    "defaultMessage": "Có TOTP"
+  },
+  "profile.details.label.loading-github-profile": {
+    "defaultMessage": "Đang tải..."
+  },
+  "profile.details.label.payment-methods": {
+    "defaultMessage": "Phương thức thanh toán"
+  },
+  "profile.details.label.view-github-profile": {
+    "defaultMessage": "Xem hồ sơ"
+  },
+  "profile.details.title": {
+    "defaultMessage": "Chi tiết người dùng"
+  },
+  "profile.details.tooltip.email-not-verified": {
+    "defaultMessage": "Email chưa xác minh"
+  },
+  "profile.details.tooltip.email-verified": {
+    "defaultMessage": "Email đã xác minh"
+  },
+  "profile.error.load-description": {
+    "defaultMessage": "Không thể tải hồ sơ người dùng."
+  },
+  "profile.error.not-found": {
+    "defaultMessage": "Không tìm thấy người dùng"
+  },
+  "profile.force-password-reset.admonition-body": {
+    "defaultMessage": "Mật khẩu của {username} sẽ bị xóa ngay, họ sẽ bị đăng xuất trên mọi thiết bị và một liên kết đặt mật khẩu mới sẽ được gửi đến email bên dưới. Nếu bạn thay đổi email, email trên tài khoản cũng sẽ được thay thế. Liên kết hết hạn sau 24 giờ và vẫn có thể dùng khi tài khoản đang bị khóa."
+  },
+  "profile.force-password-reset.admonition-title": {
+    "defaultMessage": "Mật khẩu hiện tại sẽ ngừng hoạt động"
+  },
+  "profile.force-password-reset.button": {
+    "defaultMessage": "Đặt lại mật khẩu"
+  },
+  "profile.force-password-reset.email-label": {
+    "defaultMessage": "Email tài khoản"
+  },
+  "profile.force-password-reset.email-placeholder": {
+    "defaultMessage": "Để trống để dùng email của tài khoản"
+  },
+  "profile.force-password-reset.error-description": {
+    "defaultMessage": "Đã xảy ra lỗi khi đặt lại mật khẩu. Vui lòng thử lại."
+  },
+  "profile.force-password-reset.error-title": {
+    "defaultMessage": "Không thể đặt lại mật khẩu"
+  },
+  "profile.force-password-reset.success-description": {
+    "defaultMessage": "Đã gửi liên kết đặt lại mật khẩu cho {username}."
+  },
+  "profile.force-password-reset.success-title": {
+    "defaultMessage": "Đã đặt lại mật khẩu"
+  },
+  "profile.force-password-reset.title": {
+    "defaultMessage": "Buộc đặt lại mật khẩu cho {username}"
+  },
+  "profile.label.affiliate": {
+    "defaultMessage": "Đối tác liên kết"
+  },
   "profile.label.badges": {
     "defaultMessage": "Huy hiệu"
+  },
+  "profile.label.collection": {
+    "defaultMessage": "Bộ sưu tập"
+  },
+  "profile.label.download-count": {
+    "defaultMessage": "{count, plural, one {lượt tải} other {lượt tải}}"
+  },
+  "profile.label.joined": {
+    "defaultMessage": "Tham gia"
+  },
+  "profile.label.locked": {
+    "defaultMessage": "Đã khóa"
+  },
+  "profile.label.no-collections": {
+    "defaultMessage": "Người dùng này chưa có bộ sưu tập nào!"
+  },
+  "profile.label.no-collections-auth-description": {
+    "defaultMessage": "Bạn chưa có bộ sưu tập nào."
+  },
+  "profile.label.no-projects": {
+    "defaultMessage": "Người dùng này chưa có dự án nào!"
+  },
+  "profile.label.no-projects-auth-description": {
+    "defaultMessage": "Bạn chưa có dự án nào."
+  },
+  "profile.label.organizations": {
+    "defaultMessage": "Tổ chức"
+  },
+  "profile.label.project-count": {
+    "defaultMessage": "{count, plural, one {dự án} other {dự án}}"
+  },
+  "profile.official-account": {
+    "defaultMessage": "Tài khoản Modrinth chính thức"
+  },
+  "profile.official-account.bio": {
+    "defaultMessage": "Tài khoản người dùng chính thức của Modrinth. Nhận hỗ trợ tại <support-link></support-link> hoặc qua email tại <email></email>"
+  },
+  "profile.reset-2fa.admonition-body": {
+    "defaultMessage": "Ứng dụng xác thực và các mã dự phòng của {username} sẽ bị xóa và họ sẽ được thông báo. Chỉ thực hiện việc này sau khi đã xác minh danh tính của họ."
+  },
+  "profile.reset-2fa.admonition-title": {
+    "defaultMessage": "Bạn có chắc muốn đặt lại xác thực hai yếu tố không?"
+  },
+  "profile.reset-2fa.button": {
+    "defaultMessage": "Đặt lại 2FA"
+  },
+  "profile.reset-2fa.error-description": {
+    "defaultMessage": "Đã xảy ra lỗi khi đặt lại xác thực hai yếu tố. Vui lòng thử lại."
+  },
+  "profile.reset-2fa.error-title": {
+    "defaultMessage": "Không thể đặt lại xác thực hai yếu tố"
+  },
+  "profile.reset-2fa.success-description": {
+    "defaultMessage": "Đã xóa xác thực hai yếu tố của {username}."
+  },
+  "profile.reset-2fa.success-title": {
+    "defaultMessage": "Đã đặt lại xác thực hai yếu tố"
+  },
+  "profile.reset-2fa.title": {
+    "defaultMessage": "Đặt lại xác thực hai yếu tố cho {username}"
+  },
+  "profile.revoke-sessions.admonition-body": {
+    "defaultMessage": "{username} sẽ bị đăng xuất trên mọi thiết bị và phải đăng nhập lại. Token truy cập cá nhân không bị ảnh hưởng."
+  },
+  "profile.revoke-sessions.admonition-title": {
+    "defaultMessage": "Bạn có chắc muốn thu hồi tất cả phiên đăng nhập không?"
+  },
+  "profile.revoke-sessions.button": {
+    "defaultMessage": "Thu hồi phiên đăng nhập"
+  },
+  "profile.revoke-sessions.error-description": {
+    "defaultMessage": "Đã xảy ra lỗi khi thu hồi các phiên đăng nhập. Vui lòng thử lại."
+  },
+  "profile.revoke-sessions.error-title": {
+    "defaultMessage": "Không thể thu hồi phiên đăng nhập"
+  },
+  "profile.revoke-sessions.success-description": {
+    "defaultMessage": "{username} đã bị đăng xuất ở mọi nơi."
+  },
+  "profile.revoke-sessions.success-title": {
+    "defaultMessage": "Đã thu hồi phiên đăng nhập"
+  },
+  "profile.revoke-sessions.title": {
+    "defaultMessage": "Thu hồi phiên đăng nhập của {username}"
+  },
+  "profile.unblock-user.error-description": {
+    "defaultMessage": "Đã xảy ra lỗi khi bỏ chặn người dùng này. Vui lòng thử lại."
+  },
+  "profile.unblock-user.error-title": {
+    "defaultMessage": "Không thể bỏ chặn người dùng"
+  },
+  "profile.unblock-user.success-description": {
+    "defaultMessage": "Đã bỏ chặn {username}."
+  },
+  "profile.unblock-user.success-title": {
+    "defaultMessage": "Đã bỏ chặn người dùng"
+  },
+  "profile.unlock-user.error-description": {
+    "defaultMessage": "Đã xảy ra lỗi khi mở khóa tài khoản này. Vui lòng thử lại."
+  },
+  "profile.unlock-user.error-title": {
+    "defaultMessage": "Không thể mở khóa tài khoản"
+  },
+  "profile.unlock-user.success-description": {
+    "defaultMessage": "Tài khoản của {username} đã được mở khóa."
+  },
+  "profile.unlock-user.success-title": {
+    "defaultMessage": "Đã mở khóa tài khoản"
   },
   "project-card.date.published.tooltip": {
     "defaultMessage": "Được đăng vào {date}"
@@ -2432,11 +3536,20 @@
   "project-card.environment.client-or-server": {
     "defaultMessage": "Máy khách hoặc máy chủ"
   },
+  "project-card.environment.dedicated-server": {
+    "defaultMessage": "Máy chủ chuyên dụng"
+  },
   "project-card.environment.server": {
     "defaultMessage": "Máy chủ"
   },
+  "project-card.environment.singleplayer": {
+    "defaultMessage": "Chơi đơn"
+  },
   "project-type.all": {
     "defaultMessage": "Tất cả"
+  },
+  "project-type.collection.plural": {
+    "defaultMessage": "Bộ sưu tập"
   },
   "project-type.datapack.capital": {
     "defaultMessage": "{count, plural, other {Gói dữ liệu}}"
@@ -2537,6 +3650,9 @@
   "project.about.compatibility.platforms": {
     "defaultMessage": "Nền tảng"
   },
+  "project.about.compatibility.platforms-plural": {
+    "defaultMessage": "{count, plural, one {Nền tảng} other {Nền tảng}}"
+  },
   "project.about.compatibility.title": {
     "defaultMessage": "Tương thích"
   },
@@ -2633,6 +3749,48 @@
   "project.about.tags.title": {
     "defaultMessage": "Thẻ"
   },
+  "project.disclosure.advertising.title": {
+    "defaultMessage": "Có chứa quảng cáo"
+  },
+  "project.disclosure.ai-functionality.title": {
+    "defaultMessage": "Chức năng AI tạo sinh"
+  },
+  "project.disclosure.ai-generated-content.title": {
+    "defaultMessage": "Có {types} do AI tạo"
+  },
+  "project.disclosure.ai-generated-content.use.assets": {
+    "defaultMessage": "tài nguyên"
+  },
+  "project.disclosure.ai-generated-content.use.code": {
+    "defaultMessage": "mã nguồn"
+  },
+  "project.disclosure.ai-generated-content.use.content": {
+    "defaultMessage": "nội dung"
+  },
+  "project.disclosure.ai-generated-content.use.text": {
+    "defaultMessage": "văn bản"
+  },
+  "project.disclosure.derivative-work.show-fewer": {
+    "defaultMessage": "Hiển thị ít hơn"
+  },
+  "project.disclosure.derivative-work.show-more": {
+    "defaultMessage": "Hiển thị thêm {count}"
+  },
+  "project.disclosure.derivative-work.title": {
+    "defaultMessage": "Đây là tác phẩm phái sinh từ:"
+  },
+  "project.disclosure.paid-features.title": {
+    "defaultMessage": "Có tính năng trả phí"
+  },
+  "project.disclosure.photosensitivity.title": {
+    "defaultMessage": "Cảnh báo nhạy cảm ánh sáng"
+  },
+  "project.disclosure.system-interactions.title": {
+    "defaultMessage": "Có tương tác với hệ thống bên ngoài"
+  },
+  "project.disclosure.telemetry.title": {
+    "defaultMessage": "Có {consent, select, opt_in {dữ liệu đo từ xa cần chủ động đồng ý} opt_out {dữ liệu đo từ xa có thể từ chối} always_active {dữ liệu đo từ xa luôn hoạt động} other {dữ liệu đo từ xa}}"
+  },
   "project.download-count-tooltip": {
     "defaultMessage": "{count, number} {count, plural, other {lượt tải xuống}}"
   },
@@ -2704,6 +3862,15 @@
   },
   "project.follower-count-tooltip": {
     "defaultMessage": "{count, number} {count, plural, other {lượt theo dõi}}"
+  },
+  "project.license.error": {
+    "defaultMessage": "Không thể tải nội dung giấy phép."
+  },
+  "project.license.loading": {
+    "defaultMessage": "Đang tải nội dung giấy phép..."
+  },
+  "project.license.title": {
+    "defaultMessage": "Giấy phép"
   },
   "project.online-player-count": {
     "defaultMessage": "{count, number} trực tuyến"
@@ -2987,6 +4154,27 @@
   "project.settings.description.title": {
     "defaultMessage": "Mô tả"
   },
+  "project.settings.disclosures.ai.types-assets": {
+    "defaultMessage": "Tài nguyên"
+  },
+  "project.settings.disclosures.ai.types-code": {
+    "defaultMessage": "Mã nguồn"
+  },
+  "project.settings.disclosures.ai.types-text": {
+    "defaultMessage": "Văn bản"
+  },
+  "project.settings.disclosures.telemetry.consent-always-active": {
+    "defaultMessage": "Luôn hoạt động"
+  },
+  "project.settings.disclosures.telemetry.consent-opt-in": {
+    "defaultMessage": "Chủ động đồng ý"
+  },
+  "project.settings.disclosures.telemetry.consent-opt-out": {
+    "defaultMessage": "Có thể từ chối"
+  },
+  "project.settings.disclosures.title": {
+    "defaultMessage": "Công bố nội dung"
+  },
   "project.settings.environment.client_and_server.description": {
     "defaultMessage": "Có một số chức năng hoạt động trên cả client và server, dù chỉ ở mức độ một phần."
   },
@@ -3110,6 +4298,18 @@
   "project.settings.view.title": {
     "defaultMessage": "Xem"
   },
+  "project.stats.downloads-label": {
+    "defaultMessage": "{count, plural, one {lượt tải} other {lượt tải}}"
+  },
+  "project.stats.followers-label": {
+    "defaultMessage": "{count, plural, one {người theo dõi} other {người theo dõi}}"
+  },
+  "project.status.archived.body": {
+    "defaultMessage": "{title} sẽ không nhận thêm bản cập nhật nào trừ khi tác giả quyết định bỏ lưu trữ dự án."
+  },
+  "project.status.archived.header": {
+    "defaultMessage": "{title} đã được lưu trữ"
+  },
   "project.versions.channel.alpha.symbol": {
     "defaultMessage": "A"
   },
@@ -3118,6 +4318,27 @@
   },
   "project.versions.channel.release.symbol": {
     "defaultMessage": "R"
+  },
+  "project.versions.filter.channel": {
+    "defaultMessage": "Kênh"
+  },
+  "project.versions.filter.selected-count": {
+    "defaultMessage": "Đã chọn {count, number}"
+  },
+  "project.versions.filter.toggle-tooltip": {
+    "defaultMessage": "Bật/tắt bộ lọc {filter}"
+  },
+  "project.versions.platform.modloader.short": {
+    "defaultMessage": "Bộ nạp mod"
+  },
+  "project.versions.version.withheld": {
+    "defaultMessage": "Bị giữ lại"
+  },
+  "project.versions.version.withheld.tooltip": {
+    "defaultMessage": "Phiên bản bị giữ lại do thiếu quyền"
+  },
+  "project.versions.withheld-versions-warning.resolve-button": {
+    "defaultMessage": "Xử lý"
   },
   "project.visibility.archived": {
     "defaultMessage": "Đã lưu trữ"
@@ -3161,8 +4382,83 @@
   "report.item-type.version": {
     "defaultMessage": "phiên bản"
   },
+  "report.type.ai-images": {
+    "defaultMessage": "Hình ảnh do AI tạo trong biểu tượng, thư viện hoặc mô tả"
+  },
+  "report.type.copyright": {
+    "defaultMessage": "Nội dung đăng lại"
+  },
+  "report.type.fully-ai-generated": {
+    "defaultMessage": "Dự án hoàn toàn do AI tạo"
+  },
+  "report.type.inappropriate": {
+    "defaultMessage": "Không phù hợp"
+  },
+  "report.type.malicious": {
+    "defaultMessage": "Độc hại"
+  },
+  "report.type.missing-disclosure": {
+    "defaultMessage": "Thiếu hoặc sai thông tin công bố"
+  },
+  "report.type.name-squatting": {
+    "defaultMessage": "Chiếm dụng tên"
+  },
+  "report.type.spam": {
+    "defaultMessage": "Spam"
+  },
   "s.bg": {
     "defaultMessage": "Đang chạy tác vụ nền"
+  },
+  "search.filter.dependency_type.any": {
+    "defaultMessage": "Mọi loại phần phụ thuộc"
+  },
+  "search.filter.dependency_type.embedded": {
+    "defaultMessage": "Nhúng"
+  },
+  "search.filter.dependency_type.optional": {
+    "defaultMessage": "Tùy chọn"
+  },
+  "search.filter.dependency_type.optional_or_embedded": {
+    "defaultMessage": "Tùy chọn hoặc nhúng"
+  },
+  "search.filter.dependency_type.required": {
+    "defaultMessage": "Bắt buộc"
+  },
+  "search.filter.dependency_type.required_or_embedded": {
+    "defaultMessage": "Bắt buộc hoặc nhúng"
+  },
+  "search.filter.dependency_type.required_or_optional": {
+    "defaultMessage": "Bắt buộc hoặc tùy chọn"
+  },
+  "search.filter.dependent_project": {
+    "defaultMessage": "Phụ thuộc vào: {project}"
+  },
+  "search.filter.dependent_project.clear": {
+    "defaultMessage": "Xóa bộ lọc phần phụ thuộc"
+  },
+  "search.filter.dependent_project.search_placeholder": {
+    "defaultMessage": "Tìm dự án..."
+  },
+  "search.filter.excluded_projects": {
+    "defaultMessage": "Loại trừ: {projects}"
+  },
+  "search.filter.included_content.exclude": {
+    "defaultMessage": "Loại trừ"
+  },
+  "search.filter.included_content.excluded": {
+    "defaultMessage": "Đã loại trừ"
+  },
+  "search.filter.included_content.remove_project": {
+    "defaultMessage": "Xóa {project}"
+  },
+  "search.filter.included_content.remove_project.tooltip": {
+    "defaultMessage": "Xóa dự án"
+  },
+  "search.filter.included_content.search_placeholder": {
+    "defaultMessage": "Tìm nội dung..."
+  },
+  "search.filter.included_projects": {
+    "defaultMessage": "Bao gồm: {projects}"
   },
   "search.filter.locked.default": {
     "defaultMessage": "Içime cin girdi"
@@ -3194,6 +4490,48 @@
   "search.filter.option.show_more": {
     "defaultMessage": "Hiển thị nhiều hơn"
   },
+  "search.filter.option.sub_options.collapse.tooltip": {
+    "defaultMessage": "Ẩn bớt tùy chọn"
+  },
+  "search.filter.option.sub_options.expand.tooltip": {
+    "defaultMessage": "Hiện thêm tùy chọn"
+  },
+  "search.filter_type.advanced": {
+    "defaultMessage": "Loại trừ nâng cao"
+  },
+  "search.filter_type.advanced.disclosure.advertisements": {
+    "defaultMessage": "Quảng cáo"
+  },
+  "search.filter_type.advanced.disclosure.ai_content": {
+    "defaultMessage": "Nội dung do AI tạo"
+  },
+  "search.filter_type.advanced.disclosure.ai_content.usage": {
+    "defaultMessage": "AI {usage}"
+  },
+  "search.filter_type.advanced.disclosure.ai_functionality": {
+    "defaultMessage": "Chức năng AI tạo sinh"
+  },
+  "search.filter_type.advanced.disclosure.archived": {
+    "defaultMessage": "Đã lưu trữ"
+  },
+  "search.filter_type.advanced.disclosure.derivative_work": {
+    "defaultMessage": "Nội dung phái sinh"
+  },
+  "search.filter_type.advanced.disclosure.epilepsy_triggers": {
+    "defaultMessage": "Yếu tố kích hoạt nhạy cảm ánh sáng"
+  },
+  "search.filter_type.advanced.disclosure.paid_features": {
+    "defaultMessage": "Tính năng trả phí"
+  },
+  "search.filter_type.advanced.disclosure.system_interactions": {
+    "defaultMessage": "Tương tác với hệ thống bên ngoài"
+  },
+  "search.filter_type.advanced.disclosure.telemetry": {
+    "defaultMessage": "Dữ liệu đo từ xa"
+  },
+  "search.filter_type.compatible_dependency_project_ids": {
+    "defaultMessage": "Phụ thuộc vào"
+  },
   "search.filter_type.environment": {
     "defaultMessage": "Môi trường"
   },
@@ -3208,6 +4546,9 @@
   },
   "search.filter_type.game_version.all_versions": {
     "defaultMessage": "Hiện tất cả phiên bản"
+  },
+  "search.filter_type.included_content": {
+    "defaultMessage": "Nội dung được bao gồm"
   },
   "search.filter_type.license": {
     "defaultMessage": "Giấy phép"
@@ -3244,6 +4585,21 @@
   },
   "search.filter_type.shader_loader": {
     "defaultMessage": "Trình nạp"
+  },
+  "search.photosensitivity-warning-modal.body.1": {
+    "defaultMessage": "Chúng tôi không thể đảm bảo mọi nội dung trên Modrinth đều đã được gắn nhãn phù hợp."
+  },
+  "search.photosensitivity-warning-modal.body.2": {
+    "defaultMessage": "Nhãn nội dung về yếu tố kích hoạt nhạy cảm ánh sáng do chính người sáng tạo tự khai báo khi tải nội dung lên Modrinth. Các dự án này chưa trải qua kiểm tra an toàn."
+  },
+  "search.photosensitivity-warning-modal.body.3": {
+    "defaultMessage": "Bạn tự chịu rủi ro khi sử dụng bất kỳ nội dung nào trên Modrinth. Hãy giữ an toàn! 💚"
+  },
+  "search.photosensitivity-warning-modal.dont-show-again": {
+    "defaultMessage": "Không hiển thị lại"
+  },
+  "search.photosensitivity-warning-modal.title": {
+    "defaultMessage": "Không thể đảm bảo kết quả an toàn"
   },
   "search.server_content_type.modpack": {
     "defaultMessage": "Modded"
@@ -3385,6 +4741,9 @@
   },
   "servers.access-page.activity-log-filter.action.server-stopped": {
     "defaultMessage": "Máy chủ bị tắt"
+  },
+  "servers.access-page.activity-log-filter.action.sftp-credentials-rolled": {
+    "defaultMessage": "Đã xoay vòng thông tin đăng nhập SFTP"
   },
   "servers.access-page.activity-log-filter.action.sftp-login": {
     "defaultMessage": "Đã đăng nhập qua SFTP"
@@ -3710,6 +5069,102 @@
   "servers.audit-log.event.server-created": {
     "defaultMessage": "Đã tạo server"
   },
+  "servers.audit-log.event.server-killed": {
+    "defaultMessage": "Đã buộc dừng máy chủ"
+  },
+  "servers.audit-log.event.server-metadata-changed": {
+    "defaultMessage": "Đã thay đổi siêu dữ liệu máy chủ"
+  },
+  "servers.audit-log.event.server-name-changed": {
+    "defaultMessage": "Đã đổi tên máy chủ thành <name></name>"
+  },
+  "servers.audit-log.event.server-plan-changed": {
+    "defaultMessage": "Đã đổi gói thành <specs></specs>"
+  },
+  "servers.audit-log.event.server-plan.cpu": {
+    "defaultMessage": "{count, plural, one {# CPU} other {# CPU}}"
+  },
+  "servers.audit-log.event.server-plan.new-plan": {
+    "defaultMessage": "gói mới"
+  },
+  "servers.audit-log.event.server-plan.ram-gb": {
+    "defaultMessage": "{amount, number} GB RAM"
+  },
+  "servers.audit-log.event.server-plan.ram-mb": {
+    "defaultMessage": "{amount, number} MB RAM"
+  },
+  "servers.audit-log.event.server-plan.storage-gb": {
+    "defaultMessage": "{amount, number} GB lưu trữ"
+  },
+  "servers.audit-log.event.server-plan.storage-mb": {
+    "defaultMessage": "{amount, number} MB lưu trữ"
+  },
+  "servers.audit-log.event.server-properties-modified": {
+    "defaultMessage": "Đã chỉnh sửa thuộc tính máy chủ <properties></properties>"
+  },
+  "servers.audit-log.event.server-properties-modified-label": {
+    "defaultMessage": "Đã chỉnh sửa thuộc tính máy chủ"
+  },
+  "servers.audit-log.event.server-reallocated": {
+    "defaultMessage": "Đã phân bổ lại máy chủ"
+  },
+  "servers.audit-log.event.server-repaired": {
+    "defaultMessage": "Đã sửa máy chủ"
+  },
+  "servers.audit-log.event.server-reset": {
+    "defaultMessage": "Đã đặt lại máy chủ"
+  },
+  "servers.audit-log.event.server-restarted": {
+    "defaultMessage": "Đã khởi động lại máy chủ"
+  },
+  "servers.audit-log.event.server-started": {
+    "defaultMessage": "Đã khởi động máy chủ"
+  },
+  "servers.audit-log.event.server-stopped": {
+    "defaultMessage": "Đã dừng máy chủ"
+  },
+  "servers.audit-log.event.server-subdomain-changed": {
+    "defaultMessage": "Đã đổi tên miền phụ của máy chủ thành <subdomain></subdomain>"
+  },
+  "servers.audit-log.event.sftp-credentials-rolled": {
+    "defaultMessage": "Đã xoay vòng thông tin đăng nhập SFTP"
+  },
+  "servers.audit-log.event.sftp-login": {
+    "defaultMessage": "Đã đăng nhập qua SFTP"
+  },
+  "servers.audit-log.event.startup-command-modified": {
+    "defaultMessage": "Đã đổi lệnh khởi động thành <command></command>"
+  },
+  "servers.audit-log.event.unknown": {
+    "defaultMessage": "Sự kiện không xác định"
+  },
+  "servers.audit-log.event.unknown-basic": {
+    "defaultMessage": "Đã ghi nhận hoạt động máy chủ"
+  },
+  "servers.audit-log.event.user-invite-revoked": {
+    "defaultMessage": "Đã thu hồi lời mời của <target-user></target-user>"
+  },
+  "servers.audit-log.event.user-invited": {
+    "defaultMessage": "Đã mời <target-user></target-user>"
+  },
+  "servers.audit-log.event.user-invited-with-permissions": {
+    "defaultMessage": "Đã mời <target-user></target-user> với quyền <permission-label>{permissions}</permission-label>"
+  },
+  "servers.audit-log.event.user-permission-modified": {
+    "defaultMessage": "Đã thay đổi quyền của <target-user></target-user>"
+  },
+  "servers.audit-log.event.user-permission-modified-with-permissions": {
+    "defaultMessage": "Đã đổi quyền của <target-user></target-user> thành <permission-label>{permissions}</permission-label>"
+  },
+  "servers.audit-log.event.user-removed": {
+    "defaultMessage": "Đã thu hồi quyền truy cập của <target-user></target-user>"
+  },
+  "servers.audit-log.scope.server": {
+    "defaultMessage": "Máy chủ"
+  },
+  "servers.audit-log.user-avatar-alt": {
+    "defaultMessage": "Ảnh đại diện của {username}"
+  },
   "servers.backups.admonition.backup-cancelled.description": {
     "defaultMessage": "Bản sao lưu {backupName} đã bị hủy."
   },
@@ -3830,6 +5285,12 @@
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Lịch sao lưu"
   },
+  "servers.backups.item.creator-avatar-alt": {
+    "defaultMessage": "Ảnh đại diện của {username}"
+  },
+  "servers.backups.item.creator.support": {
+    "defaultMessage": "Hỗ trợ"
+  },
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Sao lưu thủ công"
   },
@@ -3863,14 +5324,134 @@
   "servers.busy.installing": {
     "defaultMessage": "Đang cài máy chủ"
   },
+  "servers.download.failed.description": {
+    "defaultMessage": "Đã xảy ra lỗi khi tải các tệp của thế giới."
+  },
+  "servers.download.failed.title": {
+    "defaultMessage": "Tải xuống thất bại"
+  },
+  "servers.download.unavailable.description": {
+    "defaultMessage": "Hiện không thể tải xuống các tệp của thế giới này."
+  },
+  "servers.download.unavailable.title": {
+    "defaultMessage": "Không thể tải xuống"
+  },
+  "servers.files.server-locked": {
+    "defaultMessage": "Máy chủ này đã bị khóa và các tệp ở chế độ chỉ đọc."
+  },
+  "servers.files.zip-created": {
+    "defaultMessage": "Đã tạo ZIP"
+  },
+  "servers.files.zip-created-description": {
+    "defaultMessage": "Đã tạo {destination}"
+  },
+  "servers.grant-access-modal.add-as-friend": {
+    "defaultMessage": "Đồng thời gửi lời mời kết bạn"
+  },
+  "servers.grant-access-modal.already-member-tooltip": {
+    "defaultMessage": "Người dùng này đã được mời"
+  },
+  "servers.grant-access-modal.cancel": {
+    "defaultMessage": "Hủy"
+  },
+  "servers.grant-access-modal.header": {
+    "defaultMessage": "Thêm người dùng"
+  },
+  "servers.grant-access-modal.invite": {
+    "defaultMessage": "Mời"
+  },
+  "servers.grant-access-modal.permissions-help": {
+    "defaultMessage": "Xem danh sách đầy đủ các quyền của từng vai trò <link>tại đây</link>."
+  },
+  "servers.grant-access-modal.role.editor": {
+    "defaultMessage": "Biên tập viên"
+  },
+  "servers.grant-access-modal.role.editor-description": {
+    "defaultMessage": "Quản lý nội dung bản cài đặt, tệp, bản sao lưu và các cài đặt khác."
+  },
+  "servers.grant-access-modal.role.label": {
+    "defaultMessage": "Chọn vai trò"
+  },
+  "servers.grant-access-modal.role.viewer": {
+    "defaultMessage": "Giới hạn"
+  },
+  "servers.grant-access-modal.role.viewer-description": {
+    "defaultMessage": "Khởi động, dừng và xem máy chủ mà không thực hiện thay đổi."
+  },
+  "servers.grant-access-modal.suggestion-avatar-alt": {
+    "defaultMessage": "Ảnh đại diện của {username}"
+  },
+  "servers.grant-access-modal.target.help": {
+    "defaultMessage": "Không dùng tên người chơi Minecraft của họ."
+  },
+  "servers.grant-access-modal.target.label": {
+    "defaultMessage": "Tên người dùng Modrinth"
+  },
+  "servers.grant-access-modal.target.no-suggestions": {
+    "defaultMessage": "Không tìm thấy người dùng phù hợp."
+  },
+  "servers.grant-access-modal.target.placeholder": {
+    "defaultMessage": "Nhập tên người dùng Modrinth"
+  },
+  "servers.grant-access-modal.target.searching": {
+    "defaultMessage": "Đang tìm kiếm..."
+  },
+  "servers.installing-banner.description.applying": {
+    "defaultMessage": "Đang áp dụng thay đổi cài đặt..."
+  },
+  "servers.installing-banner.description.controls": {
+    "defaultMessage": "Các điều khiển máy chủ sẽ được mở khóa khi quá trình cài đặt hoàn tất."
+  },
+  "servers.installing-banner.description.duration": {
+    "defaultMessage": "Quá trình cài đặt này có thể mất vài phút..."
+  },
+  "servers.installing-banner.description.preparing": {
+    "defaultMessage": "Đang chuẩn bị máy chủ..."
+  },
+  "servers.installing-banner.description.still-working": {
+    "defaultMessage": "Vẫn đang xử lý — quá trình cài đặt đang diễn ra..."
+  },
   "servers.installing-banner.error.header": {
     "defaultMessage": "Tải thất bại"
+  },
+  "servers.installing-banner.error.header.local-modpack": {
+    "defaultMessage": "Không thể cài {filename}"
+  },
+  "servers.installing-banner.error.header.minecraft": {
+    "defaultMessage": "Không thể cài Minecraft {version}"
+  },
+  "servers.installing-banner.error.header.modpack": {
+    "defaultMessage": "Không thể cài modpack"
+  },
+  "servers.installing-banner.error.header.platform": {
+    "defaultMessage": "Không thể cài {loader} {loaderVersion} cho Minecraft {gameVersion}"
+  },
+  "servers.installing-banner.error.header.platform-without-version": {
+    "defaultMessage": "Không thể cài {loader} cho Minecraft {gameVersion}"
   },
   "servers.installing-banner.error.unknown": {
     "defaultMessage": "Có lỗi lạ xảy ra trong khi tải."
   },
+  "servers.installing-banner.installing-local-modpack": {
+    "defaultMessage": "Đang cài {filename}"
+  },
+  "servers.installing-banner.installing-minecraft": {
+    "defaultMessage": "Đang cài Minecraft {version}"
+  },
+  "servers.installing-banner.installing-modpack": {
+    "defaultMessage": "Đang cài modpack"
+  },
+  "servers.installing-banner.installing-platform": {
+    "defaultMessage": "Đang cài {loader} cho Minecraft {version}"
+  },
+  "servers.installing-banner.preparing.header": {
+    "defaultMessage": "Đang chuẩn bị máy chủ"
+  },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Đã có máy chủ rồi?"
+  },
+  "servers.list-empty.learn-more-link": {
+    "defaultMessage": "Tìm hiểu thêm"
   },
   "servers.list-empty.modrinth-hosting-label": {
     "defaultMessage": "Modrinth Hosting"
@@ -3887,8 +5468,14 @@
   "servers.list-empty.one-click-mod-installs-title": {
     "defaultMessage": "Cài mod với một cú nhấp"
   },
+  "servers.list-empty.play-with-friends-description": {
+    "defaultMessage": "Mời bạn bè chơi trên máy chủ của bạn với tính năng vào chơi chỉ bằng một cú nhấp từ Ứng dụng Modrinth."
+  },
   "servers.list-empty.play-with-friends-title": {
     "defaultMessage": "Chơi với bạn bè"
+  },
+  "servers.list-empty.sign-in-button": {
+    "defaultMessage": "Đăng nhập vào Modrinth"
   },
   "servers.list-empty.simple-setup-description": {
     "defaultMessage": "Thiết lập máy chủ giống như thế giới chơi đơn."
@@ -3950,6 +5537,12 @@
   "servers.listing.notice.upgrading": {
     "defaultMessage": "Phần cứng máy chủ của bạn hiện đang được nâng cấp và sẽ hoạt động trở lại trong thời gian ngắn."
   },
+  "servers.listing.owner-avatar-alt": {
+    "defaultMessage": "Ảnh đại diện của {username}"
+  },
+  "servers.listing.owner-tooltip": {
+    "defaultMessage": "Thuộc sở hữu của {username}"
+  },
   "servers.listing.resubscribe-label": {
     "defaultMessage": "Đăng ký lại"
   },
@@ -3961,6 +5554,36 @@
   },
   "servers.listing.using-project-label": {
     "defaultMessage": "Đang sử dụng {projectTitle}"
+  },
+  "servers.lock.modal.error-text": {
+    "defaultMessage": "Đã xảy ra lỗi khi khóa máy chủ này. Vui lòng thử lại."
+  },
+  "servers.lock.modal.error-title": {
+    "defaultMessage": "Không thể khóa máy chủ"
+  },
+  "servers.lock.modal.header": {
+    "defaultMessage": "Khóa {name}"
+  },
+  "servers.lock.modal.lock-button": {
+    "defaultMessage": "Khóa máy chủ"
+  },
+  "servers.lock.modal.reason-label": {
+    "defaultMessage": "Lý do"
+  },
+  "servers.lock.modal.reason-placeholder": {
+    "defaultMessage": "Hiển thị cho các quản trị viên khác"
+  },
+  "servers.lock.modal.success-text": {
+    "defaultMessage": "Đã khóa {name}."
+  },
+  "servers.lock.modal.success-title": {
+    "defaultMessage": "Đã khóa máy chủ"
+  },
+  "servers.lock.modal.warning-body": {
+    "defaultMessage": "{name} sẽ ở chế độ chỉ đọc đối với chủ sở hữu và thành viên cho đến khi được quản trị viên mở khóa."
+  },
+  "servers.lock.modal.warning-header": {
+    "defaultMessage": "Máy chủ này sẽ chuyển sang chế độ chỉ đọc"
   },
   "servers.manage.checking-for-new-servers": {
     "defaultMessage": "Đang tìm máy chủ mới..."
@@ -3992,14 +5615,38 @@
   "servers.manage.error.title": {
     "defaultMessage": "Không tải được máy chủ"
   },
+  "servers.manage.error.unknown": {
+    "defaultMessage": "Lỗi không xác định"
+  },
   "servers.manage.handle-error.title": {
     "defaultMessage": "Có lỗi xảy ra"
+  },
+  "servers.manage.lock-server": {
+    "defaultMessage": "Khóa máy chủ"
+  },
+  "servers.manage.locked.badge": {
+    "defaultMessage": "Đã khóa"
+  },
+  "servers.manage.locked.badge-tooltip": {
+    "defaultMessage": "Đã khóa từ {date}"
+  },
+  "servers.manage.locked.body": {
+    "defaultMessage": "Bộ phận hỗ trợ đã tạm thời khóa máy chủ này nên bạn không thể thực hiện thay đổi. <support-link>Liên hệ hỗ trợ</support-link> nếu bạn cho rằng đây là nhầm lẫn."
+  },
+  "servers.manage.locked.header": {
+    "defaultMessage": "Máy chủ bị bộ phận hỗ trợ khóa"
   },
   "servers.manage.new-server-button": {
     "defaultMessage": "Máy chủ mới"
   },
+  "servers.manage.no-owned-servers-found": {
+    "defaultMessage": "Không có máy chủ nào bạn sở hữu khớp với tìm kiếm."
+  },
   "servers.manage.no-servers-found": {
     "defaultMessage": "Không tìm thấy máy chủ."
+  },
+  "servers.manage.no-shared-servers-found": {
+    "defaultMessage": "Không có máy chủ được chia sẻ nào khớp với tìm kiếm."
   },
   "servers.manage.purchase-unavailable.text": {
     "defaultMessage": "Thông tin thanh toán đang được tải. Trang thanh toán sẽ được mở khi sẵn sàng."
@@ -4043,6 +5690,27 @@
   "servers.manage.settings-hint.title": {
     "defaultMessage": "Cài đặt máy chủ của bạn đã được di chuyển"
   },
+  "servers.manage.shared-servers-title": {
+    "defaultMessage": "Máy chủ được chia sẻ"
+  },
+  "servers.manage.unlock-server": {
+    "defaultMessage": "Mở khóa máy chủ"
+  },
+  "servers.manage.unlock.error-text": {
+    "defaultMessage": "Đã xảy ra lỗi khi mở khóa máy chủ này. Vui lòng thử lại."
+  },
+  "servers.manage.unlock.error-title": {
+    "defaultMessage": "Không thể mở khóa máy chủ"
+  },
+  "servers.manage.unlock.success-text": {
+    "defaultMessage": "Đã mở khóa {name}."
+  },
+  "servers.manage.unlock.success-title": {
+    "defaultMessage": "Đã mở khóa máy chủ"
+  },
+  "servers.manage.your-servers-title": {
+    "defaultMessage": "Máy chủ của bạn"
+  },
   "servers.medal-listing.countdown.remaining": {
     "defaultMessage": "còn <days-count>{days}</days-count> {days, plural, other {ngày}} <hours-count>{hours}</hours-count> {hours, plural,  other {giờ}} <minutes-count>{minutes}</minutes-count> {minutes, plural,  other {phút}} <seconds-count>{seconds}</seconds-count> {seconds, plural, other {giây}}..."
   },
@@ -4060,6 +5728,12 @@
   },
   "servers.medal-listing.notice.upgrading": {
     "defaultMessage": "Phần cứng máy chủ của bạn hiện đang được nâng cấp và sẽ hoạt động trở lại trong thời gian ngắn."
+  },
+  "servers.medal-listing.owner-avatar-alt": {
+    "defaultMessage": "Ảnh đại diện của {username}"
+  },
+  "servers.medal-listing.owner-tooltip": {
+    "defaultMessage": "Thuộc sở hữu của {username}"
   },
   "servers.medal-listing.server-icon-alt": {
     "defaultMessage": "Biểu tượng máy chủ"
@@ -4123,6 +5797,9 @@
   },
   "servers.purchase.step.plan.get-started": {
     "defaultMessage": "Bắt đầu"
+  },
+  "servers.purchase.step.plan.hardware-subtitle": {
+    "defaultMessage": "Vận hành bằng AMD Ryzen 7950X, 9950X hoặc tương đương, cùng bộ nhớ DDR5."
   },
   "servers.purchase.step.plan.large": {
     "defaultMessage": "Lớn"
@@ -4192,6 +5869,96 @@
   },
   "servers.region.western-europe": {
     "defaultMessage": "Tây Âu"
+  },
+  "servers.remove-access-modal.added-label": {
+    "defaultMessage": "Đã thêm {time}"
+  },
+  "servers.remove-access-modal.cancel-button": {
+    "defaultMessage": "Thu hồi lời mời"
+  },
+  "servers.remove-access-modal.cancel-effect-access": {
+    "defaultMessage": "Họ sẽ không được thêm vào máy chủ này"
+  },
+  "servers.remove-access-modal.cancel-effect-invite": {
+    "defaultMessage": "Bạn có thể gửi cho họ lời mời khác sau"
+  },
+  "servers.remove-access-modal.cancel-header": {
+    "defaultMessage": "Thu hồi lời mời"
+  },
+  "servers.remove-access-modal.cancel-warning-body": {
+    "defaultMessage": "Nếu thu hồi lời mời này, {username} sẽ cần một lời mời mới trước khi có thể tham gia máy chủ."
+  },
+  "servers.remove-access-modal.header": {
+    "defaultMessage": "Thu hồi quyền truy cập"
+  },
+  "servers.remove-access-modal.invited-label": {
+    "defaultMessage": "Đã mời {time}"
+  },
+  "servers.remove-access-modal.pending-invite-label": {
+    "defaultMessage": "Lời mời đang chờ"
+  },
+  "servers.remove-access-modal.remove-button": {
+    "defaultMessage": "Thu hồi quyền truy cập"
+  },
+  "servers.remove-access-modal.remove-effect-access": {
+    "defaultMessage": "Họ sẽ ngay lập tức mất quyền truy cập bảng điều khiển máy chủ và không còn có thể chỉnh sửa nội dung"
+  },
+  "servers.remove-access-modal.remove-effect-join": {
+    "defaultMessage": "Họ vẫn có thể tham gia và chơi trên máy chủ trừ khi bạn thực hiện thay đổi riêng"
+  },
+  "servers.remove-access-modal.unknown-added-label": {
+    "defaultMessage": "Không rõ ngày thêm"
+  },
+  "servers.remove-access-modal.user-avatar-alt": {
+    "defaultMessage": "Ảnh đại diện của {username}"
+  },
+  "servers.remove-access-modal.warning-body": {
+    "defaultMessage": "Nếu thu hồi quyền truy cập của một người dùng vào máy chủ, bạn sẽ phải mời lại họ để khôi phục quyền truy cập."
+  },
+  "servers.remove-access-modal.what-happens-label": {
+    "defaultMessage": "Điều gì sẽ xảy ra?"
+  },
+  "servers.settings.advanced.sftp.roll-credentials": {
+    "defaultMessage": "Tạo lại thông tin đăng nhập"
+  },
+  "servers.settings.advanced.sftp.roll-credentials-error-text": {
+    "defaultMessage": "Vui lòng thử lại sau."
+  },
+  "servers.settings.advanced.sftp.roll-credentials-error-title": {
+    "defaultMessage": "Không thể tạo lại thông tin đăng nhập SFTP"
+  },
+  "servers.settings.advanced.sftp.roll-credentials-modal-description": {
+    "defaultMessage": "Tên người dùng và mật khẩu trước đó sẽ ngừng hoạt động."
+  },
+  "servers.settings.advanced.sftp.roll-credentials-modal-title": {
+    "defaultMessage": "Tạo lại thông tin đăng nhập"
+  },
+  "servers.settings.advanced.sftp.roll-credentials-success-text": {
+    "defaultMessage": "Tên người dùng và mật khẩu SFTP của bạn đã được tạo lại."
+  },
+  "servers.settings.advanced.sftp.roll-credentials-success-title": {
+    "defaultMessage": "Đã tạo lại thông tin đăng nhập SFTP"
+  },
+  "servers.settings.support.action-log-title": {
+    "defaultMessage": "Nhật ký thao tác"
+  },
+  "servers.settings.support.clear-action-log-button": {
+    "defaultMessage": "Xóa nhật ký thao tác"
+  },
+  "servers.settings.support.clear-action-log-confirmation": {
+    "defaultMessage": "Thao tác này sẽ xóa vĩnh viễn toàn bộ mục nhật ký thao tác của máy chủ này. Tiếp tục?"
+  },
+  "servers.settings.support.clear-action-log-description": {
+    "defaultMessage": "Xóa toàn bộ mục nhật ký thao tác của máy chủ này."
+  },
+  "servers.settings.support.clear-action-log-error": {
+    "defaultMessage": "Không thể xóa nhật ký thao tác"
+  },
+  "servers.settings.support.clear-action-log-success": {
+    "defaultMessage": "Đã xóa nhật ký thao tác"
+  },
+  "servers.settings.support.clear-action-log-title": {
+    "defaultMessage": "Xóa nhật ký thao tác?"
   },
   "servers.setup.onboarding.installation-failed.text": {
     "defaultMessage": "Có lỗi xảy ra trong khi tải. Thử lại sau."
@@ -4271,8 +6038,71 @@
   "settings.billing.title": {
     "defaultMessage": "Thanh toán và gói đăng ký"
   },
+  "settings.display.project-list-layouts.datapack": {
+    "defaultMessage": "Trang Gói dữ liệu"
+  },
+  "settings.display.project-list-layouts.description": {
+    "defaultMessage": "Chọn bố cục ưa thích cho từng trang hiển thị danh sách dự án."
+  },
+  "settings.display.project-list-layouts.mod": {
+    "defaultMessage": "Trang Mod"
+  },
+  "settings.display.project-list-layouts.mode.grid": {
+    "defaultMessage": "Lưới"
+  },
+  "settings.display.project-list-layouts.mode.rows": {
+    "defaultMessage": "Hàng"
+  },
+  "settings.display.project-list-layouts.modpack": {
+    "defaultMessage": "Trang Modpack"
+  },
+  "settings.display.project-list-layouts.plugin": {
+    "defaultMessage": "Trang Plugin"
+  },
+  "settings.display.project-list-layouts.resourcepack": {
+    "defaultMessage": "Trang Gói tài nguyên"
+  },
+  "settings.display.project-list-layouts.server": {
+    "defaultMessage": "Trang Máy chủ"
+  },
+  "settings.display.project-list-layouts.shader": {
+    "defaultMessage": "Trang Shader"
+  },
+  "settings.display.project-list-layouts.title": {
+    "defaultMessage": "Bố cục danh sách dự án"
+  },
+  "settings.display.project-list-layouts.user": {
+    "defaultMessage": "Trang hồ sơ người dùng"
+  },
+  "settings.display.sidebar.advanced-rendering.description": {
+    "defaultMessage": "Bật các hiệu ứng hiển thị nâng cao như làm mờ, có thể gây vấn đề hiệu năng nếu không có tăng tốc phần cứng."
+  },
+  "settings.display.sidebar.advanced-rendering.title": {
+    "defaultMessage": "Hiển thị nâng cao"
+  },
+  "settings.display.sidebar.external-links-new-tab.description": {
+    "defaultMessage": "Mở các liên kết dẫn ra ngoài Modrinth trong tab mới. Bất kể cài đặt này, liên kết cùng tên miền và liên kết trong mô tả Markdown sẽ mở trong cùng tab, còn liên kết trong quảng cáo và trang chỉnh sửa sẽ mở trong tab mới."
+  },
+  "settings.display.sidebar.external-links-new-tab.title": {
+    "defaultMessage": "Mở liên kết bên ngoài trong tab mới"
+  },
+  "settings.display.sidebar.left-aligned-content-sidebar.description": {
+    "defaultMessage": "Căn thanh bên về phía trái nội dung trang."
+  },
+  "settings.display.sidebar.left-aligned-content-sidebar.title": {
+    "defaultMessage": "Thanh bên trái trên trang nội dung"
+  },
+  "settings.display.sidebar.right-aligned-filters-sidebar.description": {
+    "defaultMessage": "Căn thanh bộ lọc về phía phải kết quả tìm kiếm."
+  },
+  "settings.display.sidebar.right-aligned-filters-sidebar.title": {
+    "defaultMessage": "Thanh bộ lọc bên phải trên trang tìm kiếm"
+  },
   "settings.display.theme.dark": {
     "defaultMessage": "Tối"
+  },
+  "settings.display.theme.description": {
+    "defaultMessage": "Chọn giao diện màu bạn muốn dùng trên Modrinth."
   },
   "settings.display.theme.light": {
     "defaultMessage": "Sáng"
@@ -4289,6 +6119,15 @@
   "settings.display.theme.retro": {
     "defaultMessage": "Retro"
   },
+  "settings.display.theme.sync-across-devices": {
+    "defaultMessage": "Đồng bộ giao diện giữa các thiết bị"
+  },
+  "settings.display.theme.sync-across-devices.description": {
+    "defaultMessage": "Dùng giao diện này ở mọi nơi bạn đăng nhập. Tắt tùy chọn này để dùng giao diện riêng trên thiết bị này."
+  },
+  "settings.display.theme.sync-across-devices.sign-in-tooltip": {
+    "defaultMessage": "Đăng nhập vào Modrinth để đồng bộ giao diện"
+  },
   "settings.display.theme.system": {
     "defaultMessage": "Đồng bộ với hệ thống"
   },
@@ -4298,11 +6137,23 @@
   "settings.feature-flags.title": {
     "defaultMessage": "Tính năng phụ"
   },
+  "settings.form.group.optional": {
+    "defaultMessage": "(tùy chọn)"
+  },
   "settings.language.categories.default": {
     "defaultMessage": "Ngôn ngữ tiêu chuẩn"
   },
   "settings.language.categories.search-result": {
     "defaultMessage": "Kết quả tìm kiếm"
+  },
+  "settings.language.coverage.app-tooltip": {
+    "defaultMessage": "Khoảng {percentage}% Ứng dụng Modrinth đã có sẵn bằng ngôn ngữ này."
+  },
+  "settings.language.coverage.label": {
+    "defaultMessage": "Hỗ trợ {percentage}%"
+  },
+  "settings.language.coverage.website-tooltip": {
+    "defaultMessage": "Khoảng {percentage}% trang web đã có sẵn bằng ngôn ngữ này."
   },
   "settings.language.description": {
     "defaultMessage": "Chọn ngôn ngữ ưa thích của bạn cho {platform}. Các bản dịch được đóng góp bởi những tình nguyện viên trên <crowdin-link>Crowdin</crowdin-link>."
@@ -4331,8 +6182,257 @@
   "settings.pats.title": {
     "defaultMessage": "Khóa truy cập cá nhân"
   },
+  "settings.preferences.update-failed.description": {
+    "defaultMessage": "Không thể lưu cài đặt vào tài khoản Modrinth của bạn. Vui lòng thử lại."
+  },
+  "settings.preferences.update-failed.title": {
+    "defaultMessage": "Không thể đồng bộ cài đặt"
+  },
+  "settings.profile.bio.description": {
+    "defaultMessage": "Mô tả ngắn để mọi người biết thêm một chút về bạn."
+  },
+  "settings.profile.bio.title": {
+    "defaultMessage": "Giới thiệu"
+  },
+  "settings.profile.navigation-title": {
+    "defaultMessage": "Hồ sơ"
+  },
+  "settings.profile.profile-picture.title": {
+    "defaultMessage": "Ảnh hồ sơ"
+  },
+  "settings.profile.public-information.description": {
+    "defaultMessage": "Thông tin hồ sơ của bạn được công khai và có thể <profile-link>xem trên Modrinth</profile-link> cũng như qua <docs-link>Modrinth API</docs-link>."
+  },
+  "settings.profile.save-error": {
+    "defaultMessage": "Không thể cập nhật hồ sơ"
+  },
+  "settings.profile.save-error-description": {
+    "defaultMessage": "Đã xảy ra lỗi khi cập nhật hồ sơ. Vui lòng thử lại."
+  },
+  "settings.profile.sign-in-required.description": {
+    "defaultMessage": "Đăng nhập bằng tài khoản Modrinth để tùy chỉnh hồ sơ công khai."
+  },
+  "settings.profile.sign-in-required.title": {
+    "defaultMessage": "Yêu cầu tài khoản Modrinth"
+  },
+  "settings.profile.username.description": {
+    "defaultMessage": "Tên duy nhất, không phân biệt chữ hoa chữ thường, dùng để nhận diện hồ sơ của bạn."
+  },
   "settings.sessions.title": {
     "defaultMessage": "Phiên hoạt động"
+  },
+  "settings.social.blocked-users.column.actions": {
+    "defaultMessage": "Thao tác"
+  },
+  "settings.social.blocked-users.column.user": {
+    "defaultMessage": "Người dùng"
+  },
+  "settings.social.blocked-users.description": {
+    "defaultMessage": "Đây là những người dùng bạn đã chặn trên Modrinth. Họ không thể:"
+  },
+  "settings.social.blocked-users.empty": {
+    "defaultMessage": "Bạn chưa chặn ai."
+  },
+  "settings.social.blocked-users.load-error": {
+    "defaultMessage": "Không thể tải danh sách người dùng bị chặn."
+  },
+  "settings.social.blocked-users.loading": {
+    "defaultMessage": "Đang tải người dùng bị chặn…"
+  },
+  "settings.social.blocked-users.restriction.friend-requests": {
+    "defaultMessage": "Gửi lời mời kết bạn cho bạn"
+  },
+  "settings.social.blocked-users.restriction.hosting": {
+    "defaultMessage": "Mời bạn quản lý máy chủ Modrinth Hosting."
+  },
+  "settings.social.blocked-users.restriction.shared-instances": {
+    "defaultMessage": "Mời bạn vào các bản cài đặt được chia sẻ"
+  },
+  "settings.social.blocked-users.title": {
+    "defaultMessage": "Người dùng bị chặn"
+  },
+  "settings.social.blocked-users.unblock": {
+    "defaultMessage": "Bỏ chặn"
+  },
+  "settings.social.blocked-users.unblock-error": {
+    "defaultMessage": "Không thể bỏ chặn người dùng"
+  },
+  "settings.social.blocked-users.unblock-error-description": {
+    "defaultMessage": "Đã xảy ra lỗi khi bỏ chặn người dùng này. Vui lòng thử lại."
+  },
+  "settings.social.blocked-users.unblock-user": {
+    "defaultMessage": "Bỏ chặn {username}"
+  },
+  "settings.social.blocked-users.user-avatar": {
+    "defaultMessage": "Ảnh đại diện của {username}"
+  },
+  "settings.social.friend-requests.description": {
+    "defaultMessage": "Kiểm soát ai có thể gửi lời mời kết bạn cho bạn trên Modrinth."
+  },
+  "settings.social.friend-requests.title": {
+    "defaultMessage": "Lời mời kết bạn"
+  },
+  "settings.social.hosting-access.description": {
+    "defaultMessage": "Kiểm soát ai có thể mời bạn quản lý máy chủ Modrinth Hosting."
+  },
+  "settings.social.hosting-access.title": {
+    "defaultMessage": "Lời mời truy cập Hosting"
+  },
+  "settings.social.interaction-source.everyone": {
+    "defaultMessage": "Mọi người"
+  },
+  "settings.social.interaction-source.friends": {
+    "defaultMessage": "Bạn bè"
+  },
+  "settings.social.interaction-source.friends-of-friends": {
+    "defaultMessage": "Bạn của bạn bè"
+  },
+  "settings.social.interaction-source.loading": {
+    "defaultMessage": "Đang tải tùy chọn của bạn…"
+  },
+  "settings.social.interaction-source.no-one": {
+    "defaultMessage": "Không ai"
+  },
+  "settings.social.interaction-source.saving": {
+    "defaultMessage": "Đang lưu tùy chọn của bạn…"
+  },
+  "settings.social.interaction-source.unavailable": {
+    "defaultMessage": "Hiện không thể tải tùy chọn của bạn."
+  },
+  "settings.social.shared-instance-invites.description": {
+    "defaultMessage": "Kiểm soát ai có thể gửi lời mời vào bản cài đặt được chia sẻ."
+  },
+  "settings.social.shared-instance-invites.title": {
+    "defaultMessage": "Lời mời vào bản cài đặt được chia sẻ"
+  },
+  "settings.social.sign-in-required.description": {
+    "defaultMessage": "Với tài khoản Modrinth, bạn có thể kiểm soát ai được tương tác với mình và quản lý người dùng bị chặn"
+  },
+  "settings.social.sign-in-required.title": {
+    "defaultMessage": "Yêu cầu tài khoản Modrinth"
+  },
+  "settings.social.title": {
+    "defaultMessage": "Xã hội"
+  },
+  "sharing.invite-players-modal.add": {
+    "defaultMessage": "Thêm"
+  },
+  "sharing.invite-players-modal.added": {
+    "defaultMessage": "Đã thêm"
+  },
+  "sharing.invite-players-modal.already-invited": {
+    "defaultMessage": "Người dùng này đã được mời."
+  },
+  "sharing.invite-players-modal.apply-button": {
+    "defaultMessage": "Áp dụng"
+  },
+  "sharing.invite-players-modal.avatar-alt": {
+    "defaultMessage": "Ảnh đại diện của {username}"
+  },
+  "sharing.invite-players-modal.cancel": {
+    "defaultMessage": "Hủy"
+  },
+  "sharing.invite-players-modal.custom-expiry": {
+    "defaultMessage": "Tùy chỉnh..."
+  },
+  "sharing.invite-players-modal.custom-expiry-value": {
+    "defaultMessage": "Tùy chỉnh: {date}"
+  },
+  "sharing.invite-players-modal.edit-invite-link": {
+    "defaultMessage": "Chỉnh sửa liên kết mời."
+  },
+  "sharing.invite-players-modal.edit-invite-link-title": {
+    "defaultMessage": "Chỉnh sửa liên kết mời"
+  },
+  "sharing.invite-players-modal.expiry-in-one-day": {
+    "defaultMessage": "Sau 1 ngày"
+  },
+  "sharing.invite-players-modal.expiry-in-one-hour": {
+    "defaultMessage": "Sau 1 giờ"
+  },
+  "sharing.invite-players-modal.expiry-in-seven-days": {
+    "defaultMessage": "Sau 7 ngày"
+  },
+  "sharing.invite-players-modal.expiry-in-six-hours": {
+    "defaultMessage": "Sau 6 giờ"
+  },
+  "sharing.invite-players-modal.expiry-in-three-days": {
+    "defaultMessage": "Sau 3 ngày"
+  },
+  "sharing.invite-players-modal.expiry-in-twelve-hours": {
+    "defaultMessage": "Sau 12 giờ"
+  },
+  "sharing.invite-players-modal.expiry-label": {
+    "defaultMessage": "Ngày hết hạn"
+  },
+  "sharing.invite-players-modal.friends-heading": {
+    "defaultMessage": "Bạn bè của bạn - {count}"
+  },
+  "sharing.invite-players-modal.heading": {
+    "defaultMessage": "Mời người chơi"
+  },
+  "sharing.invite-players-modal.invite": {
+    "defaultMessage": "Mời"
+  },
+  "sharing.invite-players-modal.invite-expiry-description": {
+    "defaultMessage": "Liên kết mời sẽ hết hạn sau {duration}."
+  },
+  "sharing.invite-players-modal.invite-link-heading": {
+    "defaultMessage": "Hoặc dùng liên kết mời"
+  },
+  "sharing.invite-players-modal.link-copied-text": {
+    "defaultMessage": "Liên kết mời đã được sao chép vào bảng tạm."
+  },
+  "sharing.invite-players-modal.link-copied-title": {
+    "defaultMessage": "Đã sao chép liên kết"
+  },
+  "sharing.invite-players-modal.link-copy-failed-title": {
+    "defaultMessage": "Không thể sao chép liên kết"
+  },
+  "sharing.invite-players-modal.max-uses-label": {
+    "defaultMessage": "Số lượt dùng tối đa"
+  },
+  "sharing.invite-players-modal.no-friends": {
+    "defaultMessage": "Không tìm thấy bạn bè."
+  },
+  "sharing.invite-players-modal.no-search-results": {
+    "defaultMessage": "Không tìm thấy người dùng phù hợp."
+  },
+  "sharing.invite-players-modal.requested": {
+    "defaultMessage": "Đã gửi yêu cầu"
+  },
+  "sharing.invite-players-modal.requested-tooltip": {
+    "defaultMessage": "{username} cần chấp nhận lời mời kết bạn của bạn trước"
+  },
+  "sharing.invite-players-modal.save-button": {
+    "defaultMessage": "Lưu"
+  },
+  "sharing.invite-players-modal.search-placeholder": {
+    "defaultMessage": "Nhập tên người dùng Modrinth"
+  },
+  "sharing.invite-players-modal.searching": {
+    "defaultMessage": "Đang tìm kiếm..."
+  },
+  "sharing.invite-players-modal.update-invite-link-failed-title": {
+    "defaultMessage": "Không thể cập nhật liên kết mời"
+  },
+  "sharing.invite-players-toast.accept": {
+    "defaultMessage": "Chấp nhận"
+  },
+  "sharing.invite-players-toast.decline": {
+    "defaultMessage": "Từ chối"
+  },
+  "sharing.invite-players-toast.invited-you-to": {
+    "defaultMessage": "đã mời bạn vào"
+  },
+  "sharing.invite-players-toast.server-suffix": {
+    "defaultMessage": "máy chủ."
+  },
+  "skins.select": {
+    "defaultMessage": "Chọn skin"
+  },
+  "skins.select-named": {
+    "defaultMessage": "Chọn {name}"
   },
   "tag.category.128x": {
     "defaultMessage": "128x"
@@ -4862,11 +6962,125 @@
   "ui.confirm-leave-modal.title": {
     "defaultMessage": "Rời khỏi trang nhé?"
   },
+  "ui.pagination.go-to-page": {
+    "defaultMessage": "Đi tới trang"
+  },
+  "ui.pagination.next-page": {
+    "defaultMessage": "Trang tiếp theo"
+  },
+  "ui.pagination.previous-page": {
+    "defaultMessage": "Trang trước"
+  },
   "ui.stacked-admonitions.alert-count": {
     "defaultMessage": "{count, plural, other {# thông báo}}"
   },
   "ui.stacked-admonitions.dismiss-all": {
     "defaultMessage": "Tắt hết"
+  },
+  "unknown-file-warning-modal.dont-install": {
+    "defaultMessage": "Không cài đặt"
+  },
+  "unknown-file-warning-modal.dont-show-again": {
+    "defaultMessage": "Không hiển thị lại cảnh báo này"
+  },
+  "unknown-file-warning-modal.header": {
+    "defaultMessage": "Xác nhận cài đặt"
+  },
+  "unknown-file-warning-modal.install-anyway": {
+    "defaultMessage": "Vẫn cài đặt"
+  },
+  "unknown-file-warning-modal.malware-warning": {
+    "defaultMessage": "Phần mềm độc hại thường được phát tán qua các tệp mod bằng cách chia sẻ trên những nền tảng như Discord."
+  },
+  "unknown-file-warning-modal.mod-warning-body": {
+    "defaultMessage": " chưa được xuất bản trên Modrinth. Chúng tôi đặc biệt khuyên bạn chỉ cài đặt tệp từ những nguồn mà bạn tin tưởng."
+  },
+  "unknown-file-warning-modal.mod-warning-title": {
+    "defaultMessage": "Cảnh báo tệp không xác định"
+  },
+  "unknown-file-warning-modal.modpack-warning-body": {
+    "defaultMessage": " chứa các tệp chưa được xuất bản trên Modrinth. Chúng tôi đặc biệt khuyên bạn chỉ cài đặt tệp từ những nguồn mà bạn tin tưởng."
+  },
+  "unknown-file-warning-modal.modpack-warning-title": {
+    "defaultMessage": "Cảnh báo tệp không xác định"
+  },
+  "unknown-file-warning-modal.reviewed-files": {
+    "defaultMessage": "Các tệp chưa được xuất bản trên Modrinth sẽ không được kiểm duyệt."
+  },
+  "unknown-file-warning-modal.unrecognized-files": {
+    "defaultMessage": "Tệp không được nhận dạng"
+  },
+  "update-all-modal.changelog-for": {
+    "defaultMessage": "Nhật ký thay đổi của {project}"
+  },
+  "update-all-modal.changelog-loaded": {
+    "defaultMessage": "Đã tải nhật ký thay đổi."
+  },
+  "update-all-modal.close-changelog": {
+    "defaultMessage": "Đóng nhật ký thay đổi"
+  },
+  "update-all-modal.current-version": {
+    "defaultMessage": "Phiên bản hiện tại"
+  },
+  "update-all-modal.empty": {
+    "defaultMessage": "Không có bản cập nhật."
+  },
+  "update-all-modal.header": {
+    "defaultMessage": "Cập nhật dự án"
+  },
+  "update-all-modal.loading": {
+    "defaultMessage": "Đang tải bản cập nhật…"
+  },
+  "update-all-modal.loading-changelog": {
+    "defaultMessage": "Đang tải nhật ký thay đổi…"
+  },
+  "update-all-modal.new-version": {
+    "defaultMessage": "Phiên bản mới"
+  },
+  "update-all-modal.no-changelog": {
+    "defaultMessage": "Không có nhật ký thay đổi cho phiên bản này."
+  },
+  "update-all-modal.no-compatible-updates": {
+    "defaultMessage": "Không có bản cập nhật tương thích."
+  },
+  "update-all-modal.no-version": {
+    "defaultMessage": "Không có bản cập nhật tương thích"
+  },
+  "update-all-modal.project": {
+    "defaultMessage": "Dự án"
+  },
+  "update-all-modal.project-list": {
+    "defaultMessage": "Các bản cập nhật dự án"
+  },
+  "update-all-modal.results": {
+    "defaultMessage": "{count, plural, one {# dự án sẵn sàng cập nhật} other {# dự án sẵn sàng cập nhật}}"
+  },
+  "update-all-modal.select-all": {
+    "defaultMessage": "Chọn tất cả dự án"
+  },
+  "update-all-modal.select-project": {
+    "defaultMessage": "Chọn {project} để cập nhật"
+  },
+  "update-all-modal.select-version": {
+    "defaultMessage": "Phiên bản mới cho {project}"
+  },
+  "update-all-modal.update": {
+    "defaultMessage": "Cập nhật {count, plural, one {# dự án} other {# dự án}}"
+  },
+  "update-all-modal.versions": {
+    "defaultMessage": "Phiên bản hiện tại / Phiên bản mới"
+  },
+  "update-all-modal.view": {
+    "defaultMessage": "Xem"
+  },
+  "update-all-modal.view-changelog": {
+    "defaultMessage": "Xem nhật ký thay đổi của {project}"
+  },
+  "update-all-modal.warning": {
+    "defaultMessage": "Chúng tôi không thể đảm bảo các bản cập nhật an toàn cho thế giới của bạn. Hãy xem nhật ký thay đổi và cân nhắc tạo bản sao lưu."
+  },
+  "update-all-modal.warning-server": {
+    "defaultMessage": "Chúng tôi không thể đảm bảo các bản cập nhật an toàn cho máy chủ của bạn. Hãy xem nhật ký thay đổi và cân nhắc tạo bản sao lưu."
   },
   "user.profile.badge.alpha.about.1": {
     "defaultMessage": "Người dùng này đã có mặt từ thời khủng long, kết thúc vào tháng mười một năm 2020."
@@ -4963,5 +7177,102 @@
   },
   "user.profile.badge.staff.name": {
     "defaultMessage": "Đội ngũ Modrinth"
+  },
+  "user.role.moderator": {
+    "defaultMessage": "Kiểm duyệt viên nội dung"
+  },
+  "user.role.modrinth-team": {
+    "defaultMessage": "Đội ngũ Modrinth"
+  },
+  "version.content.name": {
+    "defaultMessage": "Tên"
+  },
+  "version.content.version": {
+    "defaultMessage": "Phiên bản"
+  },
+  "version.file-type.dev-jar": {
+    "defaultMessage": "Bản phát triển jar"
+  },
+  "version.file-type.javadoc-jar": {
+    "defaultMessage": "Javadocs jar"
+  },
+  "version.file-type.optional-resource-pack": {
+    "defaultMessage": "Gói tài nguyên tùy chọn"
+  },
+  "version.file-type.primary": {
+    "defaultMessage": "Chính"
+  },
+  "version.file-type.required-resource-pack": {
+    "defaultMessage": "Gói tài nguyên bắt buộc"
+  },
+  "version.file-type.signature": {
+    "defaultMessage": "Tệp chữ ký"
+  },
+  "version.file-type.sources-jar": {
+    "defaultMessage": "Mã nguồn jar"
+  },
+  "version.file-type.unknown": {
+    "defaultMessage": "Khác"
+  },
+  "version.section.changes": {
+    "defaultMessage": "Thay đổi"
+  },
+  "version.section.compatibility": {
+    "defaultMessage": "Tương thích"
+  },
+  "version.section.content": {
+    "defaultMessage": "Nội dung"
+  },
+  "version.section.content.search-placeholder": {
+    "defaultMessage": "Tìm nội dung..."
+  },
+  "version.section.dependencies.any-compatible-version": {
+    "defaultMessage": "Bất kỳ phiên bản tương thích nào"
+  },
+  "version.section.dependencies.any-version": {
+    "defaultMessage": "Bất kỳ phiên bản nào"
+  },
+  "version.section.dependencies.unavailable-version": {
+    "defaultMessage": "Phiên bản không khả dụng"
+  },
+  "version.section.dependencies.unavailable-version.description": {
+    "defaultMessage": "Phiên bản này có thể đã bị xóa hoặc đang được kiểm duyệt viên xét duyệt."
+  },
+  "version.section.dependencies.unavailable-version.description.required": {
+    "defaultMessage": "Phiên bản bắt buộc có thể đã bị xóa hoặc đang được kiểm duyệt viên xét duyệt."
+  },
+  "version.section.files": {
+    "defaultMessage": "Tệp"
+  },
+  "version.section.included-content": {
+    "defaultMessage": "Nội dung được bao gồm"
+  },
+  "version.section.known-incompatibilities": {
+    "defaultMessage": "Các điểm không tương thích đã biết"
+  },
+  "version.section.no-changes": {
+    "defaultMessage": "Không có nhật ký thay đổi."
+  },
+  "version.section.no-modpack-mod-loader": {
+    "defaultMessage": "Không có bộ nạp mod"
+  },
+  "version.section.optional-dependencies": {
+    "defaultMessage": "Phần phụ thuộc tùy chọn"
+  },
+  "version.section.required-content": {
+    "defaultMessage": "Nội dung bắt buộc"
+  },
+  "version.section.supplementary-resources": {
+    "defaultMessage": "Tài nguyên bổ sung"
+  },
+  "version.supplementary-resources.file": {
+    "defaultMessage": "Tệp"
+  },
+  "version.supplementary-resources.size": {
+    "defaultMessage": "Kích thước"
+  },
+  "version.supplementary-resources.type": {
+    "defaultMessage": "Loại"
   }
 }
+

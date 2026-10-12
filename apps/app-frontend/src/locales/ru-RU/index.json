@@ -302,6 +302,18 @@
   "app.content.sync-resource-packs-disabled": {
     "message": "Сначала включите синхронизацию наборов ресурсов."
   },
+  "app.debug-export.canceling": {
+    "message": "Отмена экспорта..."
+  },
+  "app.debug-export.exporting": {
+    "message": "Экспорт..."
+  },
+  "app.debug-export.finishing": {
+    "message": "Завершение..."
+  },
+  "app.debug-export.preparing": {
+    "message": "Подготовка файлов..."
+  },
   "app.download-manager.active": {
     "message": "Активные"
   },
@@ -423,13 +435,13 @@
     "message": "Страница игры"
   },
   "app.features-settings.quick-instances.description": {
-    "message": "Выберите максимальное количество недавних сборок, отображаемых в левой боковой панели. Вы также можете изменить это, перетаскивая разделитель."
+    "message": "Выберите максимальное количество недавних экземпляров, отображаемых в левой части панели. Вы также можете изменить это, перетаскивая разделитель."
   },
   "app.features-settings.quick-instances.title": {
     "message": "Количество сборок в боковой панели"
   },
   "app.features-settings.show-all-screenshots.description": {
-    "message": "Показать кнопку на левой боковой панели для просмотра скриншотов всех ваших сборок."
+    "message": "Покажите кнопку на левой части панели для просмотра скриншотов всех ваших экземпляров."
   },
   "app.features-settings.show-all-screenshots.title": {
     "message": "Показать все скриншоты в боковой панели"
@@ -447,10 +459,10 @@
     "message": "Показывать вкладку Скриншоты в сборках"
   },
   "app.features-settings.show-skin-selector.description": {
-    "message": "Показать кнопку на левой боковой панели, чтобы открыть настройки скина."
+    "message": "Показать кнопку на левой Боковой панели, чтобы открыть настройки персонажа."
   },
   "app.features-settings.show-skin-selector.title": {
-    "message": "Выбор скина в боковой панели"
+    "message": "Выбор персонажа в боковой панели"
   },
   "app.features-settings.show-worlds-tab.title": {
     "message": "Показывать вкладку Миры в сборках"
@@ -2770,6 +2782,15 @@
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "Каталог приложения"
+  },
+  "app.settings.resource-management.debug-info.description": {
+    "message": "Экспортировать журналы приложения и диагностические данные в ZIP файл, чтобы поделиться ими с поддержкой Modrinth."
+  },
+  "app.settings.resource-management.debug-info.export": {
+    "message": "Экспорт отладочной информации"
+  },
+  "app.settings.resource-management.debug-info.title": {
+    "message": "Информация отладки"
   },
   "app.settings.resource-management.maximum-concurrent-downloads.description": {
     "message": "Количество одновременно скачиваемых файлов. Уменьшите, если скачивание работает нестабильно. Требуется перезапуск."

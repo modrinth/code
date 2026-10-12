@@ -416,6 +416,9 @@
   "app.features-settings.quick-instances.description": {
     "message": "Vyberte maximální počet nedávných instancí v levém postranním panelu. Můžete také upravit přetažením oddělovače."
   },
+  "app.features-settings.show-screenshots-tab.title": {
+    "message": "Zobrazit kartu Screenshoty v instancích"
+  },
   "app.home.jump-back-in.actions.label": {
     "message": "Akce instance"
   },
@@ -1388,6 +1391,9 @@
   "app.screenshots.error-heading": {
     "message": "Snímky obrazovky se nepodařilo načíst"
   },
+  "app.screenshots.go-to-instance": {
+    "message": "Přidat do instance"
+  },
   "app.screenshots.group-by": {
     "message": "Seskupit podle"
   },
@@ -1405,6 +1411,9 @@
   },
   "app.screenshots.group.delete": {
     "message": "Odstranit skupinu"
+  },
+  "app.screenshots.group.delete-description": {
+    "message": "Screenshoty v této skupině nebudou seskupeny."
   },
   "app.screenshots.group.edit": {
     "message": "Upravit název skupiny"
@@ -1462,6 +1471,9 @@
   },
   "app.screenshots.selection.aria-label": {
     "message": "Vybrané snímky obrazovky"
+  },
+  "app.screenshots.selection.delete-description": {
+    "message": "Smazat {count, plural, one {# screenshot} few {# screenshotů} many {# screenshotů} other {# screenshotů}}? Tuto akci nelze vrátit zpět."
   },
   "app.screenshots.selection.delete-success": {
     "message": "{count, plural, one {# snímek obrazovky smazán} few {# snímky obrazovky smazány} other {# snímků obrazovky smazáno}}"
@@ -1540,6 +1552,12 @@
   },
   "app.settings.default-instance-options.java-arguments.title": {
     "message": "Argumenty Javy"
+  },
+  "app.settings.default-instance-options.launch-hooks.title": {
+    "message": "Spustit háčky"
+  },
+  "app.settings.default-instance-options.memory-allocation.description": {
+    "message": "Maximální dostupná paměť pro každou instanci."
   },
   "app.settings.default-instance-options.pre-launch-hook.description": {
     "message": "Spustí se před spuštěním instance."
