@@ -94,6 +94,7 @@ pub enum ThreadIssueTarget {
     },
     AddGalleryImages {
         original_image_ids: Vec<GalleryImageId>,
+        auto_resolve: bool,
     },
     ModifyGalleryImage {
         image_id: GalleryImageId,
@@ -386,11 +387,18 @@ impl ThreadIssueTarget {
                     ThreadIssueValueState::DifferentToOriginal
                 }
             }
-            Self::AddGalleryImages { original_image_ids } => {
+            Self::AddGalleryImages {
+                original_image_ids,
+                auto_resolve,
+            } => {
                 if project.gallery.iter().any(|image| {
                     image.id.is_some_and(|id| !original_image_ids.contains(&id))
                 }) {
-                    ThreadIssueValueState::DifferentToOriginal
+                    if *auto_resolve {
+                        ThreadIssueValueState::SameAsSuggested
+                    } else {
+                        ThreadIssueValueState::DifferentToOriginal
+                    }
                 } else {
                     ThreadIssueValueState::SameAsOriginal
                 }
@@ -1137,6 +1145,7 @@ mod tests {
     fn gallery_addition_and_metadata_value_states() {
         let mut project = project();
         let add = ThreadIssueTarget::AddGalleryImages {
+            auto_resolve: false,
             original_image_ids: project
                 .gallery
                 .iter()
@@ -1188,6 +1197,7 @@ mod tests {
     fn gallery_addition_is_independent_of_removal() {
         let mut project = project();
         let add = ThreadIssueTarget::AddGalleryImages {
+            auto_resolve: false,
             original_image_ids: project
                 .gallery
                 .iter()
