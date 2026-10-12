@@ -4475,11 +4475,29 @@
   "minecraft-account.add-account": {
     "message": "Add account"
   },
+  "minecraft-account.add-offline-account": {
+    "message": "Add offline account"
+  },
+  "minecraft-account.cancel": {
+    "message": "Cancel"
+  },
+  "minecraft-account.create-offline-account": {
+    "message": "Create offline account"
+  },
   "minecraft-account.label": {
     "message": "Minecraft account"
   },
   "minecraft-account.not-signed-in": {
     "message": "Not signed in"
+  },
+  "minecraft-account.offline-account": {
+    "message": "Offline"
+  },
+  "minecraft-account.offline-username": {
+    "message": "Username"
+  },
+  "minecraft-account.offline-username-placeholder": {
+    "message": "Enter a Minecraft username"
   },
   "minecraft-account.remove-account": {
     "message": "Remove account"

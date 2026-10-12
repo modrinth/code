@@ -33,6 +33,10 @@ export async function login() {
 	return await invoke('plugin:auth|login')
 }
 
+export async function create_offline_user(username) {
+	return await invoke('plugin:auth|create_offline_user', { username })
+}
+
 /**
  * Retrieves the default user
  * @return {Promise<UUID | undefined>}

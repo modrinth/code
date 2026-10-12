@@ -197,6 +197,70 @@ pub async fn login_finish(
     Ok(credentials)
 }
 
+pub async fn create_offline_user(
+    username: &str,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
+) -> crate::Result<Credentials> {
+    if !is_valid_offline_username(username) {
+        return Err(crate::ErrorKind::OtherError(
+            "Minecraft usernames must be 1-16 ASCII letters, numbers, or underscores".into(),
+        )
+        .as_error());
+    }
+
+    let profile = MinecraftProfile {
+        id: offline_uuid(username),
+        name: username.to_owned(),
+        ..MinecraftProfile::default()
+    };
+    let credentials = Credentials {
+        offline_profile: profile,
+        access_token: String::new(),
+        refresh_token: String::new(),
+        expires: Utc::now(),
+        active: true,
+    };
+    credentials.upsert(exec).await?;
+
+    Ok(credentials)
+}
+
+fn is_valid_offline_username(username: &str) -> bool {
+    (1..=16).contains(&username.len())
+        && username
+            .bytes()
+            .all(|byte| byte.is_ascii_alphanumeric() || byte == b'_')
+}
+
+fn offline_uuid(username: &str) -> Uuid {
+    Uuid::new_v3(
+        &Uuid::NAMESPACE_DNS,
+        format!("OfflinePlayer:{username}").as_bytes(),
+    )
+}
+
+#[cfg(test)]
+mod offline_user_tests {
+    use super::{is_valid_offline_username, offline_uuid};
+
+    #[test]
+    fn creates_standard_minecraft_offline_uuid() {
+        assert_eq!(
+            offline_uuid("Notch").to_string(),
+            "b50ad385-829d-3141-a216-7e7d7539ba7f"
+        );
+    }
+
+    #[test]
+    fn validates_minecraft_username_limits() {
+        assert!(is_valid_offline_username("Player_1"));
+        assert!(!is_valid_offline_username(""));
+        assert!(!is_valid_offline_username("ThisUsernameIsTooLong"));
+        assert!(!is_valid_offline_username("Player One"));
+        assert!(!is_valid_offline_username("玩家"));
+    }
+}
+
 #[derive(Deserialize, Debug)]
 pub struct Credentials {
     /// The offline profile of the user these credentials are for.
@@ -265,12 +329,20 @@ impl OnlineProfileCacheIntent {
 }
 
 impl Credentials {
+    pub fn is_offline(&self) -> bool {
+        self.access_token.is_empty() && self.refresh_token.is_empty()
+    }
+
     /// Refreshes the authentication tokens for this user if they are expired, or
     /// very close to expiration.
     async fn refresh(
         &mut self,
         exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
     ) -> crate::Result<()> {
+        if self.is_offline() {
+            return Ok(());
+        }
+
         // Use a margin of 5 minutes to give e.g. Minecraft and potentially
         // other operations that depend on a fresh token 5 minutes to complete
         // from now, and deal with some classes of clock skew
@@ -351,6 +423,10 @@ impl Credentials {
         &self,
         cache_intent: OnlineProfileCacheIntent,
     ) -> Option<Arc<MinecraftProfile>> {
+        if self.is_offline() {
+            return None;
+        }
+
         let max_age = cache_intent.max_age();
         let stale_profile = {
             let mut profile_cache = PROFILE_CACHE.lock().await;
