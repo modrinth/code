@@ -57,20 +57,20 @@
 			</dd>
 			<dt class="font-medium">{{ formatMessage(messages.created) }}</dt>
 			<dd class="m-0">
-				<time :datetime="project.published" :title="project.published">{{
+				<time v-tooltip="formatDateTime(project.published)" :datetime="project.published">{{
 					relativeTime(project.published)
 				}}</time>
 			</dd>
 			<dt class="font-medium">{{ formatMessage(messages.updated) }}</dt>
 			<dd class="m-0">
-				<time :datetime="project.updated" :title="project.updated">{{
+				<time v-tooltip="formatDateTime(project.updated)" :datetime="project.updated">{{
 					relativeTime(project.updated)
 				}}</time>
 			</dd>
 			<template v-if="project.queued">
 				<dt class="font-medium">{{ formatMessage(messages.submitted) }}</dt>
 				<dd class="m-0 flex flex-wrap items-center gap-x-1.5">
-					<time :datetime="project.queued" :title="project.queued">{{
+					<time v-tooltip="formatDateTime(project.queued)" :datetime="project.queued">{{
 						relativeTime(project.queued)
 					}}</time>
 					<template v-if="submissionCount">
@@ -142,6 +142,7 @@ import {
 	getProjectTypeTitleMessage,
 	ProjectStatusBadge,
 	Tooltip,
+	useFormatDateTime,
 	useFormatNumber,
 	useRelativeTime,
 	useVIntl,
@@ -199,5 +200,6 @@ const projectTypes = computed(() => {
 })
 const { formatMessage } = useVIntl()
 const relativeTime = useRelativeTime({ style: 'narrow' })
+const formatDateTime = useFormatDateTime({ dateStyle: 'long', timeStyle: 'short' })
 const formatNumber = useFormatNumber()
 </script>
