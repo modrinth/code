@@ -66,20 +66,43 @@ export const curseforgeMessages = defineMessages({
 	},
 })
 
-export function isCurseForgeModpackUrl(value: string): boolean {
+/**
+ * Normalizes any CurseForge modpack page link to its project or file link, dropping extra path
+ * segments, queries, and fragments, such as those of the files list.
+ *
+ * @returns The canonical link, or `null` when the value isn't a CurseForge modpack link.
+ */
+export function normalizeCurseForgeModpackUrl(value: string): string | null {
+	const trimmed = value.trim()
+	let url: URL
 	try {
-		const url = new URL(value.trim())
-		return (
-			url.protocol === 'https:' &&
-			(url.hostname === 'curseforge.com' || url.hostname === 'www.curseforge.com') &&
-			!url.username &&
-			!url.password &&
-			!url.port &&
-			/^\/(?:minecraft\/)?modpacks\/[^/]+(?:\/files\/\d+)?\/?$/.test(url.pathname)
-		)
+		url = new URL(/^[a-z][a-z\d+.-]*:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`)
 	} catch {
-		return false
+		return null
 	}
+	if (
+		(url.protocol !== 'https:' && url.protocol !== 'http:') ||
+		(url.hostname !== 'curseforge.com' && url.hostname !== 'www.curseforge.com') ||
+		url.username ||
+		url.password ||
+		url.port
+	) {
+		return null
+	}
+
+	const segments = url.pathname.split('/').filter(Boolean)
+	if (segments[0] === 'minecraft') segments.shift()
+	const [section, slug, kind, fileId] = segments
+	if (section !== 'modpacks' || !slug || !/^[\w-]+$/.test(slug)) return null
+
+	const projectUrl = `https://www.curseforge.com/minecraft/modpacks/${slug}`
+	return (kind === 'files' || kind === 'download') && fileId && /^\d+$/.test(fileId)
+		? `${projectUrl}/files/${fileId}`
+		: projectUrl
+}
+
+export function isCurseForgeModpackUrl(value: string): boolean {
+	return normalizeCurseForgeModpackUrl(value) !== null
 }
 
 /**
@@ -105,14 +128,15 @@ export async function installCurseForgeModpack(
 	const { auth } = options
 	const modpackFile = ctx.curseforgeModpackFile.value
 	const serverPackFile = ctx.curseforgeServerPackFile.value
-	const link = ctx.curseforgeUrl.value.trim()
-	if (!modpackFile && !isCurseForgeModpackUrl(link)) {
+	const link = modpackFile ? null : normalizeCurseForgeModpackUrl(ctx.curseforgeUrl.value)
+	let filename: string
+	if (modpackFile) {
+		filename = modpackFile.name
+	} else if (link) {
+		filename = (await flameanvil.queryLink(worldId, { link }, { auth })).file.file_name
+	} else {
 		throw new Error('A CurseForge modpack link or file is required')
 	}
-
-	const filename = modpackFile
-		? modpackFile.name
-		: (await flameanvil.queryLink(worldId, { link }, { auth })).file.file_name
 
 	const { session: staleSession } = await flameanvil.getSession(worldId, { auth })
 	if (staleSession) {
@@ -145,7 +169,7 @@ export async function installCurseForgeModpack(
 			worldId,
 			uploadId,
 			{
-				link: modpackFile ? null : link,
+				link,
 				soft_override: options.softOverride,
 				properties: ctx.buildProperties(),
 			},
