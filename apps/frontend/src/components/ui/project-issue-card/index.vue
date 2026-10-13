@@ -246,7 +246,7 @@ import {
 } from '@modrinth/ui'
 import { isStaff } from '@modrinth/utils'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
-import { computed, reactive } from 'vue'
+import { computed, reactive, watch } from 'vue'
 
 import type { ProjectIssueFieldAction } from '~/composables/project-issue-field-action'
 import { isThreadIssueFacetReadyToAddress, isThreadIssueVerified } from '~/helpers/thread-issues'
@@ -586,6 +586,20 @@ const matchingIssues = computed(() =>
 					issue.facets.some(({ what }) => matchesTarget(what))),
 		)
 		.sort((a, b) => issuePriority(a) - issuePriority(b)),
+)
+
+watch(
+	() => matchingIssues.value.map((issue) => [issue.id, isComplete(issue)] as const),
+	(issues, previousIssues) => {
+		if (props.threadHistory) return
+		const previousStates = new Map(previousIssues)
+		for (const [id, complete] of issues) {
+			if (previousStates.get(id) !== complete) {
+				expandedAddressed.delete(id)
+				finishedExpanding.delete(id)
+			}
+		}
+	},
 )
 
 function issueDetails(issue: ThreadIssue): Record<string, unknown> {
