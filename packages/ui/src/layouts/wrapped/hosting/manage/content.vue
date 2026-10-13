@@ -398,7 +398,10 @@ function getEnabledForWarning(
 	if (!addon.disabled_player && isIncompatibleEnvironment(addon, 'player')) {
 		return { kind: 'server-only', tooltip: formatMessage(messages.serverOnlyEnabledForPlayers) }
 	}
-	if (!hasDetectedEnvironment(addon))
+	const sidesUnknown = addon.from_modpack
+		? addon.needs_side_type_review
+		: !hasDetectedEnvironment(addon)
+	if (sidesUnknown)
 		return { kind: 'unknown-environment', tooltip: formatMessage(messages.unknownEnvironment) }
 	return null
 }
