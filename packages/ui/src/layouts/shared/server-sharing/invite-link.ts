@@ -1,11 +1,13 @@
 import type { AbstractModrinthClient } from '@modrinth/api-client'
 
 const INVITE_MAX_AGE = 7 * 24 * 60 * 60
+const DEFAULT_INVITE_MAX_USES = 10
 
 export async function ensureServerInviteLink(
 	client: AbstractModrinthClient,
 	instanceId: string,
 	remainingSlots?: number,
+	options: { maximizeUses?: boolean } = {},
 ): Promise<string> {
 	const links = await client.sharedinstances.invites_v1.list(instanceId)
 	const active = links.find(
@@ -22,7 +24,9 @@ export async function ensureServerInviteLink(
 
 	const invite = await client.sharedinstances.invites_v1.create(instanceId, {
 		max_age: INVITE_MAX_AGE,
-		max_uses: Math.min(10, availableSlots),
+		max_uses: options.maximizeUses
+			? availableSlots
+			: Math.min(DEFAULT_INVITE_MAX_USES, availableSlots),
 	})
 	return invite.id
 }

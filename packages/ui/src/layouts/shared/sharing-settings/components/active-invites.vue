@@ -80,12 +80,9 @@ const columns = computed<TableColumn<'id' | 'uses' | 'expiration' | 'actions'>[]
 
 <template>
 	<section class="flex flex-col gap-4">
-		<div class="flex flex-col gap-1">
-			<h3 class="m-0 text-lg font-semibold text-contrast">
-				{{ formatMessage(messages.activeInvitesTitle) }}
-			</h3>
-			<p class="m-0 text-secondary">{{ formatMessage(messages.activeInvitesDescription) }}</p>
-		</div>
+		<h3 class="m-0 text-lg font-semibold text-contrast">
+			{{ formatMessage(messages.activeInvitesTitle) }}
+		</h3>
 		<Admonition
 			v-if="ctx.error.value"
 			type="critical"
@@ -136,5 +133,8 @@ const columns = computed<TableColumn<'id' | 'uses' | 'expiration' | 'actions'>[]
 				</div>
 			</template>
 		</Table>
+		<p class="m-0 -mt-2 text-sm text-secondary">
+			{{ formatMessage(messages.activeInvitesDescription) }}
+		</p>
 	</section>
 </template>
