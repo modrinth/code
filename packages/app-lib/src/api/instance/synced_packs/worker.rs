@@ -13,12 +13,12 @@ use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::Duration;
 use tokio::sync::{MutexGuard, oneshot};
 use tokio::time::Instant;
-use tracing_error::InstrumentError;
 
 #[derive(Default)]
 struct Queue {
     instances: BTreeSet<String>,
-    waiters: BTreeMap<String, Vec<oneshot::Sender<crate::Result<()>>>>,
+    waiters:
+        BTreeMap<String, Vec<oneshot::Sender<Result<(), Arc<crate::Error>>>>>,
     retry_at: BTreeMap<String, Instant>,
     all: bool,
     running: bool,
@@ -49,7 +49,7 @@ pub(super) fn queue_all() {
     }
 }
 
-pub(crate) async fn flush(instance_id: &str) -> crate::Result<()> {
+pub(crate) async fn flush(instance_id: &str) -> Result<(), Arc<crate::Error>> {
     let state = State::get().await?;
     let (sender, receiver) = oneshot::channel();
     {
@@ -57,11 +57,13 @@ pub(crate) async fn flush(instance_id: &str) -> crate::Result<()> {
         if let Some(retry_at) = queue.retry_at.get(instance_id) {
             let remaining = retry_at.saturating_duration_since(Instant::now());
             if !remaining.is_zero() {
-                return Err(crate::ErrorKind::Ratelimited {
-                    retry_in_seconds: remaining.as_secs()
-                        + u64::from(remaining.subsec_nanos() != 0),
-                }
-                .into());
+                return Err(Arc::new(
+                    crate::ErrorKind::Ratelimited {
+                        retry_in_seconds: remaining.as_secs()
+                            + u64::from(remaining.subsec_nanos() != 0),
+                    }
+                    .as_error(),
+                ));
             }
         }
         queue.instances.insert(instance_id.to_owned());
@@ -77,6 +79,7 @@ pub(crate) async fn flush(instance_id: &str) -> crate::Result<()> {
             "Pack sync worker stopped before completing the request."
                 .to_owned(),
         )
+        .as_error()
     })?
 }
 
@@ -133,7 +136,9 @@ fn start(state: Arc<State>) {
                 (instance_id, pending)
             };
             let result =
-                super::reconciliation::run_queued(&instance_id, &state).await;
+                super::reconciliation::run_queued(&instance_id, &state)
+                    .await
+                    .map_err(Arc::new);
             if let Err(error) = &result {
                 match error.raw.as_ref() {
                     crate::ErrorKind::PackSyncChanged => {
@@ -182,12 +187,7 @@ fn start(state: Arc<State>) {
                 }
             }
             for sender in pending {
-                let result =
-                    result.as_ref().map(|_| ()).map_err(|error| crate::Error {
-                        raw: error.raw.clone(),
-                        source: error.raw.clone().in_current_span(),
-                    });
-                let _ = sender.send(result);
+                let _ = sender.send(result.clone());
             }
         }
     });
