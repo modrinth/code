@@ -401,6 +401,8 @@ export namespace Archon {
 				modloader: string | null
 				modloader_version: string | null
 				game_version: string | null
+				/** The least stable channel addon updates are offered from. */
+				update_channel: Archon.Servers.v1.ReleaseChannel
 				modpack: ModpackFields | null
 				installing?: 'loader' | 'modpack'
 				error?: {
@@ -895,9 +897,19 @@ export namespace Archon {
 						status: 'unassigned'
 				  }
 
+			export type ReleaseChannel = 'release' | 'beta' | 'alpha'
+
+			export type PatchWorld = {
+				name?: string
+				icon_data?: string
+				update_channel?: ReleaseChannel
+			}
+
 			export type WorldFull = {
 				id: string
 				name: string
+				/** The least stable channel addon updates and dependencies are selected from. */
+				update_channel: ReleaseChannel
 				created_at: string
 				is_active: boolean
 				download_method: WorldDownloadMethod

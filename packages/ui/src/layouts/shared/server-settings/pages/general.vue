@@ -63,6 +63,22 @@
 					/>
 				</div>
 
+				<div class="flex flex-col gap-2.5">
+					<span class="text-lg font-semibold text-contrast">
+						{{ formatMessage(messages.updateChannel) }}
+					</span>
+					<Chips
+						v-model="updateChannel"
+						:items="updateChannelOptions"
+						:format-label="formatUpdateChannelLabel"
+						:capitalize="false"
+						:disabled-items="canSetup ? [] : updateChannelOptions"
+						:disabled-tooltip="permissionDeniedMessage"
+						:aria-label="formatMessage(messages.selectUpdateChannelAriaLabel)"
+					/>
+					<span>{{ formatUpdateChannelDescription(updateChannel) }}</span>
+				</div>
+
 				<!-- preferences -->
 				<div
 					v-for="(prefConfig, key) in preferences"
@@ -130,11 +146,12 @@
 </template>
 
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
+import type { Archon, Labrinth } from '@modrinth/api-client'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
 
 import { CopyCode, Input, Toggle } from '#ui/components'
+import Chips from '#ui/components/base/Chips.vue'
 import EditServerIcon from '#ui/components/servers/edit-server-icon/EditServerIcon.vue'
 import SaveBanner from '#ui/components/servers/SaveBanner.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
@@ -150,7 +167,7 @@ import {
 
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
-const { server: data, serverId, busyReasons } = injectModrinthServerContext()
+const { server: data, serverId, worldId, serverFull, busyReasons } = injectModrinthServerContext()
 const { isApp } = injectServerSettings()
 const { featureFlags } = injectPageContext()
 const queryClient = useQueryClient()
@@ -174,12 +191,80 @@ const isValidCharsSubdomain = computed(
 )
 const isValidSubdomain = computed(() => isValidLengthSubdomain.value && isValidCharsSubdomain.value)
 
+type UpdateChannel = Archon.Servers.v1.ReleaseChannel
+const updateChannelOptions: UpdateChannel[] = ['release', 'beta', 'alpha']
+
+const worldUpdateChannel = computed<UpdateChannel>(
+	() =>
+		serverFull.value?.worlds.find((world) => world.id === worldId.value)?.update_channel ??
+		'release',
+)
+const updateChannel = ref<UpdateChannel>(worldUpdateChannel.value)
+
+watch(worldUpdateChannel, (channel) => {
+	updateChannel.value = channel
+})
+
+function formatUpdateChannelLabel(channel: UpdateChannel) {
+	switch (channel) {
+		case 'release':
+			return formatMessage(messages.updateChannelRelease)
+		case 'beta':
+			return formatMessage(messages.updateChannelBeta)
+		case 'alpha':
+			return formatMessage(messages.updateChannelAlpha)
+	}
+}
+
+function formatUpdateChannelDescription(channel: UpdateChannel) {
+	switch (channel) {
+		case 'release':
+			return formatMessage(messages.updateChannelReleaseDescription)
+		case 'beta':
+			return formatMessage(messages.updateChannelBetaDescription)
+		case 'alpha':
+			return formatMessage(messages.updateChannelAlphaDescription)
+	}
+}
+
 const isUpdating = ref(false)
 const isValidServerName = computed(() => (serverName.value?.length ?? 0) > 0)
 
 // Preferences
 const { formatMessage } = useVIntl()
 const messages = defineMessages({
+	updateChannel: {
+		id: 'hosting.settings.update-channel',
+		defaultMessage: 'Update channel',
+	},
+	updateChannelRelease: {
+		id: 'hosting.settings.update-channel.release',
+		defaultMessage: 'Release',
+	},
+	updateChannelBeta: {
+		id: 'hosting.settings.update-channel.beta',
+		defaultMessage: 'Beta',
+	},
+	updateChannelAlpha: {
+		id: 'hosting.settings.update-channel.alpha',
+		defaultMessage: 'Alpha',
+	},
+	updateChannelReleaseDescription: {
+		id: 'hosting.settings.update-channel.release.description',
+		defaultMessage: 'Only release versions will be shown as available updates.',
+	},
+	updateChannelBetaDescription: {
+		id: 'hosting.settings.update-channel.beta.description',
+		defaultMessage: 'Release and beta versions will be shown as available updates.',
+	},
+	updateChannelAlphaDescription: {
+		id: 'hosting.settings.update-channel.alpha.description',
+		defaultMessage: 'Release, beta, and alpha versions will be shown as available updates.',
+	},
+	selectUpdateChannelAriaLabel: {
+		id: 'hosting.settings.update-channel.select',
+		defaultMessage: 'Select update channel',
+	},
 	environmentChangesTitle: {
 		id: 'hosting.settings.warn-environment-changes.title',
 		defaultMessage: 'Warn about incompatible or required content',
@@ -345,13 +430,18 @@ const hasServerSettingsChanges = computed(
 const hasPreferenceChanges = computed(() =>
 	preferenceKeys.some((key) => newUserPreferences.value[key] !== userPreferences.value[key]),
 )
+const hasUpdateChannelChanges = computed(
+	() => updateChannel.value !== worldUpdateChannel.value,
+)
 const hasUnsavedChanges = computed(
-	() => hasServerSettingsChanges.value || hasPreferenceChanges.value,
+	() =>
+		hasServerSettingsChanges.value || hasPreferenceChanges.value || hasUpdateChannelChanges.value,
 )
 
 const saveGeneral = async () => {
 	if (!isValidServerName.value || !isValidSubdomain.value) return
 	if (hasServerSettingsChanges.value && !canUseAdvancedSettings.value) return
+	if (hasUpdateChannelChanges.value && !canSetup.value) return
 
 	try {
 		isUpdating.value = true
@@ -386,6 +476,16 @@ const saveGeneral = async () => {
 			}
 		}
 
+		if (hasUpdateChannelChanges.value && worldId.value) {
+			await client.archon.servers_v1.patchWorld(serverId, worldId.value, {
+				update_channel: updateChannel.value,
+			})
+			await Promise.all([
+				queryClient.invalidateQueries({ queryKey: ['servers', 'v1', 'detail', serverId] }),
+				queryClient.invalidateQueries({ queryKey: ['content', 'list', 'v1', serverId] }),
+			])
+		}
+
 		// Save preferences to localStorage
 		for (const key of preferenceKeys) userPreferences.value[key] = newUserPreferences.value[key]
 
@@ -413,5 +513,6 @@ const resetGeneral = () => {
 	serverName.value = data.value?.name || ''
 	serverSubdomain.value = data.value?.net?.domain ?? ''
 	newUserPreferences.value = { ...userPreferences.value }
+	updateChannel.value = worldUpdateChannel.value
 }
 </script>
