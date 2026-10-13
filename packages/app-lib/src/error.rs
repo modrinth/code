@@ -1,11 +1,8 @@
 //! Theseus error type
-use std::sync::Arc;
-
 use crate::util;
 use data_url::DataUrlError;
 use derive_more::Display;
 use serde::{Deserialize, Serialize};
-use tracing_error::InstrumentError;
 
 #[derive(Serialize, Deserialize, Debug, Display)]
 #[display("{description}")]
@@ -48,9 +45,6 @@ impl std::fmt::Display for SharedInstanceUnavailableReason {
 pub enum ErrorKind {
     #[error("Pack sync inputs changed during preparation")]
     PackSyncChanged,
-
-    #[error("{0:?}")]
-    Any(anyhow::Error),
 
     #[error("Filesystem error: {0}")]
     FSError(String),
@@ -247,55 +241,7 @@ fn format_seconds(seconds: u64) -> String {
     )
 }
 
-#[derive(Debug)]
-pub struct Error {
-    pub raw: Arc<ErrorKind>,
-    pub source: tracing_error::TracedError<Arc<ErrorKind>>,
-}
-
-impl std::error::Error for Error {
-    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
-        self.source.source()
-    }
-}
-
-impl std::fmt::Display for Error {
-    fn fmt(&self, fmt: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(fmt, "{}", self.source)
-    }
-}
-
-impl Clone for Error {
-    fn clone(&self) -> Self {
-        Self {
-            raw: Arc::clone(&self.raw),
-            source: Arc::clone(&self.raw).in_current_span(),
-        }
-    }
-}
-
-impl<E: Into<ErrorKind>> From<E> for Error {
-    fn from(source: E) -> Self {
-        let error = Into::<ErrorKind>::into(source);
-        let boxed_error = Arc::new(error);
-
-        Self {
-            raw: boxed_error.clone(),
-            source: boxed_error.in_current_span(),
-        }
-    }
-}
-
-impl From<anyhow::Error> for Error {
-    fn from(value: anyhow::Error) -> Self {
-        let error = Arc::new(ErrorKind::Any(value));
-
-        Self {
-            raw: error.clone(),
-            source: error.in_current_span(),
-        }
-    }
-}
+pub type Error = anyhow::Error;
 
 impl ErrorKind {
     pub fn as_error(self) -> Error {

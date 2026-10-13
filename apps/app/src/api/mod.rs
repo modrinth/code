@@ -54,11 +54,7 @@ impl Serialize for CommandError {
     {
         tracing::warn!("{:?}", self.0);
 
-        let kind = self
-            .0
-            .downcast_ref::<theseus::Error>()
-            .map(|error| error.raw.as_ref());
-        let (code, reason) = match kind {
+        let (code, reason) = match self.0.downcast_ref::<ErrorKind>() {
             Some(ErrorKind::SharedInstanceUnavailable(reason)) => {
                 (Some("shared_instance_unavailable"), Some(reason))
             }

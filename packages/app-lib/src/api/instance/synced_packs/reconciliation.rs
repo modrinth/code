@@ -836,9 +836,11 @@ async fn apply_instance_inner(
                 Ok(prepared) => prepared,
                 Err(error)
                     if matches!(
-                        error.raw.as_ref(),
-                        crate::ErrorKind::PackSyncChanged
-                            | crate::ErrorKind::Ratelimited { .. }
+                        error.downcast_ref::<crate::ErrorKind>(),
+                        Some(
+                            crate::ErrorKind::PackSyncChanged
+                                | crate::ErrorKind::Ratelimited { .. }
+                        )
                     ) =>
                 {
                     return Err(error);
@@ -1068,8 +1070,8 @@ pub(crate) async fn reconcile_after_content_change(instance_id: &str) {
         match capture_after_change(instance_id).await {
             Err(error)
                 if matches!(
-                    error.raw.as_ref(),
-                    crate::ErrorKind::PackSyncChanged
+                    error.downcast_ref::<crate::ErrorKind>(),
+                    Some(crate::ErrorKind::PackSyncChanged)
                 ) =>
             {
                 tokio::task::yield_now().await;

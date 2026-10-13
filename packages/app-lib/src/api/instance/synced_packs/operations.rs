@@ -309,12 +309,16 @@ pub(in crate::api::instance) async fn seed_from_instance(
         {
             Ok(candidate) => candidate,
             Err(error)
-                if matches!(
-                    error.raw.as_ref(),
-                    crate::ErrorKind::JSONError(_)
-                        | crate::ErrorKind::InputError(_)
-                        | crate::ErrorKind::StdIOError(_)
-                ) =>
+                if error.is::<serde_json::Error>()
+                    || error.is::<std::io::Error>()
+                    || matches!(
+                        error.downcast_ref::<crate::ErrorKind>(),
+                        Some(
+                            crate::ErrorKind::JSONError(_)
+                                | crate::ErrorKind::InputError(_)
+                                | crate::ErrorKind::StdIOError(_)
+                        )
+                    ) =>
             {
                 tracing::warn!(
                     "Skipping pack {} from instance {instance_id} while initializing pack sync: {error}",
@@ -400,8 +404,8 @@ async fn sync_pack_inner(
         match sync_pack_once(instance_id, project_path, automatic).await {
             Err(error)
                 if matches!(
-                    error.raw.as_ref(),
-                    crate::ErrorKind::PackSyncChanged
+                    error.downcast_ref::<crate::ErrorKind>(),
+                    Some(crate::ErrorKind::PackSyncChanged)
                 ) =>
             {
                 tokio::task::yield_now().await;

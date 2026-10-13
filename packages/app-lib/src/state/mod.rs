@@ -1,5 +1,6 @@
 //! Theseus state management system
 use crate::util::fetch::{FetchSemaphore, IoSemaphore};
+use anyhow::anyhow;
 use dashmap::DashMap;
 use std::sync::atomic::AtomicBool;
 use std::sync::{Arc, LazyLock};
@@ -71,7 +72,7 @@ pub mod server_join_log;
 enum StartupPhase {
     Pending,
     Ready,
-    Failed(crate::Error),
+    Failed(String),
 }
 
 static LAUNCHER_STATE: OnceCell<Arc<State>> = OnceCell::const_new();
@@ -187,7 +188,7 @@ impl State {
             .await;
         STATE_STARTUP.send_replace(match &result {
             Ok(_) => StartupPhase::Ready,
-            Err(error) => StartupPhase::Failed(error.clone()),
+            Err(error) => StartupPhase::Failed(format!("{error:#}")),
         });
         let state = result?;
 
@@ -327,7 +328,7 @@ impl State {
                     .get()
                     .expect("state is set before startup is marked ready"),
             )),
-            StartupPhase::Failed(error) => Err(error.clone()),
+            StartupPhase::Failed(message) => Err(anyhow!("{message}")),
             StartupPhase::Pending => {
                 unreachable!(
                     "wait_for returns only once the phase has left Pending"

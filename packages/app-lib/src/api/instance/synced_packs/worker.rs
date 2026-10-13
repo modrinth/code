@@ -140,8 +140,8 @@ fn start(state: Arc<State>) {
                     .await
                     .map_err(Arc::new);
             if let Err(error) = &result {
-                match error.raw.as_ref() {
-                    crate::ErrorKind::PackSyncChanged => {
+                match error.downcast_ref::<crate::ErrorKind>() {
+                    Some(crate::ErrorKind::PackSyncChanged) => {
                         let mut queue = state.pack_sync_worker.queue.lock();
                         queue.instances.insert(instance_id.clone());
                         if !pending.is_empty() {
@@ -153,7 +153,9 @@ fn start(state: Arc<State>) {
                         }
                         continue;
                     }
-                    crate::ErrorKind::Ratelimited { retry_in_seconds } => {
+                    Some(crate::ErrorKind::Ratelimited {
+                        retry_in_seconds,
+                    }) => {
                         let retry_at = Instant::now()
                             + Duration::from_secs((*retry_in_seconds).max(1));
                         {

@@ -666,11 +666,9 @@ async fn read_memory_response(
             .try_with(|_| ())
             .is_err()
     {
-        return response
-            .bytes()
-            .await
-            .with_context(|| format!("failed to read response body from {url}"))
-            .map_err(Into::into);
+        return response.bytes().await.with_context(|| {
+            format!("failed to read response body from {url}")
+        });
     }
     use futures::StreamExt;
     let total_size = total_size.unwrap_or(0);
