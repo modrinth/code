@@ -10,7 +10,6 @@ import {
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { computed, onScopeDispose, ref, watch } from 'vue'
 
-import { projectReviewMessages } from '~/components/project-review/messages'
 import { useAuthState } from '~/composables/auth'
 import { sendThreadReply, type ThreadReply } from '~/helpers/thread-issues'
 import { isStaff } from '~/helpers/users.js'
