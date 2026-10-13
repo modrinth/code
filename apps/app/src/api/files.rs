@@ -313,7 +313,7 @@ impl From<reqwest::Error> for ExternalSaveError {
 }
 
 fn external_save_session<R: Runtime>(
-    window: &tauri::WebviewWindow<R>,
+    window: &tauri::Window<R>,
     state: &ExternalSaveSessions,
     save_id: &str,
 ) -> std::result::Result<Arc<ExternalSaveSession>, ExternalSaveError> {
@@ -327,7 +327,7 @@ fn external_save_session<R: Runtime>(
 
 #[tauri::command]
 pub async fn files_select_external<R: Runtime>(
-    window: tauri::WebviewWindow<R>,
+    window: tauri::Window<R>,
     state: tauri::State<'_, ExternalSaveSessions>,
     filename: String,
     filter: Option<ExternalSaveFilter>,
@@ -367,7 +367,7 @@ pub async fn files_select_external<R: Runtime>(
 
 #[tauri::command]
 pub async fn files_save_external<R: Runtime>(
-    window: tauri::WebviewWindow<R>,
+    window: tauri::Window<R>,
     state: tauri::State<'_, ExternalSaveSessions>,
     save_id: String,
     request: ExternalSaveRequest,
@@ -446,7 +446,7 @@ pub async fn files_save_external<R: Runtime>(
 
 #[tauri::command]
 pub async fn files_release_external<R: Runtime>(
-    window: tauri::WebviewWindow<R>,
+    window: tauri::Window<R>,
     state: tauri::State<'_, ExternalSaveSessions>,
     save_id: String,
 ) -> std::result::Result<(), ExternalSaveError> {
