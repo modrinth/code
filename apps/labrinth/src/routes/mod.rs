@@ -354,13 +354,23 @@ pub async fn redirect_ref(
     session_queue: &AuthQueue,
     required_scopes: Scopes,
 ) -> Result<Option<HttpResponse>, ApiError> {
+    let Some(parameter_index) = req
+        .match_info()
+        .iter()
+        .position(|(name, _)| name == parameter_name)
+    else {
+        return Ok(None);
+    };
     // `match_info` preserves encoded `+`, `/`, and `%`; the path extractor fully decodes them.
-    let parameters = web::Path::<HashMap<String, String>>::extract(req)
-        .await
-        .map_err(|err| {
-        ApiError::Request(eyre::eyre!("decoding project redirect path: {err}"))
-    })?;
-    let Some(project_ref) = parameters.get(parameter_name) else {
+    let parameters =
+        web::Path::<Vec<String>>::extract(req)
+            .await
+            .map_err(|err| {
+                ApiError::Request(eyre::eyre!(
+                    "decoding project redirect path: {err}"
+                ))
+            })?;
+    let Some(project_ref) = parameters.get(parameter_index) else {
         return Ok(None);
     };
     let Some(target_project_id) = resolve_visible_refs(
