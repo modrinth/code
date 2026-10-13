@@ -18,6 +18,8 @@ export async function createServerOnboardingInvite(
 		(await client.archon.content_v1.share(serverId, worldId, [], { timeout: 20_000 }))
 			.shared_instance_id
 	if (!isCurrent()) return null
-	const inviteId = await ensureServerInviteLink(client, instanceId)
+	const inviteId = await ensureServerInviteLink(client, instanceId, undefined, {
+		maximizeUses: true,
+	})
 	return `${siteUrl.replace(/\/$/, '')}/share/${encodeURIComponent(inviteId)}`
 }
