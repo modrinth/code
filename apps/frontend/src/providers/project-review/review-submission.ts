@@ -16,6 +16,7 @@ import { isStaff } from '~/helpers/users.js'
 
 import { injectProjectReviewPageContext } from './index'
 import { applyReviewDecision, type ReviewDecision } from './review-decision'
+import { ReviewLockError } from './review-lock'
 import type { createReviewMessages } from './review-messages'
 import type { createReviewPanels } from './review-panels'
 import type { createReviewPreviousIssues } from './review-previous-issues'
@@ -39,7 +40,7 @@ export function createReviewSubmission(
 	const { formatMessage } = useVIntl()
 	const { addNotification } = injectNotificationManager()
 	const auth = useAuthState()
-	const { project, threadQuery, disclosures } = injectProjectReviewPageContext()
+	const { project, threadQuery, disclosures, lock } = injectProjectReviewPageContext()
 	const draft = ref('')
 	const uploadedImages = ref<string[]>([])
 	let disposed = false
@@ -56,6 +57,10 @@ export function createReviewSubmission(
 	})
 
 	const errors = defineMessages({
+		submitFailed: {
+			id: 'project-review.decision.submit-failed',
+			defaultMessage: 'Failed to submit review',
+		},
 		unresolved: {
 			id: 'project-review.decision.unresolved',
 			defaultMessage:
@@ -130,7 +135,12 @@ export function createReviewSubmission(
 				uploadedImages.value = []
 			}
 			if (decision) {
-				await applyReviewDecision(decision, client, () => assertCurrent(id), clearMessage)
+				await lock.ensureEligible(id)
+				const assertReview = () => {
+					assertCurrent(id)
+					lock.assertEligible(id)
+				}
+				await applyReviewDecision(decision, client, assertReview, clearMessage)
 				session.clearProject(id)
 			} else if (reply) {
 				const issueIds = clearIssues ? panels.activeIssues.value.map(({ id }) => id) : []
@@ -141,12 +151,17 @@ export function createReviewSubmission(
 				for (const issueId of issueIds) panels.removeIssue(issueId)
 			}
 		},
-		onError: (error) =>
+		onError: (error) => {
 			addNotification({
-				title: formatMessage(commonMessages.errorNotificationTitle),
+				title: formatMessage(
+					error instanceof ReviewLockError
+						? errors.submitFailed
+						: commonMessages.errorNotificationTitle,
+				),
 				text: error instanceof Error ? error.message : String(error),
 				type: 'error',
-			}),
+			})
+		},
 		onSettled: async (_, __, { id, threadId }) => {
 			await Promise.all([
 				queryClient.invalidateQueries({ queryKey: ['project', 'v3', id] }),

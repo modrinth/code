@@ -1,5 +1,9 @@
 <template>
-	<div v-if="project" class="flex shrink-0 flex-wrap gap-1.5">
+	<ModerationLockedCard
+		v-if="project && heldBy"
+		:disabled="pending || advancingAction !== undefined"
+	/>
+	<div v-else-if="project" class="flex shrink-0 flex-wrap gap-1.5">
 		<Button
 			v-for="action in actions"
 			:key="action.status"
@@ -57,9 +61,11 @@ import { injectProjectReviewPageContext } from '~/providers/project-review'
 import { injectReviewMessages } from '~/providers/project-review/review-messages'
 import { injectReviewSubmission } from '~/providers/project-review/review-submission'
 
-import { useReviewShortcut } from './shortcuts'
+import { useReviewShortcut } from '../shortcuts'
+import ModerationLockedCard from './moderation-locked-card.vue'
 
-const { project, navigation, queue } = injectProjectReviewPageContext()
+const { project, navigation, queue, lock } = injectProjectReviewPageContext()
+const { heldBy } = lock
 const settings = useModerationSettings()
 const {
 	canSubmit,
@@ -118,7 +124,10 @@ const overflowActions = computed(() => [
 		label: formatMessage(messages.addIssues),
 		icon: PlusIcon,
 		action: () => submitIssues(),
-		disabled: !canAddIssues.value || generating.value || advancingAction.value !== undefined,
+		disabled:
+			!canAddIssues.value ||
+			generating.value ||
+			advancingAction.value !== undefined,
 	},
 	{
 		id: 'send-to-review',
@@ -139,6 +148,7 @@ const overflowActions = computed(() => [
 ])
 
 function actionAvailable(status: Parameters<typeof submitDecision>[0]) {
+	if (heldBy.value) return false
 	if (status === 'processing')
 		return (
 			project.value?.status !== 'processing' &&

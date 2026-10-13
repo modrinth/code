@@ -28,6 +28,7 @@ export function useProjectReviewLayout(
 	const bottomVisible = ref(savedLayout?.bottomVisible ?? true)
 	let leftWidth = savedLayout?.leftWidth ?? workspacePanelSizes.left.default
 	let rightWidth = savedLayout?.rightWidth ?? workspacePanelSizes.right.default
+	const visibleRightWidth = ref(rightVisible.value ? rightWidth : 0)
 	let bottomHeight = savedLayout?.bottomHeight ?? workspacePanelSizes.bottom.default
 	const topLeftGroupId = ref<string>()
 	const topRightGroupId = ref<string>()
@@ -74,6 +75,12 @@ export function useProjectReviewLayout(
 		saveTimer = setTimeout(saveLayout, 200)
 	}
 
+	function updateRightPanelWidth() {
+		visibleRightWidth.value = rightVisible.value
+			? (columns?.getPanel('right')?.api.width ?? rightWidth)
+			: 0
+	}
+
 	function onColumnsReady({ api }: SplitviewReadyEvent) {
 		columns = api
 		api.addPanel({
@@ -100,7 +107,11 @@ export function useProjectReviewLayout(
 		api.getPanel('right')?.api.setSize({ size: rightWidth })
 		api.getPanel('left')?.api.setVisible(leftVisible.value)
 		api.getPanel('right')?.api.setVisible(rightVisible.value)
-		subscriptions.push(api.onDidLayoutChange(scheduleSave))
+		updateRightPanelWidth()
+		subscriptions.push(
+			api.onDidLayoutChange(updateRightPanelWidth),
+			api.onDidLayoutChange(scheduleSave),
+		)
 	}
 
 	function onRowsReady({ api }: SplitviewReadyEvent) {
@@ -205,6 +216,7 @@ export function useProjectReviewLayout(
 		}
 		visible.value = !visible.value
 		panel.api.setVisible(visible.value)
+		updateRightPanelWidth()
 		scheduleSave()
 	}
 
@@ -339,6 +351,7 @@ export function useProjectReviewLayout(
 		revealSlot,
 		resetActiveTabs,
 		rightVisible,
+		visibleRightWidth,
 		topLeftGroupId,
 		topRightGroupId,
 		onColumnsReady,

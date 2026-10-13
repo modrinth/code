@@ -12,6 +12,7 @@ import { useModerationQueue } from '~/services/moderation/queue'
 import { useReviewContent } from './content'
 import { useReviewProject } from './project'
 import { useReviewQueue } from './queue'
+import { useReviewLock } from './review-lock'
 import type { ProjectReviewPageContext } from './types'
 
 export const [injectProjectReviewPageContext, provideProjectReviewPageContext] =
@@ -30,6 +31,7 @@ export function createProjectReviewPageContext() {
 	const data = useReviewProject(selection)
 	const content = useReviewContent(data.projectId)
 	const auth = useAuthState()
+	const lock = useReviewLock(data.projectId)
 	const disclosures = useDisclosureEditor({
 		projectId: data.projectId,
 		projectTypes: computed(() => data.project.value?.project_types ?? []),
@@ -74,6 +76,7 @@ export function createProjectReviewPageContext() {
 
 	return {
 		pixelated,
+		lock,
 		disclosures,
 		confirmLeaveModal,
 		...data,

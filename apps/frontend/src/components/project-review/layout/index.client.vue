@@ -20,7 +20,7 @@ import 'dockview-vue/dist/styles/dockview.css'
 
 import { useVIntl } from '@modrinth/ui'
 import { useEventListener } from '@vueuse/core'
-import { onScopeDispose, watch } from 'vue'
+import { onScopeDispose, watch, watchEffect } from 'vue'
 
 import { useModerationKeybinds } from '~/composables/moderation'
 
@@ -40,9 +40,19 @@ const layout = useProjectReviewLayout(
 	(tab) => formatMessage(messages[tab]),
 	() => props.tabs,
 )
-const { leftVisible, rightVisible, onDividerDoubleClick } = layout
+const { leftVisible, rightVisible, visibleRightWidth, onDividerDoubleClick } = layout
 const { heldTab, shortcutTab } = injectReviewContext()
 let heldTabKey: string | undefined
+
+watchEffect(() => {
+	document.body.style.setProperty(
+		'--project-review-right-panel-width',
+		`${visibleRightWidth.value}px`,
+	)
+})
+onScopeDispose(() => {
+	document.body.style.removeProperty('--project-review-right-panel-width')
+})
 
 function releaseHeldTab() {
 	heldTab.value = undefined
