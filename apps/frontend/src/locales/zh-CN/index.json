@@ -881,6 +881,9 @@
   "auth.sign-in.choose-account": {
     "message": "选择要在 Modrinth App 中使用的账户"
   },
+  "auth.sign-in.choose-existing-account": {
+    "message": "使用一个现有账户"
+  },
   "auth.sign-in.continue-with-email": {
     "message": "使用邮箱继续"
   },
@@ -905,14 +908,23 @@
   "auth.sign-in.launcher.complete.return-button": {
     "message": "打开 Modrinth App"
   },
+  "auth.sign-in.launcher.handoff-failed": {
+    "message": "无法完成登录到 Modrinth 应用，请重试。"
+  },
   "auth.sign-in.launcher.opening.description": {
     "message": "如果应用程序没有打开，请使用下面的按钮来完成登录。"
   },
   "auth.sign-in.launcher.opening.title": {
     "message": "打开Modrinth App……"
   },
+  "auth.sign-in.launcher.reauthenticate.title": {
+    "message": "登录到 Modrinth App"
+  },
   "auth.sign-in.no-account": {
     "message": "没有账号？"
+  },
+  "auth.sign-in.reauthenticate.use-different-account": {
+    "message": "使用另一个账户"
   },
   "auth.sign-in.sign-in-with": {
     "message": "登录到 Modrinth"
@@ -2254,6 +2266,9 @@
   },
   "error.generic.default.list_item.1": {
     "message": "前往我们的<status-link>状态页面</status-link>，查看 Modrinth 服务是否中断。"
+  },
+  "error.generic.default.list_item.support": {
+    "message": "如果这种情况持续发生，您可能想通过我们的<support-link>支持门户</support-link>告知 Modrinth 团队。"
   },
   "error.generic.default.list_title": {
     "message": "请在几分钟后再试。"

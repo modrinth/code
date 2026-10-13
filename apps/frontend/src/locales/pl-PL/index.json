@@ -878,6 +878,9 @@
   "auth.sign-in.choose-account": {
     "message": "Wybierz konto do użycia w aplikacji Modrinth"
   },
+  "auth.sign-in.choose-existing-account": {
+    "message": "Użyj istniejącego konta"
+  },
   "auth.sign-in.continue-with-email": {
     "message": "Kontynuuj przez e-mail"
   },
@@ -891,7 +894,7 @@
     "message": "Nie pamiętam hasła"
   },
   "auth.sign-in.last-sign-in": {
-    "message": "Ostatnio użyty"
+    "message": "Ostatnio użyte"
   },
   "auth.sign-in.launcher.callback.title": {
     "message": "Przekazanie wyniku logowania do aplikacji Modrinth"
@@ -902,14 +905,23 @@
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Otwórz Modrinth App"
   },
+  "auth.sign-in.launcher.handoff-failed": {
+    "message": "Logowanie do Modrinth App nie powiodło się. Spróbuj ponownie."
+  },
   "auth.sign-in.launcher.opening.description": {
     "message": "Jeśli aplikacja się nie otworzy, użyj poniższego przycisku, aby dokończyć logowanie."
   },
   "auth.sign-in.launcher.opening.title": {
     "message": "Otwieranie aplikacji Modrinth..."
   },
+  "auth.sign-in.launcher.reauthenticate.title": {
+    "message": "Zaloguj się do Modrinth App"
+  },
   "auth.sign-in.no-account": {
     "message": "Nie masz konta?"
+  },
+  "auth.sign-in.reauthenticate.use-different-account": {
+    "message": "Użyj innego konta"
   },
   "auth.sign-in.sign-in-with": {
     "message": "Zaloguj się na Modrinth"
@@ -2248,6 +2260,9 @@
   },
   "error.generic.default.list_item.1": {
     "message": "Sprawdź na naszej <status-link>stronie statusu</status-link>, czy Modrinth jest niedostępny."
+  },
+  "error.generic.default.list_item.support": {
+    "message": "Jeśli problem będzie się powtarzał, możesz powiadomić o tym Zespół Modrinth korzystając z <support-link>portalu wsparcia</support-link>."
   },
   "error.generic.default.list_title": {
     "message": "Spróbuj ponownie za kilka minut."

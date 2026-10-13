@@ -87,7 +87,7 @@
     "message": "无法下载整合包"
   },
   "app.action-bar.install.summary.unexpected-error": {
-    "message": "出现了一些问题"
+    "message": "出了点问题"
   },
   "app.action-bar.install.unknown-instance": {
     "message": "未知的实例"
@@ -174,7 +174,7 @@
     "message": "显示您在每个实例中游玩的时间。"
   },
   "app.appearance-settings.show-play-time.title": {
-    "message": "显示总游玩时间"
+    "message": "显示游玩时间"
   },
   "app.appearance-settings.skip-non-essential-warnings.description": {
     "message": "自动跳过低风险确认，包括重复安装整合包、常规内容删除、批量更新、解除整合包关联及修复提示。危险警告仍会显示。"
@@ -301,6 +301,18 @@
   },
   "app.content.sync-resource-packs-disabled": {
     "message": "首先在应用设置中打开资源包同步。"
+  },
+  "app.debug-export.canceling": {
+    "message": "正在取消导出……"
+  },
+  "app.debug-export.exporting": {
+    "message": "正在导出……"
+  },
+  "app.debug-export.finishing": {
+    "message": "正在完成……"
+  },
+  "app.debug-export.preparing": {
+    "message": "正在准备文件……"
   },
   "app.download-manager.active": {
     "message": "启用"
@@ -2791,6 +2803,15 @@
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "应用目录"
+  },
+  "app.settings.resource-management.debug-info.description": {
+    "message": "导出应用日志和诊断数据到 ZIP 文件用于与 Modrinth 支持共享。"
+  },
+  "app.settings.resource-management.debug-info.export": {
+    "message": "导出调试信息"
+  },
+  "app.settings.resource-management.debug-info.title": {
+    "message": "调试信息"
   },
   "app.settings.resource-management.maximum-concurrent-downloads.description": {
     "message": "应用可同时下载的文件数量。如果您的连接下载不稳定，请降低该值。需要重新启动应用程序。"

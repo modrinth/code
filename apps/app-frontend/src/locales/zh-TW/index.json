@@ -302,6 +302,18 @@
   "app.content.sync-resource-packs-disabled": {
     "message": "請先在應用程式設定中啟用資源包同步。"
   },
+  "app.debug-export.canceling": {
+    "message": "正在取消匯出..."
+  },
+  "app.debug-export.exporting": {
+    "message": "正在匯出..."
+  },
+  "app.debug-export.finishing": {
+    "message": "即將完成..."
+  },
+  "app.debug-export.preparing": {
+    "message": "正在準備檔案..."
+  },
   "app.download-manager.active": {
     "message": "執行中"
   },
@@ -924,7 +936,7 @@
     "message": "這個伺服器將從你的伺服器清單中移除。如果你記得伺服器位址，稍後可以將其重新新增回來。"
   },
   "app.instance.worlds.remove-server-modal.warning-header": {
-    "message": "即將移除 {name}"
+    "message": "即將移除「{name}」"
   },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "搜尋 {count} 個世界..."
@@ -2792,6 +2804,15 @@
   "app.settings.resource-management.app-directory.title": {
     "message": "應用程式資料夾"
   },
+  "app.settings.resource-management.debug-info.description": {
+    "message": "將應用程式紀錄與診斷資料匯出為 ZIP 檔案，以便與 Modrinth 客服團隊分享。"
+  },
+  "app.settings.resource-management.debug-info.export": {
+    "message": "匯出除錯資訊"
+  },
+  "app.settings.resource-management.debug-info.title": {
+    "message": "除錯資訊"
+  },
   "app.settings.resource-management.maximum-concurrent-downloads.description": {
     "message": "應用程式一次可下載的檔案數量。若你的網路連線導致下載不穩定，請降低此數值。需要重新啟動應用程式。"
   },
@@ -3141,7 +3162,7 @@
     "message": "刪除外觀"
   },
   "app.skins.delete-modal.description": {
-    "message": "這會永久刪除所選的外觀，這項動作無法復原。"
+    "message": "這將永久刪除所選的外觀，這項動作無法復原。"
   },
   "app.skins.delete-modal.title": {
     "message": "確定要刪除這個外觀嗎？"
@@ -3648,7 +3669,7 @@
     "message": "取消連結共用實例"
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
-    "message": "這會從 Modrinth 的伺服器刪除共用實例。在 Modrinth App 使用該實例的使用者將不再收到更新，但本機實例及其內容仍會保留在此裝置上。"
+    "message": "這將從 Modrinth 的伺服器刪除共用實例。在 Modrinth App 使用該實例的使用者將不再收到更新，但本機實例及其內容仍會保留在此裝置上。"
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-header": {
     "message": "即將取消發布共用實例"

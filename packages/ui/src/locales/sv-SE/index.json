@@ -1163,6 +1163,9 @@
   "external-files.permissions-card.editor.link-to-work-url-placeholder": {
     "defaultMessage": "länk-till-arbete"
   },
+  "external-files.permissions-card.editor.modrinth-link-to-work": {
+    "defaultMessage": "Det här verkar vara en Modrinth-länk. Om det här innehållet är tillgängligt på Modrinth, har ditt paket troligen exporterats inkorrekt. Om du har laddat ner det från en annan webbplats, försök att ladda ner Modrinth-versionen istället; ibland är de inte identiska filer."
+  },
   "external-files.permissions-card.editor.notes-label": {
     "defaultMessage": "Anteckningar"
   },
@@ -1595,6 +1598,9 @@
   "files.operations.compressing-completed": {
     "defaultMessage": "Skapning av {source} slutförd"
   },
+  "files.operations.compressing-failed": {
+    "defaultMessage": "Kunde inte skapa {source}"
+  },
   "files.operations.current-file": {
     "defaultMessage": "Nuvarande fil: {file}"
   },
@@ -1711,6 +1717,9 @@
   },
   "files.zip-url-modal.install-failed-title": {
     "defaultMessage": "Installation misslyckades"
+  },
+  "files.zip-url-modal.step-copy-description": {
+    "defaultMessage": "Kopiera och klistra in versionssidans URL nedan."
   },
   "files.zip-url-modal.step-copy-title": {
     "defaultMessage": "Kopiera URL:en"
@@ -2095,6 +2104,9 @@
   },
   "installation-settings.incompatible-content.disable-conflicts-button": {
     "defaultMessage": "Inaktivera konflikter"
+  },
+  "installation-settings.incompatible-content.game-version-warning-body": {
+    "defaultMessage": "Vid ändring av spelversionen kan vi antingen inaktivera inkompatibelt installerat innehåll eller försöka att lösa inkompatibiliteterna."
   },
   "installation-settings.incompatible-content.game-version-warning-title": {
     "defaultMessage": "Inkompatibilitetsvarning"
@@ -3107,11 +3119,17 @@
   "profile.button.create-project": {
     "defaultMessage": "Skapa ett projekt"
   },
+  "profile.button.force-password-reset": {
+    "defaultMessage": "Tvinga lösenordsåterställning"
+  },
   "profile.button.info": {
     "defaultMessage": "Visa användardetaljer"
   },
   "profile.button.manage-projects": {
     "defaultMessage": "Hantera projekt"
+  },
+  "profile.button.reset-2fa": {
+    "defaultMessage": "Återställ tvåfaktorsautentisering"
   },
   "profile.button.revoke-sessions": {
     "defaultMessage": "Återkalla alla sessioner"
@@ -3170,6 +3188,36 @@
   "profile.error.not-found": {
     "defaultMessage": "Användare hittades inte"
   },
+  "profile.force-password-reset.admonition-body": {
+    "defaultMessage": "{username}s lösenord kommer att tas bort omedelbart, de kommer att loggas ut från alla enheter och en länk för att ställa in ett nytt kommer att skickas till e-posten nedan. Om du byter e-post kommer det att byta kontots e-post. Länken går ut efter 24 timmar och kan även användas när kontot är låst."
+  },
+  "profile.force-password-reset.admonition-title": {
+    "defaultMessage": "Det nuvarande lösenordet kommer att sluta fungera"
+  },
+  "profile.force-password-reset.button": {
+    "defaultMessage": "Återställ lösenord"
+  },
+  "profile.force-password-reset.email-label": {
+    "defaultMessage": "E-post för konto"
+  },
+  "profile.force-password-reset.email-placeholder": {
+    "defaultMessage": "Lämna tom för att använda kontots e-post"
+  },
+  "profile.force-password-reset.error-description": {
+    "defaultMessage": "Ett fel inträffade när lösenordet återställdes. Vänligen försök igen."
+  },
+  "profile.force-password-reset.error-title": {
+    "defaultMessage": "Kunde inte återställa lösenord"
+  },
+  "profile.force-password-reset.success-description": {
+    "defaultMessage": "En länk för lösenordsåterställning har skickats till {username}."
+  },
+  "profile.force-password-reset.success-title": {
+    "defaultMessage": "Lösenordsåterställning"
+  },
+  "profile.force-password-reset.title": {
+    "defaultMessage": "Tvinga lösenordsåterställning för {username}"
+  },
   "profile.label.badges": {
     "defaultMessage": "Märken"
   },
@@ -3208,6 +3256,30 @@
   },
   "profile.official-account.bio": {
     "defaultMessage": "Modrinths officiella användarkonto. Få hjälp på <support-link></support-link> eller via e-post hos <email></email>"
+  },
+  "profile.reset-2fa.admonition-body": {
+    "defaultMessage": "{username}s autentiserare och reservkoder kommer tas bort och kommer att notifierats. Gör endast det här efter att ha verifierat deras identitet."
+  },
+  "profile.reset-2fa.admonition-title": {
+    "defaultMessage": "Är du säker på att du vill återställa tvåfaktorautentisering?"
+  },
+  "profile.reset-2fa.button": {
+    "defaultMessage": "Återställ 2FA"
+  },
+  "profile.reset-2fa.error-description": {
+    "defaultMessage": "Ett fel inträffade när tvåfaktorsautentiseringen återställdes. Vänligen försök igen."
+  },
+  "profile.reset-2fa.error-title": {
+    "defaultMessage": "Kunde inte återställa tvåfaktorsautentisering"
+  },
+  "profile.reset-2fa.success-description": {
+    "defaultMessage": "{username}s tvåfaktorsautentisering har tagits bort."
+  },
+  "profile.reset-2fa.success-title": {
+    "defaultMessage": "Tvåfaktorsautentisering återställd"
+  },
+  "profile.reset-2fa.title": {
+    "defaultMessage": "Återställ tvåfaktorsautentisering för {username}"
   },
   "profile.revoke-sessions.admonition-body": {
     "defaultMessage": "{username} kommer att loggas ut från alla enheter och måste logga in igen. Personliga åtkomsttokens påverkas inte."
@@ -5165,6 +5237,24 @@
   "servers.listing.using-project-label": {
     "defaultMessage": "Använder {projectTitle}"
   },
+  "servers.lock.modal.header": {
+    "defaultMessage": "Lås {name}"
+  },
+  "servers.lock.modal.lock-button": {
+    "defaultMessage": "Lås server"
+  },
+  "servers.lock.modal.reason-label": {
+    "defaultMessage": "Anledning"
+  },
+  "servers.lock.modal.reason-placeholder": {
+    "defaultMessage": "Synlig för andra administratörer"
+  },
+  "servers.lock.modal.success-text": {
+    "defaultMessage": "{name} har låsts."
+  },
+  "servers.lock.modal.success-title": {
+    "defaultMessage": "Server låst"
+  },
   "servers.manage.checking-for-new-servers": {
     "defaultMessage": "Letar efter nya servrar..."
   },
@@ -5191,6 +5281,15 @@
   },
   "servers.manage.handle-error.title": {
     "defaultMessage": "Ett fel inträffade"
+  },
+  "servers.manage.lock-server": {
+    "defaultMessage": "Lås server"
+  },
+  "servers.manage.locked.badge": {
+    "defaultMessage": "Låst"
+  },
+  "servers.manage.locked.badge-tooltip": {
+    "defaultMessage": "Låst sedan {date}"
   },
   "servers.manage.new-server-button": {
     "defaultMessage": "Ny server"
@@ -5239,6 +5338,18 @@
   },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Delade servrar"
+  },
+  "servers.manage.unlock-server": {
+    "defaultMessage": "Lås upp server"
+  },
+  "servers.manage.unlock.error-title": {
+    "defaultMessage": "Kunde inte låsa upp server"
+  },
+  "servers.manage.unlock.success-text": {
+    "defaultMessage": "{name} har låsts upp."
+  },
+  "servers.manage.unlock.success-title": {
+    "defaultMessage": "Server upplåst"
   },
   "servers.manage.your-servers-title": {
     "defaultMessage": "Dina servrar"

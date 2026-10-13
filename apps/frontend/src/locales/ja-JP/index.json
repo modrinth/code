@@ -126,7 +126,7 @@
     "message": "プロジェクト"
   },
   "analytics.chart.controls.ratio": {
-    "message": ""
+    "message": "割合"
   },
   "analytics.chart.empty.select-table-items": {
     "message": "以下の表から項目を選択して、データを可視化してください。"
@@ -881,6 +881,9 @@
   "auth.sign-in.choose-account": {
     "message": "Modrinth Appで使用するアカウントを選択"
   },
+  "auth.sign-in.choose-existing-account": {
+    "message": "既存のアカウントを使う"
+  },
   "auth.sign-in.continue-with-email": {
     "message": "メールアドレスで続ける"
   },
@@ -902,14 +905,23 @@
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Modrinth Appを開く"
   },
+  "auth.sign-in.launcher.handoff-failed": {
+    "message": "Modrinth アプリへのサインインに失敗しました　もう一度やり直してください。"
+  },
   "auth.sign-in.launcher.opening.description": {
     "message": "アプリが開かない場合は、下のボタンを使用してサインインしてください。"
   },
   "auth.sign-in.launcher.opening.title": {
     "message": "Modrinth Appを開いています..."
   },
+  "auth.sign-in.launcher.reauthenticate.title": {
+    "message": "Modrinthへサインイン"
+  },
   "auth.sign-in.no-account": {
     "message": "アカウントを持っていませんか？"
+  },
+  "auth.sign-in.reauthenticate.use-different-account": {
+    "message": "他のアカウントを使う"
   },
   "auth.sign-in.sign-in-with": {
     "message": "Modrinthへサインイン"
@@ -1282,6 +1294,9 @@
   },
   "create-project-version.create-modal.stage.metadata.prefilled-environment-tooltip": {
     "message": "以前の類似バージョンから入力済み"
+  },
+  "create-project-version.create-modal.stage.metadata.resource-pack-loaders-tooltip": {
+    "message": "リソースパックのローダーは編集できません"
   },
   "create-project-version.create-modal.stage.metadata.suggested": {
     "message": "おすすめ"
@@ -1931,6 +1946,9 @@
   "dashboard.projects.table.name": {
     "message": "名前"
   },
+  "dashboard.projects.table.select-all-bulk-editable": {
+    "message": "一括編集をサポートするすべてのプロジェクトを選択"
+  },
   "dashboard.projects.table.status": {
     "message": "ステータス"
   },
@@ -2174,6 +2192,9 @@
   "error.generic.401.switch-account": {
     "message": "またはアカウントを変更："
   },
+  "error.generic.401.switch-account-failed": {
+    "message": "アカウントの切り替えに失敗しました。 再度お試しください。"
+  },
   "error.generic.401.title": {
     "message": "このページにアクセスする権限がありません"
   },
@@ -2404,6 +2425,15 @@
   },
   "hosting-marketing.medal.text-secondary": {
     "message": "期間限定オファー。クレジットカード不要。米国サーバーで利用可能。"
+  },
+  "hosting-marketing.notification.error-fetching-payment-data-title": {
+    "message": "支払いデータの取得エラー"
+  },
+  "hosting-marketing.notification.invalid-product-text": {
+    "message": "選択した製品が見つかりましたが、必要なデータがありません。サポートにお問い合わせください。"
+  },
+  "hosting-marketing.notification.invalid-product-title": {
+    "message": "無効な製品です"
   },
   "hosting-marketing.pick-customized-plan": {
     "message": "必要な仕様だけを選んでカスタマイズプランを選びましょう。"
@@ -2642,6 +2672,9 @@
   "layout.banner.add-email.description": {
     "message": "セキュリティ上の理由から、Modrinthではアカウントにメールアドレスを登録する必要があります。"
   },
+  "layout.banner.build-fail.always-ignore": {
+    "message": "常に無視"
+  },
   "layout.banner.build-fail.description": {
     "message": "Modrinthのフロントエンドのデプロイで、APIからのステート生成に失敗しました。APIの障害、または設定エラーの可能性があります。APIが利用可能になったら再ビルドしてください。エラーコード: {errors}; 現在のAPI URL: {url}"
   },
@@ -2710,6 +2743,18 @@
   },
   "layout.footer.about.status": {
     "message": "ステータス"
+  },
+  "layout.footer.developer-mode-activated.text": {
+    "message": "開発者モードが有効です"
+  },
+  "layout.footer.developer-mode-activated.title": {
+    "message": "開発者モードを有効化しました"
+  },
+  "layout.footer.developer-mode-deactivated.text": {
+    "message": "開発者モードが無効です"
+  },
+  "layout.footer.developer-mode-deactivated.title": {
+    "message": "開発者モードを無効化しました"
   },
   "layout.footer.legal": {
     "message": "法的情報"
@@ -2837,6 +2882,9 @@
   "layout.nav.projects": {
     "message": "プロジェクト"
   },
+  "layout.nav.remove-account": {
+    "message": "アカウントを削除する"
+  },
   "layout.nav.revenue": {
     "message": "収益"
   },
@@ -2849,11 +2897,23 @@
   "layout.nav.switch-account": {
     "message": "アカウント切り替え"
   },
+  "layout.nav.switch-account-failed": {
+    "message": "アカウントの切り替えに失敗しました。 再度お試しください。"
+  },
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Modrinth+にアップグレード"
   },
+  "layout.publish.email-verification-required.description": {
+    "message": "Modrinthに公開する前にメールアドレスを確認する必要があります。"
+  },
+  "layout.publish.email-verification-required.title": {
+    "message": "メール認証が必要です"
+  },
   "modal.shared-instance.open-in-app.get-app": {
     "message": "Modrinth Appを取得"
+  },
+  "modal.shared-instance.open-in-app.managed-by": {
+    "message": "管理者"
   },
   "modal.shared-instance.open-in-app.title": {
     "message": "Modrinth Appで開く"
@@ -2876,8 +2936,38 @@
   "moderation.page.technicalReview": {
     "message": "技術評価"
   },
+  "modpack-scan-modal.delete-all-groups.error": {
+    "message": "すべてのグループの消去に失敗しました。{error}"
+  },
+  "modpack-scan-modal.failed": {
+    "message": "失敗"
+  },
+  "modpack-scan-modal.load-versions-error": {
+    "message": "バージョンの読み込みに失敗しました:{error}"
+  },
   "modpack-scan-modal.loading-versions": {
     "message": "バージョンを読み込んでいます…"
+  },
+  "modpack-scan-modal.new-files": {
+    "message": "新しいファイル"
+  },
+  "modpack-scan-modal.new-groups": {
+    "message": "新しいグループ"
+  },
+  "modpack-scan-modal.no-files": {
+    "message": "ファイルが見つかりませんでした。"
+  },
+  "modpack-scan-modal.not-scanned": {
+    "message": "スキャンされていません"
+  },
+  "modpack-scan-modal.override-files": {
+    "message": "ファイルを上書きする({count})"
+  },
+  "modpack-scan-modal.pack-file-name": {
+    "message": "パックのファイル名"
+  },
+  "modpack-scan-modal.scan-all-files": {
+    "message": "全ファイルをスキャン"
   },
   "modpack-scan-modal.scan-error": {
     "message": "一部のファイルのスキャンに失敗しました：\n\n{error}"
@@ -3176,11 +3266,20 @@
   "organization.project-transfer.name-column": {
     "message": "名前"
   },
+  "organization.project-transfer.no-projects-available": {
+    "message": "分析対象のプロジェクトがありません."
+  },
   "organization.project-transfer.project-icon-alt": {
     "message": "{name}のアイコン"
   },
+  "organization.project-transfer.title": {
+    "message": "プロジェクトを転送"
+  },
   "organization.project-transfer.type-column": {
     "message": "タイプ"
+  },
+  "organization.projects.none": {
+    "message": "この組織にはまだプロジェクトはありません"
   },
   "project-member-header.error-decline": {
     "message": "チームへの招待の辞退に失敗しました"
@@ -3202,6 +3301,9 @@
   },
   "project-member-header.success-join": {
     "message": "あなたはプロジェクトに参加しました"
+  },
+  "project-moderation-nags.project-submitted-for-review": {
+    "message": "プロジェクトは審査に提出されました！"
   },
   "project-moderation-nags.publishing-checklist": {
     "message": "公開チェックリスト"
@@ -3338,6 +3440,12 @@
   "project.actions.view-project-type-dependents": {
     "message": "{projectType} の依存関係を表示"
   },
+  "project.ai-image-warning-modal.body.1": {
+    "message": "プロジェクト画像（サムネイル等）にAI生成画像を使用することは許可されていません。検出を回避しよう（AI画像だと隠そう）とすると、Modrinthアカウントが停止される場合があります。"
+  },
+  "project.ai-image-warning-modal.body.2": {
+    "message": "生成型AIに関するポリシーの詳細については、<rules>Modrinthのコンテンツルール</rules>のセクション6をご覧ください。"
+  },
   "project.ai-image-warning-modal.title": {
     "message": "AI生成画像の使用は禁止されています"
   },
@@ -3350,14 +3458,44 @@
   "project.description.title": {
     "message": "説明"
   },
+  "project.download.compatible-version-title": {
+    "message": "互換性のあるバージョン:"
+  },
   "project.download.dependencies-title": {
     "message": "依存関係"
+  },
+  "project.download.dependency-already-installed": {
+    "message": "この依存関係は既にインストールされています"
+  },
+  "project.download.dependency-any-compatible": {
+    "message": "互換性のあるもの"
+  },
+  "project.download.dependency-download-file": {
+    "message": "ダウンロード{filename}"
+  },
+  "project.download.dependency-download-file-with-size": {
+    "message": "ダウンロード{filename}({size})"
+  },
+  "project.download.dependency-duplicate": {
+    "message": "この依存関係は既に含まれています"
+  },
+  "project.download.dependency-missing-version": {
+    "message": "この依存関係のバージョンはご利用になれません"
+  },
+  "project.download.dependency-no-compatible-version": {
+    "message": "この依存関係には互換性があるバージョンがありません"
   },
   "project.download.download": {
     "message": "ダウンロード"
   },
   "project.download.download-as-zip": {
     "message": "ZIPでダウンロード"
+  },
+  "project.download.download-version": {
+    "message": "ダウンロード{version}"
+  },
+  "project.download.download-with-recommended": {
+    "message": "推奨されたダウンロード"
   },
   "project.download.file-unavailable": {
     "message": "このファイルはダウンロードできません"
@@ -3379,6 +3517,9 @@
   },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title}は{gameVersion}の{platform}に対応していません"
+  },
+  "project.download.recommended-title": {
+    "message": "推奨"
   },
   "project.download.required-resource-pack-short": {
     "message": "リソースパック"
@@ -3491,8 +3632,26 @@
   "project.notification.updated.title": {
     "message": "プロジェクトが更新されました"
   },
+  "project.settings.delete-project.button": {
+    "message": "プロジェクトを削除する"
+  },
+  "project.settings.delete-project.confirmation.description": {
+    "message": "続行すると、このプロジェクトのすべての情報と全ファイルがデータベースから削除されます。この作業を行うと二度と元の状態には戻せなくなります。\nプロジェクトを非公開設定にするだけで永続的なオプションを選択できます"
+  },
+  "project.settings.delete-project.confirmation.proceed-text": {
+    "message": "プロジェクトを削除する"
+  },
+  "project.settings.delete-project.confirmation.title": {
+    "message": "本当にプロジェクトを削除しますか？"
+  },
   "project.settings.delete-project.title": {
     "message": "プロジェクトを削除"
+  },
+  "project.settings.description.title": {
+    "message": "概要"
+  },
+  "project.settings.description.updated": {
+    "message": "概要を更新しました"
   },
   "project.settings.disclosures.ai.title": {
     "message": "AI生成コンテンツが含まれています"
@@ -3557,8 +3716,35 @@
   "project.settings.license.url": {
     "message": "ライセンスURL"
   },
+  "project.settings.links.remove-donation-link": {
+    "message": "寄付リンクを削除する"
+  },
   "project.settings.links.server-discord": {
     "message": "Discord"
+  },
+  "project.settings.links.server-updated": {
+    "message": "サーバーのリンクが更新されました。"
+  },
+  "project.settings.links.server-wiki-description": {
+    "message": "プロジェクトに関する情報、ドキュメント、ヘルプが掲載されているページです。"
+  },
+  "project.settings.links.site": {
+    "message": "ウェブサイト"
+  },
+  "project.settings.links.source": {
+    "message": "ソースコード"
+  },
+  "project.settings.links.title": {
+    "message": "リンク"
+  },
+  "project.settings.links.updated-title": {
+    "message": "リンクを更新しました"
+  },
+  "project.settings.links.url-placeholder": {
+    "message": "有効なURLを入力してください"
+  },
+  "project.settings.links.visit-link": {
+    "message": "{url} にアクセス"
   },
   "project.settings.links.wiki": {
     "message": "ウィキページ"
@@ -3568,6 +3754,9 @@
   },
   "project.settings.permissions.empty-state.heading": {
     "message": "準備完了です！"
+  },
+  "project.settings.permissions.expand-all": {
+    "message": "すべて展開する"
   },
   "project.settings.permissions.learn-more": {
     "message": "もっと詳しく"
@@ -3602,11 +3791,32 @@
   "project.versions.delete-button": {
     "message": "削除"
   },
+  "project.versions.edit-details-option": {
+    "message": "詳細情報を編集する"
+  },
+  "project.versions.edit-files-option": {
+    "message": "ファイルを編集する"
+  },
+  "project.versions.edit-metadata-option": {
+    "message": "メタデータを編集する"
+  },
+  "project.versions.edit-version-tooltip": {
+    "message": "バージョンの編集"
+  },
   "project.versions.open-in-new-tab-option": {
     "message": "新しいタブで開く"
   },
+  "project.versions.share-option": {
+    "message": "共有"
+  },
   "project.versions.title": {
     "message": "バージョン"
+  },
+  "project.versions.version-deleted-text": {
+    "message": "バージョンは正常に削除されました"
+  },
+  "project.versions.version-deleted-title": {
+    "message": "バージョンが削除されました"
   },
   "report.already-reported": {
     "message": "既に {title} をレポートしています"
@@ -4158,7 +4368,7 @@
     "message": "アカウントに関連づけられたメールアドレスを変更します。"
   },
   "settings.account.security.email.title": {
-    "message": "メールドレス"
+    "message": "メールアドレス"
   },
   "settings.account.security.passkey.add-modal.name.description": {
     "message": "後でこのパスキーを識別できるように、覚えやすい名前を付けてください。"
@@ -4730,6 +4940,21 @@
   "ui.newsletter-button.tooltip": {
     "message": "Modrinthのニュースレターに登録する"
   },
+  "ui.two-factor-code.authentication-code": {
+    "message": "6桁の認証コード"
+  },
+  "ui.two-factor-code.backup-code": {
+    "message": "バックアップコード"
+  },
+  "ui.two-factor-code.backup-code.placeholder": {
+    "message": "バックアップコードを入力"
+  },
+  "ui.two-factor-code.use-authentication-code": {
+    "message": "認証コードを使う"
+  },
+  "ui.two-factor-code.use-backup-code": {
+    "message": "バックアップコードを使う"
+  },
   "version.all-versions": {
     "message": "全てのバージョン"
   },
@@ -4822,6 +5047,9 @@
   },
   "version.section.content.dev-info": {
     "message": "開発者情報\n"
+  },
+  "version.section.content.dev-info.gradle-snippet": {
+    "message": "build.gradle"
   },
   "version.section.content.dev-info.maven-description": {
     "message": "Modrinthのプロジェクトは、<gradle-link>Gradle</gradle-link>などのJVMビルドツールで利用できるMavenリポジトリから自動的に取得できます。Modrinth Maven APIの詳細については、<article-link>こちら</article-link>をご覧ください。"

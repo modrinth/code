@@ -881,6 +881,9 @@
   "auth.sign-in.choose-account": {
     "message": "選擇要在 Modrinth App 中使用的帳號"
   },
+  "auth.sign-in.choose-existing-account": {
+    "message": "使用現有帳號"
+  },
   "auth.sign-in.continue-with-email": {
     "message": "使用電子郵件繼續"
   },
@@ -905,14 +908,23 @@
   "auth.sign-in.launcher.complete.return-button": {
     "message": "開啟 Modrinth App"
   },
+  "auth.sign-in.launcher.handoff-failed": {
+    "message": "無法完成 Modrinth App 登入，請再試一次。"
+  },
   "auth.sign-in.launcher.opening.description": {
     "message": "如果應用程式沒有開啟，請使用下方按鈕完成登入。"
   },
   "auth.sign-in.launcher.opening.title": {
     "message": "正在開啟 Modrinth App..."
   },
+  "auth.sign-in.launcher.reauthenticate.title": {
+    "message": "登入 Modrinth App"
+  },
   "auth.sign-in.no-account": {
     "message": "還沒有帳號嗎？"
+  },
+  "auth.sign-in.reauthenticate.use-different-account": {
+    "message": "使用其他帳號"
   },
   "auth.sign-in.sign-in-with": {
     "message": "登入 Modrinth"
@@ -1014,7 +1026,7 @@
     "message": "取消追蹤專案"
   },
   "collection.delete-modal.description": {
-    "message": "這會永久刪除這個收藏，這項動作無法復原。"
+    "message": "這將永久刪除這個收藏，這項動作無法復原。"
   },
   "collection.delete-modal.title": {
     "message": "確定要刪除這個收藏嗎？"
@@ -2255,6 +2267,9 @@
   "error.generic.default.list_item.1": {
     "message": "前往我們的<status-link>狀態頁面</status-link>，查看 Modrinth 是不是停機了。"
   },
+  "error.generic.default.list_item.support": {
+    "message": "如果這種情況持續發生，建議你可以透過我們的<support-link>支援中心</support-link>回報給 Modrinth 團隊。"
+  },
   "error.generic.default.list_title": {
     "message": "請在幾分鐘後再試一次。"
   },
@@ -3036,7 +3051,7 @@
     "message": "批次數量"
   },
   "modpack-scan-modal.delete-all-groups-confirmation.description": {
-    "message": "這會永久刪除這個專案的所有引用標註群組及其中的所有檔案，這項動作無法復原。"
+    "message": "這將永久刪除這個專案的所有引用標註群組及其中的所有檔案，這項動作無法復原。"
   },
   "modpack-scan-modal.delete-all-groups.error": {
     "message": "無法清除所有群組：{error}"
@@ -4311,7 +4326,7 @@
     "message": "刪除所有群組"
   },
   "project.settings.permissions.delete-all-groups-confirmation.description": {
-    "message": "這會永久刪除專案中的所有 {count, plural, other {# 個引用標註群組}}及其中的所有檔案，這項動作無法復原。"
+    "message": "這將永久刪除專案中的所有 {count, plural, other {# 個引用標註群組}}及其中的所有檔案，這項動作無法復原。"
   },
   "project.settings.permissions.delete-all-groups-confirmation.title": {
     "message": "刪除所有引用標註群組？"
@@ -5124,7 +5139,7 @@
     "message": "刪除通行金鑰"
   },
   "settings.account.security.passkey.remove.description": {
-    "message": "這會永久移除通行金鑰「{name}」。你將無法再使用這個通行金鑰登入。"
+    "message": "這將永久移除通行金鑰「{name}」。你將無法再使用這個通行金鑰登入。"
   },
   "settings.account.security.passkey.remove.title": {
     "message": "確定要移除這個通行金鑰嗎？"
@@ -5397,7 +5412,7 @@
     "message": "取消訂閱"
   },
   "settings.billing.modal.cancel.description": {
-    "message": "這會取消你的訂閱。你的福利將保留到本期計費週期結束。"
+    "message": "這將取消你的訂閱。你的福利將保留到本期計費週期結束。"
   },
   "settings.billing.modal.cancel.title": {
     "message": "確定要取消訂閱嗎？"
@@ -5757,7 +5772,7 @@
     "message": "封裝為模組"
   },
   "version.package-as-mod.description": {
-    "message": "這會建立一個支援所選模組載入器的新版本。系統將自動引導你前往新版本，你可以依個人喜好進行編輯。"
+    "message": "這將建立一個支援所選模組載入器的新版本。系統將自動引導你前往新版本，你可以依個人喜好進行編輯。"
   },
   "version.package-as-mod.header": {
     "message": "將資料包封裝為模組"

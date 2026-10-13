@@ -302,6 +302,18 @@
   "app.content.sync-resource-packs-disabled": {
     "message": "Aktiviere zuerst die Synchronisierung der Ressourcenpakete in den Einstellungen der App ein."
   },
+  "app.debug-export.canceling": {
+    "message": "Export wird abgebrochen…"
+  },
+  "app.debug-export.exporting": {
+    "message": "Wird exportiert…"
+  },
+  "app.debug-export.finishing": {
+    "message": "Wird fertiggestellt…"
+  },
+  "app.debug-export.preparing": {
+    "message": "Dateien werden vorbereitet…"
+  },
   "app.download-manager.active": {
     "message": "Aktiv"
   },
@@ -345,13 +357,13 @@
     "message": "Importierte Instanz"
   },
   "app.download-manager.instance-installation": {
-    "message": "Instanz Installation"
+    "message": "Installation einer Instanz"
   },
   "app.download-manager.modpack": {
     "message": "Modpack"
   },
   "app.download-manager.modpack-installation": {
-    "message": "Modpack-Installation"
+    "message": "Installation eines Modpacks"
   },
   "app.download-manager.new-instance": {
     "message": "Neue Instanz"
@@ -2792,6 +2804,15 @@
   "app.settings.resource-management.app-directory.title": {
     "message": "App-Verzeichnis"
   },
+  "app.settings.resource-management.debug-info.description": {
+    "message": "Exportiere App-Protokolle und Diagnosedaten in eine ZIP-Datei, um sie mit dem Modrinth-Support zu teilen."
+  },
+  "app.settings.resource-management.debug-info.export": {
+    "message": "Debuginformationen exportieren"
+  },
+  "app.settings.resource-management.debug-info.title": {
+    "message": "Debuginformationen"
+  },
   "app.settings.resource-management.maximum-concurrent-downloads.description": {
     "message": "Anzahl der Dateien, die die App auf einmal herunterladen kann. Senke dies, wenn downloads auf deiner Verbindung unzuverlässig sind. Benötigt einen App-Neustart."
   },
@@ -2850,7 +2871,7 @@
     "message": "Dies schließt alle laufenden Instanzen."
   },
   "app.settings.resource-management.store.repair.verify-description": {
-    "message": "Überprüfen Sie fehlende oder beschädigte Dateien und reparieren Sie sie."
+    "message": "Überprüfe, ob Dateien fehlen oder beschädigt sind, und repariere diese."
   },
   "app.settings.resource-management.store.repairing": {
     "message": "Wird überprüft und repariert…"

@@ -302,6 +302,9 @@
   "app.content.sync-resource-packs-disabled": {
     "message": "Schakel eerst resource pakket syncen aan in de appinstellingen."
   },
+  "app.debug-export.canceling": {
+    "message": "Exporteren annuleren…"
+  },
   "app.download-manager.active": {
     "message": "Actief"
   },
@@ -2648,6 +2651,9 @@
   "app.settings.game-options.setting.subtitles.label": {
     "message": "Ondertiteling"
   },
+  "app.settings.game-options.setting.toggle-crouch.label": {
+    "message": ""
+  },
   "app.settings.game-options.setting.toggle-sprint.description": {
     "message": "Druk één keer om te blijven sprinten."
   },
@@ -2737,6 +2743,9 @@
   },
   "app.settings.resource-management.maximum-concurrent-writes.title": {
     "message": "Maximaal aantal gelijktijdige schrijfbewerkingen"
+  },
+  "app.settings.resource-management.store.verified": {
+    "message": "Verificatie voltooid"
   },
   "app.settings.sidebar.label.instances": {
     "message": "Instanties"

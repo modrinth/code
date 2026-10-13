@@ -69,7 +69,7 @@
     "message": "Не вдалося завершити встановлення Java"
   },
   "app.action-bar.install.summary.loader-setup-failed": {
-    "message": "Помилка встановлення завантажувача"
+    "message": "Не вдалося встановити завантажувач"
   },
   "app.action-bar.install.summary.local-data-error": {
     "message": "Не вдалось оновити локальні дані"
@@ -301,6 +301,18 @@
   },
   "app.content.sync-resource-packs-disabled": {
     "message": "Спершу ввімкніть синхронізацію пакетів ресурсів у налаштуваннях застосунку."
+  },
+  "app.debug-export.canceling": {
+    "message": "Скасування експорту…"
+  },
+  "app.debug-export.exporting": {
+    "message": "Експортуємо…"
+  },
+  "app.debug-export.finishing": {
+    "message": "Завершуємо…"
+  },
+  "app.debug-export.preparing": {
+    "message": "Готуємо файли…"
   },
   "app.download-manager.active": {
     "message": "Активно"
@@ -2782,6 +2794,15 @@
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "Каталог застосунку"
+  },
+  "app.settings.resource-management.debug-info.description": {
+    "message": "Експортує журнал застосунку та діагностичні дані в ZIP-файл, яким можна поділитися з підтримкою Modrinth."
+  },
+  "app.settings.resource-management.debug-info.export": {
+    "message": "Експортувати інформацію налагодження"
+  },
+  "app.settings.resource-management.debug-info.title": {
+    "message": "Інформація налагодження"
   },
   "app.settings.resource-management.maximum-concurrent-downloads.description": {
     "message": "Кількість файлів, які застосунок може завантажувати одночасно. Зменште це значення, якщо завантаження нестабільне на вашому з'єднанні. Потребує перезапуску застосунку."

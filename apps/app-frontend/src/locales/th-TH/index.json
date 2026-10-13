@@ -44,6 +44,9 @@
   "app.action-bar.install.summary.corrupt-download": {
     "message": "ไฟล์ที่ดาวน์โหลดเสียหาย"
   },
+  "app.action-bar.install.summary.could-not-save-files": {
+    "message": "ไม่สามารถบันทึกไฟล์ได้"
+  },
   "app.action-bar.make-primary-instance": {
     "message": "กำหนดอินสแตนซ์หลัก"
   },
@@ -95,6 +98,9 @@
   "app.appearance-settings.show-play-time.title": {
     "message": "แสดงระยะเวลาที่เล่น"
   },
+  "app.appearance-settings.toggle-sidebar.title": {
+    "message": "ซ่อนแถบทางด้านขวา"
+  },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "เตือนฉันก่อนติดตั้งแพ็กม็อดที่ไม่รู้จัก"
   },
@@ -103,6 +109,12 @@
   },
   "app.auth-servers.unreachable.header": {
     "message": "ไม่สามารถเชื่อมต่อถึงเซิร์ฟเวอร์ได้"
+  },
+  "app.behavior-settings.confirmations.title": {
+    "message": "การยืนยัน"
+  },
+  "app.behavior-settings.content.title": {
+    "message": "หน้าหลัก และ เนื้อหา"
   },
   "app.browse.add-servers-to-instance": {
     "message": "เพิ่มเซิร์ฟเวอร์ลงในอินสแตนซ์"

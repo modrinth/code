@@ -441,7 +441,7 @@
     "message": "N/A"
   },
   "analytics.stat.unavailable-tooltip": {
-    "message": "Statistik inte tillgängligt för aktuell fråga"
+    "message": "Statistik är otillgänglig för sökning"
   },
   "analytics.stat.views": {
     "message": "Visningar"
@@ -720,7 +720,7 @@
     "message": "Auktorisera {appName}"
   },
   "auth.authorize.error.missing-parameters": {
-    "message": "Saknar obligatoriska OAuth-frågeparametrar."
+    "message": "Saknar obligatoriska OAuth-sökparametrar."
   },
   "auth.authorize.error.no-redirect-url": {
     "message": "Ingen omdirigeringsposition hittad i respons"
@@ -878,11 +878,20 @@
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Öppna Modrinth App"
   },
+  "auth.sign-in.launcher.opening.description": {
+    "message": "Om appen inte öppnas, använd knappen nedan för att slutföra inloggningen."
+  },
   "auth.sign-in.launcher.opening.title": {
     "message": "Öppnar Modrinth App..."
   },
+  "auth.sign-in.launcher.reauthenticate.title": {
+    "message": "Logga in på Modrinth App"
+  },
   "auth.sign-in.no-account": {
     "message": "Har du inget konto?"
+  },
+  "auth.sign-in.reauthenticate.use-different-account": {
+    "message": "Använd ett annat konto"
   },
   "auth.sign-in.sign-in-with": {
     "message": "Logga in på Modrinth"
@@ -2123,6 +2132,9 @@
   "error.generic.default.list_item.1": {
     "message": "Se om Modrinth ligger nere på vår <status-link>statussida</status-link>."
   },
+  "error.generic.default.list_item.support": {
+    "message": "Om det här fortsätter hända kan du kontakta Modrinth-teamet genom vår <support-link>support-portal</support-link>."
+  },
   "error.generic.default.list_title": {
     "message": "Vänligen försök igen om några minuter."
   },
@@ -2827,6 +2839,9 @@
   },
   "layout.publish.email-verification-required.title": {
     "message": "E-post verifikation behövs"
+  },
+  "messages.noResults": {
+    "message": "Inga resultat för din sökning!"
   },
   "modal.shared-instance.open-in-app.benefit.join": {
     "message": "Spela samma innehåll som dina vänner"

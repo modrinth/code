@@ -45,10 +45,10 @@
     "message": "Abhängiger Projekttyp"
   },
   "analytics.breakdown.download-reason": {
-    "message": "Downloadgrund"
+    "message": "Grund des Downloads"
   },
   "analytics.breakdown.download-source": {
-    "message": "Download-Quelle"
+    "message": "Downloadquelle"
   },
   "analytics.breakdown.game-version": {
     "message": "Spielversion"
@@ -881,6 +881,9 @@
   "auth.sign-in.choose-account": {
     "message": "Wähle ein Konto für die Modrinth App"
   },
+  "auth.sign-in.choose-existing-account": {
+    "message": "Ein bestehendes Konto verwenden"
+  },
   "auth.sign-in.continue-with-email": {
     "message": "Weiter mit E-Mail"
   },
@@ -894,7 +897,7 @@
     "message": "Passwort vergessen"
   },
   "auth.sign-in.last-sign-in": {
-    "message": "Zuletzt benutzt"
+    "message": "Zuletzt verwendet"
   },
   "auth.sign-in.launcher.callback.title": {
     "message": "Callback für die Anmeldung bei der Modrinth App"
@@ -905,14 +908,23 @@
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Modrinth App öffnen"
   },
+  "auth.sign-in.launcher.handoff-failed": {
+    "message": "Die Anmeldung bei der Modrinth-App konnte nicht abgeschlossen werden. Bitte versuche es erneut."
+  },
   "auth.sign-in.launcher.opening.description": {
     "message": "Falls sich die App nicht öffnet, klicke auf den Button unten, um die Anmeldung abzuschließen."
   },
   "auth.sign-in.launcher.opening.title": {
     "message": "Modrinth App wird geöffnet..."
   },
+  "auth.sign-in.launcher.reauthenticate.title": {
+    "message": "Bei der Modrinth App anmelden"
+  },
   "auth.sign-in.no-account": {
     "message": "Du hast kein Konto?"
+  },
+  "auth.sign-in.reauthenticate.use-different-account": {
+    "message": "Verwende ein anderes Konto"
   },
   "auth.sign-in.sign-in-with": {
     "message": "Bei Modrinth anmelden"
@@ -1398,7 +1410,7 @@
     "message": "Icon von {name}"
   },
   "create.project.owner-description": {
-    "message": "Setze dich oder eine Organisation, bei der du Mitglied bist, als Projektbesitzer."
+    "message": "Wähle dich selbst oder eine Organisation, der du angehörst, als Besitzer des Projekts aus."
   },
   "create.project.owner-label": {
     "message": "Besitzer"
@@ -2254,6 +2266,9 @@
   },
   "error.generic.default.list_item.1": {
     "message": "Schaue auf unserer <status-link>Statusseite</status-link> nach, ob Modrinth offline ist."
+  },
+  "error.generic.default.list_item.support": {
+    "message": "Falls dies weiterhin auftritt, kannst du das Modrinth-Team über unser <support-link>Support-Portal</support-link> informieren."
   },
   "error.generic.default.list_title": {
     "message": "Bitte versuch es in ein paar Minuten erneut."
@@ -5361,7 +5376,7 @@
     "message": "Jahr"
   },
   "settings.billing.midas.benefits.ad-free": {
-    "message": "Werbungsfreies Surfen auf modrinth.com und in Modrinth App"
+    "message": "Werbefreies Surfen auf modrinth.com und in Modrinth App"
   },
   "settings.billing.midas.benefits.badge": {
     "message": "Modrinth+ Abzeichen in deinem Profil"

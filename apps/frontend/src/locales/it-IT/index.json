@@ -92,6 +92,9 @@
   "analytics.chart.axis.playtime-hours": {
     "message": "{hours} o"
   },
+  "analytics.chart.controls.active-count": {
+    "message": "Attivi: {count}"
+  },
   "analytics.chart.controls.annotations": {
     "message": "Annotazioni"
   },
@@ -156,16 +159,16 @@
     "message": "Mostrare tutte le {count} linee nel grafico?"
   },
   "analytics.chart.table-selection.all": {
-    "message": "Mostrate: {itemType, select, project {tutti i progetti} country {tutti i paesi} monetization {tutti i valori di monetizzazione} downloadSource {tutte le fonti di download} downloadReason {tutti i motivi di download} member {tutti i membri} projectVersion {tutte le versioni del progetto} loader {tutti i loader} gameVersion {tutte le versioni di gioco} other {tutti gli elementi}}"
+    "message": "Mostrato: {itemType, select, project {{count, plural, one {il progetto} other {tutti i progetti}}} country {{count, plural, one {il paese} other {tutti i paesi}}} monetization {{count, plural, one {il valore} other {tutti i valori}} di monetizzazione} downloadSource {{count, plural, one {la fonte} other {tutte le fonti}} di download} downloadReason {{count, plural, one {il motivo} other {tutti i motivi}} di download} member {{count, plural, one {il membro} other {tutti i membri}}} projectVersion {{count, plural, one {la versione} other {tutte le versioni}} del progetto} loader {{count, plural, one {il} other {tutti i}} loader} gameVersion {{count, plural, one {la versione} other {tutte le versioni}} di gioco} other {{count, plural, one {l'elemento} other {gli elementi}}}} dalla tabella"
   },
   "analytics.chart.table-selection.count": {
-    "message": "Mostrate: {count} {itemType, select, project {{count, plural, one {progetto} other {progetti}}} country {{count, plural, one {paese} other {paesi}}} monetization {{count, plural, one {valore} other {valori}} di monetizzazione} downloadSource {{count, plural, one {fonte} other {fonti}} di download} downloadReason {{count, plural, one {motivo} other {motivi}} di download} member {{count, plural, one {membro} other {membri}}} projectVersion {{count, plural, one {versione} other {versioni}} del progetto} loader {loader} gameVersion {{count, plural, one {versione} other {versioni}} di gioco} other {{count, plural, one {elemento} other {elementi}}}}"
+    "message": "Mostrato: {count} {itemType, select, project {{count, plural, one {progetto} other {progetti}}} country {{count, plural, one {paese} other {paesi}}} monetization {{count, plural, one {valore} other {valori}} di monetizzazione} downloadSource {{count, plural, one {fonte} other {fonti}} di download} downloadReason {{count, plural, one {motivo} other {motivi}} di download} member {{count, plural, one {membro} other {membri}}} projectVersion {{count, plural, one {versione} other {versioni}} del progetto} loader {loader} gameVersion {{count, plural, one {versione} other {versioni}} di gioco} other {{count, plural, one {elemento} other {elementi}}}} dalla tabella"
   },
   "analytics.chart.table-selection.limited": {
-    "message": "Mostrate: {limit} {itemType, select, project {{limit, plural, one {progetto} other {progetti}}} country {{limit, plural, one {paese} other {paesi}}} monetization {{limit, plural, one {valore} other {valori}} di monetizzazione} downloadSource {{limit, plural, one {fonte} other {fonti}} di download} downloadReason {{limit, plural, one {motivo} other {motivi}} di download} member {{limit, plural, one {membro} other {membri}}} projectVersion {{limit, plural, one {versione} other {versioni}} del progetto} loader {loader} gameVersion {{limit, plural, one {versione} other {versioni}} di gioco} other {{limit, plural, one {elemento} other {elementi}}}}"
+    "message": "Mostrato: {limit} {itemType, select, project {{limit, plural, one {progetto} other {progetti}}} country {{limit, plural, one {paese} other {paesi}}} monetization {{limit, plural, one {valore} other {valori}} di monetizzazione} downloadSource {{limit, plural, one {fonte} other {fonti}} di download} downloadReason {{limit, plural, one {motivo} other {motivi}} di download} member {{limit, plural, one {membro} other {membri}}} projectVersion {{limit, plural, one {versione} other {versioni}} del progetto} loader {loader} gameVersion {{limit, plural, one {versione} other {versioni}} di gioco} other {{limit, plural, one {elemento} other {elementi}}}} dalla tabella"
   },
   "analytics.chart.table-selection.top": {
-    "message": "Mostrate: {itemType, select, project {{count, plural, one {il primo progetto} other {i primi # progetti}}} country {{count, plural, one {il primo paese} other {i primi # paesi}}} monetization {{count, plural, one {il primo valore} other {i primi # valori}} di monetizzazione} downloadSource {{count, plural, one {la prima fonte} other {le prime # fonti}} di download} downloadReason {{count, plural, one {il primo motivo} other {i primi # motivi}} di download} member {{count, plural, one {il primo membro} other {i primi # membri}}} projectVersion {{count, plural, one {la prima versione} other {le prime # versioni}} del progetto} loader {{count, plural, one {il primo} other {i primi #}} loader} gameVersion {{count, plural, one {la prima versione} other {le prime # versioni}} di gioco} other {{count, plural, one {il primo elemento} other {i primi {count} elementi}}}}"
+    "message": "Mostrato: {itemType, select, project {{count, plural, one {il primo progetto} other {i primi # progetti}}} country {{count, plural, one {il primo paese} other {i primi # paesi}}} monetization {{count, plural, one {il primo valore} other {i primi # valori}} di monetizzazione} downloadSource {{count, plural, one {la prima fonte} other {le prime # fonti}} di download} downloadReason {{count, plural, one {il primo motivo} other {i primi # motivi}} di download} member {{count, plural, one {il primo membro} other {i primi # membri}}} projectVersion {{count, plural, one {la prima versione} other {le prime # versioni}} del progetto} loader {{count, plural, one {il primo} other {i primi #}} loader} gameVersion {{count, plural, one {la prima versione} other {le prime # versioni}} di gioco} other {{count, plural, one {il primo elemento} other {i primi # elementi}}}} dalla tabella"
   },
   "analytics.chart.tooltip.dependent-on-project": {
     "message": "Dipendente su {project}"
@@ -261,10 +264,10 @@
     "message": "Stabili"
   },
   "analytics.filter.search.countries": {
-    "message": "Cerca un paese..."
+    "message": "Cerca paesi..."
   },
   "analytics.filter.search.dependent-projects": {
-    "message": "Cerca un progetto..."
+    "message": "Cerca progetti..."
   },
   "analytics.filter.search.download-sources": {
     "message": "Cerca una fonte di download..."
@@ -276,7 +279,7 @@
     "message": "Cerca una versione del progetto..."
   },
   "analytics.filter.search.versions": {
-    "message": "Cerca una versione..."
+    "message": "Cerca versioni..."
   },
   "analytics.graph.title.downloads": {
     "message": "Download nel tempo"
@@ -483,7 +486,7 @@
     "message": "Raggruppato per {groupBy}"
   },
   "analytics.table.pagination.summary": {
-    "message": "Mostrati: {start} - {end} di {total}"
+    "message": "Mostrato: {start} a {end} di {total}"
   },
   "analytics.table.search.placeholder": {
     "message": "Cerca..."
@@ -878,6 +881,9 @@
   "auth.sign-in.choose-account": {
     "message": "Scegli un account da utilizzare su Modrinth App"
   },
+  "auth.sign-in.choose-existing-account": {
+    "message": "Usa un account esistente"
+  },
   "auth.sign-in.continue-with-email": {
     "message": "Continua con l'email"
   },
@@ -902,14 +908,23 @@
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Apri Modrinth App"
   },
+  "auth.sign-in.launcher.handoff-failed": {
+    "message": "Impossibile completare l'accesso a Modrinth App. Riprova."
+  },
   "auth.sign-in.launcher.opening.description": {
     "message": "Se l'app non si apre, usa il pulsante sotto per terminare l'accesso."
   },
   "auth.sign-in.launcher.opening.title": {
     "message": "Apertura di Modrinth App..."
   },
+  "auth.sign-in.launcher.reauthenticate.title": {
+    "message": "Accedi a Modrinth App"
+  },
   "auth.sign-in.no-account": {
     "message": "Non hai un account?"
+  },
+  "auth.sign-in.reauthenticate.use-different-account": {
+    "message": "Usa un account diverso"
   },
   "auth.sign-in.sign-in-with": {
     "message": "Accedi a Modrinth"
@@ -1497,13 +1512,13 @@
     "message": "{count} {countPlural, plural, one {progetto} other {progetti}}"
   },
   "dashboard.collections.label.search-input": {
-    "message": "Cerca tra le tue raccolte"
+    "message": "Cerca tue raccolte"
   },
   "dashboard.collections.long-title": {
     "message": "Le tue raccolte"
   },
   "dashboard.collections.placeholder.search": {
-    "message": "Cerca una raccolta..."
+    "message": "Cerca raccolte..."
   },
   "dashboard.collections.sort.name-ascending": {
     "message": "Nome (A-Z)"
@@ -1599,16 +1614,16 @@
     "message": "Privato"
   },
   "dashboard.creator-withdraw-modal.kyc.search-countries-placeholder": {
-    "message": "Cerca un paese..."
+    "message": "Cerca paesi..."
   },
   "dashboard.creator-withdraw-modal.kyc.search-subdivisions-placeholder": {
-    "message": "Cerca una suddivisione..."
+    "message": "Cerca suddivisioni..."
   },
   "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
     "message": "Seleziona il paese"
   },
   "dashboard.creator-withdraw-modal.method-selection.country-search-placeholder": {
-    "message": "Cerca un paese..."
+    "message": "Cerca paesi..."
   },
   "dashboard.creator-withdraw-modal.method-selection.error-text": {
     "message": "Impossibile recuperare i metodi di pagamento. Riprova più tardi."
@@ -1767,10 +1782,10 @@
     "message": "Premi"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.search-amount-label": {
-    "message": "Cerca un valore"
+    "message": "Cerca valore"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.search-category-placeholder": {
-    "message": "Cerca tra {category}..."
+    "message": "Cerca {category}..."
   },
   "dashboard.creator-withdraw-modal.tremendous-details.select-category-placeholder": {
     "message": "Seleziona {category}"
@@ -1885,6 +1900,9 @@
   },
   "dashboard.projects.head-title": {
     "message": "Progetti"
+  },
+  "dashboard.projects.links.and-more": {
+    "message": "e ancora {count}..."
   },
   "dashboard.projects.links.button.clear-link": {
     "message": "Rimuovi link"
@@ -2248,6 +2266,9 @@
   },
   "error.generic.default.list_item.1": {
     "message": "Verifica se Modrinth è fuori uso sulla nostra <status-link>pagina Stato</status-link>."
+  },
+  "error.generic.default.list_item.support": {
+    "message": "Se questo continua, dovresti informare il team di Modrinth attraverso il nostro <support-link>portale di assistenza</support-link>."
   },
   "error.generic.default.list_title": {
     "message": "Riprova tra qualche minuto."
@@ -3033,7 +3054,7 @@
     "message": "Tutti i gruppi di attribuzione del progetto e i loro contenuti saranno eliminati per sempre. Questa azione è irreversibile."
   },
   "modpack-scan-modal.delete-all-groups.error": {
-    "message": "Errore nell'eliminazione dei gruppi: {error}"
+    "message": "Impossibile eliminare i gruppi: {error}"
   },
   "modpack-scan-modal.delete-all-groups.success": {
     "message": "Tutti i gruppi eliminati con successo."
@@ -3069,7 +3090,7 @@
     "message": "Scansiona tutto"
   },
   "modpack-scan-modal.scan-error": {
-    "message": "Alcuni file non sono stati scansionati: \n\n{error}"
+    "message": "Impossibile scansionare alcuni file: \n\n{error}"
   },
   "modpack-scan-modal.scanning": {
     "message": "Scansione..."
@@ -3834,7 +3855,7 @@
     "message": "Non puoi salvare modifiche ai tuoi progetti che risultano in una validazione fallita."
   },
   "project.notification.review-save-failed.title": {
-    "message": "Impossibile salvare il progetto durante la revisione"
+    "message": "Impossibile salvare il progetto in revisione"
   },
   "project.notification.updated.message": {
     "message": "Il progetto è stato aggiornato."
@@ -4044,7 +4065,7 @@
     "message": "es: Aggiunge un file sul desktop chiamato svegliati.txt"
   },
   "project.settings.disclosures.system-interactions.title": {
-    "message": "Interazioni esterne col sistema"
+    "message": "Interazioni col sistema"
   },
   "project.settings.disclosures.telemetry.consent-description": {
     "message": "Qual è il modello di consenso della telemetria?"
@@ -4130,6 +4151,9 @@
   "project.settings.license.custom-url-description": {
     "message": "La posizione web del testo completo della licenza."
   },
+  "project.settings.license.intro": {
+    "message": "È importante scegliere una licenza adeguata per il progetto. Puoi sceglierne una dalla nostra lista o fornirne una personalizzata. Puoi anche fornire un URL alla licensa scelta; altrimenti, il suo testo verrà mostrato. Vedi la nostra <guide>guida sulle licenze</guide> per maggiori informazioni."
+  },
   "project.settings.license.later": {
     "message": "Edizioni successive"
   },
@@ -4155,7 +4179,7 @@
     "message": "Licenza"
   },
   "project.settings.license.select-placeholder": {
-    "message": "Cerca una licenza..."
+    "message": "Cerca licenze..."
   },
   "project.settings.license.title": {
     "message": "Licenza"
@@ -4424,6 +4448,9 @@
   "project.settings.tags.featured-tags-select-description": {
     "message": "Seleziona i tag più pertinenti. Questi sono mostrati prima degli altri tag."
   },
+  "project.settings.tags.features-description": {
+    "message": "Seleziona tutte le funzioni che il progetto usa."
+  },
   "project.settings.tags.group-title.categories": {
     "message": "{showType, select, yes {{types}: categorie} other {Categorie}}"
   },
@@ -4438,6 +4465,12 @@
   },
   "project.settings.tags.multiple-resolution-tags-warning": {
     "message": "Hai selezionato {count} tag di risoluzione ({tags}). I pacchetti di risorse dovrebbero averne solo uno."
+  },
+  "project.settings.tags.performance-impact-description": {
+    "message": "Seleziona l'impatto che il progetto ha sulle prestazioni. Selezionane di più se è configurabile con più impostazioni."
+  },
+  "project.settings.tags.resolutions-description": {
+    "message": "Seleziona le risoluzioni delle grafiche che il progetto usa."
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "Seleziona almeno una categoria per metterla in evidenza."
@@ -4514,6 +4547,12 @@
   "report.already-reported": {
     "message": "Hai già segnalato {title}"
   },
+  "report.already-reported-description": {
+    "message": "Hai già una segnalazione aperta a riguardo. Se hai maggiori informazioni, puoi aggiungerci dettagli."
+  },
+  "report.back-to-item": {
+    "message": "Torna indietro"
+  },
   "report.body.description": {
     "message": "Includi link e immagini se possibile e pertinente. Segnalazioni vuote o carenti saranno chiuse e ignorate."
   },
@@ -4522,6 +4561,9 @@
   },
   "report.checking": {
     "message": "Controllo {item}..."
+  },
+  "report.could-not-find": {
+    "message": "Impossibile trovare il contenuto"
   },
   "report.for.violation": {
     "message": "Violazione delle <rules-link>Regole</rules-link> o dei <terms-link>Termini d'uso</terms-link> di Modrinth"
@@ -4574,8 +4616,14 @@
   "report.please-report": {
     "message": "Si prega di segnalare:"
   },
+  "report.question.content-id": {
+    "message": "Qual è l'ID del contenuto?"
+  },
   "report.question.content-type": {
     "message": "Che tipo di contenuto stai segnalando?"
+  },
+  "report.question.report-reason": {
+    "message": "Quali delle regole di Modrinth sono violate da questo contenuto?"
   },
   "report.report-content": {
     "message": "Segnala contenuto ai moderatori"

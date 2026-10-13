@@ -129,7 +129,7 @@
     "message": "Mostra istanza"
   },
   "app.action-bar.view-logs": {
-    "message": "Mostra i log"
+    "message": "Mostra il registro"
   },
   "app.ads-consent.accept": {
     "message": "Accetta tutto"
@@ -301,6 +301,18 @@
   },
   "app.content.sync-resource-packs-disabled": {
     "message": "Attiva prima la sincronizzazione dei pacchetti di risorse nelle impostazioni."
+  },
+  "app.debug-export.canceling": {
+    "message": "Annullamento esportazione…"
+  },
+  "app.debug-export.exporting": {
+    "message": "Esportazione…"
+  },
+  "app.debug-export.finishing": {
+    "message": "Finalizzazione…"
+  },
+  "app.debug-export.preparing": {
+    "message": "Preparazione file…"
   },
   "app.download-manager.active": {
     "message": "Attivi"
@@ -597,7 +609,7 @@
     "message": "Il server potrebbe non essere compatibile con tutte le istanze."
   },
   "app.instance.add-server.search-placeholder": {
-    "message": "Cerca tra le istanze"
+    "message": "Cerca una istanza"
   },
   "app.instance.add-server.title": {
     "message": "Aggiungi server all'istanza"
@@ -1074,7 +1086,7 @@
     "message": "Nessuna istanza trovata"
   },
   "app.library.group.instances-modal.search-placeholder": {
-    "message": "Cerca tra le istanze"
+    "message": "Cerca istanza"
   },
   "app.library.group.instances-modal.title": {
     "message": "Aggiungi istanze a \"{groupName}\""
@@ -1110,7 +1122,7 @@
     "message": "Impossibile rinominare il gruppo"
   },
   "app.library.group.search-instance": {
-    "message": "Cerca tra le istanze"
+    "message": "Cerca istanza"
   },
   "app.library.group.ungrouped": {
     "message": "Senza gruppo"
@@ -1204,6 +1216,9 @@
   },
   "app.library.selection.remove-from-group": {
     "message": "Rimuovi dal gruppo"
+  },
+  "app.library.selection.selected-count": {
+    "message": "Selezionate: {count}"
   },
   "app.library.sort.date-created": {
     "message": "Data di creazione"
@@ -1600,6 +1615,9 @@
   },
   "app.screenshots.selection.remove-from-group": {
     "message": "Rimuovi dal gruppo"
+  },
+  "app.screenshots.selection.selected-count": {
+    "message": "Selezionate: {count}"
   },
   "app.screenshots.selection.zip-archive": {
     "message": "Archivio ZIP"
@@ -2786,6 +2804,15 @@
   "app.settings.resource-management.app-directory.title": {
     "message": "Cartella dell'app"
   },
+  "app.settings.resource-management.debug-info.description": {
+    "message": "Esporta i registri e i dati diagnostici dell'app in un file ZIP da condividere con l'assistenza di Modrinth."
+  },
+  "app.settings.resource-management.debug-info.export": {
+    "message": "Esporta info di debug"
+  },
+  "app.settings.resource-management.debug-info.title": {
+    "message": "Info di debug"
+  },
   "app.settings.resource-management.maximum-concurrent-downloads.description": {
     "message": "Il numero di file che l'app può scaricare contemporaneamente. Decrementa se i download risultano instabili sulla tua connessione. Richiede un riavvio."
   },
@@ -2916,7 +2943,7 @@
     "message": "Riprova"
   },
   "app.settings.synced-options.choose-sync-source.search-placeholder": {
-    "message": "Cerca tra le istanze"
+    "message": "Cerca istanza"
   },
   "app.settings.synced-options.choose-sync-source.sync": {
     "message": "Sincronizza"
@@ -3000,7 +3027,7 @@
     "message": "Salva"
   },
   "app.settings.synced-options.game-settings.search": {
-    "message": "Cerca un'impostazione..."
+    "message": "Cerca impostazioni..."
   },
   "app.settings.synced-options.game-settings.sync-description": {
     "message": "Le impostazioni sincronizzate sono applicate a ogni istanza e sovrascrivono i valori inclusi con un pacchetto di mod."
@@ -3228,7 +3255,7 @@
     "message": "L'ordine delle skin non è stato salvato."
   },
   "app.skins.reorder-error.title": {
-    "message": "Errore nel riordine delle skin"
+    "message": "Impossibile riordinare le skin"
   },
   "app.skins.section.builders-and-biomes": {
     "message": "Builders & Biomes"
@@ -3405,7 +3432,7 @@
     "message": "Puoi rimuoverlo da solo questa istanza o da tutte quelle sincronizzate. Rimuovere da solo questa istanza abiliterà le sovrascritture, e non sincronizzerà più i contenuti selezionati con le altre istanze."
   },
   "app.synced-content.delete.resource-pack-description": {
-    "message": "Puoi {count, plural, one {rimuoverlo} other {rimuoverli}} solo da questa istanza o da tutte le sincronizzate. da solo questa istanza abiliterà le sovrascritture, e non sincronizzerà più i pacchetti di risorse con le altre istanze."
+    "message": "Puoi {count, plural, one {rimuoverlo} other {rimuoverli}} solo da questa istanza o da tutte le sincronizzate. {count, plural, one {Rimuoverlo} other {Rimuoverli}} da solo questa istanza abiliterà le sovrascritture e non sincronizzerà più i pacchetti di risorse con le altre istanze."
   },
   "app.synced-content.delete.resource-pack-header": {
     "message": "{count, plural, one {Il pacchetto di risorse è sincronizzato} other {I pacchetti di risorse sono sincronizzati}}"
@@ -3600,7 +3627,7 @@
     "message": "Nessuna amicizia trovata per ''{query}''"
   },
   "friends.search-friends-placeholder": {
-    "message": "Cerca un'amicizia..."
+    "message": "Cerca amicizie..."
   },
   "friends.section.heading": {
     "message": "{title} - {count}"

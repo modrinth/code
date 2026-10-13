@@ -1712,6 +1712,9 @@
   "app.settings.game-options.choice.on": {
     "message": "مفعل"
   },
+  "app.settings.game-options.choice.opengl": {
+    "message": "OpenGL"
+  },
   "app.settings.game-options.choice.right": {
     "message": "يمين"
   },
