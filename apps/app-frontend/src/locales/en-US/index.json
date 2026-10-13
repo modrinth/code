@@ -4476,7 +4476,7 @@
     "message": "Add account"
   },
   "minecraft-account.add-offline-account": {
-    "message": "Add offline account"
+    "message": "Create offline account"
   },
   "minecraft-account.cancel": {
     "message": "Cancel"
@@ -4492,6 +4492,9 @@
   },
   "minecraft-account.offline-account": {
     "message": "Offline"
+  },
+  "minecraft-account.offline-hint": {
+    "message": "No Microsoft login required"
   },
   "minecraft-account.offline-username": {
     "message": "Username"

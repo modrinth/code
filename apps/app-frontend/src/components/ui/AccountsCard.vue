@@ -4,6 +4,7 @@
 		class="flex flex-col gap-3 bg-button-bg border border-solid border-surface-5 rounded-xl p-3 mt-2"
 	>
 		<span>{{ formatMessage(messages.notSignedIn) }}</span>
+		<span class="text-secondary text-xs">{{ formatMessage(messages.offlineHint) }}</span>
 		<Button type="colored" color="brand" :disabled="loginDisabled" @click="login()">
 			<LogInIcon v-if="!loginDisabled" />
 			<SpinnerIcon v-else class="animate-spin" />
@@ -382,7 +383,11 @@ const messages = defineMessages({
 	},
 	addOfflineAccount: {
 		id: 'minecraft-account.add-offline-account',
-		defaultMessage: 'Add offline account',
+		defaultMessage: 'Create offline account',
+	},
+	offlineHint: {
+		id: 'minecraft-account.offline-hint',
+		defaultMessage: 'No Microsoft login required',
 	},
 	offlineUsername: {
 		id: 'minecraft-account.offline-username',
