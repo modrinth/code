@@ -88,6 +88,17 @@
 						>
 							<CoffeeIcon aria-hidden="true" />
 						</ButtonLink>
+						<Button
+							v-tooltip="formatMessage(messages.scanAi)"
+							:aria-label="formatMessage(messages.scanAi)"
+							type="quiet"
+							size="sm"
+							circular
+							icon-only
+							@click="emit('scan-ai', file.url)"
+						>
+							<ScanEyeIcon aria-hidden="true" />
+						</Button>
 						<TeleportOverflowMenu
 							type="quiet"
 							size="sm"
@@ -294,6 +305,7 @@ import {
 	DropdownIcon,
 	ExternalIcon,
 	MoreVerticalIcon,
+	ScanEyeIcon,
 } from '@modrinth/assets'
 import {
 	Accordion,
@@ -340,7 +352,11 @@ const props = defineProps<{
 	expanded: boolean
 	editable: boolean
 }>()
-const emit = defineEmits<{ toggle: []; edit: [stage: EditVersionStage] }>()
+const emit = defineEmits<{
+	toggle: []
+	edit: [stage: EditVersionStage]
+	'scan-ai': [url: string]
+}>()
 const { formatMessage } = useVIntl()
 const formatDateTime = useFormatDateTime({
 	dateStyle: 'long',

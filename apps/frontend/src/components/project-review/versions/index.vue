@@ -7,6 +7,7 @@
 			:host="editorHost"
 			:enable-drop-area="false"
 		/>
+		<ProjectC2paScanModal ref="aiScanModal" />
 		<ReviewPanel
 			v-if="resolve({ kind: 'undefined-project' })"
 			mode="inline"
@@ -80,6 +81,7 @@
 						:editable="!!editorHost"
 						@edit="editModal?.openEditVersionModal(version.id, version.project_id, $event)"
 						@toggle="toggle(version.id)"
+						@scan-ai="aiScanModal?.openC2paModal($event)"
 					/>
 				</template>
 			</div>
@@ -94,6 +96,7 @@ import { useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, useTemplateRef } from 'vue'
 
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
+import ProjectC2paScanModal from '~/components/ui/moderation/ProjectC2paScanModal.vue'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 import { injectReviewPanels } from '~/providers/project-review/review-panels'
 import type { ManageVersionHost } from '~/providers/version/manage-version-modal'
@@ -109,6 +112,7 @@ const { selection, projectV2, versions, versionsQuery, isLoading, error, refresh
 	injectProjectReviewPageContext()
 const queryClient = useQueryClient()
 const editModal = useTemplateRef<InstanceType<typeof CreateProjectVersionModal>>('editModal')
+const aiScanModal = useTemplateRef<InstanceType<typeof ProjectC2paScanModal>>('aiScanModal')
 const editorHost = computed<ManageVersionHost | undefined>(() => {
 	const project = projectV2.value
 	if (!project || isLoading.value || error.value) return undefined

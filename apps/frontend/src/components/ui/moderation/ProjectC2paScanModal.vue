@@ -1,12 +1,30 @@
 <script setup lang="ts">
 import { ExternalIcon } from '@modrinth/assets'
-import { ButtonLink, NewModal } from '@modrinth/ui'
+import {
+	ButtonLink,
+	defineMessages,
+	injectNotificationManager,
+	NewModal,
+	useVIntl,
+} from '@modrinth/ui'
 import { ref, useTemplateRef } from 'vue'
 
 import { fileDeclaresAi } from '~/helpers/c2pa.ts'
 
 const modalRef = useTemplateRef<InstanceType<typeof NewModal>>('modalRef')
 const isScanning = ref(false)
+const { addNotification } = injectNotificationManager()
+const { formatMessage } = useVIntl()
+const messages = defineMessages({
+	noAiFiles: {
+		id: 'moderation.c2pa-scan.no-ai-files',
+		defaultMessage: 'No AI-generated files found.',
+	},
+	scanFailed: {
+		id: 'moderation.c2pa-scan.failed',
+		defaultMessage: 'Failed to scan for AI-generated files.',
+	},
+})
 
 const fileUrl = ref<string | null>(null)
 const totalFiles = ref(0)
@@ -51,6 +69,21 @@ async function scanFile(url: string) {
 				aiFiles.value.push(entry.filename)
 			}
 		}
+
+		if (aiFiles.value.length > 0) {
+			modalRef.value?.show()
+		} else {
+			addNotification({
+				type: 'success',
+				title: formatMessage(messages.noAiFiles),
+			})
+		}
+	} catch (error) {
+		addNotification({
+			type: 'error',
+			title: formatMessage(messages.scanFailed),
+			text: error instanceof Error ? error.message : String(error),
+		})
 	} finally {
 		isScanning.value = false
 	}
@@ -64,7 +97,6 @@ function createSlicerUrl(path: string) {
 }
 
 function openC2paModal(url: string) {
-	modalRef.value?.show()
 	void scanFile(url)
 }
 

@@ -637,6 +637,10 @@ export const projectReviewMessages = defineMessages({
 		id: 'moderation.project-review.openSlicer',
 		defaultMessage: 'Open in Slicer',
 	},
+	scanAi: {
+		id: 'moderation.project-review.scanAi',
+		defaultMessage: 'Scan for AI-generated images',
+	},
 	dependencies: {
 		id: 'moderation.project-review.dependencies',
 		defaultMessage: 'Dependencies',
