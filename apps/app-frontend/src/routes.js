@@ -82,7 +82,7 @@ export default new createRouter({
 			path: '/:projectType(mod|plugin|datapack|resourcepack|shader|modpack)/:id/:rest(.*)*',
 			redirect: (to) => {
 				const rest = to.params.rest ? `/${[].concat(to.params.rest).join('/')}` : ''
-				return `/project/${to.params.id}${rest}${to.hash}`
+				return { path: `/project/${to.params.id}${rest}`, query: to.query, hash: to.hash }
 			},
 		},
 		{

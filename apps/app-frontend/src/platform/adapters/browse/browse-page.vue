@@ -26,6 +26,7 @@ import {
 	formatProjectTypeSentence,
 	getHostingModEnvironmentOverride,
 	getLatestMatchingInstallVersion,
+	getProjectVersionFilterQuery,
 	getSelectedInstallPreferences,
 	getTargetInstallPreferences,
 	injectNotificationManager,
@@ -1385,7 +1386,15 @@ provideBrowseManager({
 	dismissedPhotosensitivityFilterWarning,
 	getProjectLink: (result: Labrinth.Search.v3.ResultSearchProject) => ({
 		path: `/project/${result.project_id ?? result.slug}`,
-		query: getProjectBrowseQuery(),
+		query: {
+			...getProjectBrowseQuery(),
+			...getProjectVersionFilterQuery({
+				contentType: projectType.value,
+				selectedFilters: searchState.currentFilters.value,
+				providedFilters: combinedProvidedFilters.value,
+				overriddenProvidedFilterTypes: searchState.overriddenProvidedFilterTypes.value,
+			}),
+		},
 	}),
 	getServerProjectLink: (result: Labrinth.Search.v3.ResultSearchProject) => ({
 		path: `/project/${result.slug ?? result.project_id}`,

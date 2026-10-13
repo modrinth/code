@@ -19,6 +19,7 @@ import {
 	CreationFlowModal,
 	defineMessages,
 	formatProjectTypeSentence,
+	getProjectVersionFilterQuery,
 	injectModrinthClient,
 	injectUserPreferences,
 	isServerContentEnvironmentProjectType,
@@ -564,10 +565,18 @@ provideBrowseManager({
 	tags,
 	projectType: projectTypeId,
 	...searchState,
-	getProjectLink: (result: Labrinth.Search.v3.ResultSearchProject) =>
-		withHostingContext(
-			`/${projectType.value?.id ?? 'project'}/${result.slug ? result.slug : result.project_id}`,
-		),
+	getProjectLink: (result: Labrinth.Search.v3.ResultSearchProject) => ({
+		path: `/${projectType.value?.id ?? 'project'}/${result.slug ? result.slug : result.project_id}`,
+		query: {
+			...hostingContextQuery.value,
+			...getProjectVersionFilterQuery({
+				contentType: projectTypeId.value,
+				selectedFilters: searchState.currentFilters.value,
+				providedFilters: serverFilters.value,
+				overriddenProvidedFilterTypes: searchState.overriddenProvidedFilterTypes.value,
+			}),
+		},
+	}),
 	getServerProjectLink: (result: Labrinth.Search.v3.ResultSearchProject) =>
 		withHostingContext(`/server/${result.slug ?? result.project_id}`),
 	selectableProjectTypes: computed(() => []),
