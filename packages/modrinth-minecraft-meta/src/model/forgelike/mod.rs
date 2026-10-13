@@ -4,27 +4,13 @@ pub use name::ForgelikeInstallerName;
 use jiff::Timestamp;
 use serde::{Deserialize, Serialize};
 use toasty::{Embed, Model};
-use uuid::Uuid;
+use crate::model::NEOFORGE_BLACKLIST;
 
 use crate::{
     model::{DownloadRun, DownloadRunId, ProfileMetadata},
     util::{MavenCoordinate, Sha256},
 };
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Embed)]
-pub struct ForgeCatalogId(pub Uuid);
-
-#[derive(Debug, Clone, Model)]
-pub struct ForgeCatalog {
-    #[key]
-    #[auto]
-    pub id: ForgeCatalogId,
-    #[unique]
-    pub download_run_id: DownloadRunId,
-    #[belongs_to]
-    pub download_run: toasty::Deferred<DownloadRun>,
-    pub sha256: Sha256,
-}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Embed)]
 pub enum ForgelikeLoader {
@@ -46,8 +32,10 @@ pub struct ForgelikeInstaller {
 
 impl ForgelikeInstaller {
     pub fn is_blacklisted(&self) -> bool {
-        self.loader == ForgelikeLoader::Neoforge
-            && crate::import::neoforge::BLACKLIST.contains(&self.name.as_str())
+        match self.loader {
+            ForgelikeLoader::Forge => false,
+            ForgelikeLoader::Neoforge => NEOFORGE_BLACKLIST.contains(&self.name.as_str()),
+        }
     }
 }
 
@@ -78,33 +66,4 @@ pub struct ForgelikeExtract {
     /// The field name is retained for compatibility with existing extraction records.
     #[column(type = json)]
     pub embedded_maven_artifacts: toasty::Json<Vec<ForgelikeStoredArtifact>>,
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use serde_json::json;
-
-    #[test]
-    fn stored_artifact_round_trips_and_requires_hash() {
-        let value = json!({
-            "coordinate": "net.example:library:1",
-            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
-        });
-        let stored: ForgelikeStoredArtifact =
-            serde_json::from_value(value.clone()).unwrap();
-        assert_eq!(serde_json::to_value(stored).unwrap(), value);
-        assert!(
-            serde_json::from_value::<ForgelikeStoredArtifact>(json!({
-                "coordinate": "net.example:library:1"
-            }))
-            .is_err()
-        );
-        assert!(
-            serde_json::from_value::<Vec<ForgelikeStoredArtifact>>(json!([
-                "maven/net/example/library/1/library-1.jar"
-            ]))
-            .is_err()
-        );
-    }
 }

@@ -1,7 +1,6 @@
 version = 1
 
 [schema]
-
 [[schema.tables]]
 id = 0
 name = "quilt_catalogs"

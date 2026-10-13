@@ -116,16 +116,6 @@ pub async fn download(cx: &mut DownloadRunContext<'_>) -> Result<()> {
     Ok(())
 }
 
-/// Specific NeoForge installer versions which we can't download or process.
-pub(crate) const BLACKLIST: &[&str] = &[
-    // listed upstream, but installer JARs and POMs return 404
-    "1.20.1-47.1.7",
-    "47.1.82",
-    // the installer references a missing universal JAR; upstream and launcher-meta
-    // return 404, although production publishes a manifest referencing that JAR
-    "21.4.31-beta",
-];
-
 fn installer_url(artifact: &str, name: &ForgelikeInstallerName) -> String {
     format!(
         "https://maven.neoforged.net/releases/net/neoforged/{artifact}/{name}/{artifact}-{name}-installer.jar"
