@@ -137,12 +137,12 @@ const messages = defineMessages({
 				</div>
 			</div>
 			<div
-				class="pointer-events-none absolute inset-x-0 top-0 z-10 h-8 bg-gradient-to-b from-[#19211F] to-transparent transition-opacity duration-200 motion-reduce:transition-none"
+				class="sidebar-scroll-fade pointer-events-none absolute inset-x-0 top-0 z-10 h-8 rotate-180 transition-opacity duration-200 motion-reduce:transition-none"
 				:class="showTopFade ? 'opacity-100' : 'opacity-0'"
 				aria-hidden="true"
 			/>
 			<div
-				class="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-8 bg-gradient-to-t from-[#151A1B] to-transparent transition-opacity duration-200 motion-reduce:transition-none"
+				class="sidebar-scroll-fade pointer-events-none absolute inset-x-0 bottom-0 z-10 h-8 transition-opacity duration-200 motion-reduce:transition-none"
 				:class="showAd || showBottomFade ? 'opacity-100' : 'opacity-0'"
 				aria-hidden="true"
 			/>
@@ -164,5 +164,9 @@ const messages = defineMessages({
 
 .sidebar-teleport-content:empty + .sidebar-default-content.sidebar-enabled {
 	display: contents;
+}
+
+.sidebar-scroll-fade {
+	background: var(--brand-gradient-fade-out-color);
 }
 </style>
