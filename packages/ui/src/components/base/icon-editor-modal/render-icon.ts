@@ -1,7 +1,7 @@
 import type { IconConfig } from './types'
 
 export async function renderIcon(config: IconConfig, symbolAsset: string): Promise<File> {
-	const size = 256
+	const size = 512
 	const canvas = document.createElement('canvas')
 	canvas.width = size
 	canvas.height = size
