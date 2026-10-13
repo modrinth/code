@@ -265,6 +265,24 @@ pub async fn import_mmc(
     Ok(())
 }
 
+/// Whether the instance's intermediary patch comes from Ornithe.
+///
+/// The Ornithe installer adds a regular Fabric Loader component, so the
+/// intermediary patch is the only thing that sets its instances apart.
+async fn has_ornithe_intermediary(minecraft_folder: &Path) -> bool {
+    let Some(instance_folder) = minecraft_folder.parent() else {
+        return false;
+    };
+
+    io::read(
+        instance_folder
+            .join("patches")
+            .join("net.fabricmc.intermediary.json"),
+    )
+    .await
+    .is_ok_and(|x| String::from_utf8_lossy(&x).contains("net.ornithemc"))
+}
+
 async fn import_mmc_unmanaged(
     instance_id: &str,
     minecraft_folder: PathBuf,
@@ -274,17 +292,11 @@ async fn import_mmc_unmanaged(
     reporter: InstallProgressReporter,
     details: InstallPhaseDetails,
 ) -> crate::Result<()> {
-    // The Ornithe installer adds a regular Fabric Loader component, so only the intermediary patch tells its instances apart
-    let has_ornithe_intermediary = match minecraft_folder.parent() {
-        Some(instance_folder) => io::read(
-            instance_folder
-                .join("patches")
-                .join("net.fabricmc.intermediary.json"),
-        )
-        .await
-        .is_ok_and(|x| String::from_utf8_lossy(&x).contains("net.ornithemc")),
-        None => false,
-    };
+    let is_ornithe = mmc_pack
+        .components
+        .iter()
+        .any(|x| x.uid.starts_with("net.fabricmc.fabric-loader"))
+        && has_ornithe_intermediary(&minecraft_folder).await;
 
     // Pack dependencies stored in mmc-pack.json, we convert to .mrpack pack dependencies
     let dependencies = mmc_pack
@@ -293,7 +305,7 @@ async fn import_mmc_unmanaged(
         .filter_map(|component| {
             if component.uid.starts_with("net.fabricmc.fabric-loader") {
                 return Some((
-                    if has_ornithe_intermediary {
+                    if is_ornithe {
                         PackDependency::OrnitheLoader
                     } else {
                         PackDependency::FabricLoader

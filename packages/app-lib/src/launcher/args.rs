@@ -273,6 +273,24 @@ pub async fn get_minecraft_arguments(
     let profile = credentials.maybe_online_profile().await;
     let mut parsed_arguments = Vec::new();
 
+    if let Some(legacy_arguments) = legacy_arguments {
+        for x in legacy_arguments.split(' ') {
+            parsed_arguments.push(parse_minecraft_argument(
+                &x.replace(' ', TEMPORARY_REPLACE_CHAR),
+                &access_token,
+                &profile.name,
+                profile.id,
+                version,
+                asset_index_name,
+                game_directory,
+                assets_directory,
+                version_type,
+                resolution,
+                quick_play_type,
+            )?);
+        }
+    }
+
     if let Some(arguments) = arguments {
         parse_arguments(
             arguments,
@@ -295,22 +313,6 @@ pub async fn get_minecraft_arguments(
             java_arch,
             quick_play_type,
         )?;
-    } else if let Some(legacy_arguments) = legacy_arguments {
-        for x in legacy_arguments.split(' ') {
-            parsed_arguments.push(parse_minecraft_argument(
-                &x.replace(' ', TEMPORARY_REPLACE_CHAR),
-                &access_token,
-                &profile.name,
-                profile.id,
-                version,
-                asset_index_name,
-                game_directory,
-                assets_directory,
-                version_type,
-                resolution,
-                quick_play_type,
-            )?);
-        }
     }
 
     if let QuickPlayType::Server(server) = quick_play_type

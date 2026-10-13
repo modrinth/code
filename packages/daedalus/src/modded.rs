@@ -143,6 +143,10 @@ pub struct PartialVersionInfo {
     pub arguments: Option<HashMap<ArgumentType, Vec<Argument>>>,
     /// Libraries that the version depends on
     pub libraries: Vec<Library>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    /// Library artifacts (`groupId:artifactId`) of the inherited version that
+    /// the loader drops
+    pub removed_libraries: Vec<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     /// The Java version the loader prefers over the one the game asks for
     pub java_version: Option<JavaVersion>,
@@ -192,6 +196,10 @@ pub fn merge_partial_version(
         let lib_artifact = lib.name.rsplit_once(':').map(|x| x.0);
 
         if let Some(lib_artifact) = lib_artifact {
+            if partial.removed_libraries.iter().any(|x| x == lib_artifact) {
+                continue;
+            }
+
             if !partial.libraries.iter().any(|x| {
                 let target_artifact = x.name.rsplit_once(':').map(|x| x.0);
 
@@ -452,6 +460,47 @@ mod tests {
         );
         assert_eq!(merged.java_version.unwrap().major_version, 8);
         assert!(merged.logging.is_some());
+    }
+
+    #[test]
+    fn loader_removed_libraries_are_dropped() {
+        let partial: PartialVersionInfo = serde_json::from_value(json!({
+            "id": "fabric-loader-0.19.5-1.5.2-ornithe-gen2",
+            "inheritsFrom": "1.5.2",
+            "time": "2026-05-27T14:13:59+00:00",
+            "releaseTime": "2026-05-27T14:13:59+00:00",
+            "libraries": [{ "name": "org.ow2.asm:asm:9.10.1" }],
+            "removedLibraries": ["org.ow2.asm:asm-all"],
+            "type": "release"
+        }))
+        .unwrap();
+        let vanilla: VersionInfo = serde_json::from_value(json!({
+            "assetIndex": { "id": "pre-1.6", "sha1": "", "size": 0, "totalSize": 0, "url": "" },
+            "assets": "pre-1.6",
+            "downloads": {},
+            "id": "1.5.2",
+            "libraries": [
+                { "name": "net.minecraft:launchwrapper:1.5" },
+                { "name": "org.ow2.asm:asm-all:4.1" }
+            ],
+            "mainClass": "net.minecraft.launchwrapper.Launch",
+            "minimumLauncherVersion": 13,
+            "releaseTime": "2013-04-25T15:45:00+00:00",
+            "time": "2013-04-25T15:45:00+00:00",
+            "type": "release"
+        }))
+        .unwrap();
+
+        let merged = merge_partial_version(partial, vanilla);
+
+        assert_eq!(
+            merged
+                .libraries
+                .iter()
+                .map(|x| x.name.as_str())
+                .collect::<Vec<_>>(),
+            ["net.minecraft:launchwrapper:1.5", "org.ow2.asm:asm:9.10.1"]
+        );
     }
 
     #[test]

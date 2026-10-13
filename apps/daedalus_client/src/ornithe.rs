@@ -52,11 +52,13 @@ struct GameVersion {
     id: String,
     ornithe_id: String,
     stable: bool,
+    /// The URL of Mojang's version JSON.
+    url: String,
 }
 
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
-struct OrnitheVersionInfo {
+struct GameVersionInfo {
     libraries: Vec<Library>,
     java_version: Option<JavaVersion>,
 }
@@ -64,7 +66,35 @@ struct OrnitheVersionInfo {
 struct GameVersionUpgrades<'a> {
     game_version: &'a GameVersion,
     libraries: Vec<Library>,
+    removed_libraries: Vec<String>,
     java_version: Option<JavaVersion>,
+}
+
+fn library_artifact(library: &Library) -> &str {
+    library
+        .name
+        .rsplit_once(':')
+        .map_or(library.name.as_str(), |x| x.0)
+}
+
+/// The artifacts of Mojang's libraries that Ornithe's version JSON drops.
+fn removed_libraries(
+    mojang_libraries: &[Library],
+    ornithe_libraries: &[Library],
+) -> Vec<String> {
+    let ornithe_artifacts = ornithe_libraries
+        .iter()
+        .map(library_artifact)
+        .collect::<HashSet<_>>();
+
+    mojang_libraries
+        .iter()
+        .map(library_artifact)
+        .filter(|x| !ornithe_artifacts.contains(x))
+        .sorted()
+        .dedup()
+        .map(str::to_string)
+        .collect()
 }
 
 fn is_lwjgl_upgrade(library: &Library) -> bool {
@@ -87,6 +117,7 @@ fn is_lwjgl_upgrade(library: &Library) -> bool {
 struct LibraryGroup {
     id: String,
     libraries: Vec<Library>,
+    removed_libraries: Vec<String>,
     /// The Java version Ornithe asks for, in place of the game's.
     java_version: Option<JavaVersion>,
     game_versions: Vec<String>,
@@ -113,6 +144,7 @@ fn group_by_libraries<'a>(
     for GameVersionUpgrades {
         game_version,
         mut libraries,
+        removed_libraries,
         java_version,
     } in game_versions
     {
@@ -123,12 +155,17 @@ fn group_by_libraries<'a>(
         let java = java_version
             .as_ref()
             .map(|x| format!("java:{}:{}", x.component, x.major_version));
+        let removed = removed_libraries
+            .iter()
+            .map(|x| format!("removed:{x}"))
+            .collect::<Vec<_>>();
         let id = sha1_smol::Sha1::from(
             libraries
                 .iter()
                 .map(|x| x.name.as_str())
                 .chain(ornithe_game_version.as_deref())
                 .chain(java.as_deref())
+                .chain(removed.iter().map(String::as_str))
                 .join("\n"),
         )
         .hexdigest()[..8]
@@ -140,6 +177,7 @@ fn group_by_libraries<'a>(
             groups.push(LibraryGroup {
                 id,
                 libraries,
+                removed_libraries,
                 java_version,
                 game_versions: vec![game_version.id.clone()],
                 ornithe_game_version,
@@ -185,6 +223,7 @@ pub async fn fetch(semaphore: Arc<Semaphore>) -> Result<FetchResult, Error> {
             id: mojang_version.id.clone(),
             ornithe_id: x.version,
             stable: x.stable,
+            url: mojang_version.url.clone(),
         })
     })
     .collect::<Vec<_>>();
@@ -199,11 +238,18 @@ pub async fn fetch(semaphore: Arc<Semaphore>) -> Result<FetchResult, Error> {
                         semaphore,
                     )
                     .await?;
-                    let version_info = fetch_json::<OrnitheVersionInfo>(
+                    let version_info = fetch_json::<GameVersionInfo>(
                         &format!("{MC_VERSIONS_URL}/{}.json", x.ornithe_id),
                         semaphore,
                     )
                     .await?;
+                    let mojang_version_info =
+                        fetch_json::<GameVersionInfo>(&x.url, semaphore)
+                            .await?;
+                    let removed_libraries = removed_libraries(
+                        &mojang_version_info.libraries,
+                        &version_info.libraries,
+                    );
 
                     libraries.extend(
                         version_info
@@ -215,6 +261,7 @@ pub async fn fetch(semaphore: Arc<Semaphore>) -> Result<FetchResult, Error> {
                     Ok::<_, Error>(GameVersionUpgrades {
                         game_version: x,
                         libraries,
+                        removed_libraries,
                         java_version: version_info.java_version,
                     })
                 }
@@ -236,33 +283,67 @@ pub async fn fetch(semaphore: Arc<Semaphore>) -> Result<FetchResult, Error> {
         .await;
     let groups = group_by_libraries(library_upgrades.into_iter().flatten());
 
+    let published_profiles = modrinth_manifest
+        .iter()
+        .flat_map(|x| &x.version_groups)
+        .flat_map(|group| {
+            group
+                .loaders
+                .iter()
+                .map(|loader| (group.id.as_str(), loader.id.as_str()))
+        })
+        .collect::<HashSet<_>>();
+    let published_game_versions = modrinth_manifest
+        .iter()
+        .flat_map(|x| &x.game_versions)
+        .filter_map(|x| Some((x.version_group.as_deref()?, x.id.as_str())))
+        .collect::<HashSet<_>>();
+
+    let published_profiles = &published_profiles;
+    let published_game_versions = &published_game_versions;
     let profile_requests = groups
         .iter()
         .flat_map(|group| {
-            loaders.iter().map(move |loader| ProfileRequest {
-                group: group.id.clone(),
-                loader_profile_template_game_version: group
-                    .ornithe_game_version
-                    .is_none()
-                    .then(|| group.profile_game_version().to_string()),
-                game_versions: group.game_versions.clone(),
-                loader_version: loader.version.clone(),
-                url: format!(
-                    "{META_URL}/fabric-loader/{}/{}/profile/json",
-                    group.profile_game_version(),
-                    loader.version
-                ),
-                extra_libraries: group.libraries.clone(),
-                java_version: group.java_version.clone(),
-            })
+            let group_unchanged = group.game_versions.iter().all(|x| {
+                published_game_versions
+                    .contains(&(group.id.as_str(), x.as_str()))
+            });
+
+            loaders
+                .iter()
+                .filter(move |loader| {
+                    !group_unchanged
+                        || !published_profiles.contains(&(
+                            group.id.as_str(),
+                            loader.version.as_str(),
+                        ))
+                })
+                .map(move |loader| ProfileRequest {
+                    group: group.id.clone(),
+                    loader_profile_template_game_version: group
+                        .ornithe_game_version
+                        .is_none()
+                        .then(|| group.profile_game_version().to_string()),
+                    game_versions: group.game_versions.clone(),
+                    loader_version: loader.version.clone(),
+                    url: format!(
+                        "{META_URL}/fabric-loader/{}/{}/profile/json",
+                        group.profile_game_version(),
+                        loader.version
+                    ),
+                    extra_libraries: group.libraries.clone(),
+                    removed_libraries: group.removed_libraries.clone(),
+                    java_version: group.java_version.clone(),
+                })
         })
         .collect::<Vec<_>>();
 
-    fetch_metadata_profiles(
+    let failed_profiles = fetch_metadata_profiles(
         MOD_LOADER,
         format_version,
         MAVEN_URL,
         profile_requests,
+        true,
         &upload_files,
         &mirror_artifacts,
         &semaphore,
@@ -291,6 +372,12 @@ pub async fn fetch(semaphore: Arc<Semaphore>) -> Result<FetchResult, Error> {
                 id: group.id.clone(),
                 loaders: loaders
                     .iter()
+                    .filter(|loader| {
+                        !failed_profiles.contains(&(
+                            group.id.clone(),
+                            loader.version.clone(),
+                        ))
+                    })
                     .map(|loader| LoaderVersion {
                         id: loader.version.clone(),
                         url: format_url(&metadata_version_path(
@@ -353,6 +440,7 @@ mod tests {
         GameVersionUpgrades {
             game_version,
             libraries: libraries(library_names),
+            removed_libraries: Vec::new(),
             java_version: java_major_version.map(|major_version| JavaVersion {
                 component: "jre-legacy".to_string(),
                 major_version,
@@ -365,6 +453,7 @@ mod tests {
             id: id.to_string(),
             ornithe_id: ornithe_game_version(id),
             stable: true,
+            url: String::new(),
         }
     }
 
@@ -413,6 +502,42 @@ mod tests {
         assert_eq!(groups.len(), 2);
         assert_eq!(groups[1].java_version.as_ref().unwrap().major_version, 25);
         assert_ne!(groups[0].id, groups[1].id);
+    }
+
+    #[test]
+    fn libraries_ornithe_drops_are_removed() {
+        let removed = removed_libraries(
+            &libraries(&[
+                "net.minecraft:launchwrapper:1.5",
+                "org.ow2.asm:asm-all:4.1",
+                "org.lwjgl.lwjgl:lwjgl:2.9.0",
+                "org.lwjgl.lwjgl:lwjgl:2.9.1-nightly-20130708-debug3",
+            ]),
+            &libraries(&[
+                "org.ow2.asm:asm:7.0",
+                "net.minecraft:launchwrapper:1.5",
+                "org.lwjgl.lwjgl:lwjgl:2.9.4+legacyfabric.15",
+            ]),
+        );
+
+        assert_eq!(removed, ["org.ow2.asm:asm-all"]);
+    }
+
+    #[test]
+    fn game_versions_dropping_different_libraries_get_separate_groups() {
+        let game_versions = ["1.5.2", "1.6.4"].map(game_version);
+        let mut dropping_asm_all =
+            upgrades(&game_versions[0], &["a:a:1"], Some(8));
+        dropping_asm_all.removed_libraries =
+            vec!["org.ow2.asm:asm-all".to_string()];
+        let groups = group_by_libraries([
+            dropping_asm_all,
+            upgrades(&game_versions[1], &["a:a:1"], Some(8)),
+        ]);
+
+        assert_eq!(groups.len(), 2);
+        assert_eq!(groups[0].removed_libraries, ["org.ow2.asm:asm-all"]);
+        assert!(groups[1].removed_libraries.is_empty());
     }
 
     #[test]

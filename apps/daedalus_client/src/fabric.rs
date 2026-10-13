@@ -21,10 +21,12 @@ use crate::util::{
 use crate::{
     Error, FetchResult, MirrorArtifact, UploadFile, insert_mirrored_artifact,
 };
-use daedalus::minecraft::{Argument, JavaVersion, Library};
+use daedalus::get_path_from_artifact;
+use daedalus::minecraft::{Argument, JavaVersion, Library, LibraryDownload};
 use daedalus::modded::{DUMMY_REPLACE_STRING, Manifest, PartialVersionInfo};
 use dashmap::DashMap;
 use serde::Deserialize;
+use std::collections::HashSet;
 use std::sync::Arc;
 use tokio::sync::Semaphore;
 
@@ -110,6 +112,7 @@ async fn fetch(
                     game_versions: group.game_versions.clone(),
                     loader_version: loader.version.clone(),
                     extra_libraries: Vec::new(),
+                    removed_libraries: Vec::new(),
                     java_version: None,
                     url: format!(
                         "{}/versions/loader/{}/{}/profile/json",
@@ -126,6 +129,7 @@ async fn fetch(
             format_version,
             maven_url,
             profile_requests,
+            false,
             &upload_files,
             &mirror_artifacts,
             &semaphore,
@@ -282,6 +286,7 @@ async fn fetch(
                 game_versions: universal_group.game_versions.clone(),
                 loader_version: loader.version.clone(),
                 extra_libraries: Vec::new(),
+                removed_libraries: Vec::new(),
                 java_version: None,
                 url: format!(
                     "{}/versions/loader/{}/{}/profile/json",
@@ -297,6 +302,7 @@ async fn fetch(
             format_version,
             maven_url,
             profile_requests,
+            false,
             &upload_files,
             &mirror_artifacts,
             &semaphore,
@@ -373,6 +379,8 @@ pub(crate) struct ProfileRequest {
     pub loader_version: String,
     pub url: String,
     pub extra_libraries: Vec<Library>,
+    /// Artifacts of the game's libraries this group's profiles drop.
+    pub removed_libraries: Vec<String>,
     /// The Java version this group's profiles prefer over the game's.
     pub java_version: Option<JavaVersion>,
 }
@@ -392,24 +400,53 @@ pub(crate) fn metadata_version_path(
     }
 }
 
+/// Fetches, patches and queues the upload of each requested loader profile.
+///
+/// With `allow_failures`, profiles that fail to download or parse are skipped
+/// and returned as `(group, loader_version)` pairs instead of failing the
+/// whole fetch.
+#[allow(clippy::too_many_arguments)]
 pub(crate) async fn fetch_metadata_profiles(
     mod_loader: &str,
     format_version: usize,
     maven_url: &str,
     profile_requests: Vec<ProfileRequest>,
+    allow_failures: bool,
     upload_files: &DashMap<String, UploadFile>,
     mirror_artifacts: &DashMap<String, MirrorArtifact>,
     semaphore: &Arc<Semaphore>,
-) -> Result<(), Error> {
-    let version_manifests = futures::future::try_join_all(
+) -> Result<HashSet<(String, String)>, Error> {
+    let downloads = futures::future::join_all(
         profile_requests
             .iter()
             .map(|x| download_file(&x.url, None, semaphore)),
     )
-    .await?
-    .into_iter()
-    .map(|x| serde_json::from_slice(&x))
-    .collect::<Result<Vec<PartialVersionInfo>, serde_json::Error>>()?;
+    .await;
+
+    let mut failed = HashSet::new();
+    let mut fetched = Vec::with_capacity(profile_requests.len());
+
+    for (download, request) in downloads.into_iter().zip(profile_requests) {
+        let version_info = download.and_then(|x| {
+            Ok(serde_json::from_slice::<PartialVersionInfo>(&x)?)
+        });
+
+        match version_info {
+            Ok(version_info) => fetched.push((version_info, request)),
+            Err(err) if allow_failures => {
+                tracing::warn!(
+                    url = %request.url,
+                    error = %err,
+                    "Skipping {mod_loader} loader profile"
+                );
+                failed.insert((request.group, request.loader_version));
+            }
+            Err(err) => return Err(err),
+        }
+    }
+
+    let (version_manifests, profile_requests): (Vec<_>, Vec<_>) =
+        fetched.into_iter().unzip();
 
     let patched_version_manifests = version_manifests
         .into_iter()
@@ -423,7 +460,12 @@ pub(crate) async fn fetch_metadata_profiles(
                 &request.extra_libraries,
                 mirror_artifacts,
             )?;
-            version_info.java_version.clone_from(&request.java_version);
+            if let Some(java_version) = &request.java_version {
+                version_info.java_version = Some(java_version.clone());
+            }
+            version_info
+                .removed_libraries
+                .clone_from(&request.removed_libraries);
 
             Ok(version_info)
         })
@@ -453,7 +495,7 @@ pub(crate) async fn fetch_metadata_profiles(
             );
         });
 
-    Ok(())
+    Ok(failed)
 }
 
 fn template_game_version(value: &str, game_version: Option<&str>) -> String {
@@ -494,6 +536,25 @@ fn template_library_name(name: &str, game_version: Option<&str>) -> String {
         })
         .collect::<Vec<_>>()
         .join(":")
+}
+
+/// Mirrors a library download and points it at the mirrored copy.
+fn mirror_library_download(
+    artifact: &str,
+    download: &mut LibraryDownload,
+    mirror_artifacts: &DashMap<String, MirrorArtifact>,
+) -> Result<(), Error> {
+    insert_mirrored_artifact(
+        artifact,
+        Some(download.sha1.clone()),
+        vec![download.url.clone()],
+        true,
+        mirror_artifacts,
+    )?;
+    download.url =
+        format_url(&format!("maven/{}", get_path_from_artifact(artifact)?));
+
+    Ok(())
 }
 
 fn patch_version_info(
@@ -545,7 +606,21 @@ fn patch_version_info(
     for lib in extra_libraries {
         let mut lib = lib.clone();
 
-        if lib.downloads.is_none() {
+        if let Some(downloads) = lib.downloads.as_mut() {
+            if let Some(artifact) = downloads.artifact.as_mut() {
+                mirror_library_download(&lib.name, artifact, mirror_artifacts)?;
+            }
+
+            for (classifier, download) in
+                downloads.classifiers.iter_mut().flatten()
+            {
+                mirror_library_download(
+                    &format!("{}:{classifier}", lib.name),
+                    download,
+                    mirror_artifacts,
+                )?;
+            }
+        } else {
             insert_mirrored_artifact(
                 &lib.name,
                 None,
