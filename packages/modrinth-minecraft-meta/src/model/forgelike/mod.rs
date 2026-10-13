@@ -67,3 +67,25 @@ pub struct ForgelikeExtract {
     #[column(type = json)]
     pub embedded_maven_artifacts: toasty::Json<Vec<ForgelikeStoredArtifact>>,
 }
+
+#[cfg(test)]
+mod tests {
+	use super::*;
+	use serde_json::json;
+
+	#[test]
+	fn stored_artifact_round_trips_and_requires_hash() {
+		let value = json!({
+			"coordinate": "net.example:library:1",
+			"sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+		});
+		let stored: ForgelikeStoredArtifact = serde_json::from_value(value.clone()).unwrap();
+		assert_eq!(serde_json::to_value(stored).unwrap(), value);
+		assert!(serde_json::from_value::<ForgelikeStoredArtifact>(json!({
+			"coordinate": "net.example:library:1"
+		})).is_err());
+		assert!(serde_json::from_value::<Vec<ForgelikeStoredArtifact>>(json!([
+			"maven/net/example/library/1/library-1.jar"
+		])).is_err());
+	}
+}

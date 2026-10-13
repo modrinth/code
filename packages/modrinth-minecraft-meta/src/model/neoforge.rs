@@ -23,7 +23,7 @@ pub struct NeoforgeCatalog {
 }
 
 /// Specific NeoForge installer versions which we can't download or process.
-pub(crate) const NEOFORGE_BLACKLIST: &[&str] = &[
+pub const NEOFORGE_BLACKLIST: &[&str] = &[
     // listed upstream, but installer JARs and POMs return 404
     "1.20.1-47.1.7",
     "47.1.82",

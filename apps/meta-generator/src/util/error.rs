@@ -1,36 +1,32 @@
 use std::sync::Mutex;
 
-use serde::{Deserialize, Serialize};
 use tracing::warn;
 
 #[derive(Debug)]
 pub struct ErrorAccumulator {
-    imp: Mutex<ErrorVec>,
+	imp: Mutex<Vec<String>>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct ErrorVec(Vec<Box<str>>);
-
 impl ErrorAccumulator {
-    #[must_use]
-    pub const fn new() -> Self {
-        Self {
-            imp: Mutex::new(ErrorVec(Vec::new())),
-        }
-    }
+	#[must_use]
+	pub const fn new() -> Self {
+		Self {
+			imp: Mutex::new(Vec::new()),
+		}
+	}
 
-    pub fn push(&self, err: &anyhow::Error) {
-        warn!("error: {err:?}");
-        let err = format!("{err:#}").into_boxed_str();
-        let mut imp = self.imp.lock().expect("should not be poisoned");
-        imp.0.push(err);
-    }
+	pub fn push(&self, err: &anyhow::Error) {
+		warn!("error: {err:?}");
+		let err = format!("{err:#}");
+		let mut imp = self.imp.lock().expect("should not be poisoned");
+		imp.push(err);
+	}
 
-    pub fn len(&self) -> usize {
-        self.imp.lock().expect("should not be poisoned").0.len()
-    }
+	pub fn len(&self) -> usize {
+		self.imp.lock().expect("should not be poisoned").len()
+	}
 
-    pub fn finish(self) -> ErrorVec {
-        self.imp.into_inner().expect("should not be poisoned")
-    }
+	pub fn finish(self) -> Vec<String> {
+		self.imp.into_inner().expect("should not be poisoned")
+	}
 }

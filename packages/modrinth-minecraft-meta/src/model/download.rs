@@ -4,9 +4,7 @@ use uuid::Uuid;
 
 use crate::util::{Sha1, Sha256};
 
-/// Hashes for blobs stored in our [`BlobCas`].
-///
-/// [`BlobCas`]: crate::store::BlobCas
+/// Hashes for blobs retained in content-addressed storage.
 #[derive(Debug, Clone, Model)]
 #[table = "blob_hashes"]
 pub struct BlobHash {

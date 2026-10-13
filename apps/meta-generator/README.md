@@ -1,5 +1,7 @@
 Game version and launcher version related metadata manifests.
 
+The generator reuses models, upstream schemas, and shared utilities from the `modrinth-minecraft-meta` package. Import/export orchestration, configuration, storage, and migrations remain in `meta-generator`.
+
 # Architecture
 
 The general flow of the metadata service is:
@@ -28,15 +30,15 @@ This means that:
 From the repository root:
 
 ```sh
-cargo run -p modrinth-minecraft-meta -- import
-cargo run -p modrinth-minecraft-meta -- export
+cargo run -p meta-generator -- import
+cargo run -p meta-generator -- export
 ```
 
 Without upstream flags, all upstreams are selected. Put flags before the command to select specific upstreams:
 
 ```sh
-cargo run -p modrinth-minecraft-meta -- --fabric --quilt import
-cargo run -p modrinth-minecraft-meta -- --fabric --quilt export
+cargo run -p meta-generator -- --fabric --quilt import
+cargo run -p meta-generator -- --fabric --quilt export
 ```
 
 Forge and NeoForge currently import installer metadata and embedded artifacts, and export the embedded artifacts. Their launcher manifests are not implemented yet.

@@ -41,7 +41,7 @@ pub async fn download(cx: &mut DownloadRunContext<'_>) -> Result<()> {
             }))
             .collect::<Result<Vec<(ForgelikeInstallerName, &str)>>>()?
             .into_iter()
-            .filter(|(name, _)| !BLACKLIST.contains(&name.as_str()))
+            .filter(|(name, _)| !model::NEOFORGE_BLACKLIST.contains(&name.as_str()))
             .filter(|(name, _)| seen.insert(name.clone()))
             .collect::<Vec<_>>();
     let existing_versions = model::ForgelikeInstaller::all()

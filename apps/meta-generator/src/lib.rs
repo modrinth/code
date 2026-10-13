@@ -19,10 +19,10 @@ use crate::{
 mod config;
 mod export;
 mod import;
-mod model;
 mod store;
-mod upstream;
 mod util;
+
+pub use modrinth_minecraft_meta::{model, upstream};
 
 #[derive(Debug, clap::Parser)]
 struct Cli {
@@ -163,7 +163,7 @@ pub fn create_config() -> Result<Config> {
 
 pub async fn connect_to_db(config: &Config) -> Result<toasty::Db> {
     toasty::Db::builder()
-        .models(toasty::models!(crate::*))
+        .models(toasty::models!(modrinth_minecraft_meta::*))
         .connect(config.database_url.as_str())
         .context(info_span!("connecting to database"))
         .await
