@@ -8,7 +8,9 @@ use crate::util::{
     fetch_json, fetch_optional_json, format_url, retain_manifest_versions,
 };
 use crate::{Error, FetchResult, MirrorArtifact, UploadFile};
-use daedalus::minecraft::{Library, VERSION_MANIFEST_URL, VersionManifest};
+use daedalus::minecraft::{
+    JavaVersion, Library, VERSION_MANIFEST_URL, VersionManifest,
+};
 use daedalus::modded::{
     CURRENT_ORNITHE_FORMAT_VERSION, LoaderVersion, Manifest, Version,
     VersionGroup,
@@ -53,8 +55,16 @@ struct GameVersion {
 }
 
 #[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
 struct OrnitheVersionInfo {
     libraries: Vec<Library>,
+    java_version: Option<JavaVersion>,
+}
+
+struct GameVersionUpgrades<'a> {
+    game_version: &'a GameVersion,
+    libraries: Vec<Library>,
+    java_version: Option<JavaVersion>,
 }
 
 fn is_lwjgl_upgrade(library: &Library) -> bool {
@@ -77,6 +87,8 @@ fn is_lwjgl_upgrade(library: &Library) -> bool {
 struct LibraryGroup {
     id: String,
     libraries: Vec<Library>,
+    /// The Java version Ornithe asks for, in place of the game's.
+    java_version: Option<JavaVersion>,
     game_versions: Vec<String>,
     /// Set for the group of a game version Ornithe names differently.
     ornithe_game_version: Option<String>,
@@ -94,20 +106,29 @@ impl LibraryGroup {
 }
 
 fn group_by_libraries<'a>(
-    game_versions: impl IntoIterator<Item = (&'a GameVersion, Vec<Library>)>,
+    game_versions: impl IntoIterator<Item = GameVersionUpgrades<'a>>,
 ) -> Vec<LibraryGroup> {
     let mut groups = Vec::<LibraryGroup>::new();
 
-    for (game_version, mut libraries) in game_versions {
+    for GameVersionUpgrades {
+        game_version,
+        mut libraries,
+        java_version,
+    } in game_versions
+    {
         libraries.sort_by(|a, b| a.name.cmp(&b.name));
 
         let ornithe_game_version = (game_version.id != game_version.ornithe_id)
             .then(|| game_version.ornithe_id.clone());
+        let java = java_version
+            .as_ref()
+            .map(|x| format!("java:{}:{}", x.component, x.major_version));
         let id = sha1_smol::Sha1::from(
             libraries
                 .iter()
                 .map(|x| x.name.as_str())
                 .chain(ornithe_game_version.as_deref())
+                .chain(java.as_deref())
                 .join("\n"),
         )
         .hexdigest()[..8]
@@ -119,6 +140,7 @@ fn group_by_libraries<'a>(
             groups.push(LibraryGroup {
                 id,
                 libraries,
+                java_version,
                 game_versions: vec![game_version.id.clone()],
                 ornithe_game_version,
             });
@@ -171,7 +193,7 @@ pub async fn fetch(semaphore: Arc<Semaphore>) -> Result<FetchResult, Error> {
         futures::future::join_all(game_versions.iter().map(|x| {
             let semaphore = &semaphore;
             async move {
-                let libraries = async {
+                let upgrades = async {
                     let mut libraries = fetch_json::<Vec<Library>>(
                         &format!("{META_URL}/libraries/{}", x.ornithe_id),
                         semaphore,
@@ -190,12 +212,16 @@ pub async fn fetch(semaphore: Arc<Semaphore>) -> Result<FetchResult, Error> {
                             .filter(is_lwjgl_upgrade),
                     );
 
-                    Ok::<_, Error>(libraries)
+                    Ok::<_, Error>(GameVersionUpgrades {
+                        game_version: x,
+                        libraries,
+                        java_version: version_info.java_version,
+                    })
                 }
                 .await;
 
-                match libraries {
-                    Ok(libraries) => Some((x, libraries)),
+                match upgrades {
+                    Ok(upgrades) => Some(upgrades),
                     Err(err) => {
                         tracing::warn!(
                             game_version = %x.ornithe_id,
@@ -227,6 +253,7 @@ pub async fn fetch(semaphore: Arc<Semaphore>) -> Result<FetchResult, Error> {
                     loader.version
                 ),
                 extra_libraries: group.libraries.clone(),
+                java_version: group.java_version.clone(),
             })
         })
         .collect::<Vec<_>>();
@@ -318,6 +345,21 @@ mod tests {
             .collect()
     }
 
+    fn upgrades<'a>(
+        game_version: &'a GameVersion,
+        library_names: &[&str],
+        java_major_version: Option<u32>,
+    ) -> GameVersionUpgrades<'a> {
+        GameVersionUpgrades {
+            game_version,
+            libraries: libraries(library_names),
+            java_version: java_major_version.map(|major_version| JavaVersion {
+                component: "jre-legacy".to_string(),
+                major_version,
+            }),
+        }
+    }
+
     fn game_version(id: &str) -> GameVersion {
         GameVersion {
             id: id.to_string(),
@@ -331,9 +373,9 @@ mod tests {
         let game_versions =
             ["1.8.9", "13w16a-04192037", "1.14.4"].map(game_version);
         let groups = group_by_libraries([
-            (&game_versions[0], libraries(&["a:a:1", "b:b:1"])),
-            (&game_versions[1], libraries(&["b:b:1", "a:a:1"])),
-            (&game_versions[2], libraries(&["a:a:1"])),
+            upgrades(&game_versions[0], &["a:a:1", "b:b:1"], Some(8)),
+            upgrades(&game_versions[1], &["b:b:1", "a:a:1"], Some(8)),
+            upgrades(&game_versions[2], &["a:a:1"], Some(8)),
         ]);
 
         assert_eq!(groups.len(), 2);
@@ -348,7 +390,9 @@ mod tests {
         let game_versions =
             ["1.0.1", "1.0", "1.14.2 Pre-Release 4"].map(game_version);
         let groups = group_by_libraries(
-            game_versions.iter().map(|x| (x, libraries(&["a:a:1"]))),
+            game_versions
+                .iter()
+                .map(|x| upgrades(x, &["a:a:1"], Some(8))),
         );
 
         assert_eq!(groups.len(), 3);
@@ -356,6 +400,19 @@ mod tests {
         assert_eq!(groups[1].game_versions, ["1.0"]);
         assert_eq!(groups[1].profile_game_version(), "1.0.0");
         assert_eq!(groups[2].profile_game_version(), "1.14.2-pre4");
+    }
+
+    #[test]
+    fn game_versions_asking_for_different_java_get_separate_groups() {
+        let game_versions = ["1.8.9", "1.12.2"].map(game_version);
+        let groups = group_by_libraries([
+            upgrades(&game_versions[0], &["a:a:1"], Some(8)),
+            upgrades(&game_versions[1], &["a:a:1"], Some(25)),
+        ]);
+
+        assert_eq!(groups.len(), 2);
+        assert_eq!(groups[1].java_version.as_ref().unwrap().major_version, 25);
+        assert_ne!(groups[0].id, groups[1].id);
     }
 
     #[test]

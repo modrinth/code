@@ -1,6 +1,6 @@
 use crate::minecraft::{
-    Argument, ArgumentType, Library, LoggingConfiguration, LoggingSide,
-    VersionInfo, VersionType,
+    Argument, ArgumentType, JavaVersion, Library, LoggingConfiguration,
+    LoggingSide, VersionInfo, VersionType,
 };
 use chrono::{DateTime, NaiveDateTime, Utc};
 use serde::{Deserialize, Deserializer, Serialize};
@@ -144,6 +144,9 @@ pub struct PartialVersionInfo {
     /// Libraries that the version depends on
     pub libraries: Vec<Library>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    /// The Java version the loader prefers over the one the game asks for
+    pub java_version: Option<JavaVersion>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     /// The logging configuration the loader uses in place of the game's
     pub logging: Option<HashMap<LoggingSide, LoggingConfiguration>>,
     #[serde(rename = "type")]
@@ -256,7 +259,7 @@ pub fn merge_partial_version(
         assets: merge.assets,
         downloads: merge.downloads,
         id: partial.id.replace(DUMMY_REPLACE_STRING, &merge_id),
-        java_version: merge.java_version,
+        java_version: partial.java_version.or(merge.java_version),
         libraries: libraries
             .into_iter()
             .chain(partial.libraries)
@@ -449,6 +452,38 @@ mod tests {
         );
         assert_eq!(merged.java_version.unwrap().major_version, 8);
         assert!(merged.logging.is_some());
+    }
+
+    #[test]
+    fn loader_java_version_overrides_vanilla() {
+        let partial: PartialVersionInfo = serde_json::from_value(json!({
+            "id": "fabric-loader-0.19.5-1.8.9-ornithe-gen2",
+            "inheritsFrom": "1.8.9",
+            "javaVersion": { "component": "java-runtime-epsilon", "majorVersion": 25 },
+            "time": "2026-05-27T14:13:59+00:00",
+            "releaseTime": "2026-05-27T14:13:59+00:00",
+            "libraries": [],
+            "type": "release"
+        }))
+        .unwrap();
+        let vanilla: VersionInfo = serde_json::from_value(json!({
+            "assetIndex": { "id": "1.8", "sha1": "", "size": 0, "totalSize": 0, "url": "" },
+            "assets": "1.8",
+            "downloads": {},
+            "id": "1.8.9",
+            "javaVersion": { "component": "jre-legacy", "majorVersion": 8 },
+            "libraries": [],
+            "mainClass": "net.minecraft.client.main.Main",
+            "minimumLauncherVersion": 14,
+            "releaseTime": "2015-12-03T09:24:39+00:00",
+            "time": "2015-12-03T09:24:39+00:00",
+            "type": "release"
+        }))
+        .unwrap();
+
+        let merged = merge_partial_version(partial, vanilla);
+
+        assert_eq!(merged.java_version.unwrap().major_version, 25);
     }
 
     #[test]

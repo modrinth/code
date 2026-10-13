@@ -444,6 +444,7 @@ async fn fetch(
                             .cloned()
                             .collect()
                         }),
+                    java_version: None,
                     logging: None,
                     libraries: install_profile
                         .version_info
