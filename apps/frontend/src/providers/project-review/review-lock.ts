@@ -267,9 +267,7 @@ export function useReviewLock(projectId: Ref<string>) {
 				ownsLock.value &&
 				!operation.isPending.value
 			)
-				void operation
-					.mutateAsync({ session: session.value, kind: 'renew' })
-					.catch(() => undefined)
+				void operation.mutateAsync({ session: session.value, kind: 'renew' }).catch(() => undefined)
 		}, 5 * 60_000)
 		window.addEventListener('focus', checkOnFocus)
 		document.addEventListener('visibilitychange', checkOnFocus)
@@ -307,8 +305,7 @@ export function useReviewLock(projectId: Ref<string>) {
 			throw new ReviewLockError(formatMessage(messages.unverified))
 		}
 		assertCurrent(current)
-		if (!isEligibleStatus(status))
-			throw new ReviewLockError(formatMessage(messages.unverified))
+		if (!isEligibleStatus(status)) throw new ReviewLockError(formatMessage(messages.unverified))
 	}
 
 	function assertEligible(id: string) {

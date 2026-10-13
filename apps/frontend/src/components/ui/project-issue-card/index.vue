@@ -7,23 +7,31 @@
 		<div
 			v-for="issue in matchingIssues"
 			:key="issue.id"
-			class="min-w-0 rounded-2xl border border-solid border-surface-5 bg-surface-2"
-			:class="threadHistory ? 'p-2.5 py-3 pr-1.5' : 'p-4'"
+			class="min-w-0 rounded-2xl border border-solid"
+			:class="[
+				threadHistory ? 'p-2.5 py-3 pr-1.5' : 'p-4',
+				threadHistory ? 'text-primary' : 'text-contrast',
+				threadHistory
+					? 'border-surface-5 bg-surface-2'
+					: isComplete(issue)
+						? 'border-brand-green bg-bg-green'
+						: 'border-brand-orange bg-bg-orange',
+			]"
 		>
 			<div class="flex flex-wrap items-start justify-between gap-1">
 				<h2
-					class="m-0 flex min-w-0 flex-1 basis-[150px] flex-wrap items-start text-contrast"
+					class="m-0 flex min-w-0 flex-1 basis-[150px] flex-wrap items-start text-inherit"
 					:class="threadHistory ? 'gap-1.5' : '!mt-[3px] gap-2'"
 				>
 					<CheckCircleIcon
 						v-if="isComplete(issue)"
-						class="!mt-0.5 shrink-0 text-primary"
+						class="!mt-0.5 shrink-0 text-brand-green"
 						:class="threadHistory ? 'size-4' : 'size-5'"
 						aria-hidden="true"
 					/>
-					<TriangleAlertIcon
+					<MessageSquareWarningIcon
 						v-else
-						class="!mt-0.5 shrink-0 text-red"
+						class="!mt-0.5 shrink-0 text-brand-orange"
 						:class="threadHistory ? 'size-4' : 'size-5'"
 						aria-hidden="true"
 					/>
@@ -35,7 +43,7 @@
 				</h2>
 				<Button
 					v-if="threadHistory || isComplete(issue)"
-					class="ml-auto max-w-full shrink-0 !whitespace-normal"
+					class="ml-auto max-w-full shrink-0 !whitespace-normal !text-inherit"
 					:class="threadHistory ? '-my-1.5 aspect-square' : ''"
 					:circular="threadHistory"
 					type="quiet"
@@ -65,7 +73,7 @@
 					:label="formatMessage(messages.issueOptions)"
 					:options="moderatorOptions(issue)"
 					:disabled="verifyMutation.isPending.value"
-					class="shrink-0"
+					class="shrink-0 !text-inherit"
 					:class="threadHistory ? '-my-1.5' : ''"
 					type="quiet"
 					size="sm"
@@ -80,16 +88,16 @@
 				@transitionend.self="onContentTransitionEnd($event, issue)"
 			>
 				<div :inert="!isExpanded(issue)" class="min-w-0">
-					<div class="flex flex-col gap-3 pt-2">
+					<div class="flex flex-col gap-3 pt-3">
 						<IssueMessage
 							v-if="issueMessage(issue)"
-							class="markdown-body min-w-0 text-sm text-primary"
+							class="markdown-body min-w-0 text-sm text-inherit"
 							:message="issueMessage(issue)"
 						/>
 						<div
 							v-if="
 								!threadHistory &&
-								issue.verdict !== 'resolved' &&
+								!isComplete(issue) &&
 								((showProjectAreaLink && issueActions(issue).length) ||
 									addressableFacets(issue).length)
 							"
@@ -102,7 +110,8 @@
 								<ButtonLink
 									v-for="action in issueActions(issue).slice(0, 2)"
 									:key="action.id"
-									type="outlined"
+									type="colored"
+									color="orange"
 									:to="action.to"
 								>
 									<CheckIcon v-if="action.complete === true" aria-hidden="true" />
@@ -152,6 +161,7 @@
 									:text="formatMessage(messages.changeFacetFirst)"
 								>
 									<Button
+										v-if="!isComplete(issue)"
 										:loading="
 											addressMutation.isPending.value &&
 											addressMutation.variables.value?.issueId === issue.id
@@ -162,6 +172,8 @@
 											!facetsToAddress(issue).length ||
 											(fieldAction !== undefined && !fieldAction.canSave)
 										"
+										:type="isComplete(issue) ? 'base' : 'colored'"
+										color="orange"
 										@click="
 											addressMutation.mutate({
 												issueId: issue.id,
@@ -205,8 +217,8 @@ import {
 	ChevronRightIcon,
 	CircleIcon,
 	FoldVerticalIcon,
+	MessageSquareWarningIcon,
 	MoreHorizontalIcon,
-	TriangleAlertIcon,
 	UnfoldVerticalIcon,
 	XCircleIcon,
 } from '@modrinth/assets'

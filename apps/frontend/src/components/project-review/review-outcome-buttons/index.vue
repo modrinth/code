@@ -122,12 +122,10 @@ const overflowActions = computed(() => [
 	{
 		id: 'add-issues',
 		label: formatMessage(messages.addIssues),
+		tone: 'orange' as const,
 		icon: PlusIcon,
 		action: () => submitIssues(),
-		disabled:
-			!canAddIssues.value ||
-			generating.value ||
-			advancingAction.value !== undefined,
+		disabled: !canAddIssues.value || generating.value || advancingAction.value !== undefined,
 	},
 	{
 		id: 'send-to-review',

@@ -3053,8 +3053,11 @@
   "modal.shared-instance.open-in-app.why-use": {
     "message": "Why use the Modrinth App"
   },
-  "moderation.checklist.project-changed": {
-    "message": "The selected project changed. Review it again."
+  "moderation.c2pa-scan.failed": {
+    "message": "Failed to scan for AI-generated files."
+  },
+  "moderation.c2pa-scan.no-ai-files": {
+    "message": "No AI-generated files found."
   },
   "moderation.exclude-technical-review": {
     "message": "Exclude TR"
@@ -3074,8 +3077,8 @@
   "moderation.keybinds.scope-global": {
     "message": "Can be used anywhere on the website."
   },
-  "moderation.keybinds.scope-project": {
-    "message": "Can be used without the checklist open if setting enabled."
+  "moderation.keybinds.scope-project-page": {
+    "message": "Used on project pages when project page shortcuts are enabled."
   },
   "moderation.keybinds.scope-tech": {
     "message": "Used within the tech review pages."
@@ -3538,6 +3541,9 @@
   },
   "moderation.project-review.saveProject": {
     "message": "Save project"
+  },
+  "moderation.project-review.scanAi": {
+    "message": "Scan for AI-generated images"
   },
   "moderation.project-review.scheduled": {
     "message": "Scheduled"
@@ -4369,6 +4375,12 @@
   },
   "project-review.issues.search": {
     "message": "Search issues…"
+  },
+  "project-review.lock.moderating": {
+    "message": "{username} is moderating"
+  },
+  "project-review.lock.take-over": {
+    "message": "Take over project"
   },
   "project-review.members.revoke-sessions-body": {
     "message": "{username} will be signed out on every device. They will need to sign in again."
