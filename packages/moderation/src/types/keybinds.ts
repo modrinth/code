@@ -2,54 +2,15 @@ import type { Labrinth } from '@modrinth/api-client'
 
 import type { MiscReviewPanelKey } from '../data/issues'
 
-export interface ModerationActions {
-	tryGoNext: () => void
-	tryGoBack: () => void
-	tryGenerateMessage: () => void
-	trySkipProject: () => void
-
-	tryToggleCollapse: () => void
-	tryResetProgress: () => void
-	tryExitModeration: () => void
-
-	tryApprove: () => void
-	tryReject: () => void
-	tryWithhold: () => void
-	tryEditMessage: () => void
-}
-
 export interface TechReviewActions {
 	goToTop: () => void
 	goToBottom: () => void
-}
-
-export interface ModerationState {
-	currentStage: number
-	totalStages: number
-	currentStageId: string | undefined
-	currentStageTitle: string
-
-	isCollapsed: boolean
-	isDone: boolean
-	hasGeneratedMessage: boolean
-	isLoadingMessage: boolean
-	isModpackPermissionsStage: boolean
-
-	futureProjectCount: number
-	visibleActionsCount: number
 }
 
 export type ModerationProjectContext = {
 	project: Labrinth.Projects.v2.Project
 	scope: 'project'
 	notifyCopied: (value: string, title: string) => void
-}
-
-export type ModerationChecklistContext = {
-	project: Labrinth.Projects.v2.Project
-	scope: 'checklist'
-	state: ModerationState
-	actions: ModerationActions
 }
 
 export type ModerationTechReviewContext = {
@@ -73,7 +34,6 @@ export type ModerationProjectReviewContext = {
 
 export type ModerationContext =
 	| ModerationProjectContext
-	| ModerationChecklistContext
 	| ModerationTechReviewContext
 	| ModerationGlobalContext
 	| ModerationProjectReviewContext
@@ -138,9 +98,6 @@ export type BaseKeybindListener<T> = {
 export type KeybindProjectListener = BaseKeybindListener<ModerationProjectContext> & {
 	scope: 'project'
 }
-export type KeybindChecklistListener = BaseKeybindListener<ModerationChecklistContext> & {
-	scope: 'checklist'
-}
 export type KeybindTechReviewListener = BaseKeybindListener<ModerationTechReviewContext> & {
 	scope: 'tech-review'
 }
@@ -150,9 +107,8 @@ export type KeybindGlobalListener = BaseKeybindListener<ModerationGlobalContext>
 export type KeybindProjectReviewListener = BaseKeybindListener<ModerationProjectReviewContext> & {
 	scope: 'project-review'
 }
-export type KeybindListener = (
+export type KeybindListener =
 	| KeybindProjectListener
-	| KeybindChecklistListener
 	| KeybindTechReviewListener
 	| KeybindGlobalListener
 	| KeybindProjectReviewListener
@@ -165,7 +121,6 @@ export type KeybindListener = (
 	| (BaseKeybindListener<ModerationReviewComposerContext> & {
 			scope: 'review-composer'
 	  })
-) & { reviewAction?: ReviewShortcutAction }
 
 export function parseKeybind(keybindString: string): KeybindDefinition {
 	const parts = keybindString.split('+').map((p) => p.trim().toLowerCase())

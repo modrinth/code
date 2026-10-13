@@ -1,7 +1,7 @@
 import type { Labrinth } from '@modrinth/api-client'
 import type { FunctionalComponent, SVGAttributes } from 'vue'
 
-import type { ModerationStatus } from '../../../types/node/state'
+import type { ModerationStatus } from '../../../types/review'
 import type { IssuePriority } from './priority'
 
 export interface ReviewContext {
@@ -167,11 +167,11 @@ export type PanelConfig = Omit<Panel, 'children'>
 
 /**
  * Only panels and sections support `.content()`; toggles and markdown controls are leaves.
- * When migrating other stages, move nested control content into a section and use `shown`
- * to check `selected.issueIds` for a toggle without an ID, or `selected.toggleIds` for an explicit ID.
+ * Nest conditional controls in a section and use `shown` to check `selected.issueIds` for a toggle
+ * without an ID, or `selected.toggleIds` for an explicit ID.
  * Preserve ancestor visibility by nesting conditional sections or checking every parent toggle
  * in a sibling section's `shown` callback. Keep existing issue IDs, toggle IDs, and markdown keys.
- * See description.ts for an example of migrating toggle content into conditional sections.
+ * See description.ts for an example of toggle content in conditional sections.
  */
 export interface PanelSection {
 	type: 'section'

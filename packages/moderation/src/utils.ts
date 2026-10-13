@@ -34,25 +34,6 @@ export function expandVariables(
 	}, template)
 }
 
-export const licensesNotRequiringSource: string[] = [
-	// typos:off
-	'LicenseRef-All-Rights-Reserved',
-	'Apache-2.0',
-	'BSD-2-Clause',
-	'BSD-3-Clause',
-	'CC0-1.0',
-	'CC-BY-4.0',
-	'CC-BY-SA-4.0',
-	'CC-BY-NC-4.0',
-	'CC-BY-NC-SA-4.0',
-	'CC-BY-ND-4.0',
-	'CC-BY-NC-ND-4.0',
-	'ISC',
-	'MIT',
-	'Zlib',
-	// typos:on
-]
-
 export const licensesRequiringSource: string[] = [
 	'GPL-2.0',
 	'GPL-2.0+',
@@ -77,12 +58,6 @@ export const licensesRequiringSource: string[] = [
 	'MPL-2.0',
 ]
 
-export function licenseDoesNotRequireSource(licenseId: string): boolean {
-	return licensesNotRequiringSource.includes(licenseId)
-}
-export function licenseMayRequireSource(licenseId: string): boolean {
-	return !licensesNotRequiringSource.includes(licenseId)
-}
 export function licenseRequiresSource(licenseId: string): boolean {
 	return licensesRequiringSource.includes(licenseId)
 }
@@ -93,13 +68,6 @@ export function notSourceAsDistributed(projectTypes): boolean {
 
 export function promptSourceRequired(licenseId: string, projectTypes): boolean {
 	return licenseRequiresSource(licenseId) && notSourceAsDistributed(projectTypes)
-}
-
-export function kebabToTitleCase(input: string): string {
-	return input
-		.split('-')
-		.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-		.join(' ')
 }
 
 export function arrayOrNone(arr: string[]): string {

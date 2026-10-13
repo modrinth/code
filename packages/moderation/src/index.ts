@@ -1,4 +1,3 @@
-export { useStages } from './data/checklist'
 export { default as keybinds } from './data/keybinds'
 export {
 	getMessageTemplates,
@@ -20,8 +19,8 @@ export * from './handles/settings'
 export * from './locales'
 export * from './types/keybinds'
 export * from './types/nags'
-export * from './types/priority'
 export * from './types/quick-reply'
 export * from './types/reports'
+export * from './types/review'
 export * from './types/settings'
 export * from './utils'

@@ -59,19 +59,6 @@ const settings = {
 			description: 'Whether the slicer button should be shown in the versions table and page.',
 			default: false,
 		}),
-		AdjustPageAlignment: setting.asEnum({
-			type: 'enum',
-			id: 'adjust-page-alignment',
-			title: 'Adjust page alignment',
-			description:
-				'Whether the main page elements should be centered or offset opposite to the Checklist Position.',
-			entries: [
-				{ value: 'never', label: 'Never' },
-				{ value: 'checklist-present', label: 'Checklist Needed' },
-				{ value: 'always', label: 'Always' },
-			],
-			default: 'never',
-		}),
 		AlternativeHostname: setting.asString({
 			type: 'string',
 			id: 'alternative-hostname',
@@ -80,31 +67,18 @@ const settings = {
 				'When Open production/staging is used on an official host, open this hostname instead. Example: localhost:3000',
 			default: '',
 		}),
-	},
-	Checklist: {
-		Position: setting.asEnum({
-			type: 'enum',
-			id: 'checklist-position',
-			title: 'Position',
-			description: 'Where the checklist should be displayed on the page',
-			entries: [
-				{ value: 'left', label: 'Left' },
-				{ value: 'right', label: 'Right' },
-			],
-			default: 'right',
-		}),
-		AlwaysAllowKeybinds: setting.asToggle({
+		EnableProjectKeybinds: setting.asToggle({
 			type: 'toggle',
 			id: 'checklist-always-allow-keybinds',
-			title: 'Always allow project keybinds',
-			description: 'Whether certain keybinds should work without the checklist visible.',
+			title: 'Enable project page shortcuts',
+			description: 'Use moderation copy shortcuts on public project pages.',
 			default: false,
 		}),
-		IgnoreConditions: setting.asToggle({
+		IncludeNonProcessingProjects: setting.asToggle({
 			type: 'toggle',
 			id: 'checklist-ignore-conditions',
-			title: 'Ignore checklist conditions',
-			description: 'Allow moderating projects the checklist normally auto skips.',
+			title: 'Include projects no longer awaiting review',
+			description: 'Allow queue navigation to include projects that are no longer awaiting review.',
 			default: false,
 		}),
 	},

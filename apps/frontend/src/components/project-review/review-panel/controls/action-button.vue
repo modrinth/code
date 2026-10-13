@@ -3,14 +3,12 @@
 		type="outlined"
 		:disabled="disabled"
 		:aria-pressed="mixed ? 'mixed' : modelValue"
-		:aria-label="icon ? label : undefined"
 		:aria-keyshortcuts="keybind"
 		:data-review-keybind="keybind"
-		:data-tone="tone"
 		class="action-toggle !gap-1.5 !rounded-lg !px-2.5 !font-medium [&>svg]:!text-inherit"
 		:class="{
 			'!brightness-100': modelValue,
-			'enabled:hover:!brightness-125 !text-primary': !modelValue,
+			'!text-primary enabled:hover:!brightness-125': !modelValue,
 			'action-toggle-selected !text-contrast': modelValue || mixed,
 		}"
 		size="sm"
@@ -20,8 +18,7 @@
 		<span v-if="reReview" class="flex shrink-0 items-center text-orange">
 			<TagCategoryRefreshCcwIcon class="size-4" aria-hidden="true" />
 		</span>
-		<component :is="icon" v-if="icon" aria-hidden="true" />
-		<template v-else>{{ label }}</template>
+		{{ label }}
 		<kbd
 			v-if="keybind && showKeybindHint !== false"
 			class="action-toggle-keybind ml-1 flex h-5 min-w-5 shrink-0 items-center justify-center gap-0.5 rounded px-1 font-sans text-[11px] font-medium leading-none"
@@ -36,18 +33,13 @@
 <script lang="ts" setup>
 import { ArrowBigUpIcon, MinusIcon, TagCategoryRefreshCcwIcon } from '@modrinth/assets'
 import { Button } from '@modrinth/ui'
-import type { Component } from 'vue'
-import { computed } from 'vue'
 
-const props = defineProps<{
+defineProps<{
 	modelValue: boolean
 	mixed?: boolean
 	reReview?: boolean
-	label?: string
-	icon?: Component
+	label: string
 	disabled?: boolean
-	needsAttention?: boolean
-	fixActionable?: boolean
 	keybind?: string
 	showKeybindHint?: boolean
 }>()
@@ -55,22 +47,12 @@ const props = defineProps<{
 const emit = defineEmits<{
 	'update:modelValue': [boolean]
 }>()
-
-const tone = computed(() => {
-	if (props.needsAttention) return 'orange'
-	return props.fixActionable ? 'blue' : 'orange'
-})
 </script>
 
 <style scoped>
 .action-toggle {
 	--action-color: var(--color-orange);
 	--action-highlight: var(--color-orange-highlight);
-}
-
-.action-toggle[data-tone='blue'] {
-	--action-color: var(--color-blue);
-	--action-highlight: var(--color-blue-highlight);
 }
 
 .action-toggle-selected {

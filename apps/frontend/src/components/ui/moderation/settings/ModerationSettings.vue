@@ -16,33 +16,12 @@ const flattenedSettings = Object.entries(moderationSettings).reduce(
 	{} as { [name: string]: SettingDefinition[] },
 )
 
-onMounted(() => {
-	const merged: { [name: string]: SettingDefinition[] } = {}
-	const addMergedSettings = (settings: { [name: string]: SettingDefinition[] }) => {
-		for (const [groupId, groupSettings] of Object.entries(settings)) {
-			const group = (merged[groupId] = merged[groupId] || [])
-			group.push(...groupSettings)
-		}
-	}
-
-	addMergedSettings(flattenedSettings)
-	const event = new CustomEvent('request-moderation-settings', {
-		detail: {
-			addSettings: addMergedSettings,
-		},
-	})
-	window.dispatchEvent(event)
-
-	displayedSettings.value = merged
-})
-
 const configuredSettings = useModerationSettings()
-const displayedSettings = ref<{ [name: string]: SettingDefinition[] }>(flattenedSettings)
 </script>
 
 <template>
 	<div
-		v-for="[name, page] in Object.entries(displayedSettings)"
+		v-for="[name, page] in Object.entries(flattenedSettings)"
 		:key="name"
 		:class="{ 'universal-card': !embedded }"
 	>

@@ -3,35 +3,31 @@ import { moderationSettings } from '@modrinth/moderation'
 
 import type { ModerationQueueService } from './queue.ts'
 
-export interface QueueCandidateCheck {
+interface QueueCandidateCheck {
 	locked: boolean
 	expired?: boolean
 	isOwnLock?: boolean
-	slug?: string
-	projectType?: string
-	status?: string
 	isProcessing: boolean
 }
 
 export interface EligibleQueueProject {
 	project: string
-	result: QueueCandidateCheck
 	excluded: string[]
 }
 
 const BATCH_SIZE = 5
 
-export function isEligibleQueueCandidate(result: QueueCandidateCheck | undefined): boolean {
+function isEligibleQueueCandidate(result: QueueCandidateCheck | undefined): boolean {
 	if (
 		!result ||
 		(!result.isProcessing &&
-			!useModerationSettings().value.get(moderationSettings.Checklist.IgnoreConditions))
+			!useModerationSettings().value.get(moderationSettings.General.IncludeNonProcessingProjects))
 	)
 		return false
 	return !result.locked || !!result.expired || !!result.isOwnLock
 }
 
-export async function batchCheckQueueCandidates(
+async function batchCheckQueueCandidates(
 	client: AbstractModrinthClient,
 	moderationQueue: ModerationQueueService,
 	projectIds: string[],
@@ -56,9 +52,6 @@ export async function batchCheckQueueCandidates(
 				locked: lockResponse.locked,
 				expired: lockResponse.expired,
 				isOwnLock: lockResponse.is_own_lock,
-				slug: project.slug,
-				projectType: project.project_types[0],
-				status: project.status,
 				isProcessing: project.status === 'processing',
 			}
 		}),
@@ -94,7 +87,7 @@ export async function findNextEligibleQueueProject(
 		for (const id of batch) {
 			const result = results.get(id)
 			if (isEligibleQueueCandidate(result)) {
-				return { project: id, result: result!, excluded: [...excluded] }
+				return { project: id, excluded: [...excluded] }
 			}
 			excluded.push(id)
 		}

@@ -181,7 +181,6 @@
 <script setup lang="ts">
 import { InfoIcon } from '@modrinth/assets'
 import { moderationSettings } from '@modrinth/moderation'
-import ActionButton from '@modrinth/moderation/src/types/node/components/ActionButton.vue'
 import {
 	Combobox,
 	defineMessages,
@@ -210,6 +209,7 @@ import {
 import { injectReviewPreviousIssues } from '~/providers/project-review/review-previous-issues'
 
 import { projectReviewMessages as messages } from '../../messages'
+import ActionButton from './action-button.vue'
 import SlugInput from './slug-input.vue'
 
 const props = defineProps<{

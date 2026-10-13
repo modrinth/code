@@ -29,16 +29,12 @@ const groups = computed(() => {
 		{
 			id: 'project-review',
 			title: formatMessage(messages.projectReview),
-			bindings: bindings.filter(
-				([, binding]) => isProjectReview(binding.scope) || !!binding.reviewAction,
-			),
+			bindings: bindings.filter(([, binding]) => isProjectReview(binding.scope)),
 		},
 		{
 			id: 'general',
 			title: formatMessage(messages.general),
-			bindings: bindings.filter(
-				([, binding]) => !isProjectReview(binding.scope) && !binding.reviewAction,
-			),
+			bindings: bindings.filter(([, binding]) => !isProjectReview(binding.scope)),
 		},
 	]
 })

@@ -70,8 +70,8 @@ const isMac = ref(false)
 const { formatMessage } = useVIntl()
 const messages = defineMessages({
 	projectScope: {
-		id: 'moderation.keybinds.scope-project',
-		defaultMessage: 'Can be used without the checklist open if setting enabled.',
+		id: 'moderation.keybinds.scope-project-page',
+		defaultMessage: 'Used on project pages when project page shortcuts are enabled.',
 	},
 	globalScope: {
 		id: 'moderation.keybinds.scope-global',

@@ -18,13 +18,10 @@ export interface ModerationQueue {
 	lastUpdated: Date
 }
 
-export type LockedByUser = Labrinth.Moderation.Internal.LockedByUser
 export type LockStatusResponse = Labrinth.Moderation.Internal.LockStatusResponse
-export type LockAcquireResponse = Labrinth.Moderation.Internal.LockAcquireResponse
 
 export interface ModerationQueueService {
 	currentQueue: ModerationQueue
-	currentLock: { projectId: string; lockedAt: Date } | null
 	isQueueMode: boolean
 	hydrated: boolean
 	ready: Promise<void>
@@ -43,11 +40,7 @@ export interface ModerationQueueService {
 	resetQueue(): Promise<void>
 	visitProject(projectId: string, back?: boolean): Promise<void>
 
-	acquireLock(projectId: string): Promise<LockAcquireResponse>
-	overrideLock(projectId: string): Promise<LockAcquireResponse>
-	releaseLock(projectId: string): Promise<boolean>
 	checkLock(projectId: string, throwOnError?: boolean): Promise<LockStatusResponse>
-	refreshLock(): Promise<LockAcquireResponse>
 }
 
 const EMPTY_QUEUE: ModerationQueue = {
@@ -114,7 +107,6 @@ function persistedPayload(
 
 function createModerationQueueState(client: AbstractModrinthClient = injectModrinthClient()) {
 	const currentQueue = ref(createEmptyQueue())
-	const currentLock = ref<{ projectId: string; lockedAt: Date } | null>(null)
 	const isQueueMode = ref(false)
 	const hydrated = ref(false)
 
@@ -265,60 +257,6 @@ function createModerationQueueState(client: AbstractModrinthClient = injectModri
 		})
 	}
 
-	async function acquireLock(projectId: string): Promise<LockAcquireResponse> {
-		await ready
-
-		try {
-			const response = await client.labrinth.moderation_internal.acquireLock(projectId)
-
-			if (response.success) {
-				currentLock.value = { projectId, lockedAt: new Date() }
-			} else if (currentLock.value?.projectId === projectId) {
-				currentLock.value = null
-			}
-
-			return response
-		} catch (error) {
-			console.error('Failed to acquire moderation lock:', error)
-			return { success: false, is_own_lock: false }
-		}
-	}
-
-	async function overrideLock(projectId: string): Promise<LockAcquireResponse> {
-		await ready
-
-		try {
-			const response = await client.labrinth.moderation_internal.overrideLock(projectId)
-
-			if (response.success) {
-				currentLock.value = { projectId, lockedAt: new Date() }
-			} else if (currentLock.value?.projectId === projectId) {
-				currentLock.value = null
-			}
-
-			return response
-		} catch (error) {
-			console.error('Failed to override moderation lock:', error)
-			return { success: false, is_own_lock: false }
-		}
-	}
-
-	async function releaseLock(projectId: string): Promise<boolean> {
-		await ready
-
-		try {
-			const response = await client.labrinth.moderation_internal.releaseLock(projectId)
-
-			if (currentLock.value?.projectId === projectId) {
-				currentLock.value = null
-			}
-
-			return response.success
-		} catch {
-			return false
-		}
-	}
-
 	async function checkLock(projectId: string, throwOnError = false): Promise<LockStatusResponse> {
 		await ready
 
@@ -332,24 +270,8 @@ function createModerationQueueState(client: AbstractModrinthClient = injectModri
 		}
 	}
 
-	async function refreshLock(): Promise<LockAcquireResponse> {
-		await ready
-
-		if (!currentLock.value) return { success: false, is_own_lock: false }
-
-		try {
-			const response = await acquireLock(currentLock.value.projectId)
-			return response
-		} catch (error) {
-			console.error('Failed to refresh moderation lock:', error)
-			currentLock.value = null
-			return { success: false, is_own_lock: false }
-		}
-	}
-
 	return proxyRefs({
 		currentQueue,
-		currentLock,
 		isQueueMode,
 		hydrated,
 		ready,
@@ -368,11 +290,7 @@ function createModerationQueueState(client: AbstractModrinthClient = injectModri
 		resetQueue,
 		visitProject,
 
-		acquireLock,
-		overrideLock,
-		releaseLock,
 		checkLock,
-		refreshLock,
 	}) as ModerationQueueService
 }
 

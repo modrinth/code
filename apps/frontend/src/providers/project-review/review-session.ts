@@ -1,10 +1,10 @@
-import type { NodeState } from '@modrinth/moderation/src/types/node'
+import type { ReviewStateValue } from '@modrinth/moderation'
 import { createContext } from '@modrinth/ui'
 import { reactive, watch } from 'vue'
 
 import { useAuthState } from '~/composables/auth'
 
-type ReviewState = Record<string, NodeState>
+type ReviewState = Record<string, ReviewStateValue>
 type ProjectReviewState = Record<string, ReviewState>
 
 const DRAFT_EXPIRY_MS = 30 * 24 * 60 * 60 * 1000
@@ -13,14 +13,14 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 	return !!value && typeof value === 'object' && !(value instanceof Set) && !Array.isArray(value)
 }
 
-function isNodeState(value: unknown): value is NodeState {
+function isReviewStateValue(value: unknown): value is ReviewStateValue {
 	return (
 		value === null ||
 		typeof value === 'boolean' ||
 		typeof value === 'string' ||
 		typeof value === 'number' ||
 		(value instanceof Set && [...value].every((entry) => typeof entry === 'string')) ||
-		(isRecord(value) && Object.values(value).every(isNodeState))
+		(isRecord(value) && Object.values(value).every(isReviewStateValue))
 	)
 }
 
@@ -28,7 +28,7 @@ function isProjectReviewState(value: unknown): value is ProjectReviewState {
 	return (
 		isRecord(value) &&
 		Object.values(value).every(
-			(scope) => isRecord(scope) && Object.values(scope).every(isNodeState),
+			(scope) => isRecord(scope) && Object.values(scope).every(isReviewStateValue),
 		)
 	)
 }
@@ -99,7 +99,7 @@ export function createReviewSession() {
 		return readProject(projectId)[scope] ?? {}
 	}
 
-	function write(projectId: string, scope: string, id: string, value: NodeState) {
+	function write(projectId: string, scope: string, id: string, value: ReviewStateValue) {
 		const project = readProject(projectId)
 		const state = { ...project[scope] }
 		if (value === undefined) Reflect.deleteProperty(state, id)

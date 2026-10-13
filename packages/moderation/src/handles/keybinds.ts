@@ -22,18 +22,9 @@ function bindKeybind<T>(keybind: BaseKeybindListener<T>, ctx: T) {
 }
 
 function scopedKeybind(keybind: KeybindListener, ctx: ModerationContext) {
-	if (ctx.scope === 'review-actions' && keybind.reviewAction) {
-		const action = keybind.reviewAction
-		return {
-			enabled: () => ctx.available(action),
-			run: () => ctx.run(action),
-		}
-	}
 	switch (ctx.scope) {
 		case 'project':
 			return keybind.scope === 'project' ? bindKeybind(keybind, ctx) : undefined
-		case 'checklist':
-			return keybind.scope === 'checklist' ? bindKeybind(keybind, ctx) : undefined
 		case 'tech-review':
 			return keybind.scope === 'tech-review' ? bindKeybind(keybind, ctx) : undefined
 		case 'global':

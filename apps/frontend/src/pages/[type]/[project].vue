@@ -117,23 +117,7 @@
 				v-if="projectInstallContext && !isSettings"
 				:install-context="projectInstallContext"
 			/>
-			<div
-				class="new-page sidebar"
-				:class="[
-					{
-						'alt-layout': cosmetics.leftContentLayout,
-						'checklist-open':
-							showModerationChecklist &&
-							!collapsedModerationChecklist &&
-							!flags.alwaysShowChecklistAsPopup,
-						'checklist-collapsed':
-							showModerationChecklist &&
-							collapsedModerationChecklist &&
-							!flags.alwaysShowChecklistAsPopup,
-					},
-					`align-${marginTarget}`,
-				]"
-			>
+			<div class="new-page sidebar" :class="{ 'alt-layout': cosmetics.leftContentLayout }">
 				<div
 					class="normal-page__header relative mb-4"
 					:class="projectInstallContext && !isSettings ? 'mt-0' : 'mt-4'"
@@ -558,15 +542,6 @@
 			</div>
 		</div>
 
-		<ClientOnly>
-			<ModerationChecklist
-				v-if="auth.user && tags.staffRoles.includes(auth.user.role) && showModerationChecklist"
-				:collapsed="collapsedModerationChecklist"
-				@exit="setModerationChecklistOpen(false)"
-				@toggle-collapsed="collapsedModerationChecklist = !collapsedModerationChecklist"
-			/>
-		</ClientOnly>
-
 		<template v-if="hasEditDetailsPermission">
 			<ProjectEnvironmentModal ref="projectEnvironmentModal" />
 		</template>
@@ -594,7 +569,7 @@ import {
 	SettingsIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { getMarginTarget, moderationSettings } from '@modrinth/moderation'
+import { moderationSettings } from '@modrinth/moderation'
 import {
 	Admonition,
 	ArchivedProjectBanner,
@@ -646,7 +621,6 @@ import { navigateTo } from '#app'
 import ProjectStatusStats from '~/components/ProjectStatusStats.vue'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
-import ModerationChecklist from '~/components/ui/moderation/checklist/ModerationChecklist.vue'
 import ModerationProjectNags from '~/components/ui/moderation/ModerationProjectNags.vue'
 import ModpackScanModal from '~/components/ui/moderation/ModpackScanModal.vue'
 import ProjectCollectionSaveButton from '~/components/ui/ProjectCollectionSaveButton.vue'
@@ -669,8 +643,6 @@ import { useServerInstallContent } from '~/composables/use-server-install-conten
 import { userCollectProject, userFollowProject } from '~/composables/user.js'
 import { isApproved, isRejected } from '~/helpers/projects.js'
 import { injectCurrentProjectId } from '~/providers/current-project.ts'
-import { loadChecklistState } from '~/services/moderation/checklist-storage.ts'
-import { useModerationQueue } from '~/services/moderation/queue.ts'
 import { getReportPath, reportProject } from '~/utils/report-helpers.ts'
 
 definePageMeta({
@@ -682,10 +654,8 @@ const route = useRoute()
 const router = useRouter()
 const signInRouteObj = computed(() => getSignInRouteObj(route))
 const config = useRuntimeConfig()
-const moderationQueue = useModerationQueue()
 const keybinds = useModerationKeybinds()
 const modSettings = useModerationSettings()
-const marginTarget = computed(() => getMarginTarget(modSettings.value))
 const notifications = injectNotificationManager()
 const { addNotification } = notifications
 
@@ -2414,57 +2384,6 @@ const collapsedChecklist = useLocalStorage(
 	false,
 )
 
-const showModerationChecklist = ref(false)
-const collapsedModerationChecklist = useLocalStorage('collapsed-moderation-checklist', false)
-
-function consumeShowChecklistHistoryState() {
-	if (!import.meta.client) return false
-	if (!window.history?.state?.showChecklist) return false
-
-	const state = { ...window.history.state }
-	delete state.showChecklist
-	window.history.replaceState(state, '', window.location.href)
-	return true
-}
-
-function setModerationChecklistOpen(open) {
-	showModerationChecklist.value = open
-}
-
-watch(
-	() => project.value?.id,
-	async (projectId, _previousProjectId, onCleanup) => {
-		if (!import.meta.client || !projectId) return
-
-		let cancelled = false
-		onCleanup(() => {
-			cancelled = true
-		})
-
-		const openedFromNavigation = consumeShowChecklistHistoryState()
-		await moderationQueue.ready
-		if (cancelled) return
-
-		if (openedFromNavigation) {
-			setModerationChecklistOpen(true)
-			return
-		}
-
-		const storedState = await loadChecklistState(projectId)
-		if (cancelled) return
-
-		if (storedState !== null) {
-			showModerationChecklist.value = storedState.open ?? false
-			return
-		}
-
-		const shouldRecoverFromQueue =
-			moderationQueue.isQueueMode && moderationQueue.getCurrentProjectId() === projectId
-		showModerationChecklist.value = shouldRecoverFromQueue
-	},
-	{ immediate: true },
-)
-
 function triggerDownloadAnimation() {
 	overTheTopDownloadAnimation.value = true
 	setTimeout(() => (overTheTopDownloadAnimation.value = false), 500)
@@ -2508,18 +2427,12 @@ async function deleteVersion(id) {
 	stopLoading()
 }
 
-// moderation project keybinds
-
 onMounted(() => window.addEventListener('keydown', handleKeybinds))
 onUnmounted(() => window.removeEventListener('keydown', handleKeybinds))
 
 function handleKeybinds(event) {
 	if (!isStaff(auth.value.user)) return
-	if (
-		!showModerationChecklist.value &&
-		!modSettings.value.get(moderationSettings.Checklist.AlwaysAllowKeybinds)
-	)
-		return
+	if (!modSettings.value.get(moderationSettings.General.EnableProjectKeybinds)) return
 
 	keybinds.value.handle(event, {
 		project: projectRaw.value,
