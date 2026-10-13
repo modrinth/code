@@ -12431,6 +12431,7 @@ dependencies = [
 name = "theseus"
 version = "1.0.0-local"
 dependencies = [
+ "anyhow",
  "ariadne",
  "async-minecraft-ping",
  "async-recursion",
@@ -12456,7 +12457,6 @@ dependencies = [
  "either",
  "encoding_rs",
  "enumset",
- "eyre",
  "flate2",
  "fs4",
  "futures",

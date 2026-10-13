@@ -50,7 +50,7 @@ pub enum ErrorKind {
     PackSyncChanged,
 
     #[error("{0:?}")]
-    Any(eyre::Report),
+    Any(anyhow::Error),
 
     #[error("Filesystem error: {0}")]
     FSError(String),
@@ -286,8 +286,8 @@ impl<E: Into<ErrorKind>> From<E> for Error {
     }
 }
 
-impl From<eyre::Report> for Error {
-    fn from(value: eyre::Report) -> Self {
+impl From<anyhow::Error> for Error {
+    fn from(value: anyhow::Error) -> Self {
         let error = Arc::new(ErrorKind::Any(value));
 
         Self {
