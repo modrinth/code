@@ -1,34 +1,39 @@
 
 import {
-	type FileContentPromise, type FileDetails, type FileTypeInfo,
+	type FileContentPromise, type FileDetails, type FileTypeInfo, hashBuffer,
 	type HashedFileContent, resolveContent
 } from "#ui/helpers/toolbox/file";
 import {
 	isWorker,
-	resolveOutput,
-	type ServerInputHandler,
+	type ServerMessageHandler,
 	setupAsServer
 } from "#ui/helpers/toolbox/messenger";
 import { zipHandlerType } from "#ui/helpers/toolbox/workers";
 import type {  ZipMessages } from "#ui/helpers/toolbox/workers/zip/api";
-import type {
-	LazyDataAccess,
-	NodeTarget,
-	RootZipTreeNode,
-	Sha512,
-	StringMatcher,
-	ZipTreeNode } from "#ui/helpers/toolbox/zip";
-import { readZipTree } from "#ui/helpers/toolbox/zip/impl";
+import {
+	arrayBufferFromSource,
+	type LazyDataAccess,
+	type NodeTarget, type RootNodeTarget,
+	type RootZipTreeNode,
+	type StringMatcher,
+	type UUID_V7,
+	type ZipNode,
+} from "#ui/helpers/toolbox/zip";
+import {readZipTreeFromBuffer, readZipTreeFromURL} from "#ui/helpers/toolbox/zip/impl";
 
-const zipArchivesByHash = new Map<Sha512, RootZipTreeNode>();
+export type Sha512 = string;
 
-const urlToHash = new Map<string, Sha512>();
-const hashToUrls = new Map<string, string[]>();
+const zipByUUID = new Map<UUID_V7, RootZipTreeNode>();
+
+const hashToUUID = new Map<Sha512, UUID_V7>();
+
+const urlToUUID = new Map<string, UUID_V7>();
+const UUIDToUrls = new Map<UUID_V7, string[]>();
 
 function getNodeFrom(target: NodeTarget) {
-	if (!zipArchivesByHash || zipArchivesByHash.size == 0) throw new Error(`Unable to locate node as no known root tree is within the worker!`);
+	if (!zipByUUID || zipByUUID.size == 0) throw new Error(`Unable to locate node as no known root tree is within the worker!`);
 
-	const root = zipArchivesByHash.get(target.root);
+	const root = zipByUUID.get(target.root);
 	if (root == undefined) throw new Error(`Unable to get node '${target.root}:${target.path}' as their is no active root with the hash given namespace hash!`);
 
 	const node = (target.relative ? root.relativeFileEntries : root.fileEntries).get(target.path);
@@ -37,23 +42,23 @@ function getNodeFrom(target: NodeTarget) {
 	return node;
 }
 
-function getRootFrom(target: Sha512) {
-	if (!zipArchivesByHash || zipArchivesByHash.size == 0) throw new Error(`Unable to locate node as no known root tree is within the worker!`);
+function getRootFrom(target: UUID_V7) {
+	if (!zipByUUID || zipByUUID.size == 0) throw new Error(`Unable to locate node as no known root tree is within the worker!`);
 
-	const root = zipArchivesByHash.get(target);
+	const root = zipByUUID.get(target);
 	if (root == undefined) throw new Error(`Unable to get root '${target}' as their is no active root with the hash given hash!`);
 
 	return root;
 }
 
 function getZipNode(value: string) {
-	if (zipArchivesByHash.has(value)) {
-		return zipArchivesByHash.get(value);
+	if (zipByUUID.has(value)) {
+		return zipByUUID.get(value);
 	}
 
-	if (urlToHash.has(value)) {
-		const hash = urlToHash.get(value)!;
-		const node = zipArchivesByHash.get(hash);
+	if (urlToUUID.has(value)) {
+		const hash = urlToUUID.get(value)!;
+		const node = zipByUUID.get(hash);
 
 		if (node) return node;
 	}
@@ -84,8 +89,8 @@ async function isValidFor(path: string, fileType: () => Promise<FileTypeInfo | n
 	return true;
 }
 
-export const messageHandler: ServerInputHandler<ZipMessages> = function (messenger, msg, sender) {
-	return resolveOutput(msg, {
+export const messageHandler: ServerMessageHandler<ZipMessages> = (messenger, msg, resolver, sender)=>  {
+	return resolver(msg, {
 		lazy_read: async (msg) => {
 			const node = getNodeFrom(msg);
 
@@ -101,47 +106,127 @@ export const messageHandler: ServerInputHandler<ZipMessages> = function (messeng
 			const node = getNodeFrom(msg);
 
 			const buffer = await node.getBuffer();
+			console.log(buffer);
 			return {
 				buffer: buffer
 			};
 		},
 		node_write: async (msg) => {
 			const node = getNodeFrom(msg);
-			await node.setBuffer(async () => msg.buffer, msg.nodeType, msg.options);
+			await node.setBuffer(async () => msg.buffer, msg.options);
+			messenger.forActiveMessengersUnless(sender, (connection) => {
+				messenger.sendClientMessage(connection, async () => {
+					return {
+						channel: "archive_update",
+						type: "updated_node_data",
+						node: {
+							root: node.root?.key!,
+							path: node.path,
+						}
+					}
+				})
+			})
 			return {
 				wasWritten: true
 			};
 		},
 		read_zip_tree: async (msg) => {
 			let tree: RootZipTreeNode | undefined = undefined;
+			let isFullyLoaded = sender != null;
 
-			if (msg.hash) tree = getZipNode(msg.hash);
+			if (msg.sha512Hash) tree = getZipNode(msg.sha512Hash);
 			if (tree == null && msg.url) tree = getZipNode(msg.url);
 			if (tree == null) {
-				tree = await readZipTree(messenger.logger, msg.buffer, { name: msg.name, logger: messenger.logger });
+				if (msg.data_type == 'buffer') {
+					const buffer = await arrayBufferFromSource(msg.buffer);
+					const hash = await hashBuffer(buffer)
 
-				zipArchivesByHash.set(tree.key, tree);
+					tree = await readZipTreeFromBuffer(messenger.logger, buffer, {
+						name: msg.name,
+						logger: messenger.logger,
+						innerArchiveReadCallback: sender != null ? (root, node) => {
+							messenger.forActiveMessengersUnless(sender, (connection) => {
+								messenger.sendClientMessage(connection, async () => {
+									return {
+										channel: 'archive_update',
+										type: 'node_loaded',
+										root: { root: root.key } as RootNodeTarget,
+										node: copyChildNode(node)
+									}
+								})
+							})
+						} : undefined
+					});
+
+					hashToUUID.set(hash, tree.key)
+				} else {
+					tree = await readZipTreeFromURL(messenger.logger, msg.url, {
+						name: msg.name,
+						logger: messenger.logger,
+						innerArchiveReadCallback: (root, node) => {
+							messenger.forActiveMessengersUnless(sender, (connection) => {
+								messenger.sendClientMessage(connection, async () => {
+									return {
+										channel: 'archive_update',
+										type: 'node_loaded',
+										root: { root: root.key } as RootNodeTarget,
+										node: copyChildNode(node)
+									}
+								})
+							})
+						},
+						rangeOptions: {
+							...msg.rangeOptions,
+							onProgress(current, total) {
+								messenger.forActiveMessengersUnless(sender, (connection) => {
+									messenger.sendClientMessage(connection, async () => {
+										return {
+											channel: 'archive_update',
+											type: 'archive_download',
+											root: { root: tree!.key } as RootNodeTarget,
+											current: current,
+											total: total
+										}
+									})
+								})
+							}
+						},
+					});
+
+					if (msg.sha512Hash) zipByUUID.set(msg.sha512Hash, tree);
+				}
+
+				tree!.onFinishedLoading.then(() => {
+					isFullyLoaded = true;
+					messenger.forActiveMessengersUnless(sender, (connection) => {
+						messenger.sendClientMessage(connection, async () => {
+							return {
+								channel: 'archive_update',
+								type: 'root_loaded',
+								root: {root: tree!.key} as RootNodeTarget
+							}
+						})
+					})
+				})
+
+				zipByUUID.set(tree.key, tree);
 
 				if (msg.url) {
-					urlToHash.set(msg.url, tree.key);
+					urlToUUID.set(msg.url, tree.key);
 
-					const urls = (hashToUrls.has(tree.key))
-						? hashToUrls.get(tree.key)!
-						: (() => { const array = new Array<string>(); hashToUrls.set(tree.key, array); return array; })();
+					const urls = (UUIDToUrls.has(tree.key))
+						? UUIDToUrls.get(tree.key)!
+						: (() => { const array = new Array<string>(); UUIDToUrls.set(tree.key, array); return array; })();
 
 					urls.push(msg.url);
 				}
 			}
 
-			const copiedTree = copy(tree);
-
-			return {
-				node: copiedTree
-			};
+			return { node: copyRoot(tree), isFullyLoaded: isFullyLoaded };
 		},
 		get_zip_tree: async (msg) => {
 			const node = getZipNode(msg.value);
-			const copiedTree = node ? copy(node) : undefined;
+			const copiedTree = node ? copyRoot(node) : undefined;
 
 			return {
 				node: copiedTree
@@ -258,11 +343,11 @@ export const messageHandler: ServerInputHandler<ZipMessages> = function (messeng
 			return { files: files };
 		},
 		close_zip_tree: async (msg) => {
-			zipArchivesByHash.delete(msg.root);
+			zipByUUID.delete(msg.root);
 
-			const urls = hashToUrls.get(msg.root);
-			if (urls) for (const url of urls) urlToHash.delete(url);
-			hashToUrls.delete(msg.root);
+			const urls = UUIDToUrls.get(msg.root);
+			if (urls) for (const url of urls) urlToUUID.delete(url);
+			UUIDToUrls.delete(msg.root);
 
 			return {
 				err: undefined,
@@ -270,52 +355,44 @@ export const messageHandler: ServerInputHandler<ZipMessages> = function (messeng
 			}
 		},
 		close_all_zip_trees: async () => {
-			zipArchivesByHash.clear();
-			urlToHash.clear();
-			hashToUrls.clear();
+			zipByUUID.clear();
+			urlToUUID.clear();
+			UUIDToUrls.clear();
 
 			return {
 				err: undefined,
 				wasClosed: true,
 			}
 		},
-		update_node_data: async (target) => {
-			if (sender != null) {
-				const connectedMessengers = messenger.getActiveMessengers();
-
-				for (const connectedMessenger of connectedMessengers) {
-					messenger.sendOutputMessage(connectedMessenger, Promise.resolve(target))
-				}
-			}
-
-			return target;
-		}
 	})
 };
 
-export function copy(node: RootZipTreeNode): RootZipTreeNode {
+export function copyRoot(node: RootZipTreeNode): RootZipTreeNode {
 	const cloneNode = { children: new Map(), key: node.key } as RootZipTreeNode;
+
 	return copyNodeData(cloneNode, node);
 }
 
-function copyNodeData<N extends ZipTreeNode>(clone: N, oldNode: N): N {
+export function copyChildNode(node: ZipNode): ZipNode {
+	// Required to strip the functions that can not cross the message barrier
+	const cloneMetaData = {
+		...node.metadata,
+		getData: undefined,
+		arrayBuffer: undefined,
+	};
+
+	const cloneNode = { name: node.name, path: node.path, type: node.type, metadata: cloneMetaData, children: new Map() } as any as ZipNode
+
+	return copyNodeData(cloneNode, node);
+}
+
+function copyNodeData<N extends ZipNode>(clone: N, oldNode: N): N {
 	for (const entry of oldNode.children.values()) {
-		// Required to strip the functions that can not cross the message barrier
-		const cloneMetaData = {
-			...entry.metadata,
-			getData: undefined,
-			arrayBuffer: undefined,
-		};
-
-		const entryClone = { name: entry.name, path: entry.path, type: entry.type, metadata: cloneMetaData, children: new Map() } as any as ZipTreeNode
-
-		clone.children.set(entry.name, entryClone)
-
-		copyNodeData(entryClone, entry);
+		clone.children.set(entry.name, copyChildNode(entry))
 	}
 
 	return clone;
 }
 
 /** In development the handler is also loaded on the main thread as a bypass, where no server is set up. */
-if (isWorker()) setupAsServer(zipHandlerType, self as unknown as Worker, messageHandler);
+if (isWorker()) setupAsServer<ZipMessages>(zipHandlerType, self as unknown as Worker, messageHandler);

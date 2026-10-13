@@ -72,7 +72,7 @@ export async function decompileFileContent(logger: Logger, zipHandler: ZipHandle
 
 	if (options == null) options = DEFAULT_DECOMPILE_OPTIONS;
 
-    const rootKey = (targetFile as any).rootKey ? (targetFile as ZipFileContent).rootKey : undefined;
+    const rootKey = (targetFile as Partial<ZipFileContent>).root ?? undefined;
 
     try {
         // const pathParts = targetFile.fullPath.split('.jar'); \n const withoutClassSuffix = pathParts[pathParts.length - 1].slice(0, -6); \n
@@ -84,9 +84,9 @@ export async function decompileFileContent(logger: Logger, zipHandler: ZipHandle
 				source: async (name) => {
 					if (name === withoutClassSuffix) {
 						return new Uint8Array(buffer);
-					} else if (rootKey && name.includes(withoutClassSuffix)) {
+					} else if (rootKey != null && name.includes(withoutClassSuffix)) {
 						// TODO: THIS DOES NOT PROPERLY HANDLE WHICH JAR WE NEED TO LOOK AT SO IF DUPLICATE FILES EXIST, WE MAY GET THE WRONG ONE!!!!
-						const buffer = await zipHandler?.readNodeData({ path: name + ".class", root: rootKey, relative: true });
+						const buffer = await zipHandler?.readNodeData({ path: "/" + name + ".class", root: rootKey, relative: true });
 						if (buffer) return new Uint8Array(buffer);
 					}
 
@@ -98,9 +98,11 @@ export async function decompileFileContent(logger: Logger, zipHandler: ZipHandle
 				options: options.options
 			});
 
+		const unnormalizedPath = withoutClassSuffix.slice(1);
+
 		if (typeof decompiled === 'string') {
 			source = decompiled ?? undefined;
-		} else if (!decompiled[withoutClassSuffix]) {
+		} else if (!decompiled[unnormalizedPath]) {
             console.error("Decompilation failed for", targetFile.fullPath, decompiled);
             error = "// [Decompilation output either is kotlin or their is issues just a fyi!] \n\n";
 
@@ -109,7 +111,7 @@ export async function decompileFileContent(logger: Logger, zipHandler: ZipHandle
                 error = `${error} \n\n Class: ${key} \n\n ${value}`
             }
         } else {
-            source = decompiled[withoutClassSuffix] ?? undefined;
+            source = decompiled[unnormalizedPath] ?? undefined;
         }
     } catch (err: any) {
         error = `[${err?.message ?? "Decompilation has due to an unknown error being thrown!"}]`;

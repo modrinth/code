@@ -5,12 +5,16 @@ export const ALL_DECOMPILER_TYPES = ['cfr', 'vineflower', 'procyon', 'krakatau']
 
 export type DecompilerTypes = typeof ALL_DECOMPILER_TYPES[number];
 
-export type DecompileInput = {
-	targetFile: FileContent, resources?: FileDetails[], options?: DecompileOptions
-};
+export interface DecompileInput {
+	targetFile: FileContent,
+	transferBuffer?: boolean,
+	resources?: FileDetails[],
+	options?: DecompileOptions
+}
 
-export type DecompileOptions = {
-	decompiler?: DecompilerTypes, options?: Record<string, any>
+export interface DecompileOptions {
+	decompiler?: DecompilerTypes,
+	options?: Record<string, any>
 }
 
 export const DEFAULT_DECOMPILE_OPTIONS = {
@@ -24,7 +28,7 @@ export const DEFAULT_DECOMPILE_OPTIONS = {
 
 export type DecompilerMessages = MessageTypes<
 	{
-		main: {input: DecompileInput, output: DecompilerResult}
+		main: { serverbound: DecompileInput, clientbound: DecompilerResult }
 	}
 >
 

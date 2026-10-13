@@ -55,16 +55,15 @@ export interface FileTypeInfo {
     method?: 'content-analysis' | 'extension-lookup';
 }
 
-type PromiseMaybe<T, R> = T extends undefined ? R : Promise<R>
+export type AsyncMaybe<T, R, D = undefined> = T extends D ? R : Promise<R>
 
-export function getFileTypeInfo<T extends ArrayBuffer | Blob | undefined = undefined>(path: string, data?: T): PromiseMaybe<T, FileTypeInfo | null> {
-	const promiseLike: Promise<FileTypeInfo | null> | undefined = data ? getFileTypeFromData(data) : undefined;
+export function getFileTypeInfo<T extends ArrayBuffer | Blob | undefined = undefined>(path: string, data?: T): AsyncMaybe<T, FileTypeInfo | null> {
+	const promiseLike = data ? getFileTypeFromData(data) : undefined;
 
-	if (promiseLike != null) {
-		return promiseLike.then((result) => result ?? getFileTypeFromExt(path)) as PromiseMaybe<T, FileTypeInfo | null>;
-	} else {
-		return getFileTypeFromExt(path) as PromiseMaybe<T, FileTypeInfo | null>;
-	}
+	return ((promiseLike != null)
+		? promiseLike.then((result) => result ?? getFileTypeFromExt(path))
+		: getFileTypeFromExt(path)
+	) as AsyncMaybe<T, FileTypeInfo | null>
 }
 
 function getFileTypeFromExt(path: string): FileTypeInfo | null {

@@ -5,44 +5,83 @@ import {
 	type DecompilerResult,
 	DEFAULT_DECOMPILE_OPTIONS
 } from "#ui/helpers/toolbox/decompile";
-import type { FileDetails, FileTypeInfo, HashedFileContent } from "#ui/helpers/toolbox/file";
+import type {
+	AsyncMaybe,
+	FileDetails,
+	FileTypeInfo,
+	HashedFileContent
+} from "#ui/helpers/toolbox/file";
 import {
 	type LazyValue,
 	lazyValue,
 	TreeNode
 } from "#ui/helpers/toolbox/misc";
 import type { Logger } from "#ui/helpers/toolbox/misc/logging";
+import type { EventSource } from "#ui/helpers/toolbox/misc"
+import type {RangeCacheReaderOptions} from "#ui/helpers/toolbox/zip/range-cache-reader.ts";
 
 // TODO: SWITCH TO ZipWriterAddDataOptions instead of EntryMetaData ???
 export type EntryData = EntryMetaData & { directory: boolean };
 
-export type ZipNodeTypes = "zip" | "file" | "directory" | "root";
+export type ZipNodeType = {
+	'file': FileZipTreeNode,
+	'directory': ZipTreeNode & { type: 'directory'},
+}
+
+export type ZipNodeTypes = keyof ZipNodeType;
+export type ZipNode = ZipNodeType[ZipNodeTypes];
 
 export const nodeTypeToOrdinal = {
-    "zip": 2,
     "directory": 1,
     "file": 0
 } as Record<ZipNodeTypes, number>
 
-export function sortZipNodes(node1: ZipTreeNode, node2: ZipTreeNode)  {
-    const order = nodeTypeToOrdinal[node1.type] - nodeTypeToOrdinal[node2.type];
+export const zipExtensionRegex = /\.(ear|war|jar|zip|mrpack)$/;
+export const zipMimeTypes = new Set([
+	'application/x-zip-compressed',
+	'application/zip',
+	'application/zip-compressed',
+	'application/java-archive'
+])
+
+export function isZipArchive<BL extends boolean | undefined = undefined>(node: ZipNode, verifyWithData?: BL): AsyncMaybe<BL, boolean> {
+	return (node.type == 'file'
+		? (verifyWithData
+			? node.getFileType()
+					.then((type) => type != null ? zipMimeTypes.has(type.mime) : zipExtensionRegex.test(node.name))
+			:  zipExtensionRegex.test(node.name)
+		)
+		: false
+	) as AsyncMaybe<BL, boolean>
+}
+
+function nodeToOrdinal(node: ZipNode) {
+	return isZipArchive(node) ? 2 : (node.type == 'directory' ? 1 : 0);
+}
+
+export function sortZipNodes(node1: ZipNode, node2: ZipNode)  {
+    const order = nodeToOrdinal(node1) - nodeToOrdinal(node2);
 
     return order == 0 ? node1.name.localeCompare(node2.name, "en") : -order
 }
 
 export type ArrayBufferSource = (() => Promise<ArrayBuffer>) | Promise<ArrayBuffer> | ArrayBuffer;
 
+export function arrayBufferFromSource(source: ArrayBufferSource): Promise<ArrayBuffer> {
+	return typeof source === 'function' ? source() : Promise.resolve(source);
+}
+
 export interface ZipFileContent extends FileDetails {
-	rootKey: Sha512;
+	root: UUID_V7;
 	content: ArrayBuffer;
 }
 
-export class ZipTreeNode extends TreeNode<ZipTreeNode> {
+export class ZipTreeNode extends TreeNode<ZipNode> {
     root?: RootZipTreeNode;
     type: ZipNodeTypes;
     metadata: EntryData
 
-    constructor(root: RootZipTreeNode | undefined, parent: ZipTreeNode | undefined, name: string, path: string, type: ZipNodeTypes, metadata?: EntryMetaData) {
+    constructor(root: RootZipTreeNode | undefined, parent: ZipNode | undefined, name: string, path: string, type: ZipNodeTypes, metadata?: EntryMetaData) {
         super(parent, name, path);
         this.root = root;
         this.type = type;
@@ -55,68 +94,71 @@ export class ZipTreeNode extends TreeNode<ZipTreeNode> {
     remove() {
         this.children.delete(this.name);
 
-        this.root?.removeNodeFromRoot(this)
+        this.root?.removeNodeFromRoot(this as ZipNode)
     };
 
-    addFile(name: string, buffer: ArrayBufferSource | undefined, type: "zip" | "file", metadata: FileEntry): FileZipTreeNode {
-        return this.addNode(name, (root, parent, name, path) => this.createFileNode(root, parent, name, path, buffer, type, metadata));
+    addFile(name: string, buffer: ArrayBufferSource | undefined, metadata: FileEntry): FileZipTreeNode {
+        return this.addNode(name, (root, parent, name, path) => this.createFileNode(root, parent, name, path, buffer, metadata));
     };
 
-    protected createFileNode(root: RootZipTreeNode, parent: ZipTreeNode, name: string, path: string, buffer: ArrayBufferSource | undefined, type: "zip" | "file", metadata: FileEntry): FileZipTreeNode {
-        const node = new DelegateFileZipTreeNode(root, parent, name, path, type, metadata);
+    protected createFileNode(root: RootZipTreeNode, parent: ZipNode, name: string, path: string, buffer: ArrayBufferSource | undefined, metadata: FileEntry): FileZipTreeNode {
+        const node = new DelegateFileZipTreeNode(root, parent, name, path, metadata);
         if (buffer != null) node.setBuffer(buffer);
         return node;
     }
 
-    addDirectory(name: string, metadata?: EntryMetaData): ZipTreeNode {
+    addDirectory(name: string, metadata?: EntryMetaData): ZipNode {
         return this.addNode(name, (root, parent, name, path) => this.createNode(root, parent, name, path, metadata));
     };
 
-    protected createNode(root: RootZipTreeNode, parent: ZipTreeNode, name: string, path: string, metadata?: EntryMetaData): ZipTreeNode {
-        return new ZipTreeNode(root, parent, name, path, "directory", metadata)
+    protected createNode(root: RootZipTreeNode, parent: ZipNode, name: string, path: string, metadata?: EntryMetaData): ZipNode {
+        return new ZipTreeNode(root, parent, name, path, "directory", metadata) as ZipNode
     }
 
-    addNode<N extends ZipTreeNode>(name: string, nodeBuilder: (root: RootZipTreeNode, parent: ZipTreeNode, name: string, path: string) => N): N {
+    addNode<N extends ZipNode>(name: string, nodeBuilder: (root: RootZipTreeNode, parent: ZipNode, name: string, path: string) => N): N {
         const root = this.root ?? this as unknown as RootZipTreeNode;
         this.children.get(name)?.remove();
-        const node = nodeBuilder(root, this, name, (this.type != "root" ? this.path + "/" : "") + name);
+        const node = nodeBuilder(root, this as ZipNode, name, this.path + "/" + name);
         this.children.set(name, node);
         root.addNodeToRoot(node);
         return node;
     };
 
     asFile(): FileZipTreeNode | undefined{
-        return (this.type == "zip" || this.type == "file") ? this as unknown as FileZipTreeNode : undefined;
+        return this.type == "file" ? this as unknown as FileZipTreeNode : undefined;
     }
 }
 
-export type Sha512 = string;
+export type UUID_V7 = string;
 
 /**
  * Root tree node — extends TreeNode with a flat entries list.
  */
 export class RootZipTreeNode extends ZipTreeNode {
-    key: Sha512;
-    entries = new Map<string, ZipTreeNode>();
+    key: UUID_V7;
+    entries = new Map<string, ZipNode>();
     fileEntries = new Map<string, FileZipTreeNode>();
     relativeFileEntries = new Map<string, FileZipTreeNode>();
 
     logger?: Logger;
 
-    declare type: "root";
+	onFinishedLoading: Promise<void>
+
+    declare type: "directory";
 
     declare root: undefined;
     declare parent: undefined;
 
-    constructor(key: Sha512) {
-        super(undefined, undefined, "", "", "root");
+    constructor(key: UUID_V7, onFinishedLoading: Promise<void>) {
+        super(undefined, undefined, "", "", "directory");
         this.key = key;
+		this.onFinishedLoading = onFinishedLoading;
     }
 
     /**
      * @internal Only used to add a node to the given reference maps
      */
-    addNodeToRoot(node: ZipTreeNode) {
+    addNodeToRoot(node: ZipNode) {
         this.entries.set(node.path, node)
         const fileNode = node.asFile();
 
@@ -133,7 +175,7 @@ export class RootZipTreeNode extends ZipTreeNode {
     /**
      * @internal Only used to remove a node from the given reference maps
      */
-    removeNodeFromRoot(node: ZipTreeNode) {
+    removeNodeFromRoot(node: ZipNode) {
         this.entries.delete(node.path)
         this.fileEntries.delete(node.path)
 
@@ -158,13 +200,13 @@ export interface LazyDataAccess {
 }
 
 export interface FileZipTreeNode extends ZipTreeNode, LazyDataAccess, SourceHandler {
-    type: "zip" | "file";
+    type: "file";
 
     metadata: FileEntry
     isSetup: boolean;
 
     getBuffer(): Promise<ArrayBuffer>
-    setBuffer(buffer: ArrayBufferSource, type?: "zip" | "file", options?: ZipWriterAddDataOptions): Promise<this>;
+    setBuffer(buffer: ArrayBufferSource, options?: ZipWriterAddDataOptions): Promise<this>;
 
     getFileType(): Promise<FileTypeInfo | null>
 
@@ -182,13 +224,13 @@ export interface TypedBlob extends Blob {
     fileType: FileTypeInfo | null;
 }
 
-export function fileOrNull(data: ZipTreeNode|EntryData): FileEntry | null {
-    const castedData = (((data as Partial<ZipTreeNode>).metadata ?? data) as EntryData);
+export function fileOrNull(data: ZipNode|EntryData): FileEntry | null {
+    const castedData = (((data as Partial<ZipNode>).metadata ?? data) as EntryData);
     return !castedData.directory ? castedData as FileEntry : null;
 }
 
-export function dirOrNull(data: ZipTreeNode|EntryData): DirectoryEntry | null {
-    const castedData = (((data as Partial<ZipTreeNode>).metadata ?? data) as EntryData);
+export function dirOrNull(data: ZipNode|EntryData): DirectoryEntry | null {
+    const castedData = (((data as Partial<ZipNode>).metadata ?? data) as EntryData);
     return castedData.directory ? castedData as DirectoryEntry : null;
 }
 
@@ -199,7 +241,7 @@ export type FileMatcher = {
 }
 
 export interface RootNodeTarget {
-    root: Sha512
+    root: UUID_V7
 }
 
 export interface NodeTarget extends RootNodeTarget {
@@ -211,31 +253,45 @@ export function getAsTarget(target: FileZipTreeNode | NodeTarget) {
     return (target as FileZipTreeNode).type != undefined ? {path: target.path, root: (target.root as RootZipTreeNode).key} : target as NodeTarget;
 }
 
+export type ZipBufferSource = { data_type: 'buffer', name?: string, url?: string, sha512Hash?: string, buffer: ArrayBufferSource, rangeOptions?: undefined };
+export type ZipURLSource = { data_type: 'url', name?: string, url: string, sha512Hash?: string, buffer?: undefined, rangeOptions?: RangeCacheReaderOptions,}
+export type ZipDataSource = ZipBufferSource | ZipURLSource;
+
+type Typed<K extends string, T> = { type: K } & T;
+
+export type ArchiveUpdateTypes =
+	Typed<'node_loaded', { root: RootNodeTarget, node: ZipNode, }> |
+	Typed<'updated_node_data', { node: NodeTarget }> |
+	Typed<'root_loaded', { root: RootNodeTarget }> |
+	Typed<'archive_download', { root: RootNodeTarget, current: number, total: number }>;
+
 export interface ZipHandler {
-    zipArchivesByHash: Map<Sha512, RootZipTreeNode>;
-    urlToHash: Map<string, Sha512>;
+    zipByUUID: Map<UUID_V7, RootZipTreeNode>;
+    urlToUUID: Map<string, UUID_V7>;
     readLazyData<K extends keyof LazyDataAccess>(node: FileZipTreeNode | NodeTarget, key: K): Promise<Awaited<ReturnType<LazyDataAccess[K]['get']>>>;
 	readSource(node: FileZipTreeNode | NodeTarget, options?: SourceOptions): Promise<DecompilerResult>;
     readNodeData(node: FileZipTreeNode | NodeTarget): Promise<ArrayBuffer>;
-    writeNodeData(node: FileZipTreeNode | NodeTarget, buffer: ArrayBuffer, type?: "zip" | "file", options?: ZipWriterAddDataOptions): Promise<boolean>;
-    collectFiles(root: RootZipTreeNode | Sha512, matcher?: FileMatcher): Promise<FileDetails[]>;
-    collectHashedFiles(root: RootZipTreeNode | Sha512, matcher?: FileMatcher, deduplicate?: boolean): Promise<HashedFileContent[]>;
-    getOrReadZipTree(buffer: () => Promise<ArrayBuffer | undefined>, details?: { name?: string, url?: string, hash?: string }): Promise<RootZipTreeNode | undefined>;
-    readZipTree(buffer: ArrayBuffer, details?: { name?: string, url?: string, hash?: string }): Promise<RootZipTreeNode>;
-    getZipTree(value: string | Sha512, isUrl: boolean, localOnly?: boolean): Promise<RootZipTreeNode | undefined>;
-    closeZipTree(root: RootZipTreeNode | Sha512, name?: string): Promise<{ err?: Error, wasClosed: boolean }>;
+    writeNodeData(node: FileZipTreeNode | NodeTarget, buffer: ArrayBuffer, options?: ZipWriterAddDataOptions): Promise<boolean>;
+    collectFiles(root: RootZipTreeNode | UUID_V7, matcher?: FileMatcher): Promise<FileDetails[]>;
+    collectHashedFiles(root: RootZipTreeNode | UUID_V7, matcher?: FileMatcher, deduplicate?: boolean): Promise<HashedFileContent[]>;
+    getOrReadZipTree(source: ZipDataSource): Promise<RootZipTreeNode | undefined>;
+    readZipTree(source: ZipDataSource): Promise<RootZipTreeNode>;
+    getZipTree(value: string | UUID_V7, isUrl: boolean, localOnly?: boolean): Promise<RootZipTreeNode | undefined>;
+    closeZipTree(root: RootZipTreeNode | UUID_V7, name?: string): Promise<{ err?: Error, wasClosed: boolean }>;
     closeAllZipTrees(): Promise<{ err?: Error, wasClosed: boolean }>;
+	archiveUpdate(msg: ArchiveUpdateTypes): void;
+	onArchiveUpdate: EventSource<(msg: ArchiveUpdateTypes) => void>;
 }
 
 export class DelegateFileZipTreeNode extends ZipTreeNode implements FileZipTreeNode {
-    declare type: "zip" | "file";
+    declare type: "file";
     declare metadata: FileEntry;
     declare handler: ZipHandler | undefined;
 
     isSetup: boolean;
 
-    constructor(root: RootZipTreeNode | undefined, parent: ZipTreeNode | undefined, name: string, path: string, type: "zip" | "file", metadata: FileEntry) {
-        super(root, parent, name, path, type, metadata);
+    constructor(root: RootZipTreeNode | undefined, parent: ZipNode | undefined, name: string, path: string, metadata: FileEntry) {
+        super(root, parent, name, path, "file", metadata);
 
         this.handler = undefined;
 
@@ -317,9 +373,8 @@ export class DelegateFileZipTreeNode extends ZipTreeNode implements FileZipTreeN
         return this.getHandler().readNodeData(this);
     }
 
-    async setBuffer(buffer: ArrayBufferSource, type?: "zip" | "file", options?: ZipWriterAddDataOptions): Promise<this> {
-        const bufferPromise = typeof buffer === 'function' ? buffer() : Promise.resolve(buffer);
-        await this.getHandler().writeNodeData(this, await bufferPromise, type, options);
+    async setBuffer(buffer: ArrayBufferSource, options?: ZipWriterAddDataOptions): Promise<this> {
+        await this.getHandler().writeNodeData(this, await arrayBufferFromSource(buffer), options);
         return this;
     }
 
@@ -350,9 +405,9 @@ export function reconstituteRoot(handler: ZipHandler, root: RootZipTreeNode): Ro
     return reconstituteNodes(handler, root, root, root)
 }
 
-function reconstituteNodes<N extends ZipTreeNode>(handler: ZipHandler, root: RootZipTreeNode, parent: N, node: N): N {
-    let reconstitutedNode: ZipTreeNode;
-    if (node.type == "root") {
+export function reconstituteNodes<N extends ZipNode>(handler: ZipHandler, root: RootZipTreeNode, parent: N, node: N): N {
+    let reconstitutedNode: ZipNode;
+    if (node instanceof RootZipTreeNode) {
         reconstitutedNode = Object.setPrototypeOf(node, RootZipTreeNode.prototype);
     } else if (node.type == "directory") {
         reconstitutedNode = Object.setPrototypeOf(node, ZipTreeNode.prototype);
@@ -363,14 +418,14 @@ function reconstituteNodes<N extends ZipTreeNode>(handler: ZipHandler, root: Roo
 
     node.children.forEach((entry) => reconstituteNodes(handler, root, node, entry))
 
-    if (reconstitutedNode.type != "root") {
+    if (!(reconstitutedNode instanceof RootZipTreeNode)) {
         root.entries.set(reconstitutedNode.path, reconstitutedNode);
 
         reconstitutedNode.root = root;
         reconstitutedNode.parent = parent;
     }
 
-    if (node.type == "file" || node.type == "zip") (node as unknown as DelegateFileZipTreeNode).finishNodeSetup(handler)
+    if (node.type == "file") (node as unknown as DelegateFileZipTreeNode).finishNodeSetup(handler)
 
     return reconstitutedNode as N;
 }

@@ -16,20 +16,37 @@ import {
 	fileOrNull,
 	type FileZipTreeNode,
 	RootZipTreeNode,
-	type Sha512, type SourceOptions,
+	type SourceOptions,
 	type TypedArrayBuffer,
 	type TypedBlob,
 	type ZipFileContent,
-	type ZipNodeTypes,
-	ZipTreeNode
+	type ZipNode,
+	ZipTreeNode,
+	type UUID_V7, arrayBufferFromSource
 } from "#ui/helpers/toolbox/zip";
+import { v7 as uuidV7 } from 'uuid';
+import {
+	RangeCacheReader,
+	type RangeCacheReaderOptions
+} from "#ui/helpers/toolbox/zip/range-cache-reader.ts";
 
 /**
  * Method used to generate the zip tree of the given blob returning the root node of the entire zip file
  */
-export async function readZipTree(logger: Logger, buffer: ArrayBuffer, options: ReadExtraOptions = {}): Promise<RootZipTreeNodeImpl> {
-    const root = new RootZipTreeNodeImpl(logger, await hashBuffer(buffer, "SHA-512"));
-    return readZipDataToNode(root, root, buffer, options);
+export async function readZipTreeFromBuffer(logger: Logger, buffer: ArrayBuffer, options: ReadExtraOptions = {}): Promise<RootZipTreeNodeImpl> {
+	const onFinishedLoadingHolder = Promise.withResolvers<void>();
+    const root = new RootZipTreeNodeImpl(logger, uuidV7(), onFinishedLoadingHolder);
+    const result = await readZipDataToNode(root, root, zipReaderFromBuffer(buffer), options);
+	if (options.innerArchiveReadCallback == null) onFinishedLoadingHolder.resolve()
+	return result;
+}
+
+export async function readZipTreeFromURL(logger: Logger, url: string, options: ReadExtraOptions & {rangeOptions?: RangeCacheReaderOptions} = {}): Promise<RootZipTreeNodeImpl> {
+	const onFinishedLoadingHolder = Promise.withResolvers<void>();
+	const root = new RootZipTreeNodeImpl(logger, uuidV7(), onFinishedLoadingHolder);
+	const result = await readZipDataToNode(root, root, zipReaderFromURL(url, options.rangeOptions), options);
+	if (options.innerArchiveReadCallback == null) onFinishedLoadingHolder.resolve()
+	return result;
 }
 
 export async function writeZipTree(node: ZipTreeNodeImpl): Promise<ArrayBuffer|undefined> {
@@ -47,22 +64,31 @@ export async function writeZipTree(node: ZipTreeNodeImpl): Promise<ArrayBuffer|u
     return (await zip.close()).buffer;
 }
 
-const zipArchiveExtensionRegex = /\.(ear|war|jar|zip|mrpack)$/;
+export const zipArchiveExtensionRegex = /\.(ear|war|jar|zip|mrpack)$/;
 
-export type ReadExtraOptions = { name?: string, logger?: Logger };
+export type ReadExtraOptions = { name?: string, logger?: Logger, innerArchiveReadCallback?: (root: RootZipTreeNode, node: FileZipTreeNode) => void };
+
+function zipReaderFromBuffer(buffer: ArrayBuffer): ZipReader<Uint8Array<ArrayBuffer>> {
+	return new ZipReader(new Uint8ArrayReader(new Uint8Array(buffer)));
+}
+
+function zipReaderFromURL(url: string, options: RangeCacheReaderOptions = {}): ZipReader<string> {
+	return new ZipReader(new RangeCacheReader(url, options));
+}
 
 /**
  * Reads a given buffer and apply its content to the baseNode passed with the primary
  */
-async function readZipDataToNode<N extends ZipTreeNode>(rootNode: RootZipTreeNodeImpl, baseNode: N, buffer: ArrayBuffer, {name, logger}: ReadExtraOptions): Promise<N> {
-    const zip = new ZipReader(new Uint8ArrayReader(new Uint8Array(buffer)));
-
+async function readZipDataToNode<N extends ZipNode>(rootNode: RootZipTreeNodeImpl, baseNode: N, reader: ZipReader<unknown>, options: ReadExtraOptions): Promise<N> {
+	const { name, logger, innerArchiveReadCallback } = options;
     logger?.debug(`Setting up to read ${name} archive.`)
 
-    const handleEntry = async (entry: EntryData) => {
+	const zipFiles: Promise<FileZipTreeNode>[] = [];
+
+    async function handleEntry(entry: EntryData){
         const segments = entry.filename.split('/').filter(Boolean); // Remove empty strings from trailing slashes
 
-        let parentNode: ZipTreeNode = baseNode;
+        let parentNode: ZipNode = baseNode;
 
         let path = "";
 
@@ -77,12 +103,7 @@ async function readZipDataToNode<N extends ZipTreeNode>(rootNode: RootZipTreeNod
                     : null;
 
                 if (fileEntry && fileEntry.filename == path) {
-                    segmentNode = parentNode.addFile(
-                        segment,
-                        undefined,
-                        zipArchiveExtensionRegex.test(segment) ? "zip" : "file",
-                        fileEntry
-                    );
+                    segmentNode = parentNode.addFile(segment, undefined, fileEntry);
                 } else {
                     segmentNode = parentNode.addDirectory(segment, entry);
                 }
@@ -91,57 +112,71 @@ async function readZipDataToNode<N extends ZipTreeNode>(rootNode: RootZipTreeNod
             if (segmentNode.type === 'directory') {
                 // Set next parent node to add the given next segment node
                 parentNode = segmentNode;
-            } else if(segmentNode.type === 'zip' && !segmentNode.metadata.encrypted) {
+            } else if(!segmentNode.metadata.encrypted) {
                 // FYI: This technically will not work when using onprogress as technically the
                 // given arraybuffer method is not ready yet meaning this is here just for
                 // legacy or needing to go back to waiting for all entries is better.
-                const arrayBuffer = await fileOrNull(segmentNode)?.arrayBuffer();
-                if (arrayBuffer) readZipDataToNode(rootNode, segmentNode, arrayBuffer, { name: segmentNode.name, logger: logger });
+				const fileEntry = fileOrNull(segmentNode) ?? undefined;
+				const fileNode = segmentNode.asFile();
+
+				if (fileNode == null || fileEntry == null) continue;
+
+				const bufferSetPromise = handleFileNode(fileEntry, fileNode);
+
+				if (bufferSetPromise != null) zipFiles.push(bufferSetPromise)
             }
         }
     }
 
+	function handleFileNode(fileEntry: FileEntry, fileNode: FileZipTreeNode): Promise<FileZipTreeNode> | undefined {
+		const isZipArchive = zipArchiveExtensionRegex.test(fileNode.name);
+
+		const bufferSetPromise = fileEntry.arrayBuffer()
+			.then(async (buffer) => {
+				await fileNode.setBuffer(buffer);
+				if (isZipArchive) await readZipDataToNode(rootNode, fileNode, zipReaderFromBuffer(buffer), options);
+				if (innerArchiveReadCallback) innerArchiveReadCallback(rootNode, fileNode);
+				return fileNode;
+			})
+
+		return isZipArchive ? bufferSetPromise : undefined;
+	}
+
     logger?.debug(`Reading entries ${name} archive.`)
 
-    const entries = await zip.getEntries({
+    const entries = await reader.getEntries({
         onprogress: (_progress, _total, entry) => handleEntry(entry as EntryData)
     })
 
-    const zipFiles: Promise<FileZipTreeNode>[] = [];
-
     for (const entry of entries) {
         const fileNode = rootNode.fileEntries.get(
-            (baseNode.type != "root" ? baseNode.path + "/" : "") + entry.filename.split('/').filter(Boolean).join('/')
+			[baseNode.path].concat(entry.filename.split('/')).join('/')
         );
+        if (fileNode == null) continue;
 
-        if (fileNode) {
-            fileNode.setBuffer(
-                fileOrNull(entry)!.arrayBuffer.bind(entry),
-                fileNode.type,
-                entry as ZipWriterAddDataOptions
-            );
+		// TODO: SOMETHING HAS GONE WRONG IF WE HAVE A FILE NODE BUT NO FILE ENTRY
+		const fileEntry = fileOrNull(entry);
+		if (fileEntry == null) continue;
 
-            if (!fileNode.isSetup) fileNode.isSetup = true;
-
-            if (fileNode.type == "zip") zipFiles.push(readZipDataToNode(rootNode, fileNode, await fileNode.getBuffer(), {name: fileNode.name, logger: logger}))
-        }
+		const bufferSetPromise = handleFileNode(fileEntry, fileNode);
+		if (bufferSetPromise != null) zipFiles.push(bufferSetPromise)
     }
 
     logger?.debug(`Entries from ${name} archive have been read${zipFiles.length > 0 ? ', waiting for given inner Zip Files' : '.'}`)
 
     // TODO: MAKE INNER JARS ASYNC I.E. UPDATE LATER TYPE DEAL AFTER THEY ARE DONE LOADING....
-    if (zipFiles.length > 0) await Promise.all(zipFiles);
+    if (zipFiles.length > 0 && innerArchiveReadCallback == null) await Promise.all(zipFiles);
 
     return baseNode;
 }
 
 class ZipTreeNodeImpl extends ZipTreeNode {
-    protected override createFileNode(root: RootZipTreeNodeImpl, parent: ZipTreeNode, name: string, path: string, buffer: ArrayBufferSource | undefined, type: "zip" | "file", metadata: FileEntry): FileZipTreeNode {
-        return new FileZipTreeNodeImpl(root, parent, name, path, buffer, type, metadata);
+    protected override createFileNode(root: RootZipTreeNodeImpl, parent: ZipNode, name: string, path: string, buffer: ArrayBufferSource | undefined, metadata: FileEntry): FileZipTreeNode {
+        return new FileZipTreeNodeImpl(root, parent, name, path, buffer, "file", metadata);
     }
 
-    protected override createNode(root: RootZipTreeNodeImpl, parent: ZipTreeNode, name: string, path: string, metadata?: EntryMetaData): ZipTreeNode {
-        return new ZipTreeNodeImpl(root, parent, name, path, "directory", metadata)
+    protected override createNode(root: RootZipTreeNodeImpl, parent: ZipNode, name: string, path: string, metadata?: EntryMetaData): ZipNode {
+        return new ZipTreeNodeImpl(root, parent, name, path, "directory", metadata) as ZipNode
     }
 }
 
@@ -150,17 +185,21 @@ class ZipTreeNodeImpl extends ZipTreeNode {
  * combined with extra info like maps for all entries and all file entries within the archive
  */
 class RootZipTreeNodeImpl extends RootZipTreeNode {
-    constructor(logger: Logger, key: Sha512) {
-        super(key);
+	loadingInnerZipCount: number = -1;
+	onFinishedLoadingHolder: PromiseWithResolvers<void>
+
+    constructor(logger: Logger, key: UUID_V7, onFinishedLoadingHolder: PromiseWithResolvers<void>) {
+        super(key, onFinishedLoadingHolder.promise);
         this.logger = logger;
+		this.onFinishedLoadingHolder = onFinishedLoadingHolder;
     }
 
-    protected override createFileNode(root: RootZipTreeNode, parent: ZipTreeNode, name: string, path: string, buffer: ArrayBufferSource | undefined, type: "zip" | "file", metadata: FileEntry): FileZipTreeNode {
-        return new FileZipTreeNodeImpl(root as RootZipTreeNodeImpl, parent as ZipTreeNodeImpl, name, path, buffer, type, metadata);
+    protected override createFileNode(root: RootZipTreeNode, parent: ZipNode, name: string, path: string, buffer: ArrayBufferSource | undefined, metadata: FileEntry): FileZipTreeNode {
+        return new FileZipTreeNodeImpl(root as RootZipTreeNodeImpl, parent as ZipNode, name, path, buffer, "file", metadata);
     }
 
-    protected override createNode(root: RootZipTreeNode, parent: ZipTreeNode, name: string, path: string, metadata?: EntryMetaData): ZipTreeNode {
-        return new ZipTreeNodeImpl(root, parent, name, path, "directory", metadata)
+    protected override createNode(root: RootZipTreeNode, parent: ZipNode, name: string, path: string, metadata?: EntryMetaData): ZipNode {
+        return new ZipTreeNodeImpl(root, parent, name, path, "directory", metadata) as ZipNode
     }
 }
 
@@ -169,7 +208,7 @@ class FileZipTreeNodeImpl extends ZipTreeNodeImpl implements FileZipTreeNode {
     isSetup: boolean;
     private arrayBuffer: LazyMutableValue<ArrayBuffer>;
 
-    declare type: "zip" | "file";
+    declare type: "file";
     declare metadata: FileEntry;
     declare root: RootZipTreeNode;
 
@@ -183,12 +222,12 @@ class FileZipTreeNodeImpl extends ZipTreeNodeImpl implements FileZipTreeNode {
 
     sha512: LazyValue<string>;
 
-    constructor(root: RootZipTreeNode, parent: ZipTreeNode, name: string, path: string, buffer: ArrayBufferSource | undefined, type: "zip" | "file", metadata?: FileEntry) {
+    constructor(root: RootZipTreeNode, parent: ZipNode, name: string, path: string, buffer: ArrayBufferSource | undefined, type: "file", metadata?: FileEntry) {
         super(root, parent, name, path, type, metadata);
 
         if (buffer) {
             this.isSetup = true;
-            this.arrayBuffer = lazyMutableValue(() => typeof buffer === 'function' ? buffer() : Promise.resolve(buffer));
+            this.arrayBuffer = lazyMutableValue(() => arrayBufferFromSource(buffer));
         } else {
             this.isSetup = false;
             this.arrayBuffer = lazyMutableValue(
@@ -230,7 +269,7 @@ class FileZipTreeNodeImpl extends ZipTreeNodeImpl implements FileZipTreeNode {
 
 								if (buffer != undefined) {
 									return await decompiler.decompile({
-										targetFile: { fullPath: this.path, name: this.name, content: buffer, rootKey: this.root.key } as ZipFileContent,
+										targetFile: { fullPath: this.path, name: this.name, content: buffer, root: this.root.key } as ZipFileContent,
 										resources: this.parent?.children.values().map(entry => { return { fullPath: entry.path, name: entry.name } }).toArray(),
 										options: options
 									});
@@ -278,13 +317,15 @@ class FileZipTreeNodeImpl extends ZipTreeNodeImpl implements FileZipTreeNode {
         this.sha512 = this.arrayBuffer.lazyMap(async (buffer) => hashBuffer(buffer, "SHA-512"))
     }
 
-    async setBuffer(buffer: ArrayBufferSource, type?: "zip" | "file", options?: ZipWriterAddDataOptions) {
-        this.arrayBuffer.updateGetter(() => typeof buffer === 'function' ? buffer() : Promise.resolve(buffer));
-        this.type = type ?? "file";
+    async setBuffer(buffer: ArrayBufferSource, options?: ZipWriterAddDataOptions) {
+        this.arrayBuffer.updateGetter(() => arrayBufferFromSource(buffer));
+        this.type = "file";
         this.metadata = {
             ...options,
             ...this.metadata
         } as FileEntry;
+
+		this.isSetup = true;
 
         return this;
     }

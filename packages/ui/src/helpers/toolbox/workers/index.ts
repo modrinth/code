@@ -1,13 +1,9 @@
 import type {
-	DecompileHandler,
-	DecompilerMessages,
+	DecompileHandler, DecompileInput,
+	DecompilerMessages, DecompilerResult,
 } from "#ui/helpers/toolbox/decompile";
 import {
-	type ClientMessenger,
-	createRegistry,
-	type InputResolverMap,
-	type MessengerType,
-	resolveInputTransfers,
+	createRegistry, type MessengerType,
 } from '#ui/helpers/toolbox/messenger';
 // import { AtlasMessenger, handlerConstructor as atlasHandlerConstructor  } from "./atlas/common";
 import { handlerConstructor as zipHandlerConstructor,type ZipMessages } from "#ui/helpers/toolbox/workers/zip/api";
@@ -18,36 +14,22 @@ import ZipWorker from "./zip?worker";
 
 export const messengerRegistry = createRegistry();
 
-export type ZipHandlerMessenger = ClientMessenger<ZipMessages, ZipHandler>;
-
-export const zipHandlerType: MessengerType<ZipHandlerMessenger> = messengerRegistry.of<ZipMessages, ZipHandler>("zip-handler", {
+export const zipHandlerType = messengerRegistry.of<ZipMessages, ZipHandler>("zip-handler", {
     handlerConstructor: zipHandlerConstructor,
-    inputTransferHandler: (input) => {
-        return resolveInputTransfers(input, {
+    serverMessageTransferHandler(msg, resolver){
+        return resolver(msg, {
             node_write: (msg) => [msg.buffer],
-            read_zip_tree: (msg) => [msg.buffer],
-        } as InputResolverMap<ZipMessages>);
+            read_zip_tree: (msg) => msg.data_type == 'buffer' ? [msg.buffer] : [],
+        });
     },
-    independentOutputHandler: (messenger, msg) => {
-        if (msg.channel == "update_node_data") {
-            const data = msg as ZipMessages['update_node_data']['output'];
-
-            const root = messenger.handler.zipArchivesByHash.get(data.root);
-
-            if (root != null) {
-                const node = (data.relative ? root.relativeFileEntries : root.fileEntries).get(data.path);
-
-				if (node) {
-					for (const lazy of [node.sha1, node.sha256, node.sha512, node.fileTypeInfo]) {
-						lazy.reset()
-					}
-					(node as unknown as Partial<DelegateFileZipTreeNode>).onDataUpdate?.()
-				}
-            }
+    independentClientMessageHandler(messenger, msg){
+        if (msg.channel === "archive_update") {
+			messenger.handler.archiveUpdate(msg as ZipMessages['archive_update']['clientbound'])
+			return true;
         }
         return false;
     },
-    closeCallback: (messenger) => {
+    closeCallback(messenger){
         return messenger.handler.closeAllZipTrees();
     },
 	shared: true,
@@ -61,23 +43,22 @@ export const zipHandlerType: MessengerType<ZipHandlerMessenger> = messengerRegis
 // });
 //
 
-type DecompileMessenger = ClientMessenger<DecompilerMessages, DecompileHandler>;
-
-export const decompileMessengerType: MessengerType<DecompileMessenger> = messengerRegistry.of<DecompilerMessages, DecompileHandler>("decompiler-vf", {
-	handlerConstructor: (messenger) => {
+export const decompileMessengerType: MessengerType<DecompilerMessages, DecompileHandler> = messengerRegistry.of<DecompilerMessages, DecompileHandler>("decompiler-vf", {
+	serverMessageTransferHandler(msg, resolver) {
+		return resolver(msg, {
+			main: (msg) => msg.transferBuffer ? [msg.targetFile.content] : []
+		});
+	},
+	handlerConstructor(messenger) {
 		return {
 			decompile: async (input) => {
 				return await messenger.sendMessage({
 					...input,
-					channel: 'main'
+					channel: 'main',
+					transferBuffer: input.transferBuffer ?? false
 				})
 			}
-		};
-	},
-    inputTransferHandler: (input) => {
-		return resolveInputTransfers(input, {
-			main: (msg) => [msg.targetFile.content],
-		} as InputResolverMap<DecompilerMessages>)
+		} as DecompileHandler;
 	},
 	shared: true,
 	timeout: 30000,

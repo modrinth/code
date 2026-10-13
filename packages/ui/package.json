@@ -108,6 +108,7 @@
 		"postprocessing": "^6.37.6",
 		"qrcode.vue": "^3.4.1",
 		"three": "^0.172.0",
+		"uuid": "^14.0.2",
 		"vue-i18n": "^10.0.0",
 		"vue-select": "4.0.0-beta.6",
 		"vue-typed-virtual-list": "^1.0.10",
