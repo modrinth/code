@@ -8,10 +8,10 @@ use tracing_anyhow::FutureContext;
 use crate::{
     import::download::DownloadRunContext,
     model,
-    upstream::fabric::{
-        CATALOG_URL, Catalog, GameLoaderProfile, LoaderVersion,
-        LoaderVersionName,
-    },
+	upstream::{
+		fabric::{CATALOG_URL, Catalog, LoaderVersion},
+		fabriclike::{GameLoaderProfile, LoaderVersionName},
+	},
 };
 
 pub const PROFILE_GAME_VERSION: &str = "1.21";

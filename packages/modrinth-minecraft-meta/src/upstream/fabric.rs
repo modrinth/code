@@ -2,6 +2,8 @@ use derive_more::Display;
 use serde::{Deserialize, Serialize};
 use url::Url;
 
+use super::fabriclike::{GameVersion, GameVersionName, LoaderVersionName};
+
 use crate::util::MavenCoordinate;
 
 pub const CATALOG_URL: &str = "https://meta.fabricmc.net/v2/versions";
@@ -13,17 +15,6 @@ pub struct Catalog {
     pub intermediary: Vec<IntermediaryVersion>,
     pub loader: Vec<LoaderVersion>,
     pub installer: Vec<InstallerVersion>,
-}
-
-#[derive(
-    Debug, Display, Clone, PartialEq, Eq, Hash, Serialize, Deserialize,
-)]
-pub struct GameVersionName(pub String);
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct GameVersion {
-    pub version: GameVersionName,
-    pub stable: bool,
 }
 
 #[derive(
@@ -54,11 +45,6 @@ pub struct IntermediaryVersion {
     pub stable: bool,
 }
 
-#[derive(
-    Debug, Display, Clone, PartialEq, Eq, Hash, Serialize, Deserialize,
-)]
-pub struct LoaderVersionName(pub String);
-
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LoaderVersion {
     pub separator: String,
@@ -79,10 +65,4 @@ pub struct InstallerVersion {
     pub maven: MavenCoordinate,
     pub version: InstallerVersionName,
     pub stable: bool,
-}
-
-/// Example URL: <https://meta.fabricmc.net/v2/versions/loader/1.21/0.19.5/profile/json>
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct GameLoaderProfile {
-    pub id: String,
 }

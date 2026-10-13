@@ -2,6 +2,8 @@ use derive_more::Display;
 use serde::{Deserialize, Serialize};
 use url::Url;
 
+use super::fabriclike::{GameVersion, GameVersionName, LoaderVersionName};
+
 use crate::util::{MavenCoordinate, Sha1, Sha256};
 
 pub const CATALOG_URL: &str = "https://meta.quiltmc.org/v3/versions";
@@ -22,17 +24,6 @@ pub struct Catalog {
     pub hashed: Vec<HashedVersion>,
     pub loader: Vec<LoaderVersion>,
     pub installer: Vec<InstallerVersion>,
-}
-
-#[derive(
-    Debug, Display, Clone, PartialEq, Eq, Hash, Serialize, Deserialize,
-)]
-pub struct GameVersionName(pub String);
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct GameVersion {
-    pub version: GameVersionName,
-    pub stable: bool,
 }
 
 #[derive(
@@ -68,11 +59,6 @@ pub struct HashedVersion {
     pub hashes: Hashes,
 }
 
-#[derive(
-    Debug, Display, Clone, PartialEq, Eq, Hash, Serialize, Deserialize,
-)]
-pub struct LoaderVersionName(pub String);
-
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub struct LoaderVersion {
@@ -106,10 +92,4 @@ pub struct Hashes {
     pub sha1: Sha1,
     pub sha256: Sha256,
     pub sha512: String,
-}
-
-/// Example URL: <https://meta.quiltmc.org/v3/versions/loader/1.21/0.19.5/profile/json>
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct GameLoaderProfile {
-    pub id: String,
 }

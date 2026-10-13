@@ -9,10 +9,14 @@ use url::Url;
 use crate::{
     import::download::DownloadRunContext,
     model,
-    upstream::quilt::{
-        CATALOG_URL, Catalog, GameLoaderProfile, GameVersion, GameVersionName,
-        LoaderVersion, LoaderVersionName, MetadataGroup, PROFILE_BASE_URL,
-    },
+	upstream::{
+		fabriclike::{
+			GameLoaderProfile, GameVersion, GameVersionName, LoaderVersionName,
+		},
+		quilt::{
+			CATALOG_URL, Catalog, LoaderVersion, MetadataGroup, PROFILE_BASE_URL,
+		},
+	},
 };
 
 pub const SKIPPED_LOADER_VERSION: &str = "0.17.5-beta.4";

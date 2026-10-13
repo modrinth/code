@@ -12,7 +12,10 @@ use crate::{
         self, CatalogGame, CatalogLoader, CatalogSnapshot, ProfileGroup,
     },
     model::{self, FabriclikeLoader},
-    upstream::quilt,
+	upstream::{
+		fabriclike::{GameVersion, GameVersionName},
+		quilt,
+	},
     util::from_json_slice,
 };
 
@@ -98,8 +101,8 @@ pub async fn extract(app: &AppState) -> Result<()> {
         let snapshot_games = catalog
             .games
             .iter()
-            .map(|game| quilt::GameVersion {
-                version: quilt::GameVersionName(game.id.clone()),
+			.map(|game| GameVersion {
+				version: GameVersionName(game.id.clone()),
                 stable: game.stable,
             })
             .collect::<Vec<_>>();

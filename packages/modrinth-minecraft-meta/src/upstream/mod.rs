@@ -2,6 +2,7 @@
 //! catalog manifest).
 
 pub mod fabric;
+pub mod fabriclike;
 pub mod forge;
 pub mod mojang;
 pub mod neoforge;
