@@ -1135,6 +1135,7 @@ pub struct AuthorizationInit {
     pub token: Option<String>,
     /// If the user is already logged in, and is linking a PayPal account,
     /// this will be set to the user's auth token from the frontend.
+    /// Only first-party session tokens may authorize linking.
     pub auth_token: Option<String>,
 }
 #[derive(Serialize, Deserialize, utoipa::ToSchema)]
@@ -1170,7 +1171,11 @@ pub async fn init(
     // This can happen when linking to a PayPal account (logging in) when already
     // logged in.
     let existing_user_id = if let Some(auth_token) = &info.auth_token {
-        get_user_record_from_bearer_token(
+        if !auth_token.starts_with("mra_") {
+            return Err(AuthenticationError::InvalidCredentials);
+        }
+
+        let (scopes, user) = get_user_record_from_bearer_token(
             &req,
             Some(auth_token),
             &**client,
@@ -1178,10 +1183,14 @@ pub async fn init(
             &session_queue,
             false,
         )
-        .await
-        .ok()
-        .flatten()
-        .map(|(_scopes, user)| user.id)
+        .await?
+        .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
+
+        if !scopes.contains(Scopes::USER_AUTH_WRITE) {
+            return Err(AuthenticationError::InvalidCredentials);
+        }
+
+        Some(user.id)
     } else {
         None
     };
@@ -1342,11 +1351,6 @@ pub async fn auth_callback(
             .await
             .wrap_err("failed to get user from provider")?;
 
-        let user_id_opt = provider
-            .get_user_id(&oauth_user.id, &**client)
-            .await
-            .wrap_err("failed to get user ID from provider")?;
-
         let mut transaction = client
             .begin()
             .await
@@ -1365,6 +1369,22 @@ pub async fn auth_callback(
 
             if DBUserLock::exists(existing_user_id, &mut transaction).await? {
                 return Err(AuthenticationError::AccountLocked);
+            }
+
+            crate::database::advisory_lock::AdvisoryLock::PayPalAccount(
+                oauth_user.id.clone(),
+            )
+            .acquire(&mut transaction)
+            .await
+            .wrap_err("failed to lock PayPal account for linking")?;
+
+            let linked_user_id = provider
+                .get_user_id(&oauth_user.id, &mut transaction)
+                .await
+                .wrap_err("failed to get linked user ID from PayPal")?;
+
+            if linked_user_id.is_some_and(|id| id != existing_user_id) {
+                return Err(AuthenticationError::ProviderAlreadyLinked);
             }
 
             sqlx::query!(
@@ -1397,6 +1417,11 @@ pub async fn auth_callback(
                 .append_header(("Location", url.as_str()))
                 .json(serde_json::json!({ "url": url })));
         }
+
+        let user_id_opt = provider
+            .get_user_id(&oauth_user.id, &**client)
+            .await
+            .wrap_err("failed to get user ID from provider")?;
 
         if let Some(id) = user_id {
             if user_id_opt.is_some() {
