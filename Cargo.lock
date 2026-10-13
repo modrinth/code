@@ -12524,6 +12524,7 @@ name = "theseus_gui"
 version = "1.0.0-local"
 dependencies = [
  "aes-gcm",
+ "anyhow",
  "async_zip",
  "base64 0.22.1",
  "chrono",

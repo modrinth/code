@@ -6,10 +6,10 @@ use theseus::{
     prelude::{CommandPayload, DirectoryInfo, app_db_backup_dir},
 };
 
+use crate::api::Result;
 use crate::api::oauth_utils::auth_code_reply::{
     normalize_deep_link_command, parse_auth_deeplink, submit_deeplink,
 };
-use crate::api::{Result, TheseusSerializableError};
 use dashmap::DashMap;
 use std::path::{Path, PathBuf};
 use theseus::prelude::canonicalize;
@@ -281,20 +281,9 @@ pub(crate) fn tauri_convert_file_src(path: &Path) -> Result<Url> {
     #[cfg(not(any(windows, target_os = "android")))]
     const BASE: &str = "asset://localhost/";
 
-    macro_rules! theseus_try {
-        ($test:expr) => {
-            match $test {
-                Ok(val) => val,
-                Err(e) => {
-                    return Err(TheseusSerializableError::Theseus(e.into()))
-                }
-            }
-        };
-    }
-
-    let path = theseus_try!(canonicalize(path));
+    let path = canonicalize(path)?;
     let path = path.to_string_lossy();
     let encoded = urlencoding::encode(&path);
 
-    Ok(theseus_try!(Url::parse(&format!("{BASE}{encoded}"))))
+    Ok(Url::parse(&format!("{BASE}{encoded}"))?)
 }

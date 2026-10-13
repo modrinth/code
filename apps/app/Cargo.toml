@@ -9,6 +9,7 @@ license = "GPL-3.0-only"
 
 [dependencies]
 aes-gcm = { workspace = true }
+anyhow = { workspace = true }
 async_zip = { workspace = true, features = ["deflate", "tokio-fs"] }
 base64 = { workspace = true }
 chrono = { workspace = true }
