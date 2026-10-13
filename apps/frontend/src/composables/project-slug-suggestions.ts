@@ -7,7 +7,7 @@ import { computed, type MaybeRefOrGetter, ref, toValue } from 'vue'
 import { projectQueryOptions, STALE_TIME } from '~/composables/queries/project'
 
 const CHECK_DEBOUNCE = 300
-const PROJECT_SLUG_REGEX = /^[a-zA-Z0-9._-]{3,64}$/
+const PROJECT_SLUG_REGEX = /^[a-z0-9._-]{3,64}$/
 
 interface ProjectSlugSuggestionOptions {
 	title: MaybeRefOrGetter<string>
@@ -16,10 +16,24 @@ interface ProjectSlugSuggestionOptions {
 	enabled?: MaybeRefOrGetter<boolean>
 }
 
-export { generateUrlSlug }
+export function generateUrlSlug(value: string) {
+	return value
+		.trim()
+		.toLowerCase()
+		.replaceAll('+', '-plus')
+		.replaceAll(/[!"'`]/g, '')
+		.replaceAll(/[^a-z0-9._-]+/g, '-')
+		.replaceAll(/-+/g, '-')
+		.replaceAll(/^-+|-+$/g, '')
+}
 
 function isValidProjectSlug(value: string) {
-	return PROJECT_SLUG_REGEX.test(value)
+	return (
+		PROJECT_SLUG_REGEX.test(value) &&
+		!value.startsWith('-') &&
+		!value.endsWith('-') &&
+		!value.includes('--')
+	)
 }
 
 function generateProjectSlugSuggestions(title: string, username?: string | null) {
@@ -34,7 +48,7 @@ function generateProjectSlugSuggestions(title: string, username?: string | null)
 	const usernameSlug = username ? generateUrlSlug(username) : ''
 	let withUsername = ''
 
-	if (titleSlug && usernameSlug) {
+	if (titleSlug && usernameSlug && usernameSlug.length <= 62) {
 		const availableTitleLength = 64 - usernameSlug.length - 1
 		const truncatedTitle = titleSlug.slice(0, availableTitleLength).replace(/-+$/, '')
 		if (truncatedTitle) withUsername = `${truncatedTitle}-${usernameSlug}`

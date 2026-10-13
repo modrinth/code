@@ -265,6 +265,15 @@ impl std::fmt::Display for Error {
     }
 }
 
+impl Clone for Error {
+    fn clone(&self) -> Self {
+        Self {
+            raw: Arc::clone(&self.raw),
+            source: Arc::clone(&self.raw).in_current_span(),
+        }
+    }
+}
+
 impl<E: Into<ErrorKind>> From<E> for Error {
     fn from(source: E) -> Self {
         let error = Into::<ErrorKind>::into(source);

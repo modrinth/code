@@ -3,7 +3,7 @@
     "message": "Đang tải Java {version}"
   },
   "app.action-bar.downloading-update": {
-    "message": "Đang tải bản cập nhật"
+    "message": "Đang tải xuống bản cập nhật"
   },
   "app.action-bar.downloads": {
     "message": "Tải xuống"
@@ -301,6 +301,18 @@
   },
   "app.content.sync-resource-packs-disabled": {
     "message": "Trước tiên hãy bật đồng bộ gói tài nguyên trong cài đặt ứng dụng."
+  },
+  "app.debug-export.canceling": {
+    "message": "Đang hủy..."
+  },
+  "app.debug-export.exporting": {
+    "message": "Đang xuất..."
+  },
+  "app.debug-export.finishing": {
+    "message": "Đang hoàn tất..."
+  },
+  "app.debug-export.preparing": {
+    "message": "Đang chuẩn bị các tệp..."
   },
   "app.download-manager.active": {
     "message": "Hoạt động"
@@ -2791,6 +2803,15 @@
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "Thư mục ứng dụng"
+  },
+  "app.settings.resource-management.debug-info.description": {
+    "message": "Xuất nhật ký hệ thống và dữ liệu chuẩn đoán ra tệp nén để gửi cho đội ngũ hỗ trợ Modrinth."
+  },
+  "app.settings.resource-management.debug-info.export": {
+    "message": "Xuất thông tin gỡ lỗi"
+  },
+  "app.settings.resource-management.debug-info.title": {
+    "message": "Thông tin gỡ lỗi"
   },
   "app.settings.resource-management.maximum-concurrent-downloads.description": {
     "message": "Số tệp ứng dụng có thể tải cùng lúc. Hãy giảm giá trị này nếu việc tải xuống không ổn định với kết nối của bạn. Cần khởi động lại ứng dụng."

@@ -8,11 +8,17 @@
   "ads-consent.accept": {
     "message": "ยอมรับทั้งหมด"
   },
+  "ads-consent.body": {
+    "message": "โฆษณาช่วยให้ Modrinth สามารถเปิดให้บริการต่อไปได้ และยังเป็นทุนสำหรับจ่ายเงินให้กับครีเอเตอร์ด้วย พาร์ทเนอร์หรือผู้ให้บริการของเราอาจมีการจัดเก็บหรือเข้าถึงคุกกี้บนเว็บไซต์ เพื่อใช้ปรับแต่งโฆษณาให้เข้ากับคุณและวัดผลประสิทธิภาพของโฆษณาเหล่านั้น"
+  },
   "ads-consent.manage": {
     "message": "จัดการการตั้งค่า"
   },
   "ads-consent.reject": {
     "message": "ปฏิเสธทั้งหมด"
+  },
+  "ads-consent.title": {
+    "message": "ความเป็นส่วนตัวของคุณ และการที่โฆษณาช่วยสนับสนุน Modrinth ได้อย่างไร"
   },
   "analytics.action.add": {
     "message": "เพิ่ม"
@@ -28,6 +34,9 @@
   },
   "analytics.breakdown.country": {
     "message": "ประเทศ"
+  },
+  "analytics.breakdown.dependent-on": {
+    "message": "ต้องใช้ร่วมกับ"
   },
   "analytics.breakdown.dependent-project-download": {
     "message": "โปรเจกต์ที่นำไปใช้"
@@ -146,6 +155,24 @@
   "analytics.chart.render-limit.header": {
     "message": "แสดงเส้นกราฟทั้ง {count} เส้นหรือไม่?"
   },
+  "analytics.chart.table-selection.all": {
+    "message": "กำลังแสดงข้อมูลจากตารางทุกประเทศ {itemType, select, project {{count, plural, other {projects}}} country {{count, plural, other {countries}}} monetization {{count, plural, other {monetization values}}} downloadSource {{count, plural, other {download sources}}} downloadReason {{count, plural, other {download reasons}}} member {{count, plural, other {members}}} projectVersion {{count, plural, other {project versions}}} loader {{count, plural, other {loaders}}} gameVersion {{count, plural, other {game versions}}} other {{count, plural, other {items}}}} "
+  },
+  "analytics.chart.table-selection.count": {
+    "message": "กำลังแสดงข้อมูลจากตารางของ {count} {itemType, select, project {{count, plural, other {projects}}} country {{count, plural, other {countries}}} monetization {{count, plural, other {monetization values}}} downloadSource {{count, plural, other {download sources}}} downloadReason {{count, plural, other {download reasons}}} member {{count, plural, other {members}}} projectVersion {{count, plural, other {project versions}}} loader {{count, plural, other {loaders}}} gameVersion {{count, plural, other {game versions}}} other {{count, plural, other {items}}}} ประเทศ"
+  },
+  "analytics.chart.table-selection.limited": {
+    "message": "กำลังแสดงตารางข้อมูลของ {limit} {itemType, select, project {{limit, plural, other {projects}}} country {{limit, plural, other {countries}}} monetization {{limit, plural, other {monetization values}}} downloadSource {{limit, plural, other {download sources}}} downloadReason {{limit, plural, other {download reasons}}} member {{limit, plural, other {members}}} projectVersion {{limit, plural, other {project versions}}} loader {{limit, plural, other {loaders}}} gameVersion {{limit, plural, other {game versions}}} other {{limit, plural, other {items}}}} ประเทศ"
+  },
+  "analytics.chart.table-selection.top": {
+    "message": "กำลังแสดงตารางข้อมูลอันดับสูงสุดของ {count} {itemType, select, project {{count, plural, other {projects}}} country {{count, plural, other {countries}}} monetization {{count, plural, other {monetization values}}} downloadSource {{count, plural, other {download sources}}} downloadReason {{count, plural, other {download reasons}}} member {{count, plural, other {members}}} projectVersion {{count, plural, other {project versions}}} loader {{count, plural, other {loaders}}} gameVersion {{count, plural, other {game versions}}} other {{count, plural, other {items}}}} ประเทศ"
+  },
+  "analytics.chart.tooltip.dependent-on-project": {
+    "message": "ต้องใช้ร่วมกับ {project}"
+  },
+  "analytics.chart.tooltip.dependent-project-version": {
+    "message": "{dependentProject} ต้องใช้ร่วมกับ {dependencyProject}, {version}"
+  },
   "analytics.chart.tooltip.duration.days": {
     "message": "{count, plural, one {# วัน} other {# วัน}}"
   },
@@ -157,6 +184,9 @@
   },
   "analytics.chart.tooltip.hide-entry": {
     "message": "ซ่อน {name} ในกราฟ"
+  },
+  "analytics.chart.tooltip.no-data": {
+    "message": "ไม่พบข้อมูล"
   },
   "analytics.chart.tooltip.pinned": {
     "message": "ปักหมุดคำแนะนำบนกราฟแล้ว"
@@ -218,6 +248,12 @@
   "analytics.empty.select-project": {
     "message": "เลือกอย่างน้อยหนึ่งโปรเจกต์เพื่อดูข้อมูล"
   },
+  "analytics.filter.dependent-project-search-failed-title": {
+    "message": "ไม่สามารถโหลดโปรเจกต์ที่ต้องใช้ร่วมกันได้"
+  },
+  "analytics.filter.game-version-type": {
+    "message": "ชนิดของเวอร์ชั่นเกม"
+  },
   "analytics.filter.game-version-type.all": {
     "message": "ทั้งหมด"
   },
@@ -230,6 +266,36 @@
   "analytics.filter.search.dependent-projects": {
     "message": "ค้นหาโปรเจกต์"
   },
+  "analytics.filter.search.download-sources": {
+    "message": "ค้นหาแหล่งดาวน์โหลด"
+  },
+  "analytics.filter.search.members": {
+    "message": "ค้นหาสมาชิก"
+  },
+  "analytics.filter.search.project-versions": {
+    "message": "ค้นหาเวอร์ชั่นของโปรเจกต์"
+  },
+  "analytics.filter.search.versions": {
+    "message": "ค้นหาเวอร์ชั่นของเกม"
+  },
+  "analytics.graph.title.downloads": {
+    "message": "ยอดดาวน์โหลดตามช่วงเวลา"
+  },
+  "analytics.graph.title.playtime": {
+    "message": "เวลาเล่นตามช่วงเวลา"
+  },
+  "analytics.graph.title.revenue": {
+    "message": "รายได้ตามช่วงเวลา"
+  },
+  "analytics.graph.title.views": {
+    "message": "จำนวนการเข้าชมตามช่วงเวลา"
+  },
+  "analytics.group-by.1h": {
+    "message": "1 ชม."
+  },
+  "analytics.group-by.6h": {
+    "message": "6 ชม."
+  },
   "analytics.group-by.date": {
     "message": "วันที่"
   },
@@ -238,6 +304,12 @@
   },
   "analytics.group-by.month": {
     "message": "เดือน"
+  },
+  "analytics.project-status.draft": {
+    "message": "แบบร่าง"
+  },
+  "analytics.project.select": {
+    "message": "เลือกโปรเจกต์"
   },
   "analytics.project.user": {
     "message": "โปรเจกต์ของ {username}"

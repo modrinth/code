@@ -55,7 +55,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
 pub async fn get_version_from_hash_route(
     req: HttpRequest,
     info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
+    pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     hash_query: web::Query<HashQuery>,
     session_queue: web::Data<AuthQueue>,
@@ -67,14 +67,14 @@ pub async fn get_version_from_hash_route(
 pub async fn get_version_from_hash(
     req: HttpRequest,
     info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
+    pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     hash_query: web::Query<HashQuery>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user_option = get_user_from_headers(
         &req,
-        &**pool,
+        &***pool,
         &redis,
         &session_queue,
         Scopes::VERSION_READ,
@@ -90,14 +90,14 @@ pub async fn get_version_from_hash(
         algorithm,
         hash,
         hash_query.version_id.map(|x| x.into()),
-        &**pool,
+        &***pool,
         &redis,
     )
     .await
     .wrap_internal_err("fetching version from database")?;
     if let Some(file) = file {
         let version =
-            database::models::DBVersion::get(file.version_id, &**pool, &redis)
+            database::models::DBVersion::get(file.version_id, &***pool, &redis)
                 .await
                 .wrap_internal_err("fetching version from database")?;
         if let Some(version) = version {
@@ -336,7 +336,6 @@ pub async fn get_versions_from_hashes(
             .await
             .wrap_internal_err("fetching versions from database")?,
         &user_option,
-        &pool,
         pool.as_ref(),
         &redis,
     )
@@ -587,6 +586,18 @@ async fn update_files_internal(
     .await
     .wrap_internal_err("updating versions in database")?;
 
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("starting database transaction")?;
+
+    // Custom plans for this query cost more to plan than to execute, and the
+    // generic plan executes at least as fast, so skip replanning per call.
+    sqlx::query!("SET LOCAL plan_cache_mode = force_generic_plan")
+        .execute(&mut transaction)
+        .await
+        .wrap_internal_err("forcing generic plan for update query")?;
+
     // TODO: de-hardcode this and actually use version fields system
     let latest_version_ids = sqlx::query_scalar!(
         r#"
@@ -672,9 +683,14 @@ async fn update_files_internal(
             .as_ref()
             .map(|x| database::models::DBUserId::from(x.id).0),
     )
-    .fetch_all(&***pool)
+    .fetch_all(&mut transaction)
     .await
     .wrap_internal_err("fetching latest visible update versions")?;
+
+    transaction
+        .commit()
+        .await
+        .wrap_internal_err("committing database transaction")?;
 
     let versions = database::models::DBVersion::get_many(
         &latest_version_ids
@@ -1144,7 +1160,7 @@ pub struct DownloadRedirect {
 pub async fn download_version_route(
     req: HttpRequest,
     info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
+    pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     hash_query: web::Query<HashQuery>,
     session_queue: web::Data<AuthQueue>,
@@ -1155,14 +1171,14 @@ pub async fn download_version_route(
 pub async fn download_version(
     req: HttpRequest,
     info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
+    pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     hash_query: web::Query<HashQuery>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user_option = get_user_from_headers(
         &req,
-        &**pool,
+        &***pool,
         &redis,
         &session_queue,
         Scopes::VERSION_READ,
@@ -1179,7 +1195,7 @@ pub async fn download_version(
         algorithm.clone(),
         hash,
         hash_query.version_id.map(|x| x.into()),
-        &**pool,
+        &***pool,
         &redis,
     )
     .await
@@ -1187,7 +1203,7 @@ pub async fn download_version(
 
     if let Some(file) = file {
         let version =
-            database::models::DBVersion::get(file.version_id, &**pool, &redis)
+            database::models::DBVersion::get(file.version_id, &***pool, &redis)
                 .await
                 .wrap_internal_err("fetching version from database")?;
 

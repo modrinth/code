@@ -302,6 +302,18 @@
   "app.content.sync-resource-packs-disabled": {
     "message": "Öncelikle uygulama ayarlarından Kaynak Paketi eşitlemeyi açın."
   },
+  "app.debug-export.canceling": {
+    "message": "Dışa aktarma iptal ediliyor..."
+  },
+  "app.debug-export.exporting": {
+    "message": "Dışa aktarılıyor..."
+  },
+  "app.debug-export.finishing": {
+    "message": "Sonlandırılıyor..."
+  },
+  "app.debug-export.preparing": {
+    "message": "Dosyalar hazırlanıyor..."
+  },
   "app.download-manager.active": {
     "message": "Aktif"
   },
@@ -2182,6 +2194,15 @@
   },
   "app.settings.game-options.setting.clouds.label": {
     "message": "Bulutlar"
+  },
+  "app.settings.game-options.setting.ctrl-click-right-click.label": {
+    "message": "Ctrl+Tıkı Sağ Tık Yap"
+  },
+  "app.settings.game-options.setting.cutout-leaves.label": {
+    "message": "Yaprakların içini göster"
+  },
+  "app.settings.game-options.setting.damage-tilt.label": {
+    "message": "Hasar Sarsıntısı"
   },
   "app.settings.game-options.setting.dark-splash.description": {
     "message": "Mojang Studios yüklenme ekranını kırmızıdan siyaha çevir."

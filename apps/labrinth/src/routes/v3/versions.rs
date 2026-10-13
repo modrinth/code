@@ -131,9 +131,14 @@ pub async fn version_project_get_helper(
         });
 
         if let Some(version) = version
-            && is_visible_version(&version.inner, &user_option, &pool, &redis)
-                .await
-                .wrap_api_err("checking version visibility")?
+            && is_visible_version(
+                &version.inner,
+                &user_option,
+                &ro_pool,
+                &redis,
+            )
+            .await
+            .wrap_api_err("checking version visibility")?
         {
             let version_id = version.inner.id;
             let project_id = version.inner.project_id;
@@ -238,15 +243,10 @@ pub async fn versions_get(
     .map(|x| x.1)
     .ok();
 
-    let mut versions = filter_visible_versions(
-        versions_data,
-        &user_option,
-        &pool,
-        &ro_pool,
-        &redis,
-    )
-    .await
-    .wrap_api_err("filtering visible versions")?;
+    let mut versions =
+        filter_visible_versions(versions_data, &user_option, &ro_pool, &redis)
+            .await
+            .wrap_api_err("filtering visible versions")?;
 
     if !ids.include_changelog {
         for version in &mut versions {
@@ -321,7 +321,7 @@ pub async fn version_get_helper(
     .ok();
 
     if let Some(data) = version_data
-        && is_visible_version(&data.inner, &user_option, &pool, &redis)
+        && is_visible_version(&data.inner, &user_option, &ro_pool, &redis)
             .await
             .wrap_api_err("checking version visibility")?
     {
@@ -1243,15 +1243,10 @@ pub async fn version_list_internal(
         });
         response.dedup_by(|a, b| a.inner.id == b.inner.id);
 
-        let mut response = filter_visible_versions(
-            response,
-            &user_option,
-            &pool,
-            &ro_pool,
-            &redis,
-        )
-        .await
-        .wrap_api_err("filtering visible versions")?;
+        let mut response =
+            filter_visible_versions(response, &user_option, &ro_pool, &redis)
+                .await
+                .wrap_api_err("filtering visible versions")?;
 
         if !filters.include_changelog {
             for version in &mut response {

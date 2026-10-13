@@ -1764,7 +1764,7 @@
     "message": "Online"
   },
   "app.settings.game-options.category.skin-customization.description": {
-    "message": "Kinézet-rétegek és főkéz"
+    "message": "Kinézet-rétegek és domináns kéz"
   },
   "app.settings.game-options.category.skin-customization.label": {
     "message": "Kinézet szerkesztése"
@@ -1809,7 +1809,7 @@
     "message": "Csodálatos"
   },
   "app.settings.game-options.choice.fancy": {
-    "message": "Csicsás"
+    "message": "Szép"
   },
   "app.settings.game-options.choice.far": {
     "message": "Nagy"

@@ -1,3 +1,8 @@
+<picture>
+	<source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/modrinth/code/main/.github/assets/api_client_cover_light.png">
+	<img alt="Modrinth API Client Cover" src="https://raw.githubusercontent.com/modrinth/code/main/.github/assets/api_client_cover.png">
+</picture>
+
 # @modrinth/api-client
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-c78aff?style=for-the-badge)](https://www.typescriptlang.org/)

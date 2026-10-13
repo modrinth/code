@@ -2,8 +2,7 @@
 pub(crate) mod move_app_directory;
 use crate::LoadingBarType;
 use crate::event::emit::{emit_loading, init_loading};
-use crate::state::LAUNCHER_STATE;
-use crate::state::Settings;
+use crate::state::{Settings, State};
 use crate::util::fetch::IoSemaphore;
 use std::path::PathBuf;
 use tokio::fs;
@@ -23,8 +22,8 @@ pub struct DirectoryInfo {
 }
 
 impl DirectoryInfo {
-    pub fn global_handle_if_ready() -> Option<&'static Self> {
-        LAUNCHER_STATE.get().map(|x| &x.directories)
+    pub fn global_handle_if_ready() -> Option<Self> {
+        State::get_if_initialized().map(|state| state.directories.clone())
     }
 
     pub fn get_initial_settings_dir(&self) -> Option<PathBuf> {

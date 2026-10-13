@@ -213,14 +213,13 @@ pub async fn is_team_member_version(
 pub async fn filter_visible_versions(
     mut versions: Vec<VersionQueryResult>,
     user_option: &Option<User>,
-    pool: &PgPool,
     ro_pool: &ReadOnlyPgPool,
     redis: &RedisPool,
 ) -> Result<Vec<crate::models::projects::Version>, ApiError> {
     let filtered_version_ids = filter_visible_version_ids(
         versions.iter().map(|x| &x.inner).collect_vec(),
         user_option,
-        pool,
+        ro_pool,
         redis,
     )
     .await

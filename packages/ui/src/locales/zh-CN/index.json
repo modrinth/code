@@ -2063,6 +2063,15 @@
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "服务器已重置为初始设置"
   },
+  "hosting.save-banner.resolve-errors": {
+    "defaultMessage": "保存前请先解决您的更改中的错误。"
+  },
+  "hosting.settings.properties.motd-profanity": {
+    "defaultMessage": "根据《Minecraft Usage Guidelines》，服务器的 MOTD不得包含粗俗用语。检测到的粗俗用语：“{value}”。"
+  },
+  "hosting.settings.properties.motd-profanity-save-error": {
+    "defaultMessage": "根据《Minecraft Usage Guidelines》，服务器的 MOTD 不得包含粗俗用语。检测到的内容：“{value}”"
+  },
   "hosting.specs.burst": {
     "defaultMessage": "爆发时最多 {cpus} CPU"
   },
@@ -4733,6 +4742,9 @@
   "servers.access-page.activity-log-filter.action.server-stopped": {
     "defaultMessage": "停止服务器"
   },
+  "servers.access-page.activity-log-filter.action.sftp-credentials-rolled": {
+    "defaultMessage": "轮转 SFTP 凭据"
+  },
   "servers.access-page.activity-log-filter.action.sftp-login": {
     "defaultMessage": "通过SFTP登录"
   },
@@ -5114,6 +5126,9 @@
   "servers.audit-log.event.server-subdomain-changed": {
     "defaultMessage": "已将服务器子域更改为 <subdomain></subdomain>"
   },
+  "servers.audit-log.event.sftp-credentials-rolled": {
+    "defaultMessage": "轮转 SFTP 凭据"
+  },
   "servers.audit-log.event.sftp-login": {
     "defaultMessage": "通过SFTP登录"
   },
@@ -5320,6 +5335,9 @@
   },
   "servers.download.unavailable.title": {
     "defaultMessage": "下载不可用"
+  },
+  "servers.files.server-locked": {
+    "defaultMessage": "此服务器已被锁定，其文件现在只读。"
   },
   "servers.files.zip-created": {
     "defaultMessage": "ZIP 已创建"
@@ -5537,6 +5555,36 @@
   "servers.listing.using-project-label": {
     "defaultMessage": "正在使用 {projectTitle}"
   },
+  "servers.lock.modal.error-text": {
+    "defaultMessage": "锁定服务器时遇到了问题，请稍候重试。"
+  },
+  "servers.lock.modal.error-title": {
+    "defaultMessage": "无法锁定服务器"
+  },
+  "servers.lock.modal.header": {
+    "defaultMessage": "锁定/屏蔽{name}"
+  },
+  "servers.lock.modal.lock-button": {
+    "defaultMessage": "锁定服务器"
+  },
+  "servers.lock.modal.reason-label": {
+    "defaultMessage": "原因"
+  },
+  "servers.lock.modal.reason-placeholder": {
+    "defaultMessage": "对其他管理员可见"
+  },
+  "servers.lock.modal.success-text": {
+    "defaultMessage": "{name} 已被锁定/屏蔽。"
+  },
+  "servers.lock.modal.success-title": {
+    "defaultMessage": "服务器已锁定"
+  },
+  "servers.lock.modal.warning-body": {
+    "defaultMessage": "{name}对所有者和其成员为只读状态直到被任意管理员解锁。"
+  },
+  "servers.lock.modal.warning-header": {
+    "defaultMessage": "此服务器将成为只读"
+  },
   "servers.manage.checking-for-new-servers": {
     "defaultMessage": "正在查找新服务器……"
   },
@@ -5572,6 +5620,21 @@
   },
   "servers.manage.handle-error.title": {
     "defaultMessage": "发生错误"
+  },
+  "servers.manage.lock-server": {
+    "defaultMessage": "锁定服务器"
+  },
+  "servers.manage.locked.badge": {
+    "defaultMessage": "已锁定"
+  },
+  "servers.manage.locked.badge-tooltip": {
+    "defaultMessage": "从{date}开始已被锁定"
+  },
+  "servers.manage.locked.body": {
+    "defaultMessage": "技术支持已暂时锁定此服务器，因此您无法进行任何更改。如果您认为这是误操作，请<support-link>联系技术支持</support-link>。"
+  },
+  "servers.manage.locked.header": {
+    "defaultMessage": "服务器被客服锁定"
   },
   "servers.manage.new-server-button": {
     "defaultMessage": "新建服务器"
@@ -5629,6 +5692,21 @@
   },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "共享服务器"
+  },
+  "servers.manage.unlock-server": {
+    "defaultMessage": "解锁服务器"
+  },
+  "servers.manage.unlock.error-text": {
+    "defaultMessage": "解锁该服务器的时候出现了错误。 请重试。"
+  },
+  "servers.manage.unlock.error-title": {
+    "defaultMessage": "解锁服务器失败"
+  },
+  "servers.manage.unlock.success-text": {
+    "defaultMessage": "{name} 已被解除屏蔽。"
+  },
+  "servers.manage.unlock.success-title": {
+    "defaultMessage": "服务器解锁"
   },
   "servers.manage.your-servers-title": {
     "defaultMessage": "你的服务器"
@@ -5860,6 +5938,27 @@
   },
   "servers.settings.advanced.sftp.roll-credentials-success-title": {
     "defaultMessage": "SFTP凭据已更换"
+  },
+  "servers.settings.support.action-log-title": {
+    "defaultMessage": "操作日志"
+  },
+  "servers.settings.support.clear-action-log-button": {
+    "defaultMessage": "清除操作日志"
+  },
+  "servers.settings.support.clear-action-log-confirmation": {
+    "defaultMessage": "这将永久删除此服务器的所有动作日志条目。是否继续？"
+  },
+  "servers.settings.support.clear-action-log-description": {
+    "defaultMessage": "删除此服务器的所有操作日志条目。"
+  },
+  "servers.settings.support.clear-action-log-error": {
+    "defaultMessage": "清除操作日志失败"
+  },
+  "servers.settings.support.clear-action-log-success": {
+    "defaultMessage": "操作日志已清除"
+  },
+  "servers.settings.support.clear-action-log-title": {
+    "defaultMessage": "是否清除操作日志？"
   },
   "servers.setup.onboarding.installation-failed.text": {
     "defaultMessage": "安装时出现了未被预料的错误。请稍后再试。"
@@ -7176,3 +7275,4 @@
     "defaultMessage": "类型"
   }
 }
+

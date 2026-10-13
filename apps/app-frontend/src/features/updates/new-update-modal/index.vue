@@ -13,6 +13,7 @@ import { computed, nextTick, useTemplateRef } from 'vue'
 
 import SyncSourceModal from '@/components/ui/settings/instances/SyncSourceModal.vue'
 
+import { useNewUpdateNotification } from './use-notification'
 import { type SyncUpdateOption, syncUpdateOptions, useSyncInstancesUpdate } from './use-sync'
 
 const modal = useTemplateRef<InstanceType<typeof NewModal>>('modal')
@@ -37,6 +38,7 @@ const {
 	chooseSource,
 	retrySources,
 } = useSyncInstancesUpdate()
+const { notifyForVersion } = useNewUpdateNotification(show)
 
 const messages = defineMessages({
 	badge: {
@@ -265,7 +267,7 @@ async function confirmSource() {
 	sourceModal.value?.hide()
 }
 
-defineExpose({ show, hide })
+defineExpose({ show, hide, notifyForVersion })
 </script>
 
 <template>

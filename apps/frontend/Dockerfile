@@ -79,6 +79,8 @@ ENV HOST=0.0.0.0
 ENV PORT=3000
 ENV NODE_COMPILE_CACHE=/app/.node-compile-cache
 ENV NO_COLOR=1
+ENV NODE_OPTIONS="--max-old-space-size=512 --max-semi-space-size=32"
+ENV MALLOC_ARENA_MAX=2
 
 WORKDIR /app
 

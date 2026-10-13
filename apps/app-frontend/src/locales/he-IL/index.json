@@ -293,6 +293,15 @@
   "app.content.sync-resource-packs-disabled": {
     "message": "הפעל סנכרון טקסטורות בהדרות האפליקציה קודם."
   },
+  "app.download-manager.pause": {
+    "message": "השהה את ההתקנה"
+  },
+  "app.download-manager.show": {
+    "message": "משימות"
+  },
+  "app.download-manager.tasks": {
+    "message": "משימות"
+  },
   "app.error.state-init.open-backups-folder": {
     "message": "לפתוח תיקיית גיבויים"
   },
@@ -1411,6 +1420,9 @@
   },
   "app.screenshots.group-by": {
     "message": "קבץ לפי"
+  },
+  "app.screenshots.selection.global-export-filename": {
+    "message": "צילומי_מסך.zip"
   },
   "app.settings.default-instance-options.height.placeholder": {
     "message": "הכנס גובה..."

@@ -302,6 +302,9 @@
   "app.content.sync-resource-packs-disabled": {
     "message": "Laita ensin resurssipakettien synkronointi päälle ohjelman asetuksissa."
   },
+  "app.debug-export.finishing": {
+    "message": "Viimeistellään..."
+  },
   "app.download-manager.active": {
     "message": "Aktiivinen"
   },
@@ -800,6 +803,21 @@
   "app.instance.share.unable-to-connect.description": {
     "message": "Instanssinjakopalvelu ei ole saatavilla tällä hetkellä. Kokeile uudelleen myöhemmin."
   },
+  "app.instance.shared-instance-wrong-account.sign-in-as-label": {
+    "message": "Kirjaudu sisään nimellä"
+  },
+  "app.instance.tab.content": {
+    "message": "Sisältö"
+  },
+  "app.instance.tab.files": {
+    "message": "Tiedostot"
+  },
+  "app.instance.tab.share": {
+    "message": "Jaa"
+  },
+  "app.instance.tab.worlds": {
+    "message": "Maailmat"
+  },
   "app.instance.worlds.add-server": {
     "message": "Lisää palvelin"
   },
@@ -836,8 +854,17 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Ei palvelimia tai maailmoja lisättynä"
   },
+  "app.instance.worlds.refreshing": {
+    "message": "Päivitetään..."
+  },
   "app.instance.worlds.remove-server-modal.remove-button": {
     "message": "Poista palvelin"
+  },
+  "app.instance.worlds.remove-server-modal.remove-everywhere": {
+    "message": "Poista kaikkialle"
+  },
+  "app.instance.worlds.remove-server-modal.remove-here": {
+    "message": "Poista tästä"
   },
   "app.instance.worlds.remove-server-modal.title": {
     "message": "Poista palvelin"
@@ -850,6 +877,66 @@
   },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Hae {count} maailmasta..."
+  },
+  "app.java-detection.cancel": {
+    "message": "Peruuta"
+  },
+  "app.java-detection.columns.version": {
+    "message": "Versio"
+  },
+  "app.java-detection.select": {
+    "message": "Valitse"
+  },
+  "app.java-detection.selected": {
+    "message": "Valittu"
+  },
+  "app.java-selector.already-installed": {
+    "message": "On jo asennettu"
+  },
+  "app.java-selector.installing": {
+    "message": "Asennetaan..."
+  },
+  "app.library.filter.add": {
+    "message": "Lisää suodatin"
+  },
+  "app.library.filter.game-version": {
+    "message": "Peliversio"
+  },
+  "app.library.filter.loader": {
+    "message": "Lataaja"
+  },
+  "app.library.group-by.game-version": {
+    "message": "Peliversio"
+  },
+  "app.library.group.create.cancel": {
+    "message": "Peru"
+  },
+  "app.library.group.instance.add": {
+    "message": "Lisää"
+  },
+  "app.library.group.instance.added": {
+    "message": "Lisätty"
+  },
+  "app.library.group.instances-modal.add": {
+    "message": "Lisää"
+  },
+  "app.library.group.instances-modal.added": {
+    "message": "Lisätty"
+  },
+  "app.library.instance.action.add-to-favorites": {
+    "message": "Lisää suosikkeihin"
+  },
+  "app.library.instance.action.delete": {
+    "message": "Poista"
+  },
+  "app.library.instance.action.play": {
+    "message": "Pelaa"
+  },
+  "app.library.instance.action.stop": {
+    "message": "Pysäytä"
+  },
+  "app.library.sort.last-played": {
+    "message": "Viimeksi pelattu"
   },
   "app.modal.install-to-play.header": {
     "message": "Asenna pelataksesi"
@@ -865,6 +952,9 @@
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Jaettu instanssi"
+  },
+  "app.modal.install-to-play.unknown-files-warning": {
+    "message": "Tuntematon tiedoston varoitus"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "Tarkastele sisältöä"
@@ -889,6 +979,18 @@
   },
   "app.settings.downloading": {
     "message": "Ladataan v{version}"
+  },
+  "app.settings.synced-options.game-settings.button": {
+    "message": "Muokkaa peliasetuksia"
+  },
+  "app.settings.synced-options.game-settings.retry": {
+    "message": "Yritä uudelleen"
+  },
+  "app.settings.synced-options.game-settings.title": {
+    "message": "Pelin asetukset"
+  },
+  "app.settings.synced-options.game-settings.value-unset": {
+    "message": "Valitse arvo"
   },
   "app.settings.tabs.appearance": {
     "message": "Ulkonäkö"
@@ -1198,6 +1300,9 @@
   },
   "instance.files.save-as": {
     "message": "Tallenna nimellä..."
+  },
+  "instance.last-played": {
+    "message": "Viimeksi pelattu"
   },
   "instance.server-modal.address": {
     "message": "Osoite"

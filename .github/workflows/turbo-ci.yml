@@ -38,6 +38,8 @@ jobs:
       REDIS_URL: redis://127.0.0.1:7000,redis://127.0.0.1:7001,redis://127.0.0.1:7002,redis://127.0.0.1:7003,redis://127.0.0.1:7004,redis://127.0.0.1:7005
       # Avoid stack overflows in tests
       RUST_MIN_STACK: 134217728
+      # Services the labrinth tests never use, skipped to save memory on small runners
+      UNUSED_SERVICES: --scale gotenberg=0
 
     steps:
       - name: Check out code
@@ -60,7 +62,7 @@ jobs:
         background: true
         run: |
           if [ "$INTERNAL" = 'true' ]; then
-            docker compose --profile clustered-redis up --wait
+            docker compose --profile clustered-redis up --wait $UNUSED_SERVICES
           fi
 
       - name: Setup Node
@@ -169,7 +171,7 @@ jobs:
 
       - name: Start services (fork)
         if: steps.check-labrinth.outputs.needs_services == 'true'
-        run: docker compose --profile clustered-redis up --wait
+        run: docker compose --profile clustered-redis up --wait $UNUSED_SERVICES
 
       - name: Wait for services
         wait: [services]

@@ -1,5 +1,10 @@
 * text=auto eol=lf
 
+# Excludes locale files that have been automatically trimmed during prepr
+# from the diff viewer + diff calculation on GitHub.
+**/locales/*/index.json linguist-generated=true
+!**/locales/en-US/index.json linguist-generated
+
 # SQLx calculates a checksum of migration scripts at build time to compare
 # it with the checksum of the applied migration for the same version at
 # runtime, to know if the migration script has been changed, and thus the

@@ -302,6 +302,18 @@
   "app.content.sync-resource-packs-disabled": {
     "message": "Aktivera synkronisering av resurs­paket i appens inställningar först."
   },
+  "app.debug-export.canceling": {
+    "message": "Avbryter exportering…"
+  },
+  "app.debug-export.exporting": {
+    "message": "Exporterar…"
+  },
+  "app.debug-export.finishing": {
+    "message": "Slutför…"
+  },
+  "app.debug-export.preparing": {
+    "message": "Förbereder filer…"
+  },
   "app.download-manager.active": {
     "message": "Aktiv"
   },
