@@ -1,12 +1,12 @@
 import { AlignLeftIcon } from '@modrinth/assets'
 
+import { messageWithOptionalSuggestion } from '../../utils'
 import formatting from '../messages/checklist/messages/summary/formatting.md'
 import insufficient from '../messages/checklist/messages/summary/insufficient.md'
 import nonEnglish from '../messages/checklist/messages/summary/non-english.md'
 import repeatIp from '../messages/checklist/messages/summary/repeat-ip.md'
 import { issue, panel, section, textarea, toggle } from './component-builders/builders'
 import { issueTargets } from './component-builders/targets'
-import { messageWithOptionalSuggestion } from '../../utils'
 
 const panelCategory = 'Summary'
 

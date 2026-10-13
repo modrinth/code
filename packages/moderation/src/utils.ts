@@ -1,6 +1,7 @@
 import type { Labrinth } from '@modrinth/api-client'
-import suggestionMessage from './data/messages/checklist/messages/text-suggestion.md'
 import { md } from '@modrinth/utils'
+
+import suggestionMessage from './data/messages/checklist/messages/text-suggestion.md'
 
 export function isValidProjectSlug(value: string) {
 	return /^[a-zA-Z0-9._-]{3,64}$/.test(value)
