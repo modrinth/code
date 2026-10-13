@@ -48,9 +48,9 @@
 		<div class="flex flex-col gap-4 p-6">
 			<div
 				v-if="projectInstallContext"
-				class="sticky top-0 z-20 -mx-6 -mt-6 rounded-tl-[--radius-xl] border-0 border-b border-solid bg-surface-1 px-3 py-4 border-surface-5"
+				class="sticky top-0 z-20 -mx-6 -mt-6 rounded-tl-[--radius-xl] border-0 border-b border-solid bg-surface-1 px-6 py-4 border-surface-5"
 			>
-				<BrowseInstallHeader :install-context="projectInstallContext" />
+				<BrowseInstallHeader :install-context="projectHeaderInstallContext" />
 			</div>
 			<InstanceIndicator v-if="instance && !projectInstallContext" :instance="instance" />
 			<template v-if="data">
@@ -191,7 +191,7 @@
 					]"
 				/>
 				<RouterView
-					v-if="route.path.startsWith('/project')"
+					:route="displayedProjectRoute"
 					:project="data"
 					:versions="versions"
 					:members="members"
@@ -200,6 +200,11 @@
 					:installed="installed"
 					:installing="installing"
 					:installed-version="installedVersion"
+					:server-install-context="serverProjectInstallContext"
+					:server-installed="serverProjectInstalled"
+					:server-selected-version-id="serverSelectedVersionId"
+					:loader-tags="allLoaders ?? []"
+					:game-version-tags="allGameVersions ?? []"
 				/>
 			</template>
 			<template v-else>{{ formatMessage(messages.loadError) }}</template>
@@ -318,6 +323,7 @@ const { handleError } = injectNotificationManager()
 const { install: installVersion } = injectContentInstall()
 const route = useRoute()
 const router = useRouter()
+
 const displayedProjectRoute = shallowRef(router.currentRoute.value)
 watch(
 	() => router.currentRoute.value,
@@ -431,7 +437,10 @@ const serverStatusOnline = ref(false)
 const serverInstancePath = ref(null)
 const serverPlaying = ref(false)
 const serverSetupModalRef = ref(null)
-const serverInstallContent = useServerInstallContent({ serverSetupModalRef })
+const serverInstallContent = useServerInstallContent({
+	serverSetupModalRef,
+	inheritBreadcrumbServer: true,
+})
 
 serverInstallContent.watchServerContextChanges()
 await serverInstallContent.initServerContext()
@@ -470,7 +479,7 @@ function buildProjectHref(path, extraQuery = {}) {
 function buildBrowseHref(path) {
 	const params = new URLSearchParams()
 	for (const [key, val] of Object.entries(route.query)) {
-		if (key === 'b') continue
+		if (key === 'b' || key === 'g' || key === 'l') continue
 		if (Array.isArray(val)) {
 			for (const v of val) params.append(key, v)
 		} else if (val) {
@@ -490,6 +499,7 @@ const projectGalleryHref = computed(() => buildProjectHref(`/project/${route.par
 const projectBrowseBackUrl = computed(() => {
 	const browsePath = route.query.b
 	if (typeof browsePath === 'string' && browsePath.startsWith('/browse/')) return browsePath
+	if (serverInstallContent.isServerContext.value) return serverInstallContent.serverBackUrl.value
 	const instanceId = route.query.i
 	if (typeof instanceId === 'string' && instanceId) {
 		return `/instance/${encodeURIComponent(instanceId)}`
@@ -497,11 +507,13 @@ const projectBrowseBackUrl = computed(() => {
 	const type = data.value?.project_type ? `${data.value.project_type}` : 'mod'
 	return buildBrowseHref(`/browse/${type}`)
 })
-const projectBackLabel = computed(() =>
-	typeof route.query.i === 'string' && typeof route.query.b !== 'string'
+const projectBackLabel = computed(() => {
+	if (typeof route.query.b === 'string') return formatMessage(messages.backToBrowse)
+	if (serverInstallContent.isServerContext.value) return serverInstallContent.serverBackLabel.value
+	return typeof route.query.i === 'string'
 		? formatMessage(messages.backToInstance)
-		: formatMessage(messages.backToBrowse),
-)
+		: formatMessage(messages.backToBrowse)
+})
 
 const projectInstallContext = computed(() => {
 	const serverData = serverInstallContent.serverContextServerData.value
@@ -543,6 +555,20 @@ const projectInstallContext = computed(() => {
 	return null
 })
 
+/**
+ * Going back from a project returns to browse, where the selection is still shown, so the header
+ * skips the "selected projects not installed yet" prompt that would otherwise leave to the server.
+ */
+const projectHeaderInstallContext = computed(() => {
+	const context = projectInstallContext.value
+	if (!context) return null
+	return {
+		...context,
+		selectedProjects: [],
+		isInstallingSelected: false,
+	}
+})
+
 const serverProjectInstallContext = computed(
 	() =>
 		!!serverInstallContent.serverContextServerData.value &&
@@ -562,6 +588,11 @@ const serverProjectInstalled = computed(
 		!!data.value &&
 		(serverInstallContent.serverContentProjectIds.value.has(data.value.id) ||
 			serverInstallContent.serverContextServerData.value?.upstream?.project_id === data.value.id),
+)
+const serverSelectedVersionId = computed(() =>
+	serverProjectInstallContext.value && serverProjectSelected.value
+		? (serverInstallContent.getQueuedServerInstallPlans().get(data.value.id)?.versionId ?? null)
+		: null,
 )
 const installButtonLoading = computed(
 	() =>
@@ -890,7 +921,8 @@ async function install(version) {
 							},
 							contentType,
 						),
-				getProjectVersions: async () => versions.value,
+				getProjectVersions: async () =>
+					version ? versions.value.filter((candidate) => candidate.id === version) : versions.value,
 				queue: {
 					get: serverInstallContent.getQueuedServerInstallPlans,
 					set: serverInstallContent.setQueuedServerInstallPlans,

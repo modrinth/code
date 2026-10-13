@@ -23,6 +23,7 @@ import { computed, type ComputedRef, nextTick, type Ref, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { config as appConfig } from '@/config'
+import { useBreadcrumbServerId } from '@/shared/breadcrumbs'
 
 type ServerFlowFrom = 'onboarding' | 'reset-server'
 
@@ -99,8 +100,14 @@ function readQueryString(value: unknown): string | null {
 
 export function useServerInstallContent(opts: {
 	serverSetupModalRef: Ref<ServerSetupModalHandle | null>
+	/**
+	 * Falls back to the server in the breadcrumb trail when the route has no `sid`, so pages reached
+	 * from a server panel install to that server.
+	 */
+	inheritBreadcrumbServer?: boolean
 }) {
 	const { serverSetupModalRef } = opts
+	const breadcrumbServerId = opts.inheritBreadcrumbServer ? useBreadcrumbServerId() : null
 	const route = useRoute()
 	const router = useRouter()
 	const client = injectModrinthClient()
@@ -108,7 +115,9 @@ export function useServerInstallContent(opts: {
 	const { handleError } = injectNotificationManager()
 	const queryClient = useQueryClient()
 
-	const serverIdQuery = computed(() => readQueryString(route.query.sid))
+	const serverIdQuery = computed(
+		() => readQueryString(route.query.sid) ?? breadcrumbServerId?.value ?? null,
+	)
 	const worldIdQuery = computed(() => readQueryString(route.query.wid))
 	const browseFrom = computed(() => readQueryString(route.query.from))
 	const serverFlowFrom = computed<ServerFlowFrom | null>(() =>
