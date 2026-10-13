@@ -8,6 +8,9 @@
   "app.action-bar.downloads": {
     "message": "Instalacije"
   },
+  "app.action-bar.hide-downloads": {
+    "message": "Sakrij aktivna preuzimanja"
+  },
   "app.action-bar.hide-more-running-instances": {
     "message": "Sakrij više pokrenutih instanca"
   },
@@ -104,6 +107,9 @@
   "app.action-bar.reload-to-update": {
     "message": "Ponovo učitaj da ažuriraš"
   },
+  "app.action-bar.show-downloads": {
+    "message": "Vidi aktivna preuzimanja"
+  },
   "app.action-bar.show-more-running-instances": {
     "message": "Pokaži više pokrenutih instanca"
   },
@@ -136,6 +142,9 @@
   },
   "app.ads-consent.title": {
     "message": "Tvoja bezbednost i kako reklame pomažu Modrinth-u"
+  },
+  "app.appearance-settings.compact-mode.title": {
+    "message": "Kompaktni mod"
   },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Početna stranica"
@@ -215,11 +224,53 @@
   "app.browse.project-type.modpacks": {
     "message": "Modpackovi"
   },
+  "app.browse.project-type.mods": {
+    "message": "Mod"
+  },
+  "app.browse.project-type.resource-packs": {
+    "message": "Resurs paketi"
+  },
+  "app.browse.project-type.servers": {
+    "message": "Serveri"
+  },
+  "app.browse.project-type.shaders": {
+    "message": "Shaderi"
+  },
   "app.browse.server.installing": {
     "message": "Instaliranje"
   },
   "app.content-install.no-compatible-versions": {
     "message": "Nijedna dostupna verzija ne odgovara {compatibilityLabel}. Izaberite verziju za instaliranje u svakom slučaju. Zavisnosti se neće instalirati automatski."
+  },
+  "app.download-manager.active": {
+    "message": "Aktivno"
+  },
+  "app.download-manager.attention": {
+    "message": "Potrebna je pažnja"
+  },
+  "app.download-manager.clear-all": {
+    "message": "Obriši sve"
+  },
+  "app.download-manager.modpack": {
+    "message": "Modpack"
+  },
+  "app.download-manager.new-instance": {
+    "message": "Nova instanca"
+  },
+  "app.download-manager.paused": {
+    "message": "Pauzirano"
+  },
+  "app.download-manager.remove": {
+    "message": "Uklonite iz istorije"
+  },
+  "app.download-manager.resume": {
+    "message": "Nastavi instalaciju"
+  },
+  "app.download-manager.shared-instance": {
+    "message": "Deljena instanca"
+  },
+  "app.download-manager.tasks": {
+    "message": "Radnje"
   },
   "app.export-modal.description-placeholder": {
     "message": "Ukucaj opis modpacka..."
@@ -241,6 +292,24 @@
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.features-settings.show-screenshots-tab.title": {
+    "message": "Prikaži zaslon ekrana u instancama"
+  },
+  "app.features-settings.show-skin-selector.description": {
+    "message": "Prikaži dugme u levoj bočnoj traci za odabir skinova."
+  },
+  "app.features-settings.show-skin-selector.title": {
+    "message": "Prikaži odabir skina u bočnoj traci"
+  },
+  "app.features-settings.show-worlds-tab.title": {
+    "message": "Prikaži svetove u instancama"
+  },
+  "app.features-settings.sidebar.title": {
+    "message": "Bočna traka"
+  },
+  "app.home.jump-back-in.more-options": {
+    "message": "Više opcija"
   },
   "app.install.phase.downloading_content": {
     "message": "Instaliranje sadržaja"
@@ -296,6 +365,9 @@
   "app.install.phase.running_loader_processors": {
     "message": "Pokret procesora za učitavanje"
   },
+  "app.instance.card.play": {
+    "message": "Igraj"
+  },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Svi podaci za tvoju instancu će biti trajno izbrisani, uključujući tvoje svetove, konfiguracije, i sav instaliran sadržaj."
   },
@@ -307,6 +379,12 @@
   },
   "app.instance.confirm-delete.header": {
     "message": "Izbriši instancu"
+  },
+  "app.instance.content.managed-content.modpack-header": {
+    "message": "Sadržaj modpacka"
+  },
+  "app.instance.content.managed-content.shared-header": {
+    "message": "Deljen sadržaj"
   },
   "app.instance.modpack-already-installed.body": {
     "message": "Ovaj modpack je već instaliran u <bold>{instanceName}</bold> instancu. Da li si siguran da želiš da je dupliraš?"
@@ -323,6 +401,12 @@
   "app.instance.mods.content-type-project": {
     "message": "projekat"
   },
+  "app.instance.mods.freeze-content": {
+    "message": "Zamrzni verziju"
+  },
+  "app.instance.mods.locked-content": {
+    "message": "Sadržaj u zaključanoj instanci nije moguće promenit."
+  },
   "app.instance.mods.project-was-added": {
     "message": "\"{name}\" je dodato"
   },
@@ -337,6 +421,78 @@
   },
   "app.instance.mods.successfully-uploaded": {
     "message": "Uspešno otpremljeno"
+  },
+  "app.instance.mods.unfreeze-content": {
+    "message": "Odmrzni verziju"
+  },
+  "app.instance.navigation.back-to-instance": {
+    "message": "Nazad na instancu"
+  },
+  "app.instance.share.empty.description": {
+    "message": "Možeš dijeliti ovu instancu sa prijateljima!"
+  },
+  "app.instance.share.empty.heading": {
+    "message": "Nema pozvanih prijatelja"
+  },
+  "app.instance.share.empty.invite-friends-button": {
+    "message": "Pozovi prijatelje"
+  },
+  "app.instance.share.invite-modal.heading": {
+    "message": "Dijeli {name}"
+  },
+  "app.instance.share.invite-modal.user-limit-reached": {
+    "message": "Ova instanca je dostigla {limit}-korisnički limit."
+  },
+  "app.instance.share.locked.empty-description-prefix": {
+    "message": "Logiraj se kao"
+  },
+  "app.instance.share.locked.empty-description-suffix": {
+    "message": "za pristup ove stranice."
+  },
+  "app.instance.share.locked.linked-account-fallback": {
+    "message": "povezan račun"
+  },
+  "app.instance.share.locked.signed-out-heading": {
+    "message": "Nisi prijavljen"
+  },
+  "app.instance.share.locked.switch-account-button": {
+    "message": "Promeni nalog"
+  },
+  "app.instance.share.locked.wrong-account-heading": {
+    "message": "Krivi nalog"
+  },
+  "app.instance.share.members.empty": {
+    "message": "Niti jedan korisnik se nije pridružio"
+  },
+  "app.instance.share.members.no-filter-results": {
+    "message": "Nijedan korisnik ne odgovara tvojim filterima."
+  },
+  "app.instance.share.remove-user-modal.effect-access": {
+    "message": "Neće više primat ažuriranja za ovu instancu"
+  },
+  "app.instance.share.remove-user-modal.effect-installed-copy": {
+    "message": "Instalirane kopije će ostat na njihovim uređajima"
+  },
+  "app.instance.share.remove-user-modal.effect-invite-again": {
+    "message": "Možeš ih pozvat kasnije"
+  },
+  "app.instance.share.remove-user-modal.effect-last-user": {
+    "message": "Ovo je zadnji korsnik, delenje će biti onemogućeno za ovu instancu"
+  },
+  "app.instance.share.remove-user-modal.effects-label": {
+    "message": "Šta se desi?"
+  },
+  "app.instance.share.remove-user-modal.header": {
+    "message": "Opozvi dostup"
+  },
+  "app.instance.share.remove-user-modal.remove-button": {
+    "message": "Opozvi dostup"
+  },
+  "app.instance.share.remove-user-modal.user-avatar-alt": {
+    "message": "Avatar od {username}"
+  },
+  "app.instance.share.sign-in.button": {
+    "message": "Prijavi se"
   },
   "app.instance.worlds.add-server": {
     "message": "Dodaj server"

@@ -773,7 +773,7 @@ const primaryPaymentMethodId = computed(() => {
 		props.customer.invoice_settings.default_payment_method
 	) {
 		return props.customer.invoice_settings.default_payment_method
-	} else if (props.paymentMethods && props.paymentMethods[0] && props.paymentMethods[0].id) {
+	} else if (props.paymentMethods?.length === 1) {
 		return props.paymentMethods[0].id
 	} else {
 		return null

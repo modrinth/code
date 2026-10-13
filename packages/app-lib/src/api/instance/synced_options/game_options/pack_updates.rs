@@ -1,7 +1,9 @@
 //! Keeps game settings intact when a modpack is installed or updated.
 
 use super::MAX_OPTIONS_BYTES;
-use super::options_file::{input_error, options_path, sha1_bytes};
+use super::options_file::{
+    GameOptionsDocument, input_error, options_path, sha1_bytes,
+};
 use super::write_shared_settings::{
     apply_shared_settings_to_instance, capture_instance_options,
     sync_is_active_for_instance,
@@ -13,6 +15,8 @@ use std::io::ErrorKind;
 use std::path::Path;
 
 const YOSBR_OPTIONS_PATH: &str = "config/yosbr/options.txt";
+const DEFAULT_OPTIONS_PATH: &str = "config/defaultoptions/options.txt";
+const DEFAULT_KEYBINDINGS_PATH: &str = "config/defaultoptions/keybindings.txt";
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum GameOptionsPackSource {
@@ -20,20 +24,31 @@ pub enum GameOptionsPackSource {
     Overrides,
     ClientOverridesYosbr,
     OverridesYosbr,
+    ClientOverridesDefaultOptions,
+    OverridesDefaultOptions,
 }
 
 impl GameOptionsPackSource {
     fn as_str(self) -> &'static str {
         match self {
-            Self::ClientOverrides | Self::ClientOverridesYosbr => {
-                "client_overrides"
-            }
-            Self::Overrides | Self::OverridesYosbr => "overrides",
+            Self::ClientOverrides
+            | Self::ClientOverridesYosbr
+            | Self::ClientOverridesDefaultOptions => "client_overrides",
+            Self::Overrides
+            | Self::OverridesYosbr
+            | Self::OverridesDefaultOptions => "overrides",
         }
     }
 
-    fn is_yosbr(self) -> bool {
-        matches!(self, Self::ClientOverridesYosbr | Self::OverridesYosbr)
+    fn template_path(self) -> Option<&'static str> {
+        match self {
+            Self::ClientOverridesYosbr | Self::OverridesYosbr => {
+                Some(YOSBR_OPTIONS_PATH)
+            }
+            Self::ClientOverridesDefaultOptions
+            | Self::OverridesDefaultOptions => Some(DEFAULT_OPTIONS_PATH),
+            Self::ClientOverrides | Self::Overrides => None,
+        }
     }
 }
 
@@ -104,7 +119,80 @@ async fn options_target_exists(path: &Path) -> crate::Result<bool> {
     }
 }
 
-pub(super) async fn materialize_yosbr_options_if_missing(
+fn merge_default_keybindings(
+    document: &mut GameOptionsDocument,
+    keybindings: &GameOptionsDocument,
+) -> crate::Result<bool> {
+    let mut changed = false;
+    for line in &keybindings.lines {
+        let Some(entry) = &line.entry else {
+            continue;
+        };
+        if !entry.key.starts_with("key_")
+            || document.value(&entry.key).is_some()
+        {
+            continue;
+        }
+        let Some(value) = keybindings.value(&entry.key) else {
+            continue;
+        };
+        let (key, modifier) = super::catalog::split_key_binding(value);
+        // Modified bindings use loader-specific storage. Leaving them absent lets
+        // Default Options apply them without marking an incomplete binding as seen.
+        if modifier.is_some_and(|value| !value.is_empty() && value != "NONE") {
+            continue;
+        }
+        changed |= document.set(&entry.key, key, true)?;
+    }
+    Ok(changed)
+}
+
+async fn read_pack_options_template(
+    metadata: &InstanceMetadata,
+    state: &State,
+    relative_path: &str,
+) -> crate::Result<Option<(Vec<u8>, String, String)>> {
+    let directory = super::super::instance_dir(metadata, state);
+    let captured =
+        read_pack_options(&directory.join(relative_path), relative_path)
+            .await?;
+    if captured.is_none() && relative_path != DEFAULT_OPTIONS_PATH {
+        return Ok(None);
+    }
+    let keybindings = read_pack_options(
+        &directory.join(DEFAULT_KEYBINDINGS_PATH),
+        "Default Options keybindings.txt",
+    )
+    .await?;
+    let Some((keybindings, _, _)) = keybindings else {
+        return Ok(captured);
+    };
+    let mut document = if let Some((bytes, _, _)) = &captured {
+        GameOptionsDocument::parse(bytes)?
+    } else if relative_path == DEFAULT_OPTIONS_PATH {
+        let Some(document) =
+            GameOptionsDocument::for_instance(metadata, state).await?
+        else {
+            return Ok(None);
+        };
+        document
+    } else {
+        return Ok(None);
+    };
+    let changed = merge_default_keybindings(
+        &mut document,
+        &GameOptionsDocument::parse(&keybindings)?,
+    )?;
+    if !changed && captured.is_some() {
+        return Ok(captured);
+    }
+    let bytes = document.serialize()?;
+    let sha1 = sha1_bytes(&bytes);
+    let encoding = document.encoding.name().to_string();
+    Ok(Some((bytes, sha1, encoding)))
+}
+
+pub(super) async fn materialize_pack_options_if_missing(
     metadata: &InstanceMetadata,
     state: &State,
 ) -> crate::Result<()> {
@@ -112,14 +200,14 @@ pub(super) async fn materialize_yosbr_options_if_missing(
     if options_target_exists(&path).await? {
         return Ok(());
     }
-    let template_path =
-        super::super::instance_dir(metadata, state).join(YOSBR_OPTIONS_PATH);
-    let Some((bytes, _, _)) =
-        read_pack_options(&template_path, "YOSBR options.txt").await?
-    else {
-        return Ok(());
-    };
-    io::write(&path, bytes).await?;
+    for template_path in [YOSBR_OPTIONS_PATH, DEFAULT_OPTIONS_PATH] {
+        if let Some((bytes, _, _)) =
+            read_pack_options_template(metadata, state, template_path).await?
+        {
+            io::write(&path, bytes).await?;
+            break;
+        }
+    }
     Ok(())
 }
 
@@ -241,21 +329,30 @@ pub async fn capture_pack_base(
         }
     }
 
-    let captured = if source.is_some_and(GameOptionsPackSource::is_yosbr) {
-        let template_path = super::super::instance_dir(&metadata, &state)
-            .join(YOSBR_OPTIONS_PATH);
-        let template = read_pack_options(&template_path, "YOSBR options.txt")
-            .await?
-            .ok_or_else(|| {
-                input_error("The modpack YOSBR options.txt is missing")
-            })?;
-        if !options_target_exists(&path).await? {
-            io::write(&path, template.0.clone()).await?;
-        }
-        Some(template)
-    } else {
-        read_pack_options(&path, "options.txt").await?
-    };
+    let template_path = source.and_then(GameOptionsPackSource::template_path);
+    let captured =
+        if let Some(template_path) = template_path {
+            let template =
+			read_pack_options_template(&metadata, &state, template_path)
+			.await?
+			.ok_or_else(|| {
+				input_error(format!(
+					"The modpack {template_path} defaults could not be materialized"
+				))
+			})?;
+            if !options_target_exists(&path).await? {
+                io::write(&path, template.0.clone()).await?;
+            }
+            Some(template)
+        } else {
+            read_pack_options_template(&metadata, &state, "options.txt").await?
+        };
+    if let Some((bytes, _, _)) =
+        read_pack_options_template(&metadata, &state, "options.txt").await?
+        && io::read(&path).await? != bytes
+    {
+        io::write(&path, bytes).await?;
+    }
     let (document_bytes, sha1, encoding) = captured
         .map(|(document, sha1, encoding)| {
             (Some(document), Some(sha1), Some(encoding))

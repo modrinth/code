@@ -47,6 +47,9 @@
   "analytics.breakdown.download-reason": {
     "message": "Motivul descărcării"
   },
+  "analytics.breakdown.download-source": {
+    "message": "Descărcare sursă"
+  },
   "analytics.breakdown.game-version": {
     "message": "Versiune joc"
   },
@@ -548,6 +551,84 @@
   "collection.title": {
     "message": "{name} - Colecție"
   },
+  "conversation-thread.resubmit-modal.description": {
+    "message": "Trimiți <project-title>{projectTitle}</project-title> pentru a fi revizuit din nou de moderatori."
+  },
+  "conversation-thread.resubmit-modal.header.resubmitting": {
+    "message": "Retrimite pentru revizuire"
+  },
+  "conversation-thread.resubmit-modal.header.submitting": {
+    "message": "Retrimite pentru revizuire"
+  },
+  "create-project-version.create-modal.stage.add-files.details-tab": {
+    "message": "Detalii"
+  },
+  "create-project-version.create-modal.stage.add-files.files-tab": {
+    "message": "File-uri"
+  },
+  "create-project-version.create-modal.stage.add-files.metadata-tab": {
+    "message": "Metadate"
+  },
+  "create-project-version.create-modal.stage.add-files.primary-file-label": {
+    "message": "Fişier principal"
+  },
+  "create-project-version.create-modal.stage.add-files.supplementary-files-description": {
+    "message": "Opţional puteţi adăuga fişiere suplimentare, cum ar fi codul sursă, documentaţia sau pachete de resurse necesare."
+  },
+  "create-project-version.create-modal.stage.add-files.supplementary-files-label": {
+    "message": "Fişiere suplimentare"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-additional-file-aria-label": {
+    "message": "Încărcați fișierul suplimentar"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-file-aria-label": {
+    "message": "Încărcați fișierul"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-primary-prompt": {
+    "message": "Încărcați fișiere primare și suport"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-secondary-prompt": {
+    "message": "Trage și plasează fișiere sau apasă pentru a naviga"
+  },
+  "create-project-version.create-modal.stage.details.details-tab": {
+    "message": "Detalii"
+  },
+  "create-project-version.create-modal.stage.details.files-tab": {
+    "message": "File-uri"
+  },
+  "create-project-version.create-modal.stage.details.metadata-tab": {
+    "message": "Metadate"
+  },
+  "create-project-version.create-modal.stage.details.version-changelog": {
+    "message": "Jurnal modificări versiune"
+  },
+  "create-project-version.create-modal.stage.details.version-number": {
+    "message": "Numărul versiunii"
+  },
+  "create-project-version.create-modal.stage.details.version-number-description": {
+    "message": "Numărul versiunii diferențiază această versiune specifică de altele."
+  },
+  "create-project-version.create-modal.stage.details.version-number-placeholder": {
+    "message": "Introduceți numărul versiunii, ex. 1.2.3-alfa.1"
+  },
+  "create-project-version.create-modal.stage.details.version-subtitle": {
+    "message": "Subtitlu versiune"
+  },
+  "create-project-version.create-modal.stage.details.version-subtitle-placeholder": {
+    "message": "Introduceţi subtitlu..."
+  },
+  "create-project-version.create-modal.stage.details.version-type": {
+    "message": "Tipul versiunii"
+  },
+  "create-project-version.create-modal.stage.metadata.add-dependency": {
+    "message": "Adaugă Dependență"
+  },
+  "create-project-version.create-modal.stage.metadata.dependencies": {
+    "message": "Dependențe"
+  },
+  "create-project-version.create-modal.stage.metadata.details-tab": {
+    "message": "Detalii"
+  },
   "create.collection.collection-info": {
     "message": "Noua ta colecție va fi creată ca o colecție publică cu {count, plural, =0 {niciun proiect} one {# proiect} other {# proiecte}}."
   },
@@ -859,9 +940,6 @@
   },
   "error.generic.default.list_item.1": {
     "message": "Verifică dacă Modrinth este picat pe a noastră <status-link>Pagină de status</status-link>."
-  },
-  "error.generic.default.list_item.2": {
-    "message": "Dacă asta continuă să se întâmple, poate vrei să anunți echipa Modrinth alăturându-te serverului nostru de <discord-link>Discord</discord-link>."
   },
   "error.generic.default.list_title": {
     "message": "Te rog încercă din nou în câteva minute."

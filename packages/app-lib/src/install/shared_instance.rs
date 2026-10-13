@@ -22,6 +22,7 @@ use crate::util::fetch::{DownloadReason, REQWEST_CLIENT};
 use futures::StreamExt;
 use path_util::SafeRelativeUtf8UnixPathBuf;
 use std::collections::{HashMap, HashSet};
+use std::future::Future;
 use std::path::PathBuf;
 use uuid::Uuid;
 
@@ -155,7 +156,7 @@ impl SharedInstanceApplyPlan {
             .projects
             .values()
             .filter(|current| {
-                !desired.projects.contains_key(&current.project_id)
+                !desired.projects.contains_key(&current.version_id)
             })
             .cloned()
             .collect();
@@ -172,16 +173,35 @@ impl SharedInstanceApplyPlan {
             ..Default::default()
         };
 
-        for desired in desired.projects.into_values() {
-            match current.projects.get(&desired.project_id) {
-                Some(current) if current.version_id != desired.version_id => {
-                    plan.project_updates.push(SharedInstanceProjectUpdate {
-                        current: current.clone(),
-                        desired,
-                    });
-                }
-                None => plan.project_additions.push(desired),
-                Some(_) => {}
+        let mut additions = desired
+            .projects
+            .into_values()
+            .filter(|desired| {
+                !current.projects.contains_key(&desired.version_id)
+            })
+            .collect::<Vec<_>>();
+        while let Some(desired) = additions.pop() {
+            let replacements = plan
+                .project_removals
+                .iter()
+                .enumerate()
+                .filter(|(_, current)| current.project_id == desired.project_id)
+                .map(|(index, _)| index)
+                .collect::<Vec<_>>();
+            let unambiguous = !additions
+                .iter()
+                .any(|other| other.project_id == desired.project_id)
+                && !plan
+                    .project_additions
+                    .iter()
+                    .any(|other| other.project_id == desired.project_id);
+            if replacements.len() == 1 && unambiguous {
+                plan.project_updates.push(SharedInstanceProjectUpdate {
+                    current: plan.project_removals.remove(replacements[0]),
+                    desired,
+                });
+            } else {
+                plan.project_additions.push(desired);
             }
         }
 
@@ -207,7 +227,23 @@ impl SharedInstanceApplyPlan {
     }
 }
 
-pub(super) async fn apply_shared_instance_update(
+pub(super) fn apply_shared_instance_update<'a>(
+    job_id: Uuid,
+    job_state: &'a mut InstallJobState,
+    state: &'a State,
+    instance_id: &'a str,
+    data: &'a SharedInstanceInstallData,
+) -> impl Future<Output = crate::Result<()>> + Send + 'a {
+    Box::pin(apply_shared_instance_update_inner(
+        job_id,
+        job_state,
+        state,
+        instance_id,
+        data,
+    ))
+}
+
+async fn apply_shared_instance_update_inner(
     job_id: Uuid,
     job_state: &mut InstallJobState,
     state: &State,
@@ -227,13 +263,13 @@ pub(super) async fn apply_shared_instance_update(
     if plan.configuration_changed {
         crate::api::instance::prepare_instance_update(instance_id).await?;
         remove_existing_shared_instance_content(instance_id, state).await?;
-        Box::pin(apply_shared_instance_content(
+        apply_shared_instance_content(
             job_id,
             job_state,
             state,
             instance_id,
             data,
-        ))
+        )
         .await?;
         if data.modpack.is_none() {
             if let Err(error) =
@@ -247,8 +283,10 @@ pub(super) async fn apply_shared_instance_update(
                     "The shared instance was updated, but its local options.txt could not be restored after removing the previous pack: {error}"
                 );
             }
-            crate::api::instance::reconcile_instance_after_pack_update(
-                instance_id,
+            Box::pin(
+                crate::api::instance::reconcile_instance_after_pack_update(
+                    instance_id,
+                ),
             )
             .await?;
         }
@@ -474,7 +512,7 @@ async fn current_shared_instance_content(
             };
 
             content.projects.insert(
-                project_id.clone(),
+                version_id.clone(),
                 CurrentSharedInstanceProject {
                     project_id,
                     version_id,
@@ -509,7 +547,7 @@ async fn desired_shared_instance_content(
             ))
         })?;
         content.projects.insert(
-            version.project_id.clone(),
+            version.id.clone(),
             DesiredSharedInstanceProject {
                 project_id: version.project_id.clone(),
                 version_id: version.id.clone(),
@@ -578,7 +616,23 @@ async fn shared_instance_versions_by_id(
     Ok(versions_by_id)
 }
 
-pub(super) async fn apply_shared_instance_content(
+pub(super) fn apply_shared_instance_content<'a>(
+    job_id: Uuid,
+    job_state: &'a mut InstallJobState,
+    state: &'a State,
+    instance_id: &'a str,
+    data: &'a SharedInstanceInstallData,
+) -> impl Future<Output = crate::Result<()>> + Send + 'a {
+    Box::pin(apply_shared_instance_content_inner(
+        job_id,
+        job_state,
+        state,
+        instance_id,
+        data,
+    ))
+}
+
+async fn apply_shared_instance_content_inner(
     job_id: Uuid,
     job_state: &mut InstallJobState,
     state: &State,
@@ -614,13 +668,13 @@ pub(super) async fn apply_shared_instance_content(
             modpack_details(&location),
         )
         .await?;
-        Box::pin(install_pack(
+        install_pack(
             job_id,
             job_state,
             location,
             instance_id.to_string(),
             DownloadReason::Modpack,
-        ))
+        )
         .await?;
     } else {
         crate::api::instance::edit(

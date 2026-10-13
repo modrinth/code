@@ -612,7 +612,7 @@ components:
           type: array
           items:
             type: string
-          enum: [release, alpha, beta]
+            enum: [release, alpha, beta]
           example: [release]
       required:
         - loaders
@@ -661,7 +661,7 @@ components:
               type: array
               items:
                 type: string
-              enum: [release, alpha, beta]
+                enum: [release, alpha, beta]
               example: [release]
           required:
             - loaders

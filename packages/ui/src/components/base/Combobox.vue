@@ -274,6 +274,8 @@ const props = withDefaults(
 	defineProps<{
 		modelValue?: T
 		options: (ComboboxOption<T> | { type: 'divider' })[]
+		/** Options to filter after the user types; defaults to options. */
+		searchOptions?: (ComboboxOption<T> | { type: 'divider' })[]
 		placeholder?: string
 		disabled?: boolean
 		searchable?: boolean
@@ -396,7 +398,7 @@ const dropdownTransformOrigin = computed(() =>
 )
 
 const selectedOption = computed<ComboboxOption<T> | undefined>(() => {
-	return props.options.find(
+	return [...props.options, ...(props.searchOptions ?? [])].find(
 		(opt): opt is ComboboxOption<T> => isDropdownOption(opt) && opt.value === props.modelValue,
 	)
 })
@@ -438,13 +440,21 @@ const optionsWithKeys = computed(() => {
 	}))
 })
 
+const searchOptionsWithKeys = computed(() => {
+	return (props.searchOptions ?? props.options).map((opt, index) => ({
+		...opt,
+		key: isDivider(opt) ? `divider-${index}` : `option-${opt.value}`,
+	}))
+})
+
 const filteredOptions = computed(() => {
-	if (!searchQuery.value || !props.searchable || props.disableSearchFilter || !userHasTyped.value) {
+	if (!searchQuery.value || !props.searchable || !userHasTyped.value) {
 		return optionsWithKeys.value
 	}
+	if (props.disableSearchFilter) return searchOptionsWithKeys.value
 
 	const query = searchQuery.value.toLowerCase()
-	return optionsWithKeys.value.filter((opt) => {
+	return searchOptionsWithKeys.value.filter((opt) => {
 		if (isDivider(opt)) return false
 		if (opt.label.toLowerCase().includes(query)) return true
 		if (opt.searchTerms?.some((term) => term.toLowerCase().includes(query))) return true
@@ -1085,11 +1095,10 @@ watch(hasMinimumSearchLength, (canOpen) => {
 })
 
 watch(
-	[() => props.modelValue, () => props.options],
-	([val]) => {
+	[() => props.modelValue, () => props.options, () => props.searchOptions],
+	() => {
 		if (props.searchable && props.syncWithSelection && !isOpen.value && !userHasTyped.value) {
-			const opt = props.options.find((o) => isDropdownOption(o) && o.value === val)
-			searchQuery.value = opt && isDropdownOption(opt) ? opt.label : ''
+			searchQuery.value = selectedOption.value?.label ?? ''
 		}
 		if (isOpen.value) {
 			updateOptionsOverlayScrollbars()

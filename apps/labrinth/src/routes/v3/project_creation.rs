@@ -108,6 +108,7 @@ pub enum CreateError {
 impl From<crate::routes::ApiError> for CreateError {
     fn from(value: crate::routes::ApiError) -> Self {
         match value {
+            err if err.is_account_locked() => Self::Request(err),
             crate::routes::ApiError::Auth(err) => {
                 Self::CustomAuthenticationError(format!("{err:#}"))
             }
@@ -146,7 +147,7 @@ impl actix_web::ResponseError for CreateError {
             CreateError::InvalidLoader(..) => StatusCode::BAD_REQUEST,
             CreateError::InvalidCategory(..) => StatusCode::BAD_REQUEST,
             CreateError::InvalidFileType(..) => StatusCode::BAD_REQUEST,
-            CreateError::Unauthorized(..) => StatusCode::UNAUTHORIZED,
+            CreateError::Unauthorized(err) => err.status_code(),
             CreateError::CustomAuthenticationError(..) => {
                 StatusCode::UNAUTHORIZED
             }
@@ -180,7 +181,7 @@ impl actix_web::ResponseError for CreateError {
                 CreateError::InvalidLoader(..) => "invalid_input",
                 CreateError::InvalidCategory(..) => "invalid_input",
                 CreateError::InvalidFileType(..) => "invalid_input",
-                CreateError::Unauthorized(..) => "unauthorized",
+                CreateError::Unauthorized(err) => err.error_name(),
                 CreateError::CustomAuthenticationError(..) => "unauthorized",
                 CreateError::SlugCollision => "invalid_input",
                 CreateError::ValidationError(..) => "invalid_input",
@@ -191,7 +192,10 @@ impl actix_web::ResponseError for CreateError {
                 | CreateError::ProjectVersionLimitReached
                 | CreateError::DailyVersionLimitReached => "limit_reached",
             },
-            description: self.to_string(),
+            description: match self {
+                Self::InternalError(error) => format!("{error:#}"),
+                _ => self.to_string(),
+            },
             details: None,
         })
     }
@@ -373,11 +377,15 @@ pub async fn project_create_internal(
         }
     } else {
         transaction.commit().await?;
+        let slug =
+            models::DBProject::get_id(project_id.into(), &**client, &redis)
+                .await?
+                .and_then(|project| project.inner.slug);
         super::projects::clear_project_cache_and_queue_search(
             &redis,
             &search_state,
             project_id.into(),
-            None,
+            slug,
             None,
         )
         .await?;
@@ -439,11 +447,15 @@ pub async fn project_create_with_id(
         }
     } else {
         transaction.commit().await?;
+        let slug =
+            models::DBProject::get_id(project_id.into(), &**client, &redis)
+                .await?
+                .and_then(|project| project.inner.slug);
         super::projects::clear_project_cache_and_queue_search(
             &redis,
             &search_state,
             project_id.into(),
-            None,
+            slug,
             None,
         )
         .await?;
@@ -694,7 +706,7 @@ async fn project_create_inner(
             })?;
 
             let (file_name, file_extension) =
-                super::version_creation::get_name_ext(&content_disposition)?;
+                super::version_creation::get_name_and_extension(&content_disposition)?;
 
             if name == "icon" {
                 if icon_data.is_some() {
@@ -730,7 +742,7 @@ async fn project_create_inner(
                     .await?;
 
                     let (_, file_extension) =
-                        super::version_creation::get_name_ext(&content_disposition)?;
+                        super::version_creation::get_name_and_extension(&content_disposition)?;
 
                     let url = format!("data/{project_id}/images");
                     let upload_result = upload_image_optimized(

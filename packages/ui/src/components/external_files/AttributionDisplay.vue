@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { CheckCircleIcon, ScaleIcon, UserRoundIcon, XCircleIcon } from '@modrinth/assets'
-import { builtinLicenses } from '@modrinth/utils'
+import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
 import { IntlFormatted } from '#ui/components'
@@ -9,6 +9,7 @@ import { AutoLink, Avatar } from '#ui/components/base'
 
 import { useFormatDateTime } from '../../composables/format-date-time'
 import { defineMessage, defineMessages, useVIntl } from '../../composables/i18n'
+import { injectModrinthClient } from '../../providers'
 import type { ProjectPermissionField } from './external-project-utils'
 import {
 	attributionLinkToWork,
@@ -35,8 +36,18 @@ const props = withDefaults(
 
 const { formatMessage } = useVIntl()
 const formatDate = useFormatDateTime({ dateStyle: 'long' })
+const { labrinth } = injectModrinthClient()
+const { data: spdxLicenses } = useQuery({
+	queryKey: ['tags', 'licenses', 'v2'],
+	queryFn: () => labrinth.tags_v2.getLicenses(),
+	staleTime: 1000 * 60 * 60,
+})
 
 const messages = defineMessages({
+	allRights: {
+		id: 'external-files.permissions-card.license.all-rights',
+		defaultMessage: 'All Rights Reserved/No License',
+	},
 	linkLabel: {
 		id: 'external-files.permissions-card.link-label',
 		defaultMessage: 'Link to work:',
@@ -109,7 +120,9 @@ const licenseReadDisplay = computed(() => {
 	const licenseId = attr.license
 	if (licenseId) {
 		const friendly =
-			builtinLicenses.find((license) => license.short === licenseId)?.friendly ?? licenseId
+			licenseId === 'All-Rights-Reserved'
+				? formatMessage(messages.allRights)
+				: (spdxLicenses.value?.find((license) => license.short === licenseId)?.name ?? licenseId)
 		return { kind: 'standard' as const, value: friendly }
 	}
 	return { kind: 'unknown' as const, value: formatMessage(unknownLicenseMessage) }

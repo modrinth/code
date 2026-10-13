@@ -524,9 +524,6 @@
   "external-files.permissions-card.editor.proof-image-remove": {
     "defaultMessage": "Fjern billede"
   },
-  "external-files.permissions-card.editor.select-license-label": {
-    "defaultMessage": "Vælg en licens..."
-  },
   "external-files.permissions-card.reason.my-project": {
     "defaultMessage": "Mit projekt"
   },

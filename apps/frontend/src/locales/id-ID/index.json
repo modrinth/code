@@ -251,6 +251,39 @@
   "analytics.group-by.month": {
     "message": "Bulan"
   },
+  "analytics.group-by.week": {
+    "message": "Pekan"
+  },
+  "analytics.group-by.year": {
+    "message": "Tahun"
+  },
+  "analytics.options.loading": {
+    "message": "Memuat..."
+  },
+  "analytics.project-event.project-approved": {
+    "message": "Proyek disetujui"
+  },
+  "analytics.project-status.approved": {
+    "message": "Disetujui"
+  },
+  "analytics.project-status.archived": {
+    "message": "Diarsipkan"
+  },
+  "analytics.project-status.draft": {
+    "message": "Draf"
+  },
+  "analytics.project-status.other": {
+    "message": "Lainnya"
+  },
+  "analytics.project-status.rejected": {
+    "message": "Ditolak"
+  },
+  "analytics.project.all": {
+    "message": "Semua proyek"
+  },
+  "analytics.project.select": {
+    "message": "Pilih proyek"
+  },
   "app-marketing.download.description": {
     "message": "Aplikasi destop kami tersedia pada semua platform, pilih versi yang Anda inginkan."
   },
@@ -1222,9 +1255,6 @@
   },
   "error.generic.default.list_item.1": {
     "message": "Periksa apakah Modrinth sedang mengalami gangguan di <status-link>halaman Status</status-link>."
-  },
-  "error.generic.default.list_item.2": {
-    "message": "Bila hal ini terus terjadi, Anda mungkin ingin memberi tahu Tim Modrinth dengan bergabung ke <discord-link>server Discord</discord-link> kami."
   },
   "error.generic.default.list_title": {
     "message": "Silakan coba lagi dalam beberapa menit."

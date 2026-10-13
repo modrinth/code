@@ -1,0 +1,21 @@
+diff --git a/dist/index.js b/dist/index.js
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -747,4 +747,4 @@
+         @tailwind base;
+         @tailwind components;
+         @tailwind utilities;
+-      `,{from:void 0}).css}function qee(t){return t.replace(/([^\\]|^)(?=([^\w\-]))/g,(e,r,a)=>r===""&&a==="\\"?e:`${r}\\`)}function Hee(t){const e={};for(const[r,a,l]of t.matchAll(/\s*\.([\S]+)\s*{([^}]*)}/gm))e[a.trim()]=l.replace(/^\n+/,"").replace(/\n+$/,"").trim();return e}const Gee=eh.defineComponent({name:"Tailwind",props:{config:{type:Object,default:{},required:!1}},async setup(t,{slots:e}){if(!e.default||!e.default())throw new Error("Tailwind component must have a default slot");const r=e.default();let a=[];const l=await _6.renderToString(eh.h("div",r)).then(g=>g.replace(/^<div[^>]*>|<\/div>$/g,"")),h=g7(await Wee(l,t.config||{})).replaceAll(/@media\s*\(.*\)\s*{\s*\.(.*)\s*{[\s\S]*}\s*}/gm,(g,b)=>(a.push(g.replace(/[\r\n|\r|\n]+/g,"").replace(/\s+/g," ").replaceAll(/\s*\.[\S]+\s*{([^}]*)}/gm,(v,T)=>v.replace(T,T.split(";").map(E=>E.endsWith("!important")?E.trim():`${E.trim()}!important`).join(";")))),"")),n=Hee(h);a=a.filter(g=>g.trim().length>0);const u=/<html[^>]*>/gm.test(l),i=/<head[^>]*>/gm.test(l);if(a.length>0&&(!u||!i))throw new Error("Tailwind: To use responsive styles you must have a <Html> and <Head> element in your template.");const c=new X6,f=new R6(c);f.write(l),f.end();const s=c.dom,o=E2(g=>g.name==="head",s);a.length>0&&i&&o&&m7(o,{type:"tag",name:"style",children:[{type:"text",data:b7(a.join(""))}]});const y=g=>g.attribs&&g.attribs.class;y7(g=>y(g),s).forEach(g=>{const b=g.attribs.style||"";if(g.attribs.class){const T=g.attribs.class.split(" "),E=[],O=[];T.forEach(D=>{const $=qee(D);typeof n[$]>"u"?E.push(D):O.push(`${n[$]};`)}),E.length>0&&(g.attribs.class=E.join(" ").trim()),O.length>0&&(g.attribs.style=`${b} ${O.join(" ")}`.trim()),g.attribs.style===""&&delete g.attribs.style}});const m=Ey(s,{decodeEntities:!1,xmlMode:!0});return()=>eh.h("tailwind-clean-component",{innerHTML:m})}});exports.Tailwind=Gee;
++      `,{from:void 0}).css}function qee(t){return t.replace(/([^\\]|^)(?=([^\w\-]))/g,(e,r,a)=>r===""&&a==="\\"?e:`${r}\\`)}function Hee(t){const e={};for(const[r,a,l]of t.matchAll(/\s*\.([\S]+)\s*{([^}]*)}/gm))e[a.trim()]=l.replace(/^\n+/,"").replace(/\n+$/,"").trim();return e}const Gee=eh.defineComponent({name:"Tailwind",props:{config:{type:Object,default:{},required:!1}},async setup(t,{slots:e}){if(!e.default||!e.default())throw new Error("Tailwind component must have a default slot");const r=e.default();let a=[];const l=await _6.renderToString(eh.h("div",r)).then(g=>g.replace(/^<div[^>]*>|<\/div>$/g,"")),h=g7(await Wee(l,t.config||{})).replaceAll(/@media\s*\(.*\)\s*{\s*\.(.*)\s*{[\s\S]*}\s*}/gm,(g,b)=>(a.push(g.replace(/[\r\n|\r|\n]+/g,"").replace(/\s+/g," ").replaceAll(/\s*\.[\S]+\s*{([^}]*)}/gm,(v,T)=>v.replace(T,T.split(";").map(E=>E.endsWith("!important")?E.trim():`${E.trim()}!important`).join(";")))),"")),n=Hee(h);a=a.filter(g=>g.trim().length>0);const u=/<html[^>]*>/gm.test(l),i=/<head[^>]*>/gm.test(l);if(a.length>0&&(!u||!i))throw new Error("Tailwind: To use responsive styles you must have a <Html> and <Head> element in your template.");const c=new X6,f=new R6(c);f.write(l),f.end();const s=c.dom,o=E2(g=>g.name==="head",s);a.length>0&&i&&o&&m7(o,{type:"tag",name:"style",children:[{type:"text",data:b7(a.join(""))}]});const y=g=>g.attribs&&g.attribs.class;y7(g=>y(g),s).forEach(g=>{const b=g.attribs.style||"";if(g.attribs.class){const T=g.attribs.class.split(" "),E=[],O=[];T.forEach(D=>{const $=qee(D);typeof n[$]>"u"?E.push(D):O.push(`${n[$]};`)}),E.length>0&&(g.attribs.class=E.join(" ").trim()),O.length>0&&(g.attribs.style=`${b} ${O.join(" ")}`.trim()),g.attribs.style===""&&delete g.attribs.style}});const m=Ey(s,{decodeEntities:!0,xmlMode:!0});return()=>eh.h("tailwind-clean-component",{innerHTML:m})}});exports.Tailwind=Gee;
+diff --git a/dist/index.mjs b/dist/index.mjs
+--- a/dist/index.mjs
++++ b/dist/index.mjs
+@@ -91398,7 +91398,7 @@
+       }
+     });
+     const m = vy(s, {
+-      decodeEntities: !1,
++      decodeEntities: !0,
+       xmlMode: !0
+     });
+     return () => _v("tailwind-clean-component", { innerHTML: m });

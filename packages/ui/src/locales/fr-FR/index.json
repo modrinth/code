@@ -1239,7 +1239,7 @@
     "defaultMessage": "Sauvegarder"
   },
   "external-files.permissions-card.editor.select-license-label": {
-    "defaultMessage": "Sélectionnez une licence..."
+    "defaultMessage": "Rechercher des licences…"
   },
   "external-files.permissions-card.editor.type-label": {
     "defaultMessage": "Motif de l'autorisation"
@@ -1282,6 +1282,9 @@
   },
   "external-files.permissions-card.last-updated": {
     "defaultMessage": "Dernière modification le {date} par {user}"
+  },
+  "external-files.permissions-card.license.all-rights": {
+    "defaultMessage": "Tous droits réservés/Aucune licence"
   },
   "external-files.permissions-card.license.unknown": {
     "defaultMessage": "Inconnu"
@@ -2047,9 +2050,6 @@
   },
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Serveur réinitialisé à l'intégration"
-  },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "Options de prise en charge"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Jusqu'à {cpus} processeurs"
@@ -3341,6 +3341,15 @@
   "profile.error.not-found": {
     "defaultMessage": "Utilisateur introuvable"
   },
+  "profile.force-password-reset.admonition-body": {
+    "defaultMessage": "Le mot de passe de {username} sera immédiatement supprimé, et la session sera fermée sur tous les appareils. Un lien permettant de définir un nouveau mot de passe sera envoyé à l’adresse e-mail ci-dessous. Si vous modifiez l’adresse e-mail, elle remplacera celle associée au compte. Le lien expirera au bout de 24 heures et pourra être utilisé même si le compte est verrouillé."
+  },
+  "profile.force-password-reset.button": {
+    "defaultMessage": "Réinitialiser le mot de passe"
+  },
+  "profile.force-password-reset.email-label": {
+    "defaultMessage": "Adresse email du compte"
+  },
   "profile.label.affiliate": {
     "defaultMessage": "Affilié"
   },
@@ -3379,6 +3388,18 @@
   },
   "profile.official-account.bio": {
     "defaultMessage": "Le compte utilisateur officiel de Modrinth. Obtenez de l’aide via <support-link></support-link> ou par e-mail à <email></email>"
+  },
+  "profile.reset-2fa.admonition-title": {
+    "defaultMessage": "Voulez-vous vraiment réinitialiser l’authentification à deux facteurs ?"
+  },
+  "profile.reset-2fa.button": {
+    "defaultMessage": "Réinitialiser l'A2F"
+  },
+  "profile.reset-2fa.error-title": {
+    "defaultMessage": "Échec de la réinitialisation de l’authentification à deux facteurs"
+  },
+  "profile.reset-2fa.success-title": {
+    "defaultMessage": "Authentification à deux facteurs réinitialisée"
   },
   "profile.unblock-user.error-description": {
     "defaultMessage": "Une erreur s'est produite pendant le déblocage de cet utilisateur. Veuillez réessayer."
@@ -6787,6 +6808,27 @@
   },
   "unknown-file-warning-modal.unrecognized-files": {
     "defaultMessage": "Fichiers non reconnus"
+  },
+  "update-all-modal.new-version": {
+    "defaultMessage": "Nouvelle version"
+  },
+  "update-all-modal.no-changelog": {
+    "defaultMessage": "Aucun journal des modifications n'est fourni pour cette version."
+  },
+  "update-all-modal.project": {
+    "defaultMessage": "Projet"
+  },
+  "update-all-modal.project-list": {
+    "defaultMessage": "MàJ des projets"
+  },
+  "update-all-modal.results": {
+    "defaultMessage": "{count, plural, one {# projet prêt à être mis à jour} other {# projets prêts à être mis à jour}}"
+  },
+  "update-all-modal.update": {
+    "defaultMessage": "Mettre {count, plural, one {# projet} other {# projets}} à jour"
+  },
+  "update-all-modal.view": {
+    "defaultMessage": "Voir"
   },
   "user.profile.badge.alpha.about.1": {
     "defaultMessage": "Cet utilisateur existe depuis Modrinth Alpha, qui s'est terminé en novembre 2020."

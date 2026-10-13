@@ -9,7 +9,9 @@ use clap::Parser;
 use labrinth::background_task::BackgroundTask;
 use labrinth::database::redis;
 use labrinth::env::ENV;
-use labrinth::file_hosting::{FileHost, FileHostKind, S3BucketConfig, S3Host};
+use labrinth::file_hosting::{
+    FileHost, FileHostKind, KafkaFileHost, S3BucketConfig, S3Host,
+};
 use labrinth::queue::email::EmailQueue;
 use labrinth::search;
 use labrinth::util::anrok;
@@ -123,6 +125,11 @@ async fn app() -> std::io::Result<()> {
     // Redis connector
     let redis_pool = redis::from_env("").await;
 
+    let kafka_client = actix_web::web::Data::new(
+        labrinth::util::kafka::KafkaClientState::new()
+            .expect("Kafka connection failed"),
+    );
+
     let storage_backend = ENV.STORAGE_BACKEND;
     let file_host: Arc<dyn FileHost> = match storage_backend {
         FileHostKind::S3 => {
@@ -155,6 +162,8 @@ async fn app() -> std::io::Result<()> {
         }
         FileHostKind::Local => Arc::new(file_hosting::MockHost::new()),
     };
+    let file_host: Arc<dyn FileHost> =
+        Arc::new(KafkaFileHost::new(file_host, kafka_client.clone()));
     let file_host = web::Data::<dyn FileHost>::from(file_host);
 
     info!("Initializing clickhouse connection");
@@ -173,10 +182,6 @@ async fn app() -> std::io::Result<()> {
         .expect("Failed to create Gotenberg client");
     let muralpay = labrinth::queue::payouts::create_muralpay_client()
         .expect("Failed to create MuralPay client");
-    let kafka_client = actix_web::web::Data::new(
-        labrinth::util::kafka::KafkaClientState::new()
-            .expect("Kafka connection failed"),
-    );
 
     if let Some(task) = args.run_background_task {
         info!("Running task {task:?} and exiting");

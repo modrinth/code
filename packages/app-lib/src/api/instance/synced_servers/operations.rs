@@ -914,7 +914,7 @@ pub(super) async fn effective(
     participating(metadata, state).await
 }
 
-async fn participating(
+pub(super) async fn participating(
     metadata: &InstanceMetadata,
     state: &State,
 ) -> crate::Result<bool> {

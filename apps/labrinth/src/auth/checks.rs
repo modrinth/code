@@ -213,24 +213,28 @@ pub async fn is_team_member_version(
 pub async fn filter_visible_versions(
     mut versions: Vec<VersionQueryResult>,
     user_option: &Option<User>,
-    pool: &PgPool,
     ro_pool: &ReadOnlyPgPool,
     redis: &RedisPool,
 ) -> Result<Vec<crate::models::projects::Version>, ApiError> {
     let filtered_version_ids = filter_visible_version_ids(
         versions.iter().map(|x| &x.inner).collect_vec(),
         user_option,
-        pool,
+        ro_pool,
         redis,
     )
     .await
     .wrap_api_err("filtering visible version ids")?;
     versions.retain(|x| filtered_version_ids.contains(&x.inner.id));
 
-    let version_ids: Vec<_> = versions.iter().map(|v| v.inner.id).collect();
-    let missing = get_files_missing_attribution(&**ro_pool, &version_ids)
-        .await
-        .unwrap_or_default();
+    let missing = get_files_missing_attribution(
+        &**ro_pool,
+        &versions
+            .iter()
+            .map(|v| (v.inner.id, v.inner.project_id))
+            .collect_vec(),
+    )
+    .await
+    .unwrap_or_default();
 
     Ok(versions
         .into_iter()
@@ -315,10 +319,12 @@ pub async fn filter_visible_version_ids(
             .await
             .wrap_api_err("filtering enlisted version ids")?;
 
-    let version_ids: Vec<_> = versions.iter().map(|v| v.id).collect();
-    let withheld_versions = get_files_missing_attribution(pool, &version_ids)
-        .await
-        .unwrap_or_default();
+    let withheld_versions = get_files_missing_attribution(
+        pool,
+        &versions.iter().map(|v| (v.id, v.project_id)).collect_vec(),
+    )
+    .await
+    .unwrap_or_default();
 
     // Return versions that are not hidden, we are a mod of, or we are enlisted on the team of
     for version in versions {

@@ -1,4 +1,10 @@
-import { defineMessages, injectNotificationManager, useFormatBytes, useVIntl } from '@modrinth/ui'
+import {
+	commonMessages,
+	defineMessages,
+	injectNotificationManager,
+	useFormatBytes,
+	useVIntl,
+} from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { computed, onMounted, onScopeDispose, ref, watch } from 'vue'
 
@@ -18,6 +24,7 @@ import {
 import { get_many as getInstances } from '@/helpers/instance'
 import { injectAppEvents } from '@/providers/app-events'
 
+import { debugInfoExports, type DebugInfoExportTask } from './debug-info-export'
 import { createDownloadTransferTracker } from './download-transfer'
 import { createInstallJobProgressTracker } from './install-job-progress'
 import { storeVerificationTask } from './store-verification'
@@ -25,6 +32,8 @@ import { useInstallJobDisplay } from './use-install-job-display'
 
 export interface DownloadManagerJob {
 	id: string
+	kind?: 'debug-export'
+	createdAt?: string
 	instanceId: string | null
 	status: InstallJobSnapshot['status']
 	paused: boolean
@@ -58,6 +67,18 @@ const verificationMessages = defineMessages({
 		id: 'app.settings.resource-management.store.attention',
 		defaultMessage: 'Some files still need attention',
 	},
+})
+
+const debugExportMessages = defineMessages({
+	canceled: { id: 'app.action-bar.install.summary.canceled', defaultMessage: 'Canceled' },
+	title: {
+		id: 'app.settings.resource-management.debug-info.export',
+		defaultMessage: 'Export debug info',
+	},
+	preparing: { id: 'app.debug-export.preparing', defaultMessage: 'Preparing files…' },
+	exporting: { id: 'app.debug-export.exporting', defaultMessage: 'Exporting…' },
+	finishing: { id: 'app.debug-export.finishing', defaultMessage: 'Finishing…' },
+	canceling: { id: 'app.debug-export.canceling', defaultMessage: 'Canceling export…' },
 })
 
 function getIconUrl(icon: string | null | undefined): string | null {
@@ -104,6 +125,7 @@ export function useDownloadManager() {
 			const progress = display.getEffectiveProgress(job)
 			return {
 				id: job.job_id,
+				createdAt: job.created,
 				instanceId: instance && instanceId ? instanceId : null,
 				status: job.status,
 				paused: job.paused,
@@ -145,7 +167,14 @@ export function useDownloadManager() {
 		const task = storeVerificationTask.value
 		return task ? [buildVerificationRow(task)] : []
 	})
-	const allRows = computed(() => [...rows.value, ...verificationRows.value])
+	const debugExportRows = computed(() =>
+		[...debugInfoExports.value.values()].map(buildDebugExportRow),
+	)
+	const allRows = computed(() => [
+		...rows.value,
+		...verificationRows.value,
+		...debugExportRows.value,
+	])
 
 	const activeJobs = computed(() =>
 		allRows.value
@@ -153,7 +182,7 @@ export function useDownloadManager() {
 			.sort(
 				(a, b) =>
 					Number(a.status === 'queued') - Number(b.status === 'queued') ||
-					(jobs.value.get(a.id)?.created ?? '').localeCompare(jobs.value.get(b.id)?.created ?? ''),
+					(a.createdAt ?? '').localeCompare(b.createdAt ?? ''),
 			),
 	)
 	const attentionJobs = computed(() =>
@@ -174,6 +203,48 @@ export function useDownloadManager() {
 			),
 		),
 	)
+
+	function buildDebugExportRow(task: DebugInfoExportTask): DownloadManagerJob {
+		const progress = task.totalBytes ? Math.min(0.99, task.processedBytes / task.totalBytes) : 0
+		return {
+			id: task.id,
+			kind: 'debug-export',
+			createdAt: task.createdAt,
+			instanceId: null,
+			status: task.status,
+			paused: false,
+			canceling: task.canceling,
+			canPause: false,
+			canCancel: task.status === 'running' && task.started && task.stage !== 'finishing',
+			title: formatMessage(debugExportMessages.title),
+			iconUrl: null,
+			taskType: task.filename,
+			text:
+				task.error ??
+				formatMessage(
+					task.status === 'succeeded'
+						? commonMessages.savedLabel
+						: task.status === 'canceled'
+							? debugExportMessages.canceled
+							: task.canceling
+								? debugExportMessages.canceling
+								: debugExportMessages[task.stage],
+				),
+			finishedAt: task.finishedAt,
+			progress,
+			overallProgress: task.status === 'succeeded' ? 1 : progress,
+			progressLabel:
+				task.status === 'running' && task.totalBytes !== null
+					? `${formatBytes(task.processedBytes)} / ${formatBytes(task.totalBytes)}`
+					: '',
+			waiting: task.stage !== 'exporting' || !task.totalBytes,
+			eta: '',
+			canRetry: false,
+			canCopyDetails: !!task.error,
+			copied: copiedJobs.value.has(task.id),
+			busy: busyJobs.value.has(task.id),
+		}
+	}
 
 	function buildVerificationRow(
 		task: NonNullable<typeof storeVerificationTask.value>,
@@ -214,10 +285,7 @@ export function useDownloadManager() {
 	}
 
 	function newestFirst(a: DownloadManagerJob, b: DownloadManagerJob) {
-		const first = jobs.value.get(a.id)!
-		const second = jobs.value.get(b.id)!
-		if (!first || !second) return Number(!second) - Number(!first)
-		return (second.finished ?? second.modified).localeCompare(first.finished ?? first.modified)
+		return (b.finishedAt ?? '').localeCompare(a.finishedAt ?? '')
 	}
 
 	function reportError(error: unknown) {
@@ -314,6 +382,11 @@ export function useDownloadManager() {
 	}
 
 	async function cancel(id: string) {
+		const debugExport = debugInfoExports.value.get(id)
+		if (debugExport) {
+			await runAction(id, debugExport.cancel)
+			return
+		}
 		if (!jobs.value.get(id)?.can_cancel) return
 		await runJobAction(id, () => install_job_cancel(id))
 	}
@@ -325,6 +398,11 @@ export function useDownloadManager() {
 	}
 
 	async function dismiss(id: string) {
+		const debugExport = debugInfoExports.value.get(id)
+		if (debugExport) {
+			if (debugExport.status !== 'running') debugInfoExports.value.delete(id)
+			return
+		}
 		if (storeVerificationTask.value?.id === id) {
 			if (storeVerificationTask.value.status !== 'running') storeVerificationTask.value = null
 			return
@@ -346,7 +424,10 @@ export function useDownloadManager() {
 
 	async function copyDetails(id: string) {
 		await runAction(id, async () => {
-			const details = await install_job_support_details(id)
+			const debugExport = debugInfoExports.value.get(id)
+			const details = debugExport
+				? (debugExport.error ?? '')
+				: await install_job_support_details(id)
 			if (disposed) return
 			await navigator.clipboard.writeText(details)
 			if (disposed) return

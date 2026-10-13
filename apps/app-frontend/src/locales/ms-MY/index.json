@@ -8,6 +8,9 @@
   "app.action-bar.downloads": {
     "message": "Muat Turun"
   },
+  "app.action-bar.hide-downloads": {
+    "message": "Sembunyikan muat turun yang aktif"
+  },
   "app.action-bar.hide-more-running-instances": {
     "message": "Sembunyikan lebih banyak pemasangan yang berjalan"
   },
@@ -20,8 +23,65 @@
   "app.action-bar.install.dismiss": {
     "message": "Ketepikan"
   },
+  "app.action-bar.install.open-instance": {
+    "message": "Buka pemasangan"
+  },
   "app.action-bar.install.retry": {
     "message": "Cuba semula"
+  },
+  "app.action-bar.install.summary.app-closing": {
+    "message": "Dibatalkan kerana aplikasi ditutup"
+  },
+  "app.action-bar.install.summary.bad-modpack-file": {
+    "message": "Tidak dapat membaca pek mod"
+  },
+  "app.action-bar.install.summary.canceled": {
+    "message": "Dibatalkan"
+  },
+  "app.action-bar.install.summary.cleanup-incomplete": {
+    "message": "Pembersihan tidak selesai"
+  },
+  "app.action-bar.install.summary.content-download-failed": {
+    "message": "Tidak dapat memuat turun fail"
+  },
+  "app.action-bar.install.summary.corrupt-download": {
+    "message": "Fail yang dimuat turun rosak"
+  },
+  "app.action-bar.install.summary.could-not-save-files": {
+    "message": "Tidak dapat menyimpan fail"
+  },
+  "app.action-bar.install.summary.download-failed": {
+    "message": "Muat turun tidak dapat diselesaikan"
+  },
+  "app.action-bar.install.summary.instance-error": {
+    "message": "Tidak dapat menyediakan pemasangan"
+  },
+  "app.action-bar.install.summary.invalid-file-path": {
+    "message": "Laluan fail tidak sah"
+  },
+  "app.action-bar.install.summary.invalid-modpack": {
+    "message": "Data pek mod tidak sah"
+  },
+  "app.action-bar.install.summary.invalid-modpack-files": {
+    "message": "Fail pek mod mempunyai metadata tidak sah"
+  },
+  "app.action-bar.install.summary.local-data-error": {
+    "message": "Tidak dapat mengemas kini data tempatan"
+  },
+  "app.action-bar.install.summary.modrinth-unreachable": {
+    "message": "Tidak dapat mencapai Modrinth"
+  },
+  "app.action-bar.install.summary.no-write-permission": {
+    "message": "Tiada keizinan untuk menulis"
+  },
+  "app.action-bar.install.summary.pack-download-failed": {
+    "message": "Tidak dapat memuat turun pek"
+  },
+  "app.action-bar.install.summary.unexpected-error": {
+    "message": "Sesuatu masalah telah berlaku"
+  },
+  "app.action-bar.install.unknown-instance": {
+    "message": "Pemasangan tidak diketahui"
   },
   "app.action-bar.make-primary-instance": {
     "message": "Jadikan pemasangan utama"
@@ -34,6 +94,9 @@
   },
   "app.action-bar.primary-instance": {
     "message": "Pemasangan utama"
+  },
+  "app.action-bar.reload-to-update": {
+    "message": "Muat semula untuk kemas kini"
   },
   "app.action-bar.show-more-running-instances": {
     "message": "Tunjukkan lebih banyak pemasangan yang berjalan"
@@ -1409,6 +1472,12 @@
   "app.settings.operating-system.macos": {
     "message": "macOS"
   },
+  "app.settings.resource-management.store.cache-limit.unit": {
+    "message": "GiB"
+  },
+  "app.settings.synced-options.choose-sync-source.sync": {
+    "message": "Segerakkan"
+  },
   "app.settings.synced-options.game-settings.retry": {
     "message": "Cuba semula"
   },
@@ -1528,6 +1597,9 @@
   },
   "app.sync-instances-update.skip": {
     "message": "Langkau"
+  },
+  "app.synced-content.delete.resource-pack-description": {
+    "message": "Anda boleh menghapuskannya daripada pemasangan ini sahaja atau daripada semua pemasangan yang disegerakkan. Menghapuskannya hanya daripada pemasangan ini akan mendayakan penggantian, dan pemasangan ini tidak akan lagi menerima perubahan pek sumber yang disegerakkan."
   },
   "app.synced-content.desync.keep": {
     "message": "Kekalkan"

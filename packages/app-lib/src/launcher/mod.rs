@@ -572,7 +572,7 @@ async fn install_minecraft_inner(
             )
             .await?;
     }
-	Box::pin(download::download_minecraft(
+	download::download_minecraft(
 		&state,
 		&version_info,
 		loading_bar.as_ref(),
@@ -581,7 +581,7 @@ async fn install_minecraft_inner(
 		minecraft_updated,
 		reporter.clone(),
 		phase_details.clone(),
-	))
+	)
 	.await?;
 
     let client_path = state
@@ -1040,7 +1040,15 @@ pub async fn launch_minecraft(
     )? {
         tracing::info!(instance_id = %instance.id, path = %path.display(), "Restoring missing Minecraft runtime files before launch");
         drop(runtime_lease);
-        install_minecraft_with_reporter(context, false, None).await?;
+        let job = crate::install::install_existing_instance(
+            instance.id.clone(),
+            false,
+        )
+        .await?;
+        let job_id = uuid::Uuid::parse_str(&job.job_id).map_err(|error| {
+            crate::ErrorKind::LauncherError(error.to_string())
+        })?;
+        crate::install::runner::wait_for_job(job_id).await?;
         runtime_lease = state.content_store.runtime_cache_lock.read().await;
     }
     let _runtime_lease = runtime_lease;
@@ -1196,6 +1204,24 @@ pub async fn launch_minecraft(
         .await?;
     let _instance_content_lock =
         state.lock_instance_content(&instance.id).await;
+    let current =
+		crate::state::instances::adapters::sqlite::instance_rows::get_instance_by_id(
+			&instance.id, &state.pool,
+		)
+		.await?
+		.ok_or_else(|| crate::state::content_store::input("Unknown instance"))?;
+    if current.install_stage != InstanceInstallStage::Installed {
+        return Err(crate::ErrorKind::LauncherError(
+			"Instance is not ready to launch; finish or recover its installation first".to_string(),
+		)
+		.into());
+    }
+    crate::install::store::ensure_no_pending_recovery(
+        &instance.id,
+        None,
+        &state,
+    )
+    .await?;
     let _store_lock = state.content_store.files_lock.lock().await;
     let _store_lease = state.content_store.lease().await;
     state.content_store.recover(Some(&instance.id)).await?;

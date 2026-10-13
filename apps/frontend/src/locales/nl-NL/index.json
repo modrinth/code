@@ -890,17 +890,11 @@
   "auth.sign-in.last-sign-in": {
     "message": "Laatst gebruikt"
   },
-  "auth.sign-in.launcher.complete.description": {
-    "message": "We sturen je terug naar de Modrinth-app. Als er niets gebeurt, klik dan op de onderstaande knop."
-  },
   "auth.sign-in.launcher.complete.go-to-website": {
     "message": "Ga naar Modrinth.com"
   },
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Modrinth-app openen"
-  },
-  "auth.sign-in.launcher.complete.title": {
-    "message": "Je bent aangemeld"
   },
   "auth.sign-in.launcher.opening.description": {
     "message": "Als de app niet wordt geopend, gebruik dan de knop hieronder om je aan te melden."
@@ -2248,9 +2242,6 @@
   },
   "error.generic.default.list_item.1": {
     "message": "Controleer of Modrinth een storing heeft op onze <status-link>Status pagina</status-link>."
-  },
-  "error.generic.default.list_item.2": {
-    "message": "Als dit blijft gebeuren, kun je dit het beste aan het Modrinth-team laten weten door lid te worden van onze <discord-link>Discord-server</discord-link>."
   },
   "error.generic.default.list_title": {
     "message": "Probeer alstublieft opnieuw in een paar minuten."

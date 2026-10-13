@@ -582,7 +582,7 @@
     "message": "Windows"
   },
   "app-marketing.features.importing.description": {
-    "message": "Importiere all deine existierenden Instanzen von einem zuvor benutzten Launcher und starte in Sekunden!"
+    "message": "Importiere alle deine bestehenden Spielinstanzen aus dem Launcher, den du zuvor verwendet hast, und leg in Sekundenschnelle mit der Modrinth App los!"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -881,6 +881,9 @@
   "auth.sign-in.choose-account": {
     "message": "Wähle ein Konto für die Modrinth App"
   },
+  "auth.sign-in.choose-existing-account": {
+    "message": "Ein bestehendes Konto verwenden"
+  },
   "auth.sign-in.continue-with-email": {
     "message": "Weiter mit E-Mail"
   },
@@ -894,13 +897,10 @@
     "message": "Passwort vergessen"
   },
   "auth.sign-in.last-sign-in": {
-    "message": "Zuletzt benutzt"
+    "message": "Zuletzt verwendet"
   },
   "auth.sign-in.launcher.callback.title": {
     "message": "Callback für die Anmeldung bei der Modrinth App"
-  },
-  "auth.sign-in.launcher.complete.description": {
-    "message": "Wir leiten dich zurück zur Modrinth-App. Sollte nichts passieren, klicke bitte auf die Schaltfläche unten."
   },
   "auth.sign-in.launcher.complete.go-to-website": {
     "message": "Gehe zu Modrinth.com"
@@ -908,8 +908,8 @@
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Modrinth App öffnen"
   },
-  "auth.sign-in.launcher.complete.title": {
-    "message": "Du bist angemeldet"
+  "auth.sign-in.launcher.handoff-failed": {
+    "message": "Die Anmeldung bei der Modrinth-App konnte nicht abgeschlossen werden. Bitte versuche es erneut."
   },
   "auth.sign-in.launcher.opening.description": {
     "message": "Falls sich die App nicht öffnet, klicke auf den Button unten, um die Anmeldung abzuschließen."
@@ -917,8 +917,14 @@
   "auth.sign-in.launcher.opening.title": {
     "message": "Modrinth App wird geöffnet..."
   },
+  "auth.sign-in.launcher.reauthenticate.title": {
+    "message": "Bei der Modrinth App anmelden"
+  },
   "auth.sign-in.no-account": {
     "message": "Du hast kein Konto?"
+  },
+  "auth.sign-in.reauthenticate.use-different-account": {
+    "message": "Verwende ein anderes Konto"
   },
   "auth.sign-in.sign-in-with": {
     "message": "Bei Modrinth anmelden"
@@ -2261,8 +2267,8 @@
   "error.generic.default.list_item.1": {
     "message": "Überprüfe auf unserer <status-link>Status Seite</status-link> ob Modrinth unerreichbar ist."
   },
-  "error.generic.default.list_item.2": {
-    "message": "Sollte dies weiterhin passieren, solltest du das Modrinth-Team darüber informieren, indem du unserem <discord-link>Discord Server</discord-link> beitittst."
+  "error.generic.default.list_item.support": {
+    "message": "Falls dies weiterhin auftritt, kannst du das Modrinth-Team über unser <support-link>Support-Portal</support-link> informieren."
   },
   "error.generic.default.list_title": {
     "message": "Bitte versuch es in ein paar Minuten erneut."
@@ -2986,6 +2992,9 @@
   },
   "layout.publish.email-verification-required.title": {
     "message": "E-Mail-Bestätigung erforderlich"
+  },
+  "messages.noResults": {
+    "message": "Keine Ergebnisse für deine Suche gefunden!"
   },
   "modal.shared-instance.open-in-app.benefit.install": {
     "message": "Installiere automatisch alles, was gerade gespielt wird"
@@ -4136,20 +4145,20 @@
   "project.settings.license.custom": {
     "message": "Benutzerdefiniert"
   },
-  "project.settings.license.custom-url-description": {
-    "message": "Die Webadresse des vollständigen Lizenztextes. Du musst einen Link angeben, da es sich um eine benutzerdefinierte Lizenz handelt."
+  "project.settings.license.custom-name-required": {
+    "message": "Gib einen Namen für deine benutzerdefinierte Lizenz ein."
   },
-  "project.settings.license.has-spdx": {
-    "message": "SPDX-Kennung verwenden"
+  "project.settings.license.custom-url-description": {
+    "message": "Die Web-Adresse des vollständigen Lizenztextes."
+  },
+  "project.settings.license.intro": {
+    "message": "Es ist wichtig, eine geeignete Lizenz für dein {type} auszuwählen. Du kannst eine Lizenz aus unserer Liste auswählen oder eine benutzerdefinierte Lizenz angeben. Du kannst auch eine benutzerdefinierte URL zu deiner ausgewählten Lizenz angeben; andernfalls wird der Lizenztext angezeigt. Weitere Informationen findest du in unserem <guide>Leitfaden zur Lizenzierung</guide>."
   },
   "project.settings.license.later": {
     "message": "Später Ausgaben"
   },
   "project.settings.license.later-description": {
     "message": "Die von dir ausgewählte Lizenz enthält eine „oder höher“-Klausel. Wenn du dieses Kästchen auswählst, dürfen Benutzer dein Projekt unter späteren Versionen der Lizenz nutzen."
-  },
-  "project.settings.license.missing-name": {
-    "message": "Gib einen Namen oder eine SPDX-Kennung für deine benutzerdefinierte Lizenz ein."
   },
   "project.settings.license.missing-url": {
     "message": "Gib eine URL zum vollen Text deiner benutzerdefinierten Lizenz ein."
@@ -4158,31 +4167,19 @@
     "message": "Lizenzname"
   },
   "project.settings.license.name-description": {
-    "message": "Der vollständige Name der Lizenz. Falls die Lizenz über eine SPDX-Kennung verfügt, wähle bitte das Kästchen aus und verwende stattdessen die Kennung."
+    "message": "Der vollständige Name der benutzerdefinierten Lizenz."
   },
   "project.settings.license.name-placeholder": {
     "message": "Lizenzname"
   },
-  "project.settings.license.optional-url": {
-    "message": "Lizenz-URL (optional)"
+  "project.settings.license.optional-label": {
+    "message": "Optional"
   },
   "project.settings.license.select": {
-    "message": "Eine Lizenz auswählen"
-  },
-  "project.settings.license.select-description": {
-    "message": "Wie Benutzer dein Projekt nutzen dürfen und wie nicht."
+    "message": "Lizenz"
   },
   "project.settings.license.select-placeholder": {
-    "message": "Lizenz auswählen..."
-  },
-  "project.settings.license.spdx": {
-    "message": "SPDX-Kennung"
-  },
-  "project.settings.license.spdx-description": {
-    "message": "Falls deine Lizenz keine offizielle <spdx>SPDX-Lizenzkennung</spdx> besitzt, deaktiviere das Kästchen und gib stattdessen den Namen der Lizenz ein."
-  },
-  "project.settings.license.spdx-placeholder": {
-    "message": "SPDX-Kennung"
+    "message": "Lizenzen suchen..."
   },
   "project.settings.license.title": {
     "message": "Lizenz"
@@ -4198,6 +4195,9 @@
   },
   "project.settings.license.url-description": {
     "message": "Die Webadresse des vollständigen Lizenztextes. Falls du keinen Link angibst, wird stattdessen der Lizenztext angezeigt."
+  },
+  "project.settings.license.url-placeholder": {
+    "message": "Lizenz-URL"
   },
   "project.settings.links.add-link": {
     "message": "Link hinzufügen"
@@ -4226,8 +4226,29 @@
   "project.settings.links.donations": {
     "message": "Spenden-Links"
   },
+  "project.settings.links.donations-description": {
+    "message": "Füge Spendenlinks hinzu, über die Benutzer dich direkt unterstützen können."
+  },
+  "project.settings.links.issues": {
+    "message": "Issue-Tracker"
+  },
+  "project.settings.links.issues-description": {
+    "message": "Ein Ort, an dem Benutzer Fehler, Probleme und Anliegen zu deinem Projekt melden können."
+  },
+  "project.settings.links.link-type": {
+    "message": "Linktyp"
+  },
+  "project.settings.links.remove-donation-link": {
+    "message": "Spendenlink entfernen"
+  },
   "project.settings.links.server-discord": {
     "message": "Discord"
+  },
+  "project.settings.links.server-updated": {
+    "message": "Deine Serverlinks wurden aktualisiert."
+  },
+  "project.settings.links.server-wiki-description": {
+    "message": "Eine Seite mit Informationen, Dokumentation und Hilfe zum Server."
   },
   "project.settings.links.site": {
     "message": "Webseite"

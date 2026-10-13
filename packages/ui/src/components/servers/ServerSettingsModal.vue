@@ -13,6 +13,7 @@ import {
 	ServerSettingsInstallationPage,
 	ServerSettingsNetworkPage,
 	ServerSettingsPropertiesPage,
+	ServerSettingsSupportPage,
 	serverSettingsTabDefinitions,
 	type ServerSettingsTabId,
 } from '#ui/layouts/shared/server-settings'
@@ -77,6 +78,7 @@ const serverSettingsTabComponentMap = {
 	network: ServerSettingsNetworkPage,
 	properties: ServerSettingsPropertiesPage,
 	advanced: ServerSettingsAdvancedPage,
+	support: ServerSettingsSupportPage,
 } as const
 
 const saveBannerTarget = ref<HTMLElement | null>(null)
@@ -159,20 +161,6 @@ async function show({ serverId, tabIndex, tabId }: ShowOptions) {
 		])
 
 		modal.value?.show()
-		const visibleTabs = tabs.value.filter((tab) => tab.shown !== false)
-		let requestedTab = tabIndex ?? 0
-		if (tabId) {
-			const defIndex = serverSettingsTabDefinitions.findIndex((d) => d.id === tabId)
-			if (defIndex >= 0) {
-				const visibleIndex = visibleTabs.findIndex(
-					(_, i) => tabs.value.indexOf(visibleTabs[i]) === defIndex,
-				)
-				if (visibleIndex >= 0) requestedTab = visibleIndex
-			}
-		}
-		const clampedTab = Math.min(Math.max(requestedTab, 0), Math.max(visibleTabs.length - 1, 0))
-		nextTick(() => modal.value?.setTab(clampedTab))
-
 		const fetchPromises: Promise<unknown>[] = [fetchViewer()]
 
 		if (!cachedServer) {
@@ -194,6 +182,20 @@ async function show({ serverId, tabIndex, tabId }: ShowOptions) {
 		}
 
 		await Promise.all(fetchPromises)
+
+		const visibleTabs = tabs.value.filter((tab) => tab.shown !== false)
+		let requestedTab = tabIndex ?? 0
+		if (tabId) {
+			const defIndex = serverSettingsTabDefinitions.findIndex((d) => d.id === tabId)
+			if (defIndex >= 0) {
+				const visibleIndex = visibleTabs.findIndex(
+					(_, i) => tabs.value.indexOf(visibleTabs[i]) === defIndex,
+				)
+				if (visibleIndex >= 0) requestedTab = visibleIndex
+			}
+		}
+		const clampedTab = Math.min(Math.max(requestedTab, 0), Math.max(visibleTabs.length - 1, 0))
+		nextTick(() => modal.value?.setTab(clampedTab))
 
 		if (worldId.value) {
 			queryClient.prefetchQuery({

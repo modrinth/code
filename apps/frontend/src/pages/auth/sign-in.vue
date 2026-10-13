@@ -1,16 +1,19 @@
 <template>
 	<SignInView
-		v-if="signInReady || subtleLauncherRedirectUri"
+		v-if="signInReady || launcherHandoff"
 		v-model:email="email"
 		v-model:password="password"
 		v-model:token="token"
 		v-model:two-factor-code="twoFactorCode"
-		:subtle-launcher-redirect-uri="subtleLauncherRedirectUri"
+		:subtle-launcher-redirect-uri="launcherHandoff?.localhostUrl ?? undefined"
+		:launcher-deeplink="launcherHandoff?.deeplinkUrl ?? undefined"
+		:reauth-account="reauthAccountPreview"
+		:on-cancel-reauthenticate="cancelReauth"
 		:flow="flow"
 		:redirect-target="redirectTarget"
 		:route-query="route.query"
 		:globals="globals"
-		:accounts="launcherAccountChoices"
+		:accounts="accountsForView"
 		:on-password-sign-in="beginPasswordSignIn"
 		:on-two-factor-sign-in="begin2FASignIn"
 		:two-factor-pending="twoFactorPending"
@@ -31,7 +34,6 @@ import {
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useStorage } from '@vueuse/core'
-import type { LocationQueryValue } from 'vue-router'
 
 import SignInView from '@/components/ui/auth/SignIn.vue'
 import {
@@ -42,13 +44,20 @@ import {
 	rememberStoredAccount,
 	type StoredAccount,
 	type StoredAccountAuthMethod,
+	updateStoredAccountAuthMethod,
 	useStoredAccounts,
 } from '@/composables/accounts.ts'
+import { ADD_ACCOUNT_QUERY_PARAM, promotePendingSignInOAuthProvider } from '@/composables/auth.ts'
 import {
-	ADD_ACCOUNT_QUERY_PARAM,
-	getLauncherRedirectUrl,
-	promotePendingSignInOAuthProvider,
-} from '@/composables/auth.ts'
+	createLauncherHandoff,
+	getQueryString,
+	hideLauncherSessionCode,
+	isLauncherProtocolV2,
+	LAUNCHER_APP_CODE_QUERY_PARAM,
+	LAUNCHER_REAUTH_ACCOUNT_STORAGE_KEY,
+	launcherAuthMessages,
+	type LauncherHandoff,
+} from '@/composables/launcher-auth.ts'
 import { getPasskeyCredential } from '@/helpers/passkey.ts'
 
 type AuthProvider = 'discord' | 'google' | 'github' | 'gitlab' | 'steam' | 'microsoft' | 'passkey'
@@ -62,13 +71,6 @@ interface ApiErrorShape {
 	data?: {
 		description?: string
 	}
-}
-
-const getQueryString = (
-	value: LocationQueryValue | LocationQueryValue[] | null | undefined,
-): string => {
-	const firstValue = Array.isArray(value) ? value[0] : value
-	return typeof firstValue === 'string' ? firstValue : ''
 }
 
 const getErrorMessage = (error: unknown): string => {
@@ -127,10 +129,13 @@ if (route.query.state !== undefined) {
 	)
 }
 
-const redirectTarget = getQueryString(route.query.redirect)
-const subtleLauncherRedirectUri = ref<string>()
+const redirectTarget = getQueryString(route.query.redirect) ?? ''
+type LauncherCallback = Extract<LauncherHandoff, { type: 'callback' }>
+const launcherHandoff = ref<LauncherCallback | null>(null)
+const reauthAccount = ref<StoredAccount | null>(null)
+const isProtocolV2 = isLauncherProtocolV2(route)
 
-if (route.query.code) {
+if (route.query.code && !isProtocolV2) {
 	await finishSignIn()
 }
 
@@ -138,6 +143,44 @@ const isAddingAccount = route.query[ADD_ACCOUNT_QUERY_PARAM] !== undefined
 const isLauncherSignIn = route.query.launcher !== undefined
 const storedAccounts = useStoredAccounts()
 const signInReady = ref(!isLauncherSignIn)
+
+function isLauncherSignInMethod(value: unknown): value is StoredAccountAuthMethod {
+	return isStoredAccountAuthMethod(value) && value !== 'paypal'
+}
+
+function readLastSignInMethod(): StoredAccountAuthMethod | undefined {
+	return isLauncherSignInMethod(lastSignInOAuthProvider.value)
+		? lastSignInOAuthProvider.value
+		: undefined
+}
+
+function inferLauncherAuthMethod(
+	account: StoredAccount,
+	accountCount: number,
+): StoredAccountAuthMethod | undefined {
+	if (isLauncherSignInMethod(account.authMethod)) {
+		return account.authMethod
+	}
+
+	const user = auth.value.user
+	const isCurrentUser = user?.id === account.id
+	const lastMethod = readLastSignInMethod()
+	if ((isCurrentUser || accountCount === 1) && lastMethod) {
+		return lastMethod
+	}
+	if (!isCurrentUser || !user) {
+		return undefined
+	}
+
+	const linked = (user.auth_providers ?? []).filter(isLauncherSignInMethod)
+	if (linked.length === 1) {
+		return linked[0]
+	}
+	if (linked.length === 0 && user.has_password) {
+		return 'password'
+	}
+	return undefined
+}
 
 const choosableAccounts = computed((): StoredAccount[] => {
 	const user = auth.value.user
@@ -166,15 +209,42 @@ const choosableAccounts = computed((): StoredAccount[] => {
 		})
 	}
 
-	return accounts
+	return accounts.map((account) => ({
+		...account,
+		authMethod: inferLauncherAuthMethod(account, accounts.length),
+	}))
 })
 
 const launcherAccountChoices = computed(() => {
 	if (!isLauncherSignIn) return []
 
-	const minimumAccounts = isAddingAccount ? 1 : 2
+	const minimumAccounts = isProtocolV2 || isAddingAccount ? 1 : 2
 	return choosableAccounts.value.length >= minimumAccounts ? choosableAccounts.value : []
 })
+
+const accountsForView = computed(() => (reauthAccount.value ? [] : launcherAccountChoices.value))
+
+const reauthAccountPreview = computed(() => {
+	const account = reauthAccount.value
+	if (!account) {
+		return null
+	}
+	return {
+		id: account.id,
+		username: account.username,
+		avatarUrl: account.avatarUrl,
+		authMethod: account.authMethod ?? null,
+	}
+})
+
+function sessionTokensFromRoute() {
+	const session = getQueryString(route.query.code) ?? ''
+	const appSession = getQueryString(route.query[LAUNCHER_APP_CODE_QUERY_PARAM]) ?? ''
+	return {
+		session: session.startsWith('mra_') ? session : null,
+		appSession: appSession.startsWith('mra_') ? appSession : null,
+	}
+}
 
 onMounted(async () => {
 	if (!isLauncherSignIn) {
@@ -183,19 +253,27 @@ onMounted(async () => {
 
 	hydrateStoredAccounts()
 
-	if (subtleLauncherRedirectUri.value) {
+	if (isProtocolV2) {
+		const { session, appSession } = sessionTokensFromRoute()
+		if (session) {
+			await completeProtocolV2SignIn(session, appSession, readPendingLauncherAuthMethod())
+		}
+	}
+
+	if (launcherHandoff.value) {
 		signInReady.value = true
 		return
 	}
 
 	if (
+		!isProtocolV2 &&
 		auth.value.user &&
 		!isAddingAccount &&
 		choosableAccounts.value.length === 1 &&
 		route.query.code === undefined
 	) {
 		await showLauncherOpeningPage(auth.value.token)
-		if (subtleLauncherRedirectUri.value) {
+		if (launcherHandoff.value) {
 			signInReady.value = true
 		}
 		return
@@ -204,30 +282,86 @@ onMounted(async () => {
 	signInReady.value = true
 })
 
-function getLauncherCallbackUrl(sessionToken: string) {
-	return `${getLauncherRedirectUrl(route)}/?code=${sessionToken}`
-}
-
 async function showLauncherOpeningPage(sessionToken: string) {
-	promotePendingSignInOAuthProvider()
+	try {
+		const handoff = await createLauncherHandoff(route, sessionToken)
+		if (handoff.type === 'external') {
+			promotePendingSignInOAuthProvider()
+			await navigateTo(handoff.url, {
+				external: true,
+			})
+			return
+		}
 
-	const redirectUrl = getLauncherCallbackUrl(sessionToken)
-
-	if (redirectUrl.startsWith('https://launcher-files.modrinth.com/')) {
-		await navigateTo(redirectUrl, {
-			external: true,
+		promotePendingSignInOAuthProvider()
+		launcherHandoff.value = handoff
+		if (isProtocolV2) {
+			hideLauncherSessionCode()
+		}
+	} catch (err) {
+		console.error(err)
+		addNotification({
+			title: formatMessage(commonMessages.errorNotificationTitle),
+			text: formatMessage(launcherAuthMessages.handoffFailed),
+			type: 'error',
 		})
-		return
 	}
-
-	subtleLauncherRedirectUri.value = redirectUrl
 }
 
 function onSelectLauncherAccount(account: { id: string }) {
 	const stored = choosableAccounts.value.find((choice) => choice.id === account.id)
-	if (stored) {
-		void showLauncherOpeningPage(stored.token)
+	if (!stored) {
+		return
 	}
+
+	if (!isProtocolV2) {
+		void showLauncherOpeningPage(stored.token)
+		return
+	}
+
+	reauthAccount.value = stored
+	email.value = stored.username
+	password.value = ''
+	if (import.meta.client) {
+		window.sessionStorage.setItem(LAUNCHER_REAUTH_ACCOUNT_STORAGE_KEY, stored.id)
+	}
+
+	const original = storedAccounts.value.find((choice) => choice.id === stored.id)
+	if (stored.authMethod && stored.authMethod !== original?.authMethod) {
+		updateStoredAccountAuthMethod(stored, stored.authMethod)
+	}
+}
+
+function cancelReauth() {
+	reauthAccount.value = null
+	email.value = ''
+	password.value = ''
+	if (import.meta.client) {
+		window.sessionStorage.removeItem(LAUNCHER_REAUTH_ACCOUNT_STORAGE_KEY)
+	}
+}
+
+function readPendingLauncherAuthMethod(): StoredAccountAuthMethod | undefined {
+	return isStoredAccountAuthMethod(pendingSignInOAuthProvider.value)
+		? pendingSignInOAuthProvider.value
+		: undefined
+}
+
+function rememberLauncherAuthMethod(authMethod?: StoredAccountAuthMethod) {
+	if (!authMethod || !import.meta.client) {
+		return
+	}
+
+	const accountId = window.sessionStorage.getItem(LAUNCHER_REAUTH_ACCOUNT_STORAGE_KEY)
+	const account =
+		(accountId ? choosableAccounts.value.find((stored) => stored.id === accountId) : undefined) ??
+		reauthAccount.value
+	if (!account) {
+		return
+	}
+
+	updateStoredAccountAuthMethod(account, authMethod)
+	window.sessionStorage.removeItem(LAUNCHER_REAUTH_ACCOUNT_STORAGE_KEY)
 }
 
 const captcha = ref<{ reset?: () => void } | null>(null)
@@ -251,7 +385,7 @@ const email = ref('')
 const password = ref('')
 const token = ref('')
 
-const flow = ref(getQueryString(route.query.flow))
+const flow = ref(getQueryString(route.query.flow) ?? '')
 
 async function beginPasswordSignIn() {
 	pendingSignInOAuthProvider.value = null
@@ -262,12 +396,13 @@ async function beginPasswordSignIn() {
 			username: email.value,
 			password: password.value,
 			challenge: token.value,
+			app_session: shouldRequestAppSession(),
 		})
 
 		if (res.flow) {
 			flow.value = res.flow
 		} else {
-			await finishSignIn(res.session, 'password')
+			await finishSignIn(res.session, res.app_session, 'password')
 		}
 	} catch (err) {
 		addNotification({
@@ -293,9 +428,10 @@ async function begin2FASignIn(code: string) {
 		const res = await client.labrinth.auth_v2.login2FA({
 			flow: flow.value,
 			code,
+			app_session: shouldRequestAppSession(),
 		})
 
-		await finishSignIn(res.session, 'password')
+		await finishSignIn(res.session, res.app_session, 'password')
 	} catch {
 		twoFactorCode.value = ''
 		twoFactorError.value = true
@@ -315,10 +451,11 @@ async function beginPasskeySignin() {
 		const result = await client.labrinth.auth_v2.authenticatePasskeyFinish({
 			flow: start.flow,
 			credential,
+			app_session: shouldRequestAppSession(),
 		})
 
 		pendingSignInOAuthProvider.value = 'passkey'
-		await finishSignIn(result.session, 'passkey')
+		await finishSignIn(result.session, result.app_session, 'passkey')
 	} catch (err) {
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
@@ -329,8 +466,80 @@ async function beginPasskeySignin() {
 	stopLoading()
 }
 
-async function finishSignIn(sessionToken?: string | null, authMethod?: StoredAccountAuthMethod) {
+function isKnownAccountReauth() {
+	if (reauthAccount.value) {
+		return true
+	}
+	if (!import.meta.client) {
+		return false
+	}
+	return window.sessionStorage.getItem(LAUNCHER_REAUTH_ACCOUNT_STORAGE_KEY) != null
+}
+
+const shouldRequestAppSession = () => isProtocolV2 && !isKnownAccountReauth()
+
+async function adoptWebsiteSession(sessionToken: string, authMethod?: StoredAccountAuthMethod) {
+	await useAuth(sessionToken)
+	await useUser()
+	queryClient.clear()
+
+	const signedIn = await useAuth()
+	if (signedIn.value.user && signedIn.value.token) {
+		rememberStoredAccount(
+			signedIn.value.user,
+			signedIn.value.token,
+			authMethod ? { authMethod } : undefined,
+		)
+	}
+}
+
+async function completeProtocolV2SignIn(
+	sessionToken: string,
+	appSessionToken: string | null | undefined,
+	authMethod?: StoredAccountAuthMethod,
+) {
+	const knownAccount = isKnownAccountReauth()
+
+	if (!knownAccount) {
+		if (!appSessionToken) {
+			addNotification({
+				title: formatMessage(commonMessages.errorNotificationTitle),
+				text: formatMessage(launcherAuthMessages.handoffFailed),
+				type: 'error',
+			})
+			return
+		}
+
+		try {
+			await adoptWebsiteSession(sessionToken, authMethod)
+		} catch (err) {
+			addNotification({
+				title: formatMessage(commonMessages.errorNotificationTitle),
+				text: getErrorMessage(err),
+				type: 'error',
+			})
+			return
+		}
+	} else {
+		rememberLauncherAuthMethod(authMethod)
+	}
+
+	await showLauncherOpeningPage(appSessionToken ?? sessionToken)
+}
+
+async function finishSignIn(
+	sessionToken?: string | null,
+	appSessionToken?: string | null,
+	authMethod?: StoredAccountAuthMethod,
+) {
 	if (route.query.launcher) {
+		if (isProtocolV2) {
+			if (sessionToken) {
+				await completeProtocolV2SignIn(sessionToken, appSessionToken, authMethod)
+			}
+			return
+		}
+
 		const token = sessionToken ?? auth.value.token
 		if (token) {
 			await showLauncherOpeningPage(token)
@@ -362,7 +571,7 @@ async function finishSignIn(sessionToken?: string | null, authMethod?: StoredAcc
 	promotePendingSignInOAuthProvider()
 
 	if (route.query.redirect) {
-		const redirect = decodeURIComponent(getQueryString(route.query.redirect))
+		const redirect = decodeURIComponent(getQueryString(route.query.redirect) ?? '')
 		await navigateTo(redirect, {
 			replace: true,
 		})

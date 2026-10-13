@@ -3,6 +3,7 @@ import {
 	BoxIcon,
 	CheckIcon,
 	CopyIcon,
+	DownloadIcon,
 	PauseIcon,
 	PlayIcon,
 	TrashIcon,
@@ -13,6 +14,7 @@ import {
 	Avatar,
 	BulletDivider,
 	Button,
+	commonMessages,
 	defineMessages,
 	IconButton,
 	ProgressBar,
@@ -59,6 +61,15 @@ const needsAttention = computed(
 	() => props.job.status === 'failed' || props.job.status === 'interrupted',
 )
 const complete = computed(() => props.job.status === 'succeeded' || props.job.status === 'canceled')
+const cancelLabel = computed(() =>
+	formatMessage(
+		needsAttention.value
+			? messages.dismiss
+			: props.job.kind === 'debug-export'
+				? commonMessages.cancelButton
+				: messages.cancel,
+	),
+)
 const instanceLink = computed(() =>
 	props.job.status === 'succeeded' && props.job.instanceId
 		? `/instance/${encodeURIComponent(props.job.instanceId)}`
@@ -93,7 +104,11 @@ const instanceLink = computed(() =>
 					v-else
 					class="flex size-9 shrink-0 items-center justify-center rounded-xl border border-solid border-surface-5 bg-purple/10"
 				>
-					<BoxIcon class="size-6 text-primary" aria-hidden="true" />
+					<component
+						:is="job.kind === 'debug-export' ? DownloadIcon : BoxIcon"
+						class="size-6 text-primary"
+						aria-hidden="true"
+					/>
 				</div>
 				<div class="flex min-w-0 flex-1 flex-col gap-1">
 					<span
@@ -146,8 +161,8 @@ const instanceLink = computed(() =>
 				</IconButton>
 				<IconButton
 					v-if="job.canCancel || job.canceling || needsAttention"
-					v-tooltip="formatMessage(needsAttention ? messages.dismiss : messages.cancel)"
-					:label="formatMessage(needsAttention ? messages.dismiss : messages.cancel)"
+					v-tooltip="cancelLabel"
+					:label="cancelLabel"
 					type="quiet"
 					size="sm"
 					:disabled="job.busy || job.canceling"

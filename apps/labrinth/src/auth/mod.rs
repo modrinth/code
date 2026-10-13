@@ -55,6 +55,8 @@ pub enum AuthenticationError {
     SocketError,
     #[error("Invalid callback URL specified")]
     Url,
+    #[error("Your account is locked and cannot perform this action")]
+    AccountLocked,
 }
 
 impl actix_web::ResponseError for AuthenticationError {
@@ -83,6 +85,7 @@ impl actix_web::ResponseError for AuthenticationError {
                 StatusCode::BAD_REQUEST
             }
             AuthenticationError::SocketError => StatusCode::BAD_REQUEST,
+            AuthenticationError::AccountLocked => StatusCode::FORBIDDEN,
         }
     }
 
@@ -115,6 +118,7 @@ impl AuthenticationError {
                 "provider_already_linked"
             }
             AuthenticationError::SocketError => "socket",
+            AuthenticationError::AccountLocked => "account_locked",
         }
     }
 }

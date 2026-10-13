@@ -229,6 +229,13 @@ where
         _ => return Err(AuthenticationError::InvalidAuthMethod),
     };
 
+    if possible_user
+        .as_ref()
+        .is_some_and(|(_, user)| user.is_locked())
+    {
+        return Err(AuthenticationError::AccountLocked);
+    }
+
     Ok(possible_user)
 }
 

@@ -276,6 +276,10 @@ export const actionLogActionMessages = defineMessages({
 		id: 'servers.access-page.activity-log-filter.action.sftp-login',
 		defaultMessage: 'Logged in via SFTP',
 	},
+	sftp_credentials_rolled: {
+		id: 'servers.access-page.activity-log-filter.action.sftp-credentials-rolled',
+		defaultMessage: 'Rotated SFTP credentials',
+	},
 	console_command_executed: {
 		id: 'servers.access-page.activity-log-filter.action.console-command-executed',
 		defaultMessage: 'Ran console command',

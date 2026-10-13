@@ -806,6 +806,9 @@
   "auth.create-account.username.placeholder": {
     "message": "أدخل اسم المستخدم"
   },
+  "auth.reauthenticate.2fa.label": {
+    "message": "المصادقة الثنائية"
+  },
   "auth.reset-password.method-choice.action": {
     "message": "إرسال بريد استعادة الحساب"
   },
@@ -2189,9 +2192,6 @@
   "error.generic.default.list_item.1": {
     "message": "تحقق مما إذا كان مودرنث متوقفًا على <status-link>صفحة الحالة</status-link> الخاصة بنا."
   },
-  "error.generic.default.list_item.2": {
-    "message": "إذا استمر حدوث ذلك، قد ترغب في إعلام فريق مودرنث بالانضمام إلى <discord-link>سيرفر ديسكورد</discord-link> الخاص بنا."
-  },
   "error.generic.default.list_title": {
     "message": "يرجى المحاولة مرة أخرى بعد بضع دقائق."
   },
@@ -2846,6 +2846,9 @@
   "layout.nav.active-reports": {
     "message": "البلاغات النشطة"
   },
+  "layout.nav.add-account": {
+    "message": "إضافة حساب"
+  },
   "layout.nav.discover": {
     "message": "استكشاف"
   },
@@ -2876,6 +2879,9 @@
   "layout.nav.projects": {
     "message": "المشاريع"
   },
+  "layout.nav.remove-account": {
+    "message": "إزالة الحساب"
+  },
   "layout.nav.revenue": {
     "message": "الإيرادات"
   },
@@ -2884,6 +2890,9 @@
   },
   "layout.nav.search": {
     "message": "البحث"
+  },
+  "layout.nav.switch-account": {
+    "message": "تبديل الحساب"
   },
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "الترقية إلى Modrinth+"

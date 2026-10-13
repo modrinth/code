@@ -53,6 +53,9 @@
   "app.action-bar.install.summary.download-failed": {
     "message": "ダウンロードを完了することができませんでした"
   },
+  "app.action-bar.install.summary.instance-error": {
+    "message": "インスタンスの準備ができませんでした"
+  },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "ファイルパスが無効です"
   },
@@ -203,6 +206,12 @@
   "app.behavior-settings.content.title": {
     "message": "ホームとコンテンツ"
   },
+  "app.behavior-settings.refocus-on-game-close.description": {
+    "message": "Minecraftが終了したときに、Modrinth Appを前面に表示します。"
+  },
+  "app.behavior-settings.refocus-on-game-close.title": {
+    "message": "Minecraftが閉じられたときにアプリをフォーカスする"
+  },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "起動とナビゲーション"
   },
@@ -292,6 +301,18 @@
   },
   "app.content.sync-resource-packs-disabled": {
     "message": "アプリの設定で最初にリソースパックの同期をオンにしてください。"
+  },
+  "app.debug-export.canceling": {
+    "message": "エクスポートを取り消しています"
+  },
+  "app.debug-export.exporting": {
+    "message": "エクスポートしています"
+  },
+  "app.debug-export.finishing": {
+    "message": "終了処理をしています"
+  },
+  "app.debug-export.preparing": {
+    "message": "ファイルを準備しています"
   },
   "app.download-manager.active": {
     "message": "有効"
@@ -1718,6 +1739,9 @@
   "app.settings.game-options.category.chat.label": {
     "message": "チャット"
   },
+  "app.settings.game-options.category.controls.label": {
+    "message": "操作"
+  },
   "app.settings.game-options.category.custom.description": {
     "message": "Mod によって追加された設定"
   },
@@ -1734,7 +1758,7 @@
     "message": "オーディオ設定"
   },
   "app.settings.game-options.category.music-and-sound.label": {
-    "message": "音楽とサウンド"
+    "message": "サウンド"
   },
   "app.settings.game-options.category.online.description": {
     "message": "オンラインとRealms の設定"
@@ -1742,8 +1766,11 @@
   "app.settings.game-options.category.online.label": {
     "message": "オンライン"
   },
+  "app.settings.game-options.category.skin-customization.label": {
+    "message": "スキンのカスタマイズ"
+  },
   "app.settings.game-options.category.video.label": {
-    "message": "動画"
+    "message": "ビデオ"
   },
   "app.settings.game-options.choice.all": {
     "message": "すべて"
@@ -1757,11 +1784,38 @@
   "app.settings.game-options.choice.custom": {
     "message": "カスタム"
   },
+  "app.settings.game-options.choice.decreased": {
+    "message": "少し"
+  },
+  "app.settings.game-options.choice.default": {
+    "message": "デフォルト"
+  },
+  "app.settings.game-options.choice.fabulous": {
+    "message": "最高設定"
+  },
+  "app.settings.game-options.choice.fancy": {
+    "message": "描画優先"
+  },
+  "app.settings.game-options.choice.fast": {
+    "message": "処理優先"
+  },
   "app.settings.game-options.choice.hotbar": {
     "message": "ホットバー"
   },
+  "app.settings.game-options.choice.left": {
+    "message": "左手"
+  },
   "app.settings.game-options.choice.max-fps": {
     "message": "最大フレームレート"
+  },
+  "app.settings.game-options.choice.maximum": {
+    "message": "最大"
+  },
+  "app.settings.game-options.choice.minimal": {
+    "message": "最小"
+  },
+  "app.settings.game-options.choice.minimum": {
+    "message": "最小"
   },
   "app.settings.game-options.choice.off": {
     "message": "オフ"
@@ -1775,8 +1829,410 @@
   "app.settings.game-options.choice.pause": {
     "message": "ポーズメニュー"
   },
+  "app.settings.game-options.choice.right": {
+    "message": "右手"
+  },
   "app.settings.game-options.choice.system": {
     "message": "システム"
+  },
+  "app.settings.game-options.choice.vulkan": {
+    "message": "Vulkan"
+  },
+  "app.settings.game-options.choice.when-minimized": {
+    "message": "最小化されたとき"
+  },
+  "app.settings.game-options.custom-value.placeholder": {
+    "message": "値を入力"
+  },
+  "app.settings.game-options.keybind.key.arrow-down": {
+    "message": "下方向キー"
+  },
+  "app.settings.game-options.keybind.key.arrow-left": {
+    "message": "左方向キー"
+  },
+  "app.settings.game-options.keybind.key.arrow-right": {
+    "message": "右方向キー"
+  },
+  "app.settings.game-options.keybind.key.arrow-up": {
+    "message": "上方向キー"
+  },
+  "app.settings.game-options.keybind.key.backspace": {
+    "message": "Backspace"
+  },
+  "app.settings.game-options.keybind.key.caps-lock": {
+    "message": "Caps Lock"
+  },
+  "app.settings.game-options.keybind.key.delete": {
+    "message": "Delete"
+  },
+  "app.settings.game-options.keybind.key.end": {
+    "message": "End"
+  },
+  "app.settings.game-options.keybind.key.enter": {
+    "message": "Enter"
+  },
+  "app.settings.game-options.keybind.key.escape": {
+    "message": "Escape"
+  },
+  "app.settings.game-options.keybind.key.home": {
+    "message": "Home"
+  },
+  "app.settings.game-options.keybind.key.insert": {
+    "message": "Insert"
+  },
+  "app.settings.game-options.keybind.key.left-alt": {
+    "message": "左Alt"
+  },
+  "app.settings.game-options.keybind.key.left-control": {
+    "message": "左Ctrl"
+  },
+  "app.settings.game-options.keybind.key.left-shift": {
+    "message": "左Shift"
+  },
+  "app.settings.game-options.keybind.key.menu": {
+    "message": "メニュー"
+  },
+  "app.settings.game-options.keybind.key.num-lock": {
+    "message": "Num Lock"
+  },
+  "app.settings.game-options.keybind.key.page-down": {
+    "message": "Page Down"
+  },
+  "app.settings.game-options.keybind.key.page-up": {
+    "message": "Page Up"
+  },
+  "app.settings.game-options.keybind.key.pause": {
+    "message": "ポーズ"
+  },
+  "app.settings.game-options.keybind.key.print-screen": {
+    "message": "Print Screen"
+  },
+  "app.settings.game-options.keybind.key.right-alt": {
+    "message": "右Alt"
+  },
+  "app.settings.game-options.keybind.key.right-command": {
+    "message": "右⌘"
+  },
+  "app.settings.game-options.keybind.key.right-control": {
+    "message": "右Ctrl"
+  },
+  "app.settings.game-options.keybind.key.right-shift": {
+    "message": "右Shift"
+  },
+  "app.settings.game-options.keybind.key.right-super": {
+    "message": "右Super"
+  },
+  "app.settings.game-options.keybind.key.scroll-lock": {
+    "message": "Scroll Lock"
+  },
+  "app.settings.game-options.keybind.key.space": {
+    "message": "Space"
+  },
+  "app.settings.game-options.keybind.key.tab": {
+    "message": "Tab"
+  },
+  "app.settings.game-options.keybind.key.unbound": {
+    "message": "未割り当て"
+  },
+  "app.settings.game-options.keybind.key.unknown": {
+    "message": "不明なキー"
+  },
+  "app.settings.game-options.keybind.modifier.alt": {
+    "message": "Altキー"
+  },
+  "app.settings.game-options.keybind.modifier.control": {
+    "message": "Ctrl"
+  },
+  "app.settings.game-options.keybind.modifier.shift": {
+    "message": "Shiftキー"
+  },
+  "app.settings.game-options.keybind.mouse.middle": {
+    "message": "左マウスボタン"
+  },
+  "app.settings.game-options.keybind.mouse.right": {
+    "message": "右マウスボタン"
+  },
+  "app.settings.game-options.setting.ambient-occlusion.label": {
+    "message": "スムーズライティング"
+  },
+  "app.settings.game-options.setting.auto-jump.label": {
+    "message": "自動ジャンプ"
+  },
+  "app.settings.game-options.setting.blocks-volume.label": {
+    "message": "ブロック"
+  },
+  "app.settings.game-options.setting.brightness.label": {
+    "message": "明るさ"
+  },
+  "app.settings.game-options.setting.cape.description": {
+    "message": "エリトラのテクスチャを含む、プレイヤーのマントを表示します。"
+  },
+  "app.settings.game-options.setting.cape.label": {
+    "message": "マント"
+  },
+  "app.settings.game-options.setting.chat-links-prompt.label": {
+    "message": "リンクを開く時に確認の表示"
+  },
+  "app.settings.game-options.setting.chat-links.label": {
+    "message": "ウェブリンク"
+  },
+  "app.settings.game-options.setting.chat-width.label": {
+    "message": "幅"
+  },
+  "app.settings.game-options.setting.cloud-range.label": {
+    "message": "雲の距離"
+  },
+  "app.settings.game-options.setting.clouds.label": {
+    "message": "雲の表示"
+  },
+  "app.settings.game-options.setting.ctrl-click-right-click.label": {
+    "message": "Ctrl+左クリックを右クリックとして扱う"
+  },
+  "app.settings.game-options.setting.entity-distance.label": {
+    "message": "エンティティの描画距離"
+  },
+  "app.settings.game-options.setting.entity-shadows.label": {
+    "message": "エンティティの影"
+  },
+  "app.settings.game-options.setting.exclusive-fullscreen.label": {
+    "message": "排他的フルスクリーン"
+  },
+  "app.settings.game-options.setting.fov.label": {
+    "message": "視野"
+  },
+  "app.settings.game-options.setting.fullscreen.label": {
+    "message": "フルスクリーン"
+  },
+  "app.settings.game-options.setting.glint-speed.label": {
+    "message": "オーラの速度"
+  },
+  "app.settings.game-options.setting.glint-strength.label": {
+    "message": "オーラの濃さ"
+  },
+  "app.settings.game-options.setting.graphics-backend.label": {
+    "message": "グラフィックスバックエンド"
+  },
+  "app.settings.game-options.setting.graphics.description": {
+    "message": "映像の質とパフォーマンスを設定します。"
+  },
+  "app.settings.game-options.setting.gui-scale.label": {
+    "message": "GUIの大きさ"
+  },
+  "app.settings.game-options.setting.hat.label": {
+    "message": "帽子"
+  },
+  "app.settings.game-options.setting.jacket.label": {
+    "message": "上着"
+  },
+  "app.settings.game-options.setting.key-advancements.label": {
+    "message": "進捗"
+  },
+  "app.settings.game-options.setting.key-attack.label": {
+    "message": "攻撃する／壊す"
+  },
+  "app.settings.game-options.setting.key-back.label": {
+    "message": "後退"
+  },
+  "app.settings.game-options.setting.key-chat.label": {
+    "message": "チャットを開く"
+  },
+  "app.settings.game-options.setting.key-command.label": {
+    "message": "コマンドラインを開く"
+  },
+  "app.settings.game-options.setting.key-debug-advanced-tooltips.label": {
+    "message": "高度なツールチップ情報の表示"
+  },
+  "app.settings.game-options.setting.key-debug-chunk-borders.label": {
+    "message": "チャンク境界の表示"
+  },
+  "app.settings.game-options.setting.key-debug-clear-chat.label": {
+    "message": "チャット欄のクリア"
+  },
+  "app.settings.game-options.setting.key-debug-copy-location.label": {
+    "message": "座標のコピー"
+  },
+  "app.settings.game-options.setting.key-debug-crash.label": {
+    "message": "デバッグ用クラッシュ"
+  },
+  "app.settings.game-options.setting.key-debug-dump-dynamic-textures.label": {
+    "message": "ダイナミックテクスチャの出力"
+  },
+  "app.settings.game-options.setting.key-debug-dump-version.label": {
+    "message": "バージョン情報の出力"
+  },
+  "app.settings.game-options.setting.key-debug-fps-charts.label": {
+    "message": "FPSグラフ"
+  },
+  "app.settings.game-options.setting.key-debug-hitboxes.label": {
+    "message": "当たり判定の表示"
+  },
+  "app.settings.game-options.setting.key-debug-lightmap-texture.label": {
+    "message": "ライトマップテクスチャ"
+  },
+  "app.settings.game-options.setting.key-debug-network-charts.label": {
+    "message": "ネットワークグラフ"
+  },
+  "app.settings.game-options.setting.key-debug-options.label": {
+    "message": "デバッグ設定"
+  },
+  "app.settings.game-options.setting.key-debug-overlay.label": {
+    "message": "オーバーレイの切り替え"
+  },
+  "app.settings.game-options.setting.key-debug-profiling-chart.label": {
+    "message": "プロファイラグラフ"
+  },
+  "app.settings.game-options.setting.key-debug-profiling.label": {
+    "message": "プロファイリングの開始／停止"
+  },
+  "app.settings.game-options.setting.key-debug-reload-chunks.label": {
+    "message": "チャンクの再読み込み"
+  },
+  "app.settings.game-options.setting.key-debug-reload-resource-packs.label": {
+    "message": "リソースパックの再読み込み"
+  },
+  "app.settings.game-options.setting.key-debug-switch-game-mode.label": {
+    "message": "ゲームモード切り替え画面"
+  },
+  "app.settings.game-options.setting.key-drop.label": {
+    "message": "アイテムを捨てる"
+  },
+  "app.settings.game-options.setting.key-forward.label": {
+    "message": "前進"
+  },
+  "app.settings.game-options.setting.key-friends.label": {
+    "message": "フレンド画面"
+  },
+  "app.settings.game-options.setting.key-fullscreen.label": {
+    "message": "フルスクリーン切り替え"
+  },
+  "app.settings.game-options.setting.key-hotbar-1.label": {
+    "message": "ホットバースロット1"
+  },
+  "app.settings.game-options.setting.key-hotbar-2.label": {
+    "message": "ホットバースロット2"
+  },
+  "app.settings.game-options.setting.key-hotbar-3.label": {
+    "message": "ホットバースロット3"
+  },
+  "app.settings.game-options.setting.key-hotbar-4.label": {
+    "message": "ホットバースロット4"
+  },
+  "app.settings.game-options.setting.key-hotbar-5.label": {
+    "message": "ホットバースロット5"
+  },
+  "app.settings.game-options.setting.key-hotbar-6.label": {
+    "message": "ホットバースロット6"
+  },
+  "app.settings.game-options.setting.key-hotbar-7.label": {
+    "message": "ホットバースロット7"
+  },
+  "app.settings.game-options.setting.key-hotbar-8.label": {
+    "message": "ホットバースロット8"
+  },
+  "app.settings.game-options.setting.key-hotbar-9.label": {
+    "message": "ホットバースロット9"
+  },
+  "app.settings.game-options.setting.key-inventory.label": {
+    "message": "インベントリの開閉"
+  },
+  "app.settings.game-options.setting.key-jump.label": {
+    "message": "ジャンプ"
+  },
+  "app.settings.game-options.setting.key-pick-item.label": {
+    "message": "ブロック選択"
+  },
+  "app.settings.game-options.setting.key-player-list.label": {
+    "message": "プレイヤーリストの表示"
+  },
+  "app.settings.game-options.setting.key-quick-actions.label": {
+    "message": "クイックアクション"
+  },
+  "app.settings.game-options.setting.key-screenshot.label": {
+    "message": "スクリーンショットの撮影"
+  },
+  "app.settings.game-options.setting.key-sneak.label": {
+    "message": "スニーク"
+  },
+  "app.settings.game-options.setting.key-spectator-hotbar.label": {
+    "message": "ホットバーから選択"
+  },
+  "app.settings.game-options.setting.key-spectator-outlines.label": {
+    "message": "プレイヤーの強調表示"
+  },
+  "app.settings.game-options.setting.key-sprint.label": {
+    "message": "ダッシュ"
+  },
+  "app.settings.game-options.setting.key-swap-offhand.label": {
+    "message": "アイテムをオフハンドと交換"
+  },
+  "app.settings.game-options.setting.key-toggle-gui.label": {
+    "message": "GUIの切り替え"
+  },
+  "app.settings.game-options.setting.key-toggle-spectator-shader.label": {
+    "message": "スペクテイターでのシェーダーを切り替え"
+  },
+  "app.settings.game-options.setting.key-use.label": {
+    "message": "アイテムの使用／ブロックの設置"
+  },
+  "app.settings.game-options.setting.language.label": {
+    "message": "言語設定"
+  },
+  "app.settings.game-options.setting.left-pants-leg.label": {
+    "message": "ズボンの左脚"
+  },
+  "app.settings.game-options.setting.left-sleeve.label": {
+    "message": "左袖"
+  },
+  "app.settings.game-options.setting.main-hand.description": {
+    "message": "利き手が左右どちらかを選択します。"
+  },
+  "app.settings.game-options.setting.main-hand.label": {
+    "message": "利き手"
+  },
+  "app.settings.game-options.setting.master-volume.label": {
+    "message": "主音量"
+  },
+  "app.settings.game-options.setting.max-framerate.label": {
+    "message": "最大フレームレート"
+  },
+  "app.settings.game-options.setting.menu-background-blur.label": {
+    "message": "メニュー背景のぼかし具合"
+  },
+  "app.settings.game-options.setting.narrator-hotkey.label": {
+    "message": "音声読み上げのホットキー"
+  },
+  "app.settings.game-options.setting.neutral-volume.label": {
+    "message": "友好的Mob"
+  },
+  "app.settings.game-options.setting.particles.label": {
+    "message": "パーティクルの表示"
+  },
+  "app.settings.game-options.setting.players-volume.label": {
+    "message": "プレイヤー"
+  },
+  "app.settings.game-options.setting.render-distance.label": {
+    "message": "描画距離"
+  },
+  "app.settings.game-options.setting.right-pants-leg.label": {
+    "message": "ズボンの右脚"
+  },
+  "app.settings.game-options.setting.right-sleeve.label": {
+    "message": "右袖"
+  },
+  "app.settings.game-options.setting.simulation-distance.label": {
+    "message": "演算距離"
+  },
+  "app.settings.game-options.setting.view-bobbing.description": {
+    "message": "歩行中に画面の揺れを加えます。"
+  },
+  "app.settings.game-options.setting.view-bobbing.label": {
+    "message": "画面の揺れ"
+  },
+  "app.settings.game-options.setting.voice-volume.label": {
+    "message": "音声読み上げ／声"
+  },
+  "app.settings.game-options.setting.vsync.label": {
+    "message": "垂直同期"
   },
   "app.settings.java-installations.location.title": {
     "message": "Java {version, number} の場所"
@@ -1880,6 +2336,27 @@
   "app.settings.synced-options.creative-hotbars.description": {
     "message": "保存したクリエイティブホットバーを複数のインスタンスで共通して使用できます。"
   },
+  "app.settings.synced-options.game-settings": {
+    "message": "ゲーム設定の同期"
+  },
+  "app.settings.synced-options.game-settings.button": {
+    "message": "ゲーム設定を編集"
+  },
+  "app.settings.synced-options.game-settings.description": {
+    "message": "ゲーム設定を複数のインスタンスで共通して使用できます。"
+  },
+  "app.settings.synced-options.game-settings.disable-all": {
+    "message": "すべて同期解除"
+  },
+  "app.settings.synced-options.game-settings.enable-all": {
+    "message": "すべて同期"
+  },
+  "app.settings.synced-options.game-settings.value-off": {
+    "message": "オフ"
+  },
+  "app.settings.synced-options.game-settings.value-on": {
+    "message": "オン"
+  },
   "app.settings.synced-options.multiplayer-servers": {
     "message": "マルチプレイヤーサーバーの同期"
   },
@@ -1895,14 +2372,29 @@
   "app.settings.synced-options.multiplayer-servers.empty": {
     "message": "現在同期されているユーザー追加のサーバーはありません。"
   },
+  "app.settings.synced-options.multiplayer-servers.filter-offline": {
+    "message": "オフライン"
+  },
+  "app.settings.synced-options.multiplayer-servers.filter-online": {
+    "message": "オンライン"
+  },
   "app.settings.synced-options.multiplayer-servers.name": {
     "message": "サーバー名"
+  },
+  "app.settings.synced-options.resource-packs": {
+    "message": "リソースパックの同期"
+  },
+  "app.settings.synced-options.resource-packs.description": {
+    "message": "リソースパックを複数のインスタンスで共通して使用できます。"
   },
   "app.settings.tabs.appearance": {
     "message": "表示設定"
   },
   "app.settings.tabs.behavior": {
     "message": "動作"
+  },
+  "app.settings.tabs.features": {
+    "message": "機能"
   },
   "app.settings.tabs.java-installations": {
     "message": "Javaのインストール設定"
@@ -2098,6 +2590,9 @@
   },
   "app.survey.title": {
     "message": "Modrinthユーザーのみなさん、こんにちは！"
+  },
+  "app.sync-instances-update.skip": {
+    "message": "スキップ"
   },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} のダウンロードが完了しました。今すぐ更新するには再読み込みするか、Modrinth Appを閉じる際に自動更新されます。"

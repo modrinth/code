@@ -134,6 +134,9 @@
   "analytics.chart.legend.previous-period-suffix": {
     "message": "{name} (Předch.)"
   },
+  "analytics.chart.table-selection.all": {
+    "message": "Zobrazuji všechny {itemType, select, project {{count, plural, one {projekt} few {projekty} many {projekty} other {projekty}}} country {{count, plural, one {Země} few {země} many {země} other {země}}} monetization {{count, plural, one {hodnota monetizace} few {hodnoty monetizace} many {hodnoty monetizace} other {hodnoty monetizace}}} downloadSource {{count, plural, one {stáhněte zdroj} few {Stáhněte si zdroje} many {Stáhněte si zdroje} other {Stáhněte si zdroje}}} downloadReason {{count, plural, one {Stáhněte si důvod} few {důvody ke stažení} many {důvody ke stažení} other {důvody ke stažení}}} member {{count, plural, one {člen} few {člen} many {člen} other {člen}}} projectVersion {{count, plural, one {projekt verze} few {projektové verze} many {projektové verze} other {projektové verze}}} loader {{count, plural, one {loader} few {nakladatelé} many {nakladatelé} other {nakladatelé}}} gameVersion {{count, plural, one {verze hry} few {verze hry} many {verze hry} other {verze hry}}} other {{count, plural, one {položka} few {položka} many {položka} other {položka}}}} z tabulky"
+  },
   "analytics.chart.tooltip.dependent-on-project": {
     "message": "Závisí na {project}"
   },
@@ -1690,9 +1693,6 @@
   },
   "error.generic.default.list_item.1": {
     "message": "Zkontrolujte, zda je Modrinth offline, na naší <status-link>Stránce statusu</status-link>."
-  },
-  "error.generic.default.list_item.2": {
-    "message": "Pokud se to bude dít i nadále, můžete dát vědět týmu Modrinth připojením se k našemu <discord-link>Discord serveru</discord-link>."
   },
   "error.generic.default.list_title": {
     "message": "Prosím zkuste znovu za pár minut."

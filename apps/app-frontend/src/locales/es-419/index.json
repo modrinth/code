@@ -57,7 +57,7 @@
     "message": "No se pudo preparar la instancia"
   },
   "app.action-bar.install.summary.invalid-file-path": {
-    "message": "La ruta del archivo no es válida"
+    "message": "Ruta de archivo no válida"
   },
   "app.action-bar.install.summary.invalid-modpack": {
     "message": "Los datos del modpack no son válidos"
@@ -206,6 +206,12 @@
   "app.behavior-settings.content.title": {
     "message": "Página de inicio y contenido"
   },
+  "app.behavior-settings.refocus-on-game-close.description": {
+    "message": "Pasar la App de Modrinth al primer plano cuando cierres Minecraft."
+  },
+  "app.behavior-settings.refocus-on-game-close.title": {
+    "message": "Reenfocar app cuando se cierra Minecraft"
+  },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Inicio y navegación"
   },
@@ -296,14 +302,29 @@
   "app.content.sync-resource-packs-disabled": {
     "message": "Activa la sincronización de resourcepacks en la configuración de la aplicación primero."
   },
+  "app.debug-export.canceling": {
+    "message": "Cancelando exportación..."
+  },
+  "app.debug-export.exporting": {
+    "message": "Exportando..."
+  },
+  "app.debug-export.finishing": {
+    "message": "Finalizando..."
+  },
+  "app.debug-export.preparing": {
+    "message": "Preparando archivos..."
+  },
   "app.download-manager.active": {
     "message": "Activos"
   },
   "app.download-manager.attention": {
-    "message": "Requiere atención"
+    "message": "Necesita atención"
+  },
+  "app.download-manager.bulk-update-content": {
+    "message": "Actualizando {count, plural, one {# elemento} other {# elementos}}"
   },
   "app.download-manager.cancel": {
-    "message": "Cancelar la instalación"
+    "message": "Cancelar instalación"
   },
   "app.download-manager.canceling": {
     "message": "Cancelando instalación…"
@@ -480,7 +501,7 @@
     "message": "Arrastrar para redimensionar"
   },
   "app.home.jump-back-in.title": {
-    "message": "Jugar"
+    "message": "Continuar"
   },
   "app.home.jump-back-in.view-instance": {
     "message": "Ver instancia"
@@ -2783,6 +2804,15 @@
   "app.settings.resource-management.app-directory.title": {
     "message": "Directorio de la aplicación"
   },
+  "app.settings.resource-management.debug-info.description": {
+    "message": "Exportar registros de la aplicación y datos de diagnostico en un archivo ZIP para compartir con el equipo de soporte de Modrinth."
+  },
+  "app.settings.resource-management.debug-info.export": {
+    "message": "Exportar información de depuración"
+  },
+  "app.settings.resource-management.debug-info.title": {
+    "message": "Información de depuración"
+  },
   "app.settings.resource-management.maximum-concurrent-downloads.description": {
     "message": "El número de archivos que la app puede descargar a la vez. Baja este número si las descargas no son estables con tu conexión. Necesita reiniciar la app."
   },
@@ -3239,6 +3269,12 @@
   "app.skins.section.default-skins": {
     "message": "Skins predeterminadas"
   },
+  "app.skins.section.dungeons-hero": {
+    "message": "Héroe de mazmorra"
+  },
+  "app.skins.section.dungeons-ii-hero": {
+    "message": "Héroe de mazmorra II"
+  },
   "app.skins.section.minecon-earth-2017": {
     "message": "MINECON Earth 2017"
   },
@@ -3268,6 +3304,9 @@
   },
   "app.skins.section.tiny-takeover": {
     "message": "Bebés al Poder"
+  },
+  "app.skins.section.wilderness-bound": {
+    "message": "Naturaleza Salvaje"
   },
   "app.skins.sign-in.button": {
     "message": "Inicia sesión en Microsoft"

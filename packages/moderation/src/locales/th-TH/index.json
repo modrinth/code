@@ -11,6 +11,9 @@
   "nags.add-java-address.title": {
     "defaultMessage": "เพิ่มที่อยู่ Java"
   },
+  "nags.add-license-details.description": {
+    "defaultMessage": "ใส่ลิงก์เว็บที่ใช้งานได้จริง พร้อมกับใส่ชื่อหรือรหัส SPDX ของไลเซนส์"
+  },
   "nags.add-links.title": {
     "defaultMessage": "เพิ่มลิงก์ภายนอก"
   },

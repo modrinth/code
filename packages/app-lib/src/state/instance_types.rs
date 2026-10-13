@@ -121,6 +121,8 @@ impl ModLoader {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ContentFile {
+    #[serde(skip)]
+    pub on_disk_path: String,
     pub hash: String,
     pub file_name: String,
     pub enabled: bool,

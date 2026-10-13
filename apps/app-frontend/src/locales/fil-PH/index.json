@@ -8,6 +8,9 @@
   "app.action-bar.downloads": {
     "message": "Mga downloads"
   },
+  "app.action-bar.hide-downloads": {
+    "message": "Itago ang aktibong download"
+  },
   "app.action-bar.hide-more-running-instances": {
     "message": "Itago ang mas marami pang tumatakbong instansiya"
   },
@@ -16,6 +19,12 @@
   },
   "app.action-bar.install.copy-details": {
     "message": "Kopyahin ang detalye"
+  },
+  "app.action-bar.install.dismiss": {
+    "message": "Ibasura"
+  },
+  "app.action-bar.install.open-instance": {
+    "message": "Buksan ang instansiya"
   },
   "app.action-bar.install.retry": {
     "message": "Subukan muli"
@@ -35,11 +44,56 @@
   "app.action-bar.install.summary.content-download-failed": {
     "message": "Hindi ma-download ang mga talaksan"
   },
+  "app.action-bar.install.summary.corrupt-download": {
+    "message": "Ang na-download na file ay sira"
+  },
   "app.action-bar.install.summary.could-not-save-files": {
     "message": "Hindi ma-save ang mga talaksan"
   },
   "app.action-bar.install.summary.download-failed": {
     "message": "Hindi matapos ang pagdownload"
+  },
+  "app.action-bar.install.summary.instance-error": {
+    "message": "Hindi maihanda ang instansiya"
+  },
+  "app.action-bar.install.summary.invalid-file-path": {
+    "message": "Hindi tama ang file path"
+  },
+  "app.action-bar.install.summary.invalid-modpack": {
+    "message": "Hindi tama ang data ng modpack"
+  },
+  "app.action-bar.install.summary.invalid-modpack-files": {
+    "message": "May mali na datos ang mga files ng modpack."
+  },
+  "app.action-bar.install.summary.java-setup-failed": {
+    "message": "Hindi natapos ang pag-setup ng Java."
+  },
+  "app.action-bar.install.summary.loader-setup-failed": {
+    "message": "Pumalpak ang pag-ayos ng loader."
+  },
+  "app.action-bar.install.summary.local-data-error": {
+    "message": "Hindi ma-bago ang lokal na datos"
+  },
+  "app.action-bar.install.summary.minecraft-setup-failed": {
+    "message": "Pumalpak ang pag-ayos ng Minecraft."
+  },
+  "app.action-bar.install.summary.modrinth-unreachable": {
+    "message": "Hindi maabot ang Modrinth"
+  },
+  "app.action-bar.install.summary.no-write-permission": {
+    "message": "Walang permiso magsulat"
+  },
+  "app.action-bar.install.summary.pack-download-failed": {
+    "message": "Hindi madownload ang modpack"
+  },
+  "app.action-bar.install.summary.unexpected-error": {
+    "message": "May nangyaring mali"
+  },
+  "app.action-bar.install.unknown-instance": {
+    "message": "Hindi kilalang instansya"
+  },
+  "app.action-bar.install.updating-shared-content": {
+    "message": "Binabago ang ibinahaging nilalaman"
   },
   "app.action-bar.make-primary-instance": {
     "message": "Gumawa ng pangunahing instansiya"
@@ -55,6 +109,9 @@
   },
   "app.action-bar.reload-to-update": {
     "message": "Mag-reload upang ma-update"
+  },
+  "app.action-bar.show-downloads": {
+    "message": "Ipakita ang aktibong download"
   },
   "app.action-bar.show-more-running-instances": {
     "message": "Ipakita ang mas marami pang tumatakbong instansiya"
@@ -74,14 +131,65 @@
   "app.action-bar.view-logs": {
     "message": "Tignan ang logs"
   },
+  "app.ads-consent.accept": {
+    "message": "Tanggapin lahat"
+  },
+  "app.ads-consent.body": {
+    "message": "Ginagawang posible ng mga advertisement ang Modrinth at pinopondohan nito ang mga bayad sa mga creator. Maaaring mag-imbak o mag-access ng cookies ang aming mga partner sa app upang i-personalize ang mga advertisement at sukatin ang pagsasagawa."
+  },
+  "app.ads-consent.manage": {
+    "message": "Pamahalaan ang mga kagustuhan"
+  },
+  "app.ads-consent.reject": {
+    "message": "Tanggihan lahat"
+  },
+  "app.ads-consent.title": {
+    "message": "Iyong pagkapribado at kung paano sinusuportahan ng mga ad ang Modrinth\n"
+  },
+  "app.appearance-settings.compact-mode.description": {
+    "message": "Ipakita ang mga instansya ng librerya sa masiksik na layout."
+  },
+  "app.appearance-settings.compact-mode.title": {
+    "message": "Masiksik na paraan"
+  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Tahanan"
   },
   "app.appearance-settings.default-landing-page.library": {
     "message": "Librarya"
   },
+  "app.appearance-settings.hide-nametag.description": {
+    "message": "Itago ang iyong pangalan sa itaas ng paunang-tingin\nng manlalaro sa pahina ng pagpili ng balat."
+  },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Itago ang nametag"
+  },
+  "app.appearance-settings.minimize-launcher.description": {
+    "message": "Itago ang Modrinth App pag nagsimula ang Minecraft."
+  },
+  "app.appearance-settings.minimize-launcher.title": {
+    "message": "Itago ang aplikasyon"
+  },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "Ipakita gaano katagal mo nalaro ang bawat instansiya."
+  },
+  "app.appearance-settings.show-play-time.title": {
+    "message": "Ipakita ang oras ng iyong paglalaro"
+  },
+  "app.appearance-settings.skip-non-essential-warnings.description": {
+    "message": "Laktawan ang mga kumpirmasyon para sa mga aksyon na mababa ang panganib tulad ng mga duplicate na pag-install, normal na pagbura ng nilalaman, maramihang pag-bago, pag-unlink, at mga pagkukumpuni. Palaging ipinapakita ang mga babala para sa mga mapanganib na aksyon."
+  },
+  "app.appearance-settings.skip-non-essential-warnings.title": {
+    "message": "Laktawan ang mga hindi mahalagang mga babala"
+  },
+  "app.appearance-settings.toggle-sidebar.description": {
+    "message": "Itago ang kanang sidebar bilang default at magdagdag ng pindutan para ipakita o itago ito."
+  },
+  "app.appearance-settings.toggle-sidebar.title": {
+    "message": "Itago ang kanang sidebar"
+  },
+  "app.appearance-settings.unknown-pack-warning.description": {
+    "message": "Magpakita ng babala sa kaligtasan bago i-install ang isang Modrinth Pack (.mrpack) na hindi naka-host sa Modrinth."
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "Pakipaalala bago ko ma-install ang mga di-kilalang modpack"
@@ -91,6 +199,30 @@
   },
   "app.auth-servers.unreachable.header": {
     "message": "Hindi maabot ang mga authentication server"
+  },
+  "app.behavior-settings.confirmations.title": {
+    "message": "Pagpapatunay"
+  },
+  "app.behavior-settings.content.title": {
+    "message": "Tahanan at nilalaman"
+  },
+  "app.behavior-settings.refocus-on-game-close.description": {
+    "message": "Ilitaw ang Modrinth App kapag nagsara ang Minecraft."
+  },
+  "app.behavior-settings.refocus-on-game-close.title": {
+    "message": "Ibabalik ang pokus sa aplikasyon kapag nagsara ang Minecraft"
+  },
+  "app.behavior-settings.startup-and-navigation.title": {
+    "message": "Pagsisimula at nabigasyon"
+  },
+  "app.behavior-settings.sync-across-devices.description": {
+    "message": "Gamitin ang mga setting ng gawi na ito saanman ka naka-sign in. I-off ito upang magkaroon ng magkakahiwalay na setting sa device na ito."
+  },
+  "app.behavior-settings.sync-across-devices.signed-out-tooltip": {
+    "message": "Mag sign-in sayong Modrinth account para pagsabayin ang setting"
+  },
+  "app.behavior-settings.sync-across-devices.title": {
+    "message": "Ipagsabay ang gawi sa iba't ibang device"
   },
   "app.browse.add-servers-to-instance": {
     "message": "Idinaragdag ang server sa instansiya"
@@ -113,11 +245,29 @@
   "app.browse.back-to-instance": {
     "message": "Bumalik sa instansiya"
   },
+  "app.browse.discover-project-type": {
+    "message": "Tuklasin ang mga"
+  },
   "app.browse.discover-servers": {
     "message": "Tumuklas ng mga server"
   },
+  "app.browse.hide-added-servers": {
+    "message": "Itago ang mga palaruan na nadagdag na"
+  },
+  "app.browse.hide-installed-modpacks": {
+    "message": "Itago ang mga na-installed"
+  },
+  "app.browse.project-actions.label": {
+    "message": "Mga aksyon sa proyekto"
+  },
+  "app.browse.project-type.data-packs": {
+    "message": "Data Packs"
+  },
   "app.browse.project-type.modpacks": {
     "message": "Modpacks"
+  },
+  "app.browse.project-type.mods": {
+    "message": "Mods"
   },
   "app.browse.server.installing": {
     "message": "Ini-install"

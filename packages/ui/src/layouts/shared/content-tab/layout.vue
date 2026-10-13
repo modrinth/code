@@ -900,6 +900,10 @@ async function openUpdateAll(items: ContentItem[]) {
 		return
 	const candidates = getUpdateAllCandidates(items)
 	if (candidates.length === 0) return
+	if (candidates.length === 1 && ctx.updateItem) {
+		handleUpdateById(getItemId(candidates[0]))
+		return
+	}
 
 	const requestId = ++updateAllRequestId
 	updateAllItems.value = []

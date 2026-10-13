@@ -35,6 +35,12 @@
   "affiliate.viewAnalytics": {
     "defaultMessage": "Näytä analytiikat"
   },
+  "app.appearance-settings.native-decorations.description": {
+    "defaultMessage": "Käytä käyttöjärjestelmän otsikkopalkkia ja ikkunaohjaimia. Vaatii uudelleenkäynnistyksen."
+  },
+  "app.appearance-settings.native-decorations.title": {
+    "defaultMessage": "Käyttöjärjestelmän tyylinen ikkunakehys"
+  },
   "app.server-settings.failed-to-load-server": {
     "defaultMessage": "Palvelimen asetuksien lataus epäonnistui"
   },
@@ -57,7 +63,7 @@
     "defaultMessage": "Takaisin"
   },
   "billing.resubscribe-modal.cpus": {
-    "defaultMessage": "{sharedCpus} Jaettua Prosessoria"
+    "defaultMessage": "{sharedCpus} Jaettua prosessoria"
   },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "Olet aikomassa uudelleentilata palvelimen <server-name>{serverName}</server-name>. Tilauksesi uudelleenaktivoidaan ja palvelimesi jatkaa toimintaa ilman pysäytyksiä."
@@ -70,6 +76,12 @@
   },
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Tilaustietojen lataus epäonnistui."
+  },
+  "billing.resubscribe-modal.interval": {
+    "defaultMessage": "{intervalOption, select, fiveDays {/5 päivää} monthly {/kuukausi} quarterly {/neljännesvuosi} yearly {/vuosi} other {{interval}}}"
+  },
+  "billing.resubscribe-modal.next-charge": {
+    "defaultMessage": "Seuraava maksupäiväsi on <charge-date>{date}</charge-date>."
   },
   "billing.resubscribe-modal.plan-label": {
     "defaultMessage": "Suunnitelma"
@@ -89,8 +101,38 @@
   "browse.advanced-filters.apply-saved-preferences": {
     "defaultMessage": "Hyväksy tallennetut valinnat"
   },
+  "browse.advanced-filters.link-overriding-preferences": {
+    "defaultMessage": "Tämän linkin suodattimet poikkeavat tallennetuista tarkennetuista suodattimistasi"
+  },
+  "browse.advanced-filters.persistence-note": {
+    "defaultMessage": "Tarkennetut suodattimet tallennetaan istuntojen välillä. Suodattimellisen jaetun linkin avaaminen ohittaa ne."
+  },
+  "browse.filter-results": {
+    "defaultMessage": "Suodata tuloksia..."
+  },
+  "browse.no-results": {
+    "defaultMessage": "Hakutuloksia ei löytynyt."
+  },
+  "browse.offline": {
+    "defaultMessage": "Olet poissa linjoilta. Yhdistä internetiin selataksesi Modrinthia!"
+  },
   "browse.search.placeholder": {
-    "defaultMessage": "Etsi {projectType}"
+    "defaultMessage": "Etsi {projectType}..."
+  },
+  "browse.selected-projects-floating-bar.aria-label": {
+    "defaultMessage": "Valitut projektit"
+  },
+  "browse.selected-projects-floating-bar.install": {
+    "defaultMessage": "Asenna {count, plural, one {# projekti} other {# projektia}}"
+  },
+  "browse.selected-projects-floating-bar.selected-count": {
+    "defaultMessage": "{count, plural, one {# projekti valittu} other {# projektia valittu}}"
+  },
+  "browse.selected-projects-leave-modal.admonition-body": {
+    "defaultMessage": "Olet valinnut {count, plural, one {# projekti} other {# projektia}} asennettavaksi. Asenna ne nyt tai palaa takaisin asentamatta."
+  },
+  "browse.selected-projects-leave-modal.admonition-header": {
+    "defaultMessage": "Valittuja projekteja ei ole asennettu"
   },
   "browse.selected-projects-leave-modal.discard": {
     "defaultMessage": "Hylkää"
@@ -98,11 +140,17 @@
   "browse.selected-projects-leave-modal.header": {
     "defaultMessage": "Valittuja töitä ei vielä asennettu"
   },
+  "browse.view-prefix": {
+    "defaultMessage": "Hakutulokset per sivu:"
+  },
   "button.accept": {
     "defaultMessage": "Hyväksy"
   },
   "button.add-another": {
     "defaultMessage": "Lisää uusi"
+  },
+  "button.add-server-to-instance": {
+    "defaultMessage": "Lisää palvelin instanssiin"
   },
   "button.affiliate-links": {
     "defaultMessage": "Kumppanilinkit"
@@ -127,6 +175,9 @@
   },
   "button.continue": {
     "defaultMessage": "Jatka"
+  },
+  "button.copied-to-clipboard": {
+    "defaultMessage": "Kopioitu leikepöydälle"
   },
   "button.copy-filename": {
     "defaultMessage": "Kopioi tiedoston nimi"
@@ -153,7 +204,10 @@
     "defaultMessage": "Estä"
   },
   "button.download": {
-    "defaultMessage": "Lataa"
+    "defaultMessage": "Lataa tietokoneelle"
+  },
+  "button.download-files": {
+    "defaultMessage": "Lataa tiedostoja"
   },
   "button.downloading": {
     "defaultMessage": "Ladataan"
@@ -163,6 +217,9 @@
   },
   "button.enable": {
     "defaultMessage": "Salli"
+  },
+  "button.extract": {
+    "defaultMessage": "Pura"
   },
   "button.follow": {
     "defaultMessage": "Seuraa"
@@ -182,11 +239,23 @@
   "button.more-options": {
     "defaultMessage": "Lisää asetuksia"
   },
+  "button.move": {
+    "defaultMessage": "Siirrä"
+  },
   "button.next": {
     "defaultMessage": "Seuraava"
   },
   "button.open-folder": {
     "defaultMessage": "Avaa kansio"
+  },
+  "button.open-in-browser": {
+    "defaultMessage": "Avaa selaimessa"
+  },
+  "button.open-in-folder": {
+    "defaultMessage": "Avaa kansiossa"
+  },
+  "button.open-in-modrinth": {
+    "defaultMessage": "Avaa Modrinthissa"
   },
   "button.play": {
     "defaultMessage": "Pelaa"
@@ -194,8 +263,23 @@
   "button.refresh": {
     "defaultMessage": "Päivitä"
   },
+  "button.reinstall-modpack": {
+    "defaultMessage": "Asenna modipaketti uudelleen"
+  },
+  "button.remove": {
+    "defaultMessage": "Poista"
+  },
   "button.remove-image": {
     "defaultMessage": "Poista kuva"
+  },
+  "button.rename": {
+    "defaultMessage": "Nimeä uudelleen"
+  },
+  "button.repair": {
+    "defaultMessage": "Korjaa"
+  },
+  "button.repairing": {
+    "defaultMessage": "Korjataan..."
   },
   "button.report": {
     "defaultMessage": "Ilmoita"
@@ -218,6 +302,12 @@
   "button.saving": {
     "defaultMessage": "Tallennetaan"
   },
+  "button.show-all-versions": {
+    "defaultMessage": "Näytä kaikki versiot"
+  },
+  "button.show-file": {
+    "defaultMessage": "Näytä tiedostot"
+  },
   "button.sign-in": {
     "defaultMessage": "Kirjaudu sisään"
   },
@@ -230,8 +320,17 @@
   "button.stop": {
     "defaultMessage": "Pysäytä"
   },
+  "button.switch-to-version": {
+    "defaultMessage": "Vaihda versioon"
+  },
+  "button.switch-version": {
+    "defaultMessage": "Vaihda versiota"
+  },
   "button.unfollow": {
     "defaultMessage": "Lopeta seuraaminen"
+  },
+  "button.unlink-modpack": {
+    "defaultMessage": "Poista linkitys"
   },
   "button.update": {
     "defaultMessage": "Päivitys"
@@ -245,14 +344,491 @@
   "changelog.product.app": {
     "defaultMessage": "Sovellus"
   },
+  "changelog.product.hosting": {
+    "defaultMessage": "Isännöinti"
+  },
+  "changelog.product.web": {
+    "defaultMessage": "Alusta"
+  },
+  "collection-widget.empty-collection": {
+    "defaultMessage": "Tämä kokoelma on tyhjä."
+  },
+  "collection-widget.loading-projects": {
+    "defaultMessage": "Ladataan projekteja..."
+  },
+  "collection-widget.no-search-results": {
+    "defaultMessage": "Ei hakutuloksia."
+  },
+  "collection-widget.project-count": {
+    "defaultMessage": "{count, plural, one {# projekti} other {# projekteja}}"
+  },
+  "collection-widget.search-placeholder": {
+    "defaultMessage": "Etsi projekteja"
+  },
   "collections.label.private": {
     "defaultMessage": "Yksityinen"
+  },
+  "console.actions.collapse": {
+    "defaultMessage": "Pienennä"
+  },
+  "console.actions.expand": {
+    "defaultMessage": "Suurenna"
+  },
+  "console.actions.share": {
+    "defaultMessage": "Jaa"
+  },
+  "content-type.content.lowercase": {
+    "defaultMessage": "sisältö"
+  },
+  "content-type.item.lowercase": {
+    "defaultMessage": "{count, plural, one {kappale} other {kappaletta}}"
+  },
+  "content.card.frozen": {
+    "defaultMessage": "Tämä projekti on lukittu nykyiseen versioonsa, kunnes sen jäädytys poistetaan."
+  },
+  "content.card.select-project": {
+    "defaultMessage": "Valitse {project}"
+  },
+  "content.card.sync-update-pending": {
+    "defaultMessage": "Jotkut synkronoidut kopiot odottavat muutoksia. Instanssi saattaa olla päällä tai sillä voi olla jäädytetty tai yhteensopimaton versio tai saattaa jo sisältää kopion itsestään."
+  },
+  "content.card.synced": {
+    "defaultMessage": "Synkronoitu instansseihin"
+  },
+  "content.card.uploaded": {
+    "defaultMessage": "Ladattu palvelimelle"
+  },
+  "content.confirm-bulk-update.admonition-body": {
+    "defaultMessage": "Haluatko varmasti päivittää {count, plural, one {# projekti} other {# projektia}} uusimpaan yhteensopivaan versioon? Suosittelemme päivittämään sisältöä yksitellen."
+  },
+  "content.confirm-bulk-update.admonition-header": {
+    "defaultMessage": "Päivitysvaroitus"
+  },
+  "content.confirm-bulk-update.header": {
+    "defaultMessage": "Päivitä projekteja"
+  },
+  "content.confirm-bulk-update.shift-click-hint": {
+    "defaultMessage": "Pidä Vaihto pohjassa klikatessasi \"Päivitä kaikki\" ohittaaksesi tämän varoituksen."
+  },
+  "content.confirm-bulk-update.update-button": {
+    "defaultMessage": "Päivitä {count, plural, one {# projekti} other {# projektia}}"
+  },
+  "content.confirm-deletion.admonition-body": {
+    "defaultMessage": "Modin poistaminen voi pysyvästi vaikuttaa maailmaasi, ja voi aiheuttaa puuttuvaa sisältöä tai odottamattomia ongelmia, kun se avataan."
+  },
+  "content.confirm-deletion.admonition-header": {
+    "defaultMessage": "Poistovaroitus"
+  },
+  "content.confirm-deletion.delete-button": {
+    "defaultMessage": "Poista {count, number} {itemType}"
+  },
+  "content.confirm-deletion.header": {
+    "defaultMessage": "Poista {itemType}"
+  },
+  "content.confirm-disable.header": {
+    "defaultMessage": "Poista käytöstä {itemType}"
+  },
+  "content.confirm-modpack-update.admonition-body": {
+    "defaultMessage": "{action, select, downgrade {Taaksepäin päivittäminen} other {Päivittäminen}} voi aiheuttaa yhteensopivuusongelmia. Modit, tai muu sisältö, mitä olet lisännyt modipaketin päälle pidetään, mutta saattavat olla yhteensopimattomia uuden version kanssa."
+  },
+  "content.confirm-modpack-update.admonition-header": {
+    "defaultMessage": "Varoitus"
+  },
+  "content.confirm-modpack-update.confirm-button": {
+    "defaultMessage": "{action, select, downgrade {Taaksepäin päivitä} other {Päivitä}} modipaketti"
+  },
+  "content.confirm-modpack-update.header": {
+    "defaultMessage": "{action, select, downgrade {Taaksepäin päivitä} other {Päivitä}} modipaketti"
+  },
+  "content.confirm-unlink.admonition-body": {
+    "defaultMessage": "Modit ja sisältö yhdistetään modipakettiin lisäämäsi sisällön päälle, ja modipaketti ei saa enää päivityksiä."
+  },
+  "content.confirm-unlink.admonition-header": {
+    "defaultMessage": "Linkityksen poisto modipaketista"
+  },
+  "content.confirm-unlink.header": {
+    "defaultMessage": "Poista linkitys modipaketista"
+  },
+  "content.confirm-unlink.unlink-button": {
+    "defaultMessage": "Poista linkitys"
+  },
+  "content.dependency-warning.admonition-header": {
+    "defaultMessage": "Muu sisältö vaatii tätä sisältöä"
+  },
+  "content.dependency-warning.affected-dependents-label": {
+    "defaultMessage": "Vaikutuksen {count, plural, one {alainen projekti} other {alaiset projektit}}"
+  },
+  "content.dependency-warning.bulk-admonition-body": {
+    "defaultMessage": "Jotkin valitut projektit on asennettu riippuvuuksiksi. Niiden poistaminen saattaa rikkoa {context} tai lopettaa riippuvaisen sisällön oikein latautumisen."
+  },
+  "content.dependency-warning.context.instance": {
+    "defaultMessage": "instanssin"
+  },
+  "content.dependency-warning.context.server": {
+    "defaultMessage": "palvelimen"
+  },
+  "content.dependency-warning.delete-anyway-button": {
+    "defaultMessage": "Poista kuitenkin"
+  },
+  "content.dependency-warning.delete-many-anyway-button": {
+    "defaultMessage": "Poista {count, number} {itemType} kuitenkin"
+  },
+  "content.dependency-warning.deleting-label": {
+    "defaultMessage": "Poistetaan"
+  },
+  "content.dependency-warning.disable-dependents-label": {
+    "defaultMessage": "Poista riippuvaiset sisällöt käytöstä poistamisen jälkeen"
+  },
+  "content.dependency-warning.effect-dependent-content": {
+    "defaultMessage": "Riippuvainen sisältö saattaa estyä käynnistymästä tai saattaa poistaa itsensä käytöstä"
+  },
+  "content.dependency-warning.effect-instance": {
+    "defaultMessage": "Sinun {context} saattaa sammua, estää käynnistyksen tai käyttäytyä odottamattomasti"
+  },
+  "content.dependency-warning.header": {
+    "defaultMessage": "Riippuvaisuusvaroitus"
+  },
+  "content.dependency-warning.single-admonition-body": {
+    "defaultMessage": "{project} on asennettu riippuvaisuutena. Sen poistaminen voi rikkoa {context} tai estää riippuvaisen sisällön kunnollisen latautumisen."
+  },
+  "content.dependency-warning.what-happens-label": {
+    "defaultMessage": "Mitä tapahtuu?"
   },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} lisätty"
   },
+  "content.diff-modal.config-files-updated": {
+    "defaultMessage": "Muutetut asetustiedostot"
+  },
+  "content.diff-modal.diff-type.added": {
+    "defaultMessage": "Lisätyt (riippuvaisuudet)"
+  },
+  "content.diff-modal.diff-type.removed": {
+    "defaultMessage": "Käytöstä poistetut"
+  },
+  "content.diff-modal.diff-type.removed-disabled": {
+    "defaultMessage": "Poistetut (käytöstä poistetut)"
+  },
+  "content.diff-modal.diff-type.updated": {
+    "defaultMessage": "Päivitetyt"
+  },
+  "content.diff-modal.dont-install": {
+    "defaultMessage": "Älä asenna"
+  },
+  "content.diff-modal.external-diff-type.added": {
+    "defaultMessage": "Lisätty"
+  },
+  "content.diff-modal.external-diff-type.removed": {
+    "defaultMessage": "Poistettu"
+  },
+  "content.diff-modal.external-diff-type.updated": {
+    "defaultMessage": "Päivitetty"
+  },
+  "content.diff-modal.file-count": {
+    "defaultMessage": "{count, plural, one {# tiedosto} other {# tiedostot}}"
+  },
+  "content.diff-modal.game-version-updated": {
+    "defaultMessage": "Peliversio"
+  },
+  "content.diff-modal.install-anyway": {
+    "defaultMessage": "Asenna silti"
+  },
+  "content.diff-modal.loader-updated": {
+    "defaultMessage": "Lataaja"
+  },
+  "content.diff-modal.modpack-linked": {
+    "defaultMessage": "Linkitetty modipaketti"
+  },
+  "content.diff-modal.modpack-unlinked": {
+    "defaultMessage": "Modipaketti, josta linkitys poistettu"
+  },
+  "content.diff-modal.modpack-updated": {
+    "defaultMessage": "Päivitetty modipaketti"
+  },
+  "content.diff-modal.no-content-changes": {
+    "defaultMessage": "Ei sisällon muutoksia"
+  },
+  "content.diff-modal.removed-count": {
+    "defaultMessage": "{count} poistettu"
+  },
+  "content.diff-modal.removed-disabled-count": {
+    "defaultMessage": "{count} poistettu (jotka pois käytöstä)"
+  },
+  "content.diff-modal.reviewed-files": {
+    "defaultMessage": "Tiedostot, joita ei julkaista Modrinthiin ei tarkastella."
+  },
+  "content.diff-modal.unknown-content-body": {
+    "defaultMessage": "Jotain sisältöä palvelimellasi ei pystytty analysoimaan ja tämä muutos voi vaikuttaa niihin."
+  },
+  "content.diff-modal.unknown-files-description": {
+    "defaultMessage": "Tämä päivitys sisältää tiedostoja, joita ei ole julkaistu Modrinthiin. Suosittelemme asentamaan tiedostoja vain lähteistä, joihin luotat."
+  },
+  "content.diff-modal.unknown-files-warning": {
+    "defaultMessage": "Varoitus"
+  },
+  "content.diff-modal.unknown-project": {
+    "defaultMessage": "Tuntematon"
+  },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} päivitetty"
+  },
+  "content.filter.disabled": {
+    "defaultMessage": "Pois käytöstä"
+  },
+  "content.filter.enabled": {
+    "defaultMessage": "Käytössä"
+  },
+  "content.filter.updates": {
+    "defaultMessage": "Päivitykset"
+  },
+  "content.filter.warnings": {
+    "defaultMessage": "Varoitukset"
+  },
+  "content.inline-backup.backing-up": {
+    "defaultMessage": "Luodaan varmuuskopiota..."
+  },
+  "content.inline-backup.backup-complete": {
+    "defaultMessage": "Varmuuskopio luotu"
+  },
+  "content.inline-backup.backup-failed": {
+    "defaultMessage": "Varmuuskopion luonti epäonnistui. Voit silti jatkaa."
+  },
+  "content.inline-backup.backup-in-progress": {
+    "defaultMessage": "Varmuuskopio on käynnissä. On suositeltavaa odottaa sen valmistumista ennen tämän toiminnon suorittamista."
+  },
+  "content.inline-backup.backup-takes-a-while": {
+    "defaultMessage": "Varmuuskopion luonti voi viedä montakin minuuttia riippuen palvelimesi koosta."
+  },
+  "content.inline-backup.create-backup": {
+    "defaultMessage": "Luo varmuuskopio"
+  },
+  "content.inline-backup.instance-label": {
+    "defaultMessage": "instanssin"
+  },
+  "content.inline-backup.shift-click-hint": {
+    "defaultMessage": "Paina vaihtonäppäintä klikatessasi ohittaaksesi vahvistuksen."
+  },
+  "content.inline-backup.warning-body": {
+    "defaultMessage": "Suosittelemme luomaan varmuuskopion ennen, kun jatkat, jotta {type} voi palauttaa, jos jotain menee rikki."
+  },
+  "content.inline-backup.world-label": {
+    "defaultMessage": "maailman"
+  },
+  "content.managed-card.modpack-content": {
+    "defaultMessage": "Modipaketin sisältö"
+  },
+  "content.managed-card.provided-by": {
+    "defaultMessage": "Tekijä"
+  },
+  "content.managed-card.server-suffix": {
+    "defaultMessage": "palvelin"
+  },
+  "content.managed-card.settings": {
+    "defaultMessage": "Asennusasetukset"
+  },
+  "content.managed-card.shared-content": {
+    "defaultMessage": "Jaettu sisältö"
+  },
+  "content.managed-card.summary.installing": {
+    "defaultMessage": "Asennetaan sisältöä..."
+  },
+  "content.managed-card.summary.loading": {
+    "defaultMessage": "Ladataan yhteenvetoa hallinnoidusta sisällöstä"
+  },
+  "content.managed-card.summary.no-provided-content": {
+    "defaultMessage": "Ei sisältöä"
+  },
+  "content.managed-card.switch-version": {
+    "defaultMessage": "Vaihda versiota"
+  },
+  "content.managed-card.synced": {
+    "defaultMessage": "Synkronoitu {time}"
+  },
+  "content.managed-card.update-available": {
+    "defaultMessage": "Päivitys saatavilla"
+  },
+  "content.managed-card.updated": {
+    "defaultMessage": "Päivitetty {time}"
+  },
+  "content.managed-card.updating": {
+    "defaultMessage": "Päivitetään..."
+  },
+  "content.managed-card.view-content": {
+    "defaultMessage": "Sisältö"
+  },
+  "content.metadata-filter.author": {
+    "defaultMessage": "Tekijä"
+  },
+  "content.metadata-filter.environment": {
+    "defaultMessage": "Ympäristö"
+  },
+  "content.metadata-filter.open-source": {
+    "defaultMessage": "Avoin lähde"
+  },
+  "content.metadata-filter.shared-content": {
+    "defaultMessage": "Jaettu sisältö"
+  },
+  "content.metadata-filter.source.external": {
+    "defaultMessage": "Ulkoinen"
+  },
+  "content.metadata-filter.state": {
+    "defaultMessage": "Tila"
+  },
+  "content.metadata-filter.state.disabled": {
+    "defaultMessage": "Pois käytöstä"
+  },
+  "content.metadata-filter.state.enabled": {
+    "defaultMessage": "Käytössä"
+  },
+  "content.metadata-filter.update.available": {
+    "defaultMessage": "Päivitys saatavilla"
+  },
+  "content.metadata-filter.warning.client-depends": {
+    "defaultMessage": "Käyttäjä on riippuvainen tiedostosta"
+  },
+  "content.metadata-filter.warning.client-only": {
+    "defaultMessage": "Vain käyttäjän tarvitsema sisältö"
+  },
+  "content.metadata-filter.warning.client-retained": {
+    "defaultMessage": "Käyttäjätiedosto säilytetty"
+  },
+  "content.metadata-filter.warning.none": {
+    "defaultMessage": "Ei varoituksia"
+  },
+  "content.metadata-filter.warnings": {
+    "defaultMessage": "Varoitukset"
+  },
+  "content.page-layout.additional-content": {
+    "defaultMessage": "Lisäsisältö"
+  },
+  "content.page-layout.browse-content": {
+    "defaultMessage": "Selaa sisältöä"
+  },
+  "content.page-layout.busy-description": {
+    "defaultMessage": "Odota toiminnon valmistumista ennen sisällön muokkausta."
+  },
+  "content.page-layout.empty.hint": {
+    "defaultMessage": "Selaa tai lataa {contentType} aloittaaksesi"
+  },
+  "content.page-layout.empty.modpack-hint": {
+    "defaultMessage": "Lisää lisäsisältöä modipaketin päälle"
+  },
+  "content.page-layout.empty.no-content-installed": {
+    "defaultMessage": "Ei asennettua sisältöä"
+  },
+  "content.page-layout.empty.no-extra-content-installed": {
+    "defaultMessage": "Ei asennettua lisäsisältöä"
+  },
+  "content.page-layout.failed-to-load": {
+    "defaultMessage": "Sisällön lataus epäonnistui"
+  },
+  "content.page-layout.failed-to-load-changelog": {
+    "defaultMessage": "Muutosluettelon lataus epäonnistui"
+  },
+  "content.page-layout.failed-to-load-updates": {
+    "defaultMessage": "Saatavilla olevien päivitysten lataus epäonnistui"
+  },
+  "content.page-layout.filter.add": {
+    "defaultMessage": "Suodatin"
+  },
+  "content.page-layout.filter.author-count": {
+    "defaultMessage": "{count, plural, one {# tekijä} other {# tekijät}}"
+  },
+  "content.page-layout.loading": {
+    "defaultMessage": "Ladataan sisältöä..."
+  },
+  "content.page-layout.no-content-found": {
+    "defaultMessage": "Sisältöä ei löytynyt."
+  },
+  "content.page-layout.please-wait": {
+    "defaultMessage": "Odota"
+  },
+  "content.page-layout.search-placeholder": {
+    "defaultMessage": "Etsi {count, number} {contentType}..."
+  },
+  "content.page-layout.share.file-names": {
+    "defaultMessage": "Tiedostonimet"
+  },
+  "content.page-layout.share.label": {
+    "defaultMessage": "Jaa"
+  },
+  "content.page-layout.share.markdown-links": {
+    "defaultMessage": "Markdown -linkit"
+  },
+  "content.page-layout.share.project-links": {
+    "defaultMessage": "Projektilinkit"
+  },
+  "content.page-layout.share.project-names": {
+    "defaultMessage": "Projektinimet"
+  },
+  "content.page-layout.sort.alphabetical-ascending": {
+    "defaultMessage": "Nimi (A-Ö)"
+  },
+  "content.page-layout.sort.alphabetical-descending": {
+    "defaultMessage": "Nimi (Ö-A)"
+  },
+  "content.page-layout.sort.date-added-newest": {
+    "defaultMessage": "Uusin ensin"
+  },
+  "content.page-layout.sort.date-added-oldest": {
+    "defaultMessage": "Vanhin ensin"
+  },
+  "content.page-layout.update-all": {
+    "defaultMessage": "Päivitä kaikki"
+  },
+  "content.page-layout.upload-files": {
+    "defaultMessage": "Lisää tiedostoja"
+  },
+  "content.selection-bar.all-already-disabled": {
+    "defaultMessage": "Kaikki valittu sisältö on jo pois käytöstä"
+  },
+  "content.selection-bar.all-already-enabled": {
+    "defaultMessage": "Kaikki valittu sisältö on jo käytössä"
+  },
+  "content.selection-bar.bulk.deleting": {
+    "defaultMessage": "Poistetaan {progress}/{total} {contentType}..."
+  },
+  "content.selection-bar.bulk.deleting-count": {
+    "defaultMessage": "Poistetaan {count, number} {contentType}"
+  },
+  "content.selection-bar.bulk.deleting-waiting": {
+    "defaultMessage": "Poistetaan {contentType}..."
+  },
+  "content.selection-bar.bulk.disabling": {
+    "defaultMessage": "Poistetaan käytöstä {progress}/{total} {contentType}..."
+  },
+  "content.selection-bar.bulk.disabling-count": {
+    "defaultMessage": "Poistetaan käytöstä {count, number} {contentType}"
+  },
+  "content.selection-bar.bulk.disabling-waiting": {
+    "defaultMessage": "Poistetaan käytöstä {contentType}..."
+  },
+  "content.selection-bar.bulk.enabling": {
+    "defaultMessage": "Otetaan käyttöön {progress}/{total} {contentType}..."
+  },
+  "content.selection-bar.bulk.enabling-count": {
+    "defaultMessage": "Otetaan käyttöön {count, number} {contentType}"
+  },
+  "content.selection-bar.bulk.enabling-waiting": {
+    "defaultMessage": "Otetaan käyttöön {contentType}..."
+  },
+  "content.selection-bar.bulk.updating": {
+    "defaultMessage": "Päivitetään {progress}/{total} {contentType}..."
+  },
+  "content.selection-bar.bulk.updating-count": {
+    "defaultMessage": "Päivitetään {count, number} {contentType}"
+  },
+  "content.selection-bar.bulk.updating-waiting": {
+    "defaultMessage": "Päivitetään {contentType}..."
+  },
+  "content.selection-bar.selected-count": {
+    "defaultMessage": "{count, number} {contentType} valittu"
+  },
+  "content.selection-bar.selected-count-simple": {
+    "defaultMessage": "{count, number} valittu"
+  },
+  "creation-flow.button.create-instance": {
+    "defaultMessage": "Luo instanssi"
   },
   "form.label.first-name": {
     "defaultMessage": "Etunimi"
@@ -297,7 +873,7 @@
     "defaultMessage": "Resoluutio"
   },
   "hosting.specs.burst.tooltip": {
-    "defaultMessage": ""
+    "defaultMessage": "CPU bursting antaa palvelimesi käyttää ylimääräisiä säikeitä välttääkseen TPS piikkejä. Klikkaa saadaksesi lisätietoja."
   },
   "hosting.specs.gb-ram": {
     "defaultMessage": "{ram} Gt RAM"

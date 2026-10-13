@@ -127,6 +127,18 @@ const messages = defineMessages({
 		id: 'app.skins.section.chaos-cubed',
 		defaultMessage: 'Chaos Cubed',
 	},
+	dungeonsHeroSection: {
+		id: 'app.skins.section.dungeons-hero',
+		defaultMessage: 'Dungeons Hero',
+	},
+	dungeonsIIHeroSection: {
+		id: 'app.skins.section.dungeons-ii-hero',
+		defaultMessage: 'Dungeons II Hero',
+	},
+	wildernessBoundSection: {
+		id: 'app.skins.section.wilderness-bound',
+		defaultMessage: 'Wilderness Bound',
+	},
 	rateLimitTitle: {
 		id: 'app.skins.rate-limit.title',
 		defaultMessage: 'Slow down!',
@@ -499,6 +511,12 @@ function getDefaultSkinSectionTitle(section?: string) {
 			return formatMessage(messages.tinyTakeoverSection)
 		case 'Chaos Cubed':
 			return formatMessage(messages.chaosCubedSection)
+		case 'Dungeons Hero':
+			return formatMessage(messages.dungeonsHeroSection)
+		case 'Dungeons II Hero':
+			return formatMessage(messages.dungeonsIIHeroSection)
+		case 'Wilderness Bound':
+			return formatMessage(messages.wildernessBoundSection)
 		case 'Default skins':
 			return formatMessage(messages.defaultSkinsSection)
 		default:

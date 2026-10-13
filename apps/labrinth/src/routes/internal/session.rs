@@ -3,6 +3,7 @@ use crate::auth::{AuthenticationError, get_user_from_headers};
 use crate::database::models::DBUserId;
 use crate::database::models::session_item::DBSession;
 use crate::database::models::session_item::SessionBuilder;
+use crate::database::models::user_lock_item::DBUserLock;
 use crate::database::{PgPool, PgTransaction};
 use crate::env::ENV;
 use crate::models::pats::Scopes;
@@ -17,6 +18,7 @@ use chrono::{DateTime, Utc};
 use rand::distributions::Alphanumeric;
 use rand::{Rng, SeedableRng};
 use rand_chacha::ChaCha20Rng;
+use serde::Serialize;
 use woothee::parser::Parser;
 use xredis::RedisPool;
 
@@ -92,6 +94,10 @@ pub async fn issue_session(
     redis: &RedisPool,
     session_expires: Option<DateTime<Utc>>,
 ) -> Result<DBSession, AuthenticationError> {
+    if DBUserLock::exists(user_id, &mut *transaction).await? {
+        return Err(AuthenticationError::AccountLocked);
+    }
+
     let metadata = get_session_metadata(&req).await?;
 
     let session = ChaCha20Rng::from_entropy()
@@ -132,6 +138,39 @@ pub async fn issue_session(
     .await?;
 
     Ok(session)
+}
+
+#[derive(Serialize)]
+pub struct AuthSession {
+    #[serde(flatten)]
+    pub session: Session,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub app_session: Option<String>,
+}
+
+pub async fn issue_auth_sessions(
+    req: HttpRequest,
+    user_id: DBUserId,
+    transaction: &mut PgTransaction<'_>,
+    redis: &RedisPool,
+    include_app_session: bool,
+) -> Result<AuthSession, AuthenticationError> {
+    let session =
+        issue_session(req.clone(), user_id, transaction, redis, None).await?;
+    let app_session = if include_app_session {
+        Some(
+            issue_session(req, user_id, transaction, redis, None)
+                .await?
+                .session,
+        )
+    } else {
+        None
+    };
+
+    Ok(AuthSession {
+        session: Session::from(session, true, None),
+        app_session,
+    })
 }
 
 /// List sessions.  

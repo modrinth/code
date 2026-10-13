@@ -726,6 +726,18 @@
 				"user_id": "TEZXhE2U"
 			},
 			"action": {
+				"action": "sftp_credentials_rolled"
+			},
+			"server_id": "4f3d5df7-4e75-4f08-a1f5-fc472fb7b7bd",
+			"world_id": null,
+			"timestamp": "2026-05-20T12:17:00Z"
+		},
+		{
+			"actor": {
+				"type": "user",
+				"user_id": "TEZXhE2U"
+			},
+			"action": {
 				"action": "console_command_executed",
 				"metadata": {
 					"command": "say Maintenance in 5 minutes"

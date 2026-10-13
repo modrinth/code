@@ -6,6 +6,7 @@ use super::ApiError;
 use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::models;
 use crate::models::ids::VersionId;
+use crate::models::pats::Scopes;
 use crate::models::projects::{
     Dependency, FileType, Version, VersionStatus, VersionType,
 };
@@ -85,6 +86,8 @@ pub async fn version_list(
         "project_id",
         pool.as_ref(),
         redis.as_ref(),
+        session_queue.as_ref(),
+        Scopes::PROJECT_READ | Scopes::VERSION_READ,
     )
     .await?
     {
@@ -200,6 +203,8 @@ pub async fn version_project_get(
         "project_id",
         pool.as_ref(),
         redis.as_ref(),
+        session_queue.as_ref(),
+        Scopes::PROJECT_READ | Scopes::VERSION_READ,
     )
     .await?
     {
