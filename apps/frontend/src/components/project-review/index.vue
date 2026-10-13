@@ -311,7 +311,7 @@ const rightPanelTabs = computed(() => [
 				{
 					value: 're-review',
 					label: formatMessage(reviewTabMessages.reReview, {
-						count: previousIssues.reReviewIssues.value.length,
+						count: previousIssues.remainingReReviewIssues.value.length,
 					}),
 				},
 			]

@@ -265,7 +265,11 @@ export function createReviewSubmission(
 				body: status ? draft.value : '',
 				images: status ? [...uploadedImages.value] : [],
 				privateMessage: false,
-				facetUpdates: status ? [...previousIssues.facetUpdates.value] : [],
+				facetUpdates: [
+					...(status
+						? previousIssues.facetUpdates.value
+						: previousIssues.replacementFacetUpdates.value),
+				],
 				issues: selectedIssues(),
 			}
 			mutationStarted = true

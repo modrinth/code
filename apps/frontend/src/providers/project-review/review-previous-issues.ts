@@ -344,6 +344,9 @@ export function createReviewPreviousIssues(
 	}
 
 	const reReviewIssues = computed(() => issues.value.filter((issue) => !isResolved(issue)))
+	const remainingReReviewIssues = computed(() =>
+		reReviewIssues.value.filter((issue) => !isApplicable(issue)),
+	)
 	const resolvedIssues = computed(() => issues.value.filter(isResolved))
 
 	const appliedIssues = computed(() => issues.value.filter(isApplicable))
@@ -369,79 +372,26 @@ export function createReviewPreviousIssues(
 		)
 	}
 
-	function targetKey(what: Labrinth.Threads.v3.ThreadIssueTarget): string {
-		switch (what.type) {
-			case 'version':
-				return `${what.type}:${what.value.version_id}:${what.value.target.type}:${
-					what.value.target.type === 'modify_additional_file_type'
-						? what.value.target.value.file_id
-						: what.value.target.type === 'remove_additional_files'
-							? [...what.value.target.value.file_ids].sort().join(',')
-							: ''
-				}`
-			case 'modify_gallery_image':
-				return `${what.type}:${what.value.image_id}`
-			case 'modify_team_member_role':
-				return `${what.type}:${what.value.team_id}:${what.value.user_id}`
-			case 'modify_server_address':
-				return `${what.type}:${what.value.platform}`
-			case 'modify_project_disclosure':
-			case 'modify_project_disclosure_note':
-				return `${what.type}:${what.value.disclosure_type}`
-			case 'modify_links':
-				return `${what.type}:${Object.keys(what.value.links).sort().join(',')}`
-			case 'remove_tags':
-				return `${what.type}:${[...what.value.tags].sort().join(',')}`
-			case 'remove_gallery_images':
-				return `${what.type}:${[...what.value.image_ids].sort((a, b) => a - b).join(',')}`
-			case 'add_project_disclosures':
-			case 'remove_project_disclosures':
-				return `${what.type}:${[...what.value.disclosure_types].sort().join(',')}`
-			case 'acknowledge':
-				return `${what.type}:${what.value.mode}`
-			default:
-				return what.type
-		}
-	}
-
 	const recreatedIssues = computed(() =>
 		appliedIssues.value
 			.filter(needsReplacement)
 			.flatMap((issue): Labrinth.Threads.v3.NewThreadIssue[] => {
 				const id = reviewIssue(issue)?.id
 				const active = panels.activeIssues.value.find((active) => active.id === id)
-				const changed = !!active && !panels.isRestoredIssue(active.id)
-				const custom = panels.customIssues.value.find((entry) => entry.id === id)?.custom
-				const previousFacets = new Map(issue.facets.map((facet) => [targetKey(facet.what), facet]))
-				const facets = active
-					? active.facets.filter(({ what }) => {
-							const previous = previousFacets.get(targetKey(what))
-							return changed || !previous || isFacetApplicable(issue, previous)
-						})
-					: issue.facets
-							.filter((facet) => isFacetApplicable(issue, facet))
-							.map(({ what }) => ({ what }))
-				const [first, ...rest] = facets
-				if (!first) return []
+				if (!active) return []
+				const definition = panels.availableIssues.value.find((entry) => entry.id === id)
+				const custom = definition?.custom
 				return [
 					{
 						why: {
-							...issueDetails(issue),
+							issue_id: custom?.id.trim() ?? active.id,
+							...(custom ? { custom: { priority: custom.priority } } : {}),
+							title: definition?.title ?? active.id,
 							message: reviewMessage(issue),
-							...(custom
-								? {
-										issue_id: custom.id.trim(),
-										custom: { priority: custom.priority },
-									}
-								: {}),
-							...(active
-								? {
-										selection: panels.issueSelection(active.id),
-										locations: active.locations,
-									}
-								: {}),
+							selection: panels.issueSelection(active.id),
+							locations: active.locations,
 						},
-						facets: [first, ...rest],
+						facets: active.facets,
 					},
 				]
 			}),
@@ -458,10 +408,19 @@ export function createReviewPreviousIssues(
 			),
 		),
 	)
+	const replacementFacetUpdates = computed(() => {
+		const facetIds = new Set(
+			appliedIssues.value
+				.filter(needsReplacement)
+				.flatMap((issue) => issue.facets.map(({ id }) => id)),
+		)
+		return facetUpdates.value.filter(({ id }) => facetIds.has(id))
+	})
 
 	return {
 		issues,
 		reReviewIssues,
+		remainingReReviewIssues,
 		appliedIssues,
 		resolvedIssues,
 		associatedIssueIds,
@@ -478,6 +437,7 @@ export function createReviewPreviousIssues(
 				0,
 			),
 		facetUpdates,
+		replacementFacetUpdates,
 		hasUnresolvedFacets: computed(() =>
 			issues.value.some((issue) => issue.facets.some((facet) => isFacetApplicable(issue, facet))),
 		),

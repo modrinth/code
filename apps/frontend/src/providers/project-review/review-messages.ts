@@ -44,7 +44,13 @@ export function createReviewMessages(
 	}
 	function resetIssueMessage(id: string) {
 		overrides.delete(id)
-		panels.updateCustomIssue(id, { message: '' })
+		const custom = panels.customIssues.value.find((issue) => issue.id === id)?.custom
+		if (custom) panels.updateCustomIssue(id, { message: custom.previous?.why.message ?? '' })
+	}
+	function hasIssueOverride(id: string) {
+		const custom = panels.customIssues.value.find((issue) => issue.id === id)?.custom
+		if (custom?.previous) return custom.message !== (custom.previous.why.message ?? '')
+		return overrides.has(id)
 	}
 	function resetAllIssueMessages() {
 		overrides.clear()
@@ -67,6 +73,6 @@ export function createReviewMessages(
 		editIssueMessage,
 		resetIssueMessage,
 		resetAllIssueMessages,
-		hasIssueOverride: (id: string) => overrides.has(id),
+		hasIssueOverride,
 	}
 }
