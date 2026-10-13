@@ -115,6 +115,9 @@ pub async fn export(
         FabriclikeLoader::Quilt => {
             format!("quilt/v{format_version}/manifest.json")
         }
+        FabriclikeLoader::Ornithe => {
+            format!("ornithe/v{format_version}/manifest.json")
+        }
     };
     app.public_blobs
         .put(&path, &json, ContentType::Json)
@@ -163,8 +166,11 @@ fn prepare_profile(
     mut profile: FabriclikeProfileMetadata,
     public_maven: &Url,
 ) -> FabriclikeProfileMetadata {
+    // libraries with their own downloads are served from upstream
     for library in &mut profile.libraries {
-        library.url = Some(public_maven.to_string());
+        if library.downloads.is_none() {
+            library.url = Some(public_maven.to_string());
+        }
     }
     profile
 }
@@ -232,6 +238,7 @@ fn profile_path(
     let loader = match loader {
         FabriclikeLoader::Fabric => "fabric",
         FabriclikeLoader::Quilt => "quilt",
+        FabriclikeLoader::Ornithe => "ornithe",
     };
     match group {
         None => format!("{loader}/v{format_version}/versions/{version}.json"),
@@ -335,6 +342,10 @@ mod tests {
             profile_base_url: "https://meta.example.com/versions/loader/"
                 .parse()
                 .unwrap(),
+            templated: true,
+            extra_libraries: Vec::new(),
+            removed_libraries: Vec::new(),
+            java_version: None,
         }
     }
 

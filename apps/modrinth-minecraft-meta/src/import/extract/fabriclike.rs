@@ -12,6 +12,7 @@ use crate::{
     model::{
         FabriclikeLoader, FabriclikeStoredArtifact, GAME_VERSION_PLACEHOLDER,
     },
+    upstream::mojang::Argument,
     util::{MavenCoordinate, ResponseExt, Sha1, Sha256, from_json_slice},
 };
 
@@ -132,11 +133,20 @@ pub async fn extract_catalogs(
             let bytes = app.cas.get(sha256)
 				.context(info_span!("fetching loader profile", loader_version = %version.id, %source))
 				.await?;
-            let profile = from_json_slice::<ProfileMetadata>(&bytes)
+            let mut profile = from_json_slice::<ProfileMetadata>(&bytes)
                 .context("parsing loader profile")?;
+            profile
+                .libraries
+                .extend(group.extra_libraries.iter().cloned());
+            if let Some(java_version) = &group.java_version {
+                profile.java_version = Some(java_version.clone());
+            }
+            profile
+                .removed_libraries
+                .clone_from(&group.removed_libraries);
             let (profile, dependencies) = normalize_profile(
                 profile,
-                template,
+                group.templated.then_some(template),
                 &group.games,
                 fallback_maven,
             )
@@ -409,26 +419,64 @@ fn validate_groups(
     Ok(())
 }
 
+/// Replaces whole occurrences of `game_version` in `value` with
+/// [`GAME_VERSION_PLACEHOLDER`], so `1.8` is left alone in `1.8.9`.
+fn template_game_version(value: &str, game_version: &str) -> String {
+    let is_boundary =
+        |x: Option<char>| x.is_none_or(|x| !x.is_alphanumeric() && x != '.');
+    let mut templated = String::with_capacity(value.len());
+    let mut copied = 0;
+    for (start, _) in value.match_indices(game_version) {
+        let end = start + game_version.len();
+        if is_boundary(value[..start].chars().next_back())
+            && is_boundary(value[end..].chars().next())
+        {
+            templated.push_str(&value[copied..start]);
+            templated.push_str(GAME_VERSION_PLACEHOLDER);
+            copied = end;
+        }
+    }
+    templated.push_str(&value[copied..]);
+    templated
+}
+
 /// Takes a downloaded loader profile, replaces its game-specific metadata with
 /// placeholders, retaining source repositories for later publication.
 ///
+/// Without a `template`, the profile is kept as downloaded, for a group with a
+/// single game which the upstream names differently.
+///
 /// Returns the processed profile and the concrete artifacts needed by its games.
 /// Callers should dedup artifacts by Maven path before mirroring them.
+/// Libraries with their own downloads are served from upstream, so they are
+/// not returned.
 pub fn normalize_profile(
     mut profile: ProfileMetadata,
-    template: &str,
+    template: Option<&str>,
     games: &[String],
     fallback_maven: &Url,
 ) -> Result<(ProfileMetadata, Vec<Artifact>)> {
-    if let Some(prefix) = profile.id.strip_suffix(template) {
-        profile.id = format!("{prefix}{GAME_VERSION_PLACEHOLDER}");
+    if let Some(template) = template {
+        profile.id = template_game_version(&profile.id, template);
+        profile.inherits_from =
+            template_game_version(&profile.inherits_from, template);
+        for argument in profile
+            .arguments
+            .iter_mut()
+            .flat_map(|arguments| arguments.values_mut())
+            .flatten()
+        {
+            if let Argument::Normal(value) = argument {
+                *value = template_game_version(value, template);
+            }
+        }
     }
-    profile.inherits_from = profile
-        .inherits_from
-        .replace(template, GAME_VERSION_PLACEHOLDER);
 
     let mut artifacts = Vec::new();
     for (index, library) in profile.libraries.iter_mut().enumerate() {
+        if library.downloads.is_some() {
+            continue;
+        }
         let name = library.name.clone();
         let coordinate =
             name.parse::<MavenCoordinate>().with_context(|| {
@@ -462,13 +510,17 @@ pub fn normalize_profile(
         // we only rewrite the coordinate if it's one of the ones
         // that we know contains a game version
         // (like fabric intermediary coordinate).
-        if matches!(
-            (
-                coordinate.group_id.as_str(),
-                coordinate.artifact_id.as_str()
-            ),
-            ("net.fabricmc", "intermediary") | ("org.quiltmc", "hashed")
-        ) {
+        if let Some(template) = template
+            && matches!(
+                (
+                    coordinate.group_id.as_str(),
+                    coordinate.artifact_id.as_str()
+                ),
+                ("net.fabricmc", "intermediary")
+                    | ("org.quiltmc", "hashed")
+                    | ("net.ornithemc", "calamus-intermediary-gen2")
+            )
+        {
             ensure!(
                 coordinate.version.as_str() == template,
                 "library {index} mapping version {} does not match template {template:?}",
@@ -588,6 +640,10 @@ mod tests {
             profile_base_url: "https://meta.example.com/versions/loader/"
                 .parse()
                 .unwrap(),
+            templated: true,
+            extra_libraries: Vec::new(),
+            removed_libraries: Vec::new(),
+            java_version: None,
         }
     }
 
@@ -765,7 +821,7 @@ mod tests {
         }
         let (profile, artifacts) = normalize_profile(
             serde_json::from_value(profile)?,
-            "GAME",
+            Some("GAME"),
             games,
             &Url::parse("https://maven.fabricmc.net/").unwrap(),
         )?;
@@ -785,7 +841,7 @@ mod tests {
         .unwrap();
         let (profile, _) = normalize_profile(
             profile,
-            "26.3",
+            Some("26.3"),
             &[],
             &Url::parse("https://maven.quiltmc.org/repository/release/")
                 .unwrap(),
@@ -989,6 +1045,133 @@ mod tests {
         let mut missing = value;
         missing.as_object_mut().unwrap().remove("releaseTime");
         assert!(serde_json::from_value::<ProfileMetadata>(missing).is_err());
+    }
+
+    #[test]
+    fn game_versions_inside_longer_versions_are_not_templated() {
+        assert_eq!(
+            template_game_version(
+                "fabric-loader-0.11.8-1.8-ornithe-gen2",
+                "1.8"
+            ),
+            format!(
+                "fabric-loader-0.11.8-{GAME_VERSION_PLACEHOLDER}-ornithe-gen2"
+            )
+        );
+        assert_eq!(
+            template_game_version("-Dfabric.gameVersion=1.8", "1.8"),
+            format!("-Dfabric.gameVersion={GAME_VERSION_PLACEHOLDER}")
+        );
+        assert_eq!(template_game_version("a:b:1.8.9", "1.8"), "a:b:1.8.9");
+        assert_eq!(template_game_version("0.1.8", "1.8"), "0.1.8");
+    }
+
+    fn ornithe_profile() -> Value {
+        json!({
+            "id": "fabric-loader-0.19.5-GAME-ornithe-gen2",
+            "inheritsFrom": "GAME-vanilla",
+            "releaseTime": "2026-10-13T09:08:32+0200",
+            "time": "2026-10-13T09:08:32+0200",
+            "type": "release",
+            "arguments": {
+                "jvm": ["-Dfabric.fixPackageAccess=true", "-Dfabric.gameVersion=GAME"],
+                "game": []
+            },
+            "logging": { "client": {
+                "argument": "-Dlog4j.configurationFile=${path}",
+                "file": {
+                    "id": "client-1.12.xml",
+                    "sha1": "bd65e7d2e3c237be76cfbef4c2405033d7f91521",
+                    "size": 888,
+                    "url": "https://launcher.mojang.com/v1/objects/bd65e7d2e3c237be76cfbef4c2405033d7f91521/client-1.12.xml"
+                },
+                "type": "log4j2-xml"
+            } },
+            "libraries": [
+                {
+                    "name": "net.ornithemc:calamus-intermediary-gen2:GAME",
+                    "url": "https://maven.ornithemc.net/releases/"
+                },
+                {
+                    "name": "org.lwjgl.lwjgl:lwjgl-platform:2.9.4+legacyfabric.15",
+                    "downloads": { "classifiers": { "natives-osx": {
+                        "sha1": "0000000000000000000000000000000000000000",
+                        "size": 1,
+                        "url": "https://maven.legacyfabric.net/natives-osx.jar"
+                    } } },
+                    "natives": { "osx": "natives-osx" }
+                }
+            ]
+        })
+    }
+
+    #[test]
+    fn templates_ornithe_profiles() {
+        let (profile, artifacts) = normalize_profile(
+            serde_json::from_value(ornithe_profile()).unwrap(),
+            Some("GAME"),
+            &["1.8.9".into(), "1.6.4".into()],
+            &Url::parse("https://maven.ornithemc.net/releases/").unwrap(),
+        )
+        .unwrap();
+        let profile = serde_json::to_value(profile).unwrap();
+        assert_eq!(
+            profile["id"],
+            format!(
+                "fabric-loader-0.19.5-{GAME_VERSION_PLACEHOLDER}-ornithe-gen2"
+            )
+        );
+        assert_eq!(
+            profile["inheritsFrom"],
+            format!("{GAME_VERSION_PLACEHOLDER}-vanilla")
+        );
+        assert_eq!(
+            profile["arguments"]["jvm"][1],
+            format!("-Dfabric.gameVersion={GAME_VERSION_PLACEHOLDER}")
+        );
+        assert_eq!(
+            profile["libraries"][0]["name"],
+            format!(
+                "net.ornithemc:calamus-intermediary-gen2:{GAME_VERSION_PLACEHOLDER}"
+            )
+        );
+        assert_eq!(
+            profile["logging"]["client"]["file"]["id"],
+            "client-1.12.xml"
+        );
+        assert_eq!(
+            artifacts
+                .iter()
+                .map(|artifact| artifact.coordinate.to_string())
+                .collect::<Vec<_>>(),
+            [
+                "net.ornithemc:calamus-intermediary-gen2:1.8.9",
+                "net.ornithemc:calamus-intermediary-gen2:1.6.4"
+            ]
+        );
+    }
+
+    #[test]
+    fn untemplated_profiles_are_kept_as_downloaded() {
+        let (profile, artifacts) = normalize_profile(
+            serde_json::from_value(ornithe_profile()).unwrap(),
+            None,
+            &["1.0".into()],
+            &Url::parse("https://maven.ornithemc.net/releases/").unwrap(),
+        )
+        .unwrap();
+        let profile = serde_json::to_value(profile).unwrap();
+        assert_eq!(profile["id"], "fabric-loader-0.19.5-GAME-ornithe-gen2");
+        assert_eq!(profile["arguments"]["jvm"][1], "-Dfabric.gameVersion=GAME");
+        assert_eq!(
+            profile["libraries"][0]["name"],
+            "net.ornithemc:calamus-intermediary-gen2:GAME"
+        );
+        assert_eq!(artifacts.len(), 1);
+        assert_eq!(
+            artifacts[0].coordinate.to_string(),
+            "net.ornithemc:calamus-intermediary-gen2:GAME"
+        );
     }
 
     #[test]

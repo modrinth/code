@@ -4,6 +4,7 @@
 pub mod fabric;
 pub mod fabriclike;
 pub mod mojang;
+pub mod ornithe;
 pub mod quilt;
 
 use anyhow::{Result, ensure};
@@ -43,6 +44,17 @@ pub async fn extract(app: &AppState, upstreams: Upstreams) -> Result<()> {
             .inspect_err(|err| {
                 warn!("error: {err:?}");
                 failed.push("Quilt");
+            })
+            .ok();
+    }
+
+    if upstreams.ornithe {
+        ornithe::extract(app)
+            .context(info_span!("extracting Ornithe metadata"))
+            .await
+            .inspect_err(|err| {
+                warn!("error: {err:?}");
+                failed.push("Ornithe");
             })
             .ok();
     }

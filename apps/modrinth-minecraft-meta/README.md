@@ -45,6 +45,16 @@ Forge and NeoForge currently import installer metadata and embedded artifacts, a
 
 Forge and NeoForge (henceforth Forgelike) store much of their important info in the installer JAR file, rather than as a JSON file served at some HTTP route.
 
+## Ornithe
+
+Ornithe runs Fabric Loader on game versions up to 1.14.4, with its own intermediary (`net.ornithemc:calamus-intermediary-gen2`). Its profiles look like Fabric's, so it is extracted and exported through the same code, but a single template doesn't work:
+- Ornithe adds different libraries depending on the game version (e.g. a newer log4j, or LWJGL builds from Legacy Fabric's Maven), which aren't in its profiles. Game versions are grouped by these libraries, and profiles are downloaded once per group, templated from the group's longest game version. The libraries are added to every profile of their group.
+- The LWJGL builds come from Ornithe's copy of each version manifest. They keep their upstream downloads, like Mojang's libraries.
+- Ornithe's version manifests also drop some of Mojang's libraries (e.g. `org.ow2.asm:asm-all`). These are listed in the profile's `removedLibraries`, and split groups without changing which profile is downloaded.
+- Group IDs are hashed the same way as the legacy daedalus client, so they stay stable when switching over.
+- A few game versions are named differently by Ornithe and Mojang (e.g. `1.0.0` and `1.0`). These get a group of their own whose profile isn't templated, since the app would fill the placeholder with Mojang's name.
+- Only game versions in Mojang's catalog are exported, so Mojang metadata must be extracted first.
+
 ## Fabric and Quilt
 
 Fabric's and Quilt's manifests contain (among other things) two fields:

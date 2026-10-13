@@ -7,6 +7,7 @@ mod forgelike;
 mod minecraft;
 mod mojang;
 mod neoforge;
+mod ornithe;
 mod profile;
 mod quilt;
 
@@ -17,5 +18,6 @@ pub use forgelike::*;
 pub use minecraft::*;
 pub use mojang::*;
 pub use neoforge::*;
+pub use ornithe::*;
 pub use profile::*;
 pub use quilt::*;

@@ -5,6 +5,7 @@ pub mod fabric;
 pub mod forge;
 pub mod mojang;
 pub mod neoforge;
+pub mod ornithe;
 pub mod quilt;
 
 #[derive(Debug, Clone, Copy)]
@@ -14,6 +15,7 @@ pub struct Upstreams {
     pub forge: bool,
     pub neoforge: bool,
     pub quilt: bool,
+    pub ornithe: bool,
 }
 
 impl Default for Upstreams {
@@ -24,6 +26,7 @@ impl Default for Upstreams {
             forge: true,
             neoforge: true,
             quilt: true,
+            ornithe: true,
         }
     }
 }
