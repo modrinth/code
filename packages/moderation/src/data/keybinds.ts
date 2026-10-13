@@ -35,6 +35,13 @@ function isOfficialModrinthHost(): boolean {
 }
 
 const keybinds: { [id: string]: KeybindListener } = {
+	'review-toggle-icon': {
+		keybind: 'I',
+		description: 'Toggle project icon viewer',
+		scope: 'review-actions',
+		enabled: (ctx) => ctx.available('toggle-icon'),
+		action: (ctx) => ctx.run('toggle-icon'),
+	},
 	'review-cycle-conversation': {
 		keybind: 'Shift+R',
 		description: 'Cycle issues, thread, and re-review',

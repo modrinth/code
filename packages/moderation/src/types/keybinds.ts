@@ -48,6 +48,7 @@ export type ModerationConversationContext = {
 
 export type ReviewShortcutAction =
 	| 'cycle-conversation'
+	| 'toggle-icon'
 	| 'new-issue'
 	| 'toggle-left'
 	| 'toggle-right'
