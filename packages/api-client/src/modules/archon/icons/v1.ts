@@ -5,12 +5,19 @@ export class ArchonIconsV1Module extends AbstractModule {
 		return 'archon_icons_v1'
 	}
 
-	public async get(serverId: string): Promise<Blob> {
+	/**
+	 * Get a server's custom icon.
+	 * GET /v1/servers/:id/icon?original=true
+	 *
+	 * Returns the 64x64 game icon, or the up to 512x512 display icon when `original` is set.
+	 */
+	public async get(serverId: string, original = false): Promise<Blob> {
 		return this.client.request<Blob>(`/servers/${encodeURIComponent(serverId)}/icon`, {
 			api: 'archon',
 			version: 1,
 			method: 'GET',
 			responseType: 'blob',
+			params: original ? { original: 'true' } : undefined,
 		})
 	}
 

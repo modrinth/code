@@ -16,7 +16,7 @@ export function serverIconQueryOptions(serverId: string, client: AbstractModrint
 		staleTime: 60_000,
 		queryFn: async (): Promise<Blob | null> => {
 			try {
-				return await client.archon.icons_v1.get(serverId)
+				return await client.archon.icons_v1.get(serverId, true)
 			} catch (error) {
 				if (error instanceof ModrinthApiError && error.statusCode === 404) return null
 				throw error
