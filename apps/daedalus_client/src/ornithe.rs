@@ -8,9 +8,7 @@ use crate::util::{
     fetch_json, fetch_optional_json, format_url, retain_manifest_versions,
 };
 use crate::{Error, FetchResult, MirrorArtifact, UploadFile};
-use daedalus::minecraft::{
-    JavaVersion, Library, VERSION_MANIFEST_URL, VersionManifest,
-};
+use daedalus::minecraft::{Library, VERSION_MANIFEST_URL, VersionManifest};
 use daedalus::modded::{
     CURRENT_ORNITHE_FORMAT_VERSION, LoaderVersion, Manifest, Version,
     VersionGroup,
@@ -28,8 +26,6 @@ const MAVEN_URL: &str = "https://maven.fabricmc.net/";
 const MC_VERSIONS_URL: &str =
     "https://ornithemc.net/mc-versions/gen2/version/manifest";
 const LWJGL_MAVEN_HOST: &str = "maven.legacyfabric.net";
-const JAVA_COMPONENT: &str = "java-runtime-epsilon";
-const JAVA_MAJOR_VERSION: u32 = 25;
 
 /// Mojang game version IDs paired with the Ornithe ID of the same client JAR.
 const GAME_VERSION_ALIASES: &[(&str, &str)] = &[
@@ -231,10 +227,6 @@ pub async fn fetch(semaphore: Arc<Semaphore>) -> Result<FetchResult, Error> {
                     loader.version
                 ),
                 extra_libraries: group.libraries.clone(),
-                java_version: Some(JavaVersion {
-                    component: JAVA_COMPONENT.to_string(),
-                    major_version: JAVA_MAJOR_VERSION,
-                }),
             })
         })
         .collect::<Vec<_>>();

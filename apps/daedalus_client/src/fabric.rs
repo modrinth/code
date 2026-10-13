@@ -21,7 +21,7 @@ use crate::util::{
 use crate::{
     Error, FetchResult, MirrorArtifact, UploadFile, insert_mirrored_artifact,
 };
-use daedalus::minecraft::{Argument, JavaVersion, Library};
+use daedalus::minecraft::{Argument, Library};
 use daedalus::modded::{DUMMY_REPLACE_STRING, Manifest, PartialVersionInfo};
 use dashmap::DashMap;
 use serde::Deserialize;
@@ -110,7 +110,6 @@ async fn fetch(
                     game_versions: group.game_versions.clone(),
                     loader_version: loader.version.clone(),
                     extra_libraries: Vec::new(),
-                    java_version: None,
                     url: format!(
                         "{}/versions/loader/{}/{}/profile/json",
                         meta_url,
@@ -282,7 +281,6 @@ async fn fetch(
                 game_versions: universal_group.game_versions.clone(),
                 loader_version: loader.version.clone(),
                 extra_libraries: Vec::new(),
-                java_version: None,
                 url: format!(
                     "{}/versions/loader/{}/{}/profile/json",
                     meta_url,
@@ -373,8 +371,6 @@ pub(crate) struct ProfileRequest {
     pub loader_version: String,
     pub url: String,
     pub extra_libraries: Vec<Library>,
-    /// The Java version this group's profiles prefer over the game's.
-    pub java_version: Option<JavaVersion>,
 }
 
 pub(crate) fn metadata_version_path(
@@ -423,7 +419,6 @@ pub(crate) async fn fetch_metadata_profiles(
                 &request.extra_libraries,
                 mirror_artifacts,
             )?;
-            version_info.java_version.clone_from(&request.java_version);
 
             Ok(version_info)
         })

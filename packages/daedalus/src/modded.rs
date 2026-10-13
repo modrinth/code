@@ -1,6 +1,6 @@
 use crate::minecraft::{
-    Argument, ArgumentType, JavaVersion, Library, LoggingConfiguration,
-    LoggingSide, VersionInfo, VersionType,
+    Argument, ArgumentType, Library, LoggingConfiguration, LoggingSide,
+    VersionInfo, VersionType,
 };
 use chrono::{DateTime, NaiveDateTime, Utc};
 use serde::{Deserialize, Deserializer, Serialize};
@@ -144,9 +144,6 @@ pub struct PartialVersionInfo {
     /// Libraries that the version depends on
     pub libraries: Vec<Library>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    /// The Java version the loader prefers over the one the game asks for
-    pub java_version: Option<JavaVersion>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     /// The logging configuration the loader uses in place of the game's
     pub logging: Option<HashMap<LoggingSide, LoggingConfiguration>>,
     #[serde(rename = "type")]
@@ -259,7 +256,7 @@ pub fn merge_partial_version(
         assets: merge.assets,
         downloads: merge.downloads,
         id: partial.id.replace(DUMMY_REPLACE_STRING, &merge_id),
-        java_version: partial.java_version.or(merge.java_version),
+        java_version: merge.java_version,
         libraries: libraries
             .into_iter()
             .chain(partial.libraries)
@@ -269,7 +266,7 @@ pub fn merge_partial_version(
                 x
             })
             .collect::<Vec<_>>(),
-        logging: partial.logging.or(merge.logging),
+        logging: partial.logging.filter(|x| !x.is_empty()).or(merge.logging),
         main_class: if let Some(main_class) = partial.main_class {
             main_class
         } else {
@@ -380,7 +377,6 @@ mod tests {
     fn merge_loader_arguments_into_legacy_version() {
         let partial: PartialVersionInfo = serde_json::from_value(json!({
             "id": "fabric-loader-0.19.5-${modrinth.gameVersion}-ornithe-gen2",
-            "javaVersion": { "component": "java-runtime-epsilon", "majorVersion": 25 },
             "inheritsFrom": "${modrinth.gameVersion}-vanilla",
             "logging": { "client": {
                 "argument": "-Dlog4j.configurationFile=${path}",
@@ -451,8 +447,44 @@ mod tests {
                 "org.lwjgl.lwjgl:lwjgl-platform:2.9.4+legacyfabric.15"
             ]
         );
-        assert_eq!(merged.java_version.unwrap().major_version, 25);
+        assert_eq!(merged.java_version.unwrap().major_version, 8);
         assert!(merged.logging.is_some());
+    }
+
+    #[test]
+    fn empty_loader_logging_keeps_vanilla_logging() {
+        let partial: PartialVersionInfo = serde_json::from_value(json!({
+            "id": "1.20.1-forge-47.4.0",
+            "inheritsFrom": "1.20.1",
+            "logging": {},
+            "time": "2026-05-27T14:13:59+00:00",
+            "releaseTime": "2026-05-27T14:13:59+00:00",
+            "libraries": [],
+            "type": "release"
+        }))
+        .unwrap();
+        let vanilla: VersionInfo = serde_json::from_value(json!({
+            "assetIndex": { "id": "5", "sha1": "", "size": 0, "totalSize": 0, "url": "" },
+            "assets": "5",
+            "downloads": {},
+            "id": "1.20.1",
+            "logging": { "client": {
+                "argument": "-Dlog4j.configurationFile=${path}",
+                "file": { "id": "client-1.12.xml", "sha1": "", "size": 888, "url": "" },
+                "type": "log4j2-xml"
+            } },
+            "libraries": [],
+            "mainClass": "net.minecraft.client.main.Main",
+            "minimumLauncherVersion": 21,
+            "releaseTime": "2023-06-12T13:25:51+00:00",
+            "time": "2023-06-12T13:25:51+00:00",
+            "type": "release"
+        }))
+        .unwrap();
+
+        let merged = merge_partial_version(partial, vanilla);
+
+        assert_eq!(merged.logging.map(|x| x.len()), Some(1));
     }
 
     #[test]
