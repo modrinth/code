@@ -131,6 +131,20 @@ struct CurrentSharedInstanceProject {
 #[derive(Clone, Debug)]
 struct CurrentSharedInstanceExternalFile {
     relative_path: String,
+    size: u64,
+    sha1: String,
+    missing: bool,
+}
+
+impl CurrentSharedInstanceExternalFile {
+    /// Whether the local file is already the shared file, comparing hashes when the server provides one.
+    fn matches(&self, desired: &SharedInstanceExternalFileData) -> bool {
+        !self.missing
+            && desired.sha1.as_deref().map_or_else(
+                || self.size == desired.file_size,
+                |sha1| self.sha1.eq_ignore_ascii_case(sha1),
+            )
+    }
 }
 
 type SharedInstanceExternalFileKey = (ProjectType, String);
@@ -269,10 +283,9 @@ impl SharedInstanceApplyPlan {
         for desired in desired.external_files.into_values() {
             let key = (desired.file_type, desired.file.file_name.clone());
             match current.external_files.get(&key) {
-                Some(_) => {
-                    plan.external_updates.push(desired);
-                }
-                _ => plan.external_additions.push(desired),
+                Some(current) if current.matches(&desired.file) => {}
+                Some(_) => plan.external_updates.push(desired),
+                None => plan.external_additions.push(desired),
             }
         }
 
@@ -655,6 +668,9 @@ async fn current_shared_instance_content(
                 (entry.project_type, file.file_name.clone()),
                 CurrentSharedInstanceExternalFile {
                     relative_path: file.relative_path.clone(),
+                    size: file.size,
+                    sha1: file.sha1.clone(),
+                    missing: file.missing,
                 },
             );
         }

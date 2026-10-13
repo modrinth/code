@@ -587,6 +587,7 @@ fn shared_instance_external_file_data(
         file_type: file.file_type,
         url,
         file_size,
+        sha1: file.sha1,
     })
 }
 
