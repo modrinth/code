@@ -1,4 +1,3 @@
-import { generateUrlSlug } from '@modrinth/moderation/src/utils'
 import { injectModrinthClient } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { refDebounced } from '@vueuse/core'
