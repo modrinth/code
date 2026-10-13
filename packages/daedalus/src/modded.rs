@@ -1,5 +1,6 @@
 use crate::minecraft::{
-    Argument, ArgumentType, Library, VersionInfo, VersionType,
+    Argument, ArgumentType, JavaVersion, Library, LoggingConfiguration,
+    LoggingSide, VersionInfo, VersionType,
 };
 use chrono::{DateTime, NaiveDateTime, Utc};
 use serde::{Deserialize, Deserializer, Serialize};
@@ -13,6 +14,8 @@ pub const CURRENT_FORGE_FORMAT_VERSION: usize = 0;
 pub const CURRENT_QUILT_FORMAT_VERSION: usize = 1;
 /// The latest version of the format the neoforge model structs deserialize to
 pub const CURRENT_NEOFORGE_FORMAT_VERSION: usize = 0;
+/// The latest version of the format the ornithe model structs deserialize to
+pub const CURRENT_ORNITHE_FORMAT_VERSION: usize = 0;
 
 /// Metadata for locating and caching a loader manifest.
 #[derive(Debug, Clone)]
@@ -73,6 +76,7 @@ fn current_loader_manifest_format_version(loader: &str) -> usize {
         "forge" => CURRENT_FORGE_FORMAT_VERSION,
         "quilt" => CURRENT_QUILT_FORMAT_VERSION,
         "neo" => CURRENT_NEOFORGE_FORMAT_VERSION,
+        "ornithe" => CURRENT_ORNITHE_FORMAT_VERSION,
         _ => 0,
     }
 }
@@ -96,6 +100,10 @@ where
     let s = String::deserialize(deserializer)?;
 
     serde_json::from_str::<DateTime<Utc>>(&format!("\"{s}\""))
+        .or_else(|_| {
+            DateTime::parse_from_str(&s, "%Y-%m-%dT%H:%M:%S%.f%z")
+                .map(|date| date.with_timezone(&Utc))
+        })
         .or_else(|_| {
             NaiveDateTime::parse_from_str(&s, "%Y-%m-%dT%H:%M:%S%.f")
                 .map(|date| date.and_utc())
@@ -128,6 +136,16 @@ pub struct PartialVersionInfo {
     pub arguments: Option<HashMap<ArgumentType, Vec<Argument>>>,
     /// Libraries that the version depends on
     pub libraries: Vec<Library>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    /// Library artifacts (`groupId:artifactId`) of the inherited version that
+    /// the loader drops
+    pub removed_libraries: Vec<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    /// The Java version the loader prefers over the one the game asks for
+    pub java_version: Option<JavaVersion>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    /// The logging configuration the loader uses in place of the game's
+    pub logging: Option<HashMap<LoggingSide, LoggingConfiguration>>,
     #[serde(rename = "type")]
     /// The type of version
     pub type_: VersionType,
@@ -171,6 +189,10 @@ pub fn merge_partial_version(
         let lib_artifact = lib.name.rsplit_once(':').map(|x| x.0);
 
         if let Some(lib_artifact) = lib_artifact {
+            if partial.removed_libraries.iter().any(|x| x == lib_artifact) {
+                continue;
+            }
+
             if !partial.libraries.iter().any(|x| {
                 let target_artifact = x.name.rsplit_once(':').map(|x| x.0);
 
@@ -185,8 +207,27 @@ pub fn merge_partial_version(
         }
     }
 
+    let partial_arguments = partial.arguments.map(|args| {
+        args.into_iter()
+            .filter(|(_, arguments)| !arguments.is_empty())
+            .map(|(type_, arguments)| {
+                let arguments = arguments
+                    .into_iter()
+                    .map(|argument| match argument {
+                        Argument::Normal(value) => Argument::Normal(
+                            value.replace(DUMMY_REPLACE_STRING, &merge_id),
+                        ),
+                        ruled => ruled,
+                    })
+                    .collect();
+
+                (type_, arguments)
+            })
+            .collect::<HashMap<_, _>>()
+    });
+
     VersionInfo {
-        arguments: if let Some(partial_args) = partial.arguments {
+        arguments: if let Some(partial_args) = partial_arguments {
             if let Some(merge_args) = merge.arguments {
                 let mut new_map = HashMap::new();
 
@@ -219,7 +260,7 @@ pub fn merge_partial_version(
         assets: merge.assets,
         downloads: merge.downloads,
         id: partial.id.replace(DUMMY_REPLACE_STRING, &merge_id),
-        java_version: merge.java_version,
+        java_version: partial.java_version.or(merge.java_version),
         libraries: libraries
             .into_iter()
             .chain(partial.libraries)
@@ -229,13 +270,15 @@ pub fn merge_partial_version(
                 x
             })
             .collect::<Vec<_>>(),
-        logging: merge.logging,
+        logging: partial.logging.filter(|x| !x.is_empty()).or(merge.logging),
         main_class: if let Some(main_class) = partial.main_class {
             main_class
         } else {
             merge.main_class
         },
-        minecraft_arguments: partial.minecraft_arguments,
+        minecraft_arguments: partial
+            .minecraft_arguments
+            .or(merge.minecraft_arguments),
         minimum_launcher_version: merge.minimum_launcher_version,
         release_time: partial.release_time,
         time: partial.time,

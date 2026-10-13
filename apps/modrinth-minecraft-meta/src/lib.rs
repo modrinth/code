@@ -42,6 +42,9 @@ struct Cli {
     /// Process Quilt loader info?
     #[arg(long)]
     quilt: bool,
+    /// Process Ornithe loader info?
+    #[arg(long)]
+    ornithe: bool,
     #[command(subcommand)]
     command: Command,
 }
@@ -129,13 +132,15 @@ pub async fn main() -> Result<()> {
             && !cli.fabric
             && !cli.forge
             && !cli.neoforge
-            && !cli.quilt;
+            && !cli.quilt
+            && !cli.ornithe;
         Upstreams {
             mojang: all_upstreams || cli.mojang,
             fabric: all_upstreams || cli.fabric,
             forge: all_upstreams || cli.forge,
             neoforge: all_upstreams || cli.neoforge,
             quilt: all_upstreams || cli.quilt,
+            ornithe: all_upstreams || cli.ornithe,
         }
     };
 
@@ -186,7 +191,7 @@ mod tests {
         .unwrap();
         assert!(matches!(cli.command, Command::Import));
         assert!(cli.fabric && cli.quilt);
-        assert!(!cli.mojang && !cli.forge && !cli.neoforge);
+        assert!(!cli.mojang && !cli.forge && !cli.neoforge && !cli.ornithe);
         let cli = Cli::try_parse_from(["minecraft-meta", "export"]).unwrap();
         assert!(matches!(cli.command, Command::Export));
     }

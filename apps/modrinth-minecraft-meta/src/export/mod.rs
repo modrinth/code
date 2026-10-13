@@ -11,6 +11,7 @@ mod fabric;
 mod fabriclike;
 mod forgelike;
 mod mojang;
+mod ornithe;
 mod quilt;
 
 pub async fn run(app: AppState, upstreams: Upstreams) -> Result<()> {
@@ -44,6 +45,17 @@ pub async fn run(app: AppState, upstreams: Upstreams) -> Result<()> {
             .inspect_err(|err| {
                 warn!("error: {err:?}");
                 failed.push("Quilt");
+            })
+            .ok();
+    }
+
+    if upstreams.ornithe {
+        ornithe::export(&app)
+            .context(info_span!("exporting Ornithe artifacts"))
+            .await
+            .inspect_err(|err| {
+                warn!("error: {err:?}");
+                failed.push("Ornithe");
             })
             .ok();
     }

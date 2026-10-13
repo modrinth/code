@@ -10,7 +10,7 @@ use tracing_anyhow::FutureContext;
 
 use crate::{
     AppState,
-    import::{fabric, forge, mojang, neoforge, quilt},
+    import::{fabric, forge, mojang, neoforge, ornithe, quilt},
     model::{self, DownloadRunId},
     store::BlobCas,
     upstream::Upstreams,
@@ -61,6 +61,7 @@ pub async fn download_from_upstreams(
         forge: false,
         neoforge: false,
         quilt: false,
+        ornithe: false,
     };
 
     if upstreams.mojang {
@@ -96,6 +97,15 @@ pub async fn download_from_upstreams(
             .context(info_span!("downloading Quilt upstream"))
             .await;
         completed.quilt = download_succeeded(result, &cx.errors, errors_before);
+    }
+
+    if upstreams.ornithe {
+        let errors_before = cx.errors.len();
+        let result = ornithe::download(&mut cx)
+            .context(info_span!("downloading Ornithe upstream"))
+            .await;
+        completed.ornithe =
+            download_succeeded(result, &cx.errors, errors_before);
     }
 
     // do Forge last since we have to download a lot of installers
@@ -162,11 +172,41 @@ impl<'cx> DownloadRunContext<'cx> {
         url: impl IntoUrl,
     ) -> Result<(T, Sha256)> {
         let url = url.into_url().context("converting to URL")?;
+        let response = self
+            .http
+            .get(url.clone())
+            .send()
+            .context(info_span!("fetching text"))
+            .await?;
+        self.store_json(url, response).await
+    }
+
+    /// Like [`Self::download_json`], but returns [`None`] if the server
+    /// responds with 404 Not Found.
+    pub async fn download_json_if_found<T: DeserializeOwned>(
+        &self,
+        url: impl IntoUrl,
+    ) -> Result<Option<(T, Sha256)>> {
+        let url = url.into_url().context("converting to URL")?;
+        let response = self
+            .http
+            .get(url.clone())
+            .send()
+            .context(info_span!("fetching text"))
+            .await?;
+        if response.status() == reqwest::StatusCode::NOT_FOUND {
+            return Ok(None);
+        }
+        self.store_json(url, response).await.map(Some)
+    }
+
+    async fn store_json<T: DeserializeOwned>(
+        &self,
+        url: reqwest::Url,
+        response: reqwest::Response,
+    ) -> Result<(T, Sha256)> {
         let text = async {
-            self.http
-                .get(url.clone())
-                .send()
-                .await?
+            response
                 .error_for_status_ext()
                 .await?
                 .text()

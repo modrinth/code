@@ -117,6 +117,10 @@ pub async fn extract(app: &AppState) -> Result<()> {
             "{}/loader/",
             fabric::CATALOG_URL
         ))?,
+        templated: true,
+        extra_libraries: Vec::new(),
+        removed_libraries: Vec::new(),
+        java_version: None,
     };
 
     fabriclike::extract_catalogs(

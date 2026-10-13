@@ -132,6 +132,10 @@ pub async fn extract(app: &AppState) -> Result<()> {
                 .map(|game| game.to_string())
                 .collect(),
             profile_base_url: profile_base_url.clone(),
+            templated: true,
+            extra_libraries: Vec::new(),
+            removed_libraries: Vec::new(),
+            java_version: None,
         })
         .collect();
 

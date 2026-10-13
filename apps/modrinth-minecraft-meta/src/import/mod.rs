@@ -11,6 +11,7 @@ pub mod forge;
 pub mod forgelike;
 pub mod mojang;
 pub mod neoforge;
+pub mod ornithe;
 pub mod quilt;
 
 pub async fn run(app: AppState, upstreams: Upstreams) -> Result<()> {
@@ -23,6 +24,7 @@ pub async fn run(app: AppState, upstreams: Upstreams) -> Result<()> {
         (upstreams.forge, completed.forge, "Forge"),
         (upstreams.neoforge, completed.neoforge, "NeoForge"),
         (upstreams.quilt, completed.quilt, "Quilt"),
+        (upstreams.ornithe, completed.ornithe, "Ornithe"),
     ]
     .into_iter()
     .filter(|(selected, completed, _)| *selected && !completed)
