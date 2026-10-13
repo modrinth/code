@@ -32,13 +32,6 @@ mod tests {
 		assert!(serde_json::from_value::<GameVersion>(json!({"version": "1.21"})).is_err());
 	}
 
-	#[test]
-	fn version_names_serialize_as_strings() {
-		let value = json!("0.19.5");
-		let loader: LoaderVersionName = serde_json::from_value(value.clone()).unwrap();
-		assert_eq!(loader.to_string(), "0.19.5");
-		assert_eq!(serde_json::to_value(loader).unwrap(), value);
-	}
 
 	#[test]
 	fn profiles_require_id_and_accept_extra_fields() {

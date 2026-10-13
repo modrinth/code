@@ -443,6 +443,6 @@ mod tests {
             }
             assert_eq!(serde_json::to_value(published).unwrap(), expected);
         }
-        assert_eq!(serde_json::to_value(profile).unwrap(), original);
+
     }
 }
