@@ -294,7 +294,13 @@ impl ErrorKind {
 }
 
 pub fn error_code(error: &Error) -> &'static str {
-    if let Some(kind) = error.downcast_ref::<ErrorKind>() {
+    if error.chain().any(|cause| {
+        cause.downcast_ref::<std::io::Error>().is_some_and(|error| {
+            error.kind() == std::io::ErrorKind::PermissionDenied
+        })
+    }) {
+        "permission_denied"
+    } else if let Some(kind) = error.downcast_ref::<ErrorKind>() {
         kind.code()
     } else if error.is::<reqwest::Error>()
         || error.is::<tungstenite::Error>()
