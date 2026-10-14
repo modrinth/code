@@ -728,9 +728,9 @@ fn start_dbus_proxy(
             1,
         ) != 1
         {
-            return Err(eyre!("Failed to sync with xdg-dbus-proxy"));
+            return Err(eyre!("syncing with xdg-dbus-proxy"));
         }
-        tracing::info!("xdg-dbus-proxy took {:?} to start", start.elapsed());
+        tracing::info!("xdg-dbus-proxy took {:.1?} to start", start.elapsed());
     }
 
     eyre::Ok(DbusProxy {
