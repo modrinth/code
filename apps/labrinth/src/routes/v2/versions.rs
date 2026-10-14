@@ -44,60 +44,60 @@ pub struct VersionListFilters {
 }
 
 impl VersionListFilters {
-	fn into_v3(self) -> v3::versions::VersionListFilters {
-		let filters = self;
-		let loaders = if let Some(loaders) = filters.loaders {
-			if let Ok(mut loaders) =
-				serde_json::from_str::<Vec<String>>(&loaders)
-			{
-				loaders.push("mrpack".to_string());
-				Some(loaders)
-			} else {
-				None
-			}
-		} else {
-			None
-		};
+    fn into_v3(self) -> v3::versions::VersionListFilters {
+        let filters = self;
+        let loaders = if let Some(loaders) = filters.loaders {
+            if let Ok(mut loaders) =
+                serde_json::from_str::<Vec<String>>(&loaders)
+            {
+                loaders.push("mrpack".to_string());
+                Some(loaders)
+            } else {
+                None
+            }
+        } else {
+            None
+        };
 
-		let loader_fields = if let Some(game_versions) = filters.game_versions {
-			// TODO: extract this logic which is similar to the other v2->v3 version_file functions
-			let mut loader_fields = HashMap::new();
-			serde_json::from_str::<Vec<String>>(&game_versions)
-				.ok()
-				.and_then(|versions| {
-					let mut game_versions: Vec<serde_json::Value> = vec![];
-					for gv in versions {
-						game_versions.push(serde_json::json!(gv.clone()));
-					}
-					loader_fields
-						.insert("game_versions".to_string(), game_versions);
+        let loader_fields = if let Some(game_versions) = filters.game_versions {
+            // TODO: extract this logic which is similar to the other v2->v3 version_file functions
+            let mut loader_fields = HashMap::new();
+            serde_json::from_str::<Vec<String>>(&game_versions)
+                .ok()
+                .and_then(|versions| {
+                    let mut game_versions: Vec<serde_json::Value> = vec![];
+                    for gv in versions {
+                        game_versions.push(serde_json::json!(gv.clone()));
+                    }
+                    loader_fields
+                        .insert("game_versions".to_string(), game_versions);
 
-					if let Some(ref loaders) = loaders {
-						loader_fields.insert(
-							"loaders".to_string(),
-							loaders
-								.iter()
-								.map(|x| serde_json::json!(x.clone()))
-								.collect(),
-						);
-					}
+                    if let Some(ref loaders) = loaders {
+                        loader_fields.insert(
+                            "loaders".to_string(),
+                            loaders
+                                .iter()
+                                .map(|x| serde_json::json!(x.clone()))
+                                .collect(),
+                        );
+                    }
 
-					serde_json::to_string(&loader_fields).ok()
-				})
-		} else {
-			None
-		};
+                    serde_json::to_string(&loader_fields).ok()
+                })
+        } else {
+            None
+        };
 
-		v3::versions::VersionListFilters {
-			loader_fields,
-			loaders: loaders.and_then(|x| serde_json::to_string(&x).ok()),
-			featured: filters.featured,
-			version_type: filters.version_type,
-			limit: filters.limit,
-			offset: filters.offset,
-			include_changelog: filters.include_changelog,
-		}
-	}
+        v3::versions::VersionListFilters {
+            loader_fields,
+            loaders: loaders.and_then(|x| serde_json::to_string(&x).ok()),
+            featured: filters.featured,
+            version_type: filters.version_type,
+            limit: filters.limit,
+            offset: filters.offset,
+            include_changelog: filters.include_changelog,
+        }
+    }
 }
 
 fn default_true() -> bool {
@@ -151,7 +151,7 @@ pub async fn version_list(
         return Ok(response);
     }
 
-	let filters = filters.into_v3();
+    let filters = filters.into_v3();
 
     let response = v3::versions::version_list_internal(
         req,
@@ -244,14 +244,14 @@ pub async fn version_project_get(
 
 #[derive(Serialize, Deserialize, utoipa::ToSchema)]
 pub struct VersionsFilters {
-	pub ids: Option<String>,
-	pub project_ids: Option<String>,
-	pub game_versions: Option<String>,
-	pub loaders: Option<String>,
-	pub featured: Option<String>,
-	pub version_type: Option<String>,
-	pub limit: Option<String>,
-	pub offset: Option<String>,
+    pub ids: Option<String>,
+    pub project_ids: Option<String>,
+    pub game_versions: Option<String>,
+    pub loaders: Option<String>,
+    pub featured: Option<String>,
+    pub version_type: Option<String>,
+    pub limit: Option<String>,
+    pub offset: Option<String>,
     #[serde(default = "default_true")]
     pub include_changelog: bool,
 }
@@ -277,193 +277,193 @@ pub struct VersionsFilters {
 #[get("/versions")]
 pub async fn versions_get(
     req: HttpRequest,
-	web::Query(query): web::Query<VersionsFilters>,
+    web::Query(query): web::Query<VersionsFilters>,
     pool: web::Data<PgPool>,
     ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-	let ids = match (query.ids, query.project_ids) {
-		(Some(ids), None) => v3::versions::VersionIds {
-			ids,
-			include_changelog: query.include_changelog,
-		},
-		(None, Some(project_ids)) => {
-			let filters = VersionListFilters {
-				game_versions: query.game_versions,
-				loaders: query.loaders,
-				featured: query
-					.featured
-					.map(|value| value.parse::<bool>())
-					.transpose()
-					.wrap_request_err("deserializing `featured`")?,
-				version_type: query
-					.version_type
-					.map(|value| {
-						serde_json::from_value(serde_json::Value::String(value))
-					})
-					.transpose()
-					.wrap_request_err("deserializing `version_type`")?,
-				limit: query
-					.limit
-					.map(|value| value.parse::<usize>())
-					.transpose()
-					.wrap_request_err("deserializing `limit`")?,
-				offset: query
-					.offset
-					.map(|value| value.parse::<usize>())
-					.transpose()
-					.wrap_request_err("deserializing `offset`")?,
-				include_changelog: query.include_changelog,
-			};
-			let project_ids = serde_json::from_str::<Vec<String>>(&project_ids)
-				.wrap_request_err("deserializing `project_ids`")?;
-			if project_ids.len() > 100 {
-				return Err(ApiError::Request(eyre::eyre!(
-					"`project_ids` must contain at most 100 projects"
-				)));
-			}
-			for (name, value) in [
-				("game_versions", &filters.game_versions),
-				("loaders", &filters.loaders),
-			] {
-				if let Some(value) = value {
-					serde_json::from_str::<Vec<String>>(value)
-						.wrap_request_err_with(|| {
-							format!("deserializing `{name}`")
-						})?;
-				}
-			}
-			let requested_loaders = filters
-				.loaders
-				.as_deref()
-				.map(serde_json::from_str::<Vec<String>>)
-				.transpose()
-				.wrap_request_err("deserializing `loaders`")?;
-			let user_option = crate::auth::get_user_from_headers(
-				&req,
-				&**pool,
-				&redis,
-				&session_queue,
-				Scopes::PROJECT_READ | Scopes::VERSION_READ,
-			)
-			.await
-			.map(|x| x.1)
-			.ok();
-			let mut projects = crate::database::models::DBProject::get_many(
-				&project_ids,
-				&***ro_pool,
-				&redis,
-			)
-			.await
-			.wrap_internal_err("fetching projects from database")?;
-			let visible = crate::auth::checks::filter_visible_project_ids(
-				projects.iter().map(|p| &p.inner).collect(),
-				&user_option,
-				&pool,
-				false,
-			)
-			.await
-			.wrap_api_err("filtering visible projects")?;
-			projects.retain(|p| visible.contains(&p.inner.id));
-			let version_ids = projects
-				.iter()
-				.flat_map(|p| p.versions.iter().copied())
-				.collect::<std::collections::HashSet<_>>()
-				.into_iter()
-				.collect::<Vec<_>>();
-			let versions = crate::database::models::DBVersion::get_many(
-				&version_ids,
-				&***ro_pool,
-				&redis,
-			)
-			.await
-			.wrap_internal_err("fetching versions from database")?;
-			let mut grouped = HashMap::new();
-			for version in versions {
-				if let Some(loaders) = &requested_loaders {
-					let legacy_loaders = if version
-						.loaders
-						.iter()
-						.any(|loader| loader == "mrpack")
-					{
-						version
-							.version_fields
-							.iter()
-							.find(|field| field.field_name == "mrpack_loaders")
-							.map(|field| field.value.as_strings())
-							.unwrap_or_else(|| version.loaders.clone())
-					} else {
-						version.loaders.clone()
-					};
-					if !legacy_loaders
-						.iter()
-						.any(|loader| loaders.contains(loader))
-					{
-						continue;
-					}
-				}
-				grouped
-					.entry(version.inner.project_id)
-					.or_insert_with(Vec::new)
-					.push(version);
-			}
-			let mut filters = filters.into_v3();
-			let limit = filters.limit.take();
-			let offset = filters.offset.take();
-			let auto_featured = if filters.featured == Some(true) {
-				Some(
-					v3::versions::auto_featured_filters(&ro_pool, &redis)
-						.await?,
-				)
-			} else {
-				None
-			};
-			let mut response = Vec::new();
-			for mut versions in grouped.into_values() {
-				versions.sort_by_key(|version| version.inner.id.0);
-				response.extend(
-					v3::versions::filter_project_versions(
-						versions,
-						&filters,
-						&ro_pool,
-						&redis,
-						auto_featured.as_deref(),
-					)
-					.await?,
-				);
-			}
-			let mut response = crate::auth::checks::filter_visible_versions(
-				response,
-				&user_option,
-				&ro_pool,
-				&redis,
-			)
-			.await
-			.wrap_api_err("filtering visible versions")?;
-			response.sort_by(|a, b| {
-				b.date_published
-					.cmp(&a.date_published)
-					.then_with(|| a.id.0.cmp(&b.id.0))
-			});
-			let response = response
-				.into_iter()
-				.map(|mut version| {
-					if !filters.include_changelog {
-						version.changelog = None;
-					}
-					LegacyVersion::from(version)
-				})
-				.skip(offset.unwrap_or(0))
-				.take(limit.unwrap_or(usize::MAX))
-				.collect::<Vec<_>>();
-			return Ok(HttpResponse::Ok().json(response));
-		}
-		_ => {
-			return Err(ApiError::Request(eyre::eyre!(
-				"exactly one of `ids` and `project_ids` is required"
-			)));
-		}
+    let ids = match (query.ids, query.project_ids) {
+        (Some(ids), None) => v3::versions::VersionIds {
+            ids,
+            include_changelog: query.include_changelog,
+        },
+        (None, Some(project_ids)) => {
+            let filters = VersionListFilters {
+                game_versions: query.game_versions,
+                loaders: query.loaders,
+                featured: query
+                    .featured
+                    .map(|value| value.parse::<bool>())
+                    .transpose()
+                    .wrap_request_err("deserializing `featured`")?,
+                version_type: query
+                    .version_type
+                    .map(|value| {
+                        serde_json::from_value(serde_json::Value::String(value))
+                    })
+                    .transpose()
+                    .wrap_request_err("deserializing `version_type`")?,
+                limit: query
+                    .limit
+                    .map(|value| value.parse::<usize>())
+                    .transpose()
+                    .wrap_request_err("deserializing `limit`")?,
+                offset: query
+                    .offset
+                    .map(|value| value.parse::<usize>())
+                    .transpose()
+                    .wrap_request_err("deserializing `offset`")?,
+                include_changelog: query.include_changelog,
+            };
+            let project_ids = serde_json::from_str::<Vec<String>>(&project_ids)
+                .wrap_request_err("deserializing `project_ids`")?;
+            if project_ids.len() > 100 {
+                return Err(ApiError::Request(eyre::eyre!(
+                    "`project_ids` must contain at most 100 projects"
+                )));
+            }
+            for (name, value) in [
+                ("game_versions", &filters.game_versions),
+                ("loaders", &filters.loaders),
+            ] {
+                if let Some(value) = value {
+                    serde_json::from_str::<Vec<String>>(value)
+                        .wrap_request_err_with(|| {
+                            format!("deserializing `{name}`")
+                        })?;
+                }
+            }
+            let requested_loaders = filters
+                .loaders
+                .as_deref()
+                .map(serde_json::from_str::<Vec<String>>)
+                .transpose()
+                .wrap_request_err("deserializing `loaders`")?;
+            let user_option = crate::auth::get_user_from_headers(
+                &req,
+                &**pool,
+                &redis,
+                &session_queue,
+                Scopes::PROJECT_READ | Scopes::VERSION_READ,
+            )
+            .await
+            .map(|x| x.1)
+            .ok();
+            let mut projects = crate::database::models::DBProject::get_many(
+                &project_ids,
+                &***ro_pool,
+                &redis,
+            )
+            .await
+            .wrap_internal_err("fetching projects from database")?;
+            let visible = crate::auth::checks::filter_visible_project_ids(
+                projects.iter().map(|p| &p.inner).collect(),
+                &user_option,
+                &pool,
+                false,
+            )
+            .await
+            .wrap_api_err("filtering visible projects")?;
+            projects.retain(|p| visible.contains(&p.inner.id));
+            let version_ids = projects
+                .iter()
+                .flat_map(|p| p.versions.iter().copied())
+                .collect::<std::collections::HashSet<_>>()
+                .into_iter()
+                .collect::<Vec<_>>();
+            let versions = crate::database::models::DBVersion::get_many(
+                &version_ids,
+                &***ro_pool,
+                &redis,
+            )
+            .await
+            .wrap_internal_err("fetching versions from database")?;
+            let mut grouped = HashMap::new();
+            for version in versions {
+                if let Some(loaders) = &requested_loaders {
+                    let legacy_loaders = if version
+                        .loaders
+                        .iter()
+                        .any(|loader| loader == "mrpack")
+                    {
+                        version
+                            .version_fields
+                            .iter()
+                            .find(|field| field.field_name == "mrpack_loaders")
+                            .map(|field| field.value.as_strings())
+                            .unwrap_or_else(|| version.loaders.clone())
+                    } else {
+                        version.loaders.clone()
+                    };
+                    if !legacy_loaders
+                        .iter()
+                        .any(|loader| loaders.contains(loader))
+                    {
+                        continue;
+                    }
+                }
+                grouped
+                    .entry(version.inner.project_id)
+                    .or_insert_with(Vec::new)
+                    .push(version);
+            }
+            let mut filters = filters.into_v3();
+            let limit = filters.limit.take();
+            let offset = filters.offset.take();
+            let auto_featured = if filters.featured == Some(true) {
+                Some(
+                    v3::versions::auto_featured_filters(&ro_pool, &redis)
+                        .await?,
+                )
+            } else {
+                None
+            };
+            let mut response = Vec::new();
+            for mut versions in grouped.into_values() {
+                versions.sort_by_key(|version| version.inner.id.0);
+                response.extend(
+                    v3::versions::filter_project_versions(
+                        versions,
+                        &filters,
+                        &ro_pool,
+                        &redis,
+                        auto_featured.as_deref(),
+                    )
+                    .await?,
+                );
+            }
+            let mut response = crate::auth::checks::filter_visible_versions(
+                response,
+                &user_option,
+                &ro_pool,
+                &redis,
+            )
+            .await
+            .wrap_api_err("filtering visible versions")?;
+            response.sort_by(|a, b| {
+                b.date_published
+                    .cmp(&a.date_published)
+                    .then_with(|| a.id.0.cmp(&b.id.0))
+            });
+            let response = response
+                .into_iter()
+                .map(|mut version| {
+                    if !filters.include_changelog {
+                        version.changelog = None;
+                    }
+                    LegacyVersion::from(version)
+                })
+                .skip(offset.unwrap_or(0))
+                .take(limit.unwrap_or(usize::MAX))
+                .collect::<Vec<_>>();
+            return Ok(HttpResponse::Ok().json(response));
+        }
+        _ => {
+            return Err(ApiError::Request(eyre::eyre!(
+                "exactly one of `ids` and `project_ids` is required"
+            )));
+        }
     };
     let response = v3::versions::versions_get(
         req,
