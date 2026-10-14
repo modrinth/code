@@ -1,10 +1,8 @@
-use std::{
-    any::type_name,
-    collections::{HashMap, HashSet},
-};
+use std::{any::type_name, collections::HashSet};
 
 use anyhow::{Context, Result, anyhow, ensure};
 use futures::{StreamExt, TryStreamExt, stream};
+use indexmap::IndexMap;
 use jiff::Timestamp;
 use serde::{Deserialize, de::DeserializeOwned};
 use tracing::{debug, info, info_span, warn};
@@ -99,7 +97,7 @@ pub async fn extract_installers(
 
 #[derive(Debug, Deserialize)]
 struct ModernInstallProfile {
-    data: HashMap<String, model::SidedDataEntry>,
+    data: IndexMap<String, model::SidedDataEntry>,
     libraries: Vec<mojang::Library>,
     processors: Vec<model::Processor>,
 }
@@ -138,7 +136,7 @@ impl LegacyInstallProfile {
     fn into_metadata(self) -> model::ProfileMetadata {
         let version = self.version_info;
         let arguments = version.minecraft_arguments.as_ref().map(|args| {
-            HashMap::from([(
+            IndexMap::from([(
                 mojang::ArgumentType::Game,
                 args.split(' ')
                     .map(|arg| mojang::Argument::Normal(arg.to_owned()))

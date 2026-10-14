@@ -4,14 +4,13 @@ use std::{
 };
 
 use anyhow::{Context, Result, ensure};
-use futures::{TryStreamExt, stream};
+use futures::{StreamExt, TryStreamExt, stream};
 use indexmap::IndexMap;
 use serde::Serialize;
 use tracing::{info, info_span};
 use tracing_anyhow::FutureContext;
 use url::Url;
 
-use crate::model::GAME_VERSION_PLACEHOLDER;
 use crate::{
     AppState,
     model::{
@@ -21,13 +20,14 @@ use crate::{
     },
     store::ContentType,
 };
+use crate::{model::GAME_VERSION_PLACEHOLDER, store::PutStatus};
 
 /// Publishes extracted catalog state and profiles, with store-specific URLs.
 pub async fn export(
     app: &AppState,
     loader: FabriclikeLoader,
     format_version: u32,
-) -> Result<()> {
+) -> Result<PutStatus> {
     let (catalog, rows) = fetch_catalog(app, loader).await?;
     ensure!(
         !rows.is_empty(),
@@ -81,30 +81,36 @@ pub async fn export(
     let manifest = make_manifest(games, &groups, profiles)?;
     let json =
         serde_json::to_vec(&manifest).context("serializing loader manifest")?;
+
     // publish libraries before publishing profiles which reference them
     let num_total = artifacts.len();
     info!(num_artifacts = num_total, "publishing loader dependencies");
     let num_done = AtomicUsize::new(0);
-    stream::iter(artifacts.into_iter().map(Ok::<_, anyhow::Error>))
-        .try_for_each_concurrent(
-            app.concurrency.download.get(),
-            |artifact| async {
-                publish_artifact(app, artifact).await?;
-                let num_done = num_done.fetch_add(1, Ordering::Relaxed) + 1;
-                if num_done.is_multiple_of(100) || num_done == num_total {
-                    info!("published {num_done}/{num_total} dependencies");
-                }
-                anyhow::Ok(())
-            },
-        )
+    let mut status =
+        stream::iter(artifacts.into_iter().map(|artifact| async {
+            let changed = publish_artifact(app, artifact).await?;
+            let num_done = num_done.fetch_add(1, Ordering::Relaxed) + 1;
+            if num_done.is_multiple_of(100) || num_done == num_total {
+                info!("published {num_done}/{num_total} dependencies");
+            }
+            anyhow::Ok(changed)
+        }))
+        .buffer_unordered(app.concurrency.download.get())
+        .try_fold(PutStatus::Unchanged, |mut status, changed| async move {
+            super::latch(&mut status, changed);
+            Ok(status)
+        })
         .context(info_span!("publishing loader dependencies"))
         .await?;
     // write processed loader profiles
     for (path, data) in &profile_files {
-        app.public_blobs
-            .put(path, data, ContentType::Json)
-            .context(info_span!("writing loader profile", %path))
-            .await?;
+        super::latch(
+            &mut status,
+            app.public_blobs
+                .put(path, data, ContentType::Json)
+                .context(info_span!("writing loader profile", %path))
+                .await?,
+        );
     }
     info!(num_profiles = profile_files.len(), "wrote loader profiles");
     // write manifest (overall catalog), after all referenced files are uploaded
@@ -116,12 +122,15 @@ pub async fn export(
             format!("quilt/v{format_version}/manifest.json")
         }
     };
-    app.public_blobs
-        .put(&path, &json, ContentType::Json)
-        .context(info_span!("writing loader manifest", %path))
-        .await?;
+    super::latch(
+        &mut status,
+        app.public_blobs
+            .put(&path, &json, ContentType::Json)
+            .context(info_span!("writing loader manifest", %path))
+            .await?,
+    );
     info!(%path, "wrote loader manifest");
-    Ok(())
+    Ok(status)
 }
 
 async fn fetch_catalog(
@@ -173,7 +182,7 @@ fn prepare_profile(
 pub async fn publish_artifact(
     app: &AppState,
     stored: FabriclikeStoredArtifact,
-) -> Result<()> {
+) -> Result<crate::store::PutStatus> {
     let bytes = app.cas
         .get(stored.sha256)
         .context(info_span!("reading stored Maven artifact", sha256 = %stored.sha256, coordinate = %stored.artifact.coordinate))
@@ -443,6 +452,5 @@ mod tests {
             }
             assert_eq!(serde_json::to_value(published).unwrap(), expected);
         }
-
     }
 }

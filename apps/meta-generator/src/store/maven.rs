@@ -1,7 +1,7 @@
 use anyhow::Result;
 
 use crate::{
-    store::{BlobStore, ContentType},
+    store::{BlobStore, ContentType, PutStatus},
     util::MavenCoordinate,
 };
 
@@ -20,7 +20,7 @@ impl MavenStore {
         &self,
         coordinate: &MavenCoordinate,
         data: &[u8],
-    ) -> Result<()> {
+    ) -> Result<PutStatus> {
         let path = coordinate.to_maven_path();
         self.imp.put(&path, data, ContentType::Binary).await
     }

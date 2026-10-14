@@ -1,5 +1,4 @@
-use std::collections::HashMap;
-
+use indexmap::IndexMap;
 use jiff::Timestamp;
 use serde::{Deserialize, Serialize};
 use toasty::{Embed, Model};
@@ -96,12 +95,12 @@ pub struct FabriclikeProfileMetadata {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub minecraft_arguments: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub arguments: Option<HashMap<ArgumentType, Vec<Argument>>>,
+    pub arguments: Option<IndexMap<ArgumentType, Vec<Argument>>>,
     pub libraries: Vec<FabriclikeLibrary>,
     #[serde(rename = "type")]
     pub ty: VersionType,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub data: Option<HashMap<String, SidedDataEntry>>,
+    pub data: Option<IndexMap<String, SidedDataEntry>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub processors: Option<Vec<Processor>>,
 }
@@ -116,7 +115,7 @@ pub struct FabriclikeLibrary {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub url: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub natives: Option<HashMap<OperatingSystem, String>>,
+    pub natives: Option<IndexMap<OperatingSystem, String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rules: Option<Vec<Rule>>,
     #[serde(skip_serializing_if = "Option::is_none")]

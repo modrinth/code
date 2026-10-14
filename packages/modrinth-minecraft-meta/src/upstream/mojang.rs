@@ -1,6 +1,5 @@
-use std::collections::HashMap;
-
 use anyhow::Result;
+use indexmap::IndexMap;
 use jiff::Timestamp;
 use serde::{Deserialize, Serialize};
 use url::Url;
@@ -59,15 +58,15 @@ pub enum VersionType {
 #[serde(rename_all = "camelCase")]
 pub struct VersionManifest {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub arguments: Option<HashMap<ArgumentType, Vec<Argument>>>,
+    pub arguments: Option<IndexMap<ArgumentType, Vec<Argument>>>,
     pub asset_index: AssetIndex,
     pub assets: String,
-    pub downloads: HashMap<DownloadType, Download>,
+    pub downloads: IndexMap<DownloadType, Download>,
     pub id: model::MinecraftVersionName,
     pub java_version: Option<JavaVersion>,
     pub libraries: Vec<Library>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub logging: Option<HashMap<LoggingSide, LoggingConfiguration>>,
+    pub logging: Option<IndexMap<LoggingSide, LoggingConfiguration>>,
     pub main_class: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub minecraft_arguments: Option<String>,
@@ -202,7 +201,7 @@ pub struct Library {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub url: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub natives: Option<HashMap<OperatingSystem, String>>,
+    pub natives: Option<IndexMap<OperatingSystem, String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rules: Option<Vec<Rule>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -218,7 +217,7 @@ pub struct LibraryDownloads {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub artifact: Option<LibraryDownload>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub classifiers: Option<HashMap<String, LibraryDownload>>,
+    pub classifiers: Option<IndexMap<String, LibraryDownload>>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

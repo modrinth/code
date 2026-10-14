@@ -16,7 +16,7 @@ use crate::{
         ForgelikeExtract, ForgelikeInstaller, ForgelikeLoader,
         ForgelikeStoredArtifact, ProfileMetadata,
     },
-    store::ContentType,
+    store::{ContentType, PutStatus},
     upstream::Upstreams,
     util::MavenCoordinate,
 };
@@ -24,7 +24,7 @@ use crate::{
 pub const FORMAT_VERSION: u32 = 0;
 
 /// Publishes stored dependencies, version profiles, and Forge-like catalogs.
-pub async fn export(app: &AppState, upstreams: Upstreams) -> Result<()> {
+pub async fn export(app: &AppState, upstreams: Upstreams) -> Result<PutStatus> {
     let mut loaders = Vec::new();
     if upstreams.forge {
         loaders.push(ForgelikeLoader::Forge);
@@ -33,7 +33,7 @@ pub async fn export(app: &AppState, upstreams: Upstreams) -> Result<()> {
         loaders.push(ForgelikeLoader::Neoforge);
     }
     if loaders.is_empty() {
-        return Ok(());
+        return Ok(PutStatus::Unchanged);
     }
     let mut conn = app
         .db
@@ -159,39 +159,65 @@ pub async fn export(app: &AppState, upstreams: Upstreams) -> Result<()> {
         "publishing Forge-like embedded artifacts"
     );
     let num_done = &num_done;
-    stream::iter(artifacts.into_iter().map(Ok::<_, anyhow::Error>))
-        .try_for_each_concurrent(app.concurrency.extract_files.get(), |artifact| async move {
-            let bytes = app.cas.get(artifact.sha256)
-                .context(info_span!("reading embedded Maven artifact", coordinate = %artifact.coordinate, sha256 = %artifact.sha256))
-                .await?;
-            app.maven.put(&artifact.coordinate, &bytes)
-                .context(info_span!("publishing embedded Maven artifact", coordinate = %artifact.coordinate))
-                .await?;
-            let done = num_done.fetch_add(1, Ordering::Relaxed) + 1;
-            if done.is_multiple_of(100) || done == num_total {
-                info!("published {done}/{num_total} Forge-like embedded artifacts");
-            }
-            anyhow::Ok(())
-        })
-        .await?;
+    let mut status = stream::iter(
+        artifacts.into_iter().map(Ok::<_, anyhow::Error>),
+    )
+    .map_ok(|artifact| async move {
+        let span = info_span!(
+           "reading embedded Maven artifact",
+           coordinate = %artifact.coordinate,
+           sha256 = %artifact.sha256,
+        );
+        let bytes = app.cas.get(artifact.sha256).context(span).await?;
+
+        let span = info_span!(
+           "publishing embedded Maven artifact",
+           coordinate = %artifact.coordinate,
+           sha256 = %artifact.sha256,
+        );
+        let changed = app
+            .maven
+            .put(&artifact.coordinate, &bytes)
+            .context(span)
+            .await?;
+        let done = num_done.fetch_add(1, Ordering::Relaxed) + 1;
+        if done.is_multiple_of(100) || done == num_total {
+            info!("published {done}/{num_total} Forge-like embedded artifacts");
+        }
+        anyhow::Ok(changed)
+    })
+    .try_buffer_unordered(app.concurrency.extract_files.get())
+    .try_fold(
+        PutStatus::Unchanged,
+        |mut status, artifact_status| async move {
+            super::latch(&mut status, artifact_status);
+            Ok(status)
+        },
+    )
+    .await?;
     info!(
         num_artifacts = num_total,
         "finished publishing Forge-like embedded artifacts"
     );
+
     // publish profiles before the catalogs which reference them
     for (path, json) in profiles {
-        app.public_blobs
+        let changed = app
+            .public_blobs
             .put(&path, &json, ContentType::Json)
             .context(info_span!("writing Forge-like profile", %path))
             .await?;
+        super::latch(&mut status, changed);
     }
     for (path, json) in catalogs {
-        app.public_blobs
+        let changed = app
+            .public_blobs
             .put(&path, &json, ContentType::Json)
             .context(info_span!("writing Forge-like catalog", %path))
             .await?;
+        super::latch(&mut status, changed);
     }
-    Ok(())
+    Ok(status)
 }
 
 fn loader_path(loader: ForgelikeLoader) -> &'static str {
@@ -466,7 +492,6 @@ mod tests {
                     .collect::<Vec<_>>(),
                 expected
             );
-
         }
         assert!(
             compare_loader_versions(
@@ -505,7 +530,6 @@ mod tests {
                 serde_json::json!(base.join("maven/g/a/1/a-1.jar").unwrap());
             assert_eq!(serde_json::to_value(published).unwrap(), expected);
         }
-
     }
 
     #[test]

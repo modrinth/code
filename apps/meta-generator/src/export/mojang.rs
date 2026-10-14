@@ -4,7 +4,7 @@ use tracing_anyhow::FutureContext;
 
 use crate::{
     AppState, model,
-    store::ContentType,
+    store::{ContentType, PutStatus},
     upstream::mojang,
     util::{Sha1, to_json_string},
 };
@@ -17,7 +17,7 @@ struct VersionManifestExport {
     path: String,
 }
 
-pub async fn export(app: &AppState) -> Result<()> {
+pub async fn export(app: &AppState) -> Result<PutStatus> {
     let mut conn = app
         .db
         .connection()
@@ -110,16 +110,18 @@ pub async fn export(app: &AppState) -> Result<()> {
     let data = to_json_string(&uber_catalog);
 
     // write processed version manifests
+    let mut status = PutStatus::Unchanged;
     let num_total = exports.len();
     for (index, export) in exports.iter().enumerate() {
         let game_version = &export.version.id;
         let path = &export.path;
-        app.public_blobs
+        let changed = app.public_blobs
 			.put(path, export.json.as_bytes(), ContentType::Json)
 			.context(
 				info_span!("writing manifest to blob store", %game_version, %path),
 			)
 			.await?;
+        super::latch(&mut status, changed);
         debug!(%path, "wrote version manifest to blob store");
 
         let num_done = index + 1;
@@ -130,11 +132,13 @@ pub async fn export(app: &AppState) -> Result<()> {
 
     // write manifest (uber catalog)
     let path = format!("minecraft/v{FORMAT_VERSION}/manifest.json");
-    app.public_blobs
+    let changed = app
+        .public_blobs
         .put(&path, data.as_bytes(), ContentType::Json)
         .context(info_span!("writing manifest to blob store", %path))
         .await?;
+    super::latch(&mut status, changed);
     info!(%path, "wrote uber catalog (manifest) to blob store");
 
-    Ok(())
+    Ok(status)
 }

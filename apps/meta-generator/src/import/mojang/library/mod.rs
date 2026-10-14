@@ -1,4 +1,6 @@
-use std::{collections::HashMap, sync::LazyLock};
+use std::sync::LazyLock;
+
+use indexmap::IndexMap;
 
 use serde::{Deserialize, Serialize};
 
@@ -28,7 +30,7 @@ pub struct PartialLibrary {
     pub extract: Option<LibraryExtract>,
     pub name: Option<String>,
     pub url: Option<String>,
-    pub natives: Option<HashMap<OperatingSystem, String>>,
+    pub natives: Option<IndexMap<OperatingSystem, String>>,
     pub rules: Option<Vec<Rule>>,
     pub checksums: Option<Vec<String>>,
     pub include_in_classpath: Option<bool>,

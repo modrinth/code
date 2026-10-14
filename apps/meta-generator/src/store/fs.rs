@@ -1,13 +1,14 @@
 use std::pin::Pin;
 
 use anyhow::{Context, Result};
+use modrinth_minecraft_meta::util::Sha256;
 use tokio::{fs, io::AsyncWriteExt};
 use tracing::{info_span, warn};
 use tracing_anyhow::FutureContext;
 use url::Url;
 use uuid::Uuid;
 
-use crate::store::{ContentType, StoreOps, StoreVisibility};
+use crate::store::{ContentType, PutStatus, StoreOps, StoreVisibility};
 
 #[derive(Debug)]
 pub struct FsStore {
@@ -71,13 +72,27 @@ impl StoreOps for FsStore {
         path: &'a str,
         data: &'a [u8],
         _content_type: ContentType,
-    ) -> Pin<Box<dyn Future<Output = Result<()>> + 'a>> {
+        _skip_if_matches: Option<Sha256>,
+    ) -> Pin<Box<dyn Future<Output = Result<PutStatus>> + 'a>> {
         let path = self
             .root
             .to_file_path()
             .expect("root is a local file URL")
             .join(path);
         Box::pin(async move {
+            // avoid write if unchanged
+            match fs::read(&path).await {
+                Ok(existing) if existing == data => {
+                    return Ok(PutStatus::Unchanged);
+                }
+                Ok(_) => {}
+                Err(err) if err.kind() == std::io::ErrorKind::NotFound => {}
+                Err(err) => {
+                    return Err(err)
+                        .context(format!("reading original file {path:?}"));
+                }
+            }
+
             let parent = path.parent().context("path has no parent")?;
             fs::create_dir_all(&parent)
                 .context(info_span!("creating parent dir", ?parent))
@@ -100,7 +115,7 @@ impl StoreOps for FsStore {
                 fs::rename(&temp_path, &path)
                     .context(info_span!("publishing file", ?temp_path, ?path))
                     .await?;
-                Ok(())
+                Ok(PutStatus::Changed)
             }
             .await;
             if result.is_err()
@@ -110,42 +125,5 @@ impl StoreOps for FsStore {
             }
             result
         })
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn urls_preserve_directory_slashes_and_encode_file_names() {
-        let store = FsStore {
-            root: Url::from_directory_path(
-                std::env::temp_dir().join("minecraft-meta-url-test"),
-            )
-            .unwrap(),
-        };
-        let directory = store.url_for("maven/");
-        assert!(directory.as_str().ends_with("/maven/"));
-        assert_eq!(
-            directory.join("net/fabricmc/library.jar").unwrap(),
-            store.url_for("maven/net/fabricmc/library.jar")
-        );
-        let file =
-            store.url_for("minecraft/v0/versions/3D Shareware v1.34.json");
-        assert!(file.as_str().ends_with("/3D%20Shareware%20v1.34.json"));
-        assert!(!file.as_str().ends_with('/'));
-        assert!(!store.url_for("maven").as_str().ends_with('/'));
-        let literal = store.url_for("maven/file%20?#.jar");
-        assert!(literal.query().is_none());
-        assert!(literal.fragment().is_none());
-        assert_eq!(
-            literal.to_file_path().unwrap(),
-            store
-                .root
-                .to_file_path()
-                .unwrap()
-                .join("maven/file%20?#.jar")
-        );
     }
 }

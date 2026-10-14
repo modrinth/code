@@ -8064,6 +8064,7 @@ dependencies = [
  "anyhow",
  "derive_more 2.1.1",
  "hex",
+ "indexmap 2.14.2",
  "jiff",
  "regex",
  "serde",

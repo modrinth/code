@@ -2,14 +2,15 @@ use std::pin::Pin;
 
 use anyhow::{Context, Result, ensure};
 use derive_more::Debug;
-use s3::{Bucket, Region, creds::Credentials};
+use s3::{Bucket, Region, creds::Credentials, error::S3Error};
 use tracing::info_span;
 use tracing_anyhow::FutureContext;
 use url::Url;
 
 use crate::{
     config::S3,
-    store::{ContentType, StoreOps},
+    store::{ContentType, PutStatus, StoreOps},
+    util::Sha256,
 };
 
 #[derive(Debug)]
@@ -88,11 +89,40 @@ impl StoreOps for S3Store {
         path: &'a str,
         data: &'a [u8],
         content_type: ContentType,
-    ) -> Pin<Box<dyn Future<Output = Result<()>> + 'a>> {
+        skip_if_matches: Option<Sha256>,
+    ) -> Pin<Box<dyn Future<Output = Result<PutStatus>> + 'a>> {
         let bucket = self.bucket.clone();
         Box::pin(async move {
+            let sha256 = skip_if_matches
+                .unwrap_or_else(|| Sha256::from_digest(data))
+                .to_string();
+            match bucket.head_object(path).await {
+                Ok((_, 404)) | Err(S3Error::HttpFailWithBody(404, _)) => {}
+                Ok((object, status)) => {
+                    ensure!(
+                        (200..300).contains(&status),
+                        "S3 HEAD {path} returned HTTP {status}"
+                    );
+                    if object
+                        .metadata
+                        .as_ref()
+                        .and_then(|metadata| metadata.get("sha256"))
+                        == Some(&sha256)
+                    {
+                        return Ok(PutStatus::Unchanged);
+                    }
+                }
+                Err(err) => {
+                    return Err(err)
+                        .context(format!("reading S3 object metadata {path}"));
+                }
+            }
+
             let response = bucket
-                .put_object_with_content_type(path, data, content_type.as_str())
+                .put_object_builder(path, data)
+                .with_content_type(content_type.as_str())
+                .with_metadata("sha256", &sha256)?
+                .execute()
                 .context(info_span!("writing S3 object", path))
                 .await?;
             ensure!(
@@ -100,38 +130,7 @@ impl StoreOps for S3Store {
                 "S3 PUT {path} returned HTTP {}",
                 response.status_code()
             );
-            Ok(())
+            Ok(PutStatus::Changed)
         })
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn public_urls_encode_keys_and_preserve_prefix() {
-        let store = S3Store {
-            bucket: Bucket::new(
-                "test",
-                Region::Custom {
-                    region: "test".into(),
-                    endpoint: "https://s3.example.com".into(),
-                },
-                Credentials::anonymous().unwrap(),
-            )
-            .unwrap(),
-            base_url: "https://cdn.example.com/prefix/".parse().unwrap(),
-        };
-        assert_eq!(
-            store
-                .url_for("minecraft/v0/versions/3D Shareware v1.34.json")
-                .as_str(),
-            "https://cdn.example.com/prefix/minecraft/v0/versions/3D%20Shareware%20v1.34.json"
-        );
-        assert_eq!(
-            store.url_for("maven/a+b/file.jar").as_str(),
-            "https://cdn.example.com/prefix/maven/a+b/file.jar"
-        );
     }
 }

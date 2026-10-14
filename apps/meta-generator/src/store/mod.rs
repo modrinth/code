@@ -5,6 +5,7 @@ mod s3;
 
 pub use cas::BlobCas;
 pub use maven::MavenStore;
+use modrinth_minecraft_meta::util::Sha256;
 use url::Url;
 
 use std::{fmt::Debug, pin::Pin, sync::Arc};
@@ -71,15 +72,21 @@ impl BlobStore {
         self.imp.get(path).await
     }
 
-    /// Put a blob `data` at `path`.
+    /// Put a blob `data` at `path`, returning whether its contents changed.
     pub async fn put(
         &self,
         path: &str,
         data: &[u8],
         content_type: ContentType,
-    ) -> Result<()> {
-        self.imp.put(path, data, content_type).await
+    ) -> Result<PutStatus> {
+        self.imp.put(path, data, content_type, None).await
     }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PutStatus {
+    Changed,
+    Unchanged,
 }
 
 trait StoreOps: Send + Sync + Debug + 'static {
@@ -95,5 +102,6 @@ trait StoreOps: Send + Sync + Debug + 'static {
         path: &'a str,
         data: &'a [u8],
         content_type: ContentType,
-    ) -> Pin<Box<dyn Future<Output = Result<()>> + 'a>>;
+        skip_if_matches: Option<Sha256>,
+    ) -> Pin<Box<dyn Future<Output = Result<PutStatus>> + 'a>>;
 }
