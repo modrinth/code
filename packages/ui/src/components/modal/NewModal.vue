@@ -100,7 +100,10 @@
 							:style="{ maxHeight: maxContentHeight }"
 							@scroll="checkScrollState"
 						>
-							<slot> You just lost the game.</slot>
+							<slot
+								>Something went wrong. We were unable to show you the content of this modal. Please
+								contact support and explain what you were doing.</slot
+							>
 						</div>
 
 						<Transition
@@ -127,7 +130,7 @@
 							{ 'pt-12': props.mergeHeader && closable && !props.noPadding },
 						]"
 					>
-						<slot> You just lost the game.</slot>
+						<slot />
 					</div>
 
 					<div
