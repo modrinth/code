@@ -1655,9 +1655,6 @@
   "app.settings.default-instance-options.height.title": {
     "message": "Висота"
   },
-  "app.settings.default-instance-options.java-and-memory.title": {
-    "message": "Java й памʼять"
-  },
   "app.settings.default-instance-options.java-arguments.description": {
     "message": "Аргументи передаються Java, коли запускається примірник."
   },
@@ -1666,9 +1663,6 @@
   },
   "app.settings.default-instance-options.java-arguments.title": {
     "message": "Аргументи Java"
-  },
-  "app.settings.default-instance-options.launch-hooks.title": {
-    "message": "Параметри запуску"
   },
   "app.settings.default-instance-options.memory-allocation.description": {
     "message": "Максимальна кількість памʼяті для кожного примірника."
@@ -1702,9 +1696,6 @@
   },
   "app.settings.default-instance-options.width.title": {
     "message": "Ширина"
-  },
-  "app.settings.default-instance-options.window.title": {
-    "message": "Вікно"
   },
   "app.settings.default-instance-options.wrapper-hook.description": {
     "message": "Команда, що використовується для обгортки процесу запуску Minecraft."
@@ -2762,14 +2753,8 @@
   "app.settings.resource-management.app-cache.confirm.description": {
     "message": "Застосунок може завантажуватися повільніше, поки кеш не відновиться."
   },
-  "app.settings.resource-management.app-cache.confirm.title": {
-    "message": "Очистити кеш?"
-  },
   "app.settings.resource-management.app-cache.description": {
     "message": "Очистити кешовані дані та завантажити їх знову з Modrinth. Застосунок може завантажуватися повільніше, поки кеш відновиться."
-  },
-  "app.settings.resource-management.app-cache.purge": {
-    "message": "Очистити кеш"
   },
   "app.settings.resource-management.app-cache.title": {
     "message": "Кеш застосунку"
@@ -2846,9 +2831,6 @@
   "app.settings.resource-management.store.description": {
     "message": "Заощаджуйте місце, повторно використовуючи наявні інсталяції ігор, модів та пакетів між вашими примірниками."
   },
-  "app.settings.resource-management.store.empty": {
-    "message": "Установіть моди чи пакети, щоби побачити тут використання вашого сховища."
-  },
   "app.settings.resource-management.store.issues": {
     "message": "Переглянути {count, plural, one {# проблему} few {# проблеми} many {# проблем} other {# проблем}}"
   },
@@ -2887,9 +2869,6 @@
   },
   "app.settings.resource-management.store.verified": {
     "message": "Перевірку завершено"
-  },
-  "app.settings.sidebar.label.instances": {
-    "message": "Примірники"
   },
   "app.settings.synced-options.choose-sync-source.command-history-description": {
     "message": "Виберіть із якого примірника копіювати вашу історію команд. Її буде використано лише для первинної синхронізації, опісля ви можете редагувати її з будь-якого примірника."
@@ -3130,12 +3109,6 @@
   },
   "app.settings.tabs.privacy": {
     "message": "Конфіденційність"
-  },
-  "app.settings.tabs.resource-management": {
-    "message": "Керування ресурсами"
-  },
-  "app.settings.tabs.synced-options": {
-    "message": "Спільні налаштування"
   },
   "app.sidebar.playing-as": {
     "message": "Ігровий профіль"
@@ -4133,9 +4106,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Оберіть випуск оновлення"
   },
-  "instance.settings.tabs.hooks.description": {
-    "message": "Виконати системні команди примірника перед і після запуску гри."
-  },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Після виходу"
   },
@@ -4196,18 +4166,6 @@
   "instance.settings.tabs.installation.locked": {
     "message": "Налаштування інсталяції недоступні, поки цей примірник заблокований."
   },
-  "instance.settings.tabs.java.custom-environment-variables": {
-    "message": "Установити змінні середовища окремо для цього примірника."
-  },
-  "instance.settings.tabs.java.custom-java-arguments": {
-    "message": "Установити аргументи Java окремо для цього примірника."
-  },
-  "instance.settings.tabs.java.custom-java-installation": {
-    "message": "Вибрати іншу інсталяцію Java для цього примірника."
-  },
-  "instance.settings.tabs.java.custom-memory-allocation": {
-    "message": "Установити розподіл пам'яті окремо для цього примірника."
-  },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Уведіть змінні середовища..."
   },
@@ -4231,9 +4189,6 @@
   },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/шлях/до/java"
-  },
-  "instance.settings.tabs.settings-overrides": {
-    "message": "Перевизначення синхронізації"
   },
   "instance.settings.tabs.sharing": {
     "message": "Спільний доступ"
@@ -4297,9 +4252,6 @@
   },
   "instance.settings.tabs.window": {
     "message": "Власні налаштування вікна"
-  },
-  "instance.settings.tabs.window.custom-window-settings": {
-    "message": "Налаштувати повноекранний режим та роздільну здатність окремо для цього примірника."
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Повний екран"

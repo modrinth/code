@@ -1643,9 +1643,6 @@
   "app.settings.default-instance-options.height.title": {
     "message": "Высота"
   },
-  "app.settings.default-instance-options.java-and-memory.title": {
-    "message": "Java и память"
-  },
   "app.settings.default-instance-options.java-arguments.description": {
     "message": "Аргументы, передаваемые Java при запуске игры."
   },
@@ -1654,9 +1651,6 @@
   },
   "app.settings.default-instance-options.java-arguments.title": {
     "message": "Аргументы Java"
-  },
-  "app.settings.default-instance-options.launch-hooks.title": {
-    "message": "Команды запуска"
   },
   "app.settings.default-instance-options.memory-allocation.description": {
     "message": "Максимальный объём памяти, выделяемый игре."
@@ -1690,9 +1684,6 @@
   },
   "app.settings.default-instance-options.width.title": {
     "message": "Ширина"
-  },
-  "app.settings.default-instance-options.window.title": {
-    "message": "Окно"
   },
   "app.settings.default-instance-options.wrapper-hook.description": {
     "message": "Команда, оборачивающая процесс запуска Minecraft."
@@ -2750,14 +2741,8 @@
   "app.settings.resource-management.app-cache.confirm.description": {
     "message": "Приложение может замедлиться, пока кеш не восстановится."
   },
-  "app.settings.resource-management.app-cache.confirm.title": {
-    "message": "Очистить кеш приложения?"
-  },
   "app.settings.resource-management.app-cache.description": {
     "message": "Удаляет кешированные данные и повторно скачивает их с Modrinth. Приложение может замедлиться, пока кеш не восстановится."
-  },
-  "app.settings.resource-management.app-cache.purge": {
-    "message": "Очистить кеш"
   },
   "app.settings.resource-management.app-cache.title": {
     "message": "Кеш приложения"
@@ -2834,9 +2819,6 @@
   "app.settings.resource-management.store.description": {
     "message": "Экономьте место, используя общие файлы игры и контент в сборках."
   },
-  "app.settings.resource-management.store.empty": {
-    "message": "Установите контент, чтобы отслеживать объём занятого места."
-  },
   "app.settings.resource-management.store.issues": {
     "message": "Посмотреть {count, plural, one {# проблему} few {# проблемы} other {# проблем}}"
   },
@@ -2875,9 +2857,6 @@
   },
   "app.settings.resource-management.store.verified": {
     "message": "Проверка завершена"
-  },
-  "app.settings.sidebar.label.instances": {
-    "message": "Сборки"
   },
   "app.settings.synced-options.choose-sync-source.command-history-description": {
     "message": "Выберете, из какой сборки копировать историю команд. Эта история нужна только для первоначальной синхронизации, после чего её можно изменить."
@@ -3118,12 +3097,6 @@
   },
   "app.settings.tabs.privacy": {
     "message": "Конфиденциальность"
-  },
-  "app.settings.tabs.resource-management": {
-    "message": "Управление ресурсами"
-  },
-  "app.settings.tabs.synced-options": {
-    "message": "Глобальные настройки"
   },
   "app.sidebar.playing-as": {
     "message": "Сейчас играет"
@@ -4118,9 +4091,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Выберите канал обновления"
   },
-  "instance.settings.tabs.hooks.description": {
-    "message": "Выполнение системных команд конкретной сборки до и после запуска игры."
-  },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "После выхода"
   },
@@ -4181,18 +4151,6 @@
   "instance.settings.tabs.installation.locked": {
     "message": "Параметры установки недоступны, пока сборка заблокирована."
   },
-  "instance.settings.tabs.java.custom-environment-variables": {
-    "message": "Настройка переменных среды отдельно для этой сборки."
-  },
-  "instance.settings.tabs.java.custom-java-arguments": {
-    "message": "Настройка аргументов Java отдельно для этой сборки."
-  },
-  "instance.settings.tabs.java.custom-java-installation": {
-    "message": "Выбрать другую установку Java в сборке."
-  },
-  "instance.settings.tabs.java.custom-memory-allocation": {
-    "message": "Настройка выделения памяти отдельно для этой сборки."
-  },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Введите переменные среды..."
   },
@@ -4216,9 +4174,6 @@
   },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/путь/к/java"
-  },
-  "instance.settings.tabs.settings-overrides": {
-    "message": "Переопределения"
   },
   "instance.settings.tabs.sharing": {
     "message": "Доступ"
@@ -4282,9 +4237,6 @@
   },
   "instance.settings.tabs.window": {
     "message": "Переопределение настроек окна"
-  },
-  "instance.settings.tabs.window.custom-window-settings": {
-    "message": "Настройка полноэкранного режима и разрешения при запуске для этой сборки."
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Полноэкранный режим"

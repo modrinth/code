@@ -302,9 +302,6 @@
   "app.settings.tabs.privacy": {
     "message": "Personvern"
   },
-  "app.settings.tabs.resource-management": {
-    "message": "Ressursforvaltning"
-  },
   "app.update.complete-toast.text": {
     "message": "Klikk her for å se endringsloggen."
   },

@@ -146,9 +146,7 @@ defineExpose({ show, hide, selectedTab, setTab })
 			<slot name="title" />
 		</template>
 		<div class="grid h-[min(65vh,640px)] min-h-0 grid-cols-[250px_minmax(0,1fr)] overflow-hidden">
-			<div
-				class="relative flex min-h-0 min-w-0 flex-col gap-2 bg-surface-3 p-4"
-			>
+			<div class="relative flex min-h-0 min-w-0 flex-col gap-2 bg-surface-3 p-4">
 				<div
 					aria-hidden="true"
 					class="pointer-events-none absolute inset-y-0 right-0 border-0 border-r border-solid border-surface-5"
@@ -247,7 +245,10 @@ defineExpose({ show, hide, selectedTab, setTab })
 					class="tabbed-modal-scrollbar absolute inset-0 overflow-y-auto overscroll-contain"
 					@scroll="checkScrollState"
 				>
-					<div class="flow-root min-h-full px-6 pt-6" :style="{ paddingBottom: contentBottomPadding }">
+					<div
+						class="flow-root min-h-full px-6 pt-6"
+						:style="{ paddingBottom: contentBottomPadding }"
+					>
 						<slot name="content" :tab="visibleTabs[selectedTab]" :index="selectedTab">
 							<Suspense>
 								<component
