@@ -107,7 +107,7 @@ impl SandboxChildOp for StdChild {
     fn try_wait(&mut self) -> Result<Option<SandboxExitStatus>> {
         self.child
             .try_wait()
-            .map(|status| status.map(Into::into))
+            .map(|status| status.map(sandbox_exit_status))
             .wrap_err("checking unsandboxed child status")
     }
 
@@ -115,7 +115,7 @@ impl SandboxChildOp for StdChild {
         self.child
             .wait()
             .await
-            .map(Into::into)
+            .map(sandbox_exit_status)
             .wrap_err("waiting for unsandboxed child")
     }
 
@@ -127,6 +127,28 @@ impl SandboxChildOp for StdChild {
             .kill()
             .await
             .wrap_err("killing unsandboxed child")
+    }
+}
+
+fn sandbox_exit_status(status: std::process::ExitStatus) -> SandboxExitStatus {
+    #[cfg(unix)]
+    {
+        use std::os::unix::process::ExitStatusExt;
+
+        SandboxExitStatus {
+            imp: super::unix::UnixSandboxExitStatus(status.into_raw()),
+        }
+    }
+    #[cfg(windows)]
+    {
+        SandboxExitStatus {
+            imp: super::windows::WindowsSandboxExitStatus(
+                status
+                    .code()
+                    .expect("Windows exit status always has a code")
+                    as u32,
+            ),
+        }
     }
 }
 

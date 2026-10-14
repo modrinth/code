@@ -164,25 +164,6 @@ pub struct SandboxExitStatus {
     imp: windows::WindowsSandboxExitStatus,
 }
 
-impl From<std::process::ExitStatus> for SandboxExitStatus {
-    fn from(status: std::process::ExitStatus) -> Self {
-        #[cfg(unix)]
-        {
-            use std::os::unix::process::ExitStatusExt;
-            Self {
-                imp: unix::UnixSandboxExitStatus(status.into_raw()),
-            }
-        }
-        #[cfg(windows)]
-        {
-            use std::os::windows::process::ExitStatusExt;
-            Self {
-                imp: windows::WindowsSandboxExitStatus(status.into_raw()),
-            }
-        }
-    }
-}
-
 impl SandboxExitStatus {
     /// Was termination successful? Signal termination is not considered a
     /// success, and success is defined as a zero exit status.

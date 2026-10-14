@@ -409,8 +409,37 @@ impl SandboxChildOp for WindowsChild {
     }
 
     async fn wait(&mut self) -> Result<SandboxExitStatus> {
-        // todo: make this async
-        self.blocking_wait()
+        if let Some(exit_status) = self.exit_status {
+            return Ok(exit_status);
+        }
+
+        let process_handle =
+            to_owned_handle(duplicate_handle(self.process_handle, false)?)?;
+        let code = tokio::task::spawn_blocking(move || unsafe {
+            let process_handle = HANDLE(process_handle.as_raw_handle());
+            let wait = windows::Win32::System::Threading::WaitForSingleObject(
+                process_handle,
+                windows::Win32::System::Threading::INFINITE,
+            );
+            if wait == windows::Win32::Foundation::WAIT_FAILED {
+                return Err(eyre!("wait failed"));
+            }
+
+            let mut code = 0;
+            windows::Win32::System::Threading::GetExitCodeProcess(
+                process_handle,
+                &mut code,
+            )?;
+            Ok(code)
+        })
+        .await
+        .wrap_err("joining process wait task")??;
+
+        let exit_status = SandboxExitStatus {
+            imp: WindowsSandboxExitStatus(code),
+        };
+        self.exit_status = Some(exit_status);
+        Ok(exit_status)
     }
 
     async fn kill(&mut self) -> Result<()> {
@@ -583,6 +612,10 @@ pub fn open_null_device() -> Result<HANDLE> {
 }
 
 pub fn duplicate_handle_as_inheritable(handle: HANDLE) -> Result<HANDLE> {
+    duplicate_handle(handle, true)
+}
+
+fn duplicate_handle(handle: HANDLE, inheritable: bool) -> Result<HANDLE> {
     let mut duplicated = HANDLE::default();
     unsafe {
         let cur_proc = GetCurrentProcess();
@@ -592,7 +625,7 @@ pub fn duplicate_handle_as_inheritable(handle: HANDLE) -> Result<HANDLE> {
             cur_proc,
             &mut duplicated,
             0,
-            true,
+            inheritable,
             DUPLICATE_SAME_ACCESS,
         )?;
     }
