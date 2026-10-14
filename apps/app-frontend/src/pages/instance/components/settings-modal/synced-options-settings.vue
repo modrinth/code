@@ -36,10 +36,7 @@ import type { GameInstance } from '@/helpers/types'
 import { appSettingsModalOpenSyncedOptionsKey } from '@/providers/app-settings-modal'
 
 import { instanceKeys, instanceListQueryOptions } from '../../query-options'
-import HooksSettings from './hooks-settings.vue'
 import { injectInstanceSettings } from './instance-settings-context'
-import JavaSettings from './java-settings.vue'
-import WindowSettings from './window-settings.vue'
 
 const { instance, closeModal } = injectInstanceSettings()
 const { formatMessage } = useVIntl()
@@ -672,17 +669,5 @@ function resolveHotbars(resolution: SyncedOptionJoinResolution) {
 				</div>
 			</div>
 		</div>
-
-		<hr class="m-0 h-px border-none bg-button-border" />
-
-		<WindowSettings />
-
-		<hr class="m-0 h-px border-none bg-button-border" />
-
-		<JavaSettings />
-
-		<hr class="m-0 h-px border-none bg-button-border" />
-
-		<HooksSettings />
 	</div>
 </template>

@@ -1,10 +1,20 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { ChevronRightIcon, InfoIcon, Settings2Icon, UsersIcon, WrenchIcon } from '@modrinth/assets'
+import {
+	ChevronRightIcon,
+	CodeIcon,
+	CoffeeIcon,
+	InfoIcon,
+	Settings2Icon,
+	UsersIcon,
+	WindowIcon,
+	WrenchIcon,
+} from '@modrinth/assets'
 import {
 	Avatar,
 	commonMessages,
 	defineMessage,
+	defineMessages,
 	TabbedModal,
 	type TabbedModalTab,
 	useVIntl,
@@ -20,10 +30,13 @@ import { get_game_versions, get_loaders } from '@/helpers/tags'
 import type { GameInstance } from '@/helpers/types'
 
 import GeneralSettings from './general-settings.vue'
+import HooksSettings from './hooks-settings.vue'
 import InstallationSettings from './installation-settings.vue'
 import { provideInstanceSettings } from './instance-settings-context.ts'
+import JavaSettings from './java-settings.vue'
 import SharingSettings from './sharing-settings.vue'
 import SyncedOptionsSettings from './synced-options-settings.vue'
+import WindowSettings from './window-settings.vue'
 
 const { formatMessage } = useVIntl()
 const queryClient = useQueryClient()
@@ -79,6 +92,17 @@ watch(
 	{ immediate: true },
 )
 
+const tabCategories = defineMessages({
+	instance: {
+		id: 'instance.settings.sidebar.label.instance',
+		defaultMessage: 'Instance',
+	},
+	game: {
+		id: 'instance.settings.sidebar.label.game',
+		defaultMessage: 'Game',
+	},
+})
+
 const tabs = computed<TabbedModalTab[]>(() => [
 	{
 		name: defineMessage({
@@ -86,6 +110,7 @@ const tabs = computed<TabbedModalTab[]>(() => [
 			defaultMessage: 'General',
 		}),
 		icon: InfoIcon,
+		category: tabCategories.instance,
 		content: GeneralSettings,
 	},
 	{
@@ -94,24 +119,54 @@ const tabs = computed<TabbedModalTab[]>(() => [
 			defaultMessage: 'Installation',
 		}),
 		icon: WrenchIcon,
+		category: tabCategories.instance,
 		content: InstallationSettings,
-	},
-	{
-		name: defineMessage({
-			id: 'instance.settings.tabs.settings-overrides',
-			defaultMessage: 'Sync overrides',
-		}),
-		icon: Settings2Icon,
-		content: SyncedOptionsSettings,
 	},
 	{
 		name: defineMessage({
 			id: 'instance.settings.tabs.sharing',
 			defaultMessage: 'Sharing',
 		}),
+		category: tabCategories.instance,
 		icon: UsersIcon,
 		content: SharingSettings,
 		shown: props.instance.shared_instance?.role === 'owner' && !props.instance.quarantined,
+	},
+	{
+		name: defineMessage({
+			id: 'instance.settings.tabs.java.label',
+			defaultMessage: 'Java and memory',
+		}),
+		icon: CoffeeIcon,
+		category: tabCategories.game,
+		content: JavaSettings,
+	},
+	{
+		name: defineMessage({
+			id: 'instance.settings.tabs.window.label',
+			defaultMessage: 'Window',
+		}),
+		icon: WindowIcon,
+		category: tabCategories.game,
+		content: WindowSettings,
+	},
+	{
+		name: defineMessage({
+			id: 'instance.settings.tabs.hooks.label',
+			defaultMessage: 'Launch hooks',
+		}),
+		icon: CodeIcon,
+		category: tabCategories.game,
+		content: HooksSettings,
+	},
+	{
+		name: defineMessage({
+			id: 'instance.settings.tabs.syncing',
+			defaultMessage: 'Syncing',
+		}),
+		icon: Settings2Icon,
+		category: tabCategories.game,
+		content: SyncedOptionsSettings,
 	},
 ])
 
@@ -174,8 +229,8 @@ defineExpose({ show, hide })
 		ref="tabbedModal"
 		:tabs="tabs"
 		:on-after-hide="handleAfterHide"
-		:max-width="'min(928px, calc(95vw - 10rem))'"
-		:width="'min(928px, calc(95vw - 10rem))'"
+		max-width="928px"
+		width="928px"
 	>
 		<template #title>
 			<span class="flex items-center gap-2 text-lg font-semibold text-primary">

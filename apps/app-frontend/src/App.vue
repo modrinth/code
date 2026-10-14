@@ -183,6 +183,7 @@ import { appMessages } from '@/utils/app-messages'
 import { AppNotificationManager } from './providers/app-notifications'
 import { AppPopupNotificationManager } from './providers/app-popup-notifications'
 import {
+	appSettingsModalOpenDefaultsKey,
 	appSettingsModalOpenProfileKey,
 	appSettingsModalOpenSyncedOptionsKey,
 } from './providers/app-settings-modal'
@@ -965,6 +966,7 @@ const appSettingsModal = ref()
 const newUpdateModal = ref()
 
 provide(appSettingsModalOpenProfileKey, () => appSettingsModal.value?.showProfile())
+provide(appSettingsModalOpenDefaultsKey, (tab) => appSettingsModal.value?.showDefaults(tab))
 provide(appSettingsModalOpenSyncedOptionsKey, () => appSettingsModal.value?.showSyncedOptions())
 
 watch(incompatibilityWarningModal, (modal) => {

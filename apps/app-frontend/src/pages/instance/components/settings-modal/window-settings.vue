@@ -7,6 +7,7 @@ import { get } from '@/helpers/settings.ts'
 
 import type { AppSettings } from '../../../../helpers/types'
 import { injectInstanceSettings } from './instance-settings-context'
+import DefaultSettingsIntro from './default-settings-intro.vue'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -54,13 +55,14 @@ watch(
 )
 
 const messages = defineMessages({
+	defaultSettingsDescription: {
+		id: 'instance.settings.tabs.window.default-settings-description',
+		defaultMessage:
+			'Your instance uses the default window settings unless you override them here.',
+	},
 	window: {
 		id: 'instance.settings.tabs.window',
 		defaultMessage: 'Custom window settings',
-	},
-	customWindowSettings: {
-		id: 'instance.settings.tabs.window.custom-window-settings',
-		defaultMessage: 'Configure fullscreen and launch resolution separately for this instance.',
 	},
 	fullscreen: {
 		id: 'instance.settings.tabs.window.fullscreen',
@@ -98,17 +100,20 @@ const messages = defineMessages({
 </script>
 
 <template>
-	<div class="flex flex-col">
-		<div class="flex items-center justify-between gap-4">
-			<div class="flex min-w-0 flex-col gap-1">
-				<h2 class="m-0 text-lg font-semibold text-contrast">
-					{{ formatMessage(messages.window) }}
-				</h2>
-				<p class="m-0">{{ formatMessage(messages.customWindowSettings) }}</p>
-			</div>
+	<div class="flex flex-col gap-6">
+		<DefaultSettingsIntro
+			tab="window"
+			:description="formatMessage(messages.defaultSettingsDescription)"
+		/>
+		<div
+			class="flex items-center justify-between gap-4 border-0 border-b border-solid border-surface-5 pb-6"
+		>
+			<label for="override-window-settings" class="text-lg font-semibold text-contrast">
+				{{ formatMessage(messages.window) }}
+			</label>
 			<Toggle id="override-window-settings" v-model="overrideWindowSettings" />
 		</div>
-		<div class="flex flex-col gap-6 pt-6" :class="{ 'opacity-50': !overrideWindowSettings }">
+		<div class="flex flex-col gap-6" :class="{ 'opacity-50': !overrideWindowSettings }">
 			<div class="flex items-center gap-4 justify-between">
 				<div class="flex flex-col gap-1">
 					<h2 class="m-0 text-lg font-semibold text-contrast">
