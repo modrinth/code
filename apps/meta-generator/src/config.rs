@@ -36,4 +36,6 @@ pub struct Concurrency {
 pub struct Fastly {
     pub base_url: Url,
     pub key: SecretString,
+    pub service_id: String,
+    pub surrogate_key: String,
 }

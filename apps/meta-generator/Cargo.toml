@@ -16,6 +16,7 @@ figment = { workspace = true, features = ["env"] }
 futures = { workspace = true }
 hex = { workspace = true }
 indexmap = { workspace = true }
+bon = { workspace = true }
 jiff = { workspace = true, features = ["serde"] }
 modrinth-minecraft-meta = { workspace = true }
 reqwest = { workspace = true, features = ["default"] }

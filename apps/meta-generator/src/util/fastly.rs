@@ -11,13 +11,19 @@ pub struct Client {
     http: reqwest::Client,
     base: Url,
     fastly_key: HeaderValue,
+    service_id: String,
+    surrogate_key: String,
 }
 
+#[bon::bon]
 impl Client {
+    #[builder]
     pub fn new(
         http: reqwest::Client,
         base: impl IntoUrl,
         fastly_key: SecretString,
+        service_id: String,
+        surrogate_key: String,
     ) -> Result<Self> {
         let base = base.into_url().context("invalid base URL")?;
         let mut fastly_key = HeaderValue::from_str(fastly_key.expose_secret())
@@ -27,20 +33,24 @@ impl Client {
             http,
             base,
             fastly_key,
+            service_id,
+            surrogate_key,
         })
     }
 
-    pub async fn purge_url(&self, cached_url: &Url) -> Result<()> {
-        let mut endpoint = self.base.join("purge/")?;
+    pub async fn soft_purge_all(&self) -> Result<()> {
+        let mut endpoint = self.base.join("service/")?;
         endpoint
             .path_segments_mut()
-            .expect("API URL supports path segments")
+            .expect("URL should support path segments")
             .pop_if_empty()
-            .push(cached_url.as_str());
-
+            .push(&self.service_id)
+            .push("purge")
+            .push(&self.surrogate_key);
         self.http
             .post(endpoint)
             .header("Fastly-Key", &self.fastly_key)
+            .header("Fastly-Soft-Purge", "1")
             .send()
             .await?
             .error_for_status_ext()

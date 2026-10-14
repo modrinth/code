@@ -109,7 +109,7 @@ pub async fn download_from_upstreams(
 
     toasty::update!(download_run {
         completed_at: Timestamp::now(),
-        errors: toasty::Json(cx.errors.finish()),
+        errors: toasty::Json(cx.errors.finish_into_messages()),
     })
     .exec(&mut conn)
     .context(info_span!("marking download run as completed"))

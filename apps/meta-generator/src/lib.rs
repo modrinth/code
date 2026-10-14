@@ -92,23 +92,26 @@ pub async fn main() -> Result<()> {
     info!("applied {} migrations", report.applied());
 
     let fastly = if let Some(config) = config.fastly {
-        fastly::Client::new(http.clone(), config.base_url, config.key)
+        fastly::Client::builder()
+            .http(http.clone())
+            .base(config.base_url)
+            .fastly_key(config.key)
+            .service_id(config.service_id)
+            .surrogate_key(config.surrogate_key)
+            .build()
             .map(|client| Some(Arc::new(client)))
             .context("creating Fastly client")?
     } else {
         None
     };
 
-    let public_blobs = BlobStore::new(
-        config.public_s3,
-        fastly.clone(),
-        StoreVisibility::Public,
-    )
-    .context(info_span!("creating public blob store"))
-    .await?;
+    let public_blobs =
+        BlobStore::new(config.public_s3, StoreVisibility::Public)
+            .context(info_span!("creating public blob store"))
+            .await?;
     // private store is never behind a CDN, so we don't need to purge with Fastly
     let private_blobs =
-        BlobStore::new(config.private_s3, None, StoreVisibility::Private)
+        BlobStore::new(config.private_s3, StoreVisibility::Private)
             .context(info_span!("creating private blob store"))
             .await?;
     let cas = BlobCas::new(private_blobs.clone());
@@ -121,6 +124,7 @@ pub async fn main() -> Result<()> {
         cas,
         public_blobs,
         maven,
+        fastly,
     };
 
     let upstreams = {
@@ -152,6 +156,7 @@ struct AppState {
     cas: BlobCas,
     public_blobs: BlobStore,
     maven: MavenStore,
+    fastly: Option<Arc<fastly::Client>>,
 }
 
 pub fn create_config() -> Result<Config> {

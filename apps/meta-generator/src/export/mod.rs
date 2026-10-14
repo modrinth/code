@@ -1,11 +1,11 @@
 //! Schemas and logic for generating manifest artifacts consumed by the Modrinth
 //! App.
 
-use anyhow::{Result, ensure};
-use tracing::{info_span, warn};
+use anyhow::Result;
+use tracing::{info, info_span};
 use tracing_anyhow::FutureContext;
 
-use crate::{AppState, upstream::Upstreams};
+use crate::{AppState, upstream::Upstreams, util::ErrorAccumulator};
 
 mod fabric;
 mod fabriclike;
@@ -14,15 +14,12 @@ mod mojang;
 mod quilt;
 
 pub async fn run(app: AppState, upstreams: Upstreams) -> Result<()> {
-    let mut failed = Vec::new();
+    let mut errors = ErrorAccumulator::new();
     if upstreams.mojang {
         mojang::export(&app)
             .context(info_span!("exporting Mojang artifacts"))
             .await
-            .inspect_err(|err| {
-                warn!("error: {err:?}");
-                failed.push("Mojang");
-            })
+            .inspect_err(|err| errors.push_mut(err))
             .ok();
     }
 
@@ -30,10 +27,7 @@ pub async fn run(app: AppState, upstreams: Upstreams) -> Result<()> {
         fabric::export(&app)
             .context(info_span!("exporting Fabric artifacts"))
             .await
-            .inspect_err(|err| {
-                warn!("error: {err:?}");
-                failed.push("Fabric");
-            })
+            .inspect_err(|err| errors.push_mut(err))
             .ok();
     }
 
@@ -41,10 +35,7 @@ pub async fn run(app: AppState, upstreams: Upstreams) -> Result<()> {
         quilt::export(&app)
             .context(info_span!("exporting Quilt artifacts"))
             .await
-            .inspect_err(|err| {
-                warn!("error: {err:?}");
-                failed.push("Quilt");
-            })
+            .inspect_err(|err| errors.push_mut(err))
             .ok();
     }
 
@@ -52,13 +43,21 @@ pub async fn run(app: AppState, upstreams: Upstreams) -> Result<()> {
         forgelike::export(&app, upstreams)
             .context(info_span!("exporting Forge-like artifacts"))
             .await
-            .inspect_err(|err| {
-                warn!("error: {err:?}");
-                failed.push("Forge/NeoForge");
-            })
+            .inspect_err(|err| errors.push_mut(err))
             .ok();
     }
 
-    ensure!(failed.is_empty(), "export failed for {}", failed.join(", "));
-    Ok(())
+    if let Some(fastly) = app.fastly.as_ref() {
+        fastly
+            .soft_purge_all()
+            .context(info_span!("soft purging with Fastly"))
+            .await
+            .inspect(|()| info!("purged Fastly CDN"))
+            .inspect_err(|err| errors.push_mut(err))
+            .ok();
+    } else {
+        info!("Fastly client not configured; not purging CDN");
+    }
+
+    errors.finish_into_result()
 }

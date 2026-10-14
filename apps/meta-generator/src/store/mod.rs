@@ -1,5 +1,4 @@
 mod cas;
-mod cdn;
 mod fs;
 mod maven;
 mod s3;
@@ -12,10 +11,7 @@ use std::{fmt::Debug, pin::Pin, sync::Arc};
 
 use anyhow::Result;
 
-use crate::{
-    config::{self},
-    util::fastly,
-};
+use crate::config;
 
 /// Stores arbitrary binary [`Vec<u8>`] blobs at a string `path`.
 ///
@@ -50,20 +46,12 @@ pub enum StoreVisibility {
 impl BlobStore {
     pub async fn new(
         s3_config: Option<config::S3>,
-        fastly: Option<Arc<fastly::Client>>,
         visibility: StoreVisibility,
     ) -> Result<Self> {
-        let mut imp: Box<dyn StoreOps> = match s3_config {
+        let imp: Box<dyn StoreOps> = match s3_config {
             Some(config) => Box::new(s3::new(&config)?),
             None => Box::new(fs::new(visibility).await?),
         };
-
-        if visibility == StoreVisibility::Public
-            && let Some(fastly) = fastly
-        {
-            imp = Box::new(cdn::new(imp, fastly));
-        }
-
         Ok(Self {
             imp: Arc::from(imp),
         })
