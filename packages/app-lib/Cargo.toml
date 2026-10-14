@@ -9,6 +9,7 @@ name = "export_app_events"
 required-features = ["export-ts"]
 
 [dependencies]
+anyhow = { workspace = true }
 ariadne = { workspace = true }
 async-minecraft-ping = { workspace = true, features = ["srv"] }
 async-recursion = { workspace = true }
@@ -39,7 +40,6 @@ dunce = { workspace = true }
 either = { workspace = true }
 encoding_rs = { workspace = true }
 enumset = { workspace = true }
-eyre = { workspace = true }
 flate2 = { workspace = true }
 fs4 = { workspace = true, features = ["tokio"] }
 futures = { workspace = true, features = ["alloc", "async-await"] }
