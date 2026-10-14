@@ -63,7 +63,7 @@ impl Serialize for CommandError {
             "CommandError",
             2 + usize::from(reason.is_some()),
         )?;
-        state.serialize_field("message", &self.0.to_string())?;
+        state.serialize_field("message", &format!("{:#}", self.0))?;
         state.serialize_field("code", error_code(&self.0))?;
         if let Some(reason) = reason {
             state.serialize_field("reason", reason)?;

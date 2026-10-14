@@ -674,7 +674,7 @@ impl InstallErrorView {
         Self {
             code: code.to_string(),
             phase: Some(phase),
-            message: error.to_string(),
+            message: format!("{error:#}"),
             reason: None,
             api: match error.downcast_ref::<crate::ErrorKind>() {
                 Some(crate::ErrorKind::LabrinthError(error)) => {
