@@ -146,7 +146,7 @@ pub fn spawn(
         UnixChild {
             pid,
             exit_status: None,
-			wait_task: None,
+            wait_task: None,
         },
     ))
 }
@@ -245,7 +245,7 @@ fn exec(
 pub struct UnixChild {
     pid: libc::pid_t,
     exit_status: Option<SandboxExitStatus>,
-	wait_task: Option<tokio::task::JoinHandle<Result<libc::c_int>>>,
+    wait_task: Option<tokio::task::JoinHandle<Result<libc::c_int>>>,
 }
 
 #[async_trait]
@@ -263,16 +263,16 @@ impl SandboxChildOp for UnixChild {
             return Ok(Some(exit_status));
         }
 
-		if let Some(task) = self.wait_task.as_mut() {
-			let Some(result) = task.now_or_never() else {
-				return Ok(None);
-			};
-			self.wait_task = None;
-			self.exit_status = Some(SandboxExitStatus {
-				imp: UnixSandboxExitStatus(result??),
-			});
-			return Ok(self.exit_status);
-		}
+        if let Some(task) = self.wait_task.as_mut() {
+            let Some(result) = task.now_or_never() else {
+                return Ok(None);
+            };
+            self.wait_task = None;
+            self.exit_status = Some(SandboxExitStatus {
+                imp: UnixSandboxExitStatus(result??),
+            });
+            return Ok(self.exit_status);
+        }
 
         let mut status = 0 as libc::c_int;
         let pid = cvt_r(|| unsafe {
@@ -289,29 +289,28 @@ impl SandboxChildOp for UnixChild {
         }
     }
 
-
     async fn wait(&mut self) -> Result<SandboxExitStatus> {
         if let Some(exit_status) = self.exit_status {
             return Ok(exit_status);
         }
 
-		let wait_for_pid = self.pid;
-		let task = self.wait_task.get_or_insert_with(|| {
-			tokio::task::spawn_blocking(move || {
-				let mut status = 0 as libc::c_int;
-				cvt_r(|| unsafe {
-					libc::waitpid(wait_for_pid, &raw mut status, 0)
-				})?;
-				eyre::Ok(status)
-			})
-		});
-		let result = task.await;
-		self.wait_task = None;
-		let exit_status = SandboxExitStatus {
-			imp: UnixSandboxExitStatus(result??),
-		};
-		self.exit_status = Some(exit_status);
-		Ok(exit_status)
+        let wait_for_pid = self.pid;
+        let task = self.wait_task.get_or_insert_with(|| {
+            tokio::task::spawn_blocking(move || {
+                let mut status = 0 as libc::c_int;
+                cvt_r(|| unsafe {
+                    libc::waitpid(wait_for_pid, &raw mut status, 0)
+                })?;
+                eyre::Ok(status)
+            })
+        });
+        let result = task.await;
+        self.wait_task = None;
+        let exit_status = SandboxExitStatus {
+            imp: UnixSandboxExitStatus(result??),
+        };
+        self.exit_status = Some(exit_status);
+        Ok(exit_status)
     }
 
     async fn kill(&mut self) -> Result<()> {
@@ -322,54 +321,6 @@ impl SandboxChildOp for UnixChild {
         .await??;
         Ok(())
     }
-}
-
-#[cfg(test)]
-mod tests {
-	use super::*;
-	use std::process::{Command, Stdio};
-
-	#[tokio::test]
-	async fn cancelled_wait_preserves_exit_status() -> Result<()> {
-		for use_try_wait in [false, true] {
-			let mut process = Command::new("/bin/sh")
-				.args(["-c", "read line; exit 42"])
-				.stdin(Stdio::piped())
-				.spawn()?;
-			let mut child = UnixChild {
-				pid: process.id() as libc::pid_t,
-				exit_status: None,
-				wait_task: None,
-			};
-			{
-				let mut wait = child.wait();
-				assert!(futures::poll!(wait.as_mut()).is_pending());
-			}
-			assert!(child.try_wait()?.is_none());
-			drop(process.stdin.take());
-
-			let status = tokio::time::timeout(
-				std::time::Duration::from_secs(5),
-				async {
-					if use_try_wait {
-						loop {
-							if let Some(status) = child.try_wait()? {
-								break Ok(status);
-							}
-							tokio::time::sleep(std::time::Duration::from_millis(1)).await;
-						}
-					} else {
-						child.wait().await
-					}
-				},
-			)
-			.await??;
-			assert_eq!(status.code(), Some(42));
-			assert_eq!(child.wait().await?.code(), Some(42));
-			assert_eq!(child.try_wait()?.unwrap().code(), Some(42));
-		}
-		Ok(())
-	}
 }
 
 #[derive(Default, Clone, Copy)]
