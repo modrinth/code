@@ -59,16 +59,16 @@
 <script setup lang="ts">
 import { MessagesSquareIcon, SpinnerIcon } from '@modrinth/assets'
 import { Button, ButtonLink, defineMessages, NewModal, useVIntl } from '@modrinth/ui'
-import { inject, type Ref, ref } from 'vue'
+import { ref } from 'vue'
 
 import steveImage from '@/assets/steve-look-up-left.webp'
-import type AccountsCard from '@/components/ui/AccountsCard.vue'
 import { handleSevereError } from '@/composables/use-error.js'
+import { injectMinecraftAccounts } from '@/features/minecraft-accounts/context'
 import { trackEvent } from '@/helpers/analytics'
 import { login as loginFlow, set_default_user } from '@/helpers/auth.js'
 
 const { formatMessage } = useVIntl()
-const accountsCard = inject('accountsCard') as Ref<InstanceType<typeof AccountsCard> | null>
+const minecraftAccounts = injectMinecraftAccounts()
 
 const messages = defineMessages({
 	header: {
@@ -117,7 +117,7 @@ async function signIn() {
 		if (!loggedIn) return
 
 		await set_default_user(loggedIn.profile.id)
-		await accountsCard.value?.refreshValues()
+		await minecraftAccounts.value?.refreshValues()
 		await trackEvent('AccountLogIn', { source: 'MinecraftRequiredModal' })
 		modal.value?.hide()
 	} catch (error) {

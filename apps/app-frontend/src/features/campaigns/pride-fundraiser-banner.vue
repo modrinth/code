@@ -5,6 +5,14 @@ import { useQuery } from '@tanstack/vue-query'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { computed, ref } from 'vue'
 
+import { useAppSettings } from '@/composables/use-app-settings'
+
+const PRIDE_FUNDRAISER_END_DATE = new Date('2026-07-01T00:00:00Z').getTime()
+const appSettings = useAppSettings()
+const enabled = computed(
+	() => appSettings.getFeatureFlag('pride_fundraiser') && Date.now() < PRIDE_FUNDRAISER_END_DATE,
+)
+
 const DISMISSED_STORAGE_KEY = 'pride-fundraiser-2026-dismissed'
 
 const client = injectModrinthClient()
@@ -13,13 +21,13 @@ const dismissed = ref(localStorage.getItem(DISMISSED_STORAGE_KEY) === 'true')
 const { data: campaignInfo } = useQuery({
 	queryKey: ['campaign', 'pride-26'],
 	queryFn: () => client.labrinth.campaign_internal.getPride26(),
-	enabled: () => !dismissed.value,
+	enabled: () => enabled.value && !dismissed.value,
 	staleTime: 15 * 60 * 1000,
 	refetchInterval: 15 * 60 * 1000,
 	retry: false,
 })
 const shouldShowBanner = computed(
-	() => !dismissed.value && Number(campaignInfo.value?.target_usd) > 0,
+	() => enabled.value && !dismissed.value && Number(campaignInfo.value?.target_usd) > 0,
 )
 
 async function openPrideFundraiser() {
@@ -40,10 +48,7 @@ function formatUsd(amount: string | number) {
 }
 
 function daysLeft() {
-	return Math.max(
-		0,
-		Math.ceil((new Date('2026-07-01T00:00:00Z').getTime() - Date.now()) / (24 * 60 * 60 * 1000)),
-	)
+	return Math.max(0, Math.ceil((PRIDE_FUNDRAISER_END_DATE - Date.now()) / (24 * 60 * 60 * 1000)))
 }
 </script>
 
