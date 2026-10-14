@@ -222,7 +222,16 @@ fn spawn(
 
     let mut readable: HashSet<std::path::PathBuf> = HashSet::default();
     let mut parents_to_add: HashSet<std::path::PathBuf> = HashSet::default();
-    for allow_read in &command.read_only_paths {
+    let mut read_paths_to_elevate: HashSet<std::path::PathBuf> =
+        HashSet::default();
+    let mut write_paths_to_elevate: HashSet<std::path::PathBuf> =
+        HashSet::default();
+    let mut read_only_paths = command.read_only_paths.clone();
+    read_only_paths.push(command.executable.clone());
+    read_only_paths.sort_unstable();
+    read_only_paths.dedup();
+
+    for allow_read in &read_only_paths {
         readable.insert(allow_read.clone());
         if let Some(parent) = allow_read.parent() {
             parents_to_add.insert(parent.to_path_buf());
@@ -230,9 +239,16 @@ fn spawn(
         if let Err(err) =
             add_to_acl(&app_container_sid, &allow_read, PermissionType::Read)
         {
-            tracing::error!(
-                "Unable to allow reading from path {allow_read:?} due to error: {err}"
-            );
+            if is_access_denied(&err) {
+                warn!(
+                    "lacking permission to allow reading from {allow_read:?}; will elevate"
+                );
+                read_paths_to_elevate.insert(allow_read.clone());
+            } else {
+                return Err(err).wrap_err_with(|| {
+                    eyre!("allowing sandbox read access to {allow_read:?}")
+                });
+            }
         }
     }
     for allow_write in &command.read_write_paths {
@@ -243,9 +259,16 @@ fn spawn(
         if let Err(err) =
             add_to_acl(&app_container_sid, &allow_write, PermissionType::Write)
         {
-            tracing::error!(
-                "Unable to allow writing to path {allow_write:?} due to error: {err}"
-            );
+            if is_access_denied(&err) {
+                warn!(
+                    "Lacking permission to allow writing to {allow_write:?}; will elevate"
+                );
+                write_paths_to_elevate.insert(allow_write.clone());
+            } else {
+                return Err(err).wrap_err_with(|| {
+                    format!("allowing sandbox write access to {allow_write:?}")
+                });
+            }
         }
     }
 
@@ -269,33 +292,46 @@ fn spawn(
     let mut parents = parents.into_iter().collect::<Vec<_>>();
     parents.sort();
 
-    parents.retain(|path| {
-        if let Err(err) = add_to_acl(&app_container_sid, path, PermissionType::TraverseNoInherit) {
-            let raw_access_denied = err.raw_os_error().unwrap_or(0) == HRESULT::from_win32(ERROR_ACCESS_DENIED.0).0;
-            if err.kind() == ErrorKind::PermissionDenied || raw_access_denied {
-                tracing::warn!("Lacking permission to allow traversal of {path:?}... will need to elevate");
-                return true;
-            }
-            tracing::error!("Unable to allow traversal of path {path:?} due to error: {err}");
-        }
-        false
-    });
-
-    let mut need_set_network_isolation_elevated = false;
-    if command.allow_network {
-        if let Err(err) = try_set_network_isolation(&app_container_sid) {
-            let raw_access_denied = err.raw_os_error().unwrap_or(0)
-                == HRESULT::from_win32(ERROR_ACCESS_DENIED.0).0;
-            if err.kind() == ErrorKind::PermissionDenied || raw_access_denied {
-                info!(
-                    "lacking permission to allow localhost access, elevating"
+    let mut parents_to_elevate = Vec::new();
+    for path in parents {
+        if let Err(err) = add_to_acl(
+            &app_container_sid,
+            &path,
+            PermissionType::TraverseNoInherit,
+        ) {
+            if is_access_denied(&err) {
+                tracing::warn!(
+                    "Lacking permission to allow traversal of {path:?}; will elevate"
                 );
-                need_set_network_isolation_elevated = true;
+                parents_to_elevate.push(path);
+            } else {
+                return Err(err).wrap_err_with(|| {
+                    format!("allowing sandbox traversal of {path:?}")
+                });
             }
         }
     }
 
-    if !parents.is_empty() || need_set_network_isolation_elevated {
+    let mut need_set_network_isolation_elevated = false;
+    if command.allow_network {
+        if let Err(err) = try_set_network_isolation(&app_container_sid) {
+            if is_access_denied(&err) {
+                info!(
+                    "lacking permission to allow localhost access, elevating"
+                );
+                need_set_network_isolation_elevated = true;
+            } else {
+                return Err(err)
+                    .wrap_err("configuring AppContainer network isolation");
+            }
+        }
+    }
+
+    if !parents_to_elevate.is_empty()
+        || !read_paths_to_elevate.is_empty()
+        || !write_paths_to_elevate.is_empty()
+        || need_set_network_isolation_elevated
+    {
         let mut stringsid = PWSTR::default();
         unsafe { ConvertSidToStringSidW(app_container_sid, &mut stringsid)? };
         assert!(!stringsid.is_null());
@@ -309,7 +345,9 @@ fn spawn(
         } else {
             "false".into()
         });
-        arguments.push(std::env::join_paths(parents)?.into());
+        arguments.push(std::env::join_paths(parents_to_elevate)?.into());
+        arguments.push(std::env::join_paths(read_paths_to_elevate)?.into());
+        arguments.push(std::env::join_paths(write_paths_to_elevate)?.into());
 
         info!(?arguments, "spawning elevated helper command");
         let mut elevated = super::runas::spawn(env.make_helper, arguments)
@@ -318,13 +356,11 @@ fn spawn(
             .blocking_wait()
             .wrap_err("running elevated helper")?;
         info!("elevated helper command finished: {elevated_status}");
+        eyre::ensure!(
+            elevated_status.success(),
+            "elevated helper failed with {elevated_status}"
+        );
     }
-
-    _ = add_to_acl(
-        &app_container_sid,
-        &command.executable,
-        PermissionType::Read,
-    );
 
     let (pipes, child) = super::spawn(
         command.executable.clone().into(),
@@ -473,10 +509,17 @@ fn try_set_network_isolation(app_container: &PSID) -> std::io::Result<()> {
     Ok(())
 }
 
+#[derive(Clone, Copy)]
 enum PermissionType {
     TraverseNoInherit,
     Write,
     Read,
+}
+
+fn is_access_denied(err: &std::io::Error) -> bool {
+    err.kind() == ErrorKind::PermissionDenied
+        || err.raw_os_error().unwrap_or(0)
+            == HRESULT::from_win32(ERROR_ACCESS_DENIED.0).0
 }
 
 fn add_writeattributes_to_winsta(app_container: &PSID) -> std::io::Result<()> {
@@ -776,8 +819,17 @@ pub fn run_helper(
         Some(stringsid),
         Some(need_set_network_isolation_elevated),
         Some(traverse_paths),
+        Some(read_paths),
+        Some(write_paths),
         None,
-    ) = (args.next(), args.next(), args.next(), args.next())
+    ) = (
+        args.next(),
+        args.next(),
+        args.next(),
+        args.next(),
+        args.next(),
+        args.next(),
+    )
     else {
         bail!("invalid arguments");
     };
@@ -796,23 +848,39 @@ pub fn run_helper(
 
     let need_set_network_isolation_elevated =
         need_set_network_isolation_elevated == OsStr::new("true");
-    let traverse_paths = std::env::split_paths(traverse_paths.as_os_str());
-
     if need_set_network_isolation_elevated {
         try_set_network_isolation(&psid)?;
     }
 
-    let mut result = Ok(true);
+    apply_acl_paths(
+        &psid,
+        std::env::split_paths(traverse_paths.as_os_str()),
+        PermissionType::TraverseNoInherit,
+    )?;
+    apply_acl_paths(
+        &psid,
+        std::env::split_paths(read_paths.as_os_str()),
+        PermissionType::Read,
+    )?;
+    apply_acl_paths(
+        &psid,
+        std::env::split_paths(write_paths.as_os_str()),
+        PermissionType::Write,
+    )?;
 
-    for path in traverse_paths {
-        if let Err(err) =
-            add_to_acl(&psid, &path, PermissionType::TraverseNoInherit)
-        {
-            if result.is_ok() {
-                result = Err(err);
-            }
+    Ok(true)
+}
+
+fn apply_acl_paths(
+    app_container: &PSID,
+    paths: impl IntoIterator<Item = std::path::PathBuf>,
+    permission: PermissionType,
+) -> std::io::Result<()> {
+    for path in paths {
+        if path.as_os_str().is_empty() {
+            continue;
         }
+        add_to_acl(app_container, &path, permission)?;
     }
-
-    Ok(result?)
+    Ok(())
 }

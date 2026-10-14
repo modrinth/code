@@ -1227,7 +1227,8 @@ pub async fn launch_minecraft(
             &instance.name,
             // TODO: change this back to `sandbox_env`
             // when turning on sandboxing
-            &state.sandbox_env_noop,
+            // &state.sandbox_env_noop,
+            &state.sandbox_env,
             command,
             post_exit_hook,
             env_args,

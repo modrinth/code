@@ -85,7 +85,10 @@ pub(crate) fn spawn(
         .encode_wide()
         .chain([0])
         .collect::<Vec<_>>();
-    let mut command_line = join_windows_shell_arg(arguments.as_slice())
+    let mut command_arguments = Vec::with_capacity(arguments.len() + 1);
+    command_arguments.push(program.clone().into());
+    command_arguments.extend(arguments);
+    let mut command_line = join_windows_shell_arg(&command_arguments)
         .encode_wide()
         .chain([0])
         .collect::<Vec<_>>();

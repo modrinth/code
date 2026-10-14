@@ -30,6 +30,7 @@ pub const HELPER_ARG: &str = "--modrinth-sandbox-helper";
 /// successfully without continuing application initialization.
 pub fn run_default() -> Result<bool> {
     let mut args = std::env::args_os();
+    args.next(); // skip executable name
     if args.next().as_deref() != Some(OsStr::new(HELPER_ARG)) {
         return Ok(false);
     }
