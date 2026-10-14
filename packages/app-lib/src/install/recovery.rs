@@ -7,6 +7,7 @@ use super::model::{
 use super::store;
 use crate::event::InstancePayloadType;
 use crate::event::emit::emit_instance;
+use crate::state::content_store::ContentStore;
 use crate::state::instances::adapters::sqlite::{content_rows, instance_rows};
 use crate::state::{
     ContentEntry, ContentSetRemoteRef, ContentSetRemoteRefType,
@@ -210,7 +211,10 @@ async fn recover_unrecorded_instance_update_backup(
     Ok(())
 }
 
-pub(super) async fn clear_staging_dir(job_state: &InstallJobState) {
+pub(super) async fn clear_staging_dir(
+    job_state: &InstallJobState,
+    content_store: &ContentStore,
+) {
     let Some(staging_dir) = &job_state.paths.staging_dir else {
         return;
     };
@@ -223,10 +227,8 @@ pub(super) async fn clear_staging_dir(job_state: &InstallJobState) {
         );
         return;
     }
-    if let Some(state) = State::get_if_initialized()
-        && let Some(owner) =
-            staging_dir.file_name().and_then(|name| name.to_str())
-        && let Err(error) = state.content_store.release("rollback", owner).await
+    if let Some(owner) = staging_dir.file_name().and_then(|name| name.to_str())
+        && let Err(error) = content_store.release("rollback", owner).await
     {
         tracing::warn!(
             "Could not release rollback content references: {error}"
@@ -483,7 +485,7 @@ async fn copy_symlink(source: &Path, target: &Path) -> crate::Result<()> {
 }
 
 pub async fn recover_interrupted_jobs(state: &State) -> crate::Result<()> {
-    let jobs = store::list_interrupted_candidates(state).await?;
+    let jobs = store::list_interrupted_candidates(&state.pool).await?;
 
     for job in jobs {
         let job_id = job.id;
@@ -503,7 +505,7 @@ pub async fn recover_interrupted_jobs(state: &State) -> crate::Result<()> {
 }
 
 async fn recover_orphaned_install_stages(state: &State) -> crate::Result<()> {
-    let jobs = store::list_all(state).await?;
+    let jobs = store::list_all(&state.pool).await?;
     for instance in instance_rows::list_instances(&state.pool).await? {
         let needs_recovery = jobs.iter().any(|job| {
             job.instance_id.as_deref() == Some(instance.id.as_str())
@@ -578,12 +580,12 @@ async fn recover_interrupted_job_inner(
             job.id,
             InstallJobStatus::Canceled,
             &job.state,
-            state,
+            &state.pool,
         )
         .await?
         {
-            store::dismiss(job.id, state).await?;
-            clear_staging_dir(&job.state).await;
+            store::dismiss(job.id, &state.pool).await?;
+            clear_staging_dir(&job.state, &state.content_store).await;
             emit_install_job(&record.snapshot()).await?;
         }
 
@@ -637,12 +639,12 @@ async fn recover_interrupted_job_inner(
         job.id,
         InstallJobStatus::Interrupted,
         &job.state,
-        state,
+        &state.pool,
     )
     .await?
     {
         if cleanup_succeeded {
-            clear_staging_dir(&job.state).await;
+            clear_staging_dir(&job.state, &state.content_store).await;
         }
         emit_install_job(&record.snapshot()).await?;
     }

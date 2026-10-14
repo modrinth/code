@@ -5,11 +5,10 @@ use crate::state::instances::{
 };
 use crate::state::{
     Hooks, InstanceInstallStage, LauncherFeatureVersion, MemorySettings,
-    ModLoader, ReleaseChannel, WindowSize,
+    ModLoader, ReleaseChannel, State, WindowSize,
 };
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::SqlitePool;
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct EditInstance {
@@ -108,18 +107,13 @@ pub struct AppliedContentSetPatch {
 pub(crate) async fn edit_instance(
     instance_id: &str,
     patch: EditInstance,
-    pool: &SqlitePool,
+    state: &State,
 ) -> crate::Result<Instance> {
-    let state = crate::State::get_if_initialized();
+    let pool = &state.pool;
     let _runtime_lease = if patch.launch_overrides.is_some()
         || patch.content_set_patch.is_some()
     {
-        match state.as_ref() {
-            Some(state) => {
-                Some(state.content_store.runtime_cache_lock.read().await)
-            }
-            None => None,
-        }
+        Some(state.content_store.runtime_cache_lock.read().await)
     } else {
         None
     };

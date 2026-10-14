@@ -26,6 +26,7 @@ pub async fn get_optimal_jre_key(
         &context.applied_content_set.game_version,
         context.applied_content_set.loader,
         context.applied_content_set.loader_version.as_deref(),
+        &state.directories,
     )
     .await?;
     let version_info = crate::launcher::download::download_version_info(
@@ -41,6 +42,7 @@ pub async fn get_optimal_jre_key(
     crate::launcher::get_java_version_from_launch_context(
         &context,
         &version_info,
+        &state.pool,
     )
     .await
 }
