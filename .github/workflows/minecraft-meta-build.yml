@@ -7,7 +7,8 @@ on:
       - 'prod'
     paths:
       - .github/workflows/minecraft-meta-build.yml
-      - 'apps/modrinth-minecraft-meta/**'
+      - 'apps/meta-generator/**'
+      - 'packages/modrinth-minecraft-meta/**'
       - 'packages/modrinth-log/**'
       - Cargo.toml
       - Cargo.lock
@@ -15,7 +16,8 @@ on:
     types: [opened, synchronize]
     paths:
       - .github/workflows/minecraft-meta-build.yml
-      - 'apps/modrinth-minecraft-meta/**'
+      - 'apps/meta-generator/**'
+      - 'packages/modrinth-minecraft-meta/**'
       - 'packages/modrinth-log/**'
       - Cargo.toml
       - Cargo.lock
@@ -31,7 +33,7 @@ env:
 
 jobs:
   build:
-    name: Build modrinth-minecraft-meta
+    name: Build meta-generator
     runs-on: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && 'namespace-profile-medium-amd64' || 'ubuntu-latest' }}
     steps:
       - name: Check out code
@@ -51,13 +53,13 @@ jobs:
       - name: Setup mold
         uses: rui314/setup-mold@9c9c13bf4c3f1adef0cc596abc155580bcb04444 # v1 / Mold 2.41.0
 
-      - name: Build modrinth-minecraft-meta
-        run: cargo build --locked --release --package modrinth-minecraft-meta
+      - name: Build meta-generator
+        run: cargo build --locked --release --package meta-generator
 
       - name: Stage Docker context
         run: |
-          mkdir -p apps/modrinth-minecraft-meta/docker-stage
-          cp target/release/modrinth-minecraft-meta apps/modrinth-minecraft-meta/docker-stage/modrinth-minecraft-meta
+          mkdir -p apps/meta-generator/docker-stage
+          cp target/release/meta-generator apps/meta-generator/docker-stage/meta-generator
 
       - name: Upload Docker context
         if: env.INTERNAL == 'true'
@@ -65,7 +67,7 @@ jobs:
         with:
           name: minecraft-meta-docker-context
           retention-days: 1
-          path: apps/modrinth-minecraft-meta/docker-stage
+          path: apps/meta-generator/docker-stage
 
   docker-build:
     needs: [build]
@@ -73,6 +75,6 @@ jobs:
     uses: SparkUniverse/workflows/.github/workflows/docker-build.yaml@main
     with:
       image-name: minecraft-meta
-      dockerfile-path: apps/modrinth-minecraft-meta/Dockerfile
+      dockerfile-path: apps/meta-generator/Dockerfile
       artifacts-name: minecraft-meta-docker-context
 

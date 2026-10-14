@@ -18,9 +18,9 @@ services:
       interval: 3s
       timeout: 5s
       retries: 3
-  postgres_launcher_meta:
+  postgres_minecraft_meta:
     image: postgres:15-alpine
-    container_name: labrinth-postgres-launcher-meta
+    container_name: labrinth-postgres-minecraft-meta
     volumes:
       - db-launcher-meta-data:/var/lib/postgresql/data
     ports:
@@ -37,6 +37,7 @@ services:
       retries: 3
   minecraft-meta-s3:
     image: docker.io/rustfs/rustfs:1.0.1
+    container_name: labrinth-minecraft-meta-s3
     user: '0:0'
     ports:
       - '127.0.0.1:9000:9000'
@@ -58,6 +59,7 @@ services:
       retries: 10
   minecraft-meta-s3-init:
     image: docker.io/amazon/aws-cli:2.34.0
+    container_name: labrinth-minecraft-meta-s3-init
     environment:
       AWS_ACCESS_KEY_ID: minecraftmeta
       AWS_SECRET_ACCESS_KEY: minecraftmeta-local
