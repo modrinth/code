@@ -4,7 +4,7 @@ import { defineMessages, useVIntl } from '@modrinth/ui'
 import { onActivated } from 'vue'
 
 import ScreenshotsPage from '@/components/ui/screenshots-page/index.vue'
-import { useRootBreadcrumb } from '@/providers/breadcrumbs'
+import { useRootBreadcrumb } from '@/shared/breadcrumbs'
 
 defineOptions({ name: 'ScreenshotsPage' })
 
