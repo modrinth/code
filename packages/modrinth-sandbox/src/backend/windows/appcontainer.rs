@@ -3,7 +3,7 @@ use std::{
     ffi::{OsStr, OsString},
     io::{Error, ErrorKind},
     os::windows::ffi::{OsStrExt, OsStringExt},
-    path::Path,
+    path::{Path, PathBuf},
 };
 
 use tracing::info;
@@ -33,6 +33,7 @@ use windows::{
             Isolation::{
                 CreateAppContainerProfile,
                 DeriveAppContainerSidFromAppContainerName,
+                GetAppContainerFolderPath,
             },
             NO_INHERITANCE, OBJECT_INHERIT_ACE, PSECURITY_DESCRIPTOR, PSID,
             SECURITY_CAPABILITIES, SID_AND_ATTRIBUTES, SetFileSecurityW,
@@ -46,6 +47,7 @@ use windows::{
             FILE_TRAVERSE, READ_CONTROL, WRITE_DAC,
         },
         System::{
+            Com::CoTaskMemFree,
             Memory::{GetProcessHeap, HEAP_FLAGS, HeapFree},
             StationsAndDesktops::OpenWindowStationW,
             SystemServices::{SE_GROUP_ENABLED, SECURITY_DESCRIPTOR_REVISION},
@@ -112,15 +114,6 @@ fn spawn(
     env: &AppContainerEnv,
     mut command: SandboxCommand,
 ) -> Result<crate::SandboxChild> {
-    let environment = command.take_environment();
-
-    if !environment.contains_key(&"APPDATA".into()) {
-        return Err(eyre!("Missing APPDATA environment variable"));
-    }
-    if !environment.contains_key(&"LOCALAPPDATA".into()) {
-        return Err(eyre!("Missing LOCALAPPDATA environment variable"));
-    }
-
     let app_container_sid = create_app_container(
         command.app_container_name.as_os_str(),
         command.app_container_description.as_os_str(),
@@ -128,6 +121,35 @@ fn spawn(
     scopeguard::defer! {
         unsafe { FreeSid(app_container_sid) };
     }
+
+    let app_container_folder = get_app_container_folder(&app_container_sid)?;
+    let local_state = app_container_folder.join("LocalState");
+    let roaming_state = app_container_folder.join("RoamingState");
+    let temp_state = app_container_folder.join("TempState");
+    let home = local_state.join("Home");
+    for path in [&local_state, &roaming_state, &temp_state, &home] {
+        std::fs::create_dir_all(path).wrap_err_with(|| {
+            format!("creating AppContainer storage directory {path:?}")
+        })?;
+    }
+
+    command.extra_environment.extend([
+        ("APPDATA".into(), roaming_state.into()),
+        ("LOCALAPPDATA".into(), local_state.into()),
+        ("HOME".into(), home.clone().into()),
+        ("USERPROFILE".into(), home.clone().into()),
+        ("HOMEDRIVE".into(), "".into()),
+        ("HOMEPATH".into(), home.clone().into()),
+        ("TEMP".into(), temp_state.clone().into()),
+        ("TMP".into(), temp_state.into()),
+    ]);
+    if command.is_jvm {
+        let mut user_home = OsString::from("-Duser.home=");
+        user_home.push(home);
+        command.args.insert(0, user_home.into());
+    }
+
+    let environment = command.take_environment();
 
     let mut owned_capabilities: Vec<OwnedCapability> = Vec::new();
 
@@ -240,7 +262,7 @@ fn spawn(
             add_to_acl(&app_container_sid, &allow_read, PermissionType::Read)
         {
             if is_access_denied(&err) {
-                warn!(
+                tracing::warn!(
                     "lacking permission to allow reading from {allow_read:?}; will elevate"
                 );
                 read_paths_to_elevate.insert(allow_read.clone());
@@ -260,7 +282,7 @@ fn spawn(
             add_to_acl(&app_container_sid, &allow_write, PermissionType::Write)
         {
             if is_access_denied(&err) {
-                warn!(
+                tracing::warn!(
                     "Lacking permission to allow writing to {allow_write:?}; will elevate"
                 );
                 write_paths_to_elevate.insert(allow_write.clone());
@@ -415,6 +437,33 @@ impl OwnedCapability {
     pub fn as_psid(&mut self) -> PSID {
         PSID(self.sid_alloc.as_mut_ptr() as *mut _)
     }
+}
+
+fn get_app_container_folder(app_container_sid: &PSID) -> Result<PathBuf> {
+    let mut string_sid = PWSTR::default();
+    unsafe { ConvertSidToStringSidW(*app_container_sid, &mut string_sid)? };
+    if string_sid.is_null() {
+        return Err(eyre!("ConvertSidToStringSidW returned a null SID"));
+    }
+    scopeguard::defer! {
+        unsafe {
+            LocalFree(Some(windows::Win32::Foundation::HLOCAL(
+                string_sid.0.cast(),
+            )))
+        };
+    }
+
+    let folder = unsafe { GetAppContainerFolderPath(PCWSTR(string_sid.0))? };
+    if folder.is_null() {
+        return Err(eyre!("GetAppContainerFolderPath returned a null path"));
+    }
+    scopeguard::defer! {
+        unsafe { CoTaskMemFree(Some(folder.0.cast())) };
+    }
+
+    Ok(PathBuf::from(OsString::from_wide(unsafe {
+        folder.as_wide()
+    })))
 }
 
 fn create_app_container(
