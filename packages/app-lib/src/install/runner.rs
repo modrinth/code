@@ -10,6 +10,7 @@ use super::shared_instance::{
     apply_shared_instance_content, apply_shared_instance_update,
     attach_pending_shared_instance, finalize_shared_instance_attachment,
     shared_instance_link, shared_instance_pack_location,
+    shared_instance_update_requires_full_apply,
 };
 use super::{diagnostics, recovery, store};
 use crate::ErrorKind;
@@ -18,14 +19,16 @@ use crate::api::pack::install_from::{
     generate_pack_from_version_id_with_reporter, get_instance_from_pack,
     get_local_pack_instance,
 };
-use crate::api::pack::install_mrpack::install_zipped_mrpack_files_with_reporter;
+use crate::api::pack::install_mrpack::{
+    install_zipped_mrpack_files_with_reporter, mrpack_instance_paths,
+};
 use crate::event::InstancePayloadType;
 use crate::event::emit::emit_instance;
 use crate::state::instances::adapters::sqlite::content_rows;
 use crate::state::instances::commands::resolve_icon_path;
 use crate::state::{
     ContentSourceKind, InstanceIconConfig, InstanceInstallStage, InstanceLink,
-    ModLoader, State,
+    ModLoader, ProjectType, State,
 };
 use crate::util::fetch::DownloadReason;
 use std::collections::{HashMap, HashSet};
@@ -34,6 +37,14 @@ use std::path::PathBuf;
 use std::sync::{Arc, LazyLock, Mutex, Weak};
 use tokio::sync::{Mutex as AsyncMutex, MutexGuard, OwnedMutexGuard};
 use uuid::Uuid;
+
+/// Game settings files that pack updates prepare, detach or replace.
+const SYNCED_OPTION_FILES: [&str; 4] = [
+    "options.txt",
+    "servers.dat",
+    "hotbar.nbt",
+    "command_history.txt",
+];
 
 /// Admission covers setup and deletion. A target reservation stays with its worker
 /// until cleanup finishes, so backups and rollback cannot overlap another install.
@@ -1640,6 +1651,7 @@ async fn prepare_update_backup(
     state: &State,
 ) -> crate::Result<()> {
     super::control::checkpoint(job_id).await?;
+    let scoped_paths = update_backup_scope(job_id, job_state, state).await?;
     let rollback = job_state.rollback.as_ref().ok_or_else(|| {
         crate::ErrorKind::OtherError(
             "Instance update rollback state is missing".to_string(),
@@ -1648,6 +1660,7 @@ async fn prepare_update_backup(
     let staging_dir = recovery::prepare_instance_update_backup(
         job_id,
         &rollback.instance,
+        scoped_paths,
         state,
     )
     .await?;
@@ -1655,6 +1668,121 @@ async fn prepare_update_backup(
     let record = store::update_state(job_id, job_state, state).await?;
     emit_install_job(&record.snapshot()).await?;
     super::control::checkpoint(job_id).await
+}
+
+/// Instance-relative paths an update job can change, so its backup can leave out
+/// everything else, such as worlds. `None` backs up the whole instance.
+///
+/// Pack files are read here to list their overrides. The content store keeps them by
+/// hash, so installing the pack afterwards reuses the download.
+async fn update_backup_scope(
+    job_id: Uuid,
+    job_state: &InstallJobState,
+    state: &State,
+) -> crate::Result<Option<Vec<String>>> {
+    let mut paths = ProjectType::iterator()
+        .map(|project_type| project_type.get_folder().to_string())
+        .collect::<Vec<_>>();
+    let (instance_id, packs) = match &job_state.request {
+        InstallRequest::BulkUpdateContent { .. } => return Ok(Some(paths)),
+        InstallRequest::InstallPackToExistingInstance {
+            instance_id,
+            location,
+            ..
+        } => {
+            let metadata = instance_metadata(instance_id, state).await?;
+            let mut packs = vec![(location.clone(), DownloadReason::Modpack)];
+            packs.extend(
+                linked_pack_location(&metadata)
+                    .map(|location| (location, DownloadReason::Update)),
+            );
+            (instance_id, packs)
+        }
+        InstallRequest::UpdateSharedInstance { instance_id, data } => {
+            paths.push(crate::api::instance::CONFIG_DIRECTORY.to_string());
+            let metadata = instance_metadata(instance_id, state).await?;
+            if !shared_instance_update_requires_full_apply(&metadata, data) {
+                return Ok(Some(paths));
+            }
+            let packs = data
+                .modpack
+                .clone()
+                .map(|modpack| {
+                    (
+                        shared_instance_pack_location(modpack),
+                        DownloadReason::Modpack,
+                    )
+                })
+                .into_iter()
+                .collect();
+            (instance_id, packs)
+        }
+        _ => return Ok(None),
+    };
+    paths.extend(SYNCED_OPTION_FILES.map(str::to_string));
+    for (location, reason) in packs {
+        let pack = match location {
+            CreatePackLocation::FromVersionId {
+                project_id,
+                version_id,
+                title,
+                ..
+            } => {
+                Box::pin(generate_pack_from_version_id_with_reporter(
+                    project_id,
+                    version_id,
+                    title,
+                    None,
+                    instance_id.clone(),
+                    reason,
+                    InstallProgressReporter::new(job_id, job_state.clone()),
+                ))
+                .await?
+            }
+            CreatePackLocation::FromFile { path } => {
+                generate_pack_from_file(path, instance_id.clone()).await?
+            }
+        };
+        paths.extend(mrpack_instance_paths(&pack.file).await?);
+    }
+
+    Ok(Some(paths))
+}
+
+async fn instance_metadata(
+    instance_id: &str,
+    state: &State,
+) -> crate::Result<crate::state::InstanceMetadata> {
+    crate::state::instances::commands::get_instance_metadata(
+        instance_id,
+        &state.pool,
+    )
+    .await?
+    .ok_or_else(|| {
+        crate::ErrorKind::InputError("Unknown instance".to_string()).into()
+    })
+}
+
+fn linked_pack_location(
+    metadata: &crate::state::InstanceMetadata,
+) -> Option<CreatePackLocation> {
+    match &metadata.link {
+        InstanceLink::ModrinthModpack {
+            project_id,
+            version_id,
+        }
+        | InstanceLink::ServerProjectModpack {
+            content_project_id: project_id,
+            content_version_id: version_id,
+            ..
+        } => Some(CreatePackLocation::FromVersionId {
+            project_id: project_id.clone(),
+            version_id: version_id.clone(),
+            title: metadata.instance.name.clone(),
+            icon_url: None,
+        }),
+        _ => None,
+    }
 }
 
 async fn lock_install_target(
