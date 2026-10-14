@@ -23,7 +23,7 @@ itertools = { workspace = true }
 md5 = { workspace = true }
 quick-xml = { workspace = true }
 reqwest = { workspace = true, features = ["json", "rustls-tls-native-roots", "stream"] }
-rust-s3 = { workspace = true }
+rust-s3 = { workspace = true, features = ["fail-on-err"] }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 sha1_smol = { workspace = true }
