@@ -82,7 +82,7 @@ defineExpose({
 			if (errorVal.message.includes('Not enough space')) {
 				metadata.value.notEnoughSpace = true
 			}
-		} else if (errorVal.message && errorVal.message.includes('No loader version selected for')) {
+		} else if (errorVal.code === 'no_loader_version') {
 			title.value = 'No loader selected'
 			errorType.value = 'no_loader_version'
 			supportLink.value = 'https://support.modrinth.com'
