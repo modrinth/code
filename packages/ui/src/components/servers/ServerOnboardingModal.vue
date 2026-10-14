@@ -126,7 +126,7 @@ const install = useMutation({
 				config.buildProperties(),
 				{
 					auth,
-					softOverride: true,
+					softOverride: false,
 					onProgress: ({ loaded, total }) => {
 						config.uploadProgress.value = total > 0 ? Math.round((loaded / total) * 100) : 0
 					},
@@ -138,7 +138,7 @@ const install = useMutation({
 			if (config.curseforgeModpackFile.value) config.uploadProgress.value = 0
 			await installCurseForgeModpack(client, worldId, config, {
 				auth,
-				softOverride: true,
+				softOverride: false,
 				onUploadProgress: ({ progress }) => {
 					config.uploadProgress.value = Math.round(progress * 100)
 				},
