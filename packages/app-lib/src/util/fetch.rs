@@ -2,6 +2,7 @@
 use super::io::{self, IOError};
 use crate::event::LoadingBarId;
 use crate::event::emit::emit_loading;
+use crate::state::content_store::ContentStore;
 use crate::util::content_hash::{ContentHasher, temporary_file};
 use crate::{ErrorKind, LabrinthError};
 use bytes::Bytes;
@@ -436,12 +437,12 @@ impl DownloadedFile {
 
     pub(crate) async fn store_file(
         &self,
-        state: &crate::State,
+        content_store: &ContentStore,
     ) -> crate::Result<crate::state::content_store::StoredFileHandle> {
         match &self.path {
             DownloadedFilePath::Stored(stored_file) => Ok(stored_file.clone()),
             DownloadedFilePath::Temporary(_) => {
-                state.content_store.store_file(self.path()).await
+                content_store.store_file(self.path()).await
             }
         }
     }

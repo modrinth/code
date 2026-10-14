@@ -1227,7 +1227,7 @@ pub async fn launch_minecraft(
     crate::state::instances::commands::sync_content_files(&instance.id, state)
         .await?;
     let _instance_content_lock =
-        state.lock_instance_content(&instance.id).await;
+        state.instance_locks.lock_content(&instance.id).await;
     let current =
 		crate::state::instances::adapters::sqlite::instance_rows::get_instance_by_id(
 			&instance.id, &state.pool,
@@ -1280,11 +1280,13 @@ pub async fn launch_minecraft(
     }
 
     let _ = state
+        .presence
         .discord_rpc
         .set_activity(&format!("Playing {}", instance.name), true, &state.pool)
         .await;
 
     let _ = state
+        .presence
         .friends_socket
         .update_status(Some(instance.name.clone()))
         .await;

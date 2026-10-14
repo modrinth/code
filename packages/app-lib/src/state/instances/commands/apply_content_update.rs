@@ -13,6 +13,7 @@ use crate::state::{
 };
 use crate::util::fetch::DownloadReason;
 use futures::stream::{self, StreamExt};
+use sqlx::SqlitePool;
 use std::cmp::Reverse;
 use std::collections::{HashMap, HashSet};
 use std::future::Future;
@@ -375,7 +376,7 @@ pub(crate) async fn plan_bulk_update(
     state: &State,
 ) -> crate::Result<BulkUpdatePlan> {
     let shared_instance_member =
-        is_shared_instance_member(instance_id, state).await?;
+        is_shared_instance_member(instance_id, &state.pool).await?;
     let updateable_paths = bulk_updateable_project_paths(
         instance_id,
         shared_instance_member,
@@ -700,11 +701,10 @@ fn installed_project_from_row(
 
 async fn is_shared_instance_member(
     instance_id: &str,
-    state: &State,
+    pool: &SqlitePool,
 ) -> crate::Result<bool> {
     let Some(metadata) =
-        instance_rows::get_instance_metadata_by_id(instance_id, &state.pool)
-            .await?
+        instance_rows::get_instance_metadata_by_id(instance_id, pool).await?
     else {
         return Ok(false);
     };

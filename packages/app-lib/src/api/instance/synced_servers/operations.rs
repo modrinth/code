@@ -435,7 +435,7 @@ pub(crate) async fn ensure_managed_server(
     data: NbtCompound,
     state: &State,
 ) -> crate::Result<()> {
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     let path = instance_dir(metadata, state).join(SERVERS_FILE);
     let syncing = participating(metadata, state).await?;
     let records = list_server_records_locked(metadata, state).await?;
@@ -527,7 +527,7 @@ pub(crate) async fn add_user_server(
     mut data: NbtCompound,
     state: &State,
 ) -> crate::Result<String> {
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     let id = Uuid::new_v4().to_string();
     if participating(metadata, state).await? {
         let mut canonical = read_canonical(state).await?;
@@ -604,7 +604,7 @@ pub(crate) async fn update_server_by_index(
     accept_textures: Option<bool>,
     state: &State,
 ) -> crate::Result<()> {
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     if participating(metadata, state).await? {
         let records = list_server_records_locked(metadata, state).await?;
         let record = records
@@ -668,7 +668,7 @@ pub(crate) async fn remove_server_by_index(
     index: usize,
     state: &State,
 ) -> crate::Result<()> {
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     if participating(metadata, state).await? {
         let records = list_server_records_locked(metadata, state).await?;
         let record = records
@@ -699,7 +699,7 @@ pub async fn desync_server(
     mode: DesyncServerMode,
 ) -> crate::Result<()> {
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
         .ok_or_else(|| ErrorKind::InputError("Unknown instance".to_string()))?;
@@ -754,7 +754,7 @@ pub async fn desync_server(
 
 pub async fn list_synced_servers() -> crate::Result<Vec<SyncedServer>> {
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     Ok(read_canonical(&state)
         .await?
         .into_iter()
@@ -778,7 +778,7 @@ pub async fn list_synced_servers() -> crate::Result<Vec<SyncedServer>> {
 
 pub async fn update_synced_server(server: SyncedServer) -> crate::Result<()> {
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     let mut canonical = read_canonical(&state).await?;
     let target = canonical
         .iter_mut()
@@ -798,7 +798,7 @@ pub async fn update_synced_server(server: SyncedServer) -> crate::Result<()> {
 
 pub async fn remove_synced_server(server_id: &str) -> crate::Result<()> {
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     let mut canonical = read_canonical(&state).await?;
     let previous_len = canonical.len();
     canonical.retain(|server| server.id != server_id);

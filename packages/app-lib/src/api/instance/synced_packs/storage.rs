@@ -101,7 +101,7 @@ pub(super) async fn write_library(
 				.await?;
 			tokio::fs::rename(&temporary, &destination).await?;
 			renamed = true;
-			state.pack_sync_worker.revision
+			state.synced_options.packs.revision
 				.fetch_add(1, std::sync::atomic::Ordering::Release);
 		}
 		crate::state::content_store::sync_directory(&directory(state)).await?;
@@ -233,7 +233,7 @@ pub(super) async fn read_stored_file(
 
 pub(crate) async fn migrate_store(state: &State) -> crate::Result<()> {
     let ids = {
-        let _guard = state.lock_synced_options().await;
+        let _guard = state.synced_options.lock().await;
         read_library(state)
             .await?
             .packs
@@ -244,7 +244,7 @@ pub(crate) async fn migrate_store(state: &State) -> crate::Result<()> {
     for id in ids {
         let _turn = state.content_store.legacy_migration_priority.read().await;
         let snapshot = {
-            let _guard = state.lock_synced_options().await;
+            let _guard = state.synced_options.lock().await;
             read_library(state).await?
         };
         let Some(expected) = snapshot.packs.get(&id) else {
@@ -252,7 +252,7 @@ pub(crate) async fn migrate_store(state: &State) -> crate::Result<()> {
         };
         let recovered =
             recover_legacy_pack(Some(&id), expected, &snapshot, state).await;
-        let _guard = state.lock_synced_options().await;
+        let _guard = state.synced_options.lock().await;
         let mut library = read_library(state).await?;
         let Some(previous) = library.packs.get(&id).cloned() else {
             continue;
@@ -292,7 +292,7 @@ pub(crate) async fn migrate_store(state: &State) -> crate::Result<()> {
         }
     }
     let cache_complete = cleanup_legacy_cache(state).await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     if tokio::fs::try_exists(directory(state)).await? {
         crate::state::content_store::sync_directory(&directory(state)).await?;
     }
@@ -439,7 +439,7 @@ async fn cleanup_legacy_cache(state: &State) -> crate::Result<bool> {
     let mut entries = tokio::fs::read_dir(&legacy).await?;
     while let Some(entry) = entries.next_entry().await? {
         let _turn = state.content_store.legacy_migration_priority.read().await;
-        let _guard = state.lock_synced_options().await;
+        let _guard = state.synced_options.lock().await;
         let library = read_library(state).await?;
         if !entry.file_type().await?.is_file() {
             continue;

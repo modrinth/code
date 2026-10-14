@@ -191,7 +191,7 @@ impl ContentStore {
                     sources = downloads::repair_sources(
                         &self.pool,
                         &stored_file.sha512,
-                        state,
+                        &state.api_semaphore,
                     )
                     .await;
                 }

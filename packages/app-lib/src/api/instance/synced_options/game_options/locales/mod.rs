@@ -80,7 +80,7 @@ struct Candidate {
 
 pub(crate) fn queue_game_locale_index() {
     if let Some(state) = State::get_if_initialized() {
-        state.game_locale_indexer.notify.notify_one();
+        state.synced_options.locales.notify.notify_one();
     } else {
         tracing::warn!(
             "Game setting locales: cannot queue indexing before state initialization"
@@ -90,16 +90,17 @@ pub(crate) fn queue_game_locale_index() {
 
 pub(crate) fn start_game_locale_indexer(state: Arc<State>) {
     if state
-        .game_locale_indexer
+        .synced_options
+        .locales
         .started
         .swap(true, Ordering::AcqRel)
     {
         return;
     }
-    state.game_locale_indexer.notify.notify_one();
+    state.synced_options.locales.notify.notify_one();
     tokio::spawn(async move {
         loop {
-            state.game_locale_indexer.notify.notified().await;
+            state.synced_options.locales.notify.notified().await;
             tokio::time::sleep(std::time::Duration::from_millis(300)).await;
             if let Err(error) = index_installed_sources(&state).await {
                 tracing::warn!(%error, "Game setting locales: indexing failed");

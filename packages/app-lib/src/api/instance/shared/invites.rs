@@ -25,7 +25,8 @@ pub async fn invite_shared_instance_users(
     user_ids: Vec<String>,
 ) -> crate::Result<SharedInstanceUsers> {
     let state = State::get().await?;
-    let _shared_instance_lock = state.lock_shared_instance(instance_id).await;
+    let _shared_instance_lock =
+        state.instance_locks.lock_shared(instance_id).await;
     let (metadata, attachment) =
         shared_instance_for_invites(instance_id, user_ids.len(), &state)
             .await?;
@@ -65,7 +66,8 @@ pub async fn create_shared_instance_invite_link(
     replace_invite_id: Option<String>,
 ) -> crate::Result<SharedInstanceInviteLink> {
     let state = State::get().await?;
-    let _shared_instance_lock = state.lock_shared_instance(instance_id).await;
+    let _shared_instance_lock =
+        state.instance_locks.lock_shared(instance_id).await;
     let (metadata, attachment) =
         shared_instance_for_invites(instance_id, 0, &state).await?;
     ensure_owner(&attachment)?;
@@ -152,7 +154,8 @@ pub async fn revoke_shared_instance_invite(
     invite_id: String,
 ) -> crate::Result<()> {
     let state = State::get().await?;
-    let _shared_instance_lock = state.lock_shared_instance(instance_id).await;
+    let _shared_instance_lock =
+        state.instance_locks.lock_shared(instance_id).await;
     let Some(attachment) = shared_attachment(instance_id, &state).await? else {
         return Ok(());
     };
@@ -169,7 +172,8 @@ pub async fn remove_shared_instance_users(
     has_pending_recipients: bool,
 ) -> crate::Result<SharedInstanceUsers> {
     let state = State::get().await?;
-    let _shared_instance_lock = state.lock_shared_instance(instance_id).await;
+    let _shared_instance_lock =
+        state.instance_locks.lock_shared(instance_id).await;
     let Some(attachment) = shared_attachment(instance_id, &state).await? else {
         return Ok(SharedInstanceUsers::empty());
     };

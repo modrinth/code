@@ -19,6 +19,7 @@ use crate::state::instances::adapters::sqlite::{
     instance_rows::{self, InstanceScreenshotSource},
     screenshot_rows,
 };
+use crate::state::{DirectoryInfo, InstanceLocks};
 use crate::util::fetch::sha1_file_async;
 use crate::util::io::{self, IOError};
 
@@ -104,12 +105,12 @@ async fn list_source_screenshot_sets(
 }
 
 async fn lock_instance_screenshots<'a>(
-    state: &State,
+    instance_locks: &InstanceLocks,
     instance_ids: impl IntoIterator<Item = &'a str>,
 ) -> Vec<OwnedMutexGuard<()>> {
     let mut locks = Vec::new();
     for instance_id in instance_ids {
-        locks.push(state.lock_instance_screenshots(instance_id).await);
+        locks.push(instance_locks.lock_screenshots(instance_id).await);
     }
     locks
 }
@@ -123,7 +124,8 @@ pub async fn delete_screenshots(keys: &[ScreenshotKey]) -> crate::Result<()> {
         .collect::<Vec<_>>();
     instance_ids.sort_unstable();
     instance_ids.dedup();
-    let _locks = lock_instance_screenshots(&state, instance_ids).await;
+    let _locks =
+        lock_instance_screenshots(&state.instance_locks, instance_ids).await;
 
     for key in keys {
         io::remove_file(get_screenshot_path(key).await?).await?;
@@ -228,7 +230,8 @@ pub async fn move_screenshots(
         .collect::<Vec<_>>();
     instance_ids.sort_unstable();
     instance_ids.dedup();
-    let _locks = lock_instance_screenshots(&state, instance_ids).await;
+    let _locks =
+        lock_instance_screenshots(&state.instance_locks, instance_ids).await;
     let target_source = instance_rows::get_instance_screenshot_source(
         target_instance_id,
         &state.pool,
@@ -237,7 +240,8 @@ pub async fn move_screenshots(
     .ok_or_else(|| {
         crate::ErrorKind::InputError("Unknown target instance".to_string())
     })?;
-    let target_dir = source_screenshots_dir(&state, &target_source).await?;
+    let target_dir =
+        source_screenshots_dir(&state.directories, &target_source).await?;
     io::create_dir_all(&target_dir).await?;
     ensure_directory_is_not_symlink(&target_dir).await?;
 
@@ -298,7 +302,8 @@ pub async fn get_screenshot_path(
     .ok_or_else(|| {
         crate::ErrorKind::InputError("Unknown instance".to_string())
     })?;
-    let screenshots_dir = source_screenshots_dir(&state, &source).await?;
+    let screenshots_dir =
+        source_screenshots_dir(&state.directories, &source).await?;
     let canonical_dir = tokio::fs::canonicalize(&screenshots_dir)
         .await
         .map_err(|error| IOError::with_path(error, &screenshots_dir))?;
@@ -344,9 +349,9 @@ pub async fn save_edited_screenshot(
     .ok_or_else(|| {
         crate::ErrorKind::InputError("Unknown instance".to_string())
     })?;
-    let _lock = state.lock_instance_screenshots(&source.id).await;
+    let _lock = state.instance_locks.lock_screenshots(&source.id).await;
 
-    let scanned = scan_source_screenshots(&state, &source).await?;
+    let scanned = scan_source_screenshots(&state.directories, &source).await?;
     let current =
         reconcile_source_screenshots(&state, &source, scanned).await?;
     let source_screenshot = current
@@ -398,7 +403,8 @@ pub async fn save_edited_screenshot(
         .into());
     }
 
-    let screenshots_dir = source_screenshots_dir(&state, &source).await?;
+    let screenshots_dir =
+        source_screenshots_dir(&state.directories, &source).await?;
     let (target_path, copy_group) = match mode {
         ScreenshotEditSaveMode::CreateCopy => (
             available_target_path(&screenshots_dir, &source_row.file_name)
@@ -434,7 +440,7 @@ pub async fn save_edited_screenshot(
         screenshot_rows::update_screenshot(&source_row, &mut tx).await?;
         tx.commit().await?;
     }
-    let scanned = scan_source_screenshots(&state, &source).await?;
+    let scanned = scan_source_screenshots(&state.directories, &source).await?;
     let reconciled =
         reconcile_source_screenshots(&state, &source, scanned).await?;
     let mut saved = reconciled
@@ -511,10 +517,10 @@ pub async fn save_edited_screenshot(
 }
 
 pub(super) async fn source_screenshots_dir(
-    state: &State,
+    directories: &DirectoryInfo,
     source: &InstanceScreenshotSource,
 ) -> crate::Result<PathBuf> {
-    let instance_dir = state.directories.instances_dir().join(&source.path);
+    let instance_dir = directories.instances_dir().join(&source.path);
     let canonical_instance_dir =
         tokio::fs::canonicalize(&instance_dir)
             .await
