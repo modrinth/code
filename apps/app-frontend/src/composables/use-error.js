@@ -16,12 +16,7 @@ const errorState = reactive({
 		this.minecraftRequiredModal = ref
 	},
 	showError(error, context, closable = true, source = null) {
-		const errorMessage = error.message?.toLowerCase()
-		if (
-			(errorMessage?.includes('user is not logged in') ||
-				errorMessage?.includes('cannot play instance since minecraft is required')) &&
-			this.minecraftRequiredModal
-		) {
+		if (error.code === 'not_logged_in' && this.minecraftRequiredModal) {
 			this.minecraftRequiredModal.show()
 			return
 		}

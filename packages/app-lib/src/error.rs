@@ -268,6 +268,7 @@ impl ErrorKind {
             Self::SharedInstancesApiError(_) => "shared_instances_api_error",
             Self::HashError(_, _) => "hash_error",
             Self::LoginCanceled => "login_canceled",
+            Self::NoCredentialsError => "not_logged_in",
             Self::LauncherError(_) => "launcher_error",
             Self::JREError(_) => "java_error",
             Self::NoValueFor(_) | Self::MetadataError(_) => "metadata_error",
