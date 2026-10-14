@@ -138,6 +138,14 @@ export const projectReviewMessages = defineMessages({
 		id: 'moderation.project-review.tech-review',
 		defaultMessage: 'Tech Review',
 	},
+	slicer: {
+		id: 'moderation.project-review.slicer',
+		defaultMessage: 'Slicer',
+	},
+	slicerOpenExternal: {
+		id: 'moderation.project-review.slicerOpenExternal',
+		defaultMessage: 'Open in Slicer in a new tab',
+	},
 	showLeft: {
 		id: 'moderation.project-review.showLeft',
 		defaultMessage: 'Show project details',
@@ -636,6 +644,10 @@ export const projectReviewMessages = defineMessages({
 	openSlicer: {
 		id: 'moderation.project-review.openSlicer',
 		defaultMessage: 'Open in Slicer',
+	},
+	openVersionSlicer: {
+		id: 'moderation.project-review.openVersionSlicer',
+		defaultMessage: 'Open all files in Slicer',
 	},
 	scanAi: {
 		id: 'moderation.project-review.scanAi',

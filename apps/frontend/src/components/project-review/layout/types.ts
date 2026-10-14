@@ -7,6 +7,7 @@ export const projectReviewTabs = [
 	'versions',
 	'permissions',
 	'tech-review',
+	'slicer',
 ] as const
 
 export type ProjectReviewTab = (typeof projectReviewTabs)[number]

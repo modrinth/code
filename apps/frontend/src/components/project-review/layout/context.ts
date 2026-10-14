@@ -13,3 +13,8 @@ export const [injectProjectReviewContext, provideProjectReviewContext] =
 
 export const [injectReviewSlot, provideReviewSlot] =
 	createContext<Ref<ProjectReviewSlot>>('ProjectReviewSlot')
+
+/** Whether the surrounding panel is currently shown, e.g. it is the active tab in its group. */
+export const [injectReviewPanelVisible, provideReviewPanelVisible] = createContext<
+	Readonly<Ref<boolean>>
+>('ProjectReviewPanelVisible')

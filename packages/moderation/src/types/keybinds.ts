@@ -28,7 +28,14 @@ export type ModerationGlobalContext = {
 export type ModerationProjectReviewContext = {
 	scope: 'project-review'
 	openTab: (
-		tab: 'description' | 'gallery' | 'disclosures' | 'versions' | 'permissions' | 'tech-review',
+		tab:
+			| 'description'
+			| 'gallery'
+			| 'disclosures'
+			| 'versions'
+			| 'permissions'
+			| 'tech-review'
+			| 'slicer',
 	) => void
 }
 

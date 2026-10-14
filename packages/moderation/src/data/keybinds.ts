@@ -176,6 +176,12 @@ const keybinds: { [id: string]: KeybindListener } = {
 		scope: 'project-review',
 		action: (ctx) => ctx.openTab('tech-review'),
 	},
+	'review-tab-slicer': {
+		keybind: 'L',
+		description: 'Open slicer tab',
+		scope: 'project-review',
+		action: (ctx) => ctx.openTab('slicer'),
+	},
 	'toggle-collapse': {
 		keybind: 'Shift+C',
 		description: 'Toggle collapse/expand',

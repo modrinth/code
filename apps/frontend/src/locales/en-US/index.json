@@ -3428,6 +3428,9 @@
   "moderation.project-review.openSlicer": {
     "message": "Open in Slicer"
   },
+  "moderation.project-review.openVersionSlicer": {
+    "message": "Open all files in Slicer"
+  },
   "moderation.project-review.optional": {
     "message": "Optional"
   },
@@ -3583,6 +3586,12 @@
   },
   "moderation.project-review.skip": {
     "message": "Skip"
+  },
+  "moderation.project-review.slicer": {
+    "message": "Slicer"
+  },
+  "moderation.project-review.slicerOpenExternal": {
+    "message": "Open in Slicer in a new tab"
   },
   "moderation.project-review.slug": {
     "message": "Slug"

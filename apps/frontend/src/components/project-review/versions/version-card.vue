@@ -44,6 +44,18 @@
 				}}</time>
 				<div class="flex gap-0">
 					<EditVersionMenu v-if="editable" color="default" size="sm" @edit="emit('edit', $event)" />
+					<Button
+						v-if="version.files.length"
+						v-tooltip="formatMessage(messages.openVersionSlicer)"
+						:aria-label="formatMessage(messages.openVersionSlicer)"
+						type="quiet"
+						circular
+						size="sm"
+						icon-only
+						@click="openVersionInSlicer"
+					>
+						<CoffeeIcon aria-hidden="true" />
+					</Button>
 					<ButtonLink
 						v-tooltip="formatMessage(messages.viewVersion)"
 						:to="versionHref"
@@ -76,18 +88,17 @@
 						<span v-if="file.file_type && file.file_type !== 'unknown'">{{
 							formatMessage(fileTypeMessages[file.file_type])
 						}}</span>
-						<ButtonLink
+						<Button
 							v-tooltip="formatMessage(messages.openSlicer)"
-							:href="`https://slicer.run/?url=${encodeURIComponent(file.url)}`"
 							:aria-label="formatMessage(messages.openSlicer)"
-							target="_blank"
 							type="quiet"
 							size="sm"
 							circular
 							icon-only
+							@click="openInSlicer([file])"
 						>
 							<CoffeeIcon aria-hidden="true" />
-						</ButtonLink>
+						</Button>
 						<Button
 							v-tooltip="formatMessage(messages.scanAi)"
 							:aria-label="formatMessage(messages.scanAi)"
@@ -336,14 +347,16 @@ import {
 import EnvironmentTags from '@modrinth/ui/src/components/project/EnvironmentTags.vue'
 import { formatVersionsForDisplay } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
-import { computed, ref } from 'vue'
+import { computed, nextTick, ref } from 'vue'
 
 import EditVersionMenu from '~/components/ui/create-project-version/EditVersionMenu.vue'
 import { projectQueryOptions } from '~/composables/queries/project'
 import { versionQueryOptions } from '~/composables/queries/version'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
+import { injectReviewSlicer } from '~/providers/project-review/review-slicer'
 import type { EditVersionStage } from '~/providers/version/manage-version-modal'
 
+import { injectProjectReviewContext } from '../layout/context'
 import { projectReviewMessages as messages } from '../messages'
 import { useReviewInteraction } from '../shortcuts'
 
@@ -369,6 +382,8 @@ const formatBytes = useFormatBytes()
 const client = injectModrinthClient()
 const tags = injectTags(null)
 const { project, members } = injectProjectReviewPageContext()
+const slicer = injectReviewSlicer()
+const { openTab } = injectProjectReviewContext()
 const dependenciesOpen = ref(false)
 const card = ref<HTMLElement>()
 const dependenciesSection = ref<HTMLElement>()
@@ -466,8 +481,30 @@ const dependencies = computed<DependencyContext[]>(() =>
 			return typeDifference || dependencyName(a).localeCompare(dependencyName(b))
 		}),
 )
-function fileActions(file: Labrinth.Versions.v3.Version['files'][number]): ButtonMenuOption[] {
-	const options: ButtonMenuOption[] = []
+type VersionFile = Labrinth.Versions.v3.Version['files'][number]
+
+async function openInSlicer(files: VersionFile[]) {
+	slicer.open(files)
+	await nextTick()
+	openTab('slicer')
+}
+
+function openVersionInSlicer() {
+	return openInSlicer(props.version.files.toSorted((a, b) => Number(b.primary) - Number(a.primary)))
+}
+
+function fileActions(file: VersionFile): ButtonMenuOption[] {
+	const options: ButtonMenuOption[] = [
+		{
+			id: 'open-slicer-external',
+			type: 'link',
+			label: formatMessage(messages.slicerOpenExternal),
+			icon: ExternalIcon,
+			href: `https://slicer.run/?url=${encodeURIComponent(file.url)}`,
+			target: '_blank',
+			rel: 'noopener',
+		},
+	]
 	for (const algorithm of ['sha1', 'sha512'] as const) {
 		const hash = file.hashes[algorithm]
 		if (!hash) continue

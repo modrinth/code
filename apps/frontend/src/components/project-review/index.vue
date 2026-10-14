@@ -81,6 +81,7 @@
 			<template #permissions><Permissions :key="projectId" /></template>
 			<template #versions><Versions :key="projectId" /></template>
 			<template #tech-review><TechReview :key="projectId" /></template>
+			<template #slicer><Slicer :key="projectId" /></template>
 		</ProjectReviewLayout>
 		<template #fallback>
 			<p class="m-0 p-4 text-secondary" role="status">
@@ -122,6 +123,7 @@ import {
 	createReviewSession,
 	provideReviewSession,
 } from '~/providers/project-review/review-session'
+import { createReviewSlicer, provideReviewSlicer } from '~/providers/project-review/review-slicer'
 import {
 	createReviewSubmission,
 	provideReviewSubmission,
@@ -144,6 +146,7 @@ import QueueBar from './queue-bar.vue'
 import ReviewOutcomeButtons from './review-outcome-buttons/index.vue'
 import { createReviewContext, provideReviewContext } from './review-panel/context'
 import { createReviewShortcuts, provideReviewShortcuts, reviewShortcutBlocked } from './shortcuts'
+import Slicer from './slicer/index.vue'
 import TechReview from './tech-review/index.vue'
 import Versions from './versions/index.vue'
 
@@ -166,7 +169,9 @@ const {
 	selection,
 	isLoading,
 	navigation,
+	versions,
 } = injectProjectReviewPageContext()
+provideReviewSlicer(createReviewSlicer(projectId, versions))
 const visibleTabs = computed<readonly ProjectReviewTab[]>((previousTabs) => {
 	if (!project.value) {
 		return previousTabs ?? projectReviewTabs.filter((tab) => tab !== 'permissions')

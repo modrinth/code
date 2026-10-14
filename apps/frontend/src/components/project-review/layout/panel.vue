@@ -5,7 +5,8 @@
 			slotName === 'right' ||
 			slotName === 'disclosures' ||
 			slotName === 'permissions' ||
-			slotName === 'gallery'
+			slotName === 'gallery' ||
+			slotName === 'slicer'
 				? 'overflow-hidden'
 				: 'overflow-auto'
 		"
@@ -25,10 +26,10 @@
 <script setup lang="ts">
 import { useVIntl } from '@modrinth/ui'
 import type { IDockviewPanelProps } from 'dockview-vue'
-import { computed } from 'vue'
+import { computed, ref, watchEffect } from 'vue'
 
 import { projectReviewMessages as messages } from '../messages'
-import { injectProjectReviewContext, provideReviewSlot } from './context'
+import { injectProjectReviewContext, provideReviewPanelVisible, provideReviewSlot } from './context'
 import type { ProjectReviewSlot } from './types'
 
 defineOptions({ inheritAttrs: false })
@@ -43,6 +44,17 @@ const slotName = computed(() =>
 	'slot' in props.params ? props.params.slot : props.params.params.slot,
 )
 provideReviewSlot(slotName)
+const panelVisible = ref(true)
+watchEffect((onCleanup) => {
+	if (!('api' in props.params)) return
+	const api = props.params.api
+	panelVisible.value = api.isVisible
+	const subscription = api.onDidVisibilityChange((event) => {
+		panelVisible.value = event.isVisible
+	})
+	onCleanup(() => subscription.dispose())
+})
+provideReviewPanelVisible(panelVisible)
 const content = computed(() => slots[slotName.value])
 const panelHidden = computed(
 	() =>
