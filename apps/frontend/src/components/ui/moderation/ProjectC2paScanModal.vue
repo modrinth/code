@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ExternalIcon } from '@modrinth/assets'
+import { CoffeeIcon, ExternalIcon } from '@modrinth/assets'
 import {
+	Button,
 	ButtonLink,
 	defineMessages,
 	injectNotificationManager,
@@ -10,8 +11,10 @@ import {
 import { ref, useTemplateRef } from 'vue'
 
 import { fileDeclaresAi } from '~/helpers/c2pa.ts'
+import { injectReviewSlicer, slicerFileName } from '~/providers/project-review/review-slicer'
 
 const modalRef = useTemplateRef<InstanceType<typeof NewModal>>('modalRef')
+const slicer = injectReviewSlicer(null)
 const isScanning = ref(false)
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -90,10 +93,15 @@ async function scanFile(url: string) {
 }
 
 function createSlicerUrl(path: string) {
-	const downloadUrl = new URL(fileUrl.value!)
-	const fileName = downloadUrl.pathname.split('/').pop()
+	const url = fileUrl.value!
+	return `https://slicer.run/?file=${encodeURIComponent(`${slicerFileName(url)}/${path}`)}&url=${encodeURIComponent(url)}`
+}
 
-	return `https://slicer.run/?file=${encodeURIComponent(`${fileName}/${path}`)}&url=${encodeURIComponent(downloadUrl.toString())}`
+function openInSlicerTab(path: string) {
+	const url = fileUrl.value
+	if (!slicer || !url) return
+	slicer.open([url], `${slicerFileName(url)}/${path}`)
+	hide()
 }
 
 function openC2paModal(url: string) {
@@ -134,7 +142,8 @@ defineExpose({ openC2paModal, hide })
 						class="flex flex-row flex-wrap items-center justify-between gap-2 rounded-2xl bg-surface-2 p-4 font-semibold text-secondary"
 					>
 						{{ file }}
-						<ButtonLink :href="createSlicerUrl(file)" target="_blank">
+						<Button v-if="slicer" @click="openInSlicerTab(file)"> Open <CoffeeIcon /> </Button>
+						<ButtonLink v-else :href="createSlicerUrl(file)" target="_blank">
 							Open <ExternalIcon />
 						</ButtonLink>
 					</div>

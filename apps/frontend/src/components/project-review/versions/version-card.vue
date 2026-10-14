@@ -95,7 +95,7 @@
 							size="sm"
 							circular
 							icon-only
-							@click="openInSlicer([file])"
+							@click="slicer.open([file.url])"
 						>
 							<CoffeeIcon aria-hidden="true" />
 						</Button>
@@ -347,7 +347,7 @@ import {
 import EnvironmentTags from '@modrinth/ui/src/components/project/EnvironmentTags.vue'
 import { formatVersionsForDisplay } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
-import { computed, nextTick, ref } from 'vue'
+import { computed, ref } from 'vue'
 
 import EditVersionMenu from '~/components/ui/create-project-version/EditVersionMenu.vue'
 import { projectQueryOptions } from '~/composables/queries/project'
@@ -356,7 +356,6 @@ import { injectProjectReviewPageContext } from '~/providers/project-review'
 import { injectReviewSlicer } from '~/providers/project-review/review-slicer'
 import type { EditVersionStage } from '~/providers/version/manage-version-modal'
 
-import { injectProjectReviewContext } from '../layout/context'
 import { projectReviewMessages as messages } from '../messages'
 import { useReviewInteraction } from '../shortcuts'
 
@@ -383,7 +382,6 @@ const client = injectModrinthClient()
 const tags = injectTags(null)
 const { project, members } = injectProjectReviewPageContext()
 const slicer = injectReviewSlicer()
-const { openTab } = injectProjectReviewContext()
 const dependenciesOpen = ref(false)
 const card = ref<HTMLElement>()
 const dependenciesSection = ref<HTMLElement>()
@@ -483,14 +481,12 @@ const dependencies = computed<DependencyContext[]>(() =>
 )
 type VersionFile = Labrinth.Versions.v3.Version['files'][number]
 
-async function openInSlicer(files: VersionFile[]) {
-	slicer.open(files)
-	await nextTick()
-	openTab('slicer')
-}
-
 function openVersionInSlicer() {
-	return openInSlicer(props.version.files.toSorted((a, b) => Number(b.primary) - Number(a.primary)))
+	slicer.open(
+		props.version.files
+			.toSorted((a, b) => Number(b.primary) - Number(a.primary))
+			.map(({ url }) => url),
+	)
 }
 
 function fileActions(file: VersionFile): ButtonMenuOption[] {

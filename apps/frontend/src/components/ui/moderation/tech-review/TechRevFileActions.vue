@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { DownloadIcon, ExternalIcon } from '@modrinth/assets'
-import { ButtonLink, defineMessages, useFormatBytes, useVIntl } from '@modrinth/ui'
+import { CoffeeIcon, DownloadIcon, ExternalIcon } from '@modrinth/assets'
+import { Button, ButtonLink, defineMessages, useFormatBytes, useVIntl } from '@modrinth/ui'
+
+import { injectReviewSlicer } from '~/providers/project-review/review-slicer'
 
 import type { FlattenedFileReport } from './types'
 
@@ -8,6 +10,7 @@ defineProps<{
 	file: FlattenedFileReport
 }>()
 
+const slicer = injectReviewSlicer(null)
 const formatBytes = useFormatBytes()
 const { formatMessage } = useVIntl()
 const messages = defineMessages({
@@ -18,6 +21,10 @@ const messages = defineMessages({
 	},
 	slicer: { id: 'moderation.tech-review.file.slicer', defaultMessage: 'Slicer' },
 	openSlicer: { id: 'moderation.tech-review.file.open-slicer', defaultMessage: 'Open in Slicer' },
+	openSlicerTab: {
+		id: 'moderation.tech-review.file.open-slicer-tab',
+		defaultMessage: 'Open in Slicer tab',
+	},
 })
 </script>
 
@@ -40,6 +47,17 @@ const messages = defineMessages({
 		>
 			<DownloadIcon aria-hidden="true" />
 		</ButtonLink>
+		<Button
+			v-if="slicer"
+			v-tooltip="formatMessage(messages.openSlicerTab)"
+			:aria-label="formatMessage(messages.openSlicerTab)"
+			type="outlined"
+			icon-only
+			circular
+			@click="slicer.open([file.download_url])"
+		>
+			<CoffeeIcon aria-hidden="true" />
+		</Button>
 		<ButtonLink
 			v-tooltip="formatMessage(messages.openSlicer)"
 			type="outlined"
