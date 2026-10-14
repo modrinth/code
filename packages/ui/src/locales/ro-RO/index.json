@@ -656,9 +656,6 @@
   "content.metadata-filter.update.available": {
     "defaultMessage": "Actualizare valabilă"
   },
-  "content.metadata-filter.warning.client-depends": {
-    "defaultMessage": "Clientul depinde de fișier"
-  },
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "Conținut numai pentru client"
   },

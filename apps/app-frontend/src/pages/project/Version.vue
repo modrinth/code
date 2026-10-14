@@ -17,9 +17,7 @@
 					type="colored"
 					color="brand"
 					:disabled="
-						installing ||
-						serverInstalled ||
-						(!!serverSelectedVersionId && !serverVersionSelected)
+						installing || serverInstalled || (!!serverSelectedVersionId && !serverVersionSelected)
 					"
 					@click="() => version && install(version.id)"
 				>

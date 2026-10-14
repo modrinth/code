@@ -96,6 +96,7 @@ import { computed, ref, watch } from 'vue'
 import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router'
 
 import { injectSettingsActions } from '@/features/settings/settings-actions'
+import { get_project, get_version_many } from '@/helpers/cache.js'
 import {
 	block_user,
 	change_user_avatar,
@@ -108,7 +109,6 @@ import {
 	patch_user,
 	unblock_user,
 } from '@/helpers/users'
-import { get_project, get_version_many } from '@/helpers/cache.js'
 import { useServerInstallContent } from '@/platform/adapters/browse/server-install-content'
 import { injectContentInstall } from '@/providers/content-install'
 import { useBreadcrumb } from '@/shared/breadcrumbs'
