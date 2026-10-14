@@ -436,7 +436,7 @@ async fn apply_shared_instance_update_inner(
     Ok(())
 }
 
-fn shared_instance_update_requires_full_apply(
+pub(super) fn shared_instance_update_requires_full_apply(
     metadata: &crate::state::InstanceMetadata,
     data: &SharedInstanceInstallData,
 ) -> bool {
