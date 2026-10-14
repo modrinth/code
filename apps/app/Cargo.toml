@@ -40,7 +40,6 @@ tauri-plugin-single-instance = { workspace = true }
 tauri-plugin-updater = { workspace = true }
 tauri-plugin-window-state = { workspace = true }
 theseus = { workspace = true, features = ["tauri"] }
-thiserror = { workspace = true }
 tokio = { workspace = true, features = ["time"] }
 tokio-util = { workspace = true, features = ["rt"] }
 tracing = { workspace = true }

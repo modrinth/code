@@ -12560,7 +12560,6 @@ dependencies = [
  "tauri-plugin-updater",
  "tauri-plugin-window-state",
  "theseus",
- "thiserror 2.0.17",
  "tokio",
  "tokio-util",
  "tracing",
