@@ -45,6 +45,8 @@ watchEffect((onCleanup) => {
 	const subscription = api.onDidVisibilityChange((event) => {
 		isActive.value = event.isVisible
 	})
-	onCleanup(() => subscription.dispose())
+	onCleanup(() => {
+		subscription.dispose()
+	})
 })
 </script>

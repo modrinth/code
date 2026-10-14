@@ -1,7 +1,6 @@
 import type { ReviewShortcutAction } from '@modrinth/moderation'
 import { createContext } from '@modrinth/ui'
-import { useEventListener } from '@vueuse/core'
-import { onScopeDispose, shallowRef } from 'vue'
+import { onScopeDispose, type Ref, shallowRef, watch } from 'vue'
 
 type Shortcut = { run: () => void; available: () => boolean }
 type Interaction = {
@@ -15,15 +14,17 @@ export const [injectReviewShortcuts, provideReviewShortcuts] =
 	createContext<ReturnType<typeof createReviewShortcuts>>('ReviewShortcuts')
 
 export function createReviewShortcuts() {
+	const windows = shallowRef<Window[]>(typeof window === 'undefined' ? [] : [window])
 	const keyboardFocusedElement = shallowRef<HTMLElement>()
 	let keyboardNavigation = false
 	function clearKeyboardFocus() {
 		keyboardNavigation = false
 		keyboardFocusedElement.value = undefined
 	}
-	useEventListener('pointerdown', clearKeyboardFocus, { capture: true })
-	useEventListener('blur', clearKeyboardFocus)
-	useEventListener(
+	listenReviewWindows(windows, 'pointerdown', clearKeyboardFocus, { capture: true })
+	listenReviewWindows(windows, 'blur', clearKeyboardFocus)
+	listenReviewWindows(
+		windows,
 		'focusin',
 		(event) => {
 			keyboardFocusedElement.value =
@@ -31,14 +32,16 @@ export function createReviewShortcuts() {
 		},
 		{ capture: true },
 	)
-	useEventListener(
+	listenReviewWindows(
+		windows,
 		'focusout',
 		() => {
 			keyboardFocusedElement.value = undefined
 		},
 		{ capture: true },
 	)
-	useEventListener(
+	listenReviewWindows(
+		windows,
 		'keydown',
 		(event) => {
 			if (event.defaultPrevented || event.isComposing) return
@@ -46,7 +49,7 @@ export function createReviewShortcuts() {
 				keyboardNavigation = true
 				return
 			}
-			const focused = document.activeElement
+			const focused = (event.target as Node | null)?.ownerDocument?.activeElement
 			if (!(focused instanceof HTMLElement)) return
 			if (event.key === 'Escape') {
 				clearKeyboardFocus()
@@ -92,6 +95,20 @@ export function createReviewShortcuts() {
 		)
 	}
 	return {
+		listen<K extends keyof WindowEventMap>(
+			event: K,
+			listener: (event: WindowEventMap[K]) => void,
+			options?: AddEventListenerOptions,
+		) {
+			return listenReviewWindows(windows, event, listener, options)
+		},
+		windows,
+		registerWindow(target: Window) {
+			windows.value = [...windows.value, target]
+			return () => {
+				windows.value = windows.value.filter((entry) => entry !== target)
+			}
+		},
 		keyboardFocusedElement,
 		register(action: ReviewShortcutAction, run: () => void, available: () => boolean = () => true) {
 			const shortcut = { run, available }
@@ -134,9 +151,11 @@ export function useReviewInteraction(entry: Interaction) {
 export function reviewShortcutBlocked(event: KeyboardEvent) {
 	if (event.defaultPrevented || event.repeat || event.isComposing) return true
 	if (
-		[...document.querySelectorAll('[role="dialog"][aria-modal="true"]')].some(
-			(modal) => modal.getClientRects().length > 0,
-		)
+		[
+			...((event.target as Node | null)?.ownerDocument?.querySelectorAll(
+				'[role="dialog"][aria-modal="true"]',
+			) ?? []),
+		].some((modal) => modal.getClientRects().length > 0)
 	)
 		return true
 	const target = event.target
@@ -145,4 +164,32 @@ export function reviewShortcutBlocked(event: KeyboardEvent) {
 		(target.isContentEditable ||
 			!!target.closest('input, textarea, select, [role="textbox"], [role="dialog"], .cm-editor'))
 	)
+}
+
+export function useReviewEventListener<K extends keyof WindowEventMap>(
+	event: K,
+	listener: (event: WindowEventMap[K]) => void,
+	options?: AddEventListenerOptions,
+) {
+	return injectReviewShortcuts().listen(event, listener, options)
+}
+
+function listenReviewWindows<K extends keyof WindowEventMap>(
+	windows: Ref<Window[]>,
+	event: K,
+	listener: (event: WindowEventMap[K]) => void,
+	options?: AddEventListenerOptions,
+) {
+	const stop = watch(
+		windows,
+		(targets, _, onCleanup) => {
+			for (const target of targets) target.addEventListener(event, listener, options)
+			onCleanup(() => {
+				for (const target of targets) target.removeEventListener(event, listener, options)
+			})
+		},
+		{ immediate: true, flush: 'sync' },
+	)
+	onScopeDispose(stop)
+	return stop
 }

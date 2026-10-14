@@ -8,7 +8,7 @@ export const workspacePanelSizes = {
 	left: { default: 400, minimum: 200 },
 	right: { default: 400, minimum: 200 },
 	bottom: { default: 200, minimum: 50 },
-	center: { minimum: 100 },
+	center: { minimum: 20 },
 	tabs: { minimum: 100 },
 } as const
 
@@ -95,4 +95,45 @@ export function saveWorkspaceLayout(layout: SavedWorkspaceLayout) {
 	} catch {
 		// no-op
 	}
+}
+
+/** Save detached panels in the grid so restoring a layout never opens browser windows. */
+export function dockPopoutLayout(layout: SerializedDockview): SerializedDockview {
+	const result: SerializedDockview = JSON.parse(JSON.stringify(layout))
+	type GridNode = SerializedDockview['grid']['root']
+	type Group = Exclude<GridNode['data'], GridNode[]>
+	function findGroupPath(node: GridNode, id: string): GridNode[] | undefined {
+		if (!Array.isArray(node.data)) return node.data.id === id ? [node] : undefined
+		for (const child of node.data) {
+			const path = findGroupPath(child, id)
+			if (path) return [node, ...path]
+		}
+	}
+	function restoreGroup(group: Group, reference?: string) {
+		const path = reference ? (findGroupPath(result.grid.root, reference) ?? []) : []
+		const existing = path.at(-1)
+		if (existing && !Array.isArray(existing.data)) {
+			existing.data.views.push(...group.views)
+			existing.data.activeView ??= group.activeView
+			for (const node of path) node.visible = true
+			return
+		}
+		const leaf: GridNode = { type: 'leaf', data: group }
+		if (Array.isArray(result.grid.root.data)) result.grid.root.data.push(leaf)
+		else result.grid.root = { type: 'branch', data: [result.grid.root, leaf] }
+	}
+	function restoreGrid(node: GridNode, reference?: string) {
+		if (Array.isArray(node.data)) {
+			for (const child of node.data) restoreGrid(child, reference)
+		} else restoreGroup(node.data, reference)
+	}
+	for (const popout of result.popoutGroups ?? []) {
+		if (popout.data) restoreGroup(popout.data, popout.gridReferenceGroup)
+		if (popout.grid) restoreGrid(popout.grid.root, popout.gridReferenceGroup)
+	}
+	delete result.popoutGroups
+	if (result.activeGroup && !findGroupPath(result.grid.root, result.activeGroup)) {
+		delete result.activeGroup
+	}
+	return result
 }

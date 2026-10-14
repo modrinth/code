@@ -1,5 +1,5 @@
 <template>
-	<Teleport to="body">
+	<Teleport :to="anchor.element.ownerDocument.body">
 		<div
 			:id="panelId"
 			ref="element"
@@ -51,10 +51,10 @@
 import { autoUpdate, flip, offset, shift, size, useFloating } from '@floating-ui/vue'
 import { PinIcon, XIcon } from '@modrinth/assets'
 import { IconButton, useVIntl } from '@modrinth/ui'
-import { useEventListener } from '@vueuse/core'
 import { computed, nextTick, onBeforeUnmount, shallowRef, watch } from 'vue'
 
 import { projectReviewMessages as messages } from '../messages'
+import { useReviewEventListener } from '../shortcuts'
 import { injectReviewContext, type ReviewAnchor } from './context'
 
 const { formatMessage } = useVIntl()
@@ -111,11 +111,11 @@ watch([isPositioned, pinned], () => {
 			element.value?.focus({ preventScroll: true })
 	})
 })
-useEventListener('pointerdown', (event) => {
+useReviewEventListener('pointerdown', (event) => {
 	if (pinned.value) return
 	if (active.value?.id !== props.anchor.id || !(event.target instanceof Node)) return
 	if (props.anchor.element.contains(event.target) || contains(event.target)) return
-	const focused = document.activeElement
+	const focused = props.anchor.element.ownerDocument.activeElement
 	if (
 		focused instanceof HTMLElement &&
 		(props.anchor.element.contains(focused) || contains(focused))

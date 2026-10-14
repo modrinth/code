@@ -241,7 +241,7 @@ function onFocusOut(event: FocusEvent) {
 	>
 		<slot />
 	</div>
-	<Teleport v-if="hosted" to="body">
+	<Teleport v-if="hosted" :to="referenceEl?.ownerDocument.body ?? 'body'">
 		<Transition name="tooltip">
 			<div
 				v-if="isOpen"

@@ -102,7 +102,6 @@ import {
 	Tooltip,
 	useVIntl,
 } from '@modrinth/ui'
-import { useEventListener } from '@vueuse/core'
 import { computed, onScopeDispose, ref, watch } from 'vue'
 
 import { useModerationKeybinds } from '~/composables/moderation'
@@ -217,11 +216,7 @@ const issueCount = computed(() => {
 	)
 })
 const reviewContext = provideReviewContext(
-	createReviewContext(
-		reviewProjectId,
-		(target) => !!panels.resolve(target),
-		shortcuts.keyboardFocusedElement,
-	),
+	createReviewContext(reviewProjectId, (target) => !!panels.resolve(target), shortcuts),
 )
 const { pending, loadingAction } = provideReviewSubmission(
 	createReviewSubmission(messages, panels, session, previousIssues),
@@ -361,7 +356,7 @@ useShortcut(
 	() => hasPreviousIssues.value,
 )
 
-useEventListener('keydown', (event) => {
+shortcuts.listen('keydown', (event) => {
 	if (!isStaff(auth.value.user) || reviewShortcutBlocked(event)) return
 	keybinds.value.handle(event, { scope: 'review-actions', ...shortcuts })
 })

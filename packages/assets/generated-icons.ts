@@ -217,6 +217,7 @@ import _MinusIcon from './icons/minus.svg?component'
 import _MonitorIcon from './icons/monitor.svg?component'
 import _MonitorCogIcon from './icons/monitor-cog.svg?component'
 import _MonitorSmartphoneIcon from './icons/monitor-smartphone.svg?component'
+import _MonitorXIcon from './icons/monitor-x.svg?component'
 import _MoonIcon from './icons/moon.svg?component'
 import _MoreHorizontalIcon from './icons/more-horizontal.svg?component'
 import _MoreVerticalIcon from './icons/more-vertical.svg?component'
@@ -694,6 +695,7 @@ export const MinusIcon = _MinusIcon
 export const MonitorIcon = _MonitorIcon
 export const MonitorCogIcon = _MonitorCogIcon
 export const MonitorSmartphoneIcon = _MonitorSmartphoneIcon
+export const MonitorXIcon = _MonitorXIcon
 export const MoonIcon = _MoonIcon
 export const MoreHorizontalIcon = _MoreHorizontalIcon
 export const MoreVerticalIcon = _MoreVerticalIcon

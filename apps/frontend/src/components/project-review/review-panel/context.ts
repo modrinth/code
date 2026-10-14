@@ -1,5 +1,5 @@
 import { createContext } from '@modrinth/ui'
-import { useEventListener, useRafFn } from '@vueuse/core'
+import { useRafFn } from '@vueuse/core'
 import {
 	computed,
 	nextTick,
@@ -15,6 +15,7 @@ import {
 import type { ReviewTarget } from '~/providers/project-review/review'
 
 import type { ProjectReviewTab } from '../layout/types'
+import type { createReviewShortcuts } from '../shortcuts'
 import { useActionKeybinds } from './use-action-keybinds'
 
 export interface ReviewAnchor {
@@ -103,8 +104,9 @@ export const [injectReviewContext, provideReviewContext] =
 export function createReviewContext(
 	projectId: Ref<string | undefined>,
 	isAvailable: (target: ReviewTarget) => boolean,
-	keyboardFocusedElement: Ref<HTMLElement | undefined>,
+	shortcuts: ReturnType<typeof createReviewShortcuts>,
 ) {
+	const { keyboardFocusedElement } = shortcuts
 	const panelId = useId()
 	const activeAnchor = shallowRef<ReviewAnchor>()
 	const pendingAnchor = shallowRef<ReviewAnchor>()
@@ -205,7 +207,7 @@ export function createReviewContext(
 		if (inline) return inline.panel.element()
 		return active.value && panel.value?.dataset.reviewPanel === id ? panel.value : null
 	})
-	useActionKeybinds(activePanelElement)
+	useActionKeybinds(activePanelElement, shortcuts)
 
 	function hasVisibleFocus(element: HTMLElement | null) {
 		const focused = keyboardFocusedElement.value
@@ -461,14 +463,14 @@ export function createReviewContext(
 		},
 		{ flush: 'post' },
 	)
-	useEventListener(
+	shortcuts.listen(
 		'pointermove',
 		() => {
 			if (!heldTab.value) shortcutTab.value = undefined
 		},
 		{ capture: true },
 	)
-	useEventListener(
+	shortcuts.listen(
 		'pointerdown',
 		(event) => {
 			shortcutTab.value = undefined

@@ -37,6 +37,7 @@ const { onTabsReady } = injectProjectReviewContext()
 const theme: DockviewTheme = {
 	name: 'modrinth',
 	className: 'project-review-dock',
+	dndOverlayMounting: 'absolute',
 	dndTabIndicator: 'line',
 	tabAnimation: 'default',
 }
@@ -56,6 +57,14 @@ const theme: DockviewTheme = {
 	--dv-drag-over-background-color: color-mix(in srgb, var(--color-text-default) 5%, transparent);
 	--dv-drag-over-border-color: color-mix(in srgb, var(--color-text-default) 10%, transparent);
 	--dv-drag-over-border: 1px solid var(--dv-drag-over-border-color);
+}
+
+.project-review-tabs :deep(.dv-drop-target-container) {
+	--dv-transition-duration: 70ms;
+}
+
+.project-review-tabs :deep(.dv-drop-target-anchor-line) {
+	transition: none;
 }
 
 .project-review-tabs :deep(.dv-tabs-and-actions-container) {

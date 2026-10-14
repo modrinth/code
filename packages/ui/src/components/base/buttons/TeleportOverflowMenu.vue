@@ -141,6 +141,9 @@ watch(isOpen, (openState, previousOpenState) => {
 	if (!openState && previousOpenState) emit('close')
 })
 
+const teleportTarget = computed(() =>
+	isOpen.value ? (triggerElement.value?.ownerDocument.body ?? 'body') : 'body',
+)
 const isClient = ref(false)
 onMounted(() => {
 	isClient.value = true
@@ -172,7 +175,7 @@ defineExpose({ open: openMenu, close: closeMenu })
 		@mouseleave="handleMouseLeave"
 	>
 		<slot />
-		<Teleport v-if="isClient" to="body">
+		<Teleport v-if="isClient" :to="teleportTarget">
 			<ButtonMenuPanel
 				ref="panel"
 				:open="isOpen"

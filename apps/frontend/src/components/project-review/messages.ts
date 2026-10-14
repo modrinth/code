@@ -1,6 +1,22 @@
 import { defineMessages } from '@modrinth/ui'
 
 export const projectReviewMessages = defineMessages({
+	popoutPanel: {
+		id: 'moderation.project-review.popoutPanel',
+		defaultMessage: 'Open panel in its own window',
+	},
+	closeExternalPanels: {
+		id: 'moderation.project-review.closeExternalPanels',
+		defaultMessage: 'Close all popped out panels',
+	},
+	dockPanel: {
+		id: 'moderation.project-review.dockPanel',
+		defaultMessage: 'Return panel to workspace',
+	},
+	popoutFailed: {
+		id: 'moderation.project-review.popoutFailed',
+		defaultMessage: 'Could not open the panel window. Allow popups for this site and try again.',
+	},
 	generalSettings: {
 		id: 'moderation.project-review.generalSettings',
 		defaultMessage: 'General',
