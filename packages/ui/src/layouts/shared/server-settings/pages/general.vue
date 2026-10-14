@@ -430,9 +430,7 @@ const hasServerSettingsChanges = computed(
 const hasPreferenceChanges = computed(() =>
 	preferenceKeys.some((key) => newUserPreferences.value[key] !== userPreferences.value[key]),
 )
-const hasUpdateChannelChanges = computed(
-	() => updateChannel.value !== worldUpdateChannel.value,
-)
+const hasUpdateChannelChanges = computed(() => updateChannel.value !== worldUpdateChannel.value)
 const hasUnsavedChanges = computed(
 	() =>
 		hasServerSettingsChanges.value || hasPreferenceChanges.value || hasUpdateChannelChanges.value,

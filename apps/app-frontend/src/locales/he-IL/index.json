@@ -296,9 +296,6 @@
   "app.download-manager.pause": {
     "message": "השהה את ההתקנה"
   },
-  "app.download-manager.show": {
-    "message": "משימות"
-  },
   "app.download-manager.tasks": {
     "message": "משימות"
   },

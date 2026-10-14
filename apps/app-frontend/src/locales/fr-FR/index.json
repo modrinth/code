@@ -3290,35 +3290,11 @@
   "app.survey.title": {
     "message": "Salut, utilisateur de Modrinth !"
   },
-  "app.sync-instances-update.choose-source.all": {
-    "message": "Choisissez de quelle instance copier les paramètres du jeu, les packs de ressources, l'historique des commandes, les barres d'action et les serveurs multijoueurs. Ces paramètres ne sont utilisés que pour la synchronisation initiale, et vous pourrez les modifier depuis n'importe quelle instance par la suite."
-  },
-  "app.sync-instances-update.choose-source.all-title": {
-    "message": "Choisissez une source de synchronisation"
-  },
   "app.sync-instances-update.choose-source.data-packs": {
     "message": "Choisissez de quelle instance copier vos packs de données. Ces packs ne sont utilisés que pour la synchronisation initiale, et vous pourrez les modifier depuis n'importe quelle instance par la suite."
   },
   "app.sync-instances-update.choose-source.resource-packs": {
     "message": "Choisissez de quelle instance copier vos packs de ressources. Ces packs ne sont utilisés que pour la synchronisation initiale, et vous pourrez les modifier depuis n'importe quelle instance par la suite."
-  },
-  "app.sync-instances-update.creative-hotbars": {
-    "message": "Synchroniser les barres d'actions"
-  },
-  "app.sync-instances-update.description": {
-    "message": "Vous pouvez maintenant synchroniser des options telles que les paramètres du jeu, les serveurs, les packs de ressources, et plus encore dans toutes vos instances, donc tout reste pareil à chaque fois que vous jouez !"
-  },
-  "app.sync-instances-update.load-error": {
-    "message": "Impossible de charger vos paramètres de synchronisation. Veuillez réessayer."
-  },
-  "app.sync-instances-update.manage-later": {
-    "message": "Vous pouvez activer la synchronisation maintenant et la gérer plus tard dans les paramètres de votre application."
-  },
-  "app.sync-instances-update.notification.description": {
-    "message": "Gardez les paramètres du jeu, les serveurs, les packs de ressources et plus encore synchronisés entre toutes vos instances."
-  },
-  "app.sync-instances-update.notification.dismiss": {
-    "message": "Ignorer"
   },
   "app.synced-content.change.disable-everywhere": {
     "message": "Désactiver partout"
@@ -3646,120 +3622,6 @@
   },
   "instance.files.save-as": {
     "message": "Sauvegarder en tant que..."
-  },
-  "instance.icon-editor.symbol.crafting-table": {
-    "message": "Établi"
-  },
-  "instance.icon-editor.symbol.create-wrench": {
-    "message": "Clé à Molette"
-  },
-  "instance.icon-editor.symbol.creeper": {
-    "message": "Creeper"
-  },
-  "instance.icon-editor.symbol.enchanting-table": {
-    "message": "Table d'enchantement"
-  },
-  "instance.icon-editor.symbol.ender-chest": {
-    "message": "Coffre de l'Ender"
-  },
-  "instance.icon-editor.symbol.ender-dragon": {
-    "message": "Dragon de l'Ender"
-  },
-  "instance.icon-editor.symbol.engine": {
-    "message": "Moteur"
-  },
-  "instance.icon-editor.symbol.fabric": {
-    "message": "Fabric"
-  },
-  "instance.icon-editor.symbol.forge": {
-    "message": "Forge"
-  },
-  "instance.icon-editor.symbol.furnace": {
-    "message": "Four"
-  },
-  "instance.icon-editor.symbol.gizmo": {
-    "message": "Machin"
-  },
-  "instance.icon-editor.symbol.globe": {
-    "message": "Globe"
-  },
-  "instance.icon-editor.symbol.grass-block": {
-    "message": "Bloc d'herbe"
-  },
-  "instance.icon-editor.symbol.lantern": {
-    "message": "Lanterne"
-  },
-  "instance.icon-editor.symbol.moobloom": {
-    "message": "Vache Champignon"
-  },
-  "instance.icon-editor.symbol.mr-pack": {
-    "message": "Mr Pack"
-  },
-  "instance.icon-editor.symbol.neoforge": {
-    "message": "NeoForge"
-  },
-  "instance.icon-editor.symbol.orb": {
-    "message": "Orbe"
-  },
-  "instance.icon-editor.symbol.oxygen-distributor": {
-    "message": "Distributeur d'Oxygène"
-  },
-  "instance.icon-editor.symbol.pancakes": {
-    "message": "Pancakes"
-  },
-  "instance.icon-editor.symbol.pickaxe": {
-    "message": "Pioche"
-  },
-  "instance.icon-editor.symbol.poke-ball": {
-    "message": "Poke Ball"
-  },
-  "instance.icon-editor.symbol.quilt": {
-    "message": "Quilt"
-  },
-  "instance.icon-editor.symbol.redstone-block": {
-    "message": "Block de Redstone"
-  },
-  "instance.icon-editor.symbol.sculk-sensor": {
-    "message": "Détecteur Sculk"
-  },
-  "instance.icon-editor.symbol.skeleton": {
-    "message": "Squelette"
-  },
-  "instance.icon-editor.symbol.skillet": {
-    "message": "Poêle"
-  },
-  "instance.icon-editor.symbol.slime-block": {
-    "message": "Bloc de slime"
-  },
-  "instance.icon-editor.symbol.space-helmet": {
-    "message": "Casque d'Espace"
-  },
-  "instance.icon-editor.symbol.sticky-piston": {
-    "message": "Piston Collant"
-  },
-  "instance.icon-editor.symbol.sword": {
-    "message": "Épée"
-  },
-  "instance.icon-editor.symbol.terminal": {
-    "message": "Console"
-  },
-  "instance.icon-editor.symbol.tiny-potato": {
-    "message": "Petite Patate"
-  },
-  "instance.icon-editor.symbol.tire": {
-    "message": "Pneu"
-  },
-  "instance.icon-editor.symbol.tnt": {
-    "message": "TNT"
-  },
-  "instance.icon-editor.symbol.wrenth-rinth": {
-    "message": "Clé à molette Modrinth"
-  },
-  "instance.icon-editor.symbol.zombie": {
-    "message": "Zombie"
-  },
-  "instance.icon-editor.title": {
-    "message": "Éditeur d'icônes"
   },
   "instance.last-played": {
     "message": "Dernière fois joué :"

@@ -395,9 +395,6 @@
   "content.card.synced": {
     "defaultMessage": "Đã đồng bộ giữa các bản cài đặt"
   },
-  "content.card.uploaded": {
-    "defaultMessage": "Đã tải lên"
-  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Bạn có chắc chắn muốn cập nhật {count, plural, other {# dự án}} lên phiên bản tương thích mới nhất không? Đề xuất: Bạn nên cập nhật từng cái một."
   },
@@ -656,9 +653,6 @@
   "content.managed-card.view-content": {
     "defaultMessage": "Xem nội dung"
   },
-  "content.metadata-filter.author": {
-    "defaultMessage": "Tác giả"
-  },
   "content.metadata-filter.environment": {
     "defaultMessage": "Môi trường"
   },
@@ -683,17 +677,8 @@
   "content.metadata-filter.update.available": {
     "defaultMessage": "Có bản cập nhật"
   },
-  "content.metadata-filter.warning.client-depends": {
-    "defaultMessage": "Client phụ thuộc vào tệp"
-  },
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "Nội dung chỉ dành cho client"
-  },
-  "content.metadata-filter.warning.client-retained": {
-    "defaultMessage": "Tệp client được giữ lại"
-  },
-  "content.metadata-filter.warning.none": {
-    "defaultMessage": "Không có cảnh báo"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "Cảnh báo"
@@ -730,9 +715,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Bộ lọc"
-  },
-  "content.page-layout.filter.author-count": {
-    "defaultMessage": "{count, plural, one {# tác giả} other {# tác giả}}"
   },
   "content.page-layout.loading": {
     "defaultMessage": "Đang tải nội dung..."
@@ -2435,12 +2417,6 @@
   "instances.managed-content-modal.enabled": {
     "defaultMessage": "Đã bật"
   },
-  "instances.managed-content-modal.external-content": {
-    "defaultMessage": "Bên ngoài"
-  },
-  "instances.managed-content-modal.external-content-description": {
-    "defaultMessage": "Tệp này chưa được xuất bản trên Modrinth."
-  },
   "instances.managed-content-modal.header": {
     "defaultMessage": "Nội dung được quản lý"
   },
@@ -2455,9 +2431,6 @@
   },
   "instances.managed-content-modal.search-placeholder": {
     "defaultMessage": "Tìm trong {count, number} {count, plural, one {dự án} other {dự án}}"
-  },
-  "instances.managed-content-modal.warnings": {
-    "defaultMessage": "Cảnh báo"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Hiện tại"
@@ -5617,15 +5590,6 @@
   },
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
-  },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "Nó hiện đang ở đây!"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "Đừng hiển thị lại"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "Cài đặt máy chủ của bạn đã được di chuyển"
   },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Máy chủ được chia sẻ"

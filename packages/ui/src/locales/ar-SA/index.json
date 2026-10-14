@@ -395,9 +395,6 @@
   "content.card.synced": {
     "defaultMessage": "مزامنة عبر النسخ"
   },
-  "content.card.uploaded": {
-    "defaultMessage": "تم الرفع"
-  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "هل تؤكد رغبتك بتحديث {count, plural, one {# مشروع} other {# مشاريع}} لاصداراتها المتوافقة الأخيرة؟ ينصح بتحديثها واحدا تلو الاۤخر."
   },
