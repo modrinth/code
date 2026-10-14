@@ -171,11 +171,6 @@ export function createRegistryInternal(): MessengerRegistry {
         getActiveMessengers() {
             return this.types.values().flatMap((type) => (type as MessengerTypeImpl).getInstances()).toArray();
         },
-		forActiveMessengersUnless(messenger: Messenger | undefined, callback: (connection: Messenger) => void) {
-			for (const connection of this.getActiveMessengers()) {
-				if (connection !== messenger) callback(connection);
-			}
-		},
 		setWorkerFactoryFor(type, worker) {
 			if (!isWorker()) (type as MessengerTypeImpl).workerFactory = worker;
         }
@@ -316,18 +311,18 @@ function handleOutputMessages<T extends MessageTypes, H>(messenger: ClientHandle
 
         taskHolder.endTask(msg.key, msg.error, true);
     } else { // MAIN THREAD OR PORT
-        if (taskHolder.hasTask(msg.key)) {
-            logger.debug("Completed a task for given data!", {obj: msg})
-        } else {
-            logger.error("Unable to Complete a task for given data as its not here anymore!!", {obj: msg})
-        }
-
         if (msg.key == FORCED_OUTPUT_KEY) {
             if (forcedOutputHandler == null || !forcedOutputHandler(messenger, msg.data)) {
                 logger.error("Unable to Complete a forced output for given data as its not supported for this messenger!", {obj: msg})
             }
 
             return;
+        }
+
+        if (taskHolder.hasTask(msg.key)) {
+            logger.debug("Completed a task for given data!", {obj: msg})
+        } else {
+            logger.error("Unable to Complete a task for given data as its not here anymore!!", {obj: msg})
         }
 
         taskHolder.endTask(msg.key, msg.data, false);
@@ -484,9 +479,9 @@ function serverMessageHandler<T extends MessageTypes>(
         getActiveMessengers() {
             return peerPorts.values().toArray() as Messenger<T>[];
         },
-		forActiveMessengersUnless(messenger: Messenger<T> | undefined, callback: (connection: Messenger<T>) => void) {
-			for (const connection of this.getActiveMessengers()) {
-				if (connection !== messenger) callback(connection);
+		forConnections(callback: (connection: Messenger<T>) => void, except?: Messenger<T>) {
+			for (const connection of [this, ...this.getActiveMessengers()]) {
+				if (connection !== except) callback(connection);
 			}
 		},
         async sendClientMessage(sender, msg) {

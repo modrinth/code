@@ -144,6 +144,9 @@ export class RootZipTreeNode extends ZipTreeNode {
 
 	onFinishedLoading: Promise<void>
 
+	/** SHA-512 of the whole archive, once known (for a URL, only after all of it is downloaded). */
+	sha512Hash?: string;
+
     declare type: "directory";
 
     declare root: undefined;
@@ -263,7 +266,13 @@ export type ArchiveUpdateTypes =
 	Typed<'node_loaded', { root: RootNodeTarget, node: ZipNode, }> |
 	Typed<'updated_node_data', { node: NodeTarget }> |
 	Typed<'root_loaded', { root: RootNodeTarget }> |
-	Typed<'archive_download', { root: RootNodeTarget, current: number, total: number }>;
+	/**
+	 * The archive's own SHA-512 was computed from its downloaded bytes. `expectedHash` is the hash it
+	 * was opened with when that didn't match, which is no longer mapped to the archive.
+	 */
+	Typed<'root_hashed', { root: RootNodeTarget, sha512Hash: string, expectedHash?: string }> |
+	/** Bytes of the archive cached so far, keyed by `url` too as it starts before the root is returned. */
+	Typed<'archive_download', { root?: UUID_V7, url?: string, sha512Hash?: string, current: number, total: number }>;
 
 export interface ZipHandler {
     zipByUUID: Map<UUID_V7, RootZipTreeNode>;
@@ -274,7 +283,7 @@ export interface ZipHandler {
     writeNodeData(node: FileZipTreeNode | NodeTarget, buffer: ArrayBuffer, options?: ZipWriterAddDataOptions): Promise<boolean>;
     collectFiles(root: RootZipTreeNode | UUID_V7, matcher?: FileMatcher): Promise<FileDetails[]>;
     collectHashedFiles(root: RootZipTreeNode | UUID_V7, matcher?: FileMatcher, deduplicate?: boolean): Promise<HashedFileContent[]>;
-    getOrReadZipTree(source: ZipDataSource): Promise<RootZipTreeNode | undefined>;
+    getOrReadZipTree(source: ZipDataSource): Promise<RootZipTreeNode>;
     readZipTree(source: ZipDataSource): Promise<RootZipTreeNode>;
     getZipTree(value: string | UUID_V7, isUrl: boolean, localOnly?: boolean): Promise<RootZipTreeNode | undefined>;
     closeZipTree(root: RootZipTreeNode | UUID_V7, name?: string): Promise<{ err?: Error, wasClosed: boolean }>;

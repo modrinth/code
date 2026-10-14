@@ -79,7 +79,6 @@ export interface MessengerType<T extends MessageTypes | undefined = undefined, H
 export interface MessengerAccessor<T extends MessageTypes | undefined = undefined> {
 	getMessenger: <T extends MessageTypes, H>(type: MessengerType<T, H>) => Promise<ClientMessenger<T, H> & H> | undefined;
 	getActiveMessengers(): Messenger<T>[];
-	forActiveMessengersUnless(messenger: Messenger<T> | undefined, callback: (connection: Messenger<T>) => void): void
 }
 
 export interface MessengerOptions<T extends MessageTypes, H> {
@@ -134,6 +133,8 @@ export interface Messenger<T extends MessageTypes | undefined = undefined> {
 
 export interface ServerMessenger<T extends MessageTypes> extends Messenger<T>, MessengerAccessor<T> {
     sendClientMessage(sender: Messenger<T>, msg: () => Promise<MaybeTransferable<ClientboundMessage<T>>>): Promise<void>;
+
+	forConnections(callback: (connection: Messenger<T>) => void, except?: Messenger<T> | undefined): void
 }
 
 export interface ClientMessenger<T extends MessageTypes, H> extends Messenger<T> {

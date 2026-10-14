@@ -3,14 +3,19 @@ import {
 	type FileContentPromise, type FileDetails, type FileTypeInfo, hashBuffer,
 	type HashedFileContent, resolveContent
 } from "#ui/helpers/toolbox/file";
+import { v7 as uuidV7 } from 'uuid';
+
 import {
 	isWorker,
+	type Messenger,
 	type ServerMessageHandler,
+	type ServerMessenger,
 	setupAsServer
 } from "#ui/helpers/toolbox/messenger";
 import { zipHandlerType } from "#ui/helpers/toolbox/workers";
 import type {  ZipMessages } from "#ui/helpers/toolbox/workers/zip/api";
 import {
+	type ArchiveUpdateTypes,
 	arrayBufferFromSource,
 	type LazyDataAccess,
 	type NodeTarget, type RootNodeTarget,
@@ -19,7 +24,11 @@ import {
 	type UUID_V7,
 	type ZipNode,
 } from "#ui/helpers/toolbox/zip";
-import {readZipTreeFromBuffer, readZipTreeFromURL} from "#ui/helpers/toolbox/zip/impl";
+import {
+	type ReadExtraOptions,
+	readZipTreeFromBuffer,
+	readZipTreeFromURL
+} from "#ui/helpers/toolbox/zip/impl";
 
 export type Sha512 = string;
 
@@ -56,6 +65,9 @@ function getZipNode(value: string) {
 		return zipByUUID.get(value);
 	}
 
+	const hashedUUID = hashToUUID.get(value);
+	if (hashedUUID != null && zipByUUID.has(hashedUUID)) return zipByUUID.get(hashedUUID);
+
 	if (urlToUUID.has(value)) {
 		const hash = urlToUUID.get(value)!;
 		const node = zipByUUID.get(hash);
@@ -89,6 +101,43 @@ async function isValidFor(path: string, fileType: () => Promise<FileTypeInfo | n
 	return true;
 }
 
+/** Stops anything still running for the archive, such as fetching the rest of it. */
+function closeRoot(root: RootZipTreeNode | undefined) {
+	(root as Partial<{ close: () => void }> | undefined)?.close?.();
+}
+
+/**
+ * Maps the archive's actual hash to it, dropping the hash it was opened with when that turns out to
+ * be wrong, and lets every connection know.
+ */
+function onArchiveHashed(messenger: ServerMessenger<ZipMessages>, root: RootZipTreeNode, sha512Hash: Sha512, expectedHash?: Sha512) {
+	root.sha512Hash = sha512Hash;
+	hashToUUID.set(sha512Hash, root.key);
+
+	const mismatched = expectedHash != null && expectedHash !== sha512Hash;
+	if (mismatched) {
+		messenger.logger.warn(`Archive '${root.key}' was opened with SHA-512 '${expectedHash}' but its contents hash to '${sha512Hash}'`);
+		if (hashToUUID.get(expectedHash) === root.key) hashToUUID.delete(expectedHash);
+	}
+
+	broadcastArchiveUpdate(messenger, {
+		type: 'root_hashed',
+		root: { root: root.key },
+		sha512Hash: sha512Hash,
+		expectedHash: mismatched ? expectedHash : undefined,
+	});
+}
+
+/**
+ * Sends an archive update to every connection, i.e. the main thread (the server itself) and any
+ * peer worker, except the one given.
+ */
+function broadcastArchiveUpdate(messenger: ServerMessenger<ZipMessages>, update: ArchiveUpdateTypes, except?: Messenger<ZipMessages>) {
+	messenger.forConnections((connection) => {
+		messenger.sendClientMessage(connection, async () => ({ channel: 'archive_update', ...update }))
+	}, except);
+}
+
 export const messageHandler: ServerMessageHandler<ZipMessages> = (messenger, msg, resolver, sender)=>  {
 	return resolver(msg, {
 		lazy_read: async (msg) => {
@@ -106,7 +155,6 @@ export const messageHandler: ServerMessageHandler<ZipMessages> = (messenger, msg
 			const node = getNodeFrom(msg);
 
 			const buffer = await node.getBuffer();
-			console.log(buffer);
 			return {
 				buffer: buffer
 			};
@@ -114,100 +162,66 @@ export const messageHandler: ServerMessageHandler<ZipMessages> = (messenger, msg
 		node_write: async (msg) => {
 			const node = getNodeFrom(msg);
 			await node.setBuffer(async () => msg.buffer, msg.options);
-			messenger.forActiveMessengersUnless(sender, (connection) => {
-				messenger.sendClientMessage(connection, async () => {
-					return {
-						channel: "archive_update",
-						type: "updated_node_data",
-						node: {
-							root: node.root?.key!,
-							path: node.path,
-						}
-					}
-				})
-			})
+			broadcastArchiveUpdate(messenger, {
+				type: "updated_node_data",
+				node: {
+					root: node.root?.key!,
+					path: node.path,
+				}
+			}, sender)
 			return {
 				wasWritten: true
 			};
 		},
 		read_zip_tree: async (msg) => {
 			let tree: RootZipTreeNode | undefined = undefined;
-			let isFullyLoaded = sender != null;
 
 			if (msg.sha512Hash) tree = getZipNode(msg.sha512Hash);
 			if (tree == null && msg.url) tree = getZipNode(msg.url);
 			if (tree == null) {
+				const key = uuidV7();
+				const readOptions: ReadExtraOptions = {
+					key: key,
+					name: msg.name,
+					logger: messenger.logger,
+					innerArchiveReadCallback: (_root: RootZipTreeNode, node: ZipNode) => broadcastArchiveUpdate(messenger, {
+						type: 'node_loaded',
+						root: { root: key },
+						node: copyChildNode(node)
+					}),
+				};
+
 				if (msg.data_type == 'buffer') {
 					const buffer = await arrayBufferFromSource(msg.buffer);
 					const hash = await hashBuffer(buffer)
 
-					tree = await readZipTreeFromBuffer(messenger.logger, buffer, {
-						name: msg.name,
-						logger: messenger.logger,
-						innerArchiveReadCallback: sender != null ? (root, node) => {
-							messenger.forActiveMessengersUnless(sender, (connection) => {
-								messenger.sendClientMessage(connection, async () => {
-									return {
-										channel: 'archive_update',
-										type: 'node_loaded',
-										root: { root: root.key } as RootNodeTarget,
-										node: copyChildNode(node)
-									}
-								})
-							})
-						} : undefined
-					});
+					tree = await readZipTreeFromBuffer(messenger.logger, buffer, readOptions);
 
-					hashToUUID.set(hash, tree.key)
+					onArchiveHashed(messenger, tree, hash, msg.sha512Hash);
 				} else {
-					tree = await readZipTreeFromURL(messenger.logger, msg.url, {
-						name: msg.name,
-						logger: messenger.logger,
-						innerArchiveReadCallback: (root, node) => {
-							messenger.forActiveMessengersUnless(sender, (connection) => {
-								messenger.sendClientMessage(connection, async () => {
-									return {
-										channel: 'archive_update',
-										type: 'node_loaded',
-										root: { root: root.key } as RootNodeTarget,
-										node: copyChildNode(node)
-									}
-								})
-							})
-						},
+					const url = msg.url;
+					tree = await readZipTreeFromURL(messenger.logger, url, {
+						...readOptions,
+						archiveHashedCallback: (root, hash) => onArchiveHashed(messenger, root, hash, msg.sha512Hash),
 						rangeOptions: {
 							...msg.rangeOptions,
 							onProgress(current, total) {
-								messenger.forActiveMessengersUnless(sender, (connection) => {
-									messenger.sendClientMessage(connection, async () => {
-										return {
-											channel: 'archive_update',
-											type: 'archive_download',
-											root: { root: tree!.key } as RootNodeTarget,
-											current: current,
-											total: total
-										}
-									})
+								broadcastArchiveUpdate(messenger, {
+									type: 'archive_download',
+									root: key,
+									url: url,
+									current: current,
+									total: total
 								})
 							}
 						},
 					});
 
-					if (msg.sha512Hash) zipByUUID.set(msg.sha512Hash, tree);
+					// Trusted until the download finishes and the archive is hashed, unless that already happened
+					if (msg.sha512Hash && tree.sha512Hash == null) hashToUUID.set(msg.sha512Hash, tree.key);
 				}
 
-				tree!.onFinishedLoading.then(() => {
-					isFullyLoaded = true;
-					messenger.forActiveMessengersUnless(sender, (connection) => {
-						messenger.sendClientMessage(connection, async () => {
-							return {
-								channel: 'archive_update',
-								type: 'root_loaded',
-								root: {root: tree!.key} as RootNodeTarget
-							}
-						})
-					})
-				})
+				tree.onFinishedLoading.then(() => broadcastArchiveUpdate(messenger, { type: 'root_loaded', root: { root: key } }))
 
 				zipByUUID.set(tree.key, tree);
 
@@ -222,14 +236,15 @@ export const messageHandler: ServerMessageHandler<ZipMessages> = (messenger, msg
 				}
 			}
 
-			return { node: copyRoot(tree), isFullyLoaded: isFullyLoaded };
+			return { node: copyRoot(tree), isFullyLoaded: (tree as Partial<{ isFullyLoaded: boolean }>).isFullyLoaded ?? true };
 		},
 		get_zip_tree: async (msg) => {
 			const node = getZipNode(msg.value);
 			const copiedTree = node ? copyRoot(node) : undefined;
 
 			return {
-				node: copiedTree
+				node: copiedTree,
+				isFullyLoaded: (node as Partial<{ isFullyLoaded: boolean }> | undefined)?.isFullyLoaded ?? true
 			};
 		},
 		collect_files: async (msg) => {
@@ -343,11 +358,14 @@ export const messageHandler: ServerMessageHandler<ZipMessages> = (messenger, msg
 			return { files: files };
 		},
 		close_zip_tree: async (msg) => {
+			closeRoot(zipByUUID.get(msg.root));
 			zipByUUID.delete(msg.root);
 
 			const urls = UUIDToUrls.get(msg.root);
 			if (urls) for (const url of urls) urlToUUID.delete(url);
 			UUIDToUrls.delete(msg.root);
+
+			for (const [hash, key] of hashToUUID) if (key === msg.root) hashToUUID.delete(hash);
 
 			return {
 				err: undefined,
@@ -355,9 +373,11 @@ export const messageHandler: ServerMessageHandler<ZipMessages> = (messenger, msg
 			}
 		},
 		close_all_zip_trees: async () => {
+			for (const root of zipByUUID.values()) closeRoot(root);
 			zipByUUID.clear();
 			urlToUUID.clear();
 			UUIDToUrls.clear();
+			hashToUUID.clear();
 
 			return {
 				err: undefined,
@@ -368,7 +388,15 @@ export const messageHandler: ServerMessageHandler<ZipMessages> = (messenger, msg
 };
 
 export function copyRoot(node: RootZipTreeNode): RootZipTreeNode {
-	const cloneNode = { children: new Map(), key: node.key } as RootZipTreeNode;
+	const cloneNode = {
+		children: new Map(),
+		key: node.key,
+		name: node.name,
+		path: node.path,
+		type: node.type,
+		metadata: { directory: true },
+		sha512Hash: node.sha512Hash,
+	} as unknown as RootZipTreeNode;
 
 	return copyNodeData(cloneNode, node);
 }

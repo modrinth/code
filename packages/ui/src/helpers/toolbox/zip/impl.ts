@@ -34,18 +34,31 @@ import {
  * Method used to generate the zip tree of the given blob returning the root node of the entire zip file
  */
 export async function readZipTreeFromBuffer(logger: Logger, buffer: ArrayBuffer, options: ReadExtraOptions = {}): Promise<RootZipTreeNodeImpl> {
-	const onFinishedLoadingHolder = Promise.withResolvers<void>();
-    const root = new RootZipTreeNodeImpl(logger, uuidV7(), onFinishedLoadingHolder);
-    const result = await readZipDataToNode(root, root, zipReaderFromBuffer(buffer), options);
-	if (options.innerArchiveReadCallback == null) onFinishedLoadingHolder.resolve()
+	const root = new RootZipTreeNodeImpl(logger, options.key ?? uuidV7(), Promise.withResolvers<void>());
+	const result = await readZipDataToNode(root, root, zipReaderFromBuffer(buffer), options);
+	root.markEntriesRead();
 	return result;
 }
 
 export async function readZipTreeFromURL(logger: Logger, url: string, options: ReadExtraOptions & {rangeOptions?: RangeCacheReaderOptions} = {}): Promise<RootZipTreeNodeImpl> {
-	const onFinishedLoadingHolder = Promise.withResolvers<void>();
-	const root = new RootZipTreeNodeImpl(logger, uuidV7(), onFinishedLoadingHolder);
-	const result = await readZipDataToNode(root, root, zipReaderFromURL(url, options.rangeOptions), options);
-	if (options.innerArchiveReadCallback == null) onFinishedLoadingHolder.resolve()
+	const root = new RootZipTreeNodeImpl(logger, options.key ?? uuidV7(), Promise.withResolvers<void>());
+	const rangeReader = new RangeCacheReader(url, options.rangeOptions);
+	root.closeCallbacks.push(() => rangeReader.abort());
+
+	const result = await readZipDataToNode(root, root, new ZipReader(rangeReader), options);
+	root.markEntriesRead();
+
+	// Files are fetched on demand ahead of this, but caching the rest makes later reads instant
+	rangeReader.toBlob()
+		.then(async (blob) => {
+			if (root.isClosed) return;
+			root.sha512Hash = await hashBuffer(await blob.arrayBuffer(), "SHA-512");
+			if (!root.isClosed) options.archiveHashedCallback?.(root, root.sha512Hash);
+		})
+		.catch((err) => {
+			if (!root.isClosed) logger.warn(`Unable to fetch the rest of '${url}' in the background`, { err: err });
+		});
+
 	return result;
 }
 
@@ -66,14 +79,22 @@ export async function writeZipTree(node: ZipTreeNodeImpl): Promise<ArrayBuffer|u
 
 export const zipArchiveExtensionRegex = /\.(ear|war|jar|zip|mrpack)$/;
 
-export type ReadExtraOptions = { name?: string, logger?: Logger, innerArchiveReadCallback?: (root: RootZipTreeNode, node: FileZipTreeNode) => void };
+export type ReadExtraOptions = {
+	name?: string,
+	logger?: Logger,
+	/** Key for the root, for callers that need to refer to it before the read finishes. */
+	key?: UUID_V7,
+	/**
+	 * Called once a nested archive's tree has been read. When given, nested archives are read in
+	 * the background instead of being waited on, with `onFinishedLoading` resolving once all are.
+	 */
+	innerArchiveReadCallback?: (root: RootZipTreeNode, node: FileZipTreeNode) => void
+	/** Called with the SHA-512 of an archive read from a URL, once all of it has been downloaded. */
+	archiveHashedCallback?: (root: RootZipTreeNode, sha512Hash: string) => void
+};
 
 function zipReaderFromBuffer(buffer: ArrayBuffer): ZipReader<Uint8Array<ArrayBuffer>> {
 	return new ZipReader(new Uint8ArrayReader(new Uint8Array(buffer)));
-}
-
-function zipReaderFromURL(url: string, options: RangeCacheReaderOptions = {}): ZipReader<string> {
-	return new ZipReader(new RangeCacheReader(url, options));
 }
 
 /**
@@ -109,37 +130,36 @@ async function readZipDataToNode<N extends ZipNode>(rootNode: RootZipTreeNodeImp
                 }
             }
 
-            if (segmentNode.type === 'directory') {
-                // Set next parent node to add the given next segment node
-                parentNode = segmentNode;
-            } else if(!segmentNode.metadata.encrypted) {
-                // FYI: This technically will not work when using onprogress as technically the
-                // given arraybuffer method is not ready yet meaning this is here just for
-                // legacy or needing to go back to waiting for all entries is better.
-				const fileEntry = fileOrNull(segmentNode) ?? undefined;
-				const fileNode = segmentNode.asFile();
-
-				if (fileNode == null || fileEntry == null) continue;
-
-				const bufferSetPromise = handleFileNode(fileEntry, fileNode);
-
-				if (bufferSetPromise != null) zipFiles.push(bufferSetPromise)
-            }
+            // Entry data isn't readable until all entries are, so buffers are set up afterwards
+            if (segmentNode.type === 'directory') parentNode = segmentNode;
         }
     }
 
+	/**
+	 * Files are read lazily, which with a ranged reader only fetches their bytes once asked for.
+	 * Nested archives are read right away to build their trees.
+	 */
 	function handleFileNode(fileEntry: FileEntry, fileNode: FileZipTreeNode): Promise<FileZipTreeNode> | undefined {
-		const isZipArchive = zipArchiveExtensionRegex.test(fileNode.name);
+		if (fileEntry.encrypted || !zipArchiveExtensionRegex.test(fileNode.name)) {
+			fileNode.setBuffer(() => fileEntry.arrayBuffer());
+			return undefined;
+		}
 
-		const bufferSetPromise = fileEntry.arrayBuffer()
+		const archivePromise = fileEntry.arrayBuffer()
 			.then(async (buffer) => {
 				await fileNode.setBuffer(buffer);
-				if (isZipArchive) await readZipDataToNode(rootNode, fileNode, zipReaderFromBuffer(buffer), options);
-				if (innerArchiveReadCallback) innerArchiveReadCallback(rootNode, fileNode);
+				await readZipDataToNode(rootNode, fileNode, zipReaderFromBuffer(buffer), options);
+				innerArchiveReadCallback?.(rootNode, fileNode);
 				return fileNode;
 			})
+			.catch((err) => {
+				logger?.warn(`Unable to read inner archive '${fileNode.path}'`, { err: err });
+				return fileNode;
+			});
 
-		return isZipArchive ? bufferSetPromise : undefined;
+		rootNode.trackInnerArchive(archivePromise);
+
+		return archivePromise;
 	}
 
     logger?.debug(`Reading entries ${name} archive.`)
@@ -185,14 +205,46 @@ class ZipTreeNodeImpl extends ZipTreeNode {
  * combined with extra info like maps for all entries and all file entries within the archive
  */
 class RootZipTreeNodeImpl extends RootZipTreeNode {
-	loadingInnerZipCount: number = -1;
+	loadingInnerZipCount: number = 0;
 	onFinishedLoadingHolder: PromiseWithResolvers<void>
+	isFullyLoaded = false;
+	isClosed = false;
+	/** Stops work still running for this archive (e.g. background downloads) once it is closed. */
+	closeCallbacks: (() => void)[] = [];
+	private entriesRead = false;
 
     constructor(logger: Logger, key: UUID_V7, onFinishedLoadingHolder: PromiseWithResolvers<void>) {
         super(key, onFinishedLoadingHolder.promise);
         this.logger = logger;
 		this.onFinishedLoadingHolder = onFinishedLoadingHolder;
     }
+
+	/** Counts a nested archive (at any depth) as loading until the given read settles. */
+	trackInnerArchive(read: Promise<unknown>) {
+		this.loadingInnerZipCount += 1;
+		read.finally(() => {
+			this.loadingInnerZipCount -= 1;
+			this.resolveIfLoaded();
+		});
+	}
+
+	close() {
+		if (this.isClosed) return;
+		this.isClosed = true;
+		for (const callback of this.closeCallbacks) callback();
+	}
+
+	/** Marks the top level entries as read, after which the root finishes once no nested archive is loading. */
+	markEntriesRead() {
+		this.entriesRead = true;
+		this.resolveIfLoaded();
+	}
+
+	private resolveIfLoaded() {
+		if (this.isFullyLoaded || !this.entriesRead || this.loadingInnerZipCount > 0) return;
+		this.isFullyLoaded = true;
+		this.onFinishedLoadingHolder.resolve();
+	}
 
     protected override createFileNode(root: RootZipTreeNode, parent: ZipNode, name: string, path: string, buffer: ArrayBufferSource | undefined, metadata: FileEntry): FileZipTreeNode {
         return new FileZipTreeNodeImpl(root as RootZipTreeNodeImpl, parent as ZipNode, name, path, buffer, "file", metadata);

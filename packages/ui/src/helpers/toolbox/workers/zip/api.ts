@@ -42,7 +42,7 @@ export type ZipMessages = MessageTypes<
 		},
 		get_zip_tree: {
 			serverbound: { value: string | UUID_V7 },
-			clientbound: { node: RootZipTreeNode | undefined }
+			clientbound: { node: RootZipTreeNode | undefined, isFullyLoaded?: boolean }
 		},
 		collect_files: {
 			serverbound: RootNodeTarget & { matcher?: FileMatcher },
@@ -67,10 +67,56 @@ export type ZipMessages = MessageTypes<
 	}
 >
 
+/**
+ * Adds a node read in the background (e.g. a nested archive's tree) to the client's copy of the
+ * tree. A node the client already has (e.g. the nested archive's file) gets the loaded children.
+ */
+function mergeLoadedNode(handler: ZipHandler, root: RootZipTreeNode, loaded: ZipNode) {
+	const existing = root.entries.get(loaded.path);
+	if (existing != null) {
+		for (const child of loaded.children.values()) {
+			existing.children.set(child.name, reconstituteNodes<ZipNode>(handler, root, existing, child));
+		}
+		return;
+	}
+
+	const parentPath = loaded.path.split("/").slice(0, -1).join("/");
+	const parent = parentPath === "" ? root : root.entries.get(parentPath);
+	if (parent == null) return;
+
+	parent.children.set(loaded.name, reconstituteNodes<ZipNode>(handler, root, parent, loaded));
+}
+
 export const handlerConstructor: MessengerHandlerConstructor<ZipMessages, ZipHandler> = (messenger) => {
     const uuidToUrls = new Map<string, string[]>();
 	const hashToUUID = new Map<Sha512, UUID_V7>();
 	const uuidToOnFinishedLoadingHolder = new Map<UUID_V7, PromiseWithResolvers<void>>();
+	/** Roots whose loading finished, which may be reported before the tree itself is returned. */
+	const finishedRoots = new Set<UUID_V7>();
+	/** Hashes of roots, which may also be reported before the tree itself is returned. */
+	const rootHashes = new Map<UUID_V7, Sha512>();
+
+	function forgetRoot(key: UUID_V7) {
+		finishedRoots.delete(key);
+		uuidToOnFinishedLoadingHolder.delete(key);
+		rootHashes.delete(key);
+		for (const [hash, uuid] of hashToUUID) if (uuid === key) hashToUUID.delete(hash);
+	}
+
+	function trackLoading(node: RootZipTreeNode, isFullyLoaded: boolean | undefined) {
+		node.sha512Hash ??= rootHashes.get(node.key);
+		if (node.sha512Hash != null) hashToUUID.set(node.sha512Hash, node.key);
+
+		if (isFullyLoaded || finishedRoots.has(node.key)) {
+			node.onFinishedLoading = Promise.resolve();
+			return;
+		}
+
+		const holder = uuidToOnFinishedLoadingHolder.get(node.key) ?? Promise.withResolvers<void>();
+		uuidToOnFinishedLoadingHolder.set(node.key, holder);
+		node.onFinishedLoading = holder.promise;
+	}
+
     return {
         zipByUUID: new Map(),
         urlToUUID: new Map(),
@@ -105,9 +151,7 @@ export const handlerConstructor: MessengerHandlerConstructor<ZipMessages, ZipHan
 			}));
             const node = reconstituteRoot(messenger.handler, msg.node);
 
-			const holder = Promise.withResolvers<void>();
-
-			node.onFinishedLoading = msg.isFullyLoaded ? Promise.resolve() : holder.promise;
+			trackLoading(node, msg.isFullyLoaded);
 
 			const filteredURL = url?.split("?")[0];
 
@@ -120,7 +164,7 @@ export const handlerConstructor: MessengerHandlerConstructor<ZipMessages, ZipHan
                 urls.push(filteredURL);
             }
 
-			if (sha512Hash != null) {
+			if (sha512Hash != null && node.sha512Hash == null) {
 				hashToUUID.set(sha512Hash, node.key)
 			}
 
@@ -144,6 +188,8 @@ export const handlerConstructor: MessengerHandlerConstructor<ZipMessages, ZipHan
             const urls = uuidToUrls.get(hash);
             if (urls) for (const url of urls) this.urlToUUID.delete(url);
             uuidToUrls.delete(hash);
+            this.zipByUUID.delete(hash);
+            forgetRoot(hash);
 
             return value;
         },
@@ -153,6 +199,10 @@ export const handlerConstructor: MessengerHandlerConstructor<ZipMessages, ZipHan
             this.zipByUUID.clear();
             this.urlToUUID.clear();
             uuidToUrls.clear();
+            finishedRoots.clear();
+            uuidToOnFinishedLoadingHolder.clear();
+            rootHashes.clear();
+            hashToUUID.clear();
 
             return value;
         },
@@ -164,7 +214,7 @@ export const handlerConstructor: MessengerHandlerConstructor<ZipMessages, ZipHan
             if (isUrl) {
                 const filteredURL = value.split("?")[0];
                 if (this.urlToUUID.has(filteredURL)) {
-                    const hash = this.urlToUUID.get(value)!;
+                    const hash = this.urlToUUID.get(filteredURL)!;
                     const node = this.zipByUUID.get(hash);
 
                     if (node) return node;
@@ -173,11 +223,14 @@ export const handlerConstructor: MessengerHandlerConstructor<ZipMessages, ZipHan
 
             if (localOnly) return undefined;
 
-            const rawNode = (await messenger.sendMessage({ channel: "get_zip_tree", value: value })).node;
+            const response = await messenger.sendMessage({ channel: "get_zip_tree", value: value });
+            const rawNode = response.node;
 
             if (rawNode == undefined) return undefined;
 
             const node = reconstituteRoot(messenger.handler, rawNode);
+
+			trackLoading(node, response.isFullyLoaded);
 
             if (isUrl) {
                 const filteredURL = value.split("?")[0];
@@ -208,21 +261,19 @@ export const handlerConstructor: MessengerHandlerConstructor<ZipMessages, ZipHan
 			} else if (msg.type == 'node_loaded'){
 				const root = messenger.handler.zipByUUID.get(msg.root.root);
 
-				if (root != null) {
-					const parentPath = msg.node.path.split("/").slice(0, -1).join("/");
-					const parent = root.entries.get(parentPath)
-
-					if (parent != null) {
-						reconstituteNodes(this, root, parent, msg.node)
-					}
-				}
+				if (root != null) mergeLoadedNode(this, root, msg.node);
 			} else if (msg.type == 'root_loaded') {
-				const root = messenger.handler.zipByUUID.get(msg.root.root);
+				finishedRoots.add(msg.root.root);
+				uuidToOnFinishedLoadingHolder.get(msg.root.root)?.resolve()
+				uuidToOnFinishedLoadingHolder.delete(msg.root.root);
+			} else if (msg.type == 'root_hashed') {
+				const key = msg.root.root;
+				rootHashes.set(key, msg.sha512Hash);
+				hashToUUID.set(msg.sha512Hash, key);
+				if (msg.expectedHash != null && hashToUUID.get(msg.expectedHash) === key) hashToUUID.delete(msg.expectedHash);
 
-				if (root != null) {
-					uuidToOnFinishedLoadingHolder.get(root.key)?.resolve()
-					uuidToOnFinishedLoadingHolder.delete(root.key);
-				}
+				const root = messenger.handler.zipByUUID.get(key);
+				if (root != null) root.sha512Hash = msg.sha512Hash;
 			}
 
 			this.onArchiveUpdate.stream.sink(msg);
