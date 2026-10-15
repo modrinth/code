@@ -1,12 +1,11 @@
 import { ImageIcon } from '@modrinth/assets'
 
-import { issue, panel, toggle } from './component-builders/builders'
-import { rulesAiImagesIssue } from './rules'
-import { issueTargets } from './component-builders/targets'
-
 import flashingIconMessage from '../messages/checklist/messages/icon/flashing.md'
 import inappropriateIconMessage from '../messages/checklist/messages/icon/inappropriate.md'
 import iconSimilaritiesMessage from '../messages/checklist/messages/icon/similarities.md'
+import { issue, panel, toggle } from './component-builders/builders'
+import { issueTargets } from './component-builders/targets'
+import { rulesAiImagesIssue } from './rules'
 
 export const flashingIconIssue = issue({
 	id: 'flashing-icon-issue',
