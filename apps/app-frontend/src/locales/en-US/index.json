@@ -479,6 +479,15 @@
   "app.features-settings.sync-across-devices.title": {
     "message": "Sync features across devices"
   },
+  "app.file-download.canceling": {
+    "message": "Canceling download…"
+  },
+  "app.file-download.preparing": {
+    "message": "Preparing download…"
+  },
+  "app.file-download.waiting": {
+    "message": "Waiting for the server…"
+  },
   "app.home.jump-back-in.actions.label": {
     "message": "Instance actions"
   },
