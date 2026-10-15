@@ -1,15 +1,15 @@
 use std::{
-    io::{PipeReader, PipeWriter},
-    process::Stdio,
+    io::{PipeReader, PipeWriter}, path::Path, process::Stdio,
 };
 
 use async_trait::async_trait;
 use eyre::{Context, Result, eyre};
 
 use crate::{
-    SandboxCommand, SandboxExitStatus, SandboxStdio,
-    backend::{Backend, SandboxChildOp, SandboxEnv},
+    SandboxCommand, SandboxExitStatus, SandboxStdio, backend::{Backend, ExposedPath, SandboxChildOp, SandboxEnv, SandboxHandleOp},
 };
+
+use super::SandboxHandle;
 
 #[derive(Debug)]
 pub struct NoSandbox;
@@ -61,13 +61,20 @@ async fn spawn(mut command: SandboxCommand) -> Result<crate::SandboxChild> {
     // Command retains the child-side pipe handles after spawning.
     drop(builder);
 
-    Ok(crate::SandboxChild {
+    let mut child = crate::SandboxChild {
         stdin: stdin_writer,
         stdout: stdout_reader,
         stderr: stderr_reader,
         on_finish: command.on_finish,
+        handle: SandboxHandle::Noop(NoopSandboxHandle),
         imp: StdChild { child }.into(),
-    })
+    };
+
+    for on_start in command.on_start {
+        (on_start)(&mut child);
+    }
+
+    Ok(child)
 }
 
 fn input_stdio(mode: SandboxStdio) -> Result<(Stdio, Option<PipeWriter>)> {
@@ -150,6 +157,23 @@ fn sandbox_exit_status(status: std::process::ExitStatus) -> SandboxExitStatus {
                     as u32,
             ),
         }
+    }
+}
+
+#[derive(Clone, Debug)]
+pub struct NoopSandboxHandle;
+
+impl SandboxHandleOp for NoopSandboxHandle {
+    fn expose_path(&self, _path: &Path, _allow_write: bool) -> eyre::Result<ExposedPath> {
+        Ok(ExposedPath::Direct)
+    }
+
+    fn is_path_readable(&self, _path: &Path) -> bool {
+        true
+    }
+
+    fn is_path_writeable(&self, _path: &Path) -> bool {
+        true
     }
 }
 

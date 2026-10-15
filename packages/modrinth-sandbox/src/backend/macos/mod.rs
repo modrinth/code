@@ -1,7 +1,5 @@
 use std::{
-    ffi::{CString, OsString},
-    os::unix::ffi::OsStringExt,
-    path::{Path, PathBuf},
+    ffi::{CString, OsString}, os::unix::ffi::OsStringExt, path::{Path, PathBuf}, sync::Arc,
 };
 
 use async_trait::async_trait;
@@ -9,13 +7,12 @@ use derive_more::Debug;
 use eyre::{Context, OptionExt, Result};
 
 use crate::{
-    SandboxCommand, SandboxExitStatus,
-    backend::{
-        Backend, SandboxChild, SandboxChildOp, SandboxEnv,
-        unix::{self, UnixChild},
-    },
-    util::{RawStringVec, resolve_path},
+    ExposedPath, SandboxCommand, SandboxExitStatus, backend::{
+        Backend, SandboxChild, SandboxChildOp, SandboxEnv, SandboxHandleOp, pathset::ReadWritePathSet, unix::{self, UnixChild},
+    }, util::{RawStringVec, resolve_path},
 };
+
+use super::SandboxHandle;
 
 #[derive(Debug)]
 pub struct Macos;
@@ -103,11 +100,14 @@ fn spawn(
         sandbox_profile.push("\"))\n");
     }
 
+    let mut path_set = ReadWritePathSet::new(false);
     for path in command.read_only_paths {
         allow_read(&mut sandbox_profile, &path);
+        path_set.add_read_only(path);
     }
     for path in command.read_write_paths {
         allow_read_write(&mut sandbox_profile, &path);
+        path_set.add_read_write(path);
     }
 
     sandbox_profile.push(PROTECT);
@@ -134,16 +134,25 @@ fn spawn(
     )
     .wrap_err("spawning child")?;
 
-    Ok(crate::SandboxChild {
+    let mut child = crate::SandboxChild {
         stdin: pipes.stdin,
         stdout: pipes.stdout,
         stderr: pipes.stderr,
         on_finish: command.on_finish,
+        handle: SandboxHandle::Macos(MacosSandboxHandle {
+            path_set: Arc::new(path_set)
+        }),
         imp: SandboxChild::Macos(MacosChild {
             child,
             _temp_dir: temp_dir,
         }),
-    })
+    };
+
+    for on_start in command.on_start {
+        (on_start)(&mut child);
+    }
+
+    Ok(child)
 }
 
 #[derive(Debug)]
@@ -168,6 +177,25 @@ impl SandboxChildOp for MacosChild {
 
     async fn kill(&mut self) -> Result<()> {
         self.child.kill().await
+    }
+}
+
+#[derive(Clone, Debug)]
+pub struct MacosSandboxHandle {
+    path_set: Arc<ReadWritePathSet>,
+}
+
+impl SandboxHandleOp for MacosSandboxHandle {
+    fn expose_path(&self, _path: &Path, _allow_write: bool) -> eyre::Result<ExposedPath> {
+        Err(eyre::eyre!("unsupported"))
+    }
+
+    fn is_path_readable(&self, path: &Path) -> bool {
+        self.path_set.can_read(path.to_path_buf())
+    }
+
+    fn is_path_writeable(&self, path: &Path) -> bool {
+        self.path_set.can_write(path.to_path_buf())
     }
 }
 

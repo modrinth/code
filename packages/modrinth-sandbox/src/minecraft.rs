@@ -6,7 +6,7 @@ use eyre::{Context, Result, ensure};
 use rand::RngCore;
 use sha1::{Digest, Sha1};
 
-use crate::{SandboxCommand, SandboxStdio, sandboxapi::service::SandboxApiChild, util::SandboxArg};
+use crate::{SandboxChild, SandboxCommand, SandboxHandle, SandboxStdio, sandboxapi::service::SandboxApiChild, util::SandboxArg};
 
 #[derive(Debug)]
 pub struct MinecraftCommand {
@@ -327,8 +327,17 @@ pub fn create_command(minecraft: MinecraftCommand) -> Result<SandboxCommand> {
     read_write_paths.sort_unstable();
     read_write_paths.dedup();
 
+    let mut on_start: Vec<Box<dyn FnOnce(&mut SandboxChild) + Send + Sync>> = Vec::new();
     let mut on_finish: Vec<Box<dyn FnOnce() + Send + Sync>> = Vec::new();
     if let Some(sandbox_api_child) = minecraft.sandbox_api_child {
+        // Register handle
+        on_start.push(Box::new({
+            let sandbox_api_child = sandbox_api_child.clone();
+            move |child| {
+                sandbox_api_child.set_sandbox_handle(child.get_sandbox_handle());
+            }
+        }));
+
         // Keep sandbox api child alive until process dies
         on_finish.push(Box::new(move || {
             std::mem::drop(sandbox_api_child);
@@ -357,6 +366,7 @@ pub fn create_command(minecraft: MinecraftCommand) -> Result<SandboxCommand> {
         app_container_description:
             "Sandbox for Minecraft instances created by `modrinth-sandbox`"
                 .into(),
+        on_start,
         on_finish,
     })
 }

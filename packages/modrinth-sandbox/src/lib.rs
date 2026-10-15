@@ -8,10 +8,7 @@ pub mod minecraft;
 mod util;
 
 use std::{
-    collections::{BTreeMap, BTreeSet},
-    io::{PipeReader, PipeWriter},
-    path::PathBuf,
-    sync::Arc,
+    collections::{BTreeMap, BTreeSet}, io::{PipeReader, PipeWriter}, path::{Path, PathBuf}, sync::Arc,
 };
 
 use derive_more::Debug;
@@ -20,7 +17,7 @@ use eyre::Result;
 pub use backend::SandboxExitStatus;
 pub use util::SandboxArg;
 
-use crate::{backend::SandboxChildOp, helper::MakeHelper};
+use crate::{backend::{SandboxChildOp, SandboxHandleOp}, helper::MakeHelper};
 
 /// Allows spawning processes in a sandboxed environment, configured by
 /// [`SandboxCommand`].
@@ -177,6 +174,8 @@ pub struct SandboxCommand {
     ///
     /// [AppContainer]: https://learn.microsoft.com/en-us/windows/win32/secauthz/appcontainer-isolation
     pub app_container_description: SandboxArg,
+    /// Vec of callbacks to be run when the process starts
+    pub on_start: Vec<Box<dyn FnOnce(&mut SandboxChild) + Send + Sync>>,
     /// Vec of callbacks to be run when the process terminates or is dropped
     pub on_finish: Vec<Box<dyn FnOnce() + Send + Sync>>,
 }
@@ -218,6 +217,7 @@ pub struct SandboxChild {
     /// Analogous to [`std::process::Child::stderr`].
     pub stderr: Option<PipeReader>,
     on_finish: Vec<Box<dyn FnOnce() + Send + Sync>>,
+    handle: backend::SandboxHandle,
     imp: backend::SandboxChild,
 }
 
@@ -271,9 +271,37 @@ impl SandboxChild {
         res
     }
 
+    pub fn get_sandbox_handle(&self) -> SandboxHandle {
+        SandboxHandle { imp: self.handle.clone() }
+    }
+
     fn finish(&mut self) {
         for on_finish in self.on_finish.drain(..) {
             (on_finish)();
         }
+    }
+}
+
+pub enum ExposedPath {
+    Direct,
+    Proxied(PathBuf),
+}
+
+#[derive(Clone, Debug)]
+pub struct SandboxHandle {
+    imp: backend::SandboxHandle,
+}
+
+impl SandboxHandle {
+    pub fn expose_path(&self, path: &Path, writeable: bool) -> eyre::Result<ExposedPath> {
+        self.imp.expose_path(path, writeable)
+    }
+
+    pub fn is_path_readable(&self, path: &Path) -> bool {
+        self.imp.is_path_readable(path)
+    }
+
+    pub fn is_path_writeable(&self, path: &Path) -> bool {
+        self.imp.is_path_writeable(path)
     }
 }

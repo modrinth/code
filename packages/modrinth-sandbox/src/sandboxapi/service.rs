@@ -9,6 +9,8 @@ use tokio::{io::{AsyncReadExt, AsyncWriteExt}, net::TcpStream};
 use url::Url;
 use uuid::Uuid;
 
+use crate::SandboxHandle;
+
 const DEFAULT_SESSION_JOIN: &'static str = "https://sessionserver.mojang.com/session/minecraft/join";
 
 #[derive(Default)]
@@ -27,7 +29,10 @@ pub trait SandboxApiLauncher: Send + Sync {
 /// Contains info required for the game to communicate with the sandbox api
 /// Dropping this handle will result in the child being unregistered
 /// Dropping all handles will result in the localhost server being stopped until the next call to start
-pub struct SandboxApiChild {
+#[derive(Clone)]
+pub struct SandboxApiChild(Arc<SandboxApiChildInner>);
+
+pub struct SandboxApiChildInner {
     dummy_access_token: Arc<str>,
     secret: Arc<str>,
     port: u16,
@@ -44,23 +49,29 @@ impl std::fmt::Debug for SandboxApiChild {
 
 impl SandboxApiChild {
     pub fn get_dummy_access_token(&self) -> Arc<str> {
-        self.dummy_access_token.clone()
+        self.0.dummy_access_token.clone()
     }
 
     pub fn get_secret(&self) -> Arc<str> {
-        self.secret.clone()
+        self.0.secret.clone()
     }
 
     pub fn get_port(&self) -> u16 {
-        self.port
+        self.0.port
+    }
+
+    pub fn set_sandbox_handle(&self, sandbox_handle: crate::SandboxHandle) {
+        if let Some(child) = self.0.inner.lock().children_by_secret.get_mut(&self.0.secret) {
+            child.handle = Some(sandbox_handle);
+        }
     }
 }
 
-impl Drop for SandboxApiChild {
+impl Drop for SandboxApiChildInner {
     fn drop(&mut self) {
         {
             let mut inner = self.inner.lock();
-            inner.secrets.remove(&self.secret);
+            inner.children_by_secret.remove(&self.secret);
             inner.dummy_access_tokens.remove(&self.dummy_access_token);
         }
 
@@ -79,11 +90,16 @@ pub struct SandboxApiService {
     inner: Arc<Mutex<SandboxApiServiceInner>>,
 }
 
+#[derive(Default, Clone, Debug)]
+struct ServiceChildState {
+    handle: Option<SandboxHandle>,
+}
+
 #[derive(Default)]
 struct SandboxApiServiceInner {
     reuse_buffer: Option<Vec<u8>>,
     discovered_endpoints: DiscoveredEndpoints,
-    secrets: HashSet<Arc<str>>,
+    children_by_secret: HashMap<Arc<str>, ServiceChildState>,
     dummy_access_tokens: HashMap<Arc<str>, Uuid>,
     running_server: bool,
 }
@@ -123,18 +139,18 @@ impl SandboxApiService {
 
         {
             let mut inner = self.inner.lock();
-            inner.secrets.insert(secret.clone());
+            inner.children_by_secret.insert(secret.clone(), Default::default());
             inner.dummy_access_tokens.insert(dummy_access_token.clone(), account_uuid);
         }
 
-        SandboxApiChild {
+        SandboxApiChild(Arc::new(SandboxApiChildInner {
             dummy_access_token: dummy_access_token.clone(),
             secret: secret.clone(),
             port: self.port,
             notify: self.notify.clone(),
             child_count: self.child_count.clone(),
             inner: self.inner.clone(),
-        }
+        }))
     }
 
     async fn run_localhost_server(self: Self) {
@@ -256,10 +272,17 @@ impl SandboxApiService {
         // We check for this authorization header in order to prevent other applications
         // on the system from interacting with our API. This isn't strictly necessary, but
         // is good practice
-        if path.starts_with("/sandboxapi/") && let Some(error_status) = self.clone().check_authorization_secret(&request) {
-            error_status.write(stream).await;
-            return;
-        }
+        let child_state = if path.starts_with("/sandboxapi/") {
+            match self.clone().check_authorization_secret(&request) {
+                Ok(child_state) => Some(child_state),
+                Err(error_status) => {
+                    error_status.write(stream).await;
+                    return;
+                },
+            }
+        } else {
+            None
+        };
 
         if let Some(realms_path) = path.strip_prefix("/sandboxrealms/") {
             if let Ok(url) = Url::parse(&format!("https://pc.realms.minecraft.net/{realms_path}")) {
@@ -282,7 +305,7 @@ impl SandboxApiService {
                     RequestStatus::MethodNotAllowed.write(stream).await;
                     return;
                 }
-                let status = self.handle_request_request_access(params).await;
+                let status = self.handle_request_request_access(params, child_state).await;
                 status.write(stream).await;
             },
             "/sandboxauth/session/session/minecraft/join" => {
@@ -535,23 +558,23 @@ impl SandboxApiService {
         Ok(headers)
     }
 
-    fn check_authorization_secret(self: Self, request: &httparse::Request<'_, '_>) -> Option<RequestStatus> {
+    fn check_authorization_secret(self: Self, request: &httparse::Request<'_, '_>) -> Result<ServiceChildState, RequestStatus> {
         for header in request.headers.iter() {
             if header.name == "Authorization" {
                 let Some(token) = header.value.trim_ascii_start().strip_prefix(b"Bearer") else {
-                    return Some(RequestStatus::Forbidden);
+                    return Err(RequestStatus::Forbidden);
                 };
                 let Ok(token) = str::from_utf8(token) else {
-                    return Some(RequestStatus::BadRequest);
+                    return Err(RequestStatus::BadRequest);
                 };
-                if self.inner.lock().secrets.contains(token.trim_ascii_start()) {
-                    return None;
+                if let Some(child) = self.inner.lock().children_by_secret.get(token.trim_ascii_start()) {
+                    return Ok(child.clone());
                 } else {
-                    return Some(RequestStatus::Forbidden);
+                    return Err(RequestStatus::Forbidden);
                 }
             }
         }
-        Some(RequestStatus::Unauthorized)
+        Err(RequestStatus::Unauthorized)
     }
 
     async fn handle_request_open_uri(self: Self, params: &str) -> RequestStatus {
@@ -596,7 +619,7 @@ impl SandboxApiService {
         }
     }
 
-    async fn handle_request_request_access(self: Self, params: &str) -> RequestStatus {
+    async fn handle_request_request_access(self: Self, params: &str, child_state: Option<ServiceChildState>) -> RequestStatus {
         let mut path = None;
         for (key, value) in params.split("&").filter_map(|arg| arg.split_once('=')) {
             if key == "path" {
@@ -615,8 +638,10 @@ impl SandboxApiService {
 
         let path = Path::new(&*decoded);
 
+        dbg!(child_state);
+        RequestStatus::OK
         // todo(sandbox)
-        todo!();
+        // todo!();
     }
 
     #[cfg(target_os = "windows")]

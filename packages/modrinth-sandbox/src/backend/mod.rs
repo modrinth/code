@@ -1,16 +1,14 @@
 //! Backend sandbox implementations, using OS-specific primitives.
 
 use std::{
-    collections::{BTreeMap, HashSet},
-    ffi::OsString,
-    fmt::Debug,
+    collections::{BTreeMap, HashSet}, ffi::OsString, fmt::Debug, path::{Path, PathBuf},
 };
 
 use async_trait::async_trait;
 use enum_dispatch::enum_dispatch;
 use eyre::Result;
 
-use crate::{SandboxCommand, helper::MakeHelper, util::SandboxArg};
+use crate::{ExposedPath, SandboxCommand, helper::MakeHelper, util::SandboxArg};
 
 #[cfg(target_os = "linux")]
 mod bubblewrap;
@@ -21,6 +19,7 @@ mod linux;
 #[cfg(target_os = "macos")]
 mod macos;
 pub mod noop;
+pub mod pathset;
 #[cfg(unix)]
 mod unix;
 #[cfg(windows)]
@@ -185,6 +184,27 @@ impl std::fmt::Display for SandboxExitStatus {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(&self.imp, f)
     }
+}
+
+#[enum_dispatch]
+pub trait SandboxHandleOp {
+    fn expose_path(&self, path: &Path, allow_write: bool) -> eyre::Result<ExposedPath>;
+    fn is_path_readable(&self, path: &Path) -> bool;
+    fn is_path_writeable(&self, path: &Path) -> bool;
+}
+
+#[derive(Clone, Debug)]
+#[enum_dispatch(SandboxHandleOp)]
+pub enum SandboxHandle {
+    Noop(noop::NoopSandboxHandle),
+    #[cfg(target_os = "linux")]
+    Flatpak(flatpak::FlatpakSandboxHandle),
+    #[cfg(target_os = "linux")]
+    Bubblewrap(bubblewrap::BubblewrapSandboxHandle),
+    #[cfg(target_os = "macos")]
+    Macos(macos::MacosSandboxHandle),
+    #[cfg(target_os = "windows")]
+    AppContainer(windows::WindowsSandboxHandle),
 }
 
 pub fn run_helper(args: impl IntoIterator<Item = OsString>) -> Result<bool> {

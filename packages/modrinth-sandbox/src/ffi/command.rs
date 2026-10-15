@@ -154,6 +154,7 @@ pub unsafe extern "C" fn modrinth_sandbox_prepare_command(
                     app_container_description,
                 )
                 .into(),
+                on_start: Vec::new(),
                 on_finish: Vec::new(),
             };
 

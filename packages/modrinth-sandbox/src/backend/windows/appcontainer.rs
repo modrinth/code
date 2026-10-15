@@ -398,12 +398,18 @@ fn spawn(
     )
     .wrap_err("spawning child")?;
 
-    Ok(crate::SandboxChild {
+    let mut child = crate::SandboxChild {
         stdin: pipes.stdin,
         stdout: pipes.stdout,
         stderr: pipes.stderr,
         imp: SandboxChild::AppContainer(child),
-    })
+    };
+
+    for on_start in command.on_start {
+        (on_start)(&mut child);
+    }
+
+    Ok(child)
 }
 
 struct OwnedCapability {

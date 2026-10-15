@@ -301,7 +301,7 @@ async fn spawn(
         }
     });
 
-    Ok(crate::SandboxChild {
+    let mut child = crate::SandboxChild {
         stdin,
         stdout,
         stderr,
@@ -311,7 +311,13 @@ async fn spawn(
             rx_exited: Some(rx_exited),
             exit_status: None,
         }),
-    })
+    };
+
+    for on_start in command.on_start {
+        (on_start)(&mut child);
+    }
+
+    Ok(child)
 }
 
 fn nul_terminate(mut value: Vec<u8>, description: &str) -> Result<Vec<u8>> {
