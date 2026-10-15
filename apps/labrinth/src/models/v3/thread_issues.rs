@@ -1,3 +1,8 @@
+#![allow(
+    clippy::large_stack_arrays,
+    reason = "utoipa generates a large array for the thread issue target schema"
+)]
+
 use crate::models::disclosures::ProjectDisclosure;
 use crate::models::exp::minecraft::Language;
 use crate::models::ids::{
@@ -69,10 +74,6 @@ pub struct ThreadIssueFacet {
 }
 
 /// What part of a project must change for a [`ThreadIssueFacet`] to be resolved?
-#[allow(
-    clippy::large_stack_arrays,
-    reason = "utoipa generates a large array for this enum's schema"
-)]
 #[derive(
     Debug, Clone, PartialEq, Eq, Serialize, Deserialize, utoipa::ToSchema,
 )]
