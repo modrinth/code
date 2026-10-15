@@ -95,7 +95,7 @@
 			</div>
 		</ButtonFrame>
 
-		<Teleport v-if="isClient" :to="dropdownDocument?.body ?? 'body'">
+		<Teleport v-if="isClient" :to="teleportTarget">
 			<Transition name="floating-expand" :css="animateDropdown">
 				<div
 					v-if="shouldRenderDropdown"
@@ -124,7 +124,7 @@
 							:style="{ maxHeight: `${maxHeight}px` }"
 							data-overlayscrollbars-viewport
 						>
-							<div ref="optionsListRef" class="flex flex-col">
+							<div ref="optionsListRef" class="relative flex flex-col">
 								<template v-for="(item, index) in filteredOptions" :key="item.key">
 									<div v-if="item.type === 'divider'" class="h-px bg-surface-5"></div>
 									<component
@@ -367,6 +367,11 @@ const triggerRef = ref<ButtonElementHandle>()
 const searchTriggerRef = ref<InstanceType<typeof Input>>()
 const dropdownRef = ref<HTMLElement>()
 const dropdownDocument = shallowRef<Document>()
+const teleportTarget = computed(() =>
+	dropdownDocument.value?.body ??
+	containerRef.value?.ownerDocument.body ??
+	(typeof document !== 'undefined' ? document.body : 'body'),
+)
 const optionsScrollbarRef = ref<HTMLElement>()
 const optionsContainerRef = ref<HTMLElement>()
 const optionsListRef = ref<HTMLElement>()
@@ -393,7 +398,7 @@ const effectiveTriggerEl = computed(() => {
 })
 const outsideClickIgnoreTargets = computed(() => [
 	effectiveTriggerEl,
-	containerRef,
+	dropdownRef,
 	...props.outsideClickIgnore,
 ])
 
@@ -501,7 +506,7 @@ function setOptionRef(el: HTMLElement | null, index: number) {
 
 function setInitialFocus() {
 	focusedIndex.value = props.listbox
-		? props.options.findIndex((opt) => isDropdownOption(opt) && opt.value === props.modelValue)
+		? filteredOptions.value.findIndex((opt) => isDropdownOption(opt) && opt.value === props.modelValue)
 		: -1
 
 	if (focusedIndex.value >= 0) {
@@ -518,10 +523,8 @@ function scrollOptionIntoView(index: number, block: 'center' | 'nearest') {
 	const viewport = getOptionsViewport()
 	if (!option || !viewport) return
 
-	const optionRect = option.getBoundingClientRect()
-	const viewportRect = viewport.getBoundingClientRect()
-	const optionTop = optionRect.top - viewportRect.top + viewport.scrollTop
-	const optionHeight = optionRect.height
+	const optionTop = option.offsetTop
+	const optionHeight = option.offsetHeight
 	const viewHeight = viewport.clientHeight
 	const current = viewport.scrollTop
 
@@ -567,20 +570,19 @@ function estimateDropdownHeight(): number {
 }
 
 function previewOpenDirection() {
-	if (props.forceDirection) {
-		openDirection.value = props.forceDirection
-		return
-	}
-
 	if (!effectiveTriggerEl.value) return
 
 	const triggerRect = getTriggerRect(effectiveTriggerEl.value)
 	const viewport = getViewportRect()
-	openDirection.value = determineOpenDirection(
-		triggerRect,
-		{ width: triggerRect.width, height: estimateDropdownHeight() },
-		viewport,
-	)
+	const dropdownRect = { width: triggerRect.width, height: estimateDropdownHeight() }
+	const direction = determineOpenDirection(triggerRect, dropdownRect, viewport)
+	openDirection.value = direction
+	dropdownStyle.value = {
+		top: `${calculateVerticalPosition(triggerRect, dropdownRect, direction, viewport)}px`,
+		left: `${calculateHorizontalPosition(triggerRect, dropdownRect, viewport)}px`,
+		width: resolveDropdownWidth(triggerRect.width),
+		minWidth: resolveCssSize(props.dropdownMinWidth) ?? '0px',
+	}
 }
 
 function determineOpenDirection(
@@ -682,6 +684,7 @@ async function updateDropdownPosition() {
 	if (!effectiveTriggerEl.value || !dropdownRef.value) return
 
 	await nextTick()
+	if (!isOpen.value || !effectiveTriggerEl.value || !dropdownRef.value) return
 
 	const trigger = effectiveTriggerEl.value
 	let triggerRect = getTriggerRect(trigger)
@@ -695,6 +698,7 @@ async function updateDropdownPosition() {
 	}
 
 	await nextTick()
+	if (!isOpen.value || !dropdownRef.value) return
 
 	triggerRect = getTriggerRect(trigger)
 	const dropdownRect = {
@@ -768,12 +772,12 @@ async function openDropdown() {
 	emit('open')
 
 	await nextTick()
-	await updateDropdownPosition()
 	await initializeOptionsOverlayScrollbars()
+	if (!isOpen.value) return
+	await updateDropdownPosition()
 	if (!isOpen.value) return
 	startPositionTracking()
 	setInitialFocus()
-	scheduleDropdownPositionUpdate()
 }
 
 function closeDropdown(restoreFocus = true) {
@@ -1043,7 +1047,7 @@ function startPositionTracking() {
 	listenerWindow.addEventListener('beforeunload', handleWindowClose)
 	listenerWindow.visualViewport?.addEventListener('scroll', handleViewportChange)
 	listenerWindow.visualViewport?.addEventListener('resize', handleViewportChange)
-	stopOutsideClick = onClickOutside(dropdownRef, () => closeDropdown(false), {
+	stopOutsideClick = onClickOutside(containerRef, () => closeDropdown(false), {
 		window: listenerWindow,
 		ignore: outsideClickIgnoreTargets,
 	})
@@ -1078,19 +1082,6 @@ onMounted(() => {
 onUnmounted(() => {
 	stopPositionTracking()
 	destroyOptionsOverlayScrollbars()
-})
-
-watch(isOpen, (value) => {
-	if (value) {
-		updateDropdownPosition()
-	}
-})
-
-watch(shouldRenderDropdown, (value) => {
-	if (value) {
-		updateDropdownPosition()
-		initializeOptionsOverlayScrollbars()
-	}
 })
 
 watch(filteredOptions, () => {

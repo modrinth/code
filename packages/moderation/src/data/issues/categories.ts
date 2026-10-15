@@ -4,9 +4,9 @@ import inaccurateMessage from '../messages/checklist/messages/tags/inaccurate.md
 import optimizationMisusedMessage from '../messages/checklist/messages/tags/optimization-misused.md'
 import resolutionsMisusedMessage from '../messages/checklist/messages/tags/resolutions-misused.md'
 import { issue, panel, section, select, toggle } from './component-builders/builders'
+import { issueLocation } from './component-builders/locations'
 import { issueTargets } from './component-builders/targets'
 import type { ReviewContext } from './component-builders/types'
-import { issueLocation } from './component-builders/locations'
 
 const resolutionTags = new Set(['8x-', '16x', '32x', '48x', '64x', '128x', '256x', '512x+'])
 
@@ -97,10 +97,13 @@ export const categoriesReviewPanel = panel({
 			options: (ctx) => {
 				let opts = [
 					...new Set([...ctx.projectV3.categories, ...ctx.projectV3.additional_categories]),
-				].map((value) => ({ value, label: value }))
+				].map((value) => ({
+					value,
+					label: value,
+				}))
+
 				if (ctx.selected.toggleIds.includes('categories-optimization-misused'))
 					opts = opts.filter((opt) => opt.value !== 'optimization')
-
 				return opts
 			},
 		}),

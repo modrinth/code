@@ -2,6 +2,7 @@
 import { CopyCode, ImageViewerEditor } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
+import IssueMarkdown from './issue-markdown.vue'
 import { parseIssueMessage } from './message-blocks'
 
 const props = defineProps<{
@@ -19,7 +20,7 @@ const viewer = ref<InstanceType<typeof ImageViewerEditor>>()
 <template>
 	<div class="markdown-body min-w-0">
 		<template v-for="(block, index) in blocks" :key="index">
-			<div v-if="block.type === 'markdown'" v-html="block.html" />
+			<IssueMarkdown v-if="block.type === 'markdown'" :html="block.html" />
 			<CopyCode
 				v-else-if="block.type === 'copy'"
 				:text="block.text"

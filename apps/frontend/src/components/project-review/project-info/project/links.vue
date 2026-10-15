@@ -13,8 +13,15 @@
 				class="min-w-0"
 			>
 				<div class="flex flex-col gap-1">
-					<h4 class="m-0 text-sm font-medium text-secondary">
+					<h4 class="m-0 flex items-center gap-2 text-sm font-medium text-secondary">
 						{{ link.label }}
+						<TagItem
+							v-if="link.key === 'source' && project && licenseRequiresSource(project.license.id)"
+							v-tooltip="formatMessage(messages.sourceAvailabilityRequired)"
+							class="!border-orange !bg-surface-4 !px-1.5 !py-0.5 !text-orange"
+						>
+							<TagCategoryScrollTextIcon />
+						</TagItem>
 					</h4>
 					<span v-if="link.unavailable && !link.removed" class="text-xs text-secondary">
 						{{ formatMessage(messages.linkUnavailable) }}
@@ -67,9 +74,11 @@ import {
 	PatreonIcon,
 	PayPalIcon,
 	StoreIcon,
+	TagCategoryScrollTextIcon,
 	WikiIcon,
 } from '@modrinth/assets'
-import { useVIntl } from '@modrinth/ui'
+import { licenseRequiresSource } from '@modrinth/moderation'
+import { TagItem, useVIntl } from '@modrinth/ui'
 import { computed, useTemplateRef } from 'vue'
 
 import { injectProjectReviewPageContext } from '~/providers/project-review'

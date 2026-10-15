@@ -1,6 +1,6 @@
 <template>
 	<span ref="modalAnchor" hidden />
-	<Teleport :to="modalDocument?.body ?? 'body'">
+	<Teleport :to="modalTarget">
 		<div
 			v-if="open"
 			class="modal-root"
@@ -281,6 +281,11 @@ const closeLabel = computed(() => formatMessage(commonMessages.closeButton))
 
 const modalAnchor = ref<HTMLElement | null>(null)
 const modalDocument = shallowRef<Document>()
+const modalTarget = computed(() =>
+	modalDocument.value?.body ??
+	modalAnchor.value?.ownerDocument.body ??
+	(typeof document !== 'undefined' ? document.body : 'body'),
+)
 function getModalDocument() {
 	return modalDocument.value ?? document
 }

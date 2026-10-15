@@ -202,6 +202,10 @@ export const projectReviewMessages = defineMessages({
 		id: 'moderation.project-review.slug',
 		defaultMessage: 'Slug',
 	},
+	slugNotSuggested: {
+		id: 'moderation.project-review.slugNotSuggested',
+		defaultMessage: 'This slug does not match any of the suggested slugs.',
+	},
 	icon: {
 		id: 'moderation.project-review.icon',
 		defaultMessage: 'Icon',

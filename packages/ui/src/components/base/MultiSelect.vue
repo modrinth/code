@@ -106,7 +106,7 @@
 			</template>
 		</component>
 
-		<Teleport v-if="isClient" :to="dropdownDocument?.body ?? 'body'">
+		<Teleport v-if="isClient" :to="teleportTarget">
 			<Transition name="floating-expand">
 				<div
 					v-if="isOpen"
@@ -588,6 +588,11 @@ const triggerElement = computed<HTMLElement | undefined>(() => {
 })
 const dropdownRef = ref<HTMLElement>()
 const dropdownDocument = shallowRef<Document>()
+const teleportTarget = computed(() =>
+	dropdownDocument.value?.body ??
+	containerRef.value?.ownerDocument.body ??
+	(typeof document !== 'undefined' ? document.body : 'body'),
+)
 const optionsScrollbarRef = ref<HTMLElement>()
 const optionsContainerRef = ref<HTMLElement>()
 const selectionActionsRef = ref<HTMLElement>()
@@ -1414,9 +1419,9 @@ function startPositionTracking() {
 	listenerWindow.addEventListener('beforeunload', handleWindowClose)
 	listenerWindow.visualViewport?.addEventListener('scroll', handleViewportChange)
 	listenerWindow.visualViewport?.addEventListener('resize', handleViewportChange)
-	stopOutsideClick = onClickOutside(dropdownRef, () => closeDropdown(), {
+	stopOutsideClick = onClickOutside(containerRef, () => closeDropdown(), {
 		window: listenerWindow,
-		ignore: [triggerElement, containerRef, '.v-popper__popper'],
+		ignore: [triggerElement, dropdownRef, '.v-popper__popper'],
 	})
 }
 

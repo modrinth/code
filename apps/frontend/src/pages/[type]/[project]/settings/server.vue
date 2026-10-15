@@ -59,7 +59,11 @@
 						class="mt-2"
 					/>
 					<ValidationMessage :check="saveValidation.forField('server-languages')" class="mt-2" />
-					<ProjectIssueCard target="modify_server_languages" class="mt-2" />
+					<ProjectIssueCard
+						target="modify_server_languages"
+						:field-action="languagesIssueAction"
+						class="mt-2"
+					/>
 				</div>
 
 				<!-- Java Address -->
@@ -156,7 +160,12 @@
 						class="mt-2"
 					/>
 					<ValidationMessage :check="saveValidation.forField('java-address')" class="mt-2" />
-					<ProjectIssueCard target="modify_server_address" platform="minecraft_java" class="mt-2" />
+					<ProjectIssueCard
+						target="modify_server_address"
+						platform="minecraft_java"
+						:field-action="javaAddressIssueAction"
+						class="mt-2"
+					/>
 				</div>
 
 				<!-- Bedrock Address -->
@@ -182,6 +191,7 @@
 					<ProjectIssueCard
 						target="modify_server_address"
 						platform="minecraft_bedrock"
+						:field-action="bedrockAddressIssueAction"
 						class="mt-2"
 					/>
 				</div>
@@ -245,6 +255,7 @@ import { isAdmin } from '@modrinth/utils'
 import ProjectIssueCard from '~/components/ui/project-issue-card/index.vue'
 import CompatibilityCard from '~/components/ui/project-settings/CompatibilityCard.vue'
 import ValidationMessage from '~/components/ValidationMessage.vue'
+import { useProjectIssueFieldAction } from '~/composables/project-issue-field-action'
 import { useProjectNagMessages } from '~/composables/project-nag-validation'
 import { useProjectSaveValidation } from '~/composables/project-save-validation'
 
@@ -537,6 +548,39 @@ const hasChanges = computed(() =>
 const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)
 
 const saveValidation = useProjectSaveValidation(() => modified.value)
+
+function useServerIssueAction(field, value, validationField, canSave = () => true) {
+	return useProjectIssueFieldAction({
+		draft: () => ({ [field]: { ...projectV3.value?.[field], ...value() } }),
+		canSave: () =>
+			hasPermission.value &&
+			canSave() &&
+			!saveValidation.forField(validationField).some((message) => message.severity === 'error'),
+		saving,
+		validation: saveValidation,
+		save: () => patchProjectV3({ [field]: value() }, true, true),
+	})
+}
+
+const languagesIssueAction = useServerIssueAction(
+	'minecraft_server',
+	() => ({ languages: [...languages.value] }),
+	'server-languages',
+)
+const javaAddressIssueAction = useServerIssueAction(
+	'minecraft_java_server',
+	() => ({ address: javaAddress.value.trim() }),
+	'java-address',
+	() =>
+		isAdminUser.value ||
+		!javaAddress.value.trim() ||
+		(!javaPingLoading.value && !lastPingAddressChanged.value && !!javaPingResult.value?.online),
+)
+const bedrockAddressIssueAction = useServerIssueAction(
+	'minecraft_bedrock_server',
+	() => ({ address: bedrockAddress.value.trim() }),
+	'bedrock-address',
+)
 
 function resetChanges() {
 	saveValidation.clear()
