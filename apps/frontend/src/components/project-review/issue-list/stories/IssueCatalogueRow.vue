@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import {
-	Button,
 	BulletDivider,
+	Button,
 	Combobox,
 	Input,
 	MarkdownEditor,

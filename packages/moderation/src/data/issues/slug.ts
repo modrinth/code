@@ -1,6 +1,6 @@
 import { LinkIcon } from '@modrinth/assets'
 
-import { messageWithOptionalSuggestion, generateUrlSlug } from '../../utils'
+import { generateUrlSlug, messageWithOptionalSuggestion } from '../../utils'
 import misused from '../messages/checklist/messages/title-slug/slug/misused.md'
 import { issue, panel, section, text, toggle } from './component-builders/builders'
 import { issueTargets } from './component-builders/targets'

@@ -157,7 +157,9 @@ export const issueTargets = {
 			value: { tags: typeof tags === 'function' ? tags(ctx) : tags },
 		}),
 	modifySelectedLinks:
-		(suggestion?: (platform: string, ctx: ReviewContext) => string | null | undefined): IssueAction =>
+		(
+			suggestion?: (platform: string, ctx: ReviewContext) => string | null | undefined,
+		): IssueAction =>
 		(ctx) => {
 			const { projectV3, selected } = ctx
 			const platforms = new Set(
