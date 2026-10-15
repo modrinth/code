@@ -10,11 +10,28 @@ use actix_web::{
 use chrono::Utc;
 use std::str::FromStr;
 use std::sync::Arc;
+use std::sync::atomic::{AtomicI64, Ordering};
+use std::time::{Duration, Instant};
+use tracing::warn;
 use xredis::RedisPool;
 
 const RATE_LIMIT_NAMESPACE: &str = "rate_limit:v4";
 const RATE_LIMIT_EXPIRY: i64 = 300; // 5 minutes
 const MINUTE_IN_NANOS: i64 = 60_000_000_000;
+const REDIS_WARNING_INTERVAL_SECS: i64 = 10;
+
+static LAST_REDIS_WARNING_SECS: AtomicI64 = AtomicI64::new(0);
+
+/// Allows at most one Redis warning per interval across all requests, so a
+/// Redis outage at high request rates does not flood the logs.
+fn should_log_redis_warning() -> bool {
+    let now = Utc::now().timestamp();
+    let last = LAST_REDIS_WARNING_SECS.load(Ordering::Relaxed);
+    now - last >= REDIS_WARNING_INTERVAL_SECS
+        && LAST_REDIS_WARNING_SECS
+            .compare_exchange(last, now, Ordering::Relaxed, Ordering::Relaxed)
+            .is_ok()
+}
 
 pub struct GCRAParameters {
     emission_interval: i64,
@@ -56,15 +73,23 @@ impl AsyncRateLimiter {
     }
 
     pub async fn check_rate_limit(&self, key: &str) -> RateLimitDecision {
-        let Ok(mut conn) = self.redis_pool.connect().await else {
-            // If Redis is unavailable, allow the request but with reduced limit
-            return RateLimitDecision {
-                allowed: true,
-                limit: self.params.burst_size,
-                remaining: 1,
-                reset_after_ms: 60_000, // 1 minute
-                retry_after_ms: None,
-            };
+        let mut conn = match self.redis_pool.connect().await {
+            Ok(conn) => conn,
+            Err(err) => {
+                if should_log_redis_warning() {
+                    warn!(
+                        "Rate limiter could not connect to Redis, allowing request: {err:#}"
+                    );
+                }
+                // If Redis is unavailable, allow the request but with reduced limit
+                return RateLimitDecision {
+                    allowed: true,
+                    limit: self.params.burst_size,
+                    remaining: 1,
+                    reset_after_ms: 60_000, // 1 minute
+                    retry_after_ms: None,
+                };
+            }
         };
 
         // Get current time in nanoseconds since UNIX epoch
@@ -72,7 +97,16 @@ impl AsyncRateLimiter {
         let key = conn.key().with_slot(RATE_LIMIT_NAMESPACE, key, key);
 
         // Get the current TAT from Redis (if it exists)
-        let tat_str = conn.get(&key).await.ok().flatten();
+        let tat_str = conn
+            .get(&key)
+            .await
+            .inspect_err(|err| {
+                if should_log_redis_warning() {
+                    warn!("Rate limiter failed to read from Redis: {err:#}");
+                }
+            })
+            .ok()
+            .flatten();
 
         // Parse the TAT or use current time if not found
         let current_tat = match tat_str {
@@ -103,9 +137,13 @@ impl AsyncRateLimiter {
 
         let new_tat = std::cmp::max(current_tat + increment, now);
 
-        let _ = conn
+        if let Err(err) = conn
             .set(&key, &new_tat.to_string(), Some(RATE_LIMIT_EXPIRY))
-            .await;
+            .await
+            && should_log_redis_warning()
+        {
+            warn!("Rate limiter failed to write to Redis: {err:#}");
+        }
 
         let remaining_capacity =
             ((max_tat_delta - (new_tat - now)) / increment).max(0) as u32;
@@ -147,7 +185,16 @@ pub async fn rate_limit_middleware(
     };
 
     if let Some(ip) = ip {
+        let started_at = Instant::now();
         let decision = rate_limiter.check_rate_limit(ip).await;
+        let elapsed = started_at.elapsed();
+        if elapsed > Duration::from_secs(1) && should_log_redis_warning() {
+            warn!(
+                elapsed_ms = elapsed.as_millis() as u64,
+                path = req.path(),
+                "Slow rate limit check against Redis"
+            );
+        }
 
         if decision.allowed {
             let mut service_response = next.call(req).await?;
