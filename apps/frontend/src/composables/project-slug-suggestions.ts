@@ -35,7 +35,7 @@ function isValidProjectSlug(value: string) {
 	)
 }
 
-function generateProjectSlugSuggestions(title: string, username?: string | null) {
+export function generateProjectSlugSuggestions(title: string, username?: string | null) {
 	const titleSlug = generateUrlSlug(title)
 	const titleWords = title
 		.trim()
