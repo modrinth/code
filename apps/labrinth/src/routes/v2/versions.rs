@@ -366,12 +366,20 @@ pub async fn versions_get(
             .await
             .wrap_api_err("filtering visible projects")?;
             projects.retain(|p| visible.contains(&p.inner.id));
-            let version_ids = projects
+            let project_ids = projects
                 .iter()
-                .flat_map(|p| p.versions.iter().copied())
-                .collect::<std::collections::HashSet<_>>()
-                .into_iter()
+                .map(|project| project.inner.id.0)
                 .collect::<Vec<_>>();
+            let version_ids = sqlx::query!(
+                r#"SELECT id FROM versions WHERE mod_id = ANY($1::bigint[]) ORDER BY id"#,
+                &project_ids
+            )
+            .fetch_all(&***ro_pool)
+            .await
+            .wrap_internal_err("fetching project version ids from database")?
+            .into_iter()
+            .map(|version| crate::database::models::ids::DBVersionId(version.id))
+            .collect::<Vec<_>>();
             let versions = crate::database::models::DBVersion::get_many(
                 &version_ids,
                 &***ro_pool,

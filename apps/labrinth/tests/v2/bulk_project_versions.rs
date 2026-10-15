@@ -99,7 +99,7 @@ async fn bulk_project_versions_filter_each_project_without_collapsing_releases()
                 ("bulk-fabric-1", "fabric", "1.20.1"),
                 ("bulk-fabric-2", "fabric", "1.20.1"),
                 ("bulk-forge", "forge", "1.20.1"),
-                ("bulk-old", "fabric", "1.19.4"),
+                ("bulk-other-mc", "fabric", "1.20.2"),
             ] {
                 let id = add_version(api, project, number, loader, mc).await;
                 if mc == "1.20.1" {
@@ -150,7 +150,7 @@ async fn bulk_project_versions_filter_each_project_without_collapsing_releases()
             api,
             &[
                 ("project_ids", selectors),
-                ("game_versions", json!(["1.19.4"])),
+                ("game_versions", json!(["1.20.2"])),
             ],
             None,
         )
@@ -441,7 +441,8 @@ async fn bulk_project_versions_apply_visibility_before_global_pagination() {
                 alpha.version_id.clone(),
                 beta.version_id.clone(),
                 hidden
-            ])
+            ]),
+            "the owner must see listed versions from both projects and their draft version"
         );
     })
     .await;
