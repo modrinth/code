@@ -26,12 +26,15 @@ import serverSideOptInMovementMessage from '../messages/checklist/messages/rules
 import serverSideOptInPvpMessage from '../messages/checklist/messages/rules/server-side-opt-in/pvp.md'
 import serverSideOptInXRayMessage from '../messages/checklist/messages/rules/server-side-opt-in/x-ray.md'
 import serverSideOptInHeaderMessage from '../messages/checklist/messages/rules/server-side-opt-in-header.md'
+import serverSideOptInHeaderListlessMessage from '../messages/checklist/messages/rules/server-side-opt-in-header-listless.md'
 import serverSideOptOutMessage from '../messages/checklist/messages/rules/server-side-opt-out.md'
-import { issue, panel, section, toggle } from './component-builders/builders'
+import { issue, panel, section, select, toggle } from './component-builders/builders'
 import { IssuePriority } from './component-builders/priority'
 import type { IssueAction } from './component-builders/types'
 
 const escapeHtml = md().utils.escapeHtml
+
+const optInTypes = ['X-ray', 'Aimbot', 'Movement', 'PvP', 'Hiding', 'Dupes']
 
 export const rulesPaidAccessServerIssue = issue({
 	id: 'rules-paid-access-server',
@@ -155,25 +158,27 @@ export const rulesProhibitedContentIssue = issue({
 
 const serverSideOptInMessages: Record<string, string> = {
 	'rules-server-side-opt-in-x-ray': serverSideOptInXRayMessage,
-	'rules-server-side-opt-in-aim-bot': serverSideOptInAimBotMessage,
+	'rules-server-side-opt-in-aimbot': serverSideOptInAimBotMessage,
 	'rules-server-side-opt-in-movement': serverSideOptInMovementMessage,
 	'rules-server-side-opt-in-pvp': serverSideOptInPvpMessage,
-	'rules-server-side-opt-in-hiding-mods': serverSideOptInHidingModsMessage,
-	'rules-server-side-opt-in-item-duplication': serverSideOptInItemDuplicationMessage,
+	'rules-server-side-opt-in-hiding': serverSideOptInHidingModsMessage,
+	'rules-server-side-opt-in-dupes': serverSideOptInItemDuplicationMessage,
 }
 
 export const rulesServerSideOptInIssue = issue({
 	id: 'rules-server-side-opt-in',
 	title: 'Server-side opt-in required',
 	category: 'Project wide',
-	message: ({ selected }) =>
-		[
-			serverSideOptInHeaderMessage,
-			...Object.entries(serverSideOptInMessages)
-				.filter(([id]) => selected.toggleIds.includes(id))
-				.map(([, message]) => message),
-		].join('\n'),
-	suggestedStatus: 'flagged',
+	message: (ctx) =>
+		ctx.getSelectValues('rules-server-side-opt-in-features').length > 0
+			? [
+					serverSideOptInHeaderMessage,
+					...Object.entries(serverSideOptInMessages)
+						.filter(([id]) => ctx.getSelectValues('rules-server-side-opt-in-features').includes(id))
+						.map(([, message]) => message),
+				].join('\n')
+			: serverSideOptInHeaderListlessMessage,
+	suggestedStatus: 'rejected',
 })
 
 export const rulesReviewPanel = panel({
@@ -196,6 +201,14 @@ export const rulesReviewPanel = panel({
 		toggle({
 			issue: rulesServerSideOptOutIssue,
 			label: 'Opt-out',
+			id: 'rules-server-side-opt-out',
+			disabled: ({ selected }) => selected.toggleIds.includes('rules-server-side-opt-in'),
+		}),
+		toggle({
+			issue: rulesServerSideOptInIssue,
+			label: 'Opt-in',
+			id: 'rules-server-side-opt-in',
+			disabled: ({ selected }) => selected.toggleIds.includes('rules-server-side-opt-out'),
 		}),
 		toggle({
 			issue: rulesAiGeneratedIssue,
@@ -208,10 +221,6 @@ export const rulesReviewPanel = panel({
 		toggle({
 			issue: rulesProhibitedContentIssue,
 			label: 'Prohibited Content',
-		}),
-		toggle({
-			issue: rulesServerSideOptInIssue,
-			label: 'Opt-in',
 		}),
 	),
 	section({
@@ -280,38 +289,19 @@ export const rulesReviewPanel = panel({
 		}),
 	),
 	section({
-		label: 'Which features require a Server-side Opt-in?',
 		shown: ({ selected }) => selected.issueIds.includes(rulesServerSideOptInIssue.id),
 	}).content(
-		toggle({
+		select({
 			issue: rulesServerSideOptInIssue,
-			label: 'X-ray',
-			id: 'rules-server-side-opt-in-x-ray',
-		}),
-		toggle({
-			issue: rulesServerSideOptInIssue,
-			label: 'Aim Assist',
-			id: 'rules-server-side-opt-in-aim-bot',
-		}),
-		toggle({
-			issue: rulesServerSideOptInIssue,
-			label: 'Movement',
-			id: 'rules-server-side-opt-in-movement',
-		}),
-		toggle({
-			issue: rulesServerSideOptInIssue,
-			label: 'PvP',
-			id: 'rules-server-side-opt-in-pvp',
-		}),
-		toggle({
-			issue: rulesServerSideOptInIssue,
-			label: 'Anti 3.x',
-			id: 'rules-server-side-opt-in-hiding-mods',
-		}),
-		toggle({
-			issue: rulesServerSideOptInIssue,
-			label: 'Dupe',
-			id: 'rules-server-side-opt-in-item-duplication',
+			label: 'Which features require a Server-side Opt-in?',
+			id: 'rules-server-side-opt-in-features',
+			multiple: true,
+			required: false,
+			options: () =>
+				optInTypes.map((type) => ({
+					value: `rules-server-side-opt-in-${type.toLowerCase()}`,
+					label: type,
+				})),
 		}),
 	),
 )
