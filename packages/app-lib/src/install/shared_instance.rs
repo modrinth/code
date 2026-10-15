@@ -89,6 +89,18 @@ struct CurrentSharedInstanceProject {
 #[derive(Clone, Debug)]
 struct CurrentSharedInstanceExternalFile {
     relative_path: String,
+    sha1: String,
+    missing: bool,
+}
+
+impl CurrentSharedInstanceExternalFile {
+    fn matches(&self, desired: &SharedInstanceExternalFileData) -> bool {
+        !self.missing
+            && desired
+                .sha1
+                .as_deref()
+                .is_some_and(|sha1| self.sha1.eq_ignore_ascii_case(sha1))
+    }
 }
 
 type SharedInstanceExternalFileKey = (ProjectType, String);
@@ -215,10 +227,9 @@ impl SharedInstanceApplyPlan {
         for desired in desired.external_files.into_values() {
             let key = (desired.file_type, desired.file.file_name.clone());
             match current.external_files.get(&key) {
-                Some(_) => {
-                    plan.external_updates.push(desired);
-                }
-                _ => plan.external_additions.push(desired),
+                Some(current) if current.matches(&desired.file) => {}
+                Some(_) => plan.external_updates.push(desired),
+                None => plan.external_additions.push(desired),
             }
         }
 
@@ -526,6 +537,8 @@ async fn current_shared_instance_content(
                 (entry.project_type, file.file_name.clone()),
                 CurrentSharedInstanceExternalFile {
                     relative_path: file.relative_path.clone(),
+                    sha1: file.sha1.clone(),
+                    missing: file.missing,
                 },
             );
         }
@@ -970,6 +983,9 @@ async fn install_shared_instance_file(
         ))
         .into());
     }
+    if shared_instance_file_is_current(instance_id, file).await? {
+        return Ok(());
+    }
 
     let response = REQWEST_CLIENT.get(&file.url).send().await?;
     if !response.status().is_success() {
@@ -1002,6 +1018,34 @@ async fn install_shared_instance_file(
         file.file_size,
     )
     .await
+}
+
+/// Whether the instance already has this exact shared file, so the download
+/// can be skipped. Without a hash from the server it is treated as changed.
+async fn shared_instance_file_is_current(
+    instance_id: &str,
+    file: &SharedInstanceExternalFileData,
+) -> crate::Result<bool> {
+    let Some(expected_sha1) = file.sha1.as_deref() else {
+        return Ok(false);
+    };
+    let path = crate::api::instance::validate_instance_file_write(
+        instance_id,
+        &file.file_name,
+    )
+    .await?;
+    let is_same_size =
+        tokio::fs::symlink_metadata(&path)
+            .await
+            .is_ok_and(|metadata| {
+                metadata.is_file() && metadata.len() == file.file_size
+            });
+    if !is_same_size {
+        return Ok(false);
+    }
+
+    let (_, sha1) = crate::util::fetch::sha1_file_async(&path).await?;
+    Ok(sha1.eq_ignore_ascii_case(expected_sha1))
 }
 
 fn validate_shared_instance_external_file_name(

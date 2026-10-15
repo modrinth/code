@@ -102,6 +102,7 @@ mod tests {
             file_type: file_type.to_string(),
             url: url.to_string(),
             file_size: Some(1),
+            sha1: None,
         }
     }
 
