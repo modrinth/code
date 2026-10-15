@@ -7,6 +7,9 @@ use async_walkdir::{Filtering, WalkDir};
 use futures::StreamExt;
 use sha2::Digest;
 
+/// Set by the shared instances backend when it rejects an upload by file type.
+const FILE_NOT_ALLOWED_HEADER: &str = "x-file-not-allowed";
+
 #[tracing::instrument]
 pub async fn unpublish_shared_instance(instance_id: &str) -> crate::Result<()> {
     let state = State::get().await?;
@@ -996,6 +999,17 @@ pub(super) async fn upload_external_files(
             state,
         )
         .await?;
+        if response.status() == reqwest::StatusCode::BAD_REQUEST
+            && response
+                .headers()
+                .get(FILE_NOT_ALLOWED_HEADER)
+                .is_some()
+        {
+            return Err(crate::ErrorKind::SharedInstanceFileNotAllowed(
+                upload.file_name.clone(),
+            )
+            .into());
+        }
         if !response.status().is_success() {
             return shared_instances_request_error(
                 "upload_external_file",

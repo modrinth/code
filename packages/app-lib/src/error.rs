@@ -134,6 +134,9 @@ pub enum ErrorKind {
     #[error("Shared instances API request failed: {0}")]
     SharedInstancesApiError(String),
 
+    #[error("You are not allowed to share {0}")]
+    SharedInstanceFileNotAllowed(String),
+
     #[error("Join handle error: {0}")]
     JoinError(#[from] tokio::task::JoinError),
 
