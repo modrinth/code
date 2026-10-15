@@ -1,5 +1,6 @@
 import { BookOpenIcon } from '@modrinth/assets'
 
+import { messageWithOptionalSuggestion } from '../..'
 import minecraftBranding from '../messages/checklist/messages/title-slug/title/minecraft-branding.md'
 import similarities from '../messages/checklist/messages/title-slug/title/similarities.md'
 import forkSimilarities from '../messages/checklist/messages/title-slug/title/similarities/fork.md'
@@ -7,7 +8,6 @@ import modpackSimilarities from '../messages/checklist/messages/title-slug/title
 import uselessInfo from '../messages/checklist/messages/title-slug/title/useless-info.md'
 import { issue, panel, section, text, toggle } from './component-builders/builders'
 import { issueTargets } from './component-builders/targets'
-import { messageWithOptionalSuggestion } from '../..'
 
 const panelCategory = 'Title'
 

@@ -133,18 +133,11 @@ export const linksIssue = issue({
 			if (inaccessibleSelected) {
 				const uniqueNotes = [...new Set(notes.map((note) => note.trim()).filter(Boolean))]
 				inaccessibleItems.push(
-					linkMessageWithSuggestion(
-						[item, ...uniqueNotes].join('\n    - '),
-						suggestion,
-					),
+					linkMessageWithSuggestion([item, ...uniqueNotes].join('\n    - '), suggestion),
 				)
 			}
 			if (misusedSelected) {
-				misusedItems.push(
-					inaccessibleSelected
-						? item
-						: linkMessageWithSuggestion(item, suggestion),
-				)
+				misusedItems.push(inaccessibleSelected ? item : linkMessageWithSuggestion(item, suggestion))
 			}
 		}
 
