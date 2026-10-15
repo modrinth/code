@@ -59,6 +59,16 @@ pub(crate) const CONFIG_FILE_EXTENSIONS: [&str; 14] = [
     "nbt",
 ];
 
+/// Extensions of executables, scripts and installers. These are hidden from
+/// the publish file selection and never installed; the shared instances
+/// backend also rejects them by content.
+const EXECUTABLE_FILE_EXTENSIONS: [&str; 34] = [
+    "exe", "dll", "msi", "msix", "com", "scr", "cpl", "sys", "bat", "cmd",
+    "ps1", "psm1", "vbs", "vbe", "jse", "wsf", "wsh", "hta", "lnk", "reg",
+    "sh", "bash", "zsh", "command", "app", "dylib", "so", "appimage", "apk",
+    "deb", "rpm", "dmg", "pkg", "class",
+];
+
 pub(crate) fn is_supported_config_file(path: &std::path::Path) -> bool {
     path.extension()
         .and_then(|extension| extension.to_str())
@@ -74,9 +84,21 @@ pub(crate) fn is_supported_config_file(path: &std::path::Path) -> bool {
 pub(crate) fn is_shareable_file_path(path: &str) -> bool {
     crate::state::content_store::validate_relative(path).is_ok()
         && is_shareable_path(path)
+        && !is_executable_file(path)
         && path
             .split_once('/')
             .is_none_or(|(root, _)| !is_content_folder(root))
+}
+
+fn is_executable_file(path: &str) -> bool {
+    std::path::Path::new(path)
+        .extension()
+        .and_then(|extension| extension.to_str())
+        .is_some_and(|extension| {
+            EXECUTABLE_FILE_EXTENSIONS
+                .iter()
+                .any(|candidate| extension.eq_ignore_ascii_case(candidate))
+        })
 }
 
 /// Whether a directory can hold shareable files, so the rest can be skipped

@@ -124,6 +124,9 @@ pub enum ErrorKind {
     #[error("shared instances api request failed")]
     SharedInstancesApiError,
 
+    #[error("you are not allowed to share {0}")]
+    SharedInstanceFileNotAllowed(String),
+
     #[error("join handle error: {0}")]
     JoinError(#[from] tokio::task::JoinError),
 
@@ -293,6 +296,9 @@ impl ErrorKind {
                 }
             },
             Self::SharedInstancesApiError => "shared_instances_api_error",
+            Self::SharedInstanceFileNotAllowed(_) => {
+                "shared_instance_file_not_allowed"
+            }
             Self::HashError(_, _) => "hash_error",
             Self::LoginCanceled => "login_canceled",
             Self::NotLoggedIn => "not_logged_in",

@@ -4382,6 +4382,9 @@
   "instance.shared-instance.error.title": {
     "message": "Something has gone wrong"
   },
+  "instance.shared-instance.file-not-allowed.title": {
+    "message": "File type not allowed"
+  },
   "instance.shared-instance.network-error.text": {
     "message": "Unable to connect to shared instances API"
   },

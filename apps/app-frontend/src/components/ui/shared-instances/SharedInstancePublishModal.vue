@@ -40,7 +40,7 @@
 				<div class="flex min-h-0 min-w-0 flex-col gap-4 overflow-hidden">
 					<div
 						ref="fileTreeContainer"
-						class="mt-4 max-h-[calc(70vh-10rem)] overflow-y-auto rounded-[20px]"
+						class="mt-2 max-h-[calc(70vh-10rem)] overflow-y-auto rounded-[20px]"
 					>
 						<FileTreeSelect
 							v-model="includedFilePaths"
