@@ -165,7 +165,7 @@ export function createIssueCatalogue() {
 		},
 		readProject: () => state,
 		clearProject: () => {
-			for (const key of Object.keys(state)) delete state[key]
+			for (const key of Object.keys(state)) Reflect.deleteProperty(state, key)
 		},
 	}
 	const data: Pick<

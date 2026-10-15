@@ -51,10 +51,11 @@ const hover = computed(() => props.trigger === 'hover')
 const isOpen = ref(false)
 const menuDocument = shallowRef<Document>()
 const triggerEl = useTemplateRef<HTMLElement>('triggerEl')
-const teleportTarget = computed(() =>
-	menuDocument.value?.body ??
-	triggerEl.value?.ownerDocument.body ??
-	(typeof document !== 'undefined' ? document.body : 'body'),
+const teleportTarget = computed(
+	() =>
+		menuDocument.value?.body ??
+		triggerEl.value?.ownerDocument.body ??
+		(typeof document !== 'undefined' ? document.body : 'body'),
 )
 const floating = useTemplateRef<HTMLElement>('floating')
 const arrowEl = useTemplateRef<HTMLElement>('arrowEl')

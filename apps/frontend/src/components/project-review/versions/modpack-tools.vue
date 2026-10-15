@@ -106,7 +106,8 @@ const actions = computed(() => [
 		label: formatMessage(messages.viewC2paInfo),
 		icon: ScanEyeIcon,
 		tone: 'orange' as const,
-		disabled: versionsQuery.isPending.value || versionsQuery.isError.value || !c2paUrls.value.length,
+		disabled:
+			versionsQuery.isPending.value || versionsQuery.isError.value || !c2paUrls.value.length,
 		action: () => emit('scan-ai', c2paUrls.value),
 	},
 ])

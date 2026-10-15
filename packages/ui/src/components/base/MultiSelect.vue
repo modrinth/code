@@ -588,10 +588,11 @@ const triggerElement = computed<HTMLElement | undefined>(() => {
 })
 const dropdownRef = ref<HTMLElement>()
 const dropdownDocument = shallowRef<Document>()
-const teleportTarget = computed(() =>
-	dropdownDocument.value?.body ??
-	containerRef.value?.ownerDocument.body ??
-	(typeof document !== 'undefined' ? document.body : 'body'),
+const teleportTarget = computed(
+	() =>
+		dropdownDocument.value?.body ??
+		containerRef.value?.ownerDocument.body ??
+		(typeof document !== 'undefined' ? document.body : 'body'),
 )
 const optionsScrollbarRef = ref<HTMLElement>()
 const optionsContainerRef = ref<HTMLElement>()

@@ -32,7 +32,6 @@ function reviewTitle(key: string): string | undefined {
 		? panels?.resolve({ kind: 'disclosure', key })?.panel.title
 		: undefined
 }
-
 </script>
 
 <template>

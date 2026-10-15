@@ -48,10 +48,7 @@
 						</span>
 					</div>
 					<div class="ml-auto flex shrink-0 items-center gap-2">
-						<ModpackTools
-							:key="selection"
-							@scan-ai="aiScanModal?.openC2paModal($event)"
-						/>
+						<ModpackTools :key="selection" @scan-ai="aiScanModal?.openC2paModal($event)" />
 						<Button
 							v-if="versions.length && !isLoading && !error && !versionsQuery.isError.value"
 							type="quiet"

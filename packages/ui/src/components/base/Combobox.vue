@@ -367,10 +367,11 @@ const triggerRef = ref<ButtonElementHandle>()
 const searchTriggerRef = ref<InstanceType<typeof Input>>()
 const dropdownRef = ref<HTMLElement>()
 const dropdownDocument = shallowRef<Document>()
-const teleportTarget = computed(() =>
-	dropdownDocument.value?.body ??
-	containerRef.value?.ownerDocument.body ??
-	(typeof document !== 'undefined' ? document.body : 'body'),
+const teleportTarget = computed(
+	() =>
+		dropdownDocument.value?.body ??
+		containerRef.value?.ownerDocument.body ??
+		(typeof document !== 'undefined' ? document.body : 'body'),
 )
 const optionsScrollbarRef = ref<HTMLElement>()
 const optionsContainerRef = ref<HTMLElement>()
@@ -506,7 +507,9 @@ function setOptionRef(el: HTMLElement | null, index: number) {
 
 function setInitialFocus() {
 	focusedIndex.value = props.listbox
-		? filteredOptions.value.findIndex((opt) => isDropdownOption(opt) && opt.value === props.modelValue)
+		? filteredOptions.value.findIndex(
+				(opt) => isDropdownOption(opt) && opt.value === props.modelValue,
+			)
 		: -1
 
 	if (focusedIndex.value >= 0) {

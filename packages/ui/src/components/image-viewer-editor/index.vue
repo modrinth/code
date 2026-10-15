@@ -37,10 +37,11 @@ const emit = defineEmits<{
 
 const viewerAnchor = ref<HTMLElement | null>(null)
 const viewerDocument = shallowRef<Document>()
-const teleportTarget = computed(() =>
-	viewerDocument.value?.body ??
-	viewerAnchor.value?.ownerDocument.body ??
-	(typeof document !== 'undefined' ? document.body : 'body'),
+const teleportTarget = computed(
+	() =>
+		viewerDocument.value?.body ??
+		viewerAnchor.value?.ownerDocument.body ??
+		(typeof document !== 'undefined' ? document.body : 'body'),
 )
 const activeId = ref<string | null>(null)
 const mode = ref<ImageViewerEditorMode>('view')

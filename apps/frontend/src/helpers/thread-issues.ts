@@ -125,8 +125,7 @@ export function isThreadIssueFacetReadyToAddress(
 			)
 		case 'modify_project_disclosure': {
 			const disclosure = disclosures?.find(
-				(disclosure) =>
-					disclosure.type === target.value.disclosure_type && !disclosure.deleted_at,
+				(disclosure) => disclosure.type === target.value.disclosure_type && !disclosure.deleted_at,
 			)
 			if (!disclosure) return false
 			const metadata = Object.fromEntries(
@@ -149,8 +148,7 @@ export function isThreadIssueFacetReadyToAddress(
 		}
 		case 'modify_project_disclosure_note': {
 			const disclosure = disclosures?.find(
-				(disclosure) =>
-					disclosure.type === target.value.disclosure_type && !disclosure.deleted_at,
+				(disclosure) => disclosure.type === target.value.disclosure_type && !disclosure.deleted_at,
 			)
 			return (
 				disclosure !== undefined &&

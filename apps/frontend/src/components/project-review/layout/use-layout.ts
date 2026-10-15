@@ -186,7 +186,8 @@ export function useProjectReviewLayout(
 			!data ||
 			data.viewId !== event.api.id ||
 			event.position === 'center'
-		) return
+		)
+			return
 
 		const horizontal = event.position === 'left' || event.position === 'right'
 		let movedPanel: ReturnType<DockviewApi['getPanel']>

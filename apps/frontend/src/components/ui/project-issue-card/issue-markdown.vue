@@ -30,7 +30,7 @@ watch(
 	<Teleport v-for="(copy, index) in copies" :key="index" :to="copy.target">
 		<CopyCode
 			:text="copy.text"
-			class="max-w-full align-baseline !rounded-[var(--radius-sm)] !bg-[var(--color-button-bg)] !px-[0.4em] !py-[0.2em] !text-[80%] [&>span]:min-w-0 [&>span]:[overflow-wrap:anywhere] [&>svg]:shrink-0"
+			class="max-w-full !rounded-[var(--radius-sm)] !bg-[var(--color-button-bg)] !px-[0.4em] !py-[0.2em] align-baseline !text-[80%] [&>span]:min-w-0 [&>span]:[overflow-wrap:anywhere] [&>svg]:shrink-0"
 		/>
 	</Teleport>
 </template>

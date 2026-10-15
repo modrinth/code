@@ -143,10 +143,11 @@ watch(isOpen, (openState, previousOpenState) => {
 	if (!openState && previousOpenState) emit('close')
 })
 
-const teleportTarget = computed(() =>
-	menuDocument.value?.body ??
-	triggerElement.value?.ownerDocument.body ??
-	(typeof document !== 'undefined' ? document.body : 'body'),
+const teleportTarget = computed(
+	() =>
+		menuDocument.value?.body ??
+		triggerElement.value?.ownerDocument.body ??
+		(typeof document !== 'undefined' ? document.body : 'body'),
 )
 const isClient = ref(false)
 onMounted(() => {
