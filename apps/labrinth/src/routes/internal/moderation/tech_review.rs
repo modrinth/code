@@ -1177,19 +1177,6 @@ pub async fn submit_report(
         )));
     }
 
-    sqlx::query!(
-        r#"
-        DELETE FROM delphi_tech_review_queue
-        WHERE project_id = $1
-        "#,
-        project_id as DBProjectId,
-    )
-    .execute(&mut txn)
-    .await
-    .wrap_internal_err(
-        "failed to remove project from technical review queue",
-    )?;
-
     let record = sqlx::query!(
         r#"
         SELECT t.id AS "thread_id: DBThreadId"
@@ -1275,14 +1262,35 @@ pub async fn submit_report(
         .wrap_internal_err("failed to add tech review message")?;
     }
 
-    if verdict == DelphiVerdict::Unsafe {
-        crate::routes::v3::projects::mutation::finalize_mutation(
-            project_id,
-            txn,
-            &redis,
-            Some(&user),
+    let prepared = if verdict == DelphiVerdict::Unsafe {
+        Some(
+            crate::routes::v3::projects::mutation::prepare_mutations(
+                &[project_id],
+                &mut txn,
+                &redis,
+                Some(&user),
+            )
+            .await?,
         )
-        .await?;
+    } else {
+        None
+    };
+
+    sqlx::query!(
+        r#"
+        DELETE FROM delphi_tech_review_queue
+        WHERE project_id = $1
+        "#,
+        project_id as DBProjectId,
+    )
+    .execute(&mut txn)
+    .await
+    .wrap_internal_err(
+        "failed to remove project from technical review queue",
+    )?;
+
+    if let Some(prepared) = prepared {
+        prepared.commit(txn, &redis).await?;
         search_state
             .queue
             .push_project_change(project_id.into())
