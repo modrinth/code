@@ -19,10 +19,37 @@ export function useReviewContent(projectId: Ref<string>) {
 		})),
 	)
 	const versionsQuery = useQuery(
-		computed(() => ({
-			...projectQueryOptions.versionsV3(projectId.value, client),
-			enabled: !!projectId.value,
-		})),
+		computed(() => {
+			const id = projectId.value
+			const options = projectQueryOptions.versionsV3(id, client)
+			return {
+				...options,
+				enabled: !!id,
+				queryFn: async () => {
+					const [versions, project] = await Promise.all([
+						options.queryFn(),
+						queryClient.fetchQuery(projectQueryOptions.v3(id, client)),
+					])
+					const loadedIds = new Set(versions.map((version) => version.id))
+					const missingIds = project.versions.filter((versionId) => !loadedIds.has(versionId))
+					/** The list endpoint can transiently omit versions that are still available by ID. */
+					for (let index = 0; index < missingIds.length; index += 100) {
+						const recovered = await client.labrinth.versions_v3.getVersions(
+							missingIds.slice(index, index + 100),
+						)
+						for (const version of recovered) {
+							if (loadedIds.has(version.id)) continue
+							loadedIds.add(version.id)
+							versions.push(version)
+						}
+					}
+					if (missingIds.some((versionId) => !loadedIds.has(versionId))) {
+						throw new Error('Could not load all project versions')
+					}
+					return versions
+				},
+			}
+		}),
 	)
 	const reportsQuery = useQuery(
 		computed(() => ({
