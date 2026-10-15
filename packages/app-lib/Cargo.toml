@@ -55,7 +55,7 @@ itertools = { workspace = true }
 json5 = { workspace = true }
 modrinth-content-management = { workspace = true }
 notify = { workspace = true }
-notify-debouncer-mini = { workspace = true }
+notify-debouncer-full = { workspace = true }
 p256 = { workspace = true, features = ["ecdsa"] }
 parking_lot = { workspace = true }
 paste = { workspace = true }
