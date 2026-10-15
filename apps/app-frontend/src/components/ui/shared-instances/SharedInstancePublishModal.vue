@@ -10,23 +10,36 @@
 		:confirm-disabled="publishDiffs.length === 0 && selectedConfigPaths.length === 0"
 		:added-label="formatMessage(messages.addedLabel)"
 		:removed-label="formatMessage(messages.removedLabel)"
+		:hide-summary="configFilesExpanded"
 		@confirm="publishChanges"
 		@cancel="finishReview"
 	>
 		<template #additional-content>
-			<Accordion
-				class="min-w-0"
-				overflow-visible
-				button-class="w-full bg-transparent m-0 p-0 border-none"
+			<button
+				type="button"
+				class="m-0 flex w-full cursor-pointer items-center gap-1 border-none bg-transparent p-0 text-contrast"
+				:aria-expanded="configFilesExpanded"
+				@click="configFilesExpanded = !configFilesExpanded"
 			>
-				<template #title>
-					<FileCogIcon class="size-4 shrink-0 text-primary" />
-					<span class="text-lg font-semibold text-contrast">
-						{{ formatMessage(messages.configTitle) }}
-					</span>
-				</template>
-				<div class="flex min-w-0 flex-col gap-3 pt-4">
-					<div ref="configFileTreeContainer" class="max-h-[292px] overflow-y-auto rounded-[20px]">
+				<FileCogIcon class="size-4 shrink-0 text-primary" />
+				<span class="text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.configTitle) }}
+				</span>
+				<DropdownIcon
+					class="ml-auto size-5 shrink-0 text-contrast transition-transform duration-300"
+					:class="{ 'rotate-180': configFilesExpanded }"
+				/>
+			</button>
+			<div
+				class="grid transition-[grid-template-rows] duration-300 ease-in-out motion-reduce:transition-none"
+				:class="configFilesExpanded ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'"
+				:inert="!configFilesExpanded"
+			>
+				<div class="min-h-0 min-w-0 overflow-hidden">
+					<div
+						ref="configFileTreeContainer"
+						class="mt-4 max-h-[calc(70vh-4rem)] overflow-y-auto rounded-[20px]"
+					>
 						<FileTreeSelect
 							v-model="includedConfigPaths"
 							v-model:excluded-paths="excludedConfigPaths"
@@ -37,15 +50,14 @@
 						/>
 					</div>
 				</div>
-			</Accordion>
+			</div>
 		</template>
 	</ContentDiffModal>
 </template>
 
 <script setup lang="ts">
-import { FileCogIcon, UploadIcon } from '@modrinth/assets'
+import { DropdownIcon, FileCogIcon, UploadIcon } from '@modrinth/assets'
 import {
-	Accordion,
 	type ContentDiffItem,
 	ContentDiffModal,
 	defineMessages,
@@ -82,6 +94,7 @@ const publishDiffs = ref<ContentDiffItem[]>([])
 const configFilePaths = ref<string[]>([])
 const includedConfigPaths = ref<string[]>([])
 const excludedConfigPaths = ref<string[]>([])
+const configFilesExpanded = ref(false)
 const state = ref<SharedInstancePublishState>('idle')
 const configFileItems = computed<FileTreeSelectItem[]>(() =>
 	configFilePaths.value.map((path) => ({ path, type: 'file' })),
@@ -120,6 +133,7 @@ async function show(e?: MouseEvent) {
 		configFilePaths.value = preview.configFiles
 		includedConfigPaths.value = []
 		excludedConfigPaths.value = []
+		configFilesExpanded.value = false
 		if (!publishReviewModal.value) return
 
 		publishReviewModal.value.show(e)
