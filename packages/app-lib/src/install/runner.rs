@@ -1742,6 +1742,17 @@ async fn update_backup_scope(
         }
         InstallRequest::UpdateSharedInstance { instance_id, data } => {
             paths.push(crate::api::instance::CONFIG_DIRECTORY.to_string());
+            paths.extend(
+                data.external_files
+                    .iter()
+                    .filter(|file| {
+                        file.file_type == crate::api::instance::CONFIG_FILE_TYPE
+                    })
+                    .filter_map(|file| file.file_name.split('/').next())
+                    .map(str::to_string),
+            );
+            paths.sort_unstable();
+            paths.dedup();
             let metadata = instance_metadata(instance_id, state).await?;
             if !shared_instance_update_requires_full_apply(&metadata, data) {
                 return Ok(Some(paths));

@@ -4283,9 +4283,6 @@
   "instance.shared-instance.publish-review.admonition-header": {
     "message": "플레이어에게 업데이트 업로드"
   },
-  "instance.shared-instance.publish-review.config-title-v2": {
-    "message": "설정 파일 선택"
-  },
   "instance.shared-instance.publish-review.description": {
     "message": "콘텐츠 변경 사항을 검토하고 이번 업데이트에 포함할 설정 파일을 선택하세요."
   },

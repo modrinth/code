@@ -3761,9 +3761,6 @@
   "instance.shared-instance.publish-review.admonition-header": {
     "message": "Skicka uppdatering till spelare"
   },
-  "instance.shared-instance.publish-review.config-title-v2": {
-    "message": "Välj konfigurationsfiler"
-  },
   "instance.shared-instance.publish-review.description": {
     "message": "Granska innehållsändringar och välj vilka konfigurationsfiler att inkludera i den här uppdateringen."
   },

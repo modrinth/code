@@ -355,8 +355,12 @@ where
 }
 
 fn is_path_exportable(relative_path: &SafeRelativeUtf8UnixPathBuf) -> bool {
-    let path = relative_path.as_str();
+    is_exportable_path(relative_path.as_str())
+}
 
+/// Whether an instance-relative path may leave the instance, such as in an
+/// exported pack or a shared instance version.
+pub(crate) fn is_exportable_path(path: &str) -> bool {
     !NEVER_EXPORTABLE_PATH_PREFIXES.iter().any(|prefix| {
         path == *prefix
             || path

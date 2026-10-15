@@ -683,7 +683,12 @@ export interface SharedInstancePublishPreview {
 	sharedInstanceId: string
 	latestVersion: number
 	diffs: SharedInstanceUpdateDiff[]
-	configFiles: string[]
+	files: SharedInstancePublishFile[]
+}
+
+export interface SharedInstancePublishFile {
+	path: string
+	size: number
 }
 
 export interface SharedInstanceInviteLink {
@@ -761,9 +766,9 @@ export async function get_shared_instance_publish_preview(
 
 export async function publish_shared_instance(
 	instanceId: string,
-	configPaths: string[],
+	filePaths: string[],
 ): Promise<SharedInstanceAttachment> {
-	return await invoke('plugin:instance|instance_share_publish', { instanceId, configPaths })
+	return await invoke('plugin:instance|instance_share_publish', { instanceId, filePaths })
 }
 
 export async function unlink_shared_instance(instanceId: string): Promise<void> {

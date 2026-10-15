@@ -32,9 +32,13 @@ use std::collections::{HashMap, HashSet};
 use std::io::Read;
 
 pub(crate) const CONFIG_BUNDLE_FILE_TYPE: &str = "configs";
+/// Wire type for an instance file the owner selected to share. The file name
+/// is its instance-relative path.
 pub(crate) const CONFIG_FILE_TYPE: &str = "config";
 pub(crate) const CONFIG_SYNC_ENABLED: bool = true;
 pub(crate) const CONFIG_DIRECTORY: &str = "config";
+pub(crate) const MAX_SHARED_FILES: usize = 4096;
+pub(crate) const MAX_SHARED_FILES_TOTAL_SIZE: u64 = 2 * 1024 * 1024 * 1024;
 pub(crate) const MAX_CONFIG_BUNDLE_ENTRIES: usize = 4096;
 pub(crate) const MAX_CONFIG_BUNDLE_FILE_SIZE: u64 = 512 * 1024 * 1024;
 pub(crate) const MAX_CONFIG_BUNDLE_TOTAL_SIZE: u64 = 512 * 1024 * 1024;
@@ -65,11 +69,30 @@ pub(crate) fn is_supported_config_file(path: &std::path::Path) -> bool {
         })
 }
 
-/// Whether members can install a shared config at this instance-relative path.
-pub(crate) fn is_shareable_config_path(path: &str) -> bool {
+/// Whether members can install a shared file at this instance-relative path.
+/// Content folders are shared through the content set instead.
+pub(crate) fn is_shareable_file_path(path: &str) -> bool {
     crate::state::content_store::validate_relative(path).is_ok()
-        && !path.split('/').any(|part| part.starts_with('.'))
-        && is_supported_config_file(std::path::Path::new(path))
+        && is_shareable_path(path)
+        && path
+            .split_once('/')
+            .is_none_or(|(root, _)| !is_content_folder(root))
+}
+
+/// Whether a directory can hold shareable files, so the rest can be skipped
+/// while walking the instance.
+pub(super) fn is_shareable_directory(path: &str) -> bool {
+    is_shareable_path(path) && !is_content_folder(path)
+}
+
+fn is_shareable_path(path: &str) -> bool {
+    !path.split('/').any(|part| part.starts_with('.'))
+        && super::export_mrpack::is_exportable_path(path)
+}
+
+fn is_content_folder(path: &str) -> bool {
+    ProjectType::iterator()
+        .any(|project_type| project_type.get_folder() == path)
 }
 
 pub(crate) fn read_bounded_config_bundle_entry(
@@ -142,9 +165,9 @@ pub use self::types::{
     SharedInstanceExternalFilePreview, SharedInstanceInstallPreview,
     SharedInstanceInvite, SharedInstanceInviteInstallPreview,
     SharedInstanceInviteLink, SharedInstanceJoinType,
-    SharedInstancePublishPreview, SharedInstanceUpdateDiff,
-    SharedInstanceUpdateDiffType, SharedInstanceUpdatePreview,
-    SharedInstanceUser, SharedInstanceUsers,
+    SharedInstancePublishFile, SharedInstancePublishPreview,
+    SharedInstanceUpdateDiff, SharedInstanceUpdateDiffType,
+    SharedInstanceUpdatePreview, SharedInstanceUser, SharedInstanceUsers,
 };
 
 pub async fn can_active_user_use_shared_instances() -> crate::Result<bool> {

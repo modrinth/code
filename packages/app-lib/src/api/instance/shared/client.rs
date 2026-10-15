@@ -50,12 +50,7 @@ pub(super) struct ExternalFileCandidate {
 #[derive(Clone, Debug)]
 pub(super) enum ExternalFileSource {
     InstanceFile(String),
-    ConfigFile(std::path::PathBuf),
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub(super) struct ConfigFile {
-    pub(super) path: String,
+    SharedFile(std::path::PathBuf),
 }
 
 #[derive(Clone, Debug, Serialize)]

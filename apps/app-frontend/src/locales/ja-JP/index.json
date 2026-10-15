@@ -3398,9 +3398,6 @@
   "instance.shared-instance.publish-review.admonition-header": {
     "message": "アップデートを配信する"
   },
-  "instance.shared-instance.publish-review.config-title-v2": {
-    "message": "設定ファイルを選択"
-  },
   "instance.shared-instance.publish-review.description": {
     "message": "変更内容を確認し、この更新に含める設定ファイルを選択してください。"
   },

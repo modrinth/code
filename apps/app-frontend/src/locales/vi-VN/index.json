@@ -4304,9 +4304,6 @@
   "instance.shared-instance.publish-review.admonition-header": {
     "message": "Gửi bản cập nhật tới người chơi"
   },
-  "instance.shared-instance.publish-review.config-title-v2": {
-    "message": "Chọn tệp cấu hình"
-  },
   "instance.shared-instance.publish-review.description": {
     "message": "Xem lại các thay đổi nội dung và chọn các tệp cấu hình cần đưa vào bản cập nhật này."
   },

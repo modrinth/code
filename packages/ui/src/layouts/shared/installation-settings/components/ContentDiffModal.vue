@@ -495,7 +495,7 @@ const configurationDiffMessages = defineMessages({
 	},
 	config_files_updated: {
 		id: 'content.diff-modal.config-files-updated',
-		defaultMessage: 'Changed config files',
+		defaultMessage: 'Changed files',
 	},
 })
 
