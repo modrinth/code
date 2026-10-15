@@ -57,7 +57,7 @@
 					<template v-if="!threadHistory">
 						{{
 							formatMessage(
-								issue.verdict === 'resolved'
+								threadIssueVerdict(issue) === 'resolved'
 									? isExpanded(issue)
 										? messages.hideResolved
 										: messages.showResolved
@@ -247,11 +247,15 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { isStaff } from '@modrinth/utils'
-import { useMutation, useQueryClient } from '@tanstack/vue-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, reactive, watch } from 'vue'
 
 import type { ProjectIssueFieldAction } from '~/composables/project-issue-field-action'
-import { isThreadIssueFacetReadyToAddress, isThreadIssueVerified } from '~/helpers/thread-issues'
+import {
+	isThreadIssueFacetReadyToAddress,
+	isThreadIssueVerified,
+	threadIssueVerdict,
+} from '~/helpers/thread-issues'
 
 import FilledCheckIcon from './filled-check-icon.vue'
 import IssueMessage from './issue-message.vue'
@@ -294,6 +298,26 @@ function requireProjectContext() {
 
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
+const disclosuresQuery = useQuery({
+	queryKey: computed(
+		() => ['project', 'disclosures', 'v3', projectContext?.projectV2.value.id] as const,
+	),
+	queryFn: () => client.labrinth.projects_v3.getDisclosures(project.value.id),
+	enabled: computed(
+		() =>
+			!!projectContext &&
+			(props.issues ?? thread.value?.issues ?? []).some((issue) =>
+				issue.facets.some(({ what }) =>
+					[
+						'add_project_disclosures',
+						'remove_project_disclosures',
+						'modify_project_disclosure',
+						'modify_project_disclosure_note',
+					].includes(what.type),
+				),
+			),
+	),
+})
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const auth = useAuthState()
@@ -493,7 +517,7 @@ const verifyMutation = useMutation({
 })
 
 function moderatorOptions(issue: ThreadIssue): ButtonMenuOption[] {
-	const resolved = issue.verdict === 'resolved' || isThreadIssueVerified(issue)
+	const resolved = threadIssueVerdict(issue) === 'resolved' || isThreadIssueVerified(issue)
 	return [
 		{
 			id: 'moderator-verified',
@@ -789,7 +813,13 @@ function isFacetReadyToAddress(
 			},
 		}
 	}
-	return isThreadIssueFacetReadyToAddress(facet, current, allMembers.value)
+	return isThreadIssueFacetReadyToAddress(
+		facet,
+		current,
+		allMembers.value,
+		props.fieldAction?.disclosures ??
+			(disclosuresQuery.isSuccess.value ? disclosuresQuery.data.value?.disclosures : undefined),
+	)
 }
 
 function overflowOptions(issue: ThreadIssue): ButtonMenuOption[] {
@@ -829,11 +859,11 @@ function targetButtonLabel(target: Target): string {
 }
 
 function isAddressed(issue: ThreadIssue): boolean {
-	return issue.verdict === 'addressed'
+	return threadIssueVerdict(issue) === 'addressed'
 }
 
 function isComplete(issue: ThreadIssue): boolean {
-	return isAddressed(issue) || issue.verdict === 'resolved'
+	return isAddressed(issue) || threadIssueVerdict(issue) === 'resolved'
 }
 
 function issueContentId(issue: ThreadIssue): string {
