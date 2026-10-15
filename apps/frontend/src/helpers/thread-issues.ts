@@ -88,7 +88,9 @@ export function isThreadIssueFacetReadyToAddress(
 				)
 			)
 		case 'add_gallery_images':
-			return current.gallery.length > target.value.original_count
+			return current.gallery.some(
+				(image) => image.id !== undefined && !target.value.original_image_ids.includes(image.id),
+			)
 		case 'remove_tags':
 			return target.value.tags.every(
 				(tag) => !current.categories.includes(tag) && !current.additional_categories.includes(tag),

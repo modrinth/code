@@ -174,10 +174,15 @@ export const issueTargets = {
 			return { type: 'modify_links', value: { links } }
 		},
 	addGalleryImages:
-		(): IssueAction =>
+		({ autoResolve = false }: { autoResolve?: boolean } = {}): IssueAction =>
 		({ projectV3 }) => ({
 			type: 'add_gallery_images',
-			value: { original_count: projectV3.gallery.length },
+			value: {
+				original_image_ids: projectV3.gallery.flatMap((image) =>
+					image.id !== undefined ? [image.id] : [],
+				),
+				auto_resolve: autoResolve,
+			},
 		}),
 	addDisclosures:
 		(disclosureTypes: Labrinth.Projects.v3.ProjectDisclosureType[]): IssueAction =>
