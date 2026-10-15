@@ -23,7 +23,6 @@
 
 <script setup lang="ts">
 import { Button, PageLoadingBar, useVIntl } from '@modrinth/ui'
-import { useEventListener } from '@vueuse/core'
 import { onScopeDispose, ref, useTemplateRef, watch } from 'vue'
 
 import { injectProjectReviewPageContext } from '~/providers/project-review'
@@ -31,6 +30,7 @@ import { injectReviewSlicer, type SlicerTarget } from '~/providers/project-revie
 
 import { injectProjectReviewContext, injectReviewPanelVisible } from '../layout/context'
 import { projectReviewMessages as messages } from '../messages'
+import { useReviewEventListener } from '../shortcuts'
 import bridgeSource from './bridge.js?raw'
 import {
 	forgetInstalledBridge,
@@ -120,9 +120,10 @@ function retry() {
 /**
  * Slicer starts every saved copy of the bridge. Only a current copy receives targets, since older
  * copies cannot cancel their downloads when the reviewer selects something else.
+ * Reparenting the iframe reloads its document, so a bridge of the same version can handshake again.
  */
 function onHandshake(version: number) {
-	if (version < SLICER_BRIDGE_VERSION || version <= bridgeVersion) return
+	if (version < SLICER_BRIDGE_VERSION || version < bridgeVersion) return
 	bridgeVersion = version
 	clearTimeout(handshakeTimer)
 	handshakeTimer = undefined
@@ -144,7 +145,7 @@ watch(
 
 watch(openRequests, () => openTab('slicer'))
 
-useEventListener('message', (event: MessageEvent) => {
+useReviewEventListener('message', (event: MessageEvent) => {
 	if (event.origin !== SLICER_ORIGIN || event.source !== frame.value?.contentWindow) return
 	const data = event.data
 	if (data?.source !== BRIDGE_SOURCE) return
