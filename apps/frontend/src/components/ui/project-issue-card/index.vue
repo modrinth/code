@@ -190,7 +190,7 @@
 										@click="
 											addressMutation.mutate({
 												issueId: issue.id,
-												facets: facetsToAddress(issue),
+												facets: addressableFacets(issue).filter((facet) => facet.verdict === 'open'),
 												saveField: fieldAction?.save,
 												threadId: thread?.id,
 												projectId: project.id,
@@ -211,7 +211,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
+import { type Labrinth, ModrinthServerError } from '@modrinth/api-client'
 import {
 	CheckCircleIcon,
 	CheckIcon,
@@ -348,10 +348,9 @@ const messages = defineMessages({
 		defaultMessage:
 			'Your changes could not be saved. Fix the validation errors before marking this issue as addressed.',
 	},
-	addressStillOpen: {
-		id: 'thread-issues.address-still-open',
-		defaultMessage:
-			'The issue is still open because its requirements have not been met. Make the requested changes before marking it as addressed.',
+	addressRequirementsUnchanged: {
+		id: 'thread-issues.address-requirements-unchanged',
+		defaultMessage: 'Make the requested changes before marking this issue as addressed.',
 	},
 	addressed: {
 		id: 'thread-issues.addressed',
@@ -401,8 +400,6 @@ const addressMutation = useMutation({
 	mutationFn: async ({
 		facets,
 		saveField,
-		projectId,
-		threadId,
 	}: {
 		issueId: string
 		facets: Labrinth.Threads.v3.ThreadIssueFacet[]
@@ -413,29 +410,11 @@ const addressMutation = useMutation({
 		if (saveField && !(await saveField())) {
 			throw new Error(formatMessage(messages.addressSaveFailed))
 		}
-		const savedProject = saveField
-			? await client.labrinth.projects_v3.get(projectId)
-			: projectV3.value
-		const eligibleFacets = facets.filter((facet) => isFacetReadyToAddress(facet, savedProject))
-		if (!eligibleFacets.length) {
-			throw new Error(formatMessage(messages.changeFacetFirst))
-		}
 		const results = await Promise.allSettled(
-			eligibleFacets.map(({ id }) => client.labrinth.threads_v3.user_addressed(id)),
+			facets.map(({ id }) => client.labrinth.threads_v3.user_addressed(id)),
 		)
 		const failure = results.find((result) => result.status === 'rejected')
 		if (failure?.status === 'rejected') throw failure.reason
-		if (threadId) {
-			const updatedThread = await client.labrinth.threads_v3.getThread(threadId)
-			const submittedIds = new Set(eligibleFacets.map(({ id }) => id))
-			if (
-				updatedThread.issues.some((issue) =>
-					issue.facets.some((facet) => submittedIds.has(facet.id) && facet.verdict === 'open'),
-				)
-			) {
-				throw new Error(formatMessage(messages.addressStillOpen))
-			}
-		}
 	},
 	onSettled: async (_, __, { threadId, projectId }) => {
 		await Promise.all([
@@ -452,7 +431,14 @@ const addressMutation = useMutation({
 	onError: (error) =>
 		addNotification({
 			title: formatMessage(messages.addressFailed),
-			text: error instanceof Error ? error.message : String(error),
+			text:
+				error instanceof ModrinthServerError &&
+				error.message ===
+					'moderation issue requirements must be changed before addressing the issue'
+					? formatMessage(messages.addressRequirementsUnchanged)
+					: error instanceof Error
+						? error.message
+						: String(error),
 			type: 'error',
 		}),
 })
