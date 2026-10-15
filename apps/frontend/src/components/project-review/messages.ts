@@ -655,7 +655,7 @@ export const projectReviewMessages = defineMessages({
 	},
 	scanAi: {
 		id: 'moderation.project-review.scanAi',
-		defaultMessage: 'Scan for AI-generated images',
+		defaultMessage: 'Scan for AI-generated images using C2PA info',
 	},
 	dependencies: {
 		id: 'moderation.project-review.dependencies',

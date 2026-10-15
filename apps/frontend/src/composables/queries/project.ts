@@ -93,7 +93,7 @@ export const projectQueryOptions = {
 	versionsV2: (projectId: string, client: AbstractModrinthClient) => ({
 		queryKey: ['project', projectId, 'versions', 'v2'] as const,
 		queryFn: () =>
-			client.labrinth.versions_v3.getProjectVersions(projectId, { include_changelog: false }),
+			client.labrinth.versions_v2.getProjectVersions(projectId, { include_changelog: false }),
 		staleTime: STALE_TIME,
 	}),
 

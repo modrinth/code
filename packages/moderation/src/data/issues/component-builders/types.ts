@@ -7,6 +7,8 @@ import type { IssuePriority } from './priority'
 export interface ReviewContext {
 	projectV3: Labrinth.Projects.v3.Project
 	projectV2: Labrinth.Projects.v2.Project | undefined
+	versionsV3: readonly Labrinth.Versions.v3.Version[]
+	versionsV2: readonly Labrinth.Versions.v2.Version[]
 	disclosures: readonly Labrinth.Projects.v3.ProjectDisclosureData[]
 	members: readonly Labrinth.Projects.v3.TeamMember[]
 	organization: Labrinth.Organizations.v3.Organization | null

@@ -155,6 +155,8 @@ const {
 	projectId,
 	project,
 	projectV2,
+	versions,
+	versionsV2,
 	disclosures,
 	members,
 	organization,
@@ -182,6 +184,8 @@ const panels = provideReviewPanels(
 		session,
 		computed(() => ({
 			projectV2: projectV2.value,
+			versionsV3: versions.value,
+			versionsV2: versionsV2.value,
 			disclosures: disclosures.disclosuresQuery.data.value?.disclosures ?? [],
 			members: members.value,
 			organization: organization.value,

@@ -47,17 +47,23 @@
 							}}</span>
 						</span>
 					</div>
-					<Button
-						v-if="versions.length && !isLoading && !error && !versionsQuery.isError.value"
-						type="quiet"
-						@click="
-							expanded = allExpanded ? new Set() : new Set(versions.map((version) => version.id))
-						"
-					>
-						<ListChevronsDownUpIcon v-if="allExpanded" aria-hidden="true" />
-						<ListChevronsUpDownIcon v-else aria-hidden="true" />
-						{{ formatMessage(allExpanded ? messages.collapseAll : messages.expandAll) }}
-					</Button>
+					<div class="ml-auto flex shrink-0 items-center gap-2">
+						<ModpackTools
+							:key="selection"
+							@scan-ai="aiScanModal?.openC2paModal($event)"
+						/>
+						<Button
+							v-if="versions.length && !isLoading && !error && !versionsQuery.isError.value"
+							type="quiet"
+							@click="
+								expanded = allExpanded ? new Set() : new Set(versions.map((version) => version.id))
+							"
+						>
+							<ListChevronsDownUpIcon v-if="allExpanded" aria-hidden="true" />
+							<ListChevronsUpDownIcon v-else aria-hidden="true" />
+							{{ formatMessage(allExpanded ? messages.collapseAll : messages.expandAll) }}
+						</Button>
+					</div>
 				</div>
 				<p v-if="!selection" class="m-0 text-secondary">
 					{{ formatMessage(messages.empty) }}
@@ -103,6 +109,7 @@ import type { ManageVersionHost } from '~/providers/version/manage-version-modal
 
 import { projectReviewMessages as messages } from '../messages'
 import ReviewPanel from '../review-panel/index.vue'
+import ModpackTools from './modpack-tools.vue'
 import VersionCard from './version-card.vue'
 
 const { formatMessage } = useVIntl()
