@@ -1,4 +1,7 @@
 {
+  "nags.add-description.description": {
+    "defaultMessage": "Bạn cần thêm phần mô tả nêu rõ nội dung, mục đích và điểm hấp dẫn của dự án."
+  },
   "nags.add-description.title": {
     "defaultMessage": "Thêm một mô tả"
   },
@@ -20,11 +23,23 @@
   "nags.add-license-details.title": {
     "defaultMessage": "Thông tin giấy phép"
   },
+  "nags.add-links-server.description": {
+    "defaultMessage": "Thêm các liên kết liên quan đến tài nguyên bên ngoài, chẳng hạn như trang web, cửa hàng hoặc lời mời Discord vĩnh viễn."
+  },
   "nags.add-links-server.title": {
     "defaultMessage": "Thêm liên kết ngoài"
   },
+  "nags.add-links.description": {
+    "defaultMessage": "Thêm các liên kết liên quan đến tài nguyên bên ngoài, chẳng hạn như mã nguồn, trình theo dõi vấn đề hoặc lời mời Discord vĩnh viễn."
+  },
   "nags.add-links.title": {
     "defaultMessage": "Thêm liên kết ngoài"
+  },
+  "nags.adjacent-headers.description": {
+    "defaultMessage": "Không nên đặt các tiêu đề cùng cấp ngay cạnh nhau."
+  },
+  "nags.adjacent-headers.title": {
+    "defaultMessage": "Xóa các tiêu đề liền kề"
   },
   "nags.all-languages.description": {
     "defaultMessage": "Bạn đã chọn tất cả ngôn ngữ có sẵn. Xin hãy chỉ chọn những ngôn ngữ máy chủ của bạn hỗ trợ tích cực."
@@ -32,14 +47,41 @@
   "nags.all-languages.title": {
     "defaultMessage": "Chọn ngôn ngữ chính xác"
   },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "Bạn đã chọn tất cả {totalAvailableTags, plural, one {# thẻ hiện có} other {# thẻ hiện có}}. Thẻ nên được dùng để giúp người dùng tìm các dự án phù hợp. Vui lòng chỉ chọn những thẻ có liên quan."
+  },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Chọn các thẻ chính xác"
+  },
+  "nags.check-disclosures.description": {
+    "defaultMessage": "Hãy đảm bảo người dùng biết mọi thông tin quan trọng bằng cách điền các mục công bố nội dung áp dụng cho {type} của bạn."
+  },
+  "nags.check-disclosures.title": {
+    "defaultMessage": "Xem lại thông tin công bố"
+  },
+  "nags.description-ends-with-header.description": {
+    "defaultMessage": "Phần mô tả dự án không nên kết thúc bằng một tiêu đề mà phía sau không có nội dung."
+  },
+  "nags.description-ends-with-header.title": {
+    "defaultMessage": "Xóa tiêu đề ở cuối"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "Phần mô tả dự án quá ngắn. Hãy bổ sung thêm chi tiết để nêu rõ nội dung, mục đích và điểm hấp dẫn của dự án."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "Mở rộng mô tả"
   },
+  "nags.disclosures-special-formatting.description": {
+    "defaultMessage": "Thông tin công bố nội dung không được chứa HTML vì chỉ hỗ trợ Markdown nội tuyến và văn bản thuần."
+  },
+  "nags.disclosures-special-formatting.title": {
+    "defaultMessage": "Sửa định dạng thông tin công bố"
+  },
   "nags.edit-description.title": {
     "defaultMessage": "Chỉnh sửa mô tả"
+  },
+  "nags.edit-gallery.title": {
+    "defaultMessage": "Chỉnh sửa thư viện ảnh"
   },
   "nags.edit-summary.title": {
     "defaultMessage": "Chỉnh sửa tóm tắt"
@@ -47,23 +89,125 @@
   "nags.edit-tags.title": {
     "defaultMessage": "Chỉnh sửa thẻ"
   },
+  "nags.edit-title.title": {
+    "defaultMessage": "Đổi tên"
+  },
   "nags.feature-gallery-image.description": {
     "defaultMessage": "Hình ảnh thư viện nổi bật thường là cách dự án của bạn tạo ấn tượng đầu tiên."
   },
   "nags.feature-gallery-image.title": {
     "defaultMessage": "Đặt một hình ảnh thư viện nổi bật"
   },
+  "nags.gallery-text-non-standard.description": {
+    "defaultMessage": "Không cho phép các ký tự văn bản không chuẩn, chẳng hạn như “Fancy text” hoặc “Zalgo”, trong tiêu đề hoặc mô tả ảnh thư viện."
+  },
+  "nags.gallery-text-profanity.description": {
+    "defaultMessage": "Tiêu đề và mô tả ảnh trong thư viện không được chứa quá nhiều từ tục tĩu. Phát hiện: “{value}”."
+  },
+  "nags.gallery-text-slur.description": {
+    "defaultMessage": "Tiêu đề và mô tả ảnh trong thư viện không được chứa từ ngữ xúc phạm. Phát hiện: “{value}”."
+  },
   "nags.gallery.title": {
     "defaultMessage": "Truy cập trang thư viện"
   },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "Giấy phép của {type} yêu cầu mã nguồn phải được công khai. Vui lòng cung cấp liên kết mã nguồn, thêm các tệp nguồn hoặc đổi giấy phép đã chọn."
+  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Cung cấp mã nguồn"
+  },
+  "nags.invalid-gallery-text.title": {
+    "defaultMessage": "Chỉnh sửa văn bản ảnh thư viện"
   },
   "nags.invalid-license-url.description.malformed": {
     "defaultMessage": "URL giấy phép của bạn có vẻ không đúng định dạng. Vui lòng cung cấp một URL hợp lệ dẫn tới nội dung giấy phép."
   },
   "nags.invalid-license-url.title": {
     "defaultMessage": "Thêm liên kết giấy phép hợp lệ"
+  },
+  "nags.invalid-project-description.title": {
+    "defaultMessage": "Chỉnh sửa phần mô tả"
+  },
+  "nags.invalid-project-name.title": {
+    "defaultMessage": "Chỉnh sửa tên dự án"
+  },
+  "nags.invalid-project-summary.title": {
+    "defaultMessage": "Chỉnh sửa phần tóm tắt"
+  },
+  "nags.license-url.not-in-allowlist.description": {
+    "defaultMessage": "URL giấy phép của bạn không được nhận dạng là liên kết giấy phép hợp lệ. Hãy đảm bảo liên kết trỏ trực tiếp đến nội dung giấy phép."
+  },
+  "nags.license-url.not-in-allowlist.title": {
+    "defaultMessage": "Kiểm tra liên kết giấy phép"
+  },
+  "nags.link-validation.discord-invite": {
+    "defaultMessage": "Lời mời Discord không hợp lệ, đã hết hạn hoặc không mời người dùng vào máy chủ. Hãy thay bằng một lời mời máy chủ còn hiệu lực."
+  },
+  "nags.link-validation.discord-invite.title": {
+    "defaultMessage": "Thay lời mời Discord không hợp lệ"
+  },
+  "nags.link-validation.download": {
+    "defaultMessage": "Không cho phép các liên kết tự bắt đầu tải xuống. Vui lòng xóa mọi liên kết như vậy khỏi phần mô tả."
+  },
+  "nags.link-validation.download.title": {
+    "defaultMessage": "Xóa liên kết tải xuống"
+  },
+  "nags.link-validation.duplicate": {
+    "defaultMessage": "Liên kết {linkField, select, issues {trình theo dõi vấn đề} source {mã nguồn} wiki {wiki} discord {Lời mời Discord} site {trang web} store {cửa hàng} license {giấy phép} description {mô tả} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {quyên góp}} của bạn cũng đang được dùng trong {otherLinkField, select, issues {Trình theo dõi vấn đề} source {Mã nguồn} wiki {Wiki} discord {Lời mời Discord} site {Trang web} store {Cửa hàng} license {Giấy phép} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {một trường khác}}. Mỗi liên kết chỉ nên được liệt kê một lần."
+  },
+  "nags.link-validation.duplicate.title": {
+    "defaultMessage": "Xóa liên kết trùng lặp"
+  },
+  "nags.link-validation.external-blocklist-match": {
+    "defaultMessage": "Liên kết {linkField} của bạn không được phép. Vui lòng xóa liên kết này hoặc thay bằng liên kết phù hợp với loại {linkField}."
+  },
+  "nags.link-validation.external-blocklist-match.title": {
+    "defaultMessage": "Thay liên kết không phù hợp"
+  },
+  "nags.link-validation.global-blocklist-match": {
+    "defaultMessage": "Liên kết {linkField, select, issues {trình theo dõi vấn đề} source {mã nguồn} wiki {wiki} discord {Lời mời Discord} site {trang web} store {cửa hàng} license {giấy phép} description {mô tả} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {quyên góp}} của bạn sử dụng một tên miền bị cấm. Hãy xóa hoặc thay liên kết này."
+  },
+  "nags.link-validation.global-blocklist-match.title": {
+    "defaultMessage": "Xóa liên kết bị cấm"
+  },
+  "nags.link-validation.ip-address": {
+    "defaultMessage": "Liên kết {linkField, select, issues {trình theo dõi vấn đề} source {mã nguồn} wiki {wiki} discord {Lời mời Discord} site {trang web} store {cửa hàng} license {giấy phép} description {mô tả} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {quyên góp}} của bạn sử dụng địa chỉ IP. Hãy dùng URL có tên miền."
+  },
+  "nags.link-validation.ip-address.title": {
+    "defaultMessage": "Xóa liên kết dùng địa chỉ IP"
+  },
+  "nags.link-validation.malformed": {
+    "defaultMessage": "Liên kết {linkField, select, issues {trình theo dõi vấn đề} source {mã nguồn} wiki {wiki} discord {Lời mời Discord} site {trang web} store {cửa hàng} license {giấy phép} description {mô tả} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {quyên góp}} của bạn không hợp lệ. Hãy nhập một URL HTTPS đầy đủ."
+  },
+  "nags.link-validation.malformed.title": {
+    "defaultMessage": "Sửa liên kết không hợp lệ"
+  },
+  "nags.link-validation.not-in-allowlist": {
+    "defaultMessage": "Liên kết {linkField, select, issues {trình theo dõi vấn đề} source {mã nguồn} wiki {wiki} discord {Lời mời Discord} site {trang web} store {cửa hàng} license {giấy phép} description {mô tả} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {quyên góp}} có thể không phù hợp với loại liên kết này. Hãy đảm bảo liên kết đúng với mục đích sử dụng."
+  },
+  "nags.link-validation.not-in-allowlist.title": {
+    "defaultMessage": "Kiểm tra tính chính xác của liên kết"
+  },
+  "nags.link-validation.source-repository": {
+    "defaultMessage": "Liên kết mã nguồn phải dẫn đến một kho lưu trữ trên nền tảng được hỗ trợ hoặc một dịch vụ Gitea/Forgejo tự lưu trữ."
+  },
+  "nags.link-validation.source-repository.title": {
+    "defaultMessage": "Liên kết đến kho mã nguồn"
+  },
+  "nags.link-validation.title": {
+    "defaultMessage": "Xem lại liên kết này"
+  },
+  "nags.link-validation.unverifiable": {
+    "defaultMessage": "Không thể xác minh liên kết {linkField, select, issues {trình theo dõi vấn đề} source {mã nguồn} wiki {wiki} discord {Lời mời Discord} site {trang web} store {cửa hàng} license {giấy phép} description {mô tả} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {quyên góp}} của bạn. Hãy kiểm tra xem liên kết có đang hoạt động và truy cập được hay không."
+  },
+  "nags.link-validation.unverifiable.title": {
+    "defaultMessage": "Kiểm tra khả năng truy cập liên kết"
+  },
+  "nags.link-validation.wrong-field": {
+    "defaultMessage": "Liên kết {linkField, select, issues {trình theo dõi vấn đề} source {mã nguồn} wiki {wiki} discord {Lời mời Discord} site {trang web} store {cửa hàng} license {giấy phép} description {mô tả} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {quyên góp}} không phù hợp với loại liên kết {linkField, select, issues {trình theo dõi vấn đề} source {mã nguồn} wiki {wiki} discord {Lời mời Discord} site {trang web} store {cửa hàng} license {giấy phép} description {mô tả} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {quyên góp}}. Hãy xóa hoặc thay bằng liên kết đúng."
+  },
+  "nags.link-validation.wrong-field.title": {
+    "defaultMessage": "Sửa liên kết không đúng"
   },
   "nags.long-headers.description": {
     "defaultMessage": "{count, plural,  other {# tiêu đề}} trong phần mô tả của bạn {count, plural,  other {quá dài}}. Tiêu đề nên ngắn gọn và đóng vai trò là tiêu đề mục, không phải là câu hoàn chỉnh."
@@ -92,8 +236,83 @@
   "nags.moderator-feedback.title": {
     "defaultMessage": "Xem phản hồi"
   },
+  "nags.multiple-resolution-tags.description": {
+    "defaultMessage": "Bạn đã chọn {count, plural, one {# thẻ độ phân giải} other {# thẻ độ phân giải}} ({tags}). Gói tài nguyên thường chỉ nên có thẻ khớp với độ phân giải chính."
+  },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Chọn độ phân giải đúng"
+  },
+  "nags.project-description-content.title": {
+    "defaultMessage": "Xem lại phần mô tả"
+  },
+  "nags.project-description-non-english.description": {
+    "defaultMessage": "Phần mô tả dự án phải được viết bằng tiếng Anh hoặc có kèm bản dịch tiếng Anh."
+  },
+  "nags.project-description-non-english.title": {
+    "defaultMessage": "Dịch phần mô tả"
+  },
+  "nags.project-description-non-standard-text.description": {
+    "defaultMessage": "Không cho phép lạm dụng các ký tự văn bản không chuẩn, chẳng hạn như “Fancy text” hoặc “Zalgo”, trong phần mô tả dự án."
+  },
+  "nags.project-description-profanity.description": {
+    "defaultMessage": "Phần mô tả dự án không được chứa quá nhiều từ tục tĩu. Phát hiện: “{value}”."
+  },
+  "nags.project-description-slur.description": {
+    "defaultMessage": "Phần mô tả dự án không được chứa từ ngữ xúc phạm. Phát hiện: “{value}”."
+  },
+  "nags.project-description-spam.description": {
+    "defaultMessage": "Không được dùng các ký tự, từ hoặc cụm từ lặp lại để kéo dài phần mô tả dự án."
+  },
+  "nags.project-description-spam.title": {
+    "defaultMessage": "Xóa nội dung rác trong mô tả"
+  },
+  "nags.project-name-non-standard-text.description": {
+    "defaultMessage": "Không cho phép các ký tự văn bản không chuẩn, chẳng hạn như “Fancy text” hoặc “Zalgo”, trong tên dự án."
+  },
+  "nags.project-name-profanity.description": {
+    "defaultMessage": "Tên dự án không được chứa từ tục tĩu. Phát hiện: “{value}”."
+  },
+  "nags.project-name-slur.description": {
+    "defaultMessage": "Tên dự án không được chứa từ ngữ xúc phạm. Phát hiện: “{value}”."
+  },
+  "nags.project-name-version.title": {
+    "defaultMessage": "Chỉnh sửa tên dự án"
+  },
+  "nags.project-summary-content.title": {
+    "defaultMessage": "Xem lại phần tóm tắt"
+  },
+  "nags.project-summary-links.description": {
+    "defaultMessage": "Không nên đặt liên kết, URL hoặc địa chỉ IP trong phần tóm tắt. Phát hiện: “{value}”"
+  },
+  "nags.project-summary-links.title": {
+    "defaultMessage": "Xóa liên kết khỏi phần tóm tắt"
+  },
+  "nags.project-summary-non-english.description": {
+    "defaultMessage": "Phần tóm tắt dự án phải được viết bằng tiếng Anh hoặc có kèm bản dịch tiếng Anh."
+  },
+  "nags.project-summary-non-english.title": {
+    "defaultMessage": "Dịch phần tóm tắt"
+  },
+  "nags.project-summary-non-standard-text.description": {
+    "defaultMessage": "Không cho phép các ký tự văn bản không chuẩn, chẳng hạn như “Fancy text” hoặc “Zalgo”, trong phần tóm tắt."
+  },
+  "nags.project-summary-profanity.description": {
+    "defaultMessage": "Phần tóm tắt dự án không được chứa từ tục tĩu. Phát hiện: “{value}”."
+  },
+  "nags.project-summary-slur.description": {
+    "defaultMessage": "Phần tóm tắt dự án không được chứa từ ngữ xúc phạm. Phát hiện: “{value}”."
+  },
+  "nags.project-summary-spam.description": {
+    "defaultMessage": "Không được dùng các ký tự, từ hoặc cụm từ lặp lại để kéo dài phần tóm tắt dự án."
+  },
+  "nags.project-summary-spam.title": {
+    "defaultMessage": "Xóa nội dung rác trong phần tóm tắt"
+  },
+  "nags.review-permissions.description": {
+    "defaultMessage": "Hãy đảm bảo bạn đã cung cấp bằng chứng cho phép phân phối mọi nội dung bên ngoài có trong modpack."
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "Kiểm tra quyền sử dụng nội dung"
   },
   "nags.select-compatibility.description": {
     "defaultMessage": "Chọn các phiên bản mà máy chủ của bạn hỗ trợ, chọn một Modpack hoặc tải lên Modpack của riêng bạn."
@@ -106,6 +325,12 @@
   },
   "nags.select-country.title": {
     "defaultMessage": "Chọn khu vực"
+  },
+  "nags.select-environment.description": {
+    "defaultMessage": "Chỉ định môi trường mà dự án của bạn có thể chạy."
+  },
+  "nags.select-environment.title": {
+    "defaultMessage": "Chọn môi trường"
   },
   "nags.select-language.description": {
     "defaultMessage": "Liệt kê ngôn ngữ hoặc các ngôn ngữ được máy chủ của bạn hỗ trợ."
@@ -128,17 +353,32 @@
   "nags.server.title": {
     "defaultMessage": "Truy cập cài đặt máy chủ"
   },
+  "nags.settings.disclosures.title": {
+    "defaultMessage": "Đi tới cài đặt công bố nội dung"
+  },
   "nags.settings.license.title": {
     "defaultMessage": "Truy cập cài đặt giấy phép"
   },
   "nags.settings.links.title": {
     "defaultMessage": "Truy cập cài đặt liên kết"
   },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "Đi tới cài đặt quyền"
+  },
   "nags.settings.tags.title": {
     "defaultMessage": "Truy cập cài đặt thẻ"
   },
   "nags.settings.title": {
     "defaultMessage": "Truy cập cài đặt chung"
+  },
+  "nags.settings.versions.title": {
+    "defaultMessage": "Đi tới cài đặt phiên bản"
+  },
+  "nags.summary-special-formatting.description": {
+    "defaultMessage": "Phần tóm tắt không nên chứa Markdown hoặc HTML vì chỉ có thể hiển thị văn bản thuần."
+  },
+  "nags.summary-special-formatting.title": {
+    "defaultMessage": "Sửa định dạng phần tóm tắt"
   },
   "nags.summary-too-short.title": {
     "defaultMessage": "Mở rộng phần tóm tắt"
@@ -149,14 +389,26 @@
   "nags.too-many-languages.title": {
     "defaultMessage": "Chọn ngôn ngữ chính xác"
   },
+  "nags.too-many-tags-server.description": {
+    "defaultMessage": "Bạn đã chọn {tagCount, plural, one {# thẻ} other {# thẻ}}. Vui lòng giảm xuống còn {maxTagCount} thẻ trở xuống để dự án xuất hiện trong các kết quả tìm kiếm phù hợp."
+  },
   "nags.too-many-tags-server.title": {
     "defaultMessage": "Chọn thẻ chính xác"
+  },
+  "nags.too-many-tags.description": {
+    "defaultMessage": "Bạn đã chọn {tagCount, plural, one {# thẻ} other {# thẻ}}. Vui lòng giảm xuống còn {maxTagCount} thẻ trở xuống để dự án xuất hiện trong các kết quả tìm kiếm phù hợp."
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Chọn các thẻ chính xác"
   },
   "nags.upload-gallery-image.description": {
     "defaultMessage": "Cần ít nhất một hình ảnh minh họa cho {type}."
+  },
+  "nags.upload-gallery-image.description-resourcepack": {
+    "defaultMessage": "Cần ít nhất một ảnh trong thư viện để giới thiệu nội dung của gói tài nguyên, ngoại trừ các gói âm thanh hoặc bản địa hóa. Nếu gói của bạn thuộc trường hợp này, hãy chọn thẻ phù hợp."
+  },
+  "nags.upload-gallery-image.description-shader": {
+    "defaultMessage": "Cần ít nhất ba ảnh trong thư viện để giới thiệu shader trong nhiều tình huống và điều kiện khác nhau."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Tải lên hình ảnh thư viện"
@@ -169,6 +421,18 @@
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Truy cập cài đặt liên kết"
+  },
+  "project.text-validation.description-matches-summary": {
+    "defaultMessage": "Phần mô tả dự án nên cung cấp thông tin riêng, không lặp lại phần tóm tắt."
+  },
+  "project.text-validation.summary-matches-title": {
+    "defaultMessage": "Phần tóm tắt dự án nên cung cấp thông tin riêng, không lặp lại tên dự án."
+  },
+  "project.text-validation.summary-too-short": {
+    "defaultMessage": "Phần tóm tắt quá ngắn. Hãy thêm một hoặc hai câu mô tả dự án."
+  },
+  "project.text-validation.title-version-number": {
+    "defaultMessage": "Tên dự án không nên chứa số phiên bản."
   }
 }
 

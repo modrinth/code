@@ -53,6 +53,9 @@
   "app.action-bar.install.summary.download-failed": {
     "message": "ダウンロードを完了することができませんでした"
   },
+  "app.action-bar.install.summary.instance-error": {
+    "message": "インスタンスの準備ができませんでした"
+  },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "ファイルパスが無効です"
   },
@@ -298,6 +301,18 @@
   },
   "app.content.sync-resource-packs-disabled": {
     "message": "アプリの設定で最初にリソースパックの同期をオンにしてください。"
+  },
+  "app.debug-export.canceling": {
+    "message": "エクスポートを取り消しています"
+  },
+  "app.debug-export.exporting": {
+    "message": "エクスポートしています"
+  },
+  "app.debug-export.finishing": {
+    "message": "終了処理をしています"
+  },
+  "app.debug-export.preparing": {
+    "message": "ファイルを準備しています"
   },
   "app.download-manager.active": {
     "message": "有効"
@@ -1725,7 +1740,7 @@
     "message": "チャット"
   },
   "app.settings.game-options.category.controls.label": {
-    "message": "操作設定"
+    "message": "操作"
   },
   "app.settings.game-options.category.custom.description": {
     "message": "Mod によって追加された設定"
@@ -1743,7 +1758,7 @@
     "message": "オーディオ設定"
   },
   "app.settings.game-options.category.music-and-sound.label": {
-    "message": "音楽とサウンド"
+    "message": "サウンド"
   },
   "app.settings.game-options.category.online.description": {
     "message": "オンラインとRealms の設定"
@@ -1755,7 +1770,7 @@
     "message": "スキンのカスタマイズ"
   },
   "app.settings.game-options.category.video.label": {
-    "message": "動画"
+    "message": "ビデオ"
   },
   "app.settings.game-options.choice.all": {
     "message": "すべて"
@@ -1769,8 +1784,20 @@
   "app.settings.game-options.choice.custom": {
     "message": "カスタム"
   },
+  "app.settings.game-options.choice.decreased": {
+    "message": "少し"
+  },
   "app.settings.game-options.choice.default": {
     "message": "デフォルト"
+  },
+  "app.settings.game-options.choice.fabulous": {
+    "message": "最高設定"
+  },
+  "app.settings.game-options.choice.fancy": {
+    "message": "描画優先"
+  },
+  "app.settings.game-options.choice.fast": {
+    "message": "処理優先"
   },
   "app.settings.game-options.choice.hotbar": {
     "message": "ホットバー"
@@ -1780,6 +1807,15 @@
   },
   "app.settings.game-options.choice.max-fps": {
     "message": "最大フレームレート"
+  },
+  "app.settings.game-options.choice.maximum": {
+    "message": "最大"
+  },
+  "app.settings.game-options.choice.minimal": {
+    "message": "最小"
+  },
+  "app.settings.game-options.choice.minimum": {
+    "message": "最小"
   },
   "app.settings.game-options.choice.off": {
     "message": "オフ"
@@ -1798,6 +1834,15 @@
   },
   "app.settings.game-options.choice.system": {
     "message": "システム"
+  },
+  "app.settings.game-options.choice.vulkan": {
+    "message": "Vulkan"
+  },
+  "app.settings.game-options.choice.when-minimized": {
+    "message": "最小化されたとき"
+  },
+  "app.settings.game-options.custom-value.placeholder": {
+    "message": "値を入力"
   },
   "app.settings.game-options.keybind.key.arrow-down": {
     "message": "下方向キー"
@@ -1844,6 +1889,9 @@
   "app.settings.game-options.keybind.key.left-shift": {
     "message": "左Shift"
   },
+  "app.settings.game-options.keybind.key.menu": {
+    "message": "メニュー"
+  },
   "app.settings.game-options.keybind.key.num-lock": {
     "message": "Num Lock"
   },
@@ -1889,14 +1937,32 @@
   "app.settings.game-options.keybind.key.unknown": {
     "message": "不明なキー"
   },
+  "app.settings.game-options.keybind.modifier.alt": {
+    "message": "Altキー"
+  },
   "app.settings.game-options.keybind.modifier.control": {
     "message": "Ctrl"
+  },
+  "app.settings.game-options.keybind.modifier.shift": {
+    "message": "Shiftキー"
+  },
+  "app.settings.game-options.keybind.mouse.middle": {
+    "message": "左マウスボタン"
+  },
+  "app.settings.game-options.keybind.mouse.right": {
+    "message": "右マウスボタン"
+  },
+  "app.settings.game-options.setting.ambient-occlusion.label": {
+    "message": "スムーズライティング"
   },
   "app.settings.game-options.setting.auto-jump.label": {
     "message": "自動ジャンプ"
   },
   "app.settings.game-options.setting.blocks-volume.label": {
     "message": "ブロック"
+  },
+  "app.settings.game-options.setting.brightness.label": {
+    "message": "明るさ"
   },
   "app.settings.game-options.setting.cape.description": {
     "message": "エリトラのテクスチャを含む、プレイヤーのマントを表示します。"
@@ -1916,8 +1982,23 @@
   "app.settings.game-options.setting.cloud-range.label": {
     "message": "雲の距離"
   },
+  "app.settings.game-options.setting.clouds.label": {
+    "message": "雲の表示"
+  },
+  "app.settings.game-options.setting.ctrl-click-right-click.label": {
+    "message": "Ctrl+左クリックを右クリックとして扱う"
+  },
+  "app.settings.game-options.setting.entity-distance.label": {
+    "message": "エンティティの描画距離"
+  },
   "app.settings.game-options.setting.entity-shadows.label": {
     "message": "エンティティの影"
+  },
+  "app.settings.game-options.setting.exclusive-fullscreen.label": {
+    "message": "排他的フルスクリーン"
+  },
+  "app.settings.game-options.setting.fov.label": {
+    "message": "視野"
   },
   "app.settings.game-options.setting.fullscreen.label": {
     "message": "フルスクリーン"
@@ -1927,6 +2008,12 @@
   },
   "app.settings.game-options.setting.glint-strength.label": {
     "message": "オーラの濃さ"
+  },
+  "app.settings.game-options.setting.graphics-backend.label": {
+    "message": "グラフィックスバックエンド"
+  },
+  "app.settings.game-options.setting.graphics.description": {
+    "message": "映像の質とパフォーマンスを設定します。"
   },
   "app.settings.game-options.setting.gui-scale.label": {
     "message": "GUIの大きさ"
@@ -2117,8 +2204,14 @@
   "app.settings.game-options.setting.neutral-volume.label": {
     "message": "友好的Mob"
   },
+  "app.settings.game-options.setting.particles.label": {
+    "message": "パーティクルの表示"
+  },
   "app.settings.game-options.setting.players-volume.label": {
     "message": "プレイヤー"
+  },
+  "app.settings.game-options.setting.render-distance.label": {
+    "message": "描画距離"
   },
   "app.settings.game-options.setting.right-pants-leg.label": {
     "message": "ズボンの右脚"
@@ -2126,8 +2219,20 @@
   "app.settings.game-options.setting.right-sleeve.label": {
     "message": "右袖"
   },
+  "app.settings.game-options.setting.simulation-distance.label": {
+    "message": "演算距離"
+  },
+  "app.settings.game-options.setting.view-bobbing.description": {
+    "message": "歩行中に画面の揺れを加えます。"
+  },
+  "app.settings.game-options.setting.view-bobbing.label": {
+    "message": "画面の揺れ"
+  },
   "app.settings.game-options.setting.voice-volume.label": {
     "message": "音声読み上げ／声"
+  },
+  "app.settings.game-options.setting.vsync.label": {
+    "message": "垂直同期"
   },
   "app.settings.java-installations.location.title": {
     "message": "Java {version, number} の場所"

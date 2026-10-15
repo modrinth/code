@@ -2063,6 +2063,15 @@
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Server auf Onboarding zurückgesetzt"
   },
+  "hosting.save-banner.resolve-errors": {
+    "defaultMessage": "Bitte behebe vor dem Speichern die Fehler in deinen Änderungen."
+  },
+  "hosting.settings.properties.motd-profanity": {
+    "defaultMessage": "Aufgrund der Nutzungsrichtlinien von Minecraft darf die MOTD deines Servers keine Schimpfwörter enthalten. Erkannt: „{value}“."
+  },
+  "hosting.settings.properties.motd-profanity-save-error": {
+    "defaultMessage": "Aufgrund der Nutzungsrichtlinien von Minecraft darf die MOTD deines Servers keine Schimpfwörter enthalten. Erkannt: „{value}“"
+  },
   "hosting.specs.burst": {
     "defaultMessage": "Spitzenlasten von bis zu {cpus} CPUs"
   },
@@ -4733,6 +4742,9 @@
   "servers.access-page.activity-log-filter.action.server-stopped": {
     "defaultMessage": "Server gestoppt"
   },
+  "servers.access-page.activity-log-filter.action.sftp-credentials-rolled": {
+    "defaultMessage": "Rotierte SSH-Zugangsdaten"
+  },
   "servers.access-page.activity-log-filter.action.sftp-login": {
     "defaultMessage": "Über SFTP angemeldet"
   },
@@ -5114,6 +5126,9 @@
   "servers.audit-log.event.server-subdomain-changed": {
     "defaultMessage": "Subdomain des Servers zu <subdomain></subdomain> geändert"
   },
+  "servers.audit-log.event.sftp-credentials-rolled": {
+    "defaultMessage": "Rotierte SFTP-Zugangsdaten"
+  },
   "servers.audit-log.event.sftp-login": {
     "defaultMessage": "Über SFTP angemeldet"
   },
@@ -5320,6 +5335,9 @@
   },
   "servers.download.unavailable.title": {
     "defaultMessage": "Download nicht verfügbar"
+  },
+  "servers.files.server-locked": {
+    "defaultMessage": "Dieser Server ist gesperrt und seine Dateien sind schreibgeschützt."
   },
   "servers.files.zip-created": {
     "defaultMessage": "ZIP-Datei wurde erstellt"
@@ -5537,6 +5555,36 @@
   "servers.listing.using-project-label": {
     "defaultMessage": "Nutzt {projectTitle}"
   },
+  "servers.lock.modal.error-text": {
+    "defaultMessage": "Beim Sperren dieses Servers ist ein Fehler aufgetreten. Bitte versuche es erneut."
+  },
+  "servers.lock.modal.error-title": {
+    "defaultMessage": "Server konnte nicht gesperrt werden"
+  },
+  "servers.lock.modal.header": {
+    "defaultMessage": "{name} sperren"
+  },
+  "servers.lock.modal.lock-button": {
+    "defaultMessage": "Server sperren"
+  },
+  "servers.lock.modal.reason-label": {
+    "defaultMessage": "Grund"
+  },
+  "servers.lock.modal.reason-placeholder": {
+    "defaultMessage": "Sichtbar für andere Admins"
+  },
+  "servers.lock.modal.success-text": {
+    "defaultMessage": "{name} wurde gesperrt."
+  },
+  "servers.lock.modal.success-title": {
+    "defaultMessage": "Server gesperrt"
+  },
+  "servers.lock.modal.warning-body": {
+    "defaultMessage": "{name} ist für seinen Eigentümer und seine Mitglieder schreibgeschützt, bis er von einem Admin entsperrt wird."
+  },
+  "servers.lock.modal.warning-header": {
+    "defaultMessage": "Dieser Server wird schreibgeschützt"
+  },
   "servers.manage.checking-for-new-servers": {
     "defaultMessage": "Suche nach neuen Servern..."
   },
@@ -5572,6 +5620,21 @@
   },
   "servers.manage.handle-error.title": {
     "defaultMessage": "Es ist ein Fehler aufgetreten"
+  },
+  "servers.manage.lock-server": {
+    "defaultMessage": "Server sperren"
+  },
+  "servers.manage.locked.badge": {
+    "defaultMessage": "Gesperrt"
+  },
+  "servers.manage.locked.badge-tooltip": {
+    "defaultMessage": "Seit {date} gesperrt"
+  },
+  "servers.manage.locked.body": {
+    "defaultMessage": "Der Support hat diesen Server vorübergehend gesperrt, sodass du keine Änderungen vornehmen kannst. <support-link>Wende dich an den Support</support-link>, wenn du der Meinung bist, dass es sich um einen Fehler handelt."
+  },
+  "servers.manage.locked.header": {
+    "defaultMessage": "Server durch Support gesperrt"
   },
   "servers.manage.new-server-button": {
     "defaultMessage": "Neuer Server"
@@ -5629,6 +5692,21 @@
   },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Geteilte Server"
+  },
+  "servers.manage.unlock-server": {
+    "defaultMessage": "Server entsperren"
+  },
+  "servers.manage.unlock.error-text": {
+    "defaultMessage": "Beim Entsperren dieses Servers ist ein Fehler aufgetreten. Bitte versuche es erneut."
+  },
+  "servers.manage.unlock.error-title": {
+    "defaultMessage": "Server konnte nicht entsperrt werden"
+  },
+  "servers.manage.unlock.success-text": {
+    "defaultMessage": "{name} wurde entsperrt."
+  },
+  "servers.manage.unlock.success-title": {
+    "defaultMessage": "Server entsperrt"
   },
   "servers.manage.your-servers-title": {
     "defaultMessage": "Deine Server"
@@ -5860,6 +5938,27 @@
   },
   "servers.settings.advanced.sftp.roll-credentials-success-title": {
     "defaultMessage": "SFTP-Zugangsdaten wurden rotiert"
+  },
+  "servers.settings.support.action-log-title": {
+    "defaultMessage": "Aktionsprotokoll"
+  },
+  "servers.settings.support.clear-action-log-button": {
+    "defaultMessage": "Aktionsprotokoll leeren"
+  },
+  "servers.settings.support.clear-action-log-confirmation": {
+    "defaultMessage": "Dadurch werden alle Einträge im Aktionsprotokoll für diesen Server endgültig gelöscht. Möchtest du fortfahren?"
+  },
+  "servers.settings.support.clear-action-log-description": {
+    "defaultMessage": "Alle Einträge im Aktionsprotokoll für diesen Server löschen."
+  },
+  "servers.settings.support.clear-action-log-error": {
+    "defaultMessage": "Aktionsprotokoll konnte nicht geleert werden"
+  },
+  "servers.settings.support.clear-action-log-success": {
+    "defaultMessage": "Aktionsprotokoll geleert"
+  },
+  "servers.settings.support.clear-action-log-title": {
+    "defaultMessage": "Aktionsprotokoll leeren?"
   },
   "servers.setup.onboarding.installation-failed.text": {
     "defaultMessage": "Bei der Installation ist ein unerwarteter Fehler aufgetreten. Bitte versuche es später erneut."
@@ -7176,3 +7275,4 @@
     "defaultMessage": "Typ"
   }
 }
+

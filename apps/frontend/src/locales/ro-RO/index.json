@@ -941,9 +941,6 @@
   "error.generic.default.list_item.1": {
     "message": "Verifică dacă Modrinth este picat pe a noastră <status-link>Pagină de status</status-link>."
   },
-  "error.generic.default.list_item.2": {
-    "message": "Dacă asta continuă să se întâmple, poate vrei să anunți echipa Modrinth alăturându-te serverului nostru de <discord-link>Discord</discord-link>."
-  },
   "error.generic.default.list_title": {
     "message": "Te rog încercă din nou în câteva minute."
   },

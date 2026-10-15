@@ -99,7 +99,7 @@
     "defaultMessage": "Emelj ki egy képet"
   },
   "nags.gallery-text-non-standard.description": {
-    "defaultMessage": "Az olyan nem szabványos szöveges karakterek, mint a „Fancy text” vagy a „Zalgo”, nem engedélyezettek a galériaképek címeiben vagy leírásaiban."
+    "defaultMessage": "A galériaképek címében és leírásában nem használhatók nem szabványos karakterek, például díszes betűk vagy Zalgo-szöveg."
   },
   "nags.gallery-text-profanity.description": {
     "defaultMessage": "A galériaképek címei és leírásai nem tartalmazhatnak túlzott mennyiségű trágár kifejezést. Észlelt kifejezés: \"{value}\"."
@@ -252,7 +252,7 @@
     "defaultMessage": "Fordítsd le a leírást"
   },
   "nags.project-description-non-standard-text.description": {
-    "defaultMessage": "A projekted leírásában nem használhatsz túlzottan sok nem szabványos szöveges karaktert, például „Fancy text” vagy „Zalgo” karaktereket."
+    "defaultMessage": "A projekt leírásában nem használhatók túlzott mértékben nem szabványos karakterek, például díszes betűk vagy Zalgo-szöveg."
   },
   "nags.project-description-profanity.description": {
     "defaultMessage": "A projekted leírása nem tartalmazhat túlzott mennyiségű trágár kifejezést. Észlelt kifejezés: \"{value}\"."
@@ -267,7 +267,7 @@
     "defaultMessage": "Távolítsd el a leírásból a spamet"
   },
   "nags.project-name-non-standard-text.description": {
-    "defaultMessage": "A nem szabványos szöveges karakterek, például a \"Fancy text\" vagy a \"Zalgo\" nem engedélyezettek a projekt nevében."
+    "defaultMessage": "A projekt nevében nem használhatók nem szabványos karakterek, például díszes betűk vagy Zalgo-szöveg."
   },
   "nags.project-name-profanity.description": {
     "defaultMessage": "A projekted neve nem tartalmazhat trágár kifejezéseket. Észlelt kifejezés: \"{value}\"."
@@ -294,7 +294,7 @@
     "defaultMessage": "Fordítsd le az összefoglalót"
   },
   "nags.project-summary-non-standard-text.description": {
-    "defaultMessage": "A nem szabványos szöveges karakterek, például a \"Fancy text\" vagy a \"Zalgo\" nem engedélyezettek az összefoglalóban."
+    "defaultMessage": "Az összegzésben nem használhatók nem szabványos karakterek, például díszes betűk vagy Zalgo-szöveg."
   },
   "nags.project-summary-profanity.description": {
     "defaultMessage": "A projekted összefoglalója nem tartalmazhat sértő kifejezéseket. Észlelt kifejezés: \"{value}\"."

@@ -1368,7 +1368,7 @@
     "defaultMessage": "刪除群組"
   },
   "external-files.permissions-card.remove-group-confirmation.description": {
-    "defaultMessage": "這會永久刪除這個引用標註群組及其中的所有檔案，這項動作無法復原。"
+    "defaultMessage": "這將永久刪除這個引用標註群組及其中的所有檔案，這項動作無法復原。"
   },
   "external-files.permissions-card.remove-group-confirmation.title": {
     "defaultMessage": "刪除 {title}？"
@@ -2062,6 +2062,15 @@
   },
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "伺服器已重設為初始設定狀態"
+  },
+  "hosting.save-banner.resolve-errors": {
+    "defaultMessage": "請先解決變更中的錯誤再儲存。"
+  },
+  "hosting.settings.properties.motd-profanity": {
+    "defaultMessage": "根據《Minecraft 使用方針》，你的伺服器 MOTD 不能包含粗俗用語。偵測到的文字：「{value}」。"
+  },
+  "hosting.settings.properties.motd-profanity-save-error": {
+    "defaultMessage": "根據《Minecraft 使用方針》，你的伺服器 MOTD 不能包含粗俗用語。偵測到的文字：「{value}」"
   },
   "hosting.specs.burst": {
     "defaultMessage": "最高可爆發至 {cpus} 個 CPU"
@@ -4733,6 +4742,9 @@
   "servers.access-page.activity-log-filter.action.server-stopped": {
     "defaultMessage": "已停止伺服器"
   },
+  "servers.access-page.activity-log-filter.action.sftp-credentials-rolled": {
+    "defaultMessage": "已輪替 SFTP 憑證"
+  },
   "servers.access-page.activity-log-filter.action.sftp-login": {
     "defaultMessage": "已透過 SFTP 登入"
   },
@@ -5114,6 +5126,9 @@
   "servers.audit-log.event.server-subdomain-changed": {
     "defaultMessage": "已將伺服器子域名變更為 <subdomain></subdomain>"
   },
+  "servers.audit-log.event.sftp-credentials-rolled": {
+    "defaultMessage": "已輪替 SFTP 憑證"
+  },
   "servers.audit-log.event.sftp-login": {
     "defaultMessage": "已透過 SFTP 登入"
   },
@@ -5320,6 +5335,9 @@
   },
   "servers.download.unavailable.title": {
     "defaultMessage": "無法下載"
+  },
+  "servers.files.server-locked": {
+    "defaultMessage": "這個伺服器已鎖定，其中的檔案為唯讀狀態。"
   },
   "servers.files.zip-created": {
     "defaultMessage": "已建立 ZIP"
@@ -5537,6 +5555,36 @@
   "servers.listing.using-project-label": {
     "defaultMessage": "使用 {projectTitle}"
   },
+  "servers.lock.modal.error-text": {
+    "defaultMessage": "鎖定伺服器時發生錯誤，請再試一次。"
+  },
+  "servers.lock.modal.error-title": {
+    "defaultMessage": "無法鎖定伺服器"
+  },
+  "servers.lock.modal.header": {
+    "defaultMessage": "鎖定「{name}」"
+  },
+  "servers.lock.modal.lock-button": {
+    "defaultMessage": "鎖定伺服器"
+  },
+  "servers.lock.modal.reason-label": {
+    "defaultMessage": "原因"
+  },
+  "servers.lock.modal.reason-placeholder": {
+    "defaultMessage": "其他管理員可見"
+  },
+  "servers.lock.modal.success-text": {
+    "defaultMessage": "「{name}」已被鎖定。"
+  },
+  "servers.lock.modal.success-title": {
+    "defaultMessage": "伺服器已鎖定"
+  },
+  "servers.lock.modal.warning-body": {
+    "defaultMessage": "在由管理員解除鎖定之前，「{name}」對其擁有者及成員而言將為唯讀狀態。"
+  },
+  "servers.lock.modal.warning-header": {
+    "defaultMessage": "這個伺服器將轉為唯讀模式"
+  },
   "servers.manage.checking-for-new-servers": {
     "defaultMessage": "正在檢查新伺服器…"
   },
@@ -5572,6 +5620,21 @@
   },
   "servers.manage.handle-error.title": {
     "defaultMessage": "發生錯誤"
+  },
+  "servers.manage.lock-server": {
+    "defaultMessage": "鎖定伺服器"
+  },
+  "servers.manage.locked.badge": {
+    "defaultMessage": "已鎖定"
+  },
+  "servers.manage.locked.badge-tooltip": {
+    "defaultMessage": "鎖定時間：{date}"
+  },
+  "servers.manage.locked.body": {
+    "defaultMessage": "客服團隊已暫時鎖定這個伺服器，因此你無法進行任何變更。如果你認為此決定有誤，請<support-link>聯絡客服</support-link>。"
+  },
+  "servers.manage.locked.header": {
+    "defaultMessage": "伺服器已被客服團隊鎖定"
   },
   "servers.manage.new-server-button": {
     "defaultMessage": "新伺服器"
@@ -5629,6 +5692,21 @@
   },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "共享伺服器"
+  },
+  "servers.manage.unlock-server": {
+    "defaultMessage": "解除鎖定伺服器"
+  },
+  "servers.manage.unlock.error-text": {
+    "defaultMessage": "解除鎖定伺服器時發生錯誤，請再試一次。"
+  },
+  "servers.manage.unlock.error-title": {
+    "defaultMessage": "無法解除鎖定伺服器"
+  },
+  "servers.manage.unlock.success-text": {
+    "defaultMessage": "「{name}」已被解除鎖定。"
+  },
+  "servers.manage.unlock.success-title": {
+    "defaultMessage": "伺服器已解除鎖定"
   },
   "servers.manage.your-servers-title": {
     "defaultMessage": "你的伺服器"
@@ -5860,6 +5938,27 @@
   },
   "servers.settings.advanced.sftp.roll-credentials-success-title": {
     "defaultMessage": "已輪替 SFTP 憑證"
+  },
+  "servers.settings.support.action-log-title": {
+    "defaultMessage": "動作紀錄"
+  },
+  "servers.settings.support.clear-action-log-button": {
+    "defaultMessage": "清除動作紀錄"
+  },
+  "servers.settings.support.clear-action-log-confirmation": {
+    "defaultMessage": "這將永久刪除這個伺服器上的所有動作紀錄。要繼續嗎？"
+  },
+  "servers.settings.support.clear-action-log-description": {
+    "defaultMessage": "刪除這個伺服器上的所有動作紀錄。"
+  },
+  "servers.settings.support.clear-action-log-error": {
+    "defaultMessage": "無法清除動作紀錄"
+  },
+  "servers.settings.support.clear-action-log-success": {
+    "defaultMessage": "已清除動作紀錄"
+  },
+  "servers.settings.support.clear-action-log-title": {
+    "defaultMessage": "要清除動作紀錄嗎？"
   },
   "servers.setup.onboarding.installation-failed.text": {
     "defaultMessage": "安裝時發生非預期的錯誤。請稍後再試。"
@@ -7176,3 +7275,4 @@
     "defaultMessage": "類型"
   }
 }
+

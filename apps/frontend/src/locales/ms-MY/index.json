@@ -1769,9 +1769,6 @@
   "error.generic.default.list_item.1": {
     "message": "Semak sama ada Modrinth tidak berfungsi pada <status-link>laman Status</status-link> kami."
   },
-  "error.generic.default.list_item.2": {
-    "message": "Jika ralat ini terus berlaku, anda mungkin ingin memberitahu Pasukan Modrinth dengan menyertai <discord-link>pelayan Discord</discord-link> kami."
-  },
   "error.generic.default.list_title": {
     "message": "Sila cuba lagi dalam beberapa minit."
   },

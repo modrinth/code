@@ -112,7 +112,7 @@ struct ProjectCreateData {
     #[validate(nested)]
     pub donation_urls: Option<Vec<DonationLink>>,
 
-    /// Must be true. Projects must be submitted for review after creation.
+    /// Must be true. Projects are created as drafts and submitted for review separately.
     pub is_draft: Option<bool>,
 
     /// The license id that the project follows

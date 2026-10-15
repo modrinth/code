@@ -9,7 +9,7 @@
 			<IconButton
 				type="quiet"
 				label="Minimize window"
-				class="relative expanded-button"
+				class="relative before:absolute before:-inset-y-[9px] before:-inset-x-[6px] before:content-['']"
 				@click="getCurrentWindow().minimize()"
 			>
 				<MinimizeIcon />
@@ -17,7 +17,7 @@
 			<IconButton
 				type="quiet"
 				label="Toggle maximize window"
-				class="relative expanded-button"
+				class="relative before:absolute before:-inset-y-[9px] before:-inset-x-[6px] before:content-['']"
 				@click="getCurrentWindow().toggleMaximize()"
 			>
 				<RestoreIcon v-if="isMaximized" />
@@ -26,7 +26,7 @@
 			<IconButton
 				type="quiet"
 				label="Close window"
-				class="relative expanded-button close-button hover:!bg-red focus-visible:!bg-red hover:!text-[var(--color-accent-contrast)]"
+				class="close-button relative before:absolute before:-inset-y-[9px] before:-left-[6px] before:-right-[9px] before:content-[''] hover:!bg-red focus-visible:!bg-red"
 				@click="handleClose"
 			>
 				<XIcon />
@@ -113,13 +113,7 @@ const handleClose = async () => {
 }
 </script>
 <style scoped>
-.expanded-button::before {
-	inset: -9px -6px;
-	content: '';
-	position: absolute;
-}
-
-.expanded-button.close-button::before {
-	inset: -9px -9px -9px -6px;
+.close-button:hover {
+	color: var(--color-accent-contrast) !important;
 }
 </style>

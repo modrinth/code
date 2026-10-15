@@ -2192,9 +2192,6 @@
   "error.generic.default.list_item.1": {
     "message": "تحقق مما إذا كان مودرنث متوقفًا على <status-link>صفحة الحالة</status-link> الخاصة بنا."
   },
-  "error.generic.default.list_item.2": {
-    "message": "إذا استمر حدوث ذلك، قد ترغب في إعلام فريق مودرنث بالانضمام إلى <discord-link>سيرفر ديسكورد</discord-link> الخاص بنا."
-  },
   "error.generic.default.list_title": {
     "message": "يرجى المحاولة مرة أخرى بعد بضع دقائق."
   },

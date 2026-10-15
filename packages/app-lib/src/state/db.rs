@@ -22,7 +22,13 @@ pub(crate) async fn connect(
 }
 
 async fn connect_app_db(db_path: &Path) -> crate::Result<Pool<Sqlite>> {
-    super::db_backup::maybe_backup_existing_app_db(db_path).await?;
+    if let Err(err) =
+        super::db_backup::maybe_backup_existing_app_db(db_path).await
+    {
+        tracing::warn!(
+            "Continuing without a pre-migration app database backup: {err}"
+        );
+    }
     open_migrated_app_db(db_path).await
 }
 

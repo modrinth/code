@@ -1,60 +1,11 @@
-import { createContext } from '@modrinth/ui'
-import {
-	type Component,
-	computed,
-	type ComputedRef,
-	type MaybeRefOrGetter,
-	shallowRef,
-	toValue,
-	watch,
-} from 'vue'
-import type { RouteLocationRaw } from 'vue-router'
+import { computed, shallowRef, toValue } from 'vue'
 
-export type BreadcrumbVisual =
-	| {
-			type: 'icon'
-			component: Component
-	  }
-	| {
-			type: 'image'
-			src?: string | null
-			alt?: string
-			circle?: boolean
-			tintBy?: string | null
-	  }
-
-export interface BreadcrumbDefinition {
-	slot: string
-	id: MaybeRefOrGetter<string>
-	label: MaybeRefOrGetter<string>
-	to?: MaybeRefOrGetter<RouteLocationRaw | undefined>
-	visual?: MaybeRefOrGetter<BreadcrumbVisual | undefined>
-}
-
-export interface ResolvedBreadcrumb {
-	slot: string
-	id: string
-	label: string
-	to?: RouteLocationRaw
-	visual?: BreadcrumbVisual
-}
-
-export interface BreadcrumbHandle {
-	readonly slot: string
-	activate: () => void
-	reset: () => void
-	pop: () => void
-}
-
-export interface BreadcrumbManager {
-	readonly entries: ComputedRef<ResolvedBreadcrumb[]>
-	reset: (definition: BreadcrumbDefinition) => BreadcrumbHandle
-	push: (
-		definition: BreadcrumbDefinition,
-		options?: { parent?: BreadcrumbHandle },
-	) => BreadcrumbHandle
-	find: (slot: string) => BreadcrumbHandle | undefined
-}
+import type {
+	BreadcrumbDefinition,
+	BreadcrumbHandle,
+	BreadcrumbManager,
+	ResolvedBreadcrumb,
+} from './context'
 
 interface InternalBreadcrumb {
 	token: symbol
@@ -64,17 +15,6 @@ interface InternalBreadcrumb {
 	root: boolean
 	handle: BreadcrumbHandle
 }
-
-const [injectBreadcrumbManager, provideBreadcrumbManager] = createContext<BreadcrumbManager>(
-	'root',
-	'breadcrumbManager',
-)
-const [injectBreadcrumbParent, provideBreadcrumbParent] = createContext<BreadcrumbHandle>(
-	'BreadcrumbParent',
-	'breadcrumbParent',
-)
-
-export { injectBreadcrumbManager, provideBreadcrumbManager, provideBreadcrumbParent }
 
 export function createBreadcrumbManager(): BreadcrumbManager {
 	const stack = shallowRef<InternalBreadcrumb[]>([])
@@ -180,30 +120,4 @@ export function createBreadcrumbManager(): BreadcrumbManager {
 		push,
 		find: (slot) => stack.value.find((entry) => entry.definition.slot === slot)?.handle,
 	}
-}
-
-function watchBreadcrumbIdentity(definition: BreadcrumbDefinition, handle: BreadcrumbHandle) {
-	watch(
-		() => toValue(definition.id),
-		() => handle.activate(),
-		{ flush: 'sync' },
-	)
-}
-
-export function useRootBreadcrumb(definition: BreadcrumbDefinition): BreadcrumbHandle {
-	const manager = injectBreadcrumbManager()
-	const handle = manager.reset(definition)
-	watchBreadcrumbIdentity(definition, handle)
-	return handle
-}
-
-export function useBreadcrumb(
-	definition: BreadcrumbDefinition,
-	options: { parent?: BreadcrumbHandle } = {},
-): BreadcrumbHandle {
-	const manager = injectBreadcrumbManager()
-	const parent = options.parent ?? injectBreadcrumbParent(null) ?? undefined
-	const handle = manager.push(definition, { parent })
-	watchBreadcrumbIdentity(definition, handle)
-	return handle
 }

@@ -35,6 +35,9 @@
   "analytics.breakdown.country": {
     "message": "Quốc gia"
   },
+  "analytics.breakdown.dependent-on": {
+    "message": "Phụ thuộc vào"
+  },
   "analytics.breakdown.dependent-project-download": {
     "message": "Dự án phụ thuộc"
   },
@@ -184,6 +187,9 @@
   },
   "analytics.chart.tooltip.hide-entry": {
     "message": "Che {name} trong biểu đồ"
+  },
+  "analytics.chart.tooltip.no-data": {
+    "message": "Không có dữ liệu"
   },
   "analytics.chart.tooltip.pinned": {
     "message": "Đã ghim chú thích từ biểu đồ"
@@ -575,11 +581,23 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
+  "app-marketing.features.importing.description": {
+    "message": "Nhập tất cả các bản cài đặt trò chơi hiện có từ trình khởi chạy bạn đã dùng trước đây và bắt đầu với Ứng dụng Modrinth chỉ trong vài giây!"
+  },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
   },
   "app-marketing.features.importing.multimc-alt": {
     "message": "MultiMC"
+  },
+  "app-marketing.features.importing.title": {
+    "message": "Nhập bản cài đặt"
+  },
+  "app-marketing.features.manage-skins.description": {
+    "message": "Chuyển đổi giữa tất cả skin Minecraft của bạn ngay trong ứng dụng."
+  },
+  "app-marketing.features.manage-skins.title": {
+    "message": "Trình chọn skin"
   },
   "app-marketing.features.mod-management.actions": {
     "message": "Hành động"
@@ -605,6 +623,9 @@
   "app-marketing.features.mod-management.version": {
     "message": "Phiên bản"
   },
+  "app-marketing.features.open-source.description": {
+    "message": "Ứng dụng Modrinth hoàn toàn mã nguồn mở. Bạn có thể xem mã nguồn trên <github-link>GitHub</github-link> của chúng tôi!"
+  },
   "app-marketing.features.open-source.title": {
     "message": "Mã nguồn mở"
   },
@@ -613,6 +634,9 @@
   },
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
+  },
+  "app-marketing.features.performance.description": {
+    "message": "Ứng dụng Modrinth có hiệu năng tốt hơn nhiều trình quản lý mod hàng đầu!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -646,6 +670,12 @@
   },
   "app-marketing.features.play.title": {
     "message": "Chơi với các mod yêu thích của bạn"
+  },
+  "app-marketing.features.settings-sync.description": {
+    "message": "Dùng cùng các tùy chọn, gói tài nguyên và nhiều cài đặt khác trên tất cả bản cài đặt của bạn."
+  },
+  "app-marketing.features.settings-sync.title": {
+    "message": "Đồng bộ cài đặt"
   },
   "app-marketing.features.sharing.description": {
     "message": "Xây dựng, chia sẻ và chơi các modpack với bất kỳ mod và modpack nào trong hàng nghìn mod và modpack được lưu trữ tại Modrinth."
@@ -728,6 +758,84 @@
   "auth.continue-with-provider": {
     "message": "Tiếp tục với {provider}"
   },
+  "auth.create-account.age-requirement.warning-title": {
+    "message": "Yêu cầu về độ tuổi"
+  },
+  "auth.create-account.complete-sign-up": {
+    "message": "Hoàn tất đăng ký"
+  },
+  "auth.create-account.date-of-birth.invalid.text": {
+    "message": "Vui lòng nhập ngày sinh hợp lệ. Năm không thể là 0000."
+  },
+  "auth.create-account.date-of-birth.invalid.title": {
+    "message": "Ngày sinh không hợp lệ"
+  },
+  "auth.create-account.date-of-birth.label": {
+    "message": "Ngày sinh"
+  },
+  "auth.create-account.date-of-birth.not-meet-age-requirement": {
+    "message": "Bạn không đáp ứng yêu cầu về độ tuổi để tạo tài khoản trên Modrinth."
+  },
+  "auth.create-account.date-of-birth.placeholder": {
+    "message": "Chọn ngày sinh của bạn"
+  },
+  "auth.create-account.date-of-birth.required.text": {
+    "message": "Vui lòng nhập ngày sinh trước khi tiếp tục."
+  },
+  "auth.create-account.date-of-birth.required.title": {
+    "message": "Cần nhập ngày sinh"
+  },
+  "auth.create-account.date-of-birth.under13-helper": {
+    "message": "Bạn chỉ có thể tạo tài khoản trên Modrinth khi trên 13 tuổi."
+  },
+  "auth.create-account.info-panel.source-code-link": {
+    "message": "Mã nguồn liên quan"
+  },
+  "auth.create-account.info-panel.text": {
+    "message": "Chúng tôi không lưu ngày sinh của bạn. Thông tin này chỉ được dùng trong quá trình đăng ký để xác minh tuân thủ COPPA."
+  },
+  "auth.create-account.page-title": {
+    "message": "Tạo tài khoản"
+  },
+  "auth.create-account.security-check.label": {
+    "message": "Kiểm tra bảo mật"
+  },
+  "auth.create-account.subscribe.label": {
+    "message": "Gửi email cho tôi về những điều thú vị mà Modrinth đang phát triển"
+  },
+  "auth.create-account.title": {
+    "message": "Tạo tài khoản"
+  },
+  "auth.create-account.username.label": {
+    "message": "Tên người dùng"
+  },
+  "auth.create-account.username.placeholder": {
+    "message": "Nhập tên người dùng"
+  },
+  "auth.reauthenticate.2fa.description": {
+    "message": "Nhập mã 6 chữ số từ ứng dụng xác thực hoặc một trong các mã dự phòng của bạn."
+  },
+  "auth.reauthenticate.2fa.label": {
+    "message": "Xác thực hai yếu tố"
+  },
+  "auth.reauthenticate.continue-with-passkey": {
+    "message": "Tiếp tục bằng khóa truy cập"
+  },
+  "auth.reauthenticate.last-signed-in-with": {
+    "message": "Phương thức được dùng trong lần đăng nhập gần nhất là {method, select, password {mật khẩu} passkey {khóa truy cập} github {GitHub} discord {Discord} google {Google} microsoft {Microsoft} gitlab {GitLab} steam {Steam} paypal {PayPal} other {{method}} }."
+  },
+  "auth.reauthenticate.page-title": {
+    "message": "Xác thực lại"
+  },
+  "auth.reauthenticate.sign-in-another-way": {
+    "message": "Đăng nhập bằng cách khác"
+  },
+  "auth.reauthenticate.sign-in-with-provider": {
+    "message": "Đăng nhập bằng {provider}"
+  },
+  "auth.reauthenticate.title": {
+    "message": "{name} cần được xác thực lại."
+  },
   "auth.reset-password.method-choice.action": {
     "message": "Gửi email khôi phục"
   },
@@ -761,17 +869,83 @@
   "auth.reset-password.title.long": {
     "message": "Đặt lại mật khẩu của bạn"
   },
+  "auth.sign-in.2fa.description": {
+    "message": "Nhập mã 6 chữ số từ ứng dụng xác thực hoặc một trong các mã dự phòng của bạn."
+  },
+  "auth.sign-in.2fa.label": {
+    "message": "Xác thực hai yếu tố"
+  },
+  "auth.sign-in.add-account": {
+    "message": "Thêm tài khoản"
+  },
+  "auth.sign-in.choose-account": {
+    "message": "Chọn tài khoản để dùng trong Ứng dụng Modrinth"
+  },
+  "auth.sign-in.choose-existing-account": {
+    "message": "Dùng tài khoản hiện có"
+  },
+  "auth.sign-in.continue-with-email": {
+    "message": "Tiếp tục bằng email"
+  },
+  "auth.sign-in.continue-with-passkey": {
+    "message": "Tiếp tục bằng khóa truy cập"
+  },
+  "auth.sign-in.create-account": {
+    "message": "Đăng ký"
+  },
+  "auth.sign-in.forgot-password": {
+    "message": "Quên mật khẩu"
+  },
+  "auth.sign-in.last-sign-in": {
+    "message": "Dùng gần đây nhất"
+  },
+  "auth.sign-in.launcher.callback.title": {
+    "message": "Phản hồi đăng nhập Ứng dụng Modrinth"
+  },
   "auth.sign-in.launcher.complete.go-to-website": {
     "message": "Truy cập Modrinth.com"
   },
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Mở ứng dụng Modrinth"
   },
+  "auth.sign-in.launcher.handoff-failed": {
+    "message": "Không thể hoàn tất đăng nhập vào Ứng dụng Modrinth. Hãy thử lại."
+  },
+  "auth.sign-in.launcher.opening.description": {
+    "message": "Nếu ứng dụng không mở, hãy dùng nút bên dưới để hoàn tất đăng nhập."
+  },
+  "auth.sign-in.launcher.opening.title": {
+    "message": "Đang mở Ứng dụng Modrinth..."
+  },
+  "auth.sign-in.launcher.reauthenticate.title": {
+    "message": "Đăng nhập vào Ứng dụng Modrinth"
+  },
+  "auth.sign-in.no-account": {
+    "message": "Chưa có tài khoản?"
+  },
+  "auth.sign-in.reauthenticate.use-different-account": {
+    "message": "Dùng tài khoản khác"
+  },
+  "auth.sign-in.sign-in-with": {
+    "message": "Đăng nhập vào Modrinth"
+  },
   "auth.sign-in.title": {
     "message": "Đăng nhập"
   },
+  "auth.sign-up.age-requirement.warning-title": {
+    "message": "Yêu cầu về độ tuổi"
+  },
+  "auth.sign-up.continue-with-email": {
+    "message": "Tiếp tục bằng email"
+  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Khi bạn tạo tài khoản, bạn đồng ý với <terms-link>Điều khoản sử dụng</terms-link> và <privacy-policy-link>Chính sách quyền riêng tư</privacy-policy-link> của Modrinth."
+  },
+  "auth.sign-up.show-fewer-options": {
+    "message": "Hiển thị ít tùy chọn hơn"
+  },
+  "auth.sign-up.show-other-options": {
+    "message": "Hiển thị tùy chọn khác"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Đã có tài khoản rồi à?"
@@ -779,8 +953,17 @@
   "auth.sign-up.title": {
     "message": "Đăng ký"
   },
+  "auth.sign-up.title.sign-up-with": {
+    "message": "Tạo tài khoản"
+  },
+  "auth.two-factor.incorrect-code": {
+    "message": "Mã xác thực hai yếu tố không đúng. Hãy thử lại hoặc dùng mã dự phòng."
+  },
   "auth.verify-email.action.account-settings": {
     "message": "Thiết đặt tài khoản"
+  },
+  "auth.verify-email.action.discover-mods": {
+    "message": "Khám phá mod"
   },
   "auth.verify-email.already-verified.description": {
     "message": "Email của bạn đã được xác minh!"
@@ -800,6 +983,15 @@
   "auth.verify-email.failed-verification.title": {
     "message": "Xác minh email thất bại"
   },
+  "auth.verify-email.notification.email-sent.description": {
+    "message": "Một email chứa liên kết xác minh tài khoản đã được gửi tới {email}."
+  },
+  "auth.verify-email.notification.email-sent.title": {
+    "message": "Đã gửi email"
+  },
+  "auth.verify-email.notification.error-occurred.title": {
+    "message": "Đã xảy ra lỗi"
+  },
   "auth.verify-email.post-verification.description": {
     "message": "Địa chỉ email của bạn đã được xác minh thành công!"
   },
@@ -808,6 +1000,12 @@
   },
   "auth.verify-email.title": {
     "message": "Xác nhận email"
+  },
+  "collection.aria-label.upload-icon": {
+    "message": "Tải biểu tượng lên"
+  },
+  "collection.button.discover-mods": {
+    "message": "Khám phá mod"
   },
   "collection.button.edit-icon": {
     "message": "Sửa biểu tượng"
@@ -877,6 +1075,9 @@
   },
   "conversation-thread.action.approve-with-reply": {
     "message": "Chấp thuận với phản hồi"
+  },
+  "conversation-thread.action.close-report": {
+    "message": "Đóng báo cáo"
   },
   "conversation-thread.action.close-with-reply": {
     "message": "Đóng với phản hồi"
@@ -980,6 +1181,135 @@
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Các tệp bổ trợ dùng cho các tài nguyên hỗ trợ như mã nguồn, không dùng cho các phiên bản hoặc biến thể thay thế."
   },
+  "create-project-version.create-modal.stage.add-files.details-tab": {
+    "message": "Chi tiết"
+  },
+  "create-project-version.create-modal.stage.add-files.files-tab": {
+    "message": "Tệp"
+  },
+  "create-project-version.create-modal.stage.add-files.metadata-tab": {
+    "message": "Siêu dữ liệu"
+  },
+  "create-project-version.create-modal.stage.add-files.primary-file-description": {
+    "message": "Tệp chính là tệp mặc định mà người dùng tải xuống khi cài đặt dự án."
+  },
+  "create-project-version.create-modal.stage.add-files.primary-file-label": {
+    "message": "Tệp chính"
+  },
+  "create-project-version.create-modal.stage.add-files.supplementary-files-description": {
+    "message": "Bạn có thể tùy chọn thêm các tệp bổ sung như mã nguồn, tài liệu hoặc gói tài nguyên bắt buộc."
+  },
+  "create-project-version.create-modal.stage.add-files.supplementary-files-label": {
+    "message": "Tệp bổ sung"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-additional-file-aria-label": {
+    "message": "Tải tệp bổ sung lên"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-file-aria-label": {
+    "message": "Tải tệp lên"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-primary-prompt": {
+    "message": "Tải tệp chính và tệp hỗ trợ lên"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-secondary-prompt": {
+    "message": "Kéo thả tệp hoặc nhấp để duyệt"
+  },
+  "create-project-version.create-modal.stage.details.details-tab": {
+    "message": "Chi tiết"
+  },
+  "create-project-version.create-modal.stage.details.files-tab": {
+    "message": "Tệp"
+  },
+  "create-project-version.create-modal.stage.details.metadata-tab": {
+    "message": "Siêu dữ liệu"
+  },
+  "create-project-version.create-modal.stage.details.version-changelog": {
+    "message": "Nhật ký thay đổi phiên bản"
+  },
+  "create-project-version.create-modal.stage.details.version-number": {
+    "message": "Số phiên bản"
+  },
+  "create-project-version.create-modal.stage.details.version-number-description": {
+    "message": "Số phiên bản giúp phân biệt phiên bản cụ thể này với các phiên bản khác."
+  },
+  "create-project-version.create-modal.stage.details.version-number-placeholder": {
+    "message": "Nhập số phiên bản, ví dụ 1.2.3-alpha.1"
+  },
+  "create-project-version.create-modal.stage.details.version-subtitle": {
+    "message": "Phụ đề phiên bản"
+  },
+  "create-project-version.create-modal.stage.details.version-subtitle-placeholder": {
+    "message": "Nhập phụ đề..."
+  },
+  "create-project-version.create-modal.stage.details.version-type": {
+    "message": "Loại phiên bản"
+  },
+  "create-project-version.create-modal.stage.metadata.add-dependency": {
+    "message": "Thêm phần phụ thuộc"
+  },
+  "create-project-version.create-modal.stage.metadata.dependencies": {
+    "message": "Phần phụ thuộc"
+  },
+  "create-project-version.create-modal.stage.metadata.details-tab": {
+    "message": "Chi tiết"
+  },
+  "create-project-version.create-modal.stage.metadata.detected-loaders": {
+    "message": "Bộ nạp được phát hiện"
+  },
+  "create-project-version.create-modal.stage.metadata.detected-versions": {
+    "message": "Phiên bản được phát hiện"
+  },
+  "create-project-version.create-modal.stage.metadata.edit-button": {
+    "message": "Chỉnh sửa"
+  },
+  "create-project-version.create-modal.stage.metadata.environment": {
+    "message": "Môi trường"
+  },
+  "create-project-version.create-modal.stage.metadata.files-tab": {
+    "message": "Tệp"
+  },
+  "create-project-version.create-modal.stage.metadata.loaders": {
+    "message": "Bộ nạp"
+  },
+  "create-project-version.create-modal.stage.metadata.metadata-tab": {
+    "message": "Siêu dữ liệu"
+  },
+  "create-project-version.create-modal.stage.metadata.modpack-loaders-tooltip": {
+    "message": "Không thể chỉnh sửa bộ nạp của modpack"
+  },
+  "create-project-version.create-modal.stage.metadata.modpack-versions-tooltip": {
+    "message": "Không thể chỉnh sửa phiên bản của modpack"
+  },
+  "create-project-version.create-modal.stage.metadata.no-dependencies-added": {
+    "message": "Chưa thêm phần phụ thuộc."
+  },
+  "create-project-version.create-modal.stage.metadata.no-environment-set": {
+    "message": "Chưa thiết lập môi trường."
+  },
+  "create-project-version.create-modal.stage.metadata.no-loaders-selected": {
+    "message": "Chưa chọn bộ nạp."
+  },
+  "create-project-version.create-modal.stage.metadata.no-mod-loader": {
+    "message": "Không có bộ nạp mod"
+  },
+  "create-project-version.create-modal.stage.metadata.no-versions-selected": {
+    "message": "Chưa chọn phiên bản."
+  },
+  "create-project-version.create-modal.stage.metadata.prefilled-environment-tooltip": {
+    "message": "Được điền sẵn từ một phiên bản tương tự trước đó"
+  },
+  "create-project-version.create-modal.stage.metadata.resource-pack-loaders-tooltip": {
+    "message": "Không thể chỉnh sửa bộ nạp của gói tài nguyên"
+  },
+  "create-project-version.create-modal.stage.metadata.suggested": {
+    "message": "Đề xuất"
+  },
+  "create-project-version.create-modal.stage.metadata.uploaded-files": {
+    "message": "Tệp đã tải lên"
+  },
+  "create-project-version.create-modal.stage.metadata.versions": {
+    "message": "Phiên bản"
+  },
   "create.collection.collection-info": {
     "message": "Bộ sưu tập mới của bạn sẽ được tạo dưới dạng bộ sưu tập công khai với {count, plural, =0 {không có dự án} other {# dự án}}."
   },
@@ -1076,6 +1406,9 @@
   "create.project.name-placeholder": {
     "message": "Nhập tên dự án..."
   },
+  "create.project.organization-icon-alt": {
+    "message": "Biểu tượng của {name}"
+  },
   "create.project.owner-description": {
     "message": "Chọn chính bạn hoặc tổ chức của bạn làm chủ sở hữu dự án."
   },
@@ -1106,8 +1439,14 @@
   "create.project.type-server": {
     "message": "Máy chủ"
   },
+  "create.project.unknown-user": {
+    "message": "Người dùng không xác định"
+  },
   "create.project.url-label": {
     "message": "URL"
+  },
+  "create.project.user-avatar-alt": {
+    "message": "Ảnh đại diện người dùng"
   },
   "create.project.visibility-description": {
     "message": "Khả năng hiển thị của dự án sau khi được phê duyệt."
@@ -1217,6 +1556,12 @@
   "dashboard.creator-tax-form-modal.header": {
     "message": "Biểu mẫu thuế"
   },
+  "dashboard.creator-tax-form-modal.incomplete.text": {
+    "message": "Bạn chưa hoàn tất biểu mẫu thuế. Vui lòng thử lại."
+  },
+  "dashboard.creator-tax-form-modal.incomplete.title": {
+    "message": "Biểu mẫu thuế chưa hoàn tất"
+  },
   "dashboard.creator-tax-form-modal.security.description": {
     "message": "Modrinth sử dụng nhà cung cấp bên thứ ba Track1099 để thu thập và lưu trữ an toàn các biểu mẫu thuế của bạn. <security-link>Tìm hiểu thêm tại đây.</security-link>"
   },
@@ -1256,6 +1601,9 @@
   "dashboard.creator-withdraw-modal.kyc.business-entity": {
     "message": "Thực thể kinh doanh"
   },
+  "dashboard.creator-withdraw-modal.kyc.date-of-birth-placeholder": {
+    "message": "Chọn ngày sinh"
+  },
   "dashboard.creator-withdraw-modal.kyc.entity-description": {
     "message": "Thực thể kinh doanh là một tổ chức đã được đăng ký, như là công ty, hợp danh hoặc LLC."
   },
@@ -1264,6 +1612,12 @@
   },
   "dashboard.creator-withdraw-modal.kyc.private-individual": {
     "message": "Cá nhân"
+  },
+  "dashboard.creator-withdraw-modal.kyc.search-countries-placeholder": {
+    "message": "Tìm quốc gia..."
+  },
+  "dashboard.creator-withdraw-modal.kyc.search-subdivisions-placeholder": {
+    "message": "Tìm khu vực hành chính..."
   },
   "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
     "message": "Chọn quốc gia của bạn"
@@ -1400,6 +1754,21 @@
   "dashboard.creator-withdraw-modal.tremendous-details.enter-denomination-placeholder": {
     "message": "Nhập số tiền"
   },
+  "dashboard.creator-withdraw-modal.tremendous-details.minimum-denomination-exceeds-balance": {
+    "message": "Mệnh giá tối thiểu là {min}, lớn hơn số dư {balance} của bạn."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.need-at-least-gift-card": {
+    "message": "Bạn cần ít nhất {min} để dùng thẻ quà tặng này."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.no-denominations-available": {
+    "message": "Không có mệnh giá phù hợp với số dư hiện tại của bạn"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.no-suggestions-no-max": {
+    "message": "Không có mệnh giá nào gần với số tiền này"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.no-suggestions-with-max": {
+    "message": "Không có mệnh giá nào gần với số tiền này. Mệnh giá cao nhất hiện có là {max}."
+  },
   "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
     "message": "Phương thức thanh toán"
   },
@@ -1414,6 +1783,12 @@
   },
   "dashboard.creator-withdraw-modal.tremendous-details.search-amount-label": {
     "message": "Tìm theo số tiền"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.search-category-placeholder": {
+    "message": "Tìm {category}..."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-category-placeholder": {
+    "message": "Chọn {category}"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-hint": {
     "message": "Chọn mệnh giá:"
@@ -1432,6 +1807,12 @@
   },
   "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-message": {
     "message": "Bạn đã chọn USD cho PayPal Quốc tế. <direct-paypal-link>Chuyển sang PayPal trực tiếp</direct-paypal-link> để có mức phí tốt hơn (≈2% thay vì ≈6%)."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.withdrawal-amount-min-max": {
+    "message": "Số tiền rút tối thiểu {min}, tối đa {max}."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.withdrawal-amount-min-only": {
+    "message": "Số tiền rút tối thiểu {min}."
   },
   "dashboard.creator-withdraw-modal.withdraw-button": {
     "message": "Rút tiền"
@@ -1586,11 +1967,20 @@
   "dashboard.projects.project.review-environment-metadata": {
     "message": "Vui lòng xem lại thông tin dữ liệu"
   },
+  "dashboard.projects.selection-bar.aria-label": {
+    "message": "Thao tác với các dự án đã chọn"
+  },
+  "dashboard.projects.selection-bar.selected-count": {
+    "message": "{count, plural, one {Đã chọn # dự án} other {Đã chọn # dự án}}"
+  },
   "dashboard.projects.table.id": {
     "message": "ID"
   },
   "dashboard.projects.table.name": {
     "message": "Tên"
+  },
+  "dashboard.projects.table.select-all-bulk-editable": {
+    "message": "Chọn tất cả dự án hỗ trợ chỉnh sửa hàng loạt"
   },
   "dashboard.projects.table.status": {
     "message": "Trạng thái"
@@ -1790,6 +2180,12 @@
   "dashboard.withdraw.error.minimum-not-met.title": {
     "message": "Số tiền quá thấp"
   },
+  "dashboard.withdraw.error.payout-method-disabled.text": {
+    "message": "Phương thức nhận tiền này đã bị nhà cung cấp thanh toán vô hiệu hóa. Vui lòng dùng phương thức khác hoặc liên hệ hỗ trợ."
+  },
+  "dashboard.withdraw.error.payout-method-disabled.title": {
+    "message": "Phương thức nhận tiền không khả dụng"
+  },
   "dashboard.withdraw.error.paypal-country-mismatch.text": {
     "message": "Xin hãy sử dụng đúng lựa chọn chuyển tiền của PayPal cho khu vực của bạn (Mỹ hoặc Quốc tế)."
   },
@@ -1847,6 +2243,12 @@
   "error.generic.401.signed-in-as": {
     "message": "Bạn hiện được dăng nhập là:"
   },
+  "error.generic.401.switch-account": {
+    "message": "Hoặc chuyển sang tài khoản khác:"
+  },
+  "error.generic.401.switch-account-failed": {
+    "message": "Không thể chuyển tài khoản. Vui lòng thử lại."
+  },
   "error.generic.401.title": {
     "message": "Bạn không có quyền vào trang này"
   },
@@ -1865,8 +2267,8 @@
   "error.generic.default.list_item.1": {
     "message": "Kiểm tra xem Modrinth có đang gặp sự cố không trên <status-link>Trang trạng thái</status-link> của chúng tôi."
   },
-  "error.generic.default.list_item.2": {
-    "message": "Nếu điều này tiếp tục xảy ra, bạn có thể thông báo cho Đội ngũ Modrinth bằng cách tham gia <discord-link>máy chủ Discord</discord-link> của chúng tôi."
+  "error.generic.default.list_item.support": {
+    "message": "Nếu điều này tiếp tục xảy ra, bạn có thể thông báo cho đội ngũ Modrinth qua <support-link>kênh hỗ trợ</support-link> của chúng tôi."
   },
   "error.generic.default.list_title": {
     "message": "Vui lòng thử lại sau vài phút."
@@ -1957,6 +2359,9 @@
   },
   "hosting-marketing.faq.cpu-kind": {
     "message": "Những loại CPU nào được sử dụng trên Modrinth?"
+  },
+  "hosting-marketing.faq.cpu-kind.answer": {
+    "message": "Máy chủ Modrinth Hosting sử dụng AMD Ryzen 7950X hoặc 9950X tương đương, kết hợp với bộ nhớ DDR5."
   },
   "hosting-marketing.faq.currency": {
     "message": "Tiền tệ nào được sử dụng để liệt kê giá?"
@@ -2083,6 +2488,24 @@
   },
   "hosting-marketing.medal.text-secondary": {
     "message": "Ưu đãi có hạn. Không cần thẻ thanh toán. Dành cho các máy chủ Mỹ."
+  },
+  "hosting-marketing.notification.error-fetching-payment-data-title": {
+    "message": "Lỗi khi tải dữ liệu thanh toán"
+  },
+  "hosting-marketing.notification.invalid-product-text": {
+    "message": "Đã tìm thấy sản phẩm được chọn nhưng thiếu dữ liệu cần thiết. Vui lòng liên hệ hỗ trợ."
+  },
+  "hosting-marketing.notification.invalid-product-title": {
+    "message": "Sản phẩm không hợp lệ"
+  },
+  "hosting-marketing.notification.server-capacity-full-text": {
+    "message": "Hiện chúng tôi đã hết dung lượng phục vụ. Vui lòng thử lại sau."
+  },
+  "hosting-marketing.notification.server-capacity-full-title": {
+    "message": "Máy chủ đã hết công suất"
+  },
+  "hosting-marketing.notification.unexpected-error-text": {
+    "message": "Đã xảy ra lỗi không mong muốn"
   },
   "hosting-marketing.pick-customized-plan": {
     "message": "Chọn gói tùy chỉnh với đúng những cấu hình bạn cần."
@@ -2297,6 +2720,9 @@
   "layout.action.new-project": {
     "message": "Dự án mới"
   },
+  "layout.action.new-server-project": {
+    "message": "Dự án máy chủ mới"
+  },
   "layout.action.publish": {
     "message": "Đăng tải"
   },
@@ -2308,6 +2734,9 @@
   },
   "layout.action.tech-review": {
     "message": "Đánh giá kỹ thuật"
+  },
+  "layout.action.user-lookup": {
+    "message": "Tra cứu người dùng"
   },
   "layout.avatar.alt": {
     "message": "Hình đại diện của bạn"
@@ -2396,6 +2825,21 @@
   "layout.footer.about.status": {
     "message": "Trạng thái"
   },
+  "layout.footer.based-on-label": {
+    "message": "Dựa trên"
+  },
+  "layout.footer.developer-mode-activated.text": {
+    "message": "Đã bật chế độ nhà phát triển"
+  },
+  "layout.footer.developer-mode-activated.title": {
+    "message": "Đã kích hoạt chế độ nhà phát triển"
+  },
+  "layout.footer.developer-mode-deactivated.text": {
+    "message": "Đã tắt chế độ nhà phát triển"
+  },
+  "layout.footer.developer-mode-deactivated.title": {
+    "message": "Đã vô hiệu hóa chế độ nhà phát triển"
+  },
   "layout.footer.legal": {
     "message": "Pháp lý"
   },
@@ -2459,8 +2903,17 @@
   "layout.footer.social.mastodon": {
     "message": "Mastodon"
   },
+  "layout.footer.social.reddit": {
+    "message": "Reddit"
+  },
   "layout.footer.social.x": {
     "message": "X"
+  },
+  "layout.footer.social.youtube": {
+    "message": "YouTube"
+  },
+  "layout.footer.unknown-commit": {
+    "message": "không xác định"
   },
   "layout.menu-toggle.action": {
     "message": "Chuyển đổi menu"
@@ -2479,6 +2932,9 @@
   },
   "layout.nav.active-reports": {
     "message": "Báo cáo hoạt động"
+  },
+  "layout.nav.add-account": {
+    "message": "Thêm tài khoản"
   },
   "layout.nav.discover": {
     "message": "Khám phá"
@@ -2510,6 +2966,9 @@
   "layout.nav.projects": {
     "message": "Dự án"
   },
+  "layout.nav.remove-account": {
+    "message": "Xóa tài khoản"
+  },
   "layout.nav.revenue": {
     "message": "Doanh thu"
   },
@@ -2519,14 +2978,62 @@
   "layout.nav.search": {
     "message": "Tìm kiếm"
   },
+  "layout.nav.switch-account": {
+    "message": "Chuyển tài khoản"
+  },
+  "layout.nav.switch-account-failed": {
+    "message": "Không thể chuyển tài khoản. Vui lòng thử lại."
+  },
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Nâng cấp lên Modrinth+"
+  },
+  "layout.publish.email-verification-required.description": {
+    "message": "Bạn phải xác minh email trước khi đăng nội dung lên Modrinth."
+  },
+  "layout.publish.email-verification-required.title": {
+    "message": "Yêu cầu xác minh email"
+  },
+  "messages.noResults": {
+    "message": "Không tìm thấy kết quả cho truy vấn của bạn!"
+  },
+  "modal.shared-instance.open-in-app.benefit.install": {
+    "message": "Tự động cài đặt mọi thứ họ đang chơi"
+  },
+  "modal.shared-instance.open-in-app.benefit.join": {
+    "message": "Chơi cùng nội dung với bạn bè"
+  },
+  "modal.shared-instance.open-in-app.benefit.update": {
+    "message": "Luôn cập nhật nội dung được chia sẻ khi có thay đổi"
+  },
+  "modal.shared-instance.open-in-app.get-app": {
+    "message": "Tải Ứng dụng Modrinth"
+  },
+  "modal.shared-instance.open-in-app.managed-by": {
+    "message": "Được quản lý bởi"
+  },
+  "modal.shared-instance.open-in-app.opening-automatically": {
+    "message": "Ứng dụng Modrinth sẽ tự động mở..."
+  },
+  "modal.shared-instance.open-in-app.title": {
+    "message": "Đang mở Ứng dụng Modrinth"
+  },
+  "modal.shared-instance.open-in-app.why-use": {
+    "message": "Vì sao nên dùng Ứng dụng Modrinth"
+  },
+  "moderation.exclude-technical-review": {
+    "message": "Loại trừ TR"
   },
   "moderation.moderate": {
     "message": "Kiểm duyệt"
   },
+  "moderation.page.delphi-rules": {
+    "message": "Quy tắc Delphi"
+  },
   "moderation.page.external-projects": {
     "message": "Dự án ngoài"
+  },
+  "moderation.page.global-detail-traces": {
+    "message": "Dấu vết toàn cục"
   },
   "moderation.page.projects": {
     "message": "Dự án"
@@ -2536,6 +3043,60 @@
   },
   "moderation.page.technicalReview": {
     "message": "Đánh giá kỹ thuật"
+  },
+  "modpack-scan-modal.batch.label": {
+    "message": "{amount} mỗi đợt"
+  },
+  "modpack-scan-modal.batch.placeholder": {
+    "message": "Số lượng mỗi đợt"
+  },
+  "modpack-scan-modal.delete-all-groups-confirmation.description": {
+    "message": "Thao tác này sẽ xóa vĩnh viễn tất cả nhóm ghi công của dự án cùng mọi tệp bên trong. Không thể hoàn tác."
+  },
+  "modpack-scan-modal.delete-all-groups.error": {
+    "message": "Không thể xóa tất cả nhóm: {error}"
+  },
+  "modpack-scan-modal.delete-all-groups.success": {
+    "message": "Đã xóa tất cả nhóm."
+  },
+  "modpack-scan-modal.failed": {
+    "message": "Thất bại"
+  },
+  "modpack-scan-modal.load-versions-error": {
+    "message": "Không thể tải phiên bản: {error}"
+  },
+  "modpack-scan-modal.loading-versions": {
+    "message": "Đang tải phiên bản..."
+  },
+  "modpack-scan-modal.new-files": {
+    "message": "Tệp mới"
+  },
+  "modpack-scan-modal.new-groups": {
+    "message": "Nhóm mới"
+  },
+  "modpack-scan-modal.no-files": {
+    "message": "Không tìm thấy tệp."
+  },
+  "modpack-scan-modal.not-scanned": {
+    "message": "Chưa quét"
+  },
+  "modpack-scan-modal.override-files": {
+    "message": "Tệp ghi đè ({count})"
+  },
+  "modpack-scan-modal.pack-file-name": {
+    "message": "Tên tệp trong gói"
+  },
+  "modpack-scan-modal.scan-all-files": {
+    "message": "Quét tất cả tệp"
+  },
+  "modpack-scan-modal.scan-error": {
+    "message": "Một số tệp không quét được: \n\n{error}"
+  },
+  "modpack-scan-modal.scanning": {
+    "message": "Đang quét..."
+  },
+  "modpack-scan-modal.title": {
+    "message": "Quét modpack ({scanned}/{total} tệp)"
   },
   "muralpay.account-type.checking": {
     "message": "Tài khoản thanh toán"
@@ -2804,6 +3365,51 @@
   "muralpay.warning.wallet-address": {
     "message": "Hãy kiểm tra kỹ địa chỉ ví. Số tiền gửi đến địa chỉ không chính xác sẽ không thể khôi phục."
   },
+  "organization.button.manage": {
+    "message": "Quản lý"
+  },
+  "organization.button.manage-projects": {
+    "message": "Quản lý dự án"
+  },
+  "organization.label.downloads": {
+    "message": "lượt tải"
+  },
+  "organization.label.members": {
+    "message": "thành viên"
+  },
+  "organization.label.organization": {
+    "message": "Tổ chức"
+  },
+  "organization.label.projects": {
+    "message": "dự án"
+  },
+  "organization.project-transfer.id-column": {
+    "message": "ID"
+  },
+  "organization.project-transfer.name-column": {
+    "message": "Tên"
+  },
+  "organization.project-transfer.no-projects-available": {
+    "message": "Không có dự án nào để chuyển."
+  },
+  "organization.project-transfer.project-icon-alt": {
+    "message": "Biểu tượng của {name}"
+  },
+  "organization.project-transfer.title": {
+    "message": "Chuyển dự án"
+  },
+  "organization.project-transfer.transfer-selected-projects": {
+    "message": "Chuyển {count, plural, one {# dự án} other {# dự án}}"
+  },
+  "organization.project-transfer.type-column": {
+    "message": "Loại"
+  },
+  "organization.projects.none": {
+    "message": "Tổ chức này chưa có dự án nào."
+  },
+  "organization.projects.none-with-create-prompt": {
+    "message": "Tổ chức này chưa có dự án nào. Bạn có muốn <create-link>tạo một dự án</create-link> không?"
+  },
   "project-member-header.error-decline": {
     "message": "Không thể từ chối lời mời vào nhóm"
   },
@@ -2824,6 +3430,9 @@
   },
   "project-member-header.success-join": {
     "message": "Bạn đã tham gia nhóm dự án"
+  },
+  "project-moderation-nags.project-submitted-for-review": {
+    "message": "Dự án của bạn đã được gửi để xét duyệt!"
   },
   "project-moderation-nags.publishing-checklist": {
     "message": "Danh sách kiểm tra xuất bản"
@@ -2918,6 +3527,12 @@
   "project-type.shader.singular": {
     "message": "Shader"
   },
+  "project.actions.check-modpack-archives": {
+    "message": "Kiểm tra giải nén modpack"
+  },
+  "project.actions.checking-modpack-archives": {
+    "message": "Đang kiểm tra..."
+  },
   "project.actions.create-server": {
     "message": "Tạo máy chủ"
   },
@@ -2926,6 +3541,15 @@
   },
   "project.actions.dont-show-again": {
     "message": "Không hiển thị lại"
+  },
+  "project.actions.edit-project": {
+    "message": "Chỉnh sửa dự án"
+  },
+  "project.actions.project-page": {
+    "message": "Trang dự án"
+  },
+  "project.actions.rescan-modpack": {
+    "message": "Quét lại modpack"
   },
   "project.actions.review-project": {
     "message": "Xem xét dự án"
@@ -2939,6 +3563,24 @@
   "project.actions.servers-promo.title": {
     "message": "Tạo máy chủ"
   },
+  "project.actions.view-dependents": {
+    "message": "Xem dự án phụ thuộc"
+  },
+  "project.actions.view-modpacks": {
+    "message": "Xem modpack"
+  },
+  "project.actions.view-project-type-dependents": {
+    "message": "Xem các {projectType} phụ thuộc"
+  },
+  "project.ai-image-warning-modal.body.1": {
+    "message": "Không được dùng hình ảnh do AI tạo để đại diện cho dự án. Cố tình lách cơ chế phát hiện có thể khiến tài khoản Modrinth của bạn bị đình chỉ."
+  },
+  "project.ai-image-warning-modal.body.2": {
+    "message": "Xem mục 6 trong <rules>Quy tắc nội dung của Modrinth</rules> để biết thêm về chính sách đối với AI tạo sinh."
+  },
+  "project.ai-image-warning-modal.title": {
+    "message": "Không cho phép hình ảnh do AI tạo"
+  },
   "project.collections.create-new": {
     "message": "Tạo bộ sưu tập mới"
   },
@@ -2948,14 +3590,107 @@
   "project.description.title": {
     "message": "Mô tả"
   },
+  "project.download.base-game-version-incompatible-tooltip": {
+    "message": "Phiên bản trò chơi này không tương thích với dự án gốc."
+  },
+  "project.download.base-loader-incompatible-tooltip": {
+    "message": "Bộ nạp này không tương thích với dự án gốc."
+  },
+  "project.download.compatible-version-title": {
+    "message": "Phiên bản tương thích"
+  },
+  "project.download.dependencies-title": {
+    "message": "Phần phụ thuộc"
+  },
+  "project.download.dependency-already-installed": {
+    "message": "Phần phụ thuộc này đã được cài đặt"
+  },
+  "project.download.dependency-any-compatible": {
+    "message": "Bất kỳ bản tương thích nào"
+  },
+  "project.download.dependency-conflicting": {
+    "message": "Phần phụ thuộc này xung đột với một phần phụ thuộc khác"
+  },
+  "project.download.dependency-download-file": {
+    "message": "Tải {filename}"
+  },
+  "project.download.dependency-download-file-with-size": {
+    "message": "Tải {filename} ({size})"
+  },
+  "project.download.dependency-duplicate": {
+    "message": "Phần phụ thuộc này đã được bao gồm"
+  },
+  "project.download.dependency-missing-version": {
+    "message": "Phiên bản của phần phụ thuộc này không khả dụng"
+  },
+  "project.download.dependency-no-compatible-version": {
+    "message": "Không có phiên bản tương thích cho phần phụ thuộc này"
+  },
+  "project.download.dependency-quilt-fabric-api": {
+    "message": "Bỏ qua Fabric API khi dùng Quilt"
+  },
+  "project.download.dependency-resource-pack-admonition": {
+    "message": "Dự án này có một phần phụ thuộc kèm gói tài nguyên bắt buộc. Hãy tải gói đó xuống và đặt vào thư mục {folder}."
+  },
+  "project.download.dependency-unavailable": {
+    "message": "Không thể tải phần phụ thuộc này"
+  },
+  "project.download.download": {
+    "message": "Tải xuống"
+  },
+  "project.download.download-as-zip": {
+    "message": "Tải dưới dạng .zip"
+  },
+  "project.download.download-version": {
+    "message": "Tải {version}"
+  },
+  "project.download.download-with-dependencies": {
+    "message": "Tải cùng phần phụ thuộc"
+  },
+  "project.download.download-with-recommended": {
+    "message": "Tải cùng các mục đề xuất"
+  },
+  "project.download.download-with-recommended-as-zip": {
+    "message": "Tải cùng các mục đề xuất dưới dạng .zip"
+  },
+  "project.download.duplicate-dependencies-hidden": {
+    "message": "Các phần phụ thuộc trùng lặp đã được ẩn"
+  },
+  "project.download.file-unavailable": {
+    "message": "Không thể tải tệp này"
+  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} không hỗ trợ {gameVersion} cho {platform}"
+  },
+  "project.download.install-with-app": {
+    "message": "Cài bằng Ứng dụng Modrinth"
+  },
+  "project.download.manually": {
+    "message": "Tải thủ công"
   },
   "project.download.no-app": {
     "message": "Chưa có Ứng dụng Modrinth?"
   },
+  "project.download.no-game-versions-found": {
+    "message": "Không tìm thấy phiên bản trò chơi"
+  },
+  "project.download.no-versions-available": {
+    "message": "Không có phiên bản nào cho {gameVersion} và {platform}."
+  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} không hỗ trợ {platform} cho {gameVersion}"
+  },
+  "project.download.recommended-title": {
+    "message": "Đề xuất"
+  },
+  "project.download.required-resource-pack-admonition": {
+    "message": "Gói dữ liệu này cũng yêu cầu một gói tài nguyên. Hãy tải gói đó xuống và đặt vào thư mục {folder}."
+  },
+  "project.download.required-resource-pack-short": {
+    "message": "Gói tài nguyên"
+  },
+  "project.download.search-game-versions": {
+    "message": "Chọn phiên bản trò chơi"
   },
   "project.download.select-game-version": {
     "message": "Chọn phiên bản game"
@@ -2968,6 +3703,15 @@
   },
   "project.download.title": {
     "message": "Tải xuống {title}"
+  },
+  "project.download.unknown-loader": {
+    "message": "Bộ nạp không xác định"
+  },
+  "project.download.zip-failed-text": {
+    "message": "Không thể tải một hoặc nhiều tệp. Vui lòng thử lại."
+  },
+  "project.download.zip-failed-title": {
+    "message": "Không thể tải tệp"
   },
   "project.environment.migration-no-permission.message": {
     "message": "Chúng tôi vừa nâng cấp toàn bộ hệ thống Môi trường trên Modrinth và hiện đã có các tùy chọn mới. Bạn không có quyền chỉnh sửa các cài đặt này, nhưng vui lòng thông báo cho một thành viên khác của dự án rằng metadata môi trường cần được xác minh."
@@ -2998,6 +3742,9 @@
   },
   "project.gallery.title": {
     "message": "Thư viện"
+  },
+  "project.install-context.back-to-discover": {
+    "message": "Quay lại Khám phá"
   },
   "project.moderation.admonition.approved.body.private": {
     "message": "Dự án của bạn đang để chế độ riêng tư, nghĩa là chỉ có bạn và những người khác được mời có thể truy cập nó."
@@ -3041,6 +3788,12 @@
   "project.moderation.admonition.under-review.body.3": {
     "message": "Bạn có thể thay đổi dự án mà không làm ảnh hưởng đến thứ tự trong hàng của bạn."
   },
+  "project.moderation.admonition.under-review.body.4": {
+    "message": "Chúng tôi cố gắng xét duyệt trong vòng 24–48 giờ, nhưng một số dự án có thể bị chậm hơn. Điều này không có nghĩa là bài gửi của bạn có vấn đề."
+  },
+  "project.moderation.admonition.under-review.body.4.alt-week": {
+    "message": "Chúng tôi cố gắng xét duyệt trong vòng một tuần, nhưng một số dự án có thể bị chậm hơn. Điều này không có nghĩa là bài gửi của bạn có vấn đề."
+  },
   "project.moderation.admonition.under-review.body.5": {
     "message": "<emphasis>Chúng tôi rất cảm ơn sự kiên nhẫn của bạn trong khi đội ngũ kiểm duyệt chúng tôi đang nỗ lực giữ cho Modrinth an toàn, và mong được hỗ trợ bạn để chia sẻ nội dung của mình!💚</emphasis>"
   },
@@ -3074,8 +3827,23 @@
   "project.moderation.title": {
     "message": "Kiểm duyệt"
   },
+  "project.modpack-archive-warning.description": {
+    "message": "Việc nhập tệp .mrpack này có thể bị lỗi."
+  },
+  "project.modpack-archive-warning.title": {
+    "message": "Modpack này được xuất bản trong thời gian có lỗi xuất gói"
+  },
   "project.navigation.changelog": {
     "message": "Nhật ký thay đổi"
+  },
+  "project.notification.check-modpack-archives.failed": {
+    "message": "Không thể giải nén một số tệp modpack"
+  },
+  "project.notification.check-modpack-archives.no-files": {
+    "message": "Không tìm thấy tệp .mrpack nào cho dự án này."
+  },
+  "project.notification.check-modpack-archives.success": {
+    "message": "{count, plural, one {Tệp modpack có thể được giải nén.} other {Cả # tệp modpack đều có thể được giải nén.}}"
   },
   "project.notification.icon-updated.message": {
     "message": "Biểu tượng dự án của bạn đã được cập nhật."
@@ -3083,11 +3851,245 @@
   "project.notification.icon-updated.title": {
     "message": "Biểu tượng dự án đã được cập nhật"
   },
+  "project.notification.review-save-failed.description": {
+    "message": "Bạn không thể lưu các chỉnh sửa khiến dự án không vượt qua bước xác thực."
+  },
+  "project.notification.review-save-failed.title": {
+    "message": "Không thể lưu dự án đang xét duyệt"
+  },
   "project.notification.updated.message": {
     "message": "Dự án của bạn đã được cập nhật."
   },
   "project.notification.updated.title": {
     "message": "Đã cập nhật dự án"
+  },
+  "project.settings.back-to-all-projects": {
+    "message": "Quay lại tất cả dự án"
+  },
+  "project.settings.back-to-project-page": {
+    "message": "Quay lại trang dự án"
+  },
+  "project.settings.danger-zone": {
+    "message": "Khu vực nguy hiểm"
+  },
+  "project.settings.delete-project.button": {
+    "message": "Xóa dự án"
+  },
+  "project.settings.delete-project.confirmation.description": {
+    "message": "Nếu tiếp tục, toàn bộ thông tin và mọi phiên bản của dự án này sẽ bị xóa ngay khỏi cơ sở dữ liệu của chúng tôi. Không nội dung nào có thể khôi phục nếu bạn đổi ý sau đó. Nếu muốn một lựa chọn ít vĩnh viễn hơn, hãy cân nhắc đặt dự án thành Riêng tư."
+  },
+  "project.settings.delete-project.confirmation.proceed-text": {
+    "message": "Xóa dự án vĩnh viễn"
+  },
+  "project.settings.delete-project.confirmation.title": {
+    "message": "Bạn có chắc muốn xóa dự án này không?"
+  },
+  "project.settings.delete-project.description.1": {
+    "message": "Xóa vĩnh viễn dự án này khỏi Modrinth. Các dự án đã xóa <emphasis>không thể được khôi phục</emphasis> bởi nhân viên hoặc đội ngũ hỗ trợ Modrinth."
+  },
+  "project.settings.delete-project.description.2": {
+    "message": "Các tệp đã tải lên dự án này nhưng vẫn đang được dùng trong những modpack lưu trữ trên Modrinth có thể tiếp tục tồn tại."
+  },
+  "project.settings.delete-project.title": {
+    "message": "Xóa dự án"
+  },
+  "project.settings.description.intro": {
+    "message": "Bạn có thể viết mô tả chi tiết cho dự án tại đây. Phần mô tả phải nêu rõ và trung thực mục đích cũng như chức năng của dự án. Xem mục 2.1 trong <rules>Quy tắc nội dung</rules> để biết đầy đủ yêu cầu."
+  },
+  "project.settings.description.title": {
+    "message": "Mô tả"
+  },
+  "project.settings.description.updated": {
+    "message": "Đã cập nhật mô tả"
+  },
+  "project.settings.description.updated-text": {
+    "message": "Phần mô tả của bạn đã được cập nhật."
+  },
+  "project.settings.disclosures.advertising.description.1": {
+    "message": "Phải bật mục này nếu dự án có chứa quảng cáo, tài trợ hoặc quảng bá cho các sản phẩm hay tác phẩm khác."
+  },
+  "project.settings.disclosures.advertising.description.2": {
+    "message": "Điều này không áp dụng cho việc quảng bá kín đáo các nội dung liên quan không mang giá trị tiền tệ trực tiếp (chẳng hạn liên kết đến hồ sơ Modrinth trong menu cấu hình của chính bạn), và cũng không áp dụng cho quảng cáo trên trang dự án như banner tài trợ trong phần mô tả."
+  },
+  "project.settings.disclosures.advertising.note-placeholder": {
+    "message": "ví dụ: Tự động thêm máy chủ Modrinth SMP vào danh sách máy chủ của bạn."
+  },
+  "project.settings.disclosures.advertising.title": {
+    "message": "Có chứa quảng cáo"
+  },
+  "project.settings.disclosures.ai-functionality.description": {
+    "message": "Phải bật mục này nếu dự án có chức năng sử dụng AI tạo sinh, chẳng hạn chatbot trong trò chơi hoặc texture được tạo động."
+  },
+  "project.settings.disclosures.ai-functionality.note-placeholder": {
+    "message": "ví dụ: NPC sử dụng AI tạo sinh để tạo các lựa chọn hội thoại."
+  },
+  "project.settings.disclosures.ai-functionality.title": {
+    "message": "Có chức năng sử dụng AI tạo sinh"
+  },
+  "project.settings.disclosures.ai.description": {
+    "message": "Phải bật mục này nếu dự án có tài nguyên hoặc văn bản do AI tạo, hoặc chứa một lượng đáng kể mã nguồn do AI tạo."
+  },
+  "project.settings.disclosures.ai.description.2": {
+    "message": "Bạn cần trung thực nếu AI tạo sinh đóng vai trò đáng kể trong quá trình tạo hoặc xuất bản nội dung này. Có thể hiểu đơn giản rằng nếu bạn xem AI như một đồng tác giả của dự án thì nên công bố điều đó tại đây."
+  },
+  "project.settings.disclosures.ai.note-placeholder": {
+    "message": "ví dụ: Bản dịch tiếng Trung và tiếng Ả Rập được tạo bằng AI."
+  },
+  "project.settings.disclosures.ai.still-unsure": {
+    "message": "Vẫn chưa chắc? Hãy xem hướng dẫn về <faq-link>Công bố và sử dụng AI</faq-link> cùng mục 6 trong <rules>Quy tắc nội dung của Modrinth</rules> để biết thêm thông tin."
+  },
+  "project.settings.disclosures.ai.title": {
+    "message": "Có nội dung do AI tạo"
+  },
+  "project.settings.disclosures.ai.types-description": {
+    "message": "Những loại nội dung nào đã được tạo bằng AI?"
+  },
+  "project.settings.disclosures.archived.banner-preview": {
+    "message": "Xem trước banner"
+  },
+  "project.settings.disclosures.archived.description.1": {
+    "message": "Đánh dấu dự án là đã lưu trữ để cho người dùng biết rằng bạn không còn phát triển dự án nữa."
+  },
+  "project.settings.disclosures.archived.description.2": {
+    "message": "Dự án đã lưu trữ vẫn có thể được tìm thấy khi chế độ hiển thị được đặt thành Công khai. Nếu muốn ẩn dự án khỏi danh sách, hãy đặt chế độ hiển thị thành Không liệt kê."
+  },
+  "project.settings.disclosures.archived.note-placeholder": {
+    "message": "ví dụ: Tôi không còn thời gian duy trì dự án này nữa, bạn có thể thoải mái fork nó!"
+  },
+  "project.settings.disclosures.archived.title": {
+    "message": "Lưu trữ dự án"
+  },
+  "project.settings.disclosures.content-disclosures": {
+    "message": "Công bố nội dung"
+  },
+  "project.settings.disclosures.derivative.description": {
+    "message": "Bạn phải bật mục này nếu dự án là sản phẩm phái sinh từ một dự án khác, chẳng hạn là một fork hoặc chứa một lượng đáng kể công việc của người khác."
+  },
+  "project.settings.disclosures.derivative.link-label": {
+    "message": "Liên kết đến tác phẩm gốc"
+  },
+  "project.settings.disclosures.derivative.link-placeholder": {
+    "message": "https://example.com"
+  },
+  "project.settings.disclosures.derivative.name-label": {
+    "message": "Tên tác phẩm gốc"
+  },
+  "project.settings.disclosures.derivative.name-placeholder": {
+    "message": "Dự án mẫu"
+  },
+  "project.settings.disclosures.derivative.note-label": {
+    "message": "Giải thích dự án của bạn dựa trên tác phẩm gốc như thế nào"
+  },
+  "project.settings.disclosures.derivative.note-placeholder": {
+    "message": "Đây là một fork bổ sung vài quần xã mới và chuyển dự án sang các phiên bản Minecraft mới hơn."
+  },
+  "project.settings.disclosures.derivative.title": {
+    "message": "Có nội dung phái sinh"
+  },
+  "project.settings.disclosures.description": {
+    "message": "Bạn phải thêm mọi mục công bố nội dung áp dụng cho dự án theo <rules>Quy tắc nội dung của Modrinth</rules>."
+  },
+  "project.settings.disclosures.description.2": {
+    "message": "Chưa rõ cách áp dụng công bố nội dung cho dự án? Hãy xem <faq-link>Câu hỏi thường gặp về công bố nội dung</faq-link>."
+  },
+  "project.settings.disclosures.info-tooltip": {
+    "message": "Nhấp để tìm hiểu thêm về trường hợp nên dùng mục công bố này."
+  },
+  "project.settings.disclosures.last-updated": {
+    "message": "Cập nhật lần cuối vào {date} bởi {user}"
+  },
+  "project.settings.disclosures.last-updated.moderator": {
+    "message": "Kiểm duyệt viên"
+  },
+  "project.settings.disclosures.lock-status.cannot-disable.warning": {
+    "message": "Vui lòng <contact-support-link>liên hệ hỗ trợ</contact-support-link> nếu cần xóa mục công bố này."
+  },
+  "project.settings.disclosures.lock-status.disabled.warning": {
+    "message": "Mục công bố này đã bị kiểm duyệt viên khóa. Vui lòng <contact-support-link>liên hệ hỗ trợ</contact-support-link> nếu bạn cho rằng đây là nhầm lẫn."
+  },
+  "project.settings.disclosures.lock-status.fully-locked.warning": {
+    "message": "Vui lòng <contact-support-link>liên hệ hỗ trợ</contact-support-link> nếu cần chỉnh sửa hoặc xóa mục công bố này."
+  },
+  "project.settings.disclosures.paid-features.description": {
+    "message": "Phải bật mục này nếu dự án có các tính năng có thể mở khóa bằng tiền thật."
+  },
+  "project.settings.disclosures.paid-features.feature-placeholder": {
+    "message": "ví dụ: Vật phẩm trang trí được cung cấp dưới dạng phần thưởng Patreon"
+  },
+  "project.settings.disclosures.paid-features.features-description": {
+    "message": "Liệt kê các loại tính năng trả phí"
+  },
+  "project.settings.disclosures.paid-features.title": {
+    "message": "Có tính năng trả phí"
+  },
+  "project.settings.disclosures.photosensitivity.description": {
+    "message": "Bật mục này nếu dự án có bất kỳ nội dung nào mà bạn cho rằng có thể gây nguy hiểm cho những người nhạy cảm với ánh sáng nhấp nháy hoặc họa tiết."
+  },
+  "project.settings.disclosures.photosensitivity.note-placeholder": {
+    "message": "ví dụ: Dự án thêm một vật phẩm đèn pin có chế độ nhấp nháy. Có thể tắt chế độ này trong cài đặt Trợ năng của trò chơi."
+  },
+  "project.settings.disclosures.photosensitivity.title": {
+    "message": "Cảnh báo nhạy cảm ánh sáng"
+  },
+  "project.settings.disclosures.save-blocked.advertising-note": {
+    "message": "Mục công bố quảng cáo cần có phần giải thích."
+  },
+  "project.settings.disclosures.save-blocked.derivative-empty": {
+    "message": "Mục công bố tác phẩm phái sinh phải liệt kê ít nhất một tác phẩm nguồn."
+  },
+  "project.settings.disclosures.save-blocked.derivative-source-label": {
+    "message": "Nguồn của tác phẩm phái sinh phải có tên."
+  },
+  "project.settings.disclosures.save-blocked.no-permission": {
+    "message": "Bạn không có quyền chỉnh sửa các mục công bố của dự án này."
+  },
+  "project.settings.disclosures.save-blocked.paid-features-empty": {
+    "message": "Mục công bố tính năng trả phí phải liệt kê ít nhất một tính năng trả phí."
+  },
+  "project.settings.disclosures.save-blocked.photosensitivity-note": {
+    "message": "Mục cảnh báo nhạy cảm ánh sáng phải có phần mô tả."
+  },
+  "project.settings.disclosures.save-blocked.system-interactions-note": {
+    "message": "Mục công bố tương tác với hệ thống bên ngoài phải có phần mô tả."
+  },
+  "project.settings.disclosures.save-blocked.telemetry-empty": {
+    "message": "Mục công bố dữ liệu đo từ xa phải liệt kê ít nhất một loại dữ liệu được thu thập."
+  },
+  "project.settings.disclosures.system-interactions.description": {
+    "message": "Bạn phải bật mục này nếu dự án đọc hoặc chỉnh sửa nội dung trên hệ thống của người dùng ở bên ngoài trò chơi."
+  },
+  "project.settings.disclosures.system-interactions.note-label": {
+    "message": "Mô tả các tương tác với hệ thống bên ngoài"
+  },
+  "project.settings.disclosures.system-interactions.note-placeholder": {
+    "message": "ví dụ: Dự án thêm một tệp có tên wake_up.txt lên màn hình nền"
+  },
+  "project.settings.disclosures.system-interactions.title": {
+    "message": "Tương tác với hệ thống bên ngoài"
+  },
+  "project.settings.disclosures.telemetry.consent-description": {
+    "message": "Cơ chế xin đồng ý cho dữ liệu đo từ xa của bạn là gì?"
+  },
+  "project.settings.disclosures.telemetry.data-description": {
+    "message": "Bạn có thể thêm chính sách quyền riêng tư hoặc danh sách các loại dữ liệu được thu thập. Hãy nhớ nêu rõ dữ liệu có ẩn danh hay chứa thông tin nhận dạng cá nhân (PII)."
+  },
+  "project.settings.disclosures.telemetry.data-label": {
+    "message": "Dữ liệu nào được thu thập?"
+  },
+  "project.settings.disclosures.telemetry.data-placeholder": {
+    "message": "ví dụ: Phân tích lượt khởi chạy ẩn danh để theo dõi phiên bản Minecraft và mức sử dụng bộ nạp mod."
+  },
+  "project.settings.disclosures.telemetry.description": {
+    "message": "Bạn phải bật mục này nếu dự án gửi dữ liệu sử dụng về cho bạn hoặc một bên thứ ba."
+  },
+  "project.settings.disclosures.telemetry.title": {
+    "message": "Có thu thập dữ liệu đo từ xa"
+  },
+  "project.settings.disclosures.upload-version-first.heading": {
+    "message": "Tải phiên bản lên trước khi thêm mục công bố"
+  },
+  "project.settings.editing-project": {
+    "message": "Đang chỉnh sửa dự án {projectType}"
   },
   "project.settings.general.name.description": {
     "message": "Tránh dùng tiền tố, hậu tố, nội dung trong ngoặc hoặc mô tả bổ sung — chỉ sử dụng đúng tên thực của dự án."
@@ -3134,17 +4136,410 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
+  "project.settings.license.all-rights": {
+    "message": "Bảo lưu mọi quyền/Không có giấy phép"
+  },
+  "project.settings.license.allow-later": {
+    "message": "Cho phép các phiên bản giấy phép mới hơn"
+  },
+  "project.settings.license.custom": {
+    "message": "Tùy chỉnh"
+  },
+  "project.settings.license.custom-name-required": {
+    "message": "Nhập tên cho giấy phép tùy chỉnh của bạn."
+  },
+  "project.settings.license.custom-url-description": {
+    "message": "Địa chỉ web chứa toàn bộ nội dung giấy phép."
+  },
+  "project.settings.license.intro": {
+    "message": "Việc chọn giấy phép phù hợp cho {type} rất quan trọng. Bạn có thể chọn một giấy phép trong danh sách hoặc cung cấp giấy phép tùy chỉnh. Bạn cũng có thể cung cấp URL tùy chỉnh cho giấy phép đã chọn; nếu không, nội dung giấy phép sẽ được hiển thị. Xem <guide>hướng dẫn về giấy phép</guide> để biết thêm thông tin."
+  },
+  "project.settings.license.later": {
+    "message": "Phiên bản giấy phép mới hơn"
+  },
+  "project.settings.license.later-description": {
+    "message": "Giấy phép bạn chọn có điều khoản “hoặc phiên bản mới hơn”. Nếu chọn ô này, người dùng có thể sử dụng dự án của bạn theo các phiên bản giấy phép mới hơn."
+  },
+  "project.settings.license.missing-url": {
+    "message": "Nhập URL dẫn đến toàn bộ nội dung giấy phép tùy chỉnh."
+  },
+  "project.settings.license.name": {
+    "message": "Tên giấy phép"
+  },
+  "project.settings.license.name-description": {
+    "message": "Tên đầy đủ của giấy phép tùy chỉnh."
+  },
+  "project.settings.license.name-placeholder": {
+    "message": "Tên giấy phép"
+  },
+  "project.settings.license.optional-label": {
+    "message": "tùy chọn"
+  },
+  "project.settings.license.select": {
+    "message": "Giấy phép"
+  },
+  "project.settings.license.select-placeholder": {
+    "message": "Tìm giấy phép..."
+  },
+  "project.settings.license.title": {
+    "message": "Giấy phép"
+  },
+  "project.settings.license.updated": {
+    "message": "Đã cập nhật giấy phép"
+  },
+  "project.settings.license.updated-text": {
+    "message": "Giấy phép của bạn đã được cập nhật."
+  },
+  "project.settings.license.url": {
+    "message": "URL giấy phép"
+  },
+  "project.settings.license.url-description": {
+    "message": "Địa chỉ web chứa toàn bộ nội dung giấy phép. Nếu bạn không cung cấp liên kết, nội dung giấy phép sẽ được hiển thị thay thế."
+  },
+  "project.settings.license.url-placeholder": {
+    "message": "URL giấy phép"
+  },
+  "project.settings.links.add-link": {
+    "message": "Thêm liên kết"
+  },
+  "project.settings.links.discord": {
+    "message": "Lời mời Discord"
+  },
+  "project.settings.links.discord-description": {
+    "message": "Liên kết mời vào máy chủ Discord của bạn."
+  },
+  "project.settings.links.donation-link": {
+    "message": "Liên kết"
+  },
+  "project.settings.links.donation-platform": {
+    "message": "Nền tảng"
+  },
+  "project.settings.links.donation-url": {
+    "message": "URL"
+  },
+  "project.settings.links.donation-username": {
+    "message": "Tên người dùng"
+  },
+  "project.settings.links.donation-username-placeholder": {
+    "message": "Nhập tên người dùng {platform} của bạn"
+  },
+  "project.settings.links.donations": {
+    "message": "Liên kết ủng hộ"
+  },
+  "project.settings.links.donations-description": {
+    "message": "Thêm liên kết để người dùng có thể trực tiếp ủng hộ bạn."
+  },
+  "project.settings.links.issues": {
+    "message": "Trình theo dõi vấn đề"
+  },
+  "project.settings.links.issues-description": {
+    "message": "Nơi để người dùng báo lỗi, sự cố và các vấn đề liên quan đến dự án."
+  },
+  "project.settings.links.link-type": {
+    "message": "Loại liên kết"
+  },
+  "project.settings.links.remove-donation-link": {
+    "message": "Xóa liên kết ủng hộ"
+  },
+  "project.settings.links.server-discord": {
+    "message": "Discord"
+  },
+  "project.settings.links.server-updated": {
+    "message": "Các liên kết máy chủ của bạn đã được cập nhật."
+  },
+  "project.settings.links.server-wiki-description": {
+    "message": "Trang chứa thông tin, tài liệu và trợ giúp cho máy chủ."
+  },
+  "project.settings.links.site": {
+    "message": "Trang web"
+  },
+  "project.settings.links.site-description": {
+    "message": "Trang web chính thức của máy chủ."
+  },
+  "project.settings.links.source": {
+    "message": "Mã nguồn"
+  },
+  "project.settings.links.source-description": {
+    "message": "Trang hoặc kho lưu trữ chứa mã nguồn của dự án"
+  },
+  "project.settings.links.store": {
+    "message": "Cửa hàng"
+  },
+  "project.settings.links.store-description": {
+    "message": "Liên kết đến cửa hàng của máy chủ."
+  },
+  "project.settings.links.title": {
+    "message": "Liên kết"
+  },
+  "project.settings.links.updated": {
+    "message": "Các liên kết của bạn đã được cập nhật."
+  },
+  "project.settings.links.updated-title": {
+    "message": "Đã cập nhật liên kết"
+  },
+  "project.settings.links.url-placeholder": {
+    "message": "Nhập URL hợp lệ"
+  },
+  "project.settings.links.visit-link": {
+    "message": "Truy cập {url}"
+  },
+  "project.settings.links.wiki": {
+    "message": "Trang Wiki"
+  },
+  "project.settings.links.wiki-description": {
+    "message": "Trang chứa thông tin, tài liệu và trợ giúp cho dự án."
+  },
+  "project.settings.monetization.description": {
+    "message": "Các dự án trên Modrinth được tự động tham gia <rewards-program-link>Chương trình phần thưởng</rewards-program-link>. Nếu bạn không muốn (hoặc không thể vì lý do pháp lý) kiếm doanh thu từ dự án này, bạn có thể tắt tại đây."
+  },
+  "project.settings.monetization.disabled-description": {
+    "message": "Dự án này không đủ điều kiện kiếm tiền. Nếu bạn cho rằng đây là nhầm lẫn, vui lòng <contact-support-link>liên hệ hỗ trợ</contact-support-link>."
+  },
+  "project.settings.monetization.title": {
+    "message": "Kiếm tiền"
+  },
+  "project.settings.permissions.attention-needed.description.proj-approved": {
+    "message": "Vui lòng cung cấp bằng chứng cho thấy bạn có quyền phân phối lại tất cả các tệp dưới đây. Sau khi hoàn tất, các phiên bản đang bị giữ lại sẽ tự động được xuất bản."
+  },
+  "project.settings.permissions.attention-needed.description.proj-draft": {
+    "message": "Vui lòng cung cấp bằng chứng cho thấy bạn có quyền phân phối lại tất cả các tệp dưới đây trước khi gửi dự án để xét duyệt."
+  },
+  "project.settings.permissions.attention-needed.title": {
+    "message": "Nội dung bên ngoài chưa xác định"
+  },
+  "project.settings.permissions.bad-proof.description": {
+    "message": "Đội ngũ kiểm duyệt Modrinth đã từ chối thông tin quyền mà bạn cung cấp cho một số nội dung bên ngoài. Hãy xem lại các mục bị từ chối bên dưới và cung cấp bằng chứng hợp lệ hoặc xóa nội dung."
+  },
+  "project.settings.permissions.bad-proof.title": {
+    "message": "Một số bằng chứng đã bị từ chối"
+  },
+  "project.settings.permissions.collapse-all": {
+    "message": "Thu gọn tất cả"
+  },
+  "project.settings.permissions.completed.description": {
+    "message": "Đã cung cấp thông tin quyền và ghi công cho toàn bộ nội dung bên ngoài."
+  },
+  "project.settings.permissions.completed.title": {
+    "message": "Đã hoàn tất quyền!"
+  },
+  "project.settings.permissions.delete-all-groups": {
+    "message": "Xóa tất cả nhóm"
+  },
+  "project.settings.permissions.delete-all-groups-confirmation.description": {
+    "message": "Thao tác này sẽ xóa vĩnh viễn {count, plural, one {# nhóm ghi công} other {# nhóm ghi công}} của dự án này cùng tất cả tệp bên trong. Không thể hoàn tác."
+  },
+  "project.settings.permissions.delete-all-groups-confirmation.title": {
+    "message": "Xóa tất cả nhóm ghi công?"
+  },
+  "project.settings.permissions.delete-all-groups-error": {
+    "message": "Không thể xóa tất cả nhóm ghi công"
+  },
+  "project.settings.permissions.delete-all-groups-success": {
+    "message": "Đã xóa tất cả nhóm ghi công."
+  },
+  "project.settings.permissions.empty-state.description": {
+    "message": "Không có phiên bản nào của dự án chứa nội dung bên ngoài, nên bạn không cần lo về việc xin quyền phân phối."
+  },
   "project.settings.permissions.empty-state.heading": {
     "message": "Mọi thứ đều sẵn sàng!"
+  },
+  "project.settings.permissions.expand-all": {
+    "message": "Mở rộng tất cả"
+  },
+  "project.settings.permissions.fail.description": {
+    "message": "Bạn có thể không có quyền phân phối lại một số nội dung bên ngoài trong dự án. Để xuất bản trên Modrinth, vui lòng xóa nội dung này hoặc cung cấp bằng chứng cho thấy bạn có quyền sử dụng."
   },
   "project.settings.permissions.fail.title": {
     "message": "Một số nội dung không thể bao gồm"
   },
+  "project.settings.permissions.info-banner.description": {
+    "message": "Nếu bạn đưa vào nội dung không được lưu trữ trên Modrinth, hãy cho chúng tôi biết nguồn của nội dung đó và xác minh rằng bạn có quyền phân phối các tệp. Xem <link>thông báo của chúng tôi về hệ thống mới này</link> để biết thêm!"
+  },
+  "project.settings.permissions.info-banner.title": {
+    "message": "Tìm hiểu về quyền phân phối"
+  },
   "project.settings.permissions.learn-more": {
     "message": "Tìm hiểu thêm"
   },
+  "project.settings.permissions.no-results": {
+    "message": "Không có tệp bên ngoài nào khớp với tìm kiếm của bạn."
+  },
+  "project.settings.permissions.not-allowed.description": {
+    "message": "Một số nội dung bên ngoài không được phép phân phối trên Modrinth vì vi phạm Quy tắc nội dung và phải được xóa."
+  },
+  "project.settings.permissions.pending-approval-count": {
+    "message": "{count, plural, =0 {Không có mục ghi công nào cần duyệt} one {# mục ghi công cần duyệt} other {# mục ghi công cần duyệt}}"
+  },
+  "project.settings.permissions.search-placeholder": {
+    "message": "Tìm trong {count} {count, plural, one {dự án} other {dự án}}..."
+  },
+  "project.settings.permissions.sort.most-files": {
+    "message": "Nhiều tệp nhất"
+  },
+  "project.settings.permissions.sort.recently-edited": {
+    "message": "Mới chỉnh sửa"
+  },
+  "project.settings.permissions.sort.rejected": {
+    "message": "Bị từ chối"
+  },
+  "project.settings.permissions.sort.status": {
+    "message": "Trạng thái"
+  },
+  "project.settings.server.bedrock-address-label": {
+    "message": "Địa chỉ Bedrock"
+  },
+  "project.settings.server.cannot-save-text": {
+    "message": "Máy chủ Java phải có thể truy cập được trước khi lưu. Hãy đảm bảo thao tác ping thành công."
+  },
+  "project.settings.server.cannot-save-title": {
+    "message": "Không thể lưu"
+  },
+  "project.settings.server.details-heading": {
+    "message": "Chi tiết máy chủ"
+  },
+  "project.settings.server.enter-address-placeholder": {
+    "message": "Nhập địa chỉ"
+  },
+  "project.settings.server.java-address-label": {
+    "message": "Địa chỉ Java"
+  },
+  "project.settings.server.languages-label": {
+    "message": "Ngôn ngữ"
+  },
+  "project.settings.server.latency-label": {
+    "message": "Độ trễ: {latency}ms"
+  },
+  "project.settings.server.optional-label": {
+    "message": "tùy chọn"
+  },
+  "project.settings.server.ping-failed-message": {
+    "message": "Chúng tôi không thể ping máy chủ này. Có thể nhà cung cấp dịch vụ của bạn đang chặn ping, vì vậy hãy thử làm mới vài lần. Nếu máy chủ vẫn không phản hồi, vui lòng <support-link>liên hệ hỗ trợ</support-link>."
+  },
+  "project.settings.server.refresh-ping-tooltip": {
+    "message": "Ping lại"
+  },
+  "project.settings.server.region-label": {
+    "message": "Khu vực"
+  },
+  "project.settings.server.select-languages-placeholder": {
+    "message": "Chọn ngôn ngữ"
+  },
+  "project.settings.server.select-region-placeholder": {
+    "message": "Chọn khu vực"
+  },
+  "project.settings.server.server-online": {
+    "message": "Máy chủ đang trực tuyến!"
+  },
+  "project.settings.server.srv-records-hint": {
+    "message": "Nếu bạn có <srv-tooltip>[bản ghi SRV]</srv-tooltip>, bạn không cần thêm cổng. Nếu không và bạn dùng cổng khác 25565, có thể thêm theo dạng :12345"
+  },
+  "project.settings.server.srv-records-tooltip": {
+    "message": "Địa chỉ bạn nhập tại đây có thể có bản ghi DNS SRV _minecraft._tcp.(tên miền của bạn) trỏ tới địa chỉ và cổng máy chủ Minecraft."
+  },
+  "project.settings.tags.all-tags-selected-warning": {
+    "message": "Bạn đã chọn tất cả {count} thẻ hiện có. Vui lòng chỉ chọn những thẻ thực sự áp dụng cho dự án."
+  },
+  "project.settings.tags.categories-description": {
+    "message": "Chọn tất cả danh mục phản ánh chủ đề hoặc chức năng của {type}."
+  },
+  "project.settings.tags.featured-tags": {
+    "message": "Thẻ nổi bật"
+  },
+  "project.settings.tags.featured-tags-required": {
+    "message": "Bạn phải có ít nhất một thẻ nổi bật."
+  },
+  "project.settings.tags.featured-tags-select-description": {
+    "message": "Chọn các thẻ phù hợp nhất. Những thẻ này sẽ được hiển thị trước các thẻ còn lại."
+  },
+  "project.settings.tags.features-description": {
+    "message": "Chọn tất cả tính năng mà {type} của bạn sử dụng."
+  },
+  "project.settings.tags.group-title.categories": {
+    "message": "{showType, select, yes {{types} danh mục} other {Danh mục}}"
+  },
+  "project.settings.tags.group-title.features": {
+    "message": "{showType, select, yes {{types} tính năng} other {Tính năng}}"
+  },
+  "project.settings.tags.group-title.performance-impact": {
+    "message": "{showType, select, yes {Mức ảnh hưởng hiệu năng của {types}} other {Ảnh hưởng hiệu năng}}"
+  },
+  "project.settings.tags.group-title.resolutions": {
+    "message": "{showType, select, yes {Độ phân giải của {types}} other {Độ phân giải}}"
+  },
+  "project.settings.tags.multiple-resolution-tags-warning": {
+    "message": "Bạn đã chọn {count} thẻ độ phân giải ({tags}). Gói tài nguyên thường chỉ nên có một thẻ độ phân giải."
+  },
+  "project.settings.tags.performance-impact-description": {
+    "message": "Chọn mức ảnh hưởng hiệu năng thực tế của {type}. Có thể chọn nhiều mức nếu {type} có thể cấu hình để tạo ra các mức ảnh hưởng hiệu năng khác nhau."
+  },
+  "project.settings.tags.resolutions-description": {
+    "message": "Chọn (các) độ phân giải của texture trong {type}."
+  },
+  "project.settings.tags.select-at-least-one-category": {
+    "message": "Chọn ít nhất một danh mục để có thể đặt danh mục nổi bật."
+  },
+  "project.settings.tags.title": {
+    "message": "Thẻ"
+  },
+  "project.settings.tags.too-many-tags-project-warning": {
+    "message": "Bạn đã chọn {count} thẻ. Hãy cân nhắc giảm xuống còn 8 thẻ trở xuống để dự án tập trung hơn và dễ được tìm thấy."
+  },
+  "project.settings.tags.too-many-tags-server-hard-warning": {
+    "message": "Bạn đã chọn {count} thẻ. Vui lòng giảm xuống còn 18 thẻ trở xuống để máy chủ tập trung hơn và dễ được tìm thấy."
+  },
+  "project.settings.tags.too-many-tags-server-soft-warning": {
+    "message": "Bạn đã chọn {count} thẻ. Hãy cân nhắc giảm xuống còn 12 thẻ trở xuống để máy chủ tập trung hơn và dễ được tìm thấy."
+  },
+  "project.settings.tags.upload-version-first.heading": {
+    "message": "Tải phiên bản lên trước khi thêm thẻ"
+  },
+  "project.slug-suggestions.label": {
+    "message": "Gợi ý:"
+  },
+  "project.versions.copy-id-option": {
+    "message": "Sao chép ID"
+  },
+  "project.versions.copy-link-option": {
+    "message": "Sao chép liên kết"
+  },
+  "project.versions.copy-maven-coordinates-option": {
+    "message": "Sao chép tọa độ Maven"
+  },
+  "project.versions.delete-button": {
+    "message": "Xóa"
+  },
+  "project.versions.delete-confirm.description": {
+    "message": "Thao tác này sẽ xóa phiên bản này vĩnh viễn (thật sự là vĩnh viễn)."
+  },
+  "project.versions.delete-confirm.title": {
+    "message": "Bạn có chắc muốn xóa phiên bản này không?"
+  },
+  "project.versions.edit-details-option": {
+    "message": "Chỉnh sửa chi tiết"
+  },
+  "project.versions.edit-files-option": {
+    "message": "Chỉnh sửa tệp"
+  },
+  "project.versions.edit-metadata-option": {
+    "message": "Chỉnh sửa siêu dữ liệu"
+  },
+  "project.versions.edit-version-tooltip": {
+    "message": "Chỉnh sửa phiên bản"
+  },
+  "project.versions.open-in-new-tab-option": {
+    "message": "Mở trong tab mới"
+  },
+  "project.versions.share-option": {
+    "message": "Chia sẻ"
+  },
   "project.versions.title": {
     "message": "Phiên bản"
+  },
+  "project.versions.version-deleted-text": {
+    "message": "Đã xóa phiên bản thành công."
+  },
+  "project.versions.version-deleted-title": {
+    "message": "Đã xóa phiên bản"
   },
   "project.versions.withheld-versions-warning.description": {
     "message": "{count, plural, other {Những phiên bản này}} bị giữ lại và không được công khai. Vui lòng đưa ra bằng chứng rằng bạn có quyền để đăng tải một số tệp đưọc bao gồm trong {count, plural, other {các phiên bản}} modpack đó."
@@ -3197,17 +4592,29 @@
   "report.not-for.dmca.description": {
     "message": "Xem <policy-link>Chính sách bản quyền</policy-link> của chúng tôi."
   },
+  "report.note.ai-images.1": {
+    "message": "Chúng tôi vừa cập nhật quy tắc để cấm hình ảnh do AI tạo trong biểu tượng, thư viện ảnh và phần mô tả. Các nhà sáng tạo sẽ có một khoảng thời gian ân hạn để xóa hình ảnh AI khỏi dự án trước khi chúng tôi bắt đầu nhận báo cáo về nội dung này."
+  },
+  "report.note.check-back-later": {
+    "message": "Hãy quay lại sau khi thời gian ân hạn kết thúc. Hiện tại chúng tôi chưa nhận loại báo cáo này."
+  },
   "report.note.copyright.1": {
     "message": "Vui lòng lưu ý rằng bạn không đang gửi yêu cầu gỡ nội dung theo DMCA, mà là báo cáo nội dung được tải lại."
   },
   "report.note.copyright.2": {
     "message": "Nếu bạn muốn gửi yêu cầu gỡ nội dung theo DMCA (một hành động pháp lý), vui lòng xem <copyright-policy-link>Chính sách bản quyền</copyright-policy-link>."
   },
+  "report.note.fully-ai-generated.1": {
+    "message": "Chúng tôi vừa cập nhật quy tắc để cấm các dự án hoàn toàn do AI tạo. Các nhà sáng tạo sẽ có một khoảng thời gian ân hạn để cập nhật hoặc gỡ các dự án hoàn toàn do AI tạo trước khi chúng tôi bắt đầu nhận báo cáo."
+  },
   "report.note.malicious.1": {
     "message": "Báo cáo về nội dung độc hại hoặc lừa đảo phải kèm theo bằng chứng rõ ràng về hành vi đó, chẳng hạn như mẫu mã nguồn."
   },
   "report.note.malicious.2": {
     "message": "Các bản tóm tắt từ Microsoft Defender, VirusTotal hoặc công cụ phát hiện mã độc bằng AI không được coi là bằng chứng đầy đủ và sẽ không được chấp nhận."
+  },
+  "report.note.missing-disclosure.1": {
+    "message": "Công bố nội dung là một tính năng mới. Các nhà sáng tạo sẽ có một khoảng thời gian ân hạn để cập nhật đầy đủ các mục công bố trước khi chúng tôi bắt đầu nhận báo cáo về mục công bố bị thiếu hoặc không chính xác."
   },
   "report.please-report": {
     "message": "Vui lòng báo cáo:"
@@ -3226,6 +4633,9 @@
   },
   "report.report-item": {
     "message": "Báo cáo {title} cho kiểm duyệt viên"
+  },
+  "report.reported-for": {
+    "message": "Được báo cáo vì {type}"
   },
   "report.submit": {
     "message": "Gửi báo cáo"
@@ -3560,6 +4970,12 @@
   "servers.plan.small.description": {
     "message": "Hoàn hảo cho 1–5 người bạn với một vài mod nhẹ."
   },
+  "servers.purchase.step.plan.most-popular": {
+    "message": "Phổ biến nhất"
+  },
+  "servers.purchase.step.plan.per-month-billing": {
+    "message": "/ tháng{interval, select, monthly {} other {, thanh toán {interval, select, quarterly {theo quý} yearly {hàng năm} other {{interval}}}}}"
+  },
   "settings.account.button.complete-setup": {
     "message": "Hoàn tất thiết lập"
   },
@@ -3683,6 +5099,57 @@
   "settings.account.security.email.title": {
     "message": "Email"
   },
+  "settings.account.security.passkey.add-modal.name.description": {
+    "message": "Hãy chọn một tên dễ nhớ để bạn có thể nhận ra khóa truy cập này sau này."
+  },
+  "settings.account.security.passkey.add-modal.name.label": {
+    "message": "Tên"
+  },
+  "settings.account.security.passkey.add-modal.name.placeholder": {
+    "message": "Khóa truy cập của tôi"
+  },
+  "settings.account.security.passkey.add-modal.title": {
+    "message": "Thêm khóa truy cập"
+  },
+  "settings.account.security.passkey.add.button": {
+    "message": "Thêm khóa truy cập"
+  },
+  "settings.account.security.passkey.button": {
+    "message": "Quản lý khóa truy cập"
+  },
+  "settings.account.security.passkey.description": {
+    "message": "Quản lý các khóa truy cập đã đăng ký hoặc thêm khóa mới."
+  },
+  "settings.account.security.passkey.modal.added": {
+    "message": "Đã thêm {ago}"
+  },
+  "settings.account.security.passkey.modal.last-used": {
+    "message": "Dùng lần cuối {ago}"
+  },
+  "settings.account.security.passkey.modal.loading": {
+    "message": "Đang tải khóa truy cập..."
+  },
+  "settings.account.security.passkey.modal.never-used": {
+    "message": "Chưa từng dùng"
+  },
+  "settings.account.security.passkey.modal.no-passkeys": {
+    "message": "Bạn chưa đăng ký khóa truy cập nào."
+  },
+  "settings.account.security.passkey.remove.button": {
+    "message": "Xóa khóa truy cập"
+  },
+  "settings.account.security.passkey.remove.description": {
+    "message": "Thao tác này sẽ xóa vĩnh viễn khóa truy cập “{name}”. Bạn sẽ không thể dùng khóa này để đăng nhập nữa."
+  },
+  "settings.account.security.passkey.remove.title": {
+    "message": "Bạn có chắc muốn xóa khóa truy cập này không?"
+  },
+  "settings.account.security.passkey.rename-modal.header": {
+    "message": "Đổi tên khóa truy cập"
+  },
+  "settings.account.security.passkey.title": {
+    "message": "Quản lý khóa truy cập"
+  },
   "settings.account.security.password.action.add": {
     "message": "Thêm mật khẩu"
   },
@@ -3739,6 +5206,9 @@
   },
   "settings.account.two-factor.error.incorrect-code": {
     "message": "Mã đã nhập không chính xác!"
+  },
+  "settings.account.two-factor.field.code.description": {
+    "message": "Nhập mã từ ứng dụng xác thực hoặc dùng một trong các mã dự phòng."
   },
   "settings.account.two-factor.field.code.label": {
     "message": "Nhập mã xác thực hai yếu tố"
@@ -3848,11 +5318,23 @@
   "settings.authorizations.about-this-app": {
     "message": "Về ứng dụng này"
   },
+  "settings.authorizations.created-by": {
+    "message": "Được tạo bởi {user}"
+  },
   "settings.authorizations.description": {
     "message": "Khi bạn ủy quyền cho một ứng dụng bằng tài khoản Modrinth của mình, bạn đã cấp cho ứng dụng đó quyền truy cập vào tài khoản của bạn. Bạn có thể quản lý và xem lại quyền truy cập vào tài khoản của mình tại đây bất cứ lúc nào."
   },
+  "settings.authorizations.empty-state.description": {
+    "message": "Các ứng dụng bạn cấp quyền sẽ xuất hiện tại đây."
+  },
+  "settings.authorizations.empty-state.heading": {
+    "message": "Không có ứng dụng được cấp quyền"
+  },
   "settings.authorizations.head-title": {
     "message": "Quyền hạn"
+  },
+  "settings.authorizations.official-tooltip": {
+    "message": "Ứng dụng này được tạo bởi một tài khoản Modrinth chính thức."
   },
   "settings.authorizations.revoke.action": {
     "message": "Thu hồi"
@@ -3862,6 +5344,9 @@
   },
   "settings.authorizations.revoke.confirm.title": {
     "message": "Bạn có chắc chắn muốn thu hồi ứng dụng này?"
+  },
+  "settings.authorizations.unofficial-disclosure": {
+    "message": "Ứng dụng này không liên kết với Modrinth dưới bất kỳ hình thức nào, bất kể tên gọi của nó."
   },
   "settings.billing.charges.description": {
     "message": "Tất cả các khoản thanh toán trước đây cho tài khoản Modrinth của bạn sẽ được liệt kê tại đây:"
@@ -3970,6 +5455,9 @@
   },
   "settings.billing.plan.title": {
     "message": "Phương án {size}"
+  },
+  "settings.billing.price.includes-tax": {
+    "message": "Bao gồm {amount} thuế"
   },
   "settings.billing.price.per-interval": {
     "message": "{price} / {interval}"
@@ -4154,6 +5642,33 @@
   "settings.sidebar.label.display": {
     "message": "Hiển thị"
   },
+  "shared-instance.invite.accept": {
+    "message": "Chấp nhận lời mời"
+  },
+  "shared-instance.invite.inviter.unknown": {
+    "message": "Một người dùng Modrinth"
+  },
+  "shared-instance.invite.joined-count": {
+    "message": "{count, plural, one {# người đã} other {# người đã}} tham gia"
+  },
+  "shared-instance.invite.loading": {
+    "message": "Đang tải lời mời…"
+  },
+  "shared-instance.invite.title": {
+    "message": "{name} đã mời bạn cùng chơi"
+  },
+  "shared-instance.invite.trust.description": {
+    "message": "Lời mời này được tạo bởi một người dùng Modrinth khác, không phải Modrinth. Chỉ chấp nhận lời mời từ những người bạn tin tưởng."
+  },
+  "shared-instance.invite.trust.heading": {
+    "message": "Bạn có biết người dùng này không?"
+  },
+  "shared-instance.invite.unavailable.description": {
+    "message": "Lời mời có thể đã hết hạn, đạt giới hạn lượt sử dụng hoặc bị người chia sẻ xóa."
+  },
+  "shared-instance.invite.unavailable.title": {
+    "message": "Lời mời này không còn khả dụng"
+  },
   "ui.latest-news-row.latest-news": {
     "message": "Tin tức mới nhất từ Modrinth"
   },
@@ -4169,6 +5684,66 @@
   "ui.newsletter-button.tooltip": {
     "message": "Đăng ký nhận bản tin Modrinth"
   },
+  "ui.two-factor-code.authentication-code": {
+    "message": "Mã xác thực sáu chữ số"
+  },
+  "ui.two-factor-code.backup-code": {
+    "message": "Mã dự phòng"
+  },
+  "ui.two-factor-code.backup-code.placeholder": {
+    "message": "Nhập mã dự phòng"
+  },
+  "ui.two-factor-code.use-authentication-code": {
+    "message": "Dùng mã từ ứng dụng xác thực"
+  },
+  "ui.two-factor-code.use-backup-code": {
+    "message": "Dùng mã dự phòng"
+  },
+  "version.all-versions": {
+    "message": "Tất cả phiên bản"
+  },
+  "version.confirm-delete.description": {
+    "message": "Phiên bản này sẽ bị xóa vĩnh viễn. Không thể hoàn tác."
+  },
+  "version.confirm-delete.proceed": {
+    "message": "Xóa phiên bản"
+  },
+  "version.confirm-delete.title": {
+    "message": "Bạn có chắc muốn xóa phiên bản này không?"
+  },
+  "version.dependency.view-project": {
+    "message": "Xem dự án"
+  },
+  "version.dependency.view-version": {
+    "message": "Xem phiên bản"
+  },
+  "version.download.download-dependency": {
+    "message": "Chọn phiên bản để tải xuống"
+  },
+  "version.download.no-primary-file": {
+    "message": "Lỗi: Không tìm thấy tệp chính"
+  },
+  "version.download.optional-resource-pack": {
+    "message": "Gói tài nguyên tùy chọn"
+  },
+  "version.download.required-resource-pack": {
+    "message": "Gói tài nguyên bắt buộc"
+  },
+  "version.download.version": {
+    "message": "Tải {version} ({size})"
+  },
+  "version.edit.button": {
+    "message": "Chỉnh sửa"
+  },
+  "version.edit.details": {
+    "message": "Chỉnh sửa chi tiết"
+  },
+  "version.edit.files": {
+    "message": "Chỉnh sửa tệp"
+  },
+  "version.edit.metadata": {
+    "message": "Chỉnh sửa siêu dữ liệu"
+  },
   "version.environment.none.description": {
     "message": "Môi trường cho phiên bản này chưa được xác định."
   },
@@ -4180,5 +5755,68 @@
   },
   "version.environment.unknown.title": {
     "message": "Môi trường không xác định"
+  },
+  "version.notification.deleted-text": {
+    "message": "Đã xóa phiên bản thành công."
+  },
+  "version.notification.deleted-title": {
+    "message": "Đã xóa phiên bản"
+  },
+  "version.notification.packaging-success-text": {
+    "message": "Gói dữ liệu của bạn đã được đóng gói thành mod thành công! Hãy nhớ chơi thử để kiểm tra lỗi."
+  },
+  "version.notification.packaging-success-title": {
+    "message": "Đóng gói thành công"
+  },
+  "version.package-as-mod.button": {
+    "message": "Đóng gói thành mod"
+  },
+  "version.package-as-mod.description": {
+    "message": "Thao tác này sẽ tạo một phiên bản mới hỗ trợ các bộ nạp mod đã chọn. Bạn sẽ được chuyển đến phiên bản mới và có thể chỉnh sửa theo ý muốn."
+  },
+  "version.package-as-mod.header": {
+    "message": "Đóng gói gói dữ liệu thành mod"
+  },
+  "version.package-as-mod.mod-loaders": {
+    "message": "Bộ nạp mod"
+  },
+  "version.package-as-mod.mod-loaders.description": {
+    "message": "Các bộ nạp mod mà bạn muốn đóng gói gói dữ liệu để hỗ trợ."
+  },
+  "version.package-as-mod.mod-loaders.placeholder": {
+    "message": "Chọn bộ nạp mod..."
+  },
+  "version.package-as-mod.submit-button": {
+    "message": "Đóng gói gói dữ liệu"
+  },
+  "version.section.content.dev-info": {
+    "message": "Thông tin dành cho nhà phát triển"
+  },
+  "version.section.content.dev-info.gradle-snippet": {
+    "message": "build.gradle:"
+  },
+  "version.section.content.dev-info.maven-coordinates": {
+    "message": "Tọa độ Maven:"
+  },
+  "version.section.content.dev-info.maven-description": {
+    "message": "Các dự án trên Modrinth tự động khả dụng qua kho Maven để dùng với các công cụ build JVM như <gradle-link>Gradle</gradle-link>. Để tìm hiểu thêm về Modrinth Maven API, <article-link>nhấp vào đây</article-link>."
+  },
+  "version.section.content.dev-info.maven-note": {
+    "message": "Lưu ý: Khi có thể, bạn nên dùng kho Maven của tác giả vì kho đó chứa thông tin phần phụ thuộc bắc cầu mà Modrinth Maven API không có. Bạn cũng có thể gặp phần phụ thuộc trùng lặp nếu dùng kết hợp kho Maven của Modrinth và kho ngoài Modrinth, vì mã định danh nhóm sẽ khác khi được phân phối qua Modrinth Maven API."
+  },
+  "version.section.content.dev-info.version-id": {
+    "message": "ID phiên bản:"
+  },
+  "version.supplementary-resources.copy-hash-sha1": {
+    "message": "Sao chép SHA-1"
+  },
+  "version.supplementary-resources.copy-hash-sha512": {
+    "message": "Sao chép SHA-512"
+  },
+  "version.unknown-embedded-content.description": {
+    "message": "Phiên bản này hiện đang bị giữ lại và chưa được liệt kê công khai. Vui lòng cung cấp bằng chứng cho thấy bạn có quyền phân phối lại một số tệp đi kèm."
+  },
+  "version.unknown-embedded-content.title": {
+    "message": "Bị giữ lại do nội dung nhúng chưa xác định"
   }
 }

@@ -1523,9 +1523,6 @@
   "error.generic.default.list_item.1": {
     "message": "Tjek om Modrinth er nede på vores <status-link>Status side</status-link>."
   },
-  "error.generic.default.list_item.2": {
-    "message": "Hvis der bliver ved med at ske, kan du dele det Modrinth Team ved at join vores <discord-link>Discord server</discord-link>."
-  },
   "error.generic.default.list_title": {
     "message": "Venligst prøv igen om nogle minutter."
   },

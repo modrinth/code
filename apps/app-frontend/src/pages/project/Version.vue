@@ -102,7 +102,7 @@ import { useRoute, useRouter } from 'vue-router'
 
 import { SwapIcon } from '@/assets/icons'
 import { get_project_many, get_version_many } from '@/helpers/cache.js'
-import { useBreadcrumb } from '@/providers/breadcrumbs'
+import { useBreadcrumb } from '@/shared/breadcrumbs'
 
 const { formatMessage } = useVIntl()
 const formatBytes = useFormatBytes()

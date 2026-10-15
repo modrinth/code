@@ -160,7 +160,7 @@ pub async fn show_app_db_backups_folder<R: Runtime>(
 
 #[tauri::command]
 pub async fn export_debug_info<R: Runtime>(
-    window: tauri::WebviewWindow<R>,
+    window: tauri::Window<R>,
     state: tauri::State<'_, DebugInfoExports>,
     id: String,
     path: PathBuf,
@@ -192,7 +192,7 @@ pub async fn export_debug_info<R: Runtime>(
 
 #[tauri::command]
 pub fn cancel_debug_info_export<R: Runtime>(
-    window: tauri::WebviewWindow<R>,
+    window: tauri::Window<R>,
     state: tauri::State<'_, DebugInfoExports>,
     id: String,
 ) {

@@ -2267,8 +2267,8 @@
   "error.generic.default.list_item.1": {
     "message": "Check if Modrinth is down on our <status-link>Status page</status-link>."
   },
-  "error.generic.default.list_item.2": {
-    "message": "If this keeps happening, you may want to let the Modrinth Team know by joining our <discord-link>Discord server</discord-link>."
+  "error.generic.default.list_item.support": {
+    "message": "If this keeps happening, you may want to let the Modrinth Team know through our <support-link>support portal</support-link>."
   },
   "error.generic.default.list_title": {
     "message": "Please try again in a few minutes."

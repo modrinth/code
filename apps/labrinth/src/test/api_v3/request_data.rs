@@ -94,7 +94,6 @@ pub fn get_public_project_creation_data_json(
         json!([])
     };
 
-    let is_draft = version_jar.is_none();
     json!(
         {
             "name": format!("Test Project {slug}"),
@@ -102,7 +101,7 @@ pub fn get_public_project_creation_data_json(
             "summary": "A dummy project for testing with.",
             "description": "This project is approved and its versions are listed. It contains enough descriptive information to satisfy project review validation requirements and explain what the project provides to its users.",
             "initial_versions": initial_versions,
-            "is_draft": is_draft,
+            "is_draft": true,
             "categories": [],
             "license_id": "MIT",
         }

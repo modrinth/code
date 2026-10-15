@@ -1,4 +1,7 @@
-# ![Modrinth App](/.github/assets/app_cover.png)
+<picture>
+	<source media="(prefers-color-scheme: light)" srcset="../../.github/assets/app_cover_light.png">
+	<img alt="Modrinth App Cover" src="../../.github/assets/app_cover.png">
+</picture>
 
 ## Modrinth App
 

@@ -13,7 +13,7 @@ use crate::util::error::{ApiContext, Context};
 use actix_cors::Cors;
 use actix_files::Files;
 use actix_web::http::{StatusCode, header};
-use actix_web::{HttpRequest, HttpResponse, web};
+use actix_web::{FromRequest, HttpRequest, HttpResponse, web};
 use ariadne::ids::base62_impl::parse_base62;
 use futures::FutureExt;
 use std::collections::{HashMap, HashSet};
@@ -354,7 +354,23 @@ pub async fn redirect_ref(
     session_queue: &AuthQueue,
     required_scopes: Scopes,
 ) -> Result<Option<HttpResponse>, ApiError> {
-    let Some(project_ref) = req.match_info().get(parameter_name) else {
+    let Some(parameter_index) = req
+        .match_info()
+        .iter()
+        .position(|(name, _)| name == parameter_name)
+    else {
+        return Ok(None);
+    };
+    // `match_info` preserves encoded `+`, `/`, and `%`; the path extractor fully decodes them.
+    let parameters =
+        web::Path::<Vec<String>>::extract(req)
+            .await
+            .map_err(|err| {
+                ApiError::Request(eyre::eyre!(
+                    "decoding project redirect path: {err}"
+                ))
+            })?;
+    let Some(project_ref) = parameters.get(parameter_index) else {
         return Ok(None);
     };
     let Some(target_project_id) = resolve_visible_refs(
