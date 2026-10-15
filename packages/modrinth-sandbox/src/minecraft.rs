@@ -1,15 +1,17 @@
 use std::{
-    collections::BTreeMap,
-    ffi::OsString,
-    path::{Path, PathBuf},
+    collections::BTreeMap, ffi::OsString, io::{ErrorKind, Write}, path::{Path, PathBuf}, sync::OnceLock,
 };
 
-use eyre::{Result, ensure};
+use eyre::{Context, Result, ensure};
+use rand::RngCore;
+use sha1::{Digest, Sha1};
 
-use crate::{SandboxCommand, SandboxStdio, util::SandboxArg};
+use crate::{SandboxCommand, SandboxStdio, sandboxapi::service::SandboxApiChild, util::SandboxArg};
 
 #[derive(Debug)]
 pub struct MinecraftCommand {
+    /// Child reference to the sandbox API service, created using SandboxApiService::start
+    pub sandbox_api_child: Option<SandboxApiChild>,
     /// Path to the Java Runtime Environment on the host.
     pub jre_path: PathBuf,
     /// Optional Java agent JAR on the host.
@@ -194,7 +196,7 @@ pub fn create_command(minecraft: MinecraftCommand) -> Result<SandboxCommand> {
     #[cfg(target_os = "linux")]
     let persistent_state = minecraft.persistent_dir.join("state");
     let mods_path = minecraft.instance_path.join("mods");
-    let classpath = minecraft.classpath;
+    let mut classpath = minecraft.classpath;
     let mut read_only_paths = vec![
         minecraft.jre_path.clone(),
         minecraft.natives_path.clone(),
@@ -260,6 +262,30 @@ pub fn create_command(minecraft: MinecraftCommand) -> Result<SandboxCommand> {
         );
     }
 
+    // Setup sandbox java agent
+    if let Some(child) = &minecraft.sandbox_api_child {
+        let sandbox_agent_path = create_sandbox_java_agent()?;
+        classpath.push(sandbox_agent_path.clone());
+        read_only_paths.push(sandbox_agent_path.clone());
+        let port = child.get_port();
+
+        let mut agent_argument = OsString::new();
+        agent_argument.push(JAVA_AGENT_JVM_ARGUMENT);
+        agent_argument.push(":");
+        agent_argument.push(sandbox_agent_path.as_os_str());
+        args.push(agent_argument.into());
+
+        args.push(format!("-Dmodrinth.sandboxagent.secret={}", child.get_secret()).into());
+        args.push(format!("-Dmodrinth.sandboxagent.port={}", port.to_string()).into());
+
+        args.push("-Drealms.environment=local".into());
+        args.push("-Dminecraft.api.env=sandboxauth".into());
+        args.push(format!("-Dminecraft.api.discovery.host=http://127.0.0.1:{}/sandboxauth/discovery", port).into());
+        args.push(format!("-Dminecraft.api.session.host=http://127.0.0.1:{}/sandboxauth/session", port).into());
+        args.push(format!("-Dminecraft.api.services.host=http://127.0.0.1:{}/sandboxauth/services", port).into());
+        args.push(format!("-Dminecraft.api.profiles.host=http://127.0.0.1:{}/sandboxauth/profiles", port).into());
+    }
+
     args.push(CLASSPATH_JVM_ARGUMENT.into());
     args.push(std::env::join_paths(&classpath)?.into());
     args.push(minecraft.main_class);
@@ -301,6 +327,14 @@ pub fn create_command(minecraft: MinecraftCommand) -> Result<SandboxCommand> {
     read_write_paths.sort_unstable();
     read_write_paths.dedup();
 
+    let mut on_finish: Vec<Box<dyn FnOnce() + Send + Sync>> = Vec::new();
+    if let Some(sandbox_api_child) = minecraft.sandbox_api_child {
+        // Keep sandbox api child alive until process dies
+        on_finish.push(Box::new(move || {
+            std::mem::drop(sandbox_api_child);
+        }));
+    }
+
     Ok(SandboxCommand {
         executable: java_path,
         args,
@@ -323,7 +357,65 @@ pub fn create_command(minecraft: MinecraftCommand) -> Result<SandboxCommand> {
         app_container_description:
             "Sandbox for Minecraft instances created by `modrinth-sandbox`"
                 .into(),
+        on_finish,
     })
+}
+
+// todo(boris): I know you don't like doing fs operations inside create_command
+// I've left this as-is, feel free to adjust
+fn create_sandbox_java_agent() -> eyre::Result<PathBuf> {
+    const BYTES: &[u8] = include_bytes!("../../modrinth-sandbox-agent/SandboxAgent.jar");
+    static SANDBOX_HASH: OnceLock<([u8; 20], &'static str)> = OnceLock::new();
+
+    let (hash_bytes, hash_str) = SANDBOX_HASH.get_or_init(|| {
+        let mut hasher = Sha1::new();
+        hasher.update(BYTES);
+
+        let hash: [u8; 20] = hasher.finalize().try_into().expect("sha1 is 20 bytes");
+
+        (hash, hex::encode(hash).leak())
+    });
+
+    let path = std::env::temp_dir().join(format!("ModrinthSandboxAgent-{}.jar", hash_str));
+
+    // Check that file exists and checksum matches
+    if !check_sha1_hash(&path, hash_bytes)? {
+        if let Some(parent) = path.parent() {
+            let _ = std::fs::create_dir_all(parent);
+        }
+
+        let mut temp = path.clone();
+        temp.add_extension(format!("{}", rand::thread_rng().next_u32()));
+        temp.add_extension("new");
+
+        let mut temp_file = std::fs::File::create(&temp)?;
+
+        temp_file.write_all(BYTES)?;
+        temp_file.flush()?;
+        temp_file.sync_all()?;
+
+        drop(temp_file);
+
+        if let Err(err) = std::fs::rename(&temp, &path) {
+            _ = std::fs::remove_file(&temp);
+            return Err(err.into());
+        }
+    }
+
+    Ok(path)
+}
+
+fn check_sha1_hash(path: &Path, expected_hash: &[u8]) -> eyre::Result<bool> {
+    let mut file = match std::fs::File::open(path) {
+        Err(err) if err.kind() == ErrorKind::NotFound => {
+            return Ok(false);
+        },
+        result => result.with_context(|| "opening {path}")?,
+    };
+
+    let mut hasher = sha1::Sha1::new();
+    let _ = std::io::copy(&mut file, &mut hasher)?;
+    Ok(expected_hash == &*hasher.finalize())
 }
 
 fn jvm_path_argument(argument: &str, separator: &str, path: &Path) -> OsString {

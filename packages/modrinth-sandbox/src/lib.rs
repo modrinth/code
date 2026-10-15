@@ -2,6 +2,7 @@
 
 mod backend;
 pub mod ffi;
+pub mod sandboxapi;
 pub mod helper;
 pub mod minecraft;
 mod util;
@@ -127,7 +128,6 @@ impl SandboxEnv {
 ///
 /// - Graphics and audio devices will always be passed to the child process when
 ///   possible.
-#[derive(Debug)]
 pub struct SandboxCommand {
     /// Path to the executable to run.
     pub executable: PathBuf,
@@ -177,6 +177,8 @@ pub struct SandboxCommand {
     ///
     /// [AppContainer]: https://learn.microsoft.com/en-us/windows/win32/secauthz/appcontainer-isolation
     pub app_container_description: SandboxArg,
+    /// Vec of callbacks to be run when the process terminates or is dropped
+    pub on_finish: Vec<Box<dyn FnOnce() + Send + Sync>>,
 }
 
 /// Describes what to do with a standard I/O stream for a child process when
@@ -215,6 +217,7 @@ pub struct SandboxChild {
     ///
     /// Analogous to [`std::process::Child::stderr`].
     pub stderr: Option<PipeReader>,
+    on_finish: Vec<Box<dyn FnOnce() + Send + Sync>>,
     imp: backend::SandboxChild,
 }
 
@@ -223,12 +226,22 @@ impl SandboxChild {
         SandboxChildOp::id(&self.imp)
     }
 
+    /// Add a callback to be run when the process finishes or the struct is dropped
+    /// Requires one of the kill/wait/try_wait/etc. methods to be called
+    pub fn run_on_finish(&mut self, on_finish: Box<dyn FnOnce() + Send + Sync>) {
+        self.on_finish.push(on_finish);
+    }
+
     /// Attempts to collect the exit status of the child if it has already
     /// exited.
     ///
     /// This is analogous to [`std::process::Child::try_wait`].
     pub fn try_wait(&mut self) -> Result<Option<SandboxExitStatus>> {
-        SandboxChildOp::try_wait(&mut self.imp)
+        let res = SandboxChildOp::try_wait(&mut self.imp);
+        if matches!(res, Ok(Some(_))) {
+            self.finish();
+        }
+        res
     }
 
     /// Waits for the child to exit completely, returning the status that it
@@ -241,7 +254,11 @@ impl SandboxChild {
     ///
     /// This function is cancel safe.
     pub async fn wait(&mut self) -> Result<SandboxExitStatus> {
-        SandboxChildOp::wait(&mut self.imp).await
+        let res = SandboxChildOp::wait(&mut self.imp).await;
+        if res.is_ok() {
+            self.finish();
+        }
+        res
     }
 
     /// Forces the child process to exit. If the child has already exited, `Ok(())`
@@ -249,6 +266,14 @@ impl SandboxChild {
     ///
     /// This is analogous to [`std::process::Child::kill`].
     pub async fn kill(&mut self) -> Result<()> {
-        SandboxChildOp::kill(&mut self.imp).await
+        let res = SandboxChildOp::kill(&mut self.imp).await;
+        self.finish();
+        res
+    }
+
+    fn finish(&mut self) {
+        for on_finish in self.on_finish.drain(..) {
+            (on_finish)();
+        }
     }
 }

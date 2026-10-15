@@ -2,7 +2,6 @@
 use crate::instance::QuickPlayType;
 use crate::launcher::quick_play_version::QuickPlayServerVersion;
 use crate::launcher::{QuickPlayVersion, parse_rules};
-use crate::state::Credentials;
 use crate::{
     state::{MemorySettings, WindowSize},
     util::{io::IOError, platform::classpath_separator},
@@ -193,10 +192,12 @@ fn is_launcher_managed_jvm_argument(argument: &str) -> bool {
 }
 
 #[allow(clippy::too_many_arguments)]
-pub async fn get_minecraft_arguments(
+pub fn get_minecraft_arguments(
     arguments: Option<&[Argument]>,
     legacy_arguments: Option<&str>,
-    credentials: &Credentials,
+    access_token: &str,
+    username: &str,
+    uuid: Uuid,
     version: &str,
     asset_index_name: &str,
     game_directory: &Path,
@@ -207,8 +208,6 @@ pub async fn get_minecraft_arguments(
     quick_play_type: &QuickPlayType,
     quick_play_version: QuickPlayVersion,
 ) -> crate::Result<Vec<String>> {
-    let access_token = credentials.access_token.clone();
-    let profile = credentials.maybe_online_profile().await;
     let mut parsed_arguments = Vec::new();
 
     if let Some(arguments) = arguments {
@@ -218,9 +217,9 @@ pub async fn get_minecraft_arguments(
             |arg| {
                 parse_minecraft_argument(
                     arg,
-                    &access_token,
-                    &profile.name,
-                    profile.id,
+                    access_token,
+                    username,
+                    uuid,
                     version,
                     asset_index_name,
                     game_directory,
@@ -237,9 +236,9 @@ pub async fn get_minecraft_arguments(
         for x in legacy_arguments.split(' ') {
             parsed_arguments.push(parse_minecraft_argument(
                 &x.replace(' ', TEMPORARY_REPLACE_CHAR),
-                &access_token,
-                &profile.name,
-                profile.id,
+                access_token,
+                username,
+                uuid,
                 version,
                 asset_index_name,
                 game_directory,

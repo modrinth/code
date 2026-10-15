@@ -65,6 +65,7 @@ async fn spawn(mut command: SandboxCommand) -> Result<crate::SandboxChild> {
         stdin: stdin_writer,
         stdout: stdout_reader,
         stderr: stderr_reader,
+        on_finish: command.on_finish,
         imp: StdChild { child }.into(),
     })
 }
@@ -179,6 +180,7 @@ mod tests {
             stderr: SandboxStdio::Pipe,
             app_container_name: "test".into(),
             app_container_description: "test".into(),
+            on_finish: Vec::new(),
         }
     }
 

@@ -27,13 +27,18 @@ use daedalus::minecraft::{
     LoggingConfiguration, LoggingSide, RuleAction, VersionInfo,
 };
 use daedalus::modded::{LoaderVersion, Manifest};
+use modrinth_sandbox::sandboxapi::service::{SandboxApiLauncher, SandboxApiService};
 use modrinth_sandbox::{
     SandboxStdio,
     minecraft::{MinecraftCommand, MinecraftLoggingConfig},
 };
+use parking_lot::Mutex;
 use serde::Deserialize;
+use uuid::Uuid;
+use std::collections::HashMap;
 use std::future::Future;
 use std::path::{Path, PathBuf};
+use std::sync::{Arc, OnceLock};
 use tokio::process::Command;
 
 mod args;
@@ -1089,11 +1094,48 @@ pub async fn launch_minecraft(
         );
     }
 
+    let mut access_token = credentials.access_token.clone();
+    let profile = credentials.maybe_online_profile().await;
+
+    let sandbox_api_child = if true { // todo(boris): check if sandbox is enabled, do we have this yet?
+        // todo(boris): do you want to do a noninteractive login here?
+        #[derive(Default)]
+        struct SimpleLoginHandler(Mutex<HashMap<Uuid, Arc<str>>>);
+        impl SandboxApiLauncher for SimpleLoginHandler {
+            fn login(&self, uuid: Uuid, token: tokio::sync::oneshot::Sender<Arc<str>>) {
+                if let Some(access_token) = self.0.lock().get(&uuid) {
+                    _ = token.send(access_token.clone());
+                }
+            }
+        }
+
+        // Create simple login handler
+        static SIMPLE_LOGIN_HANDLER: OnceLock<Arc<SimpleLoginHandler>> = OnceLock::new();
+        let simple_login_handler = SIMPLE_LOGIN_HANDLER.get_or_init(Default::default).clone();
+
+        // Register uuid -> access token
+        simple_login_handler.0.lock().insert(profile.id, access_token.into());
+
+        // Create sandbox service
+        static SANDBOX_SERVICE: OnceLock<SandboxApiService> = OnceLock::new();
+        let sandbox_service = SANDBOX_SERVICE.get_or_init(move || {
+            SandboxApiService::new(28881, simple_login_handler)
+        }).clone();
+
+        let sandbox_api_child = sandbox_service.start(profile.id);
+        access_token = sandbox_api_child.get_dummy_access_token().to_string();
+        Some(sandbox_api_child)
+    } else {
+        None
+    };
+
     let game_args = args::get_minecraft_arguments(
         args.get(&d::minecraft::ArgumentType::Game)
             .map(|x| x.as_slice()),
         version_info.minecraft_arguments.as_deref(),
-        credentials,
+        &access_token,
+        &profile.name,
+        profile.id,
         &version.id,
         &version_info.asset_index.id,
         &instance_path,
@@ -1103,8 +1145,7 @@ pub async fn launch_minecraft(
         &java_version.architecture,
         &quick_play_type,
         quick_play_version,
-    )
-    .await?;
+    )?;
 
     let mut launcher_args = Vec::with_capacity(game_args.len() + 1);
     launcher_args.push(version_info.main_class.clone().into());
@@ -1124,6 +1165,7 @@ pub async fn launch_minecraft(
         });
 
     let command = MinecraftCommand {
+        sandbox_api_child,
         jre_path,
         java_agent: Some(main_class_path),
         classpath,

@@ -16,11 +16,23 @@ bitflags = { workspace = true, features = ["serde"] }
 derive_more = { workspace = true, features = ["debug"] }
 uuid = { workspace = true, features = ["v7"] }
 serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
 zbus = { workspace = true }
 enum_dispatch = { workspace = true }
 futures = { workspace = true }
 rand = { workspace = true }
-libc =  { workspace = true }
+libc = { workspace = true }
+infer = { workspace = true }
+parking_lot = { workspace = true }
+reqwest = { workspace = true }
+url = { workspace = true }
+objc2-app-kit = { workspace = true }
+objc2-foundation = { workspace = true }
+httparse = { workspace = true }
+open = { workspace = true }
+urlencoding = { workspace = true }
+sha1 = { workspace = true }
+hex = { workspace = true }
 
 [dev-dependencies]
 tokio = { workspace = true, features = ["full"] }

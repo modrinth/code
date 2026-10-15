@@ -138,6 +138,7 @@ fn spawn(
         stdin: pipes.stdin,
         stdout: pipes.stdout,
         stderr: pipes.stderr,
+        on_finish: command.on_finish,
         imp: SandboxChild::Macos(MacosChild {
             child,
             _temp_dir: temp_dir,
