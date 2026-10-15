@@ -18,9 +18,10 @@ export default function moderationMessages() {
 				},
 			}
 		},
-		async load(id: string) {
+		async load(this: { addWatchFile: (id: string) => void }, id: string) {
 			if (!id.startsWith(`${moderationMessagesDirectory}/`) || !id.endsWith('.md')) return null
 
+			this.addWatchFile(id)
 			const content = await readFile(id, 'utf8')
 			return {
 				code: `export default ${JSON.stringify(content)}`,

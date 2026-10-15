@@ -12,8 +12,8 @@ import {
 } from '@modrinth/ui'
 import { computed } from 'vue'
 
-import ProjectIssueCard from '../../ui/project-issue-card/index.vue'
-import ActionButton from '../review-panel/controls/action-button.vue'
+import ProjectIssueCard from '../../../ui/project-issue-card/index.vue'
+import ActionButton from '../../review-panel/controls/action-button.vue'
 import { createIssueCatalogue } from './issue-catalogue'
 
 const props = defineProps<{ issueId: string }>()

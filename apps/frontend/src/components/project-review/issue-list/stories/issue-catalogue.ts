@@ -10,9 +10,9 @@ import type {
 import { type ProjectPageContext, provideProjectPageContext } from '@modrinth/ui'
 import { reactive, ref } from 'vue'
 
-import { createReviewMessages } from '../../../providers/project-review/review-messages'
-import { createReviewPanels } from '../../../providers/project-review/review-panels'
-import type { createReviewSession } from '../../../providers/project-review/review-session'
+import { createReviewMessages } from '../../../../providers/project-review/review-messages'
+import { createReviewPanels } from '../../../../providers/project-review/review-panels'
+import type { createReviewSession } from '../../../../providers/project-review/review-session'
 
 function catalogueNodes(nodes: PanelNode[]): PanelNode[] {
 	return nodes.map((node): PanelNode => {
