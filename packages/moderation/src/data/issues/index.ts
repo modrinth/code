@@ -89,6 +89,11 @@ export const reviewPanels = {
 	're-review': reReviewReviewPanel,
 	misc: [
 		{
+			key: 'post-approval',
+			label: 'Post-Approval',
+			panel: postApprovalReviewPanel,
+		},
+		{
 			key: 'reupload',
 			label: 'Reupload',
 			panel: reuploadReviewPanel,
@@ -97,11 +102,6 @@ export const reviewPanels = {
 			key: 'rules',
 			label: 'Rule Following',
 			panel: rulesReviewPanel,
-		},
-		{
-			key: 'post-approval',
-			label: 'Post-Approval',
-			panel: postApprovalReviewPanel,
 		},
 	],
 	'undefined-project': undefinedProjectReviewPanel,

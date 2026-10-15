@@ -22,11 +22,7 @@ export const insufficientSummaryIssue = issue({
 	],
 	suggestedStatus: 'flagged',
 	message: ({ getTextValue }) =>
-		messageWithOptionalSuggestion(
-			insufficient,
-			panelCategory.toLowerCase(),
-			getTextValue('summary-suggestion'),
-		),
+		messageWithOptionalSuggestion(insufficient, panelCategory, getTextValue('summary-suggestion')),
 })
 
 export const summaryFormattingIssue = issue({
