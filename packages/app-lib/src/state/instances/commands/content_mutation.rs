@@ -1,6 +1,4 @@
-use super::apply_content_install::{
-    ContentScope, upsert_entry_for_file,
-};
+use super::apply_content_install::{ContentScope, upsert_entry_for_file};
 use crate::state::content_store::{
     FileChangeRequest, FileContent, InstanceFileStatus, StoredFileHandle,
     content_file_path, input,
