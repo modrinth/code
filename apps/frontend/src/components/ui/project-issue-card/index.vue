@@ -98,8 +98,7 @@
 							v-if="
 								!threadHistory &&
 								!isComplete(issue) &&
-								((showProjectAreaLink && issueActions(issue).length) ||
-									showAddressActions(issue))
+								((showProjectAreaLink && issueActions(issue).length) || showAddressActions(issue))
 							"
 							class="flex w-full flex-wrap items-center justify-between gap-3"
 						>
@@ -157,11 +156,25 @@
 								</ButtonLink>
 								<Tooltip
 									v-else
-									:disabled="facetsToAddress(issue).length > 0 || isAddressed(issue)"
-									:text="formatMessage(messages.changeFacetFirst)"
+									:disabled="facetsToAddress(issue).length > 0 && !isFieldAddressed(issue)"
+									:text="
+										isFieldAddressed(issue)
+											? formatMessage(messages.addressedProgressTooltip, {
+													completed: issue.facets.filter((facet) => facet.verdict !== 'open')
+														.length,
+													total: issue.facets.length,
+												})
+											: formatMessage(messages.changeFacetFirst)
+									"
 								>
+									<TagItem
+										v-if="isFieldAddressed(issue)"
+										class="!border-surface-4 !bg-surface-3 !px-2.5 !py-1 !text-sm !font-medium !text-primary"
+									>
+										{{ addressButtonLabel(issue) }}
+									</TagItem>
 									<Button
-										v-if="!isComplete(issue)"
+										v-else-if="!isComplete(issue)"
 										:loading="
 											addressMutation.isPending.value &&
 											addressMutation.variables.value?.issueId === issue.id
@@ -185,19 +198,7 @@
 										"
 									>
 										<CheckIcon class="size-4" aria-hidden="true" />
-										{{
-											formatMessage(
-												addressableFacets(issue).every((facet) => facet.verdict !== 'open')
-													? messages.addressed
-													: addressableFacets(issue).every(
-																(facet) =>
-																	facet.what.type === 'acknowledge' &&
-																	facet.what.value.mode === 'checkbox',
-														  )
-														? issueTargetLabels.acknowledge
-														: messages.markAddressed,
-											)
-										}}
+										{{ addressButtonLabel(issue) }}
 									</Button>
 								</Tooltip>
 							</div>
@@ -240,6 +241,7 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
+	TagItem,
 	TeleportOverflowMenu,
 	Tooltip,
 	useVIntl,
@@ -325,9 +327,31 @@ const messages = defineMessages({
 		id: 'thread-issues.mark-addressed',
 		defaultMessage: 'Mark as addressed',
 	},
+	markAddressedProgress: {
+		id: 'thread-issues.mark-addressed-progress',
+		defaultMessage: 'Mark as addressed {completed, number}/{total, number}',
+	},
+	addressedProgress: {
+		id: 'thread-issues.addressed-progress',
+		defaultMessage: '{completed, number} of {total, number} addressed',
+	},
+	addressedProgressTooltip: {
+		id: 'thread-issues.addressed-progress-tooltip',
+		defaultMessage: '{completed, number}/{total, number} parts have been addressed for this issue',
+	},
 	addressFailed: {
 		id: 'thread-issues.address-failed',
 		defaultMessage: 'Failed to mark issue as addressed',
+	},
+	addressSaveFailed: {
+		id: 'thread-issues.address-save-failed',
+		defaultMessage:
+			'Your changes could not be saved. Fix the validation errors before marking this issue as addressed.',
+	},
+	addressStillOpen: {
+		id: 'thread-issues.address-still-open',
+		defaultMessage:
+			'The issue is still open because its requirements have not been met. Make the requested changes before marking it as addressed.',
 	},
 	addressed: {
 		id: 'thread-issues.addressed',
@@ -378,6 +402,7 @@ const addressMutation = useMutation({
 		facets,
 		saveField,
 		projectId,
+		threadId,
 	}: {
 		issueId: string
 		facets: Labrinth.Threads.v3.ThreadIssueFacet[]
@@ -385,18 +410,32 @@ const addressMutation = useMutation({
 		threadId?: string
 		projectId: string
 	}) => {
-		if (saveField && !(await saveField())) return
+		if (saveField && !(await saveField())) {
+			throw new Error(formatMessage(messages.addressSaveFailed))
+		}
 		const savedProject = saveField
 			? await client.labrinth.projects_v3.get(projectId)
 			: projectV3.value
-		const eligibleFacets = facets.filter(
-			(facet) => isStaff(auth.value.user) || isFacetReadyToAddress(facet, savedProject),
-		)
+		const eligibleFacets = facets.filter((facet) => isFacetReadyToAddress(facet, savedProject))
+		if (!eligibleFacets.length) {
+			throw new Error(formatMessage(messages.changeFacetFirst))
+		}
 		const results = await Promise.allSettled(
 			eligibleFacets.map(({ id }) => client.labrinth.threads_v3.user_addressed(id)),
 		)
 		const failure = results.find((result) => result.status === 'rejected')
 		if (failure?.status === 'rejected') throw failure.reason
+		if (threadId) {
+			const updatedThread = await client.labrinth.threads_v3.getThread(threadId)
+			const submittedIds = new Set(eligibleFacets.map(({ id }) => id))
+			if (
+				updatedThread.issues.some((issue) =>
+					issue.facets.some((facet) => submittedIds.has(facet.id) && facet.verdict === 'open'),
+				)
+			) {
+				throw new Error(formatMessage(messages.addressStillOpen))
+			}
+		}
 	},
 	onSettled: async (_, __, { threadId, projectId }) => {
 		await Promise.all([
@@ -685,10 +724,36 @@ function showAddressActions(issue: ThreadIssue): boolean {
 function addressableFacets(issue: ThreadIssue): Labrinth.Threads.v3.ThreadIssueFacet[] {
 	return issue.facets.filter(
 		(facet) =>
-			facet.verdict !== 'resolved' &&
+			(issue.facets.length > 1 || facet.verdict !== 'resolved') &&
 			(facet.what.type === 'acknowledge' ||
 				facet.what.type === 'mark_addressed' ||
 				matchesTarget(facet.what)),
+	)
+}
+
+function isFieldAddressed(issue: ThreadIssue): boolean {
+	return addressableFacets(issue).every((facet) => facet.verdict !== 'open')
+}
+
+function addressButtonLabel(issue: ThreadIssue): string {
+	const facets = addressableFacets(issue)
+	if (issue.facets.length > 1) {
+		return formatMessage(
+			isFieldAddressed(issue) ? messages.addressedProgress : messages.markAddressedProgress,
+			{
+				completed: issue.facets.filter((facet) => facet.verdict !== 'open').length,
+				total: issue.facets.length,
+			},
+		)
+	}
+	return formatMessage(
+		isFieldAddressed(issue)
+			? messages.addressed
+			: facets.every(
+						(facet) => facet.what.type === 'acknowledge' && facet.what.value.mode === 'checkbox',
+				  )
+				? issueTargetLabels.acknowledge
+				: messages.markAddressed,
 	)
 }
 
@@ -696,11 +761,10 @@ function facetsToAddress(issue: ThreadIssue): Labrinth.Threads.v3.ThreadIssueFac
 	return addressableFacets(issue).filter(
 		(facet) =>
 			facet.verdict === 'open' &&
-			(isFacetReadyToAddress(
+			isFacetReadyToAddress(
 				facet,
 				props.fieldAction ? { ...projectV3.value, ...props.fieldAction.draft } : projectV3.value,
-			) ||
-				isStaff(auth.value.user)),
+			),
 	)
 }
 
