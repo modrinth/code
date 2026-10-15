@@ -171,48 +171,51 @@ pub async fn version_create(
     .await?
     .1;
 
-    let result = version_create_inner(
-        &mut payload,
-        &mut transaction,
-        &redis,
-        &**file_host,
-        &mut uploaded_files,
-        &user,
-        &client,
-        &kafka_client,
-    )
-    .await;
-
-    if result.is_err() {
-        let undo_result = super::project_creation::undo_uploads(
+    let result = async {
+        let (response, project_id, version_id) = version_create_inner(
+            &mut payload,
+            &mut transaction,
+            &redis,
             &**file_host,
-            &uploaded_files,
+            &mut uploaded_files,
+            &user,
+            &client,
+            &kafka_client,
         )
-        .await;
-        let rollback_result = transaction.rollback().await;
+        .await?;
 
-        undo_result?;
-        if let Err(e) = rollback_result {
-            return Err(e.into());
-        }
-    } else if let Ok((_, project_id, version_id)) = &result {
-        super::projects::mutation::finalize_mutation(
-            *project_id,
-            transaction,
+        let prepared = super::projects::mutation::prepare_mutations(
+            &[project_id],
+            &mut transaction,
             &redis,
             Some(&user),
         )
         .await?;
-        search_state
-            .queue
-            .push_version_changes(
-                (*project_id).into(),
-                [VersionId::from(*version_id)],
+        Ok::<_, CreateError>((response, project_id, version_id, prepared))
+    }
+    .await;
+
+    let (response, project_id, version_id, prepared) = match result {
+        Ok(result) => result,
+        Err(error) => {
+            let undo_result = super::project_creation::undo_uploads(
+                &**file_host,
+                &uploaded_files,
             )
             .await;
-    }
+            let rollback_result = transaction.rollback().await;
+            undo_result?;
+            rollback_result?;
+            return Err(error);
+        }
+    };
 
-    result.map(|(response, _, _)| response)
+    prepared.commit(transaction, &redis).await?;
+    search_state
+        .queue
+        .push_version_changes(project_id.into(), [VersionId::from(version_id)])
+        .await;
+    Ok(response)
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -682,46 +685,52 @@ pub async fn upload_file_to_version(
     .await?
     .1;
 
-    let result = upload_file_to_version_inner(
-        &mut payload,
-        client.clone(),
-        &mut transaction,
-        redis.clone(),
-        &**file_host,
-        &mut uploaded_files,
-        db_version_id,
-        &user,
-        &kafka_client,
-    )
-    .await;
-
-    if result.is_err() {
-        let undo_result = super::project_creation::undo_uploads(
+    let result = async {
+        let (response, project_id) = upload_file_to_version_inner(
+            &mut payload,
+            client.clone(),
+            &mut transaction,
+            redis.clone(),
             &**file_host,
-            &uploaded_files,
+            &mut uploaded_files,
+            db_version_id,
+            &user,
+            &kafka_client,
         )
-        .await;
-        let rollback_result = transaction.rollback().await;
+        .await?;
 
-        undo_result?;
-        if let Err(e) = rollback_result {
-            return Err(e.into());
-        }
-    } else if let Ok((_, project_id)) = &result {
-        super::projects::mutation::finalize_mutation(
-            *project_id,
-            transaction,
+        let prepared = super::projects::mutation::prepare_mutations(
+            &[project_id],
+            &mut transaction,
             &redis,
             Some(&user),
         )
         .await?;
-        search_state
-            .queue
-            .push_version_changes((*project_id).into(), [version_id])
-            .await;
+        Ok::<_, CreateError>((response, project_id, prepared))
     }
+    .await;
 
-    result.map(|(response, _)| response)
+    let (response, project_id, prepared) = match result {
+        Ok(result) => result,
+        Err(error) => {
+            let undo_result = super::project_creation::undo_uploads(
+                &**file_host,
+                &uploaded_files,
+            )
+            .await;
+            let rollback_result = transaction.rollback().await;
+            undo_result?;
+            rollback_result?;
+            return Err(error);
+        }
+    };
+
+    prepared.commit(transaction, &redis).await?;
+    search_state
+        .queue
+        .push_version_changes(project_id.into(), [version_id])
+        .await;
+    Ok(response)
 }
 
 #[allow(clippy::too_many_arguments)]

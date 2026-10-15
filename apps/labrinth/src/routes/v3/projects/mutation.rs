@@ -213,15 +213,29 @@ pub(crate) async fn finalize_mutations(
     redis: &RedisPool,
     project_editor: Option<&User>,
 ) -> Result<(), ApiError> {
+    let prepared =
+        prepare_mutations(project_ids, &mut transaction, redis, project_editor)
+            .await?;
+    prepared.commit(transaction, redis).await
+}
+
+pub(crate) struct PreparedMutations {
+    states: Vec<SyncedProjectState>,
+}
+
+pub(crate) async fn prepare_mutations(
+    project_ids: &[DBProjectId],
+    transaction: &mut PgTransaction<'_>,
+    redis: &RedisPool,
+    project_editor: Option<&User>,
+) -> Result<PreparedMutations, ApiError> {
     let mut project_ids = project_ids.to_vec();
     project_ids.sort_by_key(|project_id| project_id.0);
     project_ids.dedup();
 
     let mut states = Vec::with_capacity(project_ids.len());
     for project_id in project_ids {
-        states.push(
-            sync_project_state(project_id, &mut transaction, redis).await?,
-        );
+        states.push(sync_project_state(project_id, transaction, redis).await?);
     }
 
     if project_editor.is_some_and(|user| !user.role.is_mod()) {
@@ -246,23 +260,33 @@ pub(crate) async fn finalize_mutations(
         }
     }
 
-    transaction
-        .commit()
-        .await
-        .wrap_internal_err("committing project mutation")?;
+    Ok(PreparedMutations { states })
+}
 
-    for state in &states {
-        db_models::DBProject::clear_cache(
-            state.data.inner.id,
-            state.data.inner.slug.clone(),
-            Some(true),
-            redis,
-        )
-        .await
-        .wrap_internal_err("clearing cached project data")?;
+impl PreparedMutations {
+    pub(crate) async fn commit(
+        self,
+        transaction: PgTransaction<'_>,
+        redis: &RedisPool,
+    ) -> Result<(), ApiError> {
+        transaction
+            .commit()
+            .await
+            .wrap_internal_err("committing project mutation")?;
+
+        for state in &self.states {
+            db_models::DBProject::clear_cache(
+                state.data.inner.id,
+                state.data.inner.slug.clone(),
+                Some(true),
+                redis,
+            )
+            .await
+            .wrap_internal_err("clearing cached project data")?;
+        }
+
+        Ok(())
     }
-
-    Ok(())
 }
 
 pub(crate) async fn finalize_project_edit(

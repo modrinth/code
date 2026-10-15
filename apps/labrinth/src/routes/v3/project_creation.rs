@@ -363,39 +363,45 @@ pub async fn project_create_internal(
     .await?
     .1;
 
-    let result = project_create_inner(
-        &mut payload,
-        &mut transaction,
-        &**file_host,
-        &mut uploaded_files,
-        &client,
-        &redis,
-        &kafka_client,
-        project_id,
-        &current_user,
-    )
-    .await;
+    let result = async {
+        let response = project_create_inner(
+            &mut payload,
+            &mut transaction,
+            &**file_host,
+            &mut uploaded_files,
+            &client,
+            &redis,
+            &kafka_client,
+            project_id,
+            &current_user,
+        )
+        .await?;
 
-    if result.is_err() {
-        let undo_result = undo_uploads(&**file_host, &uploaded_files).await;
-        let rollback_result = transaction.rollback().await;
-
-        undo_result?;
-        if let Err(e) = rollback_result {
-            return Err(e.into());
-        }
-    } else {
-        super::projects::mutation::finalize_mutation(
-            project_id.into(),
-            transaction,
+        let prepared = super::projects::mutation::prepare_mutations(
+            &[project_id.into()],
+            &mut transaction,
             &redis,
             Some(&current_user),
         )
         .await?;
-        search_state.queue.push_project_change(project_id).await;
+        Ok::<_, CreateError>((response, prepared))
     }
+    .await;
 
-    result
+    let (response, prepared) = match result {
+        Ok(result) => result,
+        Err(error) => {
+            let undo_result = undo_uploads(&**file_host, &uploaded_files).await;
+            let rollback_result = transaction.rollback().await;
+            undo_result?;
+            rollback_result?;
+            return Err(error);
+        }
+    };
+
+    prepared.commit(transaction, &redis).await?;
+    search_state.queue.push_project_change(project_id).await;
+    Ok(response)
 }
 
 /// Create a project with a specific ID.
@@ -436,39 +442,45 @@ pub async fn project_create_with_id(
     .await?
     .1;
 
-    let result = project_create_inner(
-        &mut payload,
-        &mut transaction,
-        &**file_host,
-        &mut uploaded_files,
-        &client,
-        &redis,
-        &kafka_client,
-        project_id,
-        &current_user,
-    )
-    .await;
+    let result = async {
+        let response = project_create_inner(
+            &mut payload,
+            &mut transaction,
+            &**file_host,
+            &mut uploaded_files,
+            &client,
+            &redis,
+            &kafka_client,
+            project_id,
+            &current_user,
+        )
+        .await?;
 
-    if result.is_err() {
-        let undo_result = undo_uploads(&**file_host, &uploaded_files).await;
-        let rollback_result = transaction.rollback().await;
-
-        undo_result?;
-        if let Err(e) = rollback_result {
-            return Err(e.into());
-        }
-    } else {
-        super::projects::mutation::finalize_mutation(
-            project_id.into(),
-            transaction,
+        let prepared = super::projects::mutation::prepare_mutations(
+            &[project_id.into()],
+            &mut transaction,
             &redis,
             Some(&current_user),
         )
         .await?;
-        search_state.queue.push_project_change(project_id).await;
+        Ok::<_, CreateError>((response, prepared))
     }
+    .await;
 
-    result
+    let (response, prepared) = match result {
+        Ok(result) => result,
+        Err(error) => {
+            let undo_result = undo_uploads(&**file_host, &uploaded_files).await;
+            let rollback_result = transaction.rollback().await;
+            undo_result?;
+            rollback_result?;
+            return Err(error);
+        }
+    };
+
+    prepared.commit(transaction, &redis).await?;
+    search_state.queue.push_project_change(project_id).await;
+    Ok(response)
 }
 
 /*
