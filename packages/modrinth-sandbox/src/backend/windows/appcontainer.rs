@@ -68,6 +68,8 @@ use crate::{
     helper::MakeHelper,
 };
 
+use super::acl::{AppliedAclLedger, PermissionType};
+
 #[derive(Debug)]
 pub struct AppContainer;
 
@@ -122,7 +124,12 @@ fn spawn(
         unsafe { FreeSid(app_container_sid) };
     }
 
-    let app_container_folder = get_app_container_folder(&app_container_sid)?;
+    let app_container_sid_string =
+        app_container_sid_to_string(&app_container_sid)?;
+    let acl_ledger =
+        AppliedAclLedger::open().wrap_err("opening AppContainer ACL ledger")?;
+    let app_container_folder =
+        get_app_container_folder(&app_container_sid_string)?;
     let local_state = app_container_folder.join("LocalState");
     let roaming_state = app_container_folder.join("RoamingState");
     let temp_state = app_container_folder.join("TempState");
@@ -258,6 +265,11 @@ fn spawn(
         if let Some(parent) = allow_read.parent() {
             parents_to_add.insert(parent.to_path_buf());
         }
+        acl_ledger
+            .record(allow_read, PermissionType::Read)
+            .wrap_err_with(|| {
+                eyre!("recording read access to {allow_read:?}")
+            })?;
         if let Err(err) =
             add_to_acl(&app_container_sid, &allow_read, PermissionType::Read)
         {
@@ -278,6 +290,11 @@ fn spawn(
         if let Some(parent) = allow_write.parent() {
             parents_to_add.insert(parent.to_path_buf());
         }
+        acl_ledger
+            .record(allow_write, PermissionType::Write)
+            .wrap_err_with(|| {
+                eyre!("recording write access to {allow_write:?}")
+            })?;
         if let Err(err) =
             add_to_acl(&app_container_sid, &allow_write, PermissionType::Write)
         {
@@ -316,11 +333,12 @@ fn spawn(
 
     let mut parents_to_elevate = Vec::new();
     for path in parents {
-        if let Err(err) = add_to_acl(
-            &app_container_sid,
-            &path,
-            PermissionType::TraverseNoInherit,
-        ) {
+        acl_ledger
+            .record(&path, PermissionType::Traverse)
+            .wrap_err_with(|| eyre!("recording traverse access to {path:?}"))?;
+        if let Err(err) =
+            add_to_acl(&app_container_sid, &path, PermissionType::Traverse)
+        {
             if is_access_denied(&err) {
                 tracing::warn!(
                     "Lacking permission to allow traversal of {path:?}; will elevate"
@@ -354,14 +372,8 @@ fn spawn(
         || !write_paths_to_elevate.is_empty()
         || need_set_network_isolation_elevated
     {
-        let mut stringsid = PWSTR::default();
-        unsafe { ConvertSidToStringSidW(app_container_sid, &mut stringsid)? };
-        assert!(!stringsid.is_null());
-        let app_container_osstring =
-            OsString::from_wide(unsafe { stringsid.as_wide() });
-
         let mut arguments = Vec::<SandboxArg>::new();
-        arguments.push(app_container_osstring.into());
+        arguments.push(app_container_sid_string.clone().into());
         arguments.push(if need_set_network_isolation_elevated {
             "true".into()
         } else {
@@ -445,7 +457,7 @@ impl OwnedCapability {
     }
 }
 
-fn get_app_container_folder(app_container_sid: &PSID) -> Result<PathBuf> {
+fn app_container_sid_to_string(app_container_sid: &PSID) -> Result<OsString> {
     let mut string_sid = PWSTR::default();
     unsafe { ConvertSidToStringSidW(*app_container_sid, &mut string_sid)? };
     if string_sid.is_null() {
@@ -459,7 +471,16 @@ fn get_app_container_folder(app_container_sid: &PSID) -> Result<PathBuf> {
         };
     }
 
-    let folder = unsafe { GetAppContainerFolderPath(PCWSTR(string_sid.0))? };
+    Ok(OsString::from_wide(unsafe { string_sid.as_wide() }))
+}
+
+fn get_app_container_folder(app_container_sid: &OsStr) -> Result<PathBuf> {
+    let string_sid = app_container_sid
+        .encode_wide()
+        .chain([0])
+        .collect::<Vec<_>>();
+    let folder =
+        unsafe { GetAppContainerFolderPath(PCWSTR(string_sid.as_ptr()))? };
     if folder.is_null() {
         return Err(eyre!("GetAppContainerFolderPath returned a null path"));
     }
@@ -562,13 +583,6 @@ fn try_set_network_isolation(app_container: &PSID) -> std::io::Result<()> {
     }
 
     Ok(())
-}
-
-#[derive(Clone, Copy)]
-enum PermissionType {
-    TraverseNoInherit,
-    Write,
-    Read,
 }
 
 fn is_access_denied(err: &std::io::Error) -> bool {
@@ -694,15 +708,13 @@ fn add_to_acl(
     let mut ea = EXPLICIT_ACCESS_W::default();
     ea.grfAccessMode = GRANT_ACCESS;
     ea.grfAccessPermissions = match perms {
-        PermissionType::TraverseNoInherit => {
-            (FILE_GENERIC_READ | FILE_TRAVERSE).0
-        }
+        PermissionType::Traverse => (FILE_GENERIC_READ | FILE_TRAVERSE).0,
         PermissionType::Write => (FILE_ALL_ACCESS).0,
         PermissionType::Read => {
             (FILE_GENERIC_READ | FILE_TRAVERSE | FILE_GENERIC_EXECUTE).0
         }
     };
-    ea.grfInheritance = if matches!(perms, PermissionType::TraverseNoInherit) {
+    ea.grfInheritance = if matches!(perms, PermissionType::Traverse) {
         NO_INHERITANCE
     } else {
         OBJECT_INHERIT_ACE | CONTAINER_INHERIT_ACE
@@ -910,7 +922,7 @@ pub fn run_helper(
     apply_acl_paths(
         &psid,
         std::env::split_paths(traverse_paths.as_os_str()),
-        PermissionType::TraverseNoInherit,
+        PermissionType::Traverse,
     )?;
     apply_acl_paths(
         &psid,

@@ -60,6 +60,8 @@ objc2-foundation = { workspace = true }
 windows =  { workspace = true, features = ["Win32_System_Memory"] }
 # junction =  { workspace = true }
 scopeguard =  { workspace = true }
+winreg = { workspace = true }
+serde_json = { workspace = true }
 
 [lints]
 workspace = true

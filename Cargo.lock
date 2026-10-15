@@ -7256,6 +7256,7 @@ dependencies = [
  "urlencoding",
  "uuid 1.23.3",
  "windows",
+ "winreg 0.55.0",
  "zbus",
 ]
 
