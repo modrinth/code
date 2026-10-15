@@ -8,6 +8,9 @@
 		@update:model-value="emit('update:modelValue', $event)"
 		@ready="editorView = $event"
 	>
+		<template #preview="{ value }">
+			<IssueMessage :message="value" highlighted />
+		</template>
 		<template #after-preview="{ previewMode: preview }">
 			<div class="ml-auto">
 				<MarkdownTemplatePicker
@@ -32,6 +35,8 @@ import { syntaxTree } from '@codemirror/language'
 import { EditorView } from '@codemirror/view'
 import { MarkdownEditor } from '@modrinth/ui'
 import { nextTick, onBeforeUnmount, ref, shallowRef, watch } from 'vue'
+
+import IssueMessage from '~/components/ui/project-issue-card/issue-message.vue'
 
 import MarkdownTemplatePicker from './markdown-template-picker.vue'
 import type { MarkdownTemplate, MarkdownTemplateQuery } from './markdown-templates'

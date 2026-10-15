@@ -96,8 +96,14 @@
 				]"
 				@click="openImage"
 				@keydown="handleImageKeydown"
-				v-html="formattedMessage"
-			/>
+			>
+				<span v-if="forceCompact" v-html="formattedMessage" />
+				<IssueMessage
+					v-else
+					:message="message.body.body"
+					class="[&>:first-child>:first-child]:mt-0 [&>:last-child>:last-child]:mb-0"
+				/>
+			</div>
 			<div
 				v-else
 				class="message__body min-w-0 max-w-full leading-5 [&_.version-badge]:relative [&_.version-badge]:top-0.5 [&_.version-badge]:!inline-flex [&_.version-badge]:align-baseline"
@@ -230,6 +236,7 @@ import {
 } from '@modrinth/ui'
 import { renderString } from '@modrinth/utils'
 
+import IssueMessage from '~/components/ui/project-issue-card/issue-message.vue'
 import { isStaff } from '~/helpers/users.js'
 
 import ThreadRoleBadge from './ThreadRoleBadge.vue'
@@ -381,6 +388,7 @@ const imageMessages = defineMessages({
 function prepareImagePreviews(element, binding) {
 	if (!binding.value && !binding.oldValue) return
 	for (const image of element.querySelectorAll('img')) {
+		if (image.closest('button')) continue
 		if (binding.value && image.getAttribute('src')) {
 			image.setAttribute('role', 'button')
 			image.setAttribute('tabindex', '0')
@@ -401,7 +409,7 @@ const vImagePreviews = {
 function openImage(event) {
 	if (!props.imagePreviews || !(event.target instanceof HTMLImageElement)) return
 	const image = event.target
-	if (!image.getAttribute('src')) return
+	if (!image.getAttribute('src') || image.closest('button')) return
 	event.preventDefault()
 	event.stopPropagation()
 	emit('open-image', { src: image.currentSrc || image.src, alt: image.alt, element: image })
