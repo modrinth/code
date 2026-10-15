@@ -611,16 +611,20 @@ impl ThreadIssueTarget {
                                 })
                                 .unwrap_or_default();
                             if suggestion.as_ref().is_some_and(|suggestion| {
-                                suggestion.len() == current.len()
-                                    && suggestion.iter().all(|version| {
-                                        current.contains(version)
+                                suggestion
+                                    .iter()
+                                    .all(|version| current.contains(version))
+                                    && current.iter().all(|version| {
+                                        suggestion.contains(version)
                                     })
                             }) {
                                 ThreadIssueValueState::SameAsSuggested
-                            } else if original.len() == current.len()
-                                && original
+                            } else if original
+                                .iter()
+                                .all(|version| current.contains(version))
+                                && current
                                     .iter()
-                                    .all(|version| current.contains(version))
+                                    .all(|version| original.contains(version))
                             {
                                 ThreadIssueValueState::SameAsOriginal
                             } else {
@@ -632,19 +636,21 @@ impl ThreadIssueTarget {
                             suggestion,
                         } => {
                             if suggestion.as_ref().is_some_and(|suggestion| {
-                                suggestion.len() == version.dependencies.len()
-                                    && suggestion.iter().all(|dependency| {
-                                        version
-                                            .dependencies
-                                            .contains(dependency)
-                                    })
+                                suggestion.iter().all(|dependency| {
+                                    version.dependencies.contains(dependency)
+                                }) && version.dependencies.iter().all(
+                                    |dependency| {
+                                        suggestion.contains(dependency)
+                                    },
+                                )
                             }) {
                                 ThreadIssueValueState::SameAsSuggested
-                            } else if original.len()
-                                == version.dependencies.len()
-                                && original.iter().all(|dependency| {
-                                    version.dependencies.contains(dependency)
-                                })
+                            } else if original.iter().all(|dependency| {
+                                version.dependencies.contains(dependency)
+                            }) && version
+                                .dependencies
+                                .iter()
+                                .all(|dependency| original.contains(dependency))
                             {
                                 ThreadIssueValueState::SameAsOriginal
                             } else {
