@@ -7,16 +7,12 @@ const STORAGE_KEY = 'moderation.project-review.layout.v1'
 export const workspacePanelSizes = {
 	left: { default: 400, minimum: 200 },
 	right: { default: 400, minimum: 200 },
-	bottom: { default: 200, minimum: 50 },
 	center: { minimum: 20 },
-	tabs: { minimum: 100 },
 } as const
 
 export interface SavedWorkspaceLayout {
 	leftWidth: number
 	rightWidth: number
-	bottomHeight: number
-	bottomVisible?: boolean
 	leftVisible: boolean
 	rightVisible: boolean
 	tabs: SerializedDockview
@@ -64,10 +60,9 @@ export function readWorkspaceLayout(): SavedWorkspaceLayout | undefined {
 		)
 		if (
 			!saved ||
-			![saved.leftWidth, saved.rightWidth, saved.bottomHeight].every(
+			![saved.leftWidth, saved.rightWidth].every(
 				(size) => typeof size === 'number' && Number.isFinite(size) && size > 0,
 			) ||
-			(saved.bottomVisible !== undefined && typeof saved.bottomVisible !== 'boolean') ||
 			typeof saved.leftVisible !== 'boolean' ||
 			typeof saved.rightVisible !== 'boolean' ||
 			!isValidTabLayout(saved.tabs) ||

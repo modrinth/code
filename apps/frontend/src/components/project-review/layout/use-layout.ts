@@ -42,15 +42,12 @@ export function useProjectReviewLayout(
 	const savedLayout = readWorkspaceLayout()
 	const leftVisible = ref(savedLayout?.leftVisible ?? true)
 	const rightVisible = ref(savedLayout?.rightVisible ?? true)
-	const bottomVisible = ref(savedLayout?.bottomVisible ?? true)
 	let leftWidth = savedLayout?.leftWidth ?? workspacePanelSizes.left.default
 	let rightWidth = savedLayout?.rightWidth ?? workspacePanelSizes.right.default
 	const visibleRightWidth = ref(rightVisible.value ? rightWidth : 0)
-	let bottomHeight = savedLayout?.bottomHeight ?? workspacePanelSizes.bottom.default
 	const topLeftGroupId = ref<string>()
 	const topRightGroupId = ref<string>()
 	let columns: SplitviewApi | undefined
-	let rows: SplitviewApi | undefined
 	let tabsReady = false
 	let saveTimer: ReturnType<typeof setTimeout> | undefined
 	let tabs: DockviewApi | undefined
@@ -84,20 +81,16 @@ export function useProjectReviewLayout(
 
 	function saveLayout() {
 		clearTimeout(saveTimer)
-		if (!columns || !rows || !tabs || !tabsReady) return
+		if (!columns || !tabs || !tabsReady) return
 		const currentLeftWidth = columns.getPanel('left')?.api.width ?? 0
 		const currentRightWidth = columns.getPanel('right')?.api.width ?? 0
-		const currentBottomHeight = rows.getPanel('bottom')?.api.height ?? 0
 		if (leftVisible.value && currentLeftWidth > 0) leftWidth = currentLeftWidth
 		if (rightVisible.value && currentRightWidth > 0) rightWidth = currentRightWidth
-		if (bottomVisible.value && currentBottomHeight > 0) bottomHeight = currentBottomHeight
 		const currentTabs = tabs.toJSON()
 		if (currentTabLayoutKey) tabLayouts.set(currentTabLayoutKey, currentTabs)
 		saveWorkspaceLayout({
 			leftWidth,
 			rightWidth,
-			bottomHeight,
-			bottomVisible: bottomVisible.value,
 			leftVisible: leftVisible.value,
 			rightVisible: rightVisible.value,
 			tabs: dockPopoutLayout(currentTabs),
@@ -149,25 +142,6 @@ export function useProjectReviewLayout(
 			api.onDidLayoutChange(updateRightPanelWidth),
 			api.onDidLayoutChange(scheduleSave),
 		)
-	}
-
-	function onRowsReady({ api }: SplitviewReadyEvent) {
-		rows = api
-		api.addPanel({
-			id: 'tabs',
-			component: 'ProjectReviewTabs',
-			minimumSize: workspacePanelSizes.tabs.minimum,
-			priority: LayoutPriority.High,
-		})
-		api.addPanel({
-			id: 'bottom',
-			component: 'ProjectReviewPanel',
-			params: { slot: 'bottom' },
-			minimumSize: workspacePanelSizes.bottom.minimum,
-			size: bottomHeight,
-		})
-		api.getPanel('bottom')?.api.setVisible(bottomVisible.value)
-		subscriptions.push(api.onDidLayoutChange(scheduleSave))
 	}
 
 	function constrainDrop(event: DockviewWillDropEvent | DockviewWillShowOverlayLocationEvent) {
@@ -360,8 +334,6 @@ export function useProjectReviewLayout(
 		if (slot === 'left' || slot === 'right') {
 			const visible = slot === 'left' ? leftVisible : rightVisible
 			if (!visible.value) toggleSidebar(slot)
-		} else if (slot === 'bottom') {
-			if (!bottomVisible.value) toggleToolsPanel()
 		} else {
 			openTab(slot)
 		}
@@ -392,15 +364,6 @@ export function useProjectReviewLayout(
 		scheduleSave()
 	}
 
-	function toggleToolsPanel() {
-		const panel = rows?.getPanel('bottom')
-		if (!panel || !rows) return
-		if (bottomVisible.value) bottomHeight = panel.api.height
-		bottomVisible.value = !bottomVisible.value
-		panel.api.setVisible(bottomVisible.value)
-		scheduleSave()
-	}
-
 	function onDividerDoubleClick(event: MouseEvent) {
 		if (!(event.target instanceof HTMLElement)) return
 		const sash = event.target.closest('.dv-sash:not(.dv-disabled)')
@@ -410,9 +373,6 @@ export function useProjectReviewLayout(
 		const index = Array.from(container.children).indexOf(sash)
 		const columnSplit = split
 			.closest('.project-review-columns')
-			?.querySelector('.dv-split-view-container')
-		const rowSplit = split
-			.closest('.project-review-rows')
 			?.querySelector('.dv-split-view-container')
 		if (split === columnSplit && columns) {
 			const side = index === 0 ? 'left' : 'right'
@@ -426,16 +386,6 @@ export function useProjectReviewLayout(
 					Math.min(
 						workspacePanelSizes[side].default,
 						columns.width - otherWidth - workspacePanelSizes.center.minimum,
-					),
-				),
-			})
-		} else if (split === rowSplit && rows) {
-			rows.getPanel('bottom')?.api.setSize({
-				size: Math.max(
-					workspacePanelSizes.bottom.minimum,
-					Math.min(
-						workspacePanelSizes.bottom.default,
-						rows.height - workspacePanelSizes.tabs.minimum,
 					),
 				),
 			})
@@ -553,7 +503,6 @@ export function useProjectReviewLayout(
 		popoutTab,
 		dockTab,
 		poppingOut,
-		bottomVisible,
 		leftVisible,
 		openTab,
 		revealSlot,
@@ -563,10 +512,8 @@ export function useProjectReviewLayout(
 		topLeftGroupId,
 		topRightGroupId,
 		onColumnsReady,
-		onRowsReady,
 		onTabsReady,
 		onDividerDoubleClick,
 		toggleSidebar,
-		toggleToolsPanel,
 	}
 }

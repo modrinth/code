@@ -60,7 +60,6 @@ export type ReviewShortcutAction =
 	| 'toggle-left'
 	| 'toggle-right'
 	| 'reveal-right'
-	| 'toggle-bottom'
 	| 'back'
 	| 'next'
 	| 'exit'

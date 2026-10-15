@@ -70,13 +70,6 @@ const keybinds: { [id: string]: KeybindListener } = {
 		enabled: (ctx) => ctx.available('toggle-right'),
 		action: (ctx) => ctx.run('toggle-right'),
 	},
-	'review-toggle-bottom': {
-		keybind: 'Shift+ArrowDown',
-		description: 'Toggle tools panel',
-		scope: 'review-actions',
-		enabled: (ctx) => ctx.available('toggle-bottom'),
-		action: (ctx) => ctx.run('toggle-bottom'),
-	},
 	'review-back': {
 		keybind: 'Alt+ArrowLeft',
 		description: 'Previous project',

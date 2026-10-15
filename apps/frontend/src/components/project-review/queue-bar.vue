@@ -19,22 +19,6 @@
 					<SettingsIcon aria-hidden="true" />
 				</button>
 				<button
-					v-tooltip="{
-						text: formatMessage(bottomVisible ? messages.hideTools : messages.showTools),
-						delay: 500,
-					}"
-					type="button"
-					class="queue-action"
-					:aria-label="formatMessage(bottomVisible ? messages.hideTools : messages.showTools)"
-					:aria-expanded="bottomVisible"
-					@click="toggleToolsPanel"
-				>
-					<component
-						:is="bottomVisible ? PanelTopOpenIcon : PanelTopCloseIcon"
-						aria-hidden="true"
-					/>
-				</button>
-				<button
 					v-if="detachedTabs.length"
 					v-tooltip="{ text: formatMessage(messages.closeExternalPanels), delay: 500 }"
 					type="button"
@@ -98,8 +82,6 @@ import {
 	KeyboardIcon,
 	LeftArrowIcon,
 	MonitorXIcon,
-	PanelTopCloseIcon,
-	PanelTopOpenIcon,
 	RightArrowIcon,
 	SettingsIcon,
 } from '@modrinth/assets'
@@ -129,8 +111,7 @@ const settingsTabs: TabbedModalTab[] = [
 ]
 
 const { queue, isLoading, navigation } = injectProjectReviewPageContext()
-const { bottomVisible, toggleToolsPanel, detachedTabs, closeExternalPanels } =
-	injectProjectReviewContext()
+const { detachedTabs, closeExternalPanels } = injectProjectReviewContext()
 const {
 	busy,
 	error: navigationError,

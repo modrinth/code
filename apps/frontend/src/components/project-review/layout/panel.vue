@@ -38,7 +38,7 @@ type PanelParams = { slot: ProjectReviewSlot }
 const props = defineProps<{
 	params: PanelParams | IDockviewPanelProps<PanelParams>
 }>()
-const { slots, bottomVisible, leftVisible, rightVisible } = injectProjectReviewContext()
+const { slots, leftVisible, rightVisible } = injectProjectReviewContext()
 const { formatMessage } = useVIntl()
 const slotName = computed(() =>
 	'slot' in props.params ? props.params.slot : props.params.params.slot,
@@ -59,8 +59,7 @@ const content = computed(() => slots[slotName.value])
 const panelHidden = computed(
 	() =>
 		(slotName.value === 'left' && !leftVisible.value) ||
-		(slotName.value === 'right' && !rightVisible.value) ||
-		(slotName.value === 'bottom' && !bottomVisible.value),
+		(slotName.value === 'right' && !rightVisible.value),
 )
 </script>
 

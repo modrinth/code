@@ -78,7 +78,6 @@ provideProjectReviewContext({ ...layout, slots })
 useReviewShortcut('toggle-left', () => layout.toggleSidebar('left'))
 useReviewShortcut('toggle-right', () => layout.toggleSidebar('right'))
 useReviewShortcut('reveal-right', () => layout.revealSlot('right'))
-useReviewShortcut('toggle-bottom', layout.toggleToolsPanel)
 
 const keybinds = useModerationKeybinds()
 useReviewEventListener('keydown', (event) => {

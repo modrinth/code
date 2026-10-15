@@ -102,10 +102,6 @@ export const projectReviewMessages = defineMessages({
 		id: 'moderation.project-review.right',
 		defaultMessage: 'Right panel',
 	},
-	bottom: {
-		id: 'moderation.project-review.bottom',
-		defaultMessage: 'Tools',
-	},
 	description: {
 		id: 'moderation.project-review.description',
 		defaultMessage: 'Description',
@@ -177,14 +173,6 @@ export const projectReviewMessages = defineMessages({
 	hideRight: {
 		id: 'moderation.project-review.hideRight',
 		defaultMessage: 'Hide panel',
-	},
-	showTools: {
-		id: 'moderation.project-review.showTools',
-		defaultMessage: 'Show tools panel',
-	},
-	hideTools: {
-		id: 'moderation.project-review.hideTools',
-		defaultMessage: 'Hide tools panel',
 	},
 	empty: {
 		id: 'moderation.project-review.empty',

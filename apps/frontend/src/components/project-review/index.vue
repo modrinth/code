@@ -170,7 +170,6 @@ const {
 	selection,
 	isLoading,
 	navigation,
-	versions,
 } = injectProjectReviewPageContext()
 provideReviewSlicer(createReviewSlicer(projectId, versions))
 const visibleTabs = computed<readonly ProjectReviewTab[]>((previousTabs) => {
