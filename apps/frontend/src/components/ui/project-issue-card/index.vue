@@ -53,7 +53,7 @@
 					>
 				</h2>
 				<DropdownIcon
-					class="ml-auto mr-1.5 size-5 shrink-0 self-center transition-transform duration-300"
+					class="mb-0.5 ml-auto mr-1.5 size-5 shrink-0 self-center transition-transform duration-300"
 					:class="{ 'rotate-180': isExpanded(issue) }"
 					aria-hidden="true"
 				/>
@@ -63,6 +63,7 @@
 						:options="moderatorOptions(issue)"
 						:disabled="verifyMutation.isPending.value"
 						class="!text-inherit"
+						size="sm"
 						:class="threadHistory ? '!-my-1.5' : '!-my-1'"
 						type="quiet"
 					>

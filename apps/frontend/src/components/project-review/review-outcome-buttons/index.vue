@@ -4,6 +4,9 @@
 		:disabled="pending || advancingAction !== undefined"
 	/>
 	<div v-else-if="project" class="flex shrink-0 flex-wrap gap-1.5">
+		<span v-if="sendIssuesAsThreadMessage" class="w-full text-xs text-secondary">
+			{{ formatMessage(messages.messageMode) }}
+		</span>
 		<Button
 			v-for="action in actions"
 			:key="action.status"
@@ -71,6 +74,7 @@ const {
 	canSubmit,
 	canApprove,
 	canAddIssues,
+	sendIssuesAsThreadMessage,
 	pending,
 	loadingAction,
 	submitDecision,
@@ -80,6 +84,14 @@ const { generating } = injectReviewMessages()
 const advancingAction = ref<Parameters<typeof submitDecision>[0]>()
 const { formatMessage } = useVIntl()
 const messages = defineMessages({
+	messageMode: {
+		id: 'project-review.decision.message-mode',
+		defaultMessage: 'Send issues as thread message',
+	},
+	sendIssuesMessage: {
+		id: 'project-review.decision.send-issues-message',
+		defaultMessage: 'Send issues thread message',
+	},
 	approve: { id: 'project-review.decision.approve', defaultMessage: 'Approve' },
 	withhold: {
 		id: 'project-review.decision.withhold',
@@ -90,7 +102,10 @@ const messages = defineMessages({
 		id: 'project-review.decision.send-to-review',
 		defaultMessage: 'Send to review',
 	},
-	setToDraft: { id: 'project-review.decision.set-to-draft', defaultMessage: 'Set to draft' },
+	setToDraft: {
+		id: 'project-review.decision.set-to-draft',
+		defaultMessage: 'Set to draft',
+	},
 	addIssues: {
 		id: 'project-review.decision.add-issues',
 		defaultMessage: 'Add issues on project',
@@ -121,11 +136,17 @@ const actions = computed(() => [
 const overflowActions = computed(() => [
 	{
 		id: 'add-issues',
-		label: formatMessage(messages.addIssues),
+		label: formatMessage(
+			sendIssuesAsThreadMessage.value ? messages.sendIssuesMessage : messages.addIssues,
+		),
 		tone: 'orange' as const,
 		icon: PlusIcon,
 		action: () => submitIssues(),
-		disabled: !canAddIssues.value || generating.value || advancingAction.value !== undefined,
+		disabled:
+			!!heldBy.value ||
+			!canAddIssues.value ||
+			generating.value ||
+			advancingAction.value !== undefined,
 	},
 	{
 		id: 'send-to-review',

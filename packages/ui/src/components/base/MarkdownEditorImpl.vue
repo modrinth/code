@@ -298,8 +298,11 @@
 						overflowY: 'auto',
 					}"
 					class="markdown-body"
-					v-html="renderHighlightedString(currentValue ?? '')"
-				/>
+				>
+					<slot name="preview" :value="currentValue ?? ''">
+						<div v-html="renderHighlightedString(currentValue ?? '')" />
+					</slot>
+				</div>
 			</div>
 		</div>
 	</div>

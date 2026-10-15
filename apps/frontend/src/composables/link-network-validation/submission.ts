@@ -13,7 +13,7 @@ export function canSubmitProjectForReview(
 export function canResubmitProjectForReview(
 	thread: Pick<Labrinth.Threads.v3.Thread, 'issues'> | null | undefined,
 ): boolean {
-	return !!thread && thread.issues.every((issue) => issue.verdict !== 'open')
+	return !!thread && (thread.issues ?? []).every((issue) => issue.verdict !== 'open')
 }
 
 export async function submitProjectForReview(

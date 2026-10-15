@@ -153,7 +153,11 @@
 							)
 						"
 						:on-image-upload="onUploadImage"
-					/>
+					>
+						<template #preview="{ value }">
+							<IssueMessage :message="value" highlighted />
+						</template>
+					</MarkdownEditor>
 				</div>
 				<div v-if="replyFacets.length" class="mx-4 mt-3 flex flex-col gap-2">
 					<p class="m-0 text-sm text-secondary">
@@ -483,6 +487,7 @@ import {
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, ref, watch } from 'vue'
 
+import IssueMessage from '~/components/ui/project-issue-card/issue-message.vue'
 import ThreadTimeline from '~/components/ui/thread/ThreadTimeline.vue'
 import { useImageUpload } from '~/composables/image-upload.ts'
 import { isApproved, isRejected } from '~/helpers/projects.js'
