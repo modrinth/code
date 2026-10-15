@@ -17,6 +17,26 @@ pub struct BlobCas {
     imp: BlobStore,
 }
 
+pub struct StoredBlob {
+    pub sha256: Sha256,
+    sha1: Sha1,
+}
+
+impl StoredBlob {
+    pub async fn register(
+        &self,
+        exec: &mut dyn toasty::Executor,
+    ) -> Result<()> {
+        model::BlobHash::upsert_by_sha256(self.sha256)
+            .sha1(self.sha1)
+            .or_ignore()
+            .exec(exec)
+            .context(info_span!("upserting blob hash record"))
+            .await?;
+        Ok(())
+    }
+}
+
 impl BlobCas {
     #[must_use]
     pub const fn new(imp: BlobStore) -> Self {
@@ -27,23 +47,32 @@ impl BlobCas {
         self.imp.get(&path_for(sha256)).await
     }
 
+    /// Put a blob of data into the store, and automatically register its hashes
+    /// in the database.
+    ///
+    /// If you need to split the store/register, see [`BlobCas::store`].
     pub async fn put(
         &self,
         exec: &mut dyn toasty::Executor,
         data: &[u8],
     ) -> Result<Sha256> {
+        let blob = self.store(data).await?;
+        blob.register(exec).await?;
+        Ok(blob.sha256)
+    }
+
+    /// Put a blob of data into the store, but don't immediately register it
+    /// into the database.
+    ///
+    /// Use the returned [`StoredBlob`] to add its hashes into the database
+    /// later.
+    pub async fn store(&self, data: &[u8]) -> Result<StoredBlob> {
         let sha256 = Sha256::from_digest(data);
         let sha1 = Sha1::from_digest(data);
-        model::BlobHash::upsert_by_sha256(sha256)
-            .sha1(sha1)
-            .or_ignore()
-            .exec(exec)
-            .context(info_span!("upserting blob hash record"))
-            .await?;
         self.imp
             .put(&path_for(sha256), data, ContentType::Binary)
             .await?;
-        Ok(sha256)
+        Ok(StoredBlob { sha256, sha1 })
     }
 }
 

@@ -169,9 +169,13 @@ pub async fn extract_catalogs(
     let num_total = artifacts.len();
     let mut num_done = 0usize;
     info!(num_artifacts = num_total, "downloading loader dependencies");
-    let artifacts = stream::iter(artifacts.into_values())
-        .map(|artifact| download_artifact(app, artifact))
-        .buffered(app.concurrency.download.get())
+    let mut artifacts = stream::iter(artifacts.into_values().enumerate())
+        .map(|(index, artifact)| async move {
+            download_artifact(app, artifact)
+                .await
+                .map(|artifact| (index, artifact))
+        })
+        .buffer_unordered(app.concurrency.download.get())
         .inspect_ok(|_| {
             num_done += 1;
             if num_done.is_multiple_of(100) || num_done == num_total {
@@ -181,6 +185,11 @@ pub async fn extract_catalogs(
         .try_collect::<Vec<_>>()
         .context(info_span!("downloading loader dependencies"))
         .await?;
+    artifacts.sort_unstable_by_key(|(index, _)| *index);
+    let artifacts = artifacts
+        .into_iter()
+        .map(|(_, artifact)| artifact)
+        .collect::<Vec<_>>();
 
     let mut conn = app
         .db
@@ -730,7 +739,6 @@ mod tests {
             .is_err()
         );
     }
-
 
     fn normalize(
         mut profile: Value,

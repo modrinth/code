@@ -186,17 +186,19 @@ impl<'cx> DownloadRunContext<'cx> {
     }
 
     async fn insert_blob(&self, url: &str, data: &[u8]) -> Result<Sha256> {
+		let blob = self
+			.cas
+			.store(data)
+			.context(info_span!("storing blob"))
+			.await?;
+		let sha256 = blob.sha256;
         let mut conn = self.conn.lock().await;
         let mut txn = conn
             .transaction()
             .context(info_span!("starting transaction"))
             .await?;
 
-        let sha256 = self
-            .cas
-            .put(&mut txn, data)
-            .context(info_span!("storing blob"))
-            .await?;
+		blob.register(&mut txn).await?;
         toasty::create!(model::BlobDownload {
             download_run_id: self.download_run_id,
             sha256,

@@ -276,32 +276,46 @@ async fn extract_from_installer(
         });
     }
 
-    let mut stored_artifacts = stream::iter(embedded_maven_artifacts)
-        .map(|(coordinate, path)| {
-            let zip = &zip;
-            async move {
-                let bytes = read_file(zip, &path)
-                    .context(info_span!(
-                        "extracting embedded Maven artifact",
-                        path
-                    ))
-                    .await?
-                    .context(
-                        "embedded Maven artifact is missing from installer",
-                    )?;
-                let mut conn = app.db.connection()
-                    .context(info_span!("acquiring artifact connection"))
-                    .await?;
-                let sha256 = app.cas
+    let mut stored_artifacts =
+        stream::iter(embedded_maven_artifacts.into_iter().enumerate())
+            .map(|(index, (coordinate, path))| {
+                let zip = &zip;
+                async move {
+                    let bytes = read_file(zip, &path)
+                        .context(info_span!(
+                            "extracting embedded Maven artifact",
+                            path
+                        ))
+                        .await?
+                        .context(
+                            "embedded Maven artifact is missing from installer",
+                        )?;
+                    let mut conn = app
+                        .db
+                        .connection()
+                        .context(info_span!("acquiring artifact connection"))
+                        .await?;
+                    let sha256 = app
+						.cas
                     .put(&mut conn, &bytes)
-                    .context(info_span!("storing embedded Maven artifact in CAS", path, %coordinate))
+						.context(
+							info_span!("storing embedded Maven artifact in CAS", path, %coordinate),
+						)
                     .await?;
-                anyhow::Ok(model::ForgelikeStoredArtifact { coordinate, sha256 })
-            }
-        })
-        .buffered(app.concurrency.extract_files.get())
-        .try_collect::<Vec<_>>()
-        .await?;
+                    anyhow::Ok((
+                        index,
+                        model::ForgelikeStoredArtifact { coordinate, sha256 },
+                    ))
+                }
+            })
+            .buffer_unordered(app.concurrency.extract_files.get())
+            .try_collect::<Vec<_>>()
+            .await?;
+    stored_artifacts.sort_unstable_by_key(|(index, _)| *index);
+    let mut stored_artifacts = stored_artifacts
+        .into_iter()
+        .map(|(_, artifact)| artifact)
+        .collect::<Vec<_>>();
 
     let fallback = match installer.loader {
         model::ForgelikeLoader::Forge => "https://maven.minecraftforge.net/",
@@ -309,17 +323,22 @@ async fn extract_from_installer(
             "https://maven.neoforged.net/releases/"
         }
     };
-    let downloaded = stream::iter(external_artifacts)
-        .map(|(coordinate, mut urls, hashes)| async move {
-            if urls.len() > 1 {
-                urls.push(repository_artifact_url(fallback, &coordinate)?);
-            }
-            download_library(app, coordinate, urls, hashes).await
-        })
-        .buffered(app.concurrency.download.get())
-        .try_collect::<Vec<_>>()
-        .await?;
-    stored_artifacts.extend(downloaded);
+    let mut downloaded =
+        stream::iter(external_artifacts.into_iter().enumerate())
+            .map(|(index, (coordinate, mut urls, hashes))| async move {
+                if urls.len() > 1 {
+                    urls.push(repository_artifact_url(fallback, &coordinate)?);
+                }
+                download_library(app, coordinate, urls, hashes)
+                    .await
+                    .map(|artifact| (index, artifact))
+            })
+            .buffer_unordered(app.concurrency.download.get())
+            .try_collect::<Vec<_>>()
+            .await?;
+    downloaded.sort_unstable_by_key(|(index, _)| *index);
+    stored_artifacts
+        .extend(downloaded.into_iter().map(|(_, artifact)| artifact));
 
     let mut conn = app
         .db
