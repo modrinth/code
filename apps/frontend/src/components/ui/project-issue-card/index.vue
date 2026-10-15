@@ -9,7 +9,7 @@
 			:key="issue.id"
 			class="min-w-0 rounded-2xl border border-solid"
 			:class="[
-				threadHistory ? 'p-2.5 py-3 pr-1.5' : 'p-4',
+				threadHistory ? 'pl-2.5 pr-1.5' : 'px-4 pb-1',
 				threadHistory ? 'text-primary' : 'text-contrast',
 				threadHistory
 					? 'border-surface-5 bg-surface-2'
@@ -17,8 +17,19 @@
 						? 'border-brand-green bg-bg-green'
 						: 'border-brand-orange bg-bg-orange',
 			]"
+			@click.self="toggle(issue)"
 		>
-			<div class="flex flex-wrap items-start justify-between gap-1">
+			<div
+				class="flex cursor-pointer flex-wrap items-start justify-between gap-1"
+				:class="threadHistory ? 'py-3' : 'pb-3 pt-4'"
+				role="button"
+				tabindex="0"
+				:aria-expanded="isExpanded(issue)"
+				:aria-controls="issueContentId(issue)"
+				@click="toggle(issue)"
+				@keydown.enter.self.prevent="toggle(issue)"
+				@keydown.space.self.prevent="toggle(issue)"
+			>
 				<h2
 					class="m-0 flex min-w-0 flex-1 basis-[150px] flex-wrap items-start text-inherit"
 					:class="threadHistory ? 'gap-1.5' : '!mt-[3px] gap-2'"
@@ -41,45 +52,23 @@
 						>{{ issueTitle(issue) }}</span
 					>
 				</h2>
-				<Button
-					v-if="threadHistory || isComplete(issue)"
-					class="ml-auto max-w-full shrink-0 !whitespace-normal !text-inherit"
-					:class="threadHistory ? '-my-1.5 aspect-square' : ''"
-					:circular="threadHistory"
-					type="quiet"
-					size="sm"
-					:aria-expanded="isExpanded(issue)"
-					:aria-controls="issueContentId(issue)"
-					@click="toggle(issue.id)"
-				>
-					<FoldVerticalIcon v-if="isExpanded(issue)" aria-hidden="true" />
-					<UnfoldVerticalIcon v-else aria-hidden="true" />
-					<template v-if="!threadHistory">
-						{{
-							formatMessage(
-								threadIssueVerdict(issue) === 'resolved'
-									? isExpanded(issue)
-										? messages.hideResolved
-										: messages.showResolved
-									: isExpanded(issue)
-										? messages.hideAddressed
-										: messages.showAddressed,
-							)
-						}}
-					</template>
-				</Button>
-				<TeleportOverflowMenu
-					v-if="isStaff(auth.user)"
-					:label="formatMessage(messages.issueOptions)"
-					:options="moderatorOptions(issue)"
-					:disabled="verifyMutation.isPending.value"
-					class="shrink-0 !text-inherit"
-					:class="threadHistory ? '-my-1.5' : ''"
-					type="quiet"
-					size="sm"
-				>
-					<MoreHorizontalIcon aria-hidden="true" />
-				</TeleportOverflowMenu>
+				<DropdownIcon
+					class="ml-auto mr-1.5 size-5 shrink-0 self-center transition-transform duration-300"
+					:class="{ 'rotate-180': isExpanded(issue) }"
+					aria-hidden="true"
+				/>
+				<div v-if="isStaff(auth.user)" class="shrink-0 cursor-default" @click.stop>
+					<TeleportOverflowMenu
+						:label="formatMessage(messages.issueOptions)"
+						:options="moderatorOptions(issue)"
+						:disabled="verifyMutation.isPending.value"
+						class="!text-inherit"
+						:class="threadHistory ? '!-my-1.5' : '!-my-1'"
+						type="quiet"
+					>
+						<MoreHorizontalIcon aria-hidden="true" />
+					</TeleportOverflowMenu>
+				</div>
 			</div>
 			<div
 				:id="issueContentId(issue)"
@@ -88,7 +77,7 @@
 				@transitionend.self="onContentTransitionEnd($event, issue)"
 			>
 				<div :inert="!isExpanded(issue)" class="min-w-0">
-					<div class="flex flex-col gap-3 pt-3">
+					<div class="flex flex-col gap-3 pb-3">
 						<IssueMessage
 							v-if="issueMessage(issue)"
 							class="markdown-body min-w-0 text-sm text-inherit"
@@ -130,7 +119,8 @@
 									v-if="issueActions(issue).length > 2"
 									:label="formatMessage(messages.moreActions)"
 									:options="overflowOptions(issue)"
-									type="outlined"
+									type="colored"
+									color="orange"
 									:icon-only="false"
 									:tooltip="
 										issueActions(issue)
@@ -140,6 +130,10 @@
 									"
 								>
 									+{{ issueActions(issue).length - 2 }}
+									<template v-for="option in overflowOptions(issue)" :key="option.id" #[option.id]>
+										<span class="flex-1">{{ option.label }}</span>
+										<component :is="option.icon" aria-hidden="true" />
+									</template>
 								</TeleportOverflowMenu>
 							</div>
 							<div
@@ -217,10 +211,9 @@ import {
 	CheckIcon,
 	ChevronRightIcon,
 	CircleIcon,
-	FoldVerticalIcon,
+	DropdownIcon,
 	MessageSquareWarningIcon,
 	MoreHorizontalIcon,
-	UnfoldVerticalIcon,
 	XCircleIcon,
 } from '@modrinth/assets'
 import { IssuePriority, reviewPanels } from '@modrinth/moderation/src/data/issues'
@@ -236,6 +229,7 @@ import type {
 import {
 	Button,
 	ButtonLink,
+	type ButtonMenuLink,
 	type ButtonMenuOption,
 	defineMessages,
 	injectModrinthClient,
@@ -277,6 +271,7 @@ const props = defineProps<{
 	teamId?: string
 	disclosureType?: string
 	threadHistory?: boolean
+	defaultCollapsed?: boolean
 	fieldAction?: ProjectIssueFieldAction
 }>()
 
@@ -322,7 +317,7 @@ const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const auth = useAuthState()
 const canAddress = computed(() => !!currentMember.value?.accepted)
-const expandedAddressed = reactive(new Set<string>())
+const expandedIssues = reactive(new Map<string, boolean>())
 const finishedExpanding = reactive(new Set<string>())
 const messages = defineMessages({
 	issueOptions: {
@@ -644,7 +639,7 @@ watch(
 		const previousStates = new Map(previousIssues)
 		for (const [id, complete] of issues) {
 			if (previousStates.get(id) !== complete) {
-				expandedAddressed.delete(id)
+				expandedIssues.delete(id)
 				finishedExpanding.delete(id)
 			}
 		}
@@ -822,7 +817,7 @@ function isFacetReadyToAddress(
 	)
 }
 
-function overflowOptions(issue: ThreadIssue): ButtonMenuOption[] {
+function overflowOptions(issue: ThreadIssue): ButtonMenuLink[] {
 	return issueActions(issue)
 		.slice(2)
 		.map((action) => ({
@@ -871,11 +866,14 @@ function issueContentId(issue: ThreadIssue): string {
 }
 
 function isExpanded(issue: ThreadIssue): boolean {
-	return (!props.threadHistory && !isComplete(issue)) || expandedAddressed.has(issue.id)
+	return (
+		expandedIssues.get(issue.id) ??
+		(!props.threadHistory && !props.defaultCollapsed && !isComplete(issue))
+	)
 }
 
 function isFullyExpanded(issue: ThreadIssue): boolean {
-	return (!props.threadHistory && !isComplete(issue)) || finishedExpanding.has(issue.id)
+	return isExpanded(issue) && (!expandedIssues.has(issue.id) || finishedExpanding.has(issue.id))
 }
 
 function onContentTransitionEnd(event: TransitionEvent, issue: ThreadIssue) {
@@ -884,10 +882,9 @@ function onContentTransitionEnd(event: TransitionEvent, issue: ThreadIssue) {
 	}
 }
 
-function toggle(id: string) {
-	finishedExpanding.delete(id)
-	if (expandedAddressed.has(id)) expandedAddressed.delete(id)
-	else expandedAddressed.add(id)
+function toggle(issue: ThreadIssue) {
+	finishedExpanding.delete(issue.id)
+	expandedIssues.set(issue.id, !isExpanded(issue))
 }
 </script>
 
