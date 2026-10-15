@@ -190,7 +190,7 @@
 										@click="
 											addressMutation.mutate({
 												issueId: issue.id,
-												facets: addressableFacets(issue).filter((facet) => facet.verdict === 'open'),
+												facets: facetsToAddress(issue),
 												saveField: fieldAction?.save,
 												threadId: thread?.id,
 												projectId: project.id,
