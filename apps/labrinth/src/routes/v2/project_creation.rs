@@ -112,7 +112,7 @@ struct ProjectCreateData {
     #[validate(nested)]
     pub donation_urls: Option<Vec<DonationLink>>,
 
-    /// An optional boolean. If true, the project will be created as a draft.
+    /// Projects are always created as drafts; explicitly setting false is rejected.
     pub is_draft: Option<bool>,
 
     /// The license id that the project follows
