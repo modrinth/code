@@ -1,4 +1,6 @@
 import type { Labrinth } from '@modrinth/api-client'
+import { moderationSettings } from '@modrinth/moderation'
+import { IssuePriority } from '@modrinth/moderation/src/data/issues'
 import {
 	commonMessages,
 	createContext,
@@ -11,11 +13,12 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { computed, onScopeDispose, ref, watch } from 'vue'
 
 import { useAuthState } from '~/composables/auth'
+import { useModerationSettings } from '~/composables/moderation'
 import { sendThreadReply, type ThreadReply } from '~/helpers/thread-issues'
 import { isStaff } from '~/helpers/users.js'
 
 import { injectProjectReviewPageContext } from './index'
-import { applyReviewDecision, type ReviewDecision } from './review-decision'
+import { applyReviewDecision, type ReviewDecision, ReviewIssuesError } from './review-decision'
 import { ReviewLockError } from './review-lock'
 import type { createReviewMessages } from './review-messages'
 import type { createReviewPanels } from './review-panels'
@@ -40,6 +43,10 @@ export function createReviewSubmission(
 	const { formatMessage } = useVIntl()
 	const { addNotification } = injectNotificationManager()
 	const auth = useAuthState()
+	const settings = useModerationSettings()
+	const sendIssuesAsThreadMessage = computed(() =>
+		settings.value.get(moderationSettings.General.SendIssuesAsThreadMessage),
+	)
 	const { project, threadQuery, disclosures, lock } = injectProjectReviewPageContext()
 	const draft = ref('')
 	const uploadedImages = ref<string[]>([])
@@ -57,6 +64,18 @@ export function createReviewSubmission(
 	})
 
 	const errors = defineMessages({
+		sendIssuesFailed: {
+			id: 'project-review.decision.send-issues-failed',
+			defaultMessage: 'Failed to send issues thread message',
+		},
+		createIssuesFailed: {
+			id: 'project-review.decision.create-issues-failed',
+			defaultMessage: 'Failed to create issues',
+		},
+		issuesMessageTooLong: {
+			id: 'project-review.decision.issues-message-too-long',
+			defaultMessage: 'The issues thread message must be no larger than 65,536 bytes.',
+		},
 		submitFailed: {
 			id: 'project-review.decision.submit-failed',
 			defaultMessage: 'Failed to submit review',
@@ -115,6 +134,26 @@ export function createReviewSubmission(
 		return first ? { issues: [first, ...rest] } : undefined
 	}
 
+	const issuesMessage = computed(() => {
+		const previousIds = previousIssues.associatedIssueIds.value
+		return [
+			...previousIssues.appliedIssues.value.map((issue) => ({
+				priority: previousIssues.cardIssue(issue).priority ?? IssuePriority.Default,
+				message: previousIssues.reviewMessage(issue),
+			})),
+			...panels.activeIssues.value
+				.filter(({ id }) => !previousIds.has(id))
+				.map(({ id, issue }) => ({
+					priority: issue.priority ?? IssuePriority.Default,
+					message: messages.issueMessage(id),
+				})),
+		]
+			.sort((a, b) => a.priority - b.priority)
+			.map(({ message }) => message.trim())
+			.filter(Boolean)
+			.join('\n\n')
+	})
+
 	const submission = useMutation({
 		mutationFn: async ({
 			id,
@@ -154,9 +193,13 @@ export function createReviewSubmission(
 		onError: (error) => {
 			addNotification({
 				title: formatMessage(
-					error instanceof ReviewLockError
-						? errors.submitFailed
-						: commonMessages.errorNotificationTitle,
+					error instanceof ReviewIssuesError
+						? error.mode === 'message'
+							? errors.sendIssuesFailed
+							: errors.createIssuesFailed
+						: error instanceof ReviewLockError
+							? errors.submitFailed
+							: commonMessages.errorNotificationTitle,
 				),
 				text: error instanceof Error ? error.message : String(error),
 				type: 'error',
@@ -237,7 +280,11 @@ export function createReviewSubmission(
 		() => !previousIssues.hasUnresolvedFacets.value && panels.activeIssues.value.length === 0,
 	)
 
-	const canAddIssues = computed(() => canSubmit.value && !!selectedIssues())
+	const canAddIssues = computed(
+		() =>
+			canSubmit.value &&
+			!!(sendIssuesAsThreadMessage.value ? issuesMessage.value : selectedIssues()),
+	)
 
 	async function submitReview(status?: ProjectStatus) {
 		const current = project.value
@@ -258,6 +305,20 @@ export function createReviewSubmission(
 			if (panels.validationErrors.value.length) throw new Error(formatMessage(errors.missing))
 			if (status && ['approved', 'unlisted', 'private'].includes(status) && !canApprove.value)
 				throw new Error(formatMessage(errors.unresolved))
+			const messageMode = sendIssuesAsThreadMessage.value
+			const message = messageMode ? issuesMessage.value : undefined
+			if (message && new TextEncoder().encode(message).length > 65536)
+				throw new Error(formatMessage(errors.issuesMessageTooLong))
+			const facetUpdates = status
+				? previousIssues.facetUpdates.value
+				: previousIssues.replacementFacetUpdates.value
+			const applicableFacetIds = new Set(
+				previousIssues.appliedIssues.value.flatMap((issue) =>
+					issue.facets
+						.filter((facet) => previousIssues.isFacetApplicable(issue, facet))
+						.map(({ id }) => id),
+				),
+			)
 			const decision: ReviewDecision = {
 				projectId: current.id,
 				threadId: current.thread_id,
@@ -265,12 +326,15 @@ export function createReviewSubmission(
 				body: status ? draft.value : '',
 				images: status ? [...uploadedImages.value] : [],
 				privateMessage: false,
-				facetUpdates: [
-					...(status
-						? previousIssues.facetUpdates.value
-						: previousIssues.replacementFacetUpdates.value),
-				],
-				issues: selectedIssues(),
+				facetUpdates: messageMode
+					? status
+						? facetUpdates.filter(
+								({ id, data }) => !data.moderator_verified || !applicableFacetIds.has(id),
+							)
+						: []
+					: [...facetUpdates],
+				issues: messageMode ? undefined : selectedIssues(),
+				issuesMessage: message,
 			}
 			mutationStarted = true
 			await submission.mutateAsync({
@@ -296,6 +360,7 @@ export function createReviewSubmission(
 		canSubmit,
 		canApprove,
 		canAddIssues,
+		sendIssuesAsThreadMessage,
 		loadingAction,
 		submit,
 		submitDecision: (status: ProjectStatus) => submitReview(status),

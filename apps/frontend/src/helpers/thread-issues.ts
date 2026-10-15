@@ -26,7 +26,7 @@ export async function verifyThreadIssuesForApproval(
 ): Promise<void> {
 	const thread = await client.labrinth.threads_v3.getThread(threadId)
 	assertCurrent()
-	for (const facet of thread.issues.flatMap((issue) => issue.facets)) {
+	for (const facet of (thread.issues ?? []).flatMap((issue) => issue.facets)) {
 		if (facet.moderator_verified) continue
 		assertCurrent()
 		await client.labrinth.threads_v3.moderator_verified(facet.id)

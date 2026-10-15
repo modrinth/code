@@ -2,6 +2,13 @@ import { setting } from '../types/settings.ts'
 
 const settings = {
 	General: {
+		SendIssuesAsThreadMessage: setting.asToggle({
+			type: 'toggle',
+			id: 'send-issues-as-thread-message',
+			title: 'Send issues as thread message',
+			description: 'Send selected issues as a thread message instead of creating tracked issues.',
+			default: true,
+		}),
 		AutoGoNextOnReviewOutcome: setting.asToggle({
 			type: 'toggle',
 			id: 'auto-go-next-on-review-outcome',
