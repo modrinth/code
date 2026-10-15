@@ -110,7 +110,7 @@ export const versionsReviewPanel = panel({
 	toggle({
 		issue: versionsIncorrectAdditionalFilesIssue,
 		label: 'Incorrect additional files',
-		shown: ({ projectV3 }) => true,
+		shown: ({ versionsV3 }) => versionsV3?.some((version) => version.files.length > 1),
 	}),
 	toggle({
 		issue: versionsVanillaAssetsIssue,
@@ -130,6 +130,11 @@ export const versionsReviewPanel = panel({
 	toggle({
 		issue: versionsAlternateVersionsIssue,
 		label: 'Alternate Versions',
+		shown: ({ projectV3, versionsV3 }) =>
+			versionsV3.length > 1 ||
+			versionsV3?.some((version) => version.files.length > 1) ||
+			projectV3.project_types.includes('resourcepack') ||
+			projectV3.loaders.includes('datapack'),
 	}),
 	toggle({
 		issue: versionsUnsupportedIssue,
@@ -165,8 +170,16 @@ export const versionsReviewPanel = panel({
 			required: true,
 			placeholder: 'Unknown',
 			options: [
-				{ value: 'primary', label: 'Primary Files', shown: (ctx) => true },
-				{ value: 'additional', label: 'Additional Files', shown: (ctx) => true },
+				{
+					value: 'primary',
+					label: 'Primary Files',
+					shown: ({ versionsV3 }) => versionsV3.length > 1,
+				},
+				{
+					value: 'additional',
+					label: 'Additional Files',
+					shown: ({ versionsV3 }) => versionsV3?.some((version) => version.files.length > 1),
+				},
 				{
 					value: 'mono',
 					label: 'Monofile',
@@ -177,17 +190,22 @@ export const versionsReviewPanel = panel({
 				{
 					value: 'server',
 					label: 'Server Files (Primary Files)',
-					shown: ({ projectV3 }) => projectV3.project_types.includes('modpack'),
+					shown: ({ projectV3, versionsV3 }) =>
+						projectV3.project_types.includes('modpack') && versionsV3.length > 1,
 				},
 				{
 					value: 'server-additional',
 					label: 'Server Files (Additional Files)',
-					shown: ({ projectV3 }) => projectV3.project_types.includes('modpack'),
+					shown: ({ projectV3, versionsV3 }) =>
+						projectV3.project_types.includes('modpack') &&
+						versionsV3?.some((version) => version.files.length > 1),
 				},
 				{
 					value: 'zip',
 					label: 'mods.zip',
-					shown: ({ projectV3 }) => projectV3.project_types.includes('modpack'),
+					shown: ({ projectV3, versionsV3 }) =>
+						projectV3.project_types.includes('modpack') &&
+						versionsV3?.some((version) => version.files.length > 1),
 				},
 			],
 		}),
