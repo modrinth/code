@@ -287,6 +287,7 @@ pub(crate) async fn finalize_project_edit(
         });
 
     if (validate_review_state || entered_approved_state)
+        && !project_editor.is_some_and(|user| user.role.is_mod())
         && state.has_required_nags
     {
         return Err(ApiError::Request(eyre!(
