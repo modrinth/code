@@ -49,7 +49,6 @@
 						v-tooltip="formatMessage(messages.openVersionSlicer)"
 						:aria-label="formatMessage(messages.openVersionSlicer)"
 						:loading="loadingSlicerButton === 'version'"
-						:disabled="slicerLoading"
 						type="quiet"
 						circular
 						size="sm"
@@ -515,7 +514,7 @@ function fileActions(file: VersionFile): ButtonMenuOption[] {
 			id: 'open-slicer',
 			label: formatMessage(messages.openSlicer),
 			icon: CoffeeIcon,
-			disabled: slicerLoading.value,
+			disabled: loadingSlicerButton.value === file.url,
 			action: () => openInSlicer([file.url], file.url),
 		},
 		{

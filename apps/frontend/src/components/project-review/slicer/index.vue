@@ -1,6 +1,6 @@
 <template>
 	<div v-if="frameSrc" class="relative flex h-full min-h-0 flex-col gap-2">
-		<PageLoadingBar :loading="loadingFiles" />
+		<PageLoadingBar :key="target?.key" :loading="loadingFiles" />
 		<div v-if="loadFailed && !loadingFiles" role="alert" class="flex items-center gap-2">
 			<p class="m-0">{{ formatMessage(messages.loadError) }}</p>
 			<Button @click="retry">{{ formatMessage(messages.retry) }}</Button>
@@ -13,7 +13,6 @@
 			:aria-busy="loadingFiles"
 			allow="clipboard-read; clipboard-write"
 			class="block min-h-0 w-full flex-1 rounded-xl border border-solid border-surface-4 bg-surface-1"
-			@load="onFrameLoad"
 		/>
 	</div>
 	<p v-else-if="isLoading || versionsQuery.isPending.value" role="status" class="m-0">
@@ -61,8 +60,6 @@ const frameSrc = ref('')
 const loadFailed = ref(false)
 /** Highest bridge version that has handshaked with the current iframe, 0 when none has. */
 let bridgeVersion = 0
-/** Bridge version that received the last target, 0 when it was passed through URL parameters. */
-let deliveredVersion = 0
 let sentKey: string | undefined
 let requestId = 0
 let handshakeTimer: ReturnType<typeof setTimeout> | undefined
@@ -72,8 +69,8 @@ function bridgeInstalled() {
 }
 
 /**
- * Mounts a fresh slicer instance. Files are passed through slicer's `url` parameters so they load
- * even without the bridge; later targets are sent over the bridge once it handshakes.
+ * Mounts a fresh slicer instance. All files are loaded through the bridge after it handshakes,
+ * so replacing a target can cancel its downloads and serialize workspace updates.
  *
  * The bridge script is only passed along (which makes slicer prompt for an import) when it is not
  * known to be installed. Otherwise slicer loads its saved copies, and if no up to date copy
@@ -83,13 +80,11 @@ function mount(next: SlicerTarget, withScript = !bridgeInstalled()) {
 	clearTimeout(handshakeTimer)
 	handshakeTimer = undefined
 	bridgeVersion = 0
-	deliveredVersion = 0
 	sentKey = next.key
 	requestId++
 	loadingFiles.value = true
 	loadFailed.value = false
-	const params = new URLSearchParams(next.files.map(({ url }) => ['url', url]))
-	if (next.entry) params.set('file', next.entry)
+	const params = new URLSearchParams()
 	if (withScript) params.set('script', bridgeScript)
 	frameSrc.value = `${SLICER_ORIGIN}/?${params}`
 	frameKey.value++
@@ -107,17 +102,12 @@ function send(next: SlicerTarget) {
 	const targetWindow = frame.value?.contentWindow
 	if (!targetWindow) return
 	sentKey = next.key
-	deliveredVersion = bridgeVersion
 	loadingFiles.value = true
 	loadFailed.value = false
 	targetWindow.postMessage(
 		{ source: BRIDGE_SOURCE, type: 'load', id: ++requestId, files: next.files, entry: next.entry },
 		SLICER_ORIGIN,
 	)
-}
-
-function onFrameLoad() {
-	if (bridgeVersion < SLICER_BRIDGE_VERSION) loadingFiles.value = false
 }
 
 function retry() {
@@ -128,25 +118,17 @@ function retry() {
 }
 
 /**
- * Slicer starts every saved copy of the bridge, so older copies may handshake before the current
- * one. Older copies are used until a current one takes over, which is then sent the target again
- * since older copies may not support everything in it (such as opening an entry).
+ * Slicer starts every saved copy of the bridge. Only a current copy receives targets, since older
+ * copies cannot cancel their downloads when the reviewer selects something else.
  */
 function onHandshake(version: number) {
-	if (version <= bridgeVersion) return
+	if (version < SLICER_BRIDGE_VERSION || version <= bridgeVersion) return
 	bridgeVersion = version
-	const current = version >= SLICER_BRIDGE_VERSION
-	if (current) {
-		clearTimeout(handshakeTimer)
-		handshakeTimer = undefined
-		saveInstalledBridgeVersion(version)
-	}
+	clearTimeout(handshakeTimer)
+	handshakeTimer = undefined
+	saveInstalledBridgeVersion(version)
 	const next = target.value
-	if (!next) return
-	const outdatedDelivery = deliveredVersion > 0 && deliveredVersion < SLICER_BRIDGE_VERSION
-	if (next.key !== sentKey || (current && (outdatedDelivery || deliveredVersion === 0))) {
-		send(next)
-	}
+	if (next) send(next)
 }
 
 watch(

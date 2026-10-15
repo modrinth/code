@@ -68,59 +68,78 @@ export default {
 		if (existing && existing.version > VERSION) return
 		existing?.dispose()
 
-		let latestId
+		let controller
+		let pending = existing?.pending ?? Promise.resolve()
+		let loadedFilesKey
 		async function onMessage(event) {
 			if (event.source !== window.parent || event.origin !== PARENT_ORIGIN) return
 			const data = event.data
 			if (data?.source !== SOURCE || data.type !== 'load') return
-			latestId = data.id
+			controller?.abort()
+			const request = new AbortController()
+			controller = request
 			post({ type: 'loading', id: data.id })
-			try {
-				if (
-					!isLoaded(
-						context,
-						data.files.map(({ name }) => name),
-					)
-				) {
-					const files = await Promise.all(
-						data.files.map(async ({ url, name }) => {
-							const response = await fetch(url)
-							if (!response.ok) throw new Error(`${name}: HTTP ${response.status}`)
-							return { name, blob: await response.blob() }
-						}),
-					)
-					if (latestId !== data.id) return
-					await context.workspace.clear()
-					for (const { name, blob } of files) {
-						if (latestId !== data.id) return
-						await context.workspace.add(name, blob)
+			pending = pending.then(async () => {
+				if (request.signal.aborted) return
+				try {
+					const filesKey = JSON.stringify(data.files)
+					if (
+						filesKey !== loadedFilesKey ||
+						!isLoaded(
+							context,
+							data.files.map(({ name }) => name),
+						)
+					) {
+						const files = await Promise.all(
+							data.files.map(async ({ url, name }) => {
+								const response = await fetch(url, { signal: request.signal })
+								if (!response.ok) throw new Error(`${name}: HTTP ${response.status}`)
+								return { name, blob: await response.blob() }
+							}),
+						)
+						if (request.signal.aborted) return
+						loadedFilesKey = undefined
+						await context.workspace.clear()
+						for (const { name, blob } of files) {
+							if (request.signal.aborted) return
+							await context.workspace.add(name, blob)
+						}
+						if (request.signal.aborted) return
+						loadedFilesKey = filesKey
 					}
-				}
-				if (latestId !== data.id) return
-				if (data.entry) {
-					const entry = findEntry(context, data.entry)
-					if (entry) {
-						await context.editor.add(tabType(entry.name), entry)
-					} else {
-						context.notification.warning('Could not find file in workspace', {
-							description: data.entry,
-						})
+					if (data.entry) {
+						const entry = findEntry(context, data.entry)
+						if (entry) {
+							await context.editor.add(tabType(entry.name), entry)
+						} else {
+							context.notification.warning('Could not find file in workspace', {
+								description: data.entry,
+							})
+						}
 					}
+					if (!request.signal.aborted) post({ type: 'loaded', id: data.id })
+				} catch (error) {
+					if (request.signal.aborted) return
+					request.abort()
+					post({ type: 'error', id: data.id })
+					context.notification.error('Could not load files from Modrinth', {
+						description: String(error?.message ?? error),
+					})
 				}
-				if (latestId === data.id) post({ type: 'loaded', id: data.id })
-			} catch (error) {
-				if (latestId !== data.id) return
-				post({ type: 'error', id: data.id })
-				context.notification.error('Could not load files from Modrinth', {
-					description: String(error?.message ?? error),
-				})
-			}
+			})
+			return pending
 		}
 
 		window.addEventListener('message', onMessage)
 		instance = {
 			version: VERSION,
-			dispose: () => window.removeEventListener('message', onMessage),
+			get pending() {
+				return pending
+			},
+			dispose: () => {
+				controller?.abort()
+				window.removeEventListener('message', onMessage)
+			},
 		}
 		window[INSTANCE_KEY] = instance
 		post({ type: 'ready', version: VERSION })
