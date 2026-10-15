@@ -37,6 +37,11 @@ const emit = defineEmits<{
 
 const viewerAnchor = ref<HTMLElement | null>(null)
 const viewerDocument = shallowRef<Document>()
+const teleportTarget = computed(() =>
+	viewerDocument.value?.body ??
+	viewerAnchor.value?.ownerDocument.body ??
+	(typeof document !== 'undefined' ? document.body : 'body'),
+)
 const activeId = ref<string | null>(null)
 const mode = ref<ImageViewerEditorMode>('view')
 const closeAfterEditing = ref(false)
@@ -233,7 +238,7 @@ defineExpose({ show, edit, hide, next, previous, markSavedAndView })
 
 <template>
 	<span ref="viewerAnchor" hidden />
-	<Teleport :to="viewerDocument?.body ?? 'body'">
+	<Teleport :to="teleportTarget">
 		<div
 			v-if="activeItem"
 			class="fixed inset-0 z-[110] overflow-hidden bg-black/95 text-white"

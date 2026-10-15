@@ -3,7 +3,7 @@
 		ref="button"
 		v-tooltip="{ text: label, delay: 500 }"
 		type="button"
-		class="section-edit-button"
+		class="section-edit-button !outline-none"
 		:aria-label="label"
 		@pointerover.stop
 		@click.stop="emit('click')"

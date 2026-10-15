@@ -51,6 +51,11 @@ const hover = computed(() => props.trigger === 'hover')
 const isOpen = ref(false)
 const menuDocument = shallowRef<Document>()
 const triggerEl = useTemplateRef<HTMLElement>('triggerEl')
+const teleportTarget = computed(() =>
+	menuDocument.value?.body ??
+	triggerEl.value?.ownerDocument.body ??
+	(typeof document !== 'undefined' ? document.body : 'body'),
+)
 const floating = useTemplateRef<HTMLElement>('floating')
 const arrowEl = useTemplateRef<HTMLElement>('arrowEl')
 const expandOrigin = ref(SIDES.bottom.origin)
@@ -225,7 +230,7 @@ defineExpose({ show, hide: close })
 		@focusout="hover && hide()"
 	>
 		<slot />
-		<Teleport :to="menuDocument?.body ?? 'body'">
+		<Teleport :to="teleportTarget">
 			<Transition name="floating-expand">
 				<div
 					v-if="isOpen"
