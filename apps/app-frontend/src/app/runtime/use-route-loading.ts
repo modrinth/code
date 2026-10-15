@@ -5,6 +5,7 @@ import { trackEvent } from '@/helpers/analytics'
 import { debugStartup } from '@/helpers/startup-debug'
 
 import { useAppLoadingState } from './use-app-loading-state'
+import { useViewportScrollRestore } from './use-viewport-scroll-restore'
 
 type RouteLoadingOptions = {
 	stateInitialized: Readonly<Ref<boolean>>
@@ -21,6 +22,7 @@ export function useRouteLoading({ stateInitialized, stateFailed }: RouteLoadingO
 	let suspenseToken: symbol | null = null
 	let suspensePending = false
 	const releaseTimers = new Set<ReturnType<typeof setTimeout>>()
+	const viewportScroll = useViewportScrollRestore()
 
 	const loading = useAppLoadingState(() => ({
 		stateInitialized: stateInitialized.value,
@@ -83,12 +85,14 @@ export function useRouteLoading({ stateInitialized, stateFailed }: RouteLoadingO
 	function onSuspensePending() {
 		debugStartup('Route Suspense pending', { route: route.path })
 		suspensePending = true
+		viewportScroll.onRoutePending()
 		if (suspenseToken) loading.end(suspenseToken)
 		suspenseToken = loading.begin(`Route Suspense: ${route.path}`)
 	}
 
 	function onSuspenseResolve() {
 		debugStartup('Route Suspense resolved', { route: route.path })
+		viewportScroll.onRouteResolved()
 		if (suspenseToken) {
 			loading.end(suspenseToken)
 			suspenseToken = null
