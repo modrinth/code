@@ -99,7 +99,7 @@
 								!threadHistory &&
 								!isComplete(issue) &&
 								((showProjectAreaLink && issueActions(issue).length) ||
-									addressableFacets(issue).length)
+									showAddressActions(issue))
 							"
 							class="flex w-full flex-wrap items-center justify-between gap-3"
 						>
@@ -144,7 +144,7 @@
 								</TeleportOverflowMenu>
 							</div>
 							<div
-								v-if="addressableFacets(issue).length"
+								v-if="showAddressActions(issue)"
 								class="ml-auto flex flex-wrap justify-end gap-2"
 							>
 								<ButtonLink
@@ -672,6 +672,13 @@ function visibleFacets(issue: ThreadIssue): Labrinth.Threads.v3.ThreadIssueFacet
 			matchesTarget(what) ||
 			((what.type === 'acknowledge' || what.type === 'mark_addressed') && matchesLocation(issue)) ||
 			(props.location !== undefined && threadIssueField(what) === props.location),
+	)
+}
+
+function showAddressActions(issue: ThreadIssue): boolean {
+	return (
+		(!props.showProjectAreaLink || !readIssueLocations(issueDetails(issue).locations).length) &&
+		addressableFacets(issue).length > 0
 	)
 }
 
