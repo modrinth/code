@@ -75,8 +75,9 @@ pub use self::screenshots::{
 };
 pub(crate) use self::shared::{
     CONFIG_BUNDLE_FILE_TYPE, CONFIG_DIRECTORY, CONFIG_FILE_EXTENSIONS,
-    CONFIG_SYNC_ENABLED, MAX_CONFIG_BUNDLE_ENTRIES,
-    read_bounded_config_bundle_entry,
+    CONFIG_FILE_TYPE, CONFIG_SYNC_ENABLED, MAX_CONFIG_BUNDLE_ENTRIES,
+    MAX_CONFIG_BUNDLE_FILE_SIZE, is_shareable_config_path,
+    is_supported_config_file, read_bounded_config_bundle_entry,
 };
 pub use self::shared::{
     SharedInstanceExternalFilePreview, SharedInstanceInstallPreview,

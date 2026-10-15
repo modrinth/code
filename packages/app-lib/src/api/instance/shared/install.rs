@@ -1,4 +1,5 @@
 use super::client::*;
+use super::content::remote_shared_config_files;
 use super::diff::*;
 use super::publish::*;
 use super::types::*;
@@ -23,6 +24,7 @@ pub async fn install_shared_instance(
         instance_icon_url,
         name,
         version,
+        None,
         &state,
     )
     .await?;
@@ -142,7 +144,12 @@ pub(super) async fn shared_instance_install_preview_from_version(
     let external_files = version
         .external_files
         .iter()
-        .filter(|file| file.file_type != CONFIG_BUNDLE_FILE_TYPE)
+        .filter(|file| {
+            !matches!(
+                file.file_type.as_str(),
+                CONFIG_BUNDLE_FILE_TYPE | CONFIG_FILE_TYPE
+            )
+        })
         .map(|file| SharedInstanceExternalFilePreview {
             file_name: file.file_name.clone(),
             file_type: file.file_type.clone(),
@@ -214,7 +221,15 @@ pub async fn get_shared_instance_update_preview(
         .applied_version
         .is_none_or(|current| current < version.version);
     let diffs = if update_available {
-        shared_instance_update_diffs(&metadata, &version, &state).await?
+        let config_files = remote_shared_config_files(
+            &attachment.id,
+            attachment.applied_version,
+            &version,
+            &state,
+        )
+        .await?;
+        shared_instance_update_diffs(&metadata, &version, &config_files, &state)
+            .await?
     } else {
         Vec::new()
     };
@@ -303,6 +318,7 @@ pub async fn update_shared_instance(
         None,
         metadata.instance.name,
         version,
+        attachment.applied_version,
         &state,
     )
     .await?;
@@ -514,6 +530,7 @@ pub(super) async fn shared_instance_install_data(
     instance_icon_url: Option<String>,
     name: String,
     version: InstanceVersionResponse,
+    applied_version: Option<i32>,
     state: &State,
 ) -> crate::Result<SharedInstanceInstallData> {
     if !version.ready {
@@ -522,6 +539,13 @@ pub(super) async fn shared_instance_install_data(
         )
         .into());
     }
+    let config_files = remote_shared_config_files(
+        shared_instance_id,
+        applied_version,
+        &version,
+        state,
+    )
+    .await?;
 
     let name = shared_instance_name(name);
     let linked_user_id = linked_modrinth_user_id(state).await?;
@@ -547,6 +571,13 @@ pub(super) async fn shared_instance_install_data(
         external_files: version
             .external_files
             .into_iter()
+            .filter(|file| {
+                !matches!(
+                    file.file_type.as_str(),
+                    CONFIG_BUNDLE_FILE_TYPE | CONFIG_FILE_TYPE
+                )
+            })
+            .chain(config_files)
             .map(shared_instance_external_file_data)
             .collect::<crate::Result<Vec<_>>>()?,
         modpack,
