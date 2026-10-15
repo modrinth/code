@@ -23,9 +23,10 @@ use windows::{
             Authorization::{
                 ConvertSidToStringSidW, ConvertStringSidToSidW,
                 EXPLICIT_ACCESS_W, GRANT_ACCESS, GetNamedSecurityInfoW,
-                GetSecurityInfo, NO_MULTIPLE_TRUSTEE, SE_FILE_OBJECT,
-                SE_WINDOW_OBJECT, SetEntriesInAclW, SetNamedSecurityInfoW,
-                SetSecurityInfo, TRUSTEE_IS_GROUP, TRUSTEE_IS_SID,
+                GetSecurityInfo, NO_MULTIPLE_TRUSTEE, REVOKE_ACCESS,
+                SE_FILE_OBJECT, SE_WINDOW_OBJECT, SET_ACCESS, SetEntriesInAclW,
+                SetNamedSecurityInfoW, SetSecurityInfo, TRUSTEE_IS_GROUP,
+                TRUSTEE_IS_SID,
             },
             CONTAINER_INHERIT_ACE, CreateWellKnownSid,
             DACL_SECURITY_INFORMATION, DeriveCapabilitySidsFromName, EqualSid,
@@ -64,11 +65,11 @@ use eyre::{Context, Result, bail, eyre};
 
 use crate::{
     SandboxArg, SandboxCommand,
-    backend::{Backend, SandboxChild, SandboxEnv},
+    backend::{Backend, SandboxChild, SandboxChildOp, SandboxEnv},
     helper::MakeHelper,
 };
 
-use super::acl::{AppliedAclLedger, PermissionType};
+use super::acl::{AppliedAclLedger, Grant, PermissionType, paths_equal};
 
 #[derive(Debug)]
 pub struct AppContainer;
@@ -126,8 +127,8 @@ fn spawn(
 
     let app_container_sid_string =
         app_container_sid_to_string(&app_container_sid)?;
-    let acl_ledger =
-        AppliedAclLedger::open().wrap_err("opening AppContainer ACL ledger")?;
+    let acl_ledger = AppliedAclLedger::open(&app_container_sid_string)
+        .wrap_err("opening AppContainer ACL ledger")?;
     let app_container_folder =
         get_app_container_folder(&app_container_sid_string)?;
     let local_state = app_container_folder.join("LocalState");
@@ -251,63 +252,15 @@ fn spawn(
 
     let mut readable: HashSet<std::path::PathBuf> = HashSet::default();
     let mut parents_to_add: HashSet<std::path::PathBuf> = HashSet::default();
-    let mut read_paths_to_elevate: HashSet<std::path::PathBuf> =
-        HashSet::default();
-    let mut write_paths_to_elevate: HashSet<std::path::PathBuf> =
-        HashSet::default();
     let mut read_only_paths = command.read_only_paths.clone();
     read_only_paths.push(command.executable.clone());
     read_only_paths.sort_unstable();
     read_only_paths.dedup();
 
-    for allow_read in &read_only_paths {
-        readable.insert(allow_read.clone());
-        if let Some(parent) = allow_read.parent() {
+    for path in read_only_paths.iter().chain(&command.read_write_paths) {
+        readable.insert(path.clone());
+        if let Some(parent) = path.parent() {
             parents_to_add.insert(parent.to_path_buf());
-        }
-        acl_ledger
-            .record(allow_read, PermissionType::Read)
-            .wrap_err_with(|| {
-                eyre!("recording read access to {allow_read:?}")
-            })?;
-        if let Err(err) =
-            add_to_acl(&app_container_sid, &allow_read, PermissionType::Read)
-        {
-            if is_access_denied(&err) {
-                tracing::warn!(
-                    "lacking permission to allow reading from {allow_read:?}; will elevate"
-                );
-                read_paths_to_elevate.insert(allow_read.clone());
-            } else {
-                return Err(err).wrap_err_with(|| {
-                    eyre!("allowing sandbox read access to {allow_read:?}")
-                });
-            }
-        }
-    }
-    for allow_write in &command.read_write_paths {
-        readable.insert(allow_write.clone());
-        if let Some(parent) = allow_write.parent() {
-            parents_to_add.insert(parent.to_path_buf());
-        }
-        acl_ledger
-            .record(allow_write, PermissionType::Write)
-            .wrap_err_with(|| {
-                eyre!("recording write access to {allow_write:?}")
-            })?;
-        if let Err(err) =
-            add_to_acl(&app_container_sid, &allow_write, PermissionType::Write)
-        {
-            if is_access_denied(&err) {
-                tracing::warn!(
-                    "Lacking permission to allow writing to {allow_write:?}; will elevate"
-                );
-                write_paths_to_elevate.insert(allow_write.clone());
-            } else {
-                return Err(err).wrap_err_with(|| {
-                    format!("allowing sandbox write access to {allow_write:?}")
-                });
-            }
         }
     }
 
@@ -328,25 +281,58 @@ fn spawn(
             parents.insert(to_add);
         }
     }
-    let mut parents = parents.into_iter().collect::<Vec<_>>();
-    parents.sort();
 
-    let mut parents_to_elevate = Vec::new();
+    let mut instance_grants = Vec::new();
+    for path in &read_only_paths {
+        instance_grants.push(Grant::from_path(path, PermissionType::Read)?);
+    }
+    for path in &command.read_write_paths {
+        instance_grants.push(Grant::from_path(path, PermissionType::Write)?);
+    }
     for path in parents {
-        acl_ledger
-            .record(&path, PermissionType::Traverse)
-            .wrap_err_with(|| eyre!("recording traverse access to {path:?}"))?;
-        if let Err(err) =
-            add_to_acl(&app_container_sid, &path, PermissionType::Traverse)
+        instance_grants
+            .push(Grant::from_path(&path, PermissionType::Traverse)?);
+    }
+
+    let mut prepared = acl_ledger
+        .prepare(instance_grants)
+        .wrap_err("preparing AppContainer ACL instance")?;
+    let mut parents_to_elevate = Vec::new();
+    let mut read_paths_to_elevate = Vec::new();
+    let mut write_paths_to_elevate = Vec::new();
+    let mut remove_paths_to_elevate = Vec::new();
+
+    for grant in prepared.old_effective() {
+        if !prepared
+            .desired_effective()
+            .iter()
+            .any(|desired| paths_equal(&desired.path, &grant.path))
         {
+            let path = PathBuf::from(&grant.path);
+            if let Err(err) = remove_from_acl(&app_container_sid, &path) {
+                if is_access_denied(&err) {
+                    remove_paths_to_elevate.push(path);
+                } else {
+                    return Err(err).wrap_err_with(|| {
+                        format!("revoking sandbox access from {path:?}")
+                    });
+                }
+            }
+        }
+    }
+
+    for grant in prepared.desired_effective() {
+        let path = PathBuf::from(&grant.path);
+        if let Err(err) = set_acl(&app_container_sid, &path, grant.permission) {
             if is_access_denied(&err) {
-                tracing::warn!(
-                    "Lacking permission to allow traversal of {path:?}; will elevate"
-                );
-                parents_to_elevate.push(path);
+                match grant.permission {
+                    PermissionType::Traverse => parents_to_elevate.push(path),
+                    PermissionType::Read => read_paths_to_elevate.push(path),
+                    PermissionType::Write => write_paths_to_elevate.push(path),
+                }
             } else {
                 return Err(err).wrap_err_with(|| {
-                    format!("allowing sandbox traversal of {path:?}")
+                    format!("granting sandbox access to {path:?}")
                 });
             }
         }
@@ -370,6 +356,7 @@ fn spawn(
     if !parents_to_elevate.is_empty()
         || !read_paths_to_elevate.is_empty()
         || !write_paths_to_elevate.is_empty()
+        || !remove_paths_to_elevate.is_empty()
         || need_set_network_isolation_elevated
     {
         let mut arguments = Vec::<SandboxArg>::new();
@@ -382,6 +369,7 @@ fn spawn(
         arguments.push(std::env::join_paths(parents_to_elevate)?.into());
         arguments.push(std::env::join_paths(read_paths_to_elevate)?.into());
         arguments.push(std::env::join_paths(write_paths_to_elevate)?.into());
+        arguments.push(std::env::join_paths(remove_paths_to_elevate)?.into());
 
         info!(?arguments, "spawning elevated helper command");
         let mut elevated = super::runas::spawn(env.make_helper, arguments)
@@ -396,6 +384,10 @@ fn spawn(
         );
     }
 
+    prepared
+        .finalize_pruning()
+        .wrap_err("finalizing AppContainer ACL pruning")?;
+
     let (pipes, child) = super::spawn(
         command.executable.clone().into(),
         std::mem::take(&mut command.args),
@@ -409,6 +401,12 @@ fn spawn(
         attribute_list,
     )
     .wrap_err("spawning child")?;
+    let child_pid = child
+        .id()
+        .ok_or_else(|| eyre!("spawned child had no process ID"))?;
+    prepared
+        .activate(child_pid)
+        .wrap_err("activating AppContainer ACL instance")?;
 
     let mut child = crate::SandboxChild {
         stdin: pipes.stdin,
@@ -676,7 +674,7 @@ fn add_writeattributes_to_winsta(app_container: &PSID) -> std::io::Result<()> {
     Ok(())
 }
 
-fn add_to_acl(
+fn set_acl(
     app_container: &PSID,
     path: &Path,
     perms: PermissionType,
@@ -706,7 +704,7 @@ fn add_to_acl(
         .into());
     }
     let mut ea = EXPLICIT_ACCESS_W::default();
-    ea.grfAccessMode = GRANT_ACCESS;
+    ea.grfAccessMode = SET_ACCESS;
     ea.grfAccessPermissions = match perms {
         PermissionType::Traverse => (FILE_GENERIC_READ | FILE_TRAVERSE).0,
         PermissionType::Write => (FILE_ALL_ACCESS).0,
@@ -817,6 +815,77 @@ fn add_to_acl(
     Ok(())
 }
 
+fn remove_from_acl(app_container: &PSID, path: &Path) -> std::io::Result<()> {
+    let encoded_path = path
+        .as_os_str()
+        .encode_wide()
+        .chain([0])
+        .collect::<Vec<_>>();
+    let mut old_acl = std::ptr::null_mut();
+    let err = unsafe {
+        GetNamedSecurityInfoW(
+            PCWSTR(encoded_path.as_ptr()),
+            SE_FILE_OBJECT,
+            DACL_SECURITY_INFORMATION,
+            None,
+            None,
+            Some(&mut old_acl),
+            None,
+            std::ptr::null_mut(),
+        )
+    };
+    if err != ERROR_SUCCESS {
+        return Err(windows::core::Error::from_hresult(HRESULT::from_win32(
+            err.0,
+        ))
+        .into());
+    }
+
+    let mut access = EXPLICIT_ACCESS_W::default();
+    access.grfAccessMode = REVOKE_ACCESS;
+    access.Trustee.MultipleTrusteeOperation = NO_MULTIPLE_TRUSTEE;
+    access.Trustee.pMultipleTrustee = std::ptr::null_mut();
+    access.Trustee.ptstrName = PWSTR(app_container.0 as *mut u16);
+    access.Trustee.TrusteeForm = TRUSTEE_IS_SID;
+    access.Trustee.TrusteeType = TRUSTEE_IS_GROUP;
+
+    let mut new_acl = std::ptr::null_mut();
+    let err = unsafe {
+        SetEntriesInAclW(Some(&[access]), Some(old_acl), &mut new_acl)
+    };
+    if new_acl.is_null() {
+        return Err(Error::new(ErrorKind::Other, "new acl was null"));
+    }
+    scopeguard::defer! {
+        unsafe { LocalFree(Some(windows::Win32::Foundation::HLOCAL(new_acl.cast()))) };
+    }
+    if err != ERROR_SUCCESS {
+        return Err(windows::core::Error::from_hresult(HRESULT::from_win32(
+            err.0,
+        ))
+        .into());
+    }
+
+    let err = unsafe {
+        SetNamedSecurityInfoW(
+            PCWSTR(encoded_path.as_ptr()),
+            SE_FILE_OBJECT,
+            DACL_SECURITY_INFORMATION,
+            None,
+            None,
+            Some(new_acl),
+            None,
+        )
+    };
+    if err != ERROR_SUCCESS {
+        return Err(windows::core::Error::from_hresult(HRESULT::from_win32(
+            err.0,
+        ))
+        .into());
+    }
+    Ok(())
+}
+
 fn acl_eq(first: *const ACL, second: *const ACL) -> std::io::Result<bool> {
     if first.is_null() && second.is_null() {
         return Ok(true);
@@ -888,8 +957,10 @@ pub fn run_helper(
         Some(traverse_paths),
         Some(read_paths),
         Some(write_paths),
+        Some(remove_paths),
         None,
     ) = (
+        args.next(),
         args.next(),
         args.next(),
         args.next(),
@@ -919,6 +990,11 @@ pub fn run_helper(
         try_set_network_isolation(&psid)?;
     }
 
+    for path in std::env::split_paths(remove_paths.as_os_str()) {
+        if !path.as_os_str().is_empty() {
+            remove_from_acl(&psid, &path)?;
+        }
+    }
     apply_acl_paths(
         &psid,
         std::env::split_paths(traverse_paths.as_os_str()),
@@ -947,7 +1023,7 @@ fn apply_acl_paths(
         if path.as_os_str().is_empty() {
             continue;
         }
-        add_to_acl(app_container, &path, permission)?;
+        set_acl(app_container, &path, permission)?;
     }
     Ok(())
 }
