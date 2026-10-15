@@ -7,7 +7,6 @@ import alternateVersionsPrimaryMessage from '../messages/checklist/messages/vers
 import alternateVersionsServerMessage from '../messages/checklist/messages/versions/alternate-versions/server.md'
 import alternateVersionsServerAdditionalMessage from '../messages/checklist/messages/versions/alternate-versions/server-additional.md'
 import alternateVersionsZipMessage from '../messages/checklist/messages/versions/alternate-versions/zip.md'
-import duplicatePrimaryFilesMessage from '../messages/checklist/messages/versions/duplicate-primary-files.md'
 import incorrectAdditionalFilesMessage from '../messages/checklist/messages/versions/incorrect-additional-files.md'
 import incorrectProjectTypeDatapackMessage from '../messages/checklist/messages/versions/incorrect-project-type/datapack.md'
 import incorrectProjectTypeModpackMessage from '../messages/checklist/messages/versions/incorrect-project-type/modpack.md'
@@ -17,6 +16,7 @@ import unsupportedMessage from '../messages/checklist/messages/versions/unsuppor
 import vanillaAssetsMessage from '../messages/checklist/messages/versions/vanilla-assets.md'
 import { issue, panel, section, select, text, toggle } from './component-builders/builders'
 import { issueLocation } from './component-builders/locations'
+import { sourceRequiredSection } from './license'
 
 export const versionsIncorrectAdditionalFilesIssue = issue({
 	id: 'versions-incorrect-additional-files',
@@ -43,15 +43,6 @@ export const versionsRedistLibsIssue = issue({
 	locations: [issueLocation('versions')],
 	message: redistLibsMessage,
 	suggestedStatus: 'rejected',
-})
-
-export const versionsDuplicatePrimaryFilesIssue = issue({
-	id: 'versions-duplicate-primary-files',
-	title: 'Duplicate primary files',
-	category: 'Versions',
-	locations: [issueLocation('versions')],
-	message: duplicatePrimaryFilesMessage,
-	suggestedStatus: 'flagged',
 })
 
 const incorrectProjectTypeMessages: Record<string, string> = {
@@ -114,11 +105,12 @@ export const versionsReviewPanel = panel({
 	icon: VersionIcon,
 	guidanceUrl:
 		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e25ee711bf0804bad38e9055951ff31',
-	shown: ({ projectV3 }) => !projectV3.minecraft_server,
+	shown: (ctx) => !ctx.projectV3.minecraft_server,
 }).content(
 	toggle({
 		issue: versionsIncorrectAdditionalFilesIssue,
 		label: 'Incorrect additional files',
+		shown: ({ projectV3 }) => true,
 	}),
 	toggle({
 		issue: versionsVanillaAssetsIssue,
@@ -130,10 +122,6 @@ export const versionsReviewPanel = panel({
 		label: 'Packed Libs',
 		shown: ({ projectV3 }) =>
 			projectV3.project_types.includes('mod') || projectV3.project_types.includes('plugin'),
-	}),
-	toggle({
-		issue: versionsDuplicatePrimaryFilesIssue,
-		label: 'Duplicate Primary Files',
 	}),
 	toggle({
 		issue: versionsIncorrectProjectTypeIssue,
@@ -177,8 +165,8 @@ export const versionsReviewPanel = panel({
 			required: true,
 			placeholder: 'Unknown',
 			options: [
-				{ value: 'primary', label: 'Primary Files' },
-				{ value: 'additional', label: 'Additional Files' },
+				{ value: 'primary', label: 'Primary Files', shown: (ctx) => true },
+				{ value: 'additional', label: 'Additional Files', shown: (ctx) => true },
 				{
 					value: 'mono',
 					label: 'Monofile',
@@ -214,4 +202,5 @@ export const versionsReviewPanel = panel({
 			required: true,
 		}),
 	),
+	sourceRequiredSection,
 )

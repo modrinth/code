@@ -7,86 +7,59 @@ import modpackSimilarities from '../messages/checklist/messages/title-slug/title
 import uselessInfo from '../messages/checklist/messages/title-slug/title/useless-info.md'
 import { issue, panel, section, text, toggle } from './component-builders/builders'
 import { issueTargets } from './component-builders/targets'
+import { messageWithOptionalSuggestion } from '../..'
 
-export const issueTargetModifyTitleWithSuggestion = issueTargets.modifyTitle(({ getTextValue }) => {
-	const suggestion = getTextValue('title-suggestion')
-	return suggestion.trim() ? suggestion : undefined
-})
+const panelCategory = 'Title'
 
-export const titleSuggestion = issue({
-	id: 'title-suggestion',
-	title: 'Title suggestion',
-	category: 'Title',
-	actions: [
-		issueTargets.modifyTitle(({ getTextValue }) => {
-			const suggestion = getTextValue('title-suggestion')
-			return suggestion.trim() ? suggestion : undefined
-		}),
-	],
-	suggestedStatus: 'flagged',
-	message: 'Consider suggesting a better title for the project.',
-})
+export const issueTargetModifyTitleWithOptionalSuggestion = issueTargets.modifyTitle(
+	({ getTextValue }) => {
+		const suggestion = getTextValue('title-suggestion')
+		return suggestion.trim() ? suggestion : undefined
+	},
+)
 
 export const titleUselessInfoIssue = issue({
 	id: 'title-useless-info',
 	title: 'Unnecessary title information',
-	category: 'Title',
-	actions: [
-		issueTargets.modifyTitle(({ getTextValue }) => {
-			const suggestion = getTextValue('title-suggestion')
-			return suggestion.trim() ? suggestion : undefined
-		}),
-	],
+	category: panelCategory,
+	actions: [issueTargetModifyTitleWithOptionalSuggestion],
 	suggestedStatus: 'flagged',
-	message: uselessInfo,
+	message: ({ getTextValue }) =>
+		messageWithOptionalSuggestion(uselessInfo, panelCategory, getTextValue('title-suggestion')),
 })
 
 export const minecraftTitleIssue = issue({
 	id: 'title-minecraft-branding',
 	title: 'Minecraft branding in title',
-	category: 'Title',
-	actions: [
-		issueTargets.modifyTitle(({ getTextValue }) => {
-			const suggestion = getTextValue('title-suggestion')
-			return suggestion.trim() ? suggestion : undefined
-		}),
-	],
+	category: panelCategory,
+	actions: [issueTargetModifyTitleWithOptionalSuggestion],
 	suggestedStatus: 'flagged',
-	message: minecraftBranding,
+	message: ({ getTextValue }) =>
+		messageWithOptionalSuggestion(
+			minecraftBranding,
+			panelCategory,
+			getTextValue('title-suggestion'),
+		),
 })
 
 export const titleSimilaritiesIssue = issue({
 	id: 'title-similarities',
 	title: 'Misuse of project name',
-	category: 'Title',
-	actions: [
-		issueTargets.modifyTitle(({ getTextValue }) => {
-			const suggestion = getTextValue('title-suggestion')
-			return suggestion.trim() ? suggestion : undefined
-		}),
-	],
+	category: panelCategory,
+	actions: [issueTargetModifyTitleWithOptionalSuggestion],
 	suggestedStatus: 'flagged',
-	message: ({ selected }) => {
-		if (selected.toggleIds.includes('title-similarities-fork')) {
-			return [similarities.trim(), forkSimilarities.trim()].join('\n\n')
-		} else {
-			return similarities
-		}
-	},
-})
+	message: ({ selected, getTextValue }) => {
+		let msg = similarities.trim()
 
-export const modpackTitleSimilaritiesIssue = issue({
-	id: 'title-similarities-modpack',
-	title: 'Modpack uses another project’s name',
-	category: 'Title',
-	actions: [
-		issueTargets.modifyTitle(({ getTextValue }) => {
-			const suggestion = getTextValue('title-suggestion')
-			return suggestion.trim() ? suggestion : undefined
-		}),
-	],
-	suggestedStatus: 'flagged',
-	message: [similarities.trim(), modpackSimilarities.trim()].join('\n\n'),
+		if (selected.toggleIds.includes('title-similarities-fork')) {
+			msg = [msg, forkSimilarities.trim()].join('\n\n')
+		}
+		if (selected.toggleIds.includes('title-similarities-modpack')) {
+			msg = [msg, modpackSimilarities.trim()].join('\n\n')
+		}
+
+		return messageWithOptionalSuggestion(msg, panelCategory, getTextValue('title-suggestion'))
+	},
 })
 
 export const titleReviewPanel = panel({
@@ -123,18 +96,19 @@ export const titleReviewPanel = panel({
 		toggle({
 			label: 'Modpack Named After Mod',
 			id: 'title-similarities-modpack',
-			issue: modpackTitleSimilaritiesIssue,
+			issue: titleSimilaritiesIssue,
 			shown: (ctx) => ctx.projectV3.project_types.includes('modpack'),
 		}),
 	),
 	section({
-		label: 'Name Suggestions',
-		shown: (ctx) => ctx.selected.issueIds.includes('title-useless-info'),
+		shown: ({ selected }) =>
+			selected.issueIds.some((id) =>
+				[titleUselessInfoIssue.id, minecraftTitleIssue.id, titleSimilaritiesIssue.id].includes(id),
+			),
 	}).content(
 		text({
-			label: 'Suggest a Better Name',
-			id: 'title-name-suggestion',
-			issue: titleSuggestion,
+			id: 'title-suggestion',
+			label: 'Suggestion',
 		}),
 	),
 )
