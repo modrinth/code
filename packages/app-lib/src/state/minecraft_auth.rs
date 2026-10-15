@@ -204,7 +204,7 @@ pub async fn login_begin(
                 auth_request_uri: redirect_uri.value.msa_oauth_redirect,
             });
         }
-        Err(err) => return Err(crate::ErrorKind::from(err).into()),
+        Err(err) => return Err(err.into()),
     }
 }
 
@@ -545,14 +545,8 @@ impl Credentials {
             match res {
                 Ok(_) => Ok(Some(creds)),
                 Err(err) => {
-                    let auth_error = err
-                        .downcast_ref::<MinecraftAuthenticationError>()
-                        .or_else(|| match err.downcast_ref::<ErrorKind>() {
-                            Some(ErrorKind::MinecraftAuthenticationError(
-                                error,
-                            )) => Some(error),
-                            _ => None,
-                        });
+                    let auth_error =
+                        err.downcast_ref::<MinecraftAuthenticationError>();
 
                     if let Some(MinecraftAuthenticationError::Request {
                         source,

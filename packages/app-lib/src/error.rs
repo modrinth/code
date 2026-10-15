@@ -82,11 +82,6 @@ pub enum ErrorKind {
     #[error("Metadata error: {0}")]
     MetadataError(#[from] daedalus::Error),
 
-    #[error("Minecraft authentication error: {0}")]
-    MinecraftAuthenticationError(
-        #[from] crate::state::MinecraftAuthenticationError,
-    ),
-
     #[error("I/O error: {0}")]
     IOError(#[from] util::io::IOError),
 
@@ -285,7 +280,6 @@ impl ErrorKind {
             Self::NotLoggedIn => "not_logged_in",
             Self::NoLoaderVersion { .. } => "no_loader_version",
             Self::NoMinecraftProfile => "minecraft_auth_no_profile",
-            Self::MinecraftAuthenticationError(error) => error.code(),
             Self::LauncherError(_) => "launcher_error",
             Self::JREError(_) => "java_error",
             Self::NoValueFor(_) | Self::MetadataError(_) => "metadata_error",
