@@ -224,6 +224,54 @@ pub async fn write_instance_file(
     Ok(())
 }
 
+/// Streams `reader` into an instance file, replacing any file already there.
+/// The contents are only kept when exactly `expected_size` bytes are read, and
+/// the instance is only locked to move the finished file into place.
+pub(crate) async fn write_instance_file_from_reader(
+    instance_id: &str,
+    path: &str,
+    reader: impl tokio::io::AsyncRead + Unpin,
+    expected_size: u64,
+) -> crate::Result<()> {
+    use tokio::io::AsyncReadExt;
+
+    let state = State::get().await?;
+    let destination = resolve(&state, instance_id, path, true)
+        .await?
+        .path()
+        .to_path_buf();
+    let parent = destination
+        .parent()
+        .ok_or_else(|| input("Invalid file destination"))?;
+    fs::create_dir_all(parent).await?;
+    let parent = parent.to_path_buf();
+    let temporary = tokio::task::spawn_blocking(move || {
+        tempfile::NamedTempFile::new_in(parent)
+            .map(|file| file.into_temp_path())
+    })
+    .await??;
+    let mut file = fs::File::options().write(true).open(&temporary).await?;
+    let written = tokio::io::copy(
+        &mut reader.take(expected_size.saturating_add(1)),
+        &mut file,
+    )
+    .await?;
+    if written != expected_size {
+        return Err(input(format!("{path} has an unexpected size")));
+    }
+    file.sync_all().await?;
+    drop(file);
+
+    let _instance = state.lock_instance_content(instance_id).await;
+    let _files = state.content_store.files_lock.lock().await;
+    resolve(&state, instance_id, path, true).await?;
+    tokio::task::spawn_blocking(move || {
+        temporary.persist(destination).map_err(|error| error.error)
+    })
+    .await??;
+    Ok(())
+}
+
 pub async fn create_instance_directory(
     instance_id: &str,
     path: &str,

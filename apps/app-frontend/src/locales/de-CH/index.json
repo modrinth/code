@@ -4352,9 +4352,6 @@
   "instance.shared-instance.publish-review.admonition-header": {
     "message": "Update an Spieler senden"
   },
-  "instance.shared-instance.publish-review.config-title-v2": {
-    "message": "Konfigurationsdateien auswählen"
-  },
   "instance.shared-instance.publish-review.description": {
     "message": "Überprüfe die Inhaltsänderungen und wähle Konfigurationsdateien aus, die in diesem Update enthalten sein sollen."
   },

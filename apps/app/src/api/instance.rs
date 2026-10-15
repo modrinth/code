@@ -1488,10 +1488,10 @@ pub async fn instance_share_get_publish_preview(
 #[tauri::command]
 pub async fn instance_share_publish(
     instance_id: &str,
-    config_paths: Vec<String>,
+    file_paths: Vec<String>,
 ) -> Result<SharedInstanceAttachment> {
     Ok(
-        theseus::instance::publish_shared_instance(instance_id, config_paths)
+        theseus::instance::publish_shared_instance(instance_id, file_paths)
             .await?
             .into(),
     )

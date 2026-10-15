@@ -78,10 +78,9 @@ fn ensure_config_limits(
                 .unwrap_or(u64::MAX),
         );
     }
-    if count > MAX_CONFIG_BUNDLE_ENTRIES || size > MAX_CONFIG_BUNDLE_TOTAL_SIZE
-    {
+    if count > MAX_SHARED_FILES || size > MAX_SHARED_FILES_TOTAL_SIZE {
         return Err(crate::ErrorKind::InputError(
-            "Shared instance config files exceed the size or file count limit"
+            "Shared instance files exceed the size or file count limit"
                 .to_string(),
         )
         .into());
@@ -163,7 +162,7 @@ mod tests {
     #[test]
     fn limits_apply_per_version() {
         let mut half = file(CONFIG_FILE_TYPE, "config/a.toml", "v1");
-        half.file_size = Some((MAX_CONFIG_BUNDLE_TOTAL_SIZE / 2 + 1) as i64);
+        half.file_size = Some((MAX_SHARED_FILES_TOTAL_SIZE / 2 + 1) as i64);
         let mut other_half = half.clone();
         other_half.file_name = "config/b.toml".to_string();
         let mut too_large = half.clone();

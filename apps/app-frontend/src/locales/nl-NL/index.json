@@ -3935,9 +3935,6 @@
   "instance.shared-instance.publish-review.admonition-header": {
     "message": "Update naar spelers verzenden"
   },
-  "instance.shared-instance.publish-review.config-title-v2": {
-    "message": "Configuratiebestanden selecteren"
-  },
   "instance.shared-instance.publish-review.description": {
     "message": "Bekijk de inhoudelijke wijzigingen en selecteer de configuratiebestanden die je in deze update wilt opnemen."
   },

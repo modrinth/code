@@ -10,7 +10,7 @@ use super::runner::{
 use crate::api::instance::{
     CONFIG_BUNDLE_FILE_TYPE, CONFIG_DIRECTORY, CONFIG_FILE_TYPE,
     CONFIG_SYNC_ENABLED, MAX_CONFIG_BUNDLE_ENTRIES,
-    MAX_CONFIG_BUNDLE_FILE_SIZE, is_shareable_config_path,
+    MAX_SHARED_FILES_TOTAL_SIZE, is_shareable_file_path,
     is_supported_config_file, read_bounded_config_bundle_entry,
 };
 use crate::api::pack::install_from::CreatePackLocation;
@@ -858,18 +858,10 @@ async fn install_shared_instance_external_file(
     }
 
     if file.file_type == CONFIG_FILE_TYPE {
-        if !is_shareable_config_path(&file.file_name)
-            || file.file_size > MAX_CONFIG_BUNDLE_FILE_SIZE
-        {
-            return Err(crate::ErrorKind::InputError(format!(
-                "Shared instance config file {} is unsupported or too large",
-                file.file_name
-            ))
-            .into());
-        }
-    } else {
-        validate_shared_instance_external_file_name(&file.file_name)?;
+        return install_shared_instance_file(instance_id, file).await;
     }
+
+    validate_shared_instance_external_file_name(&file.file_name)?;
 
     if file.file_size > MAX_SHARED_INSTANCE_EXTERNAL_FILE_SIZE {
         return Err(crate::ErrorKind::InputError(format!(
@@ -940,16 +932,6 @@ async fn install_shared_instance_external_file(
     }
     let bytes = bytes::Bytes::from(bytes);
 
-    if file.file_type == CONFIG_FILE_TYPE {
-        return crate::api::instance::write_instance_file(
-            instance_id,
-            &file.file_name,
-            &bytes,
-            false,
-        )
-        .await;
-    }
-
     if file.file_type == CONFIG_BUNDLE_FILE_TYPE {
         return install_shared_instance_config_bundle(
             instance_id,
@@ -981,6 +963,55 @@ async fn install_shared_instance_external_file(
     .await?;
 
     Ok(())
+}
+
+/// Shared files can be up to the version's size limit, so they are streamed to
+/// disk rather than held in memory.
+async fn install_shared_instance_file(
+    instance_id: &str,
+    file: &SharedInstanceExternalFileData,
+) -> crate::Result<()> {
+    if !is_shareable_file_path(&file.file_name)
+        || file.file_size > MAX_SHARED_FILES_TOTAL_SIZE
+    {
+        return Err(crate::ErrorKind::InputError(format!(
+            "Shared instance file {} is unsupported or too large",
+            file.file_name
+        ))
+        .into());
+    }
+
+    let response = REQWEST_CLIENT.get(&file.url).send().await?;
+    if !response.status().is_success() {
+        return Err(crate::ErrorKind::OtherError(format!(
+            "Shared instance file download failed with status {}",
+            response.status()
+        ))
+        .into());
+    }
+    if response
+        .content_length()
+        .is_some_and(|content_length| content_length != file.file_size)
+    {
+        return Err(crate::ErrorKind::OtherError(format!(
+            "Shared instance file {} has an unexpected size",
+            file.file_name
+        ))
+        .into());
+    }
+
+    let reader = tokio_util::io::StreamReader::new(
+        response.bytes_stream().map(|chunk| {
+            chunk.map_err(|error| std::io::Error::other(error.to_string()))
+        }),
+    );
+    crate::api::instance::write_instance_file_from_reader(
+        instance_id,
+        &file.file_name,
+        reader,
+        file.file_size,
+    )
+    .await
 }
 
 fn validate_shared_instance_external_file_name(

@@ -3,7 +3,7 @@ use super::diff::*;
 use super::install::*;
 use super::types::*;
 use super::*;
-use async_walkdir::WalkDir;
+use async_walkdir::{Filtering, WalkDir};
 use futures::StreamExt;
 use sha2::Digest;
 
@@ -92,10 +92,10 @@ pub(super) async fn detach_local_shared_instance(
 #[tracing::instrument]
 pub async fn publish_shared_instance(
     instance_id: &str,
-    config_paths: Vec<String>,
+    file_paths: Vec<String>,
 ) -> crate::Result<SharedInstanceAttachment> {
     let state = State::get().await?;
-    publish_shared_instance_inner(instance_id, &config_paths, &state).await?;
+    publish_shared_instance_inner(instance_id, &file_paths, &state).await?;
     emit_instance(instance_id, InstancePayloadType::Edited).await?;
 
     shared_attachment(instance_id, &state)
@@ -157,11 +157,7 @@ pub async fn get_shared_instance_publish_preview(
         shared_instance_id: attachment.id,
         latest_version: version.version,
         diffs,
-        config_files: snapshot
-            .config_files
-            .into_iter()
-            .map(|file| file.path)
-            .collect(),
+        files: snapshot.shared_files,
     }))
 }
 
@@ -370,7 +366,7 @@ pub(super) struct CurrentPublishSnapshot {
     pub(super) disabled_project_ids: HashSet<String>,
     pub(super) disabled_version_ids: Vec<String>,
     pub(super) disabled_external_files: BTreeSet<ExternalFileKey>,
-    pub(super) config_files: Vec<ConfigFile>,
+    pub(super) shared_files: Vec<SharedInstancePublishFile>,
 }
 
 /// Cached metadata can outlive a deleted or hidden version. Only publish version
@@ -383,7 +379,7 @@ pub(super) async fn collect_publish_snapshot(
         .directories
         .instances_dir()
         .join(&metadata.instance.path);
-    let (items, config_files) = if CONFIG_SYNC_ENABLED {
+    let (items, shared_files) = if CONFIG_SYNC_ENABLED {
         tokio::try_join!(
             crate::state::list_content(
                 &metadata.instance.id,
@@ -391,7 +387,7 @@ pub(super) async fn collect_publish_snapshot(
                 None,
                 state,
             ),
-            collect_config_files(&instance_path),
+            collect_shareable_files(&instance_path),
         )?
     } else {
         (
@@ -495,7 +491,7 @@ pub(super) async fn collect_publish_snapshot(
         disabled_project_ids,
         disabled_version_ids,
         disabled_external_files,
-        config_files,
+        shared_files,
     })
 }
 
@@ -598,7 +594,7 @@ pub(super) async fn set_shared_instance_publish_status(
 
 pub(super) async fn publish_shared_instance_inner(
     instance_id: &str,
-    config_paths: &[String],
+    file_paths: &[String],
     state: &State,
 ) -> crate::Result<()> {
     let attachment =
@@ -627,13 +623,9 @@ pub(super) async fn publish_shared_instance_inner(
     )
     .await?;
 
-    let result = publish_current_content(
-        instance_id,
-        &attachment.id,
-        config_paths,
-        state,
-    )
-    .await;
+    let result =
+        publish_current_content(instance_id, &attachment.id, file_paths, state)
+            .await;
 
     match result {
         Ok(version) => {
@@ -676,7 +668,7 @@ pub(super) async fn publish_shared_instance_inner(
 pub(super) async fn publish_current_content(
     instance_id: &str,
     shared_instance_id: &str,
-    config_paths: &[String],
+    file_paths: &[String],
     state: &State,
 ) -> crate::Result<i32> {
     let _store_lease = state.content_store.lease().await;
@@ -694,11 +686,11 @@ pub(super) async fn publish_current_content(
     .await?;
     let modpack_id = shared_modpack_id(&metadata.link);
     let snapshot = collect_publish_snapshot(&metadata, state).await?;
-    let config_files = if CONFIG_SYNC_ENABLED {
-        config_file_candidates(
+    let shared_files = if CONFIG_SYNC_ENABLED {
+        shared_file_candidates(
             &metadata.instance.path,
-            &snapshot.config_files,
-            config_paths,
+            &snapshot.shared_files,
+            file_paths,
             state,
         )
         .await?
@@ -707,7 +699,7 @@ pub(super) async fn publish_current_content(
     };
     let modrinth_ids = snapshot.version_ids;
     let mut external_files = snapshot.external_files;
-    external_files.extend(config_files);
+    external_files.extend(shared_files);
     tracing::debug!(
         instance_id,
         shared_instance_id,
@@ -778,18 +770,37 @@ pub(super) async fn publish_current_content(
     Ok(response.version)
 }
 
-pub(super) async fn collect_config_files(
+pub(super) async fn collect_shareable_files(
     instance_path: &std::path::Path,
-) -> crate::Result<Vec<ConfigFile>> {
-    let config_path = instance_path.join(CONFIG_DIRECTORY);
-    crate::util::io::create_dir_all(&config_path).await?;
+) -> crate::Result<Vec<SharedInstancePublishFile>> {
     let mut files = Vec::new();
-    let mut walker = WalkDir::new(&config_path);
+    let root = instance_path.to_path_buf();
+    let mut walker = WalkDir::new(instance_path).filter(move |entry| {
+        let root = root.clone();
+        async move {
+            let is_dir = entry
+                .file_type()
+                .await
+                .is_ok_and(|file_type| file_type.is_dir());
+            let entry_path = entry.path();
+            let skip_dir = is_dir
+                && entry_path.strip_prefix(&root).is_ok_and(|relative| {
+                    !is_shareable_directory(
+                        &relative.to_string_lossy().replace('\\', "/"),
+                    )
+                });
+            if skip_dir {
+                Filtering::IgnoreDir
+            } else {
+                Filtering::Continue
+            }
+        }
+    });
 
     while let Some(entry) = walker.next().await {
         let entry = entry.map_err(|error| {
             crate::ErrorKind::OtherError(format!(
-                "Failed to read config directory: {error}"
+                "Failed to read instance directory: {error}"
             ))
         })?;
         if !entry.file_type().await?.is_file() {
@@ -797,23 +808,24 @@ pub(super) async fn collect_config_files(
         }
 
         let entry_path = entry.path();
-        let relative_path = entry_path.strip_prefix(&config_path)?;
+        let relative_path = entry_path.strip_prefix(instance_path)?;
         let path = relative_path.to_string_lossy().replace('\\', "/");
-        if !is_shareable_config_path(&format!("{CONFIG_DIRECTORY}/{path}")) {
+        if !is_shareable_file_path(&path) {
             continue;
         }
-        files.push(ConfigFile { path });
+        let size = entry.metadata().await?.len();
+        files.push(SharedInstancePublishFile { path, size });
     }
 
     files.sort_by(|left, right| left.path.cmp(&right.path));
     Ok(files)
 }
 
-/// Each selected config is uploaded as its own file under the instance root,
-/// matching how linked servers publish configs.
-async fn config_file_candidates(
+/// Each selected file is uploaded on its own under its instance-relative
+/// path, matching how linked servers publish files.
+async fn shared_file_candidates(
     instance_path: &str,
-    local_files: &[ConfigFile],
+    local_files: &[SharedInstancePublishFile],
     selected_paths: &[String],
     state: &State,
 ) -> crate::Result<Vec<ExternalFileCandidate>> {
@@ -830,44 +842,38 @@ async fn config_file_candidates(
         .find(|path| !local_paths.contains(*path))
     {
         return Err(crate::ErrorKind::InputError(format!(
-            "Config file is unavailable for sharing: {missing}"
+            "File is unavailable for sharing: {missing}"
         ))
         .into());
     }
-    ensure_config_file_count(&selected_paths)?;
+    ensure_shared_file_count(&selected_paths)?;
 
-    let config_path = state
-        .directories
-        .instances_dir()
-        .join(instance_path)
-        .join(CONFIG_DIRECTORY);
+    let instance_path = state.directories.instances_dir().join(instance_path);
     let mut total_size = 0_u64;
     let mut candidates = Vec::with_capacity(selected_paths.len());
     for path in selected_paths {
-        let source = config_path.join(path);
+        let source = instance_path.join(path);
         let size = crate::util::io::metadata(&source).await?.len();
         total_size = total_size.saturating_add(size);
-        if size > MAX_CONFIG_BUNDLE_FILE_SIZE
-            || total_size > MAX_CONFIG_BUNDLE_TOTAL_SIZE
-        {
+        if total_size > MAX_SHARED_FILES_TOTAL_SIZE {
             return Err(crate::ErrorKind::InputError(
-                "Selected config files exceed the size limit for sharing"
+                "Selected files exceed the 2 GB limit for a shared instance version"
                     .to_string(),
             )
             .into());
         }
         candidates.push(ExternalFileCandidate {
-            file_name: format!("{CONFIG_DIRECTORY}/{path}"),
+            file_name: path.to_string(),
             file_type: CONFIG_FILE_TYPE.to_string(),
-            source: ExternalFileSource::ConfigFile(source),
+            source: ExternalFileSource::SharedFile(source),
         });
     }
 
     Ok(candidates)
 }
 
-fn ensure_config_file_count(paths: &BTreeSet<&str>) -> crate::Result<()> {
-    if paths.len() <= MAX_CONFIG_BUNDLE_ENTRIES {
+fn ensure_shared_file_count(paths: &BTreeSet<&str>) -> crate::Result<()> {
+    if paths.len() <= MAX_SHARED_FILES {
         return Ok(());
     }
 
@@ -880,17 +886,17 @@ fn ensure_config_file_count(paths: &BTreeSet<&str>) -> crate::Result<()> {
 
     if let Some((folder, count)) = folder_entry_counts
         .into_iter()
-        .filter(|(_, count)| *count > MAX_CONFIG_BUNDLE_ENTRIES)
+        .filter(|(_, count)| *count > MAX_SHARED_FILES)
         .max_by_key(|(_, count)| *count)
     {
         return Err(crate::ErrorKind::InputError(format!(
-			"The \"{folder}\" config folder has too many files to share ({count}; maximum {MAX_CONFIG_BUNDLE_ENTRIES}). Select fewer files from this folder."
+			"The \"{folder}\" folder has too many files to share ({count}; maximum {MAX_SHARED_FILES}). Select fewer files from this folder."
 		))
 		.into());
     }
 
     Err(crate::ErrorKind::InputError(format!(
-		"Too many config files were selected to share ({}; maximum {MAX_CONFIG_BUNDLE_ENTRIES}). Select fewer files.",
+		"Too many files were selected to share ({}; maximum {MAX_SHARED_FILES}). Select fewer files.",
 		paths.len()
 	))
 	.into())
@@ -950,7 +956,7 @@ pub(super) async fn upload_external_files(
 					.ok_or_else(|| crate::state::content_store::input("Shared content file is not registered"))?;
                 state.content_store.read_path(&file, instance_path).await?
             }
-            ExternalFileSource::ConfigFile(path) => {
+            ExternalFileSource::SharedFile(path) => {
                 crate::state::content_store::ReadableContent::Local(
                     path.clone(),
                 )

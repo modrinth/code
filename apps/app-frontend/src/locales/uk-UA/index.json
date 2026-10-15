@@ -4343,9 +4343,6 @@
   "instance.shared-instance.publish-review.admonition-header": {
     "message": "Публікація оновлення"
   },
-  "instance.shared-instance.publish-review.config-title-v2": {
-    "message": "Оберіть файли конфігурації"
-  },
   "instance.shared-instance.publish-review.description": {
     "message": "Перегляньте зміни вмісту та оберіть файли конфігурації, які варто включити в цьому оновленні."
   },

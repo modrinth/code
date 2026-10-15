@@ -4283,9 +4283,6 @@
   "instance.shared-instance.publish-review.admonition-header": {
     "message": "Déployer la mise à jour aux joueurs"
   },
-  "instance.shared-instance.publish-review.config-title-v2": {
-    "message": "Sélectionner les fichiers de configuration"
-  },
   "instance.shared-instance.publish-review.description": {
     "message": "Examiner les changements de contenu et choisir n'importe quel fichier de configuration à inclure dans cette mise à jour."
   },

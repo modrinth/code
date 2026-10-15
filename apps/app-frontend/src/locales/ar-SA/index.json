@@ -2900,9 +2900,6 @@
   "instance.shared-instance.publish-review.admonition-header": {
     "message": "رفع التحديث للاعبين"
   },
-  "instance.shared-instance.publish-review.config-title-v2": {
-    "message": "اختر مِلَف الإعداد"
-  },
   "instance.shared-instance.publish-review.description": {
     "message": "راجع تغييرات المحتوى واختر أي ملفات تكوين (config) لضرورة تضمينها في هذا التحديث."
   },

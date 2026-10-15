@@ -4322,9 +4322,6 @@
   "instance.shared-instance.publish-review.admonition-header": {
     "message": "Lanzar actualización a jugadores"
   },
-  "instance.shared-instance.publish-review.config-title-v2": {
-    "message": "Seleccionar archivos de configuración"
-  },
   "instance.shared-instance.publish-review.description": {
     "message": "Revisa los cambios de contenido y elige cualquier archivo de configuración para incluir en esta actualización."
   },
