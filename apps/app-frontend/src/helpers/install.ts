@@ -7,7 +7,6 @@ import type { InstallJobStatus } from '@/generated/app-events/InstallJobStatus'
 import type { InstallPhaseId } from '@/generated/app-events/InstallPhaseId'
 import type { InstallProgress } from '@/generated/app-events/InstallProgress'
 import type { InstallProgressSecondary } from '@/generated/app-events/InstallProgressSecondary'
-import type { SharedInstanceUnavailableReason } from '@/generated/app-events/SharedInstanceUnavailableReason'
 import type { AppEvents } from '@/providers/app-events'
 
 import type { InstanceIconConfig, InstanceLink, InstanceLoader } from './types'
@@ -20,8 +19,9 @@ export type {
 	InstallPhaseId,
 	InstallProgress,
 	InstallProgressSecondary,
-	SharedInstanceUnavailableReason,
 }
+
+export type SharedInstanceUnavailableReason = 'deleted' | 'access_revoked' | 'quarantined'
 
 export interface PackLocationVersionId {
 	type: 'fromVersionId'

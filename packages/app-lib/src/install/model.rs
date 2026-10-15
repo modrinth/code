@@ -633,9 +633,6 @@ pub struct InstallErrorView {
     pub message: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "export-ts", ts(optional))]
-    pub reason: Option<crate::SharedInstanceUnavailableReason>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    #[cfg_attr(feature = "export-ts", ts(optional))]
     pub api: Option<InstallApiErrorDetails>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "export-ts", ts(optional))]
@@ -675,7 +672,6 @@ impl InstallErrorView {
             code: code.to_string(),
             phase: Some(phase),
             message: format!("{error:#}"),
-            reason: None,
             api: match error.downcast_ref::<crate::ErrorKind>() {
                 Some(crate::ErrorKind::LabrinthError(error)) => {
                     Some(InstallApiErrorDetails {
@@ -701,7 +697,6 @@ impl InstallErrorView {
             code: code.to_string(),
             phase: Some(phase),
             message: message.into(),
-            reason: None,
             api: None,
             context: None,
         }

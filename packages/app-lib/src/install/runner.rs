@@ -1791,18 +1791,12 @@ fn install_error_view(
     error: &crate::Error,
     context: Option<InstallErrorContext>,
 ) -> InstallErrorView {
-    let mut view = InstallErrorView::from_error(
+    InstallErrorView::from_error(
         install_error_code(phase, error),
         phase,
         error,
         context,
-    );
-    if let Some(ErrorKind::SharedInstanceUnavailable(reason)) =
-        error.downcast_ref()
-    {
-        view.reason = Some(*reason);
-    }
-    view
+    )
 }
 
 fn install_error_code(

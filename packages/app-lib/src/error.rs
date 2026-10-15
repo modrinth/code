@@ -29,12 +29,7 @@ pub struct LabrinthError {
     pub route: Option<String>,
 }
 
-#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
-#[cfg_attr(
-    feature = "export-ts",
-    derive(ts_rs::TS, postcard_bindgen::PostcardBindings)
-)]
-#[serde(rename_all = "snake_case")]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum SharedInstanceUnavailableReason {
     Deleted,
     AccessRevoked,
