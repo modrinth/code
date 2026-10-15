@@ -9,8 +9,19 @@ import misusedHeader from '../messages/checklist/messages/links/misused-header.m
 import sourceEmpty from '../messages/checklist/messages/links/source/empty.md'
 import sourceInaccessible from '../messages/checklist/messages/links/source/inaccessible.md'
 import wikiDisabled from '../messages/checklist/messages/links/wiki/disabled.md'
-import { issue, panel, toggle } from './component-builders/builders'
+import { issue, panel, text, toggle, section } from './component-builders/builders'
 import { issueTargets } from './component-builders/targets'
+
+function linkSuggestionSection(link_type: string) {
+	return section({
+		shown: ({ selected }) => selected.toggleIds.some((id) => id.startsWith(`${link_type}-link:`)),
+	}).content(
+		text({
+			id: `${link_type}-link-suggestion`,
+			label: 'Suggestion',
+		}),
+	)
+}
 
 export const linksIssue = issue({
 	id: 'links',
@@ -159,6 +170,7 @@ export const issuesReviewPanel = panel({
 		issueListGroup: 'Inaccessible',
 		issueListLabel: 'Issues: Disabled',
 	}),
+	// linkSuggestionSection('issues')
 )
 
 export const sourceReviewPanel = panel({
@@ -186,6 +198,7 @@ export const sourceReviewPanel = panel({
 		issueListGroup: 'Inaccessible',
 		issueListLabel: 'Source: Empty Repo',
 	}),
+	// linkSuggestionSection('source'),
 )
 
 export const wikiReviewPanel = panel({
@@ -213,6 +226,7 @@ export const wikiReviewPanel = panel({
 		issueListGroup: 'Inaccessible',
 		issueListLabel: 'Wiki: Disabled',
 	}),
+	// linkSuggestionSection('wiki')
 )
 
 export const discordReviewPanel = panel({
@@ -240,6 +254,7 @@ export const discordReviewPanel = panel({
 		issueListGroup: 'Inaccessible',
 		issueListLabel: 'Discord: Expiring',
 	}),
+	// linkSuggestionSection('discord')
 )
 
 export const siteReviewPanel = panel({
@@ -260,6 +275,7 @@ export const siteReviewPanel = panel({
 		id: 'site-link:inaccessible',
 		label: 'Inaccessible',
 	}),
+	// linkSuggestionSection('site')
 )
 
 export const storeReviewPanel = panel({
@@ -280,6 +296,7 @@ export const storeReviewPanel = panel({
 		id: 'store-link:inaccessible',
 		label: 'Inaccessible',
 	}),
+	// linkSuggestionSection('store')
 )
 
 export const patreonReviewPanel = panel({
