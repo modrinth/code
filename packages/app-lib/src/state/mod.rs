@@ -286,10 +286,17 @@ impl State {
             }
 
             let res = tokio::try_join!(
-                state.discord_rpc.clear_to_default(true),
-                instances::refresh_all_instances(),
+                state.discord_rpc.clear_to_default(
+                    true,
+                    &state.pool,
+                    &state.process_manager,
+                ),
+                refresh_all_instances(state),
                 Settings::migrate(&state.pool),
-                ModrinthCredentials::refresh_all(),
+                ModrinthCredentials::refresh_all(
+                    &state.pool,
+                    &state.fetch_semaphore,
+                ),
             );
 
             if let Err(e) = res {
@@ -304,7 +311,7 @@ impl State {
                     &state.process_manager,
                 )
                 .await;
-            let _ = FriendsSocket::socket_loop().await;
+            let _ = FriendsSocket::socket_loop(Arc::clone(state)).await;
         });
 
         Ok(())

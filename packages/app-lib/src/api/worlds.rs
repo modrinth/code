@@ -932,6 +932,7 @@ pub async fn get_instance_protocol_version(
         &metadata.applied_content_set.game_version,
         metadata.applied_content_set.loader,
         metadata.applied_content_set.loader_version.as_deref(),
+        &state.directories,
     )
     .await?;
     if metadata.applied_content_set.loader != ModLoader::Vanilla
