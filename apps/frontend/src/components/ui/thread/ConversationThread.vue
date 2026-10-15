@@ -229,8 +229,6 @@
 								>
 									<Button
 										v-if="replyBody"
-										type="colored"
-										color="orange"
 										:disabled="isLoading || reviewSubmissionDisabled"
 										@click="openResubmitModal(true)"
 									>
