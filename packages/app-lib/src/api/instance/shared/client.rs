@@ -120,6 +120,8 @@ pub(super) struct ExternalFileResponse {
     pub(super) url: String,
     #[serde(default)]
     pub(super) file_size: Option<i64>,
+    #[serde(default)]
+    pub(super) sha1: Option<String>,
 }
 
 #[derive(Clone, Debug, Deserialize)]
