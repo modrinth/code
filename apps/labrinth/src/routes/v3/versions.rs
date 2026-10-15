@@ -1092,6 +1092,140 @@ pub async fn version_list(
     .await
 }
 
+/// Load the shared loader/game-version pairs used by automatic featuring.
+pub(crate) async fn auto_featured_filters(
+    ro_pool: &ReadOnlyPgPool,
+    redis: &RedisPool,
+) -> Result<Vec<(String, String)>, ApiError> {
+    let (loaders, game_versions) = futures::future::try_join(
+        database::models::loader_fields::Loader::list(&**ro_pool, redis),
+        database::models::legacy_loader_fields::MinecraftGameVersion::list(
+            None,
+            Some(true),
+            &**ro_pool,
+            redis,
+        ),
+    )
+    .await
+    .wrap_internal_err("fetching automatic featured filters")?;
+    Ok(game_versions
+        .iter()
+        .flat_map(|game_version| {
+            loaders.iter().map(|loader| {
+                (game_version.version.clone(), loader.loader.clone())
+            })
+        })
+        .collect())
+}
+
+/// Apply project-list filters, including the legacy automatic featured fallback.
+pub(crate) async fn filter_project_versions(
+    versions: Vec<database::models::version_item::VersionQueryResult>,
+    filters: &VersionListFilters,
+    ro_pool: &ReadOnlyPgPool,
+    redis: &RedisPool,
+    auto_featured: Option<&[(String, String)]>,
+) -> Result<Vec<database::models::version_item::VersionQueryResult>, ApiError> {
+    let loader_field_filters = filters.loader_fields.as_ref().map(|x| {
+        serde_json::from_str::<HashMap<String, Vec<serde_json::Value>>>(x)
+            .unwrap_or_default()
+    });
+    let loader_filters = filters
+        .loaders
+        .as_ref()
+        .map(|x| serde_json::from_str::<Vec<String>>(x).unwrap_or_default());
+    let mut versions = versions
+        .into_iter()
+        .filter(|x| {
+            let mut bool = true;
+
+            if let Some(version_type) = filters.version_type {
+                bool &= &*x.inner.version_type == version_type.as_str();
+            }
+            if let Some(loaders) = &loader_filters {
+                bool &= x.loaders.iter().any(|y| loaders.contains(y));
+            }
+            if let Some(loader_fields) = &loader_field_filters {
+                for (key, values) in loader_fields {
+                    bool &= if let Some(x_vf) =
+                        x.version_fields.iter().find(|y| y.field_name == *key)
+                    {
+                        values.iter().any(|v| x_vf.value.contains_json_value(v))
+                    } else {
+                        true
+                    };
+                }
+            }
+            bool
+        })
+        .collect::<Vec<_>>();
+
+    // Sort before applying limit/offset so that limit=N returns the N newest versions
+    versions
+        .sort_by_key(|version| std::cmp::Reverse(version.inner.date_published));
+
+    let versions: Vec<_> = versions
+        .into_iter()
+        .skip(filters.offset.unwrap_or(0))
+        .take(filters.limit.unwrap_or(usize::MAX))
+        .collect();
+
+    let mut response = versions
+        .iter()
+        .filter(|version| {
+            filters
+                .featured
+                .is_none_or(|featured| featured == version.inner.featured)
+        })
+        .cloned()
+        .collect::<Vec<_>>();
+
+    // Attempt to populate versions with "auto featured" versions
+    if response.is_empty()
+        && !versions.is_empty()
+        && filters.featured.unwrap_or(false)
+    {
+        // TODO: This is a bandaid fix for detecting auto-featured versions.
+        // In the future, not all versions will have 'game_versions' fields, so this will need to be changed.
+        let loaded_filters;
+        let joined_filters = if let Some(filters) = auto_featured {
+            filters
+        } else {
+            loaded_filters = auto_featured_filters(ro_pool, redis).await?;
+            &loaded_filters
+        };
+
+        joined_filters.iter().for_each(|filter| {
+            if let Some(version) = versions.iter().find(|version| {
+                // TODO: This is the bandaid fix for detecting auto-featured versions.
+                let game_versions = version
+                    .version_fields
+                    .iter()
+                    .find(|vf| vf.field_name == "game_versions")
+                    .map(|vf| vf.value.clone())
+                    .map(|v| v.as_strings())
+                    .unwrap_or_default();
+                game_versions.contains(&filter.0)
+                    && version.loaders.contains(&filter.1)
+            }) {
+                response.push(version.clone());
+            }
+        });
+
+        if response.is_empty() {
+            versions
+                .into_iter()
+                .for_each(|version| response.push(version));
+        }
+    }
+
+    response
+        .sort_by_key(|version| std::cmp::Reverse(version.inner.date_published));
+    response.dedup_by(|a, b| a.inner.id == b.inner.id);
+
+    Ok(response)
+}
+
 pub async fn version_list_internal(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -1126,122 +1260,16 @@ pub async fn version_list_internal(
             return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
         }
 
-        let loader_field_filters = filters.loader_fields.as_ref().map(|x| {
-            serde_json::from_str::<HashMap<String, Vec<serde_json::Value>>>(x)
-                .unwrap_or_default()
-        });
-        let loader_filters = filters.loaders.as_ref().map(|x| {
-            serde_json::from_str::<Vec<String>>(x).unwrap_or_default()
-        });
-        let mut versions = database::models::DBVersion::get_many(
+        let versions = database::models::DBVersion::get_many(
             &project.versions,
             &***ro_pool,
             &redis,
         )
         .await
-        .wrap_internal_err("fetching versions from database")?
-        .into_iter()
-        .filter(|x| {
-            let mut bool = true;
-
-            if let Some(version_type) = filters.version_type {
-                bool &= &*x.inner.version_type == version_type.as_str();
-            }
-            if let Some(loaders) = &loader_filters {
-                bool &= x.loaders.iter().any(|y| loaders.contains(y));
-            }
-            if let Some(loader_fields) = &loader_field_filters {
-                for (key, values) in loader_fields {
-                    bool &= if let Some(x_vf) =
-                        x.version_fields.iter().find(|y| y.field_name == *key)
-                    {
-                        values.iter().any(|v| x_vf.value.contains_json_value(v))
-                    } else {
-                        true
-                    };
-                }
-            }
-            bool
-        })
-        .collect::<Vec<_>>();
-
-        // Sort before applying limit/offset so that limit=N returns the N newest versions
-        versions.sort_by(|a, b| {
-            b.inner.date_published.cmp(&a.inner.date_published)
-        });
-
-        let versions: Vec<_> = versions
-            .into_iter()
-            .skip(filters.offset.unwrap_or(0))
-            .take(filters.limit.unwrap_or(usize::MAX))
-            .collect();
-
-        let mut response = versions
-            .iter()
-            .filter(|version| {
-                filters
-                    .featured
-                    .is_none_or(|featured| featured == version.inner.featured)
-            })
-            .cloned()
-            .collect::<Vec<_>>();
-
-        // Attempt to populate versions with "auto featured" versions
-        if response.is_empty()
-            && !versions.is_empty()
-            && filters.featured.unwrap_or(false)
-        {
-            // TODO: This is a bandaid fix for detecting auto-featured versions.
-            // In the future, not all versions will have 'game_versions' fields, so this will need to be changed.
-            let (loaders, game_versions) = futures::future::try_join(
-                database::models::loader_fields::Loader::list(
-                    &***ro_pool,
-                    &redis,
-                ),
-                database::models::legacy_loader_fields::MinecraftGameVersion::list(
-                    None,
-                    Some(true),
-                    &***ro_pool,
-                    &redis,
-                ),
-            )
-            .await.wrap_internal_err("fetching minecraft game version from Redis")?;
-
-            let mut joined_filters = Vec::new();
-            for game_version in &game_versions {
-                for loader in &loaders {
-                    joined_filters.push((game_version, loader))
-                }
-            }
-
-            joined_filters.into_iter().for_each(|filter| {
-                if let Some(version) = versions.iter().find(|version| {
-                    // TODO: This is the bandaid fix for detecting auto-featured versions.
-                    let game_versions = version
-                        .version_fields
-                        .iter()
-                        .find(|vf| vf.field_name == "game_versions")
-                        .map(|vf| vf.value.clone())
-                        .map(|v| v.as_strings())
-                        .unwrap_or_default();
-                    game_versions.contains(&filter.0.version)
-                        && version.loaders.contains(&filter.1.loader)
-                }) {
-                    response.push(version.clone());
-                }
-            });
-
-            if response.is_empty() {
-                versions
-                    .into_iter()
-                    .for_each(|version| response.push(version));
-            }
-        }
-
-        response.sort_by(|a, b| {
-            b.inner.date_published.cmp(&a.inner.date_published)
-        });
-        response.dedup_by(|a, b| a.inner.id == b.inner.id);
+        .wrap_internal_err("fetching versions from database")?;
+        let response =
+            filter_project_versions(versions, &filters, &ro_pool, &redis, None)
+                .await?;
 
         let mut response =
             filter_visible_versions(response, &user_option, &ro_pool, &redis)

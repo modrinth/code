@@ -479,6 +479,15 @@
   "app.features-settings.sync-across-devices.title": {
     "message": "Sync features across devices"
   },
+  "app.file-download.canceling": {
+    "message": "Canceling download…"
+  },
+  "app.file-download.preparing": {
+    "message": "Preparing download…"
+  },
+  "app.file-download.waiting": {
+    "message": "Waiting for the server…"
+  },
   "app.home.jump-back-in.actions.label": {
     "message": "Instance actions"
   },
@@ -1321,6 +1330,12 @@
   },
   "app.modal.install-to-play.shared-instance-unknown-files-description": {
     "message": "This shared instance contains files that aren’t published on Modrinth. We strongly recommend only installing files from sources you trust."
+  },
+  "app.modal.install-to-play.unavailable-description": {
+    "message": "The modpack version this server uses can't be downloaded right now. It may be unpublished or under review. Try again later, or contact the server owner."
+  },
+  "app.modal.install-to-play.unavailable-header": {
+    "message": "This server's modpack isn't available"
   },
   "app.modal.install-to-play.unknown-files-description": {
     "message": "This server modpack contains files that aren’t published on Modrinth. We strongly recommend only installing files from sources you trust."
