@@ -17,6 +17,7 @@ pub struct BlobCas {
     imp: BlobStore,
 }
 
+#[must_use = "hashes will not exist in database until registered"]
 pub struct StoredBlob {
     pub sha256: Sha256,
     sha1: Sha1,
@@ -45,20 +46,6 @@ impl BlobCas {
 
     pub async fn get(&self, sha256: Sha256) -> Result<Vec<u8>> {
         self.imp.get(&path_for(sha256)).await
-    }
-
-    /// Put a blob of data into the store, and automatically register its hashes
-    /// in the database.
-    ///
-    /// If you need to split the store/register, see [`BlobCas::store`].
-    pub async fn put(
-        &self,
-        exec: &mut dyn toasty::Executor,
-        data: &[u8],
-    ) -> Result<Sha256> {
-        let blob = self.store(data).await?;
-        blob.register(exec).await?;
-        Ok(blob.sha256)
     }
 
     /// Put a blob of data into the store, but don't immediately register it

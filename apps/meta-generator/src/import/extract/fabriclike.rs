@@ -374,15 +374,17 @@ async fn download_artifact(
             Sha1::from_digest(&bytes)
         );
     }
+    let blob = app.cas
+		.store(&bytes)
+		.context(info_span!("storing Maven artifact in CAS", coordinate = %artifact.coordinate))
+		.await?;
     let mut conn = app
         .db
         .connection()
-        .context(info_span!("acquiring connection"))
+        .context(info_span!("acquiring artifact connection"))
         .await?;
-    let sha256 = app.cas
-        .put(&mut conn, &bytes)
-        .context(info_span!("storing Maven artifact in CAS", coordinate = %artifact.coordinate))
-        .await?;
+    blob.register(&mut conn).await?;
+    let sha256 = blob.sha256;
     Ok(FabriclikeStoredArtifact { artifact, sha256 })
 }
 

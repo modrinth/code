@@ -1,4 +1,4 @@
-use std::pin::Pin;
+use std::{path::PathBuf, pin::Pin};
 
 use anyhow::{Context, Result};
 use modrinth_minecraft_meta::util::Sha256;
@@ -98,32 +98,40 @@ impl StoreOps for FsStore {
                 .context(info_span!("creating parent dir", ?parent))
                 .await?;
             let temp_path = parent.join(format!(".{}.tmp", Uuid::now_v7()));
+            let _delete_on_drop = DeleteOnDrop {
+                path: temp_path.clone(),
+            };
             let mut file = fs::OpenOptions::new()
                 .write(true)
                 .create_new(true)
                 .open(&temp_path)
                 .context(info_span!("creating temporary file", ?temp_path))
                 .await?;
-            let result = async {
-                file.write_all(data)
-                    .context(info_span!("writing temporary file", ?temp_path))
-                    .await?;
-                file.flush()
-                    .context(info_span!("flushing temporary file", ?temp_path))
-                    .await?;
-                drop(file);
-                fs::rename(&temp_path, &path)
-                    .context(info_span!("publishing file", ?temp_path, ?path))
-                    .await?;
-                Ok(PutStatus::Changed)
-            }
-            .await;
-            if result.is_err()
-                && let Err(err) = fs::remove_file(&temp_path).await
-            {
-                warn!(?temp_path, ?err, "failed to remove temporary file");
-            }
-            result
+            file.write_all(data)
+                .context(info_span!("writing temporary file", ?temp_path))
+                .await?;
+            file.flush()
+                .context(info_span!("flushing temporary file", ?temp_path))
+                .await?;
+            drop(file);
+            fs::rename(&temp_path, &path)
+                .context(info_span!("publishing file", ?temp_path, ?path))
+                .await?;
+            Ok(PutStatus::Changed)
         })
+    }
+}
+
+struct DeleteOnDrop {
+    path: PathBuf,
+}
+
+impl Drop for DeleteOnDrop {
+    fn drop(&mut self) {
+        if let Err(err) = std::fs::remove_file(&self.path)
+            && err.kind() != std::io::ErrorKind::NotFound
+        {
+            warn!(temp_path = ?self.path, ?err, "failed to remove temporary file");
+        }
     }
 }

@@ -290,18 +290,15 @@ async fn extract_from_installer(
                         .context(
                             "embedded Maven artifact is missing from installer",
                         )?;
-                    let mut conn = app
-                        .db
-                        .connection()
-                        .context(info_span!("acquiring artifact connection"))
-                        .await?;
-                    let sha256 = app
-						.cas
-                    .put(&mut conn, &bytes)
-						.context(
-							info_span!("storing embedded Maven artifact in CAS", path, %coordinate),
-						)
-                    .await?;
+					let blob = app.cas
+						.store(&bytes)
+						.context(info_span!("storing embedded Maven artifact in CAS", path, %coordinate))
+						.await?;
+					let mut conn = app.db.connection()
+						.context(info_span!("acquiring artifact connection"))
+						.await?;
+					blob.register(&mut conn).await?;
+					let sha256 = blob.sha256;
                     anyhow::Ok((
                         index,
                         model::ForgelikeStoredArtifact { coordinate, sha256 },
@@ -522,8 +519,14 @@ async fn download_library(
         .await;
         match result {
             Ok(bytes) => {
-                let mut conn = app.db.connection().await?;
-                let sha256 = app.cas.put(&mut conn, &bytes).await?;
+                let blob = app.cas.store(&bytes).await?;
+                let mut conn = app
+                    .db
+                    .connection()
+                    .context(info_span!("acquiring artifact connection"))
+                    .await?;
+                blob.register(&mut conn).await?;
+                let sha256 = blob.sha256;
                 return Ok(model::ForgelikeStoredArtifact {
                     coordinate,
                     sha256,
