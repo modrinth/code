@@ -25,6 +25,7 @@ const config: StorybookConfig = {
 			},
 			resolve: {
 				alias: {
+					'~': fileURLToPath(new URL('../../../apps/frontend/src', import.meta.url)),
 					'@modrinth/api-client': fileURLToPath(
 						new URL('../../api-client/src/index.ts', import.meta.url),
 					),

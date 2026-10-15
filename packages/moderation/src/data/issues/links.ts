@@ -1,4 +1,5 @@
 import { LinkIcon } from '@modrinth/assets'
+import { md } from '@modrinth/utils'
 
 import discordExpiring from '../messages/checklist/messages/links/discord/expiring.md'
 import discordInaccessible from '../messages/checklist/messages/links/discord/inaccessible.md'
@@ -9,16 +10,38 @@ import misusedHeader from '../messages/checklist/messages/links/misused-header.m
 import sourceEmpty from '../messages/checklist/messages/links/source/empty.md'
 import sourceInaccessible from '../messages/checklist/messages/links/source/inaccessible.md'
 import wikiDisabled from '../messages/checklist/messages/links/wiki/disabled.md'
-import { issue, panel, toggle } from './component-builders/builders'
+import { issue, panel, section, text, toggle } from './component-builders/builders'
 import { issueTargets } from './component-builders/targets'
+
+function linkSuggestionSection(linkType: string) {
+	return section({
+		shown: ({ selected }) => selected.toggleIds.some((id) => id.startsWith(`${linkType}-link:`)),
+	}).content(
+		text({
+			id: `${linkType}-link-suggestion`,
+			label: 'Suggested replacement URL',
+			placeholder: 'https://',
+		}),
+	)
+}
+
+function linkMessageWithSuggestion(message: string, suggestion: string) {
+	if (!suggestion) return message
+	return `${message}\n    - Suggested replacement: <inline-copy-code>${md().utils.escapeHtml(suggestion)}</inline-copy-code>`
+}
 
 export const linksIssue = issue({
 	id: 'links',
 	title: 'Invalid project links',
 	category: 'Links',
-	actions: [issueTargets.modifySelectedLinks()],
+	actions: [
+		issueTargets.modifySelectedLinks(
+			(platform, { getTextValue }) =>
+				getTextValue(`${platform}-link-suggestion`).trim() || undefined,
+		),
+	],
 	suggestedStatus: 'flagged',
-	message: ({ projectV3, selected }) => {
+	message: ({ projectV3, selected, getTextValue }) => {
 		const toggleIds = new Set(selected.toggleIds)
 		const inaccessibleItems: string[] = []
 		const misusedItems: string[] = []
@@ -106,19 +129,24 @@ export const linksIssue = issue({
 			const url = projectV3.link_urls[type]?.url
 			// "- Source code: `https://github.com/owner/repo`" or "- Source code"
 			const item = url ? `- ${label}: \`${url}\`` : `- ${label}`
+			const suggestion = getTextValue(`${field}-suggestion`).trim()
 			if (inaccessibleSelected) {
 				const uniqueNotes = [...new Set(notes.map((note) => note.trim()).filter(Boolean))]
-				inaccessibleItems.push([item, ...uniqueNotes].join('\n    - '))
+				inaccessibleItems.push(
+					linkMessageWithSuggestion([item, ...uniqueNotes].join('\n    - '), suggestion),
+				)
 			}
-			if (misusedSelected) misusedItems.push(item)
+			if (misusedSelected) {
+				misusedItems.push(inaccessibleSelected ? item : linkMessageWithSuggestion(item, suggestion))
+			}
 		}
 
 		const sections: string[] = []
 		if (inaccessibleItems.length) {
-			sections.push(inaccessibleHeader.trim(), inaccessibleItems.join('\n'))
+			sections.push(inaccessibleHeader.trim(), inaccessibleItems.join('\n\n'))
 		}
 		if (misusedItems.length) {
-			sections.push(misusedHeader.trim(), misusedItems.join('\n'))
+			sections.push(misusedHeader.trim(), misusedItems.join('\n\n'))
 		}
 		return sections.length ? [linksHeader.trim(), ...sections].join('\n\n') : ''
 	},
@@ -159,6 +187,7 @@ export const issuesReviewPanel = panel({
 		issueListGroup: 'Inaccessible',
 		issueListLabel: 'Issues: Disabled',
 	}),
+	linkSuggestionSection('issues'),
 )
 
 export const sourceReviewPanel = panel({
@@ -186,6 +215,7 @@ export const sourceReviewPanel = panel({
 		issueListGroup: 'Inaccessible',
 		issueListLabel: 'Source: Empty Repo',
 	}),
+	linkSuggestionSection('source'),
 )
 
 export const wikiReviewPanel = panel({
@@ -213,6 +243,7 @@ export const wikiReviewPanel = panel({
 		issueListGroup: 'Inaccessible',
 		issueListLabel: 'Wiki: Disabled',
 	}),
+	linkSuggestionSection('wiki'),
 )
 
 export const discordReviewPanel = panel({
@@ -240,6 +271,7 @@ export const discordReviewPanel = panel({
 		issueListGroup: 'Inaccessible',
 		issueListLabel: 'Discord: Expiring',
 	}),
+	linkSuggestionSection('discord'),
 )
 
 export const siteReviewPanel = panel({
@@ -260,6 +292,7 @@ export const siteReviewPanel = panel({
 		id: 'site-link:inaccessible',
 		label: 'Inaccessible',
 	}),
+	linkSuggestionSection('site'),
 )
 
 export const storeReviewPanel = panel({
@@ -280,6 +313,7 @@ export const storeReviewPanel = panel({
 		id: 'store-link:inaccessible',
 		label: 'Inaccessible',
 	}),
+	linkSuggestionSection('store'),
 )
 
 export const patreonReviewPanel = panel({
@@ -300,6 +334,7 @@ export const patreonReviewPanel = panel({
 		id: 'patreon-link:inaccessible',
 		label: 'Inaccessible',
 	}),
+	linkSuggestionSection('patreon'),
 )
 
 export const bmacReviewPanel = panel({
@@ -320,6 +355,7 @@ export const bmacReviewPanel = panel({
 		id: 'bmac-link:inaccessible',
 		label: 'Inaccessible',
 	}),
+	linkSuggestionSection('bmac'),
 )
 
 export const paypalReviewPanel = panel({
@@ -340,6 +376,7 @@ export const paypalReviewPanel = panel({
 		id: 'paypal-link:inaccessible',
 		label: 'Inaccessible',
 	}),
+	linkSuggestionSection('paypal'),
 )
 
 export const githubReviewPanel = panel({
@@ -360,6 +397,7 @@ export const githubReviewPanel = panel({
 		id: 'github-link:inaccessible',
 		label: 'Inaccessible',
 	}),
+	linkSuggestionSection('github'),
 )
 
 export const koFiReviewPanel = panel({
@@ -380,6 +418,7 @@ export const koFiReviewPanel = panel({
 		id: 'ko-fi-link:inaccessible',
 		label: 'Inaccessible',
 	}),
+	linkSuggestionSection('ko-fi'),
 )
 
 export const otherReviewPanel = panel({
@@ -400,4 +439,5 @@ export const otherReviewPanel = panel({
 		id: 'other-link:inaccessible',
 		label: 'Inaccessible',
 	}),
+	linkSuggestionSection('other'),
 )

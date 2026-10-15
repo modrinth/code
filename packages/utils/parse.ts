@@ -58,6 +58,7 @@ export const configuredXss = new FilterXSS({
 		h5: ['id'],
 		h6: ['id'],
 		kbd: ['id'],
+		'inline-copy-code': [],
 		input: ['checked', 'disabled', 'type'],
 		iframe: ['width', 'height', 'allowfullscreen', 'frameborder', 'start', 'end'],
 		img: [...(whiteList.img || []), 'usemap', 'style', 'align'],

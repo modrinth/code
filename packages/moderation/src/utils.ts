@@ -115,7 +115,7 @@ export function messageWithOptionalSuggestion(message, fieldType: string, sugges
 			message +
 			`\n` +
 			suggestionMessage
-				.replaceAll('%FIELD_TYPE%', () => fieldType)
+				.replaceAll('%FIELD_TYPE%', () => fieldType.toLowerCase())
 				.replaceAll(
 					'%SUGGESTION%',
 					() => `<copy-code>\n<pre>${escapeHtml(suggestion)}</pre>\n</copy-code>`,

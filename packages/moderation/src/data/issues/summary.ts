@@ -10,80 +10,51 @@ import { issueTargets } from './component-builders/targets'
 
 const panelCategory = 'Summary'
 
+export const issueTargetModifySummaryWithOptionalSuggestion = issueTargets.modifySummary(
+	({ getTextValue }) => {
+		const suggestion = getTextValue('summary-suggestion')
+		return suggestion.trim() ? suggestion : undefined
+	},
+)
+
 export const insufficientSummaryIssue = issue({
 	id: 'summary-insufficient',
 	title: 'Insufficient summary',
 	category: panelCategory,
-	actions: [
-		issueTargets.modifySummary(({ getTextValue }) => {
-			const suggestion = getTextValue('summary-suggestion')
-			return suggestion.trim() ? suggestion : undefined
-		}),
-	],
+	actions: [issueTargetModifySummaryWithOptionalSuggestion],
 	suggestedStatus: 'flagged',
 	message: ({ getTextValue }) =>
-		messageWithOptionalSuggestion(
-			insufficient,
-			panelCategory.toLowerCase(),
-			getTextValue('summary-suggestion'),
-		),
+		messageWithOptionalSuggestion(insufficient, panelCategory, getTextValue('summary-suggestion')),
 })
 
 export const summaryFormattingIssue = issue({
 	id: 'summary-formatting',
 	title: 'Invalid summary formatting',
 	category: panelCategory,
-	actions: [
-		issueTargets.modifySummary(({ getTextValue }) => {
-			const suggestion = getTextValue('summary-suggestion')
-			return suggestion.trim() ? suggestion : undefined
-		}),
-	],
+	actions: [issueTargetModifySummaryWithOptionalSuggestion],
 	suggestedStatus: 'flagged',
 	message: ({ getTextValue }) =>
-		messageWithOptionalSuggestion(
-			formatting,
-			panelCategory.toLowerCase(),
-			getTextValue('summary-suggestion'),
-		),
+		messageWithOptionalSuggestion(formatting, panelCategory, getTextValue('summary-suggestion')),
 })
 
 export const nonEnglishSummaryIssue = issue({
 	id: 'summary-non-english',
 	title: 'Non-English summary',
 	category: panelCategory,
-	actions: [
-		issueTargets.modifySummary(({ getTextValue }) => {
-			const suggestion = getTextValue('summary-suggestion')
-			return suggestion.trim() ? suggestion : undefined
-		}),
-	],
+	actions: [issueTargetModifySummaryWithOptionalSuggestion],
 	suggestedStatus: 'flagged',
 	message: ({ getTextValue }) =>
-		messageWithOptionalSuggestion(
-			nonEnglish,
-			panelCategory.toLowerCase(),
-			getTextValue('summary-suggestion'),
-		),
+		messageWithOptionalSuggestion(nonEnglish, panelCategory, getTextValue('summary-suggestion')),
 })
 
 export const summaryRepeatsIpIssue = issue({
 	id: 'summary-repeat-ip',
 	title: 'Summary repeats the server address',
 	category: panelCategory,
-	actions: [
-		issueTargets.modifySummary(({ getTextValue }) => {
-			const suggestion = getTextValue('summary-suggestion')
-			return suggestion.trim() ? suggestion : undefined
-		}),
-	],
+	actions: [issueTargetModifySummaryWithOptionalSuggestion],
 	suggestedStatus: 'flagged',
 	message: ({ getTextValue }) =>
-		messageWithOptionalSuggestion(
-			repeatIp,
-			panelCategory.toLowerCase(),
-			getTextValue('summary-suggestion'),
-		),
+		messageWithOptionalSuggestion(repeatIp, panelCategory, getTextValue('summary-suggestion')),
 })
 
 export const summaryReviewPanel = panel({

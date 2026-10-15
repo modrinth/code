@@ -4,17 +4,15 @@ import inaccurateMessage from '../messages/checklist/messages/tags/inaccurate.md
 import optimizationMisusedMessage from '../messages/checklist/messages/tags/optimization-misused.md'
 import resolutionsMisusedMessage from '../messages/checklist/messages/tags/resolutions-misused.md'
 import { issue, panel, section, select, toggle } from './component-builders/builders'
+import { issueLocation } from './component-builders/locations'
 import { issueTargets } from './component-builders/targets'
 import type { ReviewContext } from './component-builders/types'
 
 const resolutionTags = new Set(['8x-', '16x', '32x', '48x', '64x', '128x', '256x', '512x+'])
 
-function automaticallyRemovedTags({ projectV3, selected }: ReviewContext) {
+function automaticallyRemovedTags({ selected }: ReviewContext) {
 	const tags = new Set<string>()
 	if (selected.toggleIds.includes('categories-optimization-misused')) tags.add('optimization')
-	if (selected.toggleIds.includes('categories-resolutions-misused'))
-		for (const tag of [...projectV3.categories, ...projectV3.additional_categories])
-			if (resolutionTags.has(tag)) tags.add(tag)
 	return [...tags]
 }
 
@@ -31,7 +29,11 @@ export const categoriesInaccurateIssue = issue({
 	id: 'categories-inaccurate',
 	title: 'Inaccurate tags',
 	category: 'Tags',
-	actions: [issueTargets.removeTags(removedTags)],
+	locations: [issueLocation('tags')],
+	actions: (ctx) =>
+		removedTags(ctx).length > 0
+			? [issueTargets.removeTags(removedTags)]
+			: [issueTargets.acknowledge('checkbox')],
 	message: (ctx) => {
 		const tags = removedTags(ctx)
 		return [
@@ -43,7 +45,7 @@ export const categoriesInaccurateIssue = issue({
 				? resolutionsMisusedMessage
 				: '',
 			tags.length
-				? `Please remove the following tags from your project\n\n${tags.map((tag) => `- ${tag}`).join('\n')}`
+				? `Please remove these tags from your project:  \n\n${tags.map((tag) => `- ${tag}`).join('\n')}`
 				: '',
 		]
 			.filter((message) => message.trim())
@@ -73,7 +75,10 @@ export const categoriesReviewPanel = panel({
 		issue: categoriesInaccurateIssue,
 		label: 'Resolutions',
 		id: 'categories-resolutions-misused',
-		shown: ({ projectV3 }) => projectV3.project_types.includes('resourcepack'),
+		shown: ({ projectV3 }) =>
+			projectV3.project_types.includes('resourcepack') &&
+			(projectV3.categories.some((tag) => resolutionTags.has(tag)) ||
+				projectV3.additional_categories.some((tag) => resolutionTags.has(tag))),
 	}),
 	section({
 		shown: ({ selected }) =>
@@ -84,13 +89,23 @@ export const categoriesReviewPanel = panel({
 		select({
 			issue: categoriesInaccurateIssue,
 			id: 'categories-remove-tags',
-			label: 'Remove inaccurate tags',
+			label: ({ selected }) =>
+				selected.toggleIds.includes('categories-optimization-misused')
+					? 'Remove additional inaccurate tags'
+					: 'Remove inaccurate tags',
 			multiple: true,
-			required: (ctx) => automaticallyRemovedTags(ctx).length === 0,
-			options: ({ projectV3 }) =>
-				[...new Set([...projectV3.categories, ...projectV3.additional_categories])].map(
-					(value) => ({ value, label: value }),
-				),
+			options: (ctx) => {
+				let opts = [
+					...new Set([...ctx.projectV3.categories, ...ctx.projectV3.additional_categories]),
+				].map((value) => ({
+					value,
+					label: value,
+				}))
+
+				if (ctx.selected.toggleIds.includes('categories-optimization-misused'))
+					opts = opts.filter((opt) => opt.value !== 'optimization')
+				return opts
+			},
 		}),
 	),
 )

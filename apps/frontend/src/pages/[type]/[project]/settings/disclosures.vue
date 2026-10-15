@@ -12,6 +12,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { isAdmin, isStaff, TeamMemberPermission } from '@modrinth/utils'
+import { useQueryClient } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
 import ProjectIssueCard from '~/components/ui/project-issue-card/index.vue'
@@ -26,8 +27,10 @@ const {
 	projectV3,
 	currentMember,
 	refreshProjectValidation,
+	thread,
 } = injectProjectPageContext()
 const flags = useFeatureFlags()
+const queryClient = useQueryClient()
 const editor = useDisclosureEditor({
 	projectId: computed(() => project.value.id),
 	projectTypes: computed(() => projectV3.value?.project_types ?? [project.value.project_type]),
@@ -43,7 +46,14 @@ const editor = useDisclosureEditor({
 		() => isStaff(currentMember.value?.user) && !flags.value.showModeratorProjectMemberUi,
 	),
 	isAdminUser: computed(() => isAdmin(currentMember.value?.user)),
-	onSaved: refreshProjectValidation,
+	onSaved: async () => {
+		await Promise.all([
+			refreshProjectValidation(),
+			thread.value
+				? queryClient.invalidateQueries({ queryKey: ['thread', thread.value.id] })
+				: Promise.resolve(),
+		])
+	},
 })
 useProjectSettingsHeadTitle(editor.messages.title)
 const disclosureTextValidation = useProjectNagMessages('disclosure-text')
@@ -63,6 +73,7 @@ const {
 	canEditDisclosures,
 	disclosuresQuery,
 	saveError,
+	issueAction,
 } = editor
 const { isPending, isError, refetch } = disclosuresQuery
 </script>
@@ -70,7 +81,17 @@ const { isPending, isError, refetch } = disclosuresQuery
 <template>
 	<div>
 		<ConfirmLeaveModal ref="confirmLeaveModal" />
-		<ProjectIssueCard location="disclosures" class="mb-4" />
+		<ProjectIssueCard
+			location="disclosures"
+			:field-action="issueAction"
+			:target="[
+				'add_project_disclosures',
+				'remove_project_disclosures',
+				'modify_project_disclosure',
+				'modify_project_disclosure_note',
+			]"
+			class="mb-4"
+		/>
 		<h2 class="m-0 text-2xl font-semibold">{{ formatMessage(messages.title) }}</h2>
 		<p class="mb-0 mt-2">
 			<IntlFormatted :message-id="messages.description">

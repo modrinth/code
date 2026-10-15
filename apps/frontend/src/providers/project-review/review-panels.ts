@@ -167,6 +167,8 @@ export function createReviewPanels(
 		Pick<
 			ReviewContext,
 			| 'projectV2'
+			| 'versionsV3'
+			| 'versionsV2'
 			| 'disclosures'
 			| 'members'
 			| 'organization'

@@ -34,6 +34,16 @@
 						aria-hidden="true"
 					/>
 				</button>
+				<button
+					v-if="detachedTabs.length"
+					v-tooltip="{ text: formatMessage(messages.closeExternalPanels), delay: 500 }"
+					type="button"
+					class="queue-action"
+					:aria-label="formatMessage(messages.closeExternalPanels)"
+					@click="closeExternalPanels"
+				>
+					<MonitorXIcon aria-hidden="true" />
+				</button>
 				<span
 					>{{ formatMessage(messages.complete) }}
 					<span class="ml-1 tabular-nums text-primary">{{
@@ -87,6 +97,7 @@
 import {
 	KeyboardIcon,
 	LeftArrowIcon,
+	MonitorXIcon,
 	PanelTopCloseIcon,
 	PanelTopOpenIcon,
 	RightArrowIcon,
@@ -118,7 +129,8 @@ const settingsTabs: TabbedModalTab[] = [
 ]
 
 const { queue, isLoading, navigation } = injectProjectReviewPageContext()
-const { bottomVisible, toggleToolsPanel } = injectProjectReviewContext()
+const { bottomVisible, toggleToolsPanel, detachedTabs, closeExternalPanels } =
+	injectProjectReviewContext()
 const {
 	busy,
 	error: navigationError,

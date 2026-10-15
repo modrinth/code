@@ -8,6 +8,7 @@ import showcaseClarityMessage from '../messages/checklist/messages/gallery/showc
 import { issue, panel, toggle } from './component-builders/builders'
 import { issueLocation } from './component-builders/locations'
 import { IssuePriority } from './component-builders/priority'
+import { issueTargets } from './component-builders/targets'
 import { rulesAiImagesIssue } from './rules'
 
 const escapeHtml = md().utils.escapeHtml
@@ -16,12 +17,7 @@ export const galleryInsufficientIssue = issue({
 	id: 'gallery-insufficient',
 	title: 'Insufficient gallery images',
 	category: 'Gallery',
-	actions: [
-		({ projectV3 }) => ({
-			type: 'add_gallery_images',
-			value: { original_count: projectV3.gallery.length },
-		}),
-	],
+	actions: [issueTargets.addGalleryImages()],
 	message: insufficientMessage,
 	suggestedStatus: 'flagged',
 	priority: IssuePriority.Rules + 1,

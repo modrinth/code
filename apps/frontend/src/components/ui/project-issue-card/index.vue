@@ -9,7 +9,7 @@
 			:key="issue.id"
 			class="min-w-0 rounded-2xl border border-solid"
 			:class="[
-				threadHistory ? 'p-2.5 py-3 pr-1.5' : 'p-4',
+				threadHistory ? 'pl-2.5 pr-1.5' : 'px-4 pb-1',
 				threadHistory ? 'text-primary' : 'text-contrast',
 				threadHistory
 					? 'border-surface-5 bg-surface-2'
@@ -17,8 +17,19 @@
 						? 'border-brand-green bg-bg-green'
 						: 'border-brand-orange bg-bg-orange',
 			]"
+			@click.self="toggle(issue)"
 		>
-			<div class="flex flex-wrap items-start justify-between gap-1">
+			<div
+				class="flex cursor-pointer flex-wrap items-start justify-between gap-1"
+				:class="threadHistory ? 'py-3' : 'pb-3 pt-4'"
+				role="button"
+				tabindex="0"
+				:aria-expanded="isExpanded(issue)"
+				:aria-controls="issueContentId(issue)"
+				@click="toggle(issue)"
+				@keydown.enter.self.prevent="toggle(issue)"
+				@keydown.space.self.prevent="toggle(issue)"
+			>
 				<h2
 					class="m-0 flex min-w-0 flex-1 basis-[150px] flex-wrap items-start text-inherit"
 					:class="threadHistory ? 'gap-1.5' : '!mt-[3px] gap-2'"
@@ -41,45 +52,23 @@
 						>{{ issueTitle(issue) }}</span
 					>
 				</h2>
-				<Button
-					v-if="threadHistory || isComplete(issue)"
-					class="ml-auto max-w-full shrink-0 !whitespace-normal !text-inherit"
-					:class="threadHistory ? '-my-1.5 aspect-square' : ''"
-					:circular="threadHistory"
-					type="quiet"
-					size="sm"
-					:aria-expanded="isExpanded(issue)"
-					:aria-controls="issueContentId(issue)"
-					@click="toggle(issue.id)"
-				>
-					<FoldVerticalIcon v-if="isExpanded(issue)" aria-hidden="true" />
-					<UnfoldVerticalIcon v-else aria-hidden="true" />
-					<template v-if="!threadHistory">
-						{{
-							formatMessage(
-								issue.verdict === 'resolved'
-									? isExpanded(issue)
-										? messages.hideResolved
-										: messages.showResolved
-									: isExpanded(issue)
-										? messages.hideAddressed
-										: messages.showAddressed,
-							)
-						}}
-					</template>
-				</Button>
-				<TeleportOverflowMenu
-					v-if="isStaff(auth.user)"
-					:label="formatMessage(messages.issueOptions)"
-					:options="moderatorOptions(issue)"
-					:disabled="verifyMutation.isPending.value"
-					class="shrink-0 !text-inherit"
-					:class="threadHistory ? '-my-1.5' : ''"
-					type="quiet"
-					size="sm"
-				>
-					<MoreHorizontalIcon aria-hidden="true" />
-				</TeleportOverflowMenu>
+				<DropdownIcon
+					class="ml-auto mr-1.5 size-5 shrink-0 self-center transition-transform duration-300"
+					:class="{ 'rotate-180': isExpanded(issue) }"
+					aria-hidden="true"
+				/>
+				<div v-if="isStaff(auth.user)" class="shrink-0 cursor-default" @click.stop>
+					<TeleportOverflowMenu
+						:label="formatMessage(messages.issueOptions)"
+						:options="moderatorOptions(issue)"
+						:disabled="verifyMutation.isPending.value"
+						class="!text-inherit"
+						:class="threadHistory ? '!-my-1.5' : '!-my-1'"
+						type="quiet"
+					>
+						<MoreHorizontalIcon aria-hidden="true" />
+					</TeleportOverflowMenu>
+				</div>
 			</div>
 			<div
 				:id="issueContentId(issue)"
@@ -88,7 +77,7 @@
 				@transitionend.self="onContentTransitionEnd($event, issue)"
 			>
 				<div :inert="!isExpanded(issue)" class="min-w-0">
-					<div class="flex flex-col gap-3 pt-3">
+					<div class="flex flex-col gap-3 pb-3">
 						<IssueMessage
 							v-if="issueMessage(issue)"
 							class="markdown-body min-w-0 text-sm text-inherit"
@@ -98,8 +87,7 @@
 							v-if="
 								!threadHistory &&
 								!isComplete(issue) &&
-								((showProjectAreaLink && issueActions(issue).length) ||
-									addressableFacets(issue).length)
+								((showProjectAreaLink && issueActions(issue).length) || showAddressActions(issue))
 							"
 							class="flex w-full flex-wrap items-center justify-between gap-3"
 						>
@@ -131,7 +119,8 @@
 									v-if="issueActions(issue).length > 2"
 									:label="formatMessage(messages.moreActions)"
 									:options="overflowOptions(issue)"
-									type="outlined"
+									type="colored"
+									color="orange"
 									:icon-only="false"
 									:tooltip="
 										issueActions(issue)
@@ -141,10 +130,14 @@
 									"
 								>
 									+{{ issueActions(issue).length - 2 }}
+									<template v-for="option in overflowOptions(issue)" :key="option.id" #[option.id]>
+										<span class="flex-1">{{ option.label }}</span>
+										<component :is="option.icon" aria-hidden="true" />
+									</template>
 								</TeleportOverflowMenu>
 							</div>
 							<div
-								v-if="addressableFacets(issue).length"
+								v-if="showAddressActions(issue)"
 								class="ml-auto flex flex-wrap justify-end gap-2"
 							>
 								<ButtonLink
@@ -157,11 +150,25 @@
 								</ButtonLink>
 								<Tooltip
 									v-else
-									:disabled="facetsToAddress(issue).length > 0 || isAddressed(issue)"
-									:text="formatMessage(messages.changeFacetFirst)"
+									:disabled="facetsToAddress(issue).length > 0 && !isFieldAddressed(issue)"
+									:text="
+										isFieldAddressed(issue)
+											? formatMessage(messages.addressedProgressTooltip, {
+													completed: issue.facets.filter((facet) => facet.verdict !== 'open')
+														.length,
+													total: issue.facets.length,
+												})
+											: formatMessage(messages.changeFacetFirst)
+									"
 								>
+									<TagItem
+										v-if="isFieldAddressed(issue)"
+										class="!border-surface-4 !bg-surface-3 !px-2.5 !py-1 !text-sm !font-medium !text-primary"
+									>
+										{{ addressButtonLabel(issue) }}
+									</TagItem>
 									<Button
-										v-if="!isComplete(issue)"
+										v-else-if="!isComplete(issue)"
 										:loading="
 											addressMutation.isPending.value &&
 											addressMutation.variables.value?.issueId === issue.id
@@ -185,19 +192,7 @@
 										"
 									>
 										<CheckIcon class="size-4" aria-hidden="true" />
-										{{
-											formatMessage(
-												addressableFacets(issue).every((facet) => facet.verdict !== 'open')
-													? messages.addressed
-													: addressableFacets(issue).every(
-																(facet) =>
-																	facet.what.type === 'acknowledge' &&
-																	facet.what.value.mode === 'checkbox',
-														  )
-														? issueTargetLabels.acknowledge
-														: messages.markAddressed,
-											)
-										}}
+										{{ addressButtonLabel(issue) }}
 									</Button>
 								</Tooltip>
 							</div>
@@ -210,16 +205,15 @@
 </template>
 
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
+import { type Labrinth, ModrinthServerError } from '@modrinth/api-client'
 import {
 	CheckCircleIcon,
 	CheckIcon,
 	ChevronRightIcon,
 	CircleIcon,
-	FoldVerticalIcon,
+	DropdownIcon,
 	MessageSquareWarningIcon,
 	MoreHorizontalIcon,
-	UnfoldVerticalIcon,
 	XCircleIcon,
 } from '@modrinth/assets'
 import { IssuePriority, reviewPanels } from '@modrinth/moderation/src/data/issues'
@@ -235,21 +229,27 @@ import type {
 import {
 	Button,
 	ButtonLink,
+	type ButtonMenuLink,
 	type ButtonMenuOption,
 	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
+	TagItem,
 	TeleportOverflowMenu,
 	Tooltip,
 	useVIntl,
 } from '@modrinth/ui'
 import { isStaff } from '@modrinth/utils'
-import { useMutation, useQueryClient } from '@tanstack/vue-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, reactive, watch } from 'vue'
 
 import type { ProjectIssueFieldAction } from '~/composables/project-issue-field-action'
-import { isThreadIssueFacetReadyToAddress, isThreadIssueVerified } from '~/helpers/thread-issues'
+import {
+	isThreadIssueFacetReadyToAddress,
+	isThreadIssueVerified,
+	threadIssueVerdict,
+} from '~/helpers/thread-issues'
 
 import FilledCheckIcon from './filled-check-icon.vue'
 import IssueMessage from './issue-message.vue'
@@ -271,6 +271,7 @@ const props = defineProps<{
 	teamId?: string
 	disclosureType?: string
 	threadHistory?: boolean
+	defaultCollapsed?: boolean
 	fieldAction?: ProjectIssueFieldAction
 }>()
 
@@ -292,11 +293,31 @@ function requireProjectContext() {
 
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
+const disclosuresQuery = useQuery({
+	queryKey: computed(
+		() => ['project', 'disclosures', 'v3', projectContext?.projectV2.value.id] as const,
+	),
+	queryFn: () => client.labrinth.projects_v3.getDisclosures(project.value.id),
+	enabled: computed(
+		() =>
+			!!projectContext &&
+			(props.issues ?? thread.value?.issues ?? []).some((issue) =>
+				issue.facets.some(({ what }) =>
+					[
+						'add_project_disclosures',
+						'remove_project_disclosures',
+						'modify_project_disclosure',
+						'modify_project_disclosure_note',
+					].includes(what.type),
+				),
+			),
+	),
+})
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const auth = useAuthState()
 const canAddress = computed(() => !!currentMember.value?.accepted)
-const expandedAddressed = reactive(new Set<string>())
+const expandedIssues = reactive(new Map<string, boolean>())
 const finishedExpanding = reactive(new Set<string>())
 const messages = defineMessages({
 	issueOptions: {
@@ -325,9 +346,30 @@ const messages = defineMessages({
 		id: 'thread-issues.mark-addressed',
 		defaultMessage: 'Mark as addressed',
 	},
+	markAddressedProgress: {
+		id: 'thread-issues.mark-addressed-progress',
+		defaultMessage: 'Mark as addressed {completed, number}/{total, number}',
+	},
+	addressedProgress: {
+		id: 'thread-issues.addressed-progress',
+		defaultMessage: '{completed, number} of {total, number} addressed',
+	},
+	addressedProgressTooltip: {
+		id: 'thread-issues.addressed-progress-tooltip',
+		defaultMessage: '{completed, number}/{total, number} parts have been addressed for this issue',
+	},
 	addressFailed: {
 		id: 'thread-issues.address-failed',
 		defaultMessage: 'Failed to mark issue as addressed',
+	},
+	addressSaveFailed: {
+		id: 'thread-issues.address-save-failed',
+		defaultMessage:
+			'Your changes could not be saved. Fix the validation errors before marking this issue as addressed.',
+	},
+	addressRequirementsUnchanged: {
+		id: 'thread-issues.address-requirements-unchanged',
+		defaultMessage: 'Make the requested changes before marking this issue as addressed.',
 	},
 	addressed: {
 		id: 'thread-issues.addressed',
@@ -377,7 +419,6 @@ const addressMutation = useMutation({
 	mutationFn: async ({
 		facets,
 		saveField,
-		projectId,
 	}: {
 		issueId: string
 		facets: Labrinth.Threads.v3.ThreadIssueFacet[]
@@ -385,15 +426,11 @@ const addressMutation = useMutation({
 		threadId?: string
 		projectId: string
 	}) => {
-		if (saveField && !(await saveField())) return
-		const savedProject = saveField
-			? await client.labrinth.projects_v3.get(projectId)
-			: projectV3.value
-		const eligibleFacets = facets.filter(
-			(facet) => isStaff(auth.value.user) || isFacetReadyToAddress(facet, savedProject),
-		)
+		if (saveField && !(await saveField())) {
+			throw new Error(formatMessage(messages.addressSaveFailed))
+		}
 		const results = await Promise.allSettled(
-			eligibleFacets.map(({ id }) => client.labrinth.threads_v3.user_addressed(id)),
+			facets.map(({ id }) => client.labrinth.threads_v3.user_addressed(id)),
 		)
 		const failure = results.find((result) => result.status === 'rejected')
 		if (failure?.status === 'rejected') throw failure.reason
@@ -413,7 +450,14 @@ const addressMutation = useMutation({
 	onError: (error) =>
 		addNotification({
 			title: formatMessage(messages.addressFailed),
-			text: error instanceof Error ? error.message : String(error),
+			text:
+				error instanceof ModrinthServerError &&
+				error.message ===
+					'moderation issue requirements must be changed before addressing the issue'
+					? formatMessage(messages.addressRequirementsUnchanged)
+					: error instanceof Error
+						? error.message
+						: String(error),
 			type: 'error',
 		}),
 })
@@ -468,7 +512,7 @@ const verifyMutation = useMutation({
 })
 
 function moderatorOptions(issue: ThreadIssue): ButtonMenuOption[] {
-	const resolved = issue.verdict === 'resolved' || isThreadIssueVerified(issue)
+	const resolved = threadIssueVerdict(issue) === 'resolved' || isThreadIssueVerified(issue)
 	return [
 		{
 			id: 'moderator-verified',
@@ -595,7 +639,7 @@ watch(
 		const previousStates = new Map(previousIssues)
 		for (const [id, complete] of issues) {
 			if (previousStates.get(id) !== complete) {
-				expandedAddressed.delete(id)
+				expandedIssues.delete(id)
 				finishedExpanding.delete(id)
 			}
 		}
@@ -675,13 +719,46 @@ function visibleFacets(issue: ThreadIssue): Labrinth.Threads.v3.ThreadIssueFacet
 	)
 }
 
+function showAddressActions(issue: ThreadIssue): boolean {
+	return (
+		(!props.showProjectAreaLink || !readIssueLocations(issueDetails(issue).locations).length) &&
+		addressableFacets(issue).length > 0
+	)
+}
+
 function addressableFacets(issue: ThreadIssue): Labrinth.Threads.v3.ThreadIssueFacet[] {
 	return issue.facets.filter(
 		(facet) =>
-			facet.verdict !== 'resolved' &&
+			(issue.facets.length > 1 || facet.verdict !== 'resolved') &&
 			(facet.what.type === 'acknowledge' ||
 				facet.what.type === 'mark_addressed' ||
 				matchesTarget(facet.what)),
+	)
+}
+
+function isFieldAddressed(issue: ThreadIssue): boolean {
+	return addressableFacets(issue).every((facet) => facet.verdict !== 'open')
+}
+
+function addressButtonLabel(issue: ThreadIssue): string {
+	const facets = addressableFacets(issue)
+	if (issue.facets.length > 1) {
+		return formatMessage(
+			isFieldAddressed(issue) ? messages.addressedProgress : messages.markAddressedProgress,
+			{
+				completed: issue.facets.filter((facet) => facet.verdict !== 'open').length,
+				total: issue.facets.length,
+			},
+		)
+	}
+	return formatMessage(
+		isFieldAddressed(issue)
+			? messages.addressed
+			: facets.every(
+						(facet) => facet.what.type === 'acknowledge' && facet.what.value.mode === 'checkbox',
+				  )
+				? issueTargetLabels.acknowledge
+				: messages.markAddressed,
 	)
 }
 
@@ -689,11 +766,10 @@ function facetsToAddress(issue: ThreadIssue): Labrinth.Threads.v3.ThreadIssueFac
 	return addressableFacets(issue).filter(
 		(facet) =>
 			facet.verdict === 'open' &&
-			(isFacetReadyToAddress(
+			isFacetReadyToAddress(
 				facet,
 				props.fieldAction ? { ...projectV3.value, ...props.fieldAction.draft } : projectV3.value,
-			) ||
-				isStaff(auth.value.user)),
+			),
 	)
 }
 
@@ -732,10 +808,16 @@ function isFacetReadyToAddress(
 			},
 		}
 	}
-	return isThreadIssueFacetReadyToAddress(facet, current, allMembers.value)
+	return isThreadIssueFacetReadyToAddress(
+		facet,
+		current,
+		allMembers.value,
+		props.fieldAction?.disclosures ??
+			(disclosuresQuery.isSuccess.value ? disclosuresQuery.data.value?.disclosures : undefined),
+	)
 }
 
-function overflowOptions(issue: ThreadIssue): ButtonMenuOption[] {
+function overflowOptions(issue: ThreadIssue): ButtonMenuLink[] {
 	return issueActions(issue)
 		.slice(2)
 		.map((action) => ({
@@ -772,11 +854,11 @@ function targetButtonLabel(target: Target): string {
 }
 
 function isAddressed(issue: ThreadIssue): boolean {
-	return issue.verdict === 'addressed'
+	return threadIssueVerdict(issue) === 'addressed'
 }
 
 function isComplete(issue: ThreadIssue): boolean {
-	return isAddressed(issue) || issue.verdict === 'resolved'
+	return isAddressed(issue) || threadIssueVerdict(issue) === 'resolved'
 }
 
 function issueContentId(issue: ThreadIssue): string {
@@ -784,11 +866,14 @@ function issueContentId(issue: ThreadIssue): string {
 }
 
 function isExpanded(issue: ThreadIssue): boolean {
-	return (!props.threadHistory && !isComplete(issue)) || expandedAddressed.has(issue.id)
+	return (
+		expandedIssues.get(issue.id) ??
+		(!props.threadHistory && !props.defaultCollapsed && !isComplete(issue))
+	)
 }
 
 function isFullyExpanded(issue: ThreadIssue): boolean {
-	return (!props.threadHistory && !isComplete(issue)) || finishedExpanding.has(issue.id)
+	return isExpanded(issue) && (!expandedIssues.has(issue.id) || finishedExpanding.has(issue.id))
 }
 
 function onContentTransitionEnd(event: TransitionEvent, issue: ThreadIssue) {
@@ -797,10 +882,9 @@ function onContentTransitionEnd(event: TransitionEvent, issue: ThreadIssue) {
 	}
 }
 
-function toggle(id: string) {
-	finishedExpanding.delete(id)
-	if (expandedAddressed.has(id)) expandedAddressed.delete(id)
-	else expandedAddressed.add(id)
+function toggle(issue: ThreadIssue) {
+	finishedExpanding.delete(issue.id)
+	expandedIssues.set(issue.id, !isExpanded(issue))
 }
 </script>
 

@@ -4,6 +4,14 @@ export function isThreadIssueVerified(issue: Labrinth.Threads.v3.ThreadIssue): b
 	return issue.facets.length > 0 && issue.facets.every((facet) => facet.moderator_verified)
 }
 
+export function threadIssueVerdict(
+	issue: Labrinth.Threads.v3.ThreadIssue,
+): Labrinth.Threads.v3.ThreadIssueVerdict {
+	if (!issue.facets.length) return issue.verdict
+	if (issue.facets.some((facet) => facet.verdict === 'open')) return 'open'
+	return issue.facets.every((facet) => facet.verdict === 'resolved') ? 'resolved' : 'addressed'
+}
+
 export function isThreadIssueStatusChange(
 	body: Labrinth.Threads.v3.MessageBody,
 ): body is Extract<Labrinth.Threads.v3.MessageBody, { type: 'status_change' | 'auto_approval' }> {
@@ -55,6 +63,7 @@ export function isThreadIssueFacetReadyToAddress(
 	facet: Labrinth.Threads.v3.ThreadIssueFacet,
 	current: Labrinth.Projects.v3.Project | undefined,
 	members: Labrinth.Projects.v3.TeamMember[],
+	disclosures?: (Labrinth.Projects.v3.ProjectDisclosure & { deleted_at?: string | null })[],
 ): boolean {
 	if (facet.verdict !== 'open') return true
 	const target = facet.what
@@ -88,15 +97,66 @@ export function isThreadIssueFacetReadyToAddress(
 				)
 			)
 		case 'add_gallery_images':
-			return current.gallery.length > target.value.original_count
+			return current.gallery.some(
+				(image) => image.id !== undefined && !target.value.original_image_ids.includes(image.id),
+			)
 		case 'remove_tags':
 			return target.value.tags.every(
 				(tag) => !current.categories.includes(tag) && !current.additional_categories.includes(tag),
 			)
 		case 'remove_gallery_images':
 			return target.value.image_ids.every((id) => !current.gallery.some((image) => image.id === id))
+		case 'add_project_disclosures':
+			return (
+				disclosures !== undefined &&
+				target.value.disclosure_types.length > 0 &&
+				target.value.disclosure_types.every((type) =>
+					disclosures.some((disclosure) => disclosure.type === type && !disclosure.deleted_at),
+				)
+			)
 		case 'remove_project_disclosures':
-			return false
+			return (
+				disclosures !== undefined &&
+				target.value.disclosure_types.length > 0 &&
+				target.value.disclosure_types.every(
+					(type) =>
+						!disclosures.some((disclosure) => disclosure.type === type && !disclosure.deleted_at),
+				)
+			)
+		case 'modify_project_disclosure': {
+			const disclosure = disclosures?.find(
+				(disclosure) =>
+					disclosure.type === target.value.disclosure_type && !disclosure.deleted_at,
+			)
+			if (!disclosure) return false
+			const metadata = Object.fromEntries(
+				Object.entries(disclosure).filter(
+					([key]) =>
+						![
+							'type',
+							'set_by_moderator',
+							'lock_status',
+							'updated_at',
+							'updated_by',
+							'deleted_at',
+						].includes(key),
+				),
+			)
+			return (
+				JSON.stringify(normalizeDisclosureMetadata(metadata)) !==
+				JSON.stringify(normalizeDisclosureMetadata(target.value.metadata.original))
+			)
+		}
+		case 'modify_project_disclosure_note': {
+			const disclosure = disclosures?.find(
+				(disclosure) =>
+					disclosure.type === target.value.disclosure_type && !disclosure.deleted_at,
+			)
+			return (
+				disclosure !== undefined &&
+				('note' in disclosure ? (disclosure.note ?? '') : '') !== (target.value.note.original ?? '')
+			)
+		}
 		case 'version':
 			return !['remove', 'remove_additional_files'].includes(target.value.target.type)
 		case 'modify_gallery_image': {
@@ -129,4 +189,17 @@ export function isThreadIssueFacetReadyToAddress(
 		default:
 			return true
 	}
+}
+
+function normalizeDisclosureMetadata(value: unknown): unknown {
+	if (Array.isArray(value)) return value.map(normalizeDisclosureMetadata)
+	if (value !== null && typeof value === 'object') {
+		return Object.fromEntries(
+			Object.entries(value)
+				.filter(([key, entry]) => entry != null && !(key === 'note' && entry === ''))
+				.sort(([left], [right]) => left.localeCompare(right))
+				.map(([key, entry]) => [key, normalizeDisclosureMetadata(entry)]),
+		)
+	}
+	return value
 }

@@ -138,7 +138,11 @@
 						class="mt-2"
 					/>
 					<ValidationMessage :check="saveValidation.forField('icon')" class="mt-2" />
-					<ProjectIssueCard :target="['modify_icon', 'remove_icon']" class="mt-2" />
+					<ProjectIssueCard
+						:target="['modify_icon', 'remove_icon']"
+						:field-action="iconIssueAction"
+						class="mt-2"
+					/>
 				</div>
 
 				<!-- Server Project Settings -->
@@ -621,6 +625,33 @@ const nameIssueAction = useTextIssueAction('name', name)
 const slugIssueAction = useTextIssueAction('slug', slug)
 const summaryIssueAction = useTextIssueAction('summary', summary)
 
+const iconIssueAction = useProjectIssueFieldAction({
+	draft: () => ({
+		icon_url: deletedIcon.value ? null : (previewImage.value ?? project.value.icon_url),
+	}),
+	canSave: () =>
+		hasPermission.value &&
+		!saveValidation.forField('icon').some((message) => message.severity === 'error'),
+	saving,
+	validation: saveValidation,
+	save: saveIconChanges,
+})
+
+async function saveIconChanges() {
+	if (deletedIcon.value) {
+		await deleteIcon()
+		deletedIcon.value = false
+	} else if (icon.value) {
+		const submittedIcon = icon.value
+		if ((await patchIcon(submittedIcon)) === false) return false
+		if (icon.value === submittedIcon) {
+			icon.value = null
+			previewImage.value = null
+		}
+	}
+	return true
+}
+
 async function handleSave() {
 	if (!canSave.value || saving.value) return
 	summary.value = summary.value.trim()
@@ -633,13 +664,7 @@ async function handleSave() {
 			await patchProjectV3(basePatchData.value, false, true)
 		}
 
-		if (deletedIcon.value) {
-			await deleteIcon()
-			deletedIcon.value = false
-		} else if (icon.value) {
-			await patchIcon(icon.value)
-			icon.value = null
-		}
+		if (!(await saveIconChanges())) return
 
 		if (deletedBanner.value) {
 			await deleteBanner()

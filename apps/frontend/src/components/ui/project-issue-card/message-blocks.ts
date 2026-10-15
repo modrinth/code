@@ -7,7 +7,7 @@ export type IssueMessageBlock =
 	| { type: 'copy'; text: string }
 	| { type: 'images'; images: ImageViewerEditorItem[] }
 
-/** Parses the two supported message blocks without interpreting code examples as components. */
+/** Parses message blocks without interpreting code examples as components. */
 export function parseIssueMessage(message: string, highlighted = false): IssueMessageBlock[] {
 	const markdown = md({
 		highlight: (text: string, language: string) =>
@@ -16,6 +16,23 @@ export function parseIssueMessage(message: string, highlighted = false): IssueMe
 				: '',
 	})
 	const decode = (value: string) => markdown.utils.unescapeAll(value.replaceAll('\\', '&#92;'))
+	markdown.inline.ruler.before('html_inline', 'issue_inline_copy', (state, silent) => {
+		const opening = '<inline-copy-code>'
+		const closing = '</inline-copy-code>'
+		if (!state.src.startsWith(opening, state.pos)) return false
+		const end = state.src.indexOf(closing, state.pos + opening.length)
+		if (end === -1) return false
+		const content = state.src.slice(state.pos + opening.length, end)
+		if (content.includes('\n')) return false
+		if (!silent) {
+			const token = state.push('issue_inline_copy', '', 0)
+			token.content = decode(content)
+		}
+		state.pos = end + closing.length
+		return true
+	})
+	markdown.renderer.rules.issue_inline_copy = (tokens, index) =>
+		`<inline-copy-code>${markdown.utils.escapeHtml(tokens[index].content)}</inline-copy-code>`
 	markdown.block.ruler.before(
 		'html_block',
 		'issue_message_block',

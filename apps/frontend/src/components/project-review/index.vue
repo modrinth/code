@@ -103,7 +103,6 @@ import {
 	Tooltip,
 	useVIntl,
 } from '@modrinth/ui'
-import { useEventListener } from '@vueuse/core'
 import { computed, onScopeDispose, ref, watch } from 'vue'
 
 import { useModerationKeybinds } from '~/composables/moderation'
@@ -159,6 +158,8 @@ const {
 	projectId,
 	project,
 	projectV2,
+	versions,
+	versionsV2,
 	disclosures,
 	members,
 	organization,
@@ -188,6 +189,8 @@ const panels = provideReviewPanels(
 		session,
 		computed(() => ({
 			projectV2: projectV2.value,
+			versionsV3: versions.value,
+			versionsV2: versionsV2.value,
 			disclosures: disclosures.disclosuresQuery.data.value?.disclosures ?? [],
 			members: members.value,
 			organization: organization.value,
@@ -222,11 +225,7 @@ const issueCount = computed(() => {
 	)
 })
 const reviewContext = provideReviewContext(
-	createReviewContext(
-		reviewProjectId,
-		(target) => !!panels.resolve(target),
-		shortcuts.keyboardFocusedElement,
-	),
+	createReviewContext(reviewProjectId, (target) => !!panels.resolve(target), shortcuts),
 )
 const { pending, loadingAction } = provideReviewSubmission(
 	createReviewSubmission(messages, panels, session, previousIssues),
@@ -366,7 +365,7 @@ useShortcut(
 	() => hasPreviousIssues.value,
 )
 
-useEventListener('keydown', (event) => {
+shortcuts.listen('keydown', (event) => {
 	if (!isStaff(auth.value.user) || reviewShortcutBlocked(event)) return
 	keybinds.value.handle(event, { scope: 'review-actions', ...shortcuts })
 })

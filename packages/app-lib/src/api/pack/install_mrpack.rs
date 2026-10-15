@@ -1309,6 +1309,47 @@ fn modpack_source_kind(version_id: Option<&str>) -> ContentSourceKind {
     }
 }
 
+/// Instance-relative paths installing or removing this pack can write: its
+/// manifest files, its overrides and the instance icon.
+pub(crate) async fn mrpack_instance_paths(
+    mrpack_file: &CreatePackFile,
+) -> crate::Result<Vec<String>> {
+    let mut zip_reader = MrpackZipReader::new(mrpack_file).await?;
+    let Some(manifest_idx) = zip_reader.file().entries().iter().position(|f| {
+        matches!(f.filename().as_str(), Ok("modrinth.index.json"))
+    }) else {
+        return Err(crate::Error::from(crate::ErrorKind::InputError(
+            "No pack manifest found in mrpack".to_string(),
+        )));
+    };
+    let manifest = zip_reader.read_entry_to_string(manifest_idx).await?;
+    let pack: PackFormat = serde_json::from_str(&manifest)?;
+
+    let mut paths = vec!["icon.png".to_string()];
+    paths.extend(pack.files.iter().map(|file| file.path.to_string()));
+    for entry in zip_reader.file().entries() {
+        let Ok(filename) = entry.filename().as_str() else {
+            continue;
+        };
+        if filename.ends_with('/') {
+            continue;
+        }
+        let Some(relative) = filename
+            .strip_prefix("overrides/")
+            .or_else(|| filename.strip_prefix("client-overrides/"))
+        else {
+            continue;
+        };
+        if let Ok(relative) =
+            SafeRelativeUtf8UnixPathBuf::try_from(relative.to_string())
+        {
+            paths.push(relative.to_string());
+        }
+    }
+
+    Ok(paths)
+}
+
 #[tracing::instrument(skip(mrpack_file))]
 
 pub async fn remove_all_related_files(

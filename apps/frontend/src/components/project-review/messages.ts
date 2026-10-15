@@ -1,6 +1,22 @@
 import { defineMessages } from '@modrinth/ui'
 
 export const projectReviewMessages = defineMessages({
+	popoutPanel: {
+		id: 'moderation.project-review.popoutPanel',
+		defaultMessage: 'Open panel in its own window',
+	},
+	closeExternalPanels: {
+		id: 'moderation.project-review.closeExternalPanels',
+		defaultMessage: 'Close all popped out panels',
+	},
+	dockPanel: {
+		id: 'moderation.project-review.dockPanel',
+		defaultMessage: 'Return panel to workspace',
+	},
+	popoutFailed: {
+		id: 'moderation.project-review.popoutFailed',
+		defaultMessage: 'Could not open the panel window. Allow popups for this site and try again.',
+	},
 	generalSettings: {
 		id: 'moderation.project-review.generalSettings',
 		defaultMessage: 'General',
@@ -193,6 +209,10 @@ export const projectReviewMessages = defineMessages({
 	slug: {
 		id: 'moderation.project-review.slug',
 		defaultMessage: 'Slug',
+	},
+	slugNotSuggested: {
+		id: 'moderation.project-review.slugNotSuggested',
+		defaultMessage: 'This slug does not match any of the suggested slugs.',
 	},
 	icon: {
 		id: 'moderation.project-review.icon',
@@ -651,7 +671,7 @@ export const projectReviewMessages = defineMessages({
 	},
 	scanAi: {
 		id: 'moderation.project-review.scanAi',
-		defaultMessage: 'Scan for AI-generated images',
+		defaultMessage: 'Scan for AI-generated images using C2PA info',
 	},
 	dependencies: {
 		id: 'moderation.project-review.dependencies',

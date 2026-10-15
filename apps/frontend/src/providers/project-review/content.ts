@@ -12,6 +12,12 @@ import { projectQueryOptions } from '~/composables/queries/project'
 export function useReviewContent(projectId: Ref<string>) {
 	const client = injectModrinthClient()
 	const queryClient = useQueryClient()
+	const versionsV2Query = useQuery(
+		computed(() => ({
+			...projectQueryOptions.versionsV2(projectId.value, client),
+			enabled: !!projectId.value,
+		})),
+	)
 	const versionsQuery = useQuery(
 		computed(() => ({
 			...projectQueryOptions.versionsV3(projectId.value, client),
@@ -63,6 +69,12 @@ export function useReviewContent(projectId: Ref<string>) {
 	}
 
 	return {
+		versionsV2Query,
+		versionsV2: computed(() =>
+			(versionsV2Query.data.value ?? [])
+				.filter((version) => version.name !== '__synthetic')
+				.toSorted((a, b) => Date.parse(b.date_published) - Date.parse(a.date_published)),
+		),
 		versionsQuery,
 		versions,
 		reportsQuery,

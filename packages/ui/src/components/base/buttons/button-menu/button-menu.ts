@@ -103,7 +103,7 @@ export function useButtonMenuNavigation(
 		const items = getItems()
 		if (items.length === 0) return false
 
-		const activeIndex = items.indexOf(document.activeElement as HTMLElement)
+		const activeIndex = items.indexOf(panel.value?.ownerDocument.activeElement as HTMLElement)
 		const currentIndex = activeIndex === -1 ? focusedIndex.value : activeIndex
 
 		switch (event.key) {

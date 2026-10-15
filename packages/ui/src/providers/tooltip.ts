@@ -178,7 +178,7 @@ export function unbindTooltipSource(el: HTMLElement) {
 }
 
 function isFocusVisible(el: HTMLElement) {
-	const active = document.activeElement
+	const active = el.ownerDocument.activeElement
 	if (!(active instanceof Element) || !el.contains(active)) {
 		return false
 	}

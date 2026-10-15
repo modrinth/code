@@ -1,28 +1,25 @@
 import { LinkIcon } from '@modrinth/assets'
 
-import { generateUrlSlug } from '../../utils'
+import { generateUrlSlug, messageWithOptionalSuggestion } from '../../utils'
 import misused from '../messages/checklist/messages/title-slug/slug/misused.md'
 import { issue, panel, section, text, toggle } from './component-builders/builders'
 import { issueTargets } from './component-builders/targets'
+
+const panelCategory = 'Slug'
 
 export const misusedSlugIssue = issue({
 	id: 'slug-misused',
 	title: 'Misused project URL',
 	category: 'Slug',
+	suggestedStatus: 'flagged',
 	actions: [
 		issueTargets.modifySlug(({ getTextValue }) => {
 			const suggestion = getTextValue('correct-slug').toLowerCase()
 			return suggestion.trim() ? suggestion : undefined
 		}),
 	],
-	message: ({ getTextValue }) => {
-		const suggestion = getTextValue('correct-slug').toLowerCase()
-		return misused
-			.replaceAll('%CORRECT%', () =>
-				suggestion.trim() ? `We suggest using the slug \`${suggestion}\`.` : '',
-			)
-			.trim()
-	},
+	message: ({ getTextValue }) =>
+		messageWithOptionalSuggestion(misused, panelCategory, getTextValue('correct-slug')),
 })
 
 export const slugReviewPanel = panel({

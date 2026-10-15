@@ -48,6 +48,10 @@ export function useAnchoredTeleport(
 	const expandOrigin = ref('top center')
 
 	let resizeObserver: ResizeObserver | undefined
+	let listenerDocument: Document | undefined
+	function ownerWindow() {
+		return panel.value?.ownerDocument.defaultView ?? window
+	}
 
 	function updatePosition() {
 		if (!isOpen.value || !trigger.value || !panel.value) return
@@ -66,7 +70,7 @@ export function useAnchoredTeleport(
 
 		if (isHorizontal) {
 			const prefersRight = placement.value.startsWith('right')
-			const spaceRight = window.innerWidth - triggerRect.right - viewportPadding
+			const spaceRight = ownerWindow().innerWidth - triggerRect.right - viewportPadding
 			const spaceLeft = triggerRect.left - viewportPadding
 			const opensRight = prefersRight
 				? panelRect.width + offset <= spaceRight || spaceRight > spaceLeft
@@ -80,7 +84,7 @@ export function useAnchoredTeleport(
 				: triggerRect.left - panelRect.width - offset
 		} else {
 			const prefersTop = placement.value.startsWith('top')
-			const spaceBelow = window.innerHeight - triggerRect.bottom - viewportPadding
+			const spaceBelow = ownerWindow().innerHeight - triggerRect.bottom - viewportPadding
 			const spaceAbove = triggerRect.top - viewportPadding
 			const opensAbove = prefersTop
 				? panelRect.height + offset <= spaceAbove || spaceAbove > spaceBelow
@@ -98,7 +102,7 @@ export function useAnchoredTeleport(
 				const centered = triggerRect.left + triggerRect.width / 2 - panelRect.width / 2
 				if (centered < viewportPadding) {
 					idealLeft = triggerRect.left
-				} else if (centered + panelRect.width > window.innerWidth - viewportPadding) {
+				} else if (centered + panelRect.width > ownerWindow().innerWidth - viewportPadding) {
 					idealLeft = triggerRect.right - panelRect.width
 				} else {
 					idealLeft = centered
@@ -110,8 +114,14 @@ export function useAnchoredTeleport(
 		}
 
 		const effectiveHeight = maxHeight ?? panelRect.height
-		const maxTop = Math.max(viewportPadding, window.innerHeight - effectiveHeight - viewportPadding)
-		const maxLeft = Math.max(viewportPadding, window.innerWidth - panelRect.width - viewportPadding)
+		const maxTop = Math.max(
+			viewportPadding,
+			ownerWindow().innerHeight - effectiveHeight - viewportPadding,
+		)
+		const maxLeft = Math.max(
+			viewportPadding,
+			ownerWindow().innerWidth - panelRect.width - viewportPadding,
+		)
 		const panelTop = Math.min(Math.max(idealTop, viewportPadding), maxTop)
 		const panelLeft = Math.min(Math.max(idealLeft, viewportPadding), maxLeft)
 		const originY = triggerRect.top + triggerRect.height / 2 - panelTop
@@ -148,14 +158,20 @@ export function useAnchoredTeleport(
 	function handlePointerDown(event: PointerEvent) {
 		const target = event.target as Node | null
 		if (!target || triggerElement()?.contains(target) || panel.value?.contains(target)) return
-		if (document.getElementById('teleports')?.contains(target)) return
+		if (panel.value?.ownerDocument.getElementById('teleports')?.contains(target)) return
+		close()
+	}
+
+	function handleWindowClose() {
 		close()
 	}
 
 	function addListeners() {
-		document.addEventListener('pointerdown', handlePointerDown)
-		window.addEventListener('resize', updatePosition)
-		window.addEventListener('scroll', updatePosition, true)
+		listenerDocument = panel.value?.ownerDocument ?? document
+		listenerDocument.addEventListener('pointerdown', handlePointerDown)
+		listenerDocument.defaultView?.addEventListener('resize', updatePosition)
+		listenerDocument.defaultView?.addEventListener('beforeunload', handleWindowClose)
+		listenerDocument.defaultView?.addEventListener('scroll', updatePosition, true)
 
 		resizeObserver = new ResizeObserver(updatePosition)
 		const element = triggerElement()
@@ -164,11 +180,13 @@ export function useAnchoredTeleport(
 	}
 
 	function removeListeners() {
-		document.removeEventListener('pointerdown', handlePointerDown)
-		window.removeEventListener('resize', updatePosition)
-		window.removeEventListener('scroll', updatePosition, true)
+		listenerDocument?.removeEventListener('pointerdown', handlePointerDown)
+		listenerDocument?.defaultView?.removeEventListener('resize', updatePosition)
+		listenerDocument?.defaultView?.removeEventListener('beforeunload', handleWindowClose)
+		listenerDocument?.defaultView?.removeEventListener('scroll', updatePosition, true)
 		resizeObserver?.disconnect()
 		resizeObserver = undefined
+		listenerDocument = undefined
 	}
 
 	async function open() {

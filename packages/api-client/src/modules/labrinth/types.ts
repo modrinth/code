@@ -2188,7 +2188,10 @@ export namespace Labrinth {
 				| { type: 'remove_icon' }
 				| { type: 'remove_tags'; value: { tags: string[] } }
 				| { type: 'modify_links'; value: { links: Record<string, TextTarget> } }
-				| { type: 'add_gallery_images'; value: { original_count: number } }
+				| {
+						type: 'add_gallery_images'
+						value: { original_image_ids: number[]; auto_resolve: boolean }
+				  }
 				| {
 						type: 'modify_gallery_image'
 						value: {

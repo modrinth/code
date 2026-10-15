@@ -15,8 +15,13 @@
 				<Combobox
 					v-model="selectedLicense"
 					:options="licenseOptions"
+					:search-options="allLicenseOptions"
 					:display-value="licenseDisplayName(currentLicense)"
 					:placeholder="formatMessage(messages.selectPlaceholder)"
+					:search-placeholder="formatMessage(messages.selectPlaceholder)"
+					:searchable="true"
+					sync-with-selection
+					select-search-text-on-focus
 					:disabled="saving"
 					trigger-type="base"
 					class="w-full"
@@ -223,12 +228,19 @@ const availableLicenses = computed<LicenseChoice[]>(() => {
 	]
 })
 
-const licenseOptions = computed<ComboboxOption<string>[]>(() =>
+const allLicenseOptions = computed<ComboboxOption<string>[]>(() =>
 	availableLicenses.value.map((license) => ({
 		value: license.short,
 		label: licenseDisplayName(license),
+		searchTerms: [license.short, license.short.replaceAll('-', ' ')],
 	})),
 )
+const licenseOptions = computed(() => {
+	const defaultIds = new Set<string>(defaultLicenseIds)
+	return allLicenseOptions.value.filter(
+		(license) => license.value === '' || defaultIds.has(license.value),
+	)
+})
 
 function initialLicense(): LicenseChoice {
 	const oldLicenseId = project.value?.license.id ?? 'LicenseRef-Unknown'

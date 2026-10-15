@@ -5,6 +5,7 @@ import type { useProjectSaveValidation } from './project-save-validation'
 
 export interface ProjectIssueFieldAction {
 	draft: Partial<Labrinth.Projects.v3.Project>
+	disclosures?: Labrinth.Projects.v3.ProjectDisclosure[]
 	canSave: boolean
 	save: () => Promise<boolean>
 }

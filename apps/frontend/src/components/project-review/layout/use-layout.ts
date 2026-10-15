@@ -1,6 +1,9 @@
+import { injectNotificationManager, useVIntl } from '@modrinth/ui'
+import { useIntervalFn } from '@vueuse/core'
 import type {
 	DockviewApi,
 	DockviewIDisposable,
+	DockviewPopoutGroupOptions,
 	DockviewReadyEvent,
 	DockviewWillDropEvent,
 	DockviewWillShowOverlayLocationEvent,
@@ -10,18 +13,32 @@ import type {
 import { getGridLocation, LayoutPriority } from 'dockview-vue'
 import { onBeforeUnmount, ref, watchEffect } from 'vue'
 
+import { projectReviewMessages } from '../messages'
+import { injectReviewContext } from '../review-panel/context'
+import { injectReviewShortcuts } from '../shortcuts'
+import { registerDragPopouts } from './drag-popout'
 import {
+	dockPopoutLayout,
 	readWorkspaceLayout,
 	saveWorkspaceLayout,
 	workspacePanelSizes,
 	workspaceTabLayoutKey,
 } from './layout-storage'
+import { configureReviewPopout, openReviewPopout, type ReviewPopoutTarget } from './popout-window'
 import { type ProjectReviewSlot, type ProjectReviewTab, projectReviewTabs } from './types'
 
 export function useProjectReviewLayout(
 	getTitle: (tab: ProjectReviewTab) => string,
 	getTabs: () => readonly ProjectReviewTab[],
 ) {
+	const shortcuts = injectReviewShortcuts()
+	const review = injectReviewContext()
+	const detachedTabs = ref<ProjectReviewTab[]>([])
+	const { addNotification } = injectNotificationManager()
+	const { formatMessage } = useVIntl()
+	const poppingOut = ref<string[]>([])
+	const popoutSources = new Map<string, string>()
+	const popoutCleanups = new Map<Window, () => void>()
 	const savedLayout = readWorkspaceLayout()
 	const leftVisible = ref(savedLayout?.leftVisible ?? true)
 	const rightVisible = ref(savedLayout?.rightVisible ?? true)
@@ -46,6 +63,24 @@ export function useProjectReviewLayout(
 		)
 	}
 	const subscriptions: DockviewIDisposable[] = []
+	const { pause: stopCheckingWindows, resume: checkWindows } = useIntervalFn(
+		() => {
+			for (const tab of detachedTabs.value) {
+				const panel = tabs?.getPanel(tab)
+				if (panel?.api.location.type === 'popout' && panel.api.getWindow().closed) dockTab(tab)
+			}
+		},
+		500,
+		{ immediate: false },
+	)
+
+	function updateDetachedTabs() {
+		detachedTabs.value = getTabs().filter(
+			(tab) => tabs?.getPanel(tab)?.api.location.type === 'popout',
+		)
+		if (detachedTabs.value.length) checkWindows()
+		else stopCheckingWindows()
+	}
 
 	function saveLayout() {
 		clearTimeout(saveTimer)
@@ -65,8 +100,10 @@ export function useProjectReviewLayout(
 			bottomVisible: bottomVisible.value,
 			leftVisible: leftVisible.value,
 			rightVisible: rightVisible.value,
-			tabs: currentTabs,
-			tabLayouts: Object.fromEntries(tabLayouts),
+			tabs: dockPopoutLayout(currentTabs),
+			tabLayouts: Object.fromEntries(
+				[...tabLayouts].map(([key, layout]) => [key, dockPopoutLayout(layout)]),
+			),
 		})
 	}
 
@@ -139,12 +176,53 @@ export function useProjectReviewLayout(
 		}
 	}
 
+	function splitDroppedGroup(event: DockviewWillDropEvent) {
+		const data = event.getData()
+		const target = event.group
+		if (
+			event.defaultPrevented ||
+			event.kind !== 'content' ||
+			!target ||
+			!data ||
+			data.viewId !== event.api.id ||
+			event.position === 'center'
+		) return
+
+		const horizontal = event.position === 'left' || event.position === 'right'
+		let movedPanel: ReturnType<DockviewApi['getPanel']>
+		const subscription = event.api.onDidMovePanel(({ panel, from }) => {
+			if (from.id === data.groupId && (!data.panelId || panel.id === data.panelId)) {
+				movedPanel = panel
+			}
+		})
+		queueMicrotask(() => {
+			subscription.dispose()
+			const moved = movedPanel?.group
+			if (!tabsReady || !moved || moved === target || !event.api.groups.includes(target)) return
+			const dimension = horizontal ? 'width' : 'height'
+			const minimum = horizontal ? 'minimumWidth' : 'minimumHeight'
+			const maximum = horizontal ? 'maximumWidth' : 'maximumHeight'
+			const total = target.api[dimension] + moved.api[dimension]
+			const lower = Math.max(moved[minimum], total - target[maximum])
+			const upper = Math.min(moved[maximum], total - target[minimum])
+			if (lower > upper) return
+			const size = Math.max(lower, Math.min(Math.round(total / 2), upper))
+			target.api.setSize({ [dimension]: total - size })
+			moved.api.setSize({ [dimension]: size })
+		})
+	}
+
 	function updateCornerGroups() {
 		const groups =
-			tabs?.groups.map((group) => ({
-				id: group.id,
-				bounds: group.element.getBoundingClientRect(),
-			})) ?? []
+			tabs?.groups
+				.filter(
+					(group) =>
+						group.api.location.type === 'grid' && group.api.isVisible && group.panels.length > 0,
+				)
+				.map((group) => ({
+					id: group.id,
+					bounds: group.element.getBoundingClientRect(),
+				})) ?? []
 		const top = Math.min(...groups.map(({ bounds }) => bounds.top))
 		const topGroups = groups.filter(({ bounds }) => Math.abs(bounds.top - top) < 1)
 		topGroups.sort((a, b) => a.bounds.left - b.bounds.left)
@@ -155,9 +233,34 @@ export function useProjectReviewLayout(
 	function onTabsReady({ api }: DockviewReadyEvent) {
 		tabs = api
 		subscriptions.push(
+			registerDragPopouts(api, (target, position, sourceWindow) => {
+				void popoutPanels(target, position, sourceWindow)
+			}),
+			api.onDidAddPopoutGroup(({ window: child }) => {
+				updateDetachedTabs()
+				review.close()
+				const disposeWindow = shortcuts.registerWindow(child)
+				const disposeTheme = configureReviewPopout(child)
+				popoutCleanups.set(child, () => {
+					disposeWindow()
+					disposeTheme()
+				})
+			}),
+			api.onDidRemovePopoutGroup(() => {
+				updateDetachedTabs()
+				review.close()
+				const windows = new Set(api.getPopouts().map((popout) => popout.window))
+				for (const [child, cleanup] of popoutCleanups) {
+					if (windows.has(child)) continue
+					cleanup()
+					popoutCleanups.delete(child)
+				}
+			}),
 			api.onWillShowOverlay(constrainDrop),
 			api.onWillDrop(constrainDrop),
+			api.onWillDrop(splitDroppedGroup),
 			api.onDidLayoutChange(updateCornerGroups),
+			api.onDidLayoutChange(updateDetachedTabs),
 			api.onDidLayoutChange(scheduleSave),
 			api.onDidActivePanelChange(scheduleSave),
 		)
@@ -166,7 +269,7 @@ export function useProjectReviewLayout(
 		const savedTabLayout = tabLayouts.get(currentTabLayoutKey)
 		if (savedTabLayout) {
 			try {
-				api.fromJSON(savedTabLayout)
+				api.fromJSON(dockPopoutLayout(savedTabLayout))
 				restored = true
 			} catch {
 				api.clear()
@@ -181,7 +284,75 @@ export function useProjectReviewLayout(
 
 	function openTab(tab: ProjectReviewTab) {
 		if (!getTabs().includes(tab)) return
-		tabs?.getPanel(tab)?.api.setActive()
+		const panel = tabs?.getPanel(tab)
+		panel?.api.setActive()
+		if (panel?.api.location.type === 'popout') panel.api.getWindow().focus()
+	}
+
+	function popoutTab(
+		tab: ProjectReviewTab,
+		position?: DockviewPopoutGroupOptions['position'],
+		sourceWindow?: Window,
+	) {
+		const panel = tabs?.getPanel(tab)
+		if (panel) return popoutPanels(panel, position, sourceWindow)
+	}
+
+	async function popoutPanels(
+		target: ReviewPopoutTarget,
+		position?: DockviewPopoutGroupOptions['position'],
+		sourceWindow?: Window,
+	) {
+		const panels = 'panels' in target ? [...target.panels] : [target]
+		const panelIds = panels.map((panel) => panel.id)
+		if (!tabs || !panels.length || panelIds.some((id) => poppingOut.value.includes(id))) return
+		if (target.api.location.type === 'popout' && !position) return
+		for (const panel of panels) {
+			if (panel.api.location.type === 'grid') popoutSources.set(panel.id, panel.group.id)
+		}
+		poppingOut.value = [...poppingOut.value, ...panelIds]
+		try {
+			const opened = await openReviewPopout(
+				tabs,
+				target,
+				{
+					popoutUrl: '/project-review-popout.html',
+					position,
+				},
+				sourceWindow,
+			)
+			if (!opened) notifyPopoutFailure()
+		} catch {
+			notifyPopoutFailure()
+		} finally {
+			poppingOut.value = poppingOut.value.filter((id) => !panelIds.includes(id))
+		}
+	}
+
+	function notifyPopoutFailure() {
+		addNotification({
+			type: 'error',
+			text: formatMessage(projectReviewMessages.popoutFailed),
+		})
+	}
+
+	function dockTab(tab: ProjectReviewTab) {
+		const panel = tabs?.getPanel(tab)
+		if (!tabs || !panel || panel.api.location.type !== 'popout') return
+		const source = tabs.groups.find((group) => group.id === popoutSources.get(tab))
+		const group =
+			source?.api.location.type === 'grid' && source.panels.length
+				? source
+				: (tabs.groups.find((group) => group.api.location.type === 'grid' && group.panels.length) ??
+					tabs.addGroup())
+		panel.api.moveTo({ group, position: 'center' })
+		panel.api.setActive()
+		popoutSources.delete(tab)
+		scheduleSave()
+	}
+
+	function closeExternalPanels() {
+		for (const tab of [...detachedTabs.value]) dockTab(tab)
 	}
 
 	function revealSlot(slot: ProjectReviewSlot) {
@@ -281,9 +452,34 @@ export function useProjectReviewLayout(
 			const after = node.data[index + 1]
 			if (!before?.size || !after?.size) return
 			const total = before.size + after.size
-			before.size = Math.round(total / 2)
-			after.size = total - before.size
-			tabs.fromJSON(layout, { reuseExistingPanels: true })
+			if (tabs.getPopouts().length) {
+				const horizontal = split.classList.contains('dv-horizontal')
+				const sizes: { id: string; size: number }[] = []
+				function collectSizes(node: typeof layout.grid.root, scale: number) {
+					if (Array.isArray(node.data)) {
+						for (const child of node.data) collectSizes(child, scale)
+					} else {
+						const id = node.data.id
+						const group = tabs?.groups.find((group) => group.id === id)
+						if (group)
+							sizes.push({
+								id: group.id,
+								size: (horizontal ? group.api.width : group.api.height) * scale,
+							})
+					}
+				}
+				collectSizes(before, total / 2 / before.size)
+				collectSizes(after, total / 2 / after.size)
+				for (const { id, size } of sizes) {
+					tabs.groups
+						.find((group) => group.id === id)
+						?.api.setSize(horizontal ? { width: size } : { height: size })
+				}
+			} else {
+				before.size = Math.round(total / 2)
+				after.size = total - before.size
+				tabs.fromJSON(layout, { reuseExistingPanels: true })
+			}
 			updateCornerGroups()
 		} else {
 			return
@@ -302,9 +498,9 @@ export function useProjectReviewLayout(
 			if (currentTabLayoutKey) tabLayouts.set(currentTabLayoutKey, tabs.toJSON())
 			currentTabLayoutKey = nextTabLayoutKey
 			const savedTabLayout = tabLayouts.get(nextTabLayoutKey)
-			if (savedTabLayout) {
+			if (savedTabLayout && !tabs.getPopouts().length) {
 				try {
-					tabs.fromJSON(savedTabLayout)
+					tabs.fromJSON(dockPopoutLayout(savedTabLayout))
 				} catch {
 					tabs.clear()
 					tabLayouts.delete(nextTabLayoutKey)
@@ -315,9 +511,14 @@ export function useProjectReviewLayout(
 			const panel = tabs.getPanel(tab)
 			if (!visibleTabs.includes(tab)) {
 				if (panel) tabs.removePanel(panel)
+				popoutSources.delete(tab)
 				continue
 			}
 			if (!panel) {
+				const referencePanel =
+					tabs.getPanel('description')?.api.location.type === 'grid'
+						? tabs.getPanel('description')
+						: tabs.panels.find((panel) => panel.api.location.type === 'grid')
 				tabs.addPanel({
 					id: tab,
 					component: 'ProjectReviewPanel',
@@ -326,7 +527,7 @@ export function useProjectReviewLayout(
 					renderer: 'always',
 					minimumHeight: 120,
 					inactive: true,
-					position: tab === 'description' ? undefined : { referencePanel: 'description' },
+					position: referencePanel ? { referencePanel: referencePanel.id } : undefined,
 				})
 			} else {
 				panel.api.setTitle(titles.get(tab) ?? tab)
@@ -342,9 +543,15 @@ export function useProjectReviewLayout(
 		tabsReady = false
 		window.removeEventListener('pagehide', saveLayout)
 		subscriptions.forEach((subscription) => subscription.dispose())
+		popoutCleanups.forEach((cleanup) => cleanup())
 	})
 
 	return {
+		closeExternalPanels,
+		detachedTabs,
+		popoutTab,
+		dockTab,
+		poppingOut,
 		bottomVisible,
 		leftVisible,
 		openTab,

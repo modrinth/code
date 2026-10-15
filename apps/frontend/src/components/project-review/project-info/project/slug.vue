@@ -40,19 +40,30 @@
 			</div>
 		</div>
 		<div v-else-if="project" class="min-w-0">
-			<div class="break-all text-sm">
-				<span>/{{ projectTypeForUrl }}/</span>
-				<span class="inline-flex text-contrast">{{ project.slug ?? project.id }}</span>
+			<div class="flex items-center gap-1.5 text-sm">
+				<span class="min-w-0 break-all">
+					<span>/{{ projectTypeForUrl }}/</span>
+					<span class="inline-flex text-contrast">{{ project.slug ?? project.id }}</span>
+				</span>
+				<TriangleAlertIcon
+					v-if="isNonSuggestedSlug"
+					v-tooltip="formatMessage(messages.slugNotSuggested)"
+					:aria-label="formatMessage(messages.slugNotSuggested)"
+					class="size-4 shrink-0 text-orange"
+				/>
 			</div>
 		</div>
 	</Section>
 </template>
 
 <script setup lang="ts">
+import { TriangleAlertIcon } from '@modrinth/assets'
 import { Button, commonMessages, Input, useVIntl } from '@modrinth/ui'
 import { computed, useTemplateRef } from 'vue'
 
+import { generateProjectSlugSuggestions } from '~/composables/project-slug-suggestions'
 import { getProjectTypeForUrl } from '~/helpers/projects.js'
+import { injectProjectReviewPageContext } from '~/providers/project-review'
 
 import { projectReviewMessages as messages } from '../../messages'
 import EditButton from '../edit/button.vue'
@@ -60,6 +71,7 @@ import { useProjectTextEdit } from '../edit/use-project-text-edit'
 import Section from '../section.vue'
 
 const { formatMessage } = useVIntl()
+const { members } = injectProjectReviewPageContext()
 const input = useTemplateRef<InstanceType<typeof Input>>('input')
 const {
 	project,
@@ -72,6 +84,13 @@ const {
 	resetEditing,
 	save,
 } = useProjectTextEdit('slug', () => input.value?.focus())
+
+const isNonSuggestedSlug = computed(() => {
+	if (!project.value) return false
+	const owner = members.value.find((member) => member.is_owner) ?? members.value[0]
+	const suggestions = generateProjectSlugSuggestions(project.value.name, owner?.user.username)
+	return !suggestions.includes(project.value.slug?.toLowerCase() ?? '')
+})
 
 const projectTypeForUrl = computed(() => {
 	if (project.value?.minecraft_server != null) return 'server'

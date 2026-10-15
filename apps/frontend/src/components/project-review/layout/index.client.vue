@@ -4,13 +4,15 @@
 		:aria-label="formatMessage(messages.title)"
 		@dblclick="onDividerDoubleClick"
 	>
-		<div class="min-h-0 min-w-0 flex-1 overflow-x-auto">
-			<ProjectReviewColumns
-				class="project-review-dock h-full"
-				:style="{
-					minWidth: `${workspacePanelSizes.center.minimum + (leftVisible ? workspacePanelSizes.left.minimum : 0) + (rightVisible ? workspacePanelSizes.right.minimum : 0)}px`,
-				}"
-			/>
+		<div class="flex min-h-0 min-w-0 flex-1 flex-col">
+			<div class="min-h-0 flex-1 overflow-x-auto">
+				<ProjectReviewColumns
+					class="project-review-dock h-full"
+					:style="{
+						minWidth: `${workspacePanelSizes.center.minimum + (leftVisible ? workspacePanelSizes.left.minimum : 0) + (rightVisible ? workspacePanelSizes.right.minimum : 0)}px`,
+					}"
+				/>
+			</div>
 		</div>
 	</section>
 </template>
@@ -19,14 +21,13 @@
 import 'dockview-vue/dist/styles/dockview.css'
 
 import { useVIntl } from '@modrinth/ui'
-import { useEventListener } from '@vueuse/core'
 import { onScopeDispose, watch, watchEffect } from 'vue'
 
 import { useModerationKeybinds } from '~/composables/moderation'
 
 import { projectReviewMessages as messages } from '../messages'
 import { injectReviewContext } from '../review-panel/context'
-import { reviewShortcutBlocked, useReviewShortcut } from '../shortcuts'
+import { reviewShortcutBlocked, useReviewEventListener, useReviewShortcut } from '../shortcuts'
 import ProjectReviewColumns from './columns.vue'
 import { provideProjectReviewContext } from './context'
 import { workspacePanelSizes } from './layout-storage'
@@ -80,7 +81,7 @@ useReviewShortcut('reveal-right', () => layout.revealSlot('right'))
 useReviewShortcut('toggle-bottom', layout.toggleToolsPanel)
 
 const keybinds = useModerationKeybinds()
-useEventListener('keydown', (event) => {
+useReviewEventListener('keydown', (event) => {
 	if (reviewShortcutBlocked(event)) return
 	keybinds.value.handle(event, {
 		scope: 'project-review',
@@ -93,10 +94,10 @@ useEventListener('keydown', (event) => {
 		},
 	})
 })
-useEventListener('keyup', (event) => {
+useReviewEventListener('keyup', (event) => {
 	if ((event.code || event.key.toLowerCase()) === heldTabKey) releaseHeldTab()
 })
-useEventListener('blur', clearShortcutTab)
+useReviewEventListener('blur', clearShortcutTab)
 onScopeDispose(clearShortcutTab)
 </script>
 

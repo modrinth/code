@@ -3134,6 +3134,9 @@
   "moderation.project-review.changelog": {
     "message": "Changelog"
   },
+  "moderation.project-review.closeExternalPanels": {
+    "message": "Close all popped out panels"
+  },
   "moderation.project-review.closeReview": {
     "message": "Close review controls"
   },
@@ -3196,6 +3199,9 @@
   },
   "moderation.project-review.discord": {
     "message": "Discord invite"
+  },
+  "moderation.project-review.dockPanel": {
+    "message": "Return panel to workspace"
   },
   "moderation.project-review.donationBmac": {
     "message": "Buy Me A Coffee"
@@ -3458,6 +3464,12 @@
   "moderation.project-review.platforms": {
     "message": "Platforms"
   },
+  "moderation.project-review.popoutFailed": {
+    "message": "Could not open the panel window. Allow popups for this site and try again."
+  },
+  "moderation.project-review.popoutPanel": {
+    "message": "Open panel in its own window"
+  },
   "moderation.project-review.post-approval": {
     "message": "Post-approval"
   },
@@ -3546,7 +3558,7 @@
     "message": "Save project"
   },
   "moderation.project-review.scanAi": {
-    "message": "Scan for AI-generated images"
+    "message": "Scan for AI-generated images using C2PA info"
   },
   "moderation.project-review.scheduled": {
     "message": "Scheduled"
@@ -3595,6 +3607,9 @@
   },
   "moderation.project-review.slug": {
     "message": "Slug"
+  },
+  "moderation.project-review.slugNotSuggested": {
+    "message": "This slug does not match any of the suggested slugs."
   },
   "moderation.project-review.source": {
     "message": "Source code"
@@ -4414,6 +4429,12 @@
   },
   "project-review.right-panel.thread": {
     "message": "Thread"
+  },
+  "project-review.versions.modpack-tools": {
+    "message": "Modpack tools"
+  },
+  "project-review.versions.view-c2pa-info": {
+    "message": "View C2PA Info"
   },
   "project-type.collection.plural": {
     "message": "Collections"
@@ -6689,8 +6710,20 @@
   "thread-issues.address-failed": {
     "message": "Failed to mark issue as addressed"
   },
+  "thread-issues.address-requirements-unchanged": {
+    "message": "Make the requested changes before marking this issue as addressed."
+  },
+  "thread-issues.address-save-failed": {
+    "message": "Your changes could not be saved. Fix the validation errors before marking this issue as addressed."
+  },
   "thread-issues.addressed": {
     "message": "Marked as addressed"
+  },
+  "thread-issues.addressed-progress": {
+    "message": "{completed, number} of {total, number} addressed"
+  },
+  "thread-issues.addressed-progress-tooltip": {
+    "message": "{completed, number}/{total, number} parts have been addressed for this issue"
   },
   "thread-issues.change-facet-first": {
     "message": "Please make the requested changes before marking it as addressed."
@@ -6733,6 +6766,9 @@
   },
   "thread-issues.mark-addressed": {
     "message": "Mark as addressed"
+  },
+  "thread-issues.mark-addressed-progress": {
+    "message": "Mark as addressed {completed, number}/{total, number}"
   },
   "thread-issues.mark-resolved": {
     "message": "Mark as resolved"

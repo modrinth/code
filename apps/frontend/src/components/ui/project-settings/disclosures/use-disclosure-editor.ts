@@ -9,11 +9,13 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, type Ref, ref, watch } from 'vue'
 
 import { useAuthState } from '~/composables/auth'
+import type { ProjectIssueFieldAction } from '~/composables/project-issue-field-action'
 
 import type { DisclosureFormIssue } from './form'
 import {
 	disclosuresToForm,
 	findDisclosureData,
+	formToDisclosures,
 	getDisclosureFormIssues,
 	getDisclosureFormSnapshot,
 	toModifyRequests,
@@ -200,8 +202,9 @@ export function useDisclosureEditor({
 		() => JSON.stringify(savedSnapshot.value) !== JSON.stringify(currentSnapshot.value),
 	)
 
-	async function save() {
-		if (!hasChanges.value || !canSave.value || saving.value) return
+	async function save(): Promise<boolean> {
+		if (!canSave.value || saving.value) return false
+		if (!hasChanges.value) return true
 		const id = projectId.value
 		try {
 			await mutation.mutateAsync({
@@ -211,8 +214,10 @@ export function useDisclosureEditor({
 			if (id === projectId.value) {
 				reset()
 			}
+			return true
 		} catch {
 			// The mutation error is rendered alongside the retained draft.
+			return false
 		}
 	}
 
@@ -276,6 +281,13 @@ export function useDisclosureEditor({
 			(isAdminUser.value || issues.value.length === 0),
 	)
 
+	const issueAction = computed<ProjectIssueFieldAction>(() => ({
+		draft: {},
+		disclosures: formToDisclosures(current.value),
+		canSave: canSave.value && !saving.value,
+		save,
+	}))
+
 	const saveDisabledReason = computed(() => {
 		if (!hasPermission.value) {
 			return formatMessage(messages.noPermission)
@@ -294,6 +306,7 @@ export function useDisclosureEditor({
 		save,
 		canSave,
 		saveDisabledReason,
+		issueAction,
 		disclosureUpdateProps,
 		setDisclosureLockStatus,
 		isDisclosureVisible,

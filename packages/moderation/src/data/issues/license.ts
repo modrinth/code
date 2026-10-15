@@ -32,6 +32,30 @@ export const licenseNoSourceIssue = issue({
 	suggestedStatus: 'rejected',
 })
 
+export const sourceRequiredSection = section({
+	shown: (ctx) =>
+		!ctx.projectV3.minecraft_server &&
+		promptSourceRequired(ctx.projectV3.license.id, ctx.projectV3.project_types),
+}).content(
+	toggle({
+		shown: (ctx) => !ctx.projectV3.minecraft_server,
+		issue: licenseNoSourceIssue,
+		label: 'No Source',
+	}),
+	section({
+		label: 'Additional reason for source requirements?',
+		shown: (ctx) =>
+			!ctx.projectV3.minecraft_server && ctx.selected.issueIds.includes(licenseNoSourceIssue.id),
+	}).content(
+		toggle({
+			shown: (ctx) => !ctx.projectV3.minecraft_server,
+			issue: licenseNoSourceIssue,
+			label: 'No Source: Fork',
+			id: 'license-fork',
+		}),
+	),
+)
+
 export const licenseReviewPanel = panel({
 	title: 'License',
 	hint: 'Is this license and link valid?',
@@ -57,26 +81,5 @@ export const licenseReviewPanel = panel({
 			id: 'license-custom-license',
 		}),
 	),
-	section({
-		shown: (ctx) =>
-			!ctx.projectV3.minecraft_server &&
-			promptSourceRequired(ctx.projectV3.license.id, ctx.projectV3.project_types),
-	}).content(
-		toggle({
-			shown: (ctx) => !ctx.projectV3.minecraft_server,
-			issue: licenseNoSourceIssue,
-			label: 'No Source',
-		}),
-		section({
-			shown: (ctx) =>
-				!ctx.projectV3.minecraft_server && ctx.selected.issueIds.includes(licenseNoSourceIssue.id),
-		}).content(
-			toggle({
-				shown: (ctx) => !ctx.projectV3.minecraft_server,
-				issue: licenseNoSourceIssue,
-				label: 'No Source: Fork',
-				id: 'license-fork',
-			}),
-		),
-	),
+	sourceRequiredSection,
 )

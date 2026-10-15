@@ -1,8 +1,12 @@
-import { useEventListener } from '@vueuse/core'
 import type { Ref } from 'vue'
 
-export function useActionKeybinds(element: Readonly<Ref<HTMLElement | null>>) {
-	useEventListener('keydown', (event) => {
+import type { createReviewShortcuts } from '../shortcuts'
+
+export function useActionKeybinds(
+	element: Readonly<Ref<HTMLElement | null>>,
+	shortcuts: ReturnType<typeof createReviewShortcuts>,
+) {
+	shortcuts.listen('keydown', (event) => {
 		if (
 			event.defaultPrevented ||
 			event.repeat ||
@@ -32,10 +36,11 @@ export function useActionKeybinds(element: Readonly<Ref<HTMLElement | null>>) {
 
 		const panel = element.value
 		if (!panel || panel.closest('[inert], [hidden]')) return
+		if ((event.target as Node | null)?.ownerDocument !== panel.ownerDocument) return
 		const dialog = target instanceof Element ? target.closest('[role="dialog"]') : null
 		if (dialog && dialog !== panel && !dialog.contains(panel)) return
 		if (
-			[...document.querySelectorAll('[role="dialog"][aria-modal="true"]')].some(
+			[...panel.ownerDocument.querySelectorAll('[role="dialog"][aria-modal="true"]')].some(
 				(modal) => !modal.contains(panel),
 			)
 		) {
@@ -47,7 +52,8 @@ export function useActionKeybinds(element: Readonly<Ref<HTMLElement | null>>) {
 		if (!button || button.disabled || button.closest('[data-review-panel]') !== panel) return
 
 		event.preventDefault()
-		if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
+		const focused = panel.ownerDocument.activeElement
+		if (focused instanceof HTMLElement) focused.blur()
 		button.click()
 		button.blur()
 	})
