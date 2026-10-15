@@ -6,7 +6,7 @@
 		:src="frameSrc"
 		:title="formatMessage(messages.slicer)"
 		allow="clipboard-read; clipboard-write"
-		class="h-full w-full rounded-xl border border-solid border-surface-4 bg-surface-1"
+		class="block h-full w-full rounded-xl border border-solid border-surface-4 bg-surface-1"
 	/>
 	<p v-else-if="isLoading || versionsQuery.isPending.value" role="status" class="m-0">
 		{{ formatMessage(messages.loading) }}

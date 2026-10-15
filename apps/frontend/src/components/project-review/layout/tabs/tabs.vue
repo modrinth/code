@@ -1,5 +1,5 @@
 <template>
-	<div class="project-review-tabs h-full">
+	<div class="project-review-tabs h-full overflow-clip">
 		<DockviewVue
 			class="project-review-dock h-full"
 			:theme="theme"
