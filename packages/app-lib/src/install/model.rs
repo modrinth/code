@@ -1,3 +1,4 @@
+use crate::LabrinthError;
 use crate::api::pack::import::ImportLauncherType;
 use crate::api::pack::install_from::{CreatePackInstance, CreatePackLocation};
 use crate::state::{
@@ -672,18 +673,15 @@ impl InstallErrorView {
             code: code.to_string(),
             phase: Some(phase),
             message: format!("{error:#}"),
-            api: match error.downcast_ref::<crate::ErrorKind>() {
-                Some(crate::ErrorKind::LabrinthError(error)) => {
-                    Some(InstallApiErrorDetails {
-                        error: error.error.clone(),
-                        status: error.status,
-                        method: error.method.clone(),
-                        url: error.url.clone(),
-                        route: error.route.clone(),
-                    })
+            api: error.downcast_ref::<LabrinthError>().map(|error| {
+                InstallApiErrorDetails {
+                    error: error.error.clone(),
+                    status: error.status,
+                    method: error.method.clone(),
+                    url: error.url.clone(),
+                    route: error.route.clone(),
                 }
-                _ => None,
-            },
+            }),
             context,
         }
     }

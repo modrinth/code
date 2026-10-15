@@ -7,15 +7,14 @@ use crate::util::jre::JREError;
 use async_tungstenite::tungstenite;
 use async_zip::error::ZipError;
 use data_url::DataUrlError;
-use derive_more::Display;
 use hickory_resolver::ResolveError;
 use serde::{Deserialize, Serialize};
 use sqlx::migrate::MigrateError;
 use std::path::StripPrefixError;
 use std::time::Duration;
 
-#[derive(Serialize, Deserialize, Debug, Display)]
-#[display("{description}")]
+#[derive(Serialize, Deserialize, Debug, thiserror::Error)]
+#[error("{description}")]
 pub struct LabrinthError {
     pub error: String,
     pub description: String,
@@ -105,9 +104,6 @@ pub enum ErrorKind {
 
     #[error("Too many requests, retry in {}", format_duration(*.retry_in))]
     RateLimited { retry_in: Duration },
-
-    #[error("{0}")]
-    LabrinthError(LabrinthError),
 
     #[error("Websocket error: {0}")]
     WSError(#[from] async_tungstenite::tungstenite::Error),
@@ -299,7 +295,6 @@ impl ErrorKind {
             | Self::WSClosedError(_)
             | Self::DNSError(_)
             | Self::RateLimited { .. } => "network_error",
-            Self::LabrinthError(_) => "api_error",
             Self::ZipError(_) => "archive_error",
             Self::DeserializationError(_) | Self::StripPrefixError(_) => {
                 "path_error"
@@ -351,6 +346,8 @@ pub fn error_code(error: &Error) -> &'static str {
         error.downcast_ref::<MinecraftAuthenticationError>()
     {
         error.code()
+    } else if error.is::<LabrinthError>() {
+        "api_error"
     } else if error.is::<reqwest::Error>()
         || error.is::<tungstenite::Error>()
         || error.is::<ResolveError>()

@@ -1034,7 +1034,7 @@ async fn fetch_advanced_with_target(
                         error.method = Some(method.as_str().to_string());
                         error.url = Some(url.to_string());
                         error.route = uri_path.map(str::to_string);
-                        return Err(ErrorKind::LabrinthError(error).into());
+                        return Err(error.into());
                     }
                     return Err(backup_error.into());
                 }
