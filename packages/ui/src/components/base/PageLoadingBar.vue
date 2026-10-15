@@ -1,7 +1,7 @@
 <template>
-	<div class="analytics-loading-bar" :style="{ opacity: isVisible ? 1 : 0 }" aria-hidden="true">
+	<div class="page-loading-bar" :style="{ opacity: isVisible ? 1 : 0 }" aria-hidden="true">
 		<div
-			class="analytics-loading-bar__track"
+			class="page-loading-bar__track"
 			:style="{
 				width: `${progress}%`,
 				transition: !isTransitioning
@@ -9,8 +9,8 @@
 					: isFinishing
 						? 'width 0.1s ease-in-out'
 						: isCreeping
-							? 'width 2s linear'
-							: 'width 0.9s ease-in-out',
+							? `width ${props.creepDuration}ms linear`
+							: `width ${props.duration}ms ease-in-out`,
 			}"
 		/>
 	</div>
@@ -19,9 +19,19 @@
 <script setup lang="ts">
 import { onBeforeUnmount, ref, watch } from 'vue'
 
-const props = defineProps<{
-	loading: boolean
-}>()
+const props = withDefaults(
+	defineProps<{
+		loading: boolean
+		/** Time in milliseconds to reach the initial 85% fill. */
+		duration?: number
+		/** Time in milliseconds to advance from 85% to 98% while loading continues. */
+		creepDuration?: number
+	}>(),
+	{
+		duration: 900,
+		creepDuration: 2000,
+	},
+)
 
 const progress = ref(0)
 const isVisible = ref(false)
@@ -78,7 +88,7 @@ function start() {
 		isCreeping.value = true
 		progress.value = 98
 		creepTimeout = null
-	}, 900)
+	}, props.duration)
 }
 
 function finish() {
@@ -131,7 +141,7 @@ onBeforeUnmount(clearTimers)
 </script>
 
 <style scoped>
-.analytics-loading-bar {
+.page-loading-bar {
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -144,7 +154,7 @@ onBeforeUnmount(clearTimers)
 	transition: opacity 0.4s;
 }
 
-.analytics-loading-bar__track {
+.page-loading-bar__track {
 	height: 100%;
 	border-radius: 999px;
 	background: var(--loading-bar-gradient);

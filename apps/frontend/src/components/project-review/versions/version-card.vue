@@ -48,13 +48,20 @@
 						v-if="version.files.length"
 						v-tooltip="formatMessage(messages.openVersionSlicer)"
 						:aria-label="formatMessage(messages.openVersionSlicer)"
+						:loading="loadingSlicerButton === 'version'"
+						:disabled="slicerLoading"
 						type="quiet"
 						circular
 						size="sm"
 						icon-only
 						@click="openVersionInSlicer"
 					>
-						<CoffeeIcon aria-hidden="true" />
+						<SpinnerIcon
+							v-if="loadingSlicerButton === 'version'"
+							class="animate-spin motion-reduce:animate-none"
+							aria-hidden="true"
+						/>
+						<CoffeeIcon v-else aria-hidden="true" />
 					</Button>
 					<ButtonLink
 						v-tooltip="formatMessage(messages.viewVersion)"
@@ -89,17 +96,6 @@
 							formatMessage(fileTypeMessages[file.file_type])
 						}}</span>
 						<Button
-							v-tooltip="formatMessage(messages.openSlicer)"
-							:aria-label="formatMessage(messages.openSlicer)"
-							type="quiet"
-							size="sm"
-							circular
-							icon-only
-							@click="slicer.open([file.url])"
-						>
-							<CoffeeIcon aria-hidden="true" />
-						</Button>
-						<Button
 							v-tooltip="formatMessage(messages.scanAi)"
 							:aria-label="formatMessage(messages.scanAi)"
 							type="quiet"
@@ -116,6 +112,15 @@
 							:label="formatMessage(commonMessages.moreOptionsButton)"
 							:options="fileActions(file)"
 						>
+							<template #open-slicer="{ option }">
+								<SpinnerIcon
+									v-if="loadingSlicerButton === file.url"
+									class="animate-spin motion-reduce:animate-none"
+									aria-hidden="true"
+								/>
+								<CoffeeIcon v-else aria-hidden="true" />
+								{{ option.label }}
+							</template>
 							<MoreVerticalIcon />
 						</TeleportOverflowMenu>
 					</div>
@@ -317,6 +322,7 @@ import {
 	ExternalIcon,
 	MoreVerticalIcon,
 	ScanEyeIcon,
+	SpinnerIcon,
 } from '@modrinth/assets'
 import {
 	Accordion,
@@ -382,6 +388,14 @@ const client = injectModrinthClient()
 const tags = injectTags(null)
 const { project, members } = injectProjectReviewPageContext()
 const slicer = injectReviewSlicer()
+const { loadingFiles: slicerLoading } = slicer
+const slicerRequest = ref<{ id: number; button: string }>()
+const loadingSlicerButton = computed(() => {
+	const request = slicerRequest.value
+	return slicerLoading.value && request?.id === slicer.openRequests.value
+		? request.button
+		: undefined
+})
 const dependenciesOpen = ref(false)
 const card = ref<HTMLElement>()
 const dependenciesSection = ref<HTMLElement>()
@@ -481,16 +495,29 @@ const dependencies = computed<DependencyContext[]>(() =>
 )
 type VersionFile = Labrinth.Versions.v3.Version['files'][number]
 
+function openInSlicer(urls: string[], button: string) {
+	slicer.open(urls)
+	slicerRequest.value = { id: slicer.openRequests.value, button }
+}
+
 function openVersionInSlicer() {
-	slicer.open(
+	openInSlicer(
 		props.version.files
 			.toSorted((a, b) => Number(b.primary) - Number(a.primary))
 			.map(({ url }) => url),
+		'version',
 	)
 }
 
 function fileActions(file: VersionFile): ButtonMenuOption[] {
 	const options: ButtonMenuOption[] = [
+		{
+			id: 'open-slicer',
+			label: formatMessage(messages.openSlicer),
+			icon: CoffeeIcon,
+			disabled: slicerLoading.value,
+			action: () => openInSlicer([file.url], file.url),
+		},
 		{
 			id: 'open-slicer-external',
 			type: 'link',

@@ -1,13 +1,21 @@
 <template>
-	<iframe
-		v-if="frameSrc"
-		:key="frameKey"
-		ref="frame"
-		:src="frameSrc"
-		:title="formatMessage(messages.slicer)"
-		allow="clipboard-read; clipboard-write"
-		class="block h-full w-full rounded-xl border border-solid border-surface-4 bg-surface-1"
-	/>
+	<div v-if="frameSrc" class="relative flex h-full min-h-0 flex-col gap-2">
+		<PageLoadingBar :loading="loadingFiles" />
+		<div v-if="loadFailed && !loadingFiles" role="alert" class="flex items-center gap-2">
+			<p class="m-0">{{ formatMessage(messages.loadError) }}</p>
+			<Button @click="retry">{{ formatMessage(messages.retry) }}</Button>
+		</div>
+		<iframe
+			:key="frameKey"
+			ref="frame"
+			:src="frameSrc"
+			:title="formatMessage(messages.slicer)"
+			:aria-busy="loadingFiles"
+			allow="clipboard-read; clipboard-write"
+			class="block min-h-0 w-full flex-1 rounded-xl border border-solid border-surface-4 bg-surface-1"
+			@load="onFrameLoad"
+		/>
+	</div>
 	<p v-else-if="isLoading || versionsQuery.isPending.value" role="status" class="m-0">
 		{{ formatMessage(messages.loading) }}
 	</p>
@@ -15,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import { useVIntl } from '@modrinth/ui'
+import { Button, PageLoadingBar, useVIntl } from '@modrinth/ui'
 import { useEventListener } from '@vueuse/core'
 import { onScopeDispose, ref, useTemplateRef, watch } from 'vue'
 
@@ -38,7 +46,7 @@ const HANDSHAKE_TIMEOUT_MS = 15_000
 
 const { formatMessage } = useVIntl()
 const { isLoading, versionsQuery } = injectProjectReviewPageContext()
-const { target, openRequests } = injectReviewSlicer()
+const { target, openRequests, loadingFiles } = injectReviewSlicer()
 const { openTab } = injectProjectReviewContext()
 const panelVisible = injectReviewPanelVisible()
 const frame = useTemplateRef<HTMLIFrameElement>('frame')
@@ -50,11 +58,13 @@ const bridgeScript = `data:text/javascript;base64,${btoa(
 
 const frameKey = ref(0)
 const frameSrc = ref('')
+const loadFailed = ref(false)
 /** Highest bridge version that has handshaked with the current iframe, 0 when none has. */
 let bridgeVersion = 0
 /** Bridge version that received the last target, 0 when it was passed through URL parameters. */
 let deliveredVersion = 0
 let sentKey: string | undefined
+let requestId = 0
 let handshakeTimer: ReturnType<typeof setTimeout> | undefined
 
 function bridgeInstalled() {
@@ -75,6 +85,9 @@ function mount(next: SlicerTarget, withScript = !bridgeInstalled()) {
 	bridgeVersion = 0
 	deliveredVersion = 0
 	sentKey = next.key
+	requestId++
+	loadingFiles.value = true
+	loadFailed.value = false
 	const params = new URLSearchParams(next.files.map(({ url }) => ['url', url]))
 	if (next.entry) params.set('file', next.entry)
 	if (withScript) params.set('script', bridgeScript)
@@ -95,10 +108,23 @@ function send(next: SlicerTarget) {
 	if (!targetWindow) return
 	sentKey = next.key
 	deliveredVersion = bridgeVersion
+	loadingFiles.value = true
+	loadFailed.value = false
 	targetWindow.postMessage(
-		{ source: BRIDGE_SOURCE, type: 'load', id: next.key, files: next.files, entry: next.entry },
+		{ source: BRIDGE_SOURCE, type: 'load', id: ++requestId, files: next.files, entry: next.entry },
 		SLICER_ORIGIN,
 	)
+}
+
+function onFrameLoad() {
+	if (bridgeVersion < SLICER_BRIDGE_VERSION) loadingFiles.value = false
+}
+
+function retry() {
+	const next = target.value
+	if (!next) return
+	if (bridgeVersion >= SLICER_BRIDGE_VERSION) send(next)
+	else mount(next)
 }
 
 /**
@@ -118,13 +144,16 @@ function onHandshake(version: number) {
 	const next = target.value
 	if (!next) return
 	const outdatedDelivery = deliveredVersion > 0 && deliveredVersion < SLICER_BRIDGE_VERSION
-	if (next.key !== sentKey || (current && outdatedDelivery)) send(next)
+	if (next.key !== sentKey || (current && (outdatedDelivery || deliveredVersion === 0))) {
+		send(next)
+	}
 }
 
 watch(
 	[target, panelVisible],
 	([next, visible]) => {
 		if (!next || next.key === sentKey) return
+		loadFailed.value = false
 		if (bridgeVersion) send(next)
 		else if (handshakeTimer === undefined && (frameSrc.value || visible)) mount(next)
 	},
@@ -136,9 +165,30 @@ watch(openRequests, () => openTab('slicer'))
 useEventListener('message', (event: MessageEvent) => {
 	if (event.origin !== SLICER_ORIGIN || event.source !== frame.value?.contentWindow) return
 	const data = event.data
-	if (data?.source !== BRIDGE_SOURCE || data.type !== 'ready') return
-	onHandshake(typeof data.version === 'number' ? data.version : 0)
+	if (data?.source !== BRIDGE_SOURCE) return
+	if (data.type === 'ready') {
+		onHandshake(typeof data.version === 'number' ? data.version : 0)
+		return
+	}
+	if (
+		data.version !== bridgeVersion ||
+		data.version < SLICER_BRIDGE_VERSION ||
+		data.id !== requestId ||
+		sentKey !== target.value?.key
+	) {
+		return
+	}
+	if (data.type === 'loading') {
+		loadingFiles.value = true
+		loadFailed.value = false
+	} else if (data.type === 'loaded' || data.type === 'error') {
+		loadingFiles.value = false
+		loadFailed.value = data.type === 'error'
+	}
 })
 
-onScopeDispose(() => clearTimeout(handshakeTimer))
+onScopeDispose(() => {
+	clearTimeout(handshakeTimer)
+	loadingFiles.value = false
+})
 </script>

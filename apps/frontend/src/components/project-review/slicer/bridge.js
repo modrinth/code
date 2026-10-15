@@ -23,7 +23,7 @@ const TAB_TYPES_BY_EXTENSION = {
 let instance
 
 function post(message) {
-	window.parent.postMessage({ source: SOURCE, ...message }, PARENT_ORIGIN)
+	window.parent.postMessage({ source: SOURCE, version: VERSION, ...message }, PARENT_ORIGIN)
 }
 
 /** Picks the tab type slicer itself would use when opening an entry with this name. */
@@ -74,6 +74,7 @@ export default {
 			const data = event.data
 			if (data?.source !== SOURCE || data.type !== 'load') return
 			latestId = data.id
+			post({ type: 'loading', id: data.id })
 			try {
 				if (
 					!isLoaded(
@@ -91,19 +92,25 @@ export default {
 					if (latestId !== data.id) return
 					await context.workspace.clear()
 					for (const { name, blob } of files) {
+						if (latestId !== data.id) return
 						await context.workspace.add(name, blob)
 					}
 				}
-				if (!data.entry) return
-				const entry = findEntry(context, data.entry)
-				if (entry) {
-					await context.editor.add(tabType(entry.name), entry)
-				} else {
-					context.notification.warning('Could not find file in workspace', {
-						description: data.entry,
-					})
+				if (latestId !== data.id) return
+				if (data.entry) {
+					const entry = findEntry(context, data.entry)
+					if (entry) {
+						await context.editor.add(tabType(entry.name), entry)
+					} else {
+						context.notification.warning('Could not find file in workspace', {
+							description: data.entry,
+						})
+					}
 				}
+				if (latestId === data.id) post({ type: 'loaded', id: data.id })
 			} catch (error) {
+				if (latestId !== data.id) return
+				post({ type: 'error', id: data.id })
 				context.notification.error('Could not load files from Modrinth', {
 					description: String(error?.message ?? error),
 				})

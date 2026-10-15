@@ -41,9 +41,11 @@ export function createReviewSlicer(
 ) {
 	const selected = shallowRef<SlicerTarget>()
 	const openRequests = ref(0)
+	const loadingFiles = ref(false)
 
 	watch(projectId, () => {
 		selected.value = undefined
+		loadingFiles.value = false
 	})
 
 	const target = computed<SlicerTarget | undefined>(() => {
@@ -59,9 +61,11 @@ export function createReviewSlicer(
 	 */
 	function open(urls: string[], entry?: string) {
 		if (!urls.length) return
-		selected.value = createTarget(urls, entry)
+		const next = createTarget(urls, entry)
+		if (next.key !== target.value?.key) loadingFiles.value = true
+		selected.value = next
 		openRequests.value++
 	}
 
-	return { target, open, openRequests }
+	return { target, open, openRequests, loadingFiles }
 }
