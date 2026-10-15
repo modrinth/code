@@ -458,6 +458,16 @@ impl SandboxChildOp for WindowsChild {
 }
 
 impl WindowsChild {
+    fn process_identity(&self) -> std::io::Result<acl::ProcessIdentity> {
+        let pid = unsafe {
+            windows::Win32::System::Threading::GetProcessId(self.process_handle)
+        };
+        if pid == 0 {
+            return Err(std::io::Error::last_os_error());
+        }
+        acl::ProcessIdentity::from_handle(pid, self.process_handle)
+    }
+
     pub(crate) fn blocking_wait(&mut self) -> Result<SandboxExitStatus> {
         if let Some(exit_status) = self.exit_status {
             return Ok(exit_status);

@@ -13,8 +13,8 @@ use windows::{
             WAIT_FAILED, WAIT_OBJECT_0, WAIT_TIMEOUT,
         },
         System::Threading::{
-            CreateMutexW, GetCurrentProcessId, GetProcessTimes, INFINITE,
-            OpenProcess, PROCESS_ACCESS_RIGHTS,
+            CreateMutexW, GetCurrentProcess, GetCurrentProcessId,
+            GetProcessTimes, INFINITE, OpenProcess, PROCESS_ACCESS_RIGHTS,
             PROCESS_QUERY_LIMITED_INFORMATION, ReleaseMutex,
             WaitForSingleObject,
         },
@@ -24,7 +24,7 @@ use windows::{
 use winreg::{RegKey, enums::HKEY_CURRENT_USER};
 
 const REGISTRY_BASE: &str = r"Software\MinecraftSandbox";
-const STATE_VALUE: &str = "State";
+const GRANT_VALUE: &str = "Grant";
 const SYNCHRONIZE_PROCESS: PROCESS_ACCESS_RIGHTS =
     PROCESS_ACCESS_RIGHTS(0x00100000);
 
@@ -64,15 +64,13 @@ impl Grant {
 }
 
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
-pub struct ProcessIdentity {
-    pub pid: u32,
-    pub creation_time: u64,
+pub(super) struct ProcessIdentity {
+    pid: u32,
+    creation_time: u64,
 }
 
 #[derive(Debug, Default, Deserialize, Serialize)]
 struct RegistryState {
-    #[serde(default)]
-    grants: Vec<Grant>,
     #[serde(default)]
     instances: Vec<Instance>,
 }
@@ -114,7 +112,7 @@ impl AppliedAclLedger {
                 "AppContainer SID is not valid Unicode",
             )
         })?;
-        let key_path = format!(r"{REGISTRY_BASE}\{sid}\Grant");
+        let key_path = format!(r"{REGISTRY_BASE}\{sid}");
         let (key, _) =
             RegKey::predef(HKEY_CURRENT_USER).create_subkey(key_path)?;
         let mutex_name =
@@ -144,7 +142,7 @@ impl AppliedAclLedger {
     }
 
     fn read(&self) -> io::Result<RegistryState> {
-        let state: String = match self.key.get_value(STATE_VALUE) {
+        let state: String = match self.key.get_value(GRANT_VALUE) {
             Ok(state) => state,
             Err(error) if error.kind() == io::ErrorKind::NotFound => {
                 return Ok(RegistryState::default());
@@ -159,7 +157,7 @@ impl AppliedAclLedger {
         let state = serde_json::to_string(state).map_err(|error| {
             io::Error::new(io::ErrorKind::InvalidData, error)
         })?;
-        self.key.set_value(STATE_VALUE, &state)
+        self.key.set_value(GRANT_VALUE, &state)
     }
 }
 
@@ -233,12 +231,10 @@ impl PreparedInstance<'_> {
         self.guard.persist()
     }
 
-    pub fn activate(&mut self, child_pid: u32) -> io::Result<ProcessIdentity> {
-        let process = ProcessIdentity::for_pid(child_pid)?;
+    pub fn activate(&mut self, process: ProcessIdentity) -> io::Result<()> {
         let instance = self.instance_mut()?;
         instance.state = InstanceState::Running { process };
-        self.guard.persist()?;
-        Ok(process)
+        self.guard.persist()
     }
 
     fn instance_mut(&mut self) -> io::Result<&mut Instance> {
@@ -257,22 +253,16 @@ impl PreparedInstance<'_> {
 }
 
 impl ProcessIdentity {
-    pub fn current() -> io::Result<Self> {
-        Self::for_pid(unsafe { GetCurrentProcessId() })
+    fn current() -> io::Result<Self> {
+        Self::from_handle(unsafe { GetCurrentProcessId() }, unsafe {
+            GetCurrentProcess()
+        })
     }
 
-    pub fn for_pid(pid: u32) -> io::Result<Self> {
-        let handle = unsafe {
-            OpenProcess(
-                PROCESS_QUERY_LIMITED_INFORMATION | SYNCHRONIZE_PROCESS,
-                false,
-                pid,
-            )
-        }?;
-        let handle = ProcessHandle(handle);
+    pub(super) fn from_handle(pid: u32, handle: HANDLE) -> io::Result<Self> {
         Ok(Self {
             pid,
-            creation_time: process_creation_time(handle.0)?,
+            creation_time: process_creation_time(handle)?,
         })
     }
 
@@ -326,13 +316,11 @@ fn effective_union<'a>(
     include_instance: impl Fn(&Instance) -> bool,
 ) -> Vec<Grant> {
     normalize_grants(
-        state.grants.iter().chain(
-            state
-                .instances
-                .iter()
-                .filter(|instance| include_instance(instance))
-                .flat_map(|instance| instance.grants.iter()),
-        ),
+        state
+            .instances
+            .iter()
+            .filter(|instance| include_instance(instance))
+            .flat_map(|instance| instance.grants.iter()),
     )
 }
 

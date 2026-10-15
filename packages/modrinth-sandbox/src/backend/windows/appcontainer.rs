@@ -65,7 +65,7 @@ use eyre::{Context, Result, bail, eyre};
 
 use crate::{
     SandboxArg, SandboxCommand,
-    backend::{Backend, SandboxChild, SandboxChildOp, SandboxEnv},
+    backend::{Backend, SandboxChild, SandboxEnv},
     helper::MakeHelper,
 };
 
@@ -401,11 +401,11 @@ fn spawn(
         attribute_list,
     )
     .wrap_err("spawning child")?;
-    let child_pid = child
-        .id()
-        .ok_or_else(|| eyre!("spawned child had no process ID"))?;
+    let process_identity = child
+        .process_identity()
+        .wrap_err("reading spawned child process identity")?;
     prepared
-        .activate(child_pid)
+        .activate(process_identity)
         .wrap_err("activating AppContainer ACL instance")?;
 
     let mut child = crate::SandboxChild {
