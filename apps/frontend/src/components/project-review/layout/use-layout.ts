@@ -260,8 +260,15 @@ export function useProjectReviewLayout(
 	function openTab(tab: ProjectReviewTab) {
 		if (!getTabs().includes(tab)) return
 		const panel = tabs?.getPanel(tab)
-		panel?.api.setActive()
-		if (panel?.api.location.type === 'popout') panel.api.getWindow().focus()
+		if (!panel) return
+		if (panel.api.location.type === 'popout') {
+			if (!panel.api.isVisible) {
+				panel.group.model.openPanel(panel, { skipSetGroupActive: true })
+			}
+			panel.api.getWindow().focus()
+			return
+		}
+		panel.api.setActive()
 	}
 
 	function popoutTab(

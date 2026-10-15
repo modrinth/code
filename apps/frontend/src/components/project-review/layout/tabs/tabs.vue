@@ -3,7 +3,7 @@
 		<DockviewVue
 			class="project-review-dock h-full"
 			:theme="theme"
-			dnd-strategy="pointer"
+			dnd-strategy="html5"
 			disable-tabs-overflow-list
 			disable-floating-groups
 			default-tab-component="ProjectReviewTab"
