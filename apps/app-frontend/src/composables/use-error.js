@@ -1,7 +1,5 @@
 import { reactive } from 'vue'
 
-import { findMinecraftAuthError } from '@/components/ui/minecraft-auth-error-modal/minecraft-auth-errors'
-
 const errorState = reactive({
 	errorModal: null,
 	minecraftAuthErrorModal: null,
@@ -20,12 +18,7 @@ const errorState = reactive({
 			this.minecraftRequiredModal.show()
 			return
 		}
-		if (
-			error.message &&
-			(error.message.includes('Minecraft authentication error:') ||
-				findMinecraftAuthError(error.message)) &&
-			this.minecraftAuthErrorModal
-		) {
+		if (error.code?.startsWith('minecraft_auth_') && this.minecraftAuthErrorModal) {
 			this.minecraftAuthErrorModal.show(error)
 			return
 		}

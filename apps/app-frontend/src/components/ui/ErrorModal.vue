@@ -55,19 +55,16 @@ defineExpose({
 		console.log(errorVal, context, canClose, source)
 		closable.value = canClose
 
-		if (errorVal.message && errorVal.message.includes('Minecraft authentication error:')) {
+		if (errorVal.code?.startsWith('minecraft_auth_')) {
 			title.value = 'Unable to sign in to Minecraft'
 			errorType.value = 'minecraft_auth'
 			supportLink.value =
 				'https://support.modrinth.com/en/articles/9038231-minecraft-sign-in-issues'
 
-			if (
-				errorVal.message.includes('existing connection was forcibly closed') ||
-				errorVal.message.includes('error sending request for url')
-			) {
+			if (errorVal.code === 'minecraft_auth_network') {
 				metadata.value.network = true
 			}
-			if (errorVal.message.includes('because the target machine actively refused it')) {
+			if (errorVal.code === 'minecraft_auth_connection_refused') {
 				metadata.value.hostsFile = true
 			}
 		} else if (errorVal.code?.startsWith('directory_move_')) {

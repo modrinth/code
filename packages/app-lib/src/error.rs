@@ -1,5 +1,6 @@
 //! Theseus error type
 use crate::data::ModLoader;
+use crate::state::MinecraftAuthenticationError;
 use crate::util;
 use crate::util::io::IOError;
 use crate::util::jre::JREError;
@@ -283,6 +284,7 @@ impl ErrorKind {
             Self::NoCredentialsError => "not_logged_in",
             Self::NoLoaderVersion { .. } => "no_loader_version",
             Self::NoMinecraftProfile => "minecraft_auth_no_profile",
+            Self::MinecraftAuthenticationError(error) => error.code(),
             Self::LauncherError(_) => "launcher_error",
             Self::JREError(_) => "java_error",
             Self::NoValueFor(_) | Self::MetadataError(_) => "metadata_error",
@@ -340,6 +342,10 @@ pub fn error_code(error: &Error) -> &'static str {
         "permission_denied"
     } else if let Some(kind) = error.downcast_ref::<ErrorKind>() {
         kind.code()
+    } else if let Some(error) =
+        error.downcast_ref::<MinecraftAuthenticationError>()
+    {
+        error.code()
     } else if error.is::<reqwest::Error>()
         || error.is::<tungstenite::Error>()
         || error.is::<ResolveError>()

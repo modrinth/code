@@ -20,11 +20,13 @@ use serde_json::json;
 use sha2::Digest;
 use std::borrow::Cow;
 use std::collections::HashMap;
+use std::error::Error;
 use std::future::Future;
 use std::hash::{BuildHasherDefault, DefaultHasher};
 use std::ops::Deref;
 use std::sync::Arc;
 use std::time::Instant;
+use std::{io, iter};
 use tokio::runtime::{Handle, RuntimeFlavor};
 use tokio::sync::Mutex;
 use tokio::task;
@@ -83,7 +85,76 @@ struct OAuthErrorResponse {
     error: String,
 }
 
+#[derive(Deserialize)]
+struct XboxErrorResponse {
+    #[serde(rename = "XErr")]
+    xerr: u64,
+}
+
 impl MinecraftAuthenticationError {
+    pub(crate) fn code(&self) -> &'static str {
+        match self {
+            Self::DeserializeResponse {
+                step: MinecraftAuthStep::RefreshOAuthToken,
+                ..
+            } => "minecraft_auth_token_expired",
+            Self::DeserializeResponse {
+                step: MinecraftAuthStep::SisuAuthenticate,
+                ..
+            } => "minecraft_auth_clock_out_of_sync",
+            Self::DeserializeResponse {
+                step: MinecraftAuthStep::MinecraftToken,
+                status_code: StatusCode::TOO_MANY_REQUESTS,
+                ..
+            } => "minecraft_auth_rate_limited",
+            Self::DeserializeResponse {
+                step: MinecraftAuthStep::MinecraftToken,
+                status_code,
+                ..
+            } if status_code.is_server_error() => {
+                "minecraft_auth_service_unavailable"
+            }
+            Self::Request { source, .. } if source.is_request() => {
+                let connection_refused = iter::successors(
+                    Some(source as &(dyn Error + 'static)),
+                    |&error| error.source(),
+                )
+                .any(|error| {
+                    error.downcast_ref::<io::Error>().is_some_and(|error| {
+                        error.kind() == io::ErrorKind::ConnectionRefused
+                    })
+                });
+
+                if connection_refused {
+                    "minecraft_auth_connection_refused"
+                } else {
+                    "minecraft_auth_network"
+                }
+            }
+            Self::DeserializeResponse { step, raw, .. } => {
+                match serde_json::from_str::<XboxErrorResponse>(raw)
+                    .map(|response| response.xerr)
+                {
+                    Ok(2148916222) => "minecraft_auth_age_verification",
+                    Ok(2148916227) => "minecraft_auth_banned",
+                    Ok(2148916229) => "minecraft_auth_restricted",
+                    Ok(2148916233) => "minecraft_auth_no_xbox_profile",
+                    Ok(2148916234) => "minecraft_auth_terms_not_accepted",
+                    Ok(2148916235) => "minecraft_auth_region_unavailable",
+                    Ok(2148916236 | 2148916237) => {
+                        "minecraft_auth_adult_verification"
+                    }
+                    Ok(2148916238) => "minecraft_auth_underage",
+                    _ if matches!(step, MinecraftAuthStep::XstsAuthorize) => {
+                        "minecraft_auth_xsts_rejected"
+                    }
+                    _ => "minecraft_auth_error",
+                }
+            }
+            _ => "minecraft_auth_error",
+        }
+    }
+
     fn is_invalid_grant(&self) -> bool {
         matches!(
             self,
