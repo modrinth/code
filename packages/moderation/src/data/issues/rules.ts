@@ -10,6 +10,7 @@ import prohibitedContentDiscriminatoryMessage from '../messages/checklist/messag
 import prohibitedContentFalseEndorsementMessage from '../messages/checklist/messages/rules/prohibited-content/false-endorsement.md'
 import prohibitedContentHarmfulMessage from '../messages/checklist/messages/rules/prohibited-content/harmful.md'
 import prohibitedContentIllegalActivityMessage from '../messages/checklist/messages/rules/prohibited-content/illegal-activity.md'
+import prohibitedContentIllegalActivityPiracyMessage from '../messages/checklist/messages/rules/prohibited-content/illegal-activity/piracy.md'
 import prohibitedContentImpersonationMessage from '../messages/checklist/messages/rules/prohibited-content/impersonation.md'
 import prohibitedContentIpInfringementMessage from '../messages/checklist/messages/rules/prohibited-content/ip-infringement.md'
 import prohibitedContentLegalRightsMessage from '../messages/checklist/messages/rules/prohibited-content/legal-rights.md'
@@ -133,6 +134,7 @@ const prohibitedContentMessages: Record<string, string> = {
 	'rules-prohibited-content-ip-infringement': prohibitedContentIpInfringementMessage,
 	'rules-prohibited-content-legal-rights': prohibitedContentLegalRightsMessage,
 	'rules-prohibited-content-illegal-activity': prohibitedContentIllegalActivityMessage,
+	'rules-prohibited-content-illegal-activity-piracy': prohibitedContentIllegalActivityPiracyMessage,
 	'rules-prohibited-content-harmful': prohibitedContentHarmfulMessage,
 	'rules-prohibited-content-misleading': prohibitedContentMisleadingMessage,
 	'rules-prohibited-content-impersonation': prohibitedContentImpersonationMessage,
@@ -224,7 +226,7 @@ export const rulesReviewPanel = panel({
 		}),
 	),
 	section({
-		label: 'Which Prohibited Content rules does this project violate?',
+		label: 'Which rules does this project violate?',
 		shown: ({ selected }) => selected.issueIds.includes(rulesProhibitedContentIssue.id),
 	}).content(
 		toggle({
@@ -302,6 +304,17 @@ export const rulesReviewPanel = panel({
 					value: `rules-server-side-opt-in-${type.toLowerCase()}`,
 					label: type,
 				})),
+		}),
+	),
+	section({
+		label: 'Type of potentially illegal activity?',
+		shown: ({ selected }) =>
+			selected.toggleIds.includes('rules-prohibited-content-illegal-activity'),
+	}).content(
+		toggle({
+			issue: rulesProhibitedContentIssue,
+			label: 'Piracy',
+			id: 'rules-prohibited-content-illegal-activity-piracy',
 		}),
 	),
 )
