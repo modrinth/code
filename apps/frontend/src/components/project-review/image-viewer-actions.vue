@@ -4,14 +4,19 @@ import {
 	ButtonLink,
 	defineMessages,
 	IconButton,
+	type ImageViewerEditorMetadata,
 	injectNotificationManager,
 	useVIntl,
 } from '@modrinth/ui'
 import { ref } from 'vue'
 
+import ImageViewerInfo from './image-viewer-info.vue'
 import { projectReviewMessages } from './messages'
 
-const props = defineProps<{ src: string }>()
+const props = defineProps<{
+	src: string
+	metadata?: ImageViewerEditorMetadata
+}>()
 const pixelated = defineModel<boolean>('pixelated', { default: false })
 const downloading = ref(false)
 const { formatMessage } = useVIntl()
@@ -84,4 +89,5 @@ async function downloadImage() {
 	>
 		<ExternalIcon aria-hidden="true" />
 	</ButtonLink>
+	<ImageViewerInfo :key="src" :metadata="metadata" />
 </template>

@@ -240,10 +240,11 @@ const proofImageItems = computed(() =>
 								editor="disabled"
 								:pixelated="pixelated"
 							>
-								<template #actions="{ item }">
+								<template #actions="{ item, metadata }">
 									<slot
 										name="image-viewer-actions"
 										:item="item"
+										:metadata="metadata"
 										:pixelated="pixelated"
 										:set-pixelated="(value: boolean) => (pixelated = value)"
 									/>

@@ -18,8 +18,8 @@
 				collapse-all-icon-only
 				collapse-attributed-by-default
 			>
-				<template #image-viewer-actions="{ item }">
-					<ImageViewerActions v-model:pixelated="pixelated" :src="item.src" />
+				<template #image-viewer-actions="{ item, metadata }">
+					<ImageViewerActions v-model:pixelated="pixelated" :src="item.src" :metadata="metadata" />
 				</template>
 			</ProjectPermissions>
 		</div>

@@ -286,8 +286,14 @@ defineExpose({ show, edit, hide, next, previous, markSavedAndView })
 				@cancel="finishEditing"
 				@save="emit('save', $event)"
 			>
-				<template #actions>
-					<slot name="actions" :item="activeItem" :index="activeIndex" :hide="hide" />
+				<template #actions="{ metadata }">
+					<slot
+						name="actions"
+						:item="activeItem"
+						:index="activeIndex"
+						:hide="hide"
+						:metadata="metadata"
+					/>
 				</template>
 			</Editor>
 		</div>

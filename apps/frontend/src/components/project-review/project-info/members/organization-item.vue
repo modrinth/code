@@ -25,8 +25,8 @@
 			editor="disabled"
 			:pixelated="pixelated"
 		>
-			<template #actions="{ item }">
-				<ImageViewerActions v-model:pixelated="pixelated" :src="item.src" />
+			<template #actions="{ item, metadata }">
+				<ImageViewerActions v-model:pixelated="pixelated" :src="item.src" :metadata="metadata" />
 			</template>
 		</ImageViewerEditor>
 		<div class="min-w-0">

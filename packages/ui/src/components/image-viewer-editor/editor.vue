@@ -21,6 +21,7 @@ import Toolbar from './toolbar.vue'
 import type {
 	ImageViewerEditorData,
 	ImageViewerEditorItem,
+	ImageViewerEditorMetadata,
 	ImageViewerEditorSavePayload,
 } from './types'
 import { useImageEditor } from './use-image-editor'
@@ -55,6 +56,7 @@ const fitBounds = ref<HTMLElement>()
 const exporting = ref(false)
 const discarding = ref(false)
 const loadingEditorData = ref(true)
+const imageMetadata = ref<ImageViewerEditorMetadata>()
 const spacePressed = ref(false)
 const panning = ref<{
 	x: number
@@ -138,14 +140,20 @@ function isGifOrWebpSource(source?: string) {
 function queueInitialization() {
 	const generation = ++initializationGeneration
 	loadingEditorData.value = true
+	imageMetadata.value = undefined
 	const editorDataPromise = props.loadData(props.item)
 	initializationChain = initializationChain.then(async () => {
 		if (generation !== initializationGeneration) return
 		try {
 			const editorData = await editorDataPromise
 			if (generation !== initializationGeneration || !canvasElement.value) return
-			await initialize(canvasElement.value, editorData, getViewportSize())
+			const dimensions = await initialize(canvasElement.value, editorData, getViewportSize())
 			if (generation !== initializationGeneration) return
+			imageMetadata.value = {
+				...dimensions,
+				size: editorData.source.size,
+				mimeType: editorData.source.type,
+			}
 			setInteractionEnabled(props.mode === 'edit')
 			observeViewport()
 			await waitForRender()
@@ -515,7 +523,7 @@ defineExpose({ markSaved })
 			<EditIcon aria-hidden="true" />
 		</IconButton>
 		<div class="flex items-center gap-2">
-			<slot name="actions" />
+			<slot name="actions" :metadata="imageMetadata" />
 		</div>
 		<div class="h-6 w-px bg-white/10" />
 		<IconButton :label="formatMessage(messages.close)" type="quiet" @click="emit('close')">

@@ -41,8 +41,8 @@
 			:pixelated="pixelated"
 			@hide="restoreImageFocus"
 		>
-			<template #actions="{ item }">
-				<ImageViewerActions v-model:pixelated="pixelated" :src="item.src" />
+			<template #actions="{ item, metadata }">
+				<ImageViewerActions v-model:pixelated="pixelated" :src="item.src" :metadata="metadata" />
 			</template>
 		</ImageViewerEditor>
 	</div>
