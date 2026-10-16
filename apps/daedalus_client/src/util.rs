@@ -396,7 +396,11 @@ async fn download_file_inner(
     const RETRIES: u32 = 10;
     for attempt in 1..=(RETRIES + 1) {
         let result = REQWEST_CLIENT
-            .get(url.replace("http://", "https://"))
+            .get(if url.starts_with("http://localhost") {
+                url.to_string()
+            } else {
+                url.replace("http://", "https://")
+            })
             .send()
             .await
             .and_then(|x| x.error_for_status());

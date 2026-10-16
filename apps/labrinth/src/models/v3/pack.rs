@@ -88,6 +88,7 @@ pub enum PackDependency {
     Neoforge,
     FabricLoader,
     QuiltLoader,
+    OrnitheLoader,
     Minecraft,
 }
 
@@ -106,6 +107,7 @@ impl PackDependency {
             PackDependency::FabricLoader => "fabric-loader",
             PackDependency::Minecraft => "minecraft",
             PackDependency::QuiltLoader => "quilt-loader",
+            PackDependency::OrnitheLoader => "ornithe-loader",
         }
     }
 }

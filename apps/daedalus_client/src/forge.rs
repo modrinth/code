@@ -444,6 +444,9 @@ async fn fetch(
                             .cloned()
                             .collect()
                         }),
+                    java_version: None,
+                    logging: None,
+                    removed_libraries: Vec::new(),
                     libraries: install_profile
                         .version_info
                         .libraries

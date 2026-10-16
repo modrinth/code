@@ -7,6 +7,7 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FrameNode;
+import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
@@ -17,6 +18,8 @@ import org.objectweb.asm.tree.VarInsnNode;
 
 public final class MinecraftTransformer extends ClassNodeTransformer {
     private static final String SET_SERVER_NAME_DESC = "(Ljava/lang/String;I)V";
+    private static final String QUICK_PLAY_NAME = "modrinth$quickPlay";
+    private static final String QUICK_PLAY_DESC = "(Lnet/minecraft/client/Minecraft;)V";
     private static final InsnPattern[] INITIALIZE_THIS_PATTERN = {InsnPattern.opcode(Opcodes.INVOKESPECIAL)};
 
     @Override
@@ -46,7 +49,7 @@ public final class MinecraftTransformer extends ClassNodeTransformer {
                 }
             }
         }
-        if (constructor == null) {
+        if (constructor == null || setServerName == null) {
             return false;
         }
 
@@ -55,44 +58,36 @@ public final class MinecraftTransformer extends ClassNodeTransformer {
             return true;
         }
 
-        final LabelNode noQuickPlayLabel = new LabelNode();
-        final LabelNode doneQuickPlayLabel = new LabelNode();
-        it.add(new LdcInsnNode("modrinth.internal.quickPlay.host"));
-        // String
-        it.add(new MethodInsnNode(
-                Opcodes.INVOKESTATIC, "java/lang/System", "getProperty", "(Ljava/lang/String;)Ljava/lang/String;"));
-        // String
-        it.add(new InsnNode(Opcodes.DUP));
-        // String String
-        it.add(new JumpInsnNode(Opcodes.IFNULL, noQuickPlayLabel));
-        // String
         it.add(new VarInsnNode(Opcodes.ALOAD, 0));
-        // String Minecraft
-        it.add(new InsnNode(Opcodes.SWAP));
-        // Minecraft String
-        it.add(new LdcInsnNode("modrinth.internal.quickPlay.port"));
-        // Minecraft String String
-        it.add(new MethodInsnNode(
+        it.add(new MethodInsnNode(Opcodes.INVOKESTATIC, classNode.name, QUICK_PLAY_NAME, QUICK_PLAY_DESC));
+
+        final MethodNode quickPlay = new MethodNode(
+                Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC | Opcodes.ACC_SYNTHETIC,
+                QUICK_PLAY_NAME,
+                QUICK_PLAY_DESC,
+                null,
+                null);
+        final InsnList insns = quickPlay.instructions;
+        final LabelNode doneLabel = new LabelNode();
+        insns.add(new LdcInsnNode("modrinth.internal.quickPlay.host"));
+        insns.add(new MethodInsnNode(
                 Opcodes.INVOKESTATIC, "java/lang/System", "getProperty", "(Ljava/lang/String;)Ljava/lang/String;"));
-        // Minecraft String String
-        it.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Integer", "parseInt", "(Ljava/lang/String;)I"));
-        // Minecraft String int
-        it.add(new MethodInsnNode(
-                Opcodes.INVOKEVIRTUAL, "net/minecraft/client/Minecraft", setServerName, SET_SERVER_NAME_DESC));
-        //
-        it.add(new JumpInsnNode(Opcodes.GOTO, doneQuickPlayLabel));
-        it.add(noQuickPlayLabel);
+        insns.add(new VarInsnNode(Opcodes.ASTORE, 1));
+        insns.add(new VarInsnNode(Opcodes.ALOAD, 1));
+        insns.add(new JumpInsnNode(Opcodes.IFNULL, doneLabel));
+        insns.add(new VarInsnNode(Opcodes.ALOAD, 0));
+        insns.add(new VarInsnNode(Opcodes.ALOAD, 1));
+        insns.add(new LdcInsnNode("modrinth.internal.quickPlay.port"));
+        insns.add(new MethodInsnNode(
+                Opcodes.INVOKESTATIC, "java/lang/System", "getProperty", "(Ljava/lang/String;)Ljava/lang/String;"));
+        insns.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Integer", "parseInt", "(Ljava/lang/String;)I"));
+        insns.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, classNode.name, setServerName, SET_SERVER_NAME_DESC));
+        insns.add(doneLabel);
         if (needsStackMap(classNode)) {
-            it.add(new FrameNode(Opcodes.F_SAME, 0, null, 0, null));
+            insns.add(new FrameNode(Opcodes.F_APPEND, 1, new Object[] {"java/lang/String"}, 0, null));
         }
-        // String
-        it.add(new InsnNode(Opcodes.POP));
-        //
-        it.add(doneQuickPlayLabel);
-        if (needsStackMap(classNode)) {
-            it.add(new FrameNode(Opcodes.F_SAME, 0, null, 0, null));
-        }
-        //
+        insns.add(new InsnNode(Opcodes.RETURN));
+        classNode.methods.add(quickPlay);
 
         return true;
     }

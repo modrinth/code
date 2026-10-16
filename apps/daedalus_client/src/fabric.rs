@@ -21,9 +21,12 @@ use crate::util::{
 use crate::{
     Error, FetchResult, MirrorArtifact, UploadFile, insert_mirrored_artifact,
 };
+use daedalus::get_path_from_artifact;
+use daedalus::minecraft::{Argument, JavaVersion, Library, LibraryDownload};
 use daedalus::modded::{DUMMY_REPLACE_STRING, Manifest, PartialVersionInfo};
 use dashmap::DashMap;
 use serde::Deserialize;
+use std::collections::HashSet;
 use std::sync::Arc;
 use tokio::sync::Semaphore;
 
@@ -103,11 +106,14 @@ async fn fetch(
             .flat_map(|group| {
                 loaders.iter().map(move |loader| ProfileRequest {
                     group: group.id.to_string(),
-                    loader_profile_template_game_version: group
-                        .loader_profile_template_game_version
-                        .clone(),
+                    loader_profile_template_game_version: Some(
+                        group.loader_profile_template_game_version.clone(),
+                    ),
                     game_versions: group.game_versions.clone(),
                     loader_version: loader.version.clone(),
+                    extra_libraries: Vec::new(),
+                    removed_libraries: Vec::new(),
+                    java_version: None,
                     url: format!(
                         "{}/versions/loader/{}/{}/profile/json",
                         meta_url,
@@ -123,6 +129,7 @@ async fn fetch(
             format_version,
             maven_url,
             profile_requests,
+            false,
             &upload_files,
             &mirror_artifacts,
             &semaphore,
@@ -271,11 +278,16 @@ async fn fetch(
             .iter()
             .map(|loader| ProfileRequest {
                 group: universal_group.id.to_string(),
-                loader_profile_template_game_version: universal_group
-                    .loader_profile_template_game_version
-                    .clone(),
+                loader_profile_template_game_version: Some(
+                    universal_group
+                        .loader_profile_template_game_version
+                        .clone(),
+                ),
                 game_versions: universal_group.game_versions.clone(),
                 loader_version: loader.version.clone(),
+                extra_libraries: Vec::new(),
+                removed_libraries: Vec::new(),
+                java_version: None,
                 url: format!(
                     "{}/versions/loader/{}/{}/profile/json",
                     meta_url,
@@ -290,6 +302,7 @@ async fn fetch(
             format_version,
             maven_url,
             profile_requests,
+            false,
             &upload_files,
             &mirror_artifacts,
             &semaphore,
@@ -359,15 +372,20 @@ async fn fetch(
     })
 }
 
-struct ProfileRequest {
-    group: String,
-    loader_profile_template_game_version: String,
-    game_versions: Vec<String>,
-    loader_version: String,
-    url: String,
+pub(crate) struct ProfileRequest {
+    pub group: String,
+    pub loader_profile_template_game_version: Option<String>,
+    pub game_versions: Vec<String>,
+    pub loader_version: String,
+    pub url: String,
+    pub extra_libraries: Vec<Library>,
+    /// Artifacts of the game's libraries this group's profiles drop.
+    pub removed_libraries: Vec<String>,
+    /// The Java version this group's profiles prefer over the game's.
+    pub java_version: Option<JavaVersion>,
 }
 
-fn metadata_version_path(
+pub(crate) fn metadata_version_path(
     mod_loader: &str,
     format_version: usize,
     loader_version: &str,
@@ -382,24 +400,53 @@ fn metadata_version_path(
     }
 }
 
-async fn fetch_metadata_profiles(
+/// Fetches, patches and queues the upload of each requested loader profile.
+///
+/// With `allow_failures`, profiles that fail to download or parse are skipped
+/// and returned as `(group, loader_version)` pairs instead of failing the
+/// whole fetch.
+#[allow(clippy::too_many_arguments)]
+pub(crate) async fn fetch_metadata_profiles(
     mod_loader: &str,
     format_version: usize,
     maven_url: &str,
     profile_requests: Vec<ProfileRequest>,
+    allow_failures: bool,
     upload_files: &DashMap<String, UploadFile>,
     mirror_artifacts: &DashMap<String, MirrorArtifact>,
     semaphore: &Arc<Semaphore>,
-) -> Result<(), Error> {
-    let version_manifests = futures::future::try_join_all(
+) -> Result<HashSet<(String, String)>, Error> {
+    let downloads = futures::future::join_all(
         profile_requests
             .iter()
             .map(|x| download_file(&x.url, None, semaphore)),
     )
-    .await?
-    .into_iter()
-    .map(|x| serde_json::from_slice(&x))
-    .collect::<Result<Vec<PartialVersionInfo>, serde_json::Error>>()?;
+    .await;
+
+    let mut failed = HashSet::new();
+    let mut fetched = Vec::with_capacity(profile_requests.len());
+
+    for (download, request) in downloads.into_iter().zip(profile_requests) {
+        let version_info = download.and_then(|x| {
+            Ok(serde_json::from_slice::<PartialVersionInfo>(&x)?)
+        });
+
+        match version_info {
+            Ok(version_info) => fetched.push((version_info, request)),
+            Err(err) if allow_failures => {
+                tracing::warn!(
+                    url = %request.url,
+                    error = %err,
+                    "Skipping {mod_loader} loader profile"
+                );
+                failed.insert((request.group, request.loader_version));
+            }
+            Err(err) => return Err(err),
+        }
+    }
+
+    let (version_manifests, profile_requests): (Vec<_>, Vec<_>) =
+        fetched.into_iter().unzip();
 
     let patched_version_manifests = version_manifests
         .into_iter()
@@ -407,11 +454,18 @@ async fn fetch_metadata_profiles(
         .map(|(mut version_info, request)| {
             patch_version_info(
                 &mut version_info,
-                &request.loader_profile_template_game_version,
+                request.loader_profile_template_game_version.as_deref(),
                 &request.game_versions,
                 maven_url,
+                &request.extra_libraries,
                 mirror_artifacts,
             )?;
+            if let Some(java_version) = &request.java_version {
+                version_info.java_version = Some(java_version.clone());
+            }
+            version_info
+                .removed_libraries
+                .clone_from(&request.removed_libraries);
 
             Ok(version_info)
         })
@@ -441,18 +495,78 @@ async fn fetch_metadata_profiles(
             );
         });
 
+    Ok(failed)
+}
+
+fn template_game_version(value: &str, game_version: Option<&str>) -> String {
+    let Some(game_version) = game_version else {
+        return value.to_string();
+    };
+    let is_boundary =
+        |x: Option<char>| x.is_none_or(|x| !x.is_alphanumeric() && x != '.');
+    let mut templated = String::with_capacity(value.len());
+    let mut copied = 0;
+
+    for (start, _) in value.match_indices(game_version) {
+        let end = start + game_version.len();
+
+        if is_boundary(value[..start].chars().next_back())
+            && is_boundary(value[end..].chars().next())
+        {
+            templated.push_str(&value[copied..start]);
+            templated.push_str(DUMMY_REPLACE_STRING);
+            copied = end;
+        }
+    }
+
+    templated.push_str(&value[copied..]);
+    templated
+}
+
+/// Swaps the version of a library for the placeholder where it is exactly
+/// the game version, so `1.14` is left alone in `1.14-pre1`.
+fn template_library_name(name: &str, game_version: Option<&str>) -> String {
+    name.split(':')
+        .map(|x| {
+            if Some(x) == game_version {
+                DUMMY_REPLACE_STRING
+            } else {
+                x
+            }
+        })
+        .collect::<Vec<_>>()
+        .join(":")
+}
+
+/// Mirrors a library download and points it at the mirrored copy.
+fn mirror_library_download(
+    artifact: &str,
+    download: &mut LibraryDownload,
+    mirror_artifacts: &DashMap<String, MirrorArtifact>,
+) -> Result<(), Error> {
+    insert_mirrored_artifact(
+        artifact,
+        Some(download.sha1.clone()),
+        vec![download.url.clone()],
+        true,
+        mirror_artifacts,
+    )?;
+    download.url =
+        format_url(&format!("maven/{}", get_path_from_artifact(artifact)?));
+
     Ok(())
 }
 
 fn patch_version_info(
     version_info: &mut PartialVersionInfo,
-    game_version: &str,
+    game_version: Option<&str>,
     game_versions: &[String],
     maven_url: &str,
+    extra_libraries: &[Library],
     mirror_artifacts: &DashMap<String, MirrorArtifact>,
 ) -> Result<(), Error> {
     for lib in &mut version_info.libraries {
-        let new_name = lib.name.replace(game_version, DUMMY_REPLACE_STRING);
+        let new_name = template_library_name(&lib.name, game_version);
 
         // Hard-code: This library is not present on fabric's maven, so we fetch it from MC libraries
         if &*lib.name == "net.minecraft:launchwrapper:1.12" {
@@ -471,8 +585,8 @@ fn patch_version_info(
             )?;
         } else {
             for concrete_game_version in game_versions {
-                let concrete_name =
-                    lib.name.replace(game_version, concrete_game_version);
+                let concrete_name = new_name
+                    .replace(DUMMY_REPLACE_STRING, concrete_game_version);
 
                 insert_mirrored_artifact(
                     &concrete_name,
@@ -489,11 +603,51 @@ fn patch_version_info(
         lib.url = Some(format_url("maven/"));
     }
 
-    version_info.id =
-        version_info.id.replace(game_version, DUMMY_REPLACE_STRING);
-    version_info.inherits_from = version_info
-        .inherits_from
-        .replace(game_version, DUMMY_REPLACE_STRING);
+    for lib in extra_libraries {
+        let mut lib = lib.clone();
+
+        if let Some(downloads) = lib.downloads.as_mut() {
+            if let Some(artifact) = downloads.artifact.as_mut() {
+                mirror_library_download(&lib.name, artifact, mirror_artifacts)?;
+            }
+
+            for (classifier, download) in
+                downloads.classifiers.iter_mut().flatten()
+            {
+                mirror_library_download(
+                    &format!("{}:{classifier}", lib.name),
+                    download,
+                    mirror_artifacts,
+                )?;
+            }
+        } else {
+            insert_mirrored_artifact(
+                &lib.name,
+                None,
+                vec![lib.url.unwrap_or_else(|| maven_url.to_string())],
+                false,
+                mirror_artifacts,
+            )?;
+            lib.url = Some(format_url("maven/"));
+        }
+
+        version_info.libraries.push(lib);
+    }
+
+    for argument in version_info
+        .arguments
+        .iter_mut()
+        .flat_map(|x| x.values_mut())
+        .flatten()
+    {
+        if let Argument::Normal(value) = argument {
+            *value = template_game_version(value, game_version);
+        }
+    }
+
+    version_info.id = template_game_version(&version_info.id, game_version);
+    version_info.inherits_from =
+        template_game_version(&version_info.inherits_from, game_version);
 
     Ok(())
 }
@@ -507,7 +661,7 @@ struct FabricVersions {
 }
 
 #[derive(Deserialize, Debug, Clone)]
-struct FabricLoaderVersion {
+pub(crate) struct FabricLoaderVersion {
     // pub separator: String,
     // pub build: u32,
     // pub maven: String,
@@ -523,7 +677,39 @@ struct FabricIntermediaryVersion {
 }
 
 #[derive(Deserialize, Debug, Clone)]
-struct FabricGameVersion {
+pub(crate) struct FabricGameVersion {
     pub version: String,
     pub stable: bool,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn game_versions_inside_longer_versions_are_not_templated() {
+        let template = |value| template_game_version(value, Some("1.8"));
+
+        assert_eq!(
+            template("fabric-loader-0.11.8-1.8-ornithe-gen2"),
+            format!("fabric-loader-0.11.8-{DUMMY_REPLACE_STRING}-ornithe-gen2")
+        );
+        assert_eq!(template("a:b:1.8.9"), "a:b:1.8.9");
+        assert_eq!(template_game_version("a:b:1.8", None), "a:b:1.8");
+    }
+
+    #[test]
+    fn only_whole_library_versions_are_templated() {
+        let template = |name| template_library_name(name, Some("1.8"));
+
+        assert_eq!(
+            template("net.ornithemc:calamus-intermediary-gen2:1.8"),
+            format!(
+                "net.ornithemc:calamus-intermediary-gen2:{DUMMY_REPLACE_STRING}"
+            )
+        );
+        assert_eq!(template("a:b:1.8-pre1"), "a:b:1.8-pre1");
+        assert_eq!(template("a:b:0.11.8"), "a:b:0.11.8");
+        assert_eq!(template_library_name("a:b:1.8", None), "a:b:1.8");
+    }
 }
