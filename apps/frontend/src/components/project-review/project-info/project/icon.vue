@@ -1,9 +1,14 @@
 <template>
 	<Section :heading="formatMessage(messages.icon)" :target="{ kind: 'icon' }">
-		<template v-if="iconUrl" #heading-after>
-			<KbdChip keybind="review-toggle-icon" />
+		<template #right>
+			<EditButton
+				v-if="!editing"
+				:section="formatMessage(messages.icon)"
+				@click="startEditing"
+			/>
 		</template>
-		<template v-if="project">
+		<IconEdit v-if="editing" :key="projectId" @done="editing = false" />
+		<template v-else-if="project">
 			<button
 				v-if="iconUrl"
 				type="button"
@@ -40,15 +45,17 @@ import { useModerationKeybinds } from '~/composables/moderation'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
 import ImageViewerActions from '../../image-viewer-actions.vue'
-import KbdChip from '../../kdb-chip.vue'
 import { projectReviewMessages as messages } from '../../messages'
 import { useReviewShortcut } from '../../shortcuts'
+import EditButton from '../edit/button.vue'
+import IconEdit from '../edit/icon.vue'
 import Section from '../section.vue'
 
 const { formatMessage } = useVIntl()
 const { project, projectId, pixelated } = injectProjectReviewPageContext()
 const viewer = ref<InstanceType<typeof ImageViewerEditor>>()
 const viewerOpen = ref(false)
+const editing = ref(false)
 const keybinds = useModerationKeybinds()
 const iconUrl = computed(() => project.value?.raw_icon_url || project.value?.icon_url)
 const viewerItems = computed(() => {
@@ -64,7 +71,14 @@ const viewerItems = computed(() => {
 
 watch(projectId, () => {
 	viewerOpen.value = false
+	editing.value = false
 })
+
+function startEditing() {
+	if (!project.value) return
+	viewer.value?.hide()
+	editing.value = true
+}
 
 function toggleViewer() {
 	if (viewerOpen.value) viewer.value?.hide()
