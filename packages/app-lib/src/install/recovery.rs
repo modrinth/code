@@ -13,6 +13,7 @@ use crate::state::{
     ContentSetSyncProvider, ContentSetSyncState, InstanceFile,
     InstanceMetadata, State,
 };
+use anyhow::Context;
 use async_walkdir::WalkDir;
 use chrono::Utc;
 use futures::StreamExt;
@@ -49,7 +50,7 @@ pub(super) async fn prepare_instance_update_backup(
         .await?
     {
         return Err(crate::state::content_store::input(
-            "Stop this instance before backing it up for an update",
+            "stop this instance before backing it up for an update",
         ));
     }
     let owner = job_id.to_string();
@@ -88,7 +89,7 @@ pub(super) async fn prepare_instance_update_backup(
 				.find(|file| file.id == binding.file_id)
 				.ok_or_else(|| {
 					crate::state::content_store::input(
-						"Backup content reference has no file record",
+						"backup content reference has no file record",
 					)
 				})?;
 			let file_status = state.content_store
@@ -102,7 +103,7 @@ pub(super) async fn prepare_instance_update_backup(
 			if file_status != crate::state::content_store::InstanceFileStatus::Healthy
 			{
 				return Err(crate::state::content_store::input(format!(
-					"Restore or repair {} before updating this instance; its current content cannot be backed up safely",
+					"restore or repair {} before updating this instance; its current content cannot be backed up safely",
 					file.relative_path,
 				)));
 			}
@@ -245,7 +246,7 @@ async fn restore_instance_update(
     let _lease = state.content_store.lease().await;
     if crate::state::instance_has_running_process(instance_id, state).await? {
         return Err(crate::state::content_store::input(
-            "Stop this instance before restoring its content",
+            "stop this instance before restoring its content",
         ));
     }
     state.content_store.recover(Some(instance_id)).await?;
@@ -260,7 +261,7 @@ async fn restore_instance_update(
     let backup_path = staging_dir.join(SHARED_INSTANCE_ROLLBACK_INSTANCE_DIR);
     if !tokio::fs::symlink_metadata(&backup_path).await?.is_dir() {
         return Err(crate::state::content_store::input(
-            "The instance backup is missing or is not a directory",
+            "the instance backup is missing or is not a directory",
         ));
     }
     for binding in &snapshot.bindings {
@@ -274,7 +275,7 @@ async fn restore_instance_update(
                 .find(|file| file.id == binding.file_id)
                 .ok_or_else(|| {
                     crate::state::content_store::input(
-                        "Backup content reference has no file record",
+                        "backup content reference has no file record",
                     )
                 })?;
             let path = backup_path
@@ -283,7 +284,7 @@ async fn restore_instance_update(
                 != binding.blob_sha512
             {
                 return Err(crate::state::content_store::input(
-                    "The instance backup contains changed content",
+                    "the instance backup contains changed content",
                 ));
             }
             continue;
@@ -295,7 +296,7 @@ async fn restore_instance_update(
             .is_none()
         {
             return Err(crate::state::content_store::input(
-                "Repair the backup's shared content before restoring this instance",
+                "repair the backup's shared content before restoring this instance",
             ));
         }
     }
@@ -412,11 +413,9 @@ async fn copy_directory(
     crate::util::io::create_dir_all(target).await?;
     let mut walker = WalkDir::new(source);
     while let Some(entry) = walker.next().await {
-        let entry = entry.map_err(|error| {
-            crate::ErrorKind::FSError(format!(
-                "Failed to read instance backup path: {error}"
-            ))
-        })?;
+        let entry = entry.context(crate::ErrorKind::FSError(
+            "failed to read instance backup path".to_string(),
+        ))?;
         let entry_path = entry.path();
         let relative_path = entry_path.strip_prefix(source)?;
         let relative = relative_path
@@ -455,14 +454,14 @@ async fn copy_symlink(source: &Path, target: &Path) -> crate::Result<()> {
         &source
             .parent()
             .ok_or_else(|| {
-                crate::state::content_store::input("Invalid backup symlink")
+                crate::state::content_store::input("invalid backup symlink")
             })?
             .join(link_target),
     );
     let link_target = crate::state::content_store::relative_link(
         &absolute,
         target.parent().ok_or_else(|| {
-            crate::state::content_store::input("Invalid backup target")
+            crate::state::content_store::input("invalid backup target")
         })?,
     );
 
