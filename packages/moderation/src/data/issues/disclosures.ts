@@ -1,6 +1,7 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { TriangleAlertIcon } from '@modrinth/assets'
 
+import { anyDisclosureHasText } from '../../utils'
 import disclosuresHeaderMessage from '../messages/checklist/messages/disclosures/header.md'
 import disclosuresHeaderListlessMessage from '../messages/checklist/messages/disclosures/header-listless.md'
 import missingAdsMessage from '../messages/checklist/messages/disclosures/missing-disclosures/ads.md'
@@ -557,25 +558,6 @@ export const disclosuresReviewPanel = panel({
 	toggle({
 		issue: disclosuresNonEnglishIssue,
 		label: 'Non-English',
-		shown: ({ disclosures }) =>
-			disclosures.some((disclosure) => {
-				if (disclosure.deleted_at) return false
-				if ('note' in disclosure && disclosure.note?.trim()) return true
-
-				switch (disclosure.type) {
-					case 'derivative_work':
-						return disclosure.sources.some((source) =>
-							[source.label, source.link, source.note].some((text) => text?.trim()),
-						)
-					case 'telemetry':
-						return disclosure.data_collected.some((text) => text.trim())
-					case 'paid_features':
-						return disclosure.features.some((text) => text.trim())
-					case 'system_interactions':
-						return disclosure.interactions.some((text) => text.trim())
-					default:
-						return false
-				}
-			}),
+		shown: ({ disclosures }) => anyDisclosureHasText(disclosures),
 	}),
 )
