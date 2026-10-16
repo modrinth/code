@@ -4016,6 +4016,9 @@
   "moderation.settings.appearance": {
     "message": "Panels and appearance"
   },
+  "moderation.settings.based-on": {
+    "message": "Based on"
+  },
   "moderation.settings.default-value-styled": {
     "message": "Default: <value></value>"
   },
@@ -4045,6 +4048,9 @@
   },
   "moderation.settings.title": {
     "message": "General settings"
+  },
+  "moderation.settings.unknown-commit": {
+    "message": "unknown"
   },
   "moderation.settings.workflow": {
     "message": "Review workflow and queue"
