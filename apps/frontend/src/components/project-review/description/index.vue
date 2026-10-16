@@ -50,7 +50,7 @@
 				<Button @click="refresh">{{ formatMessage(messages.retry) }}</Button>
 			</div>
 			<div v-else-if="editing" class="flex min-h-full flex-col gap-2">
-				<MarkdownEditor
+				<TemplateMarkdownEditor
 					ref="editor"
 					v-model="draft"
 					:disabled="saving"
@@ -76,15 +76,10 @@
 
 <script setup lang="ts">
 import { moderationSettings } from '@modrinth/moderation'
-import {
-	Button,
-	commonMessages,
-	MarkdownEditor,
-	ProjectPageDescription,
-	useVIntl,
-} from '@modrinth/ui'
+import { Button, commonMessages, ProjectPageDescription, useVIntl } from '@modrinth/ui'
 import { useTemplateRef } from 'vue'
 
+import TemplateMarkdownEditor from '~/components/project-review/message-thread/template-markdown-editor.vue'
 import { useModerationSettings } from '~/composables/moderation'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
@@ -97,7 +92,7 @@ const { formatMessage } = useVIntl()
 const settings = useModerationSettings()
 const interactionScope = useTemplateRef<HTMLElement>('interactionScope')
 const { selection, isLoading, error, refresh } = injectProjectReviewPageContext()
-const editor = useTemplateRef<InstanceType<typeof MarkdownEditor>>('editor')
+const editor = useTemplateRef<InstanceType<typeof TemplateMarkdownEditor>>('editor')
 const {
 	project,
 	saving,

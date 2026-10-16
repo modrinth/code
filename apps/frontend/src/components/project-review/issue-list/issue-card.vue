@@ -141,7 +141,7 @@
 									:class="{ 'issue-message-editor': editingMessage && !customMessageInput }"
 									@keydown.capture="onMessageKeydown"
 								>
-									<MarkdownEditor
+									<TemplateMarkdownEditor
 										v-if="customMessageInput || editingMessage"
 										ref="messageEditor"
 										:model-value="displayMessage"
@@ -272,13 +272,13 @@ import {
 	commonMessages,
 	defineMessages,
 	Input,
-	MarkdownEditor,
 	MultiSelect,
 	Tooltip,
 	useVIntl,
 } from '@modrinth/ui'
 import { computed, nextTick, ref, useId, watch } from 'vue'
 
+import TemplateMarkdownEditor from '~/components/project-review/message-thread/template-markdown-editor.vue'
 import IssueMessage from '~/components/ui/project-issue-card/issue-message.vue'
 import { useModerationSettings } from '~/composables/moderation'
 import { injectReviewMessages } from '~/providers/project-review/review-messages'

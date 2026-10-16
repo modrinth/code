@@ -14,9 +14,10 @@
 		<template #after-preview="{ previewMode: preview }">
 			<div class="ml-auto">
 				<MarkdownTemplatePicker
-					v-if="templates.length"
+					v-if="resolvedTemplates.length || placeholders.length"
 					ref="templatePicker"
-					:templates="templates"
+					:templates="pickerTemplates"
+					:kind="templateQuery?.trigger === '%' ? 'placeholders' : 'messages'"
 					:inline-query="templateQuery"
 					:disabled="disabled || preview"
 					@insert="insertTemplate"
@@ -33,10 +34,17 @@
 import { isolateHistory } from '@codemirror/commands'
 import { syntaxTree } from '@codemirror/language'
 import { EditorView } from '@codemirror/view'
+import { getMessageTemplates } from '@modrinth/moderation'
+import {
+	flattenProjectV3Variables,
+	flattenProjectVariables,
+	flattenStaticVariables,
+} from '@modrinth/moderation/src/utils'
 import { MarkdownEditor } from '@modrinth/ui'
-import { nextTick, onBeforeUnmount, ref, shallowRef, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref, shallowRef, watch } from 'vue'
 
 import IssueMessage from '~/components/ui/project-issue-card/issue-message.vue'
+import { injectProjectReviewPageContext } from '~/providers/project-review'
 
 import MarkdownTemplatePicker from './markdown-template-picker.vue'
 import type { MarkdownTemplate, MarkdownTemplateQuery } from './markdown-templates'
@@ -44,7 +52,7 @@ import type { MarkdownTemplate, MarkdownTemplateQuery } from './markdown-templat
 defineOptions({ inheritAttrs: false })
 const props = defineProps<{
 	modelValue: string
-	templates: MarkdownTemplate[]
+	templates?: MarkdownTemplate[]
 	disabled?: boolean
 }>()
 const emit = defineEmits<{
@@ -55,6 +63,34 @@ const markdownEditor = ref<InstanceType<typeof MarkdownEditor>>()
 const editorView = shallowRef<EditorView>()
 const templatePicker = ref<InstanceType<typeof MarkdownTemplatePicker>>()
 const templateQuery = ref<MarkdownTemplateQuery | null>(null)
+const { project, projectV2 } = injectProjectReviewPageContext()
+const resolvedTemplates = computed(() => {
+	if (props.templates) return props.templates
+	const current = project.value
+	const legacy = projectV2.value
+	return current && legacy && current.id === legacy.id
+		? getMessageTemplates({ project: current, projectV2: legacy })
+		: []
+})
+const placeholders = computed<MarkdownTemplate[]>(() => {
+	const current = project.value
+	const legacy = projectV2.value
+	const variables = {
+		...flattenStaticVariables(),
+		...(current && legacy && current.id === legacy.id ? flattenProjectVariables(legacy) : {}),
+		...(current ? flattenProjectV3Variables(current) : {}),
+	}
+	return Object.entries(variables).map(([key, body]) => ({
+		label: `%${key}%`,
+		body,
+		kind: 'placeholder',
+	}))
+})
+const pickerTemplates = computed(() =>
+	templateQuery.value?.trigger === '%'
+		? placeholders.value
+		: [...resolvedTemplates.value, ...placeholders.value],
+)
 const extensions = [
 	EditorView.domEventHandlers({
 		keydown: (event) => templatePicker.value?.handleKeydown(event) ?? false,
@@ -75,13 +111,17 @@ const extensions = [
 async function updateTemplateQuery(view: EditorView) {
 	await nextTick()
 	if (view !== editorView.value) return
-	if (!props.templates?.length || props.disabled || templatePicker.value?.disabled) {
+	if (props.disabled || templatePicker.value?.disabled) {
 		templateQuery.value = null
 		return
 	}
 	const { head, empty } = view.state.selection.main
 	const line = view.state.doc.lineAt(head)
-	const match = /(?:^|\s)\/([^/\s]*)$/.exec(view.state.doc.sliceString(line.from, head))
+	const before = view.state.doc.sliceString(line.from, head)
+	const match = /(?:^|\s)\/([^/\s]*)$/.exec(before)
+	const placeholderQuery = [...before.matchAll(/%[\w.]+%|%([\w.]*)$/g)].at(-1)?.[1]
+	const trigger = placeholderQuery !== undefined ? '%' : '/'
+	const query = placeholderQuery ?? match?.[1]
 	let node = syntaxTree(view.state).resolveInner(head, -1)
 	while (node) {
 		if (['FencedCode', 'CodeBlock', 'InlineCode', 'Link', 'URL', 'Autolink'].includes(node.name)) {
@@ -92,14 +132,20 @@ async function updateTemplateQuery(view: EditorView) {
 		node = node.parent
 	}
 	const rect = view.coordsAtPos(head)
-	if (!empty || !match || !rect) {
+	if (
+		!empty ||
+		query === undefined ||
+		!rect ||
+		(trigger === '/' && !pickerTemplates.value.length)
+	) {
 		templateQuery.value = null
 		return
 	}
 	templateQuery.value = {
-		from: head - match[1].length - 1,
+		trigger,
+		from: head - query.length - 1,
 		to: head,
-		query: match[1],
+		query,
 		anchor: {
 			contextElement: view.contentDOM,
 			getBoundingClientRect: () => {
@@ -122,7 +168,7 @@ async function updateTemplateQuery(view: EditorView) {
 	}
 }
 
-async function insertTemplate(body: string) {
+async function insertTemplate(body: string, inline = false) {
 	const view = editorView.value
 	if (!view || props.disabled) return
 	const doc = view.state.doc
@@ -144,7 +190,8 @@ async function insertTemplate(body: string) {
 				? '\n'
 				: '\n\n'
 		: ''
-	const insert = prefix + body.trim() + suffix
+	const isPlaceholder = inline || templateQuery.value?.trigger === '%'
+	const insert = isPlaceholder ? body : prefix + body.trim() + suffix
 	templateQuery.value = null
 	view.dispatch({
 		changes: { from, to, insert },
@@ -153,7 +200,7 @@ async function insertTemplate(body: string) {
 		userEvent: 'input.template',
 		annotations: isolateHistory.of('full'),
 	})
-	emit('insert-template', body)
+	if (!isPlaceholder) emit('insert-template', body)
 	await focus()
 }
 

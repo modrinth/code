@@ -1,6 +1,9 @@
-export type { MessageTemplate as MarkdownTemplate } from '@modrinth/moderation'
+import type { MessageTemplate } from '@modrinth/moderation'
+
+export type MarkdownTemplate = MessageTemplate & { kind?: 'placeholder' }
 
 export interface MarkdownTemplateQuery {
+	trigger: '/' | '%'
 	from: number
 	to: number
 	query: string

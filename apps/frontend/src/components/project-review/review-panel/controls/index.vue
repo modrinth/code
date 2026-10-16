@@ -28,7 +28,7 @@
 							{{ control.label }}
 							<span v-if="control.required" class="text-red" aria-hidden="true">*</span>
 						</p>
-						<MarkdownEditor
+						<TemplateMarkdownEditor
 							v-if="control.type === 'markdown'"
 							:ref="(field) => setFieldRef(fieldKey(control), field)"
 							:disabled="control.disabled"
@@ -185,7 +185,6 @@ import {
 	Combobox,
 	defineMessages,
 	Input,
-	MarkdownEditor,
 	MultiSelect,
 	Textarea,
 	Tooltip,
@@ -200,6 +199,7 @@ import {
 	watch,
 } from 'vue'
 
+import TemplateMarkdownEditor from '~/components/project-review/message-thread/template-markdown-editor.vue'
 import { useModerationSettings } from '~/composables/moderation'
 import type { ReviewTarget } from '~/providers/project-review/review'
 import {
