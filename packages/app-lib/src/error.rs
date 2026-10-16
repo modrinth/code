@@ -183,9 +183,6 @@ pub enum ErrorKind {
     #[error("Error while applying migrations: {0}")]
     SqlxMigrate(#[from] sqlx::migrate::MigrateError),
 
-    #[error("Move directory error: {0}")]
-    DirectoryMoveError(String),
-
     #[error("Error resolving DNS: {0}")]
     DNSError(#[from] hickory_resolver::ResolveError),
 
@@ -233,6 +230,14 @@ pub enum ErrorKind {
 
     #[error("No loader version selected for {}", .loader.as_str())]
     NoLoaderVersion { loader: ModLoader },
+
+    #[error("Move directory error")]
+    DirectoryMoveFailed,
+
+    #[error(
+        "Not enough space: the destination needs at least {required} bytes plus working space for the app-directory move"
+    )]
+    NotEnoughSpace { required: u64 },
 }
 
 fn format_duration(duration: Duration) -> String {
@@ -299,12 +304,35 @@ impl ErrorKind {
     }
 }
 
+/// `downcast_ref` stops at the outermost kind, so this also yields kinds
+/// further down the chain.
+pub fn error_kinds(error: &Error) -> impl Iterator<Item = &ErrorKind> {
+    error
+        .downcast_ref::<ErrorKind>()
+        .into_iter()
+        .chain(error.chain().filter_map(|cause| cause.downcast_ref()))
+}
+
 pub fn error_code(error: &Error) -> &'static str {
-    if error.chain().any(|cause| {
+    let permission_denied = error.chain().any(|cause| {
         cause.downcast_ref::<std::io::Error>().is_some_and(|error| {
             error.kind() == std::io::ErrorKind::PermissionDenied
         })
-    }) {
+    });
+
+    if error_kinds(error)
+        .any(|kind| matches!(kind, ErrorKind::DirectoryMoveFailed))
+    {
+        if error_kinds(error)
+            .any(|kind| matches!(kind, ErrorKind::NotEnoughSpace { .. }))
+        {
+            "directory_move_no_space"
+        } else if permission_denied {
+            "directory_move_permission_denied"
+        } else {
+            "directory_move_failed"
+        }
+    } else if permission_denied {
         "permission_denied"
     } else if let Some(kind) = error.downcast_ref::<ErrorKind>() {
         kind.code()

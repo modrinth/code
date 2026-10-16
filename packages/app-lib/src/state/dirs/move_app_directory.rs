@@ -1,3 +1,4 @@
+use crate::ErrorKind;
 use crate::state::content_store;
 mod managed_content;
 
@@ -480,9 +481,7 @@ fn ensure_move_space(destination: &Path, required: u64) -> crate::Result<()> {
     if fs4::available_space(destination)?
         < required.saturating_add(64 * 1024 * 1024)
     {
-        return Err(input(format!(
-            "Not enough space: the destination needs at least {required} bytes plus working space for the app-directory move"
-        )));
+        return Err(ErrorKind::NotEnoughSpace { required }.into());
     }
     Ok(())
 }

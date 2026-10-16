@@ -70,16 +70,16 @@ defineExpose({
 			if (errorVal.message.includes('because the target machine actively refused it')) {
 				metadata.value.hostsFile = true
 			}
-		} else if (errorVal.message && errorVal.message.includes('Move directory error:')) {
+		} else if (errorVal.code?.startsWith('directory_move_')) {
 			title.value = 'Could not change app directory'
 			errorType.value = 'directory_move'
 			supportLink.value = 'https://support.modrinth.com'
 
-			if (errorVal.message.includes('directory is not writable')) {
+			if (errorVal.code === 'directory_move_permission_denied') {
 				metadata.value.readOnly = true
 			}
 
-			if (errorVal.message.includes('Not enough space')) {
+			if (errorVal.code === 'directory_move_no_space') {
 				metadata.value.notEnoughSpace = true
 			}
 		} else if (errorVal.code === 'no_loader_version') {
