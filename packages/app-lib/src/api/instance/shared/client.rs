@@ -1,5 +1,7 @@
 use super::install::*;
 use super::*;
+use crate::ErrorKind;
+use anyhow::{Context, anyhow};
 
 #[derive(Clone, Copy, Debug)]
 pub(super) enum SharedInstancesRequestAuth {
@@ -710,38 +712,32 @@ where
 {
     let status = response.status();
     let request_id = response_request_id(&response);
-    let body = match response.text().await {
-        Ok(body) => body,
-        Err(error) if strip_response_url => {
-            return Err(crate::ErrorKind::SharedInstancesApiError(
-                error.without_url().to_string(),
-            )
-            .into());
-        }
-        Err(error) => {
-            return Err(crate::ErrorKind::SharedInstancesApiError(
-                error.to_string(),
-            )
-            .into());
-        }
-    };
-    serde_json::from_str::<T>(&body).map_err(|error| {
-		tracing::warn!(
-			operation,
-			method = method.as_str(),
-			path = log_path,
-			status = status.as_u16(),
-			request_id = request_id.as_deref().unwrap_or("none"),
-			error_category = ?error.classify(),
-            error_line = error.line(),
-            error_column = error.column(),
-            "Shared instances API returned an invalid JSON response"
-		);
-		crate::ErrorKind::SharedInstancesApiError(format!(
-			"Shared instances API request {operation} {method} {log_path} returned invalid JSON with status {status}"
-		))
-		.into()
-	})
+    let body = response
+        .text()
+        .await
+        .map_err(|error| {
+            if strip_response_url {
+                error.without_url()
+            } else {
+                error
+            }
+        })
+        .context(ErrorKind::SharedInstancesApiError)?;
+    serde_json::from_str::<T>(&body)
+        .inspect_err(|error| {
+            tracing::warn!(
+                operation,
+                method = method.as_str(),
+                path = log_path,
+                status = status.as_u16(),
+                request_id = request_id.as_deref().unwrap_or("none"),
+                error_category = ?error.classify(),
+                error_line = error.line(),
+                error_column = error.column(),
+                "Shared instances API returned an invalid JSON response"
+            );
+        })
+        .context(ErrorKind::SharedInstancesApiError)
 }
 
 pub(super) async fn request_empty(
@@ -911,11 +907,11 @@ pub(super) async fn send_body_request_to_url(
         request = request.header("x-file-sha512", file_sha512);
     }
 
-    let response = request.send().await.map_err(|error| {
-        crate::ErrorKind::SharedInstancesApiError(
-            error.without_url().to_string(),
-        )
-    })?;
+    let response = request
+        .send()
+        .await
+        .map_err(|error| error.without_url())
+        .context(ErrorKind::SharedInstancesApiError)?;
 
     if response.status().is_success() {
         let request_id = response_request_id(&response);
@@ -1002,21 +998,17 @@ async fn send_request_with_auth_and_log_path(
         request = request.json(&body);
     }
 
-    let response = match request.send().await {
-        Ok(response) => response,
-        Err(error) if path != log_path => {
-            return Err(crate::ErrorKind::SharedInstancesApiError(
-                error.without_url().to_string(),
-            )
-            .into());
-        }
-        Err(error) => {
-            return Err(crate::ErrorKind::SharedInstancesApiError(
-                error.to_string(),
-            )
-            .into());
-        }
-    };
+    let response = request
+        .send()
+        .await
+        .map_err(|error| {
+            if path != log_path {
+                error.without_url()
+            } else {
+                error
+            }
+        })
+        .context(ErrorKind::SharedInstancesApiError)?;
     if response.status().is_success() {
         let request_id = response_request_id(&response);
         tracing::debug!(
@@ -1052,7 +1044,9 @@ pub(super) async fn shared_instances_request_error<T>(
         "Shared instances API request {operation} {method} {path} failed with status {status}"
     );
     if status.is_server_error() {
-        return Err(crate::ErrorKind::SharedInstancesApiError(message).into());
+        return Err(
+            anyhow!(message).context(ErrorKind::SharedInstancesApiError)
+        );
     }
 
     Err(crate::ErrorKind::OtherError(message).into())

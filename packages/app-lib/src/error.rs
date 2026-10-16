@@ -130,8 +130,8 @@ pub enum ErrorKind {
     #[error("Shared instance unavailable: {0}")]
     SharedInstanceUnavailable(SharedInstanceUnavailableReason),
 
-    #[error("Shared instances API request failed: {0}")]
-    SharedInstancesApiError(String),
+    #[error("shared instances api request failed")]
+    SharedInstancesApiError,
 
     #[error("Join handle error: {0}")]
     JoinError(#[from] tokio::task::JoinError),
@@ -283,7 +283,7 @@ impl ErrorKind {
                     "shared_instance_quarantined"
                 }
             },
-            Self::SharedInstancesApiError(_) => "shared_instances_api_error",
+            Self::SharedInstancesApiError => "shared_instances_api_error",
             Self::HashError(_, _) => "hash_error",
             Self::LoginCanceled => "login_canceled",
             Self::NotLoggedIn => "not_logged_in",
