@@ -9,7 +9,7 @@ pub(crate) fn validate_digest(hash: &str, length: usize) -> crate::Result<()> {
             .bytes()
             .all(|byte| byte.is_ascii_digit() || (b'a'..=b'f').contains(&byte))
     {
-        bail!(ErrorKind::ContentStoreError("Invalid content hash".into()));
+        bail!(ErrorKind::ContentStoreError("invalid content hash".into()));
     }
     Ok(())
 }
@@ -35,7 +35,7 @@ pub(crate) fn validate_relative(path: &str) -> crate::Result<()> {
             .any(|part| !matches!(part, Component::Normal(_)))
     {
         bail!(ErrorKind::ContentStoreError(format!(
-            "Invalid instance-relative path: {path:?}"
+            "invalid instance-relative path {path:?}"
         )));
     }
     Ok(())
@@ -49,7 +49,7 @@ pub(crate) fn validate_instance_path(path: &str) -> crate::Result<()> {
         .join("/");
     validate_relative(&normalized).map_err(|_| {
         ErrorKind::ContentStoreError(format!(
-            "Invalid instance folder path: {path:?}"
+            "invalid instance folder path {path:?}"
         ))
     })?;
     Ok(())

@@ -137,7 +137,7 @@ impl ContentStore {
                 InstanceFileStatus::Healthy => {}
                 InstanceFileStatus::Conflict => {
                     bail!(ErrorKind::ContentStoreError(format!(
-                        "Cannot recover {}: its contents were changed outside the app",
+                        "cannot recover {}: its contents were changed outside the app",
                         before.relative_path
                     )));
                 }
@@ -147,7 +147,7 @@ impl ContentStore {
                         .await?
                     {
                         bail!(ErrorKind::ContentStoreError(format!(
-                            "Cannot recover {}: the toggled content is missing or changed",
+                            "cannot recover {}: the toggled content is missing or changed",
                             after.relative_path
                         )));
                     }
@@ -172,7 +172,7 @@ impl ContentStore {
                         return self.finish_journal(journal).await;
                     }
                     bail!(ErrorKind::ContentStoreError(format!(
-                        "Cannot recover {}: its contents were changed outside the app",
+                        "cannot recover {}: its contents were changed outside the app",
                         after.relative_path
                     )));
                 }
@@ -188,7 +188,7 @@ impl ContentStore {
                     self.check_instance_path(&path, &before.sha512).await?;
                 if status == InstanceFileStatus::Conflict {
                     bail!(ErrorKind::ContentStoreError(
-                        "Recovery would overwrite externally changed content"
+                        "recovery would overwrite externally changed content"
                             .into(),
                     ));
                 }
@@ -198,12 +198,12 @@ impl ContentStore {
                         .await?
                         .ok_or_else(|| {
                             ErrorKind::ContentStoreError(
-                                "Recovery content needs repair or re-import"
+                                "recovery content needs repair or re-import"
                                     .into(),
                             )
                         })?;
                     let policy = before.storage_kind
-						.ok_or_else(|| ErrorKind::ContentStoreError("Recovery content has no previous storage method".into()))?
+						.ok_or_else(|| ErrorKind::ContentStoreError("recovery content has no previous storage method".into()))?
 						.restore_policy();
                     let storage_kind = self
                         .create_instance_file(&stored_file, &path, policy)

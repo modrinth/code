@@ -74,7 +74,7 @@ impl UnregisteredFiles {
                         sha512,
                         size: size.try_into().map_err(|_| {
                             ErrorKind::ContentStoreError(
-                                "Content file is too large".into(),
+                                "content file is too large".into(),
                             )
                         })?,
                         status: StoredFileStatus::Ready,

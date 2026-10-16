@@ -138,7 +138,7 @@ impl ContentStore {
         match catalog::setting(&self.pool, "store_cache_limit_bytes").await? {
             Some(value) => Ok(value.parse().map_err(|_| {
                 ErrorKind::ContentStoreError(
-                    "The shared content cache limit is invalid".into(),
+                    "the shared content cache limit is invalid".into(),
                 )
             })?),
             None => Ok(5_368_709_120),
@@ -148,7 +148,7 @@ impl ContentStore {
     pub async fn set_cache_limit(&self, bytes: u64) -> crate::Result<()> {
         if bytes > i64::MAX as u64 {
             bail!(ErrorKind::ContentStoreError(
-                "The shared content cache limit is too large".into(),
+                "the shared content cache limit is too large".into(),
             ));
         }
         catalog::set_setting(
@@ -164,19 +164,19 @@ impl ContentStore {
         state: &State,
         purge_unused: bool,
     ) -> crate::Result<u64> {
-        let _exclusive = self.cleanup_lock.try_write().map_err(|_| ErrorKind::ContentStoreError("The shared store is busy; try cleanup again after content operations finish".into()))?;
+        let _exclusive = self.cleanup_lock.try_write().map_err(|_| ErrorKind::ContentStoreError("the shared store is busy; try cleanup again after content operations finish".into()))?;
         if catalog::setting(&self.pool, "store_layout_version")
             .await?
             .as_deref()
             != Some("1")
         {
             bail!(ErrorKind::ContentStoreError(
-                "Finish shared-store migration before cleaning its cache"
+                "finish shared-store migration before cleaning its cache"
                     .into(),
             ));
         }
         let _runtime_exclusive = self.runtime_cache_lock.try_write()
-			.map_err(|_| ErrorKind::ContentStoreError("Game or Java files are in use; try cleanup again after the operation finishes".into()))?;
+			.map_err(|_| ErrorKind::ContentStoreError("game or Java files are in use; try cleanup again after the operation finishes".into()))?;
         let runtime =
             crate::state::runtime_cache::RuntimeStorage::read(state).await?;
         let candidates = catalog::cleanup_candidates(&self.pool).await?;

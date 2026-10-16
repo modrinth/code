@@ -28,7 +28,7 @@ impl ContentStore {
             repaired = true;
             if self.any_instance_running(state).await? {
                 bail!(ErrorKind::ContentStoreError(
-                    "Stop Minecraft instances before re-importing damaged shared content".into(),
+                    "stop Minecraft instances before re-importing damaged shared content".into(),
                 ));
             }
             filesystem::quarantine_file(&self.root, &stored_file.path, &hash)
@@ -118,7 +118,7 @@ impl ContentStore {
             for path in quarantined {
                 let name = path.file_name().ok_or_else(|| {
                     ErrorKind::ContentStoreError(
-                        "Invalid quarantined content path".into(),
+                        "invalid quarantined content path".into(),
                     )
                 })?;
                 let backup = self.root.join("recovered-content").join(name);
@@ -151,7 +151,7 @@ impl ContentStore {
         let _lease = self.lease().await;
         if repair && self.any_instance_running(state).await? {
             bail!(ErrorKind::ContentStoreError(
-                "Stop Minecraft instances before repairing shared content"
+                "stop Minecraft instances before repairing shared content"
                     .into(),
             ));
         }
@@ -261,7 +261,7 @@ impl ContentStore {
             || downloaded.size != stored_file.size as u64
         {
             bail!(ErrorKind::ContentStoreError(
-                "Repair download has an unexpected hash or size".into(),
+                "repair download has an unexpected hash or size".into(),
             ));
         }
         let path = self.path(stored_file)?;
