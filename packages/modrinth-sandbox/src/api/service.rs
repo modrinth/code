@@ -1,6 +1,13 @@
 use std::{
-    collections::HashMap, ffi::OsStr, io::ErrorKind, net::{IpAddr, Ipv4Addr, SocketAddr}, path::{Path, PathBuf}, str::FromStr, sync::{
-        Arc, atomic::{AtomicBool, AtomicU32, Ordering},
+    collections::HashMap,
+    ffi::OsStr,
+    io::ErrorKind,
+    net::{IpAddr, Ipv4Addr, SocketAddr},
+    path::{Path, PathBuf},
+    str::FromStr,
+    sync::{
+        Arc,
+        atomic::{AtomicBool, AtomicU32, Ordering},
     },
 };
 
@@ -369,11 +376,17 @@ impl SandboxApiService {
                     RequestStatus::MethodNotAllowed.write(stream).await;
                     return;
                 }
-                match self.handle_request_request_access(params, child_state).await {
-                    Ok(path) => write_text_response(stream, &path.to_string_lossy()).await,
+                match self
+                    .handle_request_request_access(params, child_state)
+                    .await
+                {
+                    Ok(path) => {
+                        write_text_response(stream, &path.to_string_lossy())
+                            .await
+                    }
                     Err(error_status) => error_status.write(stream).await,
                 };
-            },
+            }
             "/sandboxauth/session/session/minecraft/join" => {
                 let Ok(mut join_request) =
                     serde_json::from_slice::<MinecraftJoinRequest>(body)
@@ -788,7 +801,11 @@ impl SandboxApiService {
         }
     }
 
-    async fn handle_request_request_access(self: Self, params: &str, child_state: Option<ServiceChildState>) -> Result<PathBuf, RequestStatus>  {
+    async fn handle_request_request_access(
+        self: Self,
+        params: &str,
+        child_state: Option<ServiceChildState>,
+    ) -> Result<PathBuf, RequestStatus> {
         let Some(child_state) = child_state else {
             return Err(RequestStatus::InternalServerError);
         };
@@ -827,12 +844,16 @@ impl SandboxApiService {
             // If we're receiving a request for a file that doesn't exist, it's possible
             // that a malicious program is attempting to enumerate files on the computer
             // To prevent this, we return Unauthorized and block the process from further requests
-            child_state.disallow_request_access.store(true, Ordering::SeqCst);
+            child_state
+                .disallow_request_access
+                .store(true, Ordering::SeqCst);
             return Err(RequestStatus::Unauthorized);
         }
 
         // We only allow certain zip file formats (resourcepacks, mods, shaders, etc.)
-        let Ok(archive) = async_zip::tokio::read::fs::ZipFileReader::new(path).await else {
+        let Ok(archive) =
+            async_zip::tokio::read::fs::ZipFileReader::new(path).await
+        else {
             return Err(RequestStatus::InternalServerError);
         };
 
@@ -844,17 +865,19 @@ impl SandboxApiService {
             };
             let filename = filename.strip_prefix('/').unwrap_or(filename);
             let is_content_file = match filename {
-                "pack.mcmeta" => true, // Resourcepack/datapack
-                "mcmod.info" => true, // Old forge mod
-                "fabric.mod.json" => true, // Fabric mod
+                "pack.mcmeta" => true,        // Resourcepack/datapack
+                "mcmod.info" => true,         // Old forge mod
+                "fabric.mod.json" => true,    // Fabric mod
                 "META-INF/mods.toml" => true, // New forge mod
                 "META-INF/neoforge.mods.toml" => true, // Neoforge mod
                 "META-INF/jarjar/metadata.json" => true, // Forge jarjar
                 "modrinth.index.json" => true, // Mrpack
                 "metaData.json" => path.extension() == Some(OsStr::new("mcpr")), // Replaymod replay
                 _ => {
-                    let is_shaderpack = filename.starts_with("shaders/") && is_zip;
-                    let is_flashback_replay = filename.ends_with(".flashback") && is_zip;
+                    let is_shaderpack =
+                        filename.starts_with("shaders/") && is_zip;
+                    let is_flashback_replay =
+                        filename.ends_with(".flashback") && is_zip;
                     is_shaderpack || is_flashback_replay
                 }
             };
@@ -874,7 +897,7 @@ impl SandboxApiService {
             Err(err) => {
                 tracing::error!("Unable to expose path to sandbox: {err}");
                 Ok(path.to_path_buf())
-            },
+            }
         }
     }
 
@@ -971,8 +994,11 @@ pub async fn write_json_response<T: Serialize>(
 }
 
 pub async fn write_text_response(stream: &mut TcpStream, t: &str) {
-    let response = format!("HTTP/1.1 200 OK\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}",
-        t.len(), t);
+    let response = format!(
+        "HTTP/1.1 200 OK\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}",
+        t.len(),
+        t
+    );
     _ = stream.write_all(response.as_bytes()).await;
 }
 

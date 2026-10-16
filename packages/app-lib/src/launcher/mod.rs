@@ -1069,12 +1069,12 @@ pub async fn launch_minecraft(
     let command = sandbox::prepare_command(
         sandbox_session,
         sandbox::CommandInput {
-			directories: &state.directories,
-			java: &java_version,
-			version_info: &version_info,
-			version_jar: &version_jar,
-			java_agent: main_class_path,
-			classpath,
+            directories: &state.directories,
+            java: &java_version,
+            version_info: &version_info,
+            version_jar: &version_jar,
+            java_agent: main_class_path,
+            classpath,
             rpc_address: rpc_server.address(),
             instance_path: instance_path.clone(),
             jvm_args,
