@@ -3062,14 +3062,44 @@
   "moderation.exclude-technical-review": {
     "message": "Exclude TR"
   },
-  "moderation.keybinds.general": {
-    "message": "General"
+  "moderation.keybinds.change": {
+    "message": "{setting}: {binding}. Activate to change the binding."
+  },
+  "moderation.keybinds.composer": {
+    "message": "Thread replies and private notes"
+  },
+  "moderation.keybinds.conflict-summary": {
+    "message": "{count, plural, one {# action has overlapping bindings.} other {# actions have overlapping bindings.}} These shortcuts may compete when available together. Change a binding, or press Escape while recording to remove it."
+  },
+  "moderation.keybinds.conflicts": {
+    "message": "Overlaps with: {actions}"
+  },
+  "moderation.keybinds.decisions": {
+    "message": "Review outcomes and queue"
+  },
+  "moderation.keybinds.global": {
+    "message": "Switch hosts and copy URLs"
+  },
+  "moderation.keybinds.items": {
+    "message": "Review items and checks"
+  },
+  "moderation.keybinds.listen": {
+    "message": "Press a key…"
+  },
+  "moderation.keybinds.navigation": {
+    "message": "Review navigation and panels"
+  },
+  "moderation.keybinds.no-results": {
+    "message": "No keybinds match your search."
   },
   "moderation.keybinds.not-bound": {
     "message": "Not bound"
   },
-  "moderation.keybinds.project-review": {
-    "message": "Project review page"
+  "moderation.keybinds.project": {
+    "message": "Copy from public project pages"
+  },
+  "moderation.keybinds.recording": {
+    "message": "{setting}: listening for a shortcut. Press Escape to clear this binding."
   },
   "moderation.keybinds.reset-default": {
     "message": "Reset to default"
@@ -3082,6 +3112,15 @@
   },
   "moderation.keybinds.scope-tech": {
     "message": "Used within the tech review pages."
+  },
+  "moderation.keybinds.search": {
+    "message": "Search keybinds…"
+  },
+  "moderation.keybinds.self-conflict": {
+    "message": "another binding for this action"
+  },
+  "moderation.keybinds.technical": {
+    "message": "Technical review pages"
   },
   "moderation.keybinds.title": {
     "message": "Keybinds"
@@ -3973,6 +4012,42 @@
   },
   "moderation.project-review.withheldCount": {
     "message": "{count} withheld"
+  },
+  "moderation.settings.appearance": {
+    "message": "Panels and appearance"
+  },
+  "moderation.settings.default-value-styled": {
+    "message": "Default: <value></value>"
+  },
+  "moderation.settings.localhost": {
+    "message": "Set to {hostname}"
+  },
+  "moderation.settings.no-results": {
+    "message": "No settings match your search."
+  },
+  "moderation.settings.none": {
+    "message": "None"
+  },
+  "moderation.settings.off": {
+    "message": "Off"
+  },
+  "moderation.settings.on": {
+    "message": "On"
+  },
+  "moderation.settings.project-pages": {
+    "message": "Public project pages and hosts"
+  },
+  "moderation.settings.search": {
+    "message": "Search settings…"
+  },
+  "moderation.settings.shortcuts": {
+    "message": "Editors and shortcut hints"
+  },
+  "moderation.settings.title": {
+    "message": "General settings"
+  },
+  "moderation.settings.workflow": {
+    "message": "Review workflow and queue"
   },
   "moderation.tech-review.file.download": {
     "message": "Download"

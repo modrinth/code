@@ -10,7 +10,6 @@ import {
 	Toggle,
 	useVIntl,
 } from '@modrinth/ui'
-
 import { computed, ref } from 'vue'
 
 import { useModerationSettings } from '~/composables/moderation'
