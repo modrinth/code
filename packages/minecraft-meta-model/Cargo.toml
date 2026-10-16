@@ -7,7 +7,6 @@ rust-version.workspace = true
 [dependencies]
 anyhow = { workspace = true }
 derive_more = { workspace = true, features = ["debug", "deref", "display"] }
-indexmap = { workspace = true, features = ["serde"] }
 jiff = { workspace = true, features = ["serde"] }
 minecraft-meta-manifest = { workspace = true, features = ["toasty"] }
 regex = { workspace = true }
