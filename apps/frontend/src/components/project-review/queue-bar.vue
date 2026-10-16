@@ -58,21 +58,23 @@
 					</FloatingMenu>
 				</div>
 
-				<template v-for="(column, index) in queueColumns" :key="column.label.id">
-					<span v-if="index" class="h-5 w-px bg-divider" aria-hidden="true" />
-					<FloatingMenu trigger="hover" placement="top-start" theme="tooltip" :distance="4">
-						<span tabindex="0">
-							{{ formatMessage(column.label) }}
-							<span class="ml-1 tabular-nums text-primary">{{ column.count }}</span>
-						</span>
-						<template #popper>
-							<div class="flex max-w-80 flex-col gap-2 py-1">
-								<span class="font-semibold">{{ formatMessage(column.heading) }}</span>
-								<QueueProjectList :project-ids="column.projects" :empty-message="column.empty" />
-							</div>
-						</template>
-					</FloatingMenu>
-				</template>
+				<div class="flex items-center gap-2">
+					<template v-for="(column, index) in queueColumns" :key="column.label.id">
+						<span v-if="index" class="h-5 w-px bg-divider" aria-hidden="true" />
+						<FloatingMenu trigger="hover" placement="top-start" theme="tooltip" :distance="4">
+							<span tabindex="0" class="cursor-default pb-1 pt-1.5 text-xs">
+								{{ formatMessage(column.label) }}
+								<span class="ml-1 tabular-nums text-primary">{{ column.count }}</span>
+							</span>
+							<template #popper>
+								<div class="flex max-w-80 flex-col gap-2 py-1">
+									<span class="font-semibold">{{ formatMessage(column.heading) }}</span>
+									<QueueProjectList :project-ids="column.projects" :empty-message="column.empty" />
+								</div>
+							</template>
+						</FloatingMenu>
+					</template>
+				</div>
 			</div>
 			<div class="flex items-center gap-1">
 				<button type="button" class="queue-action" :disabled="busy" @click="exit">
