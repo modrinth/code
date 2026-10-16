@@ -1,7 +1,8 @@
 import { ServerIcon } from '@modrinth/assets'
 
-import { projectHasCustomServerModpack } from '../../utils'
+import { isTempHostAddress, projectHasCustomServerModpack } from '../../utils'
 import excessiveLanguagesMessage from '../messages/checklist/messages/rules/excessive-languages.md'
+import temporaryServerMessage from '../messages/checklist/messages/status-alerts/temporary-server.md'
 import { issue, markdown, panel, section, text, toggle } from './component-builders/builders'
 import { issueTargets } from './component-builders/targets'
 import { metadataGameVersionsIssue } from './metadata'
@@ -18,6 +19,14 @@ export const serversExcessiveLanguagesIssue = issue({
 	category: 'Server details',
 	actions: [issueTargets.modifyServerLanguages()],
 	message: excessiveLanguagesMessage,
+	suggestedStatus: 'flagged',
+})
+
+export const tempServerIssue = issue({
+	id: 'temp-server',
+	title: 'Temp server',
+	category: 'Server details',
+	message: temporaryServerMessage,
 	suggestedStatus: 'flagged',
 })
 
@@ -40,6 +49,14 @@ export const serverReviewPanel = panel({
 	toggle({
 		issue: metadataGameVersionsIssue,
 		label: 'Game Versions',
+	}),
+	toggle({
+		issue: tempServerIssue,
+		label: 'Temporary Host',
+		shown: ({ projectV3 }) =>
+			!!projectV3.minecraft_java_server &&
+			!!projectV3.minecraft_java_server.address &&
+			isTempHostAddress(projectV3.minecraft_java_server.address),
 	}),
 	section({
 		shown: (ctx) =>

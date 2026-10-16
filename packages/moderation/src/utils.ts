@@ -97,6 +97,15 @@ export function requiresEnvironmentInfo(projectTypes): boolean {
 	return projectTypes.includes('mod') || projectTypes.includes('modpack')
 }
 
+export function isTempHostAddress(address: string): boolean {
+	return (
+		address.includes('aternos') ||
+		address.includes('minekeep') ||
+		address.includes('minehut') ||
+		address.includes('eagler')
+	)
+}
+
 export function projectHasCustomServerModpack(projectV3: Labrinth.Projects.v3.Project): boolean {
 	return (
 		!!projectV3.minecraft_server &&
