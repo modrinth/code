@@ -3230,6 +3230,12 @@
   "moderation.project-review.draftCount": {
     "message": "{count} draft"
   },
+  "moderation.project-review.edit.remove-icon": {
+    "message": "Remove icon"
+  },
+  "moderation.project-review.edit.upload-icon": {
+    "message": "Upload icon"
+  },
   "moderation.project-review.editSection": {
     "message": "Edit {section}"
   },
@@ -4121,56 +4127,17 @@
   "organization.projects.none-with-create-prompt": {
     "message": "This organization doesn't have any projects yet. Would you like to <create-link>create one</create-link>?"
   },
-  "profile.block-user.admonition-body": {
-    "message": "{username} will not be able to send you friend requests, invite you to shared instances or invite you to Modrinth Hosting servers."
-  },
-  "profile.block-user.admonition-title": {
-    "message": "Are you sure you want to block this user?"
-  },
   "profile.button.analytics": {
     "message": "View user analytics"
-  },
-  "profile.button.billing": {
-    "message": "Manage user billing"
-  },
-  "profile.button.block": {
-    "message": "Block"
   },
   "profile.button.edit-user": {
     "message": "Edit user"
   },
-  "profile.button.force-password-reset": {
-    "message": "Force password reset"
-  },
   "profile.button.info": {
     "message": "View user details"
   },
-  "profile.button.lock": {
-    "message": "Lock account"
-  },
-  "profile.button.manage-projects": {
-    "message": "Manage projects"
-  },
-  "profile.button.remove-affiliate": {
-    "message": "Remove as affiliate"
-  },
-  "profile.button.reset-2fa": {
-    "message": "Reset two-factor authentication"
-  },
-  "profile.button.revoke-sessions": {
-    "message": "Revoke all sessions"
-  },
-  "profile.button.set-affiliate": {
-    "message": "Set as affiliate"
-  },
   "profile.button.shared-instances": {
     "message": "View shared instances"
-  },
-  "profile.button.unblock": {
-    "message": "Unblock"
-  },
-  "profile.button.unlock": {
-    "message": "Unlock account"
   },
   "profile.details.label.auth-providers": {
     "message": "Auth providers"
@@ -4438,9 +4405,6 @@
   },
   "project-review.lock.take-over": {
     "message": "Take over project"
-  },
-  "project-review.members.revoke-sessions-body": {
-    "message": "{username} will be signed out on every device. They will need to sign in again."
   },
   "project-review.message-box.resize": {
     "message": "Resize message box"

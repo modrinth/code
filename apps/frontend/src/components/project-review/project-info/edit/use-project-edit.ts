@@ -10,9 +10,7 @@ import { watch } from 'vue'
 
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
-type ProjectEdit =
-	| { patch: Labrinth.Projects.v3.EditProjectRequest }
-	| { icon: File | null }
+type ProjectEdit = { patch: Labrinth.Projects.v3.EditProjectRequest } | { icon: File | null }
 
 export function useProjectInfoEdit() {
 	const { project } = injectProjectReviewPageContext()

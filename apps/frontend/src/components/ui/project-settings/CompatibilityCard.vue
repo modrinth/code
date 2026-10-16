@@ -216,13 +216,7 @@ import {
 	PackagePlusIcon,
 	RefreshCwIcon,
 } from '@modrinth/assets'
-import {
-	Avatar,
-	Button,
-	FormattedTag,
-	injectModrinthClient,
-	TagItem,
-} from '@modrinth/ui'
+import { Avatar, Button, FormattedTag, injectModrinthClient, TagItem } from '@modrinth/ui'
 import { formatVersionsForDisplay } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 

@@ -377,9 +377,7 @@ const moreActions = computed<ButtonMenuOption[]>(() => [
 	{
 		type: 'divider',
 		shown:
-			props.showStaffActions &&
-			props.isAdmin &&
-			(props.user.role === 'developer' || !props.isSelf),
+			props.showStaffActions && props.isAdmin && (props.user.role === 'developer' || !props.isSelf),
 	},
 	{
 		id: 'toggle-lock',

@@ -21,8 +21,8 @@
 					<UploadIcon aria-hidden="true" />
 				</FileButton>
 				<Button
-					size="sm"
 					v-if="!deleted && (icon || project?.icon_url)"
+					size="sm"
 					:disabled="saving"
 					@click="removeIcon"
 				>

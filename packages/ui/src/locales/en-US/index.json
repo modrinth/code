@@ -3299,6 +3299,9 @@
   "profile.button.create-project": {
     "defaultMessage": "Create a project"
   },
+  "profile.button.edit-user": {
+    "defaultMessage": "Edit user"
+  },
   "profile.button.force-password-reset": {
     "defaultMessage": "Force password reset"
   },

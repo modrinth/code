@@ -1,11 +1,7 @@
 <template>
 	<Section :heading="formatMessage(messages.icon)" :target="{ kind: 'icon' }">
 		<template #right>
-			<EditButton
-				v-if="!editing"
-				:section="formatMessage(messages.icon)"
-				@click="startEditing"
-			/>
+			<EditButton v-if="!editing" :section="formatMessage(messages.icon)" @click="startEditing" />
 		</template>
 		<IconEdit v-if="editing" :key="projectId" @done="editing = false" />
 		<template v-else-if="project">
