@@ -1,15 +1,15 @@
 <template>
-	<footer class="shrink-0 border-0 border-t border-solid border-divider">
-		<div v-if="navigationError" role="alert" class="px-3 py-2 text-xs text-red">
+	<footer class="shrink-0 border-0 border-t border-solid border-divider text-sm">
+		<div v-if="navigationError" role="alert" class="px-3 py-2 text-red">
 			{{ formatMessage(messages.queueError) }}
 		</div>
 		<nav
-			class="flex min-h-10 flex-wrap items-center justify-between gap-x-3 gap-y-1 px-2 py-0 pr-3 text-xs text-secondary"
+			class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-2 pr-2.5 text-secondary"
 			:aria-label="formatMessage(messages.queueNavigation)"
 			:aria-busy="busy"
 		>
-			<div class="flex items-center gap-3 text-xs font-medium" aria-live="polite">
-				<div class="flex gap-0.5">
+			<div class="flex items-center gap-3 font-medium" aria-live="polite">
+				<div class="flex">
 					<button
 						v-tooltip="{ text: formatMessage(commonMessages.settingsLabel), delay: 500 }"
 						type="button"
@@ -64,17 +64,17 @@
 						queue.currentQueue.completed.length
 					}}</span></span
 				>
-				<span class="h-3 w-px bg-divider" aria-hidden="true" />
+				<span class="h-5 w-px bg-divider" aria-hidden="true" />
 				<span
 					>{{ formatMessage(messages.total) }}
 					<span class="ml-1 tabular-nums text-primary">{{ queue.currentQueue.total }}</span></span
 				>
 			</div>
-			<div class="flex items-center">
+			<div class="flex items-center gap-1">
 				<button type="button" class="queue-action" :disabled="busy" @click="exit">
 					{{ formatMessage(messages.exit) }}
 				</button>
-				<span class="mx-1.5 h-3 w-px bg-divider" aria-hidden="true" />
+				<span class="mx-1.5 h-5 w-px bg-divider" aria-hidden="true" />
 				<button type="button" class="queue-action" :disabled="disabled || !canGoBack" @click="back">
 					<LeftArrowIcon class="mb-px" />
 					{{ formatMessage(messages.back) }}
@@ -200,10 +200,11 @@ useReviewShortcut(
 	display: inline-flex;
 	align-items: center;
 	gap: 0.25rem;
-	padding: 0.5rem 0.5rem;
+	padding: 0.625rem 0.375rem;
 	background: transparent;
 	color: inherit;
 	font: inherit;
+	font-size: inherit;
 	font-weight: 600;
 }
 .queue-action:hover:not(:disabled) {
