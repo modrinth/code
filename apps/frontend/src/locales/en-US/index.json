@@ -3656,6 +3656,9 @@
   "moderation.project-review.noLicense": {
     "message": "No license URL"
   },
+  "moderation.project-review.noMatchingDependencies": {
+    "message": "No matching dependencies"
+  },
   "moderation.project-review.noMatchingProjects": {
     "message": "No matching projects"
   },
@@ -3853,6 +3856,9 @@
   },
   "moderation.project-review.scheduledCount": {
     "message": "{count} scheduled"
+  },
+  "moderation.project-review.searchDependencies": {
+    "message": "Search dependencies…"
   },
   "moderation.project-review.searchingProjects": {
     "message": "Searching projects…"
@@ -4647,13 +4653,7 @@
     "message": "Actions"
   },
   "project-review.issues.custom-add-facets": {
-    "message": "Add actions"
-  },
-  "project-review.issues.custom-id": {
-    "message": "Issue ID"
-  },
-  "project-review.issues.custom-id-invalid": {
-    "message": "Enter a unique, non-empty issue ID."
+    "message": "Mark as addressed"
   },
   "project-review.issues.custom-message-required": {
     "message": "Enter a message for this custom issue."
@@ -4666,6 +4666,12 @@
   },
   "project-review.issues.custom-search-facets": {
     "message": "Search actions…"
+  },
+  "project-review.issues.custom-title": {
+    "message": "Title"
+  },
+  "project-review.issues.custom-title-required": {
+    "message": "Enter a title for this custom issue."
   },
   "project-review.issues.edited": {
     "message": "(Edited)"

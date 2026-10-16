@@ -86,19 +86,20 @@
 								class="m-0 flex min-w-0 flex-col gap-2 border-0 p-0"
 							>
 								<label class="flex min-w-0 flex-col gap-1">
-									{{ formatMessage(messages.customId) }}
+									<span>
+										{{ formatMessage(messages.customTitle) }}
+										<span class="text-red" aria-hidden="true">*</span>
+									</span>
 									<Input
-										:model-value="issue.custom.id"
-										:disabled="pending || disabled"
-										:aria-invalid="customIdInvalid"
+										:model-value="issue.custom.title"
+										required
+										:aria-invalid="customTitleMissing"
+										:placeholder="formatMessage(messages.customTitlePlaceholder)"
 										@update:model-value="
-											panels.updateCustomIssue(issue.id, { id: String($event ?? '') })
+											panels.updateCustomIssue(issue.id, { title: String($event ?? '') })
 										"
 									/>
 								</label>
-								<p v-if="customIdInvalid" class="m-0 text-xs text-orange" role="status">
-									{{ formatMessage(messages.customIdInvalid) }}
-								</p>
 								<div class="flex min-w-0 flex-col gap-1">
 									<span>{{ formatMessage(messages.customPriority) }}</span>
 									<Combobox
@@ -134,13 +135,14 @@
 								<Controls v-for="binding in fields" :key="binding.key" :binding="binding" />
 							</fieldset>
 							<div class="flex min-w-0 flex-col gap-1">
+								<span v-if="customMessageInput">{{ formatMessage(messages.issueMessage) }}</span>
 								<div
 									class="relative min-w-0"
-									:class="{ 'issue-message-editor': editingMessage }"
+									:class="{ 'issue-message-editor': editingMessage && !customMessageInput }"
 									@keydown.capture="onMessageKeydown"
 								>
 									<MarkdownEditor
-										v-if="editingMessage"
+										v-if="customMessageInput || editingMessage"
 										ref="messageEditor"
 										:model-value="displayMessage"
 										:disabled="pending || disabled || generating"
@@ -163,7 +165,7 @@
 										highlighted
 									/>
 									<div
-										v-if="!resolved"
+										v-if="!resolved && !customMessageInput"
 										class="absolute right-1.5 z-10 flex items-center gap-1"
 										:class="editingMessage ? '-top-0' : 'top-1.5'"
 									>
@@ -317,7 +319,7 @@ const previousIssue = computed(() => {
 const issue = computed(() =>
 	'controls' in props.issue ? props.issue : previousIssues.cardIssue(props.issue),
 )
-const issueTitle = computed(() => issue.value.custom?.id ?? issue.value.title)
+const issueTitle = computed(() => issue.value.title || formatMessage(messages.customIssue))
 const active = computed(() =>
 	panels.activeIssues.value.some((entry) => entry.id === issue.value.id),
 )
@@ -338,9 +340,10 @@ const { generating } = reviewMessages
 const { pending } = injectReviewSubmission()
 const card = ref<HTMLElement>()
 const expanded = ref(!!issue.value.custom && !props.resolved)
-const editingMessage = ref(
-	!!issue.value.custom && !issue.value.custom.message.trim() && !props.disabled && !props.resolved,
+const customMessageInput = computed(
+	() => !!issue.value.custom && !props.resolved && !props.disabled,
 )
+const editingMessage = ref(false)
 useReviewInteraction({
 	element: () => card.value,
 	collapse: () => {
@@ -373,15 +376,17 @@ watch(
 )
 const { formatMessage } = useVIntl()
 const messages = defineMessages({
-	customId: { id: 'project-review.issues.custom-id', defaultMessage: 'Issue ID' },
+	customIssue: { id: 'project-review.issues.custom', defaultMessage: 'Custom issue' },
+	customTitle: { id: 'project-review.issues.custom-title', defaultMessage: 'Title' },
+	customTitlePlaceholder: {
+		id: 'project-review.issues.custom-title-placeholder',
+		defaultMessage: 'Enter title...',
+	},
+	issueMessage: { id: 'project-review.issues.issue-message', defaultMessage: 'Message' },
 	customPriority: { id: 'project-review.issues.custom-priority', defaultMessage: 'Priority' },
 	customPlaceholder: {
 		id: 'project-review.issues.custom-placeholder',
 		defaultMessage: 'Enter custom issue message...',
-	},
-	customIdInvalid: {
-		id: 'project-review.issues.custom-id-invalid',
-		defaultMessage: 'Enter a unique, non-empty issue ID.',
 	},
 	customMessageRequired: {
 		id: 'project-review.issues.custom-message-required',
@@ -400,7 +405,7 @@ const messages = defineMessages({
 		defaultMessage: 'Search actions…',
 	},
 	actions: { id: 'project-review.issues.custom-actions', defaultMessage: 'Actions' },
-	addFacets: { id: 'project-review.issues.custom-add-facets', defaultMessage: 'Add actions' },
+	addFacets: { id: 'project-review.issues.custom-add-facets', defaultMessage: 'Mark as addressed' },
 	notResolved: {
 		id: 'project-review.issues.not-resolved',
 		defaultMessage: 'Not resolved',
@@ -461,11 +466,7 @@ const facetOptions = computed(() =>
 			),
 		})),
 )
-const customIdInvalid = computed(() =>
-	panels.validationErrors.value.some(
-		({ issueId, key }) => issueId === issue.value.id && key === 'id',
-	),
-)
+const customTitleMissing = computed(() => !!issue.value.custom && !issue.value.custom.title.trim())
 const facetLabels = computed(() => {
 	const facets =
 		panels.activeIssues.value.find((entry) => entry.id === issue.value.id)?.facets ??
@@ -500,6 +501,7 @@ const needsToggle = computed(() =>
 )
 function onMessageKeydown(event: KeyboardEvent) {
 	if (
+		customMessageInput.value ||
 		event.defaultPrevented ||
 		event.repeat ||
 		event.isComposing ||

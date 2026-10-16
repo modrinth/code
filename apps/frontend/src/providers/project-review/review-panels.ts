@@ -98,6 +98,7 @@ export interface ReviewIssue {
 	controls: ReviewIssueControl[]
 	custom?: {
 		id: string
+		title: string
 		priority: string
 		message: string
 		facets: string[]
@@ -193,19 +194,24 @@ export function createReviewPanels(
 					typeof value.previous === 'string'
 						? (JSON.parse(value.previous) as Labrinth.Threads.v3.ThreadIssue)
 						: undefined
+				const priority = customIssuePriority(value.priority)
+				const title = String(value.title ?? previous?.why.title ?? '')
+				const message = String(value.message ?? '')
+				const facets =
+					value.facets instanceof Set ? customIssueActionKeys(value.facets, previous) : []
 				return [
 					{
 						id,
-						title: 'Custom issue',
+						title: title.trim(),
 						category: 'Project wide',
-						priority: IssuePriority[customIssuePriority(value.priority)],
+						priority: IssuePriority[priority],
 						controls: [],
 						custom: {
 							id: String(value.id ?? id),
-							priority: customIssuePriority(value.priority),
-							message: String(value.message ?? ''),
-							facets:
-								value.facets instanceof Set ? customIssueActionKeys(value.facets, previous) : [],
+							title,
+							priority,
+							message,
+							facets,
 							previous,
 						},
 					},
@@ -214,7 +220,12 @@ export function createReviewPanels(
 		)
 	})
 
-	function updateCustomIssue(id: string, changes: Partial<NonNullable<ReviewIssue['custom']>>) {
+	function updateCustomIssue(
+		id: string,
+		changes: Partial<
+			Pick<NonNullable<ReviewIssue['custom']>, 'title' | 'priority' | 'message' | 'facets'>
+		>,
+	) {
 		const current = customIssues.value.find((issue) => issue.id === id)?.custom
 		if (!project.value || !current) return
 		const next = { ...current, ...changes }
@@ -232,6 +243,7 @@ export function createReviewPanels(
 		if (!customIssues.value.some((issue) => issue.id === id)) {
 			session.write(project.value.id, 'custom-issues', id, {
 				id: previous.why.issue_id ?? id,
+				title: previous.why.title ?? '',
 				priority: customIssuePriority(previous.why.custom?.priority),
 				message: previous.why.message ?? '',
 				facets: new Set(
@@ -249,17 +261,10 @@ export function createReviewPanels(
 
 	function addCustomIssue() {
 		if (!project.value) return
-		const sequence = Number(session.read(project.value.id, 'custom-issue-counter').value ?? 0) + 1
-		let number = sequence
-		const used = new Set([
-			...availableIssues.value.flatMap((issue) => [issue.id, issue.custom?.id?.trim()]),
-			...(reviewData.value.previousIssueIds ?? []),
-		])
-		while (used.has(`custom-issue-${number}`)) number++
-		const id = `custom-issue-${number}`
-		session.write(project.value.id, 'custom-issue-counter', 'value', number)
+		const id = crypto.randomUUID()
 		session.write(project.value.id, 'custom-issues', id, {
 			id,
+			title: '',
 			priority: 'Bottom',
 			message: '',
 			facets: new Set<string>(),
@@ -713,6 +718,7 @@ export function createReviewPanels(
 				? {
 						custom: {
 							id: custom.id,
+							title: custom.title,
 							priority: custom.priority,
 							message: custom.message,
 							facets: [...custom.facets].sort(),
@@ -845,6 +851,7 @@ export function createReviewPanels(
 				}
 				const custom = customIssues.value.find((entry) => entry.id === id)?.custom
 				if (custom) {
+					if (!custom.title.trim()) missing.push('title')
 					if (!custom.message.trim()) missing.push('message')
 					if (
 						!custom.id.trim() ||
