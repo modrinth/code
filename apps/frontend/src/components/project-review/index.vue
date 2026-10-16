@@ -106,7 +106,11 @@ import {
 } from '@modrinth/ui'
 import { computed, onScopeDispose, ref, watch } from 'vue'
 
-import { notifyCopied, useModerationKeybinds, useModerationSettings } from '~/composables/moderation'
+import {
+	notifyCopied,
+	useModerationKeybinds,
+	useModerationSettings,
+} from '~/composables/moderation'
 import { isStaff } from '~/helpers/users.js'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 import { previousReviewLinkUrls } from '~/providers/project-review/project-links'

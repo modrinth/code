@@ -3371,6 +3371,9 @@
   "moderation.project-review.issues": {
     "message": "Issue tracker"
   },
+  "moderation.project-review.keepPopoutClosed": {
+    "message": "Keep closed"
+  },
   "moderation.project-review.keybindsSettings": {
     "message": "Keybinds"
   },
