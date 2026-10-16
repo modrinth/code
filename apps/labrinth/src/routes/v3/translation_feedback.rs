@@ -147,6 +147,16 @@ pub async fn translation_feedback_create(
         return Ok(());
     };
 
+    let daily_key = daily_limit_key(&redis, user.id);
+    let reports_today = count_daily_report(&redis, &daily_key)
+        .await
+        .wrap_internal_err("counting daily translation feedback")?;
+    if reports_today > DAILY_LIMIT {
+        return Err(ApiError::RateLimit(eyre!(
+            "daily translation feedback limit reached"
+        )));
+    }
+
     let language_id = crowdin
         .resolve_language_id(&redis, &feedback.locale)
         .await
@@ -171,18 +181,9 @@ pub async fn translation_feedback_create(
         .await
         .wrap_internal_err("checking for duplicate translation feedback")?
     {
+        uncount_daily_report(&redis, &daily_key).await;
         return Err(ApiError::Conflict(eyre!(
             "you already reported this string recently"
-        )));
-    }
-
-    let reports_today = count_daily_report(&redis, user.id)
-        .await
-        .wrap_internal_err("counting daily translation feedback")?;
-    if reports_today > DAILY_LIMIT {
-        release_report(&redis, &report_key).await;
-        return Err(ApiError::RateLimit(eyre!(
-            "daily translation feedback limit reached"
         )));
     }
 
@@ -191,7 +192,7 @@ pub async fn translation_feedback_create(
             string_id,
             &language_id,
             feedback.kind.issue_type(),
-            &issue_text(&feedback, &user.username),
+            &issue_text(&feedback, &language_id, &user.username),
         )
         .await
     {
@@ -202,23 +203,38 @@ pub async fn translation_feedback_create(
     Ok(())
 }
 
-/// Counts a report towards the user's daily limit, returning how many reports
-/// they have sent today (UTC).
-async fn count_daily_report(redis: &RedisPool, user_id: UserId) -> Result<u64> {
-    let key = redis.key().entity(
+fn daily_limit_key(redis: &RedisPool, user_id: UserId) -> String {
+    redis.key().entity(
         DAILY_LIMIT_NAMESPACE,
         format!("{user_id}:{}", Utc::now().date_naive()),
-    );
+    )
+}
+
+/// Counts a report attempt towards the user's daily limit, returning how many
+/// attempts they have made today (UTC).
+async fn count_daily_report(redis: &RedisPool, key: &str) -> Result<u64> {
     let mut conn = redis.connect().await?;
     let (count,): (u64,) = redis::pipe()
         .atomic()
-        .incr(&key, 1)
-        .expire(&key, DAILY_LIMIT_EXPIRY_SECONDS)
+        .incr(key, 1)
+        .expire(key, DAILY_LIMIT_EXPIRY_SECONDS)
         .ignore()
         .query_async(&mut conn)
         .await?;
 
     Ok(count)
+}
+
+/// Refunds an attempt counted by [`count_daily_report`].
+async fn uncount_daily_report(redis: &RedisPool, key: &str) {
+    let result = async {
+        let _: i64 = redis.connect().await?.decr(key, 1).await?;
+        eyre::Ok(())
+    }
+    .await;
+    if let Err(err) = result {
+        tracing::warn!("Failed to refund daily translation feedback: {err:#}");
+    }
 }
 
 /// Marks a string as reported by a user in a language, returning `false` if
@@ -242,15 +258,18 @@ async fn release_report(redis: &RedisPool, key: &str) {
     }
 }
 
-fn issue_text(feedback: &TranslationFeedback, username: &str) -> String {
+fn issue_text(
+    feedback: &TranslationFeedback,
+    language_id: &str,
+    username: &str,
+) -> String {
     let product = match feedback.product {
         TranslationProduct::Website => "website",
         TranslationProduct::App => "app",
     };
 
     let mut text = format!(
-        "Player feedback from the Modrinth {product} ({}), reported by {username}\n\nProblem: {}\nShown text: {}",
-        feedback.locale,
+        "Player feedback from the Modrinth {product} ({language_id}), reported by {username}\n\nProblem: {}\nShown text: {}",
         feedback.kind.label(),
         feedback.seen_text.trim(),
     );
