@@ -228,6 +228,31 @@ pub enum ErrorKind {
         "Not enough space: the destination needs at least {required} bytes plus working space for the app-directory move"
     )]
     NotEnoughSpace { required: u64 },
+
+    #[error("{0}")]
+    InvalidPack(InvalidPack),
+}
+
+#[derive(Debug, derive_more::Display)]
+pub enum InvalidPack {
+    #[display("only resource packs and data packs can be synced")]
+    UnsupportedType,
+    #[display("data pack syncing is currently disabled")]
+    DataPacksDisabled,
+    #[display("invalid pack file path")]
+    InvalidPath,
+    #[display("the pack is not registered")]
+    NotRegistered,
+    #[display("the pack's compatibility could not be verified")]
+    UnverifiedCompatibility,
+    #[display("choose a valid pack zip file")]
+    NotZip,
+    #[display("choose a pack zip containing pack.mcmeta")]
+    MissingMetadata,
+    #[display("the pack metadata is too large")]
+    MetadataTooLarge,
+    #[display("this file is not a pack of the selected type")]
+    WrongType,
 }
 
 fn format_duration(duration: Duration) -> String {
