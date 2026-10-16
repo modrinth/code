@@ -58,6 +58,9 @@
 					:format-label="(item) => formatMessage(kindMessages[item])"
 					:capitalize="false"
 				/>
+				<p class="m-0 text-sm text-secondary">
+					{{ formatMessage(kindDescriptions[kind]) }}
+				</p>
 			</div>
 			<div class="flex flex-col gap-2">
 				<label for="translation-feedback-suggestion" class="font-semibold text-contrast">
@@ -251,6 +254,29 @@ const kindMessages = defineMessages({
 	other: {
 		id: 'settings.language.feedback.kind.other',
 		defaultMessage: 'Other',
+	},
+})
+
+const kindDescriptions = defineMessages({
+	incorrect: {
+		id: 'settings.language.feedback.kind.incorrect.description',
+		defaultMessage: 'The translation says something different from the English text.',
+	},
+	typo: {
+		id: 'settings.language.feedback.kind.typo.description',
+		defaultMessage: 'The translation has spelling, grammar or punctuation mistakes.',
+	},
+	inconsistent: {
+		id: 'settings.language.feedback.kind.inconsistent.description',
+		defaultMessage: 'The same term is translated differently elsewhere in the interface.',
+	},
+	untranslated: {
+		id: 'settings.language.feedback.kind.untranslated.description',
+		defaultMessage: 'The text is still shown in English.',
+	},
+	other: {
+		id: 'settings.language.feedback.kind.other.description',
+		defaultMessage: 'Something else is wrong, like text being cut off or hard to understand.',
 	},
 })
 

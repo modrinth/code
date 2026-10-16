@@ -6182,8 +6182,14 @@
   "settings.language.feedback.kind.inconsistent": {
     "defaultMessage": "Inconsistent"
   },
+  "settings.language.feedback.kind.inconsistent.description": {
+    "defaultMessage": "The same term is translated differently elsewhere in the interface."
+  },
   "settings.language.feedback.kind.incorrect": {
     "defaultMessage": "Wrong meaning"
+  },
+  "settings.language.feedback.kind.incorrect.description": {
+    "defaultMessage": "The translation says something different from the English text."
   },
   "settings.language.feedback.kind.label": {
     "defaultMessage": "What's wrong?"
@@ -6191,11 +6197,20 @@
   "settings.language.feedback.kind.other": {
     "defaultMessage": "Other"
   },
+  "settings.language.feedback.kind.other.description": {
+    "defaultMessage": "Something else is wrong, like text being cut off or hard to understand."
+  },
   "settings.language.feedback.kind.typo": {
     "defaultMessage": "Spelling or grammar"
   },
+  "settings.language.feedback.kind.typo.description": {
+    "defaultMessage": "The translation has spelling, grammar or punctuation mistakes."
+  },
   "settings.language.feedback.kind.untranslated": {
     "defaultMessage": "Not translated"
+  },
+  "settings.language.feedback.kind.untranslated.description": {
+    "defaultMessage": "The text is still shown in English."
   },
   "settings.language.feedback.search.description": {
     "defaultMessage": "Search for the text that looks wrong, then pick it from the list."
