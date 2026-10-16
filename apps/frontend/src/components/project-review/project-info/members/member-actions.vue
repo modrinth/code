@@ -2,8 +2,7 @@
 	<TeleportOverflowMenu
 		v-bind="$attrs"
 		:label="formatMessage(commonMessages.moreOptionsButton)"
-		:options="options"
-		:disabled="mutation.isPending.value"
+		:options="menuOptions"
 		type="quiet"
 		size="sm"
 		@open="activated = true"
@@ -12,48 +11,6 @@
 	</TeleportOverflowMenu>
 	<template v-if="activated">
 		<EditUserModal v-if="isAdmin" ref="editModal" :user="user" :user-id="user.id" />
-		<LockUserModal v-if="isAdmin" ref="lockModal" :user="user" :user-id="user.id" />
-		<ForcePasswordResetModal v-if="isAdmin" ref="passwordModal" :user="user" :user-id="user.id" />
-		<Reset2faModal v-if="isAdmin" ref="totpModal" :user="user" :user-id="user.id" />
-		<NewModal
-			ref="confirmModal"
-			:header="
-				formatMessage(
-					confirmation === 'block' ? messages.blockTitle : menuMessages.revokeSessionsButton,
-				)
-			"
-			:closable="!mutation.isPending.value"
-			fade="danger"
-			max-width="500px"
-		>
-			<p class="m-0">
-				{{
-					formatMessage(confirmation === 'block' ? messages.blockBody : messages.revokeBody, {
-						username: user.username,
-					})
-				}}
-			</p>
-			<template #actions>
-				<Button type="outlined" :disabled="mutation.isPending.value" @click="confirmModal?.hide()">
-					{{ formatMessage(commonMessages.cancelButton) }}
-				</Button>
-				<Button
-					type="colored"
-					color="red"
-					:loading="mutation.isPending.value"
-					:disabled="mutation.isPending.value"
-					@click="mutation.mutate(confirmation)"
-				>
-					{{
-						formatMessage(
-							confirmation === 'block'
-								? menuMessages.blockButton
-								: menuMessages.revokeSessionsButton,
-						)
-					}}
-				</Button>
-			</template>
-		</NewModal>
 		<NewModal
 			v-if="isStaffViewing"
 			ref="detailsModal"
@@ -74,44 +31,29 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import {
-	AffiliateIcon,
-	BanIcon,
 	BoxesIcon,
-	BoxIcon,
 	ChartIcon,
 	ClipboardCopyIcon,
-	CurrencyIcon,
 	EditIcon,
 	InfoIcon,
-	KeyIcon,
-	LockIcon,
-	LockOpenIcon,
-	LogOutIcon,
 	MoreHorizontalIcon,
-	ReportIcon,
-	ShieldAlertIcon,
 } from '@modrinth/assets'
 import {
-	blockedUsersQueryKey,
-	Button,
 	type ButtonMenuOption,
 	commonMessages,
 	defineMessages,
 	injectModrinthClient,
-	injectNotificationManager,
 	NewModal,
 	provideUserProfile,
 	TeleportOverflowMenu,
+	type UserProfileContext,
 	useVIntl,
 } from '@modrinth/ui'
 import EditUserModal from '@modrinth/ui/src/layouts/shared/user-profile/components/edit-user-modal.vue'
-import ForcePasswordResetModal from '@modrinth/ui/src/layouts/shared/user-profile/components/force-password-reset-modal.vue'
-import LockUserModal from '@modrinth/ui/src/layouts/shared/user-profile/components/lock-user-modal.vue'
-import Reset2faModal from '@modrinth/ui/src/layouts/shared/user-profile/components/reset-2fa-modal.vue'
-import { isStaff, UserBadge } from '@modrinth/utils'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
+import { isStaff } from '@modrinth/utils'
+import { useQuery } from '@tanstack/vue-query'
 import { useClipboard } from '@vueuse/core'
-import { computed, reactive, ref } from 'vue'
+import { computed, ref } from 'vue'
 
 defineOptions({ inheritAttrs: false })
 
@@ -124,18 +66,6 @@ const menuMessages = defineMessages({
 		id: 'profile.button.analytics',
 		defaultMessage: 'View user analytics',
 	},
-	billingButton: {
-		id: 'profile.button.billing',
-		defaultMessage: 'Manage user billing',
-	},
-	blockButton: {
-		id: 'profile.button.block',
-		defaultMessage: 'Block',
-	},
-	unblockButton: {
-		id: 'profile.button.unblock',
-		defaultMessage: 'Unblock',
-	},
 	infoButton: {
 		id: 'profile.button.info',
 		defaultMessage: 'View user details',
@@ -144,45 +74,11 @@ const menuMessages = defineMessages({
 		id: 'profile.button.shared-instances',
 		defaultMessage: 'View shared instances',
 	},
-	profileManageProjectsButton: {
-		id: 'profile.button.manage-projects',
-		defaultMessage: 'Manage projects',
-	},
-	removeAffiliateButton: {
-		id: 'profile.button.remove-affiliate',
-		defaultMessage: 'Remove as affiliate',
-	},
-	setAffiliateButton: {
-		id: 'profile.button.set-affiliate',
-		defaultMessage: 'Set as affiliate',
-	},
-	lockButton: {
-		id: 'profile.button.lock',
-		defaultMessage: 'Lock account',
-	},
-	unlockButton: {
-		id: 'profile.button.unlock',
-		defaultMessage: 'Unlock account',
-	},
-	revokeSessionsButton: {
-		id: 'profile.button.revoke-sessions',
-		defaultMessage: 'Revoke all sessions',
-	},
-	forcePasswordResetButton: {
-		id: 'profile.button.force-password-reset',
-		defaultMessage: 'Force password reset',
-	},
-	reset2faButton: {
-		id: 'profile.button.reset-2fa',
-		defaultMessage: 'Reset two-factor authentication',
-	},
 })
 
 const props = defineProps<{ user: Labrinth.Users.v3.User }>()
 const auth = useAuthState()
 const client = injectModrinthClient()
-const queryClient = useQueryClient()
-const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const config = useRuntimeConfig()
 const { copy } = useClipboard()
@@ -196,49 +92,25 @@ const userQuery = useQuery({
 	staleTime: 30_000,
 })
 const user = computed(() => userQuery.data.value ?? props.user)
-const blocksQuery = useQuery({
-	queryKey: computed(() => blockedUsersQueryKey(auth.value.user?.id)),
-	queryFn: () => client.labrinth.blocked_users_v3.list(),
-	enabled: computed(() => activated.value && !!auth.value.user),
-	staleTime: 30_000,
-})
-const isBlocked = computed(() => blocksQuery.data.value?.includes(user.value.id) ?? false)
 
 provideUserProfile({
-	getUser: (id) => client.labrinth.users_v3.get(id),
-	getProjects: (id) => client.labrinth.users_v3.getProjects(id),
-	getOrganizations: (id) => client.labrinth.users_v2.getOrganizations(id),
-	getCollections: (id) => client.labrinth.users_v2.getCollections(id),
-	patchUser: (id, patch) => client.labrinth.users_v2.patch(id, patch),
-	changeAvatar: (id, file, extension) => client.labrinth.users_v2.changeIcon(id, file, extension),
-	deleteAvatar: (id) => client.labrinth.users_v2.deleteIcon(id),
+	getUser: (id: string) => client.labrinth.users_v3.get(id),
+	getProjects: (id: string) => client.labrinth.users_v3.getProjects(id),
+	getOrganizations: (id: string) => client.labrinth.users_v2.getOrganizations(id),
+	getCollections: (id: string) => client.labrinth.users_v2.getCollections(id),
+	patchUser: (id: string, patch: Parameters<UserProfileContext['patchUser']>[1]) =>
+		client.labrinth.users_v2.patch(id, patch),
+	changeAvatar: (id: string, file: Blob, extension: string) =>
+		client.labrinth.users_v2.changeIcon(id, file, extension),
+	deleteAvatar: (id: string) => client.labrinth.users_v2.deleteIcon(id),
 	getBlockedUsers: () => client.labrinth.blocked_users_v3.list(),
-	blockUser: (id) => client.labrinth.blocked_users_v3.block(id),
-	unblockUser: (id) => client.labrinth.blocked_users_v3.unblock(id),
-})
+	blockUser: (id: string) => client.labrinth.blocked_users_v3.block(id),
+	unblockUser: (id: string) => client.labrinth.blocked_users_v3.unblock(id),
+} satisfies UserProfileContext)
 
 const editModal = ref<InstanceType<typeof EditUserModal>>()
-const lockModal = ref<InstanceType<typeof LockUserModal>>()
-const passwordModal = ref<InstanceType<typeof ForcePasswordResetModal>>()
-const totpModal = ref<InstanceType<typeof Reset2faModal>>()
-const confirmModal = ref<InstanceType<typeof NewModal>>()
 const detailsModal = ref<InstanceType<typeof NewModal>>()
-const confirmation = ref<'block' | 'revoke'>('block')
 const messages = defineMessages({
-	blockTitle: {
-		id: 'profile.block-user.admonition-title',
-		defaultMessage: 'Are you sure you want to block this user?',
-	},
-	blockBody: {
-		id: 'profile.block-user.admonition-body',
-		defaultMessage:
-			'{username} will not be able to send you friend requests, invite you to shared instances or invite you to Modrinth Hosting servers.',
-	},
-	revokeBody: {
-		id: 'project-review.members.revoke-sessions-body',
-		defaultMessage:
-			'{username} will be signed out on every device. They will need to sign in again.',
-	},
 	detailsTitle: { id: 'profile.details.title', defaultMessage: 'User details' },
 	emailVerified: {
 		id: 'profile.details.label.email-verified',
@@ -259,187 +131,32 @@ const messages = defineMessages({
 	totp: { id: 'profile.details.label.has-totp', defaultMessage: 'Has TOTP' },
 })
 
-type Action = 'block' | 'unblock' | 'affiliate' | 'unlock' | 'revoke'
-const mutation = useMutation({
-	mutationFn: async (action: Action) => {
-		const target = user.value
-		if (action === 'block' || action === 'unblock') {
-			if (!auth.value.user || auth.value.user.id === target.id) return
-			await client.labrinth.blocked_users_v3[action](target.id)
-		} else {
-			if (!isAdmin.value) return
-			if (action === 'affiliate')
-				await client.labrinth.users_v2.patch(target.id, {
-					badges: target.badges ^ UserBadge.AFFILIATE,
-				})
-			else if (action === 'unlock' && target.role === 'developer')
-				await client.labrinth.moderation_internal.unlockUser(target.id)
-			else if (action === 'revoke' && auth.value.user?.id !== target.id)
-				await client.labrinth.moderation_internal.revokeUserSessions(target.id)
-		}
-	},
-	onSuccess: () => confirmModal.value?.hide(),
-	onSettled: () =>
-		Promise.all([
-			queryClient.invalidateQueries({ queryKey: ['user', props.user.id] }),
-			queryClient.invalidateQueries({
-				queryKey: blockedUsersQueryKey(auth.value.user?.id),
-			}),
-		]),
-	onError: (error) =>
-		addNotification({
-			type: 'error',
-			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: error instanceof Error ? error.message : String(error),
-		}),
-})
-
-function confirm(action: 'block' | 'revoke') {
-	confirmation.value = action
-	confirmModal.value?.show()
-}
-
-const menuProps = reactive({
-	user,
-	authUser: computed(() => auth.value.user),
-	isSelf: computed(() => auth.value.user?.id === user.value.id),
-	isAdmin,
-	isStaff: isStaffViewing,
-	showStaffActions: true,
-	isBlocked,
-	isAffiliate: computed(() => !!(user.value.badges & UserBadge.AFFILIATE)),
-})
-const handlers = {
-	block: () => (isBlocked.value ? mutation.mutate('unblock') : confirm('block')),
-	copyId: () => {
-		void copy(user.value.id)
-	},
-	copyPermalink: () => {
-		void copy(`${config.public.siteUrl}/user/${user.value.id}`)
-	},
-	toggleAffiliate: () => mutation.mutate('affiliate'),
-	openInfo: () => detailsModal.value?.show(),
-	editUser: () => editModal.value?.show(),
-	toggleLock: () => (user.value.lock ? mutation.mutate('unlock') : lockModal.value?.show()),
-	revokeSessions: () => confirm('revoke'),
-	forcePasswordReset: () => passwordModal.value?.show(),
-	reset2fa: () => totpModal.value?.show(),
-}
-
 const menuOptions = computed<ButtonMenuOption[]>(() => [
-	{
-		id: 'manage-projects',
-		type: 'link',
-		label: formatMessage(menuMessages.profileManageProjectsButton),
-		icon: BoxIcon,
-		href: '/dashboard/projects',
-		target: '_blank',
-		rel: 'noopener noreferrer',
-		shown: menuProps.isSelf,
-	},
-	{ type: 'divider', shown: menuProps.isSelf },
-	{
-		id: 'report',
-		type: 'link',
-		label: formatMessage(commonMessages.reportButton),
-		icon: ReportIcon,
-		href: `/report?item=user&itemID=${encodeURIComponent(user.value.id)}`,
-		target: '_blank',
-		rel: 'noopener noreferrer',
-		tone: 'red',
-		shown: menuProps.authUser?.id !== menuProps.user.id,
-	},
-	{
-		id: 'block',
-		label: formatMessage(
-			menuProps.isBlocked ? menuMessages.unblockButton : menuMessages.blockButton,
-		),
-		icon: BanIcon,
-		action: () => handlers.block(),
-		tone: 'red',
-		shown: menuProps.authUser?.id !== menuProps.user.id,
-	},
 	{
 		id: 'copy-id',
 		label: formatMessage(commonMessages.copyIdButton),
 		icon: ClipboardCopyIcon,
-		action: () => handlers.copyId(),
+		action: () => {
+			void copy(user.value.id)
+		},
 	},
 	{
 		id: 'copy-permalink',
 		label: formatMessage(commonMessages.copyPermalinkButton),
 		icon: ClipboardCopyIcon,
-		action: () => handlers.copyPermalink(),
+		action: () => {
+			void copy(`${config.public.siteUrl}/user/${user.value.id}`)
+		},
 	},
-	{
-		type: 'divider',
-		shown: menuProps.showStaffActions && (menuProps.isAdmin || menuProps.isStaff),
-	},
-	{
-		id: 'open-billing',
-		type: 'link',
-		label: formatMessage(menuMessages.billingButton),
-		icon: CurrencyIcon,
-		href: `/admin/billing/${encodeURIComponent(user.value.id)}`,
-		target: '_blank',
-		rel: 'noopener noreferrer',
-		tone: 'orange',
-		shown: menuProps.showStaffActions && menuProps.isStaff,
-	},
-	{
-		id: 'toggle-affiliate',
-		label: menuProps.isAffiliate
-			? formatMessage(menuMessages.removeAffiliateButton)
-			: formatMessage(menuMessages.setAffiliateButton),
-		icon: AffiliateIcon,
-		action: () => handlers.toggleAffiliate(),
-		shown: menuProps.showStaffActions && menuProps.isAdmin,
-		remainOpen: true,
-		tone: menuProps.isAffiliate ? 'red' : 'orange',
-	},
+	{ type: 'divider', shown: isStaffViewing.value },
 	{
 		id: 'open-info',
 		label: formatMessage(menuMessages.infoButton),
 		icon: InfoIcon,
-		action: () => handlers.openInfo(),
+		action: () => detailsModal.value?.show(),
 		tone: 'orange',
-		shown: menuProps.showStaffActions && menuProps.isStaff,
-	},
-	{
-		id: 'toggle-lock',
-		label: formatMessage(menuProps.user.lock ? menuMessages.unlockButton : menuMessages.lockButton),
-		icon: menuProps.user.lock ? LockOpenIcon : LockIcon,
-		action: () => handlers.toggleLock(),
-		tone: 'red',
-		shown: menuProps.showStaffActions && menuProps.isAdmin && menuProps.user.role === 'developer',
-	},
-	{
-		id: 'revoke-sessions',
-		label: formatMessage(menuMessages.revokeSessionsButton),
-		icon: LogOutIcon,
-		action: () => handlers.revokeSessions(),
-		tone: 'red',
-		shown: menuProps.showStaffActions && menuProps.isAdmin && !menuProps.isSelf,
-	},
-	{
-		id: 'force-password-reset',
-		label: formatMessage(menuMessages.forcePasswordResetButton),
-		icon: KeyIcon,
-		action: () => handlers.forcePasswordReset(),
-		tone: 'red',
-		shown: menuProps.showStaffActions && menuProps.isAdmin && menuProps.user.role === 'developer',
-	},
-	{
-		id: 'reset-2fa',
-		label: formatMessage(menuMessages.reset2faButton),
-		icon: ShieldAlertIcon,
-		action: () => handlers.reset2fa(),
-		tone: 'red',
-		shown:
-			menuProps.showStaffActions &&
-			menuProps.isAdmin &&
-			menuProps.user.role === 'developer' &&
-			Boolean(menuProps.user.has_totp),
+		shown: isStaffViewing.value,
+		disabled: !userQuery.data.value || userQuery.isFetching.value,
 	},
 	{
 		id: 'open-shared-instances',
@@ -450,7 +167,8 @@ const menuOptions = computed<ButtonMenuOption[]>(() => [
 		target: '_blank',
 		rel: 'noopener noreferrer',
 		tone: 'orange',
-		shown: menuProps.showStaffActions && menuProps.isStaff,
+		shown: isStaffViewing.value,
+		disabled: !userQuery.data.value || userQuery.isFetching.value,
 	},
 	{
 		id: 'open-analytics',
@@ -461,32 +179,20 @@ const menuOptions = computed<ButtonMenuOption[]>(() => [
 		target: '_blank',
 		rel: 'noopener noreferrer',
 		tone: 'orange',
-		shown: menuProps.showStaffActions && menuProps.isAdmin,
+		shown: isAdmin.value,
+		disabled: !userQuery.data.value || userQuery.isFetching.value,
 	},
+	{ type: 'divider', shown: isAdmin.value },
 	{
 		id: 'edit-user',
 		label: formatMessage(menuMessages.editUserButton),
 		icon: EditIcon,
-		action: () => handlers.editUser(),
-		tone: 'orange',
-		shown: menuProps.showStaffActions && menuProps.isAdmin,
+		action: () => editModal.value?.show(),
+		tone: 'default',
+		shown: isAdmin.value,
+		disabled: !userQuery.data.value || userQuery.isFetching.value,
 	},
 ])
-const options = computed(() =>
-	menuOptions.value.map((option) => {
-		if (option.type === 'divider' || option.type === 'heading') return option
-		const needsUser = !['manage-projects', 'report', 'block', 'copy-id', 'copy-permalink'].includes(
-			option.id,
-		)
-		return {
-			...option,
-			disabled:
-				mutation.isPending.value ||
-				(needsUser && (!userQuery.data.value || userQuery.isFetching.value)) ||
-				(option.id === 'block' && (!blocksQuery.data.value || blocksQuery.isFetching.value)),
-		}
-	}),
-)
 
 const userDetails = computed(() => {
 	const yesNo = (value: unknown) =>
