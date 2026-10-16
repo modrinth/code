@@ -1278,7 +1278,7 @@ pub async fn project_edit_internal(
         .await
         .wrap_internal_err("fetching versions from database")?
         {
-            let mut savepoint = sqlx::Acquire::begin(&mut transaction)
+            let mut savepoint = sqlx_tracing::Acquire::begin(&mut transaction)
                 .await
                 .wrap_internal_err("starting version edit savepoint")?;
             match super::versions::version_edit_in_transaction(
