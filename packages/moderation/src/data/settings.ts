@@ -52,6 +52,17 @@ const settings = {
 			description: 'Highlight inline review panels when hovering over or interacting with them.',
 			default: true,
 		}),
+		LinkInfoPlacement: setting.asEnum({
+			type: 'enum',
+			id: 'link-info-placement',
+			title: 'Link info panel position',
+			description: 'Prefer showing link info above or below the link in project review.',
+			default: 'above',
+			entries: [
+				{ label: 'Above', value: 'above' },
+				{ label: 'Below', value: 'below' },
+			],
+		}),
 		PrivateMessageHighlight: setting.asToggle({
 			type: 'toggle',
 			id: 'private-message-highlight',

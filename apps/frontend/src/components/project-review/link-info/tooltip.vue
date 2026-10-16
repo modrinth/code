@@ -32,14 +32,17 @@
 
 <script setup lang="ts">
 import { autoUpdate, flip, offset, shift, size, useFloating } from '@floating-ui/vue'
-import type { FieldValidationMessage } from '@modrinth/moderation'
-import { onScopeDispose, ref, useId, watch } from 'vue'
+import { type FieldValidationMessage, moderationSettings } from '@modrinth/moderation'
+import { computed, onScopeDispose, ref, useId, watch } from 'vue'
+
+import { useModerationSettings } from '~/composables/moderation'
 
 import { useReviewEventListener } from '../shortcuts'
 import LinkInfo from './index.vue'
 
 const props = defineProps<{ url: string; validationMessages?: FieldValidationMessage[] }>()
 const emit = defineEmits<{ hover: [hovered: boolean] }>()
+const settings = useModerationSettings()
 const anchor = ref<HTMLElement>()
 const panel = ref<HTMLElement>()
 const open = ref(false)
@@ -49,7 +52,11 @@ let openTimer: ReturnType<typeof setTimeout> | undefined
 let closeTimer: ReturnType<typeof setTimeout> | undefined
 
 const { floatingStyles } = useFloating(anchor, panel, {
-	placement: 'bottom-start',
+	placement: computed(() =>
+		settings.value.get(moderationSettings.General.LinkInfoPlacement) === 'above'
+			? 'top-start'
+			: 'bottom-start',
+	),
 	strategy: 'fixed',
 	whileElementsMounted: autoUpdate,
 	middleware: [
