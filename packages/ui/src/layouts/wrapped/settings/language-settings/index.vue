@@ -17,7 +17,7 @@
 			:body="formatMessage(messages.feedbackDescription, { platform })"
 		>
 			<template #actions>
-				<Button type="colored" color="blue" @click="feedbackModal?.show()">
+				<Button type="colored" color="blue" @click="openFeedbackModal">
 					<ReportIcon />
 					{{ formatMessage(messages.feedbackButton) }}
 				</Button>
@@ -57,7 +57,12 @@ import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { Admonition, AutoLink, IntlFormatted } from '#ui/components/base'
 import { Button } from '#ui/components/base/buttons'
 import { defineMessages, LOCALES, useVIntl } from '#ui/composables'
-import { injectI18n, injectUserPreferences } from '#ui/providers'
+import {
+	injectAuth,
+	injectI18n,
+	injectNotificationManager,
+	injectUserPreferences,
+} from '#ui/providers'
 import { commonSettingsMessages, languageSelectorMessages, useSavable } from '#ui/utils'
 
 import { languageCoverage } from './language-settings-coverage.generated'
@@ -74,6 +79,8 @@ const props = defineProps<{
 const { formatMessage } = useVIntl()
 const { locale, setLocale } = injectI18n()
 const { preferences, updatePreferences } = injectUserPreferences()
+const auth = injectAuth()
+const notificationManager = injectNotificationManager()
 const platform = computed(() =>
 	formatMessage(
 		props.product === 'app'
@@ -94,9 +101,30 @@ const messages = defineMessages({
 		id: 'settings.language.feedback.button',
 		defaultMessage: 'Report a translation issue',
 	},
+	emailVerificationRequired: {
+		id: 'settings.language.feedback.email-verification-required.title',
+		defaultMessage: 'Email verification required',
+	},
+	verifyEmailBeforeFeedback: {
+		id: 'settings.language.feedback.email-verification-required.text',
+		defaultMessage: 'You must verify your email before sending translation feedback.',
+	},
 })
 
 const feedbackModal = ref<InstanceType<typeof TranslationFeedbackModal> | null>(null)
+
+function openFeedbackModal(): void {
+	if (auth.user.value && !auth.user.value.email_verified) {
+		notificationManager.addNotification({
+			title: formatMessage(messages.emailVerificationRequired),
+			text: formatMessage(messages.verifyEmailBeforeFeedback),
+			type: 'error',
+		})
+		return
+	}
+
+	feedbackModal.value?.show()
+}
 const persistedLocale = ref(locale.value)
 let localeChangeQueue = Promise.resolve()
 

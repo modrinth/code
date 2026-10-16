@@ -1,4 +1,4 @@
-use crate::auth::get_user_from_headers;
+use crate::auth::{get_user_from_headers, require_verified_email};
 use crate::database::PgPool;
 use crate::models::pats::Scopes;
 use crate::queue::session::AuthQueue;
@@ -114,11 +114,13 @@ pub async fn translation_feedback_create(
         &**pool,
         &redis,
         &session_queue,
-        Scopes::REPORT_CREATE,
+        Scopes::SESSION_ACCESS,
     )
     .await
     .wrap_auth_err("authenticating API request")?
     .1;
+
+    require_verified_email(&user)?;
 
     let feedback = body.into_inner();
     feedback
