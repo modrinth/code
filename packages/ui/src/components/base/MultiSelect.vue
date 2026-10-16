@@ -1420,9 +1420,9 @@ function startPositionTracking() {
 	listenerWindow.addEventListener('beforeunload', handleWindowClose)
 	listenerWindow.visualViewport?.addEventListener('scroll', handleViewportChange)
 	listenerWindow.visualViewport?.addEventListener('resize', handleViewportChange)
-	stopOutsideClick = onClickOutside(containerRef, () => closeDropdown(), {
+	stopOutsideClick = onClickOutside(dropdownRef, () => closeDropdown(), {
 		window: listenerWindow,
-		ignore: [triggerElement, dropdownRef, '.v-popper__popper'],
+		ignore: [containerRef, triggerElement, '.v-popper__popper'],
 	})
 }
 
