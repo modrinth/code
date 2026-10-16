@@ -1,18 +1,19 @@
+import { MinecraftServerIcon } from '@modrinth/assets'
 import { createContext, injectAuth } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, type Ref, ref, watch } from 'vue'
 
 import { useUserQuery } from '@/composables/users/use-user-query'
+import { injectInstanceLaunchState } from '@/features/instances/launch-state'
 import {
 	getSharedInstanceUnavailableReason,
-	install_get_shared_instance_update_preview,
 	isSharedInstanceUnavailableError,
 	type SharedInstanceUnavailableReason,
 } from '@/helpers/install'
-import { can_current_user_use_shared_instances } from '@/helpers/instance'
+import { can_current_user_use_shared_instances, getInstanceIconUrl } from '@/helpers/instance'
 import type { GameInstance } from '@/helpers/types'
 
-import { instanceKeys } from './query-options'
+import { instanceKeys, sharedInstanceUpdatePreviewQueryOptions } from './query-options'
 
 export type SharedInstanceManager =
 	| {
@@ -35,6 +36,7 @@ export function createSharedInstanceContext(
 ) {
 	const auth = injectAuth()
 	const queryClient = useQueryClient()
+	const instanceLaunch = injectInstanceLaunchState()
 	const forcedUnavailableReason = ref<SharedInstanceUnavailableReason | null>(null)
 
 	const expectedUserId = computed(() => instance.value?.shared_instance?.linked_user_id ?? null)
@@ -62,7 +64,7 @@ export function createSharedInstanceContext(
 			return {
 				type: 'server',
 				name: attachment.server_manager_name,
-				avatarUrl: attachment.server_manager_icon_url ?? undefined,
+				avatarUrl: getInstanceIconUrl(attachment.server_manager_icon_url) ?? MinecraftServerIcon,
 				tintBy: attachment.server_manager_name,
 			}
 		}
@@ -91,13 +93,10 @@ export function createSharedInstanceContext(
 		() => !auth.session_token.value || eligibilityQuery.data.value !== false,
 	)
 
-	const updatePreviewQuery = useQuery({
-		queryKey: computed(() =>
-			instanceKeys.sharedUpdatePreview(instance.value?.id ?? '', auth.user.value?.id),
-		),
-		queryFn: () => install_get_shared_instance_update_preview(instance.value!.id),
-		enabled: computed(
-			() =>
+	const updatePreviewQuery = useQuery(
+		computed(() => ({
+			...sharedInstanceUpdatePreviewQueryOptions(instance.value?.id ?? '', auth.user.value?.id),
+			enabled:
 				!!instance.value?.id &&
 				instance.value.install_stage === 'installed' &&
 				!!instance.value.shared_instance &&
@@ -106,23 +105,24 @@ export function createSharedInstanceContext(
 				(auth.isReady?.value ?? true) &&
 				!!auth.session_token.value &&
 				!!auth.user.value?.id,
-		),
-		retry: false,
-		staleTime: 30_000,
-		refetchOnWindowFocus: false,
-	})
+		})),
+	)
 
 	watch(updatePreviewQuery.data, (preview) => {
 		if (preview !== undefined) forcedUnavailableReason.value = null
 	})
-	watch(updatePreviewQuery.error, (error) => {
-		if (!error) return
-		if (isSharedInstanceUnavailableError(error)) {
-			forcedUnavailableReason.value = getSharedInstanceUnavailableReason(error)
-		} else {
-			notifyError(error)
-		}
-	})
+	watch(
+		updatePreviewQuery.error,
+		(error) => {
+			if (!error) return
+			if (isSharedInstanceUnavailableError(error)) {
+				forcedUnavailableReason.value = getSharedInstanceUnavailableReason(error)
+			} else if (!instance.value?.id || !instanceLaunch.isCheckingPreview(instance.value.id)) {
+				notifyError(error)
+			}
+		},
+		{ flush: 'sync' },
+	)
 
 	const unavailableReason = computed(() => forcedUnavailableReason.value)
 	const shareActionsLocked = computed(() => actionsLocked.value || unavailableReason.value !== null)
@@ -149,7 +149,9 @@ export function createSharedInstanceContext(
 	async function refreshUpdatePreview() {
 		forcedUnavailableReason.value = null
 		if (!instance.value?.id || !auth.user.value?.id) return null
-		const result = await updatePreviewQuery.refetch({ throwOnError: true })
+		const result = await instanceLaunch.runPreviewCheck(instance.value.id, () =>
+			updatePreviewQuery.refetch({ throwOnError: true }),
+		)
 		return result.data ?? null
 	}
 

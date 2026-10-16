@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { DownloadIcon, ExcitedRinthbot, RefreshCwIcon, ServerStackIcon } from '@modrinth/assets'
-import { Button, commonMessages, defineMessages, useVIntl } from '@modrinth/ui'
+import { Button, defineMessages, useVIntl } from '@modrinth/ui'
 import { computed } from 'vue'
 
 import {
@@ -42,7 +42,7 @@ const messages = defineMessages({
 useRootBreadcrumb({
 	slot: 'root',
 	id: 'servers',
-	label: () => formatMessage(commonMessages.serversLabel),
+	label: 'Hosting',
 	to: '/hosting/manage/',
 	visual: { type: 'icon', component: ServerStackIcon },
 })

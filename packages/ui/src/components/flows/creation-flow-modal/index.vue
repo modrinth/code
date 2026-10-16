@@ -4,8 +4,12 @@
 		:stages="ctx.stageConfigs"
 		:context="ctx"
 		:fade="fade"
+		:animate-stages="type === 'server-onboarding'"
+		:disable-close="ctx.navigating.value"
 		disable-progress
 		@hide="handleHide"
+		@after-hide="emit('after-hide')"
+		@after-show="emit('after-show')"
 	/>
 </template>
 
@@ -36,6 +40,7 @@ const props = withDefaults(
 		initialGameVersion?: string
 		fetchExistingInstanceNames?: () => Promise<string[]>
 		onBack?: (() => void) | null
+		browseModpacks?: () => Promise<void>
 		fade?: 'standard' | 'warning' | 'danger'
 		searchProjects?: (query: string, limit?: number) => Promise<ProjectSearchResult>
 		prepareProjectInstall?: (
@@ -60,13 +65,14 @@ const props = withDefaults(
 		initialGameVersion: undefined,
 		fetchExistingInstanceNames: undefined,
 		onBack: null,
+		browseModpacks: undefined,
 		randomizeInstanceIcon: undefined,
 		customizeInstanceIcon: undefined,
 	},
 )
 
 const emit = defineEmits<{
-	(e: 'hide' | 'browse-modpacks'): void
+	(e: 'hide' | 'after-hide' | 'after-show' | 'browse-modpacks'): void
 	(e: 'create', config: CreationFlowContextValue): void
 }>()
 
@@ -88,6 +94,7 @@ const ctx = createCreationFlowContext(
 		initialGameVersion: props.initialGameVersion,
 		fetchExistingInstanceNames: props.fetchExistingInstanceNames,
 		onBack: props.onBack ?? undefined,
+		browseModpacks: props.browseModpacks,
 		searchProjects: props.searchProjects,
 		prepareProjectInstall: props.prepareProjectInstall,
 		createProjectInstall: props.createProjectInstall,
@@ -101,10 +108,11 @@ const ctx = createCreationFlowContext(
 )
 provideCreationFlowContext(ctx)
 
-async function show() {
+async function show(prepare?: (context: CreationFlowContextValue) => void | Promise<void>) {
 	await ctx.reset()
 	void ctx.prefetchLoaderMetadata()
 	modal.value?.setStage(0)
+	await prepare?.(ctx)
 	modal.value?.show()
 }
 

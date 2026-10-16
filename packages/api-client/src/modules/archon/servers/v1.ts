@@ -86,6 +86,23 @@ export class ArchonServersV1Module extends AbstractModule {
 	}
 
 	/**
+	 * Modify a world
+	 * PATCH /v1/servers/:server_id/worlds/:world_id
+	 */
+	public async patchWorld(
+		serverId: string,
+		worldId: string,
+		body: Archon.Servers.v1.PatchWorld,
+	): Promise<void> {
+		await this.client.request(`/servers/${serverId}/worlds/${worldId}`, {
+			api: 'archon',
+			version: 1,
+			method: 'PATCH',
+			body,
+		})
+	}
+
+	/**
 	 * Roll SFTP credentials for a server
 	 * POST /v1/servers/:server_id/sftp/roll
 	 */

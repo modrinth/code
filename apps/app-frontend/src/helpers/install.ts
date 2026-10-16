@@ -82,6 +82,7 @@ export interface SharedInstanceInstallPreview {
 
 export interface SharedInstanceInviteInstallPreview {
 	sharedInstanceId: string
+	inviter?: { id: string; name: string; avatar: string | null } | null
 	managerId?: string | null
 	serverManagerName?: string | null
 	serverManagerIconUrl?: string | null
@@ -185,13 +186,27 @@ export async function install_get_shared_instance_preview(sharedInstanceId: stri
 	)
 }
 
-export async function install_accept_shared_instance_invite(inviteId: string) {
+export async function install_get_shared_instance_invite_preview(inviteId: string) {
 	return await invoke<SharedInstanceInviteInstallPreview>(
-		'plugin:install|install_accept_shared_instance_invite',
-		{
-			inviteId,
-		},
+		'plugin:install|install_get_shared_instance_invite_preview',
+		{ inviteId },
 	)
+}
+
+export async function install_accept_shared_instance_invite(
+	sharedInstanceId: string,
+	inviteId: string,
+) {
+	return await invoke<void>('plugin:install|install_accept_shared_instance_invite', {
+		sharedInstanceId,
+		inviteId,
+	})
+}
+
+export async function install_accept_pending_shared_instance_invite(sharedInstanceId: string) {
+	return await invoke<void>('plugin:install|install_accept_pending_shared_instance_invite', {
+		sharedInstanceId,
+	})
 }
 
 export async function install_get_shared_instance_update_preview(instanceId: string) {

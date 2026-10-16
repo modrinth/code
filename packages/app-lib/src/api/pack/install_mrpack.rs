@@ -514,12 +514,16 @@ pub(crate) fn install_zipped_mrpack_files_with_reporter(
     ignore_lock: bool,
     reason: DownloadReason,
     reporter: InstallProgressReporter,
+    ignore_modpack_servers: bool,
+    preserve_icon: bool,
 ) -> impl Future<Output = crate::Result<String>> + Send + 'static {
     Box::pin(install_zipped_mrpack_files_with_reporter_inner(
         create_pack,
         ignore_lock,
         reason,
         reporter,
+        ignore_modpack_servers,
+        preserve_icon,
     ))
 }
 
@@ -528,6 +532,8 @@ async fn install_zipped_mrpack_files_with_reporter_inner(
     ignore_lock: bool,
     reason: DownloadReason,
     reporter: InstallProgressReporter,
+    ignore_modpack_servers: bool,
+    preserve_icon: bool,
 ) -> crate::Result<String> {
     let state = &State::get().await?;
 
@@ -537,7 +543,7 @@ async fn install_zipped_mrpack_files_with_reporter_inner(
     let project_id = create_pack.description.project_id;
     let version_id = create_pack.description.version_id;
     let instance_id = create_pack.description.instance_id;
-    let mut icon_exists = icon.is_some();
+    let mut icon_exists = preserve_icon || icon.is_some();
     let source_path = pack_source_path(&file);
 
     reporter
@@ -1050,7 +1056,12 @@ async fn install_zipped_mrpack_files_with_reporter_inner(
                         ))
                         && has_override(&format!("client-overrides/{path}"))
                 });
-            (is_override && !shadowed_sync_override)
+            let ignored_servers = ignore_modpack_servers
+                && filename
+                    .strip_prefix("overrides/")
+                    .or_else(|| filename.strip_prefix("client-overrides/"))
+                    .is_some_and(|path| MODPACK_SERVER_PATHS.contains(&path));
+            (is_override && !shadowed_sync_override && !ignored_servers)
                 .then(|| (index, file.clone()))
         })
         .collect::<Vec<_>>();
@@ -1256,11 +1267,18 @@ async fn install_zipped_mrpack_files_with_reporter_inner(
         }
     }
 
-    crate::api::instance::synced_servers::capture_modpack_server_override(
-        &instance_id,
-        servers_override_path,
-    )
-    .await?;
+    if ignore_modpack_servers {
+        crate::api::instance::synced_servers::discard_modpack_servers(
+            &instance_id,
+        )
+        .await?;
+    } else {
+        crate::api::instance::synced_servers::capture_modpack_server_override(
+            &instance_id,
+            servers_override_path,
+        )
+        .await?;
+    }
     if let Err(error) = crate::api::instance::capture_game_options_pack_base(
         &instance_id,
         game_options_override_source,

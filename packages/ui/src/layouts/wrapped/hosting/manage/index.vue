@@ -2,11 +2,7 @@
 	<div
 		data-pyro-server-list-root
 		class="relative mx-auto flex w-full flex-col p-6"
-		:class="
-			serverList.length && !showEmptyState
-				? 'min-h-screen mb-6'
-				: 'min-h-[calc(100vh-14.5rem)] h-full py-0'
-		"
+		:class="!showEmptyState ? 'min-h-screen mb-6' : 'min-h-[calc(100vh-14.5rem)] h-full py-0'"
 	>
 		<ServersGuestPlanModal
 			ref="guestPlanModal"
@@ -266,6 +262,7 @@ import ServersUpgradeModalWrapper from '#ui/components/billing/ServersUpgradeMod
 import type { ServerListingOwner } from '#ui/components/servers/access'
 import MedalServerListing from '#ui/components/servers/marketing/MedalServerListing.vue'
 import ServerListing from '#ui/components/servers/ServerListing.vue'
+import { serverListQueryOptions } from '#ui/composables/server-list'
 import { createHostingPurchaseIntentContext, provideHostingPurchaseIntent } from '#ui/providers'
 
 const props = defineProps<{
@@ -469,30 +466,16 @@ async function fetchStock(
 	return result.available
 }
 
+const serversQueryOptions = serverListQueryOptions(client)
+
 const {
 	data: serverResponse,
 	error: fetchError,
 	isPending: serversQueryPending,
 } = useQuery({
-	queryKey: ['servers'],
+	...serversQueryOptions,
 	queryFn: async () => {
-		const response = await client.archon.servers_v0.list({ limit: 100 })
-
-		// Fetch subscriptions for medal servers
-		const hasMedalServers = response.servers.some((s) => s.is_medal)
-		if (hasMedalServers) {
-			const subscriptions = await client.labrinth.billing_internal.getSubscriptions()
-
-			// Inject medal_expires into servers
-			for (const server of response.servers) {
-				if (server.is_medal) {
-					const sub = subscriptions.find((s) => s.metadata?.id === server.server_id)
-					if (sub) {
-						server.medal_expires = dayjs(sub.created).add(5, 'days').toISOString()
-					}
-				}
-			}
-		}
+		const response = await serversQueryOptions.queryFn()
 
 		// Check if new servers appeared (stop polling)
 		if (pollingState.value.enabled) {

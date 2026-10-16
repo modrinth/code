@@ -9,7 +9,6 @@
 		:initial-loader="initialLoader"
 		:initial-game-version="initialGameVersion"
 		:fade="props.initialSetup ? undefined : 'danger'"
-		:search-projects="searchModpacks"
 		:get-project-versions="getProjectVersions"
 		:finish-disabled="!canCompleteSetup"
 		:finish-disabled-tooltip="!canCompleteSetup ? permissionDeniedMessage : undefined"
@@ -33,6 +32,7 @@ import { injectModrinthClient } from '../../providers/api-client'
 import { injectModrinthServerContext } from '../../providers/server-context'
 import { injectNotificationManager } from '../../providers/web-notifications'
 import type { CreationFlowContextValue } from '../flows/creation-flow-modal/creation-flow-context'
+import { installCurseForgeModpack } from '../flows/creation-flow-modal/curseforge'
 import CreationFlowModal from '../flows/creation-flow-modal/index.vue'
 import { UploadProgressModal } from '../modal'
 
@@ -64,15 +64,6 @@ const { addNotification } = injectNotificationManager()
 
 const serverLoaders = ['vanilla', 'fabric', 'neoforge', 'forge', 'quilt', 'paper', 'purpur']
 const { canSetup, canResetServer, permissionDeniedMessage } = useServerPermissions()
-
-async function searchModpacks(query: string, limit: number = 10) {
-	return client.labrinth.projects_v2.search({
-		query: query || undefined,
-		new_filters:
-			'project_types = "modpack" AND (client_side = "optional" OR client_side = "required") AND server_side = "required"',
-		limit,
-	})
-}
 
 async function getProjectVersions(projectId: string) {
 	const versions = await client.labrinth.versions_v3.getProjectVersions(projectId)
@@ -126,9 +117,15 @@ async function onFlowComplete(ctx: CreationFlowContextValue) {
 	})
 
 	try {
-		if (ctx.setupType.value === 'modpack' && ctx.modpackFile.value) {
+		if (ctx.projectInstall.value) {
+			await ctx.installServerContent(serverContext.serverId, serverContext.worldId.value!)
+			emitReinstall()
+		} else if (ctx.setupType.value === 'modpack' && ctx.modpackFile.value) {
 			debug('onFlowComplete: mrpack upload path')
 			await handleMrpackUpload(ctx.modpackFile.value, ctx.buildProperties())
+		} else if (ctx.setupType.value === 'curseforge') {
+			debug('onFlowComplete: curseforge path')
+			await handleCurseForgeInstall(ctx)
 		} else if (ctx.setupType.value === 'modpack' && ctx.modpackSelection.value) {
 			debug('onFlowComplete: modpack selection path, calling installContent')
 			serverContext.beginInstallation({
@@ -229,6 +226,23 @@ async function handleMrpackUpload(file: File, properties: Archon.Content.v1.Prop
 		type: 'local_modpack',
 		filename: file.name,
 	})
+	emitReinstall()
+}
+
+async function handleCurseForgeInstall(ctx: CreationFlowContextValue) {
+	const worldId = serverContext.worldId.value!
+	let installationKey
+	if (ctx.curseforgeModpackFile.value) {
+		creationFlowRef.value?.hide()
+		installationKey = await uploadProgressModal.value!.trackProgress((onUploadProgress) =>
+			installCurseForgeModpack(client, worldId, ctx, { softOverride: false, onUploadProgress }),
+		)
+	} else {
+		installationKey = await installCurseForgeModpack(client, worldId, ctx, {
+			softOverride: false,
+		})
+	}
+	serverContext.beginInstallation(installationKey)
 	emitReinstall()
 }
 

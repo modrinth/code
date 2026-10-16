@@ -163,6 +163,7 @@ const headerLabel = computed(() => {
 				current.status === 'failed' ? messages.modpackErrorHeader : messages.installingModpack,
 			)
 		case 'local_modpack':
+		case 'curse_forge_modpack':
 			return formatMessage(
 				current.status === 'failed'
 					? messages.localModpackErrorHeader
