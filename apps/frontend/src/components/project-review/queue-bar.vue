@@ -45,7 +45,7 @@
 									{{ formatMessage(messages.resetPanelLayout) }}
 								</Button>
 								<Button
-									v-if="detachedTabs.length"
+									v-if="hasPopouts"
 									type="quiet"
 									class="justify-start"
 									@click="runPanelAction(closeExternalPanels, hide)"
@@ -158,7 +158,7 @@ const settingsTabs: TabbedModalTab[] = [
 ]
 
 const { queue, isLoading, navigation } = injectProjectReviewPageContext()
-const { detachedTabs, closeExternalPanels, resetPanelLayout, poppingOut } =
+const { hasPopouts, closeExternalPanels, resetPanelLayout, poppingOut } =
 	injectProjectReviewContext()
 const {
 	busy,

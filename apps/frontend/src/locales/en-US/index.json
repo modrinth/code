@@ -3152,6 +3152,9 @@
   "moderation.project-review.completedFiles": {
     "message": "Reviewed files ({count})"
   },
+  "moderation.project-review.completedProjects": {
+    "message": "Completed projects"
+  },
   "moderation.project-review.conversationThread": {
     "message": "Conversation thread"
   },
@@ -3266,6 +3269,9 @@
   "moderation.project-review.emptyPlatforms": {
     "message": "No platforms"
   },
+  "moderation.project-review.emptyPopout": {
+    "message": "No tabs open in this panel"
+  },
   "moderation.project-review.emptyTags": {
     "message": "No tags"
   },
@@ -3338,6 +3344,216 @@
   "moderation.project-review.licenseUrl": {
     "message": "License URL"
   },
+  "moderation.project-review.link-info.active": {
+    "message": "Active"
+  },
+  "moderation.project-review.link-info.activity": {
+    "message": "Activity"
+  },
+  "moderation.project-review.link-info.archived": {
+    "message": "This repository is archived; its features may be read-only."
+  },
+  "moderation.project-review.link-info.archivedValue": {
+    "message": "Archived"
+  },
+  "moderation.project-review.link-info.author": {
+    "message": "Author"
+  },
+  "moderation.project-review.link-info.board": {
+    "message": "Board"
+  },
+  "moderation.project-review.link-info.bot": {
+    "message": "Bot"
+  },
+  "moderation.project-review.link-info.channel": {
+    "message": "Channel"
+  },
+  "moderation.project-review.link-info.closedIssues": {
+    "message": "Closed issues"
+  },
+  "moderation.project-review.link-info.community": {
+    "message": "Community"
+  },
+  "moderation.project-review.link-info.company": {
+    "message": "Company"
+  },
+  "moderation.project-review.link-info.created": {
+    "message": "Account created"
+  },
+  "moderation.project-review.link-info.detailTooltip": {
+    "message": "{label}: {value}"
+  },
+  "moderation.project-review.link-info.disabled": {
+    "message": "Disabled"
+  },
+  "moderation.project-review.link-info.discussions": {
+    "message": "Discussions"
+  },
+  "moderation.project-review.link-info.discussionsDisabled": {
+    "message": "Discussions are disabled."
+  },
+  "moderation.project-review.link-info.dm": {
+    "message": "DM link"
+  },
+  "moderation.project-review.link-info.document": {
+    "message": "Document"
+  },
+  "moderation.project-review.link-info.donation": {
+    "message": "Donation profile"
+  },
+  "moderation.project-review.link-info.downloads": {
+    "message": "Downloads"
+  },
+  "moderation.project-review.link-info.enabled": {
+    "message": "Enabled"
+  },
+  "moderation.project-review.link-info.expires": {
+    "message": "Expires"
+  },
+  "moderation.project-review.link-info.externalLinks": {
+    "message": "External links on this page"
+  },
+  "moderation.project-review.link-info.followers": {
+    "message": "Followers"
+  },
+  "moderation.project-review.link-info.forkOf": {
+    "message": "Fork of"
+  },
+  "moderation.project-review.link-info.forks": {
+    "message": "Forks"
+  },
+  "moderation.project-review.link-info.invite": {
+    "message": "Server invite"
+  },
+  "moderation.project-review.link-info.inviteExpired": {
+    "message": "This invite has expired."
+  },
+  "moderation.project-review.link-info.inviteExpires": {
+    "message": "This invite has an expiry date."
+  },
+  "moderation.project-review.link-info.inviter": {
+    "message": "Invited by"
+  },
+  "moderation.project-review.link-info.issues": {
+    "message": "Issues"
+  },
+  "moderation.project-review.link-info.issuesDisabled": {
+    "message": "Issues are disabled."
+  },
+  "moderation.project-review.link-info.language": {
+    "message": "Language"
+  },
+  "moderation.project-review.link-info.lastPush": {
+    "message": "Last push"
+  },
+  "moderation.project-review.link-info.license": {
+    "message": "License"
+  },
+  "moderation.project-review.link-info.loading": {
+    "message": "Loading link details…"
+  },
+  "moderation.project-review.link-info.maxUses": {
+    "message": "Use limit"
+  },
+  "moderation.project-review.link-info.members": {
+    "message": "Members"
+  },
+  "moderation.project-review.link-info.noExpiry": {
+    "message": "No expiry"
+  },
+  "moderation.project-review.link-info.notFound": {
+    "message": "This resource was not found. It may be private, deleted, or expired."
+  },
+  "moderation.project-review.link-info.online": {
+    "message": "Online"
+  },
+  "moderation.project-review.link-info.openIssues": {
+    "message": "Open issues"
+  },
+  "moderation.project-review.link-info.organization": {
+    "message": "Organization"
+  },
+  "moderation.project-review.link-info.owner": {
+    "message": "Owner"
+  },
+  "moderation.project-review.link-info.playlist": {
+    "message": "Playlist"
+  },
+  "moderation.project-review.link-info.privateCommunity": {
+    "message": "This community is private."
+  },
+  "moderation.project-review.link-info.project": {
+    "message": "Project"
+  },
+  "moderation.project-review.link-info.projectStatus": {
+    "message": "Project status: {status}"
+  },
+  "moderation.project-review.link-info.projectUnavailable": {
+    "message": "This project is not publicly available or is archived. Check its status below."
+  },
+  "moderation.project-review.link-info.repositories": {
+    "message": "Public repositories"
+  },
+  "moderation.project-review.link-info.repository": {
+    "message": "Repository"
+  },
+  "moderation.project-review.link-info.role": {
+    "message": "Role"
+  },
+  "moderation.project-review.link-info.server": {
+    "message": "Server"
+  },
+  "moderation.project-review.link-info.size": {
+    "message": "Repository size"
+  },
+  "moderation.project-review.link-info.sponsors": {
+    "message": "Sponsors"
+  },
+  "moderation.project-review.link-info.stars": {
+    "message": "Stars"
+  },
+  "moderation.project-review.link-info.status": {
+    "message": "Status"
+  },
+  "moderation.project-review.link-info.stream": {
+    "message": "Stream"
+  },
+  "moderation.project-review.link-info.subscribers": {
+    "message": "Subscribers"
+  },
+  "moderation.project-review.link-info.target": {
+    "message": "Invite type"
+  },
+  "moderation.project-review.link-info.topic": {
+    "message": "Topic"
+  },
+  "moderation.project-review.link-info.unavailable": {
+    "message": "Additional details could not be loaded. The service may be unavailable, private, rate limited, or blocked by the browser."
+  },
+  "moderation.project-review.link-info.unlimitedUses": {
+    "message": "Unlimited uses"
+  },
+  "moderation.project-review.link-info.unsupported": {
+    "message": "No additional public metadata is available for this link."
+  },
+  "moderation.project-review.link-info.user": {
+    "message": "User"
+  },
+  "moderation.project-review.link-info.uses": {
+    "message": "Uses"
+  },
+  "moderation.project-review.link-info.video": {
+    "message": "Video"
+  },
+  "moderation.project-review.link-info.website": {
+    "message": "Website"
+  },
+  "moderation.project-review.link-info.wiki": {
+    "message": "Wiki"
+  },
+  "moderation.project-review.link-info.wikiDisabled": {
+    "message": "The wiki is disabled."
+  },
   "moderation.project-review.linkRemoved": {
     "message": "Link removed: {link}"
   },
@@ -3386,6 +3602,9 @@
   "moderation.project-review.next": {
     "message": "Next"
   },
+  "moderation.project-review.noCompletedProjects": {
+    "message": "No completed projects yet"
+  },
   "moderation.project-review.noFlagsFiles": {
     "message": "Files without flags ({count})"
   },
@@ -3395,8 +3614,14 @@
   "moderation.project-review.noLicense": {
     "message": "No license URL"
   },
+  "moderation.project-review.noMatchingProjects": {
+    "message": "No matching projects"
+  },
   "moderation.project-review.noPendingFiles": {
     "message": "No files with unresolved flags"
+  },
+  "moderation.project-review.noQueuedProjects": {
+    "message": "No projects in the queue"
   },
   "moderation.project-review.noReports": {
     "message": "No technical-review reports are available for this project"
@@ -3412,6 +3637,9 @@
   },
   "moderation.project-review.noServerLanguages": {
     "message": "No languages."
+  },
+  "moderation.project-review.noSkippedProjects": {
+    "message": "No skipped projects"
   },
   "moderation.project-review.openIcon": {
     "message": "View enlarged project icon"
@@ -3512,6 +3740,9 @@
   "moderation.project-review.queueNavigation": {
     "message": "Review queue navigation"
   },
+  "moderation.project-review.queuedProjects": {
+    "message": "Next 5 projects"
+  },
   "moderation.project-review.re-review": {
     "message": "Re-review"
   },
@@ -3523,6 +3754,9 @@
   },
   "moderation.project-review.rejectedCount": {
     "message": "{count} rejected"
+  },
+  "moderation.project-review.remaining": {
+    "message": "Remaining"
   },
   "moderation.project-review.reopenPopouts": {
     "message": "Reopen window"
@@ -3578,6 +3812,9 @@
   "moderation.project-review.scheduledCount": {
     "message": "{count} scheduled"
   },
+  "moderation.project-review.searchingProjects": {
+    "message": "Searching projects…"
+  },
   "moderation.project-review.selectedFindings": {
     "message": "{count, plural, one {# selected finding} other {# selected findings}}"
   },
@@ -3610,6 +3847,12 @@
   },
   "moderation.project-review.skip": {
     "message": "Skip"
+  },
+  "moderation.project-review.skipped": {
+    "message": "Skipped"
+  },
+  "moderation.project-review.skippedProjects": {
+    "message": "Skipped projects"
   },
   "moderation.project-review.slicer": {
     "message": "Slicer"
@@ -3658,9 +3901,6 @@
   },
   "moderation.project-review.title": {
     "message": "Project Review"
-  },
-  "moderation.project-review.total": {
-    "message": "Total"
   },
   "moderation.project-review.unavailable": {
     "message": "Unavailable"

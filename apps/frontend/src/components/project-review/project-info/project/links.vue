@@ -93,13 +93,12 @@ import { computed, ref, useTemplateRef, watch } from 'vue'
 
 import { getProjectNagMessages } from '~/composables/project-nag-validation'
 import { projectQueryOptions, STALE_TIME } from '~/composables/queries/project'
-
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 import { reviewExternalUrl } from '~/providers/project-review/project-links'
 import { injectReviewPanels } from '~/providers/project-review/review-panels'
 
-import { projectReviewMessages as messages } from '../../messages'
 import LinkInfoTooltip from '../../link-info/tooltip.vue'
+import { projectReviewMessages as messages } from '../../messages'
 import ReviewPanel from '../../review-panel/index.vue'
 import EditButton from '../edit/button.vue'
 import EditModal from '../edit/links.vue'

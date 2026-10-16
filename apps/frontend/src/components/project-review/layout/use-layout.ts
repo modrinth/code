@@ -2,6 +2,7 @@ import { injectNotificationManager, useVIntl } from '@modrinth/ui'
 import { useIntervalFn } from '@vueuse/core'
 import type {
 	DockviewApi,
+	DockviewGroupPanel,
 	DockviewIDisposable,
 	DockviewPopoutGroupOptions,
 	DockviewReadyEvent,
@@ -29,6 +30,7 @@ import {
 import {
 	configureReviewPopout,
 	openReviewPopout,
+	removeReviewPopoutPanel,
 	restoreReviewPopout,
 	type ReviewPopoutLayout,
 	type ReviewPopoutTarget,
@@ -46,10 +48,15 @@ export function useProjectReviewLayout(
 	const review = injectReviewContext()
 	const tabSelection = useTabSelection()
 	const detachedTabs = ref<ProjectReviewTab[]>([])
+	const hasPopouts = ref(false)
 	const { addNotification, removeNotification } = injectNotificationManager()
 	const { formatMessage } = useVIntl()
 	const poppingOut = ref<string[]>([])
 	const popoutSources = new Map<string, string>()
+	const unavailablePopoutTabs = new Map<
+		ProjectReviewTab,
+		{ group: DockviewGroupPanel; index: number }
+	>()
 	const popoutCleanups = new Map<Window, () => void>()
 	const savedLayout = readWorkspaceLayout()
 	const leftVisible = ref(savedLayout?.leftVisible ?? true)
@@ -92,6 +99,7 @@ export function useProjectReviewLayout(
 	)
 
 	function updateDetachedTabs() {
+		hasPopouts.value = !!tabs?.getPopouts().length
 		detachedTabs.value = getTabs().filter(
 			(tab) => tabs?.getPanel(tab)?.api.location.type === 'popout',
 		)
@@ -446,6 +454,10 @@ export function useProjectReviewLayout(
 		blockedPopoutLayout = undefined
 		dismissRestoreNotifications()
 		for (const tab of [...detachedTabs.value]) dockTab(tab)
+		unavailablePopoutTabs.clear()
+		for (const group of tabs?.groups ?? []) {
+			if (group.api.location.type === 'popout' && !group.panels.length) tabs?.removeGroup(group)
+		}
 	}
 
 	function resetPanelLayout() {
@@ -619,11 +631,28 @@ export function useProjectReviewLayout(
 		for (const tab of projectReviewTabs) {
 			const panel = tabs.getPanel(tab)
 			if (!visibleTabs.includes(tab)) {
-				if (panel) tabs.removePanel(panel)
-				popoutSources.delete(tab)
+				if (panel?.api.location.type === 'popout') {
+					const group = panel.group
+					unavailablePopoutTabs.set(tab, {
+						group,
+						index: group.panels.indexOf(panel),
+					})
+					removeReviewPopoutPanel(panel)
+				} else if (panel) {
+					tabs.removePanel(panel)
+					popoutSources.delete(tab)
+				}
 				continue
 			}
 			if (!panel) {
+				const previous = unavailablePopoutTabs.get(tab)
+				const popoutGroup =
+					previous &&
+					tabs.groups.includes(previous.group) &&
+					previous.group.api.location.type === 'popout' &&
+					!previous.group.api.getWindow().closed
+						? previous.group
+						: undefined
 				const referencePanel =
 					tabs.getPanel('description')?.api.location.type === 'grid'
 						? tabs.getPanel('description')
@@ -636,8 +665,13 @@ export function useProjectReviewLayout(
 					renderer: 'always',
 					minimumHeight: 120,
 					inactive: true,
-					position: referencePanel ? { referencePanel: referencePanel.id } : undefined,
+					position: popoutGroup
+						? { referenceGroup: popoutGroup.id, index: previous?.index }
+						: referencePanel
+							? { referencePanel: referencePanel.id }
+							: undefined,
 				})
+				unavailablePopoutTabs.delete(tab)
 			} else {
 				panel.api.setTitle(titles.get(tab) ?? tab)
 			}
@@ -719,6 +753,7 @@ export function useProjectReviewLayout(
 		resetPanelLayout,
 		selectedTabs: tabSelection.selectedTabs,
 		closeExternalPanels,
+		hasPopouts,
 		detachedTabs,
 		popoutTab,
 		dockTab,

@@ -1,6 +1,10 @@
 import { defineMessages } from '@modrinth/ui'
 
 export const projectReviewMessages = defineMessages({
+	emptyPopout: {
+		id: 'moderation.project-review.emptyPopout',
+		defaultMessage: 'No tabs open in this panel',
+	},
 	popoutPanel: {
 		id: 'moderation.project-review.popoutPanel',
 		defaultMessage: 'Open panel in its own window',

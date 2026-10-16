@@ -122,9 +122,11 @@ const { isFetching: indexing, isError: indexError } = useQuery(
 			for (let offset = 0; offset < missing.length; offset += 5) {
 				signal.throwIfAborted()
 				const results = await Promise.allSettled(
-					missing.slice(offset, offset + 5).map((id) =>
-						queryClient.ensureQueryData(queueProjectPreviewOptions(id, client, queryClient)),
-					),
+					missing
+						.slice(offset, offset + 5)
+						.map((id) =>
+							queryClient.ensureQueryData(queueProjectPreviewOptions(id, client, queryClient)),
+						),
 				)
 				for (const result of results) {
 					if (result.status === 'rejected') failure = result.reason

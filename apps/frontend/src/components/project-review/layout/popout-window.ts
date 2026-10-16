@@ -9,6 +9,14 @@ import type {
 export type ReviewPopoutTarget = IDockviewPanel | DockviewGroupPanel
 export type ReviewPopoutLayout = NonNullable<SerializedDockview['popoutGroups']>[number]
 
+/** Dispose an unavailable panel while keeping its popout group available for returning tabs. */
+export function removeReviewPopoutPanel(panel: IDockviewPanel) {
+	const group = panel.group
+	group.model.removePanel(panel)
+	group.model.renderContainer.detatch(panel)
+	panel.dispose()
+}
+
 /** Restore one saved window without replacing any live popouts. */
 export async function restoreReviewPopout(api: DockviewApi, popout: ReviewPopoutLayout) {
 	type GridNode = SerializedDockview['grid']['root']

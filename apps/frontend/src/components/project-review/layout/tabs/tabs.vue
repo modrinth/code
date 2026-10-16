@@ -7,6 +7,7 @@
 			disable-tabs-overflow-list
 			disable-floating-groups
 			default-tab-component="ProjectReviewTab"
+			watermark-component="ProjectReviewEmptyPopout"
 			prefix-header-actions-component="ProjectReviewLeftControl"
 			right-header-actions-component="ProjectReviewRightControl"
 			@ready="onTabsReady"
@@ -20,11 +21,13 @@ import { type DockviewTheme, DockviewVue } from 'dockview-vue'
 import { injectProjectReviewContext } from '../context'
 import ProjectReviewLeftControl from '../controls/left-control.vue'
 import ProjectReviewRightControl from '../controls/right-control.vue'
+import ProjectReviewEmptyPopout from '../empty-popout.vue'
 import ProjectReviewPanel from '../panel.vue'
 import ProjectReviewTab from './tab.vue'
 
 defineOptions({
 	components: {
+		ProjectReviewEmptyPopout,
 		ProjectReviewLeftControl,
 		ProjectReviewPanel,
 		ProjectReviewRightControl,

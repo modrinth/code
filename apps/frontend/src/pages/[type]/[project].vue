@@ -630,7 +630,6 @@ import { getSignInRouteObj } from '~/composables/auth.ts'
 import { useCreatorProjectStats } from '~/composables/creator-project-stats'
 import { saveFeatureFlags } from '~/composables/featureFlags.ts'
 import { useProjectLinkValidation } from '~/composables/link-network-validation'
-import { projectQueryOptions } from '~/composables/queries/project'
 import {
 	canResubmitProjectForReview,
 	canSubmitProjectForReview,
@@ -638,7 +637,12 @@ import {
 	submitProjectForReview,
 } from '~/composables/link-network-validation/submission'
 import { notifyCopied } from '~/composables/moderation.ts'
-import { STALE_TIME, STALE_TIME_LONG, warmProjectCheckCaches } from '~/composables/queries/project'
+import {
+	projectQueryOptions,
+	STALE_TIME,
+	STALE_TIME_LONG,
+	warmProjectCheckCaches,
+} from '~/composables/queries/project'
 import { versionQueryOptions } from '~/composables/queries/version'
 import { useServerInstallContent } from '~/composables/use-server-install-content'
 import { userCollectProject, userFollowProject } from '~/composables/user.js'
