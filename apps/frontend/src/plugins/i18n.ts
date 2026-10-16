@@ -233,7 +233,12 @@ export default defineNuxtPlugin({
 
 		debug('init: complete', { locale: locale.value })
 
-		const context: I18nContext = { locale, t, setLocale }
+		const context: I18nContext = {
+			locale,
+			t,
+			setLocale,
+			getMessages: (code) => messageCache.get(code) ?? {},
+		}
 		nuxtApp.vueApp.provide(I18N_INJECTION_KEY, context)
 	},
 })

@@ -336,6 +336,10 @@ vars! {
     ANROK_API_URL: String = "";
     ANROK_API_KEY: String = "";
 
+    CROWDIN_API_URL: String = crate::util::crowdin::DEFAULT_API_URL;
+    CROWDIN_API_TOKEN: String = "";
+    CROWDIN_PROJECT_ID: u64 = 0u64;
+
     PAYOUT_ALERT_SLACK_WEBHOOK: String = "none";
     CLOUDFLARE_INTEGRATION: bool = false;
 

@@ -56,6 +56,7 @@ import { LabrinthTeamsV2Module } from './labrinth/teams/v2'
 import { LabrinthTeamsV3Module } from './labrinth/teams/v3'
 import { LabrinthTechReviewInternalModule } from './labrinth/tech-review/internal'
 import { LabrinthThreadsV3Module } from './labrinth/threads/v3'
+import { LabrinthTranslationFeedbackV3Module } from './labrinth/translation-feedback/v3'
 import { LabrinthUsersV2Module } from './labrinth/users/v2'
 import { LabrinthUsersV3Module } from './labrinth/users/v3'
 import { LauncherMetaManifestV0Module } from './launcher-meta/v0'
@@ -138,6 +139,7 @@ export const MODULE_REGISTRY = {
 	labrinth_teams_v3: LabrinthTeamsV3Module,
 	labrinth_tech_review_internal: LabrinthTechReviewInternalModule,
 	labrinth_threads_v3: LabrinthThreadsV3Module,
+	labrinth_translation_feedback_v3: LabrinthTranslationFeedbackV3Module,
 	labrinth_users_v2: LabrinthUsersV2Module,
 	labrinth_users_v3: LabrinthUsersV3Module,
 	labrinth_versions_v2: LabrinthVersionsV2Module,

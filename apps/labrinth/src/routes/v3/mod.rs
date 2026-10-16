@@ -23,6 +23,7 @@ pub mod statistics;
 pub mod tags;
 pub mod teams;
 pub mod threads;
+pub mod translation_feedback;
 pub mod users;
 pub mod version_creation;
 pub mod version_file;
@@ -66,6 +67,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .configure(tags::config)
             .configure(teams::config)
             .configure(threads::config)
+            .configure(translation_feedback::config)
             .configure(users::config)
             .configure(version_file::config)
             .configure(versions::config)
@@ -196,6 +198,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 		threads::threads_get_route,
 		threads::thread_send_message_route,
 		threads::message_delete_route,
+		translation_feedback::translation_feedback_create,
 		users::all_projects,
 		users::admin_user_email,
 		users::admin_user_discord,

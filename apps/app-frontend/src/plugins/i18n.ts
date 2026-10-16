@@ -13,6 +13,7 @@ export default {
 			locale: i18n.global.locale,
 			t: (key, values) => i18n.global.t(key, values ?? {}) as string,
 			setLocale,
+			getMessages: (locale) => i18n.global.getLocaleMessage(locale) as Record<string, string>,
 		}
 
 		// Provide the context at app-level

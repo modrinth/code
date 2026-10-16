@@ -6,6 +6,7 @@ pub mod bitflag;
 pub mod captcha;
 pub mod cel;
 pub mod cors;
+pub mod crowdin;
 pub mod date;
 pub mod error;
 pub mod ext;

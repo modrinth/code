@@ -187,6 +187,7 @@ setup((app) => {
 		setLocale: (newLocale) => {
 			i18n.global.locale.value = newLocale
 		},
+		getMessages: (locale) => i18n.global.getLocaleMessage(locale) as Record<string, string>,
 	}
 	app.provide(I18N_INJECTION_KEY, i18nContext)
 

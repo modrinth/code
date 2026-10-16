@@ -6,6 +6,8 @@ export interface I18nContext {
 	locale: Ref<string>
 	t: (key: string, values?: Record<string, unknown>) => string
 	setLocale: (locale: string, options?: { persist?: boolean }) => Promise<void> | void
+	/** Raw messages loaded for a locale, keyed by message ID. Untranslated messages are absent. */
+	getMessages: (locale: string) => Record<string, string>
 }
 
 export const I18N_INJECTION_KEY: InjectionKey<I18nContext> = Symbol('i18n')

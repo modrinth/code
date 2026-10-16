@@ -2227,6 +2227,24 @@ export namespace Labrinth {
 		}
 	}
 
+	export namespace TranslationFeedback {
+		export namespace v3 {
+			export type Product = 'website' | 'app'
+
+			export type Kind = 'incorrect' | 'typo' | 'inconsistent' | 'untranslated' | 'other'
+
+			export type CreateTranslationFeedbackRequest = {
+				product: Product
+				locale: string
+				key: string
+				kind: Kind
+				seen_text: string
+				suggestion?: string
+				comment?: string
+			}
+		}
+	}
+
 	export namespace Moderation {
 		export namespace Internal {
 			export type Ownership =

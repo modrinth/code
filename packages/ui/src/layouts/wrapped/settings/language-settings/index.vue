@@ -8,6 +8,22 @@
 			{{ formatMessage(languageSelectorMessages.languageWarning, { platform }) }}
 		</Admonition>
 
+		<Admonition
+			v-if="locale !== SOURCE_LOCALE"
+			type="info"
+			class="mb-4"
+			inline-actions
+			:header="formatMessage(messages.feedbackTitle)"
+			:body="formatMessage(messages.feedbackDescription, { platform })"
+		>
+			<template #actions>
+				<Button type="colored" color="blue" @click="feedbackModal?.show()">
+					<ReportIcon />
+					{{ formatMessage(messages.feedbackButton) }}
+				</Button>
+			</template>
+		</Admonition>
+
 		<p class="m-0 mb-4 text-secondary">
 			<IntlFormatted
 				:message-id="languageSelectorMessages.languagesDescription"
@@ -29,19 +45,26 @@
 			:is-changing="saving"
 			:coverage-by-locale="languageCoverage[product]"
 		/>
+
+		<TranslationFeedbackModal ref="feedbackModal" :product="product" />
 	</div>
 </template>
 
 <script setup lang="ts">
+import { ReportIcon } from '@modrinth/assets'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 
 import { Admonition, AutoLink, IntlFormatted } from '#ui/components/base'
-import { LOCALES, useVIntl } from '#ui/composables'
+import { Button } from '#ui/components/base/buttons'
+import { defineMessages, LOCALES, useVIntl } from '#ui/composables'
 import { injectI18n, injectUserPreferences } from '#ui/providers'
 import { commonSettingsMessages, languageSelectorMessages, useSavable } from '#ui/utils'
 
 import { languageCoverage } from './language-settings-coverage.generated'
 import LanguageSettingsSelector from './language-settings-selector.vue'
+import TranslationFeedbackModal from './translation-feedback-modal.vue'
+
+const SOURCE_LOCALE = 'en-US'
 
 const props = defineProps<{
 	product: 'app' | 'website'
@@ -58,6 +81,22 @@ const platform = computed(() =>
 			: languageSelectorMessages.platformSite,
 	),
 )
+const messages = defineMessages({
+	feedbackTitle: {
+		id: 'settings.language.feedback.title',
+		defaultMessage: 'Spotted a translation mistake?',
+	},
+	feedbackDescription: {
+		id: 'settings.language.feedback.description',
+		defaultMessage: 'Let our translators know about text in the {platform} that reads wrong.',
+	},
+	feedbackButton: {
+		id: 'settings.language.feedback.button',
+		defaultMessage: 'Report a translation issue',
+	},
+})
+
+const feedbackModal = ref<InstanceType<typeof TranslationFeedbackModal> | null>(null)
 const persistedLocale = ref(locale.value)
 let localeChangeQueue = Promise.resolve()
 
