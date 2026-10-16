@@ -52,7 +52,7 @@ pub(super) fn normalize(
             let extension =
                 parts.next().context("missing data filename extension")?;
             let coordinate: MavenCoordinate = format!(
-                "com.modrinth.minecraft-meta:{loader}-installer-extracts:{}:{stem}@{extension}",
+                "com.modrinth.daedalus:{loader}-installer-extracts:{}:{stem}@{extension}",
                 name.as_str()
             )
             .parse()
@@ -123,7 +123,7 @@ mod tests {
     }
 
     #[test]
-    fn sides_and_coordinate_names_match_minecraft_meta() {
+    fn sides_and_coordinate_names_preserve_legacy_namespace() {
         let mut profile = profile("/data/client.lzma", "/data/server.lzma");
         let artifacts = normalize_forge(
             &mut profile,
@@ -134,11 +134,11 @@ mod tests {
         let data = &profile.data.as_ref().unwrap()["BINPATCH"];
         assert_eq!(
             data.client,
-            "[com.modrinth.minecraft-meta:forge-installer-extracts:1.20.3-49.0.1:client@lzma]"
+            "[com.modrinth.daedalus:forge-installer-extracts:1.20.3-49.0.1:client@lzma]"
         );
         assert_eq!(
             data.server,
-            "[com.modrinth.minecraft-meta:forge-installer-extracts:1.20.3-49.0.1:server@lzma]"
+            "[com.modrinth.daedalus:forge-installer-extracts:1.20.3-49.0.1:server@lzma]"
         );
         assert_eq!(artifacts[0].1, "data/client.lzma");
         assert!(profile.libraries.iter().all(|lib| lib.downloadable
@@ -185,7 +185,7 @@ mod tests {
     }
 
     #[test]
-    fn neoforge_and_multidot_names_match_minecraft_meta() {
+    fn neoforge_and_multidot_names_preserve_legacy_namespace() {
         let mut profile = profile("/data/client.extra.lzma", "'scalar'");
         let artifacts = normalize(
             &mut profile,
@@ -196,7 +196,7 @@ mod tests {
         .unwrap();
         assert_eq!(
             artifacts[0].0.to_string(),
-            "com.modrinth.minecraft-meta:neoforge-installer-extracts:21.0.1-beta:client@extra"
+            "com.modrinth.daedalus:neoforge-installer-extracts:21.0.1-beta:client@extra"
         );
         assert_eq!(profile.data.unwrap()["BINPATCH"].server, "'scalar'");
     }
