@@ -460,12 +460,12 @@ impl SandboxChildOp for WindowsChild {
 }
 
 impl WindowsChild {
-    fn process_identity(&self) -> std::io::Result<acl::ProcessIdentity> {
+    fn process_identity(&self) -> Result<acl::ProcessIdentity> {
         let pid = unsafe {
             windows::Win32::System::Threading::GetProcessId(self.process_handle)
         };
         if pid == 0 {
-            return Err(std::io::Error::last_os_error());
+            return Err(std::io::Error::last_os_error().into());
         }
         acl::ProcessIdentity::from_handle(pid, self.process_handle)
     }

@@ -12,8 +12,8 @@ use sha1::{Digest, Sha1};
 use tokio::sync::OnceCell;
 
 use crate::{
-    SandboxChild, SandboxCommand, SandboxStdio,
-    api::SandboxApiChild, util::SandboxArg,
+    SandboxChild, SandboxCommand, SandboxStdio, api::SandboxApiChild,
+    util::SandboxArg,
 };
 
 #[derive(Debug)]
@@ -279,9 +279,9 @@ pub async fn setup_minecraft_command(
     if let Some(child) = &minecraft.sandbox_api_child {
         static SANDBOX_AGENT_PATH: OnceCell<PathBuf> = OnceCell::const_new();
         let sandbox_agent_path = SANDBOX_AGENT_PATH
-			.get_or_try_init(|| async {
-				tokio::task::spawn_blocking(create_sandbox_java_agent).await?
-			})
+            .get_or_try_init(|| async {
+                tokio::task::spawn_blocking(create_sandbox_java_agent).await?
+            })
             .await?;
 
         classpath.push(sandbox_agent_path.clone());
@@ -433,10 +433,7 @@ fn create_sandbox_java_agent() -> eyre::Result<PathBuf> {
     Ok(path)
 }
 
-fn check_sha1_hash(
-    path: &Path,
-    expected_hash: &[u8],
-) -> eyre::Result<bool> {
+fn check_sha1_hash(path: &Path, expected_hash: &[u8]) -> eyre::Result<bool> {
     let mut file = match fs::File::open(path) {
         Err(err) if err.kind() == ErrorKind::NotFound => {
             return Ok(false);
@@ -447,7 +444,7 @@ fn check_sha1_hash(
     };
 
     let mut hasher = sha1::Sha1::new();
-	std::io::copy(&mut file, &mut hasher)?;
+    std::io::copy(&mut file, &mut hasher)?;
     Ok(expected_hash == &*hasher.finalize())
 }
 

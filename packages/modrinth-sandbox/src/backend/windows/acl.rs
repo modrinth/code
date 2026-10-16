@@ -4,6 +4,7 @@ use std::os::windows::io::{AsRawHandle, OwnedHandle};
 use std::path::Path;
 use std::{ffi::OsStr, os::windows::ffi::OsStrExt};
 
+use eyre::Result;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 use windows::{
@@ -45,10 +46,7 @@ pub struct Grant {
 }
 
 impl Grant {
-    pub fn from_path(
-        path: &Path,
-        permission: PermissionType,
-    ) -> io::Result<Self> {
+    pub fn from_path(path: &Path, permission: PermissionType) -> Result<Self> {
         let path = path.canonicalize()?;
         let path = path.to_str().ok_or_else(|| {
             io::Error::new(
@@ -105,7 +103,7 @@ pub struct AppliedAclLedger {
 }
 
 impl AppliedAclLedger {
-    pub fn open(app_container_sid: &OsStr) -> io::Result<Self> {
+    pub fn open(app_container_sid: &OsStr) -> Result<Self> {
         let sid = app_container_sid.to_str().ok_or_else(|| {
             io::Error::new(
                 io::ErrorKind::InvalidData,
@@ -123,55 +121,48 @@ impl AppliedAclLedger {
         Ok(Self { key, mutex_name })
     }
 
-    pub fn lock(&self) -> io::Result<RegistryStateGuard<'_>> {
+    /// Locks the global Windows mutex, allowing safe access to the sandbox ACL
+    /// ledger.
+    pub fn lock(&self) -> Result<LockedAclLedger<'_>> {
         let mutex = LedgerMutexGuard::acquire(&self.mutex_name)?;
-        let state = self.read()?;
-        Ok(RegistryStateGuard {
-            ledger: self,
+        LockedAclLedger::open(&self.key, mutex)
+    }
+}
+
+pub struct LockedAclLedger<'a> {
+    key: &'a RegKey,
+    state: RegistryState,
+    _mutex: LedgerMutexGuard,
+}
+
+impl<'a> LockedAclLedger<'a> {
+    fn open(key: &'a RegKey, mutex: LedgerMutexGuard) -> Result<Self> {
+        let state: String = match key.get_value(GRANT_VALUE) {
+            Ok(state) => state,
+            Err(error) if error.kind() == io::ErrorKind::NotFound => {
+                return Ok(Self {
+                    key,
+                    state: RegistryState::default(),
+                    _mutex: mutex,
+                });
+            }
+            Err(error) => return Err(error.into()),
+        };
+        let state = serde_json::from_str(&state).map_err(|error| {
+            io::Error::new(io::ErrorKind::InvalidData, error)
+        })?;
+        Ok(Self {
+            key,
             state,
             _mutex: mutex,
         })
     }
 
-    pub fn prepare(
-        &self,
-        grants: Vec<Grant>,
-    ) -> io::Result<PreparedInstance<'_>> {
-        let guard = self.lock()?;
-        guard.prepare(grants)
-    }
-
-    fn read(&self) -> io::Result<RegistryState> {
-        let state: String = match self.key.get_value(GRANT_VALUE) {
-            Ok(state) => state,
-            Err(error) if error.kind() == io::ErrorKind::NotFound => {
-                return Ok(RegistryState::default());
-            }
-            Err(error) => return Err(error),
-        };
-        serde_json::from_str(&state)
-            .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))
-    }
-
-    fn write(&self, state: &RegistryState) -> io::Result<()> {
-        let state = serde_json::to_string(state).map_err(|error| {
-            io::Error::new(io::ErrorKind::InvalidData, error)
-        })?;
-        self.key.set_value(GRANT_VALUE, &state)
-    }
-}
-
-pub struct RegistryStateGuard<'a> {
-    ledger: &'a AppliedAclLedger,
-    state: RegistryState,
-    _mutex: LedgerMutexGuard,
-}
-
-impl<'a> RegistryStateGuard<'a> {
+    /// Removes stale instances, and prepares the ledger to add a new instance.
     pub fn prepare(
         mut self,
         grants: Vec<Grant>,
-    ) -> io::Result<PreparedInstance<'a>> {
+    ) -> Result<PreparedInstance<'a>> {
         let process = ProcessIdentity::current()?;
         let grants = normalize_grants(grants.iter());
         let old_effective = effective_union(&self.state, |_| true);
@@ -192,7 +183,7 @@ impl<'a> RegistryStateGuard<'a> {
         });
         self.persist()?;
         Ok(PreparedInstance {
-            guard: self,
+            ledger: self,
             id,
             dead_instances,
             old_effective,
@@ -200,13 +191,17 @@ impl<'a> RegistryStateGuard<'a> {
         })
     }
 
-    fn persist(&self) -> io::Result<()> {
-        self.ledger.write(&self.state)
+    fn persist(&self) -> Result<()> {
+        let state = serde_json::to_string(&self.state).map_err(|error| {
+            io::Error::new(io::ErrorKind::InvalidData, error)
+        })?;
+        self.key.set_value(GRANT_VALUE, &state)?;
+        Ok(())
     }
 }
 
 pub struct PreparedInstance<'a> {
-    guard: RegistryStateGuard<'a>,
+    ledger: LockedAclLedger<'a>,
     id: Uuid,
     dead_instances: HashSet<Uuid>,
     old_effective: Vec<Grant>,
@@ -222,23 +217,24 @@ impl PreparedInstance<'_> {
         &self.desired_effective
     }
 
-    pub fn finalize_pruning(&mut self) -> io::Result<()> {
-        self.guard
+    pub fn finalize_pruning(&mut self) -> Result<()> {
+        self.ledger
             .state
             .instances
             .retain(|instance| !self.dead_instances.contains(&instance.id));
         self.dead_instances.clear();
-        self.guard.persist()
+        self.ledger.persist()
     }
 
-    pub fn activate(&mut self, process: ProcessIdentity) -> io::Result<()> {
+    pub fn activate(&mut self, process: ProcessIdentity) -> Result<()> {
         let instance = self.instance_mut()?;
         instance.state = InstanceState::Running { process };
-        self.guard.persist()
+        self.ledger.persist()
     }
 
-    fn instance_mut(&mut self) -> io::Result<&mut Instance> {
-        self.guard
+    fn instance_mut(&mut self) -> Result<&mut Instance> {
+        Ok(self
+            .ledger
             .state
             .instances
             .iter_mut()
@@ -248,25 +244,25 @@ impl PreparedInstance<'_> {
                     io::ErrorKind::NotFound,
                     "pending ACL instance not found",
                 )
-            })
+            })?)
     }
 }
 
 impl ProcessIdentity {
-    fn current() -> io::Result<Self> {
+    fn current() -> Result<Self> {
         Self::from_handle(unsafe { GetCurrentProcessId() }, unsafe {
             GetCurrentProcess()
         })
     }
 
-    pub(super) fn from_handle(pid: u32, handle: HANDLE) -> io::Result<Self> {
+    pub(super) fn from_handle(pid: u32, handle: HANDLE) -> Result<Self> {
         Ok(Self {
             pid,
             creation_time: process_creation_time(handle)?,
         })
     }
 
-    fn is_alive(self) -> io::Result<bool> {
+    fn is_alive(self) -> Result<bool> {
         let handle = match unsafe {
             OpenProcess(
                 PROCESS_QUERY_LIMITED_INFORMATION | SYNCHRONIZE_PROCESS,
@@ -276,7 +272,9 @@ impl ProcessIdentity {
         } {
             Ok(handle) => handle,
             Err(error) if error.code() == E_INVALIDARG => return Ok(false),
-            Err(error) => return Err(io::Error::other(error.to_string())),
+            Err(error) => {
+                return Err(io::Error::other(error.to_string()).into());
+            }
         };
         let handle = ProcessHandle(handle);
         if process_creation_time(handle.0)? != self.creation_time {
@@ -285,15 +283,16 @@ impl ProcessIdentity {
         match unsafe { WaitForSingleObject(handle.0, 0) } {
             WAIT_TIMEOUT => Ok(true),
             WAIT_OBJECT_0 => Ok(false),
-            WAIT_FAILED => Err(io::Error::last_os_error()),
+            WAIT_FAILED => Err(io::Error::last_os_error().into()),
             wait => Err(io::Error::other(format!(
                 "unexpected process wait result: {wait:?}"
-            ))),
+            ))
+            .into()),
         }
     }
 }
 
-fn process_creation_time(handle: HANDLE) -> io::Result<u64> {
+fn process_creation_time(handle: HANDLE) -> Result<u64> {
     let mut creation = FILETIME::default();
     let mut exit = FILETIME::default();
     let mut kernel = FILETIME::default();
@@ -377,7 +376,7 @@ struct LedgerMutexGuard {
 }
 
 impl LedgerMutexGuard {
-    fn acquire(name: &[u16]) -> io::Result<Self> {
+    fn acquire(name: &[u16]) -> Result<Self> {
         let handle =
             unsafe { CreateMutexW(None, false, PCWSTR(name.as_ptr())) }?;
         let handle = super::to_owned_handle(handle)
@@ -387,11 +386,12 @@ impl LedgerMutexGuard {
         };
         if wait != WAIT_OBJECT_0 && wait != WAIT_ABANDONED {
             if wait == WAIT_FAILED {
-                return Err(io::Error::last_os_error());
+                return Err(io::Error::last_os_error().into());
             }
             return Err(io::Error::other(format!(
                 "unexpected mutex wait result: {wait:?}"
-            )));
+            ))
+            .into());
         }
         Ok(Self { handle })
     }
@@ -399,9 +399,7 @@ impl LedgerMutexGuard {
 
 impl Drop for LedgerMutexGuard {
     fn drop(&mut self) {
-        unsafe {
-            let _ = ReleaseMutex(HANDLE(self.handle.as_raw_handle()));
-        }
+        let _ = unsafe { ReleaseMutex(HANDLE(self.handle.as_raw_handle())) };
     }
 }
 
@@ -409,14 +407,19 @@ mod uuid_string {
     use serde::{Deserialize, Deserializer, Serializer};
     use uuid::Uuid;
 
-    pub fn serialize<S>(uuid: &Uuid, serializer: S) -> Result<S::Ok, S::Error>
+    pub fn serialize<S>(
+        uuid: &Uuid,
+        serializer: S,
+    ) -> std::result::Result<S::Ok, S::Error>
     where
         S: Serializer,
     {
         serializer.serialize_str(&uuid.to_string())
     }
 
-    pub fn deserialize<'de, D>(deserializer: D) -> Result<Uuid, D::Error>
+    pub fn deserialize<'de, D>(
+        deserializer: D,
+    ) -> std::result::Result<Uuid, D::Error>
     where
         D: Deserializer<'de>,
     {

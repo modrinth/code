@@ -306,7 +306,10 @@ fn spawn(
             .push(Grant::from_path(&path, PermissionType::Traverse)?);
     }
 
-    let mut prepared = acl_ledger
+    let locked_acl_ledger = acl_ledger
+        .lock()
+        .wrap_err("locking AppContainer ACL ledger")?;
+    let mut prepared = locked_acl_ledger
         .prepare(instance_grants)
         .wrap_err("preparing AppContainer ACL instance")?;
     let mut parents_to_elevate = Vec::new();
@@ -466,7 +469,7 @@ struct OwnedCapability {
 }
 
 impl OwnedCapability {
-    pub fn new(known: WELL_KNOWN_SID_TYPE) -> std::io::Result<Self> {
+    pub fn new(known: WELL_KNOWN_SID_TYPE) -> Result<Self> {
         let mut size = 0;
         let result =
             unsafe { CreateWellKnownSid(known, None, None, &mut size) };
@@ -562,7 +565,7 @@ fn create_app_container(
     result
 }
 
-fn try_set_network_isolation(app_container: &PSID) -> std::io::Result<()> {
+fn try_set_network_isolation(app_container: &PSID) -> Result<()> {
     let mut current_count: u32 = 0;
     let mut current_containers: *mut SID_AND_ATTRIBUTES = std::ptr::null_mut();
 
@@ -622,13 +625,19 @@ fn try_set_network_isolation(app_container: &PSID) -> std::io::Result<()> {
     Ok(())
 }
 
-fn is_access_denied(err: &std::io::Error) -> bool {
-    err.kind() == ErrorKind::PermissionDenied
-        || err.raw_os_error().unwrap_or(0)
-            == HRESULT::from_win32(ERROR_ACCESS_DENIED.0).0
+fn is_access_denied(err: &eyre::Report) -> bool {
+    err.downcast_ref::<std::io::Error>().is_some_and(|err| {
+        err.kind() == ErrorKind::PermissionDenied
+            || err.raw_os_error().unwrap_or(0)
+                == HRESULT::from_win32(ERROR_ACCESS_DENIED.0).0
+    }) || err
+        .downcast_ref::<windows::core::Error>()
+        .is_some_and(|err| {
+            err.code() == HRESULT::from_win32(ERROR_ACCESS_DENIED.0)
+        })
 }
 
-fn add_writeattributes_to_winsta(app_container: &PSID) -> std::io::Result<()> {
+fn add_writeattributes_to_winsta(app_container: &PSID) -> Result<()> {
     let winsta = unsafe {
         OpenWindowStationW(
             windows::core::w!("winsta0"),
@@ -670,7 +679,7 @@ fn add_writeattributes_to_winsta(app_container: &PSID) -> std::io::Result<()> {
     let err =
         unsafe { SetEntriesInAclW(Some(&[ea]), Some(old_acl), &mut new_acl) };
     if new_acl.is_null() {
-        return Err(Error::new(ErrorKind::Other, "new acl was null"));
+        return Err(Error::new(ErrorKind::Other, "new acl was null").into());
     }
     scopeguard::defer! {
         unsafe { LocalFree(Some(windows::Win32::Foundation::HLOCAL(new_acl as *mut _))) };
@@ -717,7 +726,7 @@ fn set_acl(
     app_container: &PSID,
     path: &Path,
     perms: PermissionType,
-) -> std::io::Result<()> {
+) -> Result<()> {
     let encoded_path = path
         .as_os_str()
         .encode_wide()
@@ -766,7 +775,7 @@ fn set_acl(
     let err =
         unsafe { SetEntriesInAclW(Some(&[ea]), Some(old_acl), &mut new_acl) };
     if new_acl.is_null() {
-        return Err(Error::new(ErrorKind::Other, "new acl was null"));
+        return Err(Error::new(ErrorKind::Other, "new acl was null").into());
     }
     scopeguard::defer! {
         unsafe { LocalFree(Some(windows::Win32::Foundation::HLOCAL(new_acl as *mut _))) };
@@ -854,7 +863,7 @@ fn set_acl(
     Ok(())
 }
 
-fn remove_from_acl(app_container: &PSID, path: &Path) -> std::io::Result<()> {
+fn remove_from_acl(app_container: &PSID, path: &Path) -> Result<()> {
     let encoded_path = path
         .as_os_str()
         .encode_wide()
@@ -893,7 +902,7 @@ fn remove_from_acl(app_container: &PSID, path: &Path) -> std::io::Result<()> {
         SetEntriesInAclW(Some(&[access]), Some(old_acl), &mut new_acl)
     };
     if new_acl.is_null() {
-        return Err(Error::new(ErrorKind::Other, "new acl was null"));
+        return Err(Error::new(ErrorKind::Other, "new acl was null").into());
     }
     scopeguard::defer! {
         unsafe { LocalFree(Some(windows::Win32::Foundation::HLOCAL(new_acl.cast()))) };
@@ -925,7 +934,7 @@ fn remove_from_acl(app_container: &PSID, path: &Path) -> std::io::Result<()> {
     Ok(())
 }
 
-fn acl_eq(first: *const ACL, second: *const ACL) -> std::io::Result<bool> {
+fn acl_eq(first: *const ACL, second: *const ACL) -> Result<bool> {
     if first.is_null() && second.is_null() {
         return Ok(true);
     }
@@ -1057,7 +1066,7 @@ fn apply_acl_paths(
     app_container: &PSID,
     paths: impl IntoIterator<Item = std::path::PathBuf>,
     permission: PermissionType,
-) -> std::io::Result<()> {
+) -> Result<()> {
     for path in paths {
         if path.as_os_str().is_empty() {
             continue;
