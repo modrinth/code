@@ -20,7 +20,7 @@ use crate::state::{
 };
 use crate::util::io;
 use crate::util::rpc::RpcServerBuilder;
-use crate::{State, get_resource_file, process};
+use crate::{State, get_resource_file};
 use chrono::Utc;
 use daedalus as d;
 use daedalus::minecraft::{LoggingSide, RuleAction, VersionInfo};
@@ -1015,14 +1015,6 @@ pub async fn launch_minecraft(
     let env_args = Vec::from(env_args);
 
     // Check if instance has a running process, and reject running the command if it does
-    let existing_processes = process::get_by_instance_id(&instance.id).await?;
-    if let Some(process) = existing_processes.first() {
-        return Err(crate::ErrorKind::LauncherError(format!(
-            "Instance {} is already running as process {}",
-            instance.id, process.uuid
-        ))
-        .as_error());
-    }
     if crate::state::instance_has_running_process(&instance.id, &state).await? {
         return Err(crate::ErrorKind::LauncherError(format!(
             "Instance {} is already running",
