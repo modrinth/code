@@ -29,6 +29,7 @@ pub(crate) struct SyncedProjectState {
     team_members: Vec<ThreadIssueTeamMember>,
     thread_issues: Vec<DBThreadIssue>,
     has_required_nags: bool,
+    has_outstanding_technical_review: bool,
 }
 
 impl SyncedProjectState {
@@ -36,7 +37,8 @@ impl SyncedProjectState {
         if !matches!(
             self.project.status,
             ProjectStatus::Rejected | ProjectStatus::Withheld
-        ) || self.thread_issues.is_empty()
+        ) || self.has_outstanding_technical_review
+            || self.thread_issues.is_empty()
             || self
                 .thread_issues
                 .iter()
@@ -106,6 +108,18 @@ pub(crate) async fn sync_project_state(
     .await
     .wrap_internal_err("reloading project for state synchronization")?;
     let data = projects.pop().wrap_not_found_err("resource not found")?;
+    let has_outstanding_technical_review = sqlx::query_scalar!(
+        r#"
+		SELECT EXISTS (
+			SELECT 1 FROM delphi_tech_review_queue WHERE project_id = $1
+		) AS "exists!"
+		"#,
+        project_id.0,
+    )
+    .fetch_one(&mut *transaction)
+    .await
+    .wrap_internal_err("checking outstanding project technical review")?;
+
     let project_ids = [project_id.0];
     let version_ids = sqlx::query!(
         "SELECT id FROM versions WHERE mod_id = ANY($1::bigint[]) ORDER BY id",
@@ -195,6 +209,7 @@ pub(crate) async fn sync_project_state(
         team_members,
         thread_issues,
         has_required_nags,
+        has_outstanding_technical_review,
     })
 }
 
