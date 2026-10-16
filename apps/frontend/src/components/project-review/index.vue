@@ -106,7 +106,7 @@ import {
 } from '@modrinth/ui'
 import { computed, onScopeDispose, ref, watch } from 'vue'
 
-import { useModerationKeybinds, useModerationSettings } from '~/composables/moderation'
+import { notifyCopied, useModerationKeybinds, useModerationSettings } from '~/composables/moderation'
 import { isStaff } from '~/helpers/users.js'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 import { previousReviewLinkUrls } from '~/providers/project-review/project-links'
@@ -381,6 +381,12 @@ useShortcut(
 
 shortcuts.listen('keydown', (event) => {
 	if (!isStaff(auth.value.user) || reviewShortcutBlocked(event)) return
-	keybinds.value.handle(event, { scope: 'review-actions', ...shortcuts })
+	if (keybinds.value.handle(event, { scope: 'review-actions', ...shortcuts })) return
+	if (!layoutReady.value || !projectV2.value) return
+	keybinds.value.handle(event, {
+		scope: 'project',
+		project: projectV2.value,
+		notifyCopied,
+	})
 })
 </script>

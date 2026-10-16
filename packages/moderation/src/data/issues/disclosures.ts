@@ -557,6 +557,25 @@ export const disclosuresReviewPanel = panel({
 	toggle({
 		issue: disclosuresNonEnglishIssue,
 		label: 'Non-English',
-		shown: ({ disclosures }) => disclosures.length > 1,
+		shown: ({ disclosures }) =>
+			disclosures.some((disclosure) => {
+				if (disclosure.deleted_at) return false
+				if ('note' in disclosure && disclosure.note?.trim()) return true
+
+				switch (disclosure.type) {
+					case 'derivative_work':
+						return disclosure.sources.some((source) =>
+							[source.label, source.link, source.note].some((text) => text?.trim()),
+						)
+					case 'telemetry':
+						return disclosure.data_collected.some((text) => text.trim())
+					case 'paid_features':
+						return disclosure.features.some((text) => text.trim())
+					case 'system_interactions':
+						return disclosure.interactions.some((text) => text.trim())
+					default:
+						return false
+				}
+			}),
 	}),
 )

@@ -41,6 +41,10 @@ export const projectReviewMessages = defineMessages({
 		id: 'moderation.project-review.reopenPopouts',
 		defaultMessage: 'Reopen window',
 	},
+	keepPopoutClosed: {
+		id: 'moderation.project-review.keepPopoutClosed',
+		defaultMessage: 'Keep closed',
+	},
 	generalSettings: {
 		id: 'moderation.project-review.generalSettings',
 		defaultMessage: 'General',

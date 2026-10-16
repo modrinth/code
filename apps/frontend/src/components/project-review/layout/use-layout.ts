@@ -191,8 +191,33 @@ export function useProjectReviewLayout(
 					color: 'green',
 					action: () => reopenPopout(popout),
 				},
+				{
+					label: formatMessage(projectReviewMessages.keepPopoutClosed),
+					keepOpen: true,
+					action: () => keepPopoutClosed(popout),
+				},
 			],
 		}).id
+	}
+
+	function keepPopoutClosed(popout: ReviewPopoutLayout) {
+		const pending = pendingPopouts.get(popout)
+		if (!pending || pending.opening) return
+		if (pending.notificationId !== undefined) removeNotification(pending.notificationId)
+		pendingPopouts.delete(popout)
+		if (blockedPopoutLayout) {
+			const remainingPopouts = blockedPopoutLayout.popoutGroups?.filter((group) => group !== popout)
+			blockedPopoutLayout = dockPopoutLayout({
+				...blockedPopoutLayout,
+				popoutGroups: [popout],
+			})
+			blockedPopoutLayout.popoutGroups = remainingPopouts
+		}
+		if (!pendingPopouts.size) {
+			blockedPopoutLayout = undefined
+			blockedPopoutBaseline = undefined
+		}
+		scheduleSave()
 	}
 
 	async function reopenPopout(popout: ReviewPopoutLayout) {
