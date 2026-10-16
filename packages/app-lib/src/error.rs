@@ -1,8 +1,15 @@
 //! Theseus error type
 use crate::util;
+use crate::util::io::IOError;
+use crate::util::jre::JREError;
+use async_tungstenite::tungstenite;
+use async_zip::error::ZipError;
 use data_url::DataUrlError;
 use derive_more::Display;
+use hickory_resolver::ResolveError;
 use serde::{Deserialize, Serialize};
+use sqlx::migrate::MigrateError;
+use std::path::StripPrefixError;
 use std::time::Duration;
 
 #[derive(Serialize, Deserialize, Debug, Display)]
@@ -250,6 +257,66 @@ pub type Error = anyhow::Error;
 impl ErrorKind {
     pub fn as_error(self) -> Error {
         self.into()
+    }
+
+    fn code(&self) -> &'static str {
+        match self {
+            Self::SharedInstanceUnavailable(_) => "shared_instance_unavailable",
+            Self::SharedInstancesApiError(_) => "shared_instances_api_error",
+            Self::HashError(_, _) => "hash_error",
+            Self::LauncherError(_) => "launcher_error",
+            Self::JREError(_) => "java_error",
+            Self::NoValueFor(_) | Self::MetadataError(_) => "metadata_error",
+            Self::FetchError(_)
+            | Self::ApiIsDownError(_)
+            | Self::WSError(_)
+            | Self::WSClosedError(_)
+            | Self::DNSError(_)
+            | Self::RateLimited { .. } => "network_error",
+            Self::LabrinthError(_) => "api_error",
+            Self::ZipError(_) => "archive_error",
+            Self::DeserializationError(_) | Self::StripPrefixError(_) => {
+                "path_error"
+            }
+            Self::FSError(_)
+            | Self::IOError(_)
+            | Self::StdIOError(_)
+            | Self::UTFError(_) => "filesystem_error",
+            Self::INIError(_) | Self::JSONError(_) => "parse_error",
+            Self::Sqlx(_) | Self::SqlxMigrate(_) => "database_error",
+            _ => "internal_error",
+        }
+    }
+}
+
+pub fn error_code(error: &Error) -> &'static str {
+    if let Some(kind) = error.downcast_ref::<ErrorKind>() {
+        kind.code()
+    } else if error.is::<reqwest::Error>()
+        || error.is::<tungstenite::Error>()
+        || error.is::<ResolveError>()
+    {
+        "network_error"
+    } else if error.is::<JREError>() {
+        "java_error"
+    } else if error.is::<daedalus::Error>() {
+        "metadata_error"
+    } else if error.is::<ZipError>() {
+        "archive_error"
+    } else if error.is::<serde::de::value::Error>()
+        || error.is::<StripPrefixError>()
+    {
+        "path_error"
+    } else if error.is::<IOError>() || error.is::<std::io::Error>() {
+        "filesystem_error"
+    } else if error.is::<serde_ini::de::Error>()
+        || error.is::<serde_json::Error>()
+    {
+        "parse_error"
+    } else if error.is::<sqlx::Error>() || error.is::<MigrateError>() {
+        "database_error"
+    } else {
+        "internal_error"
     }
 }
 
