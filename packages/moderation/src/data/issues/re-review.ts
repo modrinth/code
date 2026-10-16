@@ -23,7 +23,8 @@ export const reReviewReviewPanel = panel({
 	hint: 'Did the author ignore previous review messages?',
 	icon: RefreshCwIcon,
 	guidanceUrl: 'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892',
-	shown: ({ wasReviewed, hasPreviousStructuredIssues }) => wasReviewed && hasPreviousStructuredIssues,
+	shown: ({ wasReviewed, hasPreviousStructuredIssues }) =>
+		wasReviewed && hasPreviousStructuredIssues,
 }).content(
 	toggle({
 		issue: reReviewIgnoredIssue,
@@ -39,5 +40,6 @@ export const reReviewReviewPanel = panel({
 
 export const reReviewMiscReviewPanel = {
 	...reReviewReviewPanel,
-	shown: ({ wasReviewed, hasPreviousStructuredIssues }) => wasReviewed && !hasPreviousStructuredIssues,
+	shown: ({ wasReviewed, hasPreviousStructuredIssues }) =>
+		wasReviewed && !hasPreviousStructuredIssues,
 } satisfies Panel

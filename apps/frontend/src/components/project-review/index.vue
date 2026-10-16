@@ -375,7 +375,8 @@ useShortcut(
 		void reviewContext.revealPanel('re-review')
 		shortcuts.run('reveal-right')
 	},
-	() => hasPreviousStructuredIssues.value || !!panels.resolve({ kind: 'panel', key: 're-review-misc' }),
+	() =>
+		hasPreviousStructuredIssues.value || !!panels.resolve({ kind: 'panel', key: 're-review-misc' }),
 )
 
 shortcuts.listen('keydown', (event) => {
