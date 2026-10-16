@@ -11,9 +11,9 @@ use tracing::info;
 use windows::{
     Win32::{
         Foundation::{
-            ERROR_ACCESS_DENIED, ERROR_ALREADY_EXISTS,
-            ERROR_INSUFFICIENT_BUFFER, ERROR_SUCCESS, GetLastError, HANDLE,
-            LocalFree,
+            ERROR_ACCESS_DENIED, ERROR_ALREADY_EXISTS, ERROR_FILE_NOT_FOUND,
+            ERROR_INSUFFICIENT_BUFFER, ERROR_PATH_NOT_FOUND, ERROR_SUCCESS,
+            GetLastError, HANDLE, LocalFree,
         },
         NetworkManagement::WindowsFirewall::{
             NetworkIsolationGetAppContainerConfig,
@@ -882,6 +882,9 @@ fn remove_from_acl(app_container: &PSID, path: &Path) -> Result<()> {
             std::ptr::null_mut(),
         )
     };
+    if err == ERROR_FILE_NOT_FOUND || err == ERROR_PATH_NOT_FOUND {
+        return Ok(());
+    }
     if err != ERROR_SUCCESS {
         return Err(windows::core::Error::from_hresult(HRESULT::from_win32(
             err.0,
@@ -925,6 +928,9 @@ fn remove_from_acl(app_container: &PSID, path: &Path) -> Result<()> {
             None,
         )
     };
+    if err == ERROR_FILE_NOT_FOUND || err == ERROR_PATH_NOT_FOUND {
+        return Ok(());
+    }
     if err != ERROR_SUCCESS {
         return Err(windows::core::Error::from_hresult(HRESULT::from_win32(
             err.0,
