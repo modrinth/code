@@ -277,7 +277,17 @@ impl ErrorKind {
 
     fn code(&self) -> &'static str {
         match self {
-            Self::SharedInstanceUnavailable(_) => "shared_instance_unavailable",
+            Self::SharedInstanceUnavailable(reason) => match reason {
+                SharedInstanceUnavailableReason::Deleted => {
+                    "shared_instance_deleted"
+                }
+                SharedInstanceUnavailableReason::AccessRevoked => {
+                    "shared_instance_access_revoked"
+                }
+                SharedInstanceUnavailableReason::Quarantined => {
+                    "shared_instance_quarantined"
+                }
+            },
             Self::SharedInstancesApiError(_) => "shared_instances_api_error",
             Self::HashError(_, _) => "hash_error",
             Self::LoginCanceled => "login_canceled",
