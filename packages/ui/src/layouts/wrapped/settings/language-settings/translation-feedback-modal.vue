@@ -239,6 +239,10 @@ const kindMessages = defineMessages({
 		id: 'settings.language.feedback.kind.inconsistent',
 		defaultMessage: 'Inconsistent',
 	},
+	formatting: {
+		id: 'settings.language.feedback.kind.formatting',
+		defaultMessage: 'Broken formatting',
+	},
 	untranslated: {
 		id: 'settings.language.feedback.kind.untranslated',
 		defaultMessage: 'Not translated',
@@ -262,6 +266,10 @@ const kindDescriptions = defineMessages({
 		id: 'settings.language.feedback.kind.inconsistent.description',
 		defaultMessage: 'The same term is translated differently elsewhere in the interface.',
 	},
+	formatting: {
+		id: 'settings.language.feedback.kind.formatting.description',
+		defaultMessage: 'Placeholders, links or line breaks are broken or shown as raw text.',
+	},
 	untranslated: {
 		id: 'settings.language.feedback.kind.untranslated.description',
 		defaultMessage: 'The text is still shown in English.',
@@ -272,7 +280,7 @@ const kindDescriptions = defineMessages({
 	},
 })
 
-const kinds: Kind[] = ['incorrect', 'typo', 'inconsistent', 'untranslated', 'other']
+const kinds: Kind[] = ['incorrect', 'typo', 'inconsistent', 'formatting', 'untranslated', 'other']
 
 const modal = ref<InstanceType<typeof NewModal>>()
 const query = ref('')

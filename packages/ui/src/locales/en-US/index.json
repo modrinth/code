@@ -6179,6 +6179,12 @@
   "settings.language.feedback.header": {
     "defaultMessage": "Report a translation issue"
   },
+  "settings.language.feedback.kind.formatting": {
+    "defaultMessage": "Broken formatting"
+  },
+  "settings.language.feedback.kind.formatting.description": {
+    "defaultMessage": "Placeholders, links or line breaks are broken or shown as raw text."
+  },
   "settings.language.feedback.kind.inconsistent": {
     "defaultMessage": "Inconsistent"
   },

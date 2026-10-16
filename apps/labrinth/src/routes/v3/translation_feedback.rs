@@ -33,6 +33,8 @@ pub enum TranslationFeedbackKind {
     Typo,
     /// The translation uses different wording than the rest of the interface.
     Inconsistent,
+    /// Placeholders, links or line breaks are broken or shown as raw text.
+    Formatting,
     /// The text is still shown in English.
     Untranslated,
     Other,
@@ -44,6 +46,7 @@ impl TranslationFeedbackKind {
             Self::Incorrect
             | Self::Typo
             | Self::Inconsistent
+            | Self::Formatting
             | Self::Untranslated => IssueType::TranslationMistake,
             Self::Other => IssueType::GeneralQuestion,
         }
@@ -54,6 +57,7 @@ impl TranslationFeedbackKind {
             Self::Incorrect => "Incorrect translation",
             Self::Typo => "Spelling or grammar mistake",
             Self::Inconsistent => "Inconsistent translation",
+            Self::Formatting => "Broken formatting",
             Self::Untranslated => "Not translated",
             Self::Other => "Other",
         }

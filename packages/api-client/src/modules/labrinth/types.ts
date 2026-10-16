@@ -2231,7 +2231,13 @@ export namespace Labrinth {
 		export namespace v3 {
 			export type Product = 'website' | 'app'
 
-			export type Kind = 'incorrect' | 'typo' | 'inconsistent' | 'untranslated' | 'other'
+			export type Kind =
+				| 'incorrect'
+				| 'typo'
+				| 'inconsistent'
+				| 'formatting'
+				| 'untranslated'
+				| 'other'
 
 			export type CreateTranslationFeedbackRequest = {
 				product: Product
