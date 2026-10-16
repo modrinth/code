@@ -235,15 +235,6 @@ watchSyncEffect(() => {
 	if (validFilters.length !== selectedFilters.value.length) selectedFilters.value = validFilters
 })
 
-const stats = computed(() => {
-	const counts: Record<string, number> = {}
-	for (const item of items.value) {
-		const normalized = normalizeProjectType(item.project_type)
-		counts[normalized] = (counts[normalized] || 0) + 1
-	}
-	return counts
-})
-
 const attributeFilterIds = new Set(['enabled', 'disabled', 'warnings'])
 
 function matchesSelectedFilters(item: ContentItem) {
@@ -260,7 +251,9 @@ function matchesSelectedFilters(item: ContentItem) {
 	return true
 }
 
-const typeFilteredCount = computed(() => items.value.filter(matchesSelectedFilters).length)
+const searchableCount = computed(
+	() => applyMetadataFilters(items.value.filter(matchesSelectedFilters)).length,
+)
 
 const filteredItems = computed(() => {
 	const query = searchQuery.value.trim()
@@ -277,6 +270,15 @@ const filteredItems = computed(() => {
 	}
 
 	return applyMetadataFilters(sortContentItems(result, !query))
+})
+
+const stats = computed(() => {
+	const counts: Record<string, number> = {}
+	for (const item of filteredItems.value) {
+		const normalized = normalizeProjectType(item.project_type)
+		counts[normalized] = (counts[normalized] || 0) + 1
+	}
+	return counts
 })
 
 function contentVersionLabel(item: ContentItem): string {
@@ -570,8 +572,8 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 					v-model="searchQuery"
 					:icon="SearchIcon"
 					type="search"
-					:placeholder="formatMessage(messages.searchPlaceholder, { count: typeFilteredCount })"
-					:aria-label="formatMessage(messages.searchPlaceholder, { count: typeFilteredCount })"
+					:placeholder="formatMessage(messages.searchPlaceholder, { count: searchableCount })"
+					:aria-label="formatMessage(messages.searchPlaceholder, { count: searchableCount })"
 					:clear-label="formatMessage(commonMessages.clearButton)"
 					clearable
 				/>

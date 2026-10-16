@@ -1,15 +1,17 @@
 <template>
 	<label
+		ref="dropTargetRef"
 		:class="[
 			'flex flex-col items-center justify-center  cursor-pointer border-2 border-dashed bg-surface-4 text-contrast transition-colors',
 			size === 'small' ? 'p-5' : size === 'medium' ? 'p-10' : 'p-12',
 			size === 'small' ? 'gap-2' : 'gap-4',
 			size === 'small' ? 'rounded-2xl' : 'rounded-3xl',
-			isDragOver ? 'border-purple' : 'border-surface-5',
+			isDragging ? 'border-purple' : 'border-surface-5',
 		]"
-		@dragover.prevent="onDragOver"
-		@dragleave.prevent="onDragLeave"
-		@drop.prevent="handleDrop"
+		@dragenter="dropTargetProps.onDragenter"
+		@dragover="dropTargetProps.onDragover"
+		@dragleave="dropTargetProps.onDragleave"
+		@drop="dropTargetProps.onDrop"
 	>
 		<div
 			:class="[
@@ -48,9 +50,10 @@
 <script setup lang="ts">
 import { FolderUpIcon } from '@modrinth/assets'
 import { fileIsValid } from '@modrinth/utils'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 import { useFormatBytes } from '../../composables'
+import { useFileDropTarget } from '../../composables/file-drop'
 import { injectNotificationManager } from '../../providers'
 
 const { addNotification } = injectNotificationManager()
@@ -109,7 +112,7 @@ function matchesAccept(file: File, accept?: string): boolean {
 		})
 }
 
-function addFiles(incoming: FileList, shouldNotReset = false) {
+function addFiles(incoming: FileList | File[], shouldNotReset = false) {
 	if (!shouldNotReset || props.shouldAlwaysReset) {
 		files.value = Array.from(incoming)
 	}
@@ -141,22 +144,12 @@ function addFiles(incoming: FileList, shouldNotReset = false) {
 	if (fileInput.value) fileInput.value.value = ''
 }
 
-const isDragOver = ref(false)
-
-function onDragOver() {
-	isDragOver.value = true
-}
-
-function onDragLeave() {
-	isDragOver.value = false
-}
-
-function handleDrop(e: DragEvent) {
-	isDragOver.value = false
-
-	if (!e.dataTransfer) return
-	addFiles(e.dataTransfer.files)
-}
+const dropTargetRef = ref<HTMLElement | null>(null)
+const { isDragging, dropTargetProps } = useFileDropTarget({
+	target: dropTargetRef,
+	disabled: computed(() => props.disabled ?? false),
+	onFiles: (droppedFiles) => addFiles(droppedFiles),
+})
 
 function handleChange(e: Event) {
 	const input = e.target as HTMLInputElement

@@ -6,6 +6,7 @@
 		width="830px"
 		no-padding
 		actions-divider
+		:animate-resize="false"
 		:disable-close="saving"
 	>
 		<div class="flex flex-col">
@@ -18,13 +19,7 @@
 					</IntlFormatted>
 				</Admonition>
 			</div>
-			<div v-if="loading" class="flex items-center justify-center p-8 text-secondary">
-				<SpinnerIcon class="size-8 animate-spin" />
-			</div>
-			<div
-				v-else
-				class="max-h-[50vh] overflow-y-auto border-0 border-t border-solid border-surface-5"
-			>
+			<div class="max-h-[50vh] overflow-y-auto border-0 border-t border-solid border-surface-5">
 				<ContentCardTable
 					v-model:selected-ids="selectedIds"
 					:items="tableItems"
@@ -47,7 +42,7 @@
 				<Button
 					type="colored"
 					color="brand"
-					:disabled="loading || addons.length === 0"
+					:disabled="addons.length === 0"
 					:loading="saving"
 					@click="save"
 				>
@@ -61,7 +56,7 @@
 
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
-import { ChevronRightIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
+import { ChevronRightIcon, XIcon } from '@modrinth/assets'
 import { useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, ref } from 'vue'
 
@@ -246,21 +241,19 @@ async function save() {
 
 async function show() {
 	const worldId = ctx.worldId.value
-	if (!worldId) return
-	addons.value = []
-	draft.value = new Map()
-	selectedIds.value = []
+	if (!worldId || loading.value) return
 	loading.value = true
-	modal.value?.show()
 	try {
 		const content = await client.archon.content_v1.getAddons(ctx.serverId, worldId, {
 			needs_side_type_review: true,
 			updates: false,
 		})
 		addons.value = content.addons ?? []
+		draft.value = new Map()
+		selectedIds.value = []
+		modal.value?.show()
 	} catch (error) {
 		handleError(error as Error)
-		modal.value?.hide()
 	} finally {
 		loading.value = false
 	}
@@ -270,5 +263,5 @@ function hide() {
 	modal.value?.hide()
 }
 
-defineExpose({ show, hide })
+defineExpose({ show, hide, loading })
 </script>

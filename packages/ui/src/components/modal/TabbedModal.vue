@@ -199,7 +199,11 @@ defineExpose({ show, hide, selectedTab, setTab })
 								:href="tab.href ?? undefined"
 								:target="tab.href ? '_blank' : undefined"
 								:rel="tab.href ? 'noopener noreferrer' : undefined"
-								:class="`flex min-w-0 shrink-0 gap-2 items-center text-left rounded-[14px] px-4 py-2.5 border-none text-base leading-5 font-semibold cursor-pointer active:scale-[0.97] transition-all no-underline ${tabClasses(tab, index)}`"
+								:class="[
+									'flex min-w-0 shrink-0 gap-2 items-center text-left rounded-[14px] px-4 py-2.5 border-none text-base leading-5 font-semibold cursor-pointer active:scale-[0.97] transition-all no-underline',
+									{ 'no-click-animation subpixel-antialiased will-change-auto': tab.href },
+									tabClasses(tab, index),
+								]"
 								@click="!tab.href && setTab(index)"
 							>
 								<component :is="tab.icon" class="size-5 flex-shrink-0" />
