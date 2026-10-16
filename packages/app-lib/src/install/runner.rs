@@ -1857,7 +1857,7 @@ fn install_error_code(
         | ErrorKind::ApiIsDownError(_)
         | ErrorKind::WSError(_)
         | ErrorKind::WSClosedError(_)
-        | ErrorKind::Ratelimited { .. } => "network_error",
+        | ErrorKind::RateLimited { .. } => "network_error",
         ErrorKind::LabrinthError(_) => "api_error",
         ErrorKind::HashError(_, _) => "hash_error",
         ErrorKind::ZipError(_) => "archive_error",

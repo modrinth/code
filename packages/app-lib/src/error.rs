@@ -3,6 +3,7 @@ use crate::util;
 use data_url::DataUrlError;
 use derive_more::Display;
 use serde::{Deserialize, Serialize};
+use std::time::Duration;
 
 #[derive(Serialize, Deserialize, Debug, Display)]
 #[display("{description}")]
@@ -98,8 +99,8 @@ pub enum ErrorKind {
     #[error("Too many API errors, try again in {0} minutes")]
     ApiIsDownError(u32),
 
-    #[error("Too many requests, retry in {}", format_seconds(*.retry_in_seconds))]
-    Ratelimited { retry_in_seconds: u64 },
+    #[error("Too many requests, retry in {}", format_duration(*.retry_in))]
+    RateLimited { retry_in: Duration },
 
     #[error("{0}")]
     LabrinthError(LabrinthError),
@@ -220,7 +221,10 @@ pub enum ErrorKind {
     DiscordRichPresenceError(#[from] discord_rich_presence::error::Error),
 }
 
-fn format_seconds(seconds: u64) -> String {
+fn format_duration(duration: Duration) -> String {
+    let seconds = duration
+        .as_secs()
+        .saturating_add(u64::from(duration.subsec_nanos() > 0));
     let plural = |unit: u64| if unit == 1 { "" } else { "s" };
 
     if seconds <= 59 {

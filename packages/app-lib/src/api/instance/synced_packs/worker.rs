@@ -58,9 +58,8 @@ pub(crate) async fn flush(instance_id: &str) -> Result<(), Arc<crate::Error>> {
             let remaining = retry_at.saturating_duration_since(Instant::now());
             if !remaining.is_zero() {
                 return Err(Arc::new(
-                    crate::ErrorKind::Ratelimited {
-                        retry_in_seconds: remaining.as_secs()
-                            + u64::from(remaining.subsec_nanos() != 0),
+                    crate::ErrorKind::RateLimited {
+                        retry_in: remaining,
                     }
                     .as_error(),
                 ));
@@ -153,11 +152,9 @@ fn start(state: Arc<State>) {
                         }
                         continue;
                     }
-                    Some(crate::ErrorKind::Ratelimited {
-                        retry_in_seconds,
-                    }) => {
+                    Some(crate::ErrorKind::RateLimited { retry_in }) => {
                         let retry_at = Instant::now()
-                            + Duration::from_secs((*retry_in_seconds).max(1));
+                            + (*retry_in).max(Duration::from_secs(1));
                         {
                             let mut queue = state.pack_sync_worker.queue.lock();
                             queue.instances.insert(instance_id.clone());
