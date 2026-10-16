@@ -907,7 +907,7 @@ mod tests {
     }
 
     #[test]
-    fn preserves_concrete_libraries_and_emits_daedalus_defaults() {
+    fn preserves_concrete_libraries_and_emits_minecraft_meta_defaults() {
         let (profile, artifacts) = normalize(json!({
 			"id": "loader", "inheritsFrom": "1.21.1",
 			"libraries": [

@@ -3,13 +3,11 @@ resolver = "2"
 members = [
   "apps/app",
   "apps/app-playground",
-  "apps/daedalus_client",
   "apps/labrinth",
   "apps/meta-generator",
   "packages/app-lib",
   "packages/ariadne",
   "packages/component-derive",
-  "packages/daedalus",
   "packages/minecraft-meta-manifest",
   "packages/minecraft-meta-model",
   "packages/modrinth-content-management",
@@ -76,7 +74,6 @@ component-derive = { path = "packages/component-derive" }
 const_format = "0.2.34"
 core-foundation = "0.10.1"
 core-graphics = "0.24.0"
-daedalus = { path = "packages/daedalus" }
 darling = { version = "0.23" }
 dashmap = "6.1.0"
 data-url = "0.3.2"

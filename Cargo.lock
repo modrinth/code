@@ -3060,43 +3060,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "daedalus"
-version = "0.2.3"
-dependencies = [
- "chrono",
- "serde",
- "serde_json",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "daedalus_client"
-version = "0.2.2"
-dependencies = [
- "async_zip",
- "bytes",
- "chrono",
- "daedalus",
- "dashmap",
- "dotenvy",
- "futures",
- "indexmap 2.14.2",
- "itertools 0.14.0",
- "md5",
- "quick-xml 0.38.3",
- "reqwest 0.12.24",
- "rust-s3",
- "serde",
- "serde_json",
- "sha1_smol",
- "thiserror 2.0.21",
- "tokio",
- "tracing",
- "tracing-error",
- "tracing-subscriber",
-]
-
-[[package]]
 name = "darling"
 version = "0.20.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -10768,7 +10731,6 @@ dependencies = [
  "pin-project-lite",
  "quinn",
  "rustls 0.23.32",
- "rustls-native-certs 0.8.1",
  "rustls-pki-types",
  "serde",
  "serde_json",
