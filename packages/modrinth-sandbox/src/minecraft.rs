@@ -1,16 +1,26 @@
 use std::{
-    collections::BTreeMap, ffi::OsString, io::{ErrorKind, Write}, path::{Path, PathBuf}, sync::OnceLock,
+    collections::BTreeMap,
+    ffi::OsString,
+    io::{ErrorKind, Write},
+    path::{Path, PathBuf},
+    sync::OnceLock,
 };
 
 use eyre::{Context, Result, ensure};
 use rand::RngCore;
 use sha1::{Digest, Sha1};
 
-use crate::{SandboxChild, SandboxCommand, SandboxHandle, SandboxStdio, sandboxapi::service::SandboxApiChild, util::SandboxArg};
+use crate::{
+    SandboxChild, SandboxCommand, SandboxHandle, SandboxStdio,
+    sandboxapi::service::SandboxApiChild, util::SandboxArg,
+};
 
 #[derive(Debug)]
 pub struct MinecraftCommand {
-    /// Child reference to the sandbox API service, created using SandboxApiService::start
+    /// Child reference to the sandbox API service, created using
+    /// [`SandboxApiService::start`]
+    ///
+    /// [`SandboxApiService::start`]: crate::sandboxapi::service::SandboxApiService::start
     pub sandbox_api_child: Option<SandboxApiChild>,
     /// Path to the Java Runtime Environment on the host.
     pub jre_path: PathBuf,
@@ -275,8 +285,13 @@ pub fn create_command(minecraft: MinecraftCommand) -> Result<SandboxCommand> {
         agent_argument.push(sandbox_agent_path.as_os_str());
         args.push(agent_argument.into());
 
-        args.push(format!("-Dmodrinth.sandboxagent.secret={}", child.get_secret()).into());
-        args.push(format!("-Dmodrinth.sandboxagent.port={}", port.to_string()).into());
+        args.push(
+            format!("-Dmodrinth.sandboxagent.secret={}", child.get_secret())
+                .into(),
+        );
+        args.push(
+            format!("-Dmodrinth.sandboxagent.port={}", port.to_string()).into(),
+        );
 
         args.push("-Drealms.environment=local".into());
         args.push("-Dminecraft.api.env=sandboxauth".into());
@@ -327,14 +342,16 @@ pub fn create_command(minecraft: MinecraftCommand) -> Result<SandboxCommand> {
     read_write_paths.sort_unstable();
     read_write_paths.dedup();
 
-    let mut on_start: Vec<Box<dyn FnOnce(&mut SandboxChild) + Send + Sync>> = Vec::new();
+    let mut on_start: Vec<Box<dyn FnOnce(&mut SandboxChild) + Send + Sync>> =
+        Vec::new();
     let mut on_finish: Vec<Box<dyn FnOnce() + Send + Sync>> = Vec::new();
     if let Some(sandbox_api_child) = minecraft.sandbox_api_child {
         // Register handle
         on_start.push(Box::new({
             let sandbox_api_child = sandbox_api_child.clone();
             move |child| {
-                sandbox_api_child.set_sandbox_handle(child.get_sandbox_handle());
+                sandbox_api_child
+                    .set_sandbox_handle(child.get_sandbox_handle());
             }
         }));
 
@@ -374,19 +391,22 @@ pub fn create_command(minecraft: MinecraftCommand) -> Result<SandboxCommand> {
 // todo(boris): I know you don't like doing fs operations inside create_command
 // I've left this as-is, feel free to adjust
 fn create_sandbox_java_agent() -> eyre::Result<PathBuf> {
-    const BYTES: &[u8] = include_bytes!("../../modrinth-sandbox-agent/SandboxAgent.jar");
+    const BYTES: &[u8] =
+        include_bytes!("../../modrinth-sandbox-agent/SandboxAgent.jar");
     static SANDBOX_HASH: OnceLock<([u8; 20], &'static str)> = OnceLock::new();
 
     let (hash_bytes, hash_str) = SANDBOX_HASH.get_or_init(|| {
         let mut hasher = Sha1::new();
         hasher.update(BYTES);
 
-        let hash: [u8; 20] = hasher.finalize().try_into().expect("sha1 is 20 bytes");
+        let hash: [u8; 20] =
+            hasher.finalize().try_into().expect("sha1 is 20 bytes");
 
         (hash, hex::encode(hash).leak())
     });
 
-    let path = std::env::temp_dir().join(format!("ModrinthSandboxAgent-{}.jar", hash_str));
+    let path = std::env::temp_dir()
+        .join(format!("ModrinthSandboxAgent-{}.jar", hash_str));
 
     // Check that file exists and checksum matches
     if !check_sha1_hash(&path, hash_bytes)? {
@@ -419,7 +439,7 @@ fn check_sha1_hash(path: &Path, expected_hash: &[u8]) -> eyre::Result<bool> {
     let mut file = match std::fs::File::open(path) {
         Err(err) if err.kind() == ErrorKind::NotFound => {
             return Ok(false);
-        },
+        }
         result => result.with_context(|| "opening {path}")?,
     };
 
