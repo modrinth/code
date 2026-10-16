@@ -1,22 +1,19 @@
 use std::{
     collections::BTreeMap,
     ffi::OsString,
-    io::ErrorKind,
+    fs,
+    io::{ErrorKind, Write},
     path::{Path, PathBuf},
 };
 
 use eyre::{Context, Result, ensure};
 use rand::RngCore;
 use sha1::{Digest, Sha1};
-use tokio::{
-    fs,
-    io::{AsyncReadExt, AsyncWriteExt},
-    sync::OnceCell,
-};
+use tokio::sync::OnceCell;
 
 use crate::{
     SandboxChild, SandboxCommand, SandboxHandle, SandboxStdio,
-    sandboxapi::service::SandboxApiChild, util::SandboxArg,
+    api::SandboxApiChild, util::SandboxArg,
 };
 
 #[derive(Debug)]
@@ -282,7 +279,9 @@ pub async fn setup_minecraft_command(
     if let Some(child) = &minecraft.sandbox_api_child {
         static SANDBOX_AGENT_PATH: OnceCell<PathBuf> = OnceCell::const_new();
         let sandbox_agent_path = SANDBOX_AGENT_PATH
-            .get_or_try_init(create_sandbox_java_agent)
+			.get_or_try_init(|| async {
+				tokio::task::spawn_blocking(create_sandbox_java_agent).await?
+			})
             .await?;
 
         classpath.push(sandbox_agent_path.clone());
@@ -398,7 +397,7 @@ pub async fn setup_minecraft_command(
     })
 }
 
-async fn create_sandbox_java_agent() -> eyre::Result<PathBuf> {
+fn create_sandbox_java_agent() -> eyre::Result<PathBuf> {
     const BYTES: &[u8] =
         include_bytes!("../../modrinth-sandbox-agent/SandboxAgent.jar");
     let hash_bytes = Sha1::digest(BYTES);
@@ -408,25 +407,25 @@ async fn create_sandbox_java_agent() -> eyre::Result<PathBuf> {
         .join(format!("ModrinthSandboxAgent-{}.jar", hash_str));
 
     // Check that file exists and checksum matches
-    if !check_sha1_hash(&path, &hash_bytes).await? {
+    if !check_sha1_hash(&path, &hash_bytes)? {
         if let Some(parent) = path.parent() {
-            fs::create_dir_all(parent).await?;
+            fs::create_dir_all(parent)?;
         }
 
         let mut temp = path.clone();
         temp.add_extension(format!("{}", rand::thread_rng().next_u32()));
         temp.add_extension("new");
 
-        let mut temp_file = fs::File::create(&temp).await?;
+        let mut temp_file = fs::File::create(&temp)?;
 
-        temp_file.write_all(BYTES).await?;
-        temp_file.flush().await?;
-        temp_file.sync_all().await?;
+        temp_file.write_all(BYTES)?;
+        temp_file.flush()?;
+        temp_file.sync_all()?;
 
         drop(temp_file);
 
-        if let Err(err) = fs::rename(&temp, &path).await {
-            _ = fs::remove_file(&temp).await;
+        if let Err(err) = fs::rename(&temp, &path) {
+            _ = fs::remove_file(&temp);
             return Err(err.into());
         }
     }
@@ -434,11 +433,11 @@ async fn create_sandbox_java_agent() -> eyre::Result<PathBuf> {
     Ok(path)
 }
 
-async fn check_sha1_hash(
+fn check_sha1_hash(
     path: &Path,
     expected_hash: &[u8],
 ) -> eyre::Result<bool> {
-    let mut file = match fs::File::open(path).await {
+    let mut file = match fs::File::open(path) {
         Err(err) if err.kind() == ErrorKind::NotFound => {
             return Ok(false);
         }
@@ -448,14 +447,7 @@ async fn check_sha1_hash(
     };
 
     let mut hasher = sha1::Sha1::new();
-    let mut buffer = [0; 8192];
-    loop {
-        let read = file.read(&mut buffer).await?;
-        if read == 0 {
-            break;
-        }
-        hasher.update(&buffer[..read]);
-    }
+	std::io::copy(&mut file, &mut hasher)?;
     Ok(expected_hash == &*hasher.finalize())
 }
 

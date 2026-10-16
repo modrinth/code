@@ -26,8 +26,6 @@ infer = { workspace = true }
 parking_lot = { workspace = true }
 reqwest = { workspace = true }
 url = { workspace = true }
-objc2-app-kit = { workspace = true }
-objc2-foundation = { workspace = true }
 httparse = { workspace = true }
 open = { workspace = true }
 urlencoding = { workspace = true }
@@ -53,6 +51,8 @@ directories =  { workspace = true }
 
 [target.'cfg(target_os = "macos")'.dependencies]
 tempfile = { workspace = true }
+objc2-app-kit = { workspace = true }
+objc2-foundation = { workspace = true }
 # security-framework =  { workspace = true }
 # security-framework-sys =  { workspace = true }
 
