@@ -15,6 +15,16 @@
 //! single file on the disk to see if our container can access it, so instead we
 //! keep track of it ourselves.
 //!
+//! We record grants in the ledger before adding them to the ACL, and revoke
+//! grants from the ACL before removing them from the ledger. This means that:
+//! - all ACL grants **must** be in the ledger
+//! - all grants in the ledger **may** also exist in the ACL
+//!
+//! The first one is the important part, since we need to ensure that we can
+//! always clean up ACL entries after ourselves; and addition/removal of a
+//! grant or ACL entry is idempotent, so it's OK to remove or add a path that's
+//! already removed/added.
+//!
 //! While reading/writing the ledger, we take a global Windows mutex keyed to
 //! that container, to make sure that reads/writes won't conflict with another
 //! process trying to read/write to the same ledger.
