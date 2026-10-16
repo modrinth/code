@@ -93,6 +93,7 @@
 
 <script setup lang="ts">
 import { RotateCounterClockwiseIcon, TrashIcon, XIcon } from '@modrinth/assets'
+import { moderationSettings } from '@modrinth/moderation'
 import {
 	Button,
 	commonMessages,
@@ -105,7 +106,7 @@ import {
 } from '@modrinth/ui'
 import { computed, onScopeDispose, ref, watch } from 'vue'
 
-import { useModerationKeybinds } from '~/composables/moderation'
+import { useModerationKeybinds, useModerationSettings } from '~/composables/moderation'
 import { isStaff } from '~/helpers/users.js'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 import { previousReviewLinkUrls } from '~/providers/project-review/project-links'
@@ -182,6 +183,7 @@ const visibleTabs = computed<readonly ProjectReviewTab[]>((previousTabs) => {
 })
 const reviewProjectId = computed(() => project.value?.id)
 const session = provideReviewSession(createReviewSession())
+const settings = useModerationSettings()
 const panels = provideReviewPanels(
 	createReviewPanels(
 		project,
@@ -195,6 +197,9 @@ const panels = provideReviewPanels(
 			organization: organization.value,
 			organizationMembers: organizationMembers.value,
 			wasReviewed: wasReviewed.value,
+			sendIssuesAsThreadMessage: settings.value.get(
+				moderationSettings.General.SendIssuesAsThreadMessage,
+			),
 			permissions: permissions.value,
 			previousIssueIds: (project.value?.thread_id === threadQuery.data.value?.id
 				? (threadQuery.data.value?.issues ?? [])

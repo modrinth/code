@@ -6,6 +6,7 @@ import insufficientMessage from '../messages/checklist/messages/gallery/insuffic
 import notRelevantMessage from '../messages/checklist/messages/gallery/not-relevant.md'
 import showcaseClarityMessage from '../messages/checklist/messages/gallery/showcase-clarity.md'
 import { issue, panel, toggle } from './component-builders/builders'
+import { selectedGalleryImages } from './component-builders/gallery-images'
 import { issueLocation } from './component-builders/locations'
 import { IssuePriority } from './component-builders/priority'
 import { issueTargets } from './component-builders/targets'
@@ -27,7 +28,8 @@ export const galleryNotRelevantIssue = issue({
 	id: 'gallery-not-relevant',
 	title: 'Irrelevant gallery images',
 	category: 'Gallery',
-	actions: ({ projectV3, selected }) => {
+	actions: ({ projectV3, selected, sendIssuesAsThreadMessage }) => {
+		if (sendIssuesAsThreadMessage) return []
 		const keys = new Set((selected.items['gallery-image'] ?? []).map(({ key }) => key))
 		const imageIds = projectV3.gallery.flatMap((image) =>
 			image.id !== undefined && keys.has(String(image.id)) ? [image.id] : [],
@@ -36,14 +38,11 @@ export const galleryNotRelevantIssue = issue({
 			? [() => ({ type: 'remove_gallery_images', value: { image_ids: imageIds } })]
 			: []
 	},
-	message: ({ projectV3, selected }) => {
-		const keys = new Set((selected.items['gallery-image'] ?? []).map(({ key }) => key))
-		const entries = projectV3.gallery
-			.filter((image) => image.id !== undefined && keys.has(String(image.id)))
-			.map(
-				(image) =>
-					`<image-viewer src="${escapeHtml(image.raw_url || image.url)}" alt="${escapeHtml(image.name ?? '')}" />`,
-			)
+	message: (context) => {
+		const entries = selectedGalleryImages(context).map(
+			(image) =>
+				`<image-viewer src="${escapeHtml(image.raw_url || image.url)}" alt="${escapeHtml(image.name ?? '')}" />`,
+		)
 		const list = entries.length ? `Please remove the following images:\n${entries.join('\n')}` : ''
 		return notRelevantMessage.replace('%GALLERY_IMAGES%', list).trimEnd()
 	},
@@ -64,8 +63,6 @@ export function galleryImageReviewPanel(
 	image: Labrinth.Projects.v3.GalleryItem,
 	imageNumber: number,
 ) {
-	if (!image.id) throw new Error('Gallery image review requires an image ID')
-
 	return panel({
 		parent: 'gallery',
 		title: image.name ?? `Gallery image ${imageNumber}`,

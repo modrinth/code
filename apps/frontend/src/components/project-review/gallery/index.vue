@@ -27,8 +27,8 @@
 					v-for="(item, index) in gallery"
 					:key="item.id ?? item.url"
 					mode="anchored"
-					:target="{ kind: 'gallery-image', key: String(item.id) }"
-					:disabled="item.id === undefined"
+					:target="{ kind: 'gallery-image', key: imageReviewKey(item) ?? '' }"
+					:disabled="imageReviewKey(item) === undefined"
 					as="article"
 					class="flex min-w-0 flex-col overflow-hidden rounded-xl border border-solid border-surface-4"
 				>
@@ -82,10 +82,13 @@
 </template>
 
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
+import { galleryImageReviewKey } from '@modrinth/moderation/src/data/issues/component-builders/gallery-images'
 import { Button, ImageViewerEditor, useFormatDateTime, useVIntl } from '@modrinth/ui'
 import { computed, ref, useTemplateRef } from 'vue'
 
 import { injectProjectReviewPageContext } from '~/providers/project-review'
+import { injectReviewSubmission } from '~/providers/project-review/review-submission'
 
 import ImageViewerActions from '../image-viewer-actions.vue'
 import { projectReviewMessages as messages } from '../messages'
@@ -99,6 +102,9 @@ const formatDateTime = useFormatDateTime({
 })
 const { selection, projectId, gallery, isLoading, error, refresh, pixelated } =
 	injectProjectReviewPageContext()
+const { sendIssuesAsThreadMessage } = injectReviewSubmission()
+const imageReviewKey = (image: Labrinth.Projects.v3.GalleryItem) =>
+	galleryImageReviewKey(image, sendIssuesAsThreadMessage.value)
 const viewer = ref<InstanceType<typeof ImageViewerEditor>>()
 const viewerItems = computed(() =>
 	gallery.value.map((item, index) => ({
