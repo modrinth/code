@@ -5,7 +5,7 @@
 		:aria-pressed="mixed ? 'mixed' : modelValue"
 		:aria-keyshortcuts="keybind"
 		:data-review-keybind="keybind"
-		class="action-toggle !gap-1.5 !rounded-lg !px-2.5 !font-medium [&>svg]:!text-inherit"
+		class="action-toggle !h-auto min-h-8 max-w-full !gap-1.5 !whitespace-normal !rounded-lg !px-2.5 !font-medium [&>svg]:!text-inherit"
 		:class="{
 			'!brightness-100': modelValue,
 			'!text-primary enabled:hover:!brightness-125': !modelValue,
@@ -18,7 +18,7 @@
 		<span v-if="reReview" class="flex shrink-0 items-center text-orange">
 			<TagCategoryRefreshCcwIcon class="size-4" aria-hidden="true" />
 		</span>
-		{{ label }}
+		<span class="min-w-0 [overflow-wrap:anywhere]">{{ label }}</span>
 		<kbd
 			v-if="keybind && showKeybindHint !== false"
 			class="action-toggle-keybind ml-1 flex h-5 min-w-5 shrink-0 items-center justify-center gap-0.5 rounded px-1 font-sans text-[11px] font-medium leading-none"

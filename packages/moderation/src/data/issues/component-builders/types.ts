@@ -146,6 +146,8 @@ export interface ReviewPanelItem {
 
 export interface Panel {
 	icon: FunctionalComponent<SVGAttributes>
+	/** Maximum panel width as a CSS width value. */
+	maxWidth?: string
 	/** Parent panel whose matching controls apply to this item. */
 	parent?: string
 	shown?: WithContext<boolean>

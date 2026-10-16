@@ -119,7 +119,12 @@
 							{{ formatMessage(controlMessages.required) }}
 						</p>
 					</div>
-					<Tooltip v-else :disabled="!control.tooltip" :text="control.tooltip">
+					<Tooltip
+						v-else
+						:disabled="!control.tooltip"
+						:text="control.tooltip"
+						class="min-w-0 max-w-full"
+					>
 						<ActionButton
 							:label="control.label"
 							:keybind="keybinds.get(control)"

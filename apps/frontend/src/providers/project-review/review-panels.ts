@@ -76,6 +76,7 @@ export interface ReviewPanelBinding {
 	projectId: string
 	panel: {
 		icon: Panel['icon']
+		maxWidth?: string
 		title: string | undefined
 		hint: string
 		guidanceUrl: string
@@ -457,6 +458,7 @@ export function createReviewPanels(
 				projectId: projectV3.id,
 				panel: {
 					icon: panel.icon,
+					maxWidth: panel.maxWidth,
 					title: resolveWithContext(panel.title, context),
 					hint: resolveWithContext(panel.hint, context),
 					guidanceUrl: panel.guidanceUrl,

@@ -40,6 +40,8 @@ import { issue, panel, section, toggle } from './component-builders/builders'
 import { issueLocation } from './component-builders/locations'
 import { issueTargets } from './component-builders/targets'
 
+const DISCLOSURES_MAX_WIDTH = '400px'
+
 const disclosureTypes = {
 	ai: 'ai_content',
 	'ai-functionality': 'ai_functionality',
@@ -223,6 +225,7 @@ export const aiDisclosureReviewPanel = panel({
 	hint: 'Has this project accurately disclosed this content?',
 	icon: TriangleAlertIcon,
 	guidanceUrl: 'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892',
+	maxWidth: DISCLOSURES_MAX_WIDTH,
 }).content(
 	toggle({
 		issue: disclosuresIssue,
@@ -320,6 +323,7 @@ export const aiFunctionalityDisclosureReviewPanel = panel({
 	hint: 'Has this project accurately disclosed this content?',
 	icon: TriangleAlertIcon,
 	guidanceUrl: 'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892',
+	maxWidth: DISCLOSURES_MAX_WIDTH,
 }).content(
 	toggle({
 		issue: disclosuresIssue,
@@ -344,6 +348,7 @@ export const adsDisclosureReviewPanel = panel({
 	hint: 'Has this project accurately disclosed this content?',
 	icon: TriangleAlertIcon,
 	guidanceUrl: 'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892',
+	maxWidth: DISCLOSURES_MAX_WIDTH,
 }).content(
 	toggle({
 		issue: disclosuresIssue,
@@ -368,6 +373,7 @@ export const paidFeaturesDisclosureReviewPanel = panel({
 	hint: 'Has this project accurately disclosed this content?',
 	icon: TriangleAlertIcon,
 	guidanceUrl: 'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892',
+	maxWidth: DISCLOSURES_MAX_WIDTH,
 }).content(
 	toggle({
 		issue: disclosuresIssue,
@@ -392,6 +398,7 @@ export const telemetryDisclosureReviewPanel = panel({
 	hint: 'Has this project accurately disclosed this content?',
 	icon: TriangleAlertIcon,
 	guidanceUrl: 'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892',
+	maxWidth: DISCLOSURES_MAX_WIDTH,
 }).content(
 	toggle({
 		issue: disclosuresIssue,
@@ -449,6 +456,7 @@ export const derivativeContentDisclosureReviewPanel = panel({
 	hint: 'Has this project accurately disclosed this content?',
 	icon: TriangleAlertIcon,
 	guidanceUrl: 'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892',
+	maxWidth: DISCLOSURES_MAX_WIDTH,
 }).content(
 	toggle({
 		issue: disclosuresIssue,
@@ -473,6 +481,7 @@ export const photosensitivityDisclosureReviewPanel = panel({
 	hint: 'Has this project accurately disclosed this content?',
 	icon: TriangleAlertIcon,
 	guidanceUrl: 'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892',
+	maxWidth: DISCLOSURES_MAX_WIDTH,
 }).content(
 	toggle({
 		issue: disclosuresIssue,
@@ -497,6 +506,7 @@ export const systemInteractionsDisclosureReviewPanel = panel({
 	hint: 'Has this project accurately disclosed this content?',
 	icon: TriangleAlertIcon,
 	guidanceUrl: 'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892',
+	maxWidth: DISCLOSURES_MAX_WIDTH,
 }).content(
 	toggle({
 		issue: disclosuresIssue,
@@ -521,6 +531,7 @@ export const archiveDisclosureReviewPanel = panel({
 	hint: 'Has this project accurately disclosed this content?',
 	icon: TriangleAlertIcon,
 	guidanceUrl: 'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892',
+	maxWidth: DISCLOSURES_MAX_WIDTH,
 }).content(
 	toggle({
 		issue: disclosuresIssue,

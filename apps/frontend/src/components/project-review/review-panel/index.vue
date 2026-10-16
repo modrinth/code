@@ -13,6 +13,7 @@
 		<Popover
 			v-if="active?.id === id"
 			:anchor="active"
+			:max-width="maxWidth"
 			:title-id="title && !hideTitle ? titleId : undefined"
 			:label="accessibleTitle"
 		>
@@ -62,6 +63,7 @@
 		:aria-label="hideTitle ? accessibleTitle : undefined"
 		class="box-border flex w-full flex-col gap-2.5 text-sm text-primary transition-opacity duration-150"
 		:class="inlineActive ? 'opacity-100' : 'opacity-50'"
+		:style="{ maxWidth }"
 	>
 		<Highlight
 			:active="inlineActive"
@@ -129,6 +131,7 @@ const props = withDefaults(
 	defineProps<{
 		mode: 'anchored' | 'inline'
 		target: ReviewTarget
+		maxWidth?: string
 		as?: 'section' | 'div' | 'article'
 		disabled?: boolean
 		showFindingBadge?: boolean
@@ -184,6 +187,7 @@ watch(
 	{ immediate: true },
 )
 const panel = computed(() => binding.value?.panel)
+const maxWidth = computed(() => props.maxWidth ?? panel.value?.maxWidth)
 const controlsKey = computed(() =>
 	binding.value ? `${binding.value.projectId}:${binding.value.key}` : undefined,
 )
