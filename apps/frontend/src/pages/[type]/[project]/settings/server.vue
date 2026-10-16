@@ -197,7 +197,11 @@
 				</div>
 
 				<div>
-					<CompatibilityCard />
+					<CompatibilityCard
+						:project="projectV3"
+						:save-project="patchProjectV3"
+						:can-edit="hasPermission"
+					/>
 					<ValidationMessage :check="compatibilityValidation" class="mt-2" />
 					<ValidationMessage
 						:check="saveValidation.forField('server-compatibility')"
@@ -237,7 +241,6 @@ import {
 	ConfirmLeaveModal,
 	defineMessages,
 	IconButton,
-	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
 	Input,
@@ -258,8 +261,7 @@ import ValidationMessage from '~/components/ValidationMessage.vue'
 import { useProjectIssueFieldAction } from '~/composables/project-issue-field-action'
 import { useProjectNagMessages } from '~/composables/project-nag-validation'
 import { useProjectSaveValidation } from '~/composables/project-save-validation'
-
-const PING_TIMEOUT_MS = 5000
+import { useJavaServerPing } from '~/providers/manage-server-compatibility-modal'
 
 const { formatMessage, locale } = useVIntl()
 
@@ -338,7 +340,6 @@ const messages = defineMessages({
 	},
 })
 
-const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const { projectV3, currentMember, patchProjectV3 } = injectProjectPageContext()
 
@@ -355,23 +356,12 @@ const bedrockPort = ref(19132)
 const region = ref('')
 const languages = ref([])
 
-const javaPingLoading = ref(false)
-const javaPingResult = ref(null)
-
-const lastPingedAddress = ref('')
-
-const lastPingAddressChanged = computed(() => {
-	return javaAddress.value.trim() !== lastPingedAddress.value
-})
-
-let pingDebounceTimer = null
-
-watch(javaAddress, () => {
-	clearTimeout(pingDebounceTimer)
-	pingDebounceTimer = setTimeout(() => {
-		pingJavaServer()
-	}, 500)
-})
+const {
+	loading: javaPingLoading,
+	result: javaPingResult,
+	addressChanged: lastPingAddressChanged,
+	ping: pingJavaServer,
+} = useJavaServerPing(javaAddress)
 
 const isAdminUser = computed(() => isAdmin(currentMember.value?.user))
 const hasPermission = computed(() => {
@@ -380,35 +370,6 @@ const hasPermission = computed(() => {
 		isAdminUser.value || ((currentMember.value?.permissions ?? 0) & EDIT_DETAILS) === EDIT_DETAILS
 	)
 })
-
-async function pingJavaServer() {
-	const address = javaAddress.value?.trim()
-	if (!address) {
-		javaPingResult.value = null
-		return
-	}
-
-	javaPingLoading.value = true
-	javaPingResult.value = null
-
-	try {
-		await Promise.race([
-			client.labrinth.server_ping_internal.pingMinecraftJava({
-				address,
-				timeout_ms: PING_TIMEOUT_MS,
-			}),
-			new Promise((_, reject) =>
-				setTimeout(() => reject(new Error('Ping timed out')), PING_TIMEOUT_MS),
-			),
-		])
-		javaPingResult.value = { online: true, latency: null }
-	} catch {
-		javaPingResult.value = { online: false, latency: null }
-	} finally {
-		javaPingLoading.value = false
-		lastPingedAddress.value = address
-	}
-}
 
 function initFromProjectV3(v3) {
 	if (!v3) return

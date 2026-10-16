@@ -9,7 +9,8 @@
 </template>
 
 <script setup lang="ts">
-import { injectProjectPageContext, MultiStageModal } from '@modrinth/ui'
+import type { Labrinth } from '@modrinth/api-client'
+import { MultiStageModal } from '@modrinth/ui'
 import type { ComponentExposed } from 'vue-component-type-helpers'
 
 import {
@@ -20,9 +21,15 @@ import {
 
 const modal = useTemplateRef<ComponentExposed<typeof MultiStageModal>>('modal')
 
-const { projectV3 } = injectProjectPageContext()
-const ctx = createServerCompatibilityContext(modal)
+const props = defineProps<{
+	project: Labrinth.Projects.v3.Project | undefined
+	saveProject: (patch: Labrinth.Projects.v3.EditProjectRequest) => Promise<boolean>
+}>()
+const projectV3 = computed(() => props.project)
+const ctx = createServerCompatibilityContext(modal, projectV3, (patch) => props.saveProject(patch))
 provideServerCompatibilityContext(ctx)
+const emit = defineEmits<{ busy: [value: boolean] }>()
+watch(ctx.isSubmitting, (value) => emit('busy', value), { flush: 'sync' })
 
 interface ShowModalOptions {
 	stageId?: string | null

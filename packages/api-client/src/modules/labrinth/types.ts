@@ -1336,7 +1336,7 @@ export namespace Labrinth {
 				environment?: Environment
 
 				minecraft_server?: MinecraftServer
-				minecraft_java_server?: MinecraftJavaServer
+				minecraft_java_server?: Omit<MinecraftJavaServer, 'ping'>
 				minecraft_bedrock_server?: MinecraftBedrockServer
 				[key: string]: unknown
 			}

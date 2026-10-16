@@ -1,5 +1,9 @@
 <template>
 	<Section :heading="formatMessage(messages.serverDetails)" :target="{ kind: 'server' }">
+		<template #right>
+			<EditButton :section="formatMessage(messages.serverDetails)" @click="editModal?.show()" />
+		</template>
+		<EditModal :key="project?.id" ref="editModal" />
 		<dl v-if="project" class="m-0 grid grid-cols-[max-content_minmax(0,1fr)] gap-x-3 gap-y-2.5">
 			<dt class="font-medium">{{ formatMessage(messages.serverAddress) }}</dt>
 			<dd class="m-0 flex items-center gap-1.5 break-all text-primary">
@@ -144,15 +148,18 @@ import {
 } from '@modrinth/ui'
 import { formatVersionsForDisplay } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
-import { computed } from 'vue'
+import { computed, useTemplateRef } from 'vue'
 
 import { versionQueryOptions } from '~/composables/queries/version'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
 import { projectReviewMessages as messages } from '../../messages'
+import EditButton from '../edit/button.vue'
+import EditModal from '../edit/server-details.vue'
 import Section from '../section.vue'
 
 const { project } = injectProjectReviewPageContext()
+const editModal = useTemplateRef<InstanceType<typeof EditModal>>('editModal')
 const client = injectModrinthClient()
 const { formatMessage } = useVIntl()
 const tags = injectTags(null)
