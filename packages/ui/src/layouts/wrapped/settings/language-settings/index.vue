@@ -95,7 +95,8 @@ const messages = defineMessages({
 	},
 	feedbackDescription: {
 		id: 'settings.language.feedback.description',
-		defaultMessage: 'Let our translators know about text in the {platform} that reads wrong.',
+		defaultMessage:
+			'Let the community translators know about text in the {platform} that reads wrong.',
 	},
 	feedbackButton: {
 		id: 'settings.language.feedback.button',

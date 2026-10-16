@@ -155,7 +155,7 @@ const messages = defineMessages({
 	},
 	signInRequired: {
 		id: 'settings.language.feedback.sign-in-required',
-		defaultMessage: 'Sign in to send feedback about translations to our translators.',
+		defaultMessage: 'Sign in to send feedback about translations to the community translators.',
 	},
 	searchDescription: {
 		id: 'settings.language.feedback.search.description',
@@ -195,7 +195,7 @@ const messages = defineMessages({
 	},
 	submitSuccessText: {
 		id: 'settings.language.feedback.success.text',
-		defaultMessage: 'Thank you! Our translators will review your feedback.',
+		defaultMessage: 'Thank you! The community translators will review your feedback.',
 	},
 	submitErrorTitle: {
 		id: 'settings.language.feedback.error.title',

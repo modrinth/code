@@ -6162,7 +6162,7 @@
     "defaultMessage": "Report a translation issue"
   },
   "settings.language.feedback.description": {
-    "defaultMessage": "Let our translators know about text in the {platform} that reads wrong."
+    "defaultMessage": "Let the community translators know about text in the {platform} that reads wrong."
   },
   "settings.language.feedback.details.label": {
     "defaultMessage": "Details"
@@ -6243,13 +6243,13 @@
     "defaultMessage": "Search for text..."
   },
   "settings.language.feedback.sign-in-required": {
-    "defaultMessage": "Sign in to send feedback about translations to our translators."
+    "defaultMessage": "Sign in to send feedback about translations to the community translators."
   },
   "settings.language.feedback.submit": {
     "defaultMessage": "Send feedback"
   },
   "settings.language.feedback.success.text": {
-    "defaultMessage": "Thank you! Our translators will review your feedback."
+    "defaultMessage": "Thank you! The community translators will review your feedback."
   },
   "settings.language.feedback.success.title": {
     "defaultMessage": "Feedback sent"
