@@ -196,9 +196,6 @@ pub enum ErrorKind {
     )]
     InvalidSkinTexture,
 
-    #[error("RPC error: {0}")]
-    RpcError(String),
-
     #[cfg(windows)]
     #[error("Windows error: {0}")]
     WindowsError(#[from] windows_core::Error),
