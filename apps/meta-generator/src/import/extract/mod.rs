@@ -54,3 +54,24 @@ pub async fn extract(app: &AppState, upstreams: Upstreams) -> Result<()> {
     );
     Ok(())
 }
+
+/// Reads each immutable content hash once, retaining first-seen order for errors.
+async fn read_blobs(
+	app: &AppState,
+	hashes: impl IntoIterator<Item = crate::util::Sha256>,
+) -> Result<std::collections::HashMap<crate::util::Sha256, Vec<u8>>> {
+	use futures::{StreamExt, TryStreamExt, stream};
+	let hashes = hashes.into_iter().collect::<indexmap::IndexSet<_>>();
+	stream::iter(hashes)
+		.map(|sha256| async move {
+			let bytes = app
+				.cas
+				.get(sha256)
+				.context(info_span!("reading import blob", %sha256))
+				.await?;
+			Ok((sha256, bytes.to_vec()))
+		})
+		.buffered(app.concurrency.download.get())
+		.try_collect()
+		.await
+}

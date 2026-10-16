@@ -108,6 +108,7 @@ pub async fn extract_catalogs(
             .or_insert(download.sha256);
     }
     // now we make all the loader profiles and collect their libraries
+	let mut selected = Vec::new();
     let mut profiles = Vec::new();
     for group in &groups {
         for version in loaders.values() {
@@ -129,38 +130,38 @@ pub async fn extract_catalogs(
                 );
                 continue;
             };
-            let bytes = app.cas.get(sha256)
-				.context(info_span!("fetching loader profile", loader_version = %version.id, %source))
-				.await?;
-            let profile = from_json_slice::<ProfileMetadata>(&bytes)
-                .context("parsing loader profile")?;
-            let (profile, dependencies) = normalize_profile(
-                profile,
-                template,
-                &group.games,
-                fallback_maven,
-            )
-            .with_context(|| {
-                format!("normalizing profile {} from {source}", version.id)
-            })?;
-            for mut artifact in dependencies {
-                artifact.source =
-                    Some(format!("{source} (profile SHA256 {sha256})"));
-                artifacts
-                    .entry(artifact.coordinate.to_maven_path())
-                    .or_insert(artifact);
-            }
-            profiles.push(SelectedProfile {
-                loader_version: version.id.clone(),
-                stable: version.stable,
-                version_group: group.id.clone().unwrap_or_default(),
-                source_url: source.to_string(),
-                source_sha256: sha256,
-                template: template.to_owned(),
-                metadata: profile,
-            });
+			selected.push((group, version, template, source, sha256));
         }
     }
+	let blobs =
+		super::read_blobs(app, selected.iter().map(|entry| entry.4)).await?;
+	for (group, version, template, source, sha256) in selected {
+		let bytes = &blobs[&sha256];
+		let profile = from_json_slice::<ProfileMetadata>(bytes)
+			.context("parsing loader profile")?;
+		let (profile, dependencies) =
+			normalize_profile(profile, template, &group.games, fallback_maven)
+				.with_context(|| {
+					format!("normalizing profile {} from {source}", version.id)
+				})?;
+		for mut artifact in dependencies {
+			artifact.source =
+				Some(format!("{source} (profile SHA256 {sha256})"));
+			artifacts
+				.entry(artifact.coordinate.to_maven_path())
+				.or_insert(artifact);
+		}
+		profiles.push(SelectedProfile {
+			loader_version: version.id.clone(),
+			stable: version.stable,
+			version_group: group.id.clone().unwrap_or_default(),
+			source_url: source.to_string(),
+			source_sha256: sha256,
+			template: template.to_owned(),
+			metadata: profile,
+		});
+	}
+	drop(blobs);
     validate_groups(&games, &groups)?;
     drop(conn);
 
@@ -207,23 +208,37 @@ pub async fn extract_catalogs(
         .context(info_span!("clearing previous loader profiles", ?loader))
         .await?;
     let num_profiles = profiles.len();
+	let mut batch = model::FabriclikeProfile::create_many();
     for (position, profile) in profiles.into_iter().enumerate() {
-        model::FabriclikeProfile::create()
-            .loader(loader)
-            .version_group(profile.version_group)
-            .loader_version(profile.loader_version)
-            .stable(profile.stable)
-            .position(
-                i32::try_from(position).context("too many loader profiles")?,
-            )
-            .source_url(profile.source_url)
-            .source_sha256(profile.source_sha256)
-            .template(profile.template)
-            .metadata(toasty::Json(profile.metadata))
-            .exec(&mut txn)
-            .context(info_span!("storing extracted loader profile", ?loader))
-            .await?;
+		batch = batch.item(
+			model::FabriclikeProfile::create()
+				.loader(loader)
+				.version_group(profile.version_group)
+				.loader_version(profile.loader_version)
+				.stable(profile.stable)
+				.position(
+					i32::try_from(position)
+						.context("too many loader profiles")?,
+				)
+				.source_url(profile.source_url)
+				.source_sha256(profile.source_sha256)
+				.template(profile.template)
+				.metadata(toasty::Json(profile.metadata)),
+		);
+		if (position + 1).is_multiple_of(100) {
+			std::mem::take(&mut batch)
+				.exec(&mut txn)
+				.context(info_span!(
+					"storing extracted loader profiles",
+					?loader
+				))
+				.await?;
+		}
     }
+	batch
+		.exec(&mut txn)
+		.context(info_span!("storing extracted loader profiles", ?loader))
+		.await?;
     model::FabriclikeCatalog::upsert_by_loader(loader)
         .games(toasty::Json(games.into_values().collect::<Vec<_>>()))
         .groups(toasty::Json(groups))
@@ -332,16 +347,21 @@ async fn download_artifact(
         .context(info_span!("checking Maven artifact CAS hash"))
         .await?;
     drop(conn);
-    if let Some(existing) = existing.first() {
-        let expected_sha256 = existing.sha256;
-        app.cas.get(expected_sha256)
-            .context(info_span!("fetching cached Maven artifact", sha256 = %expected_sha256, coordinate = %artifact.coordinate))
-            .await?;
-        return Ok(FabriclikeStoredArtifact {
-            artifact,
-            sha256: expected_sha256,
-        });
-    }
+	let expected_sha256 = expected_sha256.or_else(|| existing.first().map(|blob| blob.sha256));
+	if let Some(existing) = existing.first() {
+		match app.cas.get(existing.sha256).await {
+			Ok(_) => {
+				return Ok(FabriclikeStoredArtifact {
+					artifact,
+					sha256: existing.sha256,
+				});
+			}
+			Err(error) => {
+				warn!(%error, sha256 = %existing.sha256, coordinate = %artifact.coordinate,
+					"cached Maven artifact unavailable; restoring from upstream");
+			}
+		}
+	}
 
     let bytes = async {
         app.http

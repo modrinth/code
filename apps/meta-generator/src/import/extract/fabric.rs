@@ -50,15 +50,11 @@ pub async fn extract(app: &AppState) -> Result<()> {
     let repository = Url::parse(crate::import::fabric::MAVEN_URL)?;
     let mut catalogs = Vec::new();
     let mut games = IndexSet::new();
+	let blobs =
+		super::read_blobs(app, rows.iter().map(|row| row.sha256)).await?;
     for row in rows {
-        let bytes = app
-            .cas
-            .get(row.sha256)
-            .context(
-                info_span!("fetching Fabric catalog", sha256 = %row.sha256),
-            )
-            .await?;
-        let catalog = from_json_slice::<fabric::Catalog>(&bytes)
+		let bytes = &blobs[&row.sha256];
+		let catalog = from_json_slice::<fabric::Catalog>(bytes)
             .context("parsing Fabric catalog")?;
 
         for game in &catalog.game {
@@ -84,25 +80,25 @@ pub async fn extract(app: &AppState) -> Result<()> {
                     stable: loader.stable,
                 })
                 .collect(),
-            mappings:
-                catalog
-                    .intermediary
-                    .into_iter()
-                    .map(|mapping| Artifact {
-                        coordinate: mapping.maven,
-                        repository: repository.clone(),
-                        source: Some(format!(
-                            "{} (catalog SHA256 {})",
-                            fabric::CATALOG_URL,
-                            row.sha256
-                        )),
-                        repository_source:
-                            "catalog intermediary: loader Maven fallback"
-                                .to_owned(),
-                    })
-                    .collect(),
+			mappings: catalog
+				.intermediary
+				.into_iter()
+				.map(|mapping| Artifact {
+					coordinate: mapping.maven,
+					repository: repository.clone(),
+					source: Some(format!(
+						"{} (catalog SHA256 {})",
+						fabric::CATALOG_URL,
+						row.sha256
+					)),
+					repository_source:
+						"catalog intermediary: loader Maven fallback".to_owned(),
+				})
+				.collect(),
         });
     }
+
+	drop(blobs);
 
     // setup version groups
     // see README.md on what version groups are and why we need them

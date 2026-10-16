@@ -1,5 +1,5 @@
 use std::{
-	collections::HashMap,
+	collections::{BTreeMap, HashMap},
 	sync::atomic::{AtomicUsize, Ordering},
 };
 
@@ -42,7 +42,7 @@ pub async fn export(
 		.map(|game| (game.id.clone(), game))
 		.collect();
 	let groups = catalog.groups.0;
-	let artifacts = catalog.artifacts.0;
+	let artifacts = deduplicate_artifacts(catalog.artifacts.0)?;
 	let public_maven = app.public_blobs.url_for("maven/");
 	let mut profiles = Vec::with_capacity(rows.len());
 	for row in rows {
@@ -76,10 +76,18 @@ pub async fn export(
 				.context("serializing loader profile")?,
 		});
 	}
-	let profile_files = profiles
-		.iter()
-		.map(|profile| (profile.path.clone(), profile.json.clone()))
-		.collect::<Vec<_>>();
+	let mut profile_files = BTreeMap::new();
+	for profile in &profiles {
+		if let Some(existing) = profile_files.get(&profile.path) {
+			ensure!(
+				existing == &profile.json,
+				"conflicting loader profiles at {}",
+				profile.path
+			);
+		} else {
+			profile_files.insert(profile.path.clone(), profile.json.clone());
+		}
+	}
 	let manifest = make_manifest(games, &groups, profiles)?;
 	let json =
 		serde_json::to_vec(&manifest).context("serializing loader manifest")?;
@@ -105,16 +113,12 @@ pub async fn export(
 		.context(info_span!("publishing loader dependencies"))
 		.await?;
 	// write processed loader profiles
-	for (path, data) in &profile_files {
-		super::latch(
-			&mut status,
-			app.public_blobs
-				.put(path, data, ContentType::Json)
-				.context(info_span!("writing loader profile", %path))
-				.await?,
-		);
-	}
-	info!(num_profiles = profile_files.len(), "wrote loader profiles");
+	let num_profiles = profile_files.len();
+	super::latch(
+		&mut status,
+		super::publish_json_files(app, profile_files).await?,
+	);
+	info!(num_profiles, "wrote loader profiles");
 	// write manifest (overall catalog), after all referenced files are uploaded
 	let path = match loader {
 		FabriclikeLoader::Fabric => {
@@ -194,6 +198,26 @@ pub async fn publish_artifact(
         .put(&stored.artifact.coordinate, &bytes)
         .context(info_span!("publishing Maven artifact", coordinate = %stored.artifact.coordinate))
         .await
+}
+
+fn deduplicate_artifacts(
+	artifacts: impl IntoIterator<Item = FabriclikeStoredArtifact>,
+) -> Result<Vec<FabriclikeStoredArtifact>> {
+	let mut paths = BTreeMap::<String, FabriclikeStoredArtifact>::new();
+	for stored in artifacts {
+		let path = stored.artifact.coordinate.to_maven_path();
+		if let Some(existing) = paths.get(&path) {
+			ensure!(
+				existing.sha256 == stored.sha256,
+				"conflicting Maven artifacts at {path}: {} and {}",
+				existing.sha256,
+				stored.sha256
+			);
+		} else {
+			paths.insert(path, stored);
+		}
+	}
+	Ok(paths.into_values().collect())
 }
 
 struct ProfileExport {

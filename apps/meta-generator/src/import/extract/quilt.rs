@@ -52,13 +52,11 @@ pub async fn extract(app: &AppState) -> Result<()> {
     let repository = Url::parse(quilt::MAVEN_URL)?;
     let mut games = IndexMap::new();
     let mut catalogs = Vec::with_capacity(rows.len());
+	let blobs =
+		super::read_blobs(app, rows.iter().map(|row| row.sha256)).await?;
     for row in rows {
-        let bytes = app
-            .cas
-            .get(row.sha256)
-            .context(info_span!("fetching Quilt catalog", sha256 = %row.sha256))
-            .await?;
-        let catalog = from_json_slice::<quilt::Catalog>(&bytes)
+		let bytes = &blobs[&row.sha256];
+		let catalog = from_json_slice::<quilt::Catalog>(bytes)
             .context("parsing Quilt catalog")?;
 
         for game in &catalog.game {
@@ -93,6 +91,8 @@ pub async fn extract(app: &AppState) -> Result<()> {
             mappings: Vec::new(),
         });
     }
+	drop(blobs);
+
     // older loaders may only have been downloaded with an older template;
     // keep those templates as fallbacks, within the same version group
     let mut historical_templates: IndexMap<String, IndexMap<String, ()>> =

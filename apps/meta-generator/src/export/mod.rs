@@ -2,11 +2,15 @@
 //! App.
 
 use anyhow::Result;
+use futures::{StreamExt, TryStreamExt, stream};
 use tracing::{info, info_span};
 use tracing_anyhow::FutureContext;
 
 use crate::{
-    AppState, store::PutStatus, upstream::Upstreams, util::ErrorAccumulator,
+	AppState,
+	store::{ContentType, PutStatus},
+	upstream::Upstreams,
+	util::ErrorAccumulator,
 };
 
 mod fabric;
@@ -67,6 +71,24 @@ pub async fn run(app: AppState, upstreams: Upstreams) -> Result<()> {
     }
 
     errors.finish_into_result()
+}
+
+async fn publish_json_files(
+	app: &AppState,
+	files: impl IntoIterator<Item = (String, Vec<u8>)>,
+) -> Result<PutStatus> {
+	stream::iter(files.into_iter().map(|(path, data)| async move {
+		app.public_blobs
+			.put(&path, &data, ContentType::Json)
+			.context(info_span!("writing JSON to blob store", %path))
+			.await
+	}))
+	.buffer_unordered(app.concurrency.download.get())
+	.try_fold(PutStatus::Unchanged, |mut status, changed| async move {
+		latch(&mut status, changed);
+		Ok(status)
+	})
+	.await
 }
 
 fn latch(status: &mut PutStatus, new: PutStatus) {

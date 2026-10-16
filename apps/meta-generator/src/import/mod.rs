@@ -20,9 +20,9 @@ pub async fn run(app: AppState, upstreams: Upstreams) -> Result<()> {
     let mut failed = [
         (upstreams.mojang, completed.mojang, "Mojang"),
         (upstreams.fabric, completed.fabric, "Fabric"),
+        (upstreams.quilt, completed.quilt, "Quilt"),
         (upstreams.forge, completed.forge, "Forge"),
         (upstreams.neoforge, completed.neoforge, "NeoForge"),
-        (upstreams.quilt, completed.quilt, "Quilt"),
     ]
     .into_iter()
     .filter(|(selected, completed, _)| *selected && !completed)

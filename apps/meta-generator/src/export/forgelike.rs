@@ -190,7 +190,7 @@ pub async fn export(app: &AppState, upstreams: Upstreams) -> Result<PutStatus> {
 				}
 				anyhow::Ok(changed)
 			})
-			.try_buffer_unordered(app.concurrency.extract_files.get())
+			.try_buffer_unordered(app.concurrency.download.get())
 			.try_fold(
 				PutStatus::Unchanged,
 				|mut status, artifact_status| async move {
@@ -205,14 +205,10 @@ pub async fn export(app: &AppState, upstreams: Upstreams) -> Result<PutStatus> {
 	);
 
 	// publish profiles before the catalogs which reference them
-	for (path, json) in profiles {
-		let changed = app
-			.public_blobs
-			.put(&path, &json, ContentType::Json)
-			.context(info_span!("writing Forge-like profile", %path))
-			.await?;
-		super::latch(&mut status, changed);
-	}
+	super::latch(
+		&mut status,
+		super::publish_json_files(app, profiles).await?,
+	);
 	for (path, json) in catalogs {
 		let changed = app
 			.public_blobs

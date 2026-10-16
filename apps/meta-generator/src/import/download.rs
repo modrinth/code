@@ -81,6 +81,15 @@ pub async fn download_from_upstreams(
             download_succeeded(result, &cx.errors, errors_before);
     }
 
+    if upstreams.quilt {
+        let errors_before = cx.errors.len();
+        let result = quilt::download(&mut cx)
+            .context(info_span!("downloading Quilt upstream"))
+            .await;
+        completed.quilt = download_succeeded(result, &cx.errors, errors_before);
+    }
+
+    // do Forgelikes last since we have to download a lot of installers
     if upstreams.neoforge {
         let errors_before = cx.errors.len();
         let result = neoforge::download(&mut cx)
@@ -90,15 +99,6 @@ pub async fn download_from_upstreams(
             download_succeeded(result, &cx.errors, errors_before);
     }
 
-    if upstreams.quilt {
-        let errors_before = cx.errors.len();
-        let result = quilt::download(&mut cx)
-            .context(info_span!("downloading Quilt upstream"))
-            .await;
-        completed.quilt = download_succeeded(result, &cx.errors, errors_before);
-    }
-
-    // do Forge last since we have to download a lot of installers
     if upstreams.forge {
         let errors_before = cx.errors.len();
         let result = forge::download(&mut cx)

@@ -1,6 +1,6 @@
 use anyhow::{Result, bail, ensure};
 use minecraft_meta_manifest::minecraft;
-use tracing::{debug, info, info_span};
+use tracing::{info, info_span};
 use tracing_anyhow::FutureContext;
 
 use crate::{
@@ -28,6 +28,7 @@ pub async fn export(app: &AppState) -> Result<PutStatus> {
 		.exec(&mut conn)
 		.context(info_span!("fetching extracted Minecraft versions"))
 		.await?;
+	drop(conn);
 	ensure!(
 		!rows.is_empty(),
 		"no extracted Minecraft versions; run Mojang extraction before exporting"
@@ -111,26 +112,15 @@ pub async fn export(app: &AppState) -> Result<PutStatus> {
 	let data = to_json_string(&uber_catalog);
 
 	// write processed version manifests
-	let mut status = PutStatus::Unchanged;
 	let num_total = exports.len();
-	for (index, export) in exports.iter().enumerate() {
-		let game_version = &export.version.id;
-		let path = &export.path;
-		let changed = app
-			.public_blobs
-			.put(path, export.json.as_bytes(), ContentType::Json)
-			.context(
-				info_span!("writing manifest to blob store", %game_version, %path),
-			)
-			.await?;
-		super::latch(&mut status, changed);
-		debug!(%path, "wrote version manifest to blob store");
-
-		let num_done = index + 1;
-		if num_done.is_multiple_of(100) || num_done == num_total {
-			info!("wrote {num_done}/{num_total} version manifests");
-		}
-	}
+	let mut status = super::publish_json_files(
+		app,
+		exports
+			.into_iter()
+			.map(|export| (export.path, export.json.into_bytes())),
+	)
+	.await?;
+	info!(num_profiles = num_total, "wrote version manifests");
 
 	// write manifest (uber catalog)
 	let path = format!("minecraft/v{FORMAT_VERSION}/manifest.json");

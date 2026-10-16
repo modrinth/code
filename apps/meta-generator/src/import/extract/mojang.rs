@@ -42,22 +42,18 @@ pub async fn extract(app: &AppState) -> Result<()> {
 
     // read each catalog from its blob in the store;
     // preserve query order while reading concurrently
-    let catalogs = stream::iter(rows)
-        .map(|row| async move {
-            let bytes = app
-                .cas
-                .get(row.sha256)
-                .context(
-                    info_span!("fetching Mojang catalog", sha256 = %row.sha256),
-                )
-                .await?;
-            let catalog = from_json_slice::<mojang::Catalog>(&bytes)
-                .context("parsing Mojang catalog")?;
+	let blobs =
+		super::read_blobs(app, rows.iter().map(|row| row.sha256)).await?;
+	let catalogs = rows
+		.into_iter()
+		.map(|row| {
+			let catalog =
+				from_json_slice::<mojang::Catalog>(&blobs[&row.sha256])
+					.context("parsing Mojang catalog")?;
             anyhow::Ok((row.sha256, catalog))
         })
-        .buffered(app.concurrency.download.get())
-        .try_collect::<Vec<_>>()
-        .await?;
+		.collect::<Result<Vec<_>>>()?;
+	drop(blobs);
     let candidate_sha1s = catalogs
         .iter()
         .flat_map(|(_, catalog)| {
@@ -66,36 +62,47 @@ pub async fn extract(app: &AppState) -> Result<()> {
         .collect::<HashSet<_>>()
         .into_iter()
         .collect::<Vec<_>>();
-    let available_sha1s = model::BlobHash::all()
-        .select(model::BlobHash::fields().sha1())
+	let matching_hashes = model::BlobHash::all()
         .filter(model::BlobHash::fields().sha1().in_list(candidate_sha1s))
         .exec(&mut conn)
         .context(info_span!("fetching available version manifest hashes"))
-        .await?
-        .into_iter()
-        .collect::<HashSet<_>>();
+		.await?;
+	let mut hashes_by_sha1: HashMap<Sha1, Vec<Sha256>> = HashMap::new();
+	for hash in matching_hashes {
+		hashes_by_sha1
+			.entry(hash.sha1)
+			.or_default()
+			.push(hash.sha256);
+	}
+	let available_sha1s = hashes_by_sha1.keys().copied().collect();
     let (latest, versions) = select_versions(catalogs, &available_sha1s)?;
     info!("found {} unique versions", versions.len());
 
     // now we make all the version manifests;
     // finish reading and patching before changing any selected rows
     let num_total = versions.len();
-    let mut extracted = Vec::with_capacity(num_total);
-    for (source_catalog_sha256, catalog_entry) in versions {
-        let (source_manifest_sha256, manifest) = make_version_manifest(&mut conn, &app.cas, &catalog_entry)
+	let mut num_done = 0usize;
+	let extracted = stream::iter(versions)
+        .map(|(source_catalog_sha256, catalog_entry)| {
+            let hashes_by_sha1 = &hashes_by_sha1;
+            async move {
+                let (source_manifest_sha256, manifest) = make_version_manifest(
+                    hashes_by_sha1, &app.cas, &catalog_entry,
+                )
 			.context(info_span!("extracting version manifest", version = %catalog_entry.id, %source_catalog_sha256))
 			.await?;
-        extracted.push((
-            source_catalog_sha256,
-            source_manifest_sha256,
-            catalog_entry,
-            manifest,
-        ));
-        let num_done = extracted.len();
+                anyhow::Ok((source_catalog_sha256, source_manifest_sha256, catalog_entry, manifest))
+            }
+        })
+        .buffered(app.concurrency.download.get())
+        .inspect_ok(|_| {
+            num_done += 1;
         if num_done.is_multiple_of(100) || num_done == num_total {
             info!("extracted {num_done}/{num_total} version manifests");
         }
-    }
+        })
+        .try_collect::<Vec<_>>()
+        .await?;
     info!("inserting into database");
 
     // write the selected metadata together, so a failed extraction doesn't
@@ -209,19 +216,15 @@ fn select_versions(
 /// - patched manifest hash
 /// - patched manifest
 async fn make_version_manifest(
-    conn: &mut toasty::Connection,
+	hashes_by_sha1: &HashMap<Sha1, Vec<Sha256>>,
     cas: &BlobCas,
     version: &mojang::Version,
 ) -> Result<(Sha256, mojang::VersionManifest)> {
-    let matching_hashes = model::BlobHash::all()
-        .select(model::BlobHash::fields().sha256())
-        .filter(model::BlobHash::fields().sha1().eq(version.sha1))
-        .exec(conn)
-        .context(
-            info_span!("resolving version manifest hash", sha1 = %version.sha1),
-        )
-        .await?;
-    let sha256 = match matching_hashes.as_slice() {
+	let matching_hashes = hashes_by_sha1
+		.get(&version.sha1)
+		.map(Vec::as_slice)
+		.unwrap_or_default();
+	let sha256 = match matching_hashes {
         [sha256] => *sha256,
         [] => bail!(
             "no stored version manifest for {} with SHA-1 {}",
