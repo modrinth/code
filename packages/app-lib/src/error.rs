@@ -1,4 +1,5 @@
 //! Theseus error type
+use crate::data::ModLoader;
 use crate::util;
 use crate::util::io::IOError;
 use crate::util::jre::JREError;
@@ -229,6 +230,9 @@ pub enum ErrorKind {
 
     #[error("Login canceled")]
     LoginCanceled,
+
+    #[error("No loader version selected for {}", .loader.as_str())]
+    NoLoaderVersion { loader: ModLoader },
 }
 
 fn format_duration(duration: Duration) -> String {
@@ -269,6 +273,7 @@ impl ErrorKind {
             Self::HashError(_, _) => "hash_error",
             Self::LoginCanceled => "login_canceled",
             Self::NoCredentialsError => "not_logged_in",
+            Self::NoLoaderVersion { .. } => "no_loader_version",
             Self::LauncherError(_) => "launcher_error",
             Self::JREError(_) => "java_error",
             Self::NoValueFor(_) | Self::MetadataError(_) => "metadata_error",
