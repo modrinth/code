@@ -737,6 +737,14 @@ export const projectReviewMessages = defineMessages({
 		id: 'moderation.project-review.emptyDependencies',
 		defaultMessage: 'No dependencies',
 	},
+	searchDependencies: {
+		id: 'moderation.project-review.searchDependencies',
+		defaultMessage: 'Search dependencies…',
+	},
+	noMatchingDependencies: {
+		id: 'moderation.project-review.noMatchingDependencies',
+		defaultMessage: 'No matching dependencies',
+	},
 	listed: {
 		id: 'moderation.project-review.listed',
 		defaultMessage: 'Listed',

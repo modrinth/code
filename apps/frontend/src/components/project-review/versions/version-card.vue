@@ -213,8 +213,17 @@
 								"
 								:inert="version.dependencies.length > 6 && !dependenciesOpen"
 							>
-								<div class="min-h-0 overflow-hidden">
-									<div class="pb-2.5">
+								<div class="-mx-1 min-h-0 overflow-hidden px-1">
+									<Input
+										v-if="version.dependencies.length > 8"
+										v-model="dependencySearch"
+										:icon="SearchIcon"
+										:placeholder="formatMessage(messages.searchDependencies)"
+										:aria-label="formatMessage(messages.searchDependencies)"
+										wrapper-class="mb-2 mt-1 w-full"
+										clearable
+									/>
+									<div class="mb-2.5 max-h-[360px] overflow-y-auto">
 										<p v-if="!version.dependencies.length" class="m-0 text-secondary">
 											{{ formatMessage(messages.emptyDependencies) }}
 										</p>
@@ -228,8 +237,11 @@
 											}}</Button>
 										</div>
 										<div v-else class="flex flex-col gap-1.5">
+											<p v-if="!filteredDependencies.length" class="m-0 text-secondary">
+												{{ formatMessage(messages.noMatchingDependencies) }}
+											</p>
 											<div
-												v-for="(context, index) in dependencies"
+												v-for="(context, index) in filteredDependencies"
 												:key="index"
 												class="min-w-0 rounded-lg bg-surface-1 px-3 py-2"
 											>
@@ -278,11 +290,11 @@
 							<template #title>
 								<span class="text-primary">{{ formatMessage(messages.changelog) }}</span>
 							</template>
-							<div class="mb-4">
+							<div class="mb-1 max-h-[360px] overflow-y-auto">
 								<ProjectPageDescription :description="detailQuery.data.value.changelog" />
 							</div>
 						</Accordion>
-						<div v-else class="mb-4">
+						<div v-else class="mb-1">
 							<h3 class="m-0 py-2 text-sm font-medium text-primary">
 								{{ formatMessage(messages.changelog) }}
 							</h3>
@@ -314,6 +326,7 @@ import {
 	ExternalIcon,
 	MoreVerticalIcon,
 	ScanEyeIcon,
+	SearchIcon,
 	SpinnerIcon,
 } from '@modrinth/assets'
 import {
@@ -330,6 +343,7 @@ import {
 	fileTypeMessages,
 	injectModrinthClient,
 	injectTags,
+	Input,
 	ProjectPageDescription,
 	TagItem,
 	TagTagItem,
@@ -388,7 +402,8 @@ const loadingSlicerButton = computed(() => {
 		? request.button
 		: undefined
 })
-const dependenciesOpen = ref(false)
+const dependenciesOpen = ref(true)
+const dependencySearch = ref('')
 const card = ref<HTMLElement>()
 const dependenciesSection = ref<HTMLElement>()
 const detailsAccordion = ref<InstanceType<typeof Accordion>>()
@@ -485,6 +500,20 @@ const dependencies = computed<DependencyContext[]>(() =>
 			return typeDifference || dependencyName(a).localeCompare(dependencyName(b))
 		}),
 )
+const filteredDependencies = computed(() => {
+	const search = dependencySearch.value.trim().toLocaleLowerCase()
+	if (props.version.dependencies.length <= 8 || !search) return dependencies.value
+	return dependencies.value.filter((context) =>
+		[
+			dependencyName(context),
+			context.project?.slug,
+			context.dependency.file_name,
+			context.dependency.project_id,
+			context.dependency.version_id,
+			context.version?.version_number,
+		].some((value) => value?.toLocaleLowerCase().includes(search)),
+	)
+})
 type VersionFile = Labrinth.Versions.v3.Version['files'][number]
 
 function openInSlicer(urls: string[], button: string) {
