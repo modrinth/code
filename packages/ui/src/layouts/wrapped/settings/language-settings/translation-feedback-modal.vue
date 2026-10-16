@@ -228,6 +228,10 @@ const messages = defineMessages({
 		id: 'settings.language.feedback.error.already-reported',
 		defaultMessage: 'You already reported this text recently.',
 	},
+	limitReachedText: {
+		id: 'settings.language.feedback.error.limit-reached',
+		defaultMessage: "You've sent a lot of feedback today. Please try again later.",
+	},
 })
 
 const kindMessages = defineMessages({
@@ -361,12 +365,16 @@ async function submit(): Promise<void> {
 		})
 		modal.value?.hide()
 	} catch (error) {
-		const alreadyReported = error instanceof ModrinthApiError && error.statusCode === 409
+		const statusCode = error instanceof ModrinthApiError ? error.statusCode : undefined
 		notificationManager.addNotification({
 			type: 'error',
 			title: formatMessage(messages.submitErrorTitle),
 			text: formatMessage(
-				alreadyReported ? messages.alreadyReportedText : messages.submitErrorText,
+				statusCode === 409
+					? messages.alreadyReportedText
+					: statusCode === 429
+						? messages.limitReachedText
+						: messages.submitErrorText,
 			),
 		})
 	} finally {

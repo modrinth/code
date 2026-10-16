@@ -7,6 +7,8 @@ use crate::util::crowdin::{CrowdinClient, IssueType};
 use crate::util::error::Context as _;
 use crate::util::ratelimit::{AsyncRateLimiter, GCRAParameters};
 use actix_web::{HttpRequest, post, web};
+use ariadne::ids::UserId;
+use chrono::Utc;
 use eyre::{Result, eyre};
 use redis::{AsyncCommands, ExistenceCheck, SetExpiry, SetOptions};
 use serde::Deserialize;
@@ -16,6 +18,9 @@ use xredis::RedisPool;
 
 const REPORT_NAMESPACE: &str = "translation_feedback:v1";
 const REPORT_EXPIRY_SECONDS: u64 = 60 * 60 * 24 * 7;
+const DAILY_LIMIT_NAMESPACE: &str = "translation_feedback_daily:v1";
+const DAILY_LIMIT_EXPIRY_SECONDS: i64 = 60 * 60 * 24;
+const DAILY_LIMIT: u64 = 5;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(translation_feedback_create);
@@ -169,6 +174,16 @@ pub async fn translation_feedback_create(
         )));
     }
 
+    let reports_today = count_daily_report(&redis, user.id)
+        .await
+        .wrap_internal_err("counting daily translation feedback")?;
+    if reports_today > DAILY_LIMIT {
+        release_report(&redis, &report_key).await;
+        return Err(ApiError::RateLimit(eyre!(
+            "daily translation feedback limit reached"
+        )));
+    }
+
     if let Err(err) = crowdin
         .create_issue(
             string_id,
@@ -178,15 +193,30 @@ pub async fn translation_feedback_create(
         )
         .await
     {
-        if let Err(err) = release_report(&redis, &report_key).await {
-            tracing::warn!(
-                "Failed to release translation feedback claim: {err:#}"
-            );
-        }
+        release_report(&redis, &report_key).await;
         return Err(err).wrap_internal_err("filing translation feedback");
     }
 
     Ok(())
+}
+
+/// Counts a report towards the user's daily limit, returning how many reports
+/// they have sent today (UTC).
+async fn count_daily_report(redis: &RedisPool, user_id: UserId) -> Result<u64> {
+    let key = redis.key().entity(
+        DAILY_LIMIT_NAMESPACE,
+        format!("{user_id}:{}", Utc::now().date_naive()),
+    );
+    let mut conn = redis.connect().await?;
+    let (count,): (u64,) = redis::pipe()
+        .atomic()
+        .incr(&key, 1)
+        .expire(&key, DAILY_LIMIT_EXPIRY_SECONDS)
+        .ignore()
+        .query_async(&mut conn)
+        .await?;
+
+    Ok(count)
 }
 
 /// Marks a string as reported by a user in a language, returning `false` if
@@ -201,8 +231,13 @@ async fn claim_report(redis: &RedisPool, key: &str) -> Result<bool> {
     Ok(claimed.is_some())
 }
 
-async fn release_report(redis: &RedisPool, key: &str) -> Result<()> {
-    redis.connect().await?.delete(key).await
+/// Releases a claim from [`claim_report`] so the user can report the string
+/// again.
+async fn release_report(redis: &RedisPool, key: &str) {
+    let result = async { redis.connect().await?.delete(key).await }.await;
+    if let Err(err) = result {
+        tracing::warn!("Failed to release translation feedback claim: {err:#}");
+    }
 }
 
 fn issue_text(feedback: &TranslationFeedback, username: &str) -> String {

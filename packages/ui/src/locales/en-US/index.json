@@ -6173,6 +6173,9 @@
   "settings.language.feedback.error.already-reported": {
     "defaultMessage": "You already reported this text recently."
   },
+  "settings.language.feedback.error.limit-reached": {
+    "defaultMessage": "You've sent a lot of feedback today. Please try again later."
+  },
   "settings.language.feedback.error.text": {
     "defaultMessage": "Something went wrong. Please try again later."
   },
