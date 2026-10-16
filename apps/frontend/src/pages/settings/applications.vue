@@ -245,6 +245,9 @@
 			</div>
 		</div>
 	</div>
+	<p v-if="!usersApps || usersApps.length === 0" class="offline text-center">
+		{{ formatMessage(messages.noApplications) }}
+	</p>
 </template>
 <script setup>
 import { EditIcon, PlusIcon, SaveIcon, TrashIcon, UploadIcon, XIcon } from '@modrinth/assets'
@@ -375,6 +378,10 @@ const messages = defineMessages({
 		id: 'settings.applications.description.intro',
 		defaultMessage:
 			"Applications can be used to authenticate Modrinth's users with your products. For more information, see <docs-link>Modrinth's API documentation</docs-link>.",
+	},
+	noApplications: {
+		id: 'settings.applications.noapplications',
+		defaultMessage: "You don't have any applications yet.",
 	},
 	aboutLabel: {
 		id: 'settings.applications.about',

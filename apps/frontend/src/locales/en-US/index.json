@@ -5306,6 +5306,9 @@
   "settings.applications.modal.header": {
     "message": "Application information"
   },
+  "settings.applications.noapplications": {
+    "message": "You don't have any applications yet."
+  },
   "settings.applications.notification.icon-updated.description": {
     "message": "Your application icon has been updated."
   },
