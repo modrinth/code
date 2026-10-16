@@ -6161,14 +6161,14 @@
   "settings.language.feedback.button": {
     "defaultMessage": "Report a translation issue"
   },
-  "settings.language.feedback.comment.label": {
-    "defaultMessage": "Additional details"
-  },
-  "settings.language.feedback.comment.placeholder": {
-    "defaultMessage": "Where did you see this text, and what should translators know?"
-  },
   "settings.language.feedback.description": {
     "defaultMessage": "Let our translators know about text in the {platform} that reads wrong."
+  },
+  "settings.language.feedback.details.label": {
+    "defaultMessage": "Details"
+  },
+  "settings.language.feedback.details.placeholder": {
+    "defaultMessage": "Where did you see this text, and what should translators know?"
   },
   "settings.language.feedback.email-verification-required.text": {
     "defaultMessage": "You must verify your email before sending translation feedback."
@@ -6253,12 +6253,6 @@
   },
   "settings.language.feedback.success.title": {
     "defaultMessage": "Feedback sent"
-  },
-  "settings.language.feedback.suggestion.label": {
-    "defaultMessage": "Suggested translation"
-  },
-  "settings.language.feedback.suggestion.placeholder": {
-    "defaultMessage": "How should this text read?"
   },
   "settings.language.feedback.title": {
     "defaultMessage": "Spotted a translation mistake?"

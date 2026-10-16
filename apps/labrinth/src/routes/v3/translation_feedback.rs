@@ -84,9 +84,7 @@ pub struct TranslationFeedback {
     pub key: String,
     pub kind: TranslationFeedbackKind,
     #[validate(length(max = 2000))]
-    pub suggestion: Option<String>,
-    #[validate(length(max = 2000))]
-    pub comment: Option<String>,
+    pub details: Option<String>,
 }
 
 /// Send feedback about a translated string to the translators.
@@ -270,26 +268,13 @@ fn issue_text(
         feedback.kind.label(),
     );
 
-    if let Some(suggestion) = feedback
-        .suggestion
+    if let Some(details) = feedback
+        .details
         .as_deref()
         .map(str::trim)
         .filter(|s| !s.is_empty())
     {
-        let _ = write!(
-            text,
-            "\nSuggested translation: {}",
-            escape_mentions(suggestion)
-        );
-    }
-
-    if let Some(comment) = feedback
-        .comment
-        .as_deref()
-        .map(str::trim)
-        .filter(|s| !s.is_empty())
-    {
-        let _ = write!(text, "\nComment: {}", escape_mentions(comment));
+        let _ = write!(text, "\nDetails: {}", escape_mentions(details));
     }
 
     text

@@ -62,25 +62,14 @@
 				</p>
 			</div>
 			<div class="flex flex-col gap-2">
-				<label for="translation-feedback-suggestion" class="font-semibold text-contrast">
-					{{ formatMessage(messages.suggestionLabel) }}
+				<label for="translation-feedback-details" class="font-semibold text-contrast">
+					{{ formatMessage(messages.detailsLabel) }}
 				</label>
 				<Textarea
-					id="translation-feedback-suggestion"
-					v-model="suggestion"
+					id="translation-feedback-details"
+					v-model="details"
 					:maxlength="MAX_TEXT_LENGTH"
-					:placeholder="formatMessage(messages.suggestionPlaceholder)"
-				/>
-			</div>
-			<div class="flex flex-col gap-2">
-				<label for="translation-feedback-comment" class="font-semibold text-contrast">
-					{{ formatMessage(messages.commentLabel) }}
-				</label>
-				<Textarea
-					id="translation-feedback-comment"
-					v-model="comment"
-					:maxlength="MAX_TEXT_LENGTH"
-					:placeholder="formatMessage(messages.commentPlaceholder)"
+					:placeholder="formatMessage(messages.detailsPlaceholder)"
 				/>
 			</div>
 		</div>
@@ -188,20 +177,12 @@ const messages = defineMessages({
 		id: 'settings.language.feedback.kind.label',
 		defaultMessage: "What's wrong?",
 	},
-	suggestionLabel: {
-		id: 'settings.language.feedback.suggestion.label',
-		defaultMessage: 'Suggested translation',
+	detailsLabel: {
+		id: 'settings.language.feedback.details.label',
+		defaultMessage: 'Details',
 	},
-	suggestionPlaceholder: {
-		id: 'settings.language.feedback.suggestion.placeholder',
-		defaultMessage: 'How should this text read?',
-	},
-	commentLabel: {
-		id: 'settings.language.feedback.comment.label',
-		defaultMessage: 'Additional details',
-	},
-	commentPlaceholder: {
-		id: 'settings.language.feedback.comment.placeholder',
+	detailsPlaceholder: {
+		id: 'settings.language.feedback.details.placeholder',
 		defaultMessage: 'Where did you see this text, and what should translators know?',
 	},
 	submitButton: {
@@ -294,8 +275,7 @@ const modal = ref<InstanceType<typeof NewModal>>()
 const query = ref('')
 const selected = ref<MessageEntry | null>(null)
 const kind = ref<Kind>('incorrect')
-const suggestion = ref('')
-const comment = ref('')
+const details = ref('')
 const submitting = ref(false)
 const reportedLocale = ref(locale.value)
 const fuse = shallowRef<Fuse<MessageEntry> | null>(null)
@@ -324,8 +304,7 @@ function show(): void {
 	reportedLocale.value = locale.value
 	query.value = ''
 	selected.value = null
-	suggestion.value = ''
-	comment.value = ''
+	details.value = ''
 	fuse.value = new Fuse(buildEntries(), {
 		keys: ['translated', 'source', 'key'],
 		threshold: 0.3,
@@ -354,8 +333,7 @@ async function submit(): Promise<void> {
 			locale: reportedLocale.value,
 			key: selected.value.key,
 			kind: kind.value,
-			suggestion: suggestion.value.trim() || undefined,
-			comment: comment.value.trim() || undefined,
+			details: details.value.trim() || undefined,
 		})
 		notificationManager.addNotification({
 			type: 'success',

@@ -18,7 +18,7 @@ export class LabrinthTranslationFeedbackV3Module extends AbstractModule {
 	 *   locale: 'de-DE',
 	 *   key: 'settings.language.title',
 	 *   kind: 'typo',
-	 *   suggestion: 'Sprache',
+	 *   details: 'Should read "Sprache"',
 	 * })
 	 * ```
 	 */

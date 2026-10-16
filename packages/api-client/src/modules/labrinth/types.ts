@@ -2244,8 +2244,7 @@ export namespace Labrinth {
 				locale: string
 				key: string
 				kind: Kind
-				suggestion?: string
-				comment?: string
+				details?: string
 			}
 		}
 	}
