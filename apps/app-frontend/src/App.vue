@@ -58,7 +58,7 @@ import { fetch as tauriFetch } from '@tauri-apps/plugin-http'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { type } from '@tauri-apps/plugin-os'
 import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
-import { computed, nextTick, onMounted, onUnmounted, provide, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 
 import { useRouteLoading } from '@/app/runtime/use-route-loading'
@@ -71,7 +71,6 @@ import UnknownPackWarningModal from '@/components/ui/install_flow/UnknownPackWar
 import IconEditorModal from '@/components/ui/instance_settings/icon-editor-modal/index.vue'
 import MinecraftAuthErrorModal from '@/components/ui/minecraft-auth-error-modal/MinecraftAuthErrorModal.vue'
 import MinecraftRequiredModal from '@/components/ui/minecraft-required-modal/MinecraftRequiredModal.vue'
-import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
 import InstallToPlayModal from '@/components/ui/modal/InstallToPlayModal.vue'
 import ModpackAlreadyInstalledModal from '@/components/ui/modal/ModpackAlreadyInstalledModal.vue'
 import ModrinthAccountRequiredModal from '@/components/ui/modal/ModrinthAccountRequiredModal.vue'
@@ -90,6 +89,8 @@ import { useQuickInstanceLimit } from '@/composables/use-quick-instance-limit.ts
 import { isDarkTheme, useTheme } from '@/composables/use-theme.ts'
 import { config } from '@/config'
 import { provideMinecraftAccounts } from '@/features/minecraft-accounts/context'
+import AppSettingsModal from '@/features/settings/app-settings-modal/index.vue'
+import { provideSettingsActions } from '@/features/settings/settings-actions'
 import NewUpdateModal from '@/features/updates/new-update-modal/index.vue'
 import { getAccountAppearance, rememberAccountAppearance } from '@/helpers/account-appearance.ts'
 import {
@@ -182,10 +183,6 @@ import { appMessages } from '@/utils/app-messages'
 
 import { AppNotificationManager } from './providers/app-notifications'
 import { AppPopupNotificationManager } from './providers/app-popup-notifications'
-import {
-	appSettingsModalOpenProfileKey,
-	appSettingsModalOpenSyncedOptionsKey,
-} from './providers/app-settings-modal'
 
 debugStartup('App setup entered')
 const appSettings = useAppSettings()
@@ -964,8 +961,13 @@ const modrinthLoginModal = ref()
 const appSettingsModal = ref()
 const newUpdateModal = ref()
 
-provide(appSettingsModalOpenProfileKey, () => appSettingsModal.value?.showProfile())
-provide(appSettingsModalOpenSyncedOptionsKey, () => appSettingsModal.value?.showSyncedOptions())
+const settingsActions = provideSettingsActions({
+	openSettings: () => appSettingsModal.value?.show(),
+	openProfile: () => appSettingsModal.value?.showProfile(),
+	openFeatureFlags: () => appSettingsModal.value?.showFeatureFlags(),
+	openSyncedOptions: () => appSettingsModal.value?.showSyncedOptions(),
+	openInstanceDefaults: (tab) => appSettingsModal.value?.showInstanceDefaults(tab),
+})
 
 watch(incompatibilityWarningModal, (modal) => {
 	if (modal) {
@@ -1321,7 +1323,7 @@ const modrinthAccountMenuOptions = computed(() => [
 		label: formatMessage(commonSettingsMessages.featureFlags),
 		icon: ToggleRightIcon,
 		shown: appSettings.devMode,
-		action: () => appSettingsModal.value?.showFeatureFlags(),
+		action: settingsActions.openFeatureFlags,
 	},
 	{
 		type: 'divider',
@@ -2072,7 +2074,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			</suspense>
 			<NavButton
 				v-tooltip.right="formatMessage(commonMessages.settingsLabel)"
-				:to="() => appSettingsModal?.show()"
+				:to="settingsActions.openSettings"
 			>
 				<SettingsIcon />
 			</NavButton>

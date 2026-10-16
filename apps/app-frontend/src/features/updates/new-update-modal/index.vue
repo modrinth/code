@@ -11,7 +11,7 @@ import {
 } from '@modrinth/ui'
 import { computed, nextTick, useTemplateRef } from 'vue'
 
-import SyncSourceModal from '@/components/ui/settings/instances/SyncSourceModal.vue'
+import SyncSourceModal from '@/features/settings/syncing/sync-source-modal.vue'
 
 import { useNewUpdateNotification } from './use-notification'
 import { type SyncUpdateOption, syncUpdateOptions, useSyncInstancesUpdate } from './use-sync'

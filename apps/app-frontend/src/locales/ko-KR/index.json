@@ -1652,9 +1652,6 @@
   "app.settings.default-instance-options.height.title": {
     "message": "높이"
   },
-  "app.settings.default-instance-options.java-and-memory.title": {
-    "message": "Java 및 메모리"
-  },
   "app.settings.default-instance-options.java-arguments.description": {
     "message": "인스턴스를 실행할 때 Java에 전달되는 인수입니다."
   },
@@ -1663,9 +1660,6 @@
   },
   "app.settings.default-instance-options.java-arguments.title": {
     "message": "Java 인수"
-  },
-  "app.settings.default-instance-options.launch-hooks.title": {
-    "message": "실행 훅"
   },
   "app.settings.default-instance-options.memory-allocation.description": {
     "message": "각 인스턴스가 사용할 수 있는 최대 메모리입니다."
@@ -1699,9 +1693,6 @@
   },
   "app.settings.default-instance-options.width.title": {
     "message": "너비"
-  },
-  "app.settings.default-instance-options.window.title": {
-    "message": "창"
   },
   "app.settings.default-instance-options.wrapper-hook.description": {
     "message": "Minecraft 실행 프로세스를 감싸는 데 사용하는 명령어입니다."
@@ -2759,14 +2750,8 @@
   "app.settings.resource-management.app-cache.confirm.description": {
     "message": "캐시가 재구축될 때까지 앱 로딩이 느려질 수 있습니다."
   },
-  "app.settings.resource-management.app-cache.confirm.title": {
-    "message": "앱 캐시를 비우시겠습니까?"
-  },
   "app.settings.resource-management.app-cache.description": {
     "message": "캐시 데이터를 삭제하고 Modrinth에서 다시 다운로드합니다. 캐시가 재구축될 때까지 앱 로딩이 느려질 수 있습니다."
-  },
-  "app.settings.resource-management.app-cache.purge": {
-    "message": "캐시 비우기"
   },
   "app.settings.resource-management.app-cache.title": {
     "message": "앱 캐시"
@@ -2834,9 +2819,6 @@
   "app.settings.resource-management.store.description": {
     "message": "게임 설치, 모드, 팩을 인스턴스끼리 재사용하여 공간을 절약합니다."
   },
-  "app.settings.resource-management.store.empty": {
-    "message": "모드나 팩을 설치하여 저장 공간 사용량을 확인합니다."
-  },
   "app.settings.resource-management.store.issues": {
     "message": "문제 {count, plural, other {#}}개 보기"
   },
@@ -2875,9 +2857,6 @@
   },
   "app.settings.resource-management.store.verified": {
     "message": "검증 완료"
-  },
-  "app.settings.sidebar.label.instances": {
-    "message": "인스턴스"
   },
   "app.settings.synced-options.choose-sync-source.command-history-description": {
     "message": "명령어 기록을 복사할 인스턴스를 선택합니다. 기록은 초기 동기화에만 사용되며, 이후에는 아무 인스턴스에서 편집할 수 있습니다."
@@ -3118,12 +3097,6 @@
   },
   "app.settings.tabs.privacy": {
     "message": "개인정보"
-  },
-  "app.settings.tabs.resource-management": {
-    "message": "리소스 관리"
-  },
-  "app.settings.tabs.synced-options": {
-    "message": "동기화된 설정"
   },
   "app.sidebar.playing-as": {
     "message": "플레이 중인 계정은"
@@ -4121,9 +4094,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "업데이트 채널 선택"
   },
-  "instance.settings.tabs.hooks.description": {
-    "message": "게임 실행 전후에 인스턴스별 시스템 명령을 실행합니다."
-  },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "종료 후"
   },
@@ -4184,18 +4154,6 @@
   "instance.settings.tabs.installation.locked": {
     "message": "이 인스턴스가 잠긴 상태에서는 설치 설정을 사용할 수 없습니다."
   },
-  "instance.settings.tabs.java.custom-environment-variables": {
-    "message": "이 인스턴스에 따로 환경 변수를 설정합니다."
-  },
-  "instance.settings.tabs.java.custom-java-arguments": {
-    "message": "이 인스턴스에 따로 Java 인수를 설정합니다."
-  },
-  "instance.settings.tabs.java.custom-java-installation": {
-    "message": "이 인스턴스에 별도의 Java 설치를 선택합니다."
-  },
-  "instance.settings.tabs.java.custom-memory-allocation": {
-    "message": "이 인스턴스에 따로 메모리 할당을 설정합니다."
-  },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "환경 변수를 입력하세요..."
   },
@@ -4219,9 +4177,6 @@
   },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/path/to/java"
-  },
-  "instance.settings.tabs.settings-overrides": {
-    "message": "동기화 재정의"
   },
   "instance.settings.tabs.sharing": {
     "message": "공유"
@@ -4285,9 +4240,6 @@
   },
   "instance.settings.tabs.window": {
     "message": "창 맞춤 설정"
-  },
-  "instance.settings.tabs.window.custom-window-settings": {
-    "message": "이 인스턴스에서 따로 전체화면과 실행 해상도를 구성합니다."
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "전체 화면"

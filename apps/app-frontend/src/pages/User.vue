@@ -48,9 +48,10 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, inject, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router'
 
+import { injectSettingsActions } from '@/features/settings/settings-actions'
 import {
 	block_user,
 	change_user_avatar,
@@ -63,13 +64,12 @@ import {
 	patch_user,
 	unblock_user,
 } from '@/helpers/users'
-import { appSettingsModalOpenProfileKey } from '@/providers/app-settings-modal'
 import { injectContentInstall } from '@/providers/content-install'
 import { useBreadcrumb } from '@/shared/breadcrumbs'
 
 const route = useRoute()
 const router = useRouter()
-const openProfileSettings = inject(appSettingsModalOpenProfileKey, () => {})
+const { openProfile: openProfileSettings } = injectSettingsActions()
 const queryClient = useQueryClient()
 const { formatMessage } = useVIntl()
 const { handleError } = injectNotificationManager()

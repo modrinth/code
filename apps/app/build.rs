@@ -406,6 +406,8 @@ fn main() {
                         "record_ads_click",
                         "open_link",
                         "get_ads_personalization",
+                        "get_ads_debug_state",
+                        "report_ads_debug_state",
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,
