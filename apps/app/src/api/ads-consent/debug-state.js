@@ -1,16 +1,15 @@
-const DEBUG_STATE_MAX_STRING_LENGTH = 2000
-const DEBUG_STATE_MAX_FRAMES = 50
-const DEBUG_STATE_MAX_FRAME_LINKS = 10
-const DEBUG_STATE_FRAME_RESPONSE_WINDOW = 500
+const AD_REPORT_MAX_URL_LENGTH = 2000
+const AD_REPORT_MAX_FRAMES = 100
+const AD_REPORT_FRAME_RESPONSE_WINDOW = 500
 
 /**
  * @param {unknown} value
  * @returns {string | null}
  */
-function truncateDebugString(value) {
+function truncateUrl(value) {
 	if (typeof value !== 'string' || value.length === 0) return null
-	return value.length > DEBUG_STATE_MAX_STRING_LENGTH
-		? `${value.slice(0, DEBUG_STATE_MAX_STRING_LENGTH)}…`
+	return value.length > AD_REPORT_MAX_URL_LENGTH
+		? `${value.slice(0, AD_REPORT_MAX_URL_LENGTH)}…`
 		: value
 }
 
@@ -27,92 +26,41 @@ function tryCollect(fn) {
 	}
 }
 
-/** @returns {unknown[]} */
-function getPrebidInstances() {
-	const names = Array.isArray(window._pbjsGlobals) ? window._pbjsGlobals : ['pbjs']
-	return names
-		.map((name) => window[name])
-		.filter((pbjs) => typeof pbjs?.getBidResponses === 'function')
-}
-
-/** @param {any} bid */
-function serializePrebidBid(bid) {
-	return {
-		bidder: bid.bidderCode ?? bid.bidder ?? null,
-		ad_id: bid.adId ?? null,
-		creative_id: bid.creativeId ?? null,
-		deal_id: bid.dealId ?? null,
-		ad_unit_code: bid.adUnitCode ?? null,
-		media_type: bid.mediaType ?? null,
-		size: bid.width && bid.height ? `${bid.width}x${bid.height}` : null,
-		cpm: bid.cpm ?? null,
-		currency: bid.currency ?? null,
-		advertiser_domains: bid.meta?.advertiserDomains ?? null,
-		advertiser_name: bid.meta?.advertiserName ?? null,
-		advertiser_id: bid.meta?.advertiserId ?? null,
-		brand_name: bid.meta?.brandName ?? null,
-		network_name: bid.meta?.networkName ?? null,
-		network_id: bid.meta?.networkId ?? null,
-		status: bid.status ?? null,
-		response_timestamp: bid.responseTimestamp ?? null,
-	}
-}
-
-/** @returns {Map<string, any>} */
-function collectPrebidBidsById() {
-	const bids = new Map()
-
-	for (const pbjs of getPrebidInstances()) {
-		const responses = tryCollect(() => Object.values(pbjs.getBidResponses())) ?? []
-		for (const response of responses) {
-			for (const bid of response?.bids ?? []) {
-				if (bid?.adId) bids.set(bid.adId, bid)
-			}
-		}
-
-		for (const bid of tryCollect(() => pbjs.getAllWinningBids()) ?? []) {
-			if (bid?.adId) bids.set(bid.adId, bid)
-		}
-	}
-
-	return bids
-}
-
-/** @param {any} slot */
-function getSlotTargeting(slot) {
-	return Object.fromEntries(slot.getTargetingKeys().map((key) => [key, slot.getTargeting(key)]))
-}
-
 /**
- * @param {any} slot
- * @param {Map<string, any>} prebidBids
+ * @param {Record<string, unknown>} value
+ * @returns {Record<string, unknown>}
  */
-function serializeGptSlot(slot, prebidBids) {
-	const elementId = tryCollect(() => slot.getSlotElementId())
-	const iframe = elementId ? document.getElementById(elementId)?.querySelector('iframe') : null
-	const targeting = tryCollect(() => getSlotTargeting(slot))
-	const prebidAdId = targeting?.hb_adid?.[0]
-	const prebidBid = prebidAdId ? prebidBids.get(prebidAdId) : null
+function compact(value) {
+	return Object.fromEntries(
+		Object.entries(value).filter(
+			([, entry]) => entry != null && !(Array.isArray(entry) && entry.length === 0),
+		),
+	)
+}
 
-	return {
-		element_id: elementId,
-		ad_unit_path: tryCollect(() => slot.getAdUnitPath()),
-		response: tryCollect(() => slot.getResponseInformation()),
-		prebid_bid: prebidBid ? serializePrebidBid(prebidBid) : null,
-		targeting,
-		iframe: iframe
-			? {
-					id: iframe.id || null,
-					src: truncateDebugString(iframe.src),
-					size: `${iframe.width || iframe.clientWidth}x${iframe.height || iframe.clientHeight}`,
-				}
-			: null,
-	}
+/** @returns {any[]} */
+function getPrebidWinningBids() {
+	const names = Array.isArray(window._pbjsGlobals) ? window._pbjsGlobals : ['pbjs']
+	return names.flatMap((name) => tryCollect(() => window[name].getAllWinningBids()) ?? [])
 }
 
 /**
- * Answers a debug request from the top frame with this frame's URL and links, which lets the
- * top frame see inside cross-origin ad creatives.
+ * Finds the most recently rendered Prebid winning bid. Aditude Serve renders Prebid bids directly,
+ * so this is the ad on screen unless an Amazon or direct deal has replaced it since.
+ *
+ * @returns {any | null}
+ */
+function findRenderedPrebidBid() {
+	return (
+		getPrebidWinningBids()
+			.filter((bid) => bid.status === 'rendered')
+			.sort((a, b) => (b.responseTimestamp ?? 0) - (a.responseTimestamp ?? 0))[0] ?? null
+	)
+}
+
+/**
+ * Answers a request from the top frame with this frame's outbound links, which lets the top
+ * frame find click-through URLs inside cross-origin ad creatives.
  *
  * @param {MessageEvent} event
  * @returns {void}
@@ -120,16 +68,11 @@ function serializeGptSlot(slot, prebidBids) {
 function handleAdsDebugFrameRequest(event) {
 	if (!event.data?.modrinthAdsDebugRequest || event.source !== window.top) return
 
-	const links = Array.from(document.querySelectorAll('a[href]'), (link) =>
-		truncateDebugString(link.href),
+	const links = Array.from(document.querySelectorAll('a[href]'), (link) => link.href).filter(
+		(href) => tryCollect(() => !new URL(href).hostname.endsWith('modrinth.com')),
 	)
-		.filter(Boolean)
-		.slice(0, DEBUG_STATE_MAX_FRAME_LINKS)
 
-	window.top.postMessage(
-		{ modrinthAdsDebugFrame: { url: truncateDebugString(window.location.href), links } },
-		event.origin,
-	)
+	window.top.postMessage({ modrinthAdsDebugFrame: { links } }, event.origin)
 }
 
 /**
@@ -138,35 +81,31 @@ function handleAdsDebugFrameRequest(event) {
  * @returns {Window[]}
  */
 function collectFrameWindows(root, frames = []) {
-	for (let i = 0; i < root.frames.length && frames.length < DEBUG_STATE_MAX_FRAMES; i++) {
+	for (let i = 0; i < root.frames.length && frames.length < AD_REPORT_MAX_FRAMES; i++) {
 		frames.push(root.frames[i])
 		collectFrameWindows(root.frames[i], frames)
 	}
 	return frames
 }
 
-/** @returns {Promise<{ origin: string, url: string | null, links: string[] }[]>} */
-function collectAdFrames() {
+/** @returns {Promise<string | null>} */
+function collectClickUrl() {
 	return new Promise((resolve) => {
-		const frames = []
+		/** @param {string | null} clickUrl */
+		const finish = (clickUrl) => {
+			clearTimeout(timeout)
+			window.removeEventListener('message', handleResponse)
+			resolve(clickUrl)
+		}
 
 		/** @param {MessageEvent} event */
 		const handleResponse = (event) => {
-			const frame = event.data?.modrinthAdsDebugFrame
-			if (!frame || frames.length >= DEBUG_STATE_MAX_FRAMES) return
-
-			frames.push({
-				origin: event.origin,
-				url: truncateDebugString(frame.url),
-				links: Array.isArray(frame.links)
-					? frame.links
-							.map(truncateDebugString)
-							.filter(Boolean)
-							.slice(0, DEBUG_STATE_MAX_FRAME_LINKS)
-					: [],
-			})
+			const links = event.data?.modrinthAdsDebugFrame?.links
+			const clickUrl = Array.isArray(links) ? truncateUrl(links[0]) : null
+			if (clickUrl) finish(clickUrl)
 		}
 
+		const timeout = setTimeout(() => finish(null), AD_REPORT_FRAME_RESPONSE_WINDOW)
 		window.addEventListener('message', handleResponse)
 
 		for (const frame of tryCollect(() => collectFrameWindows(window)) ?? []) {
@@ -174,49 +113,35 @@ function collectAdFrames() {
 				frame.postMessage({ modrinthAdsDebugRequest: true }, '*')
 			} catch {}
 		}
-
-		setTimeout(() => {
-			window.removeEventListener('message', handleResponse)
-			resolve(frames)
-		}, DEBUG_STATE_FRAME_RESPONSE_WINDOW)
 	})
 }
 
 /**
- * Picks the URL that best identifies the rendered ad: its click-through link if a creative
- * exposes one, otherwise the creative frame itself.
+ * Collects what's needed to block the ad on screen: the advertiser domain and creative declared
+ * by the winning Prebid bid, and the click-through URL for ads that don't declare one (e.g.
+ * Amazon TAM or direct deals).
  *
- * @param {{ origin: string, url: string | null, links: string[] }[]} frames
- * @returns {string | null}
+ * @returns {Promise<Record<string, unknown>>}
  */
-function getCurrentAdUrl(frames) {
-	const adFrames = frames.filter((frame) => frame.origin !== window.location.origin)
-
-	return (
-		adFrames.flatMap((frame) => frame.links)[0] ??
-		adFrames.find((frame) => frame.url && frame.url !== 'about:blank')?.url ??
-		null
+async function collectAdReport() {
+	const bid = findRenderedPrebidBid()
+	const clickUrl = await collectClickUrl()
+	const advertiserDomains = (bid?.meta?.advertiserDomains ?? []).filter(
+		(domain) => typeof domain === 'string' && domain.length > 0,
 	)
-}
 
-/** @returns {Promise<Record<string, unknown>>} */
-async function collectAdsDebugState() {
-	const prebidBids = collectPrebidBidsById()
-	const gptSlots = tryCollect(() => window.googletag?.pubads?.().getSlots()) ?? []
-	const frames = await collectAdFrames()
-
-	return {
-		current_ad: getCurrentAdUrl(frames),
-		url: window.location.href,
-		user_agent: navigator.userAgent,
-		viewport: `${window.innerWidth}x${window.innerHeight}@${window.devicePixelRatio}`,
-		consent_phase: tryCollect(() => controller.state.phase),
-		gpt_slots: gptSlots.map((slot) => serializeGptSlot(slot, prebidBids)),
-		prebid_winning_bids: getPrebidInstances().flatMap(
-			(pbjs) => tryCollect(() => pbjs.getAllWinningBids().map(serializePrebidBid)) ?? [],
-		),
-		frames,
-	}
+	return compact({
+		current_ad: advertiserDomains[0] ?? clickUrl,
+		captured_at: new Date().toISOString(),
+		advertiser_domains: advertiserDomains,
+		advertiser_name: bid?.meta?.advertiserName,
+		brand_name: bid?.meta?.brandName,
+		bidder: bid?.bidderCode ?? bid?.bidder,
+		network_name: bid?.meta?.networkName,
+		creative_id: bid?.creativeId,
+		deal_id: bid?.dealId,
+		click_url: clickUrl,
+	})
 }
 
 /** @returns {Promise<void>} */
@@ -226,9 +151,9 @@ async function reportAdsDebugState() {
 
 	let debugState
 	try {
-		debugState = await collectAdsDebugState()
+		debugState = await collectAdReport()
 	} catch (error) {
-		debugState = { url: window.location.href, error: String(error) }
+		debugState = { error: String(error) }
 	}
 
 	try {

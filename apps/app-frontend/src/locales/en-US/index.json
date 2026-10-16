@@ -3173,6 +3173,12 @@
   "app.settings.troubleshooting.report-ad.description": {
     "message": "Seen an inappropriate or misleading ad? Copy its details while it is still showing and send them to Modrinth support so we can block it."
   },
+  "app.settings.troubleshooting.report-ad.no-ad.text": {
+    "message": "Wait for the ad to load, then try again."
+  },
+  "app.settings.troubleshooting.report-ad.no-ad.title": {
+    "message": "No ad found"
+  },
   "app.settings.troubleshooting.report-ad.title": {
     "message": "Report an ad"
   },

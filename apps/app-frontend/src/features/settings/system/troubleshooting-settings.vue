@@ -22,7 +22,7 @@ import { purge_cache_types } from '@/helpers/cache.js'
 import { appSettingsKeys, get, set } from '@/helpers/settings.ts'
 import { copyToClipboard, showAppDbBackupsFolder } from '@/helpers/utils.js'
 
-const { handleError } = injectNotificationManager()
+const { addNotification, handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const appSettings = useAppSettings()
 const queryClient = useQueryClient()
@@ -78,6 +78,14 @@ const messages = defineMessages({
 	copiedAdDetails: {
 		id: 'app.settings.troubleshooting.report-ad.copied',
 		defaultMessage: 'Copied',
+	},
+	noAdLoadedTitle: {
+		id: 'app.settings.troubleshooting.report-ad.no-ad.title',
+		defaultMessage: 'No ad found',
+	},
+	noAdLoadedText: {
+		id: 'app.settings.troubleshooting.report-ad.no-ad.text',
+		defaultMessage: 'Wait for the ad to load, then try again.',
 	},
 	appCacheTitle: {
 		id: 'app.settings.resource-management.app-cache.title',
@@ -168,10 +176,20 @@ async function handleCopyAdDetails() {
 	copyingAdDetails.value = true
 
 	try {
-		const { current_ad: currentAd, ...info } = (await get_ads_debug_state()) as {
-			current_ad: string | null
-		} & Record<string, unknown>
+		const adReport = (await get_ads_debug_state()) as
+			| ({ current_ad?: string } & Record<string, unknown>)
+			| null
 
+		if (!adReport) {
+			addNotification({
+				type: 'error',
+				title: formatMessage(messages.noAdLoadedTitle),
+				text: formatMessage(messages.noAdLoadedText),
+			})
+			return
+		}
+
+		const { current_ad: currentAd, ...info } = adReport
 		await copyToClipboard(
 			`CURRENT_AD: ${currentAd ?? 'unknown'}\n\nINFO:\n${JSON.stringify(info, null, 2)}`,
 		)
