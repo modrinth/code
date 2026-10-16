@@ -1,6 +1,6 @@
 import { LinkIcon } from '@modrinth/assets'
 
-import { generateUrlSlug, messageWithOptionalSuggestion } from '../../utils'
+import { messageWithOptionalSuggestion } from '../../utils'
 import misused from '../messages/checklist/messages/title-slug/slug/misused.md'
 import { issue, panel, section, text, toggle } from './component-builders/builders'
 import { issueTargets } from './component-builders/targets'
@@ -32,7 +32,6 @@ export const slugReviewPanel = panel({
 	toggle({
 		label: 'Misused slug',
 		issue: misusedSlugIssue,
-		shown: ({ projectV3 }) => generateUrlSlug(projectV3.name) !== projectV3.slug,
 	}),
 	section({
 		shown: ({ selected }) => selected.issueIds.includes(misusedSlugIssue.id),
