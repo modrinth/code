@@ -1,8 +1,9 @@
 use super::filesystem::{
     symlink_metadata_if_exists, validate_parent_directories,
 };
+use crate::ErrorKind;
 use crate::state::content_store::{
-    StoredFileMetadata, StoredFileStatus, input, validate_digest,
+    StoredFileMetadata, StoredFileStatus, validate_digest,
 };
 use crate::util::content_hash::{FileHashes, hash_file};
 use std::collections::HashSet;
@@ -71,9 +72,11 @@ impl UnregisteredFiles {
                     fs::set_permissions(&path, permissions).await?;
                     return Ok(Some(StoredFileMetadata {
                         sha512,
-                        size: size
-                            .try_into()
-                            .map_err(|_| input("Content file is too large"))?,
+                        size: size.try_into().map_err(|_| {
+                            ErrorKind::ContentStoreError(
+                                "Content file is too large".into(),
+                            )
+                        })?,
                         status: StoredFileStatus::Ready,
                         modified_as: crate::state::file_modified_at_ns(
                             &metadata,

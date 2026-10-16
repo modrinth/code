@@ -1806,20 +1806,22 @@ fn install_error_code(
     use InstallPhaseId::*;
 
     match error.downcast_ref::<ErrorKind>() {
-        Some(ErrorKind::InputError(_)) => match phase {
-            PreparingInstance | Finalizing => "instance_error",
-            ResolvingPack | DownloadingPackFile | ReadingPackManifest => {
-                "pack_error"
+        Some(ErrorKind::InputError(_) | ErrorKind::ContentStoreError(_)) => {
+            match phase {
+                PreparingInstance | Finalizing => "instance_error",
+                ResolvingPack | DownloadingPackFile | ReadingPackManifest => {
+                    "pack_error"
+                }
+                DownloadingContent => "content_error",
+                ExtractingOverrides => "path_error",
+                PreparingJava => "java_error",
+                DownloadingMinecraft => "instance_error",
+                RollingBack => "rollback_error",
+                ResolvingMinecraft
+                | ResolvingLoader
+                | RunningLoaderProcessors => "launcher_error",
             }
-            DownloadingContent => "content_error",
-            ExtractingOverrides => "path_error",
-            PreparingJava => "java_error",
-            DownloadingMinecraft => "instance_error",
-            RollingBack => "rollback_error",
-            ResolvingMinecraft | ResolvingLoader | RunningLoaderProcessors => {
-                "launcher_error"
-            }
-        },
+        }
         Some(ErrorKind::LauncherError(_)) => match phase {
             RunningLoaderProcessors => "processor_error",
             PreparingJava => "java_error",

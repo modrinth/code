@@ -230,6 +230,9 @@ pub enum ErrorKind {
     NotEnoughSpace { required: u64 },
 
     #[error("{0}")]
+    ContentStoreError(String),
+
+    #[error("{0}")]
     InvalidPack(InvalidPack),
 }
 

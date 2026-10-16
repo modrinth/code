@@ -1,9 +1,10 @@
 use super::apply_content_install::{
     ContentScope, require_stopped_for_content, upsert_entry_for_file,
 };
+use crate::ErrorKind;
 use crate::state::content_store::{
     FileChangeRequest, FileContent, InstanceFileStatus, StoredFileHandle,
-    content_file_path, input,
+    content_file_path,
 };
 use crate::state::instances::adapters::sqlite::{content_rows, instance_rows};
 use crate::state::instances::{ContentSourceKind, InstanceFile};
@@ -12,6 +13,7 @@ use crate::state::{
     file_modified_at_ns,
 };
 use crate::util::io::IOError;
+use anyhow::bail;
 use chrono::Utc;
 use std::path::Path;
 use tokio::fs;
@@ -80,14 +82,7 @@ enum PreparedChange {
 fn adoption_can_be_deferred(error: &crate::Error) -> bool {
     error.is::<std::io::Error>()
         || error.is::<IOError>()
-        || matches!(
-            error.downcast_ref::<crate::ErrorKind>(),
-            Some(
-                crate::ErrorKind::StdIOError(_)
-                    | crate::ErrorKind::IOError(_)
-                    | crate::ErrorKind::InputError(_)
-            )
-        )
+        || matches!(error.downcast_ref(), Some(ErrorKind::ContentStoreError(_)))
 }
 
 struct PendingContentChange {
@@ -113,7 +108,9 @@ impl<'a> InstanceContent<'a> {
         let instance =
             instance_rows::get_instance_by_id(instance_id, &state.pool)
                 .await?
-                .ok_or_else(|| input("Unknown instance"))?;
+                .ok_or_else(|| {
+                    ErrorKind::ContentStoreError("Unknown instance".into())
+                })?;
         let content_set_id = instance.applied_content_set_id.clone();
         state.content_store.recover(Some(instance_id)).await?;
         Ok(Self {
@@ -133,7 +130,7 @@ impl<'a> InstanceContent<'a> {
         Ok(ContentScope {
             instance: self.instance.clone(),
             content_set_id: self.content_set_id.clone().ok_or_else(|| {
-                input(format!(
+                ErrorKind::ContentStoreError(format!(
                     "Instance {} has no applied content set",
                     self.instance.id
                 ))
@@ -237,7 +234,9 @@ impl<'a> InstanceContent<'a> {
         let relative_path = canonical_content_path(request.requested_path);
         if !crate::state::content_store::is_managed_content_path(relative_path)
         {
-            return Err(input("Unsupported content destination"));
+            bail!(ErrorKind::ContentStoreError(
+                "Unsupported content destination".into()
+            ));
         }
         let previous_path = request.previous_path.map(canonical_content_path);
         for file in content_rows::get_instance_files(
@@ -251,7 +250,7 @@ impl<'a> InstanceContent<'a> {
                 && registered.eq_ignore_ascii_case(relative_path)
                 && Some(registered) != previous_path
             {
-                return Err(input(format!(
+                bail!(ErrorKind::ContentStoreError(format!(
                     "Content destination {relative_path} differs only in case from the registered file {registered}; rename or remove that file first",
                 )));
             }
@@ -264,8 +263,9 @@ impl<'a> InstanceContent<'a> {
         )
         .await?;
         if request.previous_path.is_some() && existing.is_none() {
-            return Err(input(
-                "Content changed while its update was downloading; refresh and try again",
+            bail!(ErrorKind::ContentStoreError(
+                "Content changed while its update was downloading; refresh and try again"
+                    .into(),
             ));
         }
         if previous_path.is_some_and(|previous| previous != relative_path)
@@ -277,8 +277,8 @@ impl<'a> InstanceContent<'a> {
             .await?
             .is_some()
         {
-            return Err(input(
-                "The updated filename belongs to another content item",
+            bail!(ErrorKind::ContentStoreError(
+                "The updated filename belongs to another content item".into(),
             ));
         }
         let enabled = if request.previous_path.is_some() {
@@ -356,13 +356,18 @@ impl<'a> InstanceContent<'a> {
         )
         .await?
         .ok_or_else(|| {
-            input(
-                "Content file is not registered; refresh the Content tab first",
+            ErrorKind::ContentStoreError(
+                "Content file is not registered; refresh the Content tab first"
+                    .into(),
             )
         })?;
         let project_type =
             super::sync_content_files::project_type_for_file(&file)
-                .ok_or_else(|| input("Unsupported content type"))?;
+                .ok_or_else(|| {
+                    ErrorKind::ContentStoreError(
+                        "Unsupported content type".into(),
+                    )
+                })?;
         require_stopped_for_content(
             &self.instance.id,
             project_type,
@@ -416,8 +421,9 @@ impl<'a> InstanceContent<'a> {
                             .await?
                     }
                     InstanceFileStatus::Conflict => {
-                        return Err(input(
-                            "Content was changed outside the app; resolve the conflict first",
+                        bail!(ErrorKind::ContentStoreError(
+                            "Content was changed outside the app; resolve the conflict first"
+                                .into(),
                         ));
                     }
                 }
@@ -457,13 +463,15 @@ impl<'a> InstanceContent<'a> {
                             .await?
                     }
                     InstanceFileStatus::Missing => {
-                        return Err(input(
-                            "Content needs repair or re-import before it can be enabled",
+                        bail!(ErrorKind::ContentStoreError(
+                            "Content needs repair or re-import before it can be enabled"
+                                .into(),
                         ));
                     }
                     InstanceFileStatus::Conflict => {
-                        return Err(input(
-                            "Content was changed outside the app; resolve the conflict first",
+                        bail!(ErrorKind::ContentStoreError(
+                            "Content was changed outside the app; resolve the conflict first"
+                                .into(),
                         ));
                     }
                 }
@@ -476,7 +484,9 @@ impl<'a> InstanceContent<'a> {
                     .instance_path(&self.instance.path, &physical_path)
                     .await?;
                 if fs::symlink_metadata(&path).await?.file_type().is_symlink() {
-                    return Err(input("Cannot adopt an external symlink"));
+                    bail!(ErrorKind::ContentStoreError(
+                        "Cannot adopt an external symlink".into()
+                    ));
                 }
                 let stored_file =
                     self.state.content_store.store_file(&path).await?;
@@ -508,7 +518,9 @@ impl<'a> InstanceContent<'a> {
         self.content_scope()?;
         let canonical_path = canonical_content_path(project_path);
         let project_type = ProjectType::get_from_parent_folder(canonical_path)
-            .ok_or_else(|| input("Unsupported content type"))?;
+            .ok_or_else(|| {
+                ErrorKind::ContentStoreError("Unsupported content type".into())
+            })?;
         require_stopped_for_content(
             &self.instance.id,
             project_type,
@@ -563,7 +575,9 @@ impl<'a> InstanceContent<'a> {
     ) -> crate::Result<Option<PendingContentChange>> {
         let canonical = canonical_content_path(&file.relative_path);
         if !crate::state::content_store::is_managed_content_path(canonical) {
-            return Err(input("Unsupported managed content path"));
+            bail!(ErrorKind::ContentStoreError(
+                "Unsupported managed content path".into()
+            ));
         }
         let source_path = self
             .state
@@ -575,7 +589,9 @@ impl<'a> InstanceContent<'a> {
             .file_type()
             .is_symlink()
         {
-            return Err(input("External symlinks must be imported explicitly"));
+            bail!(ErrorKind::ContentStoreError(
+                "External symlinks must be imported explicitly".into(),
+            ));
         }
         if !self
             .state
@@ -609,7 +625,7 @@ impl<'a> InstanceContent<'a> {
             (source_record.as_ref(), canonical_record.as_ref())
             && source.id != target.id
         {
-            return Err(input(format!(
+            bail!(ErrorKind::ContentStoreError(format!(
                 "Both enabled and disabled records exist for {canonical}; preserve both files and resolve the duplicate first"
             )));
         }
@@ -898,5 +914,8 @@ fn canonical_file_name(relative_path: &str) -> crate::Result<&str> {
     Path::new(relative_path)
         .file_name()
         .and_then(|name| name.to_str())
-        .ok_or_else(|| input("Invalid content filename"))
+        .ok_or_else(|| {
+            ErrorKind::ContentStoreError("Invalid content filename".into())
+                .into()
+        })
 }
