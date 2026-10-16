@@ -70,17 +70,17 @@ const messages = defineMessages({
 	},
 })
 const statusMessages = {
+	tech_review_failed: messages.techReviewFailedCount,
 	approved: messages.approvedCount,
-	archived: messages.archivedCount,
 	unlisted: messages.unlistedCount,
-	withheld: messages.withheldCount,
-	processing: messages.processingCount,
-	draft: messages.draftCount,
-	rejected: messages.rejectedCount,
 	private: messages.privateCount,
+	withheld: messages.withheldCount,
+	rejected: messages.rejectedCount,
+	draft: messages.draftCount,
+	processing: messages.processingCount,
+	archived: messages.archivedCount,
 	scheduled: messages.scheduledCount,
 	unknown: messages.unknownCount,
-	tech_review_failed: messages.techReviewFailedCount,
 }
 const statusColors = {
 	approved: 'text-green',
