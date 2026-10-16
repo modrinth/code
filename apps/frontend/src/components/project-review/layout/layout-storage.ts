@@ -3,6 +3,7 @@ import type { SerializedDockview } from 'dockview-vue'
 import { type ProjectReviewTab, projectReviewTabs } from './types'
 
 const STORAGE_KEY = 'moderation.project-review.layout.v1'
+export const reviewPopoutUrl = '/project-review-popout.html'
 
 export const workspacePanelSizes = {
 	left: { default: 400, minimum: 200 },
@@ -31,11 +32,54 @@ function isValidTabLayout(layout: SerializedDockview) {
 			(tab) => !projectReviewTabs.includes(tab as ProjectReviewTab),
 		) ||
 		layout.floatingGroups?.length ||
-		layout.popoutGroups?.length ||
+		(layout.popoutGroups !== undefined && !Array.isArray(layout.popoutGroups)) ||
 		layout.edgeGroups
 	) {
 		return false
 	}
+
+	const panelIds = new Set<string>()
+	const groupIds = new Set<string>()
+	type GridNode = SerializedDockview['grid']['root']
+	function validateGroup(group: Exclude<GridNode['data'], GridNode[]>) {
+		if (
+			!group ||
+			typeof group.id !== 'string' ||
+			groupIds.has(group.id) ||
+			!Array.isArray(group.views) ||
+			(group.activeView !== undefined && !group.views.includes(group.activeView))
+		)
+			return false
+		groupIds.add(group.id)
+		for (const id of group.views) {
+			if (typeof id !== 'string' || !Object.hasOwn(layout.panels, id) || panelIds.has(id))
+				return false
+			panelIds.add(id)
+		}
+		return true
+	}
+	function validateGrid(node: GridNode): boolean {
+		if (!node) return false
+		if (node.type === 'branch') return Array.isArray(node.data) && node.data.every(validateGrid)
+		return node.type === 'leaf' && !Array.isArray(node.data) && validateGroup(node.data)
+	}
+	if (!validateGrid(layout.grid.root)) return false
+	for (const popout of layout.popoutGroups ?? []) {
+		if (
+			!popout ||
+			(popout.url !== undefined && popout.url !== reviewPopoutUrl) ||
+			!!popout.data === !!popout.grid ||
+			(popout.position !== null &&
+				(!popout.position ||
+					![popout.position.left, popout.position.top].every(Number.isFinite) ||
+					![popout.position.width, popout.position.height].every(
+						(size) => Number.isFinite(size) && size > 0,
+					))) ||
+			!(popout.grid ? validateGrid(popout.grid.root) : popout.data && validateGroup(popout.data))
+		)
+			return false
+	}
+	if (panelIds.size !== Object.keys(layout.panels).length) return false
 
 	for (const tab of projectReviewTabs) {
 		const panel = layout.panels[tab]
@@ -78,6 +122,9 @@ export function readWorkspaceLayout(): SavedWorkspaceLayout | undefined {
 			return
 		}
 
+		for (const layout of [saved.tabs, ...Object.values(saved.tabLayouts ?? {})]) {
+			for (const popout of layout.popoutGroups ?? []) popout.url = reviewPopoutUrl
+		}
 		return saved
 	} catch {
 		return
@@ -92,9 +139,9 @@ export function saveWorkspaceLayout(layout: SavedWorkspaceLayout) {
 	}
 }
 
-/** Save detached panels in the grid so restoring a layout never opens browser windows. */
+/** Keep saved popout panels accessible in the workspace until the user restores their windows. */
 export function dockPopoutLayout(layout: SerializedDockview): SerializedDockview {
-	const result: SerializedDockview = JSON.parse(JSON.stringify(layout))
+	const result: SerializedDockview = structuredClone(layout)
 	type GridNode = SerializedDockview['grid']['root']
 	type Group = Exclude<GridNode['data'], GridNode[]>
 	function findGroupPath(node: GridNode, id: string): GridNode[] | undefined {
@@ -105,12 +152,12 @@ export function dockPopoutLayout(layout: SerializedDockview): SerializedDockview
 		}
 	}
 	function restoreGroup(group: Group, reference?: string) {
-		const path = reference ? (findGroupPath(result.grid.root, reference) ?? []) : []
-		const existing = path.at(-1)
+		const path = reference ? findGroupPath(result.grid.root, reference) : undefined
+		const existing = path?.at(-1)
 		if (existing && !Array.isArray(existing.data)) {
 			existing.data.views.push(...group.views)
 			existing.data.activeView ??= group.activeView
-			for (const node of path) node.visible = true
+			for (const node of path ?? []) node.visible = true
 			return
 		}
 		const leaf: GridNode = { type: 'leaf', data: group }
@@ -127,8 +174,7 @@ export function dockPopoutLayout(layout: SerializedDockview): SerializedDockview
 		if (popout.grid) restoreGrid(popout.grid.root, popout.gridReferenceGroup)
 	}
 	delete result.popoutGroups
-	if (result.activeGroup && !findGroupPath(result.grid.root, result.activeGroup)) {
+	if (result.activeGroup && !findGroupPath(result.grid.root, result.activeGroup))
 		delete result.activeGroup
-	}
 	return result
 }

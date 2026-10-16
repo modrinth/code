@@ -34,12 +34,13 @@ import { workspacePanelSizes } from './layout-storage'
 import type { ProjectReviewSlots, ProjectReviewTab } from './types'
 import { useProjectReviewLayout } from './use-layout'
 
-const props = defineProps<{ tabs: readonly ProjectReviewTab[]; resetKey: string }>()
+const props = defineProps<{ tabs: readonly ProjectReviewTab[]; resetKey: string; ready: boolean }>()
 const slots = defineSlots<ProjectReviewSlots>()
 const { formatMessage } = useVIntl()
 const layout = useProjectReviewLayout(
 	(tab) => formatMessage(messages[tab]),
 	() => props.tabs,
+	() => props.ready,
 )
 const { leftVisible, rightVisible, visibleRightWidth, onDividerDoubleClick } = layout
 const { heldTab, shortcutTab } = injectReviewContext()

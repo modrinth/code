@@ -72,7 +72,9 @@ export default {
 		let pending = existing?.pending ?? Promise.resolve()
 		let loadedFilesKey
 		async function onMessage(event) {
-			if (event.source !== window.parent || event.origin !== PARENT_ORIGIN) return
+			if (event.origin !== PARENT_ORIGIN) return
+			// Popout panels still send messages from the main window's JavaScript context.
+			if (event.source !== window.parent && event.source !== window.parent.opener) return
 			const data = event.data
 			if (data?.source !== SOURCE || data.type !== 'load') return
 			controller?.abort()

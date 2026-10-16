@@ -87,9 +87,15 @@ const theme: DockviewTheme = {
 
 .project-review-tabs :deep(.dv-pre-actions-container),
 .project-review-tabs :deep(.dv-left-actions-container),
-.project-review-tabs :deep(.dv-right-actions-container),
-.project-review-tabs :deep(.dv-void-container) {
+.project-review-tabs :deep(.dv-right-actions-container) {
 	height: calc(var(--dv-tabs-and-actions-container-height) + 6px);
+}
+
+.project-review-tabs :deep(.dv-void-container) {
+	display: flex;
+	min-width: 0;
+	height: auto;
+	align-self: stretch;
 }
 
 .project-review-tabs :deep(.dv-tab) {

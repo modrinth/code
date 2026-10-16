@@ -7,10 +7,11 @@ import type {
 	DockviewReadyEvent,
 	DockviewWillDropEvent,
 	DockviewWillShowOverlayLocationEvent,
+	SerializedDockview,
 	SplitviewApi,
 	SplitviewReadyEvent,
 } from 'dockview-vue'
-import { getGridLocation, LayoutPriority } from 'dockview-vue'
+import { getGridLocation, LayoutPriority, Orientation } from 'dockview-vue'
 import { onBeforeUnmount, ref, watchEffect } from 'vue'
 
 import { projectReviewMessages } from '../messages'
@@ -20,21 +21,32 @@ import { registerDragPopouts } from './drag-popout'
 import {
 	dockPopoutLayout,
 	readWorkspaceLayout,
+	reviewPopoutUrl,
 	saveWorkspaceLayout,
 	workspacePanelSizes,
 	workspaceTabLayoutKey,
 } from './layout-storage'
-import { configureReviewPopout, openReviewPopout, type ReviewPopoutTarget } from './popout-window'
+import {
+	configureReviewPopout,
+	openReviewPopout,
+	restoreReviewPopout,
+	type ReviewPopoutLayout,
+	type ReviewPopoutTarget,
+} from './popout-window'
+import { useTabSelection } from './tab-selection'
 import { type ProjectReviewSlot, type ProjectReviewTab, projectReviewTabs } from './types'
+import { registerWrappedTabs } from './wrapped-tabs'
 
 export function useProjectReviewLayout(
 	getTitle: (tab: ProjectReviewTab) => string,
 	getTabs: () => readonly ProjectReviewTab[],
+	getReady: () => boolean,
 ) {
 	const shortcuts = injectReviewShortcuts()
 	const review = injectReviewContext()
+	const tabSelection = useTabSelection()
 	const detachedTabs = ref<ProjectReviewTab[]>([])
-	const { addNotification } = injectNotificationManager()
+	const { addNotification, removeNotification } = injectNotificationManager()
 	const { formatMessage } = useVIntl()
 	const poppingOut = ref<string[]>([])
 	const popoutSources = new Map<string, string>()
@@ -49,6 +61,14 @@ export function useProjectReviewLayout(
 	const topRightGroupId = ref<string>()
 	let columns: SplitviewApi | undefined
 	let tabsReady = false
+	let leavingPage = false
+	let blockedPopoutLayout: SerializedDockview | undefined
+	let blockedPopoutBaseline: string | undefined
+	const pendingPopouts = new Map<
+		ReviewPopoutLayout,
+		{ notificationId?: string | number; opening: boolean }
+	>()
+	const documentLoaded = ref(document.readyState === 'complete')
 	let saveTimer: ReturnType<typeof setTimeout> | undefined
 	let tabs: DockviewApi | undefined
 	let currentTabLayoutKey: string | undefined
@@ -79,30 +99,127 @@ export function useProjectReviewLayout(
 		else stopCheckingWindows()
 	}
 
+	function currentTabLayout(api: DockviewApi) {
+		const layout = api.toJSON()
+		if (
+			blockedPopoutLayout &&
+			!restoringPopouts() &&
+			blockedPopoutBaseline !== JSON.stringify(layout)
+		) {
+			blockedPopoutLayout = undefined
+			blockedPopoutBaseline = undefined
+		}
+		return blockedPopoutLayout ?? layout
+	}
+
 	function saveLayout() {
 		clearTimeout(saveTimer)
-		if (!columns || !tabs || !tabsReady) return
+		if (!columns || !tabs || !tabsReady || leavingPage || !getReady() || !documentLoaded.value)
+			return
 		const currentLeftWidth = columns.getPanel('left')?.api.width ?? 0
 		const currentRightWidth = columns.getPanel('right')?.api.width ?? 0
 		if (leftVisible.value && currentLeftWidth > 0) leftWidth = currentLeftWidth
 		if (rightVisible.value && currentRightWidth > 0) rightWidth = currentRightWidth
-		const currentTabs = tabs.toJSON()
+		const currentTabs = currentTabLayout(tabs)
 		if (currentTabLayoutKey) tabLayouts.set(currentTabLayoutKey, currentTabs)
 		saveWorkspaceLayout({
 			leftWidth,
 			rightWidth,
 			leftVisible: leftVisible.value,
 			rightVisible: rightVisible.value,
-			tabs: dockPopoutLayout(currentTabs),
-			tabLayouts: Object.fromEntries(
-				[...tabLayouts].map(([key, layout]) => [key, dockPopoutLayout(layout)]),
-			),
+			tabs: currentTabs,
+			tabLayouts: Object.fromEntries(tabLayouts),
 		})
 	}
 
 	function scheduleSave() {
 		clearTimeout(saveTimer)
+		if (leavingPage) return
 		saveTimer = setTimeout(saveLayout, 200)
+	}
+
+	function dismissRestoreNotifications() {
+		for (const pending of pendingPopouts.values()) {
+			if (pending.notificationId !== undefined) removeNotification(pending.notificationId)
+		}
+		pendingPopouts.clear()
+	}
+
+	function restoringPopouts() {
+		return [...pendingPopouts.values()].some((pending) => pending.opening)
+	}
+
+	function popoutPanelIds(popout: ReviewPopoutLayout) {
+		const ids: string[] = []
+		function collect(node: SerializedDockview['grid']['root']) {
+			if (Array.isArray(node.data)) node.data.forEach(collect)
+			else ids.push(...node.data.views)
+		}
+		if (popout.grid) collect(popout.grid.root)
+		else if (popout.data) ids.push(...popout.data.views)
+		return ids
+	}
+
+	function notifyPopoutRestoration(popout: ReviewPopoutLayout) {
+		const pending = pendingPopouts.get(popout)
+		if (!pending || pending.notificationId !== undefined) return
+		const panels = popoutPanelIds(popout)
+			.map((id) => getTitle(id as ProjectReviewTab))
+			.join(', ')
+		pending.notificationId = addNotification({
+			id: crypto.randomUUID(),
+			type: 'neutral',
+			title: formatMessage(projectReviewMessages.restorePopouts),
+			text: formatMessage(projectReviewMessages.restorePopoutsDescription, {
+				panels,
+			}),
+			autoCloseMs: null,
+			noIcon: true,
+			buttons: [
+				{
+					label: formatMessage(projectReviewMessages.reopenPopouts),
+					keepOpen: true,
+					color: 'green',
+					action: () => reopenPopout(popout),
+				},
+			],
+		}).id
+	}
+
+	async function reopenPopout(popout: ReviewPopoutLayout) {
+		const pending = pendingPopouts.get(popout)
+		if (!tabs || !pending || pending.opening || !tabsReady || leavingPage || !getReady()) return
+		currentTabLayout(tabs)
+		pending.opening = true
+		const opened = await restoreReviewPopout(tabs, popout)
+		if (pendingPopouts.get(popout) !== pending) return
+		pending.opening = false
+		if (opened) {
+			if (pending.notificationId !== undefined) removeNotification(pending.notificationId)
+			pendingPopouts.delete(popout)
+			if (!pendingPopouts.size) blockedPopoutLayout = undefined
+		} else notifyPopoutRestoration(popout)
+		syncTabs()
+		if (blockedPopoutLayout && !restoringPopouts()) {
+			blockedPopoutBaseline = JSON.stringify(tabs.toJSON())
+		}
+		scheduleSave()
+	}
+
+	function restoreTabLayout(layout: SerializedDockview) {
+		if (!tabs) return
+		dismissRestoreNotifications()
+		blockedPopoutLayout = undefined
+		blockedPopoutBaseline = undefined
+		if (layout.popoutGroups?.length) {
+			tabs.fromJSON(dockPopoutLayout(layout), { reuseExistingPanels: true })
+			blockedPopoutLayout = layout
+			blockedPopoutBaseline = JSON.stringify(tabs.toJSON())
+			for (const popout of layout.popoutGroups) pendingPopouts.set(popout, { opening: false })
+			for (const popout of layout.popoutGroups) void reopenPopout(popout)
+			return
+		}
+		tabs.fromJSON(layout, { reuseExistingPanels: true })
 	}
 
 	function updateRightPanelWidth() {
@@ -208,8 +325,11 @@ export function useProjectReviewLayout(
 	function onTabsReady({ api }: DockviewReadyEvent) {
 		tabs = api
 		subscriptions.push(
+			registerWrappedTabs(api),
+			tabSelection.register(api),
 			registerDragPopouts(api, (target, position, sourceWindow) => {
-				void popoutPanels(target, position, sourceWindow)
+				const release = tabSelection.keepDragForPopout()
+				void popoutPanels(target, position, sourceWindow).finally(release)
 			}),
 			api.onDidAddPopoutGroup(({ window: child }) => {
 				updateDetachedTabs()
@@ -239,21 +359,8 @@ export function useProjectReviewLayout(
 			api.onDidLayoutChange(scheduleSave),
 			api.onDidActivePanelChange(scheduleSave),
 		)
-		currentTabLayoutKey = workspaceTabLayoutKey(getTabs())
-		let restored = false
-		const savedTabLayout = tabLayouts.get(currentTabLayoutKey)
-		if (savedTabLayout) {
-			try {
-				api.fromJSON(dockPopoutLayout(savedTabLayout))
-				restored = true
-			} catch {
-				api.clear()
-				tabLayouts.delete(currentTabLayoutKey)
-			}
-		}
 		tabsReady = true
 		syncTabs()
-		if (!restored) api.getPanel('description')?.api.setActive()
 		updateCornerGroups()
 	}
 
@@ -285,7 +392,8 @@ export function useProjectReviewLayout(
 		position?: DockviewPopoutGroupOptions['position'],
 		sourceWindow?: Window,
 	) {
-		const panels = 'panels' in target ? [...target.panels] : [target]
+		const panels =
+			'panels' in target ? [...target.panels] : (tabSelection.getDragPanels(target.id) ?? [target])
 		const panelIds = panels.map((panel) => panel.id)
 		if (!tabs || !panels.length || panelIds.some((id) => poppingOut.value.includes(id))) return
 		if (target.api.location.type === 'popout' && !position) return
@@ -298,7 +406,7 @@ export function useProjectReviewLayout(
 				tabs,
 				target,
 				{
-					popoutUrl: '/project-review-popout.html',
+					popoutUrl: reviewPopoutUrl,
 					position,
 				},
 				sourceWindow,
@@ -314,7 +422,7 @@ export function useProjectReviewLayout(
 	function notifyPopoutFailure() {
 		addNotification({
 			type: 'error',
-			text: formatMessage(projectReviewMessages.popoutFailed),
+			title: formatMessage(projectReviewMessages.popoutFailed),
 		})
 	}
 
@@ -334,7 +442,45 @@ export function useProjectReviewLayout(
 	}
 
 	function closeExternalPanels() {
+		blockedPopoutLayout = undefined
+		dismissRestoreNotifications()
 		for (const tab of [...detachedTabs.value]) dockTab(tab)
+	}
+
+	function resetPanelLayout() {
+		if (!tabs || !tabsReady || restoringPopouts() || poppingOut.value.length) return
+		closeExternalPanels()
+		const layout = tabs.toJSON()
+		const views = projectReviewTabs.filter((tab) => getTabs().includes(tab))
+		const groupId = tabs.getPanel('description')?.group.id ?? tabs.groups[0]?.id ?? 'review-tabs'
+		tabLayouts.clear()
+		popoutSources.clear()
+		tabs.fromJSON(
+			{
+				panels: layout.panels,
+				activeGroup: groupId,
+				grid: {
+					...layout.grid,
+					orientation: Orientation.HORIZONTAL,
+					root: {
+						type: 'branch',
+						data: [{ type: 'leaf', data: { id: groupId, views, activeView: views[0] } }],
+					},
+				},
+			},
+			{ reuseExistingPanels: true },
+		)
+		leftWidth = workspacePanelSizes.left.default
+		rightWidth = workspacePanelSizes.right.default
+		leftVisible.value = true
+		rightVisible.value = true
+		for (const side of ['left', 'right'] as const) {
+			const panel = columns?.getPanel(side)
+			panel?.api.setVisible(true)
+			panel?.api.setSize({ size: workspacePanelSizes[side].default })
+		}
+		updateRightPanelWidth()
+		scheduleSave()
 	}
 
 	function revealSlot(slot: ProjectReviewSlot) {
@@ -448,17 +594,21 @@ export function useProjectReviewLayout(
 	}
 
 	function syncTabs() {
+		const ready = getReady() && documentLoaded.value
 		const visibleTabs = getTabs()
 		const nextTabLayoutKey = workspaceTabLayoutKey(visibleTabs)
 		const titles = new Map(visibleTabs.map((tab) => [tab, getTitle(tab)]))
-		if (!tabs || !tabsReady) return
+		if (!tabs || !tabsReady || restoringPopouts() || !ready) return
 		if (currentTabLayoutKey !== nextTabLayoutKey) {
-			if (currentTabLayoutKey) tabLayouts.set(currentTabLayoutKey, tabs.toJSON())
+			if (currentTabLayoutKey) tabLayouts.set(currentTabLayoutKey, currentTabLayout(tabs))
+			blockedPopoutLayout = undefined
+			dismissRestoreNotifications()
 			currentTabLayoutKey = nextTabLayoutKey
 			const savedTabLayout = tabLayouts.get(nextTabLayoutKey)
 			if (savedTabLayout && !tabs.getPopouts().length) {
 				try {
-					tabs.fromJSON(dockPopoutLayout(savedTabLayout))
+					restoreTabLayout(savedTabLayout)
+					if (restoringPopouts()) return
 				} catch {
 					tabs.clear()
 					tabLayouts.delete(nextTabLayoutKey)
@@ -491,20 +641,82 @@ export function useProjectReviewLayout(
 				panel.api.setTitle(titles.get(tab) ?? tab)
 			}
 		}
+		if (!tabs.activePanel) tabs.getPanel('description')?.api.setActive()
 	}
 
 	watchEffect(syncTabs)
 
-	window.addEventListener('pagehide', saveLayout)
+	/** Capture the popouts before Dockview's unload handlers return their panels to the grid. */
+	function onBeforeUnload() {
+		saveLayout()
+		leavingPage = true
+		clearTimeout(saveTimer)
+	}
+
+	function onPageShow() {
+		leavingPage = false
+	}
+
+	function resumeAfterCancelledUnload(event: Event) {
+		if (event.currentTarget === window) leavingPage = false
+	}
+
+	function preventPopoutRefresh(event: KeyboardEvent) {
+		if (event.currentTarget === window) return
+		if (
+			event.key !== 'F5' &&
+			!(
+				(event.ctrlKey || event.metaKey) &&
+				!event.altKey &&
+				(event.code === 'KeyR' || event.key.toLowerCase() === 'r')
+			)
+		)
+			return
+		event.preventDefault()
+		event.stopImmediatePropagation()
+	}
+
+	function onDocumentLoad() {
+		documentLoaded.value = true
+	}
+
+	subscriptions.push(
+		{
+			dispose: shortcuts.listen('keydown', preventPopoutRefresh, {
+				capture: true,
+			}),
+		},
+		{
+			dispose: shortcuts.listen('pointerdown', resumeAfterCancelledUnload, {
+				capture: true,
+			}),
+		},
+		{
+			dispose: shortcuts.listen('keydown', resumeAfterCancelledUnload, {
+				capture: true,
+			}),
+		},
+	)
+	window.addEventListener('beforeunload', onBeforeUnload, { capture: true })
+	window.addEventListener('load', onDocumentLoad)
+	window.addEventListener('pageshow', onPageShow)
+	window.addEventListener('pagehide', onBeforeUnload)
 	onBeforeUnmount(() => {
 		saveLayout()
 		tabsReady = false
-		window.removeEventListener('pagehide', saveLayout)
+		clearTimeout(saveTimer)
+		dismissRestoreNotifications()
+		window.removeEventListener('load', onDocumentLoad)
+		window.removeEventListener('beforeunload', onBeforeUnload, true)
+		window.removeEventListener('pageshow', onPageShow)
+		window.removeEventListener('pagehide', onBeforeUnload)
 		subscriptions.forEach((subscription) => subscription.dispose())
 		popoutCleanups.forEach((cleanup) => cleanup())
 	})
 
 	return {
+		resetPanelLayout,
+		selectedTabs: tabSelection.selectedTabs,
 		closeExternalPanels,
 		detachedTabs,
 		popoutTab,

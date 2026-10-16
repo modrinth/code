@@ -5,9 +5,17 @@ export const projectReviewMessages = defineMessages({
 		id: 'moderation.project-review.popoutPanel',
 		defaultMessage: 'Open panel in its own window',
 	},
-	closeExternalPanels: {
-		id: 'moderation.project-review.closeExternalPanels',
-		defaultMessage: 'Close all popped out panels',
+	closePopoutWindows: {
+		id: 'moderation.project-review.closePopoutWindows',
+		defaultMessage: 'Close popout windows',
+	},
+	panelLayout: {
+		id: 'moderation.project-review.panelLayout',
+		defaultMessage: 'Panel layout',
+	},
+	resetPanelLayout: {
+		id: 'moderation.project-review.resetPanelLayout',
+		defaultMessage: 'Reset panel layout',
 	},
 	dockPanel: {
 		id: 'moderation.project-review.dockPanel',
@@ -15,7 +23,19 @@ export const projectReviewMessages = defineMessages({
 	},
 	popoutFailed: {
 		id: 'moderation.project-review.popoutFailed',
-		defaultMessage: 'Could not open the panel window. Allow popups for this site and try again.',
+		defaultMessage: 'Could not open the panel window',
+	},
+	restorePopouts: {
+		id: 'moderation.project-review.restorePopouts',
+		defaultMessage: 'Popout window closed',
+	},
+	restorePopoutsDescription: {
+		id: 'moderation.project-review.restorePopoutsDescription',
+		defaultMessage: 'Panels from this window have been moved to the main window: {panels}.',
+	},
+	reopenPopouts: {
+		id: 'moderation.project-review.reopenPopouts',
+		defaultMessage: 'Reopen window',
 	},
 	generalSettings: {
 		id: 'moderation.project-review.generalSettings',

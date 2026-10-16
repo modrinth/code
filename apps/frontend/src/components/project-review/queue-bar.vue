@@ -4,30 +4,60 @@
 			{{ formatMessage(messages.queueError) }}
 		</div>
 		<nav
-			class="flex min-h-10 flex-wrap items-center justify-between gap-x-4 gap-y-1 px-3 py-1.5 text-xs text-secondary"
+			class="flex min-h-10 flex-wrap items-center justify-between gap-x-3 gap-y-1 px-2 py-0 pr-3 text-xs text-secondary"
 			:aria-label="formatMessage(messages.queueNavigation)"
 			:aria-busy="busy"
 		>
-			<div class="flex items-center gap-3 text-[0.6875rem] font-medium" aria-live="polite">
-				<button
-					v-tooltip="{ text: formatMessage(commonMessages.settingsLabel), delay: 500 }"
-					type="button"
-					class="queue-action"
-					:aria-label="formatMessage(commonMessages.settingsLabel)"
-					@click="settingsModal?.show($event)"
-				>
-					<SettingsIcon aria-hidden="true" />
-				</button>
-				<button
-					v-if="detachedTabs.length"
-					v-tooltip="{ text: formatMessage(messages.closeExternalPanels), delay: 500 }"
-					type="button"
-					class="queue-action"
-					:aria-label="formatMessage(messages.closeExternalPanels)"
-					@click="closeExternalPanels"
-				>
-					<MonitorXIcon aria-hidden="true" />
-				</button>
+			<div class="flex items-center gap-3 text-xs font-medium" aria-live="polite">
+				<div class="flex gap-0.5">
+					<button
+						v-tooltip="{ text: formatMessage(commonMessages.settingsLabel), delay: 500 }"
+						type="button"
+						class="queue-action"
+						:aria-label="formatMessage(commonMessages.settingsLabel)"
+						@click="settingsModal?.show($event)"
+					>
+						<SettingsIcon aria-hidden="true" />
+					</button>
+					<FloatingMenu
+						placement="top-start"
+						@open="panelMenuOpen = true"
+						@close="panelMenuOpen = false"
+					>
+						<button
+							v-tooltip="{ text: formatMessage(messages.panelLayout), delay: 500 }"
+							type="button"
+							class="queue-action"
+							:aria-label="formatMessage(messages.panelLayout)"
+							:aria-expanded="panelMenuOpen"
+						>
+							<LayoutPanelLeftIcon aria-hidden="true" />
+						</button>
+						<template #popper="{ hide }">
+							<div class="flex flex-col gap-1">
+								<Button
+									type="quiet"
+									class="justify-start"
+									:disabled="isLoading || poppingOut.length > 0"
+									@click="runPanelAction(resetPanelLayout, hide)"
+								>
+									<RotateCounterClockwiseIcon aria-hidden="true" />
+									{{ formatMessage(messages.resetPanelLayout) }}
+								</Button>
+								<Button
+									v-if="detachedTabs.length"
+									type="quiet"
+									class="justify-start"
+									@click="runPanelAction(closeExternalPanels, hide)"
+								>
+									<MonitorXIcon aria-hidden="true" />
+									{{ formatMessage(messages.closePopoutWindows) }}
+								</Button>
+							</div>
+						</template>
+					</FloatingMenu>
+				</div>
+
 				<span
 					>{{ formatMessage(messages.complete) }}
 					<span class="ml-1 tabular-nums text-primary">{{
@@ -40,11 +70,11 @@
 					<span class="ml-1 tabular-nums text-primary">{{ queue.currentQueue.total }}</span></span
 				>
 			</div>
-			<div class="flex items-center gap-3">
+			<div class="flex items-center">
 				<button type="button" class="queue-action" :disabled="busy" @click="exit">
 					{{ formatMessage(messages.exit) }}
 				</button>
-				<span class="h-3 w-px bg-divider" aria-hidden="true" />
+				<span class="mx-1.5 h-3 w-px bg-divider" aria-hidden="true" />
 				<button type="button" class="queue-action" :disabled="disabled || !canGoBack" @click="back">
 					<LeftArrowIcon class="mb-px" />
 					{{ formatMessage(messages.back) }}
@@ -80,12 +110,21 @@
 <script setup lang="ts">
 import {
 	KeyboardIcon,
+	LayoutPanelLeftIcon,
 	LeftArrowIcon,
 	MonitorXIcon,
 	RightArrowIcon,
+	RotateCounterClockwiseIcon,
 	SettingsIcon,
 } from '@modrinth/assets'
-import { commonMessages, TabbedModal, type TabbedModalTab, useVIntl } from '@modrinth/ui'
+import {
+	Button,
+	commonMessages,
+	FloatingMenu,
+	TabbedModal,
+	type TabbedModalTab,
+	useVIntl,
+} from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import ModerationKeybinds from '~/components/ui/moderation/settings/ModerationKeybinds.vue'
@@ -96,6 +135,7 @@ import { injectProjectReviewContext } from './layout/context'
 import { projectReviewMessages as messages } from './messages'
 import { useReviewShortcut } from './shortcuts'
 
+const panelMenuOpen = ref(false)
 const settingsModal = ref<InstanceType<typeof TabbedModal> | null>(null)
 const settingsTabs: TabbedModalTab[] = [
 	{
@@ -111,7 +151,8 @@ const settingsTabs: TabbedModalTab[] = [
 ]
 
 const { queue, isLoading, navigation } = injectProjectReviewPageContext()
-const { detachedTabs, closeExternalPanels } = injectProjectReviewContext()
+const { detachedTabs, closeExternalPanels, resetPanelLayout, poppingOut } =
+	injectProjectReviewContext()
 const {
 	busy,
 	error: navigationError,
@@ -125,6 +166,12 @@ const {
 } = navigation
 const { formatMessage } = useVIntl()
 const disabled = computed(() => busy.value || isLoading.value || !queue.hydrated)
+
+function runPanelAction(action: () => void, hide: () => void) {
+	action()
+	hide()
+}
+
 useReviewShortcut(
 	'back',
 	() => {
@@ -153,7 +200,7 @@ useReviewShortcut(
 	display: inline-flex;
 	align-items: center;
 	gap: 0.25rem;
-	padding: 0.25rem 0;
+	padding: 0.5rem 0.5rem;
 	background: transparent;
 	color: inherit;
 	font: inherit;
@@ -167,7 +214,7 @@ useReviewShortcut(
 	opacity: 0.4;
 }
 .queue-action :deep(svg) {
-	width: 0.875rem;
-	height: 0.875rem;
+	width: 1rem;
+	height: 1rem;
 }
 </style>

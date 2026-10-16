@@ -4,7 +4,7 @@ const STORAGE_KEY = 'moderation.project-review.slicer-bridge.v1'
  * Version of `bridge.js`. Bump whenever the script changes so reviewers with an older copy
  * installed in slicer are prompted to import the new one.
  */
-export const SLICER_BRIDGE_VERSION = 6
+export const SLICER_BRIDGE_VERSION = 7
 
 interface SavedSlicerBridge {
 	version: number

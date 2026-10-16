@@ -3131,8 +3131,8 @@
   "moderation.project-review.changelog": {
     "message": "Changelog"
   },
-  "moderation.project-review.closeExternalPanels": {
-    "message": "Close all popped out panels"
+  "moderation.project-review.closePopoutWindows": {
+    "message": "Close popout windows"
   },
   "moderation.project-review.closeReview": {
     "message": "Close review controls"
@@ -3440,6 +3440,9 @@
   "moderation.project-review.owner": {
     "message": "Owner"
   },
+  "moderation.project-review.panelLayout": {
+    "message": "Panel layout"
+  },
   "moderation.project-review.pendingFiles": {
     "message": "Pending files ({count})"
   },
@@ -3459,7 +3462,7 @@
     "message": "Platforms"
   },
   "moderation.project-review.popoutFailed": {
-    "message": "Could not open the panel window. Allow popups for this site and try again."
+    "message": "Could not open the panel window"
   },
   "moderation.project-review.popoutPanel": {
     "message": "Open panel in its own window"
@@ -3515,6 +3518,9 @@
   "moderation.project-review.rejectedCount": {
     "message": "{count} rejected"
   },
+  "moderation.project-review.reopenPopouts": {
+    "message": "Reopen window"
+  },
   "moderation.project-review.requesting": {
     "message": "Requesting"
   },
@@ -3524,8 +3530,17 @@
   "moderation.project-review.reset": {
     "message": "Reset"
   },
+  "moderation.project-review.resetPanelLayout": {
+    "message": "Reset panel layout"
+  },
   "moderation.project-review.resolvePermissions": {
     "message": "Review redistribution permissions"
+  },
+  "moderation.project-review.restorePopouts": {
+    "message": "Popout window closed"
+  },
+  "moderation.project-review.restorePopoutsDescription": {
+    "message": "Panels from this window have been moved to the main window: {panels}."
   },
   "moderation.project-review.retry": {
     "message": "Retry"
@@ -4274,8 +4289,14 @@
   "project-review.decision.approve": {
     "message": "Approve"
   },
+  "project-review.decision.message-mode": {
+    "message": "Send issues as thread message"
+  },
   "project-review.decision.reject": {
     "message": "Reject"
+  },
+  "project-review.decision.send-issues-message": {
+    "message": "Send issues thread message"
   },
   "project-review.decision.send-to-review": {
     "message": "Send to review"

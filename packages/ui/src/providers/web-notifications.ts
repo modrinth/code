@@ -149,7 +149,7 @@ export abstract class AbstractWebNotificationManager {
 	private createNotification(notification: Partial<WebNotification>): WebNotification {
 		return {
 			...notification,
-			id: new Date().getTime(),
+			id: notification.id ?? new Date().getTime(),
 			count: 1,
 		} as WebNotification
 	}

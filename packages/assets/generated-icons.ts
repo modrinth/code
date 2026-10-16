@@ -180,6 +180,7 @@ import _LandmarkIcon from './icons/landmark.svg?component'
 import _LanguagesIcon from './icons/languages.svg?component'
 import _LayersIcon from './icons/layers.svg?component'
 import _LayoutGridIcon from './icons/layout-grid.svg?component'
+import _LayoutPanelLeftIcon from './icons/layout-panel-left.svg?component'
 import _LayoutTemplateIcon from './icons/layout-template.svg?component'
 import _LeftArrowIcon from './icons/left-arrow.svg?component'
 import _LibraryIcon from './icons/library.svg?component'
@@ -658,6 +659,7 @@ export const LandmarkIcon = _LandmarkIcon
 export const LanguagesIcon = _LanguagesIcon
 export const LayersIcon = _LayersIcon
 export const LayoutGridIcon = _LayoutGridIcon
+export const LayoutPanelLeftIcon = _LayoutPanelLeftIcon
 export const LayoutTemplateIcon = _LayoutTemplateIcon
 export const LeftArrowIcon = _LeftArrowIcon
 export const LibraryIcon = _LibraryIcon

@@ -1,11 +1,13 @@
 <template>
 	<span
+		:data-review-tab="params.params.tab"
 		class="box-border flex h-full w-full items-center justify-center whitespace-nowrap rounded-[10px] border border-solid px-2.5 text-sm font-medium transition-all active:scale-[0.97] motion-reduce:transition-none"
-		:class="
+		:class="[
 			isActive
 				? 'border-green bg-highlight-green text-green'
-				: 'border-transparent bg-transparent text-primary hover:bg-surface-4'
-		"
+				: 'border-transparent bg-transparent text-primary hover:bg-surface-4',
+			isSelected ? 'ring-1 ring-inset ring-primary' : '',
+		]"
 	>
 		<span>
 			{{ formatMessage(projectReviewMessages[params.params.tab]) }}
@@ -26,6 +28,7 @@ import { injectProjectReviewPageContext } from '~/providers/project-review'
 
 import KbdChip from '../../kdb-chip.vue'
 import { projectReviewMessages } from '../../messages'
+import { injectProjectReviewContext } from '../context'
 import type { ProjectReviewTab } from '../types'
 
 const props = defineProps<{
@@ -33,6 +36,8 @@ const props = defineProps<{
 }>()
 const { formatMessage } = useVIntl()
 const { tabCounts } = injectProjectReviewPageContext()
+const { selectedTabs } = injectProjectReviewContext()
+const isSelected = computed(() => selectedTabs.value.includes(props.params.params.tab))
 const count = computed(() => {
 	const tab = props.params.params.tab
 	return tab in tabCounts.value ? tabCounts.value[tab as keyof typeof tabCounts.value] : undefined

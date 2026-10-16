@@ -37,7 +37,7 @@
 				</div>
 			</template>
 		</NewModal>
-		<ProjectReviewLayout :tabs="visibleTabs" :reset-key="selection">
+		<ProjectReviewLayout :tabs="visibleTabs" :reset-key="selection" :ready="layoutReady">
 			<template #left><ProjectInfo /></template>
 			<template #right>
 				<div
@@ -172,6 +172,7 @@ const {
 	isLoading,
 	navigation,
 } = injectProjectReviewPageContext()
+const layoutReady = computed(() => !!project.value && !isLoading.value && !navigation.busy.value)
 provideReviewSlicer(createReviewSlicer(projectId, versions))
 const visibleTabs = computed<readonly ProjectReviewTab[]>((previousTabs) => {
 	if (!project.value) {
