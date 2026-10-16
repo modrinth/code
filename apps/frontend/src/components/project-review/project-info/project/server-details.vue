@@ -2,13 +2,19 @@
 	<Section :heading="formatMessage(messages.serverDetails)" :target="{ kind: 'server' }">
 		<dl v-if="project" class="m-0 grid grid-cols-[max-content_minmax(0,1fr)] gap-x-3 gap-y-2.5">
 			<dt class="font-medium">{{ formatMessage(messages.serverAddress) }}</dt>
-			<dd class="m-0 break-all text-primary">
+			<dd class="m-0 flex items-center gap-1.5 break-all text-primary">
 				<CopyCode
 					v-if="project.minecraft_java_server?.address"
 					:text="project.minecraft_java_server.address"
 					class="!-my-0.5"
 				/>
 				<span v-else>{{ formatMessage(messages.noServerAddress) }}</span>
+				<TriangleAlertIcon
+					v-if="isTemporaryHost"
+					v-tooltip="formatMessage(messages.serverAddressTemporaryHost)"
+					:aria-label="formatMessage(messages.serverAddressTemporaryHost)"
+					class="size-4 shrink-0 text-orange"
+				/>
 			</dd>
 			<dt class="font-medium">{{ formatMessage(messages.serverRegion) }}</dt>
 			<dd class="m-0 text-primary">
@@ -123,6 +129,8 @@
 </template>
 
 <script setup lang="ts">
+import { TriangleAlertIcon } from '@modrinth/assets'
+import { isTempHostAddress } from '@modrinth/moderation'
 import {
 	Avatar,
 	BulletDivider,
@@ -148,6 +156,9 @@ const { project } = injectProjectReviewPageContext()
 const client = injectModrinthClient()
 const { formatMessage } = useVIntl()
 const tags = injectTags(null)
+const isTemporaryHost = computed(() =>
+	isTempHostAddress(project.value?.minecraft_java_server?.address ?? ''),
+)
 const content = computed(() => project.value?.minecraft_java_server?.content)
 const modpackVersionId = computed(() =>
 	content.value?.kind === 'modpack' ? content.value.version_id : '',

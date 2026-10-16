@@ -346,6 +346,10 @@ export const projectReviewMessages = defineMessages({
 		id: 'moderation.project-review.serverAddress',
 		defaultMessage: 'Address',
 	},
+	serverAddressTemporaryHost: {
+		id: 'moderation.project-review.serverAddressTemporaryHost',
+		defaultMessage: 'This address uses a temporary server host.',
+	},
 	noServerAddress: {
 		id: 'moderation.project-review.noServerAddress',
 		defaultMessage: 'No address.',

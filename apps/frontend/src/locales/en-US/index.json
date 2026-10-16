@@ -3578,6 +3578,9 @@
   "moderation.project-review.serverAddress": {
     "message": "Address"
   },
+  "moderation.project-review.serverAddressTemporaryHost": {
+    "message": "This address uses a temporary server host."
+  },
   "moderation.project-review.serverContent": {
     "message": "Content"
   },
