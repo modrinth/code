@@ -68,18 +68,14 @@ export const licenseReviewPanel = panel({
 		label: 'Invalid Link',
 		shown: (ctx) => !ctx.projectV3.minecraft_server && !!ctx.projectV3.license.url,
 	}),
-	section({
+	toggle({
 		shown: (ctx) =>
 			!ctx.projectV3.minecraft_server &&
 			ctx.selected.issueIds.includes(licenseInvalidLinkIssue.id) &&
 			!!ctx.projectV3.license.url,
-	}).content(
-		toggle({
-			shown: (ctx) => !ctx.projectV3.minecraft_server,
-			issue: licenseInvalidLinkIssue,
-			label: 'Invalid Link: Custom License',
-			id: 'license-custom-license',
-		}),
-	),
+		issue: licenseInvalidLinkIssue,
+		label: 'Invalid Link: Custom License',
+		id: 'license-custom-license',
+	}),
 	sourceRequiredSection,
 )
