@@ -1,3 +1,42 @@
+//! Handles tracking which file paths we've given the sandbox access to, in a
+//! global per-container [`AppliedAclLedger`].
+//!
+//! For each AppContainer we make, we give it a registry key at
+//! `HKCU\Software\MinecraftSandbox\<SID>`, under the name `Grant`. When we give
+//! the sandbox permission to access a specific path, we add it to the ACL, and
+//! record it in the ledger; when we want to reset the sandbox's file access,
+//! we can read the ledger to see what access we previously gave it, and revoke
+//! those.
+//!
+//! The reason we need a ledger is because Windows doesn't let us list all files
+//! which we've allowed to an AppContainer via ACL. Instead, it works the other
+//! way around, where individual files/directories list what AppContainers are
+//! allowed to read/write/traverse them. It would be impractical to scan every
+//! single file on the disk to see if our container can access it, so instead we
+//! keep track of it ourselves.
+//!
+//! While reading/writing the ledger, we take a global Windows mutex keyed to
+//! that container, to make sure that reads/writes won't conflict with another
+//! process trying to read/write to the same ledger.
+//!
+//! When we spawn an instance, we keep track of what permissions it has in the
+//! ledger, and key those grants by the instance we've just made[^1]. We
+//! also prune the ledger - find any entries keyed by a process which is now
+//! dead, and remove it. This lets up clean up the grants list automatically.
+//!
+//! ACL grants are per-container, **not** per process. So all processes in the
+//! same AppContainer sandbox share the same access. If you spawn a new process,
+//! and it has less permissions than a process that we spawned before, then we
+//! wouldn't want that old process to suddenly stop working since it can no
+//! longer access some files; to solve this, the real ACL that we apply is the
+//! *union* of all grants of all instances. Since instances get cleaned up
+//! later, revoking a grant still works.
+//!
+//! [^1]: When we're preparing to spawn an instance, we give the ledger entry a
+//! UUID; after we've actually spawned the process, *then* we put the PID and
+//! process creation time into the ledger (both of these let us uniquely
+//! identify the process, since Windows can reuse PIDs).
+
 use std::collections::{BTreeMap, HashSet};
 use std::io;
 use std::os::windows::io::{AsRawHandle, OwnedHandle};
