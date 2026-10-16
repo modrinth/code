@@ -1460,6 +1460,21 @@
   "create.project.visibility-unlisted": {
     "message": "Unlisted"
   },
+  "create.restricted-alert.description": {
+    "message": "A moderator has removed this permission from your account."
+  },
+  "create.restricted-alert.header": {
+    "message": "Action restricted"
+  },
+  "create.restricted-alert.view-standing": {
+    "message": "View account standing"
+  },
+  "create.version.restricted-text": {
+    "message": "A moderator has removed this permission from your account. See Account standing in your account settings for details."
+  },
+  "create.version.restricted-title": {
+    "message": "Action restricted"
+  },
   "dashboard.affiliate-links.create.button": {
     "message": "Create affiliate link"
   },
@@ -5197,6 +5212,21 @@
   },
   "settings.account.security.two-factor.title": {
     "message": "Two-factor authentication"
+  },
+  "settings.account.standing.good": {
+    "message": "Your account is in good standing."
+  },
+  "settings.account.standing.reason-label": {
+    "message": "Reason:"
+  },
+  "settings.account.standing.restricted.description": {
+    "message": "A moderator has removed the following permissions from your account:"
+  },
+  "settings.account.standing.restricted.header": {
+    "message": "Your account has been restricted"
+  },
+  "settings.account.standing.title": {
+    "message": "Account standing"
   },
   "settings.account.two-factor.backup.intro": {
     "message": "Download and save these back-up codes in a safe place. You can use these in-place of a 2FA code if you ever lose access to your device! You should protect these codes like your password."

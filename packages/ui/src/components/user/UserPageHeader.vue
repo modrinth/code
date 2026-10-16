@@ -11,7 +11,10 @@
 			/>
 		</template>
 
-		<template v-if="isOfficialAccount || showAffiliateBadge || user.lock" #badges>
+		<template
+			v-if="isOfficialAccount || showAffiliateBadge || user.lock || showRestrictedBadge"
+			#badges
+		>
 			<PageHeaderBadgeItem
 				v-if="isOfficialAccount"
 				:icon="BadgeCheckIcon"
@@ -35,6 +38,14 @@
 				class="border-highlight-red bg-highlight-red !text-red"
 			>
 				{{ formatMessage(messages.lockedLabel) }}
+			</PageHeaderBadgeItem>
+			<PageHeaderBadgeItem
+				v-if="showRestrictedBadge"
+				:icon="ShieldAlertIcon"
+				:tooltip="user.restriction?.private_reason ?? user.restriction?.reason ?? undefined"
+				class="border-highlight-orange bg-highlight-orange !text-orange"
+			>
+				{{ formatMessage(messages.restrictedLabel) }}
 			</PageHeaderBadgeItem>
 		</template>
 
@@ -199,6 +210,18 @@ const messages = defineMessages({
 		id: 'profile.button.unlock',
 		defaultMessage: 'Unlock account',
 	},
+	restrictedLabel: {
+		id: 'profile.label.restricted',
+		defaultMessage: 'Restricted',
+	},
+	restrictButton: {
+		id: 'profile.button.restrict',
+		defaultMessage: 'Restrict user',
+	},
+	editRestrictionsButton: {
+		id: 'profile.button.edit-restrictions',
+		defaultMessage: 'Edit restrictions',
+	},
 	revokeSessionsButton: {
 		id: 'profile.button.revoke-sessions',
 		defaultMessage: 'Revoke all sessions',
@@ -262,10 +285,13 @@ const emit = defineEmits<{
 	openAnalytics: []
 	editUser: []
 	toggleLock: []
+	restrict: []
 	revokeSessions: []
 	forcePasswordReset: []
 	reset2fa: []
 }>()
+
+const showRestrictedBadge = computed(() => props.isStaff && !!props.user.restriction)
 
 const { formatMessage } = useVIntl()
 const formatNumber = useFormatNumber()
@@ -348,6 +374,16 @@ const moreActions = computed<ButtonMenuOption[]>(() => [
 		action: () => emit('toggleLock'),
 		tone: 'red',
 		shown: props.showStaffActions && props.isAdmin && props.user.role === 'developer',
+	},
+	{
+		id: 'restrict',
+		label: formatMessage(
+			props.user.restriction ? messages.editRestrictionsButton : messages.restrictButton,
+		),
+		icon: ShieldAlertIcon,
+		action: () => emit('restrict'),
+		tone: 'red',
+		shown: props.showStaffActions && props.isStaff && props.user.role === 'developer',
 	},
 	{
 		id: 'revoke-sessions',

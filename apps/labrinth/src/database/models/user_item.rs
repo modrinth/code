@@ -4,9 +4,11 @@ use crate::database::models::DBOrganizationId;
 use crate::database::models::charge_item::DBCharge;
 use crate::database::models::thread_item::ThreadMessageBuilder;
 use crate::database::models::user_lock_item::DBUserLock;
+use crate::database::models::user_restriction_item::DBUserRestriction;
 use crate::database::models::user_subscription_item::DBUserSubscription;
 use crate::database::{PgTransaction, models};
 use crate::models::billing::ChargeStatus;
+use crate::models::pats::Scopes;
 use crate::models::projects::ProjectStatus;
 use crate::models::threads::MessageBody;
 use crate::models::users::Badges;
@@ -65,6 +67,9 @@ pub struct DBUser {
 
     #[serde(default)]
     pub lock: Option<DBUserLock>,
+
+    #[serde(default)]
+    pub restriction: Option<DBUserRestriction>,
 }
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
@@ -84,6 +89,12 @@ pub struct Pride26CampaignDonation {
 impl DBUser {
     pub fn is_locked(&self) -> bool {
         self.lock.is_some()
+    }
+
+    pub fn removed_perms(&self) -> Scopes {
+        self.restriction
+            .as_ref()
+            .map_or(Scopes::NONE, |restriction| restriction.removed_perms)
     }
 
     pub async fn insert(
@@ -234,9 +245,15 @@ impl DBUser {
                         eligibility_verified_at,
                         user_locks.locked_by AS "lock_locked_by?",
                         user_locks.reason AS "lock_reason?",
-                        user_locks.created AS "lock_created?"
+                        user_locks.created AS "lock_created?",
+                        user_restrictions.removed_perms AS "restriction_removed_perms?",
+                        user_restrictions.reason AS "restriction_reason?",
+                        user_restrictions.private_reason AS "restriction_private_reason?",
+                        user_restrictions.restricted_by AS "restriction_restricted_by?",
+                        user_restrictions.updated AS "restriction_updated?"
                     FROM users
                     LEFT JOIN user_locks ON user_locks.user_id = users.id
+                    LEFT JOIN user_restrictions ON user_restrictions.user_id = users.id
                     WHERE id = ANY($1) OR LOWER(username) = ANY($2)
                     "#,
                     &user_ids,
@@ -295,6 +312,18 @@ impl DBUser {
                                     locked_by: DBUserId(locked_by),
                                     reason,
                                     created,
+                                }),
+                            restriction: u
+                                .restriction_removed_perms
+                                .zip(u.restriction_restricted_by)
+                                .zip(u.restriction_updated)
+                                .map(|((removed_perms, restricted_by), updated)| DBUserRestriction {
+                                    user_id: DBUserId(u.id),
+                                    removed_perms: Scopes::from_postgres(removed_perms),
+                                    reason: u.restriction_reason,
+                                    private_reason: u.restriction_private_reason,
+                                    restricted_by: DBUserId(restricted_by),
+                                    updated,
                                 }),
                         };
 
@@ -1191,6 +1220,19 @@ impl DBUser {
             .execute(&mut *transaction)
             .await
             .wrap_err("failed to update user_locks locked_by")?;
+
+            sqlx::query!(
+                "
+				UPDATE user_restrictions
+				SET restricted_by = $1
+				WHERE restricted_by = $2
+				",
+                deleted_user as DBUserId,
+                id as DBUserId,
+            )
+            .execute(&mut *transaction)
+            .await
+            .wrap_err("failed to update user_restrictions restricted_by")?;
 
             sqlx::query!(
                 "
