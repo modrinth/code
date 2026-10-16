@@ -33,7 +33,6 @@
 							{{ formatMessage(messages.notTranslatedLabel) }}
 						</span>
 					</span>
-					<RightArrowIcon aria-hidden="true" class="ml-auto h-5 w-5 shrink-0 text-secondary" />
 				</button>
 			</div>
 			<p v-else-if="query.trim().length >= MIN_QUERY_LENGTH" class="m-0 text-secondary">
@@ -118,14 +117,7 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import {
-	LeftArrowIcon,
-	LogInIcon,
-	RightArrowIcon,
-	SearchIcon,
-	SendIcon,
-	XIcon,
-} from '@modrinth/assets'
+import { LeftArrowIcon, LogInIcon, SearchIcon, SendIcon, XIcon } from '@modrinth/assets'
 import Fuse from 'fuse.js/dist/fuse.basic'
 import { computed, ref, shallowRef } from 'vue'
 
