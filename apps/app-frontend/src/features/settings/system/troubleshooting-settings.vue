@@ -7,8 +7,16 @@ import {
 	LoaderCircleIcon,
 	TrashIcon,
 } from '@modrinth/assets'
-import { Button, defineMessages, injectNotificationManager, Toggle, useVIntl } from '@modrinth/ui'
+import {
+	Button,
+	defineMessages,
+	injectNotificationManager,
+	IntlFormatted,
+	Toggle,
+	useVIntl,
+} from '@modrinth/ui'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
+import { openUrl } from '@tauri-apps/plugin-opener'
 import { ref } from 'vue'
 
 import {
@@ -69,7 +77,7 @@ const messages = defineMessages({
 	reportAdDescription: {
 		id: 'app.settings.troubleshooting.report-ad.description',
 		defaultMessage:
-			'Seen an inappropriate or misleading ad? Copy its details while it is still showing and send them to Modrinth support so we can block it.',
+			"Seen an inappropriate or offensive ad? Copy its details while it's showing and send them to <support>Modrinth Support</support>. We'll review it and remove it.",
 	},
 	copyAdDetails: {
 		id: 'app.settings.troubleshooting.report-ad.copy',
@@ -170,6 +178,10 @@ async function openDbBackupsFolder() {
 
 async function handleExportDebugInfo() {
 	await exportDebugInfo(formatMessage(messages.exportDebugInfo)).catch(handleError)
+}
+
+function openSupport() {
+	openUrl('https://support.modrinth.com')
 }
 
 async function handleCopyAdDetails() {
@@ -284,7 +296,17 @@ async function handleCopyAdDetails() {
 				{{ formatMessage(copiedAdDetails ? messages.copiedAdDetails : messages.copyAdDetails) }}
 			</Button>
 			<p class="m-0 leading-tight text-secondary">
-				{{ formatMessage(messages.reportAdDescription) }}
+				<IntlFormatted :message-id="messages.reportAdDescription">
+					<template #support="{ children }">
+						<button
+							type="button"
+							class="inline cursor-pointer border-0 bg-transparent p-0 text-[length:inherit] leading-[inherit] text-blue hover:underline"
+							@click="openSupport"
+						>
+							<component :is="() => children" />
+						</button>
+					</template>
+				</IntlFormatted>
 			</p>
 		</div>
 		<div class="flex items-center justify-between gap-4">
