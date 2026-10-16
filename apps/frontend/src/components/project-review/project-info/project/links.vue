@@ -26,32 +26,40 @@
 					<span v-if="link.unavailable && !link.removed" class="text-xs text-secondary">
 						{{ formatMessage(messages.linkUnavailable) }}
 					</span>
-					<a
-						v-if="link.url"
-						v-tooltip="
-							link.removed
-								? formatMessage(messages.linkRemoved, { link: link.url })
-								: link.unavailable
-									? formatMessage(messages.previousLink, { url: link.url })
-									: link.url
-						"
-						:href="link.url"
-						:aria-label="
-							link.removed
-								? formatMessage(messages.linkRemoved, { link: link.url })
-								: link.unavailable
-									? formatMessage(messages.previousLink, { url: link.url })
-									: undefined
-						"
-						target="_blank"
-						rel="noopener noreferrer"
-						class="inline-flex w-fit min-w-0 max-w-full items-center gap-1 text-xs !transition-colors hover:text-contrast"
-						:class="{ 'text-secondary line-through': link.unavailable }"
-					>
-						<component :is="link.icon" class="mt-px size-3.5 shrink-0" aria-hidden="true" />
-						<span class="min-w-0 truncate">{{ link.url.replace(/^https?:\/\//, '') }}</span>
-						<ExternalIcon class="mb-0.5 size-3.5 shrink-0" aria-hidden="true" />
-					</a>
+					<div v-if="link.url" class="flex min-w-0 items-center gap-1.5">
+						<LinkInfoTooltip
+							v-slot="{ tooltipId }"
+							:url="link.url"
+							:validation-messages="link.validationMessages"
+							@hover="setLinkHovered(link.key, $event)"
+						>
+							<a
+								:href="link.url"
+								:aria-describedby="tooltipId"
+								:aria-label="
+									link.removed
+										? formatMessage(messages.linkRemoved, { link: link.url })
+										: link.unavailable
+											? formatMessage(messages.previousLink, { url: link.url })
+											: undefined
+								"
+								target="_blank"
+								rel="noopener noreferrer"
+								class="inline-flex w-fit min-w-0 max-w-full items-center gap-1 text-xs !transition-colors hover:text-contrast"
+								:class="{ 'text-secondary line-through': link.unavailable }"
+							>
+								<component :is="link.icon" class="mt-px size-3.5 shrink-0" aria-hidden="true" />
+								<span class="min-w-0 truncate">{{ link.url.replace(/^https?:\/\//, '') }}</span>
+								<ExternalIcon class="mb-0.5 size-3.5 shrink-0" aria-hidden="true" />
+							</a>
+						</LinkInfoTooltip>
+						<TriangleAlertIcon
+							v-if="link.warningText"
+							v-tooltip="link.warningText"
+							:aria-label="link.warningText"
+							class="size-4 shrink-0 text-orange"
+						/>
+					</div>
 				</div>
 			</ReviewPanel>
 		</div>
@@ -75,25 +83,57 @@ import {
 	PayPalIcon,
 	StoreIcon,
 	TagCategoryScrollTextIcon,
+	TriangleAlertIcon,
 	WikiIcon,
 } from '@modrinth/assets'
 import { licenseRequiresSource } from '@modrinth/moderation'
-import { TagItem, useVIntl } from '@modrinth/ui'
-import { computed, useTemplateRef } from 'vue'
+import { injectModrinthClient, TagItem, useVIntl } from '@modrinth/ui'
+import { useQuery } from '@tanstack/vue-query'
+import { computed, ref, useTemplateRef, watch } from 'vue'
+
+import { getProjectNagMessages } from '~/composables/project-nag-validation'
+import { projectQueryOptions, STALE_TIME } from '~/composables/queries/project'
 
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 import { reviewExternalUrl } from '~/providers/project-review/project-links'
 import { injectReviewPanels } from '~/providers/project-review/review-panels'
 
 import { projectReviewMessages as messages } from '../../messages'
+import LinkInfoTooltip from '../../link-info/tooltip.vue'
 import ReviewPanel from '../../review-panel/index.vue'
 import EditButton from '../edit/button.vue'
 import EditModal from '../edit/links.vue'
 import Section from '../section.vue'
 
-const { project } = injectProjectReviewPageContext()
+const { project, projectId, projectV2 } = injectProjectReviewPageContext()
 const { previousLinks } = injectReviewPanels()
 const { formatMessage } = useVIntl()
+const client = injectModrinthClient()
+const hoveredLink = ref<string>()
+const validation = useQuery(
+	computed(() => ({
+		...projectQueryOptions.validation(projectId.value, client),
+		enabled: import.meta.client && !!projectId.value && hoveredLink.value !== undefined,
+		staleTime: STALE_TIME,
+		retry: false,
+		refetchOnWindowFocus: false,
+		refetchOnReconnect: false,
+	})),
+)
+
+function setLinkHovered(key: string, hovered: boolean) {
+	if (hovered) hoveredLink.value = key
+	else if (hoveredLink.value === key) hoveredLink.value = undefined
+}
+
+watch(
+	projectId,
+	() => {
+		hoveredLink.value = undefined
+	},
+	{ flush: 'sync' },
+)
+
 const editModal = useTemplateRef<InstanceType<typeof EditModal>>('editModal')
 const linkIcons = {
 	site: GlobeIcon,
@@ -152,10 +192,22 @@ const links = computed(() => {
 			const link = currentLinks[key]
 			const url = reviewExternalUrl(link?.url)
 			const message = labels[key as keyof typeof labels]
+			const validationMessages =
+				url && !validation.isError.value
+					? getProjectNagMessages(validation.data.value?.nags ?? [], 'link-field', {
+							detailField: key,
+							url,
+							projectType: projectV2.value?.project_type,
+						})
+					: []
 			return url || previousLinks.value.has(key)
 				? [
 						{
 							key,
+							validationMessages,
+							warningText: validationMessages
+								.map((message) => formatMessage(message.message, message.values))
+								.join('\n'),
 							url: url ?? reviewExternalUrl(previousLinks.value.get(key)),
 							removed: !link?.url,
 							unavailable: !url,

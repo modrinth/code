@@ -630,6 +630,7 @@ import { getSignInRouteObj } from '~/composables/auth.ts'
 import { useCreatorProjectStats } from '~/composables/creator-project-stats'
 import { saveFeatureFlags } from '~/composables/featureFlags.ts'
 import { useProjectLinkValidation } from '~/composables/link-network-validation'
+import { projectQueryOptions } from '~/composables/queries/project'
 import {
 	canResubmitProjectForReview,
 	canSubmitProjectForReview,
@@ -1742,12 +1743,12 @@ const {
 	isFetching: projectValidationLoading,
 	isError: backendValidationError,
 	refetch: refetchProjectValidation,
-} = useQuery({
-	queryKey: computed(() => ['project', projectId.value, 'validation', 'v3']),
-	queryFn: () => client.labrinth.projects_v3.validate(projectId.value),
-	staleTime: 0,
-	enabled: computed(() => !!projectId.value && !!currentMember.value?.accepted),
-})
+} = useQuery(
+	computed(() => ({
+		...projectQueryOptions.validation(projectId.value, client),
+		enabled: !!projectId.value && !!currentMember.value?.accepted,
+	})),
+)
 
 const linkValidation = useProjectLinkValidation(
 	projectId,

@@ -87,6 +87,7 @@ import _CircleAlertIcon from './icons/circle-alert.svg?component'
 import _CircleArrowRightIcon from './icons/circle-arrow-right.svg?component'
 import _CircleDashedIcon from './icons/circle-dashed.svg?component'
 import _CircleDollarSignIcon from './icons/circle-dollar-sign.svg?component'
+import _CircleDotIcon from './icons/circle-dot.svg?component'
 import _CircleSlashIcon from './icons/circle-slash.svg?component'
 import _CircleUserIcon from './icons/circle-user.svg?component'
 import _CircuitBoardIcon from './icons/circuit-board.svg?component'
@@ -148,6 +149,7 @@ import _GapIcon from './icons/gap.svg?component'
 import _GaugeIcon from './icons/gauge.svg?component'
 import _GenericListIcon from './icons/generic-list.svg?component'
 import _GiftIcon from './icons/gift.svg?component'
+import _GitCommitHorizontalIcon from './icons/git-commit-horizontal.svg?component'
 import _GitForkIcon from './icons/git-fork.svg?component'
 import _GitGraphIcon from './icons/git-graph.svg?component'
 import _GlassesIcon from './icons/glasses.svg?component'
@@ -566,6 +568,7 @@ export const CircleAlertIcon = _CircleAlertIcon
 export const CircleArrowRightIcon = _CircleArrowRightIcon
 export const CircleDashedIcon = _CircleDashedIcon
 export const CircleDollarSignIcon = _CircleDollarSignIcon
+export const CircleDotIcon = _CircleDotIcon
 export const CircleSlashIcon = _CircleSlashIcon
 export const CircleUserIcon = _CircleUserIcon
 export const CircuitBoardIcon = _CircuitBoardIcon
@@ -627,6 +630,7 @@ export const GapIcon = _GapIcon
 export const GaugeIcon = _GaugeIcon
 export const GenericListIcon = _GenericListIcon
 export const GiftIcon = _GiftIcon
+export const GitCommitHorizontalIcon = _GitCommitHorizontalIcon
 export const GitForkIcon = _GitForkIcon
 export const GitGraphIcon = _GitGraphIcon
 export const GlassesIcon = _GlassesIcon
