@@ -7,6 +7,12 @@ use serde::{Deserialize, Serialize};
 
 use crate::util::de_error;
 
+/// Returns the repository-relative path used by launcher library caches.
+pub fn get_path_from_artifact(artifact: &str) -> anyhow::Result<String> {
+	let coordinate: MavenCoordinate = artifact.parse()?;
+	Ok(coordinate.to_maven_path()["maven/".len()..].to_owned())
+}
+
 #[derive(Debug, Clone)]
 pub struct MavenCoordinate {
 	pub group_id: CoordinatePart,

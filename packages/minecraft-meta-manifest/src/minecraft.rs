@@ -296,3 +296,53 @@ pub enum LoggingConfiguration {
 fn default_true() -> bool {
     true
 }
+
+/// Version of the launcher-meta Minecraft wire format.
+pub const CURRENT_FORMAT_VERSION: usize = 0;
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Asset {
+    pub hash: Sha1,
+    pub size: u32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AssetsIndex {
+    pub objects: IndexMap<String, Asset>,
+}
+
+impl MinecraftVersionName {
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+}
+
+impl std::ops::Deref for MinecraftVersionName {
+    type Target = str;
+    fn deref(&self) -> &str {
+        &self.0
+    }
+}
+
+impl PartialEq<str> for MinecraftVersionName {
+    fn eq(&self, other: &str) -> bool {
+        self.0 == other
+    }
+}
+
+impl PartialEq<&str> for MinecraftVersionName {
+    fn eq(&self, other: &&str) -> bool {
+        self.0 == *other
+    }
+}
+
+impl VersionType {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Self::Release => "release",
+            Self::Snapshot => "snapshot",
+            Self::OldAlpha => "old_alpha",
+            Self::OldBeta => "old_beta",
+        }
+    }
+}

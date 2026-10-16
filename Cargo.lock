@@ -13794,6 +13794,7 @@ dependencies = [
 name = "theseus"
 version = "1.0.0-local"
 dependencies = [
+ "anyhow",
  "ariadne",
  "async-minecraft-ping",
  "async-recursion",
@@ -13808,7 +13809,6 @@ dependencies = [
  "chardetng",
  "chrono",
  "cidre",
- "daedalus",
  "dashmap",
  "data-url",
  "derive_more 2.1.1",
@@ -13829,9 +13829,11 @@ dependencies = [
  "hickory-resolver 0.25.2",
  "httpdate",
  "image",
+ "indexmap 2.14.2",
  "indicatif",
  "itertools 0.14.0",
  "json5",
+ "minecraft-meta-manifest",
  "modrinth-content-management",
  "notify",
  "notify-debouncer-mini",
@@ -13892,7 +13894,6 @@ dependencies = [
  "chrono",
  "core-foundation 0.10.1",
  "core-graphics 0.24.0",
- "daedalus",
  "dashmap",
  "either",
  "enumset",
