@@ -730,7 +730,7 @@ pub async fn thread_issue_facet_edit(
             "a project team member must send a message in the thread before addressing this issue"
         )));
     }
-    if edit.user_addressed == Some(true) && !user.role.is_mod() {
+    if edit.user_addressed == Some(true) {
         let state = super::projects::mutation::sync_project_state(
             project_id,
             &mut transaction,
