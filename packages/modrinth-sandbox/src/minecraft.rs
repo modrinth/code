@@ -12,7 +12,7 @@ use sha1::{Digest, Sha1};
 use tokio::sync::OnceCell;
 
 use crate::{
-    SandboxChild, SandboxCommand, SandboxHandle, SandboxStdio,
+    SandboxChild, SandboxCommand, SandboxStdio,
     api::SandboxApiChild, util::SandboxArg,
 };
 

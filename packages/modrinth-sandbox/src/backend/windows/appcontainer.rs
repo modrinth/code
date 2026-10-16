@@ -4,6 +4,7 @@ use std::{
     io::{Error, ErrorKind},
     os::windows::ffi::{OsStrExt, OsStringExt},
     path::{Path, PathBuf},
+    sync::Arc,
 };
 
 use tracing::info;
@@ -65,7 +66,10 @@ use eyre::{Context, Result, bail, eyre};
 
 use crate::{
     SandboxArg, SandboxCommand,
-    backend::{Backend, SandboxChild, SandboxEnv},
+    backend::{
+        Backend, ExposedPath, SandboxChild, SandboxEnv, SandboxHandle,
+        SandboxHandleOp, pathset::ReadWritePathSet,
+    },
     helper::MakeHelper,
 };
 
@@ -257,6 +261,14 @@ fn spawn(
     read_only_paths.sort_unstable();
     read_only_paths.dedup();
 
+    let mut path_set = ReadWritePathSet::new(false);
+    for path in &read_only_paths {
+        path_set.add_read_only(path.clone());
+    }
+    for path in &command.read_write_paths {
+        path_set.add_read_write(path.clone());
+    }
+
     for path in read_only_paths.iter().chain(&command.read_write_paths) {
         readable.insert(path.clone());
         if let Some(parent) = path.parent() {
@@ -412,6 +424,10 @@ fn spawn(
         stdin: pipes.stdin,
         stdout: pipes.stdout,
         stderr: pipes.stderr,
+        on_finish: command.on_finish,
+        handle: SandboxHandle::AppContainer(WindowsSandboxHandle {
+            path_set: Arc::new(path_set),
+        }),
         imp: SandboxChild::AppContainer(child),
     };
 
@@ -420,6 +436,29 @@ fn spawn(
     }
 
     Ok(child)
+}
+
+#[derive(Clone, Debug)]
+pub struct WindowsSandboxHandle {
+    path_set: Arc<ReadWritePathSet>,
+}
+
+impl SandboxHandleOp for WindowsSandboxHandle {
+    fn expose_path(
+        &self,
+        _path: &Path,
+        _allow_write: bool,
+    ) -> eyre::Result<ExposedPath> {
+        Err(eyre!("unsupported"))
+    }
+
+    fn is_path_readable(&self, path: &Path) -> bool {
+        self.path_set.can_read(path.to_path_buf())
+    }
+
+    fn is_path_writeable(&self, path: &Path) -> bool {
+        self.path_set.can_write(path.to_path_buf())
+    }
 }
 
 struct OwnedCapability {

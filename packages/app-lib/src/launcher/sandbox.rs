@@ -49,7 +49,7 @@ pub(super) fn prepare_session(uuid: Uuid, access_token: String) -> Session {
         .sessions
         .lock()
         .insert(uuid, access_token.into());
-    let child = SERVICE.start(uuid);
+    let child = SERVICE.clone().start(uuid);
 
     Session {
         access_token: child.get_dummy_access_token().to_string(),

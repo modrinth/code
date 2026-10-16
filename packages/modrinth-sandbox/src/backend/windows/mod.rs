@@ -58,6 +58,8 @@ mod acl;
 pub(crate) mod appcontainer;
 pub(crate) mod runas;
 
+pub use appcontainer::WindowsSandboxHandle;
+
 pub(crate) struct ProcThreadAttribute {
     pub(crate) attribute: usize,
     pub(crate) value: *const std::ffi::c_void,
