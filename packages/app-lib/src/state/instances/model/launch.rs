@@ -30,6 +30,7 @@ pub struct InstanceLaunchOverrides {
     pub force_fullscreen: Option<bool>,
     pub game_resolution: Option<WindowSize>,
     pub hooks: Hooks,
+    #[serde(default)]
     pub visible_tabs: InstanceTabVisibility,
 }
 

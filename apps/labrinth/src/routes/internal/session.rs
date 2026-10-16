@@ -18,6 +18,7 @@ use chrono::{DateTime, Utc};
 use rand::distributions::Alphanumeric;
 use rand::{Rng, SeedableRng};
 use rand_chacha::ChaCha20Rng;
+use serde::Serialize;
 use woothee::parser::Parser;
 use xredis::RedisPool;
 
@@ -137,6 +138,39 @@ pub async fn issue_session(
     .await?;
 
     Ok(session)
+}
+
+#[derive(Serialize)]
+pub struct AuthSession {
+    #[serde(flatten)]
+    pub session: Session,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub app_session: Option<String>,
+}
+
+pub async fn issue_auth_sessions(
+    req: HttpRequest,
+    user_id: DBUserId,
+    transaction: &mut PgTransaction<'_>,
+    redis: &RedisPool,
+    include_app_session: bool,
+) -> Result<AuthSession, AuthenticationError> {
+    let session =
+        issue_session(req.clone(), user_id, transaction, redis, None).await?;
+    let app_session = if include_app_session {
+        Some(
+            issue_session(req, user_id, transaction, redis, None)
+                .await?
+                .session,
+        )
+    } else {
+        None
+    };
+
+    Ok(AuthSession {
+        session: Session::from(session, true, None),
+        app_session,
+    })
 }
 
 /// List sessions.  

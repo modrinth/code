@@ -1,5 +1,6 @@
 - [TanStack Query](#tanstack-query)
 	- [Setup](#setup)
+	- [App frontend](#app-frontend)
 	- [Queries](#queries)
 		- [Query-option factories](#query-option-factories)
 		- [Conditional queries](#conditional-queries)
@@ -23,6 +24,10 @@ A TanStack MCP server is available. Use `tanstack_doc` or `tanstack_search_docs`
 The default stale time is 5 seconds. Get the `QueryClient` with `useQueryClient()` or `useAppQueryClient()`.
 
 `useAppQueryClient()` also operates in middleware.
+
+## App Frontend
+
+Follow [App Fetching Data](app-frontend/APP_FRONTEND_FETCHING_DATA.md) for desktop query placement, app-lib commands, and event-driven refreshes.
 
 ## Queries
 
@@ -48,7 +53,7 @@ Use the query state in templates:
 
 ### Query-Option Factories
 
-For a query that multiple components use, define a query-option factory in `packages/ui/src/queries/`:
+For a query used by shared UI components, define a shared query-option factory. App-only queries follow the placement described in [App Fetching Data](app-frontend/APP_FRONTEND_FETCHING_DATA.md):
 
 ```ts
 // composables/queries/project.ts

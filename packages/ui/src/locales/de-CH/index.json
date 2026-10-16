@@ -722,6 +722,12 @@
   "content.page-layout.failed-to-load": {
     "defaultMessage": "Laden von Inhalten fehlgeschlagen"
   },
+  "content.page-layout.failed-to-load-changelog": {
+    "defaultMessage": "Änderungsprotokoll konnte nicht geladen werden"
+  },
+  "content.page-layout.failed-to-load-updates": {
+    "defaultMessage": "Fehler beim Laden der verfügbaren Updates"
+  },
   "content.page-layout.filter.add": {
     "defaultMessage": "Filter"
   },
@@ -1239,7 +1245,7 @@
     "defaultMessage": "Zuordnung speichern"
   },
   "external-files.permissions-card.editor.select-license-label": {
-    "defaultMessage": "Lizenz auswählen..."
+    "defaultMessage": "Lizenzen suchen..."
   },
   "external-files.permissions-card.editor.type-label": {
     "defaultMessage": "Berechtigungsnachweis"
@@ -1282,6 +1288,9 @@
   },
   "external-files.permissions-card.last-updated": {
     "defaultMessage": "Zuletzt aktualisiert {date} von {user}"
+  },
+  "external-files.permissions-card.license.all-rights": {
+    "defaultMessage": "Alle Rechte vorbehalten/Keine Lizenz"
   },
   "external-files.permissions-card.license.unknown": {
     "defaultMessage": "Unbekannt"
@@ -2054,8 +2063,14 @@
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Server auf Onboarding zurückgesetzt"
   },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "Supportoptionen"
+  "hosting.save-banner.resolve-errors": {
+    "defaultMessage": "Bitte behebe vor dem Speichern die Fehler in deinen Änderungen."
+  },
+  "hosting.settings.properties.motd-profanity": {
+    "defaultMessage": "Aufgrund der Nutzungsrichtlinien von Minecraft darf die MOTD deines Servers keine Schimpfwörter enthalten. Erkannt: „{value}“."
+  },
+  "hosting.settings.properties.motd-profanity-save-error": {
+    "defaultMessage": "Aufgrund der Nutzungsrichtlinien von Minecraft darf die MOTD deines Servers keine Schimpfwörter enthalten. Erkannt: „{value}“"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Spitzenauslastungen von bis zu {cpus} CPUs"
@@ -3281,14 +3296,26 @@
   "profile.button.create-project": {
     "defaultMessage": "Projekt erstellen"
   },
+  "profile.button.force-password-reset": {
+    "defaultMessage": "Zurücksetzen des Passworts erzwingen"
+  },
   "profile.button.info": {
     "defaultMessage": "Nutzerdetails anzeigen"
+  },
+  "profile.button.lock": {
+    "defaultMessage": "Konto sperren"
   },
   "profile.button.manage-projects": {
     "defaultMessage": "Projekte verwalten"
   },
   "profile.button.remove-affiliate": {
     "defaultMessage": "Als Partner entfernen"
+  },
+  "profile.button.reset-2fa": {
+    "defaultMessage": "Zwei-Faktor-Authentifizierung zurücksetzen"
+  },
+  "profile.button.revoke-sessions": {
+    "defaultMessage": "Alle Sitzungen widerrufen"
   },
   "profile.button.set-affiliate": {
     "defaultMessage": "Als Partner festlegen"
@@ -3298,6 +3325,9 @@
   },
   "profile.button.unblock": {
     "defaultMessage": "Freigeben"
+  },
+  "profile.button.unlock": {
+    "defaultMessage": "Konto entsperren"
   },
   "profile.collection.projects-count": {
     "defaultMessage": "{count, plural, one {# Projekt} other {# Projekte}}"
@@ -3347,6 +3377,36 @@
   "profile.error.not-found": {
     "defaultMessage": "Nutzer nicht gefunden"
   },
+  "profile.force-password-reset.admonition-body": {
+    "defaultMessage": "Das Passwort von {username} wird sofort gelöscht, die Anmeldung wird auf allen Geräten entfernt und ein Link zum Festlegen eines neuen Passworts wird an die unten angegebene E-Mail-Adresse gesendet. Wenn du die E-Mail-Adresse änderst, wird die im Konto hinterlegte Adresse dadurch ersetzt. Der Link ist 24 Stunden lang gültig und kann auch dann verwendet werden, wenn das Konto gesperrt ist."
+  },
+  "profile.force-password-reset.admonition-title": {
+    "defaultMessage": "Das aktuelle Passwort wird nicht mehr funktionieren"
+  },
+  "profile.force-password-reset.button": {
+    "defaultMessage": "Passwort zurücksetzen"
+  },
+  "profile.force-password-reset.email-label": {
+    "defaultMessage": "E-Mail-Adresse des Kontos"
+  },
+  "profile.force-password-reset.email-placeholder": {
+    "defaultMessage": "Leer lassen, um die E-Mail des Kontos zu verwenden"
+  },
+  "profile.force-password-reset.error-description": {
+    "defaultMessage": "Beim Zurücksetzen des Passworts ist ein Fehler aufgetreten. Bitte versuche es erneut."
+  },
+  "profile.force-password-reset.error-title": {
+    "defaultMessage": "Passwort konnte nicht zurückgesetzt werden"
+  },
+  "profile.force-password-reset.success-description": {
+    "defaultMessage": "Ein Link zum Zurücksetzen des Passworts wurde an {username} gesendet."
+  },
+  "profile.force-password-reset.success-title": {
+    "defaultMessage": "Passwort zurücksetzen"
+  },
+  "profile.force-password-reset.title": {
+    "defaultMessage": "Passwortänderung für {username} erzwingen"
+  },
   "profile.label.affiliate": {
     "defaultMessage": "Partner"
   },
@@ -3361,6 +3421,9 @@
   },
   "profile.label.joined": {
     "defaultMessage": "Beigetreten"
+  },
+  "profile.label.locked": {
+    "defaultMessage": "Gesperrt"
   },
   "profile.label.no-collections": {
     "defaultMessage": "Dieser Nutzer hat keine Kollektionen!"
@@ -3386,6 +3449,54 @@
   "profile.official-account.bio": {
     "defaultMessage": "Das offizielle Benutzerkonto von Modrinth. Erhalte Hilfe unter <support-link></support-link> oder per E-Mail unter <email></email>"
   },
+  "profile.reset-2fa.admonition-body": {
+    "defaultMessage": "Die Authentifizierungs-App und die Sicherungscodes von {username} werden gelöscht, und der Nutzer wird darüber informiert. Führe diesen Schritt erst durch, nachdem du die Identität des Benutzers überprüft hast."
+  },
+  "profile.reset-2fa.admonition-title": {
+    "defaultMessage": "Möchtest du die Zwei-Faktor-Authentifizierung wirklich zurücksetzen?"
+  },
+  "profile.reset-2fa.button": {
+    "defaultMessage": "2FA zurücksetzen"
+  },
+  "profile.reset-2fa.error-description": {
+    "defaultMessage": "Beim Zurücksetzen der Zwei-Faktor-Authentifizierung ist ein Fehler aufgetreten. Bitte versuche es erneut."
+  },
+  "profile.reset-2fa.error-title": {
+    "defaultMessage": "Zwei-Faktor-Authentifizierung konnte nicht zurückgesetzt werden"
+  },
+  "profile.reset-2fa.success-description": {
+    "defaultMessage": "Die Zwei-Faktor-Authentifizierung von {username} wurde entfernt."
+  },
+  "profile.reset-2fa.success-title": {
+    "defaultMessage": "Zwei-Faktor-Authentifizierung zurücksetzen"
+  },
+  "profile.reset-2fa.title": {
+    "defaultMessage": "Zwei-Faktor-Authentifizierung für {username} zurücksetzen"
+  },
+  "profile.revoke-sessions.admonition-body": {
+    "defaultMessage": "{username} wird auf allen Geräten abgemeldet und muss sich erneut anmelden. Persönliche Zugriffstoken sind davon nicht betroffen."
+  },
+  "profile.revoke-sessions.admonition-title": {
+    "defaultMessage": "Möchtest du wirklich alle Sitzungen widerrufen?"
+  },
+  "profile.revoke-sessions.button": {
+    "defaultMessage": "Sitzungen widerrufen"
+  },
+  "profile.revoke-sessions.error-description": {
+    "defaultMessage": "Beim Widerrufen von Sitzungen ist ein Fehler aufgetreten. Bitte versuche es erneut."
+  },
+  "profile.revoke-sessions.error-title": {
+    "defaultMessage": "Sitzungen konnten nicht widerrufen werden"
+  },
+  "profile.revoke-sessions.success-description": {
+    "defaultMessage": "{username} wurde überall abgemeldet."
+  },
+  "profile.revoke-sessions.success-title": {
+    "defaultMessage": "Sitzungen widerrufen"
+  },
+  "profile.revoke-sessions.title": {
+    "defaultMessage": "Sitzungen für {username} widerrufen"
+  },
   "profile.unblock-user.error-description": {
     "defaultMessage": "Beim Freigeben dieses Nutzers ist ein Fehler aufgetreten. Bitte versuche es erneut."
   },
@@ -3397,6 +3508,18 @@
   },
   "profile.unblock-user.success-title": {
     "defaultMessage": "Benutzer freigegeben"
+  },
+  "profile.unlock-user.error-description": {
+    "defaultMessage": "Beim Entsperren dieses Kontos ist ein Fehler aufgetreten. Bitte versuche es erneut."
+  },
+  "profile.unlock-user.error-title": {
+    "defaultMessage": "Konto konnte nicht entsperrt werden"
+  },
+  "profile.unlock-user.success-description": {
+    "defaultMessage": "Das Konto von {username} wurde entsperrt."
+  },
+  "profile.unlock-user.success-title": {
+    "defaultMessage": "Konto entsperrt"
   },
   "project-card.date.published.tooltip": {
     "defaultMessage": "Veröffentlicht {date}"
@@ -4619,6 +4742,9 @@
   "servers.access-page.activity-log-filter.action.server-stopped": {
     "defaultMessage": "Server gestoppt"
   },
+  "servers.access-page.activity-log-filter.action.sftp-credentials-rolled": {
+    "defaultMessage": "Rotierte SSH-Zugangsdaten"
+  },
   "servers.access-page.activity-log-filter.action.sftp-login": {
     "defaultMessage": "Über SFTP angemeldet"
   },
@@ -5000,6 +5126,9 @@
   "servers.audit-log.event.server-subdomain-changed": {
     "defaultMessage": "Subdomain des Servers zu <subdomain></subdomain> geändert"
   },
+  "servers.audit-log.event.sftp-credentials-rolled": {
+    "defaultMessage": "Rotierte SFTP-Zugangsdaten"
+  },
   "servers.audit-log.event.sftp-login": {
     "defaultMessage": "Über SFTP angemeldet"
   },
@@ -5205,7 +5334,10 @@
     "defaultMessage": "Die Dateien dieser Welt können derzeit nicht heruntergeladen werden."
   },
   "servers.download.unavailable.title": {
-    "defaultMessage": "Herunterladen gerade nicht verfügbar"
+    "defaultMessage": "Download nicht verfügbar"
+  },
+  "servers.files.server-locked": {
+    "defaultMessage": "Dieser Server ist gesperrt und seine Dateien sind schreibgeschützt."
   },
   "servers.files.zip-created": {
     "defaultMessage": "ZIP-Datei wurde erstellt"
@@ -5423,6 +5555,36 @@
   "servers.listing.using-project-label": {
     "defaultMessage": "Nutzt {projectTitle}"
   },
+  "servers.lock.modal.error-text": {
+    "defaultMessage": "Beim Sperren dieses Servers ist ein Fehler aufgetreten. Bitte versuche es erneut."
+  },
+  "servers.lock.modal.error-title": {
+    "defaultMessage": "Server konnte nicht gesperrt werden"
+  },
+  "servers.lock.modal.header": {
+    "defaultMessage": "{name} sperren"
+  },
+  "servers.lock.modal.lock-button": {
+    "defaultMessage": "Server sperren"
+  },
+  "servers.lock.modal.reason-label": {
+    "defaultMessage": "Grund"
+  },
+  "servers.lock.modal.reason-placeholder": {
+    "defaultMessage": "Sichtbar für andere Admins"
+  },
+  "servers.lock.modal.success-text": {
+    "defaultMessage": "{name} wurde gesperrt."
+  },
+  "servers.lock.modal.success-title": {
+    "defaultMessage": "Server gesperrt"
+  },
+  "servers.lock.modal.warning-body": {
+    "defaultMessage": "{name} ist für seinen Eigentümer und seine Mitglieder schreibgeschützt, bis er von einem Admin entsperrt wird."
+  },
+  "servers.lock.modal.warning-header": {
+    "defaultMessage": "Dieser Server wird schreibgeschützt"
+  },
   "servers.manage.checking-for-new-servers": {
     "defaultMessage": "Suche nach neuen Servern..."
   },
@@ -5458,6 +5620,21 @@
   },
   "servers.manage.handle-error.title": {
     "defaultMessage": "Es ist ein Fehler aufgetreten"
+  },
+  "servers.manage.lock-server": {
+    "defaultMessage": "Server sperren"
+  },
+  "servers.manage.locked.badge": {
+    "defaultMessage": "Gesperrt"
+  },
+  "servers.manage.locked.badge-tooltip": {
+    "defaultMessage": "Seit {date} gesperrt"
+  },
+  "servers.manage.locked.body": {
+    "defaultMessage": "Der Support hat diesen Server vorübergehend gesperrt, sodass du keine Änderungen vornehmen kannst. <support-link>Wende dich an den Support</support-link>, wenn du der Meinung bist, dass es sich um einen Fehler handelt."
+  },
+  "servers.manage.locked.header": {
+    "defaultMessage": "Server durch Support gesperrt"
   },
   "servers.manage.new-server-button": {
     "defaultMessage": "Neuer Server"
@@ -5515,6 +5692,21 @@
   },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Geteilte Server"
+  },
+  "servers.manage.unlock-server": {
+    "defaultMessage": "Server entsperren"
+  },
+  "servers.manage.unlock.error-text": {
+    "defaultMessage": "Beim Entsperren dieses Servers ist ein Fehler aufgetreten. Bitte versuche es erneut."
+  },
+  "servers.manage.unlock.error-title": {
+    "defaultMessage": "Server konnte nicht entsperrt werden"
+  },
+  "servers.manage.unlock.success-text": {
+    "defaultMessage": "{name} wurde entsperrt."
+  },
+  "servers.manage.unlock.success-title": {
+    "defaultMessage": "Server entsperrt"
   },
   "servers.manage.your-servers-title": {
     "defaultMessage": "Deine Server"
@@ -5746,6 +5938,27 @@
   },
   "servers.settings.advanced.sftp.roll-credentials-success-title": {
     "defaultMessage": "SFTP-Zugangsdaten wurden rotiert"
+  },
+  "servers.settings.support.action-log-title": {
+    "defaultMessage": "Aktionsprotokoll"
+  },
+  "servers.settings.support.clear-action-log-button": {
+    "defaultMessage": "Aktionsprotokoll leeren"
+  },
+  "servers.settings.support.clear-action-log-confirmation": {
+    "defaultMessage": "Dadurch werden alle Einträge im Aktionsprotokoll für diesen Server endgültig gelöscht. Möchtest du fortfahren?"
+  },
+  "servers.settings.support.clear-action-log-description": {
+    "defaultMessage": "Alle Einträge im Aktionsprotokoll für diesen Server löschen."
+  },
+  "servers.settings.support.clear-action-log-error": {
+    "defaultMessage": "Aktionsprotokoll konnte nicht geleert werden"
+  },
+  "servers.settings.support.clear-action-log-success": {
+    "defaultMessage": "Aktionsprotokoll geleert"
+  },
+  "servers.settings.support.clear-action-log-title": {
+    "defaultMessage": "Aktionsprotokoll leeren?"
   },
   "servers.setup.onboarding.installation-failed.text": {
     "defaultMessage": "Bei der Installation ist ein unerwarteter Fehler aufgetreten. Bitte versuche es später erneut."
@@ -6796,6 +7009,78 @@
   },
   "unknown-file-warning-modal.unrecognized-files": {
     "defaultMessage": "Nicht erkannte Dateien"
+  },
+  "update-all-modal.changelog-for": {
+    "defaultMessage": "Änderungsprotokoll für {project}"
+  },
+  "update-all-modal.changelog-loaded": {
+    "defaultMessage": "Änderungsprotokoll geladen."
+  },
+  "update-all-modal.close-changelog": {
+    "defaultMessage": "Änderungsprotokoll schließen"
+  },
+  "update-all-modal.current-version": {
+    "defaultMessage": "Aktuelle Version"
+  },
+  "update-all-modal.empty": {
+    "defaultMessage": "Keine Aktualisierungen verfügbar."
+  },
+  "update-all-modal.header": {
+    "defaultMessage": "Projekte aktualisieren"
+  },
+  "update-all-modal.loading": {
+    "defaultMessage": "Aktualisierungen werden geladen…"
+  },
+  "update-all-modal.loading-changelog": {
+    "defaultMessage": "Änderungsprotokoll wird geladen…"
+  },
+  "update-all-modal.new-version": {
+    "defaultMessage": "Neue Version"
+  },
+  "update-all-modal.no-changelog": {
+    "defaultMessage": "Kein Änderungsprotokoll für diese Version verfügbar."
+  },
+  "update-all-modal.no-compatible-updates": {
+    "defaultMessage": "Keine kompatiblen Updates verfügbar."
+  },
+  "update-all-modal.no-version": {
+    "defaultMessage": "Keine kompatiblen Updates"
+  },
+  "update-all-modal.project": {
+    "defaultMessage": "Projekt"
+  },
+  "update-all-modal.project-list": {
+    "defaultMessage": "Projekt-Updates"
+  },
+  "update-all-modal.results": {
+    "defaultMessage": "{count, plural, one {# Projekt bereit zum Aktualisieren} other {# Projekte bereit}}"
+  },
+  "update-all-modal.select-all": {
+    "defaultMessage": "Alle Projekte auswählen"
+  },
+  "update-all-modal.select-project": {
+    "defaultMessage": "{project} für Update auswählen"
+  },
+  "update-all-modal.select-version": {
+    "defaultMessage": "Neue Version für {project}"
+  },
+  "update-all-modal.update": {
+    "defaultMessage": "  Aktualisiere {count, plural, one {# Projekt} other {# Projekte}}"
+  },
+  "update-all-modal.versions": {
+    "defaultMessage": "Aktuelle Version / Neue Version"
+  },
+  "update-all-modal.view": {
+    "defaultMessage": "Ansicht"
+  },
+  "update-all-modal.view-changelog": {
+    "defaultMessage": "  Änderungsprotokoll für {project} anzeigen"
+  },
+  "update-all-modal.warning": {
+    "defaultMessage": "Wir können nicht garantieren, dass Aktualisierungen für deine Welten sicher sind. Überprüfe das Änderungsprotokoll für alle Zwischenversionen und erstelle gegebenenfalls ein Backup."
+  },
+  "update-all-modal.warning-server": {
+    "defaultMessage": "Wir können nicht garantieren, dass Updates für deinen Server sicher sind. Überprüfe die Changelogs und erwäge eine Sicherung."
   },
   "user.profile.badge.alpha.about.1": {
     "defaultMessage": "Dieser Benutzer ist seit der Alpha von Modrinth dabei, die im November 2020 endete."

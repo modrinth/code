@@ -8,8 +8,86 @@
   "app.action-bar.downloads": {
     "message": "Unduhan"
   },
+  "app.action-bar.hide-downloads": {
+    "message": "Sembunyikan unduhan yang berlangsung"
+  },
   "app.action-bar.hide-more-running-instances": {
     "message": "Sembunyikan lebih banyak instans yang sedang berjalan"
+  },
+  "app.action-bar.install.copied-details": {
+    "message": "Disalin"
+  },
+  "app.action-bar.install.copy-details": {
+    "message": "Salin detail"
+  },
+  "app.action-bar.install.dismiss": {
+    "message": "Abaikan"
+  },
+  "app.action-bar.install.open-instance": {
+    "message": "Buka instans"
+  },
+  "app.action-bar.install.retry": {
+    "message": "Coba Lagi"
+  },
+  "app.action-bar.install.summary.app-closing": {
+    "message": "Dibatalkan karena aplikasi ditutup"
+  },
+  "app.action-bar.install.summary.bad-modpack-file": {
+    "message": "Tidak bisa membaca Modpack"
+  },
+  "app.action-bar.install.summary.canceled": {
+    "message": "Dibatalkan"
+  },
+  "app.action-bar.install.summary.cleanup-incomplete": {
+    "message": "Pembersihan belum selesai"
+  },
+  "app.action-bar.install.summary.content-download-failed": {
+    "message": "Tidak bisa mengunduh file"
+  },
+  "app.action-bar.install.summary.corrupt-download": {
+    "message": "File yang diunduh rusak"
+  },
+  "app.action-bar.install.summary.could-not-save-files": {
+    "message": "Tidak bisa menyimpan file"
+  },
+  "app.action-bar.install.summary.download-failed": {
+    "message": "Unduhan tidak dapat diselesaikan"
+  },
+  "app.action-bar.install.summary.invalid-file-path": {
+    "message": "Alamat file tidak valid"
+  },
+  "app.action-bar.install.summary.invalid-modpack": {
+    "message": "Data modpack tidak valid"
+  },
+  "app.action-bar.install.summary.invalid-modpack-files": {
+    "message": "FIle modpack memiliki metadata yang tidak valid"
+  },
+  "app.action-bar.install.summary.java-setup-failed": {
+    "message": "Instalasi Java tidak bisa diselesaikan"
+  },
+  "app.action-bar.install.summary.loader-setup-failed": {
+    "message": "Installasi pemuat gagal"
+  },
+  "app.action-bar.install.summary.local-data-error": {
+    "message": "Tidak bisa memperbarui data lokal"
+  },
+  "app.action-bar.install.summary.minecraft-setup-failed": {
+    "message": "Installasi Minecraft gagal"
+  },
+  "app.action-bar.install.summary.modrinth-unreachable": {
+    "message": "Tidak bisa menjangkau Modrinth"
+  },
+  "app.action-bar.install.summary.no-write-permission": {
+    "message": "Tidak ada izin untuk menulis data"
+  },
+  "app.action-bar.install.summary.pack-download-failed": {
+    "message": "Tidak bisa mengunduh paket"
+  },
+  "app.action-bar.install.summary.unexpected-error": {
+    "message": "Terjadi kesalahan"
+  },
+  "app.action-bar.install.updating-shared-content": {
+    "message": "Memperbarui konten yang dibagikan"
   },
   "app.action-bar.make-primary-instance": {
     "message": "Jadikan sebagai instans utama"
@@ -25,6 +103,9 @@
   },
   "app.action-bar.reload-to-update": {
     "message": "Muat ulang untuk memperbarui"
+  },
+  "app.action-bar.show-downloads": {
+    "message": "Lihat unduhan yang sedang berlangsung"
   },
   "app.action-bar.show-more-running-instances": {
     "message": "Tampilkan lebih banyak instans yang sedang berjalan"
@@ -44,17 +125,56 @@
   "app.action-bar.view-logs": {
     "message": "Lihat catatan"
   },
+  "app.ads-consent.accept": {
+    "message": "Terima semua"
+  },
+  "app.ads-consent.manage": {
+    "message": "Kelola preferensi"
+  },
+  "app.ads-consent.reject": {
+    "message": "Tolak semua"
+  },
+  "app.ads-consent.title": {
+    "message": "Privasi anda dan bagaimana iklan mendukung Modrinth"
+  },
+  "app.appearance-settings.compact-mode.title": {
+    "message": "Mode ringkas"
+  },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Beranda"
   },
   "app.appearance-settings.default-landing-page.library": {
     "message": "Pustaka"
   },
+  "app.appearance-settings.hide-nametag.description": {
+    "message": "Sembunyikan nama pengguna di atas pratinjau pemain di halaman pilihan skin"
+  },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Sembunyikan label nama"
   },
+  "app.appearance-settings.minimize-launcher.description": {
+    "message": "Minimalkan aplikasi Modrinth saat Minecraft diluncurkan."
+  },
+  "app.appearance-settings.minimize-launcher.title": {
+    "message": "Minimalkan aplikasi"
+  },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "Lihat berapa lama anda memainkan setiap instans."
+  },
   "app.appearance-settings.show-play-time.title": {
     "message": "Tampilkan waktu bermain"
+  },
+  "app.appearance-settings.skip-non-essential-warnings.title": {
+    "message": "Lewati peringatan yang tidak penting"
+  },
+  "app.appearance-settings.toggle-sidebar.description": {
+    "message": "Sembunyikan sidebar kanan secara default dan tambahkan tombol untuk menampilkan atau menyembunyikannya"
+  },
+  "app.appearance-settings.toggle-sidebar.title": {
+    "message": "Sembunyikan sidebar kanan"
+  },
+  "app.appearance-settings.unknown-pack-warning.description": {
+    "message": "Tampilkan peringatan sebelum memasang sebuah paket Modrinth (.mrpack) yang tidak di Modrinth."
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "Peringatkan saya sebelum memasang paket mod tidak dikenal"
@@ -64,6 +184,18 @@
   },
   "app.auth-servers.unreachable.header": {
     "message": "Tidak dapat terhubung ke server autentikasi"
+  },
+  "app.behavior-settings.confirmations.title": {
+    "message": "Konfirmasi"
+  },
+  "app.behavior-settings.content.title": {
+    "message": "Beranda dan konten"
+  },
+  "app.behavior-settings.sync-across-devices.signed-out-tooltip": {
+    "message": "Masuk ke akun Modrinth untuk sinkronisasi pengaturan."
+  },
+  "app.behavior-settings.sync-across-devices.title": {
+    "message": "Sinkronkan sifat antar perangkat"
   },
   "app.browse.add-servers-to-instance": {
     "message": "Menambah server ke instans"
@@ -86,17 +218,98 @@
   "app.browse.back-to-instance": {
     "message": "Kembali ke instans"
   },
+  "app.browse.discover-project-type": {
+    "message": "Temukan {projectType}"
+  },
   "app.browse.discover-servers": {
     "message": "Temukan server"
   },
+  "app.browse.hide-added-servers": {
+    "message": "Sembunyikan server yang sudah ditambahkan"
+  },
   "app.browse.project-type.modpacks": {
     "message": "Paket Mod"
+  },
+  "app.browse.project-type.mods": {
+    "message": "Modifikasi"
+  },
+  "app.browse.project-type.servers": {
+    "message": "Peladen"
   },
   "app.browse.server.installing": {
     "message": "Memasang"
   },
   "app.content-install.no-compatible-versions": {
     "message": "Tidak ada versi tersedia yang cocok untuk {compatibilityLabel}. Anda tetap dapat memilih versi yang akan dipasang. Dependensi tidak akan dipasang secara otomatis."
+  },
+  "app.download-manager.active": {
+    "message": "Aktif"
+  },
+  "app.download-manager.attention": {
+    "message": "Perlu perhatian"
+  },
+  "app.download-manager.bulk-update-content": {
+    "message": "Memperbarui {count, plural, other {# item}}"
+  },
+  "app.download-manager.cancel": {
+    "message": "Batalkan instalasi"
+  },
+  "app.download-manager.canceling": {
+    "message": "Membatalkan instalasi..."
+  },
+  "app.download-manager.clear-all": {
+    "message": "Bersihkan semua"
+  },
+  "app.download-manager.clear-completed": {
+    "message": "Bersihkan semua tugas yang telah selesai"
+  },
+  "app.download-manager.complete": {
+    "message": "Selesai"
+  },
+  "app.download-manager.duplicated-instance": {
+    "message": "Instans ganda"
+  },
+  "app.download-manager.empty": {
+    "message": "Tidak ada tugas instalasi"
+  },
+  "app.download-manager.estimated-rate": {
+    "message": "Perkiraan kecepatan unduh"
+  },
+  "app.download-manager.eta": {
+    "message": "Estimasi waktu tersisa untuk unduhan ini"
+  },
+  "app.download-manager.hide": {
+    "message": "Sembunyikan tugas instalasi"
+  },
+  "app.download-manager.new-instance": {
+    "message": "Instans baru"
+  },
+  "app.download-manager.pause": {
+    "message": "Jeda instalasi"
+  },
+  "app.download-manager.paused": {
+    "message": "Dijeda"
+  },
+  "app.download-manager.remove": {
+    "message": "Hapus dari riwayat"
+  },
+  "app.download-manager.resume": {
+    "message": "Lanjutkan instalasi"
+  },
+  "app.download-manager.show": {
+    "message": "Tampilkan tugas instalasi"
+  },
+  "app.download-manager.tasks": {
+    "message": "Tugas"
+  },
+  "app.download-manager.title": {
+    "message": "Pengelola unduhan"
+  },
+  "app.download-manager.verifying": {
+    "message": "Memverifikasi"
+  },
+  "app.error.state-init.open-backups-folder": {
+    "message": "Buka folder cadangan"
   },
   "app.export-modal.description-placeholder": {
     "message": "Masukkan deskripsi paket mod..."
@@ -116,11 +329,77 @@
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
   },
+  "app.home.jump-back-in.never-played": {
+    "message": "Belum pernah dimainkan"
+  },
+  "app.home.jump-back-in.new-instance": {
+    "message": "Instans baru"
+  },
+  "app.home.jump-back-in.view-instance": {
+    "message": "Lihat instans"
+  },
+  "app.hosting.update-required.title": {
+    "message": "Modrinth App membutuhkan pembaruan"
+  },
+  "app.install.phase.downloading_content": {
+    "message": "Mengunduh konten"
+  },
+  "app.install.phase.downloading_minecraft": {
+    "message": "Mengunduh Minecraft"
+  },
+  "app.install.phase.preparing_java": {
+    "message": "Mempersiapkan Java"
+  },
+  "app.install.phase.preparing_java.downloading": {
+    "message": "Mengunduh Java {version}"
+  },
+  "app.install.phase.preparing_java.extracting": {
+    "message": "Mengekstrak Java {version}"
+  },
+  "app.install.phase.preparing_java.resolving": {
+    "message": "Mempersiapkan Java {version}"
+  },
+  "app.instance.action.add-content": {
+    "message": "Tambah konten"
+  },
+  "app.instance.action.edit": {
+    "message": "Sunting"
+  },
+  "app.instance.action.open-folder": {
+    "message": "Buka folder"
+  },
+  "app.instance.action.play": {
+    "message": "Mainkan"
+  },
+  "app.instance.action.stop": {
+    "message": "Hentikan"
+  },
+  "app.instance.add-server.add": {
+    "message": "Tambah"
+  },
+  "app.instance.add-server.added": {
+    "message": "Ditambahkan"
+  },
+  "app.instance.add-server.adding": {
+    "message": "Menambahkan..."
+  },
+  "app.instance.add-server.cancel": {
+    "message": "Batal"
+  },
+  "app.instance.add-server.title": {
+    "message": "Tambahkan peladen ke instans"
+  },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Semua data dari instans Anda akan dihapus secara permanen, termasuk dunia, konfigurasi, dan konten terpasang Anda."
   },
   "app.instance.confirm-delete.admonition-header": {
     "message": "Tindakan ini tidak dapat dibatalkan"
+  },
+  "app.instance.confirm-delete.bulk-admonition-body": {
+    "message": "Semua data dari {count} instans ini akan dihapus secara permanen, termasuk dunia, konfigurasi, dan semua konten yang terinstal."
+  },
+  "app.instance.confirm-delete.bulk-delete-button": {
+    "message": "Hapus {count} instans"
   },
   "app.instance.confirm-delete.delete-button": {
     "message": "Hapus instans"
@@ -158,6 +437,12 @@
   "app.instance.mods.successfully-uploaded": {
     "message": "Berhasil diunggah"
   },
+  "app.instance.share.invite-modal.heading": {
+    "message": "Bagikan {name}"
+  },
+  "app.instance.shared-instance-already-installed.instance": {
+    "message": "Instans"
+  },
   "app.instance.worlds.add-server": {
     "message": "Tambah server"
   },
@@ -184,6 +469,39 @@
   },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Cari {count} dunia..."
+  },
+  "app.java-detection.no-installations-found": {
+    "message": "Tidak ada instalasi Java yang ditemukan."
+  },
+  "app.java-selector.path.placeholder": {
+    "message": "/jalur/ke/java"
+  },
+  "app.library.context-menu.create-instance": {
+    "message": "Instans baru"
+  },
+  "app.library.filter.add": {
+    "message": "Tambah filter"
+  },
+  "app.library.filter.clear": {
+    "message": "Bersihkan filter"
+  },
+  "app.library.filter.instance-type.server": {
+    "message": "Peladen"
+  },
+  "app.library.group.create.cancel": {
+    "message": "Batal"
+  },
+  "app.library.group.instance.add": {
+    "message": "Tambah"
+  },
+  "app.library.group.instance.added": {
+    "message": "Ditambahkan"
+  },
+  "app.library.instance.action.stop": {
+    "message": "Hentikan"
+  },
+  "app.modal.install-to-play.delete-instance": {
+    "message": "Hapus instans"
   },
   "app.modal.install-to-play.header": {
     "message": "Pasang untuk memainkan"

@@ -4,6 +4,7 @@ import {
 	ListIcon,
 	ModrinthIcon,
 	SettingsIcon,
+	ShieldIcon,
 	TextQuoteIcon,
 	VersionIcon,
 	WrenchIcon,
@@ -16,6 +17,7 @@ export type ServerSettingsTabId =
 	| 'network'
 	| 'properties'
 	| 'advanced'
+	| 'support'
 	| 'billing'
 	| 'admin-billing'
 
@@ -62,6 +64,12 @@ export const serverSettingsTabDefinitions: ServerSettingsTabDefinition[] = [
 		id: 'advanced',
 		label: 'Advanced',
 		icon: TextQuoteIcon,
+	},
+	{
+		id: 'support',
+		label: 'Support',
+		icon: ShieldIcon,
+		shown: ({ isAdmin }) => isAdmin,
 	},
 	{
 		id: 'billing',

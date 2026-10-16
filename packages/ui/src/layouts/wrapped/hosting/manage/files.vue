@@ -10,6 +10,8 @@ import { useUploadSessionUpload } from '#ui/composables/hosting/kyros-session-up
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerPermissions } from '#ui/composables/server-permissions'
 import {
+	injectAuth,
+	injectFileDownload,
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
@@ -26,6 +28,8 @@ const props = defineProps<{
 }>()
 
 const client = injectModrinthClient()
+const fileDownload = injectFileDownload(null)
+const auth = injectAuth()
 const serverContext = injectModrinthServerContext()
 const {
 	serverId,
@@ -59,20 +63,29 @@ const messages = defineMessages({
 		id: 'servers.files.zip-created-description',
 		defaultMessage: 'Created {destination}',
 	},
+	serverLocked: {
+		id: 'servers.files.server-locked',
+		defaultMessage: 'This server is locked and its files are read-only.',
+	},
 })
 
 const zippingFolder = ref(false)
 
+const serverLockedForViewer = computed(
+	() => !!serverContext.server.value?.locked_since && auth.user.value?.role !== 'admin',
+)
 const serverBusy = computed(() => busyReasons.value.length > 0)
 const busyTooltip = computed(() =>
 	busyReasons.value.length > 0 ? formatMessage(busyReasons.value[0].reason) : undefined,
 )
 const fileWriteDisabled = computed(
-	() => !canWriteFiles.value || serverBusy.value || zippingFolder.value,
+	() =>
+		serverLockedForViewer.value || !canWriteFiles.value || serverBusy.value || zippingFolder.value,
 )
-const fileWriteDisabledTooltip = computed(() =>
-	canWriteFiles.value ? busyTooltip.value : permissionDeniedMessage.value,
-)
+const fileWriteDisabledTooltip = computed(() => {
+	if (serverLockedForViewer.value) return formatMessage(messages.serverLocked)
+	return canWriteFiles.value ? busyTooltip.value : permissionDeniedMessage.value
+})
 const nonBackupBusyReasons = computed(() =>
 	busyReasons.value.filter(
 		(r) =>
@@ -376,25 +389,39 @@ async function writeFile(path: string, content: string): Promise<void> {
 
 async function downloadFile(path: string, fileName: string): Promise<void> {
 	try {
-		const fileData = await client.kyros.files_v0.downloadFile(path)
-		if (fileData) {
-			saveBlob(fileData, fileName)
+		const activeWorldId = worldId.value
+		const location = serverContext.serverFull.value?.location
+		if (!activeWorldId || location?.status !== 'assigned')
+			throw new Error('No active world or assigned node')
+
+		const nodeUrlHost = location.location_metadata.url_host
+		if (fileDownload) {
+			await fileDownload.download({
+				type: 'server-file',
+				filename: fileName,
+				serverId,
+				serverName: serverContext.server.value.name,
+				nodeUrlHost,
+				worldId: activeWorldId,
+				path,
+			})
+			return
 		}
-	} catch {
+
+		const { token } = await client.kyros.files_v1.authorizeFileDownload(
+			nodeUrlHost,
+			activeWorldId,
+			path,
+		)
+		const downloadUrl = client.kyros.files_v1.getFileDownloadUrl(nodeUrlHost, activeWorldId, token)
+		window.location.assign(downloadUrl)
+	} catch (error) {
 		addNotification({
 			title: formatMessage(commonMessages.downloadFailedLabel),
-			text: 'Could not download the file.',
+			text: error instanceof Error ? error.message : 'Could not download the file.',
 			type: 'error',
 		})
 	}
-}
-
-function saveBlob(blob: Blob, fileName: string) {
-	const link = document.createElement('a')
-	link.href = window.URL.createObjectURL(blob)
-	link.download = fileName
-	link.click()
-	window.URL.revokeObjectURL(link.href)
 }
 
 async function statFile(path: string): Promise<Kyros.Files.v1.FileStatResponse> {

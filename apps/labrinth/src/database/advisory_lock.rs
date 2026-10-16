@@ -13,6 +13,7 @@ pub enum AdvisoryLock {
     DelphiFile(DBFileId),
     DelphiScan(Uuid),
     DiscordRoleEmailCampaign,
+    PayPalAccount(String),
 }
 
 impl AdvisoryLock {
@@ -56,6 +57,9 @@ impl Display for AdvisoryLock {
             }
             Self::DiscordRoleEmailCampaign => {
                 formatter.write_str("discord_role_email_campaign")
+            }
+            Self::PayPalAccount(payer_id) => {
+                write!(formatter, "labrinth:paypal-account:{payer_id}")
             }
         }
     }

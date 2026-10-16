@@ -1769,9 +1769,6 @@
   "error.generic.default.list_item.1": {
     "message": "Semak sama ada Modrinth tidak berfungsi pada <status-link>laman Status</status-link> kami."
   },
-  "error.generic.default.list_item.2": {
-    "message": "Jika ralat ini terus berlaku, anda mungkin ingin memberitahu Pasukan Modrinth dengan menyertai <discord-link>pelayan Discord</discord-link> kami."
-  },
   "error.generic.default.list_title": {
     "message": "Sila cuba lagi dalam beberapa minit."
   },
@@ -3053,6 +3050,9 @@
   "project.notification.updated.title": {
     "message": "Projek dikemas kini"
   },
+  "project.settings.disclosures.advertising.description.2": {
+    "message": "Ini tidak terpakai bagi promosi kandungan berkaitan yang tidak mengganggu dan tidak mempunyai nilai kewangan secara langsung (seperti pautan ke profil Modrinth dalam menu konfigurasi anda), serta tidak terpakai bagi iklan pada halaman projek, seperti sepanduk tajaan dalam bahagian keterangan."
+  },
   "project.settings.disclosures.last-updated.moderator": {
     "message": "Penyederhana"
   },
@@ -3099,6 +3099,15 @@
     "message": "Slogan"
   },
   "project.settings.general.url.title": {
+    "message": "URL"
+  },
+  "project.settings.license.intro": {
+    "message": "Adalah penting untuk memilih lesen yang sesuai bagi {type} anda. Anda boleh memilih satu lesen daripada senarai kami atau menyediakan lesen tersuai. Anda juga boleh menyediakan URL tersuai untuk lesen pilihan anda; jika tidak, teks lesen tersebut akan dipaparkan. Sila rujuk <guide>panduan pelesenan</guide> kami untuk maklumat lanjut."
+  },
+  "project.settings.links.donation-link": {
+    "message": "Pautan"
+  },
+  "project.settings.links.donation-url": {
     "message": "URL"
   },
   "project.settings.permissions.attention-needed.description.proj-approved": {

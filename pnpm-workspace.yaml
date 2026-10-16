@@ -2,3 +2,38 @@ packages:
   - 'apps/*'
   - 'packages/*'
 minimumReleaseAge: 10080 # 7 days
+strictPeerDependencies: false
+autoInstallPeers: true
+publicHoistPattern:
+  - 'prettier-plugin-*'
+  - '@prettier/plugin-*'
+  - 'eslint'
+  - '@eslint/*'
+  - 'eslint-plugin-*'
+  - '@nuxt/eslint-config'
+  - 'typescript-eslint'
+  - 'vue-eslint-parser'
+  - 'globals'
+patchedDependencies:
+  'readable-stream@2.3.8': 'patches/readable-stream@2.3.8.patch'
+  '@vue-email/markdown@0.0.7': 'patches/@vue-email__markdown@0.0.7.patch'
+  '@vue-email/tailwind@0.2.0': 'patches/@vue-email__tailwind@0.2.0.patch'
+packageExtensions:
+  '@vue-email/markdown@0.0.7':
+    dependencies:
+      xss: '^1.0.14'
+peerDependencyRules:
+  allowedVersions:
+    vite: '8'
+    esbuild: '0'
+allowBuilds:
+  '@parcel/watcher': true
+  '@sentry/cli': true
+  canvas: false
+  core-js: true
+  esbuild: true
+  protobufjs: true
+  sharp: true
+  unrs-resolver: true
+  vue-demi: true
+  workerd: true

@@ -938,9 +938,6 @@
   "error.generic.default.list_item.1": {
     "message": "Proveri da li je Modrinth nedostupan na našoj <status-link>stranici statusa</status-link>."
   },
-  "error.generic.default.list_item.2": {
-    "message": "Ako se ovo nastavi dešavati, možeš obavestiti Modrinth tim pridruživši se našem <discord-link>Discord serveru</discord-link>."
-  },
   "error.generic.default.list_title": {
     "message": "Molimo pokušaj ponovo za nekoliko minuta."
   },

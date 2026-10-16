@@ -1,4 +1,5 @@
 //! Test that valid uses of the API compile.
+#![cfg(feature = "postgres")]
 #![expect(dead_code, reason = "only here to check that the code compiles")]
 
 use sqlx::Postgres;

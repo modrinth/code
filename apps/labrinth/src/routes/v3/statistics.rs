@@ -1,4 +1,4 @@
-use crate::database::PgPool;
+use crate::database::ReadOnlyPgPool;
 use crate::routes::ApiError;
 use crate::util::error::Context as _;
 use actix_web::{HttpResponse, get, web};
@@ -18,13 +18,13 @@ pub struct V3Stats {
 #[utoipa::path(tag = "statistics", responses((status = OK)))]
 #[get("/statistics")]
 pub async fn get_stats_route(
-    pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
 ) -> Result<HttpResponse, ApiError> {
-    get_stats(pool).await
+    get_stats(ro_pool).await
 }
 
 pub async fn get_stats(
-    pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
 ) -> Result<HttpResponse, ApiError> {
     let projects = sqlx::query!(
         "
@@ -37,7 +37,7 @@ pub async fn get_stats(
             .map(|x| x.to_string())
             .collect::<Vec<String>>(),
     )
-    .fetch_one(&**pool)
+    .fetch_one(&***ro_pool)
     .await
     .wrap_internal_err("counting projects")?;
 
@@ -57,7 +57,7 @@ pub async fn get_stats(
             .map(|x| x.to_string())
             .collect::<Vec<String>>(),
     )
-    .fetch_one(&**pool)
+    .fetch_one(&***ro_pool)
     .await
     .wrap_internal_err("counting versions")?;
 
@@ -73,7 +73,7 @@ pub async fn get_stats(
             .map(|x| x.to_string())
             .collect::<Vec<String>>(),
     )
-    .fetch_one(&**pool)
+    .fetch_one(&***ro_pool)
     .await
     .wrap_internal_err("counting project authors")?;
 
@@ -92,7 +92,7 @@ pub async fn get_stats(
             .map(|x| x.to_string())
             .collect::<Vec<String>>(),
     )
-    .fetch_one(&**pool)
+    .fetch_one(&***ro_pool)
     .await
     .wrap_internal_err("counting version files")?;
 

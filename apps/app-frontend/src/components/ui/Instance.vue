@@ -72,7 +72,6 @@ const installed = computed(() => props.instance.install_stage === 'installed')
 const router = useRouter()
 
 const seeInstance = async () => {
-	if (installing.value) return
 	await router.push(`/instance/${encodeURIComponent(props.instance.id)}`)
 }
 

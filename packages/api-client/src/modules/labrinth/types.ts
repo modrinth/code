@@ -744,21 +744,22 @@ export namespace Labrinth {
 				username: string
 				password: string
 				challenge: string
+				app_session?: boolean
 			}
 
 			export type LoginResponse = {
 				session?: string
+				app_session?: string
 				flow?: string
 			}
 
 			export type Login2FARequest = {
 				code: string
 				flow: string
+				app_session?: boolean
 			}
 
-			export type Login2FAResponse = {
-				session: string
-			}
+			export type Login2FAResponse = AuthSessionResponse
 
 			export type CreateAccountRequest = {
 				username: string
@@ -767,11 +768,10 @@ export namespace Labrinth {
 				challenge: string
 				sign_up_newsletter?: boolean
 				account_consent?: boolean
+				app_session?: boolean
 			}
 
-			export type CreateAccountResponse = {
-				session: string
-			}
+			export type CreateAccountResponse = AuthSessionResponse
 
 			export type ValidateCreateAccountRequest = {
 				username: string
@@ -785,10 +785,14 @@ export namespace Labrinth {
 				challenge: string
 				sign_up_newsletter: boolean
 				account_consent?: boolean
+				app_session?: boolean
 			}
 
-			export type CreateOAuthAccountResponse = {
+			export type CreateOAuthAccountResponse = AuthSessionResponse
+
+			export type AuthSessionResponse = Omit<Sessions.v2.Session, 'session'> & {
 				session: string
+				app_session?: string
 			}
 
 			export type ResetPasswordRequest = {
@@ -828,6 +832,7 @@ export namespace Labrinth {
 			export type PasskeyAuthenticateFinishRequest = {
 				flow: string
 				credential: unknown
+				app_session?: boolean
 			}
 
 			export type PasskeyRenameRequest = {

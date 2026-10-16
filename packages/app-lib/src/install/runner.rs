@@ -10,6 +10,7 @@ use super::shared_instance::{
     apply_shared_instance_content, apply_shared_instance_update,
     attach_pending_shared_instance, finalize_shared_instance_attachment,
     shared_instance_link, shared_instance_pack_location,
+    shared_instance_update_requires_full_apply,
 };
 use super::{diagnostics, recovery, store};
 use crate::ErrorKind;
@@ -18,21 +19,32 @@ use crate::api::pack::install_from::{
     generate_pack_from_version_id_with_reporter, get_instance_from_pack,
     get_local_pack_instance,
 };
-use crate::api::pack::install_mrpack::install_zipped_mrpack_files_with_reporter;
+use crate::api::pack::install_mrpack::{
+    install_zipped_mrpack_files_with_reporter, mrpack_instance_paths,
+};
 use crate::event::InstancePayloadType;
 use crate::event::emit::emit_instance;
 use crate::state::instances::adapters::sqlite::content_rows;
 use crate::state::instances::commands::resolve_icon_path;
 use crate::state::{
     ContentSourceKind, InstanceIconConfig, InstanceInstallStage, InstanceLink,
-    ModLoader, State,
+    ModLoader, ProjectType, State,
 };
 use crate::util::fetch::DownloadReason;
 use std::collections::{HashMap, HashSet};
+use std::future::Future;
 use std::path::PathBuf;
 use std::sync::{Arc, LazyLock, Mutex, Weak};
 use tokio::sync::{Mutex as AsyncMutex, MutexGuard, OwnedMutexGuard};
 use uuid::Uuid;
+
+/// Game settings files that pack updates prepare, detach or replace.
+const SYNCED_OPTION_FILES: [&str; 4] = [
+    "options.txt",
+    "servers.dat",
+    "hotbar.nbt",
+    "command_history.txt",
+];
 
 /// Admission covers setup and deletion. A target reservation stays with its worker
 /// until cleanup finishes, so backups and rollback cannot overlap another install.
@@ -160,6 +172,34 @@ pub async fn install_existing_instance(
     start(InstallRequest::InstallExistingInstance { instance_id, force }).await
 }
 
+pub(crate) async fn wait_for_job(job_id: Uuid) -> crate::Result<()> {
+    let state = State::get().await?;
+    let completion = store::completion_notification(job_id);
+    loop {
+        // Register before reading so completion during the query cannot be missed.
+        let notified = completion.notified();
+        tokio::pin!(notified);
+        notified.as_mut().enable();
+        let job = store::get_required(job_id, &state).await?;
+        if job.status == InstallJobStatus::Succeeded {
+            return Ok(());
+        }
+        if job.status.is_finished() {
+            return Err(crate::ErrorKind::LauncherError(
+                job.state
+                    .rollback_error
+                    .or(job.state.error)
+                    .map(|error| error.message)
+                    .unwrap_or_else(|| {
+                        format!("Installation {}", job.status.as_str())
+                    }),
+            )
+            .into());
+        }
+        notified.await;
+    }
+}
+
 pub async fn install_pack_to_existing_instance(
     instance_id: String,
     location: CreatePackLocation,
@@ -195,7 +235,13 @@ pub async fn job_support_details(job_id: Uuid) -> crate::Result<String> {
     diagnostics::build_job_support_details(&job, &state).await
 }
 
-pub async fn retry_job(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
+pub fn retry_job(
+    job_id: Uuid,
+) -> impl Future<Output = crate::Result<InstallJobSnapshot>> + Send + 'static {
+    Box::pin(retry_job_inner(job_id))
+}
+
+async fn retry_job_inner(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
     let _admission = INSTALL_ADMISSION.lock().await;
     let state = State::get().await?;
     let mut job = store::get_required(job_id, &state).await?;
@@ -211,11 +257,20 @@ pub async fn retry_job(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
         .into());
     }
 
+    if let Some(instance_id) = current_instance_id(&job.state) {
+        store::ensure_no_pending_recovery(&instance_id, Some(job_id), &state)
+            .await?;
+    }
+
     let cleanup_target_guard = reserve_target(&job.state.target)?;
 
     if job.state.rollback_error.is_some() {
         recovery::apply_cleanup(&job.state, &state).await?;
-        recovery::clear_staging_dir(&job.state).await;
+        let recovered = job.state.clone();
+        job.state.rollback_error = None;
+        job.state.paths.staging_dir = None;
+        store::update_status(job_id, job.status, &job.state, &state).await?;
+        recovery::clear_staging_dir(&recovered).await;
     }
 
     drop(cleanup_target_guard);
@@ -256,9 +311,7 @@ pub async fn retry_job(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
     };
     emit_install_job(&record.snapshot()).await?;
 
-    if let Err(error) =
-        Box::pin(prepare_initial_instance(&mut job.state, &state)).await
-    {
+    if let Err(error) = prepare_initial_instance(&mut job.state, &state).await {
         let error_view = install_error_view(
             job.state.progress.phase,
             &error,
@@ -419,10 +472,21 @@ pub async fn dismiss_job(job_id: Uuid) -> crate::Result<()> {
     store::dismiss(job_id, &state).await
 }
 
-async fn start(request: InstallRequest) -> crate::Result<InstallJobSnapshot> {
+fn start(
+    request: InstallRequest,
+) -> impl Future<Output = crate::Result<InstallJobSnapshot>> + Send + 'static {
+    Box::pin(start_inner(request))
+}
+
+async fn start_inner(
+    request: InstallRequest,
+) -> crate::Result<InstallJobSnapshot> {
     let _admission = INSTALL_ADMISSION.lock().await;
     let mut target_guard = reserve_target(&request.target())?;
     let state = State::get().await?;
+    if let InstallTarget::ExistingInstance { instance_id } = request.target() {
+        store::ensure_no_pending_recovery(&instance_id, None, &state).await?;
+    }
     let id = Uuid::new_v4();
     let mut job_state = InstallJobState::new(request);
     set_initial_display(&mut job_state);
@@ -430,9 +494,7 @@ async fn start(request: InstallRequest) -> crate::Result<InstallJobSnapshot> {
         store::insert(id, &job_state, InstallJobStatus::Queued, &state).await?;
     emit_install_job(&record.snapshot()).await?;
 
-    if let Err(error) =
-        Box::pin(prepare_initial_instance(&mut job_state, &state)).await
-    {
+    if let Err(error) = prepare_initial_instance(&mut job_state, &state).await {
         let error_view = install_error_view(
             job_state.progress.phase,
             &error,
@@ -489,7 +551,14 @@ async fn start(request: InstallRequest) -> crate::Result<InstallJobSnapshot> {
     Ok(record.snapshot())
 }
 
-async fn prepare_initial_instance(
+fn prepare_initial_instance<'a>(
+    job_state: &'a mut InstallJobState,
+    state: &'a State,
+) -> impl Future<Output = crate::Result<()>> + Send + 'a {
+    Box::pin(prepare_initial_instance_inner(job_state, state))
+}
+
+async fn prepare_initial_instance_inner(
     job_state: &mut InstallJobState,
     state: &State,
 ) -> crate::Result<()> {
@@ -503,7 +572,7 @@ async fn prepare_initial_instance(
             icon_config,
             link,
         } => {
-            let metadata = Box::pin(crate::api::instance::create(
+            let metadata = crate::api::instance::create(
                 name,
                 game_version,
                 loader,
@@ -511,7 +580,7 @@ async fn prepare_initial_instance(
                 icon_path,
                 icon_config,
                 link,
-            ))
+            )
             .await?;
             set_display(
                 job_state,
@@ -550,7 +619,7 @@ async fn prepare_initial_instance(
                 .and_then(|edit| edit.link.clone())
                 .or_else(|| preview.link.clone())
                 .unwrap_or(InstanceLink::Unmanaged);
-            let metadata = Box::pin(crate::api::instance::create(
+            let metadata = crate::api::instance::create(
                 name,
                 preview.game_version,
                 preview.modloader,
@@ -558,7 +627,7 @@ async fn prepare_initial_instance(
                 icon_path,
                 None,
                 link,
-            ))
+            )
             .await?;
             set_display(
                 job_state,
@@ -596,7 +665,7 @@ async fn prepare_initial_instance(
                         data.instance_icon_url.clone(),
                     )
                 };
-            let metadata = Box::pin(crate::api::instance::create(
+            let metadata = crate::api::instance::create(
                 data.name.clone(),
                 game_version,
                 loader,
@@ -604,7 +673,7 @@ async fn prepare_initial_instance(
                 icon_path,
                 None,
                 shared_link,
-            ))
+            )
             .await?;
             set_display(
                 job_state,
@@ -619,7 +688,7 @@ async fn prepare_initial_instance(
         InstallRequest::ImportInstance {
             instance_folder, ..
         } => {
-            let metadata = Box::pin(crate::api::instance::create(
+            let metadata = crate::api::instance::create(
                 instance_folder,
                 "1.19.4".to_string(),
                 ModLoader::Vanilla,
@@ -627,7 +696,7 @@ async fn prepare_initial_instance(
                 None,
                 None,
                 InstanceLink::Unmanaged,
-            ))
+            )
             .await?;
             set_display(
                 job_state,
@@ -645,7 +714,7 @@ async fn prepare_initial_instance(
                             "Unknown instance".to_string(),
                         )
                     })?;
-            let created = Box::pin(crate::api::instance::create(
+            let created = crate::api::instance::create(
                 metadata.instance.name,
                 metadata.applied_content_set.game_version,
                 metadata.applied_content_set.loader,
@@ -653,7 +722,7 @@ async fn prepare_initial_instance(
                 metadata.instance.icon_path,
                 None,
                 metadata.link,
-            ))
+            )
             .await?;
             set_display(
                 job_state,
@@ -682,9 +751,7 @@ fn spawn_job(
 ) {
     tokio::spawn(async move {
         let _target_guard = target_guard;
-        if let Err(error) =
-            Box::pin(run_job(job_id, &registration.control)).await
-        {
+        if let Err(error) = run_job(job_id, &registration.control).await {
             let failure = error.to_string();
             tracing::error!("Install job {job_id} terminated: {failure}");
             if let Err(error) = terminalize_stranded_job(job_id, failure).await
@@ -697,7 +764,14 @@ fn spawn_job(
     });
 }
 
-async fn run_job(
+fn run_job<'a>(
+    job_id: Uuid,
+    control: &'a std::sync::Arc<super::control::InstallControl>,
+) -> impl Future<Output = crate::Result<()>> + Send + 'a {
+    Box::pin(run_job_inner(job_id, control))
+}
+
+async fn run_job_inner(
     job_id: Uuid,
     control: &std::sync::Arc<super::control::InstallControl>,
 ) -> crate::Result<()> {
@@ -742,7 +816,7 @@ async fn run_job(
             super::control::CURRENT_INSTALL
                 .scope(
                     control.clone(),
-                    Box::pin(run_request(job_id, &mut job_state, &state)),
+                    run_request(job_id, &mut job_state, &state),
                 )
                 .await
         }
@@ -803,9 +877,9 @@ async fn run_job(
                     job_state.request,
                     InstallRequest::BulkUpdateContent { .. }
                 ) {
-                    crate::api::instance::synced_packs::reconcile_after_content_change(
+                    Box::pin(crate::api::instance::synced_packs::reconcile_after_content_change(
 						&instance_id,
-					).await;
+					)).await;
                 }
                 recovery::clear_staging_dir(&job_state).await;
                 if let Err(error) =
@@ -863,7 +937,18 @@ async fn terminalize_stranded_job(
     terminalize_failed_job(job_id, job.state, error_view, &state).await
 }
 
-async fn terminalize_failed_job(
+fn terminalize_failed_job<'a>(
+    job_id: Uuid,
+    job_state: InstallJobState,
+    error_view: InstallErrorView,
+    state: &'a State,
+) -> impl Future<Output = crate::Result<()>> + Send + 'a {
+    Box::pin(terminalize_failed_job_inner(
+        job_id, job_state, error_view, state,
+    ))
+}
+
+async fn terminalize_failed_job_inner(
     job_id: Uuid,
     mut job_state: InstallJobState,
     error_view: InstallErrorView,
@@ -936,7 +1021,15 @@ async fn terminalize_failed_job(
     Ok(())
 }
 
-async fn run_request(
+fn run_request<'a>(
+    job_id: Uuid,
+    job_state: &'a mut InstallJobState,
+    state: &'a State,
+) -> impl Future<Output = crate::Result<Option<String>>> + Send + 'a {
+    Box::pin(run_request_inner(job_id, job_state, state))
+}
+
+async fn run_request_inner(
     job_id: Uuid,
     job_state: &mut InstallJobState,
     state: &State,
@@ -1011,13 +1104,13 @@ async fn run_request(
                 modpack_details(&location),
             )
             .await?;
-            Box::pin(install_pack(
+            install_pack(
                 job_id,
                 job_state,
                 location,
                 instance_id.clone(),
                 DownloadReason::Modpack,
-            ))
+            )
             .await?;
             apply_post_install_edit(&instance_id, post_install_edit).await?;
             Ok(Some(instance_id))
@@ -1029,13 +1122,13 @@ async fn run_request(
                 )
                 .into());
             };
-            Box::pin(apply_shared_instance_content(
+            apply_shared_instance_content(
                 job_id,
                 job_state,
                 state,
                 &instance_id,
                 &data,
-            ))
+            )
             .await?;
 
             finalize_shared_instance_attachment(&instance_id, &data, state)
@@ -1066,13 +1159,13 @@ async fn run_request(
                 },
             )
             .await?;
-            Box::pin(crate::api::pack::import::import_instance_with_reporter(
+            crate::api::pack::import::import_instance_with_reporter(
                 &instance_id,
                 launcher_type,
                 base_path,
                 instance_folder,
                 InstallProgressReporter::new(job_id, job_state.clone()),
-            ))
+            )
             .await?;
             Ok(Some(instance_id))
         }
@@ -1092,15 +1185,13 @@ async fn run_request(
             )
             .await?;
             let state = State::get().await?;
-            Box::pin(
-                crate::api::pack::import::copy_dotminecraft_with_reporter(
-                    &instance_id,
-                    crate::api::instance::get_full_path(&source_instance_id)
-                        .await?,
-                    &state.io_semaphore,
-                    InstallProgressReporter::new(job_id, job_state.clone()),
-                    InstallPhaseDetails::Empty,
-                ),
+            crate::api::pack::import::copy_dotminecraft_with_reporter(
+                &instance_id,
+                crate::api::instance::get_full_path(&source_instance_id)
+                    .await?,
+                &state.io_semaphore,
+                InstallProgressReporter::new(job_id, job_state.clone()),
+                InstallPhaseDetails::Empty,
             )
             .await?;
             let context =
@@ -1165,13 +1256,13 @@ async fn run_request(
                 &instance_id,
             )
             .await?;
-            Box::pin(install_pack(
+            install_pack(
                 job_id,
                 job_state,
                 location,
                 instance_id.clone(),
                 DownloadReason::Modpack,
-            ))
+            )
             .await?;
             restore_disabled_projects(
                 &instance_id,
@@ -1187,10 +1278,25 @@ async fn run_request(
             updates,
         } => {
             lock_instance(&instance_id, state).await?;
+            update_progress(
+                job_id,
+                job_state,
+                state,
+                InstallPhaseId::ResolvingPack,
+                InstallPhaseDetails::Empty,
+            )
+            .await?;
+            let plan =
+                Box::pin(crate::state::instances::commands::plan_bulk_update(
+                    &instance_id,
+                    &updates,
+                    state,
+                ))
+                .await?;
             prepare_update_backup(job_id, job_state, state).await?;
-            crate::state::instances::commands::update_selected_projects(
+            crate::state::instances::commands::apply_bulk_update(
                 &instance_id,
-                &updates,
+                plan,
                 InstallProgressReporter::new(job_id, job_state.clone()),
                 state,
             )
@@ -1203,13 +1309,13 @@ async fn run_request(
             prepare_update_backup(job_id, job_state, state).await?;
             let disabled_project_ids =
                 disabled_project_ids(&instance_id, state).await?;
-            Box::pin(apply_shared_instance_update(
+            apply_shared_instance_update(
                 job_id,
                 job_state,
                 state,
                 &instance_id,
                 &data,
-            ))
+            )
             .await?;
             restore_disabled_projects(
                 &instance_id,
@@ -1412,7 +1518,23 @@ async fn restore_disabled_projects(
     Ok(())
 }
 
-pub(super) async fn install_pack(
+pub(super) fn install_pack<'a>(
+    job_id: Uuid,
+    job_state: &'a mut InstallJobState,
+    location: CreatePackLocation,
+    instance_id: String,
+    reason: DownloadReason,
+) -> impl Future<Output = crate::Result<()>> + Send + 'a {
+    Box::pin(install_pack_inner(
+        job_id,
+        job_state,
+        location,
+        instance_id,
+        reason,
+    ))
+}
+
+async fn install_pack_inner(
     job_id: Uuid,
     job_state: &mut InstallJobState,
     location: CreatePackLocation,
@@ -1466,12 +1588,12 @@ pub(super) async fn install_pack(
         }
     };
 
-    Box::pin(install_zipped_mrpack_files_with_reporter(
+    install_zipped_mrpack_files_with_reporter(
         create_pack,
         false,
         reason,
         reporter,
-    ))
+    )
     .await?;
 
     Ok(())
@@ -1529,6 +1651,7 @@ async fn prepare_update_backup(
     state: &State,
 ) -> crate::Result<()> {
     super::control::checkpoint(job_id).await?;
+    let scoped_paths = update_backup_scope(job_id, job_state, state).await?;
     let rollback = job_state.rollback.as_ref().ok_or_else(|| {
         crate::ErrorKind::OtherError(
             "Instance update rollback state is missing".to_string(),
@@ -1537,6 +1660,7 @@ async fn prepare_update_backup(
     let staging_dir = recovery::prepare_instance_update_backup(
         job_id,
         &rollback.instance,
+        scoped_paths,
         state,
     )
     .await?;
@@ -1544,6 +1668,121 @@ async fn prepare_update_backup(
     let record = store::update_state(job_id, job_state, state).await?;
     emit_install_job(&record.snapshot()).await?;
     super::control::checkpoint(job_id).await
+}
+
+/// Instance-relative paths an update job can change, so its backup can leave out
+/// everything else, such as worlds. `None` backs up the whole instance.
+///
+/// Pack files are read here to list their overrides. The content store keeps them by
+/// hash, so installing the pack afterwards reuses the download.
+async fn update_backup_scope(
+    job_id: Uuid,
+    job_state: &InstallJobState,
+    state: &State,
+) -> crate::Result<Option<Vec<String>>> {
+    let mut paths = ProjectType::iterator()
+        .map(|project_type| project_type.get_folder().to_string())
+        .collect::<Vec<_>>();
+    let (instance_id, packs) = match &job_state.request {
+        InstallRequest::BulkUpdateContent { .. } => return Ok(Some(paths)),
+        InstallRequest::InstallPackToExistingInstance {
+            instance_id,
+            location,
+            ..
+        } => {
+            let metadata = instance_metadata(instance_id, state).await?;
+            let mut packs = vec![(location.clone(), DownloadReason::Modpack)];
+            packs.extend(
+                linked_pack_location(&metadata)
+                    .map(|location| (location, DownloadReason::Update)),
+            );
+            (instance_id, packs)
+        }
+        InstallRequest::UpdateSharedInstance { instance_id, data } => {
+            paths.push(crate::api::instance::CONFIG_DIRECTORY.to_string());
+            let metadata = instance_metadata(instance_id, state).await?;
+            if !shared_instance_update_requires_full_apply(&metadata, data) {
+                return Ok(Some(paths));
+            }
+            let packs = data
+                .modpack
+                .clone()
+                .map(|modpack| {
+                    (
+                        shared_instance_pack_location(modpack),
+                        DownloadReason::Modpack,
+                    )
+                })
+                .into_iter()
+                .collect();
+            (instance_id, packs)
+        }
+        _ => return Ok(None),
+    };
+    paths.extend(SYNCED_OPTION_FILES.map(str::to_string));
+    for (location, reason) in packs {
+        let pack = match location {
+            CreatePackLocation::FromVersionId {
+                project_id,
+                version_id,
+                title,
+                ..
+            } => {
+                Box::pin(generate_pack_from_version_id_with_reporter(
+                    project_id,
+                    version_id,
+                    title,
+                    None,
+                    instance_id.clone(),
+                    reason,
+                    InstallProgressReporter::new(job_id, job_state.clone()),
+                ))
+                .await?
+            }
+            CreatePackLocation::FromFile { path } => {
+                generate_pack_from_file(path, instance_id.clone()).await?
+            }
+        };
+        paths.extend(mrpack_instance_paths(&pack.file).await?);
+    }
+
+    Ok(Some(paths))
+}
+
+async fn instance_metadata(
+    instance_id: &str,
+    state: &State,
+) -> crate::Result<crate::state::InstanceMetadata> {
+    crate::state::instances::commands::get_instance_metadata(
+        instance_id,
+        &state.pool,
+    )
+    .await?
+    .ok_or_else(|| {
+        crate::ErrorKind::InputError("Unknown instance".to_string()).into()
+    })
+}
+
+fn linked_pack_location(
+    metadata: &crate::state::InstanceMetadata,
+) -> Option<CreatePackLocation> {
+    match &metadata.link {
+        InstanceLink::ModrinthModpack {
+            project_id,
+            version_id,
+        }
+        | InstanceLink::ServerProjectModpack {
+            content_project_id: project_id,
+            content_version_id: version_id,
+            ..
+        } => Some(CreatePackLocation::FromVersionId {
+            project_id: project_id.clone(),
+            version_id: version_id.clone(),
+            title: metadata.instance.name.clone(),
+            icon_url: None,
+        }),
+        _ => None,
+    }
 }
 
 async fn lock_install_target(
@@ -1564,6 +1803,12 @@ async fn lock_install_target(
 }
 
 async fn lock_instance(instance_id: &str, state: &State) -> crate::Result<()> {
+    let _content_lock = state.lock_instance_content(instance_id).await;
+    if crate::state::instance_has_running_process(instance_id, state).await? {
+        return Err(crate::state::content_store::input(
+            "Stop this instance before installing or updating its content",
+        ));
+    }
     crate::state::instances::commands::set_instance_install_stage(
         instance_id,
         InstanceInstallStage::MinecraftInstalling,

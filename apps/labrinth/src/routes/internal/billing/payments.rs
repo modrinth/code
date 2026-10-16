@@ -19,8 +19,9 @@ use std::collections::HashMap;
 use std::str::FromStr;
 use stripe::{
     self, CreateCustomer, CreatePaymentIntent, Currency, CustomerId,
+    CustomerInvoiceSettings, CustomerPaymentMethodRetrieval,
     PaymentIntentOffSession, PaymentIntentSetupFutureUsage, PaymentMethod,
-    PaymentMethodId,
+    PaymentMethodId, UpdateCustomer,
 };
 
 use super::{
@@ -274,23 +275,10 @@ pub async fn create_or_update_payment_intent(
                 )));
             }
 
-            let customer = stripe::Customer::retrieve(
-                stripe_client,
-                &customer_id,
-                &["invoice_settings.default_payment_method"],
-            )
-            .await
-            .wrap_failed_dependency_err(
-                "communicating with payment provider",
-            )?;
-
-            customer
-                .invoice_settings
-                .and_then(|x| {
-                    x.default_payment_method.and_then(|x| x.into_object())
-                })
+            get_default_payment_method(stripe_client, &customer_id)
+                .await?
                 .wrap_request_err_with(|| {
-                    "customer has no default payment method!".to_string()
+                    "customer has no default payment method".to_string()
                 })?
         }
     };
@@ -676,6 +664,115 @@ pub async fn get_or_create_customer(
 
         Ok(customer.id)
     }
+}
+
+/// Sets the customer's default payment method, which is charged for automated renewals.
+pub async fn set_default_payment_method(
+    client: &stripe::Client,
+    customer_id: &CustomerId,
+    payment_method_id: &PaymentMethodId,
+) -> Result<(), ApiError> {
+    stripe::Customer::update(
+        client,
+        customer_id,
+        UpdateCustomer {
+            invoice_settings: Some(CustomerInvoiceSettings {
+                default_payment_method: Some(payment_method_id.to_string()),
+                ..Default::default()
+            }),
+            ..Default::default()
+        },
+    )
+    .await
+    .wrap_failed_dependency_err("communicating with payment provider")?;
+
+    Ok(())
+}
+
+/// Fetches the customer's default payment method.
+///
+/// If the customer has no default payment method but has exactly one payment method
+/// attached, that payment method is set as the default and returned.
+pub async fn get_default_payment_method(
+    client: &stripe::Client,
+    customer_id: &CustomerId,
+) -> Result<Option<PaymentMethod>, ApiError> {
+    let customer = stripe::Customer::retrieve(
+        client,
+        customer_id,
+        &["invoice_settings.default_payment_method"],
+    )
+    .await
+    .wrap_failed_dependency_err("communicating with payment provider")?;
+
+    if let Some(payment_method) = customer
+        .invoice_settings
+        .and_then(|x| x.default_payment_method)
+        .and_then(|x| x.into_object())
+    {
+        return Ok(Some(payment_method));
+    }
+
+    let payment_methods = stripe::Customer::retrieve_payment_methods(
+        client,
+        customer_id,
+        CustomerPaymentMethodRetrieval {
+            limit: Some(2),
+            ..Default::default()
+        },
+    )
+    .await
+    .wrap_failed_dependency_err("communicating with payment provider")?;
+
+    let Ok([payment_method]) =
+        <[PaymentMethod; 1]>::try_from(payment_methods.data)
+    else {
+        return Ok(None);
+    };
+
+    set_default_payment_method(client, customer_id, &payment_method.id).await?;
+
+    Ok(Some(payment_method))
+}
+
+/// Makes the customer's newest payment method the default if the customer has no
+/// default payment method left after `removed` was detached.
+pub async fn promote_default_payment_method(
+    client: &stripe::Client,
+    customer_id: &CustomerId,
+    removed: &PaymentMethodId,
+) -> Result<(), ApiError> {
+    let customer = stripe::Customer::retrieve(client, customer_id, &[])
+        .await
+        .wrap_failed_dependency_err(
+        "communicating with payment provider",
+    )?;
+
+    if customer
+        .invoice_settings
+        .and_then(|x| x.default_payment_method)
+        .is_some_and(|x| x.id() != *removed)
+    {
+        return Ok(());
+    }
+
+    let payment_methods = stripe::Customer::retrieve_payment_methods(
+        client,
+        customer_id,
+        CustomerPaymentMethodRetrieval {
+            limit: Some(1),
+            ..Default::default()
+        },
+    )
+    .await
+    .wrap_failed_dependency_err("communicating with payment provider")?;
+
+    if let Some(payment_method) = payment_methods.data.first() {
+        set_default_payment_method(client, customer_id, &payment_method.id)
+            .await?;
+    }
+
+    Ok(())
 }
 
 pub fn infer_currency_code(country: &str) -> String {

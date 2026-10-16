@@ -380,13 +380,13 @@ impl ApiProject for ApiV3 {
 
     async fn edit_gallery_item(
         &self,
-        id_or_slug: &str,
+        _id_or_slug: &str,
         image_url: &str,
         patch: HashMap<String, String>,
         pat: Option<&str>,
     ) -> ServiceResponse {
         let mut url = format!(
-            "/v3/project/{id_or_slug}/gallery?url={image_url}",
+            "/v3/project-gallery?url={image_url}",
             image_url = urlencoding::encode(image_url)
         );
 
@@ -409,12 +409,12 @@ impl ApiProject for ApiV3 {
 
     async fn remove_gallery_item(
         &self,
-        id_or_slug: &str,
+        _id_or_slug: &str,
         url: &str,
         pat: Option<&str>,
     ) -> ServiceResponse {
         let req = test::TestRequest::delete()
-            .uri(&format!("/v3/project/{id_or_slug}/gallery?url={url}"))
+            .uri(&format!("/v3/project-gallery?url={url}"))
             .append_pat(pat)
             .to_request();
 

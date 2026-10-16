@@ -6,9 +6,32 @@ use crate::state::{
     InstanceMetadata, InstanceSyncedOption, ModLoader, State,
 };
 
+use std::future::Future;
+
+#[allow(clippy::too_many_arguments)]
+pub(crate) fn create(
+    name: String,
+    game_version: String,
+    modloader: ModLoader,
+    loader_version: Option<String>,
+    icon_path: Option<String>,
+    icon_config: Option<InstanceIconConfig>,
+    link: InstanceLink,
+) -> impl Future<Output = crate::Result<InstanceMetadata>> + Send + 'static {
+    Box::pin(create_inner(
+        name,
+        game_version,
+        modloader,
+        loader_version,
+        icon_path,
+        icon_config,
+        link,
+    ))
+}
+
 #[tracing::instrument]
 #[allow(clippy::too_many_arguments)]
-pub(crate) async fn create(
+async fn create_inner(
     name: String,
     game_version: String,
     modloader: ModLoader,

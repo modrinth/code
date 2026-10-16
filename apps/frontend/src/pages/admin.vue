@@ -44,6 +44,12 @@
 							shown: admin,
 						},
 						{
+							link: '/admin/servers/locks',
+							label: 'Server locks',
+							icon: LockIcon,
+							shown: admin,
+						},
+						{
 							type: 'heading',
 							label: 'Management',
 							shown: admin,
@@ -85,6 +91,7 @@ import {
 	ChartIcon,
 	FileSearchCornerIcon,
 	IssuesIcon,
+	LockIcon,
 	MailIcon,
 	ServerSearchIcon,
 	TransferIcon,

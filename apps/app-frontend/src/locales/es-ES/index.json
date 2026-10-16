@@ -53,6 +53,9 @@
   "app.action-bar.install.summary.download-failed": {
     "message": "La descarga no ha podido terminar"
   },
+  "app.action-bar.install.summary.instance-error": {
+    "message": "No se pudo preparar la instancia"
+  },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "La ruta de archivo no es válida"
   },
@@ -203,6 +206,12 @@
   "app.behavior-settings.content.title": {
     "message": "Inicio y contenido"
   },
+  "app.behavior-settings.refocus-on-game-close.description": {
+    "message": "Trae la aplicación de Modrinth al primer plano cuando cierres Minecraft."
+  },
+  "app.behavior-settings.refocus-on-game-close.title": {
+    "message": "Volver a enfocar cuando se cierre Minecraft"
+  },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Comienzo y navegación"
   },
@@ -298,6 +307,9 @@
   },
   "app.download-manager.attention": {
     "message": "Necesita atención"
+  },
+  "app.download-manager.bulk-update-content": {
+    "message": "Actualizando {count, plural, one {# elemento} other {# elementos}}"
   },
   "app.download-manager.cancel": {
     "message": "Cancelar instalación"

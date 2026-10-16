@@ -1,0 +1,29 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT q.hash AS \"hash!\", latest.id AS \"version_id!\"\n        FROM JSONB_TO_RECORDSET($1::JSONB) AS q(\n            hash TEXT,\n            project_id BIGINT,\n            loaders VARCHAR[],\n            version_types VARCHAR[],\n            loader_fields JSONB\n        )\n        CROSS JOIN LATERAL (\n            SELECT v.id\n            FROM versions v\n            WHERE v.mod_id = q.project_id\n                AND v.status = ANY($2::VARCHAR[])\n                AND (q.version_types IS NULL OR v.version_type = ANY(q.version_types))\n                AND (\n                    q.loaders IS NULL\n                    OR EXISTS (\n                        SELECT 1 FROM loaders_versions lv\n                        INNER JOIN loaders l ON l.id = lv.loader_id\n                        WHERE lv.version_id = v.id AND l.loader = ANY(q.loaders)\n                    )\n                )\n                AND NOT EXISTS (\n                    SELECT 1\n                    FROM JSONB_EACH(q.loader_fields) AS req(field, vals)\n                    INNER JOIN loader_fields lf ON lf.field = req.field\n                    WHERE EXISTS (\n                        SELECT 1 FROM loaders_versions lv\n                        INNER JOIN loader_fields_loaders lfl ON lfl.loader_id = lv.loader_id\n                        WHERE lv.version_id = v.id AND lfl.loader_field_id = lf.id\n                    )\n                    AND (\n                        lf.field_type IN ('array_integer', 'array_text', 'array_boolean', 'array_enum')\n                        OR (\n                            SELECT COUNT(*) FROM version_fields vf\n                            WHERE vf.version_id = v.id AND vf.field_id = lf.id\n                        ) = 1\n                    )\n                    AND NOT EXISTS (\n                        SELECT 1\n                        FROM version_fields vf\n                        LEFT JOIN loader_field_enum_values lfev ON lfev.id = vf.enum_value\n                        CROSS JOIN JSONB_ARRAY_ELEMENTS(req.vals) AS want(val)\n                        WHERE vf.version_id = v.id AND vf.field_id = lf.id\n                            AND CASE\n                                WHEN lf.field_type IN ('enum', 'array_enum')\n                                    THEN JSONB_TYPEOF(want.val) = 'string' AND lfev.value = want.val #>> '{}'\n                                WHEN lf.field_type IN ('text', 'array_text')\n                                    THEN JSONB_TYPEOF(want.val) = 'string' AND vf.string_value = want.val #>> '{}'\n                                WHEN lf.field_type IN ('integer', 'array_integer')\n                                    THEN JSONB_TYPEOF(want.val) = 'number' AND vf.int_value = (want.val #>> '{}')::NUMERIC\n                                WHEN lf.field_type IN ('boolean', 'array_boolean')\n                                    THEN JSONB_TYPEOF(want.val) = 'boolean' AND (vf.int_value <> 0) = (want.val #>> '{}')::BOOLEAN\n                            END\n                    )\n                )\n            ORDER BY v.ordering DESC NULLS FIRST, v.date_published DESC, v.id DESC\n            LIMIT 1\n        ) latest\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "hash!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 1,
+        "name": "version_id!",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Jsonb",
+        "VarcharArray"
+      ]
+    },
+    "nullable": [
+      null,
+      false
+    ]
+  },
+  "hash": "4adde8c379e86b12c0b372beadd97ca77a041056b1828f897dd3c063b6cc33db"
+}

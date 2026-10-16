@@ -7,7 +7,6 @@
 		"binding": "ASSETS",
 		"directory": "./.output/public/"
 	},
-	"routes": ["modrinth.com/*"],
 	"preview_urls": true,
 	"workers_dev": true,
 	"upload_source_maps": true,
@@ -46,7 +45,6 @@
 	"vars": {
 		"NODE_ENV": "production",
 		"ENVIRONMENT": "production",
-		"SENTRY_ENVIRONMENT": "production",
 		"BASE_URL": "https://api.modrinth.com/v2/",
 		"BROWSER_BASE_URL": "https://api.modrinth.com/v2/",
 		"PYRO_BASE_URL": "https://archon.modrinth.com/",
@@ -69,7 +67,6 @@
 			"vars": {
 				"NODE_ENV": "development",
 				"ENVIRONMENT": "staging",
-				"SENTRY_ENVIRONMENT": "staging",
 				"BASE_URL": "https://staging-api.modrinth.com/v2/",
 				"BROWSER_BASE_URL": "https://staging-api.modrinth.com/v2/",
 				"PYRO_BASE_URL": "https://staging-archon.modrinth.com/",

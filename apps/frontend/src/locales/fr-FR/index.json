@@ -45,10 +45,10 @@
     "message": "Type de projet dépendant"
   },
   "analytics.breakdown.download-reason": {
-    "message": "Raison de téléchargement"
+    "message": "Raison du téléchargement"
   },
   "analytics.breakdown.download-source": {
-    "message": "Source de téléchargement"
+    "message": "Source du téléchargement"
   },
   "analytics.breakdown.game-version": {
     "message": "Version du jeu"
@@ -878,6 +878,9 @@
   "auth.sign-in.choose-account": {
     "message": "Choisissez un compte à utiliser dans l'application Modrinth"
   },
+  "auth.sign-in.choose-existing-account": {
+    "message": "Utiliser un compte existant"
+  },
   "auth.sign-in.continue-with-email": {
     "message": "Continuer avec un E-mail"
   },
@@ -896,17 +899,14 @@
   "auth.sign-in.launcher.callback.title": {
     "message": "Rappel de connexion de l'application Modrinth"
   },
-  "auth.sign-in.launcher.complete.description": {
-    "message": "Nous vous redirigeons vers l'application Modrinth. S'il ne se passe rien, utilisez le bouton ci-dessous."
-  },
   "auth.sign-in.launcher.complete.go-to-website": {
     "message": "Aller sur Modrinth.com"
   },
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Ouvrir Modrinth App"
   },
-  "auth.sign-in.launcher.complete.title": {
-    "message": "Vous êtes connectés en tant que"
+  "auth.sign-in.launcher.handoff-failed": {
+    "message": "La connexion a échoué. Réessayez."
   },
   "auth.sign-in.launcher.opening.description": {
     "message": "Si l'application ne s'ouvre pas, utilisez le bouton ci-dessous pour terminer la connexion."
@@ -914,8 +914,14 @@
   "auth.sign-in.launcher.opening.title": {
     "message": "Ouverture de Modrinth..."
   },
+  "auth.sign-in.launcher.reauthenticate.title": {
+    "message": "Se connecter à l'application Modrinth"
+  },
   "auth.sign-in.no-account": {
     "message": "Vous n'avez pas de compte ?"
+  },
+  "auth.sign-in.reauthenticate.use-different-account": {
+    "message": "Utiliser un autre compte"
   },
   "auth.sign-in.sign-in-with": {
     "message": "Se connecter à Modrinth"
@@ -2258,9 +2264,6 @@
   "error.generic.default.list_item.1": {
     "message": "Vérifiez si Modrinth est hors ligne sur notre <status-link>page de statut</status-link>."
   },
-  "error.generic.default.list_item.2": {
-    "message": "Si cela continue, vous pouvez informer l’équipe de Modrinth en rejoignant notre <discord-link>serveur Discord</discord-link>."
-  },
   "error.generic.default.list_title": {
     "message": "Veuillez réessayer dans quelques minutes."
   },
@@ -2983,6 +2986,9 @@
   },
   "layout.publish.email-verification-required.title": {
     "message": "Vérification de l'adresse e-mail requise"
+  },
+  "messages.noResults": {
+    "message": "Aucun résultat trouvé pour votre requête !"
   },
   "modal.shared-instance.open-in-app.benefit.install": {
     "message": "Installez automatiquement tout ce à quoi ils jouent"
@@ -4130,11 +4136,14 @@
   "project.settings.license.later": {
     "message": "Éditions futures"
   },
-  "project.settings.license.select": {
-    "message": "Sélectionner une licence"
+  "project.settings.license.name": {
+    "message": "Nom de la licence"
   },
-  "project.settings.license.select-placeholder": {
-    "message": "Sélectionner une licence..."
+  "project.settings.license.name-placeholder": {
+    "message": "Nom de la licence"
+  },
+  "project.settings.license.optional-label": {
+    "message": "facultatif"
   },
   "project.settings.license.title": {
     "message": "Licence"
@@ -4169,14 +4178,32 @@
   "project.settings.links.donation-username": {
     "message": "Nom d'utilisateur"
   },
+  "project.settings.links.donation-username-placeholder": {
+    "message": "Entrez votre nom d'utilisateur {platform}"
+  },
+  "project.settings.links.donations": {
+    "message": "Liens de donation"
+  },
   "project.settings.links.link-type": {
     "message": "Type de lien"
+  },
+  "project.settings.links.remove-donation-link": {
+    "message": "Retirer le lien de donation"
   },
   "project.settings.links.server-discord": {
     "message": "Discord"
   },
+  "project.settings.links.server-updated": {
+    "message": "Les liens de votre serveur ont été mis à jour."
+  },
+  "project.settings.links.server-wiki-description": {
+    "message": "Une page contenant des informations, de la documentation et de l'aide pour le serveur."
+  },
   "project.settings.links.site": {
     "message": "Site web"
+  },
+  "project.settings.links.site-description": {
+    "message": "Le site web officiel de votre serveur."
   },
   "project.settings.links.source": {
     "message": "Code source"
@@ -4184,17 +4211,29 @@
   "project.settings.links.store": {
     "message": "Boutique"
   },
+  "project.settings.links.store-description": {
+    "message": "Un lien vers la boutique ou le magasin de votre serveur."
+  },
   "project.settings.links.title": {
     "message": "Liens"
   },
+  "project.settings.links.updated": {
+    "message": "Vos liens ont été mis à jour."
+  },
   "project.settings.links.updated-title": {
     "message": "Liens mis à jour"
+  },
+  "project.settings.links.url-placeholder": {
+    "message": "Entrez une URL valide"
   },
   "project.settings.links.visit-link": {
     "message": "Visiter {url}"
   },
   "project.settings.links.wiki": {
     "message": "Page Wiki"
+  },
+  "project.settings.links.wiki-description": {
+    "message": "Une page qui contient des informations, de la documentation et de l'aide pour le projet."
   },
   "project.settings.monetization.description": {
     "message": "Les projets sur Modrinth sont automatiquement inscrits au <rewards-program-link>programme de récompenses</rewards-program-link>. Si vous ne souhaitez pas (ou ne pouvez pas, pour des raisons légales) générer des revenus avec ce projet, vous pouvez désactiver cette option ici."
