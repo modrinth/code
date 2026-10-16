@@ -467,6 +467,7 @@ function onInstallationDismiss() {
 				v-if="item.kind === 'curseforge-files'"
 				:file-count="props.curseforgeFileWarningCount"
 				:dismissible="dismissible"
+				:loading="curseforgeReviewModal?.loading ?? false"
 				@review="curseforgeReviewModal?.show()"
 				@dismiss="onCurseForgeFilesDismiss(item.id)"
 			/>

@@ -9,8 +9,9 @@ withDefaults(
 	defineProps<{
 		fileCount: number
 		dismissible?: boolean
+		loading?: boolean
 	}>(),
-	{ dismissible: true },
+	{ dismissible: true, loading: false },
 )
 
 const emit = defineEmits<{
@@ -45,7 +46,7 @@ const messages = defineMessages({
 	>
 		<span class="leading-6">{{ formatMessage(messages.body, { count: fileCount }) }}</span>
 		<template #actions>
-			<Button type="colored" color="orange" size="lg" @click="emit('review')">
+			<Button type="colored" color="orange" size="lg" :loading="loading" @click="emit('review')">
 				{{ formatMessage(messages.review) }}
 				<RightArrowIcon aria-hidden="true" />
 			</Button>
