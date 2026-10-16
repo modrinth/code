@@ -509,9 +509,45 @@ export const projectReviewMessages = defineMessages({
 		id: 'moderation.project-review.complete',
 		defaultMessage: 'Complete',
 	},
-	total: {
-		id: 'moderation.project-review.total',
-		defaultMessage: 'Total',
+	completedProjects: {
+		id: 'moderation.project-review.completedProjects',
+		defaultMessage: 'Completed projects',
+	},
+	queuedProjects: {
+		id: 'moderation.project-review.queuedProjects',
+		defaultMessage: 'Next 5 projects',
+	},
+	searchingProjects: {
+		id: 'moderation.project-review.searchingProjects',
+		defaultMessage: 'Searching projects…',
+	},
+	noMatchingProjects: {
+		id: 'moderation.project-review.noMatchingProjects',
+		defaultMessage: 'No matching projects',
+	},
+	skipped: {
+		id: 'moderation.project-review.skipped',
+		defaultMessage: 'Skipped',
+	},
+	skippedProjects: {
+		id: 'moderation.project-review.skippedProjects',
+		defaultMessage: 'Skipped projects',
+	},
+	noSkippedProjects: {
+		id: 'moderation.project-review.noSkippedProjects',
+		defaultMessage: 'No skipped projects',
+	},
+	noCompletedProjects: {
+		id: 'moderation.project-review.noCompletedProjects',
+		defaultMessage: 'No completed projects yet',
+	},
+	noQueuedProjects: {
+		id: 'moderation.project-review.noQueuedProjects',
+		defaultMessage: 'No projects in the queue',
+	},
+	remaining: {
+		id: 'moderation.project-review.remaining',
+		defaultMessage: 'Remaining',
 	},
 	back: {
 		id: 'moderation.project-review.back',

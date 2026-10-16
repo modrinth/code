@@ -9,6 +9,7 @@ import {
 } from './queue-storage.ts'
 
 export interface ModerationQueue {
+	projectOrder: string[]
 	items: string[]
 	skipped: string[]
 	total: number
@@ -44,6 +45,7 @@ export interface ModerationQueueService {
 }
 
 const EMPTY_QUEUE: ModerationQueue = {
+	projectOrder: [],
 	items: [],
 	skipped: [],
 	total: 0,
@@ -57,6 +59,7 @@ function createEmptyQueue(): ModerationQueue {
 	return {
 		...EMPTY_QUEUE,
 		lastUpdated: new Date(),
+		projectOrder: [],
 		items: [],
 		skipped: [],
 		completed: [],
@@ -75,6 +78,15 @@ function sanitizeQueue(raw: PersistedModerationQueueState['currentQueue']): Mode
 		: minimumTotal
 
 	return {
+		projectOrder: [
+			...new Set([
+				...(raw.projectOrder ?? raw.history ?? []),
+				...(raw.activeProjectId ? [raw.activeProjectId] : []),
+				...completed,
+				...skipped,
+				...items,
+			]),
+		],
 		items,
 		skipped,
 		total,
@@ -93,6 +105,7 @@ function persistedPayload(
 		version: 1,
 		savedAt: new Date().toISOString(),
 		currentQueue: {
+			projectOrder: [...queue.projectOrder],
 			items: [...queue.items],
 			skipped: [...queue.skipped],
 			total: queue.total,
@@ -163,6 +176,7 @@ function createModerationQueueState(client: AbstractModrinthClient = injectModri
 	function setQueueState(items: string[]) {
 		isQueueMode.value = true
 		currentQueue.value = {
+			projectOrder: [...items],
 			items: [...items],
 			skipped: [],
 			total: items.length,
@@ -242,7 +256,8 @@ function createModerationQueueState(client: AbstractModrinthClient = injectModri
 
 	async function startSkippedReview(): Promise<void> {
 		await withMutation(() => {
-			setQueueState(currentQueue.value.skipped)
+			const skipped = new Set(currentQueue.value.skipped)
+			setQueueState(currentQueue.value.projectOrder.filter((id) => skipped.has(id)))
 		})
 	}
 

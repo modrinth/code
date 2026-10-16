@@ -58,17 +58,21 @@
 					</FloatingMenu>
 				</div>
 
-				<span
-					>{{ formatMessage(messages.complete) }}
-					<span class="ml-1 tabular-nums text-primary">{{
-						queue.currentQueue.completed.length
-					}}</span></span
-				>
-				<span class="h-5 w-px bg-divider" aria-hidden="true" />
-				<span
-					>{{ formatMessage(messages.total) }}
-					<span class="ml-1 tabular-nums text-primary">{{ queue.currentQueue.total }}</span></span
-				>
+				<template v-for="(column, index) in queueColumns" :key="column.label.id">
+					<span v-if="index" class="h-5 w-px bg-divider" aria-hidden="true" />
+					<FloatingMenu trigger="hover" placement="top-start" theme="tooltip" :distance="4">
+						<span tabindex="0">
+							{{ formatMessage(column.label) }}
+							<span class="ml-1 tabular-nums text-primary">{{ column.count }}</span>
+						</span>
+						<template #popper>
+							<div class="flex max-w-80 flex-col gap-2 py-1">
+								<span class="font-semibold">{{ formatMessage(column.heading) }}</span>
+								<QueueProjectList :project-ids="column.projects" :empty-message="column.empty" />
+							</div>
+						</template>
+					</FloatingMenu>
+				</template>
 			</div>
 			<div class="flex items-center gap-1">
 				<button type="button" class="queue-action" :disabled="busy" @click="exit">
@@ -133,6 +137,7 @@ import { injectProjectReviewPageContext } from '~/providers/project-review'
 
 import { injectProjectReviewContext } from './layout/context'
 import { projectReviewMessages as messages } from './messages'
+import QueueProjectList from './queue-project-list.vue'
 import { useReviewShortcut } from './shortcuts'
 
 const panelMenuOpen = ref(false)
@@ -166,6 +171,34 @@ const {
 } = navigation
 const { formatMessage } = useVIntl()
 const disabled = computed(() => busy.value || isLoading.value || !queue.hydrated)
+const queueColumns = computed(() => {
+	const current = queue.currentQueue
+	const completedIds = new Set(current.completed)
+	const skippedIds = new Set(current.skipped)
+	return [
+		{
+			label: messages.complete,
+			heading: messages.completedProjects,
+			empty: messages.noCompletedProjects,
+			count: current.completed.length,
+			projects: current.projectOrder.filter((id) => completedIds.has(id)),
+		},
+		{
+			label: messages.skipped,
+			heading: messages.skippedProjects,
+			empty: messages.noSkippedProjects,
+			count: current.skipped.length,
+			projects: current.projectOrder.filter((id) => skippedIds.has(id)),
+		},
+		{
+			label: messages.remaining,
+			heading: messages.queuedProjects,
+			empty: messages.noQueuedProjects,
+			count: current.items.length,
+			projects: remaining.value.slice(0, 5),
+		},
+	]
+})
 
 function runPanelAction(action: () => void, hide: () => void) {
 	action()
