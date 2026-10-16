@@ -177,14 +177,14 @@ const keybinds: { [id: string]: KeybindListener } = {
 	},
 	'toggle-collapse': {
 		keybind: 'Shift+C',
-		description: 'Toggle collapse/expand',
+		description: 'Expand or collapse the hovered or focused item',
 		scope: 'review-actions',
 		enabled: (ctx) => ctx.available('collapse'),
 		action: (ctx) => ctx.run('collapse'),
 	},
 	'reset-progress': {
 		keybind: 'Ctrl+Shift+R',
-		description: 'Reset moderation progress',
+		description: 'Open reset issues and message customizations dialog',
 		scope: 'review-actions',
 		enabled: (ctx) => ctx.available('reset'),
 		action: (ctx) => ctx.run('reset'),
@@ -207,7 +207,7 @@ const keybinds: { [id: string]: KeybindListener } = {
 	},
 	'copy-relative-permalink': {
 		keybind: 'Ctrl+Alt+R',
-		description: 'Copy relative permalink',
+		description: 'Copy permalink on the current host',
 		scope: 'project',
 		action: async (ctx) => {
 			const url = await copyProjectLink(ctx.project, true, true, false)
@@ -225,7 +225,7 @@ const keybinds: { [id: string]: KeybindListener } = {
 	},
 	'copy-page-relative-permalink': {
 		keybind: 'Shift+Ctrl+Alt+R',
-		description: 'Copy relative permalink with page',
+		description: 'Copy permalink with page on the current host',
 		scope: 'project',
 		action: async (ctx) => {
 			const url = await copyProjectLink(ctx.project, true, true, true)
@@ -244,8 +244,8 @@ const keybinds: { [id: string]: KeybindListener } = {
 	'open-official-site': {
 		keybind: 'Ctrl+Shift+P',
 		description: isOfficialModrinthHost()
-			? 'Open current page on production/staging'
-			: 'Open current page on alternative host',
+			? 'Open current page on alternative host'
+			: 'Open current page on production/staging',
 		scope: 'global',
 		enabled: (ctx) => !isOfficialModrinthHost() || !!ctx.alternativeUrl,
 		action: (ctx) => {
@@ -289,13 +289,13 @@ const keybinds: { [id: string]: KeybindListener } = {
 	},
 	'tech-review-top': {
 		keybind: 'ArrowUp',
-		description: 'Go to top of the tech review card',
+		description: 'Scroll to the top of the technical review card or detail page',
 		scope: 'tech-review',
 		action: (ctx) => ctx.actions.goToTop(),
 	},
 	'tech-review-bottom': {
 		keybind: 'ArrowDown',
-		description: 'Go to bottom of the tech review card',
+		description: 'Scroll to the bottom of the technical review card or detail page',
 		scope: 'tech-review',
 		action: (ctx) => ctx.actions.goToBottom(),
 	},

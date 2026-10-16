@@ -3,6 +3,7 @@ import {
 	type BaseKeybindListener,
 	type KeybindDefinition,
 	type KeybindListener,
+	keybindsOverlap,
 	matchesKeybind,
 	type ModerationContext,
 	normalizeKeybind,
@@ -67,6 +68,38 @@ export class Keybinds {
 
 	set(id: string, keybind: KeybindDefinition | KeybindDefinition[] | string | string[]): void {
 		this.configured[id] = normalizeKeybinds(keybind)
+	}
+
+	getConflicts(): Map<string, Set<string>> {
+		const bindings = [...this]
+		const conflicts = new Map<string, Set<string>>()
+		for (const [index, [id, binding]] of bindings.entries()) {
+			for (const [otherId, other] of bindings.slice(index)) {
+				const sameReviewPage =
+					['project-review', 'review-actions'].includes(binding.scope) &&
+					['project-review', 'review-actions'].includes(other.scope)
+				if (
+					binding.scope !== other.scope &&
+					binding.scope !== 'global' &&
+					other.scope !== 'global' &&
+					!sameReviewPage
+				)
+					continue
+				const overlaps = binding.keybind.some((definition, definitionIndex) =>
+					other.keybind.some(
+						(otherDefinition, otherIndex) =>
+							(id !== otherId || otherIndex > definitionIndex) &&
+							keybindsOverlap(definition, otherDefinition),
+					),
+				)
+				if (!overlaps) continue
+				if (!conflicts.has(id)) conflicts.set(id, new Set())
+				if (!conflicts.has(otherId)) conflicts.set(otherId, new Set())
+				conflicts.get(id)!.add(otherId)
+				conflicts.get(otherId)!.add(id)
+			}
+		}
+		return conflicts
 	}
 
 	handle(event: KeyboardEvent, ctx: ModerationContext): boolean {

@@ -50,7 +50,14 @@
 				<Button @click="refresh">{{ formatMessage(messages.retry) }}</Button>
 			</div>
 			<div v-else-if="editing" class="flex min-h-full flex-col gap-2">
-				<MarkdownEditor ref="editor" v-model="draft" :disabled="saving" />
+				<MarkdownEditor
+					ref="editor"
+					v-model="draft"
+					:disabled="saving"
+					:hide-formatting-buttons="
+						settings.get(moderationSettings.General.HideMarkdownFormattingButtons)
+					"
+				/>
 				<p v-if="validationMessage" class="m-0 text-sm text-red" role="alert">
 					{{ validationMessage }}
 				</p>
@@ -68,6 +75,7 @@
 </template>
 
 <script setup lang="ts">
+import { moderationSettings } from '@modrinth/moderation'
 import {
 	Button,
 	commonMessages,
@@ -77,6 +85,7 @@ import {
 } from '@modrinth/ui'
 import { useTemplateRef } from 'vue'
 
+import { useModerationSettings } from '~/composables/moderation'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
 import { projectReviewMessages as messages } from '../messages'
@@ -85,6 +94,7 @@ import { useProjectTextEdit } from '../project-info/edit/use-project-text-edit'
 import ReviewPanel from '../review-panel/index.vue'
 
 const { formatMessage } = useVIntl()
+const settings = useModerationSettings()
 const interactionScope = useTemplateRef<HTMLElement>('interactionScope')
 const { selection, isLoading, error, refresh } = injectProjectReviewPageContext()
 const editor = useTemplateRef<InstanceType<typeof MarkdownEditor>>('editor')

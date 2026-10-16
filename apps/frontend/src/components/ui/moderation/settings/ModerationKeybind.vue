@@ -1,17 +1,26 @@
 <template>
-	<div>
-		<span class="flex flex-row items-center gap-2 text-sm text-secondary">
-			<BoxIcon v-if="props.scope === 'project'" v-tooltip="formatMessage(messages.projectScope)" />
-			<GlobeIcon v-if="props.scope === 'global'" v-tooltip="formatMessage(messages.globalScope)" />
+	<div class="grid grid-cols-2 items-center gap-3">
+		<span class="flex min-w-0 items-center gap-1.5 text-sm text-secondary [&>svg]:shrink-0">
+			<BoxIcon
+				class="size-4"
+				v-if="props.scope === 'project'"
+				v-tooltip="formatMessage(messages.projectScope)"
+			/>
+			<GlobeIcon
+				class="size-4"
+				v-if="props.scope === 'global'"
+				v-tooltip="formatMessage(messages.globalScope)"
+			/>
 			<ShieldCheckIcon
+				class="size-4"
 				v-if="props.scope === 'tech-review'"
 				v-tooltip="formatMessage(messages.techScope)"
 			/>
-			{{ props.title }}
+			<span class="min-w-0 flex-1 text-sm font-semibold">{{ props.title }}</span>
 			<IconButton
 				type="quiet"
 				size="xs"
-				class="!size-6"
+				class="!size-6 shrink-0"
 				:label="formatMessage(messages.reset)"
 				:disabled="!hasChanged"
 				@click="resetToDefault"
@@ -19,56 +28,86 @@
 				<RotateCounterClockwiseIcon />
 			</IconButton>
 		</span>
-		<div class="flex flex-row items-center gap-2">
-			<kbd
-				v-if="definitions.length === 0"
+		<div class="flex min-w-0 flex-wrap items-center gap-1.5">
+			<span
+				v-for="(definition, index) in definitions.length ? definitions : [undefined]"
+				:key="index"
 				ref="keybinding"
-				class="cursor-pointer border-2 !text-lg font-bold text-secondary"
-				:class="{ editing: editing === 0 }"
-				@click="startEditing(0)"
+				v-tooltip="editing === -1 && conflictMessage ? conflictMessage : undefined"
+				class="flex min-w-0 flex-1"
 			>
-				{{ formatMessage(messages.notBound) }}
-			</kbd>
-			<kbd
-				v-for="(definition, index) in definitions"
-				v-else
-				:key="`keybind-${index}`"
-				ref="keybinding"
-				class="cursor-pointer border-2 !text-lg font-bold"
-				:class="{
-					editing: editing === index,
-				}"
-				@click="startEditing(index)"
-			>
-				{{ toDisplay(definition) }}
-			</kbd>
+				<Button
+					:type="editing === index || conflictMessage ? 'outlined' : 'base'"
+					:color="editing === index ? 'brand' : conflictMessage ? 'orange' : undefined"
+					size="md"
+					:aria-label="
+						formatMessage(editing === index ? messages.recording : messages.change, {
+							setting: title,
+							binding: definition ? toDisplay(definition) : formatMessage(messages.notBound),
+						})
+					"
+					:aria-describedby="editing === index || conflictMessage ? statusId : undefined"
+					class="w-full overflow-hidden"
+					@click="startEditing(index, $event)"
+				>
+					<TriangleAlertIcon v-if="editing !== index && conflictMessage" aria-hidden="true" />
+					<span class="min-w-0 truncate">{{
+						editing === index
+							? formatMessage(messages.listen)
+							: definition
+								? toDisplay(definition)
+								: formatMessage(messages.notBound)
+					}}</span>
+				</Button>
+			</span>
 		</div>
+		<span :id="statusId" class="visually-hidden" role="status" aria-live="polite">{{
+			editing !== -1 ? formatMessage(messages.recording, { setting: title }) : conflictMessage
+		}}</span>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { BoxIcon, GlobeIcon, RotateCounterClockwiseIcon, ShieldCheckIcon } from '@modrinth/assets'
+import {
+	BoxIcon,
+	GlobeIcon,
+	RotateCounterClockwiseIcon,
+	ShieldCheckIcon,
+	TriangleAlertIcon,
+} from '@modrinth/assets'
 import { formatKeybind, type KeybindDefinition, toKeybindDefinition } from '@modrinth/moderation'
-import { defineMessages, IconButton, useVIntl } from '@modrinth/ui'
-import { onMounted, onUnmounted } from 'vue'
+import { Button, defineMessages, IconButton, useVIntl } from '@modrinth/ui'
+import { computed, onMounted, onUnmounted, ref, useId, useTemplateRef } from 'vue'
 
 const props = defineProps<{
 	title: string
 	scope: string
+	conflictMessage?: string
 	definitions: KeybindDefinition[]
 	default: KeybindDefinition[]
 	onChange: (definitions: KeybindDefinition[]) => void
 }>()
 
 const keybinding = useTemplateRef('keybinding')
-const definitions = ref(JSON.parse(JSON.stringify(props.definitions)))
+const definitions = ref<KeybindDefinition[]>(JSON.parse(JSON.stringify(props.definitions)))
 const editing = ref(-1)
+const statusId = useId()
+let recordingWindow: Window | null = null
 const hasChanged = computed(
 	() => JSON.stringify(definitions.value) !== JSON.stringify(props.default),
 )
 const isMac = ref(false)
 const { formatMessage } = useVIntl()
 const messages = defineMessages({
+	listen: { id: 'moderation.keybinds.listen', defaultMessage: 'Press a key…' },
+	change: {
+		id: 'moderation.keybinds.change',
+		defaultMessage: '{setting}: {binding}. Activate to change the binding.',
+	},
+	recording: {
+		id: 'moderation.keybinds.recording',
+		defaultMessage: '{setting}: listening for a shortcut. Press Escape to clear this binding.',
+	},
 	projectScope: {
 		id: 'moderation.keybinds.scope-project-page',
 		defaultMessage: 'Used on project pages when project page shortcuts are enabled.',
@@ -91,21 +130,25 @@ const messages = defineMessages({
 	},
 })
 
-function startEditing(index: number) {
+function startEditing(index: number, event: MouseEvent) {
 	if (editing.value === index) {
 		stopEditing()
 	} else {
 		stopEditing()
 		editing.value = index
-		window.addEventListener('keydown', handleKeybinds, true)
-		window.addEventListener('click', handleMouse)
+		recordingWindow = (event.currentTarget as HTMLElement).ownerDocument.defaultView
+		recordingWindow?.addEventListener('keydown', handleKeybinds, true)
+		recordingWindow?.addEventListener('click', handleMouse)
+		recordingWindow?.addEventListener('blur', stopEditing)
 	}
 }
 
 function stopEditing() {
 	editing.value = -1
-	window.removeEventListener('keydown', handleKeybinds, true)
-	window.removeEventListener('click', handleMouse)
+	recordingWindow?.removeEventListener('keydown', handleKeybinds, true)
+	recordingWindow?.removeEventListener('click', handleMouse)
+	recordingWindow?.removeEventListener('blur', stopEditing)
+	recordingWindow = null
 }
 
 function resetToDefault() {
@@ -158,22 +201,3 @@ defineExpose({
 	},
 })
 </script>
-
-<style scoped lang="scss">
-.editing {
-	animation: blink 1s step-end infinite;
-}
-
-@keyframes blink {
-	0%,
-	100% {
-		border-color: var(--color-red);
-		box-shadow: 0 0 10px 1px var(--color-red);
-	}
-
-	50% {
-		border-color: transparent;
-		box-shadow: none;
-	}
-}
-</style>

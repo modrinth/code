@@ -147,7 +147,12 @@ export function normalizeKeybind(keybind: KeybindDefinition | string): KeybindDe
 	return typeof keybind === 'string' ? parseKeybind(keybind) : keybind
 }
 
-export function matchesKeybind(event: KeyboardEvent, keybind: KeybindDefinition | string): boolean {
+type KeybindEvent = Pick<
+	KeyboardEvent,
+	'key' | 'code' | 'ctrlKey' | 'metaKey' | 'shiftKey' | 'altKey'
+>
+
+export function matchesKeybind(event: KeybindEvent, keybind: KeybindDefinition | string): boolean {
 	const def = normalizeKeybind(keybind)
 	const portableMod = def.mod || (def.ctrl && (def.meta || def.meta === undefined))
 	const modifiersMatch = portableMod
@@ -160,6 +165,23 @@ export function matchesKeybind(event: KeyboardEvent, keybind: KeybindDefinition 
 		event.shiftKey === (def.shift ?? false) &&
 		event.altKey === (def.alt ?? false)
 	)
+}
+
+export function keybindsOverlap(left: KeybindDefinition, right: KeybindDefinition): boolean {
+	for (const ctrlKey of [false, true]) {
+		for (const metaKey of [false, true]) {
+			const event = {
+				key: left.key,
+				code: /^[a-z]$/i.test(left.key) ? `Key${left.key.toUpperCase()}` : '',
+				ctrlKey,
+				metaKey,
+				shiftKey: left.shift ?? false,
+				altKey: left.alt ?? false,
+			}
+			if (matchesKeybind(event, left) && matchesKeybind(event, right)) return true
+		}
+	}
+	return false
 }
 
 export function toKeybindDefinition(event: KeyboardEvent): KeybindDefinition {
@@ -177,7 +199,7 @@ export function toKeybindDefinition(event: KeyboardEvent): KeybindDefinition {
 }
 
 export function formatKeybind(definition: KeybindDefinition, isMac: boolean): string {
-	const keys = []
+	const keys: string[] = []
 	if (definition.mod || (definition.ctrl && (definition.meta || definition.meta === undefined))) {
 		keys.push(isMac ? '⌘' : 'Ctrl')
 	} else {
@@ -197,5 +219,5 @@ export function formatKeybind(definition: KeybindDefinition, isMac: boolean): st
 		' ': 'Space',
 	}
 	keys.push(labels[key] ?? key)
-	return keys.join(' + ')
+	return keys.join(' ')
 }

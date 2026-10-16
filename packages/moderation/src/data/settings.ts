@@ -13,7 +13,8 @@ const settings = {
 			type: 'toggle',
 			id: 'auto-go-next-on-review-outcome',
 			title: 'Automatically go to the next project after review',
-			description: 'Move to the next project after successfully submitting a review outcome.',
+			description:
+				'Move to the next project in the queue after successfully approving, withholding, or rejecting a project.',
 			default: true,
 		}),
 		HideMarkdownFormattingButtons: setting.asToggle({
@@ -27,7 +28,7 @@ const settings = {
 			type: 'toggle',
 			id: 'show-shortcut-keybind-hints',
 			title: 'Show shortcut keybind hints',
-			description: 'Show keyboard shortcut hints on review tabs, Reply, and Private note.',
+			description: 'Show keyboard shortcut hints on review tabs.',
 			default: true,
 		}),
 		ShowToggleIssueButtonShortcutHint: setting.asToggle({
@@ -49,7 +50,8 @@ const settings = {
 			type: 'toggle',
 			id: 'show-inline-panel-hover-highlight',
 			title: 'Highlight inline review panels',
-			description: 'Highlight inline review panels when hovering over or interacting with them.',
+			description:
+				'Add a background highlight to inline review panels when hovering over or interacting with them.',
 			default: true,
 		}),
 		LinkInfoPlacement: setting.asEnum({
@@ -66,15 +68,15 @@ const settings = {
 		PrivateMessageHighlight: setting.asToggle({
 			type: 'toggle',
 			id: 'private-message-highlight',
-			title: 'Highlight private messages',
-			description: 'Whether private messages should be highlighted in the chat.',
+			title: 'Highlight private messages and issue history',
+			description: 'Add a background highlight to private messages and issue history in threads.',
 			default: true,
 		}),
 		SlicerButtonInVersions: setting.asToggle({
 			type: 'toggle',
 			id: 'slicer-button-in-versions',
 			title: 'Show Slicer button in versions table and page',
-			description: 'Whether the slicer button should be shown in the versions table and page.',
+			description: 'Show the Slicer button on public version lists and version pages for staff.',
 			default: false,
 		}),
 		AlternativeHostname: setting.asString({
@@ -82,7 +84,7 @@ const settings = {
 			id: 'alternative-hostname',
 			title: 'Alternative hostname',
 			description:
-				'When Open production/staging is used on an official host, open this hostname instead. Example: localhost:3000',
+				'Use this host for the "Open current page" shortcut when on production or staging. Enter a hostname or HTTP(S) URL, such as localhost:3000.',
 			default: '',
 		}),
 		EnableProjectKeybinds: setting.asToggle({
