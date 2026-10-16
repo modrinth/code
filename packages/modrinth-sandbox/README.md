@@ -23,7 +23,8 @@ async fn main() -> Result<()> {
 	};
 
 	// Spawn Minecraft.
-	let command = modrinth_sandbox::minecraft::create_command(command)
+	let command = modrinth_sandbox::minecraft::setup_minecraft_command(command)
+		.await
 		.wrap_err("creating Minecraft sandbox command")?;
 	let mut minecraft_process = sandbox_env
 		.spawn(command)

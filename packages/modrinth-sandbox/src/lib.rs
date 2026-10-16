@@ -125,7 +125,7 @@ impl SandboxEnv {
 ///
 /// This is a low-level configuration struct which is not aware of Minecraft,
 /// Java, etc. If launching a Minecraft client, first create a command using
-/// [`minecraft::create_command`], then customize it to your needs.
+/// [`minecraft::setup_minecraft_command`], then customize it to your needs.
 ///
 /// # Implementation notes
 ///
