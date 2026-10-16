@@ -242,7 +242,7 @@ pub(crate) async fn prepare_mutations(
     project_ids: &[DBProjectId],
     transaction: &mut PgTransaction<'_>,
     redis: &RedisPool,
-    project_editor: Option<&User>,
+    _project_editor: Option<&User>,
 ) -> Result<PreparedMutations, ApiError> {
     let mut project_ids = project_ids.to_vec();
     project_ids.sort_by_key(|project_id| project_id.0);
@@ -251,28 +251,6 @@ pub(crate) async fn prepare_mutations(
     let mut states = Vec::with_capacity(project_ids.len());
     for project_id in project_ids {
         states.push(sync_project_state(project_id, transaction, redis).await?);
-    }
-
-    if project_editor.is_some_and(|user| !user.role.is_mod()) {
-        for state in &states {
-            if state.project.status != ProjectStatus::Processing {
-                continue;
-            }
-            if state.has_required_nags {
-                return Err(ApiError::Request(eyre!(
-                    "project cannot have required validation nags while in review"
-                )));
-            }
-            if state
-                .thread_issues
-                .iter()
-                .any(|issue| issue.verdict == ThreadIssueVerdict::Open)
-            {
-                return Err(ApiError::Request(eyre!(
-                    "project cannot have open moderation issues while in review"
-                )));
-            }
-        }
     }
 
     Ok(PreparedMutations { states })
@@ -308,6 +286,7 @@ pub(crate) async fn finalize_project_edit(
     project_id: DBProjectId,
     original_status: ProjectStatus,
     original_slug: Option<String>,
+    submit_for_review: bool,
     mut transaction: PgTransaction<'_>,
     redis: &RedisPool,
     project_editor: Option<&User>,
@@ -319,18 +298,14 @@ pub(crate) async fn finalize_project_edit(
     let entered_approved_state =
         state.project.status.is_approved() && !original_status.is_approved();
 
-    let validate_review_state = entered_review
-        || project_editor.is_some_and(|user| {
-            !user.role.is_mod()
-                && state.project.status == ProjectStatus::Processing
-        });
+    let validate_review_state = entered_review || submit_for_review;
 
     if (validate_review_state || entered_approved_state)
         && !project_editor.is_some_and(|user| user.role.is_mod())
         && state.has_required_nags
     {
         return Err(ApiError::Request(eyre!(
-            "project must have no required validation nags before or during review or approval"
+            "project must have no required validation nags before review or approval"
         )));
     }
 
@@ -342,7 +317,7 @@ pub(crate) async fn finalize_project_edit(
             .any(|issue| issue.verdict == ThreadIssueVerdict::Open)
     {
         return Err(ApiError::Request(eyre!(
-            "project must have no open moderation issues before or during review"
+            "project must have no open moderation issues before review"
         )));
     }
 

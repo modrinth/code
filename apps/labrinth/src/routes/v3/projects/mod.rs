@@ -554,10 +554,6 @@ pub async fn project_edit_internal(
     let submit_for_review = new_project.status
         == Some(ProjectStatus::Processing)
         && !user.role.is_mod();
-    let leave_review = matches!(
-        new_project.status,
-        Some(ProjectStatus::Draft | ProjectStatus::Rejected)
-    );
 
     if submit_for_review && !perms.contains(ProjectPermissions::EDIT_DETAILS) {
         return Err(ApiError::Auth(eyre!(
@@ -591,10 +587,7 @@ pub async fn project_edit_internal(
         )));
     }
 
-    let validate_for_review = !user.role.is_mod()
-        && (submit_for_review
-            || (project_item.inner.status == ProjectStatus::Processing
-                && !leave_review));
+    let validate_for_review = submit_for_review;
 
     if let Some(name) = &new_project.name {
         if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
@@ -1275,6 +1268,7 @@ pub async fn project_edit_internal(
         .wrap_internal_err("querying database for `project_edit_internal`")?;
     }
 
+    let mut edited_versions = Vec::new();
     if !new_project.loader_fields.is_empty() {
         for version in db_models::DBVersion::get_many(
             &project_item.versions,
@@ -1284,7 +1278,10 @@ pub async fn project_edit_internal(
         .await
         .wrap_internal_err("fetching versions from database")?
         {
-            match super::versions::version_edit_helper(
+            let mut savepoint = sqlx::Acquire::begin(&mut transaction)
+                .await
+                .wrap_internal_err("starting version edit savepoint")?;
+            match super::versions::version_edit_in_transaction(
                 req.clone(),
                 (VersionId::from(version.inner.id),),
                 pool.clone(),
@@ -1294,17 +1291,27 @@ pub async fn project_edit_internal(
                     ..Default::default()
                 },
                 session_queue.clone(),
-                search_state.clone(),
+                &mut savepoint,
             )
             .await
             {
-                // An `InvalidInput` error being returned from this route when only
+                // A `Request` error being returned from this route when only
                 // editing the loader fields means that such fields are not valid for
                 // the loaders defined for this version, which is a common case for
                 // projects with heterogeneous loaders across versions and is best
                 // handled with opportunistic update semantics
-                Ok(_) | Err(ApiError::Request(_)) => continue,
-                err => return err,
+                Ok((version, _)) => {
+                    savepoint.commit().await.wrap_internal_err(
+                        "committing version edit savepoint",
+                    )?;
+                    edited_versions.push(version);
+                }
+                Err(ApiError::Request(_)) => {
+                    savepoint.rollback().await.wrap_internal_err(
+                        "rolling back version edit savepoint",
+                    )?;
+                }
+                Err(err) => return Err(err),
             }
         }
     }
@@ -1471,11 +1478,29 @@ pub async fn project_edit_internal(
         id,
         project_item.inner.status,
         project_item.inner.slug.clone(),
+        submit_for_review,
         transaction,
         &redis,
         Some(&user),
     )
     .await?;
+
+    for version in &edited_versions {
+        db_models::DBVersion::clear_cache(version, &redis)
+            .await
+            .wrap_internal_err("clearing cached version data from Redis")?;
+    }
+    if !edited_versions.is_empty() {
+        search_state
+            .queue
+            .push_version_changes(
+                id.into(),
+                edited_versions
+                    .iter()
+                    .map(|version| VersionId::from(version.inner.id)),
+            )
+            .await;
+    }
 
     let mut project_refs =
         vec![ProjectId::from(project_item.inner.id).to_string()];
@@ -3637,6 +3662,7 @@ pub async fn project_delete_internal(
             project.inner.id,
             original_status,
             original_slug,
+            false,
             transaction,
             &redis,
             Some(&user),
