@@ -91,20 +91,13 @@
 						</span>
 					</div>
 					<div class="flex flex-wrap items-center gap-0.5 text-sm text-secondary">
-						<span v-if="file.file_type && file.file_type !== 'unknown'">{{
-							formatMessage(fileTypeMessages[file.file_type])
+						<span v-if="!file.primary" class="mr-1">{{
+							formatMessage(
+								file.file_type && file.file_type !== 'unknown'
+									? fileTypeMessages[file.file_type]
+									: messages.unknown,
+							)
 						}}</span>
-						<Button
-							v-tooltip="formatMessage(messages.scanAi)"
-							:aria-label="formatMessage(messages.scanAi)"
-							type="quiet"
-							size="sm"
-							circular
-							icon-only
-							@click="emit('scan-ai', file.url)"
-						>
-							<ScanEyeIcon aria-hidden="true" />
-						</Button>
 						<TeleportOverflowMenu
 							type="quiet"
 							size="sm"
@@ -511,20 +504,29 @@ function openVersionInSlicer() {
 function fileActions(file: VersionFile): ButtonMenuOption[] {
 	const options: ButtonMenuOption[] = [
 		{
+			id: 'view-c2pa-info',
+			label: formatMessage(messages.viewC2paInfo),
+			icon: ScanEyeIcon,
+			action: () => emit('scan-ai', file.url),
+		},
+		{
 			id: 'open-slicer',
 			label: formatMessage(messages.openSlicer),
 			icon: CoffeeIcon,
 			disabled: loadingSlicerButton.value === file.url,
 			action: () => openInSlicer([file.url], file.url),
-		},
-		{
-			id: 'open-slicer-external',
-			type: 'link',
-			label: formatMessage(messages.slicerOpenExternal),
-			icon: ExternalIcon,
-			href: `https://slicer.run/?url=${encodeURIComponent(file.url)}`,
-			target: '_blank',
-			rel: 'noopener',
+			trailingAction: {
+				label: formatMessage(messages.slicerOpenExternal),
+				icon: ExternalIcon,
+				action: (event) => {
+					const element = event.currentTarget as HTMLElement
+					element.ownerDocument.defaultView?.open(
+						`https://slicer.run/?url=${encodeURIComponent(file.url)}`,
+						'_blank',
+						'noopener,noreferrer',
+					)
+				},
+			},
 		},
 	]
 	for (const algorithm of ['sha1', 'sha512'] as const) {

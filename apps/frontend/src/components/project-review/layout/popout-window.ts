@@ -14,9 +14,7 @@ export async function restoreReviewPopout(api: DockviewApi, popout: ReviewPopout
 	type GridNode = SerializedDockview['grid']['root']
 	function dockedLayout(node: GridNode): GridNode | undefined {
 		if (Array.isArray(node.data)) {
-			const children = node.data
-				.map(dockedLayout)
-				.filter((child): child is GridNode => !!child)
+			const children = node.data.map(dockedLayout).filter((child): child is GridNode => !!child)
 			return children.length ? { ...node, data: children } : undefined
 		}
 		const views = node.data.views.filter((id) => api.getPanel(id)?.api.location.type === 'grid')

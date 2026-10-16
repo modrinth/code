@@ -675,11 +675,11 @@ export const projectReviewMessages = defineMessages({
 	},
 	openVersionSlicer: {
 		id: 'moderation.project-review.openVersionSlicer',
-		defaultMessage: 'Open all files in Slicer',
+		defaultMessage: 'Open files in Slicer',
 	},
-	scanAi: {
-		id: 'moderation.project-review.scanAi',
-		defaultMessage: 'Scan for AI-generated images using C2PA info',
+	viewC2paInfo: {
+		id: 'moderation.project-review.viewC2paInfo',
+		defaultMessage: 'View C2PA info',
 	},
 	dependencies: {
 		id: 'moderation.project-review.dependencies',

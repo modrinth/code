@@ -3429,7 +3429,7 @@
     "message": "Open in Slicer"
   },
   "moderation.project-review.openVersionSlicer": {
-    "message": "Open all files in Slicer"
+    "message": "Open files in Slicer"
   },
   "moderation.project-review.optional": {
     "message": "Optional"
@@ -3566,9 +3566,6 @@
   "moderation.project-review.saveProject": {
     "message": "Save project"
   },
-  "moderation.project-review.scanAi": {
-    "message": "Scan for AI-generated images using C2PA info"
-  },
   "moderation.project-review.scheduled": {
     "message": "Scheduled"
   },
@@ -3703,6 +3700,9 @@
   },
   "moderation.project-review.versions": {
     "message": "Versions"
+  },
+  "moderation.project-review.viewC2paInfo": {
+    "message": "View C2PA info"
   },
   "moderation.project-review.viewVersion": {
     "message": "View version"
@@ -4307,6 +4307,9 @@
   "project-review.decision.withhold": {
     "message": "Withhold"
   },
+  "project-review.image.dimensions": {
+    "message": "Dimensions"
+  },
   "project-review.image.disable-pixelated": {
     "message": "Disable pixel-art rendering"
   },
@@ -4315,6 +4318,18 @@
   },
   "project-review.image.enable-pixelated": {
     "message": "Enable pixel-art rendering"
+  },
+  "project-review.image.file-size": {
+    "message": "File size"
+  },
+  "project-review.image.format": {
+    "message": "Format"
+  },
+  "project-review.image.info": {
+    "message": "Image information"
+  },
+  "project-review.image.info-unknown": {
+    "message": "Unknown"
   },
   "project-review.issues.add": {
     "message": "Issue"
