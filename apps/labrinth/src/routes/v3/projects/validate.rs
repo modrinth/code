@@ -14,6 +14,7 @@ use crate::models::link_platform::LinkPlatform;
 use crate::models::pats::Scopes;
 use crate::models::projects::{Project, Version};
 use crate::models::teams::ProjectPermissions;
+
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::error::Context as _;

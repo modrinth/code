@@ -6,7 +6,8 @@ use crate::database::models::project_item::{LinkUrl, ProjectQueryResult};
 use crate::database::models::version_item::VersionQueryResult;
 use crate::models::exp;
 use crate::models::ids::{
-    FileId, OrganizationId, ProjectId, TeamId, ThreadId, VersionId,
+    FileId, GalleryImageId, OrganizationId, ProjectId, TeamId, ThreadId,
+    VersionId,
 };
 use crate::routes::{FileHash, HashAlgorithm};
 use ariadne::ids::UserId;
@@ -205,6 +206,7 @@ impl From<ProjectQueryResult> for Project {
                 .gallery_items
                 .into_iter()
                 .map(|x| GalleryItem {
+                    id: x.id.map(|id| GalleryImageId(id as u32)),
                     url: x.image_url,
                     raw_url: x.raw_image_url,
                     featured: x.featured,
@@ -381,6 +383,8 @@ impl Project {
 }
 #[derive(Serialize, Deserialize, Clone, Debug, utoipa::ToSchema)]
 pub struct GalleryItem {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub id: Option<GalleryImageId>,
     pub url: String,
     pub raw_url: String,
     pub featured: bool,
