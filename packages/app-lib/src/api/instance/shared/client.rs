@@ -255,7 +255,7 @@ pub(super) async fn get_remote_instance_access(
         if reason == SharedInstanceUnavailableReason::AccessRevoked
             && !active_modrinth_session_is_valid(state).await?
         {
-            return Err(crate::ErrorKind::NoCredentialsError.into());
+            return Err(crate::ErrorKind::NotLoggedIn.into());
         }
 
         return Ok(SharedInstanceRemoteResponse::Unavailable(reason));
@@ -618,7 +618,7 @@ where
                 status = response.status().as_u16(),
                 "Shared instances API returned unauthorized while Modrinth auth is unavailable"
             );
-            return Err(crate::ErrorKind::NoCredentialsError.into());
+            return Err(crate::ErrorKind::NotLoggedIn.into());
         }
 
         tracing::warn!(
@@ -884,7 +884,7 @@ pub(super) async fn send_body_request_to_url(
     let credentials =
         ModrinthCredentials::get_and_refresh(&state.pool, &state.api_semaphore)
             .await?
-            .ok_or(crate::ErrorKind::NoCredentialsError)?;
+            .ok_or(crate::ErrorKind::NotLoggedIn)?;
     let _permit = state.api_semaphore.0.acquire().await?;
 
     tracing::debug!(
@@ -964,7 +964,7 @@ async fn send_request_with_auth_and_log_path(
                     &state.api_semaphore,
                 )
                 .await?
-                .ok_or(crate::ErrorKind::NoCredentialsError)?,
+                .ok_or(crate::ErrorKind::NotLoggedIn)?,
             )
         } else {
             None

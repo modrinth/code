@@ -145,8 +145,8 @@ pub enum ErrorKind {
     #[error("Instance {0} is not managed by the app!")]
     UnmanagedInstanceError(String),
 
-    #[error("User is not logged in, no credentials available!")]
-    NoCredentialsError,
+    #[error("not logged in")]
+    NotLoggedIn,
 
     #[error("JRE error: {0}")]
     JREError(#[from] crate::util::jre::JREError),
@@ -286,7 +286,7 @@ impl ErrorKind {
             Self::SharedInstancesApiError(_) => "shared_instances_api_error",
             Self::HashError(_, _) => "hash_error",
             Self::LoginCanceled => "login_canceled",
-            Self::NoCredentialsError => "not_logged_in",
+            Self::NotLoggedIn => "not_logged_in",
             Self::NoLoaderVersion { .. } => "no_loader_version",
             Self::NoMinecraftProfile => "minecraft_auth_no_profile",
             Self::MinecraftAuthenticationError(error) => error.code(),
