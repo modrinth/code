@@ -107,6 +107,8 @@ export interface ContentManagerContext {
 
 	// Filter persistence key — when set, filter and sort settings are saved/restored via sessionStorage
 	filterPersistKey?: string
+	// Route query param the search box syncs to, so back navigation restores the search
+	searchQueryParam?: string
 	showSharedContentFilter?: Ref<boolean> | ComputedRef<boolean>
 }
 

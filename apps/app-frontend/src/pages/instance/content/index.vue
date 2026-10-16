@@ -1705,6 +1705,7 @@ provideContentManager({
 	}),
 	showSharedContentFilter,
 	filterPersistKey: instance.value.id,
+	searchQueryParam: 'q',
 })
 
 type UnlistenFn = () => void
