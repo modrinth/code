@@ -416,7 +416,7 @@ pub async fn project_version_reads_scopes() {
             .edit_project(
                 beta_project_id,
                 json!({ "status": "draft" }),
-                USER_USER_PAT,
+                ADMIN_USER_PAT,
             )
             .await;
         assert_status!(&resp, StatusCode::NO_CONTENT);
