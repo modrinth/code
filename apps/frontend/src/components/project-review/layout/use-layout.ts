@@ -169,6 +169,7 @@ export function useProjectReviewLayout(
 		pending.notificationId = addNotification({
 			id: crypto.randomUUID(),
 			type: 'neutral',
+			containerClass: '!py-1.5 !pr-0.5 !pb-2 !rounded-xl',
 			title: formatMessage(projectReviewMessages.restorePopouts),
 			text: formatMessage(projectReviewMessages.restorePopoutsDescription, {
 				panels,

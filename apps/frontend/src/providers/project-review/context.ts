@@ -52,7 +52,20 @@ export function createProjectReviewPageContext() {
 		disclosures.reset()
 		return true
 	}
-	const navigation = useReviewQueue(data.projectId, queue, confirmDiscardDisclosures)
+	const readyToPrefetch = computed(
+		() =>
+			!!data.project.value &&
+			!data.isLoading.value &&
+			!data.initialLoading.value &&
+			!content.initialLoading.value &&
+			!disclosures.initialLoading.value,
+	)
+	const navigation = useReviewQueue(
+		data.projectId,
+		queue,
+		confirmDiscardDisclosures,
+		readyToPrefetch,
+	)
 	onBeforeRouteLeave(confirmDiscardDisclosures)
 	onBeforeRouteUpdate((to, from) => {
 		if (to.query.project !== from.query.project) return confirmDiscardDisclosures()

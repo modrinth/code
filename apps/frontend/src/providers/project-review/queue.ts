@@ -1,15 +1,20 @@
+import { moderationSettings } from '@modrinth/moderation'
 import { injectModrinthClient } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
-import { computed, type Ref, ref } from 'vue'
+import { computed, onScopeDispose, type Ref, ref, watch } from 'vue'
 
+import { useModerationSettings } from '~/composables/moderation'
 import { projectQueryOptions } from '~/composables/queries/project'
 import type { ModerationQueueService } from '~/services/moderation/queue'
 import { findNextEligibleQueueProject } from '~/services/moderation/queue-eligibility'
+
+import { prefetchReviewProject } from './prefetch'
 
 export function useReviewQueue(
 	projectId: Ref<string>,
 	queue: ModerationQueueService,
 	beforeNavigate: () => Promise<boolean>,
+	readyToPrefetch: Ref<boolean>,
 ) {
 	const router = useRouter()
 	const route = useRoute()
@@ -30,6 +35,51 @@ export function useReviewQueue(
 	const completed = computed(() => queue.currentQueue.completed.includes(projectId.value))
 	const remaining = computed(() =>
 		inQueue.value ? queue.currentQueue.items.filter((id) => id !== projectId.value) : [],
+	)
+
+	const settings = useModerationSettings()
+	const prefetchKey = computed(() =>
+		JSON.stringify([
+			projectId.value,
+			remaining.value,
+			settings.value.get(moderationSettings.General.IncludeNonProcessingProjects),
+		]),
+	)
+	let lastPrefetchKey = ''
+	let disposed = false
+	onScopeDispose(() => {
+		disposed = true
+	})
+	watch(
+		[prefetchKey, readyToPrefetch, busy, () => queue.hydrated],
+		([key, ready, navigating, hydrated]) => {
+			if (
+				!import.meta.client ||
+				!hydrated ||
+				!ready ||
+				navigating ||
+				!projectId.value ||
+				!remaining.value.length ||
+				key === lastPrefetchKey
+			)
+				return
+			lastPrefetchKey = key
+			const isCurrent = () => !disposed && prefetchKey.value === key
+			void findNextEligibleQueueProject(
+				client,
+				queue,
+				[...remaining.value],
+				true,
+				settings.value.get(moderationSettings.General.IncludeNonProcessingProjects),
+			)
+				.then(async (next) => {
+					if (next && isCurrent()) {
+						await prefetchReviewProject(next.project, client, queryClient, isCurrent)
+					}
+				})
+				.catch(() => undefined)
+		},
+		{ immediate: true, flush: 'post' },
 	)
 
 	async function run(action: () => Promise<unknown>) {
@@ -62,7 +112,13 @@ export function useReviewQueue(
 			if (!id || !inQueue.value || (completedProjectId && completedProjectId !== id)) return
 			if (completedProjectId && !completed.value) await queue.completeProject(id)
 			const candidates = remaining.value
-			const next = await findNextEligibleQueueProject(client, queue, candidates, true)
+			const next = await findNextEligibleQueueProject(
+				client,
+				queue,
+				candidates,
+				true,
+				settings.value.get(moderationSettings.General.IncludeNonProcessingProjects),
+			)
 			if (next) await queryClient.fetchQuery(projectQueryOptions.v3(next.project, client))
 			if (!completed.value) await queue.deferProject(id)
 			for (const excluded of next?.excluded ?? candidates) await queue.excludeProject(excluded)

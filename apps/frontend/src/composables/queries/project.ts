@@ -37,6 +37,18 @@ export function warmProjectCheckCaches(
  * When you only have a route slug (or unknown id-or-slug), resolve with `check` first.
  */
 export const projectQueryOptions = {
+	disclosures: (projectId: string, client: AbstractModrinthClient) => ({
+		queryKey: ['project', 'disclosures', 'v3', projectId] as const,
+		queryFn: () => client.labrinth.projects_v3.getDisclosures(projectId),
+		staleTime: STALE_TIME,
+	}),
+
+	disclosureUsers: (userIds: string[], client: AbstractModrinthClient) => ({
+		queryKey: ['users', 'disclosures', userIds] as const,
+		queryFn: () => client.labrinth.users_v2.getMultiple(userIds),
+		staleTime: STALE_TIME,
+	}),
+
 	validation: (projectId: string, client: AbstractModrinthClient) => ({
 		queryKey: ['project', projectId, 'validation', 'v3'] as const,
 		queryFn: () => client.labrinth.projects_v3.validate(projectId),

@@ -17,13 +17,11 @@ export interface EligibleQueueProject {
 
 const BATCH_SIZE = 5
 
-function isEligibleQueueCandidate(result: QueueCandidateCheck | undefined): boolean {
-	if (
-		!result ||
-		(!result.isProcessing &&
-			!useModerationSettings().value.get(moderationSettings.General.IncludeNonProcessingProjects))
-	)
-		return false
+function isEligibleQueueCandidate(
+	result: QueueCandidateCheck | undefined,
+	includeNonProcessing: boolean,
+): boolean {
+	if (!result || (!result.isProcessing && !includeNonProcessing)) return false
 	return !result.locked || !!result.expired || !!result.isOwnLock
 }
 
@@ -74,6 +72,9 @@ export async function findNextEligibleQueueProject(
 	moderationQueue: ModerationQueueService,
 	candidateIds: string[],
 	strict = false,
+	includeNonProcessing = useModerationSettings().value.get(
+		moderationSettings.General.IncludeNonProcessingProjects,
+	),
 ): Promise<EligibleQueueProject | null> {
 	const excluded: string[] = []
 	let checkedCount = 0
@@ -86,7 +87,7 @@ export async function findNextEligibleQueueProject(
 
 		for (const id of batch) {
 			const result = results.get(id)
-			if (isEligibleQueueCandidate(result)) {
+			if (isEligibleQueueCandidate(result, includeNonProcessing)) {
 				return { project: id, excluded: [...excluded] }
 			}
 			excluded.push(id)

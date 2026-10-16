@@ -10,6 +10,7 @@ import { computed, type Ref, ref, watch } from 'vue'
 
 import { useAuthState } from '~/composables/auth'
 import type { ProjectIssueFieldAction } from '~/composables/project-issue-field-action'
+import { projectQueryOptions } from '~/composables/queries/project'
 
 import type { DisclosureFormIssue } from './form'
 import {
@@ -26,8 +27,6 @@ import type {
 	DisclosureType,
 	DisclosureUpdatedByUser,
 } from './types'
-
-const DISCLOSURE_QUERY_STALE_TIME = 1000 * 60 * 5
 
 type DisclosureEditorOptions = {
 	projectId: Ref<string>
@@ -49,7 +48,8 @@ export function useDisclosureEditor({
 	onSaved,
 }: DisclosureEditorOptions) {
 	const { formatMessage } = useVIntl()
-	const { labrinth } = injectModrinthClient()
+	const client = injectModrinthClient()
+	const { labrinth } = client
 	const queryClient = useQueryClient()
 	const auth = useAuthState()
 	function isDisclosureVisible(type: DisclosureType) {
@@ -109,16 +109,12 @@ export function useDisclosureEditor({
 		},
 	}) satisfies Record<DisclosureFormIssue, MessageDescriptor>
 
-	const disclosuresQueryKey = computed(
-		() => ['project', 'disclosures', 'v3', projectId.value] as const,
+	const disclosuresQuery = useQuery(
+		computed(() => ({
+			...projectQueryOptions.disclosures(projectId.value, client),
+			enabled: !!projectId.value,
+		})),
 	)
-
-	const disclosuresQuery = useQuery({
-		queryKey: disclosuresQueryKey,
-		queryFn: () => labrinth.projects_v3.getDisclosures(projectId.value),
-		staleTime: DISCLOSURE_QUERY_STALE_TIME,
-		enabled: computed(() => !!projectId.value),
-	})
 
 	const disclosuresResponse = disclosuresQuery.data
 
@@ -132,12 +128,13 @@ export function useDisclosureEditor({
 		return [...ids]
 	})
 
-	const { data: updaterUsers } = useQuery({
-		queryKey: computed(() => ['users', 'disclosures', updaterUserIds.value] as const),
-		queryFn: () => labrinth.users_v2.getMultiple(updaterUserIds.value),
-		enabled: computed(() => updaterUserIds.value.length > 0),
-		staleTime: DISCLOSURE_QUERY_STALE_TIME,
-	})
+	const updaterUsersQuery = useQuery(
+		computed(() => ({
+			...projectQueryOptions.disclosureUsers(updaterUserIds.value, client),
+			enabled: updaterUserIds.value.length > 0,
+		})),
+	)
+	const updaterUsers = updaterUsersQuery.data
 
 	const updaterUsersById = computed(() => {
 		const map = new Map<string, NonNullable<typeof updaterUsers.value>[number]>()
@@ -312,6 +309,9 @@ export function useDisclosureEditor({
 		isDisclosureVisible,
 		canEditDisclosures,
 		disclosuresQuery,
+		initialLoading: computed(
+			() => disclosuresQuery.isFetching.value || updaterUsersQuery.isFetching.value,
+		),
 		saveError: mutation.error,
 	}
 }

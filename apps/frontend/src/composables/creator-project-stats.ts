@@ -1,6 +1,30 @@
+import type { AbstractModrinthClient } from '@modrinth/api-client'
 import { injectModrinthClient } from '@modrinth/ui'
 import { useQueries, useQuery } from '@tanstack/vue-query'
 import { computed, type Ref } from 'vue'
+
+export const creatorProjectStatsQueryOptions = {
+	organizationProjects: (id: string, client: AbstractModrinthClient) => ({
+		queryKey: ['organization', id, 'projects'] as const,
+		queryFn: () => client.labrinth.organizations_v3.getProjects(id),
+		staleTime: 60_000,
+	}),
+	organizationFlaggedProjects: (id: string, client: AbstractModrinthClient) => ({
+		queryKey: ['tech-reviews', 'flagged-projects', 'organization', id] as const,
+		queryFn: () => client.labrinth.tech_review_internal.getOrganizationFlaggedProjects(id),
+		staleTime: 60_000,
+	}),
+	memberFlaggedProjects: (ids: string[], client: AbstractModrinthClient) => ({
+		queryKey: ['tech-reviews', 'flagged-projects', 'users', ids] as const,
+		queryFn: () => client.labrinth.tech_review_internal.getUsersFlaggedProjects(ids),
+		staleTime: 60_000,
+	}),
+	memberProjects: (id: string, client: AbstractModrinthClient) => ({
+		queryKey: ['user', id, 'projects', 'v3'] as const,
+		queryFn: () => client.labrinth.users_v3.getProjects(id),
+		staleTime: 60_000,
+	}),
+}
 
 export function useCreatorProjectStats(
 	userIds: Ref<string[]>,
@@ -11,18 +35,13 @@ export function useCreatorProjectStats(
 	const memberIds = computed(() => (enabled.value ? [...new Set(userIds.value)].toSorted() : []))
 	const organizationProjects = useQuery(
 		computed(() => ({
-			queryKey: ['organization', organizationId.value, 'projects'] as const,
-			queryFn: () => client.labrinth.organizations_v3.getProjects(organizationId.value),
-			staleTime: 60_000,
+			...creatorProjectStatsQueryOptions.organizationProjects(organizationId.value, client),
 			enabled: enabled.value && !!organizationId.value,
 		})),
 	)
 	const organizationFlaggedProjects = useQuery(
 		computed(() => ({
-			queryKey: ['tech-reviews', 'flagged-projects', 'organization', organizationId.value] as const,
-			queryFn: () =>
-				client.labrinth.tech_review_internal.getOrganizationFlaggedProjects(organizationId.value),
-			staleTime: 60_000,
+			...creatorProjectStatsQueryOptions.organizationFlaggedProjects(organizationId.value, client),
 			enabled: enabled.value && !!organizationId.value,
 		})),
 	)
@@ -37,18 +56,14 @@ export function useCreatorProjectStats(
 	])
 	const memberFlaggedProjects = useQuery(
 		computed(() => ({
-			queryKey: ['tech-reviews', 'flagged-projects', 'users', memberIds.value] as const,
-			queryFn: () => client.labrinth.tech_review_internal.getUsersFlaggedProjects(memberIds.value),
-			staleTime: 60_000,
+			...creatorProjectStatsQueryOptions.memberFlaggedProjects(memberIds.value, client),
 			enabled: enabled.value && memberIds.value.length > 0,
 		})),
 	)
 	const memberProjects = useQueries({
 		queries: computed(() =>
 			memberIds.value.map((userId) => ({
-				queryKey: ['user', userId, 'projects', 'v3'],
-				queryFn: () => client.labrinth.users_v3.getProjects(userId),
-				staleTime: 60_000,
+				...creatorProjectStatsQueryOptions.memberProjects(userId, client),
 				enabled: enabled.value,
 			})),
 		),

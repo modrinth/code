@@ -6,6 +6,8 @@ import { useCreatorProjectStats } from '~/composables/creator-project-stats'
 import { projectQueryOptions } from '~/composables/queries/project'
 import { isThreadIssueStatusChange } from '~/helpers/thread-issues'
 
+import { reviewQueryOptions } from './queries'
+
 export function useReviewProject(selection: Ref<string>) {
 	const client = injectModrinthClient()
 	const queryClient = useQueryClient()
@@ -61,11 +63,12 @@ export function useReviewProject(selection: Ref<string>) {
 		organizationId,
 	)
 	const threadId = computed(() => projectQuery.data.value?.thread_id ?? '')
-	const threadQuery = useQuery({
-		queryKey: computed(() => ['thread', threadId.value]),
-		queryFn: () => client.labrinth.threads_v3.getThread(threadId.value),
-		enabled: computed(() => !!threadId.value),
-	})
+	const threadQuery = useQuery(
+		computed(() => ({
+			...reviewQueryOptions.thread(threadId.value, client),
+			enabled: !!threadId.value,
+		})),
+	)
 	const wasReviewed = computed(() => {
 		if (projectQuery.data.value?.status !== 'processing') return false
 		const messages = threadQuery.data.value?.messages ?? []
@@ -137,6 +140,18 @@ export function useReviewProject(selection: Ref<string>) {
 	}
 
 	return {
+		initialLoading: computed(
+			() =>
+				identity.isFetching.value ||
+				projectQuery.isFetching.value ||
+				legacyQuery.isFetching.value ||
+				memberQuery.isFetching.value ||
+				organizationQuery.isFetching.value ||
+				threadQuery.isFetching.value ||
+				attributionQuery.isFetching.value ||
+				creatorStats.membersLoading.value ||
+				creatorStats.organizationLoading.value,
+		),
 		projectId,
 		gallery: computed(() =>
 			(projectQuery.data.value?.gallery ?? []).toSorted((a, b) => a.ordering - b.ordering),
