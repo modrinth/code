@@ -1,0 +1,6 @@
+version = 1
+
+[[migrations]]
+id = 3110235503912450710
+name = "20261014_180018_initial.sql"
+snapshot_name = "20261014_180018_snapshot.toml"

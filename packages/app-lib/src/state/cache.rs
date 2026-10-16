@@ -209,7 +209,7 @@ pub enum CacheValue {
     Organization(Organization),
     File(CachedFile),
     LoaderManifest(CachedLoaderManifest),
-    MinecraftManifest(daedalus::minecraft::VersionManifest),
+    MinecraftManifest(minecraft_meta_manifest::minecraft::Catalog),
     Categories(Vec<Category>),
     ReportTypes(Vec<String>),
     Loaders(Vec<Loader>),
@@ -447,7 +447,7 @@ fn file_hash_path_from_cache_key(key: &str) -> Option<&str> {
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct CachedLoaderManifest {
     pub loader: String,
-    pub manifest: daedalus::modded::Manifest,
+    pub manifest: minecraft_meta_manifest::fabriclike::Manifest,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -976,7 +976,10 @@ impl_cache_methods!(
 );
 
 impl_cache_method_singular!(
-    (MinecraftManifest, daedalus::minecraft::VersionManifest),
+    (
+        MinecraftManifest,
+        minecraft_meta_manifest::minecraft::Catalog
+    ),
     (Categories, Vec<Category>),
     (ReportTypes, Vec<String>),
     (Loaders, Vec<Loader>),
@@ -1509,7 +1512,7 @@ impl CachedEntry {
                     .iter()
                     .map(|x| {
                         let metadata =
-                            daedalus::modded::loader_manifest_metadata_from_cache_key(
+                            crate::launcher::profile::loader_manifest_metadata_from_cache_key(
                                 &x.key().to_string(),
                             );
 
@@ -1560,7 +1563,7 @@ impl CachedEntry {
                     env!("MODRINTH_LAUNCHER_META_URL"),
                     format!(
                         "minecraft/v{}/manifest.json",
-                        daedalus::minecraft::CURRENT_FORMAT_VERSION
+                        minecraft_meta_manifest::minecraft::CURRENT_FORMAT_VERSION
                     ),
                     None,
                     CacheValue::MinecraftManifest

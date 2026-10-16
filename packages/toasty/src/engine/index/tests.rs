@@ -1,0 +1,674 @@
+use super::*;
+use toasty_core::{
+    schema::{Builder, app},
+    stmt,
+};
+
+use crate as toasty;
+use crate::schema::Model;
+
+#[allow(dead_code)]
+#[derive(toasty::Model)]
+struct User {
+    #[key]
+    id: String,
+    name: String,
+}
+
+/// Composite primary key: user_id (partition) + status (sort).
+#[allow(dead_code)]
+#[derive(toasty::Model)]
+struct Todo {
+    #[key]
+    user_id: String,
+    #[key]
+    status: String,
+}
+
+/// Composite primary key with a local (sort) column that accepts range predicates.
+#[allow(dead_code)]
+#[derive(toasty::Model)]
+#[key(partition = id, local = rank)]
+struct Ranked {
+    id: String,
+    rank: i64,
+}
+
+#[test]
+fn pk_equality_goes_to_index_filter() -> Result<()> {
+    let cx = sqlite_test_cx();
+
+    // col[0] = 1  — pk column equality
+    let filter = stmt::Expr::eq(
+        stmt::Expr::Reference(stmt::ExprReference::column(0, 0)),
+        stmt::Expr::Value(stmt::Value::from(1i64)),
+    );
+
+    let plan = cx.plan_basic_query_with_filter(filter.clone())?;
+
+    assert!(
+        plan.index.primary_key,
+        "should select the primary key index"
+    );
+    assert_eq!(
+        plan.index_filter, filter,
+        "pk equality should be the index filter"
+    );
+    assert!(
+        plan.result_filter.is_none(),
+        "no residual result filter expected"
+    );
+    assert!(plan.post_filter.is_none());
+    Ok(())
+}
+
+#[test]
+fn pk_equality_column_on_rhs_goes_to_index_filter() -> Result<()> {
+    let cx = sqlite_test_cx();
+
+    // 1 = col[0]  — pk column on RHS; index matching must commute the operator
+    let filter = stmt::Expr::eq(
+        stmt::Expr::Value(stmt::Value::from(1i64)),
+        stmt::Expr::Reference(stmt::ExprReference::column(0, 0)),
+    );
+
+    let plan = cx.plan_basic_query_with_filter(filter)?;
+
+    assert!(
+        plan.index.primary_key,
+        "should select the primary key index"
+    );
+    assert!(
+        plan.result_filter.is_none(),
+        "no residual result filter expected"
+    );
+    assert!(plan.post_filter.is_none());
+    Ok(())
+}
+
+#[test]
+fn pk_lt_column_on_rhs_commutes_to_gt() -> Result<()> {
+    // Schema: Ranked { id (partition), rank (local) }
+    // The local-scoped sort column accepts range predicates in the index.
+    let cx = sqlite_test_cx_ranked();
+
+    // id = "a" AND 10 < rank  — sort column on RHS with Lt
+    // Index matching must commute the second operand to rank > 10.
+    let filter = stmt::Expr::And(stmt::ExprAnd {
+        operands: vec![
+            stmt::Expr::eq(
+                stmt::Expr::Reference(stmt::ExprReference::column(0, 0)),
+                stmt::Expr::Value(stmt::Value::String("a".to_string())),
+            ),
+            stmt::Expr::BinaryOp(stmt::ExprBinaryOp {
+                lhs: Box::new(stmt::Expr::Value(stmt::Value::from(10i64))),
+                op: stmt::BinaryOp::Lt,
+                rhs: Box::new(stmt::Expr::Reference(stmt::ExprReference::column(0, 1))),
+            }),
+        ],
+    });
+
+    let plan = cx.plan_basic_query_with_filter(filter)?;
+
+    assert!(
+        plan.index.primary_key,
+        "should select the primary key index"
+    );
+
+    // The index filter should contain both conditions with the sort column
+    // commuted to col > 10 (not the original 10 < col).
+    let expected_index_filter = stmt::Expr::And(stmt::ExprAnd {
+        operands: vec![
+            stmt::Expr::eq(
+                stmt::Expr::Reference(stmt::ExprReference::column(0, 0)),
+                stmt::Expr::Value(stmt::Value::String("a".to_string())),
+            ),
+            stmt::Expr::BinaryOp(stmt::ExprBinaryOp {
+                lhs: Box::new(stmt::Expr::Reference(stmt::ExprReference::column(0, 1))),
+                op: stmt::BinaryOp::Gt,
+                rhs: Box::new(stmt::Expr::Value(stmt::Value::from(10i64))),
+            }),
+        ],
+    });
+    assert_eq!(plan.index_filter, expected_index_filter);
+    assert!(
+        plan.result_filter.is_none(),
+        "no residual result filter expected"
+    );
+    Ok(())
+}
+
+#[test]
+fn and_splits_pk_to_index_and_name_to_result() -> Result<()> {
+    let cx = sqlite_test_cx();
+
+    // col[0] = 1 AND col[1] = 2 — pk equality AND name equality
+    let pk_eq = stmt::Expr::eq(
+        stmt::Expr::Reference(stmt::ExprReference::column(0, 0)),
+        stmt::Expr::Value(stmt::Value::from(1i64)),
+    );
+    let name_eq = stmt::Expr::eq(
+        stmt::Expr::Reference(stmt::ExprReference::column(0, 1)),
+        stmt::Expr::Value(stmt::Value::from(2i64)),
+    );
+    let filter = stmt::Expr::And(stmt::ExprAnd {
+        operands: vec![pk_eq.clone(), name_eq.clone()],
+    });
+
+    let plan = cx.plan_basic_query_with_filter(filter)?;
+
+    assert!(plan.index.primary_key);
+    assert_eq!(
+        plan.index_filter, pk_eq,
+        "only the pk condition goes to index filter"
+    );
+    assert_eq!(
+        plan.result_filter.as_ref(),
+        Some(&name_eq),
+        "non-pk condition goes to result filter"
+    );
+    Ok(())
+}
+
+#[test]
+fn or_on_pk_stays_as_or_for_sql() -> Result<()> {
+    let cx = sqlite_test_cx(); // SQLite — index_or_predicate = true
+
+    // col[0] = 1 OR col[0] = 2
+    let pk_eq_1 = stmt::Expr::eq(
+        stmt::Expr::Reference(stmt::ExprReference::column(0, 0)),
+        stmt::Expr::Value(stmt::Value::from(1i64)),
+    );
+    let pk_eq_2 = stmt::Expr::eq(
+        stmt::Expr::Reference(stmt::ExprReference::column(0, 0)),
+        stmt::Expr::Value(stmt::Value::from(2i64)),
+    );
+    let filter = stmt::Expr::Or(stmt::ExprOr {
+        operands: vec![pk_eq_1, pk_eq_2],
+    });
+
+    let plan = cx.plan_basic_query_with_filter(filter.clone())?;
+
+    assert!(plan.index.primary_key);
+    assert_eq!(
+        plan.index_filter, filter,
+        "OR should be preserved as-is for SQL backends"
+    );
+    assert!(plan.result_filter.is_none());
+    assert!(plan.post_filter.is_none());
+    Ok(())
+}
+
+#[test]
+fn or_on_pk_becomes_any_map_for_dynamodb() -> Result<()> {
+    let cx = ddb_test_cx();
+
+    // col[0] = 1 OR col[0] = 2
+    let pk_eq_1 = stmt::Expr::eq(
+        stmt::Expr::Reference(stmt::ExprReference::column(0, 0)),
+        stmt::Expr::Value(stmt::Value::from(1i64)),
+    );
+    let pk_eq_2 = stmt::Expr::eq(
+        stmt::Expr::Reference(stmt::ExprReference::column(0, 0)),
+        stmt::Expr::Value(stmt::Value::from(2i64)),
+    );
+    let filter = stmt::Expr::Or(stmt::ExprOr {
+        operands: vec![pk_eq_1, pk_eq_2],
+    });
+
+    let plan = cx.plan_basic_query_with_filter(filter)?;
+
+    // Expected: ANY(MAP([1, 2], col[0][0] = arg(0)))
+    let expected = stmt::Expr::any(stmt::Expr::map(
+        stmt::Expr::Value(stmt::Value::List(vec![
+            stmt::Value::from(1i64),
+            stmt::Value::from(2i64),
+        ])),
+        stmt::Expr::eq(
+            stmt::Expr::Reference(stmt::ExprReference::column(0, 0)),
+            stmt::Expr::arg(0),
+        ),
+    ));
+
+    assert!(plan.index.primary_key);
+    assert_eq!(
+        plan.index_filter, expected,
+        "OR should be rewritten to ANY(MAP(...)) for DynamoDB"
+    );
+    assert!(plan.result_filter.is_none());
+    assert!(plan.post_filter.is_none());
+    Ok(())
+}
+
+#[test]
+fn and_with_any_map_distributes_into_any_map_for_dynamodb() -> Result<()> {
+    // Schema: Todo { user_id (pk partition), status (pk sort) }
+    // Both columns are part of the primary key index, so both land in index_filter.
+    //
+    // Filter: col[0][1] = "active" AND ANY(MAP(arg[0], col[0][0] = arg[0]))
+    //   col[0][0] = user_id (partition key), col[0][1] = status (sort key)
+    //
+    // Expected: ANY(MAP(arg[0], col[0][0] = arg[0] AND col[0][1] = "active"))
+    let cx = ddb_test_cx_composite();
+
+    let status_eq = stmt::Expr::eq(
+        stmt::Expr::Reference(stmt::ExprReference::column(0, 1)),
+        stmt::Expr::Value(stmt::Value::String("active".to_string())),
+    );
+    let user_id_any = stmt::Expr::any(stmt::Expr::map(
+        stmt::Expr::arg(0),
+        stmt::Expr::eq(
+            stmt::Expr::Reference(stmt::ExprReference::column(0, 0)),
+            stmt::Expr::arg(0),
+        ),
+    ));
+    let filter = stmt::Expr::And(stmt::ExprAnd {
+        operands: vec![status_eq.clone(), user_id_any],
+    });
+
+    let plan = cx.plan_basic_query_with_filter(filter)?;
+
+    let expected = stmt::Expr::any(stmt::Expr::map(
+        stmt::Expr::arg(0),
+        stmt::Expr::And(stmt::ExprAnd {
+            operands: vec![
+                stmt::Expr::eq(
+                    stmt::Expr::Reference(stmt::ExprReference::column(0, 0)),
+                    stmt::Expr::arg(0),
+                ),
+                status_eq,
+            ],
+        }),
+    ));
+
+    assert!(plan.index.primary_key);
+    assert_eq!(
+        plan.index_filter, expected,
+        "AND with ANY(MAP) should distribute the non-Any operands into the map predicate"
+    );
+    assert!(plan.result_filter.is_none());
+    assert!(plan.post_filter.is_none());
+    Ok(())
+}
+
+// ── key_values extraction ─────────────────────────────────────────────────────
+
+#[test]
+fn pk_equality_sets_key_values() -> Result<()> {
+    let cx = sqlite_test_cx();
+
+    // col[0] = 1  — single PK column, literal equality
+    let filter = stmt::Expr::eq(
+        stmt::Expr::Reference(stmt::ExprReference::column(0, 0)),
+        stmt::Expr::Value(stmt::Value::from(1i64)),
+    );
+
+    let plan = cx.plan_basic_query_with_filter(filter)?;
+
+    let expected = stmt::Value::List(vec![stmt::Value::Record(stmt::ValueRecord::from_vec(
+        vec![stmt::Value::from(1i64)],
+    ))]);
+    assert_eq!(plan.key_values, Some(stmt::Expr::Value(expected)));
+    Ok(())
+}
+
+#[test]
+fn pk_or_sets_key_values() -> Result<()> {
+    let cx = sqlite_test_cx();
+
+    // col[0] = 1 OR col[0] = 2  — two literal PK values
+    let filter = stmt::Expr::Or(stmt::ExprOr {
+        operands: vec![
+            stmt::Expr::eq(
+                stmt::Expr::Reference(stmt::ExprReference::column(0, 0)),
+                stmt::Expr::Value(stmt::Value::from(1i64)),
+            ),
+            stmt::Expr::eq(
+                stmt::Expr::Reference(stmt::ExprReference::column(0, 0)),
+                stmt::Expr::Value(stmt::Value::from(2i64)),
+            ),
+        ],
+    });
+
+    let plan = cx.plan_basic_query_with_filter(filter)?;
+
+    let record =
+        |v: i64| stmt::Value::Record(stmt::ValueRecord::from_vec(vec![stmt::Value::from(v)]));
+    let expected = stmt::Value::List(vec![record(1), record(2)]);
+    assert_eq!(plan.key_values, Some(stmt::Expr::Value(expected)));
+    Ok(())
+}
+
+#[test]
+fn pk_range_does_not_set_key_values() -> Result<()> {
+    // Schema: Todo { user_id (pk partition), status (pk sort) }
+    // Partition key has equality (required to match the index), but the sort key
+    // has a range predicate — no exact key record can be formed, so key_values = None.
+    let cx = ddb_test_cx_composite();
+
+    let filter = stmt::Expr::And(stmt::ExprAnd {
+        operands: vec![
+            stmt::Expr::eq(
+                stmt::Expr::Reference(stmt::ExprReference::column(0, 0)),
+                stmt::Expr::Value(stmt::Value::String("u1".to_string())),
+            ),
+            stmt::Expr::BinaryOp(stmt::ExprBinaryOp {
+                lhs: Box::new(stmt::Expr::Reference(stmt::ExprReference::column(0, 1))),
+                op: stmt::BinaryOp::Ge,
+                rhs: Box::new(stmt::Expr::Value(stmt::Value::String("s1".to_string()))),
+            }),
+        ],
+    });
+
+    let plan = cx.plan_basic_query_with_filter(filter)?;
+
+    assert_eq!(plan.key_values, None);
+    Ok(())
+}
+
+#[test]
+fn composite_pk_full_equality_sets_key_values() -> Result<()> {
+    // Schema: Todo { user_id (pk partition), status (pk sort) }
+    // Both key columns have literal equality → key_values is populated.
+    let cx = ddb_test_cx_composite();
+
+    let filter = stmt::Expr::And(stmt::ExprAnd {
+        operands: vec![
+            stmt::Expr::eq(
+                stmt::Expr::Reference(stmt::ExprReference::column(0, 0)),
+                stmt::Expr::Value(stmt::Value::String("u1".to_string())),
+            ),
+            stmt::Expr::eq(
+                stmt::Expr::Reference(stmt::ExprReference::column(0, 1)),
+                stmt::Expr::Value(stmt::Value::String("s1".to_string())),
+            ),
+        ],
+    });
+
+    let plan = cx.plan_basic_query_with_filter(filter)?;
+
+    let expected = stmt::Value::List(vec![stmt::Value::Record(stmt::ValueRecord::from_vec(
+        vec![
+            stmt::Value::String("u1".to_string()),
+            stmt::Value::String("s1".to_string()),
+        ],
+    ))]);
+    assert_eq!(plan.key_values, Some(stmt::Expr::Value(expected)));
+    Ok(())
+}
+
+#[test]
+fn composite_pk_partition_key_only_does_not_set_key_values() -> Result<()> {
+    // Schema: Todo { user_id (pk partition), status (pk sort) }
+    // Only the partition key is specified — cannot form a full key record.
+    let cx = ddb_test_cx_composite();
+
+    let filter = stmt::Expr::eq(
+        stmt::Expr::Reference(stmt::ExprReference::column(0, 0)),
+        stmt::Expr::Value(stmt::Value::String("u1".to_string())),
+    );
+
+    let plan = cx.plan_basic_query_with_filter(filter)?;
+
+    assert_eq!(plan.key_values, None);
+    Ok(())
+}
+
+#[test]
+fn any_map_with_arg_base_passes_through_for_dynamodb() {
+    // ANY(MAP(arg[0], col[0][0] = arg[0])) — the batch-load canonical form produced by
+    // rewrite_stmt_query_for_batch_load_nosql. It is already in the target form so
+    // index_filter_to_any_map must return it unchanged.
+    let filter = stmt::Expr::any(stmt::Expr::map(
+        stmt::Expr::arg(0),
+        stmt::Expr::eq(
+            stmt::Expr::Reference(stmt::ExprReference::column(0, 0)),
+            stmt::Expr::arg(0),
+        ),
+    ));
+
+    let result = or_rewrite::index_filter_to_any_map(filter.clone());
+    assert_eq!(
+        result, filter,
+        "batch-load ANY(MAP(arg, pred)) should pass through unchanged"
+    );
+}
+
+#[test]
+fn composite_pk_or_sets_key_values() -> Result<()> {
+    // Schema: Todo { user_id (pk partition), status (pk sort) }
+    //
+    // Filter: (user_id = "u1" AND status = "s1") OR (user_id = "u2" AND status = "s2")
+    //
+    // Both branches fully specify all key columns with equality → key_values is populated.
+    let cx = ddb_test_cx_composite();
+
+    let branch = |uid: &str, status: &str| {
+        stmt::Expr::And(stmt::ExprAnd {
+            operands: vec![
+                stmt::Expr::eq(
+                    stmt::Expr::Reference(stmt::ExprReference::column(0, 0)),
+                    stmt::Expr::Value(stmt::Value::String(uid.to_string())),
+                ),
+                stmt::Expr::eq(
+                    stmt::Expr::Reference(stmt::ExprReference::column(0, 1)),
+                    stmt::Expr::Value(stmt::Value::String(status.to_string())),
+                ),
+            ],
+        })
+    };
+    let filter = stmt::Expr::Or(stmt::ExprOr {
+        operands: vec![branch("u1", "s1"), branch("u2", "s2")],
+    });
+
+    let plan = cx.plan_basic_query_with_filter(filter)?;
+
+    let record = |uid: &str, status: &str| {
+        stmt::Value::Record(stmt::ValueRecord::from_vec(vec![
+            stmt::Value::String(uid.to_string()),
+            stmt::Value::String(status.to_string()),
+        ]))
+    };
+    let expected = stmt::Value::List(vec![record("u1", "s1"), record("u2", "s2")]);
+    assert_eq!(plan.key_values, Some(stmt::Expr::Value(expected)));
+    Ok(())
+}
+
+#[test]
+fn composite_pk_or_becomes_any_map_for_dynamodb() -> Result<()> {
+    // Schema: Todo { user_id (pk partition), status (pk sort) }
+    //
+    // Filter: (user_id = "u1" AND status = "s1") OR (user_id = "u2" AND status = "s2")
+    //
+    // Expected: ANY(MAP(
+    //     [(u1,s1), (u2,s2)],
+    //     user_id = arg(0) AND status = arg(1)
+    // ))
+    let cx = ddb_test_cx_composite();
+
+    let branch = |uid: &str, status: &str| {
+        stmt::Expr::And(stmt::ExprAnd {
+            operands: vec![
+                stmt::Expr::eq(
+                    stmt::Expr::Reference(stmt::ExprReference::column(0, 0)),
+                    stmt::Expr::Value(stmt::Value::String(uid.to_string())),
+                ),
+                stmt::Expr::eq(
+                    stmt::Expr::Reference(stmt::ExprReference::column(0, 1)),
+                    stmt::Expr::Value(stmt::Value::String(status.to_string())),
+                ),
+            ],
+        })
+    };
+    let filter = stmt::Expr::Or(stmt::ExprOr {
+        operands: vec![branch("u1", "s1"), branch("u2", "s2")],
+    });
+
+    let plan = cx.plan_basic_query_with_filter(filter)?;
+
+    let record = |uid: &str, status: &str| {
+        stmt::Value::Record(stmt::ValueRecord::from_vec(vec![
+            stmt::Value::String(uid.to_string()),
+            stmt::Value::String(status.to_string()),
+        ]))
+    };
+    let expected = stmt::Expr::any(stmt::Expr::map(
+        stmt::Expr::Value(stmt::Value::List(vec![
+            record("u1", "s1"),
+            record("u2", "s2"),
+        ])),
+        stmt::Expr::And(stmt::ExprAnd {
+            operands: vec![
+                stmt::Expr::eq(
+                    stmt::Expr::Reference(stmt::ExprReference::column(0, 0)),
+                    stmt::Expr::arg(0),
+                ),
+                stmt::Expr::eq(
+                    stmt::Expr::Reference(stmt::ExprReference::column(0, 1)),
+                    stmt::Expr::arg(1),
+                ),
+            ],
+        }),
+    ));
+
+    assert!(plan.index.primary_key);
+    assert_eq!(
+        plan.index_filter, expected,
+        "composite OR should be rewritten to ANY(MAP([records], col0=arg(0) AND col1=arg(1)))"
+    );
+    assert!(plan.result_filter.is_none());
+    assert!(plan.post_filter.is_none());
+    Ok(())
+}
+
+#[test]
+fn chooses_lowest_cost_index_and_first_on_ties() -> Result<()> {
+    #[allow(dead_code)]
+    #[derive(toasty::Model)]
+    struct Indexed {
+        #[key]
+        id: String,
+        #[unique]
+        name: String,
+    }
+
+    let app_schema = app::Schema::from_macro([Indexed::schema()])?;
+    let cx = TestCx {
+        schema: Builder::new().build(app_schema, &Capability::SQLITE)?,
+        capability: &Capability::SQLITE,
+    };
+
+    for op in [stmt::BinaryOp::Gt, stmt::BinaryOp::Eq] {
+        let filter = stmt::Expr::and(
+            stmt::Expr::binary_op(
+                stmt::Expr::Reference(stmt::ExprReference::column(0, 0)),
+                op,
+                "a",
+            ),
+            stmt::Expr::eq(
+                stmt::Expr::Reference(stmt::ExprReference::column(0, 1)),
+                "b",
+            ),
+        );
+        let plan = cx.plan_basic_query_with_filter(filter)?;
+        assert_eq!(plan.index.primary_key, op.is_eq());
+    }
+    Ok(())
+}
+
+#[test]
+fn no_matching_index_respects_scan_capability() -> Result<()> {
+    let cx = sqlite_test_cx();
+    let stmt = cx.basic_query_with_filter(stmt::Expr::eq(
+        stmt::Expr::Reference(stmt::ExprReference::column(0, 1)),
+        "name",
+    ));
+    assert!(plan_index_path(&cx.schema, cx.capability, &stmt)?.is_none());
+
+    let capability = Capability {
+        scan: false,
+        ..Capability::SQLITE
+    };
+    assert!(
+        plan_index_path(&cx.schema, &capability, &stmt)
+            .unwrap_err()
+            .is_unsupported_feature()
+    );
+    Ok(())
+}
+
+struct TestCx {
+    schema: toasty_core::Schema,
+    capability: &'static Capability,
+}
+
+fn sqlite_test_cx() -> TestCx {
+    test_cx_with_capability(&Capability::SQLITE)
+}
+
+fn ddb_test_cx() -> TestCx {
+    test_cx_with_capability(&Capability::DYNAMODB)
+}
+
+fn ddb_test_cx_composite() -> TestCx {
+    let app_schema =
+        app::Schema::from_macro([Todo::schema()]).expect("schema should build from macro");
+    let schema = Builder::new()
+        .build(app_schema, &Capability::DYNAMODB)
+        .expect("schema should build");
+    TestCx {
+        schema,
+        capability: &Capability::DYNAMODB,
+    }
+}
+
+fn sqlite_test_cx_ranked() -> TestCx {
+    let app_schema =
+        app::Schema::from_macro([Ranked::schema()]).expect("schema should build from macro");
+    let schema = Builder::new()
+        .build(app_schema, &Capability::SQLITE)
+        .expect("schema should build");
+    TestCx {
+        schema,
+        capability: &Capability::SQLITE,
+    }
+}
+
+fn test_cx_with_capability(capability: &'static Capability) -> TestCx {
+    let app_schema =
+        app::Schema::from_macro([User::schema()]).expect("schema should build from macro");
+    let schema = Builder::new()
+        .build(app_schema, capability)
+        .expect("schema should build");
+    TestCx { schema, capability }
+}
+
+impl TestCx {
+    /// Build a table-targeting `SELECT` statement with the given filter against
+    /// the first table in the schema.  This mirrors the lowered statements that
+    /// reach `plan_index_path` at runtime.
+    fn basic_query_with_filter(&self, filter: stmt::Expr) -> stmt::Statement {
+        let table_id = self.schema.db.tables[0].id;
+        let source = stmt::SourceTable::new(
+            vec![stmt::TableRef::Table(table_id)],
+            stmt::TableWithJoins {
+                relation: stmt::TableFactor::Table(stmt::SourceTableId(0)),
+                joins: vec![],
+            },
+        );
+        stmt::Statement::Query(stmt::Query {
+            with: None,
+            body: stmt::ExprSet::Select(Box::new(stmt::Select::new(source, filter))),
+            single: false,
+            order_by: None,
+            limit: None,
+            locks: vec![],
+        })
+    }
+
+    fn plan_basic_query_with_filter(&self, filter: stmt::Expr) -> Result<IndexPlan<'_>> {
+        let stmt = self.basic_query_with_filter(filter);
+        plan_index_path(&self.schema, self.capability, &stmt)
+            .map(|opt| opt.expect("test expects an index plan, not a scan fallback"))
+    }
+}

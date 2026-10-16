@@ -1,0 +1,2457 @@
+//! Plans a single HIR statement into MIR operations.
+//!
+//! # Overview
+//!
+//! Each HIR statement produces one or more MIR nodes that form an execution
+//! graph. The planner splits work into two concerns:
+//!
+//! - **Data loading**: issuing the database operation (SQL query, GetByKey, etc.)
+//! - **Output processing**: projecting, filtering, or merging the loaded data
+//!   into the shape the caller expects
+//!
+//! The entry point is `PlanStatement::plan()`, which runs these phases in order:
+//!
+//! 1. Extract columns needed by the returning clause
+//! 2. Discover args (references to other statements) in the filter and
+//!    assignments, registering their MIR node outputs as inputs
+//! 3. Rewrite the statement's assignment/value expressions so their `Arg`
+//!    positions reference `load_data.inputs` indices
+//! 4. Plan the data-loading MIR node (SQL or NoSQL path)
+//! 5. Create projection nodes for back-references (so child statements can
+//!    read columns from this statement's results)
+//! 6. Plan child/dependent statements
+//! 7. Build the output node (projection, eval, or nested merge)
+//!
+//! # How `Expr::Arg` flows through the planner
+//!
+//! `Expr::Arg(n)` appears throughout the statement to reference data from
+//! other statements. The meaning of `n` changes as the expression moves
+//! through the pipeline:
+//!
+//! ## HIR level (statement enters the planner)
+//!
+//! `Arg(n)` indexes into `stmt_info.args`, a list of `hir::Arg` entries
+//! created during lowering. Each entry is either:
+//!
+//! - `Arg::Sub { stmt_id, input, .. }` — data from a child statement
+//!   (e.g., a subquery result used in an `IN` list)
+//! - `Arg::Ref { stmt_id, data_load_input, .. }` — a column from a
+//!   parent/sibling statement (back-reference for nested queries)
+//!
+//! At this point, `input` and `data_load_input` are unset `Cell`s.
+//!
+//! ## After `extract_data_load_args`
+//!
+//! This pass walks the filter and assignments, and for each `Arg(n)`:
+//!
+//! - Looks up `stmt_info.args[n]` to find the source MIR node
+//! - Adds that node to `load_data.inputs` (an `IndexSet<NodeId>`)
+//! - Records the index within `load_data.inputs` back into the `hir::Arg`
+//!   cell (`input.set(Some(index))` or `data_load_input.set(Some(index))`)
+//!
+//! The `Arg(n)` positions in the statement expressions are unchanged at
+//! this point — they still reference HIR arg positions.
+//!
+//! ## After `rewrite_stmt_*_arg_dependencies`
+//!
+//! These methods rewrite `Arg` nodes in **assignments and insert values
+//! only** (not the filter). They read the cells populated above:
+//!
+//! - `Arg::Sub { input }` → `Expr::arg(input.get())` — now indexes into
+//!   `load_data.inputs`
+//! - `Arg::Ref { data_load_input, batch_load_index }` →
+//!   `Expr::arg_project(data_load_input, [batch_load_index, column])`
+//!
+//! After this, assignment expressions have MIR-level arg positions. Filter
+//! expressions still have HIR-level positions.
+//!
+//! ## During MIR node construction (`rewrite_expr_for_mir`)
+//!
+//! When building MIR nodes that carry their own expressions (a `Filter`
+//! predicate or key expression), the expression may reference a subset of
+//! the statement's `load_data.inputs`. `rewrite_expr_for_mir` does two things:
+//!
+//! 1. Resolves each `Arg(hir_pos)` through `stmt_info.args[hir_pos]` to
+//!    find the `load_data.inputs` index and MIR node ID
+//! 2. Assigns a new compact position, starting at the caller-provided offset,
+//!    and rewrites the `Arg` node in place
+//!
+//! It returns the arg types and input node IDs for constructing the MIR
+//! node. This is the same resolution as `rewrite_arg_dependencies` but
+//! builds a compact, node-specific input set rather than reusing the full
+//! `load_data.inputs` list.
+//!
+//! ## At execution time
+//!
+//! The executor loads each node's inputs from their `NodeId` variable slots
+//! and passes them to `eval::Func`, which resolves `Arg(n)` against the
+//! provided input slice.
+
+use std::mem;
+
+#[cfg(test)]
+mod tests;
+
+use indexmap::{IndexMap, IndexSet};
+use toasty_core::schema::db;
+use toasty_core::stmt::{self, visit_mut};
+
+use toasty_core::driver::{Dialect, operation::Pagination};
+
+use crate::{
+    Result,
+    engine::{
+        SelectItem, SelectItems, eval, exec,
+        hir::{self},
+        index::{self, IndexPlan},
+        mir,
+        plan::HirPlanner,
+    },
+};
+
+#[derive(Debug)]
+struct LoadData {
+    /// MIR node inputs needed to load data associated with the statement
+    inputs: IndexSet<mir::NodeId>,
+
+    /// Items to select from the database (columns and aggregates like COUNT(*))
+    select_items: SelectItems,
+
+    /// When the statement data is batch loaded (single database query to load
+    /// data for multiple statements), arguments are passed in in batches as
+    /// well. For SQL, this is done using derived tables. This maps "input" to
+    /// the derived table index.
+    batch_load_args: IndexSet<usize>,
+}
+
+type Returning = Option<stmt::Returning>;
+
+#[derive(Debug)]
+struct ReturningInfo {
+    clause: Option<stmt::Returning>,
+
+    /// Nodes the returning expression reads, in reference order. For a
+    /// `Project` clause these are the other inputs of the per-row `Eval` that
+    /// evaluates it — the loaded row is not among them; the body
+    /// references it as `arg(0)` and these as `arg(1 + i)`.
+    inputs: IndexSet<mir::NodeId>,
+
+    /// `Project` only: the projection references the loaded row (a column or
+    /// `count(*)`), so it must be evaluated per row of the data load.
+    reads_row: bool,
+}
+
+struct PaginationInfo {
+    page_size: i64,
+    has_previous_page: bool,
+    cursor_column_indices: Vec<usize>,
+}
+
+struct PlanStatement<'a, 'b> {
+    planner: &'a mut HirPlanner<'b>,
+    stmt_id: hir::StmtId,
+    stmt_info: &'b hir::StatementInfo,
+
+    /// Planning information related ot how to load data to satisfy the statement.
+    load_data: LoadData,
+
+    /// True if the statement's dependencies have been tracked
+    remaining_deps: Vec<hir::StmtId>,
+}
+
+impl HirPlanner<'_> {
+    pub(super) fn plan_statement(&mut self, stmt_id: hir::StmtId) -> Result<()> {
+        let stmt_info = &self.hir[stmt_id];
+
+        // Check if the statement has already been planned, or is currently
+        // being planned (a statement-level dependency cycle that is acyclic
+        // at the operation level — the edge anchors on a reserved data-load
+        // slot instead of recursing).
+        if stmt_info.planning.get() {
+            return Ok(());
+        }
+        stmt_info.planning.set(true);
+
+        // First, plan independent dependency statements. These are statments
+        // that must run before the current one but do not reference the current
+        // statement. Effect deps target ancestors, planned by the enclosing
+        // traversal, so they are never planned from here.
+        for (&dep_stmt_id, &kind) in &stmt_info.deps {
+            if kind == hir::DepKind::Statement && self.hir[dep_stmt_id].independent {
+                self.plan_statement(dep_stmt_id)?;
+            }
+        }
+
+        let stmt = stmt_info.stmt.as_deref().unwrap().clone();
+
+        // Delegate to PlanStatement
+        let mut planner = PlanStatement {
+            planner: self,
+            stmt_id,
+            stmt_info,
+            load_data: LoadData {
+                inputs: IndexSet::new(),
+                select_items: SelectItems::new(),
+                batch_load_args: IndexSet::new(),
+            },
+            remaining_deps: stmt_info
+                .deps
+                .iter()
+                .filter(|&(_, &kind)| kind == hir::DepKind::Statement)
+                .map(|(&stmt_id, _)| stmt_id)
+                .collect(),
+        };
+        planner.plan(stmt)?;
+
+        Ok(())
+    }
+}
+
+impl<'a, 'b> PlanStatement<'a, 'b> {
+    // ===== Entry point =====
+
+    fn plan(&mut self, mut stmt: stmt::Statement) -> Result<()> {
+        let mut returning = stmt.take_returning();
+
+        // For single VALUES queries (e.g., batch queries), the VALUES body is
+        // the output expression. Extract it as a returning value so the planner
+        // can wire up sub-statement dependencies. An empty VALUES body (e.g. an
+        // optional `belongs_to` whose foreign key is NULL, so simplification
+        // proved the filter false) has no output expression; leave `returning`
+        // empty so the query plans as an empty constant and produces zero
+        // rows, the same shape as any other query that matches nothing.
+        if returning.is_none()
+            && let stmt::Statement::Query(query) = &mut stmt
+            && let stmt::ExprSet::Values(values) = &mut query.body
+            && !values.rows.is_empty()
+        {
+            returning = Some(stmt::Returning::Expr(if query.single {
+                assert_eq!(1, values.rows.len(), "single query has more than one row");
+                values.rows.drain(..).next().unwrap()
+            } else {
+                stmt::Expr::list(std::mem::take(&mut values.rows))
+            }));
+        }
+
+        // No queries are single at this point.
+        match &mut stmt {
+            stmt::Statement::Query(stmt) => stmt.single = false,
+            stmt::Statement::Insert(stmt) => stmt.source.single = false,
+            _ => {}
+        }
+
+        // Visit the main statement's returning clause to extract needed columns
+        self.extract_columns_from_returning(&returning);
+
+        // Process any args (sub statements or refs to parent statements) in the query's filter.
+        self.extract_data_load_args(&mut stmt);
+
+        // For each back ref, include the needed columns
+        self.collect_back_ref_columns();
+
+        // If there are any ref args, then the statement might need to be
+        // rewritten to batch load all records for a NestedMerge operation.
+        if !self.load_data.batch_load_args.is_empty() {
+            debug_assert!(stmt.is_query());
+            self.rewrite_stmt_for_batch_load(&mut stmt);
+        } else if let stmt::Statement::Insert(insert) = &mut stmt {
+            self.rewrite_stmt_insert_arg_dependencies(insert);
+        } else if let stmt::Statement::Update(update) = &mut stmt {
+            self.rewrite_stmt_update_arg_dependencies(update);
+        } else if let stmt::Statement::Query(query) = &mut stmt {
+            self.rewrite_stmt_query_arg_dependencies(query);
+        }
+
+        let load_data_node_id = self.plan_data_loading(stmt, &mut returning)?;
+
+        // Track the exec statement operation node. When the slot was
+        // reserved up front (this statement is the target of an effect dep),
+        // fill it with a pass-through to the node planning actually produced.
+        match self.stmt_info.load_data_statement.get() {
+            Some(reserved) => {
+                let ty = self.planner.mir[load_data_node_id].ty().clone();
+                self.planner.mir.fill(
+                    reserved,
+                    mir::Alias {
+                        input: load_data_node_id,
+                        ty,
+                    },
+                );
+            }
+            None => {
+                self.stmt_info
+                    .load_data_statement
+                    .set(Some(load_data_node_id));
+            }
+        }
+
+        // Order this statement's database operation after every statement
+        // whose effect must precede it. The target may be an ancestor still
+        // being planned; its data-load slot is reserved, so the edge resolves
+        // regardless of planning order.
+        for (&dep, &kind) in &self.stmt_info.deps {
+            if kind != hir::DepKind::Effect {
+                continue;
+            }
+
+            let anchor = self.planner.hir[dep]
+                .load_data_statement
+                .get()
+                .expect("effect dep target's data-load slot is reserved");
+            self.planner.mir[load_data_node_id].deps.insert(anchor);
+        }
+
+        // Now, for each back ref, we need to project the expression to what the
+        // next statement expects.
+        self.process_back_ref_projections(load_data_node_id);
+
+        // Track the selection for later use.
+        // TODO: Do we actually need to track this on the statement?
+        self.stmt_info
+            .load_data_select_items
+            .set(mem::take(&mut self.load_data.select_items))
+            .unwrap();
+
+        // Plan each child
+        self.plan_child_statements()?;
+
+        // Track sub-statements referenced in the returning clause as inputs, so their
+        // results are available when building the return value.
+        let (inputs, reads_row) =
+            self.extract_inputs_from_returning(&mut returning, load_data_node_id);
+        let returning_info = ReturningInfo {
+            clause: returning,
+            inputs,
+            reads_row,
+        };
+
+        // Plans a NestedMerge if one is needed
+        let output_node_id = self.plan_output_node(load_data_node_id, returning_info);
+
+        self.stmt_info.output.set(Some(output_node_id));
+
+        // Ordinary deps only target siblings and children, all planned by the
+        // time this statement's output node exists; ancestors are expressed
+        // as `effect_deps` and were anchored above.
+        debug_assert!(
+            self.remaining_deps.is_empty(),
+            "unresolved statement deps after planning: {:?}",
+            self.remaining_deps
+        );
+
+        Ok(())
+    }
+
+    // ===== Setup helpers =====
+
+    fn extract_inputs_from_returning(
+        &mut self,
+        returning: &mut Returning,
+        load_data_node_id: mir::NodeId,
+    ) -> (IndexSet<mir::NodeId>, bool) {
+        let mut inputs = IndexSet::new();
+        let mut reads_row = false;
+
+        let is_returning_projection = matches!(returning, Some(stmt::Returning::Project(..)));
+        debug_assert!(
+            is_returning_projection || matches!(returning, None | Some(stmt::Returning::Expr(..)))
+        );
+
+        match returning {
+            Some(stmt::Returning::Project(expr)) | Some(stmt::Returning::Expr(expr)) => {
+                reads_row = self.rewrite_returning_inputs(
+                    expr,
+                    &mut inputs,
+                    load_data_node_id,
+                    is_returning_projection,
+                );
+            }
+            _ => {}
+        }
+
+        (inputs, reads_row)
+    }
+
+    /// Rewrite the returning clause expression so statement-level
+    /// `Arg`/`Reference`/`Count`/`Project` nodes reference the MIR inputs that
+    /// supply their data, collecting those inputs into `inputs`.
+    ///
+    /// A `Project` clause becomes the body of a per-row `Eval`, so its
+    /// references follow that operation's convention: the loaded row is
+    /// `arg(0)` and the collected inputs are `arg(1 + index)`. An `Expr`
+    /// clause becomes a whole-value `Eval` body, where the collected inputs
+    /// are `arg(index)` directly.
+    ///
+    /// Returns whether the expression references the loaded row (a column or
+    /// `count(*)`) — for a `Project` clause, whether it must be evaluated per
+    /// row.
+    ///
+    /// Walk scope-aware so that `Arg`/`Reference` nodes nested inside a
+    /// `Map`/`Let` body (e.g. the via-include projection that strips the
+    /// linking column with `Map(child, arg(1))`) are not mistaken for
+    /// statement-level args/columns. Statement-level constructs only appear at
+    /// the top scope (`scope_depth == 0`); a local arg inside a mapped body has
+    /// `nesting < scope_depth`.
+    fn rewrite_returning_inputs(
+        &self,
+        expr: &mut stmt::Expr,
+        inputs: &mut IndexSet<mir::NodeId>,
+        load_data_node_id: mir::NodeId,
+        is_returning_projection: bool,
+    ) -> bool {
+        // In a per-row `Eval` body, `arg(0)` is the row, so the other inputs
+        // start at position 1.
+        let input_offset = if is_returning_projection { 1 } else { 0 };
+        let mut reads_row = false;
+
+        visit_mut::walk_expr_scoped_mut(expr, 0, |expr, scope_depth| {
+            if scope_depth != 0 {
+                return true;
+            }
+            match expr {
+                stmt::Expr::Arg(expr_arg) => {
+                    match &self.stmt_info.args[expr_arg.position] {
+                        hir::Arg::Ref {
+                            stmt_id: target_id,
+                            returning_input,
+                            batch_load_index,
+                            target_expr_ref,
+                            ..
+                        } => {
+                            let target_stmt_info = &self.planner.hir[target_id];
+                            let back_ref = &target_stmt_info.back_refs[&self.stmt_id];
+
+                            // Find the column
+                            let column = back_ref.exprs.get_index_of(target_expr_ref).unwrap();
+
+                            if returning_input.get().is_none() {
+                                // Find the node providing the data for the ref
+                                let node_id = back_ref.node_id.get().unwrap();
+
+                                let (index, _) = inputs.insert_full(node_id);
+                                returning_input.set(Some(index));
+                            }
+
+                            let index = returning_input.get().unwrap();
+                            let row = batch_load_index.get().unwrap();
+
+                            *expr = stmt::Expr::arg_project(input_offset + index, [row, column]);
+                        }
+                        hir::Arg::Sub {
+                            stmt_id: target_id, ..
+                        } => {
+                            let target_stmt_info = &self.planner.hir[target_id];
+                            let target_node_id = target_stmt_info.output.get().expect("bug");
+
+                            let (index, _) = inputs.insert_full(target_node_id);
+
+                            *expr = stmt::Expr::arg(input_offset + index);
+                        }
+                    }
+                    false
+                }
+                stmt::Expr::Project(expr_project) if !is_returning_projection => {
+                    // When returning an expression (not projection),
+                    // ExprReference projections need to be handled explicitly.
+                    if let stmt::Expr::Reference(expr_reference) = &*expr_project.base {
+                        let [row] = expr_project.projection.as_slice() else {
+                            todo!("expr_projec{expr_project:#?}")
+                        };
+
+                        let column = self.load_data_expr_reference_position(expr_reference);
+                        let (position, _) = inputs.insert_full(load_data_node_id);
+                        *expr = stmt::Expr::arg_project(position, [*row, column]);
+                        false
+                    } else {
+                        true
+                    }
+                }
+                stmt::Expr::Reference(expr_reference) if is_returning_projection => {
+                    let column = self.load_data_expr_reference_position(expr_reference);
+                    reads_row = true;
+                    *expr = stmt::Expr::arg_project(0, [column]);
+                    false
+                }
+                stmt::Expr::Func(stmt::ExprFunc::Count(stmt::FuncCount { arg: None, .. }))
+                    if is_returning_projection =>
+                {
+                    let index = self
+                        .stmt_info
+                        .load_data_select_items
+                        .get()
+                        .unwrap()
+                        .get_index_of_count_star();
+                    reads_row = true;
+                    *expr = stmt::Expr::arg_project(0, [index]);
+                    false
+                }
+                _ => true,
+            }
+        });
+
+        reads_row
+    }
+
+    fn load_data_expr_reference_position(&self, expr_reference: &stmt::ExprReference) -> usize {
+        assert!(
+            expr_reference.is_column(),
+            "TODO: expr_reference = {expr_reference:#?}"
+        );
+
+        let Some(column) = self
+            .stmt_info
+            .load_data_select_items
+            .get()
+            .unwrap()
+            .try_get_index_of_expr_reference(*expr_reference)
+        else {
+            panic!(
+                "expr_reference={expr_reference:#?}; data_load.select_items={:#?}",
+                self.load_data.select_items
+            )
+        };
+        column
+    }
+
+    fn extract_columns_from_returning(&mut self, returning: &Returning) {
+        stmt::visit::for_each_expr(returning, |expr| match expr {
+            stmt::Expr::Reference(expr_reference) => {
+                assert!(
+                    expr_reference.is_column(),
+                    "TODO: expr_reference = {expr_reference:#?}"
+                );
+                self.load_data.select_items.insert((*expr_reference).into());
+            }
+            stmt::Expr::Func(stmt::ExprFunc::Count(stmt::FuncCount { arg: None, .. })) => {
+                self.load_data.select_items.insert(SelectItem::CountStar);
+            }
+            _ => {}
+        })
+    }
+
+    /// Extract arguments needed to perform data loading
+    fn extract_data_load_args(&mut self, stmt: &mut stmt::Statement) {
+        if let Some(filter) = stmt.filter() {
+            stmt::visit::for_each_expr(filter, |expr| {
+                self.extract_data_load_args_from_expr(expr, None);
+            });
+        }
+
+        if let stmt::Statement::Insert(insert) = stmt {
+            let stmt::ExprSet::Values(values) = &insert.source.body else {
+                todo!()
+            };
+
+            for (i, row) in values.rows.iter().enumerate() {
+                stmt::visit::for_each_expr(row, |expr| {
+                    self.extract_data_load_args_from_expr(expr, Some(i));
+                });
+            }
+
+            if let Some(upsert) = &insert.upsert {
+                for (_, assignment) in upsert.shared.iter() {
+                    stmt::visit::for_each_expr(assignment, |expr| {
+                        self.extract_data_load_args_from_expr(expr, None);
+                    });
+                }
+                for (_, assignment) in upsert.defaults.iter() {
+                    stmt::visit::for_each_expr(assignment, |expr| {
+                        self.extract_data_load_args_from_expr(expr, None);
+                    });
+                }
+                for (_, assignment) in upsert.update_defaults.iter() {
+                    stmt::visit::for_each_expr(assignment, |expr| {
+                        self.extract_data_load_args_from_expr(expr, None);
+                    });
+                }
+            }
+        }
+
+        if let stmt::Statement::Update(update) = stmt {
+            for (_, assignment) in update.assignments.iter() {
+                stmt::visit::for_each_expr(assignment, |expr| {
+                    self.extract_data_load_args_from_expr(expr, None);
+                });
+            }
+        }
+    }
+
+    fn extract_data_load_args_from_expr(&mut self, expr: &stmt::Expr, insert_row: Option<usize>) {
+        if let stmt::Expr::Arg(expr_arg) = expr {
+            match &self.stmt_info.args[expr_arg.position] {
+                hir::Arg::Sub {
+                    stmt_id: target_id,
+                    returning,
+                    input,
+                    batch_load_index,
+                    ..
+                } => {
+                    debug_assert!(!returning, "the argument was found in a filter");
+
+                    let target = &self.planner.hir[target_id];
+                    let Some(node_id) = target.output.get() else {
+                        panic!(
+                            "bug: expected target statement to be planned; curr={:#?}; target={:#?}",
+                            self.stmt_info, target
+                        );
+                    };
+                    let (index, _) = self.load_data.inputs.insert_full(node_id);
+                    batch_load_index.set(insert_row);
+                    input.set(Some(index));
+                }
+                hir::Arg::Ref {
+                    stmt_id: target_id,
+                    data_load_input,
+                    batch_load_index,
+                    ..
+                } => {
+                    // refs can be duplicated in the same statement
+                    if data_load_input.get().is_some() {
+                        return;
+                    }
+
+                    let target_stmt_info = &self.planner.hir[target_id];
+                    let back_ref = &target_stmt_info.back_refs[&self.stmt_id];
+
+                    // TODO: should we just use the data_load node ID?
+                    let node_id = back_ref.node_id.get().unwrap();
+
+                    let (index, _) = self.load_data.inputs.insert_full(node_id);
+                    data_load_input.set(Some(index));
+
+                    // If the target statement is a query, then we are in a batch-load scenario.
+                    if target_stmt_info.stmt().is_query() {
+                        debug_assert!(insert_row.is_none());
+
+                        let (batch_load_table_ref_index, _) =
+                            self.load_data.batch_load_args.insert_full(index);
+                        batch_load_index.set(Some(batch_load_table_ref_index));
+                    } else if let Some(row) = insert_row {
+                        debug_assert!(target_stmt_info.stmt().is_insert());
+                        // batch_load_index may already be set during lowering
+                        // (when the parent INSERT's row index was captured via
+                        // scope_statement). In that case, the lowering value is
+                        // the correct parent row index; don't overwrite it.
+                        if batch_load_index.get().is_none() {
+                            batch_load_index.set(Some(row));
+                        }
+                    } else {
+                        debug_assert!(
+                            batch_load_index.get().is_some(),
+                            "stmt={:#?}; target={:#?}; batch_load_index={:#?}",
+                            self.stmt_info,
+                            target_stmt_info,
+                            batch_load_index.get()
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    fn collect_back_ref_columns(&mut self) {
+        for back_ref in self.stmt_info.back_refs.values() {
+            for expr in &back_ref.exprs {
+                self.load_data.select_items.insert((*expr).into());
+            }
+        }
+    }
+
+    fn rewrite_stmt_for_batch_load(&mut self, stmt: &mut stmt::Statement) {
+        if self.planner.engine.capability().sql() {
+            self.rewrite_stmt_query_for_batch_load_sql(stmt);
+        } else {
+            self.rewrite_stmt_query_for_batch_load_nosql(stmt);
+        }
+    }
+
+    fn rewrite_stmt_query_for_batch_load_sql(&mut self, stmt: &mut stmt::Statement) {
+        // If targeting SQL, leverage the SQL query engine to handle most of the rewrite details.
+        let mut filter = stmt
+            .filter_mut()
+            .map(|filter| filter.take())
+            .unwrap_or_default();
+
+        visit_mut::for_each_expr_mut(&mut filter, |expr| {
+            match expr {
+                stmt::Expr::Reference(stmt::ExprReference::Column(expr_column)) => {
+                    debug_assert_eq!(0, expr_column.nesting);
+                    // We need to up the nesting to reflect that the filter is moved
+                    // one level deeper.
+                    expr_column.nesting += 1;
+                }
+                stmt::Expr::Arg(expr_arg) => {
+                    let hir::Arg::Ref {
+                        stmt_id: target_id,
+                        target_expr_ref,
+                        batch_load_index: batch_load_table_ref_index,
+                        ..
+                    } = &self.stmt_info.args[expr_arg.position]
+                    else {
+                        todo!()
+                    };
+
+                    let back_ref = &self.planner.hir[target_id].back_refs[&self.stmt_id];
+                    let column = back_ref.exprs.get_index_of(target_expr_ref).unwrap();
+
+                    // Rewrite reference the new `FROM`.
+                    *expr = stmt::Expr::column(stmt::ExprColumn {
+                        nesting: 0,
+                        table: batch_load_table_ref_index.get().unwrap(),
+                        column,
+                    });
+                }
+                _ => {}
+            }
+        });
+
+        let tables: Vec<stmt::TableRef> = self
+            .load_data
+            .batch_load_args
+            .iter()
+            .map(|position| stmt::TableRef::Arg(stmt::ExprArg::new(*position)))
+            .collect();
+
+        assert!(tables.len() <= 1, "TODO: handle more complicated cases");
+
+        let sub_query = stmt::Select {
+            returning: stmt::Returning::Project(stmt::Expr::record([1])),
+            source: stmt::Source::Table(stmt::SourceTable {
+                tables,
+                from: vec![stmt::TableWithJoins {
+                    relation: stmt::TableFactor::Table(stmt::SourceTableId(0)),
+                    joins: vec![],
+                }],
+            }),
+            filter,
+            distinct: false,
+        };
+
+        stmt.filter_mut_unwrap().set(stmt::Expr::exists(sub_query));
+    }
+
+    fn rewrite_stmt_query_for_batch_load_nosql(&mut self, stmt: &mut stmt::Statement) {
+        let mut filter = stmt.filter_expr_mut();
+        visit_mut::for_each_expr_mut(&mut filter, |expr| match expr {
+            stmt::Expr::Reference(stmt::ExprReference::Column(expr_column)) => {
+                debug_assert_eq!(0, expr_column.nesting);
+            }
+            stmt::Expr::Arg(expr_arg) => {
+                let hir::Arg::Ref {
+                    stmt_id: target_id,
+                    target_expr_ref,
+                    ..
+                } = &self.stmt_info.args[expr_arg.position]
+                else {
+                    todo!()
+                };
+
+                let back_ref = &self.planner.hir[target_id].back_refs[&self.stmt_id];
+                let column = back_ref.exprs.get_index_of(target_expr_ref).unwrap();
+
+                *expr = stmt::Expr::arg(column);
+            }
+            _ => {}
+        });
+
+        assert!(
+            self.load_data.batch_load_args.len() == 1,
+            "TODO: handle more complicated cases"
+        );
+        let input = self.load_data.batch_load_args[0];
+
+        if let Some(filter) = filter {
+            let expr = filter.take();
+            *filter = stmt::Expr::any(stmt::Expr::map(stmt::Expr::arg(input), expr));
+        }
+    }
+
+    fn rewrite_stmt_insert_arg_dependencies(&mut self, stmt: &mut stmt::Insert) {
+        let stmt::ExprSet::Values(values) = &mut stmt.source.body else {
+            todo!()
+        };
+
+        for row in &mut values.rows {
+            self.rewrite_arg_dependencies(row);
+        }
+
+        if let Some(upsert) = &mut stmt.upsert {
+            for (_, assignment) in upsert.shared.iter_mut() {
+                self.rewrite_assignment_arg_dependencies(assignment);
+            }
+            for (_, assignment) in upsert.defaults.iter_mut() {
+                self.rewrite_assignment_arg_dependencies(assignment);
+            }
+            for (_, assignment) in upsert.update_defaults.iter_mut() {
+                self.rewrite_assignment_arg_dependencies(assignment);
+            }
+        }
+    }
+
+    fn rewrite_assignment_arg_dependencies(&mut self, assignment: &mut stmt::Assignment) {
+        match assignment {
+            stmt::Assignment::Set(expr)
+            | stmt::Assignment::Insert(expr)
+            | stmt::Assignment::Remove(expr)
+            | stmt::Assignment::Append(expr)
+            | stmt::Assignment::RemoveAt(expr)
+            | stmt::Assignment::Add(expr)
+            | stmt::Assignment::Subtract(expr) => self.rewrite_arg_dependencies(expr),
+            stmt::Assignment::Pop => {}
+            stmt::Assignment::Batch(assignments) => {
+                for assignment in assignments {
+                    self.rewrite_assignment_arg_dependencies(assignment);
+                }
+            }
+        }
+    }
+
+    fn rewrite_stmt_update_arg_dependencies(&mut self, stmt: &mut stmt::Update) {
+        for (_, assignment) in stmt.assignments.iter_mut() {
+            let expr = match assignment {
+                stmt::Assignment::Set(expr)
+                | stmt::Assignment::Insert(expr)
+                | stmt::Assignment::Remove(expr)
+                | stmt::Assignment::Append(expr)
+                | stmt::Assignment::RemoveAt(expr)
+                | stmt::Assignment::Add(expr)
+                | stmt::Assignment::Subtract(expr) => expr,
+                stmt::Assignment::Pop => continue,
+                stmt::Assignment::Batch(_) => {
+                    todo!("batch assignments in arg dependency rewriting")
+                }
+            };
+            self.rewrite_arg_dependencies(expr);
+        }
+    }
+
+    /// Rewrite filter args for a query whose parent references bind to a
+    /// fixed row of the parent statement's output (`batch_load_index` set
+    /// during lowering — e.g. a `belongs_to` load subquery for one row of an
+    /// INSERT's returning). Queries that batch-load against a parent *query*
+    /// take the `rewrite_stmt_for_batch_load` path instead.
+    fn rewrite_stmt_query_arg_dependencies(&mut self, stmt: &mut stmt::Query) {
+        if let stmt::ExprSet::Select(select) = &mut stmt.body
+            && let Some(expr) = &mut select.filter.expr
+        {
+            self.rewrite_arg_dependencies(expr);
+        }
+    }
+
+    fn rewrite_arg_dependencies(&mut self, expr: &mut stmt::Expr) {
+        visit_mut::for_each_expr_mut(expr, |expr| {
+            if let stmt::Expr::Arg(expr_arg) = expr {
+                match &self.stmt_info.args[expr_arg.position] {
+                    hir::Arg::Ref {
+                        stmt_id: target_id,
+                        target_expr_ref,
+                        data_load_input,
+                        batch_load_index,
+                        ..
+                    } => {
+                        debug_assert!(!self.load_data.inputs.is_empty(), "{:#?}", self.load_data);
+
+                        // TODO: this work seems to be duplicated in the returning as well.
+                        let back_ref = &self.planner.hir[target_id].back_refs[&self.stmt_id];
+                        let column = back_ref.exprs.get_index_of(target_expr_ref).unwrap();
+
+                        *expr = stmt::Expr::arg_project(
+                            data_load_input.get().unwrap(),
+                            [batch_load_index.get().unwrap(), column],
+                        );
+                    }
+                    hir::Arg::Sub { input, .. } => {
+                        debug_assert!(
+                            !self.load_data.inputs.is_empty(),
+                            "{:#?} | is this needed?",
+                            self.load_data
+                        );
+                        *expr = stmt::Expr::arg(input.get().unwrap());
+                    }
+                }
+            }
+        });
+    }
+
+    // ===== Plan data loading phase =====
+
+    fn plan_data_loading(
+        &mut self,
+        stmt: stmt::Statement,
+        returning: &mut Returning,
+    ) -> Result<mir::NodeId> {
+        // COUNT(*) is SQL-only
+        if self.load_data.select_items.contains(&SelectItem::CountStar)
+            && !self.planner.engine.capability().sql()
+        {
+            return Err(toasty_core::Error::unsupported_feature(format!(
+                "{} does not support count() queries",
+                self.planner.engine.capability().driver_name
+            )));
+        }
+
+        if let Some(node_id) = self.plan_const_or_empty_statement(&stmt, returning) {
+            debug_assert!(
+                stmt.is_query() || stmt.assignments().map(|a| a.is_empty()).unwrap_or(false),
+                "planned a mutable statement as const; stmt={:#?}",
+                stmt
+            );
+            Ok(node_id)
+        } else if stmt.is_insert() {
+            self.plan_insert(stmt)
+        } else if self.planner.engine.capability().sql() {
+            self.plan_data_loading_sql(stmt)
+        } else {
+            self.plan_data_loading_nosql(stmt)
+        }
+    }
+
+    fn plan_const_or_empty_statement(
+        &mut self,
+        stmt: &stmt::Statement,
+        returning: &mut Returning,
+    ) -> Option<mir::NodeId> {
+        if stmt.is_const() {
+            let stmt::Value::List(rows) = stmt.eval_const().unwrap() else {
+                todo!()
+            };
+
+            return Some(
+                self.insert_const(
+                    rows,
+                    self.load_data
+                        .select_items
+                        .infer_record_list_ty(&self.planner.engine.expr_cx_for(stmt)),
+                ),
+            );
+        }
+
+        if stmt.assignments().map(|a| a.is_empty()).unwrap_or(false) {
+            if returning.is_some() {
+                return Some(self.insert_const(
+                    vec![stmt::Value::empty_sparse_record()],
+                    stmt::Type::list(stmt::Type::empty_sparse_record()),
+                ));
+            } else {
+                return Some(self.insert_const(
+                    Vec::<stmt::Value>::new(),
+                    stmt::Type::list(stmt::Type::empty_sparse_record()),
+                ));
+            }
+        }
+
+        None
+    }
+
+    // ===== Insert execution =====
+
+    fn plan_insert(&mut self, mut stmt: stmt::Statement) -> Result<mir::NodeId> {
+        debug_assert!(stmt.is_insert(), "stmt={stmt:#?}");
+
+        // An upsert's output must reflect the database outcome, so constants
+        // never replace its RETURNING clause. Back-refs (e.g. an eager
+        // `belongs_to` load subquery correlating on a returned column) read
+        // the RETURNING rows: a `DO NOTHING` upsert returns no row on
+        // conflict, but a back-ref reader only executes when a row exists
+        // (it is guarded on the insert's output being non-empty).
+        let const_returning = if stmt.is_upsert() {
+            None
+        } else {
+            self.extract_insert_returning_as_const(&stmt)
+        };
+
+        let mut ty = None;
+
+        // When the values the returning clause needs were extracted as
+        // constants above, the Const node feeds them. Otherwise, ask the
+        // database to return the remaining columns when it supports that.
+        // MySQL's exact single-row auto-increment result is represented by an
+        // Insert operation without a SQL RETURNING clause.
+        if const_returning.is_none() && !self.load_data.select_items.is_empty() {
+            if self.planner.engine.capability().sql.is_some()
+                && !self.planner.engine.capability().returning_from_insert
+            {
+                self.verify_insert_returning_without_capability(&stmt)?;
+                ty = Some(
+                    self.load_data
+                        .select_items
+                        .infer_record_list_ty(&self.planner.engine.expr_cx_for(&stmt)),
+                );
+            } else {
+                stmt.set_returning_project(stmt::Expr::record(
+                    self.load_data
+                        .select_items
+                        .iter()
+                        .map(|item| item.to_expr()),
+                ));
+            }
+        }
+
+        let input_args: Vec<_> = self
+            .load_data
+            .inputs
+            .iter()
+            .map(|input| self.planner.mir.ty(*input).clone())
+            .collect();
+        let ty = ty.unwrap_or_else(|| self.planner.engine.infer_ty(&stmt, &input_args[..]));
+        let inputs = mem::take(&mut self.load_data.inputs);
+
+        let node = if !self.planner.engine.capability().sql() && stmt.is_upsert() {
+            mir::Operation::Upsert(Box::new(mir::Upsert {
+                inputs,
+                stmt: stmt.into_insert_unwrap(),
+                ty,
+            }))
+        } else {
+            mir::Operation::ExecStatement(Box::new(mir::ExecStatement {
+                inputs,
+                stmt,
+                ty,
+                conditional: exec::ConditionalOutput::None,
+                pagination: None,
+            }))
+        };
+
+        let mut load_data_node = self.insert_mir_with_deps(node);
+
+        if let Some((const_value, const_ty)) = const_returning {
+            load_data_node = self.planner.mir.insert_with_deps(
+                mir::Const {
+                    value: const_value,
+                    ty: const_ty,
+                },
+                [load_data_node],
+            );
+        }
+
+        Ok(load_data_node)
+    }
+
+    /// Accepts the one exact mutation result available without SQL
+    /// `RETURNING`: MySQL's generated ID for a single-row insert.
+    fn verify_insert_returning_without_capability(&self, stmt: &stmt::Statement) -> Result<()> {
+        let insert = stmt.as_insert().expect("plan_insert requires an insert");
+        let target = insert.target.as_table_unwrap();
+
+        let exact_mysql_insert_id = self.planner.engine.capability().sql == Some(Dialect::Mysql)
+            && insert.upsert.is_none()
+            && insert
+                .source
+                .body
+                .as_values()
+                .is_some_and(|values| values.rows.len() == 1)
+            && self.load_data.select_items.len() == 1
+            && self
+                .load_data
+                .select_items
+                .iter()
+                .next()
+                .is_some_and(|item| {
+                    let SelectItem::ExprReference(expr_ref) = item else {
+                        return false;
+                    };
+                    let Some(expr_column) = expr_ref.as_expr_column() else {
+                        return false;
+                    };
+                    if expr_column.nesting != 0 || expr_column.table != 0 {
+                        return false;
+                    }
+
+                    let column_id = db::ColumnId {
+                        table: target.table,
+                        index: expr_column.column,
+                    };
+                    let column = self.planner.engine.schema.db.column(column_id);
+                    let Some(value_index) = target.columns.iter().position(|id| *id == column_id)
+                    else {
+                        return false;
+                    };
+                    let row = &insert.source.body.as_values().unwrap().rows[0];
+
+                    column.auto_increment
+                        && row
+                            .entry(value_index)
+                            .is_some_and(|entry| entry.is_expr_default())
+                });
+
+        if exact_mysql_insert_id {
+            return Ok(());
+        }
+
+        let table = self.planner.engine.schema.db.table(target.table);
+        let columns = self
+            .load_data
+            .select_items
+            .iter()
+            .map(|item| {
+                let SelectItem::ExprReference(expr_ref) = item else {
+                    return "the computed value `COUNT(*)`".to_owned();
+                };
+                let Some(column) = expr_ref.as_expr_column() else {
+                    return "a non-column value".to_owned();
+                };
+                format!("`{}.{}`", table.name, table.columns[column.column].name)
+            })
+            .collect::<Vec<_>>()
+            .join(", ");
+
+        Err(toasty_core::Error::unsupported_feature(format!(
+            "{} cannot return database-generated values from INSERT for {columns}; use \
+             caller-generated values, insert each row separately, or use a database with \
+             mutation RETURNING support",
+            self.planner.engine.capability().driver_name
+        )))
+    }
+
+    // ===== SQL execution =====
+
+    fn plan_data_loading_sql(&mut self, mut stmt: stmt::Statement) -> Result<mir::NodeId> {
+        debug_assert!(self.planner.engine.capability().sql(), "stmt={stmt:#?}");
+        debug_assert!(!stmt.is_insert(), "stmt={stmt:#?}");
+
+        // Phase 1: Detect pagination and add ORDER BY columns to load_data
+        let pagination_info = self.plan_pagination_sql(&stmt)?;
+
+        // Set returning clause with all columns (including added ORDER BY columns)
+        if !self.load_data.select_items.is_empty() {
+            stmt.set_returning_project(stmt::Expr::record(
+                self.load_data
+                    .select_items
+                    .iter()
+                    .map(|item| item.to_expr()),
+            ));
+        }
+
+        let input_args: Vec<_> = self
+            .load_data
+            .inputs
+            .iter()
+            .map(|input| self.planner.mir.ty(*input).clone())
+            .collect();
+
+        // Infer type after adding all columns
+        let ty = self.planner.engine.infer_ty(&stmt, &input_args[..]);
+
+        // Phase 2: Build extract_cursor function using the inferred type
+        let pagination_config = pagination_info.map(|info| self.build_extract_cursor(info, &ty));
+
+        let node = if stmt.condition().is_some() {
+            // A conditional UPDATE or DELETE (e.g. an OCC `#[version]` check).
+            // The condition is checked against the current rows and the write
+            // only applies when it holds; a mismatch surfaces as an error. Two
+            // strategies, chosen by capability: a single CTE statement
+            // (PostgreSQL) or a read-modify-write transaction (SQLite, MySQL).
+            debug_assert!(
+                stmt.is_update() || stmt.is_delete(),
+                "only UPDATE and DELETE carry conditions; stmt={stmt:#?}"
+            );
+
+            // A conditional UPDATE or DELETE compiles to a single CTE statement
+            // on backends that support data-modifying CTEs (PostgreSQL);
+            // elsewhere it becomes a read-modify-write transaction (which every
+            // SQL backend supports, locking the probed rows via `SELECT ... FOR
+            // UPDATE` where available).
+            if self.planner.engine.capability().cte_with_update {
+                mir::Operation::ExecStatement(Box::new(
+                    self.plan_conditional_sql_query_as_cte(stmt, ty),
+                ))
+            } else {
+                mir::Operation::ReadModifyWrite(Box::new(
+                    self.plan_conditional_sql_query_as_rmw(stmt, ty),
+                ))
+            }
+        } else {
+            debug_assert!(
+                stmt.returning()
+                    .and_then(|returning| returning.as_project())
+                    .map(|expr| expr.is_record())
+                    .unwrap_or(true),
+                "stmt={stmt:#?}"
+            );
+            let inputs = mem::take(&mut self.load_data.inputs);
+
+            // With SQL capability, we can just punt the details of execution to
+            // the database's query planner.
+            mir::Operation::ExecStatement(Box::new(mir::ExecStatement {
+                inputs,
+                stmt,
+                ty,
+                conditional: exec::ConditionalOutput::None,
+                pagination: pagination_config,
+            }))
+        };
+
+        Ok(self.insert_mir_with_deps(node))
+    }
+
+    fn extract_insert_returning_as_const(
+        &mut self,
+        stmt: &stmt::Statement,
+    ) -> Option<(stmt::Value, stmt::Type)> {
+        let stmt::Statement::Insert(insert) = stmt else {
+            return None;
+        };
+
+        if self.load_data.select_items.is_empty() {
+            return None;
+        }
+
+        let target = insert.target.as_table_unwrap();
+        let values = insert.source.body.as_values()?;
+
+        let mut indices = vec![];
+
+        for select_item in &self.load_data.select_items {
+            let expr_ref = select_item.as_expr_reference_unwrap();
+            let expr_col = expr_ref.as_expr_column_unwrap();
+            debug_assert!(expr_col.nesting == 0, "expr_column={expr_col:#?}");
+
+            let Some(index) = target
+                .columns
+                .iter()
+                .enumerate()
+                .find(|(_, column_id)| column_id.index == expr_col.column)
+                .map(|(index, _)| index)
+            else {
+                todo!("insert returning referencing parent statement");
+                // return None;
+            };
+
+            indices.push(index);
+        }
+
+        // Now extract the values for each row
+        let mut result = Vec::with_capacity(values.rows.len());
+
+        for row in &values.rows {
+            // Build a record with only the requested fields
+            let mut fields = Vec::with_capacity(indices.len());
+
+            for &index in &indices {
+                // Try to evaluate the expression to a constant value
+                let value = row.entry(index)?.eval_const().ok()?;
+                fields.push(value);
+            }
+
+            result.push(stmt::Value::record_from_vec(fields));
+        }
+
+        let ty = self
+            .load_data
+            .select_items
+            .infer_record_list_ty(&self.planner.engine.expr_cx_for(stmt));
+
+        Some((stmt::Value::List(result), ty))
+    }
+
+    fn plan_pagination_sql(&mut self, stmt: &stmt::Statement) -> Result<Option<PaginationInfo>> {
+        let stmt::Statement::Query(query) = stmt else {
+            return Ok(None);
+        };
+
+        // Only cursor-based limits trigger pagination planning
+        let Some(limit) = query.limit.as_ref() else {
+            return Ok(None);
+        };
+        let stmt::Limit::Cursor(cursor) = limit else {
+            return Ok(None);
+        };
+
+        // SQL cursor pagination requires ORDER BY to produce a deterministic cursor.
+        let order_by = query.order_by.as_ref().ok_or_else(|| {
+            toasty_core::Error::unsupported_feature(format!(
+                "cursor-based pagination on {} requires an ORDER BY clause",
+                self.planner.engine.capability().driver_name
+            ))
+        })?;
+
+        // Extract page_size
+        let page_size = match &cursor.page_size {
+            stmt::Expr::Value(stmt::Value::I64(n)) => *n,
+            _ => return Ok(None),
+        };
+
+        // Add ORDER BY columns to load_data so they're available for cursor extraction
+        let mut cursor_column_indices = Vec::new();
+
+        for order_expr in &order_by.exprs {
+            // Try to convert the ORDER BY expression to an ExprReference
+            if let Some(expr_ref) = order_expr.expr.as_expr_reference().copied() {
+                // Add to load_data if not already present
+                let (index, _) = self
+                    .load_data
+                    .select_items
+                    .insert_full(SelectItem::from(expr_ref));
+                cursor_column_indices.push(index);
+            } else {
+                // Complex expression in ORDER BY - can't handle yet
+                return Ok(None);
+            }
+        }
+
+        Ok(Some(PaginationInfo {
+            page_size,
+            has_previous_page: self.stmt_info.has_pagination_cursor,
+            cursor_column_indices,
+        }))
+    }
+
+    /// Builds extract_cursor function using the inferred row type.
+    /// Called after type inference in plan_data_loading_sql.
+    fn build_extract_cursor(
+        &self,
+        info: PaginationInfo,
+        ty: &stmt::Type,
+    ) -> exec::PaginationConfig {
+        // Extract row type from List<Row>
+        let row_ty = if let stmt::Type::List(item_ty) = ty {
+            (**item_ty).clone()
+        } else {
+            stmt::Type::Unit
+        };
+
+        // Build extract_cursor expression: projects ORDER BY column positions from the row
+        let extract_cursor = stmt::Expr::record(
+            info.cursor_column_indices
+                .into_iter()
+                .map(|index| stmt::Expr::arg_project(0, [index])),
+        );
+
+        // Build eval::Func with the actual row type as input
+        let extract_cursor_func = eval::Func::from_stmt(extract_cursor, vec![row_ty]);
+
+        exec::PaginationConfig {
+            page_size: info.page_size,
+            has_previous_page: info.has_previous_page,
+            extract_cursor: Some(extract_cursor_func),
+        }
+    }
+
+    fn plan_conditional_sql_query_as_cte(
+        &mut self,
+        stmt: stmt::Statement,
+        ty: stmt::Type,
+    ) -> mir::ExecStatement {
+        let (condition, filter, source, mut write) = self.conditional_write_parts(stmt);
+
+        // `found`: the probe. Projects the OCC condition once per row matching
+        // the filter, locking those rows (`FOR UPDATE`) so the condition is
+        // evaluated against the latest committed row version and the rows
+        // cannot change before the write applies. Without the lock, a stale
+        // writer blocking on a concurrent committed update would pass the
+        // write's re-check (the probe is already materialized from the old
+        // snapshot and the write's own filter is key-only) and silently
+        // overwrite the newer row — the lost update `#[version]` exists to
+        // prevent.
+        let found = stmt::Cte {
+            query: conditional_probe_query(
+                condition,
+                filter.clone(),
+                source,
+                self.planner.engine.capability().select_for_update,
+            ),
+        };
+
+        // `counts`: aggregates the probe rows into `[matched, conditioned]`.
+        // Kept separate from `found` because a locking SELECT cannot carry
+        // aggregates. `found` sits one scope out (CTE body → WITH).
+        let counts = stmt::Cte {
+            query: stmt::Query::builder(stmt::Select {
+                source: stmt::TableRef::Cte {
+                    nesting: 1,
+                    index: 0,
+                }
+                .into(),
+                filter: stmt::Filter::new(true),
+                returning: stmt::Returning::Project(conditional_probe_projection(cte_column(0, 0))),
+                distinct: false,
+            })
+            .build(),
+        };
+
+        // `changed`: the write. It applies only when the probe's two counts
+        // agree, expressed as a scalar subquery over `counts` ANDed onto the
+        // filter. `counts` sits two scopes out from here (subquery → CTE body →
+        // WITH).
+        let counts_agree = stmt::Expr::stmt(stmt::Select {
+            source: stmt::TableRef::Cte {
+                nesting: 2,
+                index: 1,
+            }
+            .into(),
+            filter: true.into(),
+            returning: stmt::Returning::Project(stmt::Expr::record_from_vec(vec![stmt::Expr::eq(
+                stmt::ExprColumn {
+                    nesting: 0,
+                    table: 0,
+                    column: 0,
+                },
+                stmt::ExprColumn {
+                    nesting: 0,
+                    table: 0,
+                    column: 1,
+                },
+            )])),
+            distinct: false,
+        });
+        // The write applies only when the two counts agree — AND that guard
+        // onto the write's filter.
+        let guarded_filter = stmt::Filter::new(stmt::Expr::and(filter, counts_agree));
+        match &mut write {
+            stmt::Statement::Update(update) => update.filter = guarded_filter,
+            stmt::Statement::Delete(delete) => delete.filter = guarded_filter,
+            _ => unreachable!("conditional write is UPDATE or DELETE; write={write:#?}"),
+        }
+
+        // A `RETURNING` on the write (e.g. a relative `value = value + 1` read
+        // back) means the caller wants the changed rows; otherwise the write
+        // just reports how many rows it touched. Only an UPDATE reads columns
+        // back — a DELETE never has a returning.
+        let returning_len = match write.returning() {
+            Some(stmt::Returning::Project(stmt::Expr::Record(record))) => record.fields.len(),
+            Some(returning) => todo!("unexpected conditional write returning={returning:#?}"),
+            None => 0,
+        };
+
+        // `changed`: the write, wrapped as a data-modifying CTE body.
+        let changed_body: stmt::ExprSet = match write {
+            stmt::Statement::Update(update) => update.into(),
+            stmt::Statement::Delete(delete) => delete.into(),
+            _ => unreachable!("conditional write is UPDATE or DELETE"),
+        };
+        let changed = stmt::Cte {
+            query: stmt::Query::new(changed_body),
+        };
+
+        let outer = if returning_len == 0 {
+            // No columns to read back: select just the two probe counts. The
+            // `changed` CTE is data-modifying, so PostgreSQL runs it even though
+            // the outer query does not reference it.
+            stmt::Query::builder(stmt::Select {
+                source: stmt::TableRef::Cte {
+                    nesting: 0,
+                    index: 1,
+                }
+                .into(),
+                filter: stmt::Filter::new(true),
+                returning: stmt::Returning::Project(stmt::Expr::record_from_vec(vec![
+                    cte_column(0, 0),
+                    cte_column(0, 1),
+                ])),
+                distinct: false,
+            })
+        } else {
+            // Read the probe counts alongside the changed rows. `counts` yields
+            // exactly one row, so the LEFT JOIN repeats the counts across every
+            // changed row (and yields a single NULL-padded row when nothing
+            // changed).
+            let mut columns = vec![cte_column(0, 0), cte_column(0, 1)];
+            for i in 0..returning_len {
+                columns.push(cte_column(1, i));
+            }
+
+            stmt::Query::builder(stmt::Select {
+                source: stmt::Source::table_with_joins(
+                    vec![
+                        stmt::TableRef::Cte {
+                            nesting: 0,
+                            index: 1,
+                        },
+                        stmt::TableRef::Cte {
+                            nesting: 0,
+                            index: 2,
+                        },
+                    ],
+                    stmt::TableWithJoins {
+                        relation: stmt::TableFactor::Table(stmt::SourceTableId(0)),
+                        joins: vec![stmt::Join {
+                            table: stmt::SourceTableId(1),
+                            constraint: stmt::JoinOp::Left(stmt::Expr::from(true)),
+                        }],
+                    },
+                ),
+                filter: stmt::Filter::new(true),
+                returning: stmt::Returning::Project(stmt::Expr::record_from_vec(columns)),
+                distinct: false,
+            })
+        };
+
+        let stmt = outer.with(vec![found, counts, changed]).build().into();
+
+        mir::ExecStatement {
+            inputs: mem::take(&mut self.load_data.inputs),
+            stmt,
+            ty,
+            conditional: if returning_len == 0 {
+                exec::ConditionalOutput::Count
+            } else {
+                exec::ConditionalOutput::Returning
+            },
+            pagination: None,
+        }
+    }
+
+    fn plan_conditional_sql_query_as_rmw(
+        &mut self,
+        stmt: stmt::Statement,
+        ty: stmt::Type,
+    ) -> mir::ReadModifyWrite {
+        let (condition, filter, source, write) = self.conditional_write_parts(stmt);
+
+        // A conditional write on a backend without data-modifying CTEs (SQLite,
+        // MySQL) becomes a transaction: first probe the matched rows, then apply
+        // the write (filter only, no condition) when every matched row satisfies
+        // the condition. The engine derives the matched and satisfied counts
+        // from the probe's per-row results.
+        let read = conditional_probe_query(
+            condition,
+            filter,
+            source,
+            self.planner.engine.capability().select_for_update,
+        );
+
+        mir::ReadModifyWrite {
+            inputs: mem::take(&mut self.load_data.inputs),
+            read,
+            write,
+            ty,
+        }
+    }
+
+    /// Decompose a conditional UPDATE/DELETE into the parts both SQL
+    /// conditional-write strategies need: the OCC condition, the row filter, a
+    /// SELECT source over the target table (for the count probe), and the bare
+    /// write statement with its condition stripped. The filter and any
+    /// `RETURNING` stay on the write.
+    fn conditional_write_parts(
+        &self,
+        mut stmt: stmt::Statement,
+    ) -> (stmt::Expr, stmt::Expr, stmt::Source, stmt::Statement) {
+        let condition = stmt
+            .condition_mut_unwrap()
+            .expr
+            .take()
+            .expect("conditional write without condition");
+
+        let filter = stmt
+            .filter()
+            .and_then(|filter| filter.expr.clone())
+            .expect("conditional write without filter");
+
+        let source = match &stmt {
+            stmt::Statement::Update(update) => stmt::Source::table(update.target.as_table_unwrap()),
+            stmt::Statement::Delete(delete) => delete.from.clone(),
+            _ => unreachable!("conditional write is UPDATE or DELETE; stmt={stmt:#?}"),
+        };
+
+        (condition, filter, source, stmt)
+    }
+
+    // ===== NoSQL execution =====
+
+    fn plan_data_loading_nosql(&mut self, stmt: stmt::Statement) -> Result<mir::NodeId> {
+        if stmt.is_insert() {
+            debug_assert!(self.load_data.select_items.is_empty());
+        }
+
+        // Without SQL capability, we have to plan the execution of the
+        // statement based on available indices.
+        let index_plan_opt = self.planner.engine.plan_index_path(&stmt)?;
+
+        if let Some(mut index_plan) = index_plan_opt {
+            // prepare_post_filter may insert additional columns (e.g. deferred
+            // fields used only in a post-filter) into select_items, so the
+            // record type must be computed AFTER this call.
+            let post_filter = self.prepare_post_filter(&stmt, &mut index_plan);
+
+            let ty = self.infer_nosql_record_ty(&stmt);
+
+            let node_id = if index_plan.index.primary_key {
+                self.plan_primary_key_execution(stmt, &mut index_plan, &ty)
+            } else {
+                self.plan_secondary_index_execution(stmt, &mut index_plan, &ty)
+            };
+
+            Ok(self.apply_post_filter(node_id, post_filter, ty))
+        } else {
+            // No index covers the filter — emit a full-table scan.
+            let ty = self.infer_nosql_record_ty(&stmt);
+            self.plan_scan_execution(stmt, ty)
+        }
+    }
+
+    fn infer_nosql_record_ty(&self, stmt: &stmt::Statement) -> stmt::Type {
+        if self.load_data.select_items.is_empty() {
+            if stmt.is_query() {
+                // Query with no columns selected is an existence check: return
+                // an empty record for every matching row.
+                stmt::Type::list(stmt::Type::Record(vec![]))
+            } else {
+                stmt::Type::Unit
+            }
+        } else {
+            self.load_data
+                .select_items
+                .infer_record_list_ty(&self.planner.engine.expr_cx_for(stmt))
+        }
+    }
+
+    fn plan_scan_execution(
+        &mut self,
+        stmt: stmt::Statement,
+        ty: stmt::Type,
+    ) -> Result<mir::NodeId> {
+        let input = if self.load_data.inputs.is_empty() {
+            None
+        } else if self.load_data.inputs.len() == 1 {
+            Some(self.load_data.inputs[0])
+        } else {
+            todo!("scan with multiple inputs")
+        };
+
+        let cx = stmt::ExprContext::new(&*self.planner.engine.schema);
+        let cx = cx.scope(&stmt);
+        let stmt::ExprTarget::Table(table) = cx.target() else {
+            return Err(toasty_core::Error::unsupported_feature(
+                "scan: expected table target",
+            ));
+        };
+        let table_id = table.id;
+
+        // Reject ORDER BY on drivers whose scan operation returns items in an
+        // unspecified order (e.g. DynamoDB Scan has no server-side sort).
+        if let Some(query) = stmt.as_query()
+            && query.order_by.is_some()
+            && !self.planner.engine.capability().scan_supports_sort
+        {
+            return Err(toasty_core::Error::unsupported_feature(format!(
+                "{} does not support ORDER BY on full-table scans. Consider adding an index on \
+                 the sort field or removing the ORDER BY clause.",
+                self.planner.engine.capability().driver_name
+            )));
+        }
+
+        let mut row_filter = {
+            let f = stmt.filter_expr_unwrap();
+            if f.is_true() { None } else { Some(f.clone()) }
+        };
+        self.legalize_kv_expr(&mut row_filter);
+
+        let limit = extract_pagination(&stmt);
+
+        Ok(self.insert_mir_with_deps(mir::Scan {
+            input,
+            table: table_id,
+            columns: self.load_data.select_items.extract_expr_references(),
+            row_filter,
+            limit,
+            ty,
+        }))
+    }
+
+    fn plan_primary_key_execution(
+        &mut self,
+        stmt: stmt::Statement,
+        index_plan: &mut index::IndexPlan,
+        ty: &stmt::Type,
+    ) -> mir::NodeId {
+        if let Some(mut key_expr) = index_plan.key_values.take() {
+            let (args, input_nodes) = self.rewrite_expr_for_mir(&mut key_expr, 0);
+            let key_ty =
+                stmt::Type::list(self.planner.engine.index_key_record_ty(index_plan.index));
+            let keys = eval::Func::from_stmt_typed(key_expr, args, key_ty);
+            let get_by_key_input =
+                self.build_get_by_key_input(keys, input_nodes, self.index_key_ty(index_plan));
+
+            self.build_key_operation(&stmt, index_plan, get_by_key_input, ty)
+        } else {
+            let input = if self.load_data.inputs.is_empty() {
+                None
+            } else if self.load_data.inputs.len() == 1 {
+                Some(self.load_data.inputs[0])
+            } else {
+                todo!()
+            };
+
+            if stmt.is_query() {
+                let limit = extract_pagination(&stmt);
+                let order = extract_query_pk_order(&stmt);
+
+                let mut row_filter = index_plan.result_filter.take();
+                self.legalize_kv_expr(&mut row_filter);
+
+                // For queries, stream all matching records with the requested columns.
+                self.insert_mir_with_deps(mir::QueryPk {
+                    input,
+                    table: index_plan.table_id(),
+                    index: None, // Querying primary key
+                    columns: self.load_data.select_items.extract_expr_references(),
+                    pk_filter: index_plan.index_filter.take(),
+                    row_filter,
+                    ty: ty.clone(),
+                    limit,
+                    order,
+                })
+            } else {
+                // For mutations (UPDATE/DELETE) with a partial primary-key filter,
+                // first collect the full primary keys of all matching records via
+                // QueryPk, then apply the mutation to each key. The index key columns
+                // were pre-populated into load_data.select_items in plan_data_loading_nosql.
+                let index_key_ty = self.index_key_ty(index_plan);
+
+                let mut columns = self.load_data.select_items.extract_expr_references();
+                assert!(columns.is_empty());
+
+                for index_col in &index_plan.index.columns {
+                    columns.insert(stmt::ExprReference::Column(stmt::ExprColumn {
+                        nesting: 0,
+                        table: 0,
+                        column: index_col.column.index,
+                    }));
+                }
+
+                let mut row_filter = index_plan.result_filter.take();
+                self.legalize_kv_expr(&mut row_filter);
+
+                let query_pk_node = self.insert_mir_with_deps(mir::QueryPk {
+                    input,
+                    table: index_plan.table_id(),
+                    index: None, // Querying primary key
+                    columns,
+                    pk_filter: index_plan.index_filter.take(),
+                    row_filter,
+                    ty: index_key_ty,
+                    limit: None,
+                    order: None,
+                });
+
+                self.build_key_operation(&stmt, index_plan, query_pk_node, ty)
+            }
+        }
+    }
+
+    fn plan_secondary_index_execution(
+        &mut self,
+        stmt: stmt::Statement,
+        index_plan: &mut index::IndexPlan,
+        ty: &stmt::Type,
+    ) -> mir::NodeId {
+        let inputs = mem::take(&mut self.load_data.inputs);
+        assert!(index_plan.post_filter.is_none(), "TODO");
+        assert!(inputs.len() <= 1, "TODO: inputs={:#?}", inputs);
+
+        // For queries on NON-UNIQUE indexes, use QueryPk optimization
+        // Non-unique indexes are created as DynamoDB GSIs with ProjectionType::All,
+        // meaning they contain all table columns and can return full records.
+        // Unique indexes are created as separate tables and don't support this optimization.
+        // This method is already on the nosql path, so we can assume the behavior of unique indexes.
+        // To support DDB's other projection types, Index will need to track projected columns, not
+        // just the columns that are part of the index key.
+        if stmt.is_query() && !index_plan.index.unique {
+            let input = if inputs.is_empty() {
+                None
+            } else {
+                Some(inputs[0])
+            };
+
+            let limit = extract_pagination(&stmt);
+            let order = extract_query_pk_order(&stmt);
+
+            let mut row_filter = index_plan.result_filter.take();
+            self.legalize_kv_expr(&mut row_filter);
+
+            // Use QueryPk with index to query the secondary index and return full records
+            // This eliminates the N+1 pattern of FindPkByIndex + GetByKey
+            return self.insert_mir_with_deps(mir::QueryPk {
+                input,
+                table: index_plan.index.on,
+                index: Some(index_plan.index.id), // Query the secondary index
+                columns: self.load_data.select_items.extract_expr_references(), // Return full records
+                pk_filter: index_plan.index_filter.take(),
+                row_filter,
+                ty: ty.clone(), // Full record type, not just PKs
+                limit,
+                order,
+            });
+        }
+
+        // For mutations, unique indexes, or other cases, use FindPkByIndex + GetByKey
+        // - Mutations only need primary keys, not full records
+        // - Unique indexes don't have full column projections in DynamoDB
+        let primary_key_ty = self.table_primary_key_ty(index_plan.index.on);
+
+        let get_by_key_input = self.insert_mir_with_deps(mir::FindPkByIndex {
+            inputs,
+            table: index_plan.index.on,
+            index: index_plan.index.id,
+            filter: index_plan.index_filter.take(),
+            ty: primary_key_ty,
+        });
+
+        self.build_key_operation(&stmt, index_plan, get_by_key_input, ty)
+    }
+
+    fn prepare_post_filter(
+        &mut self,
+        stmt: &stmt::Statement,
+        index_plan: &mut index::IndexPlan,
+    ) -> Option<stmt::Expr> {
+        let mut post_filter = index_plan.post_filter.clone();
+
+        // If fetching rows using GetByKey, some databases do not support
+        // applying additional filters to the rows before returning results.
+        // In this case, the result_filter needs to be applied in-memory.
+        if stmt.is_query()
+            && (index_plan.has_pk_keys || !index_plan.index.primary_key)
+            && let Some(result_filter) = index_plan.result_filter.take()
+        {
+            post_filter = Some(match post_filter {
+                Some(post_filter) => stmt::Expr::and(result_filter, post_filter),
+                None => result_filter,
+            });
+        }
+
+        debug_assert!(
+            post_filter.is_none() || stmt.is_query(),
+            "stmt={:#?}; post_filter={post_filter:#?}",
+            stmt
+        );
+
+        // Make sure we are including columns needed to apply the post filter
+        if let Some(post_filter) = &mut post_filter {
+            visit_mut::for_each_expr_mut(post_filter, |expr| match expr {
+                stmt::Expr::Reference(expr_reference) => {
+                    let (index, _) = self
+                        .load_data
+                        .select_items
+                        .insert_full((*expr_reference).into());
+                    *expr = stmt::Expr::arg_project(0, [index]);
+                }
+                stmt::Expr::Arg(_) => todo!("expr={expr:#?}"),
+                _ => {}
+            });
+        }
+
+        post_filter
+    }
+
+    fn apply_post_filter(
+        &mut self,
+        mut node_id: mir::NodeId,
+        post_filter: Option<stmt::Expr>,
+        ty: stmt::Type,
+    ) -> mir::NodeId {
+        // If there is a post filter, we need to apply a filter step on the returned rows.
+        if let Some(post_filter) = post_filter {
+            let item_ty = ty.as_list_unwrap();
+            node_id = self.planner.mir.insert(mir::Filter {
+                input: node_id,
+                args: IndexSet::new(),
+                predicate: eval::Func::from_stmt(post_filter, vec![item_ty.clone()]),
+                ty,
+            });
+        }
+
+        node_id
+    }
+
+    fn build_get_by_key_input(
+        &mut self,
+        keys: eval::Func,
+        input_nodes: IndexSet<mir::NodeId>,
+        index_key_ty: stmt::Type,
+    ) -> mir::NodeId {
+        if keys.is_const() {
+            let keys = keys.eval_const(&self.planner.engine.schema);
+            self.insert_const(keys, index_key_ty)
+        } else if keys.is_identity() {
+            debug_assert_eq!(1, input_nodes.len(), "TODO");
+            input_nodes[0]
+        } else {
+            // The function maps the referenced inputs' whole values to the
+            // full key list, same as the `is_const`/`is_identity` cases
+            // above.
+            self.planner
+                .mir
+                .insert(mir::Eval::compute(input_nodes, keys))
+        }
+    }
+
+    /// Legalize a driver-bound key-value operation expression (a filter or
+    /// condition the driver compiles, e.g. into a DynamoDB expression):
+    /// projections into `#[document]` columns become resolved
+    /// `FuncJsonExtract` name paths, mirroring what legalization does to full
+    /// statements at the SQL boundary. In-memory expressions (post filters,
+    /// guards) are deliberately *not* legalized — the interpreter wants the
+    /// positional form.
+    fn legalize_kv_expr(&self, expr: &mut Option<stmt::Expr>) {
+        if let Some(expr) = expr {
+            self.planner.engine.legalize_table_expr(expr);
+        }
+    }
+
+    fn build_key_operation(
+        &mut self,
+        stmt: &stmt::Statement,
+        index_plan: &mut index::IndexPlan,
+        get_by_key_input: mir::NodeId,
+        ty: &stmt::Type,
+    ) -> mir::NodeId {
+        match stmt {
+            stmt::Statement::Query(_) => {
+                debug_assert!(ty.is_list(), "ty={ty:#?}");
+                self.insert_mir_with_deps(mir::GetByKey {
+                    input: get_by_key_input,
+                    table: index_plan.table_id(),
+                    columns: self.load_data.select_items.extract_expr_references(),
+                    ty: ty.clone(),
+                })
+            }
+            stmt::Statement::Delete(delete_stmt) => {
+                let mut filter = index_plan.result_filter.take();
+                self.legalize_kv_expr(&mut filter);
+                let mut condition = delete_stmt.condition.expr.clone();
+                self.legalize_kv_expr(&mut condition);
+
+                self.insert_mir_with_deps(mir::DeleteByKey {
+                    input: get_by_key_input,
+                    table: index_plan.table_id(),
+                    filter,
+                    condition,
+                    ty: stmt::Type::Unit,
+                })
+            }
+            stmt::Statement::Update(update_stmt) => {
+                // If there is a pre-filter, filter the key input on it: a
+                // false pre-filter drops every key, causing UpdateByKey to
+                // naturally no-op.
+                let filtered_input = self.apply_pre_filter(get_by_key_input, index_plan);
+
+                let mut filter = index_plan.result_filter.take();
+                self.legalize_kv_expr(&mut filter);
+                let mut condition = update_stmt.condition.expr.clone();
+                self.legalize_kv_expr(&mut condition);
+
+                self.insert_mir_with_deps(mir::UpdateByKey {
+                    input: filtered_input,
+                    table: index_plan.table_id(),
+                    // Document values in the assignments are already named:
+                    // the mapping's lowering casts converted them during
+                    // statement lowering/simplification.
+                    assignments: update_stmt.assignments.clone(),
+                    filter,
+                    condition,
+                    columns: self.load_data.select_items.extract_expr_references(),
+                    ty: ty.clone(),
+                })
+            }
+            _ => todo!("stmt={stmt:#?}"),
+        }
+    }
+
+    /// If the index plan has a pre-filter, filter the key input on it: a
+    /// `Filter` over the key list whose predicate reads only its args (the
+    /// pre-filter's referenced statement outputs). When the
+    /// pre-filter is false every key is dropped, so the downstream operation
+    /// sees no keys and becomes a no-op. Returns the (possibly filtered)
+    /// input node ID.
+    fn apply_pre_filter(
+        &mut self,
+        input: mir::NodeId,
+        index_plan: &mut index::IndexPlan,
+    ) -> mir::NodeId {
+        let Some(mut pre_filter_expr) = index_plan.pre_filter.take() else {
+            return input;
+        };
+
+        // The predicate's `arg(0)` is the current row, so the pre-filter's
+        // inputs start at `arg(1)`.
+        let (arg_tys, args) = self.rewrite_expr_for_mir(&mut pre_filter_expr, 1);
+
+        let ty = self.planner.mir[input].ty().clone();
+        let mut func_args = vec![ty.as_list_unwrap().clone()];
+        func_args.extend(arg_tys);
+
+        self.planner.mir.insert(mir::Filter {
+            input,
+            args,
+            predicate: eval::Func::from_stmt(pre_filter_expr, func_args),
+            ty,
+        })
+    }
+
+    /// Rewrite a statement-level expression for use in a MIR node.
+    ///
+    /// Statement-level expressions contain `Arg(n)` where `n` is a position in
+    /// `stmt_info.args` (the HIR arg list). Each HIR arg maps to an entry in
+    /// `load_data.inputs` via `hir::Arg::Sub { input, .. }`.
+    ///
+    /// MIR nodes have their own compact input lists. This method:
+    /// 1. Resolves each HIR arg to its `load_data.inputs` node ID
+    /// 2. Assigns a new compact position, starting at `arg_offset`
+    /// 3. Rewrites the `Arg` position in the expression
+    ///
+    /// Only arguments that reference the statement-level scope are rewritten.
+    /// Arguments bound by nested `Map` or `Let` expressions remain unchanged.
+    ///
+    /// Returns `(arg_types, input_node_ids)` for constructing the MIR node.
+    fn rewrite_expr_for_mir(
+        &self,
+        expr: &mut stmt::Expr,
+        arg_offset: usize,
+    ) -> (Vec<stmt::Type>, IndexSet<mir::NodeId>) {
+        let mut arg_map: IndexMap<usize, (stmt::Type, mir::NodeId)> = IndexMap::new();
+
+        visit_mut::walk_expr_scoped_mut(expr, 0, |expr, scope_depth| {
+            if let stmt::Expr::Arg(expr_arg) = expr
+                && expr_arg.nesting == scope_depth
+            {
+                let hir_pos = expr_arg.position;
+                let new_pos = match arg_map.get_index_of(&hir_pos) {
+                    Some(idx) => idx,
+                    None => {
+                        // Resolve the HIR arg to its load_data input
+                        let input_idx = match &self.stmt_info.args[hir_pos] {
+                            hir::Arg::Sub { input, .. } => input.get().unwrap(),
+                            _ => todo!("rewrite_expr_for_mir with non-Sub arg"),
+                        };
+                        let node_id = self.load_data.inputs[input_idx];
+                        let ty = self.planner.mir[node_id].ty().clone();
+                        let (idx, _) = arg_map.insert_full(hir_pos, (ty, node_id));
+                        idx
+                    }
+                };
+                expr_arg.position = arg_offset + new_pos;
+            }
+
+            true
+        });
+
+        let mut types = Vec::with_capacity(arg_map.len());
+        let mut nodes = IndexSet::with_capacity(arg_map.len());
+        for (_, (ty, node_id)) in arg_map {
+            types.push(ty);
+            nodes.insert(node_id);
+        }
+        (types, nodes)
+    }
+
+    // ===== Finalization helpers =====
+
+    fn process_back_ref_projections(&mut self, exec_stmt_node_id: mir::NodeId) {
+        for (child_stmt_id, back_ref) in &self.stmt_info.back_refs {
+            let projection = stmt::Expr::record(back_ref.exprs.iter().map(|expr_reference| {
+                let index = self
+                    .load_data
+                    .select_items
+                    .get_index_of_expr_reference(*expr_reference);
+                stmt::Expr::arg_project(0, [index])
+            }));
+
+            let row_ty = match self.planner.mir[exec_stmt_node_id].ty() {
+                // Lists are flattened
+                stmt::Type::List(ty) => (**ty).clone(),
+                ty => ty.clone(),
+            };
+
+            let body = eval::Func::from_stmt(projection, vec![row_ty]);
+            let eval =
+                mir::Eval::map_over(&self.planner.mir, exec_stmt_node_id, IndexSet::new(), body);
+            let project_node_id = self.planner.mir.insert(eval);
+            let project_node_id = if self.stmt_info.stmt().is_query()
+                && let Some(predicate) = self.build_parent_only_back_ref_filter(
+                    *child_stmt_id,
+                    back_ref,
+                    project_node_id,
+                ) {
+                self.planner.mir.insert(mir::Filter {
+                    input: project_node_id,
+                    args: IndexSet::new(),
+                    predicate,
+                    ty: self.planner.mir[project_node_id].ty().clone(),
+                })
+            } else {
+                project_node_id
+            };
+            back_ref.node_id.set(Some(project_node_id));
+        }
+    }
+
+    /// Builds a filter over the projected parent rows passed to a child query.
+    ///
+    /// Each eligible top-level conjunct is copied from the child query and
+    /// rewritten to read fields from the projected back-reference row. This
+    /// limits a variant-scoped include to parent rows from that variant. If
+    /// every row is removed, the child receives an empty batch.
+    fn build_parent_only_back_ref_filter(
+        &self,
+        child_stmt_id: hir::StmtId,
+        back_ref: &hir::BackRef,
+        project_node_id: mir::NodeId,
+    ) -> Option<eval::Func> {
+        let child_stmt = &self.planner.hir[child_stmt_id];
+        let stmt::Statement::Query(child_query) = child_stmt.stmt() else {
+            return None;
+        };
+        let stmt::ExprSet::Select(child_select) = &child_query.body else {
+            return None;
+        };
+        let child_filter = child_select.filter.expr.as_ref()?;
+        let top_level_conjuncts = match child_filter {
+            stmt::Expr::And(and) => and.operands.as_slice(),
+            expr => std::slice::from_ref(expr),
+        };
+        let predicates = top_level_conjuncts
+            .iter()
+            .filter_map(|conjunct| {
+                self.rewrite_parent_only_conjunct(child_stmt, back_ref, conjunct.clone())
+            })
+            .collect::<Vec<_>>();
+
+        if predicates.is_empty() {
+            return None;
+        }
+
+        let stmt::Type::List(row_ty) = self.planner.mir[project_node_id].ty() else {
+            return None;
+        };
+
+        Some(eval::Func::from_stmt(
+            stmt::Expr::and_from_vec(predicates),
+            vec![(**row_ty).clone()],
+        ))
+    }
+
+    /// Rewrites one child-query conjunct for a projected parent row.
+    ///
+    /// The conjunct must be evaluable in memory and reference this parent at
+    /// least once. Every statement-level argument must reference this parent;
+    /// arguments bound by nested `Map` and `Let` expressions remain local.
+    fn rewrite_parent_only_conjunct(
+        &self,
+        child_stmt: &hir::StatementInfo,
+        back_ref: &hir::BackRef,
+        mut conjunct: stmt::Expr,
+    ) -> Option<stmt::Expr> {
+        if !conjunct.is_eval() {
+            return None;
+        }
+
+        let mut eligible = true;
+        let mut references_parent = false;
+
+        visit_mut::walk_expr_scoped_mut(&mut conjunct, 0, |expr, scope_depth| {
+            if !eligible {
+                return false;
+            }
+            if let stmt::Expr::Arg(arg) = expr {
+                if arg.nesting < scope_depth {
+                    return false;
+                }
+                if let Some(hir::Arg::Ref {
+                    stmt_id,
+                    target_expr_ref,
+                    ..
+                }) = child_stmt.args.get(arg.position)
+                    && *stmt_id == self.stmt_id
+                    && arg.nesting == scope_depth
+                {
+                    let back_ref_column = back_ref.exprs.get_index_of(target_expr_ref).unwrap();
+                    *expr = stmt::Expr::arg_project(
+                        stmt::ExprArg {
+                            position: 0,
+                            nesting: scope_depth,
+                        },
+                        [back_ref_column],
+                    );
+                    references_parent = true;
+                } else {
+                    eligible = false;
+                }
+                return false;
+            }
+            true
+        });
+
+        (eligible && references_parent).then_some(conjunct)
+    }
+
+    fn plan_child_statements(&mut self) -> Result<()> {
+        // Plan dependent child statements. Effect deps target ancestors,
+        // planned by the enclosing traversal.
+        for (&dep_stmt_id, &kind) in &self.stmt_info.deps {
+            if kind == hir::DepKind::Statement && !self.planner.hir[dep_stmt_id].independent {
+                self.planner.plan_statement(dep_stmt_id)?;
+            }
+        }
+
+        for arg in &self.stmt_info.args {
+            let hir::Arg::Sub { stmt_id, .. } = arg else {
+                continue;
+            };
+
+            self.planner.plan_statement(*stmt_id)?;
+        }
+
+        Ok(())
+    }
+
+    fn plan_output_node(
+        &mut self,
+        data_load_node_id: mir::NodeId,
+        returning: ReturningInfo,
+    ) -> mir::NodeId {
+        // First check for nested merge
+        if let Some(node_id) = self.planner.plan_nested_merge(self.stmt_id) {
+            // `plan_nested_merge` builds its own MIR node directly on
+            // `self.planner.mir`, so the parent statement's remaining HIR
+            // deps (e.g. a sibling `Disassociate` DELETE in an
+            // `stmt::apply([insert, remove])` batch) are never consumed.
+            // Attach them to the NestedMerge so the dep statements stay
+            // reachable from `completion` and end up in the exec plan.
+            self.apply_dependencies_to_node(node_id);
+            return node_id;
+        }
+
+        let returning_arg_tys = |row_ty: Option<stmt::Type>| -> Vec<stmt::Type> {
+            row_ty
+                .into_iter()
+                .chain(
+                    returning
+                        .inputs
+                        .iter()
+                        .map(|input| self.planner.mir[input].ty().clone()),
+                )
+                .collect()
+        };
+
+        // Then handle returning clause
+        if let Some(clause) = returning.clause {
+            match clause {
+                stmt::Returning::Expr(expr) => {
+                    // Value variant contains a constant expression that can be evaluated
+                    if let Ok(value) = expr.eval_const() {
+                        let ty = value.infer_ty();
+
+                        self.planner
+                            .mir
+                            .insert_with_deps(mir::Const { value, ty }, [data_load_node_id])
+                    } else {
+                        let body = eval::Func::from_stmt(expr, returning_arg_tys(None));
+
+                        let node_id =
+                            self.insert_mir_with_deps(mir::Eval::compute(returning.inputs, body));
+
+                        if !self.stmt().is_query() {
+                            self.planner.mir[node_id].deps.insert(data_load_node_id);
+                        }
+
+                        node_id
+                    }
+                }
+                stmt::Returning::Project(projection) => {
+                    if returning.reads_row {
+                        let row_ty = match self.planner.mir[data_load_node_id].ty() {
+                            stmt::Type::List(ty) => (**ty).clone(),
+                            ty => panic!("per-row returning over a rowless data load; ty={ty:#?}"),
+                        };
+                        let body =
+                            eval::Func::from_stmt(projection, returning_arg_tys(Some(row_ty)));
+
+                        let eval = mir::Eval::map_over(
+                            &self.planner.mir,
+                            data_load_node_id,
+                            returning.inputs,
+                            body,
+                        );
+                        self.insert_mir_with_deps(eval)
+                    } else {
+                        // The projection is fully constant — the constantize
+                        // pipeline substituted every value, so nothing was
+                        // requested from the database and the data load may
+                        // yield only an affected-row count. Repeat the value
+                        // once per row.
+                        let projection = eval::Func::from_stmt(projection, vec![]);
+                        let ty = stmt::Type::list(projection.ret.clone());
+                        let value = projection.eval_const(&self.planner.engine.schema);
+
+                        self.insert_mir_with_deps(mir::Repeat {
+                            input: data_load_node_id,
+                            value,
+                            ty,
+                        })
+                    }
+                }
+                returning => panic!("unexpected `stmt::Returning` kind; returning={returning:#?}"),
+            }
+        } else {
+            self.apply_dependencies_to_node(data_load_node_id);
+            data_load_node_id
+        }
+    }
+
+    // ===== MIR/utility helpers =====
+
+    #[track_caller]
+    fn insert_const(&mut self, value: impl Into<stmt::Value>, ty: stmt::Type) -> mir::NodeId {
+        let value = value.into();
+
+        // Type check
+        debug_assert!(
+            ty.is_list(),
+            "const types must be of type `stmt::Type::List`"
+        );
+        debug_assert!(
+            value.is_a(&self.planner.engine.schema.app, &ty),
+            "const type mismatch; expected={ty:#?}; actual={value:#?}",
+        );
+
+        self.planner.mir.insert(mir::Const { value, ty })
+    }
+
+    fn insert_mir_with_deps(&mut self, node: impl Into<mir::Node>) -> mir::NodeId {
+        let node_id = self.planner.mir.insert(node);
+        self.apply_dependencies_to_node(node_id);
+        node_id
+    }
+
+    fn apply_dependencies_to_node(&mut self, node_id: mir::NodeId) {
+        let node = &mut self.planner.mir[node_id];
+
+        self.remaining_deps.retain(|stmt_id| {
+            let dep_info = &self.planner.hir[stmt_id];
+
+            // A dep not yet planned (e.g. a child sub-statement planned after
+            // this statement's data loading) stays retained and attaches at a
+            // later node — ultimately the output node, by which point every
+            // dep is planned. Ancestors are never in this set; they are
+            // `effect_deps`, anchored on reserved data-load slots.
+            if let Some(dep_id) = dep_info.output.get() {
+                node.deps.insert(dep_id);
+                false
+            } else {
+                true
+            }
+        });
+    }
+
+    fn index_key_ty(&self, index_plan: &IndexPlan) -> stmt::Type {
+        // Type of the index key. Value for single index keys, record for
+        // composite.
+        stmt::Type::list(self.planner.engine.index_key_record_ty(index_plan.index))
+    }
+
+    fn table_primary_key_ty(&self, table: db::TableId) -> stmt::Type {
+        let table = self.planner.engine.schema.db.table(table);
+        let primary_key = self.planner.engine.schema.db.index(table.primary_key.index);
+
+        stmt::Type::list(self.planner.engine.index_key_record_ty(primary_key))
+    }
+
+    fn stmt(&self) -> &stmt::Statement {
+        self.stmt_info.stmt.as_deref().unwrap()
+    }
+}
+
+/// A reference to column `column` of CTE `table` in the outer query's `FROM`
+/// (both at zero nesting).
+fn cte_column(table: usize, column: usize) -> stmt::Expr {
+    stmt::Expr::column(stmt::ExprColumn {
+        nesting: 0,
+        table,
+        column,
+    })
+}
+
+/// The probe query shared by both SQL conditional-write strategies:
+/// `SELECT <condition> FROM <source> WHERE <filter> [FOR UPDATE]`.
+///
+/// The condition is projected once per matched row rather than as an
+/// aggregate: a per-row projection can carry `FOR UPDATE` while `SELECT
+/// count(*) ... FOR UPDATE` is rejected. Locking the matched rows makes the
+/// probe authoritative — the condition is evaluated against the latest
+/// committed row version and the rows cannot change before the write applies.
+fn conditional_probe_query(
+    condition: stmt::Expr,
+    filter: stmt::Expr,
+    source: stmt::Source,
+    lock: bool,
+) -> stmt::Query {
+    stmt::Query::builder(stmt::Select {
+        source,
+        filter: stmt::Filter::new(filter),
+        returning: stmt::Returning::Project(stmt::Expr::record_from_vec(vec![condition])),
+        distinct: false,
+    })
+    .locks(if lock {
+        vec![stmt::Lock::Update]
+    } else {
+        vec![]
+    })
+    .build()
+}
+
+/// The aggregate projection over the probe's per-row results:
+/// `[count(*), count(*) FILTER (WHERE <ok>)]`. The first column counts rows
+/// matching the filter; the second counts those that also satisfy the OCC
+/// condition. The write is safe to apply exactly when the two agree. Used by
+/// the CTE strategy's `counts` CTE; the read-modify-write strategy derives the
+/// same counts client-side.
+fn conditional_probe_projection(condition: stmt::Expr) -> stmt::Expr {
+    stmt::Expr::record_from_vec(vec![
+        stmt::Expr::count_star(),
+        stmt::FuncCount {
+            arg: None,
+            filter: Some(Box::new(condition)),
+        }
+        .into(),
+    ])
+}
+
+/// Extract limit/pagination bounds from a query statement for use with
+/// `QueryPk` on NoSQL drivers. Returns `None` when the statement has no limit
+/// clause.
+///
+/// Assumes `page_size`, `limit`, and `offset` fields are `I64` literals. Runtime
+/// values use `Expr::Value`; the fixed limit emitted by `.first()` uses
+/// `Expr::Static`. `verify::verify_limit_is_integer_literal` enforces this
+/// invariant on the AST, so any other shape reaching here is a bug upstream.
+fn extract_pagination(stmt: &stmt::Statement) -> Option<Pagination> {
+    let query = stmt.as_query()?;
+    match query.limit.as_ref()? {
+        stmt::Limit::Cursor(c) => {
+            let page_size = as_i64_literal(&c.page_size);
+            let after = c.after.as_ref().and_then(|e| match e {
+                stmt::Expr::Value(v) => Some(v.clone()),
+                _ => None,
+            });
+            Some(Pagination::Cursor { page_size, after })
+        }
+        stmt::Limit::Offset(lo) => {
+            let limit = as_i64_literal(&lo.limit);
+            let offset = lo.offset.as_ref().map(as_i64_literal);
+            Some(Pagination::Offset { limit, offset })
+        }
+    }
+}
+
+/// Extracts an `i64` from a bound or static `I64` literal expression. Panics on
+/// any other shape — an invariant violation that `verify` should have caught.
+fn as_i64_literal(expr: &stmt::Expr) -> i64 {
+    match expr {
+        stmt::Expr::Value(stmt::Value::I64(n)) | stmt::Expr::Static(stmt::Value::I64(n)) => *n,
+        _ => panic!("limit/offset must be an i64 literal; got {expr:#?}"),
+    }
+}
+
+/// Extract the sort direction from a query statement's ORDER BY clause for use
+/// with `QueryPk` on NoSQL drivers.
+fn extract_query_pk_order(stmt: &stmt::Statement) -> Option<stmt::Direction> {
+    let query = stmt.as_query()?;
+    query.order_by.as_ref().and_then(|ob| {
+        ob.exprs.first().map(|e| match e.order {
+            Some(stmt::Direction::Desc) => stmt::Direction::Desc,
+            _ => stmt::Direction::Asc,
+        })
+    })
+}
