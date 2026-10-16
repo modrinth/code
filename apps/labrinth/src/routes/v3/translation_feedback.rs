@@ -7,11 +7,15 @@ use crate::util::crowdin::{CrowdinClient, IssueType};
 use crate::util::error::Context as _;
 use crate::util::ratelimit::{AsyncRateLimiter, GCRAParameters};
 use actix_web::{HttpRequest, post, web};
-use eyre::eyre;
+use eyre::{Result, eyre};
+use redis::{AsyncCommands, ExistenceCheck, SetExpiry, SetOptions};
 use serde::Deserialize;
 use std::fmt::Write as _;
 use validator::Validate;
 use xredis::RedisPool;
+
+const REPORT_NAMESPACE: &str = "translation_feedback:v1";
+const REPORT_EXPIRY_SECONDS: u64 = 60 * 60 * 24 * 7;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(translation_feedback_create);
@@ -152,7 +156,20 @@ pub async fn translation_feedback_create(
             format!("unknown message ID: `{}`", feedback.key)
         })?;
 
-    crowdin
+    let report_key = redis.key().entity(
+        REPORT_NAMESPACE,
+        format!("{}:{language_id}:{string_id}", user.id),
+    );
+    if !claim_report(&redis, &report_key)
+        .await
+        .wrap_internal_err("checking for duplicate translation feedback")?
+    {
+        return Err(ApiError::Conflict(eyre!(
+            "you already reported this string recently"
+        )));
+    }
+
+    if let Err(err) = crowdin
         .create_issue(
             string_id,
             &language_id,
@@ -160,9 +177,32 @@ pub async fn translation_feedback_create(
             &issue_text(&feedback, &user.username),
         )
         .await
-        .wrap_internal_err("filing translation feedback")?;
+    {
+        if let Err(err) = release_report(&redis, &report_key).await {
+            tracing::warn!(
+                "Failed to release translation feedback claim: {err:#}"
+            );
+        }
+        return Err(err).wrap_internal_err("filing translation feedback");
+    }
 
     Ok(())
+}
+
+/// Marks a string as reported by a user in a language, returning `false` if
+/// they already reported it within [`REPORT_EXPIRY_SECONDS`].
+async fn claim_report(redis: &RedisPool, key: &str) -> Result<bool> {
+    let options = SetOptions::default()
+        .conditional_set(ExistenceCheck::NX)
+        .with_expiration(SetExpiry::EX(REPORT_EXPIRY_SECONDS));
+    let claimed: Option<String> =
+        redis.connect().await?.set_options(key, 1, options).await?;
+
+    Ok(claimed.is_some())
+}
+
+async fn release_report(redis: &RedisPool, key: &str) -> Result<()> {
+    redis.connect().await?.delete(key).await
 }
 
 fn issue_text(feedback: &TranslationFeedback, username: &str) -> String {

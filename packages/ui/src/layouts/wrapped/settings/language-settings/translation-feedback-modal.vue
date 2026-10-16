@@ -116,7 +116,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
+import { type Labrinth, ModrinthApiError } from '@modrinth/api-client'
 import { LeftArrowIcon, LogInIcon, SearchIcon, SendIcon, XIcon } from '@modrinth/assets'
 import Fuse from 'fuse.js/dist/fuse.basic'
 import { computed, ref, shallowRef } from 'vue'
@@ -223,6 +223,10 @@ const messages = defineMessages({
 	submitErrorText: {
 		id: 'settings.language.feedback.error.text',
 		defaultMessage: 'Something went wrong. Please try again later.',
+	},
+	alreadyReportedText: {
+		id: 'settings.language.feedback.error.already-reported',
+		defaultMessage: 'You already reported this text recently.',
 	},
 })
 
@@ -356,11 +360,14 @@ async function submit(): Promise<void> {
 			text: formatMessage(messages.submitSuccessText),
 		})
 		modal.value?.hide()
-	} catch {
+	} catch (error) {
+		const alreadyReported = error instanceof ModrinthApiError && error.statusCode === 409
 		notificationManager.addNotification({
 			type: 'error',
 			title: formatMessage(messages.submitErrorTitle),
-			text: formatMessage(messages.submitErrorText),
+			text: formatMessage(
+				alreadyReported ? messages.alreadyReportedText : messages.submitErrorText,
+			),
 		})
 	} finally {
 		submitting.value = false

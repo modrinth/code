@@ -6170,6 +6170,9 @@
   "settings.language.feedback.description": {
     "defaultMessage": "Let our translators know about text in the {platform} that reads wrong."
   },
+  "settings.language.feedback.error.already-reported": {
+    "defaultMessage": "You already reported this text recently."
+  },
   "settings.language.feedback.error.text": {
     "defaultMessage": "Something went wrong. Please try again later."
   },
