@@ -45,6 +45,7 @@
 				:key="controlsKey"
 				:binding="binding"
 				:target="target"
+				:hide-title="hideTitle"
 				@dropdown-open="setDropdownOpen(id, true)"
 				@dropdown-close="setDropdownOpen(id, false)"
 			/>
@@ -94,6 +95,7 @@
 					:key="controlsKey"
 					:binding="binding"
 					:target="target"
+					:hide-title="hideTitle"
 					@dropdown-open="setInlineDropdownOpen($event, true)"
 					@dropdown-close="setInlineDropdownOpen($event, false)"
 				/>

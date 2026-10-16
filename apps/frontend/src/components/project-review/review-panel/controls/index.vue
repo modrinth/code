@@ -137,7 +137,7 @@
 				<Tooltip
 					v-if="
 						index === panelBinding.panel.sections.length - 1 &&
-						!panelBinding.panel.title &&
+						(!panelBinding.panel.title || hideTitle) &&
 						panelBinding.panel.hint
 					"
 					:text="panelBinding.panel.hint"
@@ -161,7 +161,7 @@
 			{{ formatMessage(panelBinding ? messages.noIssues : messages.noReviewActions) }}
 		</p>
 		<Tooltip
-			v-if="panelBinding && !panelBinding.panel.title && panelBinding.panel.hint"
+			v-if="panelBinding && (!panelBinding.panel.title || hideTitle) && panelBinding.panel.hint"
 			:text="panelBinding.panel.hint"
 			class="flex shrink-0 text-secondary"
 		>
@@ -216,6 +216,7 @@ const props = defineProps<{
 	target?: ReviewTarget
 	binding?: ReviewPanelBinding
 	keybindOffset?: number
+	hideTitle?: boolean
 }>()
 const emit = defineEmits<{
 	'dropdown-open': [key: string]
