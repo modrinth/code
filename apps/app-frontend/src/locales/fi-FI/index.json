@@ -1004,9 +1004,6 @@
   "app.settings.tabs.privacy": {
     "message": "Yksityisyys"
   },
-  "app.settings.tabs.resource-management": {
-    "message": "Resurssien hallinta"
-  },
   "app.skins.add-button": {
     "message": "Lisää ulkoasu"
   },

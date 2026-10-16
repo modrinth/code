@@ -1664,9 +1664,6 @@
   "app.settings.default-instance-options.height.title": {
     "message": "Altura"
   },
-  "app.settings.default-instance-options.java-and-memory.title": {
-    "message": "Java e memória"
-  },
   "app.settings.default-instance-options.java-arguments.description": {
     "message": "Os argumentos passados para o Java ao iniciar uma instância."
   },
@@ -1675,9 +1672,6 @@
   },
   "app.settings.default-instance-options.java-arguments.title": {
     "message": "Argumentos Java"
-  },
-  "app.settings.default-instance-options.launch-hooks.title": {
-    "message": "Ganchos de inicialização"
   },
   "app.settings.default-instance-options.memory-allocation.description": {
     "message": "O máximo de memória disponível para cada instância."
@@ -1711,9 +1705,6 @@
   },
   "app.settings.default-instance-options.width.title": {
     "message": "Largura"
-  },
-  "app.settings.default-instance-options.window.title": {
-    "message": "Janela"
   },
   "app.settings.default-instance-options.wrapper-hook.description": {
     "message": "O comando usado para auxiliar o processo de inicialização do Minecraft."
@@ -2771,14 +2762,8 @@
   "app.settings.resource-management.app-cache.confirm.description": {
     "message": "O aplicativo talvez carregue mais lentamente até o cache ser refeito."
   },
-  "app.settings.resource-management.app-cache.confirm.title": {
-    "message": "Purgar cache do aplicativo?"
-  },
   "app.settings.resource-management.app-cache.description": {
     "message": "Limpe o dado cache e baixe-o novamente do Modrinth. O aplicativo talvez carregue mais lentamente até o cache ser refeito."
-  },
-  "app.settings.resource-management.app-cache.purge": {
-    "message": "Purgar cache"
   },
   "app.settings.resource-management.app-cache.title": {
     "message": "Cache do aplicativo"
@@ -2855,9 +2840,6 @@
   "app.settings.resource-management.store.description": {
     "message": "Salve espaço reutilizando instalações, mods e pacotes das suas instâncias."
   },
-  "app.settings.resource-management.store.empty": {
-    "message": "Instale mods ou pacotes para ver seu uso do armazenamento aqui."
-  },
   "app.settings.resource-management.store.issues": {
     "message": "Ver {count, plural, one {# problema} other {# problemas}}"
   },
@@ -2896,9 +2878,6 @@
   },
   "app.settings.resource-management.store.verified": {
     "message": "Verificação concluída"
-  },
-  "app.settings.sidebar.label.instances": {
-    "message": "Instâncias"
   },
   "app.settings.synced-options.choose-sync-source.command-history-description": {
     "message": "Escolha de qual instância copiar seu histórico de comandos. Esse histórico é usado apenas para a sincronização inicial, e você pode editá-lo de qualquer instância depois."
@@ -3139,12 +3118,6 @@
   },
   "app.settings.tabs.privacy": {
     "message": "Privacidade"
-  },
-  "app.settings.tabs.resource-management": {
-    "message": "Gerenciamento de recursos"
-  },
-  "app.settings.tabs.synced-options": {
-    "message": "Configurações sincronizadas"
   },
   "app.sidebar.playing-as": {
     "message": "Jogando como"
@@ -4142,9 +4115,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Selecionar canal de atualização"
   },
-  "instance.settings.tabs.hooks.description": {
-    "message": "Execute comandos específicos do sistema antes e após iniciar o jogo."
-  },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Ao sair"
   },
@@ -4205,18 +4175,6 @@
   "instance.settings.tabs.installation.locked": {
     "message": "As opções de instalação estarão indisponíveis enquanto esta instância estiver privada."
   },
-  "instance.settings.tabs.java.custom-environment-variables": {
-    "message": "Defina as variáveis de ambiente separadamente para esta instância."
-  },
-  "instance.settings.tabs.java.custom-java-arguments": {
-    "message": "Defina os argumentos do Java separadamente para esta instância."
-  },
-  "instance.settings.tabs.java.custom-java-installation": {
-    "message": "Escolha uma instalação Java diferente para esta instância."
-  },
-  "instance.settings.tabs.java.custom-memory-allocation": {
-    "message": "Define a alocação de memória separadamente para esta instância."
-  },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Insira as variáveis ​​de ambiente..."
   },
@@ -4240,9 +4198,6 @@
   },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/caminho/ao/java"
-  },
-  "instance.settings.tabs.settings-overrides": {
-    "message": "Sincronizar substituições"
   },
   "instance.settings.tabs.sharing": {
     "message": "Compartilhamento"
@@ -4306,9 +4261,6 @@
   },
   "instance.settings.tabs.window": {
     "message": "Personalizar configurações de janela"
-  },
-  "instance.settings.tabs.window.custom-window-settings": {
-    "message": "Configura a tela cheia e resolução de inicialização separadamente dessa instância."
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Tela cheia"

@@ -128,6 +128,7 @@ import { useAppEvent } from '@/composables/use-app-event'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { handleSevereError } from '@/composables/use-error.js'
 import { useInstanceConsole } from '@/composables/useInstanceConsole'
+import InstanceSettingsModal from '@/features/instances/settings-modal/index.vue'
 import { trackEvent } from '@/helpers/analytics'
 import { toError } from '@/helpers/errors'
 import {
@@ -157,7 +158,6 @@ import { useRootBreadcrumb } from '@/shared/breadcrumbs'
 
 import InstanceAdmonitions from './components/admonitions/index.vue'
 import InstancePageHeader from './components/page-header/index.vue'
-import InstanceSettingsModal from './components/settings-modal/index.vue'
 import { provideInstancePage } from './instance-context'
 import {
 	instanceContentQueryOptions,
