@@ -178,6 +178,7 @@ export function createIssueCatalogue() {
 		| 'organization'
 		| 'organizationMembers'
 		| 'wasReviewed'
+		| 'hasPreviousStructuredIssues'
 		| 'permissions'
 	> & { previousLinks: ReadonlyMap<string, string> } = {
 		projectV2: legacyProject,
@@ -188,6 +189,7 @@ export function createIssueCatalogue() {
 		organization: null,
 		organizationMembers: [],
 		wasReviewed: false,
+		hasPreviousStructuredIssues: false,
 		permissions: { groups: [], unresolvedCount: 1, loaded: true, loading: false, error: null },
 		previousLinks: new Map(),
 	}

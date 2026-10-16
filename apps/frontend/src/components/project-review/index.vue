@@ -198,6 +198,10 @@ const panels = provideReviewPanels(
 			organization: organization.value,
 			organizationMembers: organizationMembers.value,
 			wasReviewed: wasReviewed.value,
+			hasPreviousStructuredIssues:
+				wasReviewed.value &&
+				project.value?.thread_id === threadQuery.data.value?.id &&
+				(threadQuery.data.value?.issues.length ?? 0) > 0,
 			sendIssuesAsThreadMessage: settings.value.get(
 				moderationSettings.General.SendIssuesAsThreadMessage,
 			),
@@ -256,11 +260,15 @@ watch(
 	},
 	{ immediate: true },
 )
-const hasPreviousIssues = computed(() => previousIssues.issues.value.length > 0)
+const hasPreviousStructuredIssues = computed(() => previousIssues.issues.value.length > 0)
 const activeReviewTab = ref('thread')
 onScopeDispose(
 	reviewContext.registerRoute('re-review', () => {
-		activeReviewTab.value = hasPreviousIssues.value ? 're-review' : 'thread'
+		if (!hasPreviousStructuredIssues.value) {
+			void reviewContext.revealPanel('re-review-misc')
+		} else {
+			activeReviewTab.value = 're-review'
+		}
 	}),
 )
 const resetIssuesModal = ref<InstanceType<typeof NewModal>>()
@@ -315,7 +323,7 @@ function revertCustomizations() {
 }
 
 const rightPanelTabs = computed(() => [
-	...(hasPreviousIssues.value
+	...(hasPreviousStructuredIssues.value
 		? [
 				{
 					value: 're-review',
@@ -333,7 +341,7 @@ const rightPanelTabs = computed(() => [
 ])
 
 watch(
-	[projectId, hasPreviousIssues],
+	[projectId, hasPreviousStructuredIssues],
 	([, hasIssues]) => {
 		activeReviewTab.value = hasIssues ? 're-review' : 'thread'
 	},
@@ -345,7 +353,7 @@ watch(projectId, () => {
 })
 
 useShortcut('cycle-conversation', () => {
-	const tabs = ['issues', 'thread', ...(hasPreviousIssues.value ? ['re-review'] : [])]
+	const tabs = ['issues', 'thread', ...(hasPreviousStructuredIssues.value ? ['re-review'] : [])]
 	activeReviewTab.value = tabs[(tabs.indexOf(activeReviewTab.value) + 1) % tabs.length]
 	shortcuts.run('reveal-right')
 })
@@ -364,10 +372,10 @@ useShortcut(
 useShortcut(
 	're-review',
 	() => {
-		activeReviewTab.value = 're-review'
+		void reviewContext.revealPanel('re-review')
 		shortcuts.run('reveal-right')
 	},
-	() => hasPreviousIssues.value,
+	() => hasPreviousStructuredIssues.value || !!panels.resolve({ kind: 'panel', key: 're-review-misc' }),
 )
 
 shortcuts.listen('keydown', (event) => {

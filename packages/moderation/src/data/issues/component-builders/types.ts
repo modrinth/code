@@ -14,6 +14,7 @@ export interface ReviewContext {
 	organization: Labrinth.Organizations.v3.Organization | null
 	organizationMembers: readonly Labrinth.Projects.v3.TeamMember[]
 	wasReviewed: boolean
+	hasPreviousStructuredIssues: boolean
 	sendIssuesAsThreadMessage?: boolean
 	permissions: {
 		groups: readonly Labrinth.Attribution.Internal.AttributionGroup[]

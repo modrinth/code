@@ -107,14 +107,16 @@ const selectedTarget = ref<ActionTarget | undefined>(reviewPanels.misc[0]?.key)
 const shortcuts = injectReviewShortcuts()
 const { registerRoute } = injectReviewContext()
 for (const { key: target } of reviewPanels.misc) {
-	useReviewShortcut(
-		target,
-		() => {
-			selectedTarget.value = target
-			shortcuts.run('reveal-right')
-		},
-		() => visibleTargets.value.includes(target),
-	)
+	if (target !== 're-review-misc') {
+		useReviewShortcut(
+			target,
+			() => {
+				selectedTarget.value = target
+				shortcuts.run('reveal-right')
+			},
+			() => visibleTargets.value.includes(target),
+		)
+	}
 	onScopeDispose(
 		registerRoute(target, () => {
 			selectedTarget.value = target

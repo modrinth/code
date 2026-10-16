@@ -174,6 +174,7 @@ export function createReviewPanels(
 			| 'organization'
 			| 'organizationMembers'
 			| 'wasReviewed'
+			| 'hasPreviousStructuredIssues'
 			| 'sendIssuesAsThreadMessage'
 			| 'permissions'
 		> & {

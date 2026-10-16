@@ -35,7 +35,7 @@ import {
 import { metadataReviewPanel } from './metadata'
 import { permissionsReviewPanel } from './permissions'
 import { postApprovalReviewPanel } from './post-approval'
-import { reReviewReviewPanel } from './re-review'
+import { reReviewMiscReviewPanel, reReviewReviewPanel } from './re-review'
 import { reuploadReviewPanel } from './reupload'
 import { rulesReviewPanel } from './rules'
 import { serverReviewPanel } from './server'
@@ -87,6 +87,11 @@ export const reviewPanels = {
 	permissions: permissionsReviewPanel,
 	're-review': reReviewReviewPanel,
 	misc: [
+		{
+			key: 're-review-misc',
+			label: 'Re-review',
+			panel: reReviewMiscReviewPanel,
+		},
 		{
 			key: 'post-approval',
 			label: 'Post-Approval',
