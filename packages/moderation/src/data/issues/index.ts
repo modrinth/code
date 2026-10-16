@@ -1,5 +1,6 @@
 import { categoriesReviewPanel } from './categories'
 import { each } from './component-builders/builders'
+import { galleryImageReviewKey } from './component-builders/gallery-images'
 import type { PanelRegistration } from './component-builders/types'
 import { descriptionReviewPanel } from './description'
 import {
@@ -73,13 +74,11 @@ export const reviewPanels = {
 	'system-interactions-disclosure': systemInteractionsDisclosureReviewPanel,
 	'archive-disclosure': archiveDisclosureReviewPanel,
 	gallery: galleryReviewPanel,
-	'gallery-image': each(({ projectV3 }) =>
-		projectV3.gallery
-			.filter((image) => image.id !== undefined)
-			.map((image, index) => ({
-				key: String(image.id),
-				panel: galleryImageReviewPanel(image, index + 1),
-			})),
+	'gallery-image': each(({ projectV3, sendIssuesAsThreadMessage }) =>
+		projectV3.gallery.flatMap((image, index) => {
+			const key = galleryImageReviewKey(image, sendIssuesAsThreadMessage)
+			return key === undefined ? [] : [{ key, panel: galleryImageReviewPanel(image, index + 1) }]
+		}),
 	),
 	icon: iconReviewPanel,
 	license: licenseReviewPanel,

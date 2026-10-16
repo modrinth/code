@@ -174,6 +174,7 @@ export function createReviewPanels(
 			| 'organization'
 			| 'organizationMembers'
 			| 'wasReviewed'
+			| 'sendIssuesAsThreadMessage'
 			| 'permissions'
 		> & {
 			previousLinks: ReadonlyMap<string, string>

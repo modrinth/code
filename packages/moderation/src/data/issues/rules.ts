@@ -30,6 +30,7 @@ import serverSideOptInHeaderMessage from '../messages/checklist/messages/rules/s
 import serverSideOptInHeaderListlessMessage from '../messages/checklist/messages/rules/server-side-opt-in-header-listless.md'
 import serverSideOptOutMessage from '../messages/checklist/messages/rules/server-side-opt-out.md'
 import { issue, panel, section, select, toggle } from './component-builders/builders'
+import { selectedGalleryImages } from './component-builders/gallery-images'
 import { IssuePriority } from './component-builders/priority'
 import type { IssueAction } from './component-builders/types'
 
@@ -74,7 +75,8 @@ export const rulesAiImagesIssue = issue({
 	id: 'rules-ai-images',
 	title: 'Prohibited images',
 	category: 'Project wide',
-	actions: ({ projectV3, selected }) => {
+	actions: ({ projectV3, selected, sendIssuesAsThreadMessage }) => {
+		if (sendIssuesAsThreadMessage) return []
 		const keys = new Set((selected.items['gallery-image'] ?? []).map(({ key }) => key))
 		const imageIds = projectV3.gallery.flatMap((image) =>
 			image.id !== undefined && keys.has(String(image.id)) ? [image.id] : [],
@@ -96,7 +98,8 @@ export const rulesAiImagesIssue = issue({
 		}
 		return actions
 	},
-	message: ({ projectV3, selected }) => {
+	message: (context) => {
+		const { projectV3, selected } = context
 		const entries: string[] = []
 		const settingsUrl = `https://modrinth.com/project/${encodeURIComponent(projectV3.id)}/settings`
 		if (selected.toggleIds.includes('icon-ai-images')) {
@@ -105,10 +108,7 @@ export const rulesAiImagesIssue = issue({
 				: ''
 			entries.push(`[Project icon](${settingsUrl})\n${image}`)
 		}
-		const keys = new Set((selected.items['gallery-image'] ?? []).map(({ key }) => key))
-		const images = projectV3.gallery.filter(
-			(image) => image.id !== undefined && keys.has(String(image.id)),
-		)
+		const images = selectedGalleryImages(context)
 		if (images.length) {
 			const previews = images.map(
 				(image) =>
