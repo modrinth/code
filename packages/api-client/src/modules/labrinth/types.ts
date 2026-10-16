@@ -2244,7 +2244,6 @@ export namespace Labrinth {
 				locale: string
 				key: string
 				kind: Kind
-				seen_text: string
 				suggestion?: string
 				comment?: string
 			}

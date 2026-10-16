@@ -28,6 +28,15 @@ struct DataWrapper<T> {
     data: T,
 }
 
+/// A language the Crowdin project is translated into.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TargetLanguage {
+    /// Crowdin language ID, e.g. `de` or `pt-BR`.
+    pub id: String,
+    /// English name, e.g. `German` or `Portuguese, Brazilian`.
+    pub name: String,
+}
+
 /// Client for the Crowdin project that holds Modrinth's translations.
 pub struct CrowdinClient {
     base_url: String,
@@ -55,31 +64,35 @@ impl CrowdinClient {
     }
 
     /// Maps a Modrinth locale code (e.g. `de-DE`) to one of the project's
-    /// Crowdin target language IDs (e.g. `de`), preferring an exact match.
-    pub async fn resolve_language_id(
+    /// Crowdin target languages (e.g. `de`), preferring an exact match.
+    pub async fn resolve_language(
         &self,
         redis: &RedisPool,
         locale: &str,
-    ) -> Result<Option<String>> {
-        let targets = self.target_language_ids(redis).await?;
+    ) -> Result<Option<TargetLanguage>> {
+        let targets = self.target_languages(redis).await?;
 
-        let exact = targets.iter().find(|id| id.eq_ignore_ascii_case(locale));
+        let exact = targets
+            .iter()
+            .find(|language| language.id.eq_ignore_ascii_case(locale));
         let by_language = || {
-            let language = locale.split('-').next()?;
-            targets.iter().find(|id| id.eq_ignore_ascii_case(language))
+            let code = locale.split('-').next()?;
+            targets
+                .iter()
+                .find(|language| language.id.eq_ignore_ascii_case(code))
         };
 
         Ok(exact.or_else(by_language).cloned())
     }
 
-    async fn target_language_ids(
+    async fn target_languages(
         &self,
         redis: &RedisPool,
-    ) -> Result<Vec<String>> {
+    ) -> Result<Vec<TargetLanguage>> {
         #[derive(Deserialize)]
         #[serde(rename_all = "camelCase")]
         struct Project {
-            target_language_ids: Vec<String>,
+            target_languages: Vec<TargetLanguage>,
         }
 
         let mut conn = redis.connect().await?;
@@ -106,12 +119,12 @@ impl CrowdinClient {
 
         conn.set_serialized(
             &cache_key,
-            &project.target_language_ids,
+            &project.target_languages,
             Some(CACHE_EXPIRY_SECONDS),
         )
         .await?;
 
-        Ok(project.target_language_ids)
+        Ok(project.target_languages)
     }
 
     /// Finds the Crowdin string ID for a message ID.

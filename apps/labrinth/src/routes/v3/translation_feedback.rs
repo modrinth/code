@@ -83,9 +83,6 @@ pub struct TranslationFeedback {
     #[validate(length(min = 1, max = 255))]
     pub key: String,
     pub kind: TranslationFeedbackKind,
-    /// The text the player saw in the interface.
-    #[validate(length(max = 2000))]
-    pub seen_text: String,
     #[validate(length(max = 2000))]
     pub suggestion: Option<String>,
     #[validate(length(max = 2000))]
@@ -157,8 +154,8 @@ pub async fn translation_feedback_create(
         )));
     }
 
-    let language_id = crowdin
-        .resolve_language_id(&redis, &feedback.locale)
+    let language = crowdin
+        .resolve_language(&redis, &feedback.locale)
         .await
         .wrap_internal_err("resolving Crowdin language")?
         .wrap_request_err_with(|| {
@@ -175,7 +172,7 @@ pub async fn translation_feedback_create(
 
     let report_key = redis.key().entity(
         REPORT_NAMESPACE,
-        format!("{}:{language_id}:{string_id}", user.id),
+        format!("{}:{}:{string_id}", user.id, language.id),
     );
     if !claim_report(&redis, &report_key)
         .await
@@ -190,9 +187,9 @@ pub async fn translation_feedback_create(
     if let Err(err) = crowdin
         .create_issue(
             string_id,
-            &language_id,
+            &language.id,
             feedback.kind.issue_type(),
-            &issue_text(&feedback, &language_id, &user.username),
+            &issue_text(&feedback, &language.name, &user.username),
         )
         .await
     {
@@ -260,7 +257,7 @@ async fn release_report(redis: &RedisPool, key: &str) {
 
 fn issue_text(
     feedback: &TranslationFeedback,
-    language_id: &str,
+    language_name: &str,
     username: &str,
 ) -> String {
     let product = match feedback.product {
@@ -269,9 +266,8 @@ fn issue_text(
     };
 
     let mut text = format!(
-        "Player feedback from the Modrinth {product} ({language_id}), reported by {username}\n\nProblem: {}\nShown text: {}",
+        "User feedback from the {product} for {language_name}, reported by {username}\n\nProblem: {}",
         feedback.kind.label(),
-        feedback.seen_text.trim(),
     );
 
     if let Some(suggestion) = feedback
@@ -280,7 +276,11 @@ fn issue_text(
         .map(str::trim)
         .filter(|s| !s.is_empty())
     {
-        let _ = write!(text, "\nSuggested translation: {suggestion}");
+        let _ = write!(
+            text,
+            "\nSuggested translation: {}",
+            escape_mentions(suggestion)
+        );
     }
 
     if let Some(comment) = feedback
@@ -289,8 +289,14 @@ fn issue_text(
         .map(str::trim)
         .filter(|s| !s.is_empty())
     {
-        let _ = write!(text, "\nComment: {comment}");
+        let _ = write!(text, "\nComment: {}", escape_mentions(comment));
     }
 
     text
+}
+
+/// Inserts a zero-width space after every `@` in user-provided text, so
+/// Crowdin doesn't turn it into a mention that notifies project members.
+fn escape_mentions(text: &str) -> String {
+    text.replace('@', "@\u{200B}")
 }

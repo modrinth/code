@@ -354,7 +354,6 @@ async function submit(): Promise<void> {
 			locale: reportedLocale.value,
 			key: selected.value.key,
 			kind: kind.value,
-			seen_text: selected.value.translated,
 			suggestion: suggestion.value.trim() || undefined,
 			comment: comment.value.trim() || undefined,
 		})
