@@ -72,9 +72,7 @@ public class SandboxApi {
                 System.err.println("Unable to use sandboxapi requestAccess, got error code " + responseCode);
                 return originalPath;
             }
-            String result = SandboxAgent.readInputStreamToString(conn.getInputStream());
-            String decodedPath = URLDecoder.decode(result, StandardCharsets.UTF_8.toString());
-            return Paths.get(decodedPath);
+            return Paths.get(SandboxAgent.readInputStreamToString(conn.getInputStream()));
         } catch (IOException e) {
             e.printStackTrace();
         } finally {

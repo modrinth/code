@@ -71,8 +71,8 @@ public class DropFileTransformation {
                 continue;
             }
 
+            // todo: make true
             if (true) {//Files.exists(path) && !Files.isReadable(path)) {
-                // todo: request access
                 futureList.add(CompletableFuture.supplyAsync(() -> sandboxApi.tryRequestAccess(path))
                         .thenApply(newPath -> {
                             if (srcType == Path.class) {

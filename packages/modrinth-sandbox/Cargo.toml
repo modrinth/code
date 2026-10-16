@@ -33,6 +33,14 @@ open = { workspace = true }
 urlencoding = { workspace = true }
 sha1 = { workspace = true }
 hex = { workspace = true }
+async_zip = { workspace = true, features = [
+  "bzip2",
+  "chrono",
+  "deflate",
+  "deflate64",
+  "tokio-fs",
+  "zstd",
+] }
 
 [dev-dependencies]
 tokio = { workspace = true, features = ["full"] }

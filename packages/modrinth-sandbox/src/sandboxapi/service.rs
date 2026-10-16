@@ -1,4 +1,4 @@
-use std::{collections::{HashMap, HashSet}, io::ErrorKind, net::{IpAddr, Ipv4Addr, SocketAddr}, path::{Path, PathBuf}, str::FromStr, sync::{Arc, atomic::{AtomicU32, Ordering}}};
+use std::{collections::{HashMap, HashSet}, ffi::OsStr, io::ErrorKind, net::{IpAddr, Ipv4Addr, SocketAddr}, path::{Path, PathBuf}, str::FromStr, sync::{Arc, atomic::{AtomicBool, AtomicU32, Ordering}}};
 
 use futures::StreamExt;
 use parking_lot::Mutex;
@@ -9,7 +9,7 @@ use tokio::{io::{AsyncReadExt, AsyncWriteExt}, net::TcpStream};
 use url::Url;
 use uuid::Uuid;
 
-use crate::SandboxHandle;
+use crate::{ExposedPath, SandboxHandle};
 
 const DEFAULT_SESSION_JOIN: &'static str = "https://sessionserver.mojang.com/session/minecraft/join";
 
@@ -93,6 +93,7 @@ pub struct SandboxApiService {
 #[derive(Default, Clone, Debug)]
 struct ServiceChildState {
     handle: Option<SandboxHandle>,
+    disallow_request_access: Arc<AtomicBool>,
 }
 
 #[derive(Default)]
@@ -305,8 +306,10 @@ impl SandboxApiService {
                     RequestStatus::MethodNotAllowed.write(stream).await;
                     return;
                 }
-                let status = self.handle_request_request_access(params, child_state).await;
-                status.write(stream).await;
+                match self.handle_request_request_access(params, child_state).await {
+                    Ok(path) => write_text_response(stream, &path.to_string_lossy()).await,
+                    Err(error_status) => error_status.write(stream).await,
+                };
             },
             "/sandboxauth/session/session/minecraft/join" => {
                 let Ok(mut join_request) = serde_json::from_slice::<MinecraftJoinRequest>(body) else {
@@ -590,7 +593,8 @@ impl SandboxApiService {
             return RequestStatus::BadRequest;
         };
 
-        let Ok(decoded) = urlencoding::decode(encoded) else {
+        let encoded = encoded.replace("+", "%20");
+        let Ok(decoded) = urlencoding::decode(&encoded) else {
             return RequestStatus::BadRequest;
         };
 
@@ -619,7 +623,19 @@ impl SandboxApiService {
         }
     }
 
-    async fn handle_request_request_access(self: Self, params: &str, child_state: Option<ServiceChildState>) -> RequestStatus {
+    async fn handle_request_request_access(self: Self, params: &str, child_state: Option<ServiceChildState>) -> Result<PathBuf, RequestStatus>  {
+        let Some(child_state) = child_state else {
+            return Err(RequestStatus::InternalServerError);
+        };
+
+        if child_state.disallow_request_access.load(Ordering::SeqCst) {
+            return Err(RequestStatus::Unauthorized);
+        }
+
+        let Some(sandbox_handle) = child_state.handle else {
+            return Err(RequestStatus::InternalServerError);
+        };
+
         let mut path = None;
         for (key, value) in params.split("&").filter_map(|arg| arg.split_once('=')) {
             if key == "path" {
@@ -629,19 +645,70 @@ impl SandboxApiService {
         }
 
         let Some(encoded) = path else {
-            return RequestStatus::BadRequest;
+            return Err(RequestStatus::BadRequest);
         };
 
-        let Ok(decoded) = urlencoding::decode(encoded) else {
-            return RequestStatus::BadRequest;
+        let encoded = encoded.replace("+", "%20");
+        let Ok(decoded) = urlencoding::decode(&encoded) else {
+            return Err(RequestStatus::BadRequest);
         };
 
         let path = Path::new(&*decoded);
+        if !path.is_file() {
+            // This API should only be used for DnD file paths
+            // Therefore, it should only ever be called for files that actually exist
+            // If we're receiving a request for a file that doesn't exist, it's possible
+            // that a malicious program is attempting to enumerate files on the computer
+            // To prevent this, we return Unauthorized and block the process from further requests
+            child_state.disallow_request_access.store(true, Ordering::SeqCst);
+            return Err(RequestStatus::Unauthorized);
+        }
 
-        dbg!(child_state);
-        RequestStatus::OK
-        // todo(sandbox)
-        // todo!();
+        // We only allow certain zip file formats (resourcepacks, mods, shaders, etc.)
+        let Ok(archive) = async_zip::tokio::read::fs::ZipFileReader::new(path).await else {
+            return Err(RequestStatus::InternalServerError);
+        };
+
+        let mut allow = false;
+        let is_zip = path.extension() == Some(OsStr::new("zip"));
+        for entry in archive.file().entries() {
+            let Ok(filename) = entry.filename().as_str() else {
+                continue;
+            };
+            let filename = filename.strip_prefix('/').unwrap_or(filename);
+            let is_content_file = match filename {
+                "pack.mcmeta" => true, // Resourcepack/datapack
+                "mcmod.info" => true, // Old forge mod
+                "fabric.mod.json" => true, // Fabric mod
+                "META-INF/mods.toml" => true, // New forge mod
+                "META-INF/neoforge.mods.toml" => true, // Neoforge mod
+                "META-INF/jarjar/metadata.json" => true, // Forge jarjar
+                "modrinth.index.json" => true, // Mrpack
+                "metaData.json" => path.extension() == Some(OsStr::new("mcpr")), // Replaymod replay
+                _ => {
+                    let is_shaderpack = filename.starts_with("shaders/") && is_zip;
+                    let is_flashback_replay = filename.ends_with(".flashback") && is_zip;
+                    is_shaderpack || is_flashback_replay
+                }
+            };
+            if is_content_file {
+                allow = true;
+                break;
+            }
+        }
+
+        if !allow {
+            return Err(RequestStatus::Unauthorized);
+        }
+
+        match sandbox_handle.expose_path(path, false) {
+            Ok(ExposedPath::Direct) => Ok(path.to_path_buf()),
+            Ok(ExposedPath::Proxied(proxied)) => Ok(proxied),
+            Err(err) => {
+                tracing::error!("Unable to expose path to sandbox: {err}");
+                Ok(path.to_path_buf())
+            },
+        }
     }
 
     #[cfg(target_os = "windows")]
@@ -727,6 +794,12 @@ pub async fn write_json_response<T: Serialize>(stream: &mut TcpStream, t: &T) ->
         raw.len(), raw);
     _ = stream.write_all(response.as_bytes()).await;
     Ok(())
+}
+
+pub async fn write_text_response(stream: &mut TcpStream, t: &str) {
+    let response = format!("HTTP/1.1 200 OK\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}",
+        t.len(), t);
+    _ = stream.write_all(response.as_bytes()).await;
 }
 
 impl RequestStatus {

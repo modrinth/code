@@ -49,7 +49,7 @@ public class SandboxAgent {
             if (is == null) {
                 return null;
             }
-            readInputStreamToString(is);
+            return readInputStreamToString(is);
         } catch (IOException ignored) {}
         return null;
     }

@@ -14,6 +14,10 @@ public class MinecraftVersionInfo {
     public int dataVersion = 0;
 
     public MinecraftVersionInfo(String json) {
+        if (json == null) {
+            return;
+        }
+
         JsonObject minecraftVersion = GSON.fromJson(json, JsonObject.class);
         if (minecraftVersion == null) {
             return;
