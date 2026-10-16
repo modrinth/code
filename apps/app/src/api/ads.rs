@@ -6,7 +6,7 @@ use tauri::plugin::TauriPlugin;
 use tauri::{Manager, PhysicalPosition, PhysicalSize, Runtime};
 use tauri_plugin_opener::OpenerExt;
 use theseus::{AppEvent, EventState, settings};
-use tokio::sync::RwLock;
+use tokio::sync::{RwLock, oneshot};
 
 pub struct AdsState {
     pub shown: bool,
@@ -17,10 +17,12 @@ pub struct AdsState {
     pub occluded: bool,
     pub last_click: Option<Instant>,
     pub malicious_origins: HashSet<String>,
+    pub pending_debug_state: Option<oneshot::Sender<serde_json::Value>>,
 }
 
 const AD_LINK: &str = "https://modrinth.com/wrapper/app-ads-cookie";
 const APP_TITLE_BAR_HEIGHT: f32 = 48.0;
+const ADS_DEBUG_STATE_TIMEOUT: Duration = Duration::from_secs(3);
 #[cfg(any(windows, target_os = "macos"))]
 pub(super) const OCCLUDED_AREA_THRESHOLD: f64 = 0.5;
 
@@ -279,6 +281,7 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
                 occluded: false,
                 last_click: None,
                 malicious_origins: HashSet::new(),
+                pending_debug_state: None,
             }));
 
             // We refresh the ads window periodically to mitigate memory leak issues.
@@ -367,6 +370,8 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
             record_ads_click,
             open_link,
             get_ads_personalization,
+            get_ads_debug_state,
+            report_ads_debug_state,
         ])
         .build()
 }
@@ -501,6 +506,7 @@ pub async fn init_ads_window<R: Runtime>(
                 include_str!("ads-consent/cmp.js"),
                 include_str!("ads-consent/media.js"),
                 include_str!("ads-consent/controller.js"),
+                include_str!("ads-consent/debug-state.js"),
                 include_str!("ads-consent/index.js"),
                 "})()",
             ]
@@ -935,4 +941,72 @@ pub async fn open_link<R: Runtime>(
 pub async fn get_ads_personalization() -> crate::api::Result<bool> {
     let res = settings::get().await?;
     Ok(res.personalized_ads)
+}
+
+/// Collects the current state of the ads webview, including the GPT and Prebid
+/// details of the rendered ad, so support can identify and block a reported ad.
+#[tauri::command]
+pub async fn get_ads_debug_state<R: Runtime>(
+    app: tauri::AppHandle<R>,
+) -> crate::api::Result<serde_json::Value> {
+    let state = app.state::<RwLock<AdsState>>();
+    let webview = app.webviews().get("ads-window").cloned();
+
+    let page = if let Some(webview) = &webview {
+        let (tx, rx) = oneshot::channel();
+        state.write().await.pending_debug_state = Some(tx);
+        webview.eval("window.modrinthPrivacy?.adsReportDebugState?.()")?;
+
+        match tokio::time::timeout(ADS_DEBUG_STATE_TIMEOUT, rx).await {
+            Ok(Ok(page)) => page,
+            _ => {
+                state.write().await.pending_debug_state = None;
+                serde_json::Value::Null
+            }
+        }
+    } else {
+        serde_json::Value::Null
+    };
+
+    let state = state.read().await;
+    let webview_url = webview
+        .as_ref()
+        .and_then(|webview| webview.url().ok())
+        .map(|url| url.to_string());
+    let current_ad = page
+        .get("current_ad")
+        .and_then(serde_json::Value::as_str)
+        .map(str::to_string)
+        .or_else(|| webview_url.clone());
+
+    Ok(serde_json::json!({
+        "current_ad": current_ad,
+        "captured_at": chrono::Utc::now().to_rfc3339(),
+        "app_version": env!("CARGO_PKG_VERSION"),
+        "os": std::env::consts::OS,
+        "arch": std::env::consts::ARCH,
+        "webview_url": webview_url,
+        "shown": state.shown,
+        "visible": should_show_ads_webview(&state) && !state.occluded,
+        "visibility_holds": state.visibility_holds,
+        "occluded": state.occluded,
+        "consent_required": state.consent_required,
+        "consent_overlay_shown": state.consent_overlay_shown,
+        "blocked_click_origins": state.malicious_origins,
+        "page": page,
+    }))
+}
+
+#[tauri::command]
+pub async fn report_ads_debug_state<R: Runtime>(
+    app: tauri::AppHandle<R>,
+    debug_state: serde_json::Value,
+) -> crate::api::Result<()> {
+    let state = app.state::<RwLock<AdsState>>();
+
+    if let Some(tx) = state.write().await.pending_debug_state.take() {
+        let _ = tx.send(debug_state);
+    }
+
+    Ok(())
 }
