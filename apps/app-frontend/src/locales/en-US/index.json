@@ -3164,6 +3164,24 @@
   "app.settings.troubleshooting.clear-cache.confirm.title": {
     "message": "Clear the app cache?"
   },
+  "app.settings.troubleshooting.report-ad.copied": {
+    "message": "Copied"
+  },
+  "app.settings.troubleshooting.report-ad.copy": {
+    "message": "Copy ad details"
+  },
+  "app.settings.troubleshooting.report-ad.description": {
+    "message": "Seen an inappropriate or offensive ad? Copy its details while it's showing and send them to <support>Modrinth Support</support>. We'll review it and remove it."
+  },
+  "app.settings.troubleshooting.report-ad.no-ad.text": {
+    "message": "Wait for the ad to load, then try again."
+  },
+  "app.settings.troubleshooting.report-ad.no-ad.title": {
+    "message": "No ad found"
+  },
+  "app.settings.troubleshooting.report-ad.title": {
+    "message": "Report an ad"
+  },
   "app.sidebar.playing-as": {
     "message": "Playing as"
   },
