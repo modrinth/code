@@ -107,6 +107,32 @@
 		:tabs="settingsTabs"
 		width="60rem"
 	>
+		<template v-if="!isLocal" #footer>
+			<p class="m-0 shrink-0 break-words text-xs text-secondary">
+				{{ formatMessage(deploymentMessages.basedOn) }}
+				<a
+					v-if="config.public.owner && config.public.branch"
+					class="hover:underline"
+					target="_blank"
+					rel="noopener"
+					:href="`https://github.com/${config.public.owner}/code/tree/${config.public.branch}`"
+				>
+					{{ config.public.owner }}/{{ config.public.branch }}
+				</a>
+				@
+				<span v-if="config.public.hash === 'unknown'">{{
+					formatMessage(deploymentMessages.unknownCommit)
+				}}</span>
+				<AutoLink
+					v-else
+					class="text-link"
+					target="_blank"
+					:to="`https://github.com/${config.public.owner}/code/commit/${config.public.hash}`"
+				>
+					{{ config.public.hash }}
+				</AutoLink>
+			</p>
+		</template>
 		<template #content="{ tab }">
 			<component :is="tab.content" v-if="tab?.content" embedded />
 		</template>
@@ -124,8 +150,10 @@ import {
 	SettingsIcon,
 } from '@modrinth/assets'
 import {
+	AutoLink,
 	Button,
 	commonMessages,
+	defineMessages,
 	FloatingMenu,
 	TabbedModal,
 	type TabbedModalTab,
@@ -141,6 +169,19 @@ import { injectProjectReviewContext } from './layout/context'
 import { projectReviewMessages as messages } from './messages'
 import QueueProjectList from './queue-project-list.vue'
 import { useReviewShortcut } from './shortcuts'
+
+const config = useRuntimeConfig()
+const { hostname } = useRequestURL()
+const isLocal =
+	import.meta.dev ||
+	hostname === 'localhost' ||
+	hostname.endsWith('.localhost') ||
+	hostname.startsWith('127.') ||
+	hostname === '[::1]'
+const deploymentMessages = defineMessages({
+	basedOn: { id: 'moderation.settings.based-on', defaultMessage: 'Based on' },
+	unknownCommit: { id: 'moderation.settings.unknown-commit', defaultMessage: 'unknown' },
+})
 
 const panelMenuOpen = ref(false)
 const settingsModal = ref<InstanceType<typeof TabbedModal> | null>(null)
