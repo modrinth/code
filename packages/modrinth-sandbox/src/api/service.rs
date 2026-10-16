@@ -1,17 +1,25 @@
-use std::{collections::{HashMap, HashSet}, ffi::OsStr, io::ErrorKind, net::{IpAddr, Ipv4Addr, SocketAddr}, path::{Path, PathBuf}, str::FromStr, sync::{Arc, atomic::{AtomicBool, AtomicU32, Ordering}}};
+use std::{
+    collections::HashMap, ffi::OsStr, io::ErrorKind, net::{IpAddr, Ipv4Addr, SocketAddr}, path::{Path, PathBuf}, str::FromStr, sync::{
+        Arc, atomic::{AtomicBool, AtomicU32, Ordering},
+    },
+};
 
 use futures::StreamExt;
 use parking_lot::Mutex;
 use rand::{Rng, distributions::Alphanumeric};
 use reqwest::header::{HeaderMap, HeaderName, HeaderValue};
 use serde::{Deserialize, Serialize};
-use tokio::{io::{AsyncReadExt, AsyncWriteExt}, net::TcpStream};
+use tokio::{
+    io::{AsyncReadExt, AsyncWriteExt},
+    net::TcpStream,
+};
 use url::Url;
 use uuid::Uuid;
 
 use crate::{ExposedPath, SandboxHandle};
 
-const DEFAULT_SESSION_JOIN: &'static str = "https://sessionserver.mojang.com/session/minecraft/join";
+const DEFAULT_SESSION_JOIN: &'static str =
+    "https://sessionserver.mojang.com/session/minecraft/join";
 
 #[derive(Default)]
 pub struct DiscoveredEndpoints {
@@ -61,7 +69,13 @@ impl SandboxApiChild {
     }
 
     pub fn set_sandbox_handle(&self, sandbox_handle: crate::SandboxHandle) {
-        if let Some(child) = self.0.inner.lock().children_by_secret.get_mut(&self.0.secret) {
+        if let Some(child) = self
+            .0
+            .inner
+            .lock()
+            .children_by_secret
+            .get_mut(&self.0.secret)
+        {
             child.handle = Some(sandbox_handle);
         }
     }
@@ -110,7 +124,11 @@ impl SandboxApiService {
         Self::new_with_client(port, launcher_api, reqwest::Client::default())
     }
 
-    pub fn new_with_client(port: u16, launcher_api: Arc<dyn SandboxApiLauncher>, http_client: reqwest::Client) -> Self {
+    pub fn new_with_client(
+        port: u16,
+        launcher_api: Arc<dyn SandboxApiLauncher>,
+        http_client: reqwest::Client,
+    ) -> Self {
         Self {
             port,
             notify: Default::default(),
@@ -124,13 +142,21 @@ impl SandboxApiService {
     pub fn start(self: Self, account_uuid: Uuid) -> SandboxApiChild {
         // Create dummy access token
         let mut dummy_access_token = String::from("SandboxAccessToken_");
-        for c in rand::thread_rng().sample_iter(Alphanumeric).take(32).map(char::from) {
+        for c in rand::thread_rng()
+            .sample_iter(Alphanumeric)
+            .take(32)
+            .map(char::from)
+        {
             dummy_access_token.push(c);
         }
         let dummy_access_token: Arc<str> = dummy_access_token.into();
 
         // Create secret
-        let secret = rand::thread_rng().sample_iter(Alphanumeric).take(32).map(char::from).collect::<String>();
+        let secret = rand::thread_rng()
+            .sample_iter(Alphanumeric)
+            .take(32)
+            .map(char::from)
+            .collect::<String>();
         let secret: Arc<str> = secret.into();
 
         // Run localhost server if this is the first child
@@ -140,8 +166,12 @@ impl SandboxApiService {
 
         {
             let mut inner = self.inner.lock();
-            inner.children_by_secret.insert(secret.clone(), Default::default());
-            inner.dummy_access_tokens.insert(dummy_access_token.clone(), account_uuid);
+            inner
+                .children_by_secret
+                .insert(secret.clone(), Default::default());
+            inner
+                .dummy_access_tokens
+                .insert(dummy_access_token.clone(), account_uuid);
         }
 
         SandboxApiChild(Arc::new(SandboxApiChildInner {
@@ -173,7 +203,8 @@ impl SandboxApiService {
             inner.running_server = true;
         }
 
-        let socket_addr = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), self.port);
+        let socket_addr =
+            SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), self.port);
         tracing::info!("Starting sandboxapi service on {}", socket_addr);
         let listener = tokio::net::TcpListener::bind(socket_addr).await?;
 
@@ -195,24 +226,39 @@ impl SandboxApiService {
         }
     }
 
-    async fn handle_incoming(self: Self, stream: TcpStream) -> std::io::Result<()> {
-        let mut buf = self.inner.lock().reuse_buffer.take().unwrap_or_else(|| vec![0_u8; 1024]);
-        let res = self.clone().handle_incoming_with_buffer(stream, &mut buf).await;
+    async fn handle_incoming(
+        self: Self,
+        stream: TcpStream,
+    ) -> std::io::Result<()> {
+        let mut buf = self
+            .inner
+            .lock()
+            .reuse_buffer
+            .take()
+            .unwrap_or_else(|| vec![0_u8; 1024]);
+        let res = self
+            .clone()
+            .handle_incoming_with_buffer(stream, &mut buf)
+            .await;
         match &mut self.inner.lock().reuse_buffer {
-            Some(old) => if old.len() < buf.len() {
-                *old = buf;
-            },
-            v => {
-                *v = Some(buf)
-            },
+            Some(old) => {
+                if old.len() < buf.len() {
+                    *old = buf;
+                }
+            }
+            v => *v = Some(buf),
         }
         res
     }
 
-    async fn handle_incoming_with_buffer(self: Self, mut stream: TcpStream, buf: &mut Vec<u8>) -> std::io::Result<()> {
+    async fn handle_incoming_with_buffer(
+        self: Self,
+        mut stream: TcpStream,
+        buf: &mut Vec<u8>,
+    ) -> std::io::Result<()> {
         let mut read = 0;
         'read_loop: loop {
-            let n =  stream.read(&mut buf[read..]).await?;
+            let n = stream.read(&mut buf[read..]).await?;
             read += n;
 
             if read == 0 {
@@ -244,10 +290,13 @@ impl SandboxApiService {
                     if !header.name.eq_ignore_ascii_case("Content-Length") {
                         continue;
                     }
-                    let Ok(content_length_str) = str::from_utf8(header.value) else {
+                    let Ok(content_length_str) = str::from_utf8(header.value)
+                    else {
                         break;
                     };
-                    let Ok(content_length) = content_length_str.parse::<usize>() else {
+                    let Ok(content_length) =
+                        content_length_str.parse::<usize>()
+                    else {
                         break;
                     };
                     let received_length = read - body_offset;
@@ -258,12 +307,18 @@ impl SandboxApiService {
                 }
             }
 
-            self.handle_request(request, &buf[body_offset..read], &mut stream).await;
+            self.handle_request(request, &buf[body_offset..read], &mut stream)
+                .await;
             return Ok(());
         }
     }
 
-    async fn handle_request(self: Self, request: httparse::Request<'_, '_>, body: &[u8], stream: &mut TcpStream) {
+    async fn handle_request(
+        self: Self,
+        request: httparse::Request<'_, '_>,
+        body: &[u8],
+        stream: &mut TcpStream,
+    ) {
         let Some(path) = request.path else {
             RequestStatus::NotFound.write(stream).await;
             return;
@@ -279,15 +334,23 @@ impl SandboxApiService {
                 Err(error_status) => {
                     error_status.write(stream).await;
                     return;
-                },
+                }
             }
         } else {
             None
         };
 
         if let Some(realms_path) = path.strip_prefix("/sandboxrealms/") {
-            if let Ok(url) = Url::parse(&format!("https://pc.realms.minecraft.net/{realms_path}")) {
-                self.proxy_with_replacement(&request, body.to_vec(), url, stream).await;
+            if let Ok(url) = Url::parse(&format!(
+                "https://pc.realms.minecraft.net/{realms_path}"
+            )) {
+                self.proxy_with_replacement(
+                    &request,
+                    body.to_vec(),
+                    url,
+                    stream,
+                )
+                .await;
             }
             return;
         }
@@ -300,7 +363,7 @@ impl SandboxApiService {
                 }
                 let status = self.handle_request_open_uri(params).await;
                 status.write(stream).await;
-            },
+            }
             "/sandboxapi/requestAccess" => {
                 if request.method != Some("GET") {
                     RequestStatus::MethodNotAllowed.write(stream).await;
@@ -312,12 +375,19 @@ impl SandboxApiService {
                 };
             },
             "/sandboxauth/session/session/minecraft/join" => {
-                let Ok(mut join_request) = serde_json::from_slice::<MinecraftJoinRequest>(body) else {
+                let Ok(mut join_request) =
+                    serde_json::from_slice::<MinecraftJoinRequest>(body)
+                else {
                     RequestStatus::BadRequest.write(stream).await;
                     return;
                 };
 
-                let real_uuid = self.inner.lock().dummy_access_tokens.get(&join_request.access_token).copied();
+                let real_uuid = self
+                    .inner
+                    .lock()
+                    .dummy_access_tokens
+                    .get(&join_request.access_token)
+                    .copied();
                 if let Some(real_uuid) = real_uuid {
                     if real_uuid != join_request.selected_profile {
                         RequestStatus::Unauthorized.write(stream).await;
@@ -338,8 +408,12 @@ impl SandboxApiService {
                     return;
                 };
 
-
-                let to = self.inner.lock().discovered_endpoints.custom_session_join.clone()
+                let to = self
+                    .inner
+                    .lock()
+                    .discovered_endpoints
+                    .custom_session_join
+                    .clone()
                     .or_else(|| Url::parse(DEFAULT_SESSION_JOIN).ok());
 
                 let Some(to) = to else {
@@ -347,26 +421,32 @@ impl SandboxApiService {
                     return;
                 };
 
-                self.proxy_with_replacement(&request, new_body, to, stream).await;
+                self.proxy_with_replacement(&request, new_body, to, stream)
+                    .await;
                 return;
-            },
+            }
             "/sandboxauth/discovery" => {
                 let Ok(discovery) = self.http_client.get("https://discovery.minecraftservices.com/minecraft/client").send().await else {
                     RequestStatus::InternalServerError.write(stream).await;
                     return;
                 };
 
-                let mut discovery_result = match discovery.json::<MinecraftDiscoveryResult>().await {
+                let mut discovery_result = match discovery
+                    .json::<MinecraftDiscoveryResult>()
+                    .await
+                {
                     Ok(discovery_result) => discovery_result,
                     Err(err) => {
                         tracing::error!("Failed to get discovery: {:?}", err);
                         RequestStatus::InternalServerError.write(stream).await;
                         return;
-                    },
+                    }
                 };
 
                 discovery_result.environment = Some("sandboxauth".into());
-                for (service_name, endpoints) in &mut discovery_result.discovery.services {
+                for (service_name, endpoints) in
+                    &mut discovery_result.discovery.services
+                {
                     for (endpoint_name, endpoint) in &mut endpoints.endpoints {
                         let Some(old_uri) = &endpoint.uri else {
                             continue;
@@ -385,13 +465,19 @@ impl SandboxApiService {
 
                         // Custom behaviour for session join since it puts the access token in the
                         // body instead of the Authorization header
-                        if &**service_name == "session" && &**endpoint_name == "join" {
+                        if &**service_name == "session"
+                            && &**endpoint_name == "join"
+                        {
                             // Update custom_session_join
-                            self.inner.lock().discovered_endpoints.custom_session_join = if &**old_uri == DEFAULT_SESSION_JOIN {
-                                None
-                            } else {
-                                Some(old_url)
-                            };
+                            self.inner
+                                .lock()
+                                .discovered_endpoints
+                                .custom_session_join =
+                                if &**old_uri == DEFAULT_SESSION_JOIN {
+                                    None
+                                } else {
+                                    Some(old_url)
+                                };
 
                             // Override join with our custom endpoint
                             *endpoint = MinecraftEndpoint {
@@ -402,29 +488,52 @@ impl SandboxApiService {
                         } else {
                             // Create new endpoint string
                             let new_endpoint_path: Arc<str> = format!("/sandboxauth/service/{service_name}/{endpoint_name}").into();
-                            let new_endpoint: Arc<str> = format!("http://127.0.0.1:{}{}", self.port, new_endpoint_path).into();
+                            let new_endpoint: Arc<str> = format!(
+                                "http://127.0.0.1:{}{}",
+                                self.port, new_endpoint_path
+                            )
+                            .into();
 
-                            self.inner.lock().discovered_endpoints.replace_authorization_header.insert(new_endpoint_path.clone(), old_url);
+                            self.inner
+                                .lock()
+                                .discovered_endpoints
+                                .replace_authorization_header
+                                .insert(new_endpoint_path.clone(), old_url);
 
                             *endpoint = MinecraftEndpoint {
                                 uri: Some(new_endpoint),
                                 valid_uris: None,
-                                other_values: Default::default()
+                                other_values: Default::default(),
                             };
                         }
                     }
                 }
 
-                if write_json_response(stream, &discovery_result).await.is_err() {
+                if write_json_response(stream, &discovery_result)
+                    .await
+                    .is_err()
+                {
                     RequestStatus::InternalServerError.write(stream).await;
                 }
                 return;
-            },
+            }
             _ => {
                 if path.starts_with("/sandboxauth/service") {
-                    let to = self.inner.lock().discovered_endpoints.replace_authorization_header.get(path).cloned();
+                    let to = self
+                        .inner
+                        .lock()
+                        .discovered_endpoints
+                        .replace_authorization_header
+                        .get(path)
+                        .cloned();
                     if let Some(to) = to {
-                        self.proxy_with_replacement(&request, body.to_vec(), to, stream).await;
+                        self.proxy_with_replacement(
+                            &request,
+                            body.to_vec(),
+                            to,
+                            stream,
+                        )
+                        .await;
                         return;
                     }
                 }
@@ -433,18 +542,35 @@ impl SandboxApiService {
         }
     }
 
-    async fn proxy_with_replacement(self: Self, request: &httparse::Request<'_, '_>, body: Vec<u8>, to: Url, stream: &mut TcpStream) {
-        let headers = match self.create_headers_with_replacement(request).await {
+    async fn proxy_with_replacement(
+        self: Self,
+        request: &httparse::Request<'_, '_>,
+        body: Vec<u8>,
+        to: Url,
+        stream: &mut TcpStream,
+    ) {
+        let headers = match self.create_headers_with_replacement(request).await
+        {
             Ok(headers) => headers,
             Err(status) => {
                 status.write(stream).await;
                 return;
-            },
+            }
         };
-        let method = request.method
-            .and_then(|method| reqwest::Method::from_bytes(method.as_bytes()).ok())
+        let method = request
+            .method
+            .and_then(|method| {
+                reqwest::Method::from_bytes(method.as_bytes()).ok()
+            })
             .unwrap_or(reqwest::Method::GET);
-        let Ok(response) = self.http_client.request(method, to).headers(headers).body(body).send().await else {
+        let Ok(response) = self
+            .http_client
+            .request(method, to)
+            .headers(headers)
+            .body(body)
+            .send()
+            .await
+        else {
             RequestStatus::InternalServerError.write(stream).await;
             return;
         };
@@ -478,7 +604,10 @@ impl SandboxApiService {
         }
     }
 
-    async fn create_headers_with_replacement(&self, request: &httparse::Request<'_, '_>) -> Result<HeaderMap, RequestStatus> {
+    async fn create_headers_with_replacement(
+        &self,
+        request: &httparse::Request<'_, '_>,
+    ) -> Result<HeaderMap, RequestStatus> {
         let mut headers = HeaderMap::new();
 
         for old_header in request.headers.iter() {
@@ -491,18 +620,28 @@ impl SandboxApiService {
             }
             // Access token authorization header
             if old_header.name.eq_ignore_ascii_case("Authorization") {
-                if let Some(bearer) = old_header.value.strip_prefix(b"Bearer") && let Ok(bearer) = str::from_utf8(bearer) {
+                if let Some(bearer) = old_header.value.strip_prefix(b"Bearer")
+                    && let Ok(bearer) = str::from_utf8(bearer)
+                {
                     let access_token = bearer.trim_ascii_start();
-                    let real_uuid = self.inner.lock().dummy_access_tokens.get(access_token).copied();
+                    let real_uuid = self
+                        .inner
+                        .lock()
+                        .dummy_access_tokens
+                        .get(access_token)
+                        .copied();
 
                     if let Some(real_uuid) = real_uuid {
-                        let (sender, receiver) = tokio::sync::oneshot::channel();
+                        let (sender, receiver) =
+                            tokio::sync::oneshot::channel();
                         self.launcher_api.login(real_uuid, sender);
                         let Ok(real_token) = receiver.await else {
                             return Err(RequestStatus::Unauthorized);
                         };
 
-                        if let Ok(header_value) = HeaderValue::from_str(&format!("Bearer {}", real_token)) {
+                        if let Ok(header_value) = HeaderValue::from_str(
+                            &format!("Bearer {}", real_token),
+                        ) {
                             headers.insert("Authorization", header_value);
                         }
                         continue;
@@ -510,7 +649,9 @@ impl SandboxApiService {
                 }
             }
             // Realms cookie header
-            if old_header.name.eq_ignore_ascii_case("Cookie") && let Ok(cookie) = str::from_utf8(old_header.value) {
+            if old_header.name.eq_ignore_ascii_case("Cookie")
+                && let Ok(cookie) = str::from_utf8(old_header.value)
+            {
                 let mut new_cookie = String::new();
                 let mut first = true;
                 for element in cookie.split(';') {
@@ -527,9 +668,17 @@ impl SandboxApiService {
                         && let Some((token, uuid_str)) = right.split_once(':')
                         && let Ok(uuid) = Uuid::from_str(uuid_str)
                     {
-                        let real_uuid = self.inner.lock().dummy_access_tokens.get(token).copied();
-                        if let Some(real_uuid) = real_uuid && real_uuid == uuid {
-                            let (sender, receiver) = tokio::sync::oneshot::channel();
+                        let real_uuid = self
+                            .inner
+                            .lock()
+                            .dummy_access_tokens
+                            .get(token)
+                            .copied();
+                        if let Some(real_uuid) = real_uuid
+                            && real_uuid == uuid
+                        {
+                            let (sender, receiver) =
+                                tokio::sync::oneshot::channel();
                             self.launcher_api.login(real_uuid, sender);
                             let Ok(real_token) = receiver.await else {
                                 return Err(RequestStatus::Unauthorized);
@@ -549,10 +698,11 @@ impl SandboxApiService {
                     headers.insert("Cookie", header_value);
                 }
                 continue;
-
             }
             if let Ok(header_name) = HeaderName::from_str(old_header.name) {
-                if let Ok(header_value) = HeaderValue::from_bytes(old_header.value) {
+                if let Ok(header_value) =
+                    HeaderValue::from_bytes(old_header.value)
+                {
                     headers.insert(header_name, header_value);
                 }
             }
@@ -561,16 +711,26 @@ impl SandboxApiService {
         Ok(headers)
     }
 
-    fn check_authorization_secret(self: Self, request: &httparse::Request<'_, '_>) -> Result<ServiceChildState, RequestStatus> {
+    fn check_authorization_secret(
+        self: Self,
+        request: &httparse::Request<'_, '_>,
+    ) -> Result<ServiceChildState, RequestStatus> {
         for header in request.headers.iter() {
             if header.name == "Authorization" {
-                let Some(token) = header.value.trim_ascii_start().strip_prefix(b"Bearer") else {
+                let Some(token) =
+                    header.value.trim_ascii_start().strip_prefix(b"Bearer")
+                else {
                     return Err(RequestStatus::Forbidden);
                 };
                 let Ok(token) = str::from_utf8(token) else {
                     return Err(RequestStatus::BadRequest);
                 };
-                if let Some(child) = self.inner.lock().children_by_secret.get(token.trim_ascii_start()) {
+                if let Some(child) = self
+                    .inner
+                    .lock()
+                    .children_by_secret
+                    .get(token.trim_ascii_start())
+                {
                     return Ok(child.clone());
                 } else {
                     return Err(RequestStatus::Forbidden);
@@ -580,9 +740,14 @@ impl SandboxApiService {
         Err(RequestStatus::Unauthorized)
     }
 
-    async fn handle_request_open_uri(self: Self, params: &str) -> RequestStatus {
+    async fn handle_request_open_uri(
+        self: Self,
+        params: &str,
+    ) -> RequestStatus {
         let mut uri = None;
-        for (key, value) in params.split("&").filter_map(|arg| arg.split_once('=')) {
+        for (key, value) in
+            params.split("&").filter_map(|arg| arg.split_once('='))
+        {
             if key == "uri" {
                 uri = Some(value);
                 break;
@@ -637,7 +802,9 @@ impl SandboxApiService {
         };
 
         let mut path = None;
-        for (key, value) in params.split("&").filter_map(|arg| arg.split_once('=')) {
+        for (key, value) in
+            params.split("&").filter_map(|arg| arg.split_once('='))
+        {
             if key == "path" {
                 path = Some(value);
                 break;
@@ -712,7 +879,9 @@ impl SandboxApiService {
     }
 
     #[cfg(target_os = "windows")]
-    fn windows_spawn_detached(mut command: std::process::Command) -> std::io::Result<()> {
+    fn windows_spawn_detached(
+        mut command: std::process::Command,
+    ) -> std::io::Result<()> {
         command.stdin(std::process::Stdio::null());
         command.stdout(std::process::Stdio::null());
         command.stderr(std::process::Stdio::null());
@@ -724,7 +893,6 @@ impl SandboxApiService {
 
         command.spawn().map(|_| ())
     }
-
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -788,10 +956,16 @@ enum RequestStatus {
     InternalServerError,
 }
 
-pub async fn write_json_response<T: Serialize>(stream: &mut TcpStream, t: &T) -> serde_json::Result<()> {
+pub async fn write_json_response<T: Serialize>(
+    stream: &mut TcpStream,
+    t: &T,
+) -> serde_json::Result<()> {
     let raw = serde_json::to_string(t)?;
-    let response = format!("HTTP/1.1 200 OK\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}",
-        raw.len(), raw);
+    let response = format!(
+        "HTTP/1.1 200 OK\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}",
+        raw.len(),
+        raw
+    );
     _ = stream.write_all(response.as_bytes()).await;
     Ok(())
 }
@@ -805,13 +979,27 @@ pub async fn write_text_response(stream: &mut TcpStream, t: &str) {
 impl RequestStatus {
     pub async fn write(self, stream: &mut TcpStream) {
         let response = match self {
-            RequestStatus::OK => "HTTP/1.1 200 OK\r\nContent-Length: 0\r\nConnection: close\r\n\r\n",
-            RequestStatus::BadRequest => "HTTP/1.1 400 Bad Request\r\nContent-Length: 0\r\nConnection: close\r\n\r\n",
-            RequestStatus::Unauthorized => "HTTP/1.1 401 Unauthorized\r\nContent-Length: 0\r\nConnection: close\r\n\r\n",
-            RequestStatus::Forbidden => "HTTP/1.1 403 Forbidden\r\nContent-Length: 0\r\nConnection: close\r\n\r\n",
-            RequestStatus::NotFound => "HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\nConnection: close\r\n\r\n",
-            RequestStatus::MethodNotAllowed => "HTTP/1.1 405 Method Not Allowed\r\nContent-Length: 0\r\nConnection: close\r\n\r\n",
-            RequestStatus::InternalServerError => "HTTP/1.1 500 Internal Server Error\r\nContent-Length: 0\r\nConnection: close\r\n\r\n",
+            RequestStatus::OK => {
+                "HTTP/1.1 200 OK\r\nContent-Length: 0\r\nConnection: close\r\n\r\n"
+            }
+            RequestStatus::BadRequest => {
+                "HTTP/1.1 400 Bad Request\r\nContent-Length: 0\r\nConnection: close\r\n\r\n"
+            }
+            RequestStatus::Unauthorized => {
+                "HTTP/1.1 401 Unauthorized\r\nContent-Length: 0\r\nConnection: close\r\n\r\n"
+            }
+            RequestStatus::Forbidden => {
+                "HTTP/1.1 403 Forbidden\r\nContent-Length: 0\r\nConnection: close\r\n\r\n"
+            }
+            RequestStatus::NotFound => {
+                "HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\nConnection: close\r\n\r\n"
+            }
+            RequestStatus::MethodNotAllowed => {
+                "HTTP/1.1 405 Method Not Allowed\r\nContent-Length: 0\r\nConnection: close\r\n\r\n"
+            }
+            RequestStatus::InternalServerError => {
+                "HTTP/1.1 500 Internal Server Error\r\nContent-Length: 0\r\nConnection: close\r\n\r\n"
+            }
         };
         _ = stream.write_all(response.as_bytes()).await;
     }

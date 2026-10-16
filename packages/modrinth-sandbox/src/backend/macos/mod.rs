@@ -1,5 +1,8 @@
 use std::{
-    ffi::{CString, OsString}, os::unix::ffi::OsStringExt, path::{Path, PathBuf}, sync::Arc,
+    ffi::{CString, OsString},
+    os::unix::ffi::OsStringExt,
+    path::{Path, PathBuf},
+    sync::Arc,
 };
 
 use async_trait::async_trait;
@@ -7,9 +10,13 @@ use derive_more::Debug;
 use eyre::{Context, OptionExt, Result};
 
 use crate::{
-    ExposedPath, SandboxCommand, SandboxExitStatus, backend::{
-        Backend, SandboxChild, SandboxChildOp, SandboxEnv, SandboxHandleOp, pathset::ReadWritePathSet, unix::{self, UnixChild},
-    }, util::{RawStringVec, resolve_path},
+    ExposedPath, SandboxCommand, SandboxExitStatus,
+    backend::{
+        Backend, SandboxChild, SandboxChildOp, SandboxEnv, SandboxHandleOp,
+        pathset::ReadWritePathSet,
+        unix::{self, UnixChild},
+    },
+    util::{RawStringVec, resolve_path},
 };
 
 use super::SandboxHandle;
@@ -140,7 +147,7 @@ fn spawn(
         stderr: pipes.stderr,
         on_finish: command.on_finish,
         handle: SandboxHandle::Macos(MacosSandboxHandle {
-            path_set: Arc::new(path_set)
+            path_set: Arc::new(path_set),
         }),
         imp: SandboxChild::Macos(MacosChild {
             child,
@@ -186,7 +193,11 @@ pub struct MacosSandboxHandle {
 }
 
 impl SandboxHandleOp for MacosSandboxHandle {
-    fn expose_path(&self, _path: &Path, _allow_write: bool) -> eyre::Result<ExposedPath> {
+    fn expose_path(
+        &self,
+        _path: &Path,
+        _allow_write: bool,
+    ) -> eyre::Result<ExposedPath> {
         Err(eyre::eyre!("unsupported"))
     }
 

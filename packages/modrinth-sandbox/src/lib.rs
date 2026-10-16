@@ -1,14 +1,17 @@
 #![doc = include_str!("../README.md")]
 
+pub mod api;
 mod backend;
 pub mod ffi;
-pub mod sandboxapi;
 pub mod helper;
 pub mod minecraft;
 mod util;
 
 use std::{
-    collections::{BTreeMap, BTreeSet}, io::{PipeReader, PipeWriter}, path::{Path, PathBuf}, sync::Arc,
+    collections::{BTreeMap, BTreeSet},
+    io::{PipeReader, PipeWriter},
+    path::{Path, PathBuf},
+    sync::Arc,
 };
 
 use derive_more::Debug;
@@ -17,7 +20,10 @@ use eyre::Result;
 pub use backend::SandboxExitStatus;
 pub use util::SandboxArg;
 
-use crate::{backend::{SandboxChildOp, SandboxHandleOp}, helper::MakeHelper};
+use crate::{
+    backend::{SandboxChildOp, SandboxHandleOp},
+    helper::MakeHelper,
+};
 
 /// Allows spawning processes in a sandboxed environment, configured by
 /// [`SandboxCommand`].
@@ -119,7 +125,7 @@ impl SandboxEnv {
 ///
 /// This is a low-level configuration struct which is not aware of Minecraft,
 /// Java, etc. If launching a Minecraft client, first create a command using
-/// [`minecraft::create_command`], then customize it to your needs.
+/// [`minecraft::setup_minecraft_command`], then customize it to your needs.
 ///
 /// # Implementation notes
 ///
@@ -228,7 +234,10 @@ impl SandboxChild {
 
     /// Add a callback to be run when the process finishes or the struct is dropped
     /// Requires one of the kill/wait/try_wait/etc. methods to be called
-    pub fn run_on_finish(&mut self, on_finish: Box<dyn FnOnce() + Send + Sync>) {
+    pub fn run_on_finish(
+        &mut self,
+        on_finish: Box<dyn FnOnce() + Send + Sync>,
+    ) {
         self.on_finish.push(on_finish);
     }
 
@@ -272,7 +281,9 @@ impl SandboxChild {
     }
 
     pub fn get_sandbox_handle(&self) -> SandboxHandle {
-        SandboxHandle { imp: self.handle.clone() }
+        SandboxHandle {
+            imp: self.handle.clone(),
+        }
     }
 
     fn finish(&mut self) {
@@ -293,7 +304,11 @@ pub struct SandboxHandle {
 }
 
 impl SandboxHandle {
-    pub fn expose_path(&self, path: &Path, writeable: bool) -> eyre::Result<ExposedPath> {
+    pub fn expose_path(
+        &self,
+        path: &Path,
+        writeable: bool,
+    ) -> eyre::Result<ExposedPath> {
         self.imp.expose_path(path, writeable)
     }
 

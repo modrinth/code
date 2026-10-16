@@ -23,32 +23,19 @@ use crate::util::rpc::RpcServerBuilder;
 use crate::{State, process};
 use chrono::Utc;
 use daedalus as d;
-use daedalus::minecraft::{
-    LoggingConfiguration, LoggingSide, RuleAction, VersionInfo,
-};
+use daedalus::minecraft::{RuleAction, VersionInfo};
 use daedalus::modded::{LoaderVersion, Manifest};
-use modrinth_sandbox::sandboxapi::service::{SandboxApiLauncher, SandboxApiService};
-use modrinth_sandbox::{
-    SandboxStdio,
-    minecraft::{MinecraftCommand, MinecraftLoggingConfig},
-};
-use parking_lot::Mutex;
 use serde::Deserialize;
-use uuid::Uuid;
-use std::collections::HashMap;
 use std::future::Future;
 use std::path::{Path, PathBuf};
-use std::sync::{Arc, OnceLock};
 use tokio::process::Command;
 
 mod args;
 pub(crate) mod hooks;
+mod sandbox;
 
 pub mod download;
 pub mod quick_play_version;
-
-const THESEUS_MINECRAFT_LAUNCHER_MAIN_CLASS: &str =
-    "com.modrinth.theseus.MinecraftLaunch";
 
 // All nones -> disallowed
 // 1+ true -> allowed
@@ -954,17 +941,6 @@ pub async fn launch_minecraft(
         .as_error());
     }
 
-    let java_path = Path::new(&java_version.path);
-    let jre_path = java_path
-        .parent()
-        .and_then(Path::parent)
-        .ok_or_else(|| {
-            crate::ErrorKind::LauncherError(format!(
-                "Could not determine Java runtime directory from {}",
-                java_version.path
-            ))
-        })?
-        .to_path_buf();
     let env_args = Vec::from(env_args);
 
     // Check if instance has a running process, and reject running the command if it does
@@ -1003,11 +979,6 @@ pub async fn launch_minecraft(
     }
 
     io::create_dir_all(instance_path.join("mods")).await?;
-
-    let persistent_dir = state.directories.instance_data_dir();
-    for directory in ["home", "data", "config", "cache", "state"] {
-        io::create_dir_all(persistent_dir.join(directory)).await?;
-    }
 
     let quick_play_version =
         QuickPlayVersion::find_version(version_index, &minecraft.versions);
@@ -1055,14 +1026,14 @@ pub async fn launch_minecraft(
 
     let rpc_server = RpcServerBuilder::new().launch().await?;
 
-    let mut classpath = vec![main_class_path.clone(), client_path];
+    let mut classpath = vec![client_path];
     classpath.extend(args::get_class_paths(
         &state.directories.libraries_dir(),
         version_info.libraries.as_slice(),
         &java_version.architecture,
         minecraft_updated,
     )?);
-    let mut jvm_args = args::get_jvm_arguments(
+    let jvm_args = args::get_jvm_arguments(
         args.get(&d::minecraft::ArgumentType::Jvm)
             .map(|x| x.as_slice()),
         &version_jar,
@@ -1073,67 +1044,15 @@ pub async fn launch_minecraft(
         quick_play_version,
     )?;
 
-    let rpc_address = rpc_server.address();
-    jvm_args.extend([
-        format!("-Dmodrinth.internal.ipc.host={}", rpc_address.ip()),
-        format!("-Dmodrinth.internal.ipc.port={}", rpc_address.port()),
-    ]);
-
-    // The java launcher requires access to java.lang.reflect in order to force access in to
-    // whatever module the main class is in
-    if java_version.parsed_version >= 9 {
-        jvm_args.push(
-            "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED".to_owned(),
-        );
-    }
-
-    // The java launcher code requires internal JDK code in Java 25+ in order to support JEP 512
-    if java_version.parsed_version >= 25 {
-        jvm_args.push(
-            "--add-opens=jdk.internal/jdk.internal.misc=ALL-UNNAMED".to_owned(),
-        );
-    }
-
-    let mut access_token = credentials.access_token.clone();
     let profile = credentials.maybe_online_profile().await;
-
-    let sandbox_api_child = if true { // todo(boris): check if sandbox is enabled, do we have this yet?
-        // todo(boris): do you want to do a noninteractive login here?
-        #[derive(Default)]
-        struct SimpleLoginHandler(Mutex<HashMap<Uuid, Arc<str>>>);
-        impl SandboxApiLauncher for SimpleLoginHandler {
-            fn login(&self, uuid: Uuid, token: tokio::sync::oneshot::Sender<Arc<str>>) {
-                if let Some(access_token) = self.0.lock().get(&uuid) {
-                    _ = token.send(access_token.clone());
-                }
-            }
-        }
-
-        // Create simple login handler
-        static SIMPLE_LOGIN_HANDLER: OnceLock<Arc<SimpleLoginHandler>> = OnceLock::new();
-        let simple_login_handler = SIMPLE_LOGIN_HANDLER.get_or_init(Default::default).clone();
-
-        // Register uuid -> access token
-        simple_login_handler.0.lock().insert(profile.id, access_token.into());
-
-        // Create sandbox service
-        static SANDBOX_SERVICE: OnceLock<SandboxApiService> = OnceLock::new();
-        let sandbox_service = SANDBOX_SERVICE.get_or_init(move || {
-            SandboxApiService::new(28881, simple_login_handler)
-        }).clone();
-
-        let sandbox_api_child = sandbox_service.start(profile.id);
-        access_token = sandbox_api_child.get_dummy_access_token().to_string();
-        Some(sandbox_api_child)
-    } else {
-        None
-    };
+    let sandbox_session =
+        sandbox::prepare_session(profile.id, credentials.access_token.clone());
 
     let game_args = args::get_minecraft_arguments(
         args.get(&d::minecraft::ArgumentType::Game)
             .map(|x| x.as_slice()),
         version_info.minecraft_arguments.as_deref(),
-        &access_token,
+        &sandbox_session.access_token,
         &profile.name,
         profile.id,
         &version.id,
@@ -1147,45 +1066,22 @@ pub async fn launch_minecraft(
         quick_play_version,
     )?;
 
-    let mut launcher_args = Vec::with_capacity(game_args.len() + 1);
-    launcher_args.push(version_info.main_class.clone().into());
-    launcher_args.extend(game_args.into_iter().map(|arg| arg.into()));
-
-    let logging_config = version_info
-        .logging
-        .as_ref()
-        .and_then(|logging| logging.get(&LoggingSide::Client))
-        .map(|logging| match logging {
-            LoggingConfiguration::Log4j2Xml { argument, file } => {
-                MinecraftLoggingConfig {
-                    path: state.directories.log_configs_dir().join(&file.id),
-                    argument: argument.clone(),
-                }
-            }
-        });
-
-    let command = MinecraftCommand {
-        sandbox_api_child,
-        jre_path,
-        java_agent: Some(main_class_path),
-        classpath,
-        natives_path: natives_dir,
-        assets_path,
-        logging_config,
-        instance_path: instance_path.clone(),
-        persistent_dir,
-        jvm_args: jvm_args.into_iter().map(Into::into).collect(),
-        main_class: THESEUS_MINECRAFT_LAUNCHER_MAIN_CLASS.into(),
-        main_class_args: launcher_args,
-        extra_environment: env_args
-            .iter()
-            .cloned()
-            .map(|(key, value)| (key.into(), value.into()))
-            .collect(),
-        stdin: SandboxStdio::Null,
-        stdout: SandboxStdio::Pipe,
-        stderr: SandboxStdio::Pipe,
-    };
+    let command = sandbox::prepare_command(
+        sandbox_session,
+        sandbox::CommandInput {
+			directories: &state.directories,
+			java: &java_version,
+			version_info: &version_info,
+			version_jar: &version_jar,
+			java_agent: main_class_path,
+			classpath,
+            rpc_address: rpc_server.address(),
+            instance_path: instance_path.clone(),
+            jvm_args,
+            game_args,
+        },
+        &env_args,
+    )?;
 
     if let Err(error) =
         crate::api::instance::reconcile_synced_packs(&instance.id).await

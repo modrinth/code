@@ -77,11 +77,13 @@ pub async fn open_file_safe(path: PathBuf) {
     // Ensure extension matches files we allow (images, video, audio)
     match extension.to_ascii_lowercase().as_encoded_bytes() {
         // Image formats
-        b"jpg" | b"jpeg" | b"png" | b"gif" | b"webp" | b"cr2" | b"tif" | b"tiff" | b"bmp" => {},
+        b"jpg" | b"jpeg" | b"png" | b"gif" | b"webp" | b"cr2" | b"tif"
+        | b"tiff" | b"bmp" => {}
         // Video formats
         b"mp4" | b"m4v" | b"mkv" | b"webm" | b"mov" | b"avi" | b"mpg" => {}
         // Audio formats
-        b"mid" | b"mp3" | b"m4a" | b"ogg" | b"flac" | b"wav" | b"amr" | b"aac" | b"aiff" => {}
+        b"mid" | b"mp3" | b"m4a" | b"ogg" | b"flac" | b"wav" | b"amr"
+        | b"aac" | b"aiff" => {}
         // Refuse to open other formats
         _ => {
             return;
@@ -94,7 +96,8 @@ pub async fn open_file_safe(path: PathBuf) {
     // with a malicious executable after we check the mime.
     #[cfg(target_os = "linux")]
     let path = {
-        let mut new_path = std::env::temp_dir().join(Uuid::now_v7().to_string());
+        let mut new_path =
+            std::env::temp_dir().join(Uuid::now_v7().to_string());
         new_path.set_extension(extension);
         if tokio::fs::copy(&path, &new_path).await.is_err() {
             return;
@@ -107,7 +110,10 @@ pub async fn open_file_safe(path: PathBuf) {
         return;
     };
     let matcher_type = file_type.matcher_type();
-    if !matches!(matcher_type, MatcherType::Image | MatcherType::Video | MatcherType::Audio) {
+    if !matches!(
+        matcher_type,
+        MatcherType::Image | MatcherType::Video | MatcherType::Audio
+    ) {
         return;
     }
 

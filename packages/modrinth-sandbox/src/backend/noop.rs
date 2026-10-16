@@ -1,12 +1,17 @@
 use std::{
-    io::{PipeReader, PipeWriter}, path::Path, process::Stdio,
+    io::{PipeReader, PipeWriter},
+    path::Path,
+    process::Stdio,
 };
 
 use async_trait::async_trait;
 use eyre::{Context, Result, eyre};
 
 use crate::{
-    SandboxCommand, SandboxExitStatus, SandboxStdio, backend::{Backend, ExposedPath, SandboxChildOp, SandboxEnv, SandboxHandleOp},
+    SandboxCommand, SandboxExitStatus, SandboxStdio,
+    backend::{
+        Backend, ExposedPath, SandboxChildOp, SandboxEnv, SandboxHandleOp,
+    },
 };
 
 use super::SandboxHandle;
@@ -164,7 +169,11 @@ fn sandbox_exit_status(status: std::process::ExitStatus) -> SandboxExitStatus {
 pub struct NoopSandboxHandle;
 
 impl SandboxHandleOp for NoopSandboxHandle {
-    fn expose_path(&self, _path: &Path, _allow_write: bool) -> eyre::Result<ExposedPath> {
+    fn expose_path(
+        &self,
+        _path: &Path,
+        _allow_write: bool,
+    ) -> eyre::Result<ExposedPath> {
         Ok(ExposedPath::Direct)
     }
 

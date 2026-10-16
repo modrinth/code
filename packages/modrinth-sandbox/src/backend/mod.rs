@@ -1,14 +1,19 @@
 //! Backend sandbox implementations, using OS-specific primitives.
 
 use std::{
-    collections::{BTreeMap, HashSet}, ffi::OsString, fmt::Debug, path::{Path, PathBuf},
+    collections::{BTreeMap, HashSet},
+    ffi::OsString,
+    fmt::Debug,
+    path::{Path, PathBuf},
 };
 
 use async_trait::async_trait;
 use enum_dispatch::enum_dispatch;
 use eyre::Result;
 
-use crate::{ExposedPath, SandboxCommand, helper::MakeHelper, util::SandboxArg};
+use crate::{
+    ExposedPath, SandboxCommand, helper::MakeHelper, util::SandboxArg,
+};
 
 #[cfg(target_os = "linux")]
 mod bubblewrap;
@@ -188,7 +193,11 @@ impl std::fmt::Display for SandboxExitStatus {
 
 #[enum_dispatch]
 pub trait SandboxHandleOp {
-    fn expose_path(&self, path: &Path, allow_write: bool) -> eyre::Result<ExposedPath>;
+    fn expose_path(
+        &self,
+        path: &Path,
+        allow_write: bool,
+    ) -> eyre::Result<ExposedPath>;
     fn is_path_readable(&self, path: &Path) -> bool;
     fn is_path_writeable(&self, path: &Path) -> bool;
 }

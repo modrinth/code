@@ -26,10 +26,10 @@ impl ReadWritePathSet {
         }
 
         match self.readable.binary_search(&path) {
-            Ok(_) => {},
+            Ok(_) => {}
             Err(index) => {
                 self.readable.insert(index, path);
-            },
+            }
         }
     }
 
@@ -38,16 +38,16 @@ impl ReadWritePathSet {
         let path = lower_path(path);
 
         match self.writeable.binary_search(&path) {
-            Ok(_) => {},
+            Ok(_) => {}
             Err(index) => {
                 self.writeable.insert(index, path.clone());
-            },
+            }
         }
         match self.readable.binary_search(&path) {
-            Ok(_) => {},
+            Ok(_) => {}
             Err(index) => {
                 self.readable.insert(index, path);
-            },
+            }
         }
     }
 
@@ -58,7 +58,7 @@ impl ReadWritePathSet {
         let search_until = match self.readable.binary_search(&path) {
             Ok(_) => {
                 return true;
-            },
+            }
             Err(search_until) => search_until,
         };
 
@@ -87,7 +87,7 @@ impl ReadWritePathSet {
         let search_write_until = match self.writeable.binary_search(&path) {
             Ok(_) => {
                 return true;
-            },
+            }
             Err(search_write_until) => search_write_until,
         };
 
@@ -100,12 +100,13 @@ impl ReadWritePathSet {
             if path.starts_with(writeable_candidate) {
                 // If exclusive, we need to check if there's a read-only subpath
                 if self.exclusive {
-                    let search_read_until = match self.readable.binary_search(&path) {
-                        Ok(_) => {
-                            return false; // Exact read-only path
-                        },
-                        Err(search_read_until) => search_read_until,
-                    };
+                    let search_read_until =
+                        match self.readable.binary_search(&path) {
+                            Ok(_) => {
+                                return false; // Exact read-only path
+                            }
+                            Err(search_read_until) => search_read_until,
+                        };
 
                     for index in (0..search_read_until).rev() {
                         let readable_candidate = &self.readable[index];
@@ -113,9 +114,11 @@ impl ReadWritePathSet {
                             // Found read-only parent, compare length
                             // If readable is longer, it means its a read-only subpath
                             // that takes priority over our writeable parent
-                            return writeable_candidate.as_os_str().len() >=
-                                readable_candidate.as_os_str().len();
-                        } else if readable_candidate.parent() == Some(path_parent) {
+                            return writeable_candidate.as_os_str().len()
+                                >= readable_candidate.as_os_str().len();
+                        } else if readable_candidate.parent()
+                            == Some(path_parent)
+                        {
                             continue; // Siblings, continue backwards to find potential parent
                         } else {
                             break;
