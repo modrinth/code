@@ -1,10 +1,10 @@
 #![doc = include_str!("../README.md")]
 
+pub mod api;
 mod backend;
 pub mod ffi;
 pub mod helper;
 pub mod minecraft;
-pub mod sandboxapi;
 mod util;
 
 use std::{

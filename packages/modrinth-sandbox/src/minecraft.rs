@@ -20,7 +20,7 @@ pub struct MinecraftCommand {
     /// Child reference to the sandbox API service, created using
     /// [`SandboxApiService::start`]
     ///
-    /// [`SandboxApiService::start`]: crate::sandboxapi::service::SandboxApiService::start
+    /// [`SandboxApiService::start`]: crate::api::SandboxApiService::start
     pub sandbox_api_child: Option<SandboxApiChild>,
     /// Path to the Java Runtime Environment on the host.
     pub jre_path: PathBuf,
