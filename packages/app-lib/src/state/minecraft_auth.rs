@@ -22,7 +22,6 @@ use std::borrow::Cow;
 use std::collections::HashMap;
 use std::future::Future;
 use std::hash::{BuildHasherDefault, DefaultHasher};
-use std::io;
 use std::ops::Deref;
 use std::sync::Arc;
 use std::time::Instant;
@@ -185,7 +184,7 @@ pub async fn login_finish(
     let online_profile = credentials
         .online_profile()
         .await
-        .ok_or(io::Error::other("Failed to fetch player profile"))?;
+        .ok_or(ErrorKind::NoMinecraftProfile)?;
     credentials.offline_profile = MinecraftProfile {
         id: online_profile.id,
         name: online_profile.name.clone(),

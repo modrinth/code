@@ -231,6 +231,9 @@ pub enum ErrorKind {
     #[error("No loader version selected for {}", .loader.as_str())]
     NoLoaderVersion { loader: ModLoader },
 
+    #[error("Failed to fetch player profile")]
+    NoMinecraftProfile,
+
     #[error("Move directory error")]
     DirectoryMoveFailed,
 
@@ -279,6 +282,7 @@ impl ErrorKind {
             Self::LoginCanceled => "login_canceled",
             Self::NoCredentialsError => "not_logged_in",
             Self::NoLoaderVersion { .. } => "no_loader_version",
+            Self::NoMinecraftProfile => "minecraft_auth_no_profile",
             Self::LauncherError(_) => "launcher_error",
             Self::JREError(_) => "java_error",
             Self::NoValueFor(_) | Self::MetadataError(_) => "metadata_error",
