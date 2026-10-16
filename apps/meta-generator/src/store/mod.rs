@@ -5,7 +5,7 @@ mod s3;
 
 pub use cas::BlobCas;
 pub use maven::MavenStore;
-use modrinth_minecraft_meta::util::Sha256;
+use minecraft_meta_manifest::util::Sha256;
 use url::Url;
 
 use std::{fmt::Debug, pin::Pin, sync::Arc};

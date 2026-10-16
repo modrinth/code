@@ -10,10 +10,11 @@ members = [
   "packages/ariadne",
   "packages/component-derive",
   "packages/daedalus",
+  "packages/minecraft-meta-manifest",
+  "packages/minecraft-meta-model",
   "packages/modrinth-content-management",
   "packages/modrinth-log",
   "packages/modrinth-maxmind",
-  "packages/modrinth-minecraft-meta",
   "packages/modrinth-util",
   "packages/neverbounce",
   "packages/path-util",
@@ -143,9 +144,10 @@ lz4_flex = { version = "0.11.5", default-features = false, features = [
 ] }
 maxminddb = "0.26.0"
 md5 = "0.8.0"
+minecraft-meta-manifest = { path = "packages/minecraft-meta-manifest/" }
+minecraft-meta-model = { path = "packages/minecraft-meta-model/" }
 modrinth-content-management = { path = "packages/modrinth-content-management/" }
 modrinth-log = { path = "packages/modrinth-log/" }
-modrinth-minecraft-meta = { path = "packages/modrinth-minecraft-meta/" }
 modrinth-util = { path = "packages/modrinth-util/" }
 muralpay = { path = "packages/muralpay/" }
 murmur2 = "0.1.0"

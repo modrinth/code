@@ -7918,7 +7918,8 @@ dependencies = [
  "hex",
  "indexmap 2.14.2",
  "jiff",
- "modrinth-minecraft-meta",
+ "minecraft-meta-manifest",
+ "minecraft-meta-model",
  "reqwest 0.12.24",
  "rust-s3",
  "secrecy",
@@ -7970,6 +7971,42 @@ checksum = "f7c44f8e672c00fe5308fa235f821cb4198414e1c77935c1ab6948d3fd78550e"
 dependencies = [
  "mime",
  "unicase",
+]
+
+[[package]]
+name = "minecraft-meta-manifest"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "derive_more 2.1.1",
+ "hex",
+ "indexmap 2.14.2",
+ "jiff",
+ "regex",
+ "serde",
+ "serde_json",
+ "serde_path_to_error",
+ "sha1 0.10.6",
+ "sha2 0.10.9",
+ "toasty",
+ "url",
+]
+
+[[package]]
+name = "minecraft-meta-model"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "derive_more 2.1.1",
+ "indexmap 2.14.2",
+ "jiff",
+ "minecraft-meta-manifest",
+ "regex",
+ "serde",
+ "serde_json",
+ "toasty",
+ "url",
+ "uuid 1.23.3",
 ]
 
 [[package]]
@@ -8055,26 +8092,6 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-subscriber",
-]
-
-[[package]]
-name = "modrinth-minecraft-meta"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "derive_more 2.1.1",
- "hex",
- "indexmap 2.14.2",
- "jiff",
- "regex",
- "serde",
- "serde_json",
- "serde_path_to_error",
- "sha1 0.10.6",
- "sha2 0.10.9",
- "toasty",
- "url",
- "uuid 1.23.3",
 ]
 
 [[package]]

@@ -1,7 +1,7 @@
 use std::{path::PathBuf, pin::Pin};
 
 use anyhow::{Context, Result};
-use modrinth_minecraft_meta::util::Sha256;
+use minecraft_meta_manifest::util::Sha256;
 use tokio::{fs, io::AsyncWriteExt};
 use tracing::{info_span, warn};
 use tracing_anyhow::FutureContext;

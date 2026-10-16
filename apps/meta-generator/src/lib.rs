@@ -22,7 +22,7 @@ mod import;
 mod store;
 mod util;
 
-pub use modrinth_minecraft_meta::{model, upstream};
+pub use minecraft_meta_model::{model, upstream};
 
 #[derive(Debug, clap::Parser)]
 struct Cli {
@@ -168,7 +168,7 @@ pub fn create_config() -> Result<Config> {
 
 pub async fn connect_to_db(config: &Config) -> Result<toasty::Db> {
     toasty::Db::builder()
-        .models(toasty::models!(modrinth_minecraft_meta::*))
+        .models(toasty::models!(minecraft_meta_model::*))
         .connect(config.database_url.as_str())
         .context(info_span!("connecting to database"))
         .await

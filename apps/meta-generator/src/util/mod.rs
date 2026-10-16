@@ -4,4 +4,4 @@ mod http;
 
 pub use error::*;
 pub use http::*;
-pub use modrinth_minecraft_meta::util::*;
+pub use minecraft_meta_manifest::util::*;
