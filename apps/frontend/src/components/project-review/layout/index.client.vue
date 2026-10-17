@@ -1,5 +1,5 @@
 <template>
-	<section class="project-review relative flex overflow-hidden bg-bg" aria-label="Project Review">
+	<section class="project-review relative flex overflow-hidden bg-surface-1" aria-label="Project Review">
 		<WorkbenchLayout class="min-w-0 flex-1" :workbench="workbench">
 			<template v-for="panel in panels" :key="panel.id" #[`panel-${panel.id}`]>
 				<ProjectReviewPanel :slot-name="panel.id as ProjectReviewSlot" />

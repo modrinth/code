@@ -7838,17 +7838,17 @@
   "workbench.collapse-toolbar": {
     "defaultMessage": "Hide toolbar"
   },
-  "workbench.corner.hide": {
+  "workbench.corner.hide-panel": {
     "defaultMessage": "Hide {name}"
   },
-  "workbench.corner.left": {
-    "defaultMessage": "left panel"
+  "workbench.corner.hide-region": {
+    "defaultMessage": "{side, select, left {Hide left panel} other {Hide right panel}}"
   },
-  "workbench.corner.right": {
-    "defaultMessage": "right panel"
-  },
-  "workbench.corner.show": {
+  "workbench.corner.show-panel": {
     "defaultMessage": "Show {name}"
+  },
+  "workbench.corner.show-region": {
+    "defaultMessage": "{side, select, left {Show left panel} other {Show right panel}}"
   },
   "workbench.expand-toolbar": {
     "defaultMessage": "Show toolbar"

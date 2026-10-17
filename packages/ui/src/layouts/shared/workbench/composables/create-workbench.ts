@@ -51,11 +51,11 @@ import {
 	registerNoSplits,
 	registerPanelOnlyDrops,
 	registerWrappedTabs,
-} from './workbench-dock-behaviours'
-import { useWorkbenchMenus } from './workbench-menus'
-import { type DockPopouts, createDockPopouts, usePopoutServices } from './workbench-popouts'
-import { useWorkbenchSelection } from './workbench-selection'
-import { useWorkbenchWindows } from './workbench-windows'
+} from './dock-behaviours'
+import { createDockPopouts, type DockPopouts, usePopoutServices } from './dock-popouts'
+import { useWorkbenchMenus } from './use-menus'
+import { useWorkbenchSelection } from './use-tab-selection'
+import { useWorkbenchWindows } from './use-windows'
 
 export const WORKBENCH_DOCK_COMPONENT = 'workbenchDock'
 export const WORKBENCH_PANEL_COMPONENT = 'workbenchPanel'
@@ -987,7 +987,7 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 		setMenuOpener: (opener) => (openMenu = opener),
 		openPanelMenu: () => {},
 		openRegionMenu: () => {},
-		openPanelsMenu: () => {},
+		panelsMenuOptions: computed(() => []),
 		documentMoveOption: () => null,
 	}
 

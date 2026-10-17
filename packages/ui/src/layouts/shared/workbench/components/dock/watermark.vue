@@ -15,7 +15,7 @@ import { computed } from 'vue'
 
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 
-import { injectWorkbench, injectWorkbenchDock } from '../providers/workbench'
+import { injectWorkbench, injectWorkbenchDock } from '../../providers/workbench'
 
 defineOptions({ inheritAttrs: false })
 

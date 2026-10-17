@@ -9,9 +9,9 @@
 			:theme="theme"
 			:components="components"
 			:tab-components="tabComponents"
-			:prefix-header-actions-component="cornerToggles ? WorkbenchCornerToggle : undefined"
-			:right-header-actions-component="WorkbenchHeaderActions"
-			:watermark-component="WorkbenchWatermark"
+			:prefix-header-actions-component="cornerToggles ? CornerToggle : undefined"
+			:right-header-actions-component="HeaderActions"
+			:watermark-component="Watermark"
 			:popout-url="workbench.mode.popouts?.url"
 			dnd-strategy="html5"
 			disable-floating-groups
@@ -42,13 +42,13 @@ import {
 	WORKBENCH_PANEL_COMPONENT,
 	WORKBENCH_TAB_COMPONENT,
 	type WorkbenchDockParams,
-} from '../composables/workbench-layout'
-import { injectWorkbench, provideWorkbenchDock } from '../providers/workbench'
-import WorkbenchCornerToggle from './WorkbenchCornerToggle.vue'
-import WorkbenchHeaderActions from './WorkbenchHeaderActions.vue'
-import WorkbenchPanel from './WorkbenchPanel.vue'
-import WorkbenchTab from './WorkbenchTab.vue'
-import WorkbenchWatermark from './WorkbenchWatermark.vue'
+} from '../../composables/create-workbench'
+import { injectWorkbench, provideWorkbenchDock } from '../../providers/workbench'
+import CornerToggle from './corner-toggle.vue'
+import HeaderActions from './header-actions.vue'
+import Panel from './panel.vue'
+import Tab from './tab.vue'
+import Watermark from './watermark.vue'
 
 /** Gridview hands its panels their params and api directly, unlike dockview's nested `params`. */
 const props = defineProps<{
@@ -72,11 +72,11 @@ const theme: DockviewTheme = {
 }
 
 const components = {
-	[WORKBENCH_PANEL_COMPONENT]: WorkbenchPanel,
+	[WORKBENCH_PANEL_COMPONENT]: Panel,
 	...workbench.documents?.components,
 }
 const tabComponents = {
-	[WORKBENCH_TAB_COMPONENT]: WorkbenchTab,
+	[WORKBENCH_TAB_COMPONENT]: Tab,
 	...workbench.documents?.tabComponents,
 }
 

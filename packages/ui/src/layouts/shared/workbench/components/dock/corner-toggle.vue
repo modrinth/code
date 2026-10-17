@@ -28,7 +28,7 @@ import { computed } from 'vue'
 import { IconButton } from '#ui/components/base/buttons'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 
-import { injectWorkbench } from '../providers/workbench'
+import { injectWorkbench } from '../../providers/workbench'
 
 defineOptions({ inheritAttrs: false })
 
@@ -44,10 +44,16 @@ const { formatMessage } = useVIntl()
 const workbench = injectWorkbench()
 
 const messages = defineMessages({
-	show: { id: 'workbench.corner.show', defaultMessage: 'Show {name}' },
-	hide: { id: 'workbench.corner.hide', defaultMessage: 'Hide {name}' },
-	left: { id: 'workbench.corner.left', defaultMessage: 'left panel' },
-	right: { id: 'workbench.corner.right', defaultMessage: 'right panel' },
+	showPanel: { id: 'workbench.corner.show-panel', defaultMessage: 'Show {name}' },
+	hidePanel: { id: 'workbench.corner.hide-panel', defaultMessage: 'Hide {name}' },
+	showRegion: {
+		id: 'workbench.corner.show-region',
+		defaultMessage: '{side, select, left {Show left panel} other {Show right panel}}',
+	},
+	hideRegion: {
+		id: 'workbench.corner.hide-region',
+		defaultMessage: '{side, select, left {Hide left panel} other {Hide right panel}}',
+	},
 })
 
 /** Only the group in the center's outer corner on this side shows the toggle, once. */
@@ -61,12 +67,18 @@ const icon = computed(() => {
 	if (props.side === 'left') return visible.value ? PanelLeftCloseIcon : PanelLeftOpenIcon
 	return visible.value ? PanelRightCloseIcon : PanelRightOpenIcon
 })
-/** Named after the region's panel when it holds just one, e.g. "Show project details". */
+/** Named after the region's panel when it holds just one, e.g. "Show Project details". */
 const label = computed(() => {
 	const held = workbench.panels.value.filter(
 		(panel) => workbench.isOpen(panel.id) && workbench.regionOf(panel) === props.side,
 	)
-	const name = held.length === 1 ? held[0].title : formatMessage(messages[props.side])
-	return formatMessage(visible.value ? messages.hide : messages.show, { name })
+	if (held.length === 1) {
+		return formatMessage(visible.value ? messages.hidePanel : messages.showPanel, {
+			name: held[0].title,
+		})
+	}
+	return formatMessage(visible.value ? messages.hideRegion : messages.showRegion, {
+		side: props.side,
+	})
 })
 </script>

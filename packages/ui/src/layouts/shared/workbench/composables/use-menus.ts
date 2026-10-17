@@ -8,6 +8,8 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 
+import { computed } from 'vue'
+
 import type { ButtonMenuLeafOption, ButtonMenuOption } from '#ui/components/base/buttons/types'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 
@@ -46,7 +48,7 @@ export function useWorkbenchMenus(
 	open: (event: MouseEvent, options: ButtonMenuOption[]) => void,
 ): Pick<
 	WorkbenchContext,
-	'openPanelMenu' | 'openRegionMenu' | 'openPanelsMenu' | 'documentMoveOption'
+	'openPanelMenu' | 'openRegionMenu' | 'panelsMenuOptions' | 'documentMoveOption'
 > {
 	const { formatMessage } = useVIntl()
 	const { mode } = workbench
@@ -80,7 +82,16 @@ export function useWorkbenchMenus(
 		} satisfies ButtonMenuOption
 	}
 
+	/**
+	 * Menus open in the main document, so ones asked for from a popout window (whose events come
+	 * from its own window) aren't shown there.
+	 */
+	function inMainWindow(event: MouseEvent) {
+		return !event.view || event.view === window
+	}
+
 	function openPanelMenu(event: MouseEvent, id: string) {
+		if (!inMainWindow(event)) return
 		const panel = workbench.panels.value.find((candidate) => candidate.id === id)
 		if (!panel) return
 		const host = workbench.regionOf(panel)
@@ -152,6 +163,7 @@ export function useWorkbenchMenus(
 	}
 
 	function openRegionMenu(event: MouseEvent, host: WorkbenchHost) {
+		if (!inMainWindow(event)) return
 		const closedOptions = mode.closePanels ? openClosedOptions(host) : []
 		const options: ButtonMenuOption[] = []
 		if (closedOptions.length) {
@@ -174,24 +186,23 @@ export function useWorkbenchMenus(
 		if (options.length) open(event, options)
 	}
 
-	function openPanelsMenu(event: MouseEvent) {
-		open(event, [
-			{ type: 'heading', id: 'panels', label: formatMessage(messages.panels) },
-			...workbench.panels.value.map((panel) => {
-				const isOpen = workbench.isOpen(panel.id)
-				return {
-					id: `panel-${panel.id}`,
-					label: panel.title,
-					icon: panel.icon,
-					selected: isOpen,
-					action: () =>
-						isOpen && mode.closePanels
-							? workbench.closePanel(panel.id)
-							: workbench.revealPanel(panel.id),
-				}
-			}),
-		])
-	}
+	/** Every panel, to open or close each, e.g. for a toolbar menu. */
+	const panelsMenuOptions = computed<ButtonMenuOption[]>(() => [
+		{ type: 'heading', id: 'panels', label: formatMessage(messages.panels) },
+		...workbench.panels.value.map((panel) => {
+			const isOpen = workbench.isOpen(panel.id)
+			return {
+				id: `panel-${panel.id}`,
+				label: panel.title,
+				icon: panel.icon,
+				selected: isOpen,
+				action: () =>
+					isOpen && mode.closePanels
+						? workbench.closePanel(panel.id)
+						: workbench.revealPanel(panel.id),
+			}
+		}),
+	])
 
 	function documentMoveOption(id: string) {
 		const host = workbench.hostOfDocument(id)
@@ -199,5 +210,5 @@ export function useWorkbenchMenus(
 		return moveToOption(host, (target) => workbench.moveDocument(id, target))
 	}
 
-	return { openPanelMenu, openRegionMenu, openPanelsMenu, documentMoveOption }
+	return { openPanelMenu, openRegionMenu, panelsMenuOptions, documentMoveOption }
 }

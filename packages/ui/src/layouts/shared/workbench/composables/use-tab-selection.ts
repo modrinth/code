@@ -1,7 +1,7 @@
 import type { DockviewApi, IDockviewPanel } from 'dockview-vue'
 import { shallowRef } from 'vue'
 
-import type { WorkbenchWindows } from './workbench-windows'
+import type { WorkbenchWindows } from './use-windows'
 
 /** The attribute on a tab's content naming the panel it belongs to. */
 export const WORKBENCH_TAB_ATTRIBUTE = 'data-workbench-panel'

@@ -82,8 +82,8 @@ export interface WorkbenchContext {
 	openPanelMenu: (event: MouseEvent, id: string) => void
 	/** The menu of a dock's tab bar: opening closed panels there, or hiding the region. */
 	openRegionMenu: (event: MouseEvent, host: WorkbenchHost) => void
-	/** The menu listing every panel, to open or close each. */
-	openPanelsMenu: (event: MouseEvent) => void
+	/** Options listing every panel, to open or close each. */
+	panelsMenuOptions: ComputedRef<ButtonMenuOption[]>
 	/** A "Move to" entry for a document's own tab menu, or `null` when it can't be moved. */
 	documentMoveOption: (id: string) => ButtonMenuOption | null
 }

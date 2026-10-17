@@ -1,12 +1,12 @@
 <template>
 	<div class="flex items-center gap-1">
-		<Button
+		<IconButton
 			v-for="region in workbench.usedRegions.value"
 			:key="region"
 			v-tooltip="formatMessage(toggleMessages[region])"
 			type="quiet"
 			size="xs"
-			:aria-label="formatMessage(toggleMessages[region])"
+			:label="formatMessage(toggleMessages[region])"
 			:aria-pressed="workbench.visible[region].value"
 			@click="workbench.toggleRegion(region)"
 		>
@@ -15,43 +15,45 @@
 				:class="iconRotation[region]"
 				aria-hidden="true"
 			/>
-		</Button>
-		<Button
-			v-tooltip="formatMessage(messages.panels)"
+		</IconButton>
+		<TeleportOverflowMenu
+			v-if="workbench.mode.closePanels"
 			type="quiet"
 			size="xs"
-			:aria-label="formatMessage(messages.panels)"
-			@click="(event: MouseEvent) => workbench.openPanelsMenu(event)"
+			:circular="false"
+			:label="formatMessage(messages.panels)"
+			:tooltip="formatMessage(messages.panels)"
+			:options="workbench.panelsMenuOptions.value"
 		>
 			<LayersIcon aria-hidden="true" />
-		</Button>
-		<Button
+		</TeleportOverflowMenu>
+		<IconButton
 			v-tooltip="formatMessage(variantMessage)"
 			type="quiet"
 			size="xs"
-			:aria-label="formatMessage(variantMessage)"
-			@click="workbench.setVariant(workbench.variant.value === 'rounded' ? 'square' : 'rounded')"
+			:label="formatMessage(variantMessage)"
+			@click="workbench.setVariant(nextVariant)"
 		>
-			<component :is="workbench.variant.value === 'rounded' ? SquareIcon : PaletteIcon" aria-hidden="true" />
-		</Button>
-		<Button
+			<component :is="nextVariant === 'square' ? SquareIcon : PaletteIcon" aria-hidden="true" />
+		</IconButton>
+		<IconButton
 			v-tooltip="formatMessage(messages.resetLayout)"
 			type="quiet"
 			size="xs"
-			:aria-label="formatMessage(messages.resetLayout)"
+			:label="formatMessage(messages.resetLayout)"
 			@click="workbench.resetLayout()"
 		>
 			<LayoutTemplateIcon aria-hidden="true" />
-		</Button>
-		<Button
+		</IconButton>
+		<IconButton
 			v-tooltip="formatMessage(messages.collapseToolbar)"
 			type="quiet"
 			size="xs"
-			:aria-label="formatMessage(messages.collapseToolbar)"
+			:label="formatMessage(messages.collapseToolbar)"
 			@click="emit('collapse')"
 		>
 			<ChevronUpIcon aria-hidden="true" />
-		</Button>
+		</IconButton>
 	</div>
 </template>
 
@@ -67,7 +69,7 @@ import {
 } from '@modrinth/assets'
 import { computed } from 'vue'
 
-import { Button } from '#ui/components/base/buttons'
+import { IconButton, TeleportOverflowMenu } from '#ui/components/base/buttons'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 
 import { injectWorkbench } from '../providers/workbench'
@@ -115,8 +117,9 @@ const messages = defineMessages({
 	},
 })
 
+const nextVariant = computed(() => (workbench.variant.value === 'rounded' ? 'square' : 'rounded'))
 const variantMessage = computed(() =>
-	workbench.variant.value === 'rounded' ? messages.useSquare : messages.useRounded,
+	nextVariant.value === 'square' ? messages.useSquare : messages.useRounded,
 )
 
 const toggleMessages = {

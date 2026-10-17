@@ -13,9 +13,9 @@
 import type { DockviewPanelApi } from 'dockview-vue'
 import { computed, onBeforeUnmount, ref } from 'vue'
 
-import type { WorkbenchPanelParams } from '../composables/workbench-layout'
-import { injectWorkbench, provideWorkbenchPanel } from '../providers/workbench'
-import { WORKBENCH_REGIONS, type WorkbenchRegion } from '../types'
+import type { WorkbenchPanelParams } from '../../composables/create-workbench'
+import { injectWorkbench, provideWorkbenchPanel } from '../../providers/workbench'
+import { WORKBENCH_REGIONS, type WorkbenchRegion } from '../../types'
 
 const props = defineProps<{
 	params: {

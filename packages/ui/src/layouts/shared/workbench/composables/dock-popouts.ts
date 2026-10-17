@@ -13,7 +13,7 @@ import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { injectNotificationManager } from '#ui/providers/web-notifications'
 
 import type { WorkbenchPopoutOptions } from '../types'
-import type { WorkbenchWindows } from './workbench-windows'
+import type { WorkbenchWindows } from './use-windows'
 
 export type PopoutTarget = IDockviewPanel | DockviewGroupPanel
 type PopoutLayout = NonNullable<SerializedDockview['popoutGroups']>[number]

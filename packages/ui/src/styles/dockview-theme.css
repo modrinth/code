@@ -65,12 +65,17 @@
 	transition: none;
 }
 
+.workbench-square,
+.workbench-square .dockview-theme-modrinth {
+	--dv-separator-border: var(--surface-4);
+}
+
 .workbench-square .workbench-panel {
 	background-color: var(--surface-2);
 }
 
 .workbench-square .dv-tabs-and-actions-container {
-	border-bottom: 1px solid var(--surface-5);
+	border-bottom: 1px solid var(--surface-4);
 }
 
 .workbench-square .dv-tab.dv-active-tab {
@@ -83,9 +88,9 @@
 
 .workbench-rounded,
 .workbench-rounded .dockview-theme-modrinth {
-	--dv-background-color: var(--color-bg);
-	--dv-group-view-background-color: var(--color-bg);
-	--dv-tabs-and-actions-container-background-color: var(--color-bg);
+	--dv-background-color: var(--surface-1);
+	--dv-group-view-background-color: var(--surface-1);
+	--dv-tabs-and-actions-container-background-color: var(--surface-1);
 	--dv-separator-border: var(--surface-4);
 	--dv-activegroup-visiblepanel-tab-background-color: transparent;
 	--dv-activegroup-hiddenpanel-tab-background-color: transparent;
@@ -105,11 +110,11 @@
 }
 
 .workbench-rounded {
-	background-color: var(--color-bg);
+	background-color: var(--surface-1);
 }
 
 .workbench-rounded .workbench-panel {
-	background-color: var(--color-bg);
+	background-color: var(--surface-1);
 }
 
 .workbench-rounded .dv-tab {
@@ -142,7 +147,7 @@
 	align-content: flex-start;
 	gap: 4px;
 	padding: 2px;
-	border: 1px solid var(--surface-5);
+	border: 1px solid var(--surface-4);
 	border-radius: 0.75rem;
 	box-shadow: var(--shadow-sm, 0 1px 2px 0 rgb(0 0 0 / 0.05));
 }

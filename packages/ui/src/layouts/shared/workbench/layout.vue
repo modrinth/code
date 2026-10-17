@@ -8,24 +8,24 @@
 		<template v-if="workbench.mode.toolbar">
 			<div
 				v-if="!toolbarCollapsed"
-				class="flex min-h-10 shrink-0 flex-wrap items-center gap-2 border-0 border-b border-solid border-surface-5 bg-surface-3 px-2 py-1"
+				class="flex min-h-10 shrink-0 flex-wrap items-center gap-2 border-0 border-b border-solid border-surface-4 bg-surface-3 px-2 py-1"
 			>
 				<slot name="toolbar" />
-				<WorkbenchToggles class="ml-auto" @collapse="toolbarCollapsed = true" />
+				<ToolbarControls class="ml-auto" @collapse="toolbarCollapsed = true" />
 			</div>
 			<div
 				v-else
-				class="flex h-4 shrink-0 items-center justify-center border-0 border-b border-solid border-surface-5 bg-surface-3"
+				class="flex shrink-0 items-center justify-center border-0 border-b border-solid border-surface-4 bg-surface-3"
 			>
-				<button
+				<IconButton
 					v-tooltip="formatMessage(messages.expandToolbar)"
-					type="button"
-					class="flex h-4 w-12 items-center justify-center rounded-b-md border-none bg-surface-4 p-0 text-secondary hover:text-contrast focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
-					:aria-label="formatMessage(messages.expandToolbar)"
+					type="quiet"
+					size="xs"
+					:label="formatMessage(messages.expandToolbar)"
 					@click="toolbarCollapsed = false"
 				>
-					<ChevronDownIcon class="size-4" aria-hidden="true" />
-				</button>
+					<ChevronDownIcon aria-hidden="true" />
+				</IconButton>
 			</div>
 		</template>
 		<GridviewVue
@@ -45,12 +45,12 @@ import { useLocalStorage } from '@vueuse/core'
 import { GridviewVue, Orientation } from 'dockview-vue'
 import { onMounted, ref, type VNode } from 'vue'
 
-import { ContextMenu } from '#ui/components/base/buttons'
+import { ContextMenu, IconButton } from '#ui/components/base/buttons'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 
-import WorkbenchDock from './components/WorkbenchDock.vue'
-import WorkbenchToggles from './components/WorkbenchToggles.vue'
-import { createWorkbench, WORKBENCH_DOCK_COMPONENT } from './composables/workbench-layout'
+import Dock from './components/dock/index.vue'
+import ToolbarControls from './components/toolbar-controls.vue'
+import { createWorkbench, WORKBENCH_DOCK_COMPONENT } from './composables/create-workbench'
 import { provideWorkbench, type WorkbenchContext } from './providers/workbench'
 import type {
 	WorkbenchDocuments,
@@ -105,7 +105,7 @@ const messages = defineMessages({
 	},
 })
 
-const components = { [WORKBENCH_DOCK_COMPONENT]: WorkbenchDock }
+const components = { [WORKBENCH_DOCK_COMPONENT]: Dock }
 
 const workbench =
 	props.workbench ??

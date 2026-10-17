@@ -5,7 +5,7 @@
 			v-if="workbench.documents?.headerActions"
 			:params="params"
 		/>
-		<WorkbenchCornerToggle v-if="cornerToggles" side="right" :params="params" />
+		<CornerToggle v-if="cornerToggles" side="right" :params="params" />
 	</div>
 </template>
 
@@ -13,8 +13,8 @@
 import type { DockviewGroupLocation, DockviewGroupPanel, IDockviewPanel } from 'dockview-vue'
 import { computed } from 'vue'
 
-import { injectWorkbench, injectWorkbenchDock } from '../providers/workbench'
-import WorkbenchCornerToggle from './WorkbenchCornerToggle.vue'
+import { injectWorkbench, injectWorkbenchDock } from '../../providers/workbench'
+import CornerToggle from './corner-toggle.vue'
 
 defineOptions({ inheritAttrs: false })
 
