@@ -18,11 +18,8 @@
 				<template #panel-tree>
 					<FileSideBar fill-height :add-border="false" />
 				</template>
-				<template #panel-file-details>
-					<FileDetailsPanel />
-				</template>
-				<template #panel-archive-details>
-					<ArchiveDetailsPanel />
+				<template #panel-details>
+					<DetailsPanel />
 				</template>
 				<template v-if="slots['project-details']" #panel-project-details>
 					<slot name="project-details" />
@@ -38,7 +35,6 @@
 <script setup lang="ts">
 import {
 	BoxIcon,
-	FolderArchiveIcon,
 	FolderOpenIcon,
 	InfoIcon,
 	TerminalSquareIcon,
@@ -56,8 +52,7 @@ import type { WorkbenchPanel, WorkbenchRegion } from '#ui/layouts/shared/workben
 import { useArchiveFileManager } from '../composables/archive-file-manager'
 import { provideArchiveViewer } from '../providers/archive-viewer'
 import type { ArchiveSource } from '../types'
-import ArchiveDetailsPanel from './panels/ArchiveDetailsPanel.vue'
-import FileDetailsPanel from './panels/FileDetailsPanel.vue'
+import DetailsPanel from './panels/details/index.vue'
 import LogsPanel from './panels/LogsPanel.vue'
 
 const props = defineProps<{
@@ -84,13 +79,12 @@ const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
 	tree: { id: 'archive-viewer.panel.tree', defaultMessage: 'Files' },
-	fileDetails: { id: 'archive-viewer.panel.file-details', defaultMessage: 'Details' },
-	archiveDetails: { id: 'archive-viewer.panel.archive-details', defaultMessage: 'Archive' },
+	details: { id: 'archive-viewer.panel.details', defaultMessage: 'Details' },
 	projectDetails: { id: 'archive-viewer.panel.project-details', defaultMessage: 'Project' },
 	logs: { id: 'archive-viewer.panel.logs', defaultMessage: 'Logs' },
 })
 
-const { context, location, open, fullyLoaded, treeVersion, sha512Hash, nodeAt } =
+const { context, location, open, fullyLoaded, treeVersion, sha512Hash, rootHashes, nodeAt } =
 	useArchiveFileManager({
 		root: props.root,
 		handler: props.handler,
@@ -106,6 +100,7 @@ provideArchiveViewer({
 	fullyLoaded,
 	treeVersion,
 	sha512Hash,
+	rootHashes,
 	nodeAt,
 })
 
@@ -121,18 +116,7 @@ const panels = computed<WorkbenchPanel[]>(() => [
 				} satisfies WorkbenchPanel,
 			]
 		: []),
-	{
-		id: 'file-details',
-		title: formatMessage(messages.fileDetails),
-		region: 'right',
-		icon: InfoIcon,
-	},
-	{
-		id: 'archive-details',
-		title: formatMessage(messages.archiveDetails),
-		region: 'right',
-		icon: FolderArchiveIcon,
-	},
+	{ id: 'details', title: formatMessage(messages.details), region: 'right', icon: InfoIcon },
 	{ id: 'logs', title: formatMessage(messages.logs), region: 'bottom', icon: TerminalSquareIcon },
 ])
 

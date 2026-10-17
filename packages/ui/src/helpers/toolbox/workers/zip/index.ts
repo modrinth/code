@@ -1,7 +1,7 @@
 
 import {
-	type FileContentPromise, type FileDetails, type FileTypeInfo, hashBuffer,
-	type HashedFileContent, resolveContent
+	type ContentHashes, type FileContentPromise, type FileDetails, type FileTypeInfo,
+	type HashedFileContent, hashContent, resolveContent
 } from "#ui/helpers/toolbox/file";
 import { v7 as uuidV7 } from 'uuid';
 
@@ -122,9 +122,10 @@ function closeRoot(root: RootZipTreeNode | undefined) {
  * Maps the archive's actual hash to it, dropping the hash it was opened with when that turns out to
  * be wrong, and lets every connection know.
  */
-function onArchiveHashed(messenger: ServerMessenger<ZipMessages>, root: RootZipTreeNode, sha512Hash: Sha512, expectedHash?: Sha512) {
-	root.sha512Hash = sha512Hash;
-	hashToUUID.set(sha512Hash, root.key);
+function onArchiveHashed(messenger: ServerMessenger<ZipMessages>, root: RootZipTreeNode, hashes: ContentHashes, expectedHash?: Sha512) {
+	const sha512Hash = hashes.sha512;
+	root.hashes = hashes;
+	hashToUUID.set(hashes.sha512, root.key);
 
 	const mismatched = expectedHash != null && expectedHash !== sha512Hash;
 	if (mismatched) {
@@ -136,6 +137,7 @@ function onArchiveHashed(messenger: ServerMessenger<ZipMessages>, root: RootZipT
 		type: 'root_hashed',
 		root: { root: root.key },
 		sha512Hash: sha512Hash,
+		hashes: hashes,
 		expectedHash: mismatched ? expectedHash : undefined,
 	});
 }
@@ -204,16 +206,16 @@ export const messageHandler: ServerMessageHandler<ZipMessages> = (messenger, msg
 
 				if (msg.data_type == 'buffer') {
 					const buffer = await arrayBufferFromSource(msg.buffer);
-					const hash = await hashBuffer(buffer)
+					const hashes = await hashContent(buffer)
 
 					tree = await readZipTreeFromBuffer(messenger.logger, buffer, readOptions);
 
-					onArchiveHashed(messenger, tree, hash, msg.sha512Hash);
+					onArchiveHashed(messenger, tree, hashes, msg.sha512Hash);
 				} else {
 					const url = msg.url;
 					tree = await readZipTreeFromURL(messenger.logger, url, {
 						...readOptions,
-						archiveHashedCallback: (root, hash) => onArchiveHashed(messenger, root, hash, msg.sha512Hash),
+						archiveHashedCallback: (root, hashes) => onArchiveHashed(messenger, root, hashes, msg.sha512Hash),
 						rangeOptions: {
 							...msg.rangeOptions,
 							onProgress(current, total) {
@@ -407,6 +409,7 @@ export function copyRoot(node: RootZipTreeNode): RootZipTreeNode {
 		type: node.type,
 		metadata: { directory: true },
 		sha512Hash: node.sha512Hash,
+		hashes: node.hashes,
 	} as unknown as RootZipTreeNode;
 
 	return copyNodeData(cloneNode, node);

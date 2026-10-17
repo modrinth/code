@@ -3,6 +3,7 @@ import { computed, markRaw, onScopeDispose, type Ref, ref, shallowRef } from 'vu
 
 import { useFormatBytes } from '#ui/composables/format-bytes'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import type { ContentHashes } from '#ui/helpers/toolbox/file'
 import {
 	type FileZipTreeNode, isZipArchive,
 	type LazyDataAccess,
@@ -120,6 +121,7 @@ export function useArchiveFileManager({
 	const fullyLoaded = ref(false)
 	/** The archive's own SHA-512, once it has been downloaded in full and hashed. */
 	const sha512Hash = ref<string | null>(root.sha512Hash ?? null)
+	const rootHashes = ref<Partial<ContentHashes> | ContentHashes | null>(root.hashes ?? null)
 	let treeUpdated = Promise.withResolvers<void>()
 
 	function nodeAt(path: string): ZipNode | undefined {
@@ -298,6 +300,7 @@ export function useArchiveFileManager({
 			fileResults.delete(normalizeDirectoryPath(update.node.path))
 		} else if (update.type === 'root_hashed' && update.root.root === root.key) {
 			sha512Hash.value = update.sha512Hash
+			rootHashes.value = update.hashes
 		}
 	})
 	onScopeDispose(() => updates.cancel())
@@ -409,5 +412,14 @@ export function useArchiveFileManager({
 		entryDetails,
 	}
 
-	return { context, location: currentLocation, open, fullyLoaded, treeVersion, sha512Hash, nodeAt }
+	return {
+		context,
+		location: currentLocation,
+		open,
+		fullyLoaded,
+		treeVersion,
+		sha512Hash,
+		rootHashes,
+		nodeAt,
+	}
 }

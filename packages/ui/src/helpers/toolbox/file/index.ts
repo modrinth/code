@@ -136,6 +136,68 @@ export async function hashBuffer(data: ArrayBuffer, algorithm: AlgorithmIdentifi
         .join('');
 }
 
+/** Whitespace bytes (tab, line feed, carriage return and space), which fingerprints skip. */
+const FINGERPRINT_IGNORED_BYTES = new Set([9, 10, 13, 32]);
+
+/**
+ * MurmurHash2 (32 bit, seed 1) of its bytes with whitespace left out, which identifies files across its platform.
+ * Returned as the unsigned number it uses. Useful for Flame Anvil Lookup info.
+ */
+export function murmurHashV2(data: ArrayBuffer): number {
+	const source = new Uint8Array(data);
+	const bytes = new Uint8Array(source.length);
+	let length = 0;
+	for (const byte of source) {
+		if (!FINGERPRINT_IGNORED_BYTES.has(byte)) bytes[length++] = byte;
+	}
+
+	const m = 0x5bd1e995;
+	let hash = (1 ^ length) >>> 0;
+	let index = 0;
+	let remaining = length;
+	while (remaining >= 4) {
+		let k =
+			bytes[index] |
+			(bytes[index + 1] << 8) |
+			(bytes[index + 2] << 16) |
+			(bytes[index + 3] << 24);
+		k = Math.imul(k, m);
+		k ^= k >>> 24;
+		k = Math.imul(k, m);
+		hash = Math.imul(hash, m) ^ k;
+		index += 4;
+		remaining -= 4;
+	}
+	if (remaining === 3) hash ^= bytes[index + 2] << 16;
+	if (remaining >= 2) hash ^= bytes[index + 1] << 8;
+	if (remaining >= 1) {
+		hash ^= bytes[index];
+		hash = Math.imul(hash, m);
+	}
+	hash ^= hash >>> 13;
+	hash = Math.imul(hash, m);
+	hash ^= hash >>> 15;
+	return hash >>> 0;
+}
+
+/** The hashes a file is identified by across platforms: Modrinth's SHAs and Murmur2 fingerprint. */
+export interface ContentHashes {
+	sha1: string;
+	sha256: string;
+	sha512: string;
+	/** Murmur2 fingerprint, in decimal. */
+	murmur2: string;
+}
+
+export async function hashContent(data: ArrayBuffer): Promise<ContentHashes> {
+	const [sha1, sha256, sha512] = await Promise.all([
+		hashBuffer(data, "SHA-1"),
+		hashBuffer(data, "SHA-256"),
+		hashBuffer(data, "SHA-512"),
+	]);
+	return { sha1, sha256, sha512, murmur2: String(murmurHashV2(data)) };
+}
+
 const MIME_TO_LANGUAGE: Record<string, string> = {
     // JavaScript & TypeScript
     'text/javascript': 'javascript',

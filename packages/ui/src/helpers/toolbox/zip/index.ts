@@ -7,6 +7,7 @@ import {
 } from "#ui/helpers/toolbox/decompile";
 import type {
 	AsyncMaybe,
+	ContentHashes,
 	FileDetails,
 	FileTypeInfo,
 	HashedFileContent
@@ -153,7 +154,12 @@ export class RootZipTreeNode extends ZipTreeNode {
 	onFinishedLoading: Promise<void>
 
 	/** SHA-512 of the whole archive, once known (for a URL, only after all of it is downloaded). */
-	sha512Hash?: string;
+	get sha512Hash(){
+		return this.hashes?.sha512;
+	};
+
+	/** Every hash of the whole archive, known at the same time as `sha512Hash`. */
+	hashes?: Partial<ContentHashes> | ContentHashes;
 
     declare type: "directory";
 
@@ -222,7 +228,9 @@ export interface LazyDataAccess {
     fileTypeInfo: LazyValue<FileTypeInfo | null>,
     sha1: LazyValue<string>,
     sha256: LazyValue<string>,
-    sha512: LazyValue<string>
+    sha512: LazyValue<string>,
+	/** Murmur2 fingerprint, in decimal. */
+	murmur2: LazyValue<string>
 }
 
 export interface FileZipTreeNode extends ZipTreeNode, LazyDataAccess, SourceHandler {
@@ -290,10 +298,10 @@ export type ArchiveUpdateTypes =
 	Typed<'updated_node_data', { node: NodeTarget }> |
 	Typed<'root_loaded', { root: RootNodeTarget }> |
 	/**
-	 * The archive's own SHA-512 was computed from its downloaded bytes. `expectedHash` is the hash it
-	 * was opened with when that didn't match, which is no longer mapped to the archive.
+	 * The archive's own hashes were computed from its downloaded bytes. `expectedHash` is the
+	 * SHA-512 it was opened with when that didn't match, which is no longer mapped to the archive.
 	 */
-	Typed<'root_hashed', { root: RootNodeTarget, sha512Hash: string, expectedHash?: string }> |
+	Typed<'root_hashed', { root: RootNodeTarget, sha512Hash: string, hashes: ContentHashes, expectedHash?: string }> |
 	/** Bytes of the archive cached so far, keyed by `url` too as it starts before the root is returned. */
 	Typed<'archive_download', { root?: UUID_V7, url?: string, sha512Hash?: string, current: number, total: number }>;
 
@@ -337,6 +345,7 @@ export class DelegateFileZipTreeNode extends ZipTreeNode implements FileZipTreeN
         this.sha1 = lazyValue(() => { throw new Error("Unable to get value 'sha1' as it was not setup yet") });
         this.sha256 = lazyValue(() => { throw new Error("Unable to get value 'sha256' as it was not setup yet") });
         this.sha512 = lazyValue(() => { throw new Error("Unable to get value 'sha512' as it was not setup yet") });
+		this.murmur2 = lazyValue(() => { throw new Error("Unable to get value 'murmur2' as it was not setup yet") });
 
         this.isSetup = false;
     }
@@ -350,6 +359,7 @@ export class DelegateFileZipTreeNode extends ZipTreeNode implements FileZipTreeN
         this.sha1 = lazyValue(() => this.getHandler().readLazyData(this, "sha1"));
         this.sha256 = lazyValue(() => this.getHandler().readLazyData(this, "sha256"));
         this.sha512 = lazyValue(() => this.getHandler().readLazyData(this, "sha512"));
+		this.murmur2 = lazyValue(() => this.getHandler().readLazyData(this, "murmur2"));
 
 		const map = new Map<Partial<SourceOptions>, LazyValue<DecompilerResult>>();
 
@@ -405,6 +415,7 @@ export class DelegateFileZipTreeNode extends ZipTreeNode implements FileZipTreeN
     sha1: LazyValue<string>;
     sha256: LazyValue<string>;
     sha512: LazyValue<string>;
+	murmur2: LazyValue<string>;
 
     getBuffer(): Promise<ArrayBuffer> {
         return this.getHandler().readNodeData(this);

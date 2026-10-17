@@ -1,5 +1,6 @@
 import type { Ref } from 'vue'
 
+import type { ContentHashes } from '#ui/helpers/toolbox/file'
 import type { RootZipTreeNode, ZipHandler, ZipNode } from '#ui/helpers/toolbox/zip'
 import { createContext } from '#ui/providers/create-context'
 
@@ -16,6 +17,8 @@ export interface ArchiveViewerContext {
 	treeVersion: Readonly<Ref<number>>
 	/** The archive's own SHA-512, once it has been downloaded in full and hashed. */
 	sha512Hash: Readonly<Ref<string | null>>
+	/** Every hash of the opened archive, once all of it has been downloaded. */
+	rootHashes: Readonly<Ref<ContentHashes | null>>
 	/** The node at a path of the files layout (`/` being the archive's root). */
 	nodeAt: (path: string) => ZipNode | undefined
 }

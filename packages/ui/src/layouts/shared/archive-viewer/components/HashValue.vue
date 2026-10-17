@@ -6,7 +6,9 @@
 		:aria-label="formatMessage(messages.copy, { hash })"
 		@click="copy"
 	>
-		<span class="truncate">{{ shortened }}</span>
+		<span class="truncate" :class="{ 'font-sans font-medium': display }">
+			{{ display ?? shortened }}
+		</span>
 		<CheckIcon v-if="copied" class="size-3 shrink-0 text-green" aria-hidden="true" />
 		<CopyIcon v-else class="size-3 shrink-0" aria-hidden="true" />
 	</button>
@@ -20,6 +22,8 @@ import { defineMessages, useVIntl } from '#ui/composables/i18n'
 
 const props = defineProps<{
 	hash: string
+	/** Shown in place of the shortened value, e.g. a short name for a link. */
+	display?: string
 }>()
 
 const { formatMessage } = useVIntl()
@@ -32,11 +36,11 @@ const messages = defineMessages({
 })
 
 /** Enough of each end to tell hashes apart at a glance; the tooltip shows all of it. */
-const EDGE_LENGTH = 8
+const EDGE_LENGTH = 6
 
 const shortened = computed(() =>
-	props.hash.length > EDGE_LENGTH * 2 + 1
-		? `${props.hash.slice(0, EDGE_LENGTH)}…${props.hash.slice(-EDGE_LENGTH)}`
+	props.hash.length > EDGE_LENGTH
+		? `${props.hash.slice(0, EDGE_LENGTH)}…`
 		: props.hash,
 )
 

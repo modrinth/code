@@ -24,6 +24,10 @@ export interface ArchiveDetailRow {
 	copyable?: boolean
 	/** Shows the value shortened, in full on hover, in a button that copies it. */
 	hash?: boolean
+	/** Shown in place of a `hash` value, which then only shows on hover, e.g. a link's source. */
+	display?: string
+	/** More about the value, shown on hover. */
+	tooltip?: string
 	href?: string
 }
 

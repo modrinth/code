@@ -1,7 +1,7 @@
 import type { ZipWriterAddDataOptions } from "@zip.js/zip.js";
 
 import type { DecompilerResult } from "#ui/helpers/toolbox/decompile";
-import type { FileDetails, HashedFileContent } from "#ui/helpers/toolbox/file";
+import type { ContentHashes, FileDetails, HashedFileContent } from "#ui/helpers/toolbox/file";
 import {
 	type ArchiveUpdateTypes, DelegateFileZipTreeNode,
 	type FileMatcher, type FileZipTreeNode, getAsTarget, type LazyDataAccess, type NodeTarget,
@@ -94,7 +94,7 @@ export const handlerConstructor: MessengerHandlerConstructor<ZipMessages, ZipHan
 	/** Roots whose loading finished, which may be reported before the tree itself is returned. */
 	const finishedRoots = new Set<UUID_V7>();
 	/** Hashes of roots, which may also be reported before the tree itself is returned. */
-	const rootHashes = new Map<UUID_V7, Sha512>();
+	const rootHashes = new Map<UUID_V7, ContentHashes>();
 
 	function forgetRoot(key: UUID_V7) {
 		finishedRoots.delete(key);
@@ -104,7 +104,7 @@ export const handlerConstructor: MessengerHandlerConstructor<ZipMessages, ZipHan
 	}
 
 	function trackLoading(node: RootZipTreeNode, isFullyLoaded: boolean | undefined) {
-		node.sha512Hash ??= rootHashes.get(node.key);
+		node.hashes ??= rootHashes.get(node.key);
 		if (node.sha512Hash != null) hashToUUID.set(node.sha512Hash, node.key);
 
 		if (isFullyLoaded || finishedRoots.has(node.key)) {
@@ -257,7 +257,7 @@ export const handlerConstructor: MessengerHandlerConstructor<ZipMessages, ZipHan
 					const node = root.findFileEntry(nodeTarget.path, nodeTarget.relative);
 
 					if (node) {
-						for (const lazy of [node.sha1, node.sha256, node.sha512, node.fileTypeInfo]) {
+						for (const lazy of [node.sha1, node.sha256, node.sha512, node.murmur2, node.fileTypeInfo]) {
 							lazy.reset()
 						}
 						(node as unknown as Partial<DelegateFileZipTreeNode>).onDataUpdate?.()
@@ -273,12 +273,14 @@ export const handlerConstructor: MessengerHandlerConstructor<ZipMessages, ZipHan
 				uuidToOnFinishedLoadingHolder.delete(msg.root.root);
 			} else if (msg.type == 'root_hashed') {
 				const key = msg.root.root;
-				rootHashes.set(key, msg.sha512Hash);
+				rootHashes.set(key, msg.hashes);
 				hashToUUID.set(msg.sha512Hash, key);
 				if (msg.expectedHash != null && hashToUUID.get(msg.expectedHash) === key) hashToUUID.delete(msg.expectedHash);
 
 				const root = messenger.handler.zipByUUID.get(key);
-				if (root != null) root.sha512Hash = msg.sha512Hash;
+				if (root != null) {
+					root.hashes = msg.hashes;
+				}
 			}
 
 			this.onArchiveUpdate.stream.sink(msg);
