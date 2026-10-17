@@ -3,6 +3,7 @@
 mod content;
 mod export_mrpack;
 mod files;
+pub(crate) use files::write_instance_file_from_reader;
 pub use files::{
     InstanceFileItem, create_instance_directory, delete_instance_file,
     list_instance_files, read_instance_file, rename_instance_file,
@@ -75,16 +76,17 @@ pub use self::screenshots::{
 };
 pub(crate) use self::shared::{
     CONFIG_BUNDLE_FILE_TYPE, CONFIG_DIRECTORY, CONFIG_FILE_EXTENSIONS,
-    CONFIG_SYNC_ENABLED, MAX_CONFIG_BUNDLE_ENTRIES,
-    read_bounded_config_bundle_entry,
+    CONFIG_FILE_TYPE, CONFIG_SYNC_ENABLED, MAX_CONFIG_BUNDLE_ENTRIES,
+    MAX_SHARED_FILES_TOTAL_SIZE, is_shareable_file_path,
+    is_supported_config_file, read_bounded_config_bundle_entry,
 };
 pub use self::shared::{
     SharedInstanceExternalFilePreview, SharedInstanceInstallPreview,
     SharedInstanceInvite, SharedInstanceInviteInstallPreview,
     SharedInstanceInviteLink, SharedInstanceJoinType,
-    SharedInstancePublishPreview, SharedInstanceUpdateDiff,
-    SharedInstanceUpdateDiffType, SharedInstanceUpdatePreview,
-    SharedInstanceUser, SharedInstanceUsers,
+    SharedInstancePublishFile, SharedInstancePublishPreview,
+    SharedInstanceUpdateDiff, SharedInstanceUpdateDiffType,
+    SharedInstanceUpdatePreview, SharedInstanceUser, SharedInstanceUsers,
     accept_pending_shared_instance_invite,
     accept_shared_instance_invite_for_install,
     can_active_user_use_shared_instances, create_shared_instance_invite_link,

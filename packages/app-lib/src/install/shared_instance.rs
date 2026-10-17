@@ -8,9 +8,10 @@ use super::runner::{
     install_pack, modpack_details, update_content_progress, update_progress,
 };
 use crate::api::instance::{
-    CONFIG_BUNDLE_FILE_TYPE, CONFIG_DIRECTORY, CONFIG_FILE_EXTENSIONS,
+    CONFIG_BUNDLE_FILE_TYPE, CONFIG_DIRECTORY, CONFIG_FILE_TYPE,
     CONFIG_SYNC_ENABLED, MAX_CONFIG_BUNDLE_ENTRIES,
-    read_bounded_config_bundle_entry,
+    MAX_SHARED_FILES_TOTAL_SIZE, is_shareable_file_path,
+    is_supported_config_file, read_bounded_config_bundle_entry,
 };
 use crate::api::pack::install_from::CreatePackLocation;
 use crate::state::instances::adapters::sqlite::content_rows;
@@ -85,6 +86,18 @@ struct CurrentSharedInstanceProject {
 #[derive(Clone, Debug)]
 struct CurrentSharedInstanceExternalFile {
     relative_path: String,
+    sha1: String,
+    missing: bool,
+}
+
+impl CurrentSharedInstanceExternalFile {
+    fn matches(&self, desired: &SharedInstanceExternalFileData) -> bool {
+        !self.missing
+            && desired
+                .sha1
+                .as_deref()
+                .is_some_and(|sha1| self.sha1.eq_ignore_ascii_case(sha1))
+    }
 }
 
 type SharedInstanceExternalFileKey = (ProjectType, String);
@@ -118,6 +131,7 @@ struct DesiredSharedInstanceContent {
         DesiredSharedInstanceExternalFile,
     >,
     config_bundle: Option<SharedInstanceExternalFileData>,
+    config_files: Vec<SharedInstanceExternalFileData>,
 }
 
 struct SharedInstanceProjectUpdate {
@@ -135,6 +149,7 @@ struct SharedInstanceApplyPlan {
     external_updates: Vec<DesiredSharedInstanceExternalFile>,
     external_additions: Vec<DesiredSharedInstanceExternalFile>,
     config_bundle: Option<SharedInstanceExternalFileData>,
+    config_files: Vec<SharedInstanceExternalFileData>,
 }
 
 impl SharedInstanceApplyPlan {
@@ -170,6 +185,7 @@ impl SharedInstanceApplyPlan {
             project_removals,
             external_removals,
             config_bundle: desired.config_bundle,
+            config_files: desired.config_files,
             ..Default::default()
         };
 
@@ -208,10 +224,9 @@ impl SharedInstanceApplyPlan {
         for desired in desired.external_files.into_values() {
             let key = (desired.file_type, desired.file.file_name.clone());
             match current.external_files.get(&key) {
-                Some(_) => {
-                    plan.external_updates.push(desired);
-                }
-                _ => plan.external_additions.push(desired),
+                Some(current) if current.matches(&desired.file) => {}
+                Some(_) => plan.external_updates.push(desired),
+                None => plan.external_additions.push(desired),
             }
         }
 
@@ -223,7 +238,8 @@ impl SharedInstanceApplyPlan {
             + self.project_additions.len()
             + self.external_updates.len()
             + self.external_additions.len()
-            + usize::from(self.config_bundle.is_some())) as u64
+            + usize::from(self.config_bundle.is_some())
+            + self.config_files.len()) as u64
     }
 }
 
@@ -405,13 +421,9 @@ async fn apply_shared_instance_update_inner(
         .await?;
     }
 
-    if let Some(config_bundle) = plan.config_bundle {
-        install_shared_instance_external_file(
-            instance_id,
-            &config_bundle,
-            state,
-        )
-        .await?;
+    for config_file in plan.config_bundle.into_iter().chain(plan.config_files) {
+        install_shared_instance_external_file(instance_id, &config_file, state)
+            .await?;
         completed_content_changes += 1;
         update_content_progress(
             job_id,
@@ -524,6 +536,8 @@ async fn current_shared_instance_content(
                 (entry.project_type, file.file_name.clone()),
                 CurrentSharedInstanceExternalFile {
                     relative_path: file.relative_path.clone(),
+                    sha1: file.sha1.clone(),
+                    missing: file.missing,
                 },
             );
         }
@@ -556,6 +570,12 @@ async fn desired_shared_instance_content(
     }
 
     for file in &data.external_files {
+        if file.file_type == CONFIG_FILE_TYPE {
+            if CONFIG_SYNC_ENABLED {
+                content.config_files.push(file.clone());
+            }
+            continue;
+        }
         if file.file_type == CONFIG_BUNDLE_FILE_TYPE {
             if CONFIG_SYNC_ENABLED {
                 content.config_bundle = Some(file.clone());
@@ -842,8 +862,16 @@ async fn install_shared_instance_external_file(
     file: &SharedInstanceExternalFileData,
     state: &State,
 ) -> crate::Result<()> {
-    if file.file_type == CONFIG_BUNDLE_FILE_TYPE && !CONFIG_SYNC_ENABLED {
+    if matches!(
+        file.file_type.as_str(),
+        CONFIG_BUNDLE_FILE_TYPE | CONFIG_FILE_TYPE
+    ) && !CONFIG_SYNC_ENABLED
+    {
         return Ok(());
+    }
+
+    if file.file_type == CONFIG_FILE_TYPE {
+        return install_shared_instance_file(instance_id, file).await;
     }
 
     validate_shared_instance_external_file_name(&file.file_name)?;
@@ -948,6 +976,86 @@ async fn install_shared_instance_external_file(
     .await?;
 
     Ok(())
+}
+
+/// Shared files can be up to the version's size limit, so they are streamed to
+/// disk rather than held in memory.
+async fn install_shared_instance_file(
+    instance_id: &str,
+    file: &SharedInstanceExternalFileData,
+) -> crate::Result<()> {
+    if !is_shareable_file_path(&file.file_name)
+        || file.file_size > MAX_SHARED_FILES_TOTAL_SIZE
+    {
+        return Err(crate::ErrorKind::InputError(format!(
+            "Shared instance file {} is unsupported or too large",
+            file.file_name
+        ))
+        .into());
+    }
+    if shared_instance_file_is_current(instance_id, file).await? {
+        return Ok(());
+    }
+
+    let response = REQWEST_CLIENT.get(&file.url).send().await?;
+    if !response.status().is_success() {
+        return Err(crate::ErrorKind::OtherError(format!(
+            "Shared instance file download failed with status {}",
+            response.status()
+        ))
+        .into());
+    }
+    if response
+        .content_length()
+        .is_some_and(|content_length| content_length != file.file_size)
+    {
+        return Err(crate::ErrorKind::OtherError(format!(
+            "Shared instance file {} has an unexpected size",
+            file.file_name
+        ))
+        .into());
+    }
+
+    let reader = tokio_util::io::StreamReader::new(
+        response.bytes_stream().map(|chunk| {
+            chunk.map_err(|error| std::io::Error::other(error.to_string()))
+        }),
+    );
+    crate::api::instance::write_instance_file_from_reader(
+        instance_id,
+        &file.file_name,
+        reader,
+        file.file_size,
+    )
+    .await
+}
+
+/// Whether the instance already has this exact shared file, so the download
+/// can be skipped. Without a hash from the server it is treated as changed.
+async fn shared_instance_file_is_current(
+    instance_id: &str,
+    file: &SharedInstanceExternalFileData,
+) -> crate::Result<bool> {
+    let Some(expected_sha1) = file.sha1.as_deref() else {
+        return Ok(false);
+    };
+    let path = crate::api::instance::validate_instance_file_write(
+        instance_id,
+        &file.file_name,
+    )
+    .await?;
+    let is_same_size =
+        tokio::fs::symlink_metadata(&path)
+            .await
+            .is_ok_and(|metadata| {
+                metadata.is_file() && metadata.len() == file.file_size
+            });
+    if !is_same_size {
+        return Ok(false);
+    }
+
+    let (_, sha1) = crate::util::fetch::sha1_file_async(&path).await?;
+    Ok(sha1.eq_ignore_ascii_case(expected_sha1))
 }
 
 fn validate_shared_instance_external_file_name(
@@ -1056,14 +1164,4 @@ fn read_config_bundle(bytes: &[u8]) -> crate::Result<Vec<(PathBuf, Vec<u8>)>> {
     }
 
     Ok(files)
-}
-
-fn is_supported_config_file(path: &std::path::Path) -> bool {
-    path.extension()
-        .and_then(|extension| extension.to_str())
-        .is_some_and(|extension| {
-            CONFIG_FILE_EXTENSIONS
-                .iter()
-                .any(|candidate| extension.eq_ignore_ascii_case(candidate))
-        })
 }

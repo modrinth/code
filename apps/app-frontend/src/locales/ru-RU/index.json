@@ -4280,9 +4280,6 @@
   "instance.shared-instance.publish-review.admonition-header": {
     "message": "Отправка изменений игрокам"
   },
-  "instance.shared-instance.publish-review.config-title-v2": {
-    "message": "Выберите файлы настройки"
-  },
   "instance.shared-instance.publish-review.description": {
     "message": "Ознакомьтесь с изменениями в содержимом и выберите файлы конфигурации, которые следует включить в это обновление."
   },

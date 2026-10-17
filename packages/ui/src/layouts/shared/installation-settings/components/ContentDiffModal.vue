@@ -9,111 +9,128 @@
 		width="544px"
 		no-padding
 		scrollable
+		:animate-resize="!resizeAnimationPaused"
 	>
-		<div class="flex flex-col gap-4" :class="hasExternalDiffs ? 'px-6 py-4' : 'p-4'">
-			<template v-if="hasExternalDiffs">
-				<p v-if="description" class="m-0 text-primary">{{ description }}</p>
-				<Admonition type="warning" :header="formatMessage(messages.unknownFilesWarning)">
-					{{ externalWarningDescription || formatMessage(messages.unknownFilesDescription) }}
-				</Admonition>
-			</template>
-			<Admonition v-else :type="hasUnknownContent ? 'warning' : 'info'" :header="admonitionHeader">
-				<div class="flex flex-col gap-2">
-					<span>{{ description }}</span>
-					<span v-if="hasUnknownContent">{{ formatMessage(messages.unknownContentBody) }}</span>
-				</div>
-			</Admonition>
-
-			<div v-if="diffs.length" class="flex flex-col gap-1">
-				<span v-if="versionDate" class="font-semibold text-contrast">{{ versionDate }}</span>
-				<div class="flex flex-wrap items-center gap-2 text-primary">
-					<div v-if="updatedCount" class="flex items-center gap-1">
-						<RefreshCwIcon class="size-4" />
-						{{ formatMessage(messages.updatedCount, { count: updatedCount }) }}
-					</div>
-					<div v-if="addedCount" class="flex items-center gap-1">
-						<PlusIcon class="size-4" />
-						{{ formatMessage(messages.addedCount, { count: addedCount }) }}
-					</div>
-					<div v-if="removedCount" class="flex items-center gap-1">
-						<MinusIcon class="size-4" />
-						{{ formatMessage(messages.removedCount, { count: removedCount }) }}
-					</div>
-					<div v-if="removedDisabledCount" class="flex items-center gap-1">
-						<MinusIcon class="size-4" />
-						{{ formatMessage(messages.removedDisabledCount, { count: removedDisabledCount }) }}
-					</div>
-				</div>
-			</div>
-		</div>
-
 		<div
-			class="flex max-h-[272px] flex-col overflow-y-auto border-0 border-y border-solid border-surface-5 bg-surface-2 px-3 py-2"
+			class="grid transition-[grid-template-rows] duration-300 ease-in-out motion-reduce:transition-none"
+			:class="hideSummary ? 'grid-rows-[0fr]' : 'grid-rows-[1fr]'"
+			:inert="hideSummary"
 		>
-			<div v-if="!diffs.length" class="flex h-10 min-h-10 items-center gap-2 px-2">
-				<div class="flex w-4 shrink-0 items-center justify-center">
-					<MinusIcon class="size-4" />
-				</div>
-				<span class="text-sm font-medium text-contrast">
-					{{ formatMessage(messages.noContentChanges) }}
-				</span>
-			</div>
-			<div
-				v-for="(diff, index) in sortedDiffs"
-				:key="diff.projectName || diff.fileName || (isConfigurationDiff(diff) ? diff.type : index)"
-				class="flex h-10 min-h-10 items-center gap-2"
-				:class="showExternalWarning(diff) ? '-mx-3 px-5' : 'px-2'"
-				:style="
-					showExternalWarning(diff)
-						? {
-								backgroundColor: 'color-mix(in srgb, var(--color-orange) 10%, transparent)',
-							}
-						: undefined
-				"
-			>
-				<div class="relative flex w-4 shrink-0 self-stretch items-center justify-center">
-					<div
-						v-if="index > 0"
-						class="absolute left-1/2 top-0 h-3 w-px -translate-x-1/2 bg-surface-5"
-					/>
-					<PlusIcon
-						v-if="diff.type === 'added' || diff.type === 'modpack_linked'"
-						class="relative z-[1] size-4"
-					/>
-					<MinusIcon
-						v-else-if="diff.type === 'removed' || diff.type === 'modpack_unlinked'"
-						class="relative z-[1] size-4 text-red"
-					/>
-					<RefreshCwIcon v-else class="relative z-[1] size-4" />
-					<div
-						v-if="index < sortedDiffs.length - 1"
-						class="absolute bottom-0 left-1/2 top-7 w-px -translate-x-1/2 bg-surface-5"
-					/>
+			<div class="min-h-0 overflow-hidden">
+				<div class="flex flex-col gap-4" :class="hasExternalDiffs ? 'px-6 py-4' : 'p-4'">
+					<template v-if="hasExternalDiffs">
+						<p v-if="description" class="m-0 text-primary">{{ description }}</p>
+						<Admonition type="warning" :header="formatMessage(messages.unknownFilesWarning)">
+							{{ externalWarningDescription || formatMessage(messages.unknownFilesDescription) }}
+						</Admonition>
+					</template>
+					<Admonition
+						v-else
+						:type="hasUnknownContent ? 'warning' : 'info'"
+						:header="admonitionHeader"
+					>
+						<div class="flex flex-col gap-2">
+							<span>{{ description }}</span>
+							<span v-if="hasUnknownContent">{{ formatMessage(messages.unknownContentBody) }}</span>
+						</div>
+					</Admonition>
+
+					<div v-if="diffs.length" class="flex flex-col gap-1">
+						<span v-if="versionDate" class="font-semibold text-contrast">{{ versionDate }}</span>
+						<div class="flex flex-wrap items-center gap-2 text-primary">
+							<div v-if="updatedCount" class="flex items-center gap-1">
+								<RefreshCwIcon class="size-4" />
+								{{ formatMessage(messages.updatedCount, { count: updatedCount }) }}
+							</div>
+							<div v-if="addedCount" class="flex items-center gap-1">
+								<PlusIcon class="size-4" />
+								{{ formatMessage(messages.addedCount, { count: addedCount }) }}
+							</div>
+							<div v-if="removedCount" class="flex items-center gap-1">
+								<MinusIcon class="size-4" />
+								{{ formatMessage(messages.removedCount, { count: removedCount }) }}
+							</div>
+							<div v-if="removedDisabledCount" class="flex items-center gap-1">
+								<MinusIcon class="size-4" />
+								{{ formatMessage(messages.removedDisabledCount, { count: removedDisabledCount }) }}
+							</div>
+						</div>
+					</div>
 				</div>
 
-				<div class="flex min-w-0 flex-1 items-center gap-1 text-sm">
-					<span class="shrink-0 whitespace-nowrap text-primary">{{ getDiffTypeLabel(diff) }}</span>
-					<template v-if="showExternalWarning(diff)">
-						<CircleAlertIcon class="size-4 shrink-0 text-orange" />
-						<span class="truncate font-medium text-orange">
-							{{ formatMessage(messages.unknownProject) }}
-						</span>
-					</template>
-					<span
-						v-else-if="!isConfigurationDiff(diff) || diff.type === 'modpack_updated'"
-						class="truncate font-medium text-contrast"
-					>
-						{{ diff.projectName || (diff.fileName ? decodeURIComponent(diff.fileName) : '') }}
-					</span>
-				</div>
-				<span
-					v-if="getVersionLabel(diff)"
-					class="ml-2 max-w-[60%] min-w-0 shrink truncate text-right text-xs"
-					:class="showExternalWarning(diff) ? 'text-orange' : 'text-primary'"
-					:title="getVersionLabel(diff)"
+				<div
+					class="flex max-h-[272px] flex-col overflow-y-auto border-0 border-y border-solid border-surface-5 bg-surface-2 px-3 py-2"
 				>
-					{{ getVersionLabel(diff) }}
-				</span>
+					<div v-if="!diffs.length" class="flex h-10 min-h-10 items-center gap-2 px-2">
+						<div class="flex w-4 shrink-0 items-center justify-center">
+							<MinusIcon class="size-4" />
+						</div>
+						<span class="text-sm font-medium text-contrast">
+							{{ formatMessage(messages.noContentChanges) }}
+						</span>
+					</div>
+					<div
+						v-for="(diff, index) in sortedDiffs"
+						:key="
+							diff.projectName || diff.fileName || (isConfigurationDiff(diff) ? diff.type : index)
+						"
+						class="flex h-10 min-h-10 items-center gap-2"
+						:class="showExternalWarning(diff) ? '-mx-3 px-5' : 'px-2'"
+						:style="
+							showExternalWarning(diff)
+								? {
+										backgroundColor: 'color-mix(in srgb, var(--color-orange) 10%, transparent)',
+									}
+								: undefined
+						"
+					>
+						<div class="relative flex w-4 shrink-0 self-stretch items-center justify-center">
+							<div
+								v-if="index > 0"
+								class="absolute left-1/2 top-0 h-3 w-px -translate-x-1/2 bg-surface-5"
+							/>
+							<PlusIcon
+								v-if="diff.type === 'added' || diff.type === 'modpack_linked'"
+								class="relative z-[1] size-4"
+							/>
+							<MinusIcon
+								v-else-if="diff.type === 'removed' || diff.type === 'modpack_unlinked'"
+								class="relative z-[1] size-4 text-red"
+							/>
+							<RefreshCwIcon v-else class="relative z-[1] size-4" />
+							<div
+								v-if="index < sortedDiffs.length - 1"
+								class="absolute bottom-0 left-1/2 top-7 w-px -translate-x-1/2 bg-surface-5"
+							/>
+						</div>
+
+						<div class="flex min-w-0 flex-1 items-center gap-1 text-sm">
+							<span class="shrink-0 whitespace-nowrap text-primary">{{
+								getDiffTypeLabel(diff)
+							}}</span>
+							<template v-if="showExternalWarning(diff)">
+								<CircleAlertIcon class="size-4 shrink-0 text-orange" />
+								<span class="truncate font-medium text-orange">
+									{{ formatMessage(messages.unknownProject) }}
+								</span>
+							</template>
+							<span
+								v-else-if="!isConfigurationDiff(diff) || diff.type === 'modpack_updated'"
+								class="truncate font-medium text-contrast"
+							>
+								{{ diff.projectName || (diff.fileName ? decodeURIComponent(diff.fileName) : '') }}
+							</span>
+						</div>
+						<span
+							v-if="getVersionLabel(diff)"
+							class="ml-2 max-w-[60%] min-w-0 shrink truncate text-right text-xs"
+							:class="showExternalWarning(diff) ? 'text-orange' : 'text-primary'"
+							:title="getVersionLabel(diff)"
+						>
+							{{ getVersionLabel(diff) }}
+						</span>
+					</div>
+				</div>
 			</div>
 		</div>
 
@@ -205,7 +222,7 @@ import {
 	ReportIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { type Component, computed, ref } from 'vue'
+import { type Component, computed, onBeforeUnmount, ref, watch } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import { Button } from '#ui/components/base/buttons'
@@ -233,6 +250,11 @@ const props = defineProps<{
 	showExternalWarnings?: boolean
 	externalWarningDescription?: string
 	versionDate?: string
+	/**
+	 * Collapses the admonition and diff list over 300ms so `additional-content` fills the modal.
+	 * Content that expands alongside it should use the same duration and easing.
+	 */
+	hideSummary?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -247,6 +269,24 @@ const modal = ref<InstanceType<typeof NewModal>>()
 const backupCreator = ref<InstanceType<typeof InlineBackupCreator>>()
 const buttonsDisabled = ref(false)
 const closingFromAction = ref(false)
+
+/** Outlasts the 300ms summary transition, which NewModal's resize animation would otherwise clip. */
+const SUMMARY_RESIZE_PAUSE_MS = 350
+const resizeAnimationPaused = ref(false)
+let resumeResizeAnimationTimeout: ReturnType<typeof setTimeout> | undefined
+
+watch(
+	() => props.hideSummary,
+	() => {
+		resizeAnimationPaused.value = true
+		clearTimeout(resumeResizeAnimationTimeout)
+		resumeResizeAnimationTimeout = setTimeout(() => {
+			resizeAnimationPaused.value = false
+		}, SUMMARY_RESIZE_PAUSE_MS)
+	},
+)
+
+onBeforeUnmount(() => clearTimeout(resumeResizeAnimationTimeout))
 
 const removedCount = computed(
 	() => props.diffs.filter((diff) => diff.type === 'removed' && !diff.disabled).length,
@@ -455,7 +495,7 @@ const configurationDiffMessages = defineMessages({
 	},
 	config_files_updated: {
 		id: 'content.diff-modal.config-files-updated',
-		defaultMessage: 'Changed config files',
+		defaultMessage: 'Changed files',
 	},
 })
 

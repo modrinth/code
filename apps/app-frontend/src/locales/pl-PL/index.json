@@ -4292,9 +4292,6 @@
   "instance.shared-instance.publish-review.admonition-header": {
     "message": "Opublikuj aktualizację graczom"
   },
-  "instance.shared-instance.publish-review.config-title-v2": {
-    "message": "Wybierz pliki konfiguracji"
-  },
   "instance.shared-instance.publish-review.description": {
     "message": "Sprawdź zmiany zawartości i wybierz pliki konfiguracji, które mają być zawarte w tej aktualizacji."
   },

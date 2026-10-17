@@ -4382,6 +4382,12 @@
   "instance.shared-instance.error.title": {
     "message": "Something has gone wrong"
   },
+  "instance.shared-instance.file-not-allowed.text": {
+    "message": "You are not allowed to share {fileName}"
+  },
+  "instance.shared-instance.file-not-allowed.title": {
+    "message": "File type not allowed"
+  },
   "instance.shared-instance.network-error.text": {
     "message": "Unable to connect to shared instances API"
   },
@@ -4397,11 +4403,11 @@
   "instance.shared-instance.publish-review.admonition-header": {
     "message": "Push update to players"
   },
-  "instance.shared-instance.publish-review.config-title-v2": {
-    "message": "Select config files"
-  },
   "instance.shared-instance.publish-review.description": {
-    "message": "Review the content changes and choose any config files to include in this update."
+    "message": "Review the content changes and choose any files to include in this update."
+  },
+  "instance.shared-instance.publish-review.files-title": {
+    "message": "Select files"
   },
   "instance.shared-instance.publish-review.header": {
     "message": "Review changes"
@@ -4411,6 +4417,15 @@
   },
   "instance.shared-instance.publish-review.removed-label": {
     "message": "Removed"
+  },
+  "instance.shared-instance.publish-review.storage-over-limit": {
+    "message": "{size} over the limit. Deselect some files to push this update."
+  },
+  "instance.shared-instance.publish-review.storage-title": {
+    "message": "Storage allowance"
+  },
+  "instance.shared-instance.publish-review.storage-usage": {
+    "message": "{used} of {limit}"
   },
   "instance.shared-instance.tooltip": {
     "message": "This instance's content is being managed by someone else."

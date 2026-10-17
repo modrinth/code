@@ -3587,9 +3587,6 @@
   "instance.shared-instance.publish-review.admonition-header": {
     "message": "Oyunculara güncellemeyi gönder"
   },
-  "instance.shared-instance.publish-review.config-title-v2": {
-    "message": "Yapılandırma dosyalarını seç"
-  },
   "instance.shared-instance.publish-review.description": {
     "message": "İçerik değişikliklerini gözden geçirin ve bu güncellemeye dahil edilecek yapılandırma dosyalarını seçin."
   },

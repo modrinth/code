@@ -7,50 +7,114 @@
 		:diffs="publishDiffs"
 		:confirm-label="formatMessage(messages.publishButton)"
 		:confirm-icon="UploadIcon"
-		:confirm-disabled="publishDiffs.length === 0 && selectedConfigPaths.length === 0"
+		:confirm-disabled="
+			overStorageLimit || (publishDiffs.length === 0 && selectedFilePaths.length === 0)
+		"
 		:added-label="formatMessage(messages.addedLabel)"
 		:removed-label="formatMessage(messages.removedLabel)"
+		:hide-summary="filesExpanded"
 		@confirm="publishChanges"
 		@cancel="finishReview"
 	>
 		<template #additional-content>
-			<Accordion
-				class="min-w-0"
-				overflow-visible
-				button-class="w-full bg-transparent m-0 p-0 border-none"
+			<button
+				type="button"
+				class="m-0 flex w-full cursor-pointer items-center gap-1 border-none bg-transparent p-0 text-contrast"
+				:aria-expanded="filesExpanded"
+				@click="filesExpanded = !filesExpanded"
 			>
-				<template #title>
-					<FileCogIcon class="size-4 shrink-0 text-primary" />
-					<span class="text-lg font-semibold text-contrast">
-						{{ formatMessage(messages.configTitle) }}
-					</span>
-				</template>
-				<div class="flex min-w-0 flex-col gap-3 pt-4">
-					<div ref="configFileTreeContainer" class="max-h-[292px] overflow-y-auto rounded-[20px]">
+				<FolderOpenIcon class="size-4 shrink-0 text-primary" />
+				<span class="text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.filesTitle) }}
+				</span>
+				<DropdownIcon
+					class="ml-auto size-5 shrink-0 text-contrast transition-transform duration-300"
+					:class="{ 'rotate-180': filesExpanded }"
+				/>
+			</button>
+			<div
+				class="grid transition-[grid-template-rows] duration-300 ease-in-out motion-reduce:transition-none"
+				:class="filesExpanded ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'"
+				:inert="!filesExpanded"
+			>
+				<div class="flex min-h-0 min-w-0 flex-col gap-4 overflow-hidden">
+					<div
+						ref="fileTreeContainer"
+						class="mt-2 max-h-[calc(70vh-10rem)] overflow-y-auto rounded-[20px]"
+					>
 						<FileTreeSelect
-							v-model="includedConfigPaths"
-							v-model:excluded-paths="excludedConfigPaths"
-							:items="configFileItems"
-							:show-size="false"
+							v-model="includedFilePaths"
+							v-model:excluded-paths="excludedFilePaths"
+							:items="fileItems"
 							:show-modified="false"
-							@navigate="scrollConfigFileTreeToTop"
+							@navigate="scrollFileTreeToTop"
 						/>
 					</div>
+					<div class="flex flex-col gap-2">
+						<div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+							<span class="font-semibold text-contrast">
+								{{ formatMessage(messages.storageTitle) }}
+							</span>
+							<span
+								class="font-semibold tabular-nums"
+								:class="overStorageLimit ? 'text-red' : 'text-contrast'"
+								aria-live="polite"
+							>
+								{{
+									formatMessage(messages.storageUsage, {
+										used: formatBytes(selectedSize, 1),
+										limit: formatBytes(STORAGE_LIMIT_BYTES, 0),
+									})
+								}}
+							</span>
+						</div>
+						<div
+							role="meter"
+							:aria-label="formatMessage(messages.storageTitle)"
+							:aria-valuenow="selectedSize"
+							:aria-valuemin="0"
+							:aria-valuemax="STORAGE_LIMIT_BYTES"
+							class="relative h-3.5 overflow-hidden rounded-full bg-surface-4"
+						>
+							<div
+								class="absolute inset-y-0 left-0 bg-gradient-to-b from-white/10 to-black/10 motion-safe:transition-[width,background-color] motion-safe:duration-300"
+								:style="{ width: `${withinLimitPercent}%`, backgroundColor: storageBarColor }"
+							/>
+							<div
+								v-if="overStorageLimit"
+								class="absolute inset-y-0 right-0 bg-red bg-gradient-to-b from-white/10 to-black/10 motion-safe:transition-[left] motion-safe:duration-300"
+								:style="{ left: `calc(${limitMarkerPercent}% + 2px)` }"
+							/>
+							<div
+								v-if="overStorageLimit"
+								class="absolute inset-y-0 w-0 border-0 border-l-2 border-dotted border-contrast"
+								:style="{ left: `${limitMarkerPercent}%` }"
+								aria-hidden="true"
+							/>
+						</div>
+						<p v-if="overStorageLimit" class="m-0 text-sm text-red">
+							{{
+								formatMessage(messages.storageOverLimit, {
+									size: formatBytes(selectedSize - STORAGE_LIMIT_BYTES, 1),
+								})
+							}}
+						</p>
+					</div>
 				</div>
-			</Accordion>
+			</div>
 		</template>
 	</ContentDiffModal>
 </template>
 
 <script setup lang="ts">
-import { FileCogIcon, UploadIcon } from '@modrinth/assets'
+import { DropdownIcon, FolderOpenIcon, UploadIcon } from '@modrinth/assets'
 import {
-	Accordion,
 	type ContentDiffItem,
 	ContentDiffModal,
 	defineMessages,
 	FileTreeSelect,
 	type FileTreeSelectItem,
+	useFormatBytes,
 	useVIntl,
 } from '@modrinth/ui'
 import { computed, ref } from 'vue'
@@ -59,11 +123,18 @@ import {
 	getSharedInstanceUnavailableReason,
 	isSharedInstanceUnavailableError,
 } from '@/helpers/install'
-import { get_shared_instance_publish_preview, publish_shared_instance } from '@/helpers/instance'
+import {
+	get_shared_instance_publish_preview,
+	publish_shared_instance,
+	type SharedInstancePublishFile,
+} from '@/helpers/instance'
 import { useSharedInstanceErrors } from '@/helpers/shared-instance-errors'
 import type { GameInstance } from '@/helpers/types'
 
 type SharedInstancePublishState = 'idle' | 'reviewing' | 'publishing'
+
+const STORAGE_LIMIT_BYTES = 2 * 1024 ** 3
+const STORAGE_WARNING_RATIO = 0.75
 
 const props = defineProps<{
 	instance: GameInstance
@@ -75,24 +146,43 @@ const emit = defineEmits<{
 }>()
 
 const { formatMessage } = useVIntl()
+const formatBytes = useFormatBytes()
 const { notifySharedInstanceError, notifySharedInstanceUnavailable } = useSharedInstanceErrors()
 const publishReviewModal = ref<InstanceType<typeof ContentDiffModal>>()
-const configFileTreeContainer = ref<HTMLElement>()
+const fileTreeContainer = ref<HTMLElement>()
 const publishDiffs = ref<ContentDiffItem[]>([])
-const configFilePaths = ref<string[]>([])
-const includedConfigPaths = ref<string[]>([])
-const excludedConfigPaths = ref<string[]>([])
+const files = ref<SharedInstancePublishFile[]>([])
+const includedFilePaths = ref<string[]>([])
+const excludedFilePaths = ref<string[]>([])
+const filesExpanded = ref(false)
 const state = ref<SharedInstancePublishState>('idle')
-const configFileItems = computed<FileTreeSelectItem[]>(() =>
-	configFilePaths.value.map((path) => ({ path, type: 'file' })),
+const fileItems = computed<FileTreeSelectItem[]>(() =>
+	files.value.map(({ path, size }) => ({ path, size, type: 'file' })),
 )
-const selectedConfigPaths = computed(() => {
-	const includedPaths = new Set(includedConfigPaths.value)
-	const excludedPaths = new Set(excludedConfigPaths.value)
+const selectedFiles = computed(() => {
+	const includedPaths = new Set(includedFilePaths.value)
+	const excludedPaths = new Set(excludedFilePaths.value)
 
-	return configFilePaths.value.filter((path) =>
-		isConfigPathSelected(path, includedPaths, excludedPaths),
-	)
+	return files.value.filter((file) => isPathSelected(file.path, includedPaths, excludedPaths))
+})
+const selectedFilePaths = computed(() => selectedFiles.value.map((file) => file.path))
+const selectedSize = computed(() =>
+	selectedFiles.value.reduce((total, file) => total + file.size, 0),
+)
+const overStorageLimit = computed(() => selectedSize.value > STORAGE_LIMIT_BYTES)
+const storageBarScale = computed(() => Math.max(selectedSize.value, STORAGE_LIMIT_BYTES))
+const withinLimitPercent = computed(
+	() => (Math.min(selectedSize.value, STORAGE_LIMIT_BYTES) / storageBarScale.value) * 100,
+)
+const limitMarkerPercent = computed(() => (STORAGE_LIMIT_BYTES / storageBarScale.value) * 100)
+const storageBarColor = computed(() => {
+	const ratio = Math.min(selectedSize.value / STORAGE_LIMIT_BYTES, 1)
+	if (ratio <= STORAGE_WARNING_RATIO) {
+		const orangeWeight = (ratio / STORAGE_WARNING_RATIO) * 100
+		return `color-mix(in oklch, var(--color-green), var(--color-orange) ${orangeWeight}%)`
+	}
+	const redWeight = ((ratio - STORAGE_WARNING_RATIO) / (1 - STORAGE_WARNING_RATIO)) * 100
+	return `color-mix(in oklch, var(--color-orange), var(--color-red) ${redWeight}%)`
 })
 
 async function show(e?: MouseEvent) {
@@ -117,9 +207,10 @@ async function show(e?: MouseEvent) {
 			fileCount: diff.configFileCount ?? undefined,
 			disabled: diff.disabled,
 		}))
-		configFilePaths.value = preview.configFiles
-		includedConfigPaths.value = []
-		excludedConfigPaths.value = []
+		files.value = preview.files
+		includedFilePaths.value = []
+		excludedFilePaths.value = []
+		filesExpanded.value = false
 		if (!publishReviewModal.value) return
 
 		publishReviewModal.value.show(e)
@@ -132,11 +223,11 @@ async function show(e?: MouseEvent) {
 }
 
 async function publishChanges() {
-	if (state.value !== 'reviewing') return
+	if (state.value !== 'reviewing' || overStorageLimit.value) return
 
 	setState('publishing')
 	try {
-		await publish_shared_instance(props.instance.id, selectedConfigPaths.value)
+		await publish_shared_instance(props.instance.id, selectedFilePaths.value)
 		emit('published')
 	} catch (error) {
 		handlePublishError(error)
@@ -145,11 +236,7 @@ async function publishChanges() {
 	}
 }
 
-function isConfigPathSelected(
-	path: string,
-	includedPaths: Set<string>,
-	excludedPaths: Set<string>,
-) {
+function isPathSelected(path: string, includedPaths: Set<string>, excludedPaths: Set<string>) {
 	let selected = false
 	let prefix = ''
 
@@ -162,9 +249,9 @@ function isConfigPathSelected(
 	return selected
 }
 
-function scrollConfigFileTreeToTop() {
-	if (configFileTreeContainer.value) {
-		configFileTreeContainer.value.scrollTop = 0
+function scrollFileTreeToTop() {
+	if (fileTreeContainer.value) {
+		fileTreeContainer.value.scrollTop = 0
 	}
 }
 
@@ -200,8 +287,7 @@ const messages = defineMessages({
 	},
 	description: {
 		id: 'instance.shared-instance.publish-review.description',
-		defaultMessage:
-			'Review the content changes and choose any config files to include in this update.',
+		defaultMessage: 'Review the content changes and choose any files to include in this update.',
 	},
 	publishButton: {
 		id: 'instance.shared-instance.publish-review.publish-button',
@@ -215,9 +301,21 @@ const messages = defineMessages({
 		id: 'instance.shared-instance.publish-review.removed-label',
 		defaultMessage: 'Removed',
 	},
-	configTitle: {
-		id: 'instance.shared-instance.publish-review.config-title-v2',
-		defaultMessage: 'Select config files',
+	filesTitle: {
+		id: 'instance.shared-instance.publish-review.files-title',
+		defaultMessage: 'Select files',
+	},
+	storageTitle: {
+		id: 'instance.shared-instance.publish-review.storage-title',
+		defaultMessage: 'Storage allowance',
+	},
+	storageUsage: {
+		id: 'instance.shared-instance.publish-review.storage-usage',
+		defaultMessage: '{used} of {limit}',
+	},
+	storageOverLimit: {
+		id: 'instance.shared-instance.publish-review.storage-over-limit',
+		defaultMessage: '{size} over the limit. Deselect some files to push this update.',
 	},
 })
 
