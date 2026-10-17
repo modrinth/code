@@ -205,7 +205,7 @@ const panels = provideReviewPanels(
 			hasPreviousStructuredIssues:
 				wasReviewed.value &&
 				project.value?.thread_id === threadQuery.data.value?.id &&
-				(threadQuery.data.value?.issues.length ?? 0) > 0,
+				(threadQuery.data.value?.issues?.length ?? 0) > 0,
 			sendIssuesAsThreadMessage: settings.value.get(
 				moderationSettings.General.SendIssuesAsThreadMessage,
 			),
