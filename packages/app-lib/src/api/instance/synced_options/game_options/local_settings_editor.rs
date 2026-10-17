@@ -85,23 +85,21 @@ async fn load_instance_document(
 )> {
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
-        .ok_or_else(|| input_error("Unknown instance"))?;
+        .ok_or_else(|| input_error("unknown instance"))?;
     if crate::state::game_options_sync_is_enabled(&state.pool).await?
         && metadata.synced_options.game_options
     {
-        return Err(input_error(
-            "This instance is using synced game settings.",
-        ));
+        return Err(input_error("this instance is using synced game settings"));
     }
     if synced_options::sync_files_are_protected(&metadata) {
         return Err(input_error(
-            "Game settings cannot be edited while this instance is installing or updating.",
+            "game settings cannot be edited while this instance is installing or updating",
         ));
     }
     let path = options_path(&metadata, state);
     if !path.exists() {
         return Err(input_error(
-            "Launch this instance once so Minecraft can create options.txt.",
+            "launch this instance once so Minecraft can create options.txt",
         ));
     }
     let (document, input_bytes) = read_document(&path).await?;
@@ -236,11 +234,11 @@ fn encode_setting_value(
     } else {
         validate_canonical_value(None, value)?;
         let key = setting.raw_key.clone().ok_or_else(|| {
-            input_error("Custom setting is missing its file key")
+            input_error("custom setting is missing its file key")
         })?;
         let CanonicalValue::ExternalRaw(raw) = value else {
             return Err(input_error(
-                "Custom settings require a raw string value",
+                "custom settings require a raw string value",
             ));
         };
         validate_raw_key_value(&key, raw)?;
@@ -372,7 +370,7 @@ pub async fn save_changes(
             .find(|setting| setting.option_id == change.option_id)
             .ok_or_else(|| {
                 input_error(format!(
-                    "Unknown game setting {}",
+                    "unknown game setting {}",
                     change.option_id
                 ))
             })?;
@@ -391,12 +389,12 @@ pub async fn save_changes(
         }
         if change.sync_enabled.is_some() {
             return Err(input_error(
-                "Sync selection cannot be changed in the instance editor",
+                "sync selection cannot be changed in the instance editor",
             ));
         }
         let Some(Some(value)) = change.canonical_value else {
             return Err(input_error(format!(
-                "Choose a value for {}",
+                "choose a value for {}",
                 setting.option_id
             )));
         };

@@ -297,7 +297,7 @@ pub(super) fn encode_without_bom(
     let (encoded, _, had_errors) = encoding.encode(text);
     if had_errors {
         return Err(input_error(
-            "A synced option value cannot be represented in this file's encoding",
+            "a synced option value cannot be represented in this file's encoding",
         ));
     }
     Ok(encoded.into_owned())
@@ -316,14 +316,14 @@ pub(super) fn validate_raw_key_value(
         || key.contains(':')
         || key.chars().any(char::is_control)
     {
-        return Err(input_error("Invalid options.txt setting key"));
+        return Err(input_error("invalid options.txt setting key"));
     }
     if value.len() > MAX_VALUE_BYTES
         || value
             .chars()
             .any(|character| character.is_control() && character != '\t')
     {
-        return Err(input_error("Invalid options.txt setting value"));
+        return Err(input_error("invalid options.txt setting value"));
     }
     Ok(())
 }
@@ -349,7 +349,7 @@ pub(super) async fn read_document(
         .await
         .map_err(|error| io::IOError::with_path(error, path))?;
     if metadata.file_type().is_symlink() {
-        return Err(input_error("Refusing to sync a symlinked options.txt"));
+        return Err(input_error("refusing to sync a symlinked options.txt"));
     }
     let bytes = io::read(path).await?;
     let document = GameOptionsDocument::parse(&bytes)?;

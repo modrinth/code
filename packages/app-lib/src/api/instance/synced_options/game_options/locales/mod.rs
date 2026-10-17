@@ -348,7 +348,7 @@ pub async fn get_game_setting_locale_labels(
     refresh_sources: bool,
 ) -> crate::Result<GameSettingLocaleLabels> {
     if option_ids.len() > 16_384 {
-        return Err(input_error("Too many requested game-setting labels"));
+        return Err(input_error("too many requested game-setting labels"));
     }
     let requested: std::collections::HashSet<_> = option_ids
         .into_iter()
@@ -363,7 +363,7 @@ pub async fn get_game_setting_locale_labels(
     }
     let locale = minecraft_locale(locale);
     if !archive::valid_locale(&locale) {
-        return Err(input_error("Invalid Minecraft locale"));
+        return Err(input_error("invalid Minecraft locale"));
     }
     let state = State::get().await?;
     if refresh_sources {

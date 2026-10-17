@@ -279,7 +279,7 @@ pub async fn save_changes(
     let _guard = state.lock_synced_options().await;
     if !game_options_sync_is_enabled(&state.pool).await? {
         return Err(input_error(
-            "Turn on game-settings sync before editing shared values.",
+            "turn on game-settings sync before editing shared values",
         ));
     }
     let current_editor = load_settings_editor(&state).await?;
@@ -314,7 +314,7 @@ pub async fn save_changes(
             .find(|setting| setting.option_id == change.option_id)
         else {
             return Err(input_error(format!(
-                "Unknown game setting {}",
+                "unknown game setting {}",
                 change.option_id
             )));
         };
@@ -344,7 +344,7 @@ pub async fn save_changes(
         if resulting_enabled {
             if resulting_value.is_none() {
                 return Err(input_error(format!(
-                    "Choose a value before enabling {}",
+                    "choose a value before enabling {}",
                     setting.option_id
                 )));
             }

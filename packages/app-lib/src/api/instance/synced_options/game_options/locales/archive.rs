@@ -99,7 +99,7 @@ pub(super) fn inspect(
     }
     if hasher.digest().to_string() != expected_hash {
         return Err(input_error(
-            "Locale source changed before it could be indexed",
+            "locale source changed before it could be indexed",
         ));
     }
     file.rewind().map_err(crate::util::io::IOError::from)?;
@@ -124,7 +124,7 @@ fn read_entry<R: Read + Seek>(
         .map_err(|e| input_error(e.to_string()))?;
     let limit = limit.min(*budget);
     if entry.size() > limit as u64 {
-        return Err(input_error("Locale archive entry exceeds size limit"));
+        return Err(input_error("locale archive entry exceeds size limit"));
     }
     let mut bytes = Vec::new();
     entry
@@ -133,7 +133,7 @@ fn read_entry<R: Read + Seek>(
         .read_to_end(&mut bytes)
         .map_err(crate::util::io::IOError::from)?;
     if bytes.len() > limit {
-        return Err(input_error("Locale archive entry exceeds size limit"));
+        return Err(input_error("locale archive entry exceeds size limit"));
     }
     *budget -= bytes.len();
     Ok(bytes)
@@ -150,7 +150,7 @@ fn inspect_archive<R: Read + Seek>(
     let mut archive =
         ZipArchive::new(reader).map_err(|e| input_error(e.to_string()))?;
     if archive.len() > *entries {
-        return Err(input_error("Too many entries in locale archive"));
+        return Err(input_error("too many entries in locale archive"));
     }
     *entries -= archive.len();
     let names: BTreeSet<String> =
@@ -225,7 +225,7 @@ fn inspect_archive<R: Read + Seek>(
         }
     }
     if !nested.is_empty() && depth >= MAX_NESTED_DEPTH {
-        return Err(input_error("Locale archive nesting exceeds limit"));
+        return Err(input_error("locale archive nesting exceeds limit"));
     }
     for name in nested {
         if !names.contains(&name) || !name.ends_with(".jar") {

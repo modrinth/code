@@ -102,7 +102,7 @@ async fn load_archive_keys(
     source: &ArchiveSource,
 ) -> crate::Result<ArchiveKeys> {
     if !super::archive::valid_hash(&source.hash) {
-        return Err(super::input_error("Invalid locale archive hash"));
+        return Err(super::input_error("invalid locale archive hash"));
     }
     let path = sources::root(state)
         .join("origin-keys-v1")

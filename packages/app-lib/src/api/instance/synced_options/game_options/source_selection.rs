@@ -24,7 +24,7 @@ pub(in crate::api::instance) async fn initialize_from_source_instance(
     let path = options_path(metadata, state);
     if !path.exists() {
         return Err(input_error(
-            "Launch the source instance once so Minecraft can create options.txt.",
+            "launch the source instance once so Minecraft can create options.txt",
         ));
     }
     let (document, _) = read_document(&path).await?;
@@ -284,7 +284,7 @@ pub(in crate::api::instance) async fn initialize_from_source_instance(
     }
     if !seeded_any {
         return Err(input_error(
-            "The selected options.txt has no settings that can be safely used as a sync baseline.",
+            "the selected options.txt has no settings that can be safely used as a sync baseline",
         ));
     }
 

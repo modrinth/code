@@ -74,7 +74,7 @@ pub(super) async fn write_library(
 				Ok(Some(stored_file)) => stored_file,
 				Ok(None) | Err(_) if deferred => continue,
 				Ok(None) => return Err(input(
-					"A synced pack needs repair or re-import before its library can be saved",
+					"a synced pack needs repair or re-import before its library can be saved",
 				)),
 				Err(error) => return Err(error),
 			};
@@ -190,7 +190,7 @@ pub(super) async fn read_stored_file(
         }
     }
     let version = pack.item.version.as_ref().ok_or_else(|| {
-        input("The synced pack is missing or damaged; repair or re-import it")
+        input("the synced pack is missing or damaged; repair or re-import it")
     })?;
     let version = CachedEntry::get_version(
         &version.id,
@@ -200,7 +200,7 @@ pub(super) async fn read_stored_file(
     )
     .await?
     .ok_or_else(|| {
-        input("The synced pack's original version is unavailable; re-import it")
+        input("the synced pack's original version is unavailable; re-import it")
     })?;
     let file = version
         .files
@@ -397,7 +397,7 @@ async fn recover_legacy_pack(
         }
     }
     Err(input(format!(
-        "Synced pack {} is missing or damaged; restore or re-import it to finish migration",
+        "synced pack {} is missing or damaged; restore or re-import it to finish migration",
         pack.item.file_name
     )))
 }
@@ -424,7 +424,7 @@ async fn import_matching_pack(
     let stored_file = state.content_store.store_file(source).await?;
     if stored_file.metadata.sha512 != sha512 {
         return Err(input(
-            "The synced pack changed while it was being migrated; retry after closing the instance",
+            "the synced pack changed while it was being migrated; retry after closing the instance",
         ));
     }
     Ok(Some(stored_file))

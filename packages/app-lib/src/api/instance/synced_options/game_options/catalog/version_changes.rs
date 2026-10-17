@@ -683,7 +683,7 @@ fn validate_value(
         };
         if !type_valid {
             return Err(input_error(format!(
-                "Invalid value type for {}",
+                "invalid value type for {}",
                 definition.id
             )));
         }
@@ -696,7 +696,7 @@ fn validate_value(
                 .ok()
                 .is_none_or(|value| !value.is_finite()) =>
             {
-                return Err(input_error("Invalid decimal value"));
+                return Err(input_error("invalid decimal value"));
             }
             (
                 SettingEditor::Integer { min, max, step },
@@ -718,7 +718,7 @@ fn validate_value(
             ) => {
                 let parsed = value
                     .parse::<f64>()
-                    .map_err(|_| input_error("Invalid decimal value"))?;
+                    .map_err(|_| input_error("invalid decimal value"))?;
                 let increment = (parsed - min) / step;
                 if !parsed.is_finite()
                     || parsed < min
@@ -755,7 +755,7 @@ fn validate_value(
                 if !choices.contains(&value.as_str()) =>
             {
                 return Err(input_error(format!(
-                    "Invalid choice for {}",
+                    "invalid choice for {}",
                     definition.id
                 )));
             }
@@ -764,21 +764,21 @@ fn validate_value(
                     || value.len() > 64
                     || value.chars().any(char::is_control) =>
             {
-                return Err(input_error("Invalid language value"));
+                return Err(input_error("invalid language value"));
             }
             (SettingEditor::KeyBinding, CanonicalValue::KeyBinding(value))
                 if value.len() > 256
                     || value.contains(['\r', '\n'])
                     || !valid_modern_key_binding(value) =>
             {
-                return Err(input_error("Invalid key binding value"));
+                return Err(input_error("invalid key binding value"));
             }
             _ => {}
         }
     } else if let CanonicalValue::ExternalRaw(raw) = value {
         validate_raw_key_value("external", raw)?;
     } else {
-        return Err(input_error("Custom settings require a raw string value"));
+        return Err(input_error("custom settings require a raw string value"));
     }
     Ok(())
 }

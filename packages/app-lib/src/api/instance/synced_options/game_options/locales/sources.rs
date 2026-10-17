@@ -68,7 +68,7 @@ pub(super) async fn write_json<T: Serialize>(
 ) -> crate::Result<()> {
     let parent = path
         .parent()
-        .ok_or_else(|| input_error("Missing locale cache directory"))?;
+        .ok_or_else(|| input_error("missing locale cache directory"))?;
     io::create_dir_all(parent).await?;
     io::write(path, serde_json::to_vec(data)?).await?;
     Ok(())
@@ -134,7 +134,7 @@ pub(super) async fn load_snapshot(
     id: &str,
 ) -> crate::Result<Snapshot> {
     if !archive::valid_hash(id) {
-        return Err(input_error("Invalid locale snapshot hash"));
+        return Err(input_error("invalid locale snapshot hash"));
     }
     let bytes =
         io::read(root(state).join("snapshots").join(format!("{id}.json")))
@@ -151,7 +151,7 @@ pub(super) async fn archive_index(
     source: &ArchiveSource,
 ) -> crate::Result<ArchiveIndex> {
     if !archive::valid_hash(&source.hash) {
-        return Err(input_error("Invalid locale archive hash"));
+        return Err(input_error("invalid locale archive hash"));
     }
     let path = root(state)
         .join("archives")

@@ -5,6 +5,7 @@ use super::PackLibrary;
 use super::storage::{read_library, write_library};
 use crate::state::instances::adapters::{filesystem, sqlite::content_rows};
 use crate::state::{InstanceMetadata, State};
+use anyhow::Context;
 use parking_lot::Mutex;
 use std::collections::{BTreeMap, BTreeSet};
 use std::future::Future;
@@ -73,13 +74,9 @@ pub(crate) async fn flush(instance_id: &str) -> Result<(), Arc<crate::Error>> {
             .push(sender);
     }
     start(state);
-    receiver.await.map_err(|_| {
-        crate::ErrorKind::OtherError(
-            "Pack sync worker stopped before completing the request."
-                .to_owned(),
-        )
-        .as_error()
-    })?
+    receiver
+        .await
+        .context("pack sync worker stopped before completing the request")?
 }
 
 fn start(state: Arc<State>) {

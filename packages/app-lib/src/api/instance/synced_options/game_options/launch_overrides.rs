@@ -28,7 +28,7 @@ pub async fn sync_before_launch(instance_id: &str) -> crate::Result<()> {
     let _guard = state.lock_synced_options().await;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
-        .ok_or_else(|| input_error("Unknown instance"))?;
+        .ok_or_else(|| input_error("unknown instance"))?;
     if sync_is_active_for_instance(&metadata, &state).await? {
         let _ =
             apply_shared_settings_to_instance(&metadata, &state, false).await?;
@@ -50,7 +50,7 @@ pub async fn apply_launcher_overrides(
     let _guard = state.lock_synced_options().await;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
-        .ok_or_else(|| input_error("Unknown instance"))?;
+        .ok_or_else(|| input_error("unknown instance"))?;
     let path = options_path(&metadata, &state);
     let (mut document, input_bytes) = if path.exists() {
         read_document(&path).await?

@@ -94,12 +94,12 @@ async fn read_pack_options(
     };
     if metadata.file_type().is_symlink() {
         return Err(input_error(format!(
-            "Refusing to capture a symlinked {name}"
+            "refusing to capture a symlinked {name}"
         )));
     }
     if metadata.len() > MAX_OPTIONS_BYTES as u64 {
         return Err(input_error(format!(
-            "The modpack {name} is too large to capture for syncing"
+            "the modpack {name} is too large to capture for syncing"
         )));
     }
     let bytes = io::read(path).await?;
@@ -111,7 +111,7 @@ async fn read_pack_options(
 async fn options_target_exists(path: &Path) -> crate::Result<bool> {
     match tokio::fs::symlink_metadata(path).await {
         Ok(metadata) if metadata.file_type().is_symlink() => {
-            Err(input_error("Refusing to replace a symlinked options.txt"))
+            Err(input_error("refusing to replace a symlinked options.txt"))
         }
         Ok(_) => Ok(true),
         Err(error) if error.kind() == ErrorKind::NotFound => Ok(false),
@@ -251,7 +251,7 @@ pub(in crate::api::instance) async fn prepare_instance_update_with_state(
             .map_err(|error| io::IOError::with_path(error, &path))?;
         if file_metadata.file_type().is_symlink() {
             return Err(input_error(
-                "Refusing to prepare a symlinked options.txt for a modpack update",
+                "refusing to prepare a symlinked options.txt for a modpack update",
             ));
         }
         if file_metadata.len() > MAX_OPTIONS_BYTES as u64 {
@@ -293,7 +293,7 @@ pub async fn capture_pack_base(
     let _guard = state.lock_synced_options().await;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
-        .ok_or_else(|| input_error("Unknown instance"))?;
+        .ok_or_else(|| input_error("unknown instance"))?;
     let path = options_path(&metadata, &state);
     let feature = SyncedOption::GameOptions.as_str();
     sqlx::query!(
@@ -337,7 +337,7 @@ pub async fn capture_pack_base(
 			.await?
 			.ok_or_else(|| {
 				input_error(format!(
-					"The modpack {template_path} defaults could not be materialized"
+					"the modpack {template_path} defaults could not be materialized"
 				))
 			})?;
             if !options_target_exists(&path).await? {

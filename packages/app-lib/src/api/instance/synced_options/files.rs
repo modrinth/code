@@ -278,13 +278,11 @@ pub(in crate::api::instance) async fn checkpoint(
             expected_sha1: row.expected_sha1,
             merge_base: row.merge_base,
             source_revision: row.source_revision,
-            status: CheckpointStatus::from_str(&row.status).ok_or_else(
-                || {
-                    ErrorKind::InputError(format!(
-                        "Unknown sync checkpoint status {}",
-                        row.status
-                    ))
-                },
+            status: CheckpointStatus::from_str(&row.status).ok_or(
+                ErrorKind::InputError(format!(
+                    "unknown sync checkpoint status {}",
+                    row.status
+                )),
             )?,
         })
     })
