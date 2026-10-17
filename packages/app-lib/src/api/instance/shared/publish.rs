@@ -15,9 +15,7 @@ pub async fn unpublish_shared_instance(instance_id: &str) -> crate::Result<()> {
     let state = State::get().await?;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError("Unknown instance".to_string())
-        })?;
+        .ok_or(crate::ErrorKind::InputError("unknown instance".to_string()))?;
     let Some(attachment) = metadata.shared_instance.clone() else {
         return Ok(());
     };
@@ -35,9 +33,7 @@ pub async fn unlink_shared_instance(instance_id: &str) -> crate::Result<()> {
     let state = State::get().await?;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError("Unknown instance".to_string())
-        })?;
+        .ok_or(crate::ErrorKind::InputError("unknown instance".to_string()))?;
     let Some(attachment) = metadata.shared_instance.clone() else {
         return Ok(());
     };
@@ -101,14 +97,12 @@ pub async fn publish_shared_instance(
     publish_shared_instance_inner(instance_id, &config_paths, &state).await?;
     emit_instance(instance_id, InstancePayloadType::Edited).await?;
 
-    shared_attachment(instance_id, &state)
-        .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError(
-                "Shared instance attachment was not persisted".to_string(),
-            )
-            .into()
-        })
+    shared_attachment(instance_id, &state).await?.ok_or(
+        crate::ErrorKind::InputError(
+            "shared instance attachment was not persisted".to_string(),
+        )
+        .into(),
+    )
 }
 
 #[tracing::instrument]
@@ -118,9 +112,7 @@ pub async fn get_shared_instance_publish_preview(
     let state = State::get().await?;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError("Unknown instance".to_string())
-        })?;
+        .ok_or(crate::ErrorKind::InputError("unknown instance".to_string()))?;
     let Some(attachment) = metadata.shared_instance.clone() else {
         return Ok(None);
     };
@@ -214,11 +206,9 @@ pub(super) async fn modpack_dependency_version_ids(
         &state.api_semaphore,
     )
     .await?
-    .ok_or_else(|| {
-        crate::ErrorKind::InputError(
-            "Shared instance modpack version was not found".to_string(),
-        )
-    })?;
+    .ok_or(crate::ErrorKind::InputError(
+        "shared instance modpack version was not found".to_string(),
+    ))?;
 
     Ok(modpack_version
         .dependencies
@@ -269,11 +259,9 @@ pub(super) async fn shared_instance_install_modpack(
         &state.api_semaphore,
     )
     .await?
-    .ok_or_else(|| {
-        crate::ErrorKind::InputError(
-            "Shared instance modpack version was not found".to_string(),
-        )
-    })?;
+    .ok_or(crate::ErrorKind::InputError(
+        "shared instance modpack version was not found".to_string(),
+    ))?;
     let project = CachedEntry::get_project(
         &modpack_version.project_id,
         Some(CacheBehaviour::MustRevalidate),
@@ -521,10 +509,9 @@ pub(super) async fn shared_versions_by_id(
             .iter()
             .find(|id| !fetched_ids.contains(id.as_str()))
     {
-        return Err(crate::ErrorKind::InputError(format!(
-            "Shared content version {missing} was not found"
-        ))
-        .into());
+        bail!(crate::ErrorKind::InputError(format!(
+            "shared content version {missing} was not found"
+        )));
     }
     Ok(versions
         .into_iter()
@@ -599,14 +586,11 @@ pub(super) async fn publish_shared_instance_inner(
     config_paths: &[String],
     state: &State,
 ) -> crate::Result<()> {
-    let attachment =
-        shared_attachment(instance_id, state)
-            .await?
-            .ok_or_else(|| {
-                crate::ErrorKind::InputError(
-                    "Instance is not attached to a shared instance".to_string(),
-                )
-            })?;
+    let attachment = shared_attachment(instance_id, state).await?.ok_or(
+        crate::ErrorKind::InputError(
+            "instance is not attached to a shared instance".to_string(),
+        ),
+    )?;
     ensure_owner(&attachment)?;
     tracing::info!(
         instance_id,
@@ -680,9 +664,7 @@ pub(super) async fn publish_current_content(
     let _store_lease = state.content_store.lease().await;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError("Unknown instance".to_string())
-        })?;
+        .ok_or(crate::ErrorKind::InputError("unknown instance".to_string()))?;
     ensure_shareable_link(&metadata.link)?;
     update_remote_instance(
         shared_instance_id,
@@ -807,11 +789,7 @@ pub(super) async fn collect_config_files(
     let mut walker = WalkDir::new(&config_path);
 
     while let Some(entry) = walker.next().await {
-        let entry = entry.map_err(|error| {
-            crate::ErrorKind::OtherError(format!(
-                "Failed to read config directory: {error}"
-            ))
-        })?;
+        let entry = entry.context("failed to read config directory")?;
         if !entry.file_type().await?.is_file()
             || !is_supported_config_file(&entry.path())
         {
@@ -855,10 +833,9 @@ async fn build_config_bundle_candidate(
         .collect::<HashMap<_, _>>();
     for selected_path in &selected_paths {
         if !local_files_by_path.contains_key(selected_path) {
-            return Err(crate::ErrorKind::InputError(format!(
-                "Config file is unavailable for sharing: {selected_path}"
-            ))
-            .into());
+            bail!(crate::ErrorKind::InputError(format!(
+                "config file {selected_path} is unavailable for sharing"
+            )));
         }
     }
 
@@ -933,17 +910,15 @@ fn config_bundle_file(
             .filter(|(_, count)| *count > MAX_CONFIG_BUNDLE_ENTRIES)
             .max_by_key(|(_, count)| *count)
         {
-            return Err(crate::ErrorKind::InputError(format!(
-				"The \"{folder}\" config folder has too many files to share ({count}; maximum {MAX_CONFIG_BUNDLE_ENTRIES}). Select fewer files from this folder."
-			))
-			.into());
+            bail!(crate::ErrorKind::InputError(format!(
+                "the \"{folder}\" config folder has too many files to share ({count}; maximum {MAX_CONFIG_BUNDLE_ENTRIES}); select fewer files from this folder"
+            )));
         }
 
-        return Err(crate::ErrorKind::InputError(format!(
-			"Too many config files were selected to share ({}; maximum {MAX_CONFIG_BUNDLE_ENTRIES}). Select fewer files.",
-			entries.len()
-		))
-		.into());
+        bail!(crate::ErrorKind::InputError(format!(
+            "too many config files were selected to share ({}; maximum {MAX_CONFIG_BUNDLE_ENTRIES}); select fewer files",
+            entries.len()
+        )));
     }
     let temporary = tempfile::NamedTempFile::new()?;
     let mut writer = zip::ZipWriter::new(temporary);
@@ -978,19 +953,17 @@ fn copy_config_bundle_entry(
     let limit = MAX_CONFIG_BUNDLE_FILE_SIZE
         .min(MAX_CONFIG_BUNDLE_TOTAL_SIZE.saturating_sub(*total_size));
     if declared_size > limit {
-        return Err(crate::ErrorKind::InputError(
-            "Shared instance config bundle exceeds the uncompressed size limit"
+        bail!(crate::ErrorKind::InputError(
+            "shared instance config bundle exceeds the uncompressed size limit"
                 .to_string(),
-        )
-        .into());
+        ));
     }
     let size = std::io::copy(&mut reader.take(limit + 1), writer)?;
     if size > limit {
-        return Err(crate::ErrorKind::InputError(
-            "Shared instance config bundle exceeds the uncompressed size limit"
+        bail!(crate::ErrorKind::InputError(
+            "shared instance config bundle exceeds the uncompressed size limit"
                 .to_string(),
-        )
-        .into());
+        ));
     }
     *total_size += size;
     Ok(())
@@ -1001,42 +974,36 @@ fn read_config_bundle(
     directory: &Path,
 ) -> crate::Result<BTreeMap<String, PathBuf>> {
     let mut archive = zip::ZipArchive::new(std::fs::File::open(path)?)
-        .map_err(|error| {
-            crate::ErrorKind::InputError(format!(
-                "Invalid shared instance config bundle: {error}"
-            ))
-        })?;
+        .context(crate::ErrorKind::InputError(
+            "invalid shared instance config bundle".to_string(),
+        ))?;
     if archive.len() > MAX_CONFIG_BUNDLE_ENTRIES {
-        return Err(crate::ErrorKind::InputError(
-            "Shared instance config bundle contains too many entries"
+        bail!(crate::ErrorKind::InputError(
+            "shared instance config bundle contains too many entries"
                 .to_string(),
-        )
-        .into());
+        ));
     }
     let mut entries = BTreeMap::new();
     let mut total_size = 0;
 
     for index in 0..archive.len() {
-        let file = archive.by_index(index).map_err(|error| {
-            crate::ErrorKind::InputError(format!(
-                "Invalid shared instance config bundle entry: {error}"
-            ))
-        })?;
+        let file =
+            archive
+                .by_index(index)
+                .context(crate::ErrorKind::InputError(
+                    "invalid shared instance config bundle entry".to_string(),
+                ))?;
         if file.is_dir() {
             continue;
         }
-        let path = file.enclosed_name().ok_or_else(|| {
-            crate::ErrorKind::InputError(
-                "Shared instance config bundle contains an unsafe path"
-                    .to_string(),
-            )
-        })?;
+        let path = file.enclosed_name().ok_or(crate::ErrorKind::InputError(
+            "shared instance config bundle contains an unsafe path".to_string(),
+        ))?;
         if !is_supported_config_file(&path) {
-            return Err(crate::ErrorKind::InputError(format!(
-                "Shared instance config bundle contains unsupported file {}",
+            bail!(crate::ErrorKind::InputError(format!(
+                "shared instance config bundle contains unsupported file {}",
                 path.display()
-            ))
-            .into());
+            )));
         }
         let path = path.to_string_lossy().replace('\\', "/");
         let declared_size = file.size();
@@ -1049,10 +1016,9 @@ fn read_config_bundle(
             &mut output,
         )?;
         if entries.insert(path.clone(), destination).is_some() {
-            return Err(crate::ErrorKind::InputError(format!(
-                "Shared instance config bundle contains duplicate file {path}"
-            ))
-            .into());
+            bail!(crate::ErrorKind::InputError(format!(
+                "shared instance config bundle contains duplicate file {path}"
+            )));
         }
     }
 
@@ -1077,10 +1043,9 @@ pub(super) fn shared_modpack_id(link: &InstanceLink) -> Option<String> {
 
 pub(super) fn ensure_shareable_link(link: &InstanceLink) -> crate::Result<()> {
     if matches!(link, InstanceLink::ImportedModpack { .. }) {
-        return Err(crate::ErrorKind::InputError(
-            "You must unlink this modpack to share your instance".to_string(),
-        )
-        .into());
+        bail!(crate::ErrorKind::InputError(
+            "you must unlink this modpack to share your instance".to_string(),
+        ));
     }
 
     Ok(())
@@ -1099,18 +1064,16 @@ pub(super) async fn upload_external_files(
                 candidate.file_name == upload.file_name
                     && candidate.file_type == upload.file_type
             })
-            .ok_or_else(|| {
-                crate::ErrorKind::InputError(format!(
-                    "Shared instance service requested unknown external file {}",
-                    upload.file_name
-                ))
-            })?;
+            .ok_or(crate::ErrorKind::InputError(format!(
+                "shared instance service requested unknown external file {}",
+                upload.file_name
+            )))?;
         let path = match &candidate.source {
             ExternalFileSource::InstanceFile(file_path) => {
                 let instance = crate::state::instances::adapters::sqlite::instance_rows::get_instance_by_path(instance_path, &state.pool).await?
-					.ok_or_else(|| crate::state::content_store::input("Unknown instance"))?;
+					.ok_or_else(|| crate::state::content_store::input("unknown instance"))?;
                 let file = crate::state::instances::adapters::sqlite::content_rows::get_instance_file_by_relative_path(&instance.id, file_path, &state.pool).await?
-					.ok_or_else(|| crate::state::content_store::input("Shared content file is not registered"))?;
+					.ok_or_else(|| crate::state::content_store::input("shared content file is not registered"))?;
                 state.content_store.read_path(&file, instance_path).await?
             }
             ExternalFileSource::ConfigBundle(path) => {
@@ -1119,11 +1082,8 @@ pub(super) async fn upload_external_files(
                 )
             }
         };
-        let upload_url = url::Url::parse(&upload.url).map_err(|error| {
-            crate::ErrorKind::OtherError(format!(
-                "Invalid shared instance external file upload URL: {error}"
-            ))
-        })?;
+        let upload_url = url::Url::parse(&upload.url)
+            .context("invalid shared instance external file upload URL")?;
         let mut file = tokio::fs::File::open(path.path()).await?;
         let mut hasher = sha2::Sha512::new();
         let mut buffer = vec![0_u8; 64 * 1024];
@@ -1198,9 +1158,7 @@ pub(super) async fn shared_instance_for_invites(
 ) -> crate::Result<(crate::state::InstanceMetadata, SharedInstanceAttachment)> {
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError("Unknown instance".to_string())
-        })?;
+        .ok_or(crate::ErrorKind::InputError("unknown instance".to_string()))?;
     let attachment = match metadata.shared_instance.clone() {
         Some(attachment) => {
             tracing::debug!(
@@ -1252,14 +1210,11 @@ pub(super) async fn shared_instance_for_invites(
                 "Attached local instance as shared instance owner"
             );
             publish_shared_instance_inner(instance_id, &[], state).await?;
-            shared_attachment(instance_id, state)
-                .await?
-                .ok_or_else(|| {
-                    crate::ErrorKind::InputError(
-                        "Shared instance attachment was not persisted"
-                            .to_string(),
-                    )
-                })?
+            shared_attachment(instance_id, state).await?.ok_or(
+                crate::ErrorKind::InputError(
+                    "shared instance attachment was not persisted".to_string(),
+                ),
+            )?
         }
     };
 
@@ -1281,10 +1236,9 @@ pub(super) fn ensure_owner(
         return Ok(());
     }
 
-    Err(crate::ErrorKind::InputError(
-        "Only the owner instance can manage shared instance users".to_string(),
-    )
-    .into())
+    bail!(crate::ErrorKind::InputError(
+        "only the owner instance can manage shared instance users".to_string(),
+    ))
 }
 
 pub(super) fn ensure_member(
@@ -1294,11 +1248,10 @@ pub(super) fn ensure_member(
         return Ok(());
     }
 
-    Err(crate::ErrorKind::InputError(
-        "Only shared instance members can unlink from shared instances"
+    bail!(crate::ErrorKind::InputError(
+        "only shared instance members can unlink from shared instances"
             .to_string(),
-    )
-    .into())
+    ))
 }
 
 pub(super) fn file_type(project_type: ProjectType) -> String {

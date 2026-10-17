@@ -1,7 +1,7 @@
 use super::install::*;
 use super::*;
 use crate::ErrorKind;
-use anyhow::{Context, anyhow};
+use anyhow::{Context, anyhow, bail};
 
 #[derive(Clone, Copy, Debug)]
 pub(super) enum SharedInstancesRequestAuth {
@@ -489,10 +489,9 @@ pub(super) async fn accept_shared_instance_invite(
         request_id = request_id.as_deref().unwrap_or("none"),
         "Shared instances API request failed"
     );
-    Err(crate::ErrorKind::OtherError(format!(
-		"Shared instances API request {operation} {method} {log_path} failed with status {status}"
-	))
-	.into())
+    bail!(
+        "shared instances API request {operation} {method} {log_path} failed with status {status}"
+    )
 }
 
 pub(super) async fn delete_remote_invite(
@@ -681,10 +680,7 @@ pub(super) async fn active_modrinth_session_is_valid(
         request_id = request_id.as_deref().unwrap_or("none"),
         "Modrinth auth validation request failed"
     );
-    Err(crate::ErrorKind::OtherError(format!(
-        "Modrinth auth validation failed with status {status}"
-    ))
-    .into())
+    bail!("Modrinth auth validation failed with status {status}")
 }
 
 pub(super) async fn decode_json_response<T>(
@@ -857,24 +853,13 @@ pub(super) async fn send_body_request_to_url(
     state: &State,
 ) -> crate::Result<reqwest::Response> {
     let service_origin = url::Url::parse(service_base_url())
-        .map_err(|error| {
-            crate::ErrorKind::OtherError(format!(
-                "Invalid shared instances API base URL: {error}"
-            ))
-        })?
+        .context("invalid shared instances API base URL")?
         .origin();
     let upload_origin = url::Url::parse(url)
-        .map_err(|error| {
-            crate::ErrorKind::OtherError(format!(
-                "Invalid shared instances upload URL: {error}"
-            ))
-        })?
+        .context("invalid shared instances upload URL")?
         .origin();
     if service_origin != upload_origin {
-        return Err(crate::ErrorKind::OtherError(
-            "Shared instances upload URL has an unexpected origin".to_string(),
-        )
-        .into());
+        bail!("shared instances upload URL has an unexpected origin");
     }
 
     let credentials =
@@ -1041,7 +1026,7 @@ pub(super) async fn shared_instances_request_error<T>(
         "Shared instances API request failed"
     );
     let message = format!(
-        "Shared instances API request {operation} {method} {path} failed with status {status}"
+        "shared instances API request {operation} {method} {path} failed with status {status}"
     );
     if status.is_server_error() {
         return Err(
@@ -1049,7 +1034,7 @@ pub(super) async fn shared_instances_request_error<T>(
         );
     }
 
-    Err(crate::ErrorKind::OtherError(message).into())
+    Err(anyhow!(message))
 }
 
 pub(super) fn response_request_id(
