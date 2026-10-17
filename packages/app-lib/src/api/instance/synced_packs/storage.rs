@@ -211,7 +211,7 @@ pub(super) async fn read_stored_file(
         })
         .ok_or_else(|| {
             input(
-                "The synced pack's original file is unavailable; re-import it",
+                "the synced pack's original file is unavailable; re-import it",
             )
         })?;
     state

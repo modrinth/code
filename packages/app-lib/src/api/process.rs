@@ -1,5 +1,6 @@
 //! Theseus process management interface
 
+use crate::ErrorKind;
 use crate::state::ProcessMetadata;
 pub use crate::{
     State,
@@ -19,12 +20,12 @@ pub async fn resolve_instance_id(instance: &str) -> crate::Result<String> {
     let state = State::get().await?;
     resolve_instance_id_with_state(instance, &state)
         .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError(format!(
-                "Unknown instance id or path: {instance}"
+        .ok_or(
+            ErrorKind::InputError(format!(
+                "unknown instance id or path {instance}"
             ))
-            .as_error()
-        })
+            .into(),
+        )
 }
 
 async fn resolve_instance_id_with_state(

@@ -3,9 +3,10 @@ use super::super::synced_options::{
 };
 use super::PackLibrary;
 use super::storage::{read_library, write_library};
+use crate::ErrorKind;
 use crate::state::instances::adapters::{filesystem, sqlite::content_rows};
 use crate::state::{InstanceMetadata, State};
-use anyhow::Context;
+use anyhow::{Context, bail};
 use parking_lot::Mutex;
 use std::collections::{BTreeMap, BTreeSet};
 use std::future::Future;
@@ -226,7 +227,7 @@ impl<'a> Preparation<'a> {
             != revision
             || fingerprint(self.metadata, self.state).await? != before
         {
-            return Err(crate::ErrorKind::PackSyncChanged.into());
+            bail!(ErrorKind::PackSyncChanged);
         }
         result
     }
@@ -240,7 +241,7 @@ impl<'a> Preparation<'a> {
         if current.as_ref().is_none_or(|current| {
             metadata_key(current) != metadata_key(self.metadata)
         }) {
-            return Err(crate::ErrorKind::PackSyncChanged.into());
+            bail!(ErrorKind::PackSyncChanged);
         }
         Ok(())
     }

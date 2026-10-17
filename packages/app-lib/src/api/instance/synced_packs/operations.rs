@@ -19,7 +19,7 @@ use crate::state::{
 };
 use crate::util::io;
 use crate::{ErrorKind, InvalidPack};
-use anyhow::bail;
+use anyhow::{Context, bail};
 use bytes::Bytes;
 use std::io::{Cursor, Read};
 use std::path::Path;
@@ -145,12 +145,12 @@ pub(super) fn validate_pack(
     project_type: ProjectType,
 ) -> crate::Result<()> {
     let mut archive = zip::ZipArchive::new(Cursor::new(bytes))
-        .map_err(|_| ErrorKind::InvalidPack(InvalidPack::NotZip))?;
+        .context(ErrorKind::InvalidPack(InvalidPack::NotZip))?;
     let mut metadata = String::new();
     {
-        let file = archive.by_name("pack.mcmeta").map_err(|_| {
-            ErrorKind::InvalidPack(InvalidPack::MissingMetadata)
-        })?;
+        let file = archive
+            .by_name("pack.mcmeta")
+            .context(ErrorKind::InvalidPack(InvalidPack::MissingMetadata))?;
         if file.size() > 1024 * 1024 {
             bail!(ErrorKind::InvalidPack(InvalidPack::MetadataTooLarge));
         }

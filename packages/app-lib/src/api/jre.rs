@@ -19,9 +19,10 @@ use sysinfo::{MemoryRefreshKind, RefreshKind};
 use crate::util::io;
 use crate::util::jre::extract_java_version;
 use crate::{
-    LoadingBarType, State,
+    ErrorKind, LoadingBarType, State,
     util::jre::{self},
 };
+use anyhow::{Context, bail};
 
 pub async fn get_java_versions() -> crate::Result<DashMap<u32, JavaVersion>> {
     let state = State::get().await?;
@@ -283,11 +284,9 @@ async fn auto_install_java_inner(
                 .await?;
         }
         let mut archive = zip::ZipArchive::new(std::io::Cursor::new(file))
-            .map_err(|_| {
-                crate::Error::from(crate::ErrorKind::InputError(
-                    "Failed to read java zip".to_string(),
-                ))
-            })?;
+            .context(ErrorKind::InputError(
+                "failed to read java zip".to_string(),
+            ))?;
 
         // removes the old installation of java
         if let Some(file) = archive.file_names().next()
@@ -324,11 +323,9 @@ async fn auto_install_java_inner(
                 )
                 .await?;
         }
-        archive.extract(&path).map_err(|_| {
-            crate::Error::from(crate::ErrorKind::InputError(
-                "Failed to extract java zip".to_string(),
-            ))
-        })?;
+        archive.extract(&path).context(ErrorKind::InputError(
+            "failed to extract java zip".to_string(),
+        ))?;
         if let Some(loading_bar) = &loading_bar {
             emit_loading(loading_bar, 10.0, Some("Done extracting java"))?;
         }
@@ -357,10 +354,12 @@ async fn auto_install_java_inner(
 
         Ok(base_path)
     } else {
-        Err(crate::ErrorKind::LauncherError(format!(
-                    "No Java Version found for Java version {}, OS {}, and Architecture {}",
-                    java_version, std::env::consts::OS, std::env::consts::ARCH,
-                )).into())
+        bail!(ErrorKind::LauncherError(format!(
+            "no Java Version found for Java version {}, OS {}, and Architecture {}",
+            java_version,
+            std::env::consts::OS,
+            std::env::consts::ARCH,
+        )))
     }
 }
 
