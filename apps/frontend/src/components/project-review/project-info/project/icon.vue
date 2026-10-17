@@ -12,7 +12,7 @@
 				:aria-label="formatMessage(messages.openIcon)"
 				@click="viewer?.show(0)"
 			>
-				<Avatar :src="project.icon_url || iconUrl" :alt="project.name" size="5rem" no-shadow />
+				<Avatar :src="project.raw_icon_url || iconUrl" :alt="project.name" size="5rem" no-shadow />
 			</button>
 			<Avatar v-else :alt="project.name" size="5rem" no-shadow />
 			<ImageViewerEditor
