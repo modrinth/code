@@ -4,7 +4,7 @@ use crate::event::LoadingBarId;
 use crate::event::emit::emit_loading;
 use crate::util::content_hash::{ContentHasher, temporary_file};
 use crate::{ErrorKind, LabrinthError};
-use anyhow::Context;
+use anyhow::{Context, bail};
 use bytes::Bytes;
 use chrono::{DateTime, TimeDelta, Utc};
 use governor::clock::{Clock, DefaultClock};
@@ -246,7 +246,7 @@ impl ApiRateLimit {
 
             let retry_in = self.retry_in().unwrap_or(retry_after);
 
-            return Err(ErrorKind::RateLimited { retry_in }.into());
+            bail!(ErrorKind::RateLimited { retry_in });
         }
 
         self.ensure_not_blocked()
@@ -279,7 +279,7 @@ impl ApiRateLimit {
     fn ensure_not_blocked(&self) -> crate::Result<()> {
         if let Some(retry_in) = self.retry_in() {
             debug!("Hit builtin rate limiter; blocking");
-            return Err(ErrorKind::RateLimited { retry_in }.into());
+            bail!(ErrorKind::RateLimited { retry_in });
         }
 
         Ok(())
@@ -408,14 +408,13 @@ impl DownloadedFile {
 
     pub(crate) fn into_staged(self) -> crate::Result<StagedDownload> {
         let DownloadedFilePath::Temporary(path) = self.path else {
-            return Err(ErrorKind::InputError(
-                "Stored content cannot be staged again".to_string(),
-            )
-            .into());
+            bail!(ErrorKind::InputError(
+                "stored content cannot be staged again".to_string(),
+            ));
         };
         let path = Arc::try_unwrap(path).map_err(|_| {
             ErrorKind::InputError(
-                "Downloaded content is still in use and cannot be published"
+                "downloaded content is still in use and cannot be published"
                     .to_string(),
             )
         })?;
@@ -444,11 +443,9 @@ impl DownloadedFile {
         semaphore: &IoSemaphore,
     ) -> crate::Result<()> {
         let _permit = semaphore.0.acquire().await?;
-        let parent = path.parent().ok_or_else(|| {
-            ErrorKind::InputError(
-                "Download destination has no parent directory".to_string(),
-            )
-        })?;
+        let parent = path.parent().ok_or(ErrorKind::InputError(
+            "download destination has no parent directory".to_string(),
+        ))?;
         io::create_dir_all(parent).await?;
         let parent = parent.to_path_buf();
         let temporary = tokio::task::spawn_blocking(move || {
@@ -549,9 +546,7 @@ pub(crate) async fn fetch_file_mirrors_in(
     staging: Option<&Path>,
 ) -> crate::Result<DownloadedFile> {
     if mirrors.is_empty() {
-        return Err(
-            ErrorKind::InputError("No mirrors provided!".to_string()).into()
-        );
+        bail!(ErrorKind::InputError("no mirrors provided".to_string()));
     }
     for (index, mirror) in mirrors.iter().enumerate() {
         let body = fetch_advanced_with_target(
@@ -977,10 +972,9 @@ async fn fetch_advanced_with_target(
         if let Some(fence_key) = fence_key
             && GLOBAL_FETCH_FENCE.is_blocked(fence_key)
         {
-            return Err(ErrorKind::ApiIsDownError(
+            bail!(ErrorKind::ApiIsDownError(
                 GLOBAL_FETCH_FENCE.latest_block_minutes(),
-            )
-            .into());
+            ));
         }
 
         let mut req = client.request(method.clone(), url);
@@ -1072,11 +1066,10 @@ async fn fetch_advanced_with_target(
                             if attempt <= FETCH_ATTEMPTS {
                                 continue;
                             } else {
-                                return Err(ErrorKind::HashError(
+                                bail!(ErrorKind::HashError(
                                     sha1.to_string(),
                                     hash,
-                                )
-                                .into());
+                                ));
                             }
                         }
                     }
@@ -1115,9 +1108,7 @@ pub async fn fetch_mirrors(
     exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
 ) -> crate::Result<Bytes> {
     if mirrors.is_empty() {
-        return Err(
-            ErrorKind::InputError("No mirrors provided!".to_string()).into()
-        );
+        bail!(ErrorKind::InputError("no mirrors provided".to_string()));
     }
 
     for (index, mirror) in mirrors.iter().enumerate() {
