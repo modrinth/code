@@ -257,7 +257,7 @@ pub(super) async fn get_remote_instance_access(
         if reason == SharedInstanceUnavailableReason::AccessRevoked
             && !active_modrinth_session_is_valid(state).await?
         {
-            return Err(crate::ErrorKind::NotLoggedIn.into());
+            bail!(crate::ErrorKind::NotLoggedIn);
         }
 
         return Ok(SharedInstanceRemoteResponse::Unavailable(reason));
@@ -619,7 +619,7 @@ where
                 status = response.status().as_u16(),
                 "Shared instances API returned unauthorized while Modrinth auth is unavailable"
             );
-            return Err(crate::ErrorKind::NotLoggedIn.into());
+            bail!(crate::ErrorKind::NotLoggedIn);
         }
 
         tracing::warn!(
