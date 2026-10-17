@@ -157,9 +157,6 @@ pub enum ErrorKind {
     #[error("error stripping prefix: {0}")]
     StripPrefixError(#[from] std::path::StripPrefixError),
 
-    #[error("{0}")]
-    OtherError(String),
-
     #[cfg(feature = "tauri")]
     #[error("Tauri error: {0}")]
     TauriError(#[from] tauri::Error),
