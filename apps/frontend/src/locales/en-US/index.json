@@ -3014,8 +3014,17 @@
   "layout.publish.email-verification-required.title": {
     "message": "Email verification required"
   },
-  "markdown-editor.templates.empty": {
-    "message": "No matching messages."
+  "markdown-editor.placeholders.empty": {
+    "message": "No matching placeholders."
+  },
+  "markdown-editor.placeholders.label": {
+    "message": "Placeholders"
+  },
+  "markdown-editor.placeholders.search": {
+    "message": "Search placeholders…"
+  },
+  "markdown-editor.templates.empty-all": {
+    "message": "No matching messages or placeholders."
   },
   "markdown-editor.templates.insert": {
     "message": "Insert message"
@@ -3023,8 +3032,11 @@
   "markdown-editor.templates.library": {
     "message": "Message Library"
   },
-  "markdown-editor.templates.search": {
-    "message": "Search messages…"
+  "markdown-editor.templates.search-all": {
+    "message": "Search messages and placeholders…"
+  },
+  "markdown-editor.templates.section": {
+    "message": "Template messages"
   },
   "messages.noResults": {
     "message": "No results found for your query!"
@@ -4670,8 +4682,8 @@
   "project-review.issues.custom-title": {
     "message": "Title"
   },
-  "project-review.issues.custom-title-required": {
-    "message": "Enter a title for this custom issue."
+  "project-review.issues.custom-title-placeholder": {
+    "message": "Enter title..."
   },
   "project-review.issues.edited": {
     "message": "(Edited)"
@@ -4687,6 +4699,9 @@
   },
   "project-review.issues.field-option": {
     "message": "{field}: {option}"
+  },
+  "project-review.issues.issue-message": {
+    "message": "Message"
   },
   "project-review.issues.message": {
     "message": "Message for {issue}"
