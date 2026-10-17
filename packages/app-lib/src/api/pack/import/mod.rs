@@ -4,10 +4,12 @@ use std::{
     path::{Path, PathBuf},
 };
 
+use crate::ErrorKind;
 use crate::state::content_store::{FileContent, content_file_path};
 use crate::state::instances::commands::{
     ContentOrigin, InstallContent, install_stored_file,
 };
+use anyhow::{Context, bail};
 use io::IOError;
 use serde::{Deserialize, Serialize};
 
@@ -99,11 +101,9 @@ pub async fn get_importable_instances(
 
     let instances_folder = base_path.join(&instances_subfolder);
     let mut instances = Vec::new();
-    let mut dir = io::read_dir(&instances_folder).await.map_err(| _ | {
-        crate::ErrorKind::InputError(format!(
-            "Invalid {launcher_type} launcher path, could not find '{instances_subfolder}' subfolder."
-        ))
-    })?;
+    let mut dir = io::read_dir(&instances_folder).await.context(ErrorKind::InputError(format!(
+        "invalid {launcher_type} launcher path, could not find '{instances_subfolder}' subfolder"
+    )))?;
     while let Some(entry) = dir
         .next_entry()
         .await
@@ -218,11 +218,10 @@ async fn import_instance_inner(
                 }
             }
             if !matched {
-                return Err(crate::ErrorKind::InputError(
-                    "Could not determine launcher type for the given path"
+                bail!(ErrorKind::InputError(
+                    "could not determine launcher type for the given path"
                         .to_string(),
-                )
-                .into());
+                ));
             }
             return Ok(());
         }
@@ -422,7 +421,7 @@ async fn copy_dotminecraft_with_reporter_inner(
             .await?
         {
             return Err(crate::state::content_store::input(
-                "Stop the source instance before duplicating it",
+                "stop the source instance before duplicating it",
             ));
         }
         let files = crate::state::instances::commands::sync_content_files(
@@ -438,7 +437,7 @@ async fn copy_dotminecraft_with_reporter_inner(
         for file in files {
             if file.missing {
                 return Err(crate::state::content_store::input(format!(
-                    "Restore or repair {} before duplicating this instance",
+                    "restore or repair {} before duplicating this instance",
                     file.relative_path
                 )));
             }
@@ -449,7 +448,7 @@ async fn copy_dotminecraft_with_reporter_inner(
                     FileContent::Damaged(_) => {
                         return Err(crate::state::content_store::input(
                             format!(
-                                "Repair {} before duplicating this instance",
+                                "repair {} before duplicating this instance",
                                 file.relative_path
                             ),
                         ));
@@ -461,7 +460,7 @@ async fn copy_dotminecraft_with_reporter_inner(
                     &file.relative_path,
                 )
                 .ok_or_else(|| {
-                    crate::state::content_store::input("Invalid content path")
+                    crate::state::content_store::input("invalid content path")
                 })?;
             let entry = entries.iter().find(|entry| {
                 entry.file_id.as_deref() == Some(file.id.as_str())
@@ -538,7 +537,7 @@ async fn copy_dotminecraft_with_reporter_inner(
                 crate::state::ProjectType::get_from_parent_folder(&relative)
                     .ok_or_else(|| {
                         crate::state::content_store::input(
-                            "Invalid imported content path",
+                            "invalid imported content path",
                         )
                     })?;
             install_stored_file(
@@ -557,7 +556,7 @@ async fn copy_dotminecraft_with_reporter_inner(
             .await?;
         } else {
             let target_instance = crate::state::instances::adapters::sqlite::instance_rows::get_instance_by_id(instance_id, &state.pool).await?
-				.ok_or_else(|| crate::state::content_store::input("Unknown destination instance"))?;
+				.ok_or_else(|| crate::state::content_store::input("unknown destination instance"))?;
             let target = state
                 .content_store
                 .instance_path(&target_instance.path, &relative)
@@ -567,7 +566,7 @@ async fn copy_dotminecraft_with_reporter_inner(
                 .is_ok_and(|metadata| metadata.file_type().is_symlink())
             {
                 return Err(crate::state::content_store::input(
-                    "Import cannot overwrite a symbolic link",
+                    "import cannot overwrite a symbolic link",
                 ));
             }
             let same_file = tokio::fs::try_exists(&target).await?
