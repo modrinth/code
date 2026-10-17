@@ -4,6 +4,7 @@ import invalidPermissionsMessage from '../messages/checklist/messages/permission
 import missingPermissionsMessage from '../messages/checklist/messages/permissions/missing-permissions.md'
 import nonCommercialExternalContentMessage from '../messages/checklist/messages/permissions/non-commercial-external-content.md'
 import prohibitedExternalContentMessage from '../messages/checklist/messages/permissions/prohibited-external-content.md'
+import excessiveOverridesMessage from '../messages/checklist/messages/permissions/excessive-externals.md'
 import { issue, panel, toggle } from './component-builders/builders'
 import { issueLocation } from './component-builders/locations'
 
@@ -43,6 +44,15 @@ export const permissionsNonCommercialExternalContentIssue = issue({
 	suggestedStatus: 'rejected',
 })
 
+export const permissionsExcessiveOverridesIssue = issue({
+	id: 'permissions-excessive-overrides',
+	locations: [issueLocation('permissions')],
+	title: 'Excessive overrides',
+	category: 'Permissions',
+	message: excessiveOverridesMessage,
+	suggestedStatus: 'rejected',
+})
+
 export const permissionsReviewPanel = panel({
 	title: 'Modpack Permissions',
 	hint: "Does this project's external content have any issues?",
@@ -70,5 +80,9 @@ export const permissionsReviewPanel = panel({
 		issue: permissionsNonCommercialExternalContentIssue,
 		label: 'Non-commercial externals',
 		shown: ({ projectV3 }) => projectV3.monetization_status === 'monetized',
+	}),
+	toggle({
+		issue: permissionsExcessiveOverridesIssue,
+		label: 'Excessive overrides',
 	}),
 )
