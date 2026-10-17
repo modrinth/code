@@ -6,7 +6,7 @@
 
 use native_dialog::{DialogBuilder, MessageLevel};
 use std::env;
-use std::sync::atomic::Ordering;
+use std::sync::atomic::{AtomicBool, Ordering};
 use tauri::{Listener, Manager};
 use tauri_plugin_fs::FsExt;
 use theseus::prelude::*;
@@ -101,14 +101,15 @@ fn restart_app(app: tauri::AppHandle) {
     app.restart();
 }
 
+#[derive(Default)]
+struct RestartAfterPendingUpdate(AtomicBool);
+
 #[tauri::command]
 async fn set_restart_after_pending_update(
     should_restart: bool,
+    restart: tauri::State<'_, RestartAfterPendingUpdate>,
 ) -> api::Result<()> {
-    let state = State::get().await?;
-    state
-        .restart_after_pending_update
-        .store(should_restart, Ordering::Relaxed);
+    restart.0.store(should_restart, Ordering::Relaxed);
     Ok(())
 }
 
@@ -328,6 +329,7 @@ fn main() {
         .plugin(api::friends::init())
         .plugin(api::worlds::init())
         .manage(PendingUpdateData::default())
+        .manage(RestartAfterPendingUpdate::default())
         .invoke_handler(tauri::generate_handler![
             initialize_state,
             is_dev,
@@ -363,11 +365,10 @@ fn main() {
                 #[cfg(feature = "updater")]
                 if matches!(&event, tauri::RunEvent::Exit) {
                     let update_data = app.state::<PendingUpdateData>().inner();
-                    let should_restart = State::get_if_initialized()
-                        .map(|s| {
-                            s.restart_after_pending_update.load(Ordering::Relaxed)
-                        })
-                        .unwrap_or(false);
+                    let should_restart = app
+                        .state::<RestartAfterPendingUpdate>()
+                        .0
+                        .load(Ordering::Relaxed);
                     if let Some((update, data)) = &*update_data.0.lock().unwrap()
                     {
                         fn set_changelog_toast(version: Option<String>) {
