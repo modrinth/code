@@ -1,3 +1,4 @@
+use crate::ErrorKind;
 use crate::state::instances::{
     ContentSourceKind, Instance, InstanceIconConfig, InstanceLaunchOverrides,
     InstanceLink, InstanceTabVisibility,
@@ -7,6 +8,7 @@ use crate::state::{
     Hooks, InstanceInstallStage, LauncherFeatureVersion, MemorySettings,
     ModLoader, ReleaseChannel, WindowSize,
 };
+use anyhow::bail;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::SqlitePool;
@@ -134,16 +136,13 @@ pub(crate) async fn edit_instance(
         });
     let mut instance = instance_rows::get_instance_by_id(instance_id, pool)
         .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError("Unknown instance".to_string())
-        })?;
+        .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
     if modifies_content
         && instance_rows::is_instance_quarantined(instance_id, pool).await?
     {
-        return Err(crate::ErrorKind::InputError(
-            "Content in quarantined instances cannot be changed.".to_string(),
-        )
-        .into());
+        bail!(ErrorKind::InputError(
+            "content in quarantined instances cannot be changed".to_string(),
+        ));
     }
     let now = Utc::now();
 
@@ -154,12 +153,10 @@ pub(crate) async fn edit_instance(
             let applied_content_set =
                 content_rows::get_applied_content_set(&instance.id, pool)
                     .await?
-                    .ok_or_else(|| {
-                        crate::ErrorKind::InputError(format!(
-                            "Instance {} has no applied content set",
-                            instance.id
-                        ))
-                    })?;
+                    .ok_or(ErrorKind::InputError(format!(
+                        "instance {} has no applied content set",
+                        instance.id
+                    )))?;
             Some(apply_content_set_patch(
                 applied_content_set,
                 content_set_patch,
