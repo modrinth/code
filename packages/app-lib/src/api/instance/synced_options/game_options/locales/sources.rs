@@ -169,8 +169,7 @@ pub(super) async fn archive_index(
                 .ok()
                 .filter(|index| index.version >= 2 || !source_path.exists())
         })
-        .await
-        .map_err(|error| ErrorKind::InputError(error.to_string()))?;
+        .await?;
         if let Some(index) = cached {
             return Ok(index);
         }
@@ -179,8 +178,7 @@ pub(super) async fn archive_index(
     let index = tokio::task::spawn_blocking(move || {
         archive::inspect(&source.path, &source.hash)
     })
-    .await
-    .map_err(|e| ErrorKind::InputError(e.to_string()))??;
+    .await??;
     write_json(&path, &index).await?;
     Ok(index)
 }

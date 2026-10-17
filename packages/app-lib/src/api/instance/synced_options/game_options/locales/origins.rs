@@ -62,8 +62,7 @@ impl OriginResolver {
             }
             SnapshotIndex { snapshot, keys }
         })
-        .await
-        .map_err(|error| ErrorKind::InputError(error.to_string()))?;
+        .await?;
         self.snapshots.insert(id.to_owned(), index);
         Ok(())
     }
@@ -115,8 +114,7 @@ async fn load_archive_keys(
         let cached = tokio::task::spawn_blocking(move || {
             serde_json::from_slice::<ArchiveKeys>(&bytes)
         })
-        .await
-        .map_err(|error| ErrorKind::InputError(error.to_string()))?;
+        .await?;
         if let Ok(keys) = cached {
             return Ok(keys);
         }
@@ -138,8 +136,7 @@ async fn load_archive_keys(
         }
         keys
     })
-    .await
-    .map_err(|error| ErrorKind::InputError(error.to_string()))?;
+    .await?;
     if let Err(error) = sources::write_json(&path, &keys).await {
         tracing::warn!(hash = source.hash, %error,
 			"Game setting locales: could not cache origin keys");

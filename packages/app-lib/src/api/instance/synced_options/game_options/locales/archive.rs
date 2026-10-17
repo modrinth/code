@@ -1,6 +1,6 @@
 use super::super::options_file::sha1_bytes;
 use crate::ErrorKind;
-use anyhow::bail;
+use anyhow::{Context, bail};
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet};
 use std::io::{Cursor, Read, Seek};
@@ -123,9 +123,12 @@ fn read_entry<R: Read + Seek>(
     limit: usize,
     budget: &mut usize,
 ) -> crate::Result<Vec<u8>> {
-    let mut entry = archive
-        .by_name(name)
-        .map_err(|e| ErrorKind::InputError(e.to_string()))?;
+    let mut entry =
+        archive
+            .by_name(name)
+            .context(ErrorKind::InputError(format!(
+                "could not read locale archive entry {name}"
+            )))?;
     let limit = limit.min(*budget);
     if entry.size() > limit as u64 {
         bail!(ErrorKind::InputError(
@@ -155,8 +158,9 @@ fn inspect_archive<R: Read + Seek>(
     entries: &mut usize,
     index: &mut ArchiveIndex,
 ) -> crate::Result<()> {
-    let mut archive = ZipArchive::new(reader)
-        .map_err(|e| ErrorKind::InputError(e.to_string()))?;
+    let mut archive = ZipArchive::new(reader).context(
+        ErrorKind::InputError("could not open locale archive".to_string()),
+    )?;
     if archive.len() > *entries {
         bail!(ErrorKind::InputError(
             "too many entries in locale archive".to_string()
