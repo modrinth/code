@@ -1,3 +1,4 @@
+use crate::ErrorKind;
 use crate::state::DirectoryInfo;
 use sqlx::sqlite::{
     SqliteConnectOptions, SqliteJournalMode, SqlitePoolOptions,
@@ -10,8 +11,8 @@ pub(crate) async fn connect(
     app_identifier: &str,
 ) -> crate::Result<Pool<Sqlite>> {
     let settings_dir = DirectoryInfo::initial_settings_dir_path(app_identifier)
-        .ok_or(crate::ErrorKind::FSError(
-            "Could not find valid config dir".to_string(),
+        .ok_or(ErrorKind::FSError(
+            "could not find valid config dir".to_string(),
         ))?;
 
     crate::util::io::create_dir_all(&settings_dir).await?;

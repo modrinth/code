@@ -1,4 +1,5 @@
 //! Theseus state management system
+use crate::ErrorKind;
 use crate::util::fetch::{FetchSemaphore, IoSemaphore};
 use anyhow::anyhow;
 use dashmap::DashMap;
@@ -350,13 +351,12 @@ impl State {
         app_identifier: String,
     ) -> crate::Result<Arc<Self>> {
         tracing::info!("Connecting to app database");
-        let settings_dir =
-            DirectoryInfo::initial_settings_dir_path(&app_identifier)
-                .ok_or_else(|| {
-                    crate::ErrorKind::FSError(
-                        "Could not find the application directory".to_string(),
-                    )
-                })?;
+        let settings_dir = DirectoryInfo::initial_settings_dir_path(
+            &app_identifier,
+        )
+        .ok_or(ErrorKind::FSError(
+            "could not find the application directory".to_string(),
+        ))?;
         let store_lock =
             content_store::ContentStore::lock_process(&settings_dir).await?;
         let pool = db::connect(&app_identifier).await?;

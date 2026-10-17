@@ -1,10 +1,11 @@
+use crate::LabrinthError;
 use crate::data::ModrinthCredentials;
 use crate::event::FriendPayload;
 use crate::event::emit::{emit_friend, emit_notification};
 use crate::state::tunnel::InternalTunnelSocket;
 use crate::state::{ProcessManager, TunnelSocket};
 use crate::util::fetch::{FetchSemaphore, fetch_advanced, fetch_json};
-use crate::{ErrorKind, LabrinthError};
+use anyhow::bail;
 use ariadne::ids::UserId;
 use ariadne::networking::message::{
     ClientToServerMessage, ServerToClientMessage,
@@ -414,10 +415,7 @@ impl FriendsSocket {
             && let Some(e) = e.downcast_ref::<LabrinthError>()
             && e.error == "not_found"
         {
-            return Err(ErrorKind::OtherError(format!(
-                "No user found with username \"{user_id}\""
-            ))
-            .into());
+            bail!("no user found with username \"{user_id}\"");
         }
         result?;
 

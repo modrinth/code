@@ -1,5 +1,7 @@
+use crate::ErrorKind;
 use crate::state::{EmbeddedContentMetadata, ProjectType};
 use crate::util::fetch::{FetchSemaphore, fetch_json};
+use anyhow::{Context, bail};
 use chrono::{DateTime, Utc};
 use dashmap::DashSet;
 use reqwest::Method;
@@ -854,12 +856,7 @@ impl CacheValue {
             }
             CacheValue::ProjectVersions(pv) => serde_json::to_value(pv),
         }
-        .map_err(|err| {
-            crate::ErrorKind::OtherError(format!(
-                "Failed to serialize cache value: {err}"
-            ))
-            .as_error()
-        })?;
+        .context("failed to serialize cache value")?;
 
         Ok(value)
     }
@@ -1088,13 +1085,12 @@ impl CachedEntry {
 
                 if let Some(data) = parsed_data {
                     if data.get_type() != type_ {
-                        return Err(crate::ErrorKind::OtherError(format!(
-                            "Cache type mismatch for id {}: expected {:?}, got {:?}",
+                        bail!(
+                            "cache type mismatch for id {} (expected {:?}, got {:?})",
                             row.id,
                             type_,
                             data.get_type()
-                        ))
-                        .as_error());
+                        );
                     }
 
                     remaining_keys.retain(remove_matching_key);
@@ -1620,12 +1616,10 @@ impl CachedEntry {
                     instances_dir: &Path,
                     key: String,
                 ) -> crate::Result<(CachedEntry, bool)> {
-                    let path = file_hash_path_from_cache_key(&key).ok_or_else(
-                        || {
-                            crate::ErrorKind::InputError(format!(
-                                "Invalid file hash cache key: {key}",
-                            ))
-                        },
+                    let path = file_hash_path_from_cache_key(&key).ok_or(
+                        ErrorKind::InputError(format!(
+                            "invalid file hash cache key {key}"
+                        )),
                     )?;
 
                     let full_path = instances_dir.join(path);
@@ -2026,12 +2020,11 @@ impl CachedEntry {
             id: &str,
             label: &str,
         ) -> crate::Result<T> {
-            T::deserialize(&data).map_err(|err| {
-                crate::ErrorKind::OtherError(format!(
-                    "Failed to deserialize cache {label} for id {id}: {err}\n\ndata:\n{}",
+            T::deserialize(&data).with_context(|| {
+                format!(
+                    "failed to deserialize cache {label} for id {id}\n\ndata:\n{}",
                     serde_json::to_string_pretty(&data).unwrap(),
-                ))
-                .as_error()
+                )
             })
         }
 

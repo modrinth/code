@@ -66,7 +66,7 @@ impl RuntimeStorage {
             Ok(metadata) if metadata.is_dir() => {}
             Ok(_) => {
                 return Err(input(
-                    "Runtime storage must be a directory, not a symlink",
+                    "runtime storage must be a directory, not a symlink",
                 ));
             }
             Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
@@ -247,7 +247,7 @@ impl References {
                 .as_deref()
                 .filter(|version| !matches!(*version, "latest" | "stable"))
                 .ok_or_else(|| {
-                    input("The installed loader version is unresolved")
+                    input("the installed loader version is unresolved")
                 })?;
             format!("{}-{loader}", content.game_version)
         };
@@ -287,7 +287,7 @@ impl References {
             if asset.hash.len() != 40
                 || !asset.hash.bytes().all(|byte| byte.is_ascii_hexdigit())
             {
-                return Err(input("Invalid Minecraft asset hash"));
+                return Err(input("invalid Minecraft asset hash"));
             }
             self.file(dirs.object_dir(&asset.hash), owner);
             self.file(dirs.legacy_assets_dir().join(name), owner);
@@ -333,7 +333,7 @@ pub(crate) async fn remove_file(
             || tokio::fs::symlink_metadata(directory).await?.is_symlink()
         {
             return Err(input(
-                "Runtime cache path is outside the managed storage directory",
+                "runtime cache path is outside the managed storage directory",
             ));
         }
         if directory == root {
@@ -349,7 +349,7 @@ pub(crate) async fn remove_file(
         Err(error) => return Err(error.into()),
     };
     if metadata.is_dir() != file.directory {
-        return Err(input("Runtime cache entry changed during cleanup"));
+        return Err(input("runtime cache entry changed during cleanup"));
     }
     if file.directory {
         tokio::fs::remove_dir_all(path).await?;

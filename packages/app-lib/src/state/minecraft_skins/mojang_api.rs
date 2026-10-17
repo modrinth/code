@@ -1,5 +1,6 @@
 use std::{error::Error, sync::Arc, time::Instant};
 
+use anyhow::bail;
 use bytes::Bytes;
 use futures::TryStream;
 use reqwest::{Body, multipart::Part};
@@ -8,7 +9,6 @@ use uuid::Uuid;
 
 use super::MinecraftSkinVariant;
 use crate::{
-    ErrorKind,
     data::Credentials,
     state::{
         MINECRAFT_SERVICES_USER_AGENT, MinecraftProfile, PROFILE_CACHE,
@@ -82,10 +82,7 @@ impl MinecraftSkinOperation {
                     MinecraftSkinVariant::Slim => "slim",
                     MinecraftSkinVariant::Classic => "classic",
                     _ => {
-                        return Err(ErrorKind::OtherError(
-                            "Cannot equip skin of unknown model variant".into(),
-                        )
-                        .into());
+                        bail!("cannot equip skin of unknown model variant");
                     }
                 },
             )

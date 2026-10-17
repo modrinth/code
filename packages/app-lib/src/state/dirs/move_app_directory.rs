@@ -7,6 +7,7 @@ use crate::state::content_store::{
 };
 use crate::state::instances::adapters::sqlite::instance_rows;
 use crate::state::{Instance, JavaVersion};
+use anyhow::bail;
 use serde_json::Value;
 use sqlx::SqlitePool;
 use std::path::{Path, PathBuf};
@@ -26,7 +27,7 @@ pub(crate) async fn relocate_tree(from: &Path, to: &Path) -> crate::Result<()> {
     }
     if fs::symlink_metadata(from).await?.file_type().is_symlink() {
         return Err(input(
-            "A shared-data root must not be a symlink during migration",
+            "a shared-data root must not be a symlink during migration",
         ));
     }
     if let Some(parent) = to.parent() {
@@ -68,7 +69,7 @@ async fn copy_tree(
             let resolved = normalize(
                 &source
                     .parent()
-                    .ok_or_else(|| input("Invalid symlink"))?
+                    .ok_or_else(|| input("invalid symlink"))?
                     .join(&link),
             );
             let mapped = remap(&resolved, mappings);
@@ -76,7 +77,7 @@ async fn copy_tree(
                 &mapped,
                 target
                     .parent()
-                    .ok_or_else(|| input("Invalid symlink destination"))?,
+                    .ok_or_else(|| input("invalid symlink destination"))?,
             );
             if let Ok(existing) = fs::symlink_metadata(&target).await {
                 if existing.file_type().is_symlink()
@@ -91,7 +92,7 @@ async fn copy_tree(
                     continue;
                 }
                 return Err(input(format!(
-                    "Migration destination conflicts with {}",
+                    "migration destination conflicts with {}",
                     target.display()
                 )));
             }
@@ -101,7 +102,7 @@ async fn copy_tree(
                 && (!existing.is_dir() || existing.file_type().is_symlink())
             {
                 return Err(input(
-                    "Migration destination contains a directory link or conflicting file",
+                    "migration destination contains a directory link or conflicting file",
                 ));
             }
             fs::create_dir_all(&target).await?;
@@ -116,7 +117,7 @@ async fn copy_tree(
                     || hash_file(&source).await? != hash_file(&target).await?
                 {
                     return Err(input(format!(
-                        "Migration would overwrite different data at {}",
+                        "migration would overwrite different data at {}",
                         target.display()
                     )));
                 }
@@ -124,7 +125,7 @@ async fn copy_tree(
             }
             let parent = target
                 .parent()
-                .ok_or_else(|| input("Invalid migration target"))?;
+                .ok_or_else(|| input("invalid migration target"))?;
             fs::create_dir_all(parent).await?;
             let temporary = parent
                 .join(format!(".modrinth-move-{}.tmp", uuid::Uuid::new_v4()));
@@ -139,7 +140,7 @@ async fn copy_tree(
             fs::set_permissions(&temporary, metadata.permissions()).await?;
             if hash_file(&source).await? != hash_file(&temporary).await? {
                 return Err(input(
-                    "File changed or failed verification during directory migration",
+                    "file changed or failed verification during directory migration",
                 ));
             }
             fs::rename(&temporary, &target).await?;
@@ -183,7 +184,7 @@ async fn create_link(
                         .await?;
                     if hash_file(original).await? != hash_file(target).await? {
                         return Err(input(
-                            "Symlink fallback copy changed during migration",
+                            "symlink fallback copy changed during migration",
                         ));
                     }
                 }
@@ -351,7 +352,7 @@ pub(crate) async fn move_app_directory(
     }
     if from.starts_with(&to) || to.starts_with(&from) {
         return Err(input(
-            "The new app directory cannot contain, or be inside, the old app directory",
+            "the new app directory cannot contain, or be inside, the old app directory",
         ));
     }
     let processes = sqlx::query!("SELECT pid, start_time FROM processes")
@@ -367,7 +368,7 @@ pub(crate) async fn move_app_directory(
             })
     }) {
         return Err(input(
-            "Close Minecraft instances before moving the app directory",
+            "close Minecraft instances before moving the app directory",
         ));
     }
     let mappings = [&from, &original_from]
@@ -386,7 +387,7 @@ pub(crate) async fn move_app_directory(
         && previous != checkpoint
     {
         return Err(input(
-            "Finish or cancel the previous app-directory move before choosing another destination",
+            "finish or cancel the previous app-directory move before choosing another destination",
         ));
     }
     content_store::set_setting(pool, "store_directory_move", &checkpoint)
@@ -404,7 +405,7 @@ pub(crate) async fn move_app_directory(
                 if !metadata.is_dir() || metadata.file_type().is_symlink() =>
             {
                 return Err(input(format!(
-                    "The shared-data root {} must be a directory without a symbolic link before moving the app directory",
+                    "the shared-data root {} must be a directory without a symbolic link before moving the app directory",
                     source.display(),
                 )));
             }
@@ -450,7 +451,7 @@ pub(crate) async fn finish_app_directory_move(
         return Ok(());
     }
     if from.starts_with(&to) || to.starts_with(&from) {
-        return Err(input("Invalid app-directory cleanup roots"));
+        return Err(input("invalid app-directory cleanup roots"));
     }
     let expected = serde_json::to_string(&(from.clone(), to.clone()))?;
     if content_store::setting(pool, "store_directory_move_copied")
@@ -459,7 +460,7 @@ pub(crate) async fn finish_app_directory_move(
         != Some(expected.as_str())
     {
         return Err(input(
-            "The app-directory copy has not completed; preserving the source",
+            "the app-directory copy has not completed; preserving the source",
         ));
     }
     managed_content::commit(pool).await?;
@@ -481,7 +482,7 @@ fn ensure_move_space(destination: &Path, required: u64) -> crate::Result<()> {
     if fs4::available_space(destination)?
         < required.saturating_add(64 * 1024 * 1024)
     {
-        return Err(ErrorKind::NotEnoughSpace { required }.into());
+        bail!(ErrorKind::NotEnoughSpace { required });
     }
     Ok(())
 }
@@ -541,7 +542,7 @@ pub(crate) async fn cancel_move(pool: &SqlitePool) -> crate::Result<()> {
         };
         if committed {
             return Err(input(
-                "The move has committed; finish its cleanup before moving back",
+                "the move has committed; finish its cleanup before moving back",
             ));
         }
         let mappings = MOVED_APP_DIRECTORIES
@@ -566,7 +567,7 @@ pub(crate) async fn cancel_move(pool: &SqlitePool) -> crate::Result<()> {
 pub(crate) async fn remove_migrated_tree(root: &Path) -> crate::Result<()> {
     if fs::symlink_metadata(root).await?.file_type().is_symlink() {
         return Err(input(
-            "A migrated directory was replaced by a link; preserving it",
+            "a migrated directory was replaced by a link; preserving it",
         ));
     }
     #[cfg(windows)]

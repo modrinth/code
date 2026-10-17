@@ -46,14 +46,14 @@ pub(super) async fn prepare(
                 .iter()
                 .find(|file| file.id == binding.file_id)
                 .ok_or_else(|| {
-                    input("Managed content has no instance file record")
+                    input("managed content has no instance file record")
                 })?;
             let relative_path = content_file_path(file);
             validate_relative(&relative_path)?;
             let Some(stored) =
                 content_store::find_file(pool, &binding.blob_sha512).await?
             else {
-                return Err(input("Managed content has no stored file record"));
+                return Err(input("managed content has no stored file record"));
             };
             let stored_path =
                 content_store::object_relative_path(&stored.sha512)?;
@@ -98,14 +98,14 @@ pub(super) async fn copy_and_checkpoint(
         };
         if !metadata.is_file() {
             return Err(input(
-                "Managed content was replaced by a directory or symbolic link",
+                "managed content was replaced by a directory or symbolic link",
             ));
         }
         let hashes = hash_file(&file.source).await?;
         let parent = file
             .destination
             .parent()
-            .ok_or_else(|| input("Invalid content destination"))?;
+            .ok_or_else(|| input("invalid content destination"))?;
         fs::create_dir_all(parent).await?;
         let temporary =
             parent.join(format!(".modrinth-move-{}.tmp", uuid::Uuid::new_v4()));
@@ -136,7 +136,7 @@ pub(super) async fn copy_and_checkpoint(
                 || hash_file(&file.source).await? != hashes
             {
                 return Err(input(
-                    "Content changed during the app-directory move",
+                    "content changed during the app-directory move",
                 ));
             }
             if storage_kind != FileStorageKind::Hardlink {
@@ -153,7 +153,7 @@ pub(super) async fn copy_and_checkpoint(
                         || hash_file(&file.destination).await? != hashes
                     {
                         return Err(input(
-                            "The content destination contains different data",
+                            "the content destination contains different data",
                         ));
                     }
                     remove_instance_file(&file.destination).await?;
