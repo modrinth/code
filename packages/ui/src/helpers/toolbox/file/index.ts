@@ -1,7 +1,7 @@
 import { fileTypeFromBuffer } from "file-type";
 import yaml from "js-yaml"
 import mime from "mime";
-import toml from 'smol-toml'
+import * as toml from 'smol-toml'
 
 export interface FileDetails {
     fullPath: string,

@@ -44,6 +44,204 @@
   "app.server-settings.failed-to-load-server": {
     "defaultMessage": "Failed to load server settings"
   },
+  "archive-viewer.action.copied-sha512": {
+    "defaultMessage": "Copied SHA-512"
+  },
+  "archive-viewer.action.copy-sha512": {
+    "defaultMessage": "Copy SHA-512"
+  },
+  "archive-viewer.action.download-archive": {
+    "defaultMessage": "Download archive"
+  },
+  "archive-viewer.archive-details.class-files": {
+    "defaultMessage": "Class files"
+  },
+  "archive-viewer.archive-details.compressed-size": {
+    "defaultMessage": "Compressed size"
+  },
+  "archive-viewer.archive-details.content-size": {
+    "defaultMessage": "Uncompressed contents"
+  },
+  "archive-viewer.archive-details.files": {
+    "defaultMessage": "Files"
+  },
+  "archive-viewer.archive-details.folders": {
+    "defaultMessage": "Folders"
+  },
+  "archive-viewer.archive-details.hash-pending": {
+    "defaultMessage": "Available once fully downloaded"
+  },
+  "archive-viewer.archive-details.inside": {
+    "defaultMessage": "Inside"
+  },
+  "archive-viewer.archive-details.nested-archives": {
+    "defaultMessage": "Nested archives"
+  },
+  "archive-viewer.archive-details.path": {
+    "defaultMessage": "Path"
+  },
+  "archive-viewer.archive-details.sha1": {
+    "defaultMessage": "SHA-1"
+  },
+  "archive-viewer.archive-details.sha512": {
+    "defaultMessage": "SHA-512"
+  },
+  "archive-viewer.archive-details.size": {
+    "defaultMessage": "Size"
+  },
+  "archive-viewer.archive-details.source": {
+    "defaultMessage": "Source"
+  },
+  "archive-viewer.archive-details.status": {
+    "defaultMessage": "Status"
+  },
+  "archive-viewer.archive-details.status-pending": {
+    "defaultMessage": "Not read yet"
+  },
+  "archive-viewer.archive-details.status-read": {
+    "defaultMessage": "Fully read"
+  },
+  "archive-viewer.archive-details.status-reading": {
+    "defaultMessage": "Reading nested archives..."
+  },
+  "archive-viewer.detail.compressed-size": {
+    "defaultMessage": "Compressed size"
+  },
+  "archive-viewer.detail.detected-type": {
+    "defaultMessage": "Detected type"
+  },
+  "archive-viewer.detail.sha1": {
+    "defaultMessage": "SHA-1"
+  },
+  "archive-viewer.error-title": {
+    "defaultMessage": "Unable to open {name}"
+  },
+  "archive-viewer.fetched-progress": {
+    "defaultMessage": "{loaded} of {total} fetched"
+  },
+  "archive-viewer.fetching-rest": {
+    "defaultMessage": "Fetching the rest of the archive..."
+  },
+  "archive-viewer.file-details.comment": {
+    "defaultMessage": "Comment"
+  },
+  "archive-viewer.file-details.compressed-ratio": {
+    "defaultMessage": "{size} ({ratio, number, percent})"
+  },
+  "archive-viewer.file-details.compressed-size": {
+    "defaultMessage": "Compressed size"
+  },
+  "archive-viewer.file-details.compression": {
+    "defaultMessage": "Compression"
+  },
+  "archive-viewer.file-details.compression-deflate": {
+    "defaultMessage": "Deflate"
+  },
+  "archive-viewer.file-details.compression-other": {
+    "defaultMessage": "Method {method}"
+  },
+  "archive-viewer.file-details.compression-stored": {
+    "defaultMessage": "Stored"
+  },
+  "archive-viewer.file-details.crc32": {
+    "defaultMessage": "CRC-32"
+  },
+  "archive-viewer.file-details.detected-type": {
+    "defaultMessage": "Detected type"
+  },
+  "archive-viewer.file-details.encrypted": {
+    "defaultMessage": "Encrypted"
+  },
+  "archive-viewer.file-details.entries": {
+    "defaultMessage": "Entries"
+  },
+  "archive-viewer.file-details.kind": {
+    "defaultMessage": "Kind"
+  },
+  "archive-viewer.file-details.kind-archive": {
+    "defaultMessage": "Nested archive"
+  },
+  "archive-viewer.file-details.kind-file": {
+    "defaultMessage": "File"
+  },
+  "archive-viewer.file-details.kind-folder": {
+    "defaultMessage": "Folder"
+  },
+  "archive-viewer.file-details.modified": {
+    "defaultMessage": "Modified"
+  },
+  "archive-viewer.file-details.no": {
+    "defaultMessage": "No"
+  },
+  "archive-viewer.file-details.path": {
+    "defaultMessage": "Path"
+  },
+  "archive-viewer.file-details.sha1": {
+    "defaultMessage": "SHA-1"
+  },
+  "archive-viewer.file-details.sha256": {
+    "defaultMessage": "SHA-256"
+  },
+  "archive-viewer.file-details.sha512": {
+    "defaultMessage": "SHA-512"
+  },
+  "archive-viewer.file-details.size": {
+    "defaultMessage": "Size"
+  },
+  "archive-viewer.file-details.yes": {
+    "defaultMessage": "Yes"
+  },
+  "archive-viewer.hash.copy": {
+    "defaultMessage": "Copy {hash}"
+  },
+  "archive-viewer.logs.count": {
+    "defaultMessage": "{shown} of {total}"
+  },
+  "archive-viewer.logs.empty": {
+    "defaultMessage": "Nothing has been logged yet."
+  },
+  "archive-viewer.logs.level-debug": {
+    "defaultMessage": "Debug"
+  },
+  "archive-viewer.logs.level-error": {
+    "defaultMessage": "Errors"
+  },
+  "archive-viewer.logs.level-info": {
+    "defaultMessage": "Info"
+  },
+  "archive-viewer.logs.level-warning": {
+    "defaultMessage": "Warnings"
+  },
+  "archive-viewer.missing-entry": {
+    "defaultMessage": "\"{path}\" does not exist within this archive"
+  },
+  "archive-viewer.panel.archive-details": {
+    "defaultMessage": "Archive"
+  },
+  "archive-viewer.panel.file-details": {
+    "defaultMessage": "Details"
+  },
+  "archive-viewer.panel.logs": {
+    "defaultMessage": "Logs"
+  },
+  "archive-viewer.panel.project-details": {
+    "defaultMessage": "Project"
+  },
+  "archive-viewer.panel.tree": {
+    "defaultMessage": "Files"
+  },
+  "archive-viewer.read-only": {
+    "defaultMessage": "Archives are read-only"
+  },
+  "archive-viewer.reading": {
+    "defaultMessage": "Reading {name}"
+  },
+  "archive-viewer.reading-description": {
+    "defaultMessage": "Fetching the archive's index. Files are fetched as they are opened."
+  },
+  "archive-viewer.reading-nested": {
+    "defaultMessage": "Reading nested archives..."
+  },
   "badge.alpha": {
     "defaultMessage": "Alpha"
   },
@@ -1772,6 +1970,9 @@
   "files.search.placeholder": {
     "defaultMessage": "Go to file or folder"
   },
+  "files.sidebar.compact-folders": {
+    "defaultMessage": "Compact folders"
+  },
   "files.table-header.advanced-view": {
     "defaultMessage": "Advanced view"
   },
@@ -1822,6 +2023,12 @@
   },
   "files.tabs.new-tab": {
     "defaultMessage": "New tab"
+  },
+  "files.tabs.split-down": {
+    "defaultMessage": "Split down"
+  },
+  "files.tabs.split-right": {
+    "defaultMessage": "Split right"
   },
   "files.tabs.unsaved-changes": {
     "defaultMessage": "Unsaved changes"
@@ -7627,5 +7834,65 @@
   },
   "version.supplementary-resources.type": {
     "defaultMessage": "Type"
+  },
+  "workbench.collapse-toolbar": {
+    "defaultMessage": "Hide toolbar"
+  },
+  "workbench.expand-toolbar": {
+    "defaultMessage": "Show toolbar"
+  },
+  "workbench.menu.close-panel": {
+    "defaultMessage": "Close panel"
+  },
+  "workbench.menu.hide-region": {
+    "defaultMessage": "Hide this area"
+  },
+  "workbench.menu.label": {
+    "defaultMessage": "Panel actions"
+  },
+  "workbench.menu.move-to": {
+    "defaultMessage": "Move to"
+  },
+  "workbench.menu.open-panel": {
+    "defaultMessage": "Open panel"
+  },
+  "workbench.menu.panels": {
+    "defaultMessage": "Panels"
+  },
+  "workbench.menu.region.bottom": {
+    "defaultMessage": "Bottom panel"
+  },
+  "workbench.menu.region.center": {
+    "defaultMessage": "Center"
+  },
+  "workbench.menu.region.left": {
+    "defaultMessage": "Left panel"
+  },
+  "workbench.menu.region.right": {
+    "defaultMessage": "Right panel"
+  },
+  "workbench.menu.split-down": {
+    "defaultMessage": "Split down"
+  },
+  "workbench.menu.split-right": {
+    "defaultMessage": "Split right"
+  },
+  "workbench.panels": {
+    "defaultMessage": "Panels"
+  },
+  "workbench.reset-layout": {
+    "defaultMessage": "Reset layout"
+  },
+  "workbench.tab.close": {
+    "defaultMessage": "Close {name}"
+  },
+  "workbench.toggle-bottom": {
+    "defaultMessage": "Toggle bottom panel"
+  },
+  "workbench.toggle-left": {
+    "defaultMessage": "Toggle left panel"
+  },
+  "workbench.toggle-right": {
+    "defaultMessage": "Toggle right panel"
   }
 }

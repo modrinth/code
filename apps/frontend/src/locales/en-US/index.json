@@ -731,6 +731,114 @@
   "app-marketing.show-other-packages": {
     "message": "Show other packages"
   },
+  "archive.go-back": {
+    "message": "Go back"
+  },
+  "archive.load-failed": {
+    "message": "Unable to load the project"
+  },
+  "archive.load-failed-description": {
+    "message": "The project or its versions could not be fetched."
+  },
+  "archive.loading-versions": {
+    "message": "Loading versions..."
+  },
+  "archive.nothing-to-show": {
+    "message": "No archive to show"
+  },
+  "archive.nothing-to-show-description": {
+    "message": "Open a project with version files, or a file link from the Modrinth CDN."
+  },
+  "archive.open-in-slicer": {
+    "message": "Open in Slicer"
+  },
+  "archive.project-details.channel.alpha": {
+    "message": "Alpha"
+  },
+  "archive.project-details.channel.beta": {
+    "message": "Beta"
+  },
+  "archive.project-details.channel.release": {
+    "message": "Release"
+  },
+  "archive.project-details.downloads": {
+    "message": "Downloads"
+  },
+  "archive.project-details.file": {
+    "message": "File"
+  },
+  "archive.project-details.file-type": {
+    "message": "File type"
+  },
+  "archive.project-details.hash-check": {
+    "message": "Download matches"
+  },
+  "archive.project-details.hash-match": {
+    "message": "Matches listed hash"
+  },
+  "archive.project-details.hash-mismatch": {
+    "message": "Does not match listed hash"
+  },
+  "archive.project-details.hash-pending": {
+    "message": "Checked once fully downloaded"
+  },
+  "archive.project-details.id": {
+    "message": "ID"
+  },
+  "archive.project-details.more-game-versions": {
+    "message": "+{count} more"
+  },
+  "archive.project-details.name": {
+    "message": "Name"
+  },
+  "archive.project-details.open-project": {
+    "message": "Project page"
+  },
+  "archive.project-details.primary": {
+    "message": "Primary"
+  },
+  "archive.project-details.published": {
+    "message": "Published"
+  },
+  "archive.project-details.sha512": {
+    "message": "Listed SHA-512"
+  },
+  "archive.project-details.size": {
+    "message": "Size"
+  },
+  "archive.project-details.tech-review": {
+    "message": "Tech review"
+  },
+  "archive.project-details.version": {
+    "message": "Version"
+  },
+  "archive.project-details.version-status.archived": {
+    "message": "Archived"
+  },
+  "archive.project-details.version-status.draft": {
+    "message": "Draft"
+  },
+  "archive.project-details.version-status.listed": {
+    "message": "Listed"
+  },
+  "archive.project-details.version-status.scheduled": {
+    "message": "Scheduled"
+  },
+  "archive.project-details.version-status.unknown": {
+    "message": "Unknown"
+  },
+  "archive.project-details.version-status.unlisted": {
+    "message": "Unlisted"
+  },
+  "archive.search-versions": {
+    "message": "Search versions..."
+  },
+  "archive.select-version": {
+    "message": "Select a version"
+  },
+  "archive.title": {
+    "message": "Archive viewer"
+  },
   "auth.authorize.action.authorize": {
     "message": "Authorize"
   },
@@ -4108,6 +4216,9 @@
   },
   "project.error.project-not-found": {
     "message": "Project not found"
+  },
+  "project.files.title": {
+    "message": "Files"
   },
   "project.gallery.title": {
     "message": "Gallery"

@@ -964,6 +964,9 @@ importers:
       qrcode.vue:
         specifier: ^3.4.1
         version: 3.8.0(vue@3.5.43(typescript@5.9.3))
+      smol-toml:
+        specifier: ^1.9.0
+        version: 1.9.1
       three:
         specifier: ^0.172.0
         version: 0.172.0
@@ -1013,6 +1016,9 @@ importers:
       '@tailwindcss/vite':
         specifier: ^4.1.18
         version: 4.1.18(vite@5.4.21(@types/node@24.12.2)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0))
+      '@types/js-yaml':
+        specifier: ^4.0.9
+        version: 4.0.9
       '@vitejs/plugin-vue':
         specifier: ^5.2.1
         version: 5.2.4(vite@5.4.21(@types/node@24.12.2)(lightningcss@1.32.0)(sass@1.97.3)(terser@5.46.0))(vue@3.5.43(typescript@5.9.3))
@@ -9097,6 +9103,10 @@ packages:
 
   smol-toml@1.6.0:
     resolution: {integrity: sha512-4zemZi0HvTnYwLfrpk/CF9LOd9Lt87kAt50GnqhMpyF9U3poDAP2+iukq2bZsO/ufegbYehBkqINbsWxj4l4cw==}
+    engines: {node: '>= 18'}
+
+  smol-toml@1.9.1:
+    resolution: {integrity: sha512-j7WyPdf0CJoutMzMoPLF/bVXHtKZIT9Rb4eGeEbWw8X2t5oirjPgpL+OpaENZrILYaXqYwnVH+qgUwVbl+pUJQ==}
     engines: {node: '>= 18'}
 
   sortablejs@1.14.0:
@@ -19934,6 +19944,8 @@ snapshots:
   smob@1.5.0: {}
 
   smol-toml@1.6.0: {}
+
+  smol-toml@1.9.1: {}
 
   sortablejs@1.14.0: {}
 

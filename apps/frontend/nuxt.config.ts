@@ -110,6 +110,10 @@ export default defineNuxtConfig({
 				external: ['cloudflare:workers'],
 			},
 		},
+		worker: {
+			// The toolbox workers (archives, decompilation) lazily import their dependencies
+			format: 'es',
+		},
 	},
 	hooks: {
 		async 'build:before'() {

@@ -127,6 +127,14 @@ export class ZipTreeNode extends TreeNode<ZipNode> {
     asFile(): FileZipTreeNode | undefined{
         return this.type == "file" ? this as unknown as FileZipTreeNode : undefined;
     }
+
+	/** The archive this node is stored in: the root, or the nested archive (e.g. jar-in-jar) holding it. */
+	getArchive(): RootZipTreeNode | FileZipTreeNode {
+		for (let parent = this.parent; parent != null; parent = parent.parent) {
+			if (isZipArchive(parent)) return parent as FileZipTreeNode;
+		}
+		return this.root ?? this as unknown as RootZipTreeNode;
+	}
 }
 
 export type UUID_V7 = string;
@@ -167,13 +175,28 @@ export class RootZipTreeNode extends ZipTreeNode {
 
         if (fileNode) {
             this.fileEntries.set(node.path, fileNode);
-
-            const parts = node.path.split(".jar/");
-            this.relativeFileEntries.set((parts.length > 1) ? parts[parts.length - 1] : node.path, fileNode)
+            this.relativeFileEntries.set(RootZipTreeNode.relativePathOf(node.path), fileNode)
         }
 
         return node;
     }
+
+	/**
+	 * The path of a file within its innermost archive, with a leading slash, e.g. `/a/B.class` for
+	 * both `/a/B.class` and `/META-INF/jars/c.jar/a/B.class`.
+	 */
+	static relativePathOf(path: string) {
+		const parts = path.split(".jar/");
+		const relative = parts[parts.length - 1];
+		return relative.startsWith("/") ? relative : "/" + relative;
+	}
+
+	/** Finds a file by its full path, or by its path within its innermost archive when `relative`. */
+	findFileEntry(path: string, relative?: boolean) {
+		return relative
+			? this.relativeFileEntries.get(RootZipTreeNode.relativePathOf(path))
+			: this.fileEntries.get(path);
+	}
 
     /**
      * @internal Only used to remove a node from the given reference maps
@@ -182,8 +205,8 @@ export class RootZipTreeNode extends ZipTreeNode {
         this.entries.delete(node.path)
         this.fileEntries.delete(node.path)
 
-        const parts = node.path.split(".jar/");
-        if (parts.length > 1) this.relativeFileEntries.delete(parts[parts.length - 1])
+        const relativePath = RootZipTreeNode.relativePathOf(node.path);
+        if (this.relativeFileEntries.get(relativePath) === node) this.relativeFileEntries.delete(relativePath)
 
         return node;
     }
@@ -280,6 +303,11 @@ export interface ZipHandler {
     readLazyData<K extends keyof LazyDataAccess>(node: FileZipTreeNode | NodeTarget, key: K): Promise<Awaited<ReturnType<LazyDataAccess[K]['get']>>>;
 	readSource(node: FileZipTreeNode | NodeTarget, options?: SourceOptions): Promise<DecompilerResult>;
     readNodeData(node: FileZipTreeNode | NodeTarget): Promise<ArrayBuffer>;
+	/**
+	 * Reads the node's data, waiting for the archive to finish loading when the node isn't known
+	 * yet, and resolves to `undefined` when the archive turns out not to hold it.
+	 */
+	findNodeData(node: NodeTarget): Promise<ArrayBuffer | undefined>;
     writeNodeData(node: FileZipTreeNode | NodeTarget, buffer: ArrayBuffer, options?: ZipWriterAddDataOptions): Promise<boolean>;
     collectFiles(root: RootZipTreeNode | UUID_V7, matcher?: FileMatcher): Promise<FileDetails[]>;
     collectHashedFiles(root: RootZipTreeNode | UUID_V7, matcher?: FileMatcher, deduplicate?: boolean): Promise<HashedFileContent[]>;
@@ -408,8 +436,10 @@ export class DelegateFileZipTreeNode extends ZipTreeNode implements FileZipTreeN
 }
 
 export function reconstituteRoot(handler: ZipHandler, root: RootZipTreeNode): RootZipTreeNode {
+    Object.setPrototypeOf(root, RootZipTreeNode.prototype);
     root.entries = new Map();
     root.fileEntries = new Map();
+    root.relativeFileEntries = new Map();
 
     return reconstituteNodes(handler, root, root, root)
 }
@@ -422,13 +452,12 @@ export function reconstituteNodes<N extends ZipNode>(handler: ZipHandler, root: 
         reconstitutedNode = Object.setPrototypeOf(node, ZipTreeNode.prototype);
     } else {
         reconstitutedNode = Object.setPrototypeOf(node, DelegateFileZipTreeNode.prototype);
-        root.fileEntries.set(reconstitutedNode.path, reconstitutedNode as FileZipTreeNode);
     }
 
     node.children.forEach((entry) => reconstituteNodes(handler, root, node, entry))
 
     if (!(reconstitutedNode instanceof RootZipTreeNode)) {
-        root.entries.set(reconstitutedNode.path, reconstitutedNode);
+        root.addNodeToRoot(reconstitutedNode);
 
         reconstitutedNode.root = root;
         reconstitutedNode.parent = parent;

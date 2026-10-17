@@ -98,6 +98,15 @@ export interface FileManagerContext {
 	busyWarning?: Ref<string | null> | ComputedRef<string | null>
 	isReadOnly?: (file: FileInfo | null) => boolean
 	readOnlyReason?: Ref<string> | ComputedRef<string>
+	/**
+	 * Whether every entry is read-only (e.g. an archive being inspected), which hides the actions
+	 * that create or upload entries rather than only disabling them.
+	 */
+	readOnly?: boolean
+	/** Whether a file can be opened in the editor; defaults to its extension being viewable. */
+	canOpenInEditor?: (file: FileInfo) => boolean
+	/** The editor language of a file, for files whose contents differ from what their extension suggests. */
+	editorLanguage?: (file: FileInfo<'file'>) => string | undefined
 
 	extractFile?: (
 		path: string,

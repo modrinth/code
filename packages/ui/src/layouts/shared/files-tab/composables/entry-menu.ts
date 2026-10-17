@@ -16,7 +16,7 @@ import type { ButtonMenuLeafOption, ButtonMenuOption } from '#ui/components/base
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { injectNotificationManager } from '#ui/providers/web-notifications'
 import { commonMessages } from '#ui/utils/common-messages'
-import { canOpenInFileEditor, getFileExtension } from '#ui/utils/file-extensions'
+import { getFileExtension } from '#ui/utils/file-extensions'
 
 import { injectFileBrowserUI } from '../providers/file-browser-ui'
 import type { FileInfo } from '../providers/file-manager'
@@ -79,7 +79,9 @@ export function useEntryMenu() {
 			: undefined
 		const write = { disabled: writeDisabled, tooltip: writeTooltip }
 
-		const canOpenInTab = ui.advancedView.value && (isDirectory || canOpenInFileEditor(info.name))
+		const canOpenInTab = ui.advancedView.value && ui.canOpenInTab(info)
+		/** Write actions are left out entirely when nothing can be written. */
+		const writable = !ui.readOnly
 		const canExtract =
 			info.type === 'file' && getFileExtension(info.name) === 'zip' && !!ui.extractFile
 		const canZip = isDirectory && !!ui.zipFolder
@@ -92,6 +94,7 @@ export function useEntryMenu() {
 				id: 'upload-create',
 				label: formatMessage(messages.newOrUpload),
 				icon: FileIcon,
+				shown: writable,
 				options: newEntryOptions.value as ButtonMenuLeafOption[],
 			},
 			{
@@ -134,20 +137,20 @@ export function useEntryMenu() {
 				id: 'extract',
 				label: formatMessage(commonMessages.extractButton),
 				icon: PackageOpenIcon,
-				shown: canExtract,
+				shown: canExtract && writable,
 				...write,
 				action: () => ui.handleExtractItem(info),
 			},
-			{ type: 'divider', shown: canExtract },
+			{ type: 'divider', shown: canExtract && writable },
 			{
 				id: 'zip',
 				label: formatMessage(messages.createZip),
 				icon: FolderArchiveIcon,
-				shown: canZip,
+				shown: canZip && writable,
 				...write,
 				action: () => ui.zipFolder?.(info),
 			},
-			{ type: 'divider', shown: canZip },
+			{ type: 'divider', shown: canZip && writable },
 			...customActions.map(
 				(action): ButtonMenuOption => ({
 					id: `custom-${action.id}`,
@@ -163,7 +166,7 @@ export function useEntryMenu() {
 				id: 'rename',
 				label: formatMessage(commonMessages.renameButton),
 				icon: EditIcon,
-				shown: !isRoot,
+				shown: !isRoot && writable,
 				...write,
 				action: () => ui.showRenameModal(info),
 			},
@@ -171,7 +174,7 @@ export function useEntryMenu() {
 				id: 'move',
 				label: formatMessage(commonMessages.moveButton),
 				icon: RightArrowIcon,
-				shown: !isRoot,
+				shown: !isRoot && writable,
 				...write,
 				action: () => ui.showMoveModal(info),
 			},
@@ -186,7 +189,7 @@ export function useEntryMenu() {
 				id: 'delete',
 				label: formatMessage(commonMessages.deleteLabel),
 				icon: TrashIcon,
-				shown: !isRoot,
+				shown: !isRoot && writable,
 				...write,
 				action: () => ui.showDeleteModal(info),
 				tone: 'red',

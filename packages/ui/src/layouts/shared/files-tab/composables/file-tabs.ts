@@ -1,6 +1,12 @@
-import type { DockviewApi, DockviewReadyEvent, IDisposable } from 'dockview-vue'
+import type {
+	DockviewApi,
+	DockviewGroupPanel,
+	DockviewReadyEvent,
+	IDisposable,
+	IDockviewPanel,
+} from 'dockview-vue'
 import type { ComputedRef, MaybeRefOrGetter, Ref } from 'vue'
-import { computed, ref, shallowReactive, shallowRef, toValue, watch } from 'vue'
+import { computed, nextTick, ref, shallowReactive, toValue, watch } from 'vue'
 
 import {
 	infoFrom,
@@ -61,6 +67,18 @@ export interface FileTabsOptions {
 	workspaceId: MaybeRefOrGetter<string | null>
 	/** Whether the tab strip is shown, further tabs can be opened and every tab can be closed. */
 	enabled: MaybeRefOrGetter<boolean>
+	/**
+	 * `managed`: the tabs own a single dockview, kept to one strip of tabs and rebuilt from the
+	 * tabs whenever the workspace changes. `shared`: the tabs live in dockviews laid out by a host
+	 * (e.g. a workbench), which may split them or move them between its dockviews; the tabs only
+	 * add the panels that are missing and drop ones for tabs that no longer exist.
+	 */
+	mode?: 'managed' | 'shared'
+}
+
+export interface OpenTabOptions {
+	/** The group to open the tab in, rather than the focused one. */
+	group?: DockviewGroupPanel
 }
 
 export interface FileTabs {
@@ -78,7 +96,13 @@ export interface FileTabs {
 	navigate: (location: FileInfo) => Promise<void>
 	back: () => Promise<void>
 	forward: () => Promise<void>
-	openTab: (location: FileInfo) => void
+	/** Navigates the given tab, focusing it first. */
+	navigateIn: (tabId: string, location: FileInfo) => Promise<void>
+	/** Moves the given tab through its history, focusing it first. */
+	goIn: (tabId: string, delta: number) => Promise<void>
+	canGoBackIn: (tabId: string) => boolean
+	canGoForwardIn: (tabId: string) => boolean
+	openTab: (location: FileInfo, options?: OpenTabOptions) => void
 	activateTab: (id: string) => void
 	closeTab: (id: string) => Promise<void>
 	closeOtherTabs: (id: string) => Promise<void>
@@ -97,6 +121,19 @@ export interface FileTabs {
 	forget: (file: FileInfo) => void
 	registerEditor: (tabId: string, bridge: FileEditorBridge) => void
 	unregisterEditor: (tabId: string, bridge: FileEditorBridge) => void
+	/** Whether a dockview panel is one of the tabs. */
+	isTabPanel: (panel: Pick<IDockviewPanel, 'id'>) => boolean
+	/**
+	 * Asks about the tab's unsaved changes before it moves to another dockview, which remounts
+	 * its editor. Resolves `true` once it is safe to move.
+	 */
+	confirmMove: (tabId: string) => Promise<boolean>
+	/** Hosts the tabs in a dockview; the primary one is where new tabs go when none is focused. */
+	attach: (dockview: DockviewApi, options?: { primary?: boolean }) => void
+	detach: (dockview: DockviewApi) => void
+	/** Adds the panels of tabs no dockview holds (e.g. after the host reset its layout). */
+	syncPanels: () => void
+	/** Attaches the managed dockview. */
 	onReady: (event: DockviewReadyEvent) => void
 	onDispose: () => void
 }
@@ -176,6 +213,7 @@ function isRootDirectory(location: FileInfo) {
  */
 export function useFileTabs(options: FileTabsOptions): FileTabs {
 	const { ctx } = options
+	const managed = (options.mode ?? 'managed') === 'managed'
 
 	const contextLocation = computed<FileInfo>(() => ctx.currentFile.value)
 
@@ -212,13 +250,40 @@ export function useFileTabs(options: FileTabsOptions): FileTabs {
 		[...editors.values()].some((editor) => editor.hasUnsavedChanges.value),
 	)
 
-	const api = shallowRef<DockviewApi | null>(null)
-	let disposables: IDisposable[] = []
+	/** The dockviews hosting the tabs, with their event subscriptions. */
+	const docks = new Map<DockviewApi, IDisposable[]>()
+	let primaryDock: DockviewApi | null = null
+	/** The dockview the active tab was last focused in, where new tabs open. */
+	let focusedDock: DockviewApi | null = null
 	/** Set while panels are being (re)built, so dockview's events don't feed back into the tabs. */
 	let renderingPanels = false
 
 	function getTab(id: string) {
 		return tabs.value.find((tab) => tab.id === id)
+	}
+
+	function isTabPanel(panel: Pick<IDockviewPanel, 'id'>) {
+		return getTab(panel.id) != null
+	}
+
+	/** The tab's panel and the dockview holding it. */
+	function findPanel(id: string) {
+		for (const dock of docks.keys()) {
+			const panel = dock.getPanel(id)
+			if (panel) return { dock, panel }
+		}
+		return null
+	}
+
+	function dockOfGroup(group: DockviewGroupPanel) {
+		for (const dock of docks.keys()) if (dock.getGroup(group.id) === group) return dock
+		return null
+	}
+
+	function targetDock() {
+		if (focusedDock && docks.has(focusedDock)) return focusedDock
+		if (primaryDock && docks.has(primaryDock)) return primaryDock
+		return docks.keys().next().value ?? null
 	}
 
 	function pushLocation(tab: FileTab, location: FileInfo) {
@@ -302,7 +367,7 @@ export function useFileTabs(options: FileTabsOptions): FileTabs {
 		() => toValue(options.workspaceId),
 		(workspaceId) => {
 			restoreWorkspace(loadWorkspace(workspaceId))
-			if (api.value) renderPanels(api.value)
+			renderPanels()
 		},
 	)
 
@@ -341,47 +406,101 @@ export function useFileTabs(options: FileTabsOptions): FileTabs {
 		applyToContext(currentLocation(tab))
 	}
 
+	async function navigateIn(tabId: string, location: FileInfo) {
+		activateTab(tabId)
+		if (activeTabId.value === tabId) await navigate(location)
+	}
+
+	async function goIn(tabId: string, delta: number) {
+		activateTab(tabId)
+		if (activeTabId.value === tabId) await go(delta)
+	}
+
+	function canGoBackIn(tabId: string) {
+		return (getTab(tabId)?.index ?? 0) > 0
+	}
+
+	function canGoForwardIn(tabId: string) {
+		const tab = getTab(tabId)
+		return !!tab && tab.index < tab.history.length - 1
+	}
+
 	function applyHeaderVisibility() {
+		if (!managed) return
 		const hidden = !toValue(options.enabled)
-		for (const group of api.value?.groups ?? []) group.header.hidden = hidden
+		for (const group of primaryDock?.groups ?? []) group.header.hidden = hidden
 	}
 
 	watch(() => toValue(options.enabled), applyHeaderVisibility)
 
 	/**
-	 * Adds the tab's panel to the single tab group. Without an explicit group, panels added while
-	 * no group is active (e.g. `inactive` ones) each get a new group, splitting the view.
+	 * Adds the tab's panel to `group`, else the focused dockview's active (or first) group.
+	 * Without an explicit group, panels added while no group is active (e.g. `inactive` ones)
+	 * each get a new group, splitting the view.
 	 */
-	function addPanel(tab: FileTab, inactive = false) {
-		const group = api.value?.groups[0]
-		api.value?.addPanel<FileTabPanelParams>({
+	function addPanel(tab: FileTab, inactive = false, group?: DockviewGroupPanel) {
+		const dock = group ? dockOfGroup(group) : targetDock()
+		if (!dock) return
+		const reference = group ?? dock.activeGroup ?? dock.groups[0]
+		dock.addPanel<FileTabPanelParams>({
 			id: tab.id,
 			component: FILE_TAB_PANEL_COMPONENT,
 			tabComponent: FILE_TAB_COMPONENT,
 			title: currentLocation(tab).path,
 			params: { tabId: tab.id },
-			position: group ? { referenceGroup: group, direction: 'within' } : undefined,
+			position: reference ? { referenceGroup: reference, direction: 'within' } : undefined,
 			inactive,
 		})
 		applyHeaderVisibility()
 	}
 
-	function renderPanels(dockview: DockviewApi) {
+	/**
+	 * Managed: rebuilds the dockview from the tabs. Shared: drops panels of tabs that no longer
+	 * exist (or that another dockview already holds) and adds the missing ones.
+	 */
+	function renderPanels() {
 		renderingPanels = true
 		try {
-			dockview.clear()
-			for (const tab of tabs.value) addPanel(tab, true)
-			if (tabs.value.length === 0) dockview.addGroup()
-			applyHeaderVisibility()
-			dockview.getPanel(activeTabId.value)?.api.setActive()
+			if (managed) {
+				if (!primaryDock) return
+				primaryDock.clear()
+				for (const tab of tabs.value) addPanel(tab, true)
+				if (tabs.value.length === 0) primaryDock.addGroup()
+				applyHeaderVisibility()
+			} else {
+				const seen = new Set<string>()
+				for (const dock of docks.keys()) {
+					for (const panel of [...dock.panels]) {
+						if (panel.api.component !== FILE_TAB_PANEL_COMPONENT) continue
+						if (!getTab(panel.id) || seen.has(panel.id)) dock.removePanel(panel)
+						else seen.add(panel.id)
+					}
+				}
+				for (const tab of tabs.value) if (!seen.has(tab.id)) addPanel(tab, true)
+			}
+			findPanel(activeTabId.value)?.panel.api.setActive()
 		} finally {
 			renderingPanels = false
 		}
 	}
 
+	let renderScheduled = false
+
+	/** Shared dockviews come up one by one, so the missing panels are added once all have. */
+	function scheduleRender() {
+		if (renderScheduled) return
+		renderScheduled = true
+		nextTick(() => {
+			renderScheduled = false
+			renderPanels()
+		})
+	}
+
 	/** Keeps `tabs` in the order the user dragged them into, so it is restored that way. */
-	function syncTabOrder(dockview: DockviewApi) {
-		const order = dockview.groups.flatMap((group) => group.panels.map((panel) => panel.id))
+	function syncTabOrder() {
+		const order = [...docks.keys()].flatMap((dock) =>
+			dock.groups.flatMap((group) => group.panels.map((panel) => panel.id)),
+		)
 		const position = (tab: FileTab) => {
 			const index = order.indexOf(tab.id)
 			return index === -1 ? Number.MAX_SAFE_INTEGER : index
@@ -392,21 +511,22 @@ export function useFileTabs(options: FileTabsOptions): FileTabs {
 
 	function activateTab(id: string) {
 		if (!getTab(id)) return
-		const panel = api.value?.getPanel(id)
-		if (panel && !panel.api.isActive) panel.api.setActive()
+		const found = findPanel(id)
+		if (found) focusedDock = found.dock
+		if (found && !found.panel.api.isActive) found.panel.api.setActive()
 		if (activeTabId.value === id) return
 		activeTabId.value = id
 		applyToContext(activeLocation.value)
 	}
 
-	function openTab(location: FileInfo) {
+	function openTab(location: FileInfo, openOptions?: OpenTabOptions) {
 		if (!toValue(options.enabled)) {
 			navigate(location)
 			return
 		}
 		const tab = createTab(location)
 		tabs.value.push(tab)
-		addPanel(tab)
+		addPanel(tab, false, openOptions?.group)
 		activateTab(tab.id)
 	}
 
@@ -417,7 +537,7 @@ export function useFileTabs(options: FileTabsOptions): FileTabs {
 
 		tabs.value.splice(index, 1)
 		editors.delete(tab.id)
-		api.value?.getPanel(tab.id)?.api.close()
+		findPanel(tab.id)?.panel.api.close()
 		recentlyClosed.value = [tab, ...recentlyClosed.value].slice(0, MAX_RECENTLY_CLOSED)
 
 		if (activeTabId.value !== tab.id) return
@@ -529,29 +649,60 @@ export function useFileTabs(options: FileTabsOptions): FileTabs {
 		if (editors.get(tabId) === bridge) editors.delete(tabId)
 	}
 
-	function onReady({ api: dockview }: DockviewReadyEvent) {
-		onDispose()
-		api.value = dockview
+	async function confirmMove(tabId: string) {
+		const editor = editors.get(tabId)
+		return editor ? options.confirmDiscard([editor]) : true
+	}
 
-		renderPanels(dockview)
+	function attach(dockview: DockviewApi, attachOptions?: { primary?: boolean }) {
+		detach(dockview)
+		if (attachOptions?.primary) primaryDock = dockview
 
-		disposables = [
+		const disposables: IDisposable[] = [
 			dockview.onDidActivePanelChange(({ panel }) => {
-				if (panel && !renderingPanels) activateTab(panel.id)
+				if (!panel || renderingPanels || !getTab(panel.id)) return
+				focusedDock = dockview
+				activateTab(panel.id)
 			}),
 			dockview.onDidMovePanel(() => {
-				if (!renderingPanels) syncTabOrder(dockview)
-			}),
-			dockview.onWillShowOverlay((event) => {
-				if (event.kind === 'content' || event.kind === 'edge') event.preventDefault()
+				if (!renderingPanels) syncTabOrder()
 			}),
 		]
+		if (managed) {
+			disposables.push(
+				dockview.onWillShowOverlay((event) => {
+					if (event.kind === 'content' || event.kind === 'edge') event.preventDefault()
+				}),
+			)
+		}
+		docks.set(dockview, disposables)
+
+		if (managed) renderPanels()
+		else scheduleRender()
+	}
+
+	/** Re-adds missing panels where new tabs go by default, rather than the last focused dockview. */
+	function syncPanels() {
+		focusedDock = null
+		if (managed) renderPanels()
+		else scheduleRender()
+	}
+
+	function detach(dockview: DockviewApi) {
+		const disposables = docks.get(dockview)
+		if (!disposables) return
+		for (const disposable of disposables) disposable.dispose()
+		docks.delete(dockview)
+		if (primaryDock === dockview) primaryDock = null
+		if (focusedDock === dockview) focusedDock = null
+	}
+
+	function onReady({ api: dockview }: DockviewReadyEvent) {
+		attach(dockview, { primary: true })
 	}
 
 	function onDispose() {
-		for (const disposable of disposables) disposable.dispose()
-		disposables = []
-		api.value = null
+		if (primaryDock) detach(primaryDock)
 	}
 
 	return {
@@ -568,6 +719,10 @@ export function useFileTabs(options: FileTabsOptions): FileTabs {
 		navigate,
 		back: () => go(-1),
 		forward: () => go(1),
+		navigateIn,
+		goIn,
+		canGoBackIn,
+		canGoForwardIn,
 		openTab,
 		activateTab,
 		closeTab,
@@ -582,6 +737,11 @@ export function useFileTabs(options: FileTabsOptions): FileTabs {
 		forget,
 		registerEditor,
 		unregisterEditor,
+		isTabPanel,
+		confirmMove,
+		attach,
+		detach,
+		syncPanels,
 		onReady,
 		onDispose,
 	}

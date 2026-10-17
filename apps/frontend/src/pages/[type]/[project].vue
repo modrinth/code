@@ -813,6 +813,10 @@ const messages = defineMessages({
 		id: 'project.moderation.title',
 		defaultMessage: 'Moderation',
 	},
+	filesTab: {
+		id: 'project.files.title',
+		defaultMessage: 'Files',
+	},
 	noCollectionsFound: {
 		id: 'project.collections.none-found',
 		defaultMessage: 'No collections found.',
@@ -2489,6 +2493,11 @@ const navLinks = computed(() => {
 			label: formatMessage(messages.moderationTab),
 			href: withInstallContextQuery(`${projectUrl}/moderation`),
 			shown: !!currentMember.value,
+		},
+		{
+			label: formatMessage(messages.filesTab),
+			href: `/archive?project=${project.value.id}`,
+			shown: isStaff(auth.value.user) && hasVersions.value,
 		},
 	]
 })

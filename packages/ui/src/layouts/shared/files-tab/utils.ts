@@ -2,6 +2,7 @@ import {
 	BoxIcon,
 	BracesIcon,
 	ClipboardListIcon,
+	FolderArchiveIcon,
 	FolderCogIcon,
 	FolderOpenIcon,
 	GlassesIcon,
@@ -14,7 +15,7 @@ import type { Component } from 'vue'
 
 import type { FileInfo } from '#ui/layouts/shared/files-tab/providers/file-manager.ts'
 import { getFileExtensionIcon } from '#ui/utils/auto-icons'
-import { getFileExtension } from '#ui/utils/file-extensions'
+import { getFileExtension, isArchiveFile } from '#ui/utils/file-extensions'
 
 export interface FileIconStyle {
 	icon: Component
@@ -23,6 +24,9 @@ export interface FileIconStyle {
 }
 
 const DEFAULT_DIRECTORY_ICON: FileIconStyle = { icon: FolderOpenIcon, color: 'text-amber-400' }
+
+/** An archive that can be browsed like a directory, e.g. a jar nested in another. */
+const ARCHIVE_DIRECTORY_ICON: FileIconStyle = { icon: FolderArchiveIcon, color: 'text-orange' }
 
 const DIRECTORY_ICON_STYLES: Record<string, FileIconStyle> = {
 	config: { icon: FolderCogIcon, color: 'text-purple' },
@@ -40,6 +44,7 @@ const DIRECTORY_ICON_STYLES: Record<string, FileIconStyle> = {
 /** Icon and color for a file or directory, shared by the listing, sidebar tree and tabs. */
 export function fileIconFor(file: Pick<FileInfo, 'name' | 'type'>): FileIconStyle {
 	if (file.type === 'directory') {
+		if (isArchiveFile(getFileExtension(file.name))) return ARCHIVE_DIRECTORY_ICON
 		return DIRECTORY_ICON_STYLES[file.name.toLowerCase()] ?? DEFAULT_DIRECTORY_ICON
 	}
 	return { icon: getFileExtensionIcon(getFileExtension(file.name)), color: 'text-mist-200' }

@@ -228,9 +228,7 @@ function onEnter() {
 }
 
 function onTooltipEnter() {
-	console.log('WWWWWWWWWWWWWWWWWWWW')
 	if ((props.hoverable || props.pinned) && props.reference) {
-		console.log('WEEEEEEEE')
 		preventHide(props.reference)
 	}
 }

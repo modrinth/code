@@ -1,5 +1,5 @@
 <template>
-	<div class="flex h-full items-center gap-1 pr-3">
+	<div v-if="shown" class="flex h-full items-center gap-1 pr-3">
 		<TeleportOverflowMenu
 			v-if="ui.fileTabs.tabs.value.length > 1"
 			v-tooltip="formatMessage(messages.allTabs)"
@@ -24,6 +24,7 @@
 
 <script setup lang="ts">
 import { ChevronDownIcon, HomeIcon, PlusIcon } from '@modrinth/assets'
+import type { DockviewGroupPanel } from 'dockview-vue'
 import { computed } from 'vue'
 
 import type { ButtonMenuOption } from '#ui/components/base/buttons'
@@ -34,8 +35,8 @@ import { currentLocation } from '../../composables/file-tabs'
 import { injectFileBrowserUI } from '../../providers/file-browser-ui'
 import { fileIconFor, infoFrom } from '../../utils'
 
-defineProps<{
-	params?: unknown
+const props = defineProps<{
+	params?: { group?: DockviewGroupPanel; panels?: { id: string }[] }
 }>()
 
 const { formatMessage } = useVIntl()
@@ -75,7 +76,16 @@ const tabOptions = computed<ButtonMenuOption[]>(() =>
 	}),
 )
 
+/**
+ * Groups of a workbench may hold other panels too; the tab actions only belong to groups showing
+ * file tabs, or nothing at all.
+ */
+const shown = computed(() => {
+	const panels = props.params?.panels ?? []
+	return panels.length === 0 || panels.some((panel) => ui.fileTabs.isTabPanel(panel))
+})
+
 function openNewTab() {
-	ui.fileTabs.openTab(infoFrom('/'))
+	ui.fileTabs.openTab(infoFrom('/'), { group: props.params?.group })
 }
 </script>

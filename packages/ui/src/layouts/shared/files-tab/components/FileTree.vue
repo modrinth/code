@@ -43,7 +43,7 @@ import { computed, watch } from 'vue'
 
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { infoFrom, parentInfoFrom } from '#ui/layouts/shared/files-tab/utils.ts'
-import { canOpenInFileEditor } from '#ui/utils/file-extensions'
+import { getFileExtension, isArchiveFile } from '#ui/utils/file-extensions'
 
 import { injectFileBrowserUI } from '../providers/file-browser-ui'
 import type { FileItem } from '../types'
@@ -104,6 +104,30 @@ function isExpandable(item: FileItem) {
 	return item.type === 'directory' && item.count !== 0
 }
 
+function isArchive(item: FileItem) {
+	return isArchiveFile(getFileExtension(item.name))
+}
+
+/**
+ * With compact folders on, folds a chain of folders that each hold just one folder into the
+ * first one's row, named like `a/b/c` and standing for the last. Archives are never folded, so
+ * they keep their own row.
+ */
+function compactChain(item: FileItem): FileItem {
+	if (!ui.compactFolders.value || item.type !== 'directory' || isArchive(item)) return item
+
+	const names = [item.name]
+	let current = item
+	while (current.count === 1) {
+		const children = tree.get(infoFrom(current.path)).data.value
+		const only = children.length === 1 ? children[0] : undefined
+		if (only?.type !== 'directory' || isArchive(only)) break
+		current = only
+		names.push(only.name)
+	}
+	return current === item ? item : { ...current, name: names.join('/') }
+}
+
 const nameCollator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' })
 
 function compareEntries(a: FileItem, b: FileItem) {
@@ -121,7 +145,7 @@ function collectRows(path: string, depth: number): TreeRow[] {
 	}
 
 	const rows: TreeRow[] = []
-	for (const item of [...items].sort(compareEntries)) {
+	for (const item of [...items].sort(compareEntries).map(compactChain)) {
 		const expandable = isExpandable(item)
 		const expanded = expandable && expandedPaths.value.has(item.path)
 		const children = expanded ? collectRows(item.path, depth + 1) : []
@@ -154,7 +178,7 @@ function openDirectory(item: FileItem) {
 }
 
 function prefetch(item: FileItem) {
-	if (item.type === 'directory' || canOpenInFileEditor(item.name)) {
+	if (ui.canOpenInTab(item)) {
 		tree.prefetch(item)
 	}
 }

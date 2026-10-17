@@ -271,7 +271,8 @@ export function logFactory({log, formatter, counter}: FactoryOptions = {}): Logg
     }, factory);
 
     const finalCallback = (log ?? defaultCallback).bind(factory);
-    factory.log = (level, loggerName, message, extra) => {
+    factory.onLog = onLogEvent.source;
+    factory.log =(level, loggerName, message, extra) => {
         finalCallback(level, loggerName, message, extra);
         // @ts-expect-error The 'this' context of type 'void' is not assignable to method's 'this' of type 'LoggerFactory'.
         onLogEvent.sink(level, loggerName, message, extra);

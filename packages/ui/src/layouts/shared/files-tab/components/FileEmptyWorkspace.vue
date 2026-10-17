@@ -10,18 +10,20 @@
 				<HomeIcon aria-hidden="true" />
 				{{ formatMessage(messages.openHome) }}
 			</Button>
-			<Button :disabled="ui.isBusy.value" @click="ui.showCreateModal('file')">
-				<FilePlusIcon aria-hidden="true" />
-				{{ formatMessage(messages.newFile) }}
-			</Button>
-			<Button :disabled="ui.isBusy.value" @click="ui.showCreateModal('directory')">
-				<FolderIcon aria-hidden="true" />
-				{{ formatMessage(messages.newFolder) }}
-			</Button>
-			<Button :disabled="ui.isBusy.value" @click="ui.initiateFileUpload()">
-				<UploadIcon aria-hidden="true" />
-				{{ formatMessage(messages.upload) }}
-			</Button>
+			<template v-if="!ui.readOnly">
+				<Button :disabled="ui.isBusy.value" @click="ui.showCreateModal('file')">
+					<FilePlusIcon aria-hidden="true" />
+					{{ formatMessage(messages.newFile) }}
+				</Button>
+				<Button :disabled="ui.isBusy.value" @click="ui.showCreateModal('directory')">
+					<FolderIcon aria-hidden="true" />
+					{{ formatMessage(messages.newFolder) }}
+				</Button>
+				<Button :disabled="ui.isBusy.value" @click="ui.initiateFileUpload()">
+					<UploadIcon aria-hidden="true" />
+					{{ formatMessage(messages.upload) }}
+				</Button>
+			</template>
 		</div>
 		<div v-if="recentlyClosed.length > 0" class="flex w-full max-w-md flex-col gap-1 text-left">
 			<h4 class="m-0 mb-1 text-sm font-semibold text-secondary">

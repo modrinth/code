@@ -65,7 +65,6 @@ import { computed, nextTick, ref, useId, watch } from 'vue'
 
 import Input from '#ui/components/base/inputs/Input.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { canOpenInFileEditor } from '#ui/utils/file-extensions'
 
 import { injectFileBrowserUI } from '../providers/file-browser-ui'
 import type { FileItem } from '../types'
@@ -136,7 +135,7 @@ watch(query, () => (highlighted.value = 0))
 
 /** Opens directories and editable files; any other file reveals its folder instead. */
 function select(entry: FileItem) {
-	const openable = entry.type === 'directory' || canOpenInFileEditor(entry.name)
+	const openable = ui.canOpenInTab(entry)
 	ui.navigateTo(openable ? entry : parentInfoFrom(entry))
 	query.value = ''
 }

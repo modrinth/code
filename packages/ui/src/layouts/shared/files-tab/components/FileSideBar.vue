@@ -9,13 +9,13 @@
 		<FileActionBar
 			:sidebar-open="ui.sidebarOpen.value"
 			:active-location="ui.activeLocation.value"
-			:search-query="ui.searchQuery.value"
+			:search-query="ui.activeView.value.searchQuery.value"
 			:show-refresh-button="ui.showRefreshButton.value"
 			:show-install-from-url="ui.showInstallFromUrl"
 			:disabled="ui.isBusy.value"
 			:disabled-tooltip="ui.busyTooltip.value"
 			:is-refreshing="ui.isRefreshing.value"
-			@update:search-query="(value) => (ui.searchQuery.value = value)"
+			@update:search-query="(value) => (ui.activeView.value.searchQuery.value = value)"
 			@create="ui.showCreateModal"
 			@upload="ui.initiateFileUpload"
 			@upload-zip="() => {}"
@@ -24,7 +24,21 @@
 			@share="() => ui.shareEditorToMclogs()"
 			@find="() => ui.toggleFind()"
 			@toggle-sidebar="() => ui.setSidebarOpen(!ui.sidebarOpen.value)"
-		/>
+		>
+			<template #actions>
+				<IconButton
+					v-tooltip="formatMessage(messages.compactFolders)"
+					:type="ui.compactFolders.value ? 'colored' : 'quiet'"
+					:color="ui.compactFolders.value ? 'brand' : undefined"
+					size="sm"
+					:label="formatMessage(messages.compactFolders)"
+					:aria-pressed="ui.compactFolders.value"
+					@click="ui.setCompactFolders(!ui.compactFolders.value)"
+				>
+					<FoldVerticalIcon />
+				</IconButton>
+			</template>
+		</FileActionBar>
 		<FileSearch :loaded-only-notice="ui.searchLoadedOnlyNotice.value" />
 		<div
 			:class="[
@@ -39,12 +53,25 @@
 </template>
 
 <script setup lang="ts">
+import { FoldVerticalIcon } from '@modrinth/assets'
+
+import { IconButton } from '#ui/components/base/buttons'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
+
 import { injectFileBrowserUI } from '../providers/file-browser-ui'
 import FileActionBar from './FileActionBar.vue'
 import FileSearch from './FileSearch.vue'
 import FileTree from './FileTree.vue'
 
 const ui = injectFileBrowserUI()
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	compactFolders: {
+		id: 'files.sidebar.compact-folders',
+		defaultMessage: 'Compact folders',
+	},
+})
 
 withDefaults(
 	defineProps<{

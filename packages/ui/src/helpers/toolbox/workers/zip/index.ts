@@ -39,13 +39,25 @@ const hashToUUID = new Map<Sha512, UUID_V7>();
 const urlToUUID = new Map<string, UUID_V7>();
 const UUIDToUrls = new Map<UUID_V7, string[]>();
 
-function getNodeFrom(target: NodeTarget) {
+/**
+ * Finds the targeted file. Nested archives are read in the background, so a file not known yet is
+ * looked for again once the archive finishes loading, before it's deemed missing.
+ */
+async function findNodeFrom(target: NodeTarget) {
 	if (!zipByUUID || zipByUUID.size == 0) throw new Error(`Unable to locate node as no known root tree is within the worker!`);
 
 	const root = zipByUUID.get(target.root);
 	if (root == undefined) throw new Error(`Unable to get node '${target.root}:${target.path}' as their is no active root with the hash given namespace hash!`);
 
-	const node = (target.relative ? root.relativeFileEntries : root.fileEntries).get(target.path);
+	const node = root.findFileEntry(target.path, target.relative);
+	if (node != undefined || (root as Partial<{ isFullyLoaded: boolean }>).isFullyLoaded !== false) return node;
+
+	await root.onFinishedLoading;
+	return root.findFileEntry(target.path, target.relative);
+}
+
+async function getNodeFrom(target: NodeTarget) {
+	const node = await findNodeFrom(target);
 	if (node == undefined) throw new Error(`Unable to get node '${target.root}:${target.path}' as their is no active node with the given path!`);
 
 	return node;
@@ -141,26 +153,25 @@ function broadcastArchiveUpdate(messenger: ServerMessenger<ZipMessages>, update:
 export const messageHandler: ServerMessageHandler<ZipMessages> = (messenger, msg, resolver, sender)=>  {
 	return resolver(msg, {
 		lazy_read: async (msg) => {
-			const node = getNodeFrom(msg);
+			const node = await getNodeFrom(msg);
 
 			return {
 				key: msg.key,
 				value: await (node as LazyDataAccess)[msg.key].get()
 			};
 		},
-		source_read: (msg) => {
-			return getNodeFrom(msg).asText(msg.options);
+		source_read: async (msg) => {
+			return (await getNodeFrom(msg)).asText(msg.options);
 		},
 		node_read: async (msg) => {
-			const node = getNodeFrom(msg);
+			const node = msg.optional ? await findNodeFrom(msg) : await getNodeFrom(msg);
 
-			const buffer = await node.getBuffer();
 			return {
-				buffer: buffer
+				buffer: node ? await node.getBuffer() : undefined
 			};
 		},
 		node_write: async (msg) => {
-			const node = getNodeFrom(msg);
+			const node = await getNodeFrom(msg);
 			await node.setBuffer(async () => msg.buffer, msg.options);
 			broadcastArchiveUpdate(messenger, {
 				type: "updated_node_data",

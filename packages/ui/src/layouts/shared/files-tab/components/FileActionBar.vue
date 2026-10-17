@@ -4,12 +4,16 @@
 		:class="[hasNav ? 'gap-4' : 'gap-3']"
 		:aria-label="formatMessage(messages.fileNavigation)"
 	>
-		<div class="flex items-center justify-between gap-2">
+		<div class="flex justify-between gap-2" :class="compact ? 'items-start' : 'items-center'">
 			<div
 				:aria-label="formatMessage(messages.breadcrumbNavigation)"
 				class="m-0 flex min-w-0 flex-shrink items-center p-0 text-contrast"
+				:class="{ 'flex-1': compact }"
 			>
-				<div class="m-0 flex min-w-0 flex-shrink list-none items-center p-0">
+				<div
+					class="m-0 flex min-w-0 flex-shrink list-none items-center p-0"
+					:class="{ 'flex-1': compact }"
+				>
 					<div
 						v-if="sidebarToggleable && (hasNav ? (smallMode ? true : !sidebarOpen) : true)"
 						class="mr-2 flex flex-shrink-0 gap-3"
@@ -17,6 +21,7 @@
 						<IconButton
 							v-tooltip="formatMessage(sidebarOpen ? messages.collapse : messages.expand)"
 							:label="formatMessage(sidebarOpen ? messages.collapse : messages.expand)"
+							:size="compact ? 'xs' : 'md'"
 							native-type="button"
 							class="bg-surface-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 							@click="() => $emit('toggleSidebar')"
@@ -26,13 +31,14 @@
 							<span class="sr-only">{{ formatMessage(messages.expand) }}</span>
 						</IconButton>
 					</div>
-					<div class="ml-2">
+					<div class="ml-2" :class="{ 'flex min-w-0 flex-1': compact }">
 						<slot />
 					</div>
 				</div>
 			</div>
 
 			<div v-if="!hasNav || !isEditing" class="flex flex-shrink-0 items-center gap-2">
+				<slot name="actions" />
 				<Input
 					v-if="hasNav ? !sidebarOpen : false"
 					id="search-folder"
@@ -49,6 +55,7 @@
 				/>
 
 				<TeleportOverflowMenu
+					v-if="!fileManager.readOnly"
 					type="outlined"
 					:label="formatMessage(messages.createNew)"
 					:disabled="disabled"
@@ -67,7 +74,7 @@
 					v-if="isLogFile"
 					v-tooltip="formatMessage(messages.shareToMclogs)"
 					type="quiet"
-					size="lg"
+					:size="compact ? 'sm' : 'lg'"
 					:label="formatMessage(messages.shareToMclogs)"
 					@click="$emit('share')"
 				>
@@ -76,7 +83,7 @@
 				<IconButton
 					v-tooltip="formatMessage(messages.findInFile)"
 					:type="isEditorFindOpen ? 'colored' : 'quiet'"
-					size="lg"
+					:size="compact ? 'sm' : 'lg'"
 					:color="isEditorFindOpen ? 'brand' : undefined"
 					:label="formatMessage(messages.findInFile)"
 					:aria-pressed="isEditorFindOpen"
@@ -103,12 +110,16 @@ import { computed } from 'vue'
 import { IconButton, TeleportOverflowMenu } from '#ui/components/base/buttons'
 import { defineMessages, useVIntl } from '#ui/composables/i18n.ts'
 import { useFileActions } from '#ui/layouts/shared/files-tab/composables/folder-actions.ts'
-import type { FileInfo } from '#ui/layouts/shared/files-tab/providers/file-manager.ts'
+import {
+	type FileInfo,
+	injectFileManager,
+} from '#ui/layouts/shared/files-tab/providers/file-manager.ts'
 import { getFileExtension, isImageFile } from '#ui/utils'
 
 import Input from '../../../../components/base/inputs/Input.vue'
 
 const { formatMessage } = useVIntl()
+const fileManager = injectFileManager()
 
 const messages = defineMessages({
 	fileNavigation: {
@@ -197,6 +208,8 @@ export type Properties = {
 	isRefreshing?: boolean
 	/** Whether the sidebar toggle is offered. */
 	sidebarToggleable?: boolean
+	/** Smaller controls, for tighter spaces. */
+	compact?: boolean
 }
 
 const props = withDefaults(defineProps<Properties>(), {

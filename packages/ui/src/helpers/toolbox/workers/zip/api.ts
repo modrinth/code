@@ -29,8 +29,8 @@ export type ZipMessages = MessageTypes<
 			clientbound: DecompilerResult
 		}
 		node_read: {
-			serverbound: NodeTarget,
-			clientbound: { buffer: ArrayBuffer }
+			serverbound: NodeTarget & { optional?: boolean },
+			clientbound: { buffer: ArrayBuffer | undefined }
 		},
 		node_write: {
 			serverbound: NodeTarget & { options?: ZipWriterAddDataOptions } & { buffer: ArrayBuffer },
@@ -127,8 +127,13 @@ export const handlerConstructor: MessengerHandlerConstructor<ZipMessages, ZipHan
 			return (await messenger.sendMessage({ channel: 'source_read', ...getAsTarget(target), options: options}))
 		},
 		readNodeData: async (target: FileZipTreeNode | NodeTarget) => {
-            return (await messenger.sendMessage({ channel: "node_read", ...getAsTarget(target)})).buffer
-        },
+			const { buffer } = await messenger.sendMessage({ channel: "node_read", ...getAsTarget(target) });
+			if (buffer == null) throw new Error(`No data was read for '${getAsTarget(target).path}'`);
+			return buffer;
+		},
+		findNodeData: async (target: NodeTarget) => {
+			return (await messenger.sendMessage({ channel: "node_read", ...target, optional: true })).buffer
+		},
         getOrReadZipTree: async function (source: ZipDataSource) {
 			const { url, sha512Hash } = source;
             let node: RootZipTreeNode | undefined;
@@ -249,7 +254,7 @@ export const handlerConstructor: MessengerHandlerConstructor<ZipMessages, ZipHan
 				const root = messenger.handler.zipByUUID.get(nodeTarget.root);
 
 				if (root != null) {
-					const node = (nodeTarget.relative ? root.relativeFileEntries : root.fileEntries).get(nodeTarget.path);
+					const node = root.findFileEntry(nodeTarget.path, nodeTarget.relative);
 
 					if (node) {
 						for (const lazy of [node.sha1, node.sha256, node.sha512, node.fileTypeInfo]) {
