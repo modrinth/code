@@ -3425,6 +3425,9 @@
   "profile.label.download-count": {
     "defaultMessage": "{count, plural, one {download} other {downloads}}"
   },
+  "profile.label.follower-count": {
+    "defaultMessage": "{count, plural, one {follower} other {followers}}"
+  },
   "profile.label.joined": {
     "defaultMessage": "Joined"
   },
