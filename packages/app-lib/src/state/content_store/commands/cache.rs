@@ -4,7 +4,7 @@ use crate::state::content_store::{
     ContentStore, FileStorageKind, StoreUsage, StoredFileStatus,
 };
 use crate::{ErrorKind, State};
-use anyhow::bail;
+use anyhow::{Context, bail};
 use std::collections::{HashMap, HashSet};
 
 impl ContentStore {
@@ -136,11 +136,9 @@ impl ContentStore {
 
     async fn cache_limit(&self) -> crate::Result<u64> {
         match catalog::setting(&self.pool, "store_cache_limit_bytes").await? {
-            Some(value) => Ok(value.parse().map_err(|_| {
-                ErrorKind::ContentStoreError(
-                    "the shared content cache limit is invalid".into(),
-                )
-            })?),
+            Some(value) => value.parse().context(ErrorKind::ContentStoreError(
+                "the shared content cache limit is invalid".into(),
+            )),
             None => Ok(5_368_709_120),
         }
     }

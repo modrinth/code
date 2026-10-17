@@ -8,7 +8,7 @@ use crate::state::content_store::{
 };
 use crate::util::content_hash::{hash_file, temporary_file};
 use crate::util::fetch::{self, DownloadMeta, FetchProgressFn, FetchSemaphore};
-use anyhow::bail;
+use anyhow::{Context, bail};
 use sha2::{Digest, Sha512};
 use std::path::Path;
 use tokio::fs::File;
@@ -133,9 +133,9 @@ impl ContentStore {
         .await?;
         let stored_file = StoredFileMetadata {
             sha512: hash,
-            size: size.try_into().map_err(|_| {
-                ErrorKind::ContentStoreError("content file is too large".into())
-            })?,
+            size: size.try_into().context(ErrorKind::ContentStoreError(
+                "content file is too large".into(),
+            ))?,
             status: StoredFileStatus::Ready,
             modified_as: filesystem::modified_at_ns(&destination).await?,
             last_used_at: chrono::Utc::now().timestamp(),
