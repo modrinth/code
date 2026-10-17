@@ -26,6 +26,15 @@
 			<LayersIcon aria-hidden="true" />
 		</Button>
 		<Button
+			v-tooltip="formatMessage(variantMessage)"
+			type="quiet"
+			size="xs"
+			:aria-label="formatMessage(variantMessage)"
+			@click="workbench.setVariant(workbench.variant.value === 'rounded' ? 'square' : 'rounded')"
+		>
+			<component :is="workbench.variant.value === 'rounded' ? SquareIcon : PaletteIcon" aria-hidden="true" />
+		</Button>
+		<Button
 			v-tooltip="formatMessage(messages.resetLayout)"
 			type="quiet"
 			size="xs"
@@ -51,9 +60,12 @@ import {
 	ChevronUpIcon,
 	LayersIcon,
 	LayoutTemplateIcon,
+	PaletteIcon,
 	PanelRightCloseIcon,
 	PanelRightOpenIcon,
+	SquareIcon,
 } from '@modrinth/assets'
+import { computed } from 'vue'
 
 import { Button } from '#ui/components/base/buttons'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
@@ -89,11 +101,23 @@ const messages = defineMessages({
 		id: 'workbench.reset-layout',
 		defaultMessage: 'Reset layout',
 	},
+	useRounded: {
+		id: 'workbench.use-rounded',
+		defaultMessage: 'Use rounded style',
+	},
+	useSquare: {
+		id: 'workbench.use-square',
+		defaultMessage: 'Use square style',
+	},
 	collapseToolbar: {
 		id: 'workbench.collapse-toolbar',
 		defaultMessage: 'Hide toolbar',
 	},
 })
+
+const variantMessage = computed(() =>
+	workbench.variant.value === 'rounded' ? messages.useSquare : messages.useRounded,
+)
 
 const toggleMessages = {
 	left: messages.toggleLeft,

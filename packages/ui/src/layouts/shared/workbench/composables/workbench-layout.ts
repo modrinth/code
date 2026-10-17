@@ -4,11 +4,11 @@ import type {
 	DockviewDidDropEvent,
 	DockviewDndOverlayEvent,
 	DockviewGroupPanel,
+	DockviewIDisposable,
 	DockviewReadyEvent,
 	GridviewApi,
 	GridviewReadyEvent,
 	GroupviewPanelState,
-	IDisposable,
 	IDockviewPanel,
 	Position,
 	SerializedDockview,
@@ -20,29 +20,49 @@ import {
 	onBeforeUnmount,
 	ref,
 	type Ref,
+	shallowRef,
 	type Slots,
 	toValue,
 	watch,
 } from 'vue'
 
-import type { WorkbenchLayoutState } from '../providers/workbench'
+import type { ButtonMenuOption } from '#ui/components/base/buttons/types'
+
+import type { WorkbenchContext } from '../providers/workbench'
 import {
 	DEFAULT_WORKBENCH_REGION_SIZES,
 	WORKBENCH_CENTER_MINIMUM,
+	WORKBENCH_HOSTS,
+	WORKBENCH_MODES,
 	WORKBENCH_REGIONS,
 	type WorkbenchDocuments,
 	type WorkbenchHost,
+	type WorkbenchMode,
+	type WorkbenchModeName,
 	type WorkbenchPanel,
 	type WorkbenchRegion,
 	type WorkbenchRegionSizes,
+	type WorkbenchVariant,
 } from '../types'
+import {
+	evenOutDockSash,
+	findCornerGroups,
+	registerEvenSplits,
+	registerNoSplits,
+	registerPanelOnlyDrops,
+	registerWrappedTabs,
+} from './workbench-dock-behaviours'
+import { useWorkbenchMenus } from './workbench-menus'
+import { type DockPopouts, createDockPopouts, usePopoutServices } from './workbench-popouts'
+import { useWorkbenchSelection } from './workbench-selection'
+import { useWorkbenchWindows } from './workbench-windows'
 
 export const WORKBENCH_DOCK_COMPONENT = 'workbenchDock'
 export const WORKBENCH_PANEL_COMPONENT = 'workbenchPanel'
 export const WORKBENCH_TAB_COMPONENT = 'workbenchTab'
 
 const STORAGE_PREFIX = 'workbench-layout:'
-const LAYOUT_VERSION = 3
+const LAYOUT_VERSION = 4
 const SAVE_DELAY = 200
 
 export interface WorkbenchDockParams {
@@ -56,27 +76,39 @@ export interface WorkbenchPanelParams {
 /** A workbench's layout, as persisted to local storage. */
 interface SavedWorkbenchLayout {
 	version: typeof LAYOUT_VERSION
+	variant?: WorkbenchVariant
 	sizes: Partial<Record<WorkbenchRegion, number>>
 	visible: Partial<Record<WorkbenchRegion, boolean>>
-	docks: Partial<Record<WorkbenchHost, SerializedDockview>>
+	/** Each dock's arrangements, by the set of workbench panels it held at the time. */
+	docks: Partial<Record<WorkbenchHost, Record<string, SerializedDockview>>>
 	/** Panels moved away from the dock they're declared in. */
 	placements: Record<string, WorkbenchHost>
 	/** Panels the user closed. */
 	closed: string[]
 }
 
-export interface WorkbenchLayoutOptions {
-	slots: Slots
+export interface WorkbenchOptions {
 	panels: MaybeRefOrGetter<WorkbenchPanel[]>
 	/**
 	 * Identifies the layout in local storage. `null` keeps it in memory only, e.g. for a one-off
 	 * view that shouldn't touch the user's own arrangement.
 	 */
 	storageKey: string | null
+	/** How much of the layout users can change; a preset's name, or the features themselves. */
+	mode?: WorkbenchModeName | WorkbenchMode
+	/** The look used until the user picks one. */
+	variant?: WorkbenchVariant
 	sizes?: Partial<WorkbenchRegionSizes>
+	/** Minimum size of the center, in both directions. */
+	centerMinimum?: number
 	/** Regions hidden when opened, regardless of how they were left. */
 	hiddenRegions?: WorkbenchRegion[]
 	documents?: WorkbenchDocuments
+	/**
+	 * Whether the panels are settled (e.g. their data has loaded). Until then the saved layout is
+	 * neither restored nor overwritten, so it isn't lost to a partial set of panels.
+	 */
+	ready?: MaybeRefOrGetter<boolean>
 }
 
 function loadLayout(storageKey: string | null): SavedWorkbenchLayout | null {
@@ -116,9 +148,12 @@ function dropPosition(
 	return { direction: DROP_DIRECTIONS[position] }
 }
 
-/** Alongside the panels of the dock's active (or first) group. */
+/** Alongside the panels of the dock's active (or first) group in the main window. */
 function defaultPosition(api: DockviewApi): AddPanelPositionOptions | undefined {
-	const group = api.activeGroup ?? api.groups[0]
+	const inGrid = (group?: DockviewGroupPanel | null) => group?.api.location.type === 'grid'
+	const group = inGrid(api.activeGroup)
+		? api.activeGroup
+		: api.groups.find((candidate) => inGrid(candidate))
 	return group ? { referenceGroup: group, direction: 'within' } : undefined
 }
 
@@ -126,25 +161,60 @@ function isRegion(host: WorkbenchHost): host is WorkbenchRegion {
 	return host !== 'center'
 }
 
+function resolveMode(mode: WorkbenchOptions['mode']): WorkbenchMode {
+	if (!mode) return WORKBENCH_MODES.explorer
+	return typeof mode === 'string' ? WORKBENCH_MODES[mode] : mode
+}
+
 /**
  * Lays the workbench out as a grid: its center, with resizable regions to the left, right and
  * below it. Each is its own dockview (a "dock"), so its panels can be tabbed and split within it,
- * and panels can be dragged (or moved from their menu) from one dock to another. Besides its own
- * panels, the workbench hosts `documents` (e.g. file tabs) whose owner creates and closes them.
- * Region sizes and visibility, every dock's arrangement, and where panels were moved or closed
- * are persisted per `storageKey`.
+ * and (as the mode allows) dragged or moved from their menu between docks, or popped out into
+ * windows of their own. Besides its own panels, it hosts `documents` (e.g. file tabs) whose owner
+ * creates and closes them. Region sizes and visibility, every dock's arrangement (per set of
+ * panels it held), where panels were moved or closed, and the look are persisted per
+ * `storageKey`.
+ *
+ * Create it in the host's setup and hand it to `WorkbenchLayout`, so the host can use it (e.g.
+ * provide its own context from it) before the layout renders.
  */
-export function useWorkbenchLayout(options: WorkbenchLayoutOptions): WorkbenchLayoutState {
+export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
+	const mode = resolveMode(options.mode)
 	const sizes: WorkbenchRegionSizes = { ...DEFAULT_WORKBENCH_REGION_SIZES, ...options.sizes }
+	const centerMinimum = options.centerMinimum ?? WORKBENCH_CENTER_MINIMUM
 	const saved = loadLayout(options.storageKey)
 	const documents = options.documents
+	const regions = WORKBENCH_REGIONS.filter((region) => mode.regions.includes(region))
+	const popoutHosts: WorkbenchHost[] = mode.popouts ? (mode.popouts.docks ?? ['center']) : []
 
-	const panels = computed(() => toValue(options.panels))
+	const root = shallowRef<HTMLElement | null>(null)
+	const windows = useWorkbenchWindows()
+	const selection = mode.tabSelection ? useWorkbenchSelection(windows) : null
+	const popoutServices = popoutHosts.length ? usePopoutServices() : null
+
+	const variant = ref<WorkbenchVariant>(saved?.variant ?? options.variant ?? 'square')
+
+	const documentLoaded = ref(typeof document === 'undefined' || document.readyState === 'complete')
+	function onDocumentLoad() {
+		documentLoaded.value = true
+	}
+	if (!documentLoaded.value) window.addEventListener('load', onDocumentLoad, { once: true })
+
+	const isReady = computed(() => (toValue(options.ready) ?? true) && documentLoaded.value)
+	/** Set while the page unloads, after its layout was saved, so the teardown doesn't overwrite it. */
+	let leavingPage = false
+
+	const panels = computed(() =>
+		toValue(options.panels).filter(
+			(panel) => panel.region === 'center' || regions.includes(panel.region),
+		),
+	)
 	const placements = ref<Record<string, WorkbenchHost>>({ ...saved?.placements })
-	const closed = ref<string[]>([...(saved?.closed ?? [])])
+	const closed = ref<string[]>(mode.closePanels ? [...(saved?.closed ?? [])] : [])
 
 	function regionOf(panel: WorkbenchPanel): WorkbenchHost {
-		return placements.value[panel.id] ?? panel.region
+		const placed = mode.movePanels ? placements.value[panel.id] : undefined
+		return placed && (placed === 'center' || regions.includes(placed)) ? placed : panel.region
 	}
 
 	const openPanels = computed(() =>
@@ -158,6 +228,18 @@ export function useWorkbenchLayout(options: WorkbenchLayoutOptions): WorkbenchLa
 		return openPanels.value.filter((panel) => regionOf(panel) === host)
 	}
 
+	/** Identifies the set of workbench panels a dock holds, which its saved arrangements are kept by. */
+	function panelSetKey(host: WorkbenchHost) {
+		return panelsIn(host)
+			.map((panel) => panel.id)
+			.sort()
+			.join(',')
+	}
+
+	function findPanel(id: string) {
+		return panels.value.find((candidate) => candidate.id === id)
+	}
+
 	function isDocumentComponent(component: string | undefined) {
 		return !!documents && !!component && component in documents.components
 	}
@@ -166,25 +248,19 @@ export function useWorkbenchLayout(options: WorkbenchLayoutOptions): WorkbenchLa
 		return isDocumentComponent(panel.api.component)
 	}
 
-	function savedDocumentCount(layout: SerializedDockview | undefined) {
-		return Object.values(layout?.panels ?? {}).filter((panel) =>
-			isDocumentComponent(panel.contentComponent),
-		).length
+	function hasSavedDocuments(host: WorkbenchHost) {
+		return Object.values(saved?.docks?.[host] ?? {}).some((layout) =>
+			Object.values(layout.panels ?? {}).some((panel) =>
+				isDocumentComponent(panel.contentComponent),
+			),
+		)
 	}
-
-	/** Documents headed for a dock that isn't laid out yet. */
-	const pendingDocuments = new Map<WorkbenchHost, GroupviewPanelState[]>()
 
 	/**
-	 * Every region stays laid out, so one emptied by dragging its panels away can take them back;
-	 * the toggles show and hide them.
+	 * Every region of the mode stays laid out, so one emptied by dragging its panels away can take
+	 * them back; the toggles show and hide them.
 	 */
-	const usedRegions = computed(() => [...WORKBENCH_REGIONS])
-
-	/** Whether a region holds anything when the workbench opens; empty ones start hidden. */
-	function hasInitialContent(region: WorkbenchRegion) {
-		return panelsIn(region).length > 0 || savedDocumentCount(saved?.docks?.[region]) > 0
-	}
+	const usedRegions = computed(() => [...regions])
 
 	const regionSizes = Object.fromEntries(
 		WORKBENCH_REGIONS.map((region) => [region, saved?.sizes[region] ?? sizes[region].default]),
@@ -194,22 +270,42 @@ export function useWorkbenchLayout(options: WorkbenchLayoutOptions): WorkbenchLa
 		WORKBENCH_REGIONS.map((region) => [
 			region,
 			ref(
-				!options.hiddenRegions?.includes(region) &&
-					(saved?.visible[region] ?? hasInitialContent(region)),
+				regions.includes(region) &&
+					!options.hiddenRegions?.includes(region) &&
+					(saved?.visible[region] ?? (panelsIn(region).length > 0 || hasSavedDocuments(region))),
 			),
 		]),
 	) as Record<WorkbenchRegion, Ref<boolean>>
 
+	/** How wide (or tall, for the bottom) each region is shown, 0 while hidden. */
+	const regionExtents = Object.fromEntries(
+		WORKBENCH_REGIONS.map((region) => [region, ref(visible[region].value ? regionSizes[region] : 0)]),
+	) as Record<WorkbenchRegion, Ref<number>>
+
+	/** The center's top-left and top-right groups, whose tab bars hold the corner region toggles. */
+	const cornerGroups = ref<{ left?: string; right?: string }>({})
+
 	let grid: GridviewApi | null = null
-	let gridDisposables: IDisposable[] = []
-	const docks = new Map<WorkbenchHost, { api: DockviewApi; disposables: IDisposable[] }>()
-	/** Saved arrangements are only restored the first time each dock comes up. */
-	const pendingRestores = new Map(Object.entries(saved?.docks ?? {})) as Map<
-		WorkbenchHost,
-		SerializedDockview
-	>
-	/** Where panels being moved into a dock that isn't laid out yet should go once it is. */
+	let gridDisposables: DockviewIDisposable[] = []
+
+	interface Dock {
+		api: DockviewApi
+		disposables: DockviewIDisposable[]
+		/** The panel set the dock's arrangement was last loaded or saved for. */
+		key?: string
+		popouts?: DockPopouts
+		wrappedTabs?: DockviewIDisposable
+	}
+
+	const docks = new Map<WorkbenchHost, Dock>()
+	/** Saved arrangements per dock, by panel set, updated as docks are saved. */
+	const savedDockLayouts = Object.fromEntries(
+		WORKBENCH_HOSTS.map((host) => [host, new Map(Object.entries(saved?.docks?.[host] ?? {}))]),
+	) as Record<WorkbenchHost, Map<string, SerializedDockview>>
+	/** Where panels being moved into a dock should go once it adds them. */
 	const pendingPositions = new Map<string, AddPanelPositionOptions | undefined>()
+	/** Documents headed for a dock that isn't set up yet. */
+	const pendingDocuments = new Map<WorkbenchHost, GroupviewPanelState[]>()
 	/** Removals made here rather than by the user closing the panel. */
 	let ownRemovals = 0
 
@@ -220,26 +316,34 @@ export function useWorkbenchLayout(options: WorkbenchLayoutOptions): WorkbenchLa
 	}
 
 	function measureRegions() {
-		for (const region of usedRegions.value) {
+		for (const region of regions) {
 			const panel = grid?.getPanel(region)
-			if (!panel || !visible[region].value) continue
+			if (!panel) continue
 			const size = isHorizontal(region) ? panel.api.width : panel.api.height
-			if (size > 0) regionSizes[region] = size
+			if (visible[region].value && size > 0) regionSizes[region] = size
+			regionExtents[region].value = visible[region].value ? size : 0
 		}
+	}
+
+	function dockLayout(dock: Dock) {
+		return dock.popouts?.currentLayout() ?? dock.api.toJSON()
 	}
 
 	function persist() {
 		clearTimeout(saveTimer)
+		if (!isReady.value || leavingPage) return
 		measureRegions()
-		const savedDocks: SavedWorkbenchLayout['docks'] = Object.fromEntries(pendingRestores)
-		for (const [host, { api }] of docks) savedDocks[host] = api.toJSON()
+		for (const [host, dock] of docks) {
+			if (dock.key !== undefined) savedDockLayouts[host].set(dock.key, dockLayout(dock))
+		}
 		saveLayout(options.storageKey, {
 			version: LAYOUT_VERSION,
+			variant: variant.value,
 			sizes: { ...regionSizes },
-			visible: Object.fromEntries(
-				WORKBENCH_REGIONS.map((region) => [region, visible[region].value]),
+			visible: Object.fromEntries(regions.map((region) => [region, visible[region].value])),
+			docks: Object.fromEntries(
+				WORKBENCH_HOSTS.map((host) => [host, Object.fromEntries(savedDockLayouts[host])]),
 			),
-			docks: savedDocks,
 			placements: { ...placements.value },
 			closed: [...closed.value],
 		})
@@ -247,6 +351,7 @@ export function useWorkbenchLayout(options: WorkbenchLayoutOptions): WorkbenchLa
 
 	function scheduleSave() {
 		clearTimeout(saveTimer)
+		if (leavingPage) return
 		saveTimer = setTimeout(persist, SAVE_DELAY)
 	}
 
@@ -271,11 +376,6 @@ export function useWorkbenchLayout(options: WorkbenchLayoutOptions): WorkbenchLa
 		grid.getPanel(region)?.api.setVisible(visible[region].value)
 	}
 
-	/** Lays out every region. Left and right go in before the bottom one, so it only spans the center. */
-	function addRegions() {
-		for (const region of WORKBENCH_REGIONS) addRegion(region)
-	}
-
 	function onGridReady({ api }: GridviewReadyEvent) {
 		onGridDispose()
 		grid = api
@@ -283,12 +383,18 @@ export function useWorkbenchLayout(options: WorkbenchLayoutOptions): WorkbenchLa
 			id: 'center',
 			component: WORKBENCH_DOCK_COMPONENT,
 			params: { host: 'center' },
-			minimumWidth: WORKBENCH_CENTER_MINIMUM,
-			minimumHeight: WORKBENCH_CENTER_MINIMUM,
+			minimumWidth: centerMinimum,
+			minimumHeight: centerMinimum,
 			priority: LayoutPriority.High,
 		})
-		addRegions()
-		gridDisposables = [api.onDidLayoutChange(scheduleSave)]
+		for (const region of regions) addRegion(region)
+		measureRegions()
+		gridDisposables = [
+			api.onDidLayoutChange(() => {
+				measureRegions()
+				scheduleSave()
+			}),
+		]
 	}
 
 	function onGridDispose() {
@@ -311,15 +417,29 @@ export function useWorkbenchLayout(options: WorkbenchLayoutOptions): WorkbenchLa
 		if (panel) withOwnRemovals(() => api.removePanel(panel))
 	}
 
-	/** Adds the dock's missing workbench panels, drops ones it no longer holds and updates titles. */
-	function syncDockPanels(host: WorkbenchHost) {
+	/** Groups of headerless docks hide their tab bar. */
+	function applyHeaders(host: WorkbenchHost) {
 		const api = docks.get(host)?.api
-		if (!api) return
+		if (!api || !mode.headerless.includes(host)) return
+		for (const group of api.groups) group.header.hidden = true
+	}
+
+	/**
+	 * Adds the dock's missing workbench panels, drops ones it no longer holds (one popped out is
+	 * released from its window, which stays open for it to return to) and updates titles.
+	 */
+	function syncDockPanels(host: WorkbenchHost) {
+		const dock = docks.get(host)
+		if (!dock || dock.key === undefined) return
+		const { api } = dock
 		const wanted = panelsIn(host)
 		const ids = new Set(wanted.map((panel) => panel.id))
 
 		for (const panel of [...api.panels]) {
-			if (!ids.has(panel.id) && !isDocumentPanel(panel)) removeOwn(api, panel.id)
+			if (ids.has(panel.id) || isDocumentPanel(panel)) continue
+			withOwnRemovals(() => {
+				if (!dock.popouts?.release(panel)) api.removePanel(panel)
+			})
 		}
 		for (const panel of wanted) {
 			const existing = api.getPanel(panel.id)
@@ -328,7 +448,9 @@ export function useWorkbenchLayout(options: WorkbenchLayoutOptions): WorkbenchLa
 				continue
 			}
 			const moved = pendingPositions.has(panel.id)
-			const position = moved ? pendingPositions.get(panel.id) : defaultPosition(api)
+			const position = moved
+				? pendingPositions.get(panel.id)
+				: (dock.popouts?.positionFor(panel.id) ?? defaultPosition(api))
 			pendingPositions.delete(panel.id)
 			api.addPanel<WorkbenchPanelParams>({
 				id: panel.id,
@@ -336,11 +458,15 @@ export function useWorkbenchLayout(options: WorkbenchLayoutOptions): WorkbenchLa
 				tabComponent: WORKBENCH_TAB_COMPONENT,
 				title: panel.title,
 				params: { id: panel.id },
+				renderer: 'always',
+				minimumHeight: panel.minimumHeight,
 				inactive: !moved,
 				position,
 			})
 		}
 		if (!api.activePanel) api.panels[0]?.api.setActive()
+		if (api.groups.length === 0) api.addGroup()
+		applyHeaders(host)
 	}
 
 	/**
@@ -377,10 +503,6 @@ export function useWorkbenchLayout(options: WorkbenchLayoutOptions): WorkbenchLa
 		return undefined
 	}
 
-	function findPanel(id: string) {
-		return panels.value.find((candidate) => candidate.id === id)
-	}
-
 	/** The dragged panel, when it's one of this workbench's panels or documents in another dock. */
 	function draggedPanel(event: Pick<DockviewDndOverlayEvent, 'getData'>) {
 		const data = event.getData()
@@ -394,10 +516,11 @@ export function useWorkbenchLayout(options: WorkbenchLayoutOptions): WorkbenchLa
 	}
 
 	function acceptForeignPanel(event: DockviewDndOverlayEvent) {
-		if (draggedPanel(event)) event.accept()
+		if (mode.movePanels && draggedPanel(event)) event.accept()
 	}
 
 	function onForeignDrop(host: WorkbenchHost, event: DockviewDidDropEvent) {
+		if (!mode.movePanels) return
 		const dragged = draggedPanel(event)
 		if (!dragged) return
 		const position = dropPosition(event.position, event.group)
@@ -407,7 +530,7 @@ export function useWorkbenchLayout(options: WorkbenchLayoutOptions): WorkbenchLa
 
 	/** A panel the user closed from its tab (rather than one moved or removed here) is remembered. */
 	function onPanelRemoved(host: WorkbenchHost, id: string) {
-		if (ownRemovals > 0) return
+		if (ownRemovals > 0 || !mode.closePanels) return
 		queueMicrotask(() => {
 			if (docks.get(host)?.api.getPanel(id)) return
 			const panel = findPanel(id)
@@ -417,10 +540,11 @@ export function useWorkbenchLayout(options: WorkbenchLayoutOptions): WorkbenchLa
 		})
 	}
 
-	/** Whether a saved dock only holds documents and workbench panels it still has. */
+	/** Whether a saved arrangement only holds documents and workbench panels the dock still has. */
 	function isRestorable(layout: SerializedDockview | undefined, host: WorkbenchHost) {
 		if (!layout?.grid || !layout.panels) return false
-		if (layout.floatingGroups?.length || layout.popoutGroups?.length) return false
+		if (layout.floatingGroups?.length) return false
+		if (layout.popoutGroups?.length && !popoutHosts.includes(host)) return false
 		const ids = new Set(panelsIn(host).map((panel) => panel.id))
 		return Object.entries(layout.panels).every(([id, panel]) =>
 			panel.contentComponent === WORKBENCH_PANEL_COMPONENT
@@ -429,55 +553,148 @@ export function useWorkbenchLayout(options: WorkbenchLayoutOptions): WorkbenchLa
 		)
 	}
 
+	/** Loads the dock's saved arrangement for its current panel set, if there's a usable one. */
+	function restoreDock(host: WorkbenchHost, dock: Dock) {
+		const key = dock.key ?? ''
+		const layout = savedDockLayouts[host].get(key)
+		if (!layout || !isRestorable(layout, host)) return false
+		withOwnRemovals(() => {
+			try {
+				if (dock.popouts) dock.popouts.restore(layout)
+				else dock.api.fromJSON(layout, { reuseExistingPanels: true })
+			} catch {
+				dock.api.clear()
+				savedDockLayouts[host].delete(key)
+			}
+		})
+		return true
+	}
+
+	function updateCornerGroups() {
+		const api = docks.get('center')?.api
+		cornerGroups.value = api ? findCornerGroups(api) : {}
+	}
+
+	/** Brings a dock up once both it and the workbench's panels are ready. */
+	function initializeDock(host: WorkbenchHost) {
+		const dock = docks.get(host)
+		if (!dock || dock.key !== undefined || !isReady.value) return
+		dock.key = panelSetKey(host)
+		restoreDock(host, dock)
+		for (const state of pendingDocuments.get(host) ?? []) addDocumentPanel(dock.api, state)
+		pendingDocuments.delete(host)
+		syncDockPanels(host)
+		documents?.attach(dock.api, host)
+		if (host === 'center') updateCornerGroups()
+	}
+
+	/**
+	 * Follows a change of the dock's panel set: its arrangement is kept for the set it had, and the
+	 * one kept for the new set (if any) is loaded, before the panels themselves are synced.
+	 */
+	function updateDock(host: WorkbenchHost) {
+		const dock = docks.get(host)
+		if (!dock) return
+		if (dock.key === undefined) {
+			initializeDock(host)
+			return
+		}
+		const key = panelSetKey(host)
+		if (key !== dock.key) {
+			savedDockLayouts[host].set(dock.key, dockLayout(dock))
+			dock.key = key
+			if (!dock.popouts?.restoring() && !dock.api.getPopouts().length && restoreDock(host, dock)) {
+				documents?.restore()
+			}
+		}
+		syncDockPanels(host)
+	}
+
+	function applyVariant(dock: Dock) {
+		const wrapped = variant.value === 'rounded'
+		if (wrapped && !dock.wrappedTabs) dock.wrappedTabs = registerWrappedTabs(dock.api)
+		if (!wrapped && dock.wrappedTabs) {
+			dock.wrappedTabs.dispose()
+			dock.wrappedTabs = undefined
+		}
+	}
+
+	/** Bumped as docks come and go, so the combined popout state below follows them. */
+	const dockVersion = ref(0)
+
 	function onDockReady(host: WorkbenchHost, { api }: DockviewReadyEvent) {
 		onDockDispose(host)
-		const restore = pendingRestores.get(host)
-		pendingRestores.delete(host)
-		if (isRestorable(restore, host)) {
-			withOwnRemovals(() => {
-				try {
-					api.fromJSON(restore!)
-				} catch {
-					api.clear()
-				}
+		const dock: Dock = { api, disposables: [] }
+		if (popoutHosts.includes(host) && mode.popouts && popoutServices) {
+			dock.popouts = createDockPopouts({
+				api,
+				services: popoutServices,
+				options: mode.popouts,
+				windows,
+				root: () => root.value,
+				canChange: () => isReady.value && !leavingPage,
+				titleOf: (id) => findPanel(id)?.title ?? id,
+				onChange: scheduleSave,
+				dragPanels: selection?.getDragPanels,
+				keepDrag: selection?.keepDragForPopout,
 			})
 		}
-		for (const state of pendingDocuments.get(host) ?? []) addDocumentPanel(api, state)
-		pendingDocuments.delete(host)
-
-		docks.set(host, {
-			api,
-			disposables: [
-				api.onDidLayoutChange(scheduleSave),
-				api.onUnhandledDragOver(acceptForeignPanel),
-				api.onDidDrop((event) => onForeignDrop(host, event)),
-				api.onDidRemovePanel((panel) => onPanelRemoved(host, panel.id)),
-				api.onDidRemoveGroup(() => keepGroup(api)),
-			],
-		})
-		syncDockPanels(host)
-		if (api.groups.length === 0) api.addGroup()
-		documents?.attach(api, host)
+		dock.disposables.push(
+			api.onDidLayoutChange(scheduleSave),
+			api.onDidActivePanelChange(scheduleSave),
+			api.onUnhandledDragOver(acceptForeignPanel),
+			api.onDidDrop((event) => onForeignDrop(host, event)),
+			api.onDidRemovePanel((panel) => onPanelRemoved(host, panel.id)),
+			api.onDidRemoveGroup(() => keepGroup(api)),
+			api.onDidAddGroup(() => queueMicrotask(() => applyHeaders(host))),
+			registerPanelOnlyDrops(api),
+			registerEvenSplits(api, () => isReady.value),
+		)
+		if (!mode.splitPanels || mode.headerless.includes(host)) {
+			dock.disposables.push(registerNoSplits(api))
+		}
+		if (selection) dock.disposables.push(selection.register(api))
+		if (host === 'center') dock.disposables.push(api.onDidLayoutChange(updateCornerGroups))
+		docks.set(host, dock)
+		dockVersion.value += 1
+		applyVariant(dock)
+		initializeDock(host)
 	}
 
 	function onDockDispose(host: WorkbenchHost) {
-		const entry = docks.get(host)
-		if (!entry) return
-		documents?.detach(entry.api)
-		for (const disposable of entry.disposables) disposable.dispose()
+		const dock = docks.get(host)
+		if (!dock) return
+		documents?.detach(dock.api)
+		if (dock.key !== undefined && !leavingPage) {
+			savedDockLayouts[host].set(dock.key, dockLayout(dock))
+		}
+		for (const disposable of dock.disposables) disposable.dispose()
+		dock.popouts?.dispose()
+		dock.wrappedTabs?.dispose()
 		docks.delete(host)
+		dockVersion.value += 1
 	}
 
+	watch(isReady, (ready) => {
+		if (!ready) return
+		for (const host of docks.keys()) initializeDock(host)
+	})
 	watch(openPanels, () => {
-		for (const host of docks.keys()) syncDockPanels(host)
+		if (!isReady.value) return
+		for (const host of docks.keys()) updateDock(host)
+	})
+	watch(variant, () => {
+		for (const dock of docks.values()) applyVariant(dock)
+		scheduleSave()
 	})
 
 	function setRegionVisible(region: WorkbenchRegion, value: boolean) {
-		if (visible[region].value === value) return
+		if (!regions.includes(region) || visible[region].value === value) return
 		if (!value) measureRegions()
 		visible[region].value = value
 		grid?.getPanel(region)?.api.setVisible(value)
 		if (value) applyRegionSize(region)
+		measureRegions()
 		scheduleSave()
 	}
 
@@ -491,8 +708,9 @@ export function useWorkbenchLayout(options: WorkbenchLayoutOptions): WorkbenchLa
 	 */
 	function movePanel(id: string, host: WorkbenchHost, position?: AddPanelPositionOptions) {
 		const panel = findPanel(id)
-		if (!panel) return
+		if (!panel || (host !== 'center' && !regions.includes(host))) return
 		const from = regionOf(panel)
+		if (from !== host && !mode.movePanels) return
 		const fromApi = docks.get(from)?.api
 		if (fromApi) removeOwn(fromApi, id)
 
@@ -504,9 +722,9 @@ export function useWorkbenchLayout(options: WorkbenchLayoutOptions): WorkbenchLa
 		pendingPositions.set(id, position)
 
 		showHost(host)
-		syncDockPanels(host)
+		updateDock(host)
 		docks.get(host)?.api.getPanel(id)?.api.setActive()
-		if (from !== host && fromApi) syncDockPanels(from)
+		if (from !== host) updateDock(from)
 		scheduleSave()
 	}
 
@@ -520,7 +738,7 @@ export function useWorkbenchLayout(options: WorkbenchLayoutOptions): WorkbenchLa
 
 	/**
 	 * Moves a document to another dock, which remounts it, so its owner gets to confirm first
-	 * (e.g. about unsaved changes). A dock that isn't laid out yet takes it once it is.
+	 * (e.g. about unsaved changes). A dock that isn't set up yet takes it once it is.
 	 */
 	async function moveDocumentFrom(
 		from: WorkbenchHost,
@@ -528,7 +746,7 @@ export function useWorkbenchLayout(options: WorkbenchLayoutOptions): WorkbenchLa
 		host: WorkbenchHost,
 		position?: AddPanelPositionOptions,
 	) {
-		if (from === host) return
+		if (from === host || !mode.movePanels) return
 		if (documents?.confirmMove && !(await documents.confirmMove(id))) return
 		const fromApi = docks.get(from)?.api
 		const panel = fromApi?.getPanel(id)
@@ -538,9 +756,9 @@ export function useWorkbenchLayout(options: WorkbenchLayoutOptions): WorkbenchLa
 		fromApi.removePanel(panel)
 		showHost(host)
 
-		const target = docks.get(host)?.api
-		if (target) {
-			addDocumentPanel(target, state, position)
+		const target = docks.get(host)
+		if (target && target.key !== undefined) {
+			addDocumentPanel(target.api, state, position)
 		} else {
 			pendingDocuments.set(host, [...(pendingDocuments.get(host) ?? []), state])
 		}
@@ -552,24 +770,30 @@ export function useWorkbenchLayout(options: WorkbenchLayoutOptions): WorkbenchLa
 		if (from) void moveDocumentFrom(from, id, host)
 	}
 
+	function dockPanelOf(id: string) {
+		const panel = findPanel(id)
+		const dock = panel ? docks.get(regionOf(panel)) : undefined
+		return dock ? { dock, panel: dock.api.getPanel(id) } : undefined
+	}
+
 	/** Splits a panel off into its own group beside the rest of its group, within its dock. */
 	function splitPanel(id: string, side: 'right' | 'bottom') {
-		const panel = findPanel(id)
-		if (!panel) return
-		const dockPanel = docks.get(regionOf(panel))?.api.getPanel(id)
-		if (!dockPanel || dockPanel.group.panels.length < 2) return
-		dockPanel.api.moveTo({ group: dockPanel.group, position: side })
+		if (!mode.splitPanels) return
+		const panel = dockPanelOf(id)?.panel
+		if (!panel || panel.group.panels.length < 2) return
+		panel.api.moveTo({ group: panel.group, position: side })
 	}
 
 	function closePanel(id: string) {
 		const panel = findPanel(id)
-		if (!panel || closed.value.includes(id)) return
+		if (!mode.closePanels || !panel || closed.value.includes(id)) return
 		const api = docks.get(regionOf(panel))?.api
 		closed.value = [...closed.value, id]
 		if (api) removeOwn(api, id)
 		scheduleSave()
 	}
 
+	/** Shows a panel: opening it if closed, showing its region, or bringing its popout window forward. */
 	function revealPanel(id: string) {
 		const panel = findPanel(id)
 		if (!panel) return
@@ -577,45 +801,172 @@ export function useWorkbenchLayout(options: WorkbenchLayoutOptions): WorkbenchLa
 			movePanel(id, regionOf(panel))
 			return
 		}
+		const found = dockPanelOf(id)
+		if (found?.panel && found.dock.popouts?.reveal(found.panel)) return
 		showHost(regionOf(panel))
-		docks.get(regionOf(panel))?.api.getPanel(id)?.api.setActive()
+		found?.panel?.api.setActive()
 	}
 
-	/** Restores the defaults, with every document back in the center. */
+	/** Brings the first panel of every group to the front, e.g. when moving on to another subject. */
+	function resetActiveTabs() {
+		for (const { api } of docks.values()) {
+			for (const group of api.groups) {
+				const first = group.panels[0]
+				if (first) group.model.openPanel(first, { skipSetGroupActive: true })
+			}
+		}
+	}
+
+	/** Restores the defaults, with every popout docked and every document back in the center. */
 	function resetLayout() {
-		pendingRestores.clear()
+		for (const dock of docks.values()) {
+			if (dock.popouts?.restoring() || dock.popouts?.poppingOut.value.length) return
+		}
+		for (const dock of docks.values()) dock.popouts?.closeAll()
 		pendingPositions.clear()
 		pendingDocuments.clear()
 		placements.value = {}
 		closed.value = []
-		for (const region of WORKBENCH_REGIONS) {
+		for (const host of WORKBENCH_HOSTS) savedDockLayouts[host].clear()
+		for (const region of regions) {
 			regionSizes[region] = sizes[region].default
 			visible[region].value = true
 			grid?.getPanel(region)?.api.setVisible(true)
 			applyRegionSize(region)
 		}
-		for (const [host, { api }] of docks) {
-			withOwnRemovals(() => api.clear())
+		for (const [host, dock] of docks) {
+			withOwnRemovals(() => dock.api.clear())
+			dock.key = panelSetKey(host)
 			syncDockPanels(host)
-			if (api.groups.length === 0) api.addGroup()
 		}
 		documents?.restore()
+		measureRegions()
 		persist()
+	}
+
+	function popoutDocks() {
+		void dockVersion.value
+		return [...docks.values()].flatMap((dock) => (dock.popouts ? [dock.popouts] : []))
+	}
+
+	const detachedPanels = computed(() => popoutDocks().flatMap((popouts) => popouts.detached.value))
+	const hasPopouts = computed(() => popoutDocks().some((popouts) => popouts.hasPopouts.value))
+	const poppingOut = computed(() => popoutDocks().flatMap((popouts) => popouts.poppingOut.value))
+
+	function closePopouts() {
+		for (const popouts of popoutDocks()) popouts.closeAll()
+	}
+
+	/**
+	 * A double click on a sash evens out the groups on either side of it within a dock, or returns
+	 * the region beside it in the grid to its default size.
+	 */
+	function onSashDoubleClick(event: MouseEvent) {
+		if (!(event.target instanceof HTMLElement)) return
+		const sash = event.target.closest('.dv-sash:not(.dv-disabled)')
+		if (!sash) return
+		const dockElement = sash.closest<HTMLElement>('[data-workbench-host]')
+		if (dockElement) {
+			const dock = docks.get(dockElement.dataset.workbenchHost as WorkbenchHost)
+			if (!dock || !mode.splitPanels) return
+			let evened = false
+			withOwnRemovals(() => (evened = evenOutDockSash(dock.api, sash)))
+			if (!evened) return
+		} else {
+			const container = sash.parentElement
+			const views = container?.parentElement?.querySelector(':scope > .dv-view-container')
+			if (!container || !views) return
+			const index = Array.from(container.children).indexOf(sash)
+			const region = [views.children[index], views.children[index + 1]]
+				.map((view) => {
+					const hosts = [...(view?.querySelectorAll<HTMLElement>('[data-workbench-host]') ?? [])]
+					return hosts.length === 1 ? (hosts[0].dataset.workbenchHost as WorkbenchHost) : undefined
+				})
+				.find((host): host is WorkbenchRegion => !!host && isRegion(host))
+			if (!region || !visible[region].value) return
+			regionSizes[region] = sizes[region].default
+			applyRegionSize(region)
+		}
+		event.preventDefault()
+		event.stopPropagation()
+		scheduleSave()
+	}
+
+	/** Saves before Dockview's unload handlers return popped out panels to the main window. */
+	function onBeforeUnload() {
+		persist()
+		leavingPage = true
+		clearTimeout(saveTimer)
+	}
+
+	function onPageShow() {
+		leavingPage = false
+	}
+
+	function resumeAfterCancelledUnload(event: Event) {
+		if (event.currentTarget === window) leavingPage = false
+	}
+
+	/** Refreshing a popout would reload it as the main page, so it's kept from doing so. */
+	function preventPopoutRefresh(event: KeyboardEvent) {
+		if (event.currentTarget === window) return
+		const refresh =
+			event.key === 'F5' ||
+			((event.ctrlKey || event.metaKey) &&
+				!event.altKey &&
+				(event.code === 'KeyR' || event.key.toLowerCase() === 'r'))
+		if (!refresh) return
+		event.preventDefault()
+		event.stopImmediatePropagation()
+	}
+
+	if (popoutHosts.length) {
+		windows.listen('keydown', preventPopoutRefresh, { capture: true })
+		windows.listen('pointerdown', resumeAfterCancelledUnload, { capture: true })
+		windows.listen('keydown', resumeAfterCancelledUnload, { capture: true })
+		window.addEventListener('beforeunload', onBeforeUnload, { capture: true })
+		window.addEventListener('pagehide', onBeforeUnload)
+		window.addEventListener('pageshow', onPageShow)
 	}
 
 	onBeforeUnmount(() => {
 		persist()
+		clearTimeout(saveTimer)
+		window.removeEventListener('load', onDocumentLoad)
+		window.removeEventListener('beforeunload', onBeforeUnload, true)
+		window.removeEventListener('pagehide', onBeforeUnload)
+		window.removeEventListener('pageshow', onPageShow)
 		onGridDispose()
 		for (const host of [...docks.keys()]) onDockDispose(host)
 	})
 
-	return {
-		slots: options.slots,
+	let openMenu: ((event: MouseEvent, menuOptions: ButtonMenuOption[]) => void) | undefined
+
+	const context: WorkbenchContext = {
+		slots: {} as Slots,
+		root,
+		mode,
+		variant,
+		setVariant: (value) => (variant.value = value),
 		documents,
 		panels,
 		closedPanels,
 		usedRegions,
 		visible,
+		regionExtents,
+		cornerGroups,
+		selectedPanels: selection?.selectedPanels ?? shallowRef<readonly string[]>([]),
+		detachedPanels,
+		hasPopouts,
+		poppingOut,
+		popoutPanel: (id) => dockPanelOf(id)?.dock.popouts?.popoutPanel(id),
+		dockPanel: (id) => dockPanelOf(id)?.dock.popouts?.dock(id),
+		closePopouts,
+		canPopout: (id) => {
+			const found = dockPanelOf(id)
+			return !!found?.dock.popouts && found.panel?.api.location.type === 'grid'
+		},
+		isDetached: (id) => detachedPanels.value.includes(id),
 		regionOf,
 		isOpen: (id) => !closed.value.includes(id),
 		setRegionVisible,
@@ -626,14 +977,24 @@ export function useWorkbenchLayout(options: WorkbenchLayoutOptions): WorkbenchLa
 		splitPanel,
 		closePanel,
 		revealPanel,
+		resetActiveTabs,
 		resetLayout,
-		canSplit: (id) => {
-			const panel = findPanel(id)
-			const dockPanel = panel ? docks.get(regionOf(panel))?.api.getPanel(id) : undefined
-			return (dockPanel?.group.panels.length ?? 0) > 1
-		},
+		canSplit: (id) => mode.splitPanels && (dockPanelOf(id)?.panel?.group.panels.length ?? 0) > 1,
 		onGridReady,
 		onDockReady,
 		onDockDispose,
+		onSashDoubleClick,
+		setMenuOpener: (opener) => (openMenu = opener),
+		openPanelMenu: () => {},
+		openRegionMenu: () => {},
+		openPanelsMenu: () => {},
+		documentMoveOption: () => null,
 	}
+
+	Object.assign(
+		context,
+		useWorkbenchMenus(context, (event, menuOptions) => openMenu?.(event, menuOptions)),
+	)
+
+	return context
 }

@@ -1,37 +1,47 @@
 <template>
-	<section
-		class="project-review relative flex overflow-hidden bg-bg"
-		aria-label="Project Review"
-		@dblclick="onDividerDoubleClick"
-	>
-		<div class="flex min-h-0 min-w-0 flex-1 flex-col">
-			<div class="min-h-0 flex-1 overflow-x-auto">
-				<ProjectReviewColumns
-					class="project-review-dock h-full"
-					:style="{
-						minWidth: `${workspacePanelSizes.center.minimum + (leftVisible ? workspacePanelSizes.left.minimum : 0) + (rightVisible ? workspacePanelSizes.right.minimum : 0)}px`,
-					}"
-				/>
-			</div>
-		</div>
+	<section class="project-review relative flex overflow-hidden bg-bg" aria-label="Project Review">
+		<WorkbenchLayout class="min-w-0 flex-1" :workbench="workbench">
+			<template v-for="panel in panels" :key="panel.id" #[`panel-${panel.id}`]>
+				<ProjectReviewPanel :slot-name="panel.id as ProjectReviewSlot" />
+			</template>
+			<template #tab="{ panel }">
+				<ProjectReviewTabLabel :tab="panel.id as ProjectReviewTab" />
+			</template>
+			<template v-if="slots.footer" #center-footer>
+				<component :is="slots.footer" />
+			</template>
+		</WorkbenchLayout>
 	</section>
 </template>
 
 <script setup lang="ts">
-import 'dockview-vue/dist/styles/dockview.css'
-
-import { onScopeDispose, watch, watchEffect } from 'vue'
+import {
+	createWorkbench,
+	WORKBENCH_MODES,
+	type WorkbenchPanel,
+	WorkbenchLayout,
+} from '@modrinth/ui'
+import { computed, onScopeDispose, watch, watchEffect } from 'vue'
 
 import { useModerationKeybinds } from '~/composables/moderation'
 
 import { injectReviewContext } from '../review-panel/context'
-import { reviewShortcutBlocked, useReviewEventListener, useReviewShortcut } from '../shortcuts'
-import ProjectReviewColumns from './columns.vue'
+import {
+	injectReviewShortcuts,
+	reviewShortcutBlocked,
+	useReviewEventListener,
+	useReviewShortcut,
+} from '../shortcuts'
 import { provideProjectReviewContext } from './context'
 import { reviewPanelLabels } from './labels'
-import { workspacePanelSizes } from './layout-storage'
-import type { ProjectReviewSlots, ProjectReviewTab } from './types'
-import { useProjectReviewLayout } from './use-layout'
+import ProjectReviewPanel from './panel.vue'
+import ProjectReviewTabLabel from './tab.vue'
+import type { ProjectReviewSlot, ProjectReviewSlots, ProjectReviewTab } from './types'
+
+const POPOUT_URL = '/project-review-popout.html'
+
+/** Panels that clip their own content rather than scrolling as a whole. */
+const UNSCROLLED_SLOTS: ProjectReviewSlot[] = ['right', 'disclosures', 'permissions', 'gallery', 'slicer']
 
 const props = defineProps<{
 	tabs: readonly ProjectReviewTab[]
@@ -39,20 +49,87 @@ const props = defineProps<{
 	ready: boolean
 }>()
 const slots = defineSlots<ProjectReviewSlots>()
-
-const layout = useProjectReviewLayout(
-	(tab) => reviewPanelLabels[tab],
-	() => props.tabs,
-	() => props.ready,
-)
-const { leftVisible, rightVisible, visibleRightWidth, onDividerDoubleClick } = layout
-const { heldTab, shortcutTab } = injectReviewContext()
+const shortcuts = injectReviewShortcuts()
+const review = injectReviewContext()
+const { heldTab, shortcutTab } = review
 let heldTabKey: string | undefined
+
+function panelFor(slot: ProjectReviewSlot, region: WorkbenchPanel['region']): WorkbenchPanel {
+	return {
+		id: slot,
+		title: reviewPanelLabels[slot],
+		region,
+		padded: true,
+		scroll: !UNSCROLLED_SLOTS.includes(slot),
+		minimumHeight: region === 'center' ? 120 : undefined,
+	}
+}
+
+const panels = computed<WorkbenchPanel[]>(() => [
+	panelFor('left', 'left'),
+	panelFor('right', 'right'),
+	...props.tabs.map((tab) => panelFor(tab, 'center')),
+])
+
+const workbench = createWorkbench({
+	panels,
+	storageKey: 'moderation.project-review',
+	mode: {
+		...WORKBENCH_MODES.review,
+		popouts: {
+			url: POPOUT_URL,
+			onWindow: (child) => {
+				review.close()
+				const unregister = shortcuts.registerWindow(child)
+				return () => {
+					review.close()
+					unregister()
+				}
+			},
+		},
+	},
+	variant: 'rounded',
+	sizes: {
+		left: { default: 400, minimum: 200 },
+		right: { default: 400, minimum: 200 },
+	},
+	centerMinimum: 20,
+	ready: () => props.ready,
+})
+
+const leftVisible = workbench.visible.left
+const rightVisible = workbench.visible.right
+
+function openTab(tab: ProjectReviewTab) {
+	if (props.tabs.includes(tab)) workbench.revealPanel(tab)
+}
+
+provideProjectReviewContext({
+	slots,
+	leftVisible,
+	rightVisible,
+	visibleRightWidth: workbench.regionExtents.right,
+	toggleSidebar: (side) => workbench.toggleRegion(side),
+	revealSlot: (slot) => {
+		if (slot === 'left' || slot === 'right') workbench.setRegionVisible(slot, true)
+		else openTab(slot)
+	},
+	openTab,
+	resetActiveTabs: workbench.resetActiveTabs,
+	resetPanelLayout: workbench.resetLayout,
+	selectedTabs: workbench.selectedPanels,
+	hasPopouts: workbench.hasPopouts,
+	detachedTabs: workbench.detachedPanels,
+	poppingOut: workbench.poppingOut,
+	popoutTab: (tab) => void workbench.popoutPanel(tab),
+	dockTab: workbench.dockPanel,
+	closeExternalPanels: workbench.closePopouts,
+})
 
 watchEffect(() => {
 	document.body.style.setProperty(
 		'--project-review-right-panel-width',
-		`${visibleRightWidth.value}px`,
+		`${workbench.regionExtents.right.value}px`,
 	)
 })
 onScopeDispose(() => {
@@ -73,15 +150,13 @@ watch(
 	() => props.resetKey,
 	(resetKey, previousResetKey) => {
 		clearShortcutTab()
-		if (resetKey && previousResetKey) layout.resetActiveTabs()
+		if (resetKey && previousResetKey) workbench.resetActiveTabs()
 	},
 )
 
-provideProjectReviewContext({ ...layout, slots })
-
-useReviewShortcut('toggle-left', () => layout.toggleSidebar('left'))
-useReviewShortcut('toggle-right', () => layout.toggleSidebar('right'))
-useReviewShortcut('reveal-right', () => layout.revealSlot('right'))
+useReviewShortcut('toggle-left', () => workbench.toggleRegion('left'))
+useReviewShortcut('toggle-right', () => workbench.toggleRegion('right'))
+useReviewShortcut('reveal-right', () => workbench.setRegionVisible('right', true))
 
 const keybinds = useModerationKeybinds()
 useReviewEventListener('keydown', (event) => {
@@ -90,7 +165,7 @@ useReviewEventListener('keydown', (event) => {
 		scope: 'project-review',
 		openTab: (tab) => {
 			if (!props.tabs.includes(tab)) return
-			layout.openTab(tab)
+			openTab(tab)
 			heldTab.value = tab
 			shortcutTab.value = tab
 			heldTabKey = event.code || event.key.toLowerCase()
@@ -108,44 +183,5 @@ onScopeDispose(clearShortcutTab)
 .project-review {
 	height: 100dvh;
 	width: 100%;
-}
-
-.project-review :deep(.project-review-dock) {
-	--dv-background-color: var(--color-bg);
-	--dv-separator-border: var(--surface-4);
-	--dv-sash-color: transparent;
-	--dv-active-sash-color: transparent;
-}
-
-.project-review :deep(.dv-sash:not(.dv-disabled)::after) {
-	content: '';
-	position: absolute;
-	pointer-events: none;
-	background-color: var(--color-brand);
-	opacity: 0;
-}
-
-.project-review :deep(.dv-horizontal > .dv-sash-container > .dv-sash::after) {
-	top: 0;
-	left: 50%;
-	width: 1px;
-	height: 100%;
-}
-
-.project-review :deep(.dv-vertical > .dv-sash-container > .dv-sash::after) {
-	top: 50%;
-	left: 0;
-	width: 100%;
-	height: 1px;
-}
-
-.project-review :deep(.dv-sash:not(.dv-disabled):hover::after) {
-	opacity: 1;
-	transition: opacity 0s 0.5s;
-}
-
-.project-review :deep(.dv-sash:not(.dv-disabled):active::after) {
-	opacity: 1;
-	transition: none;
 }
 </style>

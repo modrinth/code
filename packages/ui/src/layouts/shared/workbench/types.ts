@@ -11,13 +11,84 @@ export const WORKBENCH_HOSTS = ['center', ...WORKBENCH_REGIONS] as const
 
 export type WorkbenchHost = (typeof WORKBENCH_HOSTS)[number]
 
+/**
+ * How the workbench looks: `square` for flat, editor-like tab strips, `rounded` for pill shaped
+ * tabs in rounded bars, as the moderation view has.
+ */
+export const WORKBENCH_VARIANTS = ['square', 'rounded'] as const
+
+export type WorkbenchVariant = (typeof WORKBENCH_VARIANTS)[number]
+
 /** A panel of the workbench, whose content is the host's `panel-{id}` slot. */
 export interface WorkbenchPanel {
 	id: string
 	title: string
 	region: WorkbenchHost
 	icon?: Component
+	/** Pads the panel's content. */
+	padded?: boolean
+	/** Whether the panel scrolls its content (the default), rather than leaving that to it. */
+	scroll?: boolean
+	minimumHeight?: number
 }
+
+export interface WorkbenchPopoutOptions {
+	/** An empty page of the same origin that popout windows load. */
+	url: string
+	/** Docks whose panels can be popped out into their own windows. Defaults to the center. */
+	docks?: WorkbenchHost[]
+	/** Called for each popout window once it opens; the function returned runs once it closes. */
+	onWindow?: (window: Window) => () => void
+}
+
+/**
+ * How much of the layout users can change. Archive browsing hands them every panel to arrange
+ * freely, while a review keeps its side panels fixed and only rearranges the center's tabs.
+ */
+export interface WorkbenchMode {
+	/** Regions laid out around the center. */
+	regions: WorkbenchRegion[]
+	/** Panels can be moved between docks, by dragging or from their menu. */
+	movePanels: boolean
+	/** Panels can be closed, and reopened from the menus. */
+	closePanels: boolean
+	/** Docks can be split into several groups. */
+	splitPanels: boolean
+	/** The toolbar row, with the region toggles, panels menu and layout reset. */
+	toolbar: boolean
+	/** Region toggles in the outer corners of the center's tab bars, for workbenches without a toolbar. */
+	cornerToggles: boolean
+	/** Docks shown without tab bars, each holding a single panel. */
+	headerless: WorkbenchHost[]
+	/** Tabs can be selected together (shift or ctrl click) and dragged as one. */
+	tabSelection: boolean
+	popouts?: WorkbenchPopoutOptions
+}
+
+export const WORKBENCH_MODES = {
+	explorer: {
+		regions: [...WORKBENCH_REGIONS],
+		movePanels: true,
+		closePanels: true,
+		splitPanels: true,
+		toolbar: true,
+		cornerToggles: false,
+		headerless: [],
+		tabSelection: false,
+	},
+	review: {
+		regions: ['left', 'right'],
+		movePanels: false,
+		closePanels: false,
+		splitPanels: true,
+		toolbar: false,
+		cornerToggles: true,
+		headerless: ['left', 'right'],
+		tabSelection: true,
+	},
+} satisfies Record<string, WorkbenchMode>
+
+export type WorkbenchModeName = keyof typeof WORKBENCH_MODES
 
 /**
  * Panels the workbench hosts on behalf of someone else, e.g. the files layout's tabs. They're
@@ -41,7 +112,7 @@ export interface WorkbenchDocuments {
 	/** A dock came up (after its saved layout was restored), the center being the primary one. */
 	attach: (api: DockviewApi, host: WorkbenchHost) => void
 	detach: (api: DockviewApi) => void
-	/** The workbench's layout was reset, dropping every document; their panels should be re-added. */
+	/** The workbench's layout was replaced, dropping documents; their panels should be re-added. */
 	restore: () => void
 }
 
@@ -59,5 +130,5 @@ export const DEFAULT_WORKBENCH_REGION_SIZES: WorkbenchRegionSizes = {
 	bottom: { default: 220, minimum: 100 },
 }
 
-/** Minimum size of the center, in both directions. */
+/** Minimum size of the center, in both directions, unless a workbench sets its own. */
 export const WORKBENCH_CENTER_MINIMUM = 240

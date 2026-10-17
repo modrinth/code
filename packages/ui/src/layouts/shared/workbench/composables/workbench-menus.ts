@@ -1,10 +1,18 @@
-import { EyeOffIcon, LayersIcon, MoveIcon, SplitIcon, XIcon } from '@modrinth/assets'
+import {
+	ExternalIcon,
+	EyeOffIcon,
+	LayersIcon,
+	MoveIcon,
+	SplitIcon,
+	UndoIcon,
+	XIcon,
+} from '@modrinth/assets'
 
 import type { ButtonMenuLeafOption, ButtonMenuOption } from '#ui/components/base/buttons/types'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 
-import type { WorkbenchContext, WorkbenchLayoutState } from '../providers/workbench'
-import { WORKBENCH_HOSTS, type WorkbenchHost } from '../types'
+import type { WorkbenchContext } from '../providers/workbench'
+import { type WorkbenchHost } from '../types'
 
 const messages = defineMessages({
 	moveTo: { id: 'workbench.menu.move-to', defaultMessage: 'Move to' },
@@ -14,6 +22,8 @@ const messages = defineMessages({
 	bottom: { id: 'workbench.menu.region.bottom', defaultMessage: 'Bottom panel' },
 	splitRight: { id: 'workbench.menu.split-right', defaultMessage: 'Split right' },
 	splitDown: { id: 'workbench.menu.split-down', defaultMessage: 'Split down' },
+	popout: { id: 'workbench.menu.popout', defaultMessage: 'Open in its own window' },
+	dock: { id: 'workbench.menu.dock', defaultMessage: 'Return to the main window' },
 	openPanel: { id: 'workbench.menu.open-panel', defaultMessage: 'Open panel' },
 	closePanel: { id: 'workbench.menu.close-panel', defaultMessage: 'Close panel' },
 	hideRegion: { id: 'workbench.menu.hide-region', defaultMessage: 'Hide this area' },
@@ -28,17 +38,22 @@ const hostMessages = {
 } satisfies Record<WorkbenchHost, unknown>
 
 /**
- * The workbench's menus, opened with `open` (e.g. a context menu's). Closed panels can be opened
- * from each of them, which is how panels are added back once closed.
+ * The workbench's menus, opened with `open` (e.g. a context menu's), offering what the mode
+ * allows. Closed panels can be opened from each of them, which is how they come back.
  */
 export function useWorkbenchMenus(
-	workbench: WorkbenchLayoutState,
+	workbench: WorkbenchContext,
 	open: (event: MouseEvent, options: ButtonMenuOption[]) => void,
 ): Pick<
 	WorkbenchContext,
 	'openPanelMenu' | 'openRegionMenu' | 'openPanelsMenu' | 'documentMoveOption'
 > {
 	const { formatMessage } = useVIntl()
+	const { mode } = workbench
+
+	function hosts(): WorkbenchHost[] {
+		return ['center', ...workbench.usedRegions.value]
+	}
 
 	function openClosedOptions(host: WorkbenchHost): ButtonMenuLeafOption[] {
 		return workbench.closedPanels.value.map((panel) => ({
@@ -55,11 +70,13 @@ export function useWorkbenchMenus(
 			id: 'move-to',
 			label: formatMessage(messages.moveTo),
 			icon: MoveIcon,
-			options: WORKBENCH_HOSTS.filter((host) => host !== current).map((host) => ({
-				id: `move-${host}`,
-				label: formatMessage(hostMessages[host]),
-				action: () => move(host),
-			})),
+			options: hosts()
+				.filter((host) => host !== current)
+				.map((host) => ({
+					id: `move-${host}`,
+					label: formatMessage(hostMessages[host]),
+					action: () => move(host),
+				})),
 		} satisfies ButtonMenuOption
 	}
 
@@ -67,56 +84,85 @@ export function useWorkbenchMenus(
 		const panel = workbench.panels.value.find((candidate) => candidate.id === id)
 		if (!panel) return
 		const host = workbench.regionOf(panel)
-		const closedOptions = openClosedOptions(host)
+		const detached = workbench.isDetached(id)
+		const closedOptions = mode.closePanels ? openClosedOptions(host) : []
 		const canSplit = workbench.canSplit(id)
+		const options: ButtonMenuOption[] = []
 
-		open(event, [
-			moveToOption(host, (target) => workbench.movePanel(id, target)),
-			{
-				id: 'split-right',
-				label: formatMessage(messages.splitRight),
-				icon: SplitIcon,
-				disabled: !canSplit,
-				action: () => workbench.splitPanel(id, 'right'),
-			},
-			{
-				id: 'split-down',
-				label: formatMessage(messages.splitDown),
-				icon: SplitIcon,
-				disabled: !canSplit,
-				action: () => workbench.splitPanel(id, 'bottom'),
-			},
-			{ type: 'divider', shown: closedOptions.length > 0 },
-			{
-				type: 'submenu',
-				id: 'open-panel',
-				label: formatMessage(messages.openPanel),
-				icon: LayersIcon,
-				shown: closedOptions.length > 0,
-				options: closedOptions,
-			},
-			{ type: 'divider' },
-			{
-				id: 'close-panel',
-				label: formatMessage(messages.closePanel),
-				icon: XIcon,
-				action: () => workbench.closePanel(id),
-			},
-		])
+		if (mode.movePanels && !detached) {
+			options.push(moveToOption(host, (target) => workbench.movePanel(id, target)))
+		}
+		if (mode.splitPanels && !mode.headerless.includes(host)) {
+			options.push(
+				{
+					id: 'split-right',
+					label: formatMessage(messages.splitRight),
+					icon: SplitIcon,
+					disabled: !canSplit,
+					action: () => workbench.splitPanel(id, 'right'),
+				},
+				{
+					id: 'split-down',
+					label: formatMessage(messages.splitDown),
+					icon: SplitIcon,
+					disabled: !canSplit,
+					action: () => workbench.splitPanel(id, 'bottom'),
+				},
+			)
+		}
+		if (detached) {
+			options.push({
+				id: 'dock',
+				label: formatMessage(messages.dock),
+				icon: UndoIcon,
+				action: () => workbench.dockPanel(id),
+			})
+		} else if (workbench.canPopout(id)) {
+			options.push({
+				id: 'popout',
+				label: formatMessage(messages.popout),
+				icon: ExternalIcon,
+				action: () => void workbench.popoutPanel(id),
+			})
+		}
+		if (closedOptions.length) {
+			options.push(
+				{ type: 'divider' },
+				{
+					type: 'submenu',
+					id: 'open-panel',
+					label: formatMessage(messages.openPanel),
+					icon: LayersIcon,
+					options: closedOptions,
+				},
+			)
+		}
+		if (mode.closePanels) {
+			options.push(
+				{ type: 'divider' },
+				{
+					id: 'close-panel',
+					label: formatMessage(messages.closePanel),
+					icon: XIcon,
+					action: () => workbench.closePanel(id),
+				},
+			)
+		}
+		if (options.some((option) => option.type !== 'divider')) open(event, options)
 	}
 
 	function openRegionMenu(event: MouseEvent, host: WorkbenchHost) {
-		const closedOptions = openClosedOptions(host)
-		const options: ButtonMenuOption[] = [
-			{
+		const closedOptions = mode.closePanels ? openClosedOptions(host) : []
+		const options: ButtonMenuOption[] = []
+		if (closedOptions.length) {
+			options.push({
 				type: 'submenu',
 				id: 'open-panel',
 				label: formatMessage(messages.openPanel),
 				icon: LayersIcon,
-				shown: closedOptions.length > 0,
 				options: closedOptions,
-			},
-		]
+			})
+		}
 		if (host !== 'center') {
 			options.push({
 				id: 'hide-region',
@@ -125,7 +171,7 @@ export function useWorkbenchMenus(
 				action: () => workbench.setRegionVisible(host, false),
 			})
 		}
-		if (closedOptions.length > 0 || host !== 'center') open(event, options)
+		if (options.length) open(event, options)
 	}
 
 	function openPanelsMenu(event: MouseEvent) {
@@ -139,7 +185,9 @@ export function useWorkbenchMenus(
 					icon: panel.icon,
 					selected: isOpen,
 					action: () =>
-						isOpen ? workbench.closePanel(panel.id) : workbench.revealPanel(panel.id),
+						isOpen && mode.closePanels
+							? workbench.closePanel(panel.id)
+							: workbench.revealPanel(panel.id),
 				}
 			}),
 		])
@@ -147,7 +195,7 @@ export function useWorkbenchMenus(
 
 	function documentMoveOption(id: string) {
 		const host = workbench.hostOfDocument(id)
-		if (!host) return null
+		if (!host || !mode.movePanels) return null
 		return moveToOption(host, (target) => workbench.moveDocument(id, target))
 	}
 

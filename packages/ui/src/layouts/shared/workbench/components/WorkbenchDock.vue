@@ -1,17 +1,27 @@
 <template>
-	<div class="workbench-dock h-full w-full" @contextmenu="openTabBarMenu">
+	<div
+		class="workbench-dock flex h-full w-full flex-col"
+		:data-workbench-host="host"
+		@contextmenu="openTabBarMenu"
+	>
 		<DockviewVue
-			class="h-full w-full"
+			class="min-h-0 w-full flex-1"
 			:theme="theme"
 			:components="components"
 			:tab-components="tabComponents"
-			:right-header-actions-component="workbench.documents?.headerActions"
-			:watermark-component="host === 'center' ? workbench.documents?.watermark : undefined"
-			default-renderer="always"
+			:prefix-header-actions-component="cornerToggles ? WorkbenchCornerToggle : undefined"
+			:right-header-actions-component="WorkbenchHeaderActions"
+			:watermark-component="WorkbenchWatermark"
+			:popout-url="workbench.mode.popouts?.url"
+			dnd-strategy="html5"
 			disable-floating-groups
 			disable-tabs-overflow-list
 			no-panels-overlay="emptyGroup"
 			@ready="(event) => workbench.onDockReady(host, event)"
+		/>
+		<component
+			:is="workbench.slots['center-footer']"
+			v-if="host === 'center' && workbench.slots['center-footer']"
 		/>
 	</div>
 </template>
@@ -33,9 +43,12 @@ import {
 	WORKBENCH_TAB_COMPONENT,
 	type WorkbenchDockParams,
 } from '../composables/workbench-layout'
-import { injectWorkbench } from '../providers/workbench'
+import { injectWorkbench, provideWorkbenchDock } from '../providers/workbench'
+import WorkbenchCornerToggle from './WorkbenchCornerToggle.vue'
+import WorkbenchHeaderActions from './WorkbenchHeaderActions.vue'
 import WorkbenchPanel from './WorkbenchPanel.vue'
 import WorkbenchTab from './WorkbenchTab.vue'
+import WorkbenchWatermark from './WorkbenchWatermark.vue'
 
 /** Gridview hands its panels their params and api directly, unlike dockview's nested `params`. */
 const props = defineProps<{
@@ -46,10 +59,15 @@ const props = defineProps<{
 
 const workbench = injectWorkbench()
 const host = props.params.host
+provideWorkbenchDock(host)
+
+/** Region toggles sit in the corners of the center's tab bars, when the mode has no toolbar for them. */
+const cornerToggles = host === 'center' && workbench.mode.cornerToggles
 
 const theme: DockviewTheme = {
 	name: 'modrinth-workbench',
 	className: 'dockview-theme-modrinth',
+	dndOverlayMounting: 'absolute',
 	dndTabIndicator: 'line',
 }
 

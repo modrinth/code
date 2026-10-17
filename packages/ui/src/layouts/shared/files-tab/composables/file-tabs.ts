@@ -2,7 +2,7 @@ import type {
 	DockviewApi,
 	DockviewGroupPanel,
 	DockviewReadyEvent,
-	IDisposable,
+	DockviewIDisposable,
 	IDockviewPanel,
 } from 'dockview-vue'
 import type { ComputedRef, MaybeRefOrGetter, Ref } from 'vue'
@@ -251,7 +251,7 @@ export function useFileTabs(options: FileTabsOptions): FileTabs {
 	)
 
 	/** The dockviews hosting the tabs, with their event subscriptions. */
-	const docks = new Map<DockviewApi, IDisposable[]>()
+	const docks = new Map<DockviewApi, DockviewIDisposable[]>()
 	let primaryDock: DockviewApi | null = null
 	/** The dockview the active tab was last focused in, where new tabs open. */
 	let focusedDock: DockviewApi | null = null
@@ -658,7 +658,7 @@ export function useFileTabs(options: FileTabsOptions): FileTabs {
 		detach(dockview)
 		if (attachOptions?.primary) primaryDock = dockview
 
-		const disposables: IDisposable[] = [
+		const disposables: DockviewIDisposable[] = [
 			dockview.onDidActivePanelChange(({ panel }) => {
 				if (!panel || renderingPanels || !getTab(panel.id)) return
 				focusedDock = dockview

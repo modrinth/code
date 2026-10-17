@@ -7838,11 +7838,26 @@
   "workbench.collapse-toolbar": {
     "defaultMessage": "Hide toolbar"
   },
+  "workbench.corner.hide": {
+    "defaultMessage": "Hide {name}"
+  },
+  "workbench.corner.left": {
+    "defaultMessage": "left panel"
+  },
+  "workbench.corner.right": {
+    "defaultMessage": "right panel"
+  },
+  "workbench.corner.show": {
+    "defaultMessage": "Show {name}"
+  },
   "workbench.expand-toolbar": {
     "defaultMessage": "Show toolbar"
   },
   "workbench.menu.close-panel": {
     "defaultMessage": "Close panel"
+  },
+  "workbench.menu.dock": {
+    "defaultMessage": "Return to the main window"
   },
   "workbench.menu.hide-region": {
     "defaultMessage": "Hide this area"
@@ -7858,6 +7873,9 @@
   },
   "workbench.menu.panels": {
     "defaultMessage": "Panels"
+  },
+  "workbench.menu.popout": {
+    "defaultMessage": "Open in its own window"
   },
   "workbench.menu.region.bottom": {
     "defaultMessage": "Bottom panel"
@@ -7880,6 +7898,24 @@
   "workbench.panels": {
     "defaultMessage": "Panels"
   },
+  "workbench.popout.empty": {
+    "defaultMessage": "No tabs open in this panel"
+  },
+  "workbench.popout.failed": {
+    "defaultMessage": "Could not open the panel window"
+  },
+  "workbench.popout.keep-closed": {
+    "defaultMessage": "Keep closed"
+  },
+  "workbench.popout.reopen": {
+    "defaultMessage": "Reopen window"
+  },
+  "workbench.popout.restore-description": {
+    "defaultMessage": "Panels from this window have been moved to the main window: {panels}."
+  },
+  "workbench.popout.restore-title": {
+    "defaultMessage": "Popout window closed"
+  },
   "workbench.reset-layout": {
     "defaultMessage": "Reset layout"
   },
@@ -7894,5 +7930,11 @@
   },
   "workbench.toggle-right": {
     "defaultMessage": "Toggle right panel"
+  },
+  "workbench.use-rounded": {
+    "defaultMessage": "Use rounded style"
+  },
+  "workbench.use-square": {
+    "defaultMessage": "Use square style"
   }
 }

@@ -1,12 +1,18 @@
 import type { DockviewApi, IDockviewPanel } from 'dockview-vue'
 import { shallowRef } from 'vue'
 
-import { injectReviewShortcuts } from '../shortcuts'
+import type { WorkbenchWindows } from './workbench-windows'
 
-export function useTabSelection() {
-	const shortcuts = injectReviewShortcuts()
-	const selectedTabs = shallowRef<readonly string[]>([])
-	let api: DockviewApi | undefined
+/** The attribute on a tab's content naming the panel it belongs to. */
+export const WORKBENCH_TAB_ATTRIBUTE = 'data-workbench-panel'
+
+/**
+ * Selecting several tabs of a group (shift click for a range, ctrl or cmd click to toggle), which
+ * are then dragged together. Spans every dock it's registered with.
+ */
+export function useWorkbenchSelection(windows: WorkbenchWindows) {
+	const selectedPanels = shallowRef<readonly string[]>([])
+	const apis = new Set<DockviewApi>()
 	let anchor: IDockviewPanel | undefined
 	let drag:
 		| {
@@ -15,20 +21,30 @@ export function useTabSelection() {
 				pendingPopout: boolean
 		  }
 		| undefined
-	let disposed = false
 
 	function clear() {
-		selectedTabs.value = []
+		selectedPanels.value = []
 		anchor = undefined
+	}
+
+	function findPanel(id: string) {
+		for (const api of apis) {
+			const panel = api.getPanel(id)
+			if (panel) return panel
+		}
+		return undefined
 	}
 
 	function panelAt(event: Event) {
 		const target = event.target as Element | null
-		const tab = target?.closest('.dv-tab')?.querySelector<HTMLElement>('[data-review-tab]')
-		return tab?.dataset.reviewTab ? api?.getPanel(tab.dataset.reviewTab) : undefined
+		const tab = target
+			?.closest('.dv-tab')
+			?.querySelector<HTMLElement>(`[${WORKBENCH_TAB_ATTRIBUTE}]`)
+		const id = tab?.getAttribute(WORKBENCH_TAB_ATTRIBUTE)
+		return id ? findPanel(id) : undefined
 	}
 
-	const stopPointer = shortcuts.listen(
+	windows.listen(
 		'pointerdown',
 		(event) => {
 			if (event.button !== 0) return
@@ -43,48 +59,48 @@ export function useTabSelection() {
 				event.preventDefault()
 				event.stopPropagation()
 				const group = panel.group
-				const previous = selectedTabs.value.filter((id) => api?.getPanel(id)?.group === group)
+				const previous = selectedPanels.value.filter((id) => findPanel(id)?.group === group)
 				if (event.shiftKey) {
 					const start = anchor?.group === group ? anchor : (group.activePanel ?? panel)
 					const from = group.panels.indexOf(start)
 					const to = group.panels.indexOf(panel)
 					const range = group.panels.slice(Math.min(from, to), Math.max(from, to) + 1)
-					selectedTabs.value = [
-						...new Set([...(toggle ? previous : []), ...range.map((p) => p.id)]),
+					selectedPanels.value = [
+						...new Set([...(toggle ? previous : []), ...range.map((entry) => entry.id)]),
 					]
 					anchor = start
 				} else {
-					selectedTabs.value = previous.includes(panel.id)
+					selectedPanels.value = previous.includes(panel.id)
 						? previous.filter((id) => id !== panel.id)
 						: [...previous, panel.id]
 					anchor = panel
 				}
 			} else {
-				if (!selectedTabs.value.includes(panel.id)) selectedTabs.value = []
+				if (!selectedPanels.value.includes(panel.id)) selectedPanels.value = []
 				anchor = panel
 			}
 		},
 		{ capture: true },
 	)
-	const stopClick = shortcuts.listen(
+	windows.listen(
 		'click',
 		(event) => {
 			const panel = panelAt(event)
 			if (panel && (event.shiftKey || event.metaKey || event.ctrlKey)) {
 				event.preventDefault()
 				event.stopPropagation()
-			} else if (panel) selectedTabs.value = []
+			} else if (panel) selectedPanels.value = []
 			else clear()
 		},
 		{ capture: true },
 	)
-	const stopKey = shortcuts.listen('keydown', (event) => {
+	windows.listen('keydown', (event) => {
 		if (event.key === 'Escape') {
 			clear()
 			drag = undefined
 		}
 	})
-	const stopDragEnd = shortcuts.listen('dragend', () => {
+	windows.listen('dragend', () => {
 		const ended = drag
 		queueMicrotask(() => {
 			if (drag === ended && !ended?.pendingPopout) drag = undefined
@@ -92,10 +108,12 @@ export function useTabSelection() {
 	})
 
 	return {
-		selectedTabs,
+		selectedPanels,
+		/** The selected panels being dragged along with the given one, if it's part of a selection. */
 		getDragPanels(id: string) {
 			return drag?.panel.id === id ? drag.panels : undefined
 		},
+		/** Keeps the dragged selection around while it's popped out, until the returned function runs. */
 		keepDragForPopout() {
 			const pending = drag
 			if (pending) pending.pendingPopout = true
@@ -103,55 +121,49 @@ export function useTabSelection() {
 				if (drag === pending) drag = undefined
 			}
 		},
-		register(target: DockviewApi) {
-			api = target
+		register(api: DockviewApi) {
+			apis.add(api)
+			let disposed = false
 			const subscriptions = [
-				target.onWillDragPanel(({ panel }) => {
-					const panels = panel.group.panels.filter((p) => selectedTabs.value.includes(p.id))
+				api.onWillDragPanel(({ panel }) => {
+					const panels = panel.group.panels.filter((entry) =>
+						selectedPanels.value.includes(entry.id),
+					)
 					drag =
 						panels.length > 1 && panels.includes(panel)
 							? { panel, panels, pendingPopout: false }
 							: undefined
 				}),
-				target.onDidMovePanel(({ panel }) => {
+				api.onDidMovePanel(({ panel }) => {
 					const moved = drag
 					if (!moved || moved.panel !== panel) return
 					drag = undefined
 					queueMicrotask(() => {
-						if (disposed || target.getPanel(panel.id) !== panel) return
+						if (disposed || api.getPanel(panel.id) !== panel) return
 						const group = panel.group
-						const panels = moved.panels.filter((p) => target.getPanel(p.id) === p)
+						const panels = moved.panels.filter((entry) => api.getPanel(entry.id) === entry)
 						const before = group.panels.slice(0, group.panels.indexOf(panel))
-						const index = before.filter((p) => !panels.includes(p)).length
-						const order = group.panels.filter((p) => !panels.includes(p))
+						const index = before.filter((entry) => !panels.includes(entry)).length
+						const order = group.panels.filter((entry) => !panels.includes(entry))
 						order.splice(index, 0, ...panels)
-						for (const [index, panel] of order.entries()) {
-							if (group.panels[index] !== panel)
-								panel.api.moveTo({
-									group,
-									position: 'center',
-									index,
-									skipSetActive: true,
-								})
+						for (const [position, entry] of order.entries()) {
+							if (group.panels[position] !== entry) {
+								entry.api.moveTo({ group, position: 'center', index: position, skipSetActive: true })
+							}
 						}
 						panel.api.setActive()
 					})
 				}),
-				target.onDidRemovePanel((panel) => {
-					selectedTabs.value = selectedTabs.value.filter((id) => id !== panel.id)
+				api.onDidRemovePanel((panel) => {
+					selectedPanels.value = selectedPanels.value.filter((id) => id !== panel.id)
 					if (anchor === panel) anchor = undefined
 				}),
-				target.onDidLayoutFromJSON(clear),
+				api.onDidLayoutFromJSON(clear),
 			]
 			return {
 				dispose() {
 					disposed = true
-					drag = undefined
-					clear()
-					stopPointer()
-					stopClick()
-					stopKey()
-					stopDragEnd()
+					apis.delete(api)
 					for (const subscription of subscriptions) subscription.dispose()
 				},
 			}

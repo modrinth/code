@@ -5,6 +5,8 @@
 		:storage-key="storageKey"
 		:sizes="sizes"
 		:hidden-regions="hiddenRegions"
+		:mode="mode"
+		:variant="variant"
 		:documents="documents"
 	>
 		<template v-for="(_, name) in $slots" #[name]="slotProps">
@@ -19,9 +21,12 @@ import { defineComponent, h, ref } from 'vue'
 import WorkbenchLayout from '#ui/layouts/shared/workbench/layout.vue'
 import type {
 	WorkbenchDocuments,
+	WorkbenchMode,
+	WorkbenchModeName,
 	WorkbenchPanel,
 	WorkbenchRegion,
 	WorkbenchRegionSizes,
+	WorkbenchVariant,
 } from '#ui/layouts/shared/workbench/types'
 
 import { FILE_TAB_COMPONENT, FILE_TAB_PANEL_COMPONENT } from '../composables/file-tabs'
@@ -41,6 +46,8 @@ defineProps<{
 	storageKey: string | null
 	sizes?: Partial<WorkbenchRegionSizes>
 	hiddenRegions?: WorkbenchRegion[]
+	mode?: WorkbenchModeName | WorkbenchMode
+	variant?: WorkbenchVariant
 }>()
 
 const ui = injectFileBrowserUI()
