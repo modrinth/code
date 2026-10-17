@@ -288,11 +288,14 @@ const {
 	visibleRange,
 	visibleTop: topSpacerHeight,
 	visibleItems,
-} = useVirtualScroll(toRef(props, 'data'), {
-	itemHeight: props.virtualRowHeight,
-	bufferSize: props.virtualBufferSize,
-	enabled: toRef(props, 'virtualized'),
-})
+} = useVirtualScroll<T>(
+	toRef(() => props.data),
+	{
+		itemHeight: props.virtualRowHeight,
+		bufferSize: props.virtualBufferSize,
+		enabled: toRef(() => props['virtualized']),
+	},
+)
 
 const renderedRows = computed(() => (props.virtualized ? visibleItems.value : props.data))
 const bottomSpacerHeight = computed(() => {

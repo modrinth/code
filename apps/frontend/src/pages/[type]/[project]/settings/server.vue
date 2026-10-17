@@ -1,5 +1,6 @@
 <template>
 	<div>
+		<ProjectIssueCard location="server" class="mb-4" />
 		<ConfirmLeaveModal ref="confirmLeaveModal" />
 		<section class="universal-card">
 			<div class="flex flex-col gap-6">
@@ -58,6 +59,11 @@
 						class="mt-2"
 					/>
 					<ValidationMessage :check="saveValidation.forField('server-languages')" class="mt-2" />
+					<ProjectIssueCard
+						target="modify_server_languages"
+						:field-action="languagesIssueAction"
+						class="mt-2"
+					/>
 				</div>
 
 				<!-- Java Address -->
@@ -154,6 +160,12 @@
 						class="mt-2"
 					/>
 					<ValidationMessage :check="saveValidation.forField('java-address')" class="mt-2" />
+					<ProjectIssueCard
+						target="modify_server_address"
+						platform="minecraft_java"
+						:field-action="javaAddressIssueAction"
+						class="mt-2"
+					/>
 				</div>
 
 				<!-- Bedrock Address -->
@@ -176,10 +188,20 @@
 							autocomplete="off"
 						/>
 					</div>
+					<ProjectIssueCard
+						target="modify_server_address"
+						platform="minecraft_bedrock"
+						:field-action="bedrockAddressIssueAction"
+						class="mt-2"
+					/>
 				</div>
 
 				<div>
-					<CompatibilityCard />
+					<CompatibilityCard
+						:project="projectV3"
+						:save-project="patchProjectV3"
+						:can-edit="hasPermission"
+					/>
 					<ValidationMessage :check="compatibilityValidation" class="mt-2" />
 					<ValidationMessage
 						:check="saveValidation.forField('server-compatibility')"
@@ -219,7 +241,6 @@ import {
 	ConfirmLeaveModal,
 	defineMessages,
 	IconButton,
-	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
 	Input,
@@ -234,12 +255,13 @@ import {
 } from '@modrinth/ui'
 import { isAdmin } from '@modrinth/utils'
 
+import ProjectIssueCard from '~/components/ui/project-issue-card/index.vue'
 import CompatibilityCard from '~/components/ui/project-settings/CompatibilityCard.vue'
 import ValidationMessage from '~/components/ValidationMessage.vue'
+import { useProjectIssueFieldAction } from '~/composables/project-issue-field-action'
 import { useProjectNagMessages } from '~/composables/project-nag-validation'
 import { useProjectSaveValidation } from '~/composables/project-save-validation'
-
-const PING_TIMEOUT_MS = 5000
+import { useJavaServerPing } from '~/providers/manage-server-compatibility-modal'
 
 const { formatMessage, locale } = useVIntl()
 
@@ -318,7 +340,6 @@ const messages = defineMessages({
 	},
 })
 
-const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const { projectV3, currentMember, patchProjectV3 } = injectProjectPageContext()
 
@@ -335,23 +356,12 @@ const bedrockPort = ref(19132)
 const region = ref('')
 const languages = ref([])
 
-const javaPingLoading = ref(false)
-const javaPingResult = ref(null)
-
-const lastPingedAddress = ref('')
-
-const lastPingAddressChanged = computed(() => {
-	return javaAddress.value.trim() !== lastPingedAddress.value
-})
-
-let pingDebounceTimer = null
-
-watch(javaAddress, () => {
-	clearTimeout(pingDebounceTimer)
-	pingDebounceTimer = setTimeout(() => {
-		pingJavaServer()
-	}, 500)
-})
+const {
+	loading: javaPingLoading,
+	result: javaPingResult,
+	addressChanged: lastPingAddressChanged,
+	ping: pingJavaServer,
+} = useJavaServerPing(javaAddress)
 
 const isAdminUser = computed(() => isAdmin(currentMember.value?.user))
 const hasPermission = computed(() => {
@@ -360,35 +370,6 @@ const hasPermission = computed(() => {
 		isAdminUser.value || ((currentMember.value?.permissions ?? 0) & EDIT_DETAILS) === EDIT_DETAILS
 	)
 })
-
-async function pingJavaServer() {
-	const address = javaAddress.value?.trim()
-	if (!address) {
-		javaPingResult.value = null
-		return
-	}
-
-	javaPingLoading.value = true
-	javaPingResult.value = null
-
-	try {
-		await Promise.race([
-			client.labrinth.server_ping_internal.pingMinecraftJava({
-				address,
-				timeout_ms: PING_TIMEOUT_MS,
-			}),
-			new Promise((_, reject) =>
-				setTimeout(() => reject(new Error('Ping timed out')), PING_TIMEOUT_MS),
-			),
-		])
-		javaPingResult.value = { online: true, latency: null }
-	} catch {
-		javaPingResult.value = { online: false, latency: null }
-	} finally {
-		javaPingLoading.value = false
-		lastPingedAddress.value = address
-	}
-}
 
 function initFromProjectV3(v3) {
 	if (!v3) return
@@ -528,6 +509,39 @@ const hasChanges = computed(() =>
 const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)
 
 const saveValidation = useProjectSaveValidation(() => modified.value)
+
+function useServerIssueAction(field, value, validationField, canSave = () => true) {
+	return useProjectIssueFieldAction({
+		draft: () => ({ [field]: { ...projectV3.value?.[field], ...value() } }),
+		canSave: () =>
+			hasPermission.value &&
+			canSave() &&
+			!saveValidation.forField(validationField).some((message) => message.severity === 'error'),
+		saving,
+		validation: saveValidation,
+		save: () => patchProjectV3({ [field]: value() }, true, true),
+	})
+}
+
+const languagesIssueAction = useServerIssueAction(
+	'minecraft_server',
+	() => ({ languages: [...languages.value] }),
+	'server-languages',
+)
+const javaAddressIssueAction = useServerIssueAction(
+	'minecraft_java_server',
+	() => ({ address: javaAddress.value.trim() }),
+	'java-address',
+	() =>
+		isAdminUser.value ||
+		!javaAddress.value.trim() ||
+		(!javaPingLoading.value && !lastPingAddressChanged.value && !!javaPingResult.value?.online),
+)
+const bedrockAddressIssueAction = useServerIssueAction(
+	'minecraft_bedrock_server',
+	() => ({ address: bedrockAddress.value.trim() }),
+	'bedrock-address',
+)
 
 function resetChanges() {
 	saveValidation.clear()

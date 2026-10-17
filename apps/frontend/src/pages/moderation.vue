@@ -1,7 +1,8 @@
 <template>
+	<NuxtPage v-if="route.name === 'moderation-project-review'" />
 	<div
-		class="relative mb-6 mt-4 flex min-h-screen w-full max-w-[1280px] flex-col px-6"
-		:class="`m${marginTarget}-auto`"
+		v-else
+		class="relative mx-auto mb-6 mt-4 flex min-h-screen w-full max-w-[1280px] flex-col px-6"
 	>
 		<h1 class="mb-4 mt-0 text-3xl font-semibold">Moderation</h1>
 		<NavTabs :links="moderationLinks" class="mb-4 hidden sm:flex" />
@@ -26,7 +27,6 @@ import {
 	SettingsIcon,
 	ShieldCheckIcon,
 } from '@modrinth/assets'
-import { getMarginTarget } from '@modrinth/moderation'
 import { Chips, defineMessages, NavTabs, useVIntl } from '@modrinth/ui'
 
 definePageMeta({
@@ -40,9 +40,6 @@ useSeoMeta({
 const { formatMessage } = useVIntl()
 const route = useRoute()
 const router = useRouter()
-
-const modSettings = useModerationSettings()
-const marginTarget = computed(() => getMarginTarget(modSettings.value))
 
 const messages = defineMessages({
 	projectsTitle: {

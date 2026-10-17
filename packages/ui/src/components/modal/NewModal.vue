@@ -1,8 +1,15 @@
 <template>
-	<Teleport to="body">
+	<span ref="modalAnchor" hidden />
+	<Teleport :to="modalTarget">
 		<div
 			v-if="open"
 			class="modal-root"
+			:style="{
+				'--modal-max-width': resolvedMaxWidth,
+				'--modal-width': resolvedWidth,
+				'--modal-mouse-x-offset': mouseXOffset,
+				'--modal-mouse-y-offset': mouseYOffset,
+			}"
 			data-modal-root
 			:data-modal-id="modalId"
 			:data-modal-depth="stackDepth"
@@ -148,8 +155,8 @@
 
 <script setup lang="ts">
 import { XIcon } from '@modrinth/assets'
-import { useMediaQuery, useResizeObserver } from '@vueuse/core'
-import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
+import { useEventListener, useMediaQuery, useResizeObserver } from '@vueuse/core'
+import { computed, nextTick, onUnmounted, ref, shallowRef, watch } from 'vue'
 
 import { IconButton } from '#ui/components/base/buttons'
 
@@ -173,7 +180,7 @@ const {
 	pop: popModal,
 	isTopmost: isTopmostModal,
 	stackSize: modalStackSize,
-} = useModalStack()
+} = useModalStack(getModalDocument)
 
 const props = withDefaults(
 	defineProps<{
@@ -275,6 +282,21 @@ const modalId = `modal-${Math.random().toString(36).slice(2, 9)}`
 const headerId = `${modalId}-header`
 const closeLabel = computed(() => formatMessage(commonMessages.closeButton))
 
+const modalAnchor = ref<HTMLElement | null>(null)
+const modalDocument = shallowRef<Document>()
+const modalTarget = computed(
+	() =>
+		modalDocument.value?.body ??
+		modalAnchor.value?.ownerDocument.body ??
+		(typeof document !== 'undefined' ? document.body : 'body'),
+)
+function getModalDocument() {
+	return modalDocument.value ?? document
+}
+function getModalWindow() {
+	return getModalDocument().defaultView ?? window
+}
+
 const open = ref(false)
 const visible = ref(false)
 const stackDepth = ref(0)
@@ -325,6 +347,7 @@ useResizeObserver(modalBodyRef, ([entry]) => {
 
 let previousFocusEl: Element | null = null
 let hideTimeout: ReturnType<typeof setTimeout> | null = null
+let showTimeout: ReturnType<typeof setTimeout> | undefined
 
 const scrollContainer = ref<HTMLElement | null>(null)
 const { showTopFade, showBottomFade, checkScrollState } = useScrollIndicator(scrollContainer)
@@ -334,7 +357,8 @@ const FOCUSABLE_SELECTOR =
 
 const inputModality = { keyboard: false }
 if (typeof window !== 'undefined') {
-	window.addEventListener(
+	useEventListener(
+		getModalWindow,
 		'keydown',
 		(event) => {
 			if (event.metaKey || event.altKey || event.ctrlKey) {
@@ -344,7 +368,8 @@ if (typeof window !== 'undefined') {
 		},
 		true,
 	)
-	window.addEventListener(
+	useEventListener(
+		getModalWindow,
 		'pointerdown',
 		() => {
 			inputModality.keyboard = false
@@ -365,7 +390,7 @@ function getFocusableElements(): HTMLElement[] {
 }
 
 function isFocusInsideModal() {
-	return !!modalBodyRef.value?.contains(document.activeElement)
+	return !!modalBodyRef.value?.contains(getModalDocument().activeElement)
 }
 
 function focusElement(el: HTMLElement) {
@@ -417,7 +442,7 @@ function scheduleFocus(attempt = 0) {
 }
 
 function nextRenderedModalDepth(): number {
-	return Array.from(document.querySelectorAll<HTMLElement>('[data-modal-root]'))
+	return Array.from(getModalDocument().querySelectorAll<HTMLElement>('[data-modal-root]'))
 		.filter((root) => root.dataset.modalId !== modalId)
 		.reduce((nextDepth, root) => {
 			const depth = Number(root.dataset.modalDepth)
@@ -426,30 +451,29 @@ function nextRenderedModalDepth(): number {
 }
 
 function show(event?: MouseEvent) {
-	if (hideTimeout) {
-		clearTimeout(hideTimeout)
-		hideTimeout = null
-	}
+	clearModalTimers()
+	modalDocument.value = modalAnchor.value?.ownerDocument ?? document
 	props.onShow?.()
 	const wasEmpty = modalStackSize() === 0
 	stackDepth.value = Math.max(modalStackSize(), nextRenderedModalDepth())
 	open.value = true
-	previousFocusEl = document.activeElement
+	previousFocusEl = getModalDocument().activeElement
 	pushModal()
 	if (wasEmpty) {
 		modalBehavior?.onShow?.()
 	}
 
-	document.body.style.overflow = 'hidden'
-	window.addEventListener('keydown', handleWindowKeyDown)
-	window.addEventListener('mousedown', updateMousePosition)
+	getModalDocument().body.style.overflow = 'hidden'
+	getModalWindow().addEventListener('keydown', handleWindowKeyDown)
+	getModalWindow().addEventListener('mousedown', updateMousePosition)
+	getModalWindow().addEventListener('beforeunload', handleWindowClose)
 	if (event) {
 		updateMousePosition(event)
 	} else {
-		mouseX.value = Math.round(window.innerWidth / 2)
-		mouseY.value = Math.round(window.innerHeight / 2)
+		mouseX.value = Math.round(getModalWindow().innerWidth / 2)
+		mouseY.value = Math.round(getModalWindow().innerHeight / 2)
 	}
-	setTimeout(() => {
+	showTimeout = setTimeout(() => {
 		visible.value = true
 		nextTick(() => {
 			scheduleFocus()
@@ -466,24 +490,56 @@ function hide(): boolean {
 	}
 	props.onHide?.()
 	resetMousePosition()
-	visible.value = false
-	popModal()
-	if (modalStackSize() === 0) {
-		modalBehavior?.onHide?.()
-		document.body.style.overflow = ''
-	}
-	window.removeEventListener('keydown', handleWindowKeyDown)
-	window.removeEventListener('mousedown', updateMousePosition)
+	stopModal()
 	if (previousFocusEl instanceof HTMLElement) {
 		previousFocusEl.focus()
 	}
 	previousFocusEl = null
 	hideTimeout = setTimeout(() => {
-		open.value = false
-		hideTimeout = null
+		finishHide()
 		nextTick(() => props.onAfterHide?.())
 	}, 300)
 	return true
+}
+
+function clearModalTimers() {
+	clearTimeout(showTimeout)
+	if (hideTimeout) clearTimeout(hideTimeout)
+	showTimeout = undefined
+	hideTimeout = null
+}
+
+function stopModal() {
+	if (open.value && !hideTimeout) releaseModal()
+	clearModalTimers()
+	resetResizeAnimation()
+	visible.value = false
+}
+
+function finishHide() {
+	open.value = false
+	previousFocusEl = null
+	modalDocument.value = undefined
+	hideTimeout = null
+}
+
+function releaseModal() {
+	popModal()
+	if (modalStackSize() === 0) {
+		modalBehavior?.onHide?.()
+		getModalDocument().body.style.overflow = ''
+	}
+	getModalWindow().removeEventListener('keydown', handleWindowKeyDown)
+	getModalWindow().removeEventListener('mousedown', updateMousePosition)
+	getModalWindow().removeEventListener('beforeunload', handleWindowClose)
+}
+
+function handleWindowClose() {
+	const wasOpen = open.value && !hideTimeout
+	stopModal()
+	finishHide()
+	if (wasOpen) props.onHide?.()
+	nextTick(() => props.onAfterHide?.())
 }
 
 async function scrollToBottom(behavior: ScrollBehavior = 'smooth') {
@@ -524,25 +580,13 @@ function updateMousePosition(event: { clientX: number; clientY: number }) {
 }
 
 function resetMousePosition() {
-	mouseX.value = Math.round(window.innerWidth / 2)
-	mouseY.value = Math.round(window.innerHeight / 2)
+	mouseX.value = Math.round(getModalWindow().innerWidth / 2)
+	mouseY.value = Math.round(getModalWindow().innerHeight / 2)
 }
 
 onUnmounted(() => {
-	resetResizeAnimation()
-	if (hideTimeout) {
-		clearTimeout(hideTimeout)
-		hideTimeout = null
-	}
-	if (open.value) {
-		popModal()
-		window.removeEventListener('keydown', handleWindowKeyDown)
-		window.removeEventListener('mousedown', updateMousePosition)
-		if (modalStackSize() === 0) {
-			document.body.style.overflow = ''
-			modalBehavior?.onHide?.()
-		}
-	}
+	stopModal()
+	finishHide()
 })
 
 function handleWindowKeyDown(event: KeyboardEvent) {
@@ -575,7 +619,7 @@ function trapFocus(event: KeyboardEvent) {
 
 	const first = focusable[0]
 	const last = focusable[focusable.length - 1]
-	const active = document.activeElement
+	const active = getModalDocument().activeElement
 	const inside = dialog.contains(active)
 	const beforeFirst = !!(active?.compareDocumentPosition(first) & Node.DOCUMENT_POSITION_FOLLOWING)
 	const afterLast = !!(active?.compareDocumentPosition(last) & Node.DOCUMENT_POSITION_PRECEDING)
@@ -677,7 +721,7 @@ defineOptions({
 	align-items: center;
 	visibility: hidden;
 	pointer-events: none;
-	transform: translate(v-bind(mouseXOffset), v-bind(mouseYOffset));
+	transform: translate(var(--modal-mouse-x-offset), var(--modal-mouse-y-offset));
 	transition: none;
 
 	&.shown {
@@ -696,10 +740,10 @@ defineOptions({
 		position: fixed;
 		box-shadow: 4px 4px 26px 10px rgba(0, 0, 0, 0.08);
 		max-height: calc(100% - 2 * var(--gap-lg));
-		max-width: min(v-bind(resolvedMaxWidth), calc(100% - 2 * var(--gap-lg)));
+		max-width: min(var(--modal-max-width), calc(100% - 2 * var(--gap-lg)));
 		overflow-y: hidden;
 		overflow-x: hidden;
-		width: v-bind(resolvedWidth);
+		width: var(--modal-width);
 		pointer-events: auto;
 		scale: 0.97;
 

@@ -1,5 +1,6 @@
 <template>
 	<div>
+		<ProjectIssueCard location="members" class="mb-4" />
 		<ConfirmTransferProjectModal
 			v-if="transferData && project"
 			ref="transferModal"
@@ -117,6 +118,7 @@
 						:disabled="(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
 					/>
 				</div>
+				<ProjectIssueCard target="modify_team_member_role" :user-id="member.user.id" />
 				<div class="adjacent-input">
 					<label
 						:for="`member-${allTeamMembers[index].user.username}-monetization-weight`"
@@ -393,6 +395,7 @@
 						"
 					/>
 				</div>
+				<ProjectIssueCard target="modify_team_member_role" :user-id="member.user.id" />
 				<div class="adjacent-input">
 					<label
 						:for="`member-${allOrgMembers[index].user.username}-monetization-weight`"
@@ -586,6 +589,7 @@ import {
 import { useQuery } from '@tanstack/vue-query'
 
 import ConfirmTransferProjectModal from '~/components/ui/ConfirmTransferProjectModal.vue'
+import ProjectIssueCard from '~/components/ui/project-issue-card/index.vue'
 import { removeSelfFromTeam } from '~/helpers/teams.js'
 
 const client = injectModrinthClient()
