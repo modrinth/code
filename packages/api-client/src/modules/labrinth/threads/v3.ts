@@ -71,7 +71,42 @@ export class LabrinthThreadsV3Module extends AbstractModule {
 			version: 3,
 			method: 'POST',
 			body: message,
+			retry: false,
 		})
+	}
+
+	/** Create moderation issues in a thread (requires THREAD_WRITE scope). */
+	public async createIssues(id: string, data: Labrinth.Threads.v3.NewThreadIssues): Promise<void> {
+		return this.client.request<void>(`/thread/${id}/issue`, {
+			api: 'labrinth',
+			version: 3,
+			method: 'PUT',
+			body: data,
+			retry: false,
+		})
+	}
+
+	/** Update a thread issue facet's addressed or verified state. */
+	public async editIssueFacet(
+		id: string,
+		data: Labrinth.Threads.v3.EditThreadIssueFacet,
+	): Promise<void> {
+		return this.client.request<void>(`/thread/issue/facet/${id}`, {
+			api: 'labrinth',
+			version: 3,
+			method: 'PATCH',
+			body: data,
+		})
+	}
+
+	/** Mark a thread issue facet as addressed by the project member. */
+	public async user_addressed(facetId: string): Promise<void> {
+		return this.editIssueFacet(facetId, { user_addressed: true })
+	}
+
+	/** Mark a thread issue facet as verified by a moderator. */
+	public async moderator_verified(facetId: string): Promise<void> {
+		return this.editIssueFacet(facetId, { moderator_verified: true })
 	}
 
 	/**

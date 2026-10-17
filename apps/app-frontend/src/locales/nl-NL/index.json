@@ -206,6 +206,12 @@
   "app.behavior-settings.content.title": {
     "message": "Startpagina en inhoud"
   },
+  "app.behavior-settings.refocus-on-game-close.description": {
+    "message": "Breng de Modrinth App naar de voorgrond als Minecraft sluit."
+  },
+  "app.behavior-settings.refocus-on-game-close.title": {
+    "message": "Opnieuw focussen bij sluiten van Minecraft"
+  },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Opstarten en navigeren"
   },
@@ -295,6 +301,9 @@
   },
   "app.content.sync-resource-packs-disabled": {
     "message": "Schakel eerst resource pakket syncen aan in de appinstellingen."
+  },
+  "app.debug-export.canceling": {
+    "message": "Exporteren annuleren…"
   },
   "app.download-manager.active": {
     "message": "Actief"
@@ -1643,9 +1652,6 @@
   "app.settings.default-instance-options.height.title": {
     "message": "Hoogte"
   },
-  "app.settings.default-instance-options.java-and-memory.title": {
-    "message": "Java en geheugen"
-  },
   "app.settings.default-instance-options.java-arguments.description": {
     "message": "Argumenten die bij het starten van een instantie aan Java worden doorgegeven."
   },
@@ -1654,9 +1660,6 @@
   },
   "app.settings.default-instance-options.java-arguments.title": {
     "message": "Java-argumenten"
-  },
-  "app.settings.default-instance-options.launch-hooks.title": {
-    "message": "Start haken"
   },
   "app.settings.default-instance-options.memory-allocation.description": {
     "message": "Maximaal beschikbaar geheugen voor elke instantie."
@@ -1690,9 +1693,6 @@
   },
   "app.settings.default-instance-options.width.title": {
     "message": "Breedte"
-  },
-  "app.settings.default-instance-options.window.title": {
-    "message": "Venster"
   },
   "app.settings.default-instance-options.wrapper-hook.description": {
     "message": "Commando gebruikt om het Minecraft proces te om wikkelen."
@@ -2531,6 +2531,12 @@
   "app.settings.game-options.setting.menu-background-blur.label": {
     "message": "Menu achtergrondblur"
   },
+  "app.settings.game-options.setting.mipmap-levels.description": {
+    "message": "Textuur vloeien op afstand."
+  },
+  "app.settings.game-options.setting.mipmap-levels.label": {
+    "message": "Mipmap levels"
+  },
   "app.settings.game-options.setting.mouse-wheel-sensitivity.label": {
     "message": "Scrollgevoeligheid"
   },
@@ -2564,6 +2570,9 @@
   "app.settings.game-options.setting.notification-time.label": {
     "message": "Meldingstijd"
   },
+  "app.settings.game-options.setting.operator-items-tab.label": {
+    "message": "Operator items tab"
+  },
   "app.settings.game-options.setting.panorama-speed.label": {
     "message": "Panorama snelheid"
   },
@@ -2573,17 +2582,68 @@
   "app.settings.game-options.setting.players-volume.label": {
     "message": "Spelers"
   },
+  "app.settings.game-options.setting.prioritize-chunk-updates.label": {
+    "message": "Prioriteer chunk updates"
+  },
+  "app.settings.game-options.setting.quit-shortcuts.label": {
+    "message": "Sluit snelkoppelingen"
+  },
   "app.settings.game-options.setting.raw-mouse-input.label": {
     "message": "Onbewerkte invoer"
+  },
+  "app.settings.game-options.setting.realms-notifications.label": {
+    "message": "Realms meldingen"
   },
   "app.settings.game-options.setting.record-volume.label": {
     "message": "Platenspeler/nootblokken"
   },
+  "app.settings.game-options.setting.reduced-debug-info.label": {
+    "message": "Verminderde debug informatie"
+  },
+  "app.settings.game-options.setting.render-distance.label": {
+    "message": "Render afstand"
+  },
   "app.settings.game-options.setting.right-pants-leg.label": {
     "message": "Rechter broek been"
   },
+  "app.settings.game-options.setting.right-sleeve.label": {
+    "message": "Rechtermouw"
+  },
+  "app.settings.game-options.setting.rotate-with-minecart.label": {
+    "message": "Draai met mijnkar"
+  },
+  "app.settings.game-options.setting.save-chat-drafts.label": {
+    "message": "Sla chat concepten op"
+  },
+  "app.settings.game-options.setting.screen-effects.label": {
+    "message": "Scherm effecten"
+  },
+  "app.settings.game-options.setting.secure-chat-only.label": {
+    "message": "Geef alleen beveiligde chat weer"
+  },
+  "app.settings.game-options.setting.sensitivity.label": {
+    "message": "Muis gevoeligheid"
+  },
+  "app.settings.game-options.setting.share-presence.label": {
+    "message": "Deel aanwezigheid"
+  },
+  "app.settings.game-options.setting.simulation-distance.description": {
+    "message": "Hoe veraf entiteiten bijwerken en blokken en vloeistoffen tick."
+  },
+  "app.settings.game-options.setting.simulation-distance.label": {
+    "message": "Simulatie afstand"
+  },
+  "app.settings.game-options.setting.snooper.label": {
+    "message": "Snooper"
+  },
+  "app.settings.game-options.setting.sprint-window.label": {
+    "message": "Ren scherm"
+  },
   "app.settings.game-options.setting.subtitles.label": {
     "message": "Ondertiteling"
+  },
+  "app.settings.game-options.setting.toggle-crouch.label": {
+    "message": ""
   },
   "app.settings.game-options.setting.toggle-sprint.description": {
     "message": "Druk één keer om te blijven sprinten."
@@ -2630,14 +2690,8 @@
   "app.settings.resource-management.app-cache.confirm.description": {
     "message": "De app kan wat trager laden totdat de cache opnieuw is opgebouwd."
   },
-  "app.settings.resource-management.app-cache.confirm.title": {
-    "message": "De cache van de app wissen?"
-  },
   "app.settings.resource-management.app-cache.description": {
     "message": "Wis de gegevens in de cache en download ze opnieuw via Modrinth. De app kan wat trager laden totdat de cache opnieuw is opgebouwd."
-  },
-  "app.settings.resource-management.app-cache.purge": {
-    "message": "Cache leegmaken"
   },
   "app.settings.resource-management.app-cache.title": {
     "message": "App-cache"
@@ -2675,8 +2729,8 @@
   "app.settings.resource-management.maximum-concurrent-writes.title": {
     "message": "Maximaal aantal gelijktijdige schrijfbewerkingen"
   },
-  "app.settings.sidebar.label.instances": {
-    "message": "Instanties"
+  "app.settings.resource-management.store.verified": {
+    "message": "Verificatie voltooid"
   },
   "app.settings.synced-options.choose-sync-source.no-instances-found": {
     "message": "Geen instanties gevonden"
@@ -2755,12 +2809,6 @@
   },
   "app.settings.tabs.privacy": {
     "message": "Privacy"
-  },
-  "app.settings.tabs.resource-management": {
-    "message": "Bronnenbeheer"
-  },
-  "app.settings.tabs.synced-options": {
-    "message": "Gesynchroniseerde instellingen"
   },
   "app.sidebar.playing-as": {
     "message": "Spelen als"
@@ -3662,9 +3710,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Selecteer updatekanaal"
   },
-  "instance.settings.tabs.hooks.description": {
-    "message": "Voer instance-specifieke systeemcommando's uit voor en na het starten van het spel."
-  },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Na het afsluiten"
   },
@@ -3725,18 +3770,6 @@
   "instance.settings.tabs.installation.locked": {
     "message": "Installatie-instellingen zijn niet beschikbaar zolang deze instantie is vergrendeld."
   },
-  "instance.settings.tabs.java.custom-environment-variables": {
-    "message": "Stel omgevingsvariabelen apart in voor deze instantie."
-  },
-  "instance.settings.tabs.java.custom-java-arguments": {
-    "message": "Stel omgevingsvariabelen apart in voor deze instantie."
-  },
-  "instance.settings.tabs.java.custom-java-installation": {
-    "message": "Kies een andere Java-installatie voor deze installatie."
-  },
-  "instance.settings.tabs.java.custom-memory-allocation": {
-    "message": "Stel de geheugentoewijzing voor deze instantie afzonderlijk in."
-  },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Voer omgevingsvariabelen in…"
   },
@@ -3760,9 +3793,6 @@
   },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "//pad/naar/java"
-  },
-  "instance.settings.tabs.settings-overrides": {
-    "message": "Synchroniseer overschrijvingen"
   },
   "instance.settings.tabs.sharing": {
     "message": "Delen"
@@ -3817,9 +3847,6 @@
   },
   "instance.settings.tabs.window": {
     "message": "Aangepaste venster instellingen"
-  },
-  "instance.settings.tabs.window.custom-window-settings": {
-    "message": "Configureer volledig scherm en lanceer de resolutie apart voor deze instantie."
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Volledig scherm"

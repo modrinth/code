@@ -131,6 +131,33 @@
   "nags.invalid-project-summary.title": {
     "defaultMessage": "Modifier le résumé"
   },
+  "nags.license-url.not-in-allowlist.description": {
+    "defaultMessage": "Votre URL de licence n'est pas un lien de licence reconnu. Veuillez vous assurer qu'il amène."
+  },
+  "nags.link-validation.duplicate": {
+    "defaultMessage": "Votre {linkField, select, issues {issue tracker} source {source code} wiki {wiki} discord {Discord invite} site {website} store {store} license {license} description {description} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {donation}} lien est également utilisé dans {otherLinkField, select, issues {Issue tracker} source {Source code} wiki {Wiki} discord {Discord invite} site {Website} store {Store} license {License} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {another field}}. Chaque lien ne doit être répertorié qu'une seule fois."
+  },
+  "nags.link-validation.global-blocklist-match": {
+    "defaultMessage": "Votre {linkField, select, issues {issue tracker} source {source code} wiki {wiki} discord {Discord invite} site {website} store {store} license {license} description {description} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {donation}} lien utilise un nom de domaine interdit. Supprimez ou remplacez ce lien."
+  },
+  "nags.link-validation.ip-address": {
+    "defaultMessage": "Votre {linkField, select, issues {issue tracker} source {source code} wiki {wiki} discord {Discord invite} site {website} store {store} license {license} description {description} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {donation}} lien utilise une adresse IP. Utilisez une URL avec un nom de domaine."
+  },
+  "nags.link-validation.malformed": {
+    "defaultMessage": "Votre {linkField, select, issues {issue tracker} source {source code} wiki {wiki} discord {Discord invite} site {website} store {store} license {license} description {description} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {donation}} lien n'est pas valide. Saisissez une URL HTTPS complète."
+  },
+  "nags.link-validation.not-in-allowlist": {
+    "defaultMessage": "Votre {linkField, select, issues {issue tracker} source {source code} wiki {wiki} discord {Discord invite} site {website} store {store} license {license} description {description} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {donation}} lien peut ne pas être approprié pour le type de lien. Veuillez vous assurer qu'il est adapté à l'usage auquel il est destiné."
+  },
+  "nags.link-validation.unverifiable": {
+    "defaultMessage": "Votre {linkField, select, issues {issue tracker} source {source code} wiki {wiki} discord {Discord invite} site {website} store {store} license {license} description {description} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {donation}} le lien n'a pas pu être vérifié. Vérifiez qu'il est en ligne et accessible."
+  },
+  "nags.link-validation.wrong-field": {
+    "defaultMessage": "Votre {linkField, select, issues {issue tracker} source {source code} wiki {wiki} discord {Discord invite} site {website} store {store} license {license} description {description} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {donation}} le lien n'est pas correct pour {linkField, select, issues {issue tracker} source {source code} wiki {wiki} discord {Discord invite} site {website} store {store} license {license} description {description} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {donation}} liens. Supprimez-le ou remplacez-le par le lien correct."
+  },
+  "nags.link-validation.wrong-field.title": {
+    "defaultMessage": "Corriger les liens incorrects"
+  },
   "nags.long-headers.description": {
     "defaultMessage": "{count, plural, one {# en-tête} other {# en-têtes}} dans votre description {count, plural, one {est trop long} other {sont trop longs}}. Les en-têtes doivent être concis et servir de titres de section, et non de phrases complètes."
   },

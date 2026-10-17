@@ -57,7 +57,7 @@
     "message": "No se pudo preparar la instancia"
   },
   "app.action-bar.install.summary.invalid-file-path": {
-    "message": "La ruta del archivo no es válida"
+    "message": "Ruta de archivo no válida"
   },
   "app.action-bar.install.summary.invalid-modpack": {
     "message": "Los datos del modpack no son válidos"
@@ -206,6 +206,12 @@
   "app.behavior-settings.content.title": {
     "message": "Página de inicio y contenido"
   },
+  "app.behavior-settings.refocus-on-game-close.description": {
+    "message": "Pasar la App de Modrinth al primer plano cuando cierres Minecraft."
+  },
+  "app.behavior-settings.refocus-on-game-close.title": {
+    "message": "Reenfocar app cuando se cierra Minecraft"
+  },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Inicio y navegación"
   },
@@ -296,14 +302,29 @@
   "app.content.sync-resource-packs-disabled": {
     "message": "Activa la sincronización de resourcepacks en la configuración de la aplicación primero."
   },
+  "app.debug-export.canceling": {
+    "message": "Cancelando exportación..."
+  },
+  "app.debug-export.exporting": {
+    "message": "Exportando..."
+  },
+  "app.debug-export.finishing": {
+    "message": "Finalizando..."
+  },
+  "app.debug-export.preparing": {
+    "message": "Preparando archivos..."
+  },
   "app.download-manager.active": {
     "message": "Activos"
   },
   "app.download-manager.attention": {
-    "message": "Requiere atención"
+    "message": "Necesita atención"
+  },
+  "app.download-manager.bulk-update-content": {
+    "message": "Actualizando {count, plural, one {# elemento} other {# elementos}}"
   },
   "app.download-manager.cancel": {
-    "message": "Cancelar la instalación"
+    "message": "Cancelar instalación"
   },
   "app.download-manager.canceling": {
     "message": "Cancelando instalación…"
@@ -480,7 +501,7 @@
     "message": "Arrastrar para redimensionar"
   },
   "app.home.jump-back-in.title": {
-    "message": "Jugar"
+    "message": "Continuar"
   },
   "app.home.jump-back-in.view-instance": {
     "message": "Ver instancia"
@@ -1643,9 +1664,6 @@
   "app.settings.default-instance-options.height.title": {
     "message": "Altura"
   },
-  "app.settings.default-instance-options.java-and-memory.title": {
-    "message": "Java y memoria"
-  },
   "app.settings.default-instance-options.java-arguments.description": {
     "message": "Los argumentos dados a Java al iniciar una instancia."
   },
@@ -1654,9 +1672,6 @@
   },
   "app.settings.default-instance-options.java-arguments.title": {
     "message": "Argumentos de Java"
-  },
-  "app.settings.default-instance-options.launch-hooks.title": {
-    "message": "Hooks de lanzamiento"
   },
   "app.settings.default-instance-options.memory-allocation.description": {
     "message": "La memoria máxima disponible para cada instancia."
@@ -1690,9 +1705,6 @@
   },
   "app.settings.default-instance-options.width.title": {
     "message": "Ancho"
-  },
-  "app.settings.default-instance-options.window.title": {
-    "message": "Ventana"
   },
   "app.settings.default-instance-options.wrapper-hook.description": {
     "message": "Envuelven al proceso iniciador de Minecraft para añadir funcionalidades o configuraciones."
@@ -2750,14 +2762,8 @@
   "app.settings.resource-management.app-cache.confirm.description": {
     "message": "La app cargará más lento hasta que se reconstruya completamente el caché."
   },
-  "app.settings.resource-management.app-cache.confirm.title": {
-    "message": "¿Limpiar el caché?"
-  },
   "app.settings.resource-management.app-cache.description": {
     "message": "Borra todos los datos en caché y los redescarga de Modrinth. La app cargará más lento hasta que se reconstruya completamente el caché."
-  },
-  "app.settings.resource-management.app-cache.purge": {
-    "message": "Limpiar caché"
   },
   "app.settings.resource-management.app-cache.title": {
     "message": "Caché de la aplicación"
@@ -2782,6 +2788,15 @@
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "Directorio de la aplicación"
+  },
+  "app.settings.resource-management.debug-info.description": {
+    "message": "Exportar registros de la aplicación y datos de diagnostico en un archivo ZIP para compartir con el equipo de soporte de Modrinth."
+  },
+  "app.settings.resource-management.debug-info.export": {
+    "message": "Exportar información de depuración"
+  },
+  "app.settings.resource-management.debug-info.title": {
+    "message": "Información de depuración"
   },
   "app.settings.resource-management.maximum-concurrent-downloads.description": {
     "message": "El número de archivos que la app puede descargar a la vez. Baja este número si las descargas no son estables con tu conexión. Necesita reiniciar la app."
@@ -2825,9 +2840,6 @@
   "app.settings.resource-management.store.description": {
     "message": "Ahorra espacio reutilizando instalaciones, mods y packs en todas tus instancias."
   },
-  "app.settings.resource-management.store.empty": {
-    "message": "Instala mods o packs para ver su uso del almacenamiento aquí."
-  },
   "app.settings.resource-management.store.issues": {
     "message": "Ver {count, plural, one {# conflicto} other {# conflictos}}"
   },
@@ -2866,9 +2878,6 @@
   },
   "app.settings.resource-management.store.verified": {
     "message": "Verificación exitosa"
-  },
-  "app.settings.sidebar.label.instances": {
-    "message": "Instancias"
   },
   "app.settings.synced-options.choose-sync-source.command-history-description": {
     "message": "Elija desde qué instancia copiar su historial de comandos. Este historial solo se utiliza para la sincronización inicial, y puede editarlo desde cualquier instancia posterior."
@@ -3110,12 +3119,6 @@
   "app.settings.tabs.privacy": {
     "message": "Privacidad"
   },
-  "app.settings.tabs.resource-management": {
-    "message": "Gestión de recursos"
-  },
-  "app.settings.tabs.synced-options": {
-    "message": "Ajustes sincronizados"
-  },
   "app.sidebar.playing-as": {
     "message": "Jugando como"
   },
@@ -3239,6 +3242,12 @@
   "app.skins.section.default-skins": {
     "message": "Skins predeterminadas"
   },
+  "app.skins.section.dungeons-hero": {
+    "message": "Héroe de mazmorra"
+  },
+  "app.skins.section.dungeons-ii-hero": {
+    "message": "Héroe de mazmorra II"
+  },
   "app.skins.section.minecon-earth-2017": {
     "message": "MINECON Earth 2017"
   },
@@ -3268,6 +3277,9 @@
   },
   "app.skins.section.tiny-takeover": {
     "message": "Bebés al Poder"
+  },
+  "app.skins.section.wilderness-bound": {
+    "message": "Naturaleza Salvaje"
   },
   "app.skins.sign-in.button": {
     "message": "Inicia sesión en Microsoft"
@@ -4103,9 +4115,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Selecciona el canal de actualizaciones"
   },
-  "instance.settings.tabs.hooks.description": {
-    "message": "Ejecutar comandos de sistema específicos de instancias antes y después de iniciar el juego."
-  },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Post-cierre"
   },
@@ -4166,18 +4175,6 @@
   "instance.settings.tabs.installation.locked": {
     "message": "Los ajustes de instalación no están disponibles mientras esta instancia esté bloqueada."
   },
-  "instance.settings.tabs.java.custom-environment-variables": {
-    "message": "Establece las variables de entorno por separado para esta instancia."
-  },
-  "instance.settings.tabs.java.custom-java-arguments": {
-    "message": "Establece los argumentos Java por separado para esta instancia."
-  },
-  "instance.settings.tabs.java.custom-java-installation": {
-    "message": "Establece una instalación de Java diferente para esta instancia."
-  },
-  "instance.settings.tabs.java.custom-memory-allocation": {
-    "message": "Establece la asignación de memoria por separado para esta instancia."
-  },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Introduce las variables de entorno..."
   },
@@ -4201,9 +4198,6 @@
   },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/ruta/de/java"
-  },
-  "instance.settings.tabs.settings-overrides": {
-    "message": "Sobreescribir sincronización"
   },
   "instance.settings.tabs.sharing": {
     "message": "Compartir"
@@ -4267,9 +4261,6 @@
   },
   "instance.settings.tabs.window": {
     "message": "Configuración de ventanas personalizadas"
-  },
-  "instance.settings.tabs.window.custom-window-settings": {
-    "message": "Configurar una pantalla completa y la resolución separada para esta instancia."
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Pantalla completa"

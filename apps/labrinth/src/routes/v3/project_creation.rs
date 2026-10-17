@@ -192,7 +192,10 @@ impl actix_web::ResponseError for CreateError {
                 | CreateError::ProjectVersionLimitReached
                 | CreateError::DailyVersionLimitReached => "limit_reached",
             },
-            description: self.to_string(),
+            description: match self {
+                Self::InternalError(error) => format!("{error:#}"),
+                _ => self.to_string(),
+            },
             details: None,
         })
     }
@@ -248,7 +251,7 @@ pub struct ProjectCreateData {
     #[serde(default)]
     pub link_urls: HashMap<String, String>,
 
-    /// An optional boolean. If true, the project will be created as a draft.
+    /// Projects are always created as drafts; explicitly setting false is rejected.
     pub is_draft: Option<bool>,
 
     /// The license id that the project follows
@@ -374,11 +377,15 @@ pub async fn project_create_internal(
         }
     } else {
         transaction.commit().await?;
+        let slug =
+            models::DBProject::get_id(project_id.into(), &**client, &redis)
+                .await?
+                .and_then(|project| project.inner.slug);
         super::projects::clear_project_cache_and_queue_search(
             &redis,
             &search_state,
             project_id.into(),
-            None,
+            slug,
             None,
         )
         .await?;
@@ -440,11 +447,15 @@ pub async fn project_create_with_id(
         }
     } else {
         transaction.commit().await?;
+        let slug =
+            models::DBProject::get_id(project_id.into(), &**client, &redis)
+                .await?
+                .and_then(|project| project.inner.slug);
         super::projects::clear_project_cache_and_queue_search(
             &redis,
             &search_state,
             project_id.into(),
-            None,
+            slug,
             None,
         )
         .await?;
@@ -559,6 +570,12 @@ async fn project_create_inner(
             );
         }
         let create_data: ProjectCreateData = serde_json::from_slice(&data)?;
+
+        if create_data.is_draft == Some(false) {
+            return Err(CreateError::InvalidInput(String::from(
+                "projects must be created as drafts; `is_draft` cannot be false",
+            )));
+        }
 
         create_data.validate().map_err(|err| {
             CreateError::InvalidInput(validation_errors_to_string(err, None))
@@ -695,7 +712,7 @@ async fn project_create_inner(
             })?;
 
             let (file_name, file_extension) =
-                super::version_creation::get_name_ext(&content_disposition)?;
+                super::version_creation::get_name_and_extension(&content_disposition)?;
 
             if name == "icon" {
                 if icon_data.is_some() {
@@ -731,7 +748,7 @@ async fn project_create_inner(
                     .await?;
 
                     let (_, file_extension) =
-                        super::version_creation::get_name_ext(&content_disposition)?;
+                        super::version_creation::get_name_and_extension(&content_disposition)?;
 
                     let url = format!("data/{project_id}/images");
                     let upload_result = upload_image_optimized(
@@ -914,17 +931,7 @@ async fn project_create_inner(
 
         let team_id = team.insert(&mut *transaction).await?;
 
-        let status;
-        if project_create_data.is_draft.unwrap_or(false) {
-            status = ProjectStatus::Draft;
-        } else {
-            status = ProjectStatus::Processing;
-            if project_create_data.initial_versions.is_empty() {
-                return Err(CreateError::InvalidInput(String::from(
-                    "Project submitted for review with no initial versions",
-                )));
-            }
-        }
+        let status = ProjectStatus::Draft;
 
         let license_id = spdx::Expression::parse(
             &project_create_data.license_id,

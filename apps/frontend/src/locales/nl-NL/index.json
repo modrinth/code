@@ -890,17 +890,11 @@
   "auth.sign-in.last-sign-in": {
     "message": "Laatst gebruikt"
   },
-  "auth.sign-in.launcher.complete.description": {
-    "message": "We sturen je terug naar de Modrinth-app. Als er niets gebeurt, klik dan op de onderstaande knop."
-  },
   "auth.sign-in.launcher.complete.go-to-website": {
     "message": "Ga naar Modrinth.com"
   },
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Modrinth-app openen"
-  },
-  "auth.sign-in.launcher.complete.title": {
-    "message": "Je bent aangemeld"
   },
   "auth.sign-in.launcher.opening.description": {
     "message": "Als de app niet wordt geopend, gebruik dan de knop hieronder om je aan te melden."
@@ -1055,9 +1049,6 @@
   "conversation-thread.action.approve": {
     "message": "Accepteren"
   },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Accepteren met antwoord"
-  },
   "conversation-thread.action.close-report": {
     "message": "Rapport afsluiten"
   },
@@ -1066,9 +1057,6 @@
   },
   "conversation-thread.action.reject": {
     "message": "Afkeuren"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Afkeuren met antwoord"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Heropen thread"
@@ -1103,9 +1091,6 @@
   "conversation-thread.action.withhold": {
     "message": "Terughouden"
   },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Terughouden met antwoord"
-  },
   "conversation-thread.closed-thread.description": {
     "message": "Deze thread is gesloten en kan geen nieuwe berichten meer ontvangen."
   },
@@ -1114,9 +1099,6 @@
   },
   "conversation-thread.error.reopening-report": {
     "message": "Fout tijdens het heropenen van rapport"
-  },
-  "conversation-thread.error.sending-message": {
-    "message": "Fout tijdens het versturen van bericht"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Reageer op het thread..."
@@ -1144,9 +1126,6 @@
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "Ik conformeer dat ik de opmerking van de moderator heb geadresseerd."
-  },
-  "conversation-thread.resubmit-modal.description": {
-    "message": "Je verstuurd <project-title>{projectTitle}</project-title> om opnieuw door de moderators gereviewd te laten worden."
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "Heropsturen voor beoordeling"
@@ -2248,9 +2227,6 @@
   },
   "error.generic.default.list_item.1": {
     "message": "Controleer of Modrinth een storing heeft op onze <status-link>Status pagina</status-link>."
-  },
-  "error.generic.default.list_item.2": {
-    "message": "Als dit blijft gebeuren, kun je dit het beste aan het Modrinth-team laten weten door lid te worden van onze <discord-link>Discord-server</discord-link>."
   },
   "error.generic.default.list_title": {
     "message": "Probeer alstublieft opnieuw in een paar minuten."
@@ -3410,9 +3386,6 @@
   "project-member-header.success-join": {
     "message": "Je doet mee met het project team"
   },
-  "project-moderation-nags.project-submitted-for-review": {
-    "message": "Je project is ingediend ter beoordeling!"
-  },
   "project-moderation-nags.publishing-checklist": {
     "message": "Controlelijst publiceren"
   },
@@ -3529,9 +3502,6 @@
   },
   "project.actions.rescan-modpack": {
     "message": "Modpack opnieuw scannen"
-  },
-  "project.actions.review-project": {
-    "message": "Beoordeel project"
   },
   "project.actions.servers-promo.description": {
     "message": "Modrinth Hosting is de makkelijkste manier om zonder gedoe met je vrienden te spelen!"

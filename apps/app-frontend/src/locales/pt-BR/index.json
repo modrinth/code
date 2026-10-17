@@ -51,13 +51,13 @@
     "message": "Não foi possível salvar os arquivos"
   },
   "app.action-bar.install.summary.download-failed": {
-    "message": "O download não foi concluído"
+    "message": "O download não pôde ser concluído"
   },
   "app.action-bar.install.summary.instance-error": {
     "message": "Não foi possível preparar a instância"
   },
   "app.action-bar.install.summary.invalid-file-path": {
-    "message": "O caminho do arquivo é inválido"
+    "message": "Caminho de arquivo inválido"
   },
   "app.action-bar.install.summary.invalid-modpack": {
     "message": "Os dados do pacote de mods são inválidos"
@@ -135,7 +135,7 @@
     "message": "Aceitar tudo"
   },
   "app.ads-consent.body": {
-    "message": "Anúncios tornam o Modrinth possível e financiam os pagamentos dos criadores. Nossos parceiros talvez armazenem ou acessem os cookies no aplicativo para personalizar anúncios e medir o desempenho."
+    "message": "Anúncios tornam o Modrinth possível e financiam pagamentos para criadores. Nossos parceiros talvez armazenem ou acessem os “cookies” no aplicativo para personalizar anúncios e medir desempenho."
   },
   "app.ads-consent.manage": {
     "message": "Gerenciar preferências"
@@ -147,7 +147,7 @@
     "message": "Sua privacidade e como anúncios apoiam o Modrinth"
   },
   "app.appearance-settings.compact-mode.description": {
-    "message": "Exibir instâncias da biblioteca em um layout de linhas compacto."
+    "message": "Exibir instâncias da biblioteca em uma disposição de linha compacta."
   },
   "app.appearance-settings.compact-mode.title": {
     "message": "Modo compacto"
@@ -159,7 +159,7 @@
     "message": "Biblioteca"
   },
   "app.appearance-settings.hide-nametag.description": {
-    "message": "Oculta o nome acima do jogador na página de seleção de skin."
+    "message": "Oculte seu nome de usuário acima da pré-visualização do jogador na página de Seleção de aparência."
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Ocultar nametag"
@@ -171,13 +171,13 @@
     "message": "Minimizar aplicativo"
   },
   "app.appearance-settings.show-play-time.description": {
-    "message": "Mostre por quanto tempo você jogou cada instância."
+    "message": "Mostra por quanto tempo você jogou cada instância."
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "Exibir tempo de jogo"
   },
   "app.appearance-settings.skip-non-essential-warnings.description": {
-    "message": "Ignora as confirmações para ações de baixo risco como instalações duplicadas, exclusão de conteúdo normal, atualizações em massa, desvinculação e reparos. Os avisos para ações perigosas sempre são mostrados."
+    "message": "Ignorar confirmações para ações de baixo risco como instalações duplicadas, exclusão de conteúdo normal, atualizações em massa, desvinculação e reparos. Avisos para ações perigosas sempre são mostrados."
   },
   "app.appearance-settings.skip-non-essential-warnings.title": {
     "message": "Ignorar avisos desnecessários"
@@ -204,7 +204,13 @@
     "message": "Confirmações"
   },
   "app.behavior-settings.content.title": {
-    "message": "Início e conteúdo"
+    "message": "Página Inicial e conteúdo"
+  },
+  "app.behavior-settings.refocus-on-game-close.description": {
+    "message": "Traga o Modrinth App para o primeiro plano quando o Minecraft for fechado."
+  },
+  "app.behavior-settings.refocus-on-game-close.title": {
+    "message": "Retornar ao aplicativo quando o Minecraft fechar"
   },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Inicialização e navegação"
@@ -255,7 +261,7 @@
     "message": "Ações do projeto"
   },
   "app.browse.project-type.data-packs": {
-    "message": "Pacote de dados"
+    "message": "Pacotes de Dados"
   },
   "app.browse.project-type.modpacks": {
     "message": "Pacotes de mods"
@@ -264,7 +270,7 @@
     "message": "Mods"
   },
   "app.browse.project-type.resource-packs": {
-    "message": "Pacote de recursos"
+    "message": "Pacotes de Recursos"
   },
   "app.browse.project-type.servers": {
     "message": "Servidores"
@@ -273,7 +279,7 @@
     "message": "Sombreadores"
   },
   "app.browse.server-instance-content-warning": {
-    "message": "Adicionar conteúdo pode impedir que você entre neste servidor. Qualquer conteúdo adicionado será removido quando o conteúdo do servidor gerenciado for atualizado."
+    "message": "Adicionar conteúdo pode impedir que você entre neste servidor. Qualquer conteúdo que você adicionar será removido quando o conteúdo do servidor gerenciado for atualizado."
   },
   "app.browse.server.installing": {
     "message": "Instalando"
@@ -291,16 +297,31 @@
     "message": "Sincronizar"
   },
   "app.content.sync-packs-override": {
-    "message": "Desative a substituição de pacote sincronizada nas configurações desta instância primeiro."
+    "message": "Desative a substituição sincronizada de pacote nas configurações desta instância primeiro."
   },
   "app.content.sync-resource-packs-disabled": {
     "message": "Ative a sincronização de pacote de recursos nas configurações do aplicativo primeiro."
+  },
+  "app.debug-export.canceling": {
+    "message": "Cancelando exportação…"
+  },
+  "app.debug-export.exporting": {
+    "message": "Exportando…"
+  },
+  "app.debug-export.finishing": {
+    "message": "Finalizando…"
+  },
+  "app.debug-export.preparing": {
+    "message": "Preparando arquivos…"
   },
   "app.download-manager.active": {
     "message": "Ativo"
   },
   "app.download-manager.attention": {
     "message": "Requer atenção"
+  },
+  "app.download-manager.bulk-update-content": {
+    "message": "Atualizando {count, plural, one {# item} other {# itens}}"
   },
   "app.download-manager.cancel": {
     "message": "Cancelar instalação"
@@ -321,13 +342,13 @@
     "message": "Instância duplicada"
   },
   "app.download-manager.empty": {
-    "message": "Não há tarefas de instalação"
+    "message": "Sem tarefas de instalação"
   },
   "app.download-manager.estimated-rate": {
-    "message": "Velocidade estimada de download"
+    "message": "Velocidade estimada de transferência"
   },
   "app.download-manager.eta": {
-    "message": "Tempo restante estimado para este download"
+    "message": "Tempo restante estimado para esta transferência"
   },
   "app.download-manager.hide": {
     "message": "Ocultar tarefas de instalação"
@@ -357,7 +378,7 @@
     "message": "Remover do histórico"
   },
   "app.download-manager.resume": {
-    "message": "Resumir Instalação"
+    "message": "Retomar instalação"
   },
   "app.download-manager.shared-instance": {
     "message": "Instância compartilhada"
@@ -366,13 +387,13 @@
     "message": "Atualização de instância compartilhada"
   },
   "app.download-manager.show": {
-    "message": "Mostrar tarefas de Instalação"
+    "message": "Mostrar tarefas de instalação"
   },
   "app.download-manager.tasks": {
     "message": "Tarefas"
   },
   "app.download-manager.title": {
-    "message": "Gerenciador de Downloads"
+    "message": "Gerenciador de Transferências"
   },
   "app.download-manager.verifying": {
     "message": "Verificando"
@@ -1643,9 +1664,6 @@
   "app.settings.default-instance-options.height.title": {
     "message": "Altura"
   },
-  "app.settings.default-instance-options.java-and-memory.title": {
-    "message": "Java e memória"
-  },
   "app.settings.default-instance-options.java-arguments.description": {
     "message": "Os argumentos passados para o Java ao iniciar uma instância."
   },
@@ -1654,9 +1672,6 @@
   },
   "app.settings.default-instance-options.java-arguments.title": {
     "message": "Argumentos Java"
-  },
-  "app.settings.default-instance-options.launch-hooks.title": {
-    "message": "Ganchos de inicialização"
   },
   "app.settings.default-instance-options.memory-allocation.description": {
     "message": "O máximo de memória disponível para cada instância."
@@ -1690,9 +1705,6 @@
   },
   "app.settings.default-instance-options.width.title": {
     "message": "Largura"
-  },
-  "app.settings.default-instance-options.window.title": {
-    "message": "Janela"
   },
   "app.settings.default-instance-options.wrapper-hook.description": {
     "message": "O comando usado para auxiliar o processo de inicialização do Minecraft."
@@ -2750,14 +2762,8 @@
   "app.settings.resource-management.app-cache.confirm.description": {
     "message": "O aplicativo talvez carregue mais lentamente até o cache ser refeito."
   },
-  "app.settings.resource-management.app-cache.confirm.title": {
-    "message": "Purgar cache do aplicativo?"
-  },
   "app.settings.resource-management.app-cache.description": {
     "message": "Limpe o dado cache e baixe-o novamente do Modrinth. O aplicativo talvez carregue mais lentamente até o cache ser refeito."
-  },
-  "app.settings.resource-management.app-cache.purge": {
-    "message": "Purgar cache"
   },
   "app.settings.resource-management.app-cache.title": {
     "message": "Cache do aplicativo"
@@ -2782,6 +2788,15 @@
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "Diretório de aplicativo"
+  },
+  "app.settings.resource-management.debug-info.description": {
+    "message": "Exportar logs do app e dados de diagnóstico para um arquivo ZIP para compartilhar com o suporte do Modrinth."
+  },
+  "app.settings.resource-management.debug-info.export": {
+    "message": "Exportar informações de depuração"
+  },
+  "app.settings.resource-management.debug-info.title": {
+    "message": "Informações de depuração"
   },
   "app.settings.resource-management.maximum-concurrent-downloads.description": {
     "message": "O número de arquivos que o aplicativo pode baixar de uma só vez. Reduza se os downloads causam instabilidade em sua conexão. Exige a reinicialização do aplicativo."
@@ -2825,9 +2840,6 @@
   "app.settings.resource-management.store.description": {
     "message": "Salve espaço reutilizando instalações, mods e pacotes das suas instâncias."
   },
-  "app.settings.resource-management.store.empty": {
-    "message": "Instale mods ou pacotes para ver seu uso do armazenamento aqui."
-  },
   "app.settings.resource-management.store.issues": {
     "message": "Ver {count, plural, one {# problema} other {# problemas}}"
   },
@@ -2862,13 +2874,10 @@
     "message": "Órfão"
   },
   "app.settings.resource-management.store.verification-result": {
-    "message": "Checado {checked, plural, one {# arquivo} other {# arquivos}} e fez {repaired, plural, one {# reparo} other {# reparos}}."
+    "message": "{checked, plural,  =0 {Nenhum arquivo checado} one {# arquivo checado} other {# arquivos checados}} e {repaired, plural, =0 {nenhum reparo feito} one {# reparo feito} other {# reparos feitos}}."
   },
   "app.settings.resource-management.store.verified": {
     "message": "Verificação concluída"
-  },
-  "app.settings.sidebar.label.instances": {
-    "message": "Instâncias"
   },
   "app.settings.synced-options.choose-sync-source.command-history-description": {
     "message": "Escolha de qual instância copiar seu histórico de comandos. Esse histórico é usado apenas para a sincronização inicial, e você pode editá-lo de qualquer instância depois."
@@ -3110,12 +3119,6 @@
   "app.settings.tabs.privacy": {
     "message": "Privacidade"
   },
-  "app.settings.tabs.resource-management": {
-    "message": "Gerenciamento de recursos"
-  },
-  "app.settings.tabs.synced-options": {
-    "message": "Configurações sincronizadas"
-  },
   "app.sidebar.playing-as": {
     "message": "Jogando como"
   },
@@ -3239,6 +3242,12 @@
   "app.skins.section.default-skins": {
     "message": "Skins padrões"
   },
+  "app.skins.section.dungeons-hero": {
+    "message": "Herói do Dungeons"
+  },
+  "app.skins.section.dungeons-ii-hero": {
+    "message": "Herói do Dugeons II"
+  },
   "app.skins.section.minecon-earth-2017": {
     "message": "MINECON Earth 2017"
   },
@@ -3268,6 +3277,9 @@
   },
   "app.skins.section.tiny-takeover": {
     "message": "Tiny Takeover"
+  },
+  "app.skins.section.wilderness-bound": {
+    "message": "Wilderness Bound"
   },
   "app.skins.sign-in.button": {
     "message": "Conecte-se à Microsoft"
@@ -4103,9 +4115,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Selecionar canal de atualização"
   },
-  "instance.settings.tabs.hooks.description": {
-    "message": "Execute comandos específicos do sistema antes e após iniciar o jogo."
-  },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Ao sair"
   },
@@ -4166,18 +4175,6 @@
   "instance.settings.tabs.installation.locked": {
     "message": "As opções de instalação estarão indisponíveis enquanto esta instância estiver privada."
   },
-  "instance.settings.tabs.java.custom-environment-variables": {
-    "message": "Defina as variáveis de ambiente separadamente para esta instância."
-  },
-  "instance.settings.tabs.java.custom-java-arguments": {
-    "message": "Defina os argumentos do Java separadamente para esta instância."
-  },
-  "instance.settings.tabs.java.custom-java-installation": {
-    "message": "Escolha uma instalação Java diferente para esta instância."
-  },
-  "instance.settings.tabs.java.custom-memory-allocation": {
-    "message": "Define a alocação de memória separadamente para esta instância."
-  },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Insira as variáveis ​​de ambiente..."
   },
@@ -4201,9 +4198,6 @@
   },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/caminho/ao/java"
-  },
-  "instance.settings.tabs.settings-overrides": {
-    "message": "Sincronizar substituições"
   },
   "instance.settings.tabs.sharing": {
     "message": "Compartilhamento"
@@ -4267,9 +4261,6 @@
   },
   "instance.settings.tabs.window": {
     "message": "Personalizar configurações de janela"
-  },
-  "instance.settings.tabs.window.custom-window-settings": {
-    "message": "Configura a tela cheia e resolução de inicialização separadamente dessa instância."
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Tela cheia"

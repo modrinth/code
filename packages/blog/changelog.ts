@@ -11,6 +11,171 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-10-16T17:26:37+00:00`,
+		product: 'app',
+		version: '0.21.10',
+		body: `## Added
+- Added a new "Report ad" action in the troubleshooting tab of the app settings modal.
+
+## Changed
+- Updated translations. Want to help translate Modrinth App? [Click here](https://translate.modrinth.com)
+- Mods can now be installed, enabled, disabled, or removed while the instance is running.
+- Reorganized the Settings modal into Display, Account, Instance defaults, and System sections.
+	- Default Java and memory, Window, and Launch hooks settings now each have their own tab under Instance defaults.
+	- Moved Java installations into the Java and memory tab.
+	- Renamed the Synced settings tab to Syncing.
+	- Split the Resource management tab into Resources and Troubleshooting tabs.
+	- Renamed \`Purge cache\` to \`Clear cache\` on the Troubleshooting tab.
+- Reorganized the instance settings modal into Instance and Game sections.
+	- Java and memory, Window, Launch hooks, and Syncing are now separate tabs that replace the Sync overrides tab.
+	- Each Game tab has a \`Manage default settings\` button that opens the matching tab in the Settings modal.
+- Refreshed the sidebar, backgrounds, and scrollbars in the Settings, instance settings, and server settings modals.
+- Settings modals that open on a specific tab now scroll the sidebar to show that tab.
+
+## Fixed
+- Fixed a blank modal when joining a server whose modpack is unavailable or under review.
+- Fixed sometimes constant high CPU usage on Linux due to database issue.
+- Fixed command history syncing to new instances when command history syncing is turned off.
+- Fixed instance shortcuts dropping the part of the name after a dot.
+- Fixed the update modal on the Content tab closing when another project finishes updating.
+- Fixed the Content tab and Discover page losing their scroll position after returning from a project page.
+- Fixed the Content tab search clearing after returning from a project page.
+- Fixed beta and alpha version badges using different colors in the update and switch version modals.
+- Fixed mods showing as installed after the install failed.
+- Fixed an issue where sometimes you were unable to launch the app after updating from a super old app version.
+- Fixes webview errors when exporting debug information from app settings.
+- Fixed "CancelledError" error notifications appearing when switching pages.
+- Fixed some issues with bad performance when the app makes a backup of your instance before doing any content related operations.`,
+	},
+	{
+		date: `2026-10-16T17:26:37+00:00`,
+		product: 'web',
+		body: `## Changed
+- Updated translations. Want to help translate Modrinth? [Click here](https://translate.modrinth.com)
+- Updated slug suggestions to handle character restrictions.
+
+## Fixed
+- Fixed uploads failing for project files whose names start or end with a space.
+
+## Security
+- Fixed an issue with PayPal account linking (thanks foksha!)`,
+	},
+	{
+		date: `2026-10-16T17:26:37+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- Updated translations. Want to help translate Modrinth Hosting? [Click here](https://translate.modrinth.com)
+
+## Fixed
+- Fixed beta and alpha version badges using different colors in the update and switch version modals.
+- Fixed a performance issue when downloading files from the files tab.`,
+	},
+	{
+		date: `2026-10-09T22:49:09+00:00`,
+		product: 'web',
+		body: `## Changed
+- Changed the Discord link on the error page to a support link.
+- Updated graphics used for Modrinth Hosting ad.
+
+## Removed
+- Removed Modrinth Hosting x Medal five-day trial promo.`,
+	},
+	{
+		date: `2026-10-07T19:34:12+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed how download modal's compatible version selector completely disappears if a version with no additional files is selected.
+- Fixed project icon appearing set even when the file size is too large.`,
+	},
+	{
+		date: `2026-10-07T19:34:12+00:00`,
+		product: 'app',
+		version: '0.21.9',
+		body: `## Fixed
+- Improved Modrinth sign-in to support deeplinking, improve security, and fix random sign-outs due to shared tokens with the website.
+- Fixed \`missing field synced_options\` error.`,
+	},
+	{
+		date: `2026-10-06T19:48:42+00:00`,
+		product: 'app',
+		version: '0.21.8',
+		body: `## Fixed
+- Fixed an issue when opening the app relating to \`synced_options\``,
+	},
+	{
+		date: `2026-10-06T18:58:20+00:00`,
+		product: 'app',
+		version: '0.21.7',
+		body: `## Added
+- Added a "Export debug info" button to the Resource management page in app settings which support can use to help identify any problems you are currently having.
+- Added the Christina skin from the Dungeons Hero skin pack to the Skin selector page.
+- Added the Dani skin from the Dungeons Hero skin pack to the Skin selector page.
+- Added the Fishy skin from the Dungeons Hero skin pack to the Skin selector page.
+- Added the Hal skin from the Dungeons Hero skin pack to the Skin selector page.
+- Added the Hedwig skin from the Dungeons Hero skin pack to the Skin selector page.
+- Added the Hex skin from the Dungeons Hero skin pack to the Skin selector page.
+- Added the Jellyfish Girl skin from the Dungeons Hero skin pack to the Skin selector page.
+- Added the Loge skin from the Dungeons Hero skin pack to the Skin selector page.
+- Added the Paw Prints skin from the Dungeons Hero skin pack to the Skin selector page.
+- Added the Penguin Onesie skin from the Dungeons Hero skin pack to the Skin selector page.
+- Added the Pig Onesie skin from the Dungeons Hero skin pack to the Skin selector page.
+- Added the Tim skin from the Dungeons Hero skin pack to the Skin selector page.
+- Added the Valorie skin from the Dungeons Hero skin pack to the Skin selector page.
+- Added the Darian skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Edson skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Eshe skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Esperanza skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Flores skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Gaston skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Greta skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Gubbis skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Javier skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Kellen skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Mats skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Nuru skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Pim skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Qamar skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Raven skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Ren skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Riggs skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Stella skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Tula skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Valorie skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Violet skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Big Foot skin from the Wilderness Bound skin pack to the Skin selector page.
+
+## Changed
+- If you use the "Update all" button and there's only one project, it will use the normal "Update project" modal/flow.
+
+## Fixed
+- Fixed some issues with the download manager where tasks would be stuck "Pending..." or on another specific stage.
+- Fixes issues with some update all actions failing.
+- Fixed project compatibility panel showing only one supported environment when a project might actually support more.
+- Fixes some issues with failed install jobs for an instance that was deleted causing the app to sometimes freeze on launch.
+- Fixed issue where you could only pick a specific version of Java in the "Custom Java installation" override in instance settings.
+- Fixed an issue with Update all where if you already had two files of the same project installed it would fail.
+- Fixed issue with linked modpack instances where the bundled sponsored servers of some modpacks would be automatically synced across all your instances.
+- Fixed issue where disabling content in the content tab would reset it's "Date added" so the sort broke.
+- Fixed "modpack data invalid" when using the Update all flow in the content tab.
+- Fixes issue when pushing an update for a shared instance where if you have two content items installed from the same project but different versions it would error out and break. Now it is handled correctly.
+- Fixes bug when installing a non-modpack when it tries to install the content before the instance has actually been set up yet.
+- Fixed window growing bug on Windows.`,
+	},
+	{
+		date: `2026-10-06T18:58:20+00:00`,
+		product: 'web',
+		body: `## Added
+- Added a "No results found for your query!" on the landing page search example if there are no results.
+
+## Fixed
+- Fixed an issue in project settings where valid SPDX license codes were being rejected.
+- Fixed project compatibility panel showing only one supported environment when a project might actually support more.
+- Fixed an issue with link validation where some repository links would be invalid.
+
+## Security
+- Fixed a security issue relating to our email templating system.`,
+	},
+	{
 		date: `2026-09-27T18:59:10+00:00`,
 		product: 'app',
 		version: '0.21.6',

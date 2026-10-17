@@ -23,26 +23,29 @@ const optionalMessage = defineMessage({
 <template>
 	<div class="flex flex-col gap-2">
 		<div
-			v-if="title || description || $slots.title || $slots.description"
+			v-if="title || description || $slots.title || $slots['title-right'] || $slots.description"
 			:class="description || $slots.description ? 'flex flex-col gap-1' : undefined"
 		>
-			<label
-				v-if="title && titleFor"
-				:for="titleFor"
-				class="m-0 leading-normal text-contrast font-semibold"
-			>
-				{{ title }}
-				<span v-if="optional" class="text-secondary font-normal">
-					{{ formatMessage(optionalMessage) }}
-				</span>
-			</label>
-			<p v-else-if="title" class="m-0 leading-normal text-contrast font-semibold">
-				{{ title }}
-				<span v-if="optional" class="text-secondary font-normal">
-					{{ formatMessage(optionalMessage) }}
-				</span>
-			</p>
-			<slot name="title" />
+			<div class="flex items-center justify-between gap-2">
+				<label
+					v-if="title && titleFor"
+					:for="titleFor"
+					class="m-0 leading-normal text-contrast font-semibold"
+				>
+					{{ title }}
+					<span v-if="optional" class="text-secondary font-normal">
+						{{ formatMessage(optionalMessage) }}
+					</span>
+				</label>
+				<p v-else-if="title" class="m-0 leading-normal text-contrast font-semibold">
+					{{ title }}
+					<span v-if="optional" class="text-secondary font-normal">
+						{{ formatMessage(optionalMessage) }}
+					</span>
+				</p>
+				<slot name="title" />
+				<slot name="title-right" />
+			</div>
 			<p v-if="description" class="m-0 leading-normal text-primary">
 				{{ description }}
 			</p>

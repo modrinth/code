@@ -2,6 +2,10 @@ import { forgetStoredAccount } from '@/composables/accounts.ts'
 import { useAuthCookie } from '@/composables/auth-cookie.ts'
 import { useAppQueryClient } from '@/composables/query-client'
 
+// Follows are full project objects (with markdown bodies); only ids are read, and the full
+// list would otherwise be serialized into every SSR payload.
+const toFollowRef = (project) => ({ id: project.id })
+
 export const useUser = async (force = false) => {
 	const user = useState('user', () => {})
 
@@ -35,7 +39,7 @@ export const initUser = async () => {
 			])
 
 			user.collections = collections
-			user.follows = follows
+			user.follows = follows.map(toFollowRef)
 			user.subscriptions = subscriptions
 			user.lastUpdated = Date.now()
 		} catch (err) {
@@ -67,7 +71,7 @@ export const initUserFollows = async () => {
 
 	if (auth.user && auth.user.id) {
 		try {
-			user.follows = await useBaseFetch(`user/${auth.user.id}/follows`)
+			user.follows = (await useBaseFetch(`user/${auth.user.id}/follows`)).map(toFollowRef)
 		} catch (err) {
 			console.error(err)
 		}
@@ -131,7 +135,7 @@ export const userFollowProject = async (project) => {
 			})
 		})
 	} else {
-		user.follows = user.follows.concat(project)
+		user.follows = user.follows.concat(toFollowRef(project))
 		project.followers++
 
 		setTimeout(() => {

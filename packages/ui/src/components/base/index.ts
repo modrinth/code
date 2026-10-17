@@ -73,6 +73,7 @@ export { default as HorizontalRule } from './HorizontalRule.vue'
 export { default as I18nDebugPanel } from './I18nDebugPanel.vue'
 export { default as IconSelect } from './IconSelect.vue'
 export { default as InlineEditableText } from './InlineEditableText.vue'
+export { default as InlineValidationMessage } from './InlineValidationMessage.vue'
 export type { InputAppearance, InputSize } from './inputs'
 export {
 	ColorPicker,
@@ -116,6 +117,7 @@ export type {
 	PageHeaderProps,
 	PageHeaderTarget,
 } from './page-header/types'
+export { default as PageLoadingBar } from './PageLoadingBar.vue'
 export { default as Pagination } from './Pagination.vue'
 export { default as PreviewSelectButton } from './PreviewSelectButton.vue'
 export { default as ProgressBar } from './ProgressBar.vue'

@@ -806,6 +806,9 @@
   "auth.create-account.username.placeholder": {
     "message": "أدخل اسم المستخدم"
   },
+  "auth.reauthenticate.2fa.label": {
+    "message": "المصادقة الثنائية"
+  },
   "auth.reset-password.method-choice.action": {
     "message": "إرسال بريد استعادة الحساب"
   },
@@ -1007,17 +1010,11 @@
   "conversation-thread.action.approve": {
     "message": "موافقة"
   },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "الموافقة مع الرد"
-  },
   "conversation-thread.action.close-with-reply": {
     "message": "الإغلاق مع الرد"
   },
   "conversation-thread.action.reject": {
     "message": "رفض"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "الرفض مع الرد"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "إعادة فتح سلسلة المحادثة"
@@ -1052,9 +1049,6 @@
   "conversation-thread.action.withhold": {
     "message": "حجب"
   },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "الحجب مع الرد"
-  },
   "conversation-thread.closed-thread.description": {
     "message": "هذه السلسلة مغلقة، ولا يمكن إرسال رسائل جديدة إليها."
   },
@@ -1063,9 +1057,6 @@
   },
   "conversation-thread.error.reopening-report": {
     "message": "حدث خطأ أثناء إعادة فتح البلاغ"
-  },
-  "conversation-thread.error.sending-message": {
-    "message": "حدث خطأ أثناء إرسال الرسالة"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "الرد على سلسلة المحادثة..."
@@ -1093,9 +1084,6 @@
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "أؤكد أنني تعاملت بشكل مناسب مع ملاحظات المشرفين."
-  },
-  "conversation-thread.resubmit-modal.description": {
-    "message": "أنت تعيد إرسال <project-title>{projectTitle}</project-title> لمراجعته مرة أخرى من قِبل المشرفين."
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "إعادة الإرسال للمراجعة"
@@ -2189,9 +2177,6 @@
   "error.generic.default.list_item.1": {
     "message": "تحقق مما إذا كان مودرنث متوقفًا على <status-link>صفحة الحالة</status-link> الخاصة بنا."
   },
-  "error.generic.default.list_item.2": {
-    "message": "إذا استمر حدوث ذلك، قد ترغب في إعلام فريق مودرنث بالانضمام إلى <discord-link>سيرفر ديسكورد</discord-link> الخاص بنا."
-  },
   "error.generic.default.list_title": {
     "message": "يرجى المحاولة مرة أخرى بعد بضع دقائق."
   },
@@ -2846,6 +2831,9 @@
   "layout.nav.active-reports": {
     "message": "البلاغات النشطة"
   },
+  "layout.nav.add-account": {
+    "message": "إضافة حساب"
+  },
   "layout.nav.discover": {
     "message": "استكشاف"
   },
@@ -2876,6 +2864,9 @@
   "layout.nav.projects": {
     "message": "المشاريع"
   },
+  "layout.nav.remove-account": {
+    "message": "إزالة الحساب"
+  },
   "layout.nav.revenue": {
     "message": "الإيرادات"
   },
@@ -2884,6 +2875,9 @@
   },
   "layout.nav.search": {
     "message": "البحث"
+  },
+  "layout.nav.switch-account": {
+    "message": "تبديل الحساب"
   },
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "الترقية إلى Modrinth+"

@@ -1,6 +1,4 @@
-use super::apply_content_install::{
-    ContentScope, require_stopped_for_content, upsert_entry_for_file,
-};
+use super::apply_content_install::{ContentScope, upsert_entry_for_file};
 use crate::state::content_store::{
     FileChangeRequest, FileContent, InstanceFileStatus, StoredFileHandle,
     content_file_path, input,
@@ -223,12 +221,6 @@ impl<'a> InstanceContent<'a> {
         request: InstallContent<'_>,
     ) -> crate::Result<PendingContentChange> {
         self.content_scope()?;
-        require_stopped_for_content(
-            &self.instance.id,
-            request.project_type,
-            self.state,
-        )
-        .await?;
         let relative_path = canonical_content_path(request.requested_path);
         if !crate::state::content_store::is_managed_content_path(relative_path)
         {
@@ -344,7 +336,7 @@ impl<'a> InstanceContent<'a> {
     ) -> crate::Result<PendingContentChange> {
         self.content_scope()?;
         let canonical_path = canonical_content_path(project_path);
-        let file = content_rows::get_instance_file_by_relative_path(
+        let mut file = content_rows::get_instance_file_by_relative_path(
             &self.instance.id,
             canonical_path,
             &self.state.pool,
@@ -355,16 +347,10 @@ impl<'a> InstanceContent<'a> {
                 "Content file is not registered; refresh the Content tab first",
             )
         })?;
-        let project_type =
-            super::sync_content_files::project_type_for_file(&file)
-                .ok_or_else(|| input("Unsupported content type"))?;
-        require_stopped_for_content(
-            &self.instance.id,
-            project_type,
-            self.state,
-        )
-        .await?;
+        super::sync_content_files::project_type_for_file(&file)
+            .ok_or_else(|| input("Unsupported content type"))?;
         let enabled = desired_enabled.unwrap_or(!file.enabled);
+        file.missing = false;
         let file_change = match self
             .state
             .content_store
@@ -393,13 +379,15 @@ impl<'a> InstanceContent<'a> {
                             .await?
                     }
                     InstanceFileStatus::Missing => {
+                        file.missing = !enabled;
                         self.state
                             .content_store
                             .prepare_file_change(
                                 &self.instance,
                                 FileChangeRequest {
                                     relative_path: canonical_path,
-                                    replacement: Some(&stored_file),
+                                    replacement: enabled
+                                        .then_some(&stored_file),
                                     enabled,
                                     legacy_path: None,
                                     previous_content: None,
@@ -414,16 +402,51 @@ impl<'a> InstanceContent<'a> {
                     }
                 }
             }
-            FileContent::Damaged(binding) if !enabled => {
-                self.state
+            FileContent::Damaged(binding) => {
+                match self
+                    .state
                     .content_store
-                    .prepare_file_move(&self.instance, &file, &binding, false)
+                    .check_instance_file(&self.instance, &file, &binding)
                     .await?
-            }
-            FileContent::Damaged(_) => {
-                return Err(input(
-                    "Content needs repair or re-import before it can be enabled",
-                ));
+                {
+                    InstanceFileStatus::Healthy => {
+                        self.state
+                            .content_store
+                            .prepare_file_move(
+                                &self.instance,
+                                &file,
+                                &binding,
+                                enabled,
+                            )
+                            .await?
+                    }
+                    InstanceFileStatus::Missing if !enabled => {
+                        file.missing = true;
+                        self.state
+                            .content_store
+                            .prepare_file_change(
+                                &self.instance,
+                                FileChangeRequest {
+                                    relative_path: canonical_path,
+                                    replacement: None,
+                                    enabled,
+                                    legacy_path: None,
+                                    previous_content: None,
+                                },
+                            )
+                            .await?
+                    }
+                    InstanceFileStatus::Missing => {
+                        return Err(input(
+                            "Content needs repair or re-import before it can be enabled",
+                        ));
+                    }
+                    InstanceFileStatus::Conflict => {
+                        return Err(input(
+                            "Content was changed outside the app; resolve the conflict first",
+                        ));
+                    }
+                }
             }
             FileContent::Unmanaged => {
                 let physical_path = content_file_path(&file);
@@ -464,14 +487,8 @@ impl<'a> InstanceContent<'a> {
     ) -> crate::Result<PendingContentChange> {
         self.content_scope()?;
         let canonical_path = canonical_content_path(project_path);
-        let project_type = ProjectType::get_from_parent_folder(canonical_path)
+        ProjectType::get_from_parent_folder(canonical_path)
             .ok_or_else(|| input("Unsupported content type"))?;
-        require_stopped_for_content(
-            &self.instance.id,
-            project_type,
-            self.state,
-        )
-        .await?;
         let mut file = content_rows::get_instance_file_by_relative_path(
             &self.instance.id,
             project_path,
@@ -685,7 +702,6 @@ impl<'a> InstanceContent<'a> {
             PreparedChange::Toggle { file, enabled } => {
                 let mut updated = file.clone();
                 updated.enabled = *enabled;
-                updated.missing = false;
                 updated.modified_at = Utc::now();
                 let updated =
                     content_rows::upsert_instance_file(&updated, &mut tx)

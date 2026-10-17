@@ -55,6 +55,7 @@ export const actionLogActionNames = [
 	'file_renamed',
 	'file_edited',
 	'sftp_login',
+	'sftp_credentials_rolled',
 	'console_command_executed',
 	'console_cleared',
 	'backup_created',
@@ -136,7 +137,14 @@ export const actionLogActionGroups = [
 			defaultMessage: 'Files and SFTP',
 		}),
 		icon: FileIcon,
-		actions: ['file_uploaded', 'file_edited', 'file_renamed', 'file_deleted', 'sftp_login'],
+		actions: [
+			'file_uploaded',
+			'file_edited',
+			'file_renamed',
+			'file_deleted',
+			'sftp_login',
+			'sftp_credentials_rolled',
+		],
 	},
 	{
 		key: 'backups',

@@ -70,7 +70,6 @@ import {
 	FormattedTag,
 	injectModrinthClient,
 	injectNotificationManager,
-	injectProjectPageContext,
 	ProjectCombobox,
 	TagItem,
 } from '@modrinth/ui'
@@ -81,10 +80,8 @@ import { injectServerCompatibilityContext } from '~/providers/manage-server-comp
 
 import DataLossWarningBanner from '../DataLossWarningBanner.vue'
 
-const { projectV3 } = injectProjectPageContext()
-
-const currentProjectId = computed(() => projectV3.value?.id)
-const { selectedProjectId, selectedVersionId } = injectServerCompatibilityContext()
+const { project, selectedProjectId, selectedVersionId } = injectServerCompatibilityContext()
+const currentProjectId = computed(() => project.value?.id)
 const { labrinth } = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const auth = await useAuth()

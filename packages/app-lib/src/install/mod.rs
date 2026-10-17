@@ -1,3 +1,8 @@
+//! Major install stages box their futures at entry so callers do not embed
+//! the full stage state. Keep large awaited operations behind these boundaries.
+
+#![deny(clippy::large_futures)]
+
 pub(crate) mod control;
 mod diagnostics;
 pub mod events;

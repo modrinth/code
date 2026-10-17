@@ -54,7 +54,7 @@ Components in `packages/ui` can need capabilities that each frontend implements 
 
 | Provider      | App frontend                       | Website frontend                |
 | ------------- | ---------------------------------- | ------------------------------- |
-| API client    | Tauri IPC client                   | REST fetch client               |
+| API client    | Tauri HTTP client                  | REST fetch client               |
 | Notifications | `ref()` state and window control   | `useState()` for SSR hydration  |
 | File picker   | Native Tauri dialogs               | Browser file inputs             |
 | Tags          | Tauri commands                     | Nuxt server state               |
@@ -68,7 +68,7 @@ Use DI to share page data with deep descendants. Examples include the project si
 
 ### 1. Define the Interface
 
-Define the interface in `packages/ui/src/providers/`:
+For shared UI contracts, define the interface in `packages/ui/src/providers/`. App-only contexts follow the app guidance below:
 
 ```ts
 // packages/ui/src/providers/my-feature.ts
@@ -111,31 +111,7 @@ Refer to `AbstractWebNotificationManager` in `packages/ui/src/providers/web-noti
 
 ### App Frontend
 
-Make a setup function in `apps/app-frontend/src/providers/setup/`:
-
-```ts
-// apps/app-frontend/src/providers/setup/my-feature.ts
-import { ref } from 'vue'
-import { provideMyFeature } from '@modrinth/ui'
-
-export function setupMyFeatureProvider() {
-	const items = ref<Item[]>([])
-
-	provideMyFeature({
-		items,
-		addItem: async (item) => {
-			await invoke('add_item', { item })
-			items.value.push(item)
-		},
-		removeItem: async (id) => {
-			await invoke('remove_item', { id })
-			items.value = items.value.filter(i => i.id !== id)
-		},
-	})
-}
-```
-
-Register the function in `apps/app-frontend/src/providers/setup.ts`. `App.vue` calls this setup file from its `setup()` function.
+Follow [App Dependency Injection](app-frontend/APP_FRONTEND_DEPENDENCY_INJECTION.md) for desktop provider setup and context placement. [App Structure](app-frontend/APP_FRONTEND_STRUCTURE.md) explains where that code belongs.
 
 ### Website Frontend
 
@@ -195,5 +171,6 @@ Use props and emits by default. DI adds an indirect layer, so use it only for a 
 - `packages/ui/src/providers/index.ts`: Contains the `createContext` factory and provider exports.
 - `packages/ui/src/providers/*.ts`: Contains provider definitions.
 - `apps/frontend/src/app.vue`: Contains the Nuxt root-provider setup.
-- `apps/app-frontend/src/App.vue`: Contains the Tauri root-provider setup.
-- `apps/app-frontend/src/providers/setup/`: Contains the app provider setup functions.
+- `apps/app-frontend/src/App.vue`: Contains the desktop application entry component.
+- `apps/app-frontend/src/components/app-shell/index.vue`: Contains root-provider setup before migration to `app/`.
+- `apps/app-frontend/src/providers/setup/`: Contains existing provider setup functions before migration.

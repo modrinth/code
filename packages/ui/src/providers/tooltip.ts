@@ -3,7 +3,7 @@ import type { App, Directive } from 'vue'
 import { ref } from 'vue'
 
 export type TooltipPlacement = Placement
-export type TooltipProps = string | { text: string } | null | undefined
+export type TooltipProps = string | { text: string; delay?: number } | null | undefined
 export type TooltipDirective = Directive<HTMLElement, TooltipProps>
 export type TooltipContent = () => unknown
 
@@ -121,7 +121,8 @@ function open(el: HTMLElement) {
 	lastOpen = Date.now()
 }
 
-function show(immediate: boolean, delay: number = SHOW_DELAY) {
+/** Delay before showing: the caller's, then the source's own (e.g. `v-tooltip="{ delay }"`), then the default. */
+function show(immediate: boolean, explicitDelay?: number) {
 	const el = focused ?? hovered
 	if (!el || !hasTooltipContent(el)) {
 		return
@@ -129,6 +130,7 @@ function show(immediate: boolean, delay: number = SHOW_DELAY) {
 	if (hideWaiting(el)) return
 	if (showTimer) stopShow()
 	const source = sources.get(el)
+	const delay = explicitDelay ?? hoverDelay(source?.delay) ?? SHOW_DELAY
 	if (
 		immediate ||
 		((activeTooltip.value.reference || Date.now() - lastOpen <= delay) && source?.allowTransfer)
@@ -145,10 +147,12 @@ function show(immediate: boolean, delay: number = SHOW_DELAY) {
 	}
 }
 
-function hide(el: HTMLElement, immediate: boolean, delay: number = HIDE_DELAY) {
+/** Delay before hiding: the caller's, then the source's own, then the default. */
+function hide(el: HTMLElement, immediate: boolean, explicitDelay?: number) {
 	if (showTimer?.el === el) stopShow()
 
 	const source = sources.get(el)
+	const delay = explicitDelay ?? unhoverDelay(source?.delay) ?? HIDE_DELAY
 
 	if (source?.pinned) {
 		return
@@ -211,7 +215,7 @@ export function unbindTooltipSource(el: HTMLElement) {
 }
 
 function isFocusVisible(el: HTMLElement) {
-	const active = document.activeElement
+	const active = el.ownerDocument.activeElement
 	if (!(active instanceof Element) || !el.contains(active)) {
 		return false
 	}
@@ -222,7 +226,6 @@ export function tooltipEnter(el: HTMLElement, delay?: number): void {
 	if (!hasTooltipContent(el)) {
 		return
 	}
-	console.log('tooltipEnter', delay)
 	hovered = el
 	show(false, delay)
 }
@@ -315,6 +318,7 @@ export function installTooltipDirective(app: App) {
 		bindTooltipSource(el, {
 			placement: tooltipPlacement(modifiers),
 			text: () => tooltipText(value),
+			delay: tooltipDelay(value),
 		})
 	}
 }
@@ -324,6 +328,27 @@ function tooltipText(value: TooltipProps): string | null {
 		return null
 	}
 	return typeof value === 'string' ? value : (value.text ?? null)
+}
+
+/** The directive's `delay` only postpones showing; hiding keeps its default delay. */
+function tooltipDelay(value: TooltipProps): DelayTimes | undefined {
+	if (
+		value == null ||
+		typeof value === 'string' ||
+		typeof value.delay !== 'number' ||
+		!Number.isFinite(value.delay)
+	) {
+		return
+	}
+	return { hover: Math.max(0, value.delay) }
+}
+
+function hoverDelay(delay: DelayTimes | null | undefined): number | undefined {
+	return typeof delay === 'number' ? delay : (delay?.hover ?? undefined)
+}
+
+function unhoverDelay(delay: DelayTimes | null | undefined): number | undefined {
+	return typeof delay === 'number' ? delay : (delay?.unhover ?? undefined)
 }
 
 function ensureAriaLabel(el: HTMLElement, text: string, added: WeakSet<HTMLElement>) {
