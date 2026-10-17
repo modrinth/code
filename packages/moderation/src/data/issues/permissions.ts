@@ -1,10 +1,10 @@
 import { SignatureIcon } from '@modrinth/assets'
 
+import excessiveOverridesMessage from '../messages/checklist/messages/permissions/excessive-externals.md'
 import invalidPermissionsMessage from '../messages/checklist/messages/permissions/invalid-permissions.md'
 import missingPermissionsMessage from '../messages/checklist/messages/permissions/missing-permissions.md'
 import nonCommercialExternalContentMessage from '../messages/checklist/messages/permissions/non-commercial-external-content.md'
 import prohibitedExternalContentMessage from '../messages/checklist/messages/permissions/prohibited-external-content.md'
-import excessiveOverridesMessage from '../messages/checklist/messages/permissions/excessive-externals.md'
 import { issue, panel, toggle } from './component-builders/builders'
 import { issueLocation } from './component-builders/locations'
 
