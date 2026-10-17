@@ -60,10 +60,10 @@ pub(crate) async fn flush(instance_id: &str) -> Result<(), Arc<crate::Error>> {
             let remaining = retry_at.saturating_duration_since(Instant::now());
             if !remaining.is_zero() {
                 return Err(Arc::new(
-                    crate::ErrorKind::RateLimited {
+                    ErrorKind::RateLimited {
                         retry_in: remaining,
                     }
-                    .as_error(),
+                    .into(),
                 ));
             }
         }

@@ -279,10 +279,6 @@ fn format_duration(duration: Duration) -> String {
 pub type Error = anyhow::Error;
 
 impl ErrorKind {
-    pub fn as_error(self) -> Error {
-        self.into()
-    }
-
     fn code(&self) -> &'static str {
         match self {
             Self::SharedInstanceUnavailable(reason) => match reason {
