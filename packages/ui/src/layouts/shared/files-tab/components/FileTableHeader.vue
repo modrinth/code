@@ -1,14 +1,14 @@
 <template>
 	<div
-		aria-hidden="true"
-		class="sticky top-0 z-10 flex h-12 w-full select-none flex-row items-center justify-between bg-surface-3 pl-3 pr-4 font-medium transition-[border-radius] duration-100"
-		:class="
+		class="sticky top-[var(--files-table-header-top,0px)] z-10 flex h-[3rem] w-full select-none flex-row items-center justify-between bg-surface-3 pl-3 pr-3 font-medium transition-[border-radius] duration-100"
+		:class="[
 			isStuck
 				? 'rounded-none border-0 border-y border-solid border-surface-4 shadow-md before:pointer-events-none before:absolute before:inset-x-0 before:-top-4 before:h-5 before:bg-surface-3'
-				: 'rounded-t-[20px]'
-		"
+				: '',
+			props.advancedView ? 'border-0 border-t border-solid border-surface-5' : '',
+		]"
 	>
-		<div class="flex flex-1 items-center gap-3">
+		<div class="flex min-w-0 flex-1 items-center gap-3">
 			<Checkbox
 				:model-value="allSelected"
 				:indeterminate="someSelected && !allSelected"
@@ -32,72 +32,52 @@
 				/>
 			</button>
 		</div>
-		<div class="flex shrink-0 items-center gap-4 @[800px]:gap-12">
+		<div class="flex shrink-0 items-center gap-6">
 			<button
-				class="hidden w-[100px] appearance-none items-center justify-start gap-1 border-0 bg-transparent p-0 font-semibold hover:text-primary @[800px]:flex"
-				:class="sortField === 'size' ? 'text-contrast' : 'text-secondary'"
-				@click="$emit('sort', 'size')"
+				v-for="column in shownColumnDefinitions"
+				:key="column.id"
+				class="flex appearance-none items-center justify-start gap-1 border-0 bg-transparent p-0 font-semibold hover:text-primary"
+				:class="sortField === column.sortField ? 'text-contrast' : 'text-secondary'"
+				:style="{ width: `${column.width}px` }"
+				@click="$emit('sort', column.sortField)"
 			>
-				<span>{{ formatMessage(messages.size) }}</span>
+				<span class="truncate">{{ formatMessage(columnMessages[column.id]) }}</span>
 				<ChevronUpIcon
-					v-if="sortField === 'size' && !sortDesc"
-					class="h-4 w-4"
+					v-if="sortField === column.sortField && !sortDesc"
+					class="h-4 w-4 shrink-0"
 					aria-hidden="true"
 				/>
 				<ChevronDownIcon
-					v-if="sortField === 'size' && sortDesc"
-					class="h-4 w-4"
+					v-if="sortField === column.sortField && sortDesc"
+					class="h-4 w-4 shrink-0"
 					aria-hidden="true"
 				/>
 			</button>
-			<button
-				class="hidden w-[160px] appearance-none items-center justify-start gap-1 border-0 bg-transparent p-0 font-semibold hover:text-primary @[800px]:flex"
-				:class="sortField === 'created' ? 'text-contrast' : 'text-secondary'"
-				@click="$emit('sort', 'created')"
-			>
-				<span>{{ formatMessage(messages.created) }}</span>
-				<ChevronUpIcon
-					v-if="sortField === 'created' && !sortDesc"
-					class="h-4 w-4"
-					aria-hidden="true"
-				/>
-				<ChevronDownIcon
-					v-if="sortField === 'created' && sortDesc"
-					class="h-4 w-4"
-					aria-hidden="true"
-				/>
-			</button>
-			<button
-				class="hidden w-[160px] appearance-none items-center justify-start gap-1 border-0 bg-transparent p-0 font-semibold hover:text-primary @[800px]:flex"
-				:class="sortField === 'modified' ? 'text-contrast' : 'text-secondary'"
-				@click="$emit('sort', 'modified')"
-			>
-				<span>{{ formatMessage(messages.modified) }}</span>
-				<ChevronUpIcon
-					v-if="sortField === 'modified' && !sortDesc"
-					class="h-4 w-4"
-					aria-hidden="true"
-				/>
-				<ChevronDownIcon
-					v-if="sortField === 'modified' && sortDesc"
-					class="h-4 w-4"
-					aria-hidden="true"
-				/>
-			</button>
-			<span class="min-w-[51px] shrink-0 text-nowrap text-right font-semibold text-secondary">{{
-				formatMessage(commonMessages.actionsLabel)
-			}}</span>
+			<div class="flex min-w-[51px] shrink-0 justify-end">
+				<TeleportOverflowMenu
+					v-if="viewSettingsEnabled"
+					v-tooltip="formatMessage(messages.viewSettings)"
+					type="quiet"
+					:label="formatMessage(messages.viewSettings)"
+					:options="columnOptions"
+				>
+					<SettingsIcon class="h-5 w-5" aria-hidden="true" />
+				</TeleportOverflowMenu>
+			</div>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { ChevronDownIcon, ChevronUpIcon } from '@modrinth/assets'
+import { ChevronDownIcon, ChevronUpIcon, SettingsIcon } from '@modrinth/assets'
+import { computed } from 'vue'
 
+import type { ButtonMenuOption } from '#ui/components/base/buttons'
+import { TeleportOverflowMenu } from '#ui/components/base/buttons'
 import Checkbox from '#ui/components/base/Checkbox.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { commonMessages } from '#ui/utils/common-messages'
 
+import { FILE_COLUMNS, type FileColumn } from '../composables/file-columns'
 import type { FileSortField } from '../types'
 
 const { formatMessage } = useVIntl()
@@ -107,9 +87,32 @@ const messages = defineMessages({
 		id: 'files.table-header.name',
 		defaultMessage: 'Name',
 	},
+	showDetails: {
+		id: 'files.table-header.show-details',
+		defaultMessage: 'Show details',
+	},
+	viewSettings: {
+		id: 'files.table-header.view-settings',
+		defaultMessage: 'View settings',
+	},
+	advancedView: {
+		id: 'files.table-header.advanced-view',
+		defaultMessage: 'Advanced view',
+	},
+	coloredIcons: {
+		id: 'files.table-header.colored-icons',
+		defaultMessage: 'Colored icons',
+	},
+})
+
+const columnMessages = defineMessages({
 	size: {
 		id: 'files.table-header.size',
 		defaultMessage: 'Size',
+	},
+	items: {
+		id: 'files.table-header.items',
+		defaultMessage: 'Items',
 	},
 	created: {
 		id: 'files.table-header.created',
@@ -121,16 +124,73 @@ const messages = defineMessages({
 	},
 })
 
-defineProps<{
+const props = defineProps<{
 	sortField: FileSortField
 	sortDesc: boolean
 	allSelected: boolean
 	someSelected: boolean
 	isStuck: boolean
+	/** Columns currently rendered, after fitting them to the available width. */
+	columns: FileColumn[]
+	/** Columns the user has chosen to show. */
+	enabledColumns: FileColumn[]
+	detailsEnabled: boolean
+	/** Whether the column picker is offered. */
+	columnsAdjustable?: boolean
+	/** Whether the view settings menu is offered at all. */
+	viewSettingsEnabled?: boolean
+	advancedView?: boolean
+	coloredIcons?: boolean
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
 	sort: [field: FileSortField]
 	'toggle-all': []
+	'toggle-column': [column: FileColumn]
+	'toggle-details': []
+	'toggle-advanced-view': []
+	'toggle-colored-icons': []
 }>()
+
+const shownColumnDefinitions = computed(() =>
+	props.columns.flatMap((id) => FILE_COLUMNS.filter((column) => column.id === id)),
+)
+
+const columnOptions = computed<ButtonMenuOption[]>(() => [
+	{
+		id: 'advanced-view',
+		label: formatMessage(messages.advancedView),
+		selected: props.advancedView,
+		remainOpen: true,
+		action: () => emit('toggle-advanced-view'),
+	},
+	{
+		id: 'colored-icons',
+		label: formatMessage(messages.coloredIcons),
+		selected: props.coloredIcons,
+		remainOpen: true,
+		action: () => emit('toggle-colored-icons'),
+	},
+	{ type: 'divider', shown: props.columnsAdjustable },
+	{
+		shown: props.columnsAdjustable,
+		id: 'show-details',
+		label: formatMessage(messages.showDetails),
+		selected: props.detailsEnabled,
+		remainOpen: true,
+		action: () => emit('toggle-details'),
+	},
+	{ type: 'divider', shown: props.columnsAdjustable },
+	...FILE_COLUMNS.map(
+		(column): ButtonMenuOption => ({
+			shown: props.columnsAdjustable,
+			id: `column-${column.id}`,
+			label: formatMessage(columnMessages[column.id]),
+			selected: props.enabledColumns.includes(column.id),
+			disabled: !props.detailsEnabled,
+			remainOpen: true,
+			action: () => emit('toggle-column', column.id),
+		}),
+	),
+])
 </script>

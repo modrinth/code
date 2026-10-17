@@ -4,7 +4,7 @@
 	<FileCreateItemModal ref="createItemModal" :type="newItemType" @create="handleCreateNewItem" />
 	<FileCreateZipModal
 		ref="createZipModal"
-		:parent="ctx.currentPath.value"
+		:parent="selectionParent?.path ?? ctx.currentFile.value.path"
 		:stat-file="ctx.statFile"
 		@create="handleZipSelection"
 	/>
@@ -19,138 +19,81 @@
 	<FileMoveItemModal
 		ref="moveItemModal"
 		:item="selectedItem"
-		:current-path="ctx.currentPath.value"
+		:current-path="selectedItem ? parentDirectory(selectedItem.path) : ctx.currentFile.value.path"
 		@move="handleMoveItem"
 	/>
 	<FileDeleteItemModal ref="deleteItemModal" :item="selectedItem" @delete="handleDeleteItem" />
 	<ContextMenu ref="contextMenuRef" :label="formatMessage(commonMessages.actionsLabel)" />
-	<div v-if="!(ctx.loading.value && items.length === 0)" class="contents">
-		<div class="relative flex w-full flex-col">
-			<div class="relative isolate flex w-full flex-col gap-4">
-				<FileNavbar
-					:breadcrumbs="breadcrumbSegments"
-					:is-editing="isEditing"
-					:editing-file-name="ctx.editingFile.value?.name"
-					:editing-file-path="ctx.editingFile.value?.path"
-					:is-editing-image="fileEditorRef?.isEditingImage"
-					:is-editor-find-open="fileEditorRef?.isFindOpen"
-					:search-query="searchQuery"
-					:show-refresh-button="showRefreshButton"
-					:show-install-from-url="ctx.showInstallFromUrl"
-					:base-id="baseId"
-					:disabled="isBusy"
-					:disabled-tooltip="busyTooltip"
-					@navigate="navigateToSegment"
-					@navigate-home="() => navigateToSegment(-1)"
-					@prefetch-home="handlePrefetchHome"
-					@update:search-query="searchQuery = $event"
-					@create="showCreateModal"
-					@upload="initiateFileUpload"
-					@upload-zip="() => {}"
-					@unzip-from-url="showUnzipFromUrlModal"
-					@refresh="ctx.refresh"
-					@share="() => fileEditorRef?.shareToMclogs()"
-					@find="() => fileEditorRef?.toggleFind()"
-				/>
 
-				<div v-if="!isEditing">
-					<FileUploadDragAndDrop
-						ref="fileUploadRef"
-						class="@container relative flex flex-col overflow-clip rounded-[20px] border border-solid border-surface-4 shadow-sm"
-						:disabled="isBusy"
-						@drop-error="handleDropError"
-						@files-dropped="handleDroppedFiles"
-					>
-						<FileTableHeader
-							:sort-field="sortField"
-							:sort-desc="sortDescValue"
-							:all-selected="allSelected"
-							:some-selected="someSelected"
-							:is-stuck="isLabelBarStuck"
-							@sort="handleSort"
-							@toggle-all="toggleSelectAll"
-						/>
-						<div
-							v-if="filteredItems.length > 0"
-							ref="virtualListContainer"
-							class="relative w-full"
-							:style="{ minHeight: `${totalHeight}px`, overflowAnchor: 'none' }"
-						>
-							<div class="absolute w-full" :style="{ top: `${visibleTop}px` }">
-								<FileTableRow
-									v-for="(item, idx) in visibleItems"
-									:key="item.path"
-									:count="item.count"
-									:created="item.created"
-									:modified="item.modified"
-									:name="item.name"
-									:path="item.path"
-									:type="item.type"
-									:size="item.size"
-									:index="visibleRange.start + idx"
-									:is-last="visibleRange.start + idx === filteredItems.length - 1"
-									:selected="selectedItems.has(item.path)"
-									:write-disabled="isBusy || !!ctx.isReadOnly?.(item.path)"
-									:write-disabled-tooltip="
-										ctx.isReadOnly?.(item.path) ? ctx.readOnlyReason?.value : busyTooltip
-									"
-									@extract="() => handleExtractItem(item)"
-									@delete="() => showDeleteModal(item)"
-									@rename="() => showRenameModal(item)"
-									@download="() => handleDownload(item)"
-									@zip="() => handleZip(item)"
-									@move="() => showMoveModal(item)"
-									@move-direct-to="handleDirectMove"
-									@edit="() => handleEditFile(item)"
-									@navigate="() => handleNavigateToFolder(item)"
-									@hover="() => handleItemHover(item)"
-									@contextmenu="
-										(event, options) => contextMenuRef?.open(event as MouseEvent, options)
-									"
-									@toggle-select="() => toggleItemSelection(item.path)"
-								/>
-							</div>
-						</div>
-						<div
-							v-else-if="items.length === 0 && !ctx.error.value"
-							class="flex h-full w-full items-center justify-center rounded-b-[20px] bg-surface-2 p-20"
-						>
-							<div class="flex flex-col items-center gap-4 text-center">
-								<FolderOpenIcon class="h-16 w-16 text-secondary" />
-								<h3 class="m-0 text-2xl font-bold text-contrast">
-									{{ formatMessage(messages.emptyFolderTitle) }}
-								</h3>
-								<p class="m-0 text-sm text-secondary">
-									{{ formatMessage(messages.emptyFolderDescription) }}
-								</p>
-							</div>
-						</div>
-						<FileManagerError
-							v-else-if="ctx.error.value"
-							class="rounded-b-[20px]"
-							:title="formatMessage(messages.errorTitle)"
-							:message="formatMessage(messages.errorMessage)"
-							@refetch="ctx.refresh"
-							@home="navigateToSegment(-1)"
-						/>
-					</FileUploadDragAndDrop>
+	<div v-if="hasLoadedOnce" ref="fileViewer">
+		<div
+			class="grid items-start"
+			:class="{ 'cursor-col-resize select-none': isResizingSidebar }"
+			:style="{
+				gridTemplateColumns: showDockedSidebar
+					? `${sidebarWidth}px auto minmax(0, 1fr)`
+					: 'minmax(0, 1fr)',
+			}"
+		>
+			<template v-if="showDockedSidebar">
+				<aside
+					class="sticky top-[var(--files-sticky-top,0px)] flex max-h-[calc(var(--files-viewport-height,100dvh)_-_var(--files-sticky-top,0px))] flex-col"
+				>
+					<FileSideBar class="min-h-0" fill-height :add-border="false" />
+				</aside>
+				<div
+					role="separator"
+					tabindex="0"
+					aria-orientation="vertical"
+					:aria-label="formatMessage(messages.resizeSidebar)"
+					:aria-valuenow="sidebarWidth"
+					:aria-valuemin="SIDEBAR_MIN_WIDTH"
+					:aria-valuemax="maxSidebarWidth"
+					class="group flex w-3 cursor-col-resize touch-none justify-center self-stretch focus-visible:outline-none"
+					@pointerdown="startSidebarResize"
+					@keydown.left.prevent="nudgeSidebarWidth(-16)"
+					@keydown.right.prevent="nudgeSidebarWidth(16)"
+					@dblclick="resetSidebarWidth"
+				>
+					<div
+						class="h-full w-px bg-surface-5 transition-colors group-hover:bg-brand group-focus-visible:bg-brand"
+						:class="{ '!bg-brand': isResizingSidebar }"
+					/>
 				</div>
-				<FileEditor
-					v-else
-					ref="fileEditorRef"
-					:file="ctx.editingFile.value"
-					:editor-component="editorComponent"
-					@close="handleEditorClose"
-				/>
+			</template>
+			<div ref="mainColumn" class="min-w-0">
+				<FileBrowserPanel :small-mode="smallMode" />
 			</div>
 		</div>
+		<template v-if="smallMode && advancedView">
+			<NewModal
+				ref="sidebarModal"
+				:on-hide="() => (sidebarModalOpen = false)"
+				:noblur="true"
+				:no-padding="true"
+				:hide-header="true"
+				:fill-width-when-small="false"
+				:max-width="fullWidthSidebar ? '100dvw' : 'fit-content'"
+				:max-width-min-check="false"
+				:scrollable="false"
+				pullout-direction="left"
+			>
+				<div class="p-2 h-full" :class="[fullWidthSidebar ? 'w-full' : '']">
+					<FileSideBar
+						:constrain-width="!fullWidthSidebar"
+						:scroll-file-entries="true"
+						:add-border="false"
+					/>
+				</div>
+			</NewModal>
+		</template>
 
 		<FloatingActionBar :shown="hasUnsavedChanges">
 			<p class="m-0 text-sm font-semibold md:text-base">
 				{{ formatMessage(messages.unsavedChanges) }}
 			</p>
 			<div class="ml-auto flex gap-2">
-				<Button type="quiet" @click="fileEditorRef?.revertChanges()">
+				<Button type="quiet" @click="revertChanges()">
 					<HistoryIcon /> {{ formatMessage(commonMessages.resetButton) }}
 				</Button>
 				<Button
@@ -158,7 +101,7 @@
 					type="colored"
 					color="brand"
 					:disabled="isBusy"
-					@click="fileEditorRef?.saveFileContent(false)"
+					@click="saveFileContent(false)"
 				>
 					<SaveIcon /> {{ formatMessage(commonMessages.saveButton) }}
 				</Button>
@@ -177,9 +120,15 @@
 			<div class="ml-auto flex items-center gap-0.5">
 				<Button
 					v-if="ctx.zipPaths"
-					v-tooltip="busyTooltip"
+					v-tooltip="
+						isBusy
+							? busyTooltip
+							: selectionParent === null
+								? formatMessage(messages.zipMixedFolders)
+								: undefined
+					"
 					type="quiet"
-					:disabled="isBusy"
+					:disabled="isBusy || selectionParent === null"
 					@click="createZipModal?.show()"
 				>
 					<FolderArchiveIcon />
@@ -203,31 +152,32 @@
 </template>
 
 <script setup lang="ts">
-import {
-	FolderArchiveIcon,
-	FolderOpenIcon,
-	HistoryIcon,
-	SaveIcon,
-	TrashIcon,
-} from '@modrinth/assets'
+import { FolderArchiveIcon, HistoryIcon, SaveIcon, TrashIcon } from '@modrinth/assets'
+import { type MaybeElement, useLocalStorage, useResizeObserver } from '@vueuse/core'
 import type { Component } from 'vue'
-import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, shallowRef, toValue, watch } from 'vue'
 
+import { type ButtonMenuOption, NewModal } from '#ui/components'
 import { Button, ContextMenu } from '#ui/components/base/buttons'
 import FloatingActionBar from '#ui/components/base/FloatingActionBar.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { useStickyObserver } from '#ui/composables/sticky-observer'
-import { useVirtualScroll } from '#ui/composables/virtual-scroll'
+import { useFileTabs } from '#ui/layouts/shared/files-tab/composables/file-tabs.ts'
+import {
+	childPath,
+	infoFrom,
+	isWithinPath,
+	parentDirectory,
+	parentInfoFrom,
+	relocateInfo,
+} from '#ui/layouts/shared/files-tab/utils.ts'
 import { injectFilePicker } from '#ui/providers/file-picker'
+import { injectPageContext } from '#ui/providers/page-context'
 import { injectNotificationManager } from '#ui/providers/web-notifications'
 import { commonMessages } from '#ui/utils/common-messages'
 import { canOpenInFileEditor } from '#ui/utils/file-extensions'
 
-import FileEditor from './components/editor/FileEditor.vue'
-import FileManagerError from './components/FileManagerError.vue'
-import FileNavbar from './components/FileNavbar.vue'
-import FileTableHeader from './components/FileTableHeader.vue'
-import FileTableRow from './components/FileTableRow.vue'
+import FileBrowserPanel from './components/FileBrowserPanel.vue'
+import FileSideBar from './components/FileSideBar.vue'
 import FileCreateItemModal from './components/modals/FileCreateItemModal.vue'
 import FileCreateZipModal from './components/modals/FileCreateZipModal.vue'
 import FileDeleteItemModal from './components/modals/FileDeleteItemModal.vue'
@@ -236,12 +186,13 @@ import FileRenameItemModal from './components/modals/FileRenameItemModal.vue'
 import FileUnsavedChangesModal from './components/modals/FileUnsavedChangesModal.vue'
 import FileUploadConflictModal from './components/modals/FileUploadConflictModal.vue'
 import FileUploadZipUrlModal from './components/modals/FileUploadZipUrlModal.vue'
-import FileUploadDragAndDrop from './components/upload/FileUploadDragAndDrop.vue'
 import { useFileSearch } from './composables/file-search'
 import { useFileSelection } from './composables/file-selection'
 import { useFileSorting } from './composables/file-sorting'
 import { useFileUndoRedo } from './composables/file-undo-redo'
-import { injectFileManager } from './providers/file-manager'
+import type { FileEditorBridge } from './providers/file-browser-ui'
+import { provideFileBrowserUI } from './providers/file-browser-ui'
+import { type FileInfo, injectFileManager } from './providers/file-manager'
 import type { FileItem } from './types'
 
 const { formatMessage } = useVIntl()
@@ -287,16 +238,50 @@ const messages = defineMessages({
 		id: 'files.layout.create-zip',
 		defaultMessage: 'Create ZIP',
 	},
+	resizeSidebar: {
+		id: 'files.layout.resize-sidebar',
+		defaultMessage: 'Resize sidebar',
+	},
+	zipMixedFolders: {
+		id: 'files.layout.zip-mixed-folders',
+		defaultMessage: 'Only entries from the same folder can be zipped together',
+	},
 })
 
-defineProps<{
-	showDebugInfo?: boolean
-	showRefreshButton?: boolean
-}>()
+const props = withDefaults(
+	defineProps<{
+		showDebugInfo?: boolean
+		showRefreshButton?: boolean
+		constrainWidth?: boolean
+		/**
+		 * Whether the sidebar search notes that it only covers folders opened so far. Hosts whose
+		 * `loadedEntries` cover the whole file system can turn it off.
+		 */
+		searchLoadedOnlyNotice?: boolean
+	}>(),
+	{ searchLoadedOnlyNotice: true },
+)
 
 const { addNotification } = injectNotificationManager()
 const ctx = injectFileManager()
 const filePicker = injectFilePicker(null)
+const pageContext = injectPageContext(null)
+
+const reworkEnabled = computed(() => pageContext?.featureFlags?.filesTabRework?.value ?? false)
+
+const advancedViewSetting = useLocalStorage('files-advanced-view', true, { initOnMounted: true })
+const coloredIconsSetting = useLocalStorage('files-colored-icons', reworkEnabled.value, {
+	initOnMounted: true,
+})
+/** The sidebar tree, tabs and column picker; behind the rework flag, then a user preference. */
+const advancedView = computed(() => reworkEnabled.value && advancedViewSetting.value)
+const coloredIcons = computed(() => coloredIconsSetting.value)
+
+/** Switching to the simple view drops the extra tabs, so their unsaved changes are confirmed first. */
+async function setAdvancedView(value: boolean) {
+	if (!value && !(await confirmDiscardEditors(fileTabs.editors.values()))) return
+	advancedViewSetting.value = value
+}
 
 const editorComponent = shallowRef<Component | null>(null)
 import('vue3-ace-editor').then(async (mod) => {
@@ -306,28 +291,45 @@ import('vue3-ace-editor').then(async (mod) => {
 
 const baseId = `files-${Math.random().toString(36).slice(2, 9)}`
 
-const items = computed(() => ctx.items.value)
-const isEditing = computed(() => ctx.editingFile.value !== null)
+const items = computed(() => ctx.directoryTree.get(ctx.currentDirectory.value).data.value)
+
+/**
+ * Only the very first load hides the viewer. Unmounting it on later navigations would tear down
+ * the tabs' dockview, and with it every other tab's open editor.
+ */
+const hasLoadedOnce = ref(false)
+watch(
+	() => {
+		const location = ctx.currentFile.value
+		const result =
+			location.type == 'directory'
+				? ctx.directoryTree.get<'directory'>(location as FileInfo<'directory'>).data
+				: null
+
+		return !(ctx.loading.value && result?.value.length === 0)
+	},
+	(loaded) => {
+		if (loaded) hasLoadedOnce.value = true
+	},
+	{ immediate: true },
+)
+const isEditing = computed(
+	() => ctx.currentFile.value !== null && ctx.currentFile.value.type == 'file',
+)
 const isBusy = computed(
-	() => (ctx.isBusy?.value ?? false) || (ctx.isReadOnly?.(ctx.currentPath.value) ?? false),
+	() => (ctx.isBusy?.value ?? false) || (ctx.isReadOnly?.(ctx.currentFile.value) ?? false),
 )
 const busyTooltip = computed(() =>
-	ctx.isReadOnly?.(ctx.currentPath.value) ? ctx.readOnlyReason?.value : ctx.busyTooltip?.value,
+	ctx.isReadOnly?.(ctx.currentFile.value) ? ctx.readOnlyReason?.value : ctx.busyTooltip?.value,
 )
 
-const breadcrumbSegments = computed(() => {
-	const path = ctx.currentPath.value
-	if (typeof path === 'string') {
-		return path.split('/').filter(Boolean)
-	}
-	return []
-})
+const activeLocation = computed(() => fileTabs.activeLocation.value)
 
 // Composables
 const { searchQuery, searchedItems } = useFileSearch(items)
 const {
 	sortField,
-	sortDesc: sortDescValue,
+	sortDesc,
 	handleSort,
 	sortedItems: filteredItems,
 	resetSort,
@@ -343,35 +345,55 @@ const {
 } = useFileSelection(filteredItems)
 
 const selectionReadOnly = computed(() =>
-	[...selectedItems.value].some((path) => ctx.isReadOnly?.(path)),
+	[...selectedItems.value.values()].some((file) => ctx.isReadOnly?.(file)),
 )
 
+/** The directory all selected entries share, or `null` when the selection is empty or spans directories. */
+const selectionParent = computed(() => {
+	const parents = new Set([...selectedItems.value.values()].map((item) => parentInfoFrom(item)))
+	return parents.size === 1 ? [...parents][0] : null
+})
+
 const { recordOperation, onKeydown } = useFileUndoRedo(
-	(path, newName) => ctx.renameItem(path, newName),
-	(source, dest) => ctx.moveItem(source, dest),
+	renameEntry,
+	moveEntry,
 	() => ctx.refresh(),
 	(title, text, type) => addNotification({ title, text, type }),
 )
 
-// Virtual scroll
-const {
-	listContainer: virtualListContainer,
-	totalHeight,
-	visibleRange,
-	visibleTop,
-	visibleItems,
-} = useVirtualScroll(filteredItems, {
-	itemHeight: 61,
-	bufferSize: 5,
+const fileTabs = useFileTabs({
+	ctx,
+	confirmDiscard: confirmDiscardEditors,
+	workspaceId: () => (advancedView.value ? (toValue(ctx.workspaceId) ?? null) : null),
+	enabled: advancedView,
 })
 
-// Sticky observer for the table header
-const fileUploadRef = ref<InstanceType<typeof FileUploadDragAndDrop>>()
-const fileUploadEl = computed(() => fileUploadRef.value?.$el as HTMLElement | null)
-const { isStuck: isLabelBarStuck } = useStickyObserver(fileUploadEl)
+const fileEditorApi = fileTabs.activeEditor
+const hasUnsavedChanges = fileTabs.hasUnsavedChanges
+
+function dirtyEditors(editors: Iterable<FileEditorBridge> = fileTabs.editors.values()) {
+	return [...editors].filter((editor) => editor.hasUnsavedChanges.value)
+}
+
+async function saveFileContent(exit = false) {
+	await Promise.all(dirtyEditors().map((editor) => editor.saveFileContent(exit)))
+}
+
+function revertChanges() {
+	for (const editor of dirtyEditors()) editor.revertChanges()
+}
+
+async function shareEditorToMclogs() {
+	await fileEditorApi.value?.shareToMclogs()
+}
+
+function toggleFind() {
+	fileEditorApi.value?.toggleFind()
+}
 
 // Refs
-const fileEditorRef = ref<InstanceType<typeof FileEditor>>()
+const fileViewer = ref<MaybeElement>()
+const sidebarModal = ref<InstanceType<typeof NewModal>>()
 const createItemModal = ref<InstanceType<typeof FileCreateItemModal>>()
 const createZipModal = ref<InstanceType<typeof FileCreateZipModal>>()
 const renameItemModal = ref<InstanceType<typeof FileRenameItemModal>>()
@@ -382,148 +404,250 @@ const uploadZipUrlModal = ref<InstanceType<typeof FileUploadZipUrlModal>>()
 const contextMenuRef = ref<InstanceType<typeof ContextMenu>>()
 
 const newItemType = ref<'file' | 'directory'>('file')
-const selectedItem = ref<FileItem | null>(null)
+const selectedItem = ref<FileInfo | null>(null)
 
 const unsavedChangesModal = ref<InstanceType<typeof FileUnsavedChangesModal>>()
 
-const hasUnsavedChanges = computed(() => fileEditorRef.value?.hasUnsavedChanges ?? false)
+const mainColumn = ref<MaybeElement>()
 
-async function confirmDiscardChanges(): Promise<boolean> {
-	if (!hasUnsavedChanges.value) return true
+const SIDEBAR_MIN_WIDTH = 240
+const SIDEBAR_DEFAULT_WIDTH = 300
+
+const browserMinSize = computed(() => (props.constrainWidth ? 700 : 1200))
+
+/** Whether the docked sidebar is open, remembered across visits. */
+const sidebarOpenSetting = useLocalStorage('file-layout-sidebar-open', false, {
+	initOnMounted: true,
+})
+const sidebarWidthSetting = useLocalStorage('file-layout-sidebar-width', SIDEBAR_DEFAULT_WIDTH, {
+	initOnMounted: true,
+})
+/** The pullout sidebar used in small mode is transient, so it doesn't touch the saved setting. */
+const sidebarModalOpen = ref(false)
+
+const sidebarOpen = computed(() =>
+	smallMode.value ? sidebarModalOpen.value : sidebarOpenSetting.value,
+)
+
+function setSidebarOpen(value: boolean) {
+	if (smallMode.value) {
+		sidebarModalOpen.value = value
+	} else {
+		sidebarOpenSetting.value = value
+	}
+}
+
+watch(sidebarModalOpen, (value) => {
+	if (value) {
+		sidebarModal.value?.show()
+	} else {
+		sidebarModal.value?.hide()
+	}
+})
+
+/** Width of the whole files tab, used to pick between the docked sidebar and the pullout modal. */
+const shellWidth = ref<number>()
+/** Width of the main column, i.e. what `FileBrowserPanel` actually gets next to the sidebar. */
+const containerWidth = ref<number>()
+
+useResizeObserver(fileViewer, (entries) => {
+	shellWidth.value = entries[0].contentRect.width
+})
+
+useResizeObserver(mainColumn, (entries) => {
+	containerWidth.value = entries[0].contentRect.width
+})
+
+const smallMode = computed(() => shellWidth.value == null || shellWidth.value < 1100)
+const fullWidthSidebar = computed(() => shellWidth.value == null || shellWidth.value < 400)
+const showDockedSidebar = computed(
+	() => advancedView.value && !smallMode.value && sidebarOpenSetting.value,
+)
+
+const maxSidebarWidth = computed(() =>
+	Math.max(SIDEBAR_MIN_WIDTH, (shellWidth.value ?? 0) - browserMinSize.value),
+)
+
+function clampSidebarWidth(width: number) {
+	return Math.round(Math.min(Math.max(width, SIDEBAR_MIN_WIDTH), maxSidebarWidth.value))
+}
+
+const sidebarWidth = computed(() => clampSidebarWidth(sidebarWidthSetting.value))
+const isResizingSidebar = ref(false)
+
+function startSidebarResize(event: PointerEvent) {
+	if (event.button !== 0) return
+	event.preventDefault()
+
+	const handle = event.currentTarget as HTMLElement
+	const startX = event.clientX
+	const startWidth = sidebarWidth.value
+
+	handle.setPointerCapture(event.pointerId)
+	isResizingSidebar.value = true
+
+	function onMove(moveEvent: PointerEvent) {
+		sidebarWidthSetting.value = clampSidebarWidth(startWidth + moveEvent.clientX - startX)
+	}
+
+	function onEnd() {
+		isResizingSidebar.value = false
+		handle.removeEventListener('pointermove', onMove)
+		handle.removeEventListener('pointerup', onEnd)
+		handle.removeEventListener('pointercancel', onEnd)
+	}
+
+	handle.addEventListener('pointermove', onMove)
+	handle.addEventListener('pointerup', onEnd)
+	handle.addEventListener('pointercancel', onEnd)
+}
+
+function nudgeSidebarWidth(delta: number) {
+	sidebarWidthSetting.value = clampSidebarWidth(sidebarWidth.value + delta)
+}
+
+function resetSidebarWidth() {
+	sidebarWidthSetting.value = SIDEBAR_DEFAULT_WIDTH
+}
+
+watch(smallMode, (value) => {
+	if (!value) sidebarModalOpen.value = false
+})
+
+/**
+ * Prompts about any unsaved changes in the given editors.
+ * Resolves `true` once it is safe to discard them (saved, discarded, or nothing to lose).
+ */
+async function confirmDiscardEditors(editors: Iterable<FileEditorBridge>): Promise<boolean> {
+	const dirty = dirtyEditors(editors)
+	if (dirty.length === 0) return true
+
 	const result = await unsavedChangesModal.value?.prompt()
 	if (result === 'save') {
 		if (isBusy.value) return false
-		await fileEditorRef.value?.saveFileContent(false)
-		return true
+		await Promise.all(dirty.map((editor) => editor.saveFileContent(false)))
+		return dirty.every((editor) => !editor.hasUnsavedChanges.value)
 	}
 	return result === 'discard'
 }
 
-// Navigation
 async function navigateToSegment(index: number) {
-	const newPath = index === -1 ? '/' : breadcrumbSegments.value.slice(0, index + 1).join('/')
-
-	if (newPath === ctx.currentPath.value && !isEditing.value) {
-		return
-	}
-
-	if (isEditing.value) {
-		if (!(await confirmDiscardChanges())) return
-		ctx.stopEditing()
-	}
-
-	ctx.navigateTo(newPath)
+	await fileTabs.navigate(parentInfoFrom(activeLocation.value, index))
 }
 
-function handleNavigateToFolder(item: FileItem) {
-	const currentPath = ctx.currentPath.value
-	const newPath = currentPath.endsWith('/')
-		? `${currentPath}${item.name}`
-		: `${currentPath}/${item.name}`
-	ctx.navigateTo(newPath)
+async function navigateTo(file: FileInfo) {
+	await fileTabs.navigate(file)
 }
 
-// Editing
-function handleEditFile(item: { name: string; type: string; path: string }) {
-	ctx.startEditing({ name: item.name, path: item.path })
+function handleOpenInNewTab(item: FileInfo) {
+	if (item.type !== 'directory' && !canOpenInFileEditor(item.name)) return
+	fileTabs.openTab(item)
 }
 
 async function handleEditorClose() {
-	if (!(await confirmDiscardChanges())) return
-	ctx.stopEditing()
+	const location = fileTabs.activeLocation.value
+	if (location.type !== 'file') return
+	await fileTabs.navigate(parentInfoFrom(location))
 }
 
-// CRUD handlers
+/** Keeps the open tabs and the sidebar tree's expanded folders following a moved or renamed entry. */
+function followRelocation(from: FileInfo, to: FileInfo) {
+	fileTabs.relocate(from, to)
+	const expanded = ctx.directoryTree.expandedEntries
+	expanded.value = expanded.value.map(
+		(path) => relocateInfo(infoFrom(path), from.path, to.path).path,
+	)
+}
+
+/** Sends tabs within a deleted entry to its parent, and drops it from the tree's expanded folders. */
+function followDeletion(file: FileInfo) {
+	fileTabs.forget(file)
+	const expanded = ctx.directoryTree.expandedEntries
+	expanded.value = expanded.value.filter((path) => !isWithinPath(path, file.path))
+}
+
+/** Renames through the host without recording undo history, as undo/redo itself does. */
+async function renameEntry(file: FileInfo, newName: string) {
+	if (!(await fileTabs.confirmDiscardWithin([file.path]))) return null
+	const renamed = await ctx.renameItem(file, newName)
+	if (renamed) followRelocation(file, renamed)
+	return renamed
+}
+
+/** Moves through the host without recording undo history, as undo/redo itself does. */
+async function moveEntry(file: FileInfo, destination: string) {
+	if (!(await fileTabs.confirmDiscardWithin([file.path]))) return null
+	const moved = await ctx.moveItem(file, destination)
+	if (moved) followRelocation(file, moved)
+	return moved
+}
+
+async function createItem(name: string, type: 'file' | 'directory') {
+	if (isBusy.value) return null
+	return ctx.createItem(name, type)
+}
+
+async function renameItem(file: FileInfo, newName: string) {
+	if (isBusy.value) return null
+	const renamed = await renameEntry(file, newName)
+	if (renamed) recordOperation({ type: 'rename', prevFile: file, newFile: renamed })
+	return renamed
+}
+
+async function moveItem(file: FileInfo, destination: string) {
+	if (isBusy.value) return null
+	const moved = await moveEntry(file, destination)
+	if (moved) recordOperation({ type: 'move', prevFile: file, newFile: moved })
+	return moved
+}
+
+async function deleteItem(file: FileInfo, recursive: boolean) {
+	if (isBusy.value) return false
+	if (!(await fileTabs.confirmDiscardWithin([file.path]))) return false
+	const deleted = await ctx.deleteItem(file, recursive)
+	if (deleted) followDeletion(file)
+	return deleted
+}
+
 async function handleCreateNewItem(name: string) {
-	if (isBusy.value) return
-	await ctx.createItem(name, newItemType.value)
+	await createItem(name, newItemType.value)
 }
 
 async function handleRenameItem(newName: string) {
-	if (isBusy.value) return
 	const item = selectedItem.value
 	if (!item) return
-
-	const path = `${ctx.currentPath.value}/${item.name}`.replace('//', '/')
-	await ctx.renameItem(path, newName)
-	recordOperation({
-		type: 'rename',
-		itemType: item.type,
-		fileName: item.name,
-		path: ctx.currentPath.value,
-		oldName: item.name,
-		newName,
-	})
+	await renameItem(item, newName)
 }
 
 async function handleMoveItem(destination: string) {
-	if (isBusy.value) return
 	const item = selectedItem.value
 	if (!item) return
-
-	const sourcePath = ctx.currentPath.value
-	const source = `${sourcePath}/${item.name}`.replace('//', '/')
-	const dest = `${destination}/${item.name}`.replace('//', '/')
-
-	await ctx.moveItem(source, dest)
-	recordOperation({
-		type: 'move',
-		sourcePath,
-		destinationPath: destination,
-		fileName: item.name,
-		itemType: item.type,
-	})
+	await moveItem(item, childPath(destination, item.name))
 }
 
-function handleDeleteItem() {
-	if (isBusy.value) return
+async function handleDeleteItem() {
 	const item = selectedItem.value
 	if (!item) return
-
-	const path = `${ctx.currentPath.value}/${item.name}`.replace('//', '/')
-	ctx.deleteItem(path, item.type === 'directory')
+	await deleteItem(item, item.type === 'directory')
 }
 
-function handleDirectMove(moveData: {
-	name: string
-	type: string
-	path: string
-	destination: string
-}) {
-	if (isBusy.value) return
-	const dest = `${moveData.destination}/${moveData.name}`.replace('//', '/')
-	const sourcePath = moveData.path.substring(0, moveData.path.lastIndexOf('/'))
-
-	ctx.moveItem(moveData.path, dest).then(() => {
-		recordOperation({
-			type: 'move',
-			sourcePath,
-			destinationPath: moveData.destination,
-			fileName: moveData.name,
-			itemType: moveData.type,
-		})
-	})
-}
-
-// Download
-async function handleDownload(item: FileItem) {
-	if (item.type === 'file') {
-		await ctx.downloadFile(item.path, item.name)
+async function downloadFile(file: FileInfo) {
+	if (file.type === 'file') {
+		await ctx.downloadFile(file)
 	}
 }
 
-async function handleZip(item: FileItem) {
-	if (isBusy.value || item.type !== 'directory' || !ctx.zipFolder) return
-	await ctx.zipFolder(item.path)
+async function zipFolder(file: FileInfo) {
+	if (isBusy.value || file.type !== 'directory' || !ctx.zipFolder) return
+	await ctx.zipFolder(file as FileInfo<'directory'>)
 }
 
 async function handleZipSelection(target: string) {
-	if (isBusy.value || !ctx.zipPaths || selectedItems.value.size === 0) return
-	const include = items.value
-		.filter((item) => selectedItems.value.has(item.path))
-		.map((item) => item.name)
+	const parent = selectionParent.value
+	if (isBusy.value || !ctx.zipPaths || parent === null) return
+	const include = [...selectedItems.value.values()]
 	deselectAll()
-	await ctx.zipPaths(ctx.currentPath.value, include, target)
+	await ctx.zipPaths(include, parent, target)
 }
 
 // Extract
@@ -533,7 +657,7 @@ async function handleExtractItem(item: { name: string; type: string; path: strin
 		const dry = await ctx.extractFile(item.path, true, true)
 		if (dry) {
 			if (dry.conflicting_files.length === 0) {
-				handleExtractConfirm(item.path)
+				await handleExtractConfirm(item.path)
 			} else {
 				uploadConflictModal.value?.show(item.path, dry.conflicting_files)
 			}
@@ -580,40 +704,40 @@ function showUnzipFromUrlModal(cf: boolean) {
 	uploadZipUrlModal.value?.show(cf)
 }
 
-function showRenameModal(item: FileItem) {
-	if (isBusy.value || ctx.isReadOnly?.(item.path)) return
+function showRenameModal(item: FileInfo) {
+	if (isBusy.value || ctx.isReadOnly?.(item)) return
 	selectedItem.value = item
 	renameItemModal.value?.show(item)
 }
 
-function showMoveModal(item: FileItem) {
-	if (isBusy.value || ctx.isReadOnly?.(item.path)) return
+function showMoveModal(item: FileInfo) {
+	if (isBusy.value || ctx.isReadOnly?.(item)) return
 	selectedItem.value = item
 	moveItemModal.value?.show()
 }
 
-function showDeleteModal(item: FileItem) {
-	if (isBusy.value || ctx.isReadOnly?.(item.path)) return
+function showDeleteModal(item: FileInfo) {
+	if (isBusy.value || ctx.isReadOnly?.(item)) return
 	selectedItem.value = item
 	deleteItemModal.value?.show()
 }
 
-function showBulkDeleteModal() {
+async function showBulkDeleteModal() {
 	if (isBusy.value || selectionReadOnly.value) return
 	if (selectedItems.value.size === 0) return
 
-	const itemsToDelete = Array.from(selectedItems.value)
-	for (const path of itemsToDelete) {
-		const item = items.value.find((i) => i.path === path)
-		if (item) {
-			ctx.deleteItem(path, item.type === 'directory')
-		}
-	}
+	const files = [...selectedItems.value.values()]
+	if (!(await fileTabs.confirmDiscardWithin(files.map((file) => file.path)))) return
 	deselectAll()
+
+	await Promise.all(
+		files.map(async (file) => {
+			if (await ctx.deleteItem(file, file.type === 'directory')) followDeletion(file)
+		}),
+	)
 }
 
-// Upload
-function handleDroppedFiles(files: File[]) {
+function uploadFiles(files: File[]) {
 	if (isEditing.value || isBusy.value) return
 	ctx.uploadFiles(files)
 }
@@ -657,46 +781,110 @@ async function initiateFileUpload() {
 
 // Prefetch
 let prefetchTimeout: ReturnType<typeof setTimeout> | null = null
-let prefetchHomeTimeout: ReturnType<typeof setTimeout> | null = null
 
-function handleItemHover(item: { type: string; path: string; name: string }) {
+function handleItemPrefetch(item: Pick<FileItem, 'type' | 'path' | 'name'>) {
 	if (prefetchTimeout) {
 		clearTimeout(prefetchTimeout)
 		prefetchTimeout = null
 	}
 
-	if (item.type === 'directory') {
+	if (item.type === 'directory' || canOpenInFileEditor(item.name)) {
 		prefetchTimeout = setTimeout(() => {
-			const currentPath = ctx.currentPath.value
-			const navPath = currentPath.endsWith('/')
-				? `${currentPath}${item.name}`
-				: `${currentPath}/${item.name}`
-			ctx.prefetchDirectory?.(navPath)
-		}, 150)
-	} else if (canOpenInFileEditor(item.name)) {
-		prefetchTimeout = setTimeout(() => {
-			ctx.prefetchFile?.(item.path)
+			ctx.directoryTree.prefetch(item)
 		}, 150)
 	}
 }
 
-function handlePrefetchHome() {
-	if (prefetchHomeTimeout) {
-		clearTimeout(prefetchHomeTimeout)
-		prefetchHomeTimeout = null
-	}
-	prefetchHomeTimeout = setTimeout(() => {
-		ctx.prefetchDirectory?.('/')
-	}, 150)
+function handleHomePrefetch() {
+	handleItemPrefetch({ path: '/', type: 'directory', name: 'home' })
 }
 
-// Reset search/sort/selection on path change
+function handleContextMenu(event: MouseEvent, options: ButtonMenuOption[]) {
+	contextMenuRef.value?.open(event, options)
+}
+
+// Shared UI state/handlers for FileSideBar, FileBrowserPanel and the dockview-hosted editor
+// tabs. Dockview mounts tab panels itself (teleported, so still Vue descendants), which means
+// prop/emit/ref bindings can't reach them but provide/inject does. See providers/file-browser-ui.ts.
+provideFileBrowserUI({
+	...ctx,
+
+	baseId,
+	showDebugInfo: computed(() => props.showDebugInfo ?? false),
+	showRefreshButton: computed(() => props.showRefreshButton ?? false),
+	searchLoadedOnlyNotice: computed(() => props.searchLoadedOnlyNotice),
+	reworkEnabled,
+	advancedView,
+	setAdvancedView,
+	coloredIcons,
+	setColoredIcons: (value) => (coloredIconsSetting.value = value),
+
+	items,
+	filteredItems,
+	isEditing,
+	isBusy,
+	busyTooltip,
+	activeLocation,
+	sidebarOpen: computed(() => advancedView.value && sidebarOpen.value),
+	setSidebarOpen,
+	containerWidth,
+
+	searchQuery,
+	sortField,
+	sortDesc,
+	handleSort,
+
+	selectedItems,
+	toggleItemSelection,
+	deselectAll,
+	toggleSelectAll,
+	allSelected,
+	someSelected,
+
+	editorComponent,
+	fileTabs,
+	fileEditorApi,
+	hasUnsavedChanges,
+	saveFileContent,
+	revertChanges,
+	shareEditorToMclogs,
+	toggleFind,
+
+	navigateTo,
+	navigateToSegment,
+	handleOpenInNewTab,
+	handleEditorClose,
+	handleHomePrefetch,
+	handleItemPrefetch,
+
+	showCreateModal,
+	showRenameModal,
+	showMoveModal,
+	showDeleteModal,
+	showBulkDeleteModal,
+	showUnzipFromUrlModal,
+
+	createItem,
+	renameItem,
+	moveItem,
+	deleteItem,
+	downloadFile,
+	zipFolder: ctx.zipFolder ? zipFolder : undefined,
+	handleExtractItem,
+
+	uploadFiles,
+	handleDropError,
+	initiateFileUpload,
+
+	handleContextMenu,
+})
+
+// Reset search/sort on path change; selection spans directories, so it is kept
 watch(
-	() => ctx.currentPath.value,
+	() => ctx.currentFile.value,
 	() => {
 		searchQuery.value = ''
 		resetSort()
-		deselectAll()
 	},
 )
 

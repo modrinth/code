@@ -1,5 +1,7 @@
-import type { Ref } from 'vue'
+import type { ComputedRef, Ref } from 'vue'
 import { computed, ref, watch, watchEffect } from 'vue'
+
+import { useRemToPx } from '#ui/composables/use-rem-to-px.ts'
 
 export interface ScrollViewportOptions {
 	onScroll?: () => void
@@ -8,6 +10,7 @@ export interface ScrollViewportOptions {
 
 export interface VirtualScrollOptions {
 	itemHeight: number
+	itemUnit?: 'px' | 'rem'
 	bufferSize?: number
 	initialItemCount?: number
 	enabled?: Ref<boolean>
@@ -131,9 +134,13 @@ export function useScrollViewport(options: ScrollViewportOptions = {}) {
 	}
 }
 
-export function useVirtualScroll<T>(items: Ref<T[]>, options: VirtualScrollOptions) {
+// TODO: Add proper usage of returned itemHeight to have the single source of truth for what given
+// element height can be. Truly would be best to force component construction to require a method
+// that applies to automatically or allows you to apply it to better prevent from setting it?
+export function useVirtualScroll<T>(items: ComputedRef<T[]>, options: VirtualScrollOptions) {
 	const {
 		itemHeight,
+		itemUnit = 'px',
 		bufferSize = 5,
 		initialItemCount = 20,
 		enabled,
@@ -153,7 +160,11 @@ export function useVirtualScroll<T>(items: Ref<T[]>, options: VirtualScrollOptio
 		onScroll: checkNearEnd,
 	})
 
-	const totalHeight = computed(() => items.value.length * itemHeight)
+	const { remToPx } = useRemToPx()
+
+	const height = itemUnit == 'rem' ? remToPx(itemHeight) : computed(() => itemHeight)
+
+	const totalHeight = computed(() => items.value.length * height.value)
 
 	const visibleRange = computed(() => {
 		if (enabled && !enabled.value) {
@@ -164,8 +175,8 @@ export function useVirtualScroll<T>(items: Ref<T[]>, options: VirtualScrollOptio
 			return { start: 0, end: Math.min(items.value.length, initialItemCount) }
 		}
 
-		const start = Math.floor(relativeScrollTop.value / itemHeight)
-		const visibleCount = Math.ceil(viewportHeight.value / itemHeight)
+		const start = Math.floor(relativeScrollTop.value / height.value)
+		const visibleCount = Math.ceil(viewportHeight.value / height.value)
 		const rangeSize = visibleCount + bufferSize * 2
 
 		const rangeStart = Math.min(
@@ -181,7 +192,7 @@ export function useVirtualScroll<T>(items: Ref<T[]>, options: VirtualScrollOptio
 	})
 
 	const visibleTop = computed(() =>
-		enabled && !enabled.value ? 0 : visibleRange.value.start * itemHeight,
+		enabled && !enabled.value ? 0 : visibleRange.value.start * height.value,
 	)
 
 	const visibleItems = computed(() =>
@@ -192,7 +203,8 @@ export function useVirtualScroll<T>(items: Ref<T[]>, options: VirtualScrollOptio
 		if (index < 0 || index >= items.value.length) return
 		syncScrollState()
 		if (!listContainer.value || !scrollContainer.value) return
-		const top = containerOffset.value + index * itemHeight - (viewportHeight.value - itemHeight) / 2
+		const top =
+			containerOffset.value + index * height.value - (viewportHeight.value - height.value) / 2
 		scrollContainer.value.scrollTo({ top: Math.max(0, top), behavior: 'instant' })
 		syncScrollState()
 	}
@@ -215,6 +227,7 @@ export function useVirtualScroll<T>(items: Ref<T[]>, options: VirtualScrollOptio
 	return {
 		listContainer,
 		totalHeight,
+		itemHeight: `${itemHeight} ${itemUnit}`,
 		visibleRange,
 		visibleTop,
 		visibleItems,

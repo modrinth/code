@@ -47,8 +47,13 @@ export function useFileSorting(items: Ref<FileItem[]>) {
 				case 'created':
 					return sortDesc.value ? a.created - b.created : b.created - a.created
 				case 'size': {
-					const aValue = (a.type === 'directory' ? a.count : a.size) ?? 0
-					const bValue = (b.type === 'directory' ? b.count : b.size) ?? 0
+					const aValue = (a.type === 'directory' ? 0 : a.size) ?? 0
+					const bValue = (b.type === 'directory' ? 0 : b.size) ?? 0
+					return sortDesc.value ? aValue - bValue : bValue - aValue
+				}
+				case 'items': {
+					const aValue = (a.type === 'directory' ? a.count : 0) ?? 0
+					const bValue = (b.type === 'directory' ? b.count : 0) ?? 0
 					return sortDesc.value ? aValue - bValue : bValue - aValue
 				}
 				default:

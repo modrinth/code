@@ -104,6 +104,7 @@ pub enum FeatureFlag {
     ServerProjectQa,
     I18nDebug,
     LocalhostSignIn,
+    FilesTabRework,
 }
 
 impl Settings {
