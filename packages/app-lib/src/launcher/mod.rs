@@ -1199,7 +1199,7 @@ pub async fn launch_minecraft(
 			&instance.id, &state.pool,
 		)
 		.await?
-		.ok_or_else(|| crate::state::content_store::input("unknown instance"))?;
+		.ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
     if current.install_stage != InstanceInstallStage::Installed {
         bail!(ErrorKind::LauncherError(
 			"instance is not ready to launch; finish or recover its installation first".to_string(),

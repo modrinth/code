@@ -66,14 +66,11 @@ fn reserve_target(
         } => instance_id,
         InstallTarget::NewInstance { instance_id: None } => return Ok(None),
     };
-    target_lock(instance_id)
-        .try_lock_owned()
-        .map(Some)
-        .map_err(|_| {
-            crate::state::content_store::input(
-                "this instance already has an active install job",
-            )
-        })
+    target_lock(instance_id).try_lock_owned().map(Some).context(
+        ErrorKind::InputError(
+            "this instance already has an active install job".to_string(),
+        ),
+    )
 }
 
 pub async fn create_instance(
@@ -126,8 +123,8 @@ pub async fn bulk_update_content(
     updates: Vec<super::model::ContentUpdateSelection>,
 ) -> crate::Result<InstallJobSnapshot> {
     if updates.is_empty() {
-        return Err(crate::state::content_store::input(
-            "no content selected to update",
+        bail!(ErrorKind::InputError(
+            "no content selected to update".to_string(),
         ));
     }
     start(InstallRequest::BulkUpdateContent {
@@ -1593,8 +1590,8 @@ async fn prepare_existing_rollback(
     if matches!(job_state.request, InstallRequest::BulkUpdateContent { .. })
         && instance.instance.install_stage != InstanceInstallStage::Installed
     {
-        return Err(crate::state::content_store::input(
-            "this instance is not ready to update content",
+        bail!(ErrorKind::InputError(
+            "this instance is not ready to update content".to_string(),
         ));
     }
     let install_stage = instance.instance.install_stage;
@@ -1656,8 +1653,9 @@ async fn lock_install_target(
 async fn lock_instance(instance_id: &str, state: &State) -> crate::Result<()> {
     let _content_lock = state.lock_instance_content(instance_id).await;
     if crate::state::instance_has_running_process(instance_id, state).await? {
-        return Err(crate::state::content_store::input(
-            "stop this instance before installing or updating its content",
+        bail!(ErrorKind::InputError(
+            "stop this instance before installing or updating its content"
+                .to_string(),
         ));
     }
     crate::state::instances::commands::set_instance_install_stage(

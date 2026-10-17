@@ -240,8 +240,9 @@ pub(crate) async fn ensure_no_pending_recovery(
             && Some(job.id) != except_job
             && job.needs_recovery()
     }) {
-        return Err(crate::state::content_store::input(
-            "retry the failed installation to recover this instance before changing its content",
+        bail!(ErrorKind::InputError(
+            "retry the failed installation to recover this instance before changing its content"
+                .to_string(),
         ));
     }
     Ok(())
@@ -517,8 +518,9 @@ pub async fn complete_success(
 pub async fn dismiss(id: Uuid, app_state: &State) -> crate::Result<()> {
     let job = get_required(id, app_state).await?;
     if job.instance_id.is_some() && job.needs_recovery() {
-        return Err(crate::state::content_store::input(
-            "recover or delete this instance before dismissing its failed installation",
+        bail!(ErrorKind::InputError(
+            "recover or delete this instance before dismissing its failed installation"
+                .to_string(),
         ));
     }
     let id = id.to_string();

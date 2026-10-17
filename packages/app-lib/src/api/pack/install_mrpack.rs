@@ -294,7 +294,7 @@ pub(crate) async fn get_external_files_from_mrpack(
             if let Some(previous) =
                 destinations.insert(canonical, path.to_string())
             {
-                return Err(crate::state::content_store::input(format!(
+                bail!(crate::ErrorKind::InputError(format!(
                     "modpack content paths {previous} and {path} refer to the same file"
                 )));
             }
@@ -315,7 +315,7 @@ pub(crate) async fn get_external_files_from_mrpack(
             {
                 // Overrides may replace the same physical path, but must not change its enabled form.
                 if previous != path {
-                    return Err(crate::state::content_store::input(format!(
+                    bail!(crate::ErrorKind::InputError(format!(
                         "modpack content paths {previous} and {path} refer to the same file"
                     )));
                 }
@@ -927,11 +927,9 @@ async fn install_zipped_mrpack_files_with_reporter_inner(
                 ) {
                     let project_type =
                         ProjectType::get_from_parent_folder(&project_path)
-                            .ok_or_else(|| {
-                                crate::state::content_store::input(
-                                    "unsupported content path",
-                                )
-                            })?;
+                            .ok_or(crate::ErrorKind::InputError(
+                                "unsupported content path".to_string(),
+                            ))?;
                     let file_info =
                         project.hashes.get(&PackFileHash::Sha1).and_then(
                             |hash| content_context.file_infos_by_hash.get(hash),

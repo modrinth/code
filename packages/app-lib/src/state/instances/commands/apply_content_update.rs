@@ -411,29 +411,24 @@ pub(crate) async fn plan_bulk_update(
         if !updateable_paths.contains(&selection.project_path)
             || !paths.insert(&selection.project_path)
         {
-            return Err(crate::state::content_store::input(
-                "selected content cannot be updated",
+            bail!(ErrorKind::InputError(
+                "selected content cannot be updated".to_string(),
             ));
         }
         let project = installed
             .iter()
             .find(|project| project.relative_path == selection.project_path)
-            .ok_or_else(|| {
-                crate::state::content_store::input(
-                    "selected content is no longer installed",
-                )
-            })?;
-        let project_id = project.project_id.clone().ok_or_else(|| {
-            crate::state::content_store::input(
-                "selected content has no Modrinth project",
-            )
-        })?;
+            .ok_or(ErrorKind::InputError(
+                "selected content is no longer installed".to_string(),
+            ))?;
+        let project_id =
+            project.project_id.clone().ok_or(ErrorKind::InputError(
+                "selected content has no Modrinth project".to_string(),
+            ))?;
         let current_version_id =
-            project.version_id.clone().ok_or_else(|| {
-                crate::state::content_store::input(
-                    "selected content has no Modrinth version",
-                )
-            })?;
+            project.version_id.clone().ok_or(ErrorKind::InputError(
+                "selected content has no Modrinth version".to_string(),
+            ))?;
         updates.push(ContentUpdate {
             project_id,
             relative_path: selection.project_path.clone(),
@@ -490,16 +485,15 @@ pub(crate) async fn plan_bulk_update(
         .map(|version| (version.id.clone(), version))
         .collect::<HashMap<_, _>>();
     for update in &updates {
-        let version = versions_by_id
-            .get(&update.update_version_id)
-            .ok_or_else(|| {
-                crate::state::content_store::input(
-                    "update version no longer exists",
-                )
-            })?;
+        let version = versions_by_id.get(&update.update_version_id).ok_or(
+            ErrorKind::InputError(
+                "update version no longer exists".to_string(),
+            ),
+        )?;
         if version.project_id != update.project_id {
-            return Err(crate::state::content_store::input(
-                "cannot update content to a different Modrinth project",
+            bail!(ErrorKind::InputError(
+                "cannot update content to a different Modrinth project"
+                    .to_string(),
             ));
         }
     }
@@ -574,13 +568,11 @@ pub(crate) async fn plan_bulk_update(
     let project_updates = updates_by_project
         .into_values()
         .map(|(update, duplicate_paths)| {
-            let version = versions_by_id
-                .get(&update.update_version_id)
-                .ok_or_else(|| {
-                    crate::state::content_store::input(
-                        "update version no longer exists",
-                    )
-                })?;
+            let version = versions_by_id.get(&update.update_version_id).ok_or(
+                ErrorKind::InputError(
+                    "update version no longer exists".to_string(),
+                ),
+            )?;
             Ok(PlannedProjectUpdate {
                 project_id: update.project_id,
                 relative_path: update.relative_path,
@@ -876,9 +868,10 @@ fn selected_file_size(version: &Version) -> crate::Result<u64> {
         .find(|file| file.primary)
         .or_else(|| version.files.first())
         .map(|file| u64::from(file.size))
-        .ok_or_else(|| {
-            crate::state::content_store::input("update version has no files")
-        })
+        .ok_or(
+            ErrorKind::InputError("update version has no files".to_string())
+                .into(),
+        )
 }
 
 fn validate_update_project(

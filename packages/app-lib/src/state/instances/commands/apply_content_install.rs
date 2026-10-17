@@ -9,6 +9,7 @@ use crate::state::{
 };
 use crate::util::fetch::{self, DownloadMeta, DownloadReason};
 use crate::util::io;
+use anyhow::bail;
 use async_trait::async_trait;
 use bytes::Bytes;
 use modrinth_content_management::{
@@ -473,8 +474,8 @@ pub(crate) async fn add_downloaded_project_version_with_enabled(
     state: &State,
 ) -> crate::Result<String> {
     if !path_util::is_safe_file_name(&downloaded.file_name) {
-        return Err(crate::state::content_store::input(
-            "invalid project filename",
+        bail!(ErrorKind::InputError(
+            "invalid project filename".to_string()
         ));
     }
     let stored_file = downloaded.file.store_file(state).await?;
@@ -507,15 +508,12 @@ pub(crate) async fn add_project_from_path(
     project_type: Option<ProjectType>,
     state: &State,
 ) -> crate::Result<String> {
-    let file_name = path
-        .file_name()
-        .and_then(|name| name.to_str())
-        .ok_or_else(|| {
-            crate::state::content_store::input("invalid project filename")
-        })?;
+    let file_name = path.file_name().and_then(|name| name.to_str()).ok_or(
+        ErrorKind::InputError("invalid project filename".to_string()),
+    )?;
     if !path_util::is_safe_file_name(file_name) {
-        return Err(crate::state::content_store::input(
-            "invalid project filename",
+        bail!(ErrorKind::InputError(
+            "invalid project filename".to_string()
         ));
     }
     let project_type = match project_type {
@@ -558,8 +556,8 @@ pub(crate) async fn add_project_bytes(
     state: &State,
 ) -> crate::Result<String> {
     if !path_util::is_safe_file_name(file_name) {
-        return Err(crate::state::content_store::input(
-            "invalid project filename",
+        bail!(ErrorKind::InputError(
+            "invalid project filename".to_string()
         ));
     }
     let project_type = match project_type {
@@ -571,8 +569,8 @@ pub(crate) async fn add_project_bytes(
     if let Some(expected) = hash {
         crate::state::content_store::validate_digest(expected, 40)?;
         if sha1_smol::Sha1::from(&bytes[..]).hexdigest() != expected {
-            return Err(crate::state::content_store::input(
-                "content bytes do not match the expected hash",
+            bail!(ErrorKind::InputError(
+                "content bytes do not match the expected hash".to_string(),
             ));
         }
     }
@@ -616,8 +614,8 @@ pub(crate) async fn require_stopped_for_content(
         && crate::state::instance_has_running_process(instance_id, state)
             .await?
     {
-        return Err(crate::state::content_store::input(
-            "stop this instance before changing its mods",
+        bail!(ErrorKind::InputError(
+            "stop this instance before changing its mods".to_string(),
         ));
     }
     Ok(())

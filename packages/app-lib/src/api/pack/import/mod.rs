@@ -420,8 +420,8 @@ async fn copy_dotminecraft_with_reporter_inner(
         if crate::state::instance_has_running_process(&source.id, &state)
             .await?
         {
-            return Err(crate::state::content_store::input(
-                "stop the source instance before duplicating it",
+            bail!(ErrorKind::InputError(
+                "stop the source instance before duplicating it".to_string(),
             ));
         }
         let files = crate::state::instances::commands::sync_content_files(
@@ -436,7 +436,7 @@ async fn copy_dotminecraft_with_reporter_inner(
         };
         for file in files {
             if file.missing {
-                return Err(crate::state::content_store::input(format!(
+                bail!(ErrorKind::InputError(format!(
                     "restore or repair {} before duplicating this instance",
                     file.relative_path
                 )));
@@ -446,12 +446,10 @@ async fn copy_dotminecraft_with_reporter_inner(
                     FileContent::Stored { stored_file, .. } => stored_file,
                     FileContent::Unmanaged => continue,
                     FileContent::Damaged(_) => {
-                        return Err(crate::state::content_store::input(
-                            format!(
-                                "repair {} before duplicating this instance",
-                                file.relative_path
-                            ),
-                        ));
+                        bail!(ErrorKind::InputError(format!(
+                            "repair {} before duplicating this instance",
+                            file.relative_path
+                        )));
                     }
                 };
             managed_paths.insert(content_file_path(&file));
@@ -459,9 +457,9 @@ async fn copy_dotminecraft_with_reporter_inner(
                 crate::state::ProjectType::get_from_parent_folder(
                     &file.relative_path,
                 )
-                .ok_or_else(|| {
-                    crate::state::content_store::input("invalid content path")
-                })?;
+                .ok_or(ErrorKind::InputError(
+                    "invalid content path".to_string(),
+                ))?;
             let entry = entries.iter().find(|entry| {
                 entry.file_id.as_deref() == Some(file.id.as_str())
             });
@@ -535,11 +533,9 @@ async fn copy_dotminecraft_with_reporter_inner(
             let stored_file = state.content_store.store_file(&source).await?;
             let project_type =
                 crate::state::ProjectType::get_from_parent_folder(&relative)
-                    .ok_or_else(|| {
-                        crate::state::content_store::input(
-                            "invalid imported content path",
-                        )
-                    })?;
+                    .ok_or(ErrorKind::InputError(
+                        "invalid imported content path".to_string(),
+                    ))?;
             install_stored_file(
                 instance_id,
                 InstallContent {
@@ -556,7 +552,7 @@ async fn copy_dotminecraft_with_reporter_inner(
             .await?;
         } else {
             let target_instance = crate::state::instances::adapters::sqlite::instance_rows::get_instance_by_id(instance_id, &state.pool).await?
-				.ok_or_else(|| crate::state::content_store::input("unknown destination instance"))?;
+				.ok_or(ErrorKind::InputError("unknown destination instance".to_string()))?;
             let target = state
                 .content_store
                 .instance_path(&target_instance.path, &relative)
@@ -565,8 +561,8 @@ async fn copy_dotminecraft_with_reporter_inner(
                 .await
                 .is_ok_and(|metadata| metadata.file_type().is_symlink())
             {
-                return Err(crate::state::content_store::input(
-                    "import cannot overwrite a symbolic link",
+                bail!(ErrorKind::InputError(
+                    "import cannot overwrite a symbolic link".to_string(),
                 ));
             }
             let same_file = tokio::fs::try_exists(&target).await?

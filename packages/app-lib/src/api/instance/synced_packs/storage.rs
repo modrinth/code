@@ -1,11 +1,13 @@
 use super::{PackLibrary, SyncedPack};
+use crate::ErrorKind;
 use crate::state::content_store::{
-    StoredFileHandle, content_file_path, hash_file, input, validate_digest,
+    StoredFileHandle, content_file_path, hash_file, validate_digest,
     validate_instance_path, validate_relative,
 };
 use crate::state::instances::adapters::sqlite::{content_rows, instance_rows};
 use crate::state::{CachedEntry, State};
 use crate::util::io;
+use anyhow::bail;
 use bytes::Bytes;
 use std::path::PathBuf;
 
@@ -73,8 +75,8 @@ pub(super) async fn write_library(
 			).await {
 				Ok(Some(stored_file)) => stored_file,
 				Ok(None) | Err(_) if deferred => continue,
-				Ok(None) => return Err(input(
-					"a synced pack needs repair or re-import before its library can be saved",
+				Ok(None) => bail!(ErrorKind::InputError(
+					"a synced pack needs repair or re-import before its library can be saved".to_string(),
 				)),
 				Err(error) => return Err(error),
 			};
@@ -189,9 +191,10 @@ pub(super) async fn read_stored_file(
             tracing::debug!("Local synced-pack recovery deferred: {error}")
         }
     }
-    let version = pack.item.version.as_ref().ok_or_else(|| {
-        input("the synced pack is missing or damaged; repair or re-import it")
-    })?;
+    let version = pack.item.version.as_ref().ok_or(ErrorKind::InputError(
+        "the synced pack is missing or damaged; repair or re-import it"
+            .to_string(),
+    ))?;
     let version = CachedEntry::get_version(
         &version.id,
         None,
@@ -199,9 +202,10 @@ pub(super) async fn read_stored_file(
         &state.api_semaphore,
     )
     .await?
-    .ok_or_else(|| {
-        input("the synced pack's original version is unavailable; re-import it")
-    })?;
+    .ok_or(ErrorKind::InputError(
+        "the synced pack's original version is unavailable; re-import it"
+            .to_string(),
+    ))?;
     let file = version
         .files
         .iter()
@@ -209,11 +213,10 @@ pub(super) async fn read_stored_file(
             Some(hash) => file.hashes.get("sha512") == Some(hash),
             None => file.hashes.get("sha1") == Some(&pack.sha1),
         })
-        .ok_or_else(|| {
-            input(
-                "the synced pack's original file is unavailable; re-import it",
-            )
-        })?;
+        .ok_or(ErrorKind::InputError(
+            "the synced pack's original file is unavailable; re-import it"
+                .to_string(),
+        ))?;
     state
         .content_store
         .require_staging_space(u64::from(file.size))?;
@@ -396,7 +399,7 @@ async fn recover_legacy_pack(
             }
         }
     }
-    Err(input(format!(
+    bail!(ErrorKind::InputError(format!(
         "synced pack {} is missing or damaged; restore or re-import it to finish migration",
         pack.item.file_name
     )))
@@ -423,8 +426,9 @@ async fn import_matching_pack(
     }
     let stored_file = state.content_store.store_file(source).await?;
     if stored_file.metadata.sha512 != sha512 {
-        return Err(input(
-            "the synced pack changed while it was being migrated; retry after closing the instance",
+        bail!(ErrorKind::InputError(
+            "the synced pack changed while it was being migrated; retry after closing the instance"
+                .to_string(),
         ));
     }
     Ok(Some(stored_file))

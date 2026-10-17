@@ -1,14 +1,14 @@
 use super::content::get_projects;
 use super::get::get;
 use super::paths::get_full_path;
+use crate::ErrorKind;
 use crate::event::LoadingBarType;
 use crate::event::emit::{emit_loading, init_loading};
 use crate::pack::install_from::{
     EnvType, PackDependency, PackFile, PackFileHash, PackFormat,
 };
 use crate::state::content_store::{
-    FileContent, ReadableContent, content_file_path, input,
-    is_managed_content_path,
+    FileContent, ReadableContent, content_file_path, is_managed_content_path,
 };
 use crate::state::instances::adapters::sqlite::content_rows;
 use crate::state::{
@@ -177,9 +177,9 @@ pub async fn export_mrpack(
 ) -> crate::Result<()> {
     let state = State::get().await?;
     let destination = Path::new(&export_path);
-    let parent = destination.parent().ok_or_else(|| {
-        crate::state::content_store::input("invalid export destination")
-    })?;
+    let parent = destination.parent().ok_or(ErrorKind::InputError(
+        "invalid export destination".to_string(),
+    ))?;
     let parent = tokio::fs::canonicalize(parent).await?;
     let store = tokio::fs::canonicalize(state.directories.store_dir()).await?;
     let profiles =
@@ -190,8 +190,9 @@ pub async fn export_mrpack(
             .await
             .is_ok_and(|metadata| metadata.file_type().is_symlink())
     {
-        return Err(crate::state::content_store::input(
-            "export to a regular file outside the store and instance directories",
+        bail!(ErrorKind::InputError(
+            "export to a regular file outside the store and instance directories"
+                .to_string(),
         ));
     }
     let _permit: tokio::sync::SemaphorePermit =
@@ -531,7 +532,7 @@ async fn export_content(
                         )
                         .await?
                 {
-                    return Err(input(format!(
+                    bail!(ErrorKind::InputError(format!(
                         "{} was changed outside the app; resolve it before exporting",
                         file.relative_path
                     )));
@@ -539,7 +540,7 @@ async fn export_content(
                 return Ok(Some(ReadableContent::Stored(stored_file)));
             }
             FileContent::Damaged(_) => {
-                return Err(input(format!(
+                bail!(ErrorKind::InputError(format!(
                     "repair {} before exporting this instance",
                     file.relative_path
                 )));
@@ -569,7 +570,7 @@ fn pack_get_relative_path(
 ) -> crate::Result<SafeRelativeUtf8UnixPathBuf> {
     Ok(SafeRelativeUtf8UnixPathBuf::try_from(
         path.strip_prefix(instance_path)
-            .context(crate::ErrorKind::FSError(format!(
+            .context(ErrorKind::FSError(format!(
                 "path {path:?} does not correspond to an instance"
             )))?
             .components()

@@ -487,9 +487,7 @@ async fn ensure_instance_content_unlocked(
 
     let instance = instance_rows::get_instance_by_id(instance_id, &state.pool)
         .await?
-        .ok_or_else(|| {
-            crate::state::content_store::input("unknown instance")
-        })?;
+        .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
     ensure_installation_content_unlocked(instance.install_stage)
 }
 
@@ -514,8 +512,9 @@ pub(super) fn ensure_installation_content_unlocked(
         .try_with(|_| ())
         .is_err()
     {
-        return Err(crate::state::content_store::input(
-            "content cannot be changed while this instance is installing or updating",
+        bail!(ErrorKind::InputError(
+            "content cannot be changed while this instance is installing or updating"
+                .to_string(),
         ));
     }
     Ok(())

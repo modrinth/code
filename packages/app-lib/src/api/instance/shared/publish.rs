@@ -1071,9 +1071,9 @@ pub(super) async fn upload_external_files(
         let path = match &candidate.source {
             ExternalFileSource::InstanceFile(file_path) => {
                 let instance = crate::state::instances::adapters::sqlite::instance_rows::get_instance_by_path(instance_path, &state.pool).await?
-					.ok_or_else(|| crate::state::content_store::input("unknown instance"))?;
+					.ok_or(crate::ErrorKind::InputError("unknown instance".to_string()))?;
                 let file = crate::state::instances::adapters::sqlite::content_rows::get_instance_file_by_relative_path(&instance.id, file_path, &state.pool).await?
-					.ok_or_else(|| crate::state::content_store::input("shared content file is not registered"))?;
+					.ok_or(crate::ErrorKind::InputError("shared content file is not registered".to_string()))?;
                 state.content_store.read_path(&file, instance_path).await?
             }
             ExternalFileSource::ConfigBundle(path) => {

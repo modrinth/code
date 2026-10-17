@@ -1,6 +1,8 @@
+use crate::ErrorKind;
 use crate::state::State;
 use crate::state::instances::adapters::sqlite::instance_rows;
 use crate::util::io;
+use anyhow::bail;
 
 pub(crate) async fn remove_instance(
     instance_id: &str,
@@ -14,8 +16,8 @@ pub(crate) async fn remove_instance(
     let _store_lock = state.content_store.files_lock.lock().await;
     let _store_lease = state.content_store.lease().await;
     if crate::state::instance_has_running_process(instance_id, state).await? {
-        return Err(crate::state::content_store::input(
-            "stop this instance before removing it",
+        bail!(ErrorKind::InputError(
+            "stop this instance before removing it".to_string(),
         ));
     }
     state.content_store.recover(Some(instance_id)).await?;
