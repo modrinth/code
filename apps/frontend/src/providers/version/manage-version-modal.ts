@@ -107,6 +107,7 @@ export interface ManageVersionContextValue {
 	editingVersion: ComputedRef<boolean>
 	noEnvironmentProject: ComputedRef<boolean>
 	noDependenciesProject: ComputedRef<boolean>
+	versionNumberError: ComputedRef<VersionNumberError | null>
 
 	// Stage helpers
 	getNextLabel: (currentIndex?: number | null) => string
@@ -126,6 +127,11 @@ export interface ManageVersionContextValue {
 	handleCreateVersion: () => Promise<void>
 	handleSaveVersionEdits: () => Promise<void>
 }
+
+/** Must match `RE_URL_SAFE_RELAXED` in `apps/labrinth/src/util/validate.rs`. */
+const VERSION_NUMBER_REGEX = /^[a-zA-Z0-9!@$()`.+,_"-]+$/
+
+export type VersionNumberError = 'empty' | 'invalid'
 
 const PROJECT_TYPE_LOADERS: Record<string, readonly string[]> = {
 	mod: [
@@ -282,6 +288,13 @@ export function createManageVersionContext(
 
 	// Computed state
 	const editingVersion = computed(() => Boolean(draftVersion.value.version_id))
+
+	const versionNumberError = computed<VersionNumberError | null>(() => {
+		const versionNumber = draftVersion.value.version_number.trim()
+		if (!versionNumber) return 'empty'
+		if (!VERSION_NUMBER_REGEX.test(versionNumber)) return 'invalid'
+		return null
+	})
 
 	const visibleSuggestedDependencies = computed<SuggestedDependency[]>(() => {
 		const existingDeps = draftVersion.value.dependencies ?? []
@@ -779,6 +792,11 @@ export function createManageVersionContext(
 	)
 
 	// Submission handlers
+	function trimVersionText(version: Labrinth.Versions.v3.DraftVersion) {
+		version.version_number = version.version_number.trim()
+		version.name = version.name.trim()
+	}
+
 	async function handleCreateVersion() {
 		const version = toRaw(draftVersion.value)
 		const files = toRaw(filesToAdd.value)
@@ -787,6 +805,8 @@ export function createManageVersionContext(
 			notifyInvalidSupplementaryMrpack()
 			return
 		}
+
+		trimVersionText(version)
 
 		isSubmitting.value = true
 		isUploading.value = true
@@ -837,6 +857,8 @@ export function createManageVersionContext(
 		const version = toRaw(draftVersion.value)
 		const files = toRaw(filesToAdd.value)
 		const filesToDelete = toRaw(existingFilesToDelete.value)
+
+		trimVersionText(version)
 
 		isSubmitting.value = true
 
@@ -947,7 +969,7 @@ export function createManageVersionContext(
 		iconPosition: 'before',
 		iconClass: isSubmitting.value ? 'animate-spin' : undefined,
 		color: 'green',
-		disabled: isSubmitting.value,
+		disabled: isSubmitting.value || versionNumberError.value !== null,
 		onClick: () => handleSaveVersionEdits(),
 	})
 
@@ -982,6 +1004,7 @@ export function createManageVersionContext(
 		editingVersion,
 		noEnvironmentProject,
 		noDependenciesProject,
+		versionNumberError,
 
 		// Stage helpers
 		getNextLabel,
