@@ -64,12 +64,12 @@ async fn create_inner(
 
         crate::state::get_instance(&instance.id, &state.pool)
             .await?
-            .ok_or_else(|| {
+            .ok_or(
                 crate::ErrorKind::InputError(
-                    "Created instance could not be loaded".to_string(),
+                    "created instance could not be loaded".to_string(),
                 )
-                .into()
-            })
+                .into(),
+            )
     }
     .await;
 
@@ -100,7 +100,7 @@ pub async fn edit(
             instance_rows::get_instance_by_id(instance_id, &state.pool)
                 .await?
                 .ok_or_else(|| {
-                    crate::state::content_store::input("Unknown instance")
+                    crate::state::content_store::input("unknown instance")
                 })?;
         super::projects::ensure_installation_content_unlocked(
             instance.install_stage,
@@ -110,10 +110,7 @@ pub async fn edit(
 
     let instance = crate::state::get_instance(instance_id, &state.pool)
         .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError("Unknown instance".to_string())
-                .as_error()
-        })?;
+        .ok_or(crate::ErrorKind::InputError("unknown instance".to_string()))?;
 
     super::reconcile_instance_synced_options(instance_id).await?;
 

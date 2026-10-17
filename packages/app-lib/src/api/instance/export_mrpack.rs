@@ -16,6 +16,7 @@ use crate::state::{
     VersionEnvironment,
 };
 use crate::util::io::{self, IOError};
+use anyhow::{Context, anyhow, bail};
 use futures::{StreamExt, stream};
 use path_util::SafeRelativeUtf8UnixPathBuf;
 use serde::Serialize;
@@ -35,7 +36,7 @@ const DEFAULT_SELECTED_EXPORT_PATH_PREFIXES: &[&str] = &[
 ];
 const EXPORT_CANDIDATE_METADATA_CONCURRENCY: usize = 32;
 const EXPORT_COPY_BUFFER_SIZE: usize = 256 * 1024;
-const STANDARD_ZIP_FILE_SIZE_ERROR: &str = "Your modpack cannot be exported as it contains a file over the size limit of 4 GB";
+const STANDARD_ZIP_FILE_SIZE_ERROR: &str = "your modpack cannot be exported as it contains a file over the size limit of 4 GB";
 
 const NEVER_EXPORTABLE_PATH_PREFIXES: &[&str] = &[
     "profile.json",
@@ -177,7 +178,7 @@ pub async fn export_mrpack(
     let state = State::get().await?;
     let destination = Path::new(&export_path);
     let parent = destination.parent().ok_or_else(|| {
-        crate::state::content_store::input("Invalid export destination")
+        crate::state::content_store::input("invalid export destination")
     })?;
     let parent = tokio::fs::canonicalize(parent).await?;
     let store = tokio::fs::canonicalize(state.directories.store_dir()).await?;
@@ -190,16 +191,14 @@ pub async fn export_mrpack(
             .is_ok_and(|metadata| metadata.file_type().is_symlink())
     {
         return Err(crate::state::content_store::input(
-            "Export to a regular file outside the store and instance directories",
+            "export to a regular file outside the store and instance directories",
         ));
     }
     let _permit: tokio::sync::SemaphorePermit =
         state.io_semaphore.0.acquire().await?;
-    let metadata = get(instance_id).await?.ok_or_else(|| {
-        crate::ErrorKind::OtherError(format!(
-            "Tried to export a nonexistent instance {instance_id}!"
-        ))
-    })?;
+    let metadata = get(instance_id).await?.context(format!(
+        "tried to export a nonexistent instance {instance_id}"
+    ))?;
     let export_selection = ExportSelection::new(
         included_export_candidates,
         excluded_export_candidates,
@@ -304,10 +303,7 @@ pub async fn export_mrpack(
 
 fn ensure_standard_zip_file_size(size: u64) -> crate::Result<()> {
     if size > zip::ZIP64_BYTES_THR {
-        return Err(crate::ErrorKind::OtherError(
-            STANDARD_ZIP_FILE_SIZE_ERROR.to_string(),
-        )
-        .into());
+        bail!(STANDARD_ZIP_FILE_SIZE_ERROR);
     }
 
     Ok(())
@@ -544,7 +540,7 @@ async fn export_content(
             }
             FileContent::Damaged(_) => {
                 return Err(input(format!(
-                    "Repair {} before exporting this instance",
+                    "repair {} before exporting this instance",
                     file.relative_path
                 )));
             }
@@ -573,11 +569,9 @@ fn pack_get_relative_path(
 ) -> crate::Result<SafeRelativeUtf8UnixPathBuf> {
     Ok(SafeRelativeUtf8UnixPathBuf::try_from(
         path.strip_prefix(instance_path)
-            .map_err(|_| {
-                crate::ErrorKind::FSError(format!(
-                    "Path {path:?} does not correspond to an instance"
-                ))
-            })?
+            .context(crate::ErrorKind::FSError(format!(
+                "path {path:?} does not correspond to an instance"
+            )))?
             .components()
             .map(|c| c.as_os_str().to_string_lossy())
             .collect::<Vec<_>>()
@@ -636,10 +630,7 @@ pub async fn create_mrpack_json(
         }
         (ModLoader::Vanilla, _) => None,
         _ => {
-            return Err(crate::ErrorKind::OtherError(
-                "Loader version mismatch".to_string(),
-            )
-            .into());
+            bail!("loader version mismatch");
         }
     };
     dependencies.insert(
@@ -695,10 +686,9 @@ pub async fn create_mrpack_json(
                 path: match path.try_into() {
                     Ok(path) => path,
                     Err(_) => {
-                        return Some(Err(crate::ErrorKind::OtherError(
-                            "Invalid file path in project".into(),
-                        )
-                        .as_error()));
+                        return Some(Err(anyhow!(
+                            "invalid file path in project"
+                        )));
                     }
                 },
                 hashes,

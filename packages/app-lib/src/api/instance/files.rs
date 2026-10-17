@@ -36,7 +36,7 @@ async fn resolve(
     let path = normalized(path);
     let instance = instance_rows::get_instance_by_id(instance_id, &state.pool)
         .await?
-        .ok_or_else(|| input("Unknown instance"))?;
+        .ok_or_else(|| input("unknown instance"))?;
     let base = state
         .content_store
         .instance_path(&instance.path, "")
@@ -44,12 +44,12 @@ async fn resolve(
     if path.is_empty() {
         if writing {
             return Err(input(
-                "The instance directory cannot be changed in the Files tab",
+                "the instance directory cannot be changed in the Files tab",
             ));
         }
         if fs::symlink_metadata(&base).await?.file_type().is_symlink() {
             return Err(input(
-                "The instance directory must not be a symbolic link",
+                "the instance directory must not be a symbolic link",
             ));
         }
         return Ok(ReadableContent::Local(base));
@@ -62,7 +62,7 @@ async fn resolve(
             .is_some_and(|part| part.eq_ignore_ascii_case("mods"))
         {
             return Err(input(
-                "The mods folder is read-only in Files. Manage mods from the Content tab",
+                "the mods folder is read-only in Files; manage mods from the Content tab",
             ));
         }
         let prefix = format!("{}/", path.to_lowercase());
@@ -77,7 +77,7 @@ async fn resolve(
                     || file.relative_path.to_lowercase().starts_with(&prefix))
         }) {
             return Err(input(
-                "Managed content is read-only in Files. Use the Content tab",
+                "managed content is read-only in Files; use the Content tab",
             ));
         }
     }
@@ -192,11 +192,11 @@ pub async fn write_instance_file(
         .path()
         .to_path_buf();
     if create_only && fs::symlink_metadata(&destination).await.is_ok() {
-        return Err(input("A file already exists at this path"));
+        return Err(input("a file already exists at this path"));
     }
     let parent = destination
         .parent()
-        .ok_or_else(|| input("Invalid file destination"))?;
+        .ok_or_else(|| input("invalid file destination"))?;
     fs::create_dir_all(parent).await?;
     let parent = parent.to_path_buf();
     let temporary = tokio::task::spawn_blocking(move || {
@@ -247,7 +247,7 @@ pub async fn rename_instance_file(
     let source = resolve(&state, instance_id, source, true).await?;
     let destination = resolve(&state, instance_id, destination, true).await?;
     if fs::symlink_metadata(destination.path()).await.is_ok() {
-        return Err(input("The destination already exists"));
+        return Err(input("the destination already exists"));
     }
     fs::rename(source.path(), destination.path()).await?;
     Ok(())
@@ -283,7 +283,7 @@ pub async fn save_instance_file_as(
     let _files = state.content_store.files_lock.lock().await;
     let parent = destination
         .parent()
-        .ok_or_else(|| input("Invalid save destination"))?;
+        .ok_or_else(|| input("invalid save destination"))?;
     let canonical_parent = fs::canonicalize(parent).await?;
     let store = fs::canonicalize(state.directories.store_dir()).await?;
     let profiles = fs::canonicalize(state.directories.instances_dir()).await?;
@@ -291,14 +291,14 @@ pub async fn save_instance_file_as(
         || canonical_parent.starts_with(&profiles)
     {
         return Err(input(
-            "Save a copy outside the store and instance directories",
+            "save a copy outside the store and instance directories",
         ));
     }
     if fs::symlink_metadata(destination)
         .await
         .is_ok_and(|metadata| metadata.file_type().is_symlink())
     {
-        return Err(input("Cannot save over a symbolic link"));
+        return Err(input("cannot save over a symbolic link"));
     }
     let content = resolve(&state, instance_id, source, false).await?;
     fs::copy(content.path(), destination).await?;
