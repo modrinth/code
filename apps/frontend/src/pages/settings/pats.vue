@@ -204,6 +204,9 @@
 			</div>
 		</div>
 	</div>
+	<p v-if="!pats || pats.length === 0" class="offline text-center">
+		{{ formatMessage(messages.noPats) }}
+	</p>
 </template>
 <script setup>
 import { EditIcon, PlusIcon, SaveIcon, TrashIcon, XIcon } from '@modrinth/assets'
@@ -298,6 +301,10 @@ const messages = defineMessages({
 	create: {
 		id: 'settings.pats.action.create',
 		defaultMessage: 'Create a PAT',
+	},
+	noPats: {
+		id: 'settings.pats.nopats',
+		defaultMessage: "You don't have any personal access tokens yet.",
 	},
 })
 

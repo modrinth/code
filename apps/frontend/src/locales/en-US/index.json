@@ -6971,6 +6971,9 @@
   "settings.pats.modal.edit.title": {
     "message": "Edit personal access token"
   },
+  "settings.pats.nopats": {
+    "message": "You don't have any personal access tokens yet."
+  },
   "settings.pats.token.action.edit": {
     "message": "Edit token"
   },
