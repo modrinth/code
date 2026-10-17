@@ -214,13 +214,14 @@ async fn listen(
             listener
         }
         Err(error) => {
+            let cause = error.to_string();
             listen_socket_tx
                 .send(
                     Err(error).context("failed to bind auth code reply socket"),
                 )
                 .ok();
 
-            bail!("failed to bind auth code reply socket");
+            bail!("failed to bind auth code reply socket: {cause}");
         }
     };
 
