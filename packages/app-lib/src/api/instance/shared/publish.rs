@@ -1112,7 +1112,11 @@ pub(super) async fn upload_external_files(
             Some(&file_sha512),
             state,
         )
-        .await?;
+        .await
+        .context(format!(
+            "uploading external file {} ({size} bytes, sha512 {file_sha512})",
+            upload.file_name
+        ))?;
         if !response.status().is_success() {
             return shared_instances_request_error(
                 "upload_external_file",

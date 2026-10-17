@@ -993,6 +993,7 @@ async fn send_request_with_auth_and_log_path(
                 error
             }
         })
+        .context(format!("sending {operation} request"))
         .context(ErrorKind::SharedInstancesApiError)?;
     if response.status().is_success() {
         let request_id = response_request_id(&response);
