@@ -66,8 +66,9 @@ watch(
 			rememberStoredAccountAppearance(userId, preferences.appearance)
 		}
 
-		if (locale.value !== preferences.localization.locale) {
-			void setLocale(preferences.localization.locale)
+		const accountLocale = preferences.localization.locale
+		if (accountLocale && locale.value !== accountLocale) {
+			void setLocale(accountLocale)
 		}
 
 		cosmetics.value.searchDisplayMode.mod = preferences.layouts.mods === 'rows' ? 'list' : 'grid'

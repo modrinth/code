@@ -1834,7 +1834,7 @@ export namespace Labrinth {
 			}
 
 			export type LocalizationPreferences = {
-				locale: string
+				locale: string | null
 			}
 
 			export type LayoutPreferences = {
