@@ -7,10 +7,10 @@ use tracing::{info, info_span};
 use tracing_anyhow::FutureContext;
 
 use crate::{
-	AppState,
-	store::{ContentType, PutStatus},
-	upstream::Upstreams,
-	util::ErrorAccumulator,
+    AppState,
+    store::{ContentType, PutStatus},
+    upstream::Upstreams,
+    util::{ErrorAccumulator, TaskContext},
 };
 
 mod fabric;
@@ -24,7 +24,7 @@ pub async fn run(app: AppState, upstreams: Upstreams) -> Result<()> {
     let mut status = PutStatus::Unchanged;
     if upstreams.mojang {
         mojang::export(&app)
-            .context(info_span!("exporting Mojang artifacts"))
+            .transaction_context(|| info_span!("exporting Mojang artifacts"))
             .await
             .inspect(|new| latch(&mut status, *new))
             .inspect_err(|err| errors.push_mut(err))
@@ -33,7 +33,7 @@ pub async fn run(app: AppState, upstreams: Upstreams) -> Result<()> {
 
     if upstreams.fabric {
         fabric::export(&app)
-            .context(info_span!("exporting Fabric artifacts"))
+            .transaction_context(|| info_span!("exporting Fabric artifacts"))
             .await
             .inspect(|new| latch(&mut status, *new))
             .inspect_err(|err| errors.push_mut(err))
@@ -42,7 +42,7 @@ pub async fn run(app: AppState, upstreams: Upstreams) -> Result<()> {
 
     if upstreams.quilt {
         quilt::export(&app)
-            .context(info_span!("exporting Quilt artifacts"))
+            .transaction_context(|| info_span!("exporting Quilt artifacts"))
             .await
             .inspect(|new| latch(&mut status, *new))
             .inspect_err(|err| errors.push_mut(err))
@@ -51,7 +51,9 @@ pub async fn run(app: AppState, upstreams: Upstreams) -> Result<()> {
 
     if upstreams.forge || upstreams.neoforge {
         forgelike::export(&app, upstreams)
-            .context(info_span!("exporting Forge-like artifacts"))
+            .transaction_context(|| {
+                info_span!("exporting Forge-like artifacts")
+            })
             .await
             .inspect(|new| latch(&mut status, *new))
             .inspect_err(|err| errors.push_mut(err))
@@ -74,21 +76,23 @@ pub async fn run(app: AppState, upstreams: Upstreams) -> Result<()> {
 }
 
 async fn publish_json_files(
-	app: &AppState,
-	files: impl IntoIterator<Item = (String, Vec<u8>)>,
+    app: &AppState,
+    files: impl IntoIterator<Item = (String, Vec<u8>)>,
 ) -> Result<PutStatus> {
-	stream::iter(files.into_iter().map(|(path, data)| async move {
-		app.public_blobs
-			.put(&path, &data, ContentType::Json)
-			.context(info_span!("writing JSON to blob store", %path))
-			.await
-	}))
-	.buffer_unordered(app.concurrency.download.get())
-	.try_fold(PutStatus::Unchanged, |mut status, changed| async move {
-		latch(&mut status, changed);
-		Ok(status)
-	})
-	.await
+    stream::iter(files.into_iter().map(|(path, data)| async move {
+        app.public_blobs
+            .put(&path, &data, ContentType::Json)
+            .transaction_context(
+                || info_span!("writing JSON to blob store", %path),
+            )
+            .await
+    }))
+    .buffer_unordered(app.concurrency.download.get())
+    .try_fold(PutStatus::Unchanged, |mut status, changed| async move {
+        latch(&mut status, changed);
+        Ok(status)
+    })
+    .await
 }
 
 fn latch(status: &mut PutStatus, new: PutStatus) {

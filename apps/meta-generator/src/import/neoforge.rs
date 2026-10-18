@@ -8,6 +8,8 @@ use futures::{StreamExt, stream};
 use tracing::{info, info_span};
 use tracing_anyhow::FutureContext;
 
+use crate::util::TaskContext;
+
 use crate::{
     import::download::DownloadRunContext,
     model::{self, ForgelikeInstallerName},
@@ -31,19 +33,20 @@ pub async fn download(cx: &mut DownloadRunContext<'_>) -> Result<()> {
     );
 
     let mut seen = HashSet::new();
-    let cataloged_versions =
-        forge_catalog
-            .versions
-            .into_iter()
-            .map(|version| version.0.parse().map(|name| (name, "forge")))
-            .chain(neoforge_catalog.versions.into_iter().map(|version| {
+    let cataloged_versions = forge_catalog
+        .versions
+        .into_iter()
+        .map(|version| version.0.parse().map(|name| (name, "forge")))
+        .chain(
+            neoforge_catalog.versions.into_iter().map(|version| {
                 version.0.parse().map(|name| (name, "neoforge"))
-            }))
-            .collect::<Result<Vec<(ForgelikeInstallerName, &str)>>>()?
-            .into_iter()
-            .filter(|(name, _)| !model::NEOFORGE_BLACKLIST.contains(&name.as_str()))
-            .filter(|(name, _)| seen.insert(name.clone()))
-            .collect::<Vec<_>>();
+            }),
+        )
+        .collect::<Result<Vec<(ForgelikeInstallerName, &str)>>>()?
+        .into_iter()
+        .filter(|(name, _)| !model::NEOFORGE_BLACKLIST.contains(&name.as_str()))
+        .filter(|(name, _)| seen.insert(name.clone()))
+        .collect::<Vec<_>>();
     let existing_versions = model::ForgelikeInstaller::all()
         .filter(
             model::ForgelikeInstaller::fields()
@@ -86,7 +89,8 @@ pub async fn download(cx: &mut DownloadRunContext<'_>) -> Result<()> {
             .context(info_span!("inserting installer record"))
             .await?;
             anyhow::Ok(())
-        }
+		}
+		.transaction_context(|| info_span!("downloading NeoForge installer", %installer_name, artifact))
         .await
         .inspect_err(|err| cx.errors.push(err))
         .ok();

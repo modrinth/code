@@ -5,6 +5,8 @@ use futures::{StreamExt, stream};
 use tracing::{info, info_span};
 use tracing_anyhow::FutureContext;
 
+use crate::util::TaskContext;
+
 use crate::{
     import::download::DownloadRunContext,
     model::{self, ForgelikeInstallerName},
@@ -87,6 +89,9 @@ pub async fn download(cx: &mut DownloadRunContext<'_>) -> Result<()> {
 
             anyhow::Ok(())
         }
+        .transaction_context(
+            || info_span!("downloading Forge installer", %installer_name),
+        )
         .await
         .inspect_err(|err| cx.errors.push(err))
         .ok();

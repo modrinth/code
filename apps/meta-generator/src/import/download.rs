@@ -5,7 +5,7 @@ use jiff::Timestamp;
 use reqwest::IntoUrl;
 use serde::de::DeserializeOwned;
 use tokio::sync::Mutex;
-use tracing::{info, info_span};
+use tracing::{Instrument, info, info_span};
 use tracing_anyhow::FutureContext;
 
 use crate::{
@@ -15,7 +15,8 @@ use crate::{
     store::BlobCas,
     upstream::Upstreams,
     util::{
-        ErrorAccumulator, ResponseExt, Sha256, from_json_str, from_json_value,
+        ErrorAccumulator, ResponseExt, Sha256, TaskContext, from_json_str,
+        from_json_value,
     },
 };
 
@@ -66,7 +67,7 @@ pub async fn download_from_upstreams(
     if upstreams.mojang {
         let errors_before = cx.errors.len();
         let result = mojang::download(&mut cx)
-            .context(info_span!("downloading Mojang upstream"))
+            .transaction_context(|| info_span!("downloading Mojang upstream"))
             .await;
         completed.mojang =
             download_succeeded(result, &cx.errors, errors_before);
@@ -75,7 +76,7 @@ pub async fn download_from_upstreams(
     if upstreams.fabric {
         let errors_before = cx.errors.len();
         let result = fabric::download(&mut cx)
-            .context(info_span!("downloading Fabric upstream"))
+            .transaction_context(|| info_span!("downloading Fabric upstream"))
             .await;
         completed.fabric =
             download_succeeded(result, &cx.errors, errors_before);
@@ -84,7 +85,7 @@ pub async fn download_from_upstreams(
     if upstreams.quilt {
         let errors_before = cx.errors.len();
         let result = quilt::download(&mut cx)
-            .context(info_span!("downloading Quilt upstream"))
+            .transaction_context(|| info_span!("downloading Quilt upstream"))
             .await;
         completed.quilt = download_succeeded(result, &cx.errors, errors_before);
     }
@@ -93,7 +94,7 @@ pub async fn download_from_upstreams(
     if upstreams.forge {
         let errors_before = cx.errors.len();
         let result = forge::download(&mut cx)
-            .context(info_span!("downloading Forge upstream"))
+            .transaction_context(|| info_span!("downloading Forge upstream"))
             .await;
         completed.forge = download_succeeded(result, &cx.errors, errors_before);
     }
@@ -101,7 +102,7 @@ pub async fn download_from_upstreams(
     if upstreams.neoforge {
         let errors_before = cx.errors.len();
         let result = neoforge::download(&mut cx)
-            .context(info_span!("downloading NeoForge upstream"))
+            .transaction_context(|| info_span!("downloading NeoForge upstream"))
             .await;
         completed.neoforge =
             download_succeeded(result, &cx.errors, errors_before);
@@ -186,19 +187,23 @@ impl<'cx> DownloadRunContext<'cx> {
     }
 
     async fn insert_blob(&self, url: &str, data: &[u8]) -> Result<Sha256> {
-		let blob = self
-			.cas
-			.store(data)
-			.context(info_span!("storing blob"))
-			.await?;
-		let sha256 = blob.sha256;
-        let mut conn = self.conn.lock().await;
+        let blob = self
+            .cas
+            .store(data)
+            .context(info_span!("storing blob"))
+            .await?;
+        let sha256 = blob.sha256;
+        let mut conn = self
+            .conn
+            .lock()
+            .instrument(info_span!("taking connection lock"))
+            .await;
         let mut txn = conn
             .transaction()
             .context(info_span!("starting transaction"))
             .await?;
 
-		blob.register(&mut txn).await?;
+        blob.register(&mut txn).await?;
         toasty::create!(model::BlobDownload {
             download_run_id: self.download_run_id,
             sha256,

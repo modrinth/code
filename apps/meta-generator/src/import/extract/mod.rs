@@ -8,15 +8,14 @@ pub mod quilt;
 
 use anyhow::{Result, ensure};
 use tracing::{info_span, warn};
-use tracing_anyhow::FutureContext;
 
-use crate::{AppState, upstream::Upstreams};
+use crate::{AppState, upstream::Upstreams, util::TaskContext};
 
 pub async fn extract(app: &AppState, upstreams: Upstreams) -> Result<()> {
     let mut failed = Vec::new();
     if upstreams.mojang {
         mojang::extract(app)
-            .context(info_span!("extracting Mojang metadata"))
+            .transaction_context(|| info_span!("extracting Mojang metadata"))
             .await
             .inspect_err(|err| {
                 warn!("error: {err:?}");
@@ -27,7 +26,7 @@ pub async fn extract(app: &AppState, upstreams: Upstreams) -> Result<()> {
 
     if upstreams.fabric {
         fabric::extract(app)
-            .context(info_span!("extracting Fabric metadata"))
+            .transaction_context(|| info_span!("extracting Fabric metadata"))
             .await
             .inspect_err(|err| {
                 warn!("error: {err:?}");
@@ -38,7 +37,7 @@ pub async fn extract(app: &AppState, upstreams: Upstreams) -> Result<()> {
 
     if upstreams.quilt {
         quilt::extract(app)
-            .context(info_span!("extracting Quilt metadata"))
+            .transaction_context(|| info_span!("extracting Quilt metadata"))
             .await
             .inspect_err(|err| {
                 warn!("error: {err:?}");
@@ -57,21 +56,22 @@ pub async fn extract(app: &AppState, upstreams: Upstreams) -> Result<()> {
 
 /// Reads each immutable content hash once, retaining first-seen order for errors.
 async fn read_blobs(
-	app: &AppState,
-	hashes: impl IntoIterator<Item = crate::util::Sha256>,
+    app: &AppState,
+    hashes: impl IntoIterator<Item = crate::util::Sha256>,
 ) -> Result<std::collections::HashMap<crate::util::Sha256, Vec<u8>>> {
-	use futures::{StreamExt, TryStreamExt, stream};
-	let hashes = hashes.into_iter().collect::<indexmap::IndexSet<_>>();
-	stream::iter(hashes)
-		.map(|sha256| async move {
-			let bytes = app
-				.cas
-				.get(sha256)
-				.context(info_span!("reading import blob", %sha256))
-				.await?;
-			Ok((sha256, bytes.to_vec()))
-		})
-		.buffered(app.concurrency.download.get())
-		.try_collect()
-		.await
+    use futures::{StreamExt, TryStreamExt, stream};
+    let hashes = hashes.into_iter().collect::<indexmap::IndexSet<_>>();
+    stream::iter(hashes)
+        .map(|sha256| {
+            async move {
+                let bytes = app.cas.get(sha256).await?;
+                anyhow::Ok((sha256, bytes.to_vec()))
+            }
+            .transaction_context(
+                move || info_span!("reading import blob", %sha256),
+            )
+        })
+        .buffered(app.concurrency.download.get())
+        .try_collect()
+        .await
 }

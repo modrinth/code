@@ -7886,6 +7886,7 @@ dependencies = [
  "reqwest 0.12.24",
  "rust-s3",
  "secrecy",
+ "sentry",
  "serde",
  "serde_json",
  "toasty",

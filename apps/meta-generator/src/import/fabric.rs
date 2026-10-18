@@ -5,13 +5,15 @@ use futures::{StreamExt, stream};
 use tracing::{info, info_span};
 use tracing_anyhow::FutureContext;
 
+use crate::util::TaskContext;
+
 use crate::{
     import::download::DownloadRunContext,
     model,
-	upstream::{
-		fabric::{CATALOG_URL, Catalog, LoaderVersion},
-		fabriclike::{GameLoaderProfile, LoaderVersionName},
-	},
+    upstream::{
+        fabric::{CATALOG_URL, Catalog, LoaderVersion},
+        fabriclike::{GameLoaderProfile, LoaderVersionName},
+    },
 };
 
 pub const PROFILE_GAME_VERSION: &str = "1.21";
@@ -42,6 +44,9 @@ pub async fn download(cx: &mut DownloadRunContext<'_>) -> Result<()> {
         let url = profile_url(version_name);
 
         cx.download_json::<GameLoaderProfile>(&url)
+            .transaction_context(
+                || info_span!("downloading loader profile", %version_name),
+            )
             .await
             .inspect_err(|err| cx.errors.push(err))
             .ok();

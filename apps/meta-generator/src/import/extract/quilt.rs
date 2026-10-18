@@ -12,10 +12,10 @@ use crate::{
         self, CatalogGame, CatalogLoader, CatalogSnapshot, ProfileGroup,
     },
     model::{self, FabriclikeLoader},
-	upstream::{
-		fabriclike::{GameVersion, GameVersionName},
-		quilt,
-	},
+    upstream::{
+        fabriclike::{GameVersion, GameVersionName},
+        quilt,
+    },
     util::from_json_slice,
 };
 
@@ -52,11 +52,11 @@ pub async fn extract(app: &AppState) -> Result<()> {
     let repository = Url::parse(quilt::MAVEN_URL)?;
     let mut games = IndexMap::new();
     let mut catalogs = Vec::with_capacity(rows.len());
-	let blobs =
-		super::read_blobs(app, rows.iter().map(|row| row.sha256)).await?;
+    let blobs =
+        super::read_blobs(app, rows.iter().map(|row| row.sha256)).await?;
     for row in rows {
-		let bytes = &blobs[&row.sha256];
-		let catalog = from_json_slice::<quilt::Catalog>(bytes)
+        let bytes = &blobs[&row.sha256];
+        let catalog = from_json_slice::<quilt::Catalog>(bytes)
             .context("parsing Quilt catalog")?;
 
         for game in &catalog.game {
@@ -91,7 +91,7 @@ pub async fn extract(app: &AppState) -> Result<()> {
             mappings: Vec::new(),
         });
     }
-	drop(blobs);
+    drop(blobs);
 
     // older loaders may only have been downloaded with an older template;
     // keep those templates as fallbacks, within the same version group
@@ -101,8 +101,8 @@ pub async fn extract(app: &AppState) -> Result<()> {
         let snapshot_games = catalog
             .games
             .iter()
-			.map(|game| GameVersion {
-				version: GameVersionName(game.id.clone()),
+            .map(|game| GameVersion {
+                version: GameVersionName(game.id.clone()),
                 stable: game.stable,
             })
             .collect::<Vec<_>>();

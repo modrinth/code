@@ -22,7 +22,14 @@ pub struct Config {
 pub struct Sentry {
     pub dsn: String,
     pub environment: String,
+    #[serde(default = "default_sample_rate")]
     pub sample_rate: f32,
+    #[serde(default = "default_sample_rate")]
+    pub traces_sample_rate: f32,
+}
+
+fn default_sample_rate() -> f32 {
+    1.0
 }
 
 #[derive(Debug, Clone, Deserialize)]

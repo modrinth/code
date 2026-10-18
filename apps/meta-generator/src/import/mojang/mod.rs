@@ -5,6 +5,8 @@ use futures::{StreamExt, stream};
 use tracing::{info, info_span};
 use tracing_anyhow::FutureContext;
 
+use crate::util::TaskContext;
+
 use crate::{
     import::download::DownloadRunContext,
     model,
@@ -52,7 +54,9 @@ pub async fn download(cx: &mut DownloadRunContext<'_>) -> Result<()> {
     let num_done = AtomicUsize::new(0);
     let task = async |version: Version| {
         cx.download_blob(version.url.clone())
-            .context(info_span!("downloading version", %version.id))
+            .transaction_context(
+                || info_span!("downloading version", %version.id),
+            )
             .await
             .inspect_err(|err| cx.errors.push(err))
             .ok();

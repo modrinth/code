@@ -2,6 +2,7 @@ use std::{sync::Arc, time::Duration};
 
 use anyhow::{Context, Result, ensure};
 use figment::Figment;
+
 use toasty::migration::MigrationSet;
 use tracing::{info, info_span, level_filters::LevelFilter};
 use tracing_anyhow::FutureContext;
@@ -13,7 +14,7 @@ use crate::{
     config::Config,
     store::{BlobCas, BlobStore, MavenStore, StoreVisibility},
     upstream::Upstreams,
-    util::fastly,
+    util::{TaskContext, fastly},
 };
 
 mod config;
@@ -59,6 +60,7 @@ pub fn main() -> Result<()> {
     dotenvy::dotenv().ok();
     tracing_subscriber::registry()
         .with(tracing_anyhow::ErrorLayer::default())
+        .with(sentry::integrations::tracing::layer())
         .with(
             tracing_subscriber::fmt::layer()
                 .with_timer(tracing_subscriber::fmt::time::ChronoLocal::new(
@@ -75,12 +77,13 @@ pub fn main() -> Result<()> {
         .init();
     let mut config = create_config()?;
 
-    if let Some(sentry) = config.sentry.take() {
+    let _sentry = if let Some(sentry) = config.sentry.take() {
         let sentry = sentry::init(sentry::ClientOptions {
             dsn: Some(sentry.dsn.parse().context("invalid Sentry DSN")?),
             release: sentry::release_name!(),
             environment: Some(sentry.environment.into()),
             sample_rate: sentry.sample_rate,
+            traces_sample_rate: sentry.traces_sample_rate,
             ..Default::default()
         });
         ensure!(
@@ -89,11 +92,24 @@ pub fn main() -> Result<()> {
         );
         info!("enabled Sentry integration");
         unsafe { std::env::set_var("RUST_BACKTRACE", "1") };
-    }
+        Some(sentry)
+    } else {
+        None
+    };
 
     tokio::runtime::Runtime::new()
         .context("creating async runtime")?
-        .block_on(main_(config))
+        .block_on(
+            async {
+                let result = main_(config).await;
+                if let Err(error) = &result {
+                    sentry::Hub::current()
+                        .capture_error::<dyn std::error::Error>(error.as_ref());
+                }
+                result
+            }
+            .transaction_context(|| info_span!("meta-generator")),
+        )
 }
 
 async fn main_(config: Config) -> Result<()> {
@@ -164,8 +180,16 @@ async fn main_(config: Config) -> Result<()> {
     };
 
     match cli.command {
-        Command::Import => import::run(app, upstreams).await,
-        Command::Export => export::run(app, upstreams).await,
+        Command::Import => {
+            import::run(app, upstreams)
+                .context(info_span!("import"))
+                .await
+        }
+        Command::Export => {
+            export::run(app, upstreams)
+                .context(info_span!("export"))
+                .await
+        }
     }
 }
 

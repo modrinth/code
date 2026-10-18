@@ -10,7 +10,7 @@ use crate::{
     AppState, model,
     store::BlobCas,
     upstream::mojang,
-    util::{Sha1, Sha256, from_json_slice},
+    util::{Sha1, Sha256, TaskContext, from_json_slice},
 };
 
 pub async fn extract(app: &AppState) -> Result<()> {
@@ -42,18 +42,18 @@ pub async fn extract(app: &AppState) -> Result<()> {
 
     // read each catalog from its blob in the store;
     // preserve query order while reading concurrently
-	let blobs =
-		super::read_blobs(app, rows.iter().map(|row| row.sha256)).await?;
-	let catalogs = rows
-		.into_iter()
-		.map(|row| {
-			let catalog =
-				from_json_slice::<mojang::Catalog>(&blobs[&row.sha256])
-					.context("parsing Mojang catalog")?;
+    let blobs =
+        super::read_blobs(app, rows.iter().map(|row| row.sha256)).await?;
+    let catalogs = rows
+        .into_iter()
+        .map(|row| {
+            let catalog =
+                from_json_slice::<mojang::Catalog>(&blobs[&row.sha256])
+                    .context("parsing Mojang catalog")?;
             anyhow::Ok((row.sha256, catalog))
         })
-		.collect::<Result<Vec<_>>>()?;
-	drop(blobs);
+        .collect::<Result<Vec<_>>>()?;
+    drop(blobs);
     let candidate_sha1s = catalogs
         .iter()
         .flat_map(|(_, catalog)| {
@@ -62,34 +62,34 @@ pub async fn extract(app: &AppState) -> Result<()> {
         .collect::<HashSet<_>>()
         .into_iter()
         .collect::<Vec<_>>();
-	let matching_hashes = model::BlobHash::all()
+    let matching_hashes = model::BlobHash::all()
         .filter(model::BlobHash::fields().sha1().in_list(candidate_sha1s))
         .exec(&mut conn)
         .context(info_span!("fetching available version manifest hashes"))
-		.await?;
-	let mut hashes_by_sha1: HashMap<Sha1, Vec<Sha256>> = HashMap::new();
-	for hash in matching_hashes {
-		hashes_by_sha1
-			.entry(hash.sha1)
-			.or_default()
-			.push(hash.sha256);
-	}
-	let available_sha1s = hashes_by_sha1.keys().copied().collect();
+        .await?;
+    let mut hashes_by_sha1: HashMap<Sha1, Vec<Sha256>> = HashMap::new();
+    for hash in matching_hashes {
+        hashes_by_sha1
+            .entry(hash.sha1)
+            .or_default()
+            .push(hash.sha256);
+    }
+    let available_sha1s = hashes_by_sha1.keys().copied().collect();
     let (latest, versions) = select_versions(catalogs, &available_sha1s)?;
     info!("found {} unique versions", versions.len());
 
     // now we make all the version manifests;
     // finish reading and patching before changing any selected rows
     let num_total = versions.len();
-	let mut num_done = 0usize;
-	let extracted = stream::iter(versions)
+    let mut num_done = 0usize;
+    let extracted = stream::iter(versions)
         .map(|(source_catalog_sha256, catalog_entry)| {
             let hashes_by_sha1 = &hashes_by_sha1;
             async move {
                 let (source_manifest_sha256, manifest) = make_version_manifest(
                     hashes_by_sha1, &app.cas, &catalog_entry,
                 )
-			.context(info_span!("extracting version manifest", version = %catalog_entry.id, %source_catalog_sha256))
+			.transaction_context(|| info_span!("extracting version manifest", version = %catalog_entry.id, %source_catalog_sha256))
 			.await?;
                 anyhow::Ok((source_catalog_sha256, source_manifest_sha256, catalog_entry, manifest))
             }
@@ -150,7 +150,9 @@ pub async fn extract(app: &AppState) -> Result<()> {
             .source_catalog_sha256(source_catalog_sha256)
             .source_manifest_sha256(source_manifest_sha256)
             .exec(&mut txn)
-            .context(info_span!("upserting Minecraft version", %name))
+            .transaction_context(
+                || info_span!("upserting Minecraft version", %name),
+            )
             .await?;
     }
     txn.commit()
@@ -216,15 +218,15 @@ fn select_versions(
 /// - patched manifest hash
 /// - patched manifest
 async fn make_version_manifest(
-	hashes_by_sha1: &HashMap<Sha1, Vec<Sha256>>,
+    hashes_by_sha1: &HashMap<Sha1, Vec<Sha256>>,
     cas: &BlobCas,
     version: &mojang::Version,
 ) -> Result<(Sha256, mojang::VersionManifest)> {
-	let matching_hashes = hashes_by_sha1
-		.get(&version.sha1)
-		.map(Vec::as_slice)
-		.unwrap_or_default();
-	let sha256 = match matching_hashes {
+    let matching_hashes = hashes_by_sha1
+        .get(&version.sha1)
+        .map(Vec::as_slice)
+        .unwrap_or_default();
+    let sha256 = match matching_hashes {
         [sha256] => *sha256,
         [] => bail!(
             "no stored version manifest for {} with SHA-1 {}",

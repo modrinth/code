@@ -12,7 +12,8 @@ use crate::{
     AppState, model,
     upstream::{self, mojang},
     util::{
-        MavenCoordinate, ResponseExt, Sha1, from_json_slice, from_json_value,
+        MavenCoordinate, ResponseExt, Sha1, TaskContext, from_json_slice,
+        from_json_value,
     },
 };
 
@@ -71,7 +72,9 @@ pub async fn extract_installers(
         let name = installer.name.clone();
         let sha256 = installer.sha256;
         if let Err(err) = extract_from_installer(app, installer)
-            .context(info_span!("extracting from installer", %name, %sha256))
+            .transaction_context(
+                || info_span!("extracting from installer", %name, %sha256),
+            )
             .await
         {
             num_failed += 1;
@@ -280,6 +283,7 @@ async fn extract_from_installer(
         stream::iter(embedded_maven_artifacts.into_iter().enumerate())
             .map(|(index, (coordinate, path))| {
                 let zip = &zip;
+				let artifact_path = path.clone();
                 async move {
                     let bytes = read_file(zip, &path)
                         .context(info_span!(
@@ -304,6 +308,7 @@ async fn extract_from_installer(
                         model::ForgelikeStoredArtifact { coordinate, sha256 },
                     ))
                 }
+				.transaction_context(move || info_span!("extracting installer Maven artifact", path = %artifact_path))
             })
             .buffer_unordered(app.concurrency.extract_files.get())
             .try_collect::<Vec<_>>()
@@ -326,7 +331,9 @@ async fn extract_from_installer(
                 if urls.len() > 1 {
                     urls.push(repository_artifact_url(fallback, &coordinate)?);
                 }
+				let artifact_name = coordinate.to_string();
                 download_library(app, coordinate, urls, hashes)
+					.transaction_context(|| info_span!("downloading installer dependency", coordinate = %artifact_name))
                     .await
                     .map(|artifact| (index, artifact))
             })

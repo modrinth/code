@@ -6,17 +6,20 @@ use tracing::{info, info_span};
 use tracing_anyhow::FutureContext;
 use url::Url;
 
+use crate::util::TaskContext;
+
 use crate::{
     import::download::DownloadRunContext,
     model,
-	upstream::{
-		fabriclike::{
-			GameLoaderProfile, GameVersion, GameVersionName, LoaderVersionName,
-		},
-		quilt::{
-			CATALOG_URL, Catalog, LoaderVersion, MetadataGroup, PROFILE_BASE_URL,
-		},
-	},
+    upstream::{
+        fabriclike::{
+            GameLoaderProfile, GameVersion, GameVersionName, LoaderVersionName,
+        },
+        quilt::{
+            CATALOG_URL, Catalog, LoaderVersion, MetadataGroup,
+            PROFILE_BASE_URL,
+        },
+    },
 };
 
 pub const SKIPPED_LOADER_VERSION: &str = "0.17.5-beta.4";
@@ -53,21 +56,24 @@ pub async fn download(cx: &mut DownloadRunContext<'_>) -> Result<()> {
 
     let num_total = template_pairs.len();
     let num_done = AtomicUsize::new(0);
-    let task =
-        async |(game_version, loader): (&GameVersionName, &LoaderVersion)| {
-            let loader_version = &loader.version;
-            let url = profile_url(game_version, loader_version);
+    let task = async |(game_version, loader): (
+        &GameVersionName,
+        &LoaderVersion,
+    )| {
+        let loader_version = &loader.version;
+        let url = profile_url(game_version, loader_version);
 
-            cx.download_json::<GameLoaderProfile>(&url)
+        cx.download_json::<GameLoaderProfile>(&url)
+				.transaction_context(|| info_span!("downloading loader profile", %game_version, %loader_version))
                 .await
                 .inspect_err(|err| cx.errors.push(err))
                 .ok();
 
-            let num_done = num_done.fetch_add(1, atomic::Ordering::SeqCst) + 1;
-            if num_done.is_multiple_of(10) || num_done == num_total {
-                info!("downloaded {num_done}/{num_total} loader profiles");
-            }
-        };
+        let num_done = num_done.fetch_add(1, atomic::Ordering::SeqCst) + 1;
+        if num_done.is_multiple_of(10) || num_done == num_total {
+            info!("downloaded {num_done}/{num_total} loader profiles");
+        }
+    };
     stream::iter(template_pairs)
         .for_each_concurrent(cx.download_concurrency, task)
         .await;
