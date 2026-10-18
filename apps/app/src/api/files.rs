@@ -1,15 +1,46 @@
 use crate::api::Result;
 use async_zip::base::read::seek::ZipFileReader;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use std::io::Cursor;
-use tauri::Runtime;
+use std::path::PathBuf;
+use std::sync::Arc;
+use std::time::{Duration, Instant};
+use tauri::{Manager, Runtime};
 use tauri_plugin_dialog::DialogExt;
+use tauri_plugin_http::reqwest;
+use tokio::io::AsyncWriteExt;
+use tokio_util::sync::CancellationToken;
 
 pub fn init<R: Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("files")
+        .setup(|app, _| {
+            app.manage(ExternalSaveSessions::default());
+            Ok(())
+        })
+        .on_event(|app, event| {
+            if let tauri::RunEvent::WindowEvent {
+                label,
+                event: tauri::WindowEvent::Destroyed,
+                ..
+            } = event
+            {
+                app.state::<ExternalSaveSessions>().0.retain(|_, session| {
+                    if &session.window_label == label {
+                        session.cancel.cancel();
+                        false
+                    } else {
+                        true
+                    }
+                });
+            }
+        })
         .invoke_handler(tauri::generate_handler![
             file_extract_zip,
             file_save_as,
+            files_select_external,
+            files_save_external,
+            files_release_external,
             file_read_dragged_file,
             file_list,
             file_read,
@@ -230,5 +261,213 @@ pub async fn file_save_as<R: Runtime>(
         .await?;
     }
 
+    Ok(())
+}
+
+#[derive(Default)]
+pub struct ExternalSaveSessions(
+    dashmap::DashMap<String, Arc<ExternalSaveSession>>,
+);
+
+struct ExternalSaveSession {
+    window_label: String,
+    path: PathBuf,
+    lock: tokio::sync::Mutex<()>,
+    cancel: CancellationToken,
+}
+
+#[derive(Deserialize)]
+pub struct ExternalSaveFilter {
+    name: String,
+    extensions: Vec<String>,
+}
+
+#[derive(Deserialize)]
+pub struct ExternalSaveRequest {
+    url: String,
+    #[serde(default)]
+    headers: HashMap<String, String>,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ExternalSaveProgress {
+    stage: &'static str,
+    downloaded_bytes: u64,
+    total_bytes: Option<u64>,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ExternalSaveError {
+    message: String,
+    status_code: Option<u16>,
+}
+
+impl ExternalSaveError {
+    fn new(message: impl Into<String>) -> Self {
+        Self {
+            message: message.into(),
+            status_code: None,
+        }
+    }
+}
+
+impl From<std::io::Error> for ExternalSaveError {
+    fn from(error: std::io::Error) -> Self {
+        Self::new(error.to_string())
+    }
+}
+
+impl From<reqwest::Error> for ExternalSaveError {
+    fn from(error: reqwest::Error) -> Self {
+        Self {
+            status_code: error.status().map(|status| status.as_u16()),
+            message: error.without_url().to_string(),
+        }
+    }
+}
+
+fn external_save_session<R: Runtime>(
+    window: &tauri::WebviewWindow<R>,
+    state: &ExternalSaveSessions,
+    save_id: &str,
+) -> std::result::Result<Arc<ExternalSaveSession>, ExternalSaveError> {
+    state
+        .0
+        .get(save_id)
+        .filter(|session| session.window_label == window.label())
+        .map(|session| Arc::clone(session.value()))
+        .ok_or_else(|| ExternalSaveError::new("Unknown save session"))
+}
+
+#[tauri::command]
+pub async fn files_select_external<R: Runtime>(
+    window: tauri::WebviewWindow<R>,
+    state: tauri::State<'_, ExternalSaveSessions>,
+    filename: String,
+    filter: Option<ExternalSaveFilter>,
+) -> std::result::Result<Option<String>, ExternalSaveError> {
+    let file_name = filename
+        .rsplit(['/', '\\'])
+        .next()
+        .filter(|name| !name.is_empty())
+        .unwrap_or("download");
+    let mut dialog = window.dialog().file().set_file_name(file_name);
+    if let Some(filter) = filter {
+        let extensions: Vec<&str> =
+            filter.extensions.iter().map(String::as_str).collect();
+        dialog = dialog.add_filter(filter.name, &extensions);
+    }
+    let (tx, rx) = tokio::sync::oneshot::channel();
+    dialog.save_file(|path| {
+        let _ = tx.send(path);
+    });
+    let Some(destination) = rx.await.unwrap_or(None) else {
+        return Ok(None);
+    };
+    let path = PathBuf::try_from(destination)
+        .map_err(|error| ExternalSaveError::new(error.to_string()))?;
+    let save_id = uuid::Uuid::new_v4().to_string();
+    state.0.insert(
+        save_id.clone(),
+        Arc::new(ExternalSaveSession {
+            window_label: window.label().to_string(),
+            path,
+            lock: tokio::sync::Mutex::new(()),
+            cancel: CancellationToken::new(),
+        }),
+    );
+    Ok(Some(save_id))
+}
+
+#[tauri::command]
+pub async fn files_save_external<R: Runtime>(
+    window: tauri::WebviewWindow<R>,
+    state: tauri::State<'_, ExternalSaveSessions>,
+    save_id: String,
+    request: ExternalSaveRequest,
+    on_progress: tauri::ipc::Channel<ExternalSaveProgress>,
+) -> std::result::Result<String, ExternalSaveError> {
+    let session = external_save_session(&window, &state, &save_id)?;
+    let url = url::Url::parse(&request.url)
+        .map_err(|_| ExternalSaveError::new("Invalid download URL"))?;
+    if !matches!(url.scheme(), "http" | "https") {
+        return Err(ExternalSaveError::new("Unsupported download URL"));
+    }
+    tokio::select! {
+        _ = session.cancel.cancelled() => Err(ExternalSaveError::new("Download cancelled")),
+        result = async {
+            let _lock = session.lock.lock().await;
+            let _ = on_progress.send(ExternalSaveProgress {
+                stage: "waiting",
+                downloaded_bytes: 0,
+                total_bytes: None,
+            });
+            let client = reqwest::Client::builder()
+                .connect_timeout(Duration::from_secs(30))
+                .read_timeout(Duration::from_secs(60))
+                .build()?;
+            let mut download = client.get(url);
+            for (name, value) in request.headers {
+                download = download.header(name, value);
+            }
+            let mut response = download.send().await?.error_for_status()?;
+            let total_bytes = response.content_length();
+            let mut downloaded_bytes = 0;
+            let mut last_progress = Instant::now();
+            let _ = on_progress.send(ExternalSaveProgress {
+                stage: "downloading",
+                downloaded_bytes,
+                total_bytes,
+            });
+            let parent = session.path.parent().ok_or_else(|| {
+                ExternalSaveError::new("Invalid save destination")
+            })?;
+            let temporary = tempfile::NamedTempFile::new_in(parent)?;
+            let (file, temporary_path) = temporary.into_parts();
+            let mut file = tokio::fs::File::from_std(file);
+            while let Some(chunk) = response.chunk().await? {
+                file.write_all(&chunk).await?;
+                downloaded_bytes += chunk.len() as u64;
+                if last_progress.elapsed() >= Duration::from_millis(200) {
+                    let _ = on_progress.send(ExternalSaveProgress {
+                        stage: "downloading",
+                        downloaded_bytes,
+                        total_bytes,
+                    });
+                    last_progress = Instant::now();
+                }
+            }
+            let _ = on_progress.send(ExternalSaveProgress {
+                stage: "saving",
+                downloaded_bytes,
+                total_bytes,
+            });
+            file.flush().await?;
+            file.sync_all().await?;
+            drop(file);
+            temporary_path
+                .persist(&session.path)
+                .map_err(|error| error.error)?;
+            Ok(session
+                .path
+                .file_name()
+                .unwrap_or_default()
+                .to_string_lossy()
+                .to_string())
+        } => result,
+    }
+}
+
+#[tauri::command]
+pub async fn files_release_external<R: Runtime>(
+    window: tauri::WebviewWindow<R>,
+    state: tauri::State<'_, ExternalSaveSessions>,
+    save_id: String,
+) -> std::result::Result<(), ExternalSaveError> {
+    let session = external_save_session(&window, &state, &save_id)?;
+    session.cancel.cancel();
+    state.0.remove(&save_id);
     Ok(())
 }

@@ -1541,9 +1541,6 @@
   "app.settings.default-instance-options.height.title": {
     "message": "Výška"
   },
-  "app.settings.default-instance-options.java-and-memory.title": {
-    "message": "Jáva a paměť"
-  },
   "app.settings.default-instance-options.java-arguments.description": {
     "message": "Argumenty předány Javě při spuštění instance."
   },
@@ -1553,9 +1550,6 @@
   "app.settings.default-instance-options.java-arguments.title": {
     "message": "Argumenty Javy"
   },
-  "app.settings.default-instance-options.launch-hooks.title": {
-    "message": "Spustit háčky"
-  },
   "app.settings.default-instance-options.memory-allocation.description": {
     "message": "Maximální dostupná paměť pro každou instanci."
   },
@@ -1564,9 +1558,6 @@
   },
   "app.settings.default-instance-options.width.title": {
     "message": "Šířka"
-  },
-  "app.settings.default-instance-options.window.title": {
-    "message": "Okno"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Vývojářský režim povolen."
@@ -1622,12 +1613,6 @@
   "app.settings.resource-management.app-cache.confirm.description": {
     "message": "Načítání aplikace může být pomalejší, dokud se mezipaměť neobnoví."
   },
-  "app.settings.resource-management.app-cache.confirm.title": {
-    "message": "Vymazat mezipaměť aplikace?"
-  },
-  "app.settings.resource-management.app-cache.purge": {
-    "message": "Vymazat mezipaměť"
-  },
   "app.settings.resource-management.app-cache.title": {
     "message": "Mezipaměť aplikace"
   },
@@ -1642,9 +1627,6 @@
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "Složka aplikace"
-  },
-  "app.settings.sidebar.label.instances": {
-    "message": "Instance"
   },
   "app.settings.synced-options.choose-sync-source.search-placeholder": {
     "message": "Prohledat instanci"
@@ -1681,9 +1663,6 @@
   },
   "app.settings.tabs.privacy": {
     "message": "Soukromí"
-  },
-  "app.settings.tabs.resource-management": {
-    "message": "Správa zdrojů"
   },
   "app.skins.add-button": {
     "message": "Přidat skin"

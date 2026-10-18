@@ -1073,9 +1073,6 @@
   "conversation-thread.action.approve": {
     "message": "Approva"
   },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Approva con risposta"
-  },
   "conversation-thread.action.close-report": {
     "message": "Chiudi segnalazione"
   },
@@ -1084,9 +1081,6 @@
   },
   "conversation-thread.action.reject": {
     "message": "Rifiuta"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Rifiuta con risposta"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Riapri thread"
@@ -1121,9 +1115,6 @@
   "conversation-thread.action.withhold": {
     "message": "Sospendi"
   },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Sospendi con risposta"
-  },
   "conversation-thread.closed-thread.description": {
     "message": "Questo thread è stato chiuso. Non potranno essere inviati nuovi messaggi."
   },
@@ -1132,9 +1123,6 @@
   },
   "conversation-thread.error.reopening-report": {
     "message": "Impossibile riaprire la segnalazione"
-  },
-  "conversation-thread.error.sending-message": {
-    "message": "Impossibile inviare il messaggio"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Rispondi al thread..."
@@ -1162,9 +1150,6 @@
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "Confermo di aver risposto adeguatamente ai messaggi dei moderatori."
-  },
-  "conversation-thread.resubmit-modal.description": {
-    "message": "Stai ripresentando <project-title>{projectTitle}</project-title> per farlo revisionare nuovamente ai moderatori."
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "Ripresentazione"
@@ -3431,9 +3416,6 @@
   "project-member-header.success-join": {
     "message": "Ora fai parte del team del progetto"
   },
-  "project-moderation-nags.project-submitted-for-review": {
-    "message": "Il progetto è stato presentato per la revisione!"
-  },
   "project-moderation-nags.publishing-checklist": {
     "message": "Checklist di pubblicazione"
   },
@@ -3550,9 +3532,6 @@
   },
   "project.actions.rescan-modpack": {
     "message": "Riscansiona pacchetto"
-  },
-  "project.actions.review-project": {
-    "message": "Rivedi progetto"
   },
   "project.actions.servers-promo.description": {
     "message": "Modrinth Hosting è il modo più facile per giocare insieme spensieratamente!"

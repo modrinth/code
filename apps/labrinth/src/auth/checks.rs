@@ -224,6 +224,9 @@ pub async fn filter_visible_versions(
     )
     .await
     .wrap_api_err("filtering visible version ids")?;
+    let filtered_version_ids = filtered_version_ids
+        .into_iter()
+        .collect::<std::collections::HashSet<_>>();
     versions.retain(|x| filtered_version_ids.contains(&x.inner.id));
 
     let missing = get_files_missing_attribution(

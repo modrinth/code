@@ -734,9 +734,6 @@
   "app.settings.tabs.privacy": {
     "message": "Confidențialitate"
   },
-  "app.settings.tabs.resource-management": {
-    "message": "Administrare resurse"
-  },
   "app.update-popup.body.download-complete": {
     "message": "Aplicația Modrinth v{version} a terminat descărcarea. Reîncărcați pentru a actualiza acum sau automat când închideți aplicația Modrinth."
   },

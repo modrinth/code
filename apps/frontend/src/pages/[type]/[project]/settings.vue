@@ -44,13 +44,14 @@ const {
 const flags = useFeatureFlags()
 
 const isServerProject = computed(() => projectV3.value?.minecraft_server != null)
+const isStaffMember = computed(() => isStaff(currentMember.value?.user))
 
 const navItems = computed(() => {
 	const base = `${project.value.project_type}/${project.value.slug ? project.value.slug : project.value.id}`
 
 	const showEnvironment =
 		projectV3.value?.project_types?.some((type) => ['mod', 'modpack'].includes(type)) &&
-		isStaff(currentMember.value?.user)
+		isStaffMember.value
 
 	const hasPermissionsPage = computed(() =>
 		projectV3.value?.project_types?.some((type) => ['modpack'].includes(type)),
@@ -188,7 +189,7 @@ const moderatorSeeUserUi = computed<boolean>({
 		<div class="grid gap-6 lg:grid-cols-[1fr_3fr]">
 			<div>
 				<NavStack :items="navItems" />
-				<div v-if="isStaff(currentMember?.user)" class="mt-4 flex items-center gap-2">
+				<div v-if="isStaffMember" class="mt-4 flex items-center gap-2">
 					<Toggle id="moderator-see-user-ui-toggle" v-model="moderatorSeeUserUi" small />
 					<label for="moderator-see-user-ui-toggle"> Show member UI </label>
 				</div>

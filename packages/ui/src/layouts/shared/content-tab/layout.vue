@@ -268,11 +268,11 @@ const sortedItems = computed(() => {
 	}
 })
 
-const { searchQuery, search } = useContentSearch(sortedItems, [
-	'project.title',
-	'owner.name',
-	'file_name',
-])
+const { searchQuery, search } = useContentSearch(
+	sortedItems,
+	['project.title', 'owner.name', 'file_name'],
+	{ queryParam: ctx.searchQueryParam },
+)
 
 const { selectedFilters, filterOptions, toggleFilter, applyFilters } = useContentFilters(
 	ctx.items,

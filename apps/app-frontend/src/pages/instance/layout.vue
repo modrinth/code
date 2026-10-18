@@ -128,6 +128,7 @@ import { useAppEvent } from '@/composables/use-app-event'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { handleSevereError } from '@/composables/use-error.js'
 import { useInstanceConsole } from '@/composables/useInstanceConsole'
+import InstanceSettingsModal from '@/features/instances/settings-modal/index.vue'
 import { trackEvent } from '@/helpers/analytics'
 import { toError } from '@/helpers/errors'
 import {
@@ -151,13 +152,12 @@ import { useSharedInstanceErrors } from '@/helpers/shared-instance-errors'
 import type { GameInstance } from '@/helpers/types'
 import { createInstanceShortcut, showInstanceInFolder } from '@/helpers/utils.js'
 import type { ServerStatus } from '@/helpers/worlds'
-import { useRootBreadcrumb } from '@/providers/breadcrumbs'
 import { provideInstanceBackup } from '@/providers/instance-backup'
 import { injectServerInstall } from '@/providers/server-install'
+import { useRootBreadcrumb } from '@/shared/breadcrumbs'
 
 import InstanceAdmonitions from './components/admonitions/index.vue'
 import InstancePageHeader from './components/page-header/index.vue'
-import InstanceSettingsModal from './components/settings-modal/index.vue'
 import { provideInstancePage } from './instance-context'
 import {
 	instanceContentQueryOptions,

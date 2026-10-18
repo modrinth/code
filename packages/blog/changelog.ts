@@ -11,6 +11,66 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-10-16T17:26:37+00:00`,
+		product: 'app',
+		version: '0.21.10',
+		body: `## Added
+- Added a new "Report ad" action in the troubleshooting tab of the app settings modal.
+
+## Changed
+- Updated translations. Want to help translate Modrinth App? [Click here](https://translate.modrinth.com)
+- Mods can now be installed, enabled, disabled, or removed while the instance is running.
+- Reorganized the Settings modal into Display, Account, Instance defaults, and System sections.
+	- Default Java and memory, Window, and Launch hooks settings now each have their own tab under Instance defaults.
+	- Moved Java installations into the Java and memory tab.
+	- Renamed the Synced settings tab to Syncing.
+	- Split the Resource management tab into Resources and Troubleshooting tabs.
+	- Renamed \`Purge cache\` to \`Clear cache\` on the Troubleshooting tab.
+- Reorganized the instance settings modal into Instance and Game sections.
+	- Java and memory, Window, Launch hooks, and Syncing are now separate tabs that replace the Sync overrides tab.
+	- Each Game tab has a \`Manage default settings\` button that opens the matching tab in the Settings modal.
+- Refreshed the sidebar, backgrounds, and scrollbars in the Settings, instance settings, and server settings modals.
+- Settings modals that open on a specific tab now scroll the sidebar to show that tab.
+
+## Fixed
+- Fixed a blank modal when joining a server whose modpack is unavailable or under review.
+- Fixed sometimes constant high CPU usage on Linux due to database issue.
+- Fixed command history syncing to new instances when command history syncing is turned off.
+- Fixed instance shortcuts dropping the part of the name after a dot.
+- Fixed the update modal on the Content tab closing when another project finishes updating.
+- Fixed the Content tab and Discover page losing their scroll position after returning from a project page.
+- Fixed the Content tab search clearing after returning from a project page.
+- Fixed beta and alpha version badges using different colors in the update and switch version modals.
+- Fixed mods showing as installed after the install failed.
+- Fixed an issue where sometimes you were unable to launch the app after updating from a super old app version.
+- Fixes webview errors when exporting debug information from app settings.
+- Fixed "CancelledError" error notifications appearing when switching pages.
+- Fixed some issues with bad performance when the app makes a backup of your instance before doing any content related operations.`,
+	},
+	{
+		date: `2026-10-16T17:26:37+00:00`,
+		product: 'web',
+		body: `## Changed
+- Updated translations. Want to help translate Modrinth? [Click here](https://translate.modrinth.com)
+- Updated slug suggestions to handle character restrictions.
+
+## Fixed
+- Fixed uploads failing for project files whose names start or end with a space.
+
+## Security
+- Fixed an issue with PayPal account linking (thanks foksha!)`,
+	},
+	{
+		date: `2026-10-16T17:26:37+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- Updated translations. Want to help translate Modrinth Hosting? [Click here](https://translate.modrinth.com)
+
+## Fixed
+- Fixed beta and alpha version badges using different colors in the update and switch version modals.
+- Fixed a performance issue when downloading files from the files tab.`,
+	},
+	{
 		date: `2026-10-09T22:49:09+00:00`,
 		product: 'web',
 		body: `## Changed

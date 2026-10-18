@@ -5,7 +5,7 @@ import { injectModrinthClient, ServersManagePageIndex } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
-import { useRootBreadcrumb } from '@/providers/breadcrumbs'
+import { useRootBreadcrumb } from '@/shared/breadcrumbs'
 
 import { config } from '../config'
 

@@ -134,13 +134,7 @@ import {
 import type { Nag, NagContext, NagStatus } from '@modrinth/moderation'
 import { nagDestinations, normalizeProjectNagKind, toProjectNag } from '@modrinth/moderation'
 import { Accordion, Button, IconButton } from '@modrinth/ui'
-import {
-	commonMessages,
-	defineMessages,
-	injectNotificationManager,
-	type MessageDescriptor,
-	useVIntl,
-} from '@modrinth/ui'
+import { defineMessages, type MessageDescriptor, useVIntl } from '@modrinth/ui'
 import { isStaff } from '@modrinth/utils'
 import type { Component } from 'vue'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
@@ -215,14 +209,9 @@ const messages = defineMessages({
 		id: 'project-moderation-nags.suggestion',
 		defaultMessage: 'Suggestion',
 	},
-	projectSubmittedForReview: {
-		id: 'project-moderation-nags.project-submitted-for-review',
-		defaultMessage: 'Your project has been submitted for review!',
-	},
 })
 
 const { formatMessage } = useVIntl()
-const { addNotification } = injectNotificationManager()
 const flags = useFeatureFlags()
 
 const props = withDefaults(defineProps<Props>(), {
@@ -388,11 +377,6 @@ async function submitForReview() {
 	await navigateTo(
 		`/${props.project.project_type}/${props.project.slug ?? props.project.id}/${nagDestinations.moderation.path}`,
 	)
-	addNotification({
-		type: 'success',
-		title: formatMessage(commonMessages.successLabel),
-		text: formatMessage(messages.projectSubmittedForReview),
-	})
 }
 
 const applicableNags = computed<Nag[]>(() => {
