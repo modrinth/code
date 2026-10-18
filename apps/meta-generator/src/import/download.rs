@@ -90,6 +90,14 @@ pub async fn download_from_upstreams(
     }
 
     // do Forgelikes last since we have to download a lot of installers
+    if upstreams.forge {
+        let errors_before = cx.errors.len();
+        let result = forge::download(&mut cx)
+            .context(info_span!("downloading Forge upstream"))
+            .await;
+        completed.forge = download_succeeded(result, &cx.errors, errors_before);
+    }
+
     if upstreams.neoforge {
         let errors_before = cx.errors.len();
         let result = neoforge::download(&mut cx)
@@ -97,14 +105,6 @@ pub async fn download_from_upstreams(
             .await;
         completed.neoforge =
             download_succeeded(result, &cx.errors, errors_before);
-    }
-
-    if upstreams.forge {
-        let errors_before = cx.errors.len();
-        let result = forge::download(&mut cx)
-            .context(info_span!("downloading Forge upstream"))
-            .await;
-        completed.forge = download_succeeded(result, &cx.errors, errors_before);
     }
 
     toasty::update!(download_run {
