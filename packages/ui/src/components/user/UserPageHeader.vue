@@ -50,6 +50,12 @@
 					:label="formatMessage(messages.profileProjectCountLabel, { count: projectsCount })"
 				/>
 				<PageHeaderMetadataNumberItem
+					:icon="HeartIcon"
+					:value="followers"
+					:label="formatMessage(messages.profileFollowerCountLabel, { count: followers })"
+					:tooltip="followersTooltip"
+				/>
+				<PageHeaderMetadataNumberItem
 					:icon="DownloadIcon"
 					:value="downloads"
 					:label="formatMessage(messages.profileDownloadCountLabel, { count: downloads })"
@@ -110,6 +116,7 @@ import {
 	CurrencyIcon,
 	DownloadIcon,
 	EditIcon,
+	HeartIcon,
 	InfoIcon,
 	KeyIcon,
 	LockIcon,
@@ -191,6 +198,10 @@ const messages = defineMessages({
 		id: 'profile.label.download-count',
 		defaultMessage: '{count, plural, one {download} other {downloads}}',
 	},
+	profileFollowerCountLabel: {
+		id: 'profile.label.follower-count',
+		defaultMessage: '{count, plural, one {follower} other {followers}}',
+	},
 	removeAffiliateButton: {
 		id: 'profile.button.remove-affiliate',
 		defaultMessage: 'Remove as affiliate',
@@ -238,6 +249,7 @@ const props = withDefaults(
 		isBlocked?: boolean
 		projectsCount?: number
 		downloads?: number
+		followers?: number
 	}>(),
 	{
 		summary: null,
@@ -254,6 +266,7 @@ const props = withDefaults(
 		isBlocked: false,
 		projectsCount: 0,
 		downloads: 0,
+		followers: 0,
 	},
 )
 
@@ -282,6 +295,7 @@ const formatDateTime = useFormatDateTime({
 	dateStyle: 'long',
 })
 const downloadsTooltip = computed(() => formatNumber(props.downloads))
+const followersTooltip = computed(() => formatNumber(props.followers))
 const joinedTooltip = computed(() => formatDateTime(props.user.created))
 
 const moreActions = computed<ButtonMenuOption[]>(() => [

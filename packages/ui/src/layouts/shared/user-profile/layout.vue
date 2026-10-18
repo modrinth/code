@@ -238,6 +238,7 @@
 					:is-blocked="isBlocked"
 					:projects-count="projects.length"
 					:downloads="sumDownloads"
+					:followers="sumFollowers"
 					@manage-projects="openPath('/dashboard/projects')"
 					@report="reportProfile"
 					@block="handleBlockAction"
@@ -897,6 +898,10 @@ const navLinks = computed(() => {
 
 const sumDownloads = computed(() =>
 	projects.value.reduce((total, project) => total + project.downloads, 0),
+)
+
+const sumFollowers = computed(() =>
+	projects.value.reduce((total, project) => total + project.followers, 0),
 )
 const profileHeaderSummary = computed(() => {
 	if (!user.value) return ''
