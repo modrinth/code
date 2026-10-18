@@ -1,6 +1,6 @@
 use std::{sync::Arc, time::Duration};
 
-use anyhow::{Context, Result};
+use anyhow::{Context, Result, ensure};
 use figment::Figment;
 use toasty::migration::MigrationSet;
 use tracing::{info, info_span, level_filters::LevelFilter};
@@ -55,11 +55,8 @@ enum Command {
     Export,
 }
 
-pub async fn main() -> Result<()> {
-    static MIGRATIONS: MigrationSet = toasty::embed_migrations!();
-
+pub fn main() -> Result<()> {
     dotenvy::dotenv().ok();
-    let cli = <Cli as clap::Parser>::parse();
     tracing_subscriber::registry()
         .with(tracing_anyhow::ErrorLayer::default())
         .with(
@@ -76,9 +73,33 @@ pub async fn main() -> Result<()> {
                 ),
         )
         .init();
+    let mut config = create_config()?;
 
-    let config = create_config()?;
+    if let Some(sentry) = config.sentry.take() {
+        let sentry = sentry::init(sentry::ClientOptions {
+            dsn: Some(sentry.dsn.parse().context("invalid Sentry DSN")?),
+            release: sentry::release_name!(),
+            environment: Some(sentry.environment.into()),
+            sample_rate: sentry.sample_rate,
+            ..Default::default()
+        });
+        ensure!(
+            sentry.is_enabled(),
+            "config defines Sentry integration but is not enabled"
+        );
+        info!("enabled Sentry integration");
+        unsafe { std::env::set_var("RUST_BACKTRACE", "1") };
+    }
 
+    tokio::runtime::Runtime::new()
+        .context("creating async runtime")?
+        .block_on(main_(config))
+}
+
+async fn main_(config: Config) -> Result<()> {
+    static MIGRATIONS: MigrationSet = toasty::embed_migrations!();
+
+    let cli = <Cli as clap::Parser>::parse();
     let http = reqwest::Client::builder()
         .timeout(Duration::from_secs(30))
         .build()

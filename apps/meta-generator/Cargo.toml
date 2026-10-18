@@ -17,6 +17,7 @@ figment = { workspace = true, features = ["env"] }
 futures = { workspace = true }
 hex = { workspace = true }
 indexmap = { workspace = true }
+sentry = { workspace = true }
 jiff = { workspace = true, features = ["serde"] }
 minecraft-meta-manifest = { workspace = true }
 minecraft-meta-model = { workspace = true }

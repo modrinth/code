@@ -9,11 +9,20 @@ pub struct Config {
     pub database_url: Url,
     pub concurrency: Concurrency,
     #[serde(default)]
+    pub sentry: Option<Sentry>,
+    #[serde(default)]
     pub public_s3: Option<S3>,
     #[serde(default)]
     pub private_s3: Option<S3>,
     #[serde(default)]
     pub fastly: Option<Fastly>,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct Sentry {
+    pub dsn: String,
+    pub environment: String,
+    pub sample_rate: f32,
 }
 
 #[derive(Debug, Clone, Deserialize)]
