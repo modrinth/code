@@ -8,7 +8,9 @@ use tracing_anyhow::FutureContext;
 use url::Url;
 use uuid::Uuid;
 
-use crate::store::{ContentType, PutStatus, StoreOps, StoreVisibility};
+use crate::store::{
+    ContentType, PutMode, PutStatus, StoreOps, StoreVisibility,
+};
 
 #[derive(Debug)]
 pub struct FsStore {
@@ -67,12 +69,35 @@ impl StoreOps for FsStore {
         })
     }
 
+    fn matches_hash<'a>(
+        &self,
+        path: &'a str,
+        sha256: Sha256,
+    ) -> Pin<Box<dyn Future<Output = Result<bool>> + 'a>> {
+        let path = self
+            .root
+            .to_file_path()
+            .expect("root is a local file URL")
+            .join(path);
+        Box::pin(async move {
+            match fs::read(&path).await {
+                Ok(data) => Ok(Sha256::from_digest(&data) == sha256),
+                Err(err) if err.kind() == std::io::ErrorKind::NotFound => {
+                    Ok(false)
+                }
+                Err(err) => {
+                    Err(err).context(format!("reading original file {path:?}"))
+                }
+            }
+        })
+    }
+
     fn put<'a>(
         &self,
         path: &'a str,
         data: &'a [u8],
         _content_type: ContentType,
-        _skip_if_matches: Option<Sha256>,
+        mode: PutMode,
     ) -> Pin<Box<dyn Future<Output = Result<PutStatus>> + 'a>> {
         let path = self
             .root
@@ -80,16 +105,18 @@ impl StoreOps for FsStore {
             .expect("root is a local file URL")
             .join(path);
         Box::pin(async move {
-            // avoid write if unchanged
-            match fs::read(&path).await {
-                Ok(existing) if existing == data => {
-                    return Ok(PutStatus::Unchanged);
-                }
-                Ok(_) => {}
-                Err(err) if err.kind() == std::io::ErrorKind::NotFound => {}
-                Err(err) => {
-                    return Err(err)
-                        .context(format!("reading original file {path:?}"));
+            if matches!(mode, PutMode::Check) {
+                match fs::read(&path).await {
+                    Ok(existing) if existing == data => {
+                        return Ok(PutStatus::Unchanged);
+                    }
+                    Ok(_) => {}
+                    Err(err) if err.kind() == std::io::ErrorKind::NotFound => {}
+                    Err(err) => {
+                        return Err(err).context(format!(
+                            "reading original file {path:?}"
+                        ));
+                    }
                 }
             }
 
@@ -119,6 +146,78 @@ impl StoreOps for FsStore {
                 .await?;
             Ok(PutStatus::Changed)
         })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::store::BlobStore;
+    use std::sync::Arc;
+
+    #[tokio::test]
+    async fn filesystem_put_and_preflight() -> Result<()> {
+        let root =
+            std::env::temp_dir().join(format!("meta-store-{}", Uuid::now_v7()));
+        fs::create_dir_all(&root).await?;
+        let store = BlobStore {
+            imp: Arc::new(FsStore {
+                root: Url::from_directory_path(&root).unwrap(),
+            }),
+        };
+        assert_eq!(
+            store
+                .put("nested/blob", b"old", ContentType::Binary)
+                .await?,
+            PutStatus::Changed
+        );
+        assert_eq!(
+            store
+                .put("nested/blob", b"old", ContentType::Binary)
+                .await?,
+            PutStatus::Unchanged
+        );
+        assert_eq!(
+            store
+                .put_from(
+                    "nested/blob",
+                    Sha256::from_digest(b"old"),
+                    ContentType::Binary,
+                    async {
+                        panic!("matching destination must not fetch the source")
+                    }
+                )
+                .await?,
+            PutStatus::Unchanged
+        );
+        assert_eq!(
+            store
+                .put_from(
+                    "nested/blob",
+                    Sha256::from_digest(b"new"),
+                    ContentType::Binary,
+                    async { Ok(b"new".to_vec()) }
+                )
+                .await?,
+            PutStatus::Changed
+        );
+        assert_eq!(store.get("nested/blob").await?, b"new");
+        assert_eq!(
+            store
+                .put_from(
+                    "missing",
+                    Sha256::from_digest(b"new"),
+                    ContentType::Binary,
+                    async { Ok(b"new".to_vec()) }
+                )
+                .await?,
+            PutStatus::Changed
+        );
+        let mut entries = fs::read_dir(root.join("nested")).await?;
+        assert_eq!(entries.next_entry().await?.unwrap().file_name(), "blob");
+        assert!(entries.next_entry().await?.is_none());
+        fs::remove_dir_all(root).await?;
+        Ok(())
     }
 }
 

@@ -9,7 +9,7 @@ use url::Url;
 
 use crate::{
     config::S3,
-    store::{ContentType, PutStatus, StoreOps},
+    store::{ContentType, PutMode, PutStatus, StoreOps},
     util::Sha256,
 };
 
@@ -55,6 +55,40 @@ pub fn new(config: &S3) -> Result<S3Store> {
     })
 }
 
+async fn matches_hash(
+    bucket: &Bucket,
+    path: &str,
+    sha256: Sha256,
+) -> Result<bool> {
+    let response = bucket
+        .head_object(path)
+        .context(info_span!("reading S3 object metadata", path))
+        .await;
+    match response {
+        Ok((_, 404)) => Ok(false),
+        Ok((object, status)) => {
+            ensure!(
+                (200..300).contains(&status),
+                "S3 HEAD {path} returned HTTP {status}"
+            );
+            Ok(object
+                .metadata
+                .as_ref()
+                .and_then(|metadata| metadata.get("sha256"))
+                == Some(&sha256.to_string()))
+        }
+        Err(err) => {
+            if matches!(
+                err.downcast_ref::<S3Error>(),
+                Some(S3Error::HttpFailWithBody(404, _))
+            ) {
+                return Ok(false);
+            }
+            Err(err)
+        }
+    }
+}
+
 impl StoreOps for S3Store {
     fn url_for(&self, path: &str) -> Url {
         let mut url = self.base_url.clone();
@@ -84,39 +118,35 @@ impl StoreOps for S3Store {
         })
     }
 
+    fn matches_hash<'a>(
+        &self,
+        path: &'a str,
+        sha256: Sha256,
+    ) -> Pin<Box<dyn Future<Output = Result<bool>> + 'a>> {
+        let bucket = self.bucket.clone();
+        Box::pin(async move { matches_hash(&bucket, path, sha256).await })
+    }
+
     fn put<'a>(
         &self,
         path: &'a str,
         data: &'a [u8],
         content_type: ContentType,
-        skip_if_matches: Option<Sha256>,
+        mode: PutMode,
     ) -> Pin<Box<dyn Future<Output = Result<PutStatus>> + 'a>> {
         let bucket = self.bucket.clone();
         Box::pin(async move {
-            let sha256 = skip_if_matches
-                .unwrap_or_else(|| Sha256::from_digest(data))
-                .to_string();
-            match bucket.head_object(path).await {
-                Ok((_, 404)) | Err(S3Error::HttpFailWithBody(404, _)) => {}
-                Ok((object, status)) => {
-                    ensure!(
-                        (200..300).contains(&status),
-                        "S3 HEAD {path} returned HTTP {status}"
-                    );
-                    if object
-                        .metadata
-                        .as_ref()
-                        .and_then(|metadata| metadata.get("sha256"))
-                        == Some(&sha256)
-                    {
+            let sha256 = match mode {
+                PutMode::Check => {
+                    let sha256 = Sha256::from_digest(data);
+                    if matches_hash(&bucket, path, sha256).await? {
                         return Ok(PutStatus::Unchanged);
                     }
+                    sha256
                 }
-                Err(err) => {
-                    return Err(err)
-                        .context(format!("reading S3 object metadata {path}"));
-                }
+                PutMode::Prechecked(sha256) => sha256,
             }
+            .to_string();
 
             let response = bucket
                 .put_object_builder(path, data)

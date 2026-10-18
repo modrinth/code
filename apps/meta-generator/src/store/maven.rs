@@ -1,8 +1,8 @@
 use anyhow::Result;
 
 use crate::{
-    store::{BlobStore, ContentType, PutStatus},
-    util::MavenCoordinate,
+    store::{BlobCas, BlobStore, ContentType, PutStatus},
+    util::{MavenCoordinate, Sha256},
 };
 
 #[derive(Debug, Clone)]
@@ -16,12 +16,18 @@ impl MavenStore {
         Self { imp }
     }
 
-    pub async fn put(
+    /// Publish a CAS blob only if the destination hash differs.
+    pub async fn publish(
         &self,
         coordinate: &MavenCoordinate,
-        data: &[u8],
+        sha256: Sha256,
+        cas: &BlobCas,
     ) -> Result<PutStatus> {
         let path = coordinate.to_maven_path();
-        self.imp.put(&path, data, ContentType::Binary).await
+        self.imp
+            .put_from(&path, sha256, ContentType::Binary, async {
+                cas.get(sha256).await
+            })
+            .await
     }
 }

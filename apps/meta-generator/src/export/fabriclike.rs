@@ -194,13 +194,8 @@ pub async fn publish_artifact(
     app: &AppState,
     stored: FabriclikeStoredArtifact,
 ) -> Result<crate::store::PutStatus> {
-    let bytes = app.cas
-        .get(stored.sha256)
-        .context(info_span!("reading stored Maven artifact", sha256 = %stored.sha256, coordinate = %stored.artifact.coordinate))
-        .await?;
-
     app.maven
-        .put(&stored.artifact.coordinate, &bytes)
+		.publish(&stored.artifact.coordinate, stored.sha256, &app.cas)
         .context(info_span!("publishing Maven artifact", coordinate = %stored.artifact.coordinate))
         .await
 }

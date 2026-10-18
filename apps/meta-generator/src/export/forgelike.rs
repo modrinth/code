@@ -166,12 +166,6 @@ pub async fn export(app: &AppState, upstreams: Upstreams) -> Result<PutStatus> {
         stream::iter(artifacts.into_iter().map(Ok::<_, anyhow::Error>))
             .map_ok(|artifact| async move {
                 async {
-				let span = info_span!(
-				   "reading embedded Maven artifact",
-				   coordinate = %artifact.coordinate,
-				   sha256 = %artifact.sha256,
-				);
-				let bytes = app.cas.get(artifact.sha256).context(span).await?;
 
 				let span = info_span!(
 				   "publishing embedded Maven artifact",
@@ -180,7 +174,7 @@ pub async fn export(app: &AppState, upstreams: Upstreams) -> Result<PutStatus> {
 				);
 				let changed = app
 					.maven
-					.put(&artifact.coordinate, &bytes)
+					.publish(&artifact.coordinate, artifact.sha256, &app.cas)
 					.context(span)
 					.await?;
 				let done = num_done.fetch_add(1, Ordering::Relaxed) + 1;
