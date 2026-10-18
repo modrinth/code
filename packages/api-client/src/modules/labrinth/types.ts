@@ -1167,6 +1167,7 @@ export namespace Labrinth {
 				| 'add-java-address'
 				| 'all-languages'
 				| 'select-compatibility'
+								| 'modpack-version-not-public'
 				| 'select-country'
 				| 'select-language'
 				| 'too-many-languages'
