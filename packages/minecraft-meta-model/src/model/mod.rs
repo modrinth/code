@@ -3,7 +3,7 @@
 //! Use this when interacting with a Postgres database which was populated by
 //! `meta-generator`.
 
-mod download;
+mod blob;
 mod fabric;
 mod fabriclike;
 mod forge;
@@ -13,7 +13,7 @@ mod mojang;
 mod neoforge;
 mod profile;
 mod quilt;
-pub use download::*;
+pub use blob::*;
 pub use fabric::*;
 pub use fabriclike::*;
 pub use forge::*;

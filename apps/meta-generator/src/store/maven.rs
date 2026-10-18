@@ -12,22 +12,24 @@ pub struct MavenStore {
 
 impl MavenStore {
     #[must_use]
-    pub const fn new(imp: BlobStore) -> Self {
+    pub fn new(imp: BlobStore) -> Self {
         Self { imp }
     }
 
-    /// Publish a CAS blob only if the destination hash differs.
+    /// Publishes an artifact, fetching it from CAS only if the destination differs.
     pub async fn publish(
         &self,
         coordinate: &MavenCoordinate,
         sha256: Sha256,
         cas: &BlobCas,
     ) -> Result<PutStatus> {
-        let path = coordinate.to_maven_path();
         self.imp
-            .put_from(&path, sha256, ContentType::Binary, async {
-                cas.get(sha256).await
-            })
+            .put_from(
+                &coordinate.to_maven_path(),
+                sha256,
+                ContentType::Binary,
+                async { cas.get(sha256).await },
+            )
             .await
     }
 }

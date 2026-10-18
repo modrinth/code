@@ -14,6 +14,15 @@ pub struct BlobHash {
 	pub sha1: Sha1,
 }
 
+/// Hash last published at each Maven path in the single export destination.
+#[derive(Debug, Clone, Model)]
+#[table = "maven_exports"]
+#[key(path)]
+pub struct MavenExport {
+	pub path: String,
+	pub sha256: Sha256,
+}
+
 /// ID for a [`DownloadRun`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Embed)]
 pub struct DownloadRunId(pub Uuid);
