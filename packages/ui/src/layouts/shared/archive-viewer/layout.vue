@@ -22,6 +22,7 @@
 					{{ formatMessage(fullyLoaded ? messages.fetchingRest : messages.readingNested) }}
 					<span v-if="fetchedLabel" class="tabular-nums">({{ fetchedLabel }})</span>
 				</div>
+				<DetailsSettings class="ml-auto" />
 			</template>
 			<template v-if="slots['project-details']" #project-details>
 				<slot name="project-details" />
@@ -72,7 +73,13 @@ import type { WorkbenchRegion } from '#ui/layouts/shared/workbench/types'
 import { commonMessages } from '#ui/utils/common-messages'
 
 import ArchiveWorkbench from './components/ArchiveWorkbench.vue'
+import DetailsSettings from './components/details-settings.vue'
 import { useArchiveLoader } from './composables/archive-loader'
+import {
+	injectArchiveDetailsSettings,
+	provideArchiveDetailsSettings,
+	useStoredArchiveDetailsSettings,
+} from './providers/details-settings'
 import type { ArchiveSource } from './types'
 
 const props = withDefaults(
@@ -108,6 +115,10 @@ const slots = defineSlots<{
 
 const { formatMessage } = useVIntl()
 const formatBytes = useFormatBytes()
+
+provideArchiveDetailsSettings(
+	injectArchiveDetailsSettings(null) ?? useStoredArchiveDetailsSettings(),
+)
 
 const messages = defineMessages({
 	reading: {

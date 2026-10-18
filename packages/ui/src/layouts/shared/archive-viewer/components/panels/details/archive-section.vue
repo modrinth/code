@@ -7,9 +7,11 @@
 		:path="node.path.replace(/^\/+/, '')"
 		:status="contents.status"
 		:rows="entry.rows"
+		:more="entry.more"
 		:sizes="sizes"
 		:counts="contents.counts"
-		:hashes="entry.hashes"
+		:hash="entry.hash"
+		details-key="nested"
 	/>
 </template>
 
@@ -22,7 +24,7 @@ import { useVIntl } from '#ui/composables/i18n'
 import type { FileZipTreeNode } from '#ui/helpers/toolbox/zip'
 
 import { detailsMessages as messages } from './messages'
-import DetailsEntry from './entry.vue'
+import DetailsEntry from '../../details-section/index.vue'
 import { useContentsDetails } from './use-contents-details'
 import { useEntryDetails } from './use-entry-details'
 import { useSizeRow } from './use-size-row'

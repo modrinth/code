@@ -6,8 +6,10 @@
 		:icon-class="iconStyle.color"
 		:path="node.path.replace(/^\/+/, '') || '/'"
 		:rows="rows"
+		:more="file ? entry.more : undefined"
 		:sizes="sizes"
-		:hashes="file ? entry.hashes : undefined"
+		:hash="file ? entry.hash : undefined"
+		details-key="entry"
 	/>
 </template>
 
@@ -23,7 +25,7 @@ import { fileIconFor } from '#ui/layouts/shared/files-tab/utils'
 import type { ArchiveDetailRow } from '../../../types'
 import { isPlaceholderDate } from './entry-values'
 import { detailsMessages as messages } from './messages'
-import DetailsEntry from './entry.vue'
+import DetailsEntry from '../../details-section/index.vue'
 import { useEntryDetails } from './use-entry-details'
 import { useSizeRow } from './use-size-row'
 

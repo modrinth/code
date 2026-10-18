@@ -1,7 +1,7 @@
 
 import {
-	type ContentHashes, type FileContentPromise, type FileDetails, type FileTypeInfo,
-	type HashedFileContent, hashContent, resolveContent
+	computeHash, type FileContentPromise, type FileDetails, type FileTypeInfo,
+	type HashedFileContent, type HashType, resolveContent
 } from "#ui/helpers/toolbox/file";
 import { v7 as uuidV7 } from 'uuid';
 
@@ -122,10 +122,9 @@ function closeRoot(root: RootZipTreeNode | undefined) {
  * Maps the archive's actual hash to it, dropping the hash it was opened with when that turns out to
  * be wrong, and lets every connection know.
  */
-function onArchiveHashed(messenger: ServerMessenger<ZipMessages>, root: RootZipTreeNode, hashes: ContentHashes, expectedHash?: Sha512) {
-	const sha512Hash = hashes.sha512;
-	root.hashes = hashes;
-	hashToUUID.set(hashes.sha512, root.key);
+function onArchiveHashed(messenger: ServerMessenger<ZipMessages>, root: RootZipTreeNode, sha512Hash: Sha512, expectedHash?: Sha512) {
+	root.hashes = { ...root.hashes, sha512: sha512Hash };
+	hashToUUID.set(root.hashes!.sha512!, root.key);
 
 	const mismatched = expectedHash != null && expectedHash !== sha512Hash;
 	if (mismatched) {
@@ -137,7 +136,6 @@ function onArchiveHashed(messenger: ServerMessenger<ZipMessages>, root: RootZipT
 		type: 'root_hashed',
 		root: { root: root.key },
 		sha512Hash: sha512Hash,
-		hashes: hashes,
 		expectedHash: mismatched ? expectedHash : undefined,
 	});
 }
@@ -164,6 +162,14 @@ export const messageHandler: ServerMessageHandler<ZipMessages> = (messenger, msg
 		},
 		source_read: async (msg) => {
 			return (await getNodeFrom(msg)).asText(msg.options);
+		},
+		hash_read: async (msg) => {
+			return { hash: await (await getNodeFrom(msg)).hash(msg.algorithm) };
+		},
+		archive_hash_read: async (msg) => {
+			const root = getRootFrom(msg.root) as RootZipTreeNode & Partial<{ hash: (type: HashType) => Promise<string> }>;
+			if (!root.hash) throw new Error(`Archive '${msg.root}' can't compute its own hashes`);
+			return { hash: await root.hash(msg.algorithm) };
 		},
 		node_read: async (msg) => {
 			const node = msg.optional ? await findNodeFrom(msg) : await getNodeFrom(msg);
@@ -206,16 +212,16 @@ export const messageHandler: ServerMessageHandler<ZipMessages> = (messenger, msg
 
 				if (msg.data_type == 'buffer') {
 					const buffer = await arrayBufferFromSource(msg.buffer);
-					const hashes = await hashContent(buffer)
+					const sha512Hash = await computeHash(buffer, "sha512")
 
 					tree = await readZipTreeFromBuffer(messenger.logger, buffer, readOptions);
 
-					onArchiveHashed(messenger, tree, hashes, msg.sha512Hash);
+					onArchiveHashed(messenger, tree, sha512Hash, msg.sha512Hash);
 				} else {
 					const url = msg.url;
 					tree = await readZipTreeFromURL(messenger.logger, url, {
 						...readOptions,
-						archiveHashedCallback: (root, hashes) => onArchiveHashed(messenger, root, hashes, msg.sha512Hash),
+						archiveHashedCallback: (root, sha512Hash) => onArchiveHashed(messenger, root, sha512Hash, msg.sha512Hash),
 						rangeOptions: {
 							...msg.rangeOptions,
 							onProgress(current, total) {
@@ -326,7 +332,7 @@ export const messageHandler: ServerMessageHandler<ZipMessages> = (messenger, msg
 					filterPromises.push(
 						isValidFor(file.path, async () => file.fileTypeInfo.get(), pathMatcher, mimeMatcher)
 							.then((value) => {
-								if (value) baseFiles.push({ fullPath: file.path, name: file.name, content: () => file.getBuffer(), sha512: () => file.sha512.get()});
+								if (value) baseFiles.push({ fullPath: file.path, name: file.name, content: () => file.getBuffer(), sha512: () => file.hash("sha512")});
 							})
 					)
 				}
@@ -361,7 +367,7 @@ export const messageHandler: ServerMessageHandler<ZipMessages> = (messenger, msg
 				files = await Promise.all(
 					entries.values().map(async file => {
 						const buffer = await file.getBuffer();
-						const sha512 = await file.sha512.get();
+						const sha512 = await file.hash("sha512");
 
 						return { fullPath: file.path, name: file.name, content: buffer, sha512: sha512};
 					}).toArray()

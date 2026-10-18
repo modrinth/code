@@ -19,9 +19,10 @@
 			no-panels-overlay="emptyGroup"
 			@ready="(event) => workbench.onDockReady(host, event)"
 		/>
-		<component
-			:is="workbench.slots['center-footer']"
+		<SlotOutlet
 			v-if="host === 'center' && workbench.slots['center-footer']"
+			:slots="workbench.slots"
+			name="center-footer"
 		/>
 	</div>
 </template>
@@ -44,6 +45,7 @@ import {
 	type WorkbenchDockParams,
 } from '../../composables/create-workbench'
 import { injectWorkbench, provideWorkbenchDock } from '../../providers/workbench'
+import { SlotOutlet } from '../slot-outlet'
 import CornerToggle from './corner-toggle.vue'
 import HeaderActions from './header-actions.vue'
 import Panel from './panel.vue'

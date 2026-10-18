@@ -8,7 +8,8 @@
 		:rows="rows"
 		:sizes="sizes"
 		:counts="contents.counts"
-		:hashes="hashes"
+		:hash="archive.archiveHash"
+		details-key="root"
 	/>
 </template>
 
@@ -22,7 +23,7 @@ import { injectArchiveViewer } from '../../../providers/archive-viewer'
 import type { ArchiveDetailRow } from '../../../types'
 import { sourceHost } from './entry-values'
 import { detailsMessages as messages } from './messages'
-import DetailsEntry from './entry.vue'
+import DetailsEntry from '../../details-section/index.vue'
 import { useContentsDetails } from './use-contents-details'
 import { useSizeRow } from './use-size-row'
 
@@ -33,36 +34,42 @@ const archive = injectArchiveViewer()
 
 const contents = useContentsDetails(() => archive.root)
 
-const rows = computed<ArchiveDetailRow[]>(() => [
-	{
-		id: 'source',
-		label: formatMessage(messages.source),
-		value: archive.source.url,
-		hash: true,
-		display: formatMessage(messages.sourceName, { host: sourceHost(archive.source.url) }),
-	},
-])
+/**
+ * Where the archive came from, and whether its hash matches the one it was listed with (e.g. by
+ * the project version it was published in), once all of it has been downloaded.
+ */
+const rows = computed<ArchiveDetailRow[]>(() => {
+	const known = archive.sha512Hash.value
+	const listed = archive.source.sha512Hash
+	const result: ArchiveDetailRow[] = [
+		{
+			id: 'source',
+			label: formatMessage(messages.source),
+			value: archive.source.url,
+			hash: true,
+			display: formatMessage(messages.sourceName, { host: sourceHost(archive.source.url) }),
+		},
+	]
+	if (listed) {
+		const matches = known ? known === listed : null
+		result.push({
+			id: 'listed-hash',
+			label: formatMessage(messages.listedHash),
+			value: formatMessage(
+				matches == null
+					? messages.listedHashPending
+					: matches
+						? messages.listedHashMatch
+						: messages.listedHashMismatch,
+			),
+			tone: matches == null ? undefined : matches ? 'green' : 'red',
+			tooltip: formatMessage(messages.listedHashValue, { hash: listed }),
+		})
+	}
+	return result
+})
 
 /** The downloaded archive against what it holds once uncompressed. */
 const sizes = computed(() => [sizeRow(archive.source.size, contents.value.size)])
 
-/** The archive's hashes, which are only known once all of it has been downloaded. */
-const hashes = computed<ArchiveDetailRow[]>(() => {
-	const known = archive.rootHashes.value
-	if (!known) {
-		return [
-			{
-				id: 'hashes',
-				label: formatMessage(messages.hashes),
-				value: formatMessage(messages.hashPending),
-			},
-		]
-	}
-	return [
-		{ id: 'sha1', label: formatMessage(messages.sha1), value: known.sha1, hash: true },
-		{ id: 'sha256', label: formatMessage(messages.sha256), value: known.sha256, hash: true },
-		{ id: 'sha512', label: formatMessage(messages.sha512), value: known.sha512, hash: true },
-		{ id: 'murmur2', label: formatMessage(messages.murmur2), value: known.murmur2, hash: true },
-	]
-})
 </script>

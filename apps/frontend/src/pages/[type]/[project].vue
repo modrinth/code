@@ -2498,6 +2498,7 @@ const navLinks = computed(() => {
 			label: formatMessage(messages.filesTab),
 			href: `/archive?project=${project.value.id}`,
 			shown: isStaff(auth.value.user) && hasVersions.value,
+			replace: false,
 		},
 	]
 })

@@ -8,7 +8,7 @@
 				<ProjectReviewTabLabel :tab="panel.id as ProjectReviewTab" />
 			</template>
 			<template v-if="slots.footer" #center-footer>
-				<component :is="slots.footer" />
+				<slot name="footer" />
 			</template>
 		</WorkbenchLayout>
 	</section>

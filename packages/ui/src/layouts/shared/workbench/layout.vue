@@ -15,7 +15,7 @@
 			</div>
 			<div
 				v-else
-				class="flex shrink-0 items-center justify-center border-0 border-b border-solid border-surface-4 bg-surface-3"
+				class="flex shrink-0 items-center justify-end border-0 border-b border-solid border-surface-4 bg-surface-3 px-2"
 			>
 				<IconButton
 					v-tooltip="formatMessage(messages.expandToolbar)"
@@ -23,6 +23,8 @@
 					size="xs"
 					:label="formatMessage(messages.expandToolbar)"
 					@click="toolbarCollapsed = false"
+					:circular="true"
+					class="h-[0.8rem] my-[0.15rem]"
 				>
 					<ChevronDownIcon aria-hidden="true" />
 				</IconButton>

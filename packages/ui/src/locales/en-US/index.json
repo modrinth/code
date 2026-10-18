@@ -62,6 +62,15 @@
   "archive-viewer.detail.sha1": {
     "defaultMessage": "SHA-1"
   },
+  "archive-viewer.details-settings.content-counts": {
+    "defaultMessage": "Content counts"
+  },
+  "archive-viewer.details-settings.hashes": {
+    "defaultMessage": "Hashes to list"
+  },
+  "archive-viewer.details-settings.title": {
+    "defaultMessage": "Details settings"
+  },
   "archive-viewer.details.class-files-count": {
     "defaultMessage": "{count, plural, one {# class file} other {# class files}}"
   },
@@ -92,8 +101,8 @@
   "archive-viewer.details.copy-path": {
     "defaultMessage": "Copy path"
   },
-  "archive-viewer.details.crc32": {
-    "defaultMessage": "CRC-32"
+  "archive-viewer.details.copy-value": {
+    "defaultMessage": "Copy {label}"
   },
   "archive-viewer.details.detected-type": {
     "defaultMessage": "Detected type"
@@ -116,20 +125,29 @@
   "archive-viewer.details.folders-count": {
     "defaultMessage": "{count, plural, one {# folder} other {# folders}}"
   },
-  "archive-viewer.details.hash-pending": {
-    "defaultMessage": "Available once fully downloaded"
-  },
-  "archive-viewer.details.hashes": {
-    "defaultMessage": "Hashes"
+  "archive-viewer.details.hide-details": {
+    "defaultMessage": "Hide details"
   },
   "archive-viewer.details.hide-parents": {
     "defaultMessage": "Only show the closest parent archive"
   },
+  "archive-viewer.details.listed-hash": {
+    "defaultMessage": "Listed hash"
+  },
+  "archive-viewer.details.listed-hash-match": {
+    "defaultMessage": "Matches"
+  },
+  "archive-viewer.details.listed-hash-mismatch": {
+    "defaultMessage": "Doesn't match"
+  },
+  "archive-viewer.details.listed-hash-pending": {
+    "defaultMessage": "Checked once fully downloaded"
+  },
+  "archive-viewer.details.listed-hash-value": {
+    "defaultMessage": "Listed SHA-512: {hash}"
+  },
   "archive-viewer.details.modified": {
     "defaultMessage": "Modified"
-  },
-  "archive-viewer.details.murmur2": {
-    "defaultMessage": "Murmur2"
   },
   "archive-viewer.details.nested-archive": {
     "defaultMessage": "Nested archive · depth {depth}"
@@ -143,14 +161,8 @@
   "archive-viewer.details.root-archive": {
     "defaultMessage": "Archive"
   },
-  "archive-viewer.details.sha1": {
-    "defaultMessage": "SHA-1"
-  },
-  "archive-viewer.details.sha256": {
-    "defaultMessage": "SHA-256"
-  },
-  "archive-viewer.details.sha512": {
-    "defaultMessage": "SHA-512"
+  "archive-viewer.details.show-details": {
+    "defaultMessage": "Show details"
   },
   "archive-viewer.details.show-parents": {
     "defaultMessage": "{count, plural, one {Show # more parent archive} other {Show # more parent archives}}"
@@ -175,6 +187,9 @@
   },
   "archive-viewer.details.status-reading": {
     "defaultMessage": "Reading nested archives..."
+  },
+  "archive-viewer.details.value-copied": {
+    "defaultMessage": "{label} copied"
   },
   "archive-viewer.details.yes": {
     "defaultMessage": "Yes"
@@ -217,9 +232,6 @@
   },
   "archive-viewer.panel.logs": {
     "defaultMessage": "Logs"
-  },
-  "archive-viewer.panel.project-details": {
-    "defaultMessage": "Project"
   },
   "archive-viewer.panel.tree": {
     "defaultMessage": "Files"

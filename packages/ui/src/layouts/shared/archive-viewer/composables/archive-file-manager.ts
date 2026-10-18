@@ -1,9 +1,9 @@
 import { ClipboardCopyIcon, DownloadIcon } from '@modrinth/assets'
-import { computed, markRaw, onScopeDispose, type Ref, ref, shallowRef } from 'vue'
+import { computed, markRaw, onScopeDispose, type Ref, ref, shallowReactive, shallowRef } from 'vue'
 
 import { useFormatBytes } from '#ui/composables/format-bytes'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import type { ContentHashes } from '#ui/helpers/toolbox/file'
+import { type FileTypeInfo, getFileTypeInfo, type HashType } from '#ui/helpers/toolbox/file'
 import {
 	type FileZipTreeNode, isZipArchive,
 	type LazyDataAccess,
@@ -31,7 +31,13 @@ import {
 	parentInfoFrom,
 } from '#ui/layouts/shared/files-tab/utils'
 import { injectNotificationManager } from '#ui/providers/web-notifications'
-import { canOpenInFileEditor, getFileExtension } from '#ui/utils/file-extensions'
+import {
+	canOpenInFileEditor,
+	getEditorLanguage,
+	getFileExtension,
+	isEditableFile,
+	isImageFile,
+} from '#ui/utils/file-extensions'
 
 import type { ArchiveSource } from '../types'
 
@@ -121,7 +127,12 @@ export function useArchiveFileManager({
 	const fullyLoaded = ref(false)
 	/** The archive's own SHA-512, once it has been downloaded in full and hashed. */
 	const sha512Hash = ref<string | null>(root.sha512Hash ?? null)
-	const rootHashes = ref<Partial<ContentHashes> | ContentHashes | null>(root.hashes ?? null)
+
+	/** The whole archive's hash of the given type, once all of it has been downloaded. */
+	function archiveHash(type: HashType) {
+		return handler.readArchiveHash(root.key, type)
+	}
+
 	let treeUpdated = Promise.withResolvers<void>()
 
 	function nodeAt(path: string): ZipNode | undefined {
@@ -131,6 +142,44 @@ export function useArchiveFileManager({
 
 	function fileNodeAt(path: string): FileZipTreeNode | undefined {
 		return nodeAt(path)?.asFile()
+	}
+
+	const fileTypes = shallowReactive(new WeakMap<FileZipTreeNode, FileTypeInfo | null>())
+	const fileTypesRequested = new WeakSet<FileZipTreeNode>()
+
+	/**
+	 * The file's type as the worker detects it from its contents, read the first time it's asked
+	 * for. Until then it's `undefined`, and callers that track it are updated once it's read.
+	 */
+	function contentFileType(node: FileZipTreeNode): FileTypeInfo | null | undefined {
+		if (!fileTypesRequested.has(node)) {
+			fileTypesRequested.add(node)
+			node.fileTypeInfo
+				.get()
+				.catch(() => null)
+				.then((info) => fileTypes.set(node, info))
+		}
+		return fileTypes.get(node)
+	}
+
+	/**
+	 * The file's type for the editor. Files with a known extension are judged by it; only those
+	 * without one have their contents read to tell what they are.
+	 */
+	function editorFileType(file: FileInfo): FileTypeInfo | null {
+		const ext = getFileExtension(file.name)
+		const typeFromName = file.name.includes('.') ? getFileTypeInfo(file.name) : null
+		if (typeFromName != null || isEditableFile(ext) || isImageFile(ext)) return typeFromName
+		const node = fileNodeAt(file.path)
+		return (node ? contentFileType(node) : null) ?? null
+	}
+
+	function canOpenInEditor(file: FileInfo) {
+		return isClassFile(file.name) || canOpenInFileEditor(file.name, editorFileType(file))
+	}
+
+	function editorLanguage(file: FileInfo) {
+		return isClassFile(file.name) ? 'java' : getEditorLanguage(file.name, editorFileType(file))
 	}
 
 	/** Whether the entry is a nested archive whose own entries haven't been read yet. */
@@ -298,9 +347,13 @@ export function useArchiveFileManager({
 			onTreeChanged()
 		} else if (update.type === 'updated_node_data' && update.node.root === root.key) {
 			fileResults.delete(normalizeDirectoryPath(update.node.path))
+			const node = fileNodeAt(update.node.path)
+			if (node) {
+				fileTypesRequested.delete(node)
+				fileTypes.delete(node)
+			}
 		} else if (update.type === 'root_hashed' && update.root.root === root.key) {
 			sha512Hash.value = update.sha512Hash
-			rootHashes.value = update.hashes
 		}
 	})
 	onScopeDispose(() => updates.cancel())
@@ -352,7 +405,7 @@ export function useArchiveFileManager({
 			id: 'archive-sha1',
 			label: formatMessage(messages.sha1),
 			shown: isFileNode,
-			value: async (entry) => await readLazy(entry, 'sha1'),
+			value: async (entry) => (await fileNodeAt(entry.path)?.hash('sha1')) ?? null,
 		},
 	]
 
@@ -373,7 +426,7 @@ export function useArchiveFileManager({
 			icon: ClipboardCopyIcon,
 			shown: isFileNode,
 			action: async (entry) => {
-				const hash = await readLazy(entry, 'sha512')
+				const hash = await fileNodeAt(entry.path)?.hash('sha512')
 				if (!hash) return
 				await navigator.clipboard.writeText(hash)
 				addNotification({ title: formatMessage(messages.copiedSha512), type: 'success' })
@@ -406,8 +459,8 @@ export function useArchiveFileManager({
 		readOnlyReason: computed(() => formatMessage(messages.readOnly)),
 		basePath: computed(() => source.name),
 
-		canOpenInEditor: (file) => isClassFile(file.name) || canOpenInFileEditor(file.name),
-		editorLanguage: (file) => (isClassFile(file.name) ? 'java' : undefined),
+		canOpenInEditor,
+		editorLanguage,
 		entryActions,
 		entryDetails,
 	}
@@ -419,7 +472,7 @@ export function useArchiveFileManager({
 		fullyLoaded,
 		treeVersion,
 		sha512Hash,
-		rootHashes,
+		archiveHash,
 		nodeAt,
 	}
 }

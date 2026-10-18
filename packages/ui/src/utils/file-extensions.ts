@@ -1,5 +1,5 @@
 // File extension constants
-import {getFileTypeInfo, getLanguageFromFile} from "#ui/helpers/toolbox/file";
+import { type FileTypeInfo, getFileTypeInfo, getLanguageFromFile } from '#ui/helpers/toolbox/file'
 
 export const FILE_CODE_EXTENSIONS = [
 	'json',
@@ -92,24 +92,45 @@ export function isEditableFile(ext: string): boolean {
 }
 
 /**
- * Check if a file can be opened in the file editor
+ * Check if a file can be opened in the file editor, from its type when known (e.g. detected from
+ * its contents) or else from its name. A type detected from its contents as neither text, code nor
+ * an image can't be opened, whatever its extension suggests.
  */
-export function canOpenInFileEditor(filename: string): boolean {
-	const fileInfo = getFileTypeInfo(filename);
-	if (fileInfo != null && (getLanguageFromFile(fileInfo) || fileInfo.mime.startsWith("text/"))) return true;
-	const ext = getFileExtension(filename);
+export function canOpenInFileEditor(
+	filename: string,
+	fileInfo: FileTypeInfo | null = getFileTypeInfo(filename),
+): boolean {
+	const lang = getLanguageFromFile(filename, fileInfo);
+	if (lang != null) return true;
+	if (fileInfo != null) {
+		if (fileInfo.mime.startsWith('text/') || isImageFile(fileInfo.extension ?? '')) {
+			return true
+		}
+		if (fileInfo.method === 'content-analysis') return false
+	}
+	const ext = getFileExtension(filename)
 	return !filename.includes('.') || isEditableFile(ext) || isImageFile(ext)
 }
 
+/** Check if a file can be opened in the file editor, detecting its type from its contents. */
+export async function canOpenDataInFileEditor(
+	filename: string,
+	data: ArrayBuffer | Blob,
+): Promise<boolean> {
+	return canOpenInFileEditor(filename, await getFileTypeInfo(filename, data))
+}
+
 /**
- * Get Ace editor language mode for a file extension
+ * Get the editor language mode for a file, from its type when known (e.g. detected from its
+ * contents) or else from its name.
  */
-export function getEditorLanguage(filename: string): string {
-	const fileInfo = getFileTypeInfo(filename);
-	if (fileInfo != null) {
-		const language = getLanguageFromFile(fileInfo);
-		if (language) return language;
-	}
+export function getEditorLanguage(
+	filename: string,
+	fileInfo: FileTypeInfo | null = getFileTypeInfo(filename),
+): string {
+	const language = getLanguageFromFile(filename, fileInfo);
+	if (language) return language;
+
 	const lowered = getFileExtension(filename);
 
 	switch (lowered) {

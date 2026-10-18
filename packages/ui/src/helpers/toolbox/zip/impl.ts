@@ -4,12 +4,10 @@ import {
 	type DecompilerResult, DEFAULT_DECOMPILE_OPTIONS
 } from "#ui/helpers/toolbox/decompile";
 import {
-	type ContentHashes,
-	murmurHashV2,
+	computeHash,
 	type FileTypeInfo,
 	getFileTypeInfo,
-	hashBuffer,
-	hashContent,
+	type HashType,
 } from "#ui/helpers/toolbox/file";
 import {
 type LazyMutableValue, lazyMutableValue,
@@ -42,6 +40,7 @@ import {
  */
 export async function readZipTreeFromBuffer(logger: Logger, buffer: ArrayBuffer, options: ReadExtraOptions = {}): Promise<RootZipTreeNodeImpl> {
 	const root = new RootZipTreeNodeImpl(logger, options.key ?? uuidV7(), Promise.withResolvers<void>());
+	root.setContent(buffer);
 	const result = await readZipDataToNode(root, root, zipReaderFromBuffer(buffer), options);
 	root.markEntriesRead();
 	return result;
@@ -59,8 +58,9 @@ export async function readZipTreeFromURL(logger: Logger, url: string, options: R
 	rangeReader.toBlob()
 		.then(async (blob) => {
 			if (root.isClosed) return;
-			root.hashes = await hashContent(await blob.arrayBuffer());
-			if (!root.isClosed) options.archiveHashedCallback?.(root, root.hashes as ContentHashes);
+			root.setContent(await blob.arrayBuffer());
+			const sha512Hash = await root.hash("sha512");
+			if (!root.isClosed) options.archiveHashedCallback?.(root, sha512Hash);
 		})
 		.catch((err) => {
 			if (!root.isClosed) logger.warn(`Unable to fetch the rest of '${url}' in the background`, { err: err });
@@ -96,8 +96,8 @@ export type ReadExtraOptions = {
 	 * the background instead of being waited on, with `onFinishedLoading` resolving once all are.
 	 */
 	innerArchiveReadCallback?: (root: RootZipTreeNode, node: FileZipTreeNode) => void
-	/** Called with the hashes of an archive read from a URL, once all of it has been downloaded. */
-	archiveHashedCallback?: (root: RootZipTreeNode, hashes: ContentHashes) => void
+	/** Called with the SHA-512 of an archive read from a URL, once all of it has been downloaded. */
+	archiveHashedCallback?: (root: RootZipTreeNode, sha512Hash: string) => void
 };
 
 function zipReaderFromBuffer(buffer: ArrayBuffer): ZipReader<Uint8Array<ArrayBuffer>> {
@@ -219,6 +219,27 @@ class RootZipTreeNodeImpl extends RootZipTreeNode {
 	/** Stops work still running for this archive (e.g. background downloads) once it is closed. */
 	closeCallbacks: (() => void)[] = [];
 	private entriesRead = false;
+	/** The whole archive's bytes, once all of it is at hand (for a URL, once downloaded). */
+	private content = Promise.withResolvers<ArrayBuffer>();
+	private hashResults = new Map<HashType, Promise<string>>();
+
+	setContent(data: ArrayBuffer) {
+		this.content.resolve(data);
+	}
+
+	/** The whole archive's hash of the given type, once all of it is at hand; kept in `hashes` too. */
+	hash(type: HashType): Promise<string> {
+		let result = this.hashResults.get(type);
+		if (!result) {
+			result = this.content.promise.then(async (data) => {
+				const value = await computeHash(data, type);
+				this.hashes = { ...this.hashes, [type]: value };
+				return value;
+			});
+			this.hashResults.set(type, result);
+		}
+		return result;
+	}
 
     constructor(logger: Logger, key: UUID_V7, onFinishedLoadingHolder: PromiseWithResolvers<void>) {
         super(key, onFinishedLoadingHolder.promise);
@@ -275,13 +296,16 @@ class FileZipTreeNodeImpl extends ZipTreeNodeImpl implements FileZipTreeNode {
 
     asText: (options?: SourceOptions) => Promise<DecompilerResult>;
 
-    sha1: LazyValue<string>;
+	private readonly hashes = new Map<HashType, LazyValue<string>>();
 
-    sha256: LazyValue<string>;
-
-    sha512: LazyValue<string>;
-
-	murmur2: LazyValue<string>;
+	hash(type: HashType): Promise<string> {
+		let value = this.hashes.get(type);
+		if (!value) {
+			value = this.arrayBuffer.lazyMap(async (buffer) => computeHash(buffer, type));
+			this.hashes.set(type, value);
+		}
+		return value.get();
+	}
 
     constructor(root: RootZipTreeNode, parent: ZipNode, name: string, path: string, buffer: ArrayBufferSource | undefined, type: "file", metadata?: FileEntry) {
         super(root, parent, name, path, type, metadata);
@@ -370,14 +394,6 @@ class FileZipTreeNodeImpl extends ZipTreeNodeImpl implements FileZipTreeNode {
 
 			return map.get(finalOptions!)!.get();
 		}
-
-        this.sha1 = this.arrayBuffer.lazyMap(async (buffer) => hashBuffer(buffer, "SHA-1"))
-
-        this.sha256 = this.arrayBuffer.lazyMap(async (buffer) => hashBuffer(buffer, "SHA-256"))
-
-        this.sha512 = this.arrayBuffer.lazyMap(async (buffer) => hashBuffer(buffer, "SHA-512"))
-
-		this.murmur2 = this.arrayBuffer.lazyMap(async (buffer) => String(murmurHashV2(buffer)))
     }
 
     async setBuffer(buffer: ArrayBufferSource, options?: ZipWriterAddDataOptions) {

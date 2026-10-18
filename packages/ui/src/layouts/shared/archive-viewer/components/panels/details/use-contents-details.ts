@@ -4,7 +4,7 @@ import { isZipArchive, type ZipNode } from '#ui/helpers/toolbox/zip'
 import { getFileExtension } from '#ui/utils/file-extensions'
 
 import { injectArchiveViewer } from '../../../providers/archive-viewer'
-import type { ArchiveCounts, ArchiveReadStatus } from './types'
+import type { ArchiveCounts, ArchiveReadStatus } from '../../../types'
 
 /** Counts what the archive holds itself, leaving out the contents of archives nested within it. */
 function summarize(

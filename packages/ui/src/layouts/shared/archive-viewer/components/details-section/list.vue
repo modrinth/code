@@ -23,7 +23,17 @@
 				>
 					{{ row.value }}
 				</a>
-				<span v-else :class="{ 'text-secondary': row.value == null }">{{ row.value ?? '-' }}</span>
+				<span
+					v-else
+					v-tooltip="row.tooltip"
+					:class="[
+						row.value == null ? 'text-secondary' : '',
+						row.tone === 'green' ? 'font-semibold text-green' : '',
+						row.tone === 'red' ? 'font-semibold text-red' : '',
+					]"
+				>
+					{{ row.value ?? '-' }}
+				</span>
 			</dd>
 		</template>
 	</dl>
@@ -34,8 +44,8 @@ import { SpinnerIcon } from '@modrinth/assets'
 
 import CopyCode from '#ui/components/base/CopyCode.vue'
 
-import type { ArchiveDetailRow } from '../../../types'
-import HashValue from '../../HashValue.vue'
+import type { ArchiveDetailRow } from '../../types'
+import HashValue from '../HashValue.vue'
 
 defineProps<{
 	rows: ArchiveDetailRow[]

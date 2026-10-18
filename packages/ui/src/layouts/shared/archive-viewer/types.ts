@@ -28,10 +28,23 @@ export interface ArchiveDetailRow {
 	display?: string
 	/** More about the value, shown on hover. */
 	tooltip?: string
+	/** Colours the value, e.g. a check that passed (`green`) or failed (`red`). */
+	tone?: 'green' | 'red'
 	href?: string
 }
 
 export interface ArchiveLoadProgress {
 	loaded: number
 	total: number | null
+}
+
+/** How far an archive has been read: nested archives are read in the background. */
+export type ArchiveReadStatus = 'read' | 'reading' | 'pending'
+
+/** What an archive holds itself, leaving out the contents of archives nested within it. */
+export interface ArchiveCounts {
+	files: number
+	folders: number
+	classFiles: number
+	nestedArchives: number
 }

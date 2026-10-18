@@ -153,7 +153,7 @@ onMounted(() => {
 
 const editorLanguage = computed(() => {
 	const hostLanguage = props.file ? ctx.editorLanguage?.(props.file) : undefined
-	return hostLanguage ?? getEditorLanguage(getFileExtension(props.file?.name ?? ''))
+	return hostLanguage ?? getEditorLanguage(props.file?.name ?? '')
 })
 const isEditorReadOnly = computed(
 	() => (ctx.isBusy?.value ?? false) || (ctx.isReadOnly?.(props.file) ?? false),

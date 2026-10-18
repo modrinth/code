@@ -752,6 +752,9 @@
   "archive.open-in-slicer": {
     "message": "Open in Slicer"
   },
+  "archive.project-details.change-version": {
+    "message": "Change version"
+  },
   "archive.project-details.channel.alpha": {
     "message": "Alpha"
   },
@@ -761,35 +764,14 @@
   "archive.project-details.channel.release": {
     "message": "Release"
   },
-  "archive.project-details.downloads": {
-    "message": "Downloads"
-  },
-  "archive.project-details.file": {
-    "message": "File"
+  "archive.project-details.download": {
+    "message": "Download file"
   },
   "archive.project-details.file-type": {
     "message": "File type"
   },
-  "archive.project-details.hash-check": {
-    "message": "Download matches"
-  },
-  "archive.project-details.hash-match": {
-    "message": "Matches listed hash"
-  },
-  "archive.project-details.hash-mismatch": {
-    "message": "Does not match listed hash"
-  },
-  "archive.project-details.hash-pending": {
-    "message": "Checked once fully downloaded"
-  },
-  "archive.project-details.id": {
-    "message": "ID"
-  },
   "archive.project-details.more-game-versions": {
     "message": "+{count} more"
-  },
-  "archive.project-details.name": {
-    "message": "Name"
   },
   "archive.project-details.open-project": {
     "message": "Project page"
@@ -797,20 +779,35 @@
   "archive.project-details.primary": {
     "message": "Primary"
   },
-  "archive.project-details.published": {
-    "message": "Published"
+  "archive.project-details.project": {
+    "message": "Project"
   },
-  "archive.project-details.sha512": {
-    "message": "Listed SHA-512"
+  "archive.project-details.project-downloads": {
+    "message": "Project downloads"
   },
-  "archive.project-details.size": {
-    "message": "Size"
+  "archive.project-details.project-id": {
+    "message": "Project ID"
+  },
+  "archive.project-details.project-published": {
+    "message": "Project published"
+  },
+  "archive.project-details.published-on": {
+    "message": "Published {date}"
   },
   "archive.project-details.tech-review": {
     "message": "Tech review"
   },
   "archive.project-details.version": {
     "message": "Version"
+  },
+  "archive.project-details.version-downloads": {
+    "message": "Version downloads"
+  },
+  "archive.project-details.version-id": {
+    "message": "Version ID"
+  },
+  "archive.project-details.version-published": {
+    "message": "Version published"
   },
   "archive.project-details.version-status.archived": {
     "message": "Archived"
@@ -830,14 +827,44 @@
   "archive.project-details.version-status.unlisted": {
     "message": "Unlisted"
   },
-  "archive.search-versions": {
-    "message": "Search versions..."
-  },
   "archive.select-version": {
     "message": "Select a version"
   },
   "archive.title": {
     "message": "Archive viewer"
+  },
+  "archive.version-modal.current": {
+    "message": "Currently open"
+  },
+  "archive.version-modal.loading": {
+    "message": "Loading versions..."
+  },
+  "archive.version-modal.loading-changelog": {
+    "message": "Loading changelog..."
+  },
+  "archive.version-modal.more-game-versions": {
+    "message": "+{count} more"
+  },
+  "archive.version-modal.no-changelog": {
+    "message": "No changelog"
+  },
+  "archive.version-modal.no-versions": {
+    "message": "No versions found"
+  },
+  "archive.version-modal.open": {
+    "message": "Open {version}"
+  },
+  "archive.version-modal.primary": {
+    "message": "Primary"
+  },
+  "archive.version-modal.search-placeholder": {
+    "message": "Search versions..."
+  },
+  "archive.version-modal.select-prompt": {
+    "message": "Select a version to see its details"
+  },
+  "archive.version-modal.title": {
+    "message": "Select a version"
   },
   "auth.authorize.action.authorize": {
     "message": "Authorize"

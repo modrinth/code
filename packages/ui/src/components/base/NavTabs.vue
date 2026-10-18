@@ -23,7 +23,7 @@
 					v-show="link.shown ?? true"
 					:key="link.href"
 					ref="tabLinkElements"
-					:replace="replace"
+					:replace="link.replace ?? replace"
 					:to="query ? (link.href ? `?${query}=${link.href}` : '?') : link.href"
 					class="button-animation z-[1] flex flex-row items-center gap-2 px-4 py-2 focus:rounded-full"
 					:class="getSSRFallbackClasses(index)"
@@ -94,6 +94,8 @@ interface Tab {
 	icon?: Component
 	subpages?: string[]
 	onHover?: () => void
+	/** Overrides the tabs' `replace` for this one, e.g. for a tab that leaves the page. */
+	replace?: boolean
 }
 
 const props = withDefaults(

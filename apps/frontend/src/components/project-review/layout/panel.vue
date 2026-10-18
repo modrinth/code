@@ -1,5 +1,5 @@
 <template>
-	<component :is="content" v-if="content" />
+	<SlotOutlet v-if="slots[slotName]" :slots="slots" :name="slotName" />
 	<template v-else>
 		<h2 class="m-0 text-lg font-semibold text-contrast">
 			{{ reviewPanelLabels[slotName] }}
@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import { injectWorkbenchPanel } from '@modrinth/ui'
+import { injectWorkbenchPanel, SlotOutlet } from '@modrinth/ui'
 import { computed } from 'vue'
 
 import { injectProjectReviewContext, provideReviewPanelVisible, provideReviewSlot } from './context'
@@ -25,5 +25,4 @@ const panel = injectWorkbenchPanel()
 provideReviewSlot(computed(() => props.slotName))
 provideReviewPanelVisible(panel.visible)
 
-const content = computed(() => slots[props.slotName])
 </script>

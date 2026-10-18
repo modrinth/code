@@ -36,8 +36,8 @@
 <script setup lang="ts">
 import { SpinnerIcon } from '@modrinth/assets'
 
-import type { ArchiveDetailRow } from '../../../types'
-import HashValue from '../../HashValue.vue'
+import type { ArchiveDetailRow } from '../../types'
+import HashValue from '../HashValue.vue'
 
 /**
  * Short values (sizes, checksums) laid out side by side, as many to a row as fit, each with its

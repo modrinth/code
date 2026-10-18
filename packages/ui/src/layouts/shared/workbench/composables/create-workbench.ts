@@ -315,7 +315,16 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 		return region !== 'bottom'
 	}
 
+	/**
+	 * Whether the grid has been laid out at its real size. Until then the sizes dockview gives the
+	 * regions aren't theirs, so they aren't measured (and saved over the ones they should have).
+	 */
+	let gridSized = false
+	/** Set while the regions' sizes are applied one by one, so the in-between layouts aren't measured. */
+	let applyingSizes = false
+
 	function measureRegions() {
+		if (!gridSized || applyingSizes) return
 		for (const region of regions) {
 			const panel = grid?.getPanel(region)
 			if (!panel) continue
@@ -371,6 +380,11 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 			params: { host: region },
 			position: { direction: region === 'bottom' ? 'below' : region, referencePanel: 'center' },
 			...(isHorizontal(region) ? { minimumWidth: minimum } : { minimumHeight: minimum }),
+			/*
+			 * Offered space last, so the center (and the branch holding it with the bottom region)
+			 * takes up the workbench being resized, rather than a region growing past its saved size.
+			 */
+			priority: LayoutPriority.Low,
 		})
 		applyRegionSize(region)
 		grid.getPanel(region)?.api.setVisible(visible[region].value)
@@ -388,19 +402,37 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 			priority: LayoutPriority.High,
 		})
 		for (const region of regions) addRegion(region)
+		gridDisposables = [api.onDidLayoutChange(onGridLayout)]
+		onGridLayout()
+	}
+
+	/** Gives the regions their sizes once the grid has its own, then keeps measuring them. */
+	function onGridLayout() {
+		if (!grid) return
+		if (!gridSized) {
+			if (grid.width <= 0 || grid.height <= 0) return
+			gridSized = true
+			applyRegionSizes()
+		}
 		measureRegions()
-		gridDisposables = [
-			api.onDidLayoutChange(() => {
-				measureRegions()
-				scheduleSave()
-			}),
-		]
+		scheduleSave()
+	}
+
+	function applyRegionSizes() {
+		applyingSizes = true
+		try {
+			for (const region of regions) applyRegionSize(region)
+		} finally {
+			applyingSizes = false
+		}
+		measureRegions()
 	}
 
 	function onGridDispose() {
 		for (const disposable of gridDisposables) disposable.dispose()
 		gridDisposables = []
 		grid = null
+		gridSized = false
 	}
 
 	function withOwnRemovals(action: () => void) {
@@ -832,8 +864,8 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 			regionSizes[region] = sizes[region].default
 			visible[region].value = true
 			grid?.getPanel(region)?.api.setVisible(true)
-			applyRegionSize(region)
 		}
+		applyRegionSizes()
 		for (const [host, dock] of docks) {
 			withOwnRemovals(() => dock.api.clear())
 			dock.key = panelSetKey(host)
@@ -892,7 +924,10 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 		scheduleSave()
 	}
 
-	/** Saves before Dockview's unload handlers return popped out panels to the main window. */
+	/**
+	 * Saves as the page unloads, so changes made just before aren't lost to the save delay, and
+	 * before Dockview's unload handlers return popped out panels to the main window.
+	 */
 	function onBeforeUnload() {
 		persist()
 		leavingPage = true
@@ -924,10 +959,13 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 		windows.listen('keydown', preventPopoutRefresh, { capture: true })
 		windows.listen('pointerdown', resumeAfterCancelledUnload, { capture: true })
 		windows.listen('keydown', resumeAfterCancelledUnload, { capture: true })
-		window.addEventListener('beforeunload', onBeforeUnload, { capture: true })
-		window.addEventListener('pagehide', onBeforeUnload)
-		window.addEventListener('pageshow', onPageShow)
+	} else {
+		window.addEventListener('pointerdown', resumeAfterCancelledUnload, { capture: true })
+		window.addEventListener('keydown', resumeAfterCancelledUnload, { capture: true })
 	}
+	window.addEventListener('beforeunload', onBeforeUnload, { capture: true })
+	window.addEventListener('pagehide', onBeforeUnload)
+	window.addEventListener('pageshow', onPageShow)
 
 	onBeforeUnmount(() => {
 		persist()
@@ -936,6 +974,8 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 		window.removeEventListener('beforeunload', onBeforeUnload, true)
 		window.removeEventListener('pagehide', onBeforeUnload)
 		window.removeEventListener('pageshow', onPageShow)
+		window.removeEventListener('pointerdown', resumeAfterCancelledUnload, true)
+		window.removeEventListener('keydown', resumeAfterCancelledUnload, true)
 		onGridDispose()
 		for (const host of [...docks.keys()]) onDockDispose(host)
 	})

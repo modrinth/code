@@ -1,5 +1,6 @@
 <template>
 	<div class="flex flex-col divide-x-0 divide-y divide-solid divide-surface-4">
+		<slot name="source" />
 		<RootSection />
 		<div v-if="chain.length > 1" class="px-2 py-1">
 			<Button type="quiet" size="sm" :aria-expanded="expanded" @click="expanded = !expanded">
@@ -38,10 +39,11 @@ import { detailsMessages as messages } from './messages'
 import RootSection from './root-section.vue'
 
 /**
- * Details of what's being viewed, stacked from the outside in: the opened archive, the archives
- * nested within it down to the one the entry sits in (or is), and the entry itself. Each is only
- * shown when it differs from the one above, so nothing is described twice, and the archives
- * between the opened one and the closest can be folded away.
+ * Details of what's being viewed, stacked from the outside in: where the archive was published
+ * (the `source` slot, e.g. a project's version, when the host knows), the opened archive, the
+ * archives nested within it down to the one the entry sits in (or is), and the entry itself. Each
+ * is only shown when it differs from the one above, so nothing is described twice, and the
+ * archives between the opened one and the closest can be folded away.
  */
 const { formatMessage } = useVIntl()
 const ui = injectFileBrowserUI()

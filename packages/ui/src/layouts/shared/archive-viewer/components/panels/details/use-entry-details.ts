@@ -2,6 +2,7 @@ import { computed } from 'vue'
 
 import { useFormatDateTime } from '#ui/composables/format-date-time'
 import { useVIntl } from '#ui/composables/i18n'
+import type { HashType } from '#ui/helpers/toolbox/file'
 import type { FileZipTreeNode } from '#ui/helpers/toolbox/zip'
 
 import { useNodeLazyValue } from '../../../composables/node-values'
@@ -12,17 +13,24 @@ import type { DetailGroups } from './types'
 
 /**
  * A file as stored in its archive: when it changed and how it's stored, its sizes (stored and
- * full), and its checksums, the hashes being computed (by the worker) as they're shown.
+ * full), and how to compute its hashes (by the worker), only done for those shown. Its CRC-32 is
+ * the one its archive stores for it.
  */
 export function useEntryDetails(file: () => FileZipTreeNode | undefined) {
 	const { formatMessage } = useVIntl()
 	const formatDate = useFormatDateTime({ dateStyle: 'medium', timeStyle: 'short' })
 
 	const fileType = useNodeLazyValue(file, 'fileTypeInfo')
-	const sha1 = useNodeLazyValue(file, 'sha1')
-	const sha256 = useNodeLazyValue(file, 'sha256')
-	const sha512 = useNodeLazyValue(file, 'sha512')
-	const murmur2 = useNodeLazyValue(file, 'murmur2')
+
+	const hash = computed(() => {
+		const target = file()
+		if (!target) return undefined
+		const signature = target.metadata.signature
+		return (type: HashType) =>
+			type === 'crc32' && signature != null
+				? Promise.resolve((signature >>> 0).toString(16).padStart(8, '0'))
+				: target.hash(type)
+	})
 
 	function compressionName(method: number | undefined) {
 		if (method == null) return null
@@ -33,7 +41,7 @@ export function useEntryDetails(file: () => FileZipTreeNode | undefined) {
 
 	return computed<DetailGroups>(() => {
 		const target = file()
-		if (!target) return { rows: [], stored: null, hashes: [] }
+		if (!target) return { rows: [], more: [], stored: null, hash: undefined }
 		const { metadata } = target
 
 		const rows: ArchiveDetailRow[] = [
@@ -43,6 +51,8 @@ export function useEntryDetails(file: () => FileZipTreeNode | undefined) {
 				value: fileType.value.value?.mime ?? null,
 				loading: fileType.loading.value,
 			},
+		]
+		const more: ArchiveDetailRow[] = [
 			{
 				id: 'compression',
 				label: formatMessage(messages.compression),
@@ -50,66 +60,28 @@ export function useEntryDetails(file: () => FileZipTreeNode | undefined) {
 			},
 		]
 		if (!isPlaceholderDate(metadata.lastModDate)) {
-			rows.push({
+			more.push({
 				id: 'modified',
 				label: formatMessage(messages.modified),
 				value: formatDate(metadata.lastModDate!),
 			})
 		}
 		if (metadata.encrypted) {
-			rows.push({
+			more.push({
 				id: 'encrypted',
 				label: formatMessage(messages.encrypted),
 				value: formatMessage(messages.yes),
 			})
 		}
 		if (metadata.comment) {
-			rows.push({ id: 'comment', label: formatMessage(messages.comment), value: metadata.comment })
+			more.push({ id: 'comment', label: formatMessage(messages.comment), value: metadata.comment })
 		}
 
 		return {
 			rows,
+			more,
 			stored: { compressed: metadata.compressedSize, size: metadata.uncompressedSize },
-			hashes: [
-				{
-					id: 'sha1',
-					label: formatMessage(messages.sha1),
-					value: sha1.value.value,
-					loading: sha1.loading.value,
-					hash: true,
-				},
-				{
-					id: 'sha256',
-					label: formatMessage(messages.sha256),
-					value: sha256.value.value,
-					loading: sha256.loading.value,
-					hash: true,
-				},
-				{
-					id: 'sha512',
-					label: formatMessage(messages.sha512),
-					value: sha512.value.value,
-					loading: sha512.loading.value,
-					hash: true,
-				},
-				{
-					id: 'murmur2',
-					label: formatMessage(messages.murmur2),
-					value: murmur2.value.value,
-					loading: murmur2.loading.value,
-					hash: true,
-				},
-				...(metadata.signature != null
-					? [
-							{
-								id: 'crc32',
-								label: formatMessage(messages.crc32),
-								value: metadata.signature.toString(16).padStart(8, '0'),
-								hash: true,
-							},
-						]
-					: []),
-			],
+			hash: hash.value,
 		}
 	})
 }

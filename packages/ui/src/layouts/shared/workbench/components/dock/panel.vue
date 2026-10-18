@@ -5,7 +5,7 @@
 		:inert="regionHidden"
 		:aria-label="panel?.title"
 	>
-		<component :is="content" v-if="content" />
+		<SlotOutlet v-if="workbench.slots[slotName]" :slots="workbench.slots" :name="slotName" />
 	</section>
 </template>
 
@@ -16,6 +16,7 @@ import { computed, onBeforeUnmount, ref } from 'vue'
 import type { WorkbenchPanelParams } from '../../composables/create-workbench'
 import { injectWorkbench, provideWorkbenchPanel } from '../../providers/workbench'
 import { WORKBENCH_REGIONS, type WorkbenchRegion } from '../../types'
+import { SlotOutlet } from '../slot-outlet'
 
 const props = defineProps<{
 	params: {
@@ -28,7 +29,7 @@ const workbench = injectWorkbench()
 const id = props.params.params.id
 
 const panel = computed(() => workbench.panels.value.find((candidate) => candidate.id === id))
-const content = computed(() => workbench.slots[`panel-${id}`])
+const slotName = `panel-${id}` as const
 
 const host = computed(() => (panel.value ? workbench.regionOf(panel.value) : 'center'))
 const regionHidden = computed(

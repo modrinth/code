@@ -19,10 +19,11 @@
 					<FileSideBar fill-height :add-border="false" />
 				</template>
 				<template #panel-details>
-					<DetailsPanel />
-				</template>
-				<template v-if="slots['project-details']" #panel-project-details>
-					<slot name="project-details" />
+					<DetailsPanel>
+						<template v-if="slots['project-details']" #source>
+							<slot name="project-details" />
+						</template>
+					</DetailsPanel>
 				</template>
 				<template #panel-logs>
 					<LogsPanel />
@@ -34,7 +35,6 @@
 
 <script setup lang="ts">
 import {
-	BoxIcon,
 	FolderOpenIcon,
 	InfoIcon,
 	TerminalSquareIcon,
@@ -80,11 +80,10 @@ const { formatMessage } = useVIntl()
 const messages = defineMessages({
 	tree: { id: 'archive-viewer.panel.tree', defaultMessage: 'Files' },
 	details: { id: 'archive-viewer.panel.details', defaultMessage: 'Details' },
-	projectDetails: { id: 'archive-viewer.panel.project-details', defaultMessage: 'Project' },
 	logs: { id: 'archive-viewer.panel.logs', defaultMessage: 'Logs' },
 })
 
-const { context, location, open, fullyLoaded, treeVersion, sha512Hash, rootHashes, nodeAt } =
+const { context, location, open, fullyLoaded, treeVersion, sha512Hash, archiveHash, nodeAt } =
 	useArchiveFileManager({
 		root: props.root,
 		handler: props.handler,
@@ -100,22 +99,12 @@ provideArchiveViewer({
 	fullyLoaded,
 	treeVersion,
 	sha512Hash,
-	rootHashes,
+	archiveHash,
 	nodeAt,
 })
 
 const panels = computed<WorkbenchPanel[]>(() => [
 	{ id: 'tree', title: formatMessage(messages.tree), region: 'left', icon: FolderOpenIcon },
-	...(slots['project-details']
-		? [
-				{
-					id: 'project-details',
-					title: formatMessage(messages.projectDetails),
-					region: 'right',
-					icon: BoxIcon,
-				} satisfies WorkbenchPanel,
-			]
-		: []),
 	{ id: 'details', title: formatMessage(messages.details), region: 'right', icon: InfoIcon },
 	{ id: 'logs', title: formatMessage(messages.logs), region: 'bottom', icon: TerminalSquareIcon },
 ])
