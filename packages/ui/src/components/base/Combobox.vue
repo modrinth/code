@@ -95,17 +95,23 @@
 			</div>
 		</ButtonFrame>
 
-		<Teleport v-if="isClient" :to="teleportTarget">
+		<Teleport v-if="isClient" :to="teleportTarget" disabled>
 			<Transition name="floating-expand" :css="animateDropdown">
 				<div
 					v-if="shouldRenderDropdown"
 					ref="dropdownRef"
-					class="fixed z-[100005] flex flex-col overflow-hidden rounded-[14px] bg-surface-4 border border-solid border-surface-5"
+					class="absolute left-0 z-[100005] flex flex-col overflow-hidden rounded-[14px] bg-surface-4 border border-solid border-surface-5"
 					:class="[
 						props.dropdownClass,
-						openDirection === 'up' ? 'shadow-[0_-25px_50px_-12px_rgb(0,0,0,0.25)]' : 'shadow-2xl',
+						openDirection === 'up'
+							? 'bottom-full mb-2 shadow-[0_-25px_50px_-12px_rgb(0,0,0,0.25)]'
+							: 'top-full mt-2 shadow-2xl',
 					]"
-					:style="[dropdownStyle, { transformOrigin: dropdownTransformOrigin }]"
+					:style="{
+						width: dropdownStyle.width,
+						minWidth: dropdownStyle.minWidth,
+						transformOrigin: dropdownTransformOrigin,
+					}"
 					:role="listbox ? 'listbox' : 'menu'"
 					@pointerdown.stop
 					@mousedown.stop
@@ -326,6 +332,7 @@ const props = withDefaults(
 		disabled: false,
 		searchable: false,
 		clearable: false,
+		forceDirection: 'down',
 		searchPlaceholder: 'Search...',
 		listbox: true,
 		showChevron: true,
