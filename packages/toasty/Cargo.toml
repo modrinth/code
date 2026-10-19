@@ -145,10 +145,6 @@ features = [
   "time",
 ]
 
-[dependencies.tokio-stream]
-version = "0.1.18"
-default-features = false
-
 [dependencies.toml]
 version = "1.1.0"
 optional = true
