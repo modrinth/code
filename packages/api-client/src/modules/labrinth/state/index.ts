@@ -2,6 +2,7 @@ import { AbstractModule } from '../../../core/abstract-module'
 import type { Labrinth } from '../types'
 
 const FEATURED_PROJECTS_COLLECTION_ID = 'YV97U1kk'
+const PRIDE_COLLECTION_ID = 'M4c3ITvd'
 const HOME_PAGE_PROJECT_COUNT = 60
 
 function shuffledSample<T>(items: T[], count: number): T[] {
@@ -60,6 +61,7 @@ export class LabrinthStateModule extends AbstractModule {
 			homePageProjects,
 			homePageSearch,
 			homePageNotifs,
+			prideProjectIds,
 			products,
 			muralBankDetails,
 			iso3166Data,
@@ -119,6 +121,10 @@ export class LabrinthStateModule extends AbstractModule {
 					params: { limit: '3', query: '', index: 'updated' },
 				})
 				.catch((err) => handleError(err, {} as Labrinth.Search.v2.SearchResults, '/v2/search')),
+			this.client.labrinth.collections
+				.get(PRIDE_COLLECTION_ID)
+				.then((collection) => collection.projects ?? [])
+				.catch((err) => handleError(err, [], `/v3/collection/${PRIDE_COLLECTION_ID}`)),
 
 			// Internal billing/mural endpoints
 			this.client.labrinth.billing_internal
@@ -171,6 +177,7 @@ export class LabrinthStateModule extends AbstractModule {
 			homePageProjects,
 			homePageSearch,
 			homePageNotifs,
+			prideProjectIds,
 			products,
 			// Always emit a value: `undefined` is dropped by JSON.stringify, and consumers
 			// import these keys by name from the generated state.

@@ -100,7 +100,6 @@ import {
 	Admonition,
 	defineMessages,
 	DropzoneFileInput,
-	injectProjectPageContext,
 	Tabs,
 	type TabsTab,
 	useVIntl,
@@ -111,10 +110,10 @@ import { injectManageVersionContext } from '~/providers/version/manage-version-m
 
 import VersionFileRow from '../components/VersionFileRow.vue'
 
-const { projectV2 } = injectProjectPageContext()
 const { formatMessage } = useVIntl()
 
 const {
+	projectV2,
 	draftVersion,
 	filesToAdd,
 	existingFilesToDelete,

@@ -222,6 +222,26 @@ impl DBSession {
         Ok(val)
     }
 
+    /// Cache-only lookup that never falls back to Postgres.
+    pub async fn get_cached(
+        session: &str,
+        redis: &RedisPool,
+    ) -> Result<Option<DBSession>> {
+        redis
+            .get_cached_keys_with_slug(
+                SESSIONS_NAMESPACE,
+                SESSIONS_IDS_NAMESPACE,
+                true,
+                &[session],
+                |_| async {
+                    eyre::Ok(DashMap::<i64, (Option<String>, DBSession)>::new())
+                },
+            )
+            .await
+            .map(|x| x.into_iter().next())
+            .wrap_err("getting cached session")
+    }
+
     pub async fn get_user_sessions<'a, E>(
         user_id: DBUserId,
         exec: E,

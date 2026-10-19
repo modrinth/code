@@ -8,6 +8,7 @@ use super::store;
 use crate::ErrorKind;
 use crate::event::InstancePayloadType;
 use crate::event::emit::emit_instance;
+use crate::state::content_store::ContentStore;
 use crate::state::instances::adapters::sqlite::{content_rows, instance_rows};
 use crate::state::{
     ContentEntry, ContentSetRemoteRef, ContentSetRemoteRefType,
@@ -36,11 +37,16 @@ struct SharedInstanceUpdateRollback {
     missing_file_ids: std::collections::HashSet<String>,
     #[serde(default)]
     copied_file_ids: std::collections::HashSet<String>,
+    #[serde(default)]
+    scoped_paths: Option<Vec<String>>,
 }
 
+/// With `scoped_paths`, only those instance-relative files and folders are backed
+/// up. A path that does not exist yet is removed again on rollback.
 pub(super) async fn prepare_instance_update_backup(
     job_id: Uuid,
     metadata: &InstanceMetadata,
+    scoped_paths: Option<Vec<String>>,
     state: &State,
 ) -> crate::Result<PathBuf> {
     let _lease = state.content_store.lease().await;
@@ -110,7 +116,7 @@ pub(super) async fn prepare_instance_update_backup(
 				copied_file_ids.insert(file.id.clone());
 			}
 		}
-        let skipped = files
+        let skipped: std::collections::HashSet<String> = files
             .iter()
             .filter(|file| {
                 bindings.iter().any(|binding| binding.file_id == file.id)
@@ -122,24 +128,44 @@ pub(super) async fn prepare_instance_update_backup(
             .iter()
             .map(|binding| binding.blob_sha512.clone())
             .collect::<Vec<_>>();
+        let scoped_paths = scoped_paths.map(outermost_paths);
+        let instance_path = state
+            .directories
+            .instances_dir()
+            .join(&metadata.instance.path);
+        let backup_path =
+            staging_dir.join(SHARED_INSTANCE_ROLLBACK_INSTANCE_DIR);
+        match &scoped_paths {
+            Some(paths) => {
+                for path in paths {
+                    let prefix = format!("{path}/");
+                    let skipped = skipped
+                        .iter()
+                        .filter_map(|skipped| skipped.strip_prefix(&prefix))
+                        .map(str::to_string)
+                        .collect();
+                    copy_path(
+                        &instance_path.join(path),
+                        &backup_path.join(path),
+                        &skipped,
+                        state,
+                    )
+                    .await?;
+                }
+            }
+            None => {
+                copy_directory(&instance_path, &backup_path, &skipped, state)
+                    .await?;
+            }
+        }
         let snapshot = SharedInstanceUpdateRollback {
             files,
             entries,
             bindings,
 			missing_file_ids,
 			copied_file_ids,
+            scoped_paths,
         };
-        let instance_path = state
-            .directories
-            .instances_dir()
-            .join(&metadata.instance.path);
-        copy_directory(
-            &instance_path,
-            &staging_dir.join(SHARED_INSTANCE_ROLLBACK_INSTANCE_DIR),
-            &skipped,
-            state,
-        )
-        .await?;
         crate::util::io::write(
             staging_dir.join(SHARED_INSTANCE_ROLLBACK_FILE),
             serde_json::to_vec(&snapshot)?,
@@ -210,7 +236,10 @@ async fn recover_unrecorded_instance_update_backup(
     Ok(())
 }
 
-pub(super) async fn clear_staging_dir(job_state: &InstallJobState) {
+pub(super) async fn clear_staging_dir(
+    job_state: &InstallJobState,
+    content_store: &ContentStore,
+) {
     let Some(staging_dir) = &job_state.paths.staging_dir else {
         return;
     };
@@ -223,10 +252,8 @@ pub(super) async fn clear_staging_dir(job_state: &InstallJobState) {
         );
         return;
     }
-    if let Some(state) = State::get_if_initialized()
-        && let Some(owner) =
-            staging_dir.file_name().and_then(|name| name.to_str())
-        && let Err(error) = state.content_store.release("rollback", owner).await
+    if let Some(owner) = staging_dir.file_name().and_then(|name| name.to_str())
+        && let Err(error) = content_store.release("rollback", owner).await
     {
         tracing::warn!(
             "Could not release rollback content references: {error}"
@@ -298,16 +325,33 @@ async fn restore_instance_update(
             ));
         }
     }
-    if tokio::fs::try_exists(&instance_path).await? {
-        crate::util::io::remove_dir_all(&instance_path).await?;
+    match &snapshot.scoped_paths {
+        Some(paths) => {
+            for path in paths {
+                let target = instance_path.join(path);
+                remove_path(&target).await?;
+                copy_path(
+                    &backup_path.join(path),
+                    &target,
+                    &std::collections::HashSet::new(),
+                    state,
+                )
+                .await?;
+            }
+        }
+        None => {
+            if tokio::fs::try_exists(&instance_path).await? {
+                crate::util::io::remove_dir_all(&instance_path).await?;
+            }
+            copy_directory(
+                &backup_path,
+                &instance_path,
+                &std::collections::HashSet::new(),
+                state,
+            )
+            .await?;
+        }
     }
-    copy_directory(
-        &backup_path,
-        &instance_path,
-        &std::collections::HashSet::new(),
-        state,
-    )
-    .await?;
     content_rows::restore_instance_content_snapshot(
         &rollback.instance.instance.id,
         &snapshot.files,
@@ -402,6 +446,69 @@ async fn restore_instance_metadata(
     Ok(())
 }
 
+/// Drops duplicates and paths inside another listed folder.
+fn outermost_paths(paths: Vec<String>) -> Vec<String> {
+    let all = paths
+        .iter()
+        .map(String::as_str)
+        .collect::<std::collections::HashSet<_>>();
+    let mut outermost = paths
+        .iter()
+        .filter(|path| {
+            !path
+                .match_indices('/')
+                .any(|(index, _)| all.contains(&path[..index]))
+        })
+        .cloned()
+        .collect::<Vec<_>>();
+    outermost.sort();
+    outermost.dedup();
+    outermost
+}
+
+async fn symlink_metadata(
+    path: &Path,
+) -> crate::Result<Option<std::fs::Metadata>> {
+    match tokio::fs::symlink_metadata(path).await {
+        Ok(metadata) => Ok(Some(metadata)),
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => Ok(None),
+        Err(error) => Err(error.into()),
+    }
+}
+
+/// Removes a file, folder or symlink without following symlinks.
+async fn remove_path(path: &Path) -> crate::Result<()> {
+    match symlink_metadata(path).await? {
+        Some(metadata) if metadata.is_file() => {
+            crate::util::io::remove_file(path).await?;
+        }
+        Some(_) => crate::util::io::remove_dir_all(path).await?,
+        None => {}
+    }
+    Ok(())
+}
+
+/// Copies a file, folder or symlink. Missing paths are skipped.
+async fn copy_path(
+    source: &Path,
+    target: &Path,
+    skipped: &std::collections::HashSet<String>,
+    state: &State,
+) -> crate::Result<()> {
+    match symlink_metadata(source).await? {
+        Some(metadata) if metadata.is_symlink() => {
+            copy_symlink(source, target).await
+        }
+        Some(metadata) if metadata.is_dir() => {
+            copy_directory(source, target, skipped, state).await
+        }
+        Some(_) => {
+            crate::util::fetch::copy(source, target, &state.io_semaphore).await
+        }
+        None => Ok(()),
+    }
+}
+
 async fn copy_directory(
     source: &Path,
     target: &Path,
@@ -478,7 +585,7 @@ async fn copy_symlink(source: &Path, target: &Path) -> crate::Result<()> {
 }
 
 pub async fn recover_interrupted_jobs(state: &State) -> crate::Result<()> {
-    let jobs = store::list_interrupted_candidates(state).await?;
+    let jobs = store::list_interrupted_candidates(&state.pool).await?;
 
     for job in jobs {
         let job_id = job.id;
@@ -498,7 +605,7 @@ pub async fn recover_interrupted_jobs(state: &State) -> crate::Result<()> {
 }
 
 async fn recover_orphaned_install_stages(state: &State) -> crate::Result<()> {
-    let jobs = store::list_all(state).await?;
+    let jobs = store::list_all(&state.pool).await?;
     for instance in instance_rows::list_instances(&state.pool).await? {
         let needs_recovery = jobs.iter().any(|job| {
             job.instance_id.as_deref() == Some(instance.id.as_str())
@@ -573,12 +680,12 @@ async fn recover_interrupted_job_inner(
             job.id,
             InstallJobStatus::Canceled,
             &job.state,
-            state,
+            &state.pool,
         )
         .await?
         {
-            store::dismiss(job.id, state).await?;
-            clear_staging_dir(&job.state).await;
+            store::dismiss(job.id, &state.pool).await?;
+            clear_staging_dir(&job.state, &state.content_store).await;
             emit_install_job(&record.snapshot()).await?;
         }
 
@@ -632,12 +739,12 @@ async fn recover_interrupted_job_inner(
         job.id,
         InstallJobStatus::Interrupted,
         &job.state,
-        state,
+        &state.pool,
     )
     .await?
     {
         if cleanup_succeeded {
-            clear_staging_dir(&job.state).await;
+            clear_staging_dir(&job.state, &state.content_store).await;
         }
         emit_install_job(&record.snapshot()).await?;
     }

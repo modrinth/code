@@ -5,6 +5,11 @@
 			isFullscreen ? `fixed inset-0 z-[15] bg-surface-1 p-6 py-8 ${isApp ? 'pt-12' : ''}` : ''
 		"
 	>
+		<div
+			v-if="isApp && isFullscreen"
+			data-tauri-drag-region
+			class="absolute inset-x-0 top-0 h-12"
+		/>
 		<CollapsibleAdmonition
 			v-if="ctx.crashAnalysis?.value && !isFullscreen"
 			type="critical"
@@ -477,7 +482,7 @@ async function handleShare() {
 }
 
 .modrinth-console-fullscreen-active .app-grid-navbar,
-.modrinth-console-fullscreen-active .app-grid-statusbar {
+.modrinth-console-fullscreen-active .app-title-bar {
 	z-index: 0 !important;
 }
 </style>

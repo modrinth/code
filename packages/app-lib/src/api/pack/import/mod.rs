@@ -14,6 +14,7 @@ use io::IOError;
 use serde::{Deserialize, Serialize};
 
 use crate::{
+    State,
     install::{
         InstallPhaseDetails, InstallPhaseId, InstallProgress,
         InstallProgressReporter,
@@ -600,14 +601,14 @@ async fn copy_dotminecraft_with_reporter_inner(
 pub(crate) async fn finish_import(
     instance_id: &str,
     dotminecraft: PathBuf,
-    io_semaphore: &IoSemaphore,
+    state: &State,
     reporter: InstallProgressReporter,
     details: InstallPhaseDetails,
 ) -> crate::Result<()> {
     copy_dotminecraft_with_reporter(
         instance_id,
         dotminecraft,
-        io_semaphore,
+        &state.io_semaphore,
         reporter.clone(),
         details,
     )
@@ -617,6 +618,7 @@ pub(crate) async fn finish_import(
         instance_id,
         false,
         Some(reporter),
+        state,
     )
     .await?;
 

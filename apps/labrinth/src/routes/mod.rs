@@ -13,7 +13,7 @@ use crate::util::error::{ApiContext, Context};
 use actix_cors::Cors;
 use actix_files::Files;
 use actix_web::http::{StatusCode, header};
-use actix_web::{HttpRequest, HttpResponse, web};
+use actix_web::{FromRequest, HttpRequest, HttpResponse, web};
 use ariadne::ids::base62_impl::parse_base62;
 use futures::FutureExt;
 use std::collections::{HashMap, HashSet};
@@ -354,7 +354,23 @@ pub async fn redirect_ref(
     session_queue: &AuthQueue,
     required_scopes: Scopes,
 ) -> Result<Option<HttpResponse>, ApiError> {
-    let Some(project_ref) = req.match_info().get(parameter_name) else {
+    let Some(parameter_index) = req
+        .match_info()
+        .iter()
+        .position(|(name, _)| name == parameter_name)
+    else {
+        return Ok(None);
+    };
+    // `match_info` preserves encoded `+`, `/`, and `%`; the path extractor fully decodes them.
+    let parameters =
+        web::Path::<Vec<String>>::extract(req)
+            .await
+            .map_err(|err| {
+                ApiError::Request(eyre::eyre!(
+                    "decoding project redirect path: {err}"
+                ))
+            })?;
+    let Some(project_ref) = parameters.get(parameter_index) else {
         return Ok(None);
     };
     let Some(target_project_id) = resolve_visible_refs(
@@ -622,14 +638,20 @@ impl ApiError {
         }
     }
 
-    pub fn is_account_locked(&self) -> bool {
-        matches!(
-            self,
-            Self::Auth(report) if matches!(
-                report.downcast_ref::<AuthenticationError>(),
-                Some(AuthenticationError::AccountLocked)
-            )
-        )
+    pub fn account_standing_error(&self) -> Option<&AuthenticationError> {
+        let Self::Auth(report) = self else {
+            return None;
+        };
+
+        report
+            .downcast_ref::<AuthenticationError>()
+            .filter(|error| {
+                matches!(
+                    error,
+                    AuthenticationError::AccountLocked
+                        | AuthenticationError::PermissionRemoved
+                )
+            })
     }
 
     pub fn as_api_error<'a>(&self) -> crate::models::error::ApiError<'a> {
@@ -653,11 +675,11 @@ impl ApiError {
         let validation = report
             .downcast_ref::<v3::projects::validate::ProjectValidationError>();
 
-        let account_locked = self.is_account_locked();
+        let standing = self.account_standing_error();
 
         crate::models::error::ApiError {
             error: match self {
-                _ if account_locked => "account_locked",
+                _ if let Some(error) = standing => error.error_name(),
                 Self::Internal(..) => "internal_error",
                 Self::Request(..) => "request_error",
                 Self::Auth(..) => "auth_error",
@@ -668,11 +690,8 @@ impl ApiError {
                 Self::PreconditionFailed(..) => "precondition_failed",
                 Self::RateLimit(..) => "ratelimit_error",
             },
-            description: if account_locked {
-                AuthenticationError::AccountLocked.to_string()
-            } else {
-                report.to_string()
-            },
+            description: standing
+                .map_or_else(|| report.to_string(), ToString::to_string),
             details: validation
                 .map(|error| serde_json::json!({ "nags": error.0 }))
                 .or_else(|| {
@@ -687,7 +706,9 @@ impl actix_web::ResponseError for ApiError {
         match self {
             Self::Internal(..) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::Request(..) => StatusCode::BAD_REQUEST,
-            Self::Auth(..) if self.is_account_locked() => StatusCode::FORBIDDEN,
+            Self::Auth(..) if self.account_standing_error().is_some() => {
+                StatusCode::FORBIDDEN
+            }
             Self::Auth(..) => StatusCode::UNAUTHORIZED,
             Self::NotFound(..) => StatusCode::NOT_FOUND,
             Self::Conflict(..) => StatusCode::CONFLICT,

@@ -27,6 +27,7 @@ export function createModrinthClient(
 		sharedInstancesBaseUrl: string
 		commitHash: string
 		rateLimitKey?: string
+		onError?: (error: Error) => void
 	},
 ): NuxtModrinthClient {
 	const flags = useFeatureFlags()
@@ -47,6 +48,7 @@ export function createModrinthClient(
 		headers: visitorUserAgent ? { [VISITOR_USER_AGENT_HEADER]: visitorUserAgent } : undefined,
 		archonSentryCapture: () => flags.value.archonSentryCapture,
 		rateLimitKey: config.rateLimitKey || (() => readEnv('RATE_LIMIT_IGNORE_KEY')),
+		hooks: config.onError ? { onError: config.onError } : undefined,
 		features: [
 			// for modrinth hosting
 			// is skipped for normal reqs

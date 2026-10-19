@@ -278,9 +278,6 @@
   "app.settings.tabs.privacy": {
     "message": "ความเป็นส่วนตัว"
   },
-  "app.settings.tabs.resource-management": {
-    "message": "การจัดการทรัพยากร"
-  },
   "app.skins.add-button": {
     "message": "เพิ่มสกิน"
   },

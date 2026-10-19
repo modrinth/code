@@ -9,20 +9,20 @@ import {
 } from './queue-storage.ts'
 
 export interface ModerationQueue {
+	projectOrder: string[]
 	items: string[]
 	skipped: string[]
 	total: number
 	completed: string[]
+	history: string[]
+	activeProjectId: string | null
 	lastUpdated: Date
 }
 
-export type LockedByUser = Labrinth.Moderation.Internal.LockedByUser
 export type LockStatusResponse = Labrinth.Moderation.Internal.LockStatusResponse
-export type LockAcquireResponse = Labrinth.Moderation.Internal.LockAcquireResponse
 
 export interface ModerationQueueService {
 	currentQueue: ModerationQueue
-	currentLock: { projectId: string; lockedAt: Date } | null
 	isQueueMode: boolean
 	hydrated: boolean
 	ready: Promise<void>
@@ -39,24 +39,32 @@ export interface ModerationQueueService {
 	startSkippedReview(): Promise<void>
 	getCurrentProjectId(): string | null
 	resetQueue(): Promise<void>
+	visitProject(projectId: string, back?: boolean): Promise<void>
 
-	acquireLock(projectId: string): Promise<LockAcquireResponse>
-	overrideLock(projectId: string): Promise<LockAcquireResponse>
-	releaseLock(projectId: string): Promise<boolean>
-	checkLock(projectId: string): Promise<LockStatusResponse>
-	refreshLock(): Promise<LockAcquireResponse>
+	checkLock(projectId: string, throwOnError?: boolean): Promise<LockStatusResponse>
 }
 
 const EMPTY_QUEUE: ModerationQueue = {
+	projectOrder: [],
 	items: [],
 	skipped: [],
 	total: 0,
 	completed: [],
+	history: [],
+	activeProjectId: null,
 	lastUpdated: new Date(),
 }
 
 function createEmptyQueue(): ModerationQueue {
-	return { ...EMPTY_QUEUE, lastUpdated: new Date(), items: [], skipped: [], completed: [] }
+	return {
+		...EMPTY_QUEUE,
+		lastUpdated: new Date(),
+		projectOrder: [],
+		items: [],
+		skipped: [],
+		completed: [],
+		history: [],
+	}
 }
 
 function sanitizeQueue(raw: PersistedModerationQueueState['currentQueue']): ModerationQueue {
@@ -70,10 +78,21 @@ function sanitizeQueue(raw: PersistedModerationQueueState['currentQueue']): Mode
 		: minimumTotal
 
 	return {
+		projectOrder: [
+			...new Set([
+				...(raw.projectOrder ?? raw.history ?? []),
+				...(raw.activeProjectId ? [raw.activeProjectId] : []),
+				...completed,
+				...skipped,
+				...items,
+			]),
+		],
 		items,
 		skipped,
 		total,
 		completed,
+		history: (raw.history ?? []).filter((id): id is string => typeof id === 'string'),
+		activeProjectId: typeof raw.activeProjectId === 'string' ? raw.activeProjectId : null,
 		lastUpdated: Number.isNaN(lastUpdated.getTime()) ? new Date() : lastUpdated,
 	}
 }
@@ -86,10 +105,13 @@ function persistedPayload(
 		version: 1,
 		savedAt: new Date().toISOString(),
 		currentQueue: {
+			projectOrder: [...queue.projectOrder],
 			items: [...queue.items],
 			skipped: [...queue.skipped],
 			total: queue.total,
 			completed: [...queue.completed],
+			history: [...queue.history],
+			activeProjectId: queue.activeProjectId,
 			lastUpdated: queue.lastUpdated.toISOString(),
 		},
 		isQueueMode,
@@ -98,7 +120,6 @@ function persistedPayload(
 
 function createModerationQueueState(client: AbstractModrinthClient = injectModrinthClient()) {
 	const currentQueue = ref(createEmptyQueue())
-	const currentLock = ref<{ projectId: string; lockedAt: Date } | null>(null)
 	const isQueueMode = ref(false)
 	const hydrated = ref(false)
 
@@ -155,10 +176,13 @@ function createModerationQueueState(client: AbstractModrinthClient = injectModri
 	function setQueueState(items: string[]) {
 		isQueueMode.value = true
 		currentQueue.value = {
+			projectOrder: [...items],
 			items: [...items],
 			skipped: [],
 			total: items.length,
 			completed: [],
+			history: [],
+			activeProjectId: null,
 			lastUpdated: new Date(),
 		}
 	}
@@ -180,6 +204,26 @@ function createModerationQueueState(client: AbstractModrinthClient = injectModri
 			currentQueue.value.lastUpdated = new Date()
 
 			return currentQueue.value.items.length > 0
+		})
+	}
+
+	async function visitProject(projectId: string, back = false): Promise<void> {
+		await withMutation(() => {
+			const queue = currentQueue.value
+			if (queue.activeProjectId === projectId) return
+			if (back) {
+				const index = queue.history.lastIndexOf(projectId)
+				if (index === -1) return
+				queue.history = queue.history.slice(0, index)
+			} else if (queue.activeProjectId) {
+				queue.history = [...queue.history, queue.activeProjectId]
+			}
+			queue.activeProjectId = projectId
+			if (queue.skipped.includes(projectId)) {
+				queue.skipped = queue.skipped.filter((id) => id !== projectId)
+				queue.items = [projectId, ...queue.items.filter((id) => id !== projectId)]
+			}
+			queue.lastUpdated = new Date()
 		})
 	}
 
@@ -212,7 +256,8 @@ function createModerationQueueState(client: AbstractModrinthClient = injectModri
 
 	async function startSkippedReview(): Promise<void> {
 		await withMutation(() => {
-			setQueueState(currentQueue.value.skipped)
+			const skipped = new Set(currentQueue.value.skipped)
+			setQueueState(currentQueue.value.projectOrder.filter((id) => skipped.has(id)))
 		})
 	}
 
@@ -227,61 +272,7 @@ function createModerationQueueState(client: AbstractModrinthClient = injectModri
 		})
 	}
 
-	async function acquireLock(projectId: string): Promise<LockAcquireResponse> {
-		await ready
-
-		try {
-			const response = await client.labrinth.moderation_internal.acquireLock(projectId)
-
-			if (response.success) {
-				currentLock.value = { projectId, lockedAt: new Date() }
-			} else if (currentLock.value?.projectId === projectId) {
-				currentLock.value = null
-			}
-
-			return response
-		} catch (error) {
-			console.error('Failed to acquire moderation lock:', error)
-			return { success: false, is_own_lock: false }
-		}
-	}
-
-	async function overrideLock(projectId: string): Promise<LockAcquireResponse> {
-		await ready
-
-		try {
-			const response = await client.labrinth.moderation_internal.overrideLock(projectId)
-
-			if (response.success) {
-				currentLock.value = { projectId, lockedAt: new Date() }
-			} else if (currentLock.value?.projectId === projectId) {
-				currentLock.value = null
-			}
-
-			return response
-		} catch (error) {
-			console.error('Failed to override moderation lock:', error)
-			return { success: false, is_own_lock: false }
-		}
-	}
-
-	async function releaseLock(projectId: string): Promise<boolean> {
-		await ready
-
-		try {
-			const response = await client.labrinth.moderation_internal.releaseLock(projectId)
-
-			if (currentLock.value?.projectId === projectId) {
-				currentLock.value = null
-			}
-
-			return response.success
-		} catch {
-			return false
-		}
-	}
-
-	async function checkLock(projectId: string): Promise<LockStatusResponse> {
+	async function checkLock(projectId: string, throwOnError = false): Promise<LockStatusResponse> {
 		await ready
 
 		try {
@@ -289,28 +280,13 @@ function createModerationQueueState(client: AbstractModrinthClient = injectModri
 			return response
 		} catch (error) {
 			console.error('Failed to check moderation lock:', error)
+			if (throwOnError) throw error
 			return { locked: false, is_own_lock: false }
-		}
-	}
-
-	async function refreshLock(): Promise<LockAcquireResponse> {
-		await ready
-
-		if (!currentLock.value) return { success: false, is_own_lock: false }
-
-		try {
-			const response = await acquireLock(currentLock.value.projectId)
-			return response
-		} catch (error) {
-			console.error('Failed to refresh moderation lock:', error)
-			currentLock.value = null
-			return { success: false, is_own_lock: false }
 		}
 	}
 
 	return proxyRefs({
 		currentQueue,
-		currentLock,
 		isQueueMode,
 		hydrated,
 		ready,
@@ -327,12 +303,9 @@ function createModerationQueueState(client: AbstractModrinthClient = injectModri
 		startSkippedReview,
 		getCurrentProjectId,
 		resetQueue,
+		visitProject,
 
-		acquireLock,
-		overrideLock,
-		releaseLock,
 		checkLock,
-		refreshLock,
 	}) as ModerationQueueService
 }
 

@@ -17,6 +17,8 @@ use std::path::{Path, PathBuf};
 // 1 day
 const DEFAULT_ID: &str = "0";
 
+const EXPIRED_CACHE_RETENTION_SECS: i64 = 7 * 24 * 60 * 60;
+
 #[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum CacheValueType {
@@ -2164,6 +2166,53 @@ impl CachedEntry {
         .await?;
 
         Ok(())
+    }
+
+    /// Deletes per-item API entries that expired more than [`EXPIRED_CACHE_RETENTION_SECS`] ago.
+    ///
+    /// Recently expired entries stay so they can still be served offline or while revalidating.
+    ///
+    /// Only types keyed per item are purged, since they grow without bound as projects are
+    /// browsed. Singleton types (manifests, categories, loaders, game versions, report types,
+    /// donation platforms) hold a fixed handful of rows, so purging them frees nothing and
+    /// drops their offline fallback. `ModpackFiles` and `EmbeddedContentMetadata` are
+    /// effectively permanent by design and are left alone.
+    pub(crate) async fn purge_long_expired(
+        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+    ) -> crate::Result<u64> {
+        let cache_types = serde_json::to_string(
+            &[
+                CacheValueType::Project,
+                CacheValueType::ProjectV3,
+                CacheValueType::Version,
+                CacheValueType::VersionV3,
+                CacheValueType::User,
+                CacheValueType::Team,
+                CacheValueType::Organization,
+                CacheValueType::File,
+                CacheValueType::FileHash,
+                CacheValueType::FileUpdate,
+                CacheValueType::SearchResults,
+                CacheValueType::SearchResultsV3,
+                CacheValueType::ProjectVersions,
+            ]
+            .map(|cache_type| cache_type.as_str()),
+        )?;
+        let cutoff = Utc::now().timestamp() - EXPIRED_CACHE_RETENTION_SECS;
+
+        let result = sqlx::query!(
+            "
+            DELETE FROM cache
+            WHERE expires < $1
+                AND data_type IN (SELECT value FROM json_each($2))
+            ",
+            cutoff,
+            cache_types,
+        )
+        .execute(exec)
+        .await?;
+
+        Ok(result.rows_affected())
     }
 
     /// Store modpack file hashes in cache

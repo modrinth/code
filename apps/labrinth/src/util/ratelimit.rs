@@ -1,3 +1,9 @@
+use crate::auth::validate::extract_authorization_header;
+use crate::database::models::DBUserId;
+use crate::database::models::pat_item::DBPersonalAccessToken;
+use crate::database::models::session_item::DBSession;
+use crate::database::models::user_limits::get_user_requests_per_minute;
+use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::env::ENV;
 use crate::routes::ApiError;
 use actix_web::{
@@ -9,13 +15,30 @@ use actix_web::{
 };
 use chrono::Utc;
 use std::str::FromStr;
-use std::sync::Arc;
+use std::sync::atomic::{AtomicI64, Ordering};
+use std::time::{Duration, Instant};
+use tracing::warn;
 use xredis::RedisPool;
 
 const RATE_LIMIT_NAMESPACE: &str = "rate_limit:v4";
 const RATE_LIMIT_EXPIRY: i64 = 300; // 5 minutes
 const MINUTE_IN_NANOS: i64 = 60_000_000_000;
+const REDIS_WARNING_INTERVAL_SECS: i64 = 10;
 
+static LAST_REDIS_WARNING_SECS: AtomicI64 = AtomicI64::new(0);
+
+/// Allows at most one Redis warning per interval across all requests, so a
+/// Redis outage at high request rates does not flood the logs.
+fn should_log_redis_warning() -> bool {
+    let now = Utc::now().timestamp();
+    let last = LAST_REDIS_WARNING_SECS.load(Ordering::Relaxed);
+    now - last >= REDIS_WARNING_INTERVAL_SECS
+        && LAST_REDIS_WARNING_SECS
+            .compare_exchange(last, now, Ordering::Relaxed, Ordering::Relaxed)
+            .is_ok()
+}
+
+#[derive(Clone, Copy)]
 pub struct GCRAParameters {
     emission_interval: i64,
     burst_size: u32,
@@ -44,27 +67,39 @@ pub struct RateLimitDecision {
 #[derive(Clone)]
 pub struct AsyncRateLimiter {
     redis_pool: RedisPool,
-    params: Arc<GCRAParameters>,
+    default_params: GCRAParameters,
 }
 
 impl AsyncRateLimiter {
-    pub fn new(redis_pool: RedisPool, params: GCRAParameters) -> Self {
+    pub fn new(redis_pool: RedisPool, default_params: GCRAParameters) -> Self {
         Self {
             redis_pool,
-            params: Arc::new(params),
+            default_params,
         }
     }
 
-    pub async fn check_rate_limit(&self, key: &str) -> RateLimitDecision {
-        let Ok(mut conn) = self.redis_pool.connect().await else {
-            // If Redis is unavailable, allow the request but with reduced limit
-            return RateLimitDecision {
-                allowed: true,
-                limit: self.params.burst_size,
-                remaining: 1,
-                reset_after_ms: 60_000, // 1 minute
-                retry_after_ms: None,
-            };
+    pub async fn check_rate_limit(
+        &self,
+        key: &str,
+        params: GCRAParameters,
+    ) -> RateLimitDecision {
+        let mut conn = match self.redis_pool.connect().await {
+            Ok(conn) => conn,
+            Err(err) => {
+                if should_log_redis_warning() {
+                    warn!(
+                        "Rate limiter could not connect to Redis, allowing request: {err:#}"
+                    );
+                }
+                // If Redis is unavailable, allow the request but with reduced limit
+                return RateLimitDecision {
+                    allowed: true,
+                    limit: params.burst_size,
+                    remaining: 1,
+                    reset_after_ms: 60_000, // 1 minute
+                    retry_after_ms: None,
+                };
+            }
         };
 
         // Get current time in nanoseconds since UNIX epoch
@@ -72,7 +107,16 @@ impl AsyncRateLimiter {
         let key = conn.key().with_slot(RATE_LIMIT_NAMESPACE, key, key);
 
         // Get the current TAT from Redis (if it exists)
-        let tat_str = conn.get(&key).await.ok().flatten();
+        let tat_str = conn
+            .get(&key)
+            .await
+            .inspect_err(|err| {
+                if should_log_redis_warning() {
+                    warn!("Rate limiter failed to read from Redis: {err:#}");
+                }
+            })
+            .ok()
+            .flatten();
 
         // Parse the TAT or use current time if not found
         let current_tat = match tat_str {
@@ -81,8 +125,8 @@ impl AsyncRateLimiter {
         };
 
         // Calculate the new TAT using GCRA
-        let increment = self.params.emission_interval;
-        let max_tat_delta = increment * self.params.burst_size as i64;
+        let increment = params.emission_interval;
+        let max_tat_delta = increment * params.burst_size as i64;
 
         // Calculate allowance: how much time has passed since the TAT
         let allowance = now - current_tat;
@@ -94,7 +138,7 @@ impl AsyncRateLimiter {
 
             return RateLimitDecision {
                 allowed: false,
-                limit: self.params.burst_size,
+                limit: params.burst_size,
                 remaining: 0,
                 reset_after_ms: -allowance / 1_000_000,
                 retry_after_ms: Some(retry_after_ms.max(0)),
@@ -103,21 +147,64 @@ impl AsyncRateLimiter {
 
         let new_tat = std::cmp::max(current_tat + increment, now);
 
-        let _ = conn
+        if let Err(err) = conn
             .set(&key, &new_tat.to_string(), Some(RATE_LIMIT_EXPIRY))
-            .await;
+            .await
+            && should_log_redis_warning()
+        {
+            warn!("Rate limiter failed to write to Redis: {err:#}");
+        }
 
         let remaining_capacity =
             ((max_tat_delta - (new_tat - now)) / increment).max(0) as u32;
 
         RateLimitDecision {
             allowed: true,
-            limit: self.params.burst_size,
+            limit: params.burst_size,
             remaining: remaining_capacity,
             reset_after_ms: (new_tat - now) / 1_000_000,
             retry_after_ms: None,
         }
     }
+}
+
+/// Resolves the request's session or PAT to a user with a rate limit override.
+///
+/// Tokens are only looked up in Redis, so unknown or cold tokens fall through
+/// to the IP limiter without touching Postgres. The handler warms the cache for
+/// valid tokens. OAuth tokens are skipped because their lookup is not cached.
+async fn get_user_rate_limit(
+    req: &ServiceRequest,
+) -> eyre::Result<Option<(DBUserId, u32)>> {
+    let Ok(token) = extract_authorization_header(req.request()) else {
+        return Ok(None);
+    };
+
+    let pool: &PgPool = req
+        .app_data::<web::Data<ReadOnlyPgPool>>()
+        .expect("Read-only Postgres pool not configured properly");
+    let redis = req
+        .app_data::<web::Data<RedisPool>>()
+        .expect("Redis pool not configured properly");
+
+    let user_id = match token.split_once('_') {
+        Some(("mrp", _)) => DBPersonalAccessToken::get_cached(token, redis)
+            .await?
+            .filter(|pat| pat.expires > Utc::now())
+            .map(|pat| pat.user_id),
+        Some(("mra", _)) => DBSession::get_cached(token, redis)
+            .await?
+            .filter(|session| session.expires > Utc::now())
+            .map(|session| session.user_id),
+        _ => None,
+    };
+    let Some(user_id) = user_id else {
+        return Ok(None);
+    };
+
+    let requests_per_minute =
+        get_user_requests_per_minute(user_id, pool, redis).await?;
+    Ok(requests_per_minute.map(|rpm| (user_id, rpm)))
 }
 
 pub async fn rate_limit_middleware(
@@ -146,8 +233,33 @@ pub async fn rate_limit_middleware(
         conn_info.peer_addr()
     };
 
-    if let Some(ip) = ip {
-        let decision = rate_limiter.check_rate_limit(ip).await;
+    let user_rate_limit =
+        get_user_rate_limit(&req).await.unwrap_or_else(|err| {
+            if should_log_redis_warning() {
+                warn!("Failed to resolve user rate limit, using IP: {err:#}");
+            }
+            None
+        });
+
+    let rate_limit_target = match user_rate_limit {
+        Some((user_id, requests_per_minute)) => Some((
+            format!("user:{}", user_id.0),
+            GCRAParameters::new(requests_per_minute, requests_per_minute),
+        )),
+        None => ip.map(|ip| (ip.to_string(), rate_limiter.default_params)),
+    };
+
+    if let Some((key, params)) = rate_limit_target {
+        let started_at = Instant::now();
+        let decision = rate_limiter.check_rate_limit(&key, params).await;
+        let elapsed = started_at.elapsed();
+        if elapsed > Duration::from_secs(1) && should_log_redis_warning() {
+            warn!(
+                elapsed_ms = elapsed.as_millis() as u64,
+                path = req.path(),
+                "Slow rate limit check against Redis"
+            );
+        }
 
         if decision.allowed {
             let mut service_response = next.call(req).await?;

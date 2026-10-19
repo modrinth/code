@@ -78,7 +78,7 @@ pub(super) async fn detach_local_shared_instance(
                 }),
                 ..Default::default()
             },
-            &state.pool,
+            state,
         )
         .await?;
     }
@@ -851,7 +851,7 @@ async fn build_config_bundle_candidate(
 
     let previous_bundle = if let Some(previous_bundle) = previous_bundle {
         Some(
-            crate::util::fetch::fetch_file_mirrors(
+            crate::util::fetch::fetch_file_mirrors_in(
                 &[&previous_bundle.url],
                 None,
                 None,
@@ -859,6 +859,7 @@ async fn build_config_bundle_candidate(
                 &state.fetch_semaphore,
                 &state.pool,
                 None,
+                Some(&state.directories.store_staging_dir()),
             )
             .await?,
         )

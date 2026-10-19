@@ -154,17 +154,17 @@ pub(in crate::api::instance) async fn detach_link(
     source: &Path,
     target: &Path,
 ) -> crate::Result<()> {
-    let target_metadata = tokio::fs::symlink_metadata(target).await.ok();
-    let contents = if target_metadata.is_some() && target.exists() {
+    if tokio::fs::symlink_metadata(target).await.is_err() {
+        return Ok(());
+    }
+    let contents = if target.exists() {
         Some(io::read(target).await?)
     } else if source.exists() {
         Some(io::read(source).await?)
     } else {
         None
     };
-    if target_metadata.is_some() {
-        io::remove_file(target).await?;
-    }
+    io::remove_file(target).await?;
     if let Some(contents) = contents {
         io::write(target, contents).await?;
     }

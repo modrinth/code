@@ -279,7 +279,7 @@ async fn apply_instance_icon(
             icon_config: Some(icon_config),
             ..EditInstance::default()
         },
-        &state.pool,
+        state,
     )
     .await?;
 

@@ -1,6 +1,6 @@
 <template>
 	<div class="relative overflow-hidden rounded-2xl">
-		<AnalyticsLoadingBar :loading="isDataLoading" />
+		<PageLoadingBar :loading="isDataLoading" />
 		<Table
 			v-model:selected-ids="tableSelectedGraphDatasetIds"
 			:sort-column="displayedSortColumn"
@@ -194,6 +194,7 @@ import { TeleportOverflowMenu } from '@modrinth/ui'
 import {
 	type ButtonMenuOption,
 	Input,
+	PageLoadingBar,
 	Pagination,
 	Table,
 	useFormatNumber,
@@ -221,7 +222,6 @@ import {
 	analyticsMessages,
 	analyticsTableMessages,
 } from '../analytics-messages.ts'
-import AnalyticsLoadingBar from '../AnalyticsLoadingBar.vue'
 import {
 	isNoDependentAnalyticsBreakdownValue,
 	isUnknownAnalyticsBreakdownValue,

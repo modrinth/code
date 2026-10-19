@@ -194,11 +194,18 @@
 				</Button>
 			</div>
 		</div>
-		<ServerCompatibilityModal v-if="hasPermission" ref="serverCompatibilityModal" />
+		<ServerCompatibilityModal
+			v-if="hasPermission"
+			ref="serverCompatibilityModal"
+			:project="project"
+			:save-project="saveProject"
+			@busy="emit('busy', $event)"
+		/>
 	</div>
 </template>
 
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import {
 	ArrowLeftRightIcon,
 	BoxIcon,
@@ -209,14 +216,7 @@ import {
 	PackagePlusIcon,
 	RefreshCwIcon,
 } from '@modrinth/assets'
-import {
-	Avatar,
-	Button,
-	FormattedTag,
-	injectModrinthClient,
-	injectProjectPageContext,
-	TagItem,
-} from '@modrinth/ui'
+import { Avatar, Button, FormattedTag, injectModrinthClient, TagItem } from '@modrinth/ui'
 import { formatVersionsForDisplay } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 
@@ -228,14 +228,17 @@ const serverCompatibilityModal = useTemplateRef<InstanceType<typeof ServerCompat
 	'serverCompatibilityModal',
 )
 
-const { projectV3, currentMember } = injectProjectPageContext()
+const props = defineProps<{
+	project: Labrinth.Projects.v3.Project | undefined
+	saveProject: (patch: Labrinth.Projects.v3.EditProjectRequest) => Promise<boolean>
+	canEdit: boolean
+}>()
+const emit = defineEmits<{ busy: [value: boolean] }>()
+const projectV3 = computed(() => props.project)
 const { labrinth } = injectModrinthClient()
 const tags = useGeneratedState()
 
-const hasPermission = computed(() => {
-	const EDIT_DETAILS = 1 << 2
-	return ((currentMember.value?.permissions ?? 0) & EDIT_DETAILS) === EDIT_DETAILS
-})
+const hasPermission = computed(() => props.canEdit)
 
 const content = computed(() => {
 	if (!projectV3.value) return null

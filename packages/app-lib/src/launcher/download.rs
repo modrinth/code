@@ -170,6 +170,7 @@ async fn fetch_minecraft_file(
             &st.fetch_semaphore,
             &st.pool,
             None,
+            &st.directories.store_staging_dir(),
         )
         .await;
     };
@@ -197,6 +198,7 @@ async fn fetch_minecraft_file(
         &st.fetch_semaphore,
         &st.pool,
         Some(&mut progress_fn as &mut FetchProgressFn<'_>),
+        &st.directories.store_staging_dir(),
     )
     .await
     {
@@ -1009,7 +1011,8 @@ pub async fn download_libraries(
                         None,
                         &st.fetch_semaphore,
                         &st.pool,
-						None,
+                        None,
+                        &st.directories.store_staging_dir(),
                     )
                     .await
                     {

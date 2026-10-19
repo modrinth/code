@@ -8,7 +8,7 @@ import {
 	downloadAvailableAppUpdate,
 	installAvailableAppUpdate,
 } from '@/providers/app-update'
-import { useRootBreadcrumb } from '@/providers/breadcrumbs'
+import { useRootBreadcrumb } from '@/shared/breadcrumbs'
 
 const { formatMessage } = useVIntl()
 
