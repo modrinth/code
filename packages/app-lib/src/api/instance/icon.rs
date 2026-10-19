@@ -1,3 +1,4 @@
+use crate::ErrorKind;
 use crate::event::InstancePayloadType;
 use crate::event::emit::emit_instance;
 use crate::state::instances::adapters::sqlite::instance_rows;
@@ -6,6 +7,7 @@ use crate::state::{
 };
 use crate::util::fetch::{sha1_async, write};
 use crate::util::io;
+use anyhow::{Context, bail};
 use bytes::Bytes;
 use image::imageops::FilterType;
 use image::{DynamicImage, ImageFormat, ImageReader, Rgba, RgbaImage};
@@ -89,9 +91,7 @@ pub async fn edit_generated_icon_if_empty(
     let instance =
         instance_rows::get_instance_display_info(instance_id, &state.pool)
             .await?
-            .ok_or_else(|| {
-                crate::ErrorKind::InputError("Unknown instance".to_string())
-            })?;
+            .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
 
     let applied = instance_rows::update_instance_icon_if_empty(
         instance_id,
@@ -186,20 +186,16 @@ pub(crate) async fn cache_icon_from_path(
 ) -> crate::Result<PathBuf> {
     let icon_path = icon_path.to_path_buf();
     let bytes = tokio::task::spawn_blocking(move || {
-        let file = StdFile::open(&icon_path).map_err(|error| {
-            crate::ErrorKind::InputError(format!(
-                "Could not open instance icon {}: {error}",
-                icon_path.display()
-            ))
-        })?;
+        let file = StdFile::open(&icon_path).context(ErrorKind::InputError(
+            format!("could not open instance icon {}", icon_path.display()),
+        ))?;
         let mut reader = BufReader::new(file);
         let looks_like_svg = {
-            let bytes = reader.fill_buf().map_err(|error| {
-                crate::ErrorKind::InputError(format!(
-                    "Could not inspect instance icon {}: {error}",
+            let bytes =
+                reader.fill_buf().context(ErrorKind::InputError(format!(
+                    "could not inspect instance icon {}",
                     icon_path.display()
-                ))
-            })?;
+                )))?;
             looks_like_svg(bytes)
         };
         if has_svg_extension(&icon_path) || looks_like_svg {
@@ -275,9 +271,7 @@ async fn apply_instance_icon(
     let instance =
         instance_rows::get_instance_display_info(instance_id, &state.pool)
             .await?
-            .ok_or_else(|| {
-                crate::ErrorKind::InputError("Unknown instance".to_string())
-            })?;
+            .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
     crate::state::edit_instance(
         instance_id,
         EditInstance {
@@ -285,7 +279,7 @@ async fn apply_instance_icon(
             icon_config: Some(icon_config),
             ..EditInstance::default()
         },
-        &state.pool,
+        state,
     )
     .await?;
 
@@ -333,22 +327,18 @@ where
 {
     let mut reader = image::ImageReader::new(reader)
         .with_guessed_format()
-        .map_err(|error| {
-            crate::ErrorKind::InputError(format!(
-                "Could not identify instance icon format: {error}"
-            ))
-        })?;
+        .context(ErrorKind::InputError(
+            "could not identify instance icon format".to_string(),
+        ))?;
     let mut limits = image::Limits::default();
     limits.max_image_width = Some(INSTANCE_ICON_MAX_SOURCE_DIMENSION);
     limits.max_image_height = Some(INSTANCE_ICON_MAX_SOURCE_DIMENSION);
     limits.max_alloc = Some(INSTANCE_ICON_MAX_DECODE_BYTES);
     reader.limits(limits);
 
-    let image = reader.decode().map_err(|error| {
-        crate::ErrorKind::InputError(format!(
-            "Could not decode instance icon: {error}"
-        ))
-    })?;
+    let image = reader.decode().context(ErrorKind::InputError(
+        "could not decode instance icon".to_string(),
+    ))?;
     let image = if image.width() > INSTANCE_ICON_MAX_DIMENSION
         || image.height() > INSTANCE_ICON_MAX_DIMENSION
     {
@@ -363,35 +353,26 @@ where
     let mut normalized = Cursor::new(Vec::new());
     image::DynamicImage::ImageRgba8(image.to_rgba8())
         .write_to(&mut normalized, image::ImageFormat::Png)
-        .map_err(|error| {
-            crate::ErrorKind::InputError(format!(
-                "Could not encode instance icon as PNG: {error}"
-            ))
-        })?;
+        .context(ErrorKind::InputError(
+            "could not encode instance icon as PNG".to_string(),
+        ))?;
 
     validate_normalized_icon(normalized.into_inner())
 }
 
 fn inspect_legacy_icon(icon_path: &Path) -> crate::Result<LegacyIconAction> {
-    let metadata = std::fs::metadata(icon_path).map_err(|error| {
-        crate::ErrorKind::InputError(format!(
-            "Could not inspect instance icon {}: {error}",
-            icon_path.display()
-        ))
-    })?;
-    let file = StdFile::open(icon_path).map_err(|error| {
-        crate::ErrorKind::InputError(format!(
-            "Could not open instance icon {}: {error}",
-            icon_path.display()
-        ))
-    })?;
+    let metadata =
+        std::fs::metadata(icon_path).context(ErrorKind::InputError(
+            format!("could not inspect instance icon {}", icon_path.display()),
+        ))?;
+    let file = StdFile::open(icon_path).context(ErrorKind::InputError(
+        format!("could not open instance icon {}", icon_path.display()),
+    ))?;
     let mut reader = BufReader::new(file);
-    let bytes = reader.fill_buf().map_err(|error| {
-        crate::ErrorKind::InputError(format!(
-            "Could not inspect instance icon {}: {error}",
-            icon_path.display()
-        ))
-    })?;
+    let bytes = reader.fill_buf().context(ErrorKind::InputError(format!(
+        "could not inspect instance icon {}",
+        icon_path.display()
+    )))?;
 
     if has_svg_extension(icon_path) || looks_like_svg(bytes) {
         return Ok(LegacyIconAction::Remove);
@@ -441,17 +422,15 @@ pub(crate) fn validate_generated_icon_config(
 
 fn parse_background_color(value: &str) -> crate::Result<[u8; 3]> {
     if value.len() != 7 || !value.starts_with('#') {
-        return Err(crate::ErrorKind::InputError(
-            "Instance icon background must be a hexadecimal color".to_string(),
-        )
-        .into());
+        bail!(ErrorKind::InputError(
+            "instance icon background must be a hexadecimal color".to_string(),
+        ));
     }
 
-    let color = u32::from_str_radix(&value[1..], 16).map_err(|_| {
-        crate::ErrorKind::InputError(
-            "Instance icon background must be a hexadecimal color".to_string(),
-        )
-    })?;
+    let color =
+        u32::from_str_radix(&value[1..], 16).context(ErrorKind::InputError(
+            "instance icon background must be a hexadecimal color".to_string(),
+        ))?;
 
     Ok([
         ((color >> 16) & 0xff) as u8,
@@ -467,10 +446,9 @@ fn validate_icon_config_id(kind: &str, value: &str) -> crate::Result<()> {
             byte.is_ascii_lowercase() || byte.is_ascii_digit() || byte == b'_'
         })
     {
-        return Err(crate::ErrorKind::InputError(format!(
-            "Instance icon {kind} ID is invalid"
-        ))
-        .into());
+        bail!(ErrorKind::InputError(format!(
+            "instance icon {kind} ID is invalid"
+        )));
     }
 
     Ok(())
@@ -481,30 +459,28 @@ fn render_generated_icon(
     symbol_bytes: &[u8],
 ) -> crate::Result<Vec<u8>> {
     if symbol_bytes.is_empty() || symbol_bytes.len() > MAX_SYMBOL_BYTES {
-        return Err(crate::ErrorKind::InputError(
-            "Instance icon symbol must be a PNG smaller than 4 MiB".to_string(),
-        )
-        .into());
+        bail!(ErrorKind::InputError(
+            "instance icon symbol must be a PNG smaller than 4 MiB".to_string(),
+        ));
     }
 
     let reader =
         ImageReader::with_format(Cursor::new(symbol_bytes), ImageFormat::Png);
     let (width, height) =
-        reader.into_dimensions().map_err(image_input_error)?;
+        reader.into_dimensions().context(invalid_symbol_error())?;
     if width == 0
         || height == 0
         || width > MAX_SYMBOL_DIMENSION
         || height > MAX_SYMBOL_DIMENSION
     {
-        return Err(crate::ErrorKind::InputError(format!(
-            "Instance icon symbol dimensions must be between 1 and {MAX_SYMBOL_DIMENSION} pixels"
-        ))
-        .into());
+        bail!(ErrorKind::InputError(format!(
+            "instance icon symbol dimensions must be between 1 and {MAX_SYMBOL_DIMENSION} pixels"
+        )));
     }
 
     let symbol =
         image::load_from_memory_with_format(symbol_bytes, ImageFormat::Png)
-            .map_err(image_input_error)?
+            .context(invalid_symbol_error())?
             .resize_exact(
                 GENERATED_ICON_SIZE,
                 GENERATED_ICON_SIZE,
@@ -548,16 +524,13 @@ fn render_generated_icon(
     let mut encoded = Cursor::new(Vec::new());
     DynamicImage::ImageRgba8(icon)
         .write_to(&mut encoded, ImageFormat::Png)
-        .map_err(image_input_error)?;
+        .context(invalid_symbol_error())?;
 
     Ok(encoded.into_inner())
 }
 
-fn image_input_error(error: image::ImageError) -> crate::Error {
-    crate::ErrorKind::InputError(format!(
-        "Invalid instance icon symbol: {error}"
-    ))
-    .into()
+fn invalid_symbol_error() -> ErrorKind {
+    ErrorKind::InputError("invalid instance icon symbol".to_string())
 }
 
 fn looks_like_svg(bytes: &[u8]) -> bool {
@@ -577,17 +550,15 @@ fn has_svg_extension(path: &Path) -> bool {
 }
 
 fn icon_too_large_error() -> crate::Error {
-    crate::ErrorKind::InputError(format!(
-        "Instance icons must be smaller than {INSTANCE_ICON_MAX_BYTES} bytes"
+    ErrorKind::InputError(format!(
+        "instance icons must be smaller than {INSTANCE_ICON_MAX_BYTES} bytes"
     ))
     .into()
 }
 
 fn svg_not_supported_error() -> crate::Error {
-    crate::ErrorKind::InputError(
-        "SVG instance icons are not supported".to_string(),
-    )
-    .into()
+    ErrorKind::InputError("SVG instance icons are not supported".to_string())
+        .into()
 }
 
 #[cfg(test)]

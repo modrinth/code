@@ -1,7 +1,58 @@
 use crate::database::PgPool;
+use eyre::{Result, WrapErr};
 use serde::{Deserialize, Serialize};
+use xredis::RedisPool;
 
 use crate::database::models::DBUserId;
+
+const USER_REQUESTS_PER_MINUTE_NAMESPACE: &str = "user_requests_per_minute:v1";
+const USER_REQUESTS_PER_MINUTE_EXPIRY: i64 = 300;
+
+/// Per-user API rate limit override. `None` means the IP rate limit applies.
+///
+/// Misses are cached too, since this runs on every authenticated request.
+pub async fn get_user_requests_per_minute(
+    user_id: DBUserId,
+    pool: &PgPool,
+    redis: &RedisPool,
+) -> Result<Option<u32>> {
+    let mut redis = redis
+        .connect()
+        .await
+        .wrap_err("connecting to redis for cached user rate limit")?;
+    let key = redis
+        .key()
+        .entity(USER_REQUESTS_PER_MINUTE_NAMESPACE, user_id.0);
+
+    let cached: Option<Option<u32>> = redis
+        .get_deserialized(&key)
+        .await
+        .wrap_err("fetching cached user rate limit")?;
+    if let Some(requests_per_minute) = cached {
+        return Ok(requests_per_minute);
+    }
+
+    let requests_per_minute = sqlx::query_scalar!(
+        "SELECT requests_per_minute FROM user_limits WHERE user_id = $1",
+        user_id as DBUserId
+    )
+    .fetch_optional(pool)
+    .await
+    .wrap_err("fetching user rate limit")?
+    .flatten()
+    .map(|requests_per_minute| requests_per_minute as u32);
+
+    redis
+        .set_serialized(
+            &key,
+            requests_per_minute,
+            Some(USER_REQUESTS_PER_MINUTE_EXPIRY),
+        )
+        .await
+        .wrap_err("caching user rate limit")?;
+
+    Ok(requests_per_minute)
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DBUserLimits {

@@ -2,6 +2,7 @@ use super::super::synced_options::{
     nbt_from_bytes, nbt_to_bytes, read_nbt_file,
 };
 use crate::ErrorKind;
+use anyhow::Context;
 use quartz_nbt::{NbtCompound, NbtList, NbtTag};
 use std::path::Path;
 
@@ -21,11 +22,11 @@ pub(super) fn servers_from_bytes(
 }
 
 fn servers_from_root(root: NbtCompound) -> crate::Result<Vec<NbtCompound>> {
-    let list = root.get::<_, &NbtList>("servers").map_err(|_| {
-        ErrorKind::InputError(
-            "servers.dat does not contain a valid servers list".to_string(),
-        )
-    })?;
+    let list =
+        root.get::<_, &NbtList>("servers")
+            .context(ErrorKind::InputError(
+                "servers.dat does not contain a valid servers list".to_string(),
+            ))?;
     list.iter()
         .map(|tag| match tag {
             NbtTag::Compound(compound) => Ok(compound.clone()),

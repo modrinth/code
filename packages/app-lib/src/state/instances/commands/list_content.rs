@@ -1,7 +1,6 @@
 use super::sync_content_files::{
     project_type_for_file, sync_instance_content_files,
 };
-use crate::State;
 use crate::pack::install_from::{PackFileHash, PackFormat};
 use crate::state::content_store::content_file_path;
 use crate::state::instances::adapters::sqlite;
@@ -17,6 +16,8 @@ use crate::state::{
     VersionV3,
 };
 use crate::util::fetch::{DownloadMeta, DownloadReason, FetchSemaphore};
+use crate::{ErrorKind, State};
+use anyhow::{Context, bail};
 use async_zip::tokio::read::fs::ZipFileReader;
 use dashmap::DashMap;
 use sqlx::SqlitePool;
@@ -55,9 +56,7 @@ pub(crate) async fn list_content_sets(
 ) -> crate::Result<Vec<ContentSet>> {
     let instance = sqlite::instance_rows::get_instance_by_id(instance_id, pool)
         .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError("Unknown instance".to_string())
-        })?;
+        .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
 
     sqlite::content_rows::get_content_sets_for_instance(&instance.id, pool)
         .await
@@ -470,11 +469,9 @@ pub(crate) async fn get_linked_modpack_info(
         } else {
             (project, all_versions)
         };
-    let project = project.ok_or_else(|| {
-        crate::ErrorKind::InputError(format!(
-            "Linked modpack project {project_id} not found"
-        ))
-    })?;
+    let project = project.ok_or(ErrorKind::InputError(format!(
+        "linked modpack project {project_id} not found"
+    )))?;
     let owner = if let Some(org_id) = &project.organization {
         let org = CachedEntry::get_organization(
             org_id,
@@ -630,26 +627,21 @@ async fn resolve_content_scope_with_instance(
 ) -> crate::Result<ResolvedContentScope> {
     let instance = sqlite::instance_rows::get_instance_by_id(instance_id, pool)
         .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError("Unknown instance".to_string())
-        })?;
+        .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
     let content_set = match content_set_id {
         Some(content_set_id) => {
             let content_set =
                 sqlite::content_rows::get_content_set(content_set_id, pool)
                     .await?
-                    .ok_or_else(|| {
-                        crate::ErrorKind::InputError(format!(
-                            "Unknown content set {content_set_id}"
-                        ))
-                    })?;
+                    .ok_or(ErrorKind::InputError(format!(
+                        "unknown content set {content_set_id}"
+                    )))?;
 
             if content_set.instance_id != instance.id {
-                return Err(crate::ErrorKind::InputError(format!(
-					"Content set {content_set_id} does not belong to instance {}",
-					instance.id
-				))
-				.into());
+                bail!(ErrorKind::InputError(format!(
+                    "content set {content_set_id} does not belong to instance {}",
+                    instance.id
+                )));
             }
 
             content_set
@@ -657,12 +649,10 @@ async fn resolve_content_scope_with_instance(
         None => {
             sqlite::content_rows::get_applied_content_set(&instance.id, pool)
                 .await?
-                .ok_or_else(|| {
-                    crate::ErrorKind::InputError(format!(
-                        "Instance {} has no applied content set",
-                        instance.id
-                    ))
-                })?
+                .ok_or(ErrorKind::InputError(format!(
+                    "instance {} has no applied content set",
+                    instance.id
+                )))?
         }
     };
 
@@ -1447,21 +1437,17 @@ async fn get_modpack_identifiers(
     let version =
         CachedEntry::get_version(version_id, None, pool, fetch_semaphore)
             .await?
-            .ok_or_else(|| {
-                crate::ErrorKind::InputError(format!(
-                    "Modpack version {version_id} not found"
-                ))
-            })?;
+            .ok_or(ErrorKind::InputError(format!(
+                "modpack version {version_id} not found"
+            )))?;
     let primary_file = version
         .files
         .iter()
         .find(|file| file.primary)
         .or_else(|| version.files.first())
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError(format!(
-                "No files found for modpack version {version_id}"
-            ))
-        })?;
+        .ok_or(ErrorKind::InputError(format!(
+            "no files found for modpack version {version_id}"
+        )))?;
     let download_meta = DownloadMeta {
         reason: DownloadReason::Modpack,
         game_version: content_set.game_version.clone(),
@@ -1477,12 +1463,9 @@ async fn get_modpack_identifiers(
         None,
     )
     .await?;
-    let zip_reader =
-        ZipFileReader::new(mrpack_file.path()).await.map_err(|_| {
-            crate::ErrorKind::InputError(
-                "Failed to read modpack zip".to_string(),
-            )
-        })?;
+    let zip_reader = ZipFileReader::new(mrpack_file.path()).await.context(
+        ErrorKind::InputError("failed to read modpack zip".to_string()),
+    )?;
     let manifest_idx = zip_reader
         .file()
         .entries()
@@ -1490,11 +1473,9 @@ async fn get_modpack_identifiers(
         .position(|file| {
             matches!(file.filename().as_str(), Ok("modrinth.index.json"))
         })
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError(
-                "No modrinth.index.json found in mrpack".to_string(),
-            )
-        })?;
+        .ok_or(ErrorKind::InputError(
+            "no modrinth.index.json found in mrpack".to_string(),
+        ))?;
     let mut manifest = String::new();
     let mut entry_reader = zip_reader.reader_with_entry(manifest_idx).await?;
     entry_reader.read_to_string_checked(&mut manifest).await?;

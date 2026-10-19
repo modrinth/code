@@ -12,7 +12,8 @@ pub use crate::util::server_ping::{
     ServerGameProfile, ServerPlayers, ServerStatus, ServerVersion,
 };
 use crate::util::{io, server_ping};
-use crate::{Error, ErrorKind, Result, State, launcher};
+use crate::{ErrorKind, Result, State, launcher};
+use anyhow::Context;
 use async_minecraft_ping::ServerDescription;
 use async_walkdir::WalkDir;
 use async_zip::{Compression, ZipEntryBuilder};
@@ -281,12 +282,9 @@ async fn resolve_instance_identity(
     )
     .fetch_optional(&state.pool)
     .await?
-    .ok_or_else(|| {
-        ErrorKind::InputError(format!(
-            "Unknown instance id or path: {instance}"
-        ))
-        .as_error()
-    })?;
+    .ok_or(ErrorKind::InputError(format!(
+        "unknown instance id or path {instance}"
+    )))?;
 
     Ok((row.id, row.path))
 }
@@ -398,11 +396,11 @@ async fn read_singleplayer_world_maybe_locked(
         quartz_nbt::io::Flavor::GzCompressed,
     )?;
 
-    let data = root.get::<_, &NbtCompound>("Data").map_err(|_| {
-        Error::from(ErrorKind::InputError(
-            "Missing Data tag in level.dat".into(),
-        ))
-    })?;
+    let data =
+        root.get::<_, &NbtCompound>("Data")
+            .context(ErrorKind::InputError(
+                "missing Data tag in level.dat".into(),
+            ))?;
 
     let level_name = data
         .get::<_, &str>("LevelName")
@@ -463,7 +461,7 @@ async fn get_server_worlds_in_instance(
     let state = State::get().await?;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
-        .ok_or_else(|| ErrorKind::InputError("Unknown instance".to_string()))?;
+        .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
     let servers = crate::api::instance::synced_servers::list_server_records(
         &metadata, &state,
     )
@@ -789,7 +787,7 @@ pub async fn add_server_to_instance(
         resolve_instance_identity(instance_id, &state).await?;
     let metadata = crate::state::get_instance(&instance_id, &state.pool)
         .await?
-        .ok_or_else(|| ErrorKind::InputError("Unknown instance".to_string()))?;
+        .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
     let data = crate::api::instance::synced_servers::server_data(
         name,
         address.clone(),
@@ -844,7 +842,7 @@ pub async fn ensure_managed_server_in_instance(
         resolve_instance_identity(instance_id, &state).await?;
     let metadata = crate::state::get_instance(&instance_id, &state.pool)
         .await?
-        .ok_or_else(|| ErrorKind::InputError("Unknown instance".to_string()))?;
+        .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
     let data =
         crate::api::instance::synced_servers::server_data(name, address, None);
     crate::api::instance::synced_servers::ensure_managed_server(
@@ -865,7 +863,7 @@ pub async fn edit_server_in_instance(
         resolve_instance_identity(instance_id, &state).await?;
     let metadata = crate::state::get_instance(&instance_id, &state.pool)
         .await?
-        .ok_or_else(|| ErrorKind::InputError("Unknown instance".to_string()))?;
+        .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
     crate::api::instance::synced_servers::update_server_by_index(
         &metadata,
         index,
@@ -886,7 +884,7 @@ pub async fn remove_server_from_instance(
         resolve_instance_identity(instance_id, &state).await?;
     let metadata = crate::state::get_instance(&instance_id, &state.pool)
         .await?
-        .ok_or_else(|| ErrorKind::InputError("Unknown instance".to_string()))?;
+        .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
     crate::api::instance::synced_servers::remove_server_by_index(
         &metadata, index, &state,
     )
@@ -896,14 +894,9 @@ pub async fn remove_server_from_instance(
 pub async fn get_instance_protocol_version(
     instance_id: &str,
 ) -> Result<Option<ProtocolVersion>> {
-    let metadata =
-        crate::api::instance::get(instance_id)
-            .await?
-            .ok_or_else(|| {
-                ErrorKind::InputError(format!(
-                    "Could not find instance {instance_id}"
-                ))
-            })?;
+    let metadata = crate::api::instance::get(instance_id).await?.ok_or(
+        ErrorKind::InputError(format!("could not find instance {instance_id}")),
+    )?;
     if metadata.instance.install_stage != InstanceInstallStage::Installed {
         return Ok(None);
     }
@@ -932,6 +925,7 @@ pub async fn get_instance_protocol_version(
         &metadata.applied_content_set.game_version,
         metadata.applied_content_set.loader,
         metadata.applied_content_set.loader_version.as_deref(),
+        &state.directories,
     )
     .await?;
     if metadata.applied_content_set.loader != ModLoader::Vanilla
@@ -1003,9 +997,9 @@ async fn _get_server_status_new(
 ) -> Result<ServerStatus> {
     let (address, port) = match address.rsplit_once(':') {
         Some((addr, port)) => {
-            let port = port.parse::<u16>().map_err(|_err| {
-                Error::from(ErrorKind::InputError("invalid port number".into()))
-            })?;
+            let port = port
+                .parse::<u16>()
+                .context(ErrorKind::InputError("invalid port number".into()))?;
             (addr, port)
         }
         None => (address, 25565),
@@ -1019,13 +1013,15 @@ async fn _get_server_status_new(
         builder = builder.with_protocol_version(version.version as usize)
     }
 
-    let conn = builder.connect().await.map_err(|_err| {
-        Error::from(ErrorKind::InputError("failed to connect to server".into()))
-    })?;
+    let conn = builder
+        .connect()
+        .await
+        .context(ErrorKind::InputError("failed to connect to server".into()))?;
 
-    let ping_conn = conn.status().await.map_err(|_err| {
-        Error::from(ErrorKind::InputError("failed to get server status".into()))
-    })?;
+    let ping_conn = conn
+        .status()
+        .await
+        .context(ErrorKind::InputError("failed to get server status".into()))?;
     let status = &ping_conn.status;
     let description = match &status.description {
         ServerDescription::Plain(text) => {
@@ -1065,9 +1061,10 @@ async fn _get_server_status_new(
     let latency = {
         let start = Instant::now();
         let ping_magic = Utc::now().timestamp_millis().cast_unsigned();
-        ping_conn.ping(ping_magic).await.map_err(|_err| {
-            Error::from(ErrorKind::InputError("failed to do ping".into()))
-        })?;
+        ping_conn
+            .ping(ping_magic)
+            .await
+            .context(ErrorKind::InputError("failed to do ping".into()))?;
         start.elapsed().as_millis() as i64
     };
 

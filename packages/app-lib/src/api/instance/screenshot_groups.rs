@@ -1,7 +1,8 @@
-use crate::State;
 use crate::event::InstancePayloadType;
 use crate::event::emit::emit_instance;
 use crate::state::instances::adapters::sqlite::screenshot_rows;
+use crate::{ErrorKind, State};
+use anyhow::bail;
 use serde::{Deserialize, Serialize};
 use sqlx::{Sqlite, Transaction};
 use std::collections::HashSet;
@@ -31,16 +32,14 @@ pub struct ScreenshotGroupImport {
 fn validate_group_name(name: &str) -> crate::Result<&str> {
     let name = name.trim();
     if name.is_empty() {
-        return Err(crate::ErrorKind::InputError(
-            "Group name cannot be empty".to_string(),
-        )
-        .into());
+        bail!(ErrorKind::InputError(
+            "group name cannot be empty".to_string(),
+        ));
     }
     if name.chars().count() > MAX_GROUP_NAME_LENGTH {
-        return Err(crate::ErrorKind::InputError(format!(
-            "Group name cannot exceed {MAX_GROUP_NAME_LENGTH} characters"
-        ))
-        .into());
+        bail!(ErrorKind::InputError(format!(
+            "group name cannot exceed {MAX_GROUP_NAME_LENGTH} characters"
+        )));
     }
     Ok(name)
 }
@@ -108,10 +107,9 @@ pub async fn rename_screenshot_group(
     .execute(&state.pool)
     .await?;
     if result.rows_affected() == 0 {
-        return Err(crate::ErrorKind::InputError(format!(
-            "Unknown screenshot group {id}"
-        ))
-        .into());
+        bail!(ErrorKind::InputError(format!(
+            "unknown screenshot group {id}"
+        )));
     }
 
     Ok(ScreenshotGroup {
@@ -138,10 +136,9 @@ pub async fn delete_screenshot_group(id: String) -> crate::Result<()> {
             .execute(&state.pool)
             .await?;
     if result.rows_affected() == 0 {
-        return Err(crate::ErrorKind::InputError(format!(
-            "Unknown screenshot group {id}"
-        ))
-        .into());
+        bail!(ErrorKind::InputError(format!(
+            "unknown screenshot group {id}"
+        )));
     }
     emit_screenshot_updates(instance_ids).await;
     Ok(())
@@ -210,11 +207,10 @@ pub async fn import_screenshot_groups(
 
     for (index, group) in groups.into_iter().enumerate() {
         if group.id.trim().is_empty() || !group_ids.insert(group.id.clone()) {
-            return Err(crate::ErrorKind::InputError(
-                "Screenshot group import contains an invalid group ID"
+            bail!(ErrorKind::InputError(
+                "screenshot group import contains an invalid group ID"
                     .to_string(),
-            )
-            .into());
+            ));
         }
         let name = validate_group_name(&group.name)?;
         let display_order = base_order + index as i64;
@@ -254,10 +250,9 @@ fn normalize_screenshot_ids(
     {
         return Ok(screenshot_ids);
     }
-    Err(crate::ErrorKind::InputError(
-        "Screenshot group contains duplicate screenshots".to_string(),
-    )
-    .into())
+    bail!(ErrorKind::InputError(
+        "screenshot group contains duplicate screenshots".to_string(),
+    ))
 }
 
 fn normalize_membership_updates(
@@ -270,11 +265,10 @@ fn normalize_membership_updates(
     {
         return Ok(updates);
     }
-    Err(crate::ErrorKind::InputError(
-        "Screenshot membership update contains duplicate screenshots"
+    bail!(ErrorKind::InputError(
+        "screenshot membership update contains duplicate screenshots"
             .to_string(),
-    )
-    .into())
+    ))
 }
 
 async fn set_group_members(
@@ -311,10 +305,9 @@ async fn ensure_group_exists(
     .fetch_one(&mut **tx)
     .await?;
     if !exists {
-        return Err(crate::ErrorKind::InputError(format!(
-            "Unknown screenshot group {group_id}"
-        ))
-        .into());
+        bail!(ErrorKind::InputError(format!(
+            "unknown screenshot group {group_id}"
+        )));
     }
     Ok(())
 }
@@ -329,12 +322,10 @@ async fn screenshot_instance_id(
     )
     .fetch_optional(&mut **tx)
     .await?
-    .ok_or_else(|| {
-        crate::ErrorKind::InputError(format!(
-            "Unknown screenshot {screenshot_id}"
-        ))
-    })
-    .map_err(Into::into)
+    .ok_or(
+        ErrorKind::InputError(format!("unknown screenshot {screenshot_id}"))
+            .into(),
+    )
 }
 
 async fn emit_screenshot_updates(

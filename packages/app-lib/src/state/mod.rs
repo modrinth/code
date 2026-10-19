@@ -1,5 +1,7 @@
 //! Theseus state management system
+use crate::ErrorKind;
 use crate::util::fetch::{FetchSemaphore, IoSemaphore};
+use anyhow::anyhow;
 use dashmap::DashMap;
 use std::sync::atomic::AtomicBool;
 use std::sync::{Arc, LazyLock};
@@ -71,7 +73,7 @@ pub mod server_join_log;
 enum StartupPhase {
     Pending,
     Ready,
-    Failed(crate::Error),
+    Failed(String),
 }
 
 static LAUNCHER_STATE: OnceCell<Arc<State>> = OnceCell::const_new();
@@ -119,8 +121,6 @@ pub struct State {
     // pub app_identifier: String,
     /// Friends socket
     pub friends_socket: FriendsSocket,
-
-    pub restart_after_pending_update: AtomicBool,
 
     pub(crate) pool: SqlitePool,
 
@@ -187,7 +187,7 @@ impl State {
             .await;
         STATE_STARTUP.send_replace(match &result {
             Ok(_) => StartupPhase::Ready,
-            Err(error) => StartupPhase::Failed(error.clone()),
+            Err(error) => StartupPhase::Failed(format!("{error:#}")),
         });
         let state = result?;
 
@@ -247,6 +247,11 @@ impl State {
                     tracing::warn!("Synced-pack migration deferred: {error}");
                 }
                 if let Err(error) =
+                    CachedEntry::purge_long_expired(&state.pool).await
+                {
+                    tracing::warn!("Expired cache cleanup deferred: {error}");
+                }
+                if let Err(error) =
                     state.content_store.cleanup(state, false).await
                 {
                     tracing::debug!(
@@ -286,10 +291,17 @@ impl State {
             }
 
             let res = tokio::try_join!(
-                state.discord_rpc.clear_to_default(true),
-                instances::refresh_all_instances(),
+                state.discord_rpc.clear_to_default(
+                    true,
+                    &state.pool,
+                    &state.process_manager,
+                ),
+                refresh_all_instances(state),
                 Settings::migrate(&state.pool),
-                ModrinthCredentials::refresh_all(),
+                ModrinthCredentials::refresh_all(
+                    &state.pool,
+                    &state.fetch_semaphore,
+                ),
             );
 
             if let Err(e) = res {
@@ -304,7 +316,7 @@ impl State {
                     &state.process_manager,
                 )
                 .await;
-            let _ = FriendsSocket::socket_loop().await;
+            let _ = FriendsSocket::socket_loop(Arc::clone(state)).await;
         });
 
         Ok(())
@@ -327,7 +339,7 @@ impl State {
                     .get()
                     .expect("state is set before startup is marked ready"),
             )),
-            StartupPhase::Failed(error) => Err(error.clone()),
+            StartupPhase::Failed(message) => Err(anyhow!("{message}")),
             StartupPhase::Pending => {
                 unreachable!(
                     "wait_for returns only once the phase has left Pending"
@@ -349,13 +361,12 @@ impl State {
         app_identifier: String,
     ) -> crate::Result<Arc<Self>> {
         tracing::info!("Connecting to app database");
-        let settings_dir =
-            DirectoryInfo::initial_settings_dir_path(&app_identifier)
-                .ok_or_else(|| {
-                    crate::ErrorKind::FSError(
-                        "Could not find the application directory".to_string(),
-                    )
-                })?;
+        let settings_dir = DirectoryInfo::initial_settings_dir_path(
+            &app_identifier,
+        )
+        .ok_or(ErrorKind::FSError(
+            "could not find the application directory".to_string(),
+        ))?;
         let store_lock =
             content_store::ContentStore::lock_process(&settings_dir).await?;
         let pool = db::connect(&app_identifier).await?;
@@ -418,7 +429,6 @@ impl State {
             discord_rpc,
             process_manager,
             friends_socket,
-            restart_after_pending_update: AtomicBool::new(false),
             pool,
             file_watcher,
             // app_identifier,

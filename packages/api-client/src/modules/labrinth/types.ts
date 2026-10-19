@@ -1776,6 +1776,14 @@ export namespace Labrinth {
 				reason: string
 				created: string
 			}
+
+			export type UserRestriction = {
+				removed_perms: number
+				reason: string | null
+				private_reason?: string
+				restricted_by?: string
+				updated: string
+			}
 		}
 
 		export namespace v2 {
@@ -1908,6 +1916,7 @@ export namespace Labrinth {
 				allow_friend_requests?: boolean
 				moderation_notes?: Common.ModerationNote | null
 				lock?: Common.UserLock
+				restriction?: Common.UserRestriction
 				github_id?: number
 				discord_id?: string
 				steam_id?: string
@@ -2447,7 +2456,12 @@ export namespace Labrinth {
 						icon_url: string | null
 				  }
 
-			export type ProjectsSort = 'oldest' | 'newest' | 'most_external_deps' | 'least_external_deps'
+			export type ProjectsSort =
+				| 'oldest'
+				| 'newest'
+				| 'oldest_initial'
+				| 'most_external_deps'
+				| 'least_external_deps'
 
 			export type ProjectsRequest = {
 				count?: number
@@ -2468,6 +2482,7 @@ export namespace Labrinth {
 				status: Projects.v2.ProjectStatus
 				requested_status: Projects.v2.ProjectStatus | null
 				queued: string | null
+				initial_queued: string | null
 				published: string
 				updated: string
 				project_types: string[]
@@ -2533,6 +2548,12 @@ export namespace Labrinth {
 			export type ProjectJudgement = FlameJudgement | UnknownJudgement
 
 			export type ProjectJudgements = Record<string, ProjectJudgement>
+
+			export type RestrictUserRequest = {
+				removed_perms: number
+				reason?: string | null
+				private_reason?: string | null
+			}
 		}
 	}
 
@@ -2657,6 +2678,7 @@ export namespace Labrinth {
 			homePageProjects?: Projects.v2.Project[]
 			homePageSearch?: Search.v2.SearchResults
 			homePageNotifs?: Search.v2.SearchResults
+			prideProjectIds?: string[]
 			products?: Billing.Internal.Product[]
 
 			countries: ISO3166.Country[]

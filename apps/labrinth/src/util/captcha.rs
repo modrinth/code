@@ -5,14 +5,14 @@ use actix_web::HttpRequest;
 use serde::Deserialize;
 use std::collections::HashMap;
 
-pub async fn check_hcaptcha(
+pub async fn check_turnstile(
     req: &HttpRequest,
     challenge: &str,
 ) -> Result<bool, ApiError> {
-    let secret = &ENV.HCAPTCHA_SECRET;
+    let secret = &ENV.TURNSTILE_SECRET;
 
     if secret.is_empty() || secret == "none" {
-        tracing::info!("hCaptcha secret not set, skipping check");
+        tracing::info!("Turnstile secret not set, skipping check");
         return Ok(true);
     }
 
@@ -43,7 +43,7 @@ pub async fn check_hcaptcha(
     form.insert("remoteip", ip_addr);
 
     let val: Response = client
-        .post("https://api.hcaptcha.com/siteverify")
+        .post("https://challenges.cloudflare.com/turnstile/v0/siteverify")
         .form(&form)
         .send()
         .await

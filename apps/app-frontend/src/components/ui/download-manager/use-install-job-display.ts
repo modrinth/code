@@ -326,7 +326,7 @@ export function useInstallJobDisplay() {
 		if (code === 'canceled') {
 			return formatMessage(failureSummaryMessages.canceled)
 		}
-		if (hasPermissionError(job)) {
+		if (code === 'permission_denied') {
 			return formatMessage(failureSummaryMessages.noWritePermission)
 		}
 
@@ -348,15 +348,6 @@ export function useInstallJobDisplay() {
 		const message = code ? failureMessagesByCode.get(code) : undefined
 		return formatMessage(
 			message ?? failureMessagesByPhase.get(phase) ?? failureSummaryMessages.unexpectedError,
-		)
-	}
-
-	function hasPermissionError(job: InstallJobSnapshot): boolean {
-		const message = job.error?.message.toLowerCase() ?? ''
-		return (
-			message.includes('permission denied') ||
-			message.includes('access is denied') ||
-			message.includes('operation not permitted')
 		)
 	}
 

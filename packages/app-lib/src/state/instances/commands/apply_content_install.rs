@@ -1,3 +1,4 @@
+use crate::ErrorKind;
 use crate::state::instances::{
     ContentRequirement, ContentSourceKind, Instance, InstanceFile,
     adapters::sqlite::{content_rows, instance_rows},
@@ -8,6 +9,7 @@ use crate::state::{
 };
 use crate::util::fetch::{self, DownloadMeta, DownloadReason};
 use crate::util::io;
+use anyhow::bail;
 use async_trait::async_trait;
 use bytes::Bytes;
 use modrinth_content_management::{
@@ -167,11 +169,9 @@ pub(crate) async fn resolve_install_plan(
     let content_set =
         content_rows::get_applied_content_set(instance_id, &state.pool)
             .await?
-            .ok_or_else(|| {
-                crate::ErrorKind::InputError(format!(
-                    "Instance {instance_id} has no applied content set"
-                ))
-            })?;
+            .ok_or(ErrorKind::InputError(format!(
+                "instance {instance_id} has no applied content set"
+            )))?;
     let existing_project_ids =
         crate::state::get_installed_project_ids_for_instance(
             instance_id,
@@ -244,11 +244,9 @@ pub(crate) async fn switch_project_version_with_dependencies(
         &state.api_semaphore,
     )
     .await?
-    .ok_or_else(|| {
-        crate::ErrorKind::InputError(format!(
-            "Unable to install version id {version_id}. Not found."
-        ))
-    })?;
+    .ok_or(ErrorKind::InputError(format!(
+        "unable to install version id {version_id}, not found"
+    )))?;
     let content_type = ProjectType::get_from_loaders(version.loaders.clone())
         .map(ContentType::from)
         .unwrap_or(ContentType::Mod);
@@ -329,17 +327,15 @@ pub(crate) async fn resolve_content_scope(
 ) -> crate::Result<ContentScope> {
     let instance = instance_rows::get_instance_by_id(instance_id, &state.pool)
         .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError("Unknown instance".to_string())
-        })?;
+        .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
     let content_set_id = match content_set_id {
         Some(id) => id.to_string(),
-        None => instance.applied_content_set_id.clone().ok_or_else(|| {
-            crate::ErrorKind::InputError(format!(
-                "Instance {} has no applied content set",
+        None => instance.applied_content_set_id.clone().ok_or(
+            ErrorKind::InputError(format!(
+                "instance {} has no applied content set",
                 instance.id
-            ))
-        })?,
+            )),
+        )?,
     };
 
     Ok(ContentScope {
@@ -399,12 +395,10 @@ pub(crate) async fn download_project_version_with_progress(
     let content_set =
         content_rows::get_content_set(&scope.content_set_id, &state.pool)
             .await?
-            .ok_or_else(|| {
-                crate::ErrorKind::InputError(format!(
-                    "Unknown content set {}",
-                    scope.content_set_id
-                ))
-            })?;
+            .ok_or(ErrorKind::InputError(format!(
+                "unknown content set {}",
+                scope.content_set_id
+            )))?;
     let version = CachedEntry::get_version(
         version_id,
         None,
@@ -412,21 +406,17 @@ pub(crate) async fn download_project_version_with_progress(
         &state.api_semaphore,
     )
     .await?
-    .ok_or_else(|| {
-        crate::ErrorKind::InputError(format!(
-            "Unable to install version id {version_id}. Not found."
-        ))
-    })?;
+    .ok_or(ErrorKind::InputError(format!(
+        "unable to install version id {version_id}, not found"
+    )))?;
     let file = version
         .files
         .iter()
         .find(|file| file.primary)
         .or_else(|| version.files.first())
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError(
-                "No files for input version present!".to_string(),
-            )
-        })?;
+        .ok_or(ErrorKind::InputError(
+            "no files for input version present".to_string(),
+        ))?;
     let download_meta = DownloadMeta {
         reason,
         game_version: content_set.game_version,
@@ -443,11 +433,9 @@ pub(crate) async fn download_project_version_with_progress(
     )
     .await?;
     let project_type = ProjectType::get_from_loaders(version.loaders.clone())
-        .ok_or_else(|| {
-        crate::ErrorKind::InputError(format!(
-            "Unable to infer project type for version {version_id}"
-        ))
-    })?;
+        .ok_or(ErrorKind::InputError(format!(
+        "unable to infer project type for version {version_id}"
+    )))?;
     let project_id = version.project_id.clone();
     let version_id = version.id.clone();
 
@@ -486,8 +474,8 @@ pub(crate) async fn add_downloaded_project_version_with_enabled(
     state: &State,
 ) -> crate::Result<String> {
     if !path_util::is_safe_file_name(&downloaded.file_name) {
-        return Err(crate::state::content_store::input(
-            "Invalid project filename",
+        bail!(ErrorKind::InputError(
+            "invalid project filename".to_string()
         ));
     }
     let stored_file = downloaded.file.store_file(state).await?;
@@ -520,15 +508,12 @@ pub(crate) async fn add_project_from_path(
     project_type: Option<ProjectType>,
     state: &State,
 ) -> crate::Result<String> {
-    let file_name = path
-        .file_name()
-        .and_then(|name| name.to_str())
-        .ok_or_else(|| {
-            crate::state::content_store::input("Invalid project filename")
-        })?;
+    let file_name = path.file_name().and_then(|name| name.to_str()).ok_or(
+        ErrorKind::InputError("invalid project filename".to_string()),
+    )?;
     if !path_util::is_safe_file_name(file_name) {
-        return Err(crate::state::content_store::input(
-            "Invalid project filename",
+        bail!(ErrorKind::InputError(
+            "invalid project filename".to_string()
         ));
     }
     let project_type = match project_type {
@@ -571,8 +556,8 @@ pub(crate) async fn add_project_bytes(
     state: &State,
 ) -> crate::Result<String> {
     if !path_util::is_safe_file_name(file_name) {
-        return Err(crate::state::content_store::input(
-            "Invalid project filename",
+        bail!(ErrorKind::InputError(
+            "invalid project filename".to_string()
         ));
     }
     let project_type = match project_type {
@@ -584,8 +569,8 @@ pub(crate) async fn add_project_bytes(
     if let Some(expected) = hash {
         crate::state::content_store::validate_digest(expected, 40)?;
         if sha1_smol::Sha1::from(&bytes[..]).hexdigest() != expected {
-            return Err(crate::state::content_store::input(
-                "Content bytes do not match the expected hash",
+            bail!(ErrorKind::InputError(
+                "content bytes do not match the expected hash".to_string(),
             ));
         }
     }

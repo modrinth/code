@@ -1,9 +1,11 @@
 //! Reads and merges Minecraft's active resource-pack list.
 
 use super::super::{instance_is_running, sync_files_are_protected};
-use super::options_file::{input_error, options_path, read_document};
+use super::options_file::{options_path, read_document};
+use crate::ErrorKind;
 use crate::state::{InstanceMetadata, State};
 use crate::util::io;
+use anyhow::Context;
 use std::collections::BTreeSet;
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -19,9 +21,9 @@ pub(in crate::api::instance) enum ResourcePackOptionsUpdate {
 }
 
 fn parse_entries(raw: &str) -> crate::Result<Vec<String>> {
-    serde_json::from_str(raw).map_err(|_| {
-        input_error("options.txt contains an invalid resourcePacks value")
-    })
+    serde_json::from_str(raw).context(ErrorKind::InputError(
+        "options.txt contains an invalid resourcePacks value".to_string(),
+    ))
 }
 
 pub(in crate::api::instance) fn merge_resource_pack_order(

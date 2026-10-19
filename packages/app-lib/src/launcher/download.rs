@@ -7,6 +7,7 @@ use crate::install::{
 use crate::instance::QuickPlayType;
 use crate::launcher::parse_rules;
 use crate::{
+    ErrorKind,
     event::{
         LoadingBarId,
         emit::{emit_loading, loading_try_for_each_concurrent},
@@ -14,6 +15,7 @@ use crate::{
     state::State,
     util::{fetch::*, io},
 };
+use anyhow::{Context, bail};
 use daedalus::minecraft::{LoggingConfiguration, LoggingSide};
 use daedalus::{
     self as d,
@@ -168,6 +170,7 @@ async fn fetch_minecraft_file(
             &st.fetch_semaphore,
             &st.pool,
             None,
+            &st.directories.store_staging_dir(),
         )
         .await;
     };
@@ -195,6 +198,7 @@ async fn fetch_minecraft_file(
         &st.fetch_semaphore,
         &st.pool,
         Some(&mut progress_fn as &mut FetchProgressFn<'_>),
+        &st.directories.store_staging_dir(),
     )
     .await
     {
@@ -271,13 +275,10 @@ fn missing_client_bytes(
     let client_download = version
         .downloads
         .get(&d::minecraft::DownloadType::Client)
-        .ok_or(
-            crate::ErrorKind::LauncherError(format!(
-                "No client downloads exist for version {}",
-                version.id
-            ))
-            .as_error(),
-        )?;
+        .ok_or(ErrorKind::LauncherError(format!(
+            "no client downloads exist for version {}",
+            version.id
+        )))?;
     let path = st
         .directories
         .version_dir(&version.id)
@@ -494,7 +495,8 @@ async fn download_minecraft_inner(
         force,
         progress.clone(),
     )
-    .await?;
+    .await
+    .context("downloading assets index")?;
     if let Some(progress) = &progress {
         progress
             .add_total(missing_asset_bytes(
@@ -519,10 +521,10 @@ async fn download_minecraft_inner(
         download_assets(st, version.assets == "legacy", &assets_index, loading_bar, amount, force, progress.clone()), // 40
         download_libraries(st, version.libraries.as_slice(), &version.id, loading_bar, amount, java_arch, force, minecraft_updated, progress.clone()) // 40
     };
-    client?;
-    log_config?;
-    assets?;
-    libraries?;
+    client.context("downloading client")?;
+    log_config.context("downloading log config")?;
+    assets.context("downloading assets")?;
+    libraries.context("downloading libraries")?;
 
     tracing::info!("Done downloading Minecraft!");
     Ok(())
@@ -550,19 +552,21 @@ pub async fn download_version_info(
         loader.filter(|loader| super::is_locally_installed_loader(loader))
         && !path.exists()
     {
-        return Err(crate::ErrorKind::LauncherError(format!(
-            "Loader version {} for Minecraft {} is no longer available",
+        bail!(ErrorKind::LauncherError(format!(
+            "loader version {} for Minecraft {} is no longer available",
             loader.id, version.id
-        ))
-        .as_error());
+        )));
     }
 
     let removed_loader = loader.is_some_and(super::is_locally_installed_loader);
     let res = if path.exists() && (!force.unwrap_or(false) || removed_loader) {
-        io::read(path)
+        io::read(&path)
             .err_into::<crate::Error>()
             .await
-            .and_then(|ref it| Ok(serde_json::from_slice(it)?))
+            .and_then(|ref it| {
+                serde_json::from_slice(it)
+                    .context(format!("parsing version info {}", path.display()))
+            })
     } else {
         tracing::info!(
             "Downloading version info for version {} from {}",
@@ -591,7 +595,8 @@ pub async fn download_version_info(
             &st.api_semaphore,
             &st.pool,
         )
-        .await?;
+        .await
+        .context(format!("fetching Minecraft {} version info", version.id))?;
 
         if let Some(loader) = loader {
             if let Some(reporter) = reporter {
@@ -616,13 +621,16 @@ pub async fn download_version_info(
                 &st.api_semaphore,
                 &st.pool,
             )
-            .await?;
+            .await
+            .context(format!("fetching loader {} version info", loader.id))?;
             info = d::modded::merge_partial_version(partial, info);
         }
 
         info.id.clone_from(&version_id);
 
-        write(&path, &serde_json::to_vec(&info)?, &st.io_semaphore).await?;
+        write(&path, &serde_json::to_vec(&info)?, &st.io_semaphore)
+            .await
+            .context(format!("writing version info to {}", path.display()))?;
         Ok(info)
     }?;
 
@@ -648,12 +656,9 @@ pub async fn download_client(
     let client_download = version_info
         .downloads
         .get(&d::minecraft::DownloadType::Client)
-        .ok_or(
-            crate::ErrorKind::LauncherError(format!(
-                "No client downloads exist for version {version}"
-            ))
-            .as_error(),
-        )?;
+        .ok_or(ErrorKind::LauncherError(format!(
+            "no client downloads exist for version {version}"
+        )))?;
     let path = st
         .directories
         .version_dir(version)
@@ -673,7 +678,10 @@ pub async fn download_client(
                 .build(),
         )
         .await?;
-        bytes.copy_to(&path, &st.io_semaphore).await?;
+        bytes
+            .copy_to(&path, &st.io_semaphore)
+            .await
+            .context(format!("writing client jar to {}", path.display()))?;
         tracing::trace!("Fetched client version {version}");
     }
     if let Some(loading_bar) = loading_bar {
@@ -700,10 +708,15 @@ pub async fn download_assets_index(
         .join(format!("{}.json", &version.asset_index.id));
 
     let res = if path.exists() && !force {
-        io::read(path)
+        io::read(&path)
             .err_into::<crate::Error>()
             .await
-            .and_then(|ref it| Ok(serde_json::from_slice(it)?))
+            .and_then(|ref it| {
+                serde_json::from_slice(it).context(format!(
+                    "parsing assets index from {}",
+                    path.display()
+                ))
+            })
     } else {
         let index = fetch_minecraft_file(
             st,
@@ -718,9 +731,12 @@ pub async fn download_assets_index(
                 .build(),
         )
         .await?;
-        let index: AssetsIndex =
-            read_json(index.path(), &st.io_semaphore).await?;
-        write(&path, &serde_json::to_vec(&index)?, &st.io_semaphore).await?;
+        let index: AssetsIndex = read_json(index.path(), &st.io_semaphore)
+            .await
+            .context("parsing downloaded assets index")?;
+        write(&path, &serde_json::to_vec(&index)?, &st.io_semaphore)
+            .await
+            .context(format!("writing assets index to {}", path.display()))?;
         tracing::info!("Fetched assets index");
         Ok(index)
     }?;
@@ -953,7 +969,10 @@ pub async fn download_libraries(
                             .build(),
                     )
                     .await?;
-                    bytes.copy_to(&path, &st.io_semaphore).await?;
+                    bytes
+                        .copy_to(&path, &st.io_semaphore)
+                        .await
+                        .context(format!("writing library to {}", path.display()))?;
 
                     tracing::trace!(
                         "Fetched library {} to path {:?}",
@@ -992,7 +1011,8 @@ pub async fn download_libraries(
                         None,
                         &st.fetch_semaphore,
                         &st.pool,
-						None,
+                        None,
+                        &st.directories.store_staging_dir(),
                     )
                     .await
                     {
@@ -1065,7 +1085,10 @@ pub async fn download_log_config(
                 .build(),
         )
         .await?;
-        bytes.copy_to(&path, &st.io_semaphore).await?;
+        bytes
+            .copy_to(&path, &st.io_semaphore)
+            .await
+            .context(format!("writing log config to {}", path.display()))?;
         tracing::trace!("Fetched log config {}", log_download.id);
     }
     if let Some(loading_bar) = loading_bar {
