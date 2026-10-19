@@ -688,7 +688,7 @@ useSeoMeta({
 								<div>
 									<div class="icon-logo modrinth">
 										<Avatar
-											src="https://cdn-raw.modrinth.com/app-landing/mr-app-icon.webp"
+											src="https://cdn.modrinth.com/app-landing/mr-app-icon.webp"
 											size="sm"
 										/>
 									</div>
