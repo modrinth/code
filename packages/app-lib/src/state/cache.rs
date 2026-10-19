@@ -2178,6 +2178,12 @@ impl CachedEntry {
     /// Deletes per-item API entries that expired more than [`EXPIRED_CACHE_RETENTION_SECS`] ago.
     ///
     /// Recently expired entries stay so they can still be served offline or while revalidating.
+    ///
+    /// Only types keyed per item are purged, since they grow without bound as projects are
+    /// browsed. Singleton types (manifests, categories, loaders, game versions, report types,
+    /// donation platforms) hold a fixed handful of rows, so purging them frees nothing and
+    /// drops their offline fallback. `ModpackFiles` and `EmbeddedContentMetadata` are
+    /// effectively permanent by design and are left alone.
     pub(crate) async fn purge_long_expired(
         exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
     ) -> crate::Result<u64> {
