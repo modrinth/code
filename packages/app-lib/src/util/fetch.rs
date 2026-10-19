@@ -4,9 +4,9 @@ use crate::event::LoadingBarId;
 use crate::event::emit::emit_loading;
 use crate::util::content_hash::{ContentHasher, temporary_file};
 use crate::{ErrorKind, LabrinthError};
+use anyhow::Context;
 use bytes::Bytes;
 use chrono::{DateTime, TimeDelta, Utc};
-use eyre::{Context, eyre};
 use governor::clock::{Clock, DefaultClock};
 use governor::{DefaultDirectRateLimiter, Quota, RateLimiter};
 use parking_lot::Mutex;
@@ -641,11 +641,9 @@ async fn read_memory_response(
             .try_with(|_| ())
             .is_err()
     {
-        return response
-            .bytes()
-            .await
-            .wrap_err_with(|| eyre!("failed to read response body from {url}"))
-            .map_err(Into::into);
+        return response.bytes().await.with_context(|| {
+            format!("failed to read response body from {url}")
+        });
     }
     use futures::StreamExt;
     let total_size = total_size.unwrap_or(0);
@@ -654,8 +652,8 @@ async fn read_memory_response(
     while let Some(chunk) =
         crate::install::control::download_step(stream.next()).await?
     {
-        let chunk = chunk.wrap_err_with(|| {
-            eyre!("failed to read response body from {url}")
+        let chunk = chunk.with_context(|| {
+            format!("failed to read response body from {url}")
         })?;
         bytes.extend_from_slice(&chunk);
         if let Some((bar, total)) = loading_bar

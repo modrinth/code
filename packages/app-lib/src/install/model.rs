@@ -676,8 +676,8 @@ impl InstallErrorView {
             phase: Some(phase),
             message: error.to_string(),
             reason: None,
-            api: match error.raw.as_ref() {
-                crate::ErrorKind::LabrinthError(error) => {
+            api: match error.downcast_ref::<crate::ErrorKind>() {
+                Some(crate::ErrorKind::LabrinthError(error)) => {
                     Some(InstallApiErrorDetails {
                         error: error.error.clone(),
                         status: error.status,

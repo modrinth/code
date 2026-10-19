@@ -409,7 +409,7 @@ impl FriendsSocket {
         .await;
 
         if let Err(ref e) = result
-            && let ErrorKind::LabrinthError(e) = &*e.raw
+            && let Some(ErrorKind::LabrinthError(e)) = e.downcast_ref()
             && e.error == "not_found"
         {
             return Err(ErrorKind::OtherError(format!(
