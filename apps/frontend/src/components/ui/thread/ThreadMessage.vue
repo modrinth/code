@@ -87,7 +87,7 @@
 			<span
 				v-if="hasBody"
 				v-tooltip="formatDateTime(message.created)"
-				class="message__date relative bottom-px ms-1.5 text-sm text-secondary opacity-80"
+				class="message__date ms-1.5 text-sm text-secondary opacity-80"
 			>
 				{{ timeSincePosted }}
 			</span>
@@ -189,7 +189,7 @@
 			<span
 				v-if="!hasBody"
 				v-tooltip="formatDateTime(message.created)"
-				class="message__date relative bottom-px ms-1.5 text-sm text-secondary opacity-80"
+				class="message__date ms-1.5 text-sm text-secondary opacity-80"
 			>
 				{{ timeSincePosted }}
 			</span>
