@@ -17,9 +17,9 @@ members = [
   "packages/neverbounce",
   "packages/path-util",
   "packages/serde-binhum",
+  "packages/toasty",
   "packages/xredis",
 ]
-exclude = ["packages/toasty"]
 
 [workspace.package]
 edition = "2024"
