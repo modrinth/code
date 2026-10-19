@@ -209,6 +209,7 @@ pub async fn setup_minecraft_command(
     #[cfg(target_os = "linux")]
     let persistent_state = minecraft.persistent_dir.join("state");
     let mods_path = minecraft.instance_path.join("mods");
+	let skins_path = minecraft.assets_path.join("skins");
     let mut classpath = minecraft.classpath;
     let mut read_only_paths = vec![
         minecraft.jre_path.clone(),
@@ -316,6 +317,7 @@ pub async fn setup_minecraft_command(
     args.extend(minecraft.main_class_args);
 
     let ensure_dirs_exist = vec![
+		skins_path.clone(),
         #[cfg(unix)]
         persistent_home.clone(),
         #[cfg(target_os = "linux")]
@@ -346,8 +348,15 @@ pub async fn setup_minecraft_command(
     read_only_paths.sort_unstable();
     read_only_paths.dedup();
 
-    let mut read_write_paths =
-        vec![minecraft.instance_path.clone(), minecraft.persistent_dir];
+	let mut read_write_paths = vec![
+	    // .minecraft dir
+		minecraft.instance_path.clone(),
+		// global persistent dirs for all mods
+		minecraft.persistent_dir,
+		// .minecraft assets/skins; assets/ is shared among instances,
+		// and so is the skin cache, but the game writes into the skin cache
+		skins_path,
+	];
     read_write_paths.sort_unstable();
     read_write_paths.dedup();
 

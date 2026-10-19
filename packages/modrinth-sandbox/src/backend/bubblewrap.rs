@@ -146,10 +146,11 @@ const SYSTEM_FILES_RO: &[&str] = &[
 #[derive(Default)]
 struct BubblewrapCommandBuilder {
     arguments: Vec<SandboxArg>,
-    bound_paths: Vec<Cow<'static, Path>>,
+	bound_paths: Vec<(Cow<'static, Path>, BindType)>,
+	symlink_paths: Vec<Cow<'static, Path>>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum BindType {
     Device,
     ReadOnly,
@@ -196,18 +197,14 @@ impl BubblewrapCommandBuilder {
                 if resolved == path {
                     break;
                 } else {
-                    for already_bound in &self.bound_paths {
-                        if path.starts_with(already_bound) {
-                            return;
-                        }
-                    }
-                    self.bound_paths.push(path.clone());
-
-                    if !path.starts_with(&resolved) {
-                        self.push("--symlink");
-                        self.push(resolved.clone());
-                        self.push(path);
-                    }
+					let alias_exists = self.symlink_paths.iter().any(|alias| path.starts_with(alias))
+						|| self.bound_paths.iter().any(|(bound, _)| path.starts_with(bound));
+					if !alias_exists && !path.starts_with(&resolved) {
+						self.symlink_paths.push(path.clone());
+						self.push("--symlink");
+						self.push(resolved.clone());
+						self.push(path);
+					}
 
                     path = Cow::Owned(resolved);
                 }
@@ -216,12 +213,16 @@ impl BubblewrapCommandBuilder {
             return;
         }
 
-        for already_bound in &self.bound_paths {
-            if path.starts_with(already_bound) {
-                return;
-            }
-        }
-        self.bound_paths.push(path.clone());
+		if let Some((_, already_bound_type)) = self
+			.bound_paths
+			.iter()
+			.rev()
+			.find(|(bound, _)| path.starts_with(bound))
+			&& *already_bound_type == bind_type
+		{
+			return;
+		}
+		self.bound_paths.push((path.clone(), bind_type));
 
         match bind_type {
             BindType::Device => self.push("--dev-bind-try"),
@@ -443,6 +444,11 @@ fn spawn(
         true,
     );
 
+	for path in command.ensure_dirs_exist {
+		std::fs::create_dir_all(&path)
+			.wrap_err_with(|| eyre!("creating directory {path:?}"))?;
+	}
+
     // Bind custom paths
     for path in command.read_only_paths {
         builder.bind_if_exists(BindType::ReadOnly, path.clone(), false);
@@ -545,13 +551,6 @@ instance-id={instance_id}
         builder.push(arg);
     }
 
-    // Make sure any required dirs exist, create them if not
-    // Do this right before we do the actual spawn, so that we don't create these
-    // if we have an error earlier on
-    for path in command.ensure_dirs_exist {
-        std::fs::create_dir_all(&path)
-            .wrap_err_with(|| eyre!("creating directory {path:?}"))?;
-    }
 
     let (pipes, child) = super::unix::spawn(
         env.bwrap.clone().into(),
