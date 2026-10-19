@@ -66,6 +66,7 @@ const messages = defineMessages({
 const navigationIds = [
 	'review-toggle-icon',
 	'review-cycle-conversation',
+	'review-cycle-misc',
 	'review-toggle-left',
 	'review-toggle-right',
 ]

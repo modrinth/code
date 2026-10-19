@@ -49,6 +49,13 @@ const keybinds: { [id: string]: KeybindListener } = {
 		enabled: (ctx) => ctx.available('cycle-conversation'),
 		action: (ctx) => ctx.run('cycle-conversation'),
 	},
+	'review-cycle-misc': {
+		keybind: 'Shift+M',
+		description: 'Cycle misc review panels',
+		scope: 'review-actions',
+		enabled: (ctx) => ctx.available('cycle-misc'),
+		action: (ctx) => ctx.run('cycle-misc'),
+	},
 	'review-new-issue': {
 		keybind: 'N',
 		description: 'Add an issue',

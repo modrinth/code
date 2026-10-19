@@ -129,6 +129,17 @@ const visiblePanels = computed(() =>
 const visibleTargets = computed(() => visiblePanels.value.map(({ key }) => key))
 const tabs = computed(() => visiblePanels.value.map(({ key, label }) => ({ value: key, label })))
 
+useReviewShortcut(
+	'cycle-misc',
+	() => {
+		const targets = visibleTargets.value
+		const currentIndex = selectedTarget.value === undefined ? -1 : targets.indexOf(selectedTarget.value)
+		selectedTarget.value = targets[(currentIndex + 1) % targets.length]
+		shortcuts.run('reveal-right')
+	},
+	() => visibleTargets.value.length > 0,
+)
+
 watch(
 	visibleTargets,
 	(visible) => {
