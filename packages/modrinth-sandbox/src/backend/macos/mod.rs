@@ -107,6 +107,11 @@ fn spawn(
         sandbox_profile.push("\"))\n");
     }
 
+	for path in &command.ensure_dirs_exist {
+		std::fs::create_dir_all(path)
+			.wrap_err_with(|| format!("creating directory {path:?}"))?;
+	}
+
     let mut path_set = ReadWritePathSet::new(false);
     for path in command.read_only_paths {
         allow_read(&mut sandbox_profile, &path);

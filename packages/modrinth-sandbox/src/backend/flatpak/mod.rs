@@ -181,6 +181,12 @@ async fn spawn(
         flags |= SpawnFlags::NO_NETWORK;
     }
 
+	for path in &command.ensure_dirs_exist {
+		fs::create_dir_all(path)
+			.await
+			.wrap_err_with(|| eyre!("creating directory {path:?}"))?;
+	}
+
     let sandbox_expose_fd = command
         .read_write_paths
         .into_iter()
@@ -232,14 +238,6 @@ async fn spawn(
         ..Default::default()
     };
 
-    // Make sure any required dirs exist, create them if not
-    // Do this right before we do the actual spawn, so that we don't create these
-    // if we have an error earlier on
-    for path in &command.ensure_dirs_exist {
-        fs::create_dir_all(path)
-            .await
-            .wrap_err_with(|| eyre!("creating directory {path:?}"))?;
-    }
 
     // make the spawn_exited stream first...
     let mut spawn_exited = env

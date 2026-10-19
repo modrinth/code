@@ -254,6 +254,11 @@ fn spawn(
         size: size_of::<SECURITY_CAPABILITIES>(),
     });
 
+	for path in &command.ensure_dirs_exist {
+		std::fs::create_dir_all(path)
+			.wrap_err_with(|| eyre!("creating directory {path:?}"))?;
+	}
+
     let mut readable: HashSet<std::path::PathBuf> = HashSet::default();
     let mut parents_to_add: HashSet<std::path::PathBuf> = HashSet::default();
     let mut read_only_paths = command.read_only_paths.clone();
