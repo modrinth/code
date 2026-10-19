@@ -49,24 +49,28 @@
 							loading="lazy"
 						/>
 					</button>
-					<div class="flex flex-1 flex-col gap-2 p-3">
-						<div class="flex flex-wrap justify-between gap-2 text-sm text-secondary">
-							<span>{{ formatMessage(messages.imageNumber, { number: index + 1 }) }}</span>
-							<span v-if="item.featured" class="text-brand">{{
-								formatMessage(messages.featured)
-							}}</span>
+					<div class="flex flex-1 flex-col gap-1.5 p-3">
+						<div class="flex flex-wrap items-center gap-2">
+							<h3 class="m-0 min-w-0 flex-1 break-words text-lg font-semibold text-contrast">
+								{{ item.name || formatMessage(messages.imageNumber, { number: index + 1 }) }}
+							</h3>
+							<TagItem
+								v-if="item.featured"
+								class="-my-0.5 !border-brand !bg-transparent !text-brand opacity-90"
+							>
+								{{ formatMessage(messages.featured) }}
+							</TagItem>
 						</div>
-						<h3 v-if="item.name" class="m-0 break-words text-lg font-semibold text-contrast">
-							{{ item.name }}
-						</h3>
 						<p v-if="item.description" class="m-0 whitespace-pre-wrap break-words">
 							{{ item.description }}
 						</p>
-						<time :datetime="item.created" class="mt-auto pt-2 text-sm text-secondary">{{
-							formatMessage(messages.uploaded, {
-								date: formatDateTime(item.created),
-							})
-						}}</time>
+						<time
+							:datetime="item.created"
+							class="mt-auto flex items-center gap-1 pt-1 text-sm text-secondary"
+						>
+							<CalendarIcon aria-hidden="true" class="h-4 w-4 shrink-0" />
+							{{ formatDate(item.created) }}
+						</time>
 					</div>
 				</ReviewPanel>
 			</div>
@@ -87,9 +91,10 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
+import { CalendarIcon } from '@modrinth/assets'
 import { moderationSettings } from '@modrinth/moderation'
 import { galleryImageReviewKey } from '@modrinth/moderation/src/data/issues/component-builders/gallery-images'
-import { Button, ImageViewerEditor, useFormatDateTime, useVIntl } from '@modrinth/ui'
+import { Button, ImageViewerEditor, TagItem, useFormatDateTime, useVIntl } from '@modrinth/ui'
 import { computed, ref, useTemplateRef } from 'vue'
 
 import { useModerationSettings } from '~/composables/moderation'
@@ -104,9 +109,10 @@ const { formatMessage } = useVIntl()
 const settings = useModerationSettings()
 const galleryColumns = computed(() => settings.value.get(moderationSettings.General.GalleryColumns))
 const interactionScope = useTemplateRef<HTMLElement>('interactionScope')
-const formatDateTime = useFormatDateTime({
-	dateStyle: 'long',
-	timeStyle: 'short',
+const formatDate = useFormatDateTime({
+	year: 'numeric',
+	month: 'long',
+	day: 'numeric',
 })
 const { selection, projectId, gallery, isLoading, error, refresh, pixelated } =
 	injectProjectReviewPageContext()
