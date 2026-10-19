@@ -1,71 +1,117 @@
 <script setup lang="ts">
-import { ExternalIcon } from '@modrinth/assets'
-import { ButtonLink, NewModal } from '@modrinth/ui'
+import { CoffeeIcon, ExternalIcon } from '@modrinth/assets'
+import {
+	Button,
+	ButtonLink,
+	defineMessages,
+	injectNotificationManager,
+	NewModal,
+	useVIntl,
+} from '@modrinth/ui'
 import { ref, useTemplateRef } from 'vue'
 
 import { fileDeclaresAi } from '~/helpers/c2pa.ts'
+import { injectReviewSlicer, slicerFileName } from '~/providers/project-review/review-slicer'
 
 const modalRef = useTemplateRef<InstanceType<typeof NewModal>>('modalRef')
+const slicer = injectReviewSlicer(null)
 const isScanning = ref(false)
+const { addNotification } = injectNotificationManager()
+const { formatMessage } = useVIntl()
+const messages = defineMessages({
+	noAiFiles: {
+		id: 'moderation.c2pa-scan.no-ai-files',
+		defaultMessage: 'No AI-generated files found.',
+	},
+	scanFailed: {
+		id: 'moderation.c2pa-scan.failed',
+		defaultMessage: 'Failed to scan for AI-generated files.',
+	},
+})
 
-const fileUrl = ref<string | null>(null)
 const totalFiles = ref(0)
 const checkedFiles = ref(0)
-const aiFiles = ref<string[]>([])
+const aiFiles = ref<{ url: string; path: string }[]>([])
+const scanFailed = ref(false)
 
-async function scanFile(url: string) {
-	if (isScanning.value) return
+async function scanFiles(urls: string[]) {
+	if (isScanning.value || !urls.length) return
 
-	fileUrl.value = url
 	isScanning.value = true
 	totalFiles.value = 0
 	checkedFiles.value = 0
 	aiFiles.value = []
+	scanFailed.value = false
+	modalRef.value?.show()
 
 	try {
 		const { BlobReader, ZipReader } = await import('@zip.js/zip.js')
 
-		const response = await fetch(url)
-		if (!response.ok) {
-			throw new Error(`Failed to fetch file: ${response.statusText}`)
-		}
-		const blob = await response.blob()
+		for (const url of new Set(urls)) {
+			try {
+				const response = await fetch(url)
+				if (!response.ok) {
+					throw new Error(`Failed to fetch file: ${response.statusText}`)
+				}
 
-		const reader = new ZipReader(new BlobReader(blob))
-		const entries = await reader.getEntries()
+				const reader = new ZipReader(new BlobReader(await response.blob()))
+				try {
+					const entries = await reader.getEntries()
+					totalFiles.value += entries.length
 
-		totalFiles.value = entries.length
+					for (const entry of entries) {
+						checkedFiles.value++
 
-		for (const entry of entries) {
-			checkedFiles.value++
+						if (entry.directory || !entry.filename.toLowerCase().endsWith('.png')) continue
 
-			if (entry.directory) continue
-			if (!entry.filename.endsWith('.png')) continue
-
-			const buffer = await entry.arrayBuffer()
-			const isAiFile = await fileDeclaresAi(
-				new File([buffer], entry.filename, { type: 'image/png' }),
-			)
-
-			if (isAiFile) {
-				aiFiles.value.push(entry.filename)
+						const buffer = await entry.arrayBuffer()
+						if (await fileDeclaresAi(new File([buffer], entry.filename, { type: 'image/png' }))) {
+							aiFiles.value.push({ url, path: entry.filename })
+						}
+					}
+				} finally {
+					await reader.close()
+				}
+			} catch (error) {
+				scanFailed.value = true
+				addNotification({
+					type: 'error',
+					title: formatMessage(messages.scanFailed),
+					text: `${url}: ${error instanceof Error ? error.message : String(error)}`,
+				})
 			}
 		}
+
+		if (!aiFiles.value.length && !scanFailed.value) {
+			addNotification({
+				type: 'success',
+				title: formatMessage(messages.noAiFiles),
+			})
+		}
+	} catch (error) {
+		scanFailed.value = true
+		addNotification({
+			type: 'error',
+			title: formatMessage(messages.scanFailed),
+			text: error instanceof Error ? error.message : String(error),
+		})
 	} finally {
 		isScanning.value = false
 	}
 }
 
-function createSlicerUrl(path: string) {
-	const downloadUrl = new URL(fileUrl.value!)
-	const fileName = downloadUrl.pathname.split('/').pop()
-
-	return `https://slicer.run/?file=${encodeURIComponent(`${fileName}/${path}`)}&url=${encodeURIComponent(downloadUrl.toString())}`
+function createSlicerUrl(file: { url: string; path: string }) {
+	return `https://slicer.run/?file=${encodeURIComponent(`${slicerFileName(file.url)}/${file.path}`)}&url=${encodeURIComponent(file.url)}`
 }
 
-function openC2paModal(url: string) {
-	modalRef.value?.show()
-	void scanFile(url)
+function openInSlicerTab(file: { url: string; path: string }) {
+	if (!slicer) return
+	slicer.open([file.url], `${slicerFileName(file.url)}/${file.path}`)
+	hide()
+}
+
+function openC2paModal(url: string | string[]) {
+	void scanFiles(Array.isArray(url) ? url : [url])
 }
 
 function hide() {
@@ -88,7 +134,10 @@ defineExpose({ openC2paModal, hide })
 				>
 			</div>
 			<div v-else>
-				<div v-if="aiFiles.length === 0" class="flex items-center justify-center">
+				<div v-if="scanFailed" class="text-red">
+					{{ formatMessage(messages.scanFailed) }}
+				</div>
+				<div v-if="aiFiles.length === 0 && !scanFailed" class="flex items-center justify-center">
 					<span class="rounded-xl bg-highlight-green px-4 py-1">No AI-generated files found.</span>
 				</div>
 
@@ -98,11 +147,13 @@ defineExpose({ openC2paModal, hide })
 					>
 					<div
 						v-for="file in aiFiles"
-						:key="file"
+						:key="`${file.url}/${file.path}`"
 						class="flex flex-row flex-wrap items-center justify-between gap-2 rounded-2xl bg-surface-2 p-4 font-semibold text-secondary"
 					>
-						{{ file }}
-						<ButtonLink :href="createSlicerUrl(file)" target="_blank">
+						{{ file.path }}
+						<span class="break-all text-xs text-secondary">{{ file.url }}</span>
+						<Button v-if="slicer" @click="openInSlicerTab(file)"> Open <CoffeeIcon /> </Button>
+						<ButtonLink v-else :href="createSlicerUrl(file)" target="_blank">
 							Open <ExternalIcon />
 						</ButtonLink>
 					</div>

@@ -41,7 +41,8 @@ pub async fn set_java_version(java_version: JavaVersion) -> crate::Result<()> {
 pub async fn find_filtered_jres(
     java_version: Option<u32>,
 ) -> crate::Result<Vec<JavaVersion>> {
-    let jres = jre::get_all_jre().await?;
+    let state = State::get().await?;
+    let jres = jre::get_all_jre(&state.directories.java_versions_dir()).await?;
 
     // Filter out JREs that are not 1.17 or higher
     Ok(if let Some(java_version) = java_version {

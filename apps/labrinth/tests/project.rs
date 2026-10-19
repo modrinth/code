@@ -1000,6 +1000,43 @@ async fn test_moderator_can_edit_invalid_project_in_review() {
 }
 
 #[actix_rt::test]
+async fn test_moderators_can_approve_invalid_project() {
+    with_test_environment(
+        None,
+        |test_env: TestEnvironment<ApiV3>| async move {
+            let api = &test_env.api;
+            let project_slug = &test_env.dummy.project_alpha.project_slug;
+
+            for pat in [MOD_USER_PAT, ADMIN_USER_PAT] {
+                let response = api
+                    .edit_project(
+                        project_slug,
+                        json!({ "status": "processing", "description": "" }),
+                        pat,
+                    )
+                    .await;
+                assert_status!(&response, StatusCode::NO_CONTENT);
+
+                let response = api
+                    .edit_project(
+                        project_slug,
+                        json!({ "status": "approved" }),
+                        pat,
+                    )
+                    .await;
+                assert_status!(&response, StatusCode::NO_CONTENT);
+
+                let project =
+                    api.get_project_deserialized(project_slug, pat).await;
+                assert_eq!(project.status, ProjectStatus::Approved);
+                assert!(project.description.is_empty());
+            }
+        },
+    )
+    .await;
+}
+
+#[actix_rt::test]
 async fn test_edit_invalid_project_in_review_rolls_back() {
     with_test_environment(
         None,

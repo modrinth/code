@@ -1073,9 +1073,6 @@
   "conversation-thread.action.approve": {
     "message": "Aprovar"
   },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Aprovar com resposta"
-  },
   "conversation-thread.action.close-report": {
     "message": "Fechar denúncia"
   },
@@ -1084,9 +1081,6 @@
   },
   "conversation-thread.action.reject": {
     "message": "Rejeitar"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Rejeitar com resposta"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Reabrir tópico"
@@ -1121,9 +1115,6 @@
   "conversation-thread.action.withhold": {
     "message": "Reter"
   },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Reter com resposta"
-  },
   "conversation-thread.closed-thread.description": {
     "message": "Este tópico foi encerrado e não é possível enviar mensagens nele."
   },
@@ -1132,9 +1123,6 @@
   },
   "conversation-thread.error.reopening-report": {
     "message": "Erro ao reabrir o relatório"
-  },
-  "conversation-thread.error.sending-message": {
-    "message": "Erro ao enviar mensagem"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Responder ao tópico..."
@@ -1162,9 +1150,6 @@
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "Confirmo que respondi adequadamente aos comentários dos moderadores."
-  },
-  "conversation-thread.resubmit-modal.description": {
-    "message": "Você está enviando <project-title>{projectTitle}</project-title> para ser revisado novamente pelos moderadores."
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "Reenviando para revisão"
@@ -3431,9 +3416,6 @@
   "project-member-header.success-join": {
     "message": "Você entrou na equipe do projeto"
   },
-  "project-moderation-nags.project-submitted-for-review": {
-    "message": "Seu projeto foi entregue para revisão!"
-  },
   "project-moderation-nags.publishing-checklist": {
     "message": "Tarefas de publicação"
   },
@@ -3550,9 +3532,6 @@
   },
   "project.actions.rescan-modpack": {
     "message": "Rescanear pacote de mods"
-  },
-  "project.actions.review-project": {
-    "message": "Revisar projeto"
   },
   "project.actions.servers-promo.description": {
     "message": "Modrinth Hosting é o jeito mais fácil de jogar com seus amigos sem perturbações!"

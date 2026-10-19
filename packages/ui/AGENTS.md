@@ -30,6 +30,14 @@ Files inside `layouts/` use the `#ui/*` import alias (resolved via the `"imports
 
 # Code Guidelines
 
+### Multiple Documents and Popout Windows
+
+Project review can move Vue component DOM into a separate browser window while its JavaScript continues running in the main window. Global `document` and `window` still refer to the main window, so they may differ from the document displaying a component.
+
+For overlays, focus checks, viewport measurements, and event listeners, use the relevant element's `ownerDocument` and its `defaultView`. Teleport overlays into that document's body. Components without an existing trigger element, such as `NewModal` and `ImageViewerEditor`, use a hidden anchor to identify their owning document when opened.
+
+Keep modal stacks and scroll locks separate per document. Otherwise, a modal in one window can suppress Escape handling or focus trapping in another, and closing a modal can leave the wrong document locked. Window closure must release overlay state and listeners even when normal user closing is disabled. Appearance synchronization must preserve each document's own scroll lock.
+
 ### Tailwind Configuration
 
 All frontend packages share a Tailwind preset at `packages/tooling-config/tailwind/tailwind-preset.ts`. This package's `tailwind.config.ts` extends it:

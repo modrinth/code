@@ -35,43 +35,166 @@ function isOfficialModrinthHost(): boolean {
 }
 
 const keybinds: { [id: string]: KeybindListener } = {
-	'next-stage': {
-		keybind: 'ArrowRight',
-		description: 'Go to next stage',
-		scope: 'checklist',
-		action: (ctx) => ctx.actions.tryGoNext(),
+	'review-toggle-icon': {
+		keybind: 'I',
+		description: 'Toggle project icon viewer',
+		scope: 'review-actions',
+		enabled: (ctx) => ctx.available('toggle-icon'),
+		action: (ctx) => ctx.run('toggle-icon'),
 	},
-	'previous-stage': {
-		keybind: 'ArrowLeft',
-		description: 'Go to previous stage',
-		scope: 'checklist',
-		enabled: (ctx) => !ctx.state.isDone,
-		action: (ctx) => ctx.actions.tryGoBack(),
+	'review-cycle-conversation': {
+		keybind: 'Shift+R',
+		description: 'Cycle issues, thread, and re-review',
+		scope: 'review-actions',
+		enabled: (ctx) => ctx.available('cycle-conversation'),
+		action: (ctx) => ctx.run('cycle-conversation'),
 	},
-	'generate-message': {
-		keybind: 'Ctrl+Shift+E',
-		description: 'Generate moderation message',
-		scope: 'checklist',
-		action: (ctx) => ctx.actions.tryGenerateMessage(),
+	'review-new-issue': {
+		keybind: 'N',
+		description: 'Add an issue',
+		scope: 'review-actions',
+		enabled: (ctx) => ctx.available('new-issue'),
+		action: (ctx) => ctx.run('new-issue'),
+	},
+	'review-toggle-left': {
+		keybind: 'Shift+ArrowLeft',
+		description: 'Toggle project information',
+		scope: 'review-actions',
+		enabled: (ctx) => ctx.available('toggle-left'),
+		action: (ctx) => ctx.run('toggle-left'),
+	},
+	'review-toggle-right': {
+		keybind: 'Shift+ArrowRight',
+		description: 'Toggle issues and thread panel',
+		scope: 'review-actions',
+		enabled: (ctx) => ctx.available('toggle-right'),
+		action: (ctx) => ctx.run('toggle-right'),
+	},
+	'review-back': {
+		keybind: 'Alt+ArrowLeft',
+		description: 'Previous project',
+		scope: 'review-actions',
+		enabled: (ctx) => ctx.available('back'),
+		action: (ctx) => ctx.run('back'),
+	},
+	'review-exit': {
+		keybind: 'Shift+X',
+		description: 'Exit project review',
+		scope: 'review-actions',
+		enabled: (ctx) => ctx.available('exit'),
+		action: (ctx) => ctx.run('exit'),
+	},
+	'review-edit': {
+		keybind: 'E',
+		description: 'Edit hovered or focused item',
+		scope: 'review-actions',
+		enabled: (ctx) => ctx.available('edit'),
+		action: (ctx) => ctx.run('edit'),
+	},
+	'review-re-review': {
+		keybind: 'Alt+R',
+		description: 'Open re-review issues',
+		scope: 'review-actions',
+		enabled: (ctx) => ctx.available('re-review'),
+		action: (ctx) => ctx.run('re-review'),
+	},
+	'review-reupload': {
+		keybind: 'Alt+U',
+		description: 'Open reupload checks',
+		scope: 'review-actions',
+		enabled: (ctx) => ctx.available('reupload'),
+		action: (ctx) => ctx.run('reupload'),
+	},
+	'review-rules': {
+		keybind: 'Alt+L',
+		description: 'Open rules checks',
+		scope: 'review-actions',
+		enabled: (ctx) => ctx.available('rules'),
+		action: (ctx) => ctx.run('rules'),
+	},
+	'review-post-approval': {
+		keybind: 'Alt+S',
+		description: 'Open post-approval checks',
+		scope: 'review-actions',
+		enabled: (ctx) => ctx.available('post-approval'),
+		action: (ctx) => ctx.run('post-approval'),
+	},
+	'review-send-reply': {
+		keybind: 'Ctrl+Enter',
+		description: 'Send reply',
+		scope: 'review-composer',
+		enabled: (ctx) => ctx.canSend(),
+		action: (ctx) => ctx.send('reply'),
+	},
+	'review-send-note': {
+		keybind: 'Ctrl+Shift+Enter',
+		description: 'Send private note',
+		scope: 'review-composer',
+		enabled: (ctx) => ctx.canSend(),
+		action: (ctx) => ctx.send('note'),
+	},
+	'review-tab-description': {
+		keybind: 'D',
+		description: 'Open description tab',
+		scope: 'project-review',
+		action: (ctx) => ctx.openTab('description'),
+	},
+	'review-tab-gallery': {
+		keybind: 'G',
+		description: 'Open gallery tab',
+		scope: 'project-review',
+		action: (ctx) => ctx.openTab('gallery'),
+	},
+	'review-tab-disclosures': {
+		keybind: 'S',
+		description: 'Open disclosures tab',
+		scope: 'project-review',
+		action: (ctx) => ctx.openTab('disclosures'),
+	},
+	'review-tab-versions': {
+		keybind: 'V',
+		description: 'Open versions tab',
+		scope: 'project-review',
+		action: (ctx) => ctx.openTab('versions'),
+	},
+	'review-tab-permissions': {
+		keybind: 'P',
+		description: 'Open permissions tab',
+		scope: 'project-review',
+		action: (ctx) => ctx.openTab('permissions'),
+	},
+	'review-tab-tech-review': {
+		keybind: 'T',
+		description: 'Open tech review tab',
+		scope: 'project-review',
+		action: (ctx) => ctx.openTab('tech-review'),
+	},
+	'review-tab-slicer': {
+		keybind: 'L',
+		description: 'Open slicer tab',
+		scope: 'project-review',
+		action: (ctx) => ctx.openTab('slicer'),
 	},
 	'toggle-collapse': {
 		keybind: 'Shift+C',
-		description: 'Toggle collapse/expand',
-		scope: 'checklist',
-		action: (ctx) => ctx.actions.tryToggleCollapse(),
+		description: 'Expand or collapse the hovered or focused item',
+		scope: 'review-actions',
+		enabled: (ctx) => ctx.available('collapse'),
+		action: (ctx) => ctx.run('collapse'),
 	},
 	'reset-progress': {
 		keybind: 'Ctrl+Shift+R',
-		description: 'Reset moderation progress',
-		scope: 'checklist',
-		action: (ctx) => ctx.actions.tryResetProgress(),
+		description: 'Open reset issues and message customizations dialog',
+		scope: 'review-actions',
+		enabled: (ctx) => ctx.available('reset'),
+		action: (ctx) => ctx.run('reset'),
 	},
 	'skip-project': {
 		keybind: 'Ctrl+Shift+S',
 		description: 'Skip to next project',
-		scope: 'checklist',
-		enabled: (ctx) => ctx.state.futureProjectCount > 0 && !ctx.state.isDone,
-		action: (ctx) => ctx.actions.trySkipProject(),
+		scope: 'review-actions',
+		enabled: (ctx) => ctx.available('next'),
+		action: (ctx) => ctx.run('next'),
 	},
 	'copy-permalink': {
 		keybind: 'Ctrl+Alt+C',
@@ -84,7 +207,7 @@ const keybinds: { [id: string]: KeybindListener } = {
 	},
 	'copy-relative-permalink': {
 		keybind: 'Ctrl+Alt+R',
-		description: 'Copy relative permalink',
+		description: 'Copy permalink on the current host',
 		scope: 'project',
 		action: async (ctx) => {
 			const url = await copyProjectLink(ctx.project, true, true, false)
@@ -102,7 +225,7 @@ const keybinds: { [id: string]: KeybindListener } = {
 	},
 	'copy-page-relative-permalink': {
 		keybind: 'Shift+Ctrl+Alt+R',
-		description: 'Copy relative permalink with page',
+		description: 'Copy permalink with page on the current host',
 		scope: 'project',
 		action: async (ctx) => {
 			const url = await copyProjectLink(ctx.project, true, true, true)
@@ -121,8 +244,8 @@ const keybinds: { [id: string]: KeybindListener } = {
 	'open-official-site': {
 		keybind: 'Ctrl+Shift+P',
 		description: isOfficialModrinthHost()
-			? 'Open current page on production/staging'
-			: 'Open current page on alternative host',
+			? 'Open current page on alternative host'
+			: 'Open current page on production/staging',
 		scope: 'global',
 		enabled: (ctx) => !isOfficialModrinthHost() || !!ctx.alternativeUrl,
 		action: (ctx) => {
@@ -146,30 +269,33 @@ const keybinds: { [id: string]: KeybindListener } = {
 	'approve-project': {
 		keybind: 'Shift+Alt+A',
 		description: 'Approve project',
-		scope: 'checklist',
-		action: (ctx) => ctx.actions.tryApprove(),
+		scope: 'review-actions',
+		enabled: (ctx) => ctx.available('approve'),
+		action: (ctx) => ctx.run('approve'),
 	},
 	'withhold-project': {
 		keybind: 'Shift+Alt+W',
 		description: 'Withhold project',
-		scope: 'checklist',
-		action: (ctx) => ctx.actions.tryWithhold(),
+		scope: 'review-actions',
+		enabled: (ctx) => ctx.available('withhold'),
+		action: (ctx) => ctx.run('withhold'),
 	},
 	'reject-project': {
 		keybind: 'Shift+Alt+R',
 		description: 'Reject project',
-		scope: 'checklist',
-		action: (ctx) => ctx.actions.tryReject(),
+		scope: 'review-actions',
+		enabled: (ctx) => ctx.available('reject'),
+		action: (ctx) => ctx.run('reject'),
 	},
 	'tech-review-top': {
 		keybind: 'ArrowUp',
-		description: 'Go to top of the tech review card',
+		description: 'Scroll to the top of the technical review card or detail page',
 		scope: 'tech-review',
 		action: (ctx) => ctx.actions.goToTop(),
 	},
 	'tech-review-bottom': {
 		keybind: 'ArrowDown',
-		description: 'Go to bottom of the tech review card',
+		description: 'Scroll to the bottom of the technical review card or detail page',
 		scope: 'tech-review',
 		action: (ctx) => ctx.actions.goToBottom(),
 	},

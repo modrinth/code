@@ -1109,9 +1109,6 @@
   "app.settings.default-instance-options.height.title": {
     "message": "Altura"
   },
-  "app.settings.default-instance-options.java-and-memory.title": {
-    "message": "Java e a memória"
-  },
   "app.settings.default-instance-options.java-arguments.description": {
     "message": "Argumentos passados ao Java ao iniciar uma instância."
   },
@@ -1120,9 +1117,6 @@
   },
   "app.settings.default-instance-options.java-arguments.title": {
     "message": "Argumentos Java"
-  },
-  "app.settings.default-instance-options.launch-hooks.title": {
-    "message": "Ganchos de lançamento"
   },
   "app.settings.default-instance-options.memory-allocation.description": {
     "message": "Memória máxima disponível para cada instância."
@@ -1153,9 +1147,6 @@
   },
   "app.settings.default-instance-options.width.title": {
     "message": "Largura"
-  },
-  "app.settings.default-instance-options.window.title": {
-    "message": "Janela"
   },
   "app.settings.default-instance-options.wrapper-hook.description": {
     "message": "Comando utilizado para encapsular o processo de arranque do Minecraft."
@@ -1205,14 +1196,8 @@
   "app.settings.resource-management.always-show-copy-details.title": {
     "message": "Mostrar sempre os detalhes da cópia"
   },
-  "app.settings.resource-management.app-cache.confirm.title": {
-    "message": "Limpar a cache da aplicação?"
-  },
   "app.settings.resource-management.app-cache.description": {
     "message": "Limpe os dados da cache e faça o download novamente a partir do Modrinth. A aplicação poderá demorar mais tempo a carregar até que a cache seja reconstruída."
-  },
-  "app.settings.resource-management.app-cache.purge": {
-    "message": "Limpar a cache"
   },
   "app.settings.resource-management.app-cache.title": {
     "message": "Cache da aplicação"
@@ -1363,9 +1348,6 @@
   },
   "app.settings.tabs.privacy": {
     "message": "Privacidade"
-  },
-  "app.settings.tabs.resource-management": {
-    "message": "Gestão de recursos"
   },
   "app.sidebar.playing-as": {
     "message": "Jogar na pele de"

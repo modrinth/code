@@ -1652,9 +1652,6 @@
   "app.settings.default-instance-options.height.title": {
     "message": "Hoogte"
   },
-  "app.settings.default-instance-options.java-and-memory.title": {
-    "message": "Java en geheugen"
-  },
   "app.settings.default-instance-options.java-arguments.description": {
     "message": "Argumenten die bij het starten van een instantie aan Java worden doorgegeven."
   },
@@ -1663,9 +1660,6 @@
   },
   "app.settings.default-instance-options.java-arguments.title": {
     "message": "Java-argumenten"
-  },
-  "app.settings.default-instance-options.launch-hooks.title": {
-    "message": "Start haken"
   },
   "app.settings.default-instance-options.memory-allocation.description": {
     "message": "Maximaal beschikbaar geheugen voor elke instantie."
@@ -1699,9 +1693,6 @@
   },
   "app.settings.default-instance-options.width.title": {
     "message": "Breedte"
-  },
-  "app.settings.default-instance-options.window.title": {
-    "message": "Venster"
   },
   "app.settings.default-instance-options.wrapper-hook.description": {
     "message": "Commando gebruikt om het Minecraft proces te om wikkelen."
@@ -2699,14 +2690,8 @@
   "app.settings.resource-management.app-cache.confirm.description": {
     "message": "De app kan wat trager laden totdat de cache opnieuw is opgebouwd."
   },
-  "app.settings.resource-management.app-cache.confirm.title": {
-    "message": "De cache van de app wissen?"
-  },
   "app.settings.resource-management.app-cache.description": {
     "message": "Wis de gegevens in de cache en download ze opnieuw via Modrinth. De app kan wat trager laden totdat de cache opnieuw is opgebouwd."
-  },
-  "app.settings.resource-management.app-cache.purge": {
-    "message": "Cache leegmaken"
   },
   "app.settings.resource-management.app-cache.title": {
     "message": "App-cache"
@@ -2746,9 +2731,6 @@
   },
   "app.settings.resource-management.store.verified": {
     "message": "Verificatie voltooid"
-  },
-  "app.settings.sidebar.label.instances": {
-    "message": "Instanties"
   },
   "app.settings.synced-options.choose-sync-source.no-instances-found": {
     "message": "Geen instanties gevonden"
@@ -2827,12 +2809,6 @@
   },
   "app.settings.tabs.privacy": {
     "message": "Privacy"
-  },
-  "app.settings.tabs.resource-management": {
-    "message": "Bronnenbeheer"
-  },
-  "app.settings.tabs.synced-options": {
-    "message": "Gesynchroniseerde instellingen"
   },
   "app.sidebar.playing-as": {
     "message": "Spelen als"
@@ -3734,9 +3710,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Selecteer updatekanaal"
   },
-  "instance.settings.tabs.hooks.description": {
-    "message": "Voer instance-specifieke systeemcommando's uit voor en na het starten van het spel."
-  },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Na het afsluiten"
   },
@@ -3797,18 +3770,6 @@
   "instance.settings.tabs.installation.locked": {
     "message": "Installatie-instellingen zijn niet beschikbaar zolang deze instantie is vergrendeld."
   },
-  "instance.settings.tabs.java.custom-environment-variables": {
-    "message": "Stel omgevingsvariabelen apart in voor deze instantie."
-  },
-  "instance.settings.tabs.java.custom-java-arguments": {
-    "message": "Stel omgevingsvariabelen apart in voor deze instantie."
-  },
-  "instance.settings.tabs.java.custom-java-installation": {
-    "message": "Kies een andere Java-installatie voor deze installatie."
-  },
-  "instance.settings.tabs.java.custom-memory-allocation": {
-    "message": "Stel de geheugentoewijzing voor deze instantie afzonderlijk in."
-  },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Voer omgevingsvariabelen in…"
   },
@@ -3832,9 +3793,6 @@
   },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "//pad/naar/java"
-  },
-  "instance.settings.tabs.settings-overrides": {
-    "message": "Synchroniseer overschrijvingen"
   },
   "instance.settings.tabs.sharing": {
     "message": "Delen"
@@ -3889,9 +3847,6 @@
   },
   "instance.settings.tabs.window": {
     "message": "Aangepaste venster instellingen"
-  },
-  "instance.settings.tabs.window.custom-window-settings": {
-    "message": "Configureer volledig scherm en lanceer de resolutie apart voor deze instantie."
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Volledig scherm"

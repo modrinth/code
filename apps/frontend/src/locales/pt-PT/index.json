@@ -986,17 +986,11 @@
   "conversation-thread.action.approve": {
     "message": "Aprovar"
   },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Aprovar com comentário"
-  },
   "conversation-thread.action.close-with-reply": {
     "message": "Fechar com comentário"
   },
   "conversation-thread.action.reject": {
     "message": "Rejeitar"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Rejeitar com comentário"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Reabrir tópico"
@@ -1031,9 +1025,6 @@
   "conversation-thread.action.withhold": {
     "message": "Reter"
   },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Reter com comentário"
-  },
   "conversation-thread.closed-thread.description": {
     "message": "Este tópico está fechado e não aceita novas mensagens."
   },
@@ -1042,9 +1033,6 @@
   },
   "conversation-thread.error.reopening-report": {
     "message": "Erro ao reabrir relatório"
-  },
-  "conversation-thread.error.sending-message": {
-    "message": "Erro ao enviar mensagem"
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Os ficheiros suplementares destinam-se a recursos de apoio, como código-fonte, e não a versões alternativas ou variantes"
@@ -2914,9 +2902,6 @@
   },
   "project.actions.dont-show-again": {
     "message": "Não mostrar novamente"
-  },
-  "project.actions.review-project": {
-    "message": "Rever projeto"
   },
   "project.actions.servers-promo.description": {
     "message": "O Modrinth Hosting é a maneira mais fácil de jogar com os teus amigos sem complicações!"

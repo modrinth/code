@@ -1222,6 +1222,19 @@ impl DBUser {
             .wrap_err("failed to update user_locks locked_by")?;
 
             sqlx::query!(
+                r#"
+				UPDATE threads_issues
+				SET created_by = $1
+				WHERE created_by = $2
+				"#,
+                deleted_user as DBUserId,
+                id as DBUserId,
+            )
+            .execute(&mut *transaction)
+            .await
+            .wrap_err("failed to update threads_issues created_by")?;
+
+            sqlx::query!(
                 "
 				UPDATE user_restrictions
 				SET restricted_by = $1

@@ -1430,9 +1430,6 @@
   "app.settings.default-instance-options.height.title": {
     "message": "גובה"
   },
-  "app.settings.default-instance-options.java-and-memory.title": {
-    "message": "Java וזיכרון"
-  },
   "app.settings.default-instance-options.java-arguments.description": {
     "message": "פקודות המועברות לJava כשמפעילים התקן."
   },
@@ -1441,9 +1438,6 @@
   },
   "app.settings.default-instance-options.java-arguments.title": {
     "message": "פקודות Java"
-  },
-  "app.settings.default-instance-options.launch-hooks.title": {
-    "message": "Hook בהפעלה"
   },
   "app.settings.default-instance-options.memory-allocation.description": {
     "message": "הגבלת זיכרון לכל התקן."
@@ -1483,9 +1477,6 @@
   },
   "app.settings.tabs.privacy": {
     "message": "פרטיות"
-  },
-  "app.settings.tabs.resource-management": {
-    "message": "ניהול משאבים"
   },
   "app.skins.modal.save-skin-button": {
     "message": "שמור סקין"

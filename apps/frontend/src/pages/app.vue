@@ -687,10 +687,7 @@ useSeoMeta({
 							<div class="cell">
 								<div>
 									<div class="icon-logo modrinth">
-										<Avatar
-											src="https://cdn-raw.modrinth.com/app-landing/mr-app-icon.webp"
-											size="sm"
-										/>
+										<Avatar src="https://cdn.modrinth.com/app-landing/mr-app-icon.webp" size="sm" />
 									</div>
 								</div>
 							</div>

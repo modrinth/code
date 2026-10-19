@@ -1679,9 +1679,6 @@
   "app.settings.default-instance-options.height.title": {
     "message": "Height"
   },
-  "app.settings.default-instance-options.java-and-memory.title": {
-    "message": "Java and memory"
-  },
   "app.settings.default-instance-options.java-arguments.description": {
     "message": "Arguments passed to Java when launching an instance."
   },
@@ -1690,9 +1687,6 @@
   },
   "app.settings.default-instance-options.java-arguments.title": {
     "message": "Java arguments"
-  },
-  "app.settings.default-instance-options.launch-hooks.title": {
-    "message": "Launch hooks"
   },
   "app.settings.default-instance-options.memory-allocation.description": {
     "message": "Maximum memory available to each instance."
@@ -1726,9 +1720,6 @@
   },
   "app.settings.default-instance-options.width.title": {
     "message": "Width"
-  },
-  "app.settings.default-instance-options.window.title": {
-    "message": "Window"
   },
   "app.settings.default-instance-options.wrapper-hook.description": {
     "message": "Command used to wrap the Minecraft launch process."
@@ -2786,14 +2777,8 @@
   "app.settings.resource-management.app-cache.confirm.description": {
     "message": "The app may load more slowly until the cache is rebuilt."
   },
-  "app.settings.resource-management.app-cache.confirm.title": {
-    "message": "Purge the app cache?"
-  },
   "app.settings.resource-management.app-cache.description": {
     "message": "Clear cached data and download it again from Modrinth. The app may load more slowly until the cache is rebuilt."
-  },
-  "app.settings.resource-management.app-cache.purge": {
-    "message": "Purge cache"
   },
   "app.settings.resource-management.app-cache.title": {
     "message": "App cache"
@@ -2870,9 +2855,6 @@
   "app.settings.resource-management.store.description": {
     "message": "Save space by reusing game installs, mods and packs across your instances."
   },
-  "app.settings.resource-management.store.empty": {
-    "message": "Install mods or packs to see your storage usage here."
-  },
   "app.settings.resource-management.store.issues": {
     "message": "View {count, plural, one {# issue} other {# issues}}"
   },
@@ -2912,8 +2894,11 @@
   "app.settings.resource-management.store.verified": {
     "message": "Verification complete"
   },
-  "app.settings.sidebar.label.instances": {
-    "message": "Instances"
+  "app.settings.sidebar.label.instance-defaults": {
+    "message": "Instance defaults"
+  },
+  "app.settings.sidebar.label.system": {
+    "message": "System"
   },
   "app.settings.synced-options.choose-sync-source.command-history-description": {
     "message": "Choose which instance to copy your command history from. This history is only used for the initial sync, and you can edit it from any instance afterward."
@@ -3146,20 +3131,56 @@
   "app.settings.tabs.features": {
     "message": "Features"
   },
+  "app.settings.tabs.java-and-memory": {
+    "message": "Java and memory"
+  },
   "app.settings.tabs.java-installations": {
     "message": "Java installations"
   },
   "app.settings.tabs.language": {
     "message": "Language"
   },
+  "app.settings.tabs.launch-hooks": {
+    "message": "Launch hooks"
+  },
   "app.settings.tabs.privacy": {
     "message": "Privacy"
   },
-  "app.settings.tabs.resource-management": {
-    "message": "Resource management"
+  "app.settings.tabs.resources": {
+    "message": "Resources"
   },
-  "app.settings.tabs.synced-options": {
-    "message": "Synced settings"
+  "app.settings.tabs.syncing": {
+    "message": "Syncing"
+  },
+  "app.settings.tabs.troubleshooting": {
+    "message": "Troubleshooting"
+  },
+  "app.settings.tabs.window": {
+    "message": "Window"
+  },
+  "app.settings.troubleshooting.clear-cache": {
+    "message": "Clear cache"
+  },
+  "app.settings.troubleshooting.clear-cache.confirm.title": {
+    "message": "Clear the app cache?"
+  },
+  "app.settings.troubleshooting.report-ad.copied": {
+    "message": "Copied"
+  },
+  "app.settings.troubleshooting.report-ad.copy": {
+    "message": "Copy ad details"
+  },
+  "app.settings.troubleshooting.report-ad.description": {
+    "message": "Seen an inappropriate or offensive ad? Copy its details while it's showing and send them to <support>Modrinth Support</support>. We'll review it and remove it."
+  },
+  "app.settings.troubleshooting.report-ad.no-ad.text": {
+    "message": "Wait for the ad to load, then try again."
+  },
+  "app.settings.troubleshooting.report-ad.no-ad.title": {
+    "message": "No ad found"
+  },
+  "app.settings.troubleshooting.report-ad.title": {
+    "message": "Report an ad"
   },
   "app.sidebar.playing-as": {
     "message": "Playing as"
@@ -4001,6 +4022,9 @@
   "instance.server-modal.resource-pack": {
     "message": "Resource pack"
   },
+  "instance.settings.defaults.open-app-settings": {
+    "message": "Manage default settings"
+  },
   "instance.settings.sharing.active-invites.actions": {
     "message": "Actions"
   },
@@ -4039,6 +4063,12 @@
   },
   "instance.settings.sharing.revoke-invite.header": {
     "message": "Revoke invite"
+  },
+  "instance.settings.sidebar.label.game": {
+    "message": "Game"
+  },
+  "instance.settings.sidebar.label.instance": {
+    "message": "Instance"
   },
   "instance.settings.synced-options.data-override": {
     "message": "Turn off this override to edit synced data."
@@ -4157,8 +4187,11 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Select update channel"
   },
-  "instance.settings.tabs.hooks.description": {
-    "message": "Run instance-specific system commands before and after launching the game."
+  "instance.settings.tabs.hooks.default-settings-description": {
+    "message": "Your instance uses the default launch hooks unless you override them here."
+  },
+  "instance.settings.tabs.hooks.label": {
+    "message": "Launch hooks"
   },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Post-exit"
@@ -4220,17 +4253,8 @@
   "instance.settings.tabs.installation.locked": {
     "message": "Installation settings are unavailable while this instance is locked."
   },
-  "instance.settings.tabs.java.custom-environment-variables": {
-    "message": "Set environment variables separately for this instance."
-  },
-  "instance.settings.tabs.java.custom-java-arguments": {
-    "message": "Set Java arguments separately for this instance."
-  },
-  "instance.settings.tabs.java.custom-java-installation": {
-    "message": "Choose a different Java installation for this instance."
-  },
-  "instance.settings.tabs.java.custom-memory-allocation": {
-    "message": "Set the memory allocation separately for this instance."
+  "instance.settings.tabs.java.default-settings-description": {
+    "message": "Your instance uses the default Java and memory settings unless you override them here."
   },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Enter environmental variables..."
@@ -4256,8 +4280,8 @@
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/path/to/java"
   },
-  "instance.settings.tabs.settings-overrides": {
-    "message": "Sync overrides"
+  "instance.settings.tabs.java.label": {
+    "message": "Java and memory"
   },
   "instance.settings.tabs.sharing": {
     "message": "Sharing"
@@ -4319,11 +4343,14 @@
   "instance.settings.tabs.synced-options.shared-settings.description": {
     "message": "Enable an override to keep a synced setting separate for this instance."
   },
+  "instance.settings.tabs.syncing": {
+    "message": "Syncing"
+  },
   "instance.settings.tabs.window": {
     "message": "Custom window settings"
   },
-  "instance.settings.tabs.window.custom-window-settings": {
-    "message": "Configure fullscreen and launch resolution separately for this instance."
+  "instance.settings.tabs.window.default-settings-description": {
+    "message": "Your instance uses the default window settings unless you override them here."
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Fullscreen"
@@ -4339,6 +4366,9 @@
   },
   "instance.settings.tabs.window.height.enter": {
     "message": "Enter height..."
+  },
+  "instance.settings.tabs.window.label": {
+    "message": "Window"
   },
   "instance.settings.tabs.window.width": {
     "message": "Width"

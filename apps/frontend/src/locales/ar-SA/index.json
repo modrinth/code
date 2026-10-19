@@ -1010,17 +1010,11 @@
   "conversation-thread.action.approve": {
     "message": "موافقة"
   },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "الموافقة مع الرد"
-  },
   "conversation-thread.action.close-with-reply": {
     "message": "الإغلاق مع الرد"
   },
   "conversation-thread.action.reject": {
     "message": "رفض"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "الرفض مع الرد"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "إعادة فتح سلسلة المحادثة"
@@ -1055,9 +1049,6 @@
   "conversation-thread.action.withhold": {
     "message": "حجب"
   },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "الحجب مع الرد"
-  },
   "conversation-thread.closed-thread.description": {
     "message": "هذه السلسلة مغلقة، ولا يمكن إرسال رسائل جديدة إليها."
   },
@@ -1066,9 +1057,6 @@
   },
   "conversation-thread.error.reopening-report": {
     "message": "حدث خطأ أثناء إعادة فتح البلاغ"
-  },
-  "conversation-thread.error.sending-message": {
-    "message": "حدث خطأ أثناء إرسال الرسالة"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "الرد على سلسلة المحادثة..."
@@ -1096,9 +1084,6 @@
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "أؤكد أنني تعاملت بشكل مناسب مع ملاحظات المشرفين."
-  },
-  "conversation-thread.resubmit-modal.description": {
-    "message": "أنت تعيد إرسال <project-title>{projectTitle}</project-title> لمراجعته مرة أخرى من قِبل المشرفين."
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "إعادة الإرسال للمراجعة"

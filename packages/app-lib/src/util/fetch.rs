@@ -498,6 +498,7 @@ pub async fn fetch_file(
     semaphore: &FetchSemaphore,
     exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
     progress: Option<&mut FetchProgressFn<'_>>,
+    staging: &Path,
 ) -> crate::Result<DownloadedFile> {
     let body = fetch_advanced_with_target(
         Method::GET,
@@ -514,35 +515,13 @@ pub async fn fetch_file(
         &INSECURE_REQWEST_CLIENT,
         progress,
         true,
-        None,
+        Some(staging),
     )
     .await?;
     match body {
         FetchBody::File(file) => Ok(file),
         FetchBody::Memory(_) => unreachable!("requested a file download"),
     }
-}
-
-pub async fn fetch_file_mirrors(
-    mirrors: &[&str],
-    sha1: Option<&str>,
-    download_meta: Option<&DownloadMeta>,
-    uri_path: Option<&'static str>,
-    semaphore: &FetchSemaphore,
-    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
-    progress: Option<&mut FetchProgressFn<'_>>,
-) -> crate::Result<DownloadedFile> {
-    fetch_file_mirrors_in(
-        mirrors,
-        sha1,
-        download_meta,
-        uri_path,
-        semaphore,
-        exec,
-        progress,
-        None,
-    )
-    .await
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -598,11 +577,7 @@ async fn read_file_response(
     staging: Option<&Path>,
 ) -> crate::Result<DownloadedFile> {
     use futures::StreamExt;
-    let staging = staging.map(Path::to_path_buf).or_else(|| {
-        crate::State::get_if_initialized()
-            .map(|state| state.directories.store_staging_dir())
-    });
-    let (mut file, path) = temporary_file(staging.as_deref()).await?;
+    let (mut file, path) = temporary_file(staging).await?;
     let total = response.content_length().unwrap_or(0);
     let mut stream = response.bytes_stream();
     let mut hasher = ContentHasher::default();

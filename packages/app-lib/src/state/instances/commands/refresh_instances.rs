@@ -3,8 +3,7 @@ use crate::state::LauncherFeatureVersion;
 
 use super::edit_instance::EditInstance;
 
-pub(crate) async fn refresh_all_instances() -> crate::Result<()> {
-    let state = State::get().await?;
+pub(crate) async fn refresh_all_instances(state: &State) -> crate::Result<()> {
     let instances = crate::state::instances::adapters::sqlite::instance_rows::list_instances(
 		&state.pool,
 	)
@@ -26,7 +25,7 @@ pub(crate) async fn refresh_all_instances() -> crate::Result<()> {
                 launcher_feature_version,
                 ..EditInstance::default()
             },
-            &state.pool,
+            state,
         )
         .await?;
     }

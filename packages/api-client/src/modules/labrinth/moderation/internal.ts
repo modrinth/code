@@ -63,6 +63,7 @@ export class LabrinthModerationInternalModule extends AbstractModule {
 
 	public async releaseLock(
 		projectId: string,
+		token?: string,
 	): Promise<Labrinth.Moderation.Internal.ReleaseLockResponse> {
 		return this.client.request<Labrinth.Moderation.Internal.ReleaseLockResponse>(
 			`/moderation/lock/${projectId}`,
@@ -70,6 +71,7 @@ export class LabrinthModerationInternalModule extends AbstractModule {
 				api: 'labrinth',
 				version: 'internal',
 				method: 'DELETE',
+				headers: token ? { Authorization: `Bearer ${token}` } : undefined,
 			},
 		)
 	}

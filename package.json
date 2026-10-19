@@ -46,7 +46,7 @@
 		"vue": "^3.5.43",
 		"yaml": "^2.8.2"
 	},
-	"packageManager": "pnpm@12.8.1",
+	"packageManager": "pnpm@12.11.2",
 	"engines": {
 		"node": ">=24.15.0"
 	},
