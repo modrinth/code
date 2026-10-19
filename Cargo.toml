@@ -39,6 +39,7 @@ modrinth-sandbox = { path = "packages/modrinth-sandbox" }
 argon2 = { version = "0.5.3", features = ["std"] }
 ariadne = { path = "packages/ariadne" }
 async-minecraft-ping = { path = "packages/async-minecraft-ping" }
+ashpd = { version = "0.11.0", default-features = false, features = ["tokio"] }
 async-recursion = "1.1.1"
 async-stripe = { version = "0.41.0", default-features = false, features = [
   "runtime-tokio-hyper-rustls",

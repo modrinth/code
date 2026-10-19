@@ -305,6 +305,8 @@ async fn spawn(
         stdin,
         stdout,
         stderr,
+		on_finish: command.on_finish,
+		handle: super::SandboxHandle::Flatpak(FlatpakSandboxHandle),
         imp: SandboxChild::Flatpak(FlatpakChild {
             flatpak_pid,
             flatpak_portal: env.flatpak_portal.clone(),
@@ -335,6 +337,28 @@ fn open_dev_null() -> Result<std::fs::File> {
         .write(true)
         .open("/dev/null")
         .wrap_err("opening /dev/null")
+}
+
+/// Flatpak does not support granting additional filesystem access after spawn.
+#[derive(Clone, Debug)]
+pub struct FlatpakSandboxHandle;
+
+impl super::SandboxHandleOp for FlatpakSandboxHandle {
+	fn expose_path(
+		&self,
+		_path: &std::path::Path,
+		_allow_write: bool,
+	) -> Result<crate::ExposedPath> {
+		bail!("exposing additional paths to a running Flatpak sandbox is unsupported")
+	}
+
+	fn is_path_readable(&self, _path: &std::path::Path) -> bool {
+		false
+	}
+
+	fn is_path_writeable(&self, _path: &std::path::Path) -> bool {
+		false
+	}
 }
 
 #[derive(Debug)]

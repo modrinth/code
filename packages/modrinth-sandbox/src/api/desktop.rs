@@ -2,14 +2,16 @@ use std::path::PathBuf;
 
 use infer::MatcherType;
 use url::Url;
+#[cfg(target_os = "linux")]
+use uuid::Uuid;
 
 pub async fn open_url(url: Url) {
     assert!(matches!(url.scheme(), "http" | "https"));
 
     #[cfg(target_os = "linux")]
-    if let Ok(uri) = ashpd::Uri::parse(url.as_str()) {
+    {
         let result = ashpd::desktop::open_uri::OpenFileRequest::default()
-            .send_uri(&uri)
+            .send_uri(&url)
             .await;
         if let Err(err) = result {
             tracing::error!("SandboxAPI failed to send OpenURI: {err}");

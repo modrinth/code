@@ -7233,6 +7233,7 @@ dependencies = [
 name = "modrinth-sandbox"
 version = "0.1.0"
 dependencies = [
+ "ashpd",
  "async-trait",
  "async_zip",
  "bitflags 2.9.4",

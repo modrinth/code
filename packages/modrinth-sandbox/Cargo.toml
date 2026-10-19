@@ -46,6 +46,7 @@ tracing-subscriber = { workspace = true }
 clap = { workspace = true, features = ["derive"] }
 
 [target.'cfg(target_os = "linux")'.dependencies]
+ashpd = { workspace = true }
 libseccomp =  { workspace = true }
 directories =  { workspace = true }
 

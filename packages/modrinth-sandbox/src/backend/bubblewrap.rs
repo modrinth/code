@@ -571,6 +571,8 @@ instance-id={instance_id}
         stdin: pipes.stdin,
         stdout: pipes.stdout,
         stderr: pipes.stderr,
+		on_finish: command.on_finish,
+		handle: super::SandboxHandle::Bubblewrap(BubblewrapSandboxHandle),
         imp: SandboxChild::Bubblewrap(BubblewrapChild {
             child,
             instance_dir,
@@ -583,6 +585,27 @@ instance-id={instance_id}
     }
 
     Ok(child)
+}
+
+#[derive(Clone, Debug)]
+pub struct BubblewrapSandboxHandle;
+
+impl super::SandboxHandleOp for BubblewrapSandboxHandle {
+	fn expose_path(
+		&self,
+		_path: &std::path::Path,
+		_allow_write: bool,
+	) -> Result<crate::ExposedPath> {
+		eyre::bail!("exposing additional paths to a running Bubblewrap sandbox is unsupported")
+	}
+
+	fn is_path_readable(&self, _path: &std::path::Path) -> bool {
+		false
+	}
+
+	fn is_path_writeable(&self, _path: &std::path::Path) -> bool {
+		false
+	}
 }
 
 #[derive(Debug)]
