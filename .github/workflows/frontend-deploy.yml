@@ -145,7 +145,7 @@ jobs:
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
           workingDirectory: ./apps/frontend
           packageManager: pnpm
-          wranglerVersion: '4.151.1'
+          wranglerVersion: '4.149.0'
           command: --version
 
       - parallel:
