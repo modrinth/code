@@ -242,7 +242,7 @@ pub(crate) async fn prepare_mutations(
     project_ids: &[DBProjectId],
     transaction: &mut PgTransaction<'_>,
     redis: &RedisPool,
-    _project_editor: Option<&User>,
+    project_editor: Option<&User>,
 ) -> Result<PreparedMutations, ApiError> {
     let mut project_ids = project_ids.to_vec();
     project_ids.sort_by_key(|project_id| project_id.0);
@@ -251,6 +251,18 @@ pub(crate) async fn prepare_mutations(
     let mut states = Vec::with_capacity(project_ids.len());
     for project_id in project_ids {
         states.push(sync_project_state(project_id, transaction, redis).await?);
+    }
+
+    if project_editor.is_some_and(|user| !user.role.is_mod()) {
+        for state in &states {
+            if state.project.status == ProjectStatus::Processing
+                && state.has_required_nags
+            {
+                return Err(ApiError::Request(eyre!(
+                    "project cannot have required validation nags while in review"
+                )));
+            }
+        }
     }
 
     Ok(PreparedMutations { states })
@@ -300,12 +312,14 @@ pub(crate) async fn finalize_project_edit(
 
     let validate_review_state = entered_review || submit_for_review;
 
-    if (validate_review_state || entered_approved_state)
+    if (state.project.status == ProjectStatus::Processing
+        || validate_review_state
+        || entered_approved_state)
         && !project_editor.is_some_and(|user| user.role.is_mod())
         && state.has_required_nags
     {
         return Err(ApiError::Request(eyre!(
-            "project must have no required validation nags before review or approval"
+            "project must have no required validation nags before or during review or approval"
         )));
     }
 
