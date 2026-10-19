@@ -1017,9 +1017,18 @@ pub async fn launch_minecraft(
         address.resolve().await?;
     }
 
-    let (main_class_keep_alive, main_class_path) = io::temporary_file_in(
-        state.directories.metadata_dir().join("launcher-temp"),
-        "theseus.jar",
+    let main_class_keep_alive =
+        modrinth_sandbox::minecraft::create_launcher_temp_dir(
+            &state.directories.instance_data_dir().join("tmp"),
+        )
+        .map_err(|error| {
+            crate::ErrorKind::LauncherError(format!(
+                "Could not create launcher staging directory: {error:#}"
+            ))
+        })?;
+    let main_class_path = main_class_keep_alive.path().join("theseus.jar");
+    io::write(
+        &main_class_path,
         include_bytes!(concat!(env!("JAVA_JARS_DIR"), "/theseus.jar")),
     )
     .await?;

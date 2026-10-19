@@ -9,7 +9,6 @@ use std::{
 use eyre::{Context, Result, ensure};
 use rand::RngCore;
 use sha1::{Digest, Sha1};
-use tokio::sync::OnceCell;
 
 use crate::{
     SandboxChild, SandboxCommand, SandboxStdio, api::SandboxApiChild,
@@ -38,7 +37,8 @@ pub struct MinecraftCommand {
     /// Path to the Minecraft instance directory on the host.
     pub instance_path: PathBuf,
     /// Directory for persistent home, data, configuration, cache, and state,
-    /// shared across all game instances.
+    /// shared across all game instances. Temporary launcher JARs are staged in
+    /// its `tmp` subdirectory and removed when the launched process exits.
     pub persistent_dir: PathBuf,
     /// JVM arguments which do not contain sandbox-managed paths.
     ///
@@ -184,6 +184,23 @@ const MINECRAFT_PASSTHROUGH_ENVIRONMENT: &[&str] = &[
     "SDL_IM_MODULE",
 ];
 
+/// Creates unique launch staging storage under the configured root.
+/// Keep the returned directory alive until the launched process exits.
+pub fn create_launcher_temp_dir(root: &Path) -> Result<tempfile::TempDir> {
+    fs::create_dir_all(root).with_context(|| {
+        format!("creating launcher staging root {}", root.display())
+    })?;
+    tempfile::Builder::new()
+        .prefix("modrinth-minecraft-")
+        .tempdir_in(root)
+        .with_context(|| {
+            format!(
+                "creating Minecraft launcher staging storage in {}",
+                root.display()
+            )
+        })
+}
+
 pub async fn setup_minecraft_command(
     minecraft: MinecraftCommand,
 ) -> Result<SandboxCommand> {
@@ -209,7 +226,7 @@ pub async fn setup_minecraft_command(
     #[cfg(target_os = "linux")]
     let persistent_state = minecraft.persistent_dir.join("state");
     let mods_path = minecraft.instance_path.join("mods");
-	let skins_path = minecraft.assets_path.join("skins");
+    let skins_path = minecraft.assets_path.join("skins");
     let mut classpath = minecraft.classpath;
     let mut read_only_paths = vec![
         minecraft.jre_path.clone(),
@@ -276,14 +293,18 @@ pub async fn setup_minecraft_command(
         );
     }
 
+    let mut launcher_temp_keep_alive = None;
     // Setup sandbox java agent
     if let Some(child) = &minecraft.sandbox_api_child {
-        static SANDBOX_AGENT_PATH: OnceCell<PathBuf> = OnceCell::const_new();
-        let sandbox_agent_path = SANDBOX_AGENT_PATH
-            .get_or_try_init(|| async {
-                tokio::task::spawn_blocking(create_sandbox_java_agent).await?
+        let launcher_temp_dir = minecraft.persistent_dir.join("tmp");
+        let (agent_dir, sandbox_agent_path) =
+            tokio::task::spawn_blocking(move || {
+                let agent_dir = create_launcher_temp_dir(&launcher_temp_dir)?;
+                let path = create_sandbox_java_agent(agent_dir.path())?;
+                Ok::<_, eyre::Report>((agent_dir, path))
             })
-            .await?;
+            .await??;
+        launcher_temp_keep_alive = Some(agent_dir);
 
         classpath.push(sandbox_agent_path.clone());
         read_only_paths.push(sandbox_agent_path.clone());
@@ -317,7 +338,7 @@ pub async fn setup_minecraft_command(
     args.extend(minecraft.main_class_args);
 
     let ensure_dirs_exist = vec![
-		skins_path.clone(),
+        skins_path.clone(),
         #[cfg(unix)]
         persistent_home.clone(),
         #[cfg(target_os = "linux")]
@@ -348,21 +369,24 @@ pub async fn setup_minecraft_command(
     read_only_paths.sort_unstable();
     read_only_paths.dedup();
 
-	let mut read_write_paths = vec![
-	    // .minecraft dir
-		minecraft.instance_path.clone(),
-		// global persistent dirs for all mods
-		minecraft.persistent_dir,
-		// .minecraft assets/skins; assets/ is shared among instances,
-		// and so is the skin cache, but the game writes into the skin cache
-		skins_path,
-	];
+    let mut read_write_paths = vec![
+        // .minecraft dir
+        minecraft.instance_path.clone(),
+        // global persistent dirs for all mods
+        minecraft.persistent_dir,
+        // .minecraft assets/skins; assets/ is shared among instances,
+        // and so is the skin cache, but the game writes into the skin cache
+        skins_path,
+    ];
     read_write_paths.sort_unstable();
     read_write_paths.dedup();
 
     let mut on_start: Vec<Box<dyn FnOnce(&mut SandboxChild) + Send + Sync>> =
         Vec::new();
     let mut on_finish: Vec<Box<dyn FnOnce() + Send + Sync>> = Vec::new();
+    if let Some(launcher_temp_dir) = launcher_temp_keep_alive {
+        on_finish.push(Box::new(move || drop(launcher_temp_dir)));
+    }
     if let Some(sandbox_api_child) = minecraft.sandbox_api_child {
         // Register handle
         on_start.push(Box::new({
@@ -406,14 +430,13 @@ pub async fn setup_minecraft_command(
     })
 }
 
-fn create_sandbox_java_agent() -> eyre::Result<PathBuf> {
+fn create_sandbox_java_agent(agent_dir: &Path) -> eyre::Result<PathBuf> {
     const BYTES: &[u8] =
         include_bytes!("../../modrinth-sandbox-agent/SandboxAgent.jar");
     let hash_bytes = Sha1::digest(BYTES);
     let hash_str = hex::encode(hash_bytes);
 
-    let path = std::env::temp_dir()
-        .join(format!("ModrinthSandboxAgent-{}.jar", hash_str));
+    let path = agent_dir.join(format!("ModrinthSandboxAgent-{}.jar", hash_str));
 
     // Check that file exists and checksum matches
     if !check_sha1_hash(&path, &hash_bytes)? {

@@ -66,7 +66,8 @@ impl SandboxEnv for BubblewrapEnv {
         &self,
         command: SandboxCommand,
     ) -> Result<crate::SandboxChild> {
-        let this = self.clone();
+		super::linux::ensure_valid_command(&command).await?;
+		let this = self.clone();
         let child = tokio::task::spawn_blocking(move || spawn(&this, command))
             .await
             .wrap_err("spawn task dropped")??;

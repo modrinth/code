@@ -60,6 +60,7 @@ impl SandboxEnv for FlatpakEnv {
         &self,
         command: SandboxCommand,
     ) -> Result<crate::SandboxChild> {
+		super::linux::ensure_valid_command(&command).await?;
         spawn(self, command).await
     }
 }

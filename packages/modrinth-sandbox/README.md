@@ -19,6 +19,7 @@ async fn main() -> Result<()> {
 		jre_path: "/path/to/the/jre".into(),
 		classpath: vec!["/path/to/minecraft.jar".into()],
 		instance_path: "/path/to/instance".into(),
+		persistent_dir: "/path/to/instance-data".into(),
 		// etc.
 	};
 

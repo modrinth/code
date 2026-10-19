@@ -8,6 +8,7 @@ readme = "README.md"
 crate-type = ["rlib", "cdylib", "staticlib"]
 
 [dependencies]
+tempfile = { workspace = true }
 tracing = { workspace = true }
 tokio = { workspace = true, features = ["fs", "io-util", "macros", "net", "process", "rt", "sync"] }
 eyre = { workspace = true }
@@ -51,7 +52,6 @@ libseccomp =  { workspace = true }
 directories =  { workspace = true }
 
 [target.'cfg(target_os = "macos")'.dependencies]
-tempfile = { workspace = true }
 objc2-app-kit = { workspace = true }
 objc2-foundation = { workspace = true }
 # security-framework =  { workspace = true }

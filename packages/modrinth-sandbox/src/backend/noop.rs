@@ -213,6 +213,7 @@ mod tests {
             stderr: SandboxStdio::Pipe,
             app_container_name: "test".into(),
             app_container_description: "test".into(),
+			on_start: Vec::new(),
             on_finish: Vec::new(),
         }
     }
