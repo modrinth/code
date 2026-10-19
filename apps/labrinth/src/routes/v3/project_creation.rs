@@ -350,6 +350,7 @@ pub async fn project_create_internal(
 ) -> Result<HttpResponse, CreateError> {
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
+    let mut delphi_scan_files = Vec::new();
 
     let project_id: ProjectId =
         models::generate_project_id(&mut transaction).await?.into();
@@ -371,7 +372,7 @@ pub async fn project_create_internal(
             &mut uploaded_files,
             &client,
             &redis,
-            &kafka_client,
+            &mut delphi_scan_files,
             project_id,
             &current_user,
         )
@@ -400,6 +401,11 @@ pub async fn project_create_internal(
     };
 
     prepared.commit(transaction, &redis).await?;
+    crate::queue::delphi_scan::publish_new_files(
+        &kafka_client,
+        &delphi_scan_files,
+    )
+    .await;
     search_state.queue.push_project_change(project_id).await;
     Ok(response)
 }
@@ -430,6 +436,7 @@ pub async fn project_create_with_id(
 ) -> Result<HttpResponse, CreateError> {
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
+    let mut delphi_scan_files = Vec::new();
 
     let (project_id,) = path.into_inner();
     let current_user = get_user_from_headers(
@@ -450,7 +457,7 @@ pub async fn project_create_with_id(
             &mut uploaded_files,
             &client,
             &redis,
-            &kafka_client,
+            &mut delphi_scan_files,
             project_id,
             &current_user,
         )
@@ -479,6 +486,11 @@ pub async fn project_create_with_id(
     };
 
     prepared.commit(transaction, &redis).await?;
+    crate::queue::delphi_scan::publish_new_files(
+        &kafka_client,
+        &delphi_scan_files,
+    )
+    .await;
     search_state.queue.push_project_change(project_id).await;
     Ok(response)
 }
@@ -523,7 +535,7 @@ async fn project_create_inner(
     uploaded_files: &mut Vec<UploadedFile>,
     pool: &PgPool,
     redis: &RedisPool,
-    kafka_client: &KafkaClientState,
+    delphi_scan_files: &mut Vec<models::DBFileId>,
     project_id: ProjectId,
     current_user: &User,
 ) -> Result<HttpResponse, CreateError> {
@@ -1008,7 +1020,7 @@ async fn project_create_inner(
         let now = Utc::now();
 
         let id = project_builder_actual
-            .insert(&mut *transaction, redis, file_host, kafka_client)
+            .insert(&mut *transaction, redis, file_host, delphi_scan_files)
             .await?;
         DBUser::clear_project_cache(&[current_user.id.into()], redis).await?;
 

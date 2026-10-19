@@ -111,6 +111,32 @@ async fn enqueue_file_inner(
         .await
         .wrap_err("locking file for Delphi scan enqueue")?;
 
+    publish_file_scan(kafka_client, file_id, force).await
+}
+
+/// Publishes scan events for files inserted by an upload. Must only be called
+/// after the inserting transaction commits, since Delphi resolves the file
+/// as soon as it receives the event.
+pub async fn publish_new_files(
+    kafka_client: &KafkaClientState,
+    file_ids: &[DBFileId],
+) {
+    for &file_id in file_ids {
+        if let Err(err) = publish_file_scan(kafka_client, file_id, false).await
+        {
+            tracing::error!(
+                file_id = %FileId::from(file_id),
+                "Failed to enqueue new file for Delphi scan: {err:?}"
+            );
+        }
+    }
+}
+
+async fn publish_file_scan(
+    kafka_client: &KafkaClientState,
+    file_id: DBFileId,
+    force: bool,
+) -> Result<()> {
     let event = KafkaEvent::new(
         DELPHI_FILE_SCAN_TOPIC,
         DelphiFileScanEvent {

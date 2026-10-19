@@ -12,7 +12,6 @@ use crate::models::link_platform::LinkPlatform;
 use crate::models::projects::{
     MonetizationStatus, ProjectStatus, SideTypesMigrationReviewStatus,
 };
-use crate::util::kafka::KafkaClientState;
 use ariadne::ids::base62_impl::parse_base62;
 use chrono::{DateTime, Utc};
 use dashmap::{DashMap, DashSet};
@@ -195,7 +194,7 @@ impl ProjectBuilder {
         transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
         file_host: &dyn FileHost,
-        kafka_client: &KafkaClientState,
+        delphi_scan_files: &mut Vec<DBFileId>,
     ) -> Result<DBProjectId> {
         let project_struct = DBProject {
             id: self.project_id,
@@ -247,7 +246,7 @@ impl ProjectBuilder {
         for mut version in self.initial_versions {
             version.project_id = self.project_id;
             version
-                .insert(transaction, redis, file_host, kafka_client)
+                .insert(transaction, redis, file_host, delphi_scan_files)
                 .await
                 .wrap_err("inserting initial project version")?;
         }
