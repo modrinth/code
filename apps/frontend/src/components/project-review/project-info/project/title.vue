@@ -37,20 +37,41 @@
 			</div>
 		</div>
 		<h1 v-else-if="project" class="m-0 flex min-w-0 items-center gap-2 text-xl">
-			<Tooltip class="flex shrink-0">
-				<template #popper>
-					<ProjectStatusBadge
-						:status="project.status"
+			<div class="flex shrink-0 items-center gap-0.5">
+				<Tooltip class="flex shrink-0">
+					<template #popper>
+						<ProjectStatusBadge
+							:status="project.status"
+							:style="{ color: `var(--color-${getProjectStatusColor(project.status)})` }"
+						/>
+					</template>
+					<component
+						:is="getProjectStatusIcon(project.status)"
+						class="size-4 shrink-0"
 						:style="{ color: `var(--color-${getProjectStatusColor(project.status)})` }"
+						aria-hidden="true"
 					/>
+				</Tooltip>
+				<template v-if="project.status === 'processing' && project.requested_status">
+					<RightArrowIcon class="size-4 shrink-0 text-secondary" aria-hidden="true" />
+					<Tooltip class="flex shrink-0">
+						<template #popper>
+							<ProjectStatusBadge
+								:status="project.requested_status"
+								:style="{
+									color: `var(--color-${getProjectStatusColor(project.requested_status)})`,
+								}"
+							/>
+						</template>
+						<component
+							:is="getProjectStatusIcon(project.requested_status)"
+							class="size-4 shrink-0"
+							:style="{ color: `var(--color-${getProjectStatusColor(project.requested_status)})` }"
+							aria-hidden="true"
+						/>
+					</Tooltip>
 				</template>
-				<component
-					:is="getProjectStatusIcon(project.status)"
-					class="size-4 shrink-0"
-					:style="{ color: `var(--color-${getProjectStatusColor(project.status)})` }"
-					aria-hidden="true"
-				/>
-			</Tooltip>
+			</div>
 			<NuxtLink
 				:to="projectUrl"
 				target="_blank"
@@ -64,6 +85,7 @@
 </template>
 
 <script setup lang="ts">
+import { RightArrowIcon } from '@modrinth/assets'
 import {
 	Button,
 	commonMessages,
@@ -101,5 +123,10 @@ const {
 const projectUrl = computed(
 	() =>
 		`/${projectV2.value?.project_type ?? project.value?.project_types[0]}/${project.value?.slug ?? project.value?.id}`,
+)
+const primaryStatus = computed(() =>
+	project.value?.status === 'processing' && project.value.requested_status
+		? project.value.requested_status
+		: (project.value?.status ?? 'unknown'),
 )
 </script>
