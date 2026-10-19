@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                INSERT INTO threads_issue_facets (\n                    id,\n                    issue_id,\n                    what,\n                    verdict\n                )\n                SELECT facet_id, $1, what, verdict\n                FROM UNNEST(\n                    $2::int8[],\n                    $3::jsonb[],\n                    $4::varchar[]\n                ) AS facet(facet_id, what, verdict)\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8Array",
+        "JsonbArray",
+        "VarcharArray"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "7bd11bb105e2f3072160b6ce7349a71fc88f9e779f8d84be372430269c2b06c3"
+}

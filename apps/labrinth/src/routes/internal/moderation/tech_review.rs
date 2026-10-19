@@ -936,6 +936,7 @@ pub async fn search_projects(
                 .messages
                 .iter()
                 .filter_map(|message| message.author_id)
+                .chain(thread.issues.iter().map(|issue| issue.created_by))
         })
         .collect::<Vec<_>>();
     let thread_authors =
@@ -1045,6 +1046,7 @@ pub async fn get_project_report(
                 .messages
                 .iter()
                 .filter_map(|message| message.author_id)
+                .chain(thread.issues.iter().map(|issue| issue.created_by))
         })
         .collect::<Vec<_>>();
     let thread_authors =
@@ -1122,6 +1124,20 @@ pub async fn submit_report(
         .await
         .wrap_internal_err("failed to begin transaction")?;
 
+    sqlx::query!(
+        r#"
+        SELECT id
+        FROM mods
+        WHERE id = $1
+        FOR UPDATE
+        "#,
+        project_id as DBProjectId,
+    )
+    .fetch_optional(&mut txn)
+    .await
+    .wrap_internal_err("locking project for technical review submission")?
+    .wrap_not_found_err("project not found")?;
+
     let pending_issue_details = sqlx::query!(
         r#"
         SELECT
@@ -1160,19 +1176,6 @@ pub async fn submit_report(
             "report still has issue details with no verdict: {details:?}"
         )));
     }
-
-    sqlx::query!(
-        r#"
-        DELETE FROM delphi_tech_review_queue
-        WHERE project_id = $1
-        "#,
-        project_id as DBProjectId,
-    )
-    .execute(&mut txn)
-    .await
-    .wrap_internal_err(
-        "failed to remove project from technical review queue",
-    )?;
 
     let record = sqlx::query!(
         r#"
@@ -1259,22 +1262,43 @@ pub async fn submit_report(
         .wrap_internal_err("failed to add tech review message")?;
     }
 
-    txn.commit()
-        .await
-        .wrap_internal_err("failed to commit transaction")?;
-
-    if verdict == DelphiVerdict::Unsafe {
-        crate::routes::v3::projects::clear_project_cache_and_queue_search(
-            &redis,
-            &search_state,
-            project_id,
-            None,
-            None,
+    let prepared = if verdict == DelphiVerdict::Unsafe {
+        Some(
+            crate::routes::v3::projects::mutation::prepare_mutations(
+                &[project_id],
+                &mut txn,
+                &redis,
+                Some(&user),
+            )
+            .await?,
         )
-        .await
-        .wrap_api_err(
-            "executing `projects::clear_project_cache_and_queue_search`",
-        )?;
+    } else {
+        None
+    };
+
+    sqlx::query!(
+        r#"
+        DELETE FROM delphi_tech_review_queue
+        WHERE project_id = $1
+        "#,
+        project_id as DBProjectId,
+    )
+    .execute(&mut txn)
+    .await
+    .wrap_internal_err(
+        "failed to remove project from technical review queue",
+    )?;
+
+    if let Some(prepared) = prepared {
+        prepared.commit(txn, &redis).await?;
+        search_state
+            .queue
+            .push_project_change(project_id.into())
+            .await;
+    } else {
+        txn.commit()
+            .await
+            .wrap_internal_err("failed to commit transaction")?;
     }
 
     Ok(())

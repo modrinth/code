@@ -1,10 +1,12 @@
 use crate::auth::checks::{is_visible_organization, is_visible_project};
 use crate::auth::get_user_from_headers;
 use crate::database::DBProject;
-use crate::database::PgPool;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::team_item::TeamAssociationId;
-use crate::database::models::{DBOrganization, DBTeam, DBTeamMember, DBUser};
+use crate::database::models::{
+    DBOrganization, DBProjectId, DBTeam, DBTeamMember, DBUser,
+};
+use crate::database::{PgPool, PgTransaction};
 use crate::models::ids::TeamId;
 use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
@@ -28,6 +30,31 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
         .service(add_team_member_route)
         .service(join_team_route)
         .service(transfer_ownership_route);
+}
+
+async fn affected_project_ids(
+    association: TeamAssociationId,
+    transaction: &mut PgTransaction<'_>,
+) -> Result<Vec<DBProjectId>, ApiError> {
+    match association {
+        TeamAssociationId::Project(project_id) => Ok(vec![project_id]),
+        TeamAssociationId::Organization(organization_id) => {
+            sqlx::query_scalar!(
+                r#"
+                SELECT id
+                FROM mods
+                WHERE organization_id = $1
+                "#,
+                organization_id as _,
+            )
+            .fetch_all(&mut *transaction)
+            .await
+            .map(|project_ids| {
+                project_ids.into_iter().map(DBProjectId).collect()
+            })
+            .wrap_internal_err("fetching projects affected by team mutation")
+        }
+    }
 }
 
 // Returns all members of a project,
@@ -776,10 +803,15 @@ pub async fn add_team_member(
         }
     }
 
-    transaction
-        .commit()
-        .await
-        .wrap_internal_err("committing database transaction")?;
+    let affected_project_ids =
+        affected_project_ids(team_association, &mut transaction).await?;
+    super::projects::mutation::finalize_mutations(
+        &affected_project_ids,
+        transaction,
+        &redis,
+        Some(&current_user),
+    )
+    .await?;
     DBTeamMember::clear_cache(team_id, &redis)
         .await
         .wrap_internal_err("clearing cached data from Redis")?;
@@ -1003,10 +1035,15 @@ pub async fn edit_team_member(
     .await
     .wrap_internal_err("updating team member in database")?;
 
-    transaction
-        .commit()
-        .await
-        .wrap_internal_err("committing database transaction")?;
+    let affected_project_ids =
+        affected_project_ids(team_association, &mut transaction).await?;
+    super::projects::mutation::finalize_mutations(
+        &affected_project_ids,
+        transaction,
+        &redis,
+        Some(&current_user),
+    )
+    .await?;
     DBTeamMember::clear_cache(id, &redis)
         .await
         .wrap_internal_err("clearing cached data from Redis")?;
@@ -1217,10 +1254,22 @@ pub async fn transfer_ownership(
         )?;
     }
 
-    transaction
-        .commit()
-        .await
-        .wrap_internal_err("committing database transaction")?;
+    if let Some(team_association_id) = team_association_id {
+        let affected_project_ids =
+            affected_project_ids(team_association_id, &mut transaction).await?;
+        super::projects::mutation::finalize_mutations(
+            &affected_project_ids,
+            transaction,
+            &redis,
+            Some(&current_user),
+        )
+        .await?;
+    } else {
+        transaction
+            .commit()
+            .await
+            .wrap_internal_err("committing database transaction")?;
+    }
 
     DBTeamMember::clear_cache(id.into(), &redis)
         .await
@@ -1406,10 +1455,15 @@ pub async fn remove_team_member(
             }
         }
 
-        transaction
-            .commit()
-            .await
-            .wrap_internal_err("committing database transaction")?;
+        let affected_project_ids =
+            affected_project_ids(team_association, &mut transaction).await?;
+        super::projects::mutation::finalize_mutations(
+            &affected_project_ids,
+            transaction,
+            &redis,
+            Some(&current_user),
+        )
+        .await?;
 
         DBTeamMember::clear_cache(id, &redis)
             .await
