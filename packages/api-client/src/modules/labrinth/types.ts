@@ -2657,6 +2657,7 @@ export namespace Labrinth {
 			homePageProjects?: Projects.v2.Project[]
 			homePageSearch?: Search.v2.SearchResults
 			homePageNotifs?: Search.v2.SearchResults
+			prideProjectIds?: string[]
 			products?: Billing.Internal.Product[]
 
 			countries: ISO3166.Country[]

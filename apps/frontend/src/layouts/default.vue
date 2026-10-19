@@ -910,7 +910,11 @@ import {
 } from '~/composables/accounts.ts'
 import { getSignInRouteObj } from '~/composables/auth.ts'
 import { logout } from '~/composables/user.js'
-import { errors as generatedStateErrors, taxComplianceThresholds } from '~/generated/state.json'
+import {
+	errors as generatedStateErrors,
+	prideProjectIds,
+	taxComplianceThresholds,
+} from '~/generated/state.json'
 import { provideCurrentProjectId } from '~/providers/current-project.ts'
 import { getProjectTypeMessage } from '~/utils/i18n-project-type.ts'
 import { hasActiveMidas } from '~/utils/user-membership.ts'
@@ -982,12 +986,7 @@ const showTinMismatchBanner = computed(() => {
 const PRIDE_COLLECTION_ID = 'M4c3ITvd'
 const PRIDE_ARTICLE_SLUGS = ['pride-campaign-2025', 'pride-campaign-2026', 'proud-of-you-2026']
 
-const { data: prideCollection } = useQuery({
-	queryKey: computed(() => ['collection', PRIDE_COLLECTION_ID]),
-	queryFn: () => client.labrinth.collections.get(PRIDE_COLLECTION_ID),
-})
-
-const prideProjectIds = computed(() => new Set(prideCollection.value?.projects ?? []))
+const prideProjectIdSet = new Set(prideProjectIds)
 
 const currentProjectId = ref()
 provideCurrentProjectId(currentProjectId)
@@ -999,7 +998,7 @@ const showPrideBackdrop = computed(() => {
 	if (route.params.collection === PRIDE_COLLECTION_ID) {
 		return true
 	}
-	return !!currentProjectId.value && prideProjectIds.value.has(currentProjectId.value)
+	return !!currentProjectId.value && prideProjectIdSet.has(currentProjectId.value)
 })
 
 async function fetchIntercomToken() {
