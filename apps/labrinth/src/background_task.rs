@@ -32,7 +32,6 @@ pub enum BackgroundTask {
     IndexBilling,
     IndexSubscriptions,
     IncrementalIndexSearch,
-    DelphiFileScan,
     Migrations,
     Mail,
     /// Queries server project analytics (e.g. number of verified plays in last
@@ -107,9 +106,6 @@ impl BackgroundTask {
                     kafka_client,
                 )
                 .await
-            }
-            DelphiFileScan => {
-                crate::queue::delphi_scan::run(pool, kafka_client).await
             }
             Mail => run_email(email_queue).await,
             CacheAnalytics => {
