@@ -54,7 +54,7 @@ pub async fn run(
 
     let default_account = Credentials::get_default_credential(&state.pool)
         .await?
-        .ok_or_else(|| crate::ErrorKind::NoCredentialsError.as_error())?;
+        .ok_or_else(|| crate::ErrorKind::NotLoggedIn.as_error())?;
 
     run_credentials(instance_id, &default_account, quick_play_type).await
 }

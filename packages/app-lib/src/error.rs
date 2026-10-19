@@ -1,11 +1,20 @@
 //! Theseus error type
+use crate::data::ModLoader;
+use crate::state::MinecraftAuthenticationError;
 use crate::util;
+use crate::util::io::IOError;
+use crate::util::jre::JREError;
+use async_tungstenite::tungstenite;
+use async_zip::error::ZipError;
 use data_url::DataUrlError;
-use derive_more::Display;
+use hickory_resolver::ResolveError;
 use serde::{Deserialize, Serialize};
+use sqlx::migrate::MigrateError;
+use std::path::StripPrefixError;
+use std::time::Duration;
 
-#[derive(Serialize, Deserialize, Debug, Display)]
-#[display("{description}")]
+#[derive(Serialize, Deserialize, Debug, thiserror::Error)]
+#[error("{description}")]
 pub struct LabrinthError {
     pub error: String,
     pub description: String,
@@ -19,12 +28,7 @@ pub struct LabrinthError {
     pub route: Option<String>,
 }
 
-#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
-#[cfg_attr(
-    feature = "export-ts",
-    derive(ts_rs::TS, postcard_bindgen::PostcardBindings)
-)]
-#[serde(rename_all = "snake_case")]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum SharedInstanceUnavailableReason {
     Deleted,
     AccessRevoked,
@@ -78,11 +82,6 @@ pub enum ErrorKind {
     #[error("Metadata error: {0}")]
     MetadataError(#[from] daedalus::Error),
 
-    #[error("Minecraft authentication error: {0}")]
-    MinecraftAuthenticationError(
-        #[from] crate::state::MinecraftAuthenticationError,
-    ),
-
     #[error("I/O error: {0}")]
     IOError(#[from] util::io::IOError),
 
@@ -98,11 +97,8 @@ pub enum ErrorKind {
     #[error("Too many API errors, try again in {0} minutes")]
     ApiIsDownError(u32),
 
-    #[error("Too many requests, retry in {}", format_seconds(*.retry_in_seconds))]
-    Ratelimited { retry_in_seconds: u64 },
-
-    #[error("{0}")]
-    LabrinthError(LabrinthError),
+    #[error("Too many requests, retry in {}", format_duration(*.retry_in))]
+    RateLimited { retry_in: Duration },
 
     #[error("Websocket error: {0}")]
     WSError(#[from] async_tungstenite::tungstenite::Error),
@@ -125,8 +121,8 @@ pub enum ErrorKind {
     #[error("Shared instance unavailable: {0}")]
     SharedInstanceUnavailable(SharedInstanceUnavailableReason),
 
-    #[error("Shared instances API request failed: {0}")]
-    SharedInstancesApiError(String),
+    #[error("shared instances api request failed")]
+    SharedInstancesApiError,
 
     #[error("Join handle error: {0}")]
     JoinError(#[from] tokio::task::JoinError),
@@ -140,8 +136,8 @@ pub enum ErrorKind {
     #[error("Instance {0} is not managed by the app!")]
     UnmanagedInstanceError(String),
 
-    #[error("User is not logged in, no credentials available!")]
-    NoCredentialsError,
+    #[error("not logged in")]
+    NotLoggedIn,
 
     #[error("JRE error: {0}")]
     JREError(#[from] crate::util::jre::JREError),
@@ -173,9 +169,6 @@ pub enum ErrorKind {
 
     #[error("Error while applying migrations: {0}")]
     SqlxMigrate(#[from] sqlx::migrate::MigrateError),
-
-    #[error("Move directory error: {0}")]
-    DirectoryMoveError(String),
 
     #[error("Error resolving DNS: {0}")]
     DNSError(#[from] hickory_resolver::ResolveError),
@@ -218,9 +211,57 @@ pub enum ErrorKind {
 
     #[error("Discord IPC error: {0}")]
     DiscordRichPresenceError(#[from] discord_rich_presence::error::Error),
+
+    #[error("Login canceled")]
+    LoginCanceled,
+
+    #[error("No loader version selected for {}", .loader.as_str())]
+    NoLoaderVersion { loader: ModLoader },
+
+    #[error("Failed to fetch player profile")]
+    NoMinecraftProfile,
+
+    #[error("Move directory error")]
+    DirectoryMoveFailed,
+
+    #[error(
+        "Not enough space: the destination needs at least {required} bytes plus working space for the app-directory move"
+    )]
+    NotEnoughSpace { required: u64 },
+
+    #[error("{0}")]
+    ContentStoreError(String),
+
+    #[error("{0}")]
+    InvalidPack(InvalidPack),
 }
 
-fn format_seconds(seconds: u64) -> String {
+#[derive(Debug, derive_more::Display)]
+pub enum InvalidPack {
+    #[display("only resource packs and data packs can be synced")]
+    UnsupportedType,
+    #[display("data pack syncing is currently disabled")]
+    DataPacksDisabled,
+    #[display("invalid pack file path")]
+    InvalidPath,
+    #[display("the pack is not registered")]
+    NotRegistered,
+    #[display("the pack's compatibility could not be verified")]
+    UnverifiedCompatibility,
+    #[display("choose a valid pack zip file")]
+    NotZip,
+    #[display("choose a pack zip containing pack.mcmeta")]
+    MissingMetadata,
+    #[display("the pack metadata is too large")]
+    MetadataTooLarge,
+    #[display("this file is not a pack of the selected type")]
+    WrongType,
+}
+
+fn format_duration(duration: Duration) -> String {
+    let seconds = duration
+        .as_secs()
+        .saturating_add(u64::from(duration.subsec_nanos() > 0));
     let plural = |unit: u64| if unit == 1 { "" } else { "s" };
 
     if seconds <= 59 {
@@ -246,6 +287,114 @@ pub type Error = anyhow::Error;
 impl ErrorKind {
     pub fn as_error(self) -> Error {
         self.into()
+    }
+
+    fn code(&self) -> &'static str {
+        match self {
+            Self::SharedInstanceUnavailable(reason) => match reason {
+                SharedInstanceUnavailableReason::Deleted => {
+                    "shared_instance_deleted"
+                }
+                SharedInstanceUnavailableReason::AccessRevoked => {
+                    "shared_instance_access_revoked"
+                }
+                SharedInstanceUnavailableReason::Quarantined => {
+                    "shared_instance_quarantined"
+                }
+            },
+            Self::SharedInstancesApiError => "shared_instances_api_error",
+            Self::HashError(_, _) => "hash_error",
+            Self::LoginCanceled => "login_canceled",
+            Self::NotLoggedIn => "not_logged_in",
+            Self::NoLoaderVersion { .. } => "no_loader_version",
+            Self::NoMinecraftProfile => "minecraft_auth_no_profile",
+            Self::LauncherError(_) => "launcher_error",
+            Self::JREError(_) => "java_error",
+            Self::NoValueFor(_) | Self::MetadataError(_) => "metadata_error",
+            Self::FetchError(_)
+            | Self::ApiIsDownError(_)
+            | Self::WSError(_)
+            | Self::WSClosedError(_)
+            | Self::DNSError(_)
+            | Self::RateLimited { .. } => "network_error",
+            Self::ZipError(_) => "archive_error",
+            Self::DeserializationError(_) | Self::StripPrefixError(_) => {
+                "path_error"
+            }
+            Self::FSError(_)
+            | Self::IOError(_)
+            | Self::StdIOError(_)
+            | Self::UTFError(_) => "filesystem_error",
+            Self::INIError(_) | Self::JSONError(_) => "parse_error",
+            Self::Sqlx(_) | Self::SqlxMigrate(_) => "database_error",
+            _ => "internal_error",
+        }
+    }
+}
+
+/// `downcast_ref` stops at the outermost kind, so this also yields kinds
+/// further down the chain.
+pub fn error_kinds(error: &Error) -> impl Iterator<Item = &ErrorKind> {
+    error
+        .downcast_ref::<ErrorKind>()
+        .into_iter()
+        .chain(error.chain().filter_map(|cause| cause.downcast_ref()))
+}
+
+pub fn error_code(error: &Error) -> &'static str {
+    let permission_denied = error.chain().any(|cause| {
+        cause.downcast_ref::<std::io::Error>().is_some_and(|error| {
+            error.kind() == std::io::ErrorKind::PermissionDenied
+        })
+    });
+
+    if error_kinds(error)
+        .any(|kind| matches!(kind, ErrorKind::DirectoryMoveFailed))
+    {
+        if error_kinds(error)
+            .any(|kind| matches!(kind, ErrorKind::NotEnoughSpace { .. }))
+        {
+            "directory_move_no_space"
+        } else if permission_denied {
+            "directory_move_permission_denied"
+        } else {
+            "directory_move_failed"
+        }
+    } else if permission_denied {
+        "permission_denied"
+    } else if let Some(kind) = error.downcast_ref::<ErrorKind>() {
+        kind.code()
+    } else if let Some(error) =
+        error.downcast_ref::<MinecraftAuthenticationError>()
+    {
+        error.code()
+    } else if error.is::<LabrinthError>() {
+        "api_error"
+    } else if error.is::<reqwest::Error>()
+        || error.is::<tungstenite::Error>()
+        || error.is::<ResolveError>()
+    {
+        "network_error"
+    } else if error.is::<JREError>() {
+        "java_error"
+    } else if error.is::<daedalus::Error>() {
+        "metadata_error"
+    } else if error.is::<ZipError>() {
+        "archive_error"
+    } else if error.is::<serde::de::value::Error>()
+        || error.is::<StripPrefixError>()
+    {
+        "path_error"
+    } else if error.is::<IOError>() || error.is::<std::io::Error>() {
+        "filesystem_error"
+    } else if error.is::<serde_ini::de::Error>()
+        || error.is::<serde_json::Error>()
+    {
+        "parse_error"
+    } else if error.is::<sqlx::Error>() || error.is::<MigrateError>() {
+        "database_error"
+    } else {
+        "internal_error"
     }
 }
 

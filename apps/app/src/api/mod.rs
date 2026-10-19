@@ -1,6 +1,6 @@
 use serde::ser::SerializeStruct;
 use serde::{Serialize, Serializer};
-use theseus::ErrorKind;
+use theseus::error_code;
 
 pub mod auth;
 pub mod import;
@@ -54,27 +54,9 @@ impl Serialize for CommandError {
     {
         tracing::warn!("{:?}", self.0);
 
-        let (code, reason) = match self.0.downcast_ref::<ErrorKind>() {
-            Some(ErrorKind::SharedInstanceUnavailable(reason)) => {
-                (Some("shared_instance_unavailable"), Some(reason))
-            }
-            Some(ErrorKind::SharedInstancesApiError(_)) => {
-                (Some("shared_instances_api_error"), None)
-            }
-            _ => (None, None),
-        };
-
-        let mut state = serializer.serialize_struct(
-            "CommandError",
-            1 + usize::from(code.is_some()) + usize::from(reason.is_some()),
-        )?;
-        state.serialize_field("message", &self.0.to_string())?;
-        if let Some(code) = code {
-            state.serialize_field("code", code)?;
-        }
-        if let Some(reason) = reason {
-            state.serialize_field("reason", reason)?;
-        }
+        let mut state = serializer.serialize_struct("CommandError", 2)?;
+        state.serialize_field("message", &format!("{:#}", self.0))?;
+        state.serialize_field("code", error_code(&self.0))?;
         state.end()
     }
 }

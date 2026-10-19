@@ -187,8 +187,7 @@ pub fn export_app_event_bindings(
             crate::install::model::InstallApiErrorDetails,
             crate::install::InstallErrorContext,
             crate::api::pack::import::ImportLauncherType,
-            crate::state::ModLoader,
-            crate::SharedInstanceUnavailableReason
+            crate::state::ModLoader
         ),
     )?;
     fix_postcard_javascript_utf8(&output.join("postcard/index.js"))?;

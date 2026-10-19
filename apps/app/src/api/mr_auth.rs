@@ -52,9 +52,7 @@ pub async fn modrinth_login<R: Runtime>(
         })?;
 
     let Some(auth_code) = reply.wait().await? else {
-        return Err(theseus::ErrorKind::OtherError("Login canceled".into())
-            .as_error()
-            .into());
+        return Err(theseus::ErrorKind::LoginCanceled.as_error().into());
     };
     let session_token = seal.open(&auth_code)?;
     let credentials = mr_auth::authenticate_finish_flow(&session_token).await?;

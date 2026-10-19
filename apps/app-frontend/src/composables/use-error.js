@@ -1,7 +1,5 @@
 import { reactive } from 'vue'
 
-import { findMinecraftAuthError } from '@/components/ui/minecraft-auth-error-modal/minecraft-auth-errors'
-
 const errorState = reactive({
 	errorModal: null,
 	minecraftAuthErrorModal: null,
@@ -16,21 +14,11 @@ const errorState = reactive({
 		this.minecraftRequiredModal = ref
 	},
 	showError(error, context, closable = true, source = null) {
-		const errorMessage = error.message?.toLowerCase()
-		if (
-			(errorMessage?.includes('user is not logged in') ||
-				errorMessage?.includes('cannot play instance since minecraft is required')) &&
-			this.minecraftRequiredModal
-		) {
+		if (error.code === 'not_logged_in' && this.minecraftRequiredModal) {
 			this.minecraftRequiredModal.show()
 			return
 		}
-		if (
-			error.message &&
-			(error.message.includes('Minecraft authentication error:') ||
-				findMinecraftAuthError(error.message)) &&
-			this.minecraftAuthErrorModal
-		) {
+		if (error.code?.startsWith('minecraft_auth_') && this.minecraftAuthErrorModal) {
 			this.minecraftAuthErrorModal.show(error)
 			return
 		}

@@ -839,7 +839,7 @@ async fn apply_instance_inner(
                         error.downcast_ref::<crate::ErrorKind>(),
                         Some(
                             crate::ErrorKind::PackSyncChanged
-                                | crate::ErrorKind::Ratelimited { .. }
+                                | crate::ErrorKind::RateLimited { .. }
                         )
                     ) =>
                 {

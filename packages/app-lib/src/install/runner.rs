@@ -22,7 +22,7 @@ use crate::api::pack::install_from::{
 use crate::api::pack::install_mrpack::{
     install_zipped_mrpack_files_with_reporter, mrpack_instance_paths,
 };
-use crate::event::EventError;
+use crate::error_code;
 use crate::event::InstancePayloadType;
 use crate::event::emit::emit_instance;
 use crate::state::instances::adapters::sqlite::content_rows;
@@ -32,21 +32,12 @@ use crate::state::{
     ModLoader, ProjectType, State,
 };
 use crate::util::fetch::DownloadReason;
-use crate::util::io::IOError;
-use crate::util::jre::JREError;
-use async_tungstenite::tungstenite;
-use async_zip::error::ZipError;
 use sqlx::SqlitePool;
-use sqlx::migrate::MigrateError;
 use std::collections::{HashMap, HashSet};
 use std::future::Future;
-use std::path::{PathBuf, StripPrefixError};
+use std::path::PathBuf;
 use std::sync::{Arc, LazyLock, Mutex, Weak};
-use tokio::sync::oneshot::error::RecvError;
-use tokio::sync::{
-    AcquireError, Mutex as AsyncMutex, MutexGuard, OwnedMutexGuard,
-};
-use tokio::task::JoinError;
+use tokio::sync::{Mutex as AsyncMutex, MutexGuard, OwnedMutexGuard};
 use uuid::Uuid;
 
 /// Game settings files that pack updates prepare, detach or replace.
@@ -1990,18 +1981,12 @@ fn install_error_view(
     error: &crate::Error,
     context: Option<InstallErrorContext>,
 ) -> InstallErrorView {
-    let mut view = InstallErrorView::from_error(
+    InstallErrorView::from_error(
         install_error_code(phase, error),
         phase,
         error,
         context,
-    );
-    if let Some(ErrorKind::SharedInstanceUnavailable(reason)) =
-        error.downcast_ref()
-    {
-        view.reason = Some(*reason);
-    }
-    view
+    )
 }
 
 fn install_error_code(
@@ -2010,105 +1995,34 @@ fn install_error_code(
 ) -> &'static str {
     use InstallPhaseId::*;
 
-    let Some(kind) = error.downcast_ref::<ErrorKind>() else {
-        return library_error_code(phase, error);
-    };
-
-    match kind {
-        ErrorKind::SharedInstanceUnavailable(_) => {
-            "shared_instance_unavailable"
+    match error.downcast_ref::<ErrorKind>() {
+        Some(ErrorKind::InputError(_) | ErrorKind::ContentStoreError(_)) => {
+            match phase {
+                PreparingInstance | Finalizing => "instance_error",
+                ResolvingPack | DownloadingPackFile | ReadingPackManifest => {
+                    "pack_error"
+                }
+                DownloadingContent => "content_error",
+                ExtractingOverrides => "path_error",
+                PreparingJava => "java_error",
+                DownloadingMinecraft => "instance_error",
+                RollingBack => "rollback_error",
+                ResolvingMinecraft
+                | ResolvingLoader
+                | RunningLoaderProcessors => "launcher_error",
+            }
         }
-        ErrorKind::SharedInstancesApiError(_) => "shared_instances_api_error",
-        ErrorKind::InputError(_) => match phase {
-            PreparingInstance | Finalizing => "instance_error",
-            ResolvingPack | DownloadingPackFile | ReadingPackManifest => {
-                "pack_error"
-            }
-            DownloadingContent => "content_error",
-            ExtractingOverrides => "path_error",
-            PreparingJava => "java_error",
-            DownloadingMinecraft => "instance_error",
-            RollingBack => "rollback_error",
-            ResolvingMinecraft | ResolvingLoader | RunningLoaderProcessors => {
-                "launcher_error"
-            }
-        },
-        ErrorKind::LauncherError(_) => match phase {
+        Some(ErrorKind::LauncherError(_)) => match phase {
             RunningLoaderProcessors => "processor_error",
             PreparingJava => "java_error",
             ResolvingLoader => "loader_error",
             _ => "launcher_error",
         },
-        ErrorKind::JREError(_) => "java_error",
-        ErrorKind::NoValueFor(_) | ErrorKind::MetadataError(_) => {
-            metadata_error_code(phase)
-        }
-        ErrorKind::FetchError(_)
-        | ErrorKind::ApiIsDownError(_)
-        | ErrorKind::WSError(_)
-        | ErrorKind::WSClosedError(_)
-        | ErrorKind::Ratelimited { .. } => "network_error",
-        ErrorKind::LabrinthError(_) => "api_error",
-        ErrorKind::HashError(_, _) => "hash_error",
-        ErrorKind::ZipError(_) => "archive_error",
-        ErrorKind::DeserializationError(_) | ErrorKind::StripPrefixError(_) => {
-            "path_error"
-        }
-        ErrorKind::FSError(_)
-        | ErrorKind::IOError(_)
-        | ErrorKind::StdIOError(_)
-        | ErrorKind::UTFError(_) => "filesystem_error",
-        ErrorKind::INIError(_) | ErrorKind::JSONError(_) => "parse_error",
-        ErrorKind::Sqlx(_) | ErrorKind::SqlxMigrate(_) => "database_error",
-        ErrorKind::JoinError(_)
-        | ErrorKind::RecvError(_)
-        | ErrorKind::AcquireError(_)
-        | ErrorKind::EventError(_) => "internal_error",
-        ErrorKind::OtherError(_) => "internal_error",
-        _ => "unknown_error",
-    }
-}
-
-fn library_error_code(
-    phase: InstallPhaseId,
-    error: &crate::Error,
-) -> &'static str {
-    if error.is::<reqwest::Error>() || error.is::<tungstenite::Error>() {
-        "network_error"
-    } else if error.is::<JREError>() {
-        "java_error"
-    } else if error.is::<daedalus::Error>() {
-        metadata_error_code(phase)
-    } else if error.is::<ZipError>() {
-        "archive_error"
-    } else if error.is::<serde::de::value::Error>()
-        || error.is::<StripPrefixError>()
-    {
-        "path_error"
-    } else if error.is::<IOError>() || error.is::<std::io::Error>() {
-        "filesystem_error"
-    } else if error.is::<serde_ini::de::Error>()
-        || error.is::<serde_json::Error>()
-    {
-        "parse_error"
-    } else if error.is::<sqlx::Error>() || error.is::<MigrateError>() {
-        "database_error"
-    } else if error.is::<JoinError>()
-        || error.is::<RecvError>()
-        || error.is::<AcquireError>()
-        || error.is::<EventError>()
-    {
-        "internal_error"
-    } else {
-        "unknown_error"
-    }
-}
-
-fn metadata_error_code(phase: InstallPhaseId) -> &'static str {
-    match phase {
-        InstallPhaseId::ResolvingLoader => "loader_error",
-        InstallPhaseId::PreparingJava => "java_error",
-        _ => "metadata_error",
+        _ => match (error_code(error), phase) {
+            ("metadata_error", ResolvingLoader) => "loader_error",
+            ("metadata_error", PreparingJava) => "java_error",
+            (code, _) => code,
+        },
     }
 }
 
