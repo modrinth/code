@@ -58,6 +58,8 @@ services:
       timeout: 5s
       retries: 10
   minecraft-meta-s3-init:
+    profiles:
+      - minecraft-meta-init
     image: docker.io/amazon/aws-cli:2.34.0
     container_name: labrinth-minecraft-meta-s3-init
     environment:
