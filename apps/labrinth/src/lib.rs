@@ -57,6 +57,7 @@ pub struct Pepper {
 pub struct LabrinthConfig {
     pub pool: PgPool,
     pub ro_pool: ReadOnlyPgPool,
+	pub minecraft_meta_db: web::Data<database::MinecraftMetaDb>,
     pub redis_pool: RedisPool,
     pub clickhouse: Client,
     pub file_host: web::Data<dyn file_hosting::FileHost>,
@@ -82,6 +83,7 @@ pub struct LabrinthConfig {
 pub fn app_setup(
     pool: PgPool,
     ro_pool: ReadOnlyPgPool,
+	minecraft_meta_db: web::Data<database::MinecraftMetaDb>,
     redis_pool: RedisPool,
     search_backend: actix_web::web::Data<dyn search::SearchBackend>,
     clickhouse: &mut Client,
@@ -249,6 +251,7 @@ pub fn app_setup(
     LabrinthConfig {
         pool,
         ro_pool,
+		minecraft_meta_db,
         redis_pool,
         clickhouse: clickhouse.clone(),
         file_host,
@@ -301,6 +304,7 @@ pub fn app_data_config(
     .app_data(web::Data::new(labrinth_config.redis_pool.clone()))
     .app_data(web::Data::new(labrinth_config.pool.clone()))
     .app_data(web::Data::new(labrinth_config.ro_pool.clone()))
+	.app_data(labrinth_config.minecraft_meta_db.clone())
     .app_data(labrinth_config.file_host.clone())
     .app_data(web::Data::from(
         labrinth_config.search_state.backend.clone(),
