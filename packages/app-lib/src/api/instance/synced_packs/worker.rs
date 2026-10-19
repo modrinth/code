@@ -3,8 +3,10 @@ use super::super::synced_options::{
 };
 use super::PackLibrary;
 use super::storage::{read_library, write_library};
+use crate::ErrorKind;
 use crate::state::instances::adapters::{filesystem, sqlite::content_rows};
 use crate::state::{InstanceMetadata, State};
+use anyhow::{Context, bail};
 use parking_lot::Mutex;
 use std::collections::{BTreeMap, BTreeSet};
 use std::future::Future;
@@ -58,10 +60,10 @@ pub(crate) async fn flush(instance_id: &str) -> Result<(), Arc<crate::Error>> {
             let remaining = retry_at.saturating_duration_since(Instant::now());
             if !remaining.is_zero() {
                 return Err(Arc::new(
-                    crate::ErrorKind::RateLimited {
+                    ErrorKind::RateLimited {
                         retry_in: remaining,
                     }
-                    .as_error(),
+                    .into(),
                 ));
             }
         }
@@ -73,13 +75,9 @@ pub(crate) async fn flush(instance_id: &str) -> Result<(), Arc<crate::Error>> {
             .push(sender);
     }
     start(state);
-    receiver.await.map_err(|_| {
-        crate::ErrorKind::OtherError(
-            "Pack sync worker stopped before completing the request."
-                .to_owned(),
-        )
-        .as_error()
-    })?
+    receiver
+        .await
+        .context("pack sync worker stopped before completing the request")?
 }
 
 fn start(state: Arc<State>) {
@@ -229,7 +227,7 @@ impl<'a> Preparation<'a> {
             != revision
             || fingerprint(self.metadata, self.state).await? != before
         {
-            return Err(crate::ErrorKind::PackSyncChanged.into());
+            bail!(ErrorKind::PackSyncChanged);
         }
         result
     }
@@ -243,7 +241,7 @@ impl<'a> Preparation<'a> {
         if current.as_ref().is_none_or(|current| {
             metadata_key(current) != metadata_key(self.metadata)
         }) {
-            return Err(crate::ErrorKind::PackSyncChanged.into());
+            bail!(ErrorKind::PackSyncChanged);
         }
         Ok(())
     }

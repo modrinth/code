@@ -28,7 +28,7 @@ async fn prepare_copy(path: &Path) -> crate::Result<PreparedCopy> {
     let path = path.to_path_buf();
     tokio::task::spawn_blocking(move || -> crate::Result<PreparedCopy> {
         let parent = path.parent().ok_or_else(|| {
-            ErrorKind::ContentStoreError("Invalid content path".into())
+            ErrorKind::ContentStoreError("invalid content path".into())
         })?;
         let mut source = std::fs::File::open(&path)?;
         let metadata = source.metadata()?;
@@ -36,7 +36,7 @@ async fn prepare_copy(path: &Path) -> crate::Result<PreparedCopy> {
             || std::fs::symlink_metadata(&path)?.file_type().is_symlink()
         {
             bail!(ErrorKind::ContentStoreError(
-                "Managed content is not a regular file".into()
+                "managed content is not a regular file".into()
             ));
         }
         filesystem::require_staging_space(parent, metadata.len())?;
@@ -256,13 +256,13 @@ async fn migrate_file_copy(
     if prepared.hashes.sha512 != binding.blob_sha512 {
         if binding.storage_kind != FileStorageKind::Hardlink {
             bail!(ErrorKind::ContentStoreError(
-                "Changed instance content must be re-imported before migration"
+                "changed instance content must be re-imported before migration"
                     .into(),
             ));
         }
         if store.any_instance_running(state).await? {
             bail!(ErrorKind::ContentStoreError(
-                "Stop Minecraft instances before repairing shared content"
+                "stop Minecraft instances before repairing shared content"
                     .into(),
             ));
         }
@@ -270,7 +270,7 @@ async fn migrate_file_copy(
             .await?
             .ok_or_else(|| {
                 ErrorKind::ContentStoreError(
-                    "Managed content has no stored file record".into(),
+                    "managed content has no stored file record".into(),
                 )
             })?;
         if store.is_healthy(&stored, true).await? {
@@ -291,7 +291,7 @@ async fn migrate_file_copy(
             }
             if sources.is_empty() {
                 bail!(ErrorKind::ContentStoreError(
-                    "Damaged shared content must be re-imported before migration"
+                    "damaged shared content must be re-imported before migration"
                         .into(),
                 ));
             }
@@ -303,14 +303,14 @@ async fn migrate_file_copy(
             != InstanceFileStatus::Healthy
         {
             bail!(ErrorKind::ContentStoreError(
-                "Damaged instance content could not be repaired before migration"
+                "damaged instance content could not be repaired before migration"
                     .into(),
             ));
         }
         return Ok(false);
     }
     let parent = path.parent().ok_or_else(|| {
-        ErrorKind::ContentStoreError("Invalid content path".into())
+        ErrorKind::ContentStoreError("invalid content path".into())
     })?;
     let bytes = prepared.hashes.size;
     let temporary = prepared.temporary;

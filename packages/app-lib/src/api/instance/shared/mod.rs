@@ -15,6 +15,7 @@ use crate::util::fetch::{
     INSECURE_NO_TIMEOUT_REQWEST_CLIENT, INSECURE_REQWEST_CLIENT,
     NO_TIMEOUT_REQWEST_CLIENT, REQWEST_CLIENT,
 };
+use anyhow::{Context, bail};
 use chrono::{DateTime, Utc};
 use modrinth_content_management::{
     Change, CommonExternalFilePolicy, ConfigurationDiff,
@@ -62,40 +63,34 @@ pub(crate) fn read_bounded_config_bundle_entry(
     let remaining = MAX_CONFIG_BUNDLE_TOTAL_SIZE.saturating_sub(*total_size);
     let entry_limit = MAX_CONFIG_BUNDLE_FILE_SIZE.min(remaining);
     if declared_size > entry_limit {
-        return Err(crate::ErrorKind::InputError(
-            "Shared instance config bundle exceeds the uncompressed size limit"
+        bail!(crate::ErrorKind::InputError(
+            "shared instance config bundle exceeds the uncompressed size limit"
                 .to_string(),
-        )
-        .into());
+        ));
     }
 
-    let capacity = usize::try_from(declared_size).map_err(|_| {
+    let capacity = usize::try_from(declared_size).context(
         crate::ErrorKind::InputError(
-            "Shared instance config bundle entry is too large".to_string(),
-        )
-    })?;
+            "shared instance config bundle entry is too large".to_string(),
+        ),
+    )?;
     let mut bytes = Vec::with_capacity(capacity);
     reader
         .take(entry_limit.saturating_add(1))
         .read_to_end(&mut bytes)
-        .map_err(|error| {
-            crate::ErrorKind::OtherError(format!(
-                "Failed to read shared instance config bundle: {error}"
-            ))
-        })?;
+        .context("failed to read shared instance config bundle")?;
     let actual_size = bytes.len() as u64;
     if actual_size > entry_limit {
-        return Err(crate::ErrorKind::InputError(
-            "Shared instance config bundle exceeds the uncompressed size limit"
+        bail!(crate::ErrorKind::InputError(
+            "shared instance config bundle exceeds the uncompressed size limit"
                 .to_string(),
-        )
-        .into());
+        ));
     }
-    *total_size = total_size.checked_add(actual_size).ok_or_else(|| {
+    *total_size = total_size.checked_add(actual_size).ok_or(
         crate::ErrorKind::InputError(
-            "Shared instance config bundle size overflowed".to_string(),
-        )
-    })?;
+            "shared instance config bundle size overflowed".to_string(),
+        ),
+    )?;
 
     Ok(bytes)
 }

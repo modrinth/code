@@ -205,7 +205,7 @@ impl ContentStore {
         let path = self.instance_path(instance_path, &relative_path).await?;
         if !filesystem::is_regular_file(&path, false).await? {
             bail!(ErrorKind::ContentStoreError(
-                "Only regular content files can be read".into()
+                "only regular content files can be read".into()
             ));
         }
         Ok(ReadableContent::Local(path))

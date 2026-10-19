@@ -1,5 +1,5 @@
 use crate::ErrorKind;
-use anyhow::bail;
+use anyhow::{Context, bail};
 use itertools::Itertools;
 use std::path::{Component, Path, PathBuf};
 
@@ -9,7 +9,7 @@ pub(crate) fn validate_digest(hash: &str, length: usize) -> crate::Result<()> {
             .bytes()
             .all(|byte| byte.is_ascii_digit() || (b'a'..=b'f').contains(&byte))
     {
-        bail!(ErrorKind::ContentStoreError("Invalid content hash".into()));
+        bail!(ErrorKind::ContentStoreError("invalid content hash".into()));
     }
     Ok(())
 }
@@ -35,7 +35,7 @@ pub(crate) fn validate_relative(path: &str) -> crate::Result<()> {
             .any(|part| !matches!(part, Component::Normal(_)))
     {
         bail!(ErrorKind::ContentStoreError(format!(
-            "Invalid instance-relative path: {path:?}"
+            "invalid instance-relative path {path:?}"
         )));
     }
     Ok(())
@@ -47,12 +47,9 @@ pub(crate) fn validate_instance_path(path: &str) -> crate::Result<()> {
         .split('/')
         .map(|part| part.trim_end_matches(['.', ' ']))
         .join("/");
-    validate_relative(&normalized).map_err(|_| {
-        ErrorKind::ContentStoreError(format!(
-            "Invalid instance folder path: {path:?}"
-        ))
-    })?;
-    Ok(())
+    validate_relative(&normalized).context(ErrorKind::ContentStoreError(
+        format!("invalid instance folder path {path:?}"),
+    ))
 }
 
 pub(crate) fn is_managed_content_path(path: &str) -> bool {

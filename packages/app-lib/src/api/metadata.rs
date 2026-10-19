@@ -1,5 +1,5 @@
-use crate::State;
 use crate::state::CachedEntry;
+use crate::{ErrorKind, State};
 pub use daedalus::minecraft::VersionManifest;
 pub use daedalus::modded::Manifest;
 
@@ -12,9 +12,7 @@ pub async fn get_minecraft_versions() -> crate::Result<VersionManifest> {
         &state.api_semaphore,
     )
     .await?
-    .ok_or_else(|| {
-        crate::ErrorKind::NoValueFor("minecraft versions".to_string())
-    })?;
+    .ok_or(ErrorKind::NoValueFor("minecraft versions".to_string()))?;
 
     Ok(minecraft_versions)
 }
@@ -31,9 +29,7 @@ pub async fn get_loader_versions(loader: &str) -> crate::Result<Manifest> {
         &state.api_semaphore,
     )
     .await?
-    .ok_or_else(|| {
-        crate::ErrorKind::NoValueFor(format!("{loader} loader versions"))
-    })?;
+    .ok_or(ErrorKind::NoValueFor(format!("{loader} loader versions")))?;
 
     Ok(loaders.manifest)
 }

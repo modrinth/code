@@ -81,7 +81,7 @@ impl ContentStore {
             != Some("1")
         {
             bail!(ErrorKind::ContentStoreError(
-                "Finish shared-store migration before launching Minecraft"
+                "finish shared-store migration before launching Minecraft"
                     .into(),
             ));
         }
@@ -97,7 +97,7 @@ impl ContentStore {
                     .await?;
                 if symlink_metadata_if_exists(&active_path).await?.is_some() {
                     bail!(ErrorKind::ContentStoreError(format!(
-                        "Disabled content {} has an unexpected active file",
+                        "disabled content {} has an unexpected active file",
                         file.relative_path
                     )));
                 }
@@ -135,7 +135,7 @@ impl ContentStore {
             let file =
                 files.get(binding.file_id.as_str()).ok_or_else(|| {
                     ErrorKind::ContentStoreError(
-                        "Rollback content reference has no file record".into(),
+                        "rollback content reference has no file record".into(),
                     )
                 })?;
             if missing_file_ids.contains(&binding.file_id) {
@@ -159,7 +159,7 @@ impl ContentStore {
                 .await?
                 .ok_or_else(|| {
                     ErrorKind::ContentStoreError(
-                        "Rollback content needs repair or re-import".into(),
+                        "rollback content needs repair or re-import".into(),
                     )
                 })?;
             let path = self
@@ -175,7 +175,7 @@ impl ContentStore {
                 InstanceFileStatus::Missing => {}
                 InstanceFileStatus::Conflict => {
                     bail!(ErrorKind::ContentStoreError(
-                        "Rollback destination contains different content"
+                        "rollback destination contains different content"
                             .into(),
                     ));
                 }

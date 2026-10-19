@@ -1,3 +1,4 @@
+use crate::ErrorKind;
 use sqlx::sqlite::{SqliteConnectOptions, SqliteConnection};
 use sqlx::{ConnectOptions, Connection};
 use std::path::{Path, PathBuf};
@@ -175,8 +176,8 @@ pub fn app_db_backup_dir() -> crate::Result<PathBuf> {
     }
 
     let base = dirs::data_local_dir().or_else(dirs::data_dir).ok_or(
-        crate::ErrorKind::FSError(
-            "Could not find valid data dir for app database backups"
+        ErrorKind::FSError(
+            "could not find valid data dir for app database backups"
                 .to_string(),
         ),
     )?;
@@ -293,7 +294,7 @@ async fn create_sqlite_snapshot(
 ) -> crate::Result<()> {
     let backup_path = backup_path
         .to_str()
-        .ok_or_else(|| crate::ErrorKind::UTFError(backup_path.to_path_buf()))?;
+        .ok_or(ErrorKind::UTFError(backup_path.to_path_buf()))?;
 
     sqlx::query!("VACUUM INTO ?", backup_path)
         .execute(&mut *conn)

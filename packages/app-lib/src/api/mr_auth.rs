@@ -1,4 +1,5 @@
 use crate::state::{FeatureFlag, ModrinthCredentials, Settings};
+use anyhow::bail;
 use serde::Deserialize;
 
 const LOCALHOST_LOGIN_URL: &str = "http://localhost:3000/auth/sign-in";
@@ -81,10 +82,7 @@ pub async fn set_active(user_id: &str) -> crate::Result<()> {
     let Some(mut creds) =
         users.into_iter().find(|creds| creds.user_id == user_id)
     else {
-        return Err(crate::ErrorKind::OtherError(format!(
-            "Tried to activate nonexistent Modrinth user with ID {user_id}"
-        ))
-        .as_error());
+        bail!("tried to activate nonexistent Modrinth user with ID {user_id}");
     };
 
     creds.active = true;
