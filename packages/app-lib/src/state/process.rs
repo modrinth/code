@@ -223,9 +223,13 @@ impl ProcessManager {
             writeln!(log_file).map_err(|e| IOError::with_path(e, &log_path))?;
         }
 
-        let command =
+        let mut command =
             modrinth_sandbox::minecraft::setup_minecraft_command(mc_command)
                 .await?;
+        let synced_options_dir =
+            crate::State::get().await?.directories.synced_options_dir();
+        command.ensure_dirs_exist.push(synced_options_dir.clone());
+        command.read_write_paths.push(synced_options_dir);
         info!("spawning Minecraft process using sandbox {sandbox_env:?}");
         let mut mc_proc = sandbox_env.spawn(command).await?;
         let child_pid = mc_proc.id();
