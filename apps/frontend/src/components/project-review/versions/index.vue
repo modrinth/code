@@ -94,12 +94,14 @@
 
 <script setup lang="ts">
 import { ListChevronsDownUpIcon, ListChevronsUpDownIcon } from '@modrinth/assets'
+import { moderationSettings } from '@modrinth/moderation'
 import { Button, useVIntl } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, useTemplateRef } from 'vue'
 
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
 import ProjectC2paScanModal from '~/components/ui/moderation/ProjectC2paScanModal.vue'
+import { useModerationSettings } from '~/composables/moderation'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 import { injectReviewPanels } from '~/providers/project-review/review-panels'
 import type { ManageVersionHost } from '~/providers/version/manage-version-modal'
@@ -146,8 +148,15 @@ const editorHost = computed<ManageVersionHost | undefined>(() => {
 	}
 })
 const expanded = ref<Set<string> | null>(null)
+const settings = useModerationSettings()
 const expandedIds = computed(
-	() => expanded.value ?? new Set(versions.value[0] ? [versions.value[0].id] : []),
+	() =>
+		expanded.value ??
+		new Set(
+			settings.value.get(moderationSettings.General.ExpandVersionDetailsByDefault) && versions.value[0]
+				? [versions.value[0].id]
+				: [],
+		),
 )
 const fileCount = computed(() =>
 	versions.value.reduce((count, version) => count + version.files.length, 0),

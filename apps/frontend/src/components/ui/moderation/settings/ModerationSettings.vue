@@ -33,9 +33,13 @@ const messages = defineMessages({
 		id: 'moderation.settings.workflow',
 		defaultMessage: 'Review workflow and queue',
 	},
+	panels: {
+		id: 'moderation.settings.panels',
+		defaultMessage: 'Panels',
+	},
 	appearance: {
 		id: 'moderation.settings.appearance',
-		defaultMessage: 'Panels and appearance',
+		defaultMessage: 'Appearance',
 	},
 	shortcuts: {
 		id: 'moderation.settings.shortcuts',
@@ -69,12 +73,21 @@ const groups = [
 		],
 	},
 	{
-		id: 'appearance',
-		title: messages.appearance,
+		id: 'panels',
+		title: messages.panels,
 		settings: [
 			general.LinkInfoPlacement,
 			general.ShowFloatingPanelFieldHoverHighlight,
 			general.ShowInlinePanelHoverHighlight,
+		],
+	},
+	{
+		id: 'appearance',
+		title: messages.appearance,
+		settings: [
+			general.ExpandVersionDetailsByDefault,
+			general.ExpandVersionDependenciesByDefault,
+			general.ExpandVersionChangelogByDefault,
 			general.EnableDelayedHoverMessagePreviews,
 			general.PrivateMessageHighlight,
 		],

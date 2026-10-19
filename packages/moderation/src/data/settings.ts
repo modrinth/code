@@ -79,6 +79,27 @@ const settings = {
 			description: 'Add a background highlight to private messages and issue history in threads.',
 			default: true,
 		}),
+		ExpandVersionDetailsByDefault: setting.asToggle({
+			type: 'toggle',
+			id: 'expand-version-details-by-default',
+			title: 'Expand version details by default',
+			description: 'Expand the latest version’s Details section automatically in project review.',
+			default: true,
+		}),
+		ExpandVersionDependenciesByDefault: setting.asToggle({
+			type: 'toggle',
+			id: 'expand-version-dependencies-by-default',
+			title: 'Expand version dependencies by default',
+			description: 'Expand dependencies automatically when viewing version details in project review.',
+			default: true,
+		}),
+		ExpandVersionChangelogByDefault: setting.asToggle({
+			type: 'toggle',
+			id: 'expand-version-changelog-by-default',
+			title: 'Expand version changelog by default',
+			description: 'Expand the changelog automatically when viewing version details in project review.',
+			default: true,
+		}),
 		SlicerButtonInVersions: setting.asToggle({
 			type: 'toggle',
 			id: 'slicer-button-in-versions',

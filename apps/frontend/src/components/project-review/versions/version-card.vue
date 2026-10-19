@@ -181,7 +181,7 @@
 						<div ref="dependenciesSection" class="min-w-0">
 							<h3 class="sticky top-0 z-10 m-0 bg-surface-2 py-2 text-sm font-medium text-primary">
 								<button
-									v-if="version.dependencies.length > 6"
+									v-if="version.dependencies.length > 0"
 									type="button"
 									class="flex w-full cursor-pointer items-center gap-1 border-0 bg-transparent p-0 text-left text-sm font-medium text-primary hover:brightness-125"
 									:aria-expanded="dependenciesOpen"
@@ -207,11 +207,11 @@
 								:id="`review-version-dependencies-${version.id}`"
 								class="grid transition-[grid-template-rows] duration-150 ease-out motion-reduce:transition-none"
 								:class="
-									version.dependencies.length <= 6 || dependenciesOpen
+									!version.dependencies.length || dependenciesOpen
 										? 'grid-rows-[1fr]'
 										: 'grid-rows-[0fr]'
 								"
-								:inert="version.dependencies.length > 6 && !dependenciesOpen"
+								:inert="version.dependencies.length > 0 && !dependenciesOpen"
 							>
 								<div class="-mx-1 min-h-0 overflow-hidden px-1">
 									<Input
@@ -284,7 +284,9 @@
 						<Accordion
 							v-if="detailQuery.data.value?.changelog"
 							ref="changelogAccordion"
-							open-by-default
+							:open-by-default="
+								settings.get(moderationSettings.General.ExpandVersionChangelogByDefault)
+							"
 							button-class="sticky top-0 z-10 w-full cursor-pointer border-0 bg-surface-2 py-2 text-left text-sm font-medium hover:[&>div]:brightness-125 [&>div>svg]:ml-0 [&>div>svg]:size-4"
 						>
 							<template #title>
@@ -329,6 +331,7 @@ import {
 	SearchIcon,
 	SpinnerIcon,
 } from '@modrinth/assets'
+import { moderationSettings } from '@modrinth/moderation'
 import {
 	Accordion,
 	AutoLink,
@@ -362,6 +365,7 @@ import { useQuery } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
 import EditVersionMenu from '~/components/ui/create-project-version/EditVersionMenu.vue'
+import { useModerationSettings } from '~/composables/moderation'
 import { projectQueryOptions } from '~/composables/queries/project'
 import { versionQueryOptions } from '~/composables/queries/version'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
@@ -402,7 +406,10 @@ const loadingSlicerButton = computed(() => {
 		? request.button
 		: undefined
 })
-const dependenciesOpen = ref(true)
+const settings = useModerationSettings()
+const dependenciesOpen = ref(
+	settings.value.get(moderationSettings.General.ExpandVersionDependenciesByDefault),
+)
 const dependencySearch = ref('')
 const card = ref<HTMLElement>()
 const dependenciesSection = ref<HTMLElement>()
@@ -421,7 +428,7 @@ useReviewInteraction({
 })
 useReviewInteraction({
 	element: () =>
-		props.expanded && props.version.dependencies.length > 6 ? dependenciesSection.value : null,
+		props.expanded && props.version.dependencies.length > 0 ? dependenciesSection.value : null,
 	collapse: () => {
 		dependenciesOpen.value = !dependenciesOpen.value
 	},
