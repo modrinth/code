@@ -12,9 +12,9 @@
 
 use std::{net::SocketAddr, sync::Mutex, time::Duration};
 
+use anyhow::{Context, anyhow, bail};
 use hyper::body::Incoming;
 use hyper_util::rt::{TokioIo, TokioTimer};
-use theseus::ErrorKind;
 use theseus::prelude::tcp_listen_any_loopback;
 use tokio::sync::oneshot;
 use tokio::task::JoinHandle;
@@ -78,11 +78,7 @@ impl AuthReplySession {
     pub async fn wait(&mut self) -> Result<Option<String>, theseus::Error> {
         let result = tokio::select! {
             localhost_result = &mut self.listener => {
-                localhost_result.map_err(|error| {
-                    ErrorKind::OtherError(format!(
-                        "Auth code listener stopped: {error}"
-                    ))
-                })?
+                localhost_result.context("auth code listener stopped")?
             }
             deeplink_result = &mut self.deeplink_rx => {
                 self.listener.abort();
@@ -182,7 +178,7 @@ fn clear_pending_auth(nonce: &str) {
 }
 
 fn auth_listener_stopped() -> theseus::Error {
-    ErrorKind::OtherError("Auth code listener stopped".into()).into()
+    anyhow!("auth code listener stopped")
 }
 
 pub fn normalize_deep_link_command(command: &str) -> String {
@@ -208,25 +204,24 @@ async fn listen(
     let listener = match tcp_listen_any_loopback().await {
         Ok(listener) => {
             listen_socket_tx
-                .send(listener.local_addr().map_err(|e| {
-                    ErrorKind::OtherError(format!(
-                        "Failed to get auth code reply socket address: {e}"
-                    ))
-                    .into()
-                }))
+                .send(
+                    listener.local_addr().context(
+                        "failed to get auth code reply socket address",
+                    ),
+                )
                 .ok();
 
             listener
         }
-        Err(e) => {
-            let error_msg =
-                format!("Failed to bind auth code reply socket: {e}");
-
+        Err(error) => {
+            let cause = error.to_string();
             listen_socket_tx
-                .send(Err(ErrorKind::OtherError(error_msg.clone()).into()))
+                .send(
+                    Err(error).context("failed to bind auth code reply socket"),
+                )
                 .ok();
 
-            return Err(ErrorKind::OtherError(error_msg).into());
+            bail!("failed to bind auth code reply socket: {cause}");
         }
     };
 

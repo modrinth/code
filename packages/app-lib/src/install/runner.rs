@@ -32,6 +32,7 @@ use crate::state::{
     ModLoader, ProjectType, State,
 };
 use crate::util::fetch::DownloadReason;
+use anyhow::{Context, bail};
 use sqlx::SqlitePool;
 use std::collections::{HashMap, HashSet};
 use std::future::Future;
@@ -77,14 +78,11 @@ fn reserve_target(
         } => instance_id,
         InstallTarget::NewInstance { instance_id: None } => return Ok(None),
     };
-    target_lock(instance_id)
-        .try_lock_owned()
-        .map(Some)
-        .map_err(|_| {
-            crate::state::content_store::input(
-                "This instance already has an active install job",
-            )
-        })
+    target_lock(instance_id).try_lock_owned().map(Some).context(
+        ErrorKind::InputError(
+            "this instance already has an active install job".to_string(),
+        ),
+    )
 }
 
 pub async fn create_instance(
@@ -137,8 +135,8 @@ pub async fn bulk_update_content(
     updates: Vec<super::model::ContentUpdateSelection>,
 ) -> crate::Result<InstallJobSnapshot> {
     if updates.is_empty() {
-        return Err(crate::state::content_store::input(
-            "No content selected to update",
+        bail!(ErrorKind::InputError(
+            "no content selected to update".to_string(),
         ));
     }
     start(InstallRequest::BulkUpdateContent {
@@ -189,16 +187,15 @@ pub(crate) async fn wait_for_job(
             return Ok(());
         }
         if job.status.is_finished() {
-            return Err(crate::ErrorKind::LauncherError(
+            bail!(ErrorKind::LauncherError(
                 job.state
                     .rollback_error
                     .or(job.state.error)
                     .map(|error| error.message)
                     .unwrap_or_else(|| {
-                        format!("Installation {}", job.status.as_str())
+                        format!("installation {}", job.status.as_str())
                     }),
-            )
-            .into());
+            ));
         }
         notified.await;
     }
@@ -254,11 +251,10 @@ async fn retry_job_inner(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
         job.status,
         InstallJobStatus::Failed | InstallJobStatus::Interrupted
     ) {
-        return Err(crate::ErrorKind::InputError(
-            "Only failed or interrupted install jobs can be retried"
+        bail!(ErrorKind::InputError(
+            "only failed or interrupted install jobs can be retried"
                 .to_string(),
-        )
-        .into());
+        ));
     }
 
     if let Some(instance_id) = current_instance_id(&job.state) {
@@ -396,14 +392,13 @@ async fn set_job_paused(
     let state = State::get().await?;
     let job = store::get_required(job_id, &state.pool).await?;
     if !job.snapshot().can_pause {
-        return Err(ErrorKind::InputError(
-            "Install job cannot be paused or resumed".to_string(),
-        )
-        .into());
+        bail!(ErrorKind::InputError(
+            "install job cannot be paused or resumed".to_string(),
+        ));
     }
-    let control = super::control::get(job_id).ok_or_else(|| {
-        ErrorKind::InputError("Install worker is unavailable".to_string())
-    })?;
+    let control = super::control::get(job_id).ok_or(ErrorKind::InputError(
+        "install worker is unavailable".to_string(),
+    ))?;
     control.set_paused(paused)?;
     let snapshot = store::get_required(job_id, &state.pool).await?.snapshot();
     emit_install_job(&snapshot).await?;
@@ -417,14 +412,13 @@ pub async fn cancel_job(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
         return Ok(job.snapshot());
     }
     if !job.snapshot().can_cancel {
-        return Err(ErrorKind::InputError(
-            "Install job cannot be canceled".to_string(),
-        )
-        .into());
+        bail!(ErrorKind::InputError(
+            "install job cannot be canceled".to_string(),
+        ));
     }
-    let control = super::control::get(job_id).ok_or_else(|| {
-        ErrorKind::InputError("Install worker is unavailable".to_string())
-    })?;
+    let control = super::control::get(job_id).ok_or(ErrorKind::InputError(
+        "install worker is unavailable".to_string(),
+    ))?;
     control.cancel()?;
     let snapshot = store::get_required(job_id, &state.pool).await?.snapshot();
     emit_install_job(&snapshot).await?;
@@ -725,11 +719,9 @@ async fn prepare_initial_instance_inner(
             let metadata =
                 crate::state::get_instance(&source_instance_id, &state.pool)
                     .await?
-                    .ok_or_else(|| {
-                        crate::ErrorKind::InputError(
-                            "Unknown instance".to_string(),
-                        )
-                    })?;
+                    .ok_or(ErrorKind::InputError(
+                        "unknown instance".to_string(),
+                    ))?;
             let created = crate::api::instance::create(
                 metadata.instance.name,
                 metadata.applied_content_set.game_version,
@@ -862,8 +854,8 @@ async fn run_job_inner(
             set_instance_id(&mut job_state, instance_id.clone());
             Ok(instance_id)
         }
-        Ok(None) => Err(crate::ErrorKind::InputError(
-            "Install job completed without an instance id".to_string(),
+        Ok(None) => Err(ErrorKind::InputError(
+            "install job completed without an instance id".to_string(),
         )
         .into()),
         Err(error) => Err(error),
@@ -920,7 +912,7 @@ async fn run_job_inner(
                 InstallErrorView::from_message(
                     "canceled",
                     job_state.progress.phase,
-                    "Install was canceled",
+                    "install was canceled",
                 )
             } else {
                 install_error_view(
@@ -1066,10 +1058,9 @@ async fn run_request_inner(
             link: _,
         } => {
             let Some(instance_id) = current_instance_id(job_state) else {
-                return Err(crate::ErrorKind::InputError(
-                    "Install job is missing its instance id".to_string(),
-                )
-                .into());
+                bail!(ErrorKind::InputError(
+                    "install job is missing its instance id".to_string(),
+                ));
             };
             update_progress(
                 job_id,
@@ -1096,9 +1087,7 @@ async fn run_request_inner(
                     &state.pool,
                 )
                 .await?
-                .ok_or_else(|| {
-                    crate::ErrorKind::InputError("Unknown instance".to_string())
-                })?;
+                .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
             crate::launcher::install_minecraft_with_reporter(
                 &context,
                 false,
@@ -1117,10 +1106,9 @@ async fn run_request_inner(
             post_install_edit,
         } => {
             let Some(instance_id) = current_instance_id(job_state) else {
-                return Err(crate::ErrorKind::InputError(
-                    "Install job is missing its instance id".to_string(),
-                )
-                .into());
+                bail!(ErrorKind::InputError(
+                    "install job is missing its instance id".to_string(),
+                ));
             };
             update_progress(
                 job_id,
@@ -1145,10 +1133,9 @@ async fn run_request_inner(
         }
         InstallRequest::CreateSharedInstance { data } => {
             let Some(instance_id) = current_instance_id(job_state) else {
-                return Err(crate::ErrorKind::InputError(
-                    "Install job is missing its instance id".to_string(),
-                )
-                .into());
+                bail!(ErrorKind::InputError(
+                    "install job is missing its instance id".to_string(),
+                ));
             };
             apply_shared_instance_content(
                 job_id,
@@ -1171,10 +1158,9 @@ async fn run_request_inner(
             instance_folder,
         } => {
             let Some(instance_id) = current_instance_id(job_state) else {
-                return Err(crate::ErrorKind::InputError(
-                    "Install job is missing its instance id".to_string(),
-                )
-                .into());
+                bail!(ErrorKind::InputError(
+                    "install job is missing its instance id".to_string(),
+                ));
             };
             update_progress(
                 job_id,
@@ -1203,10 +1189,9 @@ async fn run_request_inner(
         }
         InstallRequest::DuplicateInstance { source_instance_id } => {
             let Some(instance_id) = current_instance_id(job_state) else {
-                return Err(crate::ErrorKind::InputError(
-                    "Install job is missing its instance id".to_string(),
-                )
-                .into());
+                bail!(ErrorKind::InputError(
+                    "install job is missing its instance id".to_string(),
+                ));
             };
             update_progress(
                 job_id,
@@ -1235,9 +1220,7 @@ async fn run_request_inner(
                     &state.pool,
                 )
                 .await?
-                .ok_or_else(|| {
-                    crate::ErrorKind::InputError("Unknown instance".to_string())
-                })?;
+                .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
             crate::launcher::install_minecraft_with_reporter(
                 &context,
                 false,
@@ -1269,9 +1252,7 @@ async fn run_request_inner(
                     &state.pool,
                 )
                 .await?
-                .ok_or_else(|| {
-                    crate::ErrorKind::InputError("Unknown instance".to_string())
-                })?;
+                .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
             crate::launcher::install_minecraft_with_reporter(
                 &context,
                 force,
@@ -1445,9 +1426,7 @@ async fn remove_existing_pack_content(
         &state.pool,
     )
     .await?
-    .ok_or_else(|| {
-        crate::ErrorKind::InputError("Unknown instance".to_string())
-    })?;
+    .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
     let (project_id, version_id) = match &metadata.link {
         InstanceLink::ModrinthModpack {
             project_id,
@@ -1669,22 +1648,19 @@ async fn prepare_existing_rollback(
 
     let instance = crate::state::get_instance(instance_id, &state.pool)
         .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError(format!(
-                "Unknown instance {instance_id}"
-            ))
-        })?;
+        .ok_or(ErrorKind::InputError(format!(
+            "unknown instance {instance_id}"
+        )))?;
     if instance.quarantined {
-        return Err(crate::ErrorKind::InputError(
-            "Content in quarantined instances cannot be changed.".to_string(),
-        )
-        .into());
+        bail!(ErrorKind::InputError(
+            "content in quarantined instances cannot be changed".to_string(),
+        ));
     }
     if matches!(job_state.request, InstallRequest::BulkUpdateContent { .. })
         && instance.instance.install_stage != InstanceInstallStage::Installed
     {
-        return Err(crate::state::content_store::input(
-            "This instance is not ready to update content",
+        bail!(ErrorKind::InputError(
+            "this instance is not ready to update content".to_string(),
         ));
     }
     let install_stage = instance.instance.install_stage;
@@ -1711,11 +1687,10 @@ async fn prepare_update_backup(
 ) -> crate::Result<()> {
     super::control::checkpoint(job_id).await?;
     let scoped_paths = update_backup_scope(job_id, job_state, state).await?;
-    let rollback = job_state.rollback.as_ref().ok_or_else(|| {
-        crate::ErrorKind::OtherError(
-            "Instance update rollback state is missing".to_string(),
-        )
-    })?;
+    let rollback = job_state
+        .rollback
+        .as_ref()
+        .context("instance update rollback state is missing")?;
     let staging_dir = recovery::prepare_instance_update_backup(
         job_id,
         &rollback.instance,
@@ -1868,8 +1843,9 @@ async fn lock_install_target(
 async fn lock_instance(instance_id: &str, state: &State) -> crate::Result<()> {
     let _content_lock = state.lock_instance_content(instance_id).await;
     if crate::state::instance_has_running_process(instance_id, state).await? {
-        return Err(crate::state::content_store::input(
-            "Stop this instance before installing or updating its content",
+        bail!(ErrorKind::InputError(
+            "stop this instance before installing or updating its content"
+                .to_string(),
         ));
     }
     crate::state::instances::commands::set_instance_install_stage(

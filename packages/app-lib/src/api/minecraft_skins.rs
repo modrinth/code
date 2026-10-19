@@ -52,6 +52,7 @@ use std::{
     time::Duration,
 };
 
+use anyhow::{Context, anyhow, bail};
 pub use bytes::Bytes;
 use futures::{StreamExt, TryStreamExt, stream};
 use serde::{Deserialize, Serialize};
@@ -532,7 +533,7 @@ pub async fn add_and_equip_custom_skin(
 ) -> crate::Result<Skin> {
     let (skin_width, skin_height) = png_util::dimensions(&texture_blob)?;
     if skin_width != 64 || ![32, 64].contains(&skin_height) {
-        return Err(ErrorKind::InvalidSkinTexture)?;
+        bail!(ErrorKind::InvalidSkinTexture);
     }
 
     let state = State::get().await?;
@@ -592,7 +593,7 @@ async fn add_and_equip_custom_skin_now(
     let previous_profile = selected_credentials
         .online_profile_fresh()
         .await
-        .ok_or_else(|| ErrorKind::OnlineMinecraftProfileUnavailable {
+        .ok_or(ErrorKind::OnlineMinecraftProfileUnavailable {
             user_name: selected_credentials.offline_profile.name.clone(),
         })?;
 
@@ -610,12 +611,11 @@ async fn add_and_equip_custom_skin_now(
 
     let profile = match profile {
         Some(profile) => profile,
-        None => selected_credentials
-            .refresh_online_profile()
-            .await
-            .ok_or_else(|| ErrorKind::OnlineMinecraftProfileUnavailable {
+        None => selected_credentials.refresh_online_profile().await.ok_or(
+            ErrorKind::OnlineMinecraftProfileUnavailable {
                 user_name: selected_credentials.offline_profile.name.clone(),
-            })?,
+            },
+        )?,
     };
 
     let equipped_skin = profile.current_skin()?;
@@ -712,12 +712,11 @@ async fn equip_skin_now(
 ) -> crate::Result<()> {
     let state = State::get().await?;
 
-    let profile = selected_credentials
-        .online_profile_fresh()
-        .await
-        .ok_or_else(|| ErrorKind::OnlineMinecraftProfileUnavailable {
+    let profile = selected_credentials.online_profile_fresh().await.ok_or(
+        ErrorKind::OnlineMinecraftProfileUnavailable {
             user_name: selected_credentials.offline_profile.name.clone(),
-        })?;
+        },
+    )?;
 
     preserve_current_profile_skin(&state, &profile).await?;
 
@@ -738,12 +737,11 @@ async fn equip_skin_now(
 
     let profile = match profile {
         Some(profile) => profile,
-        None => selected_credentials
-            .refresh_online_profile()
-            .await
-            .ok_or_else(|| ErrorKind::OnlineMinecraftProfileUnavailable {
+        None => selected_credentials.refresh_online_profile().await.ok_or(
+            ErrorKind::OnlineMinecraftProfileUnavailable {
                 user_name: selected_credentials.offline_profile.name.clone(),
-            })?,
+            },
+        )?,
     };
 
     if let Err(error) =
@@ -895,7 +893,7 @@ pub async fn save_custom_skin(
 ) -> crate::Result<Skin> {
     let (skin_width, skin_height) = png_util::dimensions(&texture_blob)?;
     if skin_width != 64 || ![32, 64].contains(&skin_height) {
-        return Err(ErrorKind::InvalidSkinTexture)?;
+        bail!(ErrorKind::InvalidSkinTexture);
     }
 
     let state = State::get().await?;
@@ -994,12 +992,11 @@ async fn unequip_skin_now(
 ) -> crate::Result<()> {
     let state = State::get().await?;
 
-    let profile = selected_credentials
-        .online_profile_fresh()
-        .await
-        .ok_or_else(|| ErrorKind::OnlineMinecraftProfileUnavailable {
+    let profile = selected_credentials.online_profile_fresh().await.ok_or(
+        ErrorKind::OnlineMinecraftProfileUnavailable {
             user_name: selected_credentials.offline_profile.name.clone(),
-        })?;
+        },
+    )?;
 
     preserve_current_profile_skin(&state, &profile).await?;
 
@@ -1228,42 +1225,31 @@ pub async fn get_dragged_skin_data(
 ) -> crate::Result<Bytes> {
     if let Some(extension) = path.extension() {
         if extension.to_string_lossy().to_lowercase() != "png" {
-            return Err(ErrorKind::InvalidSkinTexture.into());
+            bail!(ErrorKind::InvalidSkinTexture);
         }
     } else {
-        return Err(ErrorKind::InvalidSkinTexture.into());
+        bail!(ErrorKind::InvalidSkinTexture);
     }
 
     tracing::debug!("Reading file: {:?}", path);
 
     if !path.exists() {
-        tracing::error!("File does not exist: {:?}", path);
-        return Err(ErrorKind::InvalidSkinTexture.into());
+        return Err(anyhow!("file {} does not exist", path.display()))
+            .context(ErrorKind::InvalidSkinTexture);
     }
 
-    let data = match tokio::fs::read(path).await {
-        Ok(data) => {
-            tracing::debug!(
-                "File read successfully, size: {} bytes",
-                data.len()
-            );
-            data
-        }
-        Err(err) => {
-            tracing::error!("Failed to read file: {}", err);
-            return Err(err.into());
-        }
-    };
+    let data = tokio::fs::read(path)
+        .await
+        .context(format!("failed to read file {}", path.display()))?;
+    tracing::debug!("File read successfully, size: {} bytes", data.len());
 
     let url_or_blob = UrlOrBlob::Blob(data.clone().into());
 
-    match normalize_skin_texture(&url_or_blob).await {
-        Ok(_) => Ok(data.into()),
-        Err(err) => {
-            tracing::error!("Failed to normalize skin texture: {}", err);
-            Err(ErrorKind::InvalidSkinTexture.into())
-        }
-    }
+    normalize_skin_texture(&url_or_blob)
+        .await
+        .context("failed to normalize skin texture")
+        .context(ErrorKind::InvalidSkinTexture)?;
+    Ok(data.into())
 }
 
 async fn preserve_current_profile_skin(
@@ -1358,10 +1344,7 @@ fn get_fallback_default_skin() -> crate::Result<&'static Skin> {
                 .find(|skin| skin.name.as_deref() == Some("Steve"))
         })
         .or_else(|| assets::DEFAULT_SKINS.first())
-        .ok_or_else(|| {
-            ErrorKind::OtherError("No bundled default skins found".into())
-                .as_error()
-        })
+        .context("no bundled default skins found")
 }
 
 fn local_skin_texture_key(texture_blob: &[u8]) -> Arc<str> {

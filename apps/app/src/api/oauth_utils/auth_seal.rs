@@ -14,6 +14,7 @@
 
 use aes_gcm::aead::Aead;
 use aes_gcm::{Aes256Gcm, KeyInit, Nonce};
+use anyhow::{Context, anyhow};
 use base64::Engine;
 use base64::engine::general_purpose::URL_SAFE_NO_PAD;
 use hkdf::Hkdf;
@@ -52,15 +53,11 @@ impl AuthSeal {
     }
 
     pub fn public_key(&self) -> Result<String, theseus::Error> {
-        let der =
-            self.secret
-                .public_key()
-                .to_public_key_der()
-                .map_err(|error| {
-                    theseus::ErrorKind::OtherError(format!(
-                        "Failed to encode auth public key: {error}"
-                    ))
-                })?;
+        let der = self
+            .secret
+            .public_key()
+            .to_public_key_der()
+            .context("failed to encode auth public key")?;
 
         Ok(URL_SAFE_NO_PAD.encode(der.as_bytes()))
     }
@@ -144,6 +141,5 @@ fn is_session_token(token: &str) -> bool {
 }
 
 fn invalid_sealed_session() -> theseus::Error {
-    theseus::ErrorKind::OtherError("Invalid sealed app sign-in session".into())
-        .into()
+    anyhow!("invalid sealed app sign-in session")
 }

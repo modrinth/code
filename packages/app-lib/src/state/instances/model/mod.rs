@@ -37,5 +37,5 @@ mod update_check;
 pub use self::update_check::*;
 
 fn unknown_value(kind: &str, value: &str) -> crate::Error {
-    crate::ErrorKind::InputError(format!("Unknown {kind} {value}")).into()
+    crate::ErrorKind::InputError(format!("unknown {kind} {value}")).into()
 }

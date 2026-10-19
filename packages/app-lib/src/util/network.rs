@@ -34,7 +34,7 @@ pub async fn is_network_metered() -> Result<bool> {
 
 #[cfg(target_os = "macos")]
 pub async fn is_network_metered() -> Result<bool> {
-    use crate::ErrorKind;
+    use anyhow::Context;
     use cidre::dispatch::Queue;
     use cidre::nw::PathMonitor;
     use std::time::Duration;
@@ -59,12 +59,7 @@ pub async fn is_network_metered() -> Result<bool> {
         .flatten();
     monitor.cancel();
 
-    result.ok_or_else(|| {
-        ErrorKind::OtherError(
-            "NWPathMonitor didn't provide an NWPath in time".to_string(),
-        )
-        .into()
-    })
+    result.context("NWPathMonitor did not provide a network path in time")
 }
 
 #[cfg(target_os = "linux")]

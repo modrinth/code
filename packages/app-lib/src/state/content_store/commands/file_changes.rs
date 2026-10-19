@@ -41,7 +41,7 @@ impl ContentStore {
         if !crate::state::content_store::is_managed_content_path(relative_path)
         {
             bail!(ErrorKind::ContentStoreError(
-                "Unsupported managed content path".into()
+                "unsupported managed content path".into()
             ));
         }
         let canonical_path = relative_path.trim_end_matches(".disabled");
@@ -79,7 +79,7 @@ impl ContentStore {
             && symlink_metadata_if_exists(&target).await?.is_some()
         {
             bail!(ErrorKind::ContentStoreError(format!(
-                "Both {source_relative} and {target_relative} exist; resolve the duplicate before continuing"
+                "both {source_relative} and {target_relative} exist; resolve the duplicate before continuing"
             )));
         }
         let binding = match &existing {
@@ -89,14 +89,14 @@ impl ContentStore {
         let metadata = symlink_metadata_if_exists(&source).await?;
         if previous_content.is_some() && metadata.is_none() {
             bail!(ErrorKind::ContentStoreError(
-                "Legacy content disappeared before it could be adopted".into(),
+                "legacy content disappeared before it could be adopted".into(),
             ));
         }
         let mut previous_lease = None;
         let before = if let Some(metadata) = &metadata {
             if metadata.file_type().is_symlink() {
                 bail!(ErrorKind::ContentStoreError(
-                    "External symlinks must be imported explicitly before changing content"
+                    "external symlinks must be imported explicitly before changing content"
                         .into(),
                 ));
             } else if metadata.is_file() {
@@ -109,7 +109,7 @@ impl ContentStore {
                     && previous.metadata.sha512 != binding.blob_sha512
                 {
                     bail!(ErrorKind::ContentStoreError(
-                        "The content file was changed outside the app; preserve or re-import it before continuing"
+                        "the content file was changed outside the app; preserve or re-import it before continuing"
                             .into(),
                     ));
                 }
@@ -137,7 +137,7 @@ impl ContentStore {
                 .await?
                 .ok_or_else(|| {
                     ErrorKind::ContentStoreError(
-                        "Managed content is missing from the catalog".into(),
+                        "managed content is missing from the catalog".into(),
                     )
                 })?;
             Some(FileState {
@@ -194,14 +194,14 @@ impl ContentStore {
             )
         {
             bail!(ErrorKind::ContentStoreError(
-                "Invalid managed content move".into()
+                "invalid managed content move".into()
             ));
         }
         if self.check_instance_file(instance, file, binding).await?
             != InstanceFileStatus::Healthy
         {
             bail!(ErrorKind::ContentStoreError(
-                "Content cannot be toggled because its instance path is missing or changed"
+                "content cannot be toggled because its instance path is missing or changed"
                     .into(),
             ));
         }
@@ -301,12 +301,12 @@ impl PendingFileChange {
                 .await?;
             if !store.instance_file_matches(&source, &before.sha512).await? {
                 bail!(ErrorKind::ContentStoreError(
-                    "Content changed before the toggle could be applied".into(),
+                    "content changed before the toggle could be applied".into(),
                 ));
             }
             if symlink_metadata_if_exists(&target).await?.is_some() {
                 bail!(ErrorKind::ContentStoreError(
-                    "The content toggle destination already exists".into(),
+                    "the content toggle destination already exists".into(),
                 ));
             }
             *mutation_started = true;
@@ -328,13 +328,13 @@ impl PendingFileChange {
                 InstanceFileStatus::Missing if !before.present => {}
                 InstanceFileStatus::Missing => {
                     bail!(ErrorKind::ContentStoreError(
-                        "Content disappeared before the operation could be applied"
+                        "content disappeared before the operation could be applied"
                             .into(),
                     ));
                 }
                 InstanceFileStatus::Conflict => {
                     bail!(ErrorKind::ContentStoreError(
-                        "Content changed before the operation could be applied"
+                        "content changed before the operation could be applied"
                             .into(),
                     ));
                 }
@@ -345,7 +345,7 @@ impl PendingFileChange {
             && after.present
         {
             let stored_file = self.stored_file.as_ref().ok_or_else(|| {
-                ErrorKind::ContentStoreError("Missing content lease".into())
+                ErrorKind::ContentStoreError("missing content lease".into())
             })?;
             let path = store
                 .instance_path(
@@ -375,7 +375,7 @@ impl PendingFileChange {
         if let (Some(file_id), Some(after)) = (file_id, &self.journal.after) {
             let storage_kind = after.storage_kind.ok_or_else(|| {
                 ErrorKind::ContentStoreError(
-                    "Content storage method was not selected".into(),
+                    "content storage method was not selected".into(),
                 )
             })?;
             catalog::set_file_storage(tx, file_id, &after.sha512, storage_kind)

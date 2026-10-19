@@ -1,6 +1,8 @@
 use super::model::{
     InstallJobKind, InstallJobSnapshot, InstallJobState, InstallJobStatus,
 };
+use crate::ErrorKind;
+use anyhow::{Context, bail};
 use chrono::{DateTime, TimeZone, Utc};
 use sqlx::SqlitePool;
 use std::collections::HashMap;
@@ -140,12 +142,9 @@ pub async fn insert(
     .execute(pool)
     .await?;
 
-    get(id, pool).await?.ok_or_else(|| {
-        crate::ErrorKind::OtherError(format!(
-            "Install job {id} was not inserted"
-        ))
-        .into()
-    })
+    get(id, pool)
+        .await?
+        .context(format!("install job {id} was not inserted"))
 }
 
 pub async fn get(
@@ -241,8 +240,9 @@ pub(crate) async fn ensure_no_pending_recovery(
             && Some(job.id) != except_job
             && job.needs_recovery()
     }) {
-        return Err(crate::state::content_store::input(
-            "Retry the failed installation to recover this instance before changing its content",
+        bail!(ErrorKind::InputError(
+            "retry the failed installation to recover this instance before changing its content"
+                .to_string(),
         ));
     }
     Ok(())
@@ -315,10 +315,9 @@ pub async fn update_state(
     .await?;
 
     if result.rows_affected() == 0 {
-        return Err(crate::ErrorKind::InputError(format!(
-            "Install job {id} is no longer active"
-        ))
-        .into());
+        bail!(ErrorKind::InputError(format!(
+            "install job {id} is no longer active"
+        )));
     }
 
     get_required(id, pool).await
@@ -457,10 +456,9 @@ pub async fn complete_success(
     pool: &SqlitePool,
 ) -> crate::Result<Option<InstallJobRecord>> {
     let Some(instance_id) = instance_id(state) else {
-        return Err(crate::ErrorKind::InputError(
-            "Install job is missing its instance id".to_string(),
-        )
-        .into());
+        bail!(ErrorKind::InputError(
+            "install job is missing its instance id".to_string(),
+        ));
     };
     let now = Utc::now().timestamp();
     let json = serde_json::to_string(state)?;
@@ -506,10 +504,9 @@ pub async fn complete_success(
 
     if instance_result.rows_affected() == 0 {
         transaction.rollback().await?;
-        return Err(crate::ErrorKind::InputError(format!(
-            "Unknown instance {instance_id}"
-        ))
-        .into());
+        bail!(ErrorKind::InputError(format!(
+            "unknown instance {instance_id}"
+        )));
     }
 
     transaction.commit().await?;
@@ -521,8 +518,9 @@ pub async fn complete_success(
 pub async fn dismiss(id: Uuid, pool: &SqlitePool) -> crate::Result<()> {
     let job = get_required(id, pool).await?;
     if job.instance_id.is_some() && job.needs_recovery() {
-        return Err(crate::state::content_store::input(
-            "Recover or delete this instance before dismissing its failed installation",
+        bail!(ErrorKind::InputError(
+            "recover or delete this instance before dismissing its failed installation"
+                .to_string(),
         ));
     }
     let id = id.to_string();
@@ -546,19 +544,16 @@ pub async fn get_required(
     id: Uuid,
     pool: &SqlitePool,
 ) -> crate::Result<InstallJobRecord> {
-    get(id, pool).await?.ok_or_else(|| {
-        crate::ErrorKind::InputError(format!("Unknown install job {id}")).into()
-    })
+    get(id, pool).await?.ok_or(
+        ErrorKind::InputError(format!("unknown install job {id}")).into(),
+    )
 }
 
 fn row_to_record(row: InstallJobRow) -> crate::Result<InstallJobRecord> {
     Ok(InstallJobRecord {
-        id: Uuid::parse_str(&row.id).map_err(|err| {
-            crate::ErrorKind::InputError(format!(
-                "Invalid install job id {}: {err}",
-                row.id
-            ))
-        })?,
+        id: Uuid::parse_str(&row.id).context(ErrorKind::InputError(
+            format!("invalid install job id {}", row.id),
+        ))?,
         instance_id: row.instance_id,
         kind: InstallJobKind::from_stored_str(&row.kind),
         status: InstallJobStatus::from_stored_str(&row.status),

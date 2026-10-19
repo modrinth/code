@@ -1,5 +1,6 @@
 use crate::ErrorKind;
 use crate::util::fetch::INSECURE_REQWEST_CLIENT;
+use anyhow::Context;
 use base64::Engine;
 use base64::prelude::{BASE64_STANDARD, BASE64_URL_SAFE_NO_PAD};
 use chrono::{DateTime, Duration, TimeZone, Utc};
@@ -993,7 +994,7 @@ async fn sisu_authenticate(
         .headers
         .get("X-SessionId")
         .and_then(|x| x.to_str().ok())
-        .ok_or_else(|| MinecraftAuthenticationError::NoSessionId)?
+        .ok_or(MinecraftAuthenticationError::NoSessionId)?
         .to_string();
 
     Ok((
@@ -1218,7 +1219,7 @@ async fn minecraft_token(
         .and_then(|x| x.get(0))
         .and_then(|x| x.get("uhs"))
         .and_then(|x| x.as_str().map(String::from))
-        .ok_or_else(|| MinecraftAuthenticationError::NoUserHash)?;
+        .ok_or(MinecraftAuthenticationError::NoUserHash)?;
 
     let token = token.token;
 
@@ -1409,16 +1410,13 @@ impl MinecraftProfile {
 
     /// Returns the currently selected skin for this profile.
     pub fn current_skin(&self) -> crate::Result<&MinecraftSkin> {
-        Ok(self
-            .skins
+        self.skins
             .iter()
             .find(|skin| {
                 skin.state == MinecraftCharacterExpressionState::Active
             })
             // There should always be one active skin, even when the player uses their default skin
-            .ok_or_else(|| {
-                ErrorKind::OtherError("No active skin found".into())
-            })?)
+            .context("no active skin found")
     }
 
     /// Returns the currently selected cape for this profile.
@@ -1588,14 +1586,14 @@ fn generate_key() -> Result<DeviceTokenKey, MinecraftAuthenticationError> {
         id: uuid,
         key: signing_key,
         x: BASE64_URL_SAFE_NO_PAD.encode(
-            encoded_point.x().ok_or_else(|| {
-                MinecraftAuthenticationError::ReadingPublicKey
-            })?,
+            encoded_point
+                .x()
+                .ok_or(MinecraftAuthenticationError::ReadingPublicKey)?,
         ),
         y: BASE64_URL_SAFE_NO_PAD.encode(
-            encoded_point.y().ok_or_else(|| {
-                MinecraftAuthenticationError::ReadingPublicKey
-            })?,
+            encoded_point
+                .y()
+                .ok_or(MinecraftAuthenticationError::ReadingPublicKey)?,
         ),
     })
 }

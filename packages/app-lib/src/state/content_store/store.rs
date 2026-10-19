@@ -42,7 +42,7 @@ impl ContentStore {
             .await?;
         if !file.try_lock_exclusive()? {
             bail!(ErrorKind::ContentStoreError(
-                "Another Modrinth process is using this application directory"
+                "another Modrinth process is using this application directory"
                     .into(),
             ));
         }

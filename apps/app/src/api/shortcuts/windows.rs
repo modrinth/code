@@ -1,4 +1,5 @@
 use crate::api::Result;
+use anyhow::Context;
 use std::{
     os::windows::ffi::OsStrExt,
     path::{Path, PathBuf},
@@ -40,11 +41,7 @@ pub(super) async fn create_shortcut(
         )
     })
     .await
-    .map_err(|error| {
-        std::io::Error::other(format!(
-            "failed to join shortcut creation task: {error}"
-        ))
-    })??;
+    .context("failed to join shortcut creation task")??;
 
     Ok(())
 }

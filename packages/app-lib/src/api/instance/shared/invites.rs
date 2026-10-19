@@ -84,16 +84,14 @@ pub async fn create_shared_instance_invite_link(
     if max_age_seconds <= 0
         || max_age_seconds > SHARED_INSTANCE_INVITE_MAX_AGE_SECONDS
     {
-        return Err(crate::ErrorKind::InputError(
-            "Invite expiry must be between now and seven days".to_string(),
-        )
-        .into());
+        bail!(crate::ErrorKind::InputError(
+            "invite expiry must be between now and seven days".to_string(),
+        ));
     }
     if max_uses <= 0 {
-        return Err(crate::ErrorKind::InputError(
-            "Invite max uses must be greater than zero".to_string(),
-        )
-        .into());
+        bail!(crate::ErrorKind::InputError(
+            "invite max uses must be greater than zero".to_string(),
+        ));
     }
 
     if let Some(invite_id) = replace_invite_id {
@@ -210,10 +208,9 @@ pub async fn accept_pending_shared_instance_invite(
         return Ok(());
     }
 
-    Err(crate::ErrorKind::InputError(
-        "No pending invite found for shared instance".to_string(),
-    )
-    .into())
+    bail!(crate::ErrorKind::InputError(
+        "no pending invite found for shared instance".to_string(),
+    ))
 }
 
 #[tracing::instrument]

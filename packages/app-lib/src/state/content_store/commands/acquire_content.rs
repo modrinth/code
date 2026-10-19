@@ -8,7 +8,7 @@ use crate::state::content_store::{
 };
 use crate::util::content_hash::{hash_file, temporary_file};
 use crate::util::fetch::{self, DownloadMeta, FetchProgressFn, FetchSemaphore};
-use anyhow::bail;
+use anyhow::{Context, bail};
 use sha2::{Digest, Sha512};
 use std::path::Path;
 use tokio::fs::File;
@@ -25,7 +25,7 @@ impl ContentStore {
     ) -> crate::Result<GetFileResult> {
         let sha512 = sha512.ok_or_else(|| {
             ErrorKind::ContentStoreError(
-                "Content download is missing a SHA-512 hash".into(),
+                "content download is missing a SHA-512 hash".into(),
             )
         })?;
         validate_digest(sha512, 128)?;
@@ -47,7 +47,7 @@ impl ContentStore {
         .await?;
         if sha512 != download.sha512 {
             bail!(ErrorKind::ContentStoreError(format!(
-                "Downloaded content SHA-512 mismatch: expected {sha512}, got {}",
+                "downloaded content SHA-512 mismatch: expected {sha512}, got {}",
                 download.sha512,
             )));
         }
@@ -105,7 +105,7 @@ impl ContentStore {
     ) -> crate::Result<StoredFileHandle> {
         if staged.path.parent() != Some(self.staging.as_path()) {
             bail!(ErrorKind::ContentStoreError(
-                "Content was not staged in the shared store".into()
+                "content was not staged in the shared store".into()
             ));
         }
         let fetch::StagedDownload {
@@ -133,9 +133,9 @@ impl ContentStore {
         .await?;
         let stored_file = StoredFileMetadata {
             sha512: hash,
-            size: size.try_into().map_err(|_| {
-                ErrorKind::ContentStoreError("Content file is too large".into())
-            })?,
+            size: size.try_into().context(ErrorKind::ContentStoreError(
+                "content file is too large".into(),
+            ))?,
             status: StoredFileStatus::Ready,
             modified_as: filesystem::modified_at_ns(&destination).await?,
             last_used_at: chrono::Utc::now().timestamp(),

@@ -1,3 +1,4 @@
+use crate::ErrorKind;
 use crate::event::InstancePayloadType;
 use crate::event::emit::emit_instance;
 use crate::state::instances::adapters::sqlite::instance_rows;
@@ -64,12 +65,12 @@ async fn create_inner(
 
         crate::state::get_instance(&instance.id, &state.pool)
             .await?
-            .ok_or_else(|| {
-                crate::ErrorKind::InputError(
-                    "Created instance could not be loaded".to_string(),
+            .ok_or(
+                ErrorKind::InputError(
+                    "created instance could not be loaded".to_string(),
                 )
-                .into()
-            })
+                .into(),
+            )
     }
     .await;
 
@@ -99,9 +100,7 @@ pub async fn edit(
         let instance =
             instance_rows::get_instance_by_id(instance_id, &state.pool)
                 .await?
-                .ok_or_else(|| {
-                    crate::state::content_store::input("Unknown instance")
-                })?;
+                .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
         super::projects::ensure_installation_content_unlocked(
             instance.install_stage,
         )?;
@@ -110,10 +109,7 @@ pub async fn edit(
 
     let instance = crate::state::get_instance(instance_id, &state.pool)
         .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError("Unknown instance".to_string())
-                .as_error()
-        })?;
+        .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
 
     super::reconcile_instance_synced_options(instance_id).await?;
 

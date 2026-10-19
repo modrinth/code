@@ -6,6 +6,7 @@ use crate::state::content_store::{
     StoredFileMetadata, StoredFileStatus, validate_digest,
 };
 use crate::util::content_hash::{FileHashes, hash_file};
+use anyhow::Context;
 use std::collections::HashSet;
 use std::path::Path;
 use tokio::fs::{self, ReadDir};
@@ -72,11 +73,11 @@ impl UnregisteredFiles {
                     fs::set_permissions(&path, permissions).await?;
                     return Ok(Some(StoredFileMetadata {
                         sha512,
-                        size: size.try_into().map_err(|_| {
+                        size: size.try_into().context(
                             ErrorKind::ContentStoreError(
-                                "Content file is too large".into(),
-                            )
-                        })?,
+                                "content file is too large".into(),
+                            ),
+                        )?,
                         status: StoredFileStatus::Ready,
                         modified_as: crate::state::file_modified_at_ns(
                             &metadata,
