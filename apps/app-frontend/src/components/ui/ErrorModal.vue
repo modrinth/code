@@ -55,34 +55,31 @@ defineExpose({
 		console.log(errorVal, context, canClose, source)
 		closable.value = canClose
 
-		if (errorVal.message && errorVal.message.includes('Minecraft authentication error:')) {
+		if (errorVal.code?.startsWith('minecraft_auth_')) {
 			title.value = 'Unable to sign in to Minecraft'
 			errorType.value = 'minecraft_auth'
 			supportLink.value =
 				'https://support.modrinth.com/en/articles/9038231-minecraft-sign-in-issues'
 
-			if (
-				errorVal.message.includes('existing connection was forcibly closed') ||
-				errorVal.message.includes('error sending request for url')
-			) {
+			if (errorVal.code === 'minecraft_auth_network') {
 				metadata.value.network = true
 			}
-			if (errorVal.message.includes('because the target machine actively refused it')) {
+			if (errorVal.code === 'minecraft_auth_connection_refused') {
 				metadata.value.hostsFile = true
 			}
-		} else if (errorVal.message && errorVal.message.includes('Move directory error:')) {
+		} else if (errorVal.code?.startsWith('directory_move_')) {
 			title.value = 'Could not change app directory'
 			errorType.value = 'directory_move'
 			supportLink.value = 'https://support.modrinth.com'
 
-			if (errorVal.message.includes('directory is not writable')) {
+			if (errorVal.code === 'directory_move_permission_denied') {
 				metadata.value.readOnly = true
 			}
 
-			if (errorVal.message.includes('Not enough space')) {
+			if (errorVal.code === 'directory_move_no_space') {
 				metadata.value.notEnoughSpace = true
 			}
-		} else if (errorVal.message && errorVal.message.includes('No loader version selected for')) {
+		} else if (errorVal.code === 'no_loader_version') {
 			title.value = 'No loader selected'
 			errorType.value = 'no_loader_version'
 			supportLink.value = 'https://support.modrinth.com'

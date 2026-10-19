@@ -1,9 +1,10 @@
 //! Theseus directory information
 pub(crate) mod move_app_directory;
-use crate::LoadingBarType;
 use crate::event::emit::{emit_loading, init_loading};
 use crate::state::{Settings, State};
 use crate::util::fetch::IoSemaphore;
+use crate::{ErrorKind, LoadingBarType};
+use anyhow::Context;
 use std::path::PathBuf;
 use tokio::fs;
 
@@ -222,9 +223,7 @@ impl DirectoryInfo {
     ) -> crate::Result<()> {
         Self::try_move_launcher_directory(settings, pool, app_identifier)
             .await
-            .map_err(|error| {
-                crate::ErrorKind::DirectoryMoveError(error.to_string()).into()
-            })
+            .context(ErrorKind::DirectoryMoveFailed)
     }
 
     async fn try_move_launcher_directory(

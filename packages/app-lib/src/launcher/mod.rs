@@ -950,10 +950,9 @@ pub async fn launch_minecraft(
     .await?;
 
     if content_set.loader != ModLoader::Vanilla && loader_version.is_none() {
-        return Err(crate::ErrorKind::LauncherError(format!(
-            "No loader version selected for {}",
-            content_set.loader.as_str()
-        ))
+        return Err(crate::ErrorKind::NoLoaderVersion {
+            loader: content_set.loader,
+        }
         .into());
     }
 

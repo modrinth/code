@@ -268,7 +268,7 @@ pub async fn get_available_capes() -> crate::Result<Vec<Cape>> {
 
     let selected_credentials = Credentials::get_default_credential(&state.pool)
         .await?
-        .ok_or(ErrorKind::NoCredentialsError)?;
+        .ok_or(ErrorKind::NotLoggedIn)?;
 
     let Some(profile) = selected_credentials.online_profile_fresh().await
     else {
@@ -538,7 +538,7 @@ pub async fn add_and_equip_custom_skin(
     let state = State::get().await?;
     let selected_credentials = Credentials::get_default_credential(&state.pool)
         .await?
-        .ok_or(ErrorKind::NoCredentialsError)?;
+        .ok_or(ErrorKind::NotLoggedIn)?;
     let cape_id = cape.map(|cape| cape.id);
     let local_texture_key = local_skin_texture_key(&texture_blob);
 
@@ -695,7 +695,7 @@ pub async fn equip_skin(skin: Skin) -> crate::Result<()> {
     let state = State::get().await?;
     let selected_credentials = Credentials::get_default_credential(&state.pool)
         .await?
-        .ok_or(ErrorKind::NoCredentialsError)?;
+        .ok_or(ErrorKind::NotLoggedIn)?;
 
     set_pending_skin_change(PendingSkinChange::Equip {
         selected_credentials,
@@ -842,7 +842,7 @@ pub async fn remove_custom_skin(skin: Skin) -> crate::Result<()> {
 
     let selected_credentials = Credentials::get_default_credential(&state.pool)
         .await?
-        .ok_or(ErrorKind::NoCredentialsError)?;
+        .ok_or(ErrorKind::NotLoggedIn)?;
 
     CustomMinecraftSkin {
         texture_key: skin.texture_key.to_string(),
@@ -871,7 +871,7 @@ pub async fn set_custom_skin_order(
 
     let selected_credentials = Credentials::get_default_credential(&state.pool)
         .await?
-        .ok_or(ErrorKind::NoCredentialsError)?;
+        .ok_or(ErrorKind::NotLoggedIn)?;
 
     CustomMinecraftSkin::set_order(
         selected_credentials.offline_profile.id,
@@ -902,7 +902,7 @@ pub async fn save_custom_skin(
 
     let selected_credentials = Credentials::get_default_credential(&state.pool)
         .await?
-        .ok_or(ErrorKind::NoCredentialsError)?;
+        .ok_or(ErrorKind::NotLoggedIn)?;
 
     let old_texture_key = Arc::clone(&skin.texture_key);
     let texture_key = if replace_texture {
@@ -979,7 +979,7 @@ pub async fn unequip_skin() -> crate::Result<()> {
     let state = State::get().await?;
     let selected_credentials = Credentials::get_default_credential(&state.pool)
         .await?
-        .ok_or(ErrorKind::NoCredentialsError)?;
+        .ok_or(ErrorKind::NotLoggedIn)?;
 
     set_pending_skin_change(PendingSkinChange::Unequip {
         selected_credentials,

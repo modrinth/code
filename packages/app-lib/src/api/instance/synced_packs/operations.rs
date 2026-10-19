@@ -18,6 +18,8 @@ use crate::state::{
     InstanceMetadata, ProjectType, State, SyncedOption, SyncedPackInfo,
 };
 use crate::util::io;
+use crate::{ErrorKind, InvalidPack};
+use anyhow::bail;
 use bytes::Bytes;
 use std::io::{Cursor, Read};
 use std::path::Path;
@@ -77,13 +79,10 @@ pub(super) async fn pack_from_item(
         || item.file_path
             != format!("{}/{}", item.project_type.get_folder(), item.file_name)
     {
-        return Err(crate::ErrorKind::InputError(
-            "Invalid pack file path.".to_string(),
-        )
-        .into());
+        bail!(ErrorKind::InvalidPack(InvalidPack::InvalidPath));
     }
     let file = crate::state::instances::adapters::sqlite::content_rows::get_instance_file_by_relative_path(&metadata.instance.id, &item.file_path, &state.pool).await?
-		.ok_or_else(|| crate::state::content_store::input("The pack is not registered"))?;
+		.ok_or(ErrorKind::InvalidPack(InvalidPack::NotRegistered))?;
     let source = state
         .content_store
         .read_path(&file, &metadata.instance.path)
@@ -104,11 +103,7 @@ pub(super) async fn pack_from_item(
             &state.api_semaphore,
         )
         .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError(
-                "The pack's compatibility could not be verified.".to_string(),
-            )
-        })?
+        .ok_or(ErrorKind::InvalidPack(InvalidPack::UnverifiedCompatibility))?
         .game_versions
     } else {
         vec![metadata.applied_content_set.game_version.clone()]
@@ -155,24 +150,15 @@ pub(super) fn validate_pack(
     bytes: &[u8],
     project_type: ProjectType,
 ) -> crate::Result<()> {
-    let mut archive =
-        zip::ZipArchive::new(Cursor::new(bytes)).map_err(|_| {
-            crate::ErrorKind::InputError(
-                "Choose a valid pack ZIP file.".to_string(),
-            )
-        })?;
+    let mut archive = zip::ZipArchive::new(Cursor::new(bytes))
+        .map_err(|_| ErrorKind::InvalidPack(InvalidPack::NotZip))?;
     let mut metadata = String::new();
     {
         let file = archive.by_name("pack.mcmeta").map_err(|_| {
-            crate::ErrorKind::InputError(
-                "Choose a pack ZIP containing pack.mcmeta.".to_string(),
-            )
+            ErrorKind::InvalidPack(InvalidPack::MissingMetadata)
         })?;
         if file.size() > 1024 * 1024 {
-            return Err(crate::ErrorKind::InputError(
-                "The pack metadata is too large.".to_string(),
-            )
-            .into());
+            bail!(ErrorKind::InvalidPack(InvalidPack::MetadataTooLarge));
         }
         file.take(1024 * 1024 + 1).read_to_string(&mut metadata)?;
     }
@@ -180,12 +166,7 @@ pub(super) fn validate_pack(
     let (prefix, other_prefix) = match project_type {
         ProjectType::ResourcePack => ("assets/", "data/"),
         ProjectType::DataPack => ("data/", "assets/"),
-        _ => {
-            return Err(crate::ErrorKind::InputError(
-                "Unsupported synced content type.".to_string(),
-            )
-            .into());
-        }
+        _ => bail!(ErrorKind::InvalidPack(InvalidPack::UnsupportedType)),
     };
     if !value.get("pack").is_some_and(serde_json::Value::is_object)
         || (!archive.file_names().any(|name| name.starts_with(prefix))
@@ -193,10 +174,7 @@ pub(super) fn validate_pack(
                 .file_names()
                 .any(|name| name.starts_with(other_prefix)))
     {
-        return Err(crate::ErrorKind::InputError(
-            "This file is not a pack of the selected type.".to_string(),
-        )
-        .into());
+        bail!(ErrorKind::InvalidPack(InvalidPack::WrongType));
     }
     Ok(())
 }
@@ -309,16 +287,11 @@ pub(in crate::api::instance) async fn seed_from_instance(
         {
             Ok(candidate) => candidate,
             Err(error)
-                if error.is::<serde_json::Error>()
-                    || error.is::<std::io::Error>()
-                    || matches!(
-                        error.downcast_ref::<crate::ErrorKind>(),
-                        Some(
-                            crate::ErrorKind::JSONError(_)
-                                | crate::ErrorKind::InputError(_)
-                                | crate::ErrorKind::StdIOError(_)
-                        )
-                    ) =>
+                if matches!(
+                    error.downcast_ref(),
+                    Some(ErrorKind::InvalidPack(_))
+                ) || error.is::<serde_json::Error>()
+                    || error.is::<std::io::Error>() =>
             {
                 tracing::warn!(
                     "Skipping pack {} from instance {instance_id} while initializing pack sync: {error}",

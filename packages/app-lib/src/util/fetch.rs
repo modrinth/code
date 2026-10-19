@@ -244,11 +244,9 @@ impl ApiRateLimit {
             );
             self.block_for(retry_after);
 
-            let retry_in_seconds = self
-                .retry_in_seconds()
-                .unwrap_or_else(|| duration_seconds_ceil(retry_after));
+            let retry_in = self.retry_in().unwrap_or(retry_after);
 
-            return Err(ErrorKind::Ratelimited { retry_in_seconds }.into());
+            return Err(ErrorKind::RateLimited { retry_in }.into());
         }
 
         self.ensure_not_blocked()
@@ -273,15 +271,15 @@ impl ApiRateLimit {
 
         self.block_for(retry_after);
 
-        Some(ErrorKind::Ratelimited {
-            retry_in_seconds: self.retry_in_seconds().unwrap_or(0),
+        Some(ErrorKind::RateLimited {
+            retry_in: self.retry_in().unwrap_or_default(),
         })
     }
 
     fn ensure_not_blocked(&self) -> crate::Result<()> {
-        if let Some(retry_in_seconds) = self.retry_in_seconds() {
+        if let Some(retry_in) = self.retry_in() {
             debug!("Hit builtin rate limiter; blocking");
-            return Err(ErrorKind::Ratelimited { retry_in_seconds }.into());
+            return Err(ErrorKind::RateLimited { retry_in }.into());
         }
 
         Ok(())
@@ -298,14 +296,14 @@ impl ApiRateLimit {
         }
     }
 
-    fn retry_in_seconds(&self) -> Option<u64> {
+    fn retry_in(&self) -> Option<Duration> {
         let mut block_until = self.block_until.lock();
         let remaining = (*block_until)?.checked_duration_since(Instant::now());
 
         if let Some(remaining) = remaining
             && !remaining.is_zero()
         {
-            return Some(duration_seconds_ceil(remaining));
+            return Some(remaining);
         }
 
         *block_until = None;
@@ -323,12 +321,6 @@ fn parse_retry_after(value: &str, now: SystemTime) -> Option<Duration> {
 
     let retry_at = httpdate::parse_http_date(value).ok()?;
     Some(retry_at.duration_since(now).unwrap_or(Duration::ZERO))
-}
-
-fn duration_seconds_ceil(duration: Duration) -> u64 {
-    duration
-        .as_secs()
-        .saturating_add(u64::from(duration.subsec_nanos() > 0))
 }
 
 fn reqwest_client_builder_with_timeout() -> reqwest::ClientBuilder {
@@ -1017,7 +1009,7 @@ async fn fetch_advanced_with_target(
                         error.method = Some(method.as_str().to_string());
                         error.url = Some(url.to_string());
                         error.route = uri_path.map(str::to_string);
-                        return Err(ErrorKind::LabrinthError(error).into());
+                        return Err(error.into());
                     }
                     return Err(backup_error.into());
                 }

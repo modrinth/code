@@ -162,7 +162,6 @@ function normalizeInstallError(value: unknown): WireObject {
 	return {
 		...error,
 		phase: error.phase === undefined ? undefined : unitVariant(error.phase),
-		reason: error.reason === undefined ? undefined : unitVariant(error.reason),
 		api: error.api === undefined ? undefined : wireObject(error.api),
 		context: error.context === undefined ? undefined : normalizeInstallContext(error.context),
 	}
