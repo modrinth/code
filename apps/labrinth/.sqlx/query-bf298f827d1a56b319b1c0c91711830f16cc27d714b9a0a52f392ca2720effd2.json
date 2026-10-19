@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                    UPDATE mods\n                    SET approved = COALESCE(approved, NOW()), initial_queued = NULL\n                    WHERE id = $1\n                    ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "bf298f827d1a56b319b1c0c91711830f16cc27d714b9a0a52f392ca2720effd2"
+}
