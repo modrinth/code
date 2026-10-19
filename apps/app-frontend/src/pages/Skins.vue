@@ -23,7 +23,6 @@ import {
 } from '@modrinth/ui'
 import { arrayBufferToBase64 } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
-import { type DragDropEvent, getCurrentWebview } from '@tauri-apps/api/webview'
 import { computedAsync } from '@vueuse/core'
 import { computed, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue'
 
@@ -35,6 +34,7 @@ import { handleSevereError } from '@/composables/use-error.js'
 import { injectMinecraftAccounts } from '@/features/minecraft-accounts/context'
 import { trackEvent } from '@/helpers/analytics'
 import { check_reachable, get_default_user, login as login_flow, users } from '@/helpers/auth'
+import { listenNativeDragDrop, type NativeDragDropEvent } from '@/helpers/native-drag-drop'
 import { cleanupUnusedPreviews } from '@/helpers/rendering/skin-previews'
 import type { Cape, Skin, SkinTextureUrl } from '@/helpers/skins.ts'
 import {
@@ -478,7 +478,16 @@ function isSkinActive(skin: Skin) {
 }
 
 function getErrorMessage(error: unknown) {
-	return error instanceof Error ? error.message : String(error)
+	if (error instanceof Error) return error.message
+	if (
+		typeof error === 'object' &&
+		error !== null &&
+		'message' in error &&
+		typeof error.message === 'string'
+	) {
+		return error.message
+	}
+	return String(error)
 }
 
 function isMinecraftSkinRateLimitError(error: unknown) {
@@ -890,30 +899,28 @@ function isPositionOverAddSkinButton(position: { x: number; y: number }) {
 	return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom
 }
 
-async function handleAddSkinNativeDragDrop(event: { payload: DragDropEvent }) {
+async function handleAddSkinNativeDragDrop(event: NativeDragDropEvent) {
 	if (isSkinManagementReadOnly.value) return
 
-	const payload = event.payload
-
-	if (payload.type === 'leave') {
+	if (event.type === 'leave') {
 		isDraggingSkinFile.value = false
 		isAddSkinButtonDragActive.value = false
 		return
 	}
 
-	if (payload.type === 'enter') {
-		isDraggingSkinFile.value = payload.paths.some(isSkinImagePath)
+	if (event.type === 'enter') {
+		isDraggingSkinFile.value = event.paths.some(isSkinImagePath)
 	}
 
-	if (payload.type === 'enter' || payload.type === 'over') {
+	if (event.type === 'enter' || event.type === 'over') {
 		isAddSkinButtonDragActive.value =
-			isDraggingSkinFile.value && isPositionOverAddSkinButton(payload.position)
+			isDraggingSkinFile.value && isPositionOverAddSkinButton(event.position)
 		return
 	}
 
-	const hasSkinPath = payload.paths.some(isSkinImagePath)
+	const hasSkinPath = event.paths.some(isSkinImagePath)
 	const shouldUpload =
-		(isDraggingSkinFile.value || hasSkinPath) && isPositionOverAddSkinButton(payload.position)
+		(isDraggingSkinFile.value || hasSkinPath) && isPositionOverAddSkinButton(event.position)
 
 	isDraggingSkinFile.value = false
 	isAddSkinButtonDragActive.value = false
@@ -922,7 +929,7 @@ async function handleAddSkinNativeDragDrop(event: { payload: DragDropEvent }) {
 		return
 	}
 
-	const skinPath = payload.paths.find(isSkinImagePath)
+	const skinPath = event.paths.find(isSkinImagePath)
 
 	if (!skinPath) {
 		return
@@ -934,7 +941,7 @@ async function handleAddSkinNativeDragDrop(event: { payload: DragDropEvent }) {
 	} catch (error) {
 		addNotification({
 			title: formatMessage(messages.droppedFileErrorTitle),
-			text: error instanceof Error ? error.message : formatMessage(messages.droppedFileErrorText),
+			text: getErrorMessage(error) || formatMessage(messages.droppedFileErrorText),
 			type: 'error',
 		})
 	}
@@ -974,7 +981,7 @@ async function onAddSkinDrop(event: DragEvent) {
 
 async function setupAddSkinDragDropListener() {
 	try {
-		const unlisten = await getCurrentWebview().onDragDropEvent(handleAddSkinNativeDragDrop)
+		const unlisten = await listenNativeDragDrop(handleAddSkinNativeDragDrop)
 
 		if (isUnmounted) {
 			unlisten()

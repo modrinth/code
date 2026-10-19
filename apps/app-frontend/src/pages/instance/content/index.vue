@@ -118,7 +118,6 @@ import {
 	versionChangesGameVersion,
 } from '@modrinth/ui'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { getCurrentWebview } from '@tauri-apps/api/webview'
 import { open } from '@tauri-apps/plugin-dialog'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
@@ -148,6 +147,7 @@ import {
 	update_managed_modrinth_version,
 } from '@/helpers/instance'
 import { type InstanceContentData, loadInstanceContentData } from '@/helpers/instance-content'
+import { listenNativeDragDrop } from '@/helpers/native-drag-drop'
 import { get as getSettings, set as setSettings } from '@/helpers/settings'
 import { set_synced_pack_enabled, syncedPackKeys } from '@/helpers/synced-packs'
 import type { CacheBehaviour } from '@/helpers/types'
@@ -1855,16 +1855,15 @@ useAppEvent('instance', async (event) => {
 })
 
 onMounted(() => {
-	void getCurrentWebview()
-		.onDragDropEvent(async (event) => {
-			if (event.payload.type !== 'drop' || !instance.value || isInstanceBusy.value) return
+	void listenNativeDragDrop(async (event) => {
+		if (event.type !== 'drop' || !instance.value || isInstanceBusy.value) return
 
-			for (const file of event.payload.paths) {
-				if (file.endsWith('.mrpack')) continue
-				await add_project_from_path(instance.value.id, file).catch(handleError)
-			}
-			await initProjects()
-		})
+		for (const file of event.paths) {
+			if (file.endsWith('.mrpack')) continue
+			await add_project_from_path(instance.value.id, file).catch(handleError)
+		}
+		await initProjects()
+	})
 		.then((unlisten) => {
 			if (isUnmounted) {
 				unlisten()
