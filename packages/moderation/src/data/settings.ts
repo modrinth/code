@@ -7,7 +7,7 @@ const settings = {
 			id: 'send-issues-as-thread-message',
 			title: 'Send issues as thread message',
 			description: 'Send selected issues as a thread message instead of creating tracked issues.',
-			default: true,
+			default: false,
 		}),
 		AutoGoNextOnReviewOutcome: setting.asToggle({
 			type: 'toggle',
