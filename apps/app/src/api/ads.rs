@@ -6,7 +6,7 @@ use tauri::plugin::TauriPlugin;
 use tauri::{Manager, PhysicalPosition, PhysicalSize, Runtime};
 use tauri_plugin_opener::OpenerExt;
 use theseus::{AppEvent, EventState, settings};
-use tokio::sync::RwLock;
+use tokio::sync::{RwLock, oneshot};
 
 pub struct AdsState {
     pub shown: bool,
@@ -17,10 +17,12 @@ pub struct AdsState {
     pub occluded: bool,
     pub last_click: Option<Instant>,
     pub malicious_origins: HashSet<String>,
+    pub pending_debug_state: Option<oneshot::Sender<serde_json::Value>>,
 }
 
 const AD_LINK: &str = "https://modrinth.com/wrapper/app-ads-cookie";
 const APP_TITLE_BAR_HEIGHT: f32 = 48.0;
+const ADS_DEBUG_STATE_TIMEOUT: Duration = Duration::from_secs(3);
 #[cfg(any(windows, target_os = "macos"))]
 pub(super) const OCCLUDED_AREA_THRESHOLD: f64 = 0.5;
 
@@ -279,6 +281,7 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
                 occluded: false,
                 last_click: None,
                 malicious_origins: HashSet::new(),
+                pending_debug_state: None,
             }));
 
             // We refresh the ads window periodically to mitigate memory leak issues.
@@ -367,6 +370,8 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
             record_ads_click,
             open_link,
             get_ads_personalization,
+            get_ads_debug_state,
+            report_ads_debug_state,
         ])
         .build()
 }
@@ -501,6 +506,7 @@ pub async fn init_ads_window<R: Runtime>(
                 include_str!("ads-consent/cmp.js"),
                 include_str!("ads-consent/media.js"),
                 include_str!("ads-consent/controller.js"),
+                include_str!("ads-consent/debug-state.js"),
                 include_str!("ads-consent/index.js"),
                 "})()",
             ]
@@ -935,4 +941,42 @@ pub async fn open_link<R: Runtime>(
 pub async fn get_ads_personalization() -> crate::api::Result<bool> {
     let res = settings::get().await?;
     Ok(res.personalized_ads)
+}
+
+/// Asks the ads webview for the details needed to block the ad it is showing,
+/// returning `None` when no ad page is loaded or it does not respond in time.
+#[tauri::command]
+pub async fn get_ads_debug_state<R: Runtime>(
+    app: tauri::AppHandle<R>,
+) -> crate::api::Result<Option<serde_json::Value>> {
+    let Some(webview) = app.webviews().get("ads-window").cloned() else {
+        return Ok(None);
+    };
+
+    let state = app.state::<RwLock<AdsState>>();
+    let (tx, rx) = oneshot::channel();
+    state.write().await.pending_debug_state = Some(tx);
+    webview.eval("window.modrinthPrivacy?.adsReportDebugState?.()")?;
+
+    match tokio::time::timeout(ADS_DEBUG_STATE_TIMEOUT, rx).await {
+        Ok(Ok(debug_state)) => Ok(Some(debug_state)),
+        _ => {
+            state.write().await.pending_debug_state = None;
+            Ok(None)
+        }
+    }
+}
+
+#[tauri::command]
+pub async fn report_ads_debug_state<R: Runtime>(
+    app: tauri::AppHandle<R>,
+    debug_state: serde_json::Value,
+) -> crate::api::Result<()> {
+    let state = app.state::<RwLock<AdsState>>();
+
+    if let Some(tx) = state.write().await.pending_debug_state.take() {
+        let _ = tx.send(debug_state);
+    }
+
+    Ok(())
 }

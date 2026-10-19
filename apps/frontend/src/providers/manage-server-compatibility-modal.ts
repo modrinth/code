@@ -4,13 +4,12 @@ import {
 	createContext,
 	injectModrinthClient,
 	injectNotificationManager,
-	injectProjectPageContext,
 	type MultiStageModal,
 	type StageConfigInput,
 } from '@modrinth/ui'
 import JSZip from 'jszip'
-import type { Ref, ShallowRef } from 'vue'
-import { markRaw, toRaw } from 'vue'
+import type { MaybeRefOrGetter, Ref, ShallowRef } from 'vue'
+import { computed, markRaw, onBeforeUnmount, ref, toRaw, toValue, watch } from 'vue'
 import type { ComponentExposed } from 'vue-component-type-helpers'
 
 import SelectCompatibilityType from '~/components/ui/project-settings/ServerCompatibilityModal/stages/SelectCompatibilityType.vue'
@@ -18,9 +17,77 @@ import SelectPublishedModpack from '~/components/ui/project-settings/ServerCompa
 import SelectVanillaVersions from '~/components/ui/project-settings/ServerCompatibilityModal/stages/SelectVanillaVersions.vue'
 import UploadCustomModpack from '~/components/ui/project-settings/ServerCompatibilityModal/stages/UploadCustomModpack.vue'
 
+const PING_TIMEOUT_MS = 5000
+
+export function useJavaServerPing(
+	address: MaybeRefOrGetter<string>,
+	enabled: MaybeRefOrGetter<boolean> = true,
+) {
+	const client = injectModrinthClient()
+	const loading = ref(false)
+	const result = ref<{ online: boolean; latency: number | null } | null>(null)
+	const lastPingedAddress = ref('')
+	const normalizedAddress = computed(() => toValue(address).trim())
+	const addressChanged = computed(() => normalizedAddress.value !== lastPingedAddress.value)
+	let request = 0
+	let debounceTimer: ReturnType<typeof setTimeout> | undefined
+
+	function clear() {
+		clearTimeout(debounceTimer)
+		request += 1
+		loading.value = false
+		result.value = null
+	}
+
+	async function ping() {
+		clearTimeout(debounceTimer)
+		const pingAddress = normalizedAddress.value
+		if (!toValue(enabled) || !pingAddress) return
+		const currentRequest = ++request
+		loading.value = true
+		result.value = null
+		let timeout: ReturnType<typeof setTimeout> | undefined
+		try {
+			await Promise.race([
+				client.labrinth.server_ping_internal.pingMinecraftJava({
+					address: pingAddress,
+					timeout_ms: PING_TIMEOUT_MS,
+				}),
+				new Promise<never>((_, reject) => {
+					timeout = setTimeout(() => reject(new Error('Ping timed out')), PING_TIMEOUT_MS)
+				}),
+			])
+			if (currentRequest === request) result.value = { online: true, latency: null }
+		} catch {
+			if (currentRequest === request) result.value = { online: false, latency: null }
+		} finally {
+			clearTimeout(timeout)
+			if (currentRequest === request) {
+				loading.value = false
+				lastPingedAddress.value = pingAddress
+			}
+		}
+	}
+
+	watch(
+		[() => toValue(enabled), normalizedAddress],
+		([isEnabled, pingAddress]) => {
+			clear()
+			if (isEnabled && pingAddress) {
+				debounceTimer = setTimeout(() => void ping(), 500)
+			}
+		},
+		{ flush: 'sync' },
+	)
+	onBeforeUnmount(clear)
+
+	return { loading, result, addressChanged, ping }
+}
+
 export type CompatibilityType = 'vanilla' | 'published-modpack' | 'custom-modpack'
 
 export interface ServerCompatibilityContextValue {
+	project: Ref<Labrinth.Projects.v3.Project | undefined>
 	// Stage management
 	stageConfigs: StageConfigInput<ServerCompatibilityContextValue>[]
 	modal: ShallowRef<ComponentExposed<typeof MultiStageModal> | null>
@@ -49,8 +116,9 @@ export const [injectServerCompatibilityContext, provideServerCompatibilityContex
 
 export function createServerCompatibilityContext(
 	modal: ShallowRef<ComponentExposed<typeof MultiStageModal> | null>,
+	projectV3: Ref<Labrinth.Projects.v3.Project | undefined>,
+	patchProjectV3: (patch: Labrinth.Projects.v3.EditProjectRequest) => Promise<boolean>,
 ): ServerCompatibilityContextValue {
-	const { projectV3, patchProjectV3 } = injectProjectPageContext()
 	const { labrinth } = injectModrinthClient()
 	const { addNotification } = injectNotificationManager()
 
@@ -68,6 +136,7 @@ export function createServerCompatibilityContext(
 	const isSwitchingCompatibilityType = ref(false)
 
 	async function uploadCustomModpackFile(file: File): Promise<Labrinth.Versions.v3.Version> {
+		if (!projectV3.value) throw new Error('No server project selected')
 		const rawFile = toRaw(file)
 
 		// Default to filename if we can't parse the mrpack
@@ -148,7 +217,7 @@ export function createServerCompatibilityContext(
 							content: {
 								kind: 'vanilla',
 								supported_game_versions: supportedGameVersions.value,
-								recommended_game_version: recommendedGameVersion.value,
+								recommended_game_version: recommendedGameVersion.value!,
 							},
 						},
 					})
@@ -225,6 +294,7 @@ export function createServerCompatibilityContext(
 	}
 
 	return {
+		project: projectV3,
 		stageConfigs,
 		modal,
 		isSubmitting,

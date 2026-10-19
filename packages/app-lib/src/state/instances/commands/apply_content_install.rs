@@ -620,22 +620,6 @@ pub(crate) async fn add_project_bytes(
     .await
 }
 
-pub(crate) async fn require_stopped_for_content(
-    instance_id: &str,
-    project_type: ProjectType,
-    state: &State,
-) -> crate::Result<()> {
-    if project_type == ProjectType::Mod
-        && crate::state::instance_has_running_process(instance_id, state)
-            .await?
-    {
-        return Err(crate::state::content_store::input(
-            "Stop this instance before changing its mods",
-        ));
-    }
-    Ok(())
-}
-
 pub(crate) async fn content_source_kind_for_project_path(
     instance_id: &str,
     project_path: &str,

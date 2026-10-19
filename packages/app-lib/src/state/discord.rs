@@ -4,9 +4,10 @@ use discord_rich_presence::{
     DiscordIpc, DiscordIpcClient,
     activity::{Activity, Assets},
 };
+use sqlx::SqlitePool;
 use tokio::sync::RwLock;
 
-use crate::State;
+use crate::state::ProcessManager;
 
 pub struct DiscordGuard {
     client: Arc<RwLock<DiscordIpcClient>>,
@@ -47,10 +48,10 @@ impl DiscordGuard {
         &self,
         msg: &str,
         reconnect_if_fail: bool,
+        pool: &SqlitePool,
     ) -> crate::Result<()> {
         // Check if discord is disabled, and if so, clear the activity instead
-        let state = State::get().await?;
-        let settings = crate::state::Settings::get(&state.pool).await?;
+        let settings = crate::state::Settings::get(pool).await?;
         if !settings.discord_rpc {
             Ok(self.clear_activity(true).await?)
         } else {
@@ -124,24 +125,26 @@ impl DiscordGuard {
     pub async fn clear_to_default(
         &self,
         reconnect_if_fail: bool,
+        pool: &SqlitePool,
+        process_manager: &ProcessManager,
     ) -> crate::Result<()> {
-        let state = State::get().await?;
-
-        let settings = crate::state::Settings::get(&state.pool).await?;
+        let settings = crate::state::Settings::get(pool).await?;
         if !settings.discord_rpc {
             println!("Discord is disabled, clearing activity");
             return self.clear_activity(true).await;
         }
 
-        let running_instances = state.process_manager.get_all();
+        let running_instances = process_manager.get_all();
         if let Some(existing_child) = running_instances.first() {
             self.set_activity(
                 &format!("Playing {}", existing_child.instance_name),
                 reconnect_if_fail,
+                pool,
             )
             .await?;
         } else {
-            self.set_activity("Idling...", reconnect_if_fail).await?;
+            self.set_activity("Idling...", reconnect_if_fail, pool)
+                .await?;
         }
         Ok(())
     }

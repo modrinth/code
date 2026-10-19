@@ -1664,9 +1664,6 @@
   "app.settings.default-instance-options.height.title": {
     "message": "Chiều cao"
   },
-  "app.settings.default-instance-options.java-and-memory.title": {
-    "message": "Java và bộ nhớ"
-  },
   "app.settings.default-instance-options.java-arguments.description": {
     "message": "Các đối số được truyền cho Java khi khởi chạy một bản cài đặt."
   },
@@ -1675,9 +1672,6 @@
   },
   "app.settings.default-instance-options.java-arguments.title": {
     "message": "Đối số Java"
-  },
-  "app.settings.default-instance-options.launch-hooks.title": {
-    "message": "Hook khởi chạy"
   },
   "app.settings.default-instance-options.memory-allocation.description": {
     "message": "Dung lượng bộ nhớ tối đa dành cho mỗi bản cài đặt."
@@ -1711,9 +1705,6 @@
   },
   "app.settings.default-instance-options.width.title": {
     "message": "Chiều rộng"
-  },
-  "app.settings.default-instance-options.window.title": {
-    "message": "Cửa sổ"
   },
   "app.settings.default-instance-options.wrapper-hook.description": {
     "message": "Lệnh dùng để bọc tiến trình khởi chạy Minecraft."
@@ -2771,14 +2762,8 @@
   "app.settings.resource-management.app-cache.confirm.description": {
     "message": "Ứng dụng có thể tải chậm hơn cho tới khi bộ nhớ đệm được tạo lại."
   },
-  "app.settings.resource-management.app-cache.confirm.title": {
-    "message": "Xóa bộ nhớ đệm ứng dụng?"
-  },
   "app.settings.resource-management.app-cache.description": {
     "message": "Xóa dữ liệu đã lưu trong bộ nhớ đệm và tải lại từ Modrinth. Ứng dụng có thể tải chậm hơn cho tới khi bộ nhớ đệm được tạo lại."
-  },
-  "app.settings.resource-management.app-cache.purge": {
-    "message": "Xóa bộ nhớ đệm"
   },
   "app.settings.resource-management.app-cache.title": {
     "message": "Bộ nhớ đệm ứng dụng"
@@ -2855,9 +2840,6 @@
   "app.settings.resource-management.store.description": {
     "message": "Tiết kiệm dung lượng bằng cách tái sử dụng tệp trò chơi, mod và gói giữa các bản cài đặt."
   },
-  "app.settings.resource-management.store.empty": {
-    "message": "Cài mod hoặc gói để xem mức sử dụng dung lượng tại đây."
-  },
   "app.settings.resource-management.store.issues": {
     "message": "Xem {count, plural, one {# vấn đề} other {# vấn đề}}"
   },
@@ -2896,9 +2878,6 @@
   },
   "app.settings.resource-management.store.verified": {
     "message": "Xác minh hoàn tất"
-  },
-  "app.settings.sidebar.label.instances": {
-    "message": "Bản cài đặt"
   },
   "app.settings.synced-options.choose-sync-source.command-history-description": {
     "message": "Chọn bản cài đặt để sao chép lịch sử lệnh. Lịch sử này chỉ được dùng cho lần đồng bộ đầu tiên và sau đó bạn có thể chỉnh sửa từ bất kỳ bản cài đặt nào."
@@ -3139,12 +3118,6 @@
   },
   "app.settings.tabs.privacy": {
     "message": "Quyền riêng tư"
-  },
-  "app.settings.tabs.resource-management": {
-    "message": "Quản lý tài nguyên"
-  },
-  "app.settings.tabs.synced-options": {
-    "message": "Cài đặt đồng bộ"
   },
   "app.sidebar.playing-as": {
     "message": "Đang chơi với tên"
@@ -4142,9 +4115,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Chọn kênh cập nhật"
   },
-  "instance.settings.tabs.hooks.description": {
-    "message": "Chạy các lệnh hệ thống riêng cho bản cài đặt trước và sau khi khởi chạy trò chơi."
-  },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Sau khi thoát"
   },
@@ -4205,18 +4175,6 @@
   "instance.settings.tabs.installation.locked": {
     "message": "Các tùy chọn cài đặt không khả dụng khi bản cài đặt này đang bị khóa."
   },
-  "instance.settings.tabs.java.custom-environment-variables": {
-    "message": "Thiết lập biến môi trường riêng cho bản cài đặt này."
-  },
-  "instance.settings.tabs.java.custom-java-arguments": {
-    "message": "Thiết lập đối số Java riêng cho bản cài đặt này."
-  },
-  "instance.settings.tabs.java.custom-java-installation": {
-    "message": "Chọn bản cài đặt Java khác cho bản cài đặt này."
-  },
-  "instance.settings.tabs.java.custom-memory-allocation": {
-    "message": "Thiết lập phân bổ bộ nhớ riêng cho bản cài đặt này."
-  },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Nhập biến môi trường..."
   },
@@ -4240,9 +4198,6 @@
   },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/đường/dẫn/đến/java"
-  },
-  "instance.settings.tabs.settings-overrides": {
-    "message": "Ghi đè đồng bộ"
   },
   "instance.settings.tabs.sharing": {
     "message": "Chia sẻ"
@@ -4306,9 +4261,6 @@
   },
   "instance.settings.tabs.window": {
     "message": "Cài đặt cửa sổ tùy chỉnh"
-  },
-  "instance.settings.tabs.window.custom-window-settings": {
-    "message": "Thiết lập chế độ toàn màn hình và độ phân giải khởi chạy riêng cho bản cài đặt này."
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Toàn màn hình"

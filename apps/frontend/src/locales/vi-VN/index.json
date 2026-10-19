@@ -1085,9 +1085,6 @@
   "conversation-thread.action.reject": {
     "message": "Từ chối"
   },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Từ chối với phản hồi"
-  },
   "conversation-thread.action.reopen-thread": {
     "message": "Mở lại luồng"
   },
@@ -1121,9 +1118,6 @@
   "conversation-thread.action.withhold": {
     "message": "Thu hồi"
   },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Thu hồi với phản hồi"
-  },
   "conversation-thread.closed-thread.description": {
     "message": "Luồng này đã bị đóng và tin nhắn mới không thể gửi được vào."
   },
@@ -1132,9 +1126,6 @@
   },
   "conversation-thread.error.reopening-report": {
     "message": "Lỗi khi mở lại báo cáo"
-  },
-  "conversation-thread.error.sending-message": {
-    "message": "Lỗi khi gửi tin nhắn"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Đang phản hồi vào luồng..."
@@ -1162,9 +1153,6 @@
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "Tôi đã chắc chắn rằng tôi đã trả lời đúng cách các bình luận từ bên kiểm duyệt."
-  },
-  "conversation-thread.resubmit-modal.description": {
-    "message": "Bạn sẽ gửi <project-title>{projectTitle}</project-title> để được xem lại từ bên kiểm duyệt."
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "Gửi lại để kiểm duyệt"
@@ -3550,9 +3538,6 @@
   },
   "project.actions.rescan-modpack": {
     "message": "Quét lại modpack"
-  },
-  "project.actions.review-project": {
-    "message": "Xem xét dự án"
   },
   "project.actions.servers-promo.description": {
     "message": "Modrinth Hosting là cách đơn giản nhất để chơi cùng bạn bè mà không gặp rắc rối!"

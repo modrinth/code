@@ -1664,9 +1664,6 @@
   "app.settings.default-instance-options.height.title": {
     "message": "Yükseklik"
   },
-  "app.settings.default-instance-options.java-and-memory.title": {
-    "message": "Java ve bellek"
-  },
   "app.settings.default-instance-options.java-arguments.description": {
     "message": "Örneği başlatırken Java'ya aktarılan argümanlar."
   },
@@ -1675,9 +1672,6 @@
   },
   "app.settings.default-instance-options.java-arguments.title": {
     "message": "Java Argümanları"
-  },
-  "app.settings.default-instance-options.launch-hooks.title": {
-    "message": "Başlatma kancaları"
   },
   "app.settings.default-instance-options.memory-allocation.description": {
     "message": "Her örnek için bulunan maksimum bellek."
@@ -1711,9 +1705,6 @@
   },
   "app.settings.default-instance-options.width.title": {
     "message": "Genişlik"
-  },
-  "app.settings.default-instance-options.window.title": {
-    "message": "Pencere"
   },
   "app.settings.default-instance-options.wrapper-hook.description": {
     "message": "Minecraft başlatma işlemini sarmalamak için kullanılan komut."
@@ -2489,14 +2480,8 @@
   "app.settings.resource-management.app-cache.confirm.description": {
     "message": "Önbellek yeniden inşa edilene kadar uygulama daha yavaş yüklenebilir."
   },
-  "app.settings.resource-management.app-cache.confirm.title": {
-    "message": "Uygulama önbelleğini temizle?"
-  },
   "app.settings.resource-management.app-cache.description": {
     "message": "Önbelleklenmiş veriyi temizle ve Modrinth'den tekrar indir. Önbellek yeniden inşa edilene kadar uygulama daha yavaş yüklenebilir."
-  },
-  "app.settings.resource-management.app-cache.purge": {
-    "message": "Önbelleği temizle"
   },
   "app.settings.resource-management.app-cache.title": {
     "message": "Uygulama önbelleği"
@@ -2533,9 +2518,6 @@
   },
   "app.settings.resource-management.maximum-concurrent-writes.title": {
     "message": "Maksimum eşzamanlı yazım"
-  },
-  "app.settings.sidebar.label.instances": {
-    "message": "Örnekler"
   },
   "app.settings.synced-options.choose-sync-source.no-instances-found": {
     "message": "Hiçbir örnek bulunamadı"
@@ -2593,12 +2575,6 @@
   },
   "app.settings.tabs.privacy": {
     "message": "Gizlilik"
-  },
-  "app.settings.tabs.resource-management": {
-    "message": "Kaynak yönetimi"
-  },
-  "app.settings.tabs.synced-options": {
-    "message": "Senkronize edilmiş ayarlar"
   },
   "app.sidebar.playing-as": {
     "message": "Şu olarak oynuyor"
@@ -3431,9 +3407,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Güncelleme kanalını seç"
   },
-  "instance.settings.tabs.hooks.description": {
-    "message": "Oyunu başlatmadan önce ve başlattıktan sonra örneğe özgü sistem komutlarını çalıştırın."
-  },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Çıkış sonrası"
   },
@@ -3494,18 +3467,6 @@
   "instance.settings.tabs.installation.locked": {
     "message": "Bu örnek kilitliyken kurulum ayarlarına erişilemez."
   },
-  "instance.settings.tabs.java.custom-environment-variables": {
-    "message": "Bu örnek için ortam değişkenlerini ayrı ayrı ayarlayın."
-  },
-  "instance.settings.tabs.java.custom-java-arguments": {
-    "message": "Bu örnek için Java bağımsız değişkenlerini ayrı olarak ayarlayın."
-  },
-  "instance.settings.tabs.java.custom-java-installation": {
-    "message": "Bu örnek için farklı bir Java kurulumu seçin."
-  },
-  "instance.settings.tabs.java.custom-memory-allocation": {
-    "message": "Bu örnek için bellek ayırmayı ayrı olarak ayarlayın."
-  },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Ortam değişkenlerini girin..."
   },
@@ -3529,9 +3490,6 @@
   },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/java/kurulum/yolu"
-  },
-  "instance.settings.tabs.settings-overrides": {
-    "message": "Geçersiz kılmaları senkronize et"
   },
   "instance.settings.tabs.sharing": {
     "message": "Paylaşım"
@@ -3586,9 +3544,6 @@
   },
   "instance.settings.tabs.window": {
     "message": "Özel pencere ayarları"
-  },
-  "instance.settings.tabs.window.custom-window-settings": {
-    "message": "Configure fullscreen and launch resolution separately for this instance."
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Tam Ekran"

@@ -8,7 +8,7 @@ import {
 	shift,
 	useFloating,
 } from '@floating-ui/vue'
-import { computed, nextTick, onBeforeUnmount, ref, useTemplateRef } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref, shallowRef, useTemplateRef } from 'vue'
 
 import { registerFloatingMenu } from '../../providers/floating-menu'
 import { dismissTooltip } from '../../providers/tooltip'
@@ -49,7 +49,14 @@ const emit = defineEmits<{
 
 const hover = computed(() => props.trigger === 'hover')
 const isOpen = ref(false)
+const menuDocument = shallowRef<Document>()
 const triggerEl = useTemplateRef<HTMLElement>('triggerEl')
+const teleportTarget = computed(
+	() =>
+		menuDocument.value?.body ??
+		triggerEl.value?.ownerDocument.body ??
+		(typeof document !== 'undefined' ? document.body : 'body'),
+)
 const floating = useTemplateRef<HTMLElement>('floating')
 const arrowEl = useTemplateRef<HTMLElement>('arrowEl')
 const expandOrigin = ref(SIDES.bottom.origin)
@@ -122,13 +129,15 @@ function updateOrigin() {
 }
 
 function listen() {
-	document.addEventListener('click', onDocumentClick)
-	document.addEventListener('keydown', onKeydown)
+	menuDocument.value?.addEventListener('click', onDocumentClick)
+	menuDocument.value?.addEventListener('keydown', onKeydown)
+	menuDocument.value?.defaultView?.addEventListener('beforeunload', close)
 }
 
 function unlisten() {
-	document.removeEventListener('click', onDocumentClick)
-	document.removeEventListener('keydown', onKeydown)
+	menuDocument.value?.removeEventListener('click', onDocumentClick)
+	menuDocument.value?.removeEventListener('keydown', onKeydown)
+	menuDocument.value?.defaultView?.removeEventListener('beforeunload', close)
 }
 
 function show() {
@@ -136,6 +145,7 @@ function show() {
 	if (props.disabled || isOpen.value) {
 		return
 	}
+	menuDocument.value = triggerEl.value?.ownerDocument ?? document
 	dismissTooltip()
 	expandOrigin.value = keywordOrigin(props.placement)
 	isOpen.value = true
@@ -221,7 +231,7 @@ defineExpose({ show, hide: close })
 		@focusout="hover && hide()"
 	>
 		<slot />
-		<Teleport to="body">
+		<Teleport :to="teleportTarget">
 			<Transition name="floating-expand">
 				<div
 					v-if="isOpen"

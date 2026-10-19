@@ -1,15 +1,12 @@
 <script setup lang="ts">
-import { getMarginTarget } from '@modrinth/moderation'
 import { commonProjectTypeCategoryMessages, NavTabs, useVIntl } from '@modrinth/ui'
 
 const { formatMessage } = useVIntl()
 
 const flags = useFeatureFlags()
 const route = useRoute()
-const modSettings = useModerationSettings()
 
 const allowTabChanging = computed(() => !route.query.sid)
-const marginTarget = computed(() => getMarginTarget(modSettings.value))
 
 const selectableProjectTypes = [
 	{
@@ -50,10 +47,7 @@ const selectableProjectTypes = [
 ]
 </script>
 <template>
-	<div
-		class="box-border flex w-full max-w-[1280px] flex-col gap-4 px-6 pb-6"
-		:class="`m${marginTarget}-auto`"
-	>
+	<div class="mx-auto box-border flex w-full max-w-[1280px] flex-col gap-4 px-6 pb-6">
 		<NavTabs
 			v-if="!flags.projectTypesPrimaryNav && allowTabChanging"
 			:links="selectableProjectTypes"

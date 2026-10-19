@@ -74,7 +74,11 @@
 					<EditIcon />
 					{{ formatMessage(commonMessages.editButton) }}
 				</Button>
-				<ButtonLink v-else-if="isSelf" size="xl" :to="editProfileLink">
+				<ButtonLink
+					v-else-if="isSelf && typeof editProfileLink === 'string'"
+					size="xl"
+					:to="editProfileLink"
+				>
 					<EditIcon />
 					{{ formatMessage(commonMessages.editButton) }}
 				</ButtonLink>
@@ -131,6 +135,18 @@ import type { AuthUser } from '#ui/providers/auth'
 import { commonMessages } from '#ui/utils'
 
 const messages = defineMessages({
+	profileManageProjectsButton: {
+		id: 'profile.button.manage-projects',
+		defaultMessage: 'Manage projects',
+	},
+	reset2faButton: {
+		id: 'profile.button.reset-2fa',
+		defaultMessage: 'Reset two-factor authentication',
+	},
+	editUserButton: {
+		id: 'profile.button.edit-user',
+		defaultMessage: 'Edit user',
+	},
 	affiliateLabel: {
 		id: 'profile.label.affiliate',
 		defaultMessage: 'Affiliate',
@@ -175,10 +191,6 @@ const messages = defineMessages({
 		id: 'profile.label.download-count',
 		defaultMessage: '{count, plural, one {download} other {downloads}}',
 	},
-	profileManageProjectsButton: {
-		id: 'profile.button.manage-projects',
-		defaultMessage: 'Manage projects',
-	},
 	removeAffiliateButton: {
 		id: 'profile.button.remove-affiliate',
 		defaultMessage: 'Remove as affiliate',
@@ -206,10 +218,6 @@ const messages = defineMessages({
 	forcePasswordResetButton: {
 		id: 'profile.button.force-password-reset',
 		defaultMessage: 'Force password reset',
-	},
-	reset2faButton: {
-		id: 'profile.button.reset-2fa',
-		defaultMessage: 'Reset two-factor authentication',
 	},
 })
 
@@ -315,12 +323,37 @@ const moreActions = computed<ButtonMenuOption[]>(() => [
 	},
 	{ type: 'divider', shown: props.showStaffActions && (props.isAdmin || props.isStaff) },
 	{
-		id: 'open-billing',
-		label: formatMessage(messages.billingButton),
-		icon: CurrencyIcon,
-		action: () => emit('openBilling'),
+		id: 'open-info',
+		label: formatMessage(messages.infoButton),
+		icon: InfoIcon,
+		action: () => emit('openInfo'),
 		tone: 'orange',
 		shown: props.showStaffActions && props.isStaff,
+	},
+	{
+		id: 'open-shared-instances',
+		label: formatMessage(messages.sharedInstancesButton),
+		icon: BoxesIcon,
+		action: () => emit('openSharedInstances'),
+		tone: 'orange',
+		shown: props.showStaffActions && props.isStaff,
+	},
+	{
+		id: 'open-analytics',
+		label: formatMessage(messages.analyticsButton),
+		icon: ChartIcon,
+		action: () => emit('openAnalytics'),
+		tone: 'orange',
+		shown: props.showStaffActions && props.isAdmin,
+	},
+	{ type: 'divider', shown: props.showStaffActions && (props.isAdmin || props.isStaff) },
+	{
+		id: 'edit-user',
+		label: formatMessage(messages.editUserButton),
+		icon: EditIcon,
+		action: () => emit('editUser'),
+		tone: 'green',
+		shown: props.showStaffActions && props.isAdmin,
 	},
 	{
 		id: 'toggle-affiliate',
@@ -331,15 +364,20 @@ const moreActions = computed<ButtonMenuOption[]>(() => [
 		action: () => emit('toggleAffiliate'),
 		shown: props.showStaffActions && props.isAdmin,
 		remainOpen: true,
-		tone: props.isAffiliate ? 'red' : 'orange',
+		tone: 'green',
 	},
 	{
-		id: 'open-info',
-		label: formatMessage(messages.infoButton),
-		icon: InfoIcon,
-		action: () => emit('openInfo'),
-		tone: 'orange',
+		id: 'open-billing',
+		label: formatMessage(messages.billingButton),
+		icon: CurrencyIcon,
+		action: () => emit('openBilling'),
+		tone: 'green',
 		shown: props.showStaffActions && props.isStaff,
+	},
+	{
+		type: 'divider',
+		shown:
+			props.showStaffActions && props.isAdmin && (props.user.role === 'developer' || !props.isSelf),
 	},
 	{
 		id: 'toggle-lock',
@@ -376,30 +414,6 @@ const moreActions = computed<ButtonMenuOption[]>(() => [
 			props.isAdmin &&
 			props.user.role === 'developer' &&
 			Boolean(props.user.has_totp),
-	},
-	{
-		id: 'open-shared-instances',
-		label: formatMessage(messages.sharedInstancesButton),
-		icon: BoxesIcon,
-		action: () => emit('openSharedInstances'),
-		tone: 'orange',
-		shown: props.showStaffActions && props.isStaff,
-	},
-	{
-		id: 'open-analytics',
-		label: formatMessage(messages.analyticsButton),
-		icon: ChartIcon,
-		action: () => emit('openAnalytics'),
-		tone: 'orange',
-		shown: props.showStaffActions && props.isAdmin,
-	},
-	{
-		id: 'edit-user',
-		label: 'Edit user',
-		icon: EditIcon,
-		action: () => emit('editUser'),
-		tone: 'orange',
-		shown: props.showStaffActions && props.isAdmin,
 	},
 ])
 </script>

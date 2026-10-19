@@ -356,14 +356,14 @@ pub(crate) async fn move_app_directory(
     let processes = sqlx::query!("SELECT pid, start_time FROM processes")
         .fetch_all(pool)
         .await?;
-    let system = sysinfo::System::new_all();
+    let start_times = crate::state::running_process_start_times(
+        processes.iter().map(|process| process.pid).collect(),
+    )
+    .await?;
     if processes.iter().any(|process| {
-        u32::try_from(process.pid)
-            .ok()
-            .and_then(|pid| system.process(sysinfo::Pid::from_u32(pid)))
-            .is_some_and(|running| {
-                (running.start_time() as i64).abs_diff(process.start_time) <= 2
-            })
+        start_times.get(&process.pid).is_some_and(|started_at| {
+            started_at.abs_diff(process.start_time) <= 2
+        })
     }) {
         return Err(input(
             "Close Minecraft instances before moving the app directory",

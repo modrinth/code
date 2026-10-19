@@ -785,17 +785,11 @@
   "conversation-thread.action.approve": {
     "message": "Luluskan"
   },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Luluskan dengan balasan"
-  },
   "conversation-thread.action.close-with-reply": {
     "message": "Tutup dengan balasan"
   },
   "conversation-thread.action.reject": {
     "message": "Tolak"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Tolak dengan balasan"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Buka semula bebenang"
@@ -830,17 +824,11 @@
   "conversation-thread.action.withhold": {
     "message": "Tahan"
   },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Tahan dengan balasan"
-  },
   "conversation-thread.error.closing-report": {
     "message": "Ralat semasa menutup laporan"
   },
   "conversation-thread.error.reopening-report": {
     "message": "Ralat semasa membuka semula laporan"
-  },
-  "conversation-thread.error.sending-message": {
-    "message": "Ralat semasa menghantar mesej"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Balas bebenang..."
@@ -865,9 +853,6 @@
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "Saya mengesahkan bahawa saya telah menjawab ulasan-ulasan penyederhana dengan betul."
-  },
-  "conversation-thread.resubmit-modal.description": {
-    "message": "Anda sedang menghantar <project-title>{projectTitle}</project-title> untuk disemak semula oleh penyederhana."
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "Sedang menyerahkan semula untuk semakan"
@@ -2884,9 +2869,6 @@
   },
   "project.actions.dont-show-again": {
     "message": "Jangan tunjukkan lagi"
-  },
-  "project.actions.review-project": {
-    "message": "Semak projek"
   },
   "project.actions.servers-promo.description": {
     "message": "Modrinth Hosting ialah cara paling mudah untuk bermain dengan rakan anda tanpa perlu bersusah payah!"

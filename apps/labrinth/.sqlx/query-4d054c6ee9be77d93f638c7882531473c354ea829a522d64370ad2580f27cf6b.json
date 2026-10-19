@@ -1,0 +1,40 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\tSELECT thread.mod_id, issue.thread_id, issue.created_at,\n\t\t\tfacet.what AS \"what: sqlx::types::Json<ThreadIssueTarget>\"\n\t\tFROM threads_issue_facets facet\n\t\tINNER JOIN threads_issues issue ON issue.id = facet.issue_id\n\t\tINNER JOIN threads thread ON thread.id = issue.thread_id\n\t\tWHERE facet.id = $1\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "mod_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "thread_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 3,
+        "name": "what: sqlx::types::Json<ThreadIssueTarget>",
+        "type_info": "Jsonb"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      true,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "4d054c6ee9be77d93f638c7882531473c354ea829a522d64370ad2580f27cf6b"
+}

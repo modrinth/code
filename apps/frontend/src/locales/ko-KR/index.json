@@ -1061,9 +1061,6 @@
   "conversation-thread.action.approve": {
     "message": "승인"
   },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "답글과 함께 승인"
-  },
   "conversation-thread.action.close-report": {
     "message": "티켓 닫기"
   },
@@ -1072,9 +1069,6 @@
   },
   "conversation-thread.action.reject": {
     "message": "거부"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "답글과 함께 거부"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "스레드 다시 열기"
@@ -1109,9 +1103,6 @@
   "conversation-thread.action.withhold": {
     "message": "보류"
   },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "답글과 함께 보류"
-  },
   "conversation-thread.closed-thread.description": {
     "message": "이 스레드는 닫혔으며, 더 이상 새로운 메시지를 작성할 수 없습니다."
   },
@@ -1120,9 +1111,6 @@
   },
   "conversation-thread.error.reopening-report": {
     "message": "신고 다시 열기 오류"
-  },
-  "conversation-thread.error.sending-message": {
-    "message": "메시지 전송 오류"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "스레드에 답글 게시..."
@@ -1150,9 +1138,6 @@
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "운영진의 지적 사항을 적절히 반영했음을 확인합니다."
-  },
-  "conversation-thread.resubmit-modal.description": {
-    "message": "<project-title>{projectTitle}</project-title> 프로젝트를 운영진의 재검토를 위해 제출하려고 합니다."
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "검토를 위해 다시 제출"
@@ -3535,9 +3520,6 @@
   },
   "project.actions.rescan-modpack": {
     "message": "모드팩 재검사"
-  },
-  "project.actions.review-project": {
-    "message": "프로젝트 검토"
   },
   "project.actions.servers-promo.description": {
     "message": "Modrinth 호스팅은 친구들과 번거로움 없이 플레이할 수 있는 가장 쉬운 방법입니다!"
