@@ -368,6 +368,12 @@
   "collections.label.private": {
     "defaultMessage": "非公開"
   },
+  "console.actions.collapse": {
+    "defaultMessage": "折りたたむ"
+  },
+  "console.actions.expand": {
+    "defaultMessage": "展開する"
+  },
   "console.actions.share": {
     "defaultMessage": "共有"
   },
@@ -382,6 +388,9 @@
   },
   "content.card.select-project": {
     "defaultMessage": "{project}を選択"
+  },
+  "content.card.sync-update-pending": {
+    "defaultMessage": "一部の同期済みコピーは変更待機状態です。原因としては、インスタンスが実行中である。バージョンが凍結されているまたは互換性がない。すでに独自のコピーが含まれている。であると考えられます。"
   },
   "content.card.synced": {
     "defaultMessage": "インスタンス間で同期済み"
@@ -710,6 +719,12 @@
   "content.page-layout.failed-to-load": {
     "defaultMessage": "コンテンツの読み込みに失敗しました"
   },
+  "content.page-layout.failed-to-load-changelog": {
+    "defaultMessage": "更新履歴の読み込みに失敗しました"
+  },
+  "content.page-layout.failed-to-load-updates": {
+    "defaultMessage": "利用可能なアップデートを読み込めませんでした"
+  },
   "content.page-layout.filter.add": {
     "defaultMessage": "フィルター"
   },
@@ -936,7 +951,7 @@
     "defaultMessage": "デフォルト"
   },
   "creation-flow.modal.final-config.generator-settings.description": {
-    "defaultMessage": "カスタムスーパーフラットの地層など、高度なワールドカスタマイズに使用されます"
+    "defaultMessage": "カスタムスーパーフラットの地層などの高度なワールドカスタマイズに使用されます。"
   },
   "creation-flow.modal.final-config.generator-settings.flat": {
     "defaultMessage": "フラット"
@@ -1028,6 +1043,9 @@
   "creation-flow.modal.modpack.search.placeholder": {
     "defaultMessage": "Modパックを検索"
   },
+  "creation-flow.modal.project.known-project.prompt": {
+    "defaultMessage": "すでにあなたがプレイしたいものを知っていますか？"
+  },
   "creation-flow.modal.project.search.create-instance": {
     "defaultMessage": "インスタンスを作成する"
   },
@@ -1093,6 +1111,9 @@
   },
   "creation-flow.title.set-up-server": {
     "defaultMessage": "サーバーの設定"
+  },
+  "empty-state.upload-versions.description": {
+    "defaultMessage": "バージョンをアップロードしたら戻ってきてください。"
   },
   "external-files.permissions-card.add-files-modal.confirm": {
     "defaultMessage": "{count, plural, other {ファイルを追加}}"
@@ -1217,6 +1238,9 @@
   "external-files.permissions-card.editor.save": {
     "defaultMessage": "帰属情報を保存"
   },
+  "external-files.permissions-card.editor.select-license-label": {
+    "defaultMessage": "ライセンスを検索…"
+  },
   "external-files.permissions-card.editor.type-label": {
     "defaultMessage": "パーミッションの理由"
   },
@@ -1258,6 +1282,9 @@
   },
   "external-files.permissions-card.last-updated": {
     "defaultMessage": "{date}に{user}によって更新されました"
+  },
+  "external-files.permissions-card.license.all-rights": {
+    "defaultMessage": "All Rights Reserved/No License"
   },
   "external-files.permissions-card.license.unknown": {
     "defaultMessage": "不明"
@@ -1376,6 +1403,12 @@
   "external-project-license-status.yes": {
     "defaultMessage": "はい"
   },
+  "file-button.file-too-large.description": {
+    "defaultMessage": "ファイル {filename} が大きすぎます。最大ファイルサイズは {maxSize} です。"
+  },
+  "file-button.file-too-large.title": {
+    "defaultMessage": "ファイルが大きすぎます"
+  },
   "files.conflict-modal.header": {
     "defaultMessage": "概要を書き出す"
   },
@@ -1428,7 +1461,7 @@
     "defaultMessage": "アーカイブ名"
   },
   "files.create-zip-modal.required": {
-    "defaultMessage": "アーカイブ名を入力してください"
+    "defaultMessage": "アーカイブ名を入力してください。"
   },
   "files.delete-modal.deleting-name": {
     "defaultMessage": "\"{name}\"を削除中"
@@ -2023,6 +2056,15 @@
   },
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "サーバーがオンボーディングにリセットされました"
+  },
+  "hosting.save-banner.resolve-errors": {
+    "defaultMessage": "保存する前に変更内容のエラーを解決してください。"
+  },
+  "hosting.settings.properties.motd-profanity": {
+    "defaultMessage": "Minecraftの使用ガイドラインにより、サーバーのMOTDには言葉遣いを含めることができません。検出された：“{value}”。"
+  },
+  "hosting.settings.properties.motd-profanity-save-error": {
+    "defaultMessage": "Minecraftの使用ガイドラインにより、サーバーのMOTD には言葉遣いを含めることができません。検出された: “{value}”"
   },
   "hosting.specs.burst": {
     "defaultMessage": "{cpus}個のCPUに増加"
@@ -3245,14 +3287,26 @@
   "profile.button.create-project": {
     "defaultMessage": "プロジェクトを作成"
   },
+  "profile.button.force-password-reset": {
+    "defaultMessage": "パスワードを強制的にリセットする"
+  },
   "profile.button.info": {
     "defaultMessage": "ユーザーの詳細を表示"
+  },
+  "profile.button.lock": {
+    "defaultMessage": "アカウントをロック"
   },
   "profile.button.manage-projects": {
     "defaultMessage": "プロジェクトを管理"
   },
   "profile.button.remove-affiliate": {
     "defaultMessage": "アフィリエイトから削除"
+  },
+  "profile.button.reset-2fa": {
+    "defaultMessage": "二要素認証をリセットする"
+  },
+  "profile.button.revoke-sessions": {
+    "defaultMessage": "すべてのセッションを取り消す"
   },
   "profile.button.set-affiliate": {
     "defaultMessage": "アフィリエイトに設定"
@@ -3262,6 +3316,9 @@
   },
   "profile.button.unblock": {
     "defaultMessage": "ブロック解除"
+  },
+  "profile.button.unlock": {
+    "defaultMessage": "アカウントのロックを解除"
   },
   "profile.details.error.github-popup-blocked": {
     "defaultMessage": "Modrinth でのポップアップを許可してから、もう一度お試しください。"
@@ -3308,6 +3365,15 @@
   "profile.error.not-found": {
     "defaultMessage": "ユーザーが見つかりません"
   },
+  "profile.force-password-reset.admonition-body": {
+    "defaultMessage": "{username}のパスワードはすぐに削除され、すべてのデバイスでログアウトされます。 そして、新しいものを設定するリンクが下記のメールに送信されます。 メールを変更すると、アカウント上のメールが置き換わります。 リンクは24時間後に有効期限が切れ、アカウントがロックされている間でも使用できます。"
+  },
+  "profile.force-password-reset.button": {
+    "defaultMessage": "パスワードをリセットする"
+  },
+  "profile.force-password-reset.email-label": {
+    "defaultMessage": "アカウントのメールアドレス"
+  },
   "profile.label.affiliate": {
     "defaultMessage": "アフィリエイト"
   },
@@ -3334,6 +3400,15 @@
   },
   "profile.official-account": {
     "defaultMessage": "Modrinth 公式アカウント"
+  },
+  "profile.reset-2fa.admonition-body": {
+    "defaultMessage": "{username}の認証コードとバックアップコードが削除され、通知されます。本人確認後にのみこれを行います。"
+  },
+  "profile.reset-2fa.admonition-title": {
+    "defaultMessage": "二要素認証を解除しますか？"
+  },
+  "profile.reset-2fa.button": {
+    "defaultMessage": "2要素認証をリセットする"
   },
   "profile.unblock-user.error-description": {
     "defaultMessage": "このユーザーのブロック解除中にエラーが発生しました。もう一度やり直してください。"
@@ -4216,6 +4291,9 @@
   },
   "search.filter_type.advanced.disclosure.ai_content.usage": {
     "defaultMessage": "AI{usage}"
+  },
+  "search.filter_type.advanced.disclosure.ai_functionality": {
+    "defaultMessage": "生成AI機能"
   },
   "search.filter_type.advanced.disclosure.archived": {
     "defaultMessage": "アーカイブ済み"
@@ -5333,6 +5411,27 @@
   "servers.remove-access-modal.what-happens-label": {
     "defaultMessage": "どうなるの？"
   },
+  "servers.settings.advanced.sftp.roll-credentials": {
+    "defaultMessage": "Sftpの認証情報が更新されました"
+  },
+  "servers.settings.advanced.sftp.roll-credentials-error-text": {
+    "defaultMessage": "しばらくしてから再試行してください。"
+  },
+  "servers.settings.advanced.sftp.roll-credentials-error-title": {
+    "defaultMessage": "SFTP資格情報の更新に失敗しました"
+  },
+  "servers.settings.advanced.sftp.roll-credentials-modal-description": {
+    "defaultMessage": "以前使用していたユーザー名とパスワードは使用できなくなります。"
+  },
+  "servers.settings.advanced.sftp.roll-credentials-modal-title": {
+    "defaultMessage": "ログイン情報が更新されました"
+  },
+  "servers.settings.advanced.sftp.roll-credentials-success-text": {
+    "defaultMessage": "SFTPのユーザー名とパスワードが再生成されました。"
+  },
+  "servers.settings.advanced.sftp.roll-credentials-success-title": {
+    "defaultMessage": "SFTPの資格情報が更新されました"
+  },
   "servers.setup.onboarding.installation-failed.text": {
     "defaultMessage": "インストール中に予期しないエラーが発生しました。時間をおいて再度お試しください。"
   },
@@ -5441,8 +5540,17 @@
   "settings.display.project-list-layouts.user": {
     "defaultMessage": "ユーザープロフィールページ"
   },
+  "settings.display.sidebar.advanced-rendering.description": {
+    "defaultMessage": "ぼかし効果などの高度なレンダリングを有効にします。ただし、グラフィックアクセラレーションが使用できない場合は、パフォーマンスが低下する可能性があります。"
+  },
+  "settings.display.sidebar.advanced-rendering.title": {
+    "defaultMessage": "高度なレンダリング"
+  },
   "settings.display.theme.dark": {
     "defaultMessage": "ダーク"
+  },
+  "settings.display.theme.description": {
+    "defaultMessage": "Modrinth全体のカラーテーマを選択してください。"
   },
   "settings.display.theme.light": {
     "defaultMessage": "ライト"
@@ -5458,6 +5566,12 @@
   },
   "settings.display.theme.retro": {
     "defaultMessage": "レトロ"
+  },
+  "settings.display.theme.sync-across-devices": {
+    "defaultMessage": "テーマをデバイス間で同期"
+  },
+  "settings.display.theme.sync-across-devices.description": {
+    "defaultMessage": "サインインしているすべての場所でこのテーマを使用します。このデバイスで別のテーマを使い続ける場合は、この設定をオフにしてください。"
   },
   "settings.display.theme.system": {
     "defaultMessage": "システムと同期"
@@ -5539,6 +5653,9 @@
   },
   "settings.social.blocked-users.user-avatar": {
     "defaultMessage": "{username}のアバター"
+  },
+  "settings.social.friend-requests.title": {
+    "defaultMessage": "フレンド申請"
   },
   "settings.social.interaction-source.everyone": {
     "defaultMessage": "全員"

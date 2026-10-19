@@ -389,6 +389,12 @@
   "content.card.select-project": {
     "defaultMessage": "تحديد {project}"
   },
+  "content.card.sync-update-pending": {
+    "defaultMessage": "تنتظر بعض النسخ المتزامنة إجراء تغييرات؛ فقد تكون هناك نسخة قيد التشغيل، أو نسخة متوقفة أو غير متوافقة، أو قد تحتوي الوجهة فعلًا على نسختها الخاصة."
+  },
+  "content.card.synced": {
+    "defaultMessage": "مزامنة عبر النسخ"
+  },
   "content.card.uploaded": {
     "defaultMessage": "تم الرفع"
   },
@@ -548,11 +554,23 @@
   "content.diff-modal.removed-disabled-count": {
     "defaultMessage": "تم إزالة {count} (معطل)"
   },
+  "content.diff-modal.reviewed-files": {
+    "defaultMessage": "لا تتم مراجعة الملفات التي لم يتم نشرها على منصة Modrinth."
+  },
+  "content.diff-modal.unknown-content-body": {
+    "defaultMessage": "تعذّر تحليل بعض المحتوى الموجود على الخادم الخاص بك، وقد يتأثر هذا المحتوى بالتغيير."
+  },
+  "content.diff-modal.unknown-files-description": {
+    "defaultMessage": "يحتوي هذا التحديث على ملفات غير منشورة على Modrinth. نوصي بشدة بعدم تثبيت ملفات إلا من مصادر تثق بها."
+  },
   "content.diff-modal.unknown-files-warning": {
     "defaultMessage": "تحذير ملف غير معلوم"
   },
   "content.diff-modal.unknown-project": {
     "defaultMessage": "غير معروف"
+  },
+  "content.diff-modal.updated-count": {
+    "defaultMessage": "تم تحديث {count}"
   },
   "content.filter.disabled": {
     "defaultMessage": "معطّل"
@@ -566,11 +584,41 @@
   "content.filter.warnings": {
     "defaultMessage": "تحذيرات"
   },
+  "content.inline-backup.backing-up": {
+    "defaultMessage": "جارٍ إنشاء نسخة احتياطية..."
+  },
+  "content.inline-backup.backup-complete": {
+    "defaultMessage": "تم إنشاء النسخة الاحتياطية بنجاح"
+  },
+  "content.inline-backup.backup-failed": {
+    "defaultMessage": "فشلت عملية إنشاء النسخة الاحتياطية. لا يزال بإمكانك المتابعة."
+  },
+  "content.inline-backup.backup-in-progress": {
+    "defaultMessage": "تجري حالياً عملية نسخ احتياطي, ويوصى بالانتظار حتى اكتمالها قبل تنفيذ هذا الإجراء."
+  },
+  "content.inline-backup.backup-takes-a-while": {
+    "defaultMessage": "قد تستغرق عملية إنشاء نسخة احتياطية بضع دقائق، وذلك يعتمد على حجم الخادم الخاص بك."
+  },
+  "content.inline-backup.create-backup": {
+    "defaultMessage": "إنشاء نسخة احتياطية"
+  },
+  "content.inline-backup.instance-label": {
+    "defaultMessage": "نسخة"
+  },
+  "content.inline-backup.shift-click-hint": {
+    "defaultMessage": "اضغط باستمرار على مفتاح Shift أثناء النقر لتخطي التأكيد."
+  },
+  "content.inline-backup.warning-body": {
+    "defaultMessage": "نوصي بإنشاء نسخة احتياطية قبل المتابعة، حتى تتمكن من استعادة {type} في حال حدوث أي خلل."
+  },
   "content.inline-backup.world-label": {
     "defaultMessage": "عالم"
   },
   "content.managed-card.modpack-content": {
     "defaultMessage": "محتوي حزمة المودات"
+  },
+  "content.managed-card.provided-by": {
+    "defaultMessage": "مقدمة من"
   },
   "content.managed-card.server-suffix": {
     "defaultMessage": "خادم"
@@ -586,6 +634,9 @@
   },
   "content.managed-card.summary.loading": {
     "defaultMessage": "جارٍ تحميل ملخص المحتوى المُدار"
+  },
+  "content.managed-card.summary.no-provided-content": {
+    "defaultMessage": "لا يوجد محتوى مقدم"
   },
   "content.managed-card.switch-version": {
     "defaultMessage": "تغيير الإصدار"
@@ -671,6 +722,12 @@
   "content.page-layout.failed-to-load": {
     "defaultMessage": "تعذّر تحميل المحتوى"
   },
+  "content.page-layout.failed-to-load-changelog": {
+    "defaultMessage": "فشل تحميل سجل التغييرات"
+  },
+  "content.page-layout.failed-to-load-updates": {
+    "defaultMessage": "فشل تحميل التحديثات المتاحة"
+  },
   "content.page-layout.filter.add": {
     "defaultMessage": "تصفية"
   },
@@ -731,6 +788,51 @@
   "content.selection-bar.all-already-enabled": {
     "defaultMessage": "المحتوب المحدد مفعل"
   },
+  "content.selection-bar.bulk.deleting": {
+    "defaultMessage": "حذف {progress}/{total} {contentType}..."
+  },
+  "content.selection-bar.bulk.deleting-count": {
+    "defaultMessage": "حذف {count, number} {contentType}"
+  },
+  "content.selection-bar.bulk.deleting-waiting": {
+    "defaultMessage": "حذف {contentType}..."
+  },
+  "content.selection-bar.bulk.disabling": {
+    "defaultMessage": "تعطيل {progress}/{total} {contentType}..."
+  },
+  "content.selection-bar.bulk.disabling-count": {
+    "defaultMessage": "تعطيل {count, number} {contentType}"
+  },
+  "content.selection-bar.bulk.disabling-waiting": {
+    "defaultMessage": "تعطيل {contentType}..."
+  },
+  "content.selection-bar.bulk.enabling": {
+    "defaultMessage": "تفعيل {progress}/{total} {contentType}..."
+  },
+  "content.selection-bar.bulk.enabling-count": {
+    "defaultMessage": "تفعيل {count, number} {contentType}"
+  },
+  "content.selection-bar.bulk.enabling-waiting": {
+    "defaultMessage": "تفعيل {contentType}..."
+  },
+  "content.selection-bar.bulk.updating": {
+    "defaultMessage": "تحديث {progress}/{total} {contentType}..."
+  },
+  "content.selection-bar.bulk.updating-count": {
+    "defaultMessage": "تحديث {count, number} {contentType}"
+  },
+  "content.selection-bar.bulk.updating-waiting": {
+    "defaultMessage": "تحديث {contentType}..."
+  },
+  "content.selection-bar.selected-count": {
+    "defaultMessage": "{count, number} تم تحديد {contentType}"
+  },
+  "content.selection-bar.selected-count-simple": {
+    "defaultMessage": "{count, number} محدد"
+  },
+  "creation-flow.button.create-instance": {
+    "defaultMessage": "إنشاء نسخة"
+  },
   "creation-flow.button.create-world": {
     "defaultMessage": "إنشاء عالم"
   },
@@ -740,14 +842,29 @@
   "creation-flow.button.import": {
     "defaultMessage": "استيراد"
   },
+  "creation-flow.button.import-instances": {
+    "defaultMessage": "استيراد {count, plural, one {# نسخة} other {# نسخ}}"
+  },
   "creation-flow.button.setup-server": {
     "defaultMessage": "إعداد السيرفر"
   },
   "creation-flow.modal.custom-setup.build-number.label": {
     "defaultMessage": "رقم الإصدار"
   },
+  "creation-flow.modal.custom-setup.build-number.placeholder": {
+    "defaultMessage": "اختر رَقَم البناء"
+  },
+  "creation-flow.modal.custom-setup.build-number.search-placeholder": {
+    "defaultMessage": "ابحث عن رقم البناء..."
+  },
+  "creation-flow.modal.custom-setup.content-loader.label": {
+    "defaultMessage": "محمل المحتوى"
+  },
   "creation-flow.modal.custom-setup.game-version.placeholder": {
     "defaultMessage": "حدد نسخة اللعبة"
+  },
+  "creation-flow.modal.custom-setup.game-version.search-placeholder": {
+    "defaultMessage": "حدد نسخة اللعبة..."
   },
   "creation-flow.modal.custom-setup.icon.customize": {
     "defaultMessage": "تخصيص"
@@ -782,8 +899,17 @@
   "creation-flow.modal.custom-setup.name.label": {
     "defaultMessage": "الإسم"
   },
+  "creation-flow.modal.custom-setup.name.placeholder": {
+    "defaultMessage": "ادخل اسم النسخة"
+  },
+  "creation-flow.modal.custom-setup.options.no-versions-available": {
+    "defaultMessage": "لا توجد اصدارات متاحة"
+  },
   "creation-flow.modal.final-config.additional-settings.title": {
     "defaultMessage": "اعدادات اضافية"
+  },
+  "creation-flow.modal.final-config.backup.before-reset-server.name": {
+    "defaultMessage": "قبل إعادة تعيين الخادم"
   },
   "creation-flow.modal.final-config.difficulty.easy": {
     "defaultMessage": "سهل"
@@ -926,8 +1052,17 @@
   "creation-flow.modal.project.known-project.prompt": {
     "defaultMessage": "هل تعرف بالفعل ما تريد أن تلعب؟"
   },
+  "creation-flow.modal.project.search.create-instance": {
+    "defaultMessage": "إنشاء نسخة"
+  },
+  "creation-flow.modal.project.search.install-modpack": {
+    "defaultMessage": "تثبيت المودباك"
+  },
   "creation-flow.modal.project.search.no-results": {
     "defaultMessage": "لم يتم العثور على نتائج"
+  },
+  "creation-flow.modal.project.search.placeholder": {
+    "defaultMessage": "البحث عن المود، حزم المودات والمزيد..."
   },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
     "defaultMessage": "ابدأ من الصفر باختيار محمّل وإصدار اللعبة."
@@ -941,6 +1076,18 @@
   "creation-flow.modal.setup-type.option.import-instance.title": {
     "defaultMessage": "استيراد نسخة"
   },
+  "creation-flow.modal.setup-type.option.modpack-base.description": {
+    "defaultMessage": "اختر مشروعاً وسنستخدم أحدث إصدار منه."
+  },
+  "creation-flow.modal.setup-type.option.modpack-base.title": {
+    "defaultMessage": "ابدأ من مود او من حزمة مودات"
+  },
+  "creation-flow.modal.setup-type.option.upload-modpack.description": {
+    "defaultMessage": "قم بتثبيت modpack من ملف .mrpack على جهازك."
+  },
+  "creation-flow.modal.setup-type.option.upload-modpack.title": {
+    "defaultMessage": "ارفع حزمة مودات"
+  },
   "creation-flow.modal.setup-type.option.vanilla-minecraft.description": {
     "defaultMessage": "ماينكرافت الكلاسيكية بدون تعديلات أو إضافات."
   },
@@ -950,8 +1097,23 @@
   "creation-flow.modal.setup-type.title.installation": {
     "defaultMessage": "اختر نوع التثبيت"
   },
+  "creation-flow.modal.setup-type.title.instance": {
+    "defaultMessage": "اختر نوع النسخة"
+  },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "اختر نمط العالم"
+  },
+  "creation-flow.title.create-instance": {
+    "defaultMessage": "إنشاء نسخة"
+  },
+  "creation-flow.title.create-world": {
+    "defaultMessage": "انشاء عالم"
+  },
+  "creation-flow.title.import-instance": {
+    "defaultMessage": "استيراد نسخة"
+  },
+  "creation-flow.title.reset-server": {
+    "defaultMessage": "إعادة ضبط الخادم"
   },
   "creation-flow.title.set-up-server": {
     "defaultMessage": "إعداد السيرفر"

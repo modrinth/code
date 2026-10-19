@@ -878,6 +878,9 @@
   "auth.sign-in.choose-account": {
     "message": "Виберіть обліковий запис для Modrinth App"
   },
+  "auth.sign-in.choose-existing-account": {
+    "message": "Використати наявний обліковий запис"
+  },
   "auth.sign-in.continue-with-email": {
     "message": "Продовжити з електронною поштою"
   },
@@ -896,17 +899,14 @@
   "auth.sign-in.launcher.callback.title": {
     "message": "Виклик Modrinth App"
   },
-  "auth.sign-in.launcher.complete.description": {
-    "message": "Ми повертаємо вас до Modrinth App. Якщо нічого не відбудеться, натисніть на кнопку нижче."
-  },
   "auth.sign-in.launcher.complete.go-to-website": {
     "message": "Перейти на Modrinth.com"
   },
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Відкрити Modrinth App"
   },
-  "auth.sign-in.launcher.complete.title": {
-    "message": "Вхід виконано"
+  "auth.sign-in.launcher.handoff-failed": {
+    "message": "Не вдалося завершити вхід у Modrinth App. Спробуйте знову."
   },
   "auth.sign-in.launcher.opening.description": {
     "message": "Якщо застосунок не відкривається, натисніть на кнопку нижче."
@@ -914,8 +914,14 @@
   "auth.sign-in.launcher.opening.title": {
     "message": "Відкриваємо Modrinth App…"
   },
+  "auth.sign-in.launcher.reauthenticate.title": {
+    "message": "Увійти в Modrinth App"
+  },
   "auth.sign-in.no-account": {
     "message": "Не маєте облікового запису?"
+  },
+  "auth.sign-in.reauthenticate.use-different-account": {
+    "message": "Використати інший обліковий запис"
   },
   "auth.sign-in.sign-in-with": {
     "message": "Увійти до Modrinth"
@@ -1064,9 +1070,6 @@
   "conversation-thread.action.approve": {
     "message": "Підтвердити"
   },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Підтвердити з відповіддю"
-  },
   "conversation-thread.action.close-report": {
     "message": "Закрити скаргу"
   },
@@ -1075,9 +1078,6 @@
   },
   "conversation-thread.action.reject": {
     "message": "Відхилити"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Відхилити з відповіддю"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Знову відкрити потік"
@@ -1112,9 +1112,6 @@
   "conversation-thread.action.withhold": {
     "message": "Утримуватися"
   },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Утримуватися з відповіддю"
-  },
   "conversation-thread.closed-thread.description": {
     "message": "Цю тему зачинено, і в нього не можна надсилати нові повідомлення."
   },
@@ -1123,9 +1120,6 @@
   },
   "conversation-thread.error.reopening-report": {
     "message": "Помилка повторного відкриття звіту"
-  },
-  "conversation-thread.error.sending-message": {
-    "message": "Помилка надсилання повідомлення"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Відповісти до потоку…"
@@ -1153,9 +1147,6 @@
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "Я підтверджую, що я правильно розглянув коментарі модераторів."
-  },
-  "conversation-thread.resubmit-modal.description": {
-    "message": "Ви надсилаєте <project-title>{projectTitle}</project-title> на повторний розгляд модераторам."
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "Повторне подання на розгляд"
@@ -2257,9 +2248,6 @@
   },
   "error.generic.default.list_item.1": {
     "message": "Перевірте, чи працює Modrinth на нашій <status-link>сторінці статусу</status-link>."
-  },
-  "error.generic.default.list_item.2": {
-    "message": "Якщо таке продовжує відбуватися, дайте знати команді Modrinth, приєднавшися до нашого <discord-link>Discord-сервера</discord-link>."
   },
   "error.generic.default.list_title": {
     "message": "Спробуйте знову за кілька хвилин."
@@ -3422,9 +3410,6 @@
   "project-member-header.success-join": {
     "message": "Ви доєдналися до команди проєкту"
   },
-  "project-moderation-nags.project-submitted-for-review": {
-    "message": "Проєкт відправлено на перевірку!"
-  },
   "project-moderation-nags.publishing-checklist": {
     "message": "Контрольний список для публікації"
   },
@@ -3541,9 +3526,6 @@
   },
   "project.actions.rescan-modpack": {
     "message": "Пересканувати збірку"
-  },
-  "project.actions.review-project": {
-    "message": "Переглянути проєкт"
   },
   "project.actions.servers-promo.description": {
     "message": "Modrinth Hosting — це найпростіший спосіб грати з друзями без клопоту!"

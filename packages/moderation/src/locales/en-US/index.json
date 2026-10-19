@@ -422,6 +422,84 @@
   "nags.visit-links-settings.title": {
     "defaultMessage": "Visit links settings"
   },
+  "project-review.issue-location.disclosures": {
+    "defaultMessage": "Edit disclosures"
+  },
+  "project-review.issue-location.gallery": {
+    "defaultMessage": "Edit gallery images"
+  },
+  "project-review.issue-location.permissions": {
+    "defaultMessage": "Review permissions"
+  },
+  "project-review.issue-location.versions": {
+    "defaultMessage": "Manage versions"
+  },
+  "project-review.issue-target.acknowledge": {
+    "defaultMessage": "Acknowledge"
+  },
+  "project-review.issue-target.add-gallery-images": {
+    "defaultMessage": "Add gallery images"
+  },
+  "project-review.issue-target.add-project-disclosures": {
+    "defaultMessage": "Add disclosures"
+  },
+  "project-review.issue-target.mark-addressed": {
+    "defaultMessage": "Mark addressed"
+  },
+  "project-review.issue-target.modify-description": {
+    "defaultMessage": "Change description"
+  },
+  "project-review.issue-target.modify-gallery-image": {
+    "defaultMessage": "Change gallery image"
+  },
+  "project-review.issue-target.modify-icon": {
+    "defaultMessage": "Change icon"
+  },
+  "project-review.issue-target.modify-license": {
+    "defaultMessage": "Change license"
+  },
+  "project-review.issue-target.modify-links": {
+    "defaultMessage": "Change links"
+  },
+  "project-review.issue-target.modify-project-disclosure": {
+    "defaultMessage": "Change disclosure"
+  },
+  "project-review.issue-target.modify-project-disclosure-note": {
+    "defaultMessage": "Change disclosure note"
+  },
+  "project-review.issue-target.modify-server-address": {
+    "defaultMessage": "Change server address"
+  },
+  "project-review.issue-target.modify-server-languages": {
+    "defaultMessage": "Change server languages"
+  },
+  "project-review.issue-target.modify-slug": {
+    "defaultMessage": "Change URL slug"
+  },
+  "project-review.issue-target.modify-summary": {
+    "defaultMessage": "Change summary"
+  },
+  "project-review.issue-target.modify-team-member-role": {
+    "defaultMessage": "Change team member role"
+  },
+  "project-review.issue-target.modify-title": {
+    "defaultMessage": "Change title"
+  },
+  "project-review.issue-target.remove-gallery-images": {
+    "defaultMessage": "Remove gallery images"
+  },
+  "project-review.issue-target.remove-icon": {
+    "defaultMessage": "Remove icon"
+  },
+  "project-review.issue-target.remove-project-disclosures": {
+    "defaultMessage": "Remove disclosures"
+  },
+  "project-review.issue-target.remove-tags": {
+    "defaultMessage": "Remove tags"
+  },
+  "project-review.issue-target.version": {
+    "defaultMessage": "Change version"
+  },
   "project.text-validation.description-matches-summary": {
     "defaultMessage": "Your project's description should provide unique information and not repeat the project's summary."
   },

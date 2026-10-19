@@ -1,12 +1,12 @@
-import { ModrinthApiError } from '@modrinth/api-client'
 import { injectModrinthClient } from '@modrinth/ui'
-import { useQueryClient } from '@tanstack/vue-query'
-import { type MaybeRefOrGetter, onScopeDispose, ref, toValue, watch } from 'vue'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { refDebounced } from '@vueuse/core'
+import { computed, type MaybeRefOrGetter, ref, toValue } from 'vue'
 
-const STALE_TIME = 1000 * 60 * 5
+import { projectQueryOptions, STALE_TIME } from '~/composables/queries/project'
+
 const CHECK_DEBOUNCE = 300
-const PROJECT_SLUG_UNSAFE_CHARS = /[^a-zA-Z0-9._-]/g
-const PROJECT_SLUG_REGEX = /^[a-zA-Z0-9._-]{3,64}$/
+const PROJECT_SLUG_REGEX = /^[a-z0-9._-]{3,64}$/
 
 interface ProjectSlugSuggestionOptions {
 	title: MaybeRefOrGetter<string>
@@ -19,16 +19,23 @@ export function generateUrlSlug(value: string) {
 	return value
 		.trim()
 		.toLowerCase()
-		.replaceAll(' ', '-')
-		.replaceAll(PROJECT_SLUG_UNSAFE_CHARS, '')
-		.replaceAll(/--+/gm, '-')
+		.replaceAll('+', '-plus')
+		.replaceAll(/[!"'`]/g, '')
+		.replaceAll(/[^a-z0-9._-]+/g, '-')
+		.replaceAll(/-+/g, '-')
+		.replaceAll(/^-+|-+$/g, '')
 }
 
 function isValidProjectSlug(value: string) {
-	return PROJECT_SLUG_REGEX.test(value)
+	return (
+		PROJECT_SLUG_REGEX.test(value) &&
+		!value.startsWith('-') &&
+		!value.endsWith('-') &&
+		!value.includes('--')
+	)
 }
 
-function generateProjectSlugSuggestions(title: string, username?: string | null) {
+export function generateProjectSlugSuggestions(title: string, username?: string | null) {
 	const titleSlug = generateUrlSlug(title)
 	const titleWords = title
 		.trim()
@@ -40,7 +47,7 @@ function generateProjectSlugSuggestions(title: string, username?: string | null)
 	const usernameSlug = username ? generateUrlSlug(username) : ''
 	let withUsername = ''
 
-	if (titleSlug && usernameSlug) {
+	if (titleSlug && usernameSlug && usernameSlug.length <= 62) {
 		const availableTitleLength = 64 - usernameSlug.length - 1
 		const truncatedTitle = titleSlug.slice(0, availableTitleLength).replace(/-+$/, '')
 		if (truncatedTitle) withUsername = `${truncatedTitle}-${usernameSlug}`
@@ -76,64 +83,42 @@ export function useProjectSlugSuggestions({
 }: ProjectSlugSuggestionOptions) {
 	const client = injectModrinthClient()
 	const queryClient = useQueryClient()
-	const suggestions = ref<string[]>([])
-	const checking = ref(false)
-	let debounceTimer: ReturnType<typeof setTimeout> | undefined
-	let requestId = 0
-
-	async function isAvailable(slug: string, projectId?: string | null) {
-		return queryClient.fetchQuery({
-			queryKey: ['project', 'slug-available', slug, projectId ?? null],
-			queryFn: async () => {
-				try {
-					const result = await client.labrinth.projects_v2.check(slug)
-					return result.id === projectId
-				} catch (error) {
-					if (error instanceof ModrinthApiError && error.statusCode === 404) return true
-					throw error
-				}
-			},
-			staleTime: STALE_TIME,
-			retry: false,
-		})
-	}
-
-	watch(
-		() => [toValue(title), toValue(username), toValue(currentProjectId), toValue(enabled)] as const,
-		([newTitle, newUsername, projectId, isEnabled]) => {
-			if (import.meta.server) return
-
-			clearTimeout(debounceTimer)
-			const currentRequestId = ++requestId
-			suggestions.value = []
-			checking.value = false
-
-			if (!isEnabled) return
-
-			const candidates = generateProjectSlugSuggestions(newTitle, newUsername)
-
-			if (candidates.length === 0) {
-				return
+	const candidates = computed(() =>
+		generateProjectSlugSuggestions(toValue(title), toValue(username)),
+	)
+	const debouncedCandidates = refDebounced(candidates, CHECK_DEBOUNCE)
+	const query = useQuery(
+		computed(() => {
+			const slugs = candidates.value
+			const projectId = toValue(currentProjectId) ?? ''
+			return {
+				queryKey: ['project', 'slug-suggestions', slugs, projectId] as const,
+				queryFn: async () => {
+					const availability = await Promise.all(
+						slugs.map((slug) =>
+							queryClient.fetchQuery({
+								...projectQueryOptions.slugAvailability(slug, projectId, client),
+								staleTime: STALE_TIME,
+								gcTime: STALE_TIME,
+							}),
+						),
+					)
+					return slugs.filter((_, index) => availability[index])
+				},
+				enabled:
+					!import.meta.server &&
+					toValue(enabled) &&
+					slugs.length > 0 &&
+					slugs.join() === debouncedCandidates.value.join(),
+				staleTime: STALE_TIME,
+				gcTime: STALE_TIME,
+				retry: false,
 			}
-
-			checking.value = true
-			debounceTimer = setTimeout(async () => {
-				const availability = await Promise.all(
-					candidates.map((candidate) => isAvailable(candidate, projectId)),
-				)
-				if (currentRequestId !== requestId) return
-
-				suggestions.value = candidates.filter((_, index) => availability[index])
-				checking.value = false
-			}, CHECK_DEBOUNCE)
-		},
-		{ immediate: true },
+		}),
 	)
 
-	onScopeDispose(() => clearTimeout(debounceTimer))
-
 	return {
-		checking,
-		suggestions,
+		checking: query.isFetching,
+		suggestions: computed(() => (toValue(enabled) ? (query.data.value ?? []) : [])),
 	}
 }

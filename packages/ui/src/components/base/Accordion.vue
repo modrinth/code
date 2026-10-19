@@ -88,6 +88,7 @@ const slots = useSlots()
 watch(
 	() => props.openByDefault,
 	(newValue) => {
+		if (!newValue) showOverflow.value = false
 		if (newValue !== toggledOpen.value) {
 			toggledOpen.value = newValue
 		}

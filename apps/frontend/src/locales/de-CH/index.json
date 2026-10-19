@@ -881,6 +881,9 @@
   "auth.sign-in.choose-account": {
     "message": "Wähle ein Konto für die Modrinth App"
   },
+  "auth.sign-in.choose-existing-account": {
+    "message": "Ein bestehendes Konto verwenden"
+  },
   "auth.sign-in.continue-with-email": {
     "message": "Weiter mit E-Mail"
   },
@@ -894,13 +897,10 @@
     "message": "Passwort vergessen"
   },
   "auth.sign-in.last-sign-in": {
-    "message": "Zuletzt benutzt"
+    "message": "Zuletzt verwendet"
   },
   "auth.sign-in.launcher.callback.title": {
     "message": "Callback für die Anmeldung bei der Modrinth App"
-  },
-  "auth.sign-in.launcher.complete.description": {
-    "message": "Wir leiten dich zurück zur Modrinth-App. Sollte nichts passieren, klicke bitte auf die Schaltfläche unten."
   },
   "auth.sign-in.launcher.complete.go-to-website": {
     "message": "Gehe zu Modrinth.com"
@@ -908,8 +908,8 @@
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Modrinth App öffnen"
   },
-  "auth.sign-in.launcher.complete.title": {
-    "message": "Du bist angemeldet"
+  "auth.sign-in.launcher.handoff-failed": {
+    "message": "Die Anmeldung bei der Modrinth-App konnte nicht abgeschlossen werden. Bitte versuche es erneut."
   },
   "auth.sign-in.launcher.opening.description": {
     "message": "Falls sich die App nicht öffnet, klicke auf den Button unten, um die Anmeldung abzuschließen."
@@ -917,8 +917,14 @@
   "auth.sign-in.launcher.opening.title": {
     "message": "Modrinth App wird geöffnet..."
   },
+  "auth.sign-in.launcher.reauthenticate.title": {
+    "message": "Bei der Modrinth App anmelden"
+  },
   "auth.sign-in.no-account": {
     "message": "Du hast kein Konto?"
+  },
+  "auth.sign-in.reauthenticate.use-different-account": {
+    "message": "Verwende ein anderes Konto"
   },
   "auth.sign-in.sign-in-with": {
     "message": "Bei Modrinth anmelden"
@@ -1067,9 +1073,6 @@
   "conversation-thread.action.approve": {
     "message": "Genehmigen"
   },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Genehmigen mit Antwort"
-  },
   "conversation-thread.action.close-report": {
     "message": "Meldung schließen"
   },
@@ -1078,9 +1081,6 @@
   },
   "conversation-thread.action.reject": {
     "message": "Ablehnen"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Ablehnen mit Antwort"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Thread wieder öffnen"
@@ -1115,9 +1115,6 @@
   "conversation-thread.action.withhold": {
     "message": "Zurückhalten"
   },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Zurückhalten mit Antwort"
-  },
   "conversation-thread.closed-thread.description": {
     "message": "Dieser Thread ist geschlossen und es können keine neuen Nachrichten gesendet werden."
   },
@@ -1126,9 +1123,6 @@
   },
   "conversation-thread.error.reopening-report": {
     "message": "Fehler beim erneuten Öffnen der Meldung"
-  },
-  "conversation-thread.error.sending-message": {
-    "message": "Fehler beim Senden der Nachricht"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Auf Thread antworten..."
@@ -1156,9 +1150,6 @@
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "Ich bestätige, dass ich die Kommentare der Moderatoren ordnungsgemäss bearbeitet habe."
-  },
-  "conversation-thread.resubmit-modal.description": {
-    "message": "Du reichst <project-title>{projectTitle}</project-title> ein, um es erneut von den Moderatoren überprüfen zu lassen."
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "Erneut zur Überprüfung einreichen"
@@ -2261,8 +2252,8 @@
   "error.generic.default.list_item.1": {
     "message": "Überprüfe auf unserer <status-link>Status Seite</status-link> ob Modrinth unerreichbar ist."
   },
-  "error.generic.default.list_item.2": {
-    "message": "Sollte dies weiterhin passieren, solltest du das Modrinth-Team darüber informieren, indem du unserem <discord-link>Discord Server</discord-link> beitittst."
+  "error.generic.default.list_item.support": {
+    "message": "Falls dies weiterhin auftritt, kannst du das Modrinth-Team über unser <support-link>Support-Portal</support-link> informieren."
   },
   "error.generic.default.list_title": {
     "message": "Bitte versuch es in ein paar Minuten erneut."
@@ -3425,9 +3416,6 @@
   "project-member-header.success-join": {
     "message": "Du bist dem Projekt-Team beigetreten"
   },
-  "project-moderation-nags.project-submitted-for-review": {
-    "message": "Dein Projekt wurde zur Überprüfung eingereicht!"
-  },
   "project-moderation-nags.publishing-checklist": {
     "message": "Veröffentlichungs-Checkliste"
   },
@@ -3544,9 +3532,6 @@
   },
   "project.actions.rescan-modpack": {
     "message": "Modpack erneut scannen"
-  },
-  "project.actions.review-project": {
-    "message": "Projekt überprüfen"
   },
   "project.actions.servers-promo.description": {
     "message": "Modrinth Hosting ist der einfachste weg, ohne Aufwand mit deinen Freunden zu spielen!"

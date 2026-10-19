@@ -87,7 +87,7 @@
     "message": "无法下载整合包"
   },
   "app.action-bar.install.summary.unexpected-error": {
-    "message": "出现了一些问题"
+    "message": "出了点问题"
   },
   "app.action-bar.install.unknown-instance": {
     "message": "未知的实例"
@@ -174,7 +174,7 @@
     "message": "显示您在每个实例中游玩的时间。"
   },
   "app.appearance-settings.show-play-time.title": {
-    "message": "显示总游玩时间"
+    "message": "显示游玩时间"
   },
   "app.appearance-settings.skip-non-essential-warnings.description": {
     "message": "自动跳过低风险确认，包括重复安装整合包、常规内容删除、批量更新、解除整合包关联及修复提示。危险警告仍会显示。"
@@ -301,6 +301,18 @@
   },
   "app.content.sync-resource-packs-disabled": {
     "message": "首先在应用设置中打开资源包同步。"
+  },
+  "app.debug-export.canceling": {
+    "message": "正在取消导出……"
+  },
+  "app.debug-export.exporting": {
+    "message": "正在导出……"
+  },
+  "app.debug-export.finishing": {
+    "message": "正在完成……"
+  },
+  "app.debug-export.preparing": {
+    "message": "正在准备文件……"
   },
   "app.download-manager.active": {
     "message": "启用"
@@ -1652,9 +1664,6 @@
   "app.settings.default-instance-options.height.title": {
     "message": "高度"
   },
-  "app.settings.default-instance-options.java-and-memory.title": {
-    "message": "Java 和内存"
-  },
   "app.settings.default-instance-options.java-arguments.description": {
     "message": "启动实例时传递给 Java 的参数。"
   },
@@ -1663,9 +1672,6 @@
   },
   "app.settings.default-instance-options.java-arguments.title": {
     "message": "Java 参数"
-  },
-  "app.settings.default-instance-options.launch-hooks.title": {
-    "message": "启动 hook"
   },
   "app.settings.default-instance-options.memory-allocation.description": {
     "message": "每个实例的最大可用内存。"
@@ -1699,9 +1705,6 @@
   },
   "app.settings.default-instance-options.width.title": {
     "message": "宽度"
-  },
-  "app.settings.default-instance-options.window.title": {
-    "message": "窗口设置"
   },
   "app.settings.default-instance-options.wrapper-hook.description": {
     "message": "用来包装 Minecraft 启动过程的命令。"
@@ -2759,14 +2762,8 @@
   "app.settings.resource-management.app-cache.confirm.description": {
     "message": "在缓存重建之前，应用加载可能会更慢。"
   },
-  "app.settings.resource-management.app-cache.confirm.title": {
-    "message": "清除App缓存？"
-  },
   "app.settings.resource-management.app-cache.description": {
     "message": "清除缓存数据，然后从Modrinth重新下载。在缓存重建之前，应用加载可能会更慢。"
-  },
-  "app.settings.resource-management.app-cache.purge": {
-    "message": "清除缓存"
   },
   "app.settings.resource-management.app-cache.title": {
     "message": "App缓存"
@@ -2791,6 +2788,15 @@
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "应用目录"
+  },
+  "app.settings.resource-management.debug-info.description": {
+    "message": "导出应用日志和诊断数据到 ZIP 文件用于与 Modrinth 支持共享。"
+  },
+  "app.settings.resource-management.debug-info.export": {
+    "message": "导出调试信息"
+  },
+  "app.settings.resource-management.debug-info.title": {
+    "message": "调试信息"
   },
   "app.settings.resource-management.maximum-concurrent-downloads.description": {
     "message": "应用可同时下载的文件数量。如果您的连接下载不稳定，请降低该值。需要重新启动应用程序。"
@@ -2834,9 +2840,6 @@
   "app.settings.resource-management.store.description": {
     "message": "通过在多个实例之间复用游戏安装、模组和各类包来节省空间。"
   },
-  "app.settings.resource-management.store.empty": {
-    "message": "安装模组或包来查看您的存储使用情况。"
-  },
   "app.settings.resource-management.store.issues": {
     "message": "查看 {count, plural, other {# 个问题}}"
   },
@@ -2875,9 +2878,6 @@
   },
   "app.settings.resource-management.store.verified": {
     "message": "验证完成"
-  },
-  "app.settings.sidebar.label.instances": {
-    "message": "实例"
   },
   "app.settings.synced-options.choose-sync-source.command-history-description": {
     "message": "选择要从哪个实例复制你的命令历史记录。 此历史仅用于初始同步，您可以在其后从任何实例编辑它。"
@@ -3118,12 +3118,6 @@
   },
   "app.settings.tabs.privacy": {
     "message": "隐私"
-  },
-  "app.settings.tabs.resource-management": {
-    "message": "资源管理"
-  },
-  "app.settings.tabs.synced-options": {
-    "message": "同步设置"
   },
   "app.sidebar.playing-as": {
     "message": "游玩账户"
@@ -4121,9 +4115,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "选择更新渠道"
   },
-  "instance.settings.tabs.hooks.description": {
-    "message": "在实例启动前后运行系统命令。"
-  },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "退出后执行"
   },
@@ -4184,18 +4175,6 @@
   "instance.settings.tabs.installation.locked": {
     "message": "当实例被锁定时，安装设置不可用。"
   },
-  "instance.settings.tabs.java.custom-environment-variables": {
-    "message": "为此实例单独设置环境变量。"
-  },
-  "instance.settings.tabs.java.custom-java-arguments": {
-    "message": "设置自定义 Java 虚拟机参数。"
-  },
-  "instance.settings.tabs.java.custom-java-installation": {
-    "message": "设置自定义的 Java 路径。"
-  },
-  "instance.settings.tabs.java.custom-memory-allocation": {
-    "message": "手动分配游戏内存。"
-  },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "输入环境变量……"
   },
@@ -4219,9 +4198,6 @@
   },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/path/to/java"
-  },
-  "instance.settings.tabs.settings-overrides": {
-    "message": "自定义同步"
   },
   "instance.settings.tabs.sharing": {
     "message": "共享"
@@ -4285,9 +4261,6 @@
   },
   "instance.settings.tabs.window": {
     "message": "自定义窗口设置"
-  },
-  "instance.settings.tabs.window.custom-window-settings": {
-    "message": "为此实例分别配置全屏模式和启动分辨率。"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "全屏"

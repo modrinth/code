@@ -7,7 +7,11 @@ use crate::models::{
     projects::{Project, Version},
 };
 use crate::test::asserts::assert_status;
-use crate::test::{api_common::Api, api_v3, database::USER_USER_PAT};
+use crate::test::{
+    api_common::Api,
+    api_v3,
+    database::{ADMIN_USER_PAT, USER_USER_PAT},
+};
 use actix_http::StatusCode;
 use actix_web::test::{self, TestRequest};
 use serde_json::json;
@@ -21,7 +25,7 @@ use super::{
 
 use super::{database::USER_USER_ID, get_json_val_str};
 
-pub const DUMMY_DATA_UPDATE: i64 = 10;
+pub const DUMMY_DATA_UPDATE: i64 = 11;
 
 pub const DUMMY_CATEGORIES: &[&str] = &[
     "combat",
@@ -430,7 +434,13 @@ pub async fn add_project_beta(api: &ApiV3) -> (Project, Version) {
         Some(jar),
         Some(modify_json),
     );
-    api.create_project(creation_data, USER_USER_PAT).await;
+    let resp = api.create_project(creation_data, USER_USER_PAT).await;
+    assert_status!(&resp, StatusCode::OK);
+
+    let resp = api
+        .edit_project("beta", json!({ "status": "processing" }), ADMIN_USER_PAT)
+        .await;
+    assert_status!(&resp, StatusCode::NO_CONTENT);
 
     get_project_beta(api).await
 }

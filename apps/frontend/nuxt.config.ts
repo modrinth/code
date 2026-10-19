@@ -5,6 +5,9 @@ import { fileURLToPath } from 'url'
 import svgLoader from 'vite-svg-loader'
 
 import { GenericModrinthClient, type Labrinth } from '../../packages/api-client/src/index.ts'
+import moderationMessages, {
+	moderationMessagesDirectory,
+} from '../../packages/moderation/vite-plugin'
 
 const STAGING_API_URL = 'https://staging-api.modrinth.com/v2/'
 const STAGING_SHARED_INSTANCES_API_URL = 'https://staging-shared-instances.modrinth.com'
@@ -26,8 +29,10 @@ export default defineNuxtConfig({
 	srcDir: 'src/',
 	alias: {
 		'@modrinth/api-client': API_CLIENT_SOURCE,
+		'#messages': moderationMessagesDirectory,
 	},
 	app: {
+		buildAssetsDir: '/_assets/',
 		head: {
 			htmlAttrs: {
 				lang: 'en',
@@ -81,6 +86,7 @@ export default defineNuxtConfig({
 			dedupe: ['vue'],
 		},
 		plugins: [
+			moderationMessages(),
 			svgLoader({
 				svgoConfig: {
 					plugins: [
@@ -231,10 +237,6 @@ export default defineNuxtConfig({
 			},
 		},
 	},
-	modules: [
-		// Sentry causes rollup-plugin-inject errors in dev, only enable in production
-		...(isProduction() ? ['@sentry/nuxt/module'] : []),
-	],
 	floatingVue: {
 		themes: {
 			'ribbit-popout': {
@@ -259,10 +261,6 @@ export default defineNuxtConfig({
 		noExternals: getNoExternals(),
 		cloudflare: {
 			nodeCompat: true,
-		},
-		replace: {
-			__SENTRY_RELEASE__: JSON.stringify(process.env.CF_PAGES_COMMIT_SHA || 'unknown'),
-			__SENTRY_ENVIRONMENT__: JSON.stringify(process.env.BUILD_ENV || 'development'),
 		},
 	},
 	devtools: {
@@ -310,11 +308,6 @@ export default defineNuxtConfig({
 		asyncContext: true,
 	},
 	sourcemap: { client: 'hidden' },
-	sentry: {
-		sourcemaps: {
-			disable: true,
-		},
-	},
 })
 
 function getApiUrl() {

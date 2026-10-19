@@ -1,5 +1,11 @@
 <template>
 	<div>
+		<ProjectIssueCard
+			location="links"
+			target="modify_links"
+			:field-action="linksIssueAction"
+			class="mb-4"
+		/>
 		<ConfirmLeaveModal ref="confirmLeaveModal" />
 		<div class="flex min-w-0 flex-col gap-8">
 			<section v-for="section in linkSections" :key="section.id" class="min-w-0">
@@ -117,7 +123,9 @@
 								/>
 								<ValidationMessage :check="saveValidation.forField(row.field)" />
 							</template>
-							<ValidationMessage v-else-if="row.donation" :check="donationMessages(row.donation)" />
+							<template v-else-if="row.donation">
+								<ValidationMessage :check="donationMessages(row.donation)" />
+							</template>
 						</div>
 					</template>
 				</Table>
@@ -160,6 +168,8 @@ import {
 import { isAdmin } from '@modrinth/utils'
 
 import ValidationMessage from '@/components/ValidationMessage.vue'
+import ProjectIssueCard from '~/components/ui/project-issue-card/index.vue'
+import { useProjectIssueFieldAction } from '~/composables/project-issue-field-action'
 import { useProjectNagMessages } from '~/composables/project-nag-validation'
 import { useProjectSaveValidation } from '~/composables/project-save-validation'
 import {
@@ -538,6 +548,35 @@ const canSave = computed(
 		!saveValidation.messages.value.some((message) => message.severity === 'error'),
 )
 const saving = ref(false)
+
+const linksIssueAction = useProjectIssueFieldAction({
+	draft: () => {
+		const linkUrls = Object.fromEntries(
+			Object.entries(project.value.link_urls).filter(
+				([platform]) => patchData.value[platform] !== null,
+			),
+		)
+		for (const [platform, url] of Object.entries(patchData.value)) {
+			if (url !== null) {
+				linkUrls[platform] = {
+					platform,
+					donation: tags.value.donationPlatforms.some((tag) => tag.short === platform),
+					url,
+				}
+			}
+		}
+		return { link_urls: linkUrls }
+	},
+	canSave: () => hasPermission.value && !saveValidation.hasErrors.value,
+	saving,
+	validation: saveValidation,
+	save: async () => {
+		if (Object.keys(patchData.value).length > 0) {
+			await patchProjectV3({ link_urls: patchData.value }, true, true)
+		}
+		reset()
+	},
+})
 
 async function save() {
 	if (!canSave.value || saving.value) return

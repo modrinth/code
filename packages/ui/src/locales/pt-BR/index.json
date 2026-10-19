@@ -2063,6 +2063,15 @@
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Servidor redefinido para a integração"
   },
+  "hosting.save-banner.resolve-errors": {
+    "defaultMessage": "Por favor, resolva os erros em suas alterações antes de salvar."
+  },
+  "hosting.settings.properties.motd-profanity": {
+    "defaultMessage": "Devido aos guias de uso do Minecraft, o MOTD do seu servidor não pode conter palavrões. Detectado: “{value}”."
+  },
+  "hosting.settings.properties.motd-profanity-save-error": {
+    "defaultMessage": "Devido aos guias de uso do Minecraft, o MOTD do seu servidor não pode conter palavrões. Detectado: “{value}”"
+  },
   "hosting.specs.burst": {
     "defaultMessage": "Picos de até {cpus} CPUs"
   },
@@ -4733,6 +4742,9 @@
   "servers.access-page.activity-log-filter.action.server-stopped": {
     "defaultMessage": "Servidor parado"
   },
+  "servers.access-page.activity-log-filter.action.sftp-credentials-rolled": {
+    "defaultMessage": "Credenciais SFTP rotacionadas"
+  },
   "servers.access-page.activity-log-filter.action.sftp-login": {
     "defaultMessage": "Login efetuado via SFTP"
   },
@@ -5114,6 +5126,9 @@
   "servers.audit-log.event.server-subdomain-changed": {
     "defaultMessage": "Alterou o subdomínio do servidor para <subdomain></subdomain>"
   },
+  "servers.audit-log.event.sftp-credentials-rolled": {
+    "defaultMessage": "Credenciais SFTP rotacionadas"
+  },
   "servers.audit-log.event.sftp-login": {
     "defaultMessage": "Login efetuado via SFTP"
   },
@@ -5320,6 +5335,9 @@
   },
   "servers.download.unavailable.title": {
     "defaultMessage": "Download indisponível"
+  },
+  "servers.files.server-locked": {
+    "defaultMessage": "Este servidor está bloqueado e seus arquivos são somente leitura."
   },
   "servers.files.zip-created": {
     "defaultMessage": "ZIP criado"
@@ -5537,6 +5555,36 @@
   "servers.listing.using-project-label": {
     "defaultMessage": "Usando {projectTitle}"
   },
+  "servers.lock.modal.error-text": {
+    "defaultMessage": "Ocorreu um erro ao bloquear este servidor. Por favor, tente novamente."
+  },
+  "servers.lock.modal.error-title": {
+    "defaultMessage": "Falha ao bloquear servidor"
+  },
+  "servers.lock.modal.header": {
+    "defaultMessage": "Bloquear {name}"
+  },
+  "servers.lock.modal.lock-button": {
+    "defaultMessage": "Bloquear servidor"
+  },
+  "servers.lock.modal.reason-label": {
+    "defaultMessage": "Motivo"
+  },
+  "servers.lock.modal.reason-placeholder": {
+    "defaultMessage": "Visível para outros administradores"
+  },
+  "servers.lock.modal.success-text": {
+    "defaultMessage": "{name} foi bloqueado."
+  },
+  "servers.lock.modal.success-title": {
+    "defaultMessage": "Servidor bloqueado"
+  },
+  "servers.lock.modal.warning-body": {
+    "defaultMessage": "{name} será somente leitura para seu dono e membros até que seja desbloqueado por um administrador."
+  },
+  "servers.lock.modal.warning-header": {
+    "defaultMessage": "Este servidor se tornará somente leitura"
+  },
   "servers.manage.checking-for-new-servers": {
     "defaultMessage": "Verificando novos servidores..."
   },
@@ -5572,6 +5620,21 @@
   },
   "servers.manage.handle-error.title": {
     "defaultMessage": "Ocorreu um erro"
+  },
+  "servers.manage.lock-server": {
+    "defaultMessage": "Bloquear servidor"
+  },
+  "servers.manage.locked.badge": {
+    "defaultMessage": "Bloqueado"
+  },
+  "servers.manage.locked.badge-tooltip": {
+    "defaultMessage": "Bloqueado desde {date}"
+  },
+  "servers.manage.locked.body": {
+    "defaultMessage": "O suporte bloqueou temporariamente este servidor, então você não pode fazer alterações. <support-link>Entre em contato com o suporte</support-link> se você acredita que isso é um erro."
+  },
+  "servers.manage.locked.header": {
+    "defaultMessage": "Servidor bloqueado pelo suporte"
   },
   "servers.manage.new-server-button": {
     "defaultMessage": "Novo servidor"
@@ -5629,6 +5692,21 @@
   },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Servidor compartilhado"
+  },
+  "servers.manage.unlock-server": {
+    "defaultMessage": "Desbloquear servidor"
+  },
+  "servers.manage.unlock.error-text": {
+    "defaultMessage": "Ocorreu um erro ao desbloquear este servidor. Por favor, tente novamente."
+  },
+  "servers.manage.unlock.error-title": {
+    "defaultMessage": "Falha ao desbloquear servidor"
+  },
+  "servers.manage.unlock.success-text": {
+    "defaultMessage": "{name} foi desbloqueado."
+  },
+  "servers.manage.unlock.success-title": {
+    "defaultMessage": "Servidor desbloqueado"
   },
   "servers.manage.your-servers-title": {
     "defaultMessage": "Seus servidores"
@@ -5860,6 +5938,27 @@
   },
   "servers.settings.advanced.sftp.roll-credentials-success-title": {
     "defaultMessage": "Credenciais SFTP rotacionadas"
+  },
+  "servers.settings.support.action-log-title": {
+    "defaultMessage": "Registro de ações"
+  },
+  "servers.settings.support.clear-action-log-button": {
+    "defaultMessage": "Limpar registro de ações"
+  },
+  "servers.settings.support.clear-action-log-confirmation": {
+    "defaultMessage": "Isto exclui permanentemente todos os registros de ação deste servidor. Deseja continuar?"
+  },
+  "servers.settings.support.clear-action-log-description": {
+    "defaultMessage": "Apagar todas as entradas do registro de ações deste servidor."
+  },
+  "servers.settings.support.clear-action-log-error": {
+    "defaultMessage": "Falha ao limpar registro de ação"
+  },
+  "servers.settings.support.clear-action-log-success": {
+    "defaultMessage": "Registro de ações limpo"
+  },
+  "servers.settings.support.clear-action-log-title": {
+    "defaultMessage": "Limpar registro de ações?"
   },
   "servers.setup.onboarding.installation-failed.text": {
     "defaultMessage": "Ocorreu um erro inesperado durante a instalação. Por favor, tente novamente mais tarde."
@@ -7176,3 +7275,4 @@
     "defaultMessage": "Tipo"
   }
 }
+

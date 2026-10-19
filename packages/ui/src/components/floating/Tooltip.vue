@@ -63,6 +63,11 @@ const isOpen = computed(
 	() => props.reference != null && (!!props.text || props.content != null) && !props.disabled,
 )
 const referenceEl = computed(() => props.reference ?? null)
+const teleportTarget = computed(
+	() =>
+		referenceEl.value?.ownerDocument.body ??
+		(typeof document !== 'undefined' ? document.body : 'body'),
+)
 const moving = ref(false)
 const jumpKey = ref(0)
 let addedTabIndex = false
@@ -241,7 +246,7 @@ function onFocusOut(event: FocusEvent) {
 	>
 		<slot />
 	</div>
-	<Teleport v-if="hosted" to="body">
+	<Teleport v-if="hosted" :to="teleportTarget">
 		<Transition name="tooltip">
 			<div
 				v-if="isOpen"

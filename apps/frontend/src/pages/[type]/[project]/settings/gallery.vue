@@ -1,6 +1,7 @@
 <template>
 	<div>
 		<ValidationMessage :check="galleryImagesValidation" class="mb-4" />
+		<ProjectIssueCard :target="['add_gallery_images', 'remove_gallery_images']" class="mb-4" />
 		<AiImageWarningModal ref="aiImageWarningModal" />
 		<Modal
 			v-if="currentMember"
@@ -52,6 +53,12 @@
 					:current-field="editTitle"
 				/>
 				<ValidationMessage :check="saveValidation.forField('gallery-text', 'name')" class="mt-2" />
+				<ProjectIssueCard
+					v-if="editingImageId !== undefined"
+					target="modify_gallery_image"
+					:image-id="editingImageId"
+					class="mt-2"
+				/>
 				<label for="gallery-image-desc" class="w-fit">
 					<span class="label__title">Description</span>
 				</label>
@@ -245,6 +252,12 @@
 							{{ item.description }}
 						</p>
 					</div>
+					<ProjectIssueCard
+						v-if="galleryImageId(item.url) !== undefined"
+						target="modify_gallery_image"
+						:image-id="galleryImageId(item.url)"
+						class="mt-2"
+					/>
 				</div>
 				<div class="gallery-bottom">
 					<div class="gallery-created">
@@ -322,6 +335,7 @@ import {
 } from '@modrinth/ui'
 
 import AiImageWarningModal from '~/components/ui/AiImageWarningModal.vue'
+import ProjectIssueCard from '~/components/ui/project-issue-card/index.vue'
 import ValidationMessage from '~/components/ValidationMessage.vue'
 import { useProjectNagMessages } from '~/composables/project-nag-validation'
 import { useProjectSaveValidation } from '~/composables/project-save-validation'
@@ -335,6 +349,7 @@ const formatDate = useFormatDateTime({
 })
 const {
 	projectV2: project,
+	projectV3,
 	currentMember,
 	createGalleryItem: createGalleryItemMutation,
 	editGalleryItem: editGalleryItemMutation,
@@ -354,6 +369,10 @@ const zoomedIn = ref(false)
 const deleteIndex = ref(-1)
 
 const editIndex = ref(-1)
+function galleryImageId(url) {
+	return projectV3.value?.gallery.find((image) => image.url === url)?.id
+}
+const editingImageId = computed(() => galleryImageId(filteredGallery.value[editIndex.value]?.url))
 const editTitle = ref('')
 const editDescription = ref('')
 const editFeatured = ref(false)

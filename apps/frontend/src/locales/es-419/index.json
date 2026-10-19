@@ -881,6 +881,9 @@
   "auth.sign-in.choose-account": {
     "message": "Elige una cuenta para usar en la aplicación de Modrinth"
   },
+  "auth.sign-in.choose-existing-account": {
+    "message": "Usar una cuenta existente"
+  },
   "auth.sign-in.continue-with-email": {
     "message": "Continuar con el correo electrónico"
   },
@@ -899,17 +902,14 @@
   "auth.sign-in.launcher.callback.title": {
     "message": "Devolver inicio de sesión en Modrinth"
   },
-  "auth.sign-in.launcher.complete.description": {
-    "message": "Te estamos devolviendo a la aplicación Modrinth. Si nada sucede, usa el botón de abajo."
-  },
   "auth.sign-in.launcher.complete.go-to-website": {
     "message": "Ir a Modrinth.com"
   },
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Abrir la aplicación de Modrinth"
   },
-  "auth.sign-in.launcher.complete.title": {
-    "message": "Has iniciado sesión"
+  "auth.sign-in.launcher.handoff-failed": {
+    "message": "No se pudo finalizar el inicio de sesión en la Modrinth App. Intenta nuevamente."
   },
   "auth.sign-in.launcher.opening.description": {
     "message": "Si la aplicación no se abre, utilice el botón de abajo para terminar de iniciar sesión."
@@ -917,8 +917,14 @@
   "auth.sign-in.launcher.opening.title": {
     "message": "Abriendo en la aplicación de Modrinth..."
   },
+  "auth.sign-in.launcher.reauthenticate.title": {
+    "message": "Iniciar sesión en la Modrinth App"
+  },
   "auth.sign-in.no-account": {
     "message": "¿No tienes una cuenta?"
+  },
+  "auth.sign-in.reauthenticate.use-different-account": {
+    "message": "Usar una cuenta diferente"
   },
   "auth.sign-in.sign-in-with": {
     "message": "Inicia sesión en Modrinth"
@@ -1067,9 +1073,6 @@
   "conversation-thread.action.approve": {
     "message": "Aprovar"
   },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Aprovar con respuesta"
-  },
   "conversation-thread.action.close-report": {
     "message": "Cerrar informe"
   },
@@ -1078,9 +1081,6 @@
   },
   "conversation-thread.action.reject": {
     "message": "Rechazar"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Rechazar con respuesta"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Reabrir hilo"
@@ -1115,9 +1115,6 @@
   "conversation-thread.action.withhold": {
     "message": "Retener"
   },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Retener con respuesta"
-  },
   "conversation-thread.closed-thread.description": {
     "message": "Este hilo está cerrado y no se pueden enviar nuevos mensajes."
   },
@@ -1126,9 +1123,6 @@
   },
   "conversation-thread.error.reopening-report": {
     "message": "Error al reabrir el reporte"
-  },
-  "conversation-thread.error.sending-message": {
-    "message": "Error al enviar el mensaje"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Responder al hilo..."
@@ -1156,9 +1150,6 @@
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "Confirmo que he atendido correctamente las observaciones de los moderadores."
-  },
-  "conversation-thread.resubmit-modal.description": {
-    "message": "Estás enviando <project-title>{projectTitle}</project-title> para ser revisado de nuevo por los moderadores."
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "Enviando de nuevo para revisión"
@@ -2260,9 +2251,6 @@
   },
   "error.generic.default.list_item.1": {
     "message": "Revisa si Modrinth está caído en nuestra <status-link>Página de estado</status-link>."
-  },
-  "error.generic.default.list_item.2": {
-    "message": "Si esto sigue ocurriendo, quizás quieras informar al equipo de Modrinth uniéndote a nuestro <discord-link>servidor de Discord</discord-link>."
   },
   "error.generic.default.list_title": {
     "message": "Vuelve a intentarlo en unos minutos."
@@ -3425,9 +3413,6 @@
   "project-member-header.success-join": {
     "message": "Te has unido al equipo del proyecto"
   },
-  "project-moderation-nags.project-submitted-for-review": {
-    "message": "¡Tu proyecto ha sido enviado para revisión!"
-  },
   "project-moderation-nags.publishing-checklist": {
     "message": "Lista de verificación para la publicación"
   },
@@ -3544,9 +3529,6 @@
   },
   "project.actions.rescan-modpack": {
     "message": "Re-escanear modpack"
-  },
-  "project.actions.review-project": {
-    "message": "Revisar proyecto"
   },
   "project.actions.servers-promo.description": {
     "message": "¡Modrinth Hosting es la forma más fácil de jugar con tus amigos sin complicaciones!"

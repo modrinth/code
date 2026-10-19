@@ -138,6 +138,22 @@
 				</div>
 			</div>
 		</div>
+		<div v-else class="flex w-full flex-col gap-6">
+			<Admonition type="critical" :header="formatMessage(messages.unavailableHeader)">
+				{{ formatMessage(messages.unavailableDescription) }}
+			</Admonition>
+
+			<div class="flex w-full items-center justify-between gap-2">
+				<Button type="quiet" color="red" @click="handleReport">
+					<ReportIcon />
+					{{ formatMessage(commonMessages.reportButton) }}
+				</Button>
+				<Button @click="hide">
+					<XIcon />
+					{{ formatMessage(commonMessages.closeButton) }}
+				</Button>
+			</div>
+		</div>
 	</NewModal>
 
 	<ManagedContentModal
@@ -226,7 +242,12 @@ async function fetchData(versionId: string) {
 	const version = await get_version(versionId, 'bypass')
 	modpackVersion.value = version
 
-	if (version?.project_id) {
+	if (!version) {
+		console.warn(`InstallToPlayModal: modpack version ${versionId} is unavailable`)
+		return
+	}
+
+	if (version.project_id) {
 		requiredContentProject.value = await get_project(version.project_id, 'bypass')
 		externalFiles.value = [
 			...new Set(
@@ -349,7 +370,18 @@ async function show(
 	externalFiles.value = []
 	onInstallComplete.value = callback
 
-	if (modpackVersionIdVal) await fetchData(modpackVersionIdVal)
+	if (modpackVersionIdVal) {
+		try {
+			await fetchData(modpackVersionIdVal)
+		} catch (error) {
+			console.error(
+				`InstallToPlayModal: failed to load modpack version ${modpackVersionIdVal}`,
+				error,
+			)
+		}
+	} else {
+		console.warn(`InstallToPlayModal: server project ${projectVal.id} has no modpack version`)
+	}
 
 	modal.value?.show(e)
 	await nextTick()
@@ -414,6 +446,15 @@ const messages = defineMessages({
 	dontInstall: {
 		id: 'app.modal.install-to-play.external-files-dont-install',
 		defaultMessage: "Don't install",
+	},
+	unavailableHeader: {
+		id: 'app.modal.install-to-play.unavailable-header',
+		defaultMessage: "This server's modpack isn't available",
+	},
+	unavailableDescription: {
+		id: 'app.modal.install-to-play.unavailable-description',
+		defaultMessage:
+			"The modpack version this server uses can't be downloaded right now. It may be unpublished or under review. Try again later, or contact the server owner.",
 	},
 })
 

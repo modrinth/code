@@ -115,17 +115,40 @@ export function useProjectNagMessages(
 	detailIndex?: () => number,
 ) {
 	const { projectValidation, projectV2 } = injectProjectPageContext()
-	const kinds = new Set<string>(projectNagFields[field])
-
 	return computed(() =>
-		(projectValidation.value?.nags ?? [])
-			.filter((nag) => {
-				if (nag.severity === 'suggestion') return false
-				const kind = normalizeProjectNagKind(nag.kind)
-				return (
-					kind !== null && kinds.has(kind) && appliesToDetails(nag, detailField, detailIndex?.())
-				)
-			})
-			.map((nag) => toProjectFieldMessage(nag, projectV2.value.project_type)),
+		getProjectNagMessages(projectValidation.value?.nags ?? [], field, {
+			detailField,
+			detailIndex: detailIndex?.(),
+			projectType: projectV2.value.project_type,
+		}),
 	)
+}
+
+export function getProjectNagMessages(
+	nags: readonly Labrinth.Projects.v3.ProjectNag[],
+	field: ProjectSettingsField,
+	options: { detailField?: string; detailIndex?: number; url?: string; projectType?: string } = {},
+) {
+	const kinds = new Set<string>(projectNagFields[field])
+	return nags
+		.filter((nag) => {
+			if (nag.severity === 'suggestion') return false
+			const kind = normalizeProjectNagKind(nag.kind)
+			if (
+				!kind ||
+				!kinds.has(kind) ||
+				!appliesToDetails(nag, options.detailField, options.detailIndex)
+			)
+				return false
+			if (options.url !== undefined) {
+				if (typeof nag.details.url !== 'string') return false
+				try {
+					return new URL(nag.details.url).href === new URL(options.url).href
+				} catch {
+					return false
+				}
+			}
+			return true
+		})
+		.map((nag) => toProjectFieldMessage(nag, options.projectType))
 }

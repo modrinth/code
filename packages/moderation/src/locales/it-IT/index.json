@@ -53,6 +53,9 @@
   "nags.all-tags-selected.title": {
     "defaultMessage": "Seleziona i tag pertinenti"
   },
+  "nags.check-disclosures.description": {
+    "defaultMessage": "Assicurati di aver fornito le informazioni di cui gli utenti dovrebbero essere a conoscenza nelle informative del progetto."
+  },
   "nags.check-disclosures.title": {
     "defaultMessage": "Rivedi le informative"
   },
@@ -335,6 +338,9 @@
   "nags.select-language.title": {
     "defaultMessage": "Seleziona una lingua"
   },
+  "nags.select-license.description": {
+    "defaultMessage": "Seleziona la licenza con la quale il progetto è distribuito."
+  },
   "nags.select-license.title": {
     "defaultMessage": "Seleziona una licenza"
   },
@@ -395,6 +401,9 @@
   "nags.too-many-tags.title": {
     "defaultMessage": "Seleziona i tag pertinenti"
   },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "È necessaria almeno un'immagine per dimostrare i contenuti del progetto."
+  },
   "nags.upload-gallery-image.description-resourcepack": {
     "defaultMessage": "È necessaria almeno un'immagine per dimostrare il contenuto del pacchetto di risorse, a meno che contenga solo audio o traduzioni. In tal caso, seleziona il tag appropriato."
   },
@@ -426,3 +435,4 @@
     "defaultMessage": "Il nome non dovrebbe contenere il numero di versione."
   }
 }
+

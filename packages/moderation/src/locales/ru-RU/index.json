@@ -231,7 +231,7 @@
     "defaultMessage": "Открыть ветку модерации"
   },
   "nags.moderator-feedback.description": {
-    "defaultMessage": "Перед повторной отправкой проекта исправьте все замечания модерации."
+    "defaultMessage": "Перед повторной отправкой проекта исправьте все замечания модераторов."
   },
   "nags.moderator-feedback.title": {
     "defaultMessage": "Посмотрите замечания"

@@ -8,7 +8,7 @@ extend-exclude = [
   "packages/blog/",
   # contains payment card IDs like `IY1VMST1MOXS` which are flagged
   "apps/labrinth/src/queue/payouts/mod.rs",
-  "apps/app-frontend/src/components/ui/settings/instances/game-settings-modal/languages.ts"
+  "apps/app-frontend/src/features/settings/syncing/game-settings-modal/languages.ts"
 ]
 
 [default]

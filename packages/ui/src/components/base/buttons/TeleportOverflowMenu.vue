@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref, toRef, useId, watch } from 'vue'
+import { computed, nextTick, onMounted, ref, shallowRef, toRef, useId, watch } from 'vue'
 
 import { useAnchoredTeleport } from '../../../utils/use-anchored-teleport'
 import Button from './Button.vue'
@@ -69,6 +69,7 @@ const emit = defineEmits<{
 
 const triggerButton = ref<ButtonElementHandle | null>(null)
 const triggerElement = computed(() => triggerButton.value?.element ?? null)
+const menuDocument = shallowRef<Document>()
 const panel = ref<InstanceType<typeof ButtonMenuPanel> | null>(null)
 const panelElement = computed(() => panel.value?.element ?? null)
 const resolvedPlacement = toRef(props, 'placement')
@@ -102,6 +103,7 @@ const { handleMouseEnter, handleMouseLeave, cancelLeave } = useHoverIntent({
 async function openMenu(position: 'first' | 'last' = 'first', focus = true) {
 	if (props.disabled || isOpen.value) return
 	cancelLeave()
+	menuDocument.value = triggerElement.value?.ownerDocument ?? document
 	await open()
 	emit('open')
 	if (!focus) return
@@ -141,6 +143,12 @@ watch(isOpen, (openState, previousOpenState) => {
 	if (!openState && previousOpenState) emit('close')
 })
 
+const teleportTarget = computed(
+	() =>
+		menuDocument.value?.body ??
+		triggerElement.value?.ownerDocument.body ??
+		(typeof document !== 'undefined' ? document.body : 'body'),
+)
 const isClient = ref(false)
 onMounted(() => {
 	isClient.value = true
@@ -172,7 +180,7 @@ defineExpose({ open: openMenu, close: closeMenu })
 		@mouseleave="handleMouseLeave"
 	>
 		<slot />
-		<Teleport v-if="isClient" to="body">
+		<Teleport v-if="isClient" :to="teleportTarget">
 			<ButtonMenuPanel
 				ref="panel"
 				:open="isOpen"

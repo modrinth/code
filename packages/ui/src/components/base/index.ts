@@ -117,6 +117,7 @@ export type {
 	PageHeaderProps,
 	PageHeaderTarget,
 } from './page-header/types'
+export { default as PageLoadingBar } from './PageLoadingBar.vue'
 export { default as Pagination } from './Pagination.vue'
 export { default as PreviewSelectButton } from './PreviewSelectButton.vue'
 export { default as ProgressBar } from './ProgressBar.vue'
