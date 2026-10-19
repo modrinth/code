@@ -290,9 +290,7 @@ impl FriendsSocket {
     }
 
     #[tracing::instrument(skip_all)]
-    pub async fn socket_loop() -> crate::Result<()> {
-        let state = crate::State::get().await?;
-
+    pub async fn socket_loop(state: Arc<crate::State>) -> crate::Result<()> {
         tokio::task::spawn(async move {
             let mut last_connection = Utc::now();
             let mut last_ping = Utc::now();

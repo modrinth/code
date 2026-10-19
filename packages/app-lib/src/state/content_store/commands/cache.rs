@@ -215,7 +215,7 @@ impl ContentStore {
         if self.any_instance_running(state).await? {
             return Ok(reclaimed);
         }
-        for job in crate::install::store::list(false, state).await? {
+        for job in crate::install::store::list(false, &state.pool).await? {
             if matches!(
                 job.status,
                 crate::install::InstallJobStatus::Queued
