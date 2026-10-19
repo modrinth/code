@@ -142,6 +142,7 @@ const overflowActions = computed(() => [
 		tone: 'orange' as const,
 		icon: PlusIcon,
 		action: () => submitIssues(),
+		hoverFilled: true,
 		disabled:
 			!!heldBy.value ||
 			!canAddIssues.value ||
