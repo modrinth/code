@@ -32,11 +32,11 @@ use crate::state::{
     ModLoader, ProjectType, State,
 };
 use crate::util::fetch::DownloadReason;
-use sqlx::SqlitePool;
 use crate::util::io::IOError;
 use crate::util::jre::JREError;
 use async_tungstenite::tungstenite;
 use async_zip::error::ZipError;
+use sqlx::SqlitePool;
 use sqlx::migrate::MigrateError;
 use std::collections::{HashMap, HashSet};
 use std::future::Future;
