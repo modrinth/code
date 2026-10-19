@@ -29,7 +29,10 @@
 			<Avatar v-else-if="isAutoApproval" size="2rem" circle :raised="raised" />
 			<ThreadRoleBadge v-else role="moderator" avatar />
 		</div>
-		<div class="message__content mt-1.5 min-w-0">
+		<div
+			class="message__content relative mt-1.5 min-w-0"
+			:class="{ 'pr-8': isStaff(auth.user) && message.author_id === auth.user.id && !noLinks }"
+		>
 			<template v-if="author">
 				<span
 					class="message__author min-w-0 max-w-full font-bold"
@@ -195,7 +198,7 @@
 			</span>
 			<div
 				v-if="isStaff(auth.user) && message.author_id === auth.user.id && !noLinks"
-				class="mt-1 flex items-center gap-2"
+				class="absolute right-0 top-0 flex items-center"
 			>
 				<div
 					class="message__actions ml-auto group-focus-within/thread:opacity-100 group-hover/thread:opacity-100 [@media(hover:hover)]:opacity-0"
@@ -203,7 +206,7 @@
 					<TeleportOverflowMenu
 						type="quiet"
 						:label="formatMessage(imageMessages.moreOptions)"
-						class="btn-dropdown-animation !size-6 !min-h-0 !p-1"
+						class="btn-dropdown-animation !size-8 !min-h-0"
 						:options="[
 							{
 								id: 'delete',
@@ -295,8 +298,7 @@ const props = defineProps({
 })
 
 const hasBody = computed(() => props.message.body.type === 'text' && !props.forceCompact)
-const authorClasses =
-	'inline [&>svg]:ms-1 [&>svg]:me-1 [&>svg]:inline-block [&>svg]:align-middle mr-1'
+const authorClasses = 'inline [&>svg]:ms-1 [&>svg]:inline-block [&>svg]:align-middle mr-1'
 const bodyClasses = computed(() => (hasBody.value ? 'mt-1' : 'inline'))
 
 const emit = defineEmits(['update-thread', 'open-image'])
@@ -453,6 +455,22 @@ const formatDateTime = useFormatDateTime({
 })
 
 const timeSincePosted = ref(formatRelativeTime(props.message.created))
+
+let timestampTimeout
+
+/** Refresh at 5 seconds, then every 15 seconds, then every minute until one hour old. */
+function refreshTimestamp() {
+	timeSincePosted.value = formatRelativeTime(props.message.created)
+	const age = Date.now() - new Date(props.message.created).getTime()
+	if (!Number.isFinite(age) || age >= 3600000) return
+
+	const interval = age < 5000 ? 5000 - age : 15000
+	const delay = age < 60000 ? Math.min(interval, 60000 - age) : Math.min(60000, 3600000 - age)
+	timestampTimeout = setTimeout(refreshTimestamp, delay)
+}
+
+onMounted(refreshTimestamp)
+onBeforeUnmount(() => clearTimeout(timestampTimeout))
 
 const isPrivateMessage = computed(() => {
 	return (
