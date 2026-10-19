@@ -4,7 +4,10 @@ use crate::env::ENV;
 use chrono::{DateTime, Utc};
 use eyre::WrapErr;
 use rdkafka::{
-    ClientConfig, consumer::StreamConsumer, producer::FutureProducer,
+    ClientConfig,
+    consumer::StreamConsumer,
+    message::{Header, OwnedHeaders},
+    producer::FutureProducer,
 };
 use serde::Serialize;
 use uuid::Uuid;
@@ -60,6 +63,28 @@ pub fn create_consumer(group_id: &str) -> eyre::Result<StreamConsumer> {
         .set("broker.address.family", "v4")
         .create()
         .wrap_err("failed to create Kafka consumer")
+}
+
+/// Sentry distributed tracing headers for the active span, so consumers can
+/// continue the producer's trace.
+///
+/// Empty outside of a span, since the scope's fallback propagation context
+/// would otherwise join every background publish into one shared trace.
+pub fn sentry_trace_headers() -> OwnedHeaders {
+    sentry::configure_scope(|scope| {
+        if scope.get_span().is_none() {
+            return OwnedHeaders::new();
+        }
+        scope.iter_trace_propagation_headers().fold(
+            OwnedHeaders::new(),
+            |headers, (key, value)| {
+                headers.insert(Header {
+                    key,
+                    value: Some(value.as_str()),
+                })
+            },
+        )
+    })
 }
 
 #[derive(Debug, Serialize)]

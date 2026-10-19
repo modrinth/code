@@ -13,6 +13,7 @@ use super::{
 };
 use crate::util::kafka::{
     KAFKA_OPERATION_INTERVAL, KafkaClientState, KafkaEvent,
+    sentry_trace_headers,
 };
 
 pub const FILE_UPLOADED_TOPIC: &str = "public.labrinth.file-uploaded.v1";
@@ -59,7 +60,8 @@ impl KafkaFileHost {
             .wrap_err("serializing file uploaded event")?;
         let record = FutureRecord::to(FILE_UPLOADED_TOPIC)
             .key(&data.file_name)
-            .payload(&payload);
+            .payload(&payload)
+            .headers(sentry_trace_headers());
 
         self.kafka_client
             .client

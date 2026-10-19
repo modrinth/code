@@ -12,7 +12,10 @@ use crate::{
     models::ids::FileId,
     util::{
         http::HTTP_CLIENT,
-        kafka::{KAFKA_OPERATION_INTERVAL, KafkaClientState, KafkaEvent},
+        kafka::{
+            KAFKA_OPERATION_INTERVAL, KafkaClientState, KafkaEvent,
+            sentry_trace_headers,
+        },
     },
 };
 
@@ -68,7 +71,8 @@ pub async fn publish_file_scan(
         .wrap_err("serializing Delphi file scan event")?;
     let record = FutureRecord::to(DELPHI_FILE_SCAN_TOPIC)
         .key(&key)
-        .payload(&payload);
+        .payload(&payload)
+        .headers(sentry_trace_headers());
 
     tokio::time::timeout(
         KAFKA_OPERATION_INTERVAL,

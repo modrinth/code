@@ -3,11 +3,13 @@ use eyre::WrapErr;
 use rdkafka::{
     Message,
     consumer::{CommitMode, Consumer, StreamConsumer},
-    message::BorrowedMessage,
+    message::{BorrowedMessage, Headers},
 };
+use sentry::{Hub, SentryFutureExt, TransactionContext, protocol::SpanStatus};
 use serde::Deserialize;
 use std::{
     collections::HashSet,
+    sync::Arc,
     time::{Duration, Instant},
 };
 use tracing::{Instrument, info, info_span};
@@ -114,15 +116,54 @@ async fn consume(
         }
 
         info!("Consuming batch of {} messages", messages.len());
-        consume_batch(
+        let hub = Arc::new(Hub::new_from_top(Hub::current()));
+        let transaction =
+            hub.start_transaction(batch_transaction_context(&messages));
+        hub.configure_scope(|scope| {
+            scope.set_span(Some(transaction.clone().into()));
+        });
+
+        let result = consume_batch(
             ro_pool,
             redis_pool,
             search_backend,
             consumer,
             messages.drain(..),
         )
-        .await?;
+        .bind_hub(hub)
+        .await;
+
+        if result.is_err() {
+            transaction.set_status(SpanStatus::InternalError);
+        }
+        transaction.finish();
+        result?;
     }
+}
+
+/// Continues the trace of the batch's first message. Sentry has no span
+/// links, so the producer traces of the other messages stay disconnected.
+fn batch_transaction_context(
+    messages: &[BorrowedMessage<'_>],
+) -> TransactionContext {
+    let headers = messages
+        .first()
+        .and_then(|message| message.headers())
+        .map(|headers| {
+            headers
+                .iter()
+                .filter_map(|header| {
+                    Some((header.key, std::str::from_utf8(header.value?).ok()?))
+                })
+                .collect::<Vec<_>>()
+        })
+        .unwrap_or_default();
+
+    TransactionContext::continue_from_headers(
+        INCREMENTAL_INDEX_SEARCH_TASK,
+        "queue.process",
+        headers,
+    )
 }
 
 async fn consume_batch(
