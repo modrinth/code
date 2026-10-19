@@ -11,6 +11,18 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-10-19T16:13:11+00:00`,
+		product: 'app',
+		version: '0.21.11',
+		body: `## Changed
+- Replaced the ended Medal free server promotion in the sidebar with the current Modrinth Hosting promotion.
+
+## Fixed
+- Fixed the Play button not launching the game, or taking several minutes, after Modrinth App had been open for a while.
+- Fixed launcher logs taking up disk space indefinitely. Logs older than 14 days are now deleted when Modrinth App starts.
+- Fixed the app database growing over time by removing cached project and version data that expired more than a week ago.`,
+	},
+	{
 		date: `2026-10-16T17:26:37+00:00`,
 		product: 'app',
 		version: '0.21.10',
