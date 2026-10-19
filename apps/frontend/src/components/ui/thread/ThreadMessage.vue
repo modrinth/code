@@ -29,7 +29,7 @@
 			<Avatar v-else-if="isAutoApproval" size="2rem" circle :raised="raised" />
 			<ThreadRoleBadge v-else role="moderator" avatar />
 		</div>
-		<div class="message__content min-w-0">
+		<div class="message__content mt-1.5 min-w-0">
 			<template v-if="author">
 				<span
 					class="message__author min-w-0 max-w-full font-bold"
@@ -84,6 +84,13 @@
 					<ThreadRoleBadge v-if="!isAutoApproval" role="moderator" />
 				</span>
 			</template>
+			<span
+				v-if="hasBody"
+				v-tooltip="formatDateTime(message.created)"
+				class="message__date relative bottom-px ms-1.5 text-sm text-secondary opacity-80"
+			>
+				{{ timeSincePosted }}
+			</span>
 			<div
 				v-if="message.body.type === 'text'"
 				v-image-previews="imagePreviews ? formatMessage(imageMessages.openImage) : null"
@@ -179,16 +186,19 @@
 					{{ formatMessage(imageMessages.techReviewExitFileDeleted) }}
 				</span>
 			</div>
-			<div class="mt-1 flex items-center gap-2">
-				<span class="message__date block text-xs text-secondary">
-					<span v-tooltip="formatDateTime(message.created)">
-						{{ timeSincePosted }}
-					</span>
-				</span>
+			<span
+				v-if="!hasBody"
+				v-tooltip="formatDateTime(message.created)"
+				class="message__date relative bottom-px ms-1.5 text-sm text-secondary opacity-80"
+			>
+				{{ timeSincePosted }}
+			</span>
+			<div
+				v-if="isStaff(auth.user) && message.author_id === auth.user.id && !noLinks"
+				class="mt-1 flex items-center gap-2"
+			>
 				<div
-					v-if="isStaff(auth.user) && message.author_id === auth.user.id"
 					class="message__actions ml-auto group-focus-within/thread:opacity-100 group-hover/thread:opacity-100 [@media(hover:hover)]:opacity-0"
-					:class="{ hidden: noLinks }"
 				>
 					<TeleportOverflowMenu
 						type="quiet"
@@ -285,8 +295,9 @@ const props = defineProps({
 })
 
 const hasBody = computed(() => props.message.body.type === 'text' && !props.forceCompact)
-const authorClasses = 'inline [&>svg]:ms-1 [&>svg]:me-1 [&>svg]:inline-block [&>svg]:align-middle'
-const bodyClasses = computed(() => (hasBody.value ? 'mt-1' : 'ms-1 inline'))
+const authorClasses =
+	'inline [&>svg]:ms-1 [&>svg]:me-1 [&>svg]:inline-block [&>svg]:align-middle mr-1'
+const bodyClasses = computed(() => (hasBody.value ? 'mt-1' : 'inline'))
 
 const emit = defineEmits(['update-thread', 'open-image'])
 const settings = useModerationSettings()
