@@ -1,9 +1,10 @@
 use std::path::{Path, PathBuf};
 
+use anyhow::bail;
 use serde::{Deserialize, Serialize, de};
 
 use crate::{
-    State,
+    ErrorKind, State,
     install::{InstallPhaseDetails, InstallProgressReporter},
     pack::{
         import::{self, finish_import},
@@ -219,10 +220,9 @@ pub async fn import_mmc(
     if !minecraft_folder.is_dir() {
         minecraft_folder = mmc_instance_path.join(".minecraft");
         if !minecraft_folder.is_dir() {
-            return Err(crate::ErrorKind::InputError(
-                "Instance is missing Minecraft directory".to_string(),
-            )
-            .into());
+            bail!(ErrorKind::InputError(
+                "instance is missing Minecraft directory".to_string(),
+            ));
         }
     }
 
@@ -247,7 +247,7 @@ pub async fn import_mmc(
                 // Treat as unmanaged
                 import_mmc_unmanaged(instance_id, minecraft_folder, "ImportedModpack".to_string(), description, mmc_pack, reporter, details).await?;
             },
-            _ => return Err(crate::ErrorKind::InputError("Instance is managed, but managed pack type not specified in instance.cfg".to_string()).into())
+            _ => bail!(ErrorKind::InputError("instance is managed, but managed pack type not specified in instance.cfg".to_string()))
         }
     } else {
         // Directly import unmanaged pack
@@ -314,6 +314,7 @@ async fn import_mmc_unmanaged(
         })
         .collect();
 
+    let state = State::get().await?;
     install_from::set_instance_information(
         instance_id.to_string(),
         &description,
@@ -321,18 +322,12 @@ async fn import_mmc_unmanaged(
         None,
         &dependencies,
         false,
+        &state.directories,
     )
     .await?;
 
     // Moves .minecraft folder over (ie: overrides such as resourcepacks, mods, etc)
-    let state = State::get().await?;
-    finish_import(
-        instance_id,
-        minecraft_folder,
-        &state.io_semaphore,
-        reporter,
-        details,
-    )
-    .await?;
+    finish_import(instance_id, minecraft_folder, &state, reporter, details)
+        .await?;
     Ok(())
 }

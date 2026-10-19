@@ -13971,7 +13971,6 @@ dependencies = [
  "either",
  "encoding_rs",
  "enumset",
- "eyre",
  "flate2",
  "fs4",
  "futures",
@@ -14041,6 +14040,7 @@ name = "theseus_gui"
 version = "1.0.0-local"
 dependencies = [
  "aes-gcm",
+ "anyhow",
  "async_zip",
  "base64 0.22.1",
  "chrono",
@@ -14076,7 +14076,6 @@ dependencies = [
  "tauri-plugin-window-state",
  "tempfile",
  "theseus",
- "thiserror 2.0.21",
  "tokio",
  "tokio-util",
  "tracing",

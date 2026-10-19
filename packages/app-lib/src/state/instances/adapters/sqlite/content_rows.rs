@@ -1,5 +1,6 @@
 #![allow(dead_code)]
 
+use crate::ErrorKind;
 use crate::state::instances::{
     ContentEntry, ContentRequirement, ContentSet, ContentSetRemoteRef,
     ContentSetRemoteRefType, ContentSetStatus, ContentSetSyncProvider,
@@ -7,6 +8,7 @@ use crate::state::instances::{
     ContentUpdateCheck, InstanceFile,
 };
 use crate::state::{ModLoader, ProjectType, ReleaseChannel};
+use anyhow::bail;
 use chrono::{DateTime, TimeZone, Utc};
 use sqlx::{Executor, Sqlite, SqlitePool, Transaction};
 use std::collections::HashSet;
@@ -581,11 +583,9 @@ pub(crate) async fn set_instance_file_locked(
     let file =
         get_instance_file_by_relative_path(instance_id, relative_path, pool)
             .await?
-            .ok_or_else(|| {
-                crate::ErrorKind::InputError(format!(
-                    "Unknown content file {relative_path}"
-                ))
-            })?;
+            .ok_or(ErrorKind::InputError(format!(
+                "unknown content file {relative_path}"
+            )))?;
 
     if locked {
         sqlx::query(
@@ -1387,12 +1387,10 @@ pub(crate) async fn upsert_content_update_check(
 }
 
 fn project_type_from_str(value: &str) -> crate::Result<ProjectType> {
-    ProjectType::from_name(value).ok_or_else(|| {
-        crate::ErrorKind::InputError(format!(
-            "Unknown content project type {value}"
-        ))
-        .into()
-    })
+    ProjectType::from_name(value).ok_or(
+        ErrorKind::InputError(format!("unknown content project type {value}"))
+            .into(),
+    )
 }
 
 fn timestamp(value: i64) -> DateTime<Utc> {
@@ -1407,10 +1405,9 @@ fn optional_timestamp(value: i64) -> Option<DateTime<Utc>> {
 
 fn unsigned(value: i64, column: &str) -> crate::Result<u64> {
     if value < 0 {
-        return Err(crate::ErrorKind::InputError(format!(
-            "Expected {column} to be non-negative"
-        ))
-        .into());
+        bail!(ErrorKind::InputError(format!(
+            "expected {column} to be non-negative"
+        )));
     }
 
     Ok(value as u64)

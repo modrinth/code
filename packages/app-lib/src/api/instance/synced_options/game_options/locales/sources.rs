@@ -1,7 +1,9 @@
-use super::super::options_file::{input_error, sha1_bytes};
+use super::super::options_file::sha1_bytes;
 use super::archive::{self, ArchiveIndex};
+use crate::ErrorKind;
 use crate::state::{CachedEntry, InstanceMetadata, Project, State};
 use crate::util::{fetch, io};
+use anyhow::bail;
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, HashMap};
 use std::path::PathBuf;
@@ -66,9 +68,9 @@ pub(super) async fn write_json<T: Serialize>(
     path: &std::path::Path,
     data: &T,
 ) -> crate::Result<()> {
-    let parent = path
-        .parent()
-        .ok_or_else(|| input_error("Missing locale cache directory"))?;
+    let parent = path.parent().ok_or(ErrorKind::InputError(
+        "missing locale cache directory".to_string(),
+    ))?;
     io::create_dir_all(parent).await?;
     io::write(path, serde_json::to_vec(data)?).await?;
     Ok(())
@@ -134,7 +136,9 @@ pub(super) async fn load_snapshot(
     id: &str,
 ) -> crate::Result<Snapshot> {
     if !archive::valid_hash(id) {
-        return Err(input_error("Invalid locale snapshot hash"));
+        bail!(ErrorKind::InputError(
+            "invalid locale snapshot hash".to_string()
+        ));
     }
     let bytes =
         io::read(root(state).join("snapshots").join(format!("{id}.json")))
@@ -151,7 +155,9 @@ pub(super) async fn archive_index(
     source: &ArchiveSource,
 ) -> crate::Result<ArchiveIndex> {
     if !archive::valid_hash(&source.hash) {
-        return Err(input_error("Invalid locale archive hash"));
+        bail!(ErrorKind::InputError(
+            "invalid locale archive hash".to_string()
+        ));
     }
     let path = root(state)
         .join("archives")
@@ -163,8 +169,7 @@ pub(super) async fn archive_index(
                 .ok()
                 .filter(|index| index.version >= 2 || !source_path.exists())
         })
-        .await
-        .map_err(|error| input_error(error.to_string()))?;
+        .await?;
         if let Some(index) = cached {
             return Ok(index);
         }
@@ -173,8 +178,7 @@ pub(super) async fn archive_index(
     let index = tokio::task::spawn_blocking(move || {
         archive::inspect(&source.path, &source.hash)
     })
-    .await
-    .map_err(|e| input_error(e.to_string()))??;
+    .await??;
     write_json(&path, &index).await?;
     Ok(index)
 }

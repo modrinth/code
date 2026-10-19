@@ -114,7 +114,7 @@
 						@keyup.enter="beginPasswordSignIn"
 					/>
 
-					<HCaptcha
+					<Turnstile
 						v-if="globals?.captcha_enabled && password"
 						:ref="setCaptchaRef"
 						v-model="captchaToken"
@@ -172,7 +172,7 @@ import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useStorage } from '@vueuse/core'
 import type { LocationQueryValue } from 'vue-router'
 
-import HCaptcha from '@/components/ui/auth/HCaptcha.vue'
+import Turnstile from '@/components/ui/auth/Turnstile.vue'
 import TwoFactorAuthCodeInput from '@/components/ui/auth/TwoFactorAuthCodeInput.vue'
 import {
 	hydrateStoredAccounts,

@@ -1,10 +1,11 @@
-use crate::ErrorKind;
+use crate::LabrinthError;
 use crate::data::ModrinthCredentials;
 use crate::event::FriendPayload;
 use crate::event::emit::{emit_friend, emit_notification};
 use crate::state::tunnel::InternalTunnelSocket;
 use crate::state::{ProcessManager, TunnelSocket};
 use crate::util::fetch::{FetchSemaphore, fetch_advanced, fetch_json};
+use anyhow::bail;
 use ariadne::ids::UserId;
 use ariadne::networking::message::{
     ClientToServerMessage, ServerToClientMessage,
@@ -290,9 +291,7 @@ impl FriendsSocket {
     }
 
     #[tracing::instrument(skip_all)]
-    pub async fn socket_loop() -> crate::Result<()> {
-        let state = crate::State::get().await?;
-
+    pub async fn socket_loop(state: Arc<crate::State>) -> crate::Result<()> {
         tokio::task::spawn(async move {
             let mut last_connection = Utc::now();
             let mut last_ping = Utc::now();
@@ -411,13 +410,10 @@ impl FriendsSocket {
         .await;
 
         if let Err(ref e) = result
-            && let ErrorKind::LabrinthError(e) = &*e.raw
+            && let Some(e) = e.downcast_ref::<LabrinthError>()
             && e.error == "not_found"
         {
-            return Err(ErrorKind::OtherError(format!(
-                "No user found with username \"{user_id}\""
-            ))
-            .into());
+            bail!("no user found with username \"{user_id}\"");
         }
         result?;
 

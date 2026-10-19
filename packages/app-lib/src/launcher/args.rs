@@ -8,6 +8,7 @@ use crate::{
     state::{MemorySettings, WindowSize},
     util::{io::IOError, platform::classpath_separator},
 };
+use anyhow::Context;
 use dunce::canonicalize;
 use itertools::Itertools;
 use minecraft_meta_manifest::minecraft::LoggingConfiguration;
@@ -35,13 +36,10 @@ pub fn get_class_paths(
         .iter()
         .map(|path| {
             Ok(canonicalize(path)
-                .map_err(|_| {
-                    crate::ErrorKind::LauncherError(format!(
-                        "Specified class path {} does not exist",
-                        path.to_string_lossy()
-                    ))
-                    .as_error()
-                })?
+                .context(crate::ErrorKind::LauncherError(format!(
+                    "specified class path {} does not exist",
+                    path.display()
+                )))?
                 .to_string_lossy()
                 .to_string())
         })
@@ -98,11 +96,10 @@ pub fn get_lib_path(
             path
         }
         Err(err) => {
-            return Err(crate::ErrorKind::LauncherError(format!(
-                "Could not canonicalize library path {}: {err}",
+            return Err(err).context(crate::ErrorKind::LauncherError(format!(
+                "could not canonicalize library path {}",
                 path.display()
-            ))
-            .as_error());
+            )));
         }
     };
 
@@ -149,11 +146,10 @@ pub fn get_jvm_arguments(
         parsed_arguments.push(format!(
             "-Djava.library.path={}",
             canonicalize(natives_path)
-                .map_err(|_| crate::ErrorKind::LauncherError(format!(
-                    "Specified natives path {} does not exist",
-                    natives_path.to_string_lossy()
-                ))
-                .as_error())?
+                .context(crate::ErrorKind::LauncherError(format!(
+                    "specified natives path {} does not exist",
+                    natives_path.display()
+                )))?
                 .to_string_lossy()
         ));
         parsed_arguments.push("-cp".to_string());
@@ -172,13 +168,10 @@ pub fn get_jvm_arguments(
     parsed_arguments.push(format!(
         "-javaagent:{}",
         canonicalize(agent_path)
-            .map_err(|_| {
-                crate::ErrorKind::LauncherError(format!(
-                    "Specified Java Agent path {} does not exist",
-                    libraries_path.to_string_lossy()
-                ))
-                .as_error()
-            })?
+            .context(crate::ErrorKind::LauncherError(format!(
+                "specified java agent path {} does not exist",
+                agent_path.display()
+            )))?
             .to_string_lossy()
     ));
 
@@ -225,25 +218,19 @@ fn parse_jvm_argument(
         .replace(
             "${natives_directory}",
             &canonicalize(natives_path)
-                .map_err(|_| {
-                    crate::ErrorKind::LauncherError(format!(
-                        "Specified natives path {} does not exist",
-                        natives_path.to_string_lossy()
-                    ))
-                    .as_error()
-                })?
+                .context(crate::ErrorKind::LauncherError(format!(
+                    "specified natives path {} does not exist",
+                    natives_path.display()
+                )))?
                 .to_string_lossy(),
         )
         .replace(
             "${library_directory}",
             &canonicalize(libraries_path)
-                .map_err(|_| {
-                    crate::ErrorKind::LauncherError(format!(
-                        "Specified libraries path {} does not exist",
-                        libraries_path.to_string_lossy()
-                    ))
-                    .as_error()
-                })?
+                .context(crate::ErrorKind::LauncherError(format!(
+                    "specified libraries path {} does not exist",
+                    libraries_path.display()
+                )))?
                 .to_string_lossy(),
         )
         .replace("${classpath_separator}", classpath_separator(java_arch))
@@ -358,37 +345,28 @@ fn parse_minecraft_argument(
         .replace(
             "${game_directory}",
             &canonicalize(game_directory)
-                .map_err(|_| {
-                    crate::ErrorKind::LauncherError(format!(
-                        "Specified game directory {} does not exist",
-                        game_directory.to_string_lossy()
-                    ))
-                    .as_error()
-                })?
+                .context(crate::ErrorKind::LauncherError(format!(
+                    "specified game directory {} does not exist",
+                    game_directory.display()
+                )))?
                 .to_string_lossy(),
         )
         .replace(
             "${assets_root}",
             &canonicalize(assets_directory)
-                .map_err(|_| {
-                    crate::ErrorKind::LauncherError(format!(
-                        "Specified assets directory {} does not exist",
-                        assets_directory.to_string_lossy()
-                    ))
-                    .as_error()
-                })?
+                .context(crate::ErrorKind::LauncherError(format!(
+                    "specified assets directory {} does not exist",
+                    assets_directory.display()
+                )))?
                 .to_string_lossy(),
         )
         .replace(
             "${game_assets}",
             &canonicalize(assets_directory)
-                .map_err(|_| {
-                    crate::ErrorKind::LauncherError(format!(
-                        "Specified assets directory {} does not exist",
-                        assets_directory.to_string_lossy()
-                    ))
-                    .as_error()
-                })?
+                .context(crate::ErrorKind::LauncherError(format!(
+                    "specified assets directory {} does not exist",
+                    assets_directory.display()
+                )))?
                 .to_string_lossy(),
         )
         .replace("${version_type}", version_type.as_str())
@@ -519,19 +497,17 @@ pub async fn get_processor_main_class(
     let main_class = tokio::task::spawn_blocking(move || {
         let zipfile = std::fs::File::open(&path)
             .map_err(|e| IOError::with_path(e, &path))?;
-        let mut archive = zip::ZipArchive::new(zipfile).map_err(|_| {
+        let mut archive = zip::ZipArchive::new(zipfile).context(
             crate::ErrorKind::LauncherError(format!(
-                "Cannot read processor at {path}"
-            ))
-            .as_error()
-        })?;
+                "cannot read processor at {path}"
+            )),
+        )?;
 
-        let file = archive.by_name("META-INF/MANIFEST.MF").map_err(|_| {
+        let file = archive.by_name("META-INF/MANIFEST.MF").context(
             crate::ErrorKind::LauncherError(format!(
-                "Cannot read processor manifest at {path}"
-            ))
-            .as_error()
-        })?;
+                "cannot read processor manifest at {path}"
+            )),
+        )?;
 
         let reader = BufReader::new(file);
 

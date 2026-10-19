@@ -143,6 +143,8 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 		moderation::external_license::update_license,
 		admin::user_credentials::force_password_reset,
 		admin::user_credentials::reset_2fa,
+		moderation::user_restrictions::restrict_user,
+		moderation::user_restrictions::unrestrict_user,
 		admin::user_lock::lock_user,
 		admin::user_lock::unlock_user,
 		admin::user_sessions::revoke_user_sessions,

@@ -11,7 +11,7 @@
 		@keyup.enter="onSubmit"
 	/>
 
-	<HCaptcha v-if="captchaEnabled && showCaptcha" :ref="onSetCaptchaRef" v-model="tokenModel" />
+	<Turnstile v-if="captchaEnabled && showCaptcha" :ref="onSetCaptchaRef" v-model="tokenModel" />
 
 	<Button
 		type="colored"
@@ -28,7 +28,7 @@
 import { KeyIcon, RightArrowIcon } from '@modrinth/assets'
 import { Button, commonMessages, Input, useVIntl } from '@modrinth/ui'
 
-import HCaptcha from '@/components/ui/auth/HCaptcha.vue'
+import Turnstile from '@/components/ui/auth/Turnstile.vue'
 
 interface Props {
 	inputId: string

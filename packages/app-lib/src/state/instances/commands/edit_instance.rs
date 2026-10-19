@@ -1,3 +1,4 @@
+use crate::ErrorKind;
 use crate::state::instances::{
     ContentSourceKind, Instance, InstanceIconConfig, InstanceLaunchOverrides,
     InstanceLink, InstanceTabVisibility,
@@ -5,11 +6,11 @@ use crate::state::instances::{
 };
 use crate::state::{
     Hooks, InstanceInstallStage, LauncherFeatureVersion, MemorySettings,
-    ModLoader, ReleaseChannel, WindowSize,
+    ModLoader, ReleaseChannel, State, WindowSize,
 };
+use anyhow::bail;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::SqlitePool;
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct EditInstance {
@@ -108,18 +109,13 @@ pub struct AppliedContentSetPatch {
 pub(crate) async fn edit_instance(
     instance_id: &str,
     patch: EditInstance,
-    pool: &SqlitePool,
+    state: &State,
 ) -> crate::Result<Instance> {
-    let state = crate::State::get_if_initialized();
+    let pool = &state.pool;
     let _runtime_lease = if patch.launch_overrides.is_some()
         || patch.content_set_patch.is_some()
     {
-        match state.as_ref() {
-            Some(state) => {
-                Some(state.content_store.runtime_cache_lock.read().await)
-            }
-            None => None,
-        }
+        Some(state.content_store.runtime_cache_lock.read().await)
     } else {
         None
     };
@@ -134,16 +130,13 @@ pub(crate) async fn edit_instance(
         });
     let mut instance = instance_rows::get_instance_by_id(instance_id, pool)
         .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError("Unknown instance".to_string())
-        })?;
+        .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
     if modifies_content
         && instance_rows::is_instance_quarantined(instance_id, pool).await?
     {
-        return Err(crate::ErrorKind::InputError(
-            "Content in quarantined instances cannot be changed.".to_string(),
-        )
-        .into());
+        bail!(ErrorKind::InputError(
+            "content in quarantined instances cannot be changed".to_string(),
+        ));
     }
     let now = Utc::now();
 
@@ -154,12 +147,10 @@ pub(crate) async fn edit_instance(
             let applied_content_set =
                 content_rows::get_applied_content_set(&instance.id, pool)
                     .await?
-                    .ok_or_else(|| {
-                        crate::ErrorKind::InputError(format!(
-                            "Instance {} has no applied content set",
-                            instance.id
-                        ))
-                    })?;
+                    .ok_or(ErrorKind::InputError(format!(
+                        "instance {} has no applied content set",
+                        instance.id
+                    )))?;
             Some(apply_content_set_patch(
                 applied_content_set,
                 content_set_patch,

@@ -163,9 +163,7 @@ export const configuredXss = new FilterXSS({
 				const allowedHostnames = [
 					'imgur.com',
 					'i.imgur.com',
-					'cdn-raw.modrinth.com',
 					'cdn.modrinth.com',
-					'staging-cdn-raw.modrinth.com',
 					'staging-cdn.modrinth.com',
 					'github.com',
 					'raw.githubusercontent.com',

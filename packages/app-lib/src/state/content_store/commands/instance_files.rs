@@ -1,3 +1,4 @@
+use crate::ErrorKind;
 use crate::state::content_store::adapters::filesystem;
 use crate::state::content_store::adapters::filesystem::remove_instance_file;
 use crate::state::content_store::adapters::filesystem::symlink_metadata_if_exists;
@@ -6,10 +7,11 @@ use crate::state::content_store::model::InstancePathContent;
 use crate::state::content_store::{
     ContentStore, FileContent, FileStorageKind, FileStoragePolicy,
     InstanceFileStatus, InstanceFileStorage, StoredFileHandle,
-    content_file_path, file_path_on_disk, input,
+    content_file_path, file_path_on_disk,
 };
 use crate::state::instances as content_rows;
 use crate::state::{Instance, InstanceFile};
+use anyhow::bail;
 use std::collections::HashMap;
 use std::path::Path;
 
@@ -78,8 +80,9 @@ impl ContentStore {
             .as_deref()
             != Some("1")
         {
-            return Err(input(
-                "Finish shared-store migration before launching Minecraft",
+            bail!(ErrorKind::ContentStoreError(
+                "finish shared-store migration before launching Minecraft"
+                    .into(),
             ));
         }
         for (file, binding) in
@@ -93,8 +96,8 @@ impl ContentStore {
                     )
                     .await?;
                 if symlink_metadata_if_exists(&active_path).await?.is_some() {
-                    return Err(input(format!(
-                        "Disabled content {} has an unexpected active file",
+                    bail!(ErrorKind::ContentStoreError(format!(
+                        "disabled content {} has an unexpected active file",
                         file.relative_path
                     )));
                 }
@@ -108,7 +111,7 @@ impl ContentStore {
             if !matches!(content, FileContent::Stored { .. })
                 || file_status != InstanceFileStatus::Healthy
             {
-                return Err(input(format!(
+                bail!(ErrorKind::ContentStoreError(format!(
                     "{} needs repair or re-import before launching this instance",
                     file.relative_path
                 )));
@@ -131,7 +134,9 @@ impl ContentStore {
         for binding in bindings {
             let file =
                 files.get(binding.file_id.as_str()).ok_or_else(|| {
-                    input("Rollback content reference has no file record")
+                    ErrorKind::ContentStoreError(
+                        "rollback content reference has no file record".into(),
+                    )
                 })?;
             if missing_file_ids.contains(&binding.file_id) {
                 restored.push((
@@ -153,7 +158,9 @@ impl ContentStore {
                 .lookup(Some(&binding.blob_sha512), Some(file.size))
                 .await?
                 .ok_or_else(|| {
-                    input("Rollback content needs repair or re-import")
+                    ErrorKind::ContentStoreError(
+                        "rollback content needs repair or re-import".into(),
+                    )
                 })?;
             let path = self
                 .instance_path(&instance.path, &content_file_path(file))
@@ -167,8 +174,9 @@ impl ContentStore {
                 }
                 InstanceFileStatus::Missing => {}
                 InstanceFileStatus::Conflict => {
-                    return Err(input(
-                        "Rollback destination contains different content",
+                    bail!(ErrorKind::ContentStoreError(
+                        "rollback destination contains different content"
+                            .into(),
                     ));
                 }
             }

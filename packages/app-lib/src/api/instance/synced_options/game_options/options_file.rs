@@ -9,6 +9,7 @@ use super::{
 use crate::ErrorKind;
 use crate::state::{InstanceMetadata, State};
 use crate::util::io;
+use anyhow::bail;
 use encoding_rs::{Encoding, UTF_8, UTF_16BE, UTF_16LE};
 use sha1_smol::Sha1;
 use std::collections::HashMap;
@@ -95,7 +96,9 @@ impl GameOptionsDocument {
 
     pub(super) fn parse(bytes: &[u8]) -> crate::Result<Self> {
         if bytes.len() > MAX_OPTIONS_BYTES {
-            return Err(input_error("options.txt is too large to sync safely"));
+            bail!(ErrorKind::InputError(
+                "options.txt is too large to sync safely".to_string()
+            ));
         }
 
         let (bom, encoding, contents) =
@@ -113,14 +116,16 @@ impl GameOptionsDocument {
         let (decoded, decode_errors) =
             encoding.decode_without_bom_handling(contents);
         if decode_errors {
-            return Err(input_error(
-                "options.txt contains bytes that cannot be decoded losslessly",
+            bail!(ErrorKind::InputError(
+                "options.txt contains bytes that cannot be decoded losslessly"
+                    .to_string(),
             ));
         }
         let roundtrip = encode_without_bom(encoding, &decoded)?;
         if roundtrip.as_slice() != contents {
-            return Err(input_error(
-                "options.txt encoding cannot be round-tripped safely",
+            bail!(ErrorKind::InputError(
+                "options.txt encoding cannot be round-tripped safely"
+                    .to_string(),
             ));
         }
 
@@ -145,8 +150,8 @@ impl GameOptionsDocument {
             lines.push(Self::parse_line(&source[start..], ""));
         }
         if lines.len() > MAX_OPTIONS_LINES {
-            return Err(input_error(
-                "options.txt has too many lines to sync safely",
+            bail!(ErrorKind::InputError(
+                "options.txt has too many lines to sync safely".to_string(),
             ));
         }
         let default_line_ending = lines
@@ -296,15 +301,12 @@ pub(super) fn encode_without_bom(
 
     let (encoded, _, had_errors) = encoding.encode(text);
     if had_errors {
-        return Err(input_error(
-            "A synced option value cannot be represented in this file's encoding",
+        bail!(ErrorKind::InputError(
+            "a synced option value cannot be represented in this file's encoding"
+                .to_string(),
         ));
     }
     Ok(encoded.into_owned())
-}
-
-pub(super) fn input_error(message: impl Into<String>) -> crate::Error {
-    ErrorKind::InputError(message.into()).into()
 }
 
 pub(super) fn validate_raw_key_value(
@@ -316,14 +318,18 @@ pub(super) fn validate_raw_key_value(
         || key.contains(':')
         || key.chars().any(char::is_control)
     {
-        return Err(input_error("Invalid options.txt setting key"));
+        bail!(ErrorKind::InputError(
+            "invalid options.txt setting key".to_string()
+        ));
     }
     if value.len() > MAX_VALUE_BYTES
         || value
             .chars()
             .any(|character| character.is_control() && character != '\t')
     {
-        return Err(input_error("Invalid options.txt setting value"));
+        bail!(ErrorKind::InputError(
+            "invalid options.txt setting value".to_string()
+        ));
     }
     Ok(())
 }
@@ -349,7 +355,9 @@ pub(super) async fn read_document(
         .await
         .map_err(|error| io::IOError::with_path(error, path))?;
     if metadata.file_type().is_symlink() {
-        return Err(input_error("Refusing to sync a symlinked options.txt"));
+        bail!(ErrorKind::InputError(
+            "refusing to sync a symlinked options.txt".to_string()
+        ));
     }
     let bytes = io::read(path).await?;
     let document = GameOptionsDocument::parse(&bytes)?;

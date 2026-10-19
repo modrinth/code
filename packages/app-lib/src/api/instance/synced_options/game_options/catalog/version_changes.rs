@@ -1,15 +1,15 @@
 //! Handles settings Minecraft renamed or stored differently between versions.
 
 use super::super::api_types::canonical_values_equal;
-use super::super::options_file::{
-    GameOptionsDocument, input_error, validate_raw_key_value,
-};
+use super::super::options_file::{GameOptionsDocument, validate_raw_key_value};
 use super::{
     GameOptionMappingKind, LEGACY_KEY_BINDINGS, SettingEditor,
     SupportedSetting, ValueEncoding, VersionedKey,
     setting_available_for_version,
 };
+use crate::ErrorKind;
 use crate::state::{CanonicalValue, StoredOption};
+use anyhow::{Context, bail};
 
 const GRAPHICS_VALUES: &[&str] = &["fast", "fancy", "fabulous", "custom"];
 const CLOUD_VALUES: &[&str] = &["false", "fast", "true"];
@@ -682,8 +682,8 @@ fn validate_value(
             }
         };
         if !type_valid {
-            return Err(input_error(format!(
-                "Invalid value type for {}",
+            bail!(ErrorKind::InputError(format!(
+                "invalid value type for {}",
                 definition.id
             )));
         }
@@ -696,7 +696,9 @@ fn validate_value(
                 .ok()
                 .is_none_or(|value| !value.is_finite()) =>
             {
-                return Err(input_error("Invalid decimal value"));
+                bail!(ErrorKind::InputError(
+                    "invalid decimal value".to_string()
+                ));
             }
             (
                 SettingEditor::Integer { min, max, step },
@@ -707,7 +709,7 @@ fn validate_value(
                     && step > 0
                     && (*value - min) % step != 0 =>
             {
-                return Err(input_error(format!(
+                bail!(ErrorKind::InputError(format!(
                     "{} is outside its supported range or increment",
                     definition.id
                 )));
@@ -716,9 +718,9 @@ fn validate_value(
                 SettingEditor::Decimal { min, max, step, .. },
                 CanonicalValue::Decimal(value),
             ) => {
-                let parsed = value
-                    .parse::<f64>()
-                    .map_err(|_| input_error("Invalid decimal value"))?;
+                let parsed = value.parse::<f64>().context(
+                    ErrorKind::InputError("invalid decimal value".to_string()),
+                )?;
                 let increment = (parsed - min) / step;
                 if !parsed.is_finite()
                     || parsed < min
@@ -727,7 +729,7 @@ fn validate_value(
                         && step > 0.0
                         && (increment - increment.round()).abs() > 0.000_001
                 {
-                    return Err(input_error(format!(
+                    bail!(ErrorKind::InputError(format!(
                         "{} is outside its supported range or increment",
                         definition.id
                     )));
@@ -745,7 +747,7 @@ fn validate_value(
                         && step > 0.0
                         && (increment - increment.round()).abs() > 0.000_001
                 {
-                    return Err(input_error(format!(
+                    bail!(ErrorKind::InputError(format!(
                         "{} is outside its supported range or increment",
                         definition.id
                     )));
@@ -754,8 +756,8 @@ fn validate_value(
             (SettingEditor::Enum(choices), CanonicalValue::Enum(value))
                 if !choices.contains(&value.as_str()) =>
             {
-                return Err(input_error(format!(
-                    "Invalid choice for {}",
+                bail!(ErrorKind::InputError(format!(
+                    "invalid choice for {}",
                     definition.id
                 )));
             }
@@ -764,21 +766,27 @@ fn validate_value(
                     || value.len() > 64
                     || value.chars().any(char::is_control) =>
             {
-                return Err(input_error("Invalid language value"));
+                bail!(ErrorKind::InputError(
+                    "invalid language value".to_string()
+                ));
             }
             (SettingEditor::KeyBinding, CanonicalValue::KeyBinding(value))
                 if value.len() > 256
                     || value.contains(['\r', '\n'])
                     || !valid_modern_key_binding(value) =>
             {
-                return Err(input_error("Invalid key binding value"));
+                bail!(ErrorKind::InputError(
+                    "invalid key binding value".to_string()
+                ));
             }
             _ => {}
         }
     } else if let CanonicalValue::ExternalRaw(raw) = value {
         validate_raw_key_value("external", raw)?;
     } else {
-        return Err(input_error("Custom settings require a raw string value"));
+        bail!(ErrorKind::InputError(
+            "custom settings require a raw string value".to_string()
+        ));
     }
     Ok(())
 }

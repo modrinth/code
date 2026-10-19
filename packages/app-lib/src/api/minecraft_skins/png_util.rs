@@ -3,6 +3,7 @@
 use std::io::{BufRead, Cursor, Seek};
 use std::sync::Arc;
 
+use anyhow::bail;
 use base64::Engine;
 use bytes::Bytes;
 use data_url::DataUrl;
@@ -62,7 +63,7 @@ pub fn is_png(png_data: &[u8]) -> bool {
 
 pub fn dimensions(png_data: &[u8]) -> crate::Result<(u32, u32)> {
     if !is_png(png_data) {
-        Err(ErrorKind::InvalidPng)?;
+        bail!(ErrorKind::InvalidPng);
     }
 
     // Read the width and height fields from the IHDR chunk, which the
@@ -132,7 +133,7 @@ pub async fn normalize_skin_texture(
     if png_reader.info().width != 64
         || ![64, 32].contains(&png_reader.info().height)
     {
-        Err(ErrorKind::InvalidSkinTexture)?;
+        bail!(ErrorKind::InvalidSkinTexture);
     }
 
     let is_legacy_skin = png_reader.info().height == 32;
@@ -226,7 +227,7 @@ fn get_skin_texture_buffer<R: BufRead + Seek>(
             .collect_vec(),
         png::ColorType::Rgba => bytemuck::try_cast_vec(png_buf)
             .map_err(|_| ErrorKind::InvalidPng)?,
-        _ => Err(ErrorKind::InvalidPng)?, // Cannot happen by PNG spec after transformations
+        _ => bail!(ErrorKind::InvalidPng), // Cannot happen by PNG spec after transformations
     };
 
     // Make the added bottom half of the expanded legacy skin buffer transparent

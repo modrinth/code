@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            DELETE FROM cache\n            WHERE expires < $1\n                AND data_type IN (SELECT value FROM json_each($2))\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "21e3381cbb8b3dc23fc05bcac5ae2d054c9c0587b84b7f7e19af5f9ef50422fe"
+}

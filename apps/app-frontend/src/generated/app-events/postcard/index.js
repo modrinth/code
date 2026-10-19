@@ -732,7 +732,6 @@ function deserialize_INSTALL_ERROR_VIEW(d) {
         code: d.deserialize_string(),
         phase: (d.deserialize_number(U32_BYTES, false) === 0) ? undefined : deserialize_INSTALL_PHASE_ID(d),
         message: d.deserialize_string(),
-        reason: (d.deserialize_number(U32_BYTES, false) === 0) ? undefined : deserialize_SHARED_INSTANCE_UNAVAILABLE_REASON(d),
         api: (d.deserialize_number(U32_BYTES, false) === 0) ? undefined : deserialize_INSTALL_API_ERROR_DETAILS(d),
         context: (d.deserialize_number(U32_BYTES, false) === 0) ? undefined : deserialize_INSTALL_ERROR_CONTEXT(d)
     };
@@ -820,25 +819,6 @@ function deserialize_MOD_LOADER(d) {
     case 4:
         return {
             tag: "neoforge"
-        };
-    default:
-        throw "variant not implemented"
-    }
-}
-
-function deserialize_SHARED_INSTANCE_UNAVAILABLE_REASON(d) {
-    switch (d.deserialize_number(U32_BYTES, false)) {
-    case 0:
-        return {
-            tag: "deleted"
-        };
-    case 1:
-        return {
-            tag: "access_revoked"
-        };
-    case 2:
-        return {
-            tag: "quarantined"
         };
     default:
         throw "variant not implemented"
@@ -950,9 +930,6 @@ function deserialize(type, bytes) {
         break;
     case "ModLoader":
         return_value = deserialize_MOD_LOADER(d);
-        break;
-    case "SharedInstanceUnavailableReason":
-        return_value = deserialize_SHARED_INSTANCE_UNAVAILABLE_REASON(d);
         break;
     default:
         throw "type not implemented";
