@@ -245,6 +245,11 @@ impl State {
                     tracing::warn!("Synced-pack migration deferred: {error}");
                 }
                 if let Err(error) =
+                    CachedEntry::purge_long_expired(&state.pool).await
+                {
+                    tracing::warn!("Expired cache cleanup deferred: {error}");
+                }
+                if let Err(error) =
                     state.content_store.cleanup(state, false).await
                 {
                     tracing::debug!(
