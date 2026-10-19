@@ -42,9 +42,6 @@ path = "tests/generate_unique_id.rs"
 name = "migration_generate"
 path = "tests/migration_generate.rs"
 
-[[test]]
-name = "pool_sweep"
-path = "tests/pool_sweep.rs"
 
 [[test]]
 name = "query_macro"

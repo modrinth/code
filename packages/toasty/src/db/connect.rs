@@ -28,8 +28,7 @@ impl Connect {
     /// The URL scheme determines which driver is used:
     ///
     /// | Scheme | Driver | Feature flag |
-    /// |---|---|---|
-
+	/// |---|---|---|
     /// | `postgresql` / `postgres` | PostgreSQL | `postgresql` |
     /// | `mysql` | MySQL | `mysql` |
     /// | `mariadb` | MariaDB | `mariadb` |
