@@ -1,13 +1,14 @@
 <script setup>
+const TURNSTILE_SITE_KEY = '0x4AAAAAAFbxS3P9EOjXZD1_'
+
 const token = defineModel()
 const container = ref(null)
 const id = ref(null)
 const theme = useTheme()
-const config = useRuntimeConfig()
 
 function turnstileReady() {
 	id.value = window.turnstile.render(container.value, {
-		sitekey: config.public.turnstileSiteKey,
+		sitekey: TURNSTILE_SITE_KEY,
 		theme: theme.active === 'light' ? 'light' : 'dark',
 		size: 'flexible',
 		callback: (newToken) => {

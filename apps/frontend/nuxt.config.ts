@@ -224,8 +224,6 @@ export default defineNuxtConfig({
 				process.env.STRIPE_PUBLISHABLE_KEY ||
 				globalThis.STRIPE_PUBLISHABLE_KEY ||
 				'pk_test_51JbFxJJygY5LJFfKV50mnXzz3YLvBVe2Gd1jn7ljWAkaBlRz3VQdxN9mXcPSrFbSqxwAb0svte9yhnsmm7qHfcWn00R611Ce7b',
-
-			turnstileSiteKey: process.env.TURNSTILE_SITE_KEY || '1x00000000000000000000AA',
 		},
 	},
 	typescript: {
