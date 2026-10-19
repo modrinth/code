@@ -1,5 +1,7 @@
 //! Theseus state management system
+use crate::ErrorKind;
 use crate::util::fetch::{FetchSemaphore, IoSemaphore};
+use anyhow::anyhow;
 use std::sync::atomic::AtomicBool;
 use std::sync::{Arc, LazyLock};
 use tokio::sync::watch::Sender;
@@ -82,7 +84,7 @@ pub mod server_join_log;
 enum StartupPhase {
     Pending,
     Ready,
-    Failed(crate::Error),
+    Failed(String),
 }
 
 static LAUNCHER_STATE: OnceCell<Arc<State>> = OnceCell::const_new();
@@ -135,7 +137,7 @@ impl State {
             .await;
         STATE_STARTUP.send_replace(match &result {
             Ok(_) => StartupPhase::Ready,
-            Err(error) => StartupPhase::Failed(error.clone()),
+            Err(error) => StartupPhase::Failed(format!("{error:#}")),
         });
         let state = result?;
 
@@ -288,7 +290,7 @@ impl State {
                     .get()
                     .expect("state is set before startup is marked ready"),
             )),
-            StartupPhase::Failed(error) => Err(error.clone()),
+            StartupPhase::Failed(message) => Err(anyhow!("{message}")),
             StartupPhase::Pending => {
                 unreachable!(
                     "wait_for returns only once the phase has left Pending"
@@ -310,13 +312,12 @@ impl State {
         app_identifier: String,
     ) -> crate::Result<Arc<Self>> {
         tracing::info!("Connecting to app database");
-        let settings_dir =
-            DirectoryInfo::initial_settings_dir_path(&app_identifier)
-                .ok_or_else(|| {
-                    crate::ErrorKind::FSError(
-                        "Could not find the application directory".to_string(),
-                    )
-                })?;
+        let settings_dir = DirectoryInfo::initial_settings_dir_path(
+            &app_identifier,
+        )
+        .ok_or(ErrorKind::FSError(
+            "could not find the application directory".to_string(),
+        ))?;
         let store_lock =
             content_store::ContentStore::lock_process(&settings_dir).await?;
         let pool = db::connect(&app_identifier).await?;

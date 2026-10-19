@@ -2,7 +2,6 @@ use super::operations::{
     InstanceScreenshot, has_png_extension, sort_screenshots,
     source_screenshots_dir,
 };
-use crate::State;
 use crate::state::DirectoryInfo;
 use crate::state::instances::adapters::sqlite::{
     instance_rows::{self, InstanceScreenshotSource},
@@ -10,6 +9,8 @@ use crate::state::instances::adapters::sqlite::{
 };
 use crate::util::fetch::sha1_file_async;
 use crate::util::io::IOError;
+use crate::{ErrorKind, State};
+use anyhow::Context;
 use chrono::{DateTime, Utc};
 use futures::stream::{self, StreamExt, TryStreamExt};
 use std::collections::HashMap;
@@ -161,11 +162,10 @@ fn scan_screenshots_dir(
             .map(DateTime::<Utc>::from)
             .map(|value| value.timestamp_millis())
             .map_err(|error| IOError::with_path(error, &path))?;
-        let file_size = i64::try_from(metadata.len()).map_err(|_| {
-            crate::ErrorKind::InputError(
-                "Screenshot is too large to index".to_string(),
-            )
-        })?;
+        let file_size =
+            i64::try_from(metadata.len()).context(ErrorKind::InputError(
+                "screenshot is too large to index".to_string(),
+            ))?;
 
         screenshots.push(ScannedScreenshot {
             file_name,
@@ -216,11 +216,10 @@ pub(super) async fn reconcile_source_screenshots(
         |(mut scanned, matched)| async move {
             let (file_size, content_hash) =
                 sha1_file_async(&scanned.path).await?;
-            scanned.file_size = i64::try_from(file_size).map_err(|_| {
-                crate::ErrorKind::InputError(
-                    "Screenshot is too large to index".to_string(),
-                )
-            })?;
+            scanned.file_size =
+                i64::try_from(file_size).context(ErrorKind::InputError(
+                    "screenshot is too large to index".to_string(),
+                ))?;
             Ok::<_, crate::Error>((scanned, content_hash, matched))
         },
     ))

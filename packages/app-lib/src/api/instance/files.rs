@@ -1,9 +1,10 @@
-use crate::State;
 use crate::state::content_store;
 use crate::state::content_store::{
-    ReadableContent, content_file_path, input, validate_relative,
+    ReadableContent, content_file_path, validate_relative,
 };
 use crate::state::instances::adapters::sqlite::{content_rows, instance_rows};
+use crate::{ErrorKind, State};
+use anyhow::bail;
 use serde::Serialize;
 use std::path::{Path, PathBuf};
 use std::time::UNIX_EPOCH;
@@ -36,20 +37,22 @@ async fn resolve(
     let path = normalized(path);
     let instance = instance_rows::get_instance_by_id(instance_id, &state.pool)
         .await?
-        .ok_or_else(|| input("Unknown instance"))?;
+        .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
     let base = state
         .content_store
         .instance_path(&instance.path, "")
         .await?;
     if path.is_empty() {
         if writing {
-            return Err(input(
-                "The instance directory cannot be changed in the Files tab",
+            bail!(ErrorKind::InputError(
+                "the instance directory cannot be changed in the Files tab"
+                    .to_string(),
             ));
         }
         if fs::symlink_metadata(&base).await?.file_type().is_symlink() {
-            return Err(input(
-                "The instance directory must not be a symbolic link",
+            bail!(ErrorKind::InputError(
+                "the instance directory must not be a symbolic link"
+                    .to_string(),
             ));
         }
         return Ok(ReadableContent::Local(base));
@@ -61,8 +64,9 @@ async fn resolve(
             .next()
             .is_some_and(|part| part.eq_ignore_ascii_case("mods"))
         {
-            return Err(input(
-                "The mods folder is read-only in Files. Manage mods from the Content tab",
+            bail!(ErrorKind::InputError(
+                "the mods folder is read-only in Files; manage mods from the Content tab"
+                    .to_string(),
             ));
         }
         let prefix = format!("{}/", path.to_lowercase());
@@ -76,8 +80,9 @@ async fn resolve(
                     || content_file_path(file).eq_ignore_ascii_case(path)
                     || file.relative_path.to_lowercase().starts_with(&prefix))
         }) {
-            return Err(input(
-                "Managed content is read-only in Files. Use the Content tab",
+            bail!(ErrorKind::InputError(
+                "managed content is read-only in Files; use the Content tab"
+                    .to_string(),
             ));
         }
     }
@@ -88,7 +93,9 @@ async fn resolve(
     if let Ok(metadata) = fs::symlink_metadata(&destination).await
         && metadata.file_type().is_symlink()
     {
-        return Err(input("Files cannot access a symbolic link or its target"));
+        bail!(ErrorKind::InputError(
+            "Files cannot access a symbolic link or its target".to_string()
+        ));
     }
     Ok(ReadableContent::Local(destination))
 }
@@ -192,11 +199,13 @@ pub async fn write_instance_file(
         .path()
         .to_path_buf();
     if create_only && fs::symlink_metadata(&destination).await.is_ok() {
-        return Err(input("A file already exists at this path"));
+        bail!(ErrorKind::InputError(
+            "a file already exists at this path".to_string()
+        ));
     }
-    let parent = destination
-        .parent()
-        .ok_or_else(|| input("Invalid file destination"))?;
+    let parent = destination.parent().ok_or(ErrorKind::InputError(
+        "invalid file destination".to_string(),
+    ))?;
     fs::create_dir_all(parent).await?;
     let parent = parent.to_path_buf();
     let temporary = tokio::task::spawn_blocking(move || {
@@ -247,7 +256,9 @@ pub async fn rename_instance_file(
     let source = resolve(&state, instance_id, source, true).await?;
     let destination = resolve(&state, instance_id, destination, true).await?;
     if fs::symlink_metadata(destination.path()).await.is_ok() {
-        return Err(input("The destination already exists"));
+        bail!(ErrorKind::InputError(
+            "the destination already exists".to_string()
+        ));
     }
     fs::rename(source.path(), destination.path()).await?;
     Ok(())
@@ -281,24 +292,27 @@ pub async fn save_instance_file_as(
 ) -> crate::Result<()> {
     let state = State::get().await?;
     let _files = state.content_store.files_lock.lock().await;
-    let parent = destination
-        .parent()
-        .ok_or_else(|| input("Invalid save destination"))?;
+    let parent = destination.parent().ok_or(ErrorKind::InputError(
+        "invalid save destination".to_string(),
+    ))?;
     let canonical_parent = fs::canonicalize(parent).await?;
     let store = fs::canonicalize(state.directories.store_dir()).await?;
     let profiles = fs::canonicalize(state.directories.instances_dir()).await?;
     if canonical_parent.starts_with(&store)
         || canonical_parent.starts_with(&profiles)
     {
-        return Err(input(
-            "Save a copy outside the store and instance directories",
+        bail!(ErrorKind::InputError(
+            "save a copy outside the store and instance directories"
+                .to_string(),
         ));
     }
     if fs::symlink_metadata(destination)
         .await
         .is_ok_and(|metadata| metadata.file_type().is_symlink())
     {
-        return Err(input("Cannot save over a symbolic link"));
+        bail!(ErrorKind::InputError(
+            "cannot save over a symbolic link".to_string()
+        ));
     }
     let content = resolve(&state, instance_id, source, false).await?;
     fs::copy(content.path(), destination).await?;

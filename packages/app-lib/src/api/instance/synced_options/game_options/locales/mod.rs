@@ -6,10 +6,10 @@ mod sources;
 mod storage;
 
 use super::catalog::{is_never_sync_key, setting_by_file_key};
-use super::options_file::{
-    GameOptionsDocument, input_error, options_path, read_document,
-};
+use super::options_file::{GameOptionsDocument, options_path, read_document};
+use crate::ErrorKind;
 use crate::state::{InstanceMetadata, State};
+use anyhow::bail;
 use archive::{ArchiveIndex, Translations};
 use serde::{Deserialize, Serialize};
 use sources::{ArchiveSource, Snapshot};
@@ -349,7 +349,9 @@ pub async fn get_game_setting_locale_labels(
     refresh_sources: bool,
 ) -> crate::Result<GameSettingLocaleLabels> {
     if option_ids.len() > 16_384 {
-        return Err(input_error("Too many requested game-setting labels"));
+        bail!(ErrorKind::InputError(
+            "too many requested game-setting labels".to_string()
+        ));
     }
     let requested: std::collections::HashSet<_> = option_ids
         .into_iter()
@@ -364,7 +366,9 @@ pub async fn get_game_setting_locale_labels(
     }
     let locale = minecraft_locale(locale);
     if !archive::valid_locale(&locale) {
-        return Err(input_error("Invalid Minecraft locale"));
+        bail!(ErrorKind::InputError(
+            "invalid Minecraft locale".to_string()
+        ));
     }
     let state = State::get().await?;
     if refresh_sources {

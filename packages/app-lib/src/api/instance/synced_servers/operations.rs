@@ -5,6 +5,7 @@ use super::super::synced_options::{
 };
 use crate::state::{InstanceMetadata, SyncedOption};
 use crate::{ErrorKind, State};
+use anyhow::bail;
 use quartz_nbt::NbtCompound;
 use uuid::Uuid;
 
@@ -77,11 +78,10 @@ pub(in crate::api::instance) async fn seed_servers(
     if is_modpack_link(&metadata.link)
         && !pack_state_exists(&metadata.instance.id, state).await?
     {
-        return Err(ErrorKind::InputError(
-			"This linked modpack cannot be used as the multiplayer base until its supplied server list has been reconstructed. Choose an unmanaged instance instead."
-				.to_string(),
-		)
-		.into());
+        bail!(ErrorKind::InputError(
+            "this linked modpack cannot be used as the multiplayer base until its supplied server list has been reconstructed; choose an unmanaged instance instead"
+                .to_string(),
+        ));
     }
     let servers = sync_candidates(metadata, state).await?;
     let canonical = servers
@@ -112,11 +112,10 @@ pub(in crate::api::instance) async fn merge_servers_from_instance(
     if is_modpack_link(&metadata.link)
         && !pack_state_exists(&metadata.instance.id, state).await?
     {
-        return Err(ErrorKind::InputError(
-            "This linked modpack cannot join multiplayer syncing until its supplied server list has been reconstructed."
+        bail!(ErrorKind::InputError(
+            "this linked modpack cannot join multiplayer syncing until its supplied server list has been reconstructed"
                 .to_string(),
-        )
-        .into());
+        ));
     }
     let candidates = sync_candidates(metadata, state).await?;
 
@@ -561,17 +560,13 @@ async fn update_server_locked(
         let record = records
             .iter()
             .find(|record| record.id == server_id)
-            .ok_or_else(|| {
-                ErrorKind::InputError("Unknown server".to_string())
-            })?;
+            .ok_or(ErrorKind::InputError("unknown server".to_string()))?;
         if record.source == ServerSource::UserSynced {
             let mut canonical = read_canonical(state).await?;
             let server = canonical
                 .iter_mut()
                 .find(|server| server.id == server_id)
-                .ok_or_else(|| {
-                    ErrorKind::InputError("Unknown server".to_string())
-                })?;
+                .ok_or(ErrorKind::InputError("unknown server".to_string()))?;
             server.data = data;
             commit_server_state(Some(&canonical), None, state).await?;
             regenerate_servers(state).await?;
@@ -580,20 +575,17 @@ async fn update_server_locked(
             let server = locals
                 .iter_mut()
                 .find(|server| server.id == server_id)
-                .ok_or_else(|| {
-                    ErrorKind::InputError("Unknown server".to_string())
-                })?;
+                .ok_or(ErrorKind::InputError("unknown server".to_string()))?;
             server.data = data;
             write_local(&metadata.instance.id, &locals, state).await?;
             compose_instance(metadata, state).await?;
         }
         return Ok(());
     }
-    Err(ErrorKind::InputError(
-        "Stable server editing requires multiplayer syncing for this instance."
+    bail!(ErrorKind::InputError(
+        "stable server editing requires multiplayer syncing for this instance"
             .to_string(),
-    )
-    .into())
+    ))
 }
 
 pub(crate) async fn update_server_by_index(
@@ -610,11 +602,9 @@ pub(crate) async fn update_server_by_index(
         let record = records
             .get(index)
             .filter(|record| !record.hidden())
-            .ok_or_else(|| {
-                ErrorKind::InputError(format!(
-                    "No editable server at index {index}"
-                ))
-            })?;
+            .ok_or(ErrorKind::InputError(format!(
+                "no editable server at index {index}"
+            )))?;
         let mut data = record.data.clone();
         update_server_data(&mut data, name, address, accept_textures);
         return update_server_locked(metadata, &record.id, data, state).await;
@@ -624,11 +614,9 @@ pub(crate) async fn update_server_by_index(
     let server = servers
         .get_mut(index)
         .filter(|server| !server_hidden(server))
-        .ok_or_else(|| {
-            ErrorKind::InputError(format!(
-                "No editable server at index {index}"
-            ))
-        })?;
+        .ok_or(ErrorKind::InputError(format!(
+            "no editable server at index {index}"
+        )))?;
     update_server_data(server, name, address, accept_textures);
     write_servers(&path, &servers).await
 }
@@ -639,17 +627,16 @@ async fn remove_server_locked(
     state: &State,
 ) -> crate::Result<()> {
     if !participating(metadata, state).await? {
-        return Err(ErrorKind::InputError(
-			"Stable server removal requires multiplayer syncing for this instance."
-				.to_string(),
-		)
-		.into());
+        bail!(ErrorKind::InputError(
+            "stable server removal requires multiplayer syncing for this instance"
+                .to_string(),
+        ));
     }
     let records = compose_records(metadata, state).await?;
     let record = records
         .iter()
         .find(|record| record.id == server_id)
-        .ok_or_else(|| ErrorKind::InputError("Unknown server".to_string()))?;
+        .ok_or(ErrorKind::InputError("unknown server".to_string()))?;
     if record.source == ServerSource::UserSynced {
         let mut canonical = read_canonical(state).await?;
         canonical.retain(|server| server.id != server_id);
@@ -674,20 +661,17 @@ pub(crate) async fn remove_server_by_index(
         let record = records
             .get(index)
             .filter(|record| !record.hidden())
-            .ok_or_else(|| {
-                ErrorKind::InputError(format!(
-                    "No removable server at index {index}"
-                ))
-            })?;
+            .ok_or(ErrorKind::InputError(format!(
+                "no removable server at index {index}"
+            )))?;
         return remove_server_locked(metadata, &record.id, state).await;
     }
     let path = instance_dir(metadata, state).join(SERVERS_FILE);
     let mut servers = read_servers(&path).await?;
     if servers.get(index).is_none_or(server_hidden) {
-        return Err(ErrorKind::InputError(format!(
-            "No removable server at index {index}"
-        ))
-        .into());
+        bail!(ErrorKind::InputError(format!(
+            "no removable server at index {index}"
+        )));
     }
     servers.remove(index);
     write_servers(&path, &servers).await
@@ -702,24 +686,21 @@ pub async fn desync_server(
     let _guard = state.synced_options.lock().await;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
-        .ok_or_else(|| ErrorKind::InputError("Unknown instance".to_string()))?;
+        .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
     if !participating(&metadata, &state).await? {
-        return Err(ErrorKind::InputError(
-            "This instance is not participating in multiplayer server syncing."
+        bail!(ErrorKind::InputError(
+            "this instance is not participating in multiplayer server syncing"
                 .to_string(),
-        )
-        .into());
+        ));
     }
     let mut canonical = read_canonical(&state).await?;
     let server = canonical
         .iter()
         .find(|server| server.id == server_id)
         .cloned()
-        .ok_or_else(|| {
-            ErrorKind::InputError(
-                "Only a synced user server can be desynced.".to_string(),
-            )
-        })?;
+        .ok_or(ErrorKind::InputError(
+            "only a synced user server can be desynced".to_string(),
+        ))?;
     let local_position = compose_records(&metadata, &state)
         .await?
         .iter()
@@ -783,9 +764,7 @@ pub async fn update_synced_server(server: SyncedServer) -> crate::Result<()> {
     let target = canonical
         .iter_mut()
         .find(|candidate| candidate.id == server.id)
-        .ok_or_else(|| {
-            ErrorKind::InputError("Unknown synced server".to_string())
-        })?;
+        .ok_or(ErrorKind::InputError("unknown synced server".to_string()))?;
     update_server_data(
         &mut target.data,
         server.name,
@@ -803,9 +782,7 @@ pub async fn remove_synced_server(server_id: &str) -> crate::Result<()> {
     let previous_len = canonical.len();
     canonical.retain(|server| server.id != server_id);
     if canonical.len() == previous_len {
-        return Err(
-            ErrorKind::InputError("Unknown synced server".to_string()).into()
-        );
+        bail!(ErrorKind::InputError("unknown synced server".to_string()));
     }
     commit_server_state(Some(&canonical), None, &state).await?;
     regenerate_servers(&state).await

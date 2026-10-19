@@ -157,6 +157,29 @@ impl DBPersonalAccessToken {
         Ok(val)
     }
 
+    /// Cache-only lookup that never falls back to Postgres.
+    pub async fn get_cached(
+        access_token: &str,
+        redis: &RedisPool,
+    ) -> Result<Option<DBPersonalAccessToken>> {
+        redis
+            .get_cached_keys_with_slug(
+                PATS_NAMESPACE,
+                PATS_TOKENS_NAMESPACE,
+                true,
+                &[access_token],
+                |_| async {
+                    eyre::Ok(DashMap::<
+                        i64,
+                        (Option<String>, DBPersonalAccessToken),
+                    >::new())
+                },
+            )
+            .await
+            .map(|x| x.into_iter().next())
+            .wrap_err("getting cached personal access token")
+    }
+
     pub async fn get_user_pats<'a, E>(
         user_id: DBUserId,
         exec: E,

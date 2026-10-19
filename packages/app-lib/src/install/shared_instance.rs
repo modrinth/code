@@ -7,6 +7,7 @@ use super::model::{
 use super::runner::{
     install_pack, modpack_details, update_content_progress, update_progress,
 };
+use crate::ErrorKind;
 use crate::api::instance::{
     CONFIG_BUNDLE_FILE_TYPE, CONFIG_DIRECTORY, CONFIG_FILE_EXTENSIONS,
     CONFIG_SYNC_ENABLED, MAX_CONFIG_BUNDLE_ENTRIES,
@@ -19,6 +20,7 @@ use crate::state::{
     ProjectType, SharedInstanceAttachmentInput, SharedInstanceRole, State,
 };
 use crate::util::fetch::{DownloadReason, REQWEST_CLIENT};
+use anyhow::{Context, bail};
 use futures::StreamExt;
 use path_util::SafeRelativeUtf8UnixPathBuf;
 use sqlx::SqlitePool;
@@ -256,9 +258,7 @@ async fn apply_shared_instance_update_inner(
         &state.pool,
     )
     .await?
-    .ok_or_else(|| {
-        crate::ErrorKind::InputError("Unknown instance".to_string())
-    })?;
+    .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
     let plan = SharedInstanceApplyPlan::build(&metadata, data, state).await?;
 
     if plan.configuration_changed {
@@ -542,11 +542,10 @@ async fn desired_shared_instance_content(
     let mut content = DesiredSharedInstanceContent::default();
 
     for version_id in &data.modrinth_ids {
-        let version = versions_by_id.get(version_id).ok_or_else(|| {
-            crate::ErrorKind::InputError(format!(
-                "Shared instance version {version_id} was not found"
-            ))
-        })?;
+        let version =
+            versions_by_id.get(version_id).ok_or(ErrorKind::InputError(
+                format!("shared instance version {version_id} was not found"),
+            ))?;
         content.projects.insert(
             version.id.clone(),
             DesiredSharedInstanceProject {
@@ -563,13 +562,12 @@ async fn desired_shared_instance_content(
             }
             continue;
         }
-        let file_type =
-            ProjectType::from_name(&file.file_type).ok_or_else(|| {
-                crate::ErrorKind::InputError(format!(
-                    "Unknown shared instance file type {}",
-                    file.file_type
-                ))
-            })?;
+        let file_type = ProjectType::from_name(&file.file_type).ok_or(
+            ErrorKind::InputError(format!(
+                "unknown shared instance file type {}",
+                file.file_type
+            )),
+        )?;
         content.external_files.insert(
             (file_type, file.file_name.clone()),
             DesiredSharedInstanceExternalFile {
@@ -607,10 +605,9 @@ async fn shared_instance_versions_by_id(
 
     for id in ids {
         if !versions_by_id.contains_key(id) {
-            return Err(crate::ErrorKind::InputError(format!(
-                "Shared instance version {id} was not found"
-            ))
-            .into());
+            bail!(ErrorKind::InputError(format!(
+                "shared instance version {id} was not found"
+            )));
         }
     }
 
@@ -710,9 +707,7 @@ async fn apply_shared_instance_content_inner(
                 &state.pool,
             )
             .await?
-            .ok_or_else(|| {
-                crate::ErrorKind::InputError("Unknown instance".to_string())
-            })?;
+            .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
         crate::launcher::install_minecraft_with_reporter(
             &context,
             false,
@@ -796,9 +791,7 @@ pub(super) async fn remove_existing_shared_instance_content(
         &state.pool,
     )
     .await?
-    .ok_or_else(|| {
-        crate::ErrorKind::InputError("Unknown instance".to_string())
-    })?;
+    .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
     let entries = content_rows::get_content_entries(
         &metadata.applied_content_set.id,
         &state.pool,
@@ -856,71 +849,62 @@ async fn install_shared_instance_external_file(
     validate_shared_instance_external_file_name(&file.file_name)?;
 
     if file.file_size > MAX_SHARED_INSTANCE_EXTERNAL_FILE_SIZE {
-        return Err(crate::ErrorKind::InputError(format!(
-            "Shared instance external file {} exceeds the maximum size",
+        bail!(ErrorKind::InputError(format!(
+            "shared instance external file {} exceeds the maximum size",
             file.file_name
-        ))
-        .into());
+        )));
     }
 
     let response = REQWEST_CLIENT.get(&file.url).send().await?;
 
     if !response.status().is_success() {
-        return Err(crate::ErrorKind::OtherError(format!(
-            "Shared instance external file download failed with status {}",
+        bail!(
+            "shared instance external file download failed with status {}",
             response.status()
-        ))
-        .into());
+        );
     }
 
     if response
         .content_length()
         .is_some_and(|content_length| content_length != file.file_size)
     {
-        return Err(crate::ErrorKind::OtherError(format!(
-            "Shared instance external file {} has an unexpected size",
+        bail!(
+            "shared instance external file {} has an unexpected size",
             file.file_name
-        ))
-        .into());
+        );
     }
 
     let mut stream = response.bytes_stream();
     let initial_capacity = usize::try_from(
         file.file_size.min(MAX_SHARED_INSTANCE_INITIAL_BUFFER_SIZE),
     )
-    .map_err(|_| {
-        crate::ErrorKind::InputError(format!(
-            "Shared instance external file {} is too large",
-            file.file_name
-        ))
-    })?;
+    .context(ErrorKind::InputError(format!(
+        "shared instance external file {} is too large",
+        file.file_name
+    )))?;
     let mut bytes = Vec::with_capacity(initial_capacity);
     while let Some(chunk) = stream.next().await {
         let chunk = chunk?;
         let downloaded_size = (bytes.len() as u64)
             .checked_add(chunk.len() as u64)
-            .ok_or_else(|| {
-                crate::ErrorKind::InputError(format!(
-                    "Shared instance external file {} is too large",
-                    file.file_name
-                ))
-            })?;
-        if downloaded_size > file.file_size {
-            return Err(crate::ErrorKind::OtherError(format!(
-                "Shared instance external file {} has an unexpected size",
+            .ok_or(ErrorKind::InputError(format!(
+                "shared instance external file {} is too large",
                 file.file_name
-            ))
-            .into());
+            )))?;
+        if downloaded_size > file.file_size {
+            bail!(
+                "shared instance external file {} has an unexpected size",
+                file.file_name
+            );
         }
         bytes.extend_from_slice(&chunk);
     }
 
     if bytes.len() as u64 != file.file_size {
-        return Err(crate::ErrorKind::OtherError(format!(
-            "Shared instance external file {} has an unexpected size",
+        bail!(
+            "shared instance external file {} has an unexpected size",
             file.file_name
-        ))
-        .into());
+        );
     }
     let bytes = bytes::Bytes::from(bytes);
 
@@ -933,13 +917,12 @@ async fn install_shared_instance_external_file(
         .await;
     }
 
-    let project_type =
-        ProjectType::from_name(&file.file_type).ok_or_else(|| {
-            crate::ErrorKind::InputError(format!(
-                "Unknown shared instance file type {}",
-                file.file_type
-            ))
-        })?;
+    let project_type = ProjectType::from_name(&file.file_type).ok_or(
+        ErrorKind::InputError(format!(
+            "unknown shared instance file type {}",
+            file.file_type
+        )),
+    )?;
 
     crate::state::instances::commands::add_project_bytes(
         instance_id,
@@ -961,20 +944,17 @@ fn validate_shared_instance_external_file_name(
     file_name: &str,
 ) -> crate::Result<()> {
     let path = SafeRelativeUtf8UnixPathBuf::try_from(file_name.to_string())
-        .map_err(|_| {
-            crate::ErrorKind::InputError(format!(
-                "Shared instance external file {file_name} has an invalid file name"
-            ))
-        })?;
+        .context(ErrorKind::InputError(format!(
+            "shared instance external file {file_name} has an invalid file name"
+        )))?;
     if file_name == "."
         || file_name.contains('/')
         || file_name.contains('\\')
         || path.components().count() != 1
     {
-        return Err(crate::ErrorKind::InputError(format!(
-            "Shared instance external file {file_name} has an invalid file name"
-        ))
-        .into());
+        bail!(ErrorKind::InputError(format!(
+            "shared instance external file {file_name} has an invalid file name"
+        )));
     }
 
     Ok(())
@@ -993,9 +973,7 @@ async fn install_shared_instance_config_bundle(
         &state.pool,
     )
     .await?
-    .ok_or_else(|| {
-        crate::ErrorKind::InputError("Unknown instance".to_string())
-    })?;
+    .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
     let config_path = state
         .directories
         .instances_dir()
@@ -1016,42 +994,33 @@ async fn install_shared_instance_config_bundle(
 
 fn read_config_bundle(bytes: &[u8]) -> crate::Result<Vec<(PathBuf, Vec<u8>)>> {
     let mut archive = zip::ZipArchive::new(std::io::Cursor::new(bytes))
-        .map_err(|error| {
-            crate::ErrorKind::InputError(format!(
-                "Invalid shared instance config bundle: {error}"
-            ))
-        })?;
+        .context(ErrorKind::InputError(
+            "invalid shared instance config bundle".to_string(),
+        ))?;
     if archive.len() > MAX_CONFIG_BUNDLE_ENTRIES {
-        return Err(crate::ErrorKind::InputError(
-            "Shared instance config bundle contains too many entries"
+        bail!(ErrorKind::InputError(
+            "shared instance config bundle contains too many entries"
                 .to_string(),
-        )
-        .into());
+        ));
     }
     let mut files = Vec::new();
     let mut total_size = 0;
 
     for index in 0..archive.len() {
-        let file = archive.by_index(index).map_err(|error| {
-            crate::ErrorKind::InputError(format!(
-                "Invalid shared instance config bundle entry: {error}"
-            ))
-        })?;
+        let file = archive.by_index(index).context(ErrorKind::InputError(
+            "invalid shared instance config bundle entry".to_string(),
+        ))?;
         if file.is_dir() {
             continue;
         }
-        let path = file.enclosed_name().ok_or_else(|| {
-            crate::ErrorKind::InputError(
-                "Shared instance config bundle contains an unsafe path"
-                    .to_string(),
-            )
-        })?;
+        let path = file.enclosed_name().ok_or(ErrorKind::InputError(
+            "shared instance config bundle contains an unsafe path".to_string(),
+        ))?;
         if !is_supported_config_file(&path) {
-            return Err(crate::ErrorKind::InputError(format!(
-                "Shared instance config bundle contains unsupported file {}",
+            bail!(ErrorKind::InputError(format!(
+                "shared instance config bundle contains unsupported file {}",
                 path.display()
-            ))
-            .into());
+            )));
         }
         let declared_size = file.size();
         let bytes = read_bounded_config_bundle_entry(

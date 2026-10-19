@@ -1,9 +1,11 @@
+use crate::ErrorKind;
 use crate::state::content_store::model::InstancePathContent;
-use crate::state::content_store::{FileStorageKind, FileStoragePolicy, input};
+use crate::state::content_store::{FileStorageKind, FileStoragePolicy};
 use crate::util::content_hash::{
     FileHashes, copy_and_hash, hash_file, temporary_file,
 };
 use crate::util::fetch;
+use anyhow::bail;
 use std::fs::Metadata;
 use std::path::Path;
 use tokio::fs::{self, File};
@@ -107,14 +109,18 @@ pub(in crate::state::content_store) async fn move_instance_file(
 ) -> crate::Result<()> {
     let metadata = fs::symlink_metadata(source).await?;
     if metadata.is_dir() {
-        return Err(input("Refusing to move a directory as content"));
+        bail!(ErrorKind::ContentStoreError(
+            "refusing to move a directory as content".into()
+        ));
     }
-    let parent = target
-        .parent()
-        .ok_or_else(|| input("Content destination has no parent"))?;
+    let parent = target.parent().ok_or_else(|| {
+        ErrorKind::ContentStoreError("content destination has no parent".into())
+    })?;
     fs::create_dir_all(parent).await?;
     if symlink_metadata_if_exists(target).await?.is_some() {
-        return Err(input("Content destination already exists"));
+        bail!(ErrorKind::ContentStoreError(
+            "content destination already exists".into()
+        ));
     }
     fs::rename(source, target).await?;
     if let Some(source_parent) = source.parent() {
@@ -157,7 +163,9 @@ pub(in crate::state::content_store) async fn try_hardlink(
 pub(crate) async fn remove_instance_file(path: &Path) -> crate::Result<()> {
     let metadata = fs::symlink_metadata(path).await?;
     if metadata.is_dir() {
-        return Err(input("Refusing to remove a directory as content"));
+        bail!(ErrorKind::ContentStoreError(
+            "refusing to remove a directory as content".into()
+        ));
     }
     #[cfg(windows)]
     if metadata.is_file() && metadata.permissions().readonly() {
@@ -225,15 +233,18 @@ pub(crate) async fn validate_parent_directories(
     root: &Path,
     path: &Path,
 ) -> crate::Result<()> {
-    let parent = path.parent().ok_or_else(|| input("Invalid content path"))?;
+    let parent = path.parent().ok_or_else(|| {
+        ErrorKind::ContentStoreError("invalid content path".into())
+    })?;
     let mut current = root.to_path_buf();
     for component in parent.strip_prefix(root)?.components() {
         current.push(component);
         if let Some(metadata) = symlink_metadata_if_exists(&current).await?
             && !metadata.is_dir()
         {
-            return Err(input(
-                "Managed content directories must not be symbolic links or files",
+            bail!(ErrorKind::ContentStoreError(
+                "managed content directories must not be symbolic links or files"
+                    .into(),
             ));
         }
     }
@@ -247,7 +258,7 @@ pub(in crate::state::content_store) fn require_staging_space(
     if fs4::available_space(staging)? < size.saturating_add(64 * 1024 * 1024) {
         return Err(std::io::Error::new(
 			std::io::ErrorKind::StorageFull,
-			"There is not enough space to import this file into the shared content store",
+			"there is not enough space to import this file into the shared content store",
 		).into());
     }
     Ok(())
@@ -260,7 +271,9 @@ pub(in crate::state::content_store) async fn stage_file(
     let mut input_file = File::open(source).await?;
     let before = input_file.metadata().await?;
     if !before.is_file() {
-        return Err(input("Only regular content files can be stored"));
+        bail!(ErrorKind::ContentStoreError(
+            "only regular content files can be stored".into()
+        ));
     }
     require_staging_space(staging, before.len())?;
     let (mut output, temporary) = temporary_file(Some(staging)).await?;
@@ -273,8 +286,9 @@ pub(in crate::state::content_store) async fn stage_file(
         || before.modified()? != after.modified()?
         || size != after.len()
     {
-        return Err(input(
-            "Content changed while it was being imported; try again after closing the instance",
+        bail!(ErrorKind::ContentStoreError(
+            "content changed while it was being imported; try again after closing the instance"
+                .into(),
         ));
     }
     Ok(fetch::StagedDownload {
@@ -289,12 +303,14 @@ pub(crate) async fn create_instance_file(
     target: &Path,
     policy: FileStoragePolicy,
 ) -> crate::Result<FileStorageKind> {
-    let parent = target
-        .parent()
-        .ok_or_else(|| input("Content destination has no parent"))?;
+    let parent = target.parent().ok_or_else(|| {
+        ErrorKind::ContentStoreError("content destination has no parent".into())
+    })?;
     fs::create_dir_all(parent).await?;
     if symlink_metadata_if_exists(target).await?.is_some() {
-        return Err(input("Content destination already exists"));
+        bail!(ErrorKind::ContentStoreError(
+            "content destination already exists".into()
+        ));
     }
     let temporary =
         parent.join(format!(".modrinth-{}.tmp", uuid::Uuid::new_v4()));
@@ -389,16 +405,16 @@ pub(in crate::state::content_store) async fn publish_staged_file(
     temporary: tempfile::TempPath,
     hash: &str,
 ) -> crate::Result<()> {
-    let parent = destination
-        .parent()
-        .ok_or_else(|| input("Invalid store path"))?;
+    let parent = destination.parent().ok_or_else(|| {
+        ErrorKind::ContentStoreError("invalid store path".into())
+    })?;
     validate_parent_directories(root, destination).await?;
     fs::create_dir_all(parent).await?;
     validate_parent_directories(root, destination).await?;
     if let Some(metadata) = symlink_metadata_if_exists(destination).await? {
         if !metadata.is_file() || hash_file(destination).await?.sha512 != hash {
-            return Err(input(format!(
-                "Content object {hash} needs repair before it can be replaced"
+            bail!(ErrorKind::ContentStoreError(format!(
+                "content object {hash} needs repair before it can be replaced"
             )));
         }
     } else {
@@ -489,8 +505,9 @@ pub(in crate::state::content_store) async fn remove_unused_file(
 ) -> crate::Result<()> {
     if let Some(metadata) = symlink_metadata_if_exists(path).await? {
         if !metadata.is_file() {
-            return Err(input(
-                "An unreferenced store object was replaced by an unexpected filesystem entry",
+            bail!(ErrorKind::ContentStoreError(
+                "an unreferenced store object was replaced by an unexpected filesystem entry"
+                    .into(),
             ));
         }
         remove_instance_file(path).await?;

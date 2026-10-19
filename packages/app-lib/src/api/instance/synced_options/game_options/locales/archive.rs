@@ -1,4 +1,6 @@
-use super::super::options_file::{input_error, sha1_bytes};
+use super::super::options_file::sha1_bytes;
+use crate::ErrorKind;
+use anyhow::{Context, bail};
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet};
 use std::io::{Cursor, Read, Seek};
@@ -55,7 +57,9 @@ pub(super) fn parse_language(
     legacy: bool,
 ) -> crate::Result<Translations> {
     if bytes.len() > MAX_LANGUAGE_BYTES {
-        return Err(input_error("Minecraft language file exceeds size limit"));
+        bail!(ErrorKind::InputError(
+            "Minecraft language file exceeds size limit".to_string()
+        ));
     }
     let values: Translations = if legacy {
         String::from_utf8_lossy(bytes)
@@ -98,8 +102,8 @@ pub(super) fn inspect(
         hasher.update(&buffer[..count]);
     }
     if hasher.digest().to_string() != expected_hash {
-        return Err(input_error(
-            "Locale source changed before it could be indexed",
+        bail!(ErrorKind::InputError(
+            "locale source changed before it could be indexed".to_string(),
         ));
     }
     file.rewind().map_err(crate::util::io::IOError::from)?;
@@ -119,12 +123,17 @@ fn read_entry<R: Read + Seek>(
     limit: usize,
     budget: &mut usize,
 ) -> crate::Result<Vec<u8>> {
-    let mut entry = archive
-        .by_name(name)
-        .map_err(|e| input_error(e.to_string()))?;
+    let mut entry =
+        archive
+            .by_name(name)
+            .context(ErrorKind::InputError(format!(
+                "could not read locale archive entry {name}"
+            )))?;
     let limit = limit.min(*budget);
     if entry.size() > limit as u64 {
-        return Err(input_error("Locale archive entry exceeds size limit"));
+        bail!(ErrorKind::InputError(
+            "locale archive entry exceeds size limit".to_string()
+        ));
     }
     let mut bytes = Vec::new();
     entry
@@ -133,7 +142,9 @@ fn read_entry<R: Read + Seek>(
         .read_to_end(&mut bytes)
         .map_err(crate::util::io::IOError::from)?;
     if bytes.len() > limit {
-        return Err(input_error("Locale archive entry exceeds size limit"));
+        bail!(ErrorKind::InputError(
+            "locale archive entry exceeds size limit".to_string()
+        ));
     }
     *budget -= bytes.len();
     Ok(bytes)
@@ -147,10 +158,13 @@ fn inspect_archive<R: Read + Seek>(
     entries: &mut usize,
     index: &mut ArchiveIndex,
 ) -> crate::Result<()> {
-    let mut archive =
-        ZipArchive::new(reader).map_err(|e| input_error(e.to_string()))?;
+    let mut archive = ZipArchive::new(reader).context(
+        ErrorKind::InputError("could not open locale archive".to_string()),
+    )?;
     if archive.len() > *entries {
-        return Err(input_error("Too many entries in locale archive"));
+        bail!(ErrorKind::InputError(
+            "too many entries in locale archive".to_string()
+        ));
     }
     *entries -= archive.len();
     let names: BTreeSet<String> =
@@ -225,7 +239,9 @@ fn inspect_archive<R: Read + Seek>(
         }
     }
     if !nested.is_empty() && depth >= MAX_NESTED_DEPTH {
-        return Err(input_error("Locale archive nesting exceeds limit"));
+        bail!(ErrorKind::InputError(
+            "locale archive nesting exceeds limit".to_string()
+        ));
     }
     for name in nested {
         if !names.contains(&name) || !name.ends_with(".jar") {
@@ -266,7 +282,9 @@ pub(super) fn checked_bytes(
     hash: &str,
 ) -> crate::Result<Vec<u8>> {
     if sha1_bytes(&bytes) != hash {
-        return Err(input_error("Minecraft locale resource checksum mismatch"));
+        bail!(ErrorKind::InputError(
+            "Minecraft locale resource checksum mismatch".to_string()
+        ));
     }
     Ok(bytes)
 }

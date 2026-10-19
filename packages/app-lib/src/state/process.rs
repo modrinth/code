@@ -1,3 +1,4 @@
+use crate::ErrorKind;
 use crate::State;
 use crate::event::emit::{emit_instance, emit_process};
 use crate::event::{InstancePayloadType, ProcessPayloadType};
@@ -5,6 +6,7 @@ use crate::event::{InstancePayloadType, ProcessPayloadType};
 use crate::event::{LogEvent, LogPayload};
 use crate::util::io::IOError;
 use crate::util::rpc::RpcServer;
+use anyhow::Context;
 use chrono::{DateTime, NaiveDateTime, TimeZone, Utc};
 use dashmap::DashMap;
 use quick_xml::Reader;
@@ -808,17 +810,11 @@ impl Process {
         let timestamp = timestamp
             .parse::<i64>()
             .map(|x| x / 1000)
-            .map_err(|x| {
-                crate::ErrorKind::OtherError(format!(
-                    "Failed to parse timestamp: {x}"
-                ))
-            })
+            .context("failed to parse timestamp")
             .and_then(|x| {
-                Utc.timestamp_opt(x, 0).single().ok_or_else(|| {
-                    crate::ErrorKind::OtherError(
-                        "Failed to convert timestamp to DateTime".to_string(),
-                    )
-                })
+                Utc.timestamp_opt(x, 0)
+                    .single()
+                    .context("failed to convert timestamp to DateTime")
             })?;
         Self::parse_and_insert_server_join(
             instance_id,
@@ -1061,11 +1057,9 @@ impl Process {
             // This behaviour may be changed in the future
             if let Some(hook) = post_exit_command {
                 let mut cmd = shlex::split(&hook)
-                    .ok_or_else(|| {
-                        crate::ErrorKind::LauncherError(format!(
-                            "Invalid post-exit command: {hook}",
-                        ))
-                    })?
+                    .ok_or(ErrorKind::LauncherError(format!(
+                        "invalid post-exit command {hook}",
+                    )))?
                     .into_iter();
 
                 if let Some(command) = cmd.next() {

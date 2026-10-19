@@ -3,8 +3,10 @@ use super::super::synced_options::{
 };
 use super::PackLibrary;
 use super::storage::{read_library, write_library};
+use crate::ErrorKind;
 use crate::state::instances::adapters::{filesystem, sqlite::content_rows};
 use crate::state::{InstanceMetadata, State};
+use anyhow::{Context, bail};
 use parking_lot::Mutex;
 use std::collections::{BTreeMap, BTreeSet};
 use std::future::Future;
@@ -13,12 +15,12 @@ use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::Duration;
 use tokio::sync::{MutexGuard, oneshot};
 use tokio::time::Instant;
-use tracing_error::InstrumentError;
 
 #[derive(Default)]
 struct Queue {
     instances: BTreeSet<String>,
-    waiters: BTreeMap<String, Vec<oneshot::Sender<crate::Result<()>>>>,
+    waiters:
+        BTreeMap<String, Vec<oneshot::Sender<Result<(), Arc<crate::Error>>>>>,
     retry_at: BTreeMap<String, Instant>,
     all: bool,
     running: bool,
@@ -50,7 +52,7 @@ pub(super) fn queue_all() {
     }
 }
 
-pub(crate) async fn flush(instance_id: &str) -> crate::Result<()> {
+pub(crate) async fn flush(instance_id: &str) -> Result<(), Arc<crate::Error>> {
     let state = State::get().await?;
     let (sender, receiver) = oneshot::channel();
     {
@@ -58,11 +60,12 @@ pub(crate) async fn flush(instance_id: &str) -> crate::Result<()> {
         if let Some(retry_at) = queue.retry_at.get(instance_id) {
             let remaining = retry_at.saturating_duration_since(Instant::now());
             if !remaining.is_zero() {
-                return Err(crate::ErrorKind::Ratelimited {
-                    retry_in_seconds: remaining.as_secs()
-                        + u64::from(remaining.subsec_nanos() != 0),
-                }
-                .into());
+                return Err(Arc::new(
+                    ErrorKind::RateLimited {
+                        retry_in: remaining,
+                    }
+                    .into(),
+                ));
             }
         }
         queue.instances.insert(instance_id.to_owned());
@@ -73,12 +76,9 @@ pub(crate) async fn flush(instance_id: &str) -> crate::Result<()> {
             .push(sender);
     }
     start(state);
-    receiver.await.map_err(|_| {
-        crate::ErrorKind::OtherError(
-            "Pack sync worker stopped before completing the request."
-                .to_owned(),
-        )
-    })?
+    receiver
+        .await
+        .context("pack sync worker stopped before completing the request")?
 }
 
 fn start(state: Arc<State>) {
@@ -141,10 +141,12 @@ fn start(state: Arc<State>) {
                 (instance_id, pending)
             };
             let result =
-                super::reconciliation::run_queued(&instance_id, &state).await;
+                super::reconciliation::run_queued(&instance_id, &state)
+                    .await
+                    .map_err(Arc::new);
             if let Err(error) = &result {
-                match error.raw.as_ref() {
-                    crate::ErrorKind::PackSyncChanged => {
+                match error.downcast_ref::<crate::ErrorKind>() {
+                    Some(crate::ErrorKind::PackSyncChanged) => {
                         let mut queue = state.synced_options.packs.queue.lock();
                         queue.instances.insert(instance_id.clone());
                         if !pending.is_empty() {
@@ -156,9 +158,9 @@ fn start(state: Arc<State>) {
                         }
                         continue;
                     }
-                    crate::ErrorKind::Ratelimited { retry_in_seconds } => {
+                    Some(crate::ErrorKind::RateLimited { retry_in }) => {
                         let retry_at = Instant::now()
-                            + Duration::from_secs((*retry_in_seconds).max(1));
+                            + (*retry_in).max(Duration::from_secs(1));
                         {
                             let mut queue =
                                 state.synced_options.packs.queue.lock();
@@ -192,12 +194,7 @@ fn start(state: Arc<State>) {
                 }
             }
             for sender in pending {
-                let result =
-                    result.as_ref().map(|_| ()).map_err(|error| crate::Error {
-                        raw: error.raw.clone(),
-                        source: error.raw.clone().in_current_span(),
-                    });
-                let _ = sender.send(result);
+                let _ = sender.send(result.clone());
             }
         }
     });
@@ -249,7 +246,7 @@ impl<'a> Preparation<'a> {
             != revision
             || fingerprint(self.metadata, self.state).await? != before
         {
-            return Err(crate::ErrorKind::PackSyncChanged.into());
+            bail!(ErrorKind::PackSyncChanged);
         }
         result
     }
@@ -263,7 +260,7 @@ impl<'a> Preparation<'a> {
         if current.as_ref().is_none_or(|current| {
             metadata_key(current) != metadata_key(self.metadata)
         }) {
-            return Err(crate::ErrorKind::PackSyncChanged.into());
+            bail!(ErrorKind::PackSyncChanged);
         }
         Ok(())
     }

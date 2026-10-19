@@ -174,9 +174,7 @@ pub async fn get_shared_instance_update_preview(
     let state = State::get().await?;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError("Unknown instance".to_string())
-        })?;
+        .ok_or(crate::ErrorKind::InputError("unknown instance".to_string()))?;
     let Some(attachment) = metadata.shared_instance.clone() else {
         return Ok(None);
     };
@@ -234,9 +232,7 @@ pub(crate) async fn check_shared_instance_availability_before_launch(
 ) -> crate::Result<()> {
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError("Unknown instance".to_string())
-        })?;
+        .ok_or(crate::ErrorKind::InputError("unknown instance".to_string()))?;
     let Some(attachment) = metadata.shared_instance else {
         return Ok(());
     };
@@ -276,20 +272,17 @@ pub async fn update_shared_instance(
     let state = State::get().await?;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError("Unknown instance".to_string())
-        })?;
-    let attachment = metadata.shared_instance.clone().ok_or_else(|| {
+        .ok_or(crate::ErrorKind::InputError("unknown instance".to_string()))?;
+    let attachment = metadata.shared_instance.clone().ok_or(
         crate::ErrorKind::InputError(
-            "Instance is not attached to a shared instance".to_string(),
-        )
-    })?;
+            "instance is not attached to a shared instance".to_string(),
+        ),
+    )?;
     if !attachment.role.is_member() {
-        return Err(crate::ErrorKind::InputError(
-            "Only shared instance members can update from shared instances"
+        bail!(crate::ErrorKind::InputError(
+            "only shared instance members can update from shared instances"
                 .to_string(),
-        )
-        .into());
+        ));
     }
 
     let version =
@@ -360,12 +353,11 @@ pub(super) async fn get_latest_remote_member_version(
             return Err(shared_instance_unavailable_error(reason));
         }
 
-        return Err(crate::ErrorKind::OtherError(format!(
-            "{}: {}",
+        bail!(
+            "{} ({})",
             shared_instance_unavailable_message(reason),
             attachment.id
-        ))
-        .into());
+        );
     }
 
     let version = match get_latest_remote_version_optional_unavailable(
@@ -388,12 +380,11 @@ pub(super) async fn get_latest_remote_member_version(
                 return Err(shared_instance_unavailable_error(reason));
             }
 
-            return Err(crate::ErrorKind::OtherError(format!(
-                "{}: {}",
+            bail!(
+                "{} ({})",
                 shared_instance_unavailable_message(reason),
                 attachment.id
-            ))
-            .into());
+            );
         }
     };
 
@@ -471,13 +462,13 @@ pub(super) fn shared_instance_unavailable_message(
 ) -> &'static str {
     match reason {
         SharedInstanceUnavailableReason::Deleted => {
-            "Shared instance was deleted"
+            "shared instance was deleted"
         }
         SharedInstanceUnavailableReason::AccessRevoked => {
-            "Shared instance access was revoked"
+            "shared instance access was revoked"
         }
         SharedInstanceUnavailableReason::Quarantined => {
-            "Shared instance was quarantined"
+            "shared instance was quarantined"
         }
     }
 }
@@ -485,18 +476,17 @@ pub(super) fn shared_instance_unavailable_message(
 fn shared_instance_external_file_data(
     file: ExternalFileResponse,
 ) -> crate::Result<SharedInstanceExternalFileData> {
-    let file_size = file.file_size.ok_or_else(|| {
-        crate::ErrorKind::InputError(format!(
-            "Shared instance external file {} is missing its size",
+    let file_size =
+        file.file_size.ok_or(crate::ErrorKind::InputError(format!(
+            "shared instance external file {} is missing its size",
             file.file_name
-        ))
-    })?;
-    let file_size = u64::try_from(file_size).map_err(|_| {
+        )))?;
+    let file_size = u64::try_from(file_size).context(
         crate::ErrorKind::InputError(format!(
-            "Shared instance external file {} has an invalid size",
+            "shared instance external file {} has an invalid size",
             file.file_name
-        ))
-    })?;
+        )),
+    )?;
 
     Ok(SharedInstanceExternalFileData {
         file_name: file.file_name,
@@ -517,10 +507,9 @@ pub(super) async fn shared_instance_install_data(
     state: &State,
 ) -> crate::Result<SharedInstanceInstallData> {
     if !version.ready {
-        return Err(crate::ErrorKind::InputError(
-            "Shared instance version is not ready to install".to_string(),
-        )
-        .into());
+        bail!(crate::ErrorKind::InputError(
+            "shared instance version is not ready to install".to_string(),
+        ));
     }
 
     let name = shared_instance_name(name);

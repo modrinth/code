@@ -1,3 +1,4 @@
+use crate::LabrinthError;
 use crate::api::pack::import::ImportLauncherType;
 use crate::api::pack::install_from::{CreatePackInstance, CreatePackLocation};
 use crate::state::{
@@ -633,9 +634,6 @@ pub struct InstallErrorView {
     pub message: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "export-ts", ts(optional))]
-    pub reason: Option<crate::SharedInstanceUnavailableReason>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    #[cfg_attr(feature = "export-ts", ts(optional))]
     pub api: Option<InstallApiErrorDetails>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "export-ts", ts(optional))]
@@ -674,20 +672,16 @@ impl InstallErrorView {
         Self {
             code: code.to_string(),
             phase: Some(phase),
-            message: error.to_string(),
-            reason: None,
-            api: match error.raw.as_ref() {
-                crate::ErrorKind::LabrinthError(error) => {
-                    Some(InstallApiErrorDetails {
-                        error: error.error.clone(),
-                        status: error.status,
-                        method: error.method.clone(),
-                        url: error.url.clone(),
-                        route: error.route.clone(),
-                    })
+            message: format!("{error:#}"),
+            api: error.downcast_ref::<LabrinthError>().map(|error| {
+                InstallApiErrorDetails {
+                    error: error.error.clone(),
+                    status: error.status,
+                    method: error.method.clone(),
+                    url: error.url.clone(),
+                    route: error.route.clone(),
                 }
-                _ => None,
-            },
+            }),
             context,
         }
     }
@@ -701,7 +695,6 @@ impl InstallErrorView {
             code: code.to_string(),
             phase: Some(phase),
             message: message.into(),
-            reason: None,
             api: None,
             context: None,
         }

@@ -4,6 +4,7 @@
 )]
 #![recursion_limit = "256"]
 
+use anyhow::Context;
 use native_dialog::{DialogBuilder, MessageLevel};
 use std::env;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -88,11 +89,9 @@ pub use updater_impl_noop::*;
 // Toggles decorations
 #[tauri::command]
 async fn toggle_decorations(b: bool, window: tauri::Window) -> api::Result<()> {
-    window.set_decorations(b).map_err(|e| {
-        theseus::Error::from(theseus::ErrorKind::OtherError(format!(
-            "Failed to toggle decorations: {e}"
-        )))
-    })?;
+    window
+        .set_decorations(b)
+        .context("failed to toggle decorations")?;
     Ok(())
 }
 

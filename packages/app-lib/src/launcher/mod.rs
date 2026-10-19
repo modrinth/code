@@ -20,7 +20,8 @@ use crate::state::{
 };
 use crate::util::io;
 use crate::util::rpc::RpcServerBuilder;
-use crate::{State, get_resource_file, process};
+use crate::{ErrorKind, State, get_resource_file};
+use anyhow::{Context, bail};
 use chrono::Utc;
 use daedalus as d;
 use daedalus::minecraft::{LoggingSide, RuleAction, VersionInfo};
@@ -365,16 +366,14 @@ pub async fn resolve_minecraft_manifest(
         &state.api_semaphore,
     )
     .await?
-    .ok_or_else(|| {
-        crate::ErrorKind::NoValueFor("minecraft versions".to_string())
-    })?;
+    .ok_or(ErrorKind::NoValueFor("minecraft versions".to_string()))?;
 
     let idx = refreshed
         .versions
         .iter()
         .position(|it| it.id == game_version)
-        .ok_or(crate::ErrorKind::LauncherError(format!(
-            "Invalid game version: {game_version}"
+        .ok_or(ErrorKind::LauncherError(format!(
+            "invalid game version {game_version}"
         )))?;
 
     Ok((refreshed, idx))
@@ -693,12 +692,10 @@ async fn install_minecraft_inner(
                             false,
                         )?)
                         .await?
-                        .ok_or_else(|| {
-                            crate::ErrorKind::LauncherError(format!(
-                                "Could not find processor main class for {}",
-                                processor.jar
-                            ))
-                        })?,
+                        .ok_or(ErrorKind::LauncherError(format!(
+                            "could not find processor main class for {}",
+                            processor.jar
+                        )))?,
                     )
                     .args(args::get_processor_arguments(
                         &libraries_dir,
@@ -708,18 +705,15 @@ async fn install_minecraft_inner(
                     .output()
                     .await
                     .map_err(|e| IOError::with_path(e, &java_version.path))
-                    .map_err(|err| {
-                        crate::ErrorKind::LauncherError(format!(
-                            "Error running processor: {err}",
-                        ))
-                    })?;
+                    .context(ErrorKind::LauncherError(
+                        "error running processor".to_string(),
+                    ))?;
 
                 if !child.status.success() {
-                    return Err(crate::ErrorKind::LauncherError(format!(
-                        "Processor error: {}",
+                    bail!(ErrorKind::LauncherError(format!(
+                        "processor error: {}",
                         String::from_utf8_lossy(&child.stderr)
-                    ))
-                    .as_error());
+                    )));
                 }
 
                 if let Some(loading_bar) = &loading_bar {
@@ -822,11 +816,9 @@ pub async fn install_minecraft_for_instance_id_with_reporter(
             &state.pool,
         )
         .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::OtherError(format!(
-                "Tried to install a nonexistent or unloaded instance {instance_id}!"
-            ))
-        })?;
+        .context(format!(
+            "tried to install a nonexistent or unloaded instance {instance_id}"
+        ))?;
 
     install_minecraft_with_reporter(&context, repairing, reporter, state).await
 }
@@ -913,26 +905,27 @@ pub async fn launch_minecraft(
     if instance.install_stage == InstanceInstallStage::PackInstalling
         || instance.install_stage == InstanceInstallStage::MinecraftInstalling
     {
-        return Err(crate::ErrorKind::LauncherError(
-            "Instance is still installing".to_string(),
-        )
-        .into());
+        bail!(ErrorKind::LauncherError(
+            "instance is still installing".to_string()
+        ));
     }
 
     if instance.install_stage != InstanceInstallStage::Installed {
-        return Err(crate::ErrorKind::LauncherError(
-            "Instance is not installed; start an install job first".to_string(),
-        )
-        .into());
+        bail!(ErrorKind::LauncherError(
+            "instance is not installed; start an install job first".to_string()
+        ));
     }
 
     let mut runtime_lease = state.content_store.runtime_cache_lock.read().await;
 
     let instance_path =
-        get_instance_full_path(&instance.path, &state.directories)?;
+        get_instance_full_path(&instance.path, &state.directories)
+            .context("resolving instance path")?;
 
     let (minecraft, version_index) =
-        resolve_minecraft_manifest(&content_set.game_version, state).await?;
+        resolve_minecraft_manifest(&content_set.game_version, state)
+            .await
+            .context("resolving Minecraft version")?;
     let version = &minecraft.versions[version_index];
     let minecraft_updated = version_index
         <= minecraft
@@ -947,14 +940,13 @@ pub async fn launch_minecraft(
         content_set.loader_version.as_deref(),
         &state.directories,
     )
-    .await?;
+    .await
+    .context("resolving loader version")?;
 
     if content_set.loader != ModLoader::Vanilla && loader_version.is_none() {
-        return Err(crate::ErrorKind::LauncherError(format!(
-            "No loader version selected for {}",
-            content_set.loader.as_str()
-        ))
-        .into());
+        bail!(ErrorKind::NoLoaderVersion {
+            loader: content_set.loader,
+        });
     }
 
     let version_jar =
@@ -970,7 +962,8 @@ pub async fn launch_minecraft(
         None,
         None,
     )
-    .await?;
+    .await
+    .context("loading version info")?;
     if version_info.logging.is_none() {
         let requires_logging_info = version_index
             <= minecraft
@@ -987,12 +980,14 @@ pub async fn launch_minecraft(
                 None,
                 None,
             )
-            .await?;
+            .await
+            .context("reloading version info with logging config")?;
         }
     }
 
-    let _ =
-        download_log_config(state, &version_info, None, false, None).await?;
+    let _ = download_log_config(state, &version_info, None, false, None)
+        .await
+        .context("downloading log config")?;
 
     let java_version = get_java_version_from_launch_context(
         context,
@@ -1000,15 +995,15 @@ pub async fn launch_minecraft(
         &state.pool,
     )
     .await?
-    .ok_or_else(|| {
-        crate::ErrorKind::LauncherError(
-            "Missing correct java installation".to_string(),
-        )
-    })?;
+    .ok_or(ErrorKind::LauncherError(
+        "missing correct java installation".to_string(),
+    ))?;
 
     // Test jre version
     let java_version =
-        crate::api::jre::check_jre(java_version.path.clone().into()).await?;
+        crate::api::jre::check_jre(java_version.path.clone().into())
+            .await
+            .context(format!("checking Java at {}", java_version.path))?;
 
     let client_path = state
         .directories
@@ -1019,16 +1014,12 @@ pub async fn launch_minecraft(
     let mut command = match wrapper {
         Some(hook) => {
             let mut cmd = shlex::split(hook)
-                .ok_or_else(|| {
-                    crate::ErrorKind::LauncherError(format!(
-                        "Invalid wrapper command: {hook}",
-                    ))
-                })?
+                .ok_or(ErrorKind::LauncherError(format!(
+                    "invalid wrapper command {hook}"
+                )))?
                 .into_iter();
             let mut command = Command::new(cmd.next().ok_or(
-                crate::ErrorKind::LauncherError(
-                    "Empty wrapper command".to_owned(),
-                ),
+                ErrorKind::LauncherError("empty wrapper command".to_owned()),
             )?);
             command.args(cmd);
             command.arg(&java_version.path);
@@ -1040,20 +1031,11 @@ pub async fn launch_minecraft(
     let env_args = Vec::from(env_args);
 
     // Check if instance has a running process, and reject running the command if it does
-    let existing_processes = process::get_by_instance_id(&instance.id).await?;
-    if let Some(process) = existing_processes.first() {
-        return Err(crate::ErrorKind::LauncherError(format!(
-            "Instance {} is already running as process {}",
-            instance.id, process.uuid
-        ))
-        .as_error());
-    }
     if crate::state::instance_has_running_process(&instance.id, state).await? {
-        return Err(crate::ErrorKind::LauncherError(format!(
-            "Instance {} is already running",
+        bail!(ErrorKind::LauncherError(format!(
+            "instance {} is already running",
             instance.id
-        ))
-        .as_error());
+        )));
     }
 
     if let Some(path) = download::missing_runtime_file(
@@ -1068,11 +1050,17 @@ pub async fn launch_minecraft(
             instance.id.clone(),
             false,
         )
-        .await?;
-        let job_id = uuid::Uuid::parse_str(&job.job_id).map_err(|error| {
-            crate::ErrorKind::LauncherError(error.to_string())
-        })?;
-        crate::install::runner::wait_for_job(job_id, &state.pool).await?;
+        .await
+        .context("starting repair install")?;
+        let job_id = uuid::Uuid::parse_str(&job.job_id).context(
+            ErrorKind::LauncherError(format!(
+                "parsing repair install job id {}",
+                job.job_id
+            )),
+        )?;
+        crate::install::runner::wait_for_job(job_id, &state.pool)
+            .await
+            .context("repairing missing runtime files")?;
         runtime_lease = state.content_store.runtime_cache_lock.read().await;
     }
     let _runtime_lease = runtime_lease;
@@ -1225,7 +1213,8 @@ pub async fn launch_minecraft(
     .await?;
 
     crate::state::instances::commands::sync_content_files(&instance.id, state)
-        .await?;
+        .await
+        .context("syncing instance content files")?;
     let _instance_content_lock =
         state.instance_locks.lock_content(&instance.id).await;
     let current =
@@ -1233,12 +1222,11 @@ pub async fn launch_minecraft(
 			&instance.id, &state.pool,
 		)
 		.await?
-		.ok_or_else(|| crate::state::content_store::input("Unknown instance"))?;
+		.ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
     if current.install_stage != InstanceInstallStage::Installed {
-        return Err(crate::ErrorKind::LauncherError(
-			"Instance is not ready to launch; finish or recover its installation first".to_string(),
-		)
-		.into());
+        bail!(ErrorKind::LauncherError(
+			"instance is not ready to launch; finish or recover its installation first".to_string(),
+		));
     }
     crate::install::store::ensure_no_pending_recovery(
         &instance.id,
@@ -1248,14 +1236,17 @@ pub async fn launch_minecraft(
     .await?;
     let _store_lock = state.content_store.files_lock.lock().await;
     let _store_lease = state.content_store.lease().await;
-    state.content_store.recover(Some(&instance.id)).await?;
+    state
+        .content_store
+        .recover(Some(&instance.id))
+        .await
+        .context("recovering interrupted content changes")?;
     // state.content_store.validate_instance(instance).await?;
     if crate::state::instance_has_running_process(&instance.id, state).await? {
-        return Err(crate::ErrorKind::LauncherError(format!(
-            "Instance {} is already running",
+        bail!(ErrorKind::LauncherError(format!(
+            "instance {} is already running",
             instance.id
-        ))
-        .as_error());
+        )));
     }
 
     crate::state::instances::commands::set_instance_last_played(

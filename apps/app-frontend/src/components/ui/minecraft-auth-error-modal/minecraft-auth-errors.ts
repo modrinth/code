@@ -1,14 +1,22 @@
 export interface MinecraftAuthError {
-	errorCode?: string
-	errorMatchers?: string[]
-	matches?: (message: string) => boolean
 	whatHappened: string
 	stepsToFix: string[]
 }
 
-export const minecraftAuthErrors: MinecraftAuthError[] = [
-	{
-		errorMatchers: ['Failed to deserialize response to JSON during step RefreshOAuthToken:'],
+const networkError: MinecraftAuthError = {
+	whatHappened:
+		'Modrinth App could not connect to a Microsoft, Xbox, or Minecraft service needed for sign-in. This is usually caused by a local network, DNS, proxy, firewall, hosts file, VPN, or antivirus issue.',
+	stepsToFix: [
+		'Restart Modrinth App and try signing in again',
+		'Check that your internet connection is working',
+		'Allow Modrinth App through your firewall, antivirus, proxy, VPN, and hosts file rules',
+		'Try a different network or temporarily disable VPN/proxy software if you use one',
+		'If routing or DNS is the issue, a service like Cloudflare WARP can sometimes help',
+	],
+}
+
+export const minecraftAuthErrors: Record<string, MinecraftAuthError> = {
+	minecraft_auth_token_expired: {
 		whatHappened:
 			'Your saved Microsoft sign-in token has expired or was revoked, so Modrinth App cannot refresh your Minecraft session.',
 		stepsToFix: [
@@ -17,8 +25,7 @@ export const minecraftAuthErrors: MinecraftAuthError[] = [
 			'Once the new sign-in finishes, try launching Minecraft again',
 		],
 	},
-	{
-		errorMatchers: ['Failed to deserialize response to JSON during step SisuAuthenticate:'],
+	minecraft_auth_clock_out_of_sync: {
 		whatHappened:
 			'Xbox services rejected the first sign-in response. This is most often caused by your system clock or time zone being out of sync.',
 		stepsToFix: [
@@ -29,10 +36,7 @@ export const minecraftAuthErrors: MinecraftAuthError[] = [
 			'Try signing in again',
 		],
 	},
-	{
-		matches: (message) =>
-			message.includes('Failed to deserialize response to JSON during step MinecraftToken:') &&
-			message.includes('429 Too Many Requests'),
+	minecraft_auth_rate_limited: {
 		whatHappened:
 			'Microsoft or Minecraft temporarily blocked the sign-in request because there were too many recent attempts.',
 		stepsToFix: [
@@ -42,10 +46,7 @@ export const minecraftAuthErrors: MinecraftAuthError[] = [
 			'If the same message appears, wait longer before retrying so the temporary limit can clear',
 		],
 	},
-	{
-		matches: (message) =>
-			message.includes('Failed to deserialize response to JSON during step MinecraftToken:') &&
-			/Status Code: 5\d\d/.test(message),
+	minecraft_auth_service_unavailable: {
 		whatHappened:
 			"Minecraft's authentication service is returning a server error, so Modrinth App cannot finish signing you in right now.",
 		stepsToFix: [
@@ -55,8 +56,7 @@ export const minecraftAuthErrors: MinecraftAuthError[] = [
 			'If the service is healthy and this keeps happening, contact support with the debug information below',
 		],
 	},
-	{
-		errorMatchers: ['Failed to fetch player profile'],
+	minecraft_auth_no_profile: {
 		whatHappened:
 			'Minecraft services could not return a Java Edition profile for this account. This most often happens when the game was purchased recently, the Java profile has not finished being created, or the wrong Microsoft account is being used.',
 		stepsToFix: [
@@ -67,29 +67,9 @@ export const minecraftAuthErrors: MinecraftAuthError[] = [
 			'Try signing in to Modrinth App again',
 		],
 	},
-	{
-		matches: (message) =>
-			message.includes('error sending request for url (') &&
-			[
-				'minecraft.net',
-				'minecraftservices.com',
-				'mojang.com',
-				'xbox.com',
-				'xboxlive.com',
-				'live.com',
-			].some((domain) => message.includes(domain)),
-		whatHappened:
-			'Modrinth App could not connect to a Microsoft, Xbox, or Minecraft service needed for sign-in. This is usually caused by a local network, DNS, proxy, firewall, hosts file, VPN, or antivirus issue.',
-		stepsToFix: [
-			'Restart Modrinth App and try signing in again',
-			'Check that your internet connection is working',
-			'Allow Modrinth App through your firewall, antivirus, proxy, VPN, and hosts file rules',
-			'Try a different network or temporarily disable VPN/proxy software if you use one',
-			'If routing or DNS is the issue, a service like Cloudflare WARP can sometimes help',
-		],
-	},
-	{
-		errorCode: '2148916222',
+	minecraft_auth_network: networkError,
+	minecraft_auth_connection_refused: networkError,
+	minecraft_auth_age_verification: {
 		whatHappened:
 			'Your Minecraft/Xbox Live account requires age verification to comply with UK regulations. You must complete this before signing in.',
 		stepsToFix: [
@@ -99,8 +79,7 @@ export const minecraftAuthErrors: MinecraftAuthError[] = [
 			'For additional help, visit <a href="https://support.xbox.com/en-GB/help/family-online-safety/online-safety/UK-age-verification">UK age verification on Xbox</a>',
 		],
 	},
-	{
-		errorCode: '2148916233',
+	minecraft_auth_no_xbox_profile: {
 		whatHappened: "This account doesn't have an Xbox profile set up or doesn't own Minecraft.",
 		stepsToFix: [
 			'Make sure Minecraft is purchased on this account',
@@ -109,16 +88,14 @@ export const minecraftAuthErrors: MinecraftAuthError[] = [
 			'Once finished, try signing in again',
 		],
 	},
-	{
-		errorCode: '2148916235',
+	minecraft_auth_region_unavailable: {
 		whatHappened: "Xbox Live isn't available in your region, so sign-in is blocked.",
 		stepsToFix: [
 			'Xbox services must be supported in your country before you can sign in',
 			'Check <a href="https://www.xbox.com/en-US/regions">Xbox Availability</a> for supported regions',
 		],
 	},
-	{
-		errorCode: '2148916236',
+	minecraft_auth_adult_verification: {
 		whatHappened: 'This account requires adult verification under South Korean regulations.',
 		stepsToFix: [
 			'Visit <a href="https://www.xbox.com">Xbox</a> and sign in',
@@ -126,17 +103,7 @@ export const minecraftAuthErrors: MinecraftAuthError[] = [
 			'Once finished, try signing in again',
 		],
 	},
-	{
-		errorCode: '2148916237',
-		whatHappened: 'This account requires adult verification under South Korean regulations.',
-		stepsToFix: [
-			'Visit <a href="https://www.xbox.com">Xbox</a> and sign in',
-			'Complete the identity verification process',
-			'Once finished, try signing in again',
-		],
-	},
-	{
-		errorCode: '2148916238',
+	minecraft_auth_underage: {
 		whatHappened: 'This account is underage and not linked to a Microsoft family group.',
 		stepsToFix: [
 			'Review the <a href="https://help.minecraft.net/hc/en-us/articles/4408968616077">Family Setup Guide</a>',
@@ -144,16 +111,14 @@ export const minecraftAuthErrors: MinecraftAuthError[] = [
 			'Once finished, try signing in again',
 		],
 	},
-	{
-		errorCode: '2148916227',
+	minecraft_auth_banned: {
 		whatHappened: 'This account was suspended for violating Xbox Community Standards.',
 		stepsToFix: [
 			'Visit <a href="https://support.xbox.com">Xbox Support</a> and review the enforcement details',
 			'Submit an appeal if one is available',
 		],
 	},
-	{
-		errorCode: '2148916229',
+	minecraft_auth_restricted: {
 		whatHappened: "This account is restricted and doesn't have permission to play online.",
 		stepsToFix: [
 			'Have a guardian sign in to <a href="https://account.microsoft.com/family/">Microsoft Family</a>',
@@ -161,8 +126,7 @@ export const minecraftAuthErrors: MinecraftAuthError[] = [
 			'Once finished, try signing in again',
 		],
 	},
-	{
-		errorCode: '2148916234',
+	minecraft_auth_terms_not_accepted: {
 		whatHappened: "This account hasn't accepted Xbox's Terms of Service.",
 		stepsToFix: [
 			'Visit <a href="https://www.xbox.com">Xbox</a> and sign in',
@@ -170,8 +134,7 @@ export const minecraftAuthErrors: MinecraftAuthError[] = [
 			'Once finished, try signing in again',
 		],
 	},
-	{
-		errorMatchers: ['Failed to deserialize response to JSON during step XstsAuthorize:'],
+	minecraft_auth_xsts_rejected: {
 		whatHappened:
 			'Xbox services rejected the request to authorize this account for Minecraft services, but did not return a specific account restriction that Modrinth App recognizes.',
 		stepsToFix: [
@@ -181,20 +144,4 @@ export const minecraftAuthErrors: MinecraftAuthError[] = [
 			'If the official launcher also fails, follow the error shown there or contact Xbox Support',
 		],
 	},
-]
-
-export function findMinecraftAuthError(message: string): MinecraftAuthError | null {
-	return (
-		minecraftAuthErrors.find((error) => {
-			if (error.errorCode && message.includes(error.errorCode)) {
-				return true
-			}
-
-			if (error.errorMatchers?.some((matcher) => message.includes(matcher))) {
-				return true
-			}
-
-			return error.matches?.(message) ?? false
-		}) ?? null
-	)
 }

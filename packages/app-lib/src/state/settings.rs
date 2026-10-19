@@ -1,5 +1,6 @@
 //! Theseus settings file
 
+use anyhow::bail;
 use serde::{Deserialize, Serialize};
 use sqlx::{Pool, Sqlite};
 use std::collections::HashMap;
@@ -425,12 +426,7 @@ impl Settings {
 
                 self.version = 3;
             }
-            version => {
-                return Err(crate::ErrorKind::OtherError(format!(
-                    "Invalid settings version: {version}"
-                ))
-                .into());
-            }
+            version => bail!("invalid settings version {version}"),
         }
 
         Ok(())

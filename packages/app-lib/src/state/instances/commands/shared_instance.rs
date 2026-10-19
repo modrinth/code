@@ -16,9 +16,9 @@ pub(crate) async fn attach_shared_instance(
     let metadata =
         instance_rows::get_instance_metadata_by_id(instance_id, pool)
             .await?
-            .ok_or_else(|| {
-                crate::ErrorKind::InputError("Unknown instance".to_string())
-            })?;
+            .ok_or(crate::ErrorKind::InputError(
+                "unknown instance".to_string(),
+            ))?;
     let content_set_id = metadata.applied_content_set.id;
     let attachment = SharedInstanceAttachment::from(input);
     let sync_state =
@@ -115,9 +115,9 @@ pub(crate) async fn set_shared_instance_sync_status(
     let metadata =
         instance_rows::get_instance_metadata_by_id(instance_id, pool)
             .await?
-            .ok_or_else(|| {
-                crate::ErrorKind::InputError("Unknown instance".to_string())
-            })?;
+            .ok_or(crate::ErrorKind::InputError(
+                "unknown instance".to_string(),
+            ))?;
     let Some(mut attachment) = metadata.shared_instance else {
         return Ok(());
     };
