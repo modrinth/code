@@ -213,18 +213,20 @@ pub async fn is_team_member_version(
 pub async fn filter_visible_versions(
     mut versions: Vec<VersionQueryResult>,
     user_option: &Option<User>,
-    pool: &PgPool,
     ro_pool: &ReadOnlyPgPool,
     redis: &RedisPool,
 ) -> Result<Vec<crate::models::projects::Version>, ApiError> {
     let filtered_version_ids = filter_visible_version_ids(
         versions.iter().map(|x| &x.inner).collect_vec(),
         user_option,
-        pool,
+        ro_pool,
         redis,
     )
     .await
     .wrap_api_err("filtering visible version ids")?;
+    let filtered_version_ids = filtered_version_ids
+        .into_iter()
+        .collect::<std::collections::HashSet<_>>();
     versions.retain(|x| filtered_version_ids.contains(&x.inner.id));
 
     let missing = get_files_missing_attribution(

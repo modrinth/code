@@ -129,7 +129,7 @@
     "message": "Mostra istanza"
   },
   "app.action-bar.view-logs": {
-    "message": "Mostra i log"
+    "message": "Mostra il registro"
   },
   "app.ads-consent.accept": {
     "message": "Accetta tutto"
@@ -301,6 +301,18 @@
   },
   "app.content.sync-resource-packs-disabled": {
     "message": "Attiva prima la sincronizzazione dei pacchetti di risorse nelle impostazioni."
+  },
+  "app.debug-export.canceling": {
+    "message": "Annullamento esportazione…"
+  },
+  "app.debug-export.exporting": {
+    "message": "Esportazione…"
+  },
+  "app.debug-export.finishing": {
+    "message": "Finalizzazione…"
+  },
+  "app.debug-export.preparing": {
+    "message": "Preparazione file…"
   },
   "app.download-manager.active": {
     "message": "Attivi"
@@ -597,7 +609,7 @@
     "message": "Il server potrebbe non essere compatibile con tutte le istanze."
   },
   "app.instance.add-server.search-placeholder": {
-    "message": "Cerca tra le istanze"
+    "message": "Cerca una istanza"
   },
   "app.instance.add-server.title": {
     "message": "Aggiungi server all'istanza"
@@ -1074,7 +1086,7 @@
     "message": "Nessuna istanza trovata"
   },
   "app.library.group.instances-modal.search-placeholder": {
-    "message": "Cerca tra le istanze"
+    "message": "Cerca istanza"
   },
   "app.library.group.instances-modal.title": {
     "message": "Aggiungi istanze a \"{groupName}\""
@@ -1110,7 +1122,7 @@
     "message": "Impossibile rinominare il gruppo"
   },
   "app.library.group.search-instance": {
-    "message": "Cerca tra le istanze"
+    "message": "Cerca istanza"
   },
   "app.library.group.ungrouped": {
     "message": "Senza gruppo"
@@ -1204,6 +1216,9 @@
   },
   "app.library.selection.remove-from-group": {
     "message": "Rimuovi dal gruppo"
+  },
+  "app.library.selection.selected-count": {
+    "message": "Selezionate: {count}"
   },
   "app.library.sort.date-created": {
     "message": "Data di creazione"
@@ -1601,6 +1616,9 @@
   "app.screenshots.selection.remove-from-group": {
     "message": "Rimuovi dal gruppo"
   },
+  "app.screenshots.selection.selected-count": {
+    "message": "Selezionate: {count}"
+  },
   "app.screenshots.selection.zip-archive": {
     "message": "Archivio ZIP"
   },
@@ -1646,9 +1664,6 @@
   "app.settings.default-instance-options.height.title": {
     "message": "Altezza"
   },
-  "app.settings.default-instance-options.java-and-memory.title": {
-    "message": "Java e memoria"
-  },
   "app.settings.default-instance-options.java-arguments.description": {
     "message": "Gli argomenti passati a Java all'avvio di un'istanza."
   },
@@ -1657,9 +1672,6 @@
   },
   "app.settings.default-instance-options.java-arguments.title": {
     "message": "Argomenti Java"
-  },
-  "app.settings.default-instance-options.launch-hooks.title": {
-    "message": "Hook di avvio"
   },
   "app.settings.default-instance-options.memory-allocation.description": {
     "message": "La memoria massima accessibile a ciascuna istanza."
@@ -1693,9 +1705,6 @@
   },
   "app.settings.default-instance-options.width.title": {
     "message": "Larghezza"
-  },
-  "app.settings.default-instance-options.window.title": {
-    "message": "Finestra"
   },
   "app.settings.default-instance-options.wrapper-hook.description": {
     "message": "Comando utilizzato per avvolgere il processo di avvio di Minecraft."
@@ -2753,14 +2762,8 @@
   "app.settings.resource-management.app-cache.confirm.description": {
     "message": "L'app potrebbe caricarsi più lentamente finché la cache non sarà ripristinata."
   },
-  "app.settings.resource-management.app-cache.confirm.title": {
-    "message": "Eliminare la cache?"
-  },
   "app.settings.resource-management.app-cache.description": {
     "message": "Elimina la cache e riscarica tutto da Modrinth. L'app potrebbe caricarsi più lentamente finché la cache non sarà ripristinata."
-  },
-  "app.settings.resource-management.app-cache.purge": {
-    "message": "Elimina cache"
   },
   "app.settings.resource-management.app-cache.title": {
     "message": "Cache dell'app"
@@ -2785,6 +2788,15 @@
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "Cartella dell'app"
+  },
+  "app.settings.resource-management.debug-info.description": {
+    "message": "Esporta i registri e i dati diagnostici dell'app in un file ZIP da condividere con l'assistenza di Modrinth."
+  },
+  "app.settings.resource-management.debug-info.export": {
+    "message": "Esporta info di debug"
+  },
+  "app.settings.resource-management.debug-info.title": {
+    "message": "Info di debug"
   },
   "app.settings.resource-management.maximum-concurrent-downloads.description": {
     "message": "Il numero di file che l'app può scaricare contemporaneamente. Decrementa se i download risultano instabili sulla tua connessione. Richiede un riavvio."
@@ -2828,9 +2840,6 @@
   "app.settings.resource-management.store.description": {
     "message": "Risparmia spazio riutilizzando le installazioni, le mod e i pacchetti tra le istanze."
   },
-  "app.settings.resource-management.store.empty": {
-    "message": "Installa delle mod o dei pacchetti per vedere l'utilizzo di archiviazione qui."
-  },
   "app.settings.resource-management.store.issues": {
     "message": "Mostra {count, plural, one {# problema} other {# problemi}}"
   },
@@ -2869,9 +2878,6 @@
   },
   "app.settings.resource-management.store.verified": {
     "message": "Verifica completata"
-  },
-  "app.settings.sidebar.label.instances": {
-    "message": "Istanze"
   },
   "app.settings.synced-options.choose-sync-source.command-history-description": {
     "message": "Scegli da quale istanza copiare la cronologia comandi. Sarà usata solo per la sincronizzazione iniziale, poi potrai modificarla in qualsiasi istanza."
@@ -2916,7 +2922,7 @@
     "message": "Riprova"
   },
   "app.settings.synced-options.choose-sync-source.search-placeholder": {
-    "message": "Cerca tra le istanze"
+    "message": "Cerca istanza"
   },
   "app.settings.synced-options.choose-sync-source.sync": {
     "message": "Sincronizza"
@@ -3000,7 +3006,7 @@
     "message": "Salva"
   },
   "app.settings.synced-options.game-settings.search": {
-    "message": "Cerca un'impostazione..."
+    "message": "Cerca impostazioni..."
   },
   "app.settings.synced-options.game-settings.sync-description": {
     "message": "Le impostazioni sincronizzate sono applicate a ogni istanza e sovrascrivono i valori inclusi con un pacchetto di mod."
@@ -3113,12 +3119,6 @@
   "app.settings.tabs.privacy": {
     "message": "Privacy"
   },
-  "app.settings.tabs.resource-management": {
-    "message": "Gestione delle risorse"
-  },
-  "app.settings.tabs.synced-options": {
-    "message": "Impostazioni sincronizzate"
-  },
   "app.sidebar.playing-as": {
     "message": "Accesso effettuato come"
   },
@@ -3228,7 +3228,7 @@
     "message": "L'ordine delle skin non è stato salvato."
   },
   "app.skins.reorder-error.title": {
-    "message": "Errore nel riordine delle skin"
+    "message": "Impossibile riordinare le skin"
   },
   "app.skins.section.builders-and-biomes": {
     "message": "Builders & Biomes"
@@ -3405,7 +3405,7 @@
     "message": "Puoi rimuoverlo da solo questa istanza o da tutte quelle sincronizzate. Rimuovere da solo questa istanza abiliterà le sovrascritture, e non sincronizzerà più i contenuti selezionati con le altre istanze."
   },
   "app.synced-content.delete.resource-pack-description": {
-    "message": "Puoi {count, plural, one {rimuoverlo} other {rimuoverli}} solo da questa istanza o da tutte le sincronizzate. da solo questa istanza abiliterà le sovrascritture, e non sincronizzerà più i pacchetti di risorse con le altre istanze."
+    "message": "Puoi {count, plural, one {rimuoverlo} other {rimuoverli}} solo da questa istanza o da tutte le sincronizzate. {count, plural, one {Rimuoverlo} other {Rimuoverli}} da solo questa istanza abiliterà le sovrascritture e non sincronizzerà più i pacchetti di risorse con le altre istanze."
   },
   "app.synced-content.delete.resource-pack-header": {
     "message": "{count, plural, one {Il pacchetto di risorse è sincronizzato} other {I pacchetti di risorse sono sincronizzati}}"
@@ -3600,7 +3600,7 @@
     "message": "Nessuna amicizia trovata per ''{query}''"
   },
   "friends.search-friends-placeholder": {
-    "message": "Cerca un'amicizia..."
+    "message": "Cerca amicizie..."
   },
   "friends.section.heading": {
     "message": "{title} - {count}"
@@ -4115,9 +4115,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Seleziona il canale di aggiornamento"
   },
-  "instance.settings.tabs.hooks.description": {
-    "message": "Esegui dei comandi di sistema specifici per questa istanza prima e dopo l'avvio del gioco."
-  },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Post-uscita"
   },
@@ -4178,18 +4175,6 @@
   "instance.settings.tabs.installation.locked": {
     "message": "Le impostazioni non sono disponibili mentre l'istanza è bloccata."
   },
-  "instance.settings.tabs.java.custom-environment-variables": {
-    "message": "Imposta delle variabili d'ambiente separate per questa istanza."
-  },
-  "instance.settings.tabs.java.custom-java-arguments": {
-    "message": "Imposta degli argomenti Java separati per questa istanza."
-  },
-  "instance.settings.tabs.java.custom-java-installation": {
-    "message": "Scegli una installazione di Java diversa per l'istanza."
-  },
-  "instance.settings.tabs.java.custom-memory-allocation": {
-    "message": "Imposta dell'allocazione della memoria separata per questa istanza."
-  },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Inserisci le variabili d'ambiente..."
   },
@@ -4213,9 +4198,6 @@
   },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/percorso/di/java"
-  },
-  "instance.settings.tabs.settings-overrides": {
-    "message": "Sovrascritture"
   },
   "instance.settings.tabs.sharing": {
     "message": "Condivisione"
@@ -4279,9 +4261,6 @@
   },
   "instance.settings.tabs.window": {
     "message": "Impostazioni della finestra personalizzate"
-  },
-  "instance.settings.tabs.window.custom-window-settings": {
-    "message": "Configura la risoluzione d'avvio e schermo intero separate per questa istanza."
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Schermo intero"

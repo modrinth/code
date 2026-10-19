@@ -1,6 +1,4 @@
-use super::apply_content_install::{
-    ContentScope, require_stopped_for_content, upsert_entry_for_file,
-};
+use super::apply_content_install::{ContentScope, upsert_entry_for_file};
 use crate::state::content_store::{
     FileChangeRequest, FileContent, InstanceFileStatus, StoredFileHandle,
     content_file_path, input,
@@ -223,12 +221,6 @@ impl<'a> InstanceContent<'a> {
         request: InstallContent<'_>,
     ) -> crate::Result<PendingContentChange> {
         self.content_scope()?;
-        require_stopped_for_content(
-            &self.instance.id,
-            request.project_type,
-            self.state,
-        )
-        .await?;
         let relative_path = canonical_content_path(request.requested_path);
         if !crate::state::content_store::is_managed_content_path(relative_path)
         {
@@ -355,15 +347,8 @@ impl<'a> InstanceContent<'a> {
                 "Content file is not registered; refresh the Content tab first",
             )
         })?;
-        let project_type =
-            super::sync_content_files::project_type_for_file(&file)
-                .ok_or_else(|| input("Unsupported content type"))?;
-        require_stopped_for_content(
-            &self.instance.id,
-            project_type,
-            self.state,
-        )
-        .await?;
+        super::sync_content_files::project_type_for_file(&file)
+            .ok_or_else(|| input("Unsupported content type"))?;
         let enabled = desired_enabled.unwrap_or(!file.enabled);
         file.missing = false;
         let file_change = match self
@@ -502,14 +487,8 @@ impl<'a> InstanceContent<'a> {
     ) -> crate::Result<PendingContentChange> {
         self.content_scope()?;
         let canonical_path = canonical_content_path(project_path);
-        let project_type = ProjectType::get_from_parent_folder(canonical_path)
+        ProjectType::get_from_parent_folder(canonical_path)
             .ok_or_else(|| input("Unsupported content type"))?;
-        require_stopped_for_content(
-            &self.instance.id,
-            project_type,
-            self.state,
-        )
-        .await?;
         let mut file = content_rows::get_instance_file_by_relative_path(
             &self.instance.id,
             project_path,

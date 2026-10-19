@@ -7,6 +7,7 @@ pub mod common;
 
 // Such V2 tests are exported here
 mod v2 {
+    mod bulk_project_versions;
     mod error;
     mod notifications;
     mod project;

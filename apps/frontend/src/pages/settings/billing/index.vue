@@ -1126,7 +1126,7 @@ const price = computed(() =>
 const primaryPaymentMethodId = computed(() => {
 	if (customer.value?.invoice_settings?.default_payment_method) {
 		return customer.value.invoice_settings.default_payment_method
-	} else if (paymentMethods.value?.[0]?.id) {
+	} else if (paymentMethods.value?.length === 1) {
 		return paymentMethods.value[0].id
 	} else {
 		return null

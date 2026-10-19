@@ -75,6 +75,7 @@ export abstract class XHRUploadClient extends AbstractModrinthClient {
 				return result
 			})().catch(async (error) => {
 				const apiError = this.normalizeError(error, context)
+				apiError.url ??= context?.url
 				if (context) {
 					await this.config.hooks?.onError?.(apiError, context)
 				}

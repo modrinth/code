@@ -1,5 +1,5 @@
 const DB_NAME = 'modrinth-moderation'
-const DB_VERSION = 2
+const DB_VERSION = 3
 
 function hasIndexedDb(): boolean {
 	return typeof window !== 'undefined' && typeof indexedDB !== 'undefined'
@@ -14,8 +14,8 @@ function openDatabase(): Promise<IDBDatabase> {
 			if (event.oldVersion < 2 && db.objectStoreNames.contains('kv')) {
 				db.deleteObjectStore('kv')
 			}
-			if (!db.objectStoreNames.contains('checklist')) {
-				db.createObjectStore('checklist')
+			if (db.objectStoreNames.contains('checklist')) {
+				db.deleteObjectStore('checklist')
 			}
 			if (!db.objectStoreNames.contains('queue')) {
 				db.createObjectStore('queue')
@@ -72,22 +72,6 @@ export async function dbDelete(store: string, key: IDBValidKey): Promise<void> {
 			tx.oncomplete = () => resolve()
 			tx.onerror = () => reject(tx.error ?? new Error('IndexedDB transaction failed'))
 		})
-	} finally {
-		db.close()
-	}
-}
-
-export async function dbScan<T>(store: string): Promise<{ key: IDBValidKey; value: T }[]> {
-	if (!hasIndexedDb()) return []
-	const db = await openDatabase()
-	try {
-		const tx = db.transaction(store, 'readonly')
-		const s = tx.objectStore(store)
-		const [keys, values] = await Promise.all([
-			requestToPromise(s.getAllKeys()),
-			requestToPromise(s.getAll()),
-		])
-		return keys.map((key, i) => ({ key, value: values[i] as T }))
 	} finally {
 		db.close()
 	}

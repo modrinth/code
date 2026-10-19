@@ -225,7 +225,7 @@
     "defaultMessage": "Скрыть снапшоты"
   },
   "button.i-understand": {
-    "defaultMessage": "Всё понятно"
+    "defaultMessage": "Я понимаю"
   },
   "button.install": {
     "defaultMessage": "Установить"
@@ -1985,6 +1985,15 @@
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Сервер сброшен до первого запуска"
   },
+  "hosting.save-banner.resolve-errors": {
+    "defaultMessage": "Пожалуйста, исправьте ошибки в ваших изменениях перед сохранением."
+  },
+  "hosting.settings.properties.motd-profanity": {
+    "defaultMessage": "В связи с Правилами использования MInecraft, MOTD вашего сервера не может содержать ненормативную лексику. Обнаружено: “{value}”."
+  },
+  "hosting.settings.properties.motd-profanity-save-error": {
+    "defaultMessage": "В связи с Правилами использования MInecraft, MOTD вашего сервера не может содержать ненормативную лексику. Обнаружено: “{value}”"
+  },
   "hosting.specs.burst": {
     "defaultMessage": "Рост до {cpus} CPU"
   },
@@ -2943,7 +2952,7 @@
     "defaultMessage": "Вставка видео с YouTube"
   },
   "markdown-editor.video-modal.url-field.description": {
-    "defaultMessage": "Введите корректную ссылку на видео с YouTube."
+    "defaultMessage": "Введите действительную ссылку на видео с YouTube."
   },
   "markdown-editor.video-modal.url-field.placeholder": {
     "defaultMessage": "Введите адрес видео с YouTube"
@@ -3284,6 +3293,9 @@
   "profile.error.not-found": {
     "defaultMessage": "Пользователь не найден"
   },
+  "profile.force-password-reset.admonition-body": {
+    "defaultMessage": "Пароль пользователя {username} будет немедленно удален, будет выполнен выход из аккаунта на всех устройствах, а ссылка для установки нового пароля будет отправлена на указанную ниже электронную почту. Если вы измените email, он заменит текущий адрес в аккаунте. Ссылка действительна в течение 24 часов и может быть использована, даже если аккаунт заблокирован."
+  },
   "profile.force-password-reset.admonition-title": {
     "defaultMessage": "Текущий пароль перестанет работать"
   },
@@ -3353,6 +3365,9 @@
   "profile.official-account.bio": {
     "defaultMessage": "Официальный аккаунт Modrinth. Связь с поддержкой: <support-link></support-link> или по почте <email></email>"
   },
+  "profile.reset-2fa.admonition-body": {
+    "defaultMessage": "Аутентификатор и резервные коды {username} будут удалены, а пользователь получит уведомление. Выполняйте это действие только после подтверждения личности."
+  },
   "profile.reset-2fa.admonition-title": {
     "defaultMessage": "Вы действительно хотите сбросить двухфакторную аутентификацию?"
   },
@@ -3373,6 +3388,9 @@
   },
   "profile.reset-2fa.title": {
     "defaultMessage": "Сбросить двухфакторную аутентификацию для {username}"
+  },
+  "profile.revoke-sessions.admonition-body": {
+    "defaultMessage": "От имени {username} будет выполнен выход на всех устройствах и будет необходимо снова войти в систему. Персональные токены доступа не будут затронуты."
   },
   "profile.revoke-sessions.admonition-title": {
     "defaultMessage": "Вы уверены, что хотите отозвать все сессии?"
@@ -4637,6 +4655,9 @@
   "servers.access-page.activity-log-filter.action.server-stopped": {
     "defaultMessage": "Остановка сервера"
   },
+  "servers.access-page.activity-log-filter.action.sftp-credentials-rolled": {
+    "defaultMessage": "Обновление учётных данных SFTP"
+  },
   "servers.access-page.activity-log-filter.action.sftp-login": {
     "defaultMessage": "Вход через SFTP"
   },
@@ -5018,6 +5039,9 @@
   "servers.audit-log.event.server-subdomain-changed": {
     "defaultMessage": "Изменён поддомен сервера на <subdomain></subdomain>"
   },
+  "servers.audit-log.event.sftp-credentials-rolled": {
+    "defaultMessage": "Учетные данные SFTP были обновлены"
+  },
   "servers.audit-log.event.sftp-login": {
     "defaultMessage": "Выполнен вход через SFTP"
   },
@@ -5224,6 +5248,9 @@
   },
   "servers.download.unavailable.title": {
     "defaultMessage": "Скачивание недоступно"
+  },
+  "servers.files.server-locked": {
+    "defaultMessage": "Этот сервер заблокирован и его файлы теперь доступны только для чтения."
   },
   "servers.files.zip-created": {
     "defaultMessage": "Архив создан"
@@ -5441,6 +5468,36 @@
   "servers.listing.using-project-label": {
     "defaultMessage": "Используется {projectTitle}"
   },
+  "servers.lock.modal.error-text": {
+    "defaultMessage": "Произошла ошибка при блокировке этого сервера. Пожалуйста, попробуйте еще раз."
+  },
+  "servers.lock.modal.error-title": {
+    "defaultMessage": "Не удалось заблокировать сервер"
+  },
+  "servers.lock.modal.header": {
+    "defaultMessage": "Заблокировать {name}"
+  },
+  "servers.lock.modal.lock-button": {
+    "defaultMessage": "Заблокировать сервер"
+  },
+  "servers.lock.modal.reason-label": {
+    "defaultMessage": "Причина"
+  },
+  "servers.lock.modal.reason-placeholder": {
+    "defaultMessage": "Видно другим администраторам"
+  },
+  "servers.lock.modal.success-text": {
+    "defaultMessage": "{name} Заблокирован(а)."
+  },
+  "servers.lock.modal.success-title": {
+    "defaultMessage": "Сервер заблокирован"
+  },
+  "servers.lock.modal.warning-body": {
+    "defaultMessage": "{name} будет доступен только для чтения его владельцем и участниками до тех пор, пока не будет разблокирован администратором."
+  },
+  "servers.lock.modal.warning-header": {
+    "defaultMessage": "Этот сервер станет доступен только для чтения"
+  },
   "servers.manage.checking-for-new-servers": {
     "defaultMessage": "Проверка наличия новых серверов..."
   },
@@ -5477,6 +5534,21 @@
   "servers.manage.handle-error.title": {
     "defaultMessage": "Произошла ошибка"
   },
+  "servers.manage.lock-server": {
+    "defaultMessage": "Заблокировать сервер"
+  },
+  "servers.manage.locked.badge": {
+    "defaultMessage": "Заблокирован"
+  },
+  "servers.manage.locked.badge-tooltip": {
+    "defaultMessage": "Заблокировано с {date}"
+  },
+  "servers.manage.locked.body": {
+    "defaultMessage": "Поддержка временно заблокировала этот сервер, поэтому вы не можете вносить изменения. <support-link>Обратитесь в службу поддержки</support-link>, если считаете, что это ошибка."
+  },
+  "servers.manage.locked.header": {
+    "defaultMessage": "Сервер заблокирован службой поддержки"
+  },
   "servers.manage.new-server-button": {
     "defaultMessage": "Новый сервер"
   },
@@ -5511,7 +5583,7 @@
     "defaultMessage": "Запрос на возобновление подписки отправлен"
   },
   "servers.manage.resubscribe-success.text": {
-    "defaultMessage": "Подписка на сервер успешно возобновлена"
+    "defaultMessage": "Подписка на сервер возобновлена"
   },
   "servers.manage.resubscribe-success.title": {
     "defaultMessage": "Готово"
@@ -5533,6 +5605,21 @@
   },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Совместные серверы"
+  },
+  "servers.manage.unlock-server": {
+    "defaultMessage": "Разблокировать сервер"
+  },
+  "servers.manage.unlock.error-text": {
+    "defaultMessage": "Произошла ошибка при разблокировке сервера. Пожалуйста, попробуйте еще раз."
+  },
+  "servers.manage.unlock.error-title": {
+    "defaultMessage": "Не удалось разблокировать сервер"
+  },
+  "servers.manage.unlock.success-text": {
+    "defaultMessage": "{name} Был разблокирован."
+  },
+  "servers.manage.unlock.success-title": {
+    "defaultMessage": "Сервер разблокирован"
   },
   "servers.manage.your-servers-title": {
     "defaultMessage": "Личные серверы"
@@ -5764,6 +5851,27 @@
   },
   "servers.settings.advanced.sftp.roll-credentials-success-title": {
     "defaultMessage": "Учётные данные SFTP обновлены"
+  },
+  "servers.settings.support.action-log-title": {
+    "defaultMessage": "Журнал действий"
+  },
+  "servers.settings.support.clear-action-log-button": {
+    "defaultMessage": "Очистить журнал действий"
+  },
+  "servers.settings.support.clear-action-log-confirmation": {
+    "defaultMessage": "Это навсегда удалит все записи журнала действий для этого сервера. Продолжить?"
+  },
+  "servers.settings.support.clear-action-log-description": {
+    "defaultMessage": "Удалить все записи журнала действий для этого сервера."
+  },
+  "servers.settings.support.clear-action-log-error": {
+    "defaultMessage": "Не удалось очистить журнал действий"
+  },
+  "servers.settings.support.clear-action-log-success": {
+    "defaultMessage": "Журнал действий очищен"
+  },
+  "servers.settings.support.clear-action-log-title": {
+    "defaultMessage": "Очистить журнал действий?"
   },
   "servers.setup.onboarding.installation-failed.text": {
     "defaultMessage": "Произошла непредвиденная ошибка во время установки. Пожалуйста, попробуйте позже."

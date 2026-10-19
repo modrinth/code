@@ -21,6 +21,7 @@ import Toolbar from './toolbar.vue'
 import type {
 	ImageViewerEditorData,
 	ImageViewerEditorItem,
+	ImageViewerEditorMetadata,
 	ImageViewerEditorSavePayload,
 } from './types'
 import { useImageEditor } from './use-image-editor'
@@ -35,6 +36,7 @@ const props = defineProps<{
 	index: number
 	count: number
 	canEdit: boolean
+	pixelated: boolean
 	saving: boolean
 	loadData: (item: ImageViewerEditorItem) => Promise<ImageViewerEditorData>
 }>()
@@ -54,6 +56,7 @@ const fitBounds = ref<HTMLElement>()
 const exporting = ref(false)
 const discarding = ref(false)
 const loadingEditorData = ref(true)
+const imageMetadata = ref<ImageViewerEditorMetadata>()
 const spacePressed = ref(false)
 const panning = ref<{
 	x: number
@@ -111,7 +114,7 @@ const canViewZoomIn = computed(() => canZoomIn.value && viewZoom.value < MAX_VIE
 const nativeImageView = computed(
 	() =>
 		props.mode === 'view' &&
-		[props.item.src, props.item.editorSource?.path].some(isGifOrWebpSource),
+		(props.pixelated || [props.item.src, props.item.editorSource?.path].some(isGifOrWebpSource)),
 )
 
 let resizeObserver: ResizeObserver | undefined
@@ -137,14 +140,20 @@ function isGifOrWebpSource(source?: string) {
 function queueInitialization() {
 	const generation = ++initializationGeneration
 	loadingEditorData.value = true
+	imageMetadata.value = undefined
 	const editorDataPromise = props.loadData(props.item)
 	initializationChain = initializationChain.then(async () => {
 		if (generation !== initializationGeneration) return
 		try {
 			const editorData = await editorDataPromise
 			if (generation !== initializationGeneration || !canvasElement.value) return
-			await initialize(canvasElement.value, editorData, getViewportSize())
+			const dimensions = await initialize(canvasElement.value, editorData, getViewportSize())
 			if (generation !== initializationGeneration) return
+			imageMetadata.value = {
+				...dimensions,
+				size: editorData.source.size,
+				mimeType: editorData.source.type,
+			}
 			setInteractionEnabled(props.mode === 'edit')
 			observeViewport()
 			await waitForRender()
@@ -388,6 +397,7 @@ defineExpose({ markSaved })
 		class="editor-viewport absolute inset-0 flex min-h-0 min-w-0 select-none overflow-auto px-6 pb-[5.75rem] pt-[4.75rem] max-[900px]:px-4 max-[900px]:pb-[8.5rem] max-[900px]:pt-[4.5rem]"
 		:class="{
 			'is-view': mode === 'view',
+			'is-pixelated': mode === 'view' && pixelated,
 			'is-view-zoomed': mode === 'view' && viewZoomed,
 			'is-panning': panning,
 			'is-pan-ready': mode === 'edit' && spacePressed && !panning,
@@ -513,7 +523,7 @@ defineExpose({ markSaved })
 			<EditIcon aria-hidden="true" />
 		</IconButton>
 		<div class="flex items-center gap-2">
-			<slot name="actions" />
+			<slot name="actions" :metadata="imageMetadata" />
 		</div>
 		<div class="h-6 w-px bg-white/10" />
 		<IconButton :label="formatMessage(messages.close)" type="quiet" @click="emit('close')">
@@ -523,6 +533,10 @@ defineExpose({ markSaved })
 </template>
 
 <style scoped>
+.editor-viewport.is-pixelated img {
+	image-rendering: pixelated;
+}
+
 .editor-viewport {
 	scrollbar-width: none;
 

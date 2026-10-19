@@ -1,0 +1,126 @@
+<template>
+	<div ref="interactionScope" class="flex h-full min-h-0 flex-col gap-2.5 overflow-hidden p-2">
+		<ReviewPanel
+			mode="inline"
+			:target="{ kind: 'gallery' }"
+			hide-title
+			:disabled="isLoading || !!error"
+			:interaction-scope="interactionScope"
+			class="shrink-0"
+		/>
+		<div class="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+			<p v-if="!selection" class="m-0 text-secondary">
+				{{ formatMessage(messages.empty) }}
+			</p>
+			<p v-else-if="isLoading" role="status" class="m-0">
+				{{ formatMessage(messages.loading) }}
+			</p>
+			<div v-else-if="error" role="alert">
+				<p class="m-0">{{ formatMessage(messages.loadError) }}</p>
+				<Button @click="refresh">{{ formatMessage(messages.retry) }}</Button>
+			</div>
+			<p v-else-if="!gallery.length" class="m-0 text-secondary">
+				{{ formatMessage(messages.emptyGallery) }}
+			</p>
+			<div v-else class="gallery-grid">
+				<ReviewPanel
+					v-for="(item, index) in gallery"
+					:key="item.id ?? item.url"
+					mode="anchored"
+					:target="{ kind: 'gallery-image', key: imageReviewKey(item) ?? '' }"
+					:disabled="imageReviewKey(item) === undefined"
+					as="article"
+					class="flex min-w-0 flex-col overflow-hidden rounded-xl border border-solid border-surface-4"
+				>
+					<button
+						type="button"
+						class="cursor-zoom-in border-0 p-0"
+						:aria-label="formatMessage(messages.openImage, { number: index + 1 })"
+						@click="viewer?.show(index)"
+					>
+						<img
+							:src="item.raw_url || item.url"
+							:alt="item.name || formatMessage(messages.imageNumber, { number: index + 1 })"
+							class="aspect-video w-full object-contain"
+							loading="lazy"
+						/>
+					</button>
+					<div class="flex flex-1 flex-col gap-2 p-3">
+						<div class="flex flex-wrap justify-between gap-2 text-sm text-secondary">
+							<span>{{ formatMessage(messages.imageNumber, { number: index + 1 }) }}</span>
+							<span v-if="item.featured" class="text-brand">{{
+								formatMessage(messages.featured)
+							}}</span>
+						</div>
+						<h3 v-if="item.name" class="m-0 break-words text-lg font-semibold text-contrast">
+							{{ item.name }}
+						</h3>
+						<p v-if="item.description" class="m-0 whitespace-pre-wrap break-words">
+							{{ item.description }}
+						</p>
+						<time :datetime="item.created" class="mt-auto pt-2 text-sm text-secondary">{{
+							formatMessage(messages.uploaded, {
+								date: formatDateTime(item.created),
+							})
+						}}</time>
+					</div>
+				</ReviewPanel>
+			</div>
+		</div>
+		<ImageViewerEditor
+			:key="projectId"
+			ref="viewer"
+			:items="viewerItems"
+			editor="disabled"
+			:pixelated="pixelated"
+		>
+			<template #actions="{ item, metadata }">
+				<ImageViewerActions v-model:pixelated="pixelated" :src="item.src" :metadata="metadata" />
+			</template>
+		</ImageViewerEditor>
+	</div>
+</template>
+
+<script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
+import { galleryImageReviewKey } from '@modrinth/moderation/src/data/issues/component-builders/gallery-images'
+import { Button, ImageViewerEditor, useFormatDateTime, useVIntl } from '@modrinth/ui'
+import { computed, ref, useTemplateRef } from 'vue'
+
+import { injectProjectReviewPageContext } from '~/providers/project-review'
+import { injectReviewSubmission } from '~/providers/project-review/review-submission'
+
+import ImageViewerActions from '../image-viewer-actions.vue'
+import { projectReviewMessages as messages } from '../messages'
+import ReviewPanel from '../review-panel/index.vue'
+
+const { formatMessage } = useVIntl()
+const interactionScope = useTemplateRef<HTMLElement>('interactionScope')
+const formatDateTime = useFormatDateTime({
+	dateStyle: 'long',
+	timeStyle: 'short',
+})
+const { selection, projectId, gallery, isLoading, error, refresh, pixelated } =
+	injectProjectReviewPageContext()
+const { sendIssuesAsThreadMessage } = injectReviewSubmission()
+const imageReviewKey = (image: Labrinth.Projects.v3.GalleryItem) =>
+	galleryImageReviewKey(image, sendIssuesAsThreadMessage.value)
+const viewer = ref<InstanceType<typeof ImageViewerEditor>>()
+const viewerItems = computed(() =>
+	gallery.value.map((item, index) => ({
+		id: item.url,
+		src: item.raw_url || item.url,
+		alt: item.name || formatMessage(messages.imageNumber, { number: index + 1 }),
+		title: item.name,
+		description: item.description,
+	})),
+)
+</script>
+
+<style scoped>
+.gallery-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+	gap: 1rem;
+}
+</style>

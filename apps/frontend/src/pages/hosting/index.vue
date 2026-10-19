@@ -75,7 +75,7 @@
 				class="top-70 absolute left-[55%] z-[5] hidden h-full max-h-[calc(100vh-25rem)] w-full xl:block"
 			>
 				<img
-					src="https://cdn-raw.modrinth.com/hosting-landing/hosting-panel.webp"
+					src="https://cdn.modrinth.com/hosting-landing/hosting-panel.webp"
 					alt=""
 					aria-hidden="true"
 					class="pointer-events-none h-full w-auto select-none"
@@ -163,7 +163,7 @@
 				</div>
 				<div class="relative">
 					<img
-						src="https://cdn-raw.modrinth.com/hosting-landing/hosting-content.webp"
+						src="https://cdn.modrinth.com/hosting-landing/hosting-content.webp"
 						alt=""
 						class="hidden w-full rounded-2xl sm:block"
 					/>
@@ -333,7 +333,7 @@
 						</div>
 
 						<img
-							src="https://cdn-raw.modrinth.com/hosting-landing/hosting-files.webp"
+							src="https://cdn.modrinth.com/hosting-landing/hosting-files.webp"
 							alt=""
 							class="ml-6"
 						/>
@@ -542,9 +542,6 @@
 					</template>
 					<span v-else></span>
 				</div>
-
-				<MedalPlanPromotion v-if="flags.enableMedalPromotion" />
-
 				<ul class="m-0 flex w-full grid-cols-3 flex-col gap-8 p-0 lg:grid">
 					<ServerPlanSelector
 						:capacity="capacityStatuses?.small?.available"
@@ -654,7 +651,6 @@ import { monthsInInterval } from '@modrinth/ui/src/utils/billing.ts'
 import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
-import MedalPlanPromotion from '~/components/ui/servers/marketing/MedalPlanPromotion.vue'
 import ServerPlanSelector from '~/components/ui/servers/marketing/ServerPlanSelector.vue'
 import { products } from '~/generated/state.json'
 
@@ -682,7 +678,6 @@ if (affiliateCode.value) {
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const formatPrice = useFormatPrice()
-const flags = useFeatureFlags()
 
 const messages = defineMessages({
 	errorFetchingPaymentDataTitle: {

@@ -1181,9 +1181,6 @@
   "error.generic.default.list_item.1": {
     "message": "Tingnan if wala ba ang Modrinth sa ngayon gamit ang aming <status-link>Status page</status-link>."
   },
-  "error.generic.default.list_item.2": {
-    "message": "Kung mangyayari pa ito muli, mangyaring ipaalam sa Modrinth Team sa pagsali sa aming <discord-link>Discord server</discord-link>."
-  },
   "error.generic.default.list_title": {
     "message": "Mangyaring subukan muli sa iilang minuto."
   },
@@ -2224,9 +2221,6 @@
   },
   "project.actions.dont-show-again": {
     "message": "Huwag ipakita muli"
-  },
-  "project.actions.review-project": {
-    "message": "Suriin ang proyekto"
   },
   "project.actions.servers-promo.description": {
     "message": "Ang Modrinth Hosting ang pinakamadaling paraang makapaglaro sa iyong mga kalaro ng walang kahadlangan!"

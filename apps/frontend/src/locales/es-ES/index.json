@@ -899,17 +899,11 @@
   "auth.sign-in.launcher.callback.title": {
     "message": "Inicio de sesión de Modrinth App"
   },
-  "auth.sign-in.launcher.complete.description": {
-    "message": "Te estamos devolviendo a la aplicación Modrinth. Si nada sucede, usa el botón de abajo."
-  },
   "auth.sign-in.launcher.complete.go-to-website": {
     "message": "Ir a Modrinth.com"
   },
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Abrir la aplicación Modrinth"
-  },
-  "auth.sign-in.launcher.complete.title": {
-    "message": "Ha iniciado sesión"
   },
   "auth.sign-in.launcher.opening.description": {
     "message": "Si la aplicación no abre, utilice el botón de abajo para terminar de iniciar sesión."
@@ -1067,9 +1061,6 @@
   "conversation-thread.action.approve": {
     "message": "Aprobar"
   },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Aprobar con respuesta"
-  },
   "conversation-thread.action.close-report": {
     "message": "Cerrar informe"
   },
@@ -1078,9 +1069,6 @@
   },
   "conversation-thread.action.reject": {
     "message": "Rechazar"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Rechazar con respuesta"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Reabrir hilo"
@@ -1115,9 +1103,6 @@
   "conversation-thread.action.withhold": {
     "message": "Retener"
   },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Retener con respuesta"
-  },
   "conversation-thread.closed-thread.description": {
     "message": "Este hilo está cerrado y los nuevos mensajes no podrán ser enviados."
   },
@@ -1126,9 +1111,6 @@
   },
   "conversation-thread.error.reopening-report": {
     "message": "Error reabriendo reporte"
-  },
-  "conversation-thread.error.sending-message": {
-    "message": "Error al enviar el mensaje"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Responder al hilo..."
@@ -1156,9 +1138,6 @@
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "Confirmo que he respondido debidamente los comentarios de los moderadores."
-  },
-  "conversation-thread.resubmit-modal.description": {
-    "message": "Estás subiendo <project-title>{projectTitle}</project-title> para que sea revisado nuevamente por los moderadores."
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "Resubiendo para revisión"
@@ -2254,9 +2233,6 @@
   },
   "error.generic.default.list_item.1": {
     "message": "Mira si Modrinth está fuera de servicio en nuestra <status-link>página de Estado</status-link>."
-  },
-  "error.generic.default.list_item.2": {
-    "message": "Si esto sigue ocurriendo, quizá quieras informar al equipo de Modrinth uniéndote a nuestro <discord-link>servidor Discord</discord-link>."
   },
   "error.generic.default.list_title": {
     "message": "Vuelve a intentarlo dentro de unos minutos."
@@ -3416,9 +3392,6 @@
   "project-member-header.success-join": {
     "message": "Te has unido al equipo del proyecto"
   },
-  "project-moderation-nags.project-submitted-for-review": {
-    "message": "¡Tu proyecto fue enviado a revisión!"
-  },
   "project-moderation-nags.publishing-checklist": {
     "message": "Lista de verificación para la publicación"
   },
@@ -3535,9 +3508,6 @@
   },
   "project.actions.rescan-modpack": {
     "message": "Volver a escanear modpack"
-  },
-  "project.actions.review-project": {
-    "message": "Revisar proyecto"
   },
   "project.actions.servers-promo.description": {
     "message": "¡Modrinth Hosting es la forma más fácil de jugar con tus amigos sin problemas!"

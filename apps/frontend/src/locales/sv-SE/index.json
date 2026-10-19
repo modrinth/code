@@ -441,7 +441,7 @@
     "message": "N/A"
   },
   "analytics.stat.unavailable-tooltip": {
-    "message": "Statistik inte tillgängligt för aktuell fråga"
+    "message": "Statistik är otillgänglig för sökning"
   },
   "analytics.stat.views": {
     "message": "Visningar"
@@ -720,7 +720,7 @@
     "message": "Auktorisera {appName}"
   },
   "auth.authorize.error.missing-parameters": {
-    "message": "Saknar obligatoriska OAuth-frågeparametrar."
+    "message": "Saknar obligatoriska OAuth-sökparametrar."
   },
   "auth.authorize.error.no-redirect-url": {
     "message": "Ingen omdirigeringsposition hittad i respons"
@@ -872,23 +872,26 @@
   "auth.sign-in.last-sign-in": {
     "message": "Användes senast"
   },
-  "auth.sign-in.launcher.complete.description": {
-    "message": "Vi skickar tillbaka dig till Modrinth App. Om ingen händer, använd knappen nedan."
-  },
   "auth.sign-in.launcher.complete.go-to-website": {
     "message": "Gå till Modrinth.com"
   },
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Öppna Modrinth App"
   },
-  "auth.sign-in.launcher.complete.title": {
-    "message": "Du är inloggad"
+  "auth.sign-in.launcher.opening.description": {
+    "message": "Om appen inte öppnas, använd knappen nedan för att slutföra inloggningen."
   },
   "auth.sign-in.launcher.opening.title": {
     "message": "Öppnar Modrinth App..."
   },
+  "auth.sign-in.launcher.reauthenticate.title": {
+    "message": "Logga in på Modrinth App"
+  },
   "auth.sign-in.no-account": {
     "message": "Har du inget konto?"
+  },
+  "auth.sign-in.reauthenticate.use-different-account": {
+    "message": "Använd ett annat konto"
   },
   "auth.sign-in.sign-in-with": {
     "message": "Logga in på Modrinth"
@@ -1034,9 +1037,6 @@
   "conversation-thread.action.approve": {
     "message": "Godkänn"
   },
-  "conversation-thread.action.approve-with-reply": {
-    "message": "Godkänn med svar"
-  },
   "conversation-thread.action.close-report": {
     "message": "Stäng rapport"
   },
@@ -1045,9 +1045,6 @@
   },
   "conversation-thread.action.reject": {
     "message": "Avslå"
-  },
-  "conversation-thread.action.reject-with-reply": {
-    "message": "Avslå med svar"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Återuppta tråd"
@@ -1082,9 +1079,6 @@
   "conversation-thread.action.withhold": {
     "message": "Tillhandahåll"
   },
-  "conversation-thread.action.withhold-with-reply": {
-    "message": "Tillbakahåll med svar"
-  },
   "conversation-thread.closed-thread.description": {
     "message": "Den här tråden är stängd och nya meddelanden kan inte skickas."
   },
@@ -1093,9 +1087,6 @@
   },
   "conversation-thread.error.reopening-report": {
     "message": "Fel vid öppning av rapport"
-  },
-  "conversation-thread.error.sending-message": {
-    "message": "Kunde inte skicka meddelande"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Svara tråden..."
@@ -1123,9 +1114,6 @@
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "Jag bekräftar att jag ordentligt tagit itu med moderatorernas kommentarer."
-  },
-  "conversation-thread.resubmit-modal.description": {
-    "message": "Du skickar in <project-title>{projectTitle}</project-title> för att granskas igen av moderatorerna."
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "Skickar in igen för granskning"
@@ -2129,8 +2117,8 @@
   "error.generic.default.list_item.1": {
     "message": "Se om Modrinth ligger nere på vår <status-link>statussida</status-link>."
   },
-  "error.generic.default.list_item.2": {
-    "message": "Om det här fortsätter hända borde du kanske kontakta Modrinth-teamet genom vår <discord-link>Discord server</discord-link>."
+  "error.generic.default.list_item.support": {
+    "message": "Om det här fortsätter hända kan du kontakta Modrinth-teamet genom vår <support-link>support-portal</support-link>."
   },
   "error.generic.default.list_title": {
     "message": "Vänligen försök igen om några minuter."
@@ -2837,6 +2825,9 @@
   "layout.publish.email-verification-required.title": {
     "message": "E-post verifikation behövs"
   },
+  "messages.noResults": {
+    "message": "Inga resultat för din sökning!"
+  },
   "modal.shared-instance.open-in-app.benefit.join": {
     "message": "Spela samma innehåll som dina vänner"
   },
@@ -3140,9 +3131,6 @@
   "project-member-header.success-join": {
     "message": "Du har gått med i projektteamet"
   },
-  "project-moderation-nags.project-submitted-for-review": {
-    "message": "Ditt projekt har skickats in för granskning!"
-  },
   "project-moderation-nags.publishing-checklist": {
     "message": "Publicerings-checklista"
   },
@@ -3256,9 +3244,6 @@
   },
   "project.actions.rescan-modpack": {
     "message": "Skanna projekt igen"
-  },
-  "project.actions.review-project": {
-    "message": "Granska projekt"
   },
   "project.actions.servers-promo.description": {
     "message": "Modrinth Hosting är det lättaste sättet att spela med dina vänner utan svårigheter!"

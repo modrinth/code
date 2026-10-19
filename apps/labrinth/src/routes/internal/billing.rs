@@ -38,11 +38,10 @@ use std::str::FromStr;
 use stripe::{
     CreateRefund, CreateSetupIntent, CreateSetupIntentAutomaticPaymentMethods,
     CreateSetupIntentAutomaticPaymentMethodsAllowRedirects,
-    CustomerInvoiceSettings, CustomerPaymentMethodRetrieval, EventObject,
-    EventType, PaymentIntentId, PaymentMethodId, SetupIntent, UpdateCustomer,
-    Webhook, WebhookError,
+    CustomerPaymentMethodRetrieval, EventObject, EventType, PaymentIntentId,
+    PaymentMethodId, SetupIntent, Webhook, WebhookError,
 };
-use tracing::warn;
+use tracing::{error, warn};
 use xredis::RedisPool;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
@@ -1421,19 +1420,12 @@ pub async fn edit_payment_method(
     if payment_method.customer.is_some_and(|x| x.id() == customer)
         || user.role.is_admin()
     {
-        stripe::Customer::update(
+        set_default_payment_method(
             &stripe_client,
             &customer,
-            UpdateCustomer {
-                invoice_settings: Some(CustomerInvoiceSettings {
-                    default_payment_method: Some(payment_method.id.to_string()),
-                    ..Default::default()
-                }),
-                ..Default::default()
-            },
+            &payment_method.id,
         )
-        .await
-        .wrap_failed_dependency_err("communicating with payment provider")?;
+        .await?;
 
         Ok(HttpResponse::NoContent().finish())
     } else {
@@ -1525,7 +1517,10 @@ pub async fn remove_payment_method(
         }
     }
 
-    if payment_method.customer.is_some_and(|x| x.id() == customer)
+    if payment_method
+        .customer
+        .as_ref()
+        .is_some_and(|x| x.id() == customer)
         || user.role.is_admin()
     {
         stripe::PaymentMethod::detach(&stripe_client, &payment_method_id)
@@ -1533,6 +1528,22 @@ pub async fn remove_payment_method(
             .wrap_failed_dependency_err(
                 "communicating with payment provider",
             )?;
+
+        if let Some(owner_id) = payment_method.customer.map(|x| x.id())
+            && let Err(err) = promote_default_payment_method(
+                &stripe_client,
+                &owner_id,
+                &payment_method_id,
+            )
+            .await
+        {
+            error!(
+                %err,
+                customer_id = %owner_id,
+                removed_payment_method_id = %payment_method_id,
+                "Failed to promote a default payment method"
+            );
+        }
 
         Ok(HttpResponse::NoContent().finish())
     } else {
@@ -2655,25 +2666,12 @@ pub async fn stripe_webhook(
                         .invoice_settings
                         .is_none_or(|x| x.default_payment_method.is_none())
                     {
-                        stripe::Customer::update(
+                        set_default_payment_method(
                             &stripe_client,
                             &customer_id,
-                            UpdateCustomer {
-                                invoice_settings: Some(
-                                    CustomerInvoiceSettings {
-                                        default_payment_method: Some(
-                                            payment_method.id.to_string(),
-                                        ),
-                                        ..Default::default()
-                                    },
-                                ),
-                                ..Default::default()
-                            },
+                            &payment_method.id,
                         )
-                        .await
-                        .wrap_failed_dependency_err(
-                            "communicating with payment provider",
-                        )?;
+                        .await?;
                     }
                 }
             }

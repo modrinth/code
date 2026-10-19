@@ -101,6 +101,36 @@ async fn clear_persisted_process(
     }
 }
 
+/// Looks up the start time, in Unix seconds, of each listed PID that is still running.
+///
+/// Only the listed processes are refreshed, on a blocking thread, so callers holding
+/// content locks are not stalled by a full system scan.
+pub(crate) async fn running_process_start_times(
+    pids: Vec<i64>,
+) -> crate::Result<std::collections::HashMap<i64, i64>> {
+    Ok(tokio::task::spawn_blocking(move || {
+        let pids = pids
+            .into_iter()
+            .filter_map(|pid| u32::try_from(pid).ok())
+            .map(sysinfo::Pid::from_u32)
+            .collect::<Vec<_>>();
+        let mut system = sysinfo::System::new();
+        system.refresh_processes_specifics(
+            sysinfo::ProcessesToUpdate::Some(&pids),
+            false,
+            sysinfo::ProcessRefreshKind::nothing(),
+        );
+        pids.iter()
+            .filter_map(|pid| {
+                system.process(*pid).map(|process| {
+                    (i64::from(pid.as_u32()), process.start_time() as i64)
+                })
+            })
+            .collect()
+    })
+    .await?)
+}
+
 pub(crate) async fn instance_has_running_process(
     instance_id: &str,
     state: &crate::State,
@@ -127,14 +157,14 @@ pub(crate) async fn instance_has_running_process(
     if processes.is_empty() {
         return Ok(false);
     }
-    let system = sysinfo::System::new_all();
+    let start_times = running_process_start_times(
+        processes.iter().map(|process| process.pid).collect(),
+    )
+    .await?;
     let mut running = false;
     for process in processes {
-        let process_is_running = u32::try_from(process.pid)
-            .ok()
-            .and_then(|pid| system.process(sysinfo::Pid::from_u32(pid)))
-            .is_some_and(|system_process| {
-                let started_at = system_process.start_time() as i64;
+        let process_is_running =
+            start_times.get(&process.pid).is_some_and(|started_at| {
                 started_at.abs_diff(process.start_time) <= 2
             });
         if process_is_running {
@@ -1048,5 +1078,23 @@ impl Process {
         }
 
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::running_process_start_times;
+
+    #[tokio::test]
+    async fn reads_start_time_of_running_process() {
+        let pid = i64::from(std::process::id());
+        let start_times = running_process_start_times(vec![pid, i64::MAX])
+            .await
+            .unwrap();
+
+        let started_at = start_times[&pid];
+        let now = chrono::Utc::now().timestamp();
+        assert!(started_at > 0 && started_at <= now);
+        assert_eq!(start_times.len(), 1);
     }
 }

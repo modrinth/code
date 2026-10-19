@@ -57,7 +57,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
 pub async fn get_version_from_hash(
     req: HttpRequest,
     info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
+    pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     hash_query: web::Query<HashQuery>,
     session_queue: web::Data<AuthQueue>,
@@ -108,7 +108,7 @@ pub async fn get_version_from_hash(
 pub async fn download_version(
     req: HttpRequest,
     info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
+    pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     hash_query: web::Query<HashQuery>,
     session_queue: web::Data<AuthQueue>,

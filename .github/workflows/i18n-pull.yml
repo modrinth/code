@@ -12,6 +12,9 @@ permissions:
   contents: write
   pull-requests: write
 
+env:
+  pnpm_config_color: always
+
 jobs:
   pull_translations:
     name: 'Pull translations from Crowdin'

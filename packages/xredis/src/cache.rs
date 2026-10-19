@@ -101,6 +101,8 @@ pub struct CacheSettings {
     pub actual_expiry: i64,
     pub version_default_expiry: i64,
     pub version_actual_expiry: i64,
+    pub session_default_expiry: i64,
+    pub session_actual_expiry: i64,
     pub encoding_format: EncodingFormat,
     pub compression_algorithm: Codec,
     pub compression_level: i32,
@@ -172,6 +174,9 @@ impl CacheSettings {
         {
             "versions" | "versions_files" => {
                 (self.version_default_expiry, self.version_actual_expiry)
+            }
+            "sessions" => {
+                (self.session_default_expiry, self.session_actual_expiry)
             }
             _ => (self.default_expiry, self.actual_expiry),
         }
