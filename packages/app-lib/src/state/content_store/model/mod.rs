@@ -9,8 +9,7 @@ pub(in crate::state::content_store) use file_change::{
 };
 pub(crate) use instance_file::InstanceFileStatus;
 pub(in crate::state::content_store) use instance_file::InstancePathContent;
-pub(crate) use reports::StoreIssue;
-pub use reports::{StoreUsage, StoreVerification};
+pub use reports::StoreUsage;
 pub(crate) use storage::{
-    FileStorageKind, FileStoragePolicy, InstanceFileStorage, StoredFileStatus,
+    FileStorageKind, InstanceFileStorage, StoredFileStatus,
 };
