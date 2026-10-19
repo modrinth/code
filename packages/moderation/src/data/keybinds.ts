@@ -34,7 +34,49 @@ function isOfficialModrinthHost(): boolean {
 	return host === 'modrinth.com' || host === 'www.modrinth.com' || host === 'staging.modrinth.com'
 }
 
+const panelToggleKeybinds = [
+	'1',
+	'2',
+	'3',
+	'4',
+	'5',
+	'6',
+	'7',
+	'8',
+	'9',
+	'Shift+1',
+	'Shift+2',
+	'Shift+3',
+	'Shift+4',
+	'Shift+5',
+	'Shift+6',
+	'Shift+7',
+	'Shift+8',
+	'Shift+9',
+	'Alt+1',
+	'Alt+2',
+	'Alt+3',
+	'Alt+4',
+	'Alt+5',
+	'Alt+6',
+	'Alt+7',
+	'Alt+8',
+	'Alt+9',
+]
+
 const keybinds: { [id: string]: KeybindListener } = {
+	...Object.fromEntries(
+		panelToggleKeybinds.map((keybind, index) => [
+			`review-panel-toggle-${index + 1}`,
+			{
+				keybind,
+				description: `Toggle panel item ${index + 1}`,
+				scope: 'review-panel-toggle',
+				enabled: (ctx) => ctx.available(index),
+				action: (ctx) => ctx.toggle(index),
+			} satisfies KeybindListener,
+		]),
+	),
 	'review-toggle-icon': {
 		keybind: 'I',
 		description: 'Toggle project icon viewer',

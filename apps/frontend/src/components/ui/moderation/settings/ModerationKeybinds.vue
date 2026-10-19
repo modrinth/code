@@ -29,6 +29,10 @@ const messages = defineMessages({
 		id: 'moderation.keybinds.items',
 		defaultMessage: 'Review items and checks',
 	},
+	panelToggles: {
+		id: 'moderation.keybinds.panel-toggles',
+		defaultMessage: 'Panel toggles',
+	},
 	decisions: {
 		id: 'moderation.keybinds.decisions',
 		defaultMessage: 'Review outcomes and queue',
@@ -125,6 +129,11 @@ const groups = computed(() => {
 			id: 'technical',
 			title: messages.technical,
 			bindings: bindings.value.filter(([, binding]) => binding.scope === 'tech-review'),
+		},
+		{
+			id: 'panel-toggles',
+			title: messages.panelToggles,
+			bindings: bindings.value.filter(([, binding]) => binding.scope === 'review-panel-toggle'),
 		},
 	]
 	return categories.filter((group) => group.bindings.length)

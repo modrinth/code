@@ -40,6 +40,7 @@ export type ModerationProjectReviewContext = {
 }
 
 export type ModerationContext =
+	| ModerationPanelToggleContext
 	| ModerationProjectContext
 	| ModerationTechReviewContext
 	| ModerationGlobalContext
@@ -47,6 +48,12 @@ export type ModerationContext =
 	| ModerationConversationContext
 	| ModerationReviewActionsContext
 	| ModerationReviewComposerContext
+
+export type ModerationPanelToggleContext = {
+	scope: 'review-panel-toggle'
+	available: (index: number) => boolean
+	toggle: (index: number) => void
+}
 
 export type ModerationConversationContext = {
 	scope: 'review-conversation'
@@ -116,6 +123,9 @@ export type KeybindProjectReviewListener = BaseKeybindListener<ModerationProject
 	scope: 'project-review'
 }
 export type KeybindListener =
+	| (BaseKeybindListener<ModerationPanelToggleContext> & {
+			scope: 'review-panel-toggle'
+	  })
 	| KeybindProjectListener
 	| KeybindTechReviewListener
 	| KeybindGlobalListener
@@ -161,6 +171,9 @@ export function matchesKeybind(event: KeybindEvent, keybind: KeybindDefinition |
 		: event.ctrlKey === !!def.ctrl && event.metaKey === !!def.meta
 	return (
 		(event.key.toLowerCase() === def.key.toLowerCase() ||
+			((event.shiftKey || event.altKey) &&
+				/^[1-9]$/.test(def.key) &&
+				event.code === `Digit${def.key}`) ||
 			(event.altKey && /^[a-z]$/i.test(def.key) && event.code === `Key${def.key.toUpperCase()}`)) &&
 		!!modifiersMatch &&
 		event.shiftKey === (def.shift ?? false) &&
@@ -188,9 +201,11 @@ export function keybindsOverlap(left: KeybindDefinition, right: KeybindDefinitio
 export function toKeybindDefinition(event: KeyboardEvent): KeybindDefinition {
 	return {
 		key:
-			event.altKey && /^Key[A-Z]$/.test(event.code)
-				? event.code.slice(3).toLowerCase()
-				: event.key.toLowerCase(),
+			(event.shiftKey || event.altKey) && /^Digit[1-9]$/.test(event.code)
+				? event.code.slice(-1)
+				: event.altKey && /^Key[A-Z]$/.test(event.code)
+					? event.code.slice(3).toLowerCase()
+					: event.key.toLowerCase(),
 		ctrl: event.ctrlKey,
 		shift: event.shiftKey,
 		alt: event.altKey,

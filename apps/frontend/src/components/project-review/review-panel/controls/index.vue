@@ -128,6 +128,7 @@
 						<ActionButton
 							:label="control.label"
 							:keybind="keybinds.get(control)"
+							:toggle-index="toggleIndexes.get(control)"
 							:show-keybind-hint="
 								settings.get(moderationSettings.General.ShowToggleIssueButtonShortcutHint)
 							"
@@ -205,7 +206,7 @@ import {
 } from 'vue'
 
 import TemplateMarkdownEditor from '~/components/project-review/message-thread/template-markdown-editor.vue'
-import { useModerationSettings } from '~/composables/moderation'
+import { useModerationKeybinds, useModerationSettings } from '~/composables/moderation'
 import type { ReviewTarget } from '~/providers/project-review/review'
 import {
 	injectReviewPanels,
@@ -355,20 +356,25 @@ function toggleControls(binding?: ReviewPanelBinding) {
 		) ?? []
 	)
 }
-const keybinds = computed(
+const toggleIndexes = computed(
 	() =>
 		new Map(
 			toggleControls(panelBinding.value).map((control, index) => [
 				control,
-				actionKeybind(index + (props.keybindOffset ?? 0)),
+				index + (props.keybindOffset ?? 0),
 			]),
 		),
 )
-function actionKeybind(index: number) {
-	if (index >= 27) return undefined
-	const modifier = index >= 18 ? 'Alt+' : index >= 9 ? 'Shift+' : ''
-	return `${modifier}${(index % 9) + 1}`
-}
+const configuredKeybinds = useModerationKeybinds()
+const keybinds = computed(() => {
+	const bindings = new Map([...configuredKeybinds.value])
+	return new Map(
+		[...toggleIndexes.value].map(([control, index]) => {
+			const definition = bindings.get(`review-panel-toggle-${index + 1}`)?.keybind[0]
+			return [control, definition]
+		}),
+	)
+})
 
 const hasControls = computed(() =>
 	panelBinding.value?.panel.sections.some((section) => section.controls.length > 0),
