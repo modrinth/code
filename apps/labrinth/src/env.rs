@@ -271,7 +271,7 @@ vars! {
     TREMENDOUS_BALANCE_ALERT_THRESHOLD: u64 = 0u64;
     MURAL_BALANCE_ALERT_THRESHOLD: u64 = 0u64;
 
-    HCAPTCHA_SECRET: String = "none";
+    TURNSTILE_SECRET: String = "none";
 
     SMTP_USERNAME: String = "";
     SMTP_PASSWORD: String = "";
