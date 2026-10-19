@@ -13,11 +13,11 @@ pub const CATALOG_URL: &str = "https://files.minecraftforge.net/net/minecraftfor
 /// Available at [`CATALOG_URL`].
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Catalog(
-	pub HashMap<GameVersionName, Vec<model::ForgelikeInstallerName>>,
+    pub HashMap<GameVersionName, Vec<model::ForgelikeInstallerName>>,
 );
 
 /// Name of a Minecraft game version.
 #[derive(
-	Debug, Display, Clone, PartialEq, Eq, Hash, Serialize, Deserialize,
+    Debug, Display, Clone, PartialEq, Eq, Hash, Serialize, Deserialize,
 )]
 pub struct GameVersionName(pub String);

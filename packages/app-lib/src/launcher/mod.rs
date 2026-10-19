@@ -9,6 +9,7 @@ use crate::install::{
 use crate::instance::QuickPlayType;
 use crate::launcher::download::download_log_config;
 use crate::launcher::io::IOError;
+use crate::launcher::profile::ResolvedVersion as VersionInfo;
 use crate::launcher::quick_play_version::{
     QuickPlayServerVersion, QuickPlayVersion,
 };
@@ -25,15 +26,14 @@ use chrono::Utc;
 use minecraft_meta_manifest as d;
 use minecraft_meta_manifest::fabriclike::{LoaderVersion, Manifest};
 use minecraft_meta_manifest::minecraft::{LoggingSide, RuleAction};
-use crate::launcher::profile::ResolvedVersion as VersionInfo;
 use serde::Deserialize;
 use std::future::Future;
 use std::path::{Path, PathBuf};
 use tokio::process::Command;
 
 mod args;
-mod library;
 pub(crate) mod hooks;
+mod library;
 
 pub mod download;
 pub(crate) mod profile;
@@ -231,14 +231,14 @@ fn installed_loader_version(
 
     Some(LoaderVersion {
         id: loader_version.to_string(),
-		url: url::Url::parse("modrinth-local:installed")
-			.expect("valid local loader URL"),
+        url: url::Url::parse("modrinth-local:installed")
+            .expect("valid local loader URL"),
         stable: false,
     })
 }
 
 pub(super) fn is_locally_installed_loader(loader: &LoaderVersion) -> bool {
-	loader.url.scheme() == "modrinth-local"
+    loader.url.scheme() == "modrinth-local"
 }
 
 fn concrete_loader_version_id(loader_version: &str) -> Option<&str> {
@@ -264,10 +264,10 @@ fn loader_versions_for_game_version<'a>(
     game_version: &str,
 ) -> Option<&'a [LoaderVersion]> {
     let version = manifest.game_versions.iter().find(|x| {
-		x.id.replace(
-			minecraft_meta_manifest::profile::DUMMY_REPLACE_STRING,
-			game_version,
-		) == game_version
+        x.id.replace(
+            minecraft_meta_manifest::profile::DUMMY_REPLACE_STRING,
+            game_version,
+        ) == game_version
     })?;
 
     if let Some(version_group) = &version.version_group {
@@ -941,10 +941,10 @@ pub async fn launch_minecraft(
         .into());
     }
 
-	let version_jar = loader_version
-		.as_ref()
-		.map_or(version.id.to_string(), |it| {
-			format!("{}-{}", version.id.to_string(), it.id.clone())
+    let version_jar = loader_version
+        .as_ref()
+        .map_or(version.id.to_string(), |it| {
+            format!("{}-{}", version.id.to_string(), it.id.clone())
         });
 
     let mut version_info = download::download_version_info(
@@ -1160,7 +1160,7 @@ pub async fn launch_minecraft(
                 &version_info.asset_index.id,
                 &instance_path,
                 &state.directories.assets_dir(),
-				&version.ty,
+                &version.ty,
                 *resolution,
                 &java_version.architecture,
                 &quick_play_type,

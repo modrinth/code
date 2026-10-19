@@ -309,10 +309,10 @@ async fn version_capability(
         option,
         SyncedOption::CreativeHotbars | SyncedOption::CommandHistory
     );
-	let is_supported_release = matches!(
-		&version.ty,
-		minecraft_meta_manifest::minecraft::VersionType::Release
-	);
+    let is_supported_release = matches!(
+        &version.ty,
+        minecraft_meta_manifest::minecraft::VersionType::Release
+    );
 
     if version.release_time >= cutoff.release_time
         && (!release_only_option || is_supported_release)

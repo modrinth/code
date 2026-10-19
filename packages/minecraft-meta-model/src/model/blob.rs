@@ -8,10 +8,10 @@ use crate::util::{Sha1, Sha256};
 #[derive(Debug, Clone, Model)]
 #[table = "blob_hashes"]
 pub struct BlobHash {
-	#[key]
-	pub sha256: Sha256,
-	#[index]
-	pub sha1: Sha1,
+    #[key]
+    pub sha256: Sha256,
+    #[index]
+    pub sha1: Sha1,
 }
 
 /// Hash last published at each Maven path in the single export destination.
@@ -19,8 +19,8 @@ pub struct BlobHash {
 #[table = "maven_exports"]
 #[key(path)]
 pub struct MavenExport {
-	pub path: String,
-	pub sha256: Sha256,
+    pub path: String,
+    pub sha256: Sha256,
 }
 
 /// ID for a [`DownloadRun`].
@@ -34,20 +34,20 @@ pub struct DownloadRunId(pub Uuid);
 /// logically grouped together.
 #[derive(Debug, Clone, Model)]
 pub struct DownloadRun {
-	#[key]
-	#[auto]
-	pub id: DownloadRunId,
-	/// When this run started.
-	pub started_at: Timestamp,
-	/// When this run finished.
-	///
-	/// If this run is still ongoing, this may be [`None`].
-	pub completed_at: Option<Timestamp>,
-	/// Errors accumulated during the run.
-	///
-	/// If this run is still ongoing, this may be [`None`].
-	#[column(type = text)]
-	pub errors: Option<toasty::Json<Vec<String>>>,
+    #[key]
+    #[auto]
+    pub id: DownloadRunId,
+    /// When this run started.
+    pub started_at: Timestamp,
+    /// When this run finished.
+    ///
+    /// If this run is still ongoing, this may be [`None`].
+    pub completed_at: Option<Timestamp>,
+    /// Errors accumulated during the run.
+    ///
+    /// If this run is still ongoing, this may be [`None`].
+    #[column(type = text)]
+    pub errors: Option<toasty::Json<Vec<String>>>,
 }
 
 /// During one [`DownloadRun`], what blobs were downloaded, and from where?
@@ -56,10 +56,10 @@ pub struct DownloadRun {
 #[derive(Debug, Clone, Model)]
 #[key(download_run_id, url)]
 pub struct BlobDownload {
-	pub download_run_id: DownloadRunId,
-	#[belongs_to]
-	pub download_run: toasty::Deferred<DownloadRun>,
-	pub url: String,
-	#[index]
-	pub sha256: Sha256,
+    pub download_run_id: DownloadRunId,
+    #[belongs_to]
+    pub download_run: toasty::Deferred<DownloadRun>,
+    pub url: String,
+    #[index]
+    pub sha256: Sha256,
 }

@@ -82,7 +82,7 @@ pub enum ErrorKind {
     NoValueFor(String),
 
     #[error("Metadata error: {0}")]
-	MetadataError(#[from] anyhow::Error),
+    MetadataError(#[from] anyhow::Error),
 
     #[error("Minecraft authentication error: {0}")]
     MinecraftAuthenticationError(

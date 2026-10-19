@@ -12,9 +12,9 @@ use dunce::canonicalize;
 use itertools::Itertools;
 use minecraft_meta_manifest::minecraft::LoggingConfiguration;
 use minecraft_meta_manifest::{
-	minecraft::{Argument, ArgumentValue, Library, VersionType},
-	profile::SidedDataEntry,
-	util::get_path_from_artifact,
+    minecraft::{Argument, ArgumentValue, Library, VersionType},
+    profile::SidedDataEntry,
+    util::get_path_from_artifact,
 };
 use std::io::{BufRead, BufReader, ErrorKind};
 use std::net::SocketAddr;
@@ -64,7 +64,7 @@ pub fn get_class_paths(
             Some(get_lib_path(
                 libraries_path,
                 &library.name,
-				library.native_classifier(java_arch).is_some(),
+                library.native_classifier(java_arch).is_some(),
             ))
         }))
         .process_results(|iter| {
@@ -456,7 +456,7 @@ where
 pub fn get_processor_arguments(
     libraries_path: &Path,
     arguments: &[impl AsRef<str>],
-	data: &indexmap::IndexMap<String, SidedDataEntry>,
+    data: &indexmap::IndexMap<String, SidedDataEntry>,
 ) -> crate::Result<Vec<String>> {
     // We use iterator combinators to make sure that 1 input argument maps
     // to exactly 1 output argument. Otherwise you might get issues that take

@@ -1,7 +1,7 @@
 use crate::State;
 pub use crate::launcher::profile::{
-	LoaderManifestMetadata, ResolvedVersion, loader_manifest_metadata,
-	loader_manifest_metadata_from_cache_key, merge_partial_version,
+    LoaderManifestMetadata, ResolvedVersion, loader_manifest_metadata,
+    loader_manifest_metadata_from_cache_key, merge_partial_version,
 };
 use crate::state::CachedEntry;
 pub use minecraft_meta_manifest::fabriclike::Manifest;
