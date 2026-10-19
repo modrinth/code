@@ -69,18 +69,18 @@ function updateAdPosition() {
 		class="ad-parent relative flex w-full justify-center cursor-pointer bg-surface-1"
 	>
 		<a
-			href="https://modrinth.host/medal?from=app-placeholder"
+			href="https://modrinth.com/hosting?from=app-placeholder"
 			target="_blank"
 			class="flex max-h-[250px] min-h-[250px] min-w-[300px] max-w-[300px] flex-col gap-4 rounded-[inherit]"
 		>
 			<img
-				src="https://cdn.modrinth.com/modrinth-hosting-medal-light.webp"
-				alt="Host your next server with Modrinth Hosting"
+				src="https://cdn.modrinth.com/hosting-oct-26-light.webp"
+				alt="Get your next server on Modrinth."
 				class="hidden rounded-[inherit] [.light_&]:block [.light-mode_&]:block"
 			/>
 			<img
-				src="https://cdn.modrinth.com/modrinth-hosting-medal-dark.webp"
-				alt="Host your next server with Modrinth Hosting"
+				src="https://cdn.modrinth.com/hosting-oct-26-dark.webp"
+				alt="Get your next server on Modrinth."
 				class="rounded-[inherit] [.light_&]:hidden [.light-mode_&]:hidden"
 			/>
 		</a>
