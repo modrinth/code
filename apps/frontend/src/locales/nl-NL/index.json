@@ -1049,6 +1049,9 @@
   "conversation-thread.action.approve": {
     "message": "Accepteren"
   },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "Accepteren met antwoord"
+  },
   "conversation-thread.action.close-report": {
     "message": "Rapport afsluiten"
   },
@@ -1057,6 +1060,9 @@
   },
   "conversation-thread.action.reject": {
     "message": "Afkeuren"
+  },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "Afkeuren met antwoord"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Heropen thread"
@@ -1091,6 +1097,9 @@
   "conversation-thread.action.withhold": {
     "message": "Terughouden"
   },
+  "conversation-thread.action.withhold-with-reply": {
+    "message": "Terughouden met antwoord"
+  },
   "conversation-thread.closed-thread.description": {
     "message": "Deze thread is gesloten en kan geen nieuwe berichten meer ontvangen."
   },
@@ -1099,6 +1108,9 @@
   },
   "conversation-thread.error.reopening-report": {
     "message": "Fout tijdens het heropenen van rapport"
+  },
+  "conversation-thread.error.sending-message": {
+    "message": "Fout tijdens het versturen van bericht"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Reageer op het thread..."
@@ -3385,6 +3397,9 @@
   },
   "project-member-header.success-join": {
     "message": "Je doet mee met het project team"
+  },
+  "project-moderation-nags.project-submitted-for-review": {
+    "message": "Je project is ingediend ter beoordeling!"
   },
   "project-moderation-nags.publishing-checklist": {
     "message": "Controlelijst publiceren"

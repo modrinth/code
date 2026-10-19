@@ -479,11 +479,20 @@
   "app.features-settings.sync-across-devices.title": {
     "message": "Synka funktioner mellan enheter"
   },
+  "app.file-download.canceling": {
+    "message": "Avbryter nedladdning…"
+  },
+  "app.file-download.preparing": {
+    "message": "Förbereder nedladdning…"
+  },
+  "app.file-download.waiting": {
+    "message": "Väntar på servern…"
+  },
   "app.home.jump-back-in.actions.label": {
     "message": "Instansåtgärder"
   },
   "app.home.jump-back-in.instance-locked": {
-    "message": "Denna instans har låsts"
+    "message": "Den här instansen har låsts"
   },
   "app.home.jump-back-in.instance-open": {
     "message": "Instansen är redan öppen"
@@ -735,7 +744,7 @@
     "message": "Uppladdning lyckades"
   },
   "app.instance.mods.unfreeze-content": {
-    "message": "Avfrys version"
+    "message": "Frigör version"
   },
   "app.instance.navigation.back-to-instance": {
     "message": "Tillbaka till instans"
@@ -1318,6 +1327,9 @@
   },
   "app.modal.install-to-play.shared-instance-unknown-files-description": {
     "message": "Denna delad instans innehåller filer som inte är publicerade på Modrinth. Vi rekommenderar stark att du endast installerar filer från källor du litar på."
+  },
+  "app.modal.install-to-play.unavailable-header": {
+    "message": "Den här serverns modpaket är inte tillgängligt"
   },
   "app.modal.install-to-play.unknown-files-description": {
     "message": "Detta server-modpaket innehåller filer som inte är utgivna på Modrinth. Vi rekommenderar att endast installera filer från källor du litar på."
@@ -2534,6 +2546,12 @@
   "app.settings.resource-management.store.verified": {
     "message": "Verifiering slutförd"
   },
+  "app.settings.sidebar.label.instance-defaults": {
+    "message": "Instansstandarder"
+  },
+  "app.settings.sidebar.label.system": {
+    "message": "System"
+  },
   "app.settings.synced-options.choose-sync-source.data-packs-title": {
     "message": "Välj källa för datapaket"
   },
@@ -2705,6 +2723,9 @@
   "app.settings.tabs.behavior": {
     "message": "Beteende"
   },
+  "app.settings.tabs.java-and-memory": {
+    "message": "Java och minne"
+  },
   "app.settings.tabs.java-installations": {
     "message": "Java-installationer"
   },
@@ -2713,6 +2734,39 @@
   },
   "app.settings.tabs.privacy": {
     "message": "Integritet"
+  },
+  "app.settings.tabs.resources": {
+    "message": "Resurser"
+  },
+  "app.settings.tabs.syncing": {
+    "message": "Synkronisering"
+  },
+  "app.settings.tabs.window": {
+    "message": "Fönster"
+  },
+  "app.settings.troubleshooting.clear-cache": {
+    "message": "Rensa cache"
+  },
+  "app.settings.troubleshooting.clear-cache.confirm.title": {
+    "message": "Rensa appens cache?"
+  },
+  "app.settings.troubleshooting.report-ad.copied": {
+    "message": "Kopierat"
+  },
+  "app.settings.troubleshooting.report-ad.copy": {
+    "message": "Kopiera annonsdetaljer"
+  },
+  "app.settings.troubleshooting.report-ad.description": {
+    "message": "Har du sett en opassande eller kränkande annons? Kopiera dess detaljer medan den visas och skicka dem till <support>Modrinth Support</support>. Vi kommer att granska och ta bort den."
+  },
+  "app.settings.troubleshooting.report-ad.no-ad.text": {
+    "message": "Vänta på att annonsen läser in, försök sedan igen."
+  },
+  "app.settings.troubleshooting.report-ad.no-ad.title": {
+    "message": "Ingen annons hittades"
+  },
+  "app.settings.troubleshooting.report-ad.title": {
+    "message": "Rapportera en annons"
   },
   "app.sidebar.playing-as": {
     "message": "Spelar som"
@@ -3476,6 +3530,9 @@
   "instance.server-modal.resource-pack": {
     "message": "Resurs pack"
   },
+  "instance.settings.defaults.open-app-settings": {
+    "message": "Hantera standardinställningar"
+  },
   "instance.settings.sharing.active-invites.actions": {
     "message": "Åtgärder"
   },
@@ -3514,6 +3571,12 @@
   },
   "instance.settings.sharing.revoke-invite.header": {
     "message": "Återkalla inbjudan"
+  },
+  "instance.settings.sidebar.label.game": {
+    "message": "Spel"
+  },
+  "instance.settings.sidebar.label.instance": {
+    "message": "Instans"
   },
   "instance.settings.synced-options.data-packs.description": {
     "message": "Håll den här instansens datapaket separata från synkroniserade paket."
@@ -3689,6 +3752,9 @@
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/sökväg/till/java"
   },
+  "instance.settings.tabs.java.label": {
+    "message": "Java och minne"
+  },
   "instance.settings.tabs.sharing": {
     "message": "Dela"
   },
@@ -3716,6 +3782,9 @@
   "instance.settings.tabs.synced-options.open-app-settings": {
     "message": "Hantera synkroniserade inställningar"
   },
+  "instance.settings.tabs.syncing": {
+    "message": "Synkronisering"
+  },
   "instance.settings.tabs.window": {
     "message": "Anpassade fönsterinställningar"
   },
@@ -3733,6 +3802,9 @@
   },
   "instance.settings.tabs.window.height.enter": {
     "message": "Ange höjd..."
+  },
+  "instance.settings.tabs.window.label": {
+    "message": "Fönster"
   },
   "instance.settings.tabs.window.width": {
     "message": "Bredd"

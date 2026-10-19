@@ -398,6 +398,9 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
+  "app-marketing.features.importing.description": {
+    "message": "นำเข้าชุดเซิร์ฟเวอร์เกมทั้งหมดที่คุณมีจากตัวเปิดใช้งานเดิม แล้วเริ่มใช้ Modrinth App ได้ภายในไม่กี่วินาที!"
+  },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
   },
@@ -463,6 +466,9 @@
   },
   "app-marketing.features.play.title": {
     "message": "เล่นกับม็อดที่คุณชอบ"
+  },
+  "app-marketing.features.settings-sync.description": {
+    "message": "ใช้ตัวเลือก แพ็กทรัพยากร และอื่นๆ เดียวกันในทุกชุดเซิร์ฟเวอร์ของคุณ"
   },
   "app-marketing.features.sharing.modpack": {
     "message": "ม็อดแพ็ก"

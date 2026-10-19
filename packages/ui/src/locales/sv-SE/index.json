@@ -2856,7 +2856,7 @@
     "defaultMessage": "URL"
   },
   "markdown-editor.url-validation-error.blocked-domain": {
-    "defaultMessage": "Ogiltig URL. Denna domän är inte tillåten."
+    "defaultMessage": "Ogiltig URL. Den här domänen är inte tillåten."
   },
   "markdown-editor.url-validation-error.malformed": {
     "defaultMessage": "Ogiltig URL. Se till att URL:en är rätt formaterad."
@@ -3125,6 +3125,9 @@
   "profile.button.info": {
     "defaultMessage": "Visa användardetaljer"
   },
+  "profile.button.lock": {
+    "defaultMessage": "Lås konto"
+  },
   "profile.button.manage-projects": {
     "defaultMessage": "Hantera projekt"
   },
@@ -3147,7 +3150,7 @@
     "defaultMessage": "{count} projekt"
   },
   "profile.details.error.github-popup-blocked": {
-    "defaultMessage": "Tillåt popup-fönster på Modrinth, fösök sedan igen."
+    "defaultMessage": "Tillåt popup-fönster på Modrinth, försök sedan igen."
   },
   "profile.details.error.github-profile-message": {
     "defaultMessage": "GitHub-profilen kunde inte hämtas. Vänligen försök igen."
@@ -3324,7 +3327,7 @@
     "defaultMessage": "Kunde inte låsa upp konto"
   },
   "profile.unlock-user.success-description": {
-    "defaultMessage": "{username}s konto har låsts upp"
+    "defaultMessage": "{username}s konto har låsts upp."
   },
   "profile.unlock-user.success-title": {
     "defaultMessage": "Konto upplåst"
@@ -4242,7 +4245,7 @@
     "defaultMessage": "Att låsa upp detta filter kan låta dig installera inkompatibelt innehåll."
   },
   "search.filter.locked.default.sync": {
-    "defaultMessage": "Synka filter"
+    "defaultMessage": "Synkronisera filter"
   },
   "search.filter.locked.default.title": {
     "defaultMessage": "{type} är låst"
@@ -5039,6 +5042,9 @@
   "servers.download.unavailable.title": {
     "defaultMessage": "Nedladdning otillgänglig"
   },
+  "servers.files.server-locked": {
+    "defaultMessage": "Den här servern är låst och dess filer är skrivskyddade."
+  },
   "servers.files.zip-created": {
     "defaultMessage": "ZIP skapad"
   },
@@ -5237,6 +5243,12 @@
   "servers.listing.using-project-label": {
     "defaultMessage": "Använder {projectTitle}"
   },
+  "servers.lock.modal.error-text": {
+    "defaultMessage": "Ett fel inträffade när servern skulle låsas. Vänligen försök igen."
+  },
+  "servers.lock.modal.error-title": {
+    "defaultMessage": "Kunde inte låsa server"
+  },
   "servers.lock.modal.header": {
     "defaultMessage": "Lås {name}"
   },
@@ -5254,6 +5266,12 @@
   },
   "servers.lock.modal.success-title": {
     "defaultMessage": "Server låst"
+  },
+  "servers.lock.modal.warning-body": {
+    "defaultMessage": "{name} kommer att bli skrivskyddad för dess ägare samt medlemmar fram tills att den blir upplåst av en administratör."
+  },
+  "servers.lock.modal.warning-header": {
+    "defaultMessage": "Den här servern kommer att bli skrivskyddad"
   },
   "servers.manage.checking-for-new-servers": {
     "defaultMessage": "Letar efter nya servrar..."
@@ -5290,6 +5308,12 @@
   },
   "servers.manage.locked.badge-tooltip": {
     "defaultMessage": "Låst sedan {date}"
+  },
+  "servers.manage.locked.body": {
+    "defaultMessage": "Support har temporärt låst den här servern, så du kan inte göra några ändringar. <support-link>Kontakta support</support-link> om du tror att det här är ett misstag."
+  },
+  "servers.manage.locked.header": {
+    "defaultMessage": "Servern är låst av support"
   },
   "servers.manage.new-server-button": {
     "defaultMessage": "Ny server"
@@ -5341,6 +5365,9 @@
   },
   "servers.manage.unlock-server": {
     "defaultMessage": "Lås upp server"
+  },
+  "servers.manage.unlock.error-text": {
+    "defaultMessage": "Ett fel inträffade när servern skulle låsas upp. Vänligen försök igen."
   },
   "servers.manage.unlock.error-title": {
     "defaultMessage": "Kunde inte låsa upp server"
@@ -5405,6 +5432,9 @@
   "servers.notice.undismissable": {
     "defaultMessage": "Kan ej avvisas"
   },
+  "servers.purchase.notification.success.text": {
+    "defaultMessage": "Ditt Modrinth Hosting-köp slutfördes."
+  },
   "servers.purchase.notification.success.title": {
     "defaultMessage": "Lyckat köp"
   },
@@ -5416,6 +5446,9 @@
   },
   "servers.purchase.step.payment.title": {
     "defaultMessage": "Betalningsmetod"
+  },
+  "servers.purchase.step.plan.billed": {
+    "defaultMessage": "fakturerad {interval, select, monthly {månadsvis} quarterly {kvartalvis} yearly {årligen} other {{interval}}}"
   },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "Välj en anpassad plan med just de specifikationer du behöver."
@@ -5796,7 +5829,7 @@
     "defaultMessage": "Du har inte blockerat någon."
   },
   "settings.social.blocked-users.load-error": {
-    "defaultMessage": "Blockerade användare kunde inte laddas in."
+    "defaultMessage": "Blockerade användare kunde inte läsas in."
   },
   "settings.social.blocked-users.loading": {
     "defaultMessage": "Läser in blockerade användare…"
@@ -5817,7 +5850,10 @@
     "defaultMessage": "Avblockera"
   },
   "settings.social.blocked-users.unblock-error": {
-    "defaultMessage": "Kunde inte avblocka användare"
+    "defaultMessage": "Kunde inte avblockera användare"
+  },
+  "settings.social.blocked-users.unblock-error-description": {
+    "defaultMessage": "Ett fel inträffade vid avblockering av den här användaren. Vänligen försök igen."
   },
   "settings.social.blocked-users.unblock-user": {
     "defaultMessage": "Avblockera {username}"
@@ -5850,7 +5886,7 @@
     "defaultMessage": "Sparar dina preferenser…"
   },
   "settings.social.sign-in-required.description": {
-    "defaultMessage": "Med ett Modrinth-konto kan du bestämma vem som kan interagera med dig och hantera blockade användare"
+    "defaultMessage": "Med ett Modrinth-konto kan du bestämma vilka som kan interagera med dig och hantera blockade användare"
   },
   "settings.social.sign-in-required.title": {
     "defaultMessage": "Modrinth-konto krävs"
@@ -6718,6 +6754,9 @@
   },
   "version.section.required-content": {
     "defaultMessage": "Nödvändigt innehåll"
+  },
+  "version.section.supplementary-resources": {
+    "defaultMessage": "Kompletterande resurser"
   },
   "version.supplementary-resources.file": {
     "defaultMessage": "Fil"

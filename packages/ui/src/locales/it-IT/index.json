@@ -21,7 +21,7 @@
     "defaultMessage": "Il nome utente per cui creare il codice affiliati"
   },
   "affiliate.create.user.placeholder": {
-    "defaultMessage": "Inserisci un nome utente..."
+    "defaultMessage": "Inserisci nome utente..."
   },
   "affiliate.createdBy": {
     "defaultMessage": "Creato da {user}"
@@ -1280,6 +1280,9 @@
   "external-files.permissions-card.file-count": {
     "defaultMessage": "{count, number} file"
   },
+  "external-files.permissions-card.file-database-id": {
+    "defaultMessage": "ID database"
+  },
   "external-files.permissions-card.included-files": {
     "defaultMessage": "File inclusi:"
   },
@@ -2460,7 +2463,7 @@
     "defaultMessage": "Nessun progetto trovato."
   },
   "instances.managed-content-modal.open-in-slicer": {
-    "defaultMessage": "Apri su Slicer"
+    "defaultMessage": "Apri con Slicer"
   },
   "instances.managed-content-modal.search-placeholder": {
     "defaultMessage": "Cerca tra {count, number} {count, plural, one {progetto} other {progetti}}"
@@ -2490,13 +2493,13 @@
     "defaultMessage": "Nascondi incompatibili"
   },
   "instances.updater-modal.incompatibility-warning": {
-    "defaultMessage": "Questa versione non è contrassegnata come compatibile per questa installazione. Le dipendenze non verranno installate automaticamente."
+    "defaultMessage": "Questa versione non è segnata come compatibile per questa installazione. Le dipendenze non verranno installate automaticamente."
   },
   "instances.updater-modal.incompatibility-warning-header": {
     "defaultMessage": "Seleziona una versione"
   },
   "instances.updater-modal.incompatible-update.description": {
-    "defaultMessage": "La {version} non è contrassegnata come compatibile per questa installazione. Potrebbe avere comportamenti imprevisti o errori nell'avvio."
+    "defaultMessage": "La {version} non è segnata come compatibile per questa installazione. Potrebbe avere comportamenti imprevisti o errori nell'avvio."
   },
   "instances.updater-modal.incompatible-update.header": {
     "defaultMessage": "Aggiornare alla versione incompatibile?"
@@ -2769,7 +2772,7 @@
     "defaultMessage": "Sconosciuto"
   },
   "label.unlisted": {
-    "defaultMessage": "Non in elenco"
+    "defaultMessage": "Nascosto"
   },
   "label.update-available": {
     "defaultMessage": "Aggiornamento disponibile"
@@ -2931,7 +2934,7 @@
     "defaultMessage": "Trascina per caricare o clicca per selezionare"
   },
   "markdown-editor.image-modal.url-field.placeholder": {
-    "defaultMessage": "Inserisci l'URL dell'immagine..."
+    "defaultMessage": "Inserisci URL immagine..."
   },
   "markdown-editor.insert-button": {
     "defaultMessage": "Inserisci"
@@ -2940,13 +2943,13 @@
     "defaultMessage": "Inserisci link"
   },
   "markdown-editor.link-modal.label-field.placeholder": {
-    "defaultMessage": "Inserisci il testo..."
+    "defaultMessage": "Inserisci testo..."
   },
   "markdown-editor.link-modal.label-field.title": {
     "defaultMessage": "Testo"
   },
   "markdown-editor.link-modal.url-field.placeholder": {
-    "defaultMessage": "Inserisci il link..."
+    "defaultMessage": "Inserisci link..."
   },
   "markdown-editor.markdown-formatting-support": {
     "defaultMessage": "Questo editor supporta la <markdown-link>formattazione in Markdown</markdown-link>."
@@ -3138,7 +3141,7 @@
     "defaultMessage": "Team di Modrinth"
   },
   "omorphia.component.badge.label.pending": {
-    "defaultMessage": "In sospeso"
+    "defaultMessage": "In attesa"
   },
   "omorphia.component.badge.label.private": {
     "defaultMessage": "Privato"
@@ -3162,7 +3165,7 @@
     "defaultMessage": "In revisione"
   },
   "omorphia.component.badge.label.unlisted": {
-    "defaultMessage": "Non in elenco"
+    "defaultMessage": "Nascosto"
   },
   "omorphia.component.badge.label.unsafe": {
     "defaultMessage": "Bocciato"
@@ -3295,6 +3298,9 @@
   },
   "profile.button.create-project": {
     "defaultMessage": "Crea un progetto"
+  },
+  "profile.button.edit-user": {
+    "defaultMessage": "Modifica utente"
   },
   "profile.button.force-password-reset": {
     "defaultMessage": "Forza reimposta password"
@@ -4175,6 +4181,15 @@
   "project.settings.disclosures.title": {
     "defaultMessage": "Informative"
   },
+  "project.settings.environment.bulk.apply-button": {
+    "defaultMessage": "Applica a tutte le versioni"
+  },
+  "project.settings.environment.bulk.description": {
+    "defaultMessage": "Questo sostituirà l'ambiente su ogni versione del progetto."
+  },
+  "project.settings.environment.bulk.title": {
+    "defaultMessage": "Applica ambiente a tutte le versioni"
+  },
   "project.settings.environment.client_and_server.description": {
     "defaultMessage": "Ha funzionalità sul client e sul server, anche solo parziali."
   },
@@ -4201,6 +4216,9 @@
   },
   "project.settings.environment.client_only.title": {
     "defaultMessage": "Solo lato client"
+  },
+  "project.settings.environment.modal.title": {
+    "defaultMessage": "Modifica ambiente"
   },
   "project.settings.environment.notice.missing-env.description": {
     "defaultMessage": "Al progetto mancano i metadati d'ambiente, scegli l'opzione appropriata sotto."
@@ -4365,7 +4383,7 @@
     "defaultMessage": "Sconosciuto"
   },
   "project.visibility.unlisted": {
-    "defaultMessage": "Non in elenco"
+    "defaultMessage": "Nascosto"
   },
   "project.visibility.unlisted-by-staff": {
     "defaultMessage": "Nascosto dallo staff"

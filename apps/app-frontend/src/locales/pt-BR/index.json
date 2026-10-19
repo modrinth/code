@@ -33,7 +33,7 @@
     "message": "Cancelado devido ao aplicativo ter fechado"
   },
   "app.action-bar.install.summary.bad-modpack-file": {
-    "message": "Falha ao ler modpack"
+    "message": "Não foi possível ler o pacote de mods"
   },
   "app.action-bar.install.summary.canceled": {
     "message": "Cancelado"
@@ -192,7 +192,7 @@
     "message": "Exibe um aviso de segurança ao instalar um Pacote Modrinth (.mrpack) que não seja hospedado no Modrinth."
   },
   "app.appearance-settings.unknown-pack-warning.title": {
-    "message": "Alertar-me antes de instalar modpacks desconhecidos"
+    "message": "Me alertar antes de instalar pacote de mods desconhecidos"
   },
   "app.auth-servers.unreachable.body": {
     "message": "Os servidores de autenticação do Minecraft talvez estejam indisponíveis no momento. Verifique sua conexão com a internet e tente novamente mais tarde."
@@ -478,6 +478,15 @@
   },
   "app.features-settings.sync-across-devices.title": {
     "message": "Sincronizar recursos entre dispositivos"
+  },
+  "app.file-download.canceling": {
+    "message": "Cancelando o download..."
+  },
+  "app.file-download.preparing": {
+    "message": "Preparando o download..."
+  },
+  "app.file-download.waiting": {
+    "message": "Aguardando o servidor…"
   },
   "app.home.jump-back-in.actions.label": {
     "message": "Ações de instância"
@@ -1321,6 +1330,12 @@
   },
   "app.modal.install-to-play.shared-instance-unknown-files-description": {
     "message": "Esta instância compartilhada contém arquivos não publicados no Modrinth. Recomendamos fortemente a instalar somente arquivos de fontes que você confia."
+  },
+  "app.modal.install-to-play.unavailable-description": {
+    "message": "A versão do pacote de mods usada neste servidor não pode ser baixada no momento. Ela pode estar não publicada ou estar em análise. Tente novamente mais tarde ou entre em contato com o dono do servidor."
+  },
+  "app.modal.install-to-play.unavailable-header": {
+    "message": "O pacote de mods deste servidor não está disponível"
   },
   "app.modal.install-to-play.unknown-files-description": {
     "message": "Este pacote de mods do servidor contém arquivos não publicados no Modrinth. Recomendamos fortemente a instalar apenas arquivos de fontes que você confia."
@@ -2879,6 +2894,12 @@
   "app.settings.resource-management.store.verified": {
     "message": "Verificação concluída"
   },
+  "app.settings.sidebar.label.instance-defaults": {
+    "message": "Padrões da instância"
+  },
+  "app.settings.sidebar.label.system": {
+    "message": "Sistema"
+  },
   "app.settings.synced-options.choose-sync-source.command-history-description": {
     "message": "Escolha de qual instância copiar seu histórico de comandos. Esse histórico é usado apenas para a sincronização inicial, e você pode editá-lo de qualquer instância depois."
   },
@@ -3110,14 +3131,56 @@
   "app.settings.tabs.features": {
     "message": "Ferramentas"
   },
+  "app.settings.tabs.java-and-memory": {
+    "message": "Java e memória"
+  },
   "app.settings.tabs.java-installations": {
     "message": "Instalações Java"
   },
   "app.settings.tabs.language": {
     "message": "Idioma"
   },
+  "app.settings.tabs.launch-hooks": {
+    "message": "Ganchos de inicialização"
+  },
   "app.settings.tabs.privacy": {
     "message": "Privacidade"
+  },
+  "app.settings.tabs.resources": {
+    "message": "Recursos"
+  },
+  "app.settings.tabs.syncing": {
+    "message": "Sincronização"
+  },
+  "app.settings.tabs.troubleshooting": {
+    "message": "Solução de problemas"
+  },
+  "app.settings.tabs.window": {
+    "message": "Janela"
+  },
+  "app.settings.troubleshooting.clear-cache": {
+    "message": "Limpar cache"
+  },
+  "app.settings.troubleshooting.clear-cache.confirm.title": {
+    "message": "Limpar o cache do app?"
+  },
+  "app.settings.troubleshooting.report-ad.copied": {
+    "message": "Copiado"
+  },
+  "app.settings.troubleshooting.report-ad.copy": {
+    "message": "Copiar detalhes do anúncio"
+  },
+  "app.settings.troubleshooting.report-ad.description": {
+    "message": "Viu um anúncio inadequado ou ofensivo? Copie os detalhes enquanto ele estiver sendo exibido e envie para o <support>Suporte do Modrinth</support>. Analisaremos e removeremos o anúncio."
+  },
+  "app.settings.troubleshooting.report-ad.no-ad.text": {
+    "message": "Aguarde o anúncio carregar e tente novamente."
+  },
+  "app.settings.troubleshooting.report-ad.no-ad.title": {
+    "message": "Nenhum anúncio encontrado"
+  },
+  "app.settings.troubleshooting.report-ad.title": {
+    "message": "Denunciar anúncio"
   },
   "app.sidebar.playing-as": {
     "message": "Jogando como"
@@ -3959,6 +4022,9 @@
   "instance.server-modal.resource-pack": {
     "message": "Pacote de recursos"
   },
+  "instance.settings.defaults.open-app-settings": {
+    "message": "Gerenciar configurações padrão"
+  },
   "instance.settings.sharing.active-invites.actions": {
     "message": "Ações"
   },
@@ -3997,6 +4063,12 @@
   },
   "instance.settings.sharing.revoke-invite.header": {
     "message": "Revogar convite"
+  },
+  "instance.settings.sidebar.label.game": {
+    "message": "Jogo"
+  },
+  "instance.settings.sidebar.label.instance": {
+    "message": "Instância"
   },
   "instance.settings.synced-options.data-override": {
     "message": "Desligar sobreposição para editar dados sincronizados"
@@ -4115,6 +4187,12 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Selecionar canal de atualização"
   },
+  "instance.settings.tabs.hooks.default-settings-description": {
+    "message": "Sua instância usa os ganchos de inicialização padrão, a menos que você os substitua aqui."
+  },
+  "instance.settings.tabs.hooks.label": {
+    "message": "Ganchos de inicialização"
+  },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Ao sair"
   },
@@ -4175,6 +4253,9 @@
   "instance.settings.tabs.installation.locked": {
     "message": "As opções de instalação estarão indisponíveis enquanto esta instância estiver privada."
   },
+  "instance.settings.tabs.java.default-settings-description": {
+    "message": "Sua instância usa as configurações padrão do Java e memória, a menos que você as altere aqui."
+  },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Insira as variáveis ​​de ambiente..."
   },
@@ -4198,6 +4279,9 @@
   },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/caminho/ao/java"
+  },
+  "instance.settings.tabs.java.label": {
+    "message": "Java e memória"
   },
   "instance.settings.tabs.sharing": {
     "message": "Compartilhamento"
@@ -4259,8 +4343,14 @@
   "instance.settings.tabs.synced-options.shared-settings.description": {
     "message": "Ativar uma substituição para manter uma configuração sincronizada separada desta instância."
   },
+  "instance.settings.tabs.syncing": {
+    "message": "Sincronização"
+  },
   "instance.settings.tabs.window": {
     "message": "Personalizar configurações de janela"
+  },
+  "instance.settings.tabs.window.default-settings-description": {
+    "message": "Sua instância usa as configurações de janela padrão, a menos que você as altere aqui."
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Tela cheia"
@@ -4276,6 +4366,9 @@
   },
   "instance.settings.tabs.window.height.enter": {
     "message": "Insira a altura..."
+  },
+  "instance.settings.tabs.window.label": {
+    "message": "Janela"
   },
   "instance.settings.tabs.window.width": {
     "message": "Largura"

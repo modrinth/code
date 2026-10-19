@@ -2054,6 +2054,9 @@
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Serwer zresetowany do trybu onboardingu"
   },
+  "hosting.save-banner.resolve-errors": {
+    "defaultMessage": "Rozwiąż błędy w swoich zmianach przed zapisaniem."
+  },
   "hosting.settings.properties.motd-profanity": {
     "defaultMessage": "Ze względu na Wytyczne Minecraft'a, MOTD twojego serwera nie może zawierać wulgarności. Wykryto: „{value}”."
   },
@@ -3765,7 +3768,7 @@
     "defaultMessage": "Pokaż {count} więcej"
   },
   "project.disclosure.derivative-work.title": {
-    "defaultMessage": "Jest to dzieło pochodne:"
+    "defaultMessage": "Dzieło pochodne:"
   },
   "project.disclosure.paid-features.title": {
     "defaultMessage": "Zawiera płatne funkcje"
@@ -4730,6 +4733,9 @@
   "servers.access-page.activity-log-filter.action.server-stopped": {
     "defaultMessage": "Zatrzymano serwer"
   },
+  "servers.access-page.activity-log-filter.action.sftp-credentials-rolled": {
+    "defaultMessage": "Wymieniono dane logowania SFTP"
+  },
   "servers.access-page.activity-log-filter.action.sftp-login": {
     "defaultMessage": "Zalogowano się poprzez SFTP"
   },
@@ -5110,6 +5116,9 @@
   },
   "servers.audit-log.event.server-subdomain-changed": {
     "defaultMessage": "Zmieniono poddomenę serwera na <subdomain></subdomain>"
+  },
+  "servers.audit-log.event.sftp-credentials-rolled": {
+    "defaultMessage": "Wymieniono dane logowania SFTP"
   },
   "servers.audit-log.event.sftp-login": {
     "defaultMessage": "Zalogowano się poprzez SFTP"

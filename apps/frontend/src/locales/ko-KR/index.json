@@ -914,6 +914,9 @@
   "auth.sign-in.no-account": {
     "message": "계정이 없으신가요?"
   },
+  "auth.sign-in.reauthenticate.use-different-account": {
+    "message": "다른 계정으로 로그인"
+  },
   "auth.sign-in.sign-in-with": {
     "message": "Modrinth 로그인"
   },
@@ -1061,6 +1064,9 @@
   "conversation-thread.action.approve": {
     "message": "승인"
   },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "답글과 함께 승인"
+  },
   "conversation-thread.action.close-report": {
     "message": "티켓 닫기"
   },
@@ -1069,6 +1075,9 @@
   },
   "conversation-thread.action.reject": {
     "message": "거부"
+  },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "답글과 함께 거부"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "스레드 다시 열기"
@@ -1103,6 +1112,9 @@
   "conversation-thread.action.withhold": {
     "message": "보류"
   },
+  "conversation-thread.action.withhold-with-reply": {
+    "message": "답글과 함께 보류"
+  },
   "conversation-thread.closed-thread.description": {
     "message": "이 스레드는 닫혔으며, 더 이상 새로운 메시지를 작성할 수 없습니다."
   },
@@ -1111,6 +1123,9 @@
   },
   "conversation-thread.error.reopening-report": {
     "message": "신고 다시 열기 오류"
+  },
+  "conversation-thread.error.sending-message": {
+    "message": "메시지 전송 오류"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "스레드에 답글 게시..."

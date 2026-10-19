@@ -1322,6 +1322,9 @@
   "app.modal.install-to-play.shared-instance-unknown-files-description": {
     "message": "Bản cài đặt được chia sẻ này chứa các tệp chưa được xuất bản trên Modrinth. Chúng tôi đặc biệt khuyên bạn chỉ cài tệp từ những nguồn mà bạn tin tưởng."
   },
+  "app.modal.install-to-play.unavailable-header": {
+    "message": "Modpack của máy chủ này hiện không khả dụng"
+  },
   "app.modal.install-to-play.unknown-files-description": {
     "message": "Modpack của máy chủ này chứa các tệp chưa được xuất bản trên Modrinth. Chúng tôi đặc biệt khuyên bạn chỉ cài tệp từ những nguồn mà bạn tin tưởng."
   },

@@ -1070,6 +1070,9 @@
   "conversation-thread.action.approve": {
     "message": "Підтвердити"
   },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "Підтвердити з відповіддю"
+  },
   "conversation-thread.action.close-report": {
     "message": "Закрити скаргу"
   },
@@ -1078,6 +1081,9 @@
   },
   "conversation-thread.action.reject": {
     "message": "Відхилити"
+  },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "Відхилити з відповіддю"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Знову відкрити потік"
@@ -1112,6 +1118,9 @@
   "conversation-thread.action.withhold": {
     "message": "Утримуватися"
   },
+  "conversation-thread.action.withhold-with-reply": {
+    "message": "Утримуватися з відповіддю"
+  },
   "conversation-thread.closed-thread.description": {
     "message": "Цю тему зачинено, і в нього не можна надсилати нові повідомлення."
   },
@@ -1120,6 +1129,12 @@
   },
   "conversation-thread.error.reopening-report": {
     "message": "Помилка повторного відкриття звіту"
+  },
+  "conversation-thread.error.sending-message": {
+    "message": "Помилка надсилання повідомлення"
+  },
+  "conversation-thread.image.open-externally": {
+    "message": "Відкрити в зовнішній програмі"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Відповісти до потоку…"
@@ -1141,6 +1156,12 @@
   },
   "conversation-thread.reply-modal.help-center-note": {
     "message": "Якщо вам потрібно зв’язатися з командою модераторів, скористайтеся <help-center-link>довідковим центром Modrinth</help-center-link> і натисніть синю підказку в нижньому правому куті, щоб зв’язатися зі службою підтримки."
+  },
+  "conversation-thread.reply.changed-thread": {
+    "message": "Обрана гілка змінилася. Відкрийте її знову, перш ніж відповісти."
+  },
+  "conversation-thread.reply.facet": {
+    "message": "Пояснення щодо: {issue}"
   },
   "conversation-thread.resubmit-modal.confirmation.description": {
     "message": "Підтверджую, що я розглянув повідомлення від модераторів"
@@ -2972,6 +2993,12 @@
   "layout.publish.email-verification-required.title": {
     "message": "Необхідно підтвердити електронну пошту"
   },
+  "markdown-editor.templates.insert": {
+    "message": "Уведіть повідомлення"
+  },
+  "markdown-editor.templates.section": {
+    "message": "Шаблони"
+  },
   "messages.noResults": {
     "message": "Не знайдено результатів за вашим запитом!"
   },
@@ -2999,8 +3026,26 @@
   "modal.shared-instance.open-in-app.why-use": {
     "message": "Навіщо використовувати Modrinth App"
   },
+  "moderation.c2pa-scan.failed": {
+    "message": "Не вдалося сканувати файли на наявність ШІ."
+  },
+  "moderation.c2pa-scan.no-ai-files": {
+    "message": "Не знайдено файлів, згенерованих ШІ."
+  },
   "moderation.exclude-technical-review": {
     "message": "Виключити технічні розгляди"
+  },
+  "moderation.keybinds.change": {
+    "message": "{setting}: {binding}. Активуйте, щоб змінити прив'язку."
+  },
+  "moderation.keybinds.composer": {
+    "message": "Відповіді в гілці та особисті нотатки"
+  },
+  "moderation.keybinds.conflicts": {
+    "message": "Перетинається з: {actions}"
+  },
+  "moderation.keybinds.listen": {
+    "message": "Натисніть клавішу…"
   },
   "moderation.moderate": {
     "message": "Проглядати"
@@ -3022,6 +3067,219 @@
   },
   "moderation.page.technicalReview": {
     "message": "Технічний огляд"
+  },
+  "moderation.project-review.collapseVersion": {
+    "message": "Приховати деталі"
+  },
+  "moderation.project-review.complete": {
+    "message": "Завершено"
+  },
+  "moderation.project-review.completedProjects": {
+    "message": "Завершені проекти"
+  },
+  "moderation.project-review.copyHash": {
+    "message": "Копіювати {algorithm}"
+  },
+  "moderation.project-review.copyValue": {
+    "message": "Копіювати: {value}"
+  },
+  "moderation.project-review.created": {
+    "message": "Створено"
+  },
+  "moderation.project-review.customLicense": {
+    "message": "Власна"
+  },
+  "moderation.project-review.details.unlistedDescription": {
+    "message": "Доступно лише за URL-адресою. Не відображається у вашому профілі чи в результатах пошуку."
+  },
+  "moderation.project-review.disclosures": {
+    "message": "Маркування"
+  },
+  "moderation.project-review.discord": {
+    "message": "Discord"
+  },
+  "moderation.project-review.dockPanel": {
+    "message": "Повернути панель в робоче середовище"
+  },
+  "moderation.project-review.donationBmac": {
+    "message": "Buy Me A Coffee"
+  },
+  "moderation.project-review.donationGithub": {
+    "message": "GitHub Sponsors"
+  },
+  "moderation.project-review.donationKoFi": {
+    "message": "Ko-fi"
+  },
+  "moderation.project-review.donationOther": {
+    "message": "Інше"
+  },
+  "moderation.project-review.donationPatreon": {
+    "message": "Patreon"
+  },
+  "moderation.project-review.donationPaypal": {
+    "message": "PayPal"
+  },
+  "moderation.project-review.download": {
+    "message": "Завантажити"
+  },
+  "moderation.project-review.downloads": {
+    "message": "Завантаження"
+  },
+  "moderation.project-review.draft": {
+    "message": "Чернетка"
+  },
+  "moderation.project-review.draftCount": {
+    "message": "Чернеток: {count}"
+  },
+  "moderation.project-review.edit.remove-icon": {
+    "message": "Видалити іконку"
+  },
+  "moderation.project-review.edit.upload-icon": {
+    "message": "Завантажити іконку"
+  },
+  "moderation.project-review.editSection": {
+    "message": "Редагувати: {section}"
+  },
+  "moderation.project-review.embedded": {
+    "message": "Вбудовано"
+  },
+  "moderation.project-review.empty": {
+    "message": "Жодного проєкту не обрано"
+  },
+  "moderation.project-review.emptyChangelog": {
+    "message": "Без змін"
+  },
+  "moderation.project-review.emptyDependencies": {
+    "message": "Немає залежностей"
+  },
+  "moderation.project-review.emptyDescription": {
+    "message": "Немає опису"
+  },
+  "moderation.project-review.emptyEnvironments": {
+    "message": "Немає середовищ"
+  },
+  "moderation.project-review.emptyGallery": {
+    "message": "Немає зображень у галереї"
+  },
+  "moderation.project-review.emptyLinks": {
+    "message": "Немає посилань"
+  },
+  "moderation.project-review.emptyPlatforms": {
+    "message": "Немає платформ"
+  },
+  "moderation.project-review.emptyPopout": {
+    "message": "У цій панелі немає вкладок"
+  },
+  "moderation.project-review.emptyTags": {
+    "message": "Немає міток"
+  },
+  "moderation.project-review.emptyVersions": {
+    "message": "Немає версій"
+  },
+  "moderation.project-review.environments": {
+    "message": "Середовища"
+  },
+  "moderation.project-review.exit": {
+    "message": "Вийти"
+  },
+  "moderation.project-review.expandAll": {
+    "message": "Розгорнути все"
+  },
+  "moderation.project-review.expandVersion": {
+    "message": "Показати деталі"
+  },
+  "moderation.project-review.featured": {
+    "message": "Рекомендоване"
+  },
+  "moderation.project-review.fileCount": {
+    "message": "{count, plural, one {# файл} few {# файли} many {# файлів} other {# файлу}}"
+  },
+  "moderation.project-review.files": {
+    "message": "Файли"
+  },
+  "moderation.project-review.finish": {
+    "message": "Завершено"
+  },
+  "moderation.project-review.gallery": {
+    "message": "Галерея"
+  },
+  "moderation.project-review.gameVersions": {
+    "message": "Версії гри"
+  },
+  "moderation.project-review.generalSettings": {
+    "message": "Загальне"
+  },
+  "moderation.project-review.hashes": {
+    "message": "Геші"
+  },
+  "moderation.project-review.hideLeft": {
+    "message": "Приховати деталі проєкту"
+  },
+  "moderation.project-review.hideRight": {
+    "message": "Приховати панель"
+  },
+  "moderation.project-review.icon": {
+    "message": "Значок"
+  },
+  "moderation.project-review.imageNumber": {
+    "message": "Зображення №{number}"
+  },
+  "moderation.project-review.incompatible": {
+    "message": "Несумісно"
+  },
+  "moderation.project-review.issues": {
+    "message": "Відстеження проблем"
+  },
+  "moderation.project-review.keepPopoutClosed": {
+    "message": "Залишати закритим"
+  },
+  "moderation.project-review.keybindsSettings": {
+    "message": "Гарячі клавіші"
+  },
+  "moderation.project-review.left": {
+    "message": "Деталі проєкту"
+  },
+  "moderation.project-review.license": {
+    "message": "Ліцензія"
+  },
+  "moderation.project-review.licenseUrl": {
+    "message": "Посилання на ліцензію"
+  },
+  "moderation.project-review.link-info.active": {
+    "message": "Активно"
+  },
+  "moderation.project-review.link-info.activity": {
+    "message": "Активність"
+  },
+  "moderation.project-review.link-info.archived": {
+    "message": "Цей репозиторій архівовано; його функції доступні лише для читання."
+  },
+  "moderation.project-review.link-info.archivedValue": {
+    "message": "Архівовано"
+  },
+  "moderation.project-review.link-info.author": {
+    "message": "Автор"
+  },
+  "moderation.project-review.link-info.board": {
+    "message": "Дошка"
+  },
+  "moderation.project-review.link-info.bot": {
+    "message": "Бот"
+  },
+  "moderation.project-review.link-info.channel": {
+    "message": "Канал"
+  },
+  "moderation.project-review.link-info.closedIssues": {
+    "message": "Закриті проблеми"
+  },
+  "moderation.project-review.link-info.community": {
+    "message": "Спільнота"
+  },
+  "moderation.project-review.link-info.company": {
+    "message": "Організація"
+  },
+  "moderation.project-review.link-info.created": {
+    "message": "Обліковий запис створено"
   },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} на сторінку"
@@ -3410,6 +3668,9 @@
   "project-member-header.success-join": {
     "message": "Ви доєдналися до команди проєкту"
   },
+  "project-moderation-nags.project-submitted-for-review": {
+    "message": "Проєкт відправлено на перевірку!"
+  },
   "project-moderation-nags.publishing-checklist": {
     "message": "Контрольний список для публікації"
   },
@@ -3442,6 +3703,12 @@
   },
   "project-moderation-nags.warning": {
     "message": "Попередження"
+  },
+  "project-review.composer.reply-placeholder": {
+    "message": "Відповісти в гілці…"
+  },
+  "project-review.issues.field-option": {
+    "message": "{field}: {option}"
   },
   "project-type.collection.plural": {
     "message": "Добірки"
@@ -4121,9 +4388,6 @@
   "project.settings.license.custom-name-required": {
     "message": "Уведіть назву власної ліцензії."
   },
-  "project.settings.license.custom-url-description": {
-    "message": "Розташування повного тексту ліцензії."
-  },
   "project.settings.license.intro": {
     "message": "Важливо вказати правильну ліцензію для: {type}. Ви можете вибрати її з нашого списку або вказати власну ліцензію. Також можна вказати URL для вибраної ліцензії, інакше показуватиметься текст ліцензії. Перегляньте наш <guide>посібник із ліцензування</guide>, щоб дізнатися більше."
   },
@@ -4148,11 +4412,8 @@
   "project.settings.license.optional-label": {
     "message": "необов’язково"
   },
-  "project.settings.license.select": {
-    "message": "Ліцензія"
-  },
-  "project.settings.license.select-placeholder": {
-    "message": "Шукати ліцензії…"
+  "project.settings.license.spdx": {
+    "message": "Ідентифікатор SPDX"
   },
   "project.settings.license.title": {
     "message": "Ліцензія"

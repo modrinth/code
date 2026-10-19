@@ -540,7 +540,7 @@
     "defaultMessage": "Pacote de mods vinculado"
   },
   "content.diff-modal.modpack-unlinked": {
-    "defaultMessage": "Unlinked modpack"
+    "defaultMessage": "Pacote de mods não vinculado"
   },
   "content.diff-modal.modpack-updated": {
     "defaultMessage": "Pacote de mods atualizado"
@@ -1279,6 +1279,9 @@
   },
   "external-files.permissions-card.file-count": {
     "defaultMessage": "{count, plural, one {# arquivo} other {# arquivos}}"
+  },
+  "external-files.permissions-card.file-database-id": {
+    "defaultMessage": "ID do banco de dados"
   },
   "external-files.permissions-card.included-files": {
     "defaultMessage": "Arquivos incluídos:"
@@ -3296,6 +3299,9 @@
   "profile.button.create-project": {
     "defaultMessage": "Criar projeto"
   },
+  "profile.button.edit-user": {
+    "defaultMessage": "Editar usuário"
+  },
   "profile.button.force-password-reset": {
     "defaultMessage": "Forçar redefinição de senha"
   },
@@ -4175,6 +4181,15 @@
   "project.settings.disclosures.title": {
     "defaultMessage": "Avisos de conteúdo"
   },
+  "project.settings.environment.bulk.apply-button": {
+    "defaultMessage": "Aplicar a todas as versões"
+  },
+  "project.settings.environment.bulk.description": {
+    "defaultMessage": "Isto substituirá o ambiente em todas as versões deste projeto."
+  },
+  "project.settings.environment.bulk.title": {
+    "defaultMessage": "Aplicar ambiente a todas as versões"
+  },
   "project.settings.environment.client_and_server.description": {
     "defaultMessage": "Tem alguma funcionalidade tanto no cliente quanto no servidor, mesmo que apenas de forma parcial."
   },
@@ -4201,6 +4216,9 @@
   },
   "project.settings.environment.client_only.title": {
     "defaultMessage": "Apenas cliente"
+  },
+  "project.settings.environment.modal.title": {
+    "defaultMessage": "Editar ambiente do projeto"
   },
   "project.settings.environment.notice.missing-env.description": {
     "defaultMessage": "Seu projeto não possui metadados de ambiente. Selecione a opção apropriada abaixo."

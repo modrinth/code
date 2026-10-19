@@ -1037,6 +1037,9 @@
   "conversation-thread.action.approve": {
     "message": "Onaylandı"
   },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "Onaylandı, işlem tamamlandı"
+  },
   "conversation-thread.action.close-report": {
     "message": "Raporu kapat"
   },
@@ -1045,6 +1048,9 @@
   },
   "conversation-thread.action.reject": {
     "message": "Reddet"
+  },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "Cevap vererek reddet"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Konuyu yeniden aç"
@@ -1079,6 +1085,9 @@
   "conversation-thread.action.withhold": {
     "message": "Yanıtla birlikte taslağa çevir"
   },
+  "conversation-thread.action.withhold-with-reply": {
+    "message": "Yanıtla birlikte beklet"
+  },
   "conversation-thread.closed-thread.description": {
     "message": "Bu konu kapatılmıştır ve yeni mesaj gönderilemez."
   },
@@ -1087,6 +1096,9 @@
   },
   "conversation-thread.error.reopening-report": {
     "message": "Rapor yeniden açılırken hata oluştu"
+  },
+  "conversation-thread.error.sending-message": {
+    "message": "Mesaj gönderilirken hata oluştu"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Konuya yanıt ver..."
@@ -3373,6 +3385,9 @@
   },
   "project-member-header.success-join": {
     "message": "Proje ekibine katıldınız"
+  },
+  "project-moderation-nags.project-submitted-for-review": {
+    "message": "Projeniz değerlendirme için gönderilmiştir!"
   },
   "project-moderation-nags.publishing-checklist": {
     "message": "Yayımlama kontrol listesi"

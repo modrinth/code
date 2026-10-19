@@ -302,11 +302,26 @@
   "app.content.sync-resource-packs-disabled": {
     "message": "Nejdříve zapněte synchronizaci balíčků textur v nastavení aplikace."
   },
+  "app.debug-export.canceling": {
+    "message": "Rušení exportu..."
+  },
+  "app.debug-export.exporting": {
+    "message": "Exportování..."
+  },
+  "app.debug-export.finishing": {
+    "message": "Dokončování..."
+  },
+  "app.debug-export.preparing": {
+    "message": "Připravování souborů..."
+  },
   "app.download-manager.active": {
     "message": "Aktivní"
   },
   "app.download-manager.attention": {
     "message": "Potřebuje pozornost"
+  },
+  "app.download-manager.bulk-update-content": {
+    "message": "Aktualizování {count, plural, one {# položky} other {# položek}}"
   },
   "app.download-manager.cancel": {
     "message": "Zrušit instalaci"
@@ -377,6 +392,9 @@
   "app.download-manager.tasks": {
     "message": "Úkoly"
   },
+  "app.download-manager.title": {
+    "message": "Správce stahování"
+  },
   "app.download-manager.verifying": {
     "message": "Ověřování"
   },
@@ -413,11 +431,53 @@
   "app.features-settings.instance-pages.title": {
     "message": "Instance"
   },
+  "app.features-settings.play-page.title": {
+    "message": "Stránka Hrát"
+  },
   "app.features-settings.quick-instances.description": {
     "message": "Vyberte maximální počet nedávných instancí v levém postranním panelu. Můžete také upravit přetažením oddělovače."
   },
+  "app.features-settings.quick-instances.title": {
+    "message": "Rychlé instance v postranním panelu"
+  },
+  "app.features-settings.show-all-screenshots.description": {
+    "message": "Zobrazí tlačítko v levém postranním panelu pro zobrazení snímků obrazovky ze všech vašich instancí."
+  },
+  "app.features-settings.show-all-screenshots.title": {
+    "message": "Zobrazit všechny snímky obrazovky v postranním panelu"
+  },
+  "app.features-settings.show-files-tab.title": {
+    "message": "Zobrazit kartu Soubory v instancích"
+  },
+  "app.features-settings.show-jump-in.description": {
+    "message": "Zobrazí naposledy hrané světy a instance v horní části stránky Hrát."
+  },
+  "app.features-settings.show-jump-in.title": {
+    "message": "Zobrazit sekci Skočit po hlavě"
+  },
   "app.features-settings.show-screenshots-tab.title": {
     "message": "Zobrazit kartu Screenshoty v instancích"
+  },
+  "app.features-settings.show-skin-selector.description": {
+    "message": "Zobrazí tlačítko v levém postranním panelu pro otevření selektoru skinů."
+  },
+  "app.features-settings.show-skin-selector.title": {
+    "message": "Zobrazit selektor skinu v postranním panelu"
+  },
+  "app.features-settings.show-worlds-tab.title": {
+    "message": "Zobrazit kartu Světy v instancích"
+  },
+  "app.features-settings.sidebar.title": {
+    "message": "Postranní panel"
+  },
+  "app.features-settings.sync-across-devices.description": {
+    "message": "Použije tyto nastavení všude, kde jste přihlášeni. Vypněte toto pro zachování oddělených nastavení na tomto zařízení."
+  },
+  "app.features-settings.sync-across-devices.signed-out-tooltip": {
+    "message": "Přihlaste se Modrinth účtem pro synchronizaci nastavení."
+  },
+  "app.features-settings.sync-across-devices.title": {
+    "message": "Synchronizovat nastavení napříč zařízeními"
   },
   "app.home.jump-back-in.actions.label": {
     "message": "Akce instance"
@@ -854,6 +914,15 @@
   "app.instance.worlds.remove-server-modal.remove-button": {
     "message": "Odebrat server"
   },
+  "app.instance.worlds.remove-server-modal.remove-everywhere": {
+    "message": "Odebrat všude"
+  },
+  "app.instance.worlds.remove-server-modal.remove-here": {
+    "message": "Odebrat zde"
+  },
+  "app.instance.worlds.remove-server-modal.synced-header": {
+    "message": "Tento server je synchronizovaný"
+  },
   "app.instance.worlds.remove-server-modal.title": {
     "message": "Odebrat server"
   },
@@ -980,8 +1049,14 @@
   "app.library.group.delete": {
     "message": "Smazat skupinu"
   },
+  "app.library.group.delete-description": {
+    "message": "Instance v této skupině budou odděleny."
+  },
   "app.library.group.edit-name": {
     "message": "Upravit název skupiny"
+  },
+  "app.library.group.empty": {
+    "message": "Táhněte a pusťte pro přidání instancí."
   },
   "app.library.group.expand": {
     "message": "Rozbalit skupinu"
@@ -1117,6 +1192,9 @@
   },
   "app.library.instance.stop": {
     "message": "Ukončit"
+  },
+  "app.library.search.no-results.title": {
+    "message": "Žádné instance neodpovídají vašemu vyhledávání."
   },
   "app.library.search.placeholder": {
     "message": "Vyhledat"
@@ -1358,6 +1436,9 @@
   "app.quick-instance-switcher.instance-locked": {
     "message": "Instance byla uzamčena"
   },
+  "app.quick-instance-switcher.title": {
+    "message": "Nedávné instance"
+  },
   "app.quick-instance-switcher.view-instance": {
     "message": "Zobrazit instanci"
   },
@@ -1369,6 +1450,9 @@
   },
   "app.screenshots.copy": {
     "message": "Kopírovat obrázek"
+  },
+  "app.screenshots.delete-description": {
+    "message": "Permanentně odstranit {name}? Tato akce nemůže být navrácena zpět."
   },
   "app.screenshots.delete-success": {
     "message": "Snímek obrazovky odstraněn"
@@ -1553,8 +1637,17 @@
   "app.settings.default-instance-options.memory-allocation.description": {
     "message": "Maximální dostupná paměť pro každou instanci."
   },
+  "app.settings.default-instance-options.memory-allocation.title": {
+    "message": "Alokace paměti"
+  },
   "app.settings.default-instance-options.pre-launch-hook.description": {
     "message": "Spustí se před spuštěním instance."
+  },
+  "app.settings.default-instance-options.width.description": {
+    "message": "Šířka okna po spuštění hry."
+  },
+  "app.settings.default-instance-options.width.placeholder": {
+    "message": "Zadejte šířku..."
   },
   "app.settings.default-instance-options.width.title": {
     "message": "Šířka"
@@ -1628,6 +1721,9 @@
   "app.settings.resource-management.app-directory.title": {
     "message": "Složka aplikace"
   },
+  "app.settings.synced-options.choose-sync-source.no-instances-found": {
+    "message": "Nebyly nalezeny žádné instance"
+  },
   "app.settings.synced-options.choose-sync-source.search-placeholder": {
     "message": "Prohledat instanci"
   },
@@ -1642,6 +1738,9 @@
   },
   "app.settings.synced-options.command-history.editor-title": {
     "message": "Upravit historii příkazů"
+  },
+  "app.settings.synced-options.game-settings.conflict-text": {
+    "message": "Načetli jsme nejnovější nastavení. Zkontrolujte změny, poté znovu uložte."
   },
   "app.settings.synced-options.multiplayer-servers.address": {
     "message": "Adresa serveru"

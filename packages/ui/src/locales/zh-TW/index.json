@@ -4202,6 +4202,9 @@
   "project.settings.environment.client_only.title": {
     "defaultMessage": "僅限用戶端"
   },
+  "project.settings.environment.modal.title": {
+    "defaultMessage": "編輯專案執行環境"
+  },
   "project.settings.environment.notice.missing-env.description": {
     "defaultMessage": "你的專案缺少環境詮釋資料，請從下方選擇適當的選項。"
   },
