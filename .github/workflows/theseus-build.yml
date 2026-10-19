@@ -19,7 +19,7 @@ on:
       sign-macos-binaries:
         description: Sign macOS binaries
         type: boolean
-        default: false
+        default: true
         required: false
       sign-windows-binaries:
         description: Sign Windows binaries
