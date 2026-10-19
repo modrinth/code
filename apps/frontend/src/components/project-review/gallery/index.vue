@@ -22,7 +22,11 @@
 			<p v-else-if="!gallery.length" class="m-0 text-secondary">
 				{{ formatMessage(messages.emptyGallery) }}
 			</p>
-			<div v-else class="gallery-grid">
+			<div
+				v-else
+				class="gallery-grid"
+				:style="{ gridTemplateColumns: `repeat(${galleryColumns}, minmax(0, 1fr))` }"
+			>
 				<ReviewPanel
 					v-for="(item, index) in gallery"
 					:key="item.id ?? item.url"
@@ -83,10 +87,12 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
+import { moderationSettings } from '@modrinth/moderation'
 import { galleryImageReviewKey } from '@modrinth/moderation/src/data/issues/component-builders/gallery-images'
 import { Button, ImageViewerEditor, useFormatDateTime, useVIntl } from '@modrinth/ui'
 import { computed, ref, useTemplateRef } from 'vue'
 
+import { useModerationSettings } from '~/composables/moderation'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 import { injectReviewSubmission } from '~/providers/project-review/review-submission'
 
@@ -95,6 +101,8 @@ import { projectReviewMessages as messages } from '../messages'
 import ReviewPanel from '../review-panel/index.vue'
 
 const { formatMessage } = useVIntl()
+const settings = useModerationSettings()
+const galleryColumns = computed(() => settings.value.get(moderationSettings.General.GalleryColumns))
 const interactionScope = useTemplateRef<HTMLElement>('interactionScope')
 const formatDateTime = useFormatDateTime({
 	dateStyle: 'long',
@@ -120,7 +128,6 @@ const viewerItems = computed(() =>
 <style scoped>
 .gallery-grid {
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
 	gap: 1rem;
 }
 </style>

@@ -133,7 +133,8 @@ useReviewShortcut(
 	'cycle-misc',
 	() => {
 		const targets = visibleTargets.value
-		const currentIndex = selectedTarget.value === undefined ? -1 : targets.indexOf(selectedTarget.value)
+		const currentIndex =
+			selectedTarget.value === undefined ? -1 : targets.indexOf(selectedTarget.value)
 		selectedTarget.value = targets[(currentIndex + 1) % targets.length]
 		shortcuts.run('reveal-right')
 	},

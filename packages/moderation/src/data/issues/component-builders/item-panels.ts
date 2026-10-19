@@ -48,6 +48,7 @@ function itemContext(
 export function expandItemReviewPanels(
 	definitions: Record<string, PanelRegistration>,
 	context: ReviewContext,
+	showAllIssueControls = false,
 ) {
 	const panels: Record<string, Panel> = {}
 	const parents = new Map<string, string>()
@@ -72,7 +73,7 @@ export function expandItemReviewPanels(
 			continue
 		}
 		for (const item of definition.items(context)) {
-			if (resolve(item.panel.shown, context) === false) continue
+			if (!showAllIssueControls && resolve(item.panel.shown, context) === false) continue
 			const itemKey = `${key}:${item.key}`
 			if (items.has(itemKey)) throw new Error(`Duplicate review panel "${itemKey}"`)
 			items.set(itemKey, item)

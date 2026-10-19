@@ -2,6 +2,28 @@ import { setting } from '../types/settings.ts'
 
 const settings = {
 	General: {
+		GalleryColumns: setting.asEnum({
+			type: 'enum',
+			id: 'gallery-columns',
+			title: 'Gallery columns',
+			description: 'Number of gallery columns to display in project review, regardless of panel width.',
+			default: '3',
+			entries: [
+				{ label: '1', value: '1' },
+				{ label: '2', value: '2' },
+				{ label: '3', value: '3' },
+				{ label: '4', value: '4' },
+				{ label: '5', value: '5' },
+				{ label: '6', value: '6' },
+			],
+		}),
+		ShowAllIssueControls: setting.asToggle({
+			type: 'toggle',
+			id: 'show-all-issue-controls',
+			title: 'Always show issue controls',
+			description: 'Show all issue controls in the issues menu regardless of visibility conditions.',
+			default: false,
+		}),
 		SendIssuesAsThreadMessage: setting.asToggle({
 			type: 'toggle',
 			id: 'send-issues-as-thread-message',
@@ -90,14 +112,16 @@ const settings = {
 			type: 'toggle',
 			id: 'expand-version-dependencies-by-default',
 			title: 'Expand version dependencies by default',
-			description: 'Expand dependencies automatically when viewing version details in project review.',
+			description:
+				'Expand dependencies automatically when viewing version details in project review.',
 			default: true,
 		}),
 		ExpandVersionChangelogByDefault: setting.asToggle({
 			type: 'toggle',
 			id: 'expand-version-changelog-by-default',
 			title: 'Expand version changelog by default',
-			description: 'Expand the changelog automatically when viewing version details in project review.',
+			description:
+				'Expand the changelog automatically when viewing version details in project review.',
 			default: true,
 		}),
 		SlicerButtonInVersions: setting.asToggle({

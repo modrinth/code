@@ -153,7 +153,8 @@ const expandedIds = computed(
 	() =>
 		expanded.value ??
 		new Set(
-			settings.value.get(moderationSettings.General.ExpandVersionDetailsByDefault) && versions.value[0]
+			settings.value.get(moderationSettings.General.ExpandVersionDetailsByDefault) &&
+				versions.value[0]
 				? [versions.value[0].id]
 				: [],
 		),

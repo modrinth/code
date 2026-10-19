@@ -209,6 +209,7 @@ const panels = provideReviewPanels(
 			sendIssuesAsThreadMessage: settings.value.get(
 				moderationSettings.General.SendIssuesAsThreadMessage,
 			),
+			showAllIssueControls: settings.value.get(moderationSettings.General.ShowAllIssueControls),
 			permissions: permissions.value,
 			previousIssueIds: (project.value?.thread_id === threadQuery.data.value?.id
 				? (threadQuery.data.value?.issues ?? [])

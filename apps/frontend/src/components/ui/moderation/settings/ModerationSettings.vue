@@ -47,7 +47,11 @@ const messages = defineMessages({
 	},
 	projectPages: {
 		id: 'moderation.settings.project-pages',
-		defaultMessage: 'Public project pages and hosts',
+		defaultMessage: 'Public pages and hosts',
+	},
+	debug: {
+		id: 'moderation.settings.debug',
+		defaultMessage: 'Debug settings',
 	},
 	defaultValue: {
 		id: 'moderation.settings.default-value-styled',
@@ -85,6 +89,7 @@ const groups = [
 		id: 'appearance',
 		title: messages.appearance,
 		settings: [
+			general.GalleryColumns,
 			general.ExpandVersionDetailsByDefault,
 			general.ExpandVersionDependenciesByDefault,
 			general.ExpandVersionChangelogByDefault,
@@ -109,6 +114,11 @@ const groups = [
 			general.SlicerButtonInVersions,
 			general.AlternativeHostname,
 		],
+	},
+	{
+		id: 'debug',
+		title: messages.debug,
+		settings: [general.ShowAllIssueControls],
 	},
 ]
 

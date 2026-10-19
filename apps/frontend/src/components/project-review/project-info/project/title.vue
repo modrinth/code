@@ -124,9 +124,4 @@ const projectUrl = computed(
 	() =>
 		`/${projectV2.value?.project_type ?? project.value?.project_types[0]}/${project.value?.slug ?? project.value?.id}`,
 )
-const primaryStatus = computed(() =>
-	project.value?.status === 'processing' && project.value.requested_status
-		? project.value.requested_status
-		: (project.value?.status ?? 'unknown'),
-)
 </script>

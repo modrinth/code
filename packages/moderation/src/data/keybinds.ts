@@ -240,7 +240,7 @@ const keybinds: { [id: string]: KeybindListener } = {
 	},
 	'skip-project': {
 		keybind: 'Ctrl+Shift+S',
-		description: 'Skip to next project',
+		description: 'Skip/next project',
 		scope: 'review-actions',
 		enabled: (ctx) => ctx.available('next'),
 		action: (ctx) => ctx.run('next'),

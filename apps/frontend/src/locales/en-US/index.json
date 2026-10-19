@@ -3107,6 +3107,9 @@
   "moderation.keybinds.not-bound": {
     "message": "Not bound"
   },
+  "moderation.keybinds.panel-toggles": {
+    "message": "Panel toggles"
+  },
   "moderation.keybinds.project": {
     "message": "Copy from public project pages"
   },
@@ -4035,10 +4038,13 @@
     "message": "{count} withheld"
   },
   "moderation.settings.appearance": {
-    "message": "Panels and appearance"
+    "message": "Appearance"
   },
   "moderation.settings.based-on": {
     "message": "Based on"
+  },
+  "moderation.settings.debug": {
+    "message": "Debug settings"
   },
   "moderation.settings.default-value-styled": {
     "message": "Default: <value></value>"
@@ -4058,8 +4064,11 @@
   "moderation.settings.on": {
     "message": "On"
   },
+  "moderation.settings.panels": {
+    "message": "Panels"
+  },
   "moderation.settings.project-pages": {
-    "message": "Public project pages and hosts"
+    "message": "Public pages and hosts"
   },
   "moderation.settings.search": {
     "message": "Search settings…"

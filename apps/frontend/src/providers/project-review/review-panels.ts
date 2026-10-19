@@ -182,6 +182,7 @@ export function createReviewPanels(
 		> & {
 			previousLinks: ReadonlyMap<string, string>
 			previousIssueIds?: readonly string[]
+			showAllIssueControls?: boolean
 		}
 	>,
 	definitions: Record<string, PanelRegistration> = reviewPanels,
@@ -323,6 +324,7 @@ export function createReviewPanels(
 		const bindings = new Map<string, ReviewPanelBinding>()
 		const projectV3 = project.value
 		if (!projectV3) return bindings
+		const showAllIssueControls = reviewData.value.showAllIssueControls === true
 		const context: ReviewContext = {
 			projectV3,
 			...reviewData.value,
@@ -348,11 +350,16 @@ export function createReviewPanels(
 			panels: itemDefinitions,
 			parents: itemParents,
 			issues: itemIssues,
-		} = expandItemReviewPanels(definitions, context)
+		} = expandItemReviewPanels(definitions, context, showAllIssueControls)
 		for (const [key, panel] of Object.entries(itemDefinitions)) {
 			const previousLink =
 				key.endsWith('-link') && reviewData.value.previousLinks.has(key.slice(0, -'-link'.length))
-			if (resolveWithContext(panel.shown, context) === false && !previousLink) continue
+			if (
+				!showAllIssueControls &&
+				resolveWithContext(panel.shown, context) === false &&
+				!previousLink
+			)
+				continue
 			const resolveNodes = (
 				nodes: readonly PanelNode[],
 				label?: string,
@@ -368,7 +375,7 @@ export function createReviewPanels(
 
 				for (const node of nodes) {
 					if (node.type === 'section') {
-						if (resolveWithContext(node.shown, context) === false) continue
+						if (!showAllIssueControls && resolveWithContext(node.shown, context) === false) continue
 						flush()
 						sections.push(...resolveNodes(node.children, resolveWithContext(node.label, context)))
 						continue
@@ -392,7 +399,8 @@ export function createReviewPanels(
 								: context.selected.toggleIds,
 						},
 					}
-					if (resolveWithContext(node.shown, issueContext) === false) continue
+					if (!showAllIssueControls && resolveWithContext(node.shown, issueContext) === false)
+						continue
 					const options: ResolvedIssueControlOptions = {
 						disabled: resolveWithContext(node.disabled, issueContext) === true,
 						issue,
@@ -421,7 +429,10 @@ export function createReviewPanels(
 							initial: typeof initial === 'string' ? [initial] : [...(initial ?? [])],
 							placeholder: resolveWithContext(node.placeholder, issueContext),
 							options: resolveWithContext(node.options, issueContext)
-								.filter((option) => resolveWithContext(option.shown, issueContext) !== false)
+								.filter(
+									(option) =>
+										showAllIssueControls || resolveWithContext(option.shown, issueContext) !== false,
+								)
 								.map((option) => ({
 									value: option.value,
 									label: resolveWithContext(option.label, issueContext),

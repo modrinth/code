@@ -2,7 +2,7 @@
 import {
 	arrow as floatingArrow,
 	autoUpdate,
-	flip,
+	flip as floatingFlip,
 	offset,
 	type Placement,
 	shift,
@@ -41,6 +41,7 @@ const props = withDefaults(
 		disabled: false,
 		bare: false,
 		arrow: true,
+		panelClass: undefined,
 	},
 )
 
@@ -78,7 +79,7 @@ const { floatingStyles, middlewareData, placement, x, y, isPositioned } = useFlo
 		open: isOpen,
 		middleware: computed(() => [
 			offset(() => props.distance),
-			...(props.flip ? [flip()] : []),
+			...(props.flip ? [floatingFlip()] : []),
 			shift({ padding: 8 }),
 			floatingArrow({ element: arrowEl, padding: 12 }),
 		]),
