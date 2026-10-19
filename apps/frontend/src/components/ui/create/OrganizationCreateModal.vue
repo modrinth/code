@@ -1,6 +1,7 @@
 <template>
 	<NewModal ref="modal" :header="formatMessage(messages.title)">
 		<div class="min-w-md flex max-w-md flex-col gap-3">
+			<RestrictedActionAlert v-model="isRestricted" scope="ORGANIZATION_CREATE" @navigate="hide" />
 			<CreateLimitAlert v-model="hasHitLimit" type="org" />
 			<div class="flex flex-col gap-2">
 				<label for="name">
@@ -62,7 +63,12 @@
 					<XIcon aria-hidden="true" />
 					{{ formatMessage(commonMessages.cancelButton) }}
 				</Button>
-				<Button type="colored" color="brand" :disabled="hasHitLimit" @click="createOrganization">
+				<Button
+					type="colored"
+					color="brand"
+					:disabled="hasHitLimit || isRestricted"
+					@click="createOrganization"
+				>
 					<PlusIcon aria-hidden="true" />
 					{{ formatMessage(messages.createOrganization) }}
 				</Button>
@@ -88,6 +94,7 @@ import { ref } from 'vue'
 import { generateUrlSlug } from '~/composables/project-slug-suggestions'
 
 import CreateLimitAlert from './CreateLimitAlert.vue'
+import RestrictedActionAlert from './RestrictedActionAlert.vue'
 
 const router = useNativeRouter()
 const { addNotification } = injectNotificationManager()
@@ -138,6 +145,7 @@ const slug = ref<string>('')
 const description = ref<string>('')
 const manualSlug = ref<boolean>(false)
 const hasHitLimit = ref<boolean>(false)
+const isRestricted = ref<boolean>(false)
 const modal = ref<InstanceType<typeof NewModal>>()
 
 async function createOrganization(): Promise<void> {

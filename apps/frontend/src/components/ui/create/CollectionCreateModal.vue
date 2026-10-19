@@ -1,6 +1,11 @@
 <template>
 	<NewModal ref="modal" :header="formatMessage(messages.title)">
 		<div class="min-w-md flex max-w-md flex-col gap-3">
+			<RestrictedActionAlert
+				v-model="isRestricted"
+				scope="COLLECTION_CREATE"
+				@navigate="modal.hide()"
+			/>
 			<CreateLimitAlert v-model="hasHitLimit" type="collection" />
 			<div class="flex flex-col gap-2">
 				<label for="name">
@@ -41,7 +46,12 @@
 					<XIcon aria-hidden="true" />
 					{{ formatMessage(commonMessages.cancelButton) }}
 				</Button>
-				<Button type="colored" color="brand" :disabled="hasHitLimit" @click="create">
+				<Button
+					type="colored"
+					color="brand"
+					:disabled="hasHitLimit || isRestricted"
+					@click="create"
+				>
 					<PlusIcon aria-hidden="true" />
 					{{ formatMessage(messages.createCollection) }}
 				</Button>
@@ -63,6 +73,7 @@ import {
 } from '@modrinth/ui'
 
 import CreateLimitAlert from './CreateLimitAlert.vue'
+import RestrictedActionAlert from './RestrictedActionAlert.vue'
 
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -107,6 +118,7 @@ const messages = defineMessages({
 const name = ref('')
 const description = ref('')
 const hasHitLimit = ref(false)
+const isRestricted = ref(false)
 
 const modal = ref()
 
