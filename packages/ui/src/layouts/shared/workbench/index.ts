@@ -7,4 +7,5 @@ export {
 	type WorkbenchContext,
 	type WorkbenchPanelContext,
 } from './providers'
+export * from './settings'
 export * from './types'

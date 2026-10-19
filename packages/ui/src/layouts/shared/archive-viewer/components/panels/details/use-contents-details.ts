@@ -32,23 +32,21 @@ function summarize(
 export function useContentsDetails(archiveNode: () => ZipNode) {
 	const archive = injectArchiveViewer()
 
-	return computed<{ counts: ArchiveCounts; size: number; status: ArchiveReadStatus }>(
-		() => {
-			void archive.treeVersion.value
-			const node = archiveNode()
-			const { size, ...counts } = summarize(node)
+	return computed<{ counts: ArchiveCounts; size: number; status: ArchiveReadStatus }>(() => {
+		void archive.treeVersion.value
+		const node = archiveNode()
+		const { size, ...counts } = summarize(node)
 
-			const status: ArchiveReadStatus = archive.fullyLoaded.value
-				? 'read'
-				: node !== archive.root && node.children.size === 0
-					? 'pending'
-					: 'reading'
+		const status: ArchiveReadStatus = archive.fullyLoaded.value
+			? 'read'
+			: node !== archive.root && node.children.size === 0
+				? 'pending'
+				: 'reading'
 
-			return {
-				counts,
-				size,
-				status,
-			}
-		},
-	)
+		return {
+			counts,
+			size,
+			status,
+		}
+	})
 }

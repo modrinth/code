@@ -77,7 +77,9 @@ const canClose = computed(() => workbench.mode.closePanels)
 const isSelected = computed(() => workbench.selectedPanels.value.includes(id))
 
 const isActive = ref(props.params.api.isVisible)
-const visibility = props.params.api.onDidVisibilityChange((event) => (isActive.value = event.isVisible))
+const visibility = props.params.api.onDidVisibilityChange(
+	(event) => (isActive.value = event.isVisible),
+)
 onBeforeUnmount(() => visibility.dispose())
 
 /** Rounded tabs are pills, green while shown; square ones are plain, marked by the tab bar. */

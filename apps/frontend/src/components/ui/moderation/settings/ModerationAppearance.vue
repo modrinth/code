@@ -7,6 +7,7 @@ import {
 	Input,
 	IntlFormatted,
 	type MessageDescriptor,
+	type SettingText,
 	Toggle,
 	useVIntl,
 } from '@modrinth/ui'
@@ -149,13 +150,17 @@ const filteredGroups = computed(() => {
 		.map((group) => ({
 			...group,
 			settings: group.settings.filter((setting) =>
-				[formatMessage(group.title), setting.title, setting.description].some((text) =>
-					text.toLocaleLowerCase().includes(query),
+				[formatMessage(group.title), text(setting.title), text(setting.description ?? '')].some(
+					(value) => value.toLocaleLowerCase().includes(query),
 				),
 			),
 		}))
 		.filter((group) => group.settings.length)
 })
+
+function text(value: SettingText) {
+	return typeof value === 'string' ? value : formatMessage(value)
+}
 
 function controlLabel(section: MessageDescriptor, setting: string) {
 	return formatMessage(messages.controlLabel, {
@@ -226,8 +231,8 @@ const { style: floatingPanelStyle } = useFloatingReviewPanelAppearance()
 					class="flex flex-row flex-wrap items-center justify-between gap-2"
 				>
 					<div class="min-w-0 flex-1">
-						<span class="mb-2.5 block font-semibold text-contrast">{{ setting.title }}</span>
-						<span class="block text-secondary">{{ setting.description }}</span>
+						<span class="mb-2.5 block font-semibold text-contrast">{{ text(setting.title) }}</span>
+						<span class="block text-secondary">{{ text(setting.description ?? '') }}</span>
 						<span
 							v-if="
 								setting.id === general.ShowFloatingPanelFieldHoverHighlight.id ||
@@ -253,7 +258,7 @@ const { style: floatingPanelStyle } = useFloatingReviewPanelAppearance()
 
 					<ModerationColorSetting
 						v-if="setting.type === 'color'"
-						:label="controlLabel(group.title, setting.title)"
+						:label="controlLabel(group.title, text(setting.title))"
 						:default-label="defaultLabel(setting)"
 						:reset-value="String(resetValue(setting))"
 						default-color="var(--color-orange)"
@@ -265,7 +270,7 @@ const { style: floatingPanelStyle } = useFloatingReviewPanelAppearance()
 							type="number"
 							clamp
 							class="w-24"
-							:aria-label="controlLabel(group.title, setting.title)"
+							:aria-label="controlLabel(group.title, text(setting.title))"
 							:model-value="configuredSettings.get(setting)"
 							:min="setting.min"
 							:max="setting.max"
@@ -350,7 +355,7 @@ const { style: floatingPanelStyle } = useFloatingReviewPanelAppearance()
 
 					<Toggle
 						v-if="setting.type === 'toggle'"
-						:aria-label="controlLabel(group.title, setting.title)"
+						:aria-label="controlLabel(group.title, text(setting.title))"
 						:model-value="configuredSettings.get(setting)"
 						class="shrink-0"
 						@update:model-value="(value) => configuredSettings.set(setting, value)"

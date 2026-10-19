@@ -5,31 +5,6 @@
 		:class="`workbench-${workbench.variant.value}`"
 		@dblclick="workbench.onSashDoubleClick"
 	>
-		<template v-if="workbench.mode.toolbar">
-			<div
-				v-if="!toolbarCollapsed"
-				class="flex min-h-10 shrink-0 flex-wrap items-center gap-2 border-0 border-b border-solid border-surface-4 bg-surface-3 px-2 py-1"
-			>
-				<slot name="toolbar" />
-				<ToolbarControls class="ml-auto" @collapse="toolbarCollapsed = true" />
-			</div>
-			<div
-				v-else
-				class="flex shrink-0 items-center justify-end border-0 border-b border-solid border-surface-4 bg-surface-3 px-2"
-			>
-				<IconButton
-					v-tooltip="formatMessage(messages.expandToolbar)"
-					type="quiet"
-					size="xs"
-					:label="formatMessage(messages.expandToolbar)"
-					@click="toolbarCollapsed = false"
-					:circular="true"
-					class="h-[0.8rem] my-[0.15rem]"
-				>
-					<ChevronDownIcon aria-hidden="true" />
-				</IconButton>
-			</div>
-		</template>
 		<GridviewVue
 			class="workbench-grid min-h-0 w-full flex-1"
 			:orientation="Orientation.HORIZONTAL"
@@ -42,16 +17,13 @@
 </template>
 
 <script setup lang="ts">
-import { ChevronDownIcon } from '@modrinth/assets'
-import { useLocalStorage } from '@vueuse/core'
 import { GridviewVue, Orientation } from 'dockview-vue'
 import { onMounted, ref, type VNode } from 'vue'
 
-import { ContextMenu, IconButton } from '#ui/components/base/buttons'
+import { ContextMenu } from '#ui/components/base/buttons'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 
 import Dock from './components/dock/index.vue'
-import ToolbarControls from './components/toolbar-controls.vue'
 import { createWorkbench, WORKBENCH_DOCK_COMPONENT } from './composables/create-workbench'
 import { provideWorkbench, type WorkbenchContext } from './providers/workbench'
 import type {
@@ -87,6 +59,8 @@ const props = defineProps<{
 
 const slots = defineSlots<{
 	toolbar?: () => VNode[]
+	/** Controls at the end of the toolbar, before the layout's own (e.g. settings). */
+	'toolbar-end'?: () => VNode[]
 	/** Content of a tab, in place of its icon and title. */
 	tab?: (props: { panel: WorkbenchPanel; active: boolean; selected: boolean }) => VNode[]
 	/** Shown below the center, spanning it. */
@@ -100,10 +74,6 @@ const messages = defineMessages({
 	menuLabel: {
 		id: 'workbench.menu.label',
 		defaultMessage: 'Panel actions',
-	},
-	expandToolbar: {
-		id: 'workbench.expand-toolbar',
-		defaultMessage: 'Show toolbar',
 	},
 })
 
@@ -122,12 +92,6 @@ const workbench =
 	})
 
 workbench.slots = slots
-
-const toolbarCollapsed = props.storageKey
-	? useLocalStorage(`workbench-toolbar-collapsed:${props.storageKey}`, false, {
-			initOnMounted: true,
-		})
-	: ref(false)
 
 const root = ref<HTMLElement | null>(null)
 const contextMenu = ref<InstanceType<typeof ContextMenu>>()

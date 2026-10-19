@@ -1,5 +1,6 @@
 export { default as FileWorkbench } from './components/FileWorkbench.vue'
 export { default as FilePageLayout } from './layout.vue'
 export * from './providers'
+export * from './settings'
 export * from './types'
 export * from './utils'

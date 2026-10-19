@@ -9,7 +9,12 @@
 			v-tooltip="entry.label"
 			class="flex items-center gap-1.5 rounded-lg border border-solid border-surface-4 bg-surface-2 px-2 py-1 tabular-nums text-primary"
 		>
-			<component :is="entry.icon" class="size-4 shrink-0" :class="entry.iconClass" aria-hidden="true" />
+			<component
+				:is="entry.icon"
+				class="size-4 shrink-0"
+				:class="entry.iconClass"
+				aria-hidden="true"
+			/>
 			<span aria-hidden="true">{{ entry.count }}</span>
 			<span class="sr-only">{{ entry.label }}</span>
 		</li>

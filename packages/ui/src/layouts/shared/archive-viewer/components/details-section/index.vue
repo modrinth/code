@@ -49,16 +49,26 @@
 				<slot name="actions" />
 			</div>
 			<slot />
-			<DetailsList v-if="rows?.length" :rows="rows" />
-			<StatGrid v-if="sizes?.length" :stats="sizes" inline />
+			<DetailsList v-if="shownRows.always.length" :rows="shownRows.always" />
+			<StatGrid v-if="shownSizes.always.length" :stats="shownSizes.always" inline />
 			<DetailsCounts v-if="counts && countsVisibility === 'always'" :counts="counts" />
+			<HashList
+				v-if="hash && hashTypesShown.always.length"
+				:resolve="hash"
+				:types="hashTypesShown.always"
+			/>
 		</div>
 		<template v-if="hasDetails">
 			<div v-if="open" :id="detailsId" class="flex flex-col gap-3 px-3 pb-3">
 				<slot name="details" />
-				<DetailsList v-if="more?.length" :rows="more" />
+				<DetailsList v-if="detailRows.length" :rows="detailRows" />
+				<StatGrid v-if="shownSizes.details.length" :stats="shownSizes.details" inline />
 				<DetailsCounts v-if="counts && countsVisibility === 'details'" :counts="counts" />
-				<HashList v-if="hash && shownHashTypes.length" :resolve="hash" :types="shownHashTypes" />
+				<HashList
+					v-if="hash && hashTypesShown.details.length"
+					:resolve="hash"
+					:types="hashTypesShown.details"
+				/>
 			</div>
 			<DetailsToggle v-model:open="open" :controls="detailsId" />
 		</template>
@@ -72,14 +82,11 @@ import { type Component, computed, onBeforeUnmount, ref, useId, type VNode } fro
 
 import { IconButton } from '#ui/components/base/buttons'
 import { useVIntl } from '#ui/composables/i18n'
-import type { HashType } from '#ui/helpers/toolbox/file'
+import { HASH_TYPES, type HashType } from '#ui/helpers/toolbox/file'
 
 import type { ArchiveDetailRow } from '../../types'
 import type { ArchiveCounts, ArchiveReadStatus } from '../../types'
-import {
-	DEFAULT_ARCHIVE_HASH_TYPES,
-	injectArchiveDetailsSettings,
-} from '../../providers/details-settings'
+import { type DetailVisibility, useArchiveDetailSettings } from '../../settings'
 import DetailsCounts from './counts.vue'
 import DetailsToggle from './details-toggle.vue'
 import HashList from './hash-list.vue'
@@ -89,12 +96,13 @@ import StatGrid from './stat-grid.vue'
 
 /**
  * One described item of the details stack: what it is and its name (with how far it's been read,
- * for an archive), then its details and sizes. In-depth details and hashes are tucked behind a
- * pull tab along its bottom, open or closed for every item sharing its `detailsKey`; contents
- * counts show as the viewer's settings say. Hosts can use it for items of their own (e.g. the
- * project an archive was published by), with an `icon` slot in place of the icon, `actions`
- * beside the name, their own content (the default slot) before the details and more of it
- * (the `details` slot) behind the pull tab.
+ * for an archive), then its details. Each row, size, the contents counts and each hash shows
+ * always, only behind the pull tab along the section's bottom, or never, as the row (or the
+ * viewer's settings) say; the pull tab is open or closed for every item sharing its
+ * `detailsKey`. Hosts can use it for items of their own (e.g. the project an archive was
+ * published by), with an `icon` slot in place of the icon, `actions` beside the name, their own
+ * content (the default slot) before the details and more of it (the `details` slot) behind the
+ * pull tab.
  */
 const props = defineProps<{
 	kind: string
@@ -104,12 +112,14 @@ const props = defineProps<{
 	/** Where the item sits in the archive, shown on hover and copied from a button. */
 	path?: string
 	status?: ArchiveReadStatus
+	/** Details shown as their `visibility` says, always by default. */
 	rows?: ArchiveDetailRow[]
-	/** In-depth details, folded away by default. */
+	/** In-depth details, only shown behind the pull tab. */
 	more?: ArchiveDetailRow[]
+	/** Sizes, shown as their `visibility` says, always by default. */
 	sizes?: ArchiveDetailRow[]
 	counts?: ArchiveCounts
-	/** Computes the item's hash of a type, for those the viewer's settings list. */
+	/** Computes the item's hash of a type, for those the viewer's settings show. */
 	hash?: (type: HashType) => Promise<string>
 	/** Hash types the item can have, when it can't have every kind. */
 	hashTypes?: HashType[]
@@ -127,25 +137,49 @@ const slots = defineSlots<{
 const { formatMessage } = useVIntl()
 const headingId = useId()
 const detailsId = useId()
-const settings = injectArchiveDetailsSettings(null)
+const settings = useArchiveDetailSettings()
 
 const open = useLocalStorage(`archive-viewer-details:open:${props.detailsKey}`, false, {
 	initOnMounted: true,
 })
 
-const countsVisibility = computed(() => settings?.contentCounts.value ?? 'details')
+const countsVisibility = computed(() => settings.visibility('contentCounts'))
 
-const shownHashTypes = computed(() => {
-	const selected = settings?.hashTypes.value ?? DEFAULT_ARCHIVE_HASH_TYPES
-	return props.hashTypes ? selected.filter((type) => props.hashTypes!.includes(type)) : selected
+/** Rows split by where they show; ones never shown are left out. */
+function byVisibility(rows: ArchiveDetailRow[] | undefined) {
+	const split: Record<Exclude<DetailVisibility, 'never'>, ArchiveDetailRow[]> = {
+		always: [],
+		details: [],
+	}
+	for (const row of rows ?? []) {
+		const visibility = row.visibility ?? 'always'
+		if (visibility !== 'never') split[visibility].push(row)
+	}
+	return split
+}
+
+const shownRows = computed(() => byVisibility(props.rows))
+const shownSizes = computed(() => byVisibility(props.sizes))
+const detailRows = computed(() => [...shownRows.value.details, ...(props.more ?? [])])
+
+/** The item's hash types split by where the settings show them, in the order they're listed. */
+const hashTypesShown = computed(() => {
+	const split: Record<Exclude<DetailVisibility, 'never'>, HashType[]> = { always: [], details: [] }
+	for (const type of HASH_TYPES) {
+		if (props.hashTypes && !props.hashTypes.includes(type)) continue
+		const visibility = settings.hashVisibility(type)
+		if (visibility !== 'never') split[visibility].push(type)
+	}
+	return split
 })
 
 const hasDetails = computed(
 	() =>
 		!!slots.details ||
-		!!props.more?.length ||
+		detailRows.value.length > 0 ||
+		shownSizes.value.details.length > 0 ||
 		(!!props.counts && countsVisibility.value === 'details') ||
-		(!!props.hash && shownHashTypes.value.length > 0),
+		(!!props.hash && hashTypesShown.value.details.length > 0),
 )
 
 const copied = ref(false)

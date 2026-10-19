@@ -1,6 +1,7 @@
 import { useFormatBytes } from '#ui/composables/format-bytes'
 import { useVIntl } from '#ui/composables/i18n'
 
+import { useArchiveDetailSettings } from '../../../settings'
 import type { ArchiveDetailRow } from '../../../types'
 import { detailsMessages as messages } from './messages'
 
@@ -11,6 +12,7 @@ import { detailsMessages as messages } from './messages'
 export function useSizeRow() {
 	const { formatMessage } = useVIntl()
 	const formatBytes = useFormatBytes()
+	const settings = useArchiveDetailSettings()
 
 	return (
 		compressed: number | null | undefined,
@@ -20,7 +22,12 @@ export function useSizeRow() {
 		const label = formatMessage(messages.size)
 		if (compressed == null || size == null) {
 			const known = size ?? compressed
-			return { id: 'size', label, value: known != null ? formatBytes(known) : null }
+			return {
+				id: 'size',
+				label,
+				value: known != null ? formatBytes(known) : null,
+				visibility: settings.visibility('size'),
+			}
 		}
 
 		const ratio = size > 0 ? compressed / size : null
@@ -42,6 +49,7 @@ export function useSizeRow() {
 				size: formatBytes(size),
 			}),
 			tooltip,
+			visibility: settings.visibility('size'),
 		}
 	}
 }

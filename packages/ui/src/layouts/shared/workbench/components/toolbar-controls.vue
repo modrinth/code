@@ -1,137 +1,77 @@
 <template>
-	<div class="flex items-center gap-1">
-		<IconButton
-			v-for="region in workbench.usedRegions.value"
-			:key="region"
-			v-tooltip="formatMessage(toggleMessages[region])"
-			type="quiet"
-			size="xs"
-			:label="formatMessage(toggleMessages[region])"
-			:aria-pressed="workbench.visible[region].value"
-			@click="workbench.toggleRegion(region)"
-		>
-			<component
-				:is="workbench.visible[region].value ? PanelRightCloseIcon : PanelRightOpenIcon"
-				:class="iconRotation[region]"
-				aria-hidden="true"
-			/>
-		</IconButton>
-		<TeleportOverflowMenu
-			v-if="workbench.mode.closePanels"
-			type="quiet"
-			size="xs"
-			:circular="false"
-			:label="formatMessage(messages.panels)"
-			:tooltip="formatMessage(messages.panels)"
-			:options="workbench.panelsMenuOptions.value"
-		>
-			<LayersIcon aria-hidden="true" />
-		</TeleportOverflowMenu>
-		<IconButton
-			v-tooltip="formatMessage(variantMessage)"
-			type="quiet"
-			size="xs"
-			:label="formatMessage(variantMessage)"
-			@click="workbench.setVariant(nextVariant)"
-		>
-			<component :is="nextVariant === 'square' ? SquareIcon : PaletteIcon" aria-hidden="true" />
-		</IconButton>
-		<IconButton
-			v-tooltip="formatMessage(messages.resetLayout)"
-			type="quiet"
-			size="xs"
-			:label="formatMessage(messages.resetLayout)"
-			@click="workbench.resetLayout()"
-		>
-			<LayoutTemplateIcon aria-hidden="true" />
-		</IconButton>
-		<IconButton
-			v-tooltip="formatMessage(messages.collapseToolbar)"
-			type="quiet"
-			size="xs"
-			:label="formatMessage(messages.collapseToolbar)"
-			@click="emit('collapse')"
-		>
-			<ChevronUpIcon aria-hidden="true" />
-		</IconButton>
-	</div>
+	<TeleportOverflowMenu
+		type="quiet"
+		size="xs"
+		:circular="false"
+		:label="formatMessage(messages.layout)"
+		:tooltip="formatMessage(messages.layout)"
+		:options="options"
+	>
+		<LayoutTemplateIcon aria-hidden="true" />
+	</TeleportOverflowMenu>
 </template>
 
 <script setup lang="ts">
 import {
-	ChevronUpIcon,
-	LayersIcon,
 	LayoutTemplateIcon,
-	PaletteIcon,
-	PanelRightCloseIcon,
+	PanelLeftOpenIcon,
 	PanelRightOpenIcon,
-	SquareIcon,
+	PanelTopIcon,
+	UndoIcon,
 } from '@modrinth/assets'
 import { computed } from 'vue'
 
-import { IconButton, TeleportOverflowMenu } from '#ui/components/base/buttons'
+import { type ButtonMenuOption, TeleportOverflowMenu } from '#ui/components/base/buttons'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 
 import { injectWorkbench } from '../providers/workbench'
 import type { WorkbenchRegion } from '../types'
 
-const emit = defineEmits<{
-	collapse: []
-}>()
-
+/**
+ * The layout menu: showing and hiding each region, opening and closing panels, and resetting the
+ * layout to its defaults.
+ */
 const { formatMessage } = useVIntl()
 const workbench = injectWorkbench()
 
 const messages = defineMessages({
-	toggleLeft: {
-		id: 'workbench.toggle-left',
-		defaultMessage: 'Toggle left panel',
-	},
-	toggleRight: {
-		id: 'workbench.toggle-right',
-		defaultMessage: 'Toggle right panel',
-	},
-	toggleBottom: {
-		id: 'workbench.toggle-bottom',
-		defaultMessage: 'Toggle bottom panel',
-	},
-	panels: {
-		id: 'workbench.panels',
-		defaultMessage: 'Panels',
-	},
-	resetLayout: {
-		id: 'workbench.reset-layout',
-		defaultMessage: 'Reset layout',
-	},
-	useRounded: {
-		id: 'workbench.use-rounded',
-		defaultMessage: 'Use rounded style',
-	},
-	useSquare: {
-		id: 'workbench.use-square',
-		defaultMessage: 'Use square style',
-	},
-	collapseToolbar: {
-		id: 'workbench.collapse-toolbar',
-		defaultMessage: 'Hide toolbar',
-	},
+	layout: { id: 'workbench.layout-menu', defaultMessage: 'Layout' },
+	regions: { id: 'workbench.layout-menu.regions', defaultMessage: 'Regions' },
+	left: { id: 'workbench.layout-menu.left', defaultMessage: 'Left panel' },
+	right: { id: 'workbench.layout-menu.right', defaultMessage: 'Right panel' },
+	bottom: { id: 'workbench.layout-menu.bottom', defaultMessage: 'Bottom panel' },
+	resetLayout: { id: 'workbench.reset-layout', defaultMessage: 'Reset layout' },
 })
 
-const nextVariant = computed(() => (workbench.variant.value === 'rounded' ? 'square' : 'rounded'))
-const variantMessage = computed(() =>
-	nextVariant.value === 'square' ? messages.useSquare : messages.useRounded,
-)
-
-const toggleMessages = {
-	left: messages.toggleLeft,
-	right: messages.toggleRight,
-	bottom: messages.toggleBottom,
+const regionIcons = {
+	left: PanelLeftOpenIcon,
+	right: PanelRightOpenIcon,
+	bottom: PanelTopIcon,
 } satisfies Record<WorkbenchRegion, unknown>
 
-/** The icons point right, so they're turned to face the region they toggle. */
-const iconRotation: Record<WorkbenchRegion, string> = {
-	left: 'rotate-180',
-	right: '',
-	bottom: 'rotate-90',
-}
+/** The icons have no bottom panel of their own, so the top one is turned over. */
+const bottomIconClass = computed(() => 'rotate-180')
+
+const options = computed<ButtonMenuOption[]>(() => [
+	{ type: 'heading', id: 'regions', label: formatMessage(messages.regions) },
+	...workbench.usedRegions.value.map((region) => ({
+		id: `region-${region}`,
+		label: formatMessage(messages[region]),
+		icon: regionIcons[region],
+		iconClass: region === 'bottom' ? bottomIconClass : undefined,
+		selected: workbench.visible[region].value,
+		remainOpen: true,
+		action: () => workbench.toggleRegion(region),
+	})),
+	...(workbench.mode.closePanels
+		? [{ type: 'divider' as const, id: 'panels-divider' }, ...workbench.panelsMenuOptions.value]
+		: []),
+	{ type: 'divider', id: 'reset-divider' },
+	{
+		id: 'reset-layout',
+		label: formatMessage(messages.resetLayout),
+		icon: UndoIcon,
+		action: () => workbench.resetLayout(),
+	},
+])
 </script>

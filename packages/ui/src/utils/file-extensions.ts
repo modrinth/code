@@ -43,6 +43,20 @@ export const FILE_IMAGE_EXTENSIONS = ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'
 
 export const FILE_ARCHIVE_EXTENSIONS = ['zip', 'jar', 'tar', 'gz', 'rar', '7z'] as const
 
+export const FILE_VIDEO_EXTENSIONS = ['mp4', 'webm', 'ogv', 'mov', 'm4v'] as const
+
+/** `ogg` counts as audio, as games mostly use it for sounds. */
+export const FILE_AUDIO_EXTENSIONS = [
+	'mp3',
+	'ogg',
+	'oga',
+	'wav',
+	'flac',
+	'm4a',
+	'aac',
+	'opus',
+] as const
+
 // Type for extension strings
 export type CodeExtension = (typeof FILE_CODE_EXTENSIONS)[number]
 export type TextExtension = (typeof FILE_TEXT_EXTENSIONS)[number]
@@ -77,6 +91,27 @@ export function isImageFile(ext: string): boolean {
 	return (FILE_IMAGE_EXTENSIONS as readonly string[]).includes(ext.toLowerCase())
 }
 
+/** Check if extension is a video file */
+export function isVideoFile(ext: string): boolean {
+	return (FILE_VIDEO_EXTENSIONS as readonly string[]).includes(ext.toLowerCase())
+}
+
+/** Check if extension is an audio file */
+export function isAudioFile(ext: string): boolean {
+	return (FILE_AUDIO_EXTENSIONS as readonly string[]).includes(ext.toLowerCase())
+}
+
+/** How a file plays, from its type when known (e.g. detected from its contents) or else its name. */
+export function mediaKindOf(
+	filename: string,
+	fileInfo: FileTypeInfo | null = getFileTypeInfo(filename),
+): 'video' | 'audio' | null {
+	const ext = getFileExtension(filename)
+	if (isAudioFile(ext) || fileInfo?.mime.startsWith('audio/')) return 'audio'
+	if (isVideoFile(ext) || fileInfo?.mime.startsWith('video/')) return 'video'
+	return null
+}
+
 /**
  * Check if extension is an archive file
  */
@@ -100,8 +135,9 @@ export function canOpenInFileEditor(
 	filename: string,
 	fileInfo: FileTypeInfo | null = getFileTypeInfo(filename),
 ): boolean {
-	const lang = getLanguageFromFile(filename, fileInfo);
-	if (lang != null) return true;
+	const lang = getLanguageFromFile(filename, fileInfo)
+	if (lang != null) return true
+	if (mediaKindOf(filename, fileInfo)) return true
 	if (fileInfo != null) {
 		if (fileInfo.mime.startsWith('text/') || isImageFile(fileInfo.extension ?? '')) {
 			return true
@@ -128,10 +164,10 @@ export function getEditorLanguage(
 	filename: string,
 	fileInfo: FileTypeInfo | null = getFileTypeInfo(filename),
 ): string {
-	const language = getLanguageFromFile(filename, fileInfo);
-	if (language) return language;
+	const language = getLanguageFromFile(filename, fileInfo)
+	if (language) return language
 
-	const lowered = getFileExtension(filename);
+	const lowered = getFileExtension(filename)
 
 	switch (lowered) {
 		// Code files

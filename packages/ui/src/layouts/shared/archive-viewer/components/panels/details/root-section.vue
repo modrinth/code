@@ -25,6 +25,7 @@ import { sourceHost } from './entry-values'
 import { detailsMessages as messages } from './messages'
 import DetailsEntry from '../../details-section/index.vue'
 import { useContentsDetails } from './use-contents-details'
+import { useModrinthLookupRow } from './use-modrinth-lookup'
 import { useSizeRow } from './use-size-row'
 
 /** The archive that was opened: where it came from, its size and hash, and what it holds. */
@@ -33,6 +34,11 @@ const sizeRow = useSizeRow()
 const archive = injectArchiveViewer()
 
 const contents = useContentsDetails(() => archive.root)
+
+/** An archive listed by a project's version is already known to be on Modrinth; others are looked up. */
+const modrinthRow = useModrinthLookupRow(() =>
+	archive.source.sha512Hash ? undefined : () => archive.archiveHash('sha1'),
+)
 
 /**
  * Where the archive came from, and whether its hash matches the one it was listed with (e.g. by
@@ -66,10 +72,10 @@ const rows = computed<ArchiveDetailRow[]>(() => {
 			tooltip: formatMessage(messages.listedHashValue, { hash: listed }),
 		})
 	}
+	if (modrinthRow.value) result.push(modrinthRow.value)
 	return result
 })
 
 /** The downloaded archive against what it holds once uncompressed. */
 const sizes = computed(() => [sizeRow(archive.source.size, contents.value.size)])
-
 </script>

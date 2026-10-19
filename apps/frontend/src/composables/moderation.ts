@@ -1,7 +1,8 @@
-import { type KeybindDefinition, Keybinds, Settings } from '@modrinth/moderation'
+import { type KeybindDefinition, Keybinds } from '@modrinth/moderation'
+import { recordSettings } from '@modrinth/ui'
 import { computed } from 'vue'
 
-import type { CookieOptions } from '#app'
+import { getSettingsCookieOptions } from '~/composables/cookie-settings'
 import {
 	type AppearanceValues,
 	defaultAppearance,
@@ -20,23 +21,14 @@ type StoredOptions = {
 	appearanceTheme?: { id: string; values: AppearanceValues }
 }
 
-const getCookieOptions = <T>() =>
-	({
-		maxAge: 60 * 60 * 24 * 365 * 10,
-		sameSite: 'lax',
-		secure: useRuntimeConfig().public.cookieSecure,
-		httpOnly: false,
-		path: '/',
-	}) satisfies CookieOptions<T>
-
 const useModerationCookies = () => {
 	const keybindCookie = useCookie<Partial<StoredKeybinds> | null>(
 		moderationKeybindsId,
-		getCookieOptions(),
+		getSettingsCookieOptions(),
 	)
 	const optionsCookie = useCookie<Partial<StoredOptions> | null>(
 		moderationSettingsId,
-		getCookieOptions(),
+		getSettingsCookieOptions(),
 	)
 
 	if (keybindCookie.value && !optionsCookie.value) {
@@ -190,8 +182,12 @@ export function replaceModerationKeybinds(keybinds: StoredKeybinds) {
 	saveModerationOptions()
 }
 
+/**
+ * The moderation settings, kept in the moderation options cookie alongside the keybinds, as a
+ * store the shared settings panel and the review components read and write.
+ */
 export const useModerationSettings = () =>
-	computed(() => new Settings(useModerationOptions().value.settings, saveModerationOptions))
+	computed(() => recordSettings(useModerationOptions().value.settings, saveModerationOptions))
 
 export const useModerationAppearanceTheme = () =>
 	computed({

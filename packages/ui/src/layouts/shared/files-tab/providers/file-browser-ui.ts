@@ -6,7 +6,13 @@ import { createContext } from '#ui/providers/create-context'
 import type { DirectoryView } from '../composables/directory-view'
 import type { FileTabs } from '../composables/file-tabs'
 import type { FileItem } from '../types'
-import type { FileInfo, FileManagerContext } from './file-manager'
+import type { FilesSidebarToggleLocation } from '../settings'
+import type {
+	FileContentVariants,
+	FileInfo,
+	FileInterpretation,
+	FileManagerContext,
+} from './file-manager'
 
 /**
  * API exposed by each tab's file editor, registered on `FileTabs` on mount
@@ -46,6 +52,29 @@ export interface FileBrowserUIContext extends FileManagerContext {
 	/** Whether the tree folds chains of folders that each hold just one folder into a single row. */
 	compactFolders: ComputedRef<boolean>
 	setCompactFolders: (value: boolean) => void
+	/** The content variants of the file a tab shows, with the one picked for it (or the default). */
+	contentVariantOf: (
+		tabId: string,
+		file: FileInfo<'file'>,
+	) => (FileContentVariants & { selected: string }) | null
+	setContentVariant: (tabId: string, file: FileInfo<'file'>, variant: string) => void
+	/** How formatted JSON is indented, as `JSON.stringify` takes it. */
+	jsonIndent: ComputedRef<string | number>
+	/**
+	 * How a tab shows the file it's on: the way it picked, else formatted JSON for JSON files that
+	 * can't be edited (when the settings say so), else `auto`.
+	 */
+	interpretationOf: (tabId: string, file: FileInfo<'file'>) => FileInterpretation
+	setInterpretation: (
+		tabId: string,
+		file: FileInfo<'file'>,
+		interpretation: FileInterpretation,
+	) => void
+	/** Whether the tab strip offers a button for opening a new tab. */
+	showNewTabButton: ComputedRef<boolean>
+	/** Where the user keeps the button for showing and hiding the folder tree. */
+	sidebarToggleLocation: ComputedRef<FilesSidebarToggleLocation>
+	setSidebarToggleLocation: (location: FilesSidebarToggleLocation) => void
 
 	/**
 	 * Whether the tabs are hosted by an enclosing workbench, so each tab shows its own navigation

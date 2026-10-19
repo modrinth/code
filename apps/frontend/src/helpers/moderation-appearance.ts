@@ -1,4 +1,5 @@
-import { isValidFor, moderationSettings, type Settings } from '@modrinth/moderation'
+import { moderationSettings } from '@modrinth/moderation'
+import { isValidSettingValue, type SettingsStore } from '@modrinth/ui'
 
 const general = moderationSettings.General
 export const appearanceFields = {
@@ -14,7 +15,7 @@ export type AppearanceValues = {
 	[K in keyof typeof appearanceFields]: (typeof appearanceFields)[K]['default']
 }
 
-export function readAppearance(settings: Settings): AppearanceValues {
+export function readAppearance(settings: SettingsStore): AppearanceValues {
 	return Object.fromEntries(
 		Object.entries(appearanceFields).map(([key, definition]) => [
 			key,
@@ -23,7 +24,7 @@ export function readAppearance(settings: Settings): AppearanceValues {
 	) as AppearanceValues
 }
 
-export function applyAppearance(settings: Settings, values: AppearanceValues) {
+export function applyAppearance(settings: SettingsStore, values: AppearanceValues) {
 	for (const [key, definition] of Object.entries(appearanceFields)) {
 		settings.set<string | number>(definition, values[key as keyof AppearanceValues])
 	}
@@ -33,7 +34,7 @@ export const defaultAppearance = Object.fromEntries(
 	Object.entries(appearanceFields).map(([key, definition]) => [key, definition.default]),
 ) as AppearanceValues
 
-export function exportAppearance(settings: Settings) {
+export function exportAppearance(settings: SettingsStore) {
 	const values = readAppearance(settings)
 	return JSON.stringify(
 		{
@@ -64,7 +65,7 @@ export function parseAppearance(source: string): AppearanceValues {
 	const values: Record<string, string | number> = {}
 	for (const [key, definition] of Object.entries(appearanceFields)) {
 		const value = data.values[key] === null && definition.type === 'color' ? '' : data.values[key]
-		if (!isValidFor(definition, value)) throw new Error('value')
+		if (!isValidSettingValue<string | number>(definition, value)) throw new Error('value')
 		values[key] = typeof value === 'string' ? value.toLowerCase() : value
 	}
 	return values as AppearanceValues

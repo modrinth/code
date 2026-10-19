@@ -78,6 +78,7 @@ import Checkbox from '#ui/components/base/Checkbox.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 
 import { FILE_COLUMNS, type FileColumn } from '../composables/file-columns'
+import type { FilesSidebarToggleLocation } from '../settings'
 import type { FileSortField } from '../types'
 
 const { formatMessage } = useVIntl()
@@ -102,6 +103,18 @@ const messages = defineMessages({
 	coloredIcons: {
 		id: 'files.table-header.colored-icons',
 		defaultMessage: 'Colored icons',
+	},
+	sidebarToggle: {
+		id: 'files.table-header.sidebar-toggle',
+		defaultMessage: 'Folder tree button',
+	},
+	sidebarToggleSidebar: {
+		id: 'files.table-header.sidebar-toggle.sidebar',
+		defaultMessage: 'In the folder tree',
+	},
+	sidebarToggleNavigation: {
+		id: 'files.table-header.sidebar-toggle.navigation',
+		defaultMessage: 'In the navigation bar',
 	},
 })
 
@@ -140,7 +153,11 @@ const props = defineProps<{
 	/** Whether the view settings menu is offered at all. */
 	viewSettingsEnabled?: boolean
 	advancedView?: boolean
+	/** Whether the advanced view can be switched off, which a workbench always uses. */
+	advancedViewToggleable?: boolean
 	coloredIcons?: boolean
+	/** Where the folder tree's button sits, offered here unless the host toggles the tree itself. */
+	sidebarToggleLocation?: FilesSidebarToggleLocation | null
 }>()
 
 const emit = defineEmits<{
@@ -150,6 +167,7 @@ const emit = defineEmits<{
 	'toggle-details': []
 	'toggle-advanced-view': []
 	'toggle-colored-icons': []
+	'set-sidebar-toggle': [location: FilesSidebarToggleLocation]
 }>()
 
 const shownColumnDefinitions = computed(() =>
@@ -158,6 +176,7 @@ const shownColumnDefinitions = computed(() =>
 
 const columnOptions = computed<ButtonMenuOption[]>(() => [
 	{
+		shown: props.advancedViewToggleable !== false,
 		id: 'advanced-view',
 		label: formatMessage(messages.advancedView),
 		selected: props.advancedView,
@@ -171,6 +190,25 @@ const columnOptions = computed<ButtonMenuOption[]>(() => [
 		remainOpen: true,
 		action: () => emit('toggle-colored-icons'),
 	},
+	{ type: 'divider', shown: props.sidebarToggleLocation != null },
+	{
+		type: 'heading',
+		id: 'sidebar-toggle',
+		label: formatMessage(messages.sidebarToggle),
+		shown: props.sidebarToggleLocation != null,
+	},
+	...(['sidebar', 'navigation'] as const).map(
+		(location): ButtonMenuOption => ({
+			shown: props.sidebarToggleLocation != null,
+			id: `sidebar-toggle-${location}`,
+			label: formatMessage(
+				location === 'sidebar' ? messages.sidebarToggleSidebar : messages.sidebarToggleNavigation,
+			),
+			selected: props.sidebarToggleLocation === location,
+			remainOpen: true,
+			action: () => emit('set-sidebar-toggle', location),
+		}),
+	),
 	{ type: 'divider', shown: props.columnsAdjustable },
 	{
 		shown: props.columnsAdjustable,

@@ -42,6 +42,7 @@ import {
 	type WorkbenchPanel,
 	type WorkbenchRegion,
 	type WorkbenchRegionSizes,
+	type WorkbenchToggleLocation,
 	type WorkbenchVariant,
 } from '../types'
 import {
@@ -77,6 +78,10 @@ export interface WorkbenchPanelParams {
 interface SavedWorkbenchLayout {
 	version: typeof LAYOUT_VERSION
 	variant?: WorkbenchVariant
+	/** Whether panels can be popped out, for modes that allow it. */
+	popouts?: boolean
+	/** Where the region toggles sit, for modes with a toolbar. */
+	toggles?: WorkbenchToggleLocation
 	sizes: Partial<Record<WorkbenchRegion, number>>
 	visible: Partial<Record<WorkbenchRegion, boolean>>
 	/** Each dock's arrangements, by the set of workbench panels it held at the time. */
@@ -85,6 +90,8 @@ interface SavedWorkbenchLayout {
 	placements: Record<string, WorkbenchHost>
 	/** Panels the user closed. */
 	closed: string[]
+	/** Panels the layout has known, so ones closed by default only start closed the first time. */
+	seen?: string[]
 }
 
 export interface WorkbenchOptions {
@@ -148,6 +155,16 @@ function dropPosition(
 	return { direction: DROP_DIRECTIONS[position] }
 }
 
+/**
+ * The position, unless it's beside a group the dock no longer has (e.g. one dropped on before the
+ * dock loaded another arrangement), in which case the dock's default one.
+ */
+function usablePosition(api: DockviewApi, position: AddPanelPositionOptions | undefined) {
+	const group = position && 'referenceGroup' in position ? position.referenceGroup : undefined
+	if (!group || typeof group === 'string') return position
+	return api.getGroup(group.id) === group ? position : defaultPosition(api)
+}
+
 /** Alongside the panels of the dock's active (or first) group in the main window. */
 function defaultPosition(api: DockviewApi): AddPanelPositionOptions | undefined {
 	const inGrid = (group?: DockviewGroupPanel | null) => group?.api.location.type === 'grid'
@@ -193,6 +210,12 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 	const popoutServices = popoutHosts.length ? usePopoutServices() : null
 
 	const variant = ref<WorkbenchVariant>(saved?.variant ?? options.variant ?? 'square')
+	const popoutsEnabled = ref(saved?.popouts ?? true)
+	const toggleLocation = ref<WorkbenchToggleLocation>(
+		saved?.toggles ?? (mode.cornerToggles ? 'tabs' : 'menu'),
+	)
+	/** Modes without a toolbar always keep their toggles in the tab bar, having nowhere else for them. */
+	const cornerToggles = computed(() => !mode.toolbar || toggleLocation.value === 'tabs')
 
 	const documentLoaded = ref(typeof document === 'undefined' || document.readyState === 'complete')
 	function onDocumentLoad() {
@@ -210,7 +233,15 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 		),
 	)
 	const placements = ref<Record<string, WorkbenchHost>>({ ...saved?.placements })
-	const closed = ref<string[]>(mode.closePanels ? [...(saved?.closed ?? [])] : [])
+	/** Panels starting closed, unless the saved layout already decided whether they're open. */
+	function closedByDefault() {
+		return toValue(options.panels)
+			.filter((panel) => panel.closedByDefault && !saved?.seen?.includes(panel.id))
+			.map((panel) => panel.id)
+	}
+	const closed = ref<string[]>(
+		mode.closePanels ? [...new Set([...(saved?.closed ?? []), ...closedByDefault()])] : [],
+	)
 
 	function regionOf(panel: WorkbenchPanel): WorkbenchHost {
 		const placed = mode.movePanels ? placements.value[panel.id] : undefined
@@ -279,7 +310,10 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 
 	/** How wide (or tall, for the bottom) each region is shown, 0 while hidden. */
 	const regionExtents = Object.fromEntries(
-		WORKBENCH_REGIONS.map((region) => [region, ref(visible[region].value ? regionSizes[region] : 0)]),
+		WORKBENCH_REGIONS.map((region) => [
+			region,
+			ref(visible[region].value ? regionSizes[region] : 0),
+		]),
 	) as Record<WorkbenchRegion, Ref<number>>
 
 	/** The center's top-left and top-right groups, whose tab bars hold the corner region toggles. */
@@ -348,6 +382,8 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 		saveLayout(options.storageKey, {
 			version: LAYOUT_VERSION,
 			variant: variant.value,
+			popouts: popoutsEnabled.value,
+			toggles: toggleLocation.value,
 			sizes: { ...regionSizes },
 			visible: Object.fromEntries(regions.map((region) => [region, visible[region].value])),
 			docks: Object.fromEntries(
@@ -355,6 +391,7 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 			),
 			placements: { ...placements.value },
 			closed: [...closed.value],
+			seen: panels.value.map((panel) => panel.id),
 		})
 	}
 
@@ -481,7 +518,7 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 			}
 			const moved = pendingPositions.has(panel.id)
 			const position = moved
-				? pendingPositions.get(panel.id)
+				? usablePosition(api, pendingPositions.get(panel.id))
 				: (dock.popouts?.positionFor(panel.id) ?? defaultPosition(api))
 			pendingPositions.delete(panel.id)
 			api.addPanel<WorkbenchPanelParams>({
@@ -497,18 +534,42 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 			})
 		}
 		if (!api.activePanel) api.panels[0]?.api.setActive()
-		if (api.groups.length === 0) api.addGroup()
+		if (!hasGridGroup(api)) api.addGroup()
 		applyHeaders(host)
 	}
 
 	/**
-	 * Dockview drops a group once its last panel leaves; an emptied dock gets an empty group back,
-	 * so it keeps a tab bar to drop panels onto. Checked once a move settles, since moving a whole
-	 * group briefly leaves the dock without any.
+	 * Whether the group shows in its dock. A group popped out into a window leaves a hidden one
+	 * behind in the dock, for it to return to once the window closes.
+	 */
+	function isShownGridGroup(group: DockviewGroupPanel) {
+		return group.api.location.type === 'grid' && group.api.isVisible
+	}
+
+	function hasGridGroup(api: DockviewApi) {
+		return api.groups.some(isShownGridGroup)
+	}
+
+	/** Empty groups added to keep an emptied dock's tab bar, until another group shows again. */
+	const placeholderGroups = new WeakSet<DockviewGroupPanel>()
+
+	/**
+	 * Dockview drops a group once its last panel leaves, and a popped out group leaves only a
+	 * hidden one behind; an emptied dock gets an empty group, so it keeps a tab bar to drop panels
+	 * onto, which goes again once a popped out group returns. Checked once a move settles, since
+	 * moving a whole group briefly leaves the dock without any.
 	 */
 	function keepGroup(api: DockviewApi) {
 		queueMicrotask(() => {
-			if (api.groups.length === 0) api.addGroup()
+			const shown = api.groups.filter(isShownGridGroup)
+			if (shown.length === 0) {
+				placeholderGroups.add(api.addGroup())
+				return
+			}
+			if (shown.length < 2) return
+			for (const group of shown) {
+				if (placeholderGroups.has(group) && group.panels.length === 0) api.removeGroup(group)
+			}
 		})
 	}
 
@@ -678,6 +739,7 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 			api.onDidDrop((event) => onForeignDrop(host, event)),
 			api.onDidRemovePanel((panel) => onPanelRemoved(host, panel.id)),
 			api.onDidRemoveGroup(() => keepGroup(api)),
+			api.onDidLayoutChange(() => keepGroup(api)),
 			api.onDidAddGroup(() => queueMicrotask(() => applyHeaders(host))),
 			registerPanelOnlyDrops(api),
 			registerEvenSplits(api, () => isReady.value),
@@ -717,6 +779,11 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 	})
 	watch(variant, () => {
 		for (const dock of docks.values()) applyVariant(dock)
+		scheduleSave()
+	})
+	watch(toggleLocation, scheduleSave)
+	watch(popoutsEnabled, (enabled) => {
+		if (!enabled) closePopouts()
 		scheduleSave()
 	})
 
@@ -858,7 +925,9 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 		pendingPositions.clear()
 		pendingDocuments.clear()
 		placements.value = {}
-		closed.value = []
+		closed.value = mode.closePanels
+			? panels.value.filter((panel) => panel.closedByDefault).map((panel) => panel.id)
+			: []
 		for (const host of WORKBENCH_HOSTS) savedDockLayouts[host].clear()
 		for (const region of regions) {
 			regionSizes[region] = sizes[region].default
@@ -988,6 +1057,12 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 		mode,
 		variant,
 		setVariant: (value) => (variant.value = value),
+		canUsePopouts: popoutHosts.length > 0,
+		popoutsEnabled,
+		setPopoutsEnabled: (value) => (popoutsEnabled.value = value),
+		toggleLocation,
+		setToggleLocation: (value) => (toggleLocation.value = value),
+		cornerToggles,
 		documents,
 		panels,
 		closedPanels,
@@ -999,16 +1074,25 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 		detachedPanels,
 		hasPopouts,
 		poppingOut,
-		popoutPanel: (id) => dockPanelOf(id)?.dock.popouts?.popoutPanel(id),
+		popoutPanel: (id) =>
+			popoutsEnabled.value ? dockPanelOf(id)?.dock.popouts?.popoutPanel(id) : undefined,
 		dockPanel: (id) => dockPanelOf(id)?.dock.popouts?.dock(id),
 		closePopouts,
 		canPopout: (id) => {
+			if (!popoutsEnabled.value) return false
 			const found = dockPanelOf(id)
 			return !!found?.dock.popouts && found.panel?.api.location.type === 'grid'
 		},
 		isDetached: (id) => detachedPanels.value.includes(id),
 		regionOf,
 		isOpen: (id) => !closed.value.includes(id),
+		isShown: (id) => {
+			const panel = findPanel(id)
+			if (!panel || closed.value.includes(id)) return false
+			const host = regionOf(panel)
+			if (isRegion(host) && !visible[host].value) return false
+			return dockPanelOf(id)?.panel?.api.isVisible ?? false
+		},
 		setRegionVisible,
 		toggleRegion: (region) => setRegionVisible(region, !visible[region].value),
 		movePanel,

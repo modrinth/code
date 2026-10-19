@@ -731,6 +731,15 @@
   "app-marketing.show-other-packages": {
     "message": "Show other packages"
   },
+  "archive.external": {
+    "message": "External"
+  },
+  "archive.external-details.description": {
+    "message": "Opened from a link that isn't part of a project's versions."
+  },
+  "archive.external-details.external": {
+    "message": "External"
+  },
   "archive.go-back": {
     "message": "Go back"
   },
@@ -3451,9 +3460,6 @@
   },
   "moderation.settings.no-results": {
     "message": "No settings match your search."
-  },
-  "moderation.settings.none": {
-    "message": "None"
   },
   "moderation.settings.off": {
     "message": "Off"

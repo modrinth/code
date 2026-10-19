@@ -1,4 +1,4 @@
-import type { DockviewApi } from 'dockview-vue'
+import type { DockviewApi, DockviewGroupPanel } from 'dockview-vue'
 import type { Component } from 'vue'
 
 /** The regions around the workbench's center, each holding its panels as dockable tabs. */
@@ -19,6 +19,9 @@ export const WORKBENCH_VARIANTS = ['square', 'rounded'] as const
 
 export type WorkbenchVariant = (typeof WORKBENCH_VARIANTS)[number]
 
+/** Where the region toggles sit: in the layout menu, or also in the corners of the center's tab bars. */
+export type WorkbenchToggleLocation = 'menu' | 'tabs'
+
 /** A panel of the workbench, whose content is the host's `panel-{id}` slot. */
 export interface WorkbenchPanel {
 	id: string
@@ -30,6 +33,11 @@ export interface WorkbenchPanel {
 	/** Whether the panel scrolls its content (the default), rather than leaving that to it. */
 	scroll?: boolean
 	minimumHeight?: number
+	/**
+	 * Starts closed until opened (e.g. from the panels menu or by the host), for panels only
+	 * wanted now and then. Needs a mode whose panels can be closed.
+	 */
+	closedByDefault?: boolean
 }
 
 export interface WorkbenchPopoutOptions {
@@ -100,8 +108,16 @@ export interface WorkbenchDocuments {
 	components: Record<string, Component>
 	/** Tab components of the documents' panels, by name. */
 	tabComponents: Record<string, Component>
-	/** Shown at the end of a group's tab bar, e.g. to open another document there. */
+	/** Shown at the end of a group's tab bar, e.g. a list of every open document. */
 	headerActions?: Component
+	/** Opening a new document in a group, offered first by each tab bar's add menu. */
+	create?: {
+		label: () => string
+		icon?: Component
+		open: (group: DockviewGroupPanel) => void
+		/** Whether it's offered at the moment, e.g. per the user's settings. */
+		shown?: () => boolean
+	}
 	/** Shown in the center while it holds no panel at all. */
 	watermark?: Component
 	/**

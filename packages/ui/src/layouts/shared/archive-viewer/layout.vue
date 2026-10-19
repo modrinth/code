@@ -9,6 +9,7 @@
 			:path="path"
 			:storage-key="storageKey"
 			:hidden-regions="hiddenRegions"
+			:popout-url="popoutUrl"
 			@navigate="(value) => emit('update:path', value)"
 		>
 			<template #toolbar>
@@ -22,7 +23,9 @@
 					{{ formatMessage(fullyLoaded ? messages.fetchingRest : messages.readingNested) }}
 					<span v-if="fetchedLabel" class="tabular-nums">({{ fetchedLabel }})</span>
 				</div>
-				<DetailsSettings class="ml-auto" />
+			</template>
+			<template #toolbar-end>
+				<ArchiveSettings />
 			</template>
 			<template v-if="slots['project-details']" #project-details>
 				<slot name="project-details" />
@@ -73,13 +76,9 @@ import type { WorkbenchRegion } from '#ui/layouts/shared/workbench/types'
 import { commonMessages } from '#ui/utils/common-messages'
 
 import ArchiveWorkbench from './components/ArchiveWorkbench.vue'
-import DetailsSettings from './components/details-settings.vue'
+import ArchiveSettings from './components/archive-settings-button.vue'
 import { useArchiveLoader } from './composables/archive-loader'
-import {
-	injectArchiveDetailsSettings,
-	provideArchiveDetailsSettings,
-	useStoredArchiveDetailsSettings,
-} from './providers/details-settings'
+import { injectArchiveSettings, provideArchiveSettings, useStoredArchiveSettings } from './settings'
 import type { ArchiveSource } from './types'
 
 const props = withDefaults(
@@ -96,6 +95,11 @@ const props = withDefaults(
 		storageKey?: string | null
 		/** Regions hidden when opened, regardless of how they were left. */
 		hiddenRegions?: WorkbenchRegion[]
+		/**
+		 * An empty page of the same origin, which lets panels be popped out into windows loading it.
+		 * Without one, panels stay within the page.
+		 */
+		popoutUrl?: string
 	}>(),
 	{ storageKey: 'archive-viewer' },
 )
@@ -116,9 +120,7 @@ const slots = defineSlots<{
 const { formatMessage } = useVIntl()
 const formatBytes = useFormatBytes()
 
-provideArchiveDetailsSettings(
-	injectArchiveDetailsSettings(null) ?? useStoredArchiveDetailsSettings(),
-)
+provideArchiveSettings(injectArchiveSettings(null) ?? useStoredArchiveSettings())
 
 const messages = defineMessages({
 	reading: {

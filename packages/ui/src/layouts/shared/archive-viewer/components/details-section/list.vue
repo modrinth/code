@@ -3,12 +3,12 @@
 		<template v-for="row in rows" :key="row.id">
 			<dt class="text-secondary">{{ row.label }}</dt>
 			<dd class="m-0 min-w-0 break-words text-primary">
-				<SpinnerIcon v-if="row.loading" class="size-4 animate-spin text-secondary" aria-hidden="true" />
-				<HashValue
-					v-else-if="row.hash && row.value"
-					:hash="row.value"
-					:display="row.display"
+				<SpinnerIcon
+					v-if="row.loading"
+					class="size-4 animate-spin text-secondary"
+					aria-hidden="true"
 				/>
+				<HashValue v-else-if="row.hash && row.value" :hash="row.value" :display="row.display" />
 				<CopyCode
 					v-else-if="row.copyable && row.value"
 					class="max-w-full [&>span]:truncate"

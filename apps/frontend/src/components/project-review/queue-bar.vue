@@ -108,7 +108,16 @@
 			</div>
 		</nav>
 	</footer>
-	<TabbedModal ref="settingsModal" header="Settings" :tabs="settingsTabs" width="60rem">
+	<SettingsModal
+		ref="settingsModal"
+		header="Settings"
+		:pages="settingsPages"
+		:store="moderationSettings"
+		width="60rem"
+	>
+		<template #setting-actions="{ setting }">
+			<ModerationSettingActions :setting="setting" :store="moderationSettings" />
+		</template>
 		<template v-if="!isLocal" #footer>
 			<p class="m-0 shrink-0 break-words text-xs text-secondary">
 				Based on
@@ -133,10 +142,7 @@
 				</AutoLink>
 			</p>
 		</template>
-		<template #content="{ tab }">
-			<component :is="tab.content" v-if="tab?.content" embedded />
-		</template>
-	</TabbedModal>
+	</SettingsModal>
 </template>
 
 <script setup lang="ts">
@@ -150,12 +156,14 @@ import {
 	RotateCounterClockwiseIcon,
 	SettingsIcon,
 } from '@modrinth/assets'
-import { AutoLink, Button, FloatingMenu, TabbedModal, type TabbedModalTab } from '@modrinth/ui'
+import { AutoLink, Button, FloatingMenu, SettingsModal, type SettingsPage } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
+import { moderationSettingGroups } from '~/components/ui/moderation/settings/groups'
 import ModerationAppearance from '~/components/ui/moderation/settings/ModerationAppearance.vue'
 import ModerationKeybinds from '~/components/ui/moderation/settings/ModerationKeybinds.vue'
-import ModerationSettings from '~/components/ui/moderation/settings/ModerationSettings.vue'
+import ModerationSettingActions from '~/components/ui/moderation/settings/ModerationSettingActions.vue'
+import { useModerationSettings } from '~/composables/moderation'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
 import { injectProjectReviewContext } from './layout/context'
@@ -172,31 +180,37 @@ const isLocal =
 	hostname === '[::1]'
 
 const panelMenuOpen = ref(false)
-const settingsModal = ref<InstanceType<typeof TabbedModal> | null>(null)
-const settingsTabs: TabbedModalTab[] = [
+const settingsModal = ref<InstanceType<typeof SettingsModal> | null>(null)
+const moderationSettings = useModerationSettings()
+const settingsPages: SettingsPage[] = [
 	{
+		id: 'general',
 		name: {
 			id: 'moderation.project-review.generalSettings',
 			defaultMessage: 'General',
 		},
 		icon: SettingsIcon,
-		content: ModerationSettings,
+		groups: moderationSettingGroups,
 	},
 	{
+		id: 'appearance',
 		name: {
 			id: 'moderation.project-review.appearanceSettings',
 			defaultMessage: 'Appearance',
 		},
 		icon: PaletteIcon,
 		content: ModerationAppearance,
+		contentProps: { embedded: true },
 	},
 	{
+		id: 'keybinds',
 		name: {
 			id: 'moderation.project-review.keybindsSettings',
 			defaultMessage: 'Keybinds',
 		},
 		icon: KeyboardIcon,
 		content: ModerationKeybinds,
+		contentProps: { embedded: true },
 	},
 ]
 

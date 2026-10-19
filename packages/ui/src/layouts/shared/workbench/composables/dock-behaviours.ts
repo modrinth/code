@@ -29,7 +29,9 @@ export function registerWrappedTabs(api: DockviewApi): DockviewIDisposable {
 		const tabs = group.model.tabsListElement
 		const header = tabs.closest('.dv-tabs-and-actions-container')
 		const space = header?.querySelector<HTMLElement>(':scope > .dv-void-container')
-		const strip = tabs.parentElement?.classList.contains('dv-scrollable') ? tabs.parentElement : tabs
+		const strip = tabs.parentElement?.classList.contains('dv-scrollable')
+			? tabs.parentElement
+			: tabs
 		if (!header || !space || strip.parentElement !== header) return
 		const nextSibling = strip.nextSibling
 		space.appendChild(strip)

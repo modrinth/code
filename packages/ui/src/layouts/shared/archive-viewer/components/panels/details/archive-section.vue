@@ -6,7 +6,7 @@
 		icon-class="text-orange"
 		:path="node.path.replace(/^\/+/, '')"
 		:status="contents.status"
-		:rows="entry.rows"
+		:rows="rows"
 		:more="entry.more"
 		:sizes="sizes"
 		:counts="contents.counts"
@@ -27,11 +27,12 @@ import { detailsMessages as messages } from './messages'
 import DetailsEntry from '../../details-section/index.vue'
 import { useContentsDetails } from './use-contents-details'
 import { useEntryDetails } from './use-entry-details'
+import { useModrinthLookupRow } from './use-modrinth-lookup'
 import { useSizeRow } from './use-size-row'
 
 /**
  * An archive nested in another: how deep it sits, how it's stored as an entry of the archive
- * holding it, and what it holds itself.
+ * holding it, whether it's already published on Modrinth, and what it holds itself.
  */
 const props = defineProps<{
 	node: FileZipTreeNode
@@ -44,6 +45,16 @@ const { formatMessage } = useVIntl()
 const entry = useEntryDetails(() => props.node)
 const contents = useContentsDetails(() => props.node)
 const sizeRow = useSizeRow()
+
+const modrinthRow = useModrinthLookupRow(() => {
+	const hash = entry.value.hash
+	return hash ? () => hash('sha1') : undefined
+})
+
+const rows = computed(() => [
+	...entry.value.rows,
+	...(modrinthRow.value ? [modrinthRow.value] : []),
+])
 
 const sizes = computed(() => [
 	sizeRow(entry.value.stored?.compressed, entry.value.stored?.size, contents.value.size),

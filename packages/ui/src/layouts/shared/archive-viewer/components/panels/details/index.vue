@@ -1,8 +1,8 @@
 <template>
 	<div class="flex flex-col divide-x-0 divide-y divide-solid divide-surface-4">
-		<slot name="source" />
-		<RootSection />
-		<div v-if="chain.length > 1" class="px-2 py-1">
+		<slot v-if="settings.section('source')" name="source" />
+		<RootSection v-if="settings.section('root')" />
+		<div v-if="settings.section('nested') && chain.length > 1" class="px-2 py-1">
 			<Button type="quiet" size="sm" :aria-expanded="expanded" @click="expanded = !expanded">
 				<ChevronUpIcon v-if="expanded" aria-hidden="true" />
 				<ChevronDownIcon v-else aria-hidden="true" />
@@ -14,12 +14,12 @@
 			</Button>
 		</div>
 		<ArchiveSection
-			v-for="(nested, index) in shownChain"
+			v-for="(nested, index) in settings.section('nested') ? shownChain : []"
 			:key="nested.path"
 			:node="nested"
 			:depth="chain.length - shownChain.length + index + 1"
 		/>
-		<EntrySection v-if="entry" :key="entry.path" :node="entry" />
+		<EntrySection v-if="entry && settings.section('entry')" :key="entry.path" :node="entry" />
 	</div>
 </template>
 
@@ -33,6 +33,7 @@ import { type FileZipTreeNode, isZipArchive, type ZipNode } from '#ui/helpers/to
 import { injectFileBrowserUI } from '#ui/layouts/shared/files-tab/providers/file-browser-ui'
 
 import { injectArchiveViewer } from '../../../providers/archive-viewer'
+import { useArchiveDetailSettings } from '../../../settings'
 import ArchiveSection from './archive-section.vue'
 import EntrySection from './entry-section.vue'
 import { detailsMessages as messages } from './messages'
@@ -43,11 +44,13 @@ import RootSection from './root-section.vue'
  * (the `source` slot, e.g. a project's version, when the host knows), the opened archive, the
  * archives nested within it down to the one the entry sits in (or is), and the entry itself. Each
  * is only shown when it differs from the one above, so nothing is described twice, and the
- * archives between the opened one and the closest can be folded away.
+ * archives between the opened one and the closest can be folded away. Each kind of item can be
+ * left out in the viewer's settings.
  */
 const { formatMessage } = useVIntl()
 const ui = injectFileBrowserUI()
 const archive = injectArchiveViewer()
+const settings = useArchiveDetailSettings()
 
 const expanded = ref(false)
 

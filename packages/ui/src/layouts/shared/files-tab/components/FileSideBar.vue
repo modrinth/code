@@ -1,13 +1,15 @@
 <template>
 	<div
-		class="flex flex-col p-1 gap-2 h-full"
+		class="flex flex-col p-1 gap-3 h-full"
 		:class="[
 			addBorder ? 'border-r border-0 border-solid border-surface-5 pr-2' : '',
 			constrainWidth ? 'w-[24rem]' : 'w-full',
 		]"
 	>
 		<FileActionBar
+			v-if="hasActions"
 			:sidebar-open="ui.sidebarOpen.value"
+			:sidebar-toggleable="toggleLocation === 'sidebar'"
 			:active-location="ui.activeLocation.value"
 			:search-query="ui.activeView.value.searchQuery.value"
 			:show-refresh-button="ui.showRefreshButton.value"
@@ -24,9 +26,11 @@
 			@share="() => ui.shareEditorToMclogs()"
 			@find="() => ui.toggleFind()"
 			@toggle-sidebar="() => ui.setSidebarOpen(!ui.sidebarOpen.value)"
+			class="py-1"
 		>
 			<template #actions>
 				<IconButton
+					v-if="!ui.inWorkbench"
 					v-tooltip="formatMessage(messages.compactFolders)"
 					:type="ui.compactFolders.value ? 'colored' : 'quiet'"
 					:color="ui.compactFolders.value ? 'brand' : undefined"
@@ -54,16 +58,27 @@
 
 <script setup lang="ts">
 import { FoldVerticalIcon } from '@modrinth/assets'
+import { computed } from 'vue'
 
 import { IconButton } from '#ui/components/base/buttons'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 
+import { useSidebarToggleLocation } from '../composables/sidebar-toggle'
 import { injectFileBrowserUI } from '../providers/file-browser-ui'
 import FileActionBar from './FileActionBar.vue'
 import FileSearch from './FileSearch.vue'
 import FileTree from './FileTree.vue'
 
 const ui = injectFileBrowserUI()
+const toggleLocation = useSidebarToggleLocation()
+
+/**
+ * Whether the action bar atop the tree has anything to offer: the tree's own button, creating
+ * entries, or compacting folders, which a workbench offers in its settings instead.
+ */
+const hasActions = computed(
+	() => toggleLocation.value === 'sidebar' || !ui.readOnly || !ui.inWorkbench,
+)
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({

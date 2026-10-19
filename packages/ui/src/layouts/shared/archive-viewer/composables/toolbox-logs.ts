@@ -43,6 +43,19 @@ export function startToolboxLogCapture(): Promise<void> {
 	return capture
 }
 
+/** Adds an entry of the viewer's own, e.g. a file a decompiler couldn't read. */
+export function addToolboxLog(level: LogLevel, logger: string, message: string, error?: unknown) {
+	const entry: ToolboxLogEntry = {
+		id: nextId++,
+		time: new Date(),
+		level,
+		logger,
+		message,
+		error: errorText(error),
+	}
+	entries.value = [...entries.value.slice(-(MAX_ENTRIES - 1)), entry]
+}
+
 export function useToolboxLogs() {
 	return {
 		entries,

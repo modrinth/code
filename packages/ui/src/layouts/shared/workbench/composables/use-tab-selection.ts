@@ -148,7 +148,12 @@ export function useWorkbenchSelection(windows: WorkbenchWindows) {
 						order.splice(index, 0, ...panels)
 						for (const [position, entry] of order.entries()) {
 							if (group.panels[position] !== entry) {
-								entry.api.moveTo({ group, position: 'center', index: position, skipSetActive: true })
+								entry.api.moveTo({
+									group,
+									position: 'center',
+									index: position,
+									skipSetActive: true,
+								})
 							}
 						}
 						panel.api.setActive()

@@ -288,14 +288,23 @@ function registerDragPopouts(
 		const source = eventTarget
 		const sourceWindow = ownerWindow
 		const bounds = dock.getBoundingClientRect()
+		/** Only releases off the whole workbench pop out; other docks can take the tab instead. */
+		const area = (root() ?? dock).getBoundingClientRect()
 		const windowOrigin = {
 			left: nativeEvent.screenX - nativeEvent.clientX - sourceWindow.screenX,
 			top: nativeEvent.screenY - nativeEvent.clientY - sourceWindow.screenY,
 		}
-		const panelIds = new Set('panels' in target ? target.panels.map((panel) => panel.id) : [target.id])
+		const panelIds = new Set(
+			'panels' in target ? target.panels.map((panel) => panel.id) : [target.id],
+		)
 		const windows = [window, ...api.getPopouts().map((entry) => entry.window)]
 		let dropCleanupTimer: ReturnType<typeof setTimeout> | undefined
 		let nativeDrop: DragEvent | undefined
+		/**
+		 * Whether the drop landed on a dock (of this window or a popout). Checked as it happens, as
+		 * the dock's tab bar can be gone by the time the drag ends, once the move empties it.
+		 */
+		let droppedOnDock = false
 		let moved = false
 		let dropped = false
 		let cancelled = false
@@ -340,6 +349,9 @@ function registerDragPopouts(
 
 		function observeDrop(event: DragEvent) {
 			nativeDrop = event
+			droppedOnDock = !!(event.target as Element | null)?.closest?.(
+				'.workbench-dock, .dv-popout-window',
+			)
 			dropCleanupTimer = setTimeout(() => onDragEnd(event), 0)
 		}
 
@@ -356,11 +368,12 @@ function registerDragPopouts(
 			const clientY = release.screenY - sourceWindow.screenY - windowOrigin.top
 			const destination = (nativeDrop?.target as Node | null)?.ownerDocument
 			const outside =
-				(destination && destination !== source.ownerDocument) ||
-				clientX < bounds.left ||
-				clientX > bounds.right ||
-				clientY < bounds.top ||
-				clientY > bounds.bottom
+				!droppedOnDock &&
+				((destination && destination !== source.ownerDocument) ||
+					clientX < area.left ||
+					clientX > area.right ||
+					clientY < area.top ||
+					clientY > area.bottom)
 			const shouldPopout =
 				!cancelled &&
 				!moved &&
@@ -635,7 +648,11 @@ export function createDockPopouts(config: DockPopoutsOptions) {
 		const group =
 			source?.api.location.type === 'grid' && source.panels.length
 				? source
-				: (api.groups.find((entry) => entry.api.location.type === 'grid' && entry.panels.length) ??
+				: (api.groups.find(
+						(entry) =>
+							entry.api.location.type === 'grid' && entry.api.isVisible && entry.panels.length,
+					) ??
+					api.groups.find((entry) => entry.api.location.type === 'grid' && entry.api.isVisible) ??
 					api.addGroup())
 		panel.api.moveTo({ group, position: 'center' })
 		panel.api.setActive()

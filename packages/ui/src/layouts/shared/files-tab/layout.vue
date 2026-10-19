@@ -157,7 +157,16 @@
 import { FolderArchiveIcon, HistoryIcon, SaveIcon, TrashIcon } from '@modrinth/assets'
 import { type MaybeElement, useLocalStorage, useResizeObserver } from '@vueuse/core'
 import type { Component } from 'vue'
-import { computed, onMounted, onUnmounted, ref, shallowRef, toValue, watch } from 'vue'
+import {
+	computed,
+	onMounted,
+	onUnmounted,
+	ref,
+	shallowReactive,
+	shallowRef,
+	toValue,
+	watch,
+} from 'vue'
 
 import { type ButtonMenuOption, NewModal } from '#ui/components'
 import { Button, ContextMenu } from '#ui/components/base/buttons'
@@ -176,7 +185,7 @@ import { injectFilePicker } from '#ui/providers/file-picker'
 import { injectPageContext } from '#ui/providers/page-context'
 import { injectNotificationManager } from '#ui/providers/web-notifications'
 import { commonMessages } from '#ui/utils/common-messages'
-import { canOpenInFileEditor } from '#ui/utils/file-extensions'
+import { canOpenInFileEditor, getEditorLanguage } from '#ui/utils/file-extensions'
 
 import FileBrowserPanel from './components/FileBrowserPanel.vue'
 import FileSideBar from './components/FileSideBar.vue'
@@ -193,7 +202,8 @@ import { useFileSelection } from './composables/file-selection'
 import { useFileUndoRedo } from './composables/file-undo-redo'
 import type { FileEditorBridge } from './providers/file-browser-ui'
 import { provideFileBrowserUI } from './providers/file-browser-ui'
-import { type FileInfo, injectFileManager } from './providers/file-manager'
+import { type FileInfo, type FileInterpretation, injectFileManager } from './providers/file-manager'
+import { filesTabSettings, jsonIndentOf, useFilesTabSettings } from './settings'
 import type { FileItem } from './types'
 
 const { formatMessage } = useVIntl()
@@ -303,6 +313,33 @@ const coloredIcons = computed(() => coloredIconsSetting.value)
 const compactFoldersSetting = useLocalStorage('files-compact-folders', false, {
 	initOnMounted: true,
 })
+const filesSettings = useFilesTabSettings()
+
+/** The content variant each tab picked for each file it showed, by tab and path. */
+const contentVariantChoices = shallowReactive(new Map<string, string>())
+/** How each tab shows each file it showed, by tab and path. */
+const interpretationChoices = shallowReactive(new Map<string, FileInterpretation>())
+
+/**
+ * JSON files that can't be edited open formatted, as nothing they show then gets saved. Editable
+ * ones open as they're stored, so saving them doesn't reformat them.
+ */
+function defaultInterpretation(file: FileInfo<'file'>): FileInterpretation {
+	if (!filesSettings.get(filesTabSettings.formatJson)) return 'auto'
+	if (!(ctx.readOnly || (ctx.isReadOnly?.(file) ?? false))) return 'auto'
+	const language = ctx.editorLanguage?.(file) ?? getEditorLanguage(file.name)
+	return language === 'json' ? 'json' : 'auto'
+}
+
+function contentVariantOf(tabId: string, file: FileInfo<'file'>) {
+	const variants = ctx.contentVariants?.(file)
+	if (!variants) return null
+	const picked = contentVariantChoices.get(`${tabId}:${file.path}`)
+	const selected = variants.options.some((option) => option.id === picked)
+		? picked!
+		: variants.default
+	return { ...variants, selected }
+}
 
 /** Switching to the simple view drops the extra tabs, so their unsaved changes are confirmed first. */
 async function setAdvancedView(value: boolean) {
@@ -851,6 +888,18 @@ provideFileBrowserUI({
 	setColoredIcons: (value) => (coloredIconsSetting.value = value),
 	compactFolders: computed(() => compactFoldersSetting.value),
 	setCompactFolders: (value) => (compactFoldersSetting.value = value),
+	contentVariantOf,
+	setContentVariant: (tabId, file, variant) =>
+		contentVariantChoices.set(`${tabId}:${file.path}`, variant),
+	interpretationOf: (tabId, file) =>
+		interpretationChoices.get(`${tabId}:${file.path}`) ?? defaultInterpretation(file),
+	jsonIndent: computed(() => jsonIndentOf(filesSettings.get(filesTabSettings.jsonIndent))),
+	setInterpretation: (tabId, file, interpretation) =>
+		interpretationChoices.set(`${tabId}:${file.path}`, interpretation),
+	showNewTabButton: computed(() => filesSettings.get(filesTabSettings.newTabButton)),
+	sidebarToggleLocation: computed(() => filesSettings.get(filesTabSettings.sidebarToggle)),
+	setSidebarToggleLocation: (location) =>
+		filesSettings.set(filesTabSettings.sidebarToggle, location),
 
 	inWorkbench: props.workbench ?? false,
 	viewFor,

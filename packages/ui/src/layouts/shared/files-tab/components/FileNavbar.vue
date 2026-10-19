@@ -50,7 +50,9 @@
 					tag="span"
 					class="relative flex items-center"
 					:class="
-						compact ? 'w-full flex-wrap' : ['w-fit', { 'breadcrumbs-scroll': isBreadcrumbAnimating }]
+						compact
+							? 'w-full flex-wrap'
+							: ['w-fit', { 'breadcrumbs-scroll': isBreadcrumbAnimating }]
 					"
 					@animationiteration="onBreadcrumbAnimationIteration"
 				>

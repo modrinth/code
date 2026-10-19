@@ -31,6 +31,11 @@ export interface ArchiveDetailRow {
 	/** Colours the value, e.g. a check that passed (`green`) or failed (`red`). */
 	tone?: 'green' | 'red'
 	href?: string
+	/**
+	 * Where the row shows within its item: always, only behind its details pull tab, or never.
+	 * Defaults to always.
+	 */
+	visibility?: 'always' | 'details' | 'never'
 }
 
 export interface ArchiveLoadProgress {

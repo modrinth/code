@@ -25,7 +25,8 @@
 					:enabled-columns="enabledColumns"
 					:details-enabled="detailsEnabled"
 					:columns-adjustable="ui.advancedView.value"
-					:view-settings-enabled="ui.canUseAdvancedView.value && !ui.inWorkbench"
+					:view-settings-enabled="ui.canUseAdvancedView.value"
+					:advanced-view-toggleable="!ui.inWorkbench"
 					:advanced-view="ui.advancedView.value"
 					:colored-icons="ui.coloredIcons.value"
 					@sort="view.handleSort"
@@ -33,7 +34,9 @@
 					@toggle-column="toggleColumn"
 					@toggle-details="detailsEnabled = !detailsEnabled"
 					@toggle-advanced-view="ui.setAdvancedView(!ui.advancedView.value)"
+					:sidebar-toggle-location="ui.inWorkbench ? null : ui.sidebarToggleLocation.value"
 					@toggle-colored-icons="ui.setColoredIcons(!ui.coloredIcons.value)"
+					@set-sidebar-toggle="ui.setSidebarToggleLocation"
 				/>
 				<ReadyTransition :pending="listingPending">
 					<div

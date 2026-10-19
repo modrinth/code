@@ -62,7 +62,9 @@ const rows = computed<ArchiveDetailRow[]>(() => {
 		},
 		...(isPlaceholderDate(modified)
 			? []
-			: [{ id: 'modified', label: formatMessage(messages.modified), value: formatDate(modified!) }]),
+			: [
+					{ id: 'modified', label: formatMessage(messages.modified), value: formatDate(modified!) },
+				]),
 	]
 })
 </script>

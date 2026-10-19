@@ -1,7 +1,10 @@
 <template>
 	<section
 		class="workbench-panel h-full min-h-0 w-full"
-		:class="[panel?.scroll === false ? 'overflow-hidden' : 'overflow-auto', { 'p-3': panel?.padded }]"
+		:class="[
+			panel?.scroll === false ? 'overflow-hidden' : 'overflow-auto',
+			{ 'p-3': panel?.padded },
+		]"
 		:inert="regionHidden"
 		:aria-label="panel?.title"
 	>
@@ -39,7 +42,9 @@ const regionHidden = computed(
 )
 
 const tabVisible = ref(props.params.api.isVisible)
-const visibility = props.params.api.onDidVisibilityChange((event) => (tabVisible.value = event.isVisible))
+const visibility = props.params.api.onDidVisibilityChange(
+	(event) => (tabVisible.value = event.isVisible),
+)
 onBeforeUnmount(() => visibility.dispose())
 
 provideWorkbenchPanel({ id, visible: computed(() => tabVisible.value && !regionHidden.value) })

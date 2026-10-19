@@ -10,6 +10,7 @@ import type {
 	WorkbenchMode,
 	WorkbenchPanel,
 	WorkbenchRegion,
+	WorkbenchToggleLocation,
 	WorkbenchVariant,
 } from '../types'
 
@@ -25,6 +26,16 @@ export interface WorkbenchContext {
 	mode: WorkbenchMode
 	variant: Ref<WorkbenchVariant>
 	setVariant: (variant: WorkbenchVariant) => void
+	/** Whether the mode lets panels be popped out at all. */
+	canUsePopouts: boolean
+	/** Whether the user lets panels be popped out, where the mode allows it. */
+	popoutsEnabled: Ref<boolean>
+	setPopoutsEnabled: (enabled: boolean) => void
+	/** Where the user keeps the region toggles: in the layout menu only, or also in the tab bar. */
+	toggleLocation: Ref<WorkbenchToggleLocation>
+	setToggleLocation: (location: WorkbenchToggleLocation) => void
+	/** Whether the left and right region toggles show in the corners of the center's tab bars. */
+	cornerToggles: ComputedRef<boolean>
 	documents?: WorkbenchDocuments
 	panels: ComputedRef<WorkbenchPanel[]>
 	/** Panels the user closed, which can be opened again. */
@@ -53,6 +64,8 @@ export interface WorkbenchContext {
 	/** The dock a panel is in, which it may have been moved to. */
 	regionOf: (panel: WorkbenchPanel) => WorkbenchHost
 	isOpen: (id: string) => boolean
+	/** Whether the panel is in view: open, in a shown region, and the front tab of its group. */
+	isShown: (id: string) => boolean
 	setRegionVisible: (region: WorkbenchRegion, visible: boolean) => void
 	toggleRegion: (region: WorkbenchRegion) => void
 	/** Moves (or reopens) a panel into a dock, and shows it. */

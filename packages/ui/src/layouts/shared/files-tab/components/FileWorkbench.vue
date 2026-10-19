@@ -16,8 +16,10 @@
 </template>
 
 <script setup lang="ts">
+import { HomeIcon } from '@modrinth/assets'
 import { defineComponent, h, ref } from 'vue'
 
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import WorkbenchLayout from '#ui/layouts/shared/workbench/layout.vue'
 import type {
 	WorkbenchDocuments,
@@ -30,6 +32,7 @@ import type {
 } from '#ui/layouts/shared/workbench/types'
 
 import { FILE_TAB_COMPONENT, FILE_TAB_PANEL_COMPONENT } from '../composables/file-tabs'
+import { infoFrom } from '../utils'
 import { injectFileBrowserUI } from '../providers/file-browser-ui'
 import FileEmptyWorkspace from './FileEmptyWorkspace.vue'
 import FileTab from './tabs/FileTab.vue'
@@ -51,18 +54,30 @@ defineProps<{
 }>()
 
 const ui = injectFileBrowserUI()
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	newTab: { id: 'files.tabs.new-tab', defaultMessage: 'New tab' },
+})
 
 /** Shown in the center once every tab is closed. */
 const EmptyWorkspace = defineComponent({
 	name: 'FileWorkbenchEmpty',
 	inheritAttrs: false,
-	setup: () => () => h('div', { class: 'h-full overflow-auto bg-surface-2' }, [h(FileEmptyWorkspace)]),
+	setup: () => () =>
+		h('div', { class: 'h-full overflow-auto bg-surface-2' }, [h(FileEmptyWorkspace)]),
 })
 
 const documents: WorkbenchDocuments = {
 	components: { [FILE_TAB_PANEL_COMPONENT]: FileTabPanel },
 	tabComponents: { [FILE_TAB_COMPONENT]: FileTab },
 	headerActions: FileTabsActions,
+	create: {
+		label: () => formatMessage(messages.newTab),
+		icon: HomeIcon,
+		open: (group) => ui.fileTabs.openTab(infoFrom('/'), { group }),
+		shown: () => ui.showNewTabButton.value,
+	},
 	watermark: EmptyWorkspace,
 	confirmMove: (id) => ui.fileTabs.confirmMove(id),
 	attach: (api, host) => ui.fileTabs.attach(api, { primary: host === 'center' }),

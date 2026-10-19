@@ -53,6 +53,9 @@
   "archive-viewer.action.download-archive": {
     "defaultMessage": "Download archive"
   },
+  "archive-viewer.decompile-failed": {
+    "defaultMessage": "{decompiler} could not decompile {path}"
+  },
   "archive-viewer.detail.compressed-size": {
     "defaultMessage": "Compressed size"
   },
@@ -61,15 +64,6 @@
   },
   "archive-viewer.detail.sha1": {
     "defaultMessage": "SHA-1"
-  },
-  "archive-viewer.details-settings.content-counts": {
-    "defaultMessage": "Content counts"
-  },
-  "archive-viewer.details-settings.hashes": {
-    "defaultMessage": "Hashes to list"
-  },
-  "archive-viewer.details-settings.title": {
-    "defaultMessage": "Details settings"
   },
   "archive-viewer.details.class-files-count": {
     "defaultMessage": "{count, plural, one {# class file} other {# class files}}"
@@ -103,6 +97,9 @@
   },
   "archive-viewer.details.copy-value": {
     "defaultMessage": "Copy {label}"
+  },
+  "archive-viewer.details.detected-language": {
+    "defaultMessage": "Language"
   },
   "archive-viewer.details.detected-type": {
     "defaultMessage": "Detected type"
@@ -155,6 +152,15 @@
   "archive-viewer.details.nested-archives-count": {
     "defaultMessage": "{count, plural, one {# nested archive} other {# nested archives}}"
   },
+  "archive-viewer.details.on-modrinth": {
+    "defaultMessage": "On Modrinth"
+  },
+  "archive-viewer.details.on-modrinth-match": {
+    "defaultMessage": "{project} {version}"
+  },
+  "archive-viewer.details.on-modrinth-none": {
+    "defaultMessage": "Not found"
+  },
   "archive-viewer.details.path-copied": {
     "defaultMessage": "Path copied"
   },
@@ -193,6 +199,9 @@
   },
   "archive-viewer.details.yes": {
     "defaultMessage": "Yes"
+  },
+  "archive-viewer.disassembler": {
+    "defaultMessage": "Disassembler"
   },
   "archive-viewer.error-title": {
     "defaultMessage": "Unable to open {name}"
@@ -247,6 +256,108 @@
   },
   "archive-viewer.reading-nested": {
     "defaultMessage": "Reading nested archives..."
+  },
+  "archive-viewer.settings.content-counts": {
+    "defaultMessage": "Contents counts"
+  },
+  "archive-viewer.settings.content-counts-description": {
+    "defaultMessage": "How many files, folders, class files and nested archives an archive holds."
+  },
+  "archive-viewer.settings.decompiler": {
+    "defaultMessage": "Default decompiler"
+  },
+  "archive-viewer.settings.decompiler-description": {
+    "defaultMessage": "The decompiler class files open with. Each tab can switch to another from its navigation."
+  },
+  "archive-viewer.settings.detected-language": {
+    "defaultMessage": "Detected language"
+  },
+  "archive-viewer.settings.detected-language-description": {
+    "defaultMessage": "The language a text file is highlighted as."
+  },
+  "archive-viewer.settings.detected-type": {
+    "defaultMessage": "Detected type"
+  },
+  "archive-viewer.settings.detected-type-description": {
+    "defaultMessage": "A file's type, as detected from its contents."
+  },
+  "archive-viewer.settings.files": {
+    "defaultMessage": "Class files"
+  },
+  "archive-viewer.settings.files-description": {
+    "defaultMessage": "How compiled Java classes are turned back into source."
+  },
+  "archive-viewer.settings.hashes": {
+    "defaultMessage": "Hashes"
+  },
+  "archive-viewer.settings.hashes-description": {
+    "defaultMessage": "Hashes are only computed once shown. The SHA family is computed by the browser, Murmur2 is the fingerprint CurseForge identifies files by, and CRC-32 is the checksum archives store for their files."
+  },
+  "archive-viewer.settings.information": {
+    "defaultMessage": "Information"
+  },
+  "archive-viewer.settings.information-description": {
+    "defaultMessage": "When each kind of detail shows: always, only with details pulled out, or never."
+  },
+  "archive-viewer.settings.modrinth-lookup": {
+    "defaultMessage": "On Modrinth"
+  },
+  "archive-viewer.settings.modrinth-lookup-description": {
+    "defaultMessage": "Whether nested archives (and archives opened from other links) are already published on Modrinth, found by their hash."
+  },
+  "archive-viewer.settings.page.details": {
+    "defaultMessage": "Details"
+  },
+  "archive-viewer.settings.page.layout": {
+    "defaultMessage": "Layout and files"
+  },
+  "archive-viewer.settings.pages": {
+    "defaultMessage": "Settings pages"
+  },
+  "archive-viewer.settings.section.entry": {
+    "defaultMessage": "Open file or folder"
+  },
+  "archive-viewer.settings.section.entry-description": {
+    "defaultMessage": "The file or folder open in the active tab."
+  },
+  "archive-viewer.settings.section.nested": {
+    "defaultMessage": "Nested archives"
+  },
+  "archive-viewer.settings.section.nested-description": {
+    "defaultMessage": "Archives stored within the opened one, down to the one holding the open file."
+  },
+  "archive-viewer.settings.section.root": {
+    "defaultMessage": "Opened archive"
+  },
+  "archive-viewer.settings.section.root-description": {
+    "defaultMessage": "The archive itself: where it came from, its size, hashes and contents."
+  },
+  "archive-viewer.settings.section.source": {
+    "defaultMessage": "Project and version"
+  },
+  "archive-viewer.settings.section.source-description": {
+    "defaultMessage": "Where the archive was published, when the viewer knows."
+  },
+  "archive-viewer.settings.sections": {
+    "defaultMessage": "Details stack"
+  },
+  "archive-viewer.settings.sections-description": {
+    "defaultMessage": "Which items the details panel describes, from the outside in."
+  },
+  "archive-viewer.settings.size": {
+    "defaultMessage": "Size"
+  },
+  "archive-viewer.settings.size-description": {
+    "defaultMessage": "Sizes as stored and in full."
+  },
+  "archive-viewer.settings.visibility.always": {
+    "defaultMessage": "Always"
+  },
+  "archive-viewer.settings.visibility.details": {
+    "defaultMessage": "In details"
+  },
+  "archive-viewer.settings.visibility.never": {
+    "defaultMessage": "Never"
   },
   "badge.alpha": {
     "defaultMessage": "Alpha"
@@ -1733,6 +1844,9 @@
   "files.editor.find-toggle-replace": {
     "defaultMessage": "Toggle replace"
   },
+  "files.editor.hex-truncated": {
+    "defaultMessage": "… {bytes, plural, one {# more byte} other {# more bytes}} not shown"
+  },
   "files.editor.log-url-copied-text": {
     "defaultMessage": "Your log file URL has been copied to your clipboard."
   },
@@ -1844,6 +1958,9 @@
   "files.layout.zip-mixed-folders": {
     "defaultMessage": "Only entries from the same folder can be zipped together"
   },
+  "files.media-viewer.unplayable": {
+    "defaultMessage": "This file can't be played in the browser."
+  },
   "files.move-modal.current-location": {
     "defaultMessage": "Current location"
   },
@@ -1940,6 +2057,9 @@
   "files.operations.modpack-from-url": {
     "defaultMessage": "modpack from URL"
   },
+  "files.preview-fallback.description": {
+    "defaultMessage": "This file isn't text, an image or media, so it can't be previewed here."
+  },
   "files.rename-modal.header": {
     "defaultMessage": "Rename {name}"
   },
@@ -1976,6 +2096,60 @@
   "files.search.placeholder": {
     "defaultMessage": "Go to file or folder"
   },
+  "files.settings.colored-icons": {
+    "defaultMessage": "Colored file icons"
+  },
+  "files.settings.colored-icons-description": {
+    "defaultMessage": "Tint file and folder icons by their type."
+  },
+  "files.settings.compact-folders": {
+    "defaultMessage": "Compact folders"
+  },
+  "files.settings.compact-folders-description": {
+    "defaultMessage": "Fold chains of folders that each hold just one folder into a single row of the tree."
+  },
+  "files.settings.format-json": {
+    "defaultMessage": "Format JSON files"
+  },
+  "files.settings.format-json-description": {
+    "defaultMessage": "Open JSON files that can't be edited laid out over lines and indented, even if they're stored compacted."
+  },
+  "files.settings.group": {
+    "defaultMessage": "Files"
+  },
+  "files.settings.group-description": {
+    "defaultMessage": "How files and folders are listed and browsed."
+  },
+  "files.settings.json-indent": {
+    "defaultMessage": "JSON indentation"
+  },
+  "files.settings.json-indent-description": {
+    "defaultMessage": "How formatted JSON is indented."
+  },
+  "files.settings.json-indent.four": {
+    "defaultMessage": "4 spaces"
+  },
+  "files.settings.json-indent.tab": {
+    "defaultMessage": "Tabs"
+  },
+  "files.settings.json-indent.two": {
+    "defaultMessage": "2 spaces"
+  },
+  "files.settings.new-tab-button": {
+    "defaultMessage": "New tab button"
+  },
+  "files.settings.new-tab-button-description": {
+    "defaultMessage": "Show a button for opening a new tab beside the file tabs."
+  },
+  "files.settings.sidebar-toggle": {
+    "defaultMessage": "Folder tree button"
+  },
+  "files.settings.sidebar-toggle.navigation": {
+    "defaultMessage": "In the navigation bar"
+  },
+  "files.settings.sidebar-toggle.sidebar": {
+    "defaultMessage": "In the folder tree"
+  },
   "files.sidebar.compact-folders": {
     "defaultMessage": "Compact folders"
   },
@@ -2002,6 +2176,15 @@
   },
   "files.table-header.show-details": {
     "defaultMessage": "Show details"
+  },
+  "files.table-header.sidebar-toggle": {
+    "defaultMessage": "Folder tree button"
+  },
+  "files.table-header.sidebar-toggle.navigation": {
+    "defaultMessage": "In the navigation bar"
+  },
+  "files.table-header.sidebar-toggle.sidebar": {
+    "defaultMessage": "In the folder tree"
   },
   "files.table-header.size": {
     "defaultMessage": "Size"
@@ -2104,6 +2287,27 @@
   },
   "files.validation.name-required": {
     "defaultMessage": "Name is required."
+  },
+  "files.view-controls.auto": {
+    "defaultMessage": "Default view"
+  },
+  "files.view-controls.auto-variant": {
+    "defaultMessage": "Disassembled"
+  },
+  "files.view-controls.hex": {
+    "defaultMessage": "Hex"
+  },
+  "files.view-controls.interpretation": {
+    "defaultMessage": "Show as"
+  },
+  "files.view-controls.interpretation-tooltip": {
+    "defaultMessage": "Showing as {current}"
+  },
+  "files.view-controls.json": {
+    "defaultMessage": "JSON"
+  },
+  "files.view-controls.text": {
+    "defaultMessage": "Text"
   },
   "files.zip-url-modal.backup-name": {
     "defaultMessage": "CurseForge modpack install"
@@ -6689,6 +6893,24 @@
   "settings.language.warning": {
     "defaultMessage": "Changing the {platform} language may cause some content to appear in English if a translation is not available. The {platform} is not yet fully translated, so some content may remain in English for certain languages."
   },
+  "settings.panel.default-value": {
+    "defaultMessage": "Default: <value></value>"
+  },
+  "settings.panel.no-results": {
+    "defaultMessage": "No settings match your search."
+  },
+  "settings.panel.none": {
+    "defaultMessage": "None"
+  },
+  "settings.panel.off": {
+    "defaultMessage": "Off"
+  },
+  "settings.panel.on": {
+    "defaultMessage": "On"
+  },
+  "settings.panel.search": {
+    "defaultMessage": "Search settings..."
+  },
   "settings.pats.title": {
     "defaultMessage": "Personal access tokens"
   },
@@ -7841,8 +8063,11 @@
   "version.supplementary-resources.type": {
     "defaultMessage": "Type"
   },
-  "workbench.collapse-toolbar": {
-    "defaultMessage": "Hide toolbar"
+  "workbench.add-menu": {
+    "defaultMessage": "Add a tab"
+  },
+  "workbench.add-menu.panels": {
+    "defaultMessage": "Panels"
   },
   "workbench.corner.hide-panel": {
     "defaultMessage": "Hide {name}"
@@ -7856,8 +8081,20 @@
   "workbench.corner.show-region": {
     "defaultMessage": "{side, select, left {Show left panel} other {Show right panel}}"
   },
-  "workbench.expand-toolbar": {
-    "defaultMessage": "Show toolbar"
+  "workbench.layout-menu": {
+    "defaultMessage": "Layout"
+  },
+  "workbench.layout-menu.bottom": {
+    "defaultMessage": "Bottom panel"
+  },
+  "workbench.layout-menu.left": {
+    "defaultMessage": "Left panel"
+  },
+  "workbench.layout-menu.regions": {
+    "defaultMessage": "Regions"
+  },
+  "workbench.layout-menu.right": {
+    "defaultMessage": "Right panel"
   },
   "workbench.menu.close-panel": {
     "defaultMessage": "Close panel"
@@ -7901,9 +8138,6 @@
   "workbench.menu.split-right": {
     "defaultMessage": "Split right"
   },
-  "workbench.panels": {
-    "defaultMessage": "Panels"
-  },
   "workbench.popout.empty": {
     "defaultMessage": "No tabs open in this panel"
   },
@@ -7925,22 +8159,37 @@
   "workbench.reset-layout": {
     "defaultMessage": "Reset layout"
   },
+  "workbench.settings.group": {
+    "defaultMessage": "Layout"
+  },
+  "workbench.settings.group-description": {
+    "defaultMessage": "How the panels around the workspace look and behave."
+  },
+  "workbench.settings.popouts": {
+    "defaultMessage": "Pop out panels"
+  },
+  "workbench.settings.popouts-description": {
+    "defaultMessage": "Let panels be moved into windows of their own from their menus."
+  },
+  "workbench.settings.toggles": {
+    "defaultMessage": "Panel toggles in the tab bar"
+  },
+  "workbench.settings.toggles-description": {
+    "defaultMessage": "Show buttons for the left and right panels at the ends of the tab bar. They can always be shown and hidden from the layout menu."
+  },
+  "workbench.settings.variant": {
+    "defaultMessage": "Panel style"
+  },
+  "workbench.settings.variant-description": {
+    "defaultMessage": "Square panels sit edge to edge, while rounded panels float apart as cards."
+  },
+  "workbench.settings.variant.rounded": {
+    "defaultMessage": "Rounded"
+  },
+  "workbench.settings.variant.square": {
+    "defaultMessage": "Square"
+  },
   "workbench.tab.close": {
     "defaultMessage": "Close {name}"
-  },
-  "workbench.toggle-bottom": {
-    "defaultMessage": "Toggle bottom panel"
-  },
-  "workbench.toggle-left": {
-    "defaultMessage": "Toggle left panel"
-  },
-  "workbench.toggle-right": {
-    "defaultMessage": "Toggle right panel"
-  },
-  "workbench.use-rounded": {
-    "defaultMessage": "Use rounded style"
-  },
-  "workbench.use-square": {
-    "defaultMessage": "Use square style"
   }
 }

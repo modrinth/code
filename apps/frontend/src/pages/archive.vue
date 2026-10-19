@@ -6,6 +6,7 @@
 				:path="archivePath"
 				:storage-key="embedded ? null : 'archive-viewer'"
 				:hidden-regions="hiddenRegions"
+				popout-url="/project-review-popout.html"
 				@update:path="setArchivePath"
 			>
 				<template #toolbar>
@@ -21,6 +22,7 @@
 						</span>
 					</div>
 					<template v-else-if="source">
+						<TagItem class="shrink-0">{{ formatMessage(messages.external) }}</TagItem>
 						<span class="truncate text-sm font-semibold text-contrast">{{ source.name }}</span>
 						<ButtonLink type="quiet" size="xs" :href="source.url" :download="source.name">
 							<DownloadIcon aria-hidden="true" />
@@ -32,8 +34,9 @@
 						</ButtonLink>
 					</template>
 				</template>
-				<template v-if="project" #project-details>
+				<template v-if="project || source" #project-details>
 					<ArchiveProjectDetails
+						v-if="project"
 						:project="project"
 						:versions="sortedVersions"
 						:versions-loading="versionsLoading"
@@ -43,6 +46,7 @@
 						@select-version="selectVersion"
 						@select-file="selectFile"
 					/>
+					<ArchiveExternalDetails v-else-if="source" :source="source" :slicer-url="slicerUrl" />
 				</template>
 				<template #empty>
 					<Admonition
@@ -76,6 +80,7 @@ import {
 	commonMessages,
 	defineMessages,
 	injectModrinthClient,
+	TagItem,
 	useVIntl,
 	WORKBENCH_REGIONS,
 	type WorkbenchRegion,
@@ -83,6 +88,7 @@ import {
 import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
+import ArchiveExternalDetails from '~/components/ui/archive-viewer/ArchiveExternalDetails.vue'
 import ArchiveProjectDetails from '~/components/ui/archive-viewer/ArchiveProjectDetails.vue'
 
 definePageMeta({
@@ -108,6 +114,10 @@ const messages = defineMessages({
 		id: 'archive.open-in-slicer',
 		defaultMessage: 'Open in Slicer',
 	},
+	external: {
+		id: 'archive.external',
+		defaultMessage: 'External',
+	},
 	loadFailed: {
 		id: 'archive.load-failed',
 		defaultMessage: 'Unable to load the project',
@@ -122,8 +132,7 @@ const messages = defineMessages({
 	},
 	nothingToShowDescription: {
 		id: 'archive.nothing-to-show-description',
-		defaultMessage:
-			'Open a project with version files, or a file link from the Modrinth CDN.',
+		defaultMessage: 'Open a project with version files, or a file link from the Modrinth CDN.',
 	},
 })
 
@@ -179,13 +188,6 @@ const isLoading = computed(
 )
 const isError = computed(() => projectQuery.isError.value || versionsQuery.isError.value)
 
-useHead({
-	title: () =>
-		project.value
-			? `${formatMessage(messages.title)} - ${project.value.name}`
-			: formatMessage(messages.title),
-})
-
 function primaryFile(version: Labrinth.Versions.v3.Version) {
 	return version.files.find((file) => file.primary) ?? version.files[0]
 }
@@ -226,7 +228,11 @@ const selectedFile = computed(() => {
 	const version = selectedVersion.value
 	if (!version) return null
 	const url = requestedUrl.value
-	return (url ? version.files.find((file) => file.url === url) : undefined) ?? primaryFile(version) ?? null
+	return (
+		(url ? version.files.find((file) => file.url === url) : undefined) ??
+		primaryFile(version) ??
+		null
+	)
 })
 
 /** The selected version's file, or a requested CDN link no version of the project holds. */
@@ -234,6 +240,13 @@ const source = computed<ArchiveSource | null>(() => {
 	if (selectedFile.value) return sourceFrom(selectedFile.value)
 	const url = requestedUrl.value
 	return url ? { url, name: decodeURIComponent(url.split('/').pop() ?? url) } : null
+})
+
+useHead({
+	title: () => {
+		const name = project.value?.name ?? source.value?.name
+		return name ? `${formatMessage(messages.title)} - ${name}` : formatMessage(messages.title)
+	},
 })
 
 /**

@@ -35,6 +35,19 @@ export const detailsMessages = defineMessages({
 	},
 	modified: { id: 'archive-viewer.details.modified', defaultMessage: 'Modified' },
 	detectedType: { id: 'archive-viewer.details.detected-type', defaultMessage: 'Detected type' },
+	onModrinth: { id: 'archive-viewer.details.on-modrinth', defaultMessage: 'On Modrinth' },
+	onModrinthMatch: {
+		id: 'archive-viewer.details.on-modrinth-match',
+		defaultMessage: '{project} {version}',
+	},
+	onModrinthNone: {
+		id: 'archive-viewer.details.on-modrinth-none',
+		defaultMessage: 'Not found',
+	},
+	detectedLanguage: {
+		id: 'archive-viewer.details.detected-language',
+		defaultMessage: 'Language',
+	},
 	compression: { id: 'archive-viewer.details.compression', defaultMessage: 'Compression' },
 	compressionStored: { id: 'archive-viewer.details.compression-stored', defaultMessage: 'Stored' },
 	compressionDeflate: {

@@ -11,9 +11,13 @@
 				:panels="panels"
 				:storage-key="storageKey"
 				:hidden-regions="hiddenRegions"
+				:mode="mode"
 			>
 				<template #toolbar>
 					<slot name="toolbar" />
+				</template>
+				<template v-if="slots['toolbar-end']" #toolbar-end>
+					<slot name="toolbar-end" />
 				</template>
 				<template #panel-tree>
 					<FileSideBar fill-height :add-border="false" />
@@ -28,17 +32,16 @@
 				<template #panel-logs>
 					<LogsPanel />
 				</template>
+				<template #panel-settings>
+					<SettingsPanel />
+				</template>
 			</FileWorkbench>
 		</template>
 	</FilePageLayout>
 </template>
 
 <script setup lang="ts">
-import {
-	FolderOpenIcon,
-	InfoIcon,
-	TerminalSquareIcon,
-} from '@modrinth/assets'
+import { FolderOpenIcon, InfoIcon, SettingsIcon, TerminalSquareIcon } from '@modrinth/assets'
 import { computed, ref, type VNode, watch } from 'vue'
 
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
@@ -47,13 +50,22 @@ import FileSideBar from '#ui/layouts/shared/files-tab/components/FileSideBar.vue
 import FileWorkbench from '#ui/layouts/shared/files-tab/components/FileWorkbench.vue'
 import FilePageLayout from '#ui/layouts/shared/files-tab/layout.vue'
 import { provideFileManager } from '#ui/layouts/shared/files-tab/providers/file-manager'
-import type { WorkbenchPanel, WorkbenchRegion } from '#ui/layouts/shared/workbench/types'
+import {
+	WORKBENCH_HOSTS,
+	WORKBENCH_MODES,
+	type WorkbenchMode,
+	type WorkbenchPanel,
+	type WorkbenchRegion,
+} from '#ui/layouts/shared/workbench/types'
+import { commonMessages } from '#ui/utils/common-messages'
 
 import { useArchiveFileManager } from '../composables/archive-file-manager'
 import { provideArchiveViewer } from '../providers/archive-viewer'
+import { SETTINGS_PANEL_ID } from '../settings'
 import type { ArchiveSource } from '../types'
 import DetailsPanel from './panels/details/index.vue'
 import LogsPanel from './panels/LogsPanel.vue'
+import SettingsPanel from './panels/settings-panel.vue'
 
 const props = defineProps<{
 	root: RootZipTreeNode
@@ -64,6 +76,8 @@ const props = defineProps<{
 	/** Where the layout is persisted; `null` keeps it in memory only. */
 	storageKey: string | null
 	hiddenRegions?: WorkbenchRegion[]
+	/** An empty page of the same origin, which lets panels be popped out into windows loading it. */
+	popoutUrl?: string
 }>()
 
 const emit = defineEmits<{
@@ -72,10 +86,17 @@ const emit = defineEmits<{
 
 const slots = defineSlots<{
 	toolbar?: () => VNode[]
+	'toolbar-end'?: () => VNode[]
 	'project-details'?: () => VNode[]
 }>()
 
 const { formatMessage } = useVIntl()
+
+/** Every panel can be arranged freely, and popped out of any dock when the host has a page for it. */
+const mode: WorkbenchMode = {
+	...WORKBENCH_MODES.explorer,
+	popouts: props.popoutUrl ? { url: props.popoutUrl, docks: [...WORKBENCH_HOSTS] } : undefined,
+}
 
 const messages = defineMessages({
 	tree: { id: 'archive-viewer.panel.tree', defaultMessage: 'Files' },
@@ -107,6 +128,14 @@ const panels = computed<WorkbenchPanel[]>(() => [
 	{ id: 'tree', title: formatMessage(messages.tree), region: 'left', icon: FolderOpenIcon },
 	{ id: 'details', title: formatMessage(messages.details), region: 'right', icon: InfoIcon },
 	{ id: 'logs', title: formatMessage(messages.logs), region: 'bottom', icon: TerminalSquareIcon },
+	{
+		id: SETTINGS_PANEL_ID,
+		title: formatMessage(commonMessages.settingsLabel),
+		region: 'right',
+		icon: SettingsIcon,
+		padded: true,
+		closedByDefault: true,
+	},
 ])
 
 const workbench = ref<InstanceType<typeof FileWorkbench>>()

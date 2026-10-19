@@ -1,4 +1,12 @@
-import { markRaw, type MaybeRefOrGetter, onScopeDispose, ref, shallowRef, toValue, watch } from 'vue'
+import {
+	markRaw,
+	type MaybeRefOrGetter,
+	onScopeDispose,
+	ref,
+	shallowRef,
+	toValue,
+	watch,
+} from 'vue'
 
 import type { EventSubscription } from '#ui/helpers/toolbox/misc'
 import type { ArchiveUpdateTypes, RootZipTreeNode, ZipHandler } from '#ui/helpers/toolbox/zip'

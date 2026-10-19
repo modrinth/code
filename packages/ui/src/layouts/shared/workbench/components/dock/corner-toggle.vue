@@ -1,5 +1,5 @@
 <template>
-	<div v-if="shown" class="flex h-full items-center">
+	<div v-if="shown" class="flex h-full items-center" :class="{ 'px-2': square }">
 		<IconButton
 			v-tooltip="label"
 			type="quiet"
@@ -59,10 +59,13 @@ const messages = defineMessages({
 /** Only the group in the center's outer corner on this side shows the toggle, once. */
 const shown = computed(
 	() =>
+		workbench.cornerToggles.value &&
 		workbench.usedRegions.value.includes(props.side) &&
 		workbench.cornerGroups.value[props.side] === props.params.group.id,
 )
 const visible = computed(() => workbench.visible[props.side].value)
+/** Square tab bars run edge to edge, so the toggle keeps some room from the edges and the tabs. */
+const square = computed(() => workbench.variant.value === 'square')
 const icon = computed(() => {
 	if (props.side === 'left') return visible.value ? PanelLeftCloseIcon : PanelLeftOpenIcon
 	return visible.value ? PanelRightCloseIcon : PanelRightOpenIcon

@@ -3,27 +3,31 @@ import { computed, markRaw, onScopeDispose, type Ref, ref, shallowReactive, shal
 
 import { useFormatBytes } from '#ui/composables/format-bytes'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import {
+	AVAILABLE_DECOMPILER_TYPES,
+	DEFAULT_DECOMPILE_OPTIONS,
+	type DecompilerTypes,
+} from '#ui/helpers/toolbox/decompile'
 import { type FileTypeInfo, getFileTypeInfo, type HashType } from '#ui/helpers/toolbox/file'
 import {
-	type FileZipTreeNode, isZipArchive,
+	type FileZipTreeNode,
+	isZipArchive,
 	type LazyDataAccess,
 	type RootZipTreeNode,
-	type ZipHandler, type ZipNode,
+	type ZipHandler,
+	type ZipNode,
 } from '#ui/helpers/toolbox/zip'
-import type {
-	DirectoryResult,
-	DirectoryTree,
-	FileInfo,
-	FileItemResultFrom,
-	FileManagerContext,
-	FileResult,
-	FileTypes,
+import {
+	type DirectoryResult,
+	type DirectoryTree,
+	type FileInfo,
+	type FileItemResultFrom,
+	type FileManagerContext,
+	type FileResult,
+	type FileTypes,
+	RAW_CONTENT_VARIANT,
 } from '#ui/layouts/shared/files-tab/providers/file-manager'
-import type {
-	FileEntryAction,
-	FileEntryDetail,
-	FileItem,
-} from '#ui/layouts/shared/files-tab/types'
+import type { FileEntryAction, FileEntryDetail, FileItem } from '#ui/layouts/shared/files-tab/types'
 import {
 	infoFrom,
 	isSameInfo,
@@ -32,14 +36,16 @@ import {
 } from '#ui/layouts/shared/files-tab/utils'
 import { injectNotificationManager } from '#ui/providers/web-notifications'
 import {
-	canOpenInFileEditor,
 	getEditorLanguage,
 	getFileExtension,
 	isEditableFile,
 	isImageFile,
 } from '#ui/utils/file-extensions'
 
+import { decompilerMessages } from '../messages'
+import { archiveSettings, injectArchiveSettings } from '../settings'
 import type { ArchiveSource } from '../types'
+import { addToolboxLog } from './toolbox-logs'
 
 const messages = defineMessages({
 	readOnly: {
@@ -49,6 +55,14 @@ const messages = defineMessages({
 	missingEntry: {
 		id: 'archive-viewer.missing-entry',
 		defaultMessage: '"{path}" does not exist within this archive',
+	},
+	disassembler: {
+		id: 'archive-viewer.disassembler',
+		defaultMessage: 'Disassembler',
+	},
+	decompileFailed: {
+		id: 'archive-viewer.decompile-failed',
+		defaultMessage: '{decompiler} could not decompile {path}',
 	},
 	detectedType: {
 		id: 'archive-viewer.detail.detected-type',
@@ -174,8 +188,9 @@ export function useArchiveFileManager({
 		return (node ? contentFileType(node) : null) ?? null
 	}
 
-	function canOpenInEditor(file: FileInfo) {
-		return isClassFile(file.name) || canOpenInFileEditor(file.name, editorFileType(file))
+	/** Every file opens, as the editor shows the ones it can't read as text in another way. */
+	function canOpenInEditor() {
+		return true
 	}
 
 	function editorLanguage(file: FileInfo) {
@@ -246,38 +261,84 @@ export function useArchiveFileManager({
 		}
 	}
 
-	/** Class files are decompiled, everything else is read as is. */
-	async function readContent(path: string): Promise<ArrayBuffer> {
+	const settings = injectArchiveSettings(null)
+
+	function isDecompiler(value: string | undefined): value is DecompilerTypes {
+		return (AVAILABLE_DECOMPILER_TYPES as readonly string[]).includes(value ?? '')
+	}
+
+	/** Class files can be read by any of the decompilers, starting with the one the settings name. */
+	function contentVariants(file: FileInfo<'file'>) {
+		if (!isClassFile(file.name)) return null
+		return {
+			label: formatMessage(messages.disassembler),
+			options: AVAILABLE_DECOMPILER_TYPES.map((type) => ({
+				id: type,
+				label: formatMessage(decompilerMessages[type]),
+			})),
+			default:
+				settings?.get(archiveSettings.files.decompiler) ?? archiveSettings.files.decompiler.default,
+		}
+	}
+
+	/**
+	 * Class files are decompiled (by the given decompiler, else the default one), everything else
+	 * (and any file asked for raw) is read as is. A class file a decompiler couldn't read is noted
+	 * in the logs.
+	 */
+	async function readContent(path: string, variant?: string): Promise<ArrayBuffer> {
 		const node = await waitForFileNode(path)
-		const result = await node.asText()
+		if (variant === RAW_CONTENT_VARIANT) return node.getBuffer()
+		const decompiler = isDecompiler(variant) ? variant : undefined
+		const result = await node.asText(
+			decompiler ? { ...DEFAULT_DECOMPILE_OPTIONS, decompiler } : undefined,
+		)
+		if (isClassFile(node.name) && (result.error || !result.wasDecompiled)) {
+			addToolboxLog(
+				'error',
+				'Decompiler',
+				formatMessage(messages.decompileFailed, {
+					path: normalizeDirectoryPath(path),
+					decompiler: formatMessage(
+						decompilerMessages[decompiler ?? DEFAULT_DECOMPILE_OPTIONS.decompiler],
+					),
+				}),
+				result.error,
+			)
+		}
 		return result.wasDecompiled
 			? new TextEncoder().encode(result.asString).buffer
 			: await node.getBuffer()
 	}
 
-	function fileResult(info: FileInfo<'file'>): FileResult {
+	function fileResultKey(path: string, variant?: string) {
+		return variant ? `${path}\u0000${variant}` : path
+	}
+
+	function fileResult(info: FileInfo<'file'>, variant?: string): FileResult {
 		const path = normalizeDirectoryPath(info.path)
-		let result = fileResults.get(path)
+		const key = fileResultKey(path, variant)
+		let result = fileResults.get(key)
 		if (!result) {
 			const data = shallowRef<ArrayBuffer | null>(null)
 			const isLoading = ref(true)
 			const loadError = ref<Error | null>(null)
-			readContent(path)
+			readContent(path, variant)
 				.then(
 					(buffer) => (data.value = markRaw(buffer)),
 					(error) => (loadError.value = toError(error)),
 				)
 				.finally(() => (isLoading.value = false))
 			result = { ...info, data: computed(() => data.value), isLoading, loadError }
-			fileResults.set(path, result)
+			fileResults.set(key, result)
 		}
 		return result
 	}
 
 	const directoryTree = {
-		get: <T extends FileTypes>(info: FileInfo<T>): FileItemResultFrom<T> =>
+		get: <T extends FileTypes>(info: FileInfo<T>, variant?: string): FileItemResultFrom<T> =>
 			(info.type === 'file'
-				? fileResult(info as FileInfo<'file'>)
+				? fileResult(info as FileInfo<'file'>, variant)
 				: directoryResult(info as FileInfo<'directory'>)) as FileItemResultFrom<T>,
 		/** Class files aren't prefetched, so hovering over a package doesn't queue up decompiles. */
 		prefetch: <T extends FileTypes>(info: FileInfo<T>) => {
@@ -346,7 +407,10 @@ export function useArchiveFileManager({
 		if (update.type === 'node_loaded' && update.root.root === root.key) {
 			onTreeChanged()
 		} else if (update.type === 'updated_node_data' && update.node.root === root.key) {
-			fileResults.delete(normalizeDirectoryPath(update.node.path))
+			const path = normalizeDirectoryPath(update.node.path)
+			for (const key of [...fileResults.keys()]) {
+				if (key === path || key.startsWith(`${path}\u0000`)) fileResults.delete(key)
+			}
 			const node = fileNodeAt(update.node.path)
 			if (node) {
 				fileTypesRequested.delete(node)
@@ -378,9 +442,12 @@ export function useArchiveFileManager({
 		saveBuffer(await node.getBuffer(), node.name)
 	}
 
-	async function readLazy<K extends keyof LazyDataAccess>(entry: FileInfo, key: K): Promise<ReturnType<LazyDataAccess[K]['get']> | null> {
+	async function readLazy<K extends keyof LazyDataAccess>(
+		entry: FileInfo,
+		key: K,
+	): Promise<ReturnType<LazyDataAccess[K]['get']> | null> {
 		const node = fileNodeAt(entry.path)
-		return node ? (await node[key].get()) as ReturnType<LazyDataAccess[K]['get']> : null
+		return node ? ((await node[key].get()) as ReturnType<LazyDataAccess[K]['get']>) : null
 	}
 
 	const isFileNode = (entry: FileInfo) => fileNodeAt(entry.path) != null
@@ -415,8 +482,8 @@ export function useArchiveFileManager({
 			label: formatMessage(messages.downloadArchive),
 			icon: DownloadIcon,
 			shown: (entry) => {
-				const node = nodeAt(entry.path);
-				return node != null && isZipArchive(node);
+				const node = nodeAt(entry.path)
+				return node != null && isZipArchive(node)
 			},
 			action: downloadEntry,
 		},
@@ -461,6 +528,7 @@ export function useArchiveFileManager({
 
 		canOpenInEditor,
 		editorLanguage,
+		contentVariants,
 		entryActions,
 		entryDetails,
 	}

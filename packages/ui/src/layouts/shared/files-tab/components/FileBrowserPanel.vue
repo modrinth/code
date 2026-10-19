@@ -13,7 +13,7 @@
 	>
 		<div
 			ref="navbarWrapper"
-			class="sticky top-[var(--files-sticky-top,0px)] z-[29] bg-surface-1 py-1 before:pointer-events-none before:top-[calc(-1.5rem_+_1px)] before:absolute before:inset-x-0 before:h-[var(--files-sticky-top,0px)] before:bg-[var(--color-bg,_var(--surface-1))] before:content-['']"
+			class="sticky top-[var(--files-sticky-top,0px)] z-[29] bg-surface-1 py-1 pr-[calc(0.75rem+1px)] before:pointer-events-none before:top-[calc(-1.5rem_+_1px)] before:absolute before:inset-x-0 before:h-[var(--files-sticky-top,0px)] before:bg-[var(--color-bg,_var(--surface-1))] before:content-['']"
 		>
 			<FileNavbar
 				:sidebar-open="sidebarOpen"
@@ -28,7 +28,8 @@
 				:small-mode="props.smallMode"
 				:can-go-back="ui.fileTabs.canGoBack.value"
 				:can-go-forward="ui.fileTabs.canGoForward.value"
-				:sidebar-toggleable="ui.advancedView.value"
+				:sidebar-toggleable="ui.advancedView.value && toggleLocation != null"
+				:sidebar-toggle-always="toggleLocation === 'navigation'"
 				:compact="ui.compactNavigation.value"
 				@back="ui.fileTabs.back"
 				@forward="ui.fileTabs.forward"
@@ -82,6 +83,7 @@ import { findScrollableAncestor } from '#ui/composables/virtual-scroll.ts'
 import { injectLoadingState } from '#ui/providers/loading-state'
 
 import { useEntryMenu } from '../composables/entry-menu'
+import { useSidebarToggleLocation } from '../composables/sidebar-toggle'
 import { injectFileBrowserUI } from '../providers/file-browser-ui'
 import { parentInfoFrom } from '../utils'
 import FileEmptyWorkspace from './FileEmptyWorkspace.vue'
@@ -106,6 +108,7 @@ const props = withDefaults(
 )
 
 const sidebarOpen = computed(() => ui.sidebarOpen.value)
+const toggleLocation = useSidebarToggleLocation()
 const isFileActive = computed(() => ui.fileTabs.activeLocation.value.type === 'file')
 /** In the advanced view every tab can be closed, which leaves an empty workspace. */
 const hasTabs = computed(() => ui.fileTabs.tabs.value.length > 0)

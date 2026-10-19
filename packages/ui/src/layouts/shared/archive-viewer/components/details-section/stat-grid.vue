@@ -7,7 +7,9 @@
 			v-for="stat in stats"
 			:key="stat.id"
 			class="flex min-w-0 rounded-lg border border-solid border-surface-4 bg-surface-2 px-2"
-			:class="inline || grid ? 'max-w-full flex items-center gap-1.5 py-1' : 'flex-col gap-1 py-1.5'"
+			:class="
+				inline || grid ? 'max-w-full flex items-center gap-1.5 py-1' : 'flex-col gap-1 py-1.5'
+			"
 		>
 			<dt class="text-xs font-medium text-secondary flex-grow">{{ `${stat.label}: ` }}</dt>
 			<dd class="m-0 min-w-0">

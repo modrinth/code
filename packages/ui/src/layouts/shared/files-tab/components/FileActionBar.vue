@@ -15,7 +15,10 @@
 					:class="{ 'flex-1': compact }"
 				>
 					<div
-						v-if="sidebarToggleable && (hasNav ? (smallMode ? true : !sidebarOpen) : true)"
+						v-if="
+							sidebarToggleable &&
+							(hasNav ? smallMode || sidebarToggleAlways || !sidebarOpen : true)
+						"
 						class="mr-2 flex flex-shrink-0 gap-3"
 					>
 						<IconButton
@@ -208,6 +211,8 @@ export type Properties = {
 	isRefreshing?: boolean
 	/** Whether the sidebar toggle is offered. */
 	sidebarToggleable?: boolean
+	/** Whether the navigation offers the folder tree's button while the tree is shown too. */
+	sidebarToggleAlways?: boolean
 	/** Smaller controls, for tighter spaces. */
 	compact?: boolean
 }

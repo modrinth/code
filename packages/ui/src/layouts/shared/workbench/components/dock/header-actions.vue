@@ -5,6 +5,7 @@
 			v-if="workbench.documents?.headerActions"
 			:params="params"
 		/>
+		<AddMenu v-if="inGrid" :group="params.group" />
 		<CornerToggle v-if="cornerToggles" side="right" :params="params" />
 	</div>
 </template>
@@ -14,11 +15,15 @@ import type { DockviewGroupLocation, DockviewGroupPanel, IDockviewPanel } from '
 import { computed } from 'vue'
 
 import { injectWorkbench, injectWorkbenchDock } from '../../providers/workbench'
+import AddMenu from './add-menu.vue'
 import CornerToggle from './corner-toggle.vue'
 
 defineOptions({ inheritAttrs: false })
 
-/** The end of a group's tab bar: the documents' own actions, and the right region's corner toggle. */
+/**
+ * The end of a group's tab bar: the documents' own actions, the add menu, then the right region's
+ * corner toggle. Groups popped out into windows only keep the documents' actions.
+ */
 const props = defineProps<{
 	params: { group: DockviewGroupPanel; panels: IDockviewPanel[]; location?: DockviewGroupLocation }
 }>()
@@ -26,10 +31,11 @@ const props = defineProps<{
 const workbench = injectWorkbench()
 const host = injectWorkbenchDock()
 
+const inGrid = computed(
+	() => (props.params.location ?? props.params.group.api.location).type === 'grid',
+)
+
 const cornerToggles = computed(
-	() =>
-		workbench.mode.cornerToggles &&
-		host === 'center' &&
-		(props.params.location ?? props.params.group.api.location).type === 'grid',
+	() => workbench.cornerToggles.value && host === 'center' && inGrid.value,
 )
 </script>

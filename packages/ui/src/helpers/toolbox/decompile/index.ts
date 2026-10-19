@@ -5,6 +5,12 @@ export const ALL_DECOMPILER_TYPES = ['cfr', 'vineflower', 'procyon', 'krakatau']
 
 export type DecompilerTypes = typeof ALL_DECOMPILER_TYPES[number];
 
+/**
+ * The decompilers the toolbox can load. Krakatau isn't bundled yet, so asking for it falls back to
+ * Vineflower; it isn't offered until it is.
+ */
+export const AVAILABLE_DECOMPILER_TYPES = ['vineflower', 'cfr', 'procyon'] as const satisfies readonly DecompilerTypes[];
+
 export interface DecompileInput {
 	targetFile: FileContent,
 	transferBuffer?: boolean,

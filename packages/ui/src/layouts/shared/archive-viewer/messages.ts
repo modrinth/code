@@ -1,4 +1,5 @@
 import { defineMessages } from '#ui/composables/i18n'
+import type { DecompilerTypes } from '#ui/helpers/toolbox/decompile'
 import type { HashType } from '#ui/helpers/toolbox/file'
 
 export const hashTypeMessages = defineMessages({
@@ -9,3 +10,10 @@ export const hashTypeMessages = defineMessages({
 	murmur2: { id: 'archive-viewer.hash-type.murmur2', defaultMessage: 'Murmur2' },
 	crc32: { id: 'archive-viewer.hash-type.crc32', defaultMessage: 'CRC-32' },
 } satisfies Record<HashType, unknown>)
+
+export const decompilerMessages = defineMessages({
+	cfr: { id: 'archive-viewer.decompiler.cfr', defaultMessage: 'CFR' },
+	vineflower: { id: 'archive-viewer.decompiler.vineflower', defaultMessage: 'Vineflower' },
+	procyon: { id: 'archive-viewer.decompiler.procyon', defaultMessage: 'Procyon' },
+	krakatau: { id: 'archive-viewer.decompiler.krakatau', defaultMessage: 'Krakatau' },
+} satisfies Record<DecompilerTypes, unknown>)

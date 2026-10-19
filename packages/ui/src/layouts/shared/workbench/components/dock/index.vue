@@ -9,7 +9,7 @@
 			:theme="theme"
 			:components="components"
 			:tab-components="tabComponents"
-			:prefix-header-actions-component="cornerToggles ? CornerToggle : undefined"
+			:prefix-header-actions-component="host === 'center' ? CornerToggle : undefined"
 			:right-header-actions-component="HeaderActions"
 			:watermark-component="Watermark"
 			:popout-url="workbench.mode.popouts?.url"
@@ -24,6 +24,7 @@
 			:slots="workbench.slots"
 			name="center-footer"
 		/>
+		<WorkbenchToolbar v-if="host === 'center' && workbench.mode.toolbar" />
 	</div>
 </template>
 
@@ -46,6 +47,7 @@ import {
 } from '../../composables/create-workbench'
 import { injectWorkbench, provideWorkbenchDock } from '../../providers/workbench'
 import { SlotOutlet } from '../slot-outlet'
+import WorkbenchToolbar from '../toolbar.vue'
 import CornerToggle from './corner-toggle.vue'
 import HeaderActions from './header-actions.vue'
 import Panel from './panel.vue'
@@ -62,9 +64,6 @@ const props = defineProps<{
 const workbench = injectWorkbench()
 const host = props.params.host
 provideWorkbenchDock(host)
-
-/** Region toggles sit in the corners of the center's tab bars, when the mode has no toolbar for them. */
-const cornerToggles = host === 'center' && workbench.mode.cornerToggles
 
 const theme: DockviewTheme = {
 	name: 'modrinth-workbench',

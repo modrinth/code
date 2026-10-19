@@ -39,9 +39,7 @@ const messages = defineMessages({
 const EDGE_LENGTH = 6
 
 const shortened = computed(() =>
-	props.hash.length > EDGE_LENGTH
-		? `${props.hash.slice(0, EDGE_LENGTH)}…`
-		: props.hash,
+	props.hash.length > EDGE_LENGTH ? `${props.hash.slice(0, EDGE_LENGTH)}…` : props.hash,
 )
 
 const copied = ref(false)
