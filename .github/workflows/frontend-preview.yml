@@ -90,7 +90,7 @@ jobs:
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
           workingDirectory: ./packages/ui
           packageManager: pnpm
-          wranglerVersion: '4.112.0'
+          wranglerVersion: '4.151.1'
           command: --version
 
       - parallel:
@@ -139,8 +139,8 @@ jobs:
         run: |
           STAGING_SHA_URL=$(cat deployment-url-staging.txt)
           PRODUCTION_SHA_URL=$(cat deployment-url-production.txt)
-          STAGING_BRANCH_URL="https://$BRANCH_ALIAS-staging-frontend.modrinth.workers.dev"
-          PRODUCTION_BRANCH_URL="https://$BRANCH_ALIAS-frontend.modrinth.workers.dev"
+          STAGING_BRANCH_URL="https://$BRANCH_ALIAS-staging.frontend.rinth.dev"
+          PRODUCTION_BRANCH_URL="https://$BRANCH_ALIAS.frontend.rinth.dev"
 
           if [ "$STORYBOOK_RESULT" = "success" ]; then
             STORYBOOK_SHA_URL="https://git-${HEAD_SHA::8}-storybook.modrinth.workers.dev"

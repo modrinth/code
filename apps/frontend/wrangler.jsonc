@@ -1,14 +1,22 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "frontend",
-	"compatibility_date": "2026-08-05",
+	"compatibility_date": "2026-10-12",
 	"main": "./.output/server/index.mjs",
 	"assets": {
 		"binding": "ASSETS",
 		"directory": "./.output/public/"
 	},
-	"preview_urls": true,
+	"preview_urls": false,
 	"workers_dev": true,
+	"routes": [
+		{
+			"pattern": "frontend.rinth.dev",
+			"custom_domain": true,
+			"previews_enabled": true,
+			"enabled": false
+		}
+	],
 	"upload_source_maps": true,
 	"limits": {
 		"cpu_ms": 5000
@@ -80,7 +88,7 @@
 					"secret_name": "labrinth-staging-ratelimit-key"
 				}
 			],
-			"preview_urls": true
+			"preview_urls": false
 		}
 	}
 }

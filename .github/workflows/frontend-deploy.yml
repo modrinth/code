@@ -69,8 +69,8 @@ jobs:
           SHA_SHORT="${DEPLOY_SHA::8}"
 
           if [ "$PREVIEW_INPUT" = "true" ]; then
-            URL="https://git-$SHA_SHORT-frontend.modrinth.workers.dev"
-            STAGING_URL="https://git-$SHA_SHORT-staging-frontend.modrinth.workers.dev"
+            URL="https://git-$SHA_SHORT.frontend.rinth.dev"
+            STAGING_URL="https://git-$SHA_SHORT-staging.frontend.rinth.dev"
             echo "env=production" >> $GITHUB_OUTPUT
             echo "url=$URL" >> $GITHUB_OUTPUT
             echo "staging_url=$STAGING_URL" >> $GITHUB_OUTPUT
@@ -80,9 +80,9 @@ jobs:
             echo "staging_cmd=versions upload --preview-alias git-$SHA_SHORT-staging ${STAGING_VARS}--var PREVIEW:true --var CF_PAGES_URL:$STAGING_URL" >> $GITHUB_OUTPUT
 
             if [ -n "$BRANCH_ALIAS" ]; then
-              echo "branch_alias_url=https://$BRANCH_ALIAS-frontend.modrinth.workers.dev" >> $GITHUB_OUTPUT
-              echo "staging_branch_alias_url=https://$BRANCH_ALIAS-staging-frontend.modrinth.workers.dev" >> $GITHUB_OUTPUT
-              echo "staging_branch_alias_cmd=versions upload --preview-alias $BRANCH_ALIAS-staging ${STAGING_VARS}--var PREVIEW:true --var CF_PAGES_URL:https://$BRANCH_ALIAS-staging-frontend.modrinth.workers.dev" >> $GITHUB_OUTPUT
+              echo "branch_alias_url=https://$BRANCH_ALIAS.frontend.rinth.dev" >> $GITHUB_OUTPUT
+              echo "staging_branch_alias_url=https://$BRANCH_ALIAS-staging.frontend.rinth.dev" >> $GITHUB_OUTPUT
+              echo "staging_branch_alias_cmd=versions upload --preview-alias $BRANCH_ALIAS-staging ${STAGING_VARS}--var PREVIEW:true --var CF_PAGES_URL:https://$BRANCH_ALIAS-staging.frontend.rinth.dev" >> $GITHUB_OUTPUT
             fi
 
           elif [ "$REF" = "refs/heads/main" ]; then
@@ -145,7 +145,7 @@ jobs:
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
           workingDirectory: ./apps/frontend
           packageManager: pnpm
-          wranglerVersion: '4.112.0'
+          wranglerVersion: '4.151.1'
           command: --version
 
       - parallel:
