@@ -80,3 +80,13 @@ jobs:
       dockerfile-path: apps/meta-generator/Dockerfile
       artifacts-name: minecraft-meta-docker-context
 
+  deploy:
+    needs: [docker-build]
+    if: ${{ github.ref == 'refs/heads/prod' }}
+    uses: SparkUniverse/workflows/.github/workflows/argo-update.yaml@main
+    secrets:
+      ARGOCD_DEPLOY_KEY: ${{ secrets.ARGOCD_DEPLOY_KEY }}
+    with:
+      application-set: labrinth
+      branch: ${{ github.ref == 'refs/heads/prod' && 'main' || 'develop' }}
+      environment-name: ${{ github.ref == 'refs/heads/prod' && 'production' || 'staging' }}
