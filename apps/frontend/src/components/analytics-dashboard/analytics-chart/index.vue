@@ -80,7 +80,7 @@
 		</div>
 
 		<div class="pointer-events-none absolute inset-0 z-[20] overflow-hidden rounded-xl">
-			<AnalyticsLoadingBar :loading="isDataLoading" />
+			<PageLoadingBar :loading="isDataLoading" />
 		</div>
 
 		<div v-if="isDataLoading" class="absolute inset-0 z-[19] overflow-hidden rounded-xl">
@@ -98,14 +98,13 @@
 </template>
 
 <script setup lang="ts">
-import { useVIntl } from '@modrinth/ui'
+import { PageLoadingBar, useVIntl } from '@modrinth/ui'
 
 import { getDefaultAnalyticsGraphProjectEventsVisibility } from '~/components/analytics-dashboard/analytics-route-query'
 import type { AnalyticsGroupByPreset } from '~/providers/analytics/analytics'
 import { injectAnalyticsDashboardContext } from '~/providers/analytics/analytics'
 
 import { analyticsMessages } from '../analytics-messages.ts'
-import AnalyticsLoadingBar from '../AnalyticsLoadingBar.vue'
 import AnalyticsChartLegend from './analytics-chart-header/AnalyticsChartLegend.vue'
 import AnalyticsChartRenderLimitModal from './analytics-chart-header/AnalyticsChartRenderLimitModal.vue'
 import AnalyticsChartHeader from './analytics-chart-header/index.vue'

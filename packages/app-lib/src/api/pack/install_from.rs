@@ -8,7 +8,7 @@ use crate::install::{
 };
 use crate::state::{
     AppliedContentSetPatch, CacheBehaviour, CachedEntry, ContentSourceKind,
-    EditInstance, InstanceInstallStage, InstanceLink, SideType,
+    DirectoryInfo, EditInstance, InstanceInstallStage, InstanceLink, SideType,
 };
 use crate::util::fetch::{
     DownloadMeta, DownloadReason, FetchProgressFn, fetch,
@@ -532,6 +532,7 @@ pub async fn set_instance_information(
     pack_version_id: Option<&str>,
     dependencies: &HashMap<PackDependency, String>,
     _ignore_lock: bool,
+    directories: &DirectoryInfo,
 ) -> crate::Result<()> {
     let mut game_version: Option<&String> = None;
     let mut mod_loader = None;
@@ -572,6 +573,7 @@ pub async fn set_instance_information(
             game_version,
             mod_loader,
             loader_version.cloned().as_deref(),
+            directories,
         )
         .await?
     } else {

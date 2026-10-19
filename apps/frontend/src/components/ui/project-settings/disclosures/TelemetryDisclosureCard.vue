@@ -87,7 +87,7 @@ function removeEntry(index: number) {
 		v-bind="props"
 		v-model="model.enabled"
 		:icon="RadioTowerIcon"
-		:title="formatMessage(messages.title)"
+		:title="props.title ?? formatMessage(messages.title)"
 		:description="formatMessage(messages.description)"
 		info-link="https://support.modrinth.com/en/articles/16567675#h_490dcf364b"
 		@set-lock-status="emit('setLockStatus', $event)"

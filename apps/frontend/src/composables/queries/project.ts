@@ -1,4 +1,4 @@
-import type { AbstractModrinthClient } from '@modrinth/api-client'
+import { type AbstractModrinthClient, ModrinthApiError } from '@modrinth/api-client'
 import type { QueryClient } from '@tanstack/query-core'
 
 export const STALE_TIME = 1000 * 60 * 5 // 5 minutes
@@ -37,6 +37,43 @@ export function warmProjectCheckCaches(
  * When you only have a route slug (or unknown id-or-slug), resolve with `check` first.
  */
 export const projectQueryOptions = {
+	disclosures: (projectId: string, client: AbstractModrinthClient) => ({
+		queryKey: ['project', 'disclosures', 'v3', projectId] as const,
+		queryFn: () => client.labrinth.projects_v3.getDisclosures(projectId),
+		staleTime: STALE_TIME,
+	}),
+
+	disclosureUsers: (userIds: string[], client: AbstractModrinthClient) => ({
+		queryKey: ['users', 'disclosures', userIds] as const,
+		queryFn: () => client.labrinth.users_v2.getMultiple(userIds),
+		staleTime: STALE_TIME,
+	}),
+
+	validation: (projectId: string, client: AbstractModrinthClient) => ({
+		queryKey: ['project', projectId, 'validation', 'v3'] as const,
+		queryFn: () => client.labrinth.projects_v3.validate(projectId),
+		staleTime: 0,
+	}),
+	slugAvailability: (slug: string, projectId: string, client: AbstractModrinthClient) => ({
+		queryKey: ['project', 'slug-available', slug, projectId] as const,
+		queryFn: async () => {
+			try {
+				const result = await client.labrinth.projects_v2.check(slug)
+				return result.id === projectId
+			} catch (error) {
+				if (error instanceof ModrinthApiError && error.statusCode === 404) return true
+				throw error
+			}
+		},
+		staleTime: 0,
+		retry: false,
+	}),
+
+	attribution: (projectId: string, client: AbstractModrinthClient) => ({
+		queryKey: ['project-attribution', projectId] as const,
+		queryFn: () => client.labrinth.attribution_internal.listProjectAttribution(projectId),
+	}),
+
 	/** Resolve a slug or ID to the canonical project ID. */
 	check: (idOrSlug: string, client: AbstractModrinthClient) => ({
 		queryKey: ['project', 'check', idOrSlug] as const,
@@ -73,7 +110,7 @@ export const projectQueryOptions = {
 	versionsV2: (projectId: string, client: AbstractModrinthClient) => ({
 		queryKey: ['project', projectId, 'versions', 'v2'] as const,
 		queryFn: () =>
-			client.labrinth.versions_v3.getProjectVersions(projectId, { include_changelog: false }),
+			client.labrinth.versions_v2.getProjectVersions(projectId, { include_changelog: false }),
 		staleTime: STALE_TIME,
 	}),
 

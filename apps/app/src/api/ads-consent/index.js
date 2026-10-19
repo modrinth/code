@@ -77,6 +77,8 @@ document.addEventListener(
 	true,
 )
 
+window.addEventListener('message', handleAdsDebugFrameRequest)
+
 window.open = (url) => {
 	if (url) openExternalUrl(url)
 	return null
@@ -85,6 +87,7 @@ window.open = (url) => {
 window.modrinthPrivacy ??= {}
 window.modrinthPrivacy.adsConsentAction = (action) => void controller.performAction(action)
 window.modrinthPrivacy.adsReopenConsentPreferences = () => controller.reopenPreferences()
+window.modrinthPrivacy.adsReportDebugState = () => void reportAdsDebugState()
 
 document.addEventListener('DOMContentLoaded', () => {
 	muteMediaElements()

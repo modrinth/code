@@ -162,7 +162,7 @@ async fn run_credentials(
             .as_ref()
             .expect("hooked launches always resolve their instance path");
         let java_version =
-            crate::launcher::resolve_java_for_launch(&context).await?;
+            crate::launcher::resolve_java_for_launch(&context, &state).await?;
 
         Some(crate::launcher::hooks::HookEnvironment::from_current_env(
             &env_args,
@@ -303,6 +303,7 @@ async fn run_credentials(
         post_exit_hook,
         &context,
         quick_play_type,
+        &state,
     )
     .await
 }

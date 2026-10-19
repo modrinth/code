@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\t\t\tUPDATE threads_issues\n\t\t\t\tSET created_by = $1\n\t\t\t\tWHERE created_by = $2\n\t\t\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "a34c946ec03bc8edc25d72b40e154dc39b81f087a1526940731bd98a406f3171"
+}

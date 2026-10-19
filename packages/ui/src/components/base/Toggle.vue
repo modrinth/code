@@ -5,7 +5,7 @@
 		role="switch"
 		:aria-checked="modelValue"
 		:disabled="disabled"
-		class="group inline-flex shrink-0 touch-manipulation items-center rounded-full m-0 p-1 transition-all duration-200 cursor-pointer border border-solid border-surface-5"
+		class="group inline-flex shrink-0 touch-manipulation items-center rounded-full m-0 p-1 transition-[background-color,border-color,opacity] duration-200 cursor-pointer border border-solid border-surface-5"
 		:class="[
 			small ? 'h-5 !w-[40px]' : 'h-6 !w-[48px]',
 			modelValue ? 'bg-brand' : 'bg-button-bg',
@@ -14,7 +14,7 @@
 		@click="toggle"
 	>
 		<span
-			class="rounded-full transition-all duration-200"
+			class="rounded-full transition-[transform,background-color,width,height,margin] duration-200"
 			:class="[
 				small ? 'w-3 h-3' : 'w-4 h-4',
 				modelValue

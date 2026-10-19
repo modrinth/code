@@ -64,7 +64,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { ArrowLeftRightIcon, CheckIcon, XIcon } from '@modrinth/assets'
-import { Combobox, IconButton, injectProjectPageContext } from '@modrinth/ui'
+import { Combobox, IconButton } from '@modrinth/ui'
 import type { ComboboxOption } from '@modrinth/ui/src/components/base/Combobox.vue'
 import { acceptFileFromProjectType } from '@modrinth/utils'
 
@@ -73,8 +73,7 @@ import {
 	injectManageVersionContext,
 } from '~/providers/version/manage-version-modal'
 
-const { projectV2 } = injectProjectPageContext()
-const { projectType } = injectManageVersionContext()
+const { projectType, projectV2 } = injectManageVersionContext()
 
 const emit = defineEmits<{
 	(e: 'setPrimaryFile', file?: File): void
@@ -97,7 +96,11 @@ const isDatapackProject = computed(() => projectType.value === 'datapack')
 const versionTypes = computed(
 	() =>
 		[
-			!editingVersion && { class: 'text-sm', value: 'primary', label: fileTypeLabels.primary },
+			!editingVersion && {
+				class: 'text-sm',
+				value: 'primary',
+				label: fileTypeLabels.primary,
+			},
 			isDatapackProject.value && {
 				class: 'text-sm',
 				value: 'required-resource-pack',
@@ -108,9 +111,17 @@ const versionTypes = computed(
 				value: 'optional-resource-pack',
 				label: fileTypeLabels['optional-resource-pack'],
 			},
-			{ class: 'text-sm', value: 'sources-jar', label: fileTypeLabels['sources-jar'] },
+			{
+				class: 'text-sm',
+				value: 'sources-jar',
+				label: fileTypeLabels['sources-jar'],
+			},
 			{ class: 'text-sm', value: 'dev-jar', label: fileTypeLabels['dev-jar'] },
-			{ class: 'text-sm', value: 'javadoc-jar', label: fileTypeLabels['javadoc-jar'] },
+			{
+				class: 'text-sm',
+				value: 'javadoc-jar',
+				label: fileTypeLabels['javadoc-jar'],
+			},
 			{ class: 'text-sm', value: 'signature', label: fileTypeLabels.signature },
 		].filter(Boolean) as ComboboxOption<Labrinth.Versions.v3.FileType | 'primary'>[],
 )

@@ -371,6 +371,59 @@ async fn project_slug_edit_invalidates_redirect_cache() {
 }
 
 #[actix_rt::test]
+async fn project_redirect_accepts_literal_and_encoded_plus() {
+    with_test_environment_all(None, |env| async move {
+        let target_id = &env.dummy.project_alpha.project_id;
+        let target = parse_base62(target_id).unwrap();
+        let percent_target_id = &env.dummy.project_beta.project_id;
+        let percent_target = parse_base62(percent_target_id).unwrap();
+        let fixture_sql = format!(
+            r#"INSERT INTO project_redirects (slug, target_project_id)
+			VALUES ('redirect+alias', {target}), ('redirect%2balias', {percent_target})"#
+        );
+        sqlx::raw_sql(&fixture_sql)
+            .execute(&env.db.pool)
+            .await
+            .unwrap();
+
+        for project_ref in [
+            "redirect+alias",
+            "redirect%2Balias",
+            "redirect%2balias",
+            "redirect%252Balias",
+        ] {
+            for suffix in ["", "/check", "/check?test=foo%2Bbar"] {
+                let response = env
+                    .api
+                    .get_project(
+                        &format!("{project_ref}{suffix}"),
+                        USER_USER_PAT,
+                    )
+                    .await;
+                assert_status!(&response, StatusCode::PERMANENT_REDIRECT);
+                let location = response
+                    .headers()
+                    .get("location")
+                    .unwrap()
+                    .to_str()
+                    .unwrap();
+                let expected_target = if project_ref == "redirect%252Balias" {
+                    percent_target_id
+                } else {
+                    target_id
+                };
+                assert!(
+                    location.ends_with(&format!(
+                        "/project/{expected_target}{suffix}"
+                    ))
+                );
+            }
+        }
+    })
+    .await;
+}
+
+#[actix_rt::test]
 async fn project_redirect_cache_preserves_case_sensitive_ids() {
     with_test_environment_all(None, |env| async move {
         let project_id = &env.dummy.project_beta.project_id;
@@ -941,6 +994,43 @@ async fn test_moderator_can_edit_invalid_project_in_review() {
                 .await;
             assert_eq!(project.status, ProjectStatus::Processing);
             assert!(project.description.is_empty());
+        },
+    )
+    .await;
+}
+
+#[actix_rt::test]
+async fn test_moderators_can_approve_invalid_project() {
+    with_test_environment(
+        None,
+        |test_env: TestEnvironment<ApiV3>| async move {
+            let api = &test_env.api;
+            let project_slug = &test_env.dummy.project_alpha.project_slug;
+
+            for pat in [MOD_USER_PAT, ADMIN_USER_PAT] {
+                let response = api
+                    .edit_project(
+                        project_slug,
+                        json!({ "status": "processing", "description": "" }),
+                        pat,
+                    )
+                    .await;
+                assert_status!(&response, StatusCode::NO_CONTENT);
+
+                let response = api
+                    .edit_project(
+                        project_slug,
+                        json!({ "status": "approved" }),
+                        pat,
+                    )
+                    .await;
+                assert_status!(&response, StatusCode::NO_CONTENT);
+
+                let project =
+                    api.get_project_deserialized(project_slug, pat).await;
+                assert_eq!(project.status, ProjectStatus::Approved);
+                assert!(project.description.is_empty());
+            }
         },
     )
     .await;

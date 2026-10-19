@@ -3,11 +3,13 @@ import {
 	CheckIcon,
 	ChevronDownIcon,
 	ClipboardCopyIcon,
+	CoffeeIcon,
 	CopyIcon,
 	ExternalIcon,
 	LoaderCircleIcon,
 } from '@modrinth/assets'
 import {
+	Button,
 	ButtonLink,
 	IconButton,
 	injectModrinthClient,
@@ -15,6 +17,8 @@ import {
 } from '@modrinth/ui'
 import { capitalizeString, highlightCodeLines } from '@modrinth/utils'
 import { computed, reactive, ref } from 'vue'
+
+import { injectReviewSlicer, slicerFileName } from '~/providers/project-review/review-slicer'
 
 import { getSeverityBadgeColor, truncateMiddle } from './helpers'
 import TechRevFlagBadges from './TechRevFlagBadges.vue'
@@ -37,6 +41,7 @@ const emit = defineEmits<{
 }>()
 
 const client = injectModrinthClient()
+const slicer = injectReviewSlicer(null)
 const { addNotification } = injectNotificationManager()
 const { isPreReviewed, getMarkedFlagsCount } = injectTechReviewDecisions()
 
@@ -124,20 +129,19 @@ function trimSlashes(path: string): string {
 	return path
 }
 
-// Creates a slicer link with a group, removes trailing and leading slashes, and if no file extension found assume .class
-function createSlicerLink(url: string, group: ClassGroup | undefined) {
-	const uri = new URL(url)
-	const filename = uri.pathname.split('/').pop() || ''
-	if (group) {
-		const jarPath = trimSlashes(group.jar ? group.jar.replace('#', '/') : filename)
-		const filePath = trimSlashes(
-			group.filePath.startsWith('/') ? group.filePath.slice(1) : group.filePath,
-		)
-		const hasFileExtension = (filePath.split('/').pop() || '').includes('.')
-		const file = `${jarPath}/${hasFileExtension ? filePath : `${filePath}.class`}`
-		return `https://slicer.run/?url=${encodeURIComponent(url)}&file=${encodeURIComponent(file)}`
-	}
-	return `https://slicer.run/?url=${encodeURIComponent(url)}`
+/**
+ * Resolves the slicer workspace entry for a class group, removing trailing and leading slashes and
+ * assuming `.class` when the path has no file extension.
+ */
+function slicerEntry(url: string, group: ClassGroup) {
+	const jarPath = trimSlashes(group.jar ? group.jar.replace('#', '/') : slicerFileName(url))
+	const filePath = trimSlashes(group.filePath)
+	const hasFileExtension = (filePath.split('/').pop() || '').includes('.')
+	return `${jarPath}/${hasFileExtension ? filePath : `${filePath}.class`}`
+}
+
+function createSlicerLink(url: string, group: ClassGroup) {
+	return `https://slicer.run/?url=${encodeURIComponent(url)}&file=${encodeURIComponent(slicerEntry(url, group))}`
 }
 </script>
 
@@ -179,6 +183,18 @@ function createSlicerLink(url: string, group: ClassGroup | undefined) {
 							</span>
 						</div>
 					</Transition>
+					<Button
+						v-if="slicer"
+						v-tooltip="'Open file in Slicer tab'"
+						type="outlined"
+						circular
+						icon-only
+						@click.stop="
+							slicer.open([file.download_url], slicerEntry(file.download_url, classItem))
+						"
+					>
+						<CoffeeIcon />
+					</Button>
 					<ButtonLink
 						v-tooltip="'Open file in slicer'"
 						type="outlined"

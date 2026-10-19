@@ -455,9 +455,6 @@
   "app.settings.default-instance-options.width.title": {
     "message": "Lebar"
   },
-  "app.settings.default-instance-options.window.title": {
-    "message": "Tetingkap"
-  },
   "app.settings.developer-mode-enabled": {
     "message": "Mod pembangun didayakan."
   },
@@ -1498,9 +1495,6 @@
   },
   "app.settings.tabs.privacy": {
     "message": "Privasi"
-  },
-  "app.settings.tabs.resource-management": {
-    "message": "Pengurusan sumber"
   },
   "app.skins.add-button": {
     "message": "Tambah kekulit"
