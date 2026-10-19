@@ -90,16 +90,25 @@
 			</div>
 
 			<div class="flex items-center gap-3">
-				<span
-					v-tooltip="`Since ${formatDateTimeFull(queuedDate.toDate())}`"
-					class="text-base text-secondary"
-					:class="{
-						'text-red': daysInQueue > 4,
-						'text-orange': daysInQueue > 2 && daysInQueue <= 4,
-					}"
-				>
-					{{ formattedDate }}
-				</span>
+				<div class="flex flex-col items-end">
+					<span
+						v-tooltip="`Since ${formatDateTimeFull(queuedDate.toDate())}`"
+						class="text-base text-secondary"
+						:class="{
+							'text-red': daysInQueue > 4,
+							'text-orange': daysInQueue > 2 && daysInQueue <= 4,
+						}"
+					>
+						{{ formattedDate }}
+					</span>
+					<span
+						v-if="initialQueuedDate"
+						v-tooltip="`First submitted ${formatDateTimeFull(initialQueuedDate.toDate())}`"
+						class="text-sm text-secondary"
+					>
+						First submitted {{ formatRelativeTime(initialQueuedDate.toISOString()) }}
+					</span>
+				</div>
 
 				<div class="flex items-center gap-2">
 					<CopyCode v-tooltip="'Copy project ID'" :text="queueEntry.project.id" />
@@ -184,6 +193,14 @@ const queuedDate = computed(() => {
 			props.queueEntry.project.published ||
 			props.queueEntry.project.updated,
 	)
+})
+
+const initialQueuedDate = computed(() => {
+	const initialQueued = props.queueEntry.project.initial_queued
+	if (!initialQueued) return null
+
+	const date = dayjs(initialQueued)
+	return date.isBefore(queuedDate.value.subtract(1, 'minute')) ? date : null
 })
 
 const daysInQueue = computed(() => {

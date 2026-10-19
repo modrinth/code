@@ -2456,7 +2456,12 @@ export namespace Labrinth {
 						icon_url: string | null
 				  }
 
-			export type ProjectsSort = 'oldest' | 'newest' | 'most_external_deps' | 'least_external_deps'
+			export type ProjectsSort =
+				| 'oldest'
+				| 'newest'
+				| 'oldest_initial'
+				| 'most_external_deps'
+				| 'least_external_deps'
 
 			export type ProjectsRequest = {
 				count?: number
@@ -2477,6 +2482,7 @@ export namespace Labrinth {
 				status: Projects.v2.ProjectStatus
 				requested_status: Projects.v2.ProjectStatus | null
 				queued: string | null
+				initial_queued: string | null
 				published: string
 				updated: string
 				project_types: string[]

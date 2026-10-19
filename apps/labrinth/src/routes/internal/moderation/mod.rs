@@ -93,6 +93,7 @@ pub enum ModerationProjectsSort {
     #[default]
     Oldest,
     Newest,
+    OldestInitial,
     MostExternalDeps,
     LeastExternalDeps,
 }
@@ -102,6 +103,7 @@ impl ModerationProjectsSort {
         match self {
             Self::Oldest => "oldest",
             Self::Newest => "newest",
+            Self::OldestInitial => "oldest_initial",
             Self::MostExternalDeps => "most_external_deps",
             Self::LeastExternalDeps => "least_external_deps",
         }
@@ -130,6 +132,7 @@ pub struct ModerationQueueProject {
     pub status: ProjectStatus,
     pub requested_status: Option<ProjectStatus>,
     pub queued: Option<DateTime<Utc>>,
+    pub initial_queued: Option<DateTime<Utc>>,
     pub published: DateTime<Utc>,
     pub updated: DateTime<Utc>,
     pub project_types: Vec<String>,
@@ -294,6 +297,7 @@ pub async fn get_projects_internal(
                     m.summary,
                     m.description,
                     m.queued,
+                    m.initial_queued,
                     m.published,
                     m.organization_id,
                     m.team_id,
@@ -341,6 +345,7 @@ pub async fn get_projects_internal(
                     mp.summary,
                     mp.description,
                     mp.queued,
+                    mp.initial_queued,
                     mp.published,
                     search_organization.name AS organization_name,
                     search_owner.username AS owner_name,
@@ -378,6 +383,7 @@ pub async fn get_projects_internal(
                 SELECT
                     id,
                     queued,
+                    initial_queued,
                     published,
                     project_types,
                     external_dependencies_count
@@ -414,6 +420,7 @@ pub async fn get_projects_internal(
                 SELECT
                     id,
                     queued,
+                    initial_queued,
                     published,
                     project_types,
                     external_dependencies_count
@@ -422,6 +429,7 @@ pub async fn get_projects_internal(
                     CASE WHEN $8 = 'most_external_deps' THEN external_dependencies_count END DESC,
                     CASE WHEN $8 = 'least_external_deps' THEN external_dependencies_count END ASC,
                     CASE WHEN $8 = 'newest' THEN COALESCE(queued, published) END DESC NULLS LAST,
+                    CASE WHEN $8 = 'oldest_initial' THEN COALESCE(initial_queued, published) END ASC NULLS LAST,
                     CASE WHEN $8 IN ('oldest', 'most_external_deps', 'least_external_deps') THEN COALESCE(queued, published) END ASC NULLS LAST,
                     id ASC
                 OFFSET $7
@@ -437,6 +445,7 @@ pub async fn get_projects_internal(
                     m.status,
                     m.requested_status,
                     m.queued,
+                    m.initial_queued,
                     m.published,
                     m.updated,
                     m.organization_id,
@@ -474,6 +483,7 @@ pub async fn get_projects_internal(
                 page_projects.status AS "status?",
                 page_projects.requested_status AS "requested_status?",
                 page_projects.queued AS "queued?",
+                page_projects.initial_queued AS "initial_queued?",
                 page_projects.published AS "published?",
                 page_projects.updated AS "updated?",
                 page_projects.organization_id AS "organization_id?",
@@ -490,6 +500,7 @@ pub async fn get_projects_internal(
                 CASE WHEN $8 = 'most_external_deps' THEN page_projects.external_dependencies_count END DESC,
                 CASE WHEN $8 = 'least_external_deps' THEN page_projects.external_dependencies_count END ASC,
                 CASE WHEN $8 = 'newest' THEN COALESCE(page_projects.queued, page_projects.published) END DESC NULLS LAST,
+                CASE WHEN $8 = 'oldest_initial' THEN COALESCE(page_projects.initial_queued, page_projects.published) END ASC NULLS LAST,
                 CASE WHEN $8 IN ('oldest', 'most_external_deps', 'least_external_deps') THEN COALESCE(page_projects.queued, page_projects.published) END ASC NULLS LAST,
                 page_projects.id ASC
             "#,
@@ -520,6 +531,7 @@ pub async fn get_projects_internal(
                 row.status,
                 row.requested_status,
                 row.queued,
+                row.initial_queued,
                 row.published,
                 row.updated,
                 row.organization_id,
@@ -545,6 +557,7 @@ pub async fn get_projects_internal(
                 SELECT
                     m.id,
                     m.queued,
+                    m.initial_queued,
                     m.published
                 FROM mods m
                 WHERE
@@ -565,10 +578,12 @@ pub async fn get_projects_internal(
                 SELECT
                     id,
                     queued,
+                    initial_queued,
                     published
                 FROM filtered_projects
                 ORDER BY
                     CASE WHEN $5 = 'newest' THEN COALESCE(queued, published) END DESC NULLS LAST,
+                    CASE WHEN $5 = 'oldest_initial' THEN COALESCE(initial_queued, published) END ASC NULLS LAST,
                     CASE WHEN $5 = 'oldest' THEN COALESCE(queued, published) END ASC NULLS LAST,
                     id ASC
                 OFFSET $4
@@ -607,6 +622,7 @@ pub async fn get_projects_internal(
                     m.status,
                     m.requested_status,
                     m.queued,
+                    m.initial_queued,
                     m.published,
                     m.updated,
                     m.organization_id,
@@ -655,6 +671,7 @@ pub async fn get_projects_internal(
                 page_projects.status AS "status?",
                 page_projects.requested_status AS "requested_status?",
                 page_projects.queued AS "queued?",
+                page_projects.initial_queued AS "initial_queued?",
                 page_projects.published AS "published?",
                 page_projects.updated AS "updated?",
                 page_projects.organization_id AS "organization_id?",
@@ -669,6 +686,7 @@ pub async fn get_projects_internal(
             LEFT JOIN page_projects ON true
             ORDER BY
                 CASE WHEN $5 = 'newest' THEN COALESCE(page_projects.queued, page_projects.published) END DESC NULLS LAST,
+                CASE WHEN $5 = 'oldest_initial' THEN COALESCE(page_projects.initial_queued, page_projects.published) END ASC NULLS LAST,
                 CASE WHEN $5 = 'oldest' THEN COALESCE(page_projects.queued, page_projects.published) END ASC NULLS LAST,
                 page_projects.id ASC
             "#,
@@ -696,6 +714,7 @@ pub async fn get_projects_internal(
                 row.status,
                 row.requested_status,
                 row.queued,
+                row.initial_queued,
                 row.published,
                 row.updated,
                 row.organization_id,
@@ -772,6 +791,7 @@ pub async fn get_project_ids(
                     m.summary,
                     m.description,
                     m.queued,
+                    m.initial_queued,
                     m.published,
                     m.organization_id,
                     m.team_id,
@@ -819,6 +839,7 @@ pub async fn get_project_ids(
                     mp.summary,
                     mp.description,
                     mp.queued,
+                    mp.initial_queued,
                     mp.published,
                     search_organization.name AS organization_name,
                     search_owner.username AS owner_name,
@@ -880,6 +901,7 @@ pub async fn get_project_ids(
                 CASE WHEN $6 = 'most_external_deps' THEN external_dependencies_count END DESC,
                 CASE WHEN $6 = 'least_external_deps' THEN external_dependencies_count END ASC,
                 CASE WHEN $6 = 'newest' THEN COALESCE(queued, published) END DESC NULLS LAST,
+                CASE WHEN $6 = 'oldest_initial' THEN COALESCE(initial_queued, published) END ASC NULLS LAST,
                 CASE WHEN $6 IN ('oldest', 'most_external_deps', 'least_external_deps') THEN COALESCE(queued, published) END ASC NULLS LAST,
                 id ASC
             "#,
@@ -916,6 +938,7 @@ pub async fn get_project_ids(
                 )
             ORDER BY
                 CASE WHEN $2 = 'newest' THEN COALESCE(queued, published) END DESC NULLS LAST,
+                CASE WHEN $2 = 'oldest_initial' THEN COALESCE(initial_queued, published) END ASC NULLS LAST,
                 CASE WHEN $2 = 'oldest' THEN COALESCE(queued, published) END ASC NULLS LAST,
                 id ASC
             "#,
@@ -945,6 +968,7 @@ fn row_to_queue_project(
     status: Option<String>,
     requested_status: Option<String>,
     queued: Option<DateTime<Utc>>,
+    initial_queued: Option<DateTime<Utc>>,
     published: Option<DateTime<Utc>>,
     updated: Option<DateTime<Utc>>,
     organization_id: Option<i64>,
@@ -1006,6 +1030,7 @@ fn row_to_queue_project(
             .as_deref()
             .map(ProjectStatus::from_string),
         queued,
+        initial_queued,
         published,
         updated,
         project_types: project_types.unwrap_or_default(),
