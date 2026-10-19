@@ -475,22 +475,26 @@ impl Credentials {
             match res {
                 Ok(_) => Ok(Some(creds)),
                 Err(err) => {
-                    if let ErrorKind::MinecraftAuthenticationError(
-                        MinecraftAuthenticationError::Request {
-                            ref source,
-                            ..
-                        },
-                    ) = *err.raw
+                    let auth_error = err
+                        .downcast_ref::<MinecraftAuthenticationError>()
+                        .or_else(|| match err.downcast_ref::<ErrorKind>() {
+                            Some(ErrorKind::MinecraftAuthenticationError(
+                                error,
+                            )) => Some(error),
+                            _ => None,
+                        });
+
+                    if let Some(MinecraftAuthenticationError::Request {
+                        source,
+                        ..
+                    }) = auth_error
                         && (source.is_connect() || source.is_timeout())
                     {
                         return Ok(Some(creds));
                     }
 
-                    if matches!(
-                        &*err.raw,
-                        ErrorKind::MinecraftAuthenticationError(source)
-                            if source.is_invalid_grant()
-                    ) {
+                    if auth_error.is_some_and(|error| error.is_invalid_grant())
+                    {
                         Self::remove(creds.offline_profile.id, exec).await?;
 
                         if let Some((_, mut user)) =

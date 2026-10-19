@@ -1,5 +1,4 @@
 use crate::api::Result;
-use crate::api::TheseusSerializableError;
 use crate::api::oauth_utils;
 use crate::api::oauth_utils::auth_code_reply::AuthReplySession;
 use crate::api::oauth_utils::auth_seal::AuthSeal;
@@ -46,18 +45,16 @@ pub async fn modrinth_login<R: Runtime>(
     app.opener()
         .open_url(auth_request_uri, None::<&str>)
         .map_err(|e| {
-            TheseusSerializableError::Theseus(
-                theseus::ErrorKind::OtherError(format!(
-                    "Failed to open auth request URI: {e}"
-                ))
-                .into(),
-            )
+            theseus::ErrorKind::OtherError(format!(
+                "Failed to open auth request URI: {e}"
+            ))
+            .as_error()
         })?;
 
     let Some(auth_code) = reply.wait().await? else {
-        return Err(TheseusSerializableError::Theseus(
-            theseus::ErrorKind::OtherError("Login canceled".into()).into(),
-        ));
+        return Err(theseus::ErrorKind::OtherError("Login canceled".into())
+            .as_error()
+            .into());
     };
     let session_token = seal.open(&auth_code)?;
     let credentials = mr_auth::authenticate_finish_flow(&session_token).await?;

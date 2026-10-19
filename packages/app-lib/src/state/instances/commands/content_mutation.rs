@@ -9,6 +9,7 @@ use crate::state::{
     KnownModrinthFile, ProjectType, State, cache_file_hash_metadata,
     file_modified_at_ns,
 };
+use crate::util::io::IOError;
 use chrono::Utc;
 use std::path::Path;
 use tokio::fs;
@@ -75,12 +76,16 @@ enum PreparedChange {
 }
 
 fn adoption_can_be_deferred(error: &crate::Error) -> bool {
-    matches!(
-        error.raw.as_ref(),
-        crate::ErrorKind::StdIOError(_)
-            | crate::ErrorKind::IOError(_)
-            | crate::ErrorKind::InputError(_)
-    )
+    error.is::<std::io::Error>()
+        || error.is::<IOError>()
+        || matches!(
+            error.downcast_ref::<crate::ErrorKind>(),
+            Some(
+                crate::ErrorKind::StdIOError(_)
+                    | crate::ErrorKind::IOError(_)
+                    | crate::ErrorKind::InputError(_)
+            )
+        )
 }
 
 struct PendingContentChange {
