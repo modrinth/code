@@ -14,16 +14,48 @@ use actix_web::{
     web,
 };
 use chrono::Utc;
+use redis::Script;
 use std::str::FromStr;
+use std::sync::LazyLock;
 use std::sync::atomic::{AtomicI64, Ordering};
 use std::time::{Duration, Instant};
 use tracing::warn;
 use xredis::RedisPool;
 
-const RATE_LIMIT_NAMESPACE: &str = "rate_limit:v4";
+const RATE_LIMIT_NAMESPACE: &str = "rate_limit:v5";
 const RATE_LIMIT_EXPIRY: i64 = 300; // 5 minutes
-const MINUTE_IN_NANOS: i64 = 60_000_000_000;
+const MINUTE_IN_MICROS: i64 = 60_000_000;
 const REDIS_WARNING_INTERVAL_SECS: i64 = 10;
+
+/// Runs one GCRA step atomically so concurrent requests cannot read the same
+/// TAT. Times are in microseconds from the Redis clock: Lua numbers are
+/// doubles, so nanoseconds since epoch would lose precision, and using one
+/// clock keeps replicas with skewed clocks consistent.
+///
+/// Returns `{allowed, remaining, reset_after_us, retry_after_us}`.
+const GCRA_LUA: &str = r#"
+local emission_interval = tonumber(ARGV[1])
+local burst_size = tonumber(ARGV[2])
+local expiry = tonumber(ARGV[3])
+
+local time = redis.call('TIME')
+local now = tonumber(time[1]) * 1000000 + tonumber(time[2])
+
+local tat = tonumber(redis.call('GET', KEYS[1])) or now
+local max_tat_delta = emission_interval * burst_size
+
+if tat - now > max_tat_delta then
+    return {0, 0, tat - now, tat - now - max_tat_delta}
+end
+
+local new_tat = math.max(tat + emission_interval, now)
+redis.call('SET', KEYS[1], string.format('%.0f', new_tat), 'EX', expiry)
+
+local remaining = math.floor((max_tat_delta - (new_tat - now)) / emission_interval)
+return {1, math.max(remaining, 0), new_tat - now, 0}
+"#;
+
+static GCRA_SCRIPT: LazyLock<Script> = LazyLock::new(|| Script::new(GCRA_LUA));
 
 static LAST_REDIS_WARNING_SECS: AtomicI64 = AtomicI64::new(0);
 
@@ -46,8 +78,7 @@ pub struct GCRAParameters {
 
 impl GCRAParameters {
     pub(crate) fn new(requests_per_minute: u32, burst_size: u32) -> Self {
-        // Calculate emission interval in nanoseconds
-        let emission_interval = MINUTE_IN_NANOS / requests_per_minute as i64;
+        let emission_interval = MINUTE_IN_MICROS / requests_per_minute as i64;
 
         Self {
             emission_interval,
@@ -91,78 +122,52 @@ impl AsyncRateLimiter {
                         "Rate limiter could not connect to Redis, allowing request: {err:#}"
                     );
                 }
-                // If Redis is unavailable, allow the request but with reduced limit
-                return RateLimitDecision {
-                    allowed: true,
-                    limit: params.burst_size,
-                    remaining: 1,
-                    reset_after_ms: 60_000, // 1 minute
-                    retry_after_ms: None,
-                };
+                return Self::fail_open(params);
             }
         };
 
-        // Get current time in nanoseconds since UNIX epoch
-        let now = Utc::now().timestamp_nanos_opt().unwrap_or(0);
         let key = conn.key().with_slot(RATE_LIMIT_NAMESPACE, key, key);
 
-        // Get the current TAT from Redis (if it exists)
-        let tat_str = conn
-            .get(&key)
+        let (allowed, remaining, reset_after_us, retry_after_us): (
+            bool,
+            u32,
+            i64,
+            i64,
+        ) = match GCRA_SCRIPT
+            .key(&key)
+            .arg(params.emission_interval)
+            .arg(params.burst_size)
+            .arg(RATE_LIMIT_EXPIRY)
+            .invoke_async(&mut conn)
             .await
-            .inspect_err(|err| {
+        {
+            Ok(result) => result,
+            Err(err) => {
                 if should_log_redis_warning() {
-                    warn!("Rate limiter failed to read from Redis: {err:#}");
+                    warn!(
+                        "Rate limiter script failed, allowing request: {err:#}"
+                    );
                 }
-            })
-            .ok()
-            .flatten();
-
-        // Parse the TAT or use current time if not found
-        let current_tat = match tat_str {
-            Some(tat_str) => tat_str.parse::<i64>().unwrap_or(now),
-            None => now,
+                return Self::fail_open(params);
+            }
         };
 
-        // Calculate the new TAT using GCRA
-        let increment = params.emission_interval;
-        let max_tat_delta = increment * params.burst_size as i64;
-
-        // Calculate allowance: how much time has passed since the TAT
-        let allowance = now - current_tat;
-
-        if allowance < -max_tat_delta {
-            // Too many requests, rate limit exceeded
-            // Calculate when the client can retry
-            let retry_after_ms = (-allowance - max_tat_delta) / 1_000_000;
-
-            return RateLimitDecision {
-                allowed: false,
-                limit: params.burst_size,
-                remaining: 0,
-                reset_after_ms: -allowance / 1_000_000,
-                retry_after_ms: Some(retry_after_ms.max(0)),
-            };
+        RateLimitDecision {
+            allowed,
+            limit: params.burst_size,
+            remaining,
+            reset_after_ms: reset_after_us / 1_000,
+            retry_after_ms: (!allowed).then_some(retry_after_us / 1_000),
         }
+    }
 
-        let new_tat = std::cmp::max(current_tat + increment, now);
-
-        if let Err(err) = conn
-            .set(&key, &new_tat.to_string(), Some(RATE_LIMIT_EXPIRY))
-            .await
-            && should_log_redis_warning()
-        {
-            warn!("Rate limiter failed to write to Redis: {err:#}");
-        }
-
-        let remaining_capacity =
-            ((max_tat_delta - (new_tat - now)) / increment).max(0) as u32;
-
+    /// Allows the request when Redis is unavailable, with a reduced limit.
+    fn fail_open(params: GCRAParameters) -> RateLimitDecision {
         RateLimitDecision {
             allowed: true,
             limit: params.burst_size,
-            remaining: remaining_capacity,
-            reset_after_ms: (new_tat - now) / 1_000_000,
+            remaining: 1,
+            reset_after_ms: 60_000,
             retry_after_ms: None,
         }
     }
