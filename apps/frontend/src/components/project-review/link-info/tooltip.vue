@@ -6,7 +6,7 @@
 		@pointerleave="leaveLink"
 		@pointerover.stop
 		@pointermove.stop
-		@focusin="show"
+		@focusin="enterFocus"
 		@focusout="leaveFocus"
 	>
 		<slot :tooltip-id="open ? tooltipId : undefined" />
@@ -18,11 +18,11 @@
 			role="tooltip"
 			:style="floatingStyles"
 			class="z-[101] box-border w-96 max-w-[calc(100vw-1rem)] overflow-y-auto rounded-xl border border-solid border-surface-5 bg-surface-2 shadow-lg"
-			@pointerenter="cancelClose"
+			@pointerenter="enterPanel"
 			@pointerleave="scheduleClose"
 			@pointerover.stop
 			@pointermove.stop
-			@focusin="cancelClose"
+			@focusin="enterFocus"
 			@focusout="leaveFocus"
 		>
 			<LinkInfo :url="url" :enabled="hovered" :validation-messages="validationMessages" />
@@ -50,6 +50,7 @@ const hovered = ref(false)
 const tooltipId = useId()
 let openTimer: ReturnType<typeof setTimeout> | undefined
 let closeTimer: ReturnType<typeof setTimeout> | undefined
+let hoveredSinceFocus = false
 
 const { floatingStyles } = useFloating(anchor, panel, {
 	placement: computed(() =>
@@ -85,9 +86,15 @@ function enterLink(event: PointerEvent) {
 	if (event.pointerType === 'touch') return
 	hovered.value = true
 	emit('hover', true)
-	cancelClose()
+	enterPanel(event)
 	clearTimeout(openTimer)
 	openTimer = setTimeout(show, 200)
+}
+
+function enterPanel(event: PointerEvent) {
+	if (event.pointerType === 'touch') return
+	hoveredSinceFocus = true
+	cancelClose()
 }
 
 function leaveLink() {
@@ -106,10 +113,15 @@ function leaveFocus(event: FocusEvent) {
 	if (!contains(event.relatedTarget)) scheduleClose()
 }
 
+function enterFocus() {
+	hoveredSinceFocus = false
+	show()
+}
+
 function scheduleClose() {
 	cancelClose()
 	closeTimer = setTimeout(() => {
-		if (contains(anchor.value?.ownerDocument.activeElement ?? null)) return
+		if (!hoveredSinceFocus && contains(anchor.value?.ownerDocument.activeElement ?? null)) return
 		close()
 	}, 200)
 }
@@ -119,6 +131,7 @@ function close() {
 	cancelClose()
 	open.value = false
 	hovered.value = false
+	hoveredSinceFocus = false
 	emit('hover', false)
 }
 

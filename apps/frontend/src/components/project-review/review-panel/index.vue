@@ -8,6 +8,7 @@
 		:as="as"
 		:disabled="disabled"
 		:show-finding-badge="showFindingBadge"
+		@click="reviewContext.retainExternalLink(id, $event)"
 	>
 		<slot />
 		<Popover
@@ -64,6 +65,9 @@
 		class="box-border flex w-full flex-col gap-2.5 text-sm text-primary transition-opacity duration-150"
 		:class="inlineActive ? 'opacity-100' : 'opacity-50'"
 		:style="{ maxWidth }"
+		@pointerenter="reviewContext.enter(id)"
+		@pointerleave="reviewContext.leave(id)"
+		@click="reviewContext.retainExternalLink(id, $event)"
 	>
 		<Highlight
 			:active="inlineActive"

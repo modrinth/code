@@ -15,6 +15,7 @@
 			@focusin="cancelClose"
 			@focusout="leave(anchor.id)"
 			@keydown="onKeydown"
+			@click="retainExternalLink(anchor.id, $event)"
 		>
 			<div class="flex items-center justify-between gap-3">
 				<slot name="title" />
@@ -64,8 +65,18 @@ const props = defineProps<{
 	label?: string
 	maxWidth?: string
 }>()
-const { active, panel, panelId, pinned, close, leave, setPopoverHovered, cancelClose, contains } =
-	injectReviewContext()
+const {
+	active,
+	panel,
+	panelId,
+	pinned,
+	close,
+	leave,
+	setPopoverHovered,
+	cancelClose,
+	contains,
+	retainExternalLink,
+} = injectReviewContext()
 const element = shallowRef<HTMLElement | null>(null)
 const reference = computed(() => props.anchor.element)
 const { floatingStyles, isPositioned } = useFloating(reference, element, {

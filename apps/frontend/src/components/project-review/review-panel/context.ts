@@ -113,6 +113,8 @@ export function createReviewContext(
 	const panel = shallowRef<HTMLElement | null>(null)
 	const pinned = ref(false)
 	const revealedPanelId = ref<string>()
+	const externalLinkPanelId = ref<string>()
+	let externalLinkPanelEntered = false
 	const popoverHovered = ref(false)
 	const heldTab = shallowRef<ProjectReviewTab>()
 	const shortcutTab = shallowRef<ProjectReviewTab>()
@@ -154,6 +156,12 @@ export function createReviewContext(
 		const availablePanels = availableInlinePanels.value
 		const tab = heldTab.value ?? shortcutTab.value
 		if (tab) return availablePanels.find((panel) => panel.target().kind === tab)?.id
+		if (
+			externalLinkPanelId.value &&
+			(activeAnchor.value?.id === externalLinkPanelId.value ||
+				availablePanels.some((panel) => panel.id === externalLinkPanelId.value))
+		)
+			return externalLinkPanelId.value
 		if (activeAnchor.value && popoverHovered.value) return activeAnchor.value.id
 		const hovered = availablePanels.find((panel) => panel.id === hoverZones.value.hovered)
 		if (revealedPanelId.value && !pinned.value) {
@@ -266,6 +274,20 @@ export function createReviewContext(
 
 	function enter(id: string) {
 		if (revealedPanelId.value === id) revealedPanelEntered.value = true
+		if (externalLinkPanelId.value === id) externalLinkPanelEntered = true
+		cancelClose()
+	}
+
+	function retainExternalLink(id: string, event: MouseEvent) {
+		const target = event.target
+		if (
+			event.defaultPrevented ||
+			!(target instanceof Element) ||
+			!target.closest('a[href][target="_blank"]')
+		)
+			return
+		externalLinkPanelId.value = id
+		externalLinkPanelEntered = false
 		cancelClose()
 	}
 
@@ -309,12 +331,15 @@ export function createReviewContext(
 		popoverHovered.value = false
 		revealedPanelId.value = undefined
 		revealedPanelEntered.value = false
+		externalLinkPanelId.value = undefined
+		externalLinkPanelEntered = false
 		openDropdowns.value = 0
 		pinned.value = false
 	}
 
 	function open(anchor: ReviewAnchor) {
 		if (heldTab.value || shortcutTab.value) return
+		if (externalLinkPanelId.value && anchor.id !== externalLinkPanelId.value) return
 		if (revealedPanelId.value && !revealedPanelEntered.value && anchor.id !== revealedPanelId.value)
 			return
 		if (pendingAnchor.value?.id === anchor.id) return
@@ -349,11 +374,12 @@ export function createReviewContext(
 			pendingAnchor.value = undefined
 		}
 		if (revealedPanelId.value === id && !revealedPanelEntered.value) return
+		if (externalLinkPanelId.value === id && !externalLinkPanelEntered) return
 		const inline = inlinePanels.get(id)?.panel
-		if (inline && revealedPanelId.value === id) {
+		if (inline && (revealedPanelId.value === id || externalLinkPanelId.value === id)) {
 			cancelClose()
 			closeTimer = setTimeout(() => {
-				if (revealedPanelId.value !== id) return
+				if (revealedPanelId.value !== id && externalLinkPanelId.value !== id) return
 				if (inline.hovered() || inline.scopeHovered() || inline.dropdownOpen()) return
 				close()
 			}, CLOSE_DELAY)
@@ -364,7 +390,7 @@ export function createReviewContext(
 		closeTimer = setTimeout(() => {
 			if (active.value?.id !== id) return
 			if (pinned.value || openDropdowns.value > 0) return
-			const preserveFocus = revealedPanelId.value !== id
+			const preserveFocus = revealedPanelId.value !== id && externalLinkPanelId.value !== id
 			if (
 				active.value.element.matches(':hover') ||
 				(preserveFocus && hasVisibleFocus(active.value.element)) ||
@@ -436,7 +462,7 @@ export function createReviewContext(
 	)
 	watch(
 		() => {
-			const id = revealedPanelId.value
+			const id = externalLinkPanelId.value ?? revealedPanelId.value
 			const inline = id ? inlinePanels.get(id)?.panel : undefined
 			return {
 				id,
@@ -457,9 +483,9 @@ export function createReviewContext(
 		{ flush: 'sync' },
 	)
 	watch(
-		[revealedPanelId, activePanelId],
-		([revealed, active]) => {
-			if (revealed && revealed !== active) close()
+		[revealedPanelId, externalLinkPanelId, activePanelId],
+		([revealed, external, active]) => {
+			if ((revealed && revealed !== active) || (external && external !== active)) close()
 		},
 		{ flush: 'post' },
 	)
@@ -474,9 +500,8 @@ export function createReviewContext(
 		'pointerdown',
 		(event) => {
 			shortcutTab.value = undefined
-			const inline = revealedPanelId.value
-				? inlinePanels.get(revealedPanelId.value)?.panel
-				: undefined
+			const retainedId = externalLinkPanelId.value ?? revealedPanelId.value
+			const inline = retainedId ? inlinePanels.get(retainedId)?.panel : undefined
 			if (
 				inline &&
 				event.target instanceof Node &&
@@ -524,6 +549,7 @@ export function createReviewContext(
 		release,
 		leave,
 		enter,
+		retainExternalLink,
 		setPopoverHovered,
 		cancelClose,
 		setDropdownOpen,
