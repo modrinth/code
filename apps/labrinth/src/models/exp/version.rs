@@ -1,6 +1,6 @@
 use crate::models::exp::{
     base,
-    component::{Component, ComponentKind},
+	component::{self, Component, ComponentKind},
     minecraft,
 };
 
@@ -8,15 +8,19 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 use validator::Validate;
 
+pub trait VersionComponent: Component<EntityId = crate::models::ids::VersionId> {
+	fn kind() -> VersionComponentKind;
+}
+
 macro_rules! define_version_components {
     (
         $(($field_name:ident, $variant_name:ident): $ty:ty),* $(,)?
     ) => {
         // kinds
 
-        #[expect(dead_code, reason = "static check so $ty implements `Component`")]
+		#[expect(dead_code, reason = "static check so type implements `VersionComponent`")]
         const _: () = {
-            fn assert_implements_component<T: Component>() {}
+			fn assert_implements_component<T: VersionComponent>() {}
 
             fn assert_components_implement_trait() {
                 $(assert_implements_component::<$ty>();)*
@@ -94,5 +98,17 @@ type Edit<T> = <T as Component>::Edit;
 type Query<T> = <T as Component>::Query;
 
 define_version_components![
+	(minecraft_mod, MinecraftMod): minecraft::ModVersion,
     (minecraft_java_server, MinecraftJavaServer): minecraft::JavaServerVersion,
 ];
+
+component::relations! {
+	pub static VERSION_COMPONENT_RELATIONS: VersionComponentKind = {
+		use VersionComponentKind::*;
+
+		[
+			[MinecraftMod].only(),
+			[MinecraftJavaServer].only(),
+		]
+	}
+}

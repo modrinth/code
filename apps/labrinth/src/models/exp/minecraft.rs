@@ -2,6 +2,7 @@ use std::time::Duration;
 
 use chrono::{DateTime, Utc};
 use eyre::Result;
+use minecraft_meta_model::model::MinecraftVersionName;
 use serde::{Deserialize, Serialize};
 use serde_binhum::serde_binhum;
 use tracing::warn;
@@ -11,6 +12,7 @@ use crate::{
     models::{
         exp::{
             ProjectComponentKind,
+			version::{VersionComponent, VersionComponentKind},
             component::{self, Component, ComponentEdit, ComponentQuery},
             project::{
                 ProjectComponent, ProjectQueryContext, ProjectQueryRequirements,
@@ -109,9 +111,107 @@ pub enum Language {
     Zu,
 }
 
+/// Supported Minecraft version environments, including the explicit legacy unknown value.
+#[derive(
+	Debug,
+	Clone,
+	Copy,
+	PartialEq,
+	Eq,
+	Hash,
+	Serialize,
+	Deserialize,
+	utoipa::ToSchema,
+)]
+#[serde(rename_all = "snake_case")]
+pub enum Environment {
+	ClientAndServer,
+	ClientOnly,
+	ClientOnlyServerOptional,
+	SingleplayerOnly,
+	ServerOnly,
+	ServerOnlyClientOptional,
+	DedicatedServerOnly,
+	ClientOrServer,
+	ClientOrServerPrefersBoth,
+	Unknown,
+}
+
+/// Loader field values for mrpack versions, not mrpack manifest dependency keys.
+/// The legacy field was populated from every non-mrpack loader.
+#[derive(
+	Debug,
+	Clone,
+	Copy,
+	PartialEq,
+	Eq,
+	Hash,
+	Serialize,
+	Deserialize,
+	utoipa::ToSchema,
+)]
+#[serde(rename_all = "lowercase")]
+pub enum MrpackLoader {
+	Forge,
+	Fabric,
+	Quilt,
+	Modloader,
+	Rift,
+	Liteloader,
+	Minecraft,
+	Bukkit,
+	Spigot,
+	Paper,
+	Purpur,
+	Bungeecord,
+	Waterfall,
+	Velocity,
+	Sponge,
+	Optifine,
+	Iris,
+	Canvas,
+	Vanilla,
+	Datapack,
+	Folia,
+	Neoforge,
+	Babric,
+	#[serde(rename = "bta-babric")]
+	BtaBabric,
+	#[serde(rename = "java-agent")]
+	JavaAgent,
+	#[serde(rename = "legacy-fabric")]
+	LegacyFabric,
+	Nilloader,
+	Ornithe,
+}
+
 component::define! {
     #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
-    pub struct ModProject {}
+	/// Umbrella for legacy Minecraft mods, modpacks, plugins, data packs,
+	/// resource packs, and shaders; not restricted to the legacy mod type.
+	pub struct ModProject {}
+
+	/// Shared version metadata for Minecraft mods, modpacks, plugins, data packs,
+	/// resource packs, and shaders.
+	#[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
+	pub struct ModVersion: version {
+		#[base(schema(value_type = Vec<String>))]
+		#[edit(serde(default), schema(value_type = Option<Vec<String>>))]
+		#[create(required)]
+		pub game_versions: Vec<MinecraftVersionName>,
+		#[base(serde(default))]
+		#[edit(serde(
+			default,
+			skip_serializing_if = "Option::is_none",
+			with = "serde_with::rust::double_option"
+		))]
+		#[create(optional)]
+		pub environment: Option<Environment>,
+		#[base(serde(default))]
+		#[edit(serde(default))]
+		#[create(default)]
+		pub mrpack_loaders: Vec<MrpackLoader>,
+	}
 
     /// Listing for a Minecraft server.
     #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
@@ -162,7 +262,7 @@ component::define! {
 
     /// Version of a Minecraft Java server listing.
     #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
-    pub struct JavaServerVersion {}
+	pub struct JavaServerVersion: version {}
 
     /// Listing for a Minecraft Bedrock server.
     #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
@@ -174,6 +274,18 @@ component::define! {
         #[validate(length(max = 255))]
         pub address: String,
     }
+}
+
+impl VersionComponent for ModVersion {
+	fn kind() -> VersionComponentKind {
+		VersionComponentKind::MinecraftMod
+	}
+}
+
+impl VersionComponent for JavaServerVersion {
+	fn kind() -> VersionComponentKind {
+		VersionComponentKind::MinecraftJavaServer
+	}
 }
 
 impl ProjectComponent for ModProject {
