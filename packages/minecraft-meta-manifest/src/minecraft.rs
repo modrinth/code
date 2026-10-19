@@ -239,12 +239,63 @@ pub struct LibraryDownload {
     pub path: Option<String>,
     pub sha1: Sha1,
     pub size: u32,
+    // old `daedalus` has this field set as `url: String`
+    // so it's required, but if it's empty then we do nothing with it.
+    // we need this `serialize_with` for compat
     #[serde(
         default,
         deserialize_with = "deserialize_optional_url",
-        skip_serializing_if = "Option::is_none"
+        serialize_with = "serialize_optional_url"
     )]
     pub url: Option<Url>,
+}
+
+fn serialize_optional_url<S>(
+    url: &Option<Url>,
+    serializer: S,
+) -> Result<S::Ok, S::Error>
+where
+    S: serde::Serializer,
+{
+    serializer.serialize_str(url.as_ref().map_or("", Url::as_str))
+}
+
+#[cfg(test)]
+mod library_download_tests {
+    use super::LibraryDownload;
+
+    #[test]
+    fn absent_urls_serialize_as_empty_strings() {
+        for url in [
+            None,
+            Some(serde_json::Value::Null),
+            Some(serde_json::json!("")),
+        ] {
+            let mut json = serde_json::json!({
+                "sha1": "0000000000000000000000000000000000000000",
+                "size": 0
+            });
+            if let Some(url) = url {
+                json["url"] = url;
+            }
+            let download: LibraryDownload =
+                serde_json::from_value(json).unwrap();
+            assert!(download.url.is_none());
+            assert_eq!(serde_json::to_value(download).unwrap()["url"], "");
+        }
+    }
+
+    #[test]
+    fn present_urls_are_preserved() {
+        let json = serde_json::json!({
+            "sha1": "0000000000000000000000000000000000000000",
+            "size": 0,
+            "url": "https://example.com/library.jar"
+        });
+        let download: LibraryDownload =
+            serde_json::from_value(json.clone()).unwrap();
+        assert_eq!(serde_json::to_value(download).unwrap(), json);
+    }
 }
 
 fn deserialize_optional_url<'de, D>(
