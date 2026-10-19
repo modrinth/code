@@ -1,3 +1,4 @@
+use crate::State;
 use crate::event::emit::{emit_instance, emit_process};
 use crate::event::{InstancePayloadType, ProcessPayloadType};
 #[cfg(feature = "tauri")]
@@ -10,13 +11,14 @@ use quick_xml::Reader;
 use quick_xml::events::Event;
 use serde::Deserialize;
 use serde::Serialize;
+use sqlx::SqlitePool;
 use std::collections::VecDeque;
 use std::fmt::Debug;
 use std::fs::OpenOptions;
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::process::ExitStatus;
-use std::sync::LazyLock;
+use std::sync::{Arc, LazyLock};
 use std::time::Instant;
 use tempfile::TempDir;
 use tokio::io::{AsyncBufReadExt, BufReader};
@@ -81,7 +83,7 @@ pub fn remove_log_buffer(instance_id: &str) {
 }
 
 async fn clear_persisted_process(
-    state: &crate::State,
+    pool: &SqlitePool,
     process: Option<(i64, i64)>,
 ) {
     let Some((pid, start_time)) = process else {
@@ -92,7 +94,7 @@ async fn clear_persisted_process(
         pid,
         start_time,
     )
-    .execute(&state.pool)
+    .execute(pool)
     .await
     {
         tracing::warn!("Failed to clear persisted process {pid}: {error}");
@@ -169,7 +171,7 @@ pub(crate) async fn instance_has_running_process(
             running = true;
         } else {
             clear_persisted_process(
-                state,
+                &state.pool,
                 Some((process.pid, process.start_time)),
             )
             .await;
@@ -208,6 +210,7 @@ impl ProcessManager {
         xml_logging: bool,
         main_class_keep_alive: TempDir,
         rpc_server: RpcServer,
+        state: &Arc<State>,
         post_process_init: impl AsyncFnOnce(
             &ProcessMetadata,
             &RpcServer,
@@ -271,13 +274,6 @@ impl ProcessManager {
             _main_class_keep_alive: main_class_keep_alive,
         };
 
-        let state = match crate::State::get().await {
-            Ok(state) => state,
-            Err(error) => {
-                let _ = process.child.kill().await;
-                return Err(error);
-            }
-        };
         let persisted_process = child_pid.map(|pid| {
             (i64::from(pid), process.metadata.start_time.timestamp())
         });
@@ -315,7 +311,7 @@ impl ProcessManager {
             post_process_init(&process.metadata, &process.rpc_server).await
         {
             tracing::error!("Failed to run post-process init: {e}");
-            clear_persisted_process(&state, persisted_process).await;
+            clear_persisted_process(&state.pool, persisted_process).await;
             let _ = process.child.kill().await;
             return Err(e);
         }
@@ -327,6 +323,7 @@ impl ProcessManager {
 
             let instance_id = metadata.instance_id.clone();
             let instance_path = metadata.instance_path.clone();
+            let pool = state.pool.clone();
             tokio::spawn(async move {
                 Process::process_output(
                     &instance_id,
@@ -334,6 +331,7 @@ impl ProcessManager {
                     stdout,
                     log_path_clone,
                     xml_logging,
+                    &pool,
                 )
                 .await;
             });
@@ -344,6 +342,7 @@ impl ProcessManager {
 
             let instance_id = metadata.instance_id.clone();
             let instance_path = metadata.instance_path.clone();
+            let pool = state.pool.clone();
             tokio::spawn(async move {
                 Process::process_output(
                     &instance_id,
@@ -351,6 +350,7 @@ impl ProcessManager {
                     stderr,
                     log_path_clone,
                     xml_logging,
+                    &pool,
                 )
                 .await;
             });
@@ -365,6 +365,7 @@ impl ProcessManager {
             post_exit_env_vars,
             metadata.uuid,
             persisted_process,
+            Arc::clone(state),
         ));
 
         emit_process(
@@ -462,6 +463,7 @@ impl Process {
         reader: R,
         log_path: impl AsRef<Path>,
         xml_logging: bool,
+        pool: &SqlitePool,
     ) where
         R: tokio::io::AsyncRead + Unpin,
     {
@@ -622,6 +624,7 @@ impl Process {
 											instance_id,
 											&timestamp,
 											message,
+											pool,
                                         ).await {
                                             tracing::error!("Failed to handle server join logging: {e}");
                                         }
@@ -686,6 +689,7 @@ impl Process {
                     if let Err(e) = Self::maybe_handle_old_server_join_logging(
                         instance_id,
                         line.trim_ascii_end(),
+                        pool,
                     )
                     .await
                     {
@@ -799,6 +803,7 @@ impl Process {
         instance_id: &str,
         timestamp: &str,
         message: &str,
+        pool: &SqlitePool,
     ) -> crate::Result<()> {
         let timestamp = timestamp
             .parse::<i64>()
@@ -815,13 +820,19 @@ impl Process {
                     )
                 })
             })?;
-        Self::parse_and_insert_server_join(instance_id, message, timestamp)
-            .await
+        Self::parse_and_insert_server_join(
+            instance_id,
+            message,
+            timestamp,
+            pool,
+        )
+        .await
     }
 
     async fn maybe_handle_old_server_join_logging(
         instance_id: &str,
         line: &str,
+        pool: &SqlitePool,
     ) -> crate::Result<()> {
         if let Some((timestamp, message)) = line.split_once(" [CLIENT] [INFO] ")
         {
@@ -831,11 +842,21 @@ impl Process {
                     .map(|x| x.to_utc())
                     .single()
                     .unwrap_or_else(Utc::now);
-            Self::parse_and_insert_server_join(instance_id, message, timestamp)
-                .await
+            Self::parse_and_insert_server_join(
+                instance_id,
+                message,
+                timestamp,
+                pool,
+            )
+            .await
         } else {
-            Self::parse_and_insert_server_join(instance_id, line, Utc::now())
-                .await
+            Self::parse_and_insert_server_join(
+                instance_id,
+                line,
+                Utc::now(),
+                pool,
+            )
+            .await
         }
     }
 
@@ -843,6 +864,7 @@ impl Process {
         instance_id: &str,
         message: &str,
         timestamp: DateTime<Utc>,
+        pool: &SqlitePool,
     ) -> crate::Result<()> {
         let Some(host_port_string) = message.strip_prefix("Connecting to ")
         else {
@@ -856,14 +878,13 @@ impl Process {
             return Ok(());
         };
 
-        let state = crate::State::get().await?;
         crate::state::server_join_log::JoinLogEntry {
             instance_id: instance_id.to_owned(),
             host: host.to_string(),
             port,
             join_time: timestamp,
         }
-        .upsert(&state.pool)
+        .upsert(pool)
         .await?;
         {
             let instance_id = instance_id.to_owned();
@@ -894,33 +915,24 @@ impl Process {
         post_exit_env_vars: Vec<(String, String)>,
         uuid: Uuid,
         persisted_process: Option<(i64, i64)>,
+        state: Arc<State>,
     ) -> crate::Result<()> {
         async fn update_playtime(
             last_updated_playtime: &mut Instant,
             instance_id: &str,
             force_update: bool,
+            pool: &SqlitePool,
         ) {
             let elapsed = last_updated_playtime.elapsed().as_secs();
             if elapsed == 0 || (!force_update && elapsed < 60) {
                 return;
             }
 
-            let state = match crate::State::get().await {
-                Ok(state) => state,
-                Err(e) => {
-                    tracing::warn!(
-                        "Failed to get state for playtime update on instance {}: {}",
-                        instance_id,
-                        e
-                    );
-                    return;
-                }
-            };
             if let Err(e) =
                 crate::state::instances::commands::add_instance_recent_playtime(
                     instance_id,
                     elapsed,
-                    &state.pool,
+                    pool,
                 )
                 .await
             {
@@ -937,7 +949,6 @@ impl Process {
         let mc_exit_status;
         let mut last_updated_playtime = Instant::now();
 
-        let state = crate::State::get().await?;
         loop {
             if let Some(process) = state.process_manager.try_wait(uuid)? {
                 if let Some(t) = process {
@@ -953,12 +964,17 @@ impl Process {
             tokio::time::sleep(tokio::time::Duration::from_millis(50)).await;
 
             // Auto-update playtime every minute
-            update_playtime(&mut last_updated_playtime, &instance_id, false)
-                .await;
+            update_playtime(
+                &mut last_updated_playtime,
+                &instance_id,
+                false,
+                &state.pool,
+            )
+            .await;
         }
 
         state.process_manager.remove(uuid);
-        clear_persisted_process(&state, persisted_process).await;
+        clear_persisted_process(&state.pool, persisted_process).await;
         let sync_instance_id = instance_id.clone();
         tokio::spawn(async move {
             if let Err(error) =
@@ -981,7 +997,13 @@ impl Process {
         .await?;
 
         // Now fully complete- update playtime one last time
-        update_playtime(&mut last_updated_playtime, &instance_id, true).await;
+        update_playtime(
+            &mut last_updated_playtime,
+            &instance_id,
+            true,
+            &state.pool,
+        )
+        .await;
 
         // Publish play time update
         // Allow failure, it will be stored locally and sent next time
@@ -1014,7 +1036,10 @@ impl Process {
             tracing::warn!("Failed to write exit status to log file: {}", e);
         }
 
-        let _ = state.discord_rpc.clear_to_default(true).await;
+        let _ = state
+            .discord_rpc
+            .clear_to_default(true, &state.pool, &state.process_manager)
+            .await;
 
         let _ = state.friends_socket.update_status(None).await;
 
