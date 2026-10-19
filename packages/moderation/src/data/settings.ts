@@ -24,6 +24,13 @@ const settings = {
 			description: 'Hide the formatting buttons above all Markdown editors in project review.',
 			default: true,
 		}),
+		EnableDelayedHoverMessagePreviews: setting.asToggle({
+			type: 'toggle',
+			id: 'enable-delayed-hover-message-previews',
+			title: 'Enable delayed hover message previews',
+			description: 'Show issue card previews when hovering over issue toggle buttons.',
+			default: true,
+		}),
 		ShowShortcutKeybindHints: setting.asToggle({
 			type: 'toggle',
 			id: 'show-shortcut-keybind-hints',

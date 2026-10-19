@@ -119,10 +119,10 @@
 							{{ formatMessage(controlMessages.required) }}
 						</p>
 					</div>
-					<Tooltip
+					<MessagePreview
 						v-else
-						:disabled="!control.tooltip"
-						:text="control.tooltip"
+						:entry="{ binding: panelBinding, control }"
+						:disabled="control.disabled"
 						class="min-w-0 max-w-full"
 					>
 						<ActionButton
@@ -138,7 +138,7 @@
 							:mixed="panels.mixed(panelBinding, control)"
 							@update:model-value="toggleAction(control, $event)"
 						/>
-					</Tooltip>
+					</MessagePreview>
 				</template>
 				<Tooltip
 					v-if="
@@ -216,6 +216,7 @@ import { injectReviewPreviousIssues } from '~/providers/project-review/review-pr
 
 import { projectReviewMessages as messages } from '../../messages'
 import ActionButton from './action-button.vue'
+import MessagePreview from './message-preview.vue'
 import SlugInput from './slug-input.vue'
 
 const props = defineProps<{

@@ -744,7 +744,7 @@ export function createReviewPanels(
 		}
 	}
 
-	const activeIssues = computed(() => {
+	function resolveActiveIssues(preview?: ReviewIssueControl) {
 		const projectV3 = project.value
 		if (!projectV3) return []
 		const issues = new Map<string, IssueSelection>()
@@ -791,7 +791,14 @@ export function createReviewPanels(
 					if (
 						control.childToggleIds ||
 						control.disabled ||
-						(control.type === 'toggle' && !selected(binding, control))
+						(control.type === 'toggle' &&
+							control !== preview?.control &&
+							!(
+								control.issueId === preview?.control.issueId &&
+								control.id !== undefined &&
+								preview.control.childToggleIds?.includes(control.id)
+							) &&
+							!selected(binding, control))
 					)
 						continue
 					const selection: IssueSelection = issues.get(control.issueId) ?? {
@@ -832,7 +839,9 @@ export function createReviewPanels(
 					...reviewData.value,
 					selected: {
 						items: {},
-						issueIds: selectedIssueIds.value,
+						issueIds: preview
+							? [...new Set([...selectedIssueIds.value, preview.control.issueId])]
+							: selectedIssueIds.value,
 						toggleIds: [...keys],
 					},
 					getMarkdownValue: (key, scope = id) =>
@@ -876,7 +885,9 @@ export function createReviewPanels(
 					},
 				}
 			})
-	})
+	}
+
+	const activeIssues = computed(() => resolveActiveIssues())
 
 	const validationErrors = computed(() => [
 		...activeIssues.value
@@ -929,6 +940,11 @@ export function createReviewPanels(
 		selectValues,
 		missing,
 		write,
+		previewIssue: (entry: ReviewIssueControl) =>
+			resolveActiveIssues(entry).find(({ id }) => id === entry.control.issueId),
+		previewIssueMessage: (entry: ReviewIssueControl) =>
+			resolveActiveIssues(entry).find(({ id }) => id === entry.control.issueId)?.issue.message ??
+			'',
 		activeIssues,
 		validationErrors,
 	}

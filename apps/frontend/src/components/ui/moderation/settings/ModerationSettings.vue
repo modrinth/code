@@ -75,6 +75,7 @@ const groups = [
 			general.LinkInfoPlacement,
 			general.ShowFloatingPanelFieldHoverHighlight,
 			general.ShowInlinePanelHoverHighlight,
+			general.EnableDelayedHoverMessagePreviews,
 			general.PrivateMessageHighlight,
 		],
 	},
