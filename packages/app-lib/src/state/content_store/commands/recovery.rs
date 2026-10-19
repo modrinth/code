@@ -8,9 +8,7 @@ use crate::state::content_store::adapters::sqlite as catalog;
 use crate::state::content_store::adapters::stored_objects::UnregisteredFiles;
 use crate::state::content_store::domain::{journal_move, journal_noop};
 use crate::state::content_store::model::FileChangeJournal;
-use crate::state::content_store::{
-    ContentStore, FileStorageKind, FileStoragePolicy, input,
-};
+use crate::state::content_store::{ContentStore, FileStorageKind, input};
 use crate::state::instances as content_rows;
 
 impl ContentStore {
@@ -100,12 +98,8 @@ impl ContentStore {
                             ".modrinth-rollback-{}.tmp",
                             uuid::Uuid::new_v4()
                         ));
-                        self.create_instance_file(
-                            &stored_file,
-                            &temporary,
-                            FileStoragePolicy::Independent,
-                        )
-                        .await?;
+                        self.create_instance_file(&stored_file, &temporary)
+                            .await?;
                         remove_instance_file(&path).await?;
                         move_instance_file(&temporary, &path).await?;
                     }
@@ -196,12 +190,11 @@ impl ContentStore {
                         .ok_or_else(|| {
                             input("Recovery content needs repair or re-import")
                         })?;
-                    let policy = before.storage_kind
-						.ok_or_else(|| input("Recovery content has no previous storage method"))?
-						.restore_policy();
-                    let storage_kind = self
-                        .create_instance_file(&stored_file, &path, policy)
-                        .await?;
+                    before.storage_kind.ok_or_else(|| {
+                        input("Recovery content has no previous storage method")
+                    })?;
+                    let storage_kind =
+                        self.create_instance_file(&stored_file, &path).await?;
                     if let Some(file) =
                         content_rows::get_instance_file_by_relative_path(
                             &journal.instance_id,
