@@ -6,7 +6,8 @@ const settings = {
 			type: 'enum',
 			id: 'gallery-columns',
 			title: 'Gallery columns',
-			description: 'Number of gallery columns to display in project review, regardless of panel width.',
+			description:
+				'Number of gallery columns to display in project review, regardless of panel width.',
 			default: '3',
 			entries: [
 				{ label: '1', value: '1' },
@@ -21,7 +22,8 @@ const settings = {
 			type: 'toggle',
 			id: 'show-all-issue-controls',
 			title: 'Always show issue controls',
-			description: 'Show all issue controls in the issues menu regardless of visibility conditions.',
+			description:
+				'Show all issue controls in the issues menu regardless of visibility conditions.',
 			default: false,
 		}),
 		SendIssuesAsThreadMessage: setting.asToggle({
@@ -70,9 +72,9 @@ const settings = {
 		ShowFloatingPanelFieldHoverHighlight: setting.asToggle({
 			type: 'toggle',
 			id: 'show-floating-panel-field-hover-highlight',
-			title: 'Highlight fields for floating review panels',
+			title: 'Highlight review sections',
 			description:
-				'Highlight the reviewed field when hovering over it or its floating review panel.',
+				'Highlight the review section when hovering over it or its floating review panel.',
 			default: true,
 		}),
 		ShowInlinePanelHoverHighlight: setting.asToggle({
@@ -82,6 +84,69 @@ const settings = {
 			description:
 				'Add a background highlight to inline review panels when hovering over or interacting with them.',
 			default: true,
+		}),
+		ReviewHighlightColor: setting.asColor({
+			type: 'color',
+			id: 'review-highlight-color',
+			title: 'Color',
+			description: 'Color for reviewed fields, inline review panels, and navigation flashes.',
+			default: '',
+		}),
+		ReviewHighlightOpacity: setting.asNumber({
+			type: 'number',
+			id: 'review-highlight-opacity',
+			title: 'Opacity',
+			description:
+				'Background opacity for review highlights. Navigation flashes use twice this opacity, up to 100%.',
+			default: 3,
+			min: 0,
+			max: 100,
+			step: 1,
+			unit: '%',
+		}),
+		IssueToggleColor: setting.asColor({
+			type: 'color',
+			id: 'issue-toggle-color',
+			title: 'Selected color',
+			description:
+				'Color for selected and partially selected issue buttons, with a 25% background tint.',
+			default: '',
+		}),
+		FloatingReviewPanelBorderColor: setting.asColor({
+			type: 'color',
+			id: 'floating-review-panel-border-color',
+			title: 'Border color',
+			description: 'Border color for floating review panels.',
+			default: '',
+		}),
+		FloatingReviewPanelBackground: setting.asColor({
+			type: 'color',
+			id: 'floating-review-panel-background',
+			title: 'Background',
+			description: 'Background tint color for floating review panels.',
+			default: '',
+		}),
+		FloatingReviewPanelBackgroundOpacity: setting.asNumber({
+			type: 'number',
+			id: 'floating-review-panel-background-opacity',
+			title: 'Opacity',
+			description: 'Background tint opacity for floating review panels.',
+			default: 3,
+			min: 0,
+			max: 100,
+			step: 1,
+			unit: '%',
+		}),
+		FloatingReviewPanelBorderWidth: setting.asNumber({
+			type: 'number',
+			id: 'floating-review-panel-border-width',
+			title: 'Border width',
+			description: 'Border width for floating review panels. Set to 0 to hide the border.',
+			default: 1,
+			min: 0,
+			max: 8,
+			step: 1,
+			unit: 'px',
 		}),
 		LinkInfoPlacement: setting.asEnum({
 			type: 'enum',

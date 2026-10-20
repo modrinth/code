@@ -2,6 +2,11 @@ import { type KeybindDefinition, Keybinds, Settings } from '@modrinth/moderation
 import { computed } from 'vue'
 
 import type { CookieOptions } from '#app'
+import {
+	defaultAppearance,
+	parseAppearance,
+	type AppearanceValues,
+} from '~/helpers/moderation-appearance'
 import { FrontendNotificationManager } from '~/providers/frontend-notifications'
 
 const moderationKeybindsId = 'moderation-keybinds'
@@ -12,6 +17,7 @@ type StoredSettings = { [id: string]: any }
 type StoredOptions = {
 	keybinds: Partial<StoredKeybinds>
 	settings: Partial<StoredSettings>
+	appearanceTheme?: { id: string; values: AppearanceValues }
 }
 
 const getCookieOptions = <T>() =>
@@ -47,43 +53,74 @@ const useModerationCookies = () => {
 }
 
 const useModerationOptions = () =>
-	useState<{ keybinds: StoredKeybinds; settings: StoredSettings }>(moderationKeybindsId, () => {
-		const cookie = useModerationCookies()
-		const stored = cookie.value ?? {}
+	useState<StoredOptions & { keybinds: StoredKeybinds; settings: StoredSettings }>(
+		moderationKeybindsId,
+		() => {
+			const cookie = useModerationCookies()
+			const stored = cookie.value ?? {}
 
-		const keybindOutput: StoredKeybinds = {}
+			const keybindOutput: StoredKeybinds = {}
 
-		for (const [id, definition] of Object.entries(stored.keybinds || {})) {
-			if (!definition) continue
-			keybindOutput[id] = definition
-		}
+			for (const [id, definition] of Object.entries(stored.keybinds || {})) {
+				if (!definition) continue
+				keybindOutput[id] = definition
+			}
 
-		if (!('review-cycle-conversation' in keybindOutput)) {
-			const reply = keybindOutput['review-tab-reply']
-			const note = keybindOutput['review-tab-note']
-			if (reply?.length) keybindOutput['review-cycle-conversation'] = reply
-			else if (note?.length) keybindOutput['review-cycle-conversation'] = note
-			else if (reply || note) keybindOutput['review-cycle-conversation'] = []
-		}
-		delete keybindOutput['review-tab-reply']
-		delete keybindOutput['review-tab-note']
+			if (!('review-cycle-conversation' in keybindOutput)) {
+				const reply = keybindOutput['review-tab-reply']
+				const note = keybindOutput['review-tab-note']
+				if (reply?.length) keybindOutput['review-cycle-conversation'] = reply
+				else if (note?.length) keybindOutput['review-cycle-conversation'] = note
+				else if (reply || note) keybindOutput['review-cycle-conversation'] = []
+			}
+			delete keybindOutput['review-tab-reply']
+			delete keybindOutput['review-tab-note']
 
-		const settingsOutput: StoredSettings = {}
-		for (const [id, setting] of Object.entries(stored.settings || {})) {
-			settingsOutput[id] = setting
-		}
+			const settingsOutput: StoredSettings = {}
+			for (const [id, setting] of Object.entries(stored.settings || {})) {
+				settingsOutput[id] = setting
+			}
 
-		return {
-			keybinds: keybindOutput,
-			settings: settingsOutput,
-		}
-	})
+			let appearanceTheme: StoredOptions['appearanceTheme']
+			try {
+				if (stored.appearanceTheme) {
+					appearanceTheme = {
+						id: 'custom',
+						values: parseAppearance(
+							JSON.stringify({
+								format: 'modrinth-review-appearance',
+								version: 1,
+								values: stored.appearanceTheme.values,
+							}),
+						),
+					}
+				}
+			} catch {
+				appearanceTheme = undefined
+			}
+			return {
+				keybinds: keybindOutput,
+				settings: settingsOutput,
+				appearanceTheme,
+			}
+		},
+	)
 
 export const useModerationKeybinds = () =>
 	computed(() => new Keybinds(useModerationOptions().value.keybinds))
 
 export const useModerationSettings = () =>
 	computed(() => new Settings(useModerationOptions().value.settings, saveModerationOptions))
+
+export const useModerationAppearanceTheme = () =>
+	computed({
+		get: () =>
+			useModerationOptions().value.appearanceTheme ?? { id: 'default', values: defaultAppearance },
+		set: (theme: NonNullable<StoredOptions['appearanceTheme']>) => {
+			useModerationOptions().value.appearanceTheme = theme
+			saveModerationOptions()
+		},
+	})
 
 export const saveModerationOptions = () => {
 	const options = useModerationOptions()
@@ -92,6 +129,7 @@ export const saveModerationOptions = () => {
 	cookie.value = {
 		keybinds: options.value.keybinds,
 		settings: options.value.settings,
+		appearanceTheme: options.value.appearanceTheme,
 	}
 }
 

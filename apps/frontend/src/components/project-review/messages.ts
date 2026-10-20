@@ -49,6 +49,10 @@ export const projectReviewMessages = defineMessages({
 		id: 'moderation.project-review.generalSettings',
 		defaultMessage: 'General',
 	},
+	appearanceSettings: {
+		id: 'moderation.project-review.appearanceSettings',
+		defaultMessage: 'Appearance',
+	},
 	keybindsSettings: {
 		id: 'moderation.project-review.keybindsSettings',
 		defaultMessage: 'Keybinds',

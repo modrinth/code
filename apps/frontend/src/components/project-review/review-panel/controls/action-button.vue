@@ -5,6 +5,14 @@
 		:aria-pressed="mixed ? 'mixed' : modelValue"
 		:aria-keyshortcuts="ariaKeybind"
 		:data-review-toggle-index="toggleIndex"
+		:style="
+			color
+				? {
+						'--action-color': color,
+						'--action-highlight': `color-mix(in srgb, ${color} 25%, transparent)`,
+					}
+				: undefined
+		"
 		class="action-toggle !h-auto min-h-8 max-w-full !gap-1.5 !whitespace-normal !rounded-lg !px-2.5 !font-medium [&>svg]:!text-inherit"
 		:class="{
 			'!brightness-100': modelValue,
@@ -40,6 +48,7 @@ const props = defineProps<{
 	mixed?: boolean
 	reReview?: boolean
 	label: string
+	color?: string
 	disabled?: boolean
 	keybind?: KeybindDefinition
 	toggleIndex?: number

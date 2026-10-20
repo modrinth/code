@@ -72,6 +72,7 @@
 		<Highlight
 			:active="inlineActive"
 			:enabled="settings.get(moderationSettings.General.ShowInlinePanelHoverHighlight)"
+			layer="behind"
 		>
 			<div v-if="title && !hideTitle" class="flex items-center gap-2">
 				<h2 :id="titleId" class="m-0 text-sm font-semibold text-contrast">
@@ -119,6 +120,7 @@ import { useElementHover } from '@vueuse/core'
 import { computed, nextTick, onScopeDispose, shallowRef, useId, watch } from 'vue'
 
 import { useModerationSettings } from '~/composables/moderation'
+import { useReviewHighlight } from '~/composables/review-highlight'
 import type { ReviewTarget } from '~/providers/project-review/review'
 import { injectReviewPanels } from '~/providers/project-review/review-panels'
 
@@ -165,6 +167,7 @@ const {
 const inlineActive = computed(() => activePanelId.value === id)
 const { formatMessage } = useVIntl()
 const settings = useModerationSettings()
+const { flashBackground } = useReviewHighlight()
 const panels = injectReviewPanels()
 const titleId = `${id}-title`
 const binding = computed(() => panels.resolve(props.target))
@@ -212,7 +215,7 @@ onScopeDispose(
 				reviewContext.revealInlinePanel(id)
 				element.focus({ preventScroll: true })
 			}
-			flashReviewElement(element)
+			flashReviewElement(element, flashBackground.value)
 		},
 	}),
 )

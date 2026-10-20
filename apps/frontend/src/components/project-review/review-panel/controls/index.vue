@@ -127,6 +127,7 @@
 					>
 						<ActionButton
 							:label="control.label"
+							:color="settings.get(moderationSettings.General.IssueToggleColor)"
 							:keybind="keybinds.get(control)"
 							:toggle-index="toggleIndexes.get(control)"
 							:show-keybind-hint="

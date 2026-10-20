@@ -17,6 +17,10 @@ const messages = defineMessages({
 		id: 'project.disclosures.lock-status.label',
 		defaultMessage: 'Lock status',
 	},
+	changeLockStatus: {
+		id: 'project.disclosures.lock-status.change',
+		defaultMessage: 'Change lock status',
+	},
 	unlocked: {
 		id: 'project.disclosures.lock-status.unlocked',
 		defaultMessage: 'Unlocked',
@@ -60,8 +64,8 @@ const options = computed(() =>
 		v-if="compact"
 		:model-value="lockStatus"
 		:options="options"
-		v-tooltip="options.find((option) => option.value === lockStatus)?.label"
-		:aria-label="formatMessage(messages.label)"
+		v-tooltip="formatMessage(messages.changeLockStatus)"
+		:aria-label="formatMessage(messages.changeLockStatus)"
 		:disabled="disabled"
 		class="!w-8 shrink-0"
 		:trigger-class="

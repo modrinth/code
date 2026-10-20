@@ -42,18 +42,21 @@ interface ReviewDestination {
 	reveal: () => Promise<void>
 }
 
-export function flashReviewElement(element: HTMLElement) {
+export function flashReviewElement(element: HTMLElement, highlightColor: string) {
 	for (const animation of element.getAnimations()) {
 		if (animation.id === 'review-reveal') animation.cancel()
 	}
-	const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-	const highlightColor = 'color-mix(in srgb, var(--color-orange) 6%, transparent)'
+	const view = element.ownerDocument.defaultView
+	if (!view) return
+	const reducedMotion = view.matchMedia('(prefers-reduced-motion: reduce)').matches
 	const animation = element.animate(
 		[
 			{ backgroundColor: highlightColor },
 			{ backgroundColor: highlightColor },
 			{
-				backgroundColor: reducedMotion ? highlightColor : getComputedStyle(element).backgroundColor,
+				backgroundColor: reducedMotion
+					? highlightColor
+					: view.getComputedStyle(element).backgroundColor,
 			},
 		],
 		{ duration: 800, easing: 'ease-out' },

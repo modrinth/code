@@ -152,6 +152,7 @@ import {
 	LayoutPanelLeftIcon,
 	LeftArrowIcon,
 	MonitorXIcon,
+	PaletteIcon,
 	RightArrowIcon,
 	RotateCounterClockwiseIcon,
 	SettingsIcon,
@@ -168,6 +169,7 @@ import {
 } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
+import ModerationAppearance from '~/components/ui/moderation/settings/ModerationAppearance.vue'
 import ModerationKeybinds from '~/components/ui/moderation/settings/ModerationKeybinds.vue'
 import ModerationSettings from '~/components/ui/moderation/settings/ModerationSettings.vue'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
@@ -197,6 +199,11 @@ const settingsTabs: TabbedModalTab[] = [
 		name: messages.generalSettings,
 		icon: SettingsIcon,
 		content: ModerationSettings,
+	},
+	{
+		name: messages.appearanceSettings,
+		icon: PaletteIcon,
+		content: ModerationAppearance,
 	},
 	{
 		name: messages.keybindsSettings,

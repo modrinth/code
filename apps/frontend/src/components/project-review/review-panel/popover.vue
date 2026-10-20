@@ -8,8 +8,8 @@
 			:aria-label="titleId ? undefined : label"
 			:data-review-panel="anchor.id"
 			tabindex="-1"
-			class="review-popover z-[100] box-border flex w-[28rem] max-w-[calc(100vw-1rem)] flex-col gap-2 overflow-y-auto rounded-xl border border-solid border-highlight-orange bg-surface-1 p-2.5 pb-3 text-sm text-primary"
-			:style="[floatingStyles, { width: maxWidth }]"
+			class="review-popover z-[100] box-border flex w-[28rem] max-w-[calc(100vw-1rem)] flex-col gap-2 overflow-y-auto rounded-xl border-solid p-2.5 pb-3 text-sm text-primary"
+			:style="[floatingStyles, appearanceStyle, { width: maxWidth }]"
 			@pointerenter="setPopoverHovered(anchor.id, true)"
 			@pointerleave="setPopoverHovered(anchor.id, false)"
 			@focusin="cancelClose"
@@ -54,11 +54,14 @@ import { PinIcon, XIcon } from '@modrinth/assets'
 import { IconButton, useVIntl } from '@modrinth/ui'
 import { computed, nextTick, onBeforeUnmount, shallowRef, watch } from 'vue'
 
+import { useFloatingReviewPanelAppearance } from '~/composables/floating-review-panel-appearance'
+
 import { projectReviewMessages as messages } from '../messages'
 import { useReviewEventListener } from '../shortcuts'
 import { injectReviewContext, type ReviewAnchor } from './context'
 
 const { formatMessage } = useVIntl()
+const { style: appearanceStyle } = useFloatingReviewPanelAppearance()
 const props = defineProps<{
 	anchor: ReviewAnchor
 	titleId?: string
@@ -141,15 +144,3 @@ useReviewEventListener('pointerdown', (event) => {
 	dismiss()
 })
 </script>
-
-<style scoped>
-.review-popover::before {
-	content: '';
-	position: absolute;
-	inset: 0;
-	z-index: 1;
-	border-radius: inherit;
-	background: color-mix(in srgb, var(--color-orange) 3%, transparent);
-	pointer-events: none;
-}
-</style>

@@ -38,6 +38,13 @@
 					>
 						<span class="text-xs">{{ formatMessage(messages.edited) }}</span>
 					</Tooltip>
+					<p
+						v-if="!resolved && missingRequiredFieldCount"
+						class="m-0 text-sm text-red"
+						role="status"
+					>
+						{{ formatMessage(messages.requiredFields, { count: missingRequiredFieldCount }) }}
+					</p>
 					<slot name="action">
 						<Button
 							v-if="resolved && previousIssue?.verdict !== 'resolved'"
@@ -51,18 +58,22 @@
 							<PlusIcon aria-hidden="true" />
 							{{ formatMessage(messages.notResolved) }}
 						</Button>
-						<Button
+						<Tooltip
 							v-else-if="!resolved"
-							size="sm"
-							type="quiet"
-							circular
-							class="-my-1 -mb-2 -mr-1.5 size-8"
-							:disabled="pending || disabled"
-							:aria-label="formatMessage(messages.remove, { issue: issueTitle })"
-							@click="removeIssue()"
+							:text="formatMessage(messages.remove)"
 						>
-							<XIcon aria-hidden="true" />
-						</Button>
+							<Button
+								size="sm"
+								type="quiet"
+								circular
+								class="-my-1 -mb-2 -mr-1.5 size-8"
+								:disabled="pending || disabled"
+								:aria-label="formatMessage(messages.remove)"
+								@click="removeIssue()"
+							>
+								<XIcon aria-hidden="true" />
+							</Button>
+						</Tooltip>
 					</slot>
 				</div>
 			</div>
@@ -237,13 +248,6 @@
 					{{ facet.label }}
 				</span>
 			</div>
-			<p
-				v-if="issue.custom && !issue.custom.message.trim() && !resolved"
-				class="m-0 text-xs text-orange"
-				role="status"
-			>
-				{{ formatMessage(messages.customMessageRequired) }}
-			</p>
 		</div>
 		<IssueToggles v-if="!resolved" :issue="issue" :disabled="disabled" @remove="removeIssue" />
 		<p v-if="!resolved && needsToggle" class="m-0 text-xs text-orange" role="status">
@@ -388,9 +392,10 @@ const messages = defineMessages({
 		id: 'project-review.issues.custom-placeholder',
 		defaultMessage: 'Enter custom issue message...',
 	},
-	customMessageRequired: {
-		id: 'project-review.issues.custom-message-required',
-		defaultMessage: 'Enter a message for this custom issue.',
+	requiredFields: {
+		id: 'project-review.issues.required-fields',
+		defaultMessage:
+			'{count, plural, one {Missing required field} other {Missing required fields}}',
 	},
 	acknowledgeCheckbox: {
 		id: 'project-review.issues.custom-acknowledge-checkbox',
@@ -428,7 +433,7 @@ const messages = defineMessages({
 	},
 	remove: {
 		id: 'project-review.issues.remove',
-		defaultMessage: 'Remove {issue}',
+		defaultMessage: 'Remove issue',
 	},
 	add: {
 		id: 'project-review.issues.add',
@@ -494,6 +499,12 @@ const fields = computed(() => {
 	}
 	return [...bindings.values()]
 })
+const missingRequiredFieldCount = computed(
+	() =>
+		panels.validationErrors.value.filter(
+			({ issueId, key }) => issueId === issue.value.id && key !== 'toggle',
+		).length,
+)
 const needsToggle = computed(() =>
 	panels.validationErrors.value.some(
 		({ issueId, key }) => issueId === issue.value.id && key === 'toggle',
