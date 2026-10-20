@@ -27,13 +27,13 @@ fn keyword<'src>(
                     ]))
                     .boxed()
             });
-	let boundary = any()
-		.filter(|character: &char| {
-        !character.is_ascii_alphanumeric() && !"_.".contains(*character)
-    })
-    .rewind()
-    .ignored()
-    .or(end());
+    let boundary = any()
+        .filter(|character: &char| {
+            !character.is_ascii_alphanumeric() && !"_.".contains(*character)
+        })
+        .rewind()
+        .ignored()
+        .or(end());
 
     keyword.then_ignore(boundary).boxed()
 }
@@ -42,8 +42,8 @@ fn quoted_literal<'src>(
     quote: char,
 ) -> Boxed<'src, 'src, &'src str, FilterLiteral, extra::Err<Rich<'src, char>>> {
     let escaped = just('\\').ignore_then(any());
-	let character = escaped.or(any()
-		.filter(move |character| *character != quote && *character != '\\'));
+    let character = escaped.or(any()
+        .filter(move |character| *character != quote && *character != '\\'));
 
     character
         .repeated()
@@ -60,37 +60,37 @@ fn literal_parser<'src>()
         quoted_literal('"'),
         quoted_literal('`'),
     ));
-	let bare = any()
-		.filter(|character: &char| {
-        !character.is_whitespace() && !",[]()".contains(*character)
-    })
-    .repeated()
-    .at_least(1)
-    .collect::<String>()
-    .map(FilterLiteral::from_bare);
+    let bare = any()
+        .filter(|character: &char| {
+            !character.is_whitespace() && !",[]()".contains(*character)
+        })
+        .repeated()
+        .at_least(1)
+        .collect::<String>()
+        .map(FilterLiteral::from_bare);
 
     quoted.or(bare).padded().boxed()
 }
 
 fn field_name_parser<'src>()
 -> Boxed<'src, 'src, &'src str, String, extra::Err<Rich<'src, char>>> {
-	any()
-		.filter(|character: &char| {
-        character.is_ascii_alphabetic() || "_.".contains(*character)
-    })
-    .then(
-			any()
-				.filter(|character: &char| {
-					character.is_ascii_alphanumeric()
-						|| "_.".contains(*character)
+    any()
+        .filter(|character: &char| {
+            character.is_ascii_alphabetic() || "_.".contains(*character)
         })
-				.repeated()
-				.collect::<Vec<_>>(),
-    )
-		.map(|(first, rest)| {
-			std::iter::once(first).chain(rest).collect::<String>()
-		})
-    .boxed()
+        .then(
+            any()
+                .filter(|character: &char| {
+                    character.is_ascii_alphanumeric()
+                        || "_.".contains(*character)
+                })
+                .repeated()
+                .collect::<Vec<_>>(),
+        )
+        .map(|(first, rest)| {
+            std::iter::once(first).chain(rest).collect::<String>()
+        })
+        .boxed()
 }
 
 fn parser<'src>()
@@ -111,7 +111,7 @@ fn parser<'src>()
         .separated_by(just(',').padded())
         .at_least(1)
         .allow_trailing()
-		.collect::<Vec<_>>()
+        .collect::<Vec<_>>()
         .delimited_by(just('[').padded(), just(']').padded());
 
     let comparison = choice((
@@ -159,38 +159,38 @@ fn parser<'src>()
             .clone()
             .or(expression.delimited_by(just('(').padded(), just(')').padded()))
             .padded();
-		let unary = keyword("NOT")
-			.padded()
-			.repeated()
-			.collect::<Vec<_>>()
-			.then(atom)
-			.map(|(operators, expression)| {
+        let unary = keyword("NOT")
+            .padded()
+            .repeated()
+            .collect::<Vec<_>>()
+            .then(atom)
+            .map(|(operators, expression)| {
                 operators.into_iter().fold(expression, |expression, ()| {
                     FilterExpr::Not(Box::new(expression))
                 })
-			});
+            });
         let and = unary
             .clone()
-			.then(
-				keyword("AND")
-					.padded()
-					.ignore_then(unary)
-					.repeated()
-					.collect::<Vec<_>>(),
-			)
+            .then(
+                keyword("AND")
+                    .padded()
+                    .ignore_then(unary)
+                    .repeated()
+                    .collect::<Vec<_>>(),
+            )
             .map(|(first, rest)| {
                 FilterExpr::and(std::iter::once(first).chain(rest))
                     .expect("an expression always contains one operand")
             });
 
         and.clone()
-			.then(
-				keyword("OR")
-					.padded()
-					.ignore_then(and)
-					.repeated()
-					.collect::<Vec<_>>(),
-			)
+            .then(
+                keyword("OR")
+                    .padded()
+                    .ignore_then(and)
+                    .repeated()
+                    .collect::<Vec<_>>(),
+            )
             .map(|(first, rest)| {
                 FilterExpr::or(std::iter::once(first).chain(rest))
                     .expect("an expression always contains one operand")
@@ -201,12 +201,12 @@ fn parser<'src>()
 }
 
 pub fn parse_expression(input: &str) -> Result<FilterExpr, FilterParseError> {
-	parser().parse(input).into_result().map_err(|errors| {
+    parser().parse(input).into_result().map_err(|errors| {
         let error = errors
             .into_iter()
             .next()
-			.unwrap_or_else(|| Rich::custom((0..0).into(), "invalid filter"));
-		let start = error.span().start;
+            .unwrap_or_else(|| Rich::custom((0..0).into(), "invalid filter"));
+        let start = error.span().start;
         FilterParseError {
             position: start,
             message: error.to_string(),
@@ -288,33 +288,33 @@ mod tests {
         assert_eq!(predicate.field.as_str(), "notification");
     }
 
-	#[test]
-	fn preserves_list_values_and_trailing_comma() {
-		let FilterExpr::Predicate(predicate) =
-			parse_expression("categories nOt iN [fabric, forge,]").unwrap()
-		else {
-			panic!("expected a predicate");
-		};
-		assert_eq!(
-			predicate.condition,
-			FilterCondition::In {
-				values: vec![
-					FilterLiteral::String("fabric".into()),
-					FilterLiteral::String("forge".into()),
-				],
-				negated: true,
-}
-		);
-		assert!(parse_expression("categories IN []").is_err());
-	}
+    #[test]
+    fn preserves_list_values_and_trailing_comma() {
+        let FilterExpr::Predicate(predicate) =
+            parse_expression("categories nOt iN [fabric, forge,]").unwrap()
+        else {
+            panic!("expected a predicate");
+        };
+        assert_eq!(
+            predicate.condition,
+            FilterCondition::In {
+                values: vec![
+                    FilterLiteral::String("fabric".into()),
+                    FilterLiteral::String("forge".into()),
+                ],
+                negated: true,
+            }
+        );
+        assert!(parse_expression("categories IN []").is_err());
+    }
 
-	#[test]
-	fn preserves_repeated_unary_not() {
-		let FilterExpr::Not(expression) =
-			parse_expression("NOT NOT open_source = true").unwrap()
-		else {
-			panic!("expected an outer NOT expression");
-		};
-		assert!(matches!(*expression, FilterExpr::Not(_)));
-	}
+    #[test]
+    fn preserves_repeated_unary_not() {
+        let FilterExpr::Not(expression) =
+            parse_expression("NOT NOT open_source = true").unwrap()
+        else {
+            panic!("expected an outer NOT expression");
+        };
+        assert!(matches!(*expression, FilterExpr::Not(_)));
+    }
 }

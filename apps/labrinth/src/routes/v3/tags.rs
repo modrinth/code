@@ -239,12 +239,12 @@ pub async fn license_list() -> HttpResponse {
     let licenses = spdx::identifiers::LICENSES;
     let mut results: Vec<License> = Vec::with_capacity(licenses.len());
 
-	for license in licenses {
-		results.push(License {
-			short: license.name.to_string(),
-			name: license.full_name.to_string(),
-		});
-	}
+    for license in licenses {
+        results.push(License {
+            short: license.name.to_string(),
+            name: license.full_name.to_string(),
+        });
+    }
 
     HttpResponse::Ok().json(results)
 }

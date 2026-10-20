@@ -100,7 +100,7 @@ pub async fn issue_session(
 
     let metadata = get_session_metadata(&req).await?;
 
-	let session = ChaCha20Rng::from_rng(&mut rand::rng())
+    let session = ChaCha20Rng::from_rng(&mut rand::rng())
         .sample_iter(&Alphanumeric)
         .take(60)
         .map(char::from)

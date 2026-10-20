@@ -26,10 +26,10 @@ async fn main() -> Result<()> {
 
     let ip = args.ip;
     let country = maxmind
-		.lookup(ip)
-		.wrap_err("failed to lookup country")?
-		.decode::<geoip2::Country>()
-		.wrap_err("failed to decode country")?;
+        .lookup(ip)
+        .wrap_err("failed to lookup country")?
+        .decode::<geoip2::Country>()
+        .wrap_err("failed to decode country")?;
 
     info!("Country details for {ip:?}:\n{country:#?}");
 

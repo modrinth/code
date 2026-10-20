@@ -1577,10 +1577,10 @@ pub struct DeviceTokenKey {
 fn generate_key() -> Result<DeviceTokenKey, MinecraftAuthenticationError> {
     let uuid = Uuid::new_v4();
 
-	let signing_key = SigningKey::generate_from_rng(&mut rand::rng());
+    let signing_key = SigningKey::generate_from_rng(&mut rand::rng());
     let public_key = VerifyingKey::from(&signing_key);
 
-	let encoded_point = public_key.to_sec1_point(false);
+    let encoded_point = public_key.to_sec1_point(false);
 
     Ok(DeviceTokenKey {
         id: uuid,
@@ -1641,7 +1641,7 @@ async fn send_signed_request<T: DeserializeOwned>(
     let mut sig_buffer = Vec::new();
     sig_buffer.extend_from_slice(&1_i32.to_be_bytes()[..]);
     sig_buffer.extend_from_slice(&(time as u64).to_be_bytes()[..]);
-	sig_buffer.extend_from_slice(&ecdsa_sig.to_bytes());
+    sig_buffer.extend_from_slice(&ecdsa_sig.to_bytes());
 
     let signature = BASE64_STANDARD.encode(&sig_buffer);
 
@@ -1700,8 +1700,8 @@ fn get_date_header(headers: &HeaderMap) -> DateTime<Utc> {
 
 #[tracing::instrument]
 fn generate_oauth_challenge() -> String {
-	let mut rng = rand::rng();
+    let mut rng = rand::rng();
 
-	let bytes: Vec<u8> = (0..64).map(|_| rng.random::<u8>()).collect();
+    let bytes: Vec<u8> = (0..64).map(|_| rng.random::<u8>()).collect();
     bytes.iter().map(|byte| format!("{byte:02x}")).collect()
 }

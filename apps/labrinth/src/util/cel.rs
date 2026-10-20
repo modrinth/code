@@ -16,25 +16,25 @@ use url::{Host, Url};
 const MAX_PREPROCESSED_SIZE: usize = 1_048_576;
 
 pub struct Context<'a> {
-	inner: CelContext<'a, 'a>,
+    inner: CelContext<'a, 'a>,
 }
 
 impl Default for Context<'_> {
     fn default() -> Self {
         let mut inner = CelContext::default();
-		inner
-			.add_function("url.parse", parse_url)
-			.expect("`url.parse` must not conflict with a standard overload");
-		inner.add_function("url.is_valid", is_valid_url).expect(
-			"`url.is_valid` must not conflict with a standard overload",
-		);
+        inner
+            .add_function("url.parse", parse_url)
+            .expect("`url.parse` must not conflict with a standard overload");
+        inner.add_function("url.is_valid", is_valid_url).expect(
+            "`url.is_valid` must not conflict with a standard overload",
+        );
 
         Self { inner }
     }
 }
 
 impl<'a> Deref for Context<'a> {
-	type Target = CelContext<'a, 'a>;
+    type Target = CelContext<'a, 'a>;
 
     fn deref(&self) -> &Self::Target {
         &self.inner
@@ -241,29 +241,29 @@ enum LexState {
 fn directive_parser<'src>()
 -> impl Parser<'src, &'src str, Directive, extra::Err<Rich<'src, char>>> {
     let horizontal_whitespace = one_of(" \t").repeated();
-	let identifier = any()
-		.filter(|character: &char| {
-        character.is_ascii_alphabetic() || *character == '_'
-    })
-    .then(
-			any()
-				.filter(|character: &char| {
-            character.is_ascii_alphanumeric() || *character == '_'
+    let identifier = any()
+        .filter(|character: &char| {
+            character.is_ascii_alphabetic() || *character == '_'
         })
-				.repeated()
-				.collect::<Vec<_>>(),
-    )
-    .map(|(first, rest)| {
-        std::iter::once(first).chain(rest).collect::<String>()
-    });
+        .then(
+            any()
+                .filter(|character: &char| {
+                    character.is_ascii_alphanumeric() || *character == '_'
+                })
+                .repeated()
+                .collect::<Vec<_>>(),
+        )
+        .map(|(first, rest)| {
+            std::iter::once(first).chain(rest).collect::<String>()
+        });
     let expression = any().repeated().at_least(1).collect::<String>();
     let kind = just("define").to(true).or(just("bind").to(false));
 
     horizontal_whitespace
         .ignore_then(just('#'))
-		.then_ignore(horizontal_whitespace)
+        .then_ignore(horizontal_whitespace)
         .ignore_then(kind)
-		.then_ignore(horizontal_whitespace.at_least(1))
+        .then_ignore(horizontal_whitespace.at_least(1))
         .then(identifier)
         .then_ignore(horizontal_whitespace.at_least(1))
         .then(expression)
@@ -295,19 +295,19 @@ fn preprocess(source: &str) -> Result<Preprocessed, PreprocessorError> {
 
         if directive {
             let directive = line.trim_end_matches(['\r', '\n']);
-			let directive = directive_parser()
-				.parse(directive)
-				.into_result()
-				.map_err(|errors| {
-				let error = errors.into_iter().next().unwrap_or_else(|| {
-					Rich::custom((0..0).into(), "invalid directive")
-                        });
-                    PreprocessorError::InvalidDirective {
-                        line: line_index + 1,
-                        column: error.span().start + 1,
-                        message: error.to_string(),
-                    }
-                })?;
+            let directive = directive_parser()
+                .parse(directive)
+                .into_result()
+                .map_err(|errors| {
+                let error = errors.into_iter().next().unwrap_or_else(|| {
+                    Rich::custom((0..0).into(), "invalid directive")
+                });
+                PreprocessorError::InvalidDirective {
+                    line: line_index + 1,
+                    column: error.span().start + 1,
+                    message: error.to_string(),
+                }
+            })?;
 
             match directive {
                 Directive::Define(definition) => {
@@ -888,18 +888,18 @@ URL.fragment == "fragment"
         assert!(error.to_string().contains("url.parse"));
     }
 
-	#[test]
-	fn preserves_directive_identifiers_and_horizontal_whitespace() {
-		let preprocessed = super::preprocess(
-			"\t# define\t_NAME2\t42\n#bind result_2 _NAME2\nresult_2",
-		)
-		.unwrap();
-		assert_eq!(preprocessed.expression.trim(), "result_2");
-		assert_eq!(preprocessed.bindings.len(), 1);
-		assert_eq!(preprocessed.bindings[0].name, "result_2");
-		assert_eq!(preprocessed.bindings[0].expression, "42");
-		assert_eq!(preprocessed.bindings[0].line, 2);
-		assert!(super::preprocess("#define 2NAME 42\ntrue").is_err());
-		assert!(super::preprocess("#bind name\ntrue").is_err());
-}
+    #[test]
+    fn preserves_directive_identifiers_and_horizontal_whitespace() {
+        let preprocessed = super::preprocess(
+            "\t# define\t_NAME2\t42\n#bind result_2 _NAME2\nresult_2",
+        )
+        .unwrap();
+        assert_eq!(preprocessed.expression.trim(), "result_2");
+        assert_eq!(preprocessed.bindings.len(), 1);
+        assert_eq!(preprocessed.bindings[0].name, "result_2");
+        assert_eq!(preprocessed.bindings[0].expression, "42");
+        assert_eq!(preprocessed.bindings[0].line, 2);
+        assert!(super::preprocess("#define 2NAME 42\ntrue").is_err());
+        assert!(super::preprocess("#bind name\ntrue").is_err());
+    }
 }

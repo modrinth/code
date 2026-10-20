@@ -15,13 +15,13 @@ categories = ["asynchronous", "database", "development-tools::debugging", "devel
 [dependencies]
 derive_more = { workspace = true, features = ["deref", "deref_mut"] }
 futures = { version = "0.3" }
-sqlx = { version = "0.8", default-features = false, features = ["derive"] }
+sqlx = { workspace = true, features = ["macros"] }
 tracing = { version = "0.1" }
 
 [dev-dependencies]
 opentelemetry = "0.33"
 opentelemetry-testing = "0.1"
-sqlx = { version = "0.8", features = ["runtime-tokio"] }
+sqlx = { workspace = true, features = ["runtime-tokio"] }
 testcontainers = "0.25.2"
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 

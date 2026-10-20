@@ -94,13 +94,13 @@ fn inspect_content_archive<R: Read + Seek>(
 fn infer_project_type<R: Read + Seek>(
     archive: &mut ZipArchive<R>,
 ) -> crate::Result<ProjectType> {
-	let mut has_data = false;
-	let mut has_shaders = false;
-	for name in archive.file_names() {
-		let name = name?;
-		has_data |= name.starts_with("data/");
-		has_shaders |= name.starts_with("shaders/");
-	}
+    let mut has_data = false;
+    let mut has_shaders = false;
+    for name in archive.file_names() {
+        let name = name?;
+        has_data |= name.starts_with("data/");
+        has_shaders |= name.starts_with("shaders/");
+    }
     if has_entry(archive, "fabric.mod.json")
         || has_entry(archive, "quilt.mod.json")
         || has_entry(archive, "META-INF/neoforge.mods.toml")
@@ -114,7 +114,7 @@ fn infer_project_type<R: Read + Seek>(
         } else {
             Ok(ProjectType::ResourcePack)
         }
-	} else if has_shaders {
+    } else if has_shaders {
         Ok(ProjectType::ShaderPack)
     } else {
         Err(ErrorKind::InputError(

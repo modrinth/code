@@ -38,10 +38,10 @@ pub struct AuthSeal {
 
 impl AuthSeal {
     pub fn generate() -> Self {
-		let mut rng = rand::rng();
-		let secret = SecretKey::generate_from_rng(&mut rng);
-		let mut nonce_bytes = [0u8; 16];
-		rng.fill_bytes(&mut nonce_bytes);
+        let mut rng = rand::rng();
+        let secret = SecretKey::generate_from_rng(&mut rng);
+        let mut nonce_bytes = [0u8; 16];
+        rng.fill_bytes(&mut nonce_bytes);
 
         Self {
             secret,

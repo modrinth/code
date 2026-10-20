@@ -52,9 +52,9 @@ impl super::Validator for ModpackValidator {
         }
 
         if pack.files.is_empty()
-			&& !crate::validate::validated_file_names(archive)?
-				.into_iter()
-				.any(|x| x.starts_with("overrides/"))
+            && !crate::validate::validated_file_names(archive)?
+                .into_iter()
+                .any(|x| x.starts_with("overrides/"))
         {
             return Err(ValidationError::InvalidInput(
                 "Pack has no files!".into(),
@@ -77,8 +77,8 @@ impl super::Validator for ModpackValidator {
 
         Ok(ValidationResult::PassWithPackDataAndFiles {
             format: pack,
-			files: crate::validate::validated_file_names(archive)?
-				.into_iter()
+            files: crate::validate::validated_file_names(archive)?
+                .into_iter()
                 .filter(|x| {
                     (x.ends_with("jar") || x.ends_with("zip"))
                         && (x.starts_with("overrides/mods")

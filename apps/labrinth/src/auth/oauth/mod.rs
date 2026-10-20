@@ -434,7 +434,7 @@ fn authenticate_client_token_request(
 }
 
 fn generate_access_token() -> String {
-	let random = ChaCha20Rng::from_rng(&mut rand::rng())
+    let random = ChaCha20Rng::from_rng(&mut rand::rng())
         .sample_iter(&Alphanumeric)
         .take(60)
         .map(char::from)

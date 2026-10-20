@@ -148,18 +148,20 @@ pub async fn resolve_server_address(
     }
 
     let _permit = SIMULTANEOUS_DNS_QUERIES.acquire().await?;
-	let resolver = hickory_resolver::TokioResolver::builder_tokio()?.build()?;
+    let resolver = hickory_resolver::TokioResolver::builder_tokio()?.build()?;
     Ok(
         match resolver.srv_lookup(format!("_minecraft._tcp.{host}")).await {
-			Err(e) if e.is_no_records_found() => None,
+            Err(e) if e.is_no_records_found() => None,
             Err(e) => return Err(e.into()),
-			Ok(lookup) => lookup.answers().iter().find_map(|record| {
-				if let hickory_resolver::proto::rr::RData::SRV(srv) = &record.data {
-					Some((srv.target.to_string(), srv.port))
-				} else {
-					None
-				}
-			}),
+            Ok(lookup) => lookup.answers().iter().find_map(|record| {
+                if let hickory_resolver::proto::rr::RData::SRV(srv) =
+                    &record.data
+                {
+                    Some((srv.target.to_string(), srv.port))
+                } else {
+                    None
+                }
+            }),
         }
         .unwrap_or_else(|| (host.to_owned(), port)),
     )

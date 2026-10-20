@@ -73,11 +73,11 @@ fn main() -> std::io::Result<()> {
     // <https://docs.sentry.io/platforms/rust/guides/actix-web/>
     // DSN is from SENTRY_DSN env variable.
     // Has no effect if not set.
-	let mut sentry_options = sentry::ClientOptions::new()
-		.traces_sample_rate(ENV.SENTRY_TRACES_SAMPLE_RATE)
-		.environment(ENV.SENTRY_ENVIRONMENT.as_str());
-	sentry_options.release = sentry::release_name!();
-	let sentry = sentry::init(sentry_options);
+    let mut sentry_options = sentry::ClientOptions::new()
+        .traces_sample_rate(ENV.SENTRY_TRACES_SAMPLE_RATE)
+        .environment(ENV.SENTRY_ENVIRONMENT.as_str());
+    sentry_options.release = sentry::release_name!();
+    let sentry = sentry::init(sentry_options);
     if sentry.is_enabled() {
         info!("Enabled Sentry integration");
         unsafe {
@@ -481,10 +481,10 @@ fn add_error_content(response: &mut Response) {
     if response.content.is_empty() {
         response.content.insert(
             "application/json".to_string(),
-			Content::new(Some(utoipa::openapi::Ref::from_schema_name(
-				"ApiError",
-			)))
-			.into(),
+            Content::new(Some(utoipa::openapi::Ref::from_schema_name(
+                "ApiError",
+            )))
+            .into(),
         );
     }
 }

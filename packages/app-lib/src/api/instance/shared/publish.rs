@@ -1098,8 +1098,8 @@ pub(super) async fn upload_external_files(
             hasher.update(&buffer[..read]);
             size += read as u64;
         }
-		let file_sha512 =
-			crate::util::content_hash::encode_hex(hasher.finalize().as_slice());
+        let file_sha512 =
+            crate::util::content_hash::encode_hex(hasher.finalize().as_slice());
         use tokio::io::AsyncSeekExt;
         file.rewind().await?;
         let body =

@@ -168,7 +168,7 @@ pub enum ErrorKind {
     SqlxMigrate(#[from] sqlx::migrate::MigrateError),
 
     #[error("error resolving DNS: {0}")]
-	DNSError(#[from] NetError),
+    DNSError(#[from] NetError),
 
     #[error("an online profile for {user_name} is not available")]
     OnlineMinecraftProfileUnavailable { user_name: String },
@@ -362,7 +362,7 @@ pub fn error_code(error: &Error) -> &'static str {
         "api_error"
     } else if error.is::<reqwest::Error>()
         || error.is::<tungstenite::Error>()
-		|| error.is::<NetError>()
+        || error.is::<NetError>()
     {
         "network_error"
     } else if error.is::<JREError>() {

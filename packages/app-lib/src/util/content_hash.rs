@@ -22,7 +22,7 @@ impl ContentHasher {
 
     pub(crate) fn finish(self, size: u64) -> FileHashes {
         FileHashes {
-			sha512: encode_hex(self.sha512.finalize().as_slice()),
+            sha512: encode_hex(self.sha512.finalize().as_slice()),
             size,
         }
     }
@@ -73,5 +73,5 @@ pub(crate) async fn copy_and_hash(
 }
 
 pub(crate) fn encode_hex(bytes: &[u8]) -> String {
-	bytes.iter().map(|byte| format!("{byte:02x}")).collect()
+    bytes.iter().map(|byte| format!("{byte:02x}")).collect()
 }

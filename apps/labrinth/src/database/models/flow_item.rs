@@ -123,7 +123,7 @@ impl DBFlow {
         expires: Duration,
         redis: &RedisPool,
     ) -> Result<String> {
-		let state = ChaCha20Rng::from_rng(&mut rand::rng())
+        let state = ChaCha20Rng::from_rng(&mut rand::rng())
             .sample_iter(&Alphanumeric)
             .take(32)
             .map(char::from)

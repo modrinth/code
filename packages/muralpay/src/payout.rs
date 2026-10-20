@@ -1,4 +1,3 @@
-
 use {
     crate::{
         AccountId, Blockchain, CounterpartyId, CurrencyCode, FiatAccountType,

@@ -747,18 +747,18 @@ async fn get_world_session_lock(world: &Path) -> Result<tokio::fs::File> {
         .await?;
     file.write_all("☃".as_bytes()).await?;
     file.sync_all().await?;
-	match file.try_lock() {
-		Ok(()) => Ok(file),
-		Err(fs4::TryLockError::WouldBlock) => Err(io::IOError::IOPathError {
-			source: std::io::Error::new(
-				std::io::ErrorKind::ResourceBusy,
-				"already locked by Minecraft",
-			),
-			path: lock_path.to_string_lossy().into_owned(),
-		}
-		.into()),
-		Err(fs4::TryLockError::Error(error)) => Err(error.into()),
-	}
+    match file.try_lock() {
+        Ok(()) => Ok(file),
+        Err(fs4::TryLockError::WouldBlock) => Err(io::IOError::IOPathError {
+            source: std::io::Error::new(
+                std::io::ErrorKind::ResourceBusy,
+                "already locked by Minecraft",
+            ),
+            path: lock_path.to_string_lossy().into_owned(),
+        }
+        .into()),
+        Err(fs4::TryLockError::Error(error)) => Err(error.into()),
+    }
 }
 
 async fn try_get_world_session_lock(
@@ -771,11 +771,11 @@ async fn try_get_world_session_lock(
         .open(world.join("session.lock"))
         .await?;
     file.sync_all().await?;
-	match file.try_lock() {
-		Ok(()) => Ok(Some(file)),
-		Err(fs4::TryLockError::WouldBlock) => Ok(None),
-		Err(fs4::TryLockError::Error(error)) => Err(error.into()),
-	}
+    match file.try_lock() {
+        Ok(()) => Ok(Some(file)),
+        Err(fs4::TryLockError::WouldBlock) => Ok(None),
+        Err(fs4::TryLockError::Error(error)) => Err(error.into()),
+    }
 }
 
 pub async fn add_server_to_instance(

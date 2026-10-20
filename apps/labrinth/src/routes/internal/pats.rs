@@ -143,7 +143,7 @@ pub async fn create_pat(
         .await
         .wrap_internal_err("generating pat ID")?;
 
-	let token = ChaCha20Rng::from_rng(&mut rand::rng())
+    let token = ChaCha20Rng::from_rng(&mut rand::rng())
         .sample_iter(&Alphanumeric)
         .take(60)
         .map(char::from)

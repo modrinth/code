@@ -61,13 +61,13 @@ where
         }
     }
 
-    fn prepare_with<'e, 'q: 'e>(
+    fn prepare_with<'e>(
         self,
-        sql: &'q str,
+        sql: sqlx::SqlStr,
         parameters: &'e [<Self::Database as sqlx::Database>::TypeInfo],
     ) -> futures::future::BoxFuture<
         'e,
-        Result<<Self::Database as sqlx::Database>::Statement<'q>, sqlx::Error>,
+        Result<<Self::Database as sqlx::Database>::Statement, sqlx::Error>,
     >
     where
         's: 'e,
@@ -81,9 +81,9 @@ where
         }
     }
 
-    fn describe<'e, 'q: 'e>(
+    fn describe<'e>(
         self,
-        sql: &'q str,
+        sql: sqlx::SqlStr,
     ) -> futures::future::BoxFuture<
         'e,
         Result<sqlx::Describe<Self::Database>, sqlx::Error>,

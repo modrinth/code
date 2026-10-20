@@ -654,7 +654,7 @@ pub async fn revoke_oauth_authorization(
 }
 
 fn generate_oauth_client_secret() -> String {
-	ChaCha20Rng::from_rng(&mut rand::rng())
+    ChaCha20Rng::from_rng(&mut rand::rng())
         .sample_iter(&Alphanumeric)
         .take(32)
         .map(char::from)

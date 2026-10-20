@@ -497,17 +497,17 @@ impl Process {
 
                     Ok(Event::Start(e)) => {
                         match e.name().as_ref() {
-							"log4j:Event" => {
+                            "log4j:Event" => {
                                 // Reset for new event
                                 current_event = Log4jEvent::default();
                                 in_event = true;
 
                                 // Extract attributes
                                 for attr in e.attributes().flatten() {
-									let key = attr.key.into_inner();
-									let value = attr.value.into_owned();
+                                    let key = attr.key.into_inner();
+                                    let value = attr.value.into_owned();
 
-									match key {
+                                    match key {
                                         "logger" => {
                                             current_event.logger_name =
                                                 Some(value)
@@ -527,11 +527,11 @@ impl Process {
                                     }
                                 }
                             }
-							"log4j:Message" => {
+                            "log4j:Message" => {
                                 in_message = true;
                                 current_content = String::new();
                             }
-							"log4j:Throwable" => {
+                            "log4j:Throwable" => {
                                 in_throwable = true;
                                 current_content = String::new();
                             }
@@ -540,12 +540,12 @@ impl Process {
                     }
                     Ok(Event::End(e)) => {
                         match e.name().as_ref() {
-							"log4j:Message" => {
+                            "log4j:Message" => {
                                 in_message = false;
                                 current_event.message =
                                     Some(current_content.clone());
                             }
-							"log4j:Throwable" => {
+                            "log4j:Throwable" => {
                                 in_throwable = false;
                                 current_event.throwable =
                                     if current_content.is_empty() {
@@ -587,7 +587,7 @@ impl Process {
                                     &current_event,
                                 );
                             }
-							"log4j:Event" => {
+                            "log4j:Event" => {
                                 in_event = false;
                                 // If no throwable was present, write the log entry at the end of the event
                                 if current_event.message.is_some()
@@ -638,13 +638,13 @@ impl Process {
                     }
                     Ok(Event::Text(mut e)) => {
                         if in_message || in_throwable {
-							let text = e.xml11_content();
-							current_content.push_str(&text);
+                            let text = e.xml11_content();
+                            current_content.push_str(&text);
                         } else if !in_event
                             && !e.inplace_trim_end()
                             && !e.inplace_trim_start()
-						{
-							let text = e.xml11_content();
+                        {
+                            let text = e.xml11_content();
                             if let Err(e) = Process::append_to_log_file(
                                 &log_path,
                                 &format!("{text}\n"),
@@ -657,10 +657,10 @@ impl Process {
                             Self::emit_legacy_log(instance_id, &text);
                         }
                     }
-					Ok(Event::CData(e)) if in_message || in_throwable => {
-						let text = e.xml11_content();
-						current_content.push_str(&text);
-					}
+                    Ok(Event::CData(e)) if in_message || in_throwable => {
+                        let text = e.xml11_content();
+                        current_content.push_str(&text);
+                    }
                     _ => (),
                 }
 

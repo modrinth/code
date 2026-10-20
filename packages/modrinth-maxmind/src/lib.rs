@@ -57,12 +57,12 @@ impl MaxMind {
     /// [`None`].
     pub async fn query_country(&self, ip: impl Into<IpAddr>) -> Option<String> {
         let reader = self.reader.as_ref()?;
-		reader
-			.lookup(ip.into())
-			.ok()?
-			.decode::<geoip2::Country>()
-			.ok()?
-			.and_then(|c| c.country.iso_code.map(|s| s.to_string()))
+        reader
+            .lookup(ip.into())
+            .ok()?
+            .decode::<geoip2::Country>()
+            .ok()?
+            .and_then(|c| c.country.iso_code.map(|s| s.to_string()))
     }
 }
 

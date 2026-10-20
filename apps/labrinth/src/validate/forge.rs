@@ -30,16 +30,16 @@ impl super::Validator for ForgeValidator {
     ) -> Result<ValidationResult, ValidationError> {
         if archive.by_name("META-INF/mods.toml").is_err()
             && archive.by_name("META-INF/MANIFEST.MF").is_err()
-			&& !crate::validate::validated_file_names(archive)?
-				.into_iter()
-				.any(|x| x.ends_with(".class"))
+            && !crate::validate::validated_file_names(archive)?
+                .into_iter()
+                .any(|x| x.ends_with(".class"))
         {
             return Ok(ValidationResult::Warning(
                 "No mods.toml or valid class files present for Forge file.",
             ));
         }
 
-		validate_pack_formats(archive)
+        validate_pack_formats(archive)
     }
 }
 
@@ -68,15 +68,15 @@ impl super::Validator for LegacyForgeValidator {
     ) -> Result<ValidationResult, ValidationError> {
         if archive.by_name("mcmod.info").is_err()
             && archive.by_name("META-INF/MANIFEST.MF").is_err()
-			&& !crate::validate::validated_file_names(archive)?
-				.into_iter()
-				.any(|x| x.ends_with(".class"))
+            && !crate::validate::validated_file_names(archive)?
+                .into_iter()
+                .any(|x| x.ends_with(".class"))
         {
             return Ok(ValidationResult::Warning(
                 "Forge mod file does not contain mcmod.info or valid class files!",
             ));
         };
 
-		validate_pack_formats(archive)
+        validate_pack_formats(archive)
     }
 }
