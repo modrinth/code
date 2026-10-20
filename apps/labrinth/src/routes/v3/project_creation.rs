@@ -1,4 +1,4 @@
-use super::version_creation::{InitialVersionData, try_create_version_fields};
+use super::version_creation::{InitialVersionData, create_minecraft_component};
 use crate::auth::{
     AuthenticationError, get_user_from_headers, require_verified_email,
 };
@@ -13,9 +13,6 @@ use crate::models::exp;
 use crate::models::ids::{ImageId, OrganizationId, ProjectId, VersionId};
 use crate::models::images::{Image, ImageContext};
 use crate::models::link_platform::LinkPlatform;
-use crate::models::minecraft::{
-    LoaderField, LoaderFieldEnumValue, VersionField,
-};
 use crate::models::pats::Scopes;
 use crate::models::projects::{
     License, Link, MonetizationStatus, Project, ProjectStatus,
@@ -819,11 +816,8 @@ async fn project_create_inner(
                 .iter()
                 .map(|x| x.filename.clone())
                 .collect();
-            let version_fields = if let Some(component) = &created_version.components.minecraft_mod {
-                VersionField::from_minecraft_component(created_version.version_id, component).await?
-            } else {
-                Vec::new()
-            };
+            let game_versions = created_version.components.minecraft_mod.as_ref()
+                .map(|component| component.game_versions.clone()).unwrap_or_default();
             // Upload the new jar file
             super::version_creation::upload_file(
                 &mut field,
@@ -835,7 +829,7 @@ async fn project_create_inner(
                 &content_disposition,
                 project_id,
                 created_version.version_id.into(),
-                &version_fields,
+                &game_versions,
                 version_data.loaders.clone(),
                 version_data.primary_file.is_some(),
                 version_data.primary_file.as_deref() == Some(name),
@@ -1158,7 +1152,7 @@ async fn create_initial_version(
     author: UserId,
     all_loaders: &[models::loader_item::Loader],
     transaction: &mut PgTransaction<'_>,
-    redis: &RedisPool,
+    _redis: &RedisPool,
 ) -> Result<models::version_item::VersionBuilder, CreateError> {
     if version_data.project_id.is_some() {
         return Err(CreateError::InvalidInput(String::from(
@@ -1186,23 +1180,17 @@ async fn create_initial_version(
         })
         .collect::<Result<Vec<models::LoaderId>, CreateError>>()?;
 
-    let loader_fields =
-        LoaderField::get_fields(&loaders, &mut *transaction, redis).await?;
-    let mut loader_field_enum_values =
-        LoaderFieldEnumValue::list_many_loader_fields(
-            &loader_fields,
-            &mut *transaction,
-            redis,
-        )
-        .await?;
-
-    let version_fields = try_create_version_fields(
-        version_id,
+    let selected_loaders = all_loaders
+        .iter()
+        .filter(|loader| loaders.contains(&loader.id))
+        .cloned()
+        .collect::<Vec<_>>();
+    let component = create_minecraft_component(
         &version_data.fields,
         version_data.minecraft_mod.as_ref(),
-        &loader_fields,
-        &mut loader_field_enum_values,
-    )?;
+        &selected_loaders,
+    )
+    .await?;
 
     let dependencies = version_data
         .dependencies
@@ -1231,13 +1219,7 @@ async fn create_initial_version(
         requested_status: None,
         ordering: version_data.ordering,
         components: exp::VersionSerial {
-            minecraft_mod: Some(match &version_data.minecraft_mod {
-                Some(component) => component.clone(),
-                None => VersionField::to_minecraft_component(&version_fields)
-                    .map_err(|error| {
-                    CreateError::InvalidInput(error.to_string())
-                })?,
-            }),
+            minecraft_mod: component,
             ..Default::default()
         },
     };

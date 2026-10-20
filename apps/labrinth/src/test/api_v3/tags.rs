@@ -1,8 +1,5 @@
 use crate::routes::v3::tags::{GameData, LoaderData};
-use crate::{
-    models::minecraft::LoaderFieldEnumValue,
-    routes::v3::tags::CategoryData,
-};
+use crate::routes::v3::tags::{CategoryData, MinecraftTagValue};
 use actix_http::StatusCode;
 use actix_web::{
     dev::ServiceResponse,
@@ -83,7 +80,7 @@ impl ApiV3 {
     pub async fn get_loader_field_variants_deserialized(
         &self,
         loader_field: &str,
-    ) -> Vec<LoaderFieldEnumValue> {
+    ) -> Vec<MinecraftTagValue> {
         let resp = self.get_loader_field_variants(loader_field).await;
         assert_status!(&resp, StatusCode::OK);
         test::read_body_json(resp).await

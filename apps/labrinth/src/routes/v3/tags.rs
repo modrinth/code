@@ -7,8 +7,14 @@ use crate::database::models::game_item::Game;
 use crate::database::models::loader_item::{Loader, LoaderMetadata};
 use crate::models::exp::minecraft::{Environment, MrpackLoader};
 use crate::models::link_platform::LinkPlatform;
-use crate::models::minecraft::{LoaderFieldEnumValue, compatibility_value};
+use crate::models::minecraft::{
+	legacy_game_version_date, legacy_game_version_name,
+};
 use actix_web::{HttpResponse, get, web};
+use chrono::{DateTime, Utc};
+use minecraft_meta_model::{
+	model::MinecraftVersion, upstream::mojang::VersionType,
+};
 use strum::IntoEnumIterator;
 use xredis::RedisPool;
 
@@ -161,6 +167,16 @@ pub async fn loader_list(
 }
 
 #[derive(serde::Deserialize, serde::Serialize)]
+pub struct MinecraftTagValue {
+	pub value: String,
+	pub ordering: Option<i32>,
+	pub created: DateTime<Utc>,
+	#[serde(rename = "type")]
+	pub ty: Option<String>,
+	pub major: Option<bool>,
+}
+
+#[derive(serde::Deserialize, serde::Serialize)]
 pub struct LoaderFieldsEnumQuery {
     pub loader_field: String,
     pub filters: Option<HashMap<String, Value>>, // For metadata
@@ -189,17 +205,61 @@ pub async fn loader_fields_list(
 ) -> Result<HttpResponse, ApiError> {
     let query = query.into_inner();
     let mut results = match query.loader_field.as_str() {
-        "game_versions" => {
-            LoaderFieldEnumValue::minecraft_catalog(&minecraft_meta)
-                .await
-                .wrap_internal_err("fetching Minecraft version catalog")?
-        }
-        "environment" => Environment::iter()
-            .map(|value| compatibility_value(2, value.as_str().to_owned()))
-            .collect(),
-        "mrpack_loaders" => MrpackLoader::iter()
-            .map(|value| compatibility_value(3, value.as_str().to_owned()))
-            .collect(),
+		"game_versions" => {
+			let mut conn = minecraft_meta
+				.0
+				.connection()
+				.await
+				.wrap_internal_err("acquiring minecraft-meta connection")?;
+			MinecraftVersion::all()
+				.exec(&mut conn)
+				.await
+				.wrap_internal_err("fetching minecraft-meta game versions")?
+				.into_iter()
+				.map(|row| {
+					let name = row.name.to_string();
+					let entry = row.catalog_entry.0;
+					let ty = match entry.ty {
+						VersionType::Release => "release",
+						VersionType::Snapshot => "snapshot",
+						VersionType::OldAlpha => "alpha",
+						VersionType::OldBeta => "beta",
+					};
+					let created = DateTime::<Utc>::from_timestamp(
+						entry.release_time.as_second(),
+						entry.release_time.subsec_nanosecond() as u32,
+					)
+					.ok_or_else(|| ApiError::Internal(eyre::eyre!(
+						"minecraft-meta release timestamp is out of range"
+					)))?;
+					Ok(MinecraftTagValue {
+						value: legacy_game_version_name(&name).to_owned(),
+						ordering: None,
+						created: legacy_game_version_date(&name, created),
+						ty: Some(ty.to_owned()),
+						major: Some(matches!(entry.ty, VersionType::Release)),
+					})
+				})
+				.collect::<Result<Vec<_>, ApiError>>()?
+		}
+		"environment" => Environment::iter()
+			.map(|value| MinecraftTagValue {
+				value: value.as_str().to_owned(),
+				ordering: None,
+				created: DateTime::<Utc>::UNIX_EPOCH,
+				ty: None,
+				major: None,
+			})
+			.collect(),
+		"mrpack_loaders" => MrpackLoader::iter()
+			.map(|value| MinecraftTagValue {
+				value: value.as_str().to_owned(),
+				ordering: None,
+				created: DateTime::<Utc>::UNIX_EPOCH,
+				ty: None,
+				major: None,
+			})
+			.collect(),
         _ => {
             return Err(ApiError::Request(eyre::eyre!(
                 "`{}` is not a valid loader field",

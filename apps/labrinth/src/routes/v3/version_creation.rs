@@ -10,11 +10,9 @@ use crate::database::models::{self, DBOrganization, image_item};
 use crate::env::ENV;
 use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::exp;
+use crate::models::exp::component::ComponentEdit;
 use crate::models::ids::{ImageId, ProjectId, VersionId};
 use crate::models::images::{Image, ImageContext};
-use crate::models::minecraft::{
-    LoaderField, LoaderFieldEnumValue, VersionField,
-};
 use crate::models::notifications::NotificationBody;
 use crate::models::pack::PackFileHash;
 use crate::models::pats::Scopes;
@@ -39,9 +37,10 @@ use chrono::Utc;
 use futures::stream::StreamExt;
 use hex::ToHex;
 use itertools::Itertools;
+use minecraft_meta_model::model::MinecraftVersionName;
 use serde::{Deserialize, Serialize};
 use sha1::Digest;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 use validator::Validate;
 use xredis::RedisPool;
 
@@ -95,7 +94,7 @@ pub struct InitialVersionData {
     pub minecraft_mod: Option<crate::models::exp::minecraft::ModVersion>,
 
     // Flattened loader fields
-    // All other fields are loader-specific VersionFields
+    // All other fields are Minecraft compatibility fields
     // These are flattened during serialization
     #[serde(deserialize_with = "skip_nulls")]
     #[serde(flatten)]
@@ -375,21 +374,11 @@ async fn version_create_inner(
                 selected_loaders = Some(loaders.clone());
                 let loader_ids: Vec<models::LoaderId> = loaders.iter().map(|y| y.id).collect_vec();
 
-                let loader_fields =
-                    LoaderField::get_fields(&loader_ids, &mut *transaction, redis).await?;
-                let mut loader_field_enum_values = LoaderFieldEnumValue::list_many_loader_fields(
-                    &loader_fields,
-                    &mut *transaction,
-                    redis,
-                )
-                .await?;
-                let version_fields = try_create_version_fields(
-                    version_id,
+                let component = create_minecraft_component(
                     &version_create_data.fields,
                     version_create_data.minecraft_mod.as_ref(),
-                    &loader_fields,
-                    &mut loader_field_enum_values,
-                )?;
+                    &loaders,
+                ).await?;
 
                 let dependencies = version_create_data
                     .dependencies
@@ -418,11 +407,7 @@ async fn version_create_inner(
                     requested_status: None,
                     ordering: version_create_data.ordering,
                     components: exp::VersionSerial {
-                        minecraft_mod: Some(match &version_create_data.minecraft_mod {
-                            Some(component) => component.clone(),
-                            None => VersionField::to_minecraft_component(&version_fields)
-                                .map_err(|error| CreateError::InvalidInput(error.to_string()))?,
-                        }),
+                        minecraft_mod: component,
                         ..Default::default()
                     },
                 });
@@ -447,11 +432,8 @@ async fn version_create_inner(
 
             let existing_file_names = version.files.iter().map(|x| x.filename.clone()).collect();
 
-            let version_fields = if let Some(component) = &version.components.minecraft_mod {
-                VersionField::from_minecraft_component(version.version_id, component).await?
-            } else {
-                Vec::new()
-            };
+            let game_versions = version.components.minecraft_mod.as_ref()
+                .map(|component| component.game_versions.clone()).unwrap_or_default();
 
             upload_file(
                 &mut field,
@@ -463,7 +445,7 @@ async fn version_create_inner(
                 &content_disposition,
                 version.project_id.into(),
                 version.version_id.into(),
-                &version_fields,
+                &game_versions,
                 loaders,
                 version_data.primary_file.is_some(),
                 version_data.primary_file.as_deref() == Some(name),
@@ -909,16 +891,12 @@ async fn upload_file_to_version_inner(
                 })
                 .collect();
 
-            let version_fields =
-                if let Some(component) = &version.components.minecraft_mod {
-                    VersionField::from_minecraft_component(
-                        version_id,
-                        component,
-                    )
-                    .await?
-                } else {
-                    Vec::new()
-                };
+            let game_versions = version
+                .components
+                .minecraft_mod
+                .as_ref()
+                .map(|component| component.game_versions.clone())
+                .unwrap_or_default();
 
             upload_file(
                 &mut field,
@@ -930,7 +908,7 @@ async fn upload_file_to_version_inner(
                 &content_disposition,
                 project_id,
                 version_id.into(),
-                &version_fields,
+                &game_versions,
                 loaders,
                 true,
                 false,
@@ -993,7 +971,7 @@ pub async fn upload_file(
     content_disposition: &actix_web::http::header::ContentDisposition,
     project_id: ProjectId,
     version_id: VersionId,
-    version_fields: &[VersionField],
+    game_versions: &[MinecraftVersionName],
     loaders: Vec<Loader>,
     ignore_primary: bool,
     force_primary: bool,
@@ -1059,7 +1037,7 @@ pub async fn upload_file(
         file_extension.to_string(),
         loaders.clone(),
         file_type,
-        version_fields.to_vec(),
+        game_versions.to_vec(),
         dependencies,
         &mut *transaction,
         redis,
@@ -1221,106 +1199,64 @@ pub fn get_name_and_extension(
     Ok((file_name, file_extension))
 }
 
-// Reused functionality between project_creation and version_creation
-// Create a list of VersionFields from the fetched data, and check that all mandatory fields are present
-pub fn try_create_version_fields(
-    version_id: VersionId,
-    submitted_fields: &HashMap<String, serde_json::Value>,
-    minecraft_mod: Option<&crate::models::exp::minecraft::ModVersion>,
-    loader_fields: &[LoaderField],
-    loader_field_enum_values: &mut HashMap<
-        crate::models::minecraft::LoaderFieldId,
-        Vec<LoaderFieldEnumValue>,
-    >,
-) -> Result<Vec<VersionField>, CreateError> {
-    let typed_names = ["game_versions", "environment", "mrpack_loaders"];
-    if minecraft_mod.is_some()
-        && submitted_fields
-            .keys()
-            .any(|key| typed_names.contains(&key.as_str()))
-    {
-        return Err(CreateError::InvalidInput(
-            "cannot combine typed and flattened Minecraft fields".into(),
-        ));
-    }
-    let mut version_fields = if let Some(component) = minecraft_mod {
-        for (name, count) in [
-            ("game_versions", component.game_versions.len()),
-            ("mrpack_loaders", component.mrpack_loaders.len()),
-        ] {
-            if let Some(schema) =
-                loader_fields.iter().find(|field| field.field == name)
-                && (schema
-                    .min_val
-                    .is_some_and(|min| (count as i64) < i64::from(min))
-                    || schema
-                        .max_val
-                        .is_some_and(|max| (count as i64) > i64::from(max)))
-            {
-                return Err(CreateError::InvalidInput(format!(
-                    "invalid number of values for `{name}`"
-                )));
-            }
-        }
-        let catalog = loader_field_enum_values
-            .values()
-            .flatten()
-            .cloned()
-            .collect_vec();
-        VersionField::from_minecraft_component_with_catalog(
-            version_id.into(),
-            component,
-            &catalog,
-        )
-        .map_err(|error| CreateError::InvalidInput(error.to_string()))?
-        .into_iter()
-        .filter(|field| {
-            loader_fields
-                .iter()
-                .any(|schema| schema.field == field.field_name)
-        })
-        .collect()
-    } else {
-        Vec::new()
-    };
-    let mut remaining_mandatory_loader_fields = loader_fields
-        .iter()
-        .filter(|lf| {
-            !(lf.optional
-                || minecraft_mod.is_some()
-                    && typed_names.contains(&lf.field.as_str()))
-        })
-        .map(|lf| lf.field.clone())
-        .collect::<HashSet<_>>();
-    for (key, value) in submitted_fields {
-        let loader_field = loader_fields
+pub async fn validate_minecraft_component(
+    component: &exp::minecraft::ModVersion,
+    loaders: &[models::loader_item::Loader],
+) -> eyre::Result<()> {
+    eyre::ensure!(
+        loaders.iter().any(|loader| loader
+            .supported_games
             .iter()
-            .find(|lf| &lf.field == key)
-            .ok_or_else(|| {
-                CreateError::InvalidInput(format!(
-                    "Loader field '{key}' does not exist for any loaders supplied,"
-                ))
-            })?;
-        remaining_mandatory_loader_fields.remove(&loader_field.field);
-        let enum_variants = loader_field_enum_values
-            .remove(&loader_field.id)
-            .unwrap_or_default();
+            .any(|game| game == "minecraft-java")),
+        "Minecraft fields do not apply to the supplied loaders"
+    );
+    eyre::ensure!(
+        !component.game_versions.is_empty(),
+        "at least one Minecraft game version is required"
+    );
+    eyre::ensure!(
+        component.mrpack_loaders.is_empty()
+            || loaders.iter().any(|loader| loader.loader == "mrpack"),
+        "`mrpack_loaders` requires the `mrpack` loader"
+    );
+    crate::models::minecraft::validate_minecraft_versions(
+        &component.game_versions,
+    )
+    .await
+}
 
-        let vf: VersionField = VersionField::check_parse(
-            version_id.into(),
-            loader_field.clone(),
-            value.clone(),
-            enum_variants,
-        )
-        .map_err(CreateError::InvalidInput)?;
-        version_fields.push(vf);
+pub async fn create_minecraft_component(
+    fields: &HashMap<String, serde_json::Value>,
+    typed: Option<&exp::minecraft::ModVersion>,
+    loaders: &[models::loader_item::Loader],
+) -> Result<Option<exp::minecraft::ModVersion>, CreateError> {
+    let build = async {
+        eyre::ensure!(
+            typed.is_none() || fields.is_empty(),
+            "cannot combine typed and flattened Minecraft fields"
+        );
+        let applies = loaders.iter().any(|loader| {
+            loader
+                .supported_games
+                .iter()
+                .any(|game| game == "minecraft-java")
+        });
+        if !applies && typed.is_none() && fields.is_empty() {
+            return Ok(None);
+        }
+        eyre::ensure!(
+            !fields.contains_key("mrpack_loaders")
+                || loaders.iter().any(|loader| loader.loader == "mrpack"),
+            "`mrpack_loaders` requires the `mrpack` loader"
+        );
+        let component = match typed {
+            Some(component) => component.clone(),
+            None => crate::models::minecraft::parse_minecraft_fields(fields)?
+                .create()?,
+        };
+        validate_minecraft_component(&component, loaders).await?;
+        eyre::Ok(Some(component))
     }
-
-    if !remaining_mandatory_loader_fields.is_empty() {
-        return Err(CreateError::InvalidInput(format!(
-            "Missing mandatory loader fields: {}",
-            remaining_mandatory_loader_fields.iter().join(", ")
-        )));
-    }
-    Ok(version_fields)
+    .await;
+    build.map_err(|error| CreateError::InvalidInput(error.to_string()))
 }

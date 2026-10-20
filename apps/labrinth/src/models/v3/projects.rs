@@ -1,6 +1,6 @@
-use crate::models::minecraft::VersionField;
+
 use std::collections::HashMap;
-use std::mem;
+
 
 use crate::database::models::project_item::{LinkUrl, ProjectQueryResult};
 use crate::database::models::version_item::VersionQueryResult;
@@ -13,7 +13,7 @@ use crate::models::minecraft::legacy_game_version_name;
 use crate::routes::{FileHash, HashAlgorithm};
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
-use itertools::Itertools;
+
 use serde::{Deserialize, Serialize};
 use url::Url;
 use validator::Validate;
@@ -109,36 +109,6 @@ pub struct Project {
     pub fields: HashMap<String, Vec<serde_json::Value>>,
 }
 
-// This is a helper function to convert a list of VersionFields into a HashMap of field name to vecs of values
-// This allows for removal of duplicates
-pub fn from_duplicate_version_fields(
-    version_fields: Vec<VersionField>,
-) -> HashMap<String, Vec<serde_json::Value>> {
-    let mut fields: HashMap<String, Vec<serde_json::Value>> = HashMap::new();
-    for vf in version_fields {
-        // We use a string directly, so we can remove duplicates
-        let serialized = if let Some(inner_array) =
-            vf.value.serialize_internal().as_array()
-        {
-            inner_array.clone()
-        } else {
-            vec![vf.value.serialize_internal()]
-        };
-
-        // Create array if doesnt exist, otherwise push, or if json is an array, extend
-        if let Some(arr) = fields.get_mut(&vf.field_name) {
-            arr.extend(serialized);
-        } else {
-            fields.insert(vf.field_name, serialized);
-        }
-    }
-
-    // Remove duplicates
-    for v in fields.values_mut() {
-        *v = mem::take(v).into_iter().unique().collect_vec();
-    }
-    fields
-}
 
 /// Projects typed Minecraft metadata into the flattened compatibility fields.
 fn minecraft_version_fields(
@@ -859,8 +829,7 @@ pub struct Version {
 
     #[serde(flatten)]
     pub components: exp::VersionQuery,
-    // All other fields are loader-specific VersionFields
-    // These are flattened during serialization
+    // Legacy Minecraft compatibility fields are flattened during serialization.
     #[serde(deserialize_with = "skip_nulls")]
     #[serde(flatten)]
     pub fields: HashMap<String, serde_json::Value>,

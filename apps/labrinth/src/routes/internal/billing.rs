@@ -2311,19 +2311,15 @@ pub async fn stripe_webhook(
                                             )
                                         } else {
                                             // Create a server with the latest version of Minecraft
-                                            let minecraft_versions = crate::models::minecraft::MinecraftGameVersion::list(
-                                                Some("release"),
-                                                None,
-                                                &**pool,
-                                                &redis,
-                                            ).await.wrap_internal_err("fetching minecraft versions from database")?;
+                                            let minecraft_versions = crate::models::minecraft::minecraft_versions()
+                                                .await.wrap_internal_err("fetching minecraft version catalog")?;
 
                                             (
                                                 None,
                                                 None,
                                                 serde_json::json!({
                                                     "loader": "Vanilla",
-                                                    "game_version": minecraft_versions.first().map(|x| x.version.clone()),
+                                                    "game_version": minecraft_versions.iter().find(|x| x.catalog_entry.0.ty == minecraft_meta_model::upstream::mojang::VersionType::Release).map(|x| x.name.0.clone()),
                                                     "loader_version": ""
                                                 }),
                                             )

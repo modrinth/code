@@ -1,6 +1,6 @@
 use crate::database::PgPool;
 use crate::database::models::loader_item::Loader;
-use crate::models::minecraft::MinecraftGameVersion;
+use crate::models::minecraft::minecraft_versions;
 use crate::routes::ApiError;
 use crate::util::error::Context;
 use arc_swap::ArcSwapOption;
@@ -58,11 +58,11 @@ pub async fn valid_download_tags(
         .into_iter()
         .map(|loader| loader.loader)
         .collect();
-    let game_versions = MinecraftGameVersion::list(None, None, pool, redis)
+    let game_versions = minecraft_versions()
         .await
         .wrap_internal_err("failed to fetch game versions")?
         .into_iter()
-        .map(|game_version| game_version.version)
+        .map(|game_version| game_version.name.0)
         .collect();
 
     let cache = Arc::new(DownloadTagsCache {

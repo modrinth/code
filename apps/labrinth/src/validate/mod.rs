@@ -2,8 +2,7 @@ use crate::database::PgTransaction;
 use crate::database::models::loader_item::Loader as DBLoader;
 use crate::database::models::version_item::DependencyBuilder;
 use crate::models::ids::ProjectId;
-use crate::models::minecraft::MinecraftGameVersion;
-use crate::models::minecraft::VersionField;
+use crate::models::minecraft::{minecraft_version_date, minecraft_versions};
 use crate::models::pack::PackFormat;
 use crate::models::projects::{DependencyType, FileType, Loader};
 use crate::validate::datapack::DataPackValidator;
@@ -22,6 +21,7 @@ use crate::validate::shader::{
 };
 use bytes::Bytes;
 use chrono::{DateTime, Utc};
+use minecraft_meta_model::model::{MinecraftVersion, MinecraftVersionName};
 use std::io::{self, Cursor};
 use std::mem;
 use std::sync::LazyLock;
@@ -90,7 +90,7 @@ pub enum SupportedGameVersions {
     All,
     PastDate(DateTime<Utc>),
     Range(DateTime<Utc>, DateTime<Utc>),
-    Custom(Vec<MinecraftGameVersion>),
+    Custom(Vec<MinecraftVersion>),
 }
 
 pub enum MaybeProtectedZipFile {
@@ -195,18 +195,15 @@ pub async fn validate_file(
     file_extension: String,
     loaders: Vec<Loader>,
     file_type: Option<FileType>,
-    version_fields: Vec<VersionField>,
+    game_versions: Vec<MinecraftVersionName>,
     dependencies: &[DependencyBuilder],
     transaction: &mut PgTransaction<'_>,
     redis: &RedisPool,
 ) -> Result<ValidationResult, ValidationError> {
-    let component = VersionField::to_minecraft_component(&version_fields)?;
-    let all_game_versions =
-        MinecraftGameVersion::list(None, None, &mut *transaction, redis)
-            .await?;
-    let game_versions = component.game_versions.iter().map(|name| {
+    let all_game_versions = minecraft_versions().await?;
+    let game_versions = game_versions.iter().map(|name| {
         let name = crate::models::minecraft::legacy_game_version_name(&name.0);
-        all_game_versions.iter().find(|version| version.version == name)
+        all_game_versions.iter().find(|version| version.name.0 == name)
             .cloned()
             .ok_or_else(|| eyre::eyre!("missing minecraft game version `{name}` required for validation"))
     }).collect::<Result<Vec<_>, _>>()?;
@@ -319,8 +316,8 @@ async fn validate_minecraft_file(
     data: Bytes,
     file_extension: String,
     loaders: Vec<Loader>,
-    game_versions: Vec<MinecraftGameVersion>,
-    all_game_versions: Vec<MinecraftGameVersion>,
+    game_versions: Vec<MinecraftVersion>,
+    all_game_versions: Vec<MinecraftVersion>,
     file_type: Option<FileType>,
 ) -> Result<ValidationResult, ValidationError> {
     actix_web::web::block(move || {
@@ -417,8 +414,8 @@ async fn validate_minecraft_file(
 
 // Write tests for this
 fn game_version_supported(
-    game_versions: &[MinecraftGameVersion],
-    all_game_versions: &[MinecraftGameVersion],
+    game_versions: &[MinecraftVersion],
+    all_game_versions: &[MinecraftVersion],
     supported_game_versions: SupportedGameVersions,
 ) -> bool {
     match supported_game_versions {
@@ -427,24 +424,27 @@ fn game_version_supported(
             game_versions.iter().any(|x| {
                 all_game_versions
                     .iter()
-                    .find(|y| y.version == x.version)
-                    .is_some_and(|x| x.created > date)
+                    .find(|y| y.name == x.name)
+                    .is_some_and(|x| minecraft_version_date(x) > date)
             })
         }
         SupportedGameVersions::Range(before, after) => {
             game_versions.iter().any(|x| {
                 all_game_versions
                     .iter()
-                    .find(|y| y.version == x.version)
-                    .is_some_and(|x| x.created > before && x.created < after)
+                    .find(|y| y.name == x.name)
+                    .is_some_and(|x| {
+                        minecraft_version_date(x) > before
+                            && minecraft_version_date(x) < after
+                    })
             })
         }
         SupportedGameVersions::Custom(versions) => {
-            let version_ids =
-                versions.iter().map(|gv| gv.id).collect::<Vec<_>>();
-            let game_version_ids: Vec<_> =
-                game_versions.iter().map(|gv| gv.id).collect::<Vec<_>>();
-            version_ids.iter().any(|x| game_version_ids.contains(x))
+            versions.iter().any(|version| {
+                game_versions
+                    .iter()
+                    .any(|selected| selected.name == version.name)
+            })
         }
     }
 }
