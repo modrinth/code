@@ -97,7 +97,7 @@ futures-util = "0.3.31"
 governor = "0.10.4"
 heck = "0.5.0"
 hex = "0.4.3"
-hickory-resolver = "0.25.2"
+hickory-resolver = "0.26.3"
 hkdf = "0.12.4"
 hmac = "0.12.1"
 httpdate = "1.0.3"
@@ -136,7 +136,7 @@ lz4_flex = { version = "0.11.5", default-features = false, features = [
   "safe-encode",
   "std",
 ] }
-maxminddb = "0.26.0"
+maxminddb = "0.27.0"
 md5 = "0.8.0"
 modrinth-content-management = { path = "packages/modrinth-content-management" }
 modrinth-log = { path = "packages/modrinth-log" }
@@ -164,7 +164,7 @@ pulldown-cmark = { version = "0.13.4", default-features = false }
 quartz_nbt = "0.2.9"
 quick-xml = "0.38.3"
 quote = { version = "1.0" }
-rand = "=0.8.5"  # Locked on 0.8 until argon2 and p256 update to 0.9
+rand = "=0.10.1"  # Locked on 0.8 until argon2 and p256 update to 0.9
 rand_chacha = "=0.3.1"  # Locked on 0.3 until we can update rand to 0.9
 rdkafka = { version = "0.36.2", features = ["cmake-build"] }
 redis = "1.4.1"
