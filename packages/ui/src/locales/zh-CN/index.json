@@ -62,9 +62,6 @@
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "取消操作"
   },
-  "billing.resubscribe-modal.cpus": {
-    "defaultMessage": "{sharedCpus} 个共享 CPU"
-  },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "你即将重新订阅 <server-name>{serverName}</server-name>。你的订阅将会重新启用，且服务器将持续运行。"
   },
@@ -77,23 +74,8 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "获取订阅信息失败。"
   },
-  "billing.resubscribe-modal.interval": {
-    "defaultMessage": "{intervalOption, select, fiveDays {/5天} monthly {/月} quarterly {/季度} yearly {/年} other {{interval}}}"
-  },
-  "billing.resubscribe-modal.next-charge": {
-    "defaultMessage": "你的下一次缴费日期为 <charge-date>{date}</charge-date>。"
-  },
-  "billing.resubscribe-modal.plan-label": {
-    "defaultMessage": "方案"
-  },
-  "billing.resubscribe-modal.ram": {
-    "defaultMessage": "{ramGb} GB 内存"
-  },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "续订"
-  },
-  "billing.resubscribe-modal.storage": {
-    "defaultMessage": "{storageGb} GB 存储空间"
   },
   "billing.resubscribe-modal.title": {
     "defaultMessage": "重新订阅服务器"
@@ -7275,4 +7257,3 @@
     "defaultMessage": "类型"
   }
 }
-

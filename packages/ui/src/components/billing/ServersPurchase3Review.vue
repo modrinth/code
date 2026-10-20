@@ -343,8 +343,8 @@ function setInterval(newInterval: ServerBillingInterval) {
 			<SpinnerIcon v-if="loading" class="animate-spin relative top-0.5 mx-2" /><template v-else>{{
 				formatPrice(total, currency)
 			}}</template>
-			every {{ period }} plus applicable taxes starting today, until you cancel. You can cancel
-			anytime from your settings page.
+			every {{ period }} starting today, until you cancel. You can cancel anytime from your settings
+			page.
 		</template>
 		<br />
 		<span class="font-semibold"

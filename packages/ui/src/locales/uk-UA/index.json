@@ -62,9 +62,6 @@
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Скасувати"
   },
-  "billing.resubscribe-modal.cpus": {
-    "defaultMessage": "{sharedCpus} спільних ЦП"
-  },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "Ви збираєтеся поновити передплату на <server-name>{serverName}</server-name>. Вашу передплату буде відновлено, а ваш сервер продовжить працювати без перерв."
   },
@@ -77,23 +74,8 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Не вдалося завантажити деталі передплати."
   },
-  "billing.resubscribe-modal.interval": {
-    "defaultMessage": "{intervalOption, select, fiveDays {/5 днів} monthly {/місяць} quarterly {/квартал} yearly {/рік} other {{interval}}}"
-  },
-  "billing.resubscribe-modal.next-charge": {
-    "defaultMessage": "Ваше наступне списання буде <charge-date>{date}</charge-date>."
-  },
-  "billing.resubscribe-modal.plan-label": {
-    "defaultMessage": "План"
-  },
-  "billing.resubscribe-modal.ram": {
-    "defaultMessage": "{ramGb} ГБ ОЗП"
-  },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Підписатися повторно"
-  },
-  "billing.resubscribe-modal.storage": {
-    "defaultMessage": "{storageGb} ГБ сховища"
   },
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Підписатися повторно до сервера"

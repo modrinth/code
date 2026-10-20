@@ -62,9 +62,6 @@
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Mégse"
   },
-  "billing.resubscribe-modal.cpus": {
-    "defaultMessage": "{sharedCpus} megosztott processzormag"
-  },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "Ön újra elő fog fizetni <server-name>{serverName}</server-name> szerverre. Az előfizetése újra fog aktiválódni és a szervere kimaradás nélkül tovább fog működni."
   },
@@ -77,23 +74,8 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Nem sikerült betölteni az előfizetés adatait."
   },
-  "billing.resubscribe-modal.interval": {
-    "defaultMessage": "{intervalOption, select, fiveDays {/5 nap} monthly {/hónap} quarterly {/negyedév} yearly {/év} other {{interval}}}"
-  },
-  "billing.resubscribe-modal.next-charge": {
-    "defaultMessage": "Következő befizetés: <charge-date>{date}</charge-date> napon."
-  },
-  "billing.resubscribe-modal.plan-label": {
-    "defaultMessage": "Csomag"
-  },
-  "billing.resubscribe-modal.ram": {
-    "defaultMessage": "{ramGb} GB memória"
-  },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Feliratkozás újra"
-  },
-  "billing.resubscribe-modal.storage": {
-    "defaultMessage": "{storageGb} GB tárhely"
   },
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Újra feliratkozás szerverre"

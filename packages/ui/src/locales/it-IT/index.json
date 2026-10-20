@@ -62,9 +62,6 @@
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Annulla"
   },
-  "billing.resubscribe-modal.cpus": {
-    "defaultMessage": "{sharedCpus} CPU condivise"
-  },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "Stai per riabbonarti al server <server-name>{serverName}</server-name>. L'abbonamento sarà riattivato e il tuo server continuerà a funzionare senza interruzioni."
   },
@@ -77,23 +74,8 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Impossibile caricare i dati dell'abbonamento."
   },
-  "billing.resubscribe-modal.interval": {
-    "defaultMessage": "{intervalOption, select, fiveDays {/5 giorni} monthly {/mese} quarterly {/trimestre} yearly {/anno} other {{interval}}}"
-  },
-  "billing.resubscribe-modal.next-charge": {
-    "defaultMessage": "Il prossimo addebito avverrà il <charge-date>{date}</charge-date>."
-  },
-  "billing.resubscribe-modal.plan-label": {
-    "defaultMessage": "Piano"
-  },
-  "billing.resubscribe-modal.ram": {
-    "defaultMessage": "{ramGb} GB di RAM"
-  },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Riabbonati"
-  },
-  "billing.resubscribe-modal.storage": {
-    "defaultMessage": "{storageGb} GB di spazio"
   },
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Riabbonamento al server"
@@ -7275,4 +7257,3 @@
     "defaultMessage": "Tipo"
   }
 }
-

@@ -20,12 +20,6 @@
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "ยกเลิก"
   },
-  "billing.resubscribe-modal.ram": {
-    "defaultMessage": "{ramGb} กิกะไบต์ RAM"
-  },
-  "billing.resubscribe-modal.storage": {
-    "defaultMessage": "{storageGb} กิกะไบต์ พื้นที่จัดเก็บ"
-  },
   "button.accept": {
     "defaultMessage": "ยอมรับ"
   },
@@ -645,4 +639,3 @@
     "defaultMessage": "ภาษา"
   }
 }
-

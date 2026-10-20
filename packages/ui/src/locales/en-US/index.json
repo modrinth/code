@@ -59,14 +59,26 @@
   "badge.release": {
     "defaultMessage": "Release"
   },
+  "billing.resubscribe-modal.add-payment-method": {
+    "defaultMessage": "Add payment method"
+  },
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Cancel"
   },
-  "billing.resubscribe-modal.cpus": {
-    "defaultMessage": "{sharedCpus} Shared CPUs"
+  "billing.resubscribe-modal.change-payment-method": {
+    "defaultMessage": "Change"
+  },
+  "billing.resubscribe-modal.charged-now": {
+    "defaultMessage": "You'll be charged {total} today, and then every {period} until you cancel. You can cancel anytime from your settings page."
+  },
+  "billing.resubscribe-modal.charged-on-date": {
+    "defaultMessage": "You'll be charged {total} on <charge-date>{date}</charge-date>, and then every {period} until you cancel. You can cancel anytime from your settings page."
   },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "You are about to resubscribe to <server-name>{serverName}</server-name>. Your subscription will be reactivated and your server will continue running without interruption."
+  },
+  "billing.resubscribe-modal.error.payment-method": {
+    "defaultMessage": "Failed to change your payment method."
   },
   "billing.resubscribe-modal.error.text": {
     "defaultMessage": "Cannot resubscribe, failed to load subscription details."
@@ -77,23 +89,38 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Failed to load subscription details."
   },
-  "billing.resubscribe-modal.interval": {
-    "defaultMessage": "{intervalOption, select, fiveDays {/5 days} monthly {/month} quarterly {/quarter} yearly {/year} other {{interval}}}"
+  "billing.resubscribe-modal.no-payment-method": {
+    "defaultMessage": "No payment method selected"
   },
-  "billing.resubscribe-modal.next-charge": {
-    "defaultMessage": "Your next charge will be on <charge-date>{date}</charge-date>."
+  "billing.resubscribe-modal.period": {
+    "defaultMessage": "{interval, select, fiveDays {5 days} monthly {month} quarterly {3 months} yearly {year} other {{interval}}}"
   },
-  "billing.resubscribe-modal.plan-label": {
-    "defaultMessage": "Plan"
+  "billing.resubscribe-modal.plan-item": {
+    "defaultMessage": "Modrinth Hosting ({plan})"
   },
-  "billing.resubscribe-modal.ram": {
-    "defaultMessage": "{ramGb} GB RAM"
+  "billing.resubscribe-modal.plan.custom": {
+    "defaultMessage": "Custom"
+  },
+  "billing.resubscribe-modal.plan.large": {
+    "defaultMessage": "Large"
+  },
+  "billing.resubscribe-modal.plan.medium": {
+    "defaultMessage": "Medium"
+  },
+  "billing.resubscribe-modal.plan.small": {
+    "defaultMessage": "Small"
+  },
+  "billing.resubscribe-modal.preview-error": {
+    "defaultMessage": "We couldn't calculate the cost of resubscribing. Make sure your payment method has a billing address, then try again."
+  },
+  "billing.resubscribe-modal.recurring-notice": {
+    "defaultMessage": "By clicking \"Resubscribe\", you are resuming a recurring subscription."
   },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Resubscribe"
   },
-  "billing.resubscribe-modal.storage": {
-    "defaultMessage": "{storageGb} GB Storage"
+  "billing.resubscribe-modal.tax-item": {
+    "defaultMessage": "Tax"
   },
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Resubscribe to Server"

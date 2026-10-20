@@ -56,9 +56,6 @@
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Avbryt"
   },
-  "billing.resubscribe-modal.cpus": {
-    "defaultMessage": "{sharedCpus} Delade CPUs"
-  },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "Du är på väg att återprenumerera till <server-name>{serverName}</server-name>. Din prenumeration kommer återaktiveras och din server kommer fortsätta köra utan avbrott."
   },
@@ -71,23 +68,8 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Kunde inte att ladda in prenumerationsdetaljer."
   },
-  "billing.resubscribe-modal.interval": {
-    "defaultMessage": "{intervalOption, select, fiveDays {/5 dagar} monthly {/månad} quarterly {/kvartalsvis} yearly {/år} other {{interval}}}"
-  },
-  "billing.resubscribe-modal.next-charge": {
-    "defaultMessage": "Din nästa betalning är <charge-date>{date}</charge-date>."
-  },
-  "billing.resubscribe-modal.plan-label": {
-    "defaultMessage": "Plan"
-  },
-  "billing.resubscribe-modal.ram": {
-    "defaultMessage": "{ramGb} GB RAM"
-  },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Återprenumerera"
-  },
-  "billing.resubscribe-modal.storage": {
-    "defaultMessage": "{storageGb} GB lagring"
   },
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Återprenumerera till Server"

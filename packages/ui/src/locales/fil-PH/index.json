@@ -50,9 +50,6 @@
   "billing.resubscribe-modal.error.title": {
     "defaultMessage": "Error"
   },
-  "billing.resubscribe-modal.plan-label": {
-    "defaultMessage": "Plan"
-  },
   "browse.view-prefix": {
     "defaultMessage": "Tingnan:"
   },
@@ -2736,4 +2733,3 @@
     "defaultMessage": "Uri"
   }
 }
-
