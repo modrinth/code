@@ -75,10 +75,10 @@ reqwest = { workspace = true, features = [
   "gzip",
   "http2",
   "json",
-	"system-proxy",
   "multipart",
-	"rustls",
+  "rustls",
   "stream",
+  "system-proxy",
 ] }
 rgb = { workspace = true }
 same-file = { workspace = true }
