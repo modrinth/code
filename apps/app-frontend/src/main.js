@@ -1,6 +1,6 @@
 import 'overlayscrollbars/overlayscrollbars.css'
 
-import { installTooltipDirective } from '@modrinth/ui'
+import { installTooltipDirective, useCodeHighlightTheme } from '@modrinth/ui'
 import { VueQueryPlugin } from '@tanstack/vue-query'
 import { createApp } from 'vue'
 
@@ -24,6 +24,7 @@ if (import.meta.env.DEV) {
 app.use(i18nPlugin)
 app.use(i18nDebugPlugin)
 installTooltipDirective(app)
+useCodeHighlightTheme().start()
 app.directive('overlay-scrollbars', overlayScrollbarsDirective)
 
 async function mount() {
