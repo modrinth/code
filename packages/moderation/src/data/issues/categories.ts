@@ -1,4 +1,5 @@
 import { TagsIcon } from '@modrinth/assets'
+import { capitalizeString } from '@modrinth/utils'
 
 import inaccurateMessage from '../messages/checklist/messages/tags/inaccurate.md'
 import optimizationMisusedMessage from '../messages/checklist/messages/tags/optimization-misused.md'
@@ -45,7 +46,7 @@ export const categoriesInaccurateIssue = issue({
 				? resolutionsMisusedMessage
 				: '',
 			tags.length
-				? `Please remove these tags from your project:  \n\n${tags.map((tag) => `- ${tag}`).join('\n')}`
+				? `Please remove these tags from your project:  \n\n${tags.map((tag) => `- ${capitalizeString(tag)}`).join('\n')}`
 				: '',
 		]
 			.filter((message) => message.trim())
