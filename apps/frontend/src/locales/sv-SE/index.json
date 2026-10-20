@@ -4889,15 +4889,6 @@
   "settings.pats.modal.create.title": {
     "message": "Skapa personlig åtkomstnyckel"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "Ta bort denna token"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "Det här kommer att radera den här nyckeln för evigt (asså för evigt)."
-  },
-  "settings.pats.modal.delete.title": {
-    "message": "Är du saker på att du vill radera den här nyckeln?"
-  },
   "settings.pats.modal.edit.title": {
     "message": "Ändra personlig åtkomstnyckel"
   },
@@ -4927,9 +4918,6 @@
   },
   "settings.sessions.current-session": {
     "message": "Nuvarande session"
-  },
-  "settings.sessions.description": {
-    "message": "Här är alla enheter som är inloggade på ditt Modrinth-konto. Du kan logga ut från var och en individuellt.\n\nOm du ser en enhet som du inte känner igen, logga ut på den enheten och byt lösenordet på ditt Modrinth-konto omedelbart."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Senast åtkommen {ago}"

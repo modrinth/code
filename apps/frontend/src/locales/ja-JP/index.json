@@ -4820,15 +4820,6 @@
   "settings.pats.modal.create.title": {
     "message": "個人用アクセストークンを作成"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "このトークンを削除"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "これにより、このトークンは永久に削除されます(本当に永久です)。"
-  },
-  "settings.pats.modal.delete.title": {
-    "message": "本当にこのトークンを削除してもよろしいですか？"
-  },
   "settings.pats.modal.edit.title": {
     "message": "個人用アクセストークンを編集"
   },
@@ -4858,9 +4849,6 @@
   },
   "settings.sessions.current-session": {
     "message": "現在のセッション"
-  },
-  "settings.sessions.description": {
-    "message": "現在、お使いのModrinthアカウントでログインしているデバイスは以下の通りです。各デバイスから個別にログアウトできます。\n\nもし覚えのないログイン履歴があった場合は、そのデバイスからログアウトし、すぐにModrinthアカウントのパスワードを変更してください。"
   },
   "settings.sessions.last-accessed-ago": {
     "message": "最終アクセス: {ago}"

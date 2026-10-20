@@ -3767,15 +3767,6 @@
   "settings.pats.modal.create.title": {
     "message": "Lag personlig tilgangs-token"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "Slett denne token-en"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "Denne kommer til å fjerne token-en for alltid (sånn... for alltid-for alltid)."
-  },
-  "settings.pats.modal.delete.title": {
-    "message": "Er du sikker på at du vil slette denne token-en?"
-  },
   "settings.pats.modal.edit.title": {
     "message": "Rediger personlig tilgangs-token"
   },
@@ -3805,9 +3796,6 @@
   },
   "settings.sessions.current-session": {
     "message": "Nåverende økt"
-  },
-  "settings.sessions.description": {
-    "message": "Her er alle enhetene som er logga inn med Modrinth-kontoen din akkurat nå. Du kan logge ut av hver av de for seg sjøl.\n\nViss du ser ei oppføring som du ikke kjenner igjen, logg ut av enheta og endre Modrinth-konto-passordet ditt med en gang."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Sist tilgang {ago}"

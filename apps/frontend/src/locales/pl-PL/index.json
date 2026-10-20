@@ -5552,15 +5552,6 @@
   "settings.pats.modal.create.title": {
     "message": "Utwórz klucz dostępu osobistego"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "Usuń klucz"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "Usunie to klucz na zawsze (na serio na zawsze)."
-  },
-  "settings.pats.modal.delete.title": {
-    "message": "Czy na pewno chcesz usunąć ten klucz?"
-  },
   "settings.pats.modal.edit.title": {
     "message": "Edytuj klucz dostępu osobistego"
   },
@@ -5590,9 +5581,6 @@
   },
   "settings.sessions.current-session": {
     "message": "Aktualna sesja"
-  },
-  "settings.sessions.description": {
-    "message": "Tu pokazane są wszystkie urządzenia zalogowane na Twoje konto Modrinth. Możesz wylogować się z każdego indywidualnie.\n\nJeżeli widzisz tu wpis, którego nie rozpoznajesz, natychmiast wyloguj to urządzenie i zmień hasło swojego konta Modrinth."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Ostatnio użyte {ago}"

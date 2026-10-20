@@ -5312,15 +5312,6 @@
   "settings.pats.modal.create.title": {
     "message": "Persoonlijke toegangstoken aanmaken"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "Verwijder deze token"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "Dit zal deze token voor altijd verwijderen (echt voor altijd)."
-  },
-  "settings.pats.modal.delete.title": {
-    "message": "Weet u zeker dat u deze token wilt verwijderen?"
-  },
   "settings.pats.modal.edit.title": {
     "message": "Persoonlijke toegangstoken bewerken"
   },
@@ -5350,9 +5341,6 @@
   },
   "settings.sessions.current-session": {
     "message": "Huidige sessie"
-  },
-  "settings.sessions.description": {
-    "message": "Hier vind je alle apparaten die momenteel zijn aangemeld bij je Modrinth-account. Je kunt je op elk apparaat afzonderlijk afmelden.\n\nAls je een vermelding ziet die je niet herkent, meld je dan af op dat apparaat en wijzig onmiddellijk het wachtwoord van je Modrinth-account."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Laatst geopend {ago}"

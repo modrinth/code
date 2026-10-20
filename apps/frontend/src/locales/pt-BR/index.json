@@ -5561,15 +5561,6 @@
   "settings.pats.modal.create.title": {
     "message": "Criar token pessoal de acesso"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "Excluir este token"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "Isto removerá esse token para sempre (para sempre mesmo)."
-  },
-  "settings.pats.modal.delete.title": {
-    "message": "Tem certeza de que deseja excluir este token?"
-  },
   "settings.pats.modal.edit.title": {
     "message": "Editar token pessoal de acesso"
   },
@@ -5599,9 +5590,6 @@
   },
   "settings.sessions.current-session": {
     "message": "Sessão atual"
-  },
-  "settings.sessions.description": {
-    "message": "Aqui estão todos os dispositivos que estão conectados à sua conta do Modrinth. Você pode sair de cada um individualmente.\n\nSe você não reconhece algo nesta lista, revogue a sessão e altere a senha da sua conta do Modrinth imediatamente."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Último acesso {ago}"

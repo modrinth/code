@@ -5537,15 +5537,6 @@
   "settings.pats.modal.create.title": {
     "message": "Személyes elérési token létrehozása"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "Token törlése"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "Ez örökre törölni fogja ezt a tokent (tényleg örökre)."
-  },
-  "settings.pats.modal.delete.title": {
-    "message": "Biztosan törölni akarod ezt a tokent?"
-  },
   "settings.pats.modal.edit.title": {
     "message": "Személyes elérési token szerkesztése"
   },
@@ -5575,9 +5566,6 @@
   },
   "settings.sessions.current-session": {
     "message": "Jelenlegi munkamenet"
-  },
-  "settings.sessions.description": {
-    "message": "Itt találhatók azok az eszközök, amelyek jelenleg be vannak jelentkezve a Modrinth fiókodba. Mindegyikről külön-külön kijelentkezhetsz.\n\nHa nem ismerős bejegyzést látsz, jelentkezz ki az adott eszközről, és azonnal változtasd meg Modrinth fiókod jelszavát."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Legutoljára hozzáférve {ago}"

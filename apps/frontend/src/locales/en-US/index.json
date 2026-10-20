@@ -6677,6 +6677,12 @@
   "settings.applications.description.intro": {
     "message": "Applications can be used to authenticate Modrinth's users with your products. For more information, see <docs-link>Modrinth's API documentation</docs-link>."
   },
+  "settings.applications.empty-state.description": {
+    "message": "Applications you create will appear here."
+  },
+  "settings.applications.empty-state.heading": {
+    "message": "No applications"
+  },
   "settings.applications.field.description": {
     "message": "Description"
   },
@@ -6712,6 +6718,9 @@
   },
   "settings.applications.modal.header": {
     "message": "Application information"
+  },
+  "settings.applications.no-scopes": {
+    "message": "No scopes"
   },
   "settings.applications.notification.icon-updated.description": {
     "message": "Your application icon has been updated."
@@ -6974,6 +6983,12 @@
   "settings.pats.description": {
     "message": "PATs can be used to access Modrinth's API. They can be created and revoked at any time. For more information, see <doc-link>Modrinth's API documentation</doc-link>."
   },
+  "settings.pats.empty-state.description": {
+    "message": "Tokens you create will appear here."
+  },
+  "settings.pats.empty-state.heading": {
+    "message": "No personal access tokens"
+  },
   "settings.pats.modal.create.action": {
     "message": "Create PAT"
   },
@@ -6989,23 +7004,29 @@
   "settings.pats.modal.create.title": {
     "message": "Create personal access token"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "Delete this token"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "This will remove this token forever (like really forever)."
-  },
-  "settings.pats.modal.delete.title": {
-    "message": "Are you sure you want to delete this token?"
-  },
   "settings.pats.modal.edit.title": {
     "message": "Edit personal access token"
+  },
+  "settings.pats.modal.revoke.action": {
+    "message": "Revoke this token"
+  },
+  "settings.pats.modal.revoke.description": {
+    "message": "This token will immediately be invalidated and anything you have set up using it will stop working. This action cannot be undone."
+  },
+  "settings.pats.modal.revoke.title": {
+    "message": "Are you sure you want to revoke this token?"
+  },
+  "settings.pats.token.access-token": {
+    "message": "Access token"
   },
   "settings.pats.token.action.edit": {
     "message": "Edit token"
   },
   "settings.pats.token.action.revoke": {
     "message": "Revoke token"
+  },
+  "settings.pats.token.disclaimer": {
+    "message": "Save this token now. You will only be able to view it once. When you leave this page, you won't be able to see it again."
   },
   "settings.pats.token.expired-ago": {
     "message": "Expired {ago}"
@@ -7019,20 +7040,38 @@
   "settings.pats.token.never-used": {
     "message": "Never used"
   },
+  "settings.pats.token.no-permissions": {
+    "message": "No permissions"
+  },
   "settings.sessions.action.revoke-session": {
     "message": "Revoke session"
   },
   "settings.sessions.created-ago": {
-    "message": "Created {ago}"
+    "message": "Signed in {ago}"
   },
   "settings.sessions.current-session": {
     "message": "Current session"
   },
-  "settings.sessions.description": {
-    "message": "Here are all the devices that are currently logged in with your Modrinth account. You can log out of each one individually.\n\nIf you see an entry you don't recognize, log out of that device and change your Modrinth account password immediately."
+  "settings.sessions.description.1": {
+    "message": "These are all the devices currently signed in with your Modrinth account. You can sign out of each one individually by revoking their session. If you don't recognize a device, sign out of that device and change your Modrinth account password immediately."
+  },
+  "settings.sessions.description.2": {
+    "message": "Locations listed may be approximate since they are based on the IP address. VPNs and some internet service providers may obscure the actual location."
+  },
+  "settings.sessions.empty-state.description": {
+    "message": "Devices signed in to your account will appear here."
+  },
+  "settings.sessions.empty-state.heading": {
+    "message": "No active sessions"
+  },
+  "settings.sessions.ip": {
+    "message": "IP address: {ip}"
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Last accessed {ago}"
+  },
+  "settings.sessions.modrinth-app": {
+    "message": "Modrinth App"
   },
   "settings.sessions.unknown-os": {
     "message": "Unknown OS"

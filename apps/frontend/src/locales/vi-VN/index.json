@@ -5567,15 +5567,6 @@
   "settings.pats.modal.create.title": {
     "message": "Tạo token truy cập cá nhân"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "Xoá token này"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "Thao tác này sẽ xóa vĩnh viễn token này (vĩnh viễn thật sự)."
-  },
-  "settings.pats.modal.delete.title": {
-    "message": "Bạn có chắc chắn muốn xoá token này không?"
-  },
   "settings.pats.modal.edit.title": {
     "message": "Chỉnh sửa token truy cập cá nhân"
   },
@@ -5605,9 +5596,6 @@
   },
   "settings.sessions.current-session": {
     "message": "Phiên hiện tại"
-  },
-  "settings.sessions.description": {
-    "message": "Dưới đây là tất cả các thiết bị hiện đang đăng nhập bằng tài khoản Modrinth của bạn. Bạn có thể đăng xuất từng thiết bị riêng lẻ.\n\nNếu bạn thấy một thiết bị không quen thuộc, hãy đăng xuất khỏi thiết bị đó và đổi mật khẩu tài khoản Modrinth ngay lập tức."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Truy cập lần cuối {ago}"

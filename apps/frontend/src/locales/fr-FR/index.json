@@ -5507,15 +5507,6 @@
   "settings.pats.modal.create.title": {
     "message": "Créer un jeton d'accès personnel"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "Supprimer ce jeton"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "Ceci supprimera définitivement ce jeton (pour toujours)."
-  },
-  "settings.pats.modal.delete.title": {
-    "message": "Êtes-vous sûr de vouloir supprimer ce jeton ?"
-  },
   "settings.pats.modal.edit.title": {
     "message": "Modifier le jeton d'accès personnel"
   },
@@ -5545,9 +5536,6 @@
   },
   "settings.sessions.current-session": {
     "message": "Session actuelle"
-  },
-  "settings.sessions.description": {
-    "message": "Voici tous les appareils actuellement connectés à votre compte Modrinth. Vous pouvez vous déconnecter de chacun d'eux individuellement.\n\nSi vous voyez une connexion inconnue sur un appareil, déconnectez-vous de celui-ci et changez le mot de passe de votre compte Modrinth immédiatement."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Dernier accès {ago}"

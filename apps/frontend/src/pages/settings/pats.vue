@@ -1,5 +1,5 @@
 <template>
-	<div class="universal-card">
+	<div class="flex flex-col">
 		<ConfirmModal
 			ref="modal_confirm"
 			:title="formatMessage(deleteModalMessages.title)"
@@ -72,7 +72,7 @@
 				</div>
 
 				<div class="ml-auto mt-4 flex gap-2">
-					<Button type="outlined" @click="$refs.patModal.hide()">
+					<Button type="outlined" @click="patModal.hide()">
 						<XIcon />
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</Button>
@@ -100,27 +100,14 @@
 			</div>
 		</NewModal>
 
-		<div class="header__row">
-			<div class="header__title">
-				<h2 class="text-2xl">{{ formatMessage(commonSettingsMessages.pats) }}</h2>
-			</div>
-			<Button
-				type="colored"
-				color="brand"
-				@click="
-					() => {
-						name = null
-						scopesVal = 0
-						expires = null
-						editPatId = null
-						$refs.patModal.show()
-					}
-				"
-			>
-				<PlusIcon /> {{ formatMessage(messages.create) }}
+		<div class="flex flex-wrap items-center justify-between gap-3">
+			<h2 class="m-0 text-2xl font-semibold">{{ formatMessage(commonSettingsMessages.pats) }}</h2>
+			<Button type="colored" color="brand" @click="openCreatePat">
+				<PlusIcon />
+				{{ formatMessage(messages.create) }}
 			</Button>
 		</div>
-		<p>
+		<p class="mb-4 mt-2 leading-tight">
 			<IntlFormatted :message-id="messages.description">
 				<template #doc-link="{ children }">
 					<a class="text-link" href="https://docs.modrinth.com">
@@ -129,84 +116,161 @@
 				</template>
 			</IntlFormatted>
 		</p>
-		<div v-for="pat in displayPats" :key="pat.id" class="universal-card recessed token">
-			<div>
-				<div>
-					<strong>{{ pat.name }}</strong>
-				</div>
-				<div>
-					<template v-if="createdPatTokens[pat.id] || pat.access_token">
-						<CopyCode :text="createdPatTokens[pat.id] || pat.access_token" />
-					</template>
-					<template v-else>
-						<span v-tooltip="pat.last_used ? formatDateTime(pat.last_used) : null">
-							<template v-if="pat.last_used">
-								{{
-									formatMessage(tokenMessages.lastUsed, {
-										ago: formatRelativeTime(pat.last_used),
-									})
-								}}
-							</template>
-							<template v-else>{{ formatMessage(tokenMessages.neverUsed) }}</template>
-						</span>
-						⋅
-						<span v-tooltip="Date.parse(pat.expires) ? formatDateTime(pat.expires) : null">
-							<template v-if="new Date(pat.expires) > new Date()">
-								{{
-									formatMessage(tokenMessages.expiresIn, {
-										inTime: formatRelativeTime(pat.expires),
-									})
-								}}
-							</template>
-							<template v-else>
-								{{
-									formatMessage(tokenMessages.expiredAgo, {
-										ago: formatRelativeTime(pat.expires),
-									})
-								}}
-							</template>
-						</span>
-						⋅
-						<span v-tooltip="formatDateTime(pat.created)">
-							{{
-								formatMessage(commonMessages.createdAgoLabel, {
-									ago: formatRelativeTime(pat.created),
-								})
-							}}
-						</span>
-					</template>
+
+		<template v-if="isLoading">
+			<div class="flex flex-col gap-3">
+				<div
+					v-for="i in 2"
+					:key="`pat-skeleton-${i}`"
+					class="overflow-hidden rounded-2xl border border-solid border-surface-4 bg-surface-3"
+				>
+					<div
+						class="flex flex-wrap items-center gap-3 border-0 border-b border-solid border-surface-4 p-4"
+					>
+						<div class="size-12 shrink-0 animate-pulse rounded-xl bg-surface-4" />
+						<div class="flex min-w-0 flex-1 flex-col gap-2">
+							<div class="h-4 w-36 animate-pulse rounded-lg bg-surface-4" />
+							<div class="h-3 w-64 max-w-full animate-pulse rounded-lg bg-surface-4" />
+						</div>
+						<div class="mb-auto flex gap-2">
+							<div class="h-9 w-28 animate-pulse rounded-xl bg-surface-4" />
+							<div class="h-9 w-40 animate-pulse rounded-xl bg-surface-4" />
+						</div>
+					</div>
+					<div class="bg-surface-2 p-4">
+						<div class="mb-3 h-3 w-28 animate-pulse rounded-lg bg-surface-3" />
+						<div class="grid gap-2 sm:grid-cols-2">
+							<div
+								v-for="j in 4"
+								:key="`pat-skeleton-${i}-scope-${j}`"
+								class="h-4 w-full animate-pulse rounded-lg bg-surface-3"
+							/>
+						</div>
+					</div>
 				</div>
 			</div>
-			<div class="token-actions ml-auto flex flex-col gap-2">
-				<Button
-					@click="
-						() => {
-							editPatId = pat.id
-							name = pat.name
-							scopesVal = pat.scopes
-							expires = $dayjs(pat.expires).format('YYYY-MM-DD')
-							$refs.patModal.show()
-						}
-					"
+		</template>
+		<EmptyState
+			v-else-if="displayPats.length === 0"
+			type="empty"
+			:heading="formatMessage(messages.emptyStateHeading)"
+			:description="formatMessage(messages.emptyStateDescription)"
+		/>
+		<div v-else class="flex flex-col gap-3">
+			<div
+				v-for="pat in displayPats"
+				:key="pat.id"
+				class="rounded-2xl border border-solid border-surface-4 bg-surface-3"
+			>
+				<div
+					class="flex flex-wrap items-start justify-between gap-3 border-0 border-b border-solid border-surface-4 p-4"
 				>
-					<EditIcon /> {{ formatMessage(tokenMessages.edit) }}
-				</Button>
-				<Button
-					@click="
-						() => {
-							deletePatIndex = pat.id
-							$refs.modal_confirm.show()
-						}
-					"
-				>
-					<TrashIcon /> {{ formatMessage(tokenMessages.revoke) }}
-				</Button>
+					<div class="flex min-w-0 flex-1 items-center gap-3">
+						<div
+							class="flex size-12 shrink-0 items-center justify-center rounded-xl border border-solid border-surface-5 bg-surface-4 text-contrast"
+						>
+							<KeyIcon class="size-6" />
+						</div>
+						<div class="flex min-w-0 flex-col gap-0.5">
+							<h2 class="m-0 break-words text-base font-semibold">{{ pat.name }}</h2>
+							<PageHeaderMetadata>
+								<PageHeaderMetadataItem
+									v-if="pat.last_used"
+									:tooltip="formatDateTime(pat.last_used)"
+								>
+									{{
+										formatMessage(tokenMessages.lastUsed, {
+											ago: formatRelativeTime(pat.last_used),
+										})
+									}}
+								</PageHeaderMetadataItem>
+								<PageHeaderMetadataItem v-else>
+									{{ formatMessage(tokenMessages.neverUsed) }}
+								</PageHeaderMetadataItem>
+								<PageHeaderMetadataItem
+									:class="isPatExpired(pat) ? '!text-red' : undefined"
+									:tooltip="Date.parse(pat.expires) ? formatDateTime(pat.expires) : undefined"
+								>
+									{{
+										isPatExpired(pat)
+											? formatMessage(tokenMessages.expiredAgo, {
+													ago: formatRelativeTime(pat.expires),
+												})
+											: formatMessage(tokenMessages.expiresIn, {
+													inTime: formatRelativeTime(pat.expires),
+												})
+									}}
+								</PageHeaderMetadataItem>
+								<PageHeaderMetadataItem :tooltip="formatDateTime(pat.created)">
+									{{
+										formatMessage(commonMessages.createdAgoLabel, {
+											ago: formatRelativeTime(pat.created),
+										})
+									}}
+								</PageHeaderMetadataItem>
+							</PageHeaderMetadata>
+						</div>
+					</div>
+					<div class="flex shrink-0 flex-wrap gap-2">
+						<Button @click="openEditPat(pat)">
+							<EditIcon />
+							{{ formatMessage(tokenMessages.edit) }}
+						</Button>
+						<Button type="colored" color="red" @click="confirmRemovePat(pat.id)">
+							<XCircleIcon />
+							{{ formatMessage(tokenMessages.revoke) }}
+						</Button>
+					</div>
+				</div>
+				<div class="flex flex-col gap-3 rounded-b-2xl bg-surface-2 p-4">
+					<div v-if="visibleToken(pat)">
+						<label :for="`pat-token-${pat.id}`" class="mb-1 flex font-semibold text-contrast">
+							{{ formatMessage(tokenMessages.accessToken) }}
+						</label>
+						<div :id="`pat-token-${pat.id}`" class="max-w-full overflow-x-auto">
+							<CopyCode :text="visibleToken(pat)" />
+						</div>
+						<p v-if="isNewlyCreatedToken(pat)" class="mb-0 mt-2 text-sm text-orange">
+							{{ formatMessage(tokenMessages.tokenDisclaimer) }}
+						</p>
+					</div>
+					<div>
+						<label :for="`pat-permissions-${pat.id}`" class="mb-1 flex font-semibold text-contrast">
+							{{ formatMessage(commonMessages.permissionsLabel) }}
+						</label>
+						<p
+							v-if="patScopes(pat).length === 0"
+							:id="`pat-permissions-${pat.id}`"
+							class="m-0 text-secondary"
+						>
+							{{ formatMessage(tokenMessages.noPermissions) }}
+						</p>
+						<div v-else :id="`pat-permissions-${pat.id}`" class="grid gap-1 sm:grid-cols-2">
+							<div
+								v-for="(scope, index) in patScopes(pat)"
+								:key="`${pat.id}-scope-${index}`"
+								class="flex items-center gap-1"
+							>
+								<CheckIcon class="size-5 shrink-0 text-green" />
+								{{ scope }}
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
 </template>
 <script setup>
-import { EditIcon, PlusIcon, SaveIcon, TrashIcon, XIcon } from '@modrinth/assets'
+import {
+	CheckIcon,
+	EditIcon,
+	KeyIcon,
+	PlusIcon,
+	SaveIcon,
+	XCircleIcon,
+	XIcon,
+} from '@modrinth/assets'
 import {
 	Button,
 	Checkbox,
@@ -216,11 +280,14 @@ import {
 	CopyCode,
 	DatePicker,
 	defineMessages,
+	EmptyState,
 	injectModrinthClient,
 	injectNotificationManager,
 	Input,
 	IntlFormatted,
 	NewModal,
+	PageHeaderMetadata,
+	PageHeaderMetadataItem,
 	useFormatDateTime,
 	useRelativeTime,
 	useVIntl,
@@ -276,16 +343,17 @@ const createModalMessages = defineMessages({
 
 const deleteModalMessages = defineMessages({
 	title: {
-		id: 'settings.pats.modal.delete.title',
-		defaultMessage: 'Are you sure you want to delete this token?',
+		id: 'settings.pats.modal.revoke.title',
+		defaultMessage: 'Are you sure you want to revoke this token?',
 	},
 	description: {
-		id: 'settings.pats.modal.delete.description',
-		defaultMessage: 'This will remove this token forever (like really forever).',
+		id: 'settings.pats.modal.revoke.description',
+		defaultMessage:
+			'This token will immediately be invalidated and anything you have set up using it will stop working. This action cannot be undone.',
 	},
 	action: {
-		id: 'settings.pats.modal.delete.action',
-		defaultMessage: 'Delete this token',
+		id: 'settings.pats.modal.revoke.action',
+		defaultMessage: 'Revoke this token',
 	},
 })
 
@@ -298,6 +366,14 @@ const messages = defineMessages({
 	create: {
 		id: 'settings.pats.action.create',
 		defaultMessage: 'Create a PAT',
+	},
+	emptyStateHeading: {
+		id: 'settings.pats.empty-state.heading',
+		defaultMessage: 'No personal access tokens',
+	},
+	emptyStateDescription: {
+		id: 'settings.pats.empty-state.description',
+		defaultMessage: 'Tokens you create will appear here.',
 	},
 })
 
@@ -326,6 +402,18 @@ const tokenMessages = defineMessages({
 		id: 'settings.pats.token.expired-ago',
 		defaultMessage: 'Expired {ago}',
 	},
+	accessToken: {
+		id: 'settings.pats.token.access-token',
+		defaultMessage: 'Access token',
+	},
+	tokenDisclaimer: {
+		id: 'settings.pats.token.disclaimer',
+		defaultMessage: `Save this token now. You will only be able to view it once. When you leave this page, you won't be able to see it again.`,
+	},
+	noPermissions: {
+		id: 'settings.pats.token.no-permissions',
+		defaultMessage: 'No permissions',
+	},
 })
 
 definePageMeta({
@@ -333,11 +421,11 @@ definePageMeta({
 })
 
 useHead({
-	title: `${formatMessage(commonSettingsMessages.pats)} - Modrinth`,
+	title: () => `${formatMessage(commonSettingsMessages.pats)} - Modrinth`,
 })
 
 const data = useNuxtApp()
-const { scopesToLabels } = useScopes()
+const { scopesToLabels, scopesToDefinitions } = useScopes()
 const patModal = ref()
 const minimumPatExpiry = data.$dayjs().add(1, 'day').format('YYYY-MM-DD')
 
@@ -352,16 +440,19 @@ const isExpiryInFuture = computed(
 )
 
 const deletePatIndex = ref(null)
+const modal_confirm = ref()
 
 const loading = ref(false)
 
-const { data: pats } = useQuery({
+const { data: pats, isLoading } = useQuery({
 	queryKey: ['pat'],
 	queryFn: () => client.labrinth.pats_v2.list(),
-	placeholderData: [],
 })
+
 const displayPats = computed(() => {
-	return pats.value.toSorted((a, b) => new Date(b.created) - new Date(a.created))
+	return [...(pats.value ?? [])].sort(
+		(a, b) => new Date(b.created).getTime() - new Date(a.created).getTime(),
+	)
 })
 
 const scopeCategories = computed(() => {
@@ -419,6 +510,43 @@ const scopeCategories = computed(() => {
 	].filter((c) => c.scopes.length > 0)
 })
 
+function openCreatePat() {
+	name.value = null
+	scopesVal.value = BigInt(0)
+	expires.value = null
+	editPatId.value = null
+	patModal.value.show()
+}
+
+function openEditPat(pat) {
+	editPatId.value = pat.id
+	name.value = pat.name
+	scopesVal.value = BigInt(pat.scopes)
+	expires.value = data.$dayjs(pat.expires).format('YYYY-MM-DD')
+	patModal.value.show()
+}
+
+function confirmRemovePat(id) {
+	deletePatIndex.value = id
+	modal_confirm.value.show()
+}
+
+function visibleToken(pat) {
+	return createdPatTokens.value[pat.id] || pat.access_token || null
+}
+
+function isNewlyCreatedToken(pat) {
+	return Boolean(createdPatTokens.value[pat.id])
+}
+
+function isPatExpired(pat) {
+	return new Date(pat.expires) <= new Date()
+}
+
+function patScopes(pat) {
+	return scopesToDefinitions(BigInt(pat.scopes || 0))
+}
+
 async function createPat() {
 	startLoading()
 	loading.value = true
@@ -468,11 +596,15 @@ async function editPat() {
 
 async function removePat(id) {
 	startLoading()
+	const previous = queryClient.getQueryData(['pat'])
+	queryClient.setQueryData(['pat'], (old) => (old ?? []).filter((pat) => pat.id !== id))
 	try {
-		pats.value = pats.value.filter((x) => x.id !== id)
 		await client.labrinth.pats_v2.delete(id)
-		await queryClient.invalidateQueries({ queryKey: ['pat'] })
+		createdPatTokens.value = Object.fromEntries(
+			Object.entries(createdPatTokens.value).filter(([key]) => key !== String(id)),
+		)
 	} catch (err) {
+		queryClient.setQueryData(['pat'], previous)
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
 			text: err.data ? err.data.description : err,
@@ -485,16 +617,5 @@ async function removePat(id) {
 <style lang="scss" scoped>
 .scope-items :deep(.checkbox-outer) {
 	justify-content: flex-start !important;
-}
-
-.token {
-	display: flex;
-	flex-direction: column;
-	gap: 0.5rem;
-
-	@media screen and (min-width: 800px) {
-		flex-direction: row;
-		align-items: center;
-	}
 }
 </style>

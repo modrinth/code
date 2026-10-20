@@ -5558,15 +5558,6 @@
   "settings.pats.modal.create.title": {
     "message": "Crea un token di accesso (PAT)"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "Elimina questo token"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "Questo eliminerà definitivamente questo token (sul serio, per sempre)."
-  },
-  "settings.pats.modal.delete.title": {
-    "message": "Vuoi davvero eliminare questo token?"
-  },
   "settings.pats.modal.edit.title": {
     "message": "Modifica token di accesso (PAT)"
   },
@@ -5596,9 +5587,6 @@
   },
   "settings.sessions.current-session": {
     "message": "Sessione corrente"
-  },
-  "settings.sessions.description": {
-    "message": "Ecco tutti i dispositivi su cui hai effettuato l'accesso al tuo account di Modrinth. Puoi uscire da ciascuno individualmente.\n\nSe noti un dispositivo che non riconosci, disconnettiti da esso e cambia la password del tuo account Modrinth immediatamente."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Ultimo accesso {ago}"

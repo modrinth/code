@@ -5549,15 +5549,6 @@
   "settings.pats.modal.create.title": {
     "message": "Створити особистий токен доступу"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "Видалити цей токен"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "Це видалить цей токен назавжди (тобто справді навіки)."
-  },
-  "settings.pats.modal.delete.title": {
-    "message": "Справді бажаєте видалити цей токен?"
-  },
   "settings.pats.modal.edit.title": {
     "message": "Редагування особистого токену доступу"
   },
@@ -5587,9 +5578,6 @@
   },
   "settings.sessions.current-session": {
     "message": "Поточний сеанс"
-  },
-  "settings.sessions.description": {
-    "message": "Тут зазначені всі пристрої, на яких виконано вхід у ваш обліковий запис Modrinth. Ви можете вийти з кожного окремо.\n\nЯкщо бачите пристрій, котрий не впізнаєте, — негайно вийдіть з нього та змініть пароль до облікового запису."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Остання активність {ago}"

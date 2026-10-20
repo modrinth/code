@@ -5333,15 +5333,6 @@
   "settings.pats.modal.create.title": {
     "message": "개인 액세스 토큰 생성"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "이 토큰 삭제"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "토큰이 영구적으로 삭제됩니다 (영원히)."
-  },
-  "settings.pats.modal.delete.title": {
-    "message": "정말로 이 토큰을 삭제할까요?"
-  },
   "settings.pats.modal.edit.title": {
     "message": "개인 액세스 토큰 편집"
   },
@@ -5371,9 +5362,6 @@
   },
   "settings.sessions.current-session": {
     "message": "현재 세션"
-  },
-  "settings.sessions.description": {
-    "message": "현재 Modrinth 계정으로 로그인 중인 장치 목록입니다. 여기서 각 장치를 개별적으로 로그아웃시키실 수 있습니다.\n\n만약 확인되지 않는 장치가 있다면 장치를 로그아웃시키신 후 즉시 Modrinth 계정 비밀번호를 변경하세요."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "{ago} 에 접근함"
