@@ -82,6 +82,7 @@
 							v-else-if="control.type === 'select' && control.multiple"
 							:model-value="panels.selectValues(panelBinding, control)"
 							:options="control.options"
+							:max-tag-rows="3"
 							:placeholder="control.placeholder ?? formatMessage(controlMessages.select)"
 							:disabled="control.disabled"
 							:aria-label="control.label"

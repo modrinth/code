@@ -128,7 +128,7 @@
 										:model-value="issue.custom.facets"
 										:options="facetOptions"
 										searchable
-										:max-tag-rows="4"
+										:max-tag-rows="3"
 										:search-placeholder="formatMessage(messages.searchFacets)"
 										:disabled="pending || disabled"
 										:placeholder="formatMessage(messages.addFacets)"

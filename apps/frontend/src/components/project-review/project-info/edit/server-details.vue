@@ -30,7 +30,7 @@
 					v-model="languages"
 					:options="languageOptions"
 					:disabled="saving"
-					:max-tag-rows="2"
+					:max-tag-rows="3"
 					searchable
 					include-select-all-option
 				/>

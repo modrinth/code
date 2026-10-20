@@ -184,6 +184,7 @@ reset()
 									v-if="control.type === 'select' && control.multiple"
 									:model-value="panels.selectValues(binding, control)"
 									:options="control.options"
+									:max-tag-rows="3"
 									:placeholder="control.placeholder ?? 'Select an option'"
 									:aria-label="control.label"
 									:aria-required="control.required"

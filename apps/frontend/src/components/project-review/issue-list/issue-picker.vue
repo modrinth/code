@@ -3,6 +3,7 @@
 		ref="picker"
 		:model-value="draft"
 		:options="options"
+		:max-tag-rows="3"
 		:disabled="pending"
 		:searchable="true"
 		:search-placeholder="formatMessage(messages.search)"

@@ -26,6 +26,7 @@
 				<MultiSelect
 					:model-value="groupedOptions ? selectedRowValues(row) : optionDraft"
 					:options="optionsForRow(row)"
+					:max-tag-rows="3"
 					:disabled="pending || disabled"
 					:dropdown-width="280"
 					lock-dropdown-horizontal-position
