@@ -76,7 +76,7 @@ The S3 configuration options are fairly self-explanatory in name, so here's simp
 #### Search, OAuth, and miscellaneous options
 
 `LOCAL_INDEX_INTERVAL`: The interval, in seconds, at which the local database is reindexed for searching. Defaults to `3600` seconds (1 hour).
-`VERSION_INDEX_INTERVAL`: The interval, in seconds, at which versions are reindexed for searching. Defaults to `1800` seconds (30 minutes).
+
 
 The OAuth configuration options are fairly self-explanatory. For help setting up authentication, please contact us on [Discord].
 

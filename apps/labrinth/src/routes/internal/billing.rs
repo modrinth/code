@@ -2311,7 +2311,7 @@ pub async fn stripe_webhook(
                                             )
                                         } else {
                                             // Create a server with the latest version of Minecraft
-                                            let minecraft_versions = crate::database::models::legacy_loader_fields::MinecraftGameVersion::list(
+                                            let minecraft_versions = crate::models::minecraft::MinecraftGameVersion::list(
                                                 Some("release"),
                                                 None,
                                                 &**pool,

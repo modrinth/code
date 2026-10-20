@@ -3,17 +3,17 @@ use std::collections::HashMap;
 
 use super::ApiError;
 use crate::database::models::categories::{Category, ProjectType, ReportType};
-use crate::database::models::loader_fields::{
-    Game, Loader, LoaderField, LoaderFieldEnumValue, LoaderFieldType,
-    LoaderMetadata,
-};
+use crate::database::models::game_item::Game;
+use crate::database::models::loader_item::{Loader, LoaderMetadata};
+use crate::models::exp::minecraft::{Environment, MrpackLoader};
 use crate::models::link_platform::LinkPlatform;
+use crate::models::minecraft::{LoaderFieldEnumValue, compatibility_value};
 use actix_web::{HttpResponse, get, web};
 use strum::IntoEnumIterator;
 use xredis::RedisPool;
 
-use crate::database::PgPool;
-use itertools::Itertools;
+use crate::database::{MinecraftMetaDb, PgPool};
+
 use serde_json::Value;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
@@ -127,26 +127,31 @@ pub async fn loader_list(
         .await
         .wrap_internal_err("fetching loader from Redis")?;
 
-    let loader_fields = LoaderField::get_fields_per_loader(
-        &loaders.iter().map(|x| x.id).collect_vec(),
-        &**pool,
-        &redis,
-    )
-    .await
-    .wrap_internal_err("fetching loader field from Redis")?;
-
     let mut results = loaders
         .into_iter()
-        .map(|x| LoaderData {
-            icon: x.icon,
-            name: x.loader,
-            supported_project_types: x.supported_project_types,
-            supported_games: x.supported_games,
-            supported_fields: loader_fields
-                .get(&x.id)
-                .map(|x| x.iter().map(|x| x.field.clone()).collect_vec())
-                .unwrap_or_default(),
-            metadata: x.metadata,
+        .map(|loader| {
+            let mut supported_fields = Vec::new();
+            if loader
+                .supported_games
+                .iter()
+                .any(|game| game == "minecraft-java")
+            {
+                supported_fields.extend([
+                    "game_versions".to_owned(),
+                    "environment".to_owned(),
+                ]);
+                if loader.loader == "mrpack" {
+                    supported_fields.push("mrpack_loaders".to_owned());
+                }
+            }
+            LoaderData {
+                icon: loader.icon,
+                name: loader.loader,
+                supported_project_types: loader.supported_project_types,
+                supported_games: loader.supported_games,
+                supported_fields,
+                metadata: loader.metadata,
+            }
         })
         .collect::<Vec<_>>();
 
@@ -172,53 +177,56 @@ pub struct LoaderFieldsEnumQuery {
 )]
 #[get("/loader_field")]
 pub async fn loader_fields_list_route(
-    pool: web::Data<PgPool>,
+    minecraft_meta: web::Data<MinecraftMetaDb>,
     web::Query(query): web::Query<LoaderFieldsEnumQuery>,
-    redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
-    loader_fields_list(pool, web::Query(query), redis).await
+    loader_fields_list(minecraft_meta, web::Query(query)).await
 }
 
 pub async fn loader_fields_list(
-    pool: web::Data<PgPool>,
+    minecraft_meta: web::Data<MinecraftMetaDb>,
     query: web::Query<LoaderFieldsEnumQuery>,
-    redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
     let query = query.into_inner();
-    let loader_field = LoaderField::get_fields_all(&**pool, &redis)
-        .await
-        .wrap_internal_err("fetching loader field from Redis")?
-        .into_iter()
-        .find(|x| x.field == query.loader_field)
-        .wrap_request_err_with(|| {
-            format!("'{}' was not a valid loader field.", query.loader_field)
-        })?;
-
-    let (LoaderFieldType::Enum(loader_field_enum_id)
-    | LoaderFieldType::ArrayEnum(loader_field_enum_id)) =
-        loader_field.field_type
-    else {
-        return Err(ApiError::Request(eyre::eyre!(format!(
-            "'{}' is not an enumerable field, but an '{}' field.",
-            query.loader_field,
-            loader_field.field_type.to_str()
-        ))));
+    let mut results = match query.loader_field.as_str() {
+        "game_versions" => {
+            LoaderFieldEnumValue::minecraft_catalog(&minecraft_meta)
+                .await
+                .wrap_internal_err("fetching Minecraft version catalog")?
+        }
+        "environment" => Environment::iter()
+            .map(|value| compatibility_value(2, value.as_str().to_owned()))
+            .collect(),
+        "mrpack_loaders" => MrpackLoader::iter()
+            .map(|value| compatibility_value(3, value.as_str().to_owned()))
+            .collect(),
+        _ => {
+            return Err(ApiError::Request(eyre::eyre!(
+                "`{}` is not a valid loader field",
+                query.loader_field
+            )));
+        }
     };
 
-    let results: Vec<_> = if let Some(filters) = query.filters {
-        LoaderFieldEnumValue::list_filter(
-            loader_field_enum_id,
-            filters,
-            &**pool,
-            &redis,
-        )
-        .await
-        .wrap_internal_err("fetching loader field enum value from Redis")?
-    } else {
-        LoaderFieldEnumValue::list(loader_field_enum_id, &**pool, &redis)
-            .await
-            .wrap_internal_err("fetching loader field enum value from Redis")?
-    };
+    results.sort_by(|a, b| {
+        b.created
+            .cmp(&a.created)
+            .then_with(|| a.value.cmp(&b.value))
+    });
+    if let Some(filters) = query.filters {
+        results.retain(|value| {
+            filters.iter().all(|(key, expected)| match key.as_str() {
+                "type" => value
+                    .ty
+                    .as_deref()
+                    .is_some_and(|ty| expected.as_str() == Some(ty)),
+                "major" => value
+                    .major
+                    .is_some_and(|major| expected.as_bool() == Some(major)),
+                _ => false,
+            })
+        });
+    }
 
     Ok(HttpResponse::Ok().json(results))
 }

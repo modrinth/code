@@ -1,7 +1,7 @@
 use crate::util::error::{ApiContext as _, Context as _};
 
 use super::ApiError;
-use crate::database::models::legacy_loader_fields::{
+use crate::models::minecraft::{
 	legacy_game_version_date, legacy_game_version_name,
 };
 use crate::database::{MinecraftMetaDb, PgPool};

@@ -4,9 +4,7 @@ use crate::auth::{
 };
 use crate::database::PgPool;
 use crate::database::PgTransaction;
-use crate::database::models::loader_fields::{
-    Loader, LoaderField, LoaderFieldEnumValue,
-};
+use crate::database::models::loader_item::Loader;
 use crate::database::models::thread_item::ThreadBuilder;
 use crate::database::models::{self, DBUser, image_item};
 use crate::file_hosting::{FileHost, FileHostPublicity, FileHostingError};
@@ -15,6 +13,9 @@ use crate::models::exp;
 use crate::models::ids::{ImageId, OrganizationId, ProjectId, VersionId};
 use crate::models::images::{Image, ImageContext};
 use crate::models::link_platform::LinkPlatform;
+use crate::models::minecraft::{
+    LoaderField, LoaderFieldEnumValue, VersionField,
+};
 use crate::models::pats::Scopes;
 use crate::models::projects::{
     License, Link, MonetizationStatus, Project, ProjectStatus,
@@ -554,7 +555,7 @@ async fn project_create_inner(
     }
 
     let all_loaders =
-        models::loader_fields::Loader::list(&mut *transaction, redis).await?;
+        models::loader_item::Loader::list(&mut *transaction, redis).await?;
 
     let project_create_data: ProjectCreateData;
     let mut versions;
@@ -818,6 +819,11 @@ async fn project_create_inner(
                 .iter()
                 .map(|x| x.filename.clone())
                 .collect();
+            let version_fields = if let Some(component) = &created_version.components.minecraft_mod {
+                VersionField::from_minecraft_component(created_version.version_id, component).await?
+            } else {
+                Vec::new()
+            };
             // Upload the new jar file
             super::version_creation::upload_file(
                 &mut field,
@@ -829,7 +835,7 @@ async fn project_create_inner(
                 &content_disposition,
                 project_id,
                 created_version.version_id.into(),
-                &created_version.version_fields,
+                &version_fields,
                 version_data.loaders.clone(),
                 version_data.primary_file.is_some(),
                 version_data.primary_file.as_deref() == Some(name),
@@ -977,7 +983,7 @@ async fn project_create_inner(
             })
         }
 
-        let mut project_builder_actual = models::project_item::ProjectBuilder {
+        let project_builder_actual = models::project_item::ProjectBuilder {
             project_id: project_id.into(),
             team_id,
             organization_id: project_create_data
@@ -1016,11 +1022,6 @@ async fn project_create_inner(
             components: exp::ProjectSerial::default(),
         };
         let project_builder = project_builder_actual.clone();
-        for version in &mut project_builder_actual.initial_versions {
-            if version.components.minecraft_mod.is_some() {
-                version.version_fields.clear();
-            }
-        }
 
         let now = Utc::now();
 
@@ -1155,7 +1156,7 @@ async fn create_initial_version(
     version_data: &InitialVersionData,
     project_id: ProjectId,
     author: UserId,
-    all_loaders: &[models::loader_fields::Loader],
+    all_loaders: &[models::loader_item::Loader],
     transaction: &mut PgTransaction<'_>,
     redis: &RedisPool,
 ) -> Result<models::version_item::VersionBuilder, CreateError> {
@@ -1224,14 +1225,19 @@ async fn create_initial_version(
         files: Vec::new(),
         dependencies,
         loaders,
-        version_fields,
         featured: version_data.featured,
         status: VersionStatus::Listed,
         version_type: version_data.release_channel.to_string(),
         requested_status: None,
         ordering: version_data.ordering,
         components: exp::VersionSerial {
-            minecraft_mod: version_data.minecraft_mod.clone(),
+            minecraft_mod: Some(match &version_data.minecraft_mod {
+                Some(component) => component.clone(),
+                None => VersionField::to_minecraft_component(&version_fields)
+                    .map_err(|error| {
+                    CreateError::InvalidInput(error.to_string())
+                })?,
+            }),
             ..Default::default()
         },
     };

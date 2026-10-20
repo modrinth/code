@@ -1,6 +1,6 @@
 use crate::database::PgPool;
-use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
-use crate::database::models::loader_fields::Loader;
+use crate::database::models::loader_item::Loader;
+use crate::models::minecraft::MinecraftGameVersion;
 use crate::routes::ApiError;
 use crate::util::error::Context;
 use arc_swap::ArcSwapOption;

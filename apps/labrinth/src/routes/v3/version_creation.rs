@@ -2,9 +2,6 @@ use super::project_creation::{CreateError, UploadedFile};
 use crate::auth::get_user_from_headers;
 use crate::database::PgPool;
 use crate::database::PgTransaction;
-use crate::database::models::loader_fields::{
-    LoaderField, LoaderFieldEnumValue, VersionField,
-};
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::version_item::{
     DependencyBuilder, VersionBuilder, VersionFileBuilder,
@@ -15,6 +12,9 @@ use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::exp;
 use crate::models::ids::{ImageId, ProjectId, VersionId};
 use crate::models::images::{Image, ImageContext};
+use crate::models::minecraft::{
+    LoaderField, LoaderFieldEnumValue, VersionField,
+};
 use crate::models::notifications::NotificationBody;
 use crate::models::pack::PackFileHash;
 use crate::models::pats::Scopes;
@@ -360,7 +360,7 @@ async fn version_create_inner(
                 let version_id: VersionId = models::generate_version_id(transaction).await?.into();
 
                 let all_loaders =
-                    models::loader_fields::Loader::list(&mut *transaction, redis).await?;
+                    models::loader_item::Loader::list(&mut *transaction, redis).await?;
                 let loaders = version_create_data
                     .loaders
                     .iter()
@@ -412,14 +412,17 @@ async fn version_create_inner(
                     files: Vec::new(),
                     dependencies,
                     loaders: loader_ids,
-                    version_fields,
                     version_type: version_create_data.release_channel.to_string(),
                     featured: version_create_data.featured,
                     status: version_create_data.status,
                     requested_status: None,
                     ordering: version_create_data.ordering,
                     components: exp::VersionSerial {
-                        minecraft_mod: version_create_data.minecraft_mod.clone(),
+                        minecraft_mod: Some(match &version_create_data.minecraft_mod {
+                            Some(component) => component.clone(),
+                            None => VersionField::to_minecraft_component(&version_fields)
+                                .map_err(|error| CreateError::InvalidInput(error.to_string()))?,
+                        }),
                         ..Default::default()
                     },
                 });
@@ -444,6 +447,12 @@ async fn version_create_inner(
 
             let existing_file_names = version.files.iter().map(|x| x.filename.clone()).collect();
 
+            let version_fields = if let Some(component) = &version.components.minecraft_mod {
+                VersionField::from_minecraft_component(version.version_id, component).await?
+            } else {
+                Vec::new()
+            };
+
             upload_file(
                 &mut field,
                 file_host,
@@ -454,7 +463,7 @@ async fn version_create_inner(
                 &content_disposition,
                 version.project_id.into(),
                 version.version_id.into(),
-                &version.version_fields,
+                &version_fields,
                 loaders,
                 version_data.primary_file.is_some(),
                 version_data.primary_file.as_deref() == Some(name),
@@ -481,7 +490,7 @@ async fn version_create_inner(
     let version_data = initial_version_data.ok_or_else(|| {
         CreateError::InvalidInput("`data` field is required".to_string())
     })?;
-    let mut builder = version_builder.ok_or_else(|| {
+    let builder = version_builder.ok_or_else(|| {
         CreateError::InvalidInput("`data` field is required".to_string())
     })?;
 
@@ -579,9 +588,6 @@ async fn version_create_inner(
     };
 
     let project_id = builder.project_id;
-    if builder.components.minecraft_mod.is_some() {
-        builder.version_fields.clear();
-    }
     builder
         .insert(transaction, redis, file_host, delphi_scan_files)
         .await?;
@@ -782,7 +788,7 @@ async fn upload_file_to_version_inner(
     };
 
     let all_loaders =
-        models::loader_fields::Loader::list(&mut *transaction, &redis).await?;
+        models::loader_item::Loader::list(&mut *transaction, &redis).await?;
     let selected_loaders = version
         .loaders
         .iter()
@@ -903,6 +909,17 @@ async fn upload_file_to_version_inner(
                 })
                 .collect();
 
+            let version_fields =
+                if let Some(component) = &version.components.minecraft_mod {
+                    VersionField::from_minecraft_component(
+                        version_id,
+                        component,
+                    )
+                    .await?
+                } else {
+                    Vec::new()
+                };
+
             upload_file(
                 &mut field,
                 file_host,
@@ -913,7 +930,7 @@ async fn upload_file_to_version_inner(
                 &content_disposition,
                 project_id,
                 version_id.into(),
-                &version.version_fields,
+                &version_fields,
                 loaders,
                 true,
                 false,
@@ -1212,7 +1229,7 @@ pub fn try_create_version_fields(
     minecraft_mod: Option<&crate::models::exp::minecraft::ModVersion>,
     loader_fields: &[LoaderField],
     loader_field_enum_values: &mut HashMap<
-        models::LoaderFieldId,
+        crate::models::minecraft::LoaderFieldId,
         Vec<LoaderFieldEnumValue>,
     >,
 ) -> Result<Vec<VersionField>, CreateError> {
@@ -1233,8 +1250,12 @@ pub fn try_create_version_fields(
         ] {
             if let Some(schema) =
                 loader_fields.iter().find(|field| field.field == name)
-                && (schema.min_val.is_some_and(|min| (count as i64) < i64::from(min))
-                    || schema.max_val.is_some_and(|max| (count as i64) > i64::from(max)))
+                && (schema
+                    .min_val
+                    .is_some_and(|min| (count as i64) < i64::from(min))
+                    || schema
+                        .max_val
+                        .is_some_and(|max| (count as i64) > i64::from(max)))
             {
                 return Err(CreateError::InvalidInput(format!(
                     "invalid number of values for `{name}`"
@@ -1266,7 +1287,8 @@ pub fn try_create_version_fields(
         .iter()
         .filter(|lf| {
             !(lf.optional
-                || minecraft_mod.is_some() && typed_names.contains(&lf.field.as_str()))
+                || minecraft_mod.is_some()
+                    && typed_names.contains(&lf.field.as_str()))
         })
         .map(|lf| lf.field.clone())
         .collect::<HashSet<_>>();

@@ -405,10 +405,16 @@ pub async fn versions_get(
                         .any(|loader| loader == "mrpack")
                     {
                         version
-                            .version_fields
-                            .iter()
-                            .find(|field| field.field_name == "mrpack_loaders")
-                            .map(|field| field.value.as_strings())
+                            .components
+                            .minecraft_mod
+                            .as_ref()
+                            .map(|component| {
+                                component
+                                    .mrpack_loaders
+                                    .iter()
+                                    .map(|loader| loader.as_str().to_owned())
+                                    .collect()
+                            })
                             .unwrap_or_else(|| version.loaders.clone())
                     } else {
                         version.loaders.clone()

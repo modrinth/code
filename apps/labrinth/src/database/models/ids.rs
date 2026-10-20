@@ -292,9 +292,6 @@ db_id_interface!(
 
 id_type!(CategoryId as i32);
 id_type!(GameId as i32);
-id_type!(LoaderFieldEnumId as i32);
-id_type!(LoaderFieldEnumValueId as i32);
-id_type!(LoaderFieldId as i32);
 id_type!(LoaderId as i32);
 id_type!(NotificationActionId as i32);
 id_type!(ProjectTypeId as i32);

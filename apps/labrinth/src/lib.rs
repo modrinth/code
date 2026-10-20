@@ -16,7 +16,6 @@ use clickhouse_crate::Client;
 use util::cors::default_cors;
 use util::gotenberg::GotenbergClient;
 
-use crate::background_task::update_versions;
 use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::env::ENV;
 use crate::queue::billing::{index_billing, index_subscriptions};
@@ -145,20 +144,6 @@ pub fn app_setup(
                     background_task::release_scheduled(pool_ref).await
                 {
                     warn!("Syncing scheduled releases failed: {e:#}");
-                }
-            }
-        });
-
-        let version_index_interval =
-            Duration::from_secs(ENV.VERSION_INDEX_INTERVAL);
-        let pool_ref = pool.clone();
-        let redis_pool_ref = redis_pool.clone();
-        scheduler.run(version_index_interval, move || {
-            let pool_ref = pool_ref.clone();
-            let redis = redis_pool_ref.clone();
-            async move {
-                if let Err(e) = update_versions(pool_ref, redis).await {
-                    warn!("Version update failed: {e:#}");
                 }
             }
         });

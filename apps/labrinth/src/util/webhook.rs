@@ -1,5 +1,5 @@
-use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
 use crate::models::ids::ProjectId;
+use crate::models::minecraft::MinecraftGameVersion;
 use crate::routes::ApiError;
 use crate::util::error::ApiContext as _;
 use crate::util::error::Context as _;
@@ -116,14 +116,21 @@ async fn get_webhook_metadata(
                     "fetching minecraft game version from Redis",
                 )?;
 
-        let versions = project
-            .aggregate_version_fields
-            .clone()
-            .into_iter()
-            .find_map(|vf| {
-                MinecraftGameVersion::try_from_version_field(&vf).ok()
+        let supported_names = project
+            .minecraft_mod_versions
+            .iter()
+            .flat_map(|component| &component.game_versions)
+            .map(|name| {
+                crate::models::minecraft::legacy_game_version_name(&name.0)
             })
-            .unwrap_or_default();
+            .collect::<std::collections::HashSet<_>>();
+        let versions = all_game_versions
+            .iter()
+            .filter(|version| {
+                supported_names.contains(version.version.as_str())
+            })
+            .cloned()
+            .collect();
 
         let formatted_game_versions = get_gv_range(versions, all_game_versions);
 

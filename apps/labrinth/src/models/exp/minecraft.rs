@@ -12,11 +12,11 @@ use crate::{
     models::{
         exp::{
             ProjectComponentKind,
-			version::{VersionComponent, VersionComponentKind},
             component::{self, Component, ComponentEdit, ComponentQuery},
             project::{
                 ProjectComponent, ProjectQueryContext, ProjectQueryRequirements,
             },
+            version::{VersionComponent, VersionComponentKind},
         },
         ids::{ProjectId, VersionId},
     },
@@ -124,6 +124,7 @@ pub enum Language {
     utoipa::ToSchema,
     strum::IntoStaticStr,
     strum::EnumString,
+    strum::EnumIter,
 )]
 #[serde(rename_all = "snake_case")]
 #[strum(
@@ -158,6 +159,7 @@ pub enum Environment {
     utoipa::ToSchema,
     strum::IntoStaticStr,
     strum::EnumString,
+    strum::EnumIter,
 )]
 #[serde(rename_all = "lowercase")]
 #[strum(
@@ -220,31 +222,31 @@ fn invalid_minecraft_metadata_value(value: &str) -> eyre::Report {
 
 component::define! {
     #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
-	/// Umbrella for legacy Minecraft mods, modpacks, plugins, data packs,
-	/// resource packs, and shaders; not restricted to the legacy mod type.
-	pub struct ModProject {}
+    /// Umbrella for legacy Minecraft mods, modpacks, plugins, data packs,
+    /// resource packs, and shaders; not restricted to the legacy mod type.
+    pub struct ModProject {}
 
-	/// Shared version metadata for Minecraft mods, modpacks, plugins, data packs,
-	/// resource packs, and shaders.
-	#[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
-	pub struct ModVersion: version {
-		#[base(schema(value_type = Vec<String>))]
-		#[edit(serde(default), schema(value_type = Option<Vec<String>>))]
-		#[create(required)]
-		pub game_versions: Vec<MinecraftVersionName>,
-		#[base(serde(default))]
-		#[edit(serde(
-			default,
-			skip_serializing_if = "Option::is_none",
-			with = "serde_with::rust::double_option"
-		))]
-		#[create(optional)]
-		pub environment: Option<Environment>,
-		#[base(serde(default))]
-		#[edit(serde(default))]
-		#[create(default)]
-		pub mrpack_loaders: Vec<MrpackLoader>,
-	}
+    /// Shared version metadata for Minecraft mods, modpacks, plugins, data packs,
+    /// resource packs, and shaders.
+    #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
+    pub struct ModVersion: version {
+        #[base(schema(value_type = Vec<String>))]
+        #[edit(serde(default), schema(value_type = Option<Vec<String>>))]
+        #[create(required)]
+        pub game_versions: Vec<MinecraftVersionName>,
+        #[base(serde(default))]
+        #[edit(serde(
+            default,
+            skip_serializing_if = "Option::is_none",
+            with = "serde_with::rust::double_option"
+        ))]
+        #[create(optional)]
+        pub environment: Option<Environment>,
+        #[base(serde(default))]
+        #[edit(serde(default))]
+        #[create(default)]
+        pub mrpack_loaders: Vec<MrpackLoader>,
+    }
 
     /// Listing for a Minecraft server.
     #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
@@ -295,7 +297,7 @@ component::define! {
 
     /// Version of a Minecraft Java server listing.
     #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
-	pub struct JavaServerVersion: version {}
+    pub struct JavaServerVersion: version {}
 
     /// Listing for a Minecraft Bedrock server.
     #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
@@ -310,15 +312,15 @@ component::define! {
 }
 
 impl VersionComponent for ModVersion {
-	fn kind() -> VersionComponentKind {
-		VersionComponentKind::MinecraftMod
-	}
+    fn kind() -> VersionComponentKind {
+        VersionComponentKind::MinecraftMod
+    }
 }
 
 impl VersionComponent for JavaServerVersion {
-	fn kind() -> VersionComponentKind {
-		VersionComponentKind::MinecraftJavaServer
-	}
+    fn kind() -> VersionComponentKind {
+        VersionComponentKind::MinecraftJavaServer
+    }
 }
 
 impl ProjectComponent for ModProject {

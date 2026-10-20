@@ -1,10 +1,9 @@
 use crate::database::PgTransaction;
-use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
-use crate::database::models::loader_fields::{
-    Loader as DBLoader, VersionField,
-};
+use crate::database::models::loader_item::Loader as DBLoader;
 use crate::database::models::version_item::DependencyBuilder;
 use crate::models::ids::ProjectId;
+use crate::models::minecraft::MinecraftGameVersion;
+use crate::models::minecraft::VersionField;
 use crate::models::pack::PackFormat;
 use crate::models::projects::{DependencyType, FileType, Loader};
 use crate::validate::datapack::DataPackValidator;
@@ -201,13 +200,16 @@ pub async fn validate_file(
     transaction: &mut PgTransaction<'_>,
     redis: &RedisPool,
 ) -> Result<ValidationResult, ValidationError> {
-    let game_versions = version_fields
-        .into_iter()
-        .find_map(|v| MinecraftGameVersion::try_from_version_field(&v).ok())
-        .unwrap_or_default();
+    let component = VersionField::to_minecraft_component(&version_fields)?;
     let all_game_versions =
         MinecraftGameVersion::list(None, None, &mut *transaction, redis)
             .await?;
+    let game_versions = component.game_versions.iter().map(|name| {
+        let name = crate::models::minecraft::legacy_game_version_name(&name.0);
+        all_game_versions.iter().find(|version| version.version == name)
+            .cloned()
+            .ok_or_else(|| eyre::eyre!("missing minecraft game version `{name}` required for validation"))
+    }).collect::<Result<Vec<_>, _>>()?;
 
     let available_loaders = DBLoader::list(&mut *transaction, redis).await?;
 

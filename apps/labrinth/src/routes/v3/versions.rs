@@ -7,9 +7,6 @@ use crate::auth::checks::{
 };
 use crate::auth::get_user_from_headers;
 use crate::database;
-use crate::database::models::loader_fields::{
-    LoaderField, LoaderFieldEnumValue, VersionField,
-};
 use crate::database::models::version_item::{
     DBLoaderVersion, DependencyBuilder,
 };
@@ -18,6 +15,9 @@ use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::models;
 use crate::models::ids::VersionId;
 use crate::models::images::ImageContext;
+use crate::models::minecraft::{
+    LoaderField, LoaderFieldEnumValue, VersionField,
+};
 use crate::models::pats::Scopes;
 use crate::models::projects::{
     Dependency, FileType, VersionStatus, VersionType,
@@ -611,7 +611,7 @@ pub(crate) async fn version_edit_in_transaction(
                     let mut loader_ids = Vec::with_capacity(loaders.len());
                     for loader in loaders {
                         let loader_id =
-                            database::models::loader_fields::Loader::get_id(
+                            database::models::loader_item::Loader::get_id(
                                 &loader.0,
                                 &mut *transaction,
                                 &redis,
@@ -1157,8 +1157,8 @@ pub(crate) async fn auto_featured_filters(
     redis: &RedisPool,
 ) -> Result<Vec<(String, String)>, ApiError> {
     let (loaders, game_versions) = futures::future::try_join(
-        database::models::loader_fields::Loader::list(&**ro_pool, redis),
-        database::models::legacy_loader_fields::MinecraftGameVersion::list(
+        database::models::loader_item::Loader::list(&**ro_pool, redis),
+        crate::models::minecraft::MinecraftGameVersion::list(
             None,
             Some(true),
             &**ro_pool,
@@ -1206,13 +1206,38 @@ pub(crate) async fn filter_project_versions(
             }
             if let Some(loader_fields) = &loader_field_filters {
                 for (key, values) in loader_fields {
-                    bool &= if let Some(x_vf) =
-                        x.version_fields.iter().find(|y| y.field_name == *key)
-                    {
-                        values.iter().any(|v| x_vf.value.contains_json_value(v))
-                    } else {
-                        true
-                    };
+                    bool &= x
+                        .inner
+                        .components
+                        .minecraft_mod
+                        .as_ref()
+                        .is_none_or(|component| match key.as_str() {
+                            "game_versions" => values.iter().any(|value| {
+                                value.as_str().is_some_and(|value| {
+                                    component
+                                        .game_versions
+                                        .iter()
+                                        .any(|version| version.0 == value)
+                                })
+                            }),
+                            "environment" => component.environment.is_none_or(
+                                |environment| {
+                                    values.iter().any(|value| {
+                                        value.as_str()
+                                            == Some(environment.as_str())
+                                    })
+                                },
+                            ),
+                            "mrpack_loaders" => values.iter().any(|value| {
+                                value.as_str().is_some_and(|value| {
+                                    component
+                                        .mrpack_loaders
+                                        .iter()
+                                        .any(|loader| loader.as_str() == value)
+                                })
+                            }),
+                            _ => true,
+                        });
                 }
             }
             bool
@@ -1256,16 +1281,14 @@ pub(crate) async fn filter_project_versions(
 
         joined_filters.iter().for_each(|filter| {
             if let Some(version) = versions.iter().find(|version| {
-                // TODO: This is the bandaid fix for detecting auto-featured versions.
-                let game_versions = version
-                    .version_fields
-                    .iter()
-                    .find(|vf| vf.field_name == "game_versions")
-                    .map(|vf| vf.value.clone())
-                    .map(|v| v.as_strings())
-                    .unwrap_or_default();
-                game_versions.contains(&filter.0)
-                    && version.loaders.contains(&filter.1)
+                version.inner.components.minecraft_mod.as_ref().is_some_and(
+                    |component| {
+                        component
+                            .game_versions
+                            .iter()
+                            .any(|version| version.0 == filter.0)
+                    },
+                ) && version.loaders.contains(&filter.1)
             }) {
                 response.push(version.clone());
             }

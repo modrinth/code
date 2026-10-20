@@ -1,230 +1,64 @@
+//! Minecraft compatibility adapters for legacy API consumers.
+
 use std::collections::HashMap;
 use std::hash::Hasher;
+use std::sync::LazyLock;
 
-use super::ids::*;
-use crate::database::PgTransaction;
-use chrono::DateTime;
-use chrono::Utc;
+use crate::database::{
+    PgTransaction,
+    models::{
+        ids::{DBVersionId, LoaderId},
+        loader_item::Loader,
+    },
+};
+use crate::models::exp;
+use chrono::{DateTime, Utc};
 use eyre::{Result, WrapErr};
-use futures::TryStreamExt;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use xredis::RedisPool;
 
-const GAMES_LIST_NAMESPACE: &str = "games:v4";
-const LOADER_ID: &str = "loader_id:v4";
-const LOADERS_LIST_NAMESPACE: &str = "loaders:v4";
-#[derive(Clone, Serialize, Deserialize, Debug)]
-pub struct Game {
-    pub id: GameId,
-    pub slug: String,
-    pub name: String,
-    pub icon_url: Option<String>,
-    pub banner_url: Option<String>,
-}
+/// Synthetic Minecraft compatibility identifier, not a database row ID.
+#[derive(
+    Copy,
+    Clone,
+    Debug,
+    Serialize,
+    Deserialize,
+    Eq,
+    PartialEq,
+    Hash,
+    utoipa::ToSchema,
+)]
+pub struct LoaderFieldId(pub i32);
 
-impl Game {
-    pub async fn get_slug<'a, E>(
-        slug: &str,
-        exec: E,
-        redis: &RedisPool,
-    ) -> Result<Option<Game>>
-    where
-        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
-    {
-        Ok(Self::list(exec, redis)
-            .await
-            .wrap_err("listing games")?
-            .into_iter()
-            .find(|x| x.slug == slug))
-    }
+/// Synthetic Minecraft compatibility identifier, not a database row ID.
+#[derive(
+    Copy,
+    Clone,
+    Debug,
+    Serialize,
+    Deserialize,
+    Eq,
+    PartialEq,
+    Hash,
+    utoipa::ToSchema,
+)]
+pub struct LoaderFieldEnumId(pub i32);
 
-    pub async fn list<'a, E>(exec: E, redis: &RedisPool) -> Result<Vec<Game>>
-    where
-        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
-    {
-        {
-            let mut redis = redis
-                .connect()
-                .await
-                .wrap_err("connecting to redis for cached games")?;
-            let key = redis.key().metadata(GAMES_LIST_NAMESPACE, "games");
-            let cached_games: Option<Vec<Game>> = redis
-                .get_deserialized(&key)
-                .await
-                .wrap_err("fetching cached games")?;
-            if let Some(cached_games) = cached_games {
-                return Ok(cached_games);
-            }
-        }
-
-        let result = sqlx::query!(
-            "
-            SELECT id, slug, name, icon_url, banner_url FROM games
-            ",
-        )
-        .fetch(exec)
-        .map_ok(|x| Game {
-            id: GameId(x.id),
-            slug: x.slug,
-            name: x.name,
-            icon_url: x.icon_url,
-            banner_url: x.banner_url,
-        })
-        .try_collect::<Vec<Game>>()
-        .await
-        .wrap_err("fetching games")?;
-
-        let mut redis = redis
-            .connect()
-            .await
-            .wrap_err("connecting to redis to cache games")?;
-        let key = redis.key().metadata(GAMES_LIST_NAMESPACE, "games");
-
-        redis
-            .set_serialized(&key, &result, None)
-            .await
-            .wrap_err("caching games")?;
-
-        Ok(result)
-    }
-}
-
-#[derive(Clone, Serialize, Deserialize)]
-pub struct LoaderMetadata {
-    pub platform: Option<bool>,
-}
-
-#[derive(Serialize, Deserialize, Clone)]
-pub struct Loader {
-    pub id: LoaderId,
-    pub loader: String,
-    pub icon: String,
-    pub supported_project_types: Vec<String>,
-    pub supported_games: Vec<String>, // slugs
-    pub metadata: LoaderMetadata,
-}
-
-impl Loader {
-    pub async fn get_id<'a, E>(
-        name: &str,
-        exec: E,
-        redis: &RedisPool,
-    ) -> Result<Option<LoaderId>>
-    where
-        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
-    {
-        {
-            let mut redis = redis
-                .connect()
-                .await
-                .wrap_err("connecting to redis for cached loader id")?;
-            let key = redis.key().metadata(LOADER_ID, name);
-            let cached_id: Option<i32> = redis
-                .get_deserialized(&key)
-                .await
-                .wrap_err("fetching cached loader id")?;
-            if let Some(cached_id) = cached_id {
-                return Ok(Some(LoaderId(cached_id)));
-            }
-        }
-
-        let result = sqlx::query!(
-            "
-            SELECT id FROM loaders
-            WHERE loader = $1
-            ",
-            name
-        )
-        .fetch_optional(exec)
-        .await
-        .wrap_err("fetching loader id")?
-        .map(|r| LoaderId(r.id));
-
-        if let Some(result) = result {
-            let mut redis = redis
-                .connect()
-                .await
-                .wrap_err("connecting to redis to cache loader id")?;
-            let key = redis.key().metadata(LOADER_ID, name);
-            redis
-                .set_serialized(&key, &result.0, None)
-                .await
-                .wrap_err("caching loader id")?;
-        }
-
-        Ok(result)
-    }
-
-    pub async fn list<'a, E>(exec: E, redis: &RedisPool) -> Result<Vec<Loader>>
-    where
-        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
-    {
-        {
-            let mut redis = redis
-                .connect()
-                .await
-                .wrap_err("connecting to redis for cached loaders")?;
-            let key = redis.key().metadata(LOADERS_LIST_NAMESPACE, "all");
-            let cached_loaders: Option<Vec<Loader>> = redis
-                .get_deserialized(&key)
-                .await
-                .wrap_err("fetching cached loaders")?;
-            if let Some(cached_loaders) = cached_loaders {
-                return Ok(cached_loaders);
-            }
-        }
-
-        let result = sqlx::query!(
-            "
-            SELECT l.id id, l.loader loader, l.icon icon,
-            (l.metadata->>'platform')::boolean AS platform,
-            ARRAY_AGG(DISTINCT pt.name) filter (where pt.name is not null) project_types,
-            ARRAY_AGG(DISTINCT g.slug) filter (where g.slug is not null) games
-            FROM loaders l
-            LEFT OUTER JOIN loaders_project_types lpt ON joining_loader_id = l.id
-            LEFT OUTER JOIN project_types pt ON lpt.joining_project_type_id = pt.id
-            LEFT OUTER JOIN loaders_project_types_games lptg ON lptg.loader_id = lpt.joining_loader_id AND lptg.project_type_id = lpt.joining_project_type_id
-            LEFT OUTER JOIN games g ON lptg.game_id = g.id
-            GROUP BY l.id;
-            ",
-        )
-        .fetch(exec)
-        .map_ok(|x| Loader {
-            id: LoaderId(x.id),
-            loader: x.loader,
-            icon: x.icon,
-            supported_project_types: x
-                .project_types
-                .unwrap_or_default()
-                .iter()
-                .map(|x| x.to_string())
-                .collect(),
-            supported_games: x
-                .games
-                .unwrap_or_default(),
-            metadata: LoaderMetadata {
-                platform: x.platform,
-            },
-        })
-        .try_collect::<Vec<_>>()
-        .await
-        .wrap_err("fetching loaders")?;
-
-        let mut redis = redis
-            .connect()
-            .await
-            .wrap_err("connecting to redis to cache loaders")?;
-        let key = redis.key().metadata(LOADERS_LIST_NAMESPACE, "all");
-
-        redis
-            .set_serialized(&key, &result, None)
-            .await
-            .wrap_err("caching loaders")?;
-
-        Ok(result)
-    }
-}
+/// Synthetic Minecraft compatibility identifier, not a database row ID.
+#[derive(
+    Copy,
+    Clone,
+    Debug,
+    Serialize,
+    Deserialize,
+    Eq,
+    PartialEq,
+    Hash,
+    utoipa::ToSchema,
+)]
+pub struct LoaderFieldEnumValueId(pub i32);
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct LoaderField {
@@ -397,519 +231,544 @@ pub struct QueryLoaderFieldEnumValue {
 
 /// Compatibility IDs are schema identifiers, not IDs from the retired tables.
 fn minecraft_fields() -> Vec<LoaderField> {
-	[
-		(1, "game_versions", false, true),
-		(2, "environment", true, false),
-		(3, "mrpack_loaders", true, true),
-	]
-	.into_iter()
-	.map(|(id, field, optional, array)| LoaderField {
-		id: LoaderFieldId(id),
-		field: field.into(),
-		optional,
-		field_type: if array {
-			LoaderFieldType::ArrayEnum(LoaderFieldEnumId(id))
-		} else {
-			LoaderFieldType::Enum(LoaderFieldEnumId(id))
-		},
-		min_val: if id == 1 { Some(1) } else { None },
-		max_val: None,
-	})
-	.collect()
+    [
+        (1, "game_versions", false, true),
+        (2, "environment", true, false),
+        (3, "mrpack_loaders", true, true),
+    ]
+    .into_iter()
+    .map(|(id, field, optional, array)| LoaderField {
+        id: LoaderFieldId(id),
+        field: field.into(),
+        optional,
+        field_type: if array {
+            LoaderFieldType::ArrayEnum(LoaderFieldEnumId(id))
+        } else {
+            LoaderFieldType::Enum(LoaderFieldEnumId(id))
+        },
+        min_val: if id == 1 { Some(1) } else { None },
+        max_val: None,
+    })
+    .collect()
 }
 
 static MINECRAFT_METADATA: std::sync::LazyLock<
-	tokio::sync::OnceCell<std::sync::Arc<crate::database::MinecraftMetaDb>>,
+    tokio::sync::OnceCell<std::sync::Arc<crate::database::MinecraftMetaDb>>,
 > = std::sync::LazyLock::new(tokio::sync::OnceCell::new);
 
 /// Register the application's existing metadata service before compatibility lookups.
 /// Call once during setup with `minecraft_meta_db.clone()`.
 pub fn register_minecraft_metadata(
-	metadata: actix_web::web::Data<crate::database::MinecraftMetaDb>,
+    metadata: actix_web::web::Data<crate::database::MinecraftMetaDb>,
 ) -> Result<()> {
-	MINECRAFT_METADATA.set(metadata.into_inner()).map_err(|_| {
-		eyre::eyre!("Minecraft metadata service is already initialized")
-	})
+    MINECRAFT_METADATA.set(metadata.into_inner()).map_err(|_| {
+        eyre::eyre!("Minecraft metadata service is already initialized")
+    })
 }
 
 pub(crate) async fn minecraft_metadata()
 -> Result<&'static crate::database::MinecraftMetaDb> {
-	Ok(MINECRAFT_METADATA
-		.get_or_try_init(|| async {
-			crate::database::MinecraftMetaDb::connect()
-				.await
-				.map(std::sync::Arc::new)
-		})
-		.await?
-		.as_ref())
+    Ok(MINECRAFT_METADATA
+        .get_or_try_init(|| async {
+            crate::database::MinecraftMetaDb::connect()
+                .await
+                .map(std::sync::Arc::new)
+        })
+        .await?
+        .as_ref())
 }
 
-fn compatibility_value(enum_id: i32, value: String) -> LoaderFieldEnumValue {
-	// FNV-1a is deterministic across processes and catalog ordering changes.
-	let hash = value.bytes().fold(2166136261u32, |hash, byte| {
-		(hash ^ u32::from(byte)).wrapping_mul(16777619)
-	});
-	LoaderFieldEnumValue {
-		id: LoaderFieldEnumValueId((hash & 0x7fff_ffff) as i32),
-		enum_id: LoaderFieldEnumId(enum_id),
-		value,
-		ordering: None,
-		created: DateTime::<Utc>::UNIX_EPOCH,
-		ty: None,
-		major: None,
-	}
+pub(crate) fn compatibility_value(
+    enum_id: i32,
+    value: String,
+) -> LoaderFieldEnumValue {
+    // FNV-1a is deterministic across processes and catalog ordering changes.
+    let hash = value.bytes().fold(2166136261u32, |hash, byte| {
+        (hash ^ u32::from(byte)).wrapping_mul(16777619)
+    });
+    LoaderFieldEnumValue {
+        id: LoaderFieldEnumValueId((hash & 0x7fff_ffff) as i32),
+        enum_id: LoaderFieldEnumId(enum_id),
+        value,
+        ordering: None,
+        created: DateTime::<Utc>::UNIX_EPOCH,
+        ty: None,
+        major: None,
+    }
 }
 
 impl LoaderField {
-	pub async fn get_field<'a, E>(
-		field: &str,
-		loader_ids: &[LoaderId],
-		exec: E,
-		redis: &RedisPool,
-	) -> Result<Option<Self>>
-	where
-		E: crate::database::Executor<'a, Database = sqlx::Postgres>,
-	{
-		Ok(Self::get_fields(loader_ids, exec, redis)
-			.await?
-			.into_iter()
-			.find(|item| item.field == field))
-	}
-	pub async fn get_fields<'a, E>(
-		loader_ids: &[LoaderId],
-		exec: E,
-		redis: &RedisPool,
-	) -> Result<Vec<Self>>
-	where
-		E: crate::database::Executor<'a, Database = sqlx::Postgres>,
-	{
-		Ok(Self::get_fields_per_loader(loader_ids, exec, redis)
-			.await?
-			.into_values()
-			.flatten()
-			.unique_by(|field| field.id)
-			.collect())
-	}
-	pub async fn get_fields_per_loader<'a, E>(
-		loader_ids: &[LoaderId],
-		exec: E,
-		redis: &RedisPool,
-	) -> Result<HashMap<LoaderId, Vec<Self>>>
-	where
-		E: crate::database::Executor<'a, Database = sqlx::Postgres>,
-	{
-		Ok(Loader::list(exec, redis)
-			.await?
-			.into_iter()
-			.filter(|loader| loader_ids.contains(&loader.id))
-			.map(|loader| {
-				let fields = minecraft_fields()
-					.into_iter()
-					.filter(|field| {
-						loader
-							.supported_games
-							.iter()
-							.any(|game| game == "minecraft-java")
-							&& (field.field != "mrpack_loaders"
-								|| loader.loader == "mrpack")
-					})
-					.collect();
-				(loader.id, fields)
-			})
-			.collect())
-	}
-	pub async fn get_fields_all<'a, E>(
-		_exec: E,
-		_redis: &RedisPool,
-	) -> Result<Vec<Self>>
-	where
-		E: crate::database::Executor<'a, Database = sqlx::Postgres>,
-	{
-		Ok(minecraft_fields())
-	}
+    pub async fn get_field<'a, E>(
+        field: &str,
+        loader_ids: &[LoaderId],
+        exec: E,
+        redis: &RedisPool,
+    ) -> Result<Option<Self>>
+    where
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
+    {
+        Ok(Self::get_fields(loader_ids, exec, redis)
+            .await?
+            .into_iter()
+            .find(|item| item.field == field))
+    }
+    pub async fn get_fields<'a, E>(
+        loader_ids: &[LoaderId],
+        exec: E,
+        redis: &RedisPool,
+    ) -> Result<Vec<Self>>
+    where
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
+    {
+        Ok(Self::get_fields_per_loader(loader_ids, exec, redis)
+            .await?
+            .into_values()
+            .flatten()
+            .unique_by(|field| field.id)
+            .collect())
+    }
+    pub async fn get_fields_per_loader<'a, E>(
+        loader_ids: &[LoaderId],
+        exec: E,
+        redis: &RedisPool,
+    ) -> Result<HashMap<LoaderId, Vec<Self>>>
+    where
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
+    {
+        Ok(Loader::list(exec, redis)
+            .await?
+            .into_iter()
+            .filter(|loader| loader_ids.contains(&loader.id))
+            .map(|loader| {
+                let fields = minecraft_fields()
+                    .into_iter()
+                    .filter(|field| {
+                        loader
+                            .supported_games
+                            .iter()
+                            .any(|game| game == "minecraft-java")
+                            && (field.field != "mrpack_loaders"
+                                || loader.loader == "mrpack")
+                    })
+                    .collect();
+                (loader.id, fields)
+            })
+            .collect())
+    }
+    pub async fn get_fields_all<'a, E>(
+        _exec: E,
+        _redis: &RedisPool,
+    ) -> Result<Vec<Self>>
+    where
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
+    {
+        Ok(minecraft_fields())
+    }
 }
 
 impl LoaderFieldEnum {
-	pub async fn get<'a, E>(
-		enum_name: &str,
-		_exec: E,
-		_redis: &RedisPool,
-	) -> Result<Option<Self>>
-	where
-		E: crate::database::Executor<'a, Database = sqlx::Postgres>,
-	{
-		Ok(minecraft_fields()
-			.into_iter()
-			.find(|field| field.field == enum_name)
-			.map(|field| Self {
-				id: LoaderFieldEnumId(field.id.0),
-				enum_name: field.field,
-				ordering: Some(field.id.0),
-				hidable: field.id.0 == 1,
-			}))
-	}
+    pub async fn get<'a, E>(
+        enum_name: &str,
+        _exec: E,
+        _redis: &RedisPool,
+    ) -> Result<Option<Self>>
+    where
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
+    {
+        Ok(minecraft_fields()
+            .into_iter()
+            .find(|field| field.field == enum_name)
+            .map(|field| Self {
+                id: LoaderFieldEnumId(field.id.0),
+                enum_name: field.field,
+                ordering: Some(field.id.0),
+                hidable: field.id.0 == 1,
+            }))
+    }
 }
 
 impl LoaderFieldEnumValue {
-	/// Fetches authoritative game-version metadata using an explicitly supplied service.
-	pub async fn minecraft_catalog(
-		db: &crate::database::MinecraftMetaDb,
-	) -> Result<Vec<Self>> {
-		let values = {
-			let mut conn =
-				db.0.connection()
-					.await
-					.wrap_err("acquiring Minecraft metadata connection")?;
-			minecraft_meta_model::model::MinecraftVersion::all()
-				.exec(&mut conn)
-				.await
-				.wrap_err("fetching Minecraft version catalog")?
-				.into_iter()
-				.map(|row| {
-					let name = row.name.to_string();
-					let mut value = compatibility_value(
-						1,
-						super::legacy_loader_fields::legacy_game_version_name(&name).to_owned(),
-					);
-					value.created = DateTime::<Utc>::from_timestamp(
-						row.catalog_entry.0.release_time.as_second(),
-						row.catalog_entry.0.release_time.subsec_nanosecond()
-							as u32,
-					)
-					.expect("Minecraft timestamp is representable by chrono");
-					value.created = super::legacy_loader_fields::legacy_game_version_date(&name, value.created);
-					use minecraft_meta_model::upstream::mojang::VersionType;
-					value.ty = Some(
-						match row.catalog_entry.0.ty {
-							VersionType::Release => "release",
-							VersionType::Snapshot => "snapshot",
-							VersionType::OldAlpha => "alpha",
-							VersionType::OldBeta => "beta",
-						}
-						.to_owned(),
-					);
-					value.major = Some(value.ty.as_deref() == Some("release"));
-					value
-				})
-				.collect::<Vec<_>>()
-		};
-		let mut seen = std::collections::HashSet::new();
-		eyre::ensure!(
-			values.iter().all(|value| seen.insert(value.id)),
-			"compatibility enum value ID collision"
-		);
-		Ok(values)
-	}
+    /// Fetches authoritative game-version metadata using an explicitly supplied service.
+    pub async fn minecraft_catalog(
+        db: &crate::database::MinecraftMetaDb,
+    ) -> Result<Vec<Self>> {
+        let values = {
+            let mut conn =
+                db.0.connection()
+                    .await
+                    .wrap_err("acquiring Minecraft metadata connection")?;
+            minecraft_meta_model::model::MinecraftVersion::all()
+                .exec(&mut conn)
+                .await
+                .wrap_err("fetching Minecraft version catalog")?
+                .into_iter()
+                .map(|row| {
+                    let name = row.name.to_string();
+                    let mut value = compatibility_value(
+                        1,
+                        legacy_game_version_name(&name).to_owned(),
+                    );
+                    value.created = DateTime::<Utc>::from_timestamp(
+                        row.catalog_entry.0.release_time.as_second(),
+                        row.catalog_entry.0.release_time.subsec_nanosecond()
+                            as u32,
+                    )
+                    .expect("Minecraft timestamp is representable by chrono");
+                    value.created =
+                        legacy_game_version_date(&name, value.created);
+                    use minecraft_meta_model::upstream::mojang::VersionType;
+                    value.ty = Some(
+                        match row.catalog_entry.0.ty {
+                            VersionType::Release => "release",
+                            VersionType::Snapshot => "snapshot",
+                            VersionType::OldAlpha => "alpha",
+                            VersionType::OldBeta => "beta",
+                        }
+                        .to_owned(),
+                    );
+                    value.major = Some(value.ty.as_deref() == Some("release"));
+                    value
+                })
+                .collect::<Vec<_>>()
+        };
+        let mut seen = std::collections::HashSet::new();
+        eyre::ensure!(
+            values.iter().all(|value| seen.insert(value.id)),
+            "compatibility enum value ID collision"
+        );
+        Ok(values)
+    }
 
-	pub async fn list<'a, E>(
-		id: LoaderFieldEnumId,
-		exec: E,
-		redis: &RedisPool,
-	) -> Result<Vec<Self>>
-	where
-		E: crate::database::Executor<'a, Database = sqlx::Postgres>,
-	{
-		Ok(Self::list_many(&[id], exec, redis)
-			.await?
-			.remove(&id)
-			.unwrap_or_default())
-	}
-	pub async fn list_many_loader_fields<'a, E>(
-		fields: &[LoaderField],
-		exec: E,
-		redis: &RedisPool,
-	) -> Result<HashMap<LoaderFieldId, Vec<Self>>>
-	where
-		E: crate::database::Executor<'a, Database = sqlx::Postgres>,
-	{
-		let ids = fields
-			.iter()
-			.filter_map(|field| match field.field_type {
-				LoaderFieldType::Enum(id) | LoaderFieldType::ArrayEnum(id) => {
-					Some(id)
-				}
-				_ => None,
-			})
-			.collect::<Vec<_>>();
-		let values = Self::list_many(&ids, exec, redis).await?;
-		Ok(fields
-			.iter()
-			.filter_map(|field| match field.field_type {
-				LoaderFieldType::Enum(id) | LoaderFieldType::ArrayEnum(id) => {
-					Some((field.id, values[&id].clone()))
-				}
-				_ => None,
-			})
-			.collect())
-	}
-	pub async fn list_many<'a, E>(
-		ids: &[LoaderFieldEnumId],
-		_exec: E,
-		_redis: &RedisPool,
-	) -> Result<HashMap<LoaderFieldEnumId, Vec<Self>>>
-	where
-		E: crate::database::Executor<'a, Database = sqlx::Postgres>,
-	{
-		use crate::models::exp::minecraft::{Environment, MrpackLoader};
-		let mut result = HashMap::new();
-		for &id in ids {
-			let mut values = match id.0 {
-				1 => {
-					Self::minecraft_catalog(minecraft_metadata().await?).await?
-				}
-				2 => [
-					Environment::ClientAndServer,
-					Environment::ClientOnly,
-					Environment::ClientOnlyServerOptional,
-					Environment::SingleplayerOnly,
-					Environment::ServerOnly,
-					Environment::ServerOnlyClientOptional,
-					Environment::DedicatedServerOnly,
-					Environment::ClientOrServer,
-					Environment::ClientOrServerPrefersBoth,
-					Environment::Unknown,
-				]
-				.into_iter()
-                .map(|value| compatibility_value(2, value.as_str().to_owned()))
-                .collect(),
-				3 => [
-					MrpackLoader::Forge,
-					MrpackLoader::Fabric,
-					MrpackLoader::Quilt,
-					MrpackLoader::Modloader,
-					MrpackLoader::Rift,
-					MrpackLoader::Liteloader,
-					MrpackLoader::Minecraft,
-					MrpackLoader::Bukkit,
-					MrpackLoader::Spigot,
-					MrpackLoader::Paper,
-					MrpackLoader::Purpur,
-					MrpackLoader::Bungeecord,
-					MrpackLoader::Waterfall,
-					MrpackLoader::Velocity,
-					MrpackLoader::Sponge,
-					MrpackLoader::Optifine,
-					MrpackLoader::Iris,
-					MrpackLoader::Canvas,
-					MrpackLoader::Vanilla,
-					MrpackLoader::Datapack,
-					MrpackLoader::Folia,
-					MrpackLoader::Neoforge,
-					MrpackLoader::Babric,
-					MrpackLoader::BtaBabric,
-					MrpackLoader::JavaAgent,
-					MrpackLoader::LegacyFabric,
-					MrpackLoader::Nilloader,
-					MrpackLoader::Ornithe,
-				]
-				.into_iter()
-                .map(|value| compatibility_value(3, value.as_str().to_owned()))
-                .collect(),
-				_ => eyre::bail!("unknown compatibility enum ID {}", id.0),
-			};
-			values.sort_by(|a, b| {
-				b.created
-					.cmp(&a.created)
-					.then_with(|| a.value.cmp(&b.value))
-			});
-			let mut seen = std::collections::HashSet::new();
-			eyre::ensure!(
-				values.iter().all(|value| seen.insert(value.id)),
-				"compatibility enum value ID collision"
-			);
-			result.insert(id, values);
-		}
-		Ok(result)
-	}
-	pub async fn list_filter<'a, E>(
-		id: LoaderFieldEnumId,
-		filter: HashMap<String, serde_json::Value>,
-		exec: E,
-		redis: &RedisPool,
-	) -> Result<Vec<Self>>
-	where
-		E: crate::database::Executor<'a, Database = sqlx::Postgres>,
-	{
-		Ok(Self::list(id, exec, redis)
-			.await?
-			.into_iter()
-			.filter(|value| {
-				filter.iter().all(|(key, expected)| match key.as_str() {
-					"type" => value
-						.ty
-						.as_deref()
-						.is_some_and(|ty| expected.as_str() == Some(ty)),
-					"major" => value
-						.major
-						.is_some_and(|major| expected.as_bool() == Some(major)),
-					_ => false,
-				})
-			})
-			.collect())
-	}
+    pub async fn list<'a, E>(
+        id: LoaderFieldEnumId,
+        exec: E,
+        redis: &RedisPool,
+    ) -> Result<Vec<Self>>
+    where
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
+    {
+        Ok(Self::list_many(&[id], exec, redis)
+            .await?
+            .remove(&id)
+            .unwrap_or_default())
+    }
+    pub async fn list_many_loader_fields<'a, E>(
+        fields: &[LoaderField],
+        exec: E,
+        redis: &RedisPool,
+    ) -> Result<HashMap<LoaderFieldId, Vec<Self>>>
+    where
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
+    {
+        let ids = fields
+            .iter()
+            .filter_map(|field| match field.field_type {
+                LoaderFieldType::Enum(id) | LoaderFieldType::ArrayEnum(id) => {
+                    Some(id)
+                }
+                _ => None,
+            })
+            .collect::<Vec<_>>();
+        let values = Self::list_many(&ids, exec, redis).await?;
+        Ok(fields
+            .iter()
+            .filter_map(|field| match field.field_type {
+                LoaderFieldType::Enum(id) | LoaderFieldType::ArrayEnum(id) => {
+                    Some((field.id, values[&id].clone()))
+                }
+                _ => None,
+            })
+            .collect())
+    }
+    pub async fn list_many<'a, E>(
+        ids: &[LoaderFieldEnumId],
+        _exec: E,
+        _redis: &RedisPool,
+    ) -> Result<HashMap<LoaderFieldEnumId, Vec<Self>>>
+    where
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
+    {
+        use crate::models::exp::minecraft::{Environment, MrpackLoader};
+        use strum::IntoEnumIterator;
+        let mut result = HashMap::new();
+        for &id in ids {
+            let mut values = match id.0 {
+                1 => {
+                    Self::minecraft_catalog(minecraft_metadata().await?).await?
+                }
+                2 => Environment::iter()
+                    .map(|value| {
+                        compatibility_value(2, value.as_str().to_owned())
+                    })
+                    .collect(),
+                3 => MrpackLoader::iter()
+                    .map(|value| {
+                        compatibility_value(3, value.as_str().to_owned())
+                    })
+                    .collect(),
+                _ => eyre::bail!("unknown compatibility enum ID {}", id.0),
+            };
+            values.sort_by(|a, b| {
+                b.created
+                    .cmp(&a.created)
+                    .then_with(|| a.value.cmp(&b.value))
+            });
+            let mut seen = std::collections::HashSet::new();
+            eyre::ensure!(
+                values.iter().all(|value| seen.insert(value.id)),
+                "compatibility enum value ID collision"
+            );
+            result.insert(id, values);
+        }
+        Ok(result)
+    }
+    pub async fn list_filter<'a, E>(
+        id: LoaderFieldEnumId,
+        filter: HashMap<String, serde_json::Value>,
+        exec: E,
+        redis: &RedisPool,
+    ) -> Result<Vec<Self>>
+    where
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
+    {
+        Ok(Self::list(id, exec, redis)
+            .await?
+            .into_iter()
+            .filter(|value| {
+                filter.iter().all(|(key, expected)| match key.as_str() {
+                    "type" => value
+                        .ty
+                        .as_deref()
+                        .is_some_and(|ty| expected.as_str() == Some(ty)),
+                    "major" => value
+                        .major
+                        .is_some_and(|major| expected.as_bool() == Some(major)),
+                    _ => false,
+                })
+            })
+            .collect())
+    }
 }
 
 impl VersionField {
-	/// Hydrates game versions before exposing legacy dates to validation or webhooks.
-	pub async fn from_minecraft_component(
-		version_id: DBVersionId,
-		component: &crate::models::exp::minecraft::ModVersion,
-	) -> Result<Vec<VersionField>> {
-		let catalog = LoaderFieldEnumValue::minecraft_catalog(
-			minecraft_metadata().await?,
-		)
-		.await?;
-		Self::from_minecraft_component_with_catalog(
-			version_id, component, &catalog,
-		)
-	}
+    /// Converts compatibility field names and enum values directly into typed metadata.
+    pub fn to_minecraft_component(
+        fields: &[VersionField],
+    ) -> Result<exp::minecraft::ModVersion> {
+        use minecraft_meta_model::model::MinecraftVersionName;
 
-	/// Reuses one catalog across a batch of versions without additional database reads.
-	pub fn from_minecraft_component_with_catalog(
-		version_id: DBVersionId,
-		component: &crate::models::exp::minecraft::ModVersion,
-		catalog: &[LoaderFieldEnumValue],
-	) -> Result<Vec<VersionField>> {
-		let mut fields = vec![
-			Self {
-				version_id,
-				field_id: LoaderFieldId(1),
-				field_name: "game_versions".into(),
-				value: VersionFieldValue::ArrayEnum(
-					LoaderFieldEnumId(1),
-					component
-						.game_versions
-						.iter()
-						.map(|name| {
-							catalog
-								.iter()
-								.find(|value| {
-									value.enum_id == LoaderFieldEnumId(1)
-										&& value.value == name.0
-								})
-								.cloned()
-								.ok_or_else(|| {
-									eyre::eyre!(
-										"Minecraft version `{name}` is absent from the metadata catalog"
-									)
-								})
-						})
-						.collect::<Result<Vec<_>>>()?,
-				),
-			},
-			Self {
-				version_id,
-				field_id: LoaderFieldId(3),
-				field_name: "mrpack_loaders".into(),
-				value: VersionFieldValue::ArrayEnum(
-					LoaderFieldEnumId(3),
-					component
-						.mrpack_loaders
-						.iter()
-						.map(|value| {
-							compatibility_value(
-								3,
-                                value.as_str().to_owned(),
-							)
-						})
-						.collect(),
-				),
-			},
-		];
-		if let Some(environment) = component.environment {
-			fields.push(Self {
-				version_id,
-				field_id: LoaderFieldId(2),
-				field_name: "environment".into(),
-				value: VersionFieldValue::Enum(
-					LoaderFieldEnumId(2),
-					compatibility_value(
-						2,
-                        environment.as_str().to_owned(),
-					),
-				),
-			});
-		}
-		Ok(fields)
-	}
+        let mut component = exp::minecraft::ModVersion {
+            game_versions: Vec::new(),
+            environment: None,
+            mrpack_loaders: Vec::new(),
+        };
+        let mut seen = std::collections::HashSet::new();
+        for field in fields {
+            eyre::ensure!(
+                seen.insert(field.field_name.as_str()),
+                "duplicate Minecraft compatibility field `{}`",
+                field.field_name
+            );
+            match (field.field_name.as_str(), &field.value) {
+                ("game_versions", VersionFieldValue::ArrayEnum(_, values)) => {
+                    component.game_versions = values
+                        .iter()
+                        .map(|value| MinecraftVersionName(value.value.clone()))
+                        .collect();
+                }
+                ("environment", VersionFieldValue::Enum(_, value)) => {
+                    component.environment = Some(
+                        value
+                            .value
+                            .parse()
+                            .wrap_err("parsing Minecraft environment")?,
+                    );
+                }
+                ("mrpack_loaders", VersionFieldValue::ArrayEnum(_, values)) => {
+                    component.mrpack_loaders = values
+                        .iter()
+                        .map(|value| {
+                            value
+                                .value
+                                .parse()
+                                .wrap_err("parsing Minecraft mrpack loader")
+                        })
+                        .collect::<Result<Vec<_>>>()?;
+                }
+                ("game_versions" | "environment" | "mrpack_loaders", _) => {
+                    eyre::bail!(
+                        "invalid value type for Minecraft field `{}`",
+                        field.field_name
+                    );
+                }
+                _ => eyre::bail!(
+                    "unknown Minecraft compatibility field `{}`",
+                    field.field_name
+                ),
+            }
+        }
+        Ok(component)
+    }
 
-	pub async fn insert_many(
-		items: Vec<Self>,
-		transaction: &mut PgTransaction<'_>,
-	) -> Result<()> {
-		let mut patches = HashMap::<
-			DBVersionId,
-			serde_json::Map<String, serde_json::Value>,
-		>::new();
-		for item in items {
-			let schema = minecraft_fields()
-				.into_iter()
-				.find(|field| {
-					field.field == item.field_name && field.id == item.field_id
-				})
-				.ok_or_else(|| {
-					eyre::eyre!(
-						"unknown Minecraft compatibility field `{}`",
-						item.field_name
-					)
-				})?;
-			let value = match (&schema.field_type, item.value) {
-				(
-					LoaderFieldType::Enum(id),
-					VersionFieldValue::Enum(actual, value),
+    /// Hydrates game versions before exposing legacy dates to validation or webhooks.
+    pub async fn from_minecraft_component(
+        version_id: DBVersionId,
+        component: &crate::models::exp::minecraft::ModVersion,
+    ) -> Result<Vec<VersionField>> {
+        let catalog = LoaderFieldEnumValue::minecraft_catalog(
+            minecraft_metadata().await?,
+        )
+        .await?;
+        Self::from_minecraft_component_with_catalog(
+            version_id, component, &catalog,
+        )
+    }
+
+    /// Reuses one catalog across a batch of versions without additional database reads.
+    pub fn from_minecraft_component_with_catalog(
+        version_id: DBVersionId,
+        component: &crate::models::exp::minecraft::ModVersion,
+        catalog: &[LoaderFieldEnumValue],
+    ) -> Result<Vec<VersionField>> {
+        let mut fields = vec![
+            Self {
+                version_id,
+                field_id: LoaderFieldId(1),
+                field_name: "game_versions".into(),
+                value: VersionFieldValue::ArrayEnum(
+                    LoaderFieldEnumId(1),
+                    component
+                        .game_versions
+                        .iter()
+                        .map(|name| {
+                            catalog
+                                .iter()
+                                .find(|value| {
+                                    value.enum_id == LoaderFieldEnumId(1)
+                                        && value.value == name.0
+                                })
+                                .cloned()
+                                .ok_or_else(|| {
+                                    eyre::eyre!(
+                                        "Minecraft version `{name}` is absent from the metadata catalog"
+                                    )
+                                })
+                        })
+                        .collect::<Result<Vec<_>>>()?,
+                ),
+            },
+            Self {
+                version_id,
+                field_id: LoaderFieldId(3),
+                field_name: "mrpack_loaders".into(),
+                value: VersionFieldValue::ArrayEnum(
+                    LoaderFieldEnumId(3),
+                    component
+                        .mrpack_loaders
+                        .iter()
+                        .map(|value| {
+                            compatibility_value(3, value.as_str().to_owned())
+                        })
+                        .collect(),
+                ),
+            },
+        ];
+        if let Some(environment) = component.environment {
+            fields.push(Self {
+                version_id,
+                field_id: LoaderFieldId(2),
+                field_name: "environment".into(),
+                value: VersionFieldValue::Enum(
+                    LoaderFieldEnumId(2),
+                    compatibility_value(2, environment.as_str().to_owned()),
+                ),
+            });
+        }
+        Ok(fields)
+    }
+
+    pub async fn insert_many(
+        items: Vec<Self>,
+        transaction: &mut PgTransaction<'_>,
+    ) -> Result<()> {
+        let mut patches = HashMap::<
+            DBVersionId,
+            serde_json::Map<String, serde_json::Value>,
+        >::new();
+        for item in items {
+            let schema = minecraft_fields()
+                .into_iter()
+                .find(|field| {
+                    field.field == item.field_name && field.id == item.field_id
+                })
+                .ok_or_else(|| {
+                    eyre::eyre!(
+                        "unknown Minecraft compatibility field `{}`",
+                        item.field_name
+                    )
+                })?;
+            let value = match (&schema.field_type, item.value) {
+                (
+                    LoaderFieldType::Enum(id),
+                    VersionFieldValue::Enum(actual, value),
                 ) if *id == actual => {
-                    let _: crate::models::exp::minecraft::Environment = value.value.parse()?;
+                    let _: crate::models::exp::minecraft::Environment =
+                        value.value.parse()?;
                     serde_json::Value::String(value.value)
-                },
-				(
-					LoaderFieldType::ArrayEnum(id),
-					VersionFieldValue::ArrayEnum(actual, values),
+                }
+                (
+                    LoaderFieldType::ArrayEnum(id),
+                    VersionFieldValue::ArrayEnum(actual, values),
                 ) if *id == actual => {
                     if item.field_name == "mrpack_loaders" {
                         for value in &values {
-                            let _: crate::models::exp::minecraft::MrpackLoader = value.value.parse()?;
+                            let _: crate::models::exp::minecraft::MrpackLoader =
+                                value.value.parse()?;
                         }
                     }
-                    serde_json::Value::Array(values.into_iter()
-                        .map(|value| serde_json::Value::String(value.value))
-                        .collect())
-                },
-				_ => eyre::bail!(
-					"invalid value type for Minecraft field `{}`",
-					item.field_name
-				),
-			};
+                    serde_json::Value::Array(
+                        values
+                            .into_iter()
+                            .map(|value| serde_json::Value::String(value.value))
+                            .collect(),
+                    )
+                }
+                _ => eyre::bail!(
+                    "invalid value type for Minecraft field `{}`",
+                    item.field_name
+                ),
+            };
 
-			patches
-				.entry(item.version_id)
-				.or_default()
-				.insert(item.field_name, value);
-		}
-		for (version_id, patch) in patches {
-			let patch = serde_json::Value::Object(patch);
-			let result = sqlx::query!(
-				r#"
-				UPDATE versions SET components = jsonb_set(
-					COALESCE(components, '{}'::jsonb), '{minecraft_mod}',
-					jsonb_build_object('game_versions', '[]'::jsonb, 'environment', NULL, 'mrpack_loaders', '[]'::jsonb)
-						|| COALESCE(NULLIF(components->'minecraft_mod', 'null'::jsonb), '{}'::jsonb)
-						|| $2::jsonb
-				) WHERE id = $1
-			"#,
-				version_id.0,
-				patch
-			)
-			.execute(&mut *transaction)
-			.await
-			.wrap_err("updating Minecraft version component")?;
-			eyre::ensure!(
-				result.rows_affected() == 1,
-				"version {} does not exist",
-				version_id.0
-			);
-		}
-		Ok(())
-	}
+            patches
+                .entry(item.version_id)
+                .or_default()
+                .insert(item.field_name, value);
+        }
+        for (version_id, patch) in patches {
+            let patch = serde_json::Value::Object(patch);
+            let result = sqlx::query!(
+                r#"
+                UPDATE versions SET components = jsonb_set(
+                    COALESCE(components, '{}'::jsonb), '{minecraft_mod}',
+                    jsonb_build_object('game_versions', '[]'::jsonb, 'environment', NULL, 'mrpack_loaders', '[]'::jsonb)
+                        || COALESCE(NULLIF(components->'minecraft_mod', 'null'::jsonb), '{}'::jsonb)
+                        || $2::jsonb
+                ) WHERE id = $1
+            "#,
+                version_id.0,
+                patch
+            )
+            .execute(&mut *transaction)
+            .await
+            .wrap_err("updating Minecraft version component")?;
+            eyre::ensure!(
+                result.rows_affected() == 1,
+                "version {} does not exist",
+                version_id.0
+            );
+        }
+        Ok(())
+    }
 
     pub fn check_parse(
         version_id: DBVersionId,
@@ -1507,6 +1366,172 @@ impl VersionFieldValue {
             VersionFieldValue::ArrayEnum(_, v) => value
                 .as_str()
                 .is_some_and(|s| v.iter().any(|v| v.value == s)),
+        }
+    }
+}
+
+/// Mojang version names that require aliases for historical Labrinth compatibility.
+// A list of version names that contains spaces.
+// Generated using the command
+// ```sh
+// curl https://launchermeta.mojang.com/mc/game/version_manifest.json \
+//      | jq '[.versions[].id | select(contains(" "))]'
+// ```
+pub(crate) const HALL_OF_SHAME: [(&str, &str); 12] = [
+    ("1.14.2 Pre-Release 4", "1.14.2-pre4"),
+    ("1.14.2 Pre-Release 3", "1.14.2-pre3"),
+    ("1.14.2 Pre-Release 2", "1.14.2-pre2"),
+    ("1.14.2 Pre-Release 1", "1.14.2-pre1"),
+    ("1.14.1 Pre-Release 2", "1.14.1-pre2"),
+    ("1.14.1 Pre-Release 1", "1.14.1-pre1"),
+    ("1.14 Pre-Release 5", "1.14-pre5"),
+    ("1.14 Pre-Release 4", "1.14-pre4"),
+    ("1.14 Pre-Release 3", "1.14-pre3"),
+    ("1.14 Pre-Release 2", "1.14-pre2"),
+    ("1.14 Pre-Release 1", "1.14-pre1"),
+    ("3D Shareware v1.34", "3D-Shareware-v1.34"),
+];
+
+/// Preserves historical Labrinth aliases while leaving other catalog names unchanged.
+pub(crate) fn legacy_game_version_name(name: &str) -> &str {
+    HALL_OF_SHAME
+        .iter()
+        .find_map(|(canonical, legacy)| (*canonical == name).then_some(*legacy))
+        .unwrap_or(name)
+}
+
+/// Mojank for some reason has versions released at the same DateTime. This hardcodes them to fix this,
+/// as most of our ordering logic is with DateTime
+pub(crate) static HALL_OF_SHAME_2: LazyLock<[(&str, DateTime<Utc>); 4]> =
+    LazyLock::new(|| {
+        [
+            ("1.4.5", "2012-12-19T22:00:00+00:00"),
+            ("1.4.6", "2012-12-19T22:00:01+00:00"),
+            ("1.6.3", "2013-09-13T10:54:41+00:00"),
+            ("13w37b", "2013-09-13T10:54:42+00:00"),
+        ]
+        .map(|(version, date)| {
+            (
+                version,
+                DateTime::parse_from_rfc3339(date)
+                    .unwrap()
+                    .with_timezone(&Utc),
+            )
+        })
+    });
+
+/// Preserves the historical ordering of releases with identical upstream timestamps.
+pub(crate) fn legacy_game_version_date(
+    name: &str,
+    date: DateTime<Utc>,
+) -> DateTime<Utc> {
+    HALL_OF_SHAME_2
+        .iter()
+        .find_map(|(version, corrected)| {
+            (*version == name).then_some(*corrected)
+        })
+        .unwrap_or(date)
+}
+
+#[derive(Clone, Serialize, Deserialize, Debug)]
+pub struct MinecraftGameVersion {
+    pub id: LoaderFieldEnumValueId,
+    pub version: String,
+    #[serde(rename = "type")]
+    pub type_: String,
+    pub created: DateTime<Utc>,
+    pub major: bool,
+}
+
+impl MinecraftGameVersion {
+    // The name under which this legacy field is stored as a LoaderField
+    pub const FIELD_NAME: &'static str = "game_versions";
+
+    pub async fn list<'a, E>(
+        version_type_option: Option<&str>,
+        major_option: Option<bool>,
+        exec: E,
+        redis: &RedisPool,
+    ) -> Result<Vec<MinecraftGameVersion>>
+    where
+        E: crate::database::Acquire<'a, Database = sqlx::Postgres>,
+    {
+        let mut exec = exec
+            .acquire()
+            .await
+            .wrap_err("acquiring database connection")?;
+        let game_version_enum =
+            LoaderFieldEnum::get(Self::FIELD_NAME, &mut exec, redis)
+                .await
+                .wrap_err("fetching game version enum")?
+                .ok_or_else(|| eyre::eyre!("Could not find game version enum."))
+                .wrap_err("finding game version enum")?;
+        let game_version_enum_values =
+            LoaderFieldEnumValue::list(game_version_enum.id, &mut exec, redis)
+                .await
+                .wrap_err("fetching game version enum values")?;
+
+        let game_versions = game_version_enum_values
+            .into_iter()
+            .map(MinecraftGameVersion::from_enum_value)
+            .filter(|x| {
+                let mut bool = true;
+
+                if let Some(version_type) = version_type_option {
+                    bool &= &*x.type_ == version_type;
+                }
+                if let Some(major) = major_option {
+                    bool &= x.major == major;
+                }
+
+                bool
+            })
+            .collect_vec();
+
+        Ok(game_versions)
+    }
+
+    // Tries to create a MinecraftGameVersion from a VersionField
+    // Clones on success
+    pub fn try_from_version_field(
+        version_field: &VersionField,
+    ) -> Result<Vec<Self>> {
+        if version_field.field_name != Self::FIELD_NAME {
+            return Err(eyre::eyre!(
+                "Field name {} is not {}",
+                version_field.field_name,
+                Self::FIELD_NAME
+            ));
+        }
+        let game_versions = match version_field.clone() {
+            VersionField {
+                value: VersionFieldValue::ArrayEnum(_, values),
+                ..
+            } => values.into_iter().map(Self::from_enum_value).collect(),
+            VersionField {
+                value: VersionFieldValue::Enum(_, value),
+                ..
+            } => {
+                vec![Self::from_enum_value(value)]
+            }
+            _ => {
+                return Err(eyre::eyre!(
+                    "Game version requires field value to be an enum: {version_field:?}"
+                ));
+            }
+        };
+        Ok(game_versions)
+    }
+
+    pub fn from_enum_value(
+        loader_field_enum_value: LoaderFieldEnumValue,
+    ) -> MinecraftGameVersion {
+        MinecraftGameVersion {
+            id: loader_field_enum_value.id,
+            version: loader_field_enum_value.value,
+            created: loader_field_enum_value.created,
+            type_: loader_field_enum_value.ty.unwrap_or_default(),
+            major: loader_field_enum_value.major.unwrap_or_default(),
         }
     }
 }

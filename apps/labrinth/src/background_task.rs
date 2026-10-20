@@ -21,7 +21,6 @@ use xredis::RedisPool;
 pub enum BackgroundTask {
     IndexSearch,
     ReleaseScheduled,
-    UpdateVersions,
     IndexBilling,
     IndexSubscriptions,
     IncrementalIndexSearch,
@@ -64,7 +63,6 @@ impl BackgroundTask {
                 index_search(ro_pool, redis_pool, search_backend).await
             }
             ReleaseScheduled => release_scheduled(pool).await,
-            UpdateVersions => update_versions(pool, redis_pool).await,
             IndexBilling => {
                 index_billing(stripe_client, anrok_client, pool, redis_pool)
                     .await;
@@ -186,18 +184,6 @@ pub async fn release_scheduled(pool: PgPool) -> eyre::Result<()> {
     Ok(())
 }
 
-pub async fn update_versions(
-    pool: PgPool,
-    redis_pool: RedisPool,
-) -> eyre::Result<()> {
-    info!("Indexing game versions list from Mojang");
-    version_updater::update_versions(&pool, &redis_pool)
-        .await
-        .wrap_err("failed to update game versions")?;
-    info!("Done indexing game versions");
-    Ok(())
-}
-
 pub async fn discord_role_email_campaign(
     pool: PgPool,
     redis_pool: RedisPool,
@@ -306,10 +292,10 @@ pub async fn ping_minecraft_java_servers(
 }
 
 mod version_updater {
+    use std::sync::LazyLock;
+
     use crate::database::PgPool;
-    use crate::database::models::legacy_loader_fields::{
-        MinecraftGameVersion, HALL_OF_SHAME, HALL_OF_SHAME_2,
-    };
+    use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
     use chrono::{DateTime, Utc};
     use serde::Deserialize;
     use thiserror::Error;
@@ -351,6 +337,67 @@ mod version_updater {
         .await?;
 
         let mut skipped_versions_count = 0u32;
+
+        // A list of version names that contains spaces.
+        // Generated using the command
+        // ```sh
+        // curl https://launchermeta.mojang.com/mc/game/version_manifest.json \
+        //      | jq '[.versions[].id | select(contains(" "))]'
+        // ```
+        const HALL_OF_SHAME: [(&str, &str); 12] = [
+            ("1.14.2 Pre-Release 4", "1.14.2-pre4"),
+            ("1.14.2 Pre-Release 3", "1.14.2-pre3"),
+            ("1.14.2 Pre-Release 2", "1.14.2-pre2"),
+            ("1.14.2 Pre-Release 1", "1.14.2-pre1"),
+            ("1.14.1 Pre-Release 2", "1.14.1-pre2"),
+            ("1.14.1 Pre-Release 1", "1.14.1-pre1"),
+            ("1.14 Pre-Release 5", "1.14-pre5"),
+            ("1.14 Pre-Release 4", "1.14-pre4"),
+            ("1.14 Pre-Release 3", "1.14-pre3"),
+            ("1.14 Pre-Release 2", "1.14-pre2"),
+            ("1.14 Pre-Release 1", "1.14-pre1"),
+            ("3D Shareware v1.34", "3D-Shareware-v1.34"),
+        ];
+
+        /// Mojank for some reason has versions released at the same DateTime. This hardcodes them to fix this,
+        /// as most of our ordering logic is with DateTime
+        static HALL_OF_SHAME_2: LazyLock<[(&'static str, DateTime<Utc>); 4]> =
+            LazyLock::new(|| {
+                [
+                    (
+                        "1.4.5",
+                        chrono::DateTime::parse_from_rfc3339(
+                            "2012-12-19T22:00:00+00:00",
+                        )
+                        .unwrap()
+                        .into(),
+                    ),
+                    (
+                        "1.4.6",
+                        chrono::DateTime::parse_from_rfc3339(
+                            "2012-12-19T22:00:01+00:00",
+                        )
+                        .unwrap()
+                        .into(),
+                    ),
+                    (
+                        "1.6.3",
+                        chrono::DateTime::parse_from_rfc3339(
+                            "2013-09-13T10:54:41+00:00",
+                        )
+                        .unwrap()
+                        .into(),
+                    ),
+                    (
+                        "13w37b",
+                        chrono::DateTime::parse_from_rfc3339(
+                            "2013-09-13T10:54:42+00:00",
+                        )
+                        .unwrap()
+                        .into(),
+                    ),
+                ]
+            });
 
         for version in input.versions.into_iter() {
             let mut name = version.id;

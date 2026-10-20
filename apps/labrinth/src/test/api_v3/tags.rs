@@ -1,6 +1,6 @@
 use crate::routes::v3::tags::{GameData, LoaderData};
 use crate::{
-    database::models::loader_fields::LoaderFieldEnumValue,
+    models::minecraft::LoaderFieldEnumValue,
     routes::v3::tags::CategoryData,
 };
 use actix_http::StatusCode;

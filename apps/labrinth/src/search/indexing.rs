@@ -10,14 +10,14 @@ use std::sync::LazyLock;
 use tracing::{info, warn};
 
 use crate::database::PgPool;
-use crate::database::models::loader_fields::{LoaderFieldEnumValue, VersionField};
+
 use crate::database::models::{
-	DBOrganizationId, DBProjectId, DBUserId, DBVersionId, LoaderFieldEnumId,
+    DBOrganizationId, DBProjectId, DBUserId, DBVersionId,
 };
 use crate::models::disclosures::ProjectDisclosure;
 use crate::models::exp;
 use crate::models::ids::{ProjectId, VersionId};
-use crate::models::projects::{DependencyType, from_duplicate_version_fields};
+use crate::models::projects::DependencyType;
 use crate::models::v2::projects::LegacyProject;
 use crate::routes::v2_reroute;
 use crate::search::{
@@ -352,7 +352,7 @@ async fn build_search_documents(
     .wrap_err("failed to fetch project disclosures")?;
 
     info!("Indexing local versions!");
-	let mut versions = load_project_versions(pool, redis, project_ids.clone()).await?;
+    let mut versions = load_project_versions(pool, project_ids.clone()).await?;
 
     info!("Indexing local org owners!");
 
@@ -580,26 +580,13 @@ async fn build_search_documents(
                 .then_with(|| a.id.0.cmp(&b.id.0))
         });
 
-		let aggregated_version_fields = versions
-			.iter()
-			.flat_map(|version| version.version_fields.clone())
-			.collect::<Vec<_>>();
-		let mut loader_fields =
-			from_duplicate_version_fields(aggregated_version_fields.clone());
-		let mut unvectorized_loader_fields = loader_fields
-			.iter()
-			.map(|(name, values)| (name.clone(), serde_json::json!(values)))
-			.collect::<HashMap<_, _>>();
-		if let Some(environment) = aggregated_version_fields
-			.iter()
-			.rev()
-			.find(|field| field.field_name == "environment")
-		{
-			unvectorized_loader_fields.insert(
-				"environment".to_owned(),
-				environment.value.serialize_internal(),
-			);
-		}
+        let mut loader_fields =
+            minecraft_search_fields(versions.iter().filter_map(|version| {
+                version.components.minecraft_mod.as_ref()
+            }));
+        let project_environment = versions.iter().rev().find_map(|version| {
+            version.components.minecraft_mod.as_ref()?.environment
+        });
         let project_loader_fields = loader_fields.clone();
 
         let mut project_loaders = versions
@@ -628,14 +615,8 @@ async fn build_search_documents(
                 return None;
             }
 
-			let version_fields = version.version_fields.clone();
-            let unvectorized_loader_fields = version_fields
-                .iter()
-                .map(|field| {
-                    (field.field_name.clone(), field.value.serialize_internal())
-                })
-                .collect();
-            let mut fields = from_duplicate_version_fields(version_fields);
+            let minecraft = version.components.minecraft_mod.as_ref();
+            let mut fields = minecraft_search_fields(minecraft.into_iter());
             let mut version_project_types = version.project_types.clone();
             exp::compat::correct_project_types(
                 &project.components,
@@ -666,16 +647,24 @@ async fn build_search_documents(
             let (_, v2_og_project_type) =
                 LegacyProject::get_project_type(&version_project_types);
             let (client_side, server_side) =
-                v2_reroute::convert_v3_side_types_to_v2_side_types(
-                    &unvectorized_loader_fields,
+                v2_reroute::convert_minecraft_environment_to_v2_side_types(
+                    minecraft
+                        .and_then(|component| component.environment)
+                        .unwrap_or(exp::minecraft::Environment::Unknown),
                     Some(&v2_og_project_type),
                 );
-            if let Ok(client_side) = serde_json::to_value(client_side) {
-                fields.insert("client_side".to_string(), vec![client_side]);
-            }
-            if let Ok(server_side) = serde_json::to_value(server_side) {
-                fields.insert("server_side".to_string(), vec![server_side]);
-            }
+            fields.insert(
+                "client_side".to_owned(),
+                vec![serde_json::Value::String(
+                    client_side.as_str().to_owned(),
+                )],
+            );
+            fields.insert(
+                "server_side".to_owned(),
+                vec![serde_json::Value::String(
+                    server_side.as_str().to_owned(),
+                )],
+            );
             fields.retain(|field, _| {
                 matches!(
                     field.as_str(),
@@ -715,17 +704,20 @@ async fn build_search_documents(
         let (_, v2_og_project_type) =
             LegacyProject::get_project_type(&project_types);
         let (client_side, server_side) =
-            v2_reroute::convert_v3_side_types_to_v2_side_types(
-                &unvectorized_loader_fields,
+            v2_reroute::convert_minecraft_environment_to_v2_side_types(
+                project_environment
+                    .unwrap_or(exp::minecraft::Environment::Unknown),
                 Some(&v2_og_project_type),
             );
 
-        if let Ok(client_side) = serde_json::to_value(client_side) {
-            loader_fields.insert("client_side".to_string(), vec![client_side]);
-        }
-        if let Ok(server_side) = serde_json::to_value(server_side) {
-            loader_fields.insert("server_side".to_string(), vec![server_side]);
-        }
+        loader_fields.insert(
+            "client_side".to_owned(),
+            vec![serde_json::Value::String(client_side.as_str().to_owned())],
+        );
+        loader_fields.insert(
+            "server_side".to_owned(),
+            vec![serde_json::Value::String(server_side.as_str().to_owned())],
+        );
 
         let components = project
             .components
@@ -791,45 +783,91 @@ async fn build_search_documents(
     })
 }
 
+fn minecraft_search_fields<'a>(
+    components: impl Iterator<Item = &'a exp::minecraft::ModVersion>,
+) -> HashMap<String, Vec<serde_json::Value>> {
+    let mut names = HashSet::new();
+    let mut environments = HashSet::new();
+    let mut loaders = HashSet::new();
+    let mut has_minecraft = false;
+    for component in components {
+        has_minecraft = true;
+        names
+            .extend(component.game_versions.iter().map(|name| name.0.as_str()));
+        environments.extend(component.environment);
+        loaders.extend(component.mrpack_loaders.iter().copied());
+    }
+    let mut fields = HashMap::new();
+    if has_minecraft {
+        fields.insert("game_versions".to_owned(), search_strings(names));
+        fields.insert(
+            "mrpack_loaders".to_owned(),
+            search_strings(loaders.iter().map(|loader| loader.as_str())),
+        );
+    }
+    if !environments.is_empty() {
+        fields.insert(
+            "environment".to_owned(),
+            search_strings(
+                environments.iter().map(|environment| environment.as_str()),
+            ),
+        );
+    }
+    fields
+}
+
+fn search_strings<'a>(
+    values: impl IntoIterator<Item = &'a str>,
+) -> Vec<serde_json::Value> {
+    values
+        .into_iter()
+        .sorted()
+        .map(|value| serde_json::Value::String(value.to_owned()))
+        .collect()
+}
+
 struct PartialVersion {
     id: DBVersionId,
     loaders: Vec<String>,
     project_types: Vec<String>,
-    version_fields: Vec<VersionField>,
+    components: exp::version::VersionSerial,
     date_published: DateTime<Utc>,
 }
 
 async fn load_project_versions(
     pool: &PgPool,
-	redis: &RedisPool,
     project_ids: Vec<i64>,
 ) -> Result<HashMap<DBProjectId, Vec<PartialVersion>>> {
-    let versions: HashMap<DBProjectId, Vec<(DBVersionId, DateTime<Utc>, exp::version::VersionSerial)>> =
-        sqlx::query!(
-            r#"
+    let versions: HashMap<
+        DBProjectId,
+        Vec<(DBVersionId, DateTime<Utc>, exp::version::VersionSerial)>,
+    > = sqlx::query!(
+        r#"
         SELECT v.id, v.mod_id, v.date_published,
 			v.components AS "components!: sqlx::types::Json<exp::version::VersionSerial>"
         FROM versions v
         WHERE mod_id = ANY($1)
         "#,
-            &project_ids,
-        )
-        .fetch(pool)
-        .try_fold(
-            HashMap::new(),
-            |mut acc: HashMap<
-                DBProjectId,
-                Vec<(DBVersionId, DateTime<Utc>, exp::version::VersionSerial)>,
-            >,
-             m| {
-                acc.entry(DBProjectId(m.mod_id))
-                    .or_default()
-                    .push((DBVersionId(m.id), m.date_published, m.components.0));
-                async move { Ok(acc) }
-            },
-        )
-        .await
-        .wrap_err("failed to fetch versions")?;
+        &project_ids,
+    )
+    .fetch(pool)
+    .try_fold(
+        HashMap::new(),
+        |mut acc: HashMap<
+            DBProjectId,
+            Vec<(DBVersionId, DateTime<Utc>, exp::version::VersionSerial)>,
+        >,
+         m| {
+            acc.entry(DBProjectId(m.mod_id)).or_default().push((
+                DBVersionId(m.id),
+                m.date_published,
+                m.components.0,
+            ));
+            async move { Ok(acc) }
+        },
+    )
+    .await
+    .wrap_err("failed to fetch versions")?;
 
     // Get project types, loaders
     #[derive(Default)]
@@ -873,16 +911,6 @@ async fn load_project_versions(
     .await
     .wrap_err("failed to fetch loaders and project types")?;
 
-	let minecraft_catalog = if versions.values().flatten().any(|(_, _, components)| {
-		components.minecraft_mod.is_some()
-	}) {
-		LoaderFieldEnumValue::list(LoaderFieldEnumId(1), pool, redis)
-			.await
-			.wrap_err("fetching Minecraft version catalog for search indexing")?
-	} else {
-		Vec::new()
-	};
-
     // Convert to partial versions
     let mut res_versions: HashMap<DBProjectId, Vec<PartialVersion>> =
         HashMap::new();
@@ -895,18 +923,6 @@ async fn load_project_versions(
                 .map(|(_, version_loader_data)| version_loader_data)
                 .unwrap_or_default();
 
-			let version_fields = components.minecraft_mod.as_ref()
-				.map(|component| {
-					VersionField::from_minecraft_component_with_catalog(
-						*version_id,
-						component,
-						&minecraft_catalog,
-					)
-				})
-				.transpose()
-				.wrap_err_with(|| format!("building search fields for version {}", version_id.0))?
-				.unwrap_or_default();
-
             res_versions
                 .entry(*project_id)
                 .or_default()
@@ -914,7 +930,7 @@ async fn load_project_versions(
                     id: *version_id,
                     loaders: version_loader_data.loaders,
                     project_types: version_loader_data.project_types,
-                    version_fields,
+                    components: components.clone(),
                     date_published: *date_published,
                 });
         }

@@ -9,11 +9,10 @@ use common::environment::{TestEnvironment, with_test_environment};
 use itertools::Itertools;
 use labrinth::database::models::{
     DBUserId, DBVersionId,
-    legacy_loader_fields::MinecraftGameVersion,
     user_limits::DBUserLimits,
     version_item::{VERSIONS_NAMESPACE, VersionQueryResult},
 };
-use labrinth::models::v3;
+use labrinth::models::{minecraft::MinecraftGameVersion, v3};
 use serde_json::json;
 use xredis::RedisValue;
 

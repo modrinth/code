@@ -1,4 +1,3 @@
-use super::loader_fields::{LoaderFieldEnumValue, VersionField, minecraft_metadata};
 use super::{DBUser, ids::*};
 
 use crate::database::{PgTransaction, models};
@@ -21,8 +20,8 @@ use std::fmt::{Debug, Display};
 use std::hash::Hash;
 use xredis::RedisPool;
 
-pub const PROJECTS_NAMESPACE: &str = "projects:v6";
-pub const PROJECTS_SLUGS_NAMESPACE: &str = "projects_slugs:v5";
+pub const PROJECTS_NAMESPACE: &str = "projects:v7";
+pub const PROJECTS_SLUGS_NAMESPACE: &str = "projects_slugs:v6";
 const PROJECTS_DEPENDENCIES_NAMESPACE: &str = "projects_dependencies:v4";
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -645,14 +644,8 @@ impl DBProject {
                     .map(|x| x.to_string().to_lowercase())
                     .collect::<Vec<_>>();
 
-				let minecraft_catalog = LoaderFieldEnumValue::minecraft_catalog(
-					minecraft_metadata().await.wrap_err("connecting to minecraft metadata")?,
-				)
-				.await
-				.wrap_err("fetching minecraft version catalog")?;
-
                 let all_version_ids = DashSet::new();
-                let version_fields: DashMap<DBProjectId, Vec<VersionField>> = DashMap::new();
+                let minecraft_mod_versions: DashMap<DBProjectId, Vec<crate::models::exp::minecraft::ModVersion>> = DashMap::new();
                 let versions: DashMap<DBProjectId, Vec<(DBVersionId, DateTime<Utc>)>> = sqlx::query!(
                     r#"
                     SELECT DISTINCT mod_id, v.id as id, date_published,
@@ -673,22 +666,20 @@ impl DBProject {
                     .try_fold(
                         DashMap::new(),
                         |acc: DashMap<DBProjectId, Vec<(DBVersionId, DateTime<Utc>)>>, m| {
-							let result = (|| {
+							let result = {
                             let version_id = DBVersionId(m.id);
                             let date_published = m.date_published;
                             all_version_ids.insert(version_id);
-                            if let Some(component) = m.components.0.minecraft_mod.as_ref() {
-                                version_fields.entry(DBProjectId(m.mod_id)).or_default()
-                                    .extend(VersionField::from_minecraft_component_with_catalog(
-										version_id, component, &minecraft_catalog,
-									).wrap_err("converting project version minecraft component")?);
+                            if let Some(component) = m.components.0.minecraft_mod {
+                                minecraft_mod_versions.entry(DBProjectId(m.mod_id)).or_default()
+                                    .push(component);
                             }
                             acc.entry(DBProjectId(m.mod_id))
                                 .or_default()
                                 .push((version_id, date_published));
 								eyre::Ok(acc)
-							})();
-							async move { result }
+							};
+                            async move { result }
                         },
                     )
                     .await
@@ -852,7 +843,7 @@ impl DBProject {
                         versions.sort_by_key(|a| a.1);
                         let mut gallery = mods_gallery.remove(&project_id).map(|x| x.1).unwrap_or_default();
                         let urls = links.remove(&project_id).map(|x| x.1).unwrap_or_default();
-                        let version_fields = version_fields.remove(&project_id).map(|x| x.1).unwrap_or_default();
+                        let minecraft_mod_versions = minecraft_mod_versions.remove(&project_id).map(|x| x.1).unwrap_or_default();
 
                         let components_serial = m.components.0;
                         exp::compat::correct_project_types(
@@ -914,7 +905,7 @@ impl DBProject {
                                 gallery
                             },
                             urls,
-                            aggregate_version_fields: version_fields,
+                            minecraft_mod_versions,
                             thread_id: DBThreadId(m.thread_id),
                             components,
                         };
@@ -1052,6 +1043,6 @@ pub struct ProjectQueryResult {
     pub urls: Vec<LinkUrl>,
     pub gallery_items: Vec<DBGalleryItem>,
     pub thread_id: DBThreadId,
-    pub aggregate_version_fields: Vec<VersionField>,
+    pub minecraft_mod_versions: Vec<crate::models::exp::minecraft::ModVersion>,
     pub components: exp::ProjectQuery,
 }

@@ -187,7 +187,6 @@ vars! {
     SELF_ADDR: String = "";
 
     LOCAL_INDEX_INTERVAL: u64 = 3600u64;
-    VERSION_INDEX_INTERVAL: u64 = 1800u64;
 
     WHITELISTED_MODPACK_DOMAINS: Json<Vec<String>> = Json(vec![
         "cdn.modrinth.com".into(),

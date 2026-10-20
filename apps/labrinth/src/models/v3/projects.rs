@@ -1,7 +1,7 @@
+use crate::models::minecraft::VersionField;
 use std::collections::HashMap;
 use std::mem;
 
-use crate::database::models::loader_fields::VersionField;
 use crate::database::models::project_item::{LinkUrl, ProjectQueryResult};
 use crate::database::models::version_item::VersionQueryResult;
 use crate::models::exp;
@@ -9,6 +9,7 @@ use crate::models::ids::{
     FileId, GalleryImageId, OrganizationId, ProjectId, TeamId, ThreadId,
     VersionId,
 };
+use crate::models::minecraft::legacy_game_version_name;
 use crate::routes::{FileHash, HashAlgorithm};
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
@@ -139,10 +140,62 @@ pub fn from_duplicate_version_fields(
     fields
 }
 
+/// Projects typed Minecraft metadata into the flattened compatibility fields.
+fn minecraft_version_fields(
+    component: &exp::minecraft::ModVersion,
+    mrpack: bool,
+) -> HashMap<String, serde_json::Value> {
+    let mut fields = HashMap::from([(
+        "game_versions".to_owned(),
+        serde_json::Value::Array(
+            component
+                .game_versions
+                .iter()
+                .map(|name| {
+                    serde_json::Value::String(
+                        legacy_game_version_name(&name.0).to_owned(),
+                    )
+                })
+                .collect(),
+        ),
+    )]);
+    if let Some(environment) = component.environment {
+        fields.insert("environment".to_owned(), environment.as_str().into());
+    }
+    if mrpack {
+        fields.insert(
+            "mrpack_loaders".to_owned(),
+            serde_json::Value::Array(
+                component
+                    .mrpack_loaders
+                    .iter()
+                    .map(|loader| loader.as_str().into())
+                    .collect(),
+            ),
+        );
+    }
+    fields
+}
+
 impl From<ProjectQueryResult> for Project {
     fn from(data: ProjectQueryResult) -> Self {
-        let fields =
-            from_duplicate_version_fields(data.aggregate_version_fields);
+        let mut fields: HashMap<String, Vec<serde_json::Value>> =
+            HashMap::new();
+        let mrpack = data.inner.loaders.iter().any(|loader| loader == "mrpack");
+        for component in &data.minecraft_mod_versions {
+            for (name, value) in minecraft_version_fields(component, mrpack) {
+                let values = match value {
+                    serde_json::Value::Array(values) => values,
+                    value => vec![value],
+                };
+                let aggregate = fields.entry(name).or_default();
+                for value in values {
+                    if !aggregate.contains(&value) {
+                        aggregate.push(value);
+                    }
+                }
+            }
+        }
         let m = data.inner;
         Self {
             id: m.id.into(),
@@ -826,6 +879,18 @@ where
 
 impl From<VersionQueryResult> for Version {
     fn from(data: VersionQueryResult) -> Version {
+        let fields = data
+            .inner
+            .components
+            .minecraft_mod
+            .as_ref()
+            .map(|component| {
+                minecraft_version_fields(
+                    component,
+                    data.loaders.iter().any(|loader| loader == "mrpack"),
+                )
+            })
+            .unwrap_or_default();
         let v = data.inner;
         Version {
             id: v.id.into(),
@@ -876,13 +941,7 @@ impl From<VersionQueryResult> for Version {
                 })
                 .collect(),
             loaders: data.loaders.into_iter().map(Loader).collect(),
-            // Only add the internal component of the field for display
-            // "ie": "game_versions",["1.2.3"] instead of "game_versions",ArrayEnum(...)
-            fields: data
-                .version_fields
-                .into_iter()
-                .map(|vf| (vf.field_name, vf.value.serialize_internal()))
-                .collect(),
+            fields,
             components: data.components,
             files_missing_attribution: Vec::new(),
         }

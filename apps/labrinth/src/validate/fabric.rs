@@ -1,4 +1,4 @@
-use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
+use crate::models::minecraft::MinecraftGameVersion;
 use crate::models::projects::Loader;
 use crate::validate::{
     SupportedGameVersions, ValidationError, ValidationResult,

@@ -1,5 +1,4 @@
 use super::ids::*;
-use super::loader_fields::{LoaderFieldEnumValue, VersionField, minecraft_metadata};
 use crate::database::PgTransaction;
 
 use crate::file_hosting::FileHost;
@@ -19,7 +18,7 @@ use std::cmp::Ordering;
 use std::collections::HashMap;
 use tracing::error;
 
-pub const VERSIONS_NAMESPACE: &str = "versions:v5";
+pub const VERSIONS_NAMESPACE: &str = "versions:v6";
 const VERSION_FILES_NAMESPACE: &str = "versions_files:v4";
 
 pub async fn cleanup_unused_attribution_files_and_groups(
@@ -72,7 +71,6 @@ pub struct VersionBuilder {
     pub files: Vec<VersionFileBuilder>,
     pub dependencies: Vec<DependencyBuilder>,
     pub loaders: Vec<LoaderId>,
-    pub version_fields: Vec<VersionField>,
     pub version_type: String,
     pub featured: bool,
     pub status: VersionStatus,
@@ -343,10 +341,6 @@ impl VersionBuilder {
         DBLoaderVersion::insert_many(loader_versions, transaction)
             .await
             .wrap_err("inserting version loaders")?;
-
-        VersionField::insert_many(self.version_fields, transaction)
-            .await
-            .wrap_err("inserting version fields")?;
 
         Ok(self.version_id)
     }
@@ -648,12 +642,6 @@ impl DBVersion {
                     .await
                     .wrap_err("acquiring database connection")?;
 
-				let minecraft_catalog = LoaderFieldEnumValue::minecraft_catalog(
-					minecraft_metadata().await.wrap_err("connecting to minecraft metadata")?,
-				)
-				.await
-				.wrap_err("fetching minecraft version catalog")?;
-
                 #[derive(Default)]
                 struct VersionLoaderData {
                     loaders: Vec<String>,
@@ -826,7 +814,7 @@ impl DBVersion {
                     .fetch(&mut exec)
                     .map_err(eyre::Report::from)
                     .try_fold(DashMap::new(), |acc, v| {
-						let result = (|| {
+						let result = {
                         let version_id = DBVersionId(v.id);
                         let VersionLoaderData {
                             loaders,
@@ -851,13 +839,6 @@ impl DBVersion {
                             .collect_vec();
 
                         let components_serial = v.components.0;
-                        let version_fields = components_serial.minecraft_mod.as_ref()
-                            .map(|component| VersionField::from_minecraft_component_with_catalog(
-								version_id, component, &minecraft_catalog,
-							))
-							.transpose()
-							.wrap_err("converting version minecraft component")?
-                            .unwrap_or_default();
                         let query_version = VersionQueryResult {
                             inner: DBVersion {
                                 id: DBVersionId(v.id),
@@ -912,7 +893,6 @@ impl DBVersion {
 
                                 files
                             },
-                            version_fields,
                             loaders,
                             project_types,
                             games,
@@ -923,8 +903,8 @@ impl DBVersion {
 
                         acc.insert(v.id, query_version);
 							eyre::Ok(acc)
-						})();
-						async move { result }
+						};
+                        async move { result }
                     })
                     .await
                     .wrap_err("fetching versions")?;
@@ -1088,7 +1068,6 @@ pub struct VersionQueryResult {
     pub inner: DBVersion,
 
     pub files: Vec<FileQueryResult>,
-    pub version_fields: Vec<VersionField>,
     pub loaders: Vec<String>,
     pub project_types: Vec<String>,
     pub games: Vec<String>,
