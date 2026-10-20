@@ -10,14 +10,32 @@ import {
 	Textarea,
 	Tooltip,
 } from '@modrinth/ui'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
+
+import { provideReviewPanels } from '../../../../providers/project-review/review-panels'
+import { provideReviewSubmission } from '../../../../providers/project-review/review-submission-context'
 
 import ProjectIssueCard from '../../../ui/project-issue-card/index.vue'
 import ActionButton from '../../review-panel/controls/action-button.vue'
+import IssueToggles from '../issue-toggles.vue'
 import { createIssueCatalogue } from './issue-catalogue'
 
 const props = defineProps<{ issueId: string }>()
 const panels = createIssueCatalogue()
+provideReviewPanels(panels)
+provideReviewSubmission({
+	draft: ref(''),
+	pending: computed(() => false),
+	canSubmit: computed(() => false),
+	canApprove: computed(() => false),
+	canAddIssues: computed(() => true),
+	sendIssuesAsThreadMessage: computed(() => false),
+	loadingAction: computed(() => undefined),
+	submit: async () => {},
+	submitDecision: async () => false,
+	submitIssues: async () => false,
+	uploadImage: async () => '',
+})
 const issue = computed(() => panels.availableIssues.value.find(({ id }) => id === props.issueId)!)
 const preview = computed(() => panels.activeIssues.value.find(({ id }) => id === props.issueId))
 const threadIssues = computed<Labrinth.Threads.v3.ThreadIssue[]>(() => {
@@ -108,6 +126,21 @@ reset()
 				<Button size="sm" @click="reset">Reset</Button>
 			</div>
 			<section
+				v-if="
+					issue.controls.some(
+						({ control }) =>
+							control.type === 'toggle' &&
+							control.issueCardDisplay &&
+							!control.issueCardDisplay.hidden,
+					)
+				"
+				class="flex min-w-0 flex-col gap-2.5 text-sm"
+				aria-label="Issue card options"
+			>
+				<h3 class="m-0 text-sm font-semibold text-contrast">Issue card options</h3>
+				<IssueToggles :issue="issue" @remove="panels.removeIssue(issueId)" />
+			</section>
+			<section
 				v-for="{ binding, sections } in controlPanels"
 				:key="binding.key"
 				class="flex min-w-0 flex-col gap-2.5 text-sm"
@@ -117,7 +150,9 @@ reset()
 					{{ binding.panel.title ?? binding.key }}
 				</h3>
 				<div v-for="(section, index) in sections" :key="index" class="flex flex-col gap-2">
-					<p v-if="section.label" class="m-0 font-semibold text-contrast">{{ section.label }}</p>
+					<p v-if="section.label" class="m-0 font-semibold text-contrast">
+						{{ section.label }}
+					</p>
 					<div class="flex flex-wrap gap-2">
 						<template
 							v-for="control in section.controls"
@@ -160,7 +195,10 @@ reset()
 									v-else-if="control.type === 'select'"
 									:model-value="panels.selectValues(binding, control)[0] ?? ''"
 									:options="[
-										{ value: '', label: control.placeholder ?? 'Select an option' },
+										{
+											value: '',
+											label: control.placeholder ?? 'Select an option',
+										},
 										...control.options,
 									]"
 									:placeholder="control.placeholder ?? 'Select an option'"

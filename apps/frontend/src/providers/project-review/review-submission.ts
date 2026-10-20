@@ -3,7 +3,6 @@ import { moderationSettings } from '@modrinth/moderation'
 import { IssuePriority } from '@modrinth/moderation/src/data/issues'
 import {
 	commonMessages,
-	createContext,
 	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
@@ -29,8 +28,7 @@ type ProjectStatus = Labrinth.Projects.v2.ProjectStatus
 type ReviewEditorMode = 'reply' | 'note'
 type NewThreadIssues = Labrinth.Threads.v3.NewThreadIssues
 
-export const [injectReviewSubmission, provideReviewSubmission] =
-	createContext<ReturnType<typeof createReviewSubmission>>('ReviewSubmission')
+export { injectReviewSubmission, provideReviewSubmission } from './review-submission-context'
 
 export function createReviewSubmission(
 	messages: ReturnType<typeof createReviewMessages>,

@@ -35,8 +35,13 @@ export type ResolvedIssueControl = ResolvedIssueControlOptions &
 		| {
 				type: 'toggle'
 				id?: string
-				issueListLabel?: string
-				issueListGroup?: string
+				issueCardDisplay?: {
+					icon?: string
+					label: string
+					group: string
+					dropdownSection?: string
+					hidden: boolean
+				}
 		  }
 		| {
 				type: 'markdown' | 'text' | 'textarea'
@@ -416,8 +421,22 @@ export function createReviewPanels(
 							...options,
 							type: 'toggle',
 							id: node.id,
-							issueListLabel: resolveWithContext(node.issueListLabel, issueContext),
-							issueListGroup: resolveWithContext(node.issueListGroup, issueContext),
+							issueCardDisplay: node.issueCardDisplay
+								? {
+										icon: resolveWithContext(node.issueCardDisplay.icon, issueContext),
+										dropdownSection: resolveWithContext(
+											node.issueCardDisplay.dropdownSection,
+											issueContext,
+										),
+										label: resolveWithContext(node.issueCardDisplay.label, issueContext),
+										group:
+											resolveWithContext(node.issueCardDisplay.group, issueContext) ??
+											resolveWithContext(panel.title, context) ??
+											issue?.category ??
+											'',
+										hidden: resolveWithContext(node.issueCardDisplay.hidden, issueContext) === true,
+									}
+								: undefined,
 						}
 					} else if (node.type === 'select') {
 						const initial = resolveWithContext(node.initial, issueContext)
@@ -431,7 +450,8 @@ export function createReviewPanels(
 							options: resolveWithContext(node.options, issueContext)
 								.filter(
 									(option) =>
-										showAllIssueControls || resolveWithContext(option.shown, issueContext) !== false,
+										showAllIssueControls ||
+										resolveWithContext(option.shown, issueContext) !== false,
 								)
 								.map((option) => ({
 									value: option.value,
@@ -659,18 +679,26 @@ export function createReviewPanels(
 						priority: control.issue.priority,
 						controls: [],
 					}
-					if (
-						!issue.controls.some(
-							({ control: existing }) =>
-								existing.type === control.type &&
-								(existing.type === 'toggle' && control.type === 'toggle'
-									? existing.id === control.id
-									: existing.type !== 'toggle' &&
-										control.type !== 'toggle' &&
-										existing.key === control.key),
-						)
+					const existing = issue.controls.find(
+						({ control: existing }) =>
+							existing.type === control.type &&
+							(existing.type === 'toggle' && control.type === 'toggle'
+								? existing.id === control.id
+								: existing.type !== 'toggle' &&
+									control.type !== 'toggle' &&
+									existing.key === control.key),
 					)
-						issue.controls.push({ binding, control })
+					if (!existing) issue.controls.push({ binding, control })
+					else if (
+						existing.control.type === 'toggle' &&
+						(!existing.control.issueCardDisplay || existing.control.issueCardDisplay.hidden) &&
+						control.type === 'toggle' &&
+						control.issueCardDisplay &&
+						!control.issueCardDisplay.hidden
+					) {
+						existing.binding = binding
+						existing.control = control
+					}
 					issues.set(issue.id, issue)
 				}
 			}

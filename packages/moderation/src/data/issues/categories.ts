@@ -63,11 +63,15 @@ export const categoriesReviewPanel = panel({
 	shown: ({ projectV3 }) =>
 		projectV3.categories.length > 0 || projectV3.additional_categories.length > 0,
 }).content(
-	toggle({ issue: categoriesInaccurateIssue, label: 'Inaccurate' }),
+	toggle({
+		issue: categoriesInaccurateIssue,
+		label: 'Inaccurate',
+	}),
 	toggle({
 		issue: categoriesInaccurateIssue,
 		label: 'Optimization',
 		id: 'categories-optimization-misused',
+		issueCardDisplay: { label: 'Optimization' },
 		shown: ({ projectV3 }) =>
 			[...projectV3.categories, ...projectV3.additional_categories].includes('optimization'),
 	}),
@@ -75,6 +79,7 @@ export const categoriesReviewPanel = panel({
 		issue: categoriesInaccurateIssue,
 		label: 'Resolutions',
 		id: 'categories-resolutions-misused',
+		issueCardDisplay: { label: 'Resolutions' },
 		shown: ({ projectV3 }) =>
 			projectV3.project_types.includes('resourcepack') &&
 			(projectV3.categories.some((tag) => resolutionTags.has(tag)) ||

@@ -209,14 +209,21 @@ export function expandItemReviewPanels(
 						: (ctx) => resolve(node.placeholder, scopedContext(ctx, item)) ?? ''
 			}
 			if (node.type !== 'toggle') return [scoped]
-			if (scoped.type === 'toggle') {
-				scoped.issueListLabel = (ctx) =>
-					resolve(node.issueListLabel, scopedContext(ctx, item)) ??
-					resolve(item.panel.title, scopedContext(ctx, item)) ??
-					item.key
-				scoped.issueListGroup = (ctx) =>
-					resolve(node.issueListGroup, scopedContext(ctx, item)) ??
-					resolve(node.label, scopedContext(ctx, item))
+			if (scoped.type === 'toggle' && node.issueCardDisplay !== undefined) {
+				const display = node.issueCardDisplay
+				scoped.issueCardDisplay = {
+					icon: (ctx) => resolve(display.icon, scopedContext(ctx, item)),
+					dropdownSection:
+						display.dropdownSection === undefined
+							? undefined
+							: (ctx) => resolve(display.dropdownSection, scopedContext(ctx, item)) ?? '',
+					label: (ctx) => resolve(display.label, scopedContext(ctx, item)),
+					group: (ctx) =>
+						resolve(display.group, scopedContext(ctx, item)) ??
+						resolve(item.panel.title, scopedContext(ctx, item)) ??
+						item.key,
+					hidden: (ctx) => resolve(display.hidden, scopedContext(ctx, item)),
+				}
 			}
 			return [scoped]
 		})
