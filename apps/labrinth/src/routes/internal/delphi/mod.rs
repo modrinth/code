@@ -40,6 +40,13 @@ pub mod tech_review_queue;
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(
         web::scope("/delphi")
+            .app_data(
+                web::JsonConfig::default()
+                    .limit(10 * 1024 * 1024)
+                    .error_handler(|err, _req| {
+                        ApiError::Request(eyre!("{err}")).into()
+                    }),
+            )
             .service(ingest_report)
             .service(_run)
             .service(get_file)
