@@ -1179,6 +1179,10 @@ export namespace Archon {
 				type: 'server.transfer.start' | 'server.transfer.done'
 				target_node: string
 			}
+			export type ServerIconPatchEvent = {
+				type: 'server.icon.patch'
+				server_icon_hash: string | null
+			}
 
 			export type UsersPatchEvent = { type: 'users.patch' }
 
@@ -1338,6 +1342,7 @@ export namespace Archon {
 				| ServerNetworkPatchEvent
 				| ServerSftpPatchEvent
 				| ServerTransferEvent
+				| ServerIconPatchEvent
 				| UsersPatchEvent
 				| WorldPatchEvent
 				| WorldStartupPatchEvent

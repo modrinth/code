@@ -114,6 +114,9 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 			case 'server.transfer.done':
 				void invalidateServerDetails(serverId)
 				break
+			case 'server.icon.patch':
+				void queryClient.invalidateQueries({ queryKey: ['server-icon', serverId] })
+				break
 			case 'users.patch':
 				handleUsersPatch(serverId)
 				break
