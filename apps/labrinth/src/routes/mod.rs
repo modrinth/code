@@ -537,10 +537,7 @@ pub fn root_config(cfg: &mut web::ServiceConfig) {
             .wrap(default_cors())
             .service(index::index_get)
             .service(index::build_get)
-            .service(Files::new(
-                "/",
-                concat!(env!("CARGO_MANIFEST_DIR"), "/assets"),
-            )),
+            .service(Files::new("/", "assets/")),
     );
 }
 
