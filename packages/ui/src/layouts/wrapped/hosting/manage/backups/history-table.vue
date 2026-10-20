@@ -1,6 +1,8 @@
 <template>
 	<Table
 		v-model:selected-ids="tableSelectedIds"
+		v-model:sort-column="sortColumn"
+		v-model:sort-direction="sortDirection"
 		:columns="columns"
 		:data="rows"
 		:row-class="rowClass"
@@ -51,17 +53,14 @@
 			<div class="flex items-center justify-end gap-1">
 				<Button
 					v-tooltip="restoreDisabled"
-					type="outlined"
-					size="sm"
 					:disabled="!!restoreDisabled"
 					@click="emit('restore', backup)"
 				>
-					<RotateCounterClockwiseIcon aria-hidden="true" />
+					<RefreshCwIcon aria-hidden="true" />
 					{{ formatMessage(messages.restore) }}
 				</Button>
 				<TeleportOverflowMenu
 					type="quiet"
-					size="sm"
 					:label="formatMessage(messages.moreOptions, { name: backup.name })"
 					:options="overflowOptions(backup)"
 				>
@@ -90,12 +89,12 @@ import {
 	EditIcon,
 	IntercomBubbleIcon,
 	MoreHorizontalIcon,
-	RotateCounterClockwiseIcon,
+	RefreshCwIcon,
 	TrashIcon,
 } from '@modrinth/assets'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
-import type { TableColumn } from '#ui/components/base'
+import type { SortDirection, TableColumn } from '#ui/components/base'
 import Avatar from '#ui/components/base/Avatar.vue'
 import type { ButtonMenuOption } from '#ui/components/base/buttons'
 import { Button, TeleportOverflowMenu } from '#ui/components/base/buttons'
@@ -180,8 +179,14 @@ const messages = defineMessages({
 })
 
 const columns = computed<TableColumn<'name' | 'created' | 'createdBy' | 'actions'>[]>(() => [
-	{ key: 'name', label: formatMessage(messages.nameColumn) },
-	{ key: 'created', label: formatMessage(messages.createdColumn), width: '20%' },
+	{ key: 'name', label: formatMessage(messages.nameColumn), enableSorting: true },
+	{
+		key: 'created',
+		label: formatMessage(messages.createdColumn),
+		width: '20%',
+		enableSorting: true,
+		defaultSortDirection: 'desc',
+	},
 	{ key: 'createdBy', label: formatMessage(messages.createdByColumn), width: '24%' },
 	{
 		key: 'actions',
@@ -191,8 +196,22 @@ const columns = computed<TableColumn<'name' | 'created' | 'createdBy' | 'actions
 	},
 ])
 
+const sortColumn = ref<string | undefined>('created')
+const sortDirection = ref<SortDirection>('desc')
+
+const sortedBackups = computed(() => {
+	const direction = sortDirection.value === 'asc' ? 1 : -1
+	return [...props.backups].sort((a, b) => {
+		const order =
+			sortColumn.value === 'name'
+				? a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
+				: new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+		return order * direction
+	})
+})
+
 const rows = computed(() =>
-	props.backups.map((backup) => {
+	sortedBackups.value.map((backup) => {
 		const user = backup.history.find(
 			(operation) => operation.operation_type === 'create' && operation.user_info,
 		)?.user_info

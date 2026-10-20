@@ -1,13 +1,6 @@
 <template>
 	<div class="relative h-full w-full">
-		<ConfirmModal
-			ref="rotationModal"
-			:title="formatMessage(messages.rotationTitle)"
-			:description="formatMessage(messages.rotationDescription, { count: rotatedBackupCount })"
-			:proceed-label="formatMessage(messages.rotationProceed)"
-			:markdown="false"
-			@proceed="saveOptions(true)"
-		/>
+		<BackupRotationModal ref="rotationModal" @proceed="saveOptions(true)" />
 
 		<div v-if="!options" class="flex h-40 items-center justify-center">
 			<SpinnerIcon class="size-6 animate-spin text-secondary" aria-hidden="true" />
@@ -15,52 +8,58 @@
 
 		<div v-else class="flex flex-col gap-6">
 			<div class="flex items-center justify-between gap-4">
-				<div class="flex flex-col gap-1">
-					<label for="auto-backups-toggle" class="text-lg font-semibold text-contrast">
+				<div>
+					<h3 id="auto-backups-label" class="m-0 text-lg font-semibold text-contrast">
 						{{ formatMessage(messages.autoTitle) }}
-					</label>
-					<span>{{ formatMessage(messages.autoDescription) }}</span>
+					</h3>
+					<p id="auto-backups-description" class="m-0 mt-1">
+						{{ formatMessage(messages.autoDescription) }}
+					</p>
 				</div>
-				<Toggle
-					id="auto-backups-toggle"
-					v-model="autoEnabled"
-					v-tooltip="manageTooltip"
-					:disabled="!canManageBackups"
-				/>
+				<span v-tooltip="manageTooltip" class="inline-flex shrink-0">
+					<Toggle
+						id="auto-backups"
+						v-model="autoEnabled"
+						:disabled="!canManageBackups"
+						aria-labelledby="auto-backups-label"
+						aria-describedby="auto-backups-description"
+					/>
+				</span>
 			</div>
 
 			<template v-if="autoEnabled">
 				<div class="flex flex-col gap-2.5">
-					<span id="backup-interval-label" class="text-lg font-semibold text-contrast">
+					<h3 class="m-0 text-lg font-semibold text-contrast">
 						{{ formatMessage(messages.intervalTitle) }}
-					</span>
-					<Chips
+					</h3>
+					<SegmentedControl
 						v-model="interval"
+						v-tooltip="manageTooltip"
 						:items="intervalOptions"
 						:format-label="formatInterval"
-						:capitalize="false"
-						:disabled-items="canManageBackups ? [] : intervalOptions"
-						:disabled-tooltip="manageTooltip"
 						:aria-label="formatMessage(messages.intervalTitle)"
-						hide-checkmark-icon
+						:disabled="!canManageBackups"
+						full-width
 					/>
 				</div>
 
 				<div class="flex flex-col gap-2.5">
-					<span class="text-lg font-semibold text-contrast">
+					<h3 class="m-0 text-lg font-semibold text-contrast">
 						{{ formatMessage(messages.manualSlotsTitle) }}
-					</span>
+					</h3>
 					<Slider
 						v-model="manualSlots"
 						:min="0"
 						:max="options.limit"
 						:step="1"
+						:snap-points="manualSlotSnapPoints"
+						:snap-range="1"
 						:disabled="!canManageBackups"
 						:aria-label="formatMessage(messages.manualSlotsTitle)"
 					/>
-					<span>{{
-						formatMessage(messages.manualSlotsDescription, { limit: options.limit })
-					}}</span>
+					<p class="m-0">
+						{{ formatMessage(messages.manualSlotsDescription, { limit: options.limit }) }}
+					</p>
 				</div>
 			</template>
 		</div>
@@ -81,10 +80,10 @@ import { SpinnerIcon } from '@modrinth/assets'
 import { useMutation } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
 
-import Chips from '#ui/components/base/Chips.vue'
+import SegmentedControl from '#ui/components/base/SegmentedControl.vue'
 import Slider from '#ui/components/base/Slider.vue'
 import Toggle from '#ui/components/base/Toggle.vue'
-import ConfirmModal from '#ui/components/modal/ConfirmModal.vue'
+import BackupRotationModal from '#ui/components/servers/backups/BackupRotationModal.vue'
 import SaveBanner from '#ui/components/servers/SaveBanner.vue'
 import {
 	BACKUP_INTERVAL_PRESETS,
@@ -123,19 +122,6 @@ const messages = defineMessages({
 		defaultMessage:
 			'Choose how many of your {limit} backup slots to use for manual and automatic backups.',
 	},
-	rotationTitle: {
-		id: 'servers.settings.backups.rotation.title',
-		defaultMessage: 'Remove auto backups?',
-	},
-	rotationDescription: {
-		id: 'servers.settings.backups.rotation.description',
-		defaultMessage:
-			'Fewer auto backup slots means {count, plural, one {your oldest auto backup} other {your # oldest auto backups}} will be deleted.',
-	},
-	rotationProceed: {
-		id: 'servers.settings.backups.rotation.proceed',
-		defaultMessage: 'Save and delete',
-	},
 	saveSuccessTitle: {
 		id: 'servers.settings.backups.save.success-title',
 		defaultMessage: 'Backup settings updated',
@@ -152,7 +138,7 @@ const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const { serverId, worldId } = injectModrinthServerContext()
 const { canManageBackups, permissionDeniedMessage } = useServerPermissions()
-const { options, invalidate } = useServerBackupsQueue(
+const { backups, options, invalidate } = useServerBackupsQueue(
 	computed(() => serverId),
 	worldId,
 )
@@ -169,6 +155,11 @@ const intervalOptions = computed(() => {
 	const saved = options.value?.interval
 	if (saved === undefined || BACKUP_INTERVAL_PRESETS.includes(saved)) return BACKUP_INTERVAL_PRESETS
 	return [...BACKUP_INTERVAL_PRESETS, saved].sort((a, b) => a - b)
+})
+
+const manualSlotSnapPoints = computed(() => {
+	const limit = options.value?.limit ?? 0
+	return [...new Set([1, 2, 3].map((quarter) => Math.round((limit * quarter) / 4)))]
 })
 
 const pendingPatch = computed<Archon.BackupsQueue.v1.PatchWorldBackupOptions | null>(() => {
@@ -215,8 +206,7 @@ watch(autoEnabled, (enabled) => {
 	}
 })
 
-const rotationModal = ref<InstanceType<typeof ConfirmModal>>()
-const rotatedBackupCount = ref(0)
+const rotationModal = ref<InstanceType<typeof BackupRotationModal>>()
 
 const { mutateAsync: patchOptions, isPending } = useMutation({
 	mutationFn: ({ acknowledgeRotation }: { acknowledgeRotation: boolean }) =>
@@ -234,8 +224,11 @@ async function saveOptions(acknowledgeRotation: boolean) {
 	try {
 		const result = await patchOptions({ acknowledgeRotation })
 		if (!result.applied) {
-			rotatedBackupCount.value = result.backup_ids?.length ?? 0
-			rotationModal.value?.show()
+			const rotatedIds = result.backup_ids ?? []
+			rotationModal.value?.show(
+				backups.value.filter((backup) => rotatedIds.includes(backup.id)),
+				rotatedIds.length,
+			)
 			return false
 		}
 

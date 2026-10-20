@@ -13,7 +13,7 @@
 
 	<ReadyTransition v-else :pending="readyPending">
 		<div class="flex flex-col gap-6">
-			<div class="grid gap-4 md:grid-cols-2">
+			<div class="grid gap-3 md:grid-cols-2">
 				<SlotCard
 					:title="formatMessage(messages.autoTitle)"
 					:icon="CalendarClockIcon"

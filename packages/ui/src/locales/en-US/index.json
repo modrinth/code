@@ -5435,6 +5435,21 @@
   "servers.backups.restore.server-running": {
     "defaultMessage": "Stop your server before restoring a backup"
   },
+  "servers.backups.rotation-modal.admonition-body": {
+    "defaultMessage": "Fewer auto backup slots means {count, plural, one {your oldest auto backup} other {your # oldest auto backups}} will be permanently deleted. This cannot be undone."
+  },
+  "servers.backups.rotation-modal.admonition-header": {
+    "defaultMessage": "Deletion warning"
+  },
+  "servers.backups.rotation-modal.backups-label": {
+    "defaultMessage": "{count, plural, one {Backup} other {Backups ({count})}}"
+  },
+  "servers.backups.rotation-modal.confirm": {
+    "defaultMessage": "Save and delete"
+  },
+  "servers.backups.rotation-modal.header": {
+    "defaultMessage": "Remove auto backups?"
+  },
   "servers.backups.slots.auto.next": {
     "defaultMessage": "Next {time}"
   },
@@ -5450,14 +5465,14 @@
   "servers.backups.slots.auto.title": {
     "defaultMessage": "Auto backups"
   },
+  "servers.backups.slots.limit": {
+    "defaultMessage": "/ {limit, plural, one {# slot} other {# slots}}"
+  },
   "servers.backups.slots.manual.description": {
     "defaultMessage": "Manually created"
   },
   "servers.backups.slots.manual.title": {
     "defaultMessage": "Manual backups"
-  },
-  "servers.backups.slots.used": {
-    "defaultMessage": "<used>{used}</used> / {limit, plural, one {# slot} other {# slots}}"
   },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Create backup"
@@ -6100,15 +6115,6 @@
   },
   "servers.settings.backups.manual-slots.title": {
     "defaultMessage": "Manual backup slots"
-  },
-  "servers.settings.backups.rotation.description": {
-    "defaultMessage": "Fewer auto backup slots means {count, plural, one {your oldest auto backup} other {your # oldest auto backups}} will be deleted."
-  },
-  "servers.settings.backups.rotation.proceed": {
-    "defaultMessage": "Save and delete"
-  },
-  "servers.settings.backups.rotation.title": {
-    "defaultMessage": "Remove auto backups?"
   },
   "servers.settings.backups.save.error-title": {
     "defaultMessage": "Failed to update backup settings"
