@@ -50,7 +50,6 @@
 			:variant="variant"
 			:interpretation="interpretation"
 			:tab-id="tabId"
-			:editor-component="ui.editorComponent.value"
 			fill-height
 			@close="() => ui.fileTabs.closeFile(tabId)"
 		/>
@@ -69,7 +68,6 @@
 		:variant="variant"
 		:interpretation="interpretation"
 		:tab-id="tabId"
-		:editor-component="ui.editorComponent.value"
 		fill-height
 		@close="() => ui.fileTabs.closeFile(tabId)"
 	/>

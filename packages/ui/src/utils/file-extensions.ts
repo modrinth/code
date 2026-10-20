@@ -157,6 +157,15 @@ export async function canOpenDataInFileEditor(
 }
 
 /**
+ * Minecraft's own formats, which the editor highlights by modes of its own. They take precedence
+ * over the type a file is detected as, which only knows them as plain text.
+ */
+const MINECRAFT_EDITOR_LANGUAGES: Record<string, string> = {
+	log: 'mclog',
+	mcfunction: 'mcfunction',
+}
+
+/**
  * Get the editor language mode for a file, from its type when known (e.g. detected from its
  * contents) or else from its name.
  */
@@ -164,6 +173,9 @@ export function getEditorLanguage(
 	filename: string,
 	fileInfo: FileTypeInfo | null = getFileTypeInfo(filename),
 ): string {
+	const minecraftLanguage = MINECRAFT_EDITOR_LANGUAGES[getFileExtension(filename)]
+	if (minecraftLanguage) return minecraftLanguage
+
 	const language = getLanguageFromFile(filename, fileInfo)
 	if (language) return language
 
@@ -221,8 +233,6 @@ export function getEditorLanguage(
 		case 'cfg':
 		case 'conf':
 			return 'ini'
-		case 'log':
-			return 'mclog'
 		default:
 			return 'text'
 	}

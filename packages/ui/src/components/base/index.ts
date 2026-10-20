@@ -40,6 +40,7 @@ export type {
 export { default as Card } from './Card.vue'
 export { default as Checkbox } from './Checkbox.vue'
 export { default as Chips } from './Chips.vue'
+export { default as CodeEditor } from './CodeEditor.vue'
 export { default as Collapsible } from './Collapsible.vue'
 export type { CollapsibleAdmonitionItem } from './CollapsibleAdmonition.vue'
 export { default as CollapsibleAdmonition } from './CollapsibleAdmonition.vue'

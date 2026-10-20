@@ -156,14 +156,12 @@
 <script setup lang="ts">
 import { FolderArchiveIcon, HistoryIcon, SaveIcon, TrashIcon } from '@modrinth/assets'
 import { type MaybeElement, useLocalStorage, useResizeObserver } from '@vueuse/core'
-import type { Component } from 'vue'
 import {
 	computed,
 	onMounted,
 	onUnmounted,
 	ref,
 	shallowReactive,
-	shallowRef,
 	toValue,
 	watch,
 } from 'vue'
@@ -346,12 +344,6 @@ async function setAdvancedView(value: boolean) {
 	if (!value && !(await confirmDiscardEditors(fileTabs.editors.values()))) return
 	advancedViewSetting.value = value
 }
-
-const editorComponent = shallowRef<Component | null>(null)
-import('vue3-ace-editor').then(async (mod) => {
-	await Promise.all([import('#ui/utils/ace-theme'), import('#ui/utils/ace-mode-log.ts')])
-	editorComponent.value = mod.VAceEditor
-})
 
 const baseId = `files-${Math.random().toString(36).slice(2, 9)}`
 
@@ -915,7 +907,6 @@ provideFileBrowserUI({
 	toggleItemSelection,
 	deselectAll,
 
-	editorComponent,
 	fileTabs,
 	fileEditorApi,
 	hasUnsavedChanges,

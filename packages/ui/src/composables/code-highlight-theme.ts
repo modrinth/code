@@ -32,51 +32,24 @@ export async function loadCodeHighlightThemeCss(id: string): Promise<string | nu
 	return entry ? entry.load().catch(() => null) : null
 }
 
-/**
- * Token colours read off the active theme into CSS variables (`--code-{name}`), for editors that
- * don't use highlight.js's classes (e.g. Ace), by the classes highlight.js gives each token.
- */
-const TOKEN_CLASSES = {
-	comment: 'hljs-comment',
-	keyword: 'hljs-keyword',
-	string: 'hljs-string',
-	number: 'hljs-number',
-	literal: 'hljs-literal',
-	regexp: 'hljs-regexp',
-	type: 'hljs-type',
-	'built-in': 'hljs-built_in',
-	function: 'hljs-title function_',
-	class: 'hljs-title class_',
-	title: 'hljs-title',
-	variable: 'hljs-variable',
-	attribute: 'hljs-attr',
-	tag: 'hljs-name',
-	meta: 'hljs-meta',
-	punctuation: 'hljs-punctuation',
-} as const
+/** The theme's colours kept as `--code-{name}`, for code shown without highlight.js's class. */
+const CODE_COLORS = ['background', 'foreground']
 
 function isTransparent(color: string) {
 	return color === 'transparent' || /^rgba\(.*,\s*0\)$/.test(color)
 }
 
-function clearTokenColors(root: HTMLElement) {
-	for (const name of ['background', 'foreground', ...Object.keys(TOKEN_CLASSES)]) {
+function clearCodeColors(root: HTMLElement) {
+	for (const name of CODE_COLORS) {
 		root.style.removeProperty(`--code-${name}`)
 	}
 }
 
-/** Renders a hidden sample of each token with the theme applied, and keeps the colours it gets. */
-function readTokenColors(root: HTMLElement) {
+/** Renders a hidden sample with the theme applied, and keeps the colours it gets. */
+function readCodeColors(root: HTMLElement) {
 	const sample = document.createElement('pre')
 	sample.className = 'hljs'
 	sample.style.cssText = 'position:absolute;visibility:hidden;pointer-events:none;left:-9999px'
-	const tokens = Object.entries(TOKEN_CLASSES).map(([name, className]) => {
-		const token = document.createElement('span')
-		token.className = className
-		token.textContent = name
-		sample.appendChild(token)
-		return [name, token] as const
-	})
 	document.body.appendChild(sample)
 
 	const style = getComputedStyle(sample)
@@ -84,9 +57,6 @@ function readTokenColors(root: HTMLElement) {
 		root.style.setProperty('--code-background', style.backgroundColor)
 	}
 	root.style.setProperty('--code-foreground', style.color)
-	for (const [name, token] of tokens) {
-		root.style.setProperty(`--code-${name}`, getComputedStyle(token).color)
-	}
 	sample.remove()
 }
 
@@ -99,7 +69,7 @@ function createCodeHighlightTheme(theme: Ref<string>) {
 			document.getElementById(STYLE_ID)?.remove()
 			document.getElementById(SERVER_CODE_THEME_STYLE_ID)?.remove()
 			delete root.dataset.codeTheme
-			clearTokenColors(root)
+			clearCodeColors(root)
 			return
 		}
 
@@ -119,8 +89,8 @@ function createCodeHighlightTheme(theme: Ref<string>) {
 		style.textContent = css
 		document.getElementById(SERVER_CODE_THEME_STYLE_ID)?.remove()
 		root.dataset.codeTheme = id
-		clearTokenColors(root)
-		readTokenColors(root)
+		clearCodeColors(root)
+		readCodeColors(root)
 	}
 
 	/** Applies the theme now and whenever it changes. Only runs in the browser, once. */
@@ -138,8 +108,8 @@ let browserState: ReturnType<typeof createCodeHighlightTheme> | undefined
 /**
  * The theme code is highlighted with everywhere, kept per device (in local storage, unless the
  * host provides `CODE_HIGHLIGHT_THEME_STORAGE`). Once started (by the app's root), a picked
- * highlight.js theme is loaded and applied to every highlighted block, and its colours are passed
- * on to editors with highlighting of their own; `modrinth` keeps the defaults. Shared by the whole
+ * highlight.js theme is loaded and applied to every highlighted block and code editor; `modrinth`
+ * keeps the defaults. Shared by the whole
  * page in the browser, while each server render gets its own, from its own request.
  */
 export function useCodeHighlightTheme() {

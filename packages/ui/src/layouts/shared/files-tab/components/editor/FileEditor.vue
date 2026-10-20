@@ -18,24 +18,17 @@
 			@replace="replaceOne"
 			@replace-all="replaceAllOccurrences"
 		/>
-		<component
-			:is="props.editorComponent"
-			v-if="
-				!isEditingImage &&
-				!mediaPreview &&
-				binarySize == null &&
-				!isLoading &&
-				props.editorComponent
-			"
-			v-model:value="fileContent"
-			:lang="editorLanguage"
-			theme="modrinth"
+		<CodeEditor
+			v-if="!isEditingImage && !mediaPreview && binarySize == null && !isLoading"
+			ref="codeEditor"
+			v-model="fileContent"
+			:language="editorLanguage"
 			:readonly="isEditorReadOnly"
-			:print-margin="false"
-			:style="{ height: props.fillHeight ? undefined : editorHeight, fontSize: '0.875rem' }"
-			class="ace-modrinth"
+			:extensions="editorKeys"
+			:style="{ height: props.fillHeight ? undefined : editorHeight }"
+			class="text-sm"
 			:class="props.fillHeight ? 'min-h-0 flex-1' : 'rounded-[20px]'"
-			@init="onEditorInit"
+			@save="saveFileContent(false)"
 		/>
 		<FileImageViewer
 			v-else-if="isEditingImage && imagePreview"
@@ -62,7 +55,7 @@
 			:file="props.file"
 		/>
 		<div
-			v-else-if="isLoading || !props.editorComponent"
+			v-else-if="isLoading"
 			class="flex items-center justify-center bg-bg-raised"
 			:class="props.fillHeight ? 'min-h-0 flex-1' : 'rounded-[20px]'"
 			:style="{ height: props.fillHeight ? undefined : editorHeight }"
@@ -73,22 +66,33 @@
 </template>
 
 <script setup lang="ts">
+import { keymap } from '@codemirror/view'
 import { SpinnerIcon } from '@modrinth/assets'
-import type { Ace } from 'ace-builds'
 import {
-	type Component,
 	computed,
 	nextTick,
 	onMounted,
 	onUnmounted,
 	ref,
 	shallowRef,
+	useTemplateRef,
 	watch,
 } from 'vue'
 
+import CodeEditor from '#ui/components/base/CodeEditor.vue'
+import type CodeEditorImpl from '#ui/components/base/CodeEditorImpl.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { injectModrinthClient } from '#ui/providers'
 import { injectNotificationManager } from '#ui/providers/web-notifications'
+import {
+	clearFind,
+	type FindMatches,
+	findNextMatch,
+	findPreviousMatch,
+	findText,
+	replaceAllMatches,
+	replaceMatch,
+} from '#ui/utils/codemirror/find'
 import {
 	getEditorLanguage,
 	getFileExtension,
@@ -110,7 +114,6 @@ import FileViewControls from './FileViewControls.vue'
 
 const props = defineProps<{
 	file: FileInfo<'file'> | null
-	editorComponent: Component | null
 	/** Fill the parent's height (e.g. a dockview panel) instead of sizing to the window. */
 	fillHeight?: boolean
 	/** Which of the file's content variants to show (see `FileManagerContext.contentVariants`). */
@@ -189,7 +192,8 @@ const mediaPreview = shallowRef<{ blob: Blob; kind: 'video' | 'audio' } | null>(
 /** The size of a file whose contents can't be shown, which then shows in their place. */
 const binarySize = ref<number | null>(null)
 const isLoading = ref(false)
-const editorInstance = ref<Ace.Editor | null>(null)
+const codeEditor = useTemplateRef<InstanceType<typeof CodeEditorImpl>>('codeEditor')
+const editorView = computed(() => codeEditor.value?.view ?? null)
 const editorContainer = ref<HTMLElement | null>(null)
 const editorHeight = ref('300px')
 
@@ -228,10 +232,6 @@ const isEditorReadOnly = computed(
 	() =>
 		isInterpreted.value || (ctx.isBusy?.value ?? false) || (ctx.isReadOnly?.(props.file) ?? false),
 )
-
-watch(isEditorReadOnly, (readOnly) => {
-	editorInstance.value?.setReadOnly(readOnly)
-})
 
 watch(
 	[() => props.file, () => props.variant, () => props.interpretation, () => ui?.jsonIndent.value],
@@ -376,32 +376,30 @@ function looksBinary(data: ArrayBuffer) {
 	return new Uint8Array(data, 0, Math.min(data.byteLength, BINARY_SNIFF_LENGTH)).includes(0)
 }
 
-function onEditorInit(editor: Ace.Editor) {
-	editorInstance.value = editor
-	editor.setReadOnly(isEditorReadOnly.value)
-
-	editor.commands.addCommand({
-		name: 'save',
-		bindKey: { win: 'Ctrl-S', mac: 'Command-S' },
-		exec: () => saveFileContent(false),
-	})
-
-	editor.commands.addCommand({
-		name: 'find',
-		bindKey: { win: 'Ctrl-F', mac: 'Command-F' },
-		exec: () => toggleFind(),
-	})
-
-	editor.commands.addCommand({
-		name: 'replace',
-		bindKey: { win: 'Ctrl-H', mac: 'Command-Option-F' },
-		exec: () => {
-			if (isEditorReadOnly.value) return
-			isFindOpen.value = true
-			nextTick(() => findReplaceRef.value?.openReplace())
+/** Find and replace open the page's own find bar, in place of the editor's. */
+const editorKeys = [
+	keymap.of([
+		{
+			key: 'Mod-f',
+			preventDefault: true,
+			run: () => {
+				toggleFind()
+				return true
+			},
 		},
-	})
-}
+		{
+			key: 'Mod-h',
+			mac: 'Mod-Alt-f',
+			preventDefault: true,
+			run: () => {
+				if (isEditorReadOnly.value) return false
+				isFindOpen.value = true
+				nextTick(() => findReplaceRef.value?.openReplace())
+				return true
+			},
+		},
+	]),
+]
 
 async function saveFileContent(exit: boolean = false) {
 	if (!props.file) return
@@ -460,10 +458,9 @@ async function shareToMclogs() {
 	}
 }
 
-function countOccurrences(content: string, query: string): number {
-	if (!query) return 0
-	const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-	return (content.match(new RegExp(escaped, 'gi')) ?? []).length
+function showMatches(matches: FindMatches) {
+	findMatchCount.value = matches.total
+	currentFindMatch.value = matches.current
 }
 
 function toggleFind() {
@@ -480,71 +477,35 @@ function closeFind() {
 	inFileFindQuery.value = ''
 	findMatchCount.value = 0
 	currentFindMatch.value = 0
-	editorInstance.value?.find('', { wrap: true })
-	editorInstance.value?.focus()
+	if (editorView.value) {
+		clearFind(editorView.value)
+		editorView.value.focus()
+	}
 }
 
-function replaceOne(query: string) {
-	const editor = editorInstance.value
-	if (!editor || isEditorReadOnly.value || findMatchCount.value === 0) return
-	editor.replace(query)
-	nextTick(() => {
-		const count = countOccurrences(fileContent.value, inFileFindQuery.value)
-		findMatchCount.value = count
-		currentFindMatch.value = count > 0 ? Math.min(currentFindMatch.value, count) : 0
-	})
+function replaceOne(replacement: string) {
+	if (!editorView.value || isEditorReadOnly.value || findMatchCount.value === 0) return
+	showMatches(replaceMatch(editorView.value, replacement))
 }
 
-function replaceAllOccurrences(query: string) {
-	const editor = editorInstance.value
-	if (!editor || isEditorReadOnly.value || findMatchCount.value === 0) return
-	editor.replaceAll(query)
-	nextTick(() => {
-		const count = countOccurrences(fileContent.value, inFileFindQuery.value)
-		findMatchCount.value = count
-		currentFindMatch.value = count > 0 ? 1 : 0
-		if (count > 0) {
-			editor.find(inFileFindQuery.value, { wrap: true, caseSensitive: false })
-		}
-	})
+function replaceAllOccurrences(replacement: string) {
+	if (!editorView.value || isEditorReadOnly.value || findMatchCount.value === 0) return
+	showMatches(replaceAllMatches(editorView.value, replacement))
 }
 
 function handleFindInput() {
-	const editor = editorInstance.value
-	if (!editor) return
-
-	const query = inFileFindQuery.value
-	if (!query) {
-		findMatchCount.value = 0
-		currentFindMatch.value = 0
-		editor.find('', { wrap: true })
-		return
-	}
-
-	const count = countOccurrences(fileContent.value, query)
-	findMatchCount.value = count
-
-	if (count > 0) {
-		editor.find(query, { wrap: true, caseSensitive: false })
-		currentFindMatch.value = 1
-	} else {
-		currentFindMatch.value = 0
-	}
+	if (!editorView.value) return
+	showMatches(findText(editorView.value, inFileFindQuery.value))
 }
 
 function findNext() {
-	const editor = editorInstance.value
-	if (!editor || findMatchCount.value === 0) return
-	editor.findNext()
-	currentFindMatch.value = (currentFindMatch.value % findMatchCount.value) + 1
+	if (!editorView.value || findMatchCount.value === 0) return
+	showMatches(findNextMatch(editorView.value))
 }
 
 function findPrevious() {
-	const editor = editorInstance.value
-	if (!editor || findMatchCount.value === 0) return
-	editor.findPrevious()
-	currentFindMatch.value =
-		((currentFindMatch.value - 2 + findMatchCount.value) % findMatchCount.value) + 1
+	if (!editorView.value || findMatchCount.value === 0) return
+	showMatches(findPreviousMatch(editorView.value))
 }
 
 function close() {
@@ -554,7 +515,6 @@ function close() {
 
 onUnmounted(() => {
 	window.removeEventListener('resize', updateEditorHeight)
-	editorInstance.value = null
 	resetState()
 })
 

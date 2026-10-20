@@ -56,23 +56,17 @@
 			<div
 				class="relative overflow-hidden rounded-[20px] border border-solid border-surface-4 shadow-sm"
 			>
-				<component
-					:is="editorComponent"
-					v-if="editorComponent"
+				<CodeEditor
 					id="rule-expression"
-					:value="form.rule"
-					lang="javascript"
-					theme="modrinth"
-					:print-margin="false"
-					:options="RULE_EDITOR_OPTIONS"
-					:style="{ height: '16rem', fontSize: '0.875rem' }"
-					class="ace-modrinth rounded-[20px]"
-					@init="onRuleEditorInit"
-					@update:value="handleRuleInput"
+					:model-value="form.rule"
+					language="javascript"
+					line-wrapping
+					indent="  "
+					:tab-size="2"
+					:extensions="RULE_EDITOR_EXTENSIONS"
+					class="h-64 rounded-[20px] text-sm"
+					@update:model-value="handleRuleInput"
 				/>
-				<div v-else class="flex h-64 items-center justify-center bg-bg-raised">
-					<LoaderCircleIcon class="size-8 animate-spin text-secondary" />
-				</div>
 			</div>
 			<div
 				v-if="ruleTestError"
@@ -574,6 +568,13 @@ IS_MATCH ? "low" : null</code></pre>
 </template>
 
 <script setup lang="ts">
+import {
+	autocompletion,
+	type Completion,
+	type CompletionContext,
+	type CompletionResult,
+	snippetCompletion,
+} from '@codemirror/autocomplete'
 import { type Labrinth, ModrinthServerError, SseParser } from '@modrinth/api-client'
 import {
 	ArrowLeftIcon,
@@ -591,6 +592,7 @@ import {
 	Avatar,
 	Button,
 	ButtonLink,
+	CodeEditor,
 	ConfirmModal,
 	EmptyState,
 	injectModrinthClient,
@@ -608,8 +610,6 @@ import {
 } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import { useDebounceFn } from '@vueuse/core'
-import type { Ace } from 'ace-builds'
-import type { Component } from 'vue'
 
 import IssueDetailPath from '~/components/ui/moderation/IssueDetailPath.vue'
 
@@ -619,85 +619,64 @@ trace.issue_type == ISSUE_TYPE
 	? "low"
 	: null`
 
-const CEL_LANGUAGE_COMPLETIONS: Ace.Completion[] = [
-	...['true', 'false', 'null', 'in'].map((value) => ({
-		value,
-		score: 900,
-		meta: 'keyword',
-	})),
-	{ caption: 'has()', snippet: 'has(${1:field})', score: 850, meta: 'macro' },
-	{ caption: 'size()', snippet: 'size(${1:value})', score: 850, meta: 'function' },
-	{ caption: 'string()', snippet: 'string(${1:value})', score: 850, meta: 'function' },
-	{ caption: 'int()', snippet: 'int(${1:value})', score: 850, meta: 'function' },
-	{ caption: 'or_null()', snippet: 'or_null(${1:field})', score: 850, meta: 'function' },
-	{ caption: 'url.parse()', snippet: 'url.parse("${1:url}")', score: 850, meta: 'URL' },
-	{ caption: 'url.is_valid()', snippet: 'url.is_valid("${1:url}")', score: 850, meta: 'URL' },
-	{ caption: '#define', snippet: '#define ${1:NAME} ${2:value}', score: 800, meta: 'preprocessor' },
-	{
-		caption: '#bind',
-		snippet: '#bind ${1:NAME} ${2:expression}',
-		score: 800,
-		meta: 'preprocessor',
-	},
+const CEL_LANGUAGE_COMPLETIONS: Completion[] = [
+	...['true', 'false', 'null', 'in'].map((label) => ({ label, type: 'keyword', boost: 10 })),
+	snippetCompletion('has(${1:field})', { label: 'has()', detail: 'macro', boost: 5 }),
+	snippetCompletion('size(${1:value})', { label: 'size()', detail: 'function', boost: 5 }),
+	snippetCompletion('string(${1:value})', { label: 'string()', detail: 'function', boost: 5 }),
+	snippetCompletion('int(${1:value})', { label: 'int()', detail: 'function', boost: 5 }),
+	snippetCompletion('or_null(${1:field})', { label: 'or_null()', detail: 'function', boost: 5 }),
+	snippetCompletion('url.parse("${1:url}")', { label: 'url.parse()', detail: 'URL', boost: 5 }),
+	snippetCompletion('url.is_valid("${1:url}")', {
+		label: 'url.is_valid()',
+		detail: 'URL',
+		boost: 5,
+	}),
+	snippetCompletion('#define ${1:NAME} ${2:value}', { label: '#define', detail: 'preprocessor' }),
+	snippetCompletion('#bind ${1:NAME} ${2:expression}', { label: '#bind', detail: 'preprocessor' }),
 ]
-const CEL_MEMBER_COMPLETIONS: Ace.Completion[] = [
-	{ caption: 'contains()', snippet: 'contains("${1:value}")', score: 800, meta: 'string' },
-	{ caption: 'startsWith()', snippet: 'startsWith("${1:prefix}")', score: 800, meta: 'string' },
-	{ caption: 'endsWith()', snippet: 'endsWith("${1:suffix}")', score: 800, meta: 'string' },
-	{ caption: 'matches()', snippet: 'matches("${1:pattern}")', score: 800, meta: 'regex' },
-	{ caption: 'all()', snippet: 'all(${1:item}, ${2:predicate})', score: 750, meta: 'list macro' },
-	{
-		caption: 'exists()',
-		snippet: 'exists(${1:item}, ${2:predicate})',
-		score: 750,
-		meta: 'list macro',
-	},
-	{
-		caption: 'exists_one()',
-		snippet: 'exists_one(${1:item}, ${2:predicate})',
-		score: 750,
-		meta: 'list macro',
-	},
-	{
-		caption: 'filter()',
-		snippet: 'filter(${1:item}, ${2:predicate})',
-		score: 750,
-		meta: 'list macro',
-	},
-	{ caption: 'map()', snippet: 'map(${1:item}, ${2:expression})', score: 750, meta: 'list macro' },
+const CEL_MEMBER_COMPLETIONS: Completion[] = [
+	snippetCompletion('contains("${1:value}")', { label: 'contains()', detail: 'string' }),
+	snippetCompletion('startsWith("${1:prefix}")', { label: 'startsWith()', detail: 'string' }),
+	snippetCompletion('endsWith("${1:suffix}")', { label: 'endsWith()', detail: 'string' }),
+	snippetCompletion('matches("${1:pattern}")', { label: 'matches()', detail: 'regex' }),
+	...[
+		['all', 'predicate'],
+		['exists', 'predicate'],
+		['exists_one', 'predicate'],
+		['filter', 'predicate'],
+		['map', 'expression'],
+	].map(([name, argument]) =>
+		snippetCompletion(`${name}(\${1:item}, \${2:${argument}})`, {
+			label: `${name}()`,
+			detail: 'list macro',
+			boost: -5,
+		}),
+	),
 ]
-const CEL_COMPLETER: Ace.Completer = {
-	id: 'delphi-cel',
-	triggerCharacters: ['.'],
-	getCompletions(_editor, session, position, prefix, callback) {
-		const beforePrefix = session
-			.getLine(position.row)
-			.slice(0, Math.max(0, position.column - prefix.length))
-		const receiver = beforePrefix.match(/([A-Za-z_][\w.]*)\.$/)?.[1]
-		if (!receiver) {
-			callback(null, [...getCelSchemaCompletions(), ...CEL_LANGUAGE_COMPLETIONS])
-			return
-		}
 
+/** Completes fields of the rule's input (by the schema), functions, macros and keywords. */
+function celCompletions(context: CompletionContext): CompletionResult | null {
+	const word = context.matchBefore(/#?\w*/)
+	if (!word) return null
+	const line = context.state.doc.lineAt(context.pos)
+	const beforeWord = line.text.slice(0, word.from - line.from)
+	const receiver = beforeWord.match(/([A-Za-z_][\w.]*)\.$/)?.[1]
+	if (word.from === word.to && !receiver && !context.explicit) return null
+
+	let options: Completion[]
+	if (!receiver) {
+		options = [...getCelSchemaCompletions(), ...CEL_LANGUAGE_COMPLETIONS]
+	} else {
 		const schemaCompletions = getCelSchemaCompletions(receiver)
-		if (schemaCompletions.length > 0) {
-			callback(null, schemaCompletions)
-			return
-		}
+		options = schemaCompletions.length > 0 ? schemaCompletions : CEL_MEMBER_COMPLETIONS
+	}
+	return { from: word.from, options, validFor: /^#?\w*$/ }
+}
 
-		callback(null, CEL_MEMBER_COMPLETIONS)
-	},
-}
-const RULE_EDITOR_OPTIONS: Partial<Ace.EditorOptions> = {
-	useWorker: false,
-	tabSize: 2,
-	useSoftTabs: true,
-	enableBasicAutocompletion: [CEL_COMPLETER],
-	enableLiveAutocompletion: [CEL_COMPLETER],
-	liveAutocompletionDelay: 150,
-	liveAutocompletionThreshold: 1,
-	enableSnippets: true,
-}
+const RULE_EDITOR_EXTENSIONS = [
+	autocompletion({ override: [celCompletions], activateOnTypingDelay: 150 }),
+]
 
 type RuleTestError = {
 	summary: string
@@ -779,8 +758,6 @@ const { addNotification } = injectNotificationManager()
 const ruleModal = useTemplateRef<InstanceType<typeof NewModal>>('ruleModal')
 const deleteModal = useTemplateRef<InstanceType<typeof ConfirmModal>>('deleteModal')
 const scanModal = useTemplateRef<InstanceType<typeof ConfirmModal>>('scanModal')
-const editorComponent = shallowRef<Component | null>(null)
-const ruleEditorInstance = shallowRef<Ace.Editor | null>(null)
 
 const rules = ref<Labrinth.TechReview.Internal.DelphiRule[]>([])
 const isLoading = ref(true)
@@ -825,15 +802,6 @@ const form = reactive({
 const testTraceForm = reactive(createTestTraceForm())
 let ruleTestRequestId = 0
 let scanAbortController: AbortController | null = null
-
-onMounted(async () => {
-	const [{ VAceEditor }] = await Promise.all([
-		import('vue3-ace-editor'),
-		import('@modrinth/ui/src/utils/ace-theme'),
-	])
-	await import('ace-builds/src-noconflict/ext-language_tools')
-	editorComponent.value = VAceEditor
-})
 
 const modalTitle = computed(() => (editingRuleId.value === null ? 'Create rule' : 'Edit rule'))
 const scanEstimatedTimeRemaining = computed(() => {
@@ -1042,7 +1010,7 @@ function getRuleSchemaLabel(
 	return types.join(' | ') || 'context'
 }
 
-function getCelSchemaCompletions(receiver?: string): Ace.Completion[] {
+function getCelSchemaCompletions(receiver?: string): Completion[] {
 	const response = ruleSchema.value
 	if (!response) return []
 
@@ -1063,10 +1031,11 @@ function getCelSchemaCompletions(receiver?: string): Ace.Completion[] {
 		.filter((entry): entry is [string, Labrinth.TechReview.Internal.DelphiRuleSchema] =>
 			isSchema(entry[1]),
 		)
-		.map(([value, property]) => ({
-			value,
-			score: 1_000,
-			meta: getRuleSchemaLabel(property, response.components),
+		.map(([label, property]) => ({
+			label,
+			type: 'property',
+			detail: getRuleSchemaLabel(property, response.components),
+			boost: 20,
 		}))
 }
 
@@ -1150,11 +1119,6 @@ function formatRuleSchema(
 	}
 
 	return nullable && formatted !== 'null' ? `${formatted} | null` : formatted
-}
-
-function onRuleEditorInit(editor: Ace.Editor) {
-	ruleEditorInstance.value = editor
-	editor.session.setUseWrapMode(true)
 }
 
 function handleRuleInput(rule: string) {
@@ -1428,7 +1392,6 @@ function openCreateModal() {
 	rawTestTraceInput.value = ''
 	isRuleModalOpen.value = true
 	ruleModal.value?.show()
-	nextTick(() => ruleEditorInstance.value?.resize(true))
 	void loadRuleSchema()
 	void testRule()
 }
@@ -1445,7 +1408,6 @@ function openEditModal(rule: Labrinth.TechReview.Internal.DelphiRule) {
 	rawTestTraceInput.value = ''
 	isRuleModalOpen.value = true
 	ruleModal.value?.show()
-	nextTick(() => ruleEditorInstance.value?.resize(true))
 	void loadRuleSchema()
 	void testRule()
 }
@@ -1456,7 +1418,6 @@ function closeRuleModal() {
 
 function handleRuleModalHide() {
 	isRuleModalOpen.value = false
-	ruleEditorInstance.value = null
 	ruleTestRequestId += 1
 	isTestingRule.value = false
 }

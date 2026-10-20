@@ -2,6 +2,7 @@
 import { SaveIcon, XIcon } from '@modrinth/assets'
 import {
 	Button,
+	CodeEditor,
 	commonMessages,
 	defineMessages,
 	injectNotificationManager,
@@ -9,7 +10,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { defineAsyncComponent, nextTick, ref } from 'vue'
+import { nextTick, ref } from 'vue'
 
 import { set_command_history } from '@/helpers/instance'
 import { commandHistoryQueryOptions, syncedOptionsKeys } from '@/helpers/synced-options'
@@ -20,14 +21,6 @@ const queryClient = useQueryClient()
 const modal = ref<InstanceType<typeof NewModal> | null>(null)
 const commandHistory = ref('')
 const historyQuery = useQuery({ ...commandHistoryQueryOptions(), enabled: false })
-const CommandHistoryEditor = defineAsyncComponent(async () => {
-	const [editor] = await Promise.all([
-		import('vue3-ace-editor'),
-		import('@modrinth/ui/src/utils/ace-theme'),
-		import('@modrinth/ui/src/utils/ace-mode-mcfunction'),
-	])
-	return editor.VAceEditor
-})
 const saveMutation = useMutation({
 	mutationFn: set_command_history,
 	onSuccess: (history) => {
@@ -78,13 +71,11 @@ defineExpose({ show })
 		max-width="700px"
 		width="700px"
 	>
-		<CommandHistoryEditor
-			v-model:value="commandHistory"
-			lang="mcfunction"
-			theme="modrinth"
-			:print-margin="false"
-			class="command-history-editor ace-modrinth"
-			style="height: 420px; font-size: 0.875rem"
+		<CodeEditor
+			v-model="commandHistory"
+			language="mcfunction"
+			class="h-[420px] text-sm"
+			@save="saveCommandHistory"
 		/>
 		<template #actions>
 			<div class="flex justify-end gap-2">
@@ -100,25 +91,3 @@ defineExpose({ show })
 		</template>
 	</NewModal>
 </template>
-
-<style>
-.command-history-editor.ace-modrinth {
-	background-color: var(--surface-2);
-}
-
-.command-history-editor.ace-modrinth .ace_gutter {
-	background: var(--surface-1);
-}
-
-.command-history-editor.ace-modrinth .ace_marker-layer .ace_active-line {
-	background: var(--surface-2-5);
-}
-
-.command-history-editor.ace-modrinth .ace_gutter-active-line {
-	background-color: var(--surface-1-5);
-}
-
-.command-history-editor.ace-modrinth.ace_multiselect .ace_selection.ace_start {
-	box-shadow: 0 0 3px 0 var(--surface-2);
-}
-</style>

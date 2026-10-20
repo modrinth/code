@@ -1,4 +1,4 @@
-import type { Component, ComputedRef, Ref, ShallowRef } from 'vue'
+import type { ComputedRef, Ref } from 'vue'
 
 import type { ButtonMenuOption } from '#ui/components'
 import { createContext } from '#ui/providers/create-context'
@@ -98,7 +98,6 @@ export interface FileBrowserUIContext extends FileManagerContext {
 	toggleItemSelection: (item: FileItem) => void
 	deselectAll: () => void
 
-	editorComponent: ShallowRef<Component | null>
 	fileTabs: FileTabs
 	/** The editor of the active tab. */
 	fileEditorApi: ComputedRef<FileEditorBridge | null>
