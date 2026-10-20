@@ -29,12 +29,12 @@
 					:advanced-view-toggleable="!ui.inWorkbench"
 					:advanced-view="ui.advancedView.value"
 					:colored-icons="ui.coloredIcons.value"
+					:sidebar-toggle-location="ui.inWorkbench ? null : ui.sidebarToggleLocation.value"
 					@sort="view.handleSort"
 					@toggle-all="view.toggleSelectAll"
 					@toggle-column="toggleColumn"
 					@toggle-details="detailsEnabled = !detailsEnabled"
 					@toggle-advanced-view="ui.setAdvancedView(!ui.advancedView.value)"
-					:sidebar-toggle-location="ui.inWorkbench ? null : ui.sidebarToggleLocation.value"
 					@toggle-colored-icons="ui.setColoredIcons(!ui.coloredIcons.value)"
 					@set-sidebar-toggle="ui.setSidebarToggleLocation"
 				/>

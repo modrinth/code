@@ -17,14 +17,13 @@
 
 <script setup lang="ts">
 import { FolderArchiveIcon } from '@modrinth/assets'
-
 import { computed } from 'vue'
 
 import { useVIntl } from '#ui/composables/i18n'
 import type { FileZipTreeNode } from '#ui/helpers/toolbox/zip'
 
-import { detailsMessages as messages } from './messages'
 import DetailsEntry from '../../details-section/index.vue'
+import { detailsMessages as messages } from './messages'
 import { useContentsDetails } from './use-contents-details'
 import { useEntryDetails } from './use-entry-details'
 import { useModrinthLookupRow } from './use-modrinth-lookup'

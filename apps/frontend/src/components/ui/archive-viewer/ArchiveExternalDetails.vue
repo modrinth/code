@@ -38,8 +38,8 @@
 <script setup lang="ts">
 import { CoffeeIcon, DownloadIcon, ExternalIcon } from '@modrinth/assets'
 import {
-	type ArchiveSource,
 	ArchiveDetailsSection,
+	type ArchiveSource,
 	ButtonLink,
 	defineMessages,
 	useVIntl,

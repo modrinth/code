@@ -27,8 +27,8 @@ import { computed } from 'vue'
 
 import { useVIntl } from '#ui/composables/i18n'
 
-import { sectionMessages as messages } from './messages'
 import type { ArchiveCounts } from '../../types'
+import { sectionMessages as messages } from './messages'
 
 /** How many of each kind of entry an archive holds, as icons and counts on one line. */
 const props = defineProps<{

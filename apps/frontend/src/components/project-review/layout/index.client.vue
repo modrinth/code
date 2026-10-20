@@ -18,8 +18,8 @@
 import {
 	createWorkbench,
 	WORKBENCH_MODES,
-	type WorkbenchPanel,
 	WorkbenchLayout,
+	type WorkbenchPanel,
 } from '@modrinth/ui'
 import { computed, onScopeDispose, watch, watchEffect } from 'vue'
 
@@ -41,7 +41,13 @@ import type { ProjectReviewSlot, ProjectReviewSlots, ProjectReviewTab } from './
 const POPOUT_URL = '/project-review-popout.html'
 
 /** Panels that clip their own content rather than scrolling as a whole. */
-const UNSCROLLED_SLOTS: ProjectReviewSlot[] = ['right', 'disclosures', 'permissions', 'gallery', 'slicer']
+const UNSCROLLED_SLOTS: ProjectReviewSlot[] = [
+	'right',
+	'disclosures',
+	'permissions',
+	'gallery',
+	'slicer',
+]
 
 const props = defineProps<{
 	tabs: readonly ProjectReviewTab[]

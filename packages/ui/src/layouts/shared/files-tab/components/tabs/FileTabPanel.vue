@@ -83,8 +83,8 @@ import {
 } from '#ui/layouts/shared/files-tab/providers/file-manager.ts'
 import { injectWorkbench } from '#ui/layouts/shared/workbench/providers/workbench'
 
-import { currentLocation, type FileTabPanelParams } from '../../composables/file-tabs'
 import { useEntryMenu } from '../../composables/entry-menu'
+import { currentLocation, type FileTabPanelParams } from '../../composables/file-tabs'
 import { useSidebarToggleLocation } from '../../composables/sidebar-toggle'
 import { type FileEditorBridge, injectFileBrowserUI } from '../../providers/file-browser-ui'
 import { infoFrom, parentInfoFrom } from '../../utils'

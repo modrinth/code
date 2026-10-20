@@ -17,6 +17,7 @@
 			:disabled="ui.isBusy.value"
 			:disabled-tooltip="ui.busyTooltip.value"
 			:is-refreshing="ui.isRefreshing.value"
+			class="py-1"
 			@update:search-query="(value) => (ui.activeView.value.searchQuery.value = value)"
 			@create="ui.showCreateModal"
 			@upload="ui.initiateFileUpload"
@@ -26,7 +27,6 @@
 			@share="() => ui.shareEditorToMclogs()"
 			@find="() => ui.toggleFind()"
 			@toggle-sidebar="() => ui.setSidebarOpen(!ui.sidebarOpen.value)"
-			class="py-1"
 		>
 			<template #actions>
 				<IconButton

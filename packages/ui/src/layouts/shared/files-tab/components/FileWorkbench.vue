@@ -32,8 +32,8 @@ import type {
 } from '#ui/layouts/shared/workbench/types'
 
 import { FILE_TAB_COMPONENT, FILE_TAB_PANEL_COMPONENT } from '../composables/file-tabs'
-import { infoFrom } from '../utils'
 import { injectFileBrowserUI } from '../providers/file-browser-ui'
+import { infoFrom } from '../utils'
 import FileEmptyWorkspace from './FileEmptyWorkspace.vue'
 import FileTab from './tabs/FileTab.vue'
 import FileTabPanel from './tabs/FileTabPanel.vue'

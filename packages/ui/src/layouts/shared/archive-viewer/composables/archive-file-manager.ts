@@ -5,8 +5,8 @@ import { useFormatBytes } from '#ui/composables/format-bytes'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import {
 	AVAILABLE_DECOMPILER_TYPES,
-	DEFAULT_DECOMPILE_OPTIONS,
 	type DecompilerTypes,
+	DEFAULT_DECOMPILE_OPTIONS,
 } from '#ui/helpers/toolbox/decompile'
 import { type FileTypeInfo, getFileTypeInfo, type HashType } from '#ui/helpers/toolbox/file'
 import {

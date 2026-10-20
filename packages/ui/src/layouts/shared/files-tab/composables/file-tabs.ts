@@ -1,8 +1,8 @@
 import type {
 	DockviewApi,
 	DockviewGroupPanel,
-	DockviewReadyEvent,
 	DockviewIDisposable,
+	DockviewReadyEvent,
 	IDockviewPanel,
 } from 'dockview-vue'
 import type { ComputedRef, MaybeRefOrGetter, Ref } from 'vue'

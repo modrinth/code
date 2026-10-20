@@ -24,5 +24,4 @@ const panel = injectWorkbenchPanel()
 
 provideReviewSlot(computed(() => props.slotName))
 provideReviewPanelVisible(panel.visible)
-
 </script>

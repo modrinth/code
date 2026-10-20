@@ -5,8 +5,8 @@ import { createContext } from '#ui/providers/create-context'
 
 import type { DirectoryView } from '../composables/directory-view'
 import type { FileTabs } from '../composables/file-tabs'
-import type { FileItem } from '../types'
 import type { FilesSidebarToggleLocation } from '../settings'
+import type { FileItem } from '../types'
 import type {
 	FileContentVariants,
 	FileInfo,

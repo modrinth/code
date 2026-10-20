@@ -19,6 +19,8 @@ const props = defineProps<{ tab: ProjectReviewTab }>()
 const { tabCounts } = injectProjectReviewPageContext()
 
 const count = computed(() =>
-	props.tab in tabCounts.value ? tabCounts.value[props.tab as keyof typeof tabCounts.value] : undefined,
+	props.tab in tabCounts.value
+		? tabCounts.value[props.tab as keyof typeof tabCounts.value]
+		: undefined,
 )
 </script>

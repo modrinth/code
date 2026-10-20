@@ -1,4 +1,4 @@
-import type { Text } from '@codemirror/state'
+import type { Range, Text } from '@codemirror/state'
 import { Decoration, type DecorationSet, ViewPlugin, type ViewUpdate } from '@codemirror/view'
 import { hljs } from '@modrinth/utils/highlightjs/index'
 
@@ -55,7 +55,7 @@ function decorate(doc: Text, language: string): DecorationSet {
 		return Decoration.none
 	}
 
-	const ranges = []
+	const ranges: Range<Decoration>[] = []
 	const open: { className: string; from: number }[] = []
 	let position = 0
 	for (const [token, className] of html.matchAll(TOKENS)) {
@@ -63,7 +63,8 @@ function decorate(doc: Text, language: string): DecorationSet {
 			open.push({ className, from: position })
 		} else if (token === '</span>') {
 			const span = open.pop()
-			if (span && span.from < position) ranges.push(markFor(span.className).range(span.from, position))
+			if (span && span.from < position)
+				ranges.push(markFor(span.className).range(span.from, position))
 		} else {
 			position += ENTITIES[token]?.length ?? token.length
 		}

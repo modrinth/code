@@ -2,8 +2,12 @@ import { type LanguageSupport, StreamLanguage, type StreamParser } from '@codemi
 
 type LanguageLoader = () => Promise<LanguageSupport | StreamLanguage<unknown>>
 
-function legacy(load: () => Promise<StreamParser<unknown>>): LanguageLoader {
-	return async () => StreamLanguage.define(await load())
+/**
+ * A language from `@codemirror/legacy-modes`, whose parsers are typed by their own copy of
+ * CodeMirror's stream parser types, which only differ from this package's by name.
+ */
+function legacy(load: () => Promise<unknown>): LanguageLoader {
+	return async () => StreamLanguage.define((await load()) as StreamParser<unknown>)
 }
 
 const clike = () => import('@codemirror/legacy-modes/mode/clike')

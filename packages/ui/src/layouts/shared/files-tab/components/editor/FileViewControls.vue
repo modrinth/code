@@ -32,8 +32,8 @@
 import { BinaryIcon, BracesIcon, ScanEyeIcon, TypeIcon } from '@modrinth/assets'
 import { computed } from 'vue'
 
-import Combobox from '#ui/components/base/Combobox.vue'
 import { type ButtonMenuOption, TeleportOverflowMenu } from '#ui/components/base/buttons'
+import Combobox from '#ui/components/base/Combobox.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 
 import { injectFileBrowserUI } from '../../providers/file-browser-ui'

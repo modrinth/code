@@ -7,14 +7,13 @@ import {
 	UndoIcon,
 	XIcon,
 } from '@modrinth/assets'
-
 import { computed } from 'vue'
 
 import type { ButtonMenuLeafOption, ButtonMenuOption } from '#ui/components/base/buttons/types'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 
 import type { WorkbenchContext } from '../providers/workbench'
-import { type WorkbenchHost } from '../types'
+import type { WorkbenchHost } from '../types'
 
 const messages = defineMessages({
 	moveTo: { id: 'workbench.menu.move-to', defaultMessage: 'Move to' },

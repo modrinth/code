@@ -156,15 +156,7 @@
 <script setup lang="ts">
 import { FolderArchiveIcon, HistoryIcon, SaveIcon, TrashIcon } from '@modrinth/assets'
 import { type MaybeElement, useLocalStorage, useResizeObserver } from '@vueuse/core'
-import {
-	computed,
-	onMounted,
-	onUnmounted,
-	ref,
-	shallowReactive,
-	toValue,
-	watch,
-} from 'vue'
+import { computed, onMounted, onUnmounted, ref, shallowReactive, toValue, watch } from 'vue'
 
 import { type ButtonMenuOption, NewModal } from '#ui/components'
 import { Button, ContextMenu } from '#ui/components/base/buttons'

@@ -1,9 +1,9 @@
 import type {
 	DockviewApi,
 	DockviewGroupPanel,
+	DockviewIDisposable,
 	DockviewWillDropEvent,
 	DockviewWillShowOverlayLocationEvent,
-	DockviewIDisposable,
 	IDockviewPanel,
 } from 'dockview-vue'
 import { getGridLocation } from 'dockview-vue'

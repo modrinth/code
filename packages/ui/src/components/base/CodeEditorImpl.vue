@@ -124,7 +124,12 @@ async function applyLanguage(name: string) {
 function followDocument() {
 	const editor = view.value
 	const root = host.value?.getRootNode()
-	if (editor && root && root !== editor.root && (root instanceof Document || root instanceof ShadowRoot)) {
+	if (
+		editor &&
+		root &&
+		root !== editor.root &&
+		(root instanceof Document || root instanceof ShadowRoot)
+	) {
 		editor.setRoot(root)
 	}
 }

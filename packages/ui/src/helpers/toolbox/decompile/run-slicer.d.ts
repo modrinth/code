@@ -6,7 +6,14 @@ interface RunSlicerWasmRuntime {
 	load(
 		module: string | BufferSource,
 		options?: { noAutoImports?: boolean },
-	): Promise<{ exports: { decompile: (...args: any[]) => Promise<any> } }>
+	): Promise<{
+		exports: {
+			decompile: (
+				names: string | string[],
+				config?: object,
+			) => Promise<string | Record<string, string>>
+		}
+	}>
 }
 
 declare module '@run-slicer/cfr/cfr.wasm-runtime.js' {

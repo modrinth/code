@@ -7,7 +7,7 @@ import type {
 	IDockviewPanel,
 	SerializedDockview,
 } from 'dockview-vue'
-import { ref, type Ref } from 'vue'
+import { type Ref, ref } from 'vue'
 
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { injectNotificationManager } from '#ui/providers/web-notifications'

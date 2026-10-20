@@ -18,8 +18,8 @@ import {
 	computed,
 	type MaybeRefOrGetter,
 	onBeforeUnmount,
-	ref,
 	type Ref,
+	ref,
 	shallowRef,
 	type Slots,
 	toValue,
@@ -813,10 +813,8 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 		const fromApi = docks.get(from)?.api
 		if (fromApi) removeOwn(fromApi, id)
 
-		const nextPlacements = { ...placements.value }
-		if (host === panel.region) delete nextPlacements[id]
-		else nextPlacements[id] = host
-		placements.value = nextPlacements
+		const { [id]: _previous, ...otherPlacements } = placements.value
+		placements.value = host === panel.region ? otherPlacements : { ...otherPlacements, [id]: host }
 		closed.value = closed.value.filter((closedId) => closedId !== id)
 		pendingPositions.set(id, position)
 

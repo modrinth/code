@@ -7,8 +7,8 @@ import {
 	replaceAll,
 	replaceNext,
 	search,
-	SearchQuery,
 	searchPanelOpen,
+	SearchQuery,
 	setSearchQuery,
 } from '@codemirror/search'
 import { EditorSelection } from '@codemirror/state'
@@ -46,7 +46,9 @@ export function countMatches(view: EditorView): FindMatches {
 
 function setQuery(view: EditorView, text: string, replacement = '') {
 	view.dispatch({
-		effects: setSearchQuery.of(new SearchQuery({ search: text, replace: replacement, literal: true })),
+		effects: setSearchQuery.of(
+			new SearchQuery({ search: text, replace: replacement, literal: true }),
+		),
 	})
 }
 

@@ -23,9 +23,9 @@ import { injectFileBrowserUI } from '#ui/layouts/shared/files-tab/providers/file
 import { fileIconFor } from '#ui/layouts/shared/files-tab/utils'
 
 import type { ArchiveDetailRow } from '../../../types'
+import DetailsEntry from '../../details-section/index.vue'
 import { isPlaceholderDate } from './entry-values'
 import { detailsMessages as messages } from './messages'
-import DetailsEntry from '../../details-section/index.vue'
 import { useEntryDetails } from './use-entry-details'
 import { useSizeRow } from './use-size-row'
 
