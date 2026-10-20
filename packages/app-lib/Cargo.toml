@@ -75,9 +75,9 @@ reqwest = { workspace = true, features = [
   "gzip",
   "http2",
   "json",
-  "macos-system-configuration",
+	"system-proxy",
   "multipart",
-  "rustls-tls-webpki-roots",
+	"rustls",
   "stream",
 ] }
 rgb = { workspace = true }
