@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\t\t\tUPDATE versions SET components = jsonb_set(\n\t\t\t\t\tCOALESCE(components, '{}'::jsonb), '{minecraft_mod}',\n\t\t\t\t\tjsonb_build_object('game_versions', '[]'::jsonb, 'environment', NULL, 'mrpack_loaders', '[]'::jsonb)\n\t\t\t\t\t\t|| COALESCE(NULLIF(components->'minecraft_mod', 'null'::jsonb), '{}'::jsonb)\n\t\t\t\t\t\t|| $2::jsonb\n\t\t\t\t) WHERE id = $1\n\t\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Jsonb"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "d287c9f0d52fcc90ebc35e512cac2028b5bcf23aaa68a351ea858d0d56681b4d"
+}

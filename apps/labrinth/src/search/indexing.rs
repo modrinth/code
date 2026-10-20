@@ -10,13 +10,9 @@ use std::sync::LazyLock;
 use tracing::{info, warn};
 
 use crate::database::PgPool;
-use crate::database::models::loader_fields::{
-    QueryLoaderField, QueryLoaderFieldEnumValue, QueryVersionField,
-    VersionField,
-};
+use crate::database::models::loader_fields::{LoaderFieldEnumValue, VersionField};
 use crate::database::models::{
-    DBOrganizationId, DBProjectId, DBUserId, DBVersionId, LoaderFieldEnumId,
-    LoaderFieldEnumValueId, LoaderFieldId,
+	DBOrganizationId, DBProjectId, DBUserId, DBVersionId, LoaderFieldEnumId,
 };
 use crate::models::disclosures::ProjectDisclosure;
 use crate::models::exp;
@@ -356,7 +352,7 @@ async fn build_search_documents(
     .wrap_err("failed to fetch project disclosures")?;
 
     info!("Indexing local versions!");
-    let mut versions = load_project_versions(pool, project_ids.clone()).await?;
+	let mut versions = load_project_versions(pool, redis, project_ids.clone()).await?;
 
     info!("Indexing local org owners!");
 
@@ -406,53 +402,6 @@ async fn build_search_documents(
         async move { Ok(acc) }
     })
     .await?;
-
-    info!("Getting all loader fields!");
-    let loader_field_definitions: Vec<QueryLoaderField> = sqlx::query!(
-        "
-        SELECT DISTINCT id, field, field_type, enum_type, min_val, max_val, optional
-        FROM loader_fields lf
-        ",
-    )
-    .fetch(pool)
-    .map_ok(|m| QueryLoaderField {
-        id: LoaderFieldId(m.id),
-        field: m.field,
-        field_type: m.field_type,
-        enum_type: m.enum_type.map(LoaderFieldEnumId),
-        min_val: m.min_val,
-        max_val: m.max_val,
-        optional: m.optional,
-    })
-    .try_collect()
-    .await?;
-    let loader_field_definitions: Vec<&QueryLoaderField> =
-        loader_field_definitions.iter().collect();
-
-    info!("Getting all loader field enum values!");
-
-    let loader_field_enum_values: Vec<QueryLoaderFieldEnumValue> =
-        sqlx::query!(
-            r#"
-        SELECT DISTINCT id, enum_id, value, ordering, created,
-        metadata->>'type' AS "ty?",
-        (metadata->>'major')::boolean AS "major?"
-        FROM loader_field_enum_values lfev
-        ORDER BY enum_id, ordering, created DESC
-        "#
-        )
-        .fetch(pool)
-        .map_ok(|m| QueryLoaderFieldEnumValue {
-            id: LoaderFieldEnumValueId(m.id),
-            enum_id: LoaderFieldEnumId(m.enum_id),
-            value: m.value,
-            ordering: m.ordering,
-            created: m.created,
-            ty: m.ty,
-            major: m.major,
-        })
-        .try_collect()
-        .await?;
 
     info!("Indexing loaders, project types!");
     let mut project_uploads = Vec::new();
@@ -631,24 +580,26 @@ async fn build_search_documents(
                 .then_with(|| a.id.0.cmp(&b.id.0))
         });
 
-        let project_version_fields = versions
-            .iter()
-            .flat_map(|x| x.version_fields.clone())
-            .collect::<Vec<_>>();
-        let aggregated_version_fields = VersionField::from_query_json(
-            project_version_fields,
-            &loader_field_definitions,
-            &loader_field_enum_values,
-            true,
-        );
-        let unvectorized_loader_fields = aggregated_version_fields
-            .iter()
-            .map(|field| {
-                (field.field_name.clone(), field.value.serialize_internal())
-            })
-            .collect();
-        let mut loader_fields =
-            from_duplicate_version_fields(aggregated_version_fields);
+		let aggregated_version_fields = versions
+			.iter()
+			.flat_map(|version| version.version_fields.clone())
+			.collect::<Vec<_>>();
+		let mut loader_fields =
+			from_duplicate_version_fields(aggregated_version_fields.clone());
+		let mut unvectorized_loader_fields = loader_fields
+			.iter()
+			.map(|(name, values)| (name.clone(), serde_json::json!(values)))
+			.collect::<HashMap<_, _>>();
+		if let Some(environment) = aggregated_version_fields
+			.iter()
+			.rev()
+			.find(|field| field.field_name == "environment")
+		{
+			unvectorized_loader_fields.insert(
+				"environment".to_owned(),
+				environment.value.serialize_internal(),
+			);
+		}
         let project_loader_fields = loader_fields.clone();
 
         let mut project_loaders = versions
@@ -677,12 +628,7 @@ async fn build_search_documents(
                 return None;
             }
 
-            let version_fields = VersionField::from_query_json(
-                version.version_fields.clone(),
-                &loader_field_definitions,
-                &loader_field_enum_values,
-                false,
-            );
+			let version_fields = version.version_fields.clone();
             let unvectorized_loader_fields = version_fields
                 .iter()
                 .map(|field| {
@@ -849,21 +795,23 @@ struct PartialVersion {
     id: DBVersionId,
     loaders: Vec<String>,
     project_types: Vec<String>,
-    version_fields: Vec<QueryVersionField>,
+    version_fields: Vec<VersionField>,
     date_published: DateTime<Utc>,
 }
 
 async fn load_project_versions(
     pool: &PgPool,
+	redis: &RedisPool,
     project_ids: Vec<i64>,
 ) -> Result<HashMap<DBProjectId, Vec<PartialVersion>>> {
-    let versions: HashMap<DBProjectId, Vec<(DBVersionId, DateTime<Utc>)>> =
+    let versions: HashMap<DBProjectId, Vec<(DBVersionId, DateTime<Utc>, exp::version::VersionSerial)>> =
         sqlx::query!(
-            "
-        SELECT v.id, v.mod_id, v.date_published
+            r#"
+        SELECT v.id, v.mod_id, v.date_published,
+			v.components AS "components!: sqlx::types::Json<exp::version::VersionSerial>"
         FROM versions v
         WHERE mod_id = ANY($1)
-        ",
+        "#,
             &project_ids,
         )
         .fetch(pool)
@@ -871,12 +819,12 @@ async fn load_project_versions(
             HashMap::new(),
             |mut acc: HashMap<
                 DBProjectId,
-                Vec<(DBVersionId, DateTime<Utc>)>,
+                Vec<(DBVersionId, DateTime<Utc>, exp::version::VersionSerial)>,
             >,
              m| {
                 acc.entry(DBProjectId(m.mod_id))
                     .or_default()
-                    .push((DBVersionId(m.id), m.date_published));
+                    .push((DBVersionId(m.id), m.date_published, m.components.0));
                 async move { Ok(acc) }
             },
         )
@@ -893,7 +841,7 @@ async fn load_project_versions(
     let all_version_ids = versions
         .values()
         .flat_map(|version_ids| version_ids.iter())
-        .map(|(version_id, _)| version_id.0)
+        .map(|(version_id, _, _)| version_id.0)
         .collect::<Vec<i64>>();
 
     let loaders_ptypes: DashMap<DBVersionId, VersionLoaderData> = sqlx::query!(
@@ -925,46 +873,21 @@ async fn load_project_versions(
     .await
     .wrap_err("failed to fetch loaders and project types")?;
 
-    // Get version fields
-    let version_fields: DashMap<DBVersionId, Vec<QueryVersionField>> =
-        sqlx::query!(
-            "
-        SELECT version_id, field_id, int_value, enum_value, string_value
-        FROM version_fields
-        WHERE version_id = ANY($1)
-        ",
-            &all_version_ids,
-        )
-        .fetch(pool)
-        .try_fold(
-            DashMap::new(),
-            |acc: DashMap<DBVersionId, Vec<QueryVersionField>>, m| {
-                let qvf = QueryVersionField {
-                    version_id: DBVersionId(m.version_id),
-                    field_id: LoaderFieldId(m.field_id),
-                    int_value: m.int_value,
-                    enum_value: if m.enum_value == -1 {
-                        None
-                    } else {
-                        Some(LoaderFieldEnumValueId(m.enum_value))
-                    },
-                    string_value: m.string_value,
-                };
-
-                acc.entry(DBVersionId(m.version_id)).or_default().push(qvf);
-                async move { Ok(acc) }
-            },
-        )
-        .await
-        .wrap_err("failed to fetch version fields")?;
-
-    // Get version fields
+	let minecraft_catalog = if versions.values().flatten().any(|(_, _, components)| {
+		components.minecraft_mod.is_some()
+	}) {
+		LoaderFieldEnumValue::list(LoaderFieldEnumId(1), pool, redis)
+			.await
+			.wrap_err("fetching Minecraft version catalog for search indexing")?
+	} else {
+		Vec::new()
+	};
 
     // Convert to partial versions
     let mut res_versions: HashMap<DBProjectId, Vec<PartialVersion>> =
         HashMap::new();
     for (project_id, version_ids) in &versions {
-        for (version_id, date_published) in version_ids {
+        for (version_id, date_published, components) in version_ids {
             // Extract version-specific data fetched
             // We use 'remove' as every version is only in the map once
             let version_loader_data = loaders_ptypes
@@ -972,10 +895,17 @@ async fn load_project_versions(
                 .map(|(_, version_loader_data)| version_loader_data)
                 .unwrap_or_default();
 
-            let version_fields = version_fields
-                .remove(version_id)
-                .map(|(_, version_fields)| version_fields)
-                .unwrap_or_default();
+			let version_fields = components.minecraft_mod.as_ref()
+				.map(|component| {
+					VersionField::from_minecraft_component_with_catalog(
+						*version_id,
+						component,
+						&minecraft_catalog,
+					)
+				})
+				.transpose()
+				.wrap_err_with(|| format!("building search fields for version {}", version_id.0))?
+				.unwrap_or_default();
 
             res_versions
                 .entry(*project_id)

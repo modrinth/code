@@ -4,20 +4,84 @@
 // for fetching data from forge, maven, etc.
 // These fields only apply to minecraft-java, and are hardcoded to the minecraft-java game.
 
+use std::sync::LazyLock;
+
 use chrono::{DateTime, Utc};
 use eyre::{Result, WrapErr};
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
-use serde_json::json;
 
 use xredis::RedisPool;
 
 use super::{
-    LoaderFieldEnumValueId,
+    LoaderFieldEnumId, LoaderFieldEnumValueId,
     loader_fields::{
         LoaderFieldEnum, LoaderFieldEnumValue, VersionField, VersionFieldValue,
     },
 };
+
+/// Mojang version names that require aliases for historical Labrinth compatibility.
+// A list of version names that contains spaces.
+// Generated using the command
+// ```sh
+// curl https://launchermeta.mojang.com/mc/game/version_manifest.json \
+//      | jq '[.versions[].id | select(contains(" "))]'
+// ```
+pub(crate) const HALL_OF_SHAME: [(&str, &str); 12] = [
+    ("1.14.2 Pre-Release 4", "1.14.2-pre4"),
+    ("1.14.2 Pre-Release 3", "1.14.2-pre3"),
+    ("1.14.2 Pre-Release 2", "1.14.2-pre2"),
+    ("1.14.2 Pre-Release 1", "1.14.2-pre1"),
+    ("1.14.1 Pre-Release 2", "1.14.1-pre2"),
+    ("1.14.1 Pre-Release 1", "1.14.1-pre1"),
+    ("1.14 Pre-Release 5", "1.14-pre5"),
+    ("1.14 Pre-Release 4", "1.14-pre4"),
+    ("1.14 Pre-Release 3", "1.14-pre3"),
+    ("1.14 Pre-Release 2", "1.14-pre2"),
+    ("1.14 Pre-Release 1", "1.14-pre1"),
+    ("3D Shareware v1.34", "3D-Shareware-v1.34"),
+];
+
+/// Preserves historical Labrinth aliases while leaving other catalog names unchanged.
+pub(crate) fn legacy_game_version_name(name: &str) -> &str {
+    HALL_OF_SHAME
+        .iter()
+        .find_map(|(canonical, legacy)| (*canonical == name).then_some(*legacy))
+        .unwrap_or(name)
+}
+
+/// Mojank for some reason has versions released at the same DateTime. This hardcodes them to fix this,
+/// as most of our ordering logic is with DateTime
+pub(crate) static HALL_OF_SHAME_2: LazyLock<[(&str, DateTime<Utc>); 4]> =
+    LazyLock::new(|| {
+        [
+            ("1.4.5", "2012-12-19T22:00:00+00:00"),
+            ("1.4.6", "2012-12-19T22:00:01+00:00"),
+            ("1.6.3", "2013-09-13T10:54:41+00:00"),
+            ("13w37b", "2013-09-13T10:54:42+00:00"),
+        ]
+        .map(|(version, date)| {
+            (
+                version,
+                DateTime::parse_from_rfc3339(date)
+                    .unwrap()
+                    .with_timezone(&Utc),
+            )
+        })
+    });
+
+/// Preserves the historical ordering of releases with identical upstream timestamps.
+pub(crate) fn legacy_game_version_date(
+    name: &str,
+    date: DateTime<Utc>,
+) -> DateTime<Utc> {
+    HALL_OF_SHAME_2
+        .iter()
+        .find_map(|(version, corrected)| {
+            (*version == name).then_some(*corrected)
+        })
+        .unwrap_or(date)
+}
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct MinecraftGameVersion {
@@ -168,66 +232,35 @@ impl<'a> MinecraftGameVersionBuilder<'a> {
         }
     }
 
-    pub async fn insert<'b, E>(
-        self,
-        exec: E,
-        redis: &RedisPool,
-    ) -> Result<LoaderFieldEnumValueId>
-    where
-        E: crate::database::Executor<'b, Database = sqlx::Postgres> + Copy,
-    {
-        let game_versions_enum =
-            LoaderFieldEnum::get("game_versions", exec, redis)
-                .await
-                .wrap_err("fetching game versions loader field")?
-                .ok_or_else(|| {
-                    eyre::eyre!("Missing loaders field: 'game_versions'")
-                })
-                .wrap_err("finding game versions loader field")?;
-
-        // Get enum id for game versions
-        let metadata = json!({
-            "type": self.version_type,
-            "major": false
-        });
-
-        // This looks like a mess, but it *should* work
-        // This allows game versions to be partially updated without
-        // replacing the unspecified fields with defaults.
-        let result = sqlx::query!(
-            "
-                INSERT INTO loader_field_enum_values (enum_id, value, created, metadata)
-                VALUES ($1, $2, COALESCE($3, timezone('utc', now())), $4)
-                ON CONFLICT (enum_id, value) DO UPDATE
-                    SET metadata = jsonb_set(
-                        COALESCE(loader_field_enum_values.metadata, $4),
-                        '{type}',
-                        COALESCE($4->'type', loader_field_enum_values.metadata->'type')
-                    ),
-                    created = COALESCE($3, loader_field_enum_values.created)
-                RETURNING id
-                ",
-            game_versions_enum.id.0,
-            self.version,
-            self.date.map(chrono::DateTime::naive_utc),
-            metadata
-        )
-        .fetch_one(exec)
-        .await
-        .wrap_err("inserting game version")?;
-
-        let mut conn = redis
-            .connect()
-            .await
-            .wrap_err("connecting to redis to clear game version cache")?;
-        let key = conn.key().entity(
-            crate::database::models::loader_fields::LOADER_FIELD_ENUM_VALUES_NAMESPACE,
-            game_versions_enum.id.0,
-        );
-        conn.delete(&key)
-            .await
-            .wrap_err("clearing cached game versions")?;
-
-        Ok(LoaderFieldEnumValueId(result.id))
-    }
+	/// Verifies an entry owned by the metadata generator; never creates incomplete catalog rows.
+	pub async fn insert<'b, E>(
+		self,
+		exec: E,
+		redis: &RedisPool,
+	) -> Result<LoaderFieldEnumValueId>
+	where
+		E: crate::database::Executor<'b, Database = sqlx::Postgres> + Copy,
+	{
+		let version = self
+			.version
+			.ok_or_else(|| eyre::eyre!("missing Minecraft version name"))?;
+		let values =
+			LoaderFieldEnumValue::list(LoaderFieldEnumId(1), exec, redis)
+				.await?;
+		let existing = values.into_iter().find(|value| value.value == version)
+			.ok_or_else(|| eyre::eyre!("Minecraft version `{version}` is absent from the metadata catalog; ingest it with the metadata generator"))?;
+		if let Some(ty) = self.version_type {
+			eyre::ensure!(
+				existing.ty.as_deref() == Some(ty),
+				"Minecraft version `{version}` type differs from the metadata catalog; update it with the metadata generator"
+			);
+		}
+		if let Some(date) = self.date {
+			eyre::ensure!(
+				existing.created == *date,
+				"Minecraft version `{version}` release date differs from the metadata catalog; update it with the metadata generator"
+			);
+		}
+		Ok(existing.id)
+	}
 }

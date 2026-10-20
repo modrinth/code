@@ -395,6 +395,9 @@ pub struct EditVersion {
     )]
     pub ordering: Option<Option<i32>>,
 
+    #[serde(default)]
+    pub minecraft_mod: Option<crate::models::exp::minecraft::ModVersionEdit>,
+
     // Flattened loader fields
     // All other fields are loader-specific VersionFields
     // These are flattened during serialization
@@ -414,6 +417,7 @@ pub struct EditVersionFileType {
 #[utoipa::path(
 	tag = "versions",
 	patch,
+    request_body = serde_json::Value,
 	params(
 		("id" = VersionId, Path, description = "The ID of the version")
 	),
@@ -436,7 +440,7 @@ pub async fn version_edit_route(
     info: web::Path<(VersionId,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    new_version: web::Json<serde_json::Value>,
+    new_version: web::Json<EditVersion>,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
@@ -457,13 +461,11 @@ pub async fn version_edit(
     info: web::Path<(VersionId,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    new_version: web::Json<serde_json::Value>,
+    new_version: web::Json<EditVersion>,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
-    let new_version: EditVersion =
-        serde_json::from_value(new_version.into_inner())
-            .wrap_request_err("deserializing JSON data")?;
+    let new_version = new_version.into_inner();
     version_edit_helper(
         req,
         info.into_inner(),
@@ -710,6 +712,55 @@ pub(crate) async fn version_edit_in_transaction(
                 )?;
             }
 
+            if let Some(edit) = new_version.minecraft_mod {
+                use crate::models::exp::component::ComponentEdit;
+
+                if new_version.fields.keys().any(|key| {
+                    matches!(
+                        key.as_str(),
+                        "game_versions" | "environment" | "mrpack_loaders"
+                    )
+                }) {
+                    return Err(ApiError::Request(eyre::eyre!(
+                        "cannot combine typed and flattened Minecraft fields"
+                    )));
+                }
+                let component = if let Some(mut component) =
+                    version_item.inner.components.minecraft_mod.clone()
+                {
+                    edit.apply_to(&mut component)
+                        .await
+                        .wrap_request_err("applying Minecraft version edit")?;
+                    component
+                } else {
+                    edit.create().wrap_request_err(
+                        "creating Minecraft version component",
+                    )?
+                };
+                if component.game_versions.is_empty() {
+                    return Err(ApiError::Request(eyre::eyre!(
+                        "at least one Minecraft game version is required"
+                    )));
+                }
+                VersionField::from_minecraft_component(version_id, &component)
+                    .await
+                    .wrap_request_err(
+                        "validating Minecraft version component",
+                    )?;
+                sqlx::query!(
+                    r#"
+                    UPDATE versions
+                    SET components = jsonb_set(COALESCE(components, '{}'::jsonb), '{minecraft_mod}', $2::jsonb)
+                    WHERE id = $1
+                    "#,
+                    version_id as database::models::ids::DBVersionId,
+                    sqlx::types::Json(component) as _
+                )
+                .execute(&mut transaction)
+                .await
+                .wrap_internal_err("updating Minecraft version component")?;
+            }
+
             if !new_version.fields.is_empty() {
                 let version_fields_names = new_version
                     .fields
@@ -778,25 +829,6 @@ pub(crate) async fn version_edit_in_transaction(
                     .into_iter()
                     .filter(|lf| version_fields_names.contains(&lf.field))
                     .collect::<Vec<LoaderField>>();
-
-                let loader_field_ids = loader_fields
-                    .iter()
-                    .map(|lf| lf.id.0)
-                    .collect::<Vec<i32>>();
-                sqlx::query!(
-                    "
-                    DELETE FROM version_fields
-                    WHERE version_id = $1
-                    AND field_id = ANY($2)
-                    ",
-                    version_id as database::models::ids::DBVersionId,
-                    &loader_field_ids
-                )
-                .execute(&mut *transaction)
-                .await
-                .wrap_internal_err(
-                    "querying database for `version_edit_helper`",
-                )?;
 
                 let mut loader_field_enum_values =
                     LoaderFieldEnumValue::list_many_loader_fields(

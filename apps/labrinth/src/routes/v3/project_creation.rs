@@ -977,7 +977,7 @@ async fn project_create_inner(
             })
         }
 
-        let project_builder_actual = models::project_item::ProjectBuilder {
+        let mut project_builder_actual = models::project_item::ProjectBuilder {
             project_id: project_id.into(),
             team_id,
             organization_id: project_create_data
@@ -1016,6 +1016,11 @@ async fn project_create_inner(
             components: exp::ProjectSerial::default(),
         };
         let project_builder = project_builder_actual.clone();
+        for version in &mut project_builder_actual.initial_versions {
+            if version.components.minecraft_mod.is_some() {
+                version.version_fields.clear();
+            }
+        }
 
         let now = Utc::now();
 
@@ -1193,6 +1198,7 @@ async fn create_initial_version(
     let version_fields = try_create_version_fields(
         version_id,
         &version_data.fields,
+        version_data.minecraft_mod.as_ref(),
         &loader_fields,
         &mut loader_field_enum_values,
     )?;
@@ -1224,7 +1230,10 @@ async fn create_initial_version(
         version_type: version_data.release_channel.to_string(),
         requested_status: None,
         ordering: version_data.ordering,
-        components: exp::VersionSerial::default(),
+        components: exp::VersionSerial {
+            minecraft_mod: version_data.minecraft_mod.clone(),
+            ..Default::default()
+        },
     };
 
     Ok(version)

@@ -5,6 +5,7 @@ use std::collections::HashMap;
 use super::super::ids::OrganizationId;
 use crate::database::models::{DBProjectDisclosure, DBProjectId, version_item};
 use crate::models::disclosures::ProjectDisclosureType;
+use crate::models::exp::minecraft::Environment;
 use crate::models::ids::{ProjectId, TeamId, ThreadId, VersionId};
 use crate::models::link_platform::LinkPlatform;
 use crate::models::projects::{
@@ -141,6 +142,13 @@ impl LegacyProject {
             .collect();
 
         if let Some(versions_item) = versions_item {
+			if let Some(component) = versions_item.inner.components.minecraft_mod.as_ref() {
+				(client_side, server_side) =
+					v2_reroute::convert_minecraft_environment_to_v2_side_types(
+						component.environment.unwrap_or(Environment::Unknown),
+						Some(&og_project_type),
+					);
+			} else {
             // Extract side types from remaining fields
             let fields = versions_item
                 .version_fields
@@ -154,6 +162,7 @@ impl LegacyProject {
                     &fields,
                     Some(&*og_project_type),
                 );
+			}
 
             // - if loader is mrpack, this is a modpack
             // the loaders are whatever the corresponding loader fields are
@@ -367,18 +376,29 @@ impl From<Version> for LegacyVersion {
                 }
             }
         }
-        let environment = data
-            .fields
-            .get("environment")
-            .and_then(|value| value.as_str())
-            .unwrap_or("unknown")
-            .to_string();
+		let minecraft = data.components.minecraft_mod.as_ref();
+		if let Some(component) = minecraft {
+			game_versions = component.game_versions.iter().map(ToString::to_string).collect();
+		}
+		let environment = if let Some(component) = minecraft {
+            component.environment.unwrap_or(Environment::Unknown).as_str().to_string()
+		} else {
+			data.fields
+				.get("environment")
+				.and_then(|value| value.as_str())
+				.unwrap_or("unknown")
+				.to_string()
+		};
 
         // - if loader is mrpack, this is a modpack
         // the v2 loaders are whatever the corresponding loader fields are
         let mut loaders =
             data.loaders.into_iter().map(|l| l.0).collect::<Vec<_>>();
-        if loaders.contains(&"mrpack".to_string())
+		if loaders.contains(&"mrpack".to_string()) && let Some(component) = minecraft {
+            loaders = component.mrpack_loaders.iter()
+                .map(|loader| loader.as_str().to_string())
+                .collect();
+		} else if loaders.contains(&"mrpack".to_string())
             && let Some((_, mrpack_loaders)) = data
                 .fields
                 .into_iter()

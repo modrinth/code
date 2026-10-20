@@ -1,16 +1,20 @@
-use crate::util::error::ApiContext as _;
-use std::collections::HashMap;
+use crate::util::error::{ApiContext as _, Context as _};
 
 use super::ApiError;
-use crate::database::PgPool;
-use crate::database::models::loader_fields::LoaderFieldEnumValue;
+use crate::database::models::legacy_loader_fields::{
+	legacy_game_version_date, legacy_game_version_name,
+};
+use crate::database::{MinecraftMetaDb, PgPool};
 use crate::models::v2::projects::LegacySideType;
 use crate::routes::v2_reroute::capitalize_first;
-use crate::routes::v3::tags::{LinkPlatformQueryData, LoaderFieldsEnumQuery};
+use crate::routes::v3::tags::LinkPlatformQueryData;
 use crate::routes::{v2_reroute, v3};
 use actix_web::{HttpResponse, get, web};
 use chrono::{DateTime, Utc};
 use itertools::Itertools;
+use minecraft_meta_model::{
+	model::MinecraftVersion, upstream::mojang::VersionType,
+};
 use xredis::RedisPool;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
@@ -184,48 +188,51 @@ pub struct GameVersionQuery {
 )]
 #[get("/game_version")]
 pub async fn game_version_list(
-    pool: web::Data<PgPool>,
-    query: web::Query<GameVersionQuery>,
-    redis: web::Data<RedisPool>,
-) -> Result<HttpResponse, ApiError> {
-    let mut filters = HashMap::new();
-    if let Some(type_) = &query.type_ {
-        filters.insert("type".to_string(), serde_json::json!(type_));
-    }
-    if let Some(major) = query.major {
-        filters.insert("major".to_string(), serde_json::json!(major));
-    }
-    let response = v3::tags::loader_fields_list(
-        pool,
-        web::Query(LoaderFieldsEnumQuery {
-            loader_field: "game_versions".to_string(),
-            filters: Some(filters),
-        }),
-        redis,
-    )
-    .await
-    .wrap_api_err("fetching game versions")?;
-
-    // Convert to V2 format
-    Ok(
-        match v2_reroute::extract_ok_json::<Vec<LoaderFieldEnumValue>>(response)
-            .await
-        {
-            Ok(fields) => {
-                let fields = fields
-                    .into_iter()
-                    .map(|f| GameVersionQueryData {
-                        version: f.value,
-                        version_type: f.ty.unwrap_or_default(),
-                        date: f.created,
-                        major: f.major.unwrap_or_default(),
-                    })
-                    .collect::<Vec<_>>();
-                HttpResponse::Ok().json(fields)
-            }
-            Err(response) => response,
-        },
-    )
+	minecraft_meta_db: web::Data<MinecraftMetaDb>,
+	query: web::Query<GameVersionQuery>,
+) -> Result<web::Json<Vec<GameVersionQueryData>>, ApiError> {
+	let mut conn = minecraft_meta_db
+		.0
+		.connection()
+		.await
+		.wrap_internal_err("acquiring minecraft-meta connection")?;
+	let versions = MinecraftVersion::all()
+		.exec(&mut conn)
+		.await
+		.wrap_internal_err("fetching minecraft-meta game versions")?;
+	let mut versions = versions
+		.into_iter()
+		.map(|row| {
+			let entry = row.catalog_entry.0;
+			let version_type = match entry.ty {
+				VersionType::Release => "release",
+				VersionType::Snapshot => "snapshot",
+				VersionType::OldAlpha => "alpha",
+				VersionType::OldBeta => "beta",
+			};
+			let date = DateTime::<Utc>::from_timestamp(
+				entry.release_time.as_second(),
+				entry.release_time.subsec_nanosecond() as u32,
+			)
+			.ok_or_else(|| ApiError::Internal(eyre::eyre!(
+				"minecraft-meta release timestamp is out of range"
+			)))?;
+			Ok(GameVersionQueryData {
+				version: legacy_game_version_name(&row.name.to_string()).to_owned(),
+				version_type: version_type.to_owned(),
+				date: legacy_game_version_date(&row.name.to_string(), date),
+				major: matches!(entry.ty, VersionType::Release),
+			})
+		})
+		.collect::<Result<Vec<_>, ApiError>>()?;
+	versions.retain(|version| {
+		query.type_.as_ref().is_none_or(|ty| ty == &version.version_type)
+			&& query.major.is_none_or(|major| major == version.major)
+	});
+	versions.sort_unstable_by(|a, b| {
+		b.date.cmp(&a.date).then_with(|| a.version.cmp(&b.version))
+	});
+	Ok(web::Json(versions))
 }
 
 #[derive(serde::Serialize, utoipa::ToSchema)]

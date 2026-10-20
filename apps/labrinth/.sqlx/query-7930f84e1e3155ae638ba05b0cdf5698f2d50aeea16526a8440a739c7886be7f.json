@@ -1,0 +1,42 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                    SELECT DISTINCT mod_id, v.id as id, date_published,\n                        v.components AS \"components: sqlx::types::Json<exp::VersionSerial>\"\n                    FROM mods m\n                    INNER JOIN versions v ON m.id = v.mod_id AND v.status = ANY($3)\n                    WHERE m.id = ANY($1) OR m.slug = ANY($2)\n                    ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "mod_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "date_published",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 3,
+        "name": "components: sqlx::types::Json<exp::VersionSerial>",
+        "type_info": "Jsonb"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array",
+        "TextArray",
+        "TextArray"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "7930f84e1e3155ae638ba05b0cdf5698f2d50aeea16526a8440a739c7886be7f"
+}

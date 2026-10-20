@@ -1,0 +1,29 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT q.hash AS \"hash!\", latest.id AS \"version_id!\"\n        FROM JSONB_TO_RECORDSET($1::JSONB) AS q(\n            hash TEXT,\n            project_id BIGINT,\n            loaders VARCHAR[],\n            version_types VARCHAR[],\n            loader_fields JSONB\n        )\n        CROSS JOIN LATERAL (\n            SELECT v.id\n            FROM versions v\n            WHERE v.mod_id = q.project_id\n                AND v.status = ANY($2::VARCHAR[])\n                AND (q.version_types IS NULL OR v.version_type = ANY(q.version_types))\n                AND (\n                    q.loaders IS NULL\n                    OR EXISTS (\n                        SELECT 1 FROM loaders_versions lv\n                        INNER JOIN loaders l ON l.id = lv.loader_id\n                        WHERE lv.version_id = v.id AND l.loader = ANY(q.loaders)\n                    )\n                )\n                AND NOT EXISTS (\n                    SELECT 1\n                    FROM JSONB_EACH(q.loader_fields) AS req(field, vals)\n\t\t\t\t\tWHERE req.field IN ('game_versions', 'mrpack_loaders', 'environment')\n\t\t\t\t\t\tAND v.components->'minecraft_mod' IS NOT NULL\n\t\t\t\t\t\tAND v.components->'minecraft_mod' <> 'null'::JSONB\n\t\t\t\t\t\tAND (\n\t\t\t\t\t\t\treq.field <> 'environment'\n\t\t\t\t\t\t\tOR COALESCE(JSONB_TYPEOF(v.components->'minecraft_mod'->'environment') = 'string', FALSE)\n\t\t\t\t\t\t)\n\t\t\t\t\t\tAND NOT EXISTS (\n\t\t\t\t\t\t\tSELECT 1\n\t\t\t\t\t\t\tFROM JSONB_ARRAY_ELEMENTS(req.vals) AS want(val)\n\t\t\t\t\t\t\tWHERE JSONB_TYPEOF(want.val) = 'string'\n\t\t\t\t\t\t\t\tAND CASE WHEN req.field = 'environment' THEN\n\t\t\t\t\t\t\t\t\tv.components->'minecraft_mod'->'environment' = want.val\n\t\t\t\t\t\t\t\tELSE\n\t\t\t\t\t\t\t\t\tCOALESCE(v.components->'minecraft_mod'->req.field, '[]'::JSONB) @> JSONB_BUILD_ARRAY(want.val)\n\t\t\t\t\t\t\t\tEND\n\t\t\t\t\t\t)\n                )\n            ORDER BY v.ordering DESC NULLS FIRST, v.date_published DESC, v.id DESC\n            LIMIT 1\n        ) latest\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "hash!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 1,
+        "name": "version_id!",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Jsonb",
+        "VarcharArray"
+      ]
+    },
+    "nullable": [
+      null,
+      false
+    ]
+  },
+  "hash": "a0ce31766162d74a7b8c2fc2b0ee988a4ee9773eb26947c54a5859a2b80bcd61"
+}

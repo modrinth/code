@@ -6,7 +6,7 @@ use crate::models::disclosures::ProjectDisclosureType;
 use crate::models::link_platform::LinkPlatform;
 use crate::models::pats::Scopes;
 use crate::models::projects::{
-    Link, MonetizationStatus, Project, ProjectStatus, Version,
+    Link, MonetizationStatus, Project, ProjectStatus,
 };
 use crate::models::v2::projects::{
     DonationLink, LegacyProject, LegacySideType, LegacyVersion,
@@ -785,26 +785,36 @@ pub async fn project_edit(
                 .await
                 .wrap_internal_err("fetching versions from database")?;
         for version in versions {
-            let version = Version::from(version);
-            let mut fields = version.fields;
+            let environment = version
+                .inner
+                .components
+                .minecraft_mod
+                .as_ref()
+                .and_then(|component| component.environment);
             let (current_client_side, current_server_side) =
-                v2_reroute::convert_v3_side_types_to_v2_side_types(
-                    &fields, None,
+                v2_reroute::convert_minecraft_environment_to_v2_side_types(
+                    environment.unwrap_or(
+                        crate::models::exp::minecraft::Environment::Unknown,
+                    ),
+                    None,
                 );
-            let client_side = client_side.unwrap_or(current_client_side);
-            let server_side = server_side.unwrap_or(current_server_side);
-            fields.extend(v2_reroute::convert_v2_side_types_to_v3_side_types(
-                client_side,
-                server_side,
-            ));
+            let environment = super::version_creation::environment_from_sides(
+                client_side.unwrap_or(current_client_side),
+                server_side.unwrap_or(current_server_side),
+            );
+            let component = crate::models::exp::minecraft::ModVersionEdit {
+                game_versions: None,
+                environment: Some(Some(environment)),
+                mrpack_loaders: None,
+            };
 
             response = v3::versions::version_edit_helper(
                 req.clone(),
-                (version.id,),
+                (version.inner.id.into(),),
                 pool.clone(),
                 redis.clone(),
                 v3::versions::EditVersion {
-                    fields,
+                    minecraft_mod: Some(component),
                     ..Default::default()
                 },
                 session_queue.clone(),

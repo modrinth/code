@@ -1,10 +1,7 @@
 use super::ids::*;
-use super::loader_fields::VersionField;
+use super::loader_fields::{LoaderFieldEnumValue, VersionField, minecraft_metadata};
 use crate::database::PgTransaction;
 
-use crate::database::models::loader_fields::{
-    QueryLoaderField, QueryLoaderFieldEnumValue, QueryVersionField,
-};
 use crate::file_hosting::FileHost;
 use crate::models::exp;
 use xredis::RedisPool;
@@ -22,7 +19,7 @@ use std::cmp::Ordering;
 use std::collections::HashMap;
 use tracing::error;
 
-pub const VERSIONS_NAMESPACE: &str = "versions:v4";
+pub const VERSIONS_NAMESPACE: &str = "versions:v5";
 const VERSION_FILES_NAMESPACE: &str = "versions_files:v4";
 
 pub async fn cleanup_unused_attribution_files_and_groups(
@@ -485,17 +482,6 @@ impl DBVersion {
 
         sqlx::query!(
             "
-            DELETE FROM version_fields vf
-            WHERE vf.version_id = $1
-            ",
-            id as DBVersionId,
-        )
-        .execute(&mut *transaction)
-        .await
-        .wrap_err("deleting version fields")?;
-
-        sqlx::query!(
-            "
             DELETE FROM loaders_versions
             WHERE loaders_versions.version_id = $1
             ",
@@ -662,55 +648,25 @@ impl DBVersion {
                     .await
                     .wrap_err("acquiring database connection")?;
 
-                let loader_field_enum_value_ids = DashSet::new();
-                let version_fields: DashMap<DBVersionId, Vec<QueryVersionField>> = sqlx::query!(
-                    "
-                    SELECT version_id, field_id, int_value, enum_value, string_value
-                    FROM version_fields
-                    WHERE version_id = ANY($1)
-                    ",
-                    &version_ids
-                )
-                    .fetch(&mut exec)
-                    .map_err(eyre::Report::from)
-                    .try_fold(
-                        DashMap::new(),
-                        |acc: DashMap<DBVersionId, Vec<QueryVersionField>>, m| {
-                            let qvf = QueryVersionField {
-                                version_id: DBVersionId(m.version_id),
-                                field_id: LoaderFieldId(m.field_id),
-                                int_value: m.int_value,
-                                enum_value: if m.enum_value == -1  { None } else { Some(LoaderFieldEnumValueId(m.enum_value)) },
-                                string_value: m.string_value,
-                            };
-
-                            if m.enum_value != -1 {
-                                loader_field_enum_value_ids.insert(LoaderFieldEnumValueId(m.enum_value));
-                            }
-
-                            acc.entry(DBVersionId(m.version_id)).or_default().push(qvf);
-                            async move { eyre::Ok(acc) }
-                        },
-                    )
-                    .await
-                    .wrap_err("fetching version fields")?;
+				let minecraft_catalog = LoaderFieldEnumValue::minecraft_catalog(
+					minecraft_metadata().await.wrap_err("connecting to minecraft metadata")?,
+				)
+				.await
+				.wrap_err("fetching minecraft version catalog")?;
 
                 #[derive(Default)]
                 struct VersionLoaderData {
                     loaders: Vec<String>,
                     project_types: Vec<String>,
                     games: Vec<String>,
-                    loader_loader_field_ids: Vec<LoaderFieldId>,
                 }
 
-                let loader_field_ids = DashSet::new();
                 let loaders_ptypes_games: DashMap<DBVersionId, VersionLoaderData> = sqlx::query!(
                     "
                     SELECT DISTINCT version_id,
                         ARRAY_AGG(DISTINCT l.loader) filter (where l.loader is not null) loaders,
                         ARRAY_AGG(DISTINCT pt.name) filter (where pt.name is not null) project_types,
-                        ARRAY_AGG(DISTINCT g.slug) filter (where g.slug is not null) games,
-                        ARRAY_AGG(DISTINCT lfl.loader_field_id) filter (where lfl.loader_field_id is not null) loader_fields
+                        ARRAY_AGG(DISTINCT g.slug) filter (where g.slug is not null) games
                     FROM versions v
                     INNER JOIN loaders_versions lv ON v.id = lv.version_id
                     INNER JOIN loaders l ON lv.loader_id = l.id
@@ -718,7 +674,6 @@ impl DBVersion {
                     INNER JOIN project_types pt ON pt.id = lpt.joining_project_type_id
                     INNER JOIN loaders_project_types_games lptg ON lptg.loader_id = l.id AND lptg.project_type_id = pt.id
                     INNER JOIN games g ON lptg.game_id = g.id
-                    LEFT JOIN loader_fields_loaders lfl ON lfl.loader_id = l.id
                     WHERE v.id = ANY($1)
                     GROUP BY version_id
                     ",
@@ -727,18 +682,10 @@ impl DBVersion {
                     .map_ok(|m| {
                         let version_id = DBVersionId(m.version_id);
 
-                        // Add loader fields to the set we need to fetch
-                        let loader_loader_field_ids = m.loader_fields.unwrap_or_default().into_iter().map(LoaderFieldId).collect::<Vec<_>>();
-                        for loader_field_id in &loader_loader_field_ids {
-                            loader_field_ids.insert(*loader_field_id);
-                        }
-
-                        // Add loader + loader associated data to the map
                         let version_loader_data = VersionLoaderData {
                             loaders: m.loaders.unwrap_or_default(),
                             project_types: m.project_types.unwrap_or_default(),
                             games: m.games.unwrap_or_default(),
-                            loader_loader_field_ids,
                         };
                         (version_id,version_loader_data)
 
@@ -747,57 +694,6 @@ impl DBVersion {
                     .try_collect()
                     .await
                     .wrap_err("fetching version loader data")?;
-
-                // Fetch all loader fields from any version
-                let loader_fields: Vec<QueryLoaderField> = sqlx::query!(
-                    "
-                    SELECT DISTINCT id, field, field_type, enum_type, min_val, max_val, optional
-                    FROM loader_fields lf
-                    WHERE id = ANY($1)
-                    ",
-                    &loader_field_ids.iter().map(|x| x.0).collect::<Vec<_>>()
-                )
-                    .fetch(&mut exec)
-                    .map_ok(|m| QueryLoaderField {
-                        id: LoaderFieldId(m.id),
-                        field: m.field,
-                        field_type: m.field_type,
-                        enum_type: m.enum_type.map(LoaderFieldEnumId),
-                        min_val: m.min_val,
-                        max_val: m.max_val,
-                        optional: m.optional,
-                    })
-                    .try_collect()
-                    .await
-                    .wrap_err("fetching loader fields")?;
-
-                let loader_field_enum_values: Vec<QueryLoaderFieldEnumValue> = sqlx::query!(
-                    r#"
-                    SELECT DISTINCT id, enum_id, value, ordering, created,
-                    metadata->>'type' AS "ty?",
-                    (metadata->>'major')::boolean AS "major?"
-                    FROM loader_field_enum_values lfev
-                    WHERE id = ANY($1)
-                    ORDER BY enum_id, ordering, created ASC
-                    "#,
-                    &loader_field_enum_value_ids
-                        .iter()
-                        .map(|x| x.0)
-                        .collect::<Vec<_>>()
-                )
-                    .fetch(&mut exec)
-                    .map_ok(|m| QueryLoaderFieldEnumValue {
-                        id: LoaderFieldEnumValueId(m.id),
-                        enum_id: LoaderFieldEnumId(m.enum_id),
-                        value: m.value,
-                        ordering: m.ordering,
-                        created: m.created,
-                        ty: m.ty,
-                        major: m.major,
-                    })
-                    .try_collect()
-                    .await
-                    .wrap_err("fetching loader field enum values")?;
 
                 #[derive(Deserialize)]
                 struct Hash {
@@ -930,16 +826,15 @@ impl DBVersion {
                     .fetch(&mut exec)
                     .map_err(eyre::Report::from)
                     .try_fold(DashMap::new(), |acc, v| {
+						let result = (|| {
                         let version_id = DBVersionId(v.id);
                         let VersionLoaderData {
                             loaders,
                             project_types,
                             games,
-                            loader_loader_field_ids,
                         } = loaders_ptypes_games.remove(&version_id).map(|x|x.1).unwrap_or_default();
                         let files = files.remove(&version_id).map(|x|x.1).unwrap_or_default();
                         let hashes = hashes.remove(&version_id).map(|x|x.1).unwrap_or_default();
-                        let version_fields = version_fields.remove(&version_id).map(|x|x.1).unwrap_or_default();
                         let dependencies = dependencies.remove(&version_id).map(|x|x.1).unwrap_or_default();
                         let dependencies = dependencies
                             .into_iter()
@@ -955,11 +850,14 @@ impl DBVersion {
                             })
                             .collect_vec();
 
-                        let loader_fields = loader_fields.iter()
-                            .filter(|x| loader_loader_field_ids.contains(&x.id))
-                            .collect::<Vec<_>>();
-
                         let components_serial = v.components.0;
+                        let version_fields = components_serial.minecraft_mod.as_ref()
+                            .map(|component| VersionField::from_minecraft_component_with_catalog(
+								version_id, component, &minecraft_catalog,
+							))
+							.transpose()
+							.wrap_err("converting version minecraft component")?
+                            .unwrap_or_default();
                         let query_version = VersionQueryResult {
                             inner: DBVersion {
                                 id: DBVersionId(v.id),
@@ -1014,7 +912,7 @@ impl DBVersion {
 
                                 files
                             },
-                            version_fields: VersionField::from_query_json(version_fields, &loader_fields, &loader_field_enum_values, false),
+                            version_fields,
                             loaders,
                             project_types,
                             games,
@@ -1024,7 +922,9 @@ impl DBVersion {
                         };
 
                         acc.insert(v.id, query_version);
-                        async move { eyre::Ok(acc) }
+							eyre::Ok(acc)
+						})();
+						async move { result }
                     })
                     .await
                     .wrap_err("fetching versions")?;

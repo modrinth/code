@@ -299,8 +299,17 @@ pub async fn versions_get(
                     .wrap_request_err("deserializing `featured`")?,
                 version_type: query
                     .version_type
-                    .map(|value| {
-                        serde_json::from_value(serde_json::Value::String(value))
+                    .map(|value| match value.as_str() {
+                        "release" => {
+                            Ok(crate::models::projects::VersionType::Release)
+                        }
+                        "beta" => {
+                            Ok(crate::models::projects::VersionType::Beta)
+                        }
+                        "alpha" => {
+                            Ok(crate::models::projects::VersionType::Alpha)
+                        }
+                        _ => Err(eyre::eyre!("invalid version type `{value}`")),
                     })
                     .transpose()
                     .wrap_request_err("deserializing `version_type`")?,
@@ -567,7 +576,9 @@ pub struct EditVersion {
         custom(function = "crate::util::validate::validate_deps")
     )]
     pub dependencies: Option<Vec<Dependency>>,
-    pub game_versions: Option<Vec<String>>,
+    #[schema(value_type = Option<Vec<String>>)]
+    pub game_versions:
+        Option<Vec<minecraft_meta_model::model::MinecraftVersionName>>,
     pub loaders: Option<Vec<models::projects::Loader>>,
     pub featured: Option<bool>,
     pub downloads: Option<u32>,
@@ -640,14 +651,6 @@ pub async fn version_edit(
         }
     }
 
-    let mut fields = HashMap::new();
-    if new_version.game_versions.is_some() {
-        fields.insert(
-            "game_versions".to_string(),
-            serde_json::json!(new_version.game_versions),
-        );
-    }
-
     // Get the older version to get info from
     let old_version = match v3::versions::version_get_helper(
         req.clone(),
@@ -674,18 +677,22 @@ pub async fn version_edit(
         Err(response) => return Ok(response),
     };
 
-    // If this has 'mrpack_loaders' as a loader field previously, this is a modpack.
-    // Therefore, if we are modifying the 'loader' field in this case,
-    // we are actually modifying the 'mrpack_loaders' loader field
-    let mut loaders = new_version.loaders.clone();
-    if old_version.fields.contains_key("mrpack_loaders")
-        && new_version.loaders.is_some()
+    let mut component = crate::models::exp::minecraft::ModVersionEdit {
+        game_versions: new_version.game_versions,
+        environment: None,
+        mrpack_loaders: None,
+    };
+    let mut loaders = new_version.loaders;
+    if old_version
+        .loaders
+        .iter()
+        .any(|loader| loader.0 == "mrpack")
+        && let Some(values) = loaders.take()
     {
-        fields.insert(
-            "mrpack_loaders".to_string(),
-            serde_json::json!(new_version.loaders),
+        component.mrpack_loaders = Some(
+            super::version_creation::parse_mrpack_loaders(&values)
+                .wrap_request_err("parsing mrpack loaders")?,
         );
-        loaders = None;
     }
 
     let new_version = v3::versions::EditVersion {
@@ -708,18 +715,16 @@ pub async fn version_edit(
                 .collect::<Vec<_>>()
         }),
         ordering: None,
-        fields,
+        minecraft_mod: Some(component),
+        fields: HashMap::new(),
     };
 
-    let response = v3::versions::version_edit(
+    let response = v3::versions::version_edit_helper(
         req,
-        info,
+        info.into_inner(),
         pool,
         redis,
-        web::Json(
-            serde_json::to_value(new_version)
-                .wrap_request_err("serializing version edit")?,
-        ),
+        new_version,
         session_queue,
         search_state,
     )

@@ -113,76 +113,109 @@ pub enum Language {
 
 /// Supported Minecraft version environments, including the explicit legacy unknown value.
 #[derive(
-	Debug,
-	Clone,
-	Copy,
-	PartialEq,
-	Eq,
-	Hash,
-	Serialize,
-	Deserialize,
-	utoipa::ToSchema,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    Serialize,
+    Deserialize,
+    utoipa::ToSchema,
+    strum::IntoStaticStr,
+    strum::EnumString,
 )]
 #[serde(rename_all = "snake_case")]
+#[strum(
+    serialize_all = "snake_case",
+    parse_err_ty = eyre::Report,
+    parse_err_fn = invalid_minecraft_metadata_value
+)]
 pub enum Environment {
-	ClientAndServer,
-	ClientOnly,
-	ClientOnlyServerOptional,
-	SingleplayerOnly,
-	ServerOnly,
-	ServerOnlyClientOptional,
-	DedicatedServerOnly,
-	ClientOrServer,
-	ClientOrServerPrefersBoth,
-	Unknown,
+    ClientAndServer,
+    ClientOnly,
+    ClientOnlyServerOptional,
+    SingleplayerOnly,
+    ServerOnly,
+    ServerOnlyClientOptional,
+    DedicatedServerOnly,
+    ClientOrServer,
+    ClientOrServerPrefersBoth,
+    Unknown,
 }
 
 /// Loader field values for mrpack versions, not mrpack manifest dependency keys.
 /// The legacy field was populated from every non-mrpack loader.
 #[derive(
-	Debug,
-	Clone,
-	Copy,
-	PartialEq,
-	Eq,
-	Hash,
-	Serialize,
-	Deserialize,
-	utoipa::ToSchema,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    Serialize,
+    Deserialize,
+    utoipa::ToSchema,
+    strum::IntoStaticStr,
+    strum::EnumString,
 )]
 #[serde(rename_all = "lowercase")]
+#[strum(
+    serialize_all = "lowercase",
+    parse_err_ty = eyre::Report,
+    parse_err_fn = invalid_minecraft_metadata_value
+)]
 pub enum MrpackLoader {
-	Forge,
-	Fabric,
-	Quilt,
-	Modloader,
-	Rift,
-	Liteloader,
-	Minecraft,
-	Bukkit,
-	Spigot,
-	Paper,
-	Purpur,
-	Bungeecord,
-	Waterfall,
-	Velocity,
-	Sponge,
-	Optifine,
-	Iris,
-	Canvas,
-	Vanilla,
-	Datapack,
-	Folia,
-	Neoforge,
-	Babric,
-	#[serde(rename = "bta-babric")]
-	BtaBabric,
-	#[serde(rename = "java-agent")]
-	JavaAgent,
-	#[serde(rename = "legacy-fabric")]
-	LegacyFabric,
-	Nilloader,
-	Ornithe,
+    Forge,
+    Fabric,
+    Quilt,
+    Modloader,
+    Rift,
+    Liteloader,
+    Minecraft,
+    Bukkit,
+    Spigot,
+    Paper,
+    Purpur,
+    Bungeecord,
+    Waterfall,
+    Velocity,
+    Sponge,
+    Optifine,
+    Iris,
+    Canvas,
+    Vanilla,
+    Datapack,
+    Folia,
+    Neoforge,
+    Babric,
+    #[serde(rename = "bta-babric")]
+    #[strum(serialize = "bta-babric")]
+    BtaBabric,
+    #[serde(rename = "java-agent")]
+    #[strum(serialize = "java-agent")]
+    JavaAgent,
+    #[serde(rename = "legacy-fabric")]
+    #[strum(serialize = "legacy-fabric")]
+    LegacyFabric,
+    Nilloader,
+    Ornithe,
+}
+
+impl Environment {
+    pub fn as_str(&self) -> &'static str {
+        self.into()
+    }
+}
+
+impl MrpackLoader {
+    pub fn as_str(&self) -> &'static str {
+        self.into()
+    }
+}
+
+fn invalid_minecraft_metadata_value(value: &str) -> eyre::Report {
+    eyre::eyre!("invalid Minecraft metadata value `{value}`")
 }
 
 component::define! {

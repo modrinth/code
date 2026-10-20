@@ -130,6 +130,8 @@ async fn app() -> std::io::Result<()> {
 			.await
 			.expect("Minecraft metadata database connection failed"),
 	);
+	database::models::loader_fields::register_minecraft_metadata(minecraft_meta_db.clone())
+		.expect("Minecraft metadata service registration failed");
 
     // Redis connector
     let redis_pool = redis::from_env("").await;
