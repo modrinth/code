@@ -2069,6 +2069,9 @@
   "hosting.save-banner.resolve-errors": {
     "defaultMessage": "Please resolve the errors in your changes before saving."
   },
+  "hosting.save-banner.saved": {
+    "defaultMessage": "Saved"
+  },
   "hosting.settings.properties.motd-profanity": {
     "defaultMessage": "Due to Minecraft Usage Guidelines, your server's MOTD cannot contain profanity. Detected: “{value}”."
   },
@@ -6118,9 +6121,6 @@
   },
   "servers.settings.backups.save.error-title": {
     "defaultMessage": "Failed to update backup settings"
-  },
-  "servers.settings.backups.save.success-title": {
-    "defaultMessage": "Backup settings updated"
   },
   "servers.settings.support.action-log-title": {
     "defaultMessage": "Action log"

@@ -7,7 +7,9 @@
 		</div>
 
 		<div v-else class="flex flex-col gap-6">
-			<div class="flex items-center justify-between gap-4">
+			<div
+				class="flex items-center justify-between gap-4 border-0 border-b border-solid border-surface-5 pb-6"
+			>
 				<div>
 					<h3 id="auto-backups-label" class="m-0 text-lg font-semibold text-contrast">
 						{{ formatMessage(messages.autoTitle) }}
@@ -27,7 +29,7 @@
 				</span>
 			</div>
 
-			<template v-if="autoEnabled">
+			<div class="flex flex-col gap-6" :class="{ 'opacity-50': !autoEnabled }">
 				<div class="flex flex-col gap-2.5">
 					<h3 class="m-0 text-lg font-semibold text-contrast">
 						{{ formatMessage(messages.intervalTitle) }}
@@ -38,7 +40,7 @@
 						:items="intervalOptions"
 						:format-label="formatInterval"
 						:aria-label="formatMessage(messages.intervalTitle)"
-						:disabled="!canManageBackups"
+						:disabled="!canManageBackups || !autoEnabled"
 						full-width
 					/>
 				</div>
@@ -54,20 +56,20 @@
 						:step="1"
 						:snap-points="manualSlotSnapPoints"
 						:snap-range="1"
-						:disabled="!canManageBackups"
+						:disabled="!canManageBackups || !autoEnabled"
 						:aria-label="formatMessage(messages.manualSlotsTitle)"
 					/>
 					<p class="m-0">
 						{{ formatMessage(messages.manualSlotsDescription, { limit: options.limit }) }}
 					</p>
 				</div>
-			</template>
+			</div>
 		</div>
 
 		<SaveBanner
-			:is-visible="hasUnsavedChanges || isPending"
+			:is-visible="hasUnsavedChanges || isSaving"
 			:server-id="serverId"
-			:is-updating="isPending"
+			:is-updating="isSaving"
 			:save="() => saveOptions(false)"
 			:reset="syncForm"
 		/>
@@ -121,10 +123,6 @@ const messages = defineMessages({
 		id: 'servers.settings.backups.manual-slots.description',
 		defaultMessage:
 			'Choose how many of your {limit} backup slots to use for manual and automatic backups.',
-	},
-	saveSuccessTitle: {
-		id: 'servers.settings.backups.save.success-title',
-		defaultMessage: 'Backup settings updated',
 	},
 	saveErrorTitle: {
 		id: 'servers.settings.backups.save.error-title',
@@ -208,7 +206,9 @@ watch(autoEnabled, (enabled) => {
 
 const rotationModal = ref<InstanceType<typeof BackupRotationModal>>()
 
-const { mutateAsync: patchOptions, isPending } = useMutation({
+const isSaving = ref(false)
+
+const { mutateAsync: patchOptions } = useMutation({
 	mutationFn: ({ acknowledgeRotation }: { acknowledgeRotation: boolean }) =>
 		client.archon.backups_queue_v1.patchOptions(
 			serverId,
@@ -221,6 +221,7 @@ const { mutateAsync: patchOptions, isPending } = useMutation({
 async function saveOptions(acknowledgeRotation: boolean) {
 	if (!canManageBackups.value || !pendingPatch.value) return false
 
+	isSaving.value = true
 	try {
 		const result = await patchOptions({ acknowledgeRotation })
 		if (!result.applied) {
@@ -234,7 +235,6 @@ async function saveOptions(acknowledgeRotation: boolean) {
 
 		await invalidate()
 		syncForm()
-		addNotification({ type: 'success', title: formatMessage(messages.saveSuccessTitle) })
 	} catch (error) {
 		addNotification({
 			type: 'error',
@@ -242,6 +242,8 @@ async function saveOptions(acknowledgeRotation: boolean) {
 			text: error instanceof Error ? error.message : String(error),
 		})
 		return false
+	} finally {
+		isSaving.value = false
 	}
 }
 </script>
