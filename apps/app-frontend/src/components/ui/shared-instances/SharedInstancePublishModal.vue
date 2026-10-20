@@ -8,9 +8,9 @@
 		no-padding
 		scrollable
 	>
-		<div class="flex flex-col gap-3 px-6 py-4">
-			<Tabs v-model:value="activeTab" :tabs="tabs" />
-			<p class="m-0 text-primary">
+		<div class="flex flex-col gap-4 px-6 py-4">
+			<Tabs v-model:value="activeTab" :tabs="tabs" size="large" />
+			<p class="m-0 text-base text-primary">
 				{{
 					formatMessage(
 						activeTab === 'changes' ? messages.changesDescription : messages.filesDescription,
@@ -39,7 +39,7 @@
 					@navigate="scrollFileTreeToTop"
 				/>
 			</div>
-			<div class="flex flex-col gap-2 px-6 pt-4">
+			<div class="flex flex-col gap-2 border-0 border-b border-solid border-surface-5 px-6 py-4">
 				<div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
 					<span class="font-semibold text-contrast">
 						{{ formatMessage(messages.storageTitle) }}
@@ -92,7 +92,7 @@
 		</div>
 
 		<template #actions>
-			<div class="flex justify-end gap-2 pt-2">
+			<div class="flex justify-end gap-2 p-2">
 				<Button type="outlined" class="!border" @click="modal?.hide()">
 					<XIcon />
 					{{ formatMessage(commonMessages.cancelButton) }}

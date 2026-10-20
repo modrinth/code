@@ -5,9 +5,9 @@
 			:class="{ 'rounded-[20px] border border-solid border-surface-4 shadow-sm': !flush }"
 		>
 			<div
-				class="flex h-10 w-full min-w-0 select-none flex-row items-center justify-between bg-surface-3 px-3 text-sm font-medium"
+				class="flex w-full min-w-0 select-none flex-row items-center justify-between bg-surface-3 p-3 font-medium"
 			>
-				<div class="flex min-w-0 flex-1 items-center gap-2">
+				<div class="flex min-w-0 flex-1 items-center gap-2.5">
 					<Checkbox
 						:model-value="allVisibleSelected"
 						:indeterminate="someVisibleSelected && !allVisibleSelected"
@@ -16,19 +16,19 @@
 					/>
 					<button
 						type="button"
-						class="flex min-w-0 appearance-none items-center gap-1.5 border-0 bg-transparent p-0 font-semibold hover:text-primary"
-						:class="sortField === 'name' ? 'text-contrast' : 'text-secondary'"
+						class="flex min-w-0 appearance-none items-center gap-1.5 border-0 bg-transparent p-0 font-medium hover:text-contrast"
+						:class="sortField === 'name' ? 'text-contrast' : 'text-primary'"
 						@click="handleSort('name')"
 					>
 						<span class="min-w-0 truncate">{{ formatMessage(messages.name) }}</span>
 						<ChevronUpIcon
 							v-if="sortField === 'name' && !sortDesc"
-							class="size-4 shrink-0"
+							class="size-5 shrink-0"
 							aria-hidden="true"
 						/>
 						<ChevronDownIcon
 							v-if="sortField === 'name' && sortDesc"
-							class="size-4 shrink-0"
+							class="size-5 shrink-0"
 							aria-hidden="true"
 						/>
 					</button>
@@ -37,75 +37,72 @@
 					<button
 						v-if="showSize"
 						type="button"
-						class="hidden w-[92px] appearance-none items-center gap-1 border-0 bg-transparent p-0 text-left font-semibold hover:text-primary sm:flex"
-						:class="sortField === 'size' ? 'text-contrast' : 'text-secondary'"
+						class="hidden w-[92px] appearance-none items-center gap-1 border-0 bg-transparent p-0 text-left font-medium hover:text-contrast sm:flex"
+						:class="sortField === 'size' ? 'text-contrast' : 'text-primary'"
 						@click="handleSort('size')"
 					>
 						<span>{{ formatMessage(messages.size) }}</span>
 						<ChevronUpIcon
 							v-if="sortField === 'size' && !sortDesc"
-							class="size-4 shrink-0"
+							class="size-5 shrink-0"
 							aria-hidden="true"
 						/>
 						<ChevronDownIcon
 							v-if="sortField === 'size' && sortDesc"
-							class="size-4 shrink-0"
+							class="size-5 shrink-0"
 							aria-hidden="true"
 						/>
 					</button>
 					<button
 						v-if="showModified"
 						type="button"
-						class="hidden w-[132px] appearance-none items-center gap-1 border-0 bg-transparent p-0 text-left font-semibold hover:text-primary sm:flex"
-						:class="sortField === 'modified' ? 'text-contrast' : 'text-secondary'"
+						class="hidden w-[132px] appearance-none items-center gap-1 border-0 bg-transparent p-0 text-left font-medium hover:text-contrast sm:flex"
+						:class="sortField === 'modified' ? 'text-contrast' : 'text-primary'"
 						@click="handleSort('modified')"
 					>
 						<span>{{ formatMessage(messages.modified) }}</span>
 						<ChevronUpIcon
 							v-if="sortField === 'modified' && !sortDesc"
-							class="size-4 shrink-0"
+							class="size-5 shrink-0"
 							aria-hidden="true"
 						/>
 						<ChevronDownIcon
 							v-if="sortField === 'modified' && sortDesc"
-							class="size-4 shrink-0"
+							class="size-5 shrink-0"
 							aria-hidden="true"
 						/>
 					</button>
-					<span class="size-4 shrink-0" aria-hidden="true" />
+					<span class="size-5 shrink-0" aria-hidden="true" />
 				</div>
 			</div>
 			<div
 				v-if="!isHomePath"
 				role="button"
 				tabindex="0"
-				class="group flex w-full min-w-0 cursor-pointer select-none items-center gap-2 border-0 border-t border-solid border-surface-4 bg-surface-2 px-3 py-2 text-left hover:bg-surface-2.5 focus:!outline-none"
+				class="group flex w-full min-w-0 cursor-pointer select-none items-center gap-2.5 border-0 border-t border-solid border-surface-4 bg-surface-2 p-3 text-left hover:bg-surface-2.5 focus:!outline-none"
 				@click="navigateTo(parentPath)"
 				@keydown="(event) => event.key === 'Enter' && navigateTo(parentPath)"
 			>
 				<span class="size-5 shrink-0" aria-hidden="true" />
-				<div class="flex size-4 shrink-0 items-center justify-center text-secondary">
-					<UndoIcon class="size-4 group-hover:text-contrast group-focus:text-contrast" />
+				<div class="flex size-5 shrink-0 items-center justify-center text-secondary">
+					<UndoIcon class="size-5 group-hover:text-contrast group-focus-visible:text-contrast" />
 				</div>
 				<span
-					class="min-w-0 flex-1 truncate text-sm font-medium text-primary group-hover:text-contrast group-focus:text-contrast"
+					class="min-w-0 flex-1 truncate text-primary group-hover:text-contrast group-focus-visible:text-contrast"
 				>
 					{{ formatMessage(messages.parentFolder) }}
 				</span>
 				<div class="ml-2 flex shrink-0 items-center gap-4">
-					<span v-if="showSize" class="hidden w-[92px] text-left text-sm text-secondary sm:block" />
-					<span
-						v-if="showModified"
-						class="hidden w-[132px] text-left text-sm text-secondary sm:block"
-					/>
-					<span class="size-4 shrink-0" aria-hidden="true" />
+					<span v-if="showSize" class="hidden w-[92px] sm:block" />
+					<span v-if="showModified" class="hidden w-[132px] sm:block" />
+					<span class="size-5 shrink-0" aria-hidden="true" />
 				</div>
 			</div>
 			<div
 				v-if="entries.length === 0"
-				class="flex items-center gap-2 bg-surface-2 px-3 py-2 text-sm text-secondary"
+				class="flex items-center gap-2.5 bg-surface-2 p-3 text-primary"
 			>
-				<FileIcon class="size-4 shrink-0" />
+				<FileIcon class="size-5 shrink-0" />
 				<span>{{ formatMessage(messages.emptyFolderTitle) }}</span>
 			</div>
 			<div
@@ -113,7 +110,7 @@
 				:key="`${entry.type}:${entry.path}`"
 				role="button"
 				tabindex="0"
-				class="group flex w-full min-w-0 select-none items-center gap-2 border-0 border-t border-solid border-surface-4 px-3 py-2 text-left first:border-t-0 focus:!outline-none"
+				class="group flex w-full min-w-0 select-none items-center gap-2.5 border-0 border-t border-solid border-surface-4 p-3 text-left first:border-t-0 focus:!outline-none"
 				:class="[
 					getRowBackgroundClass(i + (isHomePath ? 0 : 1)),
 					entry.disabled && entry.type === 'file'
@@ -132,34 +129,31 @@
 					@click.stop
 					@update:model-value="toggleEntry(entry, $event)"
 				/>
-				<div class="flex size-4 shrink-0 items-center justify-center text-secondary">
+				<div class="flex size-5 shrink-0 items-center justify-center text-secondary">
 					<component
 						:is="entry.icon"
-						class="size-4 group-hover:text-contrast group-focus:text-contrast"
+						class="size-5 group-hover:text-contrast group-focus-visible:text-contrast"
 					/>
 				</div>
 				<span
 					:ref="(element) => setEntryNameRef(entry.path, element)"
 					v-tooltip="truncatedTooltip(entryNameRefs[entry.path], entry.name)"
-					class="min-w-0 flex-1 truncate text-sm font-medium text-primary group-hover:text-contrast group-focus:text-contrast"
+					class="min-w-0 flex-1 truncate text-primary group-hover:text-contrast group-focus-visible:text-contrast"
 				>
 					{{ entry.name }}
 				</span>
 				<div class="ml-2 flex shrink-0 items-center gap-4">
-					<span
-						v-if="showSize"
-						class="hidden w-[92px] truncate text-left text-sm text-secondary sm:block"
-					>
+					<span v-if="showSize" class="hidden w-[92px] truncate text-left text-primary sm:block">
 						{{ formatSize(entry) }}
 					</span>
 					<span
 						v-if="showModified"
-						class="hidden w-[132px] truncate text-left text-sm text-secondary sm:block"
+						class="hidden w-[132px] truncate text-left text-primary sm:block"
 					>
 						{{ formatModified(entry) }}
 					</span>
 					<ChevronRightIcon
-						class="size-4 shrink-0 text-secondary group-hover:text-contrast group-focus:text-contrast"
+						class="size-5 shrink-0 text-secondary group-hover:text-contrast group-focus-visible:text-contrast"
 						:class="{ invisible: entry.type !== 'directory' }"
 						aria-hidden="true"
 					/>
@@ -168,17 +162,17 @@
 			<div
 				v-for="row in fillerRowCount"
 				:key="`filler:${row}`"
-				class="flex w-full min-w-0 select-none items-center gap-2 border-0 border-t border-solid border-surface-4 px-3 py-2 text-left"
+				class="flex w-full min-w-0 select-none items-center gap-2.5 border-0 border-t border-solid border-surface-4 p-3 text-left"
 				:class="getRowBackgroundClass(visibleRowCount + row - 1)"
 				aria-hidden="true"
 			>
 				<span class="size-5 shrink-0" />
-				<span class="size-4 shrink-0" />
-				<span class="min-w-0 flex-1 truncate text-sm font-medium opacity-0">.</span>
+				<span class="size-5 shrink-0" />
+				<span class="min-w-0 flex-1 truncate opacity-0">.</span>
 				<div class="ml-2 flex shrink-0 items-center gap-4">
-					<span v-if="showSize" class="hidden w-[92px] text-left text-sm sm:block" />
-					<span v-if="showModified" class="hidden w-[132px] text-left text-sm sm:block" />
-					<span class="size-4 shrink-0" />
+					<span v-if="showSize" class="hidden w-[92px] sm:block" />
+					<span v-if="showModified" class="hidden w-[132px] sm:block" />
+					<span class="size-5 shrink-0" />
 				</div>
 			</div>
 		</div>
