@@ -836,11 +836,10 @@ async fn shared_file_candidates(
         let size = crate::util::io::metadata(&source).await?.len();
         total_size = total_size.saturating_add(size);
         if total_size > MAX_SHARED_FILES_TOTAL_SIZE {
-            return Err(crate::ErrorKind::InputError(
-                "Selected files exceed the 2 GB limit for a shared instance version"
-                    .to_string(),
-            )
-            .into());
+            bail!(crate::ErrorKind::InputError(format!(
+                "selected files exceed the {} limit for a shared instance version",
+                crate::util::io::format_bytes(MAX_SHARED_FILES_TOTAL_SIZE)
+            )));
         }
         candidates.push(ExternalFileCandidate {
             file_name: path.to_string(),

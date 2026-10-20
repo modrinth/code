@@ -179,7 +179,15 @@ pub async fn validate_instance_file_write(
     path: &str,
 ) -> crate::Result<PathBuf> {
     let state = State::get().await?;
-    Ok(resolve(&state, instance_id, path, true)
+    instance_file_write_path(&state, instance_id, path).await
+}
+
+pub(crate) async fn instance_file_write_path(
+    state: &State,
+    instance_id: &str,
+    path: &str,
+) -> crate::Result<PathBuf> {
+    Ok(resolve(state, instance_id, path, true)
         .await?
         .path()
         .to_path_buf())
@@ -241,17 +249,15 @@ pub(crate) async fn write_instance_file_from_reader(
     path: &str,
     reader: impl tokio::io::AsyncRead + Unpin,
     expected_size: u64,
+    state: &State,
 ) -> crate::Result<()> {
     use tokio::io::AsyncReadExt;
 
-    let state = State::get().await?;
-    let destination = resolve(&state, instance_id, path, true)
-        .await?
-        .path()
-        .to_path_buf();
-    let parent = destination
-        .parent()
-        .ok_or_else(|| input("Invalid file destination"))?;
+    let destination =
+        instance_file_write_path(state, instance_id, path).await?;
+    let parent = destination.parent().ok_or(ErrorKind::InputError(
+        "invalid file destination".to_string(),
+    ))?;
     fs::create_dir_all(parent).await?;
     let parent = parent.to_path_buf();
     let temporary = tokio::task::spawn_blocking(move || {
@@ -266,14 +272,14 @@ pub(crate) async fn write_instance_file_from_reader(
     )
     .await?;
     if written != expected_size {
-        return Err(input(format!("{path} has an unexpected size")));
+        bail!("{path} has an unexpected size");
     }
     file.sync_all().await?;
     drop(file);
 
     let _instance = state.lock_instance_content(instance_id).await;
     let _files = state.content_store.files_lock.lock().await;
-    resolve(&state, instance_id, path, true).await?;
+    resolve(state, instance_id, path, true).await?;
     tokio::task::spawn_blocking(move || {
         temporary.persist(destination).map_err(|error| error.error)
     })

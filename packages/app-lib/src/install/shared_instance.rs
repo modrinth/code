@@ -871,7 +871,7 @@ async fn install_shared_instance_external_file(
     }
 
     if file.file_type == CONFIG_FILE_TYPE {
-        return install_shared_instance_file(instance_id, file).await;
+        return install_shared_instance_file(instance_id, file, state).await;
     }
 
     validate_shared_instance_external_file_name(&file.file_name)?;
@@ -973,37 +973,35 @@ async fn install_shared_instance_external_file(
 async fn install_shared_instance_file(
     instance_id: &str,
     file: &SharedInstanceExternalFileData,
+    state: &State,
 ) -> crate::Result<()> {
     if !is_shareable_file_path(&file.file_name)
         || file.file_size > MAX_SHARED_FILES_TOTAL_SIZE
     {
-        return Err(crate::ErrorKind::InputError(format!(
-            "Shared instance file {} is unsupported or too large",
+        bail!(ErrorKind::InputError(format!(
+            "shared instance file {} is unsupported or too large",
             file.file_name
-        ))
-        .into());
+        )));
     }
-    if shared_instance_file_is_current(instance_id, file).await? {
+    if shared_instance_file_is_current(instance_id, file, state).await? {
         return Ok(());
     }
 
     let response = REQWEST_CLIENT.get(&file.url).send().await?;
     if !response.status().is_success() {
-        return Err(crate::ErrorKind::OtherError(format!(
-            "Shared instance file download failed with status {}",
+        bail!(
+            "shared instance file download failed with status {}",
             response.status()
-        ))
-        .into());
+        );
     }
     if response
         .content_length()
         .is_some_and(|content_length| content_length != file.file_size)
     {
-        return Err(crate::ErrorKind::OtherError(format!(
-            "Shared instance file {} has an unexpected size",
+        bail!(
+            "shared instance file {} has an unexpected size",
             file.file_name
-        ))
-        .into());
+        );
     }
 
     let reader = tokio_util::io::StreamReader::new(
@@ -1016,6 +1014,7 @@ async fn install_shared_instance_file(
         &file.file_name,
         reader,
         file.file_size,
+        state,
     )
     .await
 }
@@ -1025,11 +1024,13 @@ async fn install_shared_instance_file(
 async fn shared_instance_file_is_current(
     instance_id: &str,
     file: &SharedInstanceExternalFileData,
+    state: &State,
 ) -> crate::Result<bool> {
     let Some(expected_sha1) = file.sha1.as_deref() else {
         return Ok(false);
     };
-    let path = crate::api::instance::validate_instance_file_write(
+    let path = crate::api::instance::instance_file_write_path(
+        state,
         instance_id,
         &file.file_name,
     )

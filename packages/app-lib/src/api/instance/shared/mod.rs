@@ -62,7 +62,7 @@ pub(crate) const CONFIG_FILE_EXTENSIONS: [&str; 14] = [
 /// Extensions of executables, scripts and installers. These are hidden from
 /// the publish file selection and never installed; the shared instances
 /// backend also rejects them by content.
-const EXECUTABLE_FILE_EXTENSIONS: [&str; 34] = [
+const EXECUTABLE_FILE_EXTENSIONS: &[&str] = &[
     "exe", "dll", "msi", "msix", "com", "scr", "cpl", "sys", "bat", "cmd",
     "ps1", "psm1", "vbs", "vbe", "jse", "wsf", "wsh", "hta", "lnk", "reg",
     "sh", "bash", "zsh", "command", "app", "dylib", "so", "appimage", "apk",

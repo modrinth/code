@@ -79,11 +79,10 @@ fn ensure_config_limits(
         );
     }
     if count > MAX_SHARED_FILES || size > MAX_SHARED_FILES_TOTAL_SIZE {
-        return Err(crate::ErrorKind::InputError(
-            "Shared instance files exceed the size or file count limit"
+        bail!(crate::ErrorKind::InputError(
+            "shared instance files exceed the size or file count limit"
                 .to_string(),
-        )
-        .into());
+        ));
     }
     Ok(())
 }

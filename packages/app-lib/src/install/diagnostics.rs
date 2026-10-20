@@ -5,6 +5,7 @@ use super::model::{
 };
 use super::store;
 use crate::state::{DirectoryInfo, ModrinthCredentials, State};
+use crate::util::io::format_bytes;
 use regex::{Captures, Regex};
 use sqlx::{Row, SqlitePool};
 use std::fmt::Write as _;
@@ -512,25 +513,6 @@ fn progress_summary(progress: &InstallProgress) -> String {
         );
     }
     value
-}
-
-fn format_bytes(bytes: u64) -> String {
-    const UNITS: [&str; 5] = ["B", "KiB", "MiB", "GiB", "TiB"];
-    let mut value = bytes as f64;
-    let mut unit = UNITS[0];
-    for next_unit in UNITS.iter().skip(1) {
-        if value < 1024.0 {
-            break;
-        }
-        value /= 1024.0;
-        unit = next_unit;
-    }
-
-    if unit == "B" {
-        format!("{bytes} B")
-    } else {
-        format!("{value:.1} {unit}")
-    }
 }
 
 fn json_string<T: serde::Serialize>(value: &T) -> String {

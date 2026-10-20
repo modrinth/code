@@ -3,11 +3,13 @@
 mod content;
 mod export_mrpack;
 mod files;
-pub(crate) use files::write_instance_file_from_reader;
 pub use files::{
     InstanceFileItem, create_instance_directory, delete_instance_file,
     list_instance_files, read_instance_file, rename_instance_file,
     save_instance_file_as, validate_instance_file_write, write_instance_file,
+};
+pub(crate) use files::{
+    instance_file_write_path, write_instance_file_from_reader,
 };
 mod get;
 mod groups;
