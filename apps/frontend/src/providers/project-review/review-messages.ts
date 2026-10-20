@@ -34,6 +34,8 @@ export function createReviewMessages(
 	}
 	function previewIssueMessage(entry: ReviewIssueControl) {
 		if (panels.selected(entry.binding, entry.control)) return issueMessage(entry.control.issueId)
+		const override = overrides.get(entry.control.issueId)
+		if (override !== undefined) return override
 		const current = project.value
 		const legacy = projectV2.value
 		if (!current || !legacy || current.id !== legacy.id) return ''

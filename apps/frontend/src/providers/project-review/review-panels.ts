@@ -325,10 +325,23 @@ export function createReviewPanels(
 		]
 	})
 
-	const panels = computed(() => {
+	function resolvePanels(preview?: ReviewIssueControl) {
 		const bindings = new Map<string, ReviewPanelBinding>()
 		const projectV3 = project.value
 		if (!projectV3) return bindings
+		const issueIds = preview
+			? [...new Set([...selectedIssueIds.value, preview.control.issueId])]
+			: selectedIssueIds.value
+		const toggleIds = (issueId: string) => {
+			const ids = new Set(selectedToggleIds(projectV3.id, issueId))
+			if (preview?.control.type === 'toggle' && preview.control.issueId === issueId) {
+				for (const id of preview.control.childToggleIds ??
+					(preview.control.id === undefined ? [] : [preview.control.id])) {
+					ids.add(id)
+				}
+			}
+			return [...ids]
+		}
 		const showAllIssueControls = reviewData.value.showAllIssueControls === true
 		const context: ReviewContext = {
 			projectV3,
@@ -341,11 +354,11 @@ export function createReviewPanels(
 				textValues(projectV3.id, issueId)[id] ?? textValues(projectV3.id, '')[id] ?? '',
 			selected: {
 				items: {},
-				issueIds: selectedIssueIds.value,
+				issueIds,
 				toggleIds: [
 					...new Set(
-						Object.values(session.read(projectV3.id, 'issues')).flatMap((keys) =>
-							keys instanceof Set ? [...keys] : [],
+						[...Object.keys(session.read(projectV3.id, 'issues')), ...issueIds].flatMap(
+							toggleIds,
 						),
 					),
 				],
@@ -398,10 +411,8 @@ export function createReviewPanels(
 						getSelectValues: (id, scope = issueId) => contextSelectValues(projectV3.id, scope, id),
 						selected: {
 							items: {},
-							issueIds: selectedIssueIds.value,
-							toggleIds: issue
-								? [...selectedToggleIds(projectV3.id, issueId)]
-								: context.selected.toggleIds,
+							issueIds,
+							toggleIds: issue ? toggleIds(issueId) : context.selected.toggleIds,
 						},
 					}
 					if (!showAllIssueControls && resolveWithContext(node.shown, issueContext) === false)
@@ -517,7 +528,9 @@ export function createReviewPanels(
 			}
 		}
 		return bindings
-	})
+	}
+
+	const panels = computed(() => resolvePanels())
 
 	function resolve(target: ReviewTarget) {
 		if (target.kind === 'panel') return panels.value.get(target.key)
@@ -786,6 +799,7 @@ export function createReviewPanels(
 	function resolveActiveIssues(preview?: ReviewIssueControl) {
 		const projectV3 = project.value
 		if (!projectV3) return []
+		const bindings = preview ? resolvePanels(preview) : panels.value
 		const issues = new Map<string, IssueSelection>()
 		const sharedInputs = {
 			textValues: {} as Record<string, string>,
@@ -816,7 +830,7 @@ export function createReviewPanels(
 				missing: [],
 			})
 		}
-		for (const binding of panels.value.values()) {
+		for (const binding of bindings.values()) {
 			for (const section of binding.panel.sections) {
 				for (const control of section.controls) {
 					if (!control.issue) {
@@ -831,7 +845,12 @@ export function createReviewPanels(
 						control.childToggleIds ||
 						control.disabled ||
 						(control.type === 'toggle' &&
-							control !== preview?.control &&
+							!(
+								binding.key === preview?.binding.key &&
+								control.issueId === preview.control.issueId &&
+								preview.control.type === 'toggle' &&
+								control.id === preview.control.id
+							) &&
 							!(
 								control.issueId === preview?.control.issueId &&
 								control.id !== undefined &&
