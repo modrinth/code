@@ -43,15 +43,17 @@ pub(crate) async fn capture_modpack_server_override(
     Ok(())
 }
 
-pub async fn discard_modpack_servers(instance_id: &str) -> crate::Result<()> {
-    let state = State::get().await?;
+pub(crate) async fn discard_modpack_servers(
+    instance_id: &str,
+    state: &State,
+) -> crate::Result<()> {
     let _guard = state.lock_synced_options().await;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
-        .ok_or_else(|| ErrorKind::InputError("Unknown instance".to_string()))?;
-    discard_modpack_servers_for_instance(&metadata, &state).await?;
-    if effective(&metadata, &state).await? {
-        compose_instance(&metadata, &state).await?;
+        .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
+    discard_modpack_servers_for_instance(&metadata, state).await?;
+    if effective(&metadata, state).await? {
+        compose_instance(&metadata, state).await?;
     }
     Ok(())
 }

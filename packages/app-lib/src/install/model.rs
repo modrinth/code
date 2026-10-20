@@ -5,6 +5,7 @@ use crate::state::{
     InstanceIconConfig, InstanceInstallStage, InstanceLink, InstanceMetadata,
     ModLoader,
 };
+use anyhow::bail;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
@@ -308,10 +309,9 @@ impl SharedInstanceRemovedFile {
                     .iter()
                     .any(|suffix| filename.ends_with(*suffix)))
         {
-            return Err(crate::ErrorKind::InputError(
-                "Invalid removed modpack file path".to_string(),
-            )
-            .into());
+            bail!(crate::ErrorKind::InputError(
+                "invalid removed modpack file path".to_string(),
+            ));
         }
         Ok(())
     }

@@ -998,10 +998,9 @@ async fn fetch_advanced_with_target(
             if let Some(fence_key) = fence_key
                 && GLOBAL_FETCH_FENCE.is_blocked(fence_key)
             {
-                return Err(ErrorKind::ApiIsDownError(
+                bail!(ErrorKind::ApiIsDownError(
                     GLOBAL_FETCH_FENCE.latest_block_minutes(),
-                )
-                .into());
+                ));
             }
             break permit;
         };
@@ -1031,10 +1030,9 @@ async fn fetch_advanced_with_target(
             if let Some(fence_key) = fence_key
                 && GLOBAL_FETCH_FENCE.is_blocked(fence_key)
             {
-                return Err(ErrorKind::ApiIsDownError(
+                bail!(ErrorKind::ApiIsDownError(
                     GLOBAL_FETCH_FENCE.latest_block_minutes(),
-                )
-                .into());
+                ));
             }
             Ok::<_, crate::Error>(req.send().await)
         })

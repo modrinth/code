@@ -93,10 +93,9 @@ pub(super) async fn shared_instance_server_icon(
     let mut bytes = Vec::new();
     while let Some(chunk) = response.chunk().await? {
         if bytes.len() + chunk.len() > 4 * 1024 * 1024 {
-            return Err(crate::ErrorKind::InputError(
-                "Server icons must be at most 4 MiB".to_string(),
-            )
-            .into());
+            bail!(crate::ErrorKind::InputError(
+                "server icons must be at most 4 MiB".to_string(),
+            ));
         }
         bytes.extend_from_slice(&chunk);
     }
@@ -105,11 +104,9 @@ pub(super) async fn shared_instance_server_icon(
             .await?;
     let filename = path
         .file_name()
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError(
-                "Cached server icon has no filename".to_string(),
-            )
-        })?
+        .ok_or(crate::ErrorKind::InputError(
+            "cached server icon has no filename".to_string(),
+        ))?
         .to_string_lossy()
         .to_string();
     crate::util::fetch::write(

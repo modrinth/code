@@ -168,10 +168,9 @@ impl InstanceVersionResponse {
         if self.modpack_id.as_deref().is_none_or(str::is_empty)
             && !self.removed_files.is_empty()
         {
-            return Err(crate::ErrorKind::InputError(
-                "Removed modpack files require a modpack id".to_string(),
-            )
-            .into());
+            bail!(ErrorKind::InputError(
+                "removed modpack files require a modpack id".to_string(),
+            ));
         }
         for removed in &self.removed_files {
             removed.validate()?;

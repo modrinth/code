@@ -348,6 +348,7 @@ async fn apply_shared_instance_update_inner(
     if !plan.configuration_changed && data.linked_server.is_some() {
         crate::api::instance::synced_servers::discard_modpack_servers(
             instance_id,
+            state,
         )
         .await?;
     }
@@ -629,10 +630,9 @@ async fn shared_modpack_toggles(
     }
     let Some(modpack) = &data.modpack else {
         if !data.removed_files.is_empty() {
-            return Err(crate::ErrorKind::InputError(
-                "Removed modpack files require a modpack id".to_string(),
-            )
-            .into());
+            bail!(ErrorKind::InputError(
+                "removed modpack files require a modpack id".to_string(),
+            ));
         }
         return Ok(SharedModpackChanges::default());
     };
@@ -714,9 +714,7 @@ async fn ensure_shared_instance_additions_enabled(
         &state.pool,
     )
     .await?
-    .ok_or_else(|| {
-        crate::ErrorKind::InputError("Unknown instance".to_string())
-    })?;
+    .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
     let entries = content_rows::get_content_entries(
         &metadata.applied_content_set.id,
         &state.pool,
@@ -987,6 +985,7 @@ async fn install_shared_instance_base(
         if data.linked_server.is_some() {
             crate::api::instance::synced_servers::discard_modpack_servers(
                 instance_id,
+                state,
             )
             .await?;
         }
@@ -1007,15 +1006,12 @@ async fn install_shared_instance_additions(
         &state.pool,
     )
     .await?
-    .ok_or_else(|| {
-        crate::ErrorKind::InputError("Unknown instance".to_string())
-    })?;
+    .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
     let changes = shared_modpack_toggles(&metadata, data, state).await?;
     if changes.missing {
-        return Err(crate::ErrorKind::InputError(
-            "Shared modpack content is missing after installation".to_string(),
-        )
-        .into());
+        bail!(ErrorKind::InputError(
+            "shared modpack content is missing after installation".to_string(),
+        ));
     }
     for path in changes.removals {
         crate::state::instances::commands::remove_project(

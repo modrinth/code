@@ -1259,6 +1259,7 @@ async fn install_zipped_mrpack_files_with_reporter_inner(
     if ignore_modpack_servers {
         crate::api::instance::synced_servers::discard_modpack_servers(
             &instance_id,
+            state,
         )
         .await?;
     } else {

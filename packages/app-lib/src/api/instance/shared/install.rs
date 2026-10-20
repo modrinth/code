@@ -107,11 +107,9 @@ pub async fn get_shared_instance_invite_install_preview(
         &shared_instance_id,
         invite.instance_name,
     );
-    let version = invite.version.ok_or_else(|| {
-        crate::ErrorKind::InputError(
-            "Invite preview has no ready version".to_string(),
-        )
-    })?;
+    let version = invite.version.ok_or(crate::ErrorKind::InputError(
+        "invite preview has no ready version".to_string(),
+    ))?;
     let mut preview = shared_instance_install_preview_from_version(
         shared_instance_id.clone(),
         name,
@@ -567,12 +565,12 @@ fn shared_instance_external_file_data(
         )),
     )?;
 
-    let url = file.url.filter(|url| !url.is_empty()).ok_or_else(|| {
+    let url = file.url.filter(|url| !url.is_empty()).ok_or(
         crate::ErrorKind::InputError(format!(
-            "Shared instance external file {} is missing its download URL",
+            "shared instance external file {} is missing its download URL",
             file.file_name
-        ))
-    })?;
+        )),
+    )?;
     Ok(SharedInstanceExternalFileData {
         file_name: file.file_name,
         file_type: file.file_type,

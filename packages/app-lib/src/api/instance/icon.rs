@@ -106,11 +106,9 @@ pub async fn cache_remote_icon(source: &str) -> crate::Result<PathBuf> {
         let path = cache_icon(bytes, &state).await?;
         let filename = path
             .file_name()
-            .ok_or_else(|| {
-                crate::ErrorKind::InputError(
-                    "Cached icon has no filename".to_string(),
-                )
-            })?
+            .ok_or(ErrorKind::InputError(
+                "cached icon has no filename".to_string(),
+            ))?
             .to_string_lossy();
         write(&mapping, filename.as_bytes(), &state.io_semaphore).await?;
         Ok::<_, crate::Error>(path)
@@ -141,18 +139,16 @@ async fn download_remote_icon(source: &str) -> crate::Result<Bytes> {
         .content_length()
         .is_some_and(|length| length > REMOTE_ICON_MAX_BYTES as u64)
     {
-        return Err(crate::ErrorKind::InputError(
-            "Remote icons must be at most 4 MiB".to_string(),
-        )
-        .into());
+        bail!(ErrorKind::InputError(
+            "remote icons must be at most 4 MiB".to_string(),
+        ));
     }
     let mut bytes = Vec::new();
     while let Some(chunk) = response.chunk().await? {
         if bytes.len() + chunk.len() > REMOTE_ICON_MAX_BYTES {
-            return Err(crate::ErrorKind::InputError(
-                "Remote icons must be at most 4 MiB".to_string(),
-            )
-            .into());
+            bail!(ErrorKind::InputError(
+                "remote icons must be at most 4 MiB".to_string(),
+            ));
         }
         bytes.extend_from_slice(&chunk);
     }

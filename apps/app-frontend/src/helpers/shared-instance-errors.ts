@@ -4,6 +4,7 @@ import { defineMessages, injectNotificationManager, useVIntl } from '@modrinth/u
 import {
 	getErrorMessage,
 	isSharedInstanceFileNotAllowedError,
+	isSharedInstancesApiError,
 	type SharedInstanceUnavailableReason,
 } from '@/helpers/install'
 
@@ -113,6 +114,11 @@ export function useSharedInstanceErrors() {
 	}
 
 	function notifySharedInstanceError(error: unknown) {
+		if (isSharedInstancesApiError(error)) {
+			notifySharedInstanceConnectionError()
+			return
+		}
+
 		const message = getErrorMessage(error)
 		const status = error instanceof ModrinthApiError ? error.statusCode : undefined
 

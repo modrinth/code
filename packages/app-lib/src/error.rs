@@ -13,7 +13,8 @@ use sqlx::migrate::MigrateError;
 use std::path::StripPrefixError;
 use std::time::Duration;
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, thiserror::Error)]
+#[error("{}", self.message())]
 pub struct LabrinthError {
     pub error: String,
     pub description: String,
@@ -29,10 +30,10 @@ pub struct LabrinthError {
     pub route: Option<String>,
 }
 
-impl std::fmt::Display for LabrinthError {
-    fn fmt(&self, fmt: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let message = self
-            .details
+impl LabrinthError {
+    /// Prefers the most specific validation detail over the generic description.
+    fn message(&self) -> &str {
+        self.details
             .as_ref()
             .and_then(serde_json::Value::as_array)
             .and_then(|details| {
@@ -42,12 +43,9 @@ impl std::fmt::Display for LabrinthError {
                     .filter_map(serde_json::Value::as_str)
                     .find(|message| !message.trim().is_empty())
             })
-            .unwrap_or(&self.description);
-        fmt.write_str(message)
+            .unwrap_or(&self.description)
     }
 }
-
-impl std::error::Error for LabrinthError {}
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum SharedInstanceUnavailableReason {

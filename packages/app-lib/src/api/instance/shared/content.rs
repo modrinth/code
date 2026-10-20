@@ -130,21 +130,17 @@ pub(crate) async fn shared_modpack_files(
         &state.api_semaphore,
     )
     .await?
-    .ok_or_else(|| {
-        crate::ErrorKind::InputError(
-            "Shared instance modpack version was not found".to_string(),
-        )
-    })?;
+    .ok_or(crate::ErrorKind::InputError(
+        "shared instance modpack version was not found".to_string(),
+    ))?;
     let file = version
         .files
         .iter()
         .find(|file| file.primary)
         .or_else(|| version.files.first())
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError(
-                "Shared instance modpack has no files".to_string(),
-            )
-        })?;
+        .ok_or(crate::ErrorKind::InputError(
+            "shared instance modpack has no files".to_string(),
+        ))?;
     let download_meta = DownloadMeta {
         reason: DownloadReason::Modpack,
         game_version: version
@@ -172,11 +168,9 @@ pub(crate) async fn shared_modpack_files(
         .position(|entry| {
             matches!(entry.filename().as_str(), Ok("modrinth.index.json"))
         })
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError(
-                "No modrinth.index.json found in shared modpack".to_string(),
-            )
-        })?;
+        .ok_or(crate::ErrorKind::InputError(
+            "no modrinth.index.json found in shared modpack".to_string(),
+        ))?;
     let mut manifest = String::new();
     zip.reader_with_entry(manifest_index)
         .await?
