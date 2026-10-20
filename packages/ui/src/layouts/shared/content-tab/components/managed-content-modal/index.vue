@@ -30,6 +30,7 @@ import {
 } from '#ui/utils/common-messages'
 
 import { getClientWarningType, getContentWarningType } from '../../composables/content-filtering'
+import { type ContentSortMode, useContentSort } from '../../composables/content-sort'
 import {
 	type ContentMetadataFilterValue,
 	useContentMetadataFilters,
@@ -42,6 +43,7 @@ import type {
 } from '../../types'
 import ContentCardTable from '../ContentCardTable.vue'
 import ContentSelectionBar from '../ContentSelectionBar.vue'
+import ContentSortMenu from '../ContentSortMenu.vue'
 
 const { formatMessage } = useVIntl()
 const pageContext = injectPageContext(null)
@@ -61,6 +63,8 @@ interface Props {
 	showVersion?: boolean
 	showEnvironmentWarnings?: boolean
 	filterMode?: 'content' | 'status'
+	/** Treats files without a Modrinth project as modpack overrides. */
+	overrideFiles?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -78,6 +82,7 @@ const props = withDefaults(defineProps<Props>(), {
 	showVersion: true,
 	showEnvironmentWarnings: false,
 	filterMode: 'content',
+	overrideFiles: false,
 })
 
 const emit = defineEmits<{
@@ -148,6 +153,7 @@ export interface ManagedContentModalState {
 	searchQuery: string
 	selectedFilters: string[]
 	selectedMetadataFilters?: ContentMetadataFilterValue
+	sortMode?: ContentSortMode
 	scrollTop: number
 }
 
@@ -159,6 +165,7 @@ const disabledIds = ref(new Set<string>())
 const loading = ref(false)
 const searchQuery = ref('')
 const selectedFilters = ref<string[]>([])
+const { sortMode, sortedItems, hasDateAdded, resetSortMode } = useContentSort(items)
 const { selectedMetadataFilters, metadataFilterCategories, applyMetadataFilters } =
 	useContentMetadataFilters(items, undefined, {
 		showEnabledFor: props.enableEnabledFor,
@@ -258,18 +265,13 @@ const searchableCount = computed(
 const filteredItems = computed(() => {
 	const query = searchQuery.value.trim()
 
-	let result: ContentItem[]
-	if (query) {
-		result = fuse.value.search(query).map(({ item }) => item)
-	} else {
-		result = sortContentItems(items.value)
-	}
+	let result = query ? fuse.value.search(query).map(({ item }) => item) : sortedItems.value
 
 	if (selectedFilters.value.length > 0) {
 		result = result.filter(matchesSelectedFilters)
 	}
 
-	return applyMetadataFilters(sortContentItems(result, !query))
+	return applyMetadataFilters(result)
 })
 
 const stats = computed(() => {
@@ -281,9 +283,8 @@ const stats = computed(() => {
 	return counts
 })
 
-function contentVersionLabel(item: ContentItem): string {
-	if (item.embedded_metadata?.version) return item.embedded_metadata.version
-	return formatMessage(commonMessages.unknownLabel)
+function isExternalItem(item: ContentItem) {
+	return item.external ?? (props.overrideFiles && !item.project)
 }
 
 const tableItems = computed<ContentCardTableItem[]>(() =>
@@ -296,12 +297,13 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 			title: item.embedded_metadata?.name ?? item.file_name,
 			icon_url: item.embedded_metadata?.icon_url ?? null,
 		},
-		projectLink: !item.external && item.project?.id ? `/project/${item.project.id}` : undefined,
+		projectLink:
+			!isExternalItem(item) && item.project?.id ? `/project/${item.project.id}` : undefined,
 		embeddedIcon: item.embeddedIcon,
 		version: props.showVersion
 			? (item.version ?? {
 					id: item.id,
-					version_number: contentVersionLabel(item),
+					version_number: item.embedded_metadata?.version ?? '',
 					file_name: item.file_name,
 				})
 			: undefined,
@@ -320,12 +322,13 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 					link: item.source.link ?? sourceProjectLink(item.source.project),
 				}
 			: undefined,
-		external: item.external,
+		external: isExternalItem(item),
 		externalFile:
 			item.external &&
 			(!!item.external_url ||
 				item.source_kind === 'modrinth_modpack' ||
 				item.source_kind === 'imported_modpack'),
+		overrideFile: props.overrideFiles && isExternalItem(item) && !item.external_url,
 		...(props.enableToggle || props.enableEnabledFor ? { enabled: item.enabled } : {}),
 		...(props.enableEnabledFor ? { enabledFor: item.enabledFor } : {}),
 		synced: !!item.synced_pack,
@@ -398,20 +401,6 @@ function getTypeIcon(type: string) {
 	}
 }
 
-function sortContentItems(contentItems: ContentItem[], sortByName = true) {
-	return [...contentItems].sort((a, b) => {
-		const externalDiff = Number(b.external === true) - Number(a.external === true)
-		if (externalDiff !== 0) return externalDiff
-		if (!sortByName) return 0
-
-		return itemDisplayName(a).toLowerCase().localeCompare(itemDisplayName(b).toLowerCase())
-	})
-}
-
-function itemDisplayName(item: ContentItem) {
-	return item.project?.title ?? item.file_name
-}
-
 function sourceProjectLink(project: ContentCardProject) {
 	const projectId = project.slug ?? project.id
 	const url = `https://modrinth.com/modpack/${encodeURIComponent(projectId)}`
@@ -450,6 +439,7 @@ function show(contentItems: ContentItem[], highlightId?: string) {
 	searchQuery.value = ''
 	selectedFilters.value = []
 	selectedMetadataFilters.value = {}
+	resetSortMode()
 	selectedIds.value = []
 	disabledIds.value = new Set()
 	loading.value = false
@@ -462,6 +452,7 @@ function showLoading() {
 	searchQuery.value = ''
 	selectedFilters.value = []
 	selectedMetadataFilters.value = {}
+	resetSortMode()
 	selectedIds.value = []
 	loading.value = true
 	showModal()
@@ -490,6 +481,7 @@ function getState(): ManagedContentModalState | null {
 		searchQuery: searchQuery.value,
 		selectedFilters: [...selectedFilters.value],
 		selectedMetadataFilters: { ...selectedMetadataFilters.value },
+		sortMode: sortMode.value,
 		scrollTop: scrollContainer.value?.scrollTop ?? 0,
 	}
 }
@@ -500,6 +492,8 @@ async function restore(state: ManagedContentModalState) {
 	searchQuery.value = state.searchQuery
 	selectedFilters.value = state.selectedFilters
 	selectedMetadataFilters.value = state.selectedMetadataFilters ?? {}
+	if (state.sortMode) sortMode.value = state.sortMode
+	else resetSortMode()
 	loading.value = false
 	showModal()
 	await nextTick()
@@ -579,16 +573,19 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 				/>
 
 				<div class="flex flex-wrap items-center gap-2">
-					<FilterPills
-						v-if="filterOptions.length > 0"
-						:model-value="selectedFilters"
-						:options="filterOptions"
-						@update:model-value="updateFilters"
-					>
-						<template #all>
-							{{ formatMessage(commonMessages.allProjectType) }}
-						</template>
-					</FilterPills>
+					<ContentSortMenu v-model="sortMode" :show-date-options="hasDateAdded" />
+					<template v-if="filterOptions.length > 0">
+						<div class="h-6 w-px shrink-0 bg-surface-5" />
+						<FilterPills
+							:model-value="selectedFilters"
+							:options="filterOptions"
+							@update:model-value="updateFilters"
+						>
+							<template #all>
+								{{ formatMessage(commonMessages.allProjectType) }}
+							</template>
+						</FilterPills>
+					</template>
 					<div
 						v-if="metadataFilterCategories.length > 0"
 						class="flex flex-wrap items-center gap-1.5 [&>div:last-of-type]:!h-[34px] [&>div:last-of-type]:!gap-1.5 [&_[data-button]]:!h-[34px]"

@@ -23,6 +23,7 @@
 					:source-icon-url="managedContent?.card.manager.iconUrl"
 					:enable-toggle="!isServerInstance && !isSharedMember && !isQuarantined"
 					:action-disabled="isBulkOperating || isInstanceBusy"
+					override-files
 					:get-overflow-options="getOverflowOptions"
 					:switch-version="
 						isServerInstance || isSharedMember || isQuarantined ? undefined : handleSwitchVersion

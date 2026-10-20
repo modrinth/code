@@ -80,6 +80,7 @@ export interface ContentCardTableItem {
 	source?: ContentSource
 	external?: boolean
 	externalFile?: boolean
+	overrideFile?: boolean
 	enabled?: boolean
 	locked?: boolean
 	disabled?: boolean

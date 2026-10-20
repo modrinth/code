@@ -407,6 +407,9 @@
   "content.card.frozen": {
     "defaultMessage": "This project is locked to its current version until unfrozen."
   },
+  "content.card.override-file": {
+    "defaultMessage": "Override file"
+  },
   "content.card.select-project": {
     "defaultMessage": "Select {project}"
   },

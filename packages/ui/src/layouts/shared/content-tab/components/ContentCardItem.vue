@@ -56,6 +56,10 @@ const messages = defineMessages({
 		id: 'content.card.external-file',
 		defaultMessage: 'External file',
 	},
+	overrideFile: {
+		id: 'content.card.override-file',
+		defaultMessage: 'Override file',
+	},
 	frozen: {
 		id: 'content.card.frozen',
 		defaultMessage: 'This project is locked to its current version until unfrozen.',
@@ -82,6 +86,7 @@ interface Props {
 	source?: ContentSource
 	external?: boolean
 	externalFile?: boolean
+	overrideFile?: boolean
 	enabled?: boolean
 	locked?: boolean
 	installing?: boolean
@@ -118,6 +123,7 @@ const props = withDefaults(defineProps<Props>(), {
 	source: undefined,
 	external: false,
 	externalFile: false,
+	overrideFile: false,
 	enabled: undefined,
 	locked: false,
 	installing: false,
@@ -353,10 +359,16 @@ const installTooltip = computed(() => {
 						<span v-else-if="external" class="flex items-center gap-1 text-secondary">
 							<UploadIcon class="mx-1 size-4 shrink-0" />
 							<span class="text-sm leading-5">{{
-								formatMessage(externalFile ? messages.externalFile : messages.uploaded)
+								formatMessage(
+									overrideFile
+										? messages.overrideFile
+										: externalFile
+											? messages.externalFile
+											: messages.uploaded,
+								)
 							}}</span>
 						</span>
-						<template v-if="showVersion && version && !external">
+						<template v-if="showVersion && version?.version_number && !external">
 							<BulletDivider
 								class="shrink-0"
 								:class="tableLayout ? { hidden: separateVersion } : '@[800px]:hidden'"
@@ -410,6 +422,7 @@ const installTooltip = computed(() => {
 		>
 			<template v-if="version">
 				<AutoLink
+					v-if="version.version_number"
 					v-tooltip="truncatedTooltip(versionNumberRef, version.version_number)"
 					:target="
 						typeof versionLink === 'string' && versionLink.startsWith('http') ? '_blank' : undefined
