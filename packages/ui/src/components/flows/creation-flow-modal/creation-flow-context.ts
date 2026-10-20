@@ -1,4 +1,4 @@
-import type { Archon, LauncherMeta } from '@modrinth/api-client'
+import type { Archon, Kyros, LauncherMeta } from '@modrinth/api-client'
 import { useQueryClient } from '@tanstack/vue-query'
 import { computed, type ComputedRef, nextTick, type Ref, ref, type ShallowRef, watch } from 'vue'
 import type { ComponentExposed } from 'vue-component-type-helpers'
@@ -149,6 +149,12 @@ export interface ProjectInstallCreateData {
 	gameVersion: string
 }
 
+/** Where CurseForge modpack links are resolved and installed. */
+export interface CurseForgeTarget {
+	worldId: string
+	auth?: Archon.Servers.v0.JWTAuth
+}
+
 export interface GeneratedInstanceIcon {
 	path: string
 	previewUrl: string
@@ -209,6 +215,11 @@ export interface CreationFlowContextValue {
 	curseforgeUrl: Ref<string>
 	curseforgeModpackFile: Ref<File | null>
 	curseforgeServerPackFile: Ref<File | null>
+	/** The modpack resolved from `curseforgeUrl`, for the file it was last queried with. */
+	curseforgeModpack: Ref<Kyros.FlameAnvil.v1.LinkQueryResponse | null>
+	/** The selected file of the resolved modpack. */
+	curseforgeFileId: Ref<number | null>
+	curseforgeFiles: Ref<Kyros.FlameAnvil.v1.LinkQueryFile[]>
 	projectInstall: Ref<ProjectInstallSelection | null>
 
 	// Project search state (persisted across stage navigation)
@@ -272,6 +283,11 @@ export interface CreationFlowContextValue {
 	searchProjects: (query: string, limit?: number) => Promise<ProjectSearchResult>
 	getProjectVersions: (projectId: string) => Promise<{ id: string }[]>
 	getLoaderManifest: LoaderManifestResolver | null
+	queryCurseForgeLink: (
+		link: string,
+		fileId?: number,
+	) => Promise<Kyros.FlameAnvil.v1.LinkQueryResponse>
+	listCurseForgeFiles: (projectId: number) => Promise<Kyros.FlameAnvil.v1.ProjectFilesResponse>
 }
 
 export const [injectCreationFlowContext, provideCreationFlowContext] =
@@ -298,6 +314,7 @@ export interface CreationFlowOptions {
 	createProjectInstall?: (data: ProjectInstallCreateData) => Promise<void>
 	getProjectVersions?: (projectId: string) => Promise<{ id: string }[]>
 	getLoaderManifest?: LoaderManifestResolver
+	getCurseForgeTarget?: () => Promise<CurseForgeTarget>
 	randomizeInstanceIcon?: () => Promise<GeneratedInstanceIcon | null>
 	customizeInstanceIcon?: () => void
 	finishDisabled?: ComputedRef<boolean>
@@ -336,6 +353,7 @@ export function createCreationFlowContext(
 		options.getProjectVersions ??
 		((projectId: string) => client.labrinth.versions_v3.getProjectVersions(projectId))
 	const getLoaderManifest = options.getLoaderManifest ?? null
+	const getCurseForgeTarget = options.getCurseForgeTarget
 	const finishDisabled = options.finishDisabled ?? computed(() => false)
 	const finishDisabledTooltip = options.finishDisabledTooltip ?? computed(() => undefined)
 
@@ -398,6 +416,9 @@ export function createCreationFlowContext(
 	const curseforgeUrl = ref('')
 	const curseforgeModpackFile = ref<File | null>(null)
 	const curseforgeServerPackFile = ref<File | null>(null)
+	const curseforgeModpack = ref<Kyros.FlameAnvil.v1.LinkQueryResponse | null>(null)
+	const curseforgeFileId = ref<number | null>(null)
+	const curseforgeFiles = ref<Kyros.FlameAnvil.v1.LinkQueryFile[]>([])
 	const projectInstall = ref<ProjectInstallSelection | null>(null)
 
 	// Project search state (persisted across stage navigation)
@@ -561,6 +582,9 @@ export function createCreationFlowContext(
 		curseforgeUrl.value = ''
 		curseforgeModpackFile.value = null
 		curseforgeServerPackFile.value = null
+		curseforgeModpack.value = null
+		curseforgeFileId.value = null
+		curseforgeFiles.value = []
 		projectInstall.value = null
 		projectSearchProjectId.value = undefined
 		projectSearchOptions.value = []
@@ -753,6 +777,21 @@ export function createCreationFlowContext(
 		}
 	}
 
+	async function curseforgeTarget(): Promise<CurseForgeTarget> {
+		if (!getCurseForgeTarget) throw new Error('CurseForge modpacks are unavailable in this flow')
+		return getCurseForgeTarget()
+	}
+
+	async function queryCurseForgeLink(link: string, fileId?: number) {
+		const { worldId, auth } = await curseforgeTarget()
+		return client.kyros.flameanvil_v1.queryLink(worldId, { link, file_id: fileId }, { auth })
+	}
+
+	async function listCurseForgeFiles(projectId: number) {
+		const { worldId, auth } = await curseforgeTarget()
+		return client.kyros.flameanvil_v1.listProjectFiles(worldId, projectId, undefined, { auth })
+	}
+
 	function buildProperties(): Archon.Content.v1.PropertiesFields {
 		const isHardcore = gamemode.value === 'hardcore'
 		const known: Archon.Content.v1.KnownPropertiesFields = {
@@ -819,6 +858,9 @@ export function createCreationFlowContext(
 		curseforgeUrl,
 		curseforgeModpackFile,
 		curseforgeServerPackFile,
+		curseforgeModpack,
+		curseforgeFileId,
+		curseforgeFiles,
 		projectInstall,
 		projectSearchProjectId,
 		projectSearchOptions,
@@ -860,6 +902,8 @@ export function createCreationFlowContext(
 		searchProjects,
 		getProjectVersions,
 		getLoaderManifest,
+		queryCurseForgeLink,
+		listCurseForgeFiles,
 	}
 
 	return contextValue

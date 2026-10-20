@@ -64,6 +64,46 @@ export const curseforgeMessages = defineMessages({
 		id: 'creation-flow.curseforge.remove-file',
 		defaultMessage: 'Remove {filename}',
 	},
+	notFound: {
+		id: 'creation-flow.curseforge.not-found',
+		defaultMessage: 'We couldn’t find this modpack on CurseForge.',
+	},
+	lookupFailed: {
+		id: 'creation-flow.curseforge.lookup-failed',
+		defaultMessage: 'We couldn’t reach CurseForge. Please try again.',
+	},
+	changeButton: {
+		id: 'creation-flow.curseforge.change-button',
+		defaultMessage: 'Change',
+	},
+	minecraftVersion: {
+		id: 'creation-flow.curseforge.minecraft-version',
+		defaultMessage: 'Minecraft {version}',
+	},
+	checkingServerPack: {
+		id: 'creation-flow.curseforge.checking-server-pack',
+		defaultMessage: 'Checking for a server pack...',
+	},
+	serverPackAvailable: {
+		id: 'creation-flow.curseforge.server-pack-available',
+		defaultMessage:
+			'A server pack is available for this version. We’ll install {filename} on the server.',
+	},
+	serverPackClosest: {
+		id: 'creation-flow.curseforge.server-pack-closest',
+		defaultMessage:
+			'A server pack is not available for this version. The closest version with a server pack is <link>{version}</link>.',
+	},
+	serverPackNone: {
+		id: 'creation-flow.curseforge.server-pack-none',
+		defaultMessage:
+			'We could not find a server pack for any version of this project. We recommend choosing a different pack or uploading the server pack manually.',
+	},
+	ftbInstaller: {
+		id: 'creation-flow.curseforge.ftb-installer',
+		defaultMessage:
+			'This version comes with FTB’s server installer, which we’ll use to set up the server.',
+	},
 })
 
 /**
@@ -107,7 +147,8 @@ export function isCurseForgeModpackUrl(value: string): boolean {
 
 /**
  * Installs the CurseForge modpack selected in the creation flow through a FlameAnvil session,
- * either from the entered link or from the uploaded client and optional server packs.
+ * either from the resolved link or from the uploaded client pack, with an optional uploaded
+ * server pack.
  *
  * Any session left over from an abandoned attempt is cancelled first, and the new session is
  * cancelled if anything fails before the installation is queued.
@@ -128,12 +169,13 @@ export async function installCurseForgeModpack(
 	const { auth } = options
 	const modpackFile = ctx.curseforgeModpackFile.value
 	const serverPackFile = ctx.curseforgeServerPackFile.value
-	const link = modpackFile ? null : normalizeCurseForgeModpackUrl(ctx.curseforgeUrl.value)
+	const modpack = modpackFile ? null : ctx.curseforgeModpack.value
+	const link = modpack ? normalizeCurseForgeModpackUrl(ctx.curseforgeUrl.value) : null
 	let filename: string
 	if (modpackFile) {
 		filename = modpackFile.name
-	} else if (link) {
-		filename = (await flameanvil.queryLink(worldId, { link }, { auth })).file.file_name
+	} else if (modpack && link) {
+		filename = modpack.file.file_name
 	} else {
 		throw new Error('A CurseForge modpack link or file is required')
 	}
@@ -145,24 +187,25 @@ export async function installCurseForgeModpack(
 
 	const { upload_id: uploadId } = await flameanvil.createSession(worldId, { auth })
 	try {
-		if (modpackFile) {
-			const total = modpackFile.size + (serverPackFile?.size ?? 0)
-			const track = <T>(handle: UploadHandle<T>, offset: number) =>
-				handle.onProgress(({ loaded }) => {
-					options.onUploadProgress?.({
-						loaded: offset + loaded,
-						total,
-						progress: total > 0 ? (offset + loaded) / total : 0,
-					})
-				}).promise
+		const modpackSize = modpackFile?.size ?? 0
+		const total = modpackSize + (serverPackFile?.size ?? 0)
+		const track = <T>(handle: UploadHandle<T>, offset: number) =>
+			handle.onProgress(({ loaded }) => {
+				options.onUploadProgress?.({
+					loaded: offset + loaded,
+					total,
+					progress: total > 0 ? (offset + loaded) / total : 0,
+				})
+			}).promise
 
+		if (modpackFile) {
 			await track(flameanvil.uploadPlayerPack(worldId, uploadId, modpackFile, { auth }), 0)
-			if (serverPackFile) {
-				await track(
-					flameanvil.uploadServerPack(worldId, uploadId, serverPackFile, { auth }),
-					modpackFile.size,
-				)
-			}
+		}
+		if (serverPackFile) {
+			await track(
+				flameanvil.uploadServerPack(worldId, uploadId, serverPackFile, { auth }),
+				modpackSize,
+			)
 		}
 
 		await flameanvil.executeSession(
@@ -170,6 +213,7 @@ export async function installCurseForgeModpack(
 			uploadId,
 			{
 				link,
+				file_id: modpack?.file.id ?? null,
 				soft_override: options.softOverride,
 				properties: ctx.buildProperties(),
 			},

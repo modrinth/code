@@ -50,6 +50,27 @@ export class KyrosFlameAnvilV1Module extends AbstractModule {
 		)
 	}
 
+	/**
+	 * GET /v1/worlds/:world_id/content/flameanvil/projects/:project_id/files
+	 *
+	 * Lists a page of the modpack's client pack files, most recent first.
+	 */
+	public async listProjectFiles(
+		worldId: string,
+		projectId: number,
+		params?: Kyros.FlameAnvil.v1.ProjectFilesRequest,
+		options?: FlameAnvilAuthOptions,
+	): Promise<Kyros.FlameAnvil.v1.ProjectFilesResponse> {
+		return this.client.request<Kyros.FlameAnvil.v1.ProjectFilesResponse>(
+			`/worlds/${worldId}/content/flameanvil/projects/${projectId}/files`,
+			{
+				...nodeRequestOptions(options?.auth),
+				method: 'GET',
+				params,
+			},
+		)
+	}
+
 	/** GET /v1/worlds/:world_id/content/flameanvil/session */
 	public async getSession(
 		worldId: string,

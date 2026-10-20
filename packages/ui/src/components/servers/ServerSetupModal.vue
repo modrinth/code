@@ -10,6 +10,7 @@
 		:initial-game-version="initialGameVersion"
 		:fade="props.initialSetup ? undefined : 'danger'"
 		:get-project-versions="getProjectVersions"
+		:get-curse-forge-target="getCurseForgeTarget"
 		:finish-disabled="!canCompleteSetup"
 		:finish-disabled-tooltip="!canCompleteSetup ? permissionDeniedMessage : undefined"
 		@create="onFlowComplete"
@@ -68,6 +69,10 @@ const { canSetup, canResetServer, permissionDeniedMessage } = useServerPermissio
 async function getProjectVersions(projectId: string) {
 	const versions = await client.labrinth.versions_v3.getProjectVersions(projectId)
 	return versions.map((v) => ({ id: v.id }))
+}
+
+async function getCurseForgeTarget() {
+	return { worldId: serverContext.worldId.value! }
 }
 
 function toApiLoader(loader: string): Archon.Content.v1.Modloader {
@@ -232,7 +237,7 @@ async function handleMrpackUpload(file: File, properties: Archon.Content.v1.Prop
 async function handleCurseForgeInstall(ctx: CreationFlowContextValue) {
 	const worldId = serverContext.worldId.value!
 	let installationKey
-	if (ctx.curseforgeModpackFile.value) {
+	if (ctx.curseforgeModpackFile.value || ctx.curseforgeServerPackFile.value) {
 		creationFlowRef.value?.hide()
 		installationKey = await uploadProgressModal.value!.trackProgress((onUploadProgress) =>
 			installCurseForgeModpack(client, worldId, ctx, { softOverride: false, onUploadProgress }),

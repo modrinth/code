@@ -5,6 +5,7 @@
 		:available-loaders="['vanilla', 'fabric', 'neoforge', 'forge', 'quilt', 'paper', 'purpur']"
 		show-snapshot-toggle
 		:get-loader-manifest="getLoaderManifest"
+		:get-curse-forge-target="getCurseForgeTarget"
 		:finish-disabled="!canSetup"
 		:finish-disabled-tooltip="
 			!canSetup ? formatMessage(commonMessages.noPermissionAction) : undefined
@@ -90,6 +91,13 @@ async function browseModpacks() {
 	})
 }
 
+async function getCurseForgeTarget() {
+	const request = flow.request.value
+	if (!request) throw new Error('No server is being set up')
+	const auth = await client.archon.servers_v0.getFilesystemAuth(request.serverId)
+	return { worldId: request.worldId, auth }
+}
+
 function onBack() {
 	if (flow.request.value?.backToBrowse) {
 		modalRef.value?.hide()
@@ -135,7 +143,9 @@ const install = useMutation({
 			await upload.promise
 		} else if (config.setupType.value === 'curseforge') {
 			const auth = await client.archon.servers_v0.getFilesystemAuth(serverId)
-			if (config.curseforgeModpackFile.value) config.uploadProgress.value = 0
+			if (config.curseforgeModpackFile.value || config.curseforgeServerPackFile.value) {
+				config.uploadProgress.value = 0
+			}
 			await installCurseForgeModpack(client, worldId, config, {
 				auth,
 				softOverride: false,

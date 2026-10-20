@@ -941,6 +941,12 @@
   "creation-flow.button.setup-server": {
     "defaultMessage": "Setup server"
   },
+  "creation-flow.curseforge.change-button": {
+    "defaultMessage": "Change"
+  },
+  "creation-flow.curseforge.checking-server-pack": {
+    "defaultMessage": "Checking for a server pack..."
+  },
   "creation-flow.curseforge.description": {
     "defaultMessage": "Use a modpack that isn’t available on Modrinth."
   },
@@ -949,6 +955,9 @@
   },
   "creation-flow.curseforge.file-label": {
     "defaultMessage": "CurseForge Modpack file"
+  },
+  "creation-flow.curseforge.ftb-installer": {
+    "defaultMessage": "This version comes with FTB’s server installer, which we’ll use to set up the server."
   },
   "creation-flow.curseforge.invalid-link": {
     "defaultMessage": "Enter a CurseForge Minecraft modpack or modpack version link."
@@ -959,6 +968,15 @@
   "creation-flow.curseforge.link-label": {
     "defaultMessage": "CurseForge modpack link"
   },
+  "creation-flow.curseforge.lookup-failed": {
+    "defaultMessage": "We couldn’t reach CurseForge. Please try again."
+  },
+  "creation-flow.curseforge.minecraft-version": {
+    "defaultMessage": "Minecraft {version}"
+  },
+  "creation-flow.curseforge.not-found": {
+    "defaultMessage": "We couldn’t find this modpack on CurseForge."
+  },
   "creation-flow.curseforge.or-upload": {
     "defaultMessage": "Or upload it yourself"
   },
@@ -968,11 +986,20 @@
   "creation-flow.curseforge.selected-file-label": {
     "defaultMessage": "Modpack file"
   },
+  "creation-flow.curseforge.server-pack-available": {
+    "defaultMessage": "A server pack is available for this version. We’ll install {filename} on the server."
+  },
+  "creation-flow.curseforge.server-pack-closest": {
+    "defaultMessage": "A server pack is not available for this version. The closest version with a server pack is <link>{version}</link>."
+  },
   "creation-flow.curseforge.server-pack-description": {
     "defaultMessage": "You can optionally add a server pack to make it easier to determine what needs to be installed on the server."
   },
   "creation-flow.curseforge.server-pack-label": {
     "defaultMessage": "Server pack <optional>(optional)</optional>"
+  },
+  "creation-flow.curseforge.server-pack-none": {
+    "defaultMessage": "We could not find a server pack for any version of this project. We recommend choosing a different pack or uploading the server pack manually."
   },
   "creation-flow.curseforge.title": {
     "defaultMessage": "Upload a CurseForge modpack"
