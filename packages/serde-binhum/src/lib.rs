@@ -30,7 +30,10 @@ impl FromMeta for SerdeOptions {
         let options = items
             .iter()
             .map(|item| match item {
-                NestedMeta::Meta(option) => Ok(option.clone()),
+				NestedMeta::Meta(option) => Ok(option.clone()),
+				NestedMeta::NameValueInvalidExpr(option) => {
+					Err(option.error.clone())
+				}
                 NestedMeta::Lit(literal) => {
                     Err(darling::Error::custom("expected a Serde option")
                         .with_span(literal))

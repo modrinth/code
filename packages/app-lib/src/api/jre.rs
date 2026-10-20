@@ -289,11 +289,25 @@ async fn auto_install_java_inner(
                 "failed to read java zip".to_string(),
             ))?;
 
-        // removes the old installation of java
-        if let Some(file) = archive.file_names().next()
-            && let Some(dir) = file.split('/').next()
-        {
-            let path = path.join(dir);
+		let names = archive.file_names().collect::<Result<Vec<_>, _>>()?;
+		// removes the old installation of java
+		if let Some(file) = names.first()
+			&& let Some(dir) = file.split('/').next()
+		{
+			if dir.is_empty()
+				|| dir == "."
+				|| dir == ".."
+				|| dir.contains(['\\', ':'])
+				|| !matches!(
+					std::path::Path::new(dir).components().next(),
+					Some(std::path::Component::Normal(_))
+				)
+			{
+				bail!(ErrorKind::InputError(
+					"invalid Java archive directory".to_string()
+				));
+			}
+			let path = path.join(dir);
 
             if path.exists() {
                 io::remove_dir_all(path).await?;

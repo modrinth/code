@@ -21,7 +21,7 @@ futures = { workspace = true }
 indexmap = { workspace = true, features = ["serde"] }
 itertools = { workspace = true }
 md5 = { workspace = true }
-quick-xml = { workspace = true }
+quick-xml = { workspace = true, features = ["serialize"] }
 reqwest = { workspace = true, features = ["json", "rustls", "stream"] }
 rust-s3 = { workspace = true }
 serde = { workspace = true, features = ["derive"] }

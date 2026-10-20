@@ -15,8 +15,8 @@ use actix_web::http::header::AUTHORIZATION;
 use actix_web::web::Data;
 use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
 use chrono::{DateTime, Utc};
-use rand::distributions::Alphanumeric;
-use rand::{Rng, SeedableRng};
+use rand::distr::Alphanumeric;
+use rand::{RngExt, SeedableRng};
 use rand_chacha::ChaCha20Rng;
 use serde::Serialize;
 use woothee::parser::Parser;
@@ -100,7 +100,7 @@ pub async fn issue_session(
 
     let metadata = get_session_metadata(&req).await?;
 
-    let session = ChaCha20Rng::from_entropy()
+	let session = ChaCha20Rng::from_rng(&mut rand::rng())
         .sample_iter(&Alphanumeric)
         .take(60)
         .map(char::from)

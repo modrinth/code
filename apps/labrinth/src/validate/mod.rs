@@ -301,7 +301,9 @@ fn validate_additional_jar(
     };
 
     if file_type == FileType::SourcesJar
-        && !archive.file_names().any(|name| name.ends_with(".java"))
+		&& !validated_file_names(archive)?
+			.into_iter()
+			.any(|name| name.ends_with(".java"))
     {
         return Err(ValidationError::InvalidInput(
             "sources jars must contain at least one `.java` file".into(),
@@ -328,6 +330,7 @@ async fn validate_minecraft_file(
         };
 
         if let MaybeProtectedZipFile::Unprotected(archive) = &mut zip {
+			validated_file_names(archive)?;
             for validator in VALIDATORS {
                 validator.ensure_required_loaders(archive, &loaders)?;
             }
@@ -444,23 +447,28 @@ fn game_version_supported(
     }
 }
 
-#[must_use]
 pub fn validate_pack_formats(
     archive: &mut ZipArchive<Cursor<Bytes>>,
-) -> ValidationResult {
-    if (archive.by_name("modlist.html").is_ok()
-        && archive.by_name("manifest.json").is_ok())
-        || archive
-            .file_names()
-            .any(|x| x.starts_with("mods/") && x.ends_with(".jar"))
-        || archive
-            .file_names()
-            .any(|x| x.starts_with("override/mods/") && x.ends_with(".jar"))
+) -> Result<ValidationResult, ValidationError> {
+	let has_bundled_mods = validated_file_names(archive)?.iter().any(|name| {
+		(name.starts_with("mods/") || name.starts_with("override/mods/"))
+			&& name.ends_with(".jar")
+	});
+	if (archive.by_name("modlist.html").is_ok()
+		&& archive.by_name("manifest.json").is_ok())
+		|| has_bundled_mods
     {
-        return ValidationResult::Warning(
+		return Ok(ValidationResult::Warning(
             "Invalid modpack file. Modpacks must be uploaded in the .mrpack format, not as a ZIP file.",
-        );
-    }
+		));
+	}
 
-    ValidationResult::Pass
+	Ok(ValidationResult::Pass)
+}
+
+/// Decodes every filename before callers can short-circuit on a matching entry.
+fn validated_file_names(
+	archive: &ZipArchive<Cursor<Bytes>>,
+) -> Result<Vec<std::borrow::Cow<'_, str>>, ValidationError> {
+	Ok(archive.file_names().collect::<Result<Vec<_>, _>>()?)
 }

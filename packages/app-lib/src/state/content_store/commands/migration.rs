@@ -342,9 +342,9 @@ fn replace_file_copy(
     temporary: tempfile::TempPath,
     destination: &std::path::Path,
 ) -> std::io::Result<()> {
-    let mut temporary = tempfile::TempPath::from_path(
-        temporary.keep().map_err(|error| error.error)?,
-    );
+	let mut temporary = tempfile::TempPath::try_from_path(
+		temporary.keep().map_err(|error| error.error)?,
+	)?;
     #[cfg(windows)]
     let original = {
         use std::os::windows::fs::OpenOptionsExt;
