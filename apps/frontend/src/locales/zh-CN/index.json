@@ -4571,29 +4571,17 @@
   "report.not-for.dmca.description": {
     "message": "详见我们的<policy-link>版权政策</policy-link>。"
   },
-  "report.note.ai-images.1": {
-    "message": "我们刚刚更新了规则，禁止在图标、画廊及项目描述中使用 AI 生成的图像。在正式开始接收此类举报之前，我们正在向创作者提供一段宽限期，以便他们从自己的项目中移除 AI 图像。"
-  },
-  "report.note.check-back-later": {
-    "message": "请在宽限期结束后再来查看。目前暂不受理此类举报。"
-  },
   "report.note.copyright.1": {
     "message": "请注意，你提交的并非 DMCA 下架请求，而是对转载内容的举报。"
   },
   "report.note.copyright.2": {
     "message": "如果你需要填报 DMCA 删除请求（这是一个法务行为），请参见我们的<copyright-policy-link>版权政策</copyright-policy-link>。"
   },
-  "report.note.fully-ai-generated.1": {
-    "message": "我们刚刚更新了规则，明确禁止完全由 AI 生成的项目。在正式开始接收此类举报之前，我们正在向创作者提供一段宽限期，以便他们更新或下架完全由 AI 生成的项目。"
-  },
   "report.note.malicious.1": {
     "message": "报告恶意或欺骗性内容时必须附上行为的实质性证据，例如代码样本。"
   },
   "report.note.malicious.2": {
     "message": "Microsoft Defender、VirusTotal 等杀毒软件的报告，或 AI 恶意软件检测结果不属于充分的证据形式，不会被接受。"
-  },
-  "report.note.missing-disclosure.1": {
-    "message": "内容披露是我们新增的一个功能。 我们向创作者提供一个宽限期，以便在我们开始接受缺失或不正确的披露报告之前更新他们的披露。"
   },
   "report.please-report": {
     "message": "请举报："
