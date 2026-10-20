@@ -216,7 +216,7 @@ async fn app() -> std::io::Result<()> {
         .build()
         .expect("Failed to create prometheus metrics middleware");
 
-    database::register_and_set_metrics(&pool, &prometheus.registry)
+    database::register_and_set_metrics(&pool, &ro_pool, &prometheus.registry)
         .await
         .expect("Failed to register database metrics");
     redis_pool
