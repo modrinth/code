@@ -17,6 +17,36 @@ export class ArchonBackupsQueueV1Module extends AbstractModule {
 		)
 	}
 
+	/** GET /v1/servers/:server_id/worlds/:world_id/backups-queue/with-options */
+	public async listWithOptions(
+		serverId: string,
+		worldId: string,
+	): Promise<Archon.BackupsQueue.v1.BackupsQueueWithOptionsResponse> {
+		return this.client.request<Archon.BackupsQueue.v1.BackupsQueueWithOptionsResponse>(
+			`/servers/${serverId}/worlds/${worldId}/backups-queue/with-options`,
+			{ api: 'archon', version: 1, method: 'GET' },
+		)
+	}
+
+	/** PATCH /v1/servers/:server_id/worlds/:world_id/backups-queue/with-options */
+	public async patchOptions(
+		serverId: string,
+		worldId: string,
+		request: Archon.BackupsQueue.v1.PatchWorldBackupOptions,
+		acknowledgeRotation = false,
+	): Promise<Archon.BackupsQueue.v1.PatchWorldBackupOptionsResponse> {
+		return this.client.request<Archon.BackupsQueue.v1.PatchWorldBackupOptionsResponse>(
+			`/servers/${serverId}/worlds/${worldId}/backups-queue/with-options`,
+			{
+				api: 'archon',
+				version: 1,
+				method: 'PATCH',
+				body: request,
+				params: acknowledgeRotation ? { ar: 'true' } : undefined,
+			},
+		)
+	}
+
 	/** POST /v1/servers/:server_id/worlds/:world_id/backups-queue */
 	public async create(
 		serverId: string,

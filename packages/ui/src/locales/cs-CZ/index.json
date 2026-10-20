@@ -4310,9 +4310,6 @@
   "servers.backups.delete-modal.header": {
     "defaultMessage": "Smazat {count, plural, one {zálohu} other {zálohy}}"
   },
-  "servers.backups.filtered-empty.clear-filters": {
-    "defaultMessage": "Vymazat filtry"
-  },
   "servers.backups.item.auto": {
     "defaultMessage": "Automaticky"
   },
@@ -4336,15 +4333,6 @@
   },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Vytvořit zálohu"
-  },
-  "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "Automatický"
-  },
-  "servers.backups.toolbar.filter-manual": {
-    "defaultMessage": "Manuální"
-  },
-  "servers.backups.toolbar.select-all": {
-    "defaultMessage": "Vybrat vše"
   },
   "servers.grant-access-modal.already-member-tooltip": {
     "defaultMessage": "Uživatel je již pozván"
@@ -5190,4 +5178,3 @@
     "defaultMessage": "Typ"
   }
 }
-

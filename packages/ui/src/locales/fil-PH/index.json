@@ -2042,9 +2042,6 @@
   "servers.backups.item.restore": {
     "defaultMessage": "I-restore"
   },
-  "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "Kusa"
-  },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Mayroon ka nang server?"
   },
@@ -2736,4 +2733,3 @@
     "defaultMessage": "Uri"
   }
 }
-

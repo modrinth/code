@@ -1,6 +1,7 @@
 import type { Archon } from '@modrinth/api-client'
 import {
 	CardIcon,
+	DatabaseBackupIcon,
 	ListIcon,
 	ModrinthIcon,
 	SettingsIcon,
@@ -15,6 +16,7 @@ export type ServerSettingsTabId =
 	| 'general'
 	| 'installation'
 	| 'network'
+	| 'backups'
 	| 'properties'
 	| 'advanced'
 	| 'support'
@@ -53,6 +55,11 @@ export const serverSettingsTabDefinitions: ServerSettingsTabDefinition[] = [
 		id: 'network',
 		label: 'Network',
 		icon: VersionIcon,
+	},
+	{
+		id: 'backups',
+		label: 'Backups',
+		icon: DatabaseBackupIcon,
 	},
 	{
 		id: 'properties',

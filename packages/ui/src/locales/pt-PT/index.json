@@ -2321,9 +2321,6 @@
   "servers.backups.item.restore": {
     "defaultMessage": "Restaurar"
   },
-  "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "Automático"
-  },
   "servers.listing.new-label": {
     "defaultMessage": "Novo"
   },
@@ -3045,4 +3042,3 @@
     "defaultMessage": "Tipo"
   }
 }
-

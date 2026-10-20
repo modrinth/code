@@ -5315,14 +5315,14 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "Restoring from backup"
   },
-  "servers.backups.bulk-bar.aria-label": {
-    "defaultMessage": "{count, plural, one {Bulk actions for one selected backup} other {Bulk actions for # selected backups}}"
-  },
-  "servers.backups.bulk-bar.deleting": {
-    "defaultMessage": "Deleting {total, plural, one {# backup} other {# backups}}..."
-  },
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "{count, plural, one {# backup selected} other {# backups selected}}"
+  },
+  "servers.backups.create.in-progress": {
+    "defaultMessage": "A backup is already queued or in progress"
+  },
+  "servers.backups.create.slots-full": {
+    "defaultMessage": "All {limit, plural, one {# manual backup slot is} other {# manual backup slots are}} in use"
   },
   "servers.backups.delete-modal.admonition-body": {
     "defaultMessage": "Once deleted, {count, plural, one {this backup cannot} other {these backups cannot}} be recovered. Deletion is permanent."
@@ -5339,20 +5339,68 @@
   "servers.backups.delete-modal.header": {
     "defaultMessage": "Delete {count, plural, one {backup} other {backups}}"
   },
+  "servers.backups.delete.error": {
+    "defaultMessage": "Failed to delete {count, plural, one {backup} other {# backups}}"
+  },
   "servers.backups.empty.description": {
     "defaultMessage": "Create your first backup"
   },
   "servers.backups.empty.heading": {
     "defaultMessage": "No backups yet"
   },
-  "servers.backups.filtered-empty.clear-filters": {
-    "defaultMessage": "Clear filters"
+  "servers.backups.history.auto-badge": {
+    "defaultMessage": "Auto"
   },
-  "servers.backups.filtered-empty.description": {
-    "defaultMessage": "Try a different filter or clear filters to see all backups."
+  "servers.backups.history.column.created": {
+    "defaultMessage": "Created"
   },
-  "servers.backups.filtered-empty.heading": {
-    "defaultMessage": "No backups match"
+  "servers.backups.history.column.created-by": {
+    "defaultMessage": "Created by"
+  },
+  "servers.backups.history.column.name": {
+    "defaultMessage": "Name"
+  },
+  "servers.backups.history.creator-avatar-alt": {
+    "defaultMessage": "{username}'s avatar"
+  },
+  "servers.backups.history.creator.support": {
+    "defaultMessage": "Support"
+  },
+  "servers.backups.history.more-options": {
+    "defaultMessage": "More options for {name}"
+  },
+  "servers.backups.history.no-results": {
+    "defaultMessage": "No backups match your search."
+  },
+  "servers.backups.history.rename": {
+    "defaultMessage": "Rename"
+  },
+  "servers.backups.history.restore": {
+    "defaultMessage": "Restore"
+  },
+  "servers.backups.history.search-label": {
+    "defaultMessage": "Search backups"
+  },
+  "servers.backups.history.search-placeholder": {
+    "defaultMessage": "Search {count, plural, one {# backup} other {# backups}}..."
+  },
+  "servers.backups.history.title": {
+    "defaultMessage": "Backup history"
+  },
+  "servers.backups.interval.days": {
+    "defaultMessage": "{days, plural, one {# day} other {# days}}"
+  },
+  "servers.backups.interval.every-days": {
+    "defaultMessage": "Every {days, plural, one {day} other {# days}}"
+  },
+  "servers.backups.interval.every-hours": {
+    "defaultMessage": "Every {hours}h"
+  },
+  "servers.backups.interval.hours": {
+    "defaultMessage": "{hours}h"
+  },
+  "servers.backups.interval.weekly": {
+    "defaultMessage": "Weekly"
   },
   "servers.backups.item.auto": {
     "defaultMessage": "Auto"
@@ -5375,20 +5423,44 @@
   "servers.backups.item.restore": {
     "defaultMessage": "Restore"
   },
-  "servers.backups.select-backup-aria": {
-    "defaultMessage": "Select backup {name}"
+  "servers.backups.load-error.description": {
+    "defaultMessage": "We couldn't load your server's backups."
+  },
+  "servers.backups.load-error.title": {
+    "defaultMessage": "Failed to load backups"
+  },
+  "servers.backups.restore.operation-in-progress": {
+    "defaultMessage": "A backup operation is already queued or in progress"
+  },
+  "servers.backups.restore.server-running": {
+    "defaultMessage": "Stop your server before restoring a backup"
+  },
+  "servers.backups.slots.auto.next": {
+    "defaultMessage": "Next {time}"
+  },
+  "servers.backups.slots.auto.next-soon": {
+    "defaultMessage": "Next backup starting soon"
+  },
+  "servers.backups.slots.auto.off": {
+    "defaultMessage": "Off"
+  },
+  "servers.backups.slots.auto.off-description": {
+    "defaultMessage": "Turn on auto backups in settings"
+  },
+  "servers.backups.slots.auto.title": {
+    "defaultMessage": "Auto backups"
+  },
+  "servers.backups.slots.manual.description": {
+    "defaultMessage": "Manually created"
+  },
+  "servers.backups.slots.manual.title": {
+    "defaultMessage": "Manual backups"
+  },
+  "servers.backups.slots.used": {
+    "defaultMessage": "<used>{used}</used> / {limit, plural, one {# slot} other {# slots}}"
   },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Create backup"
-  },
-  "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "Auto"
-  },
-  "servers.backups.toolbar.filter-manual": {
-    "defaultMessage": "Manual"
-  },
-  "servers.backups.toolbar.select-all": {
-    "defaultMessage": "Select all"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "Backup creation in progress"
@@ -6013,6 +6085,36 @@
   },
   "servers.settings.advanced.sftp.roll-credentials-success-title": {
     "defaultMessage": "SFTP credentials rotated"
+  },
+  "servers.settings.backups.auto.description": {
+    "defaultMessage": "Automatically back up your server at regular intervals."
+  },
+  "servers.settings.backups.auto.title": {
+    "defaultMessage": "Auto backups"
+  },
+  "servers.settings.backups.interval.title": {
+    "defaultMessage": "Backup interval"
+  },
+  "servers.settings.backups.manual-slots.description": {
+    "defaultMessage": "Choose how many of your {limit} backup slots to use for manual and automatic backups."
+  },
+  "servers.settings.backups.manual-slots.title": {
+    "defaultMessage": "Manual backup slots"
+  },
+  "servers.settings.backups.rotation.description": {
+    "defaultMessage": "Fewer auto backup slots means {count, plural, one {your oldest auto backup} other {your # oldest auto backups}} will be deleted."
+  },
+  "servers.settings.backups.rotation.proceed": {
+    "defaultMessage": "Save and delete"
+  },
+  "servers.settings.backups.rotation.title": {
+    "defaultMessage": "Remove auto backups?"
+  },
+  "servers.settings.backups.save.error-title": {
+    "defaultMessage": "Failed to update backup settings"
+  },
+  "servers.settings.backups.save.success-title": {
+    "defaultMessage": "Backup settings updated"
   },
   "servers.settings.support.action-log-title": {
     "defaultMessage": "Action log"

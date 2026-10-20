@@ -9,6 +9,7 @@ import { TabbedModal } from '#ui/components'
 import { defineMessage, defineMessages, useVIntl } from '#ui/composables/i18n'
 import {
 	ServerSettingsAdvancedPage,
+	ServerSettingsBackupsPage,
 	ServerSettingsGeneralPage,
 	ServerSettingsInstallationPage,
 	ServerSettingsNetworkPage,
@@ -76,6 +77,7 @@ const serverSettingsTabComponentMap = {
 	general: ServerSettingsGeneralPage,
 	installation: ServerSettingsInstallationPage,
 	network: ServerSettingsNetworkPage,
+	backups: ServerSettingsBackupsPage,
 	properties: ServerSettingsPropertiesPage,
 	advanced: ServerSettingsAdvancedPage,
 	support: ServerSettingsSupportPage,

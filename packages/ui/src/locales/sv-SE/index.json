@@ -4952,9 +4952,6 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "Återställer från säkerhetskopia"
   },
-  "servers.backups.bulk-bar.deleting": {
-    "defaultMessage": "Raderar {total, plural, one {# säkerhetskopia} other {# säkerhetskopior}}..."
-  },
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "{count, plural, one {# säkerhetskopia markerad} other {# säkerhetskopior markerade}}"
   },
@@ -4979,15 +4976,6 @@
   "servers.backups.empty.heading": {
     "defaultMessage": "Inga säkerhetskopior än"
   },
-  "servers.backups.filtered-empty.clear-filters": {
-    "defaultMessage": "Rensa filter"
-  },
-  "servers.backups.filtered-empty.description": {
-    "defaultMessage": "Prova ett annat filer eller rensa filtren för att se alla säkerhetskopior."
-  },
-  "servers.backups.filtered-empty.heading": {
-    "defaultMessage": "Inga säkerhetskopior matchar"
-  },
   "servers.backups.item.auto": {
     "defaultMessage": "Auto"
   },
@@ -5009,20 +4997,8 @@
   "servers.backups.item.restore": {
     "defaultMessage": "Återställ"
   },
-  "servers.backups.select-backup-aria": {
-    "defaultMessage": "Markera säkerhetskopia {name}"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Skapa säkerhetskopia"
-  },
-  "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "Auto"
-  },
-  "servers.backups.toolbar.filter-manual": {
-    "defaultMessage": "Manuellt"
-  },
-  "servers.backups.toolbar.select-all": {
-    "defaultMessage": "Markera alla"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "Säkerhetskopiering pågår"

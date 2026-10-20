@@ -953,12 +953,36 @@ export namespace Archon {
 				status: BackupStatus
 				locked: boolean
 				automated: boolean
+				rotates_at?: string
 				history: BackupQueueOperation[]
 			}
 
 			export type BackupsQueueResponse = {
 				active_operations: ActiveOperation[]
 				backups: BackupQueueBackup[]
+			}
+
+			export type WorldBackupOptions = {
+				split_automatic: number
+				split_manual: number
+				limit: number
+				interval: number
+			}
+
+			export type BackupsQueueWithOptionsResponse = BackupsQueueResponse & {
+				options: WorldBackupOptions
+				next_auto_backup_at: string | null
+			}
+
+			export type PatchWorldBackupOptions = {
+				split_automatic?: number
+				split_manual?: number
+				interval?: number
+			}
+
+			export type PatchWorldBackupOptionsResponse = {
+				applied: boolean
+				backup_ids?: string[]
 			}
 		}
 	}
