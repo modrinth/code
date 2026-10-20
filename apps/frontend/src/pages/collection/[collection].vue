@@ -69,7 +69,7 @@
 								{{ formatMessage(messages.removeIconButton) }}
 							</template>
 						</TeleportOverflowMenu>
-						<FileInput
+						<FileButton
 							id="collection-icon-input"
 							ref="iconInputRef"
 							:max-size="524288"
@@ -380,7 +380,7 @@ import {
 	defineMessage,
 	defineMessages,
 	EmptyState,
-	FileInput,
+	FileButton,
 	filterProjectsByType,
 	HorizontalRule,
 	injectModrinthClient,
