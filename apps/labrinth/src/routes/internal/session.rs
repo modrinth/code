@@ -1,4 +1,6 @@
-use crate::auth::validate::{extract_authorization_header, get_user_from_bearer_token};
+use crate::auth::validate::{
+    extract_authorization_header, get_user_from_bearer_token,
+};
 use crate::auth::{AuthenticationError, get_user_from_headers};
 use crate::database::models::DBUserId;
 use crate::database::models::session_item::DBSession;
