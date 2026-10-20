@@ -225,7 +225,10 @@ const choosingPaymentMethod = ref(false)
 const settingPaymentMethodId = ref<string | null>(null)
 
 const messages = defineMessages({
-	title: { id: 'billing.resubscribe-modal.title', defaultMessage: 'Resubscribe to Server' },
+	title: {
+		id: 'billing.resubscribe-modal.title',
+		defaultMessage: 'Resubscribe to Modrinth Hosting',
+	},
 	description: {
 		id: 'billing.resubscribe-modal.description',
 		defaultMessage:
