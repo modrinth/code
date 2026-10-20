@@ -112,26 +112,13 @@ function setUse(use: AiUsage, enabled: boolean) {
 		</p>
 		<template #expanded>
 			<SettingsFormGroup :title="formatMessage(messages.typesDescription)">
-				<MultiSelect
-					v-if="variant === 'review'"
-					v-model="model.uses"
-					:options="
-						AI_USES.map((use) => ({
-							value: use,
-							label: formatMessage(disclosureAiUsageMessages[use]),
-						}))
-					"
-					:aria-label="formatMessage(messages.typesDescription)"
-					:placeholder="formatMessage(messages.selectUses)"
-					:disabled="disabled"
-					class="w-full max-w-[24rem]"
-				/>
-				<div v-else class="flex flex-col gap-2">
+				<div class="flex flex-col gap-2">
 					<Checkbox
 						v-for="use in AI_USES"
 						:key="use"
 						:model-value="hasUse(use)"
 						:disabled="disabled"
+						class="!gap-1.5"
 						@update:model-value="(enabled) => setUse(use, enabled)"
 					>
 						{{ formatMessage(disclosureAiUsageMessages[use]) }}

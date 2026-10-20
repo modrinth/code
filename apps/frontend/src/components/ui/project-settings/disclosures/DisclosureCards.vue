@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
+import DisclosureView from '~/components/project-review/disclosures/view.vue'
 import ReviewPanel from '~/components/project-review/review-panel/index.vue'
 import { injectReviewPanels } from '~/providers/project-review/review-panels'
 
@@ -26,10 +27,48 @@ const props = withDefaults(
 	}>(),
 	{ hideDescription: false, variant: 'settings' },
 )
+const emit = defineEmits<{ editingChange: [editing: boolean] }>()
+
 const { current, disclosureUpdateProps, setDisclosureLockStatus, isDisclosureVisible } =
 	props.editor
 provideDisclosureDraft(current)
 const panels = injectReviewPanels(null)
+const editingTypes = ref(new Set<DisclosureType>())
+
+function toggleEditing(type: DisclosureType) {
+	const next = new Set(editingTypes.value)
+	if (next.has(type)) next.delete(type)
+	else next.add(type)
+	editingTypes.value = next
+	emit('editingChange', next.size > 0)
+}
+
+function cancelEditing(type: DisclosureType) {
+	props.editor.resetDisclosure(type, true)
+	toggleEditing(type)
+}
+
+async function saveEditing(type: DisclosureType) {
+	if (await props.editor.saveDisclosure(type)) toggleEditing(type)
+}
+
+function cardProps(type: DisclosureType) {
+	return {
+		...disclosureUpdateProps(type),
+		...(props.variant === 'review'
+			? {
+					editing: editingTypes.value.has(type),
+					onToggleEditing: () => toggleEditing(type),
+					onCancelEditing: () => cancelEditing(type),
+					onSaveEditing: () => saveEditing(type),
+					sectionCanSave: props.editor.canSaveDisclosure(type),
+					sectionSaveDisabledReason: props.editor.disclosureSaveDisabledReason(type),
+					sectionSaveError: props.editor.disclosureSaveError(type),
+					sectionSaving: props.editor.saving.value,
+				}
+			: {}),
+	}
+}
 
 function reviewTitle(key: string): string | undefined {
 	return props.variant === 'review'
@@ -101,13 +140,18 @@ const cards = computed(() => {
 					: {}
 			"
 		>
+			<DisclosureView
+				v-if="variant === 'review' && !editingTypes.has(card.type)"
+				:type="card.type"
+				@edit="toggleEditing(card.type)"
+			/>
 			<AiDisclosureCard
-				v-if="card.type === 'ai_content'"
+				v-else-if="card.type === 'ai_content'"
 				v-model="current.ai"
 				:hide-description="hideDescription"
 				:title="reviewTitle(card.key)"
 				:variant="variant"
-				v-bind="disclosureUpdateProps(card.type)"
+				v-bind="cardProps(card.type)"
 				@set-lock-status="
 					(status: DisclosureLockStatus) => setDisclosureLockStatus(card.type, status)
 				"
@@ -118,7 +162,7 @@ const cards = computed(() => {
 				:hide-description="hideDescription"
 				:title="reviewTitle(card.key)"
 				:variant="variant"
-				v-bind="disclosureUpdateProps(card.type)"
+				v-bind="cardProps(card.type)"
 				@set-lock-status="
 					(status: DisclosureLockStatus) => setDisclosureLockStatus(card.type, status)
 				"
@@ -129,7 +173,7 @@ const cards = computed(() => {
 				:hide-description="hideDescription"
 				:title="reviewTitle(card.key)"
 				:variant="variant"
-				v-bind="disclosureUpdateProps(card.type)"
+				v-bind="cardProps(card.type)"
 				@set-lock-status="
 					(status: DisclosureLockStatus) => setDisclosureLockStatus(card.type, status)
 				"
@@ -140,7 +184,7 @@ const cards = computed(() => {
 				:hide-description="hideDescription"
 				:title="reviewTitle(card.key)"
 				:variant="variant"
-				v-bind="disclosureUpdateProps(card.type)"
+				v-bind="cardProps(card.type)"
 				@set-lock-status="
 					(status: DisclosureLockStatus) => setDisclosureLockStatus(card.type, status)
 				"
@@ -151,7 +195,7 @@ const cards = computed(() => {
 				:hide-description="hideDescription"
 				:title="reviewTitle(card.key)"
 				:variant="variant"
-				v-bind="disclosureUpdateProps(card.type)"
+				v-bind="cardProps(card.type)"
 				@set-lock-status="
 					(status: DisclosureLockStatus) => setDisclosureLockStatus(card.type, status)
 				"
@@ -162,7 +206,7 @@ const cards = computed(() => {
 				:hide-description="hideDescription"
 				:title="reviewTitle(card.key)"
 				:variant="variant"
-				v-bind="disclosureUpdateProps(card.type)"
+				v-bind="cardProps(card.type)"
 				@set-lock-status="
 					(status: DisclosureLockStatus) => setDisclosureLockStatus(card.type, status)
 				"
@@ -173,7 +217,7 @@ const cards = computed(() => {
 				:hide-description="hideDescription"
 				:title="reviewTitle(card.key)"
 				:variant="variant"
-				v-bind="disclosureUpdateProps(card.type)"
+				v-bind="cardProps(card.type)"
 				@set-lock-status="
 					(status: DisclosureLockStatus) => setDisclosureLockStatus(card.type, status)
 				"
@@ -184,7 +228,7 @@ const cards = computed(() => {
 				:hide-description="hideDescription"
 				:title="reviewTitle(card.key)"
 				:variant="variant"
-				v-bind="disclosureUpdateProps(card.type)"
+				v-bind="cardProps(card.type)"
 				@set-lock-status="
 					(status: DisclosureLockStatus) => setDisclosureLockStatus(card.type, status)
 				"
@@ -196,7 +240,7 @@ const cards = computed(() => {
 				:hide-description="hideDescription"
 				:title="reviewTitle(card.key)"
 				:variant="variant"
-				v-bind="disclosureUpdateProps(card.type)"
+				v-bind="cardProps(card.type)"
 				@set-lock-status="
 					(status: DisclosureLockStatus) => setDisclosureLockStatus(card.type, status)
 				"

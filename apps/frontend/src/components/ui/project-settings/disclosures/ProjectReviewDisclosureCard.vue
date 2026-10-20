@@ -1,6 +1,10 @@
 <script setup lang="ts">
-import { Toggle } from '@modrinth/ui'
+import { Button, commonMessages, Toggle, useVIntl } from '@modrinth/ui'
 import { type Component, computed, useId } from 'vue'
+
+import { disclosureStatusMessages } from './messages'
+
+import EditButton from '~/components/project-review/project-info/edit/button.vue'
 
 const props = defineProps<{
 	title: string
@@ -8,9 +12,18 @@ const props = defineProps<{
 	description?: string
 	disabled?: boolean
 	toggleDisabled?: boolean
+	editing?: boolean
+	onToggleEditing?: () => void
+	onCancelEditing?: () => void
+	onSaveEditing?: () => Promise<void>
+	sectionCanSave?: boolean
+	sectionSaving?: boolean
+	sectionSaveError?: boolean
+	sectionSaveDisabledReason?: string[]
 }>()
 const enabled = defineModel<boolean>({ required: true })
 const titleId = useId()
+const { formatMessage } = useVIntl()
 const isToggleLocked = computed(() => !!props.disabled || (!!props.toggleDisabled && enabled.value))
 </script>
 
@@ -56,9 +69,45 @@ const isToggleLocked = computed(() => !!props.disabled || (!!props.toggleDisable
 		<div
 			v-if="$slots.expanded"
 			v-show="enabled"
-			class="flex flex-col gap-4 border-0 border-t border-solid border-surface-4 bg-surface-2 p-4"
+			class="disclosure-details editable-review-section relative flex flex-col gap-4 border-0 border-t border-solid border-surface-4 bg-surface-2 p-4 text-sm text-secondary"
+			:class="{ 'box-border min-h-14': onToggleEditing }"
 		>
-			<slot name="expanded" />
+			<div v-if="editing" class="absolute right-4 top-2 flex justify-end gap-1.5">
+				<Button type="quiet" size="xs" :disabled="disabled" @click.stop="onCancelEditing?.()">
+					{{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<Button
+					type="colored"
+					color="brand"
+					size="xs"
+					:loading="sectionSaving"
+					:disabled="disabled || !sectionCanSave"
+					@click.stop="onSaveEditing?.()"
+				>
+					{{ formatMessage(commonMessages.saveButton) }}
+				</Button>
+			</div>
+			<div v-if="onToggleEditing && !editing" class="absolute right-4 top-4 flex">
+				<EditButton :section="title" :disabled="disabled" @click="onToggleEditing" />
+			</div>
+			<div class="flex min-w-0 flex-col gap-4" :class="{ 'pr-8': onToggleEditing && !editing }">
+				<slot name="expanded" />
+			</div>
+			<template v-if="editing">
+				<p v-if="sectionSaveError" role="alert" class="m-0 text-red">
+					{{ formatMessage(disclosureStatusMessages.saveError) }}
+				</p>
+				<p v-if="sectionSaveDisabledReason?.length" role="alert" class="m-0 text-orange">
+					{{ sectionSaveDisabledReason.join(' ') }}
+				</p>
+			</template>
 		</div>
 	</section>
 </template>
+
+<style scoped>
+.disclosure-details :deep(label.font-semibold.text-contrast),
+.disclosure-details :deep(p.font-semibold.text-contrast) {
+	@apply text-sm text-secondary;
+}
+</style>

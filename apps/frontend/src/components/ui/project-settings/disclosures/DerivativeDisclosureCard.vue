@@ -107,6 +107,7 @@ watch(
 			model.value.sources = [emptyDerivativeSource()]
 		}
 	},
+	{ immediate: true },
 )
 
 function addSource() {
@@ -144,6 +145,7 @@ function setOptionalField(
 				v-for="({ source, id }, index) in sources"
 				:key="id"
 				class="relative flex flex-col gap-4 rounded-2xl border border-solid border-surface-4 bg-surface-3 p-4"
+				:class="{ 'mt-8': variant === 'review' && editing && index === 0 }"
 			>
 				<div class="absolute right-3 top-3">
 					<Button
