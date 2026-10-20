@@ -26,6 +26,7 @@ pub struct DelphiFileScanEvent {
     pub file_id: FileId,
     #[serde(default)]
     pub force: bool,
+    pub decompile: bool,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, sqlx::Type)]
@@ -44,7 +45,8 @@ pub async fn publish_new_files(
     file_ids: &[DBFileId],
 ) {
     for &file_id in file_ids {
-        if let Err(err) = publish_file_scan(kafka_client, file_id, false).await
+        if let Err(err) =
+            publish_file_scan(kafka_client, file_id, false, true).await
         {
             tracing::error!(
                 file_id = %FileId::from(file_id),
@@ -58,12 +60,14 @@ pub async fn publish_file_scan(
     kafka_client: &KafkaClientState,
     file_id: DBFileId,
     force: bool,
+    decompile: bool,
 ) -> Result<()> {
     let event = KafkaEvent::new(
         DELPHI_FILE_SCAN_TOPIC,
         DelphiFileScanEvent {
             file_id: file_id.into(),
             force,
+            decompile,
         },
     );
     let key = event.data.file_id.to_string();
