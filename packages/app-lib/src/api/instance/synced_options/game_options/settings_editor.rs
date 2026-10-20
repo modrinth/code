@@ -195,7 +195,7 @@ pub(super) async fn load_settings_editor(
 
 pub async fn get_config() -> crate::Result<GameSettingsEditorState> {
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     load_settings_editor(&state).await
 }
 
@@ -204,7 +204,7 @@ pub async fn preview_changes(
     request: UpdateGameSettingsRequest,
 ) -> crate::Result<GameSettingsEditorState> {
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     if request.expected_catalog_revision != CATALOG_REVISION {
         return load_settings_editor(&state).await;
     }
@@ -277,7 +277,7 @@ pub async fn save_changes(
     request: UpdateGameSettingsRequest,
 ) -> crate::Result<SaveGameSettingsResult> {
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     if !game_options_sync_is_enabled(&state.pool).await? {
         bail!(ErrorKind::InputError(
             "turn on game-settings sync before editing shared values"

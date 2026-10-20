@@ -192,7 +192,7 @@ pub async fn write_instance_file(
     create_only: bool,
 ) -> crate::Result<()> {
     let state = State::get().await?;
-    let _instance = state.lock_instance_content(instance_id).await;
+    let _instance = state.instance_locks.lock_content(instance_id).await;
     let _files = state.content_store.files_lock.lock().await;
     let destination = resolve(&state, instance_id, path, true)
         .await?
@@ -238,7 +238,7 @@ pub async fn create_instance_directory(
     path: &str,
 ) -> crate::Result<()> {
     let state = State::get().await?;
-    let _instance = state.lock_instance_content(instance_id).await;
+    let _instance = state.instance_locks.lock_content(instance_id).await;
     let _files = state.content_store.files_lock.lock().await;
     let destination = resolve(&state, instance_id, path, true).await?;
     fs::create_dir(destination.path()).await?;
@@ -251,7 +251,7 @@ pub async fn rename_instance_file(
     destination: &str,
 ) -> crate::Result<()> {
     let state = State::get().await?;
-    let _instance = state.lock_instance_content(instance_id).await;
+    let _instance = state.instance_locks.lock_content(instance_id).await;
     let _files = state.content_store.files_lock.lock().await;
     let source = resolve(&state, instance_id, source, true).await?;
     let destination = resolve(&state, instance_id, destination, true).await?;
@@ -270,7 +270,7 @@ pub async fn delete_instance_file(
     recursive: bool,
 ) -> crate::Result<()> {
     let state = State::get().await?;
-    let _instance = state.lock_instance_content(instance_id).await;
+    let _instance = state.instance_locks.lock_content(instance_id).await;
     let _files = state.content_store.files_lock.lock().await;
     let path = resolve(&state, instance_id, path, true).await?;
     if fs::symlink_metadata(path.path()).await?.is_dir() {

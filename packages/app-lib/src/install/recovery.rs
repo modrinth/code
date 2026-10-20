@@ -12,14 +12,16 @@ use crate::state::content_store::ContentStore;
 use crate::state::instances::adapters::sqlite::{content_rows, instance_rows};
 use crate::state::{
     ContentEntry, ContentSetRemoteRef, ContentSetRemoteRefType,
-    ContentSetSyncProvider, ContentSetSyncState, InstanceFile,
+    ContentSetSyncProvider, ContentSetSyncState, DirectoryInfo, InstanceFile,
     InstanceMetadata, State,
 };
+use crate::util::fetch::IoSemaphore;
 use anyhow::{Context, bail};
 use async_walkdir::WalkDir;
 use chrono::Utc;
 use futures::StreamExt;
 use serde::{Deserialize, Serialize};
+use sqlx::SqlitePool;
 use std::future::Future;
 use std::path::{Path, PathBuf};
 use uuid::Uuid;
@@ -50,8 +52,10 @@ pub(super) async fn prepare_instance_update_backup(
     state: &State,
 ) -> crate::Result<PathBuf> {
     let _lease = state.content_store.lease().await;
-    let _content_lock =
-        state.lock_instance_content(&metadata.instance.id).await;
+    let _content_lock = state
+        .instance_locks
+        .lock_content(&metadata.instance.id)
+        .await;
     let _store_lock = state.content_store.files_lock.lock().await;
     if crate::state::instance_has_running_process(&metadata.instance.id, state)
         .await?
@@ -61,7 +65,7 @@ pub(super) async fn prepare_instance_update_backup(
         ));
     }
     let owner = job_id.to_string();
-    let staging_dir = instance_update_backup_dir(job_id, state);
+    let staging_dir = instance_update_backup_dir(job_id, &state.directories);
     if tokio::fs::try_exists(&staging_dir).await? {
         crate::util::io::remove_dir_all(&staging_dir).await?;
     }
@@ -148,14 +152,19 @@ pub(super) async fn prepare_instance_update_backup(
                         &instance_path.join(path),
                         &backup_path.join(path),
                         &skipped,
-                        state,
+                        &state.io_semaphore,
                     )
                     .await?;
                 }
             }
             None => {
-                copy_directory(&instance_path, &backup_path, &skipped, state)
-                    .await?;
+                copy_directory(
+                    &instance_path,
+                    &backup_path,
+                    &skipped,
+                    &state.io_semaphore,
+                )
+                .await?;
             }
         }
         let snapshot = SharedInstanceUpdateRollback {
@@ -188,11 +197,11 @@ pub(super) async fn prepare_instance_update_backup(
     Ok(staging_dir)
 }
 
-fn instance_update_backup_dir(job_id: Uuid, state: &State) -> PathBuf {
-    state
-        .directories
-        .install_backups_dir()
-        .join(job_id.to_string())
+fn instance_update_backup_dir(
+    job_id: Uuid,
+    directories: &DirectoryInfo,
+) -> PathBuf {
+    directories.install_backups_dir().join(job_id.to_string())
 }
 
 async fn recover_unrecorded_instance_update_backup(
@@ -209,7 +218,7 @@ async fn recover_unrecorded_instance_update_backup(
     {
         return Ok(());
     }
-    let staging_dir = instance_update_backup_dir(job.id, state);
+    let staging_dir = instance_update_backup_dir(job.id, &state.directories);
     if !tokio::fs::try_exists(&staging_dir).await? {
         return Ok(());
     }
@@ -267,7 +276,7 @@ async fn restore_instance_update(
     state: &State,
 ) -> crate::Result<()> {
     let instance_id = &rollback.instance.instance.id;
-    let _content_lock = state.lock_instance_content(instance_id).await;
+    let _content_lock = state.instance_locks.lock_content(instance_id).await;
     let _store_lock = state.content_store.files_lock.lock().await;
     let _lease = state.content_store.lease().await;
     if crate::state::instance_has_running_process(instance_id, state).await? {
@@ -334,7 +343,7 @@ async fn restore_instance_update(
                     &backup_path.join(path),
                     &target,
                     &std::collections::HashSet::new(),
-                    state,
+                    &state.io_semaphore,
                 )
                 .await?;
             }
@@ -347,7 +356,7 @@ async fn restore_instance_update(
                 &backup_path,
                 &instance_path,
                 &std::collections::HashSet::new(),
-                state,
+                &state.io_semaphore,
             )
             .await?;
         }
@@ -369,17 +378,17 @@ async fn restore_instance_update(
             &snapshot.copied_file_ids,
         )
         .await?;
-    restore_instance_metadata(&rollback.instance, state).await?;
+    restore_instance_metadata(&rollback.instance, &state.pool).await?;
 
     Ok(())
 }
 
 async fn restore_instance_metadata(
     metadata: &InstanceMetadata,
-    state: &State,
+    pool: &SqlitePool,
 ) -> crate::Result<()> {
     let content_set_id = metadata.applied_content_set.id.as_str();
-    let mut tx = state.pool.begin_with("BEGIN IMMEDIATE").await?;
+    let mut tx = pool.begin_with("BEGIN IMMEDIATE").await?;
     instance_rows::update_instance(&metadata.instance, &mut tx).await?;
     content_rows::update_content_set(&metadata.applied_content_set, &mut tx)
         .await?;
@@ -493,18 +502,16 @@ async fn copy_path(
     source: &Path,
     target: &Path,
     skipped: &std::collections::HashSet<String>,
-    state: &State,
+    io_semaphore: &IoSemaphore,
 ) -> crate::Result<()> {
     match symlink_metadata(source).await? {
         Some(metadata) if metadata.is_symlink() => {
             copy_symlink(source, target).await
         }
         Some(metadata) if metadata.is_dir() => {
-            copy_directory(source, target, skipped, state).await
+            copy_directory(source, target, skipped, io_semaphore).await
         }
-        Some(_) => {
-            crate::util::fetch::copy(source, target, &state.io_semaphore).await
-        }
+        Some(_) => crate::util::fetch::copy(source, target, io_semaphore).await,
         None => Ok(()),
     }
 }
@@ -513,7 +520,7 @@ async fn copy_directory(
     source: &Path,
     target: &Path,
     skipped: &std::collections::HashSet<String>,
-    state: &State,
+    io_semaphore: &IoSemaphore,
 ) -> crate::Result<()> {
     crate::util::io::create_dir_all(target).await?;
     let mut walker = WalkDir::new(source);
@@ -536,12 +543,8 @@ async fn copy_directory(
         if file_type.is_dir() {
             crate::util::io::create_dir_all(&target_path).await?;
         } else if file_type.is_file() {
-            crate::util::fetch::copy(
-                &entry_path,
-                &target_path,
-                &state.io_semaphore,
-            )
-            .await?;
+            crate::util::fetch::copy(&entry_path, &target_path, io_semaphore)
+                .await?;
         } else if file_type.is_symlink() {
             copy_symlink(&entry_path, &target_path).await?;
         }

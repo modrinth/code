@@ -2,6 +2,7 @@ use super::operations::{
     InstanceScreenshot, has_png_extension, sort_screenshots,
     source_screenshots_dir,
 };
+use crate::state::DirectoryInfo;
 use crate::state::instances::adapters::sqlite::{
     instance_rows::{self, InstanceScreenshotSource},
     screenshot_rows::{self, ScreenshotRow},
@@ -80,8 +81,8 @@ pub(super) async fn list_source_screenshots(
     state: &State,
     source: InstanceScreenshotSource,
 ) -> crate::Result<Vec<InstanceScreenshot>> {
-    let _lock = state.lock_instance_screenshots(&source.id).await;
-    let scanned = scan_source_screenshots(state, &source).await?;
+    let _lock = state.instance_locks.lock_screenshots(&source.id).await;
+    let scanned = scan_source_screenshots(&state.directories, &source).await?;
     reconcile_source_screenshots(state, &source, scanned).await
 }
 
@@ -101,10 +102,10 @@ pub(crate) async fn reconcile_screenshots(
 }
 
 pub(super) async fn scan_source_screenshots(
-    state: &State,
+    directories: &DirectoryInfo,
     source: &InstanceScreenshotSource,
 ) -> crate::Result<Vec<ScannedScreenshot>> {
-    let instance_dir = state.directories.instances_dir().join(&source.path);
+    let instance_dir = directories.instances_dir().join(&source.path);
     if !tokio::fs::try_exists(&instance_dir)
         .await
         .map_err(|error| IOError::with_path(error, &instance_dir))?
@@ -112,7 +113,7 @@ pub(super) async fn scan_source_screenshots(
         return Ok(Vec::new());
     }
 
-    let screenshots_dir = source_screenshots_dir(state, source).await?;
+    let screenshots_dir = source_screenshots_dir(directories, source).await?;
     tokio::task::spawn_blocking(move || scan_screenshots_dir(&screenshots_dir))
         .await?
 }
