@@ -20,7 +20,7 @@ const isToggleLocked = computed(() => !!props.disabled || (!!props.toggleDisable
 		:aria-labelledby="titleId"
 	>
 		<div class="flex flex-col gap-3 p-4">
-			<div class="flex items-start justify-between gap-4">
+			<div class="flex items-center justify-between gap-2.5">
 				<div class="min-w-0 flex-1">
 					<h3 :id="titleId" class="m-0 flex items-center gap-2 text-lg font-semibold text-contrast">
 						<component
@@ -38,6 +38,7 @@ const isToggleLocked = computed(() => !!props.disabled || (!!props.toggleDisable
 					:disabled="isToggleLocked"
 					:aria-labelledby="titleId"
 				/>
+				<slot name="lock-controls" />
 			</div>
 			<div v-if="$slots['updated-by'] || description || $slots.default" class="flex flex-col gap-2">
 				<div v-if="$slots['updated-by']" class="text-sm">
@@ -51,12 +52,10 @@ const isToggleLocked = computed(() => !!props.disabled || (!!props.toggleDisable
 					<slot />
 				</div>
 			</div>
-			<div v-if="$slots['lock-controls']" class="ml-auto max-w-full overflow-x-auto">
-				<slot name="lock-controls" />
-			</div>
 		</div>
 		<div
-			v-if="enabled && $slots.expanded"
+			v-if="$slots.expanded"
+			v-show="enabled"
 			class="flex flex-col gap-4 border-0 border-t border-solid border-surface-4 bg-surface-2 p-4"
 		>
 			<slot name="expanded" />

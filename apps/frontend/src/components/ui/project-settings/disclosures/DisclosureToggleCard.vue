@@ -120,6 +120,7 @@ function setLockStatus(status: DisclosureLockStatus) {
 		</template>
 		<template v-if="variant === 'review' && showModeratorLockControls" #lock-controls>
 			<DisclosureLockControls
+				compact
 				:lock-status="resolvedLockStatus"
 				:disabled="disabled"
 				@set-lock-status="setLockStatus"

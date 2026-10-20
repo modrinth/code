@@ -259,8 +259,8 @@ export function useDisclosureEditor({
 				!saving.value &&
 				(changedProject ||
 					!previous ||
-					JSON.stringify(getDisclosureFormSnapshot(current.value)) ===
-						JSON.stringify(getDisclosureFormSnapshot(disclosuresToForm(previous.disclosures))))
+					JSON.stringify(current.value) ===
+						JSON.stringify(disclosuresToForm(previous.disclosures)))
 			) {
 				current.value = disclosuresToForm(disclosuresResponse.value?.disclosures ?? [])
 			}

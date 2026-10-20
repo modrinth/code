@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+
 import ReviewPanel from '~/components/project-review/review-panel/index.vue'
 import { injectReviewPanels } from '~/providers/project-review/review-panels'
 
@@ -7,11 +9,12 @@ import AiDisclosureCard from './AiDisclosureCard.vue'
 import AiFunctionalityDisclosureCard from './AiFunctionalityDisclosureCard.vue'
 import ArchivedDisclosureCard from './ArchivedDisclosureCard.vue'
 import DerivativeDisclosureCard from './DerivativeDisclosureCard.vue'
+import { provideDisclosureDraft } from './draft-context'
 import PaidFeaturesDisclosureCard from './PaidFeaturesDisclosureCard.vue'
 import PhotosensitivityDisclosureCard from './PhotosensitivityDisclosureCard.vue'
 import SystemInteractionsDisclosureCard from './SystemInteractionsDisclosureCard.vue'
 import TelemetryDisclosureCard from './TelemetryDisclosureCard.vue'
-import type { DisclosureLockStatus } from './types'
+import type { DisclosureLockStatus, DisclosureType } from './types'
 import type { useDisclosureEditor } from './use-disclosure-editor'
 
 const props = withDefaults(
@@ -25,6 +28,7 @@ const props = withDefaults(
 )
 const { current, disclosureUpdateProps, setDisclosureLockStatus, isDisclosureVisible } =
 	props.editor
+provideDisclosureDraft(current)
 const panels = injectReviewPanels(null)
 
 function reviewTitle(key: string): string | undefined {
@@ -32,215 +36,169 @@ function reviewTitle(key: string): string | undefined {
 		? panels?.resolve({ kind: 'disclosure', key })?.panel.title
 		: undefined
 }
+
+const cards = computed(() => {
+	const activeTypes = new Set(props.editor.savedSnapshot.value.disclosures.map(({ type }) => type))
+	const visible = [
+		{ type: 'ai_content', key: 'ai', enabled: activeTypes.has('ai_content') },
+		{
+			type: 'ai_functionality',
+			key: 'ai-functionality',
+			enabled: activeTypes.has('ai_functionality'),
+		},
+		{
+			type: 'advertisements',
+			key: 'ads',
+			enabled: activeTypes.has('advertisements'),
+		},
+		{
+			type: 'paid_features',
+			key: 'paid-features',
+			enabled: activeTypes.has('paid_features'),
+		},
+		{
+			type: 'telemetry',
+			key: 'telemetry',
+			enabled: activeTypes.has('telemetry'),
+		},
+		{
+			type: 'derivative_work',
+			key: 'derivative-content',
+			enabled: activeTypes.has('derivative_work'),
+		},
+		{
+			type: 'epilepsy_triggers',
+			key: 'photosensitivity',
+			enabled: activeTypes.has('epilepsy_triggers'),
+		},
+		{
+			type: 'system_interactions',
+			key: 'system-interactions',
+			enabled: activeTypes.has('system_interactions'),
+		},
+		{
+			type: 'archived',
+			key: 'archive',
+			enabled: activeTypes.has('archived'),
+		},
+	] satisfies { type: DisclosureType; key: string; enabled: boolean }[]
+	const filtered = visible.filter(({ type }) => isDisclosureVisible(type))
+	return props.variant === 'review'
+		? filtered.sort((a, b) => Number(b.enabled) - Number(a.enabled))
+		: filtered
+})
 </script>
 
 <template>
 	<div class="flex flex-col gap-4">
 		<component
 			:is="variant === 'review' ? ReviewPanel : 'div'"
-			v-if="isDisclosureVisible('ai_content')"
+			v-for="card in cards"
+			:key="card.type"
 			v-bind="
 				variant === 'review'
-					? {
-							mode: 'anchored',
-							target: { kind: 'disclosure', key: 'ai' },
-						}
+					? { mode: 'anchored', target: { kind: 'disclosure', key: card.key } }
 					: {}
 			"
 		>
 			<AiDisclosureCard
+				v-if="card.type === 'ai_content'"
 				v-model="current.ai"
 				:hide-description="hideDescription"
-				:title="reviewTitle('ai')"
+				:title="reviewTitle(card.key)"
 				:variant="variant"
-				v-bind="disclosureUpdateProps('ai_content')"
+				v-bind="disclosureUpdateProps(card.type)"
 				@set-lock-status="
-					(status: DisclosureLockStatus) => setDisclosureLockStatus('ai_content', status)
+					(status: DisclosureLockStatus) => setDisclosureLockStatus(card.type, status)
 				"
 			/>
-		</component>
-		<component
-			:is="variant === 'review' ? ReviewPanel : 'div'"
-			v-if="isDisclosureVisible('ai_functionality')"
-			v-bind="
-				variant === 'review'
-					? {
-							mode: 'anchored',
-							target: { kind: 'disclosure', key: 'ai-functionality' },
-						}
-					: {}
-			"
-		>
 			<AiFunctionalityDisclosureCard
+				v-else-if="card.type === 'ai_functionality'"
 				v-model="current.aiFunctionality"
 				:hide-description="hideDescription"
-				:title="reviewTitle('ai-functionality')"
+				:title="reviewTitle(card.key)"
 				:variant="variant"
-				v-bind="disclosureUpdateProps('ai_functionality')"
+				v-bind="disclosureUpdateProps(card.type)"
 				@set-lock-status="
-					(status: DisclosureLockStatus) => setDisclosureLockStatus('ai_functionality', status)
+					(status: DisclosureLockStatus) => setDisclosureLockStatus(card.type, status)
 				"
 			/>
-		</component>
-		<component
-			:is="variant === 'review' ? ReviewPanel : 'div'"
-			v-if="isDisclosureVisible('advertisements')"
-			v-bind="
-				variant === 'review'
-					? {
-							mode: 'anchored',
-							target: { kind: 'disclosure', key: 'ads' },
-						}
-					: {}
-			"
-		>
 			<AdvertisingDisclosureCard
+				v-else-if="card.type === 'advertisements'"
 				v-model="current.advertising"
 				:hide-description="hideDescription"
-				:title="reviewTitle('ads')"
+				:title="reviewTitle(card.key)"
 				:variant="variant"
-				v-bind="disclosureUpdateProps('advertisements')"
+				v-bind="disclosureUpdateProps(card.type)"
 				@set-lock-status="
-					(status: DisclosureLockStatus) => setDisclosureLockStatus('advertisements', status)
+					(status: DisclosureLockStatus) => setDisclosureLockStatus(card.type, status)
 				"
 			/>
-		</component>
-		<component
-			:is="variant === 'review' ? ReviewPanel : 'div'"
-			v-if="isDisclosureVisible('paid_features')"
-			v-bind="
-				variant === 'review'
-					? {
-							mode: 'anchored',
-							target: { kind: 'disclosure', key: 'paid-features' },
-						}
-					: {}
-			"
-		>
 			<PaidFeaturesDisclosureCard
+				v-else-if="card.type === 'paid_features'"
 				v-model="current.paidFeatures"
 				:hide-description="hideDescription"
-				:title="reviewTitle('paid-features')"
+				:title="reviewTitle(card.key)"
 				:variant="variant"
-				v-bind="disclosureUpdateProps('paid_features')"
+				v-bind="disclosureUpdateProps(card.type)"
 				@set-lock-status="
-					(status: DisclosureLockStatus) => setDisclosureLockStatus('paid_features', status)
+					(status: DisclosureLockStatus) => setDisclosureLockStatus(card.type, status)
 				"
 			/>
-		</component>
-		<component
-			:is="variant === 'review' ? ReviewPanel : 'div'"
-			v-if="isDisclosureVisible('telemetry')"
-			v-bind="
-				variant === 'review'
-					? {
-							mode: 'anchored',
-							target: { kind: 'disclosure', key: 'telemetry' },
-						}
-					: {}
-			"
-		>
 			<TelemetryDisclosureCard
+				v-else-if="card.type === 'telemetry'"
 				v-model="current.telemetry"
 				:hide-description="hideDescription"
-				:title="reviewTitle('telemetry')"
+				:title="reviewTitle(card.key)"
 				:variant="variant"
-				v-bind="disclosureUpdateProps('telemetry')"
+				v-bind="disclosureUpdateProps(card.type)"
 				@set-lock-status="
-					(status: DisclosureLockStatus) => setDisclosureLockStatus('telemetry', status)
+					(status: DisclosureLockStatus) => setDisclosureLockStatus(card.type, status)
 				"
 			/>
-		</component>
-		<component
-			:is="variant === 'review' ? ReviewPanel : 'div'"
-			v-if="isDisclosureVisible('derivative_work')"
-			v-bind="
-				variant === 'review'
-					? {
-							mode: 'anchored',
-							target: { kind: 'disclosure', key: 'derivative-content' },
-						}
-					: {}
-			"
-		>
 			<DerivativeDisclosureCard
+				v-else-if="card.type === 'derivative_work'"
 				v-model="current.derivative"
 				:hide-description="hideDescription"
-				:title="reviewTitle('derivative-content')"
+				:title="reviewTitle(card.key)"
 				:variant="variant"
-				v-bind="disclosureUpdateProps('derivative_work')"
+				v-bind="disclosureUpdateProps(card.type)"
 				@set-lock-status="
-					(status: DisclosureLockStatus) => setDisclosureLockStatus('derivative_work', status)
+					(status: DisclosureLockStatus) => setDisclosureLockStatus(card.type, status)
 				"
 			/>
-		</component>
-		<component
-			:is="variant === 'review' ? ReviewPanel : 'div'"
-			v-if="isDisclosureVisible('epilepsy_triggers')"
-			v-bind="
-				variant === 'review'
-					? {
-							mode: 'anchored',
-							target: { kind: 'disclosure', key: 'photosensitivity' },
-						}
-					: {}
-			"
-		>
 			<PhotosensitivityDisclosureCard
+				v-else-if="card.type === 'epilepsy_triggers'"
 				v-model="current.photosensitivity"
 				:hide-description="hideDescription"
-				:title="reviewTitle('photosensitivity')"
+				:title="reviewTitle(card.key)"
 				:variant="variant"
-				v-bind="disclosureUpdateProps('epilepsy_triggers')"
+				v-bind="disclosureUpdateProps(card.type)"
 				@set-lock-status="
-					(status: DisclosureLockStatus) => setDisclosureLockStatus('epilepsy_triggers', status)
+					(status: DisclosureLockStatus) => setDisclosureLockStatus(card.type, status)
 				"
 			/>
-		</component>
-		<component
-			:is="variant === 'review' ? ReviewPanel : 'div'"
-			v-if="isDisclosureVisible('system_interactions')"
-			v-bind="
-				variant === 'review'
-					? {
-							mode: 'anchored',
-							target: { kind: 'disclosure', key: 'system-interactions' },
-						}
-					: {}
-			"
-		>
 			<SystemInteractionsDisclosureCard
+				v-else-if="card.type === 'system_interactions'"
 				v-model="current.systemInteractions"
 				:hide-description="hideDescription"
-				:title="reviewTitle('system-interactions')"
+				:title="reviewTitle(card.key)"
 				:variant="variant"
-				v-bind="disclosureUpdateProps('system_interactions')"
+				v-bind="disclosureUpdateProps(card.type)"
 				@set-lock-status="
-					(status: DisclosureLockStatus) => setDisclosureLockStatus('system_interactions', status)
+					(status: DisclosureLockStatus) => setDisclosureLockStatus(card.type, status)
 				"
 			/>
-		</component>
-		<component
-			:is="variant === 'review' ? ReviewPanel : 'div'"
-			v-if="isDisclosureVisible('archived')"
-			v-bind="
-				variant === 'review'
-					? {
-							mode: 'anchored',
-							target: { kind: 'disclosure', key: 'archive' },
-						}
-					: {}
-			"
-		>
 			<ArchivedDisclosureCard
+				v-else-if="card.type === 'archived'"
 				v-model="current.archived"
 				:project-title="projectTitle"
 				:hide-description="hideDescription"
-				:title="reviewTitle('archive')"
+				:title="reviewTitle(card.key)"
 				:variant="variant"
-				v-bind="disclosureUpdateProps('archived')"
+				v-bind="disclosureUpdateProps(card.type)"
 				@set-lock-status="
-					(status: DisclosureLockStatus) => setDisclosureLockStatus('archived', status)
+					(status: DisclosureLockStatus) => setDisclosureLockStatus(card.type, status)
 				"
 			/>
 		</component>
