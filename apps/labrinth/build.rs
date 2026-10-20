@@ -1,10 +1,32 @@
 use std::path::Path;
 
-use chrono::Local;
+use chrono::{Local, Utc};
 use dotenv_build::Config;
 
 fn main() {
     println!("cargo:rerun-if-changed=migrations");
+    println!("cargo::rerun-if-env-changed=GITHUB_SHA");
+
+    let git_hash = std::env::var("GITHUB_SHA")
+        .ok()
+        .or_else(|| {
+            std::process::Command::new("git")
+                .args(["rev-parse", "HEAD"])
+                .output()
+                .ok()
+                .filter(|output| output.status.success())
+                .map(|output| {
+                    String::from_utf8_lossy(&output.stdout).trim().to_owned()
+                })
+        })
+        .unwrap_or_else(|| "unknown".to_owned());
+    let short_git_hash = &git_hash[..git_hash.len().min(7)];
+
+    println!("cargo::rustc-env=GIT_HASH={git_hash}");
+    println!(
+        "cargo::rustc-env=LABRINTH_VERSION={}-{short_git_hash}",
+        Utc::now().format("%Y.%m.%d")
+    );
 
     println!(
         "cargo::rustc-env=COMPILATION_DATE={}",

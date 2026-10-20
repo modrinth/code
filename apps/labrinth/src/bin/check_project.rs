@@ -323,7 +323,7 @@ async fn check_api_project(
     let client = reqwest::Client::builder()
         .user_agent(concat!(
             "labrinth-check-project/",
-            env!("CARGO_PKG_VERSION")
+            env!("LABRINTH_VERSION")
         ))
         .build()
         .wrap_err("building HTTP client")?;
