@@ -4301,12 +4301,6 @@
   "instance.shared-instance.publish-review.added-label": {
     "message": "Se añadió"
   },
-  "instance.shared-instance.publish-review.admonition-header": {
-    "message": "Enviar actualización a los jugadores"
-  },
-  "instance.shared-instance.publish-review.description": {
-    "message": "Revisa los cambios de contenido y escoge cualquier archivo de configuración que quieras incluir en esta actualización."
-  },
   "instance.shared-instance.publish-review.header": {
     "message": "Revisar cambios"
   },

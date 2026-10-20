@@ -4280,12 +4280,6 @@
   "instance.shared-instance.publish-review.added-label": {
     "message": "Hozzáadva:"
   },
-  "instance.shared-instance.publish-review.admonition-header": {
-    "message": "Frissítés közzététele a játékosoknak"
-  },
-  "instance.shared-instance.publish-review.description": {
-    "message": "Ellenőrizd a tartalmi módosításokat, és válaszd ki azokat a konfigurációs fájlokat, amelyeket be szeretnél vonni ebbe a frissítésbe."
-  },
   "instance.shared-instance.publish-review.header": {
     "message": "Változtatások áttekintése"
   },

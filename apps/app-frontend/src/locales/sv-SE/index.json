@@ -3758,12 +3758,6 @@
   "instance.shared-instance.publish-review.added-label": {
     "message": "Lade till"
   },
-  "instance.shared-instance.publish-review.admonition-header": {
-    "message": "Skicka uppdatering till spelare"
-  },
-  "instance.shared-instance.publish-review.description": {
-    "message": "Granska innehållsändringar och välj vilka konfigurationsfiler att inkludera i den här uppdateringen."
-  },
   "instance.shared-instance.publish-review.header": {
     "message": "Granska ändringar"
   },

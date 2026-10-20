@@ -4238,12 +4238,6 @@
   "instance.shared-instance.publish-review.added-label": {
     "message": "Ajouté"
   },
-  "instance.shared-instance.publish-review.admonition-header": {
-    "message": "Déployer la mise à jour aux joueurs"
-  },
-  "instance.shared-instance.publish-review.description": {
-    "message": "Examiner les changements de contenu et choisir n'importe quel fichier de configuration à inclure dans cette mise à jour."
-  },
   "instance.shared-instance.publish-review.header": {
     "message": "Examiner les changements"
   },

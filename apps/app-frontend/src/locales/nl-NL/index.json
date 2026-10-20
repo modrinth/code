@@ -3887,12 +3887,6 @@
   "instance.shared-instance.publish-review.added-label": {
     "message": "Toegevoegd"
   },
-  "instance.shared-instance.publish-review.admonition-header": {
-    "message": "Update naar spelers verzenden"
-  },
-  "instance.shared-instance.publish-review.description": {
-    "message": "Bekijk de inhoudelijke wijzigingen en selecteer de configuratiebestanden die je in deze update wilt opnemen."
-  },
   "instance.shared-instance.publish-review.header": {
     "message": "Wijzigingen bekijken"
   },

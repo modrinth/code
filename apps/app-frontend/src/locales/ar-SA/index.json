@@ -2852,12 +2852,6 @@
   "instance.shared-instance.publish-review.added-label": {
     "message": "مضاف"
   },
-  "instance.shared-instance.publish-review.admonition-header": {
-    "message": "رفع التحديث للاعبين"
-  },
-  "instance.shared-instance.publish-review.description": {
-    "message": "راجع تغييرات المحتوى واختر أي ملفات تكوين (config) لضرورة تضمينها في هذا التحديث."
-  },
   "instance.shared-instance.publish-review.header": {
     "message": "مراجعة التغييرات"
   },

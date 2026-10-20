@@ -4397,17 +4397,20 @@
   "instance.shared-instance.publish-review.added-label": {
     "message": "Added"
   },
-  "instance.shared-instance.publish-review.admonition-header": {
-    "message": "Push update to players"
+  "instance.shared-instance.publish-review.changes-description": {
+    "message": "Review the changes we've detected since your last update. These will automatically be included when you push."
   },
-  "instance.shared-instance.publish-review.description": {
-    "message": "Review the content changes and choose any files to include in this update."
+  "instance.shared-instance.publish-review.changes-tab": {
+    "message": "Changes"
   },
-  "instance.shared-instance.publish-review.files-title": {
-    "message": "Select files"
+  "instance.shared-instance.publish-review.files-description": {
+    "message": "You can also include individual files alongside the detected changes. Select any additional files you'd like to publish."
+  },
+  "instance.shared-instance.publish-review.files-tab": {
+    "message": "Files"
   },
   "instance.shared-instance.publish-review.header": {
-    "message": "Review changes"
+    "message": "Push update"
   },
   "instance.shared-instance.publish-review.publish-button": {
     "message": "Push update"

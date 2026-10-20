@@ -4301,12 +4301,6 @@
   "instance.shared-instance.publish-review.added-label": {
     "message": "已新增"
   },
-  "instance.shared-instance.publish-review.admonition-header": {
-    "message": "向玩家推送更新"
-  },
-  "instance.shared-instance.publish-review.description": {
-    "message": "檢視內容變更，並選擇要包含在本次更新的設定檔。"
-  },
   "instance.shared-instance.publish-review.header": {
     "message": "檢視變更"
   },

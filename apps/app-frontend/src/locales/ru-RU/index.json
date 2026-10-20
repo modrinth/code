@@ -4277,12 +4277,6 @@
   "instance.shared-instance.publish-review.added-label": {
     "message": "Добавлен"
   },
-  "instance.shared-instance.publish-review.admonition-header": {
-    "message": "Отправка изменений игрокам"
-  },
-  "instance.shared-instance.publish-review.description": {
-    "message": "Ознакомьтесь с изменениями в содержимом и выберите файлы конфигурации, которые следует включить в это обновление."
-  },
   "instance.shared-instance.publish-review.header": {
     "message": "Обзор изменений"
   },

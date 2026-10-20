@@ -1,119 +1,125 @@
 <template>
-	<ContentDiffModal
-		ref="publishReviewModal"
+	<NewModal
+		ref="modal"
 		:header="formatMessage(messages.header)"
-		:admonition-header="formatMessage(messages.admonitionHeader)"
-		:description="formatMessage(messages.description)"
-		:diffs="publishDiffs"
-		:confirm-label="formatMessage(messages.publishButton)"
-		:confirm-icon="UploadIcon"
-		:confirm-disabled="
-			overStorageLimit || (publishDiffs.length === 0 && selectedFilePaths.length === 0)
-		"
-		:added-label="formatMessage(messages.addedLabel)"
-		:removed-label="formatMessage(messages.removedLabel)"
-		:hide-summary="filesExpanded"
-		@confirm="publishChanges"
-		@cancel="finishReview"
+		:on-hide="finishReview"
+		max-width="544px"
+		width="544px"
+		no-padding
+		scrollable
 	>
-		<template #additional-content>
-			<button
-				type="button"
-				class="m-0 flex w-full cursor-pointer items-center gap-1 border-none bg-transparent p-0 text-contrast"
-				:aria-expanded="filesExpanded"
-				@click="filesExpanded = !filesExpanded"
-			>
-				<FolderOpenIcon class="size-4 shrink-0 text-primary" />
-				<span class="text-lg font-semibold text-contrast">
-					{{ formatMessage(messages.filesTitle) }}
-				</span>
-				<DropdownIcon
-					class="ml-auto size-5 shrink-0 text-contrast transition-transform duration-300"
-					:class="{ 'rotate-180': filesExpanded }"
-				/>
-			</button>
+		<div class="flex flex-col gap-3 px-6 py-4">
+			<Tabs v-model:value="activeTab" :tabs="tabs" />
+			<p class="m-0 text-primary">
+				{{
+					formatMessage(
+						activeTab === 'changes' ? messages.changesDescription : messages.filesDescription,
+					)
+				}}
+			</p>
+		</div>
+
+		<ContentDiffList
+			v-show="activeTab === 'changes'"
+			:diffs="publishDiffs"
+			:added-label="formatMessage(messages.addedLabel)"
+			:removed-label="formatMessage(messages.removedLabel)"
+		/>
+		<div v-show="activeTab === 'files'">
 			<div
-				class="grid transition-[grid-template-rows] duration-300 ease-in-out motion-reduce:transition-none"
-				:class="filesExpanded ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'"
-				:inert="!filesExpanded"
+				ref="fileTreeContainer"
+				class="max-h-[336px] overflow-y-auto border-0 border-y border-solid border-surface-5"
 			>
-				<div class="flex min-h-0 min-w-0 flex-col gap-4 overflow-hidden">
-					<div
-						ref="fileTreeContainer"
-						class="mt-2 max-h-[calc(70vh-10rem)] overflow-y-auto rounded-[20px]"
+				<FileTreeSelect
+					v-model="includedFilePaths"
+					v-model:excluded-paths="excludedFilePaths"
+					:items="fileItems"
+					:show-modified="false"
+					flush
+					@navigate="scrollFileTreeToTop"
+				/>
+			</div>
+			<div class="flex flex-col gap-2 px-6 pt-4">
+				<div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+					<span class="font-semibold text-contrast">
+						{{ formatMessage(messages.storageTitle) }}
+					</span>
+					<span
+						class="font-semibold tabular-nums"
+						:class="overStorageLimit ? 'text-red' : 'text-contrast'"
+						aria-live="polite"
 					>
-						<FileTreeSelect
-							v-model="includedFilePaths"
-							v-model:excluded-paths="excludedFilePaths"
-							:items="fileItems"
-							:show-modified="false"
-							@navigate="scrollFileTreeToTop"
-						/>
-					</div>
-					<div class="flex flex-col gap-2">
-						<div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-							<span class="font-semibold text-contrast">
-								{{ formatMessage(messages.storageTitle) }}
-							</span>
-							<span
-								class="font-semibold tabular-nums"
-								:class="overStorageLimit ? 'text-red' : 'text-contrast'"
-								aria-live="polite"
-							>
-								{{
-									formatMessage(messages.storageUsage, {
-										used: formatBytes(selectedSize, 1),
-										limit: formatBytes(STORAGE_LIMIT_BYTES, 0),
-									})
-								}}
-							</span>
-						</div>
-						<div
-							role="meter"
-							:aria-label="formatMessage(messages.storageTitle)"
-							:aria-valuenow="selectedSize"
-							:aria-valuemin="0"
-							:aria-valuemax="STORAGE_LIMIT_BYTES"
-							class="relative h-3.5 overflow-hidden rounded-full bg-surface-4"
-						>
-							<div
-								class="absolute inset-y-0 left-0 bg-gradient-to-b from-white/10 to-black/10 motion-safe:transition-[width,background-color] motion-safe:duration-300"
-								:style="{ width: `${withinLimitPercent}%`, backgroundColor: storageBarColor }"
-							/>
-							<div
-								v-if="overStorageLimit"
-								class="absolute inset-y-0 right-0 bg-red bg-gradient-to-b from-white/10 to-black/10 motion-safe:transition-[left] motion-safe:duration-300"
-								:style="{ left: `calc(${limitMarkerPercent}% + 2px)` }"
-							/>
-							<div
-								v-if="overStorageLimit"
-								class="absolute inset-y-0 w-0 border-0 border-l-2 border-dotted border-contrast"
-								:style="{ left: `${limitMarkerPercent}%` }"
-								aria-hidden="true"
-							/>
-						</div>
-						<p v-if="overStorageLimit" class="m-0 text-sm text-red">
-							{{
-								formatMessage(messages.storageOverLimit, {
-									size: formatBytes(selectedSize - STORAGE_LIMIT_BYTES, 1),
-								})
-							}}
-						</p>
-					</div>
+						{{
+							formatMessage(messages.storageUsage, {
+								used: formatBytes(selectedSize, 1),
+								limit: formatBytes(STORAGE_LIMIT_BYTES, 0),
+							})
+						}}
+					</span>
 				</div>
+				<div
+					role="meter"
+					:aria-label="formatMessage(messages.storageTitle)"
+					:aria-valuenow="selectedSize"
+					:aria-valuemin="0"
+					:aria-valuemax="STORAGE_LIMIT_BYTES"
+					class="relative h-3.5 overflow-hidden rounded-full bg-surface-4"
+				>
+					<div
+						class="absolute inset-y-0 left-0 bg-gradient-to-b from-white/10 to-black/10 motion-safe:transition-[width,background-color] motion-safe:duration-300"
+						:style="{ width: `${withinLimitPercent}%`, backgroundColor: storageBarColor }"
+					/>
+					<div
+						v-if="overStorageLimit"
+						class="absolute inset-y-0 right-0 bg-red bg-gradient-to-b from-white/10 to-black/10 motion-safe:transition-[left] motion-safe:duration-300"
+						:style="{ left: `calc(${limitMarkerPercent}% + 2px)` }"
+					/>
+					<div
+						v-if="overStorageLimit"
+						class="absolute inset-y-0 w-0 border-0 border-l-2 border-dotted border-contrast"
+						:style="{ left: `${limitMarkerPercent}%` }"
+						aria-hidden="true"
+					/>
+				</div>
+				<p v-if="overStorageLimit" class="m-0 text-sm text-red">
+					{{
+						formatMessage(messages.storageOverLimit, {
+							size: formatBytes(selectedSize - STORAGE_LIMIT_BYTES, 1),
+						})
+					}}
+				</p>
+			</div>
+		</div>
+
+		<template #actions>
+			<div class="flex justify-end gap-2 pt-2">
+				<Button type="outlined" class="!border" @click="modal?.hide()">
+					<XIcon />
+					{{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<Button type="colored" color="brand" :disabled="confirmDisabled" @click="confirmPublish">
+					<UploadIcon />
+					{{ formatMessage(messages.publishButton) }}
+				</Button>
 			</div>
 		</template>
-	</ContentDiffModal>
+	</NewModal>
 </template>
 
 <script setup lang="ts">
-import { DropdownIcon, FolderOpenIcon, UploadIcon } from '@modrinth/assets'
+import { UploadIcon, XIcon } from '@modrinth/assets'
 import {
+	Button,
+	commonMessages,
 	type ContentDiffItem,
-	ContentDiffModal,
+	ContentDiffList,
 	defineMessages,
 	FileTreeSelect,
 	type FileTreeSelectItem,
+	NewModal,
+	Tabs,
+	type TabsTab,
+	type TabsValue,
 	useFormatBytes,
 	useVIntl,
 } from '@modrinth/ui'
@@ -148,14 +154,18 @@ const emit = defineEmits<{
 const { formatMessage } = useVIntl()
 const formatBytes = useFormatBytes()
 const { notifySharedInstanceError, notifySharedInstanceUnavailable } = useSharedInstanceErrors()
-const publishReviewModal = ref<InstanceType<typeof ContentDiffModal>>()
+const modal = ref<InstanceType<typeof NewModal>>()
 const fileTreeContainer = ref<HTMLElement>()
 const publishDiffs = ref<ContentDiffItem[]>([])
 const files = ref<SharedInstancePublishFile[]>([])
 const includedFilePaths = ref<string[]>([])
 const excludedFilePaths = ref<string[]>([])
-const filesExpanded = ref(false)
+const activeTab = ref<TabsValue>('changes')
 const state = ref<SharedInstancePublishState>('idle')
+const tabs = computed<TabsTab[]>(() => [
+	{ value: 'changes', label: formatMessage(messages.changesTab) },
+	{ value: 'files', label: formatMessage(messages.filesTab) },
+])
 const fileItems = computed<FileTreeSelectItem[]>(() =>
 	files.value.map(({ path, size }) => ({ path, size, type: 'file' })),
 )
@@ -170,6 +180,11 @@ const selectedSize = computed(() =>
 	selectedFiles.value.reduce((total, file) => total + file.size, 0),
 )
 const overStorageLimit = computed(() => selectedSize.value > STORAGE_LIMIT_BYTES)
+const confirmDisabled = computed(
+	() =>
+		overStorageLimit.value ||
+		(publishDiffs.value.length === 0 && selectedFilePaths.value.length === 0),
+)
 const storageBarScale = computed(() => Math.max(selectedSize.value, STORAGE_LIMIT_BYTES))
 const withinLimitPercent = computed(
 	() => (Math.min(selectedSize.value, STORAGE_LIMIT_BYTES) / storageBarScale.value) * 100,
@@ -210,16 +225,23 @@ async function show(e?: MouseEvent) {
 		files.value = preview.files
 		includedFilePaths.value = []
 		excludedFilePaths.value = []
-		filesExpanded.value = false
-		if (!publishReviewModal.value) return
+		activeTab.value = 'changes'
+		if (!modal.value) return
 
-		publishReviewModal.value.show(e)
+		modal.value.show(e)
 		reviewOpened = true
 	} catch (error) {
 		handlePublishError(error)
 	} finally {
 		if (!reviewOpened) finishReview()
 	}
+}
+
+function confirmPublish() {
+	if (confirmDisabled.value) return
+
+	void publishChanges()
+	modal.value?.hide()
 }
 
 async function publishChanges() {
@@ -279,15 +301,25 @@ function setState(nextState: SharedInstancePublishState) {
 const messages = defineMessages({
 	header: {
 		id: 'instance.shared-instance.publish-review.header',
-		defaultMessage: 'Review changes',
+		defaultMessage: 'Push update',
 	},
-	admonitionHeader: {
-		id: 'instance.shared-instance.publish-review.admonition-header',
-		defaultMessage: 'Push update to players',
+	changesTab: {
+		id: 'instance.shared-instance.publish-review.changes-tab',
+		defaultMessage: 'Changes',
 	},
-	description: {
-		id: 'instance.shared-instance.publish-review.description',
-		defaultMessage: 'Review the content changes and choose any files to include in this update.',
+	filesTab: {
+		id: 'instance.shared-instance.publish-review.files-tab',
+		defaultMessage: 'Files',
+	},
+	changesDescription: {
+		id: 'instance.shared-instance.publish-review.changes-description',
+		defaultMessage:
+			"Review the changes we've detected since your last update. These will automatically be included when you push.",
+	},
+	filesDescription: {
+		id: 'instance.shared-instance.publish-review.files-description',
+		defaultMessage:
+			"You can also include individual files alongside the detected changes. Select any additional files you'd like to publish.",
 	},
 	publishButton: {
 		id: 'instance.shared-instance.publish-review.publish-button',
@@ -300,10 +332,6 @@ const messages = defineMessages({
 	removedLabel: {
 		id: 'instance.shared-instance.publish-review.removed-label',
 		defaultMessage: 'Removed',
-	},
-	filesTitle: {
-		id: 'instance.shared-instance.publish-review.files-title',
-		defaultMessage: 'Select files',
 	},
 	storageTitle: {
 		id: 'instance.shared-instance.publish-review.storage-title',

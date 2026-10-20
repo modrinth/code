@@ -1,7 +1,8 @@
 <template>
 	<div class="flex w-full min-w-0 flex-col gap-2">
 		<div
-			class="flex w-full min-w-0 flex-col rounded-[20px] border border-solid border-surface-4 shadow-sm overflow-clip"
+			class="flex w-full min-w-0 flex-col overflow-clip"
+			:class="{ 'rounded-[20px] border border-solid border-surface-4 shadow-sm': !flush }"
 		>
 			<div
 				class="flex h-10 w-full min-w-0 select-none flex-row items-center justify-between bg-surface-3 px-3 text-sm font-medium"
@@ -282,6 +283,7 @@ const props = withDefaults(
 		lazy?: boolean
 		showSize?: boolean
 		showModified?: boolean
+		flush?: boolean
 	}>(),
 	{
 		items: () => [],
@@ -289,6 +291,7 @@ const props = withDefaults(
 		lazy: false,
 		showSize: true,
 		showModified: true,
+		flush: false,
 	},
 )
 
