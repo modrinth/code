@@ -1,5 +1,9 @@
 import type { Labrinth } from '@modrinth/api-client'
 
+import {
+	newestVersionForChannel,
+	type UpdateChannelPolicy,
+} from '#ui/layouts/shared/content-tab/utils/update-channels'
 import type { FilterValue } from '#ui/utils/search'
 
 export type BrowseInstallContentType =
@@ -306,6 +310,10 @@ export interface ResolveInstallPlanOptions<
 	project: TProject
 	contentType: BrowseInstallContentType
 	targetPreferences?: BrowseInstallPreferences
+	/**
+	 * Release channel of the install target. Omitting it allows every version type.
+	 */
+	updateChannel?: UpdateChannelPolicy
 	getProjectVersions: (projectId: string) => Promise<Labrinth.Versions.v2.Version[]>
 }
 
@@ -567,15 +575,18 @@ export function mergeInstallPreferences(
 }
 
 /**
- * Finds the newest version matching the given preferences.
+ * Finds the newest version matching the given preferences, preferring the most stable channels the
+ * update channel allows. The default `alpha` channel accepts every version type.
  */
 export function getLatestMatchingInstallVersion(
 	versions: readonly Labrinth.Versions.v2.Version[],
 	preferences: BrowseInstallPreferences,
+	updateChannel: UpdateChannelPolicy = 'alpha',
 ) {
-	return [...versions]
-		.filter((version) => versionMatchesPreferences(version, preferences))
-		.sort((a, b) => new Date(b.date_published).getTime() - new Date(a.date_published).getTime())[0]
+	return newestVersionForChannel(
+		versions.filter((version) => versionMatchesPreferences(version, preferences)),
+		updateChannel,
+	)
 }
 
 /**
@@ -599,7 +610,11 @@ export async function resolveInstallPlan<TProject extends BrowseInstallProject>(
 	let lastError: Error | null = null
 
 	for (const candidate of candidates) {
-		const version = getLatestMatchingInstallVersion(versions, candidate.preferences)
+		const version = getLatestMatchingInstallVersion(
+			versions,
+			candidate.preferences,
+			options.updateChannel,
+		)
 
 		if (version) {
 			return {

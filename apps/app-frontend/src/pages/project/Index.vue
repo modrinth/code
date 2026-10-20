@@ -921,6 +921,7 @@ async function install(version) {
 							},
 							contentType,
 						),
+				updateChannel: version ? undefined : await serverInstallContent.getServerUpdateChannel(),
 				getProjectVersions: async () =>
 					version ? versions.value.filter((candidate) => candidate.id === version) : versions.value,
 				queue: {

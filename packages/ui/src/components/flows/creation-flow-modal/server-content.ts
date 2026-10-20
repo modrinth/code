@@ -110,6 +110,7 @@ export async function installServerContent(
 		throw new Error('Select a loader version before installing.')
 	}
 	const properties = ctx.buildProperties()
+	const server = await client.archon.servers_v1.get(serverId)
 	const resolved = await client.labrinth.content_v3.resolve({
 		project_id: selection.projectId,
 		version_id: selection.versionId,
@@ -118,6 +119,7 @@ export async function installServerContent(
 			game_versions: [gameVersion],
 			loaders: selection.contentType === 'datapack' ? ['datapack'] : [loader],
 		},
+		update_channel: server.worlds.find((world) => world.id === worldId)?.update_channel,
 	})
 	const runtime = retainServerContextRuntime(client, serverId)
 	let unsubscribe = () => {}

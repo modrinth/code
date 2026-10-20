@@ -7,6 +7,7 @@ import type {
 	EnvironmentSearchOverride,
 	FilterValue,
 	ServerContentEnvironment,
+	UpdateChannelPolicy,
 } from '@modrinth/ui'
 import {
 	commonMessages,
@@ -353,6 +354,7 @@ export function useServerInstallContent({
 			selected: toResolvePreferences(plan.preferences),
 			target: toResolvePreferences(getServerInstallTargetPreferences(plan.contentType)),
 			existing_project_ids: existingProjectIds,
+			update_channel: await getServerUpdateChannel(),
 		})
 
 		return [resolved.primary, ...resolved.dependencies].map((item) => ({
@@ -385,6 +387,26 @@ export function useServerInstallContent({
 		return client.labrinth.versions_v2.getProjectVersions(projectId, {
 			include_changelog: false,
 		})
+	}
+
+	/**
+	 * Release channel configured on the target world, used to avoid installing alpha or beta
+	 * versions when the world is set to release.
+	 */
+	async function getServerUpdateChannel(): Promise<UpdateChannelPolicy | undefined> {
+		const serverId = currentServerId.value
+		if (!serverId) return undefined
+
+		const server = await queryClient.fetchQuery({
+			queryKey: ['servers', 'v1', 'detail', serverId],
+			queryFn: () => client.archon.servers_v1.get(serverId),
+			staleTime: 30_000,
+		})
+		const world =
+			server.worlds.find((world) => world.id === currentWorldId.value) ??
+			server.worlds.find((world) => world.is_active) ??
+			server.worlds[0]
+		return world?.update_channel
 	}
 
 	function clearQueuedServerInstalls() {
@@ -532,6 +554,7 @@ export function useServerInstallContent({
 							browseSearchState.overriddenProvidedFilterTypes.value,
 						),
 				targetPreferences: getServerInstallTargetPreferences(contentType),
+				updateChannel: await getServerUpdateChannel(),
 				getProjectVersions: getInstallProjectVersions,
 				queue: serverInstallQueue,
 				install: async (plan) => {

@@ -4,6 +4,7 @@ import {
 	type BrowseSelectedProject,
 	createContext,
 	type CreationFlowContextValue,
+	type UpdateChannelPolicy,
 	flushStoredServerAddonInstallQueue,
 	getServerAddonInstallPlanProjectIds,
 	getStoredServerAddonInstallQueue,
@@ -74,6 +75,7 @@ export interface ServerInstallContentContext {
 	initServerContext: () => Promise<void>
 	watchServerContextChanges: () => void
 	getServerProjectVersions: (projectId: string) => Promise<{ id: string }[]>
+	getServerUpdateChannel: () => Promise<UpdateChannelPolicy | undefined>
 	enforceServerSetupRoute: (currentProjectType: string | undefined) => void
 	getQueuedServerInstallPlans: () => Map<string, BrowseInstallPlan<InstallableSearchResult>>
 	setQueuedServerInstallPlans: (
@@ -204,9 +206,17 @@ export function useServerInstallContent(opts: {
 		return 'Installing content'
 	})
 
+	async function ensureServerFull(serverId: string) {
+		return queryClient.fetchQuery({
+			queryKey: ['servers', 'v1', 'detail', serverId],
+			queryFn: () => client.archon.servers_v1.get(serverId),
+			staleTime: 30_000,
+		})
+	}
+
 	async function resolveServerContextWorldId(serverId: string) {
 		try {
-			const server = await client.archon.servers_v1.get(serverId)
+			const server = await ensureServerFull(serverId)
 			const activeWorld = server.worlds.find((world) => world.is_active)
 			return activeWorld?.id ?? server.worlds[0]?.id ?? null
 		} catch (err) {
@@ -313,6 +323,23 @@ export function useServerInstallContent(opts: {
 		return versions.map((version) => ({ id: version.id }))
 	}
 
+	/**
+	 * Release channel configured on the target world, used to avoid installing alpha or beta
+	 * versions when the world is set to release.
+	 */
+	async function getServerUpdateChannel(): Promise<UpdateChannelPolicy | undefined> {
+		const sid = serverIdQuery.value
+		const wid = effectiveServerWorldId.value
+		if (!sid) return undefined
+
+		const server = await ensureServerFull(sid)
+		const world =
+			server.worlds.find((world) => world.id === wid) ??
+			server.worlds.find((world) => world.is_active) ??
+			server.worlds[0]
+		return world?.update_channel
+	}
+
 	async function openServerModpackInstallFlow(request: ServerModpackSelectionRequest) {
 		if (!serverIdQuery.value || !effectiveServerWorldId.value) {
 			throw new Error('Missing server context')
@@ -412,6 +439,7 @@ export function useServerInstallContent(opts: {
 			selected: toResolvePreferences(plan.preferences),
 			target: toResolvePreferences(target),
 			existing_project_ids: existingProjectIds,
+			update_channel: await getServerUpdateChannel(),
 		})
 
 		return [resolved.primary, ...resolved.dependencies].map((item) => ({
@@ -602,6 +630,7 @@ export function useServerInstallContent(opts: {
 		initServerContext,
 		watchServerContextChanges,
 		getServerProjectVersions,
+		getServerUpdateChannel,
 		enforceServerSetupRoute,
 		getQueuedServerInstallPlans,
 		setQueuedServerInstallPlans,

@@ -237,6 +237,7 @@ async function toggleServerProject(project: Labrinth.Projects.v3.Project): Promi
 				{ gameVersion: server.mc_version, loader: server.loader },
 				contentType,
 			),
+			updateChannel: await serverInstallContent.getServerUpdateChannel(),
 			getProjectVersions: getInstallProjectVersions,
 			queue: {
 				get: serverInstallContent.getQueuedServerInstallPlans,

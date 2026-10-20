@@ -148,6 +148,7 @@ const {
 	initServerContext,
 	watchServerContextChanges,
 	getServerProjectVersions,
+	getServerUpdateChannel,
 	enforceServerSetupRoute,
 	getQueuedServerInstallPlans,
 	setQueuedServerInstallPlans,
@@ -955,6 +956,7 @@ async function chooseInstanceInstallVersion(
 	const selectedVersion = getLatestMatchingInstallVersion(
 		await getInstallProjectVersions(project.project_id),
 		selectedPreferences,
+		targetInstance.update_channel,
 	)
 
 	if (!selectedVersion) {
@@ -1073,6 +1075,7 @@ function getCardActions(
 										searchState.overriddenProvidedFilterTypes.value,
 									),
 							targetPreferences: getServerInstallTargetPreferences(contentType),
+							updateChannel: await getServerUpdateChannel(),
 							getProjectVersions: getInstallProjectVersions,
 							queue: serverInstallQueue,
 							install: (plan) =>

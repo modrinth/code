@@ -136,8 +136,15 @@ const messages = defineMessages({
 })
 
 const client = injectModrinthClient()
-const { server, worldId, busyReasons, installProgressItems, uploadState, cancelUpload } =
-	injectModrinthServerContext()
+const {
+	server,
+	serverFull,
+	worldId,
+	busyReasons,
+	installProgressItems,
+	uploadState,
+	cancelUpload,
+} = injectModrinthServerContext()
 const contentUploadSession = useUploadSessionUpload({
 	client,
 	scope: 'content',
@@ -567,6 +574,8 @@ async function resolveStoredServerAddonPlans(plans: BrowseInstallPlan[]) {
 				selected: toResolvePreferences(plan.preferences),
 				target: toResolvePreferences(target),
 				existing_project_ids: existingProjectIds,
+				update_channel: serverFull.value?.worlds.find((world) => world.id === worldId.value)
+					?.update_channel,
 			})
 
 			return [resolved.primary, ...resolved.dependencies].map((item) => ({
