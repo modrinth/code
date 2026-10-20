@@ -5,6 +5,7 @@ import { defineMessages, Input, useVIntl } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import ModerationKeybind from '~/components/ui/moderation/settings/ModerationKeybind.vue'
+import ModerationKeybindTransfer from '~/components/ui/moderation/settings/ModerationKeybindTransfer.vue'
 import { saveModerationOptions, useModerationKeybinds } from '~/composables/moderation'
 
 defineProps<{
@@ -174,7 +175,10 @@ const conflictLabels = computed(() => {
 
 <template>
 	<div :class="{ 'universal-card': !embedded }">
-		<h2 class="m-0 mb-2.5 text-2xl">{{ formatMessage(messages.keybinds) }}</h2>
+		<div class="mb-2.5 flex flex-wrap items-center gap-2">
+			<h2 class="m-0 text-2xl">{{ formatMessage(messages.keybinds) }}</h2>
+			<ModerationKeybindTransfer />
+		</div>
 		<Input
 			v-model="search"
 			type="search"

@@ -109,6 +109,87 @@ const useModerationOptions = () =>
 export const useModerationKeybinds = () =>
 	computed(() => new Keybinds(useModerationOptions().value.keybinds))
 
+const booleanFields = ['mod', 'ctrl', 'shift', 'alt', 'meta', 'preventDefault'] as const
+
+function compactDefinition(definition: KeybindDefinition): KeybindDefinition {
+	const portableMod = definition.mod || (definition.ctrl && definition.meta !== false)
+	return {
+		key: definition.key.toLowerCase(),
+		...(portableMod ? { mod: true } : {}),
+		...(!portableMod && definition.ctrl ? { ctrl: true, meta: false } : {}),
+		...(!portableMod && definition.meta ? { meta: true } : {}),
+		...(definition.shift ? { shift: true } : {}),
+		...(definition.alt ? { alt: true } : {}),
+		...(definition.preventDefault === false ? { preventDefault: false } : {}),
+	}
+}
+
+function readOverrides(keybinds: Keybinds): StoredKeybinds {
+	return Object.fromEntries(
+		[...keybinds].flatMap(([id, binding]) => {
+			const definitions = binding.keybind.map(compactDefinition)
+			const defaults = binding.defaultKeybind.map(compactDefinition)
+			return JSON.stringify(definitions) === JSON.stringify(defaults) ? [] : [[id, definitions]]
+		}),
+	)
+}
+
+export function exportKeybinds(keybinds: Keybinds): string {
+	return JSON.stringify(
+		{
+			format: 'modrinth-review-keybinds',
+			version: 1,
+			values: readOverrides(keybinds),
+		},
+		null,
+		2,
+	)
+}
+
+export function parseKeybinds(source: string): StoredKeybinds {
+	if (new TextEncoder().encode(source).length > 65536) throw new Error('size')
+	const data = JSON.parse(source)
+	if (
+		!data ||
+		data.format !== 'modrinth-review-keybinds' ||
+		data.version !== 1 ||
+		!data.values ||
+		typeof data.values !== 'object' ||
+		Array.isArray(data.values)
+	)
+		throw new Error('format')
+	const knownIds = new Set([...new Keybinds({})].map(([id]) => id))
+	const values: StoredKeybinds = {}
+	for (const [id, definitions] of Object.entries(data.values)) {
+		if (!knownIds.has(id) || !Array.isArray(definitions)) throw new Error('action')
+		values[id] = definitions.map((definition) => {
+			if (
+				!definition ||
+				typeof definition !== 'object' ||
+				Array.isArray(definition) ||
+				typeof definition.key !== 'string' ||
+				!definition.key.length ||
+				definition.key.length > 64 ||
+				Object.keys(definition).some(
+					(key) => key !== 'key' && !booleanFields.some((field) => field === key),
+				) ||
+				booleanFields.some((field) => field in definition && typeof definition[field] !== 'boolean')
+			)
+				throw new Error('definition')
+			return compactDefinition(definition)
+		})
+	}
+	return readOverrides(new Keybinds(values))
+}
+
+export function replaceModerationKeybinds(keybinds: StoredKeybinds) {
+	const options = useModerationOptions()
+	const nextOptions = { ...options.value, keybinds }
+	if (encodeURIComponent(JSON.stringify(nextOptions)).length > 3800) throw new Error('storage-size')
+	options.value.keybinds = keybinds
+	saveModerationOptions()
+}
+
 export const useModerationSettings = () =>
 	computed(() => new Settings(useModerationOptions().value.settings, saveModerationOptions))
 

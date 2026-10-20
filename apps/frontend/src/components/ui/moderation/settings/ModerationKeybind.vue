@@ -77,7 +77,7 @@ import {
 } from '@modrinth/assets'
 import { formatKeybind, type KeybindDefinition, toKeybindDefinition } from '@modrinth/moderation'
 import { Button, defineMessages, IconButton, useVIntl } from '@modrinth/ui'
-import { computed, onMounted, onUnmounted, ref, useId, useTemplateRef } from 'vue'
+import { computed, onMounted, onUnmounted, ref, useId, useTemplateRef, watch } from 'vue'
 
 const props = defineProps<{
 	title: string
@@ -150,6 +150,15 @@ function stopEditing() {
 	recordingWindow?.removeEventListener('blur', stopEditing)
 	recordingWindow = null
 }
+
+watch(
+	() => props.definitions,
+	(value) => {
+		stopEditing()
+		definitions.value = JSON.parse(JSON.stringify(value))
+	},
+	{ deep: true },
+)
 
 function resetToDefault() {
 	stopEditing()
