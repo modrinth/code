@@ -28,15 +28,13 @@ Nuxt 3 with SSR — pages are server-rendered and hydrated on the client. Uses `
 
 Rule of thumb: if it doesn't depend on Nuxt-specific APIs or website-only features, it should be in `packages/ui`.
 
-### Project Review Language
+### Localization
 
-Project-review code is English-only. Do not add i18n message definitions, translation keys, or translation helpers to project-review routes, components, providers, or supporting code, including review-only components outside `src/components/project-review/`. Use plain English strings, ordinary interpolation and plural handling, and English date/number formatting. This exception also applies during i18n passes. Preserve localization in shared components used elsewhere.
+Any admin or internal pages should not be localized. Use plain English strings, ordinary interpolation and plural handling, and English date/number formatting in their routes, components, providers, and supporting code. This exception also applies during i18n passes. Preserve localization in shared components used elsewhere.
 
-### Project Review Popout Windows
+### Popout Windows
 
-Project review panels can be displayed in multiple browser documents while sharing the main window's Vue application and JavaScript context. Use an anchor, panel, or event target's `ownerDocument` for DOM queries and its `defaultView` for window behavior. Global `document` and `window` still identify the main window after a panel moves.
-
-Use the review shortcut context's listeners (`shortcuts.listen` or `useReviewEventListener`) for review interactions that must work in both the workspace and popouts. Shared overlay and modal behavior follows the multiple-document guidance in `packages/ui/AGENTS.md`.
+See `standards/frontend/POPOUT-WINDOWS.md` for DOM ownership, event listeners, and overlay behavior across browser documents.
 
 ## Data Fetching
 
