@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
-import { SignalIcon, SpinnerIcon } from '@modrinth/assets'
-import { getPingLevel } from '@modrinth/utils'
 import { computed } from 'vue'
 
-import { useVIntl } from '../../composables/i18n'
+import { defineMessages, useVIntl } from '../../composables/i18n'
 import { regionOverrides } from '../../utils/regions'
+import ServersRegionPing from './ServersRegionPing.vue'
 const { formatMessage } = useVIntl()
 
 const currentRegion = defineModel<string | undefined>({ required: true })
@@ -16,6 +15,13 @@ const props = defineProps<{
 	bestPing?: boolean
 	outOfStock?: boolean
 }>()
+
+const messages = defineMessages({
+	outOfStock: {
+		id: 'servers.region.out-of-stock',
+		defaultMessage: '(Out of stock)',
+	},
+})
 
 const isCurrentRegion = computed(() => currentRegion.value === props.region.shortcode)
 const flag = computed(
@@ -30,7 +36,6 @@ const title = computed(() =>
 const locationSubtitle = computed(() =>
 	overrideTitle.value ? props.region.display_name : undefined,
 )
-const pingLevel = computed(() => getPingLevel(props.ping ?? 0))
 
 function setRegion() {
 	currentRegion.value = props.region.shortcode
@@ -40,7 +45,7 @@ function setRegion() {
 <template>
 	<button
 		:disabled="outOfStock"
-		class="rounded-2xl p-4 font-semibold transition-all border-2 border-solid flex flex-col items-center gap-3"
+		class="rounded-2xl p-4 font-semibold transition-all border-2 border-solid flex flex-col items-center justify-center gap-3"
 		:class="{
 			'bg-button-bg border-transparent text-primary': !isCurrentRegion,
 			'bg-brand-highlight border-brand text-contrast': isCurrentRegion,
@@ -62,9 +67,9 @@ function setRegion() {
 			aria-hidden="true"
 		/>
 		<span class="flex flex-col gap-1 items-center">
-			<span class="flex items-center gap-1 flex-wrap justify-center">
-				{{ title }}
-				<span v-if="outOfStock" class="text-sm text-secondary">(Out of stock)</span>
+			<span>{{ title }}</span>
+			<span v-if="outOfStock" class="text-sm text-secondary">
+				{{ formatMessage(messages.outOfStock) }}
 			</span>
 			<span
 				class="text-xs flex items-center flex-wrap justify-center gap-1 text-secondary font-medium"
@@ -73,20 +78,9 @@ function setRegion() {
 					<span>
 						{{ locationSubtitle }}
 					</span>
-					<span v-if="ping !== -1">•</span>
+					<span>•</span>
 				</template>
-				<span v-if="ping !== -1" class="flex gap-1 items-center">
-					<SignalIcon
-						v-if="ping"
-						aria-hidden="true"
-						:style="`--_signal-${pingLevel}: ${pingLevel <= 2 ? 'var(--color-red)' : pingLevel <= 4 ? 'var(--color-orange)' : 'var(--color-green)'}`"
-						stroke-width="3px"
-						class="shrink-0"
-					/>
-					<SpinnerIcon v-else class="animate-spin" />
-					<template v-if="ping"> {{ ping }}ms </template>
-					<span v-else> Testing connection... </span>
-				</span>
+				<ServersRegionPing :ping="ping" />
 			</span>
 		</span>
 	</button>

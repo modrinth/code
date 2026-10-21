@@ -6,11 +6,9 @@ import {
 	RadioButtonCheckedIcon,
 	RadioButtonIcon,
 	RightArrowIcon,
-	SignalIcon,
 	SpinnerIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { getPingLevel } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import type Stripe from 'stripe'
 import { computed } from 'vue'
@@ -27,6 +25,7 @@ import ModrinthServersIcon from '../servers/ModrinthServersIcon.vue'
 import ExpandableInvoiceTotal from './ExpandableInvoiceTotal.vue'
 import FormattedPaymentMethod from './FormattedPaymentMethod.vue'
 import type { ServerBillingInterval } from './ModrinthServersPurchaseModal.vue'
+import ServersRegionPing from './ServersRegionPing.vue'
 import ServersSpecs from './ServersSpecs.vue'
 
 const { formatMessage } = useVIntl()
@@ -163,7 +162,6 @@ const title = computed(() =>
 const locationSubtitle = computed(() =>
 	overrideTitle.value ? props.region.display_name : undefined,
 )
-const pingLevel = computed(() => getPingLevel(props.ping ?? 0))
 
 const period = computed(() => {
 	if (interval.value === 'monthly') return 'month'
@@ -211,20 +209,9 @@ function setInterval(newInterval: ServerBillingInterval) {
 					<span>
 						{{ locationSubtitle }}
 					</span>
-					<span v-if="ping !== -1">•</span>
+					<span>•</span>
 				</template>
-				<template v-if="ping !== -1">
-					<SignalIcon
-						v-if="ping"
-						aria-hidden="true"
-						:style="`--_signal-${pingLevel}: ${pingLevel <= 2 ? 'var(--color-red)' : pingLevel <= 4 ? 'var(--color-orange)' : 'var(--color-green)'}`"
-						stroke-width="3px"
-						class="shrink-0"
-					/>
-					<SpinnerIcon v-else class="animate-spin" />
-					<template v-if="ping"> {{ ping }}ms </template>
-					<span v-else> Testing connection... </span>
-				</template>
+				<ServersRegionPing :ping="ping" />
 			</span>
 		</div>
 	</div>

@@ -40,39 +40,6 @@ export class ArchonServersV0Module extends AbstractModule {
 	}
 
 	/**
-	 * Check stock availability for a region
-	 * POST /modrinth/v0/stock?region=:region
-	 */
-	public async checkStock(
-		region: string,
-		request: Archon.Servers.v0.StockRequest,
-	): Promise<Archon.Servers.v0.StockResponse> {
-		return this.client.request<Archon.Servers.v0.StockResponse>(`/stock?region=${region}`, {
-			api: 'archon',
-			version: 'modrinth/v0',
-			method: 'POST',
-			body: request,
-			skipAuth: true,
-		})
-	}
-
-	/**
-	 * Check stock availability (without region filter)
-	 * POST /modrinth/v0/stock
-	 */
-	public async checkStockGlobal(
-		request: Archon.Servers.v0.StockRequest,
-	): Promise<Archon.Servers.v0.StockResponse> {
-		return this.client.request<Archon.Servers.v0.StockResponse>('/stock', {
-			api: 'archon',
-			version: 'modrinth/v0',
-			method: 'POST',
-			body: request,
-			skipAuth: true,
-		})
-	}
-
-	/**
 	 * Get filesystem authentication credentials for a server
 	 * Returns URL and JWT token for accessing the server's filesystem via Kyros
 	 * GET /modrinth/v0/servers/:id/fs
