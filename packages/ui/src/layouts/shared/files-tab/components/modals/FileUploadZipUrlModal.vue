@@ -1,38 +1,9 @@
 <template>
-	<NewModal
-		ref="modal"
-		:header="cf ? formatMessage(messages.cfHeader) : formatMessage(messages.zipHeader)"
-	>
+	<NewModal ref="modal" :header="formatMessage(messages.zipHeader)">
 		<form class="flex flex-col gap-6 md:w-[700px]" @submit.prevent="handleSubmit">
-			<!-- CurseForge stepper cards -->
-			<div v-if="cf" class="flex gap-4">
-				<div
-					v-for="(step, i) in steps"
-					:key="i"
-					class="flex flex-1 flex-col gap-2 overflow-clip rounded-[20px] bg-surface-2 p-3"
-				>
-					<span
-						class="flex size-6 shrink-0 items-center justify-center rounded-full border border-solid border-surface-5 bg-surface-4 font-medium text-contrast"
-					>
-						{{ i + 1 }}
-					</span>
-					<div class="flex flex-col">
-						<div class="font-semibold leading-snug text-contrast">
-							{{ step.title }}
-						</div>
-						<div class="text-sm leading-relaxed text-secondary">
-							{{ step.description }}
-						</div>
-					</div>
-				</div>
-			</div>
-
 			<!-- URL input -->
 			<div class="flex flex-col gap-2.5">
-				<label v-if="cf" class="text-base font-semibold text-contrast">{{
-					formatMessage(messages.enterLink)
-				}}</label>
-				<div v-else class="text-sm text-secondary">
+				<div class="text-sm text-secondary">
 					{{ formatMessage(messages.zipDescription) }}
 				</div>
 				<Input
@@ -40,11 +11,7 @@
 					v-tooltip="props.disabled ? props.disabledTooltip : undefined"
 					:icon="LinkIcon"
 					type="url"
-					:placeholder="
-						cf
-							? 'https://www.curseforge.com/minecraft/modpacks/.../files/6412259'
-							: 'https://www.example.com/.../modpack-name-1.0.2.zip'
-					"
+					placeholder="https://www.example.com/.../modpack-name-1.0.2.zip"
 					:disabled="submitted || props.disabled"
 					:error="touched && !!error"
 					autocomplete="off"
@@ -93,14 +60,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-	DownloadIcon,
-	FileTextIcon,
-	LinkIcon,
-	SearchIcon,
-	SpinnerIcon,
-	XIcon,
-} from '@modrinth/assets'
+import { DownloadIcon, LinkIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { computed, nextTick, ref } from 'vue'
 
 import { Button } from '#ui/components/base/buttons'
@@ -129,17 +89,9 @@ const props = withDefaults(
 )
 
 const messages = defineMessages({
-	cfHeader: {
-		id: 'files.zip-url-modal.cf-header',
-		defaultMessage: 'Install a CurseForge modpack',
-	},
 	zipHeader: {
 		id: 'files.zip-url-modal.zip-header',
 		defaultMessage: 'Uploading .zip contents from URL',
-	},
-	enterLink: {
-		id: 'files.zip-url-modal.enter-link',
-		defaultMessage: 'Enter link',
 	},
 	zipDescription: {
 		id: 'files.zip-url-modal.zip-description',
@@ -149,49 +101,13 @@ const messages = defineMessages({
 		id: 'files.zip-url-modal.install-button',
 		defaultMessage: 'Install',
 	},
-	stepFindTitle: {
-		id: 'files.zip-url-modal.step-find-title',
-		defaultMessage: 'Find the modpack',
-	},
-	stepFindDescription: {
-		id: 'files.zip-url-modal.step-find-description',
-		defaultMessage: 'Browse CurseForge and locate the modpack you want.',
-	},
-	stepSelectTitle: {
-		id: 'files.zip-url-modal.step-select-title',
-		defaultMessage: 'Select a version',
-	},
-	stepSelectDescription: {
-		id: 'files.zip-url-modal.step-select-description',
-		defaultMessage: 'Go to the "Files" tab and pick the version to install.',
-	},
-	stepCopyTitle: {
-		id: 'files.zip-url-modal.step-copy-title',
-		defaultMessage: 'Copy the URL',
-	},
-	stepCopyDescription: {
-		id: 'files.zip-url-modal.step-copy-description',
-		defaultMessage: 'Copy the version page URL and paste it below.',
-	},
 	errorUrlRequired: {
 		id: 'files.zip-url-modal.error-url-required',
 		defaultMessage: 'URL is required.',
 	},
-	errorCfUrl: {
-		id: 'files.zip-url-modal.error-cf-url',
-		defaultMessage: 'URL must be a CurseForge modpack version URL.',
-	},
 	errorUrlInvalid: {
 		id: 'files.zip-url-modal.error-url-invalid',
 		defaultMessage: 'URL must be valid.',
-	},
-	cfNotFoundTitle: {
-		id: 'files.zip-url-modal.cf-not-found-title',
-		defaultMessage: 'CurseForge modpack not found',
-	},
-	cfNotFoundText: {
-		id: 'files.zip-url-modal.cf-not-found-text',
-		defaultMessage: 'Could not find CurseForge modpack at that URL.',
 	},
 	installFailedTitle: {
 		id: 'files.zip-url-modal.install-failed-title',
@@ -203,29 +119,9 @@ const messages = defineMessages({
 	},
 	backupName: {
 		id: 'files.zip-url-modal.backup-name',
-		defaultMessage: 'CurseForge modpack install',
+		defaultMessage: 'Before .zip URL upload',
 	},
 })
-
-const steps = [
-	{
-		icon: SearchIcon,
-		title: formatMessage(messages.stepFindTitle),
-		description: formatMessage(messages.stepFindDescription),
-	},
-	{
-		icon: FileTextIcon,
-		title: formatMessage(messages.stepSelectTitle),
-		description: formatMessage(messages.stepSelectDescription),
-	},
-	{
-		icon: LinkIcon,
-		title: formatMessage(messages.stepCopyTitle),
-		description: formatMessage(messages.stepCopyDescription),
-	},
-]
-
-const cf = ref(false)
 
 const modal = ref<InstanceType<typeof NewModal>>()
 const url = ref('')
@@ -235,15 +131,11 @@ const backupInProgress = ref(false)
 
 const trimmedUrl = computed(() => url.value.trim())
 
-const regex = /https:\/\/(www\.)?curseforge\.com\/minecraft\/modpacks\/[^/]+\/files\/\d+/
-
 const error = computed(() => {
 	if (trimmedUrl.value.length === 0) {
 		return formatMessage(messages.errorUrlRequired)
 	}
-	if (cf.value && !regex.test(trimmedUrl.value)) {
-		return formatMessage(messages.errorCfUrl)
-	} else if (!cf.value && !trimmedUrl.value.includes('/')) {
+	if (!trimmedUrl.value.includes('/')) {
 		return formatMessage(messages.errorUrlInvalid)
 	}
 	return ''
@@ -263,19 +155,9 @@ const handleSubmit = async () => {
 
 	submitted.value = true
 	try {
-		const dry = await client.kyros.files_v0.extractFile(trimmedUrl.value, true, true)
-
-		if (!cf.value || dry.modpack_name) {
-			await client.kyros.files_v0.extractFile(trimmedUrl.value, true, false)
-			hide()
-		} else {
-			submitted.value = false
-			addNotification({
-				title: formatMessage(messages.cfNotFoundTitle),
-				text: formatMessage(messages.cfNotFoundText),
-				type: 'error',
-			})
-		}
+		await client.kyros.files_v0.extractFile(trimmedUrl.value, true, true)
+		await client.kyros.files_v0.extractFile(trimmedUrl.value, true, false)
+		hide()
 	} catch (err) {
 		submitted.value = false
 		console.error('Error installing:', err)
@@ -287,10 +169,9 @@ const handleSubmit = async () => {
 	}
 }
 
-const show = (isCf: boolean) => {
+const show = () => {
 	if (props.disabled) return
 
-	cf.value = isCf
 	url.value = ''
 	submitted.value = false
 	touched.value = false

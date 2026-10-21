@@ -46,8 +46,8 @@
 					:loading="saving"
 					@click="save"
 				>
-					{{ formatMessage(commonMessages.continueButton) }}
-					<ChevronRightIcon />
+					<CheckIcon />
+					{{ formatMessage(commonMessages.confirmButton) }}
 				</Button>
 			</div>
 		</template>
@@ -56,7 +56,7 @@
 
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
-import { ChevronRightIcon, XIcon } from '@modrinth/assets'
+import { CheckIcon, XIcon } from '@modrinth/assets'
 import { useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, ref } from 'vue'
 

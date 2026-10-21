@@ -72,6 +72,10 @@ export const commonMessages = defineMessages({
 		id: 'label.confirm-password',
 		defaultMessage: 'Confirm password',
 	},
+	confirmButton: {
+		id: 'button.confirm',
+		defaultMessage: 'Confirm',
+	},
 	continueButton: {
 		id: 'button.continue',
 		defaultMessage: 'Continue',

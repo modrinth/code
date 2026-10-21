@@ -191,6 +191,9 @@
   "button.close": {
     "defaultMessage": "Close"
   },
+  "button.confirm": {
+    "defaultMessage": "Confirm"
+  },
   "button.continue": {
     "defaultMessage": "Continue"
   },
@@ -1805,9 +1808,6 @@
   "files.navbar.home": {
     "defaultMessage": "Home"
   },
-  "files.navbar.install-curseforge-pack": {
-    "defaultMessage": "Install CurseForge pack"
-  },
   "files.navbar.new-file": {
     "defaultMessage": "New file"
   },
@@ -1941,22 +1941,7 @@
     "defaultMessage": "Name is required."
   },
   "files.zip-url-modal.backup-name": {
-    "defaultMessage": "CurseForge modpack install"
-  },
-  "files.zip-url-modal.cf-header": {
-    "defaultMessage": "Install a CurseForge modpack"
-  },
-  "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "Could not find CurseForge modpack at that URL."
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "CurseForge modpack not found"
-  },
-  "files.zip-url-modal.enter-link": {
-    "defaultMessage": "Enter link"
-  },
-  "files.zip-url-modal.error-cf-url": {
-    "defaultMessage": "URL must be a CurseForge modpack version URL."
+    "defaultMessage": "Before .zip URL upload"
   },
   "files.zip-url-modal.error-url-invalid": {
     "defaultMessage": "URL must be valid."
@@ -1969,24 +1954,6 @@
   },
   "files.zip-url-modal.install-failed-title": {
     "defaultMessage": "Installation failed"
-  },
-  "files.zip-url-modal.step-copy-description": {
-    "defaultMessage": "Copy the version page URL and paste it below."
-  },
-  "files.zip-url-modal.step-copy-title": {
-    "defaultMessage": "Copy the URL"
-  },
-  "files.zip-url-modal.step-find-description": {
-    "defaultMessage": "Browse CurseForge and locate the modpack you want."
-  },
-  "files.zip-url-modal.step-find-title": {
-    "defaultMessage": "Find the modpack"
-  },
-  "files.zip-url-modal.step-select-description": {
-    "defaultMessage": "Go to the \"Files\" tab and pick the version to install."
-  },
-  "files.zip-url-modal.step-select-title": {
-    "defaultMessage": "Select a version"
   },
   "files.zip-url-modal.unknown-error": {
     "defaultMessage": "An unknown error occurred"
