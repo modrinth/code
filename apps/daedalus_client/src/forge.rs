@@ -9,12 +9,12 @@ use chrono::{DateTime, Utc};
 use daedalus::get_path_from_artifact;
 use daedalus::modded::PartialVersionInfo;
 use dashmap::DashMap;
-use futures::io::Cursor;
 use indexmap::IndexMap;
 use itertools::Itertools;
 use serde::Deserialize;
 use serde::de::DeserializeOwned;
 use std::collections::HashMap;
+use std::io::{Cursor, Read};
 use std::sync::{
     Arc,
     atomic::{AtomicUsize, Ordering},
@@ -304,32 +304,41 @@ async fn fetch(
                 "Reading forge installer for {}",
                 loader.loader_version
             );
-            type ZipFileReader = async_zip::base::read::seek::ZipFileReader<
-                Cursor<bytes::Bytes>,
-            >;
 
-            let cursor = Cursor::new(raw);
-            let mut zip = ZipFileReader::new(cursor).await?;
+			type ZipFileReader = zip::ZipArchive<Cursor<bytes::Bytes>>;
+
+			let mut zip = tokio::task::spawn_blocking(move || {
+				ZipFileReader::new(Cursor::new(raw))
+			})
+			.await??;
 
             #[tracing::instrument(skip(zip))]
             async fn read_file(
                 zip: &mut ZipFileReader,
                 file_name: &str,
             ) -> Result<Option<Vec<u8>>, Error> {
-                let zip_index_option =
-                    zip.file().entries().iter().position(|f| {
-                        f.filename().as_str().unwrap_or_default() == file_name
-                    });
+				let mut zip = zip.clone();
+				let file_name = file_name.to_owned();
+				tokio::task::spawn_blocking(move || -> Result<Option<Vec<u8>>, Error> {
+					let mut zip_index_option = None;
+					for index in 0..zip.len() {
+						if zip.by_index_raw(index)?.name().is_ok_and(|name| name == file_name) {
+							zip_index_option = Some(index);
+							break;
+						}
+					}
 
-                if let Some(zip_index) = zip_index_option {
-                    let mut buffer = Vec::new();
-                    let mut reader = zip.reader_with_entry(zip_index).await?;
-                    reader.read_to_end_checked(&mut buffer).await?;
+					if let Some(zip_index) = zip_index_option {
+						let mut buffer = Vec::new();
+						let mut reader = zip.by_index(zip_index)?;
+						reader.read_to_end(&mut buffer)?;
 
-                    Ok(Some(buffer))
-                } else {
-                    Ok(None)
-                }
+						Ok(Some(buffer))
+					} else {
+						Ok(None)
+					}
+				})
+				.await?
             }
 
             #[tracing::instrument(skip(zip))]

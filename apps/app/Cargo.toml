@@ -10,7 +10,7 @@ license = "GPL-3.0-only"
 [dependencies]
 aes-gcm = { workspace = true }
 anyhow = { workspace = true }
-async_zip = { workspace = true, features = ["deflate", "tokio-fs"] }
+
 base64 = { workspace = true }
 chrono = { workspace = true }
 daedalus = { workspace = true }
@@ -47,6 +47,7 @@ tracing = { workspace = true }
 url = { workspace = true }
 urlencoding = { workspace = true }
 uuid = { workspace = true, features = ["serde", "v4"] }
+zip = { workspace = true }
 
 [dependencies.tauri]
 workspace = true

@@ -46,7 +46,6 @@ async-stripe = { version = "0.41.0", default-features = false, features = [
 async-trait = "0.1.92"
 async-tungstenite = { version = "0.35.0", default-features = false, features = ["futures-03-sink"] }
 async-walkdir = "2.2.0"
-async_zip = "0.0.19"
 aws-sdk-s3 = { version = "=1.122.0", default-features = false, features = [
   "default-https-client",
   "rt-tokio",

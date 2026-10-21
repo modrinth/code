@@ -583,12 +583,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "array-init"
-version = "2.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3d62b7694a562cdf5a74227903507c56ab2cc8bdd1f781ed5cb4cf9c9f810bfc"
-
-[[package]]
 name = "arrayvec"
 version = "0.7.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -728,7 +722,6 @@ checksum = "9d5755640120b24961f8231e05892e4a4f7e0d04e8aeca161508c9c397946970"
 dependencies = [
  "compression-codecs",
  "compression-core",
- "futures-io",
  "pin-project-lite",
  "tokio",
 ]
@@ -940,23 +933,6 @@ dependencies = [
  "async-fs",
  "futures-lite 2.6.1",
  "thiserror 2.0.21",
-]
-
-[[package]]
-name = "async_zip"
-version = "0.0.19"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fb7f5f40e1eb30949a266fc900d37fd3267c7baf50c3705ac09c5d8ced5def63"
-dependencies = [
- "async-compression",
- "binrw",
- "chrono",
- "crc32fast",
- "futures-lite 2.6.1",
- "pin-project",
- "thiserror 2.0.21",
- "tokio",
- "tokio-util",
 ]
 
 [[package]]
@@ -1627,30 +1603,6 @@ dependencies = [
  "base64 0.21.7",
  "pastey 0.1.1",
  "serde",
-]
-
-[[package]]
-name = "binrw"
-version = "0.15.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6ad120d555272286c1017d25165ab8bd74806f13fc85b258484ec7e4ce75458f"
-dependencies = [
- "array-init",
- "binrw_derive",
- "bytemuck",
-]
-
-[[package]]
-name = "binrw_derive"
-version = "0.15.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6df92e0e9baae4dc82c7bad7715ca40c0a5c71539057bf2ea04a5c29c980410b"
-dependencies = [
- "either",
- "owo-colors",
- "proc-macro2",
- "quote",
- "syn 2.0.119",
 ]
 
 [[package]]
@@ -2514,13 +2466,9 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cae36683101b2899f48bd31f8db9839437356188e3b1ff23096e73dab09ba8fe"
 dependencies = [
  "brotli 9.0.0",
- "bzip2",
  "compression-core",
- "deflate64",
  "flate2",
  "memchr",
- "zstd",
- "zstd-safe",
 ]
 
 [[package]]
@@ -2995,7 +2943,6 @@ dependencies = [
 name = "daedalus_client"
 version = "0.2.2"
 dependencies = [
- "async_zip",
  "bytes",
  "chrono",
  "daedalus",
@@ -3016,6 +2963,7 @@ dependencies = [
  "tracing",
  "tracing-error",
  "tracing-subscriber",
+ "zip 9.0.5",
 ]
 
 [[package]]
@@ -12617,7 +12565,6 @@ dependencies = [
  "async-trait",
  "async-tungstenite",
  "async-walkdir",
- "async_zip",
  "base64 0.23.1",
  "bon",
  "bytemuck",
@@ -12704,7 +12651,6 @@ version = "1.0.0-local"
 dependencies = [
  "aes-gcm",
  "anyhow",
- "async_zip",
  "base64 0.23.1",
  "chrono",
  "core-foundation 0.10.1",
@@ -12749,6 +12695,7 @@ dependencies = [
  "webview2-com",
  "windows 0.61.3",
  "windows-core 0.61.2",
+ "zip 9.0.5",
 ]
 
 [[package]]

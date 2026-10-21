@@ -4,14 +4,7 @@ version = "0.2.2"
 edition.workspace = true
 
 [dependencies]
-async_zip = { workspace = true, features = [
-  "bzip2",
-  "chrono",
-  "deflate",
-  "deflate64",
-  "tokio-fs",
-  "zstd",
-] }
+
 bytes = { workspace = true }
 chrono = { workspace = true, features = ["serde"] }
 daedalus = { workspace = true }
@@ -32,6 +25,7 @@ tokio = { workspace = true, features = ["macros", "rt-multi-thread", "sync"] }
 tracing = { workspace = true }
 tracing-error = { workspace = true }
 tracing-subscriber = { workspace = true, features = ["env-filter"] }
+zip = { workspace = true }
 
 [lints]
 workspace = true

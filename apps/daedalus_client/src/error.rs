@@ -34,7 +34,7 @@ pub enum ErrorKind {
     #[error("Tracing error: {0}")]
     Tracing(#[from] tracing::subscriber::SetGlobalDefaultError),
     #[error("Zip error: {0}")]
-    Zip(#[from] async_zip::error::ZipError),
+	Zip(#[from] zip::result::ZipError),
     #[error("Failed to parse an integer: {0}")]
     ParseIntError(#[from] std::num::ParseIntError),
 }

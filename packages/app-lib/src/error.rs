@@ -5,7 +5,7 @@ use crate::util;
 use crate::util::io::IOError;
 use crate::util::jre::JREError;
 use async_tungstenite::tungstenite;
-use async_zip::error::ZipError;
+use zip::result::ZipError;
 use data_url::DataUrlError;
 use hickory_resolver::net::NetError;
 use serde::{Deserialize, Serialize};
@@ -149,7 +149,7 @@ pub enum ErrorKind {
     EventError(#[from] crate::event::EventError),
 
     #[error("zip error: {0}")]
-    ZipError(#[from] async_zip::error::ZipError),
+    ZipError(#[from] ZipError),
 
     #[error("file watching error: {0}")]
     NotifyError(#[from] notify::Error),
