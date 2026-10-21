@@ -5933,6 +5933,18 @@
   "servers.region.north-america-west": {
     "defaultMessage": "Western North America"
   },
+  "servers.region.out-of-stock": {
+    "defaultMessage": "(Out of stock)"
+  },
+  "servers.region.ping.failed": {
+    "defaultMessage": "Failed to ping"
+  },
+  "servers.region.ping.latency": {
+    "defaultMessage": "{ping}ms"
+  },
+  "servers.region.ping.testing": {
+    "defaultMessage": "Testing connection..."
+  },
   "servers.region.prompt": {
     "defaultMessage": "Where would you like your server to be located?"
   },

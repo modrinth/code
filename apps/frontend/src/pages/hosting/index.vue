@@ -20,7 +20,6 @@
 			:return-url="`${config.public.siteUrl}/hosting/manage`"
 			:server-name="`${auth?.user?.username}'s server`"
 			:out-of-stock-url="outOfStockUrl"
-			:fetch-capacity-statuses="fetchCapacityStatuses"
 			:regions="regions"
 			:refresh-payment-methods="fetchPaymentData"
 			:fetch-stock="fetchStock"
@@ -1048,44 +1047,30 @@ const { data: hasServers } = useQuery({
 	enabled: computed(() => !!auth.value?.user),
 })
 
-function fetchStock(region, request) {
-	return client.archon.servers_v0.checkStock(region.shortcode, request).then((res) => res.available)
+function fetchStock(memoryMb) {
+	return client.archon.servers_v1.getStock(memoryMb)
 }
 
-async function fetchCapacityStatuses(customProduct = null) {
+async function fetchCapacityStatuses() {
 	try {
-		const productsToCheck = customProduct?.metadata
-			? [customProduct]
-			: [
-					...pyroPlanProducts,
-					pyroProducts.reduce((min, product) =>
-						product.metadata.ram < min.metadata.ram ? product : min,
-					),
-				]
-		const capacityChecks = []
-		for (const product of productsToCheck) {
-			capacityChecks.push(
-				client.archon.servers_v0.checkStockGlobal({
-					cpu: product.metadata.cpu,
-					memory_mb: product.metadata.ram,
-					swap_mb: product.metadata.swap,
-					storage_mb: product.metadata.storage,
-				}),
-			)
+		const productsToCheck = {
+			small: pyroPlanProducts[0],
+			medium: pyroPlanProducts[1],
+			large: pyroPlanProducts[2],
+			custom: pyroProducts.reduce((min, product) =>
+				product.metadata.ram < min.metadata.ram ? product : min,
+			),
 		}
+		const stock = await client.archon.servers_v1.getStock(
+			Object.values(productsToCheck).map((product) => product.metadata.ram),
+		)
 
-		if (customProduct?.metadata) {
-			return {
-				custom: await capacityChecks[0],
-			}
-		} else {
-			return {
-				small: await capacityChecks[0],
-				medium: await capacityChecks[1],
-				large: await capacityChecks[2],
-				custom: await capacityChecks[3],
-			}
-		}
+		return Object.fromEntries(
+			Object.entries(productsToCheck).map(([plan, product]) => [
+				plan,
+				{ available: stock.total[product.metadata.ram] ?? 0 },
+			]),
+		)
 	} catch (error) {
 		console.error('Error checking server capacities:', error)
 		return {
