@@ -5273,15 +5273,6 @@
   "settings.pats.modal.create.title": {
     "message": "Kişisel erişim token'i (PAT) oluştur"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "Bu tokeni sil"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "Bu işlem, bu tokeni sonsuza dek (gerçekten de sonsuza dek) kaldıracak."
-  },
-  "settings.pats.modal.delete.title": {
-    "message": "Bu tokeni silmek istediğinizden emin misiniz?"
-  },
   "settings.pats.modal.edit.title": {
     "message": "Kişisel erişim tokenini (PAT'ı) düzenle"
   },
@@ -5311,9 +5302,6 @@
   },
   "settings.sessions.current-session": {
     "message": "Mevcut oturum"
-  },
-  "settings.sessions.description": {
-    "message": "Şu an Modrinth hesabınızla giriş yapılmış tüm cihazlar burada. Her birinden teker teker çıkış yapabilirsiniz.\n\nEğer tanımadığınız bir girdi varsa, o cihazdan çıkış yapın ve Modrinth hesabınızın parolasını derhal değiştirin."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "En son {ago} erişildi"

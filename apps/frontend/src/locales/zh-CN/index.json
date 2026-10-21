@@ -5549,15 +5549,6 @@
   "settings.pats.modal.create.title": {
     "message": "创建个人访问令牌"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "删除该令牌"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "这将永久删除此令牌（真的很久）。"
-  },
-  "settings.pats.modal.delete.title": {
-    "message": "你确定要删除这个令牌吗？"
-  },
   "settings.pats.modal.edit.title": {
     "message": "编辑个人访问令牌"
   },
@@ -5587,9 +5578,6 @@
   },
   "settings.sessions.current-session": {
     "message": "当前会话"
-  },
-  "settings.sessions.description": {
-    "message": "以下是目前登录了你的 Modrinth 账号的所有设备。你可以为任一设备单独退出登录。\n\n如果发现陌生设备，请立即将其退出登录，并更改你的 Modrinth 账号密码。"
   },
   "settings.sessions.last-accessed-ago": {
     "message": "上次访问于{ago}"

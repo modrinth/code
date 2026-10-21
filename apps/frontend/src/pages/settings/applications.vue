@@ -1,5 +1,5 @@
 <template>
-	<div class="universal-card">
+	<div class="flex flex-col">
 		<ConfirmModal
 			ref="modal_confirm"
 			:title="formatMessage(messages.deleteConfirmTitle)"
@@ -101,7 +101,7 @@
 							/>
 							<IconButton
 								v-if="index !== 0"
-								label="Delete"
+								:label="formatMessage(commonMessages.deleteLabel)"
 								@click="() => redirectUris.splice(index, 1)"
 							>
 								<TrashIcon />
@@ -148,28 +148,16 @@
 			</template>
 		</NewModal>
 
-		<div class="header__row">
-			<div class="header__title">
-				<h2 class="text-2xl">{{ formatMessage(commonSettingsMessages.applications) }}</h2>
-			</div>
-			<Button
-				type="colored"
-				color="brand"
-				@click="
-					() => {
-						name = null
-						icon = null
-						scopesVal = 0
-						redirectUris = ['']
-						editingId = null
-						$refs.appModal.show()
-					}
-				"
-			>
-				<PlusIcon /> {{ formatMessage(messages.newApplication) }}
+		<div class="flex flex-wrap items-center justify-between gap-3">
+			<h2 class="m-0 text-2xl font-semibold">
+				{{ formatMessage(commonSettingsMessages.applications) }}
+			</h2>
+			<Button type="colored" color="brand" @click="openCreateApp">
+				<PlusIcon />
+				{{ formatMessage(messages.newApplication) }}
 			</Button>
 		</div>
-		<p>
+		<p class="mb-4 mt-2 leading-tight">
 			<IntlFormatted :message-id="messages.descriptionIntro">
 				<template #docs-link="{ children }">
 					<a class="text-link" href="https://docs.modrinth.com">
@@ -178,76 +166,158 @@
 				</template>
 			</IntlFormatted>
 		</p>
-		<div v-for="app in usersApps" :key="app.id" class="universal-card recessed token mt-4">
-			<div class="token-info">
-				<div class="token-icon">
-					<Avatar size="sm" :src="app.icon_url" :raw-src="app.raw_icon_url" />
-					<div>
-						<h2 class="token-title">{{ app.name }}</h2>
-						<div>
-							{{
-								formatMessage(messages.createdOn, {
-									date: formatDate(new Date(app.created)),
-								})
-							}}
+		<template v-if="isLoading">
+			<div class="flex flex-col gap-3">
+				<div
+					v-for="i in 2"
+					:key="`application-skeleton-${i}`"
+					class="overflow-hidden rounded-2xl border border-solid border-surface-4 bg-surface-3"
+				>
+					<div
+						class="flex flex-wrap items-center gap-3 border-0 border-b border-solid border-surface-4 p-4"
+					>
+						<div class="size-12 shrink-0 animate-pulse rounded-xl bg-surface-4" />
+						<div class="flex min-w-0 flex-1 flex-col gap-2">
+							<div class="h-4 w-36 animate-pulse rounded-lg bg-surface-4" />
+							<div class="h-3 w-48 animate-pulse rounded-lg bg-surface-4" />
+						</div>
+						<div class="flex gap-2">
+							<div class="h-9 w-20 animate-pulse rounded-xl bg-surface-4" />
+							<div class="h-9 w-24 animate-pulse rounded-xl bg-surface-4" />
 						</div>
 					</div>
-				</div>
-				<div>
-					<label for="token-information">
-						<span class="label__title">{{ formatMessage(messages.aboutLabel) }}</span>
-					</label>
-					<div class="token-content">
-						<div>
-							{{ formatMessage(messages.clientId) }}
-							<CopyCode :text="app.id" />
-						</div>
-						<div v-if="!!clientCreatedInState(app.id)">
-							<div>
-								{{ formatMessage(messages.clientSecret) }}
-								<CopyCode :text="clientCreatedInState(app.id)?.client_secret" />
-							</div>
-							<div class="secret_disclaimer">
-								<i>{{ formatMessage(messages.secretDisclaimer) }}</i>
-							</div>
+					<div class="bg-surface-2 p-4">
+						<div class="mb-3 h-3 w-24 animate-pulse rounded-lg bg-surface-3" />
+						<div class="mb-4 h-8 w-56 max-w-full animate-pulse rounded-lg bg-surface-3" />
+						<div class="mb-3 h-3 w-28 animate-pulse rounded-lg bg-surface-3" />
+						<div class="grid gap-2 sm:grid-cols-2">
+							<div
+								v-for="j in 4"
+								:key="`application-skeleton-${i}-scope-${j}`"
+								class="h-4 w-full animate-pulse rounded-lg bg-surface-3"
+							/>
 						</div>
 					</div>
 				</div>
 			</div>
-			<div class="input-group">
-				<Button
-					@click="
-						() => {
-							setForm({
-								...app,
-								redirect_uris: app.redirect_uris.map((u) => u.uri) || [],
-							})
-							$refs.appModal.show()
-						}
-					"
+		</template>
+		<EmptyState
+			v-else-if="!usersApps?.length"
+			type="empty"
+			:heading="formatMessage(messages.emptyStateHeading)"
+			:description="formatMessage(messages.emptyStateDescription)"
+		/>
+		<div v-else class="flex flex-col gap-3">
+			<div
+				v-for="app in usersApps"
+				:key="app.id"
+				class="rounded-2xl border border-solid border-surface-4 bg-surface-3"
+			>
+				<div
+					class="flex flex-wrap items-start justify-between gap-3 border-0 border-b border-solid border-surface-4 p-4"
 				>
-					<EditIcon />
-					{{ formatMessage(commonMessages.editButton) }}
-				</Button>
-				<Button
-					type="colored"
-					color="red"
-					@click="
-						() => {
-							editingId = app.id
-							$refs.modal_confirm.show()
-						}
-					"
-				>
-					<TrashIcon />
-					{{ formatMessage(messages.delete) }}
-				</Button>
+					<div class="flex min-w-0 flex-1 items-center gap-3">
+						<Avatar :src="app.icon_url" :raw-src="app.raw_icon_url" size="48px" no-shadow />
+						<div class="flex min-w-0 flex-col gap-0.5">
+							<h2 class="m-0 break-words text-base font-semibold">{{ app.name }}</h2>
+							<PageHeaderMetadata>
+								<PageHeaderMetadataItem :tooltip="formatDateTime(app.created)">
+									{{
+										formatMessage(messages.createdOn, {
+											date: formatDate(new Date(app.created)),
+										})
+									}}
+								</PageHeaderMetadataItem>
+								<PageHeaderMetadataItem v-if="app.url">
+									<a
+										class="max-w-64 truncate text-link hover:underline"
+										:href="app.url"
+										target="_blank"
+										rel="noopener noreferrer"
+									>
+										{{ app.url }}
+									</a>
+								</PageHeaderMetadataItem>
+							</PageHeaderMetadata>
+						</div>
+					</div>
+					<div class="flex shrink-0 flex-wrap gap-2">
+						<Button @click="openEditApp(app)">
+							<EditIcon />
+							{{ formatMessage(commonMessages.editButton) }}
+						</Button>
+						<Button type="colored" color="red" @click="confirmDeleteApp(app.id)">
+							<TrashIcon />
+							{{ formatMessage(messages.delete) }}
+						</Button>
+					</div>
+				</div>
+				<div class="flex flex-col gap-4 rounded-b-2xl bg-surface-2 p-4">
+					<div v-if="app.description">
+						<label :for="`app-about-${app.id}`" class="mb-1 flex font-semibold text-contrast">
+							{{ formatMessage(messages.aboutLabel) }}
+						</label>
+						<div :id="`app-about-${app.id}`">{{ app.description }}</div>
+					</div>
+					<div>
+						<label :for="`app-client-id-${app.id}`" class="mb-1 flex font-semibold text-contrast">
+							{{ formatMessage(messages.clientId) }}
+						</label>
+						<div :id="`app-client-id-${app.id}`" class="max-w-full overflow-x-auto">
+							<CopyCode :text="app.id" />
+						</div>
+					</div>
+					<div v-if="clientCreatedInState(app.id)">
+						<label
+							:for="`app-client-secret-${app.id}`"
+							class="mb-1 flex font-semibold text-contrast"
+						>
+							{{ formatMessage(messages.clientSecret) }}
+						</label>
+						<div :id="`app-client-secret-${app.id}`" class="max-w-full overflow-x-auto">
+							<CopyCode :text="clientCreatedInState(app.id)?.client_secret" />
+						</div>
+						<p class="mb-0 mt-2 text-sm text-orange">
+							{{ formatMessage(messages.secretDisclaimer) }}
+						</p>
+					</div>
+					<div>
+						<label :for="`app-scopes-${app.id}`" class="mb-1 flex font-semibold text-contrast">
+							{{ formatMessage(commonMessages.scopesLabel) }}
+						</label>
+						<p
+							v-if="appScopes(app).length === 0"
+							:id="`app-scopes-${app.id}`"
+							class="m-0 text-secondary"
+						>
+							{{ formatMessage(messages.noScopes) }}
+						</p>
+						<div v-else :id="`app-scopes-${app.id}`" class="grid gap-1 sm:grid-cols-2">
+							<div
+								v-for="(scope, index) in appScopes(app)"
+								:key="`${app.id}-scope-${index}`"
+								class="flex items-center gap-1"
+							>
+								<CheckIcon class="size-5 shrink-0 text-green" />
+								{{ scope }}
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
 </template>
 <script setup>
-import { EditIcon, PlusIcon, SaveIcon, TrashIcon, UploadIcon, XIcon } from '@modrinth/assets'
+import {
+	CheckIcon,
+	EditIcon,
+	PlusIcon,
+	SaveIcon,
+	TrashIcon,
+	UploadIcon,
+	XIcon,
+} from '@modrinth/assets'
 import {
 	Avatar,
 	Button,
@@ -257,6 +327,7 @@ import {
 	ConfirmModal,
 	CopyCode,
 	defineMessages,
+	EmptyState,
 	FileButton,
 	IconButton,
 	injectModrinthClient,
@@ -265,6 +336,8 @@ import {
 	IntlFormatted,
 	NewModal,
 	normalizeChildren,
+	PageHeaderMetadata,
+	PageHeaderMetadataItem,
 	Textarea,
 	useFormatDateTime,
 	useVIntl,
@@ -284,6 +357,10 @@ const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const formatDate = useFormatDateTime()
+const formatDateTime = useFormatDateTime({
+	timeStyle: 'short',
+	dateStyle: 'long',
+})
 
 definePageMeta({
 	middleware: 'auth',
@@ -400,6 +477,18 @@ const messages = defineMessages({
 		id: 'settings.applications.button.delete',
 		defaultMessage: 'Delete',
 	},
+	emptyStateHeading: {
+		id: 'settings.applications.empty-state.heading',
+		defaultMessage: 'No applications',
+	},
+	emptyStateDescription: {
+		id: 'settings.applications.empty-state.description',
+		defaultMessage: 'Applications you create will appear here.',
+	},
+	noScopes: {
+		id: 'settings.applications.no-scopes',
+		defaultMessage: 'No scopes',
+	},
 	iconUpdatedTitle: {
 		id: 'settings.applications.notification.icon-updated.title',
 		defaultMessage: 'Icon updated',
@@ -414,7 +503,7 @@ useHead({
 	title: () => `${formatMessage(messages.headTitle)} - Modrinth`,
 })
 
-const { scopesToLabels } = useScopes()
+const { scopesToLabels, scopesToDefinitions } = useScopes()
 
 const scopeCategories = computed(() => {
 	return [
@@ -472,6 +561,7 @@ const scopeCategories = computed(() => {
 })
 
 const appModal = ref()
+const modal_confirm = ref()
 
 // Any apps created in the current state will be stored here
 // Users can copy Client Secrets and such before the page reloads
@@ -489,11 +579,40 @@ const loading = ref(false)
 
 const auth = await useAuth()
 
-const { data: usersApps, refetch: refresh } = useQuery({
+const {
+	data: usersApps,
+	isLoading,
+	refetch: refresh,
+} = useQuery({
 	queryKey: computed(() => ['user', auth.value?.user?.id, 'oauth_apps']),
 	queryFn: () => client.labrinth.oauth_internal.getUserApps(auth.value.user.id),
 	enabled: computed(() => !!auth.value?.user?.id),
 })
+
+function openCreateApp() {
+	name.value = null
+	icon.value = null
+	scopesVal.value = BigInt(0)
+	redirectUris.value = ['']
+	url.value = null
+	description.value = null
+	editingId.value = null
+	appModal.value.show()
+}
+
+function openEditApp(app) {
+	setForm(app)
+	appModal.value.show()
+}
+
+function confirmDeleteApp(id) {
+	editingId.value = id
+	modal_confirm.value.show()
+}
+
+function appScopes(app) {
+	return scopesToDefinitions(BigInt(app.max_scopes || 0))
+}
 
 const setForm = (app) => {
 	if (app?.id) {
@@ -673,12 +792,6 @@ async function removeApp() {
 }
 </script>
 <style lang="scss" scoped>
-.secret_disclaimer {
-	font-size: var(--font-size-sm);
-}
-.submit-row {
-	padding-top: var(--gap-lg);
-}
 .uri-input-list {
 	display: grid;
 	row-gap: 0.5rem;
@@ -702,57 +815,5 @@ async function removeApp() {
 	flex-direction: row;
 	align-items: center;
 	gap: var(--gap-md);
-}
-
-.token {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-start;
-	gap: var(--gap-sm);
-
-	.token-info {
-		display: flex;
-		flex-direction: column;
-		gap: var(--gap-sm);
-	}
-
-	.token-content {
-		display: grid;
-		gap: var(--gap-xs);
-	}
-
-	.token-icon {
-		display: flex;
-		align-items: flex-start;
-		gap: var(--gap-lg);
-		padding-bottom: var(--gap-sm);
-	}
-
-	.token-heading {
-		font-size: var(--font-size-lg);
-		font-weight: var(--font-weight-bold);
-		color: var(--color-gray-700);
-
-		margin-top: var(--spacing-card-md);
-		margin-bottom: var(--spacing-card-sm);
-	}
-
-	.token-title {
-		margin-bottom: var(--spacing-card-xs);
-	}
-
-	.input-group {
-		margin-left: auto;
-
-		// For the children override the padding so that y padding is --gap-sm and x padding is --gap-lg
-		// Knossos global styling breaks everything
-		> * {
-			padding: var(--gap-sm) var(--gap-lg);
-		}
-	}
-
-	@media screen and (min-width: 800px) {
-		flex-direction: row;
-	}
 }
 </style>

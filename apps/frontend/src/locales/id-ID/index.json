@@ -3068,15 +3068,6 @@
   "settings.pats.modal.create.title": {
     "message": "Buat token akses pribadi (PAT)"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "Hapus token ini"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "Token akan terhapus selamanya (benar-benar selamanya)."
-  },
-  "settings.pats.modal.delete.title": {
-    "message": "Apakah Anda yakin ingin menghapus token ini?"
-  },
   "settings.pats.modal.edit.title": {
     "message": "Sunting token akses pribadi"
   },
@@ -3106,9 +3097,6 @@
   },
   "settings.sessions.current-session": {
     "message": "Sesi saat ini"
-  },
-  "settings.sessions.description": {
-    "message": "Berikut adalah semua perangkat yang saat ini masuk dengan akun Modrinth Anda. Anda dapat keluar dari masing-masing perangkat secara satu per satu.\n\nBila Anda melihat entri yang tidak dikenali, segera keluar dari perangkat tersebut dan ubah kata sandi akun Modrinth Anda."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Terakhir diakses {ago}"

@@ -2975,12 +2975,6 @@
   "settings.pats.modal.create.title": {
     "message": "Vytvořit osobní přístupový token"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "Vymazat tento token"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "Toto vymaže tento token navždy (jako opravdu navždy)."
-  },
   "settings.sidebar.label.developer": {
     "message": "Vývojář"
   },

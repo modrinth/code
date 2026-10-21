@@ -5516,15 +5516,6 @@
   "settings.pats.modal.create.title": {
     "message": "Создание личного токена доступа"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "Удалить этот токен"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "Токен будет удалён навсегда (буквально навсегда)."
-  },
-  "settings.pats.modal.delete.title": {
-    "message": "Вы точно хотите удалить этот токен?"
-  },
   "settings.pats.modal.edit.title": {
     "message": "Настройка личного токена доступа"
   },
@@ -5554,9 +5545,6 @@
   },
   "settings.sessions.current-session": {
     "message": "Текущий сеанс"
-  },
-  "settings.sessions.description": {
-    "message": "Ниже показаны устройства, использующие ваш аккаунт Modrinth. Сеансом каждого из них можно управлять по отдельности.\n\nЕсли в списке есть незнакомое устройство, немедленно завершите его сеанс и смените пароль от аккаунта."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Активность {ago}"
