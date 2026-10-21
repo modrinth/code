@@ -47,7 +47,7 @@ pub(crate) async fn discard_modpack_servers(
     instance_id: &str,
     state: &State,
 ) -> crate::Result<()> {
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
         .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;

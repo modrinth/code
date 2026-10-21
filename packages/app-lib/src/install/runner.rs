@@ -1268,7 +1268,7 @@ async fn run_request(
                     finalize_shared_instance_attachment(
                         &instance_id,
                         &data,
-                        &state.pool,
+                        state,
                     )
                     .await?;
                     emit_instance(&instance_id, InstancePayloadType::Edited)
@@ -1558,7 +1558,7 @@ async fn run_request(
                     finalize_shared_instance_attachment(
                         &instance_id,
                         &data,
-                        &state.pool,
+                        state,
                     )
                     .await?;
                     emit_instance(&instance_id, InstancePayloadType::Edited)

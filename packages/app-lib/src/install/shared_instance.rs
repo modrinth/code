@@ -89,7 +89,7 @@ pub(super) async fn linked_server_icon(
 pub(super) async fn finalize_shared_instance_attachment(
     instance_id: &str,
     data: &SharedInstanceInstallData,
-    pool: &SqlitePool,
+    state: &State,
 ) -> crate::Result<()> {
     if let Some(server) = &data.linked_server {
         let icon = linked_server_icon(data, state).await?;
@@ -126,7 +126,7 @@ pub(super) async fn finalize_shared_instance_attachment(
             applied_version: Some(data.version),
             latest_version: Some(data.version),
         },
-        pool,
+        &state.pool,
     )
     .await
 }
