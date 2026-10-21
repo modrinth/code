@@ -399,7 +399,7 @@ const effectiveTriggerEl = computed(() => {
 })
 const outsideClickIgnoreTargets = computed(() => [
 	effectiveTriggerEl,
-	dropdownRef,
+	containerRef,
 	...props.outsideClickIgnore,
 ])
 
@@ -1050,7 +1050,7 @@ function startPositionTracking() {
 	listenerWindow.addEventListener('beforeunload', handleWindowClose)
 	listenerWindow.visualViewport?.addEventListener('scroll', handleViewportChange)
 	listenerWindow.visualViewport?.addEventListener('resize', handleViewportChange)
-	stopOutsideClick = onClickOutside(containerRef, () => closeDropdown(false), {
+	stopOutsideClick = onClickOutside(dropdownRef, () => closeDropdown(false), {
 		window: listenerWindow,
 		ignore: outsideClickIgnoreTargets,
 	})
