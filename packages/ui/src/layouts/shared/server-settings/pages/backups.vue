@@ -52,7 +52,7 @@
 					<Slider
 						v-model="manualSlots"
 						:min="0"
-						:max="options.limit"
+						:max="slotLimit"
 						:step="1"
 						:snap-points="manualSlotSnapPoints"
 						:snap-range="1"
@@ -60,7 +60,7 @@
 						:aria-label="formatMessage(messages.manualSlotsTitle)"
 					/>
 					<p class="m-0">
-						{{ formatMessage(messages.manualSlotsDescription, { limit: options.limit }) }}
+						{{ formatMessage(messages.manualSlotsDescription, { limit: slotLimit }) }}
 					</p>
 				</div>
 			</div>
@@ -101,6 +101,7 @@ import {
 } from '#ui/providers'
 
 const DEFAULT_AUTO_SLOTS = 5
+const MAX_BACKUP_SLOTS = 15
 
 const messages = defineMessages({
 	autoTitle: {
@@ -155,14 +156,15 @@ const intervalOptions = computed(() => {
 	return [...BACKUP_INTERVAL_PRESETS, saved].sort((a, b) => a - b)
 })
 
-const manualSlotSnapPoints = computed(() => {
-	const limit = options.value?.limit ?? 0
-	return Array.from({ length: Math.floor(limit / 5) }, (_, index) => (index + 1) * 5)
-})
+const slotLimit = computed(() => Math.min(options.value?.limit ?? 0, MAX_BACKUP_SLOTS))
+
+const manualSlotSnapPoints = computed(() =>
+	Array.from({ length: Math.floor(slotLimit.value / 5) }, (_, index) => (index + 1) * 5),
+)
 
 const pendingPatch = computed<Archon.BackupsQueue.v1.PatchWorldBackupOptions | null>(() => {
 	if (!options.value) return null
-	const { limit } = options.value
+	const limit = slotLimit.value
 	return autoEnabled.value
 		? {
 				split_automatic: limit - manualSlots.value,
@@ -186,7 +188,7 @@ function syncForm() {
 	if (!options.value) return
 	autoEnabled.value = options.value.split_automatic > 0
 	interval.value = options.value.interval
-	manualSlots.value = options.value.split_manual
+	manualSlots.value = Math.min(options.value.split_manual, slotLimit.value)
 }
 
 watch(
@@ -198,7 +200,7 @@ watch(
 )
 
 watch(autoEnabled, (enabled) => {
-	const limit = options.value?.limit ?? 0
+	const limit = slotLimit.value
 	if (enabled && manualSlots.value >= limit) {
 		manualSlots.value = Math.max(limit - DEFAULT_AUTO_SLOTS, 0)
 	}
