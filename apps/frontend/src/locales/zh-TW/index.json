@@ -4571,29 +4571,17 @@
   "report.not-for.dmca.description": {
     "message": "請參閱我們的《<policy-link>著作權政策</policy-link>》。"
   },
-  "report.note.ai-images.1": {
-    "message": "我們剛更新了內容規範，禁止在圖示、圖庫及描述中使用 AI 生成的圖片。在我們開始受理這類檢舉之前，我們將給予創作者一段寬限期，以便他們從專案中移除 AI 生成的圖片。"
-  },
-  "report.note.check-back-later": {
-    "message": "請在寬限期結束後再回來查看。目前暫不受理這類檢舉。"
-  },
   "report.note.copyright.1": {
     "message": "請注意，這「不是」DMCA 下架要求，而是針對重新上傳內容進行檢舉。"
   },
   "report.note.copyright.2": {
     "message": "如果你原本打算提交 DMCA 下架要求（此為法律行動），則請參閱我們的《<copyright-policy-link>著作權政策</copyright-policy-link>》。"
   },
-  "report.note.fully-ai-generated.1": {
-    "message": "我們剛更新了內容規範，禁止完全由 AI 生成的作品。在我們開始受理這類檢舉之前，我們將給予創作者一段寬限期，以便他們更新或下架完全由 AI 生成的專案。"
-  },
   "report.note.malicious.1": {
     "message": "針對惡意或欺騙性內容的檢舉，必須附上該行為的實質證據，例如程式碼樣本。"
   },
   "report.note.malicious.2": {
     "message": "Microsoft Defender、VirusTotal 或 AI 惡意軟體偵測的摘要，不構成充分證據，且將不予採納。"
-  },
-  "report.note.missing-disclosure.1": {
-    "message": "內容揭露資訊是我們剛新增的功能。在我們開始受理缺少或不正確揭露資訊的檢舉之前，我們將給予創作者一段寬限期，以便他們將揭露資訊更新至最新狀態。"
   },
   "report.please-report": {
     "message": "請檢舉："

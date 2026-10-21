@@ -4571,29 +4571,17 @@
   "report.not-for.dmca.description": {
     "message": "Veja a nossa <policy-link>Política de direitos autorais</policy-link>."
   },
-  "report.note.ai-images.1": {
-    "message": "Acabamos de atualizar nossas regras sobre o uso proibido de IA generativa em ícones, galerias e descrições. Estamos dando aos criadores um período para remover esses conteúdos de seus projetos antes de começar a aceitar relatórios."
-  },
-  "report.note.check-back-later": {
-    "message": "Verifique novamente mais tarde quando o período de invencibilidade terminar. Não aceitamos relatórios deste tipo no momento."
-  },
   "report.note.copyright.1": {
     "message": "Tenha em mente que você *não* está enviando uma solicitação de remoção de DMCA, mas sim uma denúncia de conteúdo republicado."
   },
   "report.note.copyright.2": {
     "message": "Se você pretendia registrar uma solicitação de remoção de DMCA (que é uma ação legal), consulte nossa <copyright-policy-link>Política de direitos autorais</copyright-policy-link>."
   },
-  "report.note.fully-ai-generated.1": {
-    "message": "Acabamos de atualizar nossas regras para projetos gerados por IA proibida. Estamos dando aos criadores um período para atualizar ou derrubar projetos totalmente gerados por IA antes de começar a aceitar relatórios para eles."
-  },
   "report.note.malicious.1": {
     "message": "As denúncias de conteúdo malicioso ou enganoso devem incluir evidências substanciais do comportamento, como exemplos de código."
   },
   "report.note.malicious.2": {
     "message": "Resumos do Microsoft Defender, VirusTotal ou detecção de malware por IA não são formas suficientes de evidência e não serão aceitos."
-  },
-  "report.note.missing-disclosure.1": {
-    "message": "Os avisos de conteúdos são um recurso novo que acabamos de adicionar. Estamos dando aos criadores um período para que seus avisos de conteúdo estejam atualizadas antes de começar a aceitar relatórios por avisos ausentes ou incorretos."
   },
   "report.please-report": {
     "message": "Denuncie apenas:"

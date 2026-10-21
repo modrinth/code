@@ -3971,9 +3971,6 @@
   "report.not-for.dmca.description": {
     "message": "Se våran <policy-link>Upphovsrättspolicy</policy-link>."
   },
-  "report.note.missing-disclosure.1": {
-    "message": "Innehållsupplysningar är en ny funktion vi nyligen har lagt till. Vi ger skaparna tid att få deras upplysningar aktuella innan vi börjar godkänna anmälningar för saknade eller felaktiga upplysningar."
-  },
   "report.please-report": {
     "message": "Vänligen rapportera:"
   },

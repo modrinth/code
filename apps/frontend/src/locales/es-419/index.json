@@ -4568,29 +4568,17 @@
   "report.not-for.dmca.description": {
     "message": "Consulta nuestra <policy-link>Política de derechos de autor</policy-link>."
   },
-  "report.note.ai-images.1": {
-    "message": "Acabamos de actualizar nuestras reglas para prohibir imágenes generadas por AIs en iconos, galerías y descripciones. Estamos dando a los creadores un período de gracia para eliminar imágenes hechas con IA de sus proyectos antes de empezar a aceptar reportes sobre ello."
-  },
-  "report.note.check-back-later": {
-    "message": "Vuelve a comprobar más tarde una vez finalizado el período de gracia. Los reportes de este tipo no están siendo aceptados en este momento."
-  },
   "report.note.copyright.1": {
     "message": "Ten en cuenta que *no* estás enviando una solicitud de retirada DMCA, sino reportando contenido re-subido."
   },
   "report.note.copyright.2": {
     "message": "Si lo que querías era presentar una solicitud de retirada DMCA (que es una acción legal), consulta nuestra <copyright-policy-link>Política de derechos de autor</copyright-policy-link>."
   },
-  "report.note.fully-ai-generated.1": {
-    "message": "Acabamos de actualizar nuestras reglas para prohibir proyectos totalmente generados por AI. Estamos dando a los creadores un período de gracia para actualizar o eliminar completamente los proyectos generados por AIs antes de empezar a aceptar reportes sobre ello."
-  },
   "report.note.malicious.1": {
     "message": "Los reportes de contenido malicioso o engañoso deben incluir evidencia sustancial de este comportamiento, como muestras de código."
   },
   "report.note.malicious.2": {
     "message": "Los resúmenes de Microsoft Defender, VirusTotal o la detección de malware por IA no son pruebas suficientes y no serán aceptados."
-  },
-  "report.note.missing-disclosure.1": {
-    "message": "Las divulgaciones de contenido son una nueva característica que acabamos de añadir. Estamos dando a los creadores un período de gracia para que se actualicen sus divulgaciones antes de empezar a aceptar los informes de divulgaciones faltantes o incorrectas."
   },
   "report.please-report": {
     "message": "Por favor, informa:"

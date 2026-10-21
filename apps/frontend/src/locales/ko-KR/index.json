@@ -4352,29 +4352,17 @@
   "report.not-for.dmca.description": {
     "message": "우리의 <policy-link>저작권 정책</policy-link>을 참조하세요."
   },
-  "report.note.ai-images.1": {
-    "message": "아이콘, 갤러리 및 설명에 AI로 생성된 이미지를 사용하지 못하도록 규정을 최근 변경했습니다. 신고 접수를 시작하기 전에 제작자가 프로젝트에서 AI 이미지를 삭제할 수 있도록 유예 기간을 제공하고 있습니다."
-  },
-  "report.note.check-back-later": {
-    "message": "유예 기간이 종료된 후 다시 확인해 주세요. 현재는 이러한 신고를 접수하지 않습니다."
-  },
   "report.note.copyright.1": {
     "message": "이것은 DMCA 삭제 요청이 아닌 재업로드된 콘텐츠에 대한 신고임을 유의해주시기 바랍니다."
   },
   "report.note.copyright.2": {
     "message": "DMCA 삭제 요청(법적 조치)을 하려는 경우, 대신 저희의 <copyright-policy-link>저작권 정책</copyright-policy-link>을 참조해주시기 바랍니다."
   },
-  "report.note.fully-ai-generated.1": {
-    "message": "완전히 AI로 생성한 프로젝트를 업로드하지 못하도록 규정을 최근 변경했습니다. 신고 접수를 시작하기 전에 제작자가 프로젝트에서 완전히 AI로 생성한 프로젝트를 업데이트하거나 삭제 수 있도록 유예 기간을 제공하고 있습니다."
-  },
   "report.note.malicious.1": {
     "message": "악성 또는 기만적인 콘텐츠에 대한 신고에는 코드 샘플과 같은 행위에 대한 실질적 증거가 포함되어야 합니다."
   },
   "report.note.malicious.2": {
     "message": "마이크로소프트 디펜더, VirusTotal 또는 인공지능 멀웨어 탐지의 요약은 충분한 증거가 아니므로 허용되지 않습니다."
-  },
-  "report.note.missing-disclosure.1": {
-    "message": "콘텐츠 고지 사항은 최근에 추가된 기능입니다. 누락되었거나 부정확한 고지 사항에 대한 신고 접수를 시작하기 전에 제작자가 고지 사항을 작성할 수 있도록 유예 기간을 제공하고 있습니다."
   },
   "report.please-report": {
     "message": "해당 상황에서 신고하세요:"
