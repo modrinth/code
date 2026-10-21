@@ -72,6 +72,7 @@ image = { workspace = true, features = [
 ] }
 itertools = { workspace = true }
 json-patch = { workspace = true }
+jxl-oxide = { workspace = true }
 lettre = { workspace = true }
 lingua = { workspace = true }
 linkify = { workspace = true }

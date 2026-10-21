@@ -112,7 +112,7 @@
 							<FileButton
 								id="project-icon"
 								:max-size="524288"
-								accept="image/png,image/jpeg,image/gif,image/webp"
+								accept="image/png,image/jpeg,image/gif,image/webp,image/jxl"
 								class="button-like choose-image"
 								prompt="Upload icon"
 								aria-label="Upload icon"
@@ -176,7 +176,7 @@
 								<ImageIcon v-else aria-hidden="true" class="h-8 w-8 text-secondary" />
 								<input
 									type="file"
-									accept="image/png,image/jpeg,image/gif,image/webp"
+									accept="image/png,image/jpeg,image/gif,image/webp,image/jxl"
 									class="hidden"
 									:disabled="!hasPermission"
 									@change="
@@ -200,7 +200,7 @@
 						<div class="mt-2 flex items-center gap-2">
 							<FileButton
 								:max-size="524288"
-								accept="image/png,image/jpeg,image/gif,image/webp"
+								accept="image/png,image/jpeg,image/gif,image/webp,image/jxl"
 								class="button-like"
 								prompt="Upload banner"
 								:disabled="!hasPermission"

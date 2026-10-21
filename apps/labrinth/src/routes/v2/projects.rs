@@ -1041,6 +1041,7 @@ pub struct Extension {
         content(
             ("image/png"),
             ("image/jpeg"),
+            ("image/jxl"),
             ("image/bmp"),
             ("image/gif"),
             ("image/webp"),
@@ -1179,6 +1180,7 @@ pub struct GalleryCreateQuery {
         content(
             ("image/png"),
             ("image/jpeg"),
+            ("image/jxl"),
             ("image/bmp"),
             ("image/gif"),
             ("image/webp"),

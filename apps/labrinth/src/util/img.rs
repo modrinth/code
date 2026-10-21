@@ -11,14 +11,29 @@ use hex::ToHex;
 use image::imageops::FilterType;
 use image::{
     DynamicImage, EncodableLayout, GenericImageView, ImageError, ImageFormat,
+    ImageReader,
 };
 use sha1::Digest;
 use std::io::Cursor;
+use std::sync::Once;
 use webp::Encoder;
 use xredis::RedisPool;
 
+/// Decodes an image of any supported format, including JPEG XL, which isn't
+/// built into the `image` crate.
+fn load_image(data: &[u8]) -> Result<DynamicImage, ImageError> {
+    static REGISTER_JXL_HOOK: Once = Once::new();
+    REGISTER_JXL_HOOK.call_once(|| {
+        jxl_oxide::integration::register_image_decoding_hook();
+    });
+
+    ImageReader::new(Cursor::new(data))
+        .with_guessed_format()?
+        .decode()
+}
+
 pub fn get_color_from_img(data: &[u8]) -> Result<Option<u32>, ImageError> {
-    let image = image::load_from_memory(data)?
+    let image = load_image(data)?
         .resize(256, 256, FilterType::Nearest)
         .crop_imm(128, 128, 64, 64);
     let color = color_thief::get_palette(
@@ -60,6 +75,16 @@ pub async fn upload_image_optimized(
             format!("invalid format for image: {file_extension}")
         })?;
 
+    // Not all clients can read JPEG XL, so it's only accepted as an upload
+    // format and stored as lossless WebP
+    let (bytes, content_type, file_extension) = if content_type == "image/jxl" {
+        let webp = convert_to_lossless_webp(&bytes)
+            .wrap_request_err("converting JPEG XL image to WebP")?;
+        (webp, "image/webp", "webp")
+    } else {
+        (bytes, content_type, file_extension)
+    };
+
     let cdn_url = &ENV.CDN_URL;
 
     let hash = sha1::Sha1::digest(&bytes).encode_hex::<String>();
@@ -75,10 +100,14 @@ pub async fn upload_image_optimized(
 
     // Only upload the processed image if it's smaller than the original
     let processed_upload_data = if processed_image.len() < bytes.len() {
+        let processed_content_type =
+            crate::util::ext::get_image_content_type(&processed_image_ext)
+                .unwrap_or(content_type);
+
         Some(
             file_host
                 .upload_file(
-                    content_type,
+                    processed_content_type,
                     &format!(
                         "{}/{}_{}.{}",
                         upload_folder,
@@ -134,8 +163,8 @@ fn process_image(
         return Ok((image_bytes, "gif".to_string()));
     }
 
-    let mut img = image::load_from_memory(&image_bytes)
-        .wrap_err("loading image from memory")?;
+    let mut img =
+        load_image(&image_bytes).wrap_err("loading image from memory")?;
 
     let webp_bytes = convert_to_webp(&img).wrap_err("converting to WebP")?;
     img = image::load_from_memory(&webp_bytes)
@@ -168,6 +197,17 @@ fn process_image(
         .wrap_err("writing image")?;
 
     Ok((bytes::Bytes::from(output), "webp".to_string()))
+}
+
+fn convert_to_lossless_webp(image_bytes: &[u8]) -> Result<bytes::Bytes> {
+    let img = load_image(image_bytes).wrap_err("loading image from memory")?;
+
+    let mut output = Vec::new();
+    DynamicImage::ImageRgba8(img.to_rgba8())
+        .write_to(&mut Cursor::new(&mut output), ImageFormat::WebP)
+        .wrap_err("writing image")?;
+
+    Ok(bytes::Bytes::from(output))
 }
 
 fn convert_to_webp(img: &DynamicImage) -> Result<Vec<u8>> {

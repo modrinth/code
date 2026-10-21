@@ -11,7 +11,7 @@
 			<div class="flex flex-col gap-2">
 				<FileButton
 					:max-size="524288"
-					accept="image/png,image/jpeg,image/gif,image/webp"
+					accept="image/png,image/jpeg,image/gif,image/webp,image/jxl"
 					:prompt="formatMessage(messages.uploadIcon)"
 					:aria-label="formatMessage(messages.uploadIcon)"
 					:disabled="saving"

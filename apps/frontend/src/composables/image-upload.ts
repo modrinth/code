@@ -9,10 +9,10 @@ interface ImageUploadResponse {
 }
 
 export const useImageUpload = async (file: File, ctx: ImageUploadContext) => {
-	// Make sure file is of type image/png, image/jpeg, image/gif, or image/webp
+	// Make sure file is of type image/png, image/jpeg, image/gif, image/webp, or image/jxl
 	if (
 		!file.type.startsWith('image/') ||
-		!['png', 'jpeg', 'gif', 'webp'].includes(file.type.split('/')[1])
+		!['png', 'jpeg', 'gif', 'webp', 'jxl'].includes(file.type.split('/')[1])
 	) {
 		throw new Error('File is not an accepted image type')
 	}

@@ -420,6 +420,7 @@ async function onImageUpload(file: File) {
 	const imageExtensionByType: Partial<Record<string, Labrinth.Images.v3.ImageExtension>> = {
 		'image/gif': 'gif',
 		'image/jpeg': 'jpeg',
+		'image/jxl': 'jxl',
 		'image/png': 'png',
 		'image/webp': 'webp',
 	}

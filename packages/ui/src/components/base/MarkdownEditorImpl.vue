@@ -103,7 +103,7 @@
 				class="btn-input-alternative"
 			>
 				<FileInput
-					accept="image/png,image/jpeg,image/gif,image/webp"
+					accept="image/png,image/jpeg,image/gif,image/webp,image/jxl"
 					:prompt="formatMessage(messages.imageModalUploadPrompt)"
 					long-style
 					should-always-reset

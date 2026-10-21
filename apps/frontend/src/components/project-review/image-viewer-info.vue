@@ -46,6 +46,7 @@ const format = computed(() => {
 	const mime = props.metadata?.mimeType.toLowerCase().split(';')[0]?.trim() ?? ''
 	const formats: Record<string, string> = {
 		'image/jpeg': 'JPEG',
+		'image/jxl': 'JPEG XL',
 		'image/png': 'PNG',
 		'image/gif': 'GIF',
 		'image/webp': 'WebP',
