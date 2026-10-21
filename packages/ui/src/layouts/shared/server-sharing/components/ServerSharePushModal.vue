@@ -11,7 +11,6 @@
 		:changes-error="error"
 		:files-loading="filesQuery.isFetching.value && !filesQuery.data.value"
 		:files-error="filesQuery.isError.value"
-		:files-truncated="filesQuery.data.value?.truncated"
 		@confirm="confirm"
 		@cancel="cancel"
 		@retry-changes="emit('retry')"

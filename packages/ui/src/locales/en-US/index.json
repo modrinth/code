@@ -2834,9 +2834,6 @@
   "instance.shared-instance.publish-review.files-tab": {
     "defaultMessage": "Files"
   },
-  "instance.shared-instance.publish-review.files-truncated": {
-    "defaultMessage": "Only the first {count, number} files are shown."
-  },
   "instance.shared-instance.publish-review.header": {
     "defaultMessage": "Push update"
   },

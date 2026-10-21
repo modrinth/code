@@ -18,6 +18,8 @@
 						class="shrink-0 !border"
 						:disabled="pushUpdateDisabled || pushUpdatePending"
 						@click="emit('push-update', $event)"
+						@mouseenter="emit('push-update-hover')"
+						@focus="emit('push-update-hover')"
 					>
 						<SpinnerIcon v-if="pushUpdatePending" class="animate-spin" aria-hidden="true" />
 						<UploadIcon v-else aria-hidden="true" />
@@ -190,6 +192,7 @@ const props = withDefaults(
 const emit = defineEmits<{
 	remove: [row: InvitedPlayerRow]
 	'push-update': [event: MouseEvent]
+	'push-update-hover': []
 	invite: [event: MouseEvent]
 }>()
 const usernameRefs = ref<Record<string, HTMLElement | null>>({})

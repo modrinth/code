@@ -18,7 +18,7 @@ import {
 } from '#ui/providers'
 
 import type ServerSharePushModal from './components/ServerSharePushModal.vue'
-import { serverShareDiffQueryOptions } from './query-options'
+import { serverShareableFilesQueryOptions, serverShareDiffQueryOptions } from './query-options'
 
 export type ServerShareActionTarget = {
 	worldId: string
@@ -100,6 +100,15 @@ export function useServerShareReview<Action extends string = 'push'>(options?: {
 		}
 	}
 
+	/** Warms the shareable files cache so the review's file tree is ready when it opens. */
+	function prefetchFiles() {
+		if (!canSetup.value || !worldId.value) return
+		void queryClient.prefetchQuery({
+			...serverShareableFilesQueryOptions(client, serverId, worldId.value, auth.user.value?.id),
+			staleTime: 30_000,
+		})
+	}
+
 	/**
 	 * Opens the diff review for the current world. When the shared instance has no ready
 	 * version yet there is nothing to diff against, so `action` runs straight away instead.
@@ -109,6 +118,7 @@ export function useServerShareReview<Action extends string = 'push'>(options?: {
 		const target = currentTarget()
 		if (!target) return
 		previewOpen.value = true
+		prefetchFiles()
 		const result = await previewQuery.refetch()
 		if (!previewOpen.value || !target.isCurrent()) return
 		if (result.error instanceof ModrinthApiError && result.error.statusCode === 404) {
@@ -170,6 +180,7 @@ export function useServerShareReview<Action extends string = 'push'>(options?: {
 		actionMutation,
 		pending,
 		showPreview,
+		prefetchFiles,
 		publish,
 		runAction,
 	}

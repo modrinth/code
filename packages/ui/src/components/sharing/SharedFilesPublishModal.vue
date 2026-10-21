@@ -40,9 +40,6 @@
 				>
 					<Button @click="emit('retry-files')">{{ formatMessage(messages.retry) }}</Button>
 				</Admonition>
-				<p v-else-if="filesTruncated" class="m-0 text-sm text-secondary">
-					{{ formatMessage(messages.filesTruncated, { count: files.length }) }}
-				</p>
 			</template>
 		</div>
 
@@ -55,7 +52,7 @@
 		<div v-show="activeTab === 'files'">
 			<div
 				ref="fileTreeContainer"
-				class="max-h-[336px] overflow-y-auto border-0 border-y border-solid border-surface-5"
+				class="max-h-[clamp(120px,calc(100vh-470px),336px)] overflow-y-auto border-0 border-y border-solid border-surface-5"
 				:inert="disabled"
 			>
 				<FileTreeSelect
@@ -125,7 +122,6 @@ const props = defineProps<{
 	changesError?: boolean
 	filesLoading?: boolean
 	filesError?: boolean
-	filesTruncated?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -284,10 +280,6 @@ const messages = defineMessages({
 	filesError: {
 		id: 'instance.shared-instance.publish-review.files-error',
 		defaultMessage: 'Could not load the files you can share.',
-	},
-	filesTruncated: {
-		id: 'instance.shared-instance.publish-review.files-truncated',
-		defaultMessage: 'Only the first {count, number} files are shown.',
 	},
 	retry: { id: 'servers.play.retry', defaultMessage: 'Retry' },
 })

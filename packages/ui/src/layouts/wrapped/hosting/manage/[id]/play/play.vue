@@ -29,6 +29,7 @@
 				:invite-disabled="actionsLocked || !worldId"
 				:invite-pending="pendingAction === 'invite'"
 				@push-update="showPreview()"
+				@push-update-hover="shareReview.prefetchFiles()"
 				@invite="perform('invite')"
 				@remove="confirmRemove"
 			/>

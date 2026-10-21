@@ -6,7 +6,7 @@ import { Button } from '#ui/components/base/buttons'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 
 defineProps<{ disabled: boolean; publishing: boolean; reviewing: boolean }>()
-const emit = defineEmits<{ review: [] }>()
+const emit = defineEmits<{ review: []; prefetch: [] }>()
 const { formatMessage } = useVIntl()
 const messages = defineMessages({
 	unpublished: {
@@ -36,7 +36,15 @@ const messages = defineMessages({
 	<Admonition type="info" :header="formatMessage(messages.unpublished)" inline-actions>
 		{{ formatMessage(messages.unpublishedBody) }}
 		<template #actions>
-			<Button type="colored" color="blue" size="lg" :disabled="disabled" @click="emit('review')">
+			<Button
+				type="colored"
+				color="blue"
+				size="lg"
+				:disabled="disabled"
+				@click="emit('review')"
+				@mouseenter="emit('prefetch')"
+				@focus="emit('prefetch')"
+			>
 				<SpinnerIcon v-if="publishing || reviewing" class="animate-spin" aria-hidden="true" />
 				<UploadIcon v-else aria-hidden="true" />
 				{{

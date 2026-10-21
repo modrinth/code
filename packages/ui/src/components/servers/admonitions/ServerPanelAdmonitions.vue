@@ -52,6 +52,7 @@ const {
 	sharePreviews,
 	pending: sharePending,
 	showPreview,
+	prefetchFiles,
 	runAction,
 } = useServerShareReview()
 const world = computed(() =>
@@ -463,6 +464,7 @@ function onInstallationDismiss() {
 				:publishing="shareActions > 0"
 				:reviewing="sharePreviews > 0"
 				@review="showPreview"
+				@prefetch="prefetchFiles"
 			/>
 			<InstallingBanner
 				v-else-if="item.kind === 'installing'"
