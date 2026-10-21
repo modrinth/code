@@ -299,6 +299,7 @@ pub struct Extension {
         content(
             ("image/png"),
             ("image/jpeg"),
+            ("image/jxl"),
             ("image/bmp"),
             ("image/gif"),
             ("image/webp"),

@@ -316,7 +316,8 @@ const previewImage = ref<string | null>(null)
 const shouldPreventActions = ref(false)
 // Constant for accepted file types
 const MC_SERVER_BANNER_NAME = '__mc_server_banner__'
-const acceptFileTypes = 'image/png,image/jpeg,image/gif,image/webp,.png,.jpeg,.gif,.webp'
+const acceptFileTypes =
+	'image/png,image/jpeg,image/gif,image/webp,image/jxl,.png,.jpeg,.gif,.webp,.jxl'
 
 const filteredGallery = computed(
 	() => project.value.gallery?.filter((img) => img.title !== MC_SERVER_BANNER_NAME) ?? [],

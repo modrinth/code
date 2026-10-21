@@ -218,7 +218,7 @@ export function createReviewSubmission(
 	const upload = useMutation({
 		mutationFn: async ({ file, id }: { file: File; id: string }) => {
 			const ext = file.type.split('/')[1]
-			if (!['image/png', 'image/jpeg', 'image/gif', 'image/webp'].includes(file.type))
+			if (!['image/png', 'image/jpeg', 'image/gif', 'image/webp', 'image/jxl'].includes(file.type))
 				throw new Error(formatMessage(errors.imageType))
 			if (file.size > 1024 * 1024) throw new Error(formatMessage(errors.imageSize))
 			const response = await client.upload<{ id: string; url: string }>('/image', {

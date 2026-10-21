@@ -427,7 +427,7 @@ export namespace Labrinth {
 	export namespace Images {
 		export namespace v3 {
 			/** Extensions accepted by POST /v3/image (Labrinth image pipeline). */
-			export type ImageExtension = 'bmp' | 'gif' | 'jpeg' | 'jpg' | 'png' | 'webp'
+			export type ImageExtension = 'bmp' | 'gif' | 'jpeg' | 'jpg' | 'jxl' | 'png' | 'webp'
 
 			/** `context` query values accepted by POST /v3/image. */
 			export type ImageUploadContext = 'project' | 'version' | 'thread_message' | 'report'

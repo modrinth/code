@@ -182,6 +182,7 @@ function extFromImageFile(file: File): Labrinth.Images.v3.ImageExtension | null 
 		'image/webp': 'webp',
 		'image/bmp': 'bmp',
 		'image/jpeg': 'jpg',
+		'image/jxl': 'jxl',
 	}
 	const mime = byMime[file.type]
 	if (mime) {
@@ -191,7 +192,7 @@ function extFromImageFile(file: File): Labrinth.Images.v3.ImageExtension | null 
 	if (ext === 'jpg' || ext === 'jpeg') {
 		return 'jpg'
 	}
-	if (ext === 'png' || ext === 'gif' || ext === 'webp' || ext === 'bmp') {
+	if (ext === 'png' || ext === 'gif' || ext === 'webp' || ext === 'bmp' || ext === 'jxl') {
 		return ext
 	}
 	return null
@@ -623,7 +624,7 @@ function cancelEditing() {
 						</div>
 						<div class="grid grid-cols-2 gap-4">
 							<FileInput
-								accept="image/png,image/jpeg,image/gif,image/webp,image/bmp"
+								accept="image/png,image/jpeg,image/gif,image/webp,image/bmp,image/jxl"
 								:prompt="formatMessage(messages.proofImagesUploadPrompt)"
 								long-style
 								should-always-reset

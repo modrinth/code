@@ -74,7 +74,7 @@
 							ref="iconInputRef"
 							:max-size="524288"
 							:show-icon="false"
-							accept="image/png,image/jpeg,image/gif,image/webp"
+							accept="image/png,image/jpeg,image/gif,image/webp,image/jxl"
 							class="hidden"
 							:aria-label="formatMessage(messages.uploadIconAriaLabel)"
 							@change="showPreviewImage"

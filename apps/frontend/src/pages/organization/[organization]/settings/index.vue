@@ -166,7 +166,7 @@ const onDeleteOrganization = useClientTry(async () => {
 					<FileButton
 						id="project-icon"
 						:max-size="524288"
-						accept="image/png,image/jpeg,image/gif,image/webp"
+						accept="image/png,image/jpeg,image/gif,image/webp,image/jxl"
 						class="button-like"
 						prompt="Upload icon"
 						:disabled="!hasPermission"

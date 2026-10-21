@@ -117,6 +117,7 @@ itertools = "0.14.0"
 jemalloc_pprof = "0.8.1"
 json-patch = { version = "4.1.0", default-features = false }
 json5 = "1.3.1"
+jxl-oxide = { version = "0.12.6", default-features = false, features = ["image", "rayon"] }
 lettre = { version = "0.11.19", default-features = false, features = [
   "aws-lc-rs",
   "builder",

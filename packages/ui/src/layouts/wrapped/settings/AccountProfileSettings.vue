@@ -57,7 +57,7 @@
 						<FileButton
 							:max-size="524288"
 							:prompt="formatMessage(commonMessages.uploadImageButton)"
-							accept="image/png,image/jpeg,image/gif,image/webp"
+							accept="image/png,image/jpeg,image/gif,image/webp,image/jxl"
 							size="md"
 							@change="showPreviewImage"
 						>
