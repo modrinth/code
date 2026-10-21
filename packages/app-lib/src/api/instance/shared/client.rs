@@ -57,6 +57,7 @@ pub(super) enum ExternalFileSource {
 pub(super) struct ExternalFileData {
     pub(super) file_name: String,
     pub(super) file_type: String,
+    pub(super) sha512: String,
 }
 
 #[derive(Clone, Debug, Deserialize)]
@@ -859,10 +860,24 @@ pub(super) async fn send_bytes_request_to_url(
         url,
         body.into(),
         Some(size),
-        file_sha512,
+        file_sha512_headers(file_sha512)?,
         state,
     )
     .await
+}
+
+pub(super) fn file_sha512_headers(
+    file_sha512: Option<&str>,
+) -> crate::Result<reqwest::header::HeaderMap> {
+    let mut headers = reqwest::header::HeaderMap::new();
+    if let Some(file_sha512) = file_sha512 {
+        headers.insert(
+            "x-file-sha512",
+            reqwest::header::HeaderValue::from_str(file_sha512)
+                .context("invalid file SHA-512")?,
+        );
+    }
+    Ok(headers)
 }
 
 pub(super) async fn send_body_request_to_url(
@@ -872,7 +887,7 @@ pub(super) async fn send_body_request_to_url(
     url: &str,
     body: reqwest::Body,
     content_length: Option<u64>,
-    file_sha512: Option<&str>,
+    headers: reqwest::header::HeaderMap,
     state: &State,
 ) -> crate::Result<reqwest::Response> {
     let service_origin = url::Url::parse(service_base_url())
@@ -906,13 +921,11 @@ pub(super) async fn send_body_request_to_url(
         .request(method.clone(), url)
         .bearer_auth(credentials.session)
         .header(reqwest::header::CONTENT_TYPE, "application/octet-stream")
+        .headers(headers)
         .body(body);
     if let Some(content_length) = content_length {
         request =
             request.header(reqwest::header::CONTENT_LENGTH, content_length);
-    }
-    if let Some(file_sha512) = file_sha512 {
-        request = request.header("x-file-sha512", file_sha512);
     }
 
     let response = request

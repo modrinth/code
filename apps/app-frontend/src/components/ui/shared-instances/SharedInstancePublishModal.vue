@@ -125,7 +125,9 @@ import {
 } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
+import { trackSharedInstancePublish } from '@/components/ui/download-manager/shared-instance-publishes'
 import {
+	getErrorMessage,
 	getSharedInstanceUnavailableReason,
 	isSharedInstanceUnavailableError,
 } from '@/helpers/install'
@@ -248,10 +250,13 @@ async function publishChanges() {
 	if (state.value !== 'reviewing' || overStorageLimit.value) return
 
 	setState('publishing')
+	const task = trackSharedInstancePublish(props.instance)
 	try {
-		await publish_shared_instance(props.instance.id, selectedFilePaths.value)
+		await publish_shared_instance(props.instance.id, selectedFilePaths.value, task.update)
+		task.succeed()
 		emit('published')
 	} catch (error) {
+		task.fail(getErrorMessage(error))
 		handlePublishError(error)
 	} finally {
 		setState('idle')

@@ -11,6 +11,7 @@ required-features = ["export-ts"]
 [dependencies]
 anyhow = { workspace = true }
 ariadne = { workspace = true }
+async-compression = { workspace = true, features = ["tokio", "zstd"] }
 async-minecraft-ping = { workspace = true, features = ["srv"] }
 async-recursion = { workspace = true }
 async-trait = { workspace = true }

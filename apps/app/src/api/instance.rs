@@ -1480,12 +1480,17 @@ pub async fn instance_share_get_publish_preview(
 pub async fn instance_share_publish(
     instance_id: &str,
     file_paths: Vec<String>,
+    on_progress: tauri::ipc::Channel<(u64, u64)>,
 ) -> Result<SharedInstanceAttachment> {
-    Ok(
-        theseus::instance::publish_shared_instance(instance_id, file_paths)
-            .await?
-            .into(),
+    Ok(theseus::instance::publish_shared_instance(
+        instance_id,
+        file_paths,
+        &|uploaded, total| {
+            let _ = on_progress.send((uploaded, total));
+        },
     )
+    .await?
+    .into())
 }
 
 #[tauri::command]

@@ -3182,6 +3182,15 @@
   "app.settings.troubleshooting.report-ad.title": {
     "message": "Report an ad"
   },
+  "app.shared-instance-publish.preparing": {
+    "message": "Preparing update…"
+  },
+  "app.shared-instance-publish.pushed": {
+    "message": "Update pushed"
+  },
+  "app.shared-instance-publish.uploading": {
+    "message": "Pushing update…"
+  },
   "app.sidebar.playing-as": {
     "message": "Playing as"
   },

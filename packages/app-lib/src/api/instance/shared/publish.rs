@@ -4,11 +4,21 @@ use super::install::*;
 use super::types::*;
 use super::*;
 use async_walkdir::{Filtering, WalkDir};
-use futures::StreamExt;
+use futures::{FutureExt, StreamExt, TryStreamExt};
 use sha2::Digest;
+use std::sync::Arc;
+use std::sync::atomic::{AtomicU64, Ordering};
+use std::time::Duration;
 
 /// Set by the shared instances backend when it rejects an upload by file type.
 const FILE_NOT_ALLOWED_HEADER: &str = "x-file-not-allowed";
+const UPLOAD_PROGRESS_INTERVAL: Duration = Duration::from_millis(200);
+const UPLOAD_CONCURRENCY: usize = 4;
+const UPLOAD_BATCH_MAX_FILES: usize = 256;
+const UPLOAD_BATCH_MIN_BYTES: u64 = 16 * 1024 * 1024;
+/// Total file size the shared instances backend accepts in one batch.
+const UPLOAD_BATCH_MAX_BYTES: u64 = 450 * 1024 * 1024;
+const UPLOAD_BATCH_ATTEMPTS: usize = 2;
 
 #[tracing::instrument]
 pub async fn unpublish_shared_instance(instance_id: &str) -> crate::Result<()> {
@@ -88,13 +98,22 @@ pub(super) async fn detach_local_shared_instance(
     Ok(())
 }
 
-#[tracing::instrument]
+/// `on_progress` receives the uploaded and total bytes of the files the
+/// shared instances service asks for.
+#[tracing::instrument(skip(on_progress))]
 pub async fn publish_shared_instance(
     instance_id: &str,
     file_paths: Vec<String>,
+    on_progress: &(dyn Fn(u64, u64) + Send + Sync),
 ) -> crate::Result<SharedInstanceAttachment> {
     let state = State::get().await?;
-    publish_shared_instance_inner(instance_id, &file_paths, &state).await?;
+    publish_shared_instance_inner(
+        instance_id,
+        &file_paths,
+        on_progress,
+        &state,
+    )
+    .await?;
     emit_instance(instance_id, InstancePayloadType::Edited).await?;
 
     shared_attachment(instance_id, &state).await?.ok_or(
@@ -585,6 +604,7 @@ pub(super) async fn set_shared_instance_publish_status(
 pub(super) async fn publish_shared_instance_inner(
     instance_id: &str,
     file_paths: &[String],
+    on_progress: &(dyn Fn(u64, u64) + Send + Sync),
     state: &State,
 ) -> crate::Result<()> {
     let attachment = shared_attachment(instance_id, state).await?.ok_or(
@@ -610,9 +630,14 @@ pub(super) async fn publish_shared_instance_inner(
     )
     .await?;
 
-    let result =
-        publish_current_content(instance_id, &attachment.id, file_paths, state)
-            .await;
+    let result = publish_current_content(
+        instance_id,
+        &attachment.id,
+        file_paths,
+        on_progress,
+        state,
+    )
+    .await;
 
     match result {
         Ok(version) => {
@@ -656,6 +681,7 @@ pub(super) async fn publish_current_content(
     instance_id: &str,
     shared_instance_id: &str,
     file_paths: &[String],
+    on_progress: &(dyn Fn(u64, u64) + Send + Sync),
     state: &State,
 ) -> crate::Result<i32> {
     let _store_lease = state.content_store.lease().await;
@@ -693,11 +719,16 @@ pub(super) async fn publish_current_content(
         external_file_count = external_files.len(),
         "Creating shared instance version"
     );
-    let external_file_data = external_files
+    let hashed_files =
+        hash_external_files(&metadata.instance.path, &external_files, state)
+            .await?;
+    // Older servers ignore `sha512` and request every file.
+    let external_file_data = hashed_files
         .iter()
         .map(|file| ExternalFileData {
             file_name: file.file_name.clone(),
             file_type: file.file_type.clone(),
+            sha512: file.sha512.clone(),
         })
         .collect::<Vec<_>>();
     let response = request_json_optional_unavailable::<InstanceVersionResponse>(
@@ -739,9 +770,11 @@ pub(super) async fn publish_current_content(
 
     if !response.external_files.is_empty() {
         upload_external_files(
-            &metadata.instance.path,
-            &external_files,
+            shared_instance_id,
+            response.version,
+            &hashed_files,
             &response.external_files,
+            on_progress,
             state,
         )
         .await?;
@@ -905,91 +938,396 @@ pub(super) fn ensure_shareable_link(link: &InstanceLink) -> crate::Result<()> {
     Ok(())
 }
 
-pub(super) async fn upload_external_files(
+/// A publish candidate with its content, size and SHA-512.
+pub(super) struct HashedExternalFile {
+    file_name: String,
+    file_type: String,
+    content: crate::state::content_store::ReadableContent,
+    size: u64,
+    sha512: String,
+}
+
+async fn hash_external_files(
     instance_path: &str,
     candidates: &[ExternalFileCandidate],
+    state: &State,
+) -> crate::Result<Vec<HashedExternalFile>> {
+    let hashes = candidates
+        .iter()
+        .map(|candidate| hash_external_file(instance_path, candidate, state))
+        .collect::<Vec<_>>();
+    futures::stream::iter(hashes)
+        .buffered(UPLOAD_CONCURRENCY)
+        .try_collect()
+        .await
+}
+
+async fn hash_external_file(
+    instance_path: &str,
+    candidate: &ExternalFileCandidate,
+    state: &State,
+) -> crate::Result<HashedExternalFile> {
+    use tokio::io::AsyncReadExt;
+
+    let content = external_file_source(instance_path, candidate, state).await?;
+    let mut file = tokio::fs::File::open(content.path()).await?;
+    let mut hasher = sha2::Sha512::new();
+    let mut buffer = vec![0_u8; 64 * 1024];
+    let mut size = 0_u64;
+    loop {
+        let read = file.read(&mut buffer).await?;
+        if read == 0 {
+            break;
+        }
+        hasher.update(&buffer[..read]);
+        size += read as u64;
+    }
+
+    Ok(HashedExternalFile {
+        file_name: candidate.file_name.clone(),
+        file_type: candidate.file_type.clone(),
+        content,
+        size,
+        sha512: format!("{:x}", hasher.finalize()),
+    })
+}
+
+pub(super) async fn upload_external_files(
+    shared_instance_id: &str,
+    version: i32,
+    files: &[HashedExternalFile],
     uploads: &[ExternalFileResponse],
+    on_progress: &(dyn Fn(u64, u64) + Send + Sync),
     state: &State,
 ) -> crate::Result<()> {
+    let mut sources = Vec::with_capacity(uploads.len());
     for upload in uploads {
-        let candidate = candidates
+        let file = files
             .iter()
-            .find(|candidate| {
-                candidate.file_name == upload.file_name
-                    && candidate.file_type == upload.file_type
+            .find(|file| {
+                file.file_name == upload.file_name
+                    && file.file_type == upload.file_type
             })
             .ok_or(crate::ErrorKind::InputError(format!(
                 "shared instance service requested unknown external file {}",
                 upload.file_name
             )))?;
-        let path = match &candidate.source {
-            ExternalFileSource::InstanceFile(file_path) => {
-                let instance = crate::state::instances::adapters::sqlite::instance_rows::get_instance_by_path(instance_path, &state.pool).await?
-					.ok_or(crate::ErrorKind::InputError("unknown instance".to_string()))?;
-                let file = crate::state::instances::adapters::sqlite::content_rows::get_instance_file_by_relative_path(&instance.id, file_path, &state.pool).await?
-					.ok_or(crate::ErrorKind::InputError("shared content file is not registered".to_string()))?;
-                state.content_store.read_path(&file, instance_path).await?
+        sources.push((upload, file));
+    }
+    sources.sort_by_key(|(_, file)| file.size);
+    let total = sources
+        .iter()
+        .fold(0_u64, |total, (_, file)| total.saturating_add(file.size));
+
+    let (single, batched): (Vec<_>, Vec<_>) = sources
+        .into_iter()
+        .partition(|(_, file)| file.size > UPLOAD_BATCH_MAX_BYTES);
+    let batch_bytes = (total / UPLOAD_CONCURRENCY as u64)
+        .clamp(UPLOAD_BATCH_MIN_BYTES, UPLOAD_BATCH_MAX_BYTES);
+    let mut batches = Vec::<Vec<&HashedExternalFile>>::new();
+    let mut current_bytes = 0_u64;
+    for (_, file) in batched {
+        match batches.last_mut() {
+            Some(batch)
+                if batch.len() < UPLOAD_BATCH_MAX_FILES
+                    && current_bytes + file.size <= batch_bytes =>
+            {
+                current_bytes += file.size;
+                batch.push(file);
             }
-            ExternalFileSource::SharedFile(path) => {
-                crate::state::content_store::ReadableContent::Local(
-                    path.clone(),
-                )
+            _ => {
+                current_bytes = file.size;
+                batches.push(vec![file]);
             }
-        };
-        let upload_url = url::Url::parse(&upload.url)
-            .context("invalid shared instance external file upload URL")?;
-        let mut file = tokio::fs::File::open(path.path()).await?;
-        let mut hasher = sha2::Sha512::new();
-        let mut buffer = vec![0_u8; 64 * 1024];
-        let mut size = 0_u64;
-        loop {
-            use tokio::io::AsyncReadExt;
-            let read = file.read(&mut buffer).await?;
-            if read == 0 {
-                break;
-            }
-            hasher.update(&buffer[..read]);
-            size += read as u64;
-        }
-        let file_sha512 = format!("{:x}", hasher.finalize());
-        use tokio::io::AsyncSeekExt;
-        file.rewind().await?;
-        let body =
-            reqwest::Body::wrap_stream(tokio_util::io::ReaderStream::new(file));
-        let response = send_body_request_to_url(
-            "upload_external_file",
-            Method::PUT,
-            upload_url.path(),
-            &upload.url,
-            body,
-            Some(size),
-            Some(&file_sha512),
-            state,
-        )
-        .await
-        .context(format!(
-            "uploading external file {} ({size} bytes, sha512 {file_sha512})",
-            upload.file_name
-        ))?;
-        if response.status() == reqwest::StatusCode::BAD_REQUEST
-            && response.headers().contains_key(FILE_NOT_ALLOWED_HEADER)
-        {
-            bail!(crate::ErrorKind::SharedInstanceFileNotAllowed(
-                upload.file_name.clone(),
-            ));
-        }
-        if !response.status().is_success() {
-            return shared_instances_request_error(
-                "upload_external_file",
-                Method::PUT,
-                upload_url.path(),
-                response,
-            )
-            .await;
         }
     }
 
+    let batch_path =
+        format!("/instances/{shared_instance_id}/versions/{version}/files");
+    let uploaded = Arc::new(AtomicU64::new(0));
+    on_progress(0, total);
+    let uploads = batches
+        .into_iter()
+        .map(|batch| {
+            upload_external_file_batch(
+                &batch_path,
+                batch,
+                uploaded.clone(),
+                state,
+            )
+            .boxed()
+        })
+        .chain(single.into_iter().map(|(upload, file)| {
+            upload_external_file(upload, file, uploaded.clone(), state).boxed()
+        }))
+        .collect::<Vec<_>>();
+    let uploads = futures::stream::iter(uploads)
+        .buffer_unordered(UPLOAD_CONCURRENCY)
+        .try_collect::<()>();
+    tokio::pin!(uploads);
+    let mut ticker = tokio::time::interval(UPLOAD_PROGRESS_INTERVAL);
+    loop {
+        tokio::select! {
+            result = &mut uploads => break result?,
+            _ = ticker.tick() => on_progress(
+                uploaded.load(Ordering::Relaxed).min(total),
+                total,
+            ),
+        }
+    }
+    on_progress(total, total);
+
     Ok(())
+}
+
+async fn upload_external_file_batch(
+    path: &str,
+    files: Vec<&HashedExternalFile>,
+    uploaded: Arc<AtomicU64>,
+    state: &State,
+) -> crate::Result<()> {
+    let url = service_url(service_base_url(), path);
+    let mut attempt = 1;
+    loop {
+        let sent = Arc::new(AtomicU64::new(0));
+        let result = send_external_file_batch(
+            path,
+            &url,
+            &files,
+            uploaded.clone(),
+            sent.clone(),
+            state,
+        )
+        .await;
+        let retry = match &result {
+            Ok(response) => response.status().is_server_error(),
+            Err(_) => true,
+        };
+        if !retry || attempt == UPLOAD_BATCH_ATTEMPTS {
+            let response = result?;
+            return handle_external_file_batch_response(path, &files, response)
+                .await;
+        }
+        uploaded.fetch_sub(sent.load(Ordering::Relaxed), Ordering::Relaxed);
+        tracing::warn!(
+            path,
+            attempt,
+            file_count = files.len(),
+            "Retrying shared instance external file batch upload"
+        );
+        attempt += 1;
+    }
+}
+
+async fn send_external_file_batch(
+    path: &str,
+    url: &str,
+    files: &[&HashedExternalFile],
+    uploaded: Arc<AtomicU64>,
+    sent: Arc<AtomicU64>,
+    state: &State,
+) -> crate::Result<reqwest::Response> {
+    use futures::stream::BoxStream;
+    use reqwest::header::{CONTENT_ENCODING, CONTENT_TYPE, HeaderValue};
+
+    let boundary = format!("modrinth-{}", uuid::Uuid::new_v4().simple());
+    let manifest = serde_json::to_vec(&json!({
+        "files": files
+            .iter()
+            .map(|file| json!({
+                "file_name": file.file_name,
+                "file_type": file.file_type,
+                "file_size": file.size,
+                "sha512": file.sha512,
+            }))
+            .collect::<Vec<_>>(),
+    }))?;
+
+    let chunk =
+        |data: Vec<u8>| -> BoxStream<'static, std::io::Result<bytes::Bytes>> {
+            futures::stream::once(futures::future::ready(Ok(data.into())))
+                .boxed()
+        };
+    let part_header = |name: &str, content_type: &str| {
+        chunk(
+            format!(
+                "--{boundary}\r\nContent-Disposition: form-data; name=\"{name}\"\r\nContent-Type: {content_type}\r\n\r\n"
+            )
+            .into_bytes(),
+        )
+    };
+
+    let mut parts = vec![
+        part_header("manifest", "application/json"),
+        chunk(manifest),
+        chunk(b"\r\n".to_vec()),
+    ];
+    for file in files {
+        let file_path = file.content.path().to_path_buf();
+        let uploaded = uploaded.clone();
+        let sent = sent.clone();
+        parts.push(part_header("file", "application/octet-stream"));
+        parts.push(
+            futures::stream::once(tokio::fs::File::open(file_path))
+                .map_ok(|reader| {
+                    tokio_util::io::ReaderStream::with_capacity(
+                        reader,
+                        64 * 1024,
+                    )
+                })
+                .try_flatten()
+                .inspect_ok(move |read| {
+                    let len = read.len() as u64;
+                    uploaded.fetch_add(len, Ordering::Relaxed);
+                    sent.fetch_add(len, Ordering::Relaxed);
+                })
+                .boxed(),
+        );
+        parts.push(chunk(b"\r\n".to_vec()));
+    }
+    parts.push(chunk(format!("--{boundary}--\r\n").into_bytes()));
+
+    let encoder = async_compression::tokio::bufread::ZstdEncoder::new(
+        tokio_util::io::StreamReader::new(
+            futures::stream::iter(parts).flatten(),
+        ),
+    );
+    let body = reqwest::Body::wrap_stream(
+        tokio_util::io::ReaderStream::with_capacity(encoder, 64 * 1024),
+    );
+
+    let mut headers = reqwest::header::HeaderMap::new();
+    headers.insert(
+        CONTENT_TYPE,
+        HeaderValue::from_str(&format!(
+            "multipart/form-data; boundary={boundary}"
+        ))
+        .context("invalid multipart boundary")?,
+    );
+    headers.insert(CONTENT_ENCODING, HeaderValue::from_static("zstd"));
+
+    let size = files.iter().map(|file| file.size).sum::<u64>();
+    send_body_request_to_url(
+        "upload_external_files",
+        Method::POST,
+        path,
+        url,
+        body,
+        None,
+        headers,
+        state,
+    )
+    .await
+    .context(format!(
+        "uploading {} external files ({size} bytes)",
+        files.len()
+    ))
+}
+
+async fn handle_external_file_batch_response(
+    path: &str,
+    files: &[&HashedExternalFile],
+    response: reqwest::Response,
+) -> crate::Result<()> {
+    if response.status() == reqwest::StatusCode::BAD_REQUEST
+        && response.headers().contains_key(FILE_NOT_ALLOWED_HEADER)
+    {
+        let message = response.text().await.unwrap_or_default();
+        let file_name = files
+            .iter()
+            .map(|file| file.file_name.as_str())
+            .filter(|file_name| message.ends_with(file_name))
+            .max_by_key(|file_name| file_name.len())
+            .map(str::to_string)
+            .unwrap_or(message);
+        bail!(crate::ErrorKind::SharedInstanceFileNotAllowed(file_name));
+    }
+    if !response.status().is_success() {
+        return shared_instances_request_error(
+            "upload_external_files",
+            Method::POST,
+            path,
+            response,
+        )
+        .await;
+    }
+
+    Ok(())
+}
+
+async fn upload_external_file(
+    upload: &ExternalFileResponse,
+    file: &HashedExternalFile,
+    uploaded: Arc<AtomicU64>,
+    state: &State,
+) -> crate::Result<()> {
+    let HashedExternalFile {
+        content,
+        size,
+        sha512: file_sha512,
+        ..
+    } = file;
+    let upload_url = url::Url::parse(&upload.url)
+        .context("invalid shared instance external file upload URL")?;
+    let reader = tokio::fs::File::open(content.path()).await?;
+    let body = reqwest::Body::wrap_stream(
+        tokio_util::io::ReaderStream::with_capacity(reader, 64 * 1024)
+            .inspect_ok(move |chunk| {
+                uploaded.fetch_add(chunk.len() as u64, Ordering::Relaxed);
+            }),
+    );
+    let response = send_body_request_to_url(
+        "upload_external_file",
+        Method::PUT,
+        upload_url.path(),
+        &upload.url,
+        body,
+        Some(*size),
+        file_sha512_headers(Some(file_sha512))?,
+        state,
+    )
+    .await
+    .context(format!(
+        "uploading external file {} ({size} bytes, sha512 {file_sha512})",
+        upload.file_name
+    ))?;
+    if response.status() == reqwest::StatusCode::BAD_REQUEST
+        && response.headers().contains_key(FILE_NOT_ALLOWED_HEADER)
+    {
+        bail!(crate::ErrorKind::SharedInstanceFileNotAllowed(
+            upload.file_name.clone(),
+        ));
+    }
+    if !response.status().is_success() {
+        return shared_instances_request_error(
+            "upload_external_file",
+            Method::PUT,
+            upload_url.path(),
+            response,
+        )
+        .await;
+    }
+
+    Ok(())
+}
+
+async fn external_file_source(
+    instance_path: &str,
+    candidate: &ExternalFileCandidate,
+    state: &State,
+) -> crate::Result<crate::state::content_store::ReadableContent> {
+    Ok(match &candidate.source {
+        ExternalFileSource::InstanceFile(file_path) => {
+            let instance = crate::state::instances::adapters::sqlite::instance_rows::get_instance_by_path(instance_path, &state.pool).await?
+				.ok_or(crate::ErrorKind::InputError("unknown instance".to_string()))?;
+            let file = crate::state::instances::adapters::sqlite::content_rows::get_instance_file_by_relative_path(&instance.id, file_path, &state.pool).await?
+				.ok_or(crate::ErrorKind::InputError("shared content file is not registered".to_string()))?;
+            state.content_store.read_path(&file, instance_path).await?
+        }
+        ExternalFileSource::SharedFile(path) => {
+            crate::state::content_store::ReadableContent::Local(path.clone())
+        }
+    })
 }
 
 pub(super) async fn shared_attachment(
@@ -1074,7 +1412,8 @@ pub(super) async fn shared_instance_for_invites(
                 shared_instance_id = %remote.id,
                 "Attached local instance as shared instance owner"
             );
-            publish_shared_instance_inner(instance_id, &[], state).await?;
+            publish_shared_instance_inner(instance_id, &[], &|_, _| {}, state)
+                .await?;
             shared_attachment(instance_id, state).await?.ok_or(
                 crate::ErrorKind::InputError(
                     "shared instance attachment was not persisted".to_string(),
