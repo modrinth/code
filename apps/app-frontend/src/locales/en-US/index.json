@@ -3182,6 +3182,15 @@
   "app.settings.troubleshooting.report-ad.title": {
     "message": "Report an ad"
   },
+  "app.shared-instance-publish.preparing": {
+    "message": "Preparing update…"
+  },
+  "app.shared-instance-publish.pushed": {
+    "message": "Update pushed"
+  },
+  "app.shared-instance-publish.uploading": {
+    "message": "Pushing update…"
+  },
   "app.sidebar.playing-as": {
     "message": "Playing as"
   },
@@ -4382,6 +4391,9 @@
   "instance.shared-instance.error.title": {
     "message": "Something has gone wrong"
   },
+  "instance.shared-instance.file-not-allowed.title": {
+    "message": "File type not allowed"
+  },
   "instance.shared-instance.network-error.text": {
     "message": "Unable to connect to shared instances API"
   },
@@ -4394,23 +4406,38 @@
   "instance.shared-instance.publish-review.added-label": {
     "message": "Added"
   },
-  "instance.shared-instance.publish-review.admonition-header": {
-    "message": "Push update to players"
+  "instance.shared-instance.publish-review.changes-description": {
+    "message": "Review the changes we've detected since your last update. These will automatically be included when you push."
   },
-  "instance.shared-instance.publish-review.config-title-v2": {
-    "message": "Select config files"
+  "instance.shared-instance.publish-review.changes-tab": {
+    "message": "Changes"
   },
-  "instance.shared-instance.publish-review.description": {
-    "message": "Review the content changes and choose any config files to include in this update."
+  "instance.shared-instance.publish-review.file-type-not-allowed": {
+    "message": "You're not allowed to push this file type."
+  },
+  "instance.shared-instance.publish-review.files-description": {
+    "message": "You can also include individual files alongside the detected changes. Select any additional files you'd like to publish."
+  },
+  "instance.shared-instance.publish-review.files-tab": {
+    "message": "Files"
   },
   "instance.shared-instance.publish-review.header": {
-    "message": "Review changes"
+    "message": "Push update"
   },
   "instance.shared-instance.publish-review.publish-button": {
     "message": "Push update"
   },
   "instance.shared-instance.publish-review.removed-label": {
     "message": "Removed"
+  },
+  "instance.shared-instance.publish-review.storage-over-limit": {
+    "message": "{size} over the limit. Deselect some files to push this update."
+  },
+  "instance.shared-instance.publish-review.storage-title": {
+    "message": "Storage allowance"
+  },
+  "instance.shared-instance.publish-review.storage-usage": {
+    "message": "{used} of {limit}"
   },
   "instance.shared-instance.tooltip": {
     "message": "This instance's content is being managed by someone else."

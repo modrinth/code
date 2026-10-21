@@ -58,17 +58,6 @@
 		<SharedInstanceMembersTable v-else-if="showMembersTable" />
 
 		<SharedInstanceShareEmptyState
-			v-else-if="sharedInstanceUnavailable"
-			:heading="formatMessage(sharedInstanceErrorMessages.unavailableTitle)"
-			:description="
-				formatSharedInstanceUnavailable(
-					sharedInstanceUnavailableReason,
-					sharedInstanceUnavailableManager,
-				)
-			"
-		/>
-
-		<SharedInstanceShareEmptyState
 			v-else-if="sharedInstanceActionsLocked"
 			:heading="formatMessage(lockedEmptyHeading)"
 		>
@@ -153,10 +142,7 @@ import {
 } from '@/helpers/install'
 import { edit } from '@/helpers/instance'
 import type { ModrinthAuthFlow } from '@/helpers/mr_auth.ts'
-import {
-	sharedInstanceErrorMessages,
-	useSharedInstanceErrors,
-} from '@/helpers/shared-instance-errors'
+import { useSharedInstanceErrors } from '@/helpers/shared-instance-errors'
 
 import { injectInstancePage } from '../instance-context'
 import { injectSharedInstance } from '../shared-instance-context'
@@ -173,15 +159,11 @@ const instancePage = injectInstancePage()
 const auth = injectAuth()
 const queryClient = useQueryClient()
 const { formatMessage } = useVIntl()
-const {
-	formatSharedInstanceUnavailable,
-	notifySharedInstanceError,
-	notifySharedInstanceUnavailable,
-} = useSharedInstanceErrors()
+const { notifySharedInstanceError, notifySharedInstanceUnavailable } = useSharedInstanceErrors()
 const sharedInstanceState = injectSharedInstance()
 const instance = computed(() => instancePage.instance.value!)
 const offline = instancePage.offline
-const actionsLocked = sharedInstanceState.shareActionsLocked
+const actionsLocked = sharedInstanceState.actionsLocked
 const sharedInstanceActionsLocked = actionsLocked
 const currentUserId = computed(() => auth.user.value?.id ?? null)
 const isSignedIn = computed(() => !!auth.session_token.value)
@@ -248,9 +230,7 @@ const lockedEmptyHeading = computed(() =>
 const lockedActionButton = computed(() =>
 	isSignedIn.value ? messages.switchAccountButton : messages.signInButton,
 )
-const sharedInstanceUnavailableReason = sharedInstanceState.unavailableReason
-const sharedInstanceUnavailable = computed(() => !!sharedInstanceUnavailableReason.value)
-const sharedInstanceUnavailableManager = sharedInstanceState.unavailableManager
+const sharedInstanceUnavailable = computed(() => !!sharedInstanceState.unavailableReason.value)
 const unableToConnect = computed(
 	() =>
 		sharedInstancesApiUnavailable.value ||

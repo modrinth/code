@@ -252,6 +252,8 @@ pub struct SharedInstanceExternalFileData {
     pub file_type: String,
     pub url: String,
     pub file_size: u64,
+    #[serde(default)]
+    pub sha1: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
