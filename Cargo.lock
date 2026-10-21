@@ -12433,6 +12433,7 @@ version = "1.0.0-local"
 dependencies = [
  "anyhow",
  "ariadne",
+ "async-compression",
  "async-minecraft-ping",
  "async-recursion",
  "async-trait",
@@ -12467,6 +12468,7 @@ dependencies = [
  "httpdate",
  "image",
  "indicatif",
+ "infer 0.22.0",
  "itertools 0.14.0",
  "json5",
  "modrinth-content-management",

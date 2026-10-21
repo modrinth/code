@@ -50,12 +50,7 @@ pub(super) struct ExternalFileCandidate {
 #[derive(Clone, Debug)]
 pub(super) enum ExternalFileSource {
     InstanceFile(String),
-    ConfigBundle(std::sync::Arc<tempfile::TempPath>),
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub(super) struct ConfigFile {
-    pub(super) path: String,
+    SharedFile(std::path::PathBuf),
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -127,6 +122,8 @@ pub(super) struct ExternalFileResponse {
     pub(super) url: String,
     #[serde(default)]
     pub(super) file_size: Option<i64>,
+    #[serde(default)]
+    pub(super) sha1: Option<String>,
 }
 
 #[derive(Clone, Debug, Deserialize)]
@@ -392,6 +389,32 @@ pub(super) async fn get_latest_remote_version_optional_unavailable_with_auth(
         auth,
     )
     .await
+}
+
+/// Returns `None` for versions that never became ready.
+pub(super) async fn get_remote_version(
+    shared_instance_id: &str,
+    version: i32,
+    state: &State,
+) -> crate::Result<Option<InstanceVersionResponse>> {
+    match request_json_optional_unavailable(
+        "get_instance_version",
+        Method::GET,
+        &format!("/instances/{shared_instance_id}/versions/{version}"),
+        None,
+        state,
+        SharedInstancesRequestAuth::ModrinthSession,
+    )
+    .await?
+    {
+        SharedInstanceRemoteResponse::Available(version) => Ok(Some(version)),
+        SharedInstanceRemoteResponse::Unavailable(
+            SharedInstanceUnavailableReason::Deleted,
+        ) => Ok(None),
+        SharedInstanceRemoteResponse::Unavailable(reason) => {
+            Err(shared_instance_unavailable_error(reason))
+        }
+    }
 }
 
 pub(super) async fn add_remote_users(
@@ -836,10 +859,24 @@ pub(super) async fn send_bytes_request_to_url(
         url,
         body.into(),
         Some(size),
-        file_sha512,
+        file_sha512_headers(file_sha512)?,
         state,
     )
     .await
+}
+
+pub(super) fn file_sha512_headers(
+    file_sha512: Option<&str>,
+) -> crate::Result<reqwest::header::HeaderMap> {
+    let mut headers = reqwest::header::HeaderMap::new();
+    if let Some(file_sha512) = file_sha512 {
+        headers.insert(
+            "x-file-sha512",
+            reqwest::header::HeaderValue::from_str(file_sha512)
+                .context("invalid file SHA-512")?,
+        );
+    }
+    Ok(headers)
 }
 
 pub(super) async fn send_body_request_to_url(
@@ -849,7 +886,7 @@ pub(super) async fn send_body_request_to_url(
     url: &str,
     body: reqwest::Body,
     content_length: Option<u64>,
-    file_sha512: Option<&str>,
+    headers: reqwest::header::HeaderMap,
     state: &State,
 ) -> crate::Result<reqwest::Response> {
     let service_origin = url::Url::parse(service_base_url())
@@ -883,13 +920,11 @@ pub(super) async fn send_body_request_to_url(
         .request(method.clone(), url)
         .bearer_auth(credentials.session)
         .header(reqwest::header::CONTENT_TYPE, "application/octet-stream")
+        .headers(headers)
         .body(body);
     if let Some(content_length) = content_length {
         request =
             request.header(reqwest::header::CONTENT_LENGTH, content_length);
-    }
-    if let Some(file_sha512) = file_sha512 {
-        request = request.header("x-file-sha512", file_sha512);
     }
 
     let response = request
