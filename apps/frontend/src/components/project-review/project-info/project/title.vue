@@ -1,18 +1,13 @@
 <template>
-	<Section :heading="formatMessage(messages.projectTitle)" :target="{ kind: 'title' }">
+	<Section heading="Title" :target="{ kind: 'title' }">
 		<template #right>
-			<EditButton
-				v-if="!editing"
-				:section="formatMessage(messages.projectTitle)"
-				:disabled="saving"
-				@click="startEditing"
-			/>
+			<EditButton v-if="!editing" section="Title" :disabled="saving" @click="startEditing" />
 		</template>
 		<div v-if="editing" class="flex flex-col gap-1.5">
 			<Input
 				ref="input"
 				v-model="draft"
-				:aria-label="formatMessage(messages.projectTitle)"
+				aria-label="Title"
 				:maxlength="64"
 				:disabled="saving"
 				wrapper-class="w-full"
@@ -21,9 +16,7 @@
 				{{ validationMessage }}
 			</p>
 			<div class="flex justify-end gap-1">
-				<Button type="quiet" size="xs" :disabled="saving" @click="resetEditing">
-					{{ formatMessage(commonMessages.cancelButton) }}
-				</Button>
+				<Button type="quiet" size="xs" :disabled="saving" @click="resetEditing"> Cancel </Button>
 				<Button
 					type="colored"
 					color="brand"
@@ -32,7 +25,7 @@
 					:disabled="saving || !valid"
 					@click="save"
 				>
-					{{ formatMessage(commonMessages.saveButton) }}
+					Save
 				</Button>
 			</div>
 		</div>
@@ -88,24 +81,20 @@
 import { RightArrowIcon } from '@modrinth/assets'
 import {
 	Button,
-	commonMessages,
 	getProjectStatusColor,
 	getProjectStatusIcon,
 	Input,
 	ProjectStatusBadge,
 	Tooltip,
-	useVIntl,
 } from '@modrinth/ui'
 import { computed, useTemplateRef } from 'vue'
 
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
-import { projectReviewMessages as messages } from '../../messages'
 import EditButton from '../edit/button.vue'
 import { useProjectTextEdit } from '../edit/use-project-text-edit'
 import Section from '../section.vue'
 
-const { formatMessage } = useVIntl()
 const { projectV2 } = injectProjectReviewPageContext()
 const input = useTemplateRef<InstanceType<typeof Input>>('input')
 const {

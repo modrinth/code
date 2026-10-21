@@ -15,9 +15,7 @@
 					:key="entry.control.id ?? 'active'"
 					size="sm"
 					:disabled="pending || disabled || entry.control.disabled"
-					:aria-label="
-						formatMessage(messages.removeOption, { option: entry.control.issueCardDisplay.label })
-					"
+					:aria-label="`Remove ${entry.control.issueCardDisplay.label}`"
 					@click="removeOption(entry)"
 				>
 					{{ entry.control.issueCardDisplay.label }}
@@ -47,7 +45,7 @@
 					<template #input-content>
 						<span class="flex items-center gap-1">
 							<PlusIcon class="size-4 shrink-0" aria-hidden="true" />
-							<span class="sr-only">{{ formatMessage(messages.addOption) }}</span>
+							<span class="sr-only">Add issue option</span>
 						</span>
 					</template>
 				</MultiSelect>
@@ -58,7 +56,7 @@
 
 <script setup lang="ts">
 import { PlusIcon, XIcon } from '@modrinth/assets'
-import { Button, defineMessages, MultiSelect, type MultiSelectItem, useVIntl } from '@modrinth/ui'
+import { Button, MultiSelect, type MultiSelectItem } from '@modrinth/ui'
 import { computed, h, ref, watch } from 'vue'
 
 import {
@@ -74,17 +72,7 @@ const props = withDefaults(defineProps<{ issue: ReviewIssue; disabled?: boolean 
 const emit = defineEmits<{ remove: [] }>()
 const panels = injectReviewPanels()
 const { pending } = injectReviewSubmission()
-const { formatMessage } = useVIntl()
-const messages = defineMessages({
-	addOption: {
-		id: 'project-review.issues.add-option',
-		defaultMessage: 'Add issue option',
-	},
-	removeOption: {
-		id: 'project-review.issues.remove-option',
-		defaultMessage: 'Remove {option}',
-	},
-})
+
 type ToggleControl = Extract<ReviewIssueControl['control'], { type: 'toggle' }>
 interface IssueCardOption extends ReviewIssueControl {
 	control: ToggleControl & {

@@ -4,7 +4,6 @@ import { Button, defineMessages, NewModal, Textarea, useVIntl } from '@modrinth/
 import { ref, useId } from 'vue'
 
 import { useModerationAppearanceTheme, useModerationSettings } from '~/composables/moderation'
-
 import { applyAppearance, exportAppearance, parseAppearance } from '~/helpers/moderation-appearance'
 
 const settings = useModerationSettings()

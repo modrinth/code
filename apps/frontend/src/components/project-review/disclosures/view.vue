@@ -3,30 +3,21 @@ import {
 	ArchiveIcon,
 	BrainCogIcon,
 	CircleDollarSignIcon,
-	EyeIcon,
 	ExternalIcon,
+	EyeIcon,
 	GitForkIcon,
 	MegaphoneIcon,
 	MonitorCogIcon,
 	RadioTowerIcon,
 	SparklesIcon,
 } from '@modrinth/assets'
-import {
-	AutoLink,
-	commonMessages,
-	defineMessages,
-	disclosureAiUsageMessages,
-	disclosureTelemetryConsentMessages,
-	formatDisclosureTypeLabel,
-	TagItem,
-	useVIntl,
-} from '@modrinth/ui'
+import { AutoLink, TagItem } from '@modrinth/ui'
 import { type Component, computed } from 'vue'
 
-import { formToDisclosures } from '~/components/ui/project-settings/disclosures/form'
 import DisclosureLockControls from '~/components/ui/project-settings/disclosures/DisclosureLockControls.vue'
-import ProjectReviewDisclosureCard from '~/components/ui/project-settings/disclosures/ProjectReviewDisclosureCard.vue'
 import DisclosureUpdatedBy from '~/components/ui/project-settings/disclosures/DisclosureUpdatedBy.vue'
+import { formToDisclosures } from '~/components/ui/project-settings/disclosures/form'
+import ProjectReviewDisclosureCard from '~/components/ui/project-settings/disclosures/ProjectReviewDisclosureCard.vue'
 import type {
 	DisclosureFormState,
 	DisclosureType,
@@ -34,66 +25,34 @@ import type {
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 import { injectReviewPanels } from '~/providers/project-review/review-panels'
 
+const aiUsageLabels = {
+	code: 'Code',
+	assets: 'Assets',
+	text: 'Text',
+}
+const consentLabels = {
+	opt_in: 'Opt-in',
+	opt_out: 'Opt-out',
+	always_active: 'Always active',
+}
+const disclosureTitles = {
+	ai_content: 'AI-generated content',
+	ai_functionality: 'Generative AI functionality',
+	advertisements: 'Advertisements',
+	paid_features: 'Paid features',
+	telemetry: 'Telemetry',
+	derivative_work: 'Derivative content',
+	epilepsy_triggers: 'Photosensitivity triggers',
+	system_interactions: 'External system interactions',
+	archived: 'Archived',
+}
+
 const props = defineProps<{ type: DisclosureType }>()
 const emit = defineEmits<{ edit: [] }>()
 
 const { disclosures } = injectProjectReviewPageContext()
 const panels = injectReviewPanels()
-const { formatMessage } = useVIntl()
-const messages = defineMessages({
-	generatedContent: {
-		id: 'moderation.disclosures.fields.generated-content',
-		defaultMessage: 'Content types',
-	},
-	paidFeatures: {
-		id: 'moderation.disclosures.fields.paid-features',
-		defaultMessage: 'Paid features',
-	},
-	consentModel: {
-		id: 'moderation.disclosures.fields.consent-model',
-		defaultMessage: 'Consent model',
-	},
-	dataCollected: {
-		id: 'moderation.disclosures.fields.data-collected',
-		defaultMessage: 'Data collected',
-	},
-	originalWorks: {
-		id: 'moderation.disclosures.fields.original-works',
-		defaultMessage: 'Original works',
-	},
-	originalName: {
-		id: 'moderation.disclosures.fields.original-name',
-		defaultMessage: 'Name',
-	},
-	originalLink: {
-		id: 'moderation.disclosures.fields.original-link',
-		defaultMessage: 'Link',
-	},
-	derivativeExplanation: {
-		id: 'moderation.disclosures.fields.derivative-explanation',
-		defaultMessage: "How it's used",
-	},
-	interactions: {
-		id: 'moderation.disclosures.fields.interactions',
-		defaultMessage: 'System interactions',
-	},
-	photosensitivityDescription: {
-		id: 'moderation.disclosures.fields.photosensitivity-description',
-		defaultMessage: 'Photosensitivity triggers',
-	},
-	archiveReason: {
-		id: 'moderation.disclosures.fields.archive-reason',
-		defaultMessage: 'Reason for archiving',
-	},
-	noneProvided: {
-		id: 'moderation.disclosures.empty.none-provided',
-		defaultMessage: 'None provided.',
-	},
-	noneListed: {
-		id: 'moderation.disclosures.empty.none-listed',
-		defaultMessage: 'None listed.',
-	},
-})
+
 const types = [
 	{ type: 'ai_content', formKey: 'ai', icon: SparklesIcon, key: 'ai' },
 	{
@@ -102,15 +61,30 @@ const types = [
 		icon: BrainCogIcon,
 		key: 'ai-functionality',
 	},
-	{ type: 'advertisements', formKey: 'advertising', icon: MegaphoneIcon, key: 'ads' },
+	{
+		type: 'advertisements',
+		formKey: 'advertising',
+		icon: MegaphoneIcon,
+		key: 'ads',
+	},
 	{
 		type: 'paid_features',
 		formKey: 'paidFeatures',
 		icon: CircleDollarSignIcon,
 		key: 'paid-features',
 	},
-	{ type: 'telemetry', formKey: 'telemetry', icon: RadioTowerIcon, key: 'telemetry' },
-	{ type: 'derivative_work', formKey: 'derivative', icon: GitForkIcon, key: 'derivative-content' },
+	{
+		type: 'telemetry',
+		formKey: 'telemetry',
+		icon: RadioTowerIcon,
+		key: 'telemetry',
+	},
+	{
+		type: 'derivative_work',
+		formKey: 'derivative',
+		icon: GitForkIcon,
+		key: 'derivative-content',
+	},
 	{
 		type: 'epilepsy_triggers',
 		formKey: 'photosensitivity',
@@ -137,9 +111,7 @@ const sections = computed(() =>
 			icon,
 			type,
 			key,
-			title:
-				panels.resolve({ kind: 'disclosure', key })?.panel.title ??
-				formatDisclosureTypeLabel(formatMessage, type),
+			title: panels.resolve({ kind: 'disclosure', key })?.panel.title ?? disclosureTitles[type],
 			data: formToDisclosures(disclosures.current.value).find((entry) => entry.type === type),
 			meta: disclosures.disclosureUpdateProps(type),
 			lock: disclosures.current.value.lockStatuses[type],
@@ -178,7 +150,7 @@ const sections = computed(() =>
 			<template v-if="section.data" #expanded>
 				<dl class="disclosure-fields">
 					<div v-if="section.data.type === 'ai_content'">
-						<dt>{{ formatMessage(messages.generatedContent) }}</dt>
+						<dt>Content types</dt>
 						<dd>
 							<div v-if="section.data.uses.length" class="flex flex-wrap gap-1.5">
 								<TagItem
@@ -186,46 +158,46 @@ const sections = computed(() =>
 									:key="use"
 									class="!border-surface-5 !bg-surface-4 !text-primary"
 								>
-									{{ formatMessage(disclosureAiUsageMessages[use]) }}
+									{{ aiUsageLabels[use] }}
 								</TagItem>
 							</div>
-							<p v-else class="empty-field">{{ formatMessage(messages.noneListed) }}</p>
+							<p v-else class="empty-field">None listed.</p>
 						</dd>
 					</div>
 					<template v-if="section.data.type === 'telemetry'">
 						<div>
-							<dt>{{ formatMessage(messages.consentModel) }}</dt>
+							<dt>Consent model</dt>
 							<dd>
 								<TagItem class="!border-surface-5 !bg-surface-4 !text-primary">{{
-									formatMessage(disclosureTelemetryConsentMessages[section.data.consent])
+									consentLabels[section.data.consent]
 								}}</TagItem>
 							</dd>
 						</div>
 						<div>
-							<dt>{{ formatMessage(messages.dataCollected) }}</dt>
+							<dt>Data collected</dt>
 							<dd>
 								<ul v-if="section.data.data_collected.length">
 									<li v-for="(entry, index) in section.data.data_collected" :key="index">
 										{{ entry }}
 									</li>
 								</ul>
-								<p v-else class="empty-field">{{ formatMessage(messages.noneListed) }}</p>
+								<p v-else class="empty-field">None listed.</p>
 							</dd>
 						</div>
 					</template>
 					<div v-if="section.data.type === 'paid_features'">
-						<dt>{{ formatMessage(messages.paidFeatures) }}</dt>
+						<dt>Paid features</dt>
 						<dd>
 							<ul v-if="section.data.features.length">
 								<li v-for="(feature, index) in section.data.features" :key="index">
 									{{ feature }}
 								</li>
 							</ul>
-							<p v-else class="empty-field">{{ formatMessage(messages.noneListed) }}</p>
+							<p v-else class="empty-field">None listed.</p>
 						</dd>
 					</div>
 					<div v-if="section.data.type === 'system_interactions'">
-						<dt>{{ formatMessage(messages.interactions) }}</dt>
+						<dt>System interactions</dt>
 						<dd>
 							<ul v-if="section.data.interactions.some((entry) => entry.trim())">
 								<li
@@ -237,11 +209,11 @@ const sections = computed(() =>
 									{{ interaction }}
 								</li>
 							</ul>
-							<p v-else class="empty-field">{{ formatMessage(messages.noneListed) }}</p>
+							<p v-else class="empty-field">None listed.</p>
 						</dd>
 					</div>
 					<div v-if="section.data.type === 'derivative_work'" class="original-works">
-						<dt>{{ formatMessage(messages.originalWorks) }}</dt>
+						<dt>Original works</dt>
 						<dd>
 							<div v-if="section.data.sources.length" class="flex flex-col gap-4">
 								<dl
@@ -250,16 +222,14 @@ const sections = computed(() =>
 									class="disclosure-fields border-0 border-l-2 border-solid border-surface-4 pl-3"
 								>
 									<div>
-										<dt>{{ formatMessage(messages.originalName) }}</dt>
+										<dt>Name</dt>
 										<dd>
 											<span v-if="source.label">{{ source.label }}</span>
-											<span v-else class="empty-field">{{
-												formatMessage(messages.noneProvided)
-											}}</span>
+											<span v-else class="empty-field">None provided.</span>
 										</dd>
 									</div>
 									<div>
-										<dt>{{ formatMessage(messages.originalLink) }}</dt>
+										<dt>Link</dt>
 										<dd>
 											<AutoLink
 												v-if="source.link"
@@ -271,36 +241,38 @@ const sections = computed(() =>
 												<span class="min-w-0 break-all underline">{{ source.link }}</span>
 												<ExternalIcon class="mt-0.5 size-4 shrink-0" aria-hidden="true" />
 											</AutoLink>
-											<p v-else class="empty-field">{{ formatMessage(messages.noneProvided) }}</p>
+											<p v-else class="empty-field">None provided.</p>
 										</dd>
 									</div>
 									<div>
-										<dt>{{ formatMessage(messages.derivativeExplanation) }}</dt>
+										<dt>How it's used</dt>
 										<dd>
-											<p v-if="source.note" class="field-text">{{ source.note }}</p>
-											<p v-else class="empty-field">{{ formatMessage(messages.noneProvided) }}</p>
+											<p v-if="source.note" class="field-text">
+												{{ source.note }}
+											</p>
+											<p v-else class="empty-field">None provided.</p>
 										</dd>
 									</div>
 								</dl>
 							</div>
-							<p v-else class="empty-field">{{ formatMessage(messages.noneListed) }}</p>
+							<p v-else class="empty-field">None listed.</p>
 						</dd>
 					</div>
 					<div v-if="'note' in section.data">
 						<dt>
 							{{
-								formatMessage(
-									section.type === 'epilepsy_triggers'
-										? messages.photosensitivityDescription
-										: section.type === 'archived'
-											? messages.archiveReason
-											: commonMessages.explanationLabel,
-								)
+								section.type === 'epilepsy_triggers'
+									? 'Photosensitivity triggers'
+									: section.type === 'archived'
+										? 'Reason for archiving'
+										: 'Explanation'
 							}}
 						</dt>
 						<dd>
-							<p v-if="section.data.note?.trim()" class="field-text">{{ section.data.note }}</p>
-							<p v-else class="empty-field">{{ formatMessage(messages.noneProvided) }}</p>
+							<p v-if="section.data.note?.trim()" class="field-text">
+								{{ section.data.note }}
+							</p>
+							<p v-else class="empty-field">None provided.</p>
 						</dd>
 					</div>
 				</dl>

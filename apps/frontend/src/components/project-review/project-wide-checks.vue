@@ -30,7 +30,7 @@
 			role="separator"
 			tabindex="0"
 			aria-orientation="horizontal"
-			:aria-label="formatMessage(messages.resizeActions)"
+			aria-label="Resize project checks"
 			:aria-valuenow="Math.round(measuredHeight)"
 			:aria-valuemin="80"
 			:aria-valuemax="maxActionsHeight"
@@ -50,7 +50,7 @@
 
 <script setup lang="ts">
 import { type MiscReviewPanelKey, reviewPanels } from '@modrinth/moderation/src/data/issues'
-import { defineMessages, Tabs, useVIntl } from '@modrinth/ui'
+import { Tabs } from '@modrinth/ui'
 import { useElementSize } from '@vueuse/core'
 import { computed, onScopeDispose, ref, watch } from 'vue'
 
@@ -60,13 +60,6 @@ import { injectReviewContext } from './review-panel/context'
 import ReviewPanel from './review-panel/index.vue'
 import { injectReviewShortcuts, useReviewShortcut } from './shortcuts'
 
-const { formatMessage } = useVIntl()
-const messages = defineMessages({
-	resizeActions: {
-		id: 'project-review.resize-checks',
-		defaultMessage: 'Resize project checks',
-	},
-})
 const actionsElement = ref<HTMLElement | null>(null)
 const { height: measuredHeight } = useElementSize(actionsElement)
 const actionsHeight = ref<number | null>(null)

@@ -21,9 +21,9 @@
 				<slot name="title" />
 				<div class="flex shrink-0 items-center gap-1">
 					<IconButton
-						v-tooltip="formatMessage(pinned ? messages.unpinReview : messages.pinReview)"
+						v-tooltip="pinned ? 'Unpin review controls' : 'Pin review controls'"
 						size="sm"
-						:label="formatMessage(pinned ? messages.unpinReview : messages.pinReview)"
+						:label="pinned ? 'Unpin review controls' : 'Pin review controls'"
 						:aria-pressed="pinned"
 						type="quiet"
 						:color="pinned ? 'green' : undefined"
@@ -31,12 +31,7 @@
 					>
 						<PinIcon />
 					</IconButton>
-					<IconButton
-						size="sm"
-						:label="formatMessage(messages.closeReview)"
-						type="quiet"
-						@click="dismiss()"
-					>
+					<IconButton size="sm" label="Close review controls" type="quiet" @click="dismiss()">
 						<XIcon />
 					</IconButton>
 				</div>
@@ -51,16 +46,14 @@
 <script setup lang="ts">
 import { autoUpdate, flip, offset, shift, size, useFloating } from '@floating-ui/vue'
 import { PinIcon, XIcon } from '@modrinth/assets'
-import { IconButton, useVIntl } from '@modrinth/ui'
+import { IconButton } from '@modrinth/ui'
 import { computed, nextTick, onBeforeUnmount, shallowRef, watch } from 'vue'
 
 import { useFloatingReviewPanelAppearance } from '~/composables/floating-review-panel-appearance'
 
-import { projectReviewMessages as messages } from '../messages'
 import { useReviewEventListener } from '../shortcuts'
 import { injectReviewContext, type ReviewAnchor } from './context'
 
-const { formatMessage } = useVIntl()
 const { style: appearanceStyle } = useFloatingReviewPanelAppearance()
 const props = defineProps<{
 	anchor: ReviewAnchor

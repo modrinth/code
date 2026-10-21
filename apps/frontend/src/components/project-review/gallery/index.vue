@@ -9,19 +9,13 @@
 			class="shrink-0"
 		/>
 		<div class="min-h-0 flex-1 overflow-y-auto overscroll-contain">
-			<p v-if="!selection" class="m-0 text-secondary">
-				{{ formatMessage(messages.empty) }}
-			</p>
-			<p v-else-if="isLoading" role="status" class="m-0">
-				{{ formatMessage(messages.loading) }}
-			</p>
+			<p v-if="!selection" class="m-0 text-secondary">No project selected</p>
+			<p v-else-if="isLoading" role="status" class="m-0">Loading...</p>
 			<div v-else-if="error" role="alert">
-				<p class="m-0">{{ formatMessage(messages.loadError) }}</p>
-				<Button @click="refresh">{{ formatMessage(messages.retry) }}</Button>
+				<p class="m-0">Could not load project data</p>
+				<Button @click="refresh">Retry</Button>
 			</div>
-			<p v-else-if="!gallery.length" class="m-0 text-secondary">
-				{{ formatMessage(messages.emptyGallery) }}
-			</p>
+			<p v-else-if="!gallery.length" class="m-0 text-secondary">No gallery images</p>
 			<div
 				v-else
 				class="gallery-grid"
@@ -39,12 +33,12 @@
 					<button
 						type="button"
 						class="cursor-zoom-in border-0 p-0"
-						:aria-label="formatMessage(messages.openImage, { number: index + 1 })"
+						:aria-label="`Open image ${index + 1}`"
 						@click="viewer?.show(index)"
 					>
 						<img
 							:src="item.raw_url || item.url"
-							:alt="item.name || formatMessage(messages.imageNumber, { number: index + 1 })"
+							:alt="item.name || `Image ${index + 1}`"
 							class="aspect-video w-full object-contain"
 							loading="lazy"
 						/>
@@ -52,13 +46,13 @@
 					<div class="flex flex-1 flex-col gap-1.5 p-3">
 						<div class="flex flex-wrap items-center gap-2">
 							<h3 class="m-0 min-w-0 flex-1 break-words text-lg font-semibold text-contrast">
-								{{ item.name || formatMessage(messages.imageNumber, { number: index + 1 }) }}
+								{{ item.name || `Image ${index + 1}` }}
 							</h3>
 							<TagItem
 								v-if="item.featured"
 								class="-my-0.5 !border-brand !bg-transparent !text-brand opacity-90"
 							>
-								{{ formatMessage(messages.featured) }}
+								Featured
 							</TagItem>
 						</div>
 						<p v-if="item.description" class="m-0 whitespace-pre-wrap break-words">
@@ -94,22 +88,21 @@ import type { Labrinth } from '@modrinth/api-client'
 import { CalendarIcon } from '@modrinth/assets'
 import { moderationSettings } from '@modrinth/moderation'
 import { galleryImageReviewKey } from '@modrinth/moderation/src/data/issues/component-builders/gallery-images'
-import { Button, ImageViewerEditor, TagItem, useFormatDateTime, useVIntl } from '@modrinth/ui'
+import { Button, ImageViewerEditor, TagItem } from '@modrinth/ui'
 import { computed, ref, useTemplateRef } from 'vue'
 
 import { useModerationSettings } from '~/composables/moderation'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 import { injectReviewSubmission } from '~/providers/project-review/review-submission'
 
+import { createDateFormatter } from '../format'
 import ImageViewerActions from '../image-viewer-actions.vue'
-import { projectReviewMessages as messages } from '../messages'
 import ReviewPanel from '../review-panel/index.vue'
 
-const { formatMessage } = useVIntl()
 const settings = useModerationSettings()
 const galleryColumns = computed(() => settings.value.get(moderationSettings.General.GalleryColumns))
 const interactionScope = useTemplateRef<HTMLElement>('interactionScope')
-const formatDate = useFormatDateTime({
+const formatDate = createDateFormatter({
 	year: 'numeric',
 	month: 'long',
 	day: 'numeric',
@@ -124,7 +117,7 @@ const viewerItems = computed(() =>
 	gallery.value.map((item, index) => ({
 		id: item.url,
 		src: item.raw_url || item.url,
-		alt: item.name || formatMessage(messages.imageNumber, { number: index + 1 }),
+		alt: item.name || `Image ${index + 1}`,
 		title: item.name,
 		description: item.description,
 	})),

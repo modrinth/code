@@ -10,7 +10,7 @@
 		]"
 	>
 		<span>
-			{{ formatMessage(projectReviewMessages[params.params.tab]) }}
+			{{ reviewPanelLabels[params.params.tab] }}
 		</span>
 		<span v-if="count !== undefined" class="relative top-px ml-1 rounded text-xs"
 			>({{ count }})</span
@@ -20,21 +20,20 @@
 </template>
 
 <script setup lang="ts">
-import { useVIntl } from '@modrinth/ui'
 import type { IDockviewPanelHeaderProps } from 'dockview-vue'
 import { computed, ref, watchEffect } from 'vue'
 
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
 import KbdChip from '../../kdb-chip.vue'
-import { projectReviewMessages } from '../../messages'
 import { injectProjectReviewContext } from '../context'
+import { reviewPanelLabels } from '../labels'
 import type { ProjectReviewTab } from '../types'
 
 const props = defineProps<{
 	params: IDockviewPanelHeaderProps<{ tab: ProjectReviewTab }>
 }>()
-const { formatMessage } = useVIntl()
+
 const { tabCounts } = injectProjectReviewPageContext()
 const { selectedTabs } = injectProjectReviewContext()
 const isSelected = computed(() => selectedTabs.value.includes(props.params.params.tab))

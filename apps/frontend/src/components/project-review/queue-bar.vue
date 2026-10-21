@@ -1,20 +1,23 @@
 <template>
 	<footer class="shrink-0 border-0 border-t border-solid border-divider text-sm">
 		<div v-if="navigationError" role="alert" class="px-3 py-2 text-red">
-			{{ formatMessage(messages.queueError) }}
+			Could not change projects. Please try again
 		</div>
 		<nav
 			class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-2 pr-2.5 text-secondary"
-			:aria-label="formatMessage(messages.queueNavigation)"
+			aria-label="Review queue navigation"
 			:aria-busy="busy"
 		>
 			<div class="flex items-center gap-3 font-medium" aria-live="polite">
 				<div class="flex">
 					<button
-						v-tooltip="{ text: formatMessage(commonMessages.settingsLabel), delay: 500 }"
+						v-tooltip="{
+							text: 'Settings',
+							delay: 500,
+						}"
 						type="button"
 						class="queue-action"
-						:aria-label="formatMessage(commonMessages.settingsLabel)"
+						aria-label="Settings"
 						@click="settingsModal?.show($event)"
 					>
 						<SettingsIcon aria-hidden="true" />
@@ -26,10 +29,13 @@
 						@close="panelMenuOpen = false"
 					>
 						<button
-							v-tooltip="{ text: formatMessage(messages.panelLayout), delay: 500 }"
+							v-tooltip="{
+								text: 'Panel layout',
+								delay: 500,
+							}"
 							type="button"
 							class="queue-action"
-							:aria-label="formatMessage(messages.panelLayout)"
+							aria-label="Panel layout"
 							:aria-expanded="panelMenuOpen"
 						>
 							<LayoutPanelLeftIcon aria-hidden="true" />
@@ -43,7 +49,7 @@
 									@click="runPanelAction(resetPanelLayout, hide)"
 								>
 									<RotateCounterClockwiseIcon aria-hidden="true" />
-									{{ formatMessage(messages.resetPanelLayout) }}
+									Reset panel layout
 								</Button>
 								<Button
 									v-if="hasPopouts"
@@ -52,7 +58,7 @@
 									@click="runPanelAction(closeExternalPanels, hide)"
 								>
 									<MonitorXIcon aria-hidden="true" />
-									{{ formatMessage(messages.closePopoutWindows) }}
+									Close popout windows
 								</Button>
 							</div>
 						</template>
@@ -60,7 +66,7 @@
 				</div>
 
 				<div class="flex items-center gap-2">
-					<template v-for="(column, index) in queueColumns" :key="column.label.id">
+					<template v-for="(column, index) in queueColumns" :key="column.label">
 						<span v-if="index" class="h-5 w-px bg-divider" aria-hidden="true" />
 						<FloatingMenu
 							trigger="hover"
@@ -70,12 +76,12 @@
 							:distance="4"
 						>
 							<span tabindex="0" class="cursor-default pb-1 pt-1.5 text-xs">
-								{{ formatMessage(column.label) }}
+								{{ column.label }}
 								<span class="ml-1 tabular-nums text-primary">{{ column.count }}</span>
 							</span>
 							<template #popper>
 								<div class="flex max-w-80 flex-col gap-2 py-1">
-									<span class="font-semibold">{{ formatMessage(column.heading) }}</span>
+									<span class="font-semibold">{{ column.heading }}</span>
 									<QueueProjectList :project-ids="column.projects" :empty-message="column.empty" />
 								</div>
 							</template>
@@ -84,13 +90,11 @@
 				</div>
 			</div>
 			<div class="flex items-center gap-1">
-				<button type="button" class="queue-action" :disabled="busy" @click="exit">
-					{{ formatMessage(messages.exit) }}
-				</button>
+				<button type="button" class="queue-action" :disabled="busy" @click="exit">Exit</button>
 				<span class="mx-1.5 h-5 w-px bg-divider" aria-hidden="true" />
 				<button type="button" class="queue-action" :disabled="disabled || !canGoBack" @click="back">
 					<LeftArrowIcon class="mb-px" />
-					{{ formatMessage(messages.back) }}
+					Back
 				</button>
 				<button
 					type="button"
@@ -98,25 +102,16 @@
 					:disabled="disabled || (!inQueue && !completed)"
 					@click="next"
 				>
-					{{
-						formatMessage(
-							completed ? (remaining.length ? messages.next : messages.finish) : messages.skip,
-						)
-					}}
+					{{ completed ? (remaining.length ? 'Next' : 'Finish') : 'Skip' }}
 					<RightArrowIcon class="mb-px" />
 				</button>
 			</div>
 		</nav>
 	</footer>
-	<TabbedModal
-		ref="settingsModal"
-		:header="formatMessage(commonMessages.settingsLabel)"
-		:tabs="settingsTabs"
-		width="60rem"
-	>
+	<TabbedModal ref="settingsModal" header="Settings" :tabs="settingsTabs" width="60rem">
 		<template v-if="!isLocal" #footer>
 			<p class="m-0 shrink-0 break-words text-xs text-secondary">
-				{{ formatMessage(deploymentMessages.basedOn) }}
+				Based on
 				<a
 					v-if="config.public.owner && config.public.branch"
 					class="hover:underline"
@@ -127,9 +122,7 @@
 					{{ config.public.owner }}/{{ config.public.branch }}
 				</a>
 				@
-				<span v-if="config.public.hash === 'unknown'">{{
-					formatMessage(deploymentMessages.unknownCommit)
-				}}</span>
+				<span v-if="config.public.hash === 'unknown'">unknown</span>
 				<AutoLink
 					v-else
 					class="text-link"
@@ -157,16 +150,7 @@ import {
 	RotateCounterClockwiseIcon,
 	SettingsIcon,
 } from '@modrinth/assets'
-import {
-	AutoLink,
-	Button,
-	commonMessages,
-	defineMessages,
-	FloatingMenu,
-	TabbedModal,
-	type TabbedModalTab,
-	useVIntl,
-} from '@modrinth/ui'
+import { AutoLink, Button, FloatingMenu, TabbedModal, type TabbedModalTab } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import ModerationAppearance from '~/components/ui/moderation/settings/ModerationAppearance.vue'
@@ -175,7 +159,6 @@ import ModerationSettings from '~/components/ui/moderation/settings/ModerationSe
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
 import { injectProjectReviewContext } from './layout/context'
-import { projectReviewMessages as messages } from './messages'
 import QueueProjectList from './queue-project-list.vue'
 import { useReviewShortcut } from './shortcuts'
 
@@ -187,26 +170,31 @@ const isLocal =
 	hostname.endsWith('.localhost') ||
 	hostname.startsWith('127.') ||
 	hostname === '[::1]'
-const deploymentMessages = defineMessages({
-	basedOn: { id: 'moderation.settings.based-on', defaultMessage: 'Based on' },
-	unknownCommit: { id: 'moderation.settings.unknown-commit', defaultMessage: 'unknown' },
-})
 
 const panelMenuOpen = ref(false)
 const settingsModal = ref<InstanceType<typeof TabbedModal> | null>(null)
 const settingsTabs: TabbedModalTab[] = [
 	{
-		name: messages.generalSettings,
+		name: {
+			id: 'moderation.project-review.generalSettings',
+			defaultMessage: 'General',
+		},
 		icon: SettingsIcon,
 		content: ModerationSettings,
 	},
 	{
-		name: messages.appearanceSettings,
+		name: {
+			id: 'moderation.project-review.appearanceSettings',
+			defaultMessage: 'Appearance',
+		},
 		icon: PaletteIcon,
 		content: ModerationAppearance,
 	},
 	{
-		name: messages.keybindsSettings,
+		name: {
+			id: 'moderation.project-review.keybindsSettings',
+			defaultMessage: 'Keybinds',
+		},
 		icon: KeyboardIcon,
 		content: ModerationKeybinds,
 	},
@@ -226,7 +214,7 @@ const {
 	next,
 	exit,
 } = navigation
-const { formatMessage } = useVIntl()
+
 const disabled = computed(() => busy.value || isLoading.value || !queue.hydrated)
 const queueColumns = computed(() => {
 	const current = queue.currentQueue
@@ -234,23 +222,23 @@ const queueColumns = computed(() => {
 	const skippedIds = new Set(current.skipped)
 	return [
 		{
-			label: messages.complete,
-			heading: messages.completedProjects,
-			empty: messages.noCompletedProjects,
+			label: 'Complete',
+			heading: 'Completed projects',
+			empty: 'No completed projects yet',
 			count: current.completed.length,
 			projects: current.projectOrder.filter((id) => completedIds.has(id)),
 		},
 		{
-			label: messages.skipped,
-			heading: messages.skippedProjects,
-			empty: messages.noSkippedProjects,
+			label: 'Skipped',
+			heading: 'Skipped projects',
+			empty: 'No skipped projects',
 			count: current.skipped.length,
 			projects: current.projectOrder.filter((id) => skippedIds.has(id)),
 		},
 		{
-			label: messages.remaining,
-			heading: messages.queuedProjects,
-			empty: messages.noQueuedProjects,
+			label: 'Remaining',
+			heading: 'Next 5 projects',
+			empty: 'No projects in the queue',
 			count: current.items.length,
 			projects: remaining.value.slice(0, 5),
 		},

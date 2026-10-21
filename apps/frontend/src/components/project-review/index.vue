@@ -2,20 +2,25 @@
 	<ClientOnly>
 		<NewModal
 			ref="resetIssuesModal"
-			:header="formatMessage(reviewTabMessages.resetAllIssues)"
+			header="Reset all issues"
 			max-width="800px"
 			danger
 			:initial-focus="() => resetCancelButton?.element ?? null"
 		>
 			<div class="flex max-w-[35rem] flex-col gap-4">
-				<p class="m-0">{{ formatMessage(reviewTabMessages.resetIssuesDescription) }}</p>
-				<p class="m-0">{{ formatMessage(reviewTabMessages.revertCustomizationsDescription) }}</p>
+				<p class="m-0">
+					This will discard your issue changes and move all previous issues back to Re-rev. issues.
+				</p>
+				<p class="m-0">
+					Revert all customizations restores default issue messages while keeping custom issue
+					messages and all issue toggles and selections.
+				</p>
 			</div>
 			<template #actions>
 				<div class="flex flex-wrap justify-end gap-2">
 					<Button ref="resetCancelButton" @click="resetIssuesModal?.hide()">
 						<XIcon />
-						{{ formatMessage(commonMessages.cancelButton) }}
+						Cancel
 					</Button>
 					<Button
 						type="colored"
@@ -23,7 +28,7 @@
 						:disabled="pending || resetting"
 						@click="revertCustomizations"
 					>
-						{{ formatMessage(reviewTabMessages.revertAllCustomizations) }}
+						Revert all customizations
 					</Button>
 					<Button
 						type="colored"
@@ -32,7 +37,7 @@
 						@click="resetAllIssues"
 					>
 						<TrashIcon />
-						{{ formatMessage(reviewTabMessages.resetIssues) }}
+						Reset issues
 					</Button>
 				</div>
 			</template>
@@ -49,16 +54,13 @@
 						<div class="flex shrink-0 flex-wrap items-center gap-2 pb-2.5">
 							<Tabs v-model:value="activeReviewTab" wrap :tabs="rightPanelTabs" />
 							<div class="ml-auto flex items-center gap-1">
-								<Tooltip
-									v-if="!pending && project"
-									:text="formatMessage(reviewTabMessages.resetIssues)"
-								>
+								<Tooltip v-if="!pending && project" text="Reset issues">
 									<Button
 										type="quiet"
 										size="sm"
 										icon-only
 										:disabled="resetting"
-										:aria-label="formatMessage(reviewTabMessages.resetIssues)"
+										aria-label="Reset issues"
 										@click="resetIssuesModal?.show()"
 									>
 										<RotateCounterClockwiseIcon aria-hidden="true" />
@@ -84,9 +86,7 @@
 			<template #slicer><Slicer :key="projectId" /></template>
 		</ProjectReviewLayout>
 		<template #fallback>
-			<p class="m-0 p-4 text-secondary" role="status">
-				{{ formatMessage(projectReviewMessages.loading) }}
-			</p>
+			<p class="m-0 p-4 text-secondary" role="status">Loading...</p>
 		</template>
 	</ClientOnly>
 </template>
@@ -94,16 +94,7 @@
 <script setup lang="ts">
 import { RotateCounterClockwiseIcon, TrashIcon, XIcon } from '@modrinth/assets'
 import { moderationSettings } from '@modrinth/moderation'
-import {
-	Button,
-	commonMessages,
-	defineMessages,
-	injectLoadingState,
-	NewModal,
-	Tabs,
-	Tooltip,
-	useVIntl,
-} from '@modrinth/ui'
+import { Button, injectLoadingState, NewModal, Tabs, Tooltip } from '@modrinth/ui'
 import { computed, onScopeDispose, ref, watch } from 'vue'
 
 import {
@@ -142,7 +133,6 @@ import { useReReviewIssues } from './issue-list/re-review-issues'
 import ProjectReviewLayout from './layout/index.client.vue'
 import { type ProjectReviewTab, projectReviewTabs } from './layout/types'
 import MessageThread from './message-thread/index.vue'
-import { projectReviewMessages } from './messages'
 import Permissions from './permissions/index.vue'
 import ProjectInfo from './project-info/index.vue'
 import ProjectWideChecks from './project-wide-checks.vue'
@@ -158,7 +148,7 @@ const shortcuts = provideReviewShortcuts(createReviewShortcuts())
 function useShortcut(...args: Parameters<typeof shortcuts.register>) {
 	onScopeDispose(shortcuts.register(...args))
 }
-const { formatMessage } = useVIntl()
+
 const {
 	projectId,
 	project,
@@ -282,39 +272,6 @@ const issuePicker = ref<InstanceType<typeof IssuePicker>>()
 const messageThread = ref<InstanceType<typeof MessageThread>>()
 const auth = useAuthState()
 const keybinds = useModerationKeybinds()
-const reviewTabMessages = defineMessages({
-	issues: {
-		id: 'project-review.right-panel.issues',
-		defaultMessage: 'Issues ({count})',
-	},
-	thread: { id: 'project-review.right-panel.thread', defaultMessage: 'Thread' },
-	reReview: {
-		id: 'project-review.right-panel.re-review',
-		defaultMessage: 'Re-review ({count})',
-	},
-	resetIssues: {
-		id: 'project-review.issues.reset',
-		defaultMessage: 'Reset issues',
-	},
-	resetAllIssues: {
-		id: 'project-review.issues.reset-all',
-		defaultMessage: 'Reset all issues',
-	},
-	resetIssuesDescription: {
-		id: 'project-review.issues.reset-description',
-		defaultMessage:
-			'This will discard your issue changes and move all previous issues back to Re-rev. issues.',
-	},
-	revertAllCustomizations: {
-		id: 'project-review.issues.revert-all-customizations',
-		defaultMessage: 'Revert all customizations',
-	},
-	revertCustomizationsDescription: {
-		id: 'project-review.issues.revert-customizations-description',
-		defaultMessage:
-			'Revert all customizations restores default issue messages while keeping custom issue messages and all issue toggles and selections.',
-	},
-})
 
 function resetAllIssues() {
 	resetIssuesModal.value?.hide()
@@ -332,16 +289,14 @@ const rightPanelTabs = computed(() => [
 		? [
 				{
 					value: 're-review',
-					label: formatMessage(reviewTabMessages.reReview, {
-						count: previousIssues.remainingReReviewIssues.value.length,
-					}),
+					label: `Re-review (${previousIssues.remainingReReviewIssues.value.length})`,
 				},
 			]
 		: []),
-	{ value: 'thread', label: formatMessage(reviewTabMessages.thread) },
+	{ value: 'thread', label: 'Thread' },
 	{
 		value: 'issues',
-		label: formatMessage(reviewTabMessages.issues, { count: issueCount.value }),
+		label: `Issues (${issueCount.value})`,
 	},
 ])
 

@@ -62,9 +62,9 @@ const options = computed(() =>
 <template>
 	<Combobox
 		v-if="compact"
+		v-tooltip="formatMessage(messages.changeLockStatus)"
 		:model-value="lockStatus"
 		:options="options"
-		v-tooltip="formatMessage(messages.changeLockStatus)"
 		:aria-label="formatMessage(messages.changeLockStatus)"
 		:disabled="disabled"
 		class="!w-8 shrink-0"

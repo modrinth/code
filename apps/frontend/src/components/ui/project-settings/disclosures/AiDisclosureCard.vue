@@ -6,7 +6,6 @@ import {
 	defineMessages,
 	disclosureAiUsageMessages,
 	IntlFormatted,
-	MultiSelect,
 	normalizeChildren,
 	SettingsFormGroup,
 	useVIntl,

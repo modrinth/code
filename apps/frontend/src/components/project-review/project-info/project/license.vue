@@ -1,12 +1,12 @@
 <template>
-	<Section :heading="formatMessage(messages.license)" :target="{ kind: 'license' }">
+	<Section heading="License" :target="{ kind: 'license' }">
 		<template #heading-after>
 			<TagItem v-if="isCustomLicense" class="!border-surface-4 !bg-surface-3 !text-secondary">
 				Custom
 			</TagItem>
 		</template>
 		<template #right>
-			<EditButton :section="formatMessage(messages.license)" @click="editModal?.show()" />
+			<EditButton section="License" @click="editModal?.show()" />
 		</template>
 		<EditModal :key="project?.id" ref="editModal" />
 		<div v-if="project" class="flex flex-col gap-1">
@@ -23,7 +23,7 @@
 				</span>
 				<TagItem
 					v-if="licenseRequiresSource(project.license.id)"
-					v-tooltip="formatMessage(messages.sourceAvailabilityRequired)"
+					v-tooltip="'License requires source code.'"
 					class="!border-orange !bg-surface-4 !px-1.5 !py-0.5 !text-orange"
 				>
 					<TagCategoryScrollTextIcon />
@@ -49,19 +49,18 @@
 <script setup lang="ts">
 import { ExternalIcon, TagCategoryScrollTextIcon } from '@modrinth/assets'
 import { licenseRequiresSource } from '@modrinth/moderation'
-import { TagItem, useVIntl } from '@modrinth/ui'
+import { TagItem } from '@modrinth/ui'
 import { computed, useTemplateRef } from 'vue'
 
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 import { reviewExternalUrl } from '~/providers/project-review/project-links'
 
-import { projectReviewMessages as messages } from '../../messages'
 import EditButton from '../edit/button.vue'
 import EditModal from '../edit/license.vue'
 import Section from '../section.vue'
 
 const { project, projectV2 } = injectProjectReviewPageContext()
-const { formatMessage } = useVIntl()
+
 const editModal = useTemplateRef<InstanceType<typeof EditModal>>('editModal')
 const isCustomLicense = computed(() => {
 	const id = project.value?.license.id

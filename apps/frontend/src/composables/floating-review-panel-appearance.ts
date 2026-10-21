@@ -13,7 +13,8 @@ export function useFloatingReviewPanelAppearance() {
 		const tint = `color-mix(in srgb, ${background} ${opacity}%, transparent)`
 		return {
 			borderColor:
-				settings.value.get(general.FloatingReviewPanelBorderColor) || 'var(--color-orange-highlight)',
+				settings.value.get(general.FloatingReviewPanelBorderColor) ||
+				'var(--color-orange-highlight)',
 			borderWidth: `${settings.value.get(general.FloatingReviewPanelBorderWidth)}px`,
 			backgroundColor: 'var(--surface-1)',
 			backgroundImage: `linear-gradient(${tint}, ${tint})`,

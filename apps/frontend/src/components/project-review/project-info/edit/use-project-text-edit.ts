@@ -1,4 +1,3 @@
-import { defineMessages, useVIntl } from '@modrinth/ui'
 import { computed, nextTick, ref, watch } from 'vue'
 
 import { useProjectInfoEdit } from './use-project-edit'
@@ -12,19 +11,7 @@ const limits: Record<TextField, { min: number; max: number }> = {
 	description: { min: 0, max: 65536 },
 }
 
-const messages = defineMessages({
-	length: {
-		id: 'moderation.project-review.validation.length',
-		defaultMessage: 'Enter between {min} and {max} characters.',
-	},
-	slug: {
-		id: 'moderation.project-review.validation.slug',
-		defaultMessage: 'Use only letters, numbers, periods, underscores, and hyphens.',
-	},
-})
-
 export function useProjectTextEdit(field: TextField, focus: () => unknown) {
-	const { formatMessage } = useVIntl()
 	const { project, saving, beginEditing, saveProject } = useProjectInfoEdit()
 	const editing = ref(false)
 	const draft = ref('')
@@ -32,10 +19,10 @@ export function useProjectTextEdit(field: TextField, focus: () => unknown) {
 	const validationMessage = computed(() => {
 		const length = Array.from(value.value).length
 		if (length < limits[field].min || length > limits[field].max) {
-			return formatMessage(messages.length, limits[field])
+			return `Enter between ${limits[field].min} and ${limits[field].max} characters.`
 		}
 		if (field === 'slug' && !/^[a-zA-Z0-9._-]+$/.test(value.value)) {
-			return formatMessage(messages.slug)
+			return 'Use only letters, numbers, periods, underscores, and hyphens.'
 		}
 		return ''
 	})

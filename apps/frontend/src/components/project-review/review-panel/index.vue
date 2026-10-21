@@ -34,7 +34,7 @@
 							:href="guidanceUrl"
 							target="_blank"
 							rel="noopener noreferrer"
-							:aria-label="formatMessage(messages.openReviewGuidance)"
+							aria-label="Open review guidance in new tab"
 							class="flex text-secondary hover:text-contrast"
 						>
 							<InfoIcon class="size-4" aria-hidden="true" />
@@ -89,7 +89,7 @@
 						:href="guidanceUrl"
 						target="_blank"
 						rel="noopener noreferrer"
-						:aria-label="formatMessage(messages.openReviewGuidance)"
+						aria-label="Open review guidance in new tab"
 						class="flex text-secondary hover:text-contrast"
 					>
 						<InfoIcon class="size-4" aria-hidden="true" />
@@ -107,7 +107,7 @@
 					@dropdown-close="setInlineDropdownOpen($event, false)"
 				/>
 			</template>
-			<p v-else class="m-0 text-secondary">{{ formatMessage(messages.noReviewActions) }}</p>
+			<p v-else class="m-0 text-secondary">No review actions available for this section</p>
 		</Highlight>
 	</component>
 </template>
@@ -115,7 +115,7 @@
 <script setup lang="ts">
 import { InfoIcon } from '@modrinth/assets'
 import { moderationSettings } from '@modrinth/moderation'
-import { Tooltip, useVIntl } from '@modrinth/ui'
+import { Tooltip } from '@modrinth/ui'
 import { useElementHover } from '@vueuse/core'
 import { computed, nextTick, onScopeDispose, shallowRef, useId, watch } from 'vue'
 
@@ -125,7 +125,6 @@ import type { ReviewTarget } from '~/providers/project-review/review'
 import { injectReviewPanels } from '~/providers/project-review/review-panels'
 
 import { injectProjectReviewContext, injectReviewSlot } from '../layout/context'
-import { projectReviewMessages as messages } from '../messages'
 import Anchor from './anchor.vue'
 import { flashReviewElement, injectReviewContext, scrollReviewElement } from './context'
 import Controls from './controls/index.vue'
@@ -165,7 +164,7 @@ const {
 	setDropdownOpen,
 } = reviewContext
 const inlineActive = computed(() => activePanelId.value === id)
-const { formatMessage } = useVIntl()
+
 const settings = useModerationSettings()
 const { flashBackground } = useReviewHighlight()
 const panels = injectReviewPanels()
@@ -222,9 +221,7 @@ onScopeDispose(
 const title = computed(() => panel.value?.title)
 const hint = computed(() => panel.value?.hint)
 const guidanceUrl = computed(() => panel.value?.guidanceUrl)
-const accessibleTitle = computed(() =>
-	formatMessage(messages.reviewSection, { section: title.value ?? hint.value ?? '' }),
-)
+const accessibleTitle = computed(() => `Review ${title.value ?? hint.value ?? ''}`)
 
 function setInlineDropdownOpen(key: string, open: boolean) {
 	const next = new Set(inlineDropdowns.value)

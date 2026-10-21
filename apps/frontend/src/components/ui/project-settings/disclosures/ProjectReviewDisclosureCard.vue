@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import { Button, commonMessages, Toggle, useVIntl } from '@modrinth/ui'
+import { Button, Toggle } from '@modrinth/ui'
 import { type Component, computed, useId } from 'vue'
-
-import { disclosureStatusMessages } from './messages'
 
 import EditButton from '~/components/project-review/project-info/edit/button.vue'
 
@@ -23,7 +21,7 @@ const props = defineProps<{
 }>()
 const enabled = defineModel<boolean>({ required: true })
 const titleId = useId()
-const { formatMessage } = useVIntl()
+
 const isToggleLocked = computed(() => !!props.disabled || (!!props.toggleDisabled && enabled.value))
 </script>
 
@@ -74,7 +72,7 @@ const isToggleLocked = computed(() => !!props.disabled || (!!props.toggleDisable
 		>
 			<div v-if="editing" class="absolute right-4 top-2 flex justify-end gap-1.5">
 				<Button type="quiet" size="xs" :disabled="disabled" @click.stop="onCancelEditing?.()">
-					{{ formatMessage(commonMessages.cancelButton) }}
+					Cancel
 				</Button>
 				<Button
 					type="colored"
@@ -84,7 +82,7 @@ const isToggleLocked = computed(() => !!props.disabled || (!!props.toggleDisable
 					:disabled="disabled || !sectionCanSave"
 					@click.stop="onSaveEditing?.()"
 				>
-					{{ formatMessage(commonMessages.saveButton) }}
+					Save
 				</Button>
 			</div>
 			<div v-if="onToggleEditing && !editing" class="absolute right-4 top-4 flex">
@@ -95,7 +93,7 @@ const isToggleLocked = computed(() => !!props.disabled || (!!props.toggleDisable
 			</div>
 			<template v-if="editing">
 				<p v-if="sectionSaveError" role="alert" class="m-0 text-red">
-					{{ formatMessage(disclosureStatusMessages.saveError) }}
+					Could not save all disclosure changes. Your edits have been kept. Try saving again.
 				</p>
 				<p v-if="sectionSaveDisabledReason?.length" role="alert" class="m-0 text-orange">
 					{{ sectionSaveDisabledReason.join(' ') }}

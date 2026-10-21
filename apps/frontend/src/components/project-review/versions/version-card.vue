@@ -8,7 +8,7 @@
 			<div class="mt-0.5 flex min-w-0 flex-1 flex-wrap items-center gap-2">
 				<VersionChannelIndicator
 					:channel="version.version_type"
-					:title="formatMessage(commonMessages[version.version_type])"
+					:title="versionChannels[version.version_type]"
 					size="sm"
 				/>
 				<TagTagItem v-for="loader in platforms" :key="loader" :tag="loader" />
@@ -17,22 +17,22 @@
 				<TagItem
 					v-if="withheld"
 					class="!border-orange-highlight !bg-orange-highlight font-semibold capitalize !text-orange"
-					>{{ formatMessage(messages.withheld) }}</TagItem
+					>Withheld</TagItem
 				>
 				<TagItem v-if="version.status !== 'listed'">{{
-					formatMessage(messages[version.status] ?? messages.unknown)
+					versionLabels[version.status] ?? 'Unknown'
 				}}</TagItem>
 			</div>
 			<div class="ml-auto flex flex-wrap items-center justify-end gap-1.5 text-sm text-secondary">
 				<span>{{
-					formatMessage(messages.dependencyCount, {
-						count: version.dependencies.length,
-					})
+					version.dependencies.length === 1
+						? `${version.dependencies.length} dep`
+						: `${version.dependencies.length} deps`
 				}}</span>
 				<BulletDivider aria-hidden="true" />
 				<span
 					class="inline-flex items-center gap-1"
-					:title="`${formatMessage(messages.downloads)}: ${formatNumber(version.downloads)}`"
+					:title="`${'Downloads'}: ${formatNumber(version.downloads)}`"
 				>
 					<DownloadIcon class="size-4" aria-hidden="true" />{{
 						formatCompactNumber(version.downloads)
@@ -46,8 +46,8 @@
 					<EditVersionMenu v-if="editable" color="default" size="sm" @edit="emit('edit', $event)" />
 					<Button
 						v-if="version.files.length"
-						v-tooltip="formatMessage(messages.openVersionSlicer)"
-						:aria-label="formatMessage(messages.openVersionSlicer)"
+						v-tooltip="'Open files in Slicer'"
+						aria-label="Open files in Slicer"
 						:loading="loadingSlicerButton === 'version'"
 						type="quiet"
 						circular
@@ -63,9 +63,9 @@
 						<CoffeeIcon v-else aria-hidden="true" />
 					</Button>
 					<ButtonLink
-						v-tooltip="formatMessage(messages.viewVersion)"
+						v-tooltip="'View version'"
 						:to="versionHref"
-						:aria-label="formatMessage(messages.viewVersion)"
+						aria-label="View version"
 						target="_blank"
 						type="quiet"
 						circular
@@ -92,16 +92,12 @@
 					</div>
 					<div class="flex flex-wrap items-center gap-0.5 text-sm text-secondary">
 						<span v-if="!file.primary" class="mr-1">{{
-							formatMessage(
-								file.file_type && file.file_type !== 'unknown'
-									? fileTypeMessages[file.file_type]
-									: messages.unknown,
-							)
+							file.file_type && file.file_type !== 'unknown' ? fileTypes[file.file_type] : 'Unknown'
 						}}</span>
 						<TeleportOverflowMenu
 							type="quiet"
 							size="sm"
-							:label="formatMessage(commonMessages.moreOptionsButton)"
+							label="More options"
 							:options="fileActions(file)"
 						>
 							<template #open-slicer="{ option }">
@@ -127,9 +123,7 @@
 				@on-close="expanded && emit('toggle')"
 			>
 				<template #title>
-					<span class="text-primary">
-						{{ formatMessage(messages.details) }}
-					</span>
+					<span class="text-primary"> Details </span>
 				</template>
 				<div
 					:id="`review-version-${version.id}`"
@@ -139,23 +133,15 @@
 						<dl
 							class="m-0 mt-1 grid min-w-0 grid-cols-[minmax(0,max-content)_minmax(0,1fr)] items-baseline gap-x-4 gap-y-3"
 						>
-							<dt class="font-medium text-secondary">
-								{{ formatMessage(messages.versionNumber) }}
-							</dt>
+							<dt class="font-medium text-secondary">Version Number</dt>
 							<dd class="m-0 min-w-0 break-all">
 								{{ version.version_number }}
 							</dd>
-							<dt class="font-medium text-secondary">
-								{{ formatMessage(messages.versionSubtitle) }}
-							</dt>
+							<dt class="font-medium text-secondary">Version Subtitle</dt>
 							<dd class="m-0 min-w-0 break-words">{{ version.name }}</dd>
-							<dt class="font-medium text-secondary">
-								{{ formatMessage(messages.versionId) }}
-							</dt>
+							<dt class="font-medium text-secondary">Version ID</dt>
 							<dd class="m-0 min-w-0"><CopyCode :text="version.id" /></dd>
-							<dt class="self-center font-medium text-secondary">
-								{{ formatMessage(messages.publishedBy) }}
-							</dt>
+							<dt class="self-center font-medium text-secondary">Published by</dt>
 							<dd class="m-0 min-w-0 self-center break-words">
 								<NuxtLink
 									:to="`/user/${version.author_id}`"
@@ -188,20 +174,14 @@
 									:aria-controls="`review-version-dependencies-${version.id}`"
 									@click="dependenciesOpen = !dependenciesOpen"
 								>
-									{{ formatMessage(messages.dependencies) }} ({{
-										formatNumber(version.dependencies.length)
-									}})
+									Dependencies ({{ formatNumber(version.dependencies.length) }})
 									<DropdownIcon
 										class="size-4 shrink-0 transition-transform duration-150 motion-reduce:transition-none"
 										:class="{ 'rotate-180': dependenciesOpen }"
 										aria-hidden="true"
 									/>
 								</button>
-								<span v-else>
-									{{ formatMessage(messages.dependencies) }} ({{
-										formatNumber(version.dependencies.length)
-									}})
-								</span>
+								<span v-else> Dependencies ({{ formatNumber(version.dependencies.length) }}) </span>
 							</h3>
 							<div
 								:id="`review-version-dependencies-${version.id}`"
@@ -218,27 +198,25 @@
 										v-if="version.dependencies.length > 8"
 										v-model="dependencySearch"
 										:icon="SearchIcon"
-										:placeholder="formatMessage(messages.searchDependencies)"
-										:aria-label="formatMessage(messages.searchDependencies)"
+										placeholder="Search dependencies…"
+										aria-label="Search dependencies…"
 										wrapper-class="mb-2 mt-1 w-full"
 										clearable
 									/>
 									<div class="mb-2.5 max-h-[360px] overflow-y-auto">
 										<p v-if="!version.dependencies.length" class="m-0 text-secondary">
-											{{ formatMessage(messages.emptyDependencies) }}
+											No dependencies
 										</p>
 										<p v-else-if="dependenciesQuery.isPending.value" role="status" class="m-0">
-											{{ formatMessage(messages.loading) }}
+											Loading...
 										</p>
 										<div v-else-if="dependenciesQuery.isError.value" role="alert">
-											<p class="m-0">{{ formatMessage(messages.loadError) }}</p>
-											<Button @click="dependenciesQuery.refetch()">{{
-												formatMessage(messages.retry)
-											}}</Button>
+											<p class="m-0">Could not load project data</p>
+											<Button @click="dependenciesQuery.refetch()">Retry</Button>
 										</div>
 										<div v-else class="flex flex-col gap-1.5">
 											<p v-if="!filteredDependencies.length" class="m-0 text-secondary">
-												{{ formatMessage(messages.noMatchingDependencies) }}
+												No matching dependencies
 											</p>
 											<div
 												v-for="(context, index) in filteredDependencies"
@@ -272,7 +250,7 @@
 														>{{ context.version.version_number }}</span
 													>
 													<TagItem class="text-xs">{{
-														formatMessage(messages[context.dependency.dependency_type])
+														versionLabels[context.dependency.dependency_type]
 													}}</TagItem>
 												</div>
 											</div>
@@ -290,26 +268,20 @@
 							button-class="sticky top-0 z-10 w-full cursor-pointer border-0 bg-surface-2 py-2 text-left text-sm font-medium hover:[&>div]:brightness-125 [&>div>svg]:ml-0 [&>div>svg]:size-4"
 						>
 							<template #title>
-								<span class="text-primary">{{ formatMessage(messages.changelog) }}</span>
+								<span class="text-primary">Changelog</span>
 							</template>
 							<div class="mb-1 max-h-[360px] overflow-y-auto">
 								<ProjectPageDescription :description="detailQuery.data.value.changelog" />
 							</div>
 						</Accordion>
 						<div v-else class="mb-1">
-							<h3 class="m-0 py-2 text-sm font-medium text-primary">
-								{{ formatMessage(messages.changelog) }}
-							</h3>
-							<p v-if="detailQuery.isPending.value" role="status" class="m-0">
-								{{ formatMessage(messages.loading) }}
-							</p>
+							<h3 class="m-0 py-2 text-sm font-medium text-primary">Changelog</h3>
+							<p v-if="detailQuery.isPending.value" role="status" class="m-0">Loading...</p>
 							<div v-else-if="detailQuery.isError.value" role="alert">
-								<p class="m-0">{{ formatMessage(messages.loadError) }}</p>
-								<Button @click="detailQuery.refetch()">{{ formatMessage(messages.retry) }}</Button>
+								<p class="m-0">Could not load project data</p>
+								<Button @click="detailQuery.refetch()">Retry</Button>
 							</div>
-							<p v-else class="m-0 text-secondary">
-								{{ formatMessage(messages.emptyChangelog) }}
-							</p>
+							<p v-else class="m-0 text-secondary">No changelog</p>
 						</div>
 					</section>
 				</div>
@@ -340,10 +312,8 @@ import {
 	Button,
 	ButtonLink,
 	type ButtonMenuOption,
-	commonMessages,
 	CopyCode,
 	type DependencyContext,
-	fileTypeMessages,
 	injectModrinthClient,
 	injectTags,
 	Input,
@@ -351,12 +321,6 @@ import {
 	TagItem,
 	TagTagItem,
 	TeleportOverflowMenu,
-	useCompactNumber,
-	useFormatBytes,
-	useFormatDateTime,
-	useFormatNumber,
-	useRelativeTime,
-	useVIntl,
 	VersionChannelIndicator,
 } from '@modrinth/ui'
 import EnvironmentTags from '@modrinth/ui/src/components/project/EnvironmentTags.vue'
@@ -372,9 +336,38 @@ import { injectProjectReviewPageContext } from '~/providers/project-review'
 import { injectReviewSlicer } from '~/providers/project-review/review-slicer'
 import type { EditVersionStage } from '~/providers/version/manage-version-modal'
 
-import { projectReviewMessages as messages } from '../messages'
+import {
+	createDateFormatter,
+	createRelativeTimeFormatter,
+	formatBytes,
+	formatCompactNumber,
+	formatNumber,
+} from '../format'
 import { useReviewInteraction } from '../shortcuts'
 
+const versionLabels = {
+	listed: 'Listed',
+	archived: 'Archived',
+	draft: 'Draft',
+	unlisted: 'Unlisted',
+	scheduled: 'Scheduled',
+	unknown: 'Unknown',
+	required: 'Required',
+	optional: 'Optional',
+	incompatible: 'Incompatible',
+	embedded: 'Embedded',
+}
+const versionChannels = { release: 'Release', beta: 'Beta', alpha: 'Alpha' }
+const fileTypes = {
+	primary: 'Primary',
+	unknown: 'Other',
+	'required-resource-pack': 'Required resource pack',
+	'optional-resource-pack': 'Optional resource pack',
+	'sources-jar': 'Sources jar',
+	'dev-jar': 'Dev jar',
+	'javadoc-jar': 'Javadocs jar',
+	signature: 'Signature file',
+}
 const props = defineProps<{
 	version: Labrinth.Versions.v3.Version
 	expanded: boolean
@@ -385,15 +378,12 @@ const emit = defineEmits<{
 	edit: [stage: EditVersionStage]
 	'scan-ai': [url: string]
 }>()
-const { formatMessage } = useVIntl()
-const formatDateTime = useFormatDateTime({
+
+const formatDateTime = createDateFormatter({
 	dateStyle: 'long',
 	timeStyle: 'short',
 })
-const formatNumber = useFormatNumber()
-const { formatCompactNumber } = useCompactNumber()
-const relativeTime = useRelativeTime({ style: 'narrow' })
-const formatBytes = useFormatBytes()
+const relativeTime = createRelativeTimeFormatter({ style: 'narrow' })
 const client = injectModrinthClient()
 const tags = injectTags(null)
 const { project, members } = injectProjectReviewPageContext()
@@ -476,7 +466,12 @@ const authorQuery = useQuery({
 	enabled: computed(() => props.expanded && !memberAuthor.value),
 })
 const author = computed(() => memberAuthor.value ?? authorQuery.data.value)
-const dependencyTypeOrder = { required: 0, optional: 1, incompatible: 2, embedded: 3 }
+const dependencyTypeOrder = {
+	required: 0,
+	optional: 1,
+	incompatible: 2,
+	embedded: 3,
+}
 function dependencyName(context: DependencyContext) {
 	return (
 		context.project?.title ??
@@ -541,18 +536,18 @@ function fileActions(file: VersionFile): ButtonMenuOption[] {
 	const options: ButtonMenuOption[] = [
 		{
 			id: 'view-c2pa-info',
-			label: formatMessage(messages.viewC2paInfo),
+			label: 'View C2PA info',
 			icon: ScanEyeIcon,
 			action: () => emit('scan-ai', file.url),
 		},
 		{
 			id: 'open-slicer',
-			label: formatMessage(messages.openSlicer),
+			label: 'Open in Slicer',
 			icon: CoffeeIcon,
 			disabled: loadingSlicerButton.value === file.url,
 			action: () => openInSlicer([file.url], file.url),
 			trailingAction: {
-				label: formatMessage(messages.slicerOpenExternal),
+				label: 'Open in Slicer in a new tab',
 				icon: ExternalIcon,
 				action: (event) => {
 					const element = event.currentTarget as HTMLElement
@@ -570,9 +565,7 @@ function fileActions(file: VersionFile): ButtonMenuOption[] {
 		if (!hash) continue
 		options.push({
 			id: `copy-${algorithm}`,
-			label: formatMessage(messages.copyHash, {
-				algorithm: algorithm === 'sha1' ? 'SHA-1' : 'SHA-512',
-			}),
+			label: `Copy ${algorithm === 'sha1' ? 'SHA-1' : 'SHA-512'}`,
 			icon: ClipboardCopyIcon,
 			action: () => navigator.clipboard.writeText(hash),
 		})
@@ -580,7 +573,7 @@ function fileActions(file: VersionFile): ButtonMenuOption[] {
 	options.push({
 		id: 'download',
 		type: 'link',
-		label: formatMessage(messages.download),
+		label: 'Download',
 		icon: DownloadIcon,
 		href: file.url,
 		download: file.filename,

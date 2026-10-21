@@ -14,7 +14,6 @@ import { computed, ref } from 'vue'
 
 import { provideReviewPanels } from '../../../../providers/project-review/review-panels'
 import { provideReviewSubmission } from '../../../../providers/project-review/review-submission-context'
-
 import ProjectIssueCard from '../../../ui/project-issue-card/index.vue'
 import ActionButton from '../../review-panel/controls/action-button.vue'
 import IssueToggles from '../issue-toggles.vue'

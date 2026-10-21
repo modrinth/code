@@ -2,10 +2,10 @@
 	<Button
 		v-if="kind !== 'placeholders'"
 		ref="trigger"
-		v-tooltip="formatMessage(libraryLabel)"
+		v-tooltip="libraryLabel"
 		size="sm"
 		:disabled="disabled"
-		:aria-label="formatMessage(libraryLabel)"
+		:aria-label="libraryLabel"
 		:aria-expanded="open"
 		:aria-controls="listId"
 		aria-haspopup="listbox"
@@ -27,9 +27,7 @@
 					{{ field.label }}
 					<Input v-model="values[field.token]" required />
 				</label>
-				<Button :disabled="!fieldsComplete" @click="insertSelected">
-					{{ formatMessage(messages.insert) }}
-				</Button>
+				<Button :disabled="!fieldsComplete" @click="insertSelected"> Insert message </Button>
 			</form>
 			<template v-else>
 				<Input
@@ -37,25 +35,25 @@
 					ref="searchInput"
 					v-model="search"
 					class="mb-2 w-full"
-					:placeholder="formatMessage(searchLabel)"
-					:aria-label="formatMessage(searchLabel)"
+					:placeholder="searchLabel"
+					:aria-label="searchLabel"
 					:aria-controls="listId"
 					:aria-activedescendant="activeTemplate ? `${listId}-${active}` : undefined"
 				/>
 				<div
 					:id="listId"
 					role="listbox"
-					:aria-label="formatMessage(libraryLabel)"
+					:aria-label="libraryLabel"
 					class="max-h-72 overflow-y-auto"
 				>
 					<div
 						v-for="section in sections"
 						:key="section.kind"
 						role="group"
-						:aria-label="formatMessage(section.label)"
+						:aria-label="section.label"
 					>
 						<div class="px-1.5 pb-2 pt-2.5 text-xs font-semibold text-secondary" aria-hidden="true">
-							{{ formatMessage(section.label) }}
+							{{ section.label }}
 						</div>
 						<div
 							v-for="{ item, index } in section.items"
@@ -75,7 +73,7 @@
 						</div>
 					</div>
 					<div v-if="!filtered.length" class="p-3 text-secondary">
-						{{ formatMessage(emptyLabel) }}
+						{{ emptyLabel }}
 					</div>
 				</div>
 			</template>
@@ -99,7 +97,7 @@
 <script setup lang="ts">
 import { autoUpdate, flip, offset, shift, useFloating } from '@floating-ui/vue'
 import { LibraryIcon } from '@modrinth/assets'
-import { Button, defineMessages, Input, useVIntl } from '@modrinth/ui'
+import { Button, Input } from '@modrinth/ui'
 import { renderHighlightedString } from '@modrinth/utils/highlightjs/index'
 import Fuse from 'fuse.js'
 import { computed, nextTick, ref, useId, watch } from 'vue'
@@ -120,40 +118,17 @@ const emit = defineEmits<{
 	insert: [body: string, inline: boolean]
 	dismiss: []
 }>()
-const { formatMessage } = useVIntl()
-const messages = defineMessages({
-	library: { id: 'markdown-editor.templates.library', defaultMessage: 'Message Library' },
-	search: {
-		id: 'markdown-editor.templates.search-all',
-		defaultMessage: 'Search messages and placeholders…',
-	},
-	empty: {
-		id: 'markdown-editor.templates.empty-all',
-		defaultMessage: 'No matching messages or placeholders.',
-	},
-	templateMessages: {
-		id: 'markdown-editor.templates.section',
-		defaultMessage: 'Template messages',
-	},
-	insert: { id: 'markdown-editor.templates.insert', defaultMessage: 'Insert message' },
-	placeholders: { id: 'markdown-editor.placeholders.label', defaultMessage: 'Placeholders' },
-	searchPlaceholders: {
-		id: 'markdown-editor.placeholders.search',
-		defaultMessage: 'Search placeholders…',
-	},
-	noPlaceholders: {
-		id: 'markdown-editor.placeholders.empty',
-		defaultMessage: 'No matching placeholders.',
-	},
-})
+
 const libraryLabel = computed(() =>
-	props.kind === 'placeholders' ? messages.placeholders : messages.library,
+	props.kind === 'placeholders' ? 'Placeholders' : 'Message Library',
 )
 const searchLabel = computed(() =>
-	props.kind === 'placeholders' ? messages.searchPlaceholders : messages.search,
+	props.kind === 'placeholders' ? 'Search placeholders…' : 'Search messages and placeholders…',
 )
 const emptyLabel = computed(() =>
-	props.kind === 'placeholders' ? messages.noPlaceholders : messages.empty,
+	props.kind === 'placeholders'
+		? 'No matching placeholders.'
+		: 'No matching messages or placeholders.',
 )
 const trigger = ref<InstanceType<typeof Button>>()
 const popup = ref<HTMLElement>()
@@ -195,12 +170,12 @@ const sections = computed(() => {
 	return [
 		{
 			kind: 'messages',
-			label: messages.templateMessages,
+			label: 'Template messages',
 			items: items.filter(({ item }) => item.kind !== 'placeholder'),
 		},
 		{
 			kind: 'placeholders',
-			label: messages.placeholders,
+			label: 'Placeholders',
 			items: items.filter(({ item }) => item.kind === 'placeholder'),
 		},
 	].filter((section) => section.items.length)
@@ -212,7 +187,11 @@ const { floatingStyles } = useFloating(reference, popup, {
 	strategy: 'fixed',
 	middleware: [
 		offset(6),
-		flip({ fallbackPlacements: ['top-start'], flipAlignment: false, padding: 8 }),
+		flip({
+			fallbackPlacements: ['top-start'],
+			flipAlignment: false,
+			padding: 8,
+		}),
 		shift({ padding: 8 }),
 	],
 	whileElementsMounted: autoUpdate,

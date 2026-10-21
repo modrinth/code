@@ -21,16 +21,10 @@
 					/>
 				</template>
 				<div v-else-if="isError" class="flex flex-col gap-3 p-4">
-					<p class="m-0 text-red" role="alert">
-						{{ formatMessage(messages.loadError) }}
-					</p>
-					<Button class="w-fit" @click="() => refetch()">{{
-						formatMessage(messages.retry)
-					}}</Button>
+					<p class="m-0 text-red" role="alert">Could not load project data</p>
+					<Button class="w-fit" @click="() => refetch()">Retry</Button>
 				</div>
-				<p v-else class="m-0 p-4 text-secondary" role="status">
-					{{ formatMessage(messages.loading) }}
-				</p>
+				<p v-else class="m-0 p-4 text-secondary" role="status">Loading...</p>
 			</div>
 		</div>
 		<MessageBox v-if="thread" ref="messageBox" class="[&_.markdown-body]:text-xs" />
@@ -49,7 +43,7 @@
 </template>
 
 <script setup lang="ts">
-import { Button, ImageViewerEditor, useVIntl } from '@modrinth/ui'
+import { Button, ImageViewerEditor } from '@modrinth/ui'
 import { useResizeObserver } from '@vueuse/core'
 import { computed, nextTick, ref, watch } from 'vue'
 
@@ -58,7 +52,6 @@ import { injectProjectReviewPageContext } from '~/providers/project-review'
 
 import ImageViewerActions from '../image-viewer-actions.vue'
 import { injectProjectReviewContext } from '../layout/context'
-import { projectReviewMessages as messages } from '../messages'
 import MessageBox from './message-box.vue'
 
 const {
@@ -70,7 +63,7 @@ const {
 const { rightVisible, toggleSidebar } = injectProjectReviewContext()
 const { data: thread, isError, refetch } = threadQuery
 const auth = useAuthState()
-const { formatMessage } = useVIntl()
+
 const viewer = ref<InstanceType<typeof ImageViewerEditor>>()
 const imageItems = ref<{ id: string; src: string; alt: string }[]>([])
 let imageTrigger: HTMLImageElement | undefined
@@ -81,7 +74,7 @@ async function openImage(image: { src: string; alt: string; element: HTMLImageEl
 		{
 			id: image.src,
 			src: image.src,
-			alt: image.alt || formatMessage(messages.imageNumber, { number: 1 }),
+			alt: image.alt || `Image ${1}`,
 		},
 	]
 	await nextTick()

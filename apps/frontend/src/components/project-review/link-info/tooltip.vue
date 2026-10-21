@@ -32,15 +32,19 @@
 
 <script setup lang="ts">
 import { autoUpdate, flip, offset, shift, size, useFloating } from '@floating-ui/vue'
-import { type FieldValidationMessage, moderationSettings } from '@modrinth/moderation'
+import { moderationSettings } from '@modrinth/moderation'
 import { computed, onScopeDispose, ref, useId, watch } from 'vue'
 
 import { useModerationSettings } from '~/composables/moderation'
 
 import { useReviewEventListener } from '../shortcuts'
 import LinkInfo from './index.vue'
+import type { LinkValidationWarning } from './validation'
 
-const props = defineProps<{ url: string; validationMessages?: FieldValidationMessage[] }>()
+const props = defineProps<{
+	url: string
+	validationMessages?: LinkValidationWarning[]
+}>()
 const emit = defineEmits<{ hover: [hovered: boolean] }>()
 const settings = useModerationSettings()
 const anchor = ref<HTMLElement>()

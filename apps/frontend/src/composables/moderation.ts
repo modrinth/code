@@ -3,9 +3,9 @@ import { computed } from 'vue'
 
 import type { CookieOptions } from '#app'
 import {
+	type AppearanceValues,
 	defaultAppearance,
 	parseAppearance,
-	type AppearanceValues,
 } from '~/helpers/moderation-appearance'
 import { FrontendNotificationManager } from '~/providers/frontend-notifications'
 

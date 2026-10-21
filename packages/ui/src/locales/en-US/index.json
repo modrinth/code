@@ -368,6 +368,15 @@
   "collections.label.private": {
     "defaultMessage": "Private"
   },
+  "color-picker.hex-value": {
+    "defaultMessage": "{label} hex value"
+  },
+  "color-picker.hue": {
+    "defaultMessage": "{label} hue"
+  },
+  "color-picker.saturation-and-brightness": {
+    "defaultMessage": "{label} saturation and brightness"
+  },
   "console.actions.collapse": {
     "defaultMessage": "Collapse"
   },

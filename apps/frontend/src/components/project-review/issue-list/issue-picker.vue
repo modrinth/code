@@ -6,9 +6,9 @@
 		:max-tag-rows="3"
 		:disabled="pending"
 		:searchable="true"
-		:search-placeholder="formatMessage(messages.search)"
-		:no-options-message="formatMessage(messages.empty)"
-		:no-results-message="formatMessage(messages.empty)"
+		search-placeholder="Search issues…"
+		no-options-message="No matching issues."
+		no-results-message="No matching issues."
 		:dropdown-width="288"
 		dropdown-align="right"
 		:max-height="440"
@@ -26,7 +26,7 @@
 		<template #input-content>
 			<span class="flex items-center gap-1">
 				<PlusIcon class="size-4 shrink-0" aria-hidden="true" />
-				{{ formatMessage(messages.add) }}
+				Issue
 			</span>
 		</template>
 	</MultiSelect>
@@ -34,7 +34,7 @@
 
 <script setup lang="ts">
 import { PlusIcon } from '@modrinth/assets'
-import { defineMessages, MultiSelect, type MultiSelectItem, useVIntl } from '@modrinth/ui'
+import { MultiSelect, type MultiSelectItem } from '@modrinth/ui'
 import { computed, ref, watch } from 'vue'
 
 import { injectReviewMessages } from '~/providers/project-review/review-messages'
@@ -47,28 +47,14 @@ const emit = defineEmits<{ selected: [] }>()
 const panels = injectReviewPanels()
 const reviewMessages = injectReviewMessages()
 const { pending } = injectReviewSubmission()
-const { formatMessage } = useVIntl()
-const messages = defineMessages({
-	custom: { id: 'project-review.issues.custom', defaultMessage: 'Custom issue' },
-	add: { id: 'project-review.issues.add', defaultMessage: 'Issue' },
-	search: {
-		id: 'project-review.issues.search',
-		defaultMessage: 'Search issues…',
-	},
-	empty: {
-		id: 'project-review.issues.no-results',
-		defaultMessage: 'No matching issues.',
-	},
-})
+
 const selected = computed(() => panels.activeIssues.value.map(({ id }) => id))
 const picker = ref<{ close: () => void; open: () => Promise<void> }>()
 const shortcuts = injectReviewShortcuts()
 const draft = ref([...selected.value])
 const isOpen = ref(false)
 const options = computed<MultiSelectItem<string>[]>(() => {
-	const items: MultiSelectItem<string>[] = [
-		{ value: 'add-custom-issue', label: formatMessage(messages.custom) },
-	]
+	const items: MultiSelectItem<string>[] = [{ value: 'add-custom-issue', label: 'Custom issue' }]
 	const selectedIds = new Set(selected.value)
 	const categories = new Map<string, ReviewIssue[]>()
 	for (const issue of panels.availableIssues.value) {

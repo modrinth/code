@@ -357,9 +357,7 @@ export function createReviewPanels(
 				issueIds,
 				toggleIds: [
 					...new Set(
-						[...Object.keys(session.read(projectV3.id, 'issues')), ...issueIds].flatMap(
-							toggleIds,
-						),
+						[...Object.keys(session.read(projectV3.id, 'issues')), ...issueIds].flatMap(toggleIds),
 					),
 				],
 			},

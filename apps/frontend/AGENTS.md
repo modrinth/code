@@ -28,6 +28,10 @@ Nuxt 3 with SSR — pages are server-rendered and hydrated on the client. Uses `
 
 Rule of thumb: if it doesn't depend on Nuxt-specific APIs or website-only features, it should be in `packages/ui`.
 
+### Project Review Language
+
+Project-review code is English-only. Do not add i18n message definitions, translation keys, or translation helpers to project-review routes, components, providers, or supporting code, including review-only components outside `src/components/project-review/`. Use plain English strings, ordinary interpolation and plural handling, and English date/number formatting. This exception also applies during i18n passes. Preserve localization in shared components used elsewhere.
+
 ### Project Review Popout Windows
 
 Project review panels can be displayed in multiple browser documents while sharing the main window's Vue application and JavaScript context. Use an anchor, panel, or event target's `ownerDocument` for DOM queries and its `defaultView` for window behavior. Global `document` and `window` still identify the main window after a panel moves.

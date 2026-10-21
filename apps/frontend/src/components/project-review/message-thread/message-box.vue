@@ -10,7 +10,7 @@
 			role="separator"
 			tabindex="0"
 			aria-orientation="horizontal"
-			:aria-label="formatMessage(messages.resizeMessageBox)"
+			aria-label="Resize message box"
 			:aria-valuenow="Math.round(measuredHeight)"
 			:aria-valuemin="180"
 			class="message-box-resize absolute -top-2 left-0 z-10 h-4 w-full cursor-row-resize touch-none"
@@ -30,7 +30,7 @@
 				v-model="draft"
 				:disabled="pending"
 				:templates="templates"
-				:placeholder="formatMessage(messages.replyPlaceholder)"
+				placeholder="Reply to thread…"
 				:on-image-upload="uploadImage"
 				:heading-buttons="false"
 				:hide-formatting-buttons="
@@ -45,12 +45,12 @@
 			<Button :disabled="!canSubmit || pending || !draft.trim()" @click="submit('note')">
 				<SpinnerIcon v-if="loadingAction === 'note'" class="animate-spin" aria-hidden="true" />
 				<StickyNotePlusIcon v-else aria-hidden="true" />
-				{{ formatMessage(messages.addNote) }}
+				Private note
 			</Button>
 			<Button :disabled="!canSubmit || pending || !draft.trim()" @click="submit('reply')">
 				<SpinnerIcon v-if="loadingAction === 'reply'" class="animate-spin" aria-hidden="true" />
 				<ReplyIcon v-else aria-hidden="true" />
-				{{ formatMessage(messages.reply) }}
+				Reply
 			</Button>
 			<Button
 				v-if="showClearIssues"
@@ -63,7 +63,7 @@
 					aria-hidden="true"
 				/>
 				<ReplyIcon v-else aria-hidden="true" />
-				{{ formatMessage(messages.replyAndClearIssues) }}
+				Reply and clear issues
 			</Button>
 		</div>
 	</div>
@@ -73,7 +73,7 @@
 import { ReplyIcon, SpinnerIcon, StickyNotePlusIcon } from '@modrinth/assets'
 import { getMessageTemplates, moderationSettings } from '@modrinth/moderation'
 import { IssuePriority } from '@modrinth/moderation/src/data/issues'
-import { Button, defineMessages, useVIntl } from '@modrinth/ui'
+import { Button } from '@modrinth/ui'
 import { useElementSize } from '@vueuse/core'
 import { computed, nextTick, ref, watch } from 'vue'
 
@@ -89,7 +89,7 @@ import TemplateMarkdownEditor from './template-markdown-editor.vue'
 const keybinds = useModerationKeybinds()
 const settings = useModerationSettings()
 const { project, projectV2 } = injectProjectReviewPageContext()
-const { formatMessage } = useVIntl()
+
 const panels = injectReviewPanels()
 const reviewMessages = injectReviewMessages()
 const previousIssues = injectReviewPreviousIssues()
@@ -120,7 +120,10 @@ const templates = computed(() => {
 	if (!current || !legacy || current.id !== legacy.id) return []
 	return getMessageTemplates({ project: current, projectV2: legacy }).map((template) =>
 		hasCorrectionsHeading(template.body)
-			? { ...template, body: [template.body, ...issueMessages.value].join('\n\n') }
+			? {
+					...template,
+					body: [template.body, ...issueMessages.value].join('\n\n'),
+				}
 			: template,
 	)
 })
@@ -144,22 +147,7 @@ const messageBox = ref<HTMLElement | null>(null)
 const { height: measuredHeight } = useElementSize(messageBox)
 const height = ref<number | null>(null)
 const resizeStart = ref<{ y: number; height: number } | null>(null)
-const messages = defineMessages({
-	resizeMessageBox: {
-		id: 'project-review.message-box.resize',
-		defaultMessage: 'Resize message box',
-	},
-	reply: { id: 'project-review.composer.reply', defaultMessage: 'Reply' },
-	replyAndClearIssues: {
-		id: 'project-review.composer.reply-and-clear-issues',
-		defaultMessage: 'Reply and clear issues',
-	},
-	addNote: { id: 'project-review.composer.add-note', defaultMessage: 'Private note' },
-	replyPlaceholder: {
-		id: 'project-review.composer.reply-placeholder',
-		defaultMessage: 'Reply to thread…',
-	},
-})
+
 function setHeight(value: number) {
 	height.value = Math.max(180, value)
 }
