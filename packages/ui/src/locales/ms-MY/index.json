@@ -3773,12 +3773,6 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "Memulihkan daripada sandaran"
   },
-  "servers.backups.bulk-bar.aria-label": {
-    "defaultMessage": "{count, plural, other {Tindakan pukal untuk # sandaran yang dipilih}}"
-  },
-  "servers.backups.bulk-bar.deleting": {
-    "defaultMessage": "Sedang memadamkan {total, plural, other {# sandaran}}..."
-  },
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "{count, plural, other {# sandaran dipilih}}"
   },
@@ -3794,47 +3788,11 @@
   "servers.backups.empty.heading": {
     "defaultMessage": "Belum ada sandaran"
   },
-  "servers.backups.filtered-empty.clear-filters": {
-    "defaultMessage": "Kosongkan tapisan"
-  },
-  "servers.backups.filtered-empty.heading": {
-    "defaultMessage": "Tiada sandaran yang sepadan"
-  },
   "servers.backups.item.auto": {
     "defaultMessage": "Auto"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Jadual penyandaran"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "Avatar {username}"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "Sokongan"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Penyandaran manual"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Namakan semula"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Pulihkan"
-  },
-  "servers.backups.select-backup-aria": {
-    "defaultMessage": "Pilih sandaran {name}"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Cipta sandaran"
-  },
-  "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "Auto"
-  },
-  "servers.backups.toolbar.filter-manual": {
-    "defaultMessage": "Manual"
-  },
-  "servers.backups.toolbar.select-all": {
-    "defaultMessage": "Pilih semua"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "Penciptaan sandaran sedang dijalankan"
@@ -4959,4 +4917,3 @@
     "defaultMessage": "Jenis"
   }
 }
-

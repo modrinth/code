@@ -5192,12 +5192,6 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "Відновлення з резервної копії"
   },
-  "servers.backups.bulk-bar.aria-label": {
-    "defaultMessage": "{count, plural, one {Групові дії для однієї вибраної резервної копії} other {Групові дії для # вибраних резервних копій}}"
-  },
-  "servers.backups.bulk-bar.deleting": {
-    "defaultMessage": "Видалення {total, plural, one {# резервоної копії} few {# резервних копій} many {# резервних копій} other {# резервних копій}}…"
-  },
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "{count, plural, one {# резервну копію вибрано} few {# резевні копії вибрано} many {# резевних копій вибрано} other {# резевних копій вибрано}}"
   },
@@ -5222,50 +5216,11 @@
   "servers.backups.empty.heading": {
     "defaultMessage": "Резервних копій ще немає"
   },
-  "servers.backups.filtered-empty.clear-filters": {
-    "defaultMessage": "Очистити фільтр"
-  },
-  "servers.backups.filtered-empty.description": {
-    "defaultMessage": "Спробуйте інший фільтр або очистіть фільтри, щоб переглянути всі резервні копії."
-  },
-  "servers.backups.filtered-empty.heading": {
-    "defaultMessage": "Немає відповідних резервних копій"
-  },
   "servers.backups.item.auto": {
     "defaultMessage": "Автоматично"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Розклад резервного копіювання"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "Аватар {username}"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "Підтримка"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Ручне резервне копіювання"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Перейменувати"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Відновлення"
-  },
-  "servers.backups.select-backup-aria": {
-    "defaultMessage": "Вибрати резервну копію {name}"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Створити резервну копію"
-  },
-  "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "Авто"
-  },
-  "servers.backups.toolbar.filter-manual": {
-    "defaultMessage": "Уручну"
-  },
-  "servers.backups.toolbar.select-all": {
-    "defaultMessage": "Вибрати все"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "Триває створення резервної копії"

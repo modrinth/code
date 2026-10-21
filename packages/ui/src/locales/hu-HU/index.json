@@ -5207,12 +5207,6 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "Visszaállítás biztonsági mentésből"
   },
-  "servers.backups.bulk-bar.aria-label": {
-    "defaultMessage": "{count, plural, one {Tömeges műveletek 1 kiválasztott biztonsági mentéshez} other {Tömeges műveletek # kiválasztott biztonsági mentéshez}}"
-  },
-  "servers.backups.bulk-bar.deleting": {
-    "defaultMessage": "{total} biztonsági mentés törlése..."
-  },
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "{count} biztonsági mentés kiválasztva"
   },
@@ -5237,50 +5231,11 @@
   "servers.backups.empty.heading": {
     "defaultMessage": "Még nincsenek biztonsági mentések"
   },
-  "servers.backups.filtered-empty.clear-filters": {
-    "defaultMessage": "Szűrők törlése"
-  },
-  "servers.backups.filtered-empty.description": {
-    "defaultMessage": "Próbálj ki egy másik szűrőt, vagy töröld a szűrőket, hogy az összes biztonsági mentést megtekinthesd."
-  },
-  "servers.backups.filtered-empty.heading": {
-    "defaultMessage": "Nincs találat"
-  },
   "servers.backups.item.auto": {
     "defaultMessage": "Automatikus"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Biztonsági mentés ütemezés"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "{username} avatárja"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "Támogatás"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Manuális biztonsági mentés"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Átnevezés"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Visszaállítás"
-  },
-  "servers.backups.select-backup-aria": {
-    "defaultMessage": "{name} biztonsági mentés kiválasztása"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Biztonsági mentés létrehozása"
-  },
-  "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "Automatikus"
-  },
-  "servers.backups.toolbar.filter-manual": {
-    "defaultMessage": "Kézi"
-  },
-  "servers.backups.toolbar.select-all": {
-    "defaultMessage": "Összes kijelölése"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "Biztonsági mentés létrehozás folyamatban van"

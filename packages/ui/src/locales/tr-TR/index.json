@@ -5159,9 +5159,6 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "Yedekten geri yükleniyor"
   },
-  "servers.backups.bulk-bar.deleting": {
-    "defaultMessage": "{total, plural, one {# yedek} other {# yedek}} siliniyor..."
-  },
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "{count, plural, one {# yedek seçildi} other {# yedek seçildi}}"
   },
@@ -5183,50 +5180,11 @@
   "servers.backups.empty.heading": {
     "defaultMessage": "Henüz yedekleme yok"
   },
-  "servers.backups.filtered-empty.clear-filters": {
-    "defaultMessage": "Filtreleri temizle"
-  },
-  "servers.backups.filtered-empty.description": {
-    "defaultMessage": "Tüm yedekleri görmek için farklı bir filtre deneyin veya filtreleri temizleyin."
-  },
-  "servers.backups.filtered-empty.heading": {
-    "defaultMessage": "Yedekler eşleşmiyor"
-  },
   "servers.backups.item.auto": {
     "defaultMessage": "Otomatik"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Yedekleme zamanları"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "{username} nın avatarı"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "Destek"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Manuel yedekleme"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Yeniden adlandır"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Geri yükle"
-  },
-  "servers.backups.select-backup-aria": {
-    "defaultMessage": "{name} yedek dosyasını seçin"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Yedek oluştur"
-  },
-  "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "Otomatik"
-  },
-  "servers.backups.toolbar.filter-manual": {
-    "defaultMessage": "Manüel"
-  },
-  "servers.backups.toolbar.select-all": {
-    "defaultMessage": "Hepsini seç"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "Yedek oluşturma sürüyor"

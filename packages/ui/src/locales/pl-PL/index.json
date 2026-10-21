@@ -5222,12 +5222,6 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "Przywracanie z kopii zapasowej"
   },
-  "servers.backups.bulk-bar.aria-label": {
-    "defaultMessage": "Masowe akcje dla {count, plural, one {jednej wybranej kopii zapasowej} other {# wybranych kopii zapasowych}}"
-  },
-  "servers.backups.bulk-bar.deleting": {
-    "defaultMessage": "Usuwanie {total, plural, one {# kopii zapasowej} other {# kopii zapasowych}}..."
-  },
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "Wybrano {count, plural, one {# kopię zapasową} few {# kopie zapasowe} other {# kopii zapasowych}}"
   },
@@ -5252,50 +5246,11 @@
   "servers.backups.empty.heading": {
     "defaultMessage": "Nie masz jeszcze żadnych kopii zapasowych"
   },
-  "servers.backups.filtered-empty.clear-filters": {
-    "defaultMessage": "Wyczyść filtry"
-  },
-  "servers.backups.filtered-empty.description": {
-    "defaultMessage": "Spróbuj użyć innego filtru lub wyczyść filtry, by zobaczyć wszystkie kopie zapasowe."
-  },
-  "servers.backups.filtered-empty.heading": {
-    "defaultMessage": "Nie znaleziono pasujących kopii zapasowych"
-  },
   "servers.backups.item.auto": {
     "defaultMessage": "Automatyczne"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Harmonogram kopii zapasowych"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "Awatar użytkownika {username}"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "Obsługa Modrinth"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Ręczne kopie zapasowe"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Zmień nazwę"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Przywróć"
-  },
-  "servers.backups.select-backup-aria": {
-    "defaultMessage": "Wybierz kopię zapasową {name}"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Utwórz kopię zapasową"
-  },
-  "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "Automatyczne"
-  },
-  "servers.backups.toolbar.filter-manual": {
-    "defaultMessage": "Ręczne"
-  },
-  "servers.backups.toolbar.select-all": {
-    "defaultMessage": "Wybierz wszystkie"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "Trwa tworzenie kopii zapasowej"

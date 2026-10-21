@@ -39,9 +39,7 @@
 					@navigate="scrollFileTreeToTop"
 				/>
 			</div>
-			<div
-				class="flex flex-col gap-2 border-0 border-b border-solid border-surface-5 px-6 pb-4 pt-6"
-			>
+			<div class="flex flex-col gap-2 border-0 border-b border-solid border-surface-5 px-6 py-4">
 				<div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
 					<span class="font-semibold text-contrast">
 						{{ formatMessage(messages.storageTitle) }}

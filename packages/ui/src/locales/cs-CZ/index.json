@@ -4310,41 +4310,11 @@
   "servers.backups.delete-modal.header": {
     "defaultMessage": "Smazat {count, plural, one {zálohu} other {zálohy}}"
   },
-  "servers.backups.filtered-empty.clear-filters": {
-    "defaultMessage": "Vymazat filtry"
-  },
   "servers.backups.item.auto": {
     "defaultMessage": "Automaticky"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Plán zálohování"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "Avatar uživatele {username}"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "Podpora"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Ruční zálohování"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Přejmenovat"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Obnovit"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Vytvořit zálohu"
-  },
-  "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "Automatický"
-  },
-  "servers.backups.toolbar.filter-manual": {
-    "defaultMessage": "Manuální"
-  },
-  "servers.backups.toolbar.select-all": {
-    "defaultMessage": "Vybrat vše"
   },
   "servers.grant-access-modal.already-member-tooltip": {
     "defaultMessage": "Uživatel je již pozván"
@@ -5190,4 +5160,3 @@
     "defaultMessage": "Typ"
   }
 }
-

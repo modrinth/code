@@ -5240,12 +5240,6 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "從備份還原"
   },
-  "servers.backups.bulk-bar.aria-label": {
-    "defaultMessage": "{count, plural, other {對 # 個選取的備份執行批次動作}}"
-  },
-  "servers.backups.bulk-bar.deleting": {
-    "defaultMessage": "正在刪除 {total, plural, other {# 個備份}}..."
-  },
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "{count, plural, other {已選取 # 個備份}}"
   },
@@ -5270,50 +5264,11 @@
   "servers.backups.empty.heading": {
     "defaultMessage": "尚無備份"
   },
-  "servers.backups.filtered-empty.clear-filters": {
-    "defaultMessage": "清除篩選條件"
-  },
-  "servers.backups.filtered-empty.description": {
-    "defaultMessage": "試試使用不同的篩選條件，或清除篩選條件以查看所有備份。"
-  },
-  "servers.backups.filtered-empty.heading": {
-    "defaultMessage": "沒有相符的備份"
-  },
   "servers.backups.item.auto": {
     "defaultMessage": "自動備份"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "備份排程"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "{username} 的顯示圖片"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "客服"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "手動備份"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "重新命名"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "還原"
-  },
-  "servers.backups.select-backup-aria": {
-    "defaultMessage": "選擇備份「{name}」"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "建立備份"
-  },
-  "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "自動備份"
-  },
-  "servers.backups.toolbar.filter-manual": {
-    "defaultMessage": "手動備份"
-  },
-  "servers.backups.toolbar.select-all": {
-    "defaultMessage": "全選"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "正在建立備份"
@@ -7275,4 +7230,3 @@
     "defaultMessage": "類型"
   }
 }
-

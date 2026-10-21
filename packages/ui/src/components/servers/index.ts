@@ -15,3 +15,4 @@ export { type PendingChange, default as ServerListing } from './ServerListing.vu
 export { default as ServerSettingsModal } from './ServerSettingsModal.vue'
 export { default as ServerSetupModal } from './ServerSetupModal.vue'
 export { default as ServersPromo } from './ServersPromo.vue'
+export { default as ServerStatCard } from './ServerStatCard.vue'

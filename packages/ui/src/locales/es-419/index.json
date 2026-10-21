@@ -5225,12 +5225,6 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "Restaurando desde respaldo"
   },
-  "servers.backups.bulk-bar.aria-label": {
-    "defaultMessage": "{count, plural, one {Acciones masivas para un respaldo seleccionado} other {Acciones masivas para # respaldos seleccionados}}"
-  },
-  "servers.backups.bulk-bar.deleting": {
-    "defaultMessage": "Eliminando {total, plural, one {# respaldo} other {# respaldos}}..."
-  },
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "{count, plural, one {# respaldo seleccionado} other {# respaldos seleccionados}}"
   },
@@ -5255,50 +5249,11 @@
   "servers.backups.empty.heading": {
     "defaultMessage": "Aún no hay respaldos"
   },
-  "servers.backups.filtered-empty.clear-filters": {
-    "defaultMessage": "Limpiar filtros"
-  },
-  "servers.backups.filtered-empty.description": {
-    "defaultMessage": "Prueba con otro filtro o desactiva los filtros para ver todos los respaldos."
-  },
-  "servers.backups.filtered-empty.heading": {
-    "defaultMessage": "Ningún respaldo coincide"
-  },
   "servers.backups.item.auto": {
     "defaultMessage": "Auto"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Respaldo programado"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "Avatar de {username}"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "Soporte"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Respaldo manual"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Renombrar"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Restaurar"
-  },
-  "servers.backups.select-backup-aria": {
-    "defaultMessage": "Selecciona el respaldo {name}"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Crear respaldo"
-  },
-  "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "Automático"
-  },
-  "servers.backups.toolbar.filter-manual": {
-    "defaultMessage": "Manual"
-  },
-  "servers.backups.toolbar.select-all": {
-    "defaultMessage": "Seleccionar todo"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "Creación de respaldo en curso"
@@ -7236,4 +7191,3 @@
     "defaultMessage": "Tipo"
   }
 }
-
