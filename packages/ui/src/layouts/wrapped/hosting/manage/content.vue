@@ -408,7 +408,11 @@ const managedContent = computed<ManagedContentData | null>(() => {
 			manager: {
 				name: title,
 				iconUrl: (projectId ? (project?.icon_url ?? mp.icon_url) : mp.icon_url) ?? undefined,
-				link: projectId ? `/project/${project?.slug ?? projectId}` : undefined,
+				link: projectId
+					? `/project/${project?.slug ?? projectId}`
+					: curseforgeModpackLink.value
+						? `https://www.curseforge.com/minecraft/modpacks/${curseforgeModpackLink.value.slug}`
+						: undefined,
 			},
 			summary,
 			versionNumber: isLocal ? undefined : (mp.version_number ?? undefined),

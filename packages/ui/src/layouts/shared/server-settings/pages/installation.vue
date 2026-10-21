@@ -508,7 +508,11 @@ provideInstallationSettings({
 					: spec.platform === 'curseforge'
 						? spec.filename
 						: spec.project_id),
-			link: modpackProjectId.value ? `/project/${modpackProjectId.value}` : undefined,
+			link: modpackProjectId.value
+				? `/project/${modpackProjectId.value}`
+				: spec.platform === 'curseforge' && spec.link
+					? `https://www.curseforge.com/minecraft/modpacks/${spec.link.slug}`
+					: undefined,
 			versionNumber: modpack.value.version_number,
 			filename: spec.platform === 'modrinth' ? undefined : spec.filename,
 			owner: modpack.value.owner

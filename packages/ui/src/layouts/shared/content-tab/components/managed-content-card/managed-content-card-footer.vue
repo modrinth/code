@@ -74,6 +74,10 @@ const messages = defineMessages({
 	},
 })
 
+const isExternalManagerLink = computed(
+	() => typeof props.data.manager.link === 'string' && props.data.manager.link.startsWith('http'),
+)
+
 const timestamp = computed(() => {
 	if (props.data.kind === 'modpack') {
 		return props.data.updatedAt
@@ -114,6 +118,8 @@ const showAction = computed(
 					</span>
 					<AutoLink
 						:to="data.manager.link"
+						:target="isExternalManagerLink ? '_blank' : undefined"
+						:rel="isExternalManagerLink ? 'noopener noreferrer' : undefined"
 						class="flex min-w-0 items-center gap-1.5 text-secondary"
 						:class="data.manager.link ? 'hover:underline' : ''"
 					>
