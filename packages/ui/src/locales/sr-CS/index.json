@@ -1613,9 +1613,6 @@
   "files.navbar.home": {
     "defaultMessage": "Početna stranica"
   },
-  "files.navbar.install-curseforge-pack": {
-    "defaultMessage": "Instaliraj modpack od CurseForge"
-  },
   "files.navbar.new-file": {
     "defaultMessage": "Nova datoteka"
   },
@@ -1751,21 +1748,6 @@
   "files.zip-url-modal.backup-name": {
     "defaultMessage": "Instalacija modpacka od CurseForge"
   },
-  "files.zip-url-modal.cf-header": {
-    "defaultMessage": "Instaliraj modpack od CurseForge"
-  },
-  "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "Nismo mogli da pronađemo CurseForge modpack na toj URL adresi."
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "Modpack od CurseForge nije pronađen"
-  },
-  "files.zip-url-modal.enter-link": {
-    "defaultMessage": "Ubaci link"
-  },
-  "files.zip-url-modal.error-cf-url": {
-    "defaultMessage": "URL mora biti URL verzije CurseForge modpacka."
-  },
   "files.zip-url-modal.error-url-invalid": {
     "defaultMessage": "URL mora biti važeći."
   },
@@ -1777,24 +1759,6 @@
   },
   "files.zip-url-modal.install-failed-title": {
     "defaultMessage": "Neuspešna instalacija"
-  },
-  "files.zip-url-modal.step-copy-description": {
-    "defaultMessage": "Kopiraj URL adresu stranice verzije i nalepi je ispod."
-  },
-  "files.zip-url-modal.step-copy-title": {
-    "defaultMessage": "Kopiraj URL"
-  },
-  "files.zip-url-modal.step-find-description": {
-    "defaultMessage": "Pregledaj CurseForge i pronađi željeni modpak."
-  },
-  "files.zip-url-modal.step-find-title": {
-    "defaultMessage": "Pronađi modpack"
-  },
-  "files.zip-url-modal.step-select-description": {
-    "defaultMessage": "Idi na karticu „Datoteke” i izaberi verziju za instalaciju."
-  },
-  "files.zip-url-modal.step-select-title": {
-    "defaultMessage": "Izaberi verziju"
   },
   "files.zip-url-modal.unknown-error": {
     "defaultMessage": "Došlo je do nepoznate greške"

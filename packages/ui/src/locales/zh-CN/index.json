@@ -1622,9 +1622,6 @@
   "files.navbar.home": {
     "defaultMessage": "主目录"
   },
-  "files.navbar.install-curseforge-pack": {
-    "defaultMessage": "安装 CurseForge 整合包"
-  },
   "files.navbar.new-file": {
     "defaultMessage": "新建文件"
   },
@@ -1760,21 +1757,6 @@
   "files.zip-url-modal.backup-name": {
     "defaultMessage": "安装 CurseForge 整合包"
   },
-  "files.zip-url-modal.cf-header": {
-    "defaultMessage": "安装一个 CurseForge 整合包"
-  },
-  "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "无法通过该链接找到 CurseForge 整合包。"
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "未找到 CurseForge 整合包"
-  },
-  "files.zip-url-modal.enter-link": {
-    "defaultMessage": "输入链接"
-  },
-  "files.zip-url-modal.error-cf-url": {
-    "defaultMessage": "必须是 CurseForge 整合包的链接。"
-  },
   "files.zip-url-modal.error-url-invalid": {
     "defaultMessage": "链接必须是有效的。"
   },
@@ -1786,24 +1768,6 @@
   },
   "files.zip-url-modal.install-failed-title": {
     "defaultMessage": "安装失败"
-  },
-  "files.zip-url-modal.step-copy-description": {
-    "defaultMessage": "复制版本页面的链接并粘贴到下方。"
-  },
-  "files.zip-url-modal.step-copy-title": {
-    "defaultMessage": "复制链接"
-  },
-  "files.zip-url-modal.step-find-description": {
-    "defaultMessage": "浏览 CurseForge 并找到你想要的整合包。"
-  },
-  "files.zip-url-modal.step-find-title": {
-    "defaultMessage": "找到整合包"
-  },
-  "files.zip-url-modal.step-select-description": {
-    "defaultMessage": "进入“文件”标签页并选择要安装的版本。"
-  },
-  "files.zip-url-modal.step-select-title": {
-    "defaultMessage": "选择一个版本"
   },
   "files.zip-url-modal.unknown-error": {
     "defaultMessage": "发生未知错误"

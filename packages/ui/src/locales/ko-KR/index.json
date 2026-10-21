@@ -1541,9 +1541,6 @@
   "files.navbar.home": {
     "defaultMessage": "홈"
   },
-  "files.navbar.install-curseforge-pack": {
-    "defaultMessage": "CurseForge 팩 설치"
-  },
   "files.navbar.new-file": {
     "defaultMessage": "새 파일"
   },
@@ -1679,21 +1676,6 @@
   "files.zip-url-modal.backup-name": {
     "defaultMessage": "CurseForge 모드팩 설치"
   },
-  "files.zip-url-modal.cf-header": {
-    "defaultMessage": "CurseForge 모드팩 설치"
-  },
-  "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "해당 URL에서 CurseForge 모드팩을 찾을 수 없습니다."
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "CurseForge 모드팩을 찾을 수 없음"
-  },
-  "files.zip-url-modal.enter-link": {
-    "defaultMessage": "링크 입력"
-  },
-  "files.zip-url-modal.error-cf-url": {
-    "defaultMessage": "URL은 CurseForge 모드팩 버전 URL이어야 합니다."
-  },
   "files.zip-url-modal.error-url-invalid": {
     "defaultMessage": "URL이 유효하지 않습니다."
   },
@@ -1705,24 +1687,6 @@
   },
   "files.zip-url-modal.install-failed-title": {
     "defaultMessage": "설치 실패"
-  },
-  "files.zip-url-modal.step-copy-description": {
-    "defaultMessage": "버전 페이지의 URL을 복사하여 아래에 붙여넣으세요."
-  },
-  "files.zip-url-modal.step-copy-title": {
-    "defaultMessage": "URL 복사"
-  },
-  "files.zip-url-modal.step-find-description": {
-    "defaultMessage": "CurseForge를 둘러보고 원하는 모드팩을 찾아보세요."
-  },
-  "files.zip-url-modal.step-find-title": {
-    "defaultMessage": "모드팩 찾기"
-  },
-  "files.zip-url-modal.step-select-description": {
-    "defaultMessage": "\"파일\" 탭으로 이동하여 설치할 버전을 선택하세요."
-  },
-  "files.zip-url-modal.step-select-title": {
-    "defaultMessage": "버전 선택"
   },
   "files.zip-url-modal.unknown-error": {
     "defaultMessage": "알 수 없는 오류 발생"

@@ -1610,9 +1610,6 @@
   "files.navbar.home": {
     "defaultMessage": "Startpagina"
   },
-  "files.navbar.install-curseforge-pack": {
-    "defaultMessage": "Installeer het CurseForge pakket"
-  },
   "files.navbar.new-file": {
     "defaultMessage": "Nieuw bestand"
   },
@@ -1745,21 +1742,6 @@
   "files.zip-url-modal.backup-name": {
     "defaultMessage": "CurseForge modpack installeren"
   },
-  "files.zip-url-modal.cf-header": {
-    "defaultMessage": "Installeer een CurseForge modpack"
-  },
-  "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "De modpack van CurseForge kon op die URL niet worden gevonden."
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "CurseForge modpack niet gevonden"
-  },
-  "files.zip-url-modal.enter-link": {
-    "defaultMessage": "Link invoeren"
-  },
-  "files.zip-url-modal.error-cf-url": {
-    "defaultMessage": "De URL moet een URL zijn van een CurseForge modpackversie."
-  },
   "files.zip-url-modal.error-url-invalid": {
     "defaultMessage": "De URL moet geldig zijn."
   },
@@ -1771,24 +1753,6 @@
   },
   "files.zip-url-modal.install-failed-title": {
     "defaultMessage": "Het installeren is mislukt"
-  },
-  "files.zip-url-modal.step-copy-description": {
-    "defaultMessage": "Kopieer de URL van de versiepagina en plak deze hieronder."
-  },
-  "files.zip-url-modal.step-copy-title": {
-    "defaultMessage": "Kopieer de URL"
-  },
-  "files.zip-url-modal.step-find-description": {
-    "defaultMessage": "Blader door CurseForge en zoek het gewenste modpack."
-  },
-  "files.zip-url-modal.step-find-title": {
-    "defaultMessage": "Zoek de modpack"
-  },
-  "files.zip-url-modal.step-select-description": {
-    "defaultMessage": "Ga naar het tabblad “Bestanden” en kies de versie die je wilt installeren."
-  },
-  "files.zip-url-modal.step-select-title": {
-    "defaultMessage": "Kies een versie"
   },
   "files.zip-url-modal.unknown-error": {
     "defaultMessage": "Er is een onbekende fout opgetreden"

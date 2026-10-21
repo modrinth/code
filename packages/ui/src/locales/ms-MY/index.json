@@ -1037,9 +1037,6 @@
   "files.navbar.home": {
     "defaultMessage": "Laman utama"
   },
-  "files.navbar.install-curseforge-pack": {
-    "defaultMessage": "Pasang pek CurseForge"
-  },
   "files.navbar.new-file": {
     "defaultMessage": "Fail baharu"
   },
@@ -1154,21 +1151,6 @@
   "files.zip-url-modal.backup-name": {
     "defaultMessage": "Pemasangan pek mod CurseForge"
   },
-  "files.zip-url-modal.cf-header": {
-    "defaultMessage": "Pasang pek mod CurseForge"
-  },
-  "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "Tidak dapat menemui pek mod CurseForge pada URL tersebut."
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "Pek mod CurseForge tidak ditemui"
-  },
-  "files.zip-url-modal.enter-link": {
-    "defaultMessage": "Masukkan pautan"
-  },
-  "files.zip-url-modal.error-cf-url": {
-    "defaultMessage": "URL mestilah URL versi pek mod CurseForge."
-  },
   "files.zip-url-modal.error-url-invalid": {
     "defaultMessage": "URL mestilah sah."
   },
@@ -1180,24 +1162,6 @@
   },
   "files.zip-url-modal.install-failed-title": {
     "defaultMessage": "Pemasangan gagal"
-  },
-  "files.zip-url-modal.step-copy-description": {
-    "defaultMessage": "Salin URL laman versi dan tampalkannya di bawah."
-  },
-  "files.zip-url-modal.step-copy-title": {
-    "defaultMessage": "Salin URL"
-  },
-  "files.zip-url-modal.step-find-description": {
-    "defaultMessage": "Layari CurseForge dan cari pek mod yang anda inginkan."
-  },
-  "files.zip-url-modal.step-find-title": {
-    "defaultMessage": "Cari pek mod"
-  },
-  "files.zip-url-modal.step-select-description": {
-    "defaultMessage": "Pergi ke tab \"Fail\" dan pilih versi untuk dipasang."
-  },
-  "files.zip-url-modal.step-select-title": {
-    "defaultMessage": "Pilih versi"
   },
   "files.zip-url-modal.unknown-error": {
     "defaultMessage": "Sebuah ralat yang tidak diketahui telah berlaku"

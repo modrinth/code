@@ -1550,9 +1550,6 @@
   "files.navbar.home": {
     "defaultMessage": "Hem"
   },
-  "files.navbar.install-curseforge-pack": {
-    "defaultMessage": "Installera CurseForge-paket"
-  },
   "files.navbar.new-file": {
     "defaultMessage": "Ny fil"
   },
@@ -1682,15 +1679,6 @@
   "files.validation.name-required": {
     "defaultMessage": "Namn krävs."
   },
-  "files.zip-url-modal.cf-header": {
-    "defaultMessage": "Installera ett CurseForge-modpaket"
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "CuseForge-modpaket hittades inte"
-  },
-  "files.zip-url-modal.enter-link": {
-    "defaultMessage": "Ange länk"
-  },
   "files.zip-url-modal.error-url-invalid": {
     "defaultMessage": "URL måste vara giltig."
   },
@@ -1702,24 +1690,6 @@
   },
   "files.zip-url-modal.install-failed-title": {
     "defaultMessage": "Installation misslyckades"
-  },
-  "files.zip-url-modal.step-copy-description": {
-    "defaultMessage": "Kopiera och klistra in versionssidans URL nedan."
-  },
-  "files.zip-url-modal.step-copy-title": {
-    "defaultMessage": "Kopiera URL:en"
-  },
-  "files.zip-url-modal.step-find-description": {
-    "defaultMessage": "Bläddra CurseForge och hitta modpaketet du vill ha."
-  },
-  "files.zip-url-modal.step-find-title": {
-    "defaultMessage": "Hitta modpaketet"
-  },
-  "files.zip-url-modal.step-select-description": {
-    "defaultMessage": "Gå till \"Filer\" fliken och välj version att installera."
-  },
-  "files.zip-url-modal.step-select-title": {
-    "defaultMessage": "Välj en version"
   },
   "files.zip-url-modal.unknown-error": {
     "defaultMessage": "Ett okänt fel inträffade"

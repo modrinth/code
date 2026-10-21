@@ -1616,9 +1616,6 @@
   "files.navbar.home": {
     "defaultMessage": "Strona główna"
   },
-  "files.navbar.install-curseforge-pack": {
-    "defaultMessage": "Zainstaluj paczkę modów CurseForge"
-  },
   "files.navbar.new-file": {
     "defaultMessage": "Nowy plik"
   },
@@ -1751,21 +1748,6 @@
   "files.zip-url-modal.backup-name": {
     "defaultMessage": "Instalacja paczki CurseForge"
   },
-  "files.zip-url-modal.cf-header": {
-    "defaultMessage": "Instaluj paczkę modów CurseForge"
-  },
-  "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "Nie znaleziono paczki modów CurseForge pod tym adresem."
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "Nie znaleziono paczki modów CurseForge"
-  },
-  "files.zip-url-modal.enter-link": {
-    "defaultMessage": "Wprowadź link"
-  },
-  "files.zip-url-modal.error-cf-url": {
-    "defaultMessage": "Adres URL musi prowadzić do jakiejś wersji paczki CurseForge."
-  },
   "files.zip-url-modal.error-url-invalid": {
     "defaultMessage": "Adres URL musi być prawidłowy."
   },
@@ -1777,24 +1759,6 @@
   },
   "files.zip-url-modal.install-failed-title": {
     "defaultMessage": "Instalacja nie powiodła się"
-  },
-  "files.zip-url-modal.step-copy-description": {
-    "defaultMessage": "Skopiuj adres URL strony wersji i wklej go poniżej."
-  },
-  "files.zip-url-modal.step-copy-title": {
-    "defaultMessage": "Kopiuj adres URL"
-  },
-  "files.zip-url-modal.step-find-description": {
-    "defaultMessage": "Przeglądaj CurseForge i znajdź paczkę, którą chcesz zainstalować."
-  },
-  "files.zip-url-modal.step-find-title": {
-    "defaultMessage": "Znajdź paczkę modów"
-  },
-  "files.zip-url-modal.step-select-description": {
-    "defaultMessage": "Przejdź do kategorii \"Pliki\" i wybierz wersję do zainstalowania."
-  },
-  "files.zip-url-modal.step-select-title": {
-    "defaultMessage": "Wybierz wersję"
   },
   "files.zip-url-modal.unknown-error": {
     "defaultMessage": "Wystąpił nieoczekiwany błąd"

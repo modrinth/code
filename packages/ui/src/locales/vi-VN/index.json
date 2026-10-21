@@ -1622,9 +1622,6 @@
   "files.navbar.home": {
     "defaultMessage": "Trang chủ"
   },
-  "files.navbar.install-curseforge-pack": {
-    "defaultMessage": "Cài đặt modpack từ CurseForge"
-  },
   "files.navbar.new-file": {
     "defaultMessage": "Tệp mới"
   },
@@ -1760,21 +1757,6 @@
   "files.zip-url-modal.backup-name": {
     "defaultMessage": "Cài đặt modpack của CurseForge"
   },
-  "files.zip-url-modal.cf-header": {
-    "defaultMessage": "Cài đặt một modpack của CurseForge"
-  },
-  "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "Không thể tìm modpack của CurseForge từ đường dẫn đó."
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "Không thể tìm thấy modpack từ CurseForge"
-  },
-  "files.zip-url-modal.enter-link": {
-    "defaultMessage": "Nhập đường dẫn"
-  },
-  "files.zip-url-modal.error-cf-url": {
-    "defaultMessage": "URL phải là URL phiên bản của gói mod trên CurseForge."
-  },
   "files.zip-url-modal.error-url-invalid": {
     "defaultMessage": "Đường dẫn phải khả dụng."
   },
@@ -1786,24 +1768,6 @@
   },
   "files.zip-url-modal.install-failed-title": {
     "defaultMessage": "Cài đặt thất bại"
-  },
-  "files.zip-url-modal.step-copy-description": {
-    "defaultMessage": "Sao chép URL trong trang phiên bản và dán ở dưới."
-  },
-  "files.zip-url-modal.step-copy-title": {
-    "defaultMessage": "Sao chép đường dẫn"
-  },
-  "files.zip-url-modal.step-find-description": {
-    "defaultMessage": "Tìm và xác định vị trí Modpack Curseforge mà bạn muốn."
-  },
-  "files.zip-url-modal.step-find-title": {
-    "defaultMessage": "Tìm modpack"
-  },
-  "files.zip-url-modal.step-select-description": {
-    "defaultMessage": "Vào mục \"Files\" và chọn phiên bản để cài."
-  },
-  "files.zip-url-modal.step-select-title": {
-    "defaultMessage": "Chọn phiên bản"
   },
   "files.zip-url-modal.unknown-error": {
     "defaultMessage": "Đã xảy ra lỗi không xác định"

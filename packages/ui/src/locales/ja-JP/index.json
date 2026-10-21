@@ -1619,9 +1619,6 @@
   "files.navbar.home": {
     "defaultMessage": "ホーム"
   },
-  "files.navbar.install-curseforge-pack": {
-    "defaultMessage": "CurseForgeのmodpackをインストールする"
-  },
   "files.navbar.new-file": {
     "defaultMessage": "新しいファイル"
   },
@@ -1757,21 +1754,6 @@
   "files.zip-url-modal.backup-name": {
     "defaultMessage": "CurseForgeのmodpackをインストール"
   },
-  "files.zip-url-modal.cf-header": {
-    "defaultMessage": "CurseForgeのmodpackをインストールする"
-  },
-  "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "そのURLでCurseForge modpackが見つかりませんでした。"
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "CurseForge modpackが見つかりません"
-  },
-  "files.zip-url-modal.enter-link": {
-    "defaultMessage": "リンクを入力"
-  },
-  "files.zip-url-modal.error-cf-url": {
-    "defaultMessage": "URLはCurseForgeのmodpackバージョンのURLである必要があります。"
-  },
   "files.zip-url-modal.error-url-invalid": {
     "defaultMessage": "URLは有効である必要があります。"
   },
@@ -1783,24 +1765,6 @@
   },
   "files.zip-url-modal.install-failed-title": {
     "defaultMessage": "インストールに失敗"
-  },
-  "files.zip-url-modal.step-copy-description": {
-    "defaultMessage": "バージョンページのURLをコピーして、以下に貼り付けてください。"
-  },
-  "files.zip-url-modal.step-copy-title": {
-    "defaultMessage": "URLをコピー"
-  },
-  "files.zip-url-modal.step-find-description": {
-    "defaultMessage": "CurseForgeを閲覧して、目的のMODパックを探してください。"
-  },
-  "files.zip-url-modal.step-find-title": {
-    "defaultMessage": "Modパックを探す"
-  },
-  "files.zip-url-modal.step-select-description": {
-    "defaultMessage": "「ファイル」タブを開き、インストールするバージョンを選択してください。"
-  },
-  "files.zip-url-modal.step-select-title": {
-    "defaultMessage": "バージョンを選択"
   },
   "files.zip-url-modal.unknown-error": {
     "defaultMessage": "不明なエラーが発生しました"

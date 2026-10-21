@@ -1376,9 +1376,6 @@
   "files.navbar.home": {
     "defaultMessage": "الصفحة الرئيسية"
   },
-  "files.navbar.install-curseforge-pack": {
-    "defaultMessage": "تثبيت مودباك CurseForge"
-  },
   "files.navbar.new-file": {
     "defaultMessage": "ملف جديد"
   },

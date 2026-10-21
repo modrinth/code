@@ -1544,9 +1544,6 @@
   "files.navbar.home": {
     "defaultMessage": "Начало"
   },
-  "files.navbar.install-curseforge-pack": {
-    "defaultMessage": "Установить сборку из CurseForge"
-  },
   "files.navbar.new-file": {
     "defaultMessage": "Новый файл"
   },
@@ -1682,21 +1679,6 @@
   "files.zip-url-modal.backup-name": {
     "defaultMessage": "Установка сборки из CurseForge"
   },
-  "files.zip-url-modal.cf-header": {
-    "defaultMessage": "Установить сборку из CurseForge"
-  },
-  "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "Не удалось найти сборку модов на CurseForge по этому URL."
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "Сборка модов CurseForge не найдена"
-  },
-  "files.zip-url-modal.enter-link": {
-    "defaultMessage": "Вставьте ссылку"
-  },
-  "files.zip-url-modal.error-cf-url": {
-    "defaultMessage": "URL должен соответствовать URL версии сборки на CurseForge."
-  },
   "files.zip-url-modal.error-url-invalid": {
     "defaultMessage": "URL должен быть корректным."
   },
@@ -1708,24 +1690,6 @@
   },
   "files.zip-url-modal.install-failed-title": {
     "defaultMessage": "Установка не удалась"
-  },
-  "files.zip-url-modal.step-copy-description": {
-    "defaultMessage": "Скопируйте ссылку на страницу версии и вставьте его ниже."
-  },
-  "files.zip-url-modal.step-copy-title": {
-    "defaultMessage": "Скопируйте ссылку"
-  },
-  "files.zip-url-modal.step-find-description": {
-    "defaultMessage": "Найдите необходимую вам сборку на CurseForge."
-  },
-  "files.zip-url-modal.step-find-title": {
-    "defaultMessage": "Найдите сборку"
-  },
-  "files.zip-url-modal.step-select-description": {
-    "defaultMessage": "Перейдите во вкладку \"Файлы\" и выберите версию для установки."
-  },
-  "files.zip-url-modal.step-select-title": {
-    "defaultMessage": "Выберите версию"
   },
   "files.zip-url-modal.unknown-error": {
     "defaultMessage": "Произошла неизвестная ошибка"
