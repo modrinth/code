@@ -279,7 +279,7 @@ const columns = computed<TableColumn<'name' | 'created' | 'createdBy' | 'actions
 	{
 		key: 'created',
 		label: formatMessage(messages.createdColumn),
-		width: '8rem',
+		width: 'max(8rem, 20%)',
 		enableSorting: true,
 		defaultSortDirection: 'desc',
 		cellClass: 'pr-4',
@@ -287,7 +287,7 @@ const columns = computed<TableColumn<'name' | 'created' | 'createdBy' | 'actions
 	{
 		key: 'createdBy',
 		label: formatMessage(messages.createdByColumn),
-		width: '10rem',
+		width: 'max(10rem, 22%)',
 		cellClass: 'pr-4',
 	},
 	{
