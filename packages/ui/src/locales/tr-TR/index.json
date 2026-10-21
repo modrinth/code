@@ -5183,24 +5183,6 @@
   "servers.backups.item.auto": {
     "defaultMessage": "Otomatik"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Yedekleme zamanları"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "{username} nın avatarı"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "Destek"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Manuel yedekleme"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Yeniden adlandır"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Geri yükle"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Yedek oluştur"
   },

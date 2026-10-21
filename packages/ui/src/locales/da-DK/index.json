@@ -1928,18 +1928,6 @@
   "servers.backups.item.auto": {
     "defaultMessage": "Automatisk"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Sikkerhedskopiering plan"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Manuel sikkerhedskopiering"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Ændre navn"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Genopret"
-  },
   "servers.grant-access-modal.header": {
     "defaultMessage": "Tilføj bruger"
   },
@@ -2220,4 +2208,3 @@
     "defaultMessage": "Du har ændringer, der ikke er gemt"
   }
 }
-

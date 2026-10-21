@@ -2309,18 +2309,6 @@
   "servers.backups.item.auto": {
     "defaultMessage": "Automático"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Horário de Backup"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Fazer backup manual"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Renomear"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Restaurar"
-  },
   "servers.listing.new-label": {
     "defaultMessage": "Novo"
   },

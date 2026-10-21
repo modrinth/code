@@ -5123,24 +5123,6 @@
   "servers.backups.item.auto": {
     "defaultMessage": "Automatisch"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Back-upschema"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "Avatar van {username}"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "Ondersteuning"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Handmatige back-up"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Hernoemen"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Herstel"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Back-up maken"
   },

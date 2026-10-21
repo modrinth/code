@@ -5249,24 +5249,6 @@
   "servers.backups.item.auto": {
     "defaultMessage": "Automatyczne"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Harmonogram kopii zapasowych"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "Awatar użytkownika {username}"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "Obsługa Modrinth"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Ręczne kopie zapasowe"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Zmień nazwę"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Przywróć"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Utwórz kopię zapasową"
   },

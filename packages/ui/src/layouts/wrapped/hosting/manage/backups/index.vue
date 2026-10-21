@@ -51,7 +51,7 @@
 						:icon="SearchIcon"
 						type="search"
 						size="medium"
-						wrapper-class="min-w-0 flex-1"
+						wrapper-class="min-w-0 md:flex-1"
 						:placeholder="
 							formatMessage(messages.searchPlaceholder, { count: completedBackups.length })
 						"
@@ -59,28 +59,33 @@
 						:clear-label="formatMessage(commonMessages.clearButton)"
 						clearable
 					/>
-					<div class="flex shrink-0 gap-2">
+					<div class="flex shrink-0 flex-col gap-2 md:flex-row">
 						<Button
 							v-if="settingsModal"
 							size="lg"
-							class="flex-1 md:flex-none"
 							@click="settingsModal.openServerSettings({ tabId: 'backups' })"
 						>
 							<Settings2Icon aria-hidden="true" />
 							{{ formatMessage(commonMessages.settingsLabel) }}
 						</Button>
-						<Button
+						<SplitButton
 							v-tooltip="createDisabledReason"
 							type="colored"
 							color="brand"
 							size="lg"
-							class="flex-1 md:flex-none"
-							:disabled="!!createDisabledReason"
+							class="[&>[data-button]:first-child]:flex-1"
+							:options="createMenuOptions"
+							:menu-label="formatMessage(messages.moreCreateOptions)"
+							:primary-disabled="!!createDisabledReason"
 							@click="createModal?.show()"
 						>
 							<PlusIcon aria-hidden="true" />
 							{{ formatMessage(messages.createBackup) }}
-						</Button>
+							<template #download-files>
+								<DownloadIcon aria-hidden="true" />
+								{{ formatMessage(commonMessages.downloadFilesButton) }}
+							</template>
+						</SplitButton>
 					</div>
 				</div>
 
@@ -100,7 +105,8 @@
 					:highlighted-id="highlightedBackupId"
 					:show-copy-id-action="showCopyIdAction"
 					:show-debug-info="showDebugInfo"
-					:download-href="downloadHref"
+					:can-download="!!server.node && !!worldId"
+					@download="downloadBackup"
 					@restore="(backup) => restoreModal?.show(backup)"
 					@rename="(backup) => renameModal?.show(backup)"
 					@delete="(backup) => deleteModal?.show(backup)"
@@ -165,6 +171,7 @@
 import type { Archon } from '@modrinth/api-client'
 import {
 	CalendarClockIcon,
+	DownloadIcon,
 	IssuesIcon,
 	PlusIcon,
 	SaveIcon,
@@ -176,7 +183,7 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
 import BulletDivider from '#ui/components/base/BulletDivider.vue'
-import { Button } from '#ui/components/base/buttons'
+import { Button, type ButtonMenuOption, SplitButton } from '#ui/components/base/buttons'
 import EmptyState from '#ui/components/base/EmptyState.vue'
 import ErrorInformationCard from '#ui/components/base/ErrorInformationCard.vue'
 import FloatingActionBar from '#ui/components/base/FloatingActionBar.vue'
@@ -190,8 +197,10 @@ import { useBackupIntervalFormat } from '#ui/composables/hosting/backup-interval
 import { useRelativeTime } from '#ui/composables/how-ago'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerBackupsQueue } from '#ui/composables/server-backups-queue'
+import { useServerWorldDownload } from '#ui/composables/server-download'
 import { useServerPermissions } from '#ui/composables/server-permissions'
 import {
+	injectFileDownload,
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
@@ -264,6 +273,10 @@ const messages = defineMessages({
 		id: 'servers.backups.toolbar.create-backup',
 		defaultMessage: 'Create backup',
 	},
+	moreCreateOptions: {
+		id: 'servers.backups.toolbar.more-create-options',
+		defaultMessage: 'More backup options',
+	},
 	emptyHeading: {
 		id: 'servers.backups.empty.heading',
 		defaultMessage: 'No backups yet',
@@ -309,6 +322,7 @@ const queryClient = useQueryClient()
 const { addNotification } = injectNotificationManager()
 const { server, serverId, worldId, busyReasons } = injectModrinthServerContext()
 const settingsModal = injectServerSettingsModal(null)
+const fileDownload = injectFileDownload(null)
 const { canManageBackups, permissionDeniedMessage } = useServerPermissions()
 
 const { query, backups, options, nextAutoBackupAt, hasActiveCreate, hasActiveRestore, invalidate } =
@@ -362,6 +376,31 @@ const createDisabledReason = computed(() => {
 	return undefined
 })
 
+const { downloadWorldFiles } = useServerWorldDownload()
+const isDownloadingFiles = ref(false)
+
+async function downloadFiles() {
+	const node = server.value.node
+	const currentWorldId = worldId.value
+	if (!node || !currentWorldId || isDownloadingFiles.value) return
+
+	isDownloadingFiles.value = true
+	try {
+		await downloadWorldFiles(node.instance, currentWorldId)
+	} finally {
+		isDownloadingFiles.value = false
+	}
+}
+
+const createMenuOptions = computed<ButtonMenuOption[]>(() => [
+	{
+		id: 'download-files',
+		label: formatMessage(commonMessages.downloadFilesButton),
+		disabled: !server.value.node || !worldId.value || isDownloadingFiles.value,
+		action: downloadFiles,
+	},
+])
+
 const restoreDisabledReason = computed(() => {
 	if (!canManageBackups.value) return permissionDeniedMessage.value
 	if (props.isServerRunning) return formatMessage(messages.restoreWhileRunning)
@@ -372,10 +411,47 @@ const restoreDisabledReason = computed(() => {
 	return undefined
 })
 
-function downloadHref(backup: Backup) {
+async function downloadBackup(backup: Backup) {
 	const node = server.value.node
-	if (!node) return undefined
-	return `https://${node.instance}/modrinth/v0/backups/${backup.id}/download?auth=${node.token}`
+	const currentWorldId = worldId.value
+	if (!node || !currentWorldId) return
+
+	try {
+		if (fileDownload) {
+			await fileDownload.download({
+				type: 'server-backup',
+				filename: `${backup.name}.zip`,
+				serverId,
+				serverName: server.value.name,
+				nodeUrlHost: node.instance,
+				worldId: currentWorldId,
+				backupId: backup.id,
+			})
+			return
+		}
+
+		const { token } = await client.kyros.backups_v1.authorizeDownload(
+			node.instance,
+			currentWorldId,
+			backup.id,
+		)
+		const link = document.createElement('a')
+		link.href = client.kyros.backups_v1.getDownloadUrl(
+			node.instance,
+			currentWorldId,
+			backup.id,
+			token,
+		)
+		link.download = ''
+		link.rel = 'noopener'
+		link.click()
+	} catch (error) {
+		addNotification({
+			type: 'error',
+			title: formatMessage(commonMessages.downloadFailedLabel),
+			text: error instanceof Error ? error.message : String(error),
+		})
+	}
 }
 
 const createModal = ref<InstanceType<typeof BackupCreateModal>>()

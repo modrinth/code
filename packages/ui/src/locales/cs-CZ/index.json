@@ -4313,24 +4313,6 @@
   "servers.backups.item.auto": {
     "defaultMessage": "Automaticky"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Plán zálohování"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "Avatar uživatele {username}"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "Podpora"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Ruční zálohování"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Přejmenovat"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Obnovit"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Vytvořit zálohu"
   },

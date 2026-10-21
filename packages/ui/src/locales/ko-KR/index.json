@@ -4892,24 +4892,6 @@
   "servers.backups.item.auto": {
     "defaultMessage": "자동"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "백업 스케쥴"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "{username}의 아바타"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "지원자"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "백업 메뉴얼"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "이름 변경"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "복원"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "백업 생성"
   },

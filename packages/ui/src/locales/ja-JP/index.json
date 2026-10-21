@@ -4985,24 +4985,6 @@
   "servers.backups.item.auto": {
     "defaultMessage": "自動"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "バックアップスケジュール"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "{username}のアバター"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "サポート"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "手動バックアップ"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "リネーム"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "修復"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "バックアップを作成"
   },

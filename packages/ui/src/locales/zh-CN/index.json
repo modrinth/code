@@ -5267,24 +5267,6 @@
   "servers.backups.item.auto": {
     "defaultMessage": "自动"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "备份计划"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "{username}的头像"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "支持"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "手动备份"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "重命名"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "恢复"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "创建备份"
   },

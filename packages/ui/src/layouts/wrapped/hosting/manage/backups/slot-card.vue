@@ -4,13 +4,13 @@
 			<template v-if="offLabel">{{ offLabel }}</template>
 			<template v-else>
 				<span class="tabular-nums">{{ used }}</span>
-				<span class="ml-1 text-2xl font-semibold">
+				<span class="ml-1 whitespace-nowrap text-2xl font-semibold">
 					{{ formatMessage(messages.slotLimit, { limit }) }}
 				</span>
 			</template>
 		</template>
 
-		<div class="mt-2 flex flex-col gap-3">
+		<div class="flex flex-col gap-3">
 			<div
 				class="flex h-3 gap-1"
 				role="progressbar"

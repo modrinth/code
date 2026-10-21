@@ -5219,24 +5219,6 @@
   "servers.backups.item.auto": {
     "defaultMessage": "Автоматично"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Розклад резервного копіювання"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "Аватар {username}"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "Підтримка"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Ручне резервне копіювання"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Перейменувати"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Відновлення"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Створити резервну копію"
   },

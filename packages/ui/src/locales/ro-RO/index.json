@@ -3083,18 +3083,6 @@
   "servers.backups.item.auto": {
     "defaultMessage": "Auto"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Programul de backup"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Copiere de rezervă manuală"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Redenumește"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Restaurează"
-  },
   "servers.notice.dismiss": {
     "defaultMessage": "Ignoră"
   },

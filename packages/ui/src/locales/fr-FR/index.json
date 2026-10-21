@@ -5153,24 +5153,6 @@
   "servers.backups.item.auto": {
     "defaultMessage": "Auto"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Planification de sauvegarde"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "Avatar de {username}"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "Support"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Sauvegarde manuelle"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Renommer"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Restaurer"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Sauvegarder"
   },

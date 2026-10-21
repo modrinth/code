@@ -4979,24 +4979,6 @@
   "servers.backups.item.auto": {
     "defaultMessage": "Auto"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Säkerhetskopieringschema"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "{username}s avatar"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "Support"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Manuell säkerhetskopiering"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Byt namn"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Återställ"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Skapa säkerhetskopia"
   },

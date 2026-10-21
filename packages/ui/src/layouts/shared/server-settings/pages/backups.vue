@@ -41,7 +41,7 @@
 						:format-label="formatInterval"
 						:aria-label="formatMessage(messages.intervalTitle)"
 						:disabled="!canManageBackups || !autoEnabled"
-						full-width
+						equal-width
 					/>
 				</div>
 
@@ -157,7 +157,7 @@ const intervalOptions = computed(() => {
 
 const manualSlotSnapPoints = computed(() => {
 	const limit = options.value?.limit ?? 0
-	return [...new Set([1, 2, 3].map((quarter) => Math.round((limit * quarter) / 4)))]
+	return Array.from({ length: Math.floor(limit / 5) }, (_, index) => (index + 1) * 5)
 })
 
 const pendingPatch = computed<Archon.BackupsQueue.v1.PatchWorldBackupOptions | null>(() => {

@@ -5015,24 +5015,6 @@
   "servers.backups.item.auto": {
     "defaultMessage": "Automatski"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Zakazan backup"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "Avatar od {username}"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "Podrška"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Manualni backup"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Preimenuj"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Vrati"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Napravi backup"
   },

@@ -5234,24 +5234,6 @@
   "servers.backups.item.auto": {
     "defaultMessage": "Automatikus"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Biztonsági mentés ütemezés"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "{username} avatárja"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "Támogatás"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Manuális biztonsági mentés"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Átnevezés"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Visszaállítás"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Biztonsági mentés létrehozása"
   },

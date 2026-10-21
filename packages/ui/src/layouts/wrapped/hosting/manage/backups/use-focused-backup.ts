@@ -35,9 +35,10 @@ export function useFocusedBackup(backupIds: Ref<string[]>) {
 
 			if (typeof document === 'undefined') return
 			await nextTick()
-			document
-				.querySelector(`[data-backup-id="${CSS.escape(backupId)}"]`)
-				?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+			const target = [
+				...document.querySelectorAll(`[data-backup-id="${CSS.escape(backupId)}"]`),
+			].find((element) => element.getClientRects().length > 0)
+			target?.scrollIntoView({ block: 'center', behavior: 'smooth' })
 		},
 		{ immediate: true },
 	)

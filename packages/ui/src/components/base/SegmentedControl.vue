@@ -11,12 +11,14 @@ const props = withDefaults(
 		neutralItems?: T[]
 		disabled?: boolean
 		fullWidth?: boolean
+		equalWidth?: boolean
 	}>(),
 	{
 		formatLabel: (item: T) => String(item),
 		neutralItems: () => [],
 		disabled: false,
 		fullWidth: false,
+		equalWidth: false,
 	},
 )
 
@@ -29,6 +31,11 @@ const buttonElements: (HTMLElement | null)[] = []
 const indicator = ref<{ left: number; right: number } | null>(null)
 const delays = ref({ left: '0ms', right: '0ms' })
 const transitionsEnabled = ref(false)
+
+const layoutClass = computed(() => {
+	if (props.equalWidth) return 'inline-grid w-fit auto-cols-fr grid-flow-col'
+	return props.fullWidth ? 'flex w-full' : 'inline-flex'
+})
 
 const selectedIndex = computed(() => props.items.indexOf(selected.value as T))
 const indicatorTone = computed(() =>
@@ -94,7 +101,7 @@ onUnmounted(() => resizeObserver?.disconnect())
 		role="radiogroup"
 		:aria-label="ariaLabel"
 		class="relative h-9 items-center gap-0.5 rounded-xl border border-solid border-surface-5 p-px shadow-[0_1px_3px_rgba(0,0,0,0.15)]"
-		:class="[fullWidth ? 'flex w-full' : 'inline-flex', { 'opacity-50': disabled }]"
+		:class="[layoutClass, { 'opacity-50': disabled }]"
 	>
 		<div
 			v-if="indicator"

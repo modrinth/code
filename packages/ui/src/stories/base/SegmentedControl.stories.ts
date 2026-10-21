@@ -32,6 +32,11 @@ export const FullWidth: Story = {
 	args: { ...Default.args, fullWidth: true },
 }
 
+export const EqualWidth: Story = {
+	...Default,
+	args: { ...Default.args, items: ['1h', '6h', '12h', '24h', '2 days', 'Weekly'], equalWidth: true },
+}
+
 export const NeutralItems: Story = {
 	args: {
 		items: [true, false],

@@ -5180,24 +5180,6 @@
   "servers.backups.item.auto": {
     "defaultMessage": "Авто"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Автоматическая резервная копия"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "Аватар {username}"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "Поддержка"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Ручная резервная копия"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Переименовать"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Восстановить"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Создать резервную копию"
   },

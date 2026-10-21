@@ -15,7 +15,7 @@ defineProps<{
 	<component
 		:is="to ? RouterLink : 'div'"
 		:to="to ?? undefined"
-		class="relative isolate min-h-[145px] w-full overflow-hidden rounded-[20px] border border-solid border-surface-4 bg-surface-3 p-5"
+		class="@container relative isolate min-h-[145px] w-full overflow-hidden rounded-[20px] border border-solid border-surface-4 bg-surface-3 p-5"
 		:class="
 			to
 				? 'cursor-pointer transition-transform duration-100 hover:brightness-125 active:scale-95'
@@ -27,16 +27,19 @@ defineProps<{
 				<span class="stat-drop-shadow flex items-center gap-2 text-lg font-medium text-primary">
 					{{ title }}
 				</span>
-				<component :is="icon" class="stat-drop-shadow relative z-10 size-8" aria-hidden="true" />
+				<component :is="icon" class="stat-drop-shadow relative z-10 size-6" aria-hidden="true" />
 			</div>
-			<span class="stat-drop-shadow text-4xl font-bold text-contrast">
+			<span class="stat-drop-shadow text-3xl font-bold text-contrast @[13rem]:text-4xl">
 				<slot name="value">
-					{{ value
-					}}<span
-						v-if="secondary"
-						class="stat-drop-shadow ml-1 text-sm font-normal text-secondary"
-						>{{ secondary }}</span
-					>
+					<span class="flex flex-wrap items-baseline gap-x-1">
+						<span class="whitespace-nowrap">{{ value }}</span>
+						<span
+							v-if="secondary"
+							class="stat-drop-shadow whitespace-nowrap text-sm font-normal text-secondary"
+						>
+							{{ secondary }}
+						</span>
+					</span>
 				</slot>
 			</span>
 			<slot />

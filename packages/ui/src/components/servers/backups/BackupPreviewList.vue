@@ -38,13 +38,7 @@ onMounted(forceCheck)
 				class="flex max-h-[240px] flex-col gap-2 overflow-y-auto"
 				@scroll="checkScrollState"
 			>
-				<BackupItem
-					v-for="backup in backups"
-					:key="backup.id"
-					:backup="backup"
-					preview
-					class="!bg-surface-2 !shadow-none"
-				/>
+				<BackupItem v-for="backup in backups" :key="backup.id" :backup="backup" />
 			</div>
 			<Transition
 				enter-active-class="transition-all duration-200 ease-out"

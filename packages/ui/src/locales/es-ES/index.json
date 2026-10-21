@@ -5144,24 +5144,6 @@
   "servers.backups.item.auto": {
     "defaultMessage": "Auto"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Programa de respaldo"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "Avatar de {username}"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "Soporte"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Copia de seguridad manual"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Renombrar"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Restaurar"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Crear respaldo"
   },

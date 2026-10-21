@@ -3791,24 +3791,6 @@
   "servers.backups.item.auto": {
     "defaultMessage": "Auto"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Jadual penyandaran"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "Avatar {username}"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "Sokongan"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Penyandaran manual"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Namakan semula"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Pulihkan"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Cipta sandaran"
   },
