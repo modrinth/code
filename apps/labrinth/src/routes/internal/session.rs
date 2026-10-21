@@ -1,4 +1,6 @@
-use crate::auth::validate::get_user_from_bearer_token;
+use crate::auth::validate::{
+    extract_authorization_header, get_user_from_bearer_token,
+};
 use crate::auth::{AuthenticationError, get_user_from_headers};
 use crate::database::models::DBUserId;
 use crate::database::models::session_item::DBSession;
@@ -203,11 +205,7 @@ pub async fn list(
     .wrap_auth_err("authenticating API request")?
     .1;
 
-    let session = req
-        .headers()
-        .get(AUTHORIZATION)
-        .and_then(|x| x.to_str().ok())
-        .ok_or_else(|| AuthenticationError::InvalidCredentials)
+    let session = extract_authorization_header(&req)
         .wrap_auth_err("authenticating API request")?;
 
     let session_ids =

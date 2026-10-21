@@ -294,6 +294,7 @@ import _SignalIcon from './icons/signal.svg?component'
 import _SignatureIcon from './icons/signature.svg?component'
 import _SkullIcon from './icons/skull.svg?component'
 import _SlashIcon from './icons/slash.svg?component'
+import _SmartphoneIcon from './icons/smartphone.svg?component'
 import _SortAscIcon from './icons/sort-asc.svg?component'
 import _SortDescIcon from './icons/sort-desc.svg?component'
 import _SparklesIcon from './icons/sparkles.svg?component'
@@ -309,6 +310,7 @@ import _StrikethroughIcon from './icons/strikethrough.svg?component'
 import _SunIcon from './icons/sun.svg?component'
 import _SunriseIcon from './icons/sunrise.svg?component'
 import _SupportChatIcon from './icons/support-chat.svg?component'
+import _TabletIcon from './icons/tablet.svg?component'
 import _TagIcon from './icons/tag.svg?component'
 import _TagsIcon from './icons/tags.svg?component'
 import _TagCategoryAdventureIcon from './icons/tags/categories/adventure.svg?component'
@@ -776,6 +778,7 @@ export const SignalIcon = _SignalIcon
 export const SignatureIcon = _SignatureIcon
 export const SkullIcon = _SkullIcon
 export const SlashIcon = _SlashIcon
+export const SmartphoneIcon = _SmartphoneIcon
 export const SortAscIcon = _SortAscIcon
 export const SortDescIcon = _SortDescIcon
 export const SparklesIcon = _SparklesIcon
@@ -791,6 +794,7 @@ export const StrikethroughIcon = _StrikethroughIcon
 export const SunIcon = _SunIcon
 export const SunriseIcon = _SunriseIcon
 export const SupportChatIcon = _SupportChatIcon
+export const TabletIcon = _TabletIcon
 export const TagIcon = _TagIcon
 export const TagsIcon = _TagsIcon
 export const TagCategoryAdventureIcon = _TagCategoryAdventureIcon

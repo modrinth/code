@@ -5549,15 +5549,6 @@
   "settings.pats.modal.create.title": {
     "message": "Erstelle einen persöhnlichen Zugriffstoken"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "Lösche diesen Token"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "Dies wird diesen Token für immer entfernen (Also wirklich für immer)."
-  },
-  "settings.pats.modal.delete.title": {
-    "message": "Bist du dir sicher, dass du diesen Token löschen willst?"
-  },
   "settings.pats.modal.edit.title": {
     "message": "Persöhnlichen Zugriffstoken bearbeiten"
   },
@@ -5587,9 +5578,6 @@
   },
   "settings.sessions.current-session": {
     "message": "Aktuelle Sitzung"
-  },
-  "settings.sessions.description": {
-    "message": "Hier sind alle Geräte, welche gerade mit deinem Modrinth-Konto angemeldet sind. Du kannst dich von jedem einzeln abmelden.\n\nSolltest du einen Eintrag sehen, welcher dir nicht bekannt ist, melde dich sofort von diesem Gerät ab und ändere dein Modrinth passwort."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Zuletzt aufgerufen {ago}"

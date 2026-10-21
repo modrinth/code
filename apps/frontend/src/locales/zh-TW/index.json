@@ -5549,15 +5549,6 @@
   "settings.pats.modal.create.title": {
     "message": "建立個人存取權杖"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "刪除這個權杖"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "這將會永遠移除這個權杖（真的，再也回不去了）。"
-  },
-  "settings.pats.modal.delete.title": {
-    "message": "確定要刪除這個權杖嗎？"
-  },
   "settings.pats.modal.edit.title": {
     "message": "編輯個人存取權杖"
   },
@@ -5587,9 +5578,6 @@
   },
   "settings.sessions.current-session": {
     "message": "目前的工作階段"
-  },
-  "settings.sessions.description": {
-    "message": "你目前已在下列裝置上登入 Modrinth 帳號。你可以分別登出每部裝置。\n\n如果你對某部裝置沒有印象，請立即登出該裝置，並變更你的 Modrinth 帳號密碼。"
   },
   "settings.sessions.last-accessed-ago": {
     "message": "上次存取時間：{ago}"
