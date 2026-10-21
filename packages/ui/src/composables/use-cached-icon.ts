@@ -10,14 +10,23 @@ export function useCachedIcon(source: MaybeRefOrGetter<string | Blob | null | un
 	watch(
 		input,
 		async (value, _, onCleanup) => {
-			resolved.value = undefined
-			if (!value || typeof window === 'undefined') return
+			if (!value || typeof window === 'undefined') {
+				resolved.value = undefined
+				return
+			}
 			if (typeof value === 'string' && (!cache || !value.startsWith('https://'))) return
+			const cached = cache?.peekIcon?.(value)
+			if (cached) {
+				resolved.value = { source: value, url: cached }
+				return
+			}
 			let active = true
 			let objectUrl: string | undefined
 			onCleanup(() => {
 				active = false
-				if (objectUrl) URL.revokeObjectURL(objectUrl)
+				if (!objectUrl) return
+				if (resolved.value?.url === objectUrl) resolved.value = undefined
+				URL.revokeObjectURL(objectUrl)
 			})
 			const fallback = () => {
 				if (typeof value === 'string') return value
@@ -39,6 +48,6 @@ export function useCachedIcon(source: MaybeRefOrGetter<string | Blob | null | un
 		const value = input.value
 		if (!value) return undefined
 		if (typeof value === 'string' && (!cache || !value.startsWith('https://'))) return value
-		return resolved.value?.source === value ? resolved.value.url : undefined
+		return resolved.value?.url
 	})
 }
