@@ -75,6 +75,16 @@ pub async fn upload_image_optimized(
             format!("invalid format for image: {file_extension}")
         })?;
 
+    // Not all clients can read JPEG XL, so it's only accepted as an upload
+    // format and stored as lossless WebP
+    let (bytes, content_type, file_extension) = if content_type == "image/jxl" {
+        let webp = convert_to_lossless_webp(&bytes)
+            .wrap_request_err("converting JPEG XL image to WebP")?;
+        (webp, "image/webp", "webp")
+    } else {
+        (bytes, content_type, file_extension)
+    };
+
     let cdn_url = &ENV.CDN_URL;
 
     let hash = sha1::Sha1::digest(&bytes).encode_hex::<String>();
@@ -88,11 +98,8 @@ pub async fn upload_image_optimized(
     let color = get_color_from_img(&bytes)
         .wrap_request_err("extracting color from uploaded image")?;
 
-    // Only upload the processed image if it's smaller than the original, or if
-    // the original is JPEG XL, which isn't supported by all browsers
-    let processed_upload_data = if processed_image.len() < bytes.len()
-        || content_type == "image/jxl"
-    {
+    // Only upload the processed image if it's smaller than the original
+    let processed_upload_data = if processed_image.len() < bytes.len() {
         let processed_content_type =
             crate::util::ext::get_image_content_type(&processed_image_ext)
                 .unwrap_or(content_type);
@@ -190,6 +197,17 @@ fn process_image(
         .wrap_err("writing image")?;
 
     Ok((bytes::Bytes::from(output), "webp".to_string()))
+}
+
+fn convert_to_lossless_webp(image_bytes: &[u8]) -> Result<bytes::Bytes> {
+    let img = load_image(image_bytes).wrap_err("loading image from memory")?;
+
+    let mut output = Vec::new();
+    DynamicImage::ImageRgba8(img.to_rgba8())
+        .write_to(&mut Cursor::new(&mut output), ImageFormat::WebP)
+        .wrap_err("writing image")?;
+
+    Ok(bytes::Bytes::from(output))
 }
 
 fn convert_to_webp(img: &DynamicImage) -> Result<Vec<u8>> {
