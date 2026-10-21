@@ -4340,29 +4340,17 @@
   "report.not-for.dmca.description": {
     "message": "Zie onze <policy-link>Auteursrechtbeleid</policy-link>."
   },
-  "report.note.ai-images.1": {
-    "message": "We hebben zojuist onze regels bijgewerkt om AI-gegenereerde afbeeldingen te verbieden in pictogrammen, galerijen en beschrijvingen. We geven makers een vrijwaringsperiode om AI-afbeeldingen uit hun projecten te verwijderen voordat we rapporten voor hen gaan accepteren."
-  },
-  "report.note.check-back-later": {
-    "message": "Kom later terug zodra de genadeperiode is afgelopen. Rapporten van dit type worden op dit moment niet geaccepteerd."
-  },
   "report.note.copyright.1": {
     "message": "Houd er rekening mee dat je *geen* DMCA-verzoek tot verwijdering indient, maar een melding van opnieuw geüploade inhoud."
   },
   "report.note.copyright.2": {
     "message": "Als je in plaats hiervan een DMCA-verzoek tot verwijdering (een juridische procedure) wilde indienen, raadpleeg dan ons <copyright-policy-link>auteursrechtbeleid</copyright-policy-link>."
   },
-  "report.note.fully-ai-generated.1": {
-    "message": "We hebben zojuist onze regels bijgewerkt om AI-gegenereerde projecten volledig te verbieden. We geven makers een vrijwaringsperiode om door AI-gegenereerde projecten volledig bij te werken of op te nemen voordat we rapporten voor hen accepteren."
-  },
   "report.note.malicious.1": {
     "message": "Rapporten voor malware en niet geaccepteerde content moeten bewijs hebben zoals code voorbeelden."
   },
   "report.note.malicious.2": {
     "message": "Samenvattingen van Microsoft Defender, VirusTotal, of AI malware is geen goede vorm van bewijs en zal niet geaccepteerd worden."
-  },
-  "report.note.missing-disclosure.1": {
-    "message": "Content onthullingen zijn een nieuwe functie die we zojuist hebben toegevoegd. We geven de makers een vrijwaringsperiode om hun onthullingen up-to-date te krijgen voordat we rapporten voor ontbrekende of onjuiste onthullingen gaan accepteren."
   },
   "report.please-report": {
     "message": "Graag rapporteer:"

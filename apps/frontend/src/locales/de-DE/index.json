@@ -4571,29 +4571,17 @@
   "report.not-for.dmca.description": {
     "message": "Schau dir unsere <policy-link>Urheberrechtsrichtlinie</policy-link> an."
   },
-  "report.note.ai-images.1": {
-    "message": "Wir haben kürzlich unsere Richtlinien aktualisiert und das Verwenden von KI-generierten Bildern in Icons, Galerien und Beschreibungen verboten. Wir geben Erstellern eine Übergangsfrist, um KI-Bilder aus ihren Projekten zu entfernen, bevor wir Meldungen dazu entgegennehmen."
-  },
-  "report.note.check-back-later": {
-    "message": "Schaue später erneut vorbei, sobald die Übergangsfrist abgelaufen ist. Meldungen dieser Art werden derzeit nicht entgegengenommen."
-  },
   "report.note.copyright.1": {
     "message": "Bitte beachte, dass du *keinen* DMCA-Löschungsantrag stellst, sondern lediglich einen Bericht über erneut hochgeladene Inhalte."
   },
   "report.note.copyright.2": {
     "message": "Falls du stattdessen einen DMCA-Löschungsantrag stellen möchtest (was eine rechtliche Maßnahme ist), schau dir bitte unsere <copyright-policy-link>Urheberrechtsrichtlinie</copyright-policy-link> an."
   },
-  "report.note.fully-ai-generated.1": {
-    "message": "Wir haben kürzlich unsere Richtlinien aktualisiert und vollständig KI-generierte Projekte verboten. Wir geben Erstellern eine Übergangsfrist, um vollständig KI-generierte Projekte anzupassen oder zu entfernen, bevor wir Meldungen dazu entgegennehmen."
-  },
   "report.note.malicious.1": {
     "message": "Meldungen für bösartige oder trügerische Inhalte müssen ausreichende Beweise für das Verhalten, z.B. Codeausschnitte, enthalten."
   },
   "report.note.malicious.2": {
     "message": "Zusammenfassungen von Microsoft Defender, VirusTotal oder KI-Virus-Detektoren sind keine ausreichenden Beweise und werden nicht akzeptiert."
-  },
-  "report.note.missing-disclosure.1": {
-    "message": "Angaben zum Inhalt sind eine neue Funktion, die wir gerade hinzugefügt haben. Wir geben Erstellern eine Übergangsfrist, um ihre Angaben auf den neuesten Stand zu bringen, bevor wir Meldungen über fehlende oder falsche Angaben entgegennehmen."
   },
   "report.please-report": {
     "message": "Bitte melde:"

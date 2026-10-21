@@ -32,12 +32,17 @@ import {
 	getExternalFileDownloadRate,
 } from './external-file-downloads'
 import { createInstallJobProgressTracker } from './install-job-progress'
+import {
+	getSharedInstancePublishRate,
+	sharedInstancePublishes,
+	type SharedInstancePublishTask,
+} from './shared-instance-publishes'
 import { storeVerificationTask } from './store-verification'
 import { useInstallJobDisplay } from './use-install-job-display'
 
 export interface DownloadManagerJob {
 	id: string
-	kind?: 'external-file' | 'debug-export'
+	kind?: 'external-file' | 'debug-export' | 'shared-instance-publish'
 	serverId?: string
 	createdAt?: string
 	instanceId: string | null
@@ -92,6 +97,21 @@ const debugExportMessages = defineMessages({
 	exporting: { id: 'app.debug-export.exporting', defaultMessage: 'Exporting…' },
 	finishing: { id: 'app.debug-export.finishing', defaultMessage: 'Finishing…' },
 	canceling: { id: 'app.debug-export.canceling', defaultMessage: 'Canceling export…' },
+})
+
+const publishMessages = defineMessages({
+	preparing: {
+		id: 'app.shared-instance-publish.preparing',
+		defaultMessage: 'Preparing update…',
+	},
+	uploading: {
+		id: 'app.shared-instance-publish.uploading',
+		defaultMessage: 'Pushing update…',
+	},
+	pushed: {
+		id: 'app.shared-instance-publish.pushed',
+		defaultMessage: 'Update pushed',
+	},
 })
 
 function getIconUrl(icon: string | null | undefined): string | null {
@@ -184,11 +204,15 @@ export function useDownloadManager() {
 	const debugExportRows = computed(() =>
 		[...debugInfoExports.value.values()].map(buildDebugExportRow),
 	)
+	const publishRows = computed(() =>
+		[...sharedInstancePublishes.value.values()].map(buildPublishRow),
+	)
 	const allRows = computed(() => [
 		...rows.value,
 		...verificationRows.value,
 		...fileRows.value,
 		...debugExportRows.value,
+		...publishRows.value,
 	])
 
 	const activeJobs = computed(() =>
@@ -214,7 +238,12 @@ export function useDownloadManager() {
 		display.formatRate(
 			activeJobs.value.reduce((total, job) => {
 				const file = externalFileDownloads.value.get(job.id)
-				const fileRate = file ? getExternalFileDownloadRate(file, now.value) : null
+				const publish = sharedInstancePublishes.value.get(job.id)
+				const fileRate = file
+					? getExternalFileDownloadRate(file, now.value)
+					: publish
+						? getSharedInstancePublishRate(publish)
+						: null
 				return total + (fileRate ?? transfer.get(job.id, now.value).rate ?? 0)
 			}, 0),
 		),
@@ -257,6 +286,53 @@ export function useDownloadManager() {
 			eta: '',
 			canRetry: false,
 			canCopyDetails: !!task.error,
+			copied: copiedJobs.value.has(task.id),
+			busy: busyJobs.value.has(task.id),
+		}
+	}
+
+	function buildPublishRow(task: SharedInstancePublishTask): DownloadManagerJob {
+		const rate = getSharedInstancePublishRate(task)
+		const uploading = task.totalBytes > 0
+		const progress = uploading ? Math.min(0.99, task.uploadedBytes / task.totalBytes) : 0
+		return {
+			id: task.id,
+			kind: 'shared-instance-publish',
+			createdAt: task.createdAt,
+			instanceId: task.instanceId,
+			status: task.status,
+			paused: false,
+			canceling: false,
+			canPause: false,
+			canCancel: false,
+			title: task.instanceName,
+			iconUrl: getIconUrl(task.iconPath),
+			text:
+				task.error ??
+				formatMessage(
+					task.status === 'succeeded'
+						? publishMessages.pushed
+						: uploading
+							? publishMessages.uploading
+							: publishMessages.preparing,
+				),
+			finishedAt: task.finishedAt,
+			progress,
+			overallProgress: task.status === 'succeeded' ? 1 : progress,
+			progressLabel:
+				task.status === 'running' && uploading
+					? [
+							`${formatBytes(task.uploadedBytes)} / ${formatBytes(task.totalBytes)}`,
+							display.formatRate(rate),
+						]
+							.filter(Boolean)
+							.join(' · ')
+					: '',
+			waiting: !uploading,
+			eta:
+				rate && uploading ? display.formatEta((task.totalBytes - task.uploadedBytes) / rate) : '',
+			canRetry: false,
+			canCopyDetails: !!task.error || (appSettings.alwaysShowCopyDetails && !!task.details),
 			copied: copiedJobs.value.has(task.id),
 			busy: busyJobs.value.has(task.id),
 		}
@@ -491,6 +567,11 @@ export function useDownloadManager() {
 			if (file.status !== 'running') externalFileDownloads.value.delete(id)
 			return
 		}
+		const publish = sharedInstancePublishes.value.get(id)
+		if (publish) {
+			if (publish.status !== 'running') sharedInstancePublishes.value.delete(id)
+			return
+		}
 		if (storeVerificationTask.value?.id === id) {
 			if (storeVerificationTask.value.status !== 'running') storeVerificationTask.value = null
 			return
@@ -512,8 +593,13 @@ export function useDownloadManager() {
 
 	async function copyDetails(id: string) {
 		await runAction(id, async () => {
+			const publish = sharedInstancePublishes.value.get(id)
 			const file = externalFileDownloads.value.get(id) ?? debugInfoExports.value.get(id)
-			const details = file ? (file.error ?? '') : await install_job_support_details(id)
+			const details = publish
+				? (publish.details ?? publish.error ?? '')
+				: file
+					? (file.error ?? '')
+					: await install_job_support_details(id)
 			if (disposed) return
 			await navigator.clipboard.writeText(details)
 			if (disposed) return

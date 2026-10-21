@@ -4,7 +4,7 @@
 #![deny(clippy::large_futures)]
 
 pub(crate) mod control;
-mod diagnostics;
+pub(crate) mod diagnostics;
 pub mod events;
 pub mod model;
 pub mod recovery;

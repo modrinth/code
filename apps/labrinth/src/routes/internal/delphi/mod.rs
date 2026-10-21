@@ -355,6 +355,7 @@ pub async fn _run(
         &kafka_client,
         DBFileId(run_parameters.file_id.0 as i64),
         true,
+        true,
     )
     .await
     .wrap_internal_err("enqueueing Delphi file scan")?;

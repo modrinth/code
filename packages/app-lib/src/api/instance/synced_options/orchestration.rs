@@ -123,7 +123,7 @@ pub async fn get_global_options() -> crate::Result<GlobalSyncedOptions> {
 
 pub async fn get_initialized_options() -> crate::Result<GlobalSyncedOptions> {
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     let mut options = GlobalSyncedOptions::default();
 
     for option in SyncedOption::ALL {
@@ -348,7 +348,7 @@ pub async fn set_global_option(
         ));
     }
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     pending::cancel(option, None, &state).await?;
     set_global_option_with_state(option, enabled, base_instance_id, &state)
         .await
@@ -670,7 +670,7 @@ pub async fn set_instance_option(
         ));
     }
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
         .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
@@ -768,7 +768,7 @@ pub async fn get_instance_option_join_preview(
     option: SyncedOption,
 ) -> crate::Result<SyncedOptionJoinPreview> {
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
         .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
@@ -919,7 +919,7 @@ async fn apply_pending_changes(state: &State) -> crate::Result<()> {
 
 pub async fn reconcile_all() -> crate::Result<()> {
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     create_synced_directories(&state).await?;
     apply_pending_changes(&state).await?;
     let instances = crate::state::list_instances(&state.pool).await?;
@@ -991,7 +991,7 @@ pub fn reconcile_instance(
 
 async fn reconcile_instance_inner(instance_id: &str) -> crate::Result<()> {
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     apply_pending_changes(&state).await?;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
@@ -1003,7 +1003,7 @@ pub(crate) async fn reconcile_instance_after_pack_update(
     instance_id: &str,
 ) -> crate::Result<()> {
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
         .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
@@ -1014,7 +1014,7 @@ pub(crate) async fn prepare_instance_update(
     instance_id: &str,
 ) -> crate::Result<()> {
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
         .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
@@ -1131,7 +1131,7 @@ pub async fn reconcile_changed_file(
     file_name: &str,
 ) -> crate::Result<()> {
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     apply_pending_changes(&state).await?;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?

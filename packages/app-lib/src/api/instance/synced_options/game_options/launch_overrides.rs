@@ -26,7 +26,7 @@ pub(super) fn currently_launcher_owned_keys(
 /// Writes canonical settings to `options.txt` before launch.
 pub async fn sync_before_launch(instance_id: &str) -> crate::Result<()> {
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
         .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
@@ -48,7 +48,7 @@ pub async fn apply_launcher_overrides(
         return Ok(());
     }
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
         .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;

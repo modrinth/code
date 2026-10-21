@@ -3845,29 +3845,17 @@
   "report.not-for.dmca.description": {
     "message": "<policy-link>著作権ポリシー</policy-link>をご覧ください。"
   },
-  "report.note.ai-images.1": {
-    "message": "ルールを更新し、アイコン、ギャラリー、説明文へのAI生成画像の使用を禁止しました。クリエイターがプロジェクトからAI生成画像を削除するための一定の猶予期間を設けています。そのため、猶予期間が終了するまで、AI生成画像に関する報告は受け付けません。"
-  },
-  "report.note.check-back-later": {
-    "message": "猶予期間が終了した後に、もう一度ご確認ください。現在、この種の報告は受け付けていません。"
-  },
   "report.note.copyright.1": {
     "message": "ご注意ください：これはDMCA削除要請ではなく、再アップロードされたコンテンツへの報告です。"
   },
   "report.note.copyright.2": {
     "message": "DMCAに基づく削除要請 (法的措置) を提出する意図であった場合は、当社の<copyright-policy-link>著作権ポリシー</copyright-policy-link>をご参照ください。"
   },
-  "report.note.fully-ai-generated.1": {
-    "message": "ルールを更新し、AIによって完全に生成されたプロジェクトを禁止しました。クリエイターが完全にAIで生成されたプロジェクトを更新または削除するための一定の猶予期間を設けています。そのため、猶予期間が終了するまで、完全にAIで生成されたプロジェクトに関する報告は受け付けません。"
-  },
   "report.note.malicious.1": {
     "message": "悪意のあるコンテンツまたは虚偽的なコンテンツに関する報告には、コードサンプルなど、当該行為を裏付ける十分な証拠を含める必要があります。"
   },
   "report.note.malicious.2": {
     "message": "Microsoft Defender、VirusTotal、またはAIマルウェア検出による要約は、十分な証拠形式とはみなされず、受理されません。"
-  },
-  "report.note.missing-disclosure.1": {
-    "message": "コンテンツ開示は、最近追加された新機能です。開示内容が最新の状態になるまで、クリエイターに一定の猶予期間を設けています。そのため、開示が記載されていない、または誤っていることに関する報告の受け付けは、猶予期間終了後に開始します。\n"
   },
   "report.please-report": {
     "message": "是非報告ください："

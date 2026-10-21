@@ -1022,12 +1022,6 @@
   "instance.shared-instance.publish-review.added-label": {
     "message": "Tilføjede"
   },
-  "instance.shared-instance.publish-review.admonition-header": {
-    "message": "Skub opdatering til spillere"
-  },
-  "instance.shared-instance.publish-review.config-title-v2": {
-    "message": "Vælg konfigurations filer"
-  },
   "instance.shared-instance.publish-review.header": {
     "message": "Gennemså ændringer"
   },

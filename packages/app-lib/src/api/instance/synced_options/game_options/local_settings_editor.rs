@@ -266,7 +266,7 @@ pub async fn get_config(
     instance_id: &str,
 ) -> crate::Result<GameSettingsEditorState> {
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     load_editor(instance_id, &state).await
 }
 
@@ -275,7 +275,7 @@ pub async fn preview_changes(
     request: UpdateGameSettingsRequest,
 ) -> crate::Result<GameSettingsEditorState> {
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     let (metadata, document, input_bytes, controlled_keys) =
         load_instance_document(instance_id, &state).await?;
     let mut editor = build_editor_state(
@@ -335,7 +335,7 @@ pub async fn save_changes(
     request: UpdateGameSettingsRequest,
 ) -> crate::Result<SaveGameSettingsResult> {
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     let (metadata, mut document, input_bytes, controlled_keys) =
         load_instance_document(instance_id, &state).await?;
     let current_editor = build_editor_state(

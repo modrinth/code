@@ -12,6 +12,7 @@ use crate::util::fetch;
 use crate::util::io;
 use chrono::Utc;
 use serde::{Deserialize, Serialize};
+use sqlx::SqlitePool;
 use tracing::{info, trace};
 use uuid::Uuid;
 
@@ -166,7 +167,7 @@ async fn resolve_instance_path(
     let mut path = base_path.clone();
     let mut full_path = state.directories.instances_dir().join(&path);
 
-    if path_available(&path, &full_path, state).await? {
+    if path_available(&path, &full_path, &state.pool).await? {
         return Ok((path, full_path));
     }
 
@@ -175,7 +176,7 @@ async fn resolve_instance_path(
         path = format!("{base_path} ({which})");
         full_path = state.directories.instances_dir().join(&path);
 
-        if path_available(&path, &full_path, state).await? {
+        if path_available(&path, &full_path, &state.pool).await? {
             return Ok((path, full_path));
         }
 
@@ -186,13 +187,13 @@ async fn resolve_instance_path(
 async fn path_available(
     path: &str,
     full_path: &std::path::Path,
-    state: &State,
+    pool: &SqlitePool,
 ) -> crate::Result<bool> {
     if full_path.exists() {
         return Ok(false);
     }
 
-    Ok(instance_rows::get_instance_by_path(path, &state.pool)
+    Ok(instance_rows::get_instance_by_path(path, pool)
         .await?
         .is_none())
 }

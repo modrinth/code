@@ -1,3 +1,4 @@
+export { default as ContentDiffList } from './components/ContentDiffList.vue'
 export { default as ContentDiffModal } from './components/ContentDiffModal.vue'
 export { useInstallationForm } from './composables'
 export { default as InstallationSettingsLayout } from './layout.vue'
