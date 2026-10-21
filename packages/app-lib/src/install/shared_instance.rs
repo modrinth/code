@@ -1,11 +1,12 @@
 use super::events::InstallProgressReporter;
 use super::model::{
     InstallJobState, InstallPhaseDetails, InstallPhaseId,
-    SharedInstanceExternalFileData, SharedInstanceInstallData,
-    SharedInstanceInstallModpack,
+    InstallProgressSecondary, SharedInstanceExternalFileData,
+    SharedInstanceInstallData, SharedInstanceInstallModpack,
 };
 use super::runner::{
-    install_pack, modpack_details, update_content_progress, update_progress,
+    install_pack, modpack_details, update_content_progress,
+    update_content_progress_with_bytes, update_progress,
 };
 use crate::ErrorKind;
 use crate::api::instance::{
@@ -25,13 +26,19 @@ use anyhow::{Context, bail};
 use futures::StreamExt;
 use path_util::SafeRelativeUtf8UnixPathBuf;
 use sqlx::SqlitePool;
+use std::cmp::Reverse;
 use std::collections::{HashMap, HashSet};
 use std::future::Future;
 use std::path::PathBuf;
+use std::sync::atomic::{AtomicU64, Ordering};
+use std::time::Duration;
 use uuid::Uuid;
 
 const MAX_SHARED_INSTANCE_EXTERNAL_FILE_SIZE: u64 = 500 * 1024 * 1024;
 const MAX_SHARED_INSTANCE_INITIAL_BUFFER_SIZE: u64 = 8 * 1024 * 1024;
+const SHARED_INSTANCE_CONTENT_DOWNLOAD_CONCURRENCY: usize = 4;
+const SHARED_INSTANCE_FILE_DOWNLOAD_CONCURRENCY: usize = 64;
+const SHARED_INSTANCE_PROGRESS_INTERVAL: Duration = Duration::from_millis(500);
 
 pub(super) async fn attach_pending_shared_instance(
     instance_id: &str,
@@ -351,90 +358,36 @@ async fn apply_shared_instance_update_inner(
         .await?;
     }
 
-    let mut completed_content_changes = 0;
-    for update in plan.project_updates {
-        let new_path =
-            crate::state::instances::commands::add_project_from_version(
-                instance_id,
-                &update.desired.version_id,
-                DownloadReason::Update,
-                Some(update.current.version_id),
-                ContentSourceKind::SharedInstance,
-                state,
-            )
-            .await?;
-
-        if update.current.relative_path != new_path {
-            crate::state::instances::commands::remove_project(
-                instance_id,
-                &update.current.relative_path,
-                state,
-            )
-            .await?;
-        }
-        completed_content_changes += 1;
-        update_content_progress(
-            job_id,
-            job_state,
-            &state.pool,
-            completed_content_changes,
-            content_change_count,
-        )
-        .await?;
-    }
-
-    for project in plan.project_additions {
-        crate::state::instances::commands::add_project_from_version(
-            instance_id,
-            &project.version_id,
-            DownloadReason::Standalone,
-            None,
-            ContentSourceKind::SharedInstance,
-            state,
-        )
-        .await?;
-        completed_content_changes += 1;
-        update_content_progress(
-            job_id,
-            job_state,
-            &state.pool,
-            completed_content_changes,
-            content_change_count,
-        )
-        .await?;
-    }
-
-    for file in plan
-        .external_updates
-        .into_iter()
-        .chain(plan.external_additions)
-    {
-        install_shared_instance_external_file(instance_id, &file.file, state)
-            .await?;
-        completed_content_changes += 1;
-        update_content_progress(
-            job_id,
-            job_state,
-            &state.pool,
-            completed_content_changes,
-            content_change_count,
-        )
-        .await?;
-    }
-
-    for config_file in plan.config_bundle.into_iter().chain(plan.config_files) {
-        install_shared_instance_external_file(instance_id, &config_file, state)
-            .await?;
-        completed_content_changes += 1;
-        update_content_progress(
-            job_id,
-            job_state,
-            &state.pool,
-            completed_content_changes,
-            content_change_count,
-        )
-        .await?;
-    }
+    install_shared_instance_downloads(
+        job_id,
+        job_state,
+        state,
+        instance_id,
+        plan.project_updates
+            .iter()
+            .map(|update| SharedInstanceModInstall {
+                version_id: &update.desired.version_id,
+                reason: DownloadReason::Update,
+                replaces: Some(&update.current),
+            })
+            .chain(plan.project_additions.iter().map(|project| {
+                SharedInstanceModInstall {
+                    version_id: &project.version_id,
+                    reason: DownloadReason::Standalone,
+                    replaces: None,
+                }
+            }))
+            .collect(),
+        plan.external_updates
+            .iter()
+            .chain(&plan.external_additions)
+            .map(|file| &file.file)
+            .chain(&plan.config_bundle)
+            .chain(&plan.config_files)
+            .collect(),
+        content_change_count,
+    )
+    .await?;
 
     crate::api::instance::edit(
         instance_id,
@@ -744,49 +697,23 @@ async fn apply_shared_instance_content_inner(
     if !data.modrinth_ids.is_empty() || !data.external_files.is_empty() {
         let content_change_count =
             data.modrinth_ids.len() as u64 + data.external_files.len() as u64;
-        update_content_progress(
+        install_shared_instance_downloads(
             job_id,
             job_state,
-            &state.pool,
-            0,
+            state,
+            instance_id,
+            data.modrinth_ids
+                .iter()
+                .map(|version_id| SharedInstanceModInstall {
+                    version_id,
+                    reason: DownloadReason::Standalone,
+                    replaces: None,
+                })
+                .collect(),
+            data.external_files.iter().collect(),
             content_change_count,
         )
         .await?;
-        let mut completed_content_changes = 0;
-        for version_id in &data.modrinth_ids {
-            crate::state::instances::commands::add_project_from_version(
-                instance_id,
-                version_id,
-                DownloadReason::Standalone,
-                None,
-                ContentSourceKind::SharedInstance,
-                state,
-            )
-            .await?;
-            completed_content_changes += 1;
-            update_content_progress(
-                job_id,
-                job_state,
-                &state.pool,
-                completed_content_changes,
-                content_change_count,
-            )
-            .await?;
-        }
-
-        for file in &data.external_files {
-            install_shared_instance_external_file(instance_id, file, state)
-                .await?;
-            completed_content_changes += 1;
-            update_content_progress(
-                job_id,
-                job_state,
-                &state.pool,
-                completed_content_changes,
-                content_change_count,
-            )
-            .await?;
-        }
     }
 
     crate::api::instance::edit(
@@ -857,21 +784,261 @@ pub(super) fn shared_instance_link(
     }
 }
 
+/// Bytes downloaded across every external file of an install, reported as the
+/// secondary progress so the download manager can show size, speed and ETA.
+struct DownloadedBytes {
+    current: AtomicU64,
+    total: u64,
+}
+
+impl DownloadedBytes {
+    fn add(&self, bytes: u64) {
+        self.current.fetch_add(bytes, Ordering::Relaxed);
+    }
+
+    fn progress(&self) -> InstallProgressSecondary {
+        InstallProgressSecondary {
+            current: self.current.load(Ordering::Relaxed).min(self.total),
+            total: self.total,
+        }
+    }
+}
+
+struct SharedInstanceModInstall<'a> {
+    version_id: &'a str,
+    reason: DownloadReason,
+    replaces: Option<&'a CurrentSharedInstanceProject>,
+}
+
+/// Mods and content files are installed before individual shared files, so
+/// those files are checked against the content just installed and override
+/// any config bundle entries at the same path. Larger downloads start first so
+/// a big download is not left running alone at the end.
+async fn install_shared_instance_downloads(
+    job_id: Uuid,
+    job_state: &mut InstallJobState,
+    state: &State,
+    instance_id: &str,
+    mods: Vec<SharedInstanceModInstall<'_>>,
+    files: Vec<&SharedInstanceExternalFileData>,
+    total: u64,
+) -> crate::Result<()> {
+    let version_ids = mods
+        .iter()
+        .map(|install| install.version_id.to_string())
+        .collect::<Vec<_>>();
+    let versions = shared_instance_versions_by_id(&version_ids, state).await?;
+    let mut mods = mods
+        .into_iter()
+        .map(|install| {
+            let size = versions
+                .get(install.version_id)
+                .and_then(|version| {
+                    version
+                        .files
+                        .iter()
+                        .find(|file| file.primary)
+                        .or_else(|| version.files.first())
+                })
+                .map_or(0, |file| u64::from(file.size));
+            (install, size)
+        })
+        .collect::<Vec<_>>();
+    mods.sort_by_key(|(_, size)| Reverse(*size));
+    let (mut shared_files, mut content_files): (Vec<_>, Vec<_>) = files
+        .into_iter()
+        .partition(|file| file.file_type == CONFIG_FILE_TYPE);
+    content_files.sort_by_key(|file| Reverse(file.file_size));
+    shared_files.sort_by_key(|file| Reverse(file.file_size));
+    let bytes = DownloadedBytes {
+        current: AtomicU64::new(0),
+        total: mods.iter().map(|(_, size)| size).sum::<u64>()
+            + content_files
+                .iter()
+                .chain(&shared_files)
+                .map(|file| file.file_size)
+                .sum::<u64>(),
+    };
+    let mut completed = 0;
+
+    report_shared_instance_installs(
+        futures::stream::iter(
+            mods.into_iter()
+                .map(|(install, size)| {
+                    install_shared_instance_mod(
+                        instance_id,
+                        install,
+                        size,
+                        state,
+                        &bytes,
+                    )
+                })
+                .collect::<Vec<_>>(),
+        )
+        .buffer_unordered(SHARED_INSTANCE_CONTENT_DOWNLOAD_CONCURRENCY),
+        job_id,
+        job_state,
+        &state.pool,
+        &mut completed,
+        total,
+        &bytes,
+    )
+    .await?;
+
+    report_shared_instance_installs(
+        futures::stream::iter(
+            content_files
+                .into_iter()
+                .map(|file| {
+                    install_shared_instance_external_file(
+                        instance_id,
+                        file,
+                        state,
+                        &bytes,
+                    )
+                })
+                .collect::<Vec<_>>(),
+        )
+        .buffer_unordered(SHARED_INSTANCE_CONTENT_DOWNLOAD_CONCURRENCY),
+        job_id,
+        job_state,
+        &state.pool,
+        &mut completed,
+        total,
+        &bytes,
+    )
+    .await?;
+
+    if shared_files.is_empty() {
+        return Ok(());
+    }
+    let writer =
+        crate::api::instance::InstanceFileWriter::new(state, instance_id)
+            .await?;
+    report_shared_instance_installs(
+        futures::stream::iter(
+            shared_files
+                .into_iter()
+                .map(|file| {
+                    install_shared_instance_file(&writer, file, state, &bytes)
+                })
+                .collect::<Vec<_>>(),
+        )
+        .buffer_unordered(SHARED_INSTANCE_FILE_DOWNLOAD_CONCURRENCY),
+        job_id,
+        job_state,
+        &state.pool,
+        &mut completed,
+        total,
+        &bytes,
+    )
+    .await
+}
+
+async fn install_shared_instance_mod(
+    instance_id: &str,
+    install: SharedInstanceModInstall<'_>,
+    size: u64,
+    state: &State,
+    downloaded: &DownloadedBytes,
+) -> crate::Result<()> {
+    let counted = AtomicU64::new(0);
+    let mut on_progress = |current: u64,
+                           _total: u64|
+     -> std::pin::Pin<
+        Box<dyn Future<Output = crate::Result<()>> + Send>,
+    > {
+        let previous = counted.fetch_max(current, Ordering::Relaxed);
+        downloaded.add(current.saturating_sub(previous));
+        Box::pin(std::future::ready(Ok(())))
+    };
+    let project =
+        crate::state::instances::commands::download_project_version_with_progress(
+            instance_id,
+            install.version_id,
+            install.reason,
+            install.replaces.map(|current| current.version_id.clone()),
+            state,
+            Some(&mut on_progress),
+        )
+        .await?;
+    downloaded.add(size.saturating_sub(counted.load(Ordering::Relaxed)));
+
+    let new_path =
+        crate::state::instances::commands::add_downloaded_project_version(
+            instance_id,
+            project,
+            ContentSourceKind::SharedInstance,
+            state,
+        )
+        .await?;
+    if let Some(current) = install.replaces
+        && current.relative_path != new_path
+    {
+        crate::state::instances::commands::remove_project(
+            instance_id,
+            &current.relative_path,
+            state,
+        )
+        .await?;
+    }
+    Ok(())
+}
+
+async fn report_shared_instance_installs(
+    installs: impl futures::Stream<Item = crate::Result<()>>,
+    job_id: Uuid,
+    job_state: &mut InstallJobState,
+    pool: &SqlitePool,
+    completed: &mut u64,
+    total: u64,
+    bytes: &DownloadedBytes,
+) -> crate::Result<()> {
+    let mut installs = std::pin::pin!(installs);
+    let mut ticker = tokio::time::interval(SHARED_INSTANCE_PROGRESS_INTERVAL);
+    ticker.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Delay);
+    loop {
+        tokio::select! {
+            result = installs.next() => match result {
+                Some(result) => {
+                    result?;
+                    *completed += 1;
+                }
+                None => break,
+            },
+            _ = ticker.tick() => {
+                update_content_progress_with_bytes(
+                    job_id,
+                    job_state,
+                    pool,
+                    *completed,
+                    total,
+                    Some(bytes.progress()),
+                )
+                .await?;
+            }
+        }
+    }
+    update_content_progress_with_bytes(
+        job_id,
+        job_state,
+        pool,
+        *completed,
+        total,
+        Some(bytes.progress()),
+    )
+    .await
+}
+
 async fn install_shared_instance_external_file(
     instance_id: &str,
     file: &SharedInstanceExternalFileData,
     state: &State,
+    downloaded: &DownloadedBytes,
 ) -> crate::Result<()> {
-    if matches!(
-        file.file_type.as_str(),
-        CONFIG_BUNDLE_FILE_TYPE | CONFIG_FILE_TYPE
-    ) && !CONFIG_SYNC_ENABLED
-    {
+    if file.file_type == CONFIG_BUNDLE_FILE_TYPE && !CONFIG_SYNC_ENABLED {
+        downloaded.add(file.file_size);
         return Ok(());
-    }
-
-    if file.file_type == CONFIG_FILE_TYPE {
-        return install_shared_instance_file(instance_id, file, state).await;
     }
 
     validate_shared_instance_external_file_name(&file.file_name)?;
@@ -925,6 +1092,7 @@ async fn install_shared_instance_external_file(
                 file.file_name
             );
         }
+        downloaded.add(chunk.len() as u64);
         bytes.extend_from_slice(&chunk);
     }
 
@@ -971,10 +1139,15 @@ async fn install_shared_instance_external_file(
 /// Shared files can be up to the version's size limit, so they are streamed to
 /// disk rather than held in memory.
 async fn install_shared_instance_file(
-    instance_id: &str,
+    writer: &crate::api::instance::InstanceFileWriter,
     file: &SharedInstanceExternalFileData,
     state: &State,
+    downloaded: &DownloadedBytes,
 ) -> crate::Result<()> {
+    if !CONFIG_SYNC_ENABLED {
+        downloaded.add(file.file_size);
+        return Ok(());
+    }
     if !is_shareable_file_path(&file.file_name)
         || file.file_size > MAX_SHARED_FILES_TOTAL_SIZE
     {
@@ -983,7 +1156,8 @@ async fn install_shared_instance_file(
             file.file_name
         )));
     }
-    if shared_instance_file_is_current(instance_id, file, state).await? {
+    if shared_instance_file_is_current(writer, file, state).await? {
+        downloaded.add(file.file_size);
         return Ok(());
     }
 
@@ -1006,35 +1180,28 @@ async fn install_shared_instance_file(
 
     let reader = tokio_util::io::StreamReader::new(
         response.bytes_stream().map(|chunk| {
-            chunk.map_err(|error| std::io::Error::other(error.to_string()))
+            let chunk = chunk
+                .map_err(|error| std::io::Error::other(error.to_string()))?;
+            downloaded.add(chunk.len() as u64);
+            Ok::<_, std::io::Error>(chunk)
         }),
     );
-    crate::api::instance::write_instance_file_from_reader(
-        instance_id,
-        &file.file_name,
-        reader,
-        file.file_size,
-        state,
-    )
-    .await
+    writer
+        .write_from_reader(state, &file.file_name, reader, file.file_size)
+        .await
 }
 
 /// Whether the instance already has this exact shared file, so the download
 /// can be skipped. Without a hash from the server it is treated as changed.
 async fn shared_instance_file_is_current(
-    instance_id: &str,
+    writer: &crate::api::instance::InstanceFileWriter,
     file: &SharedInstanceExternalFileData,
     state: &State,
 ) -> crate::Result<bool> {
     let Some(expected_sha1) = file.sha1.as_deref() else {
         return Ok(false);
     };
-    let path = crate::api::instance::instance_file_write_path(
-        state,
-        instance_id,
-        &file.file_name,
-    )
-    .await?;
+    let path = writer.destination(state, &file.file_name).await?;
     let is_same_size =
         tokio::fs::symlink_metadata(&path)
             .await

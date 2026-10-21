@@ -6,6 +6,7 @@ use crate::state::instances::adapters::sqlite::{content_rows, instance_rows};
 use crate::{ErrorKind, State};
 use anyhow::bail;
 use serde::Serialize;
+use std::collections::HashSet;
 use std::path::{Path, PathBuf};
 use std::time::UNIX_EPOCH;
 use tokio::fs;
@@ -59,6 +60,74 @@ async fn resolve(
     }
     validate_relative(path)?;
     if writing {
+        ManagedPaths::load(state, instance_id)
+            .await?
+            .ensure_writable(path)?;
+    }
+    Ok(ReadableContent::Local(
+        local_destination(state, &instance.path, path).await?,
+    ))
+}
+
+async fn local_destination(
+    state: &State,
+    instance_path: &str,
+    path: &str,
+) -> crate::Result<PathBuf> {
+    let destination = state
+        .content_store
+        .instance_path(instance_path, path)
+        .await?;
+    if let Ok(metadata) = fs::symlink_metadata(&destination).await
+        && metadata.file_type().is_symlink()
+    {
+        bail!(ErrorKind::InputError(
+            "Files cannot access a symbolic link or its target".to_string()
+        ));
+    }
+    Ok(destination)
+}
+
+/// Lowercased paths of an instance's managed content, and every directory
+/// containing it, which the Files tab must not write.
+struct ManagedPaths {
+    files: HashSet<String>,
+    directories: HashSet<String>,
+}
+
+impl ManagedPaths {
+    async fn load(state: &State, instance_id: &str) -> crate::Result<Self> {
+        let bindings =
+            content_store::instance_storage(&state.pool, instance_id).await?;
+        let bound = bindings
+            .iter()
+            .map(|binding| binding.file_id.as_str())
+            .collect::<HashSet<_>>();
+        let mut managed = Self {
+            files: HashSet::new(),
+            directories: HashSet::new(),
+        };
+        for file in
+            content_rows::get_instance_files(instance_id, &state.pool).await?
+        {
+            if !bound.contains(file.id.as_str()) {
+                continue;
+            }
+            let relative_path = file.relative_path.to_lowercase();
+            for (index, _) in relative_path.match_indices('/') {
+                managed
+                    .directories
+                    .insert(relative_path[..index].to_string());
+            }
+            managed
+                .files
+                .insert(content_file_path(&file).to_lowercase());
+            managed.files.insert(relative_path);
+        }
+        Ok(managed)
+    }
+
+    fn ensure_writable(&self, path: &str) -> crate::Result<()> {
         if path
             .split('/')
             .next()
@@ -69,35 +138,104 @@ async fn resolve(
                     .to_string(),
             ));
         }
-        let prefix = format!("{}/", path.to_lowercase());
-        let bindings =
-            content_store::instance_storage(&state.pool, instance_id).await?;
-        let files =
-            content_rows::get_instance_files(instance_id, &state.pool).await?;
-        if files.iter().any(|file| {
-            bindings.iter().any(|binding| binding.file_id == file.id)
-                && (file.relative_path.eq_ignore_ascii_case(path)
-                    || content_file_path(file).eq_ignore_ascii_case(path)
-                    || file.relative_path.to_lowercase().starts_with(&prefix))
-        }) {
+        let path = path.to_lowercase();
+        if self.files.contains(&path) || self.directories.contains(&path) {
             bail!(ErrorKind::InputError(
                 "managed content is read-only in Files; use the Content tab"
                     .to_string(),
             ));
         }
+        Ok(())
     }
-    let destination = state
-        .content_store
-        .instance_path(&instance.path, path)
+}
+
+/// Writes many files into one instance, checking each against managed content
+/// loaded once rather than per file.
+pub(crate) struct InstanceFileWriter {
+    instance_id: String,
+    instance_path: String,
+    managed: ManagedPaths,
+}
+
+impl InstanceFileWriter {
+    pub(crate) async fn new(
+        state: &State,
+        instance_id: &str,
+    ) -> crate::Result<Self> {
+        let instance =
+            instance_rows::get_instance_by_id(instance_id, &state.pool)
+                .await?
+                .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
+        Ok(Self {
+            instance_id: instance_id.to_string(),
+            instance_path: instance.path,
+            managed: ManagedPaths::load(state, instance_id).await?,
+        })
+    }
+
+    pub(crate) async fn destination(
+        &self,
+        state: &State,
+        path: &str,
+    ) -> crate::Result<PathBuf> {
+        let path = normalized(path);
+        if path.is_empty() {
+            bail!(ErrorKind::InputError(
+                "the instance directory cannot be changed in the Files tab"
+                    .to_string(),
+            ));
+        }
+        validate_relative(path)?;
+        self.managed.ensure_writable(path)?;
+        local_destination(state, &self.instance_path, path).await
+    }
+
+    /// Streams `reader` into an instance file, replacing any file already
+    /// there. The contents are only kept when exactly `expected_size` bytes
+    /// are read, and the instance is only locked to move the finished file
+    /// into place.
+    pub(crate) async fn write_from_reader(
+        &self,
+        state: &State,
+        path: &str,
+        reader: impl tokio::io::AsyncRead + Unpin,
+        expected_size: u64,
+    ) -> crate::Result<()> {
+        use tokio::io::AsyncReadExt;
+
+        let destination = self.destination(state, path).await?;
+        let parent = destination.parent().ok_or(ErrorKind::InputError(
+            "invalid file destination".to_string(),
+        ))?;
+        fs::create_dir_all(parent).await?;
+        let parent = parent.to_path_buf();
+        let temporary = tokio::task::spawn_blocking(move || {
+            tempfile::NamedTempFile::new_in(parent)
+                .map(|file| file.into_temp_path())
+        })
+        .await??;
+        let mut file = fs::File::options().write(true).open(&temporary).await?;
+        let written = tokio::io::copy(
+            &mut reader.take(expected_size.saturating_add(1)),
+            &mut file,
+        )
         .await?;
-    if let Ok(metadata) = fs::symlink_metadata(&destination).await
-        && metadata.file_type().is_symlink()
-    {
-        bail!(ErrorKind::InputError(
-            "Files cannot access a symbolic link or its target".to_string()
-        ));
+        if written != expected_size {
+            bail!("{path} has an unexpected size");
+        }
+        file.sync_all().await?;
+        drop(file);
+
+        let _instance =
+            state.instance_locks.lock_content(&self.instance_id).await;
+        let _files = state.content_store.files_lock.lock().await;
+        self.destination(state, path).await?;
+        tokio::task::spawn_blocking(move || {
+            temporary.persist(destination).map_err(|error| error.error)
+        })
+        .await??;
+        Ok(())
     }
-    Ok(ReadableContent::Local(destination))
 }
 
 pub async fn list_instance_files(
@@ -182,7 +320,7 @@ pub async fn validate_instance_file_write(
     instance_file_write_path(&state, instance_id, path).await
 }
 
-pub(crate) async fn instance_file_write_path(
+async fn instance_file_write_path(
     state: &State,
     instance_id: &str,
     path: &str,
@@ -236,52 +374,6 @@ pub async fn write_instance_file(
             temporary.persist(destination)
         }
         .map_err(|error| error.error)
-    })
-    .await??;
-    Ok(())
-}
-
-/// Streams `reader` into an instance file, replacing any file already there.
-/// The contents are only kept when exactly `expected_size` bytes are read, and
-/// the instance is only locked to move the finished file into place.
-pub(crate) async fn write_instance_file_from_reader(
-    instance_id: &str,
-    path: &str,
-    reader: impl tokio::io::AsyncRead + Unpin,
-    expected_size: u64,
-    state: &State,
-) -> crate::Result<()> {
-    use tokio::io::AsyncReadExt;
-
-    let destination =
-        instance_file_write_path(state, instance_id, path).await?;
-    let parent = destination.parent().ok_or(ErrorKind::InputError(
-        "invalid file destination".to_string(),
-    ))?;
-    fs::create_dir_all(parent).await?;
-    let parent = parent.to_path_buf();
-    let temporary = tokio::task::spawn_blocking(move || {
-        tempfile::NamedTempFile::new_in(parent)
-            .map(|file| file.into_temp_path())
-    })
-    .await??;
-    let mut file = fs::File::options().write(true).open(&temporary).await?;
-    let written = tokio::io::copy(
-        &mut reader.take(expected_size.saturating_add(1)),
-        &mut file,
-    )
-    .await?;
-    if written != expected_size {
-        bail!("{path} has an unexpected size");
-    }
-    file.sync_all().await?;
-    drop(file);
-
-    let _instance = state.instance_locks.lock_content(instance_id).await;
-    let _files = state.content_store.files_lock.lock().await;
-    resolve(state, instance_id, path, true).await?;
-    tokio::task::spawn_blocking(move || {
-        temporary.persist(destination).map_err(|error| error.error)
     })
     .await??;
     Ok(())

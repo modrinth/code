@@ -3,8 +3,8 @@ use super::model::{
     InstallCleanup, InstallErrorContext, InstallErrorView, InstallJobDisplay,
     InstallJobEventKind, InstallJobSnapshot, InstallJobState, InstallJobStatus,
     InstallPhaseDetails, InstallPhaseId, InstallPostInstallEdit,
-    InstallProgress, InstallRequest, InstallRollbackState, InstallTarget,
-    SharedInstanceInstallData,
+    InstallProgress, InstallProgressSecondary, InstallRequest,
+    InstallRollbackState, InstallTarget, SharedInstanceInstallData,
 };
 use super::shared_instance::{
     apply_shared_instance_content, apply_shared_instance_update,
@@ -1899,12 +1899,26 @@ pub(super) async fn update_content_progress(
     current: u64,
     total: u64,
 ) -> crate::Result<()> {
+    update_content_progress_with_bytes(
+        job_id, job_state, pool, current, total, None,
+    )
+    .await
+}
+
+pub(super) async fn update_content_progress_with_bytes(
+    job_id: Uuid,
+    job_state: &mut InstallJobState,
+    pool: &SqlitePool,
+    current: u64,
+    total: u64,
+    bytes: Option<InstallProgressSecondary>,
+) -> crate::Result<()> {
     super::control::checkpoint(job_id).await?;
     job_state.progress.phase = InstallPhaseId::DownloadingContent;
     job_state.progress.progress = Some(InstallProgress {
         current,
         total,
-        secondary: None,
+        secondary: bytes,
     });
     job_state.progress.details = InstallPhaseDetails::Empty;
     let record = store::update_state(job_id, job_state, pool).await?;
