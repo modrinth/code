@@ -301,10 +301,13 @@ fn validate_additional_jar(
     };
 
     if file_type == FileType::SourcesJar
-        && !archive.file_names().any(|name| name.ends_with(".java"))
+        && !archive
+            .file_names()
+            .any(|name| name.ends_with(".java") || name.ends_with(".kt"))
     {
         return Err(ValidationError::InvalidInput(
-            "sources jars must contain at least one `.java` file".into(),
+            "sources jars must contain at least one `.java` or `.kt` file"
+                .into(),
         ));
     }
     Ok(ValidationResult::Pass)
