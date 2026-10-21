@@ -414,7 +414,7 @@
     "defaultMessage": "Оновити {count, plural, one {# проєкт} few {# проєкти} other {# проєктів}}"
   },
   "content.confirm-deletion.admonition-body": {
-    "defaultMessage": "Видалення мода може назавжди вплинути на ваш світ і спричинити втрату вмісту або несподівані проблеми під час його повторного завантаження."
+    "defaultMessage": "Видаливши мод, ви можете зіпсувати свій світ і втратити частину вмісту або натрапити на проблеми, коли знову його запустите."
   },
   "content.confirm-deletion.admonition-header": {
     "defaultMessage": "Попередження щодо видалення"
@@ -1231,6 +1231,9 @@
   },
   "external-files.permissions-card.file-count": {
     "defaultMessage": "{count, plural, one {# файл} few {# файли} many {# файлів} other {# файлу}}"
+  },
+  "external-files.permissions-card.file-database-id": {
+    "defaultMessage": "ID бази даних"
   },
   "external-files.permissions-card.included-files": {
     "defaultMessage": "Уключені файли:"
@@ -3248,6 +3251,9 @@
   "profile.button.create-project": {
     "defaultMessage": "Створити проєкт"
   },
+  "profile.button.edit-user": {
+    "defaultMessage": "Змінити користувача"
+  },
   "profile.button.force-password-reset": {
     "defaultMessage": "Примусово скинути пароль"
   },
@@ -4127,6 +4133,15 @@
   "project.settings.disclosures.title": {
     "defaultMessage": "Маркування"
   },
+  "project.settings.environment.bulk.apply-button": {
+    "defaultMessage": "Застосувати до всіх версій"
+  },
+  "project.settings.environment.bulk.description": {
+    "defaultMessage": "Це замінить середовище на кожній версії цього проєкту."
+  },
+  "project.settings.environment.bulk.title": {
+    "defaultMessage": "Застосувати середовище для всіх версій"
+  },
   "project.settings.environment.client_and_server.description": {
     "defaultMessage": "Має деяку функціональність як на стороні клієнта, так і на стороні сервера."
   },
@@ -4153,6 +4168,9 @@
   },
   "project.settings.environment.client_only.title": {
     "defaultMessage": "Лише на стороні клієнта"
+  },
+  "project.settings.environment.modal.title": {
+    "defaultMessage": "Змінити середовище проєкту"
   },
   "project.settings.environment.notice.missing-env.description": {
     "defaultMessage": "Вашому проєктові бракує метаданих середовища. Виберіть потрібні нижче."

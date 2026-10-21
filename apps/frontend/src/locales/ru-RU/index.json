@@ -1067,6 +1067,9 @@
   "conversation-thread.action.approve": {
     "message": "Одобрить"
   },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "Одобрить с ответом"
+  },
   "conversation-thread.action.close-report": {
     "message": "Закрыть жалобу"
   },
@@ -1075,6 +1078,9 @@
   },
   "conversation-thread.action.reject": {
     "message": "Отклонить"
+  },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "Отклонить с ответом"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Возобновить ветку"
@@ -1109,6 +1115,9 @@
   "conversation-thread.action.withhold": {
     "message": "Удержать"
   },
+  "conversation-thread.action.withhold-with-reply": {
+    "message": "Удержать с ответом"
+  },
   "conversation-thread.closed-thread.description": {
     "message": "Ветка закрыта. Отправка сообщений недоступна."
   },
@@ -1117,6 +1126,12 @@
   },
   "conversation-thread.error.reopening-report": {
     "message": "Ошибка возобновления жалобы"
+  },
+  "conversation-thread.error.sending-message": {
+    "message": "Ошибка отправки сообщения"
+  },
+  "conversation-thread.image.open-externally": {
+    "message": "Открыть во внешнем редакторе"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Ответьте в ветке..."
@@ -1139,11 +1154,26 @@
   "conversation-thread.reply-modal.help-center-note": {
     "message": "Для связи с модераторами посетите <help-center-link>справочный центр</help-center-link> и используйте виджет чата внизу справа страницы."
   },
+  "conversation-thread.reply.addresses": {
+    "message": "В этом ответе даны следующие запрошенные разъяснения:"
+  },
+  "conversation-thread.reply.changed-thread": {
+    "message": "Выбранная ветка изменена. Откройте её снова перед ответом."
+  },
+  "conversation-thread.reply.facet": {
+    "message": "Объсняется {issue}"
+  },
+  "conversation-thread.reply.unknown-issue": {
+    "message": "Замечание модерации"
+  },
   "conversation-thread.resubmit-modal.confirmation.description": {
     "message": "Подтвердить, что все замечания модераторов исправлены"
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "Я подтверждаю, что все замечания модераторов исправлены."
+  },
+  "conversation-thread.resubmit-modal.description.auto-approval": {
+    "message": "Вы повторно отправляете <project-title>{projectTitle}</project-title>. Если все замечания модерации устранены, проект может быть одобрен автоматически. В противном случае он будет отправлен модераторам на проверку."
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "Отправка на перепроверку"
@@ -1157,8 +1187,14 @@
   "conversation-thread.resubmit-modal.warning": {
     "message": "Регулярная отправка без исправления замечаний модераторов грозит блокировкой аккаунта."
   },
+  "conversation-thread.resubmit-required-actions-tooltip": {
+    "message": "Чтобы отправить повторно, нужно выполнить все обязательные действия выше"
+  },
+  "conversation-thread.submit-modal.description": {
+    "message": "Вы отправляете <project-title>{projectTitle}</project-title> на проверку модераторам."
+  },
   "create-project-version.create-modal.stage.add-files.admonition": {
-    "message": "Дополнительные файлы предназначены для вспомогательных ресурсов, например исходного кода, но не для альтернативных версий или вариантов."
+    "message": "Дополнительные файлы нужны для ресурсов вроде исходного кода, а не других версий или вариантов."
   },
   "create-project-version.create-modal.stage.add-files.details-tab": {
     "message": "Сведения"
@@ -1170,25 +1206,25 @@
     "message": "Метаданные"
   },
   "create-project-version.create-modal.stage.add-files.primary-file-description": {
-    "message": "Основной файл — тот, что скачивается по умолчанию при установке проекта."
+    "message": "Основной файл скачивается по умолчанию при установке проекта."
   },
   "create-project-version.create-modal.stage.add-files.primary-file-label": {
     "message": "Основной файл"
   },
   "create-project-version.create-modal.stage.add-files.supplementary-files-description": {
-    "message": "Можно добавить дополнительные файлы, например исходный код, документация, или обязательные наборы ресурсов."
+    "message": "При желании прикрепите дополнительные файлы: исходный код, документацию, обязательные наборы ресурсов."
   },
   "create-project-version.create-modal.stage.add-files.supplementary-files-label": {
     "message": "Дополнительные файлы"
   },
   "create-project-version.create-modal.stage.add-files.upload-additional-file-aria-label": {
-    "message": "Добавить дополнительный файл"
+    "message": "Загрузить дополнительный файл"
   },
   "create-project-version.create-modal.stage.add-files.upload-file-aria-label": {
     "message": "Загрузить файл"
   },
   "create-project-version.create-modal.stage.add-files.upload-primary-prompt": {
-    "message": "Загрузите основные и вспомогательные файлы"
+    "message": "Загрузите основной и вспомогательные файлы"
   },
   "create-project-version.create-modal.stage.add-files.upload-secondary-prompt": {
     "message": "Перетащите файлы или нажмите для обзора"
@@ -1209,7 +1245,7 @@
     "message": "Номер версии"
   },
   "create-project-version.create-modal.stage.details.version-number-description": {
-    "message": "Номер версии позволяет отличить эту конкретную версию от других."
+    "message": "Номер помогает отличить эту версию от остальных."
   },
   "create-project-version.create-modal.stage.details.version-number-placeholder": {
     "message": "Введите номер версии, например: 1.2.3-alpha.1"
@@ -1224,22 +1260,22 @@
     "message": "Тип версии"
   },
   "create-project-version.create-modal.stage.metadata.add-dependency": {
-    "message": "Добавьте зависимость"
+    "message": "Добавить зависимость"
   },
   "create-project-version.create-modal.stage.metadata.dependencies": {
     "message": "Зависимости"
   },
   "create-project-version.create-modal.stage.metadata.details-tab": {
-    "message": "Подробности"
+    "message": "Сведения"
   },
   "create-project-version.create-modal.stage.metadata.detected-loaders": {
-    "message": "Найденные загрузчики"
+    "message": "Обнаруженные загрузчики"
   },
   "create-project-version.create-modal.stage.metadata.detected-versions": {
-    "message": "Найденные версии"
+    "message": "Обнаруженные версии"
   },
   "create-project-version.create-modal.stage.metadata.edit-button": {
-    "message": "Редактировать"
+    "message": "Изменить"
   },
   "create-project-version.create-modal.stage.metadata.environment": {
     "message": "Среда"
@@ -1254,37 +1290,37 @@
     "message": "Метаданные"
   },
   "create-project-version.create-modal.stage.metadata.modpack-loaders-tooltip": {
-    "message": "Загрузчики сборок нельзя редактировать"
+    "message": "Загрузчики сборки нельзя изменить"
   },
   "create-project-version.create-modal.stage.metadata.modpack-versions-tooltip": {
-    "message": "Версии сборок нельзя редактировать"
+    "message": "Версии сборки нельзя изменить"
   },
   "create-project-version.create-modal.stage.metadata.no-dependencies-added": {
-    "message": "Зависимости не добавлены."
+    "message": "Зависимости не добавлены."
   },
   "create-project-version.create-modal.stage.metadata.no-environment-set": {
-    "message": "Среда не установлена."
+    "message": "Среда не задана."
   },
   "create-project-version.create-modal.stage.metadata.no-loaders-selected": {
-    "message": "Загрузчик не выбран."
+    "message": "Загрузчики не выбраны."
   },
   "create-project-version.create-modal.stage.metadata.no-mod-loader": {
     "message": "Без загрузчика"
   },
   "create-project-version.create-modal.stage.metadata.no-versions-selected": {
-    "message": "Версия не выбрана."
+    "message": "Версии не выбраны."
   },
   "create-project-version.create-modal.stage.metadata.prefilled-environment-tooltip": {
-    "message": "Заполнено на основе прошлой схожей версии"
+    "message": "Заполняется автоматически на основе прошлых аналогичных версий"
   },
   "create-project-version.create-modal.stage.metadata.resource-pack-loaders-tooltip": {
-    "message": "Загрузчики наборов ресурсов нельзя редактировать"
+    "message": "Загрузчики набора ресурсов нельзя изменить"
   },
   "create-project-version.create-modal.stage.metadata.suggested": {
-    "message": "Предложение"
+    "message": "Предложения"
   },
   "create-project-version.create-modal.stage.metadata.uploaded-files": {
-    "message": "Добавленные файлы"
+    "message": "Загруженные файлы"
   },
   "create-project-version.create-modal.stage.metadata.versions": {
     "message": "Версии"
@@ -1536,10 +1572,10 @@
     "message": "Налоговая форма"
   },
   "dashboard.creator-tax-form-modal.incomplete.text": {
-    "message": "Вы не заполнили налоговую форму. Попробуйте снова."
+    "message": "Вы не заполнили налоговую форму. Повторите попытку."
   },
   "dashboard.creator-tax-form-modal.incomplete.title": {
-    "message": "Налоговая форма не заполнена"
+    "message": "Налоговая форма не заполнена"
   },
   "dashboard.creator-tax-form-modal.security.description": {
     "message": "Modrinth использует сторонний сервис Track1099 для безопасного сбора и хранения налоговых форм. <security-link>Подробнее...</security-link>"
@@ -1581,7 +1617,7 @@
     "message": "Юридическое лицо"
   },
   "dashboard.creator-withdraw-modal.kyc.date-of-birth-placeholder": {
-    "message": "Введите дату рождения"
+    "message": "Выберите дату рождения"
   },
   "dashboard.creator-withdraw-modal.kyc.entity-description": {
     "message": "Юридическое лицо — зарегистрированная организация, например компания, партнёрство или ООО."
@@ -1734,19 +1770,19 @@
     "message": "Введите сумму"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.minimum-denomination-exceeds-balance": {
-    "message": "Минимальный номинал — {min}, что превышает {balance} на вашем балансе."
+    "message": "Минимальный номинал — {min}, что превышает {balance} на балансе."
   },
   "dashboard.creator-withdraw-modal.tremendous-details.need-at-least-gift-card": {
-    "message": "Вам надо хотя бы {min}, чтобы использовать подарочную карту."
+    "message": "Нужно не менее {min} для подарочной карты."
   },
   "dashboard.creator-withdraw-modal.tremendous-details.no-denominations-available": {
-    "message": "Для текущего баланса нет доступных номиналов"
+    "message": "Нет номиналов для текущего баланса"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.no-suggestions-no-max": {
-    "message": "Нет близких по сумме номиналов"
+    "message": "Нет близких к сумме номиналов"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.no-suggestions-with-max": {
-    "message": "Нет близких к сумме номиналов. Доступный максимум — {max}."
+    "message": "Нет близких к сумме номиналов. Наибольший из доступных: {max}."
   },
   "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
     "message": "Способ вывода"
@@ -1788,10 +1824,10 @@
     "message": "Выбран PayPal International с USD. <direct-paypal-link>Используйте PayPal напрямую</direct-paypal-link>, чтобы снизить комиссию (≈2% вместо ≈6%)."
   },
   "dashboard.creator-withdraw-modal.tremendous-details.withdrawal-amount-min-max": {
-    "message": "Можно вывести от {min} до {max}."
+    "message": "Вывод от {min} до {max}."
   },
   "dashboard.creator-withdraw-modal.tremendous-details.withdrawal-amount-min-only": {
-    "message": "Можно вывести от {min}."
+    "message": "Вывод от {min}."
   },
   "dashboard.creator-withdraw-modal.withdraw-button": {
     "message": "Вывести средства"
@@ -2972,6 +3008,30 @@
   "layout.publish.email-verification-required.title": {
     "message": "Необходимо подтвердить почту"
   },
+  "markdown-editor.placeholders.empty": {
+    "message": "Заполнители не найдены."
+  },
+  "markdown-editor.placeholders.label": {
+    "message": "Заполнители"
+  },
+  "markdown-editor.placeholders.search": {
+    "message": "Поиск заполнителей..."
+  },
+  "markdown-editor.templates.empty-all": {
+    "message": "Подходящих сообщений или плейсхолдеров нет."
+  },
+  "markdown-editor.templates.insert": {
+    "message": "Вставить сообщение"
+  },
+  "markdown-editor.templates.library": {
+    "message": "Библиотека сообщений"
+  },
+  "markdown-editor.templates.search-all": {
+    "message": "Поиск сообщений и плейсхолдеров…"
+  },
+  "markdown-editor.templates.section": {
+    "message": "Шаблонные сообщения"
+  },
   "messages.noResults": {
     "message": "Ничего не найдено по вашему запросу."
   },
@@ -2999,8 +3059,77 @@
   "modal.shared-instance.open-in-app.why-use": {
     "message": "Преимущества Modrinth App"
   },
+  "moderation.c2pa-scan.failed": {
+    "message": "Не удалось проверить файлы на признаки создания ИИ."
+  },
+  "moderation.c2pa-scan.no-ai-files": {
+    "message": "ИИ-файлы не найдены."
+  },
   "moderation.exclude-technical-review": {
     "message": "Исключать ТП"
+  },
+  "moderation.keybinds.change": {
+    "message": "{setting}: {binding}. Нажмите, чтобы изменить клавишу."
+  },
+  "moderation.keybinds.composer": {
+    "message": "Ответы в ветке и личные заметки"
+  },
+  "moderation.keybinds.conflict-summary": {
+    "message": "{count, plural, one {# действие имеет пересекающиеся сочетания.} few {# действия имеют пересекающиеся сочетания.} many {# действий имеют пересекающиеся сочетания.} other {# действия имеют пересекающиеся сочетания.}} Эти сочетания могут конфликтовать, если доступны одновременно. Измените сочетание или нажмите Escape во время записи, чтобы удалить его."
+  },
+  "moderation.keybinds.conflicts": {
+    "message": "Пересекается с: {actions}"
+  },
+  "moderation.keybinds.decisions": {
+    "message": "Результаты проверки и очередь"
+  },
+  "moderation.keybinds.global": {
+    "message": "Переключение хостов и копирование URL"
+  },
+  "moderation.keybinds.items": {
+    "message": "Элементы проверки и сами проверки"
+  },
+  "moderation.keybinds.listen": {
+    "message": "Нажмите клавишу..."
+  },
+  "moderation.keybinds.navigation": {
+    "message": "Навигация и панели проверки"
+  },
+  "moderation.keybinds.no-results": {
+    "message": "По вашему запросу сочетаний клавиш не найдено."
+  },
+  "moderation.keybinds.not-bound": {
+    "message": "Не назначена"
+  },
+  "moderation.keybinds.project": {
+    "message": "Копирование на публичных страницах проектов"
+  },
+  "moderation.keybinds.recording": {
+    "message": "{setting}: ожидание сочетания клавиш. Нажмите Escape, чтобы сбросить это сочетание."
+  },
+  "moderation.keybinds.reset-default": {
+    "message": "Сбросить"
+  },
+  "moderation.keybinds.scope-global": {
+    "message": "Можно использовать на любой странице сайта."
+  },
+  "moderation.keybinds.scope-project-page": {
+    "message": "Работает на страницах проектов, если включены сочетания клавиш для страниц проектов."
+  },
+  "moderation.keybinds.scope-tech": {
+    "message": "Используется на страницах техпроверки."
+  },
+  "moderation.keybinds.search": {
+    "message": "Поиск клавиш..."
+  },
+  "moderation.keybinds.self-conflict": {
+    "message": "другое сочетание для этого действия"
+  },
+  "moderation.keybinds.technical": {
+    "message": "Страницы технической проверки"
+  },
+  "moderation.keybinds.title": {
+    "message": "Назначение клавиш"
   },
   "moderation.moderate": {
     "message": "Модерировать"
@@ -3022,6 +3151,951 @@
   },
   "moderation.page.technicalReview": {
     "message": "Техпроверка"
+  },
+  "moderation.project-review.actions": {
+    "message": "Действия"
+  },
+  "moderation.project-review.approvedCount": {
+    "message": "Одобрено: {count}"
+  },
+  "moderation.project-review.archived": {
+    "message": "В архиве"
+  },
+  "moderation.project-review.archivedCount": {
+    "message": "В архиве: {count}"
+  },
+  "moderation.project-review.author": {
+    "message": "Автор"
+  },
+  "moderation.project-review.back": {
+    "message": "Назад"
+  },
+  "moderation.project-review.backToFiles": {
+    "message": "Вернуться к файлам"
+  },
+  "moderation.project-review.changelog": {
+    "message": "Список изменений"
+  },
+  "moderation.project-review.closePopoutWindows": {
+    "message": "Закрыть всплывающие окна"
+  },
+  "moderation.project-review.closeReview": {
+    "message": "Закрыть панель проверки"
+  },
+  "moderation.project-review.collapseAll": {
+    "message": "Свернуть всё"
+  },
+  "moderation.project-review.collapseVersion": {
+    "message": "Скрыть подробности"
+  },
+  "moderation.project-review.compatibility": {
+    "message": "Совместимость"
+  },
+  "moderation.project-review.complete": {
+    "message": "Завершить"
+  },
+  "moderation.project-review.completedFiles": {
+    "message": "Проверенные файлы ({count})"
+  },
+  "moderation.project-review.completedProjects": {
+    "message": "Завершённые проекты"
+  },
+  "moderation.project-review.conversationThread": {
+    "message": "Ветка обсуждения"
+  },
+  "moderation.project-review.copyHash": {
+    "message": "Копировать {algorithm}"
+  },
+  "moderation.project-review.copyValue": {
+    "message": "Копировать: {value}"
+  },
+  "moderation.project-review.created": {
+    "message": "Создан"
+  },
+  "moderation.project-review.customLicense": {
+    "message": "Своя"
+  },
+  "moderation.project-review.customSlug": {
+    "message": "Отличается от названия проекта"
+  },
+  "moderation.project-review.dependencies": {
+    "message": "Зависимости"
+  },
+  "moderation.project-review.dependencyCount": {
+    "message": "{count, plural, one {# зависимость} few {# зависимости} other {# зависимостей}}"
+  },
+  "moderation.project-review.description": {
+    "message": "Описание"
+  },
+  "moderation.project-review.details": {
+    "message": "Сведения"
+  },
+  "moderation.project-review.details.privateDescription": {
+    "message": "Не виден публично. Доступен только участникам проекта."
+  },
+  "moderation.project-review.details.publicDescription": {
+    "message": "Виден по ссылке, в вашем профиле и в поиске."
+  },
+  "moderation.project-review.details.unlistedDescription": {
+    "message": "Виден только по ссылке. Не отображается в вашем профиле и в поиске."
+  },
+  "moderation.project-review.disclosures": {
+    "message": "Маркировка"
+  },
+  "moderation.project-review.discord": {
+    "message": "Discord"
+  },
+  "moderation.project-review.dockPanel": {
+    "message": "Вернуть панель в рабочую область"
+  },
+  "moderation.project-review.donationBmac": {
+    "message": "Buy Me A Coffee"
+  },
+  "moderation.project-review.donationGithub": {
+    "message": "GitHub Sponsors"
+  },
+  "moderation.project-review.donationKoFi": {
+    "message": "Ko-fi"
+  },
+  "moderation.project-review.donationOther": {
+    "message": "Другое"
+  },
+  "moderation.project-review.donationPatreon": {
+    "message": "Patreon"
+  },
+  "moderation.project-review.donationPaypal": {
+    "message": "PayPal"
+  },
+  "moderation.project-review.download": {
+    "message": "Скачать"
+  },
+  "moderation.project-review.downloads": {
+    "message": "Скачивания"
+  },
+  "moderation.project-review.draft": {
+    "message": "Черновик"
+  },
+  "moderation.project-review.draftCount": {
+    "message": "Черновиков: {count}"
+  },
+  "moderation.project-review.edit.remove-icon": {
+    "message": "Удалить иконку"
+  },
+  "moderation.project-review.edit.upload-icon": {
+    "message": "Загрузить иконку"
+  },
+  "moderation.project-review.editSection": {
+    "message": "Изменить: {section}"
+  },
+  "moderation.project-review.embedded": {
+    "message": "Встроено"
+  },
+  "moderation.project-review.empty": {
+    "message": "Проект не выбран"
+  },
+  "moderation.project-review.emptyChangelog": {
+    "message": "Список изменений пуст"
+  },
+  "moderation.project-review.emptyDependencies": {
+    "message": "Зависимостей нет"
+  },
+  "moderation.project-review.emptyDescription": {
+    "message": "Описания нет"
+  },
+  "moderation.project-review.emptyEnvironments": {
+    "message": "Сред нет"
+  },
+  "moderation.project-review.emptyGallery": {
+    "message": "Галерея пуста"
+  },
+  "moderation.project-review.emptyLinks": {
+    "message": "Ссылок нет"
+  },
+  "moderation.project-review.emptyPlatforms": {
+    "message": "Платформ нет"
+  },
+  "moderation.project-review.emptyPopout": {
+    "message": "В этой панели нет открытых вкладок"
+  },
+  "moderation.project-review.emptyTags": {
+    "message": "Без меток"
+  },
+  "moderation.project-review.emptyVersions": {
+    "message": "Нет версий"
+  },
+  "moderation.project-review.environments": {
+    "message": "Среды"
+  },
+  "moderation.project-review.exit": {
+    "message": "Выйти"
+  },
+  "moderation.project-review.expandAll": {
+    "message": "Развернуть всё"
+  },
+  "moderation.project-review.expandVersion": {
+    "message": "Показать подробности"
+  },
+  "moderation.project-review.featured": {
+    "message": "Обложка"
+  },
+  "moderation.project-review.fileCount": {
+    "message": "{count, plural, one {# файл} few {# файла} other {# файлов}}"
+  },
+  "moderation.project-review.files": {
+    "message": "Файлы"
+  },
+  "moderation.project-review.finish": {
+    "message": "Завершить"
+  },
+  "moderation.project-review.gallery": {
+    "message": "Галерея"
+  },
+  "moderation.project-review.gameVersions": {
+    "message": "Версии игры"
+  },
+  "moderation.project-review.generalSettings": {
+    "message": "Общие"
+  },
+  "moderation.project-review.hashes": {
+    "message": "Хеши"
+  },
+  "moderation.project-review.hideLeft": {
+    "message": "Скрыть сведения о проекте"
+  },
+  "moderation.project-review.hideRight": {
+    "message": "Скрыть панель"
+  },
+  "moderation.project-review.icon": {
+    "message": "Иконка"
+  },
+  "moderation.project-review.imageNumber": {
+    "message": "Изображение {number}"
+  },
+  "moderation.project-review.incompatible": {
+    "message": "Несовместимо"
+  },
+  "moderation.project-review.issues": {
+    "message": "Трекер проблем"
+  },
+  "moderation.project-review.keepPopoutClosed": {
+    "message": "Оставить закрытым"
+  },
+  "moderation.project-review.keybindsSettings": {
+    "message": "Сочетания клавиш"
+  },
+  "moderation.project-review.left": {
+    "message": "Сведения о проекте"
+  },
+  "moderation.project-review.license": {
+    "message": "Лицензия"
+  },
+  "moderation.project-review.licenseUrl": {
+    "message": "Ссылка на лицензию"
+  },
+  "moderation.project-review.link-info.active": {
+    "message": "Активен"
+  },
+  "moderation.project-review.link-info.activity": {
+    "message": "Активность"
+  },
+  "moderation.project-review.link-info.archived": {
+    "message": "Этот репозиторий архивирован, его функции могут быть доступны только для чтения."
+  },
+  "moderation.project-review.link-info.archivedValue": {
+    "message": "Архивирован"
+  },
+  "moderation.project-review.link-info.author": {
+    "message": "Автор"
+  },
+  "moderation.project-review.link-info.board": {
+    "message": "Доска"
+  },
+  "moderation.project-review.link-info.bot": {
+    "message": "Бот"
+  },
+  "moderation.project-review.link-info.channel": {
+    "message": "Канал"
+  },
+  "moderation.project-review.link-info.closedIssues": {
+    "message": "Закрытые задачи"
+  },
+  "moderation.project-review.link-info.community": {
+    "message": "Сообщество"
+  },
+  "moderation.project-review.link-info.company": {
+    "message": "Компания"
+  },
+  "moderation.project-review.link-info.created": {
+    "message": "Аккаунт создан"
+  },
+  "moderation.project-review.link-info.detailTooltip": {
+    "message": "{label}: {value}"
+  },
+  "moderation.project-review.link-info.disabled": {
+    "message": "отключён"
+  },
+  "moderation.project-review.link-info.discussions": {
+    "message": "Обсуждения"
+  },
+  "moderation.project-review.link-info.discussionsDisabled": {
+    "message": "Обсуждения отключены."
+  },
+  "moderation.project-review.link-info.dm": {
+    "message": "Ссылка на ЛС"
+  },
+  "moderation.project-review.link-info.document": {
+    "message": "Документ"
+  },
+  "moderation.project-review.link-info.donation": {
+    "message": "Профиль для пожертвований"
+  },
+  "moderation.project-review.link-info.downloads": {
+    "message": "Загрузки"
+  },
+  "moderation.project-review.link-info.enabled": {
+    "message": "включён"
+  },
+  "moderation.project-review.link-info.expires": {
+    "message": "Истекает"
+  },
+  "moderation.project-review.link-info.externalLinks": {
+    "message": "Внешние ссылки на этой странице"
+  },
+  "moderation.project-review.link-info.followers": {
+    "message": "Подписчики"
+  },
+  "moderation.project-review.link-info.forkOf": {
+    "message": "Ответвление проекта"
+  },
+  "moderation.project-review.link-info.forks": {
+    "message": "Ответвления"
+  },
+  "moderation.project-review.link-info.invite": {
+    "message": "Приглашение на сервер"
+  },
+  "moderation.project-review.link-info.inviteExpired": {
+    "message": "Срок действия приглашения истёк."
+  },
+  "moderation.project-review.link-info.inviteExpires": {
+    "message": "У этого приглашения есть срок действия."
+  },
+  "moderation.project-review.link-info.inviter": {
+    "message": "Пригласил(а)"
+  },
+  "moderation.project-review.link-info.issues": {
+    "message": "Задачи"
+  },
+  "moderation.project-review.link-info.issuesDisabled": {
+    "message": "Задачи отключены."
+  },
+  "moderation.project-review.link-info.language": {
+    "message": "Язык"
+  },
+  "moderation.project-review.link-info.lastPush": {
+    "message": "Последний пуш"
+  },
+  "moderation.project-review.link-info.license": {
+    "message": "Лицензия"
+  },
+  "moderation.project-review.link-info.loading": {
+    "message": "Загрузка сведений о ссылке…"
+  },
+  "moderation.project-review.link-info.maxUses": {
+    "message": "Лимит использований"
+  },
+  "moderation.project-review.link-info.members": {
+    "message": "Участники"
+  },
+  "moderation.project-review.link-info.noExpiry": {
+    "message": "Бессрочно"
+  },
+  "moderation.project-review.link-info.notFound": {
+    "message": "Ресурс не найден. Возможно, он приватный, удалён или срок его действия истёк."
+  },
+  "moderation.project-review.link-info.online": {
+    "message": "В сети"
+  },
+  "moderation.project-review.link-info.openIssues": {
+    "message": "Открытые задачи"
+  },
+  "moderation.project-review.link-info.organization": {
+    "message": "Организация"
+  },
+  "moderation.project-review.link-info.owner": {
+    "message": "Владелец"
+  },
+  "moderation.project-review.link-info.playlist": {
+    "message": "Плейлист"
+  },
+  "moderation.project-review.link-info.privateCommunity": {
+    "message": "Это закрытое сообщество."
+  },
+  "moderation.project-review.link-info.project": {
+    "message": "Проект"
+  },
+  "moderation.project-review.link-info.projectStatus": {
+    "message": "Статус проекта: {status}"
+  },
+  "moderation.project-review.link-info.projectUnavailable": {
+    "message": "Проект недоступен публично или архивирован. Проверьте его статус ниже."
+  },
+  "moderation.project-review.link-info.repositories": {
+    "message": "Публичные репозитории"
+  },
+  "moderation.project-review.link-info.repository": {
+    "message": "Репозиторий"
+  },
+  "moderation.project-review.link-info.role": {
+    "message": "Роль"
+  },
+  "moderation.project-review.link-info.server": {
+    "message": "Сервер"
+  },
+  "moderation.project-review.link-info.size": {
+    "message": "Размер репозитория"
+  },
+  "moderation.project-review.link-info.sponsors": {
+    "message": "Спонсоры"
+  },
+  "moderation.project-review.link-info.stars": {
+    "message": "Звёзды"
+  },
+  "moderation.project-review.link-info.status": {
+    "message": "Статус"
+  },
+  "moderation.project-review.link-info.stream": {
+    "message": "Трансляция"
+  },
+  "moderation.project-review.link-info.subscribers": {
+    "message": "Подписчики"
+  },
+  "moderation.project-review.link-info.target": {
+    "message": "Тип приглашения"
+  },
+  "moderation.project-review.link-info.topic": {
+    "message": "Тема"
+  },
+  "moderation.project-review.link-info.unavailable": {
+    "message": "Не удалось загрузить дополнительные сведения. Сервис может быть недоступен, приватен, ограничен по частоте запросов или заблокирован браузером."
+  },
+  "moderation.project-review.link-info.unlimitedUses": {
+    "message": "Без ограничения использований"
+  },
+  "moderation.project-review.link-info.unsupported": {
+    "message": "Для этой ссылки нет дополнительных публичных метаданных."
+  },
+  "moderation.project-review.link-info.user": {
+    "message": "Пользователь"
+  },
+  "moderation.project-review.link-info.uses": {
+    "message": "Использований"
+  },
+  "moderation.project-review.link-info.video": {
+    "message": "Видео"
+  },
+  "moderation.project-review.link-info.website": {
+    "message": "Сайт"
+  },
+  "moderation.project-review.link-info.wiki": {
+    "message": "Вики"
+  },
+  "moderation.project-review.link-info.wikiDisabled": {
+    "message": "Вики отключена."
+  },
+  "moderation.project-review.linkRemoved": {
+    "message": "Ссылка удалена: {link}"
+  },
+  "moderation.project-review.linkUnavailable": {
+    "message": "Ссылка недоступна"
+  },
+  "moderation.project-review.links": {
+    "message": "Ссылки"
+  },
+  "moderation.project-review.listed": {
+    "message": "В списке"
+  },
+  "moderation.project-review.loadError": {
+    "message": "Не удалось загрузить данные проекта"
+  },
+  "moderation.project-review.loading": {
+    "message": "Загрузка..."
+  },
+  "moderation.project-review.matchesName": {
+    "message": "Совпадает с названием проекта"
+  },
+  "moderation.project-review.memberCount": {
+    "message": "{count, plural, one {# участник} few {# участника} many {# участников} other {# участника}}"
+  },
+  "moderation.project-review.members": {
+    "message": "Участники"
+  },
+  "moderation.project-review.modpack": {
+    "message": "Сборка"
+  },
+  "moderation.project-review.modpackVersion": {
+    "message": "Версия {version}"
+  },
+  "moderation.project-review.monetization": {
+    "message": "Монетизация"
+  },
+  "moderation.project-review.monetizationStatus": {
+    "message": "{status, select, monetized {Монетизирован} demonetized {Демонетизирован} forceDemonetized {Принудительно демонетизирован} other {Неизвестно}}"
+  },
+  "moderation.project-review.monetizationValue": {
+    "message": "{status, select, monetized {Включена} demonetized {Отключена} forceDemonetized {Принудительно отключена} other {Неизвестно}}"
+  },
+  "moderation.project-review.mrpack": {
+    "message": ".mrpack"
+  },
+  "moderation.project-review.next": {
+    "message": "Далее"
+  },
+  "moderation.project-review.noCompletedProjects": {
+    "message": "Завершённых проектов пока нет"
+  },
+  "moderation.project-review.noFlagsFiles": {
+    "message": "Файлы без отметок ({count})"
+  },
+  "moderation.project-review.noIssues": {
+    "message": "Замечаний нет."
+  },
+  "moderation.project-review.noLicense": {
+    "message": "Нет ссылки на лицензию"
+  },
+  "moderation.project-review.noMatchingDependencies": {
+    "message": "Подходящих зависимостей нет"
+  },
+  "moderation.project-review.noMatchingProjects": {
+    "message": "Подходящих проектов нет"
+  },
+  "moderation.project-review.noPendingFiles": {
+    "message": "Нет файлов с нерешёнными отметками"
+  },
+  "moderation.project-review.noQueuedProjects": {
+    "message": "Для этого проекта нет отчётов технической проверки"
+  },
+  "moderation.project-review.noReports": {
+    "message": "Для этого проекта нет отчётов технической проверки"
+  },
+  "moderation.project-review.noReviewActions": {
+    "message": "Для этого раздела нет доступных действий проверки"
+  },
+  "moderation.project-review.noSelectedIssues": {
+    "message": "Замечания не добавлены. Выберите замечания при проверке проекта, чтобы увидеть здесь сообщение."
+  },
+  "moderation.project-review.noServerAddress": {
+    "message": "Адрес не указан."
+  },
+  "moderation.project-review.noServerLanguages": {
+    "message": "Языки не указаны."
+  },
+  "moderation.project-review.noSkippedProjects": {
+    "message": "Нет пропущенных проектов"
+  },
+  "moderation.project-review.openIcon": {
+    "message": "Увеличить значок проекта"
+  },
+  "moderation.project-review.openImage": {
+    "message": "Открыть изображение {number}"
+  },
+  "moderation.project-review.openImageInNewTab": {
+    "message": "Открыть изображение в новой вкладке"
+  },
+  "moderation.project-review.openMemberAvatar": {
+    "message": "Увеличить аватар {username}"
+  },
+  "moderation.project-review.openOrganizationIcon": {
+    "message": "Увеличить значок {organization}"
+  },
+  "moderation.project-review.openReviewGuidance": {
+    "message": "Открыть руководство по проверке в новой вкладке"
+  },
+  "moderation.project-review.openSlicer": {
+    "message": "Открыть в Slicer"
+  },
+  "moderation.project-review.openVersionSlicer": {
+    "message": "Открыть файлы в Slicer"
+  },
+  "moderation.project-review.optional": {
+    "message": "Необязательно"
+  },
+  "moderation.project-review.organization": {
+    "message": "Организация"
+  },
+  "moderation.project-review.owner": {
+    "message": "Владелец"
+  },
+  "moderation.project-review.panelLayout": {
+    "message": "Расположение панелей"
+  },
+  "moderation.project-review.pendingFiles": {
+    "message": "Ожидающие файлы ({count})"
+  },
+  "moderation.project-review.permalink": {
+    "message": "Постоянная ссылка"
+  },
+  "moderation.project-review.permissions": {
+    "message": "Разрешения"
+  },
+  "moderation.project-review.permissionsPlaceholder": {
+    "message": "Проверка разрешений скоро появится"
+  },
+  "moderation.project-review.pinReview": {
+    "message": "Закрепить панель проверки"
+  },
+  "moderation.project-review.platforms": {
+    "message": "Платформы"
+  },
+  "moderation.project-review.popoutFailed": {
+    "message": "Не удалось открыть окно панели"
+  },
+  "moderation.project-review.popoutPanel": {
+    "message": "Открыть панель в отдельном окне"
+  },
+  "moderation.project-review.post-approval": {
+    "message": "После одобрения"
+  },
+  "moderation.project-review.previousLink": {
+    "message": "Предыдущая ссылка: {url}"
+  },
+  "moderation.project-review.primary": {
+    "message": "Основной файл"
+  },
+  "moderation.project-review.privateCount": {
+    "message": "Приватные: {count}"
+  },
+  "moderation.project-review.processingCount": {
+    "message": "На проверке: {count}"
+  },
+  "moderation.project-review.project": {
+    "message": "Проект"
+  },
+  "moderation.project-review.projectId": {
+    "message": "ID проекта"
+  },
+  "moderation.project-review.projectTitle": {
+    "message": "Заголовок"
+  },
+  "moderation.project-review.projectType": {
+    "message": "Тип"
+  },
+  "moderation.project-review.published": {
+    "message": "Опубликован"
+  },
+  "moderation.project-review.publishedBy": {
+    "message": "Опубликовал(а)"
+  },
+  "moderation.project-review.queueError": {
+    "message": "Не удалось изменить проекты. Повторите попытку"
+  },
+  "moderation.project-review.queueNavigation": {
+    "message": "Навигация по очереди проверки"
+  },
+  "moderation.project-review.queuedProjects": {
+    "message": "Следующие 5 проектов"
+  },
+  "moderation.project-review.re-review": {
+    "message": "Повторная проверка"
+  },
+  "moderation.project-review.reReviewFindings": {
+    "message": "{count, plural, one {# элемент для повторной проверки} few {# элемента для повторной проверки} many {# элементов для повторной проверки} other {# элемента для повторной проверки}}"
+  },
+  "moderation.project-review.recommended": {
+    "message": "(Рекомендуется)"
+  },
+  "moderation.project-review.rejectedCount": {
+    "message": "Отклонено: {count}"
+  },
+  "moderation.project-review.remaining": {
+    "message": "Осталось"
+  },
+  "moderation.project-review.reopenPopouts": {
+    "message": "Открыть окно снова"
+  },
+  "moderation.project-review.requesting": {
+    "message": "Запрашивает"
+  },
+  "moderation.project-review.required": {
+    "message": "Обязательно"
+  },
+  "moderation.project-review.reset": {
+    "message": "Сбросить"
+  },
+  "moderation.project-review.resetPanelLayout": {
+    "message": "Сбросить расположение панелей"
+  },
+  "moderation.project-review.resolvePermissions": {
+    "message": "Проверить разрешения на распространение"
+  },
+  "moderation.project-review.restorePopouts": {
+    "message": "Отдельное окно закрыто"
+  },
+  "moderation.project-review.restorePopoutsDescription": {
+    "message": "Панели из этого окна перемещены в главное окно: {panels}."
+  },
+  "moderation.project-review.retry": {
+    "message": "Повторить"
+  },
+  "moderation.project-review.reupload": {
+    "message": "Загрузить заново"
+  },
+  "moderation.project-review.reviewIssues": {
+    "message": "Замечания"
+  },
+  "moderation.project-review.reviewProgress": {
+    "message": "Проверенные отметки показывают прогресс, а не вердикт о безопасности. У файлов без отметок вердикта нет"
+  },
+  "moderation.project-review.reviewScope": {
+    "message": "Этот выбор применяется к этапу проверки «{stage}» для всего проекта"
+  },
+  "moderation.project-review.reviewSection": {
+    "message": "Проверить: {section}"
+  },
+  "moderation.project-review.right": {
+    "message": "Правая панель"
+  },
+  "moderation.project-review.saveProject": {
+    "message": "Сохранить проект"
+  },
+  "moderation.project-review.scheduled": {
+    "message": "Запланировано"
+  },
+  "moderation.project-review.scheduledCount": {
+    "message": "Запланировано: {count}"
+  },
+  "moderation.project-review.searchDependencies": {
+    "message": "Поиск зависимостей…"
+  },
+  "moderation.project-review.searchingProjects": {
+    "message": "Поиск проектов…"
+  },
+  "moderation.project-review.selectedFindings": {
+    "message": "{count, plural, one {# выбранная находка} few {# выбранные находки} other {# выбранных находок}}"
+  },
+  "moderation.project-review.serverAddress": {
+    "message": "Адрес"
+  },
+  "moderation.project-review.serverAddressTemporaryHost": {
+    "message": "Этот адрес использует временный хост сервера."
+  },
+  "moderation.project-review.serverContent": {
+    "message": "Контент"
+  },
+  "moderation.project-review.serverDetails": {
+    "message": "О сервере"
+  },
+  "moderation.project-review.serverDiscord": {
+    "message": "Discord"
+  },
+  "moderation.project-review.serverLanguages": {
+    "message": "Языки"
+  },
+  "moderation.project-review.serverRegion": {
+    "message": "Регион"
+  },
+  "moderation.project-review.showLeft": {
+    "message": "Показать сведения о проекте"
+  },
+  "moderation.project-review.showRight": {
+    "message": "Показать панель"
+  },
+  "moderation.project-review.skip": {
+    "message": "Пропустить"
+  },
+  "moderation.project-review.skipped": {
+    "message": "Пропущено"
+  },
+  "moderation.project-review.skippedProjects": {
+    "message": "Пропущенные проекты"
+  },
+  "moderation.project-review.slicer": {
+    "message": "Slicer"
+  },
+  "moderation.project-review.slicerOpenExternal": {
+    "message": "Открыть в Slicer в новой вкладке"
+  },
+  "moderation.project-review.slug": {
+    "message": "Slug"
+  },
+  "moderation.project-review.slugNotSuggested": {
+    "message": "Этот slug не совпадает ни с одним из предложенных."
+  },
+  "moderation.project-review.source": {
+    "message": "Исходный код"
+  },
+  "moderation.project-review.sourceAvailabilityRequired": {
+    "message": "Лицензия требует открытия исходного кода."
+  },
+  "moderation.project-review.sourceError": {
+    "message": "Не удалось загрузить исходный код. Попробуйте открыть отметку снова"
+  },
+  "moderation.project-review.status-alerts": {
+    "message": "Уведомления о статусе"
+  },
+  "moderation.project-review.store": {
+    "message": "Магазин"
+  },
+  "moderation.project-review.submissions": {
+    "message": "{count, plural, one {# отправка} few {# отправки} many {# отправок} other {# отправки}}"
+  },
+  "moderation.project-review.submitted": {
+    "message": "Отправлено"
+  },
+  "moderation.project-review.summary": {
+    "message": "Сводка"
+  },
+  "moderation.project-review.tags": {
+    "message": "Теги"
+  },
+  "moderation.project-review.tech-review": {
+    "message": "Техпроверка"
+  },
+  "moderation.project-review.techReviewFailedCount": {
+    "message": "Не прошло техпроверку: {count}"
+  },
+  "moderation.project-review.title": {
+    "message": "Проверка проекта"
+  },
+  "moderation.project-review.unavailable": {
+    "message": "Недоступно"
+  },
+  "moderation.project-review.undefinedProject": {
+    "message": "Неопределённый проект"
+  },
+  "moderation.project-review.unknown": {
+    "message": "Неизвестно"
+  },
+  "moderation.project-review.unknownCount": {
+    "message": "Неизвестно: {count}"
+  },
+  "moderation.project-review.unlisted": {
+    "message": "Скрытый"
+  },
+  "moderation.project-review.unlistedCount": {
+    "message": "Скрыто: {count}"
+  },
+  "moderation.project-review.unpinReview": {
+    "message": "Открепить панель проверки"
+  },
+  "moderation.project-review.updated": {
+    "message": "Обновлён"
+  },
+  "moderation.project-review.uploaded": {
+    "message": "Загружено {date}"
+  },
+  "moderation.project-review.validation.length": {
+    "message": "Введите от {min} до {max} символов."
+  },
+  "moderation.project-review.validation.slug": {
+    "message": "Используйте только буквы, цифры, точки, подчёркивания и дефисы."
+  },
+  "moderation.project-review.vanilla": {
+    "message": "Ванилла"
+  },
+  "moderation.project-review.versionId": {
+    "message": "ID версии"
+  },
+  "moderation.project-review.versionNumber": {
+    "message": "Номер версии"
+  },
+  "moderation.project-review.versionSubtitle": {
+    "message": "Подзаголовок версии"
+  },
+  "moderation.project-review.versions": {
+    "message": "Версии"
+  },
+  "moderation.project-review.viewC2paInfo": {
+    "message": "Показать сведения C2PA"
+  },
+  "moderation.project-review.viewVersion": {
+    "message": "Открыть версию"
+  },
+  "moderation.project-review.visibility": {
+    "message": "Видимость"
+  },
+  "moderation.project-review.visibilityOption": {
+    "message": "{status, select, approved {Публичный} archived {Публичный} unlisted {Скрытый} private {Приватный} other {Неизвестно}}"
+  },
+  "moderation.project-review.website": {
+    "message": "Сайт"
+  },
+  "moderation.project-review.wiki": {
+    "message": "Вики"
+  },
+  "moderation.project-review.withheld": {
+    "message": "На удержании"
+  },
+  "moderation.project-review.withheldCount": {
+    "message": "На удержании: {count}"
+  },
+  "moderation.settings.appearance": {
+    "message": "Панели и внешний вид"
+  },
+  "moderation.settings.based-on": {
+    "message": "Основано на"
+  },
+  "moderation.settings.default-value-styled": {
+    "message": "По умолчанию: <value></value>"
+  },
+  "moderation.settings.localhost": {
+    "message": "Установить {hostname}"
+  },
+  "moderation.settings.no-results": {
+    "message": "По вашему запросу настроек не найдено."
+  },
+  "moderation.settings.none": {
+    "message": "Нет"
+  },
+  "moderation.settings.off": {
+    "message": "Выкл"
+  },
+  "moderation.settings.on": {
+    "message": "Вкл"
+  },
+  "moderation.settings.project-pages": {
+    "message": "Публичные страницы проектов и хосты"
+  },
+  "moderation.settings.search": {
+    "message": "Поиск настроек…"
+  },
+  "moderation.settings.shortcuts": {
+    "message": "Редакторы и подсказки сочетаний клавиш"
+  },
+  "moderation.settings.title": {
+    "message": "Общие настройки"
+  },
+  "moderation.settings.unknown-commit": {
+    "message": "неизвестно"
+  },
+  "moderation.settings.workflow": {
+    "message": "Процесс проверки и очередь"
+  },
+  "moderation.tech-review.file.download": {
+    "message": "Скачать"
+  },
+  "moderation.tech-review.file.download-file": {
+    "message": "Скачать {filename} ({size})"
+  },
+  "moderation.tech-review.file.flags": {
+    "message": "Отметки"
+  },
+  "moderation.tech-review.file.manual": {
+    "message": "Ручная проверка"
+  },
+  "moderation.tech-review.file.no-flags": {
+    "message": "Нет отметок"
+  },
+  "moderation.tech-review.file.open-slicer": {
+    "message": "Открыть в Slicer"
+  },
+  "moderation.tech-review.file.open-slicer-tab": {
+    "message": "Открыть во вкладке Slicer"
+  },
+  "moderation.tech-review.file.slicer": {
+    "message": "Slicer"
+  },
+  "moderation.tech-review.file.view-version": {
+    "message": "Открыть версию"
   },
   "modpack-scan-modal.batch.placeholder": {
     "message": "Файлов за раз"
@@ -3383,6 +4457,36 @@
   "organization.projects.none-with-create-prompt": {
     "message": "У этой организации ещё нет проектов. Хотите <create-link>создать новый</create-link>?"
   },
+  "profile.button.analytics": {
+    "message": "Аналитика пользователя"
+  },
+  "profile.button.edit-user": {
+    "message": "Изменить пользователя"
+  },
+  "profile.button.info": {
+    "message": "Сведения о пользователе"
+  },
+  "profile.button.shared-instances": {
+    "message": "Общие сборки"
+  },
+  "profile.details.label.auth-providers": {
+    "message": "Способы входа"
+  },
+  "profile.details.label.email-verified": {
+    "message": "Email подтверждён"
+  },
+  "profile.details.label.has-password": {
+    "message": "Есть пароль"
+  },
+  "profile.details.label.has-totp": {
+    "message": "Есть TOTP"
+  },
+  "profile.details.label.payment-methods": {
+    "message": "Способы оплаты"
+  },
+  "profile.details.title": {
+    "message": "Сведения о пользователе"
+  },
   "project-member-header.error-decline": {
     "message": "Не удалось отклонить приглашение в команду"
   },
@@ -3403,6 +4507,9 @@
   },
   "project-member-header.success-join": {
     "message": "Вы присоединились к команде проекта"
+  },
+  "project-moderation-nags.project-submitted-for-review": {
+    "message": "Проект отправлен на проверку!"
   },
   "project-moderation-nags.publishing-checklist": {
     "message": "Контрольный список для публикации"
@@ -3436,6 +4543,225 @@
   },
   "project-moderation-nags.warning": {
     "message": "Предупреждение"
+  },
+  "project-review.composer.add-note": {
+    "message": "Приватная заметка"
+  },
+  "project-review.composer.reply": {
+    "message": "Ответить"
+  },
+  "project-review.composer.reply-and-clear-issues": {
+    "message": "Ответить и снять замечания"
+  },
+  "project-review.composer.reply-placeholder": {
+    "message": "Ответить в ветке..."
+  },
+  "project-review.controls.markdown-placeholder": {
+    "message": "Объясните, что нужно изменить…"
+  },
+  "project-review.controls.required-value": {
+    "message": "Заполните это обязательное поле."
+  },
+  "project-review.controls.select": {
+    "message": "Выберите вариант"
+  },
+  "project-review.controls.slug-available": {
+    "message": "Этот URL проекта свободен."
+  },
+  "project-review.controls.slug-error": {
+    "message": "Не удалось проверить, свободен ли URL. Попробуйте ещё раз."
+  },
+  "project-review.controls.slug-invalid": {
+    "message": "Используйте от 3 до 64 символов: буквы, цифры, точки, подчёркивания или дефисы."
+  },
+  "project-review.controls.slug-taken": {
+    "message": "Этот URL проекта уже занят."
+  },
+  "project-review.controls.slug-unchanged": {
+    "message": "Выберите URL, отличный от текущего URL проекта."
+  },
+  "project-review.controls.text-placeholder": {
+    "message": "Введите текст…"
+  },
+  "project-review.decision.add-issues": {
+    "message": "Добавить замечания к проекту"
+  },
+  "project-review.decision.approve": {
+    "message": "Одобрить"
+  },
+  "project-review.decision.message-mode": {
+    "message": "Отправить замечания сообщением в ветку"
+  },
+  "project-review.decision.reject": {
+    "message": "Отклонить"
+  },
+  "project-review.decision.send-issues-message": {
+    "message": "Отправить сообщение с замечаниями в ветку"
+  },
+  "project-review.decision.send-to-review": {
+    "message": "Отправить на проверку"
+  },
+  "project-review.decision.set-to-draft": {
+    "message": "Установить в черновик"
+  },
+  "project-review.decision.withhold": {
+    "message": "Задержать"
+  },
+  "project-review.image.dimensions": {
+    "message": "Размеры"
+  },
+  "project-review.image.disable-pixelated": {
+    "message": "Отключить пиксельный рендеринг"
+  },
+  "project-review.image.download": {
+    "message": "Скачать изображение"
+  },
+  "project-review.image.enable-pixelated": {
+    "message": "Включить пиксельный рендеринг"
+  },
+  "project-review.image.file-size": {
+    "message": "Размер файла"
+  },
+  "project-review.image.format": {
+    "message": "Формат"
+  },
+  "project-review.image.info": {
+    "message": "Сведения об изображении"
+  },
+  "project-review.image.info-unknown": {
+    "message": "Неизвестно"
+  },
+  "project-review.issues.add": {
+    "message": "Замечание"
+  },
+  "project-review.issues.add-option": {
+    "message": "Добавить вариант замечания"
+  },
+  "project-review.issues.choose-option": {
+    "message": "Выберите хотя бы один вариант для этого замечания."
+  },
+  "project-review.issues.custom": {
+    "message": "Своё замечание"
+  },
+  "project-review.issues.custom-acknowledge-checkbox": {
+    "message": "Флажок подтверждения"
+  },
+  "project-review.issues.custom-acknowledge-reply": {
+    "message": "Ответ с подтверждением"
+  },
+  "project-review.issues.custom-actions": {
+    "message": "Действия"
+  },
+  "project-review.issues.custom-add-facets": {
+    "message": "Отметить как устранённое"
+  },
+  "project-review.issues.custom-message-required": {
+    "message": "Введите сообщение для этого замечания."
+  },
+  "project-review.issues.custom-placeholder": {
+    "message": "Введите текст замечания..."
+  },
+  "project-review.issues.custom-priority": {
+    "message": "Приоритет"
+  },
+  "project-review.issues.custom-search-facets": {
+    "message": "Поиск действий…"
+  },
+  "project-review.issues.custom-title": {
+    "message": "Заголовок"
+  },
+  "project-review.issues.custom-title-placeholder": {
+    "message": "Введите заголовок..."
+  },
+  "project-review.issues.edited": {
+    "message": "(Изменено)"
+  },
+  "project-review.issues.edited-tooltip": {
+    "message": "Сообщение замечания было изменено"
+  },
+  "project-review.issues.empty": {
+    "message": "Замечаний не отмечено."
+  },
+  "project-review.issues.empty-re-review": {
+    "message": "Нет предыдущих замечаний для повторной проверки."
+  },
+  "project-review.issues.field-option": {
+    "message": "{field}: {option}"
+  },
+  "project-review.issues.issue-message": {
+    "message": "Сообщение"
+  },
+  "project-review.issues.message": {
+    "message": "Сообщение для {issue}"
+  },
+  "project-review.issues.no-results": {
+    "message": "Подходящих замечаний нет."
+  },
+  "project-review.issues.not-resolved": {
+    "message": "Не решено"
+  },
+  "project-review.issues.open-panel": {
+    "message": "Открыть панель проверки {panel}"
+  },
+  "project-review.issues.remove": {
+    "message": "Удалить {issue}"
+  },
+  "project-review.issues.remove-option": {
+    "message": "Удалить {option}"
+  },
+  "project-review.issues.reset": {
+    "message": "Сбросить замечания"
+  },
+  "project-review.issues.reset-all": {
+    "message": "Сбросить все замечания"
+  },
+  "project-review.issues.reset-description": {
+    "message": "Это отменит изменения в запросе и вернет все предыдущие замечания в Re-rev."
+  },
+  "project-review.issues.reset-message": {
+    "message": "Сбросить сообщение"
+  },
+  "project-review.issues.resolved": {
+    "message": "Решено автоматически ({count})"
+  },
+  "project-review.issues.revert-all-customizations": {
+    "message": "Отменить все настройки"
+  },
+  "project-review.issues.revert-customizations-description": {
+    "message": "«Отменить все настройки» вернёт стандартные сообщения замечаний, но сохранит пользовательские сообщения, а также все переключатели и выбранные варианты."
+  },
+  "project-review.issues.search": {
+    "message": "Поиск замечаний..."
+  },
+  "project-review.lock.moderating": {
+    "message": "{username} модерирует"
+  },
+  "project-review.lock.take-over": {
+    "message": "Перехватить проект"
+  },
+  "project-review.message-box.resize": {
+    "message": "Изменить размер поля сообщения"
+  },
+  "project-review.previous-issues.re-review": {
+    "message": "Перепроверить"
+  },
+  "project-review.resize-checks": {
+    "message": "Изменить размер панели проверок проекта"
+  },
+  "project-review.right-panel.issues": {
+    "message": "Замечания ({count})"
+  },
+  "project-review.right-panel.re-review": {
+    "message": "Повторная проверка ({count})"
+  },
+  "project-review.right-panel.thread": {
+    "message": "Ветка"
+  },
+  "project-review.versions.modpack-tools": {
+    "message": "Инструменты сборки"
+  },
+  "project-review.versions.view-c2pa-info": {
+    "message": "Показать сведения C2PA"
   },
   "project-type.collection.plural": {
     "message": "Коллекции"
@@ -3515,6 +4841,9 @@
   "project.actions.edit-project": {
     "message": "Настроить проект"
   },
+  "project.actions.open-in-modview": {
+    "message": "Открыть в modview"
+  },
   "project.actions.project-page": {
     "message": "Страница проекта"
   },
@@ -3531,13 +4860,13 @@
     "message": "Создайте сервер"
   },
   "project.actions.view-dependents": {
-    "message": "Посмотреть зависимое"
+    "message": "Найти зависимые"
   },
   "project.actions.view-modpacks": {
-    "message": "Посмотреть сборки"
+    "message": "Найти сборки"
   },
   "project.actions.view-project-type-dependents": {
-    "message": "Посмотреть зависимости {projectType}"
+    "message": "Найти зависимые ({projectType})"
   },
   "project.ai-image-warning-modal.body.1": {
     "message": "Использование изображений от ИИ для представления своего проекта запрещено. Попытка обойти проверку приведёт к блокировке аккаунта Modrinth."
@@ -3556,6 +4885,30 @@
   },
   "project.description.title": {
     "message": "Описание"
+  },
+  "project.disclosures.load-error": {
+    "message": "Не удалось загрузить раскрытия."
+  },
+  "project.disclosures.loading": {
+    "message": "Загрузка маркировок..."
+  },
+  "project.disclosures.lock-status.cannot-disable": {
+    "message": "Нельзя отключить"
+  },
+  "project.disclosures.lock-status.fully-locked": {
+    "message": "Полностью заблокирован"
+  },
+  "project.disclosures.lock-status.label": {
+    "message": "Статус блокировки"
+  },
+  "project.disclosures.lock-status.unlocked": {
+    "message": "Разблокирован"
+  },
+  "project.disclosures.retry": {
+    "message": "Повторить"
+  },
+  "project.disclosures.save-error": {
+    "message": "Не удалось сохранить все изменения раскрытий. Ваши правки сохранены, попробуйте сохранить ещё раз."
   },
   "project.download.base-game-version-incompatible-tooltip": {
     "message": "Эта версия игры несовместима с зависимым проектом."
@@ -3687,7 +5040,7 @@
     "message": "Необходимо проверить метаданные среды"
   },
   "project.environment.migration.learn-more": {
-    "message": "Подробнее об этом изменении..."
+    "message": "Подробнее об изменении..."
   },
   "project.environment.migration.message": {
     "message": "На Modrinth изменилась система сред и появились новые варианты. Убедитесь в верности метаданных."
@@ -3776,6 +5129,9 @@
   "project.moderation.error.unauthorized": {
     "message": "Нет доступа"
   },
+  "project.moderation.project-changed": {
+    "message": "Выбранный проект изменился. Проверьте его снова."
+  },
   "project.moderation.thread.approved-warning": {
     "message": "За этой веткой почти не следят. Её могут изучить для уточнения сведений о проекте."
   },
@@ -3829,6 +5185,9 @@
   },
   "project.notification.updated.title": {
     "message": "Проект обновлён"
+  },
+  "project.review.approved": {
+    "message": "Ваш проект одобрен{status, select, unlisted { как скрытый} private { как приватный} other {}}."
   },
   "project.settings.back-to-all-projects": {
     "message": "Вернуться ко всем проектам"
@@ -3949,6 +5308,9 @@
   },
   "project.settings.disclosures.derivative.note-placeholder": {
     "message": "Это форк который добавляет несколько новых биомов и переносит их новые версии Minecraft."
+  },
+  "project.settings.disclosures.derivative.open-link": {
+    "message": "Перейти по ссылке"
   },
   "project.settings.disclosures.derivative.title": {
     "message": "Производная работа"
@@ -4116,16 +5478,25 @@
     "message": "Укажите название своей лицензии."
   },
   "project.settings.license.custom-url-description": {
-    "message": "Ссылка на полный текст лицензии."
+    "message": "Ссылка на полный текст лицензии. Для своей лицензии ссылка обязательна."
+  },
+  "project.settings.license.has-spdx": {
+    "message": "Использовать идентификатор SPDX"
   },
   "project.settings.license.intro": {
     "message": "Важно выбрать подходящую лицензию для вашего {type}. Вы можете выбрать ее из нашего списка или предоставить свою лицензию. Вы также можете предоставить URL выбранной лицензии в противном случае будет лицензия будет показана в виде текста. Смотрите руководство <guide>по лицензированию</guide> для получения дополнительной информации."
+  },
+  "project.settings.license.invalid-url": {
+    "message": "Введите корректную HTTP- или HTTPS-ссылку на лицензию."
   },
   "project.settings.license.later": {
     "message": "Более поздние версии"
   },
   "project.settings.license.later-description": {
     "message": "Выбранная лицензия поддерживается в варианте «или более поздняя». Установите флажок, если разрешаете использовать проект на условиях более поздних версий лицензии."
+  },
+  "project.settings.license.missing-name": {
+    "message": "Введите название или идентификатор SPDX своей лицензии."
   },
   "project.settings.license.missing-url": {
     "message": "Укажите URL полного текста своей лицензии."
@@ -4142,11 +5513,20 @@
   "project.settings.license.optional-label": {
     "message": "необязательно"
   },
+  "project.settings.license.optional-url": {
+    "message": "Ссылка на лицензию (необязательно)"
+  },
   "project.settings.license.select": {
-    "message": "Лицензия"
+    "message": "Выберите лицензию"
+  },
+  "project.settings.license.select-description": {
+    "message": "Как можно и нельзя использовать проект."
   },
   "project.settings.license.select-placeholder": {
-    "message": "Поиск лицензий..."
+    "message": "Выберите лицензию..."
+  },
+  "project.settings.license.spdx": {
+    "message": "Идентификатор SPDX"
   },
   "project.settings.license.title": {
     "message": "Лицензия"
@@ -4195,6 +5575,9 @@
   },
   "project.settings.links.donations-description": {
     "message": "Добавьте ссылки на пожертвования, чтобы пользователи могли поддерживать вас напрямую."
+  },
+  "project.settings.links.invalid-url": {
+    "message": "Перед сохранением введите корректные HTTP- или HTTPS-ссылки."
   },
   "project.settings.links.issues": {
     "message": "Трекер проблем"
@@ -4274,6 +5657,9 @@
   "project.settings.permissions.attention-needed.title": {
     "message": "Неизвестный сторонний контент"
   },
+  "project.settings.permissions.awaiting-review-count": {
+    "message": "{count, plural, =0 {Нет ожидающих проверки} one {# ожидает проверки} few {# ожидают проверки} many {# ожидают проверки} other {# ожидают проверки}}"
+  },
   "project.settings.permissions.bad-proof.description": {
     "message": "Команда Modrinth отклонила некоторые доказательства на использование стороннего контента. Изучите список ниже и предоставьте новые доказательства или удалите контент."
   },
@@ -4328,11 +5714,17 @@
   "project.settings.permissions.learn-more": {
     "message": "Подробнее"
   },
+  "project.settings.permissions.no-permission-count": {
+    "message": "{count} не имеет разрешения"
+  },
   "project.settings.permissions.no-results": {
     "message": "Сторонние файлы не найдены."
   },
   "project.settings.permissions.not-allowed.description": {
     "message": "Некоторый сторонний контент нельзя распространять на Modrinth из‑за нарушения правил контента. Его нужно удалить."
+  },
+  "project.settings.permissions.open-image-in-new-tab": {
+    "message": "Открыть изображение в новой вкладке"
   },
   "project.settings.permissions.pending-approval-count": {
     "message": "{count, plural, =0 {Все атрибуции одобрены} one {# атрибуция без одобрения} few {# атрибуции без одобрения} other {# атрибуций без одобрения}}"
@@ -4351,6 +5743,9 @@
   },
   "project.settings.permissions.sort.status": {
     "message": "Статус"
+  },
+  "project.settings.permissions.user-action-count": {
+    "message": "{count} требуется действие пользователя"
   },
   "project.settings.server.bedrock-address-label": {
     "message": "Bedrock-адрес"
@@ -4441,6 +5836,9 @@
   },
   "project.settings.tags.title": {
     "message": "Теги"
+  },
+  "project.settings.tags.upload-version-first.description": {
+    "message": "Загрузите версию перед выбором тегов проекта."
   },
   "project.settings.tags.upload-version-first.heading": {
     "message": "Загрузите версии перед добавлением тегов"
@@ -5615,6 +7013,195 @@
   "shared-instance.invite.unavailable.title": {
     "message": "Приглашение недоступно"
   },
+  "thread-issues.address-failed": {
+    "message": "Не удалось пометить задачу как адресованную"
+  },
+  "thread-issues.address-requirements-unchanged": {
+    "message": "Внесите запрошенные изменения перед тем, как отметить эту проблему как адресную."
+  },
+  "thread-issues.address-save-failed": {
+    "message": "Ваши изменения не могут быть сохранены. Исправьте ошибки проверки перед тем, как отметить эту задачу как адресную."
+  },
+  "thread-issues.addressed": {
+    "message": "Отметить адресным"
+  },
+  "thread-issues.addressed-progress": {
+    "message": "{completed, number} из {total, number} адресовано"
+  },
+  "thread-issues.addressed-progress-tooltip": {
+    "message": "{completed, number}/{total, number} части были решены для этой проблемы"
+  },
+  "thread-issues.change-facet-first": {
+    "message": "Внесите запрошенные изменения перед тем, как отметить эту проблему как адресную."
+  },
+  "thread-issues.facet.acknowledge-checkbox": {
+    "message": "Подтвердить этот запрос"
+  },
+  "thread-issues.facet.acknowledge-reply": {
+    "message": "Объясните ваши изменения в ответе"
+  },
+  "thread-issues.facet.version.changelog": {
+    "message": "Измените список изменений в версии"
+  },
+  "thread-issues.facet.version.dependencies": {
+    "message": "Измените зависимости версии"
+  },
+  "thread-issues.facet.version.environment": {
+    "message": "Измените окружение версии"
+  },
+  "thread-issues.facet.version.file-type": {
+    "message": "Измените тип дополнительного файла"
+  },
+  "thread-issues.facet.version.game-versions": {
+    "message": "Измените поддерживаемые версии игры"
+  },
+  "thread-issues.facet.version.remove": {
+    "message": "Удалите эту версию"
+  },
+  "thread-issues.facet.version.remove-files": {
+    "message": "Удалите запрошенные дополнительные файлы"
+  },
+  "thread-issues.hide-addressed": {
+    "message": "Скрыть адресным"
+  },
+  "thread-issues.hide-issue": {
+    "message": "Скрыть проблему"
+  },
+  "thread-issues.hide-resolved": {
+    "message": "Скрыть разрешенные"
+  },
+  "thread-issues.mark-addressed": {
+    "message": "Отметить адресным"
+  },
+  "thread-issues.mark-addressed-progress": {
+    "message": "Отметить адресным {completed, number}/{total, number}"
+  },
+  "thread-issues.mark-resolved": {
+    "message": "Отметить как разрешено"
+  },
+  "thread-issues.mark-unresolved": {
+    "message": "Пометить как неразрешенные"
+  },
+  "thread-issues.more-actions": {
+    "message": "Больше обязательных действий"
+  },
+  "thread-issues.options": {
+    "message": "Действия с замечанием"
+  },
+  "thread-issues.reply-to-address": {
+    "message": "Ответить, чтобы устранить"
+  },
+  "thread-issues.resolve-failed": {
+    "message": "Не удалось отметить замечание как решённое"
+  },
+  "thread-issues.resolved": {
+    "message": "Решено"
+  },
+  "thread-issues.show-addressed": {
+    "message": "Показать устранённые"
+  },
+  "thread-issues.show-issue": {
+    "message": "Показать замечание"
+  },
+  "thread-issues.show-resolved": {
+    "message": "Показать решённые"
+  },
+  "thread-issues.target.edit-name": {
+    "message": "Изменить название"
+  },
+  "thread-issues.target.edit-summary": {
+    "message": "Изменить краткое описание"
+  },
+  "thread-issues.target.edit-url": {
+    "message": "Изменить URL"
+  },
+  "thread-issues.unresolve-failed": {
+    "message": "Не удалось отметить замечание как нерешённое"
+  },
+  "thread.issue-history.flagged": {
+    "message": "отметил {count, plural, one {# замечание} few {# замечания} many {# замечаний} other {# замечания}}"
+  },
+  "thread.issue-history.private-note": {
+    "message": "Видимо только модераторам"
+  },
+  "thread.message.auto-approval": {
+    "message": "решил все вопросы, и статус проекта был автоматически установлен на <status>одобренный</status>."
+  },
+  "thread.message.delete": {
+    "message": "Удалить"
+  },
+  "thread.message.deleted-message": {
+    "message": "опубликовано сообщение, которое было удалено."
+  },
+  "thread.message.legacy-project-message": {
+    "message": "Этот проект был опубликован на Modrinth до появления веток модерации, поэтому история модерации может быть неполной."
+  },
+  "thread.message.moderator": {
+    "message": "Модератор"
+  },
+  "thread.message.modrinth-team": {
+    "message": "Команда Modrinth"
+  },
+  "thread.message.more-options": {
+    "message": "Дополнительные параметры"
+  },
+  "thread.message.open-image": {
+    "message": "Открыть изображение"
+  },
+  "thread.message.preview": {
+    "message": "Предпросмотр"
+  },
+  "thread.message.private-message": {
+    "message": "Видимо только модераторам"
+  },
+  "thread.message.project-owner": {
+    "message": "Владелец проекта"
+  },
+  "thread.message.reporter": {
+    "message": "Докладчик"
+  },
+  "thread.message.reverted-to-draft": {
+    "message": "вернул этот проект обратно к <status>.</status>"
+  },
+  "thread.message.review": {
+    "message": "пересмотрел проект и установил его статус на <status>статус</status>."
+  },
+  "thread.message.review-with-issues": {
+    "message": "оценил проект и задал его статус <status>статус</status> с помощью {count, plural, one {# задачи} few {# проблемы} many {# проблемы} other {# проблемы}}."
+  },
+  "thread.message.sent-image": {
+    "message": "отправляет изображение."
+  },
+  "thread.message.sent-message": {
+    "message": "отправляет сообщение."
+  },
+  "thread.message.status-changed": {
+    "message": "изменяет статус проекта со <old-status>статуса</old-status> на <status>.</status>"
+  },
+  "thread.message.submitted-for-review": {
+    "message": "отправил проект на рассмотрение."
+  },
+  "thread.message.system": {
+    "message": "Modrinth"
+  },
+  "thread.message.tech-review-completed": {
+    "message": "завершил технический обзор и пометил проект как <status>.</status>"
+  },
+  "thread.message.tech-review-entered": {
+    "message": "Проект в очереди на техпроверку."
+  },
+  "thread.message.tech-review-exit-file-deleted": {
+    "message": "Проект покинул очередь технических проверок, так как все файлы в ожидании проверки были удалены пользователем."
+  },
+  "thread.message.tech-review-exited": {
+    "message": "Проект покинул очередь технического рассмотрения, так как были решены все оставшиеся следы."
+  },
+  "thread.message.thread-closed": {
+    "message": "закрывает ветку."
+  },
+  "thread.message.thread-reopened": {
+    "message": "возобновляет ветку."
+  },
   "ui.latest-news-row.latest-news": {
     "message": "Последние новости от Modrinth"
   },
@@ -5673,7 +7260,7 @@
     "message": "Необязательный набор ресурсов"
   },
   "version.download.required-resource-pack": {
-    "message": "Необходимый набор ресурсов"
+    "message": "Обязательный набор ресурсов"
   },
   "version.download.version": {
     "message": "Скачать {version} ({size})"

@@ -177,7 +177,7 @@
     "message": "Játékidő megjelenítése"
   },
   "app.appearance-settings.skip-non-essential-warnings.description": {
-    "message": "Megerősítés kihagyása az alacsony kockázatú műveletek – például az ismételt telepítések, a szokásos tartalomtörlések, a tömeges frissítések, a leválasztás és a javítások – esetében. A veszélyes műveletekre vonatkozó figyelmeztetéseket mindig megjeleníti a rendszer."
+    "message": "Alacsony kockázatú műveleteknél, például ismételt telepítéseknél, szokásos tartalomtörléseknél, tömeges frissítéseknél, leválasztásnál és javításoknál ne kérjen megerősítést. A veszélyes műveletekre vonatkozó figyelmeztetéseket mindig jelenítse meg a rendszer."
   },
   "app.appearance-settings.skip-non-essential-warnings.title": {
     "message": "Lényegtelen figyelmeztetések kihagyása"
@@ -302,6 +302,18 @@
   "app.content.sync-resource-packs-disabled": {
     "message": "Először kapcsold be az erőforráscsomagok szinkronizálását az alkalmazás beállításaiban."
   },
+  "app.debug-export.canceling": {
+    "message": "Exportálás megszakítása…"
+  },
+  "app.debug-export.exporting": {
+    "message": "Exportálás…"
+  },
+  "app.debug-export.finishing": {
+    "message": "Befejezés…"
+  },
+  "app.debug-export.preparing": {
+    "message": "Fájlok előkészítése…"
+  },
   "app.download-manager.active": {
     "message": "Aktív"
   },
@@ -384,7 +396,7 @@
     "message": "Letöltéskezelő"
   },
   "app.download-manager.verifying": {
-    "message": "Ellenőrzés..."
+    "message": "Hitelesítés..."
   },
   "app.error.state-init.open-backups-folder": {
     "message": "A biztonsági mentések mappájának megnyitása"
@@ -467,6 +479,15 @@
   "app.features-settings.sync-across-devices.title": {
     "message": "Funkciók szinkronizálása az eszközök között"
   },
+  "app.file-download.canceling": {
+    "message": "Letöltés megszakítása..."
+  },
+  "app.file-download.preparing": {
+    "message": "Letöltés előkészítése..."
+  },
+  "app.file-download.waiting": {
+    "message": "Várakozás a kiszolgálóra…"
+  },
   "app.home.jump-back-in.actions.label": {
     "message": "Példány-műveletek"
   },
@@ -513,7 +534,7 @@
     "message": "A Minecraft letöltése..."
   },
   "app.install.phase.downloading_pack_file": {
-    "message": "Csomagfájlok letöltése"
+    "message": "A csomagfájl letöltése..."
   },
   "app.install.phase.extracting_overrides": {
     "message": "Felülírások kibontása"
@@ -1017,7 +1038,7 @@
     "message": "Példánytípus"
   },
   "app.library.group-by.label": {
-    "message": "Csoportosítás így:"
+    "message": "Csoportosítás"
   },
   "app.library.group-by.loader": {
     "message": "Betöltő"
@@ -1309,6 +1330,12 @@
   },
   "app.modal.install-to-play.shared-instance-unknown-files-description": {
     "message": "Ez a megosztott példány olyan fájlokat tartalmaz, amelyek nincsenek közzétéve a Modrinth-on. Határozottan javasoljuk, hogy kizárólag olyan forrásokból telepíts fájlokat, amelyekben megbízol."
+  },
+  "app.modal.install-to-play.unavailable-description": {
+    "message": "A szerver által használt modcsomag verzióját nem tudjuk letölteni most. Lehetséges hogy levették, vagy éppen felülvizsgálat alatt áll. Próbáld újra később, vagy vedd fel a kapcsolatot a szerver tulajdonosával."
+  },
+  "app.modal.install-to-play.unavailable-header": {
+    "message": "Ennek a szervernek a modcsomagja nem elérhető"
   },
   "app.modal.install-to-play.unknown-files-description": {
     "message": "Ez a szervermodcsomag olyan fájlokat tartalmaz, amelyeket nem tettek közzé a Modrinthen. Nyomatékosan javasoljuk, hogy csak megbízható forrásból származó fájlokat telepíts."
@@ -2777,6 +2804,15 @@
   "app.settings.resource-management.app-directory.title": {
     "message": "Alkalmazáskönyvtár"
   },
+  "app.settings.resource-management.debug-info.description": {
+    "message": "Exportáld az alkalmazás naplóit és diagnosztikai adatait egy ZIP-fájlba, hogy megoszthasd őket a Modrinth ügyfélszolgálatával."
+  },
+  "app.settings.resource-management.debug-info.export": {
+    "message": "Hibakeresési adatok exportálása"
+  },
+  "app.settings.resource-management.debug-info.title": {
+    "message": "Hibakeresési adatok"
+  },
   "app.settings.resource-management.maximum-concurrent-downloads.description": {
     "message": "Az egyszerre letölthető fájlok száma. Csökkentsd ezt az értéket, ha a letöltések gyakran sikertelenek a hálózati kapcsolatod miatt. Az alkalmazás újraindítása szükséges."
   },
@@ -2857,6 +2893,12 @@
   },
   "app.settings.resource-management.store.verified": {
     "message": "Sikeres ellenőrzés"
+  },
+  "app.settings.sidebar.label.instance-defaults": {
+    "message": "Példány alapbeállításai"
+  },
+  "app.settings.sidebar.label.system": {
+    "message": "Rendszer"
   },
   "app.settings.synced-options.choose-sync-source.command-history-description": {
     "message": "Válaszd ki, hogy melyik példányból másolja át a parancselőzményeidet. Az előzményeket csak a kezdeti szinkronizáláshoz használja, ezt követően bármelyik példányból szerkesztheted őket."
@@ -3089,14 +3131,47 @@
   "app.settings.tabs.features": {
     "message": "Funkciók"
   },
+  "app.settings.tabs.java-and-memory": {
+    "message": "Java és memória"
+  },
   "app.settings.tabs.java-installations": {
     "message": "Telepített Java példányok"
   },
   "app.settings.tabs.language": {
     "message": "Nyelv"
   },
+  "app.settings.tabs.launch-hooks": {
+    "message": "Indítási hookok"
+  },
   "app.settings.tabs.privacy": {
     "message": "Adatvédelem"
+  },
+  "app.settings.tabs.resources": {
+    "message": "Erőforrások"
+  },
+  "app.settings.tabs.syncing": {
+    "message": "Szinkronizálás"
+  },
+  "app.settings.tabs.troubleshooting": {
+    "message": "Hibaelhárítás"
+  },
+  "app.settings.tabs.window": {
+    "message": "Ablak"
+  },
+  "app.settings.troubleshooting.clear-cache": {
+    "message": "Gyorsítótár ürítése"
+  },
+  "app.settings.troubleshooting.clear-cache.confirm.title": {
+    "message": "Törlöd az alkalmazás gyorsítótárát?"
+  },
+  "app.settings.troubleshooting.report-ad.copied": {
+    "message": "Másolva"
+  },
+  "app.settings.troubleshooting.report-ad.copy": {
+    "message": "Hírdetési részletek másolása"
+  },
+  "app.settings.troubleshooting.report-ad.description": {
+    "message": "Nem megfelelő vagy sértő hirdetést láttál? Másold ki az adatait, amíg megjelenik, majd küldd el a <support>Modrinth ügyfélszolgálatának</support>. Ellenőrizzük, és eltávolítjuk."
   },
   "app.sidebar.playing-as": {
     "message": "Játékfiók"
@@ -4255,6 +4330,9 @@
   },
   "instance.settings.tabs.window.height.enter": {
     "message": "Magasság megadása..."
+  },
+  "instance.settings.tabs.window.label": {
+    "message": "Ablak"
   },
   "instance.settings.tabs.window.width": {
     "message": "Szélesség"

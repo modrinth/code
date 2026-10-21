@@ -305,11 +305,23 @@
   "app.debug-export.canceling": {
     "message": "Exporteren annuleren…"
   },
+  "app.debug-export.exporting": {
+    "message": "Exporteren..."
+  },
+  "app.debug-export.finishing": {
+    "message": "Afronden..."
+  },
+  "app.debug-export.preparing": {
+    "message": "Bestanden voorbereiden..."
+  },
   "app.download-manager.active": {
     "message": "Actief"
   },
   "app.download-manager.attention": {
     "message": "Heeft aandacht nodig"
+  },
+  "app.download-manager.bulk-update-content": {
+    "message": "{count, plural, one {# item} other {# items}} bijwerken"
   },
   "app.download-manager.cancel": {
     "message": "Installatie annuleren"
@@ -466,6 +478,15 @@
   },
   "app.features-settings.sync-across-devices.title": {
     "message": "Synchroniseer instellingen tussen apparaten"
+  },
+  "app.file-download.canceling": {
+    "message": "Download annuleren..."
+  },
+  "app.file-download.preparing": {
+    "message": "Download voorbereiden..."
+  },
+  "app.file-download.waiting": {
+    "message": "Wachten op de server…"
   },
   "app.home.jump-back-in.actions.label": {
     "message": "Instellingen voor instantie"
@@ -1309,6 +1330,12 @@
   },
   "app.modal.install-to-play.shared-instance-unknown-files-description": {
     "message": "Deze gedeelde instantie bevat bestanden die niet op Modrinth zijn gepubliceerd. We raden je ten zeerste aan om alleen bestanden te installeren uit bronnen die je vertrouwt."
+  },
+  "app.modal.install-to-play.unavailable-description": {
+    "message": "De modpack versie die deze server gebruikt kan nu niet worden gedownload. Het kan ongepubliceerd worden of onder beoordeling zijn. Probeer het later opnieuw of neem contact op met de servereigenaar."
+  },
+  "app.modal.install-to-play.unavailable-header": {
+    "message": "De servers modpack is niet beschikbaar"
   },
   "app.modal.install-to-play.unknown-files-description": {
     "message": "Dit server-modpack bevat bestanden die niet op Modrinth zijn gepubliceerd. We raden je ten zeerste aan om alleen bestanden te installeren uit bronnen die je vertrouwt."
@@ -2624,6 +2651,9 @@
   "app.settings.game-options.setting.sensitivity.label": {
     "message": "Muis gevoeligheid"
   },
+  "app.settings.game-options.setting.server-textures.label": {
+    "message": "Server texturen"
+  },
   "app.settings.game-options.setting.share-presence.label": {
     "message": "Deel aanwezigheid"
   },
@@ -2639,8 +2669,23 @@
   "app.settings.game-options.setting.sprint-window.label": {
     "message": "Ren scherm"
   },
+  "app.settings.game-options.setting.subtitles.description": {
+    "message": "Toon ondertitelingen voor geluiden die in het spel worden gespeeld."
+  },
   "app.settings.game-options.setting.subtitles.label": {
     "message": "Ondertiteling"
+  },
+  "app.settings.game-options.setting.text-background-opacity.label": {
+    "message": "Tekst achtergrond transparantie"
+  },
+  "app.settings.game-options.setting.texture-filtering.label": {
+    "message": "Textuurfiltering"
+  },
+  "app.settings.game-options.setting.toggle-attack.label": {
+    "message": "Aanvallen in-/uitschakelen"
+  },
+  "app.settings.game-options.setting.toggle-crouch.description": {
+    "message": "Druk eenmaal om gehurkt te blijven."
   },
   "app.settings.game-options.setting.toggle-crouch.label": {
     "message": ""
@@ -2648,8 +2693,44 @@
   "app.settings.game-options.setting.toggle-sprint.description": {
     "message": "Druk één keer om te blijven sprinten."
   },
+  "app.settings.game-options.setting.toggle-sprint.label": {
+    "message": "Rennen in-/uitschakelen"
+  },
+  "app.settings.game-options.setting.toggle-use.label": {
+    "message": "Schakel gebruik om"
+  },
+  "app.settings.game-options.setting.touchscreen.label": {
+    "message": "Touchscreenmodus"
+  },
+  "app.settings.game-options.setting.ui-volume.label": {
+    "message": "Scherm weergave"
+  },
+  "app.settings.game-options.setting.unfocused-chat-height.label": {
+    "message": "Ongefocusde chathoogte"
+  },
+  "app.settings.game-options.setting.use-vbo.label": {
+    "message": "VBO's gebruiken"
+  },
+  "app.settings.game-options.setting.view-bobbing.description": {
+    "message": "Voeg een bobbing-beweging toe aan de camera tijdens het lopen."
+  },
+  "app.settings.game-options.setting.view-bobbing.label": {
+    "message": "Loopbeweging"
+  },
+  "app.settings.game-options.setting.vignette.label": {
+    "message": "Vignette"
+  },
+  "app.settings.game-options.setting.voice-volume.label": {
+    "message": "Stem en spraak"
+  },
+  "app.settings.game-options.setting.vsync.description": {
+    "message": "Beperk de framesnelheid tot de verversingssnelheid van het scherm om te voorkomen dat het scherm hapert."
+  },
   "app.settings.game-options.setting.vsync.label": {
     "message": "VSync"
+  },
+  "app.settings.game-options.setting.weather-radius.label": {
+    "message": "Straal van het weer"
   },
   "app.settings.game-options.setting.weather-volume.label": {
     "message": "Weer"
@@ -2657,8 +2738,14 @@
   "app.settings.game-options.validation.changed-since-opened": {
     "message": "Deze instelling is ergens anders veranderd. Controleer dit en probeer het opnieuw."
   },
+  "app.settings.game-options.validation.invalid-value": {
+    "message": "Kies een geldige waarde."
+  },
   "app.settings.game-options.validation.missing-value": {
     "message": "Kies eerst een optie."
+  },
+  "app.settings.game-options.validation.no-compatible-instances": {
+    "message": "Sommige van uw instanties kunnen deze instelling niet gebruiken"
   },
   "app.settings.java-installations.location.title": {
     "message": "Java {version, number} locatie"
@@ -2717,6 +2804,15 @@
   "app.settings.resource-management.app-directory.title": {
     "message": "App-folder"
   },
+  "app.settings.resource-management.debug-info.description": {
+    "message": "Exporteer app logboeken en diagnostische gegevens naar een ZIP bestand om te delen met Modrinth ondersteuning."
+  },
+  "app.settings.resource-management.debug-info.export": {
+    "message": "Exporteer foutopsporingsinformatie"
+  },
+  "app.settings.resource-management.debug-info.title": {
+    "message": "Foutopsporingsinformatie"
+  },
   "app.settings.resource-management.maximum-concurrent-downloads.description": {
     "message": "Het aantal bestanden dat de app tegelijkertijd kan downloaden. Verlaag dit aantal als downloads via je verbinding niet betrouwbaar zijn. Hiervoor moet de app opnieuw worden opgestart."
   },
@@ -2728,6 +2824,63 @@
   },
   "app.settings.resource-management.maximum-concurrent-writes.title": {
     "message": "Maximaal aantal gelijktijdige schrijfbewerkingen"
+  },
+  "app.settings.resource-management.store.attention": {
+    "message": "Sommige bestanden vereisen nog steeds aandacht"
+  },
+  "app.settings.resource-management.store.cache-limit.description": {
+    "message": "Hou deze ongebruikte inhoud bij voor toekomstige installaties. Meer bewaren kan downloadtijd besparen."
+  },
+  "app.settings.resource-management.store.cache-limit.label": {
+    "message": "Ongebruikte downloads behouden"
+  },
+  "app.settings.resource-management.store.cache-limit.unit": {
+    "message": "GiB"
+  },
+  "app.settings.resource-management.store.calculating": {
+    "message": "Berekenen"
+  },
+  "app.settings.resource-management.store.clear": {
+    "message": "Verwijder ongebruikt"
+  },
+  "app.settings.resource-management.store.clear.description": {
+    "message": "Verwijder ongebruikte gedownloade inhoud"
+  },
+  "app.settings.resource-management.store.cleared": {
+    "message": "{size} vrijgemaakt van schijfruimte."
+  },
+  "app.settings.resource-management.store.clearing": {
+    "message": "Wissen…"
+  },
+  "app.settings.resource-management.store.description": {
+    "message": "Bespaar ruimte door spelinstallaties, mods en pakketten opnieuw te gebruiken voor uw installaties."
+  },
+  "app.settings.resource-management.store.issues": {
+    "message": "Bekijk {count, plural, one {# probleem} other {# problemen}}"
+  },
+  "app.settings.resource-management.store.nothing-to-clear": {
+    "message": "Geen ongebruikte inhoud om te wissen."
+  },
+  "app.settings.resource-management.store.repair": {
+    "message": "Controleer en herstel"
+  },
+  "app.settings.resource-management.store.repair.running-description": {
+    "message": "Dit zal alle lopende instanties sluiten."
+  },
+  "app.settings.resource-management.store.repair.verify-description": {
+    "message": "Controleer op ontbrekende of beschadigde bestanden en repareer ze."
+  },
+  "app.settings.resource-management.store.repairing": {
+    "message": "Controleren en herstellen..."
+  },
+  "app.settings.resource-management.store.shared.label": {
+    "message": "Gedeeld"
+  },
+  "app.settings.resource-management.store.title": {
+    "message": "Opslag van inhoud"
+  },
+  "app.settings.resource-management.store.total": {
+    "message": "{size} opgeslagen"
   },
   "app.settings.resource-management.store.verified": {
     "message": "Verificatie voltooid"

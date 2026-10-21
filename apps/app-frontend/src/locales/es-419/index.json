@@ -479,6 +479,15 @@
   "app.features-settings.sync-across-devices.title": {
     "message": "Función de sincronización entre dispositivos"
   },
+  "app.file-download.canceling": {
+    "message": "Cancelando descarga…"
+  },
+  "app.file-download.preparing": {
+    "message": "Preparando descarga..."
+  },
+  "app.file-download.waiting": {
+    "message": "Esperando al servidor…"
+  },
   "app.home.jump-back-in.actions.label": {
     "message": "Acciones de instancia"
   },
@@ -1321,6 +1330,12 @@
   },
   "app.modal.install-to-play.shared-instance-unknown-files-description": {
     "message": "Esta instancia contiene archivos que no están publicados en Modrinth. Recomendamos encarecidamente instalar únicamente archivos de fuentes de confianza."
+  },
+  "app.modal.install-to-play.unavailable-description": {
+    "message": "La versión del modpack que utiliza este servidor no se puede descargar ahora. Puede no estar publicado o revisado. Inténtalo de nuevo más tarde o contacta con el propietario del servidor."
+  },
+  "app.modal.install-to-play.unavailable-header": {
+    "message": "El modpack de este servidor no está disponible"
   },
   "app.modal.install-to-play.unknown-files-description": {
     "message": "Este modpack para servidor contiene archivos que no están publicados en Modrinth. Recomendamos encarecidamente instalar únicamente archivos de fuentes de confianza."
@@ -2879,6 +2894,12 @@
   "app.settings.resource-management.store.verified": {
     "message": "Verificación exitosa"
   },
+  "app.settings.sidebar.label.instance-defaults": {
+    "message": "Instancia predeterminada"
+  },
+  "app.settings.sidebar.label.system": {
+    "message": "Sistema"
+  },
   "app.settings.synced-options.choose-sync-source.command-history-description": {
     "message": "Elija desde qué instancia copiar su historial de comandos. Este historial solo se utiliza para la sincronización inicial, y puede editarlo desde cualquier instancia posterior."
   },
@@ -3110,14 +3131,56 @@
   "app.settings.tabs.features": {
     "message": "Funciones"
   },
+  "app.settings.tabs.java-and-memory": {
+    "message": "Java y Memoria"
+  },
   "app.settings.tabs.java-installations": {
     "message": "Instalaciones de Java"
   },
   "app.settings.tabs.language": {
     "message": "Idioma"
   },
+  "app.settings.tabs.launch-hooks": {
+    "message": "Hooks de inicio"
+  },
   "app.settings.tabs.privacy": {
     "message": "Privacidad"
+  },
+  "app.settings.tabs.resources": {
+    "message": "Recursos"
+  },
+  "app.settings.tabs.syncing": {
+    "message": "Sincronización"
+  },
+  "app.settings.tabs.troubleshooting": {
+    "message": "Solución de problemas"
+  },
+  "app.settings.tabs.window": {
+    "message": "Ventana"
+  },
+  "app.settings.troubleshooting.clear-cache": {
+    "message": "Limpiar caché"
+  },
+  "app.settings.troubleshooting.clear-cache.confirm.title": {
+    "message": "¿Eliminar la caché?"
+  },
+  "app.settings.troubleshooting.report-ad.copied": {
+    "message": "Copiado"
+  },
+  "app.settings.troubleshooting.report-ad.copy": {
+    "message": "Copiar detalles del anuncio"
+  },
+  "app.settings.troubleshooting.report-ad.description": {
+    "message": "¿Has detectado un anuncio inapropiado u ofensivo? Copia sus detalles mientras se muestran, y envíalos al <support>soporte de Modrinth</support>. Lo revisaremos y lo eliminaremos."
+  },
+  "app.settings.troubleshooting.report-ad.no-ad.text": {
+    "message": "Espere a que se cargue el anuncio y vuelva a intentarlo."
+  },
+  "app.settings.troubleshooting.report-ad.no-ad.title": {
+    "message": "No se encontró el anuncio"
+  },
+  "app.settings.troubleshooting.report-ad.title": {
+    "message": "Reportar un anuncio"
   },
   "app.sidebar.playing-as": {
     "message": "Jugando como"
@@ -3959,6 +4022,9 @@
   "instance.server-modal.resource-pack": {
     "message": "Paquete de recursos"
   },
+  "instance.settings.defaults.open-app-settings": {
+    "message": "Gestionar ajustes predeterminados"
+  },
   "instance.settings.sharing.active-invites.actions": {
     "message": "Acciones"
   },
@@ -3997,6 +4063,12 @@
   },
   "instance.settings.sharing.revoke-invite.header": {
     "message": "Revocar invitación"
+  },
+  "instance.settings.sidebar.label.game": {
+    "message": "Juego"
+  },
+  "instance.settings.sidebar.label.instance": {
+    "message": "Instancia"
   },
   "instance.settings.synced-options.data-override": {
     "message": "Desactivar este sobreescrito para editar los datos sincronizados."
@@ -4115,6 +4187,12 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Selecciona el canal de actualizaciones"
   },
+  "instance.settings.tabs.hooks.default-settings-description": {
+    "message": "La instancia utiliza la configuración de los Hooks de inicio predeterminado a menos que los sobrescriba aquí."
+  },
+  "instance.settings.tabs.hooks.label": {
+    "message": "Hooks de inicio"
+  },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Post-cierre"
   },
@@ -4175,6 +4253,9 @@
   "instance.settings.tabs.installation.locked": {
     "message": "Los ajustes de instalación no están disponibles mientras esta instancia esté bloqueada."
   },
+  "instance.settings.tabs.java.default-settings-description": {
+    "message": "La instancia utiliza la configuración de Java y Memoria predeterminada a menos que los sobrescriba aquí."
+  },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Introduce las variables de entorno..."
   },
@@ -4198,6 +4279,9 @@
   },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/ruta/de/java"
+  },
+  "instance.settings.tabs.java.label": {
+    "message": "Java y Memoria"
   },
   "instance.settings.tabs.sharing": {
     "message": "Compartir"
@@ -4259,8 +4343,14 @@
   "instance.settings.tabs.synced-options.shared-settings.description": {
     "message": "Anula la sincronización para mantener la configuración propia de esta instancia."
   },
+  "instance.settings.tabs.syncing": {
+    "message": "Sincronización"
+  },
   "instance.settings.tabs.window": {
     "message": "Configuración de ventanas personalizadas"
+  },
+  "instance.settings.tabs.window.default-settings-description": {
+    "message": "La instancia utiliza la configuración de la ventana predeterminada a menos que los sobrescriba aquí."
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Pantalla completa"
@@ -4276,6 +4366,9 @@
   },
   "instance.settings.tabs.window.height.enter": {
     "message": "Ingresa la altura..."
+  },
+  "instance.settings.tabs.window.label": {
+    "message": "Ventana"
   },
   "instance.settings.tabs.window.width": {
     "message": "Ancho"

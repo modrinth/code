@@ -1220,6 +1220,9 @@
   "external-files.permissions-card.file-count": {
     "defaultMessage": "{count, plural, one {# файл} few {# файла} other {# файлов}}"
   },
+  "external-files.permissions-card.file-database-id": {
+    "defaultMessage": "ID базы данных"
+  },
   "external-files.permissions-card.included-files": {
     "defaultMessage": "Включённые файлы:"
   },
@@ -3212,6 +3215,9 @@
   "profile.button.create-project": {
     "defaultMessage": "Создать проект"
   },
+  "profile.button.edit-user": {
+    "defaultMessage": "Редактировать пользователя"
+  },
   "profile.button.force-password-reset": {
     "defaultMessage": "Сбросить пароль"
   },
@@ -4088,6 +4094,15 @@
   "project.settings.disclosures.title": {
     "defaultMessage": "Маркировка"
   },
+  "project.settings.environment.bulk.apply-button": {
+    "defaultMessage": "Применить ко всем версиям"
+  },
+  "project.settings.environment.bulk.description": {
+    "defaultMessage": "Это заменит среду на каждой версии проекта."
+  },
+  "project.settings.environment.bulk.title": {
+    "defaultMessage": "Применить окружение ко всем версиям"
+  },
   "project.settings.environment.client_and_server.description": {
     "defaultMessage": "Содержит функциональность как для клиента, так и для сервера, пусть даже частично."
   },
@@ -4114,6 +4129,9 @@
   },
   "project.settings.environment.client_only.title": {
     "defaultMessage": "Только для клиента"
+  },
+  "project.settings.environment.modal.title": {
+    "defaultMessage": "Изменить окружение проекта"
   },
   "project.settings.environment.notice.missing-env.description": {
     "defaultMessage": "В проекте отсутствуют метаданные среды. Выберите один из вариантов ниже."
@@ -4323,31 +4341,31 @@
     "defaultMessage": "Выполняется фоновая задача"
   },
   "search.filter.dependency_type.any": {
-    "defaultMessage": "Любая зависимость"
+    "defaultMessage": "Любая"
   },
   "search.filter.dependency_type.embedded": {
-    "defaultMessage": "Встроен"
+    "defaultMessage": "Встроенная"
   },
   "search.filter.dependency_type.optional": {
-    "defaultMessage": "Необязателен"
+    "defaultMessage": "Необязательная"
   },
   "search.filter.dependency_type.optional_or_embedded": {
-    "defaultMessage": "Необязателен или встроен"
+    "defaultMessage": "Необязательная, встроенная"
   },
   "search.filter.dependency_type.required": {
-    "defaultMessage": "Необходим"
+    "defaultMessage": "Обязательная"
   },
   "search.filter.dependency_type.required_or_embedded": {
-    "defaultMessage": "Необходим или встроен"
+    "defaultMessage": "Обязательная, встроенная"
   },
   "search.filter.dependency_type.required_or_optional": {
-    "defaultMessage": "Необходим или необязателен"
+    "defaultMessage": "Обязательная, необязательная"
   },
   "search.filter.dependent_project": {
-    "defaultMessage": "Зависимость: {project}"
+    "defaultMessage": "Зависят от {project}"
   },
   "search.filter.dependent_project.clear": {
-    "defaultMessage": "Очистить фильтр зависимостей"
+    "defaultMessage": "Очистить фильтр зависимости"
   },
   "search.filter.dependent_project.search_placeholder": {
     "defaultMessage": "Поиск проекта..."
@@ -4443,7 +4461,7 @@
     "defaultMessage": "Телеметрия"
   },
   "search.filter_type.compatible_dependency_project_ids": {
-    "defaultMessage": "Зависимости"
+    "defaultMessage": "Зависимость"
   },
   "search.filter_type.environment": {
     "defaultMessage": "Среда"
@@ -6186,7 +6204,7 @@
     "defaultMessage": "Запросы дружбы"
   },
   "settings.social.hosting-access.description": {
-    "defaultMessage": "Настройте, кто может давать вам доступ к серверу Modrinth Hosting."
+    "defaultMessage": "Настройте, кто может приглашать вас управлять сервером Modrinth Hosting."
   },
   "settings.social.hosting-access.title": {
     "defaultMessage": "Приглашения управлять сервером"
@@ -7113,7 +7131,7 @@
     "defaultMessage": "Основной"
   },
   "version.file-type.required-resource-pack": {
-    "defaultMessage": "Необходимый набор ресурсов"
+    "defaultMessage": "Обязательный набор ресурсов"
   },
   "version.file-type.signature": {
     "defaultMessage": "Файл подписи"
@@ -7170,7 +7188,7 @@
     "defaultMessage": "Необязательные зависимости"
   },
   "version.section.required-content": {
-    "defaultMessage": "Необходимый контент"
+    "defaultMessage": "Обязательный контент"
   },
   "version.section.supplementary-resources": {
     "defaultMessage": "Дополнительные ресурсы"

@@ -857,6 +857,9 @@
   "auth.sign-in.choose-account": {
     "message": "Välj ett konto att använda i Modrinth App"
   },
+  "auth.sign-in.choose-existing-account": {
+    "message": "Använd ett befintligt konto"
+  },
   "auth.sign-in.continue-with-email": {
     "message": "Fortsätt med e-post"
   },
@@ -1037,6 +1040,9 @@
   "conversation-thread.action.approve": {
     "message": "Godkänn"
   },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "Godkänn med svar"
+  },
   "conversation-thread.action.close-report": {
     "message": "Stäng rapport"
   },
@@ -1045,6 +1051,9 @@
   },
   "conversation-thread.action.reject": {
     "message": "Avslå"
+  },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "Avslå med svar"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Återuppta tråd"
@@ -1079,6 +1088,9 @@
   "conversation-thread.action.withhold": {
     "message": "Tillhandahåll"
   },
+  "conversation-thread.action.withhold-with-reply": {
+    "message": "Tillbakahåll med svar"
+  },
   "conversation-thread.closed-thread.description": {
     "message": "Den här tråden är stängd och nya meddelanden kan inte skickas."
   },
@@ -1087,6 +1099,9 @@
   },
   "conversation-thread.error.reopening-report": {
     "message": "Fel vid öppning av rapport"
+  },
+  "conversation-thread.error.sending-message": {
+    "message": "Kunde inte skicka meddelande"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Svara tråden..."
@@ -2861,6 +2876,9 @@
   "moderation.page.reports": {
     "message": "Rapporter"
   },
+  "moderation.project-review.link-info.user": {
+    "message": "Användare"
+  },
   "modpack-scan-modal.delete-all-groups.error": {
     "message": "Kunde inte rensa alla grupper: {error}"
   },
@@ -3130,6 +3148,9 @@
   },
   "project-member-header.success-join": {
     "message": "Du har gått med i projektteamet"
+  },
+  "project-moderation-nags.project-submitted-for-review": {
+    "message": "Ditt projekt har skickats in för granskning!"
   },
   "project-moderation-nags.publishing-checklist": {
     "message": "Publicerings-checklista"
@@ -3579,7 +3600,7 @@
     "message": "Den här upplysningen har låsts av moderatorer. Vänligen <contact-support-link>kontakta support</contact-support-link> ifall du tror att det är fel."
   },
   "project.settings.disclosures.lock-status.fully-locked.warning": {
-    "message": "Vänligen <contact-support-link>kontakta support</contact-support-link> ifall den här upplysningen behöver ändras eller tas bort."
+    "message": "Vänligen <contact-support-link>kontakta support</contact-support-link> om den här upplysningen behöver ändras eller tas bort."
   },
   "project.settings.disclosures.paid-features.title": {
     "message": "Innehåller betalda funktioner"
@@ -3589,6 +3610,9 @@
   },
   "project.settings.disclosures.photosensitivity.title": {
     "message": "Ljuskänslighetsvarning"
+  },
+  "project.settings.disclosures.save-blocked.photosensitivity-note": {
+    "message": "Varningsupplysning för ljuskänslighet måste innehålla en beskrivning."
   },
   "project.settings.disclosures.save-blocked.system-interactions-note": {
     "message": "Extern systeminteraktionsupplysning måste ha en beskrivning."
@@ -3680,20 +3704,26 @@
   "project.settings.license.all-rights": {
     "message": "Alla rättigheter förbehållna/Ingen licens"
   },
+  "project.settings.license.allow-later": {
+    "message": "Tillåt senare versioner"
+  },
+  "project.settings.license.custom": {
+    "message": "Anpassad"
+  },
+  "project.settings.license.custom-name-required": {
+    "message": "Ange namnet för din anpassade licens."
+  },
   "project.settings.license.name": {
     "message": "Licensnamn"
+  },
+  "project.settings.license.name-description": {
+    "message": "Det fullständiga namnet på den anpassade licensen."
   },
   "project.settings.license.name-placeholder": {
     "message": "Licensnamn"
   },
   "project.settings.license.optional-label": {
     "message": "valfritt"
-  },
-  "project.settings.license.select": {
-    "message": "Licens"
-  },
-  "project.settings.license.select-placeholder": {
-    "message": "Sök licenser..."
   },
   "project.settings.license.title": {
     "message": "Licens"
@@ -4263,7 +4293,7 @@
     "message": "Tillhandahållet av servern"
   },
   "search.filter.locked.server-game-version.title": {
-    "message": "Spel version är tillhandahållet av servern"
+    "message": "Spelversion tillhandahålls av servern"
   },
   "search.filter.locked.server-loader.title": {
     "message": "Läsaren förses av servern"

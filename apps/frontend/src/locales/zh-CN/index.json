@@ -18,7 +18,7 @@
     "message": "全部拒绝"
   },
   "ads-consent.title": {
-    "message": "您的隐私以及广告如何支持 Modrinth"
+    "message": "您的隐私，以及广告支持 Modrinth 的方式"
   },
   "analytics.action.add": {
     "message": "添加"
@@ -141,13 +141,13 @@
     "message": "查看公告"
   },
   "analytics.chart.legend.monetization-details.aria": {
-    "message": "查看货币化分析详情"
+    "message": "查看有效收益分析详情"
   },
   "analytics.chart.legend.monetization-details.description": {
-    "message": "仅通过 Modrinth 产生的浏览量和下载量计入货币化，且下载需要用户登录。"
+    "message": "仅通过 Modrinth 产生的浏览量和下载量计入有效收益，且下载需要用户登录。"
   },
   "analytics.chart.legend.monetization-details.title": {
-    "message": "货币化分析详情"
+    "message": "有效收益分析详情"
   },
   "analytics.chart.legend.previous-period-suffix": {
     "message": "{name}（上期）"
@@ -222,7 +222,7 @@
     "message": "整合包"
   },
   "analytics.download-reason.standalone": {
-    "message": "单独安装的独立模组"
+    "message": "独立安装模组"
   },
   "analytics.download-reason.update": {
     "message": "更新"
@@ -348,7 +348,7 @@
     "message": "项目状态已变更"
   },
   "analytics.project-event.project-unlisted": {
-    "message": "项目已下架"
+    "message": "项目下架"
   },
   "analytics.project-event.version-released": {
     "message": "{version} 版本已发布"
@@ -375,10 +375,10 @@
     "message": "已退回"
   },
   "analytics.project-status.unlisted": {
-    "message": "已隐藏上架"
+    "message": "未列出"
   },
   "analytics.project-status.withheld": {
-    "message": "已被下架"
+    "message": "已暂扣"
   },
   "analytics.project.all": {
     "message": "所有项目"
@@ -423,7 +423,7 @@
     "message": "了解更多"
   },
   "analytics.stat.monetization-banner.title": {
-    "message": "如何开通模组收益？"
+    "message": "收益机制是如何运作的？"
   },
   "analytics.stat.playtime": {
     "message": "游玩时长"
@@ -519,7 +519,7 @@
     "message": "分析"
   },
   "analytics.value.monetized": {
-    "message": "商业化"
+    "message": "有效收益"
   },
   "analytics.value.no-dependent": {
     "message": "无"
@@ -540,7 +540,7 @@
     "message": "缺少元数据，无法判断该下载归属于哪个依赖项目。"
   },
   "analytics.value.unmonetized": {
-    "message": "非商业化"
+    "message": "无效收益"
   },
   "app-marketing.download.description": {
     "message": "我们的桌面应用程序可在所有平台上使用，请选择你想要的版本。"
@@ -798,7 +798,7 @@
     "message": "创建账号"
   },
   "auth.create-account.security-check.label": {
-    "message": "验证码"
+    "message": "安全验证"
   },
   "auth.create-account.subscribe.label": {
     "message": "通过邮件订阅 Modrinth 的最新资讯"
@@ -897,10 +897,10 @@
     "message": "忘记密码"
   },
   "auth.sign-in.last-sign-in": {
-    "message": "最后一次登录"
+    "message": "最近使用"
   },
   "auth.sign-in.launcher.callback.title": {
-    "message": "Modrint应用登录返回"
+    "message": "Modrinth应用登录回调"
   },
   "auth.sign-in.launcher.complete.go-to-website": {
     "message": "前往 Modrinth.com"
@@ -915,13 +915,13 @@
     "message": "如果应用程序没有打开，请使用下面的按钮来完成登录。"
   },
   "auth.sign-in.launcher.opening.title": {
-    "message": "打开Modrinth App……"
+    "message": "正在打开 Modrinth App……"
   },
   "auth.sign-in.launcher.reauthenticate.title": {
     "message": "登录到 Modrinth App"
   },
   "auth.sign-in.no-account": {
-    "message": "没有账号？"
+    "message": "没有账户？"
   },
   "auth.sign-in.reauthenticate.use-different-account": {
     "message": "使用另一个账户"
@@ -954,7 +954,7 @@
     "message": "注册"
   },
   "auth.sign-up.title.sign-up-with": {
-    "message": "创建账号"
+    "message": "创建账户"
   },
   "auth.two-factor.incorrect-code": {
     "message": "两步验证码不正确。请重试或使用备份代码。"
@@ -1073,6 +1073,9 @@
   "conversation-thread.action.approve": {
     "message": "批准"
   },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "批准并回复"
+  },
   "conversation-thread.action.close-report": {
     "message": "关闭举报"
   },
@@ -1081,6 +1084,9 @@
   },
   "conversation-thread.action.reject": {
     "message": "驳回"
+  },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "驳回并回复"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "重开对话消息"
@@ -1113,7 +1119,10 @@
     "message": "设为草稿并回复"
   },
   "conversation-thread.action.withhold": {
-    "message": "扣留"
+    "message": "暂扣"
+  },
+  "conversation-thread.action.withhold-with-reply": {
+    "message": "暂扣并回复"
   },
   "conversation-thread.closed-thread.description": {
     "message": "此对话消息已关闭，无法发送新消息。"
@@ -1123,6 +1132,12 @@
   },
   "conversation-thread.error.reopening-report": {
     "message": "重开举报出错"
+  },
+  "conversation-thread.error.sending-message": {
+    "message": "发送消息出错"
+  },
+  "conversation-thread.image.open-externally": {
+    "message": "在外部打开"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "回复对话消息……"
@@ -1145,11 +1160,26 @@
   "conversation-thread.reply-modal.help-center-note": {
     "message": "如果你需要联系管理团队，请使用 <help-center-link>Modrinth Help Center</help-center-link>，然后点击右下角的蓝色气泡以联系支持。"
   },
+  "conversation-thread.reply.addresses": {
+    "message": "本答复针对以下要求作出解释："
+  },
+  "conversation-thread.reply.changed-thread": {
+    "message": "选定的线程已更改。在回复之前再次打开它。"
+  },
+  "conversation-thread.reply.facet": {
+    "message": "对{issue}的解释"
+  },
+  "conversation-thread.reply.unknown-issue": {
+    "message": "审核问题"
+  },
   "conversation-thread.resubmit-modal.confirmation.description": {
     "message": "我已确认处理来自管理员的消息"
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "我确认我已妥善处理了管理员的评论。"
+  },
+  "conversation-thread.resubmit-modal.description.auto-approval": {
+    "message": "您正在重复提交 <project-title>{projectTitle}</project-title>. 如果所有的管理员问题都被解决，那么此提交可能自动通过审核。否则，此提交将会交由管理员审核。"
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "重新提交审核"
@@ -1162,6 +1192,12 @@
   },
   "conversation-thread.resubmit-modal.warning": {
     "message": "如果反复提交而不处理管理员的评论，可能会导致账户被暂停。"
+  },
+  "conversation-thread.resubmit-required-actions-tooltip": {
+    "message": "你必须完成上面所有必需的操作才能重新提交"
+  },
+  "conversation-thread.submit-modal.description": {
+    "message": "你正在上传 <project-title>{projectTitle}</project-title>以交由管理员审核。"
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "补充文件仅用来保存源代码等支持性资料，不能用来存放替代版本或者变体文件。"
@@ -1248,7 +1284,7 @@
     "message": "编辑"
   },
   "create-project-version.create-modal.stage.metadata.environment": {
-    "message": "环境"
+    "message": "运行环境"
   },
   "create-project-version.create-modal.stage.metadata.files-tab": {
     "message": "文件"
@@ -2978,6 +3014,30 @@
   "layout.publish.email-verification-required.title": {
     "message": "需要验证电子邮件"
   },
+  "markdown-editor.placeholders.empty": {
+    "message": "没有匹配的占位符。"
+  },
+  "markdown-editor.placeholders.label": {
+    "message": "占位符"
+  },
+  "markdown-editor.placeholders.search": {
+    "message": "搜索占位符……"
+  },
+  "markdown-editor.templates.empty-all": {
+    "message": "没有匹配的消息或占位符。"
+  },
+  "markdown-editor.templates.insert": {
+    "message": "插入信息"
+  },
+  "markdown-editor.templates.library": {
+    "message": "信息库"
+  },
+  "markdown-editor.templates.search-all": {
+    "message": "搜索消息和占位符……"
+  },
+  "markdown-editor.templates.section": {
+    "message": "模板信息"
+  },
   "messages.noResults": {
     "message": "没有您的查询结果！"
   },
@@ -3005,8 +3065,77 @@
   "modal.shared-instance.open-in-app.why-use": {
     "message": "为什么选择 Modrinth APP"
   },
+  "moderation.c2pa-scan.failed": {
+    "message": "无法扫描 AI生成的文件。"
+  },
+  "moderation.c2pa-scan.no-ai-files": {
+    "message": "没有发现AI生成的文件。"
+  },
   "moderation.exclude-technical-review": {
     "message": "排除技术评审"
+  },
+  "moderation.keybinds.change": {
+    "message": "{setting}: {binding}。启用以修改按键绑定。"
+  },
+  "moderation.keybinds.composer": {
+    "message": "帖子回复以及私密笔记"
+  },
+  "moderation.keybinds.conflict-summary": {
+    "message": "{count, plural, one {# 具有重复的按键绑定。} other {# 具有重复的按键绑定。}} 这些快捷键可能在同时可用时互相冲突。修改其中的设置，或者在绑定按键时按下Esc键以清空绑定。"
+  },
+  "moderation.keybinds.conflicts": {
+    "message": "与 {actions}重复"
+  },
+  "moderation.keybinds.decisions": {
+    "message": "查看产出与队列"
+  },
+  "moderation.keybinds.global": {
+    "message": "切换宿主和复制URL"
+  },
+  "moderation.keybinds.items": {
+    "message": "复核内容并检查"
+  },
+  "moderation.keybinds.listen": {
+    "message": "按下一个按键……"
+  },
+  "moderation.keybinds.navigation": {
+    "message": "复核导航和面板"
+  },
+  "moderation.keybinds.no-results": {
+    "message": "没有符合搜索条件的按键绑定。"
+  },
+  "moderation.keybinds.not-bound": {
+    "message": "未绑定"
+  },
+  "moderation.keybinds.project": {
+    "message": "从公开项目页复制"
+  },
+  "moderation.keybinds.recording": {
+    "message": "{setting}: 等待一个快捷键被按下。按下Esc键来清空此绑定。"
+  },
+  "moderation.keybinds.reset-default": {
+    "message": "重置为默认设置"
+  },
+  "moderation.keybinds.scope-global": {
+    "message": "全局可用。"
+  },
+  "moderation.keybinds.scope-project-page": {
+    "message": "当项目页面快捷方式可用时使用。"
+  },
+  "moderation.keybinds.scope-tech": {
+    "message": "在技术审核页面使用。"
+  },
+  "moderation.keybinds.search": {
+    "message": "搜索按键绑定……"
+  },
+  "moderation.keybinds.self-conflict": {
+    "message": "另一个用于此动作的按键绑定"
+  },
+  "moderation.keybinds.technical": {
+    "message": "技术审核页面"
+  },
+  "moderation.keybinds.title": {
+    "message": "按键设置"
   },
   "moderation.moderate": {
     "message": "审核"
@@ -3028,6 +3157,423 @@
   },
   "moderation.page.technicalReview": {
     "message": "技术审查"
+  },
+  "moderation.project-review.actions": {
+    "message": "行动"
+  },
+  "moderation.project-review.approvedCount": {
+    "message": "通过了 {count} 项"
+  },
+  "moderation.project-review.archived": {
+    "message": "已归档"
+  },
+  "moderation.project-review.archivedCount": {
+    "message": "归档了 {count} 项"
+  },
+  "moderation.project-review.author": {
+    "message": "作者"
+  },
+  "moderation.project-review.back": {
+    "message": "返回"
+  },
+  "moderation.project-review.backToFiles": {
+    "message": "返回文件列表"
+  },
+  "moderation.project-review.changelog": {
+    "message": "变更日志"
+  },
+  "moderation.project-review.closePopoutWindows": {
+    "message": "关闭弹出窗口"
+  },
+  "moderation.project-review.closeReview": {
+    "message": "关闭审核控制"
+  },
+  "moderation.project-review.collapseAll": {
+    "message": "折叠全部"
+  },
+  "moderation.project-review.collapseVersion": {
+    "message": "隐藏详细信息"
+  },
+  "moderation.project-review.compatibility": {
+    "message": "兼容性"
+  },
+  "moderation.project-review.complete": {
+    "message": "完成"
+  },
+  "moderation.project-review.completedFiles": {
+    "message": "文件已审核({count}个)"
+  },
+  "moderation.project-review.completedProjects": {
+    "message": "已完成的项目"
+  },
+  "moderation.project-review.conversationThread": {
+    "message": "对话帖子"
+  },
+  "moderation.project-review.copyHash": {
+    "message": "复制{algorithm}"
+  },
+  "moderation.project-review.copyValue": {
+    "message": "复制: {value}"
+  },
+  "moderation.project-review.created": {
+    "message": "创建于"
+  },
+  "moderation.project-review.customLicense": {
+    "message": "自定义"
+  },
+  "moderation.project-review.customSlug": {
+    "message": "与项目名称的差异"
+  },
+  "moderation.project-review.dependencies": {
+    "message": "依赖项"
+  },
+  "moderation.project-review.dependencyCount": {
+    "message": "{count, plural, other {# 个依赖}}"
+  },
+  "moderation.project-review.description": {
+    "message": "简介"
+  },
+  "moderation.project-review.details": {
+    "message": "详细信息"
+  },
+  "moderation.project-review.details.privateDescription": {
+    "message": "不公开可见。只有项目成员可以访问。"
+  },
+  "moderation.project-review.details.publicDescription": {
+    "message": "通过URL、您的个人资料和搜索显示。"
+  },
+  "moderation.project-review.details.unlistedDescription": {
+    "message": "只能透过URL显示。不显示在您的个人资料或搜索中。"
+  },
+  "moderation.project-review.disclosures": {
+    "message": "披露信息"
+  },
+  "moderation.project-review.discord": {
+    "message": "Discord 邀请"
+  },
+  "moderation.project-review.dockPanel": {
+    "message": "返回工作区面板"
+  },
+  "moderation.project-review.donationBmac": {
+    "message": "通过BMC赞助"
+  },
+  "moderation.project-review.donationGithub": {
+    "message": "通过 GitHub Sponsors 赞助"
+  },
+  "moderation.project-review.donationKoFi": {
+    "message": "通过 Ko-fi 赞助"
+  },
+  "moderation.project-review.donationOther": {
+    "message": "其它"
+  },
+  "moderation.project-review.donationPatreon": {
+    "message": "通过 Patreon 赞助"
+  },
+  "moderation.project-review.donationPaypal": {
+    "message": "PayPal"
+  },
+  "moderation.project-review.download": {
+    "message": "下载"
+  },
+  "moderation.project-review.downloads": {
+    "message": "下载量"
+  },
+  "moderation.project-review.draft": {
+    "message": "草稿"
+  },
+  "moderation.project-review.draftCount": {
+    "message": "{count} 个草稿"
+  },
+  "moderation.project-review.edit.remove-icon": {
+    "message": "移除图标"
+  },
+  "moderation.project-review.edit.upload-icon": {
+    "message": "上传图标"
+  },
+  "moderation.project-review.editSection": {
+    "message": "修改 {section}"
+  },
+  "moderation.project-review.embedded": {
+    "message": "已嵌入"
+  },
+  "moderation.project-review.empty": {
+    "message": "无被选中的项目"
+  },
+  "moderation.project-review.emptyChangelog": {
+    "message": "无更新日志"
+  },
+  "moderation.project-review.emptyDependencies": {
+    "message": "无依赖项"
+  },
+  "moderation.project-review.emptyDescription": {
+    "message": "无简介"
+  },
+  "moderation.project-review.emptyEnvironments": {
+    "message": "无运行环境"
+  },
+  "moderation.project-review.emptyGallery": {
+    "message": "无图库图像"
+  },
+  "moderation.project-review.emptyLinks": {
+    "message": "无链接"
+  },
+  "moderation.project-review.emptyPlatforms": {
+    "message": "无平台"
+  },
+  "moderation.project-review.emptyPopout": {
+    "message": "在此面板中没有打开页面"
+  },
+  "moderation.project-review.emptyTags": {
+    "message": "无标签"
+  },
+  "moderation.project-review.emptyVersions": {
+    "message": "没有版本"
+  },
+  "moderation.project-review.environments": {
+    "message": "运行环境"
+  },
+  "moderation.project-review.exit": {
+    "message": "退出"
+  },
+  "moderation.project-review.expandAll": {
+    "message": "展开全部"
+  },
+  "moderation.project-review.expandVersion": {
+    "message": "显示细节"
+  },
+  "moderation.project-review.featured": {
+    "message": "精选"
+  },
+  "moderation.project-review.fileCount": {
+    "message": "{count, plural, other {# 个文件}}"
+  },
+  "moderation.project-review.files": {
+    "message": "文件"
+  },
+  "moderation.project-review.finish": {
+    "message": "完成"
+  },
+  "moderation.project-review.gallery": {
+    "message": "图库"
+  },
+  "moderation.project-review.gameVersions": {
+    "message": "游戏版本"
+  },
+  "moderation.project-review.generalSettings": {
+    "message": "通用"
+  },
+  "moderation.project-review.hashes": {
+    "message": "哈希值"
+  },
+  "moderation.project-review.hideLeft": {
+    "message": "隐藏项目详细信息"
+  },
+  "moderation.project-review.hideRight": {
+    "message": "隐藏面板"
+  },
+  "moderation.project-review.icon": {
+    "message": "图标"
+  },
+  "moderation.project-review.imageNumber": {
+    "message": "图片 {number}"
+  },
+  "moderation.project-review.incompatible": {
+    "message": "不兼容"
+  },
+  "moderation.project-review.issues": {
+    "message": "问题追踪器"
+  },
+  "moderation.project-review.keepPopoutClosed": {
+    "message": "保持关闭"
+  },
+  "moderation.project-review.keybindsSettings": {
+    "message": "按键设置"
+  },
+  "moderation.project-review.left": {
+    "message": "项目详情"
+  },
+  "moderation.project-review.license": {
+    "message": "许可证"
+  },
+  "moderation.project-review.licenseUrl": {
+    "message": "许可证链接"
+  },
+  "moderation.project-review.link-info.active": {
+    "message": "启用"
+  },
+  "moderation.project-review.link-info.activity": {
+    "message": "活动"
+  },
+  "moderation.project-review.link-info.archived": {
+    "message": "这个仓库已归档；其功能可能是只读的。"
+  },
+  "moderation.project-review.link-info.archivedValue": {
+    "message": "已归档"
+  },
+  "moderation.project-review.link-info.author": {
+    "message": "作者"
+  },
+  "moderation.project-review.link-info.board": {
+    "message": "面板"
+  },
+  "moderation.project-review.link-info.bot": {
+    "message": "机器人"
+  },
+  "moderation.project-review.link-info.channel": {
+    "message": "频道"
+  },
+  "moderation.project-review.link-info.closedIssues": {
+    "message": "已关闭的议题"
+  },
+  "moderation.project-review.link-info.community": {
+    "message": "社区"
+  },
+  "moderation.project-review.link-info.company": {
+    "message": "公司"
+  },
+  "moderation.project-review.link-info.created": {
+    "message": "账户已创建"
+  },
+  "moderation.project-review.link-info.detailTooltip": {
+    "message": "{label}：{value}"
+  },
+  "moderation.project-review.link-info.disabled": {
+    "message": "已禁用"
+  },
+  "moderation.project-review.link-info.discussions": {
+    "message": "讨论区"
+  },
+  "moderation.project-review.link-info.discussionsDisabled": {
+    "message": "讨论已被禁用。"
+  },
+  "moderation.project-review.link-info.dm": {
+    "message": "私信链接"
+  },
+  "moderation.project-review.link-info.document": {
+    "message": "文档"
+  },
+  "moderation.project-review.link-info.donation": {
+    "message": "捐赠资料"
+  },
+  "moderation.project-review.link-info.downloads": {
+    "message": "下载"
+  },
+  "moderation.project-review.link-info.enabled": {
+    "message": "已启用"
+  },
+  "moderation.project-review.link-info.expires": {
+    "message": "过期时间"
+  },
+  "moderation.project-review.link-info.externalLinks": {
+    "message": "此页面上的外部链接"
+  },
+  "moderation.project-review.link-info.followers": {
+    "message": "粉丝"
+  },
+  "moderation.project-review.link-info.forkOf": {
+    "message": "派生于"
+  },
+  "moderation.project-review.link-info.forks": {
+    "message": "分支"
+  },
+  "moderation.project-review.link-info.invite": {
+    "message": "服务器邀请"
+  },
+  "moderation.project-review.link-info.inviteExpired": {
+    "message": "此邀请已过期。"
+  },
+  "moderation.project-review.link-info.inviteExpires": {
+    "message": "此邀请具有过期日期。"
+  },
+  "moderation.project-review.link-info.inviter": {
+    "message": "邀请者为"
+  },
+  "moderation.project-review.link-info.issues": {
+    "message": "问题"
+  },
+  "moderation.project-review.link-info.issuesDisabled": {
+    "message": "问题已被禁用。"
+  },
+  "moderation.project-review.link-info.language": {
+    "message": "语言"
+  },
+  "moderation.project-review.link-info.lastPush": {
+    "message": "最后一次提交"
+  },
+  "moderation.project-review.link-info.license": {
+    "message": "许可证"
+  },
+  "moderation.project-review.link-info.loading": {
+    "message": "正在加载链接详情……"
+  },
+  "moderation.project-review.link-info.maxUses": {
+    "message": "使用限制"
+  },
+  "moderation.project-review.link-info.members": {
+    "message": "成员"
+  },
+  "moderation.project-review.link-info.noExpiry": {
+    "message": "永久有效"
+  },
+  "moderation.project-review.link-info.notFound": {
+    "message": "找不到此资源。它可能是私密的、删除的或已过期。"
+  },
+  "moderation.project-review.link-info.online": {
+    "message": "在线"
+  },
+  "moderation.project-review.link-info.openIssues": {
+    "message": "未决问题"
+  },
+  "moderation.project-review.link-info.organization": {
+    "message": "组织"
+  },
+  "moderation.project-review.link-info.owner": {
+    "message": "所有者"
+  },
+  "moderation.project-review.link-info.playlist": {
+    "message": "播放列表"
+  },
+  "moderation.project-review.link-info.privateCommunity": {
+    "message": "此社区是私密的。"
+  },
+  "moderation.project-review.link-info.project": {
+    "message": "项目"
+  },
+  "moderation.project-review.link-info.projectStatus": {
+    "message": "项目状态：{status}"
+  },
+  "moderation.project-review.link-info.projectUnavailable": {
+    "message": "此项目非公开可见或已归档。请检查其状态。"
+  },
+  "moderation.project-review.link-info.repositories": {
+    "message": "公共仓库"
+  },
+  "moderation.project-review.link-info.repository": {
+    "message": "仓库"
+  },
+  "moderation.project-review.link-info.role": {
+    "message": "角色"
+  },
+  "moderation.project-review.link-info.server": {
+    "message": "服务器"
+  },
+  "moderation.project-review.link-info.status": {
+    "message": "状态"
+  },
+  "moderation.project-review.link-info.user": {
+    "message": "用户"
+  },
+  "moderation.project-review.link-info.website": {
+    "message": "网站"
+  },
+  "moderation.project-review.loading": {
+    "message": "加载中……"
+  },
+  "moderation.project-review.modpackVersion": {
+    "message": "版本 {version}"
+  },
+  "moderation.project-review.mrpack": {
+    "message": ".mrpack"
   },
   "modpack-scan-modal.batch.label": {
     "message": "每批 {amount}"
@@ -3415,6 +3961,9 @@
   },
   "project-member-header.success-join": {
     "message": "你加入了项目团队"
+  },
+  "project-moderation-nags.project-submitted-for-review": {
+    "message": "您的项目已提交审核！"
   },
   "project-moderation-nags.publishing-checklist": {
     "message": "发布前检查单"
@@ -3930,7 +4479,7 @@
     "message": "标记你的项目状态为已归档，让用户知道你已经不再维护。"
   },
   "project.settings.disclosures.archived.description.2": {
-    "message": "当项目的可见性设置为公开时，存档项目仍然可以被发现。如果您想要将你的项目从列表中删除，请将其可见性设置为私有。"
+    "message": "当项目的可见性设置为公开时，存档项目仍然可以被发现。如果您想要将您的项目从列表中删除，请将其可见性设置为“未列出”。"
   },
   "project.settings.disclosures.archived.note-placeholder": {
     "message": "例如，我没有时间维持这个项目，可以随时给它分支！"
@@ -4127,9 +4676,6 @@
   "project.settings.license.custom-name-required": {
     "message": "为你的自定义许可证输入名称。"
   },
-  "project.settings.license.custom-url-description": {
-    "message": "完整许可证文本的网址。"
-  },
   "project.settings.license.intro": {
     "message": "为你的 {type} 选择合适的许可证非常重要。你可以从我们的列表中选择一项，也可以提供自定义许可证。你还可以为你选择的许可证提供一个自定义 URL；否则，将显示许可证文本。更多信息请参阅我们的 <guide>许可指南</guide> 。"
   },
@@ -4153,12 +4699,6 @@
   },
   "project.settings.license.optional-label": {
     "message": "可选"
-  },
-  "project.settings.license.select": {
-    "message": "许可证"
-  },
-  "project.settings.license.select-placeholder": {
-    "message": "搜索许可证……"
   },
   "project.settings.license.title": {
     "message": "许可证"
@@ -4278,7 +4818,7 @@
     "message": "收益"
   },
   "project.settings.permissions.attention-needed.description.proj-approved": {
-    "message": "请提供证明，表明您有权利对以下的所有内容进行再次分发。 文件。一旦完成，未公开的版本将自动发布。"
+    "message": "请提供证明，表明您有权利二次分发下列所有文件进行再次分发。完成后，被暂扣的版本将自动发布。"
   },
   "project.settings.permissions.attention-needed.description.proj-draft": {
     "message": "请提供证明，表明您有权利对以下的所有内容进行再次分发。 在提交您的项目进行审核之前，请先整理好相关文件。"
@@ -4521,10 +5061,10 @@
     "message": "版本已删除"
   },
   "project.versions.withheld-versions-warning.description": {
-    "message": "{count, plural, other {上述版本}}已被暂留而未公开列出。请提供你有权再分发上述整合包{count, plural, other {版本}}所包含的某些文件的证明。"
+    "message": "{count, plural, other {上述版本}}已被暂扣而未公开列出。请提供你有权再分发上述整合包{count, plural, other {版本}}所包含的某些文件的证明。"
   },
   "project.versions.withheld-versions-warning.title": {
-    "message": "{count, plural, one {版本 {version_name}} other {这些版本}} 因未知嵌入内容被保留"
+    "message": "{count, plural, one {版本 {version_name} } other {部分版本}}因未知嵌入内容被暂扣"
   },
   "report.already-reported": {
     "message": "你已举报过 {title}"
@@ -5793,9 +6333,9 @@
     "message": "复制 SHA-512 哈希值"
   },
   "version.unknown-embedded-content.description": {
-    "message": "此版本目前暂时没有公开发布，请提供相关证明以表明你有权利分发其中相关的一些文件。"
+    "message": "此版本目前被暂扣，没有公开发布。请提供相关证明以表明你有权利分发其中相关的一些文件。"
   },
   "version.unknown-embedded-content.title": {
-    "message": "由于存在未知的嵌入式内容而未显示"
+    "message": "由于存在未知的嵌入式内容而被暂扣"
   }
 }

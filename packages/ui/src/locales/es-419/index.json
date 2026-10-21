@@ -2063,6 +2063,15 @@
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Servidor restablecido a la configuración inicial"
   },
+  "hosting.save-banner.resolve-errors": {
+    "defaultMessage": "Por favor, resuelva los errores en tus cambios antes de guardar."
+  },
+  "hosting.settings.properties.motd-profanity": {
+    "defaultMessage": "Debido a los Lineamientos de uso de Minecraft, el MOTD de tu servidor no puede contener profanidad. Detectado: “{value}”."
+  },
+  "hosting.settings.properties.motd-profanity-save-error": {
+    "defaultMessage": "Debido a los Lineamientos de uso de Minecraft, el MOTD de tu servidor no puede contener profanidad. Detectado: “{value}”"
+  },
   "hosting.specs.burst": {
     "defaultMessage": "Aumenta hasta {cpus} CPUs"
   },
@@ -4733,6 +4742,9 @@
   "servers.access-page.activity-log-filter.action.server-stopped": {
     "defaultMessage": "Servidor detenido"
   },
+  "servers.access-page.activity-log-filter.action.sftp-credentials-rolled": {
+    "defaultMessage": "Credenciales SFTP rotadas"
+  },
   "servers.access-page.activity-log-filter.action.sftp-login": {
     "defaultMessage": "Sesión iniciada vía SFTP"
   },
@@ -5113,6 +5125,9 @@
   },
   "servers.audit-log.event.server-subdomain-changed": {
     "defaultMessage": "Subdominio del servidor cambiado a <subdomain></subdomain>"
+  },
+  "servers.audit-log.event.sftp-credentials-rolled": {
+    "defaultMessage": "Credenciales SFTP rotadas"
   },
   "servers.audit-log.event.sftp-login": {
     "defaultMessage": "Sesión iniciada vía SFTP"
@@ -5552,6 +5567,9 @@
   "servers.lock.modal.lock-button": {
     "defaultMessage": "Bloquear servidor"
   },
+  "servers.lock.modal.reason-label": {
+    "defaultMessage": "Motivo"
+  },
   "servers.lock.modal.reason-placeholder": {
     "defaultMessage": "Visible para otros administradores"
   },
@@ -5920,6 +5938,27 @@
   },
   "servers.settings.advanced.sftp.roll-credentials-success-title": {
     "defaultMessage": "Credenciales SFTP rotadas"
+  },
+  "servers.settings.support.action-log-title": {
+    "defaultMessage": "Registro de acciones"
+  },
+  "servers.settings.support.clear-action-log-button": {
+    "defaultMessage": "Borrar registro de acción"
+  },
+  "servers.settings.support.clear-action-log-confirmation": {
+    "defaultMessage": "Esto elimina permanentemente todas las entradas de registro de acciones para este servidor. ¿Desea continuar?"
+  },
+  "servers.settings.support.clear-action-log-description": {
+    "defaultMessage": "Eliminar todas las entradas de registro de acciones de este servidor."
+  },
+  "servers.settings.support.clear-action-log-error": {
+    "defaultMessage": "Error al borrar el registro de acciones"
+  },
+  "servers.settings.support.clear-action-log-success": {
+    "defaultMessage": "Registro de acciones borrado"
+  },
+  "servers.settings.support.clear-action-log-title": {
+    "defaultMessage": "¿Borrar el registro de acción?"
   },
   "servers.setup.onboarding.installation-failed.text": {
     "defaultMessage": "Se produjo un error inesperado durante la instalación. Por favor, inténtalo de nuevo más tarde."

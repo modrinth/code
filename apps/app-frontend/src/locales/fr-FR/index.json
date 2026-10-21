@@ -479,6 +479,15 @@
   "app.features-settings.sync-across-devices.title": {
     "message": "Synchroniser les fonctionnalités entre les appareils"
   },
+  "app.file-download.canceling": {
+    "message": "Annulation du téléchargement..."
+  },
+  "app.file-download.preparing": {
+    "message": "Préparation du téléchargement..."
+  },
+  "app.file-download.waiting": {
+    "message": "En attente du serveur..."
+  },
   "app.home.jump-back-in.actions.label": {
     "message": "Actions de l'instance"
   },
@@ -1318,6 +1327,12 @@
   },
   "app.modal.install-to-play.shared-instance-unknown-files-description": {
     "message": "Cette instance partagée contient des fichiers qui ne sont pas publiés sur Modrinth. Nous recommandons fortement de seulement installer des fichiers de sources en qui vous avez confiance."
+  },
+  "app.modal.install-to-play.unavailable-description": {
+    "message": "La version du modpack que ce serveur utilise ne peux pas être téléchargée pour le moment. Elle peut être non publiée ou en vérification. Réessayez plus tard, ou contactez le propriétaire du serveur."
+  },
+  "app.modal.install-to-play.unavailable-header": {
+    "message": "Le modpack de ce serveur n'est pas disponible"
   },
   "app.modal.install-to-play.unknown-files-description": {
     "message": "Ce modpack de serveur contient des fichiers qui ne sont pas publiés sur Modrinth. Nous recommandons fortement de seulement installer des fichiers de sources en qui vous avez confiance."
@@ -2876,6 +2891,12 @@
   "app.settings.resource-management.store.verified": {
     "message": "Vérification terminée"
   },
+  "app.settings.sidebar.label.instance-defaults": {
+    "message": "Valeurs par défaut de l'instance"
+  },
+  "app.settings.sidebar.label.system": {
+    "message": "Système"
+  },
   "app.settings.synced-options.choose-sync-source.command-history-description": {
     "message": "Choisissez l'instance à partir de laquelle copier votre historique de commandes. Cet historique n'est utilisé que pour la synchronisation initiale. Vous pourrez le modifier depuis n'importe quelle instance par la suite."
   },
@@ -3107,14 +3128,56 @@
   "app.settings.tabs.features": {
     "message": "Fonctionnalités"
   },
+  "app.settings.tabs.java-and-memory": {
+    "message": "Java et mémoire"
+  },
   "app.settings.tabs.java-installations": {
     "message": "Installations de Java"
   },
   "app.settings.tabs.language": {
     "message": "Langue"
   },
+  "app.settings.tabs.launch-hooks": {
+    "message": "Commandes de lancement"
+  },
   "app.settings.tabs.privacy": {
     "message": "Confidentialité"
+  },
+  "app.settings.tabs.resources": {
+    "message": "Ressources"
+  },
+  "app.settings.tabs.syncing": {
+    "message": "Synchronisation"
+  },
+  "app.settings.tabs.troubleshooting": {
+    "message": "Dépannage"
+  },
+  "app.settings.tabs.window": {
+    "message": "Fenêtre"
+  },
+  "app.settings.troubleshooting.clear-cache": {
+    "message": "Effacer le cache"
+  },
+  "app.settings.troubleshooting.clear-cache.confirm.title": {
+    "message": "Effacer le cache de l'app ?"
+  },
+  "app.settings.troubleshooting.report-ad.copied": {
+    "message": "Copié"
+  },
+  "app.settings.troubleshooting.report-ad.copy": {
+    "message": "Copier les détails de la pub"
+  },
+  "app.settings.troubleshooting.report-ad.description": {
+    "message": "Vous avez vu une pub inappropriée ou offensante ? Copiez ses détails quand elle est affichée et envoyez-les au <support>Support Modrinth</support>. Nous l'examinerons et la retirons."
+  },
+  "app.settings.troubleshooting.report-ad.no-ad.text": {
+    "message": "Attendez que la pub soit chargée, puis réessayez."
+  },
+  "app.settings.troubleshooting.report-ad.no-ad.title": {
+    "message": "Aucune publicité trouvée"
+  },
+  "app.settings.troubleshooting.report-ad.title": {
+    "message": "Signaler une publicité"
   },
   "app.sidebar.playing-as": {
     "message": "Joue en tant que"
@@ -3935,6 +3998,9 @@
   "instance.server-modal.resource-pack": {
     "message": "Pack de ressources"
   },
+  "instance.settings.defaults.open-app-settings": {
+    "message": "Modifier les paramètres par défaut"
+  },
   "instance.settings.sharing.active-invites.actions": {
     "message": "Actions"
   },
@@ -3974,6 +4040,12 @@
   "instance.settings.sharing.revoke-invite.header": {
     "message": "Révoquer l'invitation"
   },
+  "instance.settings.sidebar.label.game": {
+    "message": "Jeu"
+  },
+  "instance.settings.sidebar.label.instance": {
+    "message": "Instance"
+  },
   "instance.settings.synced-options.data-packs": {
     "message": "Désynchroniser les packs de données"
   },
@@ -3988,6 +4060,9 @@
   },
   "instance.settings.synced-options.resource-packs": {
     "message": "Désynchroniser les packs de ressources"
+  },
+  "instance.settings.tabs.behavior.description": {
+    "message": "Choisissez les onglets qui apparaissent sur cette instance."
   },
   "instance.settings.tabs.behavior.files": {
     "message": "Montrer l'onglet des Fichiers"
@@ -4076,6 +4151,9 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Sélectionner le canal de mise à jour"
   },
+  "instance.settings.tabs.hooks.label": {
+    "message": "Commandes de lancement"
+  },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Post-fermeture"
   },
@@ -4136,6 +4214,9 @@
   "instance.settings.tabs.installation.locked": {
     "message": "Les paramètres d'installation ne sont pas disponible pendant que cette instance est verrouillée."
   },
+  "instance.settings.tabs.java.default-settings-description": {
+    "message": "Votre instance utilise les paramètres de Java et de mémoire par défaut à moins que ne les remplaciez ici."
+  },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Entrer une variable d'environnement..."
   },
@@ -4159,6 +4240,9 @@
   },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/chemin/vers/java"
+  },
+  "instance.settings.tabs.java.label": {
+    "message": "Java et mémoire"
   },
   "instance.settings.tabs.sharing": {
     "message": "Partage"

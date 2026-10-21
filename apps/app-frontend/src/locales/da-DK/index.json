@@ -53,6 +53,9 @@
   "app.action-bar.install.summary.download-failed": {
     "message": "Download kunne ikke blive fuldført"
   },
+  "app.action-bar.install.summary.instance-error": {
+    "message": "Kunne ikke forberede instansen"
+  },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "Filstien er ugyldig"
   },
@@ -203,6 +206,9 @@
   "app.behavior-settings.content.title": {
     "message": "Hjem og indhold"
   },
+  "app.behavior-settings.refocus-on-game-close.title": {
+    "message": "Omfokusere appen når Minecraft lukkes"
+  },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Opstart og navigation"
   },
@@ -286,6 +292,24 @@
   },
   "app.content.sync-pack": {
     "message": "Synkronisér"
+  },
+  "app.content.sync-packs-override": {
+    "message": "Slå pakken synkronisering overskriv fra i denne instans indstillinger først."
+  },
+  "app.content.sync-resource-packs-disabled": {
+    "message": "Slå resursepakken synkronisering overskriv af i app-indstillinger først."
+  },
+  "app.debug-export.canceling": {
+    "message": "Afbryder eksport…"
+  },
+  "app.debug-export.exporting": {
+    "message": "Eksporter…"
+  },
+  "app.debug-export.finishing": {
+    "message": "Færdiggør…"
+  },
+  "app.debug-export.preparing": {
+    "message": "Klargører filer…"
   },
   "app.export-modal.description-placeholder": {
     "message": "Indtast modpack beskrivelse..."
