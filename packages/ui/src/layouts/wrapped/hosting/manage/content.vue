@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { type Archon, type Labrinth, ModrinthApiError } from '@modrinth/api-client'
+import { type Archon, type Kyros, type Labrinth, ModrinthApiError } from '@modrinth/api-client'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import ReadyTransition from '#ui/components/base/ReadyTransition.vue'
+import { switchCurseForgeModpackFile } from '#ui/components/flows/creation-flow-modal/curseforge'
 import UnknownFileWarningModal from '#ui/components/modal/UnknownFileWarningModal.vue'
 import type { UpdateAllSelection } from '#ui/components/modal/update-all-modal/update-all-modal-types'
 import { useUploadSessionUpload } from '#ui/composables/hosting/kyros-session-upload'
@@ -141,6 +142,7 @@ const {
 	serverFull,
 	worldId,
 	busyReasons,
+	beginInstallation,
 	installProgressItems,
 	uploadState,
 	cancelUpload,
@@ -280,16 +282,88 @@ function sortVersionsByPublishedDate(versions: Labrinth.Versions.v2.Version[]) {
 	return [...versions].sort((a, b) => getVersionTime(b) - getVersionTime(a))
 }
 
+const updatingModpack = ref(false)
+
+const curseforgeModpackLink = computed(() => {
+	const spec = contentQuery.data.value?.modpack?.spec
+	return spec?.platform === 'curseforge' ? (spec.link ?? null) : null
+})
+
+const curseforgeFilesPageSize = 50
+const curseforgeFilesQuery = useQuery({
+	queryKey: computed(() => [
+		'kyros',
+		'flameanvil',
+		'files',
+		worldId.value,
+		curseforgeModpackLink.value?.project_id,
+	]),
+	queryFn: async () => {
+		const files: Kyros.FlameAnvil.v1.ProjectFile[] = []
+		for (let index = 0; ; index += curseforgeFilesPageSize) {
+			const page = await client.kyros.flameanvil_v1.listProjectFiles(
+				worldId.value!,
+				curseforgeModpackLink.value!.project_id,
+				{ index, page_size: curseforgeFilesPageSize },
+			)
+			files.push(...page.files)
+			if (page.files.length === 0 || index + curseforgeFilesPageSize >= page.total_count) break
+		}
+		return files.filter((file) => file.available)
+	},
+	enabled: computed(
+		() => worldId.value !== null && !!curseforgeModpackLink.value && updatingModpack.value,
+	),
+})
+
+const curseforgeFilesById = computed(
+	() => new Map((curseforgeFilesQuery.data.value ?? []).map((file) => [String(file.id), file])),
+)
+
+function curseforgeFileToVersion(
+	file: Kyros.FlameAnvil.v1.ProjectFile,
+	projectId: number,
+): Labrinth.Versions.v2.Version {
+	return {
+		id: String(file.id),
+		project_id: String(projectId),
+		author_id: '',
+		featured: false,
+		name: file.display_name,
+		version_number: file.display_name,
+		changelog: '',
+		date_published: file.file_date,
+		downloads: 0,
+		version_type: file.release_channel ?? 'release',
+		status: 'listed',
+		files: [],
+		dependencies: [],
+		game_versions: file.minecraft_versions,
+		loaders: file.loaders,
+	}
+}
+
+const modpackVersions = computed(() => {
+	const link = curseforgeModpackLink.value
+	if (link) {
+		return (curseforgeFilesQuery.data.value ?? []).map((file) =>
+			curseforgeFileToVersion(file, link.project_id),
+		)
+	}
+	return modpackVersionsQuery.data.value ?? []
+})
+
 const currentModpackVersionId = computed(() => {
 	const spec = contentQuery.data.value?.modpack?.spec
-	return spec?.platform === 'modrinth' ? spec.version_id : null
+	if (spec?.platform === 'modrinth') return spec.version_id
+	return curseforgeModpackLink.value ? String(curseforgeModpackLink.value.file_id) : null
 })
 
 const newestModpackUpdateVersion = computed(() => {
 	const currentVersionId = currentModpackVersionId.value
 	if (!currentVersionId) return null
 
-	const versions = sortVersionsByPublishedDate(modpackVersionsQuery.data.value ?? [])
+	const versions = sortVersionsByPublishedDate(modpackVersions.value)
 	const currentVersion = versions.find((version) => version.id === currentVersionId)
 	const installedPublishedAt = contentQuery.data.value?.modpack?.date_published
 	const storedCurrentTime = installedPublishedAt
@@ -343,6 +417,7 @@ const managedContent = computed<ManagedContentData | null>(() => {
 					? `/project/${project?.slug ?? spec.project_id}/version/${spec.version_id}`
 					: undefined,
 			updatedAt: isLocal ? undefined : (mp.date_published ?? undefined),
+			canSwitchVersion: spec.platform === 'modrinth' || !!curseforgeModpackLink.value,
 		},
 		disabled: setupActionDisabled.value,
 		disabledText: setupActionBusyMessage.value ?? formatMessage(commonMessages.installingLabel),
@@ -947,7 +1022,6 @@ const modpackContentModal = ref<InstanceType<typeof ManagedContentModal>>()
 const contentUpdaterModal = ref<InstanceType<typeof ContentUpdaterModal>>()
 
 const updatingProject = ref<ContentItem | null>(null)
-const updatingModpack = ref(false)
 const loadingChangelog = ref(false)
 
 watch(
@@ -971,18 +1045,17 @@ const projectVersionsQuery = useQuery({
 })
 
 const updatingProjectVersions = computed(() => {
-	const source = updatingModpack.value
-		? modpackVersionsQuery.data.value
-		: projectVersionsQuery.data.value
+	const source = updatingModpack.value ? modpackVersions.value : projectVersionsQuery.data.value
 	if (!source) return []
 	return sortVersionsByPublishedDate(source)
 })
 
-const loadingVersions = computed(() =>
-	updatingModpack.value
-		? modpackVersionsQuery.isLoading.value
-		: projectVersionsQuery.isLoading.value,
-)
+const loadingVersions = computed(() => {
+	if (!updatingModpack.value) return projectVersionsQuery.isLoading.value
+	return curseforgeModpackLink.value
+		? curseforgeFilesQuery.isLoading.value
+		: modpackVersionsQuery.isLoading.value
+})
 
 const modpackUpdateModal = ref<InstanceType<typeof ConfirmModpackUpdateModal>>()
 const pendingModpackUpdateVersion = ref<Labrinth.Versions.v2.Version | null>(null)
@@ -1283,7 +1356,7 @@ async function handleSwitchVersion(item: ContentItem) {
 async function handleModpackUpdate() {
 	if (setupActionDisabled.value) return
 	const mp = contentQuery.data.value?.modpack
-	if (!mp || mp.spec.platform !== 'modrinth') return
+	if (!mp || (mp.spec.platform !== 'modrinth' && !curseforgeModpackLink.value)) return
 
 	updatingModpack.value = true
 	updatingProject.value = null
@@ -1306,8 +1379,12 @@ function spliceVersionInCache(fullVersion: Labrinth.Versions.v2.Version) {
 	})
 }
 
+const updatingCurseForgeModpack = computed(
+	() => updatingModpack.value && !!curseforgeModpackLink.value,
+)
+
 async function handleVersionSelect(version: Labrinth.Versions.v2.Version) {
-	if (version.changelog) return
+	if (version.changelog || updatingCurseForgeModpack.value) return
 	loadingChangelog.value = true
 	try {
 		const fullVersion = await client.labrinth.versions_v2.getVersion(version.id)
@@ -1320,7 +1397,7 @@ async function handleVersionSelect(version: Labrinth.Versions.v2.Version) {
 }
 
 async function handleVersionHover(version: Labrinth.Versions.v2.Version) {
-	if (version.changelog) return
+	if (version.changelog || updatingCurseForgeModpack.value) return
 	try {
 		const fullVersion = await client.labrinth.versions_v2.getVersion(version.id)
 		spliceVersionInCache(fullVersion)
@@ -1340,9 +1417,9 @@ function handleModalUpdate(selectedVersion: Labrinth.Versions.v2.Version, event?
 		if (setupActionDisabled.value) return
 		pendingModpackUpdateVersion.value = selectedVersion
 
-		const mpSpec = contentQuery.data.value?.modpack?.spec
-		const currentVersionId = mpSpec?.platform === 'modrinth' ? mpSpec.version_id : undefined
-		const currentVersion = updatingProjectVersions.value.find((v) => v.id === currentVersionId)
+		const currentVersion = updatingProjectVersions.value.find(
+			(v) => v.id === currentModpackVersionId.value,
+		)
 		isModpackUpdateDowngrade.value = currentVersion
 			? new Date(selectedVersion.date_published) < new Date(currentVersion.date_published)
 			: false
@@ -1377,7 +1454,14 @@ async function performUpdate(selectedVersion: Labrinth.Versions.v2.Version) {
 			)
 		: undefined
 	try {
-		if (updatingModpack.value) {
+		const curseforgeLink = curseforgeModpackLink.value
+		if (updatingModpack.value && curseforgeLink) {
+			const file = curseforgeFilesById.value.get(selectedVersion.id)
+			if (!file) return
+			beginInstallation(
+				await switchCurseForgeModpackFile(client, worldId.value!, curseforgeLink, file),
+			)
+		} else if (updatingModpack.value) {
 			const mp = contentQuery.data.value?.modpack
 			if (!mp || mp.spec.platform !== 'modrinth') return
 			await client.archon.content_v1.installContent(serverId, worldId.value!, {
@@ -1522,11 +1606,7 @@ provideContentManager({
 					:current-game-version="currentGameVersion"
 					:current-loader="currentLoader"
 					:current-version-id="
-						updatingModpack
-							? contentQuery.data.value?.modpack?.spec.platform === 'modrinth'
-								? contentQuery.data.value.modpack.spec.version_id
-								: ''
-							: (updatingProject?.version?.id ?? '')
+						updatingModpack ? (currentModpackVersionId ?? '') : (updatingProject?.version?.id ?? '')
 					"
 					:is-app="false"
 					:project-type="updatingModpack ? 'modpack' : updatingProject?.project_type"

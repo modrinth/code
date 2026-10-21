@@ -1,6 +1,7 @@
 import type {
 	AbstractModrinthClient,
 	Archon,
+	Kyros,
 	UploadHandle,
 	UploadProgress,
 } from '@modrinth/api-client'
@@ -180,13 +181,7 @@ export async function installCurseForgeModpack(
 		throw new Error('A CurseForge modpack link or file is required')
 	}
 
-	const { session: staleSession } = await flameanvil.getSession(worldId, { auth })
-	if (staleSession) {
-		await flameanvil.cancelSession(worldId, staleSession.upload_id, { auth }).catch(() => {})
-	}
-
-	const { upload_id: uploadId } = await flameanvil.createSession(worldId, { auth })
-	try {
+	await withFlameAnvilSession(client, worldId, auth, async (uploadId) => {
 		const modpackSize = modpackFile?.size ?? 0
 		const total = modpackSize + (serverPackFile?.size ?? 0)
 		const track = <T>(handle: UploadHandle<T>, offset: number) =>
@@ -219,10 +214,55 @@ export async function installCurseForgeModpack(
 			},
 			{ auth },
 		)
+	})
+
+	return { type: 'curse_forge_modpack', filename }
+}
+
+/**
+ * Switches a modpack installed from a CurseForge link to another file of the same project.
+ *
+ * @returns The installation progress key Kyros publishes for the queued installation.
+ */
+export async function switchCurseForgeModpackFile(
+	client: AbstractModrinthClient,
+	worldId: string,
+	link: Archon.Content.v1.CurseForgeModpackLink,
+	file: Kyros.FlameAnvil.v1.ProjectFile,
+): Promise<Archon.Websocket.v0.InstallProgressCurseForgeModpackKey> {
+	await withFlameAnvilSession(client, worldId, undefined, (uploadId) =>
+		client.kyros.flameanvil_v1.executeSession(worldId, uploadId, {
+			link: `https://www.curseforge.com/minecraft/modpacks/${link.slug}`,
+			file_id: file.id,
+			soft_override: true,
+			properties: { known: {} },
+		}),
+	)
+
+	return { type: 'curse_forge_modpack', filename: file.file_name }
+}
+
+/**
+ * Runs `run` within a new FlameAnvil session, cancelling any session left over from an abandoned
+ * attempt first, and the new session if `run` fails before the installation is queued.
+ */
+async function withFlameAnvilSession(
+	client: AbstractModrinthClient,
+	worldId: string,
+	auth: Archon.Servers.v0.JWTAuth | undefined,
+	run: (uploadId: string) => Promise<void>,
+) {
+	const flameanvil = client.kyros.flameanvil_v1
+	const { session: staleSession } = await flameanvil.getSession(worldId, { auth })
+	if (staleSession) {
+		await flameanvil.cancelSession(worldId, staleSession.upload_id, { auth }).catch(() => {})
+	}
+
+	const { upload_id: uploadId } = await flameanvil.createSession(worldId, { auth })
+	try {
+		await run(uploadId)
 	} catch (error) {
 		await flameanvil.cancelSession(worldId, uploadId, { auth }).catch(() => {})
 		throw error
 	}
-
-	return { type: 'curse_forge_modpack', filename }
 }

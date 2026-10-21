@@ -178,6 +178,7 @@ export type ManagedContentCardData =
 			versionNumber?: string
 			versionLink?: string | RouteLocationRaw
 			updatedAt?: string
+			canSwitchVersion?: boolean
 	  })
 	| (ManagedContentCardBase & {
 			kind: 'server' | 'shared-instance'

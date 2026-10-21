@@ -96,7 +96,7 @@ const showAction = computed(
 	() =>
 		props.showPrimaryAction &&
 		(props.data.kind === 'modpack'
-			? !!props.data.versionNumber
+			? !!props.data.versionNumber && props.data.canSwitchVersion !== false
 			: props.data.updateAvailable || props.disabled),
 )
 </script>
