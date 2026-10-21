@@ -1,10 +1,12 @@
+use actix_web::web;
 use crate::database::PgTransaction;
 use crate::database::models::loader_item::Loader as DBLoader;
 use crate::database::models::version_item::DependencyBuilder;
 use crate::models::ids::ProjectId;
-use crate::models::minecraft::{minecraft_version_date, minecraft_versions};
+use crate::models::minecraft::minecraft_version_date;
 use crate::models::pack::PackFormat;
 use crate::models::projects::{DependencyType, FileType, Loader};
+use crate::util::MinecraftMeta;
 use crate::validate::datapack::DataPackValidator;
 use crate::validate::fabric::FabricValidator;
 use crate::validate::forge::{ForgeValidator, LegacyForgeValidator};
@@ -21,10 +23,11 @@ use crate::validate::shader::{
 };
 use bytes::Bytes;
 use chrono::{DateTime, Utc};
+use eyre::WrapErr as _;
 use minecraft_meta_model::model::{MinecraftVersion, MinecraftVersionName};
 use std::io::{self, Cursor};
 use std::mem;
-use std::sync::LazyLock;
+use std::sync::{Arc, LazyLock};
 use thiserror::Error;
 use xredis::RedisPool;
 use zip::ZipArchive;
@@ -191,6 +194,7 @@ static PLAUSIBLE_PACK_REGEX: LazyLock<regex::bytes::Regex> =
 /// The return value is whether this file should be marked as primary or not, based on the analysis of the file
 #[allow(clippy::too_many_arguments)]
 pub async fn validate_file(
+    minecraft_meta: web::Data<MinecraftMeta>,
     data: bytes::Bytes,
     file_extension: String,
     loaders: Vec<Loader>,
@@ -200,7 +204,10 @@ pub async fn validate_file(
     transaction: &mut PgTransaction<'_>,
     redis: &RedisPool,
 ) -> Result<ValidationResult, ValidationError> {
-    let all_game_versions = minecraft_versions().await?;
+    let all_game_versions = minecraft_meta
+        .minecraft_versions()
+        .await
+        .wrap_err("fetching minecraft versions for file validation")?;
     let game_versions = game_versions.iter().map(|name| {
         let name = crate::models::minecraft::legacy_game_version_name(&name.0);
         all_game_versions.iter().find(|version| version.name.0 == name)
@@ -221,11 +228,11 @@ pub async fn validate_file(
     )?;
 
     validate_minecraft_file(
+        all_game_versions,
         data,
         file_extension,
         loaders,
         game_versions,
-        all_game_versions,
         file_type,
     )
     .await
@@ -313,11 +320,11 @@ fn validate_additional_jar(
 }
 
 async fn validate_minecraft_file(
+    all_game_versions: Arc<[MinecraftVersion]>,
     data: Bytes,
     file_extension: String,
     loaders: Vec<Loader>,
     game_versions: Vec<MinecraftVersion>,
-    all_game_versions: Vec<MinecraftVersion>,
     file_type: Option<FileType>,
 ) -> Result<ValidationResult, ValidationError> {
     actix_web::web::block(move || {

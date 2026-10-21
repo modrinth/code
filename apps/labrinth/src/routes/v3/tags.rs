@@ -1,4 +1,5 @@
 use crate::util::error::Context as _;
+use crate::util::MinecraftMeta;
 use std::collections::HashMap;
 
 use super::ApiError;
@@ -12,13 +13,11 @@ use crate::models::minecraft::{
 };
 use actix_web::{HttpResponse, get, web};
 use chrono::{DateTime, Utc};
-use minecraft_meta_model::{
-	model::MinecraftVersion, upstream::mojang::VersionType,
-};
+use minecraft_meta_model::upstream::mojang::VersionType;
 use strum::IntoEnumIterator;
 use xredis::RedisPool;
 
-use crate::database::{MinecraftMetaDb, PgPool};
+use crate::database::PgPool;
 
 use serde_json::Value;
 
@@ -193,32 +192,28 @@ pub struct LoaderFieldsEnumQuery {
 )]
 #[get("/loader_field")]
 pub async fn loader_fields_list_route(
-    minecraft_meta: web::Data<MinecraftMetaDb>,
+    minecraft_meta: web::Data<MinecraftMeta>,
     web::Query(query): web::Query<LoaderFieldsEnumQuery>,
 ) -> Result<HttpResponse, ApiError> {
     loader_fields_list(minecraft_meta, web::Query(query)).await
 }
 
 pub async fn loader_fields_list(
-    minecraft_meta: web::Data<MinecraftMetaDb>,
+    minecraft_meta: web::Data<MinecraftMeta>,
     query: web::Query<LoaderFieldsEnumQuery>,
 ) -> Result<HttpResponse, ApiError> {
     let query = query.into_inner();
     let mut results = match query.loader_field.as_str() {
 		"game_versions" => {
-			let mut conn = minecraft_meta
-				.0
-				.connection()
+			let versions = minecraft_meta
+				.minecraft_versions()
 				.await
-				.wrap_internal_err("acquiring minecraft-meta connection")?;
-			MinecraftVersion::all()
-				.exec(&mut conn)
-				.await
-				.wrap_internal_err("fetching minecraft-meta game versions")?
-				.into_iter()
+				.wrap_internal_err("fetching minecraft-meta game versions")?;
+			versions
+				.iter()
 				.map(|row| {
 					let name = row.name.to_string();
-					let entry = row.catalog_entry.0;
+					let entry = &row.catalog_entry.0;
 					let ty = match entry.ty {
 						VersionType::Release => "release",
 						VersionType::Snapshot => "snapshot",

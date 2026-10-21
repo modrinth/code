@@ -1,3 +1,4 @@
+use actix_web::web;
 use crate::database::PgPool;
 use crate::database::models::version_item;
 use crate::file_hosting::FileHost;
@@ -12,6 +13,7 @@ use crate::routes::v3::project_creation::default_project_type;
 use crate::routes::v3::project_creation::{CreateError, NewGalleryItem};
 use crate::routes::{v2_reroute, v3};
 use crate::search::SearchState;
+use crate::util::MinecraftMeta;
 use crate::util::kafka::KafkaClientState;
 use actix_multipart::Multipart;
 use actix_web::web::Data;
@@ -154,6 +156,7 @@ struct ProjectCreateData {
 )]
 #[post("/project")]
 pub async fn project_create(
+    minecraft_meta: web::Data<MinecraftMeta>,
     req: HttpRequest,
     payload: Multipart,
     client: Data<PgPool>,
@@ -302,6 +305,7 @@ pub async fn project_create(
 
     // Call V3 project creation
     let response = v3::project_creation::project_create_internal(
+        minecraft_meta.clone(),
         req,
         payload,
         client.clone(),

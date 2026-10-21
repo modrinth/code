@@ -26,6 +26,7 @@ use crate::models::users::User;
 use crate::models::v3::user_limits::UserLimits;
 use crate::queue::session::AuthQueue;
 use crate::search::SearchState;
+use crate::util::MinecraftMeta;
 use crate::util::kafka::KafkaClientState;
 use crate::util::routes::read_from_field;
 use crate::util::validate::validation_errors_to_string;
@@ -34,6 +35,7 @@ use actix_multipart::{Field, Multipart};
 use actix_web::web::Data;
 use actix_web::{HttpRequest, HttpResponse, post, web};
 use chrono::Utc;
+use eyre::WrapErr as _;
 use futures::stream::StreamExt;
 use hex::ToHex;
 use itertools::Itertools;
@@ -128,6 +130,7 @@ struct InitialFileData {
 )]
 #[post("/version")]
 pub async fn version_create_route(
+    minecraft_meta: web::Data<MinecraftMeta>,
     req: HttpRequest,
     payload: Multipart,
     client: Data<PgPool>,
@@ -138,6 +141,7 @@ pub async fn version_create_route(
     search_state: Data<SearchState>,
 ) -> Result<HttpResponse, CreateError> {
     version_create(
+        minecraft_meta.clone(),
         req,
         payload,
         client,
@@ -151,6 +155,7 @@ pub async fn version_create_route(
 }
 
 pub async fn version_create(
+    minecraft_meta: web::Data<MinecraftMeta>,
     req: HttpRequest,
     mut payload: Multipart,
     client: Data<PgPool>,
@@ -176,6 +181,7 @@ pub async fn version_create(
 
     let result = async {
         let (response, project_id, version_id) = version_create_inner(
+            minecraft_meta.clone(),
             &mut payload,
             &mut transaction,
             &redis,
@@ -228,6 +234,7 @@ pub async fn version_create(
 
 #[allow(clippy::too_many_arguments)]
 async fn version_create_inner(
+    minecraft_meta: web::Data<MinecraftMeta>,
     payload: &mut Multipart,
     transaction: &mut PgTransaction<'_>,
     redis: &RedisPool,
@@ -375,6 +382,7 @@ async fn version_create_inner(
                 let loader_ids: Vec<models::LoaderId> = loaders.iter().map(|y| y.id).collect_vec();
 
                 let component = create_minecraft_component(
+                    minecraft_meta.clone(),
                     &version_create_data.fields,
                     version_create_data.minecraft_mod.as_ref(),
                     &loaders,
@@ -436,6 +444,7 @@ async fn version_create_inner(
                 .map(|component| component.game_versions.clone()).unwrap_or_default();
 
             upload_file(
+                minecraft_meta.clone(),
                 &mut field,
                 file_host,
                 version_data.file_parts.len(),
@@ -510,12 +519,15 @@ async fn version_create_inner(
     .await?;
 
     let loader_structs = selected_loaders.unwrap_or_default();
-    let (all_project_types, all_games): (Vec<String>, Vec<String>) =
-        loader_structs.iter().fold((vec![], vec![]), |mut acc, x| {
-            acc.0.extend_from_slice(&x.supported_project_types);
-            acc.1.extend(x.supported_games.clone());
-            acc
-        });
+	let all_project_types = loader_structs
+		.iter()
+		.flat_map(|loader| loader.supported_project_types.clone())
+		.collect();
+	let all_games = if loader_structs.is_empty() {
+		Vec::new()
+	} else {
+		vec!["minecraft-java".to_owned()]
+	};
 
     let response = Version {
         id: builder.version_id.into(),
@@ -641,6 +653,7 @@ async fn version_create_inner(
 )]
 #[post("/version/{version_id}/file")]
 pub async fn upload_file_to_version_route(
+    minecraft_meta: web::Data<MinecraftMeta>,
     req: HttpRequest,
     url_data: web::Path<(VersionId,)>,
     payload: Multipart,
@@ -652,6 +665,7 @@ pub async fn upload_file_to_version_route(
     search_state: Data<SearchState>,
 ) -> Result<HttpResponse, CreateError> {
     upload_file_to_version(
+        minecraft_meta.clone(),
         req,
         url_data,
         payload,
@@ -666,6 +680,7 @@ pub async fn upload_file_to_version_route(
 }
 
 pub async fn upload_file_to_version(
+    minecraft_meta: web::Data<MinecraftMeta>,
     req: HttpRequest,
     url_data: web::Path<(VersionId,)>,
     mut payload: Multipart,
@@ -695,6 +710,7 @@ pub async fn upload_file_to_version(
 
     let result = async {
         let (response, project_id) = upload_file_to_version_inner(
+            minecraft_meta.clone(),
             &mut payload,
             client.clone(),
             &mut transaction,
@@ -748,6 +764,7 @@ pub async fn upload_file_to_version(
 
 #[allow(clippy::too_many_arguments)]
 async fn upload_file_to_version_inner(
+    minecraft_meta: web::Data<MinecraftMeta>,
     payload: &mut Multipart,
     client: Data<PgPool>,
     transaction: &mut PgTransaction<'_>,
@@ -899,6 +916,7 @@ async fn upload_file_to_version_inner(
                 .unwrap_or_default();
 
             upload_file(
+                minecraft_meta.clone(),
                 &mut field,
                 file_host,
                 0,
@@ -962,6 +980,7 @@ async fn upload_file_to_version_inner(
 // files for a version, and for uploading the initial version files for a project
 #[allow(clippy::too_many_arguments)]
 pub async fn upload_file(
+    minecraft_meta: web::Data<MinecraftMeta>,
     field: &mut Field,
     file_host: &dyn FileHost,
     total_files_len: usize,
@@ -1033,6 +1052,7 @@ pub async fn upload_file(
     let data = data.freeze();
 
     let validation_result = validate_file(
+        minecraft_meta.clone(),
         data.clone(),
         file_extension.to_string(),
         loaders.clone(),
@@ -1200,14 +1220,12 @@ pub fn get_name_and_extension(
 }
 
 pub async fn validate_minecraft_component(
+    minecraft_meta: web::Data<MinecraftMeta>,
     component: &exp::minecraft::ModVersion,
     loaders: &[models::loader_item::Loader],
 ) -> eyre::Result<()> {
     eyre::ensure!(
-        loaders.iter().any(|loader| loader
-            .supported_games
-            .iter()
-            .any(|game| game == "minecraft-java")),
+		!loaders.is_empty(),
         "Minecraft fields do not apply to the supplied loaders"
     );
     eyre::ensure!(
@@ -1219,13 +1237,14 @@ pub async fn validate_minecraft_component(
             || loaders.iter().any(|loader| loader.loader == "mrpack"),
         "`mrpack_loaders` requires the `mrpack` loader"
     );
-    crate::models::minecraft::validate_minecraft_versions(
-        &component.game_versions,
-    )
-    .await
+    minecraft_meta
+        .validate_minecraft_versions(&component.game_versions)
+        .await
+        .wrap_err("validating minecraft game versions")
 }
 
 pub async fn create_minecraft_component(
+    minecraft_meta: web::Data<MinecraftMeta>,
     fields: &HashMap<String, serde_json::Value>,
     typed: Option<&exp::minecraft::ModVersion>,
     loaders: &[models::loader_item::Loader],
@@ -1235,12 +1254,7 @@ pub async fn create_minecraft_component(
             typed.is_none() || fields.is_empty(),
             "cannot combine typed and flattened Minecraft fields"
         );
-        let applies = loaders.iter().any(|loader| {
-            loader
-                .supported_games
-                .iter()
-                .any(|game| game == "minecraft-java")
-        });
+		let applies = !loaders.is_empty();
         if !applies && typed.is_none() && fields.is_empty() {
             return Ok(None);
         }
@@ -1254,7 +1268,12 @@ pub async fn create_minecraft_component(
             None => crate::models::minecraft::parse_minecraft_fields(fields)?
                 .create()?,
         };
-        validate_minecraft_component(&component, loaders).await?;
+        validate_minecraft_component(
+            minecraft_meta.clone(),
+            &component,
+            loaders,
+        )
+        .await?;
         eyre::Ok(Some(component))
     }
     .await;

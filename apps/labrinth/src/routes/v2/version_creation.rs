@@ -13,6 +13,7 @@ use crate::routes::v3::project_creation::CreateError;
 use crate::routes::v3::version_creation;
 use crate::routes::{v2_reroute, v3};
 use crate::search::SearchState;
+use crate::util::MinecraftMeta;
 use crate::util::kafka::KafkaClientState;
 use actix_multipart::Multipart;
 use actix_web::http::header::ContentDisposition;
@@ -119,6 +120,7 @@ pub(super) fn environment_from_sides(
 )]
 #[post("/version")]
 pub async fn version_create(
+    minecraft_meta: web::Data<MinecraftMeta>,
     req: HttpRequest,
     payload: Multipart,
     client: Data<PgPool>,
@@ -253,6 +255,7 @@ pub async fn version_create(
 
     // Call V3 project creation
     let response = v3::version_creation::version_create(
+        minecraft_meta.clone(),
         req,
         payload,
         client.clone(),
@@ -331,6 +334,7 @@ async fn get_example_environment(
 )]
 #[post("/{version_id}/file")]
 pub async fn upload_file_to_version(
+    minecraft_meta: web::Data<MinecraftMeta>,
     req: HttpRequest,
     url_data: web::Path<(VersionId,)>,
     payload: Multipart,
@@ -343,6 +347,7 @@ pub async fn upload_file_to_version(
 ) -> Result<HttpResponse, CreateError> {
     // Returns NoContent, so no need to convert to V2
     let response = v3::version_creation::upload_file_to_version(
+        minecraft_meta.clone(),
         req,
         url_data,
         payload,

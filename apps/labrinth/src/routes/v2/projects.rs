@@ -16,6 +16,7 @@ use crate::queue::session::AuthQueue;
 use crate::routes::v3::projects::ProjectIds;
 use crate::routes::{ApiError, v2_reroute, v3};
 use crate::search::{SearchBackend, SearchRequest, SearchState};
+use crate::util::MinecraftMeta;
 use crate::util::error::ApiContext as _;
 use crate::util::error::Context as _;
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
@@ -624,6 +625,7 @@ pub struct EditProject {
 #[patch("/{id}")]
 #[allow(clippy::too_many_arguments)]
 pub async fn project_edit(
+    minecraft_meta: web::Data<MinecraftMeta>,
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
@@ -755,6 +757,7 @@ pub async fn project_edit(
     // This returns 204 or failure so we don't need to do anything with it
     let project_id = info.clone().0;
     let mut response = v3::projects::project_edit_internal(
+        minecraft_meta.clone(),
         req.clone(),
         info,
         pool.clone(),
@@ -809,6 +812,7 @@ pub async fn project_edit(
             };
 
             response = v3::versions::version_edit_helper(
+                minecraft_meta.clone(),
                 req.clone(),
                 (version.inner.id.into(),),
                 pool.clone(),

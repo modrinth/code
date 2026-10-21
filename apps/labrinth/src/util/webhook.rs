@@ -1,6 +1,7 @@
 use crate::models::ids::ProjectId;
-use crate::models::minecraft::{minecraft_version_date, minecraft_versions};
+use crate::models::minecraft::minecraft_version_date;
 use crate::routes::ApiError;
+use crate::util::MinecraftMeta;
 use crate::util::error::ApiContext as _;
 use crate::util::error::Context as _;
 use crate::{database::PgPool, env::ENV};
@@ -46,6 +47,7 @@ struct WebhookAuthor {
 }
 
 async fn get_webhook_metadata(
+    minecraft_meta: &MinecraftMeta,
     project_id: ProjectId,
     pool: &PgPool,
     redis: &RedisPool,
@@ -111,9 +113,10 @@ async fn get_webhook_metadata(
             }
         };
 
-        let all_game_versions = minecraft_versions()
+        let all_game_versions = minecraft_meta
+            .minecraft_versions()
             .await
-            .wrap_internal_err("fetching minecraft version catalog")?;
+            .wrap_internal_err("fetching minecraft versions for webhook metadata")?;
 
         let supported_names = project
             .minecraft_mod_versions
@@ -129,7 +132,8 @@ async fn get_webhook_metadata(
             .cloned()
             .collect();
 
-        let formatted_game_versions = get_gv_range(versions, all_game_versions);
+        let formatted_game_versions =
+            get_gv_range(versions, all_game_versions.to_vec());
 
         let mut project_type = project.project_types.pop().unwrap_or_default(); // TODO: Should this grab a not-first?
 
@@ -191,15 +195,17 @@ async fn get_webhook_metadata(
 }
 
 pub async fn send_slack_project_webhook(
+    minecraft_meta: &MinecraftMeta,
     project_id: ProjectId,
     pool: &PgPool,
     redis: &RedisPool,
     webhook_url: &str,
     message: Option<String>,
 ) -> Result<(), ApiError> {
-    let metadata = get_webhook_metadata(project_id, pool, redis)
-        .await
-        .wrap_api_err("fetching webhook metadata")?;
+    let metadata =
+        get_webhook_metadata(minecraft_meta, project_id, pool, redis)
+            .await
+            .wrap_api_err("fetching webhook metadata")?;
 
     if let Some(metadata) = metadata {
         let mut blocks = vec![];
@@ -363,15 +369,17 @@ struct DiscordWebhook {
 }
 
 pub async fn send_discord_webhook(
+    minecraft_meta: &MinecraftMeta,
     project_id: ProjectId,
     pool: &PgPool,
     redis: &RedisPool,
     webhook_url: &str,
     message: Option<String>,
 ) -> Result<(), ApiError> {
-    let metadata = get_webhook_metadata(project_id, pool, redis)
-        .await
-        .wrap_api_err("fetching webhook metadata")?;
+    let metadata =
+        get_webhook_metadata(minecraft_meta, project_id, pool, redis)
+            .await
+            .wrap_api_err("fetching webhook metadata")?;
 
     if let Some(project) = metadata {
         let mut fields = vec![];

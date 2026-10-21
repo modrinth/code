@@ -1,5 +1,6 @@
 use crate::util::error::ApiContext as _;
 use crate::util::error::Context as _;
+use crate::util::MinecraftMeta;
 use xredis::RedisPool;
 mod fixed;
 
@@ -72,6 +73,7 @@ pub async fn fetch_facets(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    minecraft_meta: web::Data<MinecraftMeta>,
 ) -> Result<web::Json<FacetsResponse>, ApiError> {
     get_user_from_headers(
         &http_req,
@@ -83,7 +85,7 @@ pub async fn fetch_facets(
     .await
     .wrap_auth_err("authenticating API request")?;
 
-    let facets = fixed::fetch(&pool, &redis)
+    let facets = fixed::fetch(&pool, &redis, &minecraft_meta)
         .await
         .wrap_api_err("executing `fixed::fetch`")?;
 

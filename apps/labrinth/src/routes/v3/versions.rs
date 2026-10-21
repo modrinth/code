@@ -1,3 +1,4 @@
+use crate::util::MinecraftMeta;
 use crate::util::error::ApiContext as _;
 use std::collections::HashMap;
 
@@ -432,6 +433,7 @@ pub struct EditVersionFileType {
 )]
 #[patch("/version/{id}")]
 pub async fn version_edit_route(
+    minecraft_meta: web::Data<MinecraftMeta>,
     req: HttpRequest,
     info: web::Path<(VersionId,)>,
     pool: web::Data<PgPool>,
@@ -441,6 +443,7 @@ pub async fn version_edit_route(
     search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     version_edit(
+        minecraft_meta.clone(),
         req,
         info,
         pool,
@@ -453,6 +456,7 @@ pub async fn version_edit_route(
 }
 
 pub async fn version_edit(
+    minecraft_meta: web::Data<MinecraftMeta>,
     req: HttpRequest,
     info: web::Path<(VersionId,)>,
     pool: web::Data<PgPool>,
@@ -463,6 +467,7 @@ pub async fn version_edit(
 ) -> Result<HttpResponse, ApiError> {
     let new_version = new_version.into_inner();
     version_edit_helper(
+        minecraft_meta.clone(),
         req,
         info.into_inner(),
         pool,
@@ -474,6 +479,7 @@ pub async fn version_edit(
     .await
 }
 pub async fn version_edit_helper(
+    minecraft_meta: web::Data<MinecraftMeta>,
     req: HttpRequest,
     info: (VersionId,),
     pool: web::Data<PgPool>,
@@ -768,6 +774,7 @@ pub(crate) async fn version_edit_in_transaction(
                     )));
                 }
                 super::version_creation::validate_minecraft_component(
+                    minecraft_meta.clone(),
                     &component,
                     &selected_loaders,
                 )
@@ -1036,6 +1043,7 @@ pub struct VersionListFilters {
 )]
 #[get("/{project_id}/version")]
 pub async fn version_list(
+    minecraft_meta: web::Data<MinecraftMeta>,
     req: HttpRequest,
     info: web::Path<(String,)>,
     web::Query(filters): web::Query<VersionListFilters>,
@@ -1058,6 +1066,7 @@ pub async fn version_list(
     }
 
     version_list_internal(
+        minecraft_meta.clone(),
         req,
         info,
         web::Query(filters),
@@ -1071,15 +1080,18 @@ pub async fn version_list(
 
 /// Load the shared loader/game-version pairs used by automatic featuring.
 pub(crate) async fn auto_featured_filters(
+    minecraft_meta: web::Data<MinecraftMeta>,
     ro_pool: &ReadOnlyPgPool,
     redis: &RedisPool,
 ) -> Result<Vec<(String, String)>, ApiError> {
-    let (loaders, game_versions) = futures::future::try_join(
-        database::models::loader_item::Loader::list(&**ro_pool, redis),
-        crate::models::minecraft::minecraft_versions(),
-    )
-    .await
-    .wrap_internal_err("fetching automatic featured filters")?;
+    let loaders =
+        database::models::loader_item::Loader::list(&**ro_pool, redis)
+            .await
+            .wrap_internal_err("fetching automatic featured filters")?;
+    let game_versions = minecraft_meta
+        .minecraft_versions()
+        .await
+        .wrap_internal_err("fetching minecraft versions for automatic featured filters")?;
     Ok(game_versions
         .iter()
         .filter(|version| {
@@ -1096,6 +1108,7 @@ pub(crate) async fn auto_featured_filters(
 
 /// Apply project-list filters, including the legacy automatic featured fallback.
 pub(crate) async fn filter_project_versions(
+    minecraft_meta: web::Data<MinecraftMeta>,
     versions: Vec<database::models::version_item::VersionQueryResult>,
     filters: &VersionListFilters,
     ro_pool: &ReadOnlyPgPool,
@@ -1192,7 +1205,9 @@ pub(crate) async fn filter_project_versions(
         let joined_filters = if let Some(filters) = auto_featured {
             filters
         } else {
-            loaded_filters = auto_featured_filters(ro_pool, redis).await?;
+            loaded_filters =
+                auto_featured_filters(minecraft_meta.clone(), ro_pool, redis)
+                    .await?;
             &loaded_filters
         };
 
@@ -1226,6 +1241,7 @@ pub(crate) async fn filter_project_versions(
 }
 
 pub async fn version_list_internal(
+    minecraft_meta: web::Data<MinecraftMeta>,
     req: HttpRequest,
     info: web::Path<(String,)>,
     web::Query(filters): web::Query<VersionListFilters>,
@@ -1266,9 +1282,15 @@ pub async fn version_list_internal(
         )
         .await
         .wrap_internal_err("fetching versions from database")?;
-        let response =
-            filter_project_versions(versions, &filters, &ro_pool, &redis, None)
-                .await?;
+        let response = filter_project_versions(
+            minecraft_meta.clone(),
+            versions,
+            &filters,
+            &ro_pool,
+            &redis,
+            None,
+        )
+        .await?;
 
         let mut response =
             filter_visible_versions(response, &user_option, &ro_pool, &redis)

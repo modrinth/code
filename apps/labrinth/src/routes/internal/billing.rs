@@ -22,6 +22,7 @@ use crate::models::users::Badges;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::anrok;
+use crate::util::MinecraftMeta;
 use crate::util::error::ApiContext as _;
 use crate::util::error::Context as _;
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
@@ -1798,6 +1799,7 @@ pub async fn stripe_webhook(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     stripe_client: web::Data<stripe::Client>,
+    minecraft_meta: web::Data<MinecraftMeta>,
 ) -> Result<HttpResponse, ApiError> {
     let stripe_signature = req
         .headers()
@@ -2311,8 +2313,10 @@ pub async fn stripe_webhook(
                                             )
                                         } else {
                                             // Create a server with the latest version of Minecraft
-                                            let minecraft_versions = crate::models::minecraft::minecraft_versions()
-                                                .await.wrap_internal_err("fetching minecraft version catalog")?;
+                                            let minecraft_versions = minecraft_meta
+                                                .minecraft_versions()
+                                                .await
+                                                .wrap_internal_err("fetching minecraft version catalog")?;
 
                                             (
                                                 None,

@@ -1,10 +1,11 @@
 use crate::util::error::{ApiContext as _, Context as _};
+use crate::util::MinecraftMeta;
 
 use super::ApiError;
 use crate::models::minecraft::{
 	legacy_game_version_date, legacy_game_version_name,
 };
-use crate::database::{MinecraftMetaDb, PgPool};
+use crate::database::PgPool;
 use crate::models::v2::projects::LegacySideType;
 use crate::routes::v2_reroute::capitalize_first;
 use crate::routes::v3::tags::LinkPlatformQueryData;
@@ -12,9 +13,7 @@ use crate::routes::{v2_reroute, v3};
 use actix_web::{HttpResponse, get, web};
 use chrono::{DateTime, Utc};
 use itertools::Itertools;
-use minecraft_meta_model::{
-	model::MinecraftVersion, upstream::mojang::VersionType,
-};
+use minecraft_meta_model::upstream::mojang::VersionType;
 use xredis::RedisPool;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
@@ -188,22 +187,17 @@ pub struct GameVersionQuery {
 )]
 #[get("/game_version")]
 pub async fn game_version_list(
-	minecraft_meta_db: web::Data<MinecraftMetaDb>,
+	minecraft_meta: web::Data<MinecraftMeta>,
 	query: web::Query<GameVersionQuery>,
 ) -> Result<web::Json<Vec<GameVersionQueryData>>, ApiError> {
-	let mut conn = minecraft_meta_db
-		.0
-		.connection()
-		.await
-		.wrap_internal_err("acquiring minecraft-meta connection")?;
-	let versions = MinecraftVersion::all()
-		.exec(&mut conn)
+	let versions = minecraft_meta
+		.minecraft_versions()
 		.await
 		.wrap_internal_err("fetching minecraft-meta game versions")?;
 	let mut versions = versions
-		.into_iter()
+		.iter()
 		.map(|row| {
-			let entry = row.catalog_entry.0;
+			let entry = &row.catalog_entry.0;
 			let version_type = match entry.ty {
 				VersionType::Release => "release",
 				VersionType::Snapshot => "snapshot",

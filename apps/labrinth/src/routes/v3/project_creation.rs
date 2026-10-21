@@ -24,6 +24,7 @@ use crate::models::users::User;
 use crate::models::v3::user_limits::UserLimits;
 use crate::queue::session::AuthQueue;
 use crate::search::SearchState;
+use crate::util::MinecraftMeta;
 use crate::util::guards::admin_key_guard;
 use crate::util::img::upload_image_optimized;
 use crate::util::kafka::KafkaClientState;
@@ -314,6 +315,7 @@ pub async fn undo_uploads(
 )]
 #[post("")]
 pub async fn project_create(
+    minecraft_meta: web::Data<MinecraftMeta>,
     req: HttpRequest,
     payload: Multipart,
     client: Data<PgPool>,
@@ -324,6 +326,7 @@ pub async fn project_create(
     search_state: Data<SearchState>,
 ) -> Result<HttpResponse, CreateError> {
     project_create_internal(
+        minecraft_meta.clone(),
         req,
         payload,
         client,
@@ -337,6 +340,7 @@ pub async fn project_create(
 }
 
 pub async fn project_create_internal(
+    minecraft_meta: web::Data<MinecraftMeta>,
     req: HttpRequest,
     mut payload: Multipart,
     client: Data<PgPool>,
@@ -364,6 +368,7 @@ pub async fn project_create_internal(
 
     let result = async {
         let response = project_create_inner(
+            minecraft_meta.clone(),
             &mut payload,
             &mut transaction,
             &**file_host,
@@ -422,6 +427,7 @@ pub async fn project_create_internal(
 )]
 #[post("/{id}", guard = "admin_key_guard")]
 pub async fn project_create_with_id(
+    minecraft_meta: web::Data<MinecraftMeta>,
     req: HttpRequest,
     mut payload: Multipart,
     client: Data<PgPool>,
@@ -449,6 +455,7 @@ pub async fn project_create_with_id(
 
     let result = async {
         let response = project_create_inner(
+            minecraft_meta.clone(),
             &mut payload,
             &mut transaction,
             &**file_host,
@@ -527,6 +534,7 @@ Project Creation Steps:
 
 #[allow(clippy::too_many_arguments)]
 async fn project_create_inner(
+    minecraft_meta: web::Data<MinecraftMeta>,
     payload: &mut Multipart,
     transaction: &mut PgTransaction<'_>,
     file_host: &dyn FileHost,
@@ -698,6 +706,7 @@ async fn project_create_inner(
             }
             versions.push(
                 create_initial_version(
+                    minecraft_meta.clone(),
                     data,
                     project_id,
                     current_user.id,
@@ -820,6 +829,7 @@ async fn project_create_inner(
                 .map(|component| component.game_versions.clone()).unwrap_or_default();
             // Upload the new jar file
             super::version_creation::upload_file(
+                minecraft_meta.clone(),
                 &mut field,
                 file_host,
                 version_data.file_parts.len(),
@@ -1077,19 +1087,19 @@ async fn project_create_inner(
             .flat_map(|v| v.loaders.clone())
             .unique()
             .collect::<Vec<_>>();
-        let (project_types, games) = Loader::list(&mut *transaction, redis)
-            .await?
-            .into_iter()
-            .fold(
-                (Vec::new(), Vec::new()),
-                |(mut project_types, mut games), loader| {
-                    if loaders.contains(&loader.id) {
-                        project_types.extend(loader.supported_project_types);
-                        games.extend(loader.supported_games);
-                    }
-                    (project_types, games)
-                },
-            );
+		let project_types = Loader::list(&mut *transaction, redis)
+			.await?
+			.into_iter()
+			.filter(|loader| loaders.contains(&loader.id))
+			.flat_map(|loader| loader.supported_project_types)
+			.collect();
+		let games = if loaders.is_empty()
+			|| project_builder.components.minecraft_server.is_some()
+		{
+			Vec::new()
+		} else {
+			vec!["minecraft-java".to_owned()]
+		};
 
         let response = crate::models::projects::Project {
             id: project_id,
@@ -1147,6 +1157,7 @@ async fn project_create_inner(
 }
 
 async fn create_initial_version(
+    minecraft_meta: web::Data<MinecraftMeta>,
     version_data: &InitialVersionData,
     project_id: ProjectId,
     author: UserId,
@@ -1186,6 +1197,7 @@ async fn create_initial_version(
         .cloned()
         .collect::<Vec<_>>();
     let component = create_minecraft_component(
+        minecraft_meta.clone(),
         &version_data.fields,
         version_data.minecraft_mod.as_ref(),
         &selected_loaders,

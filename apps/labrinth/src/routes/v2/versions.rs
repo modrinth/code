@@ -1,3 +1,4 @@
+use crate::util::MinecraftMeta;
 use crate::util::error::ApiContext as _;
 use crate::util::error::Context as _;
 use std::collections::HashMap;
@@ -130,6 +131,7 @@ fn default_true() -> bool {
 )]
 #[get("/version")]
 pub async fn version_list(
+    minecraft_meta: web::Data<MinecraftMeta>,
     req: HttpRequest,
     info: web::Path<(String,)>,
     web::Query(filters): web::Query<VersionListFilters>,
@@ -154,6 +156,7 @@ pub async fn version_list(
     let filters = filters.into_v3();
 
     let response = v3::versions::version_list_internal(
+        minecraft_meta.clone(),
         req,
         info,
         web::Query(filters),
@@ -276,6 +279,7 @@ pub struct VersionsFilters {
 )]
 #[get("/versions")]
 pub async fn versions_get(
+    minecraft_meta: web::Data<MinecraftMeta>,
     req: HttpRequest,
     web::Query(query): web::Query<VersionsFilters>,
     pool: web::Data<PgPool>,
@@ -434,19 +438,25 @@ pub async fn versions_get(
             let mut filters = filters.into_v3();
             let limit = filters.limit.take();
             let offset = filters.offset.take();
-            let auto_featured = if filters.featured == Some(true) {
-                Some(
-                    v3::versions::auto_featured_filters(&ro_pool, &redis)
+            let auto_featured: Option<Vec<(String, String)>> =
+                if filters.featured == Some(true) {
+                    Some(
+                        v3::versions::auto_featured_filters(
+                            minecraft_meta.clone(),
+                            &ro_pool,
+                            &redis,
+                        )
                         .await?,
-                )
-            } else {
-                None
-            };
+                    )
+                } else {
+                    None
+                };
             let mut response = Vec::new();
             for mut versions in grouped.into_values() {
                 versions.sort_by_key(|version| version.inner.id.0);
                 response.extend(
                     v3::versions::filter_project_versions(
+                        minecraft_meta.clone(),
                         versions,
                         &filters,
                         &ro_pool,
@@ -624,6 +634,7 @@ pub struct EditVersionFileType {
 )]
 #[patch("/{id}")]
 pub async fn version_edit(
+    minecraft_meta: web::Data<MinecraftMeta>,
     req: HttpRequest,
     info: web::Path<(VersionId,)>,
     pool: web::Data<PgPool>,
@@ -726,6 +737,7 @@ pub async fn version_edit(
     };
 
     let response = v3::versions::version_edit_helper(
+        minecraft_meta.clone(),
         req,
         info.into_inner(),
         pool,

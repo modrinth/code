@@ -1,64 +1,17 @@
 //! Minecraft catalog access and compatibility parsing for legacy API payloads.
 
-use std::collections::{HashMap, HashSet};
-use std::sync::{Arc, LazyLock};
+use std::collections::HashMap;
+use std::sync::LazyLock;
 
 use chrono::{DateTime, Utc};
-use eyre::{Result, WrapErr, eyre};
+use eyre::{Result, eyre};
 use minecraft_meta_model::{
     model::{MinecraftVersion, MinecraftVersionName},
     upstream::mojang::VersionType,
 };
 use serde_json::Value;
-use tokio::sync::OnceCell;
 
-use crate::database::MinecraftMetaDb;
 use crate::models::exp::minecraft::{Environment, ModVersionEdit, MrpackLoader};
-
-static MINECRAFT_METADATA: LazyLock<OnceCell<Arc<MinecraftMetaDb>>> =
-    LazyLock::new(OnceCell::new);
-
-pub fn register_minecraft_metadata(
-    metadata: actix_web::web::Data<MinecraftMetaDb>,
-) -> Result<()> {
-    MINECRAFT_METADATA.set(metadata.into_inner()).map_err(|_| {
-        eyre!("minecraft-meta service is already initialized")
-    })
-}
-
-async fn minecraft_metadata() -> Result<&'static MinecraftMetaDb> {
-    Ok(MINECRAFT_METADATA
-        .get_or_try_init(|| async {
-            MinecraftMetaDb::connect().await.map(Arc::new)
-        })
-        .await?
-        .as_ref())
-}
-
-/// Returns catalog records with the names historically exposed by Labrinth.
-pub async fn minecraft_versions() -> Result<Vec<MinecraftVersion>> {
-    let mut connection = minecraft_metadata()
-        .await?
-        .0
-        .connection()
-        .await
-        .wrap_err("acquiring minecraft-meta connection")?;
-    let mut versions = MinecraftVersion::all()
-        .exec(&mut connection)
-        .await
-        .wrap_err("fetching Minecraft game versions")?;
-    for version in &mut versions {
-        version.name = MinecraftVersionName(
-            legacy_game_version_name(&version.name.0).to_owned(),
-        );
-    }
-    versions.sort_by(|a, b| {
-        minecraft_version_date(b)
-            .cmp(&minecraft_version_date(a))
-            .then_with(|| a.name.0.cmp(&b.name.0))
-    });
-    Ok(versions)
-}
 
 pub fn minecraft_version_date(version: &MinecraftVersion) -> DateTime<Utc> {
     let timestamp = version.catalog_entry.0.release_time;
@@ -77,23 +30,6 @@ pub fn minecraft_version_type(version: &MinecraftVersion) -> &'static str {
         VersionType::OldAlpha => "alpha",
         VersionType::OldBeta => "beta",
     }
-}
-
-pub async fn validate_minecraft_versions(
-    names: &[MinecraftVersionName],
-) -> Result<()> {
-    if names.is_empty() {
-        return Ok(());
-    }
-    let versions = minecraft_versions().await?;
-    let known = versions.iter().map(|version| &version.name).collect::<HashSet<_>>();
-    for name in names {
-        eyre::ensure!(
-            known.contains(name),
-            "Minecraft version `{name}` is absent from minecraft-meta"
-        );
-    }
-    Ok(())
 }
 
 /// Parses only the three flattened Minecraft fields retained by the v3 API.
