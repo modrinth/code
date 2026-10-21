@@ -2,7 +2,7 @@
 
 FROM docker.io/tailscale/tailscale:latest AS tailscale
 
-FROM node:26-trixie-slim
+FROM platformatic/node-caged:26-slim
 
 LABEL org.opencontainers.image.source=https://github.com/modrinth/code
 LABEL org.opencontainers.image.title=frontend
@@ -11,7 +11,9 @@ LABEL org.opencontainers.image.licenses=AGPL-3.0-only
 
 RUN apt-get update \
 	&& apt-get install -y --no-install-recommends dumb-init \
-	&& rm -rf /var/lib/apt/lists/*
+	&& rm -rf /var/lib/apt/lists/* \
+	&& groupadd --system app \
+	&& useradd --system --gid app --home-dir /app --no-create-home app
 
 # Debug
 COPY --from=tailscale /usr/local/bin/tailscale /usr/local/bin/tailscaled /usr/local/bin/
@@ -68,7 +70,7 @@ fi
 
 # Only drop if we actually started as root; some runtimes pin their own uid.
 if [ "$(id -u)" = "0" ]; then
-	exec setpriv --reuid=node --regid=node --init-groups -- "$@"
+	exec setpriv --reuid=app --regid=app --init-groups -- "$@"
 fi
 
 exec "$@"
@@ -85,7 +87,7 @@ ENV MALLOC_ARENA_MAX=2
 WORKDIR /app
 
 # Nitro bundles every runtime dependency into .output, so no node_modules is needed.
-COPY --chown=node:node .output ./.output
+COPY --chown=app:app .output ./.output
 
 # Boot the server once and render the index page so the compile cache ships warm.
 # Node flushes the cache on graceful exit. Job control (-m) puts the cluster primary
@@ -114,11 +116,11 @@ exec 3<&-
 
 kill -TERM -- "-$server_pid"
 wait "$server_pid"
-chown -R node:node "$NODE_COMPILE_CACHE"
+chown -R app:app "$NODE_COMPILE_CACHE"
 EOF
 
 # Stays root so tailscaled can setgroups/setuid for SSH sessions; the entrypoint
-# drops the server itself to the node user.
+# drops the server itself to the app user.
 EXPOSE 3000
 
 ENTRYPOINT ["dumb-init", "--", "/usr/local/bin/entrypoint.sh"]

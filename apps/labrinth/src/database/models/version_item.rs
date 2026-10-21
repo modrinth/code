@@ -10,8 +10,7 @@ use crate::models::exp;
 use xredis::RedisPool;
 
 use crate::models::projects::{FileType, VersionStatus};
-use crate::queue::{delphi_scan, file_scan::scan_file};
-use crate::util::kafka::KafkaClientState;
+use crate::queue::file_scan::scan_file;
 use chrono::{DateTime, Utc};
 use dashmap::{DashMap, DashSet};
 use eyre::{Result, WrapErr};
@@ -185,7 +184,7 @@ impl VersionFileBuilder {
         transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
         file_host: &dyn FileHost,
-        kafka_client: &KafkaClientState,
+        delphi_scan_files: &mut Vec<DBFileId>,
     ) -> Result<DBFileId> {
         let file_id = generate_file_id(&mut *transaction)
             .await
@@ -254,9 +253,7 @@ impl VersionFileBuilder {
             error!("Error scanning new file {file_id:?}: {err:?}");
         }
 
-        delphi_scan::enqueue_file(transaction, kafka_client, file_id)
-            .await
-            .wrap_err("enqueueing file for delphi scan")?;
+        delphi_scan_files.push(file_id);
 
         Ok(file_id)
     }
@@ -274,7 +271,7 @@ impl VersionBuilder {
         transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
         file_host: &dyn FileHost,
-        kafka_client: &KafkaClientState,
+        delphi_scan_files: &mut Vec<DBFileId>,
     ) -> Result<DBVersionId> {
         let version = DBVersion {
             id: self.version_id,
@@ -325,7 +322,7 @@ impl VersionBuilder {
                 transaction,
                 redis,
                 file_host,
-                kafka_client,
+                delphi_scan_files,
             )
             .await
             .wrap_err("inserting version file")?;

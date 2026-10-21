@@ -160,6 +160,7 @@ pub async fn version_create(
 ) -> Result<HttpResponse, CreateError> {
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
+    let mut delphi_scan_files = Vec::new();
 
     let user = get_user_from_headers(
         &req,
@@ -180,7 +181,7 @@ pub async fn version_create(
             &mut uploaded_files,
             &user,
             &client,
-            &kafka_client,
+            &mut delphi_scan_files,
         )
         .await?;
 
@@ -211,6 +212,11 @@ pub async fn version_create(
     };
 
     prepared.commit(transaction, &redis).await?;
+    crate::queue::delphi_scan::publish_new_files(
+        &kafka_client,
+        &delphi_scan_files,
+    )
+    .await;
     search_state
         .queue
         .push_version_changes(project_id.into(), [VersionId::from(version_id)])
@@ -227,7 +233,7 @@ async fn version_create_inner(
     uploaded_files: &mut Vec<UploadedFile>,
     user: &User,
     pool: &PgPool,
-    kafka_client: &KafkaClientState,
+    delphi_scan_files: &mut Vec<models::DBFileId>,
 ) -> Result<(HttpResponse, models::DBProjectId, models::DBVersionId), CreateError>
 {
     let mut initial_version_data = None;
@@ -564,7 +570,7 @@ async fn version_create_inner(
 
     let project_id = builder.project_id;
     builder
-        .insert(transaction, redis, file_host, kafka_client)
+        .insert(transaction, redis, file_host, delphi_scan_files)
         .await?;
 
     for image_id in version_data.uploaded_images {
@@ -671,6 +677,7 @@ pub async fn upload_file_to_version(
 ) -> Result<HttpResponse, CreateError> {
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
+    let mut delphi_scan_files = Vec::new();
 
     let version_id = url_data.into_inner().0;
     let db_version_id = models::DBVersionId::from(version_id);
@@ -695,7 +702,7 @@ pub async fn upload_file_to_version(
             &mut uploaded_files,
             db_version_id,
             &user,
-            &kafka_client,
+            &mut delphi_scan_files,
         )
         .await?;
 
@@ -726,6 +733,11 @@ pub async fn upload_file_to_version(
     };
 
     prepared.commit(transaction, &redis).await?;
+    crate::queue::delphi_scan::publish_new_files(
+        &kafka_client,
+        &delphi_scan_files,
+    )
+    .await;
     search_state
         .queue
         .push_version_changes(project_id.into(), [version_id])
@@ -743,7 +755,7 @@ async fn upload_file_to_version_inner(
     uploaded_files: &mut Vec<UploadedFile>,
     version_id: models::DBVersionId,
     user: &User,
-    kafka_client: &KafkaClientState,
+    delphi_scan_files: &mut Vec<models::DBFileId>,
 ) -> Result<(HttpResponse, models::DBProjectId), CreateError> {
     let mut initial_file_data: Option<InitialFileData> = None;
     let mut file_builders: Vec<VersionFileBuilder> = Vec::new();
@@ -926,7 +938,7 @@ async fn upload_file_to_version_inner(
                 &mut *transaction,
                 &redis,
                 file_host,
-                kafka_client,
+                delphi_scan_files,
             )
             .await?;
         }

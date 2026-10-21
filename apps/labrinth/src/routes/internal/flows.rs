@@ -54,7 +54,7 @@ use sha2::Sha256;
 use std::collections::HashMap;
 use std::str::FromStr;
 use thiserror::Error;
-use tracing::{error, info, warn};
+use tracing::{debug, error, info, warn};
 use url::Url;
 use uuid::Uuid;
 use validator::Validate;
@@ -1196,7 +1196,7 @@ pub async fn init(
         None
     };
 
-    info!(
+    debug!(
         ?existing_user_id,
         auth_token_present = %info.auth_token.is_some(),
         "Starting authentication flow"
