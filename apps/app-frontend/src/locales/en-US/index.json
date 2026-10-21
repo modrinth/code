@@ -4412,6 +4412,9 @@
   "instance.shared-instance.publish-review.changes-tab": {
     "message": "Changes"
   },
+  "instance.shared-instance.publish-review.file-type-not-allowed": {
+    "message": "You're not allowed to push this file type."
+  },
   "instance.shared-instance.publish-review.files-description": {
     "message": "You can also include individual files alongside the detected changes. Select any additional files you'd like to publish."
   },

@@ -113,6 +113,7 @@ pub struct SharedInstancePublishPreview {
 pub struct SharedInstancePublishFile {
     pub path: String,
     pub size: u64,
+    pub blocked: bool,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

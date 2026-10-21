@@ -96,7 +96,7 @@ fn result_summary(
     }
 }
 
-fn write_environment_details(details: &mut String) {
+pub(crate) fn write_environment_details(details: &mut String) {
     let _ = writeln!(details);
     let _ = writeln!(details, "Environment");
     let _ = writeln!(details, "App version: {}", env!("CARGO_PKG_VERSION"));
@@ -412,7 +412,10 @@ fn write_raw_snapshot(details: &mut String, snapshot: &InstallJobSnapshot) {
     }
 }
 
-async fn write_latest_log(details: &mut String, directories: &DirectoryInfo) {
+pub(crate) async fn write_latest_log(
+    details: &mut String,
+    directories: &DirectoryInfo,
+) {
     let _ = writeln!(details);
     let _ = writeln!(details, "Latest launcher log excerpt");
     match latest_launcher_log_tail(directories).await {
@@ -580,7 +583,7 @@ fn read_file_tail(path: &Path, max_bytes: u64) -> crate::Result<String> {
     Ok(output)
 }
 
-async fn censor_support_text(
+pub(crate) async fn censor_support_text(
     mut text: String,
     pool: &SqlitePool,
 ) -> crate::Result<String> {

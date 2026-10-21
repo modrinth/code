@@ -14,6 +14,7 @@ export interface SharedInstancePublishTask {
 	createdAt: string
 	finishedAt?: string
 	error?: string
+	details?: string
 }
 
 export const sharedInstancePublishes = ref(new Map<string, SharedInstancePublishTask>())
@@ -68,6 +69,9 @@ export function trackSharedInstancePublish(instance: {
 		fail(error: string) {
 			task.error = error
 			finish('failed')
+		},
+		setDetails(details: string) {
+			task.details = details
 		},
 	}
 }

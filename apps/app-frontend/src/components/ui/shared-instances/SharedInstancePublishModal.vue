@@ -39,7 +39,9 @@
 					@navigate="scrollFileTreeToTop"
 				/>
 			</div>
-			<div class="flex flex-col gap-2 border-0 border-b border-solid border-surface-5 px-6 py-4">
+			<div
+				class="flex flex-col gap-2 border-0 border-b border-solid border-surface-5 px-6 pb-4 pt-6"
+			>
 				<div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
 					<span class="font-semibold text-contrast">
 						{{ formatMessage(messages.storageTitle) }}
@@ -133,6 +135,7 @@ import {
 } from '@/helpers/install'
 import {
 	get_shared_instance_publish_preview,
+	get_shared_instance_publish_support_details,
 	publish_shared_instance,
 	type SharedInstancePublishFile,
 } from '@/helpers/instance'
@@ -169,13 +172,21 @@ const tabs = computed<TabsTab[]>(() => [
 	{ value: 'files', label: formatMessage(messages.filesTab) },
 ])
 const fileItems = computed<FileTreeSelectItem[]>(() =>
-	files.value.map(({ path, size }) => ({ path, size, type: 'file' })),
+	files.value.map(({ path, size, blocked }) => ({
+		path,
+		size,
+		type: 'file',
+		disabled: blocked,
+		disabledTooltip: blocked ? formatMessage(messages.fileTypeNotAllowed) : undefined,
+	})),
 )
 const selectedFiles = computed(() => {
 	const includedPaths = new Set(includedFilePaths.value)
 	const excludedPaths = new Set(excludedFilePaths.value)
 
-	return files.value.filter((file) => isPathSelected(file.path, includedPaths, excludedPaths))
+	return files.value.filter(
+		(file) => !file.blocked && isPathSelected(file.path, includedPaths, excludedPaths),
+	)
 })
 const selectedFilePaths = computed(() => selectedFiles.value.map((file) => file.path))
 const selectedSize = computed(() =>
@@ -253,13 +264,24 @@ async function publishChanges() {
 	const task = trackSharedInstancePublish(props.instance)
 	try {
 		await publish_shared_instance(props.instance.id, selectedFilePaths.value, task.update)
+		await loadSupportDetails(task)
 		task.succeed()
 		emit('published')
 	} catch (error) {
+		await loadSupportDetails(task)
 		task.fail(getErrorMessage(error))
 		handlePublishError(error)
 	} finally {
 		setState('idle')
+	}
+}
+
+async function loadSupportDetails(task: ReturnType<typeof trackSharedInstancePublish>) {
+	try {
+		const details = await get_shared_instance_publish_support_details(props.instance.id)
+		if (details) task.setDetails(details)
+	} catch {
+		return
 	}
 }
 
@@ -349,6 +371,10 @@ const messages = defineMessages({
 	storageOverLimit: {
 		id: 'instance.shared-instance.publish-review.storage-over-limit',
 		defaultMessage: '{size} over the limit. Deselect some files to push this update.',
+	},
+	fileTypeNotAllowed: {
+		id: 'instance.shared-instance.publish-review.file-type-not-allowed',
+		defaultMessage: "You're not allowed to push this file type.",
 	},
 })
 

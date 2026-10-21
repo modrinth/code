@@ -119,6 +119,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             instance_share_remove_users,
             instance_share_get_publish_preview,
             instance_share_publish,
+            instance_share_publish_support_details,
             instance_share_unlink,
             instance_share_unpublish,
             instance_export_mrpack,
@@ -1491,6 +1492,18 @@ pub async fn instance_share_publish(
     )
     .await?
     .into())
+}
+
+#[tauri::command]
+pub async fn instance_share_publish_support_details(
+    instance_id: &str,
+) -> Result<Option<String>> {
+    Ok(
+        theseus::instance::get_shared_instance_publish_support_details(
+            instance_id,
+        )
+        .await?,
+    )
 }
 
 #[tauri::command]

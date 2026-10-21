@@ -38,7 +38,7 @@ pub(crate) const CONFIG_FILE_TYPE: &str = "config";
 pub(crate) const CONFIG_SYNC_ENABLED: bool = true;
 pub(crate) const CONFIG_DIRECTORY: &str = "config";
 pub(crate) const MAX_SHARED_FILES: usize = 4096;
-pub(crate) const MAX_SHARED_FILES_TOTAL_SIZE: u64 = 2 * 1024 * 1024 * 1024;
+pub(crate) const MAX_SHARED_FILES_TOTAL_SIZE: u64 = 500 * 1024 * 1024;
 pub(crate) const MAX_CONFIG_BUNDLE_ENTRIES: usize = 4096;
 pub(crate) const MAX_CONFIG_BUNDLE_FILE_SIZE: u64 = 512 * 1024 * 1024;
 pub(crate) const MAX_CONFIG_BUNDLE_TOTAL_SIZE: u64 = 512 * 1024 * 1024;
@@ -99,6 +99,23 @@ fn is_executable_file(path: &str) -> bool {
                 .iter()
                 .any(|candidate| extension.eq_ignore_ascii_case(candidate))
         })
+}
+
+/// Leading bytes of each file passed to [`is_executable_content`].
+pub(super) const FILE_SCAN_HEAD_SIZE: usize = 8192;
+
+/// Mirrors the upload scan of the shared instances backend, so files it would
+/// reject fail before a version is created.
+pub(super) fn is_executable_content(head: &[u8]) -> bool {
+    infer::get(head).is_some_and(|kind| match kind.matcher_type() {
+        infer::MatcherType::App => {
+            !matches!(kind.extension(), "der" | "pem" | "obj" | "bc")
+        }
+        _ => matches!(
+            kind.extension(),
+            "sh" | "msi" | "cab" | "deb" | "rpm" | "crx"
+        ),
+    })
 }
 
 /// Whether a directory can hold shareable files, so the rest can be skipped
@@ -163,6 +180,7 @@ mod diff;
 mod install;
 mod invites;
 mod publish;
+mod report;
 mod types;
 
 pub(crate) use self::install::check_shared_instance_availability_before_launch;
@@ -183,6 +201,7 @@ pub use self::publish::{
     get_shared_instance_publish_preview, publish_shared_instance,
     unlink_shared_instance, unpublish_shared_instance,
 };
+pub use self::report::get_shared_instance_publish_support_details;
 pub use self::types::{
     SharedInstanceExternalFilePreview, SharedInstanceInstallPreview,
     SharedInstanceInvite, SharedInstanceInviteInstallPreview,

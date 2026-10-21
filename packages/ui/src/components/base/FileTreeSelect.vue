@@ -108,6 +108,7 @@
 			<div
 				v-for="(entry, i) in entries"
 				:key="`${entry.type}:${entry.path}`"
+				v-tooltip="entry.disabled ? entry.disabledTooltip : undefined"
 				role="button"
 				tabindex="0"
 				class="group flex w-full min-w-0 select-none items-center gap-2.5 border-0 border-t border-solid border-surface-4 p-3 text-left first:border-t-0 focus:!outline-none"
@@ -137,7 +138,11 @@
 				</div>
 				<span
 					:ref="(element) => setEntryNameRef(entry.path, element)"
-					v-tooltip="truncatedTooltip(entryNameRefs[entry.path], entry.name)"
+					v-tooltip="
+						entry.disabled && entry.disabledTooltip
+							? undefined
+							: truncatedTooltip(entryNameRefs[entry.path], entry.name)
+					"
 					class="min-w-0 flex-1 truncate text-primary group-hover:text-contrast group-focus-visible:text-contrast"
 				>
 					{{ entry.name }}
@@ -229,6 +234,7 @@ export type FileTreeSelectItem = {
 	path: string
 	type?: 'directory' | 'file'
 	disabled?: boolean
+	disabledTooltip?: string
 	size?: number
 	modified?: number
 	count?: number
@@ -247,6 +253,7 @@ type FileTreeSelectEntry = {
 	checked: boolean
 	indeterminate: boolean
 	disabled: boolean
+	disabledTooltip?: string
 	size?: number
 	modified?: number
 	count?: number
@@ -571,15 +578,17 @@ function buildDirectoryEntry(
 	const selectableDescendants = descendants.filter((item) => !item.disabled)
 	const selected = isPathSelected(path)
 	const indeterminate = hasDescendantSelectionRule(path)
+	const disabled = item ? (item.disabled ?? false) : selectableDescendants.length === 0
 
 	return {
 		path,
 		name,
 		type: 'directory',
 		icon: getDirectoryIcon(name),
-		checked: selected && !indeterminate,
+		checked: selected && !indeterminate && !disabled,
 		indeterminate,
-		disabled: item ? (item.disabled ?? false) : selectableDescendants.length === 0,
+		disabled,
+		disabledTooltip: item?.disabledTooltip,
 		modified: item?.modified ?? getLatestModified(descendants),
 		count: item?.count ?? (item ? undefined : getFolderChildCount(path)),
 		item,
@@ -592,9 +601,10 @@ function buildFileEntry(item: NormalizedFileTreeSelectItem): FileTreeSelectEntry
 		name: item.name,
 		type: 'file',
 		icon: getFileIcon(item.name),
-		checked: isPathSelected(item.normalizedPath),
+		checked: !item.disabled && isPathSelected(item.normalizedPath),
 		indeterminate: false,
 		disabled: item.disabled ?? false,
+		disabledTooltip: item.disabledTooltip,
 		size: item.size,
 		modified: item.modified,
 		item,

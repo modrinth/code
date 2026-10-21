@@ -1,6 +1,7 @@
 use super::client::*;
 use super::diff::*;
 use super::install::*;
+use super::report::{PublishReport, PublishReportFile};
 use super::types::*;
 use super::*;
 use async_walkdir::{Filtering, WalkDir};
@@ -607,11 +608,34 @@ pub(super) async fn publish_shared_instance_inner(
     on_progress: &(dyn Fn(u64, u64) + Send + Sync),
     state: &State,
 ) -> crate::Result<()> {
+    let mut report = PublishReport::new(instance_id, file_paths);
+    let result = publish_shared_instance_reported(
+        instance_id,
+        file_paths,
+        on_progress,
+        &mut report,
+        state,
+    )
+    .await;
+    report.finish(&result);
+    result
+}
+
+async fn publish_shared_instance_reported(
+    instance_id: &str,
+    file_paths: &[String],
+    on_progress: &(dyn Fn(u64, u64) + Send + Sync),
+    report: &mut PublishReport,
+    state: &State,
+) -> crate::Result<()> {
     let attachment = shared_attachment(instance_id, state).await?.ok_or(
         crate::ErrorKind::InputError(
             "instance is not attached to a shared instance".to_string(),
         ),
     )?;
+    report.shared_instance_id = Some(attachment.id.clone());
+    report.applied_version = attachment.applied_version;
+    report.latest_version = attachment.latest_version;
     ensure_owner(&attachment)?;
     tracing::info!(
         instance_id,
@@ -635,6 +659,7 @@ pub(super) async fn publish_shared_instance_inner(
         &attachment.id,
         file_paths,
         on_progress,
+        report,
         state,
     )
     .await;
@@ -682,12 +707,19 @@ pub(super) async fn publish_current_content(
     shared_instance_id: &str,
     file_paths: &[String],
     on_progress: &(dyn Fn(u64, u64) + Send + Sync),
+    report: &mut PublishReport,
     state: &State,
 ) -> crate::Result<i32> {
     let _store_lease = state.content_store.lease().await;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
         .ok_or(crate::ErrorKind::InputError("unknown instance".to_string()))?;
+    report.instance_name = Some(metadata.instance.name.clone());
+    report.game_version =
+        Some(metadata.applied_content_set.game_version.clone());
+    report.loader =
+        Some(metadata.applied_content_set.loader.as_str().to_string());
+    report.loader_version = metadata.applied_content_set.loader_version.clone();
     ensure_shareable_link(&metadata.link)?;
     update_remote_instance(
         shared_instance_id,
@@ -695,8 +727,11 @@ pub(super) async fn publish_current_content(
         state,
     )
     .await?;
+    report.step("Updated shared instance details");
     let modpack_id = shared_modpack_id(&metadata.link);
+    report.modpack_id = modpack_id.clone();
     let snapshot = collect_publish_snapshot(&metadata, state).await?;
+    report.step("Collected instance content");
     let shared_files = if CONFIG_SYNC_ENABLED {
         shared_file_candidates(
             &metadata.instance.path,
@@ -719,16 +754,40 @@ pub(super) async fn publish_current_content(
         external_file_count = external_files.len(),
         "Creating shared instance version"
     );
+    report.modrinth_ids = modrinth_ids.clone();
     let hashed_files =
         hash_external_files(&metadata.instance.path, &external_files, state)
             .await?;
-    // Older servers ignore `sha512` and request every file.
+    report.files = hashed_files
+        .iter()
+        .map(|file| PublishReportFile {
+            file_name: file.file_name.clone(),
+            file_type: file.file_type.clone(),
+            size: file.size,
+            sha512: file.sha512.clone(),
+            executable: file.executable,
+        })
+        .collect();
+    report.step(format!("Hashed {} files", hashed_files.len()));
+    if let Some(file) = hashed_files.iter().find(|file| file.executable) {
+        bail!(crate::ErrorKind::SharedInstanceFileNotAllowed(
+            file.file_name.clone()
+        ));
+    }
+    let total_size = hashed_files
+        .iter()
+        .fold(0_u64, |total, file| total.saturating_add(file.size));
+    if total_size > MAX_SHARED_FILES_TOTAL_SIZE {
+        bail!(crate::ErrorKind::InputError(format!(
+            "files exceed the {} limit for a shared instance version",
+            crate::util::io::format_bytes(MAX_SHARED_FILES_TOTAL_SIZE)
+        )));
+    }
     let external_file_data = hashed_files
         .iter()
         .map(|file| ExternalFileData {
             file_name: file.file_name.clone(),
             file_type: file.file_type.clone(),
-            sha512: file.sha512.clone(),
         })
         .collect::<Vec<_>>();
     let response = request_json_optional_unavailable::<InstanceVersionResponse>(
@@ -767,6 +826,19 @@ pub(super) async fn publish_current_content(
             return Err(shared_instance_unavailable_error(reason));
         }
     };
+    report.created_version = Some(response.version);
+    report.requested_files = Some(
+        response
+            .external_files
+            .iter()
+            .map(|file| file.file_name.clone())
+            .collect(),
+    );
+    report.step(format!(
+        "Created version {} ({} files requested for upload)",
+        response.version,
+        response.external_files.len()
+    ));
 
     if !response.external_files.is_empty() {
         upload_external_files(
@@ -778,6 +850,7 @@ pub(super) async fn publish_current_content(
             state,
         )
         .await?;
+        report.step("Uploaded requested files");
     } else if !response.ready {
         tracing::debug!(
             "Shared instance version {} was not ready but had no external files",
@@ -828,11 +901,29 @@ pub(super) async fn collect_shareable_files(
             continue;
         }
         let size = entry.metadata().await?.len();
-        files.push(SharedInstancePublishFile { path, size });
+        let blocked =
+            is_executable_content(&read_file_head(&entry_path).await?);
+        files.push(SharedInstancePublishFile {
+            path,
+            size,
+            blocked,
+        });
     }
 
     files.sort_by(|left, right| left.path.cmp(&right.path));
     Ok(files)
+}
+
+async fn read_file_head(path: &std::path::Path) -> crate::Result<Vec<u8>> {
+    use tokio::io::AsyncReadExt;
+
+    let mut head = Vec::with_capacity(FILE_SCAN_HEAD_SIZE);
+    tokio::fs::File::open(path)
+        .await?
+        .take(FILE_SCAN_HEAD_SIZE as u64)
+        .read_to_end(&mut head)
+        .await?;
+    Ok(head)
 }
 
 /// Each selected file is uploaded on its own under its instance-relative
@@ -843,21 +934,26 @@ async fn shared_file_candidates(
     selected_paths: &[String],
     state: &State,
 ) -> crate::Result<Vec<ExternalFileCandidate>> {
-    let local_paths = local_files
+    let local_files = local_files
         .iter()
-        .map(|file| file.path.as_str())
-        .collect::<HashSet<_>>();
+        .map(|file| (file.path.as_str(), file))
+        .collect::<HashMap<_, _>>();
     let selected_paths = selected_paths
         .iter()
         .map(String::as_str)
         .collect::<BTreeSet<_>>();
-    if let Some(missing) = selected_paths
-        .iter()
-        .find(|path| !local_paths.contains(*path))
-    {
-        bail!(crate::ErrorKind::InputError(format!(
-            "file {missing} is unavailable for sharing"
-        )));
+    for path in &selected_paths {
+        match local_files.get(path) {
+            None => bail!(crate::ErrorKind::InputError(format!(
+                "file {path} is unavailable for sharing"
+            ))),
+            Some(file) if file.blocked => {
+                bail!(crate::ErrorKind::SharedInstanceFileNotAllowed(
+                    path.to_string()
+                ))
+            }
+            Some(_) => {}
+        }
     }
     ensure_shared_file_count(&selected_paths)?;
 
@@ -945,6 +1041,7 @@ pub(super) struct HashedExternalFile {
     content: crate::state::content_store::ReadableContent,
     size: u64,
     sha512: String,
+    executable: bool,
 }
 
 async fn hash_external_files(
@@ -973,6 +1070,7 @@ async fn hash_external_file(
     let mut file = tokio::fs::File::open(content.path()).await?;
     let mut hasher = sha2::Sha512::new();
     let mut buffer = vec![0_u8; 64 * 1024];
+    let mut head = Vec::with_capacity(FILE_SCAN_HEAD_SIZE);
     let mut size = 0_u64;
     loop {
         let read = file.read(&mut buffer).await?;
@@ -980,6 +1078,8 @@ async fn hash_external_file(
             break;
         }
         hasher.update(&buffer[..read]);
+        let remaining = FILE_SCAN_HEAD_SIZE - head.len();
+        head.extend_from_slice(&buffer[..read.min(remaining)]);
         size += read as u64;
     }
 
@@ -989,6 +1089,7 @@ async fn hash_external_file(
         content,
         size,
         sha512: format!("{:x}", hasher.finalize()),
+        executable: is_executable_content(&head),
     })
 }
 

@@ -57,7 +57,6 @@ pub(super) enum ExternalFileSource {
 pub(super) struct ExternalFileData {
     pub(super) file_name: String,
     pub(super) file_type: String,
-    pub(super) sha512: String,
 }
 
 #[derive(Clone, Debug, Deserialize)]

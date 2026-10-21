@@ -277,7 +277,7 @@ pub(crate) async fn write_instance_file_from_reader(
     file.sync_all().await?;
     drop(file);
 
-    let _instance = state.lock_instance_content(instance_id).await;
+    let _instance = state.instance_locks.lock_content(instance_id).await;
     let _files = state.content_store.files_lock.lock().await;
     resolve(state, instance_id, path, true).await?;
     tokio::task::spawn_blocking(move || {

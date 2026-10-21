@@ -689,6 +689,7 @@ export interface SharedInstancePublishPreview {
 export interface SharedInstancePublishFile {
 	path: string
 	size: number
+	blocked: boolean
 }
 
 export interface SharedInstanceInviteLink {
@@ -774,6 +775,12 @@ export async function publish_shared_instance(
 		filePaths,
 		onProgress: new Channel<[number, number]>(([uploaded, total]) => onProgress(uploaded, total)),
 	})
+}
+
+export async function get_shared_instance_publish_support_details(
+	instanceId: string,
+): Promise<string | null> {
+	return await invoke('plugin:instance|instance_share_publish_support_details', { instanceId })
 }
 
 export async function unlink_shared_instance(instanceId: string): Promise<void> {

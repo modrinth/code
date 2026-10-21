@@ -330,10 +330,9 @@ export function useDownloadManager() {
 					: '',
 			waiting: !uploading,
 			eta:
-				rate && uploading
-					? display.formatEta((task.totalBytes - task.uploadedBytes) / rate) : '',
+				rate && uploading ? display.formatEta((task.totalBytes - task.uploadedBytes) / rate) : '',
 			canRetry: false,
-			canCopyDetails: !!task.error,
+			canCopyDetails: !!task.error || (appSettings.alwaysShowCopyDetails && !!task.details),
 			copied: copiedJobs.value.has(task.id),
 			busy: busyJobs.value.has(task.id),
 		}
@@ -594,11 +593,13 @@ export function useDownloadManager() {
 
 	async function copyDetails(id: string) {
 		await runAction(id, async () => {
-			const file =
-				externalFileDownloads.value.get(id) ??
-				debugInfoExports.value.get(id) ??
-				sharedInstancePublishes.value.get(id)
-			const details = file ? (file.error ?? '') : await install_job_support_details(id)
+			const publish = sharedInstancePublishes.value.get(id)
+			const file = externalFileDownloads.value.get(id) ?? debugInfoExports.value.get(id)
+			const details = publish
+				? (publish.details ?? publish.error ?? '')
+				: file
+					? (file.error ?? '')
+					: await install_job_support_details(id)
 			if (disposed) return
 			await navigator.clipboard.writeText(details)
 			if (disposed) return
