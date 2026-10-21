@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { UploadIcon } from '@modrinth/assets'
 import { computed, reactive, ref, useTemplateRef } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -9,12 +8,11 @@ import StackedAdmonitions, {
 } from '#ui/components/base/StackedAdmonitions.vue'
 import CurseForgeFilesReviewModal from '#ui/components/servers/CurseForgeFilesReviewModal.vue'
 import InstallingBanner from '#ui/components/servers/InstallingBanner.vue'
-import ServerConfigFilePicker from '#ui/components/servers/ServerConfigFilePicker.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerBackupsQueue } from '#ui/composables/server-backups-queue'
 import { useServerPermissions } from '#ui/composables/server-permissions'
 import type { FileOperation } from '#ui/layouts/shared/files-tab/types'
-import ContentDiffModal from '#ui/layouts/shared/installation-settings/components/ContentDiffModal.vue'
+import ServerSharePushModal from '#ui/layouts/shared/server-sharing/components/ServerSharePushModal.vue'
 import { useServerShareReview } from '#ui/layouts/shared/server-sharing/use-server-share-review'
 import { useServerPlayerMembers } from '#ui/layouts/wrapped/hosting/manage/[id]/play/use-server-players'
 import { injectModrinthClient, injectModrinthServerContext } from '#ui/providers'
@@ -48,7 +46,6 @@ const { canSetup, canManageBackups, canWriteFiles, permissionDeniedMessage } =
 	useServerPermissions()
 const {
 	diffModal,
-	configPicker,
 	previewOpen,
 	previewQuery,
 	shareActions,
@@ -70,17 +67,6 @@ const { activeOperations, backups, progressFor, invalidate } = useServerBackupsQ
 )
 
 const messages = defineMessages({
-	shareChanges: { id: 'servers.play.share-changes', defaultMessage: 'Share your changes' },
-	shareChangesBody: {
-		id: 'servers.play.share-changes-body',
-		defaultMessage: 'These changes will be available to players when they update their instance.',
-	},
-	added: { id: 'servers.play.diff-added', defaultMessage: 'Added' },
-	removed: { id: 'servers.play.diff-removed', defaultMessage: 'Removed' },
-	pushUpdate: {
-		id: 'app.instance.admonitions.shared-instance.publish-button',
-		defaultMessage: 'Push update',
-	},
 	backgroundTaskRunning: {
 		id: 'servers.admonitions.background-task-running',
 		defaultMessage: 'Background task running',
@@ -524,32 +510,17 @@ function onInstallationDismiss() {
 			</Admonition>
 		</template>
 	</StackedAdmonitions>
-	<ContentDiffModal
+	<ServerSharePushModal
 		ref="diffModal"
-		:header="formatMessage(messages.pushUpdate)"
-		:admonition-header="formatMessage(messages.shareChanges)"
-		:description="formatMessage(messages.shareChangesBody)"
+		:server-id="ctx.serverId"
+		:world-id="ctx.worldId.value ?? undefined"
 		:diffs="previewQuery.data.value?.items ?? []"
-		:confirm-label="formatMessage(messages.pushUpdate)"
-		:confirm-icon="UploadIcon"
-		:confirm-disabled="
-			!canSetup || sharePending || previewQuery.isError.value || !previewQuery.data.value
-		"
-		:added-label="formatMessage(messages.added)"
-		:removed-label="formatMessage(messages.removed)"
-		@confirm="runAction('push', true)"
+		:loading="previewQuery.isFetching.value"
+		:error="previewQuery.isError.value"
+		:disabled="!canSetup || sharePending || previewQuery.isError.value || !previewQuery.data.value"
+		@confirm="(paths) => runAction('push', true, paths)"
 		@cancel="previewOpen = false"
-	>
-		<template #additional-content>
-			<ServerConfigFilePicker
-				v-if="previewOpen && ctx.worldId.value"
-				:key="ctx.worldId.value"
-				ref="configPicker"
-				:server-id="ctx.serverId"
-				:world-id="ctx.worldId.value"
-				:disabled="sharePending"
-			/>
-		</template>
-	</ContentDiffModal>
+		@retry="previewQuery.refetch()"
+	/>
 	<CurseForgeFilesReviewModal ref="curseforgeReviewModal" @reviewed="onCurseForgeFilesReviewed" />
 </template>

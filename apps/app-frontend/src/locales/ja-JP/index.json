@@ -3107,18 +3107,6 @@
   "instance.shared-instance.owner-tooltip": {
     "message": "このインスタンスの内容は他のユーザーに共有されています。"
   },
-  "instance.shared-instance.publish-review.added-label": {
-    "message": "追加しました"
-  },
-  "instance.shared-instance.publish-review.header": {
-    "message": "変更内容を確認"
-  },
-  "instance.shared-instance.publish-review.publish-button": {
-    "message": "アップデートをプッシュ"
-  },
-  "instance.shared-instance.publish-review.removed-label": {
-    "message": "削除しました"
-  },
   "instance.shared-instance.tooltip": {
     "message": "このインスタンスの内容は他のユーザーによって管理されています。"
   },

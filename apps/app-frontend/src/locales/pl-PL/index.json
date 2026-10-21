@@ -3932,18 +3932,6 @@
   "instance.shared-instance.owner-tooltip": {
     "message": "Zawartość tej instancji jest udostępniana dla innych użytkowników."
   },
-  "instance.shared-instance.publish-review.added-label": {
-    "message": "Dodano"
-  },
-  "instance.shared-instance.publish-review.header": {
-    "message": "Sprawdź zmiany"
-  },
-  "instance.shared-instance.publish-review.publish-button": {
-    "message": "Opublikuj aktualizację"
-  },
-  "instance.shared-instance.publish-review.removed-label": {
-    "message": "Usunięto"
-  },
   "instance.shared-instance.tooltip": {
     "message": "Zawartość tej instancji jest zarządzana przez kogoś innego."
   },

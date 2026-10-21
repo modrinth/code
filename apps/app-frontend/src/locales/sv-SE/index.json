@@ -3431,18 +3431,6 @@
   "instance.shared-instance.owner-tooltip": {
     "message": "Den här instansens innehåll delas med andra användare."
   },
-  "instance.shared-instance.publish-review.added-label": {
-    "message": "Lade till"
-  },
-  "instance.shared-instance.publish-review.header": {
-    "message": "Granska ändringar"
-  },
-  "instance.shared-instance.publish-review.publish-button": {
-    "message": "Skicka uppdatering"
-  },
-  "instance.shared-instance.publish-review.removed-label": {
-    "message": "Tog bort"
-  },
   "instance.shared-instance.tooltip": {
     "message": "Den här instansens innehåll hanteras av någon annan."
   },

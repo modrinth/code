@@ -18,6 +18,19 @@ export function serverShareDiffQueryOptions(
 	}
 }
 
+export function serverShareableFilesQueryOptions(
+	client: AbstractModrinthClient,
+	serverId: string,
+	worldId: string,
+	userId: string | undefined,
+) {
+	return {
+		queryKey: ['servers', 'share-files', serverId, worldId, userId] as const,
+		queryFn: () => client.archon.content_v1.getShareableFiles(serverId, worldId),
+		retry: false,
+	}
+}
+
 export function sharedInstanceInvitesQueryOptions(
 	client: AbstractModrinthClient,
 	instanceId: string,

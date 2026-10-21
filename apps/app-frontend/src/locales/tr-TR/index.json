@@ -3296,18 +3296,6 @@
   "instance.shared-instance.owner-tooltip": {
     "message": "Bu kurulumun içeriği diğer kullanıcılarla paylaşılıyor."
   },
-  "instance.shared-instance.publish-review.added-label": {
-    "message": "Eklendi"
-  },
-  "instance.shared-instance.publish-review.header": {
-    "message": "Değişiklikleri incele"
-  },
-  "instance.shared-instance.publish-review.publish-button": {
-    "message": "Güncelleme gönder"
-  },
-  "instance.shared-instance.publish-review.removed-label": {
-    "message": "Kaldırıldı"
-  },
   "instance.shared-instance.tooltip": {
     "message": "Bu kurulumun içeriği başka biri tarafından yönetiliyor."
   },

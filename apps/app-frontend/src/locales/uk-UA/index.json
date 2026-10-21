@@ -3962,18 +3962,6 @@
   "instance.shared-instance.owner-tooltip": {
     "message": "Уміст цього примірника надається іншим користувачам."
   },
-  "instance.shared-instance.publish-review.added-label": {
-    "message": "Додано"
-  },
-  "instance.shared-instance.publish-review.header": {
-    "message": "Огляд змін"
-  },
-  "instance.shared-instance.publish-review.publish-button": {
-    "message": "Опублікувати оновлення"
-  },
-  "instance.shared-instance.publish-review.removed-label": {
-    "message": "Видалено"
-  },
   "instance.shared-instance.tooltip": {
     "message": "Уміст цього примірника керується іншим користувачем."
   },

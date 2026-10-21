@@ -2204,12 +2204,6 @@
   "instance.shared-instance.network-error.title": {
     "message": "Chyba sítě"
   },
-  "instance.shared-instance.publish-review.added-label": {
-    "message": "Přidáno"
-  },
-  "instance.shared-instance.publish-review.removed-label": {
-    "message": "Odstraněno"
-  },
   "instance.worlds.a_minecraft_server": {
     "message": "Minecraft server"
   },

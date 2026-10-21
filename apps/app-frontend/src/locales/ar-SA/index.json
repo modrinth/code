@@ -2573,18 +2573,6 @@
   "instance.shared-instance.owner-tooltip": {
     "message": "يتم مشاركة محتوى هذه النسخة مع مستخدمين آخرين."
   },
-  "instance.shared-instance.publish-review.added-label": {
-    "message": "مضاف"
-  },
-  "instance.shared-instance.publish-review.header": {
-    "message": "مراجعة التغييرات"
-  },
-  "instance.shared-instance.publish-review.publish-button": {
-    "message": "رفع تحديث"
-  },
-  "instance.shared-instance.publish-review.removed-label": {
-    "message": "تمت الإزالة"
-  },
   "instance.shared-instance.tooltip": {
     "message": "يتم إدارة محتوى هذه النسخة بواسطة شخص آخر."
   },

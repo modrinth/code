@@ -1709,9 +1709,6 @@
   "instance.settings.tabs.window.width.enter": {
     "message": "Inserir largura..."
   },
-  "instance.shared-instance.publish-review.added-label": {
-    "message": "Adicionado"
-  },
   "instance.worlds.a_minecraft_server": {
     "message": "Um Servidor de Minecraft"
   },

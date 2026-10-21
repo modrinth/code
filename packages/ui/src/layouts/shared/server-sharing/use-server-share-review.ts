@@ -8,10 +8,8 @@ import {
 } from '@tanstack/vue-query'
 import { computed, onScopeDispose, type Ref, ref, watch } from 'vue'
 
-import type ServerConfigFilePicker from '#ui/components/servers/ServerConfigFilePicker.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerPermissions } from '#ui/composables/server-permissions'
-import type ContentDiffModal from '#ui/layouts/shared/installation-settings/components/ContentDiffModal.vue'
 import {
 	injectAuth,
 	injectModrinthClient,
@@ -19,6 +17,7 @@ import {
 	injectNotificationManager,
 } from '#ui/providers'
 
+import type ServerSharePushModal from './components/ServerSharePushModal.vue'
 import { serverShareDiffQueryOptions } from './query-options'
 
 export type ServerShareActionTarget = {
@@ -39,8 +38,7 @@ export function useServerShareReview<Action extends string = 'push'>(options?: {
 	const { handleError } = injectNotificationManager()
 	const { formatMessage } = useVIntl()
 	const queryClient = useQueryClient()
-	const diffModal = ref<InstanceType<typeof ContentDiffModal>>()
-	const configPicker = ref<InstanceType<typeof ServerConfigFilePicker>>()
+	const diffModal = ref<InstanceType<typeof ServerSharePushModal>>()
 	const previewOpen = ref(false)
 	const sharedInstanceId = computed(
 		() =>
@@ -70,7 +68,6 @@ export function useServerShareReview<Action extends string = 'push'>(options?: {
 			reviewed: boolean
 			target: ServerShareActionTarget
 		}) => {
-			if (reviewed) target.configPaths = (await configPicker.value?.resolvePaths()) ?? []
 			if (
 				!target.isCurrent() ||
 				busyReasons.value.length ||
@@ -139,10 +136,7 @@ export function useServerShareReview<Action extends string = 'push'>(options?: {
 		return shared
 	}
 
-	/**
-	 * Runs `action` for the current world. Reviewed actions take their config files from the
-	 * picker in the diff review, so `configPaths` only applies when `reviewed` is false.
-	 */
+	/** Runs `action` for the current world, pushing `configPaths` alongside the world's content. */
 	async function runAction(action: Action, reviewed = false, configPaths: string[] = []) {
 		if (pending.value) return
 		const target = currentTarget()
@@ -157,7 +151,8 @@ export function useServerShareReview<Action extends string = 'push'>(options?: {
 			if (target.isCurrent()) previewOpen.value = false
 		} catch (error) {
 			handleError(error)
-			if (reviewed && previewOpen.value && target.isCurrent()) diffModal.value?.show()
+			if (reviewed && previewOpen.value && target.isCurrent())
+				diffModal.value?.show({ keepSelection: true })
 		}
 	}
 
@@ -168,7 +163,6 @@ export function useServerShareReview<Action extends string = 'push'>(options?: {
 
 	return {
 		diffModal,
-		configPicker,
 		previewOpen,
 		previewQuery,
 		shareActions,

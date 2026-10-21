@@ -327,6 +327,17 @@ export namespace Archon {
 				>
 			}
 
+			export type ShareableFile = {
+				path: string
+				size: number
+				blocked: boolean
+			}
+
+			export type ShareableFilesResponse = {
+				files: ShareableFile[]
+				truncated: boolean
+			}
+
 			export type AddonKind = 'mod' | 'plugin' | 'datapack' | 'shader' | 'resourcepack'
 
 			export type ContentOwnerType = 'user' | 'organization'

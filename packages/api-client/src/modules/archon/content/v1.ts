@@ -39,6 +39,21 @@ export class ArchonContentV1Module extends AbstractModule {
 		)
 	}
 
+	/** GET /v1/:server_id/worlds/:world_id/content/share/files */
+	public async getShareableFiles(
+		serverId: string,
+		worldId: string,
+	): Promise<Archon.Content.v1.ShareableFilesResponse> {
+		return this.client.request(
+			`/servers/${encodeURIComponent(serverId)}/worlds/${encodeURIComponent(worldId)}/content/share/files`,
+			{
+				api: 'archon',
+				version: 1,
+				method: 'GET',
+			},
+		)
+	}
+
 	public async unshare(serverId: string, worldId: string): Promise<void> {
 		return this.client.request(
 			`/servers/${encodeURIComponent(serverId)}/worlds/${encodeURIComponent(worldId)}/content/share`,

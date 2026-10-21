@@ -3908,18 +3908,6 @@
   "instance.shared-instance.owner-tooltip": {
     "message": "Le contenu de cette instance est partagé à d'autres utilisateurs."
   },
-  "instance.shared-instance.publish-review.added-label": {
-    "message": "Ajouté"
-  },
-  "instance.shared-instance.publish-review.header": {
-    "message": "Examiner les changements"
-  },
-  "instance.shared-instance.publish-review.publish-button": {
-    "message": "Déployer la mise à jour"
-  },
-  "instance.shared-instance.publish-review.removed-label": {
-    "message": "Supprimé"
-  },
   "instance.shared-instance.tooltip": {
     "message": "Le contenu de cette instance est gérée par quelqu'un d'autre."
   },

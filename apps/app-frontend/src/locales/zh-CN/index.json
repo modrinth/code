@@ -3971,18 +3971,6 @@
   "instance.shared-instance.owner-tooltip": {
     "message": "此实例的内容正在共享给其他用户。"
   },
-  "instance.shared-instance.publish-review.added-label": {
-    "message": "新增"
-  },
-  "instance.shared-instance.publish-review.header": {
-    "message": "审核更改内容"
-  },
-  "instance.shared-instance.publish-review.publish-button": {
-    "message": "推送更新"
-  },
-  "instance.shared-instance.publish-review.removed-label": {
-    "message": "已移除"
-  },
   "instance.shared-instance.tooltip": {
     "message": "此实例的内容正由他人管理。"
   },

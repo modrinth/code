@@ -4163,42 +4163,6 @@
   "instance.shared-instance.owner-tooltip": {
     "message": "This instance's content is being shared to other users."
   },
-  "instance.shared-instance.publish-review.added-label": {
-    "message": "Added"
-  },
-  "instance.shared-instance.publish-review.changes-description": {
-    "message": "Review the changes we've detected since your last update. These will automatically be included when you push."
-  },
-  "instance.shared-instance.publish-review.changes-tab": {
-    "message": "Changes"
-  },
-  "instance.shared-instance.publish-review.file-type-not-allowed": {
-    "message": "You're not allowed to push this file type."
-  },
-  "instance.shared-instance.publish-review.files-description": {
-    "message": "You can also include individual files alongside the detected changes. Select any additional files you'd like to publish."
-  },
-  "instance.shared-instance.publish-review.files-tab": {
-    "message": "Files"
-  },
-  "instance.shared-instance.publish-review.header": {
-    "message": "Push update"
-  },
-  "instance.shared-instance.publish-review.publish-button": {
-    "message": "Push update"
-  },
-  "instance.shared-instance.publish-review.removed-label": {
-    "message": "Removed"
-  },
-  "instance.shared-instance.publish-review.storage-over-limit": {
-    "message": "{size} over the limit. Deselect some files to push this update."
-  },
-  "instance.shared-instance.publish-review.storage-title": {
-    "message": "Storage allowance"
-  },
-  "instance.shared-instance.publish-review.storage-usage": {
-    "message": "{used} of {limit}"
-  },
   "instance.shared-instance.tooltip": {
     "message": "This instance's content is being managed by someone else."
   },

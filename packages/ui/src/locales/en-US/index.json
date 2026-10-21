@@ -2813,8 +2813,50 @@
   "instance.settings.sharing.revoke-invite.header": {
     "defaultMessage": "Revoke invite"
   },
-  "instance.shared-instance.publish-review.config-title-v2": {
-    "defaultMessage": "Select config files"
+  "instance.shared-instance.publish-review.added-label": {
+    "defaultMessage": "Added"
+  },
+  "instance.shared-instance.publish-review.changes-description": {
+    "defaultMessage": "Review the changes we've detected since your last update. These will automatically be included when you push."
+  },
+  "instance.shared-instance.publish-review.changes-tab": {
+    "defaultMessage": "Changes"
+  },
+  "instance.shared-instance.publish-review.file-type-not-allowed": {
+    "defaultMessage": "You're not allowed to push this file type."
+  },
+  "instance.shared-instance.publish-review.files-description": {
+    "defaultMessage": "You can also include individual files alongside the detected changes. Select any additional files you'd like to publish."
+  },
+  "instance.shared-instance.publish-review.files-error": {
+    "defaultMessage": "Could not load the files you can share."
+  },
+  "instance.shared-instance.publish-review.files-tab": {
+    "defaultMessage": "Files"
+  },
+  "instance.shared-instance.publish-review.files-truncated": {
+    "defaultMessage": "Only the first {count, number} files are shown."
+  },
+  "instance.shared-instance.publish-review.header": {
+    "defaultMessage": "Push update"
+  },
+  "instance.shared-instance.publish-review.loading-files": {
+    "defaultMessage": "Loading files…"
+  },
+  "instance.shared-instance.publish-review.publish-button": {
+    "defaultMessage": "Push update"
+  },
+  "instance.shared-instance.publish-review.removed-label": {
+    "defaultMessage": "Removed"
+  },
+  "instance.shared-instance.publish-review.storage-over-limit": {
+    "defaultMessage": "{size} over the limit. Deselect some files to push this update."
+  },
+  "instance.shared-instance.publish-review.storage-title": {
+    "defaultMessage": "Storage allowance"
+  },
+  "instance.shared-instance.publish-review.storage-usage": {
+    "defaultMessage": "{used} of {limit}"
   },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "Adventure mode"
@@ -6470,21 +6512,6 @@
   "servers.play.card.launcher.title": {
     "defaultMessage": "Using a different launcher?"
   },
-  "servers.play.config-files.context-changed": {
-    "defaultMessage": "The world or account changed. Open Push update again."
-  },
-  "servers.play.config-files.error": {
-    "defaultMessage": "Could not load config files"
-  },
-  "servers.play.config-files.selection-too-large": {
-    "defaultMessage": "Select up to 4,096 config files, with a maximum of 16 MiB per file and 128 MiB in total."
-  },
-  "servers.play.diff-added": {
-    "defaultMessage": "Added"
-  },
-  "servers.play.diff-removed": {
-    "defaultMessage": "Removed"
-  },
   "servers.play.invite-header": {
     "defaultMessage": "Invite players to {name}"
   },
@@ -6557,9 +6584,6 @@
   "servers.play.push-and-play": {
     "defaultMessage": "Push update and play"
   },
-  "servers.play.push-update": {
-    "defaultMessage": "Push update"
-  },
   "servers.play.refreshing-preview": {
     "defaultMessage": "Refreshing changes…"
   },
@@ -6571,12 +6595,6 @@
   },
   "servers.play.retry": {
     "defaultMessage": "Retry"
-  },
-  "servers.play.share-changes": {
-    "defaultMessage": "Share your changes"
-  },
-  "servers.play.share-changes-body": {
-    "defaultMessage": "These changes will be available to players when they update their instance."
   },
   "servers.play.share-changes-play-body": {
     "defaultMessage": "Starting the server will push these changes to all invited players. They will be asked to update their instance the next time they play."

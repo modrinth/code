@@ -3923,18 +3923,6 @@
   "instance.shared-instance.owner-tooltip": {
     "message": "이 인스턴스의 콘텐츠가 다른 사용자에게 공유되는 중입니다."
   },
-  "instance.shared-instance.publish-review.added-label": {
-    "message": "추가됨"
-  },
-  "instance.shared-instance.publish-review.header": {
-    "message": "변경 사항 검토"
-  },
-  "instance.shared-instance.publish-review.publish-button": {
-    "message": "업데이트 업로드"
-  },
-  "instance.shared-instance.publish-review.removed-label": {
-    "message": "삭제됨"
-  },
   "instance.shared-instance.tooltip": {
     "message": "이 인스턴스의 콘텐츠는 다른 사용자가 관리하고 있습니다."
   },

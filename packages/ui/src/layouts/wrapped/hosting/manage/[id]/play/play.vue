@@ -62,49 +62,24 @@
 			@invite="invitePlayer"
 			@cancel="(user) => changeMember(user.id, true)"
 		/>
-		<ContentDiffModal
+		<ServerSharePushModal
 			ref="diffModal"
-			:header="formatMessage(messages.pushUpdate)"
-			:admonition-header="formatMessage(messages.shareChanges)"
-			:description="
-				formatMessage(
-					previewAction === 'play' ? messages.shareChangesPlayBody : messages.shareChangesBody,
-				)
-			"
+			:server-id="serverId"
+			:world-id="worldId ?? undefined"
 			:diffs="previewQuery.data.value?.items ?? []"
-			:confirm-label="
-				formatMessage(previewAction === 'play' ? messages.pushAndPlay : messages.pushUpdate)
+			:changes-description="
+				previewAction === 'play' ? formatMessage(messages.shareChangesPlayBody) : undefined
 			"
-			:confirm-icon="UploadIcon"
-			:confirm-disabled="
+			:confirm-label="previewAction === 'play' ? formatMessage(messages.pushAndPlay) : undefined"
+			:loading="previewQuery.isFetching.value"
+			:error="previewQuery.isError.value"
+			:disabled="
 				!canSetup || actionsLocked || previewQuery.isError.value || !previewQuery.data.value
 			"
-			:added-label="formatMessage(messages.added)"
-			:removed-label="formatMessage(messages.removed)"
-			@confirm="perform(previewAction, true)"
+			@confirm="(paths) => perform(previewAction, true, paths)"
 			@cancel="previewOpen = false"
-		>
-			<template #additional-content>
-				<ServerConfigFilePicker
-					v-if="previewOpen && worldId"
-					:key="worldId"
-					ref="configPicker"
-					:server-id="serverId"
-					:world-id="worldId"
-					:disabled="actionsLocked"
-				/>
-				<p v-if="previewQuery.isFetching.value" class="m-0 flex items-center gap-2">
-					<SpinnerIcon class="animate-spin" />{{ formatMessage(messages.refreshingPreview) }}
-				</p>
-				<Admonition
-					v-else-if="previewQuery.isError.value"
-					type="critical"
-					:header="formatMessage(messages.previewError)"
-				>
-					<Button @click="previewQuery.refetch()">{{ formatMessage(messages.retry) }}</Button>
-				</Admonition>
-			</template>
-		</ContentDiffModal>
+			@retry="previewQuery.refetch()"
+		/>
 		<ConfirmModal
 			ref="removeModal"
 			:title="formatMessage(messages.removePlayer)"
@@ -118,14 +93,12 @@
 </template>
 
 <script setup lang="ts">
-import { SpinnerIcon, UploadIcon } from '@modrinth/assets'
 import { useIntersectionObserver } from '@vueuse/core'
 import { computed, nextTick, onScopeDispose, ref, watch } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import { Button } from '#ui/components/base/buttons'
 import ConfirmModal from '#ui/components/modal/ConfirmModal.vue'
-import ServerConfigFilePicker from '#ui/components/servers/ServerConfigFilePicker.vue'
 import {
 	type InviteLinkSettings,
 	type InvitePlayersInvitePayload,
@@ -134,8 +107,8 @@ import {
 } from '#ui/components/sharing'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerPermissions } from '#ui/composables/server-permissions'
-import ContentDiffModal from '#ui/layouts/shared/installation-settings/components/ContentDiffModal.vue'
 import InvitedPlayersTableLayout from '#ui/layouts/shared/invited-players/layout.vue'
+import ServerSharePushModal from '#ui/layouts/shared/server-sharing/components/ServerSharePushModal.vue'
 import {
 	type ServerShareActionTarget,
 	useServerShareReview,
@@ -199,7 +172,6 @@ const shareReview = useServerShareReview<Action>({
 })
 const {
 	diffModal,
-	configPicker,
 	previewOpen,
 	previewQuery,
 	actionMutation,
@@ -310,13 +282,13 @@ async function ensureServerRunning(sameContext: () => boolean) {
 		await new Promise((resolve) => setTimeout(resolve, 500))
 	}
 }
-async function perform(action: Action, reviewed = false) {
+async function perform(action: Action, reviewed = false, configPaths: string[] = []) {
 	if (!worldId.value || actionsLocked.value) return
 	if (action === 'play' && !reviewed && canSetup.value && needsUpdate.value) {
 		void showPreview(true)
 		return
 	}
-	await runAction(action, reviewed)
+	await runAction(action, reviewed, configPaths)
 }
 async function showPreview(playAfter = false) {
 	if (actionsLocked.value) return
@@ -383,27 +355,13 @@ const messages = defineMessages({
 			'The server is taking too long to start. Check the console before trying again.',
 	},
 	invitedPlayersTitle: { id: 'servers.play.players.title', defaultMessage: 'Invited players' },
-	pushUpdate: { id: 'servers.play.push-update', defaultMessage: 'Push update' },
 	pushAndPlay: { id: 'servers.play.push-and-play', defaultMessage: 'Push update and play' },
-	shareChanges: { id: 'servers.play.share-changes', defaultMessage: 'Share your changes' },
-	shareChangesBody: {
-		id: 'servers.play.share-changes-body',
-		defaultMessage: 'These changes will be available to players when they update their instance.',
-	},
 	shareChangesPlayBody: {
 		id: 'servers.play.share-changes-play-body',
 		defaultMessage:
 			'Starting the server will push these changes to all invited players. They will be asked to update their instance the next time they play.',
 	},
 	inviteHeader: { id: 'servers.play.invite-header', defaultMessage: 'Invite players to {name}' },
-	refreshingPreview: {
-		id: 'servers.play.refreshing-preview',
-		defaultMessage: 'Refreshing changes…',
-	},
-	previewError: {
-		id: 'servers.play.preview-error',
-		defaultMessage: 'Could not refresh the changes. Retry before publishing.',
-	},
 	playersError: {
 		id: 'servers.play.players-error',
 		defaultMessage: 'Could not load invited players',
@@ -420,8 +378,6 @@ const messages = defineMessages({
 		defaultMessage:
 			'Remove {username} from this shared instance? This does not ban them from the Minecraft server.',
 	},
-	added: { id: 'servers.play.diff-added', defaultMessage: 'Added' },
-	removed: { id: 'servers.play.diff-removed', defaultMessage: 'Removed' },
 	busy: {
 		id: 'servers.play.busy',
 		defaultMessage: 'Wait for the current server operation to finish.',

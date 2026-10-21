@@ -3944,18 +3944,6 @@
   "instance.shared-instance.owner-tooltip": {
     "message": "Nội dung của bản cài đặt này đang được chia sẻ với người dùng khác."
   },
-  "instance.shared-instance.publish-review.added-label": {
-    "message": "Đã thêm"
-  },
-  "instance.shared-instance.publish-review.header": {
-    "message": "Xem lại thay đổi"
-  },
-  "instance.shared-instance.publish-review.publish-button": {
-    "message": "Gửi bản cập nhật"
-  },
-  "instance.shared-instance.publish-review.removed-label": {
-    "message": "Đã gỡ"
-  },
   "instance.shared-instance.tooltip": {
     "message": "Nội dung của bản cài đặt này đang được người khác quản lý."
   },

@@ -3947,18 +3947,6 @@
   "instance.shared-instance.owner-tooltip": {
     "message": "Контент сборки доступен другим пользователям."
   },
-  "instance.shared-instance.publish-review.added-label": {
-    "message": "Добавлен"
-  },
-  "instance.shared-instance.publish-review.header": {
-    "message": "Обзор изменений"
-  },
-  "instance.shared-instance.publish-review.publish-button": {
-    "message": "Отправить изменения"
-  },
-  "instance.shared-instance.publish-review.removed-label": {
-    "message": "Удалён"
-  },
   "instance.shared-instance.tooltip": {
     "message": "Контент сборки управляется другим пользователем."
   },

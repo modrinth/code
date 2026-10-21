@@ -3557,18 +3557,6 @@
   "instance.shared-instance.owner-tooltip": {
     "message": "De inhoud van deze instantie wordt gedeeld met andere gebruikers."
   },
-  "instance.shared-instance.publish-review.added-label": {
-    "message": "Toegevoegd"
-  },
-  "instance.shared-instance.publish-review.header": {
-    "message": "Wijzigingen bekijken"
-  },
-  "instance.shared-instance.publish-review.publish-button": {
-    "message": "Update verzenden"
-  },
-  "instance.shared-instance.publish-review.removed-label": {
-    "message": "Verwijderd"
-  },
   "instance.shared-instance.tooltip": {
     "message": "De inhoud van deze instantie wordt door iemand anders beheerd."
   },

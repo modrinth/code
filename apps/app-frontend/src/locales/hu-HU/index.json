@@ -3950,18 +3950,6 @@
   "instance.shared-instance.owner-tooltip": {
     "message": "Ennek a példánynak a tartalma meg van osztva más felhasználókkal."
   },
-  "instance.shared-instance.publish-review.added-label": {
-    "message": "Hozzáadva:"
-  },
-  "instance.shared-instance.publish-review.header": {
-    "message": "Változtatások áttekintése"
-  },
-  "instance.shared-instance.publish-review.publish-button": {
-    "message": "Frissítés közzététele"
-  },
-  "instance.shared-instance.publish-review.removed-label": {
-    "message": "Eltávolítva:"
-  },
   "instance.shared-instance.tooltip": {
     "message": "Ennek a példánynak a tartalmát más kezeli."
   },

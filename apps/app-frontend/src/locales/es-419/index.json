@@ -3971,18 +3971,6 @@
   "instance.shared-instance.owner-tooltip": {
     "message": "El contenido de la instancia se está compartiendo a otros usuarios."
   },
-  "instance.shared-instance.publish-review.added-label": {
-    "message": "Se añadió"
-  },
-  "instance.shared-instance.publish-review.header": {
-    "message": "Revisar cambios"
-  },
-  "instance.shared-instance.publish-review.publish-button": {
-    "message": "Enviar actualización"
-  },
-  "instance.shared-instance.publish-review.removed-label": {
-    "message": "Se eliminó"
-  },
   "instance.shared-instance.tooltip": {
     "message": "El contenido de esta instancia está siendo administrado por alguien más."
   },
