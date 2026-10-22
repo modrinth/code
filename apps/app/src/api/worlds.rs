@@ -1,6 +1,7 @@
 use crate::api::Result;
 use either::Either;
 use enumset::EnumSet;
+use std::path::Path;
 use tauri::{AppHandle, Manager, Runtime};
 use theseus::instance::{self, QuickPlayType, get_full_path};
 use theseus::prelude::ProcessMetadata;
@@ -21,6 +22,7 @@ pub fn init<R: Runtime>() -> tauri::plugin::TauriPlugin<R> {
             rename_world,
             reset_world_icon,
             backup_world,
+            import_world,
             delete_world,
             add_server_to_instance,
             ensure_managed_server_in_instance,
@@ -138,6 +140,12 @@ pub async fn reset_world_icon(instance: &str, world: &str) -> Result<()> {
 pub async fn backup_world(instance: &str, world: &str) -> Result<u64> {
     let instance = get_full_path(instance).await?;
     Ok(worlds::backup_world(&instance, world).await?)
+}
+
+#[tauri::command]
+pub async fn import_world(instance: &str, source: &str) -> Result<String> {
+    let instance = get_full_path(instance).await?;
+    Ok(worlds::import_world(&instance, Path::new(source)).await?)
 }
 
 #[tauri::command]

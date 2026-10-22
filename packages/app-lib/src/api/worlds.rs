@@ -22,6 +22,7 @@ use either::Either;
 use enumset::{EnumSet, EnumSetType};
 use fs4::tokio::AsyncFileExt;
 use futures::StreamExt;
+use path_util::SafeRelativeUtf8UnixPathBuf;
 use quartz_nbt::{NbtCompound, NbtTag};
 use regex::{Regex, RegexBuilder};
 use serde::{Deserialize, Serialize};
@@ -33,7 +34,9 @@ use std::sync::LazyLock;
 use std::time::Instant;
 use tokio::io::AsyncWriteExt;
 use tokio::task::JoinSet;
-use tokio_util::compat::FuturesAsyncWriteCompatExt;
+use tokio_util::compat::{
+    FuturesAsyncWriteCompatExt, TokioAsyncWriteCompatExt,
+};
 use tracing::Instrument;
 use url::Url;
 
@@ -641,6 +644,162 @@ pub async fn backup_world(instance: &Path, world: &str) -> Result<u64> {
 
     writer.close().await?;
     Ok(io::metadata(output_path).await?.len())
+}
+
+/// Imports a singleplayer world into the instance's `saves` directory from
+/// a world folder, its `level.dat`, or a zip archive containing one. Returns
+/// the name of the created world folder.
+pub async fn import_world(instance: &Path, source: &Path) -> Result<String> {
+    let saves_dir = instance.join("saves");
+    io::create_dir_all(&saves_dir).await?;
+
+    let source = match source.parent() {
+        Some(parent) if source.file_name() == Some("level.dat".as_ref()) => {
+            parent
+        }
+        _ => source,
+    };
+
+    if io::metadata(source).await?.is_dir() {
+        if !source.join("level.dat").exists() {
+            return Err(ErrorKind::InputError(format!(
+                "{} is not a Minecraft world folder",
+                source.display()
+            ))
+            .into());
+        }
+        let world = find_available_name(
+            &saves_dir,
+            &source.file_name().unwrap_or_default().to_string_lossy(),
+            "",
+        );
+        let target = saves_dir.join(&world);
+        cleanup_failed_import(&target, copy_world_dir(source, &target).await)
+            .await?;
+        Ok(world)
+    } else {
+        let zip =
+            async_zip::tokio::read::fs::ZipFileReader::new(source).await?;
+        let root = find_zip_world_root(&zip).ok_or_else(|| {
+            ErrorKind::InputError(format!(
+                "No Minecraft world found in {}",
+                source.display()
+            ))
+        })?;
+        let name = match root.trim_end_matches('/').rsplit('/').next() {
+            Some(name) if !name.is_empty() => name.to_string(),
+            _ => source
+                .file_stem()
+                .unwrap_or_default()
+                .to_string_lossy()
+                .into_owned(),
+        };
+        let world = find_available_name(&saves_dir, &name, "");
+        let target = saves_dir.join(&world);
+        cleanup_failed_import(
+            &target,
+            extract_world_zip(&zip, &root, &target).await,
+        )
+        .await?;
+        Ok(world)
+    }
+}
+
+async fn cleanup_failed_import(
+    target: &Path,
+    result: Result<()>,
+) -> Result<()> {
+    if result.is_err() && target.exists() {
+        let _ = io::remove_dir_all(target).await;
+    }
+    result
+}
+
+async fn copy_world_dir(source: &Path, target: &Path) -> Result<()> {
+    io::create_dir_all(target).await?;
+    let mut walker = WalkDir::new(source);
+    while let Some(entry) = walker.next().await {
+        let entry = entry.map_err(|e| io::IOError::IOPathError {
+            path: e.path().unwrap().to_string_lossy().to_string(),
+            source: e.into_io().unwrap(),
+        })?;
+        if !entry.file_type().await?.is_file()
+            || entry.file_name() == "session.lock"
+        {
+            continue;
+        }
+        let path = entry.path();
+        let destination = target.join(path.strip_prefix(source)?);
+        if let Some(parent) = destination.parent() {
+            io::create_dir_all(parent).await?;
+        }
+        io::copy(&path, &destination).await?;
+    }
+    Ok(())
+}
+
+/// Finds the directory prefix (e.g. `My World/`, or empty for the archive
+/// root) of the shallowest `level.dat` in the archive.
+fn find_zip_world_root(
+    zip: &async_zip::tokio::read::fs::ZipFileReader,
+) -> Option<String> {
+    zip.file()
+        .entries()
+        .iter()
+        .filter_map(|entry| {
+            let name = entry.filename().as_str().ok()?.replace('\\', "/");
+            if name.starts_with("__MACOSX/") {
+                return None;
+            }
+            let root = name.strip_suffix("level.dat")?;
+            (root.is_empty() || root.ends_with('/')).then(|| root.to_string())
+        })
+        .min_by_key(|root| root.matches('/').count())
+}
+
+async fn extract_world_zip(
+    zip: &async_zip::tokio::read::fs::ZipFileReader,
+    root: &str,
+    target: &Path,
+) -> Result<()> {
+    io::create_dir_all(target).await?;
+    for (index, entry) in zip.file().entries().iter().enumerate() {
+        let Ok(name) = entry.filename().as_str() else {
+            continue;
+        };
+        let name = name.replace('\\', "/");
+        let Some(relative) = name.strip_prefix(root) else {
+            continue;
+        };
+        if relative.is_empty()
+            || entry.dir()?
+            || relative.rsplit('/').next() == Some("session.lock")
+        {
+            continue;
+        }
+        let relative =
+            SafeRelativeUtf8UnixPathBuf::try_from(relative.to_string())
+                .map_err(|_| {
+                    ErrorKind::InputError(format!(
+                        "World archive contains an unsafe path: {name}"
+                    ))
+                })?;
+
+        let destination = target.join(relative.as_str());
+        if let Some(parent) = destination.parent() {
+            io::create_dir_all(parent).await?;
+        }
+        let mut reader = zip.reader_with_entry(index).await?;
+        let mut file = tokio::fs::File::create(&destination)
+            .await
+            .map_err(|e| io::IOError::with_path(e, &destination))?
+            .compat_write();
+        futures::io::copy(&mut reader, &mut file).await?;
+        if reader.compute_hash() != reader.entry().crc32() {
+            return Err(async_zip::error::ZipError::CRC32CheckError.into());
+        }
+    }
+    Ok(())
 }
 
 fn find_available_name(dir: &Path, file_name: &str, extension: &str) -> String {
