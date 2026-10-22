@@ -4,10 +4,15 @@ use crate::util::error::Context as _;
 use actix_web::HttpRequest;
 use serde::Deserialize;
 use std::collections::HashMap;
+use xredis::RedisPool;
+
+const USED_TURNSTILE_NAMESPACE: &str = "used_turnstile:v1";
+const TURNSTILE_TOKEN_LIFETIME_SECS: i64 = 300;
 
 pub async fn check_turnstile(
     req: &HttpRequest,
     challenge: &str,
+    redis: &RedisPool,
 ) -> Result<bool, ApiError> {
     let secret = &ENV.TURNSTILE_SECRET;
 
@@ -53,5 +58,36 @@ pub async fn check_turnstile(
         .map_err(|err| eyre::eyre!(err))
         .wrap_request_err("captcha validation failed")?;
 
-    Ok(val.success)
+    if !val.success {
+        return Ok(false);
+    }
+
+    mark_token_used(challenge, redis).await
+}
+
+/// Siteverify has been observed accepting replayed tokens, so single use is
+/// enforced here as well. Returns `false` if the token was already consumed.
+async fn mark_token_used(
+    challenge: &str,
+    redis: &RedisPool,
+) -> Result<bool, ApiError> {
+    let mut conn = redis
+        .connect()
+        .await
+        .wrap_internal_err("connecting to Redis")?;
+    let key =
+        conn.key()
+            .with_slot(USED_TURNSTILE_NAMESPACE, challenge, challenge);
+
+    let newly_set: Option<String> = redis::cmd("SET")
+        .arg(&key)
+        .arg("")
+        .arg("NX")
+        .arg("EX")
+        .arg(TURNSTILE_TOKEN_LIFETIME_SECS)
+        .query_async(&mut conn)
+        .await
+        .wrap_internal_err("marking captcha token as used")?;
+
+    Ok(newly_set.is_some())
 }

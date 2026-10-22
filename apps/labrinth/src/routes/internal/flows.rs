@@ -1644,7 +1644,7 @@ pub async fn create_oauth_account(
     validate_account_consent(new_account.account_consent)
         .wrap_api_err("validating account consent")?;
 
-    if !check_turnstile(&req, &new_account.challenge)
+    if !check_turnstile(&req, &new_account.challenge, &redis)
         .await
         .wrap_api_err("checking captcha response")?
     {
@@ -2278,9 +2278,13 @@ pub async fn create_account_with_password(
     validate_account_consent(new_account.account_consent)
         .wrap_api_err("validating account consent")?;
 
-    if !check_turnstile(&req, new_account.challenge.as_deref().unwrap_or(""))
-        .await
-        .wrap_api_err("checking captcha response")?
+    if !check_turnstile(
+        &req,
+        new_account.challenge.as_deref().unwrap_or(""),
+        &redis,
+    )
+    .await
+    .wrap_api_err("checking captcha response")?
     {
         return Err(ApiError::Request(eyre::eyre!(
             "captcha validation failed"
@@ -2340,7 +2344,7 @@ pub async fn login_password(
     redis: Data<RedisPool>,
     login: web::Json<Login>,
 ) -> Result<HttpResponse, ApiError> {
-    if !check_turnstile(&req, &login.challenge)
+    if !check_turnstile(&req, &login.challenge, &redis)
         .await
         .wrap_api_err("checking captcha response")?
     {
@@ -2903,7 +2907,7 @@ pub async fn reset_password_begin(
     reset_password: web::Json<ResetPassword>,
     email: web::Data<EmailQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    if !check_turnstile(&req, &reset_password.challenge)
+    if !check_turnstile(&req, &reset_password.challenge, &redis)
         .await
         .wrap_api_err("checking captcha response")?
     {
