@@ -248,7 +248,7 @@ async fn retry_job_inner(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
     let mut job = store::get_required(job_id, &state.pool).await?;
     tracing::info!(
         %job_id,
-        kind = ?job.state.request.kind(),
+        kind = ?job.kind,
         instance_id = ?current_instance_id(&job.state),
         "Retrying install"
     );
@@ -262,6 +262,7 @@ async fn retry_job_inner(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
                 .to_string(),
         ));
     }
+    let request = store::get_required_request(job_id, &state.pool).await?;
 
     if let Some(instance_id) = current_instance_id(&job.state) {
         store::ensure_no_pending_recovery(
@@ -285,9 +286,9 @@ async fn retry_job_inner(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
     }
 
     drop(cleanup_target_guard);
-    let mut target_guard = reserve_target(&job.state.request.target())?;
-    job.state.target = job.state.request.target();
-    job.state.cleanup = job.state.request.cleanup();
+    let mut target_guard = reserve_target(&request.target())?;
+    job.state.target = request.target();
+    job.state.cleanup = request.cleanup();
     job.state.rollback = None;
     job.state.paths.staging_dir = None;
     job.state.error = None;
@@ -297,7 +298,7 @@ async fn retry_job_inner(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
     job.state.progress.progress = None;
     job.state.progress.details = InstallPhaseDetails::Empty;
     job.state.record_event(InstallJobEventKind::JobQueued {
-        kind: job.state.request.kind(),
+        kind: request.kind(),
     });
 
     let record = match store::update_status(
@@ -324,7 +325,7 @@ async fn retry_job_inner(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
 
     if let Err(error) =
         diagnostics::install_step(job_id, "prepare_instance", || {
-            prepare_initial_instance(job_id, &mut job.state, &state)
+            prepare_initial_instance(job_id, &request, &mut job.state, &state)
         })
         .await
     {
@@ -511,22 +512,27 @@ async fn start_inner(
             .await?;
     }
     let id = Uuid::new_v4();
-    let mut job_state = InstallJobState::new(request);
+    let mut job_state = InstallJobState::new(&request);
     tracing::info!(
         job_id = %id,
-        kind = ?job_state.request.kind(),
+        kind = ?request.kind(),
         instance_id = ?current_instance_id(&job_state),
         "Queuing install"
     );
-    set_initial_display(&mut job_state);
-    let record =
-        store::insert(id, &job_state, InstallJobStatus::Queued, &state.pool)
-            .await?;
+    set_initial_display(&request, &mut job_state);
+    let record = store::insert(
+        id,
+        &request,
+        &job_state,
+        InstallJobStatus::Queued,
+        &state.pool,
+    )
+    .await?;
     emit_install_job(&record.snapshot()).await?;
 
     if let Err(error) =
         diagnostics::install_step(id, "prepare_instance", || {
-            prepare_initial_instance(id, &mut job_state, &state)
+            prepare_initial_instance(id, &request, &mut job_state, &state)
         })
         .await
     {
@@ -588,10 +594,11 @@ async fn start_inner(
 
 async fn prepare_initial_instance(
     job_id: Uuid,
+    request: &InstallRequest,
     job_state: &mut InstallJobState,
     state: &State,
 ) -> crate::Result<()> {
-    match job_state.request.clone() {
+    match request.clone() {
         InstallRequest::CreateInstance {
             name,
             game_version,
@@ -825,6 +832,7 @@ async fn prepare_initial_instance(
                 || async move {
                     prepare_existing_rollback(
                         job_id,
+                        request,
                         job_state,
                         &state.pool,
                         &instance_id,
@@ -900,6 +908,7 @@ async fn run_job_inner(
         return Ok(());
     }
 
+    let request = store::get_required_request(job_id, &state.pool).await?;
     let mut job_state = job.state.clone();
     job_state.record_event(InstallJobEventKind::JobStarted);
     let Some(record) = store::update_status_if(
@@ -921,7 +930,7 @@ async fn run_job_inner(
                 .scope(
                     control.clone(),
                     diagnostics::install_step(job_id, "run_request", || {
-                        run_request(job_id, &mut job_state, state)
+                        run_request(job_id, &request, &mut job_state, state)
                     }),
                 )
                 .await
@@ -979,10 +988,7 @@ async fn run_job_inner(
                         "Failed to reconcile synced options after installing {instance_id}: {error}"
                     );
                 }
-                if matches!(
-                    job_state.request,
-                    InstallRequest::BulkUpdateContent { .. }
-                ) {
+                if matches!(request, InstallRequest::BulkUpdateContent { .. }) {
                     Box::pin(crate::api::instance::synced_packs::reconcile_after_content_change(
 						&instance_id,
 					)).await;
@@ -1134,10 +1140,11 @@ async fn terminalize_failed_job_inner(
 
 async fn run_request(
     job_id: Uuid,
+    request: &InstallRequest,
     job_state: &mut InstallJobState,
     state: &State,
 ) -> crate::Result<Option<String>> {
-    match job_state.request.clone() {
+    match request.clone() {
         InstallRequest::CreateInstance {
             name,
             game_version,
@@ -1230,6 +1237,7 @@ async fn run_request(
                         instance_id.clone(),
                         DownloadReason::Modpack,
                         &state.pool,
+                        false,
                         false,
                     )
                     .await?;
@@ -1392,6 +1400,7 @@ async fn run_request(
                 || async move {
                     prepare_existing_rollback(
                         job_id,
+                        request,
                         job_state,
                         &state.pool,
                         &instance_id,
@@ -1440,13 +1449,15 @@ async fn run_request(
                 || async move {
                     prepare_existing_rollback(
                         job_id,
+                        request,
                         job_state,
                         &state.pool,
                         &instance_id,
                     )
                     .await?;
                     lock_instance(&instance_id, state).await?;
-                    prepare_update_backup(job_id, job_state, state).await?;
+                    prepare_update_backup(job_id, request, job_state, state)
+                        .await?;
                     crate::api::instance::prepare_instance_update(&instance_id)
                         .await?;
                     let disabled_project_ids = remove_existing_pack_content(
@@ -1463,6 +1474,7 @@ async fn run_request(
                         instance_id.clone(),
                         DownloadReason::Modpack,
                         &state.pool,
+                        false,
                         false,
                     )
                     .await?;
@@ -1508,7 +1520,8 @@ async fn run_request(
                         ),
                     )
                     .await?;
-                    prepare_update_backup(job_id, job_state, state).await?;
+                    prepare_update_backup(job_id, request, job_state, state)
+                        .await?;
                     crate::state::instances::commands::apply_bulk_update(
                         &instance_id,
                         plan,
@@ -1532,13 +1545,15 @@ async fn run_request(
                 || async move {
                     prepare_existing_rollback(
                         job_id,
+                        request,
                         job_state,
                         &state.pool,
                         &instance_id,
                     )
                     .await?;
                     lock_instance(&instance_id, state).await?;
-                    prepare_update_backup(job_id, job_state, state).await?;
+                    prepare_update_backup(job_id, request, job_state, state)
+                        .await?;
                     let disabled_project_ids =
                         disabled_project_ids(&instance_id, state).await?;
                     apply_shared_instance_update(
@@ -1770,6 +1785,7 @@ pub(super) fn install_pack(
     reason: DownloadReason,
     pool: &SqlitePool,
     ignore_modpack_servers: bool,
+    preserve_icon: bool,
 ) -> impl Future<Output = crate::Result<()>> + Send {
     diagnostics::install_step(job_id, "install_pack", move || {
         install_pack_inner(
@@ -1780,6 +1796,7 @@ pub(super) fn install_pack(
             reason,
             pool,
             ignore_modpack_servers,
+            preserve_icon,
         )
     })
 }
@@ -1792,13 +1809,8 @@ async fn install_pack_inner(
     reason: DownloadReason,
     pool: &SqlitePool,
     ignore_modpack_servers: bool,
+    preserve_icon: bool,
 ) -> crate::Result<()> {
-    let preserve_icon = matches!(
-        &job_state.request,
-        InstallRequest::CreateSharedInstance { data }
-            | InstallRequest::UpdateSharedInstance { data, .. }
-            if data.linked_server.is_some()
-    );
     let reporter =
         InstallProgressReporter::new(job_id, job_state.clone(), pool.clone());
     reporter
@@ -1864,6 +1876,7 @@ async fn install_pack_inner(
 
 async fn prepare_existing_rollback(
     job_id: Uuid,
+    request: &InstallRequest,
     job_state: &mut InstallJobState,
     pool: &SqlitePool,
     instance_id: &str,
@@ -1886,7 +1899,7 @@ async fn prepare_existing_rollback(
             "content in quarantined instances cannot be changed".to_string(),
         ));
     }
-    if matches!(job_state.request, InstallRequest::BulkUpdateContent { .. })
+    if matches!(request, InstallRequest::BulkUpdateContent { .. })
         && instance.instance.install_stage != InstanceInstallStage::Installed
     {
         bail!(ErrorKind::InputError(
@@ -1912,11 +1925,13 @@ async fn prepare_existing_rollback(
 
 async fn prepare_update_backup(
     job_id: Uuid,
+    request: &InstallRequest,
     job_state: &mut InstallJobState,
     state: &State,
 ) -> crate::Result<()> {
     super::control::checkpoint(job_id).await?;
-    let scoped_paths = update_backup_scope(job_id, job_state, state).await?;
+    let scoped_paths =
+        update_backup_scope(job_id, request, job_state, state).await?;
     let rollback = job_state
         .rollback
         .as_ref()
@@ -1949,13 +1964,14 @@ async fn prepare_update_backup(
 /// hash, so installing the pack afterwards reuses the download.
 async fn update_backup_scope(
     job_id: Uuid,
+    request: &InstallRequest,
     job_state: &InstallJobState,
     state: &State,
 ) -> crate::Result<Option<Vec<String>>> {
     let mut paths = ProjectType::iterator()
         .map(|project_type| project_type.get_folder().to_string())
         .collect::<Vec<_>>();
-    let (instance_id, packs) = match &job_state.request {
+    let (instance_id, packs) = match request {
         InstallRequest::BulkUpdateContent { .. } => return Ok(Some(paths)),
         InstallRequest::InstallPackToExistingInstance {
             instance_id,
@@ -2202,8 +2218,11 @@ fn set_display(
     job_state.display = Some(InstallJobDisplay { title, icon });
 }
 
-fn set_initial_display(job_state: &mut InstallJobState) {
-    let display = match &job_state.request {
+fn set_initial_display(
+    request: &InstallRequest,
+    job_state: &mut InstallJobState,
+) {
+    let display = match request {
         InstallRequest::CreateModpackInstance { location, .. } => {
             match location {
                 CreatePackLocation::FromVersionId {

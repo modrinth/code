@@ -938,6 +938,7 @@ async fn install_shared_instance_base(
             DownloadReason::Modpack,
             &state.pool,
             data.linked_server.is_some(),
+            data.linked_server.is_some(),
         )
         .await?;
     } else {

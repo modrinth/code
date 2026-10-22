@@ -1,6 +1,6 @@
 use super::model::{
     InstallJobKind, InstallJobSnapshot, InstallJobState, InstallJobStatus,
-    InstallProgressState,
+    InstallProgressState, InstallRequest,
 };
 use crate::ErrorKind;
 use anyhow::{Context, bail};
@@ -76,13 +76,7 @@ impl InstallJobRecord {
     pub fn snapshot(&self) -> InstallJobSnapshot {
         let active = is_active(self.status);
         let mut snapshot = InstallJobSnapshot {
-            content_count: match &self.state.request {
-                super::model::InstallRequest::BulkUpdateContent {
-                    updates,
-                    ..
-                } => Some(updates.len() as u32),
-                _ => None,
-            },
+            content_count: self.state.content_count,
             job_id: self.id.to_string(),
             instance_id: self.instance_id.clone(),
             kind: self.kind,
@@ -112,8 +106,8 @@ impl InstallJobRecord {
 }
 
 /// Progress of jobs running in this process. It changes far more often than the
-/// rest of a job, so it is kept here instead of rewriting the stored job, whose
-/// request can be several megabytes, on every update.
+/// rest of a job, so it is kept here instead of rewriting the stored job on
+/// every update.
 static LIVE_JOBS: LazyLock<Mutex<HashMap<Uuid, LiveJob>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
 
@@ -190,13 +184,15 @@ async fn get_written(
 
 pub async fn insert(
     id: Uuid,
+    request: &InstallRequest,
     state: &InstallJobState,
     status: InstallJobStatus,
     pool: &SqlitePool,
 ) -> crate::Result<InstallJobRecord> {
     let now = Utc::now();
-    let kind = state.request.kind();
+    let kind = request.kind();
     let json = serde_json::to_string(state)?;
+    let request_json = serde_json::to_string(request)?;
     let status_value = status.as_str();
     let kind_value = kind.as_str();
     let instance_id = instance_id(state);
@@ -204,6 +200,7 @@ pub async fn insert(
     let created = now.timestamp();
     let modified = created;
 
+    let mut transaction = pool.begin_with("BEGIN IMMEDIATE").await?;
     sqlx::query!(
         "
 		INSERT INTO install_jobs (
@@ -219,12 +216,84 @@ pub async fn insert(
         created,
         modified,
     )
-    .execute(pool)
+    .execute(&mut *transaction)
     .await?;
+    sqlx::query!(
+        "
+		INSERT INTO install_job_requests (job_id, request)
+		VALUES (?, ?)
+		",
+        id_value,
+        request_json,
+    )
+    .execute(&mut *transaction)
+    .await?;
+    transaction.commit().await?;
 
     get(id, pool)
         .await?
         .context(format!("install job {id} was not inserted"))
+}
+
+/// The request a job was started with. Jobs that succeeded or were canceled
+/// no longer have one, since they cannot be retried.
+pub async fn get_request(
+    id: Uuid,
+    pool: &SqlitePool,
+) -> crate::Result<Option<InstallRequest>> {
+    let id = id.to_string();
+    let request = sqlx::query_scalar!(
+        "
+		SELECT json(request) AS \"request!: String\"
+		FROM install_job_requests
+		WHERE job_id = ?
+		",
+        id,
+    )
+    .fetch_optional(pool)
+    .await?;
+
+    Ok(request
+        .map(|request| serde_json::from_str(&request))
+        .transpose()?)
+}
+
+pub async fn get_required_request(
+    id: Uuid,
+    pool: &SqlitePool,
+) -> crate::Result<InstallRequest> {
+    get_request(id, pool).await?.ok_or(
+        ErrorKind::InputError(format!(
+            "install job {id} no longer has its request"
+        ))
+        .into(),
+    )
+}
+
+/// Jobs that succeeded or were canceled cannot be retried, so their request is
+/// no longer needed.
+async fn release_request(
+    id: Uuid,
+    status: InstallJobStatus,
+    pool: &SqlitePool,
+) -> crate::Result<()> {
+    if !matches!(
+        status,
+        InstallJobStatus::Succeeded | InstallJobStatus::Canceled
+    ) {
+        return Ok(());
+    }
+    let id = id.to_string();
+    sqlx::query!(
+        "
+		DELETE FROM install_job_requests
+		WHERE job_id = ?
+		",
+        id,
+    )
+    .execute(pool)
+    .await?;
+    Ok(())
 }
 
 pub async fn get(
@@ -433,6 +502,7 @@ pub async fn update_status(
     .execute(pool)
     .await?;
 
+    release_request(id, status, pool).await?;
     if status.is_finished() {
         notify_completion(id);
     }
@@ -477,6 +547,7 @@ pub async fn update_status_if(
         return Ok(None);
     }
 
+    release_request(id, status, pool).await?;
     if status.is_finished() {
         notify_completion(id);
     }
@@ -523,6 +594,7 @@ pub async fn finish_active(
         return Ok(None);
     }
 
+    release_request(id, status, pool).await?;
     if status.is_finished() {
         notify_completion(id);
     }
@@ -590,6 +662,7 @@ pub async fn complete_success(
     }
 
     transaction.commit().await?;
+    release_request(id, InstallJobStatus::Succeeded, pool).await?;
     notify_completion(id);
     crate::api::instance::queue_game_locale_index();
     get_written(id, pool).await.map(Some)
