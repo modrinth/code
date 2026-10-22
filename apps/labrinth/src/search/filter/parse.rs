@@ -291,7 +291,8 @@ mod tests {
     #[test]
     fn preserves_list_values_and_trailing_comma() {
         let FilterExpr::Predicate(predicate) =
-            parse_expression("categories nOt iN [fabric, forge,]").unwrap() // typos:ignore
+            parse_expression("categories nOt iN [fabric, forge,]").unwrap()
+        // typos:ignore
         else {
             panic!("expected a predicate");
         };

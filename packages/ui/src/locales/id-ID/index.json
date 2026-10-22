@@ -2,39 +2,6 @@
   "action.no-permission": {
     "defaultMessage": "Anda tidak memiliki izin."
   },
-  "affiliate.create.button": {
-    "defaultMessage": "Buat tautan afiliasi"
-  },
-  "affiliate.create.header": {
-    "defaultMessage": "Membuat kode afiliasi baru"
-  },
-  "affiliate.create.title.description": {
-    "defaultMessage": "Beri nama pada tautan afiliasi Anda supaya Anda tahu dari mana orang-orang datang!"
-  },
-  "affiliate.create.title.label": {
-    "defaultMessage": "Judul tautan afiliasi"
-  },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "cth. YouTube"
-  },
-  "affiliate.create.user.description": {
-    "defaultMessage": "Nama pengguna yang akan menggunakan kode afiliasi"
-  },
-  "affiliate.create.user.placeholder": {
-    "defaultMessage": "Masukkan nama pengguna..."
-  },
-  "affiliate.createdBy": {
-    "defaultMessage": "Dibuat oleh {user}"
-  },
-  "affiliate.creating.button": {
-    "defaultMessage": "Membuat tautan afiliasi..."
-  },
-  "affiliate.revoke": {
-    "defaultMessage": "Cabut tautan afiliasi"
-  },
-  "affiliate.viewAnalytics": {
-    "defaultMessage": "Lihat analisis"
-  },
   "app.server-settings.failed-to-load-server": {
     "defaultMessage": "Gagal memuat pengaturan server"
   },
@@ -130,9 +97,6 @@
   },
   "button.add-server-to-instance": {
     "defaultMessage": "Tambah server ke instans"
-  },
-  "button.affiliate-links": {
-    "defaultMessage": "Tautan afiliasi"
   },
   "button.analytics": {
     "defaultMessage": "Analisis"
@@ -2348,18 +2312,6 @@
   "servers.backups.item.auto": {
     "defaultMessage": "Otomatis"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Jadwal pencadangan"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Pencadangan manual"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Ganti nama"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Pulihkan"
-  },
   "servers.listing.owner-tooltip": {
     "defaultMessage": "Dimiliki oleh {username}"
   },
@@ -2952,4 +2904,3 @@
     "defaultMessage": "Anda memiliki perubahan yang belum tersimpan."
   }
 }
-

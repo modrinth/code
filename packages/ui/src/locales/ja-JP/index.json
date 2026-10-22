@@ -2,39 +2,6 @@
   "action.no-permission": {
     "defaultMessage": "権限がありません。"
   },
-  "affiliate.create.button": {
-    "defaultMessage": "アフィリエイトリンクを作成"
-  },
-  "affiliate.create.header": {
-    "defaultMessage": "新しいアフィリエイトコードを作成中"
-  },
-  "affiliate.create.title.description": {
-    "defaultMessage": "流入元が分かる名前を付けてください！"
-  },
-  "affiliate.create.title.label": {
-    "defaultMessage": "アフィリエイトリンクのタイトル"
-  },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "例：YouTube"
-  },
-  "affiliate.create.user.description": {
-    "defaultMessage": "アフィリエイトコードを作成するユーザー名"
-  },
-  "affiliate.create.user.placeholder": {
-    "defaultMessage": "ユーザー名を入力…"
-  },
-  "affiliate.createdBy": {
-    "defaultMessage": "{user}によって作成"
-  },
-  "affiliate.creating.button": {
-    "defaultMessage": "アフィリエイトリンクを作成中…"
-  },
-  "affiliate.revoke": {
-    "defaultMessage": "アフィリエイトリンクを無効化"
-  },
-  "affiliate.viewAnalytics": {
-    "defaultMessage": "アナリティクスを表示"
-  },
   "app.appearance-settings.native-decorations.description": {
     "defaultMessage": "OS標準のタイトルバーとウィンドウ操作ボタンを使用します。反映にはアプリの再起動が必要です。"
   },
@@ -151,9 +118,6 @@
   },
   "button.add-server-to-instance": {
     "defaultMessage": "インスタンスにサーバーを追加"
-  },
-  "button.affiliate-links": {
-    "defaultMessage": "アフィリエイトリンク"
   },
   "button.analytics": {
     "defaultMessage": "統計"
@@ -3299,17 +3263,11 @@
   "profile.button.manage-projects": {
     "defaultMessage": "プロジェクトを管理"
   },
-  "profile.button.remove-affiliate": {
-    "defaultMessage": "アフィリエイトから削除"
-  },
   "profile.button.reset-2fa": {
     "defaultMessage": "二要素認証をリセットする"
   },
   "profile.button.revoke-sessions": {
     "defaultMessage": "すべてのセッションを取り消す"
-  },
-  "profile.button.set-affiliate": {
-    "defaultMessage": "アフィリエイトに設定"
   },
   "profile.button.shared-instances": {
     "defaultMessage": "共有インスタンスを表示"
@@ -3373,9 +3331,6 @@
   },
   "profile.force-password-reset.email-label": {
     "defaultMessage": "アカウントのメールアドレス"
-  },
-  "profile.label.affiliate": {
-    "defaultMessage": "アフィリエイト"
   },
   "profile.label.badges": {
     "defaultMessage": "バッジ"
@@ -4958,9 +4913,6 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "バックアップから復元しています"
   },
-  "servers.backups.bulk-bar.aria-label": {
-    "defaultMessage": "{count, plural, one {選択したバックアップ1件に対する一括操作} other {選択したバックアップ#件に対する一括操作}}"
-  },
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "{count, plural,one {# バックアップが選択されました} other {# バックアップが選択されました}}"
   },
@@ -4985,50 +4937,11 @@
   "servers.backups.empty.heading": {
     "defaultMessage": "バックアップパックはありません"
   },
-  "servers.backups.filtered-empty.clear-filters": {
-    "defaultMessage": "フィルターを除く"
-  },
-  "servers.backups.filtered-empty.description": {
-    "defaultMessage": "すべてのバックアップを閲覧するには違ったフィルターまたはフィルターを除いてください。"
-  },
-  "servers.backups.filtered-empty.heading": {
-    "defaultMessage": "一致するバックアップがありません"
-  },
   "servers.backups.item.auto": {
     "defaultMessage": "自動"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "バックアップスケジュール"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "{username}のアバター"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "サポート"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "手動バックアップ"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "リネーム"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "修復"
-  },
-  "servers.backups.select-backup-aria": {
-    "defaultMessage": "{name}というバックアップを選択する"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "バックアップを作成"
-  },
-  "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "自動"
-  },
-  "servers.backups.toolbar.filter-manual": {
-    "defaultMessage": "手動"
-  },
-  "servers.backups.toolbar.select-all": {
-    "defaultMessage": "すべて選択"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "バックアップ作成中"

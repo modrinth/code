@@ -2,6 +2,7 @@
 	<div
 		v-if="matchingIssues.length && (!threadHistory || isStaff(auth.user))"
 		:id="fieldAnchor"
+		:inert="preview"
 		class="flex flex-col gap-2"
 	>
 		<div
@@ -57,7 +58,7 @@
 					:class="{ 'rotate-180': isExpanded(issue) }"
 					aria-hidden="true"
 				/>
-				<div v-if="isStaff(auth.user)" class="shrink-0 cursor-default" @click.stop>
+				<div v-if="!preview && isStaff(auth.user)" class="shrink-0 cursor-default" @click.stop>
 					<TeleportOverflowMenu
 						:label="formatMessage(messages.issueOptions)"
 						:options="moderatorOptions(issue)"
@@ -86,6 +87,7 @@
 						/>
 						<div
 							v-if="
+								!preview &&
 								!threadHistory &&
 								!isComplete(issue) &&
 								((showProjectAreaLink && issueActions(issue).length) || showAddressActions(issue))
@@ -271,6 +273,7 @@ const props = defineProps<{
 	userId?: string
 	teamId?: string
 	disclosureType?: string
+	preview?: boolean
 	threadHistory?: boolean
 	defaultCollapsed?: boolean
 	fieldAction?: ProjectIssueFieldAction
@@ -280,7 +283,7 @@ const emit = defineEmits<{
 	'update-thread': []
 }>()
 
-const projectContext = props.threadHistory ? null : injectProjectPageContext()
+const projectContext = props.threadHistory || props.preview ? null : injectProjectPageContext()
 const thread = computed(() => projectContext?.thread.value)
 const currentMember = computed(() => projectContext?.currentMember.value)
 const project = computed(() => requireProjectContext().projectV2.value)
@@ -863,7 +866,7 @@ function isComplete(issue: ThreadIssue): boolean {
 }
 
 function issueContentId(issue: ThreadIssue): string {
-	return `${props.threadHistory ? 'thread' : 'project'}-issue-${issue.id}`
+	return `${props.preview ? 'preview' : props.threadHistory ? 'thread' : 'project'}-issue-${issue.id}`
 }
 
 function isExpanded(issue: ThreadIssue): boolean {

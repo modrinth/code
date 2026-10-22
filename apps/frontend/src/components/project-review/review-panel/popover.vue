@@ -8,21 +8,22 @@
 			:aria-label="titleId ? undefined : label"
 			:data-review-panel="anchor.id"
 			tabindex="-1"
-			class="review-popover z-[100] box-border flex w-[28rem] max-w-[calc(100vw-1rem)] flex-col gap-2 overflow-y-auto rounded-xl border border-solid border-highlight-orange bg-surface-1 p-2.5 pb-3 text-sm text-primary"
-			:style="[floatingStyles, { width: maxWidth }]"
+			class="review-popover z-[100] box-border flex w-[28rem] max-w-[calc(100vw-1rem)] flex-col gap-2 overflow-y-auto rounded-xl border-solid p-2.5 pb-3 text-sm text-primary"
+			:style="[floatingStyles, appearanceStyle, { width: maxWidth }]"
 			@pointerenter="setPopoverHovered(anchor.id, true)"
 			@pointerleave="setPopoverHovered(anchor.id, false)"
 			@focusin="cancelClose"
 			@focusout="leave(anchor.id)"
 			@keydown="onKeydown"
+			@click="retainExternalLink(anchor.id, $event)"
 		>
 			<div class="flex items-center justify-between gap-3">
 				<slot name="title" />
 				<div class="flex shrink-0 items-center gap-1">
 					<IconButton
-						v-tooltip="formatMessage(pinned ? messages.unpinReview : messages.pinReview)"
+						v-tooltip="pinned ? 'Unpin review controls' : 'Pin review controls'"
 						size="sm"
-						:label="formatMessage(pinned ? messages.unpinReview : messages.pinReview)"
+						:label="pinned ? 'Unpin review controls' : 'Pin review controls'"
 						:aria-pressed="pinned"
 						type="quiet"
 						:color="pinned ? 'green' : undefined"
@@ -30,12 +31,7 @@
 					>
 						<PinIcon />
 					</IconButton>
-					<IconButton
-						size="sm"
-						:label="formatMessage(messages.closeReview)"
-						type="quiet"
-						@click="dismiss()"
-					>
+					<IconButton size="sm" label="Close review controls" type="quiet" @click="dismiss()">
 						<XIcon />
 					</IconButton>
 				</div>
@@ -50,22 +46,33 @@
 <script setup lang="ts">
 import { autoUpdate, flip, offset, shift, size, useFloating } from '@floating-ui/vue'
 import { PinIcon, XIcon } from '@modrinth/assets'
-import { IconButton, useVIntl } from '@modrinth/ui'
+import { IconButton } from '@modrinth/ui'
 import { computed, nextTick, onBeforeUnmount, shallowRef, watch } from 'vue'
 
-import { projectReviewMessages as messages } from '../messages'
+import { useFloatingReviewPanelAppearance } from '~/composables/floating-review-panel-appearance'
+
 import { useReviewEventListener } from '../shortcuts'
 import { injectReviewContext, type ReviewAnchor } from './context'
 
-const { formatMessage } = useVIntl()
+const { style: appearanceStyle } = useFloatingReviewPanelAppearance()
 const props = defineProps<{
 	anchor: ReviewAnchor
 	titleId?: string
 	label?: string
 	maxWidth?: string
 }>()
-const { active, panel, panelId, pinned, close, leave, setPopoverHovered, cancelClose, contains } =
-	injectReviewContext()
+const {
+	active,
+	panel,
+	panelId,
+	pinned,
+	close,
+	leave,
+	setPopoverHovered,
+	cancelClose,
+	contains,
+	retainExternalLink,
+} = injectReviewContext()
 const element = shallowRef<HTMLElement | null>(null)
 const reference = computed(() => props.anchor.element)
 const { floatingStyles, isPositioned } = useFloating(reference, element, {
@@ -130,15 +137,3 @@ useReviewEventListener('pointerdown', (event) => {
 	dismiss()
 })
 </script>
-
-<style scoped>
-.review-popover::before {
-	content: '';
-	position: absolute;
-	inset: 0;
-	z-index: 1;
-	border-radius: inherit;
-	background: color-mix(in srgb, var(--color-orange) 3%, transparent);
-	pointer-events: none;
-}
-</style>

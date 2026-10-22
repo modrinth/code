@@ -12,7 +12,7 @@ pub async fn friends() -> crate::Result<Vec<UserFriend>> {
 
 pub async fn friend_statuses() -> crate::Result<Vec<UserStatus>> {
     let state = crate::State::get().await?;
-    let statuses = state.friends_socket.friend_statuses();
+    let statuses = state.presence.friends_socket.friend_statuses();
 
     Ok(statuses)
 }

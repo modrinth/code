@@ -7,8 +7,7 @@ export class LabrinthAnalyticsV3Module extends AbstractModule {
 	}
 
 	/**
-	 * Fetch analytics data for the authenticated user's accessible projects
-	 * and affiliate codes.
+	 * Fetch analytics data for the authenticated user's accessible projects.
 	 *
 	 * @param data - Analytics request body defining time range and requested metrics
 	 * @returns Promise resolving to the analytics response, with time slices in `metrics`

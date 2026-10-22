@@ -2,39 +2,6 @@
   "action.no-permission": {
     "defaultMessage": "No tienes permiso."
   },
-  "affiliate.create.button": {
-    "defaultMessage": "Crear enlace de afiliado"
-  },
-  "affiliate.create.header": {
-    "defaultMessage": "Creando nuevo código de afiliado"
-  },
-  "affiliate.create.title.description": {
-    "defaultMessage": "¡Dale un nombre a tu enlace de afiliado para que sepas de dónde vienen las personas!"
-  },
-  "affiliate.create.title.label": {
-    "defaultMessage": "Nombre del enlace de afiliado"
-  },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "ej. YouTube"
-  },
-  "affiliate.create.user.description": {
-    "defaultMessage": "El nombre del usuario para el que se está creando el código de afiliado"
-  },
-  "affiliate.create.user.placeholder": {
-    "defaultMessage": "Introduce un nombre de usuario..."
-  },
-  "affiliate.createdBy": {
-    "defaultMessage": "Creado por {user}"
-  },
-  "affiliate.creating.button": {
-    "defaultMessage": "Creando enlace de afiliado..."
-  },
-  "affiliate.revoke": {
-    "defaultMessage": "Revocar enlace de afiliado"
-  },
-  "affiliate.viewAnalytics": {
-    "defaultMessage": "Ver estadísticas"
-  },
   "app.appearance-settings.native-decorations.description": {
     "defaultMessage": "Usa el borde de ventana de tu sistema operativo. Necesita reiniciar la aplicación."
   },
@@ -151,9 +118,6 @@
   },
   "button.add-server-to-instance": {
     "defaultMessage": "Añadir servidor a la instancia"
-  },
-  "button.affiliate-links": {
-    "defaultMessage": "Enlaces de afiliado"
   },
   "button.analytics": {
     "defaultMessage": "Estadísticas"
@@ -3299,17 +3263,11 @@
   "profile.button.manage-projects": {
     "defaultMessage": "Gestionar proyectos"
   },
-  "profile.button.remove-affiliate": {
-    "defaultMessage": "Remover como afiliado"
-  },
   "profile.button.reset-2fa": {
     "defaultMessage": "Restablecer autenticación de dos factores"
   },
   "profile.button.revoke-sessions": {
     "defaultMessage": "Revocar todas las sesiones"
-  },
-  "profile.button.set-affiliate": {
-    "defaultMessage": "Configurar como afiliado"
   },
   "profile.button.shared-instances": {
     "defaultMessage": "Ver instancias compartidas"
@@ -3397,9 +3355,6 @@
   },
   "profile.force-password-reset.title": {
     "defaultMessage": "Forzar restablecimiento de contraseña para {username}"
-  },
-  "profile.label.affiliate": {
-    "defaultMessage": "Afiliado"
   },
   "profile.label.badges": {
     "defaultMessage": "Insignias"
@@ -5225,12 +5180,6 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "Restaurando desde respaldo"
   },
-  "servers.backups.bulk-bar.aria-label": {
-    "defaultMessage": "{count, plural, one {Acciones masivas para un respaldo seleccionado} other {Acciones masivas para # respaldos seleccionados}}"
-  },
-  "servers.backups.bulk-bar.deleting": {
-    "defaultMessage": "Eliminando {total, plural, one {# respaldo} other {# respaldos}}..."
-  },
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "{count, plural, one {# respaldo seleccionado} other {# respaldos seleccionados}}"
   },
@@ -5255,50 +5204,11 @@
   "servers.backups.empty.heading": {
     "defaultMessage": "Aún no hay respaldos"
   },
-  "servers.backups.filtered-empty.clear-filters": {
-    "defaultMessage": "Limpiar filtros"
-  },
-  "servers.backups.filtered-empty.description": {
-    "defaultMessage": "Prueba con otro filtro o desactiva los filtros para ver todos los respaldos."
-  },
-  "servers.backups.filtered-empty.heading": {
-    "defaultMessage": "Ningún respaldo coincide"
-  },
   "servers.backups.item.auto": {
     "defaultMessage": "Auto"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Respaldo programado"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "Avatar de {username}"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "Soporte"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Respaldo manual"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Renombrar"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Restaurar"
-  },
-  "servers.backups.select-backup-aria": {
-    "defaultMessage": "Selecciona el respaldo {name}"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Crear respaldo"
-  },
-  "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "Automático"
-  },
-  "servers.backups.toolbar.filter-manual": {
-    "defaultMessage": "Manual"
-  },
-  "servers.backups.toolbar.select-all": {
-    "defaultMessage": "Seleccionar todo"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "Creación de respaldo en curso"
@@ -7236,4 +7146,3 @@
     "defaultMessage": "Tipo"
   }
 }
-

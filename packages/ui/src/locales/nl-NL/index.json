@@ -2,39 +2,6 @@
   "action.no-permission": {
     "defaultMessage": "Je hebt geen toestemming."
   },
-  "affiliate.create.button": {
-    "defaultMessage": "Partnerlink aanmaken"
-  },
-  "affiliate.create.header": {
-    "defaultMessage": "Nieuwe partnercode aanmaken"
-  },
-  "affiliate.create.title.description": {
-    "defaultMessage": "Geef je partnerlink een naam, zodat je weet waar mensen vandaan komen!"
-  },
-  "affiliate.create.title.label": {
-    "defaultMessage": "Titel van de partnerlink"
-  },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "bijv. YouTube"
-  },
-  "affiliate.create.user.description": {
-    "defaultMessage": "De gebruikersnaam van de gebruiker voor wie de partnercode moet worden aangemaakt"
-  },
-  "affiliate.create.user.placeholder": {
-    "defaultMessage": "Voer gebruikersnaam in..."
-  },
-  "affiliate.createdBy": {
-    "defaultMessage": "Gemaakt door {user}"
-  },
-  "affiliate.creating.button": {
-    "defaultMessage": "Partnerlink maken..."
-  },
-  "affiliate.revoke": {
-    "defaultMessage": "Partnerlink intrekken"
-  },
-  "affiliate.viewAnalytics": {
-    "defaultMessage": "Statistieken bekijken"
-  },
   "app.appearance-settings.native-decorations.description": {
     "defaultMessage": "Gebruik de titelbalk en vensterbedieningselementen van je besturingssysteem. Hiervoor moet de app opnieuw worden opgestart."
   },
@@ -151,9 +118,6 @@
   },
   "button.add-server-to-instance": {
     "defaultMessage": "Voeg server toevoegen aan instantie"
-  },
-  "button.affiliate-links": {
-    "defaultMessage": "Partnerlinks"
   },
   "button.analytics": {
     "defaultMessage": "Analytica"
@@ -3272,12 +3236,6 @@
   "profile.button.manage-projects": {
     "defaultMessage": "Projecten beheren"
   },
-  "profile.button.remove-affiliate": {
-    "defaultMessage": "Als partner verwijderen"
-  },
-  "profile.button.set-affiliate": {
-    "defaultMessage": "Als partner instellen"
-  },
   "profile.button.shared-instances": {
     "defaultMessage": "Gekoppelde gedeelde instantie"
   },
@@ -3331,9 +3289,6 @@
   },
   "profile.error.not-found": {
     "defaultMessage": "Gebruiker niet gevonden"
-  },
-  "profile.label.affiliate": {
-    "defaultMessage": "Partner"
   },
   "profile.label.badges": {
     "defaultMessage": "Badges"
@@ -5096,12 +5051,6 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "Terugzetten vanuit een back-up"
   },
-  "servers.backups.bulk-bar.aria-label": {
-    "defaultMessage": "{count, plural, one {Bulkacties voor één geselecteerde back-up} other {Bulkacties voor # geselecteerde back-ups}}"
-  },
-  "servers.backups.bulk-bar.deleting": {
-    "defaultMessage": "{total, plural, one {# back-up} other {# back-ups}} verwijderen..."
-  },
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "{count, plural, one {# back-up geselecteerd} other {# back-ups geselecteerd}}"
   },
@@ -5126,50 +5075,11 @@
   "servers.backups.empty.heading": {
     "defaultMessage": "Nog geen back-ups"
   },
-  "servers.backups.filtered-empty.clear-filters": {
-    "defaultMessage": "Filters verwijderen"
-  },
-  "servers.backups.filtered-empty.description": {
-    "defaultMessage": "Probeer een ander filter of verwijder de filters om alle back-ups te bekijken."
-  },
-  "servers.backups.filtered-empty.heading": {
-    "defaultMessage": "Geen back-ups gevonden"
-  },
   "servers.backups.item.auto": {
     "defaultMessage": "Automatisch"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Back-upschema"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "Avatar van {username}"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "Ondersteuning"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Handmatige back-up"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Hernoemen"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Herstel"
-  },
-  "servers.backups.select-backup-aria": {
-    "defaultMessage": "Selecteer back-up {name}"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Back-up maken"
-  },
-  "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "Automatisch"
-  },
-  "servers.backups.toolbar.filter-manual": {
-    "defaultMessage": "Handmatig"
-  },
-  "servers.backups.toolbar.select-all": {
-    "defaultMessage": "Alles selecteren"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "Back-up wordt gemaakt"

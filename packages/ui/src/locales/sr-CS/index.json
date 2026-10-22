@@ -2,39 +2,6 @@
   "action.no-permission": {
     "defaultMessage": "Nemaš dozvolu."
   },
-  "affiliate.create.button": {
-    "defaultMessage": "Kreiraj partnersku/sponzorisanu vezu"
-  },
-  "affiliate.create.header": {
-    "defaultMessage": "Kreacija novog partnerskog koda"
-  },
-  "affiliate.create.title.description": {
-    "defaultMessage": "Daj svom partnerskom linku ime kako bi znao odakle ljudi dolaze!"
-  },
-  "affiliate.create.title.label": {
-    "defaultMessage": "Naslov partnerske/sponzorisane veze"
-  },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "na primer Youtube"
-  },
-  "affiliate.create.user.description": {
-    "defaultMessage": "Ime korstnika za kojeg kreiraš partnerski link"
-  },
-  "affiliate.create.user.placeholder": {
-    "defaultMessage": "Unesi korisničko ime..."
-  },
-  "affiliate.createdBy": {
-    "defaultMessage": "Kreirano od {user}"
-  },
-  "affiliate.creating.button": {
-    "defaultMessage": "Kreacija partnerskog/sponzorisanog linka..."
-  },
-  "affiliate.revoke": {
-    "defaultMessage": "Opozovi partnerski/sponzorisani link"
-  },
-  "affiliate.viewAnalytics": {
-    "defaultMessage": "Pregled analitike"
-  },
   "app.appearance-settings.native-decorations.description": {
     "defaultMessage": "Koristi naslovnu traku i kontrole prozora tvog operativnog sistema. Restart aplikacije obavezan."
   },
@@ -151,9 +118,6 @@
   },
   "button.add-server-to-instance": {
     "defaultMessage": "Dodaj server instanci"
-  },
-  "button.affiliate-links": {
-    "defaultMessage": "Partnerski/sponzorisani linkovi"
   },
   "button.analytics": {
     "defaultMessage": "Analitike"
@@ -3326,9 +3290,6 @@
   "profile.error.not-found": {
     "defaultMessage": "Korisnik nije pronađen"
   },
-  "profile.label.affiliate": {
-    "defaultMessage": "Partner"
-  },
   "profile.label.badges": {
     "defaultMessage": "Bedževi"
   },
@@ -4988,12 +4949,6 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "Vraćanje iz backupa"
   },
-  "servers.backups.bulk-bar.aria-label": {
-    "defaultMessage": "{count, plural, one {Grupne radnje za jedan izabran backup} other {Grupna radnja za # izabranih backupa}}"
-  },
-  "servers.backups.bulk-bar.deleting": {
-    "defaultMessage": "Brisanje {total, plural, one {# backupa} other {# backupa}}..."
-  },
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "{count, plural, one {# backup izabran} few {# backupa izabrana} other {# backupa izabranih}}"
   },
@@ -5018,50 +4973,11 @@
   "servers.backups.empty.heading": {
     "defaultMessage": "Nema još backupa"
   },
-  "servers.backups.filtered-empty.clear-filters": {
-    "defaultMessage": "Očisti filtere"
-  },
-  "servers.backups.filtered-empty.description": {
-    "defaultMessage": "Isprobaj drugi filter ili ukloni filtere da bi vidio sve backupe."
-  },
-  "servers.backups.filtered-empty.heading": {
-    "defaultMessage": "Nema podudaranja backupa"
-  },
   "servers.backups.item.auto": {
     "defaultMessage": "Automatski"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Zakazan backup"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "Avatar od {username}"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "Podrška"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Manualni backup"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Preimenuj"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Vrati"
-  },
-  "servers.backups.select-backup-aria": {
-    "defaultMessage": "Izaberi backup {name}"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Napravi backup"
-  },
-  "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "Automatski"
-  },
-  "servers.backups.toolbar.filter-manual": {
-    "defaultMessage": "Manualno"
-  },
-  "servers.backups.toolbar.select-all": {
-    "defaultMessage": "Izaberi sve"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "Kreacija backupa u toku"
@@ -6429,4 +6345,3 @@
     "defaultMessage": "Tip"
   }
 }
-

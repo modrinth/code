@@ -1214,27 +1214,6 @@
   "create.project.visibility-unlisted": {
     "message": "Não listado"
   },
-  "dashboard.affiliate-links.create.button": {
-    "message": "Criar link de afiliado"
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "Erro a carregar links de afiliado"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "Os teus links de afiliado"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "Isto vai revogar permanentemente o código de afiliado \"{id}\" e quaisquer links partilhados com este código deixarão de ser válidos."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "Revogar"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "Tens a certeza que queres revogar o teu link de afiliado \"{title}\"?"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "Procurar links de afiliado..."
-  },
   "dashboard.collections.button.create-new": {
     "message": "Criar nova"
   },
@@ -2263,9 +2242,6 @@
   },
   "layout.action.file-lookup": {
     "message": "Pesquisa de ficheiros"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "Gerir links de afiliado"
   },
   "layout.action.manage-server-notices": {
     "message": "Gerir notificações do servidor"
@@ -3941,15 +3917,6 @@
   "settings.pats.modal.create.title": {
     "message": "Criar token de acesso pessoal"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "Apagar este token"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "Isto vai remover este token para sempre (tipo, mesmo para sempre)."
-  },
-  "settings.pats.modal.delete.title": {
-    "message": "Tens a certeza que queres apagar este token?"
-  },
   "settings.pats.modal.edit.title": {
     "message": "Editar token de acesso pessoal"
   },
@@ -3979,9 +3946,6 @@
   },
   "settings.sessions.current-session": {
     "message": "Sessão atual"
-  },
-  "settings.sessions.description": {
-    "message": "Aqui estão listados todos os dispositivos em que tens a sessão iniciada com a tua conta Modrinth. Podes terminar a sessão em cada um deles individualmente.\n\nSe não reconheceres alguma destas sessões, termina a sessão nesse dispositivo e altera a palavra-passe da tua conta Modrinth imediatamente."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Último acesso {ago}"

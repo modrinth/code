@@ -13,7 +13,6 @@ anyhow = { workspace = true }
 
 base64 = { workspace = true }
 chrono = { workspace = true }
-daedalus = { workspace = true }
 dashmap = { workspace = true }
 either = { workspace = true }
 enumset = { workspace = true, features = ["serde"] }

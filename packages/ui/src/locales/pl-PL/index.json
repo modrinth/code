@@ -2,39 +2,6 @@
   "action.no-permission": {
     "defaultMessage": "Nie posiadasz uprawnień."
   },
-  "affiliate.create.button": {
-    "defaultMessage": "Utwórz link afiliacyjny"
-  },
-  "affiliate.create.header": {
-    "defaultMessage": "Tworzenie nowego linku afiliacyjnego"
-  },
-  "affiliate.create.title.description": {
-    "defaultMessage": "Nadaj swojemu linkowi afiliacyjnemu nazwę, by wiedzieć, gdzie znajdują go ludzie!"
-  },
-  "affiliate.create.title.label": {
-    "defaultMessage": "Nazwa linku afiliacyjnego"
-  },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "np. YouTube"
-  },
-  "affiliate.create.user.description": {
-    "defaultMessage": "Nazwa użytkownika, któremu ma być utworzony ten kod"
-  },
-  "affiliate.create.user.placeholder": {
-    "defaultMessage": "Wprowadź nazwę użytkownika..."
-  },
-  "affiliate.createdBy": {
-    "defaultMessage": "Stworzony przez {user}"
-  },
-  "affiliate.creating.button": {
-    "defaultMessage": "Tworzenie linku afiliacyjnego..."
-  },
-  "affiliate.revoke": {
-    "defaultMessage": "Usuń link afiliacyjny"
-  },
-  "affiliate.viewAnalytics": {
-    "defaultMessage": "Pokaż dane analityczne"
-  },
   "app.appearance-settings.native-decorations.description": {
     "defaultMessage": "Używaj pasek tytułu i kontrolki okna systemu operacyjnego. Wymaga ponownego uruchomienia aplikacji."
   },
@@ -151,9 +118,6 @@
   },
   "button.add-server-to-instance": {
     "defaultMessage": "Dodaj serwer do instancji"
-  },
-  "button.affiliate-links": {
-    "defaultMessage": "Linki afiliacyjne"
   },
   "button.analytics": {
     "defaultMessage": "Analityka"
@@ -3296,17 +3260,11 @@
   "profile.button.manage-projects": {
     "defaultMessage": "Zarządzaj projektami"
   },
-  "profile.button.remove-affiliate": {
-    "defaultMessage": "Usuń jako partnera"
-  },
   "profile.button.reset-2fa": {
     "defaultMessage": "Zresetuj uwierzytelnianie dwuskładnikowe"
   },
   "profile.button.revoke-sessions": {
     "defaultMessage": "Unieważnij wszystkie sesje"
-  },
-  "profile.button.set-affiliate": {
-    "defaultMessage": "Ustaw jako partnera"
   },
   "profile.button.shared-instances": {
     "defaultMessage": "Pokaż udostępnione instancje"
@@ -3394,9 +3352,6 @@
   },
   "profile.force-password-reset.title": {
     "defaultMessage": "Wymuś zresetowanie hasła dla {username}"
-  },
-  "profile.label.affiliate": {
-    "defaultMessage": "Partner"
   },
   "profile.label.badges": {
     "defaultMessage": "Odznaki"
@@ -5222,12 +5177,6 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "Przywracanie z kopii zapasowej"
   },
-  "servers.backups.bulk-bar.aria-label": {
-    "defaultMessage": "Masowe akcje dla {count, plural, one {jednej wybranej kopii zapasowej} other {# wybranych kopii zapasowych}}"
-  },
-  "servers.backups.bulk-bar.deleting": {
-    "defaultMessage": "Usuwanie {total, plural, one {# kopii zapasowej} other {# kopii zapasowych}}..."
-  },
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "Wybrano {count, plural, one {# kopię zapasową} few {# kopie zapasowe} other {# kopii zapasowych}}"
   },
@@ -5252,50 +5201,11 @@
   "servers.backups.empty.heading": {
     "defaultMessage": "Nie masz jeszcze żadnych kopii zapasowych"
   },
-  "servers.backups.filtered-empty.clear-filters": {
-    "defaultMessage": "Wyczyść filtry"
-  },
-  "servers.backups.filtered-empty.description": {
-    "defaultMessage": "Spróbuj użyć innego filtru lub wyczyść filtry, by zobaczyć wszystkie kopie zapasowe."
-  },
-  "servers.backups.filtered-empty.heading": {
-    "defaultMessage": "Nie znaleziono pasujących kopii zapasowych"
-  },
   "servers.backups.item.auto": {
     "defaultMessage": "Automatyczne"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Harmonogram kopii zapasowych"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "Awatar użytkownika {username}"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "Obsługa Modrinth"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Ręczne kopie zapasowe"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Zmień nazwę"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Przywróć"
-  },
-  "servers.backups.select-backup-aria": {
-    "defaultMessage": "Wybierz kopię zapasową {name}"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Utwórz kopię zapasową"
-  },
-  "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "Automatyczne"
-  },
-  "servers.backups.toolbar.filter-manual": {
-    "defaultMessage": "Ręczne"
-  },
-  "servers.backups.toolbar.select-all": {
-    "defaultMessage": "Wybierz wszystkie"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "Trwa tworzenie kopii zapasowej"

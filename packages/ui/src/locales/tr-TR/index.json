@@ -2,39 +2,6 @@
   "action.no-permission": {
     "defaultMessage": "Bu işlemi yapma izniniz yok."
   },
-  "affiliate.create.button": {
-    "defaultMessage": "Ortaklık bağlantısı oluştur"
-  },
-  "affiliate.create.header": {
-    "defaultMessage": "Yeni ortaklık kodu oluşturuluyor"
-  },
-  "affiliate.create.title.description": {
-    "defaultMessage": "Ortaklık bağlantına bir isim ver, böylece insanların nereden geldiğini bilirsin!"
-  },
-  "affiliate.create.title.label": {
-    "defaultMessage": "Ortaklık bağlantısının başlığı"
-  },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "ör. Youtube"
-  },
-  "affiliate.create.user.description": {
-    "defaultMessage": "Ortaklık kodunu oluşturacak kullanıcının kullanıcı adı"
-  },
-  "affiliate.create.user.placeholder": {
-    "defaultMessage": "Kullanıcı adı giriniz..."
-  },
-  "affiliate.createdBy": {
-    "defaultMessage": "{user} tarafından oluşturuldu"
-  },
-  "affiliate.creating.button": {
-    "defaultMessage": "Ortaklık bağlantısı oluşturuluyor..."
-  },
-  "affiliate.revoke": {
-    "defaultMessage": "Ortaklık bağlantısını iptal et"
-  },
-  "affiliate.viewAnalytics": {
-    "defaultMessage": "Verileri görüntüle"
-  },
   "app.appearance-settings.native-decorations.description": {
     "defaultMessage": "İşletim sisteminizin başlık çubuğunu ve pencere kontrollerini kullanın. Uygulamanın yeniden başlatılmasını gerektirir."
   },
@@ -151,9 +118,6 @@
   },
   "button.add-server-to-instance": {
     "defaultMessage": "Sunucuyu kuruluma ekle"
-  },
-  "button.affiliate-links": {
-    "defaultMessage": "Ortaklık bağlantıları"
   },
   "button.analytics": {
     "defaultMessage": "Veriler"
@@ -3296,17 +3260,11 @@
   "profile.button.manage-projects": {
     "defaultMessage": "Projeleri yönet"
   },
-  "profile.button.remove-affiliate": {
-    "defaultMessage": "Ortaklıktan çıkar"
-  },
   "profile.button.reset-2fa": {
     "defaultMessage": "İki Aşamalı Doğrulamayı Sıfırla"
   },
   "profile.button.revoke-sessions": {
     "defaultMessage": "Tüm oturumlardan çık"
-  },
-  "profile.button.set-affiliate": {
-    "defaultMessage": "Ortak olarak ayarla"
   },
   "profile.button.shared-instances": {
     "defaultMessage": "Paylaşılan örnekleri görüntüle"
@@ -3394,9 +3352,6 @@
   },
   "profile.force-password-reset.title": {
     "defaultMessage": "{username} için zorla şifre sıfırlama"
-  },
-  "profile.label.affiliate": {
-    "defaultMessage": "Ortaklar"
   },
   "profile.label.badges": {
     "defaultMessage": "Rozetler"
@@ -5159,9 +5114,6 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "Yedekten geri yükleniyor"
   },
-  "servers.backups.bulk-bar.deleting": {
-    "defaultMessage": "{total, plural, one {# yedek} other {# yedek}} siliniyor..."
-  },
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "{count, plural, one {# yedek seçildi} other {# yedek seçildi}}"
   },
@@ -5183,50 +5135,11 @@
   "servers.backups.empty.heading": {
     "defaultMessage": "Henüz yedekleme yok"
   },
-  "servers.backups.filtered-empty.clear-filters": {
-    "defaultMessage": "Filtreleri temizle"
-  },
-  "servers.backups.filtered-empty.description": {
-    "defaultMessage": "Tüm yedekleri görmek için farklı bir filtre deneyin veya filtreleri temizleyin."
-  },
-  "servers.backups.filtered-empty.heading": {
-    "defaultMessage": "Yedekler eşleşmiyor"
-  },
   "servers.backups.item.auto": {
     "defaultMessage": "Otomatik"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Yedekleme zamanları"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "{username} nın avatarı"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "Destek"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Manuel yedekleme"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Yeniden adlandır"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Geri yükle"
-  },
-  "servers.backups.select-backup-aria": {
-    "defaultMessage": "{name} yedek dosyasını seçin"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Yedek oluştur"
-  },
-  "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "Otomatik"
-  },
-  "servers.backups.toolbar.filter-manual": {
-    "defaultMessage": "Manüel"
-  },
-  "servers.backups.toolbar.select-all": {
-    "defaultMessage": "Hepsini seç"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "Yedek oluşturma sürüyor"

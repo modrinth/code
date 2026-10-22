@@ -52,6 +52,9 @@ export const sourceRequiredSection = section({
 			issue: licenseNoSourceIssue,
 			label: 'No Source: Fork',
 			id: 'license-fork',
+			issueCardDisplay: {
+				label: 'No Source: Fork',
+			},
 		}),
 	),
 )
@@ -76,6 +79,9 @@ export const licenseReviewPanel = panel({
 		issue: licenseInvalidLinkIssue,
 		label: 'Invalid Link: Custom License',
 		id: 'license-custom-license',
+		issueCardDisplay: {
+			label: 'Invalid Link: Custom License',
+		},
 	}),
 	sourceRequiredSection,
 )

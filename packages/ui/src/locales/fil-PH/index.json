@@ -1,37 +1,4 @@
 {
-  "affiliate.create.button": {
-    "defaultMessage": "Lumikha ng affiliate link"
-  },
-  "affiliate.create.header": {
-    "defaultMessage": "Naglilikha ng affiliate code"
-  },
-  "affiliate.create.title.description": {
-    "defaultMessage": "Bigyan mo ng pangalan ang iyong affiliate link upang malaman mo lung saan nanggagaling ang mga tao!"
-  },
-  "affiliate.create.title.label": {
-    "defaultMessage": "Pamagat ng affilite link"
-  },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "hal. YouTube"
-  },
-  "affiliate.create.user.description": {
-    "defaultMessage": "Ang username ng tagagamit na lilikhaan ng affiliate code"
-  },
-  "affiliate.create.user.placeholder": {
-    "defaultMessage": "Ilagay ang username..."
-  },
-  "affiliate.createdBy": {
-    "defaultMessage": "Linikha ni/ng {user}"
-  },
-  "affiliate.creating.button": {
-    "defaultMessage": "Lumilikha ng affiliate link..."
-  },
-  "affiliate.revoke": {
-    "defaultMessage": "Bawiin ang affiliate link"
-  },
-  "affiliate.viewAnalytics": {
-    "defaultMessage": "Tingnan ang analitika"
-  },
   "badge.alpha": {
     "defaultMessage": "Alpha"
   },
@@ -58,9 +25,6 @@
   },
   "button.accept": {
     "defaultMessage": "Tanggapin"
-  },
-  "button.affiliate-links": {
-    "defaultMessage": "Mga affiliate link"
   },
   "button.analytics": {
     "defaultMessage": "Analitika"
@@ -2030,21 +1994,6 @@
   "servers.backups.item.auto": {
     "defaultMessage": "Auto"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Backup schedule"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Manual backup"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "I-rename"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "I-restore"
-  },
-  "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "Kusa"
-  },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Mayroon ka nang server?"
   },
@@ -2736,4 +2685,3 @@
     "defaultMessage": "Uri"
   }
 }
-

@@ -1442,30 +1442,6 @@
   "create.project.visibility-unlisted": {
     "message": "Поза списком"
   },
-  "dashboard.affiliate-links.create.button": {
-    "message": "Створити партнерське посилання"
-  },
-  "dashboard.affiliate-links.empty.no-codes": {
-    "message": "Партнерські коди не знайдено."
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "Помилка під час завантаження партнерських посилань"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "Ваші партнерські посилання"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "Це незворотно відкличе код партнера «{id}» та будь-які наявні посилання з цим кодом, які було оприлюднено, більше не будуть доступні."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "Відкликати"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "Справді бажаєте відкликати своє партнерське посилання «{title}»?"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "Пошук партнерських посилань…"
-  },
   "dashboard.analytics.from-projects": {
     "message": "з {count} {count, plural, one {проєкту} few {проєктів} many {проєктів} other {проєктів}}"
   },
@@ -2683,9 +2659,6 @@
   },
   "layout.action.file-lookup": {
     "message": "Пошук файлів"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "Керувати партнерськими посиланнями"
   },
   "layout.action.manage-server-notices": {
     "message": "Керування сповіщеннями сервера"
@@ -4559,29 +4532,17 @@
   "report.not-for.dmca.description": {
     "message": "Перегляньте нашу <policy-link>Політику авторських прав</policy-link>."
   },
-  "report.note.ai-images.1": {
-    "message": "Ми нещодавно оновили наші правила, які тепер забороняють використання ШІ-зображень для значків, галереї та опису. Ми впровадили перехідний період, протягом якого автори можуть прибрати ШІ-зображення зі своїх проєктів, перш ніж почнемо приймати скарги щодо них."
-  },
-  "report.note.check-back-later": {
-    "message": "Поверніться, коли перехідний період завершиться. Наразі ми не приймаємо скарги цього типу."
-  },
   "report.note.copyright.1": {
     "message": "Зверніть увагу, що ви не відправляєте запит на видалення згідно з DMCA, радше скаргу за повторно завантажений уміст."
   },
   "report.note.copyright.2": {
     "message": "Якщо ви хотіли подати запит на видалення вмісту через порушення DMCA (що є юридичною дією), ознайомтеся з нашою <copyright-policy-link>Політикою авторських прав</copyright-policy-link>."
   },
-  "report.note.fully-ai-generated.1": {
-    "message": "Ми нещодавно оновили наші правила, які тепер забороняють проєкти, повністю згенеровані ШІ. Ми впровадили перехідний період, протягом якого автори можуть оновити або прибрати такі проєкти, перш ніж почнемо приймати скарги щодо них."
-  },
   "report.note.malicious.1": {
     "message": "Скарги на зловмисний або оманливий уміст мають містити вагомі докази такої поведінки, як наприклад, зразки коду."
   },
   "report.note.malicious.2": {
     "message": "Звіти від Microsoft Defender, VirusTotal, або ШІ-детекторів зловмисного ПЗ не вважаються вагомими доказами та не приймаються."
-  },
-  "report.note.missing-disclosure.1": {
-    "message": "Маркування вмісту – це нова функція, яку ми додали нещодавно. Ми надаємо авторам пільговий період для оновлення своїх маркувань, перш ніж ми почнемо приймати скарги на відсутні або неправильні маркування."
   },
   "report.please-report": {
     "message": "На що скаржитися:"
@@ -5549,15 +5510,6 @@
   "settings.pats.modal.create.title": {
     "message": "Створити особистий токен доступу"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "Видалити цей токен"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "Це видалить цей токен назавжди (тобто справді навіки)."
-  },
-  "settings.pats.modal.delete.title": {
-    "message": "Справді бажаєте видалити цей токен?"
-  },
   "settings.pats.modal.edit.title": {
     "message": "Редагування особистого токену доступу"
   },
@@ -5587,9 +5539,6 @@
   },
   "settings.sessions.current-session": {
     "message": "Поточний сеанс"
-  },
-  "settings.sessions.description": {
-    "message": "Тут зазначені всі пристрої, на яких виконано вхід у ваш обліковий запис Modrinth. Ви можете вийти з кожного окремо.\n\nЯкщо бачите пристрій, котрий не впізнаєте, — негайно вийдіть з нього та змініть пароль до облікового запису."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Остання активність {ago}"

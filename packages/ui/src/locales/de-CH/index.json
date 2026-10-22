@@ -2,39 +2,6 @@
   "action.no-permission": {
     "defaultMessage": "Du hast keine Berechtigung."
   },
-  "affiliate.create.button": {
-    "defaultMessage": "Partnerlink erstellen"
-  },
-  "affiliate.create.header": {
-    "defaultMessage": "Neuen Partnercode erstellen"
-  },
-  "affiliate.create.title.description": {
-    "defaultMessage": "Gib deinem Partnerlink einen Namen, damit du weist, von wo Leute kommen!"
-  },
-  "affiliate.create.title.label": {
-    "defaultMessage": "Titel des Partnerlinks"
-  },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "z.B. YouTube"
-  },
-  "affiliate.create.user.description": {
-    "defaultMessage": "Der Benutzername des Benutzers, für den der Affiliate-Code erstellt werden soll"
-  },
-  "affiliate.create.user.placeholder": {
-    "defaultMessage": "Benutzername eingeben..."
-  },
-  "affiliate.createdBy": {
-    "defaultMessage": "Erstellt von {user}"
-  },
-  "affiliate.creating.button": {
-    "defaultMessage": "Erstelle Partnerlink..."
-  },
-  "affiliate.revoke": {
-    "defaultMessage": "Partnerlink widerrufen"
-  },
-  "affiliate.viewAnalytics": {
-    "defaultMessage": "Analysen anzeigen"
-  },
   "app.appearance-settings.native-decorations.description": {
     "defaultMessage": "Nutze die Titelleiste und die Fenstersteuerelemente deines Betriebssystems. Erfordert einen Neustart der App."
   },
@@ -151,9 +118,6 @@
   },
   "button.add-server-to-instance": {
     "defaultMessage": "Server zu Instanz hinzufügen"
-  },
-  "button.affiliate-links": {
-    "defaultMessage": "Partnerlinks"
   },
   "button.analytics": {
     "defaultMessage": "Analytik"
@@ -3308,17 +3272,11 @@
   "profile.button.manage-projects": {
     "defaultMessage": "Projekte verwalten"
   },
-  "profile.button.remove-affiliate": {
-    "defaultMessage": "Als Partner entfernen"
-  },
   "profile.button.reset-2fa": {
     "defaultMessage": "Zwei-Faktor-Authentifizierung zurücksetzen"
   },
   "profile.button.revoke-sessions": {
     "defaultMessage": "Alle Sitzungen widerrufen"
-  },
-  "profile.button.set-affiliate": {
-    "defaultMessage": "Als Partner festlegen"
   },
   "profile.button.shared-instances": {
     "defaultMessage": "Geteilte Instanzen ansehen"
@@ -3406,9 +3364,6 @@
   },
   "profile.force-password-reset.title": {
     "defaultMessage": "Passwortänderung für {username} erzwingen"
-  },
-  "profile.label.affiliate": {
-    "defaultMessage": "Partner"
   },
   "profile.label.badges": {
     "defaultMessage": "Abzeichen"
@@ -5240,12 +5195,6 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "Wiederherstellung aus Sicherung"
   },
-  "servers.backups.bulk-bar.aria-label": {
-    "defaultMessage": "Massenactionen für {count, plural, one {ein ausgewähltes Backup} other {# ausgewählte Backups}}"
-  },
-  "servers.backups.bulk-bar.deleting": {
-    "defaultMessage": "Lösche {total, plural, one {eine Sicherung} other {# Sicherungen}}..."
-  },
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "{count, plural, one {# Sicherung ausgewählt} other {# Sicherungen ausgewählt}}"
   },
@@ -5270,50 +5219,11 @@
   "servers.backups.empty.heading": {
     "defaultMessage": "Noch keine Sicherungen"
   },
-  "servers.backups.filtered-empty.clear-filters": {
-    "defaultMessage": "Filter entfernen"
-  },
-  "servers.backups.filtered-empty.description": {
-    "defaultMessage": "Versuche es mit einem anderen Filter oder entferne alle Filter, um alle Sicherungen anzuzeigen."
-  },
-  "servers.backups.filtered-empty.heading": {
-    "defaultMessage": "Keine übereinstimmenden Sicherungen"
-  },
   "servers.backups.item.auto": {
     "defaultMessage": "Auto"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Sicherungszeitplan"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "Avatar von {username}"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "Support"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Manuelle Sicherung"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Umbenennen"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Wiederherstellen"
-  },
-  "servers.backups.select-backup-aria": {
-    "defaultMessage": "Sicherung {name} auswählen"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Sicherung erstellen"
-  },
-  "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "Automatisch"
-  },
-  "servers.backups.toolbar.filter-manual": {
-    "defaultMessage": "Manuell"
-  },
-  "servers.backups.toolbar.select-all": {
-    "defaultMessage": "Alle auswählen"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "Backup-Erstellung im gange"
@@ -7275,4 +7185,3 @@
     "defaultMessage": "Typ"
   }
 }
-

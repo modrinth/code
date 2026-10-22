@@ -2,39 +2,6 @@
   "action.no-permission": {
     "defaultMessage": "Nu ai permisiune."
   },
-  "affiliate.create.button": {
-    "defaultMessage": "Creează un link de afiliere"
-  },
-  "affiliate.create.header": {
-    "defaultMessage": "Se creează un nou cod de afiliat"
-  },
-  "affiliate.create.title.description": {
-    "defaultMessage": "Dă-i un nume linkului tău de afiliere, ca să știi de unde vin oamenii!"
-  },
-  "affiliate.create.title.label": {
-    "defaultMessage": "Titlul linkului de afiliere"
-  },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "de exemplu, YouTube"
-  },
-  "affiliate.create.user.description": {
-    "defaultMessage": "Numele de utilizator al utilizatorului pentru care se creează codul de afiliere"
-  },
-  "affiliate.create.user.placeholder": {
-    "defaultMessage": "Introdu numele de utilizator..."
-  },
-  "affiliate.createdBy": {
-    "defaultMessage": "Creat de {user}"
-  },
-  "affiliate.creating.button": {
-    "defaultMessage": "Se creează link-ul de afiliere..."
-  },
-  "affiliate.revoke": {
-    "defaultMessage": "Revocare link de afiliere"
-  },
-  "affiliate.viewAnalytics": {
-    "defaultMessage": "Vizualizați analizele"
-  },
   "app.appearance-settings.native-decorations.description": {
     "defaultMessage": "Folosiți bara de titlu și controlul ferestrei sistemului de operare. Necesită repornirea aplicației."
   },
@@ -148,9 +115,6 @@
   },
   "button.add-server-to-instance": {
     "defaultMessage": "Adaugă server la instanță"
-  },
-  "button.affiliate-links": {
-    "defaultMessage": "Linkurile de afiliere"
   },
   "button.analytics": {
     "defaultMessage": "Analitice"
@@ -3082,18 +3046,6 @@
   },
   "servers.backups.item.auto": {
     "defaultMessage": "Auto"
-  },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Programul de backup"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Copiere de rezervă manuală"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Redenumește"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Restaurează"
   },
   "servers.notice.dismiss": {
     "defaultMessage": "Ignoră"

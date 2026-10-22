@@ -2,39 +2,6 @@
   "action.no-permission": {
     "defaultMessage": "У вас нет разрешения."
   },
-  "affiliate.create.button": {
-    "defaultMessage": "Создать партнёрскую ссылку"
-  },
-  "affiliate.create.header": {
-    "defaultMessage": "Создание партнёрского кода"
-  },
-  "affiliate.create.title.description": {
-    "defaultMessage": "Укажите название для отслеживания источника переходов"
-  },
-  "affiliate.create.title.label": {
-    "defaultMessage": "Название партнёрской ссылки"
-  },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "Например: YouTube"
-  },
-  "affiliate.create.user.description": {
-    "defaultMessage": "Пользователь, для которого будет создан партнёрский код"
-  },
-  "affiliate.create.user.placeholder": {
-    "defaultMessage": "Введите имя..."
-  },
-  "affiliate.createdBy": {
-    "defaultMessage": "Создана {user}"
-  },
-  "affiliate.creating.button": {
-    "defaultMessage": "Создание партнёрской ссылки..."
-  },
-  "affiliate.revoke": {
-    "defaultMessage": "Удалить ссылку"
-  },
-  "affiliate.viewAnalytics": {
-    "defaultMessage": "Посмотреть аналитику"
-  },
   "app.appearance-settings.native-decorations.description": {
     "defaultMessage": "Использовать системное оформление заголовка и кнопок окна. Требуется перезапуск."
   },
@@ -148,9 +115,6 @@
   },
   "button.add-server-to-instance": {
     "defaultMessage": "Добавить сервер в сборку"
-  },
-  "button.affiliate-links": {
-    "defaultMessage": "Партнёрские ссылки"
   },
   "button.analytics": {
     "defaultMessage": "Аналитика"
@@ -3224,17 +3188,11 @@
   "profile.button.manage-projects": {
     "defaultMessage": "Управление проектами"
   },
-  "profile.button.remove-affiliate": {
-    "defaultMessage": "Убрать из партнёров"
-  },
   "profile.button.reset-2fa": {
     "defaultMessage": "Сбросить двухфакторную аутентификацию"
   },
   "profile.button.revoke-sessions": {
     "defaultMessage": "Завершить все сеансы"
-  },
-  "profile.button.set-affiliate": {
-    "defaultMessage": "Сделать партнёром"
   },
   "profile.button.shared-instances": {
     "defaultMessage": "Посмотреть совместные сборки"
@@ -3322,9 +3280,6 @@
   },
   "profile.force-password-reset.title": {
     "defaultMessage": "Принудительный сброс пароля для {username}"
-  },
-  "profile.label.affiliate": {
-    "defaultMessage": "Партнёр"
   },
   "profile.label.badges": {
     "defaultMessage": "Значки"
@@ -5153,12 +5108,6 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "Восстановление из резервной копии"
   },
-  "servers.backups.bulk-bar.aria-label": {
-    "defaultMessage": "Действия с выбранными резервными копиями"
-  },
-  "servers.backups.bulk-bar.deleting": {
-    "defaultMessage": "Удаление {total, plural, one {# резервной копии} other {# резервных копий}}..."
-  },
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "{count, plural,one {# резервная копия выбрана} other {резервная копия выбрана}}"
   },
@@ -5183,50 +5132,11 @@
   "servers.backups.empty.heading": {
     "defaultMessage": "Резервных копий ещё нет"
   },
-  "servers.backups.filtered-empty.clear-filters": {
-    "defaultMessage": "Очистить фильтры"
-  },
-  "servers.backups.filtered-empty.description": {
-    "defaultMessage": "Попробуйте изменить или сбросить фильтры, чтобы увидеть все резервные копии."
-  },
-  "servers.backups.filtered-empty.heading": {
-    "defaultMessage": "Резервных копий не найдено"
-  },
   "servers.backups.item.auto": {
     "defaultMessage": "Авто"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Автоматическая резервная копия"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "Аватар {username}"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "Поддержка"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Ручная резервная копия"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Переименовать"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Восстановить"
-  },
-  "servers.backups.select-backup-aria": {
-    "defaultMessage": "Выбрать резервную копию {name}"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Создать резервную копию"
-  },
-  "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "Автоматические"
-  },
-  "servers.backups.toolbar.filter-manual": {
-    "defaultMessage": "Ручные"
-  },
-  "servers.backups.toolbar.select-all": {
-    "defaultMessage": "Выбрать всё"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "Выполняется создание резервной копии"

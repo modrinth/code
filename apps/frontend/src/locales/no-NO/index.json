@@ -923,30 +923,6 @@
   "create.project.visibility-unlisted": {
     "message": "Uoppført"
   },
-  "dashboard.affiliate-links.create.button": {
-    "message": "Opprett tilknytningslenke"
-  },
-  "dashboard.affiliate-links.empty.no-codes": {
-    "message": "Ingen tilknytte koder funnet."
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "Feil ved lasting av tilknytningslenker"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "Dine tilknytningslenker"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "Dette vil fjerne tilknytningskoden {id} permanent, og alle delte lenker med denne koden vil slutte å virke."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "Slett"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "Er du sikker på at du vil slette tilknytningslenken ''{title}''?"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "Søk i tilknytningslenker..."
-  },
   "dashboard.analytics.from-projects": {
     "message": "fra{count} {count, plural, one {projekt} other {projekt}}"
   },
@@ -2020,9 +1996,6 @@
   },
   "layout.action.file-lookup": {
     "message": "Filoppslag"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "Hold styr på tilknytte lenker"
   },
   "layout.action.manage-server-notices": {
     "message": "Hold styr på servervarsler"
@@ -3767,15 +3740,6 @@
   "settings.pats.modal.create.title": {
     "message": "Lag personlig tilgangs-token"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "Slett denne token-en"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "Denne kommer til å fjerne token-en for alltid (sånn... for alltid-for alltid)."
-  },
-  "settings.pats.modal.delete.title": {
-    "message": "Er du sikker på at du vil slette denne token-en?"
-  },
   "settings.pats.modal.edit.title": {
     "message": "Rediger personlig tilgangs-token"
   },
@@ -3805,9 +3769,6 @@
   },
   "settings.sessions.current-session": {
     "message": "Nåverende økt"
-  },
-  "settings.sessions.description": {
-    "message": "Her er alle enhetene som er logga inn med Modrinth-kontoen din akkurat nå. Du kan logge ut av hver av de for seg sjøl.\n\nViss du ser ei oppføring som du ikke kjenner igjen, logg ut av enheta og endre Modrinth-konto-passordet ditt med en gang."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Sist tilgang {ago}"

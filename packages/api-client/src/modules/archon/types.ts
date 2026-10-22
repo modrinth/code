@@ -699,17 +699,6 @@ export namespace Archon {
 				offset?: number
 			}
 
-			export type StockRequest = {
-				cpu?: number
-				memory_mb?: number
-				swap_mb?: number
-				storage_mb?: number
-			}
-
-			export type StockResponse = {
-				available: number
-			}
-
 			export type JWTAuth = {
 				url: string // e.g., "node-xyz.modrinth.com/modrinth/v0/fs"
 				token: string // JWT token for filesystem access
@@ -833,6 +822,28 @@ export namespace Archon {
 				lon: number
 				zone: string
 			}
+
+			export type MemorySizeStock = {
+				/** Number of servers of this memory size that fit in the region */
+				available: number
+				/** Hostnames of the nodes which fit at least one server of this memory size */
+				hostnames: string[]
+			}
+
+			export type RegionStock = {
+				/** Shortcode of the region */
+				region: string
+				/** Stock of each requested memory size, keyed by memory size in MB */
+				stock: Record<number, MemorySizeStock>
+				/** WebSocket URLs of random nodes in the region, to measure the latency to it */
+				ping_urls: string[]
+			}
+
+			export type StockResponse = {
+				regions: RegionStock[]
+				/** Number of servers that fit across all regions, keyed by memory size in MB */
+				total: Record<number, number>
+			}
 		}
 	}
 
@@ -953,12 +964,36 @@ export namespace Archon {
 				status: BackupStatus
 				locked: boolean
 				automated: boolean
+				rotates_at?: string
 				history: BackupQueueOperation[]
 			}
 
 			export type BackupsQueueResponse = {
 				active_operations: ActiveOperation[]
 				backups: BackupQueueBackup[]
+			}
+
+			export type WorldBackupOptions = {
+				split_automatic: number
+				split_manual: number
+				limit: number
+				interval: number
+			}
+
+			export type BackupsQueueWithOptionsResponse = BackupsQueueResponse & {
+				options: WorldBackupOptions
+				next_auto_backup_at: string | null
+			}
+
+			export type PatchWorldBackupOptions = {
+				split_automatic?: number
+				split_manual?: number
+				interval?: number
+			}
+
+			export type PatchWorldBackupOptionsResponse = {
+				applied: boolean
+				backup_ids?: string[]
 			}
 		}
 	}

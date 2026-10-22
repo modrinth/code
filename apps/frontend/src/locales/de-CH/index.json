@@ -1445,30 +1445,6 @@
   "create.project.visibility-unlisted": {
     "message": "Nicht gelistet"
   },
-  "dashboard.affiliate-links.create.button": {
-    "message": "Partnerlink erstellen"
-  },
-  "dashboard.affiliate-links.empty.no-codes": {
-    "message": "Keine Partnercodes gefunden."
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "Fehler beim laden von Partnerlinks"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "Deine Partnerlinks"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "Dies wird permanent den Partbercode `{id}` widerrufen und alle existierenden Links, welche es nutzen, werden nicht mehr gültig sein."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "Widerrufen"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "Bist du sicher dass du deinen \"{title}\" Partnerlink widerrufen willst?"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "Partnerlinks durchsuchen..."
-  },
   "dashboard.analytics.from-projects": {
     "message": "von {count} {count, plural, one {Projekt} other {Projekten}}"
   },
@@ -2689,9 +2665,6 @@
   },
   "layout.action.file-lookup": {
     "message": "Datei ansehen"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "Partnerlinks verwalten"
   },
   "layout.action.manage-server-notices": {
     "message": "Servermitteilungen verwalten"
@@ -4571,29 +4544,17 @@
   "report.not-for.dmca.description": {
     "message": "Siehe unsere <policy-link>Urheberrechtsrichtlinie</policy-link>."
   },
-  "report.note.ai-images.1": {
-    "message": "Wir haben kürzlich unsere Richtlinien aktualisiert und das Verwenden von KI-generierten Bildern in Icons, Galerien und Beschreibungen verboten. Wir geben Erstellern eine Übergangsfrist, um KI-Bilder aus ihren Projekten zu entfernen, bevor wir Meldungen dazu entgegennehmen."
-  },
-  "report.note.check-back-later": {
-    "message": "Schaue später erneut vorbei, sobald die Übergangsfrist abgelaufen ist. Meldungen dieser Art werden derzeit nicht entgegengenommen."
-  },
   "report.note.copyright.1": {
     "message": "Bitte beachte, dass du *keinen* DMCA Takedown Antrag einreichst, sondern einfach einen Reupload eines Inhalts meldest."
   },
   "report.note.copyright.2": {
     "message": "Wenn du stattdessen einen DMCA Takedown Antrag stellen willst (wa eine rechtliche Massnahme darstellt), lese dir bitte unsere <copyright-policy-link>Urheberrechtsrichtlinie</copyright-policy-link> durch."
   },
-  "report.note.fully-ai-generated.1": {
-    "message": "Wir haben kürzlich unsere Richtlinien aktualisiert und vollständig KI-generierte Projekte verboten. Wir geben Erstellern eine Übergangsfrist, um vollständig KI-generierte Projekte anzupassen oder zu entfernen, bevor wir Meldungen dazu entgegennehmen."
-  },
   "report.note.malicious.1": {
     "message": "Meldungen für bösartige oder trügerische Inhalte müssen substanzielle Beweise für das Verhalten enthalten, wie z. B. Codeausschnitte."
   },
   "report.note.malicious.2": {
     "message": "Zusammenfassungen von Microsoft Defender, VirusTotal, oder KI-Virus-Detektoren sind keine ausreichenden Beweise und werden nicht akzeptiert."
-  },
-  "report.note.missing-disclosure.1": {
-    "message": "Angaben zum Inhalt sind eine neue Funktion, die wir gerade hinzugefügt haben. Wir geben Erstellern eine Übergangsfrist, um ihre Angaben auf den neuesten Stand zu bringen, bevor wir Meldungen über fehlende oder falsche Angaben entgegennehmen."
   },
   "report.please-report": {
     "message": "Bitte melde:"
@@ -5561,15 +5522,6 @@
   "settings.pats.modal.create.title": {
     "message": "Erstelle einen persöhnlichen Zugriffstoken"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "Lösche diesen Token"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "Dies wird diesen Token für immer entfernen (Also wirklich für immer)."
-  },
-  "settings.pats.modal.delete.title": {
-    "message": "Bist du dir sicher, dass du diesen Token löschen willst?"
-  },
   "settings.pats.modal.edit.title": {
     "message": "Persöhnlichen Zugriffstoken bearbeiten"
   },
@@ -5599,9 +5551,6 @@
   },
   "settings.sessions.current-session": {
     "message": "Aktuelle Sitzung"
-  },
-  "settings.sessions.description": {
-    "message": "Hier sind alle Geräte, welche gerade mit deinem Modrinth-Konto angemeldet sind. Du kannst dich von jedem einzeln abmelden.\n\nSolltest du einen Eintrag sehen, welcher dir nicht bekannt ist, melde dich sofort von diesem Gerät ab und ändere dein Modrinth passwort."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Zuletzt aufgerufen {ago}"

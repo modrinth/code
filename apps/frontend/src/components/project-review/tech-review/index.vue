@@ -2,36 +2,33 @@
 	<div
 		class="flex min-w-0 flex-col gap-1 rounded-lg border border-solid border-surface-4 bg-surface-2 p-3"
 	>
-		<p v-if="!selection" class="m-0 text-secondary">
-			{{ formatMessage(messages.empty) }}
-		</p>
+		<p v-if="!selection" class="m-0 text-secondary">No project selected</p>
 		<div v-else-if="error || reportsQuery.isError.value" role="alert">
-			<p class="m-0">{{ formatMessage(messages.loadError) }}</p>
-			<Button @click="retry">{{ formatMessage(messages.retry) }}</Button>
+			<p class="m-0">Could not load project data</p>
+			<Button @click="retry">Retry</Button>
 		</div>
 		<p v-else-if="isLoading || reportsQuery.isPending.value" role="status" class="m-0">
-			{{ formatMessage(messages.loading) }}
+			Loading...
 		</p>
 		<p v-else-if="!reports.length" class="m-0 text-secondary">
-			{{ formatMessage(messages.noReports) }}
+			No technical-review reports are available for this project
 		</p>
 		<template v-else-if="project">
 			<p class="m-0 text-sm text-secondary">
-				{{ formatMessage(messages.reviewProgress) }}
+				Reviewed flags indicate progress, not a safe verdict. Files without flags have no flag
+				verdict
 			</p>
 			<template v-if="selectedFile">
 				<div class="flex flex-wrap items-center justify-between gap-2">
-					<Button @click="selectedFileId = null"
-						><LeftArrowIcon />{{ formatMessage(messages.backToFiles) }}</Button
-					>
+					<Button @click="selectedFileId = null"><LeftArrowIcon />Back to files</Button>
 					<TechRevFileActions :file="selectedFile" />
 				</div>
 				<h3 class="m-0 break-all text-lg font-semibold text-contrast">
 					{{ selectedFile.file_name }}
 				</h3>
 				<div v-if="sourceQueries.some((query) => query.isError)" role="alert">
-					<p class="m-0">{{ formatMessage(messages.sourceError) }}</p>
-					<Button @click="retrySources">{{ formatMessage(messages.retry) }}</Button>
+					<p class="m-0">Could not load source code. Try opening the flag again</p>
+					<Button @click="retrySources">Retry</Button>
 				</div>
 				<TechRevFileDetailTab
 					:key="selectedFile.id"
@@ -44,11 +41,7 @@
 			</template>
 			<template v-else>
 				<h3 class="m-0 text-lg font-semibold text-contrast">
-					{{
-						formatMessage(messages.pendingFiles, {
-							count: pendingReports.length,
-						})
-					}}
+					{{ `Pending files (${pendingReports.length})` }}
 				</h3>
 				<TechRevFilesTab
 					v-if="pendingReports.length"
@@ -56,16 +49,10 @@
 					:project="project"
 					@view-flags="selectFile"
 				/>
-				<p v-else class="m-0 text-secondary">
-					{{ formatMessage(messages.noPendingFiles) }}
-				</p>
+				<p v-else class="m-0 text-secondary">No files with unresolved flags</p>
 				<details v-if="completedReports.length">
 					<summary class="cursor-pointer py-3 font-semibold text-contrast">
-						{{
-							formatMessage(messages.completedFiles, {
-								count: completedReports.length,
-							})
-						}}
+						{{ `Reviewed files (${completedReports.length})` }}
 					</summary>
 					<TechRevFilesTab
 						:reports="completedReports"
@@ -75,11 +62,7 @@
 				</details>
 				<details v-if="unflaggedReports.length">
 					<summary class="cursor-pointer py-3 font-semibold text-contrast">
-						{{
-							formatMessage(messages.noFlagsFiles, {
-								count: unflaggedReports.length,
-							})
-						}}
+						{{ `Files without flags (${unflaggedReports.length})` }}
 					</summary>
 					<TechRevFilesTab
 						:reports="unflaggedReports"
@@ -94,7 +77,7 @@
 
 <script setup lang="ts">
 import { LeftArrowIcon } from '@modrinth/assets'
-import { Button, injectModrinthClient, useVIntl } from '@modrinth/ui'
+import { Button, injectModrinthClient } from '@modrinth/ui'
 import { useQueries } from '@tanstack/vue-query'
 import { computed, provide, ref } from 'vue'
 
@@ -105,9 +88,6 @@ import type { FlattenedFileReport } from '~/components/ui/moderation/tech-review
 import { TECH_REVIEW_DECISIONS_KEY } from '~/components/ui/moderation/tech-review/use-tech-review-decisions'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
-import { projectReviewMessages as messages } from '../messages'
-
-const { formatMessage } = useVIntl()
 const client = injectModrinthClient()
 const {
 	selection,

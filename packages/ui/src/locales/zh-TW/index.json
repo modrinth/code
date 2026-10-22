@@ -2,39 +2,6 @@
   "action.no-permission": {
     "defaultMessage": "你沒有權限。"
   },
-  "affiliate.create.button": {
-    "defaultMessage": "建立聯盟連結"
-  },
-  "affiliate.create.header": {
-    "defaultMessage": "建立新的聯盟代碼"
-  },
-  "affiliate.create.title.description": {
-    "defaultMessage": "為你的聯盟連結命名，以便你知道流量的來源了！"
-  },
-  "affiliate.create.title.label": {
-    "defaultMessage": "聯盟連結的標題"
-  },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "例如：YouTube"
-  },
-  "affiliate.create.user.description": {
-    "defaultMessage": "欲建立聯盟代碼的使用者名稱"
-  },
-  "affiliate.create.user.placeholder": {
-    "defaultMessage": "輸入使用者名稱..."
-  },
-  "affiliate.createdBy": {
-    "defaultMessage": "由 {user} 建立"
-  },
-  "affiliate.creating.button": {
-    "defaultMessage": "正在建立聯盟連結..."
-  },
-  "affiliate.revoke": {
-    "defaultMessage": "撤銷聯盟連結"
-  },
-  "affiliate.viewAnalytics": {
-    "defaultMessage": "檢視數據分析"
-  },
   "app.appearance-settings.native-decorations.description": {
     "defaultMessage": "使用作業系統的標題列和視窗控制項。需要重新啟動應用程式。"
   },
@@ -151,9 +118,6 @@
   },
   "button.add-server-to-instance": {
     "defaultMessage": "將伺服器新增至實例"
-  },
-  "button.affiliate-links": {
-    "defaultMessage": "聯盟連結"
   },
   "button.analytics": {
     "defaultMessage": "數據分析"
@@ -3308,17 +3272,11 @@
   "profile.button.manage-projects": {
     "defaultMessage": "管理專案"
   },
-  "profile.button.remove-affiliate": {
-    "defaultMessage": "移除聯盟行銷夥伴資格"
-  },
   "profile.button.reset-2fa": {
     "defaultMessage": "重設雙重驗證"
   },
   "profile.button.revoke-sessions": {
     "defaultMessage": "撤銷所有工作階段"
-  },
-  "profile.button.set-affiliate": {
-    "defaultMessage": "設為聯盟行銷夥伴"
   },
   "profile.button.shared-instances": {
     "defaultMessage": "查看共用實例"
@@ -3406,9 +3364,6 @@
   },
   "profile.force-password-reset.title": {
     "defaultMessage": "強制重設 {username} 的密碼"
-  },
-  "profile.label.affiliate": {
-    "defaultMessage": "聯盟行銷"
   },
   "profile.label.badges": {
     "defaultMessage": "徽章"
@@ -5240,12 +5195,6 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "從備份還原"
   },
-  "servers.backups.bulk-bar.aria-label": {
-    "defaultMessage": "{count, plural, other {對 # 個選取的備份執行批次動作}}"
-  },
-  "servers.backups.bulk-bar.deleting": {
-    "defaultMessage": "正在刪除 {total, plural, other {# 個備份}}..."
-  },
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "{count, plural, other {已選取 # 個備份}}"
   },
@@ -5270,50 +5219,11 @@
   "servers.backups.empty.heading": {
     "defaultMessage": "尚無備份"
   },
-  "servers.backups.filtered-empty.clear-filters": {
-    "defaultMessage": "清除篩選條件"
-  },
-  "servers.backups.filtered-empty.description": {
-    "defaultMessage": "試試使用不同的篩選條件，或清除篩選條件以查看所有備份。"
-  },
-  "servers.backups.filtered-empty.heading": {
-    "defaultMessage": "沒有相符的備份"
-  },
   "servers.backups.item.auto": {
     "defaultMessage": "自動備份"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "備份排程"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "{username} 的顯示圖片"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "客服"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "手動備份"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "重新命名"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "還原"
-  },
-  "servers.backups.select-backup-aria": {
-    "defaultMessage": "選擇備份「{name}」"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "建立備份"
-  },
-  "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "自動備份"
-  },
-  "servers.backups.toolbar.filter-manual": {
-    "defaultMessage": "手動備份"
-  },
-  "servers.backups.toolbar.select-all": {
-    "defaultMessage": "全選"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "正在建立備份"
@@ -7275,4 +7185,3 @@
     "defaultMessage": "類型"
   }
 }
-

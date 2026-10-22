@@ -530,27 +530,6 @@
   "create.project.visibility-unlisted": {
     "message": "לא מוגדר"
   },
-  "dashboard.affiliate-links.create.button": {
-    "message": "צור קישור שותפות"
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "שגיאה בטעינת קישורי שותפים"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "קישורי השותפים שלך"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "פעולה זו תבטל לצמיתות את קוד השותף {id}, וכל הקישורים הקיימים שהופצו עם קוד זה לא יהיו תקפים יותר."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "ביטול"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "האם אתה בטוח שברצונך לבטל את קישור השותף \"{title}\"?"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "חיפוש קישורי שותפים..."
-  },
   "dashboard.collections.button.create-new": {
     "message": "צור חדש"
   },
@@ -1414,9 +1393,6 @@
   },
   "layout.action.file-lookup": {
     "message": "חיפוש קבצים"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "נהל את קישורי השותפים"
   },
   "layout.action.manage-server-notices": {
     "message": "ניהול הודעות השרת"

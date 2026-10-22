@@ -2,13 +2,14 @@
 import type { Archon } from '@modrinth/api-client'
 import { ChevronRightIcon } from '@modrinth/assets'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, nextTick, ref } from 'vue'
+import { computed, ref } from 'vue'
 
 import type { TabbedModalTab } from '#ui/components'
 import { TabbedModal } from '#ui/components'
 import { defineMessage, defineMessages, useVIntl } from '#ui/composables/i18n'
 import {
 	ServerSettingsAdvancedPage,
+	ServerSettingsBackupsPage,
 	ServerSettingsGeneralPage,
 	ServerSettingsInstallationPage,
 	ServerSettingsNetworkPage,
@@ -76,6 +77,7 @@ const serverSettingsTabComponentMap = {
 	general: ServerSettingsGeneralPage,
 	installation: ServerSettingsInstallationPage,
 	network: ServerSettingsNetworkPage,
+	backups: ServerSettingsBackupsPage,
 	properties: ServerSettingsPropertiesPage,
 	advanced: ServerSettingsAdvancedPage,
 	support: ServerSettingsSupportPage,
@@ -139,6 +141,17 @@ async function fetchViewer() {
 	currentUserRole.value = result.userRole
 }
 
+function resolveVisibleTabIndex(tabIndex?: number, tabId?: ServerSettingsTabId) {
+	const visibleTabs = tabs.value.filter((tab) => tab.shown !== false)
+	let requestedTab = tabIndex ?? 0
+	if (tabId) {
+		const defIndex = serverSettingsTabDefinitions.findIndex((d) => d.id === tabId)
+		const visibleIndex = visibleTabs.findIndex((tab) => tabs.value.indexOf(tab) === defIndex)
+		if (visibleIndex >= 0) requestedTab = visibleIndex
+	}
+	return Math.min(Math.max(requestedTab, 0), Math.max(visibleTabs.length - 1, 0))
+}
+
 async function show({ serverId, tabIndex, tabId }: ShowOptions) {
 	try {
 		const targetServerId = currentServerId
@@ -160,6 +173,7 @@ async function show({ serverId, tabIndex, tabId }: ShowOptions) {
 			targetServerId,
 		])
 
+		modal.value?.setTab(resolveVisibleTabIndex(tabIndex, tabId))
 		modal.value?.show()
 		const fetchPromises: Promise<unknown>[] = [fetchViewer()]
 
@@ -182,20 +196,7 @@ async function show({ serverId, tabIndex, tabId }: ShowOptions) {
 		}
 
 		await Promise.all(fetchPromises)
-
-		const visibleTabs = tabs.value.filter((tab) => tab.shown !== false)
-		let requestedTab = tabIndex ?? 0
-		if (tabId) {
-			const defIndex = serverSettingsTabDefinitions.findIndex((d) => d.id === tabId)
-			if (defIndex >= 0) {
-				const visibleIndex = visibleTabs.findIndex(
-					(_, i) => tabs.value.indexOf(visibleTabs[i]) === defIndex,
-				)
-				if (visibleIndex >= 0) requestedTab = visibleIndex
-			}
-		}
-		const clampedTab = Math.min(Math.max(requestedTab, 0), Math.max(visibleTabs.length - 1, 0))
-		nextTick(() => modal.value?.setTab(clampedTab))
+		modal.value?.setTab(resolveVisibleTabIndex(tabIndex, tabId))
 
 		if (worldId.value) {
 			queryClient.prefetchQuery({

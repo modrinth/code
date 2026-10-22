@@ -9,6 +9,7 @@ use crate::install::{
 use crate::instance::QuickPlayType;
 use crate::launcher::download::download_log_config;
 use crate::launcher::io::IOError;
+use crate::launcher::profile::ResolvedVersion as VersionInfo;
 use crate::launcher::quick_play_version::{
     QuickPlayServerVersion, QuickPlayVersion,
 };
@@ -23,9 +24,9 @@ use crate::util::rpc::RpcServerBuilder;
 use crate::{ErrorKind, State, get_resource_file};
 use anyhow::{Context, bail};
 use chrono::Utc;
-use daedalus as d;
-use daedalus::minecraft::{LoggingSide, RuleAction, VersionInfo};
-use daedalus::modded::{LoaderVersion, Manifest};
+use minecraft_meta_manifest as d;
+use minecraft_meta_manifest::fabriclike::{LoaderVersion, Manifest};
+use minecraft_meta_manifest::minecraft::{LoggingSide, RuleAction};
 use serde::Deserialize;
 use sqlx::SqlitePool;
 use std::future::Future;
@@ -35,8 +36,10 @@ use tokio::process::Command;
 
 mod args;
 pub(crate) mod hooks;
+mod library;
 
 pub mod download;
+pub(crate) mod profile;
 pub mod quick_play_version;
 
 // All nones -> disallowed
@@ -122,10 +125,10 @@ pub fn parse_rule(
 
 macro_rules! processor_rules {
     ($dest:expr; $($name:literal : client => $client:expr, server => $server:expr;)+) => {
-        $(std::collections::HashMap::insert(
+        $(indexmap::IndexMap::insert(
             $dest,
             String::from($name),
-            daedalus::modded::SidedDataEntry {
+            minecraft_meta_manifest::profile::SidedDataEntry {
                 client: String::from($client),
                 server: String::from($server),
             },
@@ -230,13 +233,14 @@ fn installed_loader_version(
 
     Some(LoaderVersion {
         id: loader_version.to_string(),
-        url: String::new(),
+        url: url::Url::parse("modrinth-local:installed")
+            .expect("valid local loader URL"),
         stable: false,
     })
 }
 
 pub(super) fn is_locally_installed_loader(loader: &LoaderVersion) -> bool {
-    loader.url.is_empty()
+    loader.url.scheme() == "modrinth-local"
 }
 
 fn concrete_loader_version_id(loader_version: &str) -> Option<&str> {
@@ -262,8 +266,10 @@ fn loader_versions_for_game_version<'a>(
     game_version: &str,
 ) -> Option<&'a [LoaderVersion]> {
     let version = manifest.game_versions.iter().find(|x| {
-        x.id.replace(daedalus::modded::DUMMY_REPLACE_STRING, game_version)
-            == game_version
+        x.id.replace(
+            minecraft_meta_manifest::profile::DUMMY_REPLACE_STRING,
+            game_version,
+        ) == game_version
     })?;
 
     if let Some(version_group) = &version.version_group {
@@ -347,7 +353,7 @@ pub(crate) async fn resolve_java_for_launch(
 pub async fn resolve_minecraft_manifest(
     game_version: &str,
     state: &State,
-) -> crate::Result<(d::minecraft::VersionManifest, usize)> {
+) -> crate::Result<(d::minecraft::Catalog, usize)> {
     let minecraft = crate::api::metadata::get_minecraft_versions().await?;
 
     if let Some(idx) = minecraft
@@ -498,10 +504,9 @@ async fn install_minecraft_inner(
         .await?;
     }
 
-    let version_jar =
-        loader_version.as_ref().map_or(version.id.clone(), |it| {
-            format!("{}-{}", version.id.clone(), it.id.clone())
-        });
+	let version_jar = loader_version.as_ref().map_or(version.id.to_string(), |it| {
+		format!("{}-{}", version.id, it.id)
+	});
 
     // Download version info (5)
     let mut version_info = download::download_version_info(
@@ -841,28 +846,31 @@ pub(crate) struct GameVersionMetadata {
 pub(crate) async fn read_game_version_metadata_from_jar(
     path: &Path,
 ) -> crate::Result<Option<GameVersionMetadata>> {
-	let path = path.to_path_buf();
-	tokio::task::spawn_blocking(move || -> crate::Result<_> {
-		use std::io::{BufReader, Read};
+    let path = path.to_path_buf();
+    tokio::task::spawn_blocking(move || -> crate::Result<_> {
+        use std::io::{BufReader, Read};
 
-		let mut zip = zip::ZipArchive::new(BufReader::new(
-			std::fs::File::open(path)?,
-		))?;
-		let mut selected = None;
-		for index in 0..zip.len() {
-			if zip.by_index_raw(index)?.name().is_ok_and(|name| name == "version.json") {
-				selected = Some(index);
-				break;
-			}
-		}
-		let Some(index) = selected else {
-			return Ok(None);
-		};
-		let mut data = Vec::new();
-		zip.by_index(index)?.read_to_end(&mut data)?;
-		Ok(Some(serde_json::from_slice(&data)?))
-	})
-	.await?
+        let mut zip =
+            zip::ZipArchive::new(BufReader::new(std::fs::File::open(path)?))?;
+        let mut selected = None;
+        for index in 0..zip.len() {
+            if zip
+                .by_index_raw(index)?
+                .name()
+                .is_ok_and(|name| name == "version.json")
+            {
+                selected = Some(index);
+                break;
+            }
+        }
+        let Some(index) = selected else {
+            return Ok(None);
+        };
+        let mut data = Vec::new();
+        zip.by_index(index)?.read_to_end(&mut data)?;
+        Ok(Some(serde_json::from_slice(&data)?))
+    })
+    .await?
 }
 
 fn link_project_and_version(
@@ -955,9 +963,10 @@ pub async fn launch_minecraft(
         });
     }
 
-    let version_jar =
-        loader_version.as_ref().map_or(version.id.clone(), |it| {
-            format!("{}-{}", version.id.clone(), it.id.clone())
+    let version_jar = loader_version
+        .as_ref()
+        .map_or(version.id.to_string(), |it| {
+            format!("{}-{}", version.id, it.id)
         });
 
     let mut version_info = download::download_version_info(
@@ -1172,7 +1181,7 @@ pub async fn launch_minecraft(
                 &version_info.asset_index.id,
                 &instance_path,
                 &state.directories.assets_dir(),
-                &version.type_,
+                &version.ty,
                 *resolution,
                 &java_version.architecture,
                 &quick_play_type,
@@ -1222,7 +1231,7 @@ pub async fn launch_minecraft(
         .await
         .context("syncing instance content files")?;
     let _instance_content_lock =
-        state.lock_instance_content(&instance.id).await;
+        state.instance_locks.lock_content(&instance.id).await;
     let current =
 		crate::state::instances::adapters::sqlite::instance_rows::get_instance_by_id(
 			&instance.id, &state.pool,
@@ -1277,11 +1286,13 @@ pub async fn launch_minecraft(
     }
 
     let _ = state
+        .presence
         .discord_rpc
         .set_activity(&format!("Playing {}", instance.name), true, &state.pool)
         .await;
 
     let _ = state
+        .presence
         .friends_socket
         .update_status(Some(instance.name.clone()))
         .await;

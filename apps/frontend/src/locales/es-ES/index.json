@@ -1433,30 +1433,6 @@
   "create.project.visibility-unlisted": {
     "message": "No listado"
   },
-  "dashboard.affiliate-links.create.button": {
-    "message": "Crear enlace de afiliado"
-  },
-  "dashboard.affiliate-links.empty.no-codes": {
-    "message": "No se encontraron códigos de afiliado."
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "Error al cargar los enlaces de afiliado"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "Tus enlaces de afiliado"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "Esto revocará permanentemente el código de afiliado `{id}` y cualquier enlace existente con este código que se haya compartido dejará de ser válido."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "Revocar"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "¿Estás seguro de que deseas revocar tu enlace de afiliado «{title}»?"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "Buscar enlaces de afiliado..."
-  },
   "dashboard.analytics.from-projects": {
     "message": "de {count} {count, plural,one {proyecto} other {proyectos}}"
   },
@@ -2668,9 +2644,6 @@
   },
   "layout.action.file-lookup": {
     "message": "Búsqueda de archivos"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "Manejar enlaces de afiliados"
   },
   "layout.action.manage-server-notices": {
     "message": "Gestionar avisos del servidor"
@@ -4526,29 +4499,17 @@
   "report.not-for.dmca.description": {
     "message": "Consulte nuestra <policy-link>Política de derechos de autor</policy-link>."
   },
-  "report.note.ai-images.1": {
-    "message": "Acabamos de actualizar nuestras reglas para prohibir imágenes generadas por AI en iconos, galerías y descripciones. Estamos dando a los creadores un período de margen para eliminar imágenes hechas con IA de sus proyectos antes de empezar a aceptar reportes sobre ello."
-  },
-  "report.note.check-back-later": {
-    "message": "Vuelve a comprobar más tarde una vez finalizado el período de margen. Los reportes de este tipo no están siendo aceptados en este momento."
-  },
   "report.note.copyright.1": {
     "message": "Tenga en cuenta que *no* está enviando una solicitud de retirada en virtud de la DMCA, sino un informe sobre contenido vuelto a subir."
   },
   "report.note.copyright.2": {
     "message": "Si desea presentar una solicitud de eliminación de DMCA (que es una acción legal), consulte nuestra <copyright-policy-link>Política de derechos de autor</copyright-policy-link>."
   },
-  "report.note.fully-ai-generated.1": {
-    "message": "Acabamos de actualizar nuestras reglas para prohibir proyectos totalmente generados por AI. Estamos dando a los creadores un período de margen para actualizar o eliminar completamente los proyectos generados por AI antes de empezar a aceptar reportes sobre ello."
-  },
   "report.note.malicious.1": {
     "message": "Los informes de contenido malicioso o engañoso deben incluir pruebas sustanciales del comportamiento, como muestras de código."
   },
   "report.note.malicious.2": {
     "message": "Los resúmenes de Microsoft Defender, Virus Total o la detección de malware por IA no son formas de evidencia suficientes y no serán aceptadas."
-  },
-  "report.note.missing-disclosure.1": {
-    "message": "Las divulgaciones de contenido son una nueva característica que acabamos de añadir. Estamos dando a los creadores un período de gracia para que se actualicen sus divulgaciones antes de empezar a aceptar los informes de divulgaciones faltantes o incorrectas."
   },
   "report.please-report": {
     "message": "Por favor, informe:"
@@ -5516,15 +5477,6 @@
   "settings.pats.modal.create.title": {
     "message": "Crear token de acceso personal"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "Eliminar este token"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "Esto eliminará este token para siempre (de verdad, para siempre)."
-  },
-  "settings.pats.modal.delete.title": {
-    "message": "Estás seguro de que deseas eliminar este token?"
-  },
   "settings.pats.modal.edit.title": {
     "message": "Editar token de acceso personal"
   },
@@ -5554,9 +5506,6 @@
   },
   "settings.sessions.current-session": {
     "message": "Sesión actual"
-  },
-  "settings.sessions.description": {
-    "message": "Aquí están todos los dispositivos que están actualmente conectados con tu cuenta Modrinth. Puedes cerrar sesión en cada uno de ellos individualmente.\n\nSi ves una entrada que no reconoces, cierra sesión en ese dispositivo y cambia la contraseña de tu cuenta Modrinth inmediatamente."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Último Acceso"

@@ -263,6 +263,9 @@ export const reuploadReviewPanel = panel({
 			issue: reuploadCustomPackVerificationIssue,
 			label: 'List overrides?',
 			id: 'reupload-list',
+			issueCardDisplay: {
+				label: 'Reupload: List overrides?',
+			},
 		}),
 		section({
 			shown: ({ selected }) => selected.toggleIds.includes('reupload-list'),

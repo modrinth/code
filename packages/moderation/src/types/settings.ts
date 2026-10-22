@@ -4,7 +4,7 @@ export interface SettingDefinitionBase<T> {
 	title: string
 	description: string
 	default: T
-	onChange?: (previous: T | undefined, current: T) => void
+	onChange?(previous: T | undefined, current: T): void
 }
 
 export interface ToggleSettingDefinition extends SettingDefinitionBase<boolean> {
@@ -24,6 +24,18 @@ export interface StringSettingDefinition extends SettingDefinitionBase<string> {
 	regex?: RegExp
 }
 
+export interface ColorSettingDefinition extends SettingDefinitionBase<string> {
+	type: 'color'
+}
+
+export interface NumberSettingDefinition extends SettingDefinitionBase<number> {
+	type: 'number'
+	min: number
+	max: number
+	step: number
+	unit?: string
+}
+
 export type SettingDefinitions = ReturnType<(typeof setting)[keyof typeof setting]>
 export type SettingDefinitionTypes = SettingDefinitions['type']
 
@@ -35,6 +47,8 @@ export const setting = {
 	},
 	asToggle: (data: ToggleSettingDefinition) => data,
 	asString: (data: StringSettingDefinition) => data,
+	asColor: (data: ColorSettingDefinition) => data,
+	asNumber: (data: NumberSettingDefinition) => data,
 }
 
 export function isValidFor(
@@ -48,6 +62,10 @@ export function isValidFor(
 			return true
 		} else if (definition.type == 'toggle' && typeof value === 'boolean') {
 			return true
+		} else if (definition.type === 'color' && typeof value === 'string') {
+			return value === '' || /^#[0-9a-f]{6}$/i.test(value)
+		} else if (definition.type === 'number' && typeof value === 'number') {
+			return Number.isFinite(value) && value >= definition.min && value <= definition.max
 		} else if (
 			definition.type == 'string' &&
 			typeof value === 'string' &&
@@ -64,3 +82,5 @@ export type SettingDefinition =
 	| ToggleSettingDefinition
 	| EnumSettingDefinition
 	| StringSettingDefinition
+	| ColorSettingDefinition
+	| NumberSettingDefinition

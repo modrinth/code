@@ -2,39 +2,6 @@
   "action.no-permission": {
     "defaultMessage": "Não possuis permissão."
   },
-  "affiliate.create.button": {
-    "defaultMessage": "Criar link de afiliado"
-  },
-  "affiliate.create.header": {
-    "defaultMessage": "Criando novo código de afiliado"
-  },
-  "affiliate.create.title.description": {
-    "defaultMessage": "Dá um nome ao teu link de afiliado para saberes de onde vêm as pessoas!"
-  },
-  "affiliate.create.title.label": {
-    "defaultMessage": "Título do link de afiliado"
-  },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "ex: Youtube"
-  },
-  "affiliate.create.user.description": {
-    "defaultMessage": "O nome do utilizador para quem será criado o código de afiliado"
-  },
-  "affiliate.create.user.placeholder": {
-    "defaultMessage": "Inserir nome de utilizador..."
-  },
-  "affiliate.createdBy": {
-    "defaultMessage": "Criado por {user}"
-  },
-  "affiliate.creating.button": {
-    "defaultMessage": "Criar link de afiliado..."
-  },
-  "affiliate.revoke": {
-    "defaultMessage": "Cancelar link de afiliado"
-  },
-  "affiliate.viewAnalytics": {
-    "defaultMessage": "Ver estatísticas"
-  },
   "app.appearance-settings.native-decorations.description": {
     "defaultMessage": "Usa a barra de título do teu sistema operador e controlos de janela. Requer a reinicialização da aplicação."
   },
@@ -151,9 +118,6 @@
   },
   "button.add-server-to-instance": {
     "defaultMessage": "Adicionar servidor à instância"
-  },
-  "button.affiliate-links": {
-    "defaultMessage": "Links de afiliado"
   },
   "button.analytics": {
     "defaultMessage": "Estatísticas"
@@ -2309,21 +2273,6 @@
   "servers.backups.item.auto": {
     "defaultMessage": "Automático"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Horário de Backup"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Fazer backup manual"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Renomear"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Restaurar"
-  },
-  "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "Automático"
-  },
   "servers.listing.new-label": {
     "defaultMessage": "Novo"
   },
@@ -3045,4 +2994,3 @@
     "defaultMessage": "Tipo"
   }
 }
-

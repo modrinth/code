@@ -1442,30 +1442,6 @@
   "create.project.visibility-unlisted": {
     "message": "限定公開"
   },
-  "dashboard.affiliate-links.create.button": {
-    "message": "アフィリエイトリンクを作成"
-  },
-  "dashboard.affiliate-links.empty.no-codes": {
-    "message": "アフィリエイトコードが見つかりませんでした。"
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "アフィリエイトリンクの読み込みエラー"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "アフィリエイトリンク"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "アフィリエイト コード `{id}` は永久に取り消され、このコードを使用して共有されている既存のリンクは無効になります。"
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "取り消す"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "「{title}」のアフィリエイトリンクを本当に解除しますか？"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "アフィリエイトリンクを検索…"
-  },
   "dashboard.analytics.from-projects": {
     "message": "{count} 件のプロジェクトから"
   },
@@ -2614,9 +2590,6 @@
   },
   "layout.action.file-lookup": {
     "message": "ファイル検索"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "アフィリエイトリンクを管理"
   },
   "layout.action.manage-server-notices": {
     "message": "サーバー通知を管理"
@@ -3845,29 +3818,17 @@
   "report.not-for.dmca.description": {
     "message": "<policy-link>著作権ポリシー</policy-link>をご覧ください。"
   },
-  "report.note.ai-images.1": {
-    "message": "ルールを更新し、アイコン、ギャラリー、説明文へのAI生成画像の使用を禁止しました。クリエイターがプロジェクトからAI生成画像を削除するための一定の猶予期間を設けています。そのため、猶予期間が終了するまで、AI生成画像に関する報告は受け付けません。"
-  },
-  "report.note.check-back-later": {
-    "message": "猶予期間が終了した後に、もう一度ご確認ください。現在、この種の報告は受け付けていません。"
-  },
   "report.note.copyright.1": {
     "message": "ご注意ください：これはDMCA削除要請ではなく、再アップロードされたコンテンツへの報告です。"
   },
   "report.note.copyright.2": {
     "message": "DMCAに基づく削除要請 (法的措置) を提出する意図であった場合は、当社の<copyright-policy-link>著作権ポリシー</copyright-policy-link>をご参照ください。"
   },
-  "report.note.fully-ai-generated.1": {
-    "message": "ルールを更新し、AIによって完全に生成されたプロジェクトを禁止しました。クリエイターが完全にAIで生成されたプロジェクトを更新または削除するための一定の猶予期間を設けています。そのため、猶予期間が終了するまで、完全にAIで生成されたプロジェクトに関する報告は受け付けません。"
-  },
   "report.note.malicious.1": {
     "message": "悪意のあるコンテンツまたは虚偽的なコンテンツに関する報告には、コードサンプルなど、当該行為を裏付ける十分な証拠を含める必要があります。"
   },
   "report.note.malicious.2": {
     "message": "Microsoft Defender、VirusTotal、またはAIマルウェア検出による要約は、十分な証拠形式とはみなされず、受理されません。"
-  },
-  "report.note.missing-disclosure.1": {
-    "message": "コンテンツ開示は、最近追加された新機能です。開示内容が最新の状態になるまで、クリエイターに一定の猶予期間を設けています。そのため、開示が記載されていない、または誤っていることに関する報告の受け付けは、猶予期間終了後に開始します。\n"
   },
   "report.please-report": {
     "message": "是非報告ください："
@@ -4820,15 +4781,6 @@
   "settings.pats.modal.create.title": {
     "message": "個人用アクセストークンを作成"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "このトークンを削除"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "これにより、このトークンは永久に削除されます(本当に永久です)。"
-  },
-  "settings.pats.modal.delete.title": {
-    "message": "本当にこのトークンを削除してもよろしいですか？"
-  },
   "settings.pats.modal.edit.title": {
     "message": "個人用アクセストークンを編集"
   },
@@ -4858,9 +4810,6 @@
   },
   "settings.sessions.current-session": {
     "message": "現在のセッション"
-  },
-  "settings.sessions.description": {
-    "message": "現在、お使いのModrinthアカウントでログインしているデバイスは以下の通りです。各デバイスから個別にログアウトできます。\n\nもし覚えのないログイン履歴があった場合は、そのデバイスからログアウトし、すぐにModrinthアカウントのパスワードを変更してください。"
   },
   "settings.sessions.last-accessed-ago": {
     "message": "最終アクセス: {ago}"

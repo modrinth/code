@@ -1,10 +1,8 @@
 <template>
-	<Section :heading="formatMessage(messages.members)">
-		<p v-if="membersLoading || organizationLoading" role="status" class="m-0">
-			{{ formatMessage(messages.loading) }}
-		</p>
+	<Section heading="Members">
+		<p v-if="membersLoading || organizationLoading" role="status" class="m-0">Loading...</p>
 		<p v-else-if="membersError || organizationError" role="alert" class="m-0">
-			{{ formatMessage(messages.loadError) }}
+			Could not load project data
 		</p>
 		<ul v-else class="m-0 flex list-none flex-col gap-2 p-0">
 			<li v-if="organization" class="flex flex-col gap-2.5">
@@ -33,12 +31,10 @@
 </template>
 
 <script setup lang="ts">
-import { useVIntl } from '@modrinth/ui'
 import { computed } from 'vue'
 
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
-import { projectReviewMessages as messages } from '../../messages'
 import Section from '../section.vue'
 import MemberItem from './member-item.vue'
 import OrganizationItem from './organization-item.vue'
@@ -54,7 +50,7 @@ const {
 	organizationLoading,
 	organizationError,
 } = injectProjectReviewPageContext()
-const { formatMessage } = useVIntl()
+
 const organizationMemberIds = computed(
 	() => new Set(organizationMembers.value.map((member) => member.user.id)),
 )

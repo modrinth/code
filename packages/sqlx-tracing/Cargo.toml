@@ -14,12 +14,12 @@ categories = ["asynchronous", "database", "development-tools::debugging", "devel
 
 [dependencies]
 derive_more = { workspace = true, features = ["deref", "deref_mut"] }
-futures = { version = "0.3" }
+futures = { workspace = true }
 sqlx = { workspace = true, features = ["macros"] }
-tracing = { version = "0.1" }
+tracing = { workspace = true }
 
 [dev-dependencies]
-opentelemetry = "0.33"
+opentelemetry = "0.30"
 opentelemetry-testing = "0.1"
 sqlx = { workspace = true, features = ["runtime-tokio"] }
 testcontainers = "0.25.2"

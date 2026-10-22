@@ -5,13 +5,13 @@ use crate::util;
 use crate::util::io::IOError;
 use crate::util::jre::JREError;
 use async_tungstenite::tungstenite;
-use zip::result::ZipError;
 use data_url::DataUrlError;
 use hickory_resolver::net::NetError;
 use serde::{Deserialize, Serialize};
 use sqlx::migrate::MigrateError;
 use std::path::StripPrefixError;
 use std::time::Duration;
+use zip::result::ZipError;
 
 #[derive(Serialize, Deserialize, Debug, thiserror::Error)]
 #[error("{description}")]
@@ -80,7 +80,7 @@ pub enum ErrorKind {
     NoValueFor(String),
 
     #[error("metadata error: {0}")]
-    MetadataError(#[from] daedalus::Error),
+    MetadataError(#[from] anyhow::Error),
 
     #[error("I/O error: {0}")]
     IOError(#[from] util::io::IOError),
@@ -123,6 +123,9 @@ pub enum ErrorKind {
 
     #[error("shared instances api request failed")]
     SharedInstancesApiError,
+
+    #[error("you are not allowed to share {0}")]
+    SharedInstanceFileNotAllowed(String),
 
     #[error("join handle error: {0}")]
     JoinError(#[from] tokio::task::JoinError),
@@ -293,6 +296,9 @@ impl ErrorKind {
                 }
             },
             Self::SharedInstancesApiError => "shared_instances_api_error",
+            Self::SharedInstanceFileNotAllowed(_) => {
+                "shared_instance_file_not_allowed"
+            }
             Self::HashError(_, _) => "hash_error",
             Self::LoginCanceled => "login_canceled",
             Self::NotLoggedIn => "not_logged_in",
@@ -367,8 +373,6 @@ pub fn error_code(error: &Error) -> &'static str {
         "network_error"
     } else if error.is::<JREError>() {
         "java_error"
-    } else if error.is::<daedalus::Error>() {
-        "metadata_error"
     } else if error.is::<ZipError>() {
         "archive_error"
     } else if error.is::<serde::de::value::Error>()

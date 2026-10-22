@@ -2,34 +2,31 @@
 	<div v-if="frameSrc" class="relative flex h-full min-h-0 flex-col gap-2">
 		<PageLoadingBar :key="target?.key" :loading="loadingFiles" />
 		<div v-if="loadFailed && !loadingFiles" role="alert" class="flex items-center gap-2">
-			<p class="m-0">{{ formatMessage(messages.loadError) }}</p>
-			<Button @click="retry">{{ formatMessage(messages.retry) }}</Button>
+			<p class="m-0">Could not load project data</p>
+			<Button @click="retry">Retry</Button>
 		</div>
 		<iframe
 			:key="frameKey"
 			ref="frame"
 			:src="frameSrc"
-			:title="formatMessage(messages.slicer)"
+			title="Slicer"
 			:aria-busy="loadingFiles"
 			allow="clipboard-read; clipboard-write"
 			class="block min-h-0 w-full flex-1 rounded-xl border border-solid border-surface-4 bg-surface-1"
 		/>
 	</div>
-	<p v-else-if="isLoading || versionsQuery.isPending.value" role="status" class="m-0">
-		{{ formatMessage(messages.loading) }}
-	</p>
-	<p v-else class="m-0 text-secondary">{{ formatMessage(messages.emptyVersions) }}</p>
+	<p v-else-if="isLoading || versionsQuery.isPending.value" role="status" class="m-0">Loading...</p>
+	<p v-else class="m-0 text-secondary">No versions</p>
 </template>
 
 <script setup lang="ts">
-import { Button, PageLoadingBar, useVIntl } from '@modrinth/ui'
+import { Button, PageLoadingBar } from '@modrinth/ui'
 import { onScopeDispose, ref, useTemplateRef, watch } from 'vue'
 
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 import { injectReviewSlicer, type SlicerTarget } from '~/providers/project-review/review-slicer'
 
 import { injectProjectReviewContext, injectReviewPanelVisible } from '../layout/context'
-import { projectReviewMessages as messages } from '../messages'
 import { useReviewEventListener } from '../shortcuts'
 import bridgeSource from './bridge.js?raw'
 import {
@@ -43,7 +40,6 @@ const SLICER_ORIGIN = 'https://slicer.run'
 const BRIDGE_SOURCE = 'modrinth-slicer-bridge'
 const HANDSHAKE_TIMEOUT_MS = 15_000
 
-const { formatMessage } = useVIntl()
 const { isLoading, versionsQuery } = injectProjectReviewPageContext()
 const { target, openRequests, loadingFiles } = injectReviewSlicer()
 const { openTab } = injectProjectReviewContext()
@@ -105,7 +101,13 @@ function send(next: SlicerTarget) {
 	loadingFiles.value = true
 	loadFailed.value = false
 	targetWindow.postMessage(
-		{ source: BRIDGE_SOURCE, type: 'load', id: ++requestId, files: next.files, entry: next.entry },
+		{
+			source: BRIDGE_SOURCE,
+			type: 'load',
+			id: ++requestId,
+			files: next.files,
+			entry: next.entry,
+		},
 		SLICER_ORIGIN,
 	)
 }

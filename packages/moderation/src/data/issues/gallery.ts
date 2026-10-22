@@ -35,7 +35,12 @@ export const galleryNotRelevantIssue = issue({
 			image.id !== undefined && keys.has(String(image.id)) ? [image.id] : [],
 		)
 		return imageIds.length
-			? [() => ({ type: 'remove_gallery_images', value: { image_ids: imageIds } })]
+			? [
+					() => ({
+						type: 'remove_gallery_images',
+						value: { image_ids: imageIds },
+					}),
+				]
 			: []
 	},
 	message: (context) => {
@@ -63,9 +68,10 @@ export function galleryImageReviewPanel(
 	image: Labrinth.Projects.v3.GalleryItem,
 	imageNumber: number,
 ) {
+	const imageLabel = image.name ?? `Gallery image ${imageNumber}`
 	return panel({
 		parent: 'gallery',
-		title: image.name ?? `Gallery image ${imageNumber}`,
+		title: imageLabel,
 		hint: "Are this project's gallery images sufficient?",
 		icon: ImageIcon,
 		guidanceUrl:
@@ -74,11 +80,23 @@ export function galleryImageReviewPanel(
 		toggle({
 			issue: galleryNotRelevantIssue,
 			label: 'Not relevant',
+			issueCardDisplay: {
+				label: imageLabel,
+				icon: () => image.url,
+				group: 'Irrelevant images',
+				dropdownSection: 'Gallery images',
+			},
 		}),
 
 		toggle({
 			issue: rulesAiImagesIssue,
 			label: 'AI Images',
+			issueCardDisplay: {
+				label: imageLabel,
+				icon: () => image.url,
+				group: 'AI images',
+				dropdownSection: 'Gallery images',
+			},
 		}),
 	)
 }

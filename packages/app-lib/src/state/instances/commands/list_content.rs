@@ -1462,92 +1462,108 @@ async fn get_modpack_identifiers(
         None,
     )
     .await?;
-	let mrpack_path = mrpack_file.path().to_path_buf();
-	let cancel = tokio_util::sync::CancellationToken::new();
-	let _cancel_guard = cancel.clone().drop_guard();
-	let (hashes, project_ids) = tokio::task::spawn_blocking(move || -> crate::Result<_> {
-		use std::io::{BufReader, Read};
+    let mrpack_path = mrpack_file.path().to_path_buf();
+    let cancel = tokio_util::sync::CancellationToken::new();
+    let _cancel_guard = cancel.clone().drop_guard();
+    let (hashes, project_ids) =
+        tokio::task::spawn_blocking(move || -> crate::Result<_> {
+            use std::io::{BufReader, Read};
 
-		let mut archive = zip::ZipArchive::new(BufReader::new(std::fs::File::open(mrpack_path)?))
-			.context(ErrorKind::InputError("failed to read modpack zip".to_string()))?;
-		let mut manifest_idx = None;
-		for index in 0..archive.len() {
-			if cancel.is_cancelled() {
-				return Err(std::io::Error::new(
-					std::io::ErrorKind::Interrupted,
-					"modpack hashing cancelled",
-				)
-				.into());
-			}
-			if archive.by_index_raw(index)?.name().is_ok_and(|name| name == "modrinth.index.json") {
-				manifest_idx = Some(index);
-				break;
-			}
-		}
-		let manifest_idx = manifest_idx.ok_or(ErrorKind::InputError(
-			"no modrinth.index.json found in mrpack".to_string(),
-		))?;
-		let mut manifest = String::new();
-		archive.by_index(manifest_idx)?.read_to_string(&mut manifest)?;
-		let pack: PackFormat = serde_json::from_str(&manifest)?;
-		let mut hashes = pack.files.iter()
-			.filter_map(|file| file.hashes.get(&PackFileHash::Sha1).cloned())
-			.collect::<Vec<_>>();
-		let project_ids = pack
-			.files
-			.iter()
-			.filter_map(|file| {
-				file.downloads.iter().find_map(|url| {
-					let parts = url.split('/').collect::<Vec<_>>();
-					let data_idx = parts.iter().position(|part| *part == "data")?;
-					parts.get(data_idx + 1).map(|part| part.to_string())
-				})
-			})
-			.collect::<HashSet<_>>()
-			.into_iter()
-			.collect::<Vec<_>>();
-		let mut buffer = vec![0_u8; 256 * 1024];
-		for index in 0..archive.len() {
-			if cancel.is_cancelled() {
-				return Err(std::io::Error::new(
-					std::io::ErrorKind::Interrupted,
-					"modpack hashing cancelled",
-				)
-				.into());
-			}
-			let is_override = {
-				let entry = archive.by_index_raw(index)?;
-				entry.name().is_ok_and(|filename| {
-					(filename.starts_with("overrides/")
-						|| filename.starts_with("client-overrides/")
-						|| filename.starts_with("server-overrides/"))
-						&& !filename.ends_with('/')
-				})
-			};
-			if !is_override {
-				continue;
-			}
-			let mut reader = archive.by_index(index)?;
-			let mut hasher = sha1_smol::Sha1::new();
-			loop {
-				if cancel.is_cancelled() {
-					return Err(std::io::Error::new(
-						std::io::ErrorKind::Interrupted,
-						"modpack hashing cancelled",
-					)
-					.into());
-				}
-				let read = reader.read(&mut buffer)?;
-				if read == 0 {
-					break;
-				}
-				hasher.update(&buffer[..read]);
-			}
-			hashes.push(hasher.hexdigest());
-		}
-		Ok((hashes, project_ids))
-	})
-	.await??;
+            let mut archive = zip::ZipArchive::new(BufReader::new(
+                std::fs::File::open(mrpack_path)?,
+            ))
+            .context(ErrorKind::InputError(
+                "failed to read modpack zip".to_string(),
+            ))?;
+            let mut manifest_idx = None;
+            for index in 0..archive.len() {
+                if cancel.is_cancelled() {
+                    return Err(std::io::Error::new(
+                        std::io::ErrorKind::Interrupted,
+                        "modpack hashing cancelled",
+                    )
+                    .into());
+                }
+                if archive
+                    .by_index_raw(index)?
+                    .name()
+                    .is_ok_and(|name| name == "modrinth.index.json")
+                {
+                    manifest_idx = Some(index);
+                    break;
+                }
+            }
+            let manifest_idx = manifest_idx.ok_or(ErrorKind::InputError(
+                "no modrinth.index.json found in mrpack".to_string(),
+            ))?;
+            let mut manifest = String::new();
+            archive
+                .by_index(manifest_idx)?
+                .read_to_string(&mut manifest)?;
+            let pack: PackFormat = serde_json::from_str(&manifest)?;
+            let mut hashes = pack
+                .files
+                .iter()
+                .filter_map(|file| {
+                    file.hashes.get(&PackFileHash::Sha1).cloned()
+                })
+                .collect::<Vec<_>>();
+            let project_ids = pack
+                .files
+                .iter()
+                .filter_map(|file| {
+                    file.downloads.iter().find_map(|url| {
+                        let parts = url.split('/').collect::<Vec<_>>();
+                        let data_idx =
+                            parts.iter().position(|part| *part == "data")?;
+                        parts.get(data_idx + 1).map(|part| part.to_string())
+                    })
+                })
+                .collect::<HashSet<_>>()
+                .into_iter()
+                .collect::<Vec<_>>();
+            let mut buffer = vec![0_u8; 256 * 1024];
+            for index in 0..archive.len() {
+                if cancel.is_cancelled() {
+                    return Err(std::io::Error::new(
+                        std::io::ErrorKind::Interrupted,
+                        "modpack hashing cancelled",
+                    )
+                    .into());
+                }
+                let is_override = {
+                    let entry = archive.by_index_raw(index)?;
+                    entry.name().is_ok_and(|filename| {
+                        (filename.starts_with("overrides/")
+                            || filename.starts_with("client-overrides/")
+                            || filename.starts_with("server-overrides/"))
+                            && !filename.ends_with('/')
+                    })
+                };
+                if !is_override {
+                    continue;
+                }
+                let mut reader = archive.by_index(index)?;
+                let mut hasher = sha1_smol::Sha1::new();
+                loop {
+                    if cancel.is_cancelled() {
+                        return Err(std::io::Error::new(
+                            std::io::ErrorKind::Interrupted,
+                            "modpack hashing cancelled",
+                        )
+                        .into());
+                    }
+                    let read = reader.read(&mut buffer)?;
+                    if read == 0 {
+                        break;
+                    }
+                    hasher.update(&buffer[..read]);
+                }
+                hashes.push(hasher.hexdigest());
+            }
+            Ok((hashes, project_ids))
+        })
+        .await??;
 
     CachedEntry::cache_modpack_files(
         version_id,

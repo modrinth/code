@@ -2,39 +2,6 @@
   "action.no-permission": {
     "defaultMessage": "Vous n'avez pas la permission."
   },
-  "affiliate.create.button": {
-    "defaultMessage": "Créer un lien affilié"
-  },
-  "affiliate.create.header": {
-    "defaultMessage": "Création d'un nouveau code d'affiliation"
-  },
-  "affiliate.create.title.description": {
-    "defaultMessage": "Donnez un nom au lien d'affiliation pour savoir d'où viennent les gens !"
-  },
-  "affiliate.create.title.label": {
-    "defaultMessage": "Titre du lien affilié"
-  },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "par exemple, YouTube"
-  },
-  "affiliate.create.user.description": {
-    "defaultMessage": "Pseudo de l'utilisateur à qui est destiné le code d'affiliation"
-  },
-  "affiliate.create.user.placeholder": {
-    "defaultMessage": "Entrez un pseudo..."
-  },
-  "affiliate.createdBy": {
-    "defaultMessage": "Créé par {user}"
-  },
-  "affiliate.creating.button": {
-    "defaultMessage": "Création du lien en cours..."
-  },
-  "affiliate.revoke": {
-    "defaultMessage": "Révoquer le lien d'affiliation"
-  },
-  "affiliate.viewAnalytics": {
-    "defaultMessage": "Voir les statistiques"
-  },
   "app.appearance-settings.native-decorations.description": {
     "defaultMessage": "Utiliser la barre de titre et les commandes de fenêtre de votre système d'exploitation. Nécessite le redémarrage de l'application."
   },
@@ -151,9 +118,6 @@
   },
   "button.add-server-to-instance": {
     "defaultMessage": "Ajouter le serveur à l'instance"
-  },
-  "button.affiliate-links": {
-    "defaultMessage": "Liens affiliés"
   },
   "button.analytics": {
     "defaultMessage": "Statistiques"
@@ -3281,12 +3245,6 @@
   "profile.button.manage-projects": {
     "defaultMessage": "Gérer les projets"
   },
-  "profile.button.remove-affiliate": {
-    "defaultMessage": "Retirer l'affiliation"
-  },
-  "profile.button.set-affiliate": {
-    "defaultMessage": "Se mettre comme affilié"
-  },
   "profile.button.shared-instances": {
     "defaultMessage": "Voir les instances partagées"
   },
@@ -3349,9 +3307,6 @@
   },
   "profile.force-password-reset.email-label": {
     "defaultMessage": "Adresse email du compte"
-  },
-  "profile.label.affiliate": {
-    "defaultMessage": "Affilié"
   },
   "profile.label.badges": {
     "defaultMessage": "Badges"
@@ -5126,12 +5081,6 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "Restauration de la sauvegarde"
   },
-  "servers.backups.bulk-bar.aria-label": {
-    "defaultMessage": "Actions groupées pour {count, plural, one {une sauvegarde sélectionnée} other {# sauvegardes sélectionnées}}"
-  },
-  "servers.backups.bulk-bar.deleting": {
-    "defaultMessage": "Suppression de {total, plural, one {# sauvegarde} other {# sauvegardes}}..."
-  },
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "{count, plural, one {# sauvegarde sélectionnée} other {# sauvegardes sélectionnées}}"
   },
@@ -5156,50 +5105,11 @@
   "servers.backups.empty.heading": {
     "defaultMessage": "Aucune sauvegarde"
   },
-  "servers.backups.filtered-empty.clear-filters": {
-    "defaultMessage": "Effacer les filtres"
-  },
-  "servers.backups.filtered-empty.description": {
-    "defaultMessage": "Essayez un filtre différent ou effacez les filtres pour voir toutes les sauvegardes."
-  },
-  "servers.backups.filtered-empty.heading": {
-    "defaultMessage": "Aucune sauvegarde ne correspond aux filtres sélectionnés"
-  },
   "servers.backups.item.auto": {
     "defaultMessage": "Auto"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Planification de sauvegarde"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "Avatar de {username}"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "Support"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Sauvegarde manuelle"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Renommer"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Restaurer"
-  },
-  "servers.backups.select-backup-aria": {
-    "defaultMessage": "Sélectionner une sauvegarde {name}"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Sauvegarder"
-  },
-  "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "Auto"
-  },
-  "servers.backups.toolbar.filter-manual": {
-    "defaultMessage": "Manuelle"
-  },
-  "servers.backups.toolbar.select-all": {
-    "defaultMessage": "Tout sélectionner"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "Création d'une sauvegarde en cours"

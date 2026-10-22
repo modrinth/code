@@ -2,39 +2,6 @@
   "action.no-permission": {
     "defaultMessage": "Du har inte behörighet."
   },
-  "affiliate.create.button": {
-    "defaultMessage": "Skapa affiliatelänk"
-  },
-  "affiliate.create.header": {
-    "defaultMessage": "Skapar ny affiliatelänk"
-  },
-  "affiliate.create.title.description": {
-    "defaultMessage": "Ge din affiliatelänk ett namn så du vet var personerna kommer ifrån!"
-  },
-  "affiliate.create.title.label": {
-    "defaultMessage": "Affiliatelänkens titel"
-  },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "t.ex. YouTube"
-  },
-  "affiliate.create.user.description": {
-    "defaultMessage": "Användarnamnet av användaren som affiliatelänken skapas för"
-  },
-  "affiliate.create.user.placeholder": {
-    "defaultMessage": "Ange användarnamn..."
-  },
-  "affiliate.createdBy": {
-    "defaultMessage": "Skapad av {user}"
-  },
-  "affiliate.creating.button": {
-    "defaultMessage": "Skapar affiliatelänk..."
-  },
-  "affiliate.revoke": {
-    "defaultMessage": "Upphäv affiliatelänk"
-  },
-  "affiliate.viewAnalytics": {
-    "defaultMessage": "Visa statistik"
-  },
   "app.server-settings.failed-to-load-server": {
     "defaultMessage": "Kunde inte ladda in serverinställningar"
   },
@@ -145,9 +112,6 @@
   },
   "button.add-server-to-instance": {
     "defaultMessage": "Lägg till server till instans"
-  },
-  "button.affiliate-links": {
-    "defaultMessage": "Affiliatelänkar"
   },
   "button.analytics": {
     "defaultMessage": "Statistik"
@@ -4952,9 +4916,6 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "Återställer från säkerhetskopia"
   },
-  "servers.backups.bulk-bar.deleting": {
-    "defaultMessage": "Raderar {total, plural, one {# säkerhetskopia} other {# säkerhetskopior}}..."
-  },
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "{count, plural, one {# säkerhetskopia markerad} other {# säkerhetskopior markerade}}"
   },
@@ -4979,50 +4940,11 @@
   "servers.backups.empty.heading": {
     "defaultMessage": "Inga säkerhetskopior än"
   },
-  "servers.backups.filtered-empty.clear-filters": {
-    "defaultMessage": "Rensa filter"
-  },
-  "servers.backups.filtered-empty.description": {
-    "defaultMessage": "Prova ett annat filer eller rensa filtren för att se alla säkerhetskopior."
-  },
-  "servers.backups.filtered-empty.heading": {
-    "defaultMessage": "Inga säkerhetskopior matchar"
-  },
   "servers.backups.item.auto": {
     "defaultMessage": "Auto"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Säkerhetskopieringschema"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "{username}s avatar"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "Support"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Manuell säkerhetskopiering"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Byt namn"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Återställ"
-  },
-  "servers.backups.select-backup-aria": {
-    "defaultMessage": "Markera säkerhetskopia {name}"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Skapa säkerhetskopia"
-  },
-  "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "Auto"
-  },
-  "servers.backups.toolbar.filter-manual": {
-    "defaultMessage": "Manuellt"
-  },
-  "servers.backups.toolbar.select-all": {
-    "defaultMessage": "Markera alla"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "Säkerhetskopiering pågår"

@@ -30,7 +30,6 @@
 			:regions="regions"
 			:refresh-payment-methods="fetchPaymentData"
 			:fetch-stock="fetchStock"
-			:affiliate-code="affiliateCode"
 			plan-stage
 			@purchase-success="handlePurchaseSuccess"
 			@hide="clearPurchaseIntent"
@@ -415,7 +414,6 @@ const purchaseModal = ref<InstanceType<typeof ModrinthServersPurchaseModal> | nu
 type UpgradeModalRef = ComponentPublicInstance<{ open: (id?: string) => void | Promise<void> }>
 const medalUpgradeModal = ref<UpgradeModalRef | null>(null)
 const resubscribeModal = ref<InstanceType<typeof ResubscribeModal> | null>(null)
-const affiliateCode = ref<string | null>(null)
 const selectedCurrency = ref<string>('USD')
 
 const pyroProducts = computed(() => {
@@ -461,12 +459,8 @@ async function fetchPaymentData() {
 	await Promise.all([refetchCustomer(), refetchPaymentMethods()])
 }
 
-async function fetchStock(
-	region: Archon.Servers.v1.Region,
-	request: Archon.Servers.v0.StockRequest,
-): Promise<number> {
-	const result = await client.archon.servers_v0.checkStock(region.shortcode, request)
-	return result.available
+function fetchStock(memoryMb: number[]): Promise<Archon.Servers.v1.StockResponse> {
+	return client.archon.servers_v1.getStock(memoryMb)
 }
 
 const {

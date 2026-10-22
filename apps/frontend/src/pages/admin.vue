@@ -55,12 +55,6 @@
 							shown: admin,
 						},
 						{
-							link: '/admin/affiliates',
-							label: 'Affiliate links',
-							icon: AffiliateIcon,
-							shown: admin,
-						},
-						{
 							link: '/admin/analytics/events',
 							label: 'Analytics events',
 							icon: ChartIcon,
@@ -86,7 +80,6 @@
 </template>
 <script setup lang="ts">
 import {
-	AffiliateIcon,
 	BookOpenIcon,
 	ChartIcon,
 	FileSearchCornerIcon,

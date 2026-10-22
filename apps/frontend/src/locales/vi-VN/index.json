@@ -1448,30 +1448,6 @@
   "create.project.visibility-unlisted": {
     "message": "Không công khai"
   },
-  "dashboard.affiliate-links.create.button": {
-    "message": "Tạo link affiliate"
-  },
-  "dashboard.affiliate-links.empty.no-codes": {
-    "message": "Không tìm thấy mã liên kết nào."
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "Lỗi tải link affiliate"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "Link affiliate của bạn"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "Thao tác này sẽ vĩnh viễn thu hồi mã affiliate `{id}`. Mọi liên kết hiện có sử dụng mã này đã được chia sẻ sẽ không còn hiệu lực."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "Thu hồi"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "Bạn có chắc chắn muốn thu hồi link affiliate \"{title}\" không?"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "Tìm kiếm link affiliate..."
-  },
   "dashboard.analytics.from-projects": {
     "message": "từ {count} {count, plural, other {dự án}} khác"
   },
@@ -2692,9 +2668,6 @@
   },
   "layout.action.file-lookup": {
     "message": "Tra cứu tệp"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "Quản lý link affiliate"
   },
   "layout.action.manage-server-notices": {
     "message": "Quản lý thông báo máy chủ"
@@ -4577,29 +4550,17 @@
   "report.not-for.dmca.description": {
     "message": "Xem <policy-link>Chính sách bản quyền</policy-link> của chúng tôi."
   },
-  "report.note.ai-images.1": {
-    "message": "Chúng tôi vừa cập nhật quy tắc để cấm hình ảnh do AI tạo trong biểu tượng, thư viện ảnh và phần mô tả. Các nhà sáng tạo sẽ có một khoảng thời gian ân hạn để xóa hình ảnh AI khỏi dự án trước khi chúng tôi bắt đầu nhận báo cáo về nội dung này."
-  },
-  "report.note.check-back-later": {
-    "message": "Hãy quay lại sau khi thời gian ân hạn kết thúc. Hiện tại chúng tôi chưa nhận loại báo cáo này."
-  },
   "report.note.copyright.1": {
     "message": "Vui lòng lưu ý rằng bạn không đang gửi yêu cầu gỡ nội dung theo DMCA, mà là báo cáo nội dung được tải lại."
   },
   "report.note.copyright.2": {
     "message": "Nếu bạn muốn gửi yêu cầu gỡ nội dung theo DMCA (một hành động pháp lý), vui lòng xem <copyright-policy-link>Chính sách bản quyền</copyright-policy-link>."
   },
-  "report.note.fully-ai-generated.1": {
-    "message": "Chúng tôi vừa cập nhật quy tắc để cấm các dự án hoàn toàn do AI tạo. Các nhà sáng tạo sẽ có một khoảng thời gian ân hạn để cập nhật hoặc gỡ các dự án hoàn toàn do AI tạo trước khi chúng tôi bắt đầu nhận báo cáo."
-  },
   "report.note.malicious.1": {
     "message": "Báo cáo về nội dung độc hại hoặc lừa đảo phải kèm theo bằng chứng rõ ràng về hành vi đó, chẳng hạn như mẫu mã nguồn."
   },
   "report.note.malicious.2": {
     "message": "Các bản tóm tắt từ Microsoft Defender, VirusTotal hoặc công cụ phát hiện mã độc bằng AI không được coi là bằng chứng đầy đủ và sẽ không được chấp nhận."
-  },
-  "report.note.missing-disclosure.1": {
-    "message": "Công bố nội dung là một tính năng mới. Các nhà sáng tạo sẽ có một khoảng thời gian ân hạn để cập nhật đầy đủ các mục công bố trước khi chúng tôi bắt đầu nhận báo cáo về mục công bố bị thiếu hoặc không chính xác."
   },
   "report.please-report": {
     "message": "Vui lòng báo cáo:"
@@ -5567,15 +5528,6 @@
   "settings.pats.modal.create.title": {
     "message": "Tạo token truy cập cá nhân"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "Xoá token này"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "Thao tác này sẽ xóa vĩnh viễn token này (vĩnh viễn thật sự)."
-  },
-  "settings.pats.modal.delete.title": {
-    "message": "Bạn có chắc chắn muốn xoá token này không?"
-  },
   "settings.pats.modal.edit.title": {
     "message": "Chỉnh sửa token truy cập cá nhân"
   },
@@ -5605,9 +5557,6 @@
   },
   "settings.sessions.current-session": {
     "message": "Phiên hiện tại"
-  },
-  "settings.sessions.description": {
-    "message": "Dưới đây là tất cả các thiết bị hiện đang đăng nhập bằng tài khoản Modrinth của bạn. Bạn có thể đăng xuất từng thiết bị riêng lẻ.\n\nNếu bạn thấy một thiết bị không quen thuộc, hãy đăng xuất khỏi thiết bị đó và đổi mật khẩu tài khoản Modrinth ngay lập tức."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Truy cập lần cuối {ago}"

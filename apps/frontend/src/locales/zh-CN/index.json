@@ -1445,30 +1445,6 @@
   "create.project.visibility-unlisted": {
     "message": "未列出"
   },
-  "dashboard.affiliate-links.create.button": {
-    "message": "创建推广链接"
-  },
-  "dashboard.affiliate-links.empty.no-codes": {
-    "message": "未找到推广代码。"
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "加载推广链接时出错"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "你的推广链接"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "这将永久撤销关联代码 `{id}`，任何分享的此代码链接将不再有效。"
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "撤销"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "你确定要撤销你的 ''{title}'' 推广链接吗？"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "搜索推广链接……"
-  },
   "dashboard.analytics.from-projects": {
     "message": "来自 {count} {count, plural, other {个项目}}"
   },
@@ -2689,9 +2665,6 @@
   },
   "layout.action.file-lookup": {
     "message": "文件查询"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "管理推广链接"
   },
   "layout.action.manage-server-notices": {
     "message": "管理服务器通知"
@@ -4571,29 +4544,17 @@
   "report.not-for.dmca.description": {
     "message": "详见我们的<policy-link>版权政策</policy-link>。"
   },
-  "report.note.ai-images.1": {
-    "message": "我们刚刚更新了规则，禁止在图标、画廊及项目描述中使用 AI 生成的图像。在正式开始接收此类举报之前，我们正在向创作者提供一段宽限期，以便他们从自己的项目中移除 AI 图像。"
-  },
-  "report.note.check-back-later": {
-    "message": "请在宽限期结束后再来查看。目前暂不受理此类举报。"
-  },
   "report.note.copyright.1": {
     "message": "请注意，你提交的并非 DMCA 下架请求，而是对转载内容的举报。"
   },
   "report.note.copyright.2": {
     "message": "如果你需要填报 DMCA 删除请求（这是一个法务行为），请参见我们的<copyright-policy-link>版权政策</copyright-policy-link>。"
   },
-  "report.note.fully-ai-generated.1": {
-    "message": "我们刚刚更新了规则，明确禁止完全由 AI 生成的项目。在正式开始接收此类举报之前，我们正在向创作者提供一段宽限期，以便他们更新或下架完全由 AI 生成的项目。"
-  },
   "report.note.malicious.1": {
     "message": "报告恶意或欺骗性内容时必须附上行为的实质性证据，例如代码样本。"
   },
   "report.note.malicious.2": {
     "message": "Microsoft Defender、VirusTotal 等杀毒软件的报告，或 AI 恶意软件检测结果不属于充分的证据形式，不会被接受。"
-  },
-  "report.note.missing-disclosure.1": {
-    "message": "内容披露是我们新增的一个功能。 我们向创作者提供一个宽限期，以便在我们开始接受缺失或不正确的披露报告之前更新他们的披露。"
   },
   "report.please-report": {
     "message": "请举报："
@@ -5561,15 +5522,6 @@
   "settings.pats.modal.create.title": {
     "message": "创建个人访问令牌"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "删除该令牌"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "这将永久删除此令牌（真的很久）。"
-  },
-  "settings.pats.modal.delete.title": {
-    "message": "你确定要删除这个令牌吗？"
-  },
   "settings.pats.modal.edit.title": {
     "message": "编辑个人访问令牌"
   },
@@ -5599,9 +5551,6 @@
   },
   "settings.sessions.current-session": {
     "message": "当前会话"
-  },
-  "settings.sessions.description": {
-    "message": "以下是目前登录了你的 Modrinth 账号的所有设备。你可以为任一设备单独退出登录。\n\n如果发现陌生设备，请立即将其退出登录，并更改你的 Modrinth 账号密码。"
   },
   "settings.sessions.last-accessed-ago": {
     "message": "上次访问于{ago}"

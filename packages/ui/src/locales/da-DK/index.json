@@ -2,39 +2,6 @@
   "action.no-permission": {
     "defaultMessage": "Du har ikke tilladelse."
   },
-  "affiliate.create.button": {
-    "defaultMessage": "Opret affiliate link"
-  },
-  "affiliate.create.header": {
-    "defaultMessage": "Opretter et nyt affiliate kode"
-  },
-  "affiliate.create.title.description": {
-    "defaultMessage": "Giv dit affiliate link et navn så du ved hvor folk kommer fra!"
-  },
-  "affiliate.create.title.label": {
-    "defaultMessage": "Title af affiliate link"
-  },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "f.eks. YouTube"
-  },
-  "affiliate.create.user.description": {
-    "defaultMessage": "Brugernavnet af brugeren for at lave en affiliate kode til"
-  },
-  "affiliate.create.user.placeholder": {
-    "defaultMessage": "Indtast brugernavn..."
-  },
-  "affiliate.createdBy": {
-    "defaultMessage": "Lavet af {user}"
-  },
-  "affiliate.creating.button": {
-    "defaultMessage": "Opretter affiliate link..."
-  },
-  "affiliate.revoke": {
-    "defaultMessage": "Fjern affiliate link"
-  },
-  "affiliate.viewAnalytics": {
-    "defaultMessage": "Se analyser"
-  },
   "app.server-settings.failed-to-load-server": {
     "defaultMessage": "Kunne ikke indlæse server indstillinger"
   },
@@ -100,9 +67,6 @@
   },
   "button.add-server-to-instance": {
     "defaultMessage": "Tilføj server til instans"
-  },
-  "button.affiliate-links": {
-    "defaultMessage": "Affiliate links"
   },
   "button.analytics": {
     "defaultMessage": "Analytics"
@@ -1928,18 +1892,6 @@
   "servers.backups.item.auto": {
     "defaultMessage": "Automatisk"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Sikkerhedskopiering plan"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Manuel sikkerhedskopiering"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Ændre navn"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Genopret"
-  },
   "servers.grant-access-modal.header": {
     "defaultMessage": "Tilføj bruger"
   },
@@ -2220,4 +2172,3 @@
     "defaultMessage": "Du har ændringer, der ikke er gemt"
   }
 }
-

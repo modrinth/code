@@ -2,39 +2,6 @@
   "action.no-permission": {
     "defaultMessage": "Você não tem permissão."
   },
-  "affiliate.create.button": {
-    "defaultMessage": "Criar link de afiliado"
-  },
-  "affiliate.create.header": {
-    "defaultMessage": "Criando código de afiliado"
-  },
-  "affiliate.create.title.description": {
-    "defaultMessage": "Dar a seu link afiliado um nome para que saiba de onde as pessoas estão vindo!"
-  },
-  "affiliate.create.title.label": {
-    "defaultMessage": "Título do link de afiliado"
-  },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "ex.: YouTube"
-  },
-  "affiliate.create.user.description": {
-    "defaultMessage": "O nome de usuário para quem vai criar o código afiliado"
-  },
-  "affiliate.create.user.placeholder": {
-    "defaultMessage": "Digitar nome de usuário..."
-  },
-  "affiliate.createdBy": {
-    "defaultMessage": "Criado por {user}"
-  },
-  "affiliate.creating.button": {
-    "defaultMessage": "Criando link de afiliado..."
-  },
-  "affiliate.revoke": {
-    "defaultMessage": "Revogar link de afiliado"
-  },
-  "affiliate.viewAnalytics": {
-    "defaultMessage": "Ver estatísticas"
-  },
   "app.appearance-settings.native-decorations.description": {
     "defaultMessage": "Utilize a barra de título e os controles de janela do seu sistema operacional. Requer uma reinicialização."
   },
@@ -151,9 +118,6 @@
   },
   "button.add-server-to-instance": {
     "defaultMessage": "Adicionar servidor à instância"
-  },
-  "button.affiliate-links": {
-    "defaultMessage": "Links de afiliado"
   },
   "button.analytics": {
     "defaultMessage": "Estatísticas"
@@ -3308,17 +3272,11 @@
   "profile.button.manage-projects": {
     "defaultMessage": "Gerenciar projetos"
   },
-  "profile.button.remove-affiliate": {
-    "defaultMessage": "Remover como afiliado"
-  },
   "profile.button.reset-2fa": {
     "defaultMessage": "Redefinir a autenticação de dois fatores"
   },
   "profile.button.revoke-sessions": {
     "defaultMessage": "Revogar todas as sessões"
-  },
-  "profile.button.set-affiliate": {
-    "defaultMessage": "Definir como afiliado"
   },
   "profile.button.shared-instances": {
     "defaultMessage": "Ver instâncias compartilhadas"
@@ -3406,9 +3364,6 @@
   },
   "profile.force-password-reset.title": {
     "defaultMessage": "Forçar redefinição de senha para {username}"
-  },
-  "profile.label.affiliate": {
-    "defaultMessage": "Afiliado"
   },
   "profile.label.badges": {
     "defaultMessage": "Emblemas"
@@ -5240,12 +5195,6 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "Restaurando da cópia de segurança"
   },
-  "servers.backups.bulk-bar.aria-label": {
-    "defaultMessage": "Ações em massa para {count, plural, one {uma cópia de segurança selecionada} other {# cópias de segurança selecionadas}}"
-  },
-  "servers.backups.bulk-bar.deleting": {
-    "defaultMessage": "Excluindo {total, plural, one {# cópia de segurança} other {# cópias de segurança}}..."
-  },
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "{count, plural, one {# cópia de segurança selecionada} other {# cópias de segurança selecionadas}}"
   },
@@ -5270,50 +5219,11 @@
   "servers.backups.empty.heading": {
     "defaultMessage": "Ainda não há cópias de segurança"
   },
-  "servers.backups.filtered-empty.clear-filters": {
-    "defaultMessage": "Limpar filtros"
-  },
-  "servers.backups.filtered-empty.description": {
-    "defaultMessage": "Tente um filtro diferente ou limpe os filtros para ver todas as cópias de segurança."
-  },
-  "servers.backups.filtered-empty.heading": {
-    "defaultMessage": "Nenhuma cópia de segurança corresponde"
-  },
   "servers.backups.item.auto": {
     "defaultMessage": "Automático"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Agendamento de cópia de segurança"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "Avatar de {username}"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "Suporte"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Cópia de segurança manual"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Renomear"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Restaurar"
-  },
-  "servers.backups.select-backup-aria": {
-    "defaultMessage": "Selecionar cópia de segurança {name}"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Criar cópia de segurança"
-  },
-  "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "Automático"
-  },
-  "servers.backups.toolbar.filter-manual": {
-    "defaultMessage": "Manual"
-  },
-  "servers.backups.toolbar.select-all": {
-    "defaultMessage": "Selecionar tudo"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "Criação de cópia de segurança em andamento"
@@ -7275,4 +7185,3 @@
     "defaultMessage": "Tipo"
   }
 }
-

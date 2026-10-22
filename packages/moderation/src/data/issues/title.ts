@@ -90,12 +90,18 @@ export const titleReviewPanel = panel({
 		toggle({
 			label: 'Forked Project',
 			id: 'title-similarities-fork',
+			issueCardDisplay: {
+				label: 'Forked Project',
+			},
 			issue: titleSimilaritiesIssue,
 			shown: (ctx) => !ctx.projectV3.minecraft_server,
 		}),
 		toggle({
 			label: 'Modpack Named After Mod',
 			id: 'title-similarities-modpack',
+			issueCardDisplay: {
+				label: 'Modpack Named After Mod',
+			},
 			issue: titleSimilaritiesIssue,
 			shown: (ctx) => ctx.projectV3.project_types.includes('modpack'),
 		}),

@@ -2,39 +2,6 @@
   "action.no-permission": {
     "defaultMessage": "Недостатньо прав."
   },
-  "affiliate.create.button": {
-    "defaultMessage": "Створити партнерське посилання"
-  },
-  "affiliate.create.header": {
-    "defaultMessage": "Створити новий код партнера"
-  },
-  "affiliate.create.title.description": {
-    "defaultMessage": "Дайте своєму партнерському посиланню назву, щоб ви знали, звідки люди приходять!"
-  },
-  "affiliate.create.title.label": {
-    "defaultMessage": "Заголовок партнерського посилання"
-  },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "як-от YouTube"
-  },
-  "affiliate.create.user.description": {
-    "defaultMessage": "Ім’я користувача особи, для якої створити код партнера"
-  },
-  "affiliate.create.user.placeholder": {
-    "defaultMessage": "Уведіть ім’я користувача…"
-  },
-  "affiliate.createdBy": {
-    "defaultMessage": "Створено {user}"
-  },
-  "affiliate.creating.button": {
-    "defaultMessage": "Створення партнерського посилання…"
-  },
-  "affiliate.revoke": {
-    "defaultMessage": "Відкликати партнерське посилання"
-  },
-  "affiliate.viewAnalytics": {
-    "defaultMessage": "Переглянути аналітику"
-  },
   "app.appearance-settings.native-decorations.description": {
     "defaultMessage": "Використовувати рядок заголовка й елементи керування вашої операційної системи. Потребує перезапуску застосунку."
   },
@@ -151,9 +118,6 @@
   },
   "button.add-server-to-instance": {
     "defaultMessage": "Додати сервер до примірника"
-  },
-  "button.affiliate-links": {
-    "defaultMessage": "Партнерські посилання"
   },
   "button.analytics": {
     "defaultMessage": "Аналітика"
@@ -3260,17 +3224,11 @@
   "profile.button.manage-projects": {
     "defaultMessage": "Керувати проєктами"
   },
-  "profile.button.remove-affiliate": {
-    "defaultMessage": "Видалити як партнера"
-  },
   "profile.button.reset-2fa": {
     "defaultMessage": "Скинути двофакторну автентифікацію"
   },
   "profile.button.revoke-sessions": {
     "defaultMessage": "Завершити всі сеанси"
-  },
-  "profile.button.set-affiliate": {
-    "defaultMessage": "Призначити партнером"
   },
   "profile.button.shared-instances": {
     "defaultMessage": "Переглянути спільні примірники"
@@ -3358,9 +3316,6 @@
   },
   "profile.force-password-reset.title": {
     "defaultMessage": "Примусове скидання паролю для користувача {username}"
-  },
-  "profile.label.affiliate": {
-    "defaultMessage": "Партнер"
   },
   "profile.label.badges": {
     "defaultMessage": "Значки"
@@ -5192,12 +5147,6 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "Відновлення з резервної копії"
   },
-  "servers.backups.bulk-bar.aria-label": {
-    "defaultMessage": "{count, plural, one {Групові дії для однієї вибраної резервної копії} other {Групові дії для # вибраних резервних копій}}"
-  },
-  "servers.backups.bulk-bar.deleting": {
-    "defaultMessage": "Видалення {total, plural, one {# резервоної копії} few {# резервних копій} many {# резервних копій} other {# резервних копій}}…"
-  },
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "{count, plural, one {# резервну копію вибрано} few {# резевні копії вибрано} many {# резевних копій вибрано} other {# резевних копій вибрано}}"
   },
@@ -5222,50 +5171,11 @@
   "servers.backups.empty.heading": {
     "defaultMessage": "Резервних копій ще немає"
   },
-  "servers.backups.filtered-empty.clear-filters": {
-    "defaultMessage": "Очистити фільтр"
-  },
-  "servers.backups.filtered-empty.description": {
-    "defaultMessage": "Спробуйте інший фільтр або очистіть фільтри, щоб переглянути всі резервні копії."
-  },
-  "servers.backups.filtered-empty.heading": {
-    "defaultMessage": "Немає відповідних резервних копій"
-  },
   "servers.backups.item.auto": {
     "defaultMessage": "Автоматично"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Розклад резервного копіювання"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "Аватар {username}"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "Підтримка"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Ручне резервне копіювання"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Перейменувати"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Відновлення"
-  },
-  "servers.backups.select-backup-aria": {
-    "defaultMessage": "Вибрати резервну копію {name}"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Створити резервну копію"
-  },
-  "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "Авто"
-  },
-  "servers.backups.toolbar.filter-manual": {
-    "defaultMessage": "Уручну"
-  },
-  "servers.backups.toolbar.select-all": {
-    "defaultMessage": "Вибрати все"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "Триває створення резервної копії"

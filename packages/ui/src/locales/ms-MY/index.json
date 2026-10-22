@@ -2,39 +2,6 @@
   "action.no-permission": {
     "defaultMessage": "Anda tidak mempunyai keizinan."
   },
-  "affiliate.create.button": {
-    "defaultMessage": "Cipta pautan afiliasi"
-  },
-  "affiliate.create.header": {
-    "defaultMessage": "Mencipta kod afiliasi baharu"
-  },
-  "affiliate.create.title.description": {
-    "defaultMessage": "Berikan nama kepada pautan afiliasi anda supaya anda tahu dari mana orang datang!"
-  },
-  "affiliate.create.title.label": {
-    "defaultMessage": "Tajuk pautan afiliasi"
-  },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "cth. YouTube"
-  },
-  "affiliate.create.user.description": {
-    "defaultMessage": "Nama pengguna pengguna yang akan menggunakan kod afiliasi"
-  },
-  "affiliate.create.user.placeholder": {
-    "defaultMessage": "Masukkan nama pengguna..."
-  },
-  "affiliate.createdBy": {
-    "defaultMessage": "Dicipta oleh {user}"
-  },
-  "affiliate.creating.button": {
-    "defaultMessage": "Mencipta pautan afiliasi..."
-  },
-  "affiliate.revoke": {
-    "defaultMessage": "Batalkan pautan afiliasi"
-  },
-  "affiliate.viewAnalytics": {
-    "defaultMessage": "Lihat analitik"
-  },
   "app.server-settings.failed-to-load-server": {
     "defaultMessage": "Gagal memuat tetapan pelayan"
   },
@@ -130,9 +97,6 @@
   },
   "button.add-server-to-instance": {
     "defaultMessage": "Tambahkan pelayan ke dalam pemasangan"
-  },
-  "button.affiliate-links": {
-    "defaultMessage": "Pautan afiliasi"
   },
   "button.analytics": {
     "defaultMessage": "Analitik"
@@ -3773,12 +3737,6 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "Memulihkan daripada sandaran"
   },
-  "servers.backups.bulk-bar.aria-label": {
-    "defaultMessage": "{count, plural, other {Tindakan pukal untuk # sandaran yang dipilih}}"
-  },
-  "servers.backups.bulk-bar.deleting": {
-    "defaultMessage": "Sedang memadamkan {total, plural, other {# sandaran}}..."
-  },
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "{count, plural, other {# sandaran dipilih}}"
   },
@@ -3794,47 +3752,11 @@
   "servers.backups.empty.heading": {
     "defaultMessage": "Belum ada sandaran"
   },
-  "servers.backups.filtered-empty.clear-filters": {
-    "defaultMessage": "Kosongkan tapisan"
-  },
-  "servers.backups.filtered-empty.heading": {
-    "defaultMessage": "Tiada sandaran yang sepadan"
-  },
   "servers.backups.item.auto": {
     "defaultMessage": "Auto"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Jadual penyandaran"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "Avatar {username}"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "Sokongan"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Penyandaran manual"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Namakan semula"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Pulihkan"
-  },
-  "servers.backups.select-backup-aria": {
-    "defaultMessage": "Pilih sandaran {name}"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Cipta sandaran"
-  },
-  "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "Auto"
-  },
-  "servers.backups.toolbar.filter-manual": {
-    "defaultMessage": "Manual"
-  },
-  "servers.backups.toolbar.select-all": {
-    "defaultMessage": "Pilih semua"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "Penciptaan sandaran sedang dijalankan"
@@ -4959,4 +4881,3 @@
     "defaultMessage": "Jenis"
   }
 }
-

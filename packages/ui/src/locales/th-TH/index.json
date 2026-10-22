@@ -2,15 +2,6 @@
   "action.no-permission": {
     "defaultMessage": "คุณไม่มีสิทธิ์"
   },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "เช่น YouTube"
-  },
-  "affiliate.create.user.placeholder": {
-    "defaultMessage": "ใส่ชื่อผู้ใช้"
-  },
-  "affiliate.createdBy": {
-    "defaultMessage": "สร้างโดย {user}"
-  },
   "badge.beta": {
     "defaultMessage": "เบต้า"
   },
@@ -645,4 +636,3 @@
     "defaultMessage": "ภาษา"
   }
 }
-

@@ -2,39 +2,6 @@
   "action.no-permission": {
     "defaultMessage": "Nincsen hozzá jogosultságod."
   },
-  "affiliate.create.button": {
-    "defaultMessage": "Partnerlink létrehozása"
-  },
-  "affiliate.create.header": {
-    "defaultMessage": "Új partnerkód létrehozása"
-  },
-  "affiliate.create.title.description": {
-    "defaultMessage": "Add meg a nevet a partnerlinkednek, hogy tudd, honnan érkeznek az emberek!"
-  },
-  "affiliate.create.title.label": {
-    "defaultMessage": "Partnerlink címe"
-  },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "pl. YouTube"
-  },
-  "affiliate.create.user.description": {
-    "defaultMessage": "A felhasználónak a felhasználóneve a partnerkód létrehozásához"
-  },
-  "affiliate.create.user.placeholder": {
-    "defaultMessage": "Írj be a felhasználónevet..."
-  },
-  "affiliate.createdBy": {
-    "defaultMessage": "Létrehozta: {user}"
-  },
-  "affiliate.creating.button": {
-    "defaultMessage": "Partnerlink létrehozása..."
-  },
-  "affiliate.revoke": {
-    "defaultMessage": "Partnerlink visszavonása"
-  },
-  "affiliate.viewAnalytics": {
-    "defaultMessage": "Statisztika megtekintése"
-  },
   "app.appearance-settings.native-decorations.description": {
     "defaultMessage": "Az operációs rendszer címsorának és ablakvezérlőinek használata. A módosítás érvénybe lépéséhez újra kell indítani az alkalmazást."
   },
@@ -151,9 +118,6 @@
   },
   "button.add-server-to-instance": {
     "defaultMessage": "Szerver hozzáadása a példányhoz"
-  },
-  "button.affiliate-links": {
-    "defaultMessage": "Társulati linkek"
   },
   "button.analytics": {
     "defaultMessage": "Statisztika"
@@ -3281,17 +3245,11 @@
   "profile.button.manage-projects": {
     "defaultMessage": "Projektek kezelése"
   },
-  "profile.button.remove-affiliate": {
-    "defaultMessage": "Partner eltávolítása"
-  },
   "profile.button.reset-2fa": {
     "defaultMessage": "Kétlépcsős azonosítás alaphelyzetbeállítása"
   },
   "profile.button.revoke-sessions": {
     "defaultMessage": "Minden munkamenet megszakítása"
-  },
-  "profile.button.set-affiliate": {
-    "defaultMessage": "Partnerként beállítás"
   },
   "profile.button.shared-instances": {
     "defaultMessage": "Megosztott példányok megtekintése"
@@ -3379,9 +3337,6 @@
   },
   "profile.force-password-reset.title": {
     "defaultMessage": "{username} jelszavának alaphelyzetbeállításának erőltetése"
-  },
-  "profile.label.affiliate": {
-    "defaultMessage": "Partner"
   },
   "profile.label.badges": {
     "defaultMessage": "Jelvények"
@@ -5207,12 +5162,6 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "Visszaállítás biztonsági mentésből"
   },
-  "servers.backups.bulk-bar.aria-label": {
-    "defaultMessage": "{count, plural, one {Tömeges műveletek 1 kiválasztott biztonsági mentéshez} other {Tömeges műveletek # kiválasztott biztonsági mentéshez}}"
-  },
-  "servers.backups.bulk-bar.deleting": {
-    "defaultMessage": "{total} biztonsági mentés törlése..."
-  },
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "{count} biztonsági mentés kiválasztva"
   },
@@ -5237,50 +5186,11 @@
   "servers.backups.empty.heading": {
     "defaultMessage": "Még nincsenek biztonsági mentések"
   },
-  "servers.backups.filtered-empty.clear-filters": {
-    "defaultMessage": "Szűrők törlése"
-  },
-  "servers.backups.filtered-empty.description": {
-    "defaultMessage": "Próbálj ki egy másik szűrőt, vagy töröld a szűrőket, hogy az összes biztonsági mentést megtekinthesd."
-  },
-  "servers.backups.filtered-empty.heading": {
-    "defaultMessage": "Nincs találat"
-  },
   "servers.backups.item.auto": {
     "defaultMessage": "Automatikus"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Biztonsági mentés ütemezés"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "{username} avatárja"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "Támogatás"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Manuális biztonsági mentés"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Átnevezés"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Visszaállítás"
-  },
-  "servers.backups.select-backup-aria": {
-    "defaultMessage": "{name} biztonsági mentés kiválasztása"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Biztonsági mentés létrehozása"
-  },
-  "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "Automatikus"
-  },
-  "servers.backups.toolbar.filter-manual": {
-    "defaultMessage": "Kézi"
-  },
-  "servers.backups.toolbar.select-all": {
-    "defaultMessage": "Összes kijelölése"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "Biztonsági mentés létrehozás folyamatban van"

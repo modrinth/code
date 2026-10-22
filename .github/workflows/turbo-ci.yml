@@ -63,6 +63,7 @@ jobs:
         run: |
           if [ "$INTERNAL" = 'true' ]; then
             docker compose --profile clustered-redis up --wait $UNUSED_SERVICES
+            docker compose run --rm minecraft-meta-s3-init
           fi
 
       - name: Setup Node
@@ -171,7 +172,9 @@ jobs:
 
       - name: Start services (fork)
         if: steps.check-labrinth.outputs.needs_services == 'true'
-        run: docker compose --profile clustered-redis up --wait $UNUSED_SERVICES
+        run: |
+          docker compose --profile clustered-redis up --wait $UNUSED_SERVICES
+          docker compose run --rm minecraft-meta-s3-init
 
       - name: Wait for services
         wait: [services]

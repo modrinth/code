@@ -62,6 +62,39 @@ export class ArchonServersV1Module extends AbstractModule {
 	}
 
 	/**
+	 * Get how many servers of each memory size fit in every public region
+	 * GET /v1/stock
+	 */
+	public async getStock(memoryMb: number[]): Promise<Archon.Servers.v1.StockResponse> {
+		return this.client.request<Archon.Servers.v1.StockResponse>('/stock', {
+			api: 'archon',
+			version: 1,
+			method: 'GET',
+			params: { memory_mb: memoryMb.join(',') },
+			skipAuth: true,
+		})
+	}
+
+	/**
+	 * Get how many servers of each memory size fit in every public region when upgrading a server
+	 * GET /v1/servers/:server_id/upgrade-stock
+	 */
+	public async getUpgradeStock(
+		serverId: string,
+		memoryMb: number[],
+	): Promise<Archon.Servers.v1.StockResponse> {
+		return this.client.request<Archon.Servers.v1.StockResponse>(
+			`/servers/${serverId}/upgrade-stock`,
+			{
+				api: 'archon',
+				version: 1,
+				method: 'GET',
+				params: { memory_mb: memoryMb.join(',') },
+			},
+		)
+	}
+
+	/**
 	 * End the intro flow for a server
 	 * DELETE /v1/servers/:id/flows/intro
 	 */

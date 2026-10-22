@@ -1496,30 +1496,6 @@
   "create.version.restricted-title": {
     "message": "Action restricted"
   },
-  "dashboard.affiliate-links.create.button": {
-    "message": "Create affiliate link"
-  },
-  "dashboard.affiliate-links.empty.no-codes": {
-    "message": "No affiliate codes found."
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "Error loading affiliate links"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "Your affiliate links"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "This will permanently revoke the affiliate code `{id}` and any existing links with this code that have been shared will no longer be valid."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "Revoke"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "Are you sure you want to revoke your ''{title}'' affiliate link?"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "Search affiliate links..."
-  },
   "dashboard.analytics.from-projects": {
     "message": "from {count} {count, plural, one {project} other {projects}}"
   },
@@ -2741,9 +2717,6 @@
   "layout.action.file-lookup": {
     "message": "File lookup"
   },
-  "layout.action.manage-affiliates": {
-    "message": "Manage affiliate links"
-  },
   "layout.action.manage-server-notices": {
     "message": "Manage server notices"
   },
@@ -3029,30 +3002,6 @@
   "layout.publish.email-verification-required.title": {
     "message": "Email verification required"
   },
-  "markdown-editor.placeholders.empty": {
-    "message": "No matching placeholders."
-  },
-  "markdown-editor.placeholders.label": {
-    "message": "Placeholders"
-  },
-  "markdown-editor.placeholders.search": {
-    "message": "Search placeholders…"
-  },
-  "markdown-editor.templates.empty-all": {
-    "message": "No matching messages or placeholders."
-  },
-  "markdown-editor.templates.insert": {
-    "message": "Insert message"
-  },
-  "markdown-editor.templates.library": {
-    "message": "Message Library"
-  },
-  "markdown-editor.templates.search-all": {
-    "message": "Search messages and placeholders…"
-  },
-  "markdown-editor.templates.section": {
-    "message": "Template messages"
-  },
   "messages.noResults": {
     "message": "No results found for your query!"
   },
@@ -3079,6 +3028,45 @@
   },
   "modal.shared-instance.open-in-app.why-use": {
     "message": "Why use the Modrinth App"
+  },
+  "moderation.appearance.apply": {
+    "message": "Apply theme"
+  },
+  "moderation.appearance.copied": {
+    "message": "Copied!"
+  },
+  "moderation.appearance.copy": {
+    "message": "Copy JSON"
+  },
+  "moderation.appearance.copy-error": {
+    "message": "Could not copy automatically. Select and copy the JSON below."
+  },
+  "moderation.appearance.download": {
+    "message": "Download JSON"
+  },
+  "moderation.appearance.export": {
+    "message": "Export theme"
+  },
+  "moderation.appearance.export-help": {
+    "message": "Copy your appearance as JSON or download it to share or import later."
+  },
+  "moderation.appearance.file": {
+    "message": "Choose JSON file"
+  },
+  "moderation.appearance.file-error": {
+    "message": "Could not read this file. Choose a JSON file smaller than 64 KB."
+  },
+  "moderation.appearance.import": {
+    "message": "Import theme"
+  },
+  "moderation.appearance.import-help": {
+    "message": "Paste theme JSON or choose a JSON file, then apply it to preview your appearance."
+  },
+  "moderation.appearance.invalid": {
+    "message": "Invalid theme. Use a version 1 review appearance export with all seven values, valid hex colors, opacity from 0–100, and border width from 0–8."
+  },
+  "moderation.appearance.json": {
+    "message": "Theme JSON"
   },
   "moderation.c2pa-scan.failed": {
     "message": "Failed to scan for AI-generated files."
@@ -3122,6 +3110,9 @@
   "moderation.keybinds.not-bound": {
     "message": "Not bound"
   },
+  "moderation.keybinds.panel-toggles": {
+    "message": "Panel toggles"
+  },
   "moderation.keybinds.project": {
     "message": "Copy from public project pages"
   },
@@ -3152,6 +3143,48 @@
   "moderation.keybinds.title": {
     "message": "Keybinds"
   },
+  "moderation.keybinds.transfer.apply": {
+    "message": "Apply keybinds"
+  },
+  "moderation.keybinds.transfer.copied": {
+    "message": "Copied!"
+  },
+  "moderation.keybinds.transfer.copy": {
+    "message": "Copy JSON"
+  },
+  "moderation.keybinds.transfer.copy-error": {
+    "message": "Could not copy automatically. Select and copy the JSON below."
+  },
+  "moderation.keybinds.transfer.download": {
+    "message": "Download JSON"
+  },
+  "moderation.keybinds.transfer.export": {
+    "message": "Export keybinds"
+  },
+  "moderation.keybinds.transfer.export-help": {
+    "message": "Copy your custom keybinds as JSON or download them to share or import later."
+  },
+  "moderation.keybinds.transfer.file": {
+    "message": "Choose JSON file"
+  },
+  "moderation.keybinds.transfer.file-error": {
+    "message": "Could not read this file. Choose a JSON file smaller than 64 KB."
+  },
+  "moderation.keybinds.transfer.import": {
+    "message": "Import keybinds"
+  },
+  "moderation.keybinds.transfer.import-help": {
+    "message": "Paste keybind JSON or choose a JSON file. Applying replaces your keybinds; omitted actions return to defaults."
+  },
+  "moderation.keybinds.transfer.invalid": {
+    "message": "Invalid keybinds. Use a version 1 review keybind export with known action IDs, arrays of key definitions, and boolean modifiers."
+  },
+  "moderation.keybinds.transfer.json": {
+    "message": "Keybind JSON"
+  },
+  "moderation.keybinds.transfer.too-large": {
+    "message": "These keybinds exceed the space available in your saved moderation settings. Reduce the number of custom bindings and try again."
+  },
   "moderation.moderate": {
     "message": "Moderate"
   },
@@ -3173,614 +3206,14 @@
   "moderation.page.technicalReview": {
     "message": "Tech review"
   },
-  "moderation.project-review.actions": {
-    "message": "Actions"
-  },
   "moderation.project-review.approvedCount": {
     "message": "{count} approved"
-  },
-  "moderation.project-review.archived": {
-    "message": "Archived"
   },
   "moderation.project-review.archivedCount": {
     "message": "{count} archived"
   },
-  "moderation.project-review.author": {
-    "message": "Author"
-  },
-  "moderation.project-review.back": {
-    "message": "Back"
-  },
-  "moderation.project-review.backToFiles": {
-    "message": "Back to files"
-  },
-  "moderation.project-review.changelog": {
-    "message": "Changelog"
-  },
-  "moderation.project-review.closePopoutWindows": {
-    "message": "Close popout windows"
-  },
-  "moderation.project-review.closeReview": {
-    "message": "Close review controls"
-  },
-  "moderation.project-review.collapseAll": {
-    "message": "Collapse all"
-  },
-  "moderation.project-review.collapseVersion": {
-    "message": "Hide details"
-  },
-  "moderation.project-review.compatibility": {
-    "message": "Compatibility"
-  },
-  "moderation.project-review.complete": {
-    "message": "Complete"
-  },
-  "moderation.project-review.completedFiles": {
-    "message": "Reviewed files ({count})"
-  },
-  "moderation.project-review.completedProjects": {
-    "message": "Completed projects"
-  },
-  "moderation.project-review.conversationThread": {
-    "message": "Conversation thread"
-  },
-  "moderation.project-review.copyHash": {
-    "message": "Copy {algorithm}"
-  },
-  "moderation.project-review.copyValue": {
-    "message": "Copy: {value}"
-  },
-  "moderation.project-review.created": {
-    "message": "Created"
-  },
-  "moderation.project-review.customLicense": {
-    "message": "Custom"
-  },
-  "moderation.project-review.customSlug": {
-    "message": "Differs from the project name"
-  },
-  "moderation.project-review.dependencies": {
-    "message": "Dependencies"
-  },
-  "moderation.project-review.dependencyCount": {
-    "message": "{count, plural, one {# dep} other {# deps}}"
-  },
-  "moderation.project-review.description": {
-    "message": "Description"
-  },
-  "moderation.project-review.details": {
-    "message": "Details"
-  },
-  "moderation.project-review.details.privateDescription": {
-    "message": "Not publicly visible. Only accessible to project members."
-  },
-  "moderation.project-review.details.publicDescription": {
-    "message": "Visible via URL, on your profile, and in search."
-  },
-  "moderation.project-review.details.unlistedDescription": {
-    "message": "Visible via URL only. Not shown on your profile or in search."
-  },
-  "moderation.project-review.disclosures": {
-    "message": "Disclosures"
-  },
-  "moderation.project-review.discord": {
-    "message": "Discord invite"
-  },
-  "moderation.project-review.dockPanel": {
-    "message": "Return panel to workspace"
-  },
-  "moderation.project-review.donationBmac": {
-    "message": "Buy Me A Coffee"
-  },
-  "moderation.project-review.donationGithub": {
-    "message": "GitHub Sponsors"
-  },
-  "moderation.project-review.donationKoFi": {
-    "message": "Ko-fi"
-  },
-  "moderation.project-review.donationOther": {
-    "message": "Other"
-  },
-  "moderation.project-review.donationPatreon": {
-    "message": "Patreon"
-  },
-  "moderation.project-review.donationPaypal": {
-    "message": "PayPal"
-  },
-  "moderation.project-review.download": {
-    "message": "Download"
-  },
-  "moderation.project-review.downloads": {
-    "message": "Downloads"
-  },
-  "moderation.project-review.draft": {
-    "message": "Draft"
-  },
   "moderation.project-review.draftCount": {
     "message": "{count} draft"
-  },
-  "moderation.project-review.edit.remove-icon": {
-    "message": "Remove icon"
-  },
-  "moderation.project-review.edit.upload-icon": {
-    "message": "Upload icon"
-  },
-  "moderation.project-review.editSection": {
-    "message": "Edit {section}"
-  },
-  "moderation.project-review.embedded": {
-    "message": "Embedded"
-  },
-  "moderation.project-review.empty": {
-    "message": "No project selected"
-  },
-  "moderation.project-review.emptyChangelog": {
-    "message": "No changelog"
-  },
-  "moderation.project-review.emptyDependencies": {
-    "message": "No dependencies"
-  },
-  "moderation.project-review.emptyDescription": {
-    "message": "No description"
-  },
-  "moderation.project-review.emptyEnvironments": {
-    "message": "No environments"
-  },
-  "moderation.project-review.emptyGallery": {
-    "message": "No gallery images"
-  },
-  "moderation.project-review.emptyLinks": {
-    "message": "No links"
-  },
-  "moderation.project-review.emptyPlatforms": {
-    "message": "No platforms"
-  },
-  "moderation.project-review.emptyPopout": {
-    "message": "No tabs open in this panel"
-  },
-  "moderation.project-review.emptyTags": {
-    "message": "No tags"
-  },
-  "moderation.project-review.emptyVersions": {
-    "message": "No versions"
-  },
-  "moderation.project-review.environments": {
-    "message": "Environments"
-  },
-  "moderation.project-review.exit": {
-    "message": "Exit"
-  },
-  "moderation.project-review.expandAll": {
-    "message": "Expand all"
-  },
-  "moderation.project-review.expandVersion": {
-    "message": "Show details"
-  },
-  "moderation.project-review.featured": {
-    "message": "Featured"
-  },
-  "moderation.project-review.fileCount": {
-    "message": "{count, plural, one {# file} other {# files}}"
-  },
-  "moderation.project-review.files": {
-    "message": "Files"
-  },
-  "moderation.project-review.finish": {
-    "message": "Finish"
-  },
-  "moderation.project-review.gallery": {
-    "message": "Gallery"
-  },
-  "moderation.project-review.gameVersions": {
-    "message": "Game versions"
-  },
-  "moderation.project-review.generalSettings": {
-    "message": "General"
-  },
-  "moderation.project-review.hashes": {
-    "message": "Hashes"
-  },
-  "moderation.project-review.hideLeft": {
-    "message": "Hide project details"
-  },
-  "moderation.project-review.hideRight": {
-    "message": "Hide panel"
-  },
-  "moderation.project-review.icon": {
-    "message": "Icon"
-  },
-  "moderation.project-review.imageNumber": {
-    "message": "Image {number}"
-  },
-  "moderation.project-review.incompatible": {
-    "message": "Incompatible"
-  },
-  "moderation.project-review.issues": {
-    "message": "Issue tracker"
-  },
-  "moderation.project-review.keepPopoutClosed": {
-    "message": "Keep closed"
-  },
-  "moderation.project-review.keybindsSettings": {
-    "message": "Keybinds"
-  },
-  "moderation.project-review.left": {
-    "message": "Project details"
-  },
-  "moderation.project-review.license": {
-    "message": "License"
-  },
-  "moderation.project-review.licenseUrl": {
-    "message": "License URL"
-  },
-  "moderation.project-review.link-info.active": {
-    "message": "Active"
-  },
-  "moderation.project-review.link-info.activity": {
-    "message": "Activity"
-  },
-  "moderation.project-review.link-info.archived": {
-    "message": "This repository is archived; its features may be read-only."
-  },
-  "moderation.project-review.link-info.archivedValue": {
-    "message": "Archived"
-  },
-  "moderation.project-review.link-info.author": {
-    "message": "Author"
-  },
-  "moderation.project-review.link-info.board": {
-    "message": "Board"
-  },
-  "moderation.project-review.link-info.bot": {
-    "message": "Bot"
-  },
-  "moderation.project-review.link-info.channel": {
-    "message": "Channel"
-  },
-  "moderation.project-review.link-info.closedIssues": {
-    "message": "Closed issues"
-  },
-  "moderation.project-review.link-info.community": {
-    "message": "Community"
-  },
-  "moderation.project-review.link-info.company": {
-    "message": "Company"
-  },
-  "moderation.project-review.link-info.created": {
-    "message": "Account created"
-  },
-  "moderation.project-review.link-info.detailTooltip": {
-    "message": "{label}: {value}"
-  },
-  "moderation.project-review.link-info.disabled": {
-    "message": "Disabled"
-  },
-  "moderation.project-review.link-info.discussions": {
-    "message": "Discussions"
-  },
-  "moderation.project-review.link-info.discussionsDisabled": {
-    "message": "Discussions are disabled."
-  },
-  "moderation.project-review.link-info.dm": {
-    "message": "DM link"
-  },
-  "moderation.project-review.link-info.document": {
-    "message": "Document"
-  },
-  "moderation.project-review.link-info.donation": {
-    "message": "Donation profile"
-  },
-  "moderation.project-review.link-info.downloads": {
-    "message": "Downloads"
-  },
-  "moderation.project-review.link-info.enabled": {
-    "message": "Enabled"
-  },
-  "moderation.project-review.link-info.expires": {
-    "message": "Expires"
-  },
-  "moderation.project-review.link-info.externalLinks": {
-    "message": "External links on this page"
-  },
-  "moderation.project-review.link-info.followers": {
-    "message": "Followers"
-  },
-  "moderation.project-review.link-info.forkOf": {
-    "message": "Fork of"
-  },
-  "moderation.project-review.link-info.forks": {
-    "message": "Forks"
-  },
-  "moderation.project-review.link-info.invite": {
-    "message": "Server invite"
-  },
-  "moderation.project-review.link-info.inviteExpired": {
-    "message": "This invite has expired."
-  },
-  "moderation.project-review.link-info.inviteExpires": {
-    "message": "This invite has an expiry date."
-  },
-  "moderation.project-review.link-info.inviter": {
-    "message": "Invited by"
-  },
-  "moderation.project-review.link-info.issues": {
-    "message": "Issues"
-  },
-  "moderation.project-review.link-info.issuesDisabled": {
-    "message": "Issues are disabled."
-  },
-  "moderation.project-review.link-info.language": {
-    "message": "Language"
-  },
-  "moderation.project-review.link-info.lastPush": {
-    "message": "Last push"
-  },
-  "moderation.project-review.link-info.license": {
-    "message": "License"
-  },
-  "moderation.project-review.link-info.loading": {
-    "message": "Loading link details…"
-  },
-  "moderation.project-review.link-info.maxUses": {
-    "message": "Use limit"
-  },
-  "moderation.project-review.link-info.members": {
-    "message": "Members"
-  },
-  "moderation.project-review.link-info.noExpiry": {
-    "message": "No expiry"
-  },
-  "moderation.project-review.link-info.notFound": {
-    "message": "This resource was not found. It may be private, deleted, or expired."
-  },
-  "moderation.project-review.link-info.online": {
-    "message": "Online"
-  },
-  "moderation.project-review.link-info.openIssues": {
-    "message": "Open issues"
-  },
-  "moderation.project-review.link-info.organization": {
-    "message": "Organization"
-  },
-  "moderation.project-review.link-info.owner": {
-    "message": "Owner"
-  },
-  "moderation.project-review.link-info.playlist": {
-    "message": "Playlist"
-  },
-  "moderation.project-review.link-info.privateCommunity": {
-    "message": "This community is private."
-  },
-  "moderation.project-review.link-info.project": {
-    "message": "Project"
-  },
-  "moderation.project-review.link-info.projectStatus": {
-    "message": "Project status: {status}"
-  },
-  "moderation.project-review.link-info.projectUnavailable": {
-    "message": "This project is not publicly available or is archived. Check its status below."
-  },
-  "moderation.project-review.link-info.repositories": {
-    "message": "Public repositories"
-  },
-  "moderation.project-review.link-info.repository": {
-    "message": "Repository"
-  },
-  "moderation.project-review.link-info.role": {
-    "message": "Role"
-  },
-  "moderation.project-review.link-info.server": {
-    "message": "Server"
-  },
-  "moderation.project-review.link-info.size": {
-    "message": "Repository size"
-  },
-  "moderation.project-review.link-info.sponsors": {
-    "message": "Sponsors"
-  },
-  "moderation.project-review.link-info.stars": {
-    "message": "Stars"
-  },
-  "moderation.project-review.link-info.status": {
-    "message": "Status"
-  },
-  "moderation.project-review.link-info.stream": {
-    "message": "Stream"
-  },
-  "moderation.project-review.link-info.subscribers": {
-    "message": "Subscribers"
-  },
-  "moderation.project-review.link-info.target": {
-    "message": "Invite type"
-  },
-  "moderation.project-review.link-info.topic": {
-    "message": "Topic"
-  },
-  "moderation.project-review.link-info.unavailable": {
-    "message": "Additional details could not be loaded. The service may be unavailable, private, rate limited, or blocked by the browser."
-  },
-  "moderation.project-review.link-info.unlimitedUses": {
-    "message": "Unlimited uses"
-  },
-  "moderation.project-review.link-info.unsupported": {
-    "message": "No additional public metadata is available for this link."
-  },
-  "moderation.project-review.link-info.user": {
-    "message": "User"
-  },
-  "moderation.project-review.link-info.uses": {
-    "message": "Uses"
-  },
-  "moderation.project-review.link-info.video": {
-    "message": "Video"
-  },
-  "moderation.project-review.link-info.website": {
-    "message": "Website"
-  },
-  "moderation.project-review.link-info.wiki": {
-    "message": "Wiki"
-  },
-  "moderation.project-review.link-info.wikiDisabled": {
-    "message": "The wiki is disabled."
-  },
-  "moderation.project-review.linkRemoved": {
-    "message": "Link removed: {link}"
-  },
-  "moderation.project-review.linkUnavailable": {
-    "message": "Link unavailable"
-  },
-  "moderation.project-review.links": {
-    "message": "Links"
-  },
-  "moderation.project-review.listed": {
-    "message": "Listed"
-  },
-  "moderation.project-review.loadError": {
-    "message": "Could not load project data"
-  },
-  "moderation.project-review.loading": {
-    "message": "Loading..."
-  },
-  "moderation.project-review.matchesName": {
-    "message": "Matches the project name"
-  },
-  "moderation.project-review.memberCount": {
-    "message": "{count, plural, one {# member} other {# members}}"
-  },
-  "moderation.project-review.members": {
-    "message": "Members"
-  },
-  "moderation.project-review.modpack": {
-    "message": "Modpack"
-  },
-  "moderation.project-review.modpackVersion": {
-    "message": "Version {version}"
-  },
-  "moderation.project-review.monetization": {
-    "message": "Monetization"
-  },
-  "moderation.project-review.monetizationStatus": {
-    "message": "{status, select, monetized {Monetized} demonetized {Demonetized} forceDemonetized {Force demonetized} other {Unknown}}"
-  },
-  "moderation.project-review.monetizationValue": {
-    "message": "{status, select, monetized {Enabled} demonetized {Disabled} forceDemonetized {Force disabled} other {Unknown}}"
-  },
-  "moderation.project-review.mrpack": {
-    "message": ".mrpack"
-  },
-  "moderation.project-review.next": {
-    "message": "Next"
-  },
-  "moderation.project-review.noCompletedProjects": {
-    "message": "No completed projects yet"
-  },
-  "moderation.project-review.noFlagsFiles": {
-    "message": "Files without flags ({count})"
-  },
-  "moderation.project-review.noIssues": {
-    "message": "No issues."
-  },
-  "moderation.project-review.noLicense": {
-    "message": "No license URL"
-  },
-  "moderation.project-review.noMatchingDependencies": {
-    "message": "No matching dependencies"
-  },
-  "moderation.project-review.noMatchingProjects": {
-    "message": "No matching projects"
-  },
-  "moderation.project-review.noPendingFiles": {
-    "message": "No files with unresolved flags"
-  },
-  "moderation.project-review.noQueuedProjects": {
-    "message": "No projects in the queue"
-  },
-  "moderation.project-review.noReports": {
-    "message": "No technical-review reports are available for this project"
-  },
-  "moderation.project-review.noReviewActions": {
-    "message": "No review actions available for this section"
-  },
-  "moderation.project-review.noSelectedIssues": {
-    "message": "No issues added. Select issues while reviewing the project to see the message here."
-  },
-  "moderation.project-review.noServerAddress": {
-    "message": "No address."
-  },
-  "moderation.project-review.noServerLanguages": {
-    "message": "No languages."
-  },
-  "moderation.project-review.noSkippedProjects": {
-    "message": "No skipped projects"
-  },
-  "moderation.project-review.openIcon": {
-    "message": "View enlarged project icon"
-  },
-  "moderation.project-review.openImage": {
-    "message": "Open image {number}"
-  },
-  "moderation.project-review.openImageInNewTab": {
-    "message": "Open image in new tab"
-  },
-  "moderation.project-review.openMemberAvatar": {
-    "message": "View enlarged avatar for {username}"
-  },
-  "moderation.project-review.openOrganizationIcon": {
-    "message": "View enlarged icon for {organization}"
-  },
-  "moderation.project-review.openReviewGuidance": {
-    "message": "Open review guidance in new tab"
-  },
-  "moderation.project-review.openSlicer": {
-    "message": "Open in Slicer"
-  },
-  "moderation.project-review.openVersionSlicer": {
-    "message": "Open files in Slicer"
-  },
-  "moderation.project-review.optional": {
-    "message": "Optional"
-  },
-  "moderation.project-review.organization": {
-    "message": "Organization"
-  },
-  "moderation.project-review.owner": {
-    "message": "Owner"
-  },
-  "moderation.project-review.panelLayout": {
-    "message": "Panel layout"
-  },
-  "moderation.project-review.pendingFiles": {
-    "message": "Pending files ({count})"
-  },
-  "moderation.project-review.permalink": {
-    "message": "Perma link"
-  },
-  "moderation.project-review.permissions": {
-    "message": "Permissions"
-  },
-  "moderation.project-review.permissionsPlaceholder": {
-    "message": "Permissions review is coming soon"
-  },
-  "moderation.project-review.pinReview": {
-    "message": "Pin review controls"
-  },
-  "moderation.project-review.platforms": {
-    "message": "Platforms"
-  },
-  "moderation.project-review.popoutFailed": {
-    "message": "Could not open the panel window"
-  },
-  "moderation.project-review.popoutPanel": {
-    "message": "Open panel in its own window"
-  },
-  "moderation.project-review.post-approval": {
-    "message": "Post-approval"
-  },
-  "moderation.project-review.previousLink": {
-    "message": "Previous link: {url}"
-  },
-  "moderation.project-review.primary": {
-    "message": "Primary file"
   },
   "moderation.project-review.privateCount": {
     "message": "{count} private"
@@ -3788,275 +3221,62 @@
   "moderation.project-review.processingCount": {
     "message": "{count} under review"
   },
-  "moderation.project-review.project": {
-    "message": "Project"
-  },
-  "moderation.project-review.projectId": {
-    "message": "Project ID"
-  },
-  "moderation.project-review.projectTitle": {
-    "message": "Title"
-  },
-  "moderation.project-review.projectType": {
-    "message": "Type"
-  },
-  "moderation.project-review.published": {
-    "message": "Published"
-  },
-  "moderation.project-review.publishedBy": {
-    "message": "Published by"
-  },
-  "moderation.project-review.queueError": {
-    "message": "Could not change projects. Please try again"
-  },
-  "moderation.project-review.queueNavigation": {
-    "message": "Review queue navigation"
-  },
-  "moderation.project-review.queuedProjects": {
-    "message": "Next 5 projects"
-  },
-  "moderation.project-review.re-review": {
-    "message": "Re-review"
-  },
-  "moderation.project-review.reReviewFindings": {
-    "message": "{count, plural, one {# re-review item} other {# re-review items}}"
-  },
-  "moderation.project-review.recommended": {
-    "message": "(Recommended)"
-  },
   "moderation.project-review.rejectedCount": {
     "message": "{count} rejected"
-  },
-  "moderation.project-review.remaining": {
-    "message": "Remaining"
-  },
-  "moderation.project-review.reopenPopouts": {
-    "message": "Reopen window"
-  },
-  "moderation.project-review.requesting": {
-    "message": "Requesting"
-  },
-  "moderation.project-review.required": {
-    "message": "Required"
-  },
-  "moderation.project-review.reset": {
-    "message": "Reset"
-  },
-  "moderation.project-review.resetPanelLayout": {
-    "message": "Reset panel layout"
-  },
-  "moderation.project-review.resolvePermissions": {
-    "message": "Review redistribution permissions"
-  },
-  "moderation.project-review.restorePopouts": {
-    "message": "Popout window closed"
-  },
-  "moderation.project-review.restorePopoutsDescription": {
-    "message": "Panels from this window have been moved to the main window: {panels}."
-  },
-  "moderation.project-review.retry": {
-    "message": "Retry"
-  },
-  "moderation.project-review.reupload": {
-    "message": "Reupload"
-  },
-  "moderation.project-review.reviewIssues": {
-    "message": "Issues"
-  },
-  "moderation.project-review.reviewProgress": {
-    "message": "Reviewed flags indicate progress, not a safe verdict. Files without flags have no flag verdict"
-  },
-  "moderation.project-review.reviewScope": {
-    "message": "These selections apply to the {stage} review for the whole project"
-  },
-  "moderation.project-review.reviewSection": {
-    "message": "Review {section}"
-  },
-  "moderation.project-review.right": {
-    "message": "Right panel"
-  },
-  "moderation.project-review.saveProject": {
-    "message": "Save project"
-  },
-  "moderation.project-review.scheduled": {
-    "message": "Scheduled"
   },
   "moderation.project-review.scheduledCount": {
     "message": "{count} scheduled"
   },
-  "moderation.project-review.searchDependencies": {
-    "message": "Search dependencies…"
-  },
-  "moderation.project-review.searchingProjects": {
-    "message": "Searching projects…"
-  },
-  "moderation.project-review.selectedFindings": {
-    "message": "{count, plural, one {# selected finding} other {# selected findings}}"
-  },
-  "moderation.project-review.serverAddress": {
-    "message": "Address"
-  },
-  "moderation.project-review.serverAddressTemporaryHost": {
-    "message": "This address uses a temporary server host."
-  },
-  "moderation.project-review.serverContent": {
-    "message": "Content"
-  },
-  "moderation.project-review.serverDetails": {
-    "message": "Server details"
-  },
-  "moderation.project-review.serverDiscord": {
-    "message": "Discord"
-  },
-  "moderation.project-review.serverLanguages": {
-    "message": "Languages"
-  },
-  "moderation.project-review.serverRegion": {
-    "message": "Region"
-  },
-  "moderation.project-review.showLeft": {
-    "message": "Show project details"
-  },
-  "moderation.project-review.showRight": {
-    "message": "Show panel"
-  },
-  "moderation.project-review.skip": {
-    "message": "Skip"
-  },
-  "moderation.project-review.skipped": {
-    "message": "Skipped"
-  },
-  "moderation.project-review.skippedProjects": {
-    "message": "Skipped projects"
-  },
-  "moderation.project-review.slicer": {
-    "message": "Slicer"
-  },
-  "moderation.project-review.slicerOpenExternal": {
-    "message": "Open in Slicer in a new tab"
-  },
-  "moderation.project-review.slug": {
-    "message": "Slug"
-  },
-  "moderation.project-review.slugNotSuggested": {
-    "message": "This slug does not match any of the suggested slugs."
-  },
-  "moderation.project-review.source": {
-    "message": "Source code"
-  },
-  "moderation.project-review.sourceAvailabilityRequired": {
-    "message": "License requires source code."
-  },
-  "moderation.project-review.sourceError": {
-    "message": "Could not load source code. Try opening the flag again"
-  },
-  "moderation.project-review.status-alerts": {
-    "message": "Status alerts"
-  },
-  "moderation.project-review.store": {
-    "message": "Store"
-  },
-  "moderation.project-review.submissions": {
-    "message": "{count, plural, one {# submission} other {# submissions}}"
-  },
-  "moderation.project-review.submitted": {
-    "message": "Submitted"
-  },
-  "moderation.project-review.summary": {
-    "message": "Summary"
-  },
-  "moderation.project-review.tags": {
-    "message": "Tags"
-  },
-  "moderation.project-review.tech-review": {
-    "message": "Tech Review"
-  },
   "moderation.project-review.techReviewFailedCount": {
     "message": "{count} failed technical review"
-  },
-  "moderation.project-review.title": {
-    "message": "Project Review"
-  },
-  "moderation.project-review.unavailable": {
-    "message": "Unavailable"
-  },
-  "moderation.project-review.undefinedProject": {
-    "message": "Undefined project"
-  },
-  "moderation.project-review.unknown": {
-    "message": "Unknown"
   },
   "moderation.project-review.unknownCount": {
     "message": "{count} unknown"
   },
-  "moderation.project-review.unlisted": {
-    "message": "Unlisted"
-  },
   "moderation.project-review.unlistedCount": {
     "message": "{count} unlisted"
-  },
-  "moderation.project-review.unpinReview": {
-    "message": "Unpin review controls"
-  },
-  "moderation.project-review.updated": {
-    "message": "Updated"
-  },
-  "moderation.project-review.uploaded": {
-    "message": "Uploaded {date}"
-  },
-  "moderation.project-review.validation.length": {
-    "message": "Enter between {min} and {max} characters."
-  },
-  "moderation.project-review.validation.slug": {
-    "message": "Use only letters, numbers, periods, underscores, and hyphens."
-  },
-  "moderation.project-review.vanilla": {
-    "message": "Vanilla"
-  },
-  "moderation.project-review.versionId": {
-    "message": "Version ID"
-  },
-  "moderation.project-review.versionNumber": {
-    "message": "Version Number"
-  },
-  "moderation.project-review.versionSubtitle": {
-    "message": "Version Subtitle"
-  },
-  "moderation.project-review.versions": {
-    "message": "Versions"
-  },
-  "moderation.project-review.viewC2paInfo": {
-    "message": "View C2PA info"
-  },
-  "moderation.project-review.viewVersion": {
-    "message": "View version"
-  },
-  "moderation.project-review.visibility": {
-    "message": "Visibility"
-  },
-  "moderation.project-review.visibilityOption": {
-    "message": "{status, select, approved {Public} archived {Public} unlisted {Unlisted} private {Private} other {Unknown}}"
-  },
-  "moderation.project-review.website": {
-    "message": "Website"
-  },
-  "moderation.project-review.wiki": {
-    "message": "Wiki page"
-  },
-  "moderation.project-review.withheld": {
-    "message": "Withheld"
   },
   "moderation.project-review.withheldCount": {
     "message": "{count} withheld"
   },
   "moderation.settings.appearance": {
-    "message": "Panels and appearance"
+    "message": "Appearance"
   },
-  "moderation.settings.based-on": {
-    "message": "Based on"
+  "moderation.settings.control-label": {
+    "message": "{section}: {setting}"
+  },
+  "moderation.settings.debug": {
+    "message": "Debug settings"
   },
   "moderation.settings.default-value-styled": {
     "message": "Default: <value></value>"
+  },
+  "moderation.settings.floating-panel-preview": {
+    "message": "Floating panel preview"
+  },
+  "moderation.settings.floating-panel-section": {
+    "message": "Floating review panel"
+  },
+  "moderation.settings.highlight-preview": {
+    "message": "Review highlight preview"
+  },
+  "moderation.settings.highlight-preview.incorrect-formatting": {
+    "message": "Incorrect formatting"
+  },
+  "moderation.settings.highlight-preview.missing-information": {
+    "message": "Missing information"
+  },
+  "moderation.settings.highlight-preview.non-english": {
+    "message": "Non-English"
+  },
+  "moderation.settings.highlights-section": {
+    "message": "Highlights"
+  },
+  "moderation.settings.issue-toggle-preview": {
+    "message": "Issue toggle preview"
+  },
+  "moderation.settings.issue-toggles-section": {
+    "message": "Issue toggles"
   },
   "moderation.settings.localhost": {
     "message": "Set to {hostname}"
@@ -4073,8 +3293,17 @@
   "moderation.settings.on": {
     "message": "On"
   },
+  "moderation.settings.panels": {
+    "message": "Panels"
+  },
   "moderation.settings.project-pages": {
-    "message": "Public project pages and hosts"
+    "message": "Public pages and hosts"
+  },
+  "moderation.settings.reset": {
+    "message": "Reset to default"
+  },
+  "moderation.settings.review-panel-appearance": {
+    "message": "Review panel appearance"
   },
   "moderation.settings.search": {
     "message": "Search settings…"
@@ -4082,11 +3311,14 @@
   "moderation.settings.shortcuts": {
     "message": "Editors and shortcut hints"
   },
+  "moderation.settings.theme-border": {
+    "message": "Theme orange (25% opacity)"
+  },
+  "moderation.settings.theme-default": {
+    "message": "Theme orange"
+  },
   "moderation.settings.title": {
     "message": "General settings"
-  },
-  "moderation.settings.unknown-commit": {
-    "message": "unknown"
   },
   "moderation.settings.workflow": {
     "message": "Review workflow and queue"
@@ -4484,36 +3716,6 @@
   "organization.projects.none-with-create-prompt": {
     "message": "This organization doesn't have any projects yet. Would you like to <create-link>create one</create-link>?"
   },
-  "profile.button.analytics": {
-    "message": "View user analytics"
-  },
-  "profile.button.edit-user": {
-    "message": "Edit user"
-  },
-  "profile.button.info": {
-    "message": "View user details"
-  },
-  "profile.button.shared-instances": {
-    "message": "View shared instances"
-  },
-  "profile.details.label.auth-providers": {
-    "message": "Auth providers"
-  },
-  "profile.details.label.email-verified": {
-    "message": "Email verified"
-  },
-  "profile.details.label.has-password": {
-    "message": "Has password"
-  },
-  "profile.details.label.has-totp": {
-    "message": "Has TOTP"
-  },
-  "profile.details.label.payment-methods": {
-    "message": "Payment methods"
-  },
-  "profile.details.title": {
-    "message": "User details"
-  },
   "project-member-header.error-decline": {
     "message": "Failed to decline team invitation"
   },
@@ -4571,224 +3773,8 @@
   "project-moderation-nags.warning": {
     "message": "Warning"
   },
-  "project-review.composer.add-note": {
-    "message": "Private note"
-  },
-  "project-review.composer.reply": {
-    "message": "Reply"
-  },
-  "project-review.composer.reply-and-clear-issues": {
-    "message": "Reply and clear issues"
-  },
-  "project-review.composer.reply-placeholder": {
-    "message": "Reply to thread…"
-  },
-  "project-review.controls.markdown-placeholder": {
-    "message": "Explain what needs to change…"
-  },
-  "project-review.controls.required-value": {
-    "message": "Complete this required field."
-  },
-  "project-review.controls.select": {
-    "message": "Select an option"
-  },
-  "project-review.controls.slug-available": {
-    "message": "This project URL is available."
-  },
-  "project-review.controls.slug-error": {
-    "message": "Unable to check URL availability. Try again."
-  },
-  "project-review.controls.slug-invalid": {
-    "message": "Use 3–64 letters, numbers, periods, underscores, or hyphens."
-  },
-  "project-review.controls.slug-taken": {
-    "message": "This project URL is already taken."
-  },
-  "project-review.controls.slug-unchanged": {
-    "message": "Choose a URL different from the current project URL."
-  },
-  "project-review.controls.text-placeholder": {
-    "message": "Enter text…"
-  },
-  "project-review.decision.add-issues": {
-    "message": "Add issues on project"
-  },
-  "project-review.decision.approve": {
-    "message": "Approve"
-  },
-  "project-review.decision.message-mode": {
-    "message": "Send issues as thread message"
-  },
-  "project-review.decision.reject": {
-    "message": "Reject"
-  },
-  "project-review.decision.send-issues-message": {
-    "message": "Send issues thread message"
-  },
-  "project-review.decision.send-to-review": {
-    "message": "Send to review"
-  },
-  "project-review.decision.set-to-draft": {
-    "message": "Set to draft"
-  },
-  "project-review.decision.withhold": {
-    "message": "Withhold"
-  },
-  "project-review.image.dimensions": {
-    "message": "Dimensions"
-  },
-  "project-review.image.disable-pixelated": {
-    "message": "Disable pixel-art rendering"
-  },
-  "project-review.image.download": {
-    "message": "Download image"
-  },
-  "project-review.image.enable-pixelated": {
-    "message": "Enable pixel-art rendering"
-  },
-  "project-review.image.file-size": {
-    "message": "File size"
-  },
-  "project-review.image.format": {
-    "message": "Format"
-  },
-  "project-review.image.info": {
-    "message": "Image information"
-  },
-  "project-review.image.info-unknown": {
-    "message": "Unknown"
-  },
-  "project-review.issues.add": {
-    "message": "Issue"
-  },
-  "project-review.issues.add-option": {
-    "message": "Add issue option"
-  },
-  "project-review.issues.choose-option": {
-    "message": "Choose at least one option for this issue."
-  },
-  "project-review.issues.custom": {
-    "message": "Custom issue"
-  },
-  "project-review.issues.custom-acknowledge-checkbox": {
-    "message": "Acknowledge checkbox"
-  },
-  "project-review.issues.custom-acknowledge-reply": {
-    "message": "Acknowledge reply"
-  },
-  "project-review.issues.custom-actions": {
-    "message": "Actions"
-  },
-  "project-review.issues.custom-add-facets": {
-    "message": "Mark as addressed"
-  },
-  "project-review.issues.custom-message-required": {
-    "message": "Enter a message for this custom issue."
-  },
-  "project-review.issues.custom-placeholder": {
-    "message": "Enter custom issue message..."
-  },
-  "project-review.issues.custom-priority": {
-    "message": "Priority"
-  },
-  "project-review.issues.custom-search-facets": {
-    "message": "Search actions…"
-  },
-  "project-review.issues.custom-title": {
-    "message": "Title"
-  },
-  "project-review.issues.custom-title-placeholder": {
-    "message": "Enter title..."
-  },
-  "project-review.issues.edited": {
-    "message": "(Edited)"
-  },
-  "project-review.issues.edited-tooltip": {
-    "message": "Issue message has been edited"
-  },
-  "project-review.issues.empty": {
-    "message": "No issues flagged."
-  },
-  "project-review.issues.empty-re-review": {
-    "message": "No previous issues to re-review."
-  },
-  "project-review.issues.field-option": {
-    "message": "{field}: {option}"
-  },
-  "project-review.issues.issue-message": {
-    "message": "Message"
-  },
-  "project-review.issues.message": {
-    "message": "Message for {issue}"
-  },
-  "project-review.issues.no-results": {
-    "message": "No matching issues."
-  },
-  "project-review.issues.not-resolved": {
-    "message": "Not resolved"
-  },
-  "project-review.issues.open-panel": {
-    "message": "Open {panel} review panel"
-  },
-  "project-review.issues.remove": {
-    "message": "Remove {issue}"
-  },
-  "project-review.issues.remove-option": {
-    "message": "Remove {option}"
-  },
-  "project-review.issues.reset": {
-    "message": "Reset issues"
-  },
-  "project-review.issues.reset-all": {
-    "message": "Reset all issues"
-  },
-  "project-review.issues.reset-description": {
-    "message": "This will discard your issue changes and move all previous issues back to Re-rev. issues."
-  },
-  "project-review.issues.reset-message": {
-    "message": "Reset message"
-  },
-  "project-review.issues.resolved": {
-    "message": "Auto resolved ({count})"
-  },
-  "project-review.issues.revert-all-customizations": {
-    "message": "Revert all customizations"
-  },
-  "project-review.issues.revert-customizations-description": {
-    "message": "Revert all customizations restores default issue messages while keeping custom issue messages and all issue toggles and selections."
-  },
-  "project-review.issues.search": {
-    "message": "Search issues…"
-  },
-  "project-review.lock.moderating": {
-    "message": "{username} is moderating"
-  },
-  "project-review.lock.take-over": {
-    "message": "Take over project"
-  },
-  "project-review.message-box.resize": {
-    "message": "Resize message box"
-  },
-  "project-review.previous-issues.re-review": {
-    "message": "Re-review"
-  },
-  "project-review.resize-checks": {
-    "message": "Resize project checks"
-  },
-  "project-review.right-panel.issues": {
-    "message": "Issues ({count})"
-  },
-  "project-review.right-panel.re-review": {
-    "message": "Re-review ({count})"
-  },
-  "project-review.right-panel.thread": {
-    "message": "Thread"
-  },
-  "project-review.versions.modpack-tools": {
-    "message": "Modpack tools"
-  },
-  "project-review.versions.view-c2pa-info": {
-    "message": "View C2PA Info"
+  "project-review.disclosures.select-ai-uses": {
+    "message": "Select AI usages"
   },
   "project-type.collection.plural": {
     "message": "Collections"
@@ -4921,6 +3907,9 @@
   },
   "project.disclosures.lock-status.cannot-disable": {
     "message": "Cannot disable"
+  },
+  "project.disclosures.lock-status.change": {
+    "message": "Change lock status"
   },
   "project.disclosures.lock-status.fully-locked": {
     "message": "Fully locked"
@@ -5507,23 +4496,14 @@
   "project.settings.license.custom-url-description": {
     "message": "The web location of the full license text. You have to provide a link since this is a custom license."
   },
-  "project.settings.license.has-spdx": {
-    "message": "Use SPDX identifier"
-  },
   "project.settings.license.intro": {
     "message": "It is important to choose a proper license for your {type}. You may choose one from our list or provide a custom license. You may also provide a custom URL to your chosen license; otherwise, the license text will be displayed. See our <guide>licensing guide</guide> for more information."
-  },
-  "project.settings.license.invalid-url": {
-    "message": "Enter a valid HTTP or HTTPS license URL."
   },
   "project.settings.license.later": {
     "message": "Later editions"
   },
   "project.settings.license.later-description": {
     "message": "The license you selected has an \"or later\" clause. If you check this box, users may use your project under later editions of the license."
-  },
-  "project.settings.license.missing-name": {
-    "message": "Enter a name or SPDX identifier for your custom license."
   },
   "project.settings.license.missing-url": {
     "message": "Enter a URL to the full text of your custom license."
@@ -5544,16 +4524,10 @@
     "message": "License URL (optional)"
   },
   "project.settings.license.select": {
-    "message": "Select a license"
-  },
-  "project.settings.license.select-description": {
-    "message": "How users are and aren't allowed to use your project."
+    "message": "License"
   },
   "project.settings.license.select-placeholder": {
-    "message": "Select license..."
-  },
-  "project.settings.license.spdx": {
-    "message": "SPDX identifier"
+    "message": "Search licenses..."
   },
   "project.settings.license.title": {
     "message": "License"
@@ -5602,9 +4576,6 @@
   },
   "project.settings.links.donations-description": {
     "message": "Add donation links for users to support you directly."
-  },
-  "project.settings.links.invalid-url": {
-    "message": "Enter valid HTTP or HTTPS URLs before saving."
   },
   "project.settings.links.issues": {
     "message": "Issue tracker"
@@ -5879,9 +4850,6 @@
   "project.settings.tags.too-many-tags-server-soft-warning": {
     "message": "You've selected {count} tags. Consider reducing to 12 or fewer to keep your server focused and easier to discover."
   },
-  "project.settings.tags.upload-version-first.description": {
-    "message": "Upload a version before selecting project tags."
-  },
   "project.settings.tags.upload-version-first.heading": {
     "message": "Upload versions before adding tags"
   },
@@ -5984,11 +4952,11 @@
   "report.not-for.dmca.description": {
     "message": "See our <policy-link>Copyright Policy</policy-link>."
   },
-  "report.note.ai-images.1": {
-    "message": "We've just updated our rules to prohibit AI-generated images in icons, galleries, and descriptions. We're giving creators a grace period to remove AI images from their projects before we begin accepting reports for them."
+  "report.note.ai-images.1b": {
+    "message": "We're not yet accepting reports for AI-generated images as we're currently rebuilding our moderation tooling to better handle reports."
   },
-  "report.note.check-back-later": {
-    "message": "Check back later once the grace period has ended. Reports of this type are not being accepted at this time."
+  "report.note.check-back-later.b": {
+    "message": "We hope to begin accepting them in the near future! Thank you for your patience and help trying to make Modrinth safer and better!"
   },
   "report.note.copyright.1": {
     "message": "Please note that you are *not* submitting a DMCA takedown request, but rather a report of reuploaded content."
@@ -5996,8 +4964,8 @@
   "report.note.copyright.2": {
     "message": "If you meant to file a DMCA takedown request (which is a legal action) instead, please see our <copyright-policy-link>Copyright Policy</copyright-policy-link>."
   },
-  "report.note.fully-ai-generated.1": {
-    "message": "We've just updated our rules to prohibit fully AI-generated projects. We're giving creators a grace period to update or take down fully AI-generated projects before we begin accepting reports for them."
+  "report.note.fully-ai-generated.1b": {
+    "message": "We're not yet accepting reports for fully AI-generated projects as we're currently rebuilding our moderation tooling to better handle reports."
   },
   "report.note.malicious.1": {
     "message": "Reports for malicious or deceptive content must include substantial evidence of the behavior, such as code samples."
@@ -6005,8 +4973,8 @@
   "report.note.malicious.2": {
     "message": "Summaries from Microsoft Defender, VirusTotal, or AI malware detection are not sufficient forms of evidence and will not be accepted."
   },
-  "report.note.missing-disclosure.1": {
-    "message": "Content disclosures are a new feature we've just added. We're giving creators a grace period to get their disclosures up-to-date before we begin accepting reports for missing or incorrect disclosures."
+  "report.note.missing-disclosure.1b": {
+    "message": "We're not yet accepting reports for missing disclosures as we're currently rebuilding our moderation tooling to better handle reports."
   },
   "report.please-report": {
     "message": "Please report:"
@@ -6677,6 +5645,12 @@
   "settings.applications.description.intro": {
     "message": "Applications can be used to authenticate Modrinth's users with your products. For more information, see <docs-link>Modrinth's API documentation</docs-link>."
   },
+  "settings.applications.empty-state.description": {
+    "message": "Applications you create will appear here."
+  },
+  "settings.applications.empty-state.heading": {
+    "message": "No applications"
+  },
   "settings.applications.field.description": {
     "message": "Description"
   },
@@ -6712,6 +5686,9 @@
   },
   "settings.applications.modal.header": {
     "message": "Application information"
+  },
+  "settings.applications.no-scopes": {
+    "message": "No scopes"
   },
   "settings.applications.notification.icon-updated.description": {
     "message": "Your application icon has been updated."
@@ -6974,6 +5951,12 @@
   "settings.pats.description": {
     "message": "PATs can be used to access Modrinth's API. They can be created and revoked at any time. For more information, see <doc-link>Modrinth's API documentation</doc-link>."
   },
+  "settings.pats.empty-state.description": {
+    "message": "Tokens you create will appear here."
+  },
+  "settings.pats.empty-state.heading": {
+    "message": "No personal access tokens"
+  },
   "settings.pats.modal.create.action": {
     "message": "Create PAT"
   },
@@ -6989,23 +5972,29 @@
   "settings.pats.modal.create.title": {
     "message": "Create personal access token"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "Delete this token"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "This will remove this token forever (like really forever)."
-  },
-  "settings.pats.modal.delete.title": {
-    "message": "Are you sure you want to delete this token?"
-  },
   "settings.pats.modal.edit.title": {
     "message": "Edit personal access token"
+  },
+  "settings.pats.modal.revoke.action": {
+    "message": "Revoke this token"
+  },
+  "settings.pats.modal.revoke.description": {
+    "message": "This token will immediately be invalidated and anything you have set up using it will stop working. This action cannot be undone."
+  },
+  "settings.pats.modal.revoke.title": {
+    "message": "Are you sure you want to revoke this token?"
+  },
+  "settings.pats.token.access-token": {
+    "message": "Access token"
   },
   "settings.pats.token.action.edit": {
     "message": "Edit token"
   },
   "settings.pats.token.action.revoke": {
     "message": "Revoke token"
+  },
+  "settings.pats.token.disclaimer": {
+    "message": "Save this token now. You will only be able to view it once. When you leave this page, you won't be able to see it again."
   },
   "settings.pats.token.expired-ago": {
     "message": "Expired {ago}"
@@ -7019,20 +6008,38 @@
   "settings.pats.token.never-used": {
     "message": "Never used"
   },
+  "settings.pats.token.no-permissions": {
+    "message": "No permissions"
+  },
   "settings.sessions.action.revoke-session": {
     "message": "Revoke session"
   },
   "settings.sessions.created-ago": {
-    "message": "Created {ago}"
+    "message": "Signed in {ago}"
   },
   "settings.sessions.current-session": {
     "message": "Current session"
   },
-  "settings.sessions.description": {
-    "message": "Here are all the devices that are currently logged in with your Modrinth account. You can log out of each one individually.\n\nIf you see an entry you don't recognize, log out of that device and change your Modrinth account password immediately."
+  "settings.sessions.description.1": {
+    "message": "These are all the devices currently signed in with your Modrinth account. You can sign out of each one individually by revoking their session. If you don't recognize a device, sign out of that device and change your Modrinth account password immediately."
+  },
+  "settings.sessions.description.2": {
+    "message": "Locations listed may be approximate since they are based on the IP address. VPNs and some internet service providers may obscure the actual location."
+  },
+  "settings.sessions.empty-state.description": {
+    "message": "Devices signed in to your account will appear here."
+  },
+  "settings.sessions.empty-state.heading": {
+    "message": "No active sessions"
+  },
+  "settings.sessions.ip": {
+    "message": "IP address: {ip}"
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Last accessed {ago}"
+  },
+  "settings.sessions.modrinth-app": {
+    "message": "Modrinth App"
   },
   "settings.sessions.unknown-os": {
     "message": "Unknown OS"

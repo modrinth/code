@@ -1,7 +1,7 @@
 <template>
 	<EditModal
 		ref="modal"
-		:section="formatMessage(reviewMessages.details)"
+		section="Details"
 		:saving="saving"
 		:can-save="canSave"
 		width="32rem"
@@ -11,7 +11,7 @@
 		<div class="flex flex-col gap-6">
 			<div class="flex flex-col gap-2">
 				<label id="project-review-visibility-label" class="font-semibold text-contrast">
-					{{ formatMessage(reviewMessages.visibility) }}
+					Visibility
 				</label>
 				<Combobox
 					v-model="visibility"
@@ -23,7 +23,7 @@
 			</div>
 			<div v-if="!project?.minecraft_server" class="flex flex-col gap-2">
 				<label id="project-review-monetization-label" class="font-semibold text-contrast">
-					{{ formatMessage(reviewMessages.monetization) }}
+					Monetization
 				</label>
 				<Combobox
 					v-model="monetization"
@@ -39,32 +39,15 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { Combobox, defineMessages, useVIntl } from '@modrinth/ui'
+import { Combobox } from '@modrinth/ui'
 import { computed, ref, useTemplateRef } from 'vue'
 
-import { projectReviewMessages as reviewMessages } from '../../messages'
 import EditModal from './edit-modal.vue'
 import { useProjectInfoEdit } from './use-project-edit'
 
 type Visibility = 'approved' | 'unlisted' | 'private'
 type MonetizationStatus = Labrinth.Projects.v2.MonetizationStatus
 
-const messages = defineMessages({
-	publicDescription: {
-		id: 'moderation.project-review.details.publicDescription',
-		defaultMessage: 'Visible via URL, on your profile, and in search.',
-	},
-	unlistedDescription: {
-		id: 'moderation.project-review.details.unlistedDescription',
-		defaultMessage: 'Visible via URL only. Not shown on your profile or in search.',
-	},
-	privateDescription: {
-		id: 'moderation.project-review.details.privateDescription',
-		defaultMessage: 'Not publicly visible. Only accessible to project members.',
-	},
-})
-
-const { formatMessage } = useVIntl()
 const { project, saving, beginEditing, saveProject } = useProjectInfoEdit()
 const modal = useTemplateRef<InstanceType<typeof EditModal>>('modal')
 const visibility = ref<Visibility>('approved')
@@ -76,27 +59,28 @@ const currentVisibility = computed<Visibility>(() => {
 	const status = hasPublishedStatus.value ? project.value?.status : project.value?.requested_status
 	return status === 'unlisted' || status === 'private' ? status : 'approved'
 })
-const visibilityOptions = computed(() =>
-	(['approved', 'unlisted', 'private'] as const).map((value) => ({
-		value,
-		label: formatMessage(reviewMessages.visibilityOption, { status: value }),
-		subLabel: formatMessage(
-			value === 'approved'
-				? messages.publicDescription
-				: value === 'unlisted'
-					? messages.unlistedDescription
-					: messages.privateDescription,
-		),
-	})),
-)
-const monetizationOptions = computed(() =>
-	(['monetized', 'demonetized', 'force-demonetized'] as const).map((value) => ({
-		value,
-		label: formatMessage(reviewMessages.monetizationStatus, {
-			status: value === 'force-demonetized' ? 'forceDemonetized' : value,
-		}),
-	})),
-)
+const visibilityOptions = [
+	{
+		value: 'approved',
+		label: 'Public',
+		subLabel: 'Visible via URL, on your profile, and in search.',
+	},
+	{
+		value: 'unlisted',
+		label: 'Unlisted',
+		subLabel: 'Visible via URL only. Not shown on your profile or in search.',
+	},
+	{
+		value: 'private',
+		label: 'Private',
+		subLabel: 'Not publicly visible. Only accessible to project members.',
+	},
+] satisfies { value: Visibility; label: string; subLabel: string }[]
+const monetizationOptions = [
+	{ value: 'monetized', label: 'Monetized' },
+	{ value: 'demonetized', label: 'Demonetized' },
+	{ value: 'force-demonetized', label: 'Force demonetized' },
+] satisfies { value: MonetizationStatus; label: string }[]
 const patch = computed<Labrinth.Projects.v3.EditProjectRequest>(() => {
 	const result: Labrinth.Projects.v3.EditProjectRequest = {}
 	if (visibility.value !== currentVisibility.value) {

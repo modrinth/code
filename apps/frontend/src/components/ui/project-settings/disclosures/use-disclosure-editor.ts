@@ -14,6 +14,8 @@ import { projectQueryOptions } from '~/composables/queries/project'
 
 import type { DisclosureFormIssue } from './form'
 import {
+	copyDisclosureFormSection,
+	DISCLOSURE_FORM_KEYS,
 	disclosuresToForm,
 	findDisclosureData,
 	formToDisclosures,
@@ -167,9 +169,19 @@ export function useDisclosureEditor({
 	const current = ref(disclosuresToForm([]))
 	const saved = computed(() => disclosuresToForm(disclosuresResponse.value?.disclosures ?? []))
 	const mutation = useMutation({
-		mutationFn: async ({ id, form }: { id: string; form: DisclosureFormState }) => {
+		mutationFn: async ({
+			id,
+			form,
+			type,
+		}: {
+			id: string
+			form: DisclosureFormState
+			type?: DisclosureType
+		}) => {
 			const latest = await labrinth.projects_v3.getDisclosures(id)
-			const requests = toModifyRequests(form, disclosuresToForm(latest.disclosures))
+			const previous = disclosuresToForm(latest.disclosures)
+			const next = type ? copyDisclosureFormSection(previous, form, type) : form
+			const requests = toModifyRequests(next, previous)
 			try {
 				for (const request of requests) {
 					await labrinth.projects_v3.modifyDisclosures(id, request)
@@ -218,6 +230,57 @@ export function useDisclosureEditor({
 		}
 	}
 
+	function disclosureSaveDisabledReason(type: DisclosureType): string[] {
+		if (!hasPermission.value) return [formatMessage(messages.noPermission)]
+		if (isAdminUser.value) return []
+		const section = copyDisclosureFormSection(disclosuresToForm([]), current.value, type)
+		return getDisclosureFormIssues(section, projectTypes.value).map((issue) =>
+			formatMessage(issueMessages[issue]),
+		)
+	}
+
+	function canSaveDisclosure(type: DisclosureType): boolean {
+		return (
+			disclosuresQuery.isSuccess.value &&
+			canEditDisclosures.value &&
+			!disclosureUpdateProps(type).disabled &&
+			disclosureSaveDisabledReason(type).length === 0
+		)
+	}
+
+	function resetDisclosure(type: DisclosureType, detailsOnly = false) {
+		const key = DISCLOSURE_FORM_KEYS[type]
+		const enabled = current.value[key].enabled
+		const lock = current.value.lockStatuses[type]
+		current.value = copyDisclosureFormSection(current.value, saved.value, type)
+		if (detailsOnly) {
+			current.value[key].enabled = enabled
+			current.value.lockStatuses[type] = lock
+		}
+		mutation.reset()
+	}
+
+	async function saveDisclosure(type: DisclosureType): Promise<boolean> {
+		if (!canSaveDisclosure(type) || saving.value) return false
+		const id = projectId.value
+		try {
+			await mutation.mutateAsync({
+				id,
+				type,
+				form: JSON.parse(JSON.stringify(current.value)) as DisclosureFormState,
+			})
+			if (id !== projectId.value) return false
+			resetDisclosure(type)
+			return true
+		} catch {
+			return false
+		}
+	}
+
+	function disclosureSaveError(type: DisclosureType): boolean {
+		return mutation.variables.value?.type === type && !!mutation.error.value
+	}
+
 	function disclosureUpdateProps(type: DisclosureType) {
 		const disclosure = findDisclosureData(disclosuresResponse.value?.disclosures, type)
 		const savedLockStatus = disclosure?.lock_status ?? 'unlocked'
@@ -259,8 +322,7 @@ export function useDisclosureEditor({
 				!saving.value &&
 				(changedProject ||
 					!previous ||
-					JSON.stringify(getDisclosureFormSnapshot(current.value)) ===
-						JSON.stringify(getDisclosureFormSnapshot(disclosuresToForm(previous.disclosures))))
+					JSON.stringify(current.value) === JSON.stringify(disclosuresToForm(previous.disclosures)))
 			) {
 				current.value = disclosuresToForm(disclosuresResponse.value?.disclosures ?? [])
 			}
@@ -301,6 +363,11 @@ export function useDisclosureEditor({
 		saving,
 		reset,
 		save,
+		saveDisclosure,
+		resetDisclosure,
+		canSaveDisclosure,
+		disclosureSaveDisabledReason,
+		disclosureSaveError,
 		canSave,
 		saveDisabledReason,
 		issueAction,

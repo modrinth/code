@@ -2,39 +2,6 @@
   "action.no-permission": {
     "defaultMessage": "你没有操作权限。"
   },
-  "affiliate.create.button": {
-    "defaultMessage": "创建推广链接"
-  },
-  "affiliate.create.header": {
-    "defaultMessage": "创建新的推广代码"
-  },
-  "affiliate.create.title.description": {
-    "defaultMessage": "给你的推广链接起个名字，这样你就知道人们是从哪里来的了！"
-  },
-  "affiliate.create.title.label": {
-    "defaultMessage": "推广链接标题"
-  },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "例如 YouTube"
-  },
-  "affiliate.create.user.description": {
-    "defaultMessage": "用于创建推广代码的用户名"
-  },
-  "affiliate.create.user.placeholder": {
-    "defaultMessage": "输入用户名……"
-  },
-  "affiliate.createdBy": {
-    "defaultMessage": "由用户 {user} 创建"
-  },
-  "affiliate.creating.button": {
-    "defaultMessage": "创建推广链接……"
-  },
-  "affiliate.revoke": {
-    "defaultMessage": "撤销推广链接"
-  },
-  "affiliate.viewAnalytics": {
-    "defaultMessage": "查看数据信息"
-  },
   "app.appearance-settings.native-decorations.description": {
     "defaultMessage": "使用操作系统的标题栏和窗口控件，需要重启 Modrinth 后生效。"
   },
@@ -151,9 +118,6 @@
   },
   "button.add-server-to-instance": {
     "defaultMessage": "将服务器添加到实例"
-  },
-  "button.affiliate-links": {
-    "defaultMessage": "推广链接"
   },
   "button.analytics": {
     "defaultMessage": "分析"
@@ -3308,17 +3272,11 @@
   "profile.button.manage-projects": {
     "defaultMessage": "管理项目"
   },
-  "profile.button.remove-affiliate": {
-    "defaultMessage": "解除作为联盟伙伴"
-  },
   "profile.button.reset-2fa": {
     "defaultMessage": "重置双重身份验证"
   },
   "profile.button.revoke-sessions": {
     "defaultMessage": "注销所有会话"
-  },
-  "profile.button.set-affiliate": {
-    "defaultMessage": "设置为联盟伙伴"
   },
   "profile.button.shared-instances": {
     "defaultMessage": "查看共享实例"
@@ -3406,9 +3364,6 @@
   },
   "profile.force-password-reset.title": {
     "defaultMessage": "强制重置 {username} 的密码"
-  },
-  "profile.label.affiliate": {
-    "defaultMessage": "联盟"
   },
   "profile.label.badges": {
     "defaultMessage": "荣誉徽章"
@@ -5240,12 +5195,6 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "从备份中恢复"
   },
-  "servers.backups.bulk-bar.aria-label": {
-    "defaultMessage": "已选择 {count} 个备份的批量操作"
-  },
-  "servers.backups.bulk-bar.deleting": {
-    "defaultMessage": "正在删除 {total, plural,one {#个备份}other {#个备份}}……"
-  },
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "{count,plural,one {#个备份被选中} other {个备份被选中}}"
   },
@@ -5270,50 +5219,11 @@
   "servers.backups.empty.heading": {
     "defaultMessage": "暂无备份"
   },
-  "servers.backups.filtered-empty.clear-filters": {
-    "defaultMessage": "清空筛选"
-  },
-  "servers.backups.filtered-empty.description": {
-    "defaultMessage": "尝试使用其他筛选条件或清除筛选条件以查看所有备份。"
-  },
-  "servers.backups.filtered-empty.heading": {
-    "defaultMessage": "没有匹配的备份"
-  },
   "servers.backups.item.auto": {
     "defaultMessage": "自动"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "备份计划"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "{username}的头像"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "支持"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "手动备份"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "重命名"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "恢复"
-  },
-  "servers.backups.select-backup-aria": {
-    "defaultMessage": "选择备份{name}"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "创建备份"
-  },
-  "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "自动"
-  },
-  "servers.backups.toolbar.filter-manual": {
-    "defaultMessage": "手动"
-  },
-  "servers.backups.toolbar.select-all": {
-    "defaultMessage": "选择全部"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "正在创建备份"
@@ -7275,4 +7185,3 @@
     "defaultMessage": "类型"
   }
 }
-

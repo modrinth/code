@@ -1409,30 +1409,6 @@
   "create.project.visibility-unlisted": {
     "message": "Liste dışı"
   },
-  "dashboard.affiliate-links.create.button": {
-    "message": "Ortaklık bağlantısı oluştur"
-  },
-  "dashboard.affiliate-links.empty.no-codes": {
-    "message": "Yönlendirme kodu bulunamadı."
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "Ortaklık bağlantıları yüklenemedi"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "Ortaklık bağlantıların"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "Bu işlem `{id}` ortaklık kodunu kalıcı olarak iptal edecek ve bu kodla paylaşılmış mevcut bağlantıların hiçbiri artık geçerli olmayacaktır."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "İptal et"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "''{title}'' ortaklık bağlantınızı iptal etmek istediğinizden emin misiniz?"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "Ortaklık bağlantılarını ara..."
-  },
   "dashboard.analytics.from-projects": {
     "message": "{count} {count, plural, one {project} other {projects}}'den"
   },
@@ -2650,9 +2626,6 @@
   },
   "layout.action.file-lookup": {
     "message": "Dosya bulma"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "Ortaklık linklerini yönet"
   },
   "layout.action.manage-server-notices": {
     "message": "Sunucu bildirimlerini yönet"
@@ -4298,29 +4271,17 @@
   "report.not-for.dmca.description": {
     "message": "<policy-link>Telif Hakkı Politikası</policy-link>'mızı inceleyin."
   },
-  "report.note.ai-images.1": {
-    "message": "Simgelerde, galerilerde ve açıklamalarda yapay zeka tarafından üretilen görsellerin kullanılmasını yasaklamak üzere kurallarımızı güncelledik. Bu görsellerle ilgili bildirimleri kabul etmeye başlamadan önce, içerik oluşturuculara projelerinden yapay zeka görsellerini kaldırmaları için bir geçiş süresi tanıyoruz."
-  },
-  "report.note.check-back-later": {
-    "message": "Bekleme süresi sona erdiğinde lütfen daha sonra tekrar kontrol edin. Şu anda bu tür bildirimler kabul edilmemektedir."
-  },
   "report.note.copyright.1": {
     "message": "Lütfen bir DMCA kaldırma talebi *değil* ama yeniden yüklenmiş içeriğin bir bildirisini göndereceğinizi dikkate alın."
   },
   "report.note.copyright.2": {
     "message": "Eğer bir DMCA kaldırma talebi (yasal bir eylem olan) iletmeyi kastediyorsanız, bunun yerine <copyright-policy-link>Telif Hakkı Politikası</copyright-policy-link>'na göz atın."
   },
-  "report.note.fully-ai-generated.1": {
-    "message": "Kurallarımızı, tamamen yapay zekâ ile üretilmiş projeleri yasaklayacak şekilde güncelledik. Yapımcılara, tamamen yapay zekâ ile üretilmiş projelerini güncellemeleri veya kaldırmaları için bir süre tanıyoruz; bu sürenin ardından bu projelerle ilgili şikâyetleri kabul etmeye başlayacağız."
-  },
   "report.note.malicious.1": {
     "message": "Kötü niyetli ve yanıltıcı içeriklerin bildirimi, kod örnekleri gibi bu davranışın sağlam kanıtlarını içermeli."
   },
   "report.note.malicious.2": {
     "message": "Microsoft Defender, VirusTotal veya AI malware tespitlerinden çıkan özetler, yeterli kanıt biçimlerinden değildir ve kabul edilmeyecektir."
-  },
-  "report.note.missing-disclosure.1": {
-    "message": "İçerik açıklamaları, yeni eklediğimiz bir özelliktir. Yapımcılara, eksik veya yanlış açıklamalar için raporları kabul etmeye başlamadan önce açıklamalarını güncellemek için bir süre tanıyoruz."
   },
   "report.please-report": {
     "message": "Lütfen bildirin:"
@@ -5285,15 +5246,6 @@
   "settings.pats.modal.create.title": {
     "message": "Kişisel erişim token'i (PAT) oluştur"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "Bu tokeni sil"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "Bu işlem, bu tokeni sonsuza dek (gerçekten de sonsuza dek) kaldıracak."
-  },
-  "settings.pats.modal.delete.title": {
-    "message": "Bu tokeni silmek istediğinizden emin misiniz?"
-  },
   "settings.pats.modal.edit.title": {
     "message": "Kişisel erişim tokenini (PAT'ı) düzenle"
   },
@@ -5323,9 +5275,6 @@
   },
   "settings.sessions.current-session": {
     "message": "Mevcut oturum"
-  },
-  "settings.sessions.description": {
-    "message": "Şu an Modrinth hesabınızla giriş yapılmış tüm cihazlar burada. Her birinden teker teker çıkış yapabilirsiniz.\n\nEğer tanımadığınız bir girdi varsa, o cihazdan çıkış yapın ve Modrinth hesabınızın parolasını derhal değiştirin."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "En son {ago} erişildi"

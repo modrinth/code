@@ -2,39 +2,6 @@
   "action.no-permission": {
     "defaultMessage": "권한이 없습니다."
   },
-  "affiliate.create.button": {
-    "defaultMessage": "제휴 링크 생성하기"
-  },
-  "affiliate.create.header": {
-    "defaultMessage": "새 제휴 코드 생성하기"
-  },
-  "affiliate.create.title.description": {
-    "defaultMessage": "사람들이 어디에서 유입되는지 알 수 있도록 제휴 링크에 이름을 지정하세요!"
-  },
-  "affiliate.create.title.label": {
-    "defaultMessage": "제휴 링크 제목"
-  },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "예시: YouTube"
-  },
-  "affiliate.create.user.description": {
-    "defaultMessage": "제휴 코드를 생성할 사용자 이름"
-  },
-  "affiliate.create.user.placeholder": {
-    "defaultMessage": "사용자명 입력..."
-  },
-  "affiliate.createdBy": {
-    "defaultMessage": "{user}에 의해 생성됨"
-  },
-  "affiliate.creating.button": {
-    "defaultMessage": "제휴 링크 생성 중..."
-  },
-  "affiliate.revoke": {
-    "defaultMessage": "제휴 링크 취소"
-  },
-  "affiliate.viewAnalytics": {
-    "defaultMessage": "통계 보기"
-  },
   "app.appearance-settings.native-decorations.description": {
     "defaultMessage": "운영 체제의 제목 표시줄 및 창 제어 기능을 사용합니다. 앱 재시작이 필요합니다."
   },
@@ -142,9 +109,6 @@
   },
   "button.add-server-to-instance": {
     "defaultMessage": "인스턴스에 서버 추가"
-  },
-  "button.affiliate-links": {
-    "defaultMessage": "제휴 링크"
   },
   "button.analytics": {
     "defaultMessage": "분석"
@@ -3164,12 +3128,6 @@
   "profile.button.manage-projects": {
     "defaultMessage": "프로젝트 관리"
   },
-  "profile.button.remove-affiliate": {
-    "defaultMessage": "제휴 자격 해제"
-  },
-  "profile.button.set-affiliate": {
-    "defaultMessage": "제휴 자격 부여"
-  },
   "profile.button.unblock": {
     "defaultMessage": "차단 해제"
   },
@@ -3214,9 +3172,6 @@
   },
   "profile.error.not-found": {
     "defaultMessage": "사용자를 찾을 수 없음"
-  },
-  "profile.label.affiliate": {
-    "defaultMessage": "제휴 파트너"
   },
   "profile.label.badges": {
     "defaultMessage": "배지"
@@ -4865,12 +4820,6 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "백업으로부터 복원하는 중"
   },
-  "servers.backups.bulk-bar.aria-label": {
-    "defaultMessage": "백업 {count, plural, other {#}}개 선택됨"
-  },
-  "servers.backups.bulk-bar.deleting": {
-    "defaultMessage": "백업 {total, plural, other {#}}개 삭제 중..."
-  },
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "백업 {count, plural, other {#}}개 선택됨"
   },
@@ -4895,50 +4844,11 @@
   "servers.backups.empty.heading": {
     "defaultMessage": "백업이 없습니다"
   },
-  "servers.backups.filtered-empty.clear-filters": {
-    "defaultMessage": "필터 초기화"
-  },
-  "servers.backups.filtered-empty.description": {
-    "defaultMessage": "다른 필터를 적용하거나 필터를 모두 해제하여 모든 백업을 확인해 보세요."
-  },
-  "servers.backups.filtered-empty.heading": {
-    "defaultMessage": "일치하는 백업 없음"
-  },
   "servers.backups.item.auto": {
     "defaultMessage": "자동"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "백업 스케쥴"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "{username}의 아바타"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "지원자"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "백업 메뉴얼"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "이름 변경"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "복원"
-  },
-  "servers.backups.select-backup-aria": {
-    "defaultMessage": "{name} 백업 선택"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "백업 생성"
-  },
-  "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "자동"
-  },
-  "servers.backups.toolbar.filter-manual": {
-    "defaultMessage": "수동"
-  },
-  "servers.backups.toolbar.select-all": {
-    "defaultMessage": "모두 선택"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "백업 생성 진행 중"

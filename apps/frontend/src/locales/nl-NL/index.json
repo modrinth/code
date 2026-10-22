@@ -1421,30 +1421,6 @@
   "create.project.visibility-unlisted": {
     "message": "Verborgen"
   },
-  "dashboard.affiliate-links.create.button": {
-    "message": "Maak een affiliate-link"
-  },
-  "dashboard.affiliate-links.empty.no-codes": {
-    "message": "Er zijn geen affiliatecodes gevonden."
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "Fout bij het laden van affiliatelinks"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "Je partnerlinks"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "Hierdoor wordt de affiliatecode `{id}` permanent ingetrokken en zijn alle bestaande links met deze code die zijn gedeeld, niet langer geldig."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "Intrekken"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "Weet je zeker dat je je affiliate-link ''{title}'' wilt intrekken?"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "Zoek affiliatelinks..."
-  },
   "dashboard.analytics.from-projects": {
     "message": "van {count} {count, plural, one {project} other {projects}}"
   },
@@ -2662,9 +2638,6 @@
   },
   "layout.action.file-lookup": {
     "message": "Bestand opzoeken"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "Beheer partner links"
   },
   "layout.action.manage-server-notices": {
     "message": "Beheer server mededelingen"
@@ -4340,29 +4313,17 @@
   "report.not-for.dmca.description": {
     "message": "Zie onze <policy-link>Auteursrechtbeleid</policy-link>."
   },
-  "report.note.ai-images.1": {
-    "message": "We hebben zojuist onze regels bijgewerkt om AI-gegenereerde afbeeldingen te verbieden in pictogrammen, galerijen en beschrijvingen. We geven makers een vrijwaringsperiode om AI-afbeeldingen uit hun projecten te verwijderen voordat we rapporten voor hen gaan accepteren."
-  },
-  "report.note.check-back-later": {
-    "message": "Kom later terug zodra de genadeperiode is afgelopen. Rapporten van dit type worden op dit moment niet geaccepteerd."
-  },
   "report.note.copyright.1": {
     "message": "Houd er rekening mee dat je *geen* DMCA-verzoek tot verwijdering indient, maar een melding van opnieuw geüploade inhoud."
   },
   "report.note.copyright.2": {
     "message": "Als je in plaats hiervan een DMCA-verzoek tot verwijdering (een juridische procedure) wilde indienen, raadpleeg dan ons <copyright-policy-link>auteursrechtbeleid</copyright-policy-link>."
   },
-  "report.note.fully-ai-generated.1": {
-    "message": "We hebben zojuist onze regels bijgewerkt om AI-gegenereerde projecten volledig te verbieden. We geven makers een vrijwaringsperiode om door AI-gegenereerde projecten volledig bij te werken of op te nemen voordat we rapporten voor hen accepteren."
-  },
   "report.note.malicious.1": {
     "message": "Rapporten voor malware en niet geaccepteerde content moeten bewijs hebben zoals code voorbeelden."
   },
   "report.note.malicious.2": {
     "message": "Samenvattingen van Microsoft Defender, VirusTotal, of AI malware is geen goede vorm van bewijs en zal niet geaccepteerd worden."
-  },
-  "report.note.missing-disclosure.1": {
-    "message": "Content onthullingen zijn een nieuwe functie die we zojuist hebben toegevoegd. We geven de makers een vrijwaringsperiode om hun onthullingen up-to-date te krijgen voordat we rapporten voor ontbrekende of onjuiste onthullingen gaan accepteren."
   },
   "report.please-report": {
     "message": "Graag rapporteer:"
@@ -5312,15 +5273,6 @@
   "settings.pats.modal.create.title": {
     "message": "Persoonlijke toegangstoken aanmaken"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "Verwijder deze token"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "Dit zal deze token voor altijd verwijderen (echt voor altijd)."
-  },
-  "settings.pats.modal.delete.title": {
-    "message": "Weet u zeker dat u deze token wilt verwijderen?"
-  },
   "settings.pats.modal.edit.title": {
     "message": "Persoonlijke toegangstoken bewerken"
   },
@@ -5350,9 +5302,6 @@
   },
   "settings.sessions.current-session": {
     "message": "Huidige sessie"
-  },
-  "settings.sessions.description": {
-    "message": "Hier vind je alle apparaten die momenteel zijn aangemeld bij je Modrinth-account. Je kunt je op elk apparaat afzonderlijk afmelden.\n\nAls je een vermelding ziet die je niet herkent, meld je dan af op dat apparaat en wijzig onmiddellijk het wachtwoord van je Modrinth-account."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Laatst geopend {ago}"

@@ -1,4 +1,3 @@
-export * from './affiliate'
 export * from './base'
 export * from './billing'
 export * from './brand'

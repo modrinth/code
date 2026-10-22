@@ -5,16 +5,14 @@
 	>
 		<TagCategoryRefreshCcwIcon class="size-3 shrink-0 text-orange" aria-hidden="true" />
 		<span aria-hidden="true">{{ count }}</span>
-		<span class="sr-only">{{ formatMessage(messages.reReviewFindings, { count }) }}</span>
+		<span class="sr-only">{{
+			count === 1 ? `${count} re-review item` : `${count} re-review items`
+		}}</span>
 	</span>
 </template>
 
 <script setup lang="ts">
 import { TagCategoryRefreshCcwIcon } from '@modrinth/assets'
-import { useVIntl } from '@modrinth/ui'
-
-import { projectReviewMessages as messages } from '../messages'
 
 defineProps<{ count: number }>()
-const { formatMessage } = useVIntl()
 </script>

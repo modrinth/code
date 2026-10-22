@@ -11,6 +11,7 @@ required-features = ["export-ts"]
 [dependencies]
 anyhow = { workspace = true }
 ariadne = { workspace = true }
+async-compression = { workspace = true, features = ["tokio", "zstd"] }
 async-minecraft-ping = { workspace = true, features = ["srv"] }
 async-recursion = { workspace = true }
 async-trait = { workspace = true }
@@ -23,7 +24,6 @@ bytemuck = { workspace = true, features = ["extern_crate_alloc"] }
 bytes = { workspace = true, features = ["serde"] }
 chardetng = { workspace = true }
 chrono = { workspace = true, features = ["serde"] }
-daedalus = { workspace = true }
 dashmap = { workspace = true, features = ["serde"] }
 data-url = { workspace = true }
 derive_more = { workspace = true, features = ["display"] }
@@ -36,15 +36,17 @@ enumset = { workspace = true }
 flate2 = { workspace = true }
 fs4 = { workspace = true, features = ["tokio"] }
 futures = { workspace = true, features = ["alloc", "async-await"] }
-futures-lite = { workspace = true }
 governor = { workspace = true }
 heck = { workspace = true }
 hickory-resolver = { workspace = true }
 httpdate = { workspace = true }
 image = { workspace = true, features = ["gif", "jpeg", "png", "webp"] }
+indexmap = { workspace = true }
 indicatif = { workspace = true, optional = true }
+infer = { workspace = true }
 itertools = { workspace = true }
 json5 = { workspace = true }
+minecraft-meta-manifest = { workspace = true }
 modrinth-content-management = { workspace = true }
 notify = { workspace = true }
 notify-debouncer-mini = { workspace = true }
