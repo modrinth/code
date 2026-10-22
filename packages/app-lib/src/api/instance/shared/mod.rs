@@ -125,8 +125,7 @@ pub(super) fn is_shareable_directory(path: &str) -> bool {
 }
 
 fn is_shareable_path(path: &str) -> bool {
-    !path.split('/').any(|part| part.starts_with('.'))
-        && super::export_mrpack::is_exportable_path(path)
+    super::export_mrpack::is_exportable_path(path)
 }
 
 fn is_content_folder(path: &str) -> bool {
