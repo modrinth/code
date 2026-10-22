@@ -741,7 +741,7 @@
 					</template>
 					<template v-else>
 						<SearchIcon aria-hidden="true" class="smaller" />
-						{{ formatMessage(navMenuMessages.search) }}
+						<span class="truncate">{{ formatMessage(navMenuMessages.search) }}</span>
 					</template>
 				</Button>
 				<template v-if="auth.user">
@@ -1726,6 +1726,7 @@ function changeTheme() {
 		display: flex;
 		height: calc(var(--size-mobile-navbar-height) + env(safe-area-inset-bottom));
 		border-radius: var(--size-rounded-card) var(--size-rounded-card) 0 0;
+		padding-inline: 2rem;
 		padding-bottom: env(safe-area-inset-bottom);
 		position: fixed;
 		left: 0;
@@ -1760,7 +1761,7 @@ function changeTheme() {
 			position: relative;
 			background: none;
 			display: flex;
-			flex-basis: 0;
+			flex: 1 1 0;
 			justify-content: center;
 			align-items: center;
 			flex-direction: row;
@@ -1820,14 +1821,6 @@ function changeTheme() {
 			&:hover,
 			&:focus {
 				color: var(--color-text);
-			}
-
-			&:first-child {
-				margin-left: 2rem;
-			}
-
-			&:last-child {
-				margin-right: 2rem;
 			}
 
 			&.router-link-exact-active:not(&.no-active) {
