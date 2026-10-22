@@ -733,7 +733,7 @@
 					</template>
 					<template v-else>
 						<SearchIcon aria-hidden="true" class="smaller" />
-						{{ formatMessage(navMenuMessages.search) }}
+						<span>{{ formatMessage(navMenuMessages.search) }}</span>
 					</template>
 				</Button>
 				<template v-if="auth.user">
