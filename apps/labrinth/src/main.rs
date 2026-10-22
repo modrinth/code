@@ -184,8 +184,6 @@ async fn app() -> std::io::Result<()> {
 
     let gotenberg_client = GotenbergClient::from_env(redis_pool.clone())
         .expect("Failed to create Gotenberg client");
-    let muralpay = labrinth::queue::payouts::create_muralpay_client()
-        .expect("Failed to create MuralPay client");
 
     if let Some(task) = args.run_background_task {
         info!("Running task {task:?} and exiting");
@@ -200,7 +198,6 @@ async fn app() -> std::io::Result<()> {
             stripe_client,
             anrok_client.clone(),
             email_queue,
-            muralpay,
         )
         .await
         .map_err(std::io::Error::other)?;

@@ -1445,30 +1445,6 @@
   "create.project.visibility-unlisted": {
     "message": "Não listado"
   },
-  "dashboard.affiliate-links.create.button": {
-    "message": "Criar link de afiliado"
-  },
-  "dashboard.affiliate-links.empty.no-codes": {
-    "message": "Nenhum código de afiliado encontrado."
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "Erro ao carregar links de afiliado"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "Seus links de afiliado"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "Isso revogará permanentemente o código de afiliado `{id}` e quaisquer links existentes com este código se compartilhado estará inválido."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "Revogar"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "Você tem certeza que queira revogar seu link de afiliado \"{title}\"?"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "Buscar links de afiliado..."
-  },
   "dashboard.analytics.from-projects": {
     "message": "de {count} {count, plural, one {projeto} other {projetos}}"
   },
@@ -2689,9 +2665,6 @@
   },
   "layout.action.file-lookup": {
     "message": "Procurar arquivo"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "Gerenciar links de afiliado"
   },
   "layout.action.manage-server-notices": {
     "message": "Gerenciar notificações do servidor"

@@ -1448,30 +1448,6 @@
   "create.project.visibility-unlisted": {
     "message": "Không công khai"
   },
-  "dashboard.affiliate-links.create.button": {
-    "message": "Tạo link affiliate"
-  },
-  "dashboard.affiliate-links.empty.no-codes": {
-    "message": "Không tìm thấy mã liên kết nào."
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "Lỗi tải link affiliate"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "Link affiliate của bạn"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "Thao tác này sẽ vĩnh viễn thu hồi mã affiliate `{id}`. Mọi liên kết hiện có sử dụng mã này đã được chia sẻ sẽ không còn hiệu lực."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "Thu hồi"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "Bạn có chắc chắn muốn thu hồi link affiliate \"{title}\" không?"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "Tìm kiếm link affiliate..."
-  },
   "dashboard.analytics.from-projects": {
     "message": "từ {count} {count, plural, other {dự án}} khác"
   },
@@ -2692,9 +2668,6 @@
   },
   "layout.action.file-lookup": {
     "message": "Tra cứu tệp"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "Quản lý link affiliate"
   },
   "layout.action.manage-server-notices": {
     "message": "Quản lý thông báo máy chủ"

@@ -73,7 +73,6 @@ export type CreatePaymentIntentRequest = PaymentRequestType & {
 		type: 'pyro'
 		server_name?: string
 		server_region?: string
-		affiliate_code?: string
 		source:
 			| {
 					loader: ServerLoader

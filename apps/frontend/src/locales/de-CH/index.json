@@ -1445,30 +1445,6 @@
   "create.project.visibility-unlisted": {
     "message": "Nicht gelistet"
   },
-  "dashboard.affiliate-links.create.button": {
-    "message": "Partnerlink erstellen"
-  },
-  "dashboard.affiliate-links.empty.no-codes": {
-    "message": "Keine Partnercodes gefunden."
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "Fehler beim laden von Partnerlinks"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "Deine Partnerlinks"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "Dies wird permanent den Partbercode `{id}` widerrufen und alle existierenden Links, welche es nutzen, werden nicht mehr gültig sein."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "Widerrufen"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "Bist du sicher dass du deinen \"{title}\" Partnerlink widerrufen willst?"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "Partnerlinks durchsuchen..."
-  },
   "dashboard.analytics.from-projects": {
     "message": "von {count} {count, plural, one {Projekt} other {Projekten}}"
   },
@@ -2689,9 +2665,6 @@
   },
   "layout.action.file-lookup": {
     "message": "Datei ansehen"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "Partnerlinks verwalten"
   },
   "layout.action.manage-server-notices": {
     "message": "Servermitteilungen verwalten"

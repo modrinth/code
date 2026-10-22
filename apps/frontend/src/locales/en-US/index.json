@@ -1496,30 +1496,6 @@
   "create.version.restricted-title": {
     "message": "Action restricted"
   },
-  "dashboard.affiliate-links.create.button": {
-    "message": "Create affiliate link"
-  },
-  "dashboard.affiliate-links.empty.no-codes": {
-    "message": "No affiliate codes found."
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "Error loading affiliate links"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "Your affiliate links"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "This will permanently revoke the affiliate code `{id}` and any existing links with this code that have been shared will no longer be valid."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "Revoke"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "Are you sure you want to revoke your ''{title}'' affiliate link?"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "Search affiliate links..."
-  },
   "dashboard.analytics.from-projects": {
     "message": "from {count} {count, plural, one {project} other {projects}}"
   },
@@ -2740,9 +2716,6 @@
   },
   "layout.action.file-lookup": {
     "message": "File lookup"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "Manage affiliate links"
   },
   "layout.action.manage-server-notices": {
     "message": "Manage server notices"

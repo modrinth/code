@@ -1,4 +1,3 @@
-pub mod affiliate_code_item;
 pub mod analytics_event_item;
 pub mod blocked_user_item;
 pub mod categories;
@@ -44,11 +43,9 @@ pub mod user_subscription_item;
 pub mod users_compliance;
 pub mod users_notifications_preferences_item;
 pub mod users_redeemals;
-pub mod users_subscriptions_affiliations;
 pub mod users_subscriptions_credits;
 pub mod version_item;
 
-pub use affiliate_code_item::DBAffiliateCode;
 pub use analytics_event_item::DBAnalyticsEvent;
 pub use collection_item::DBCollection;
 pub use ids::*;

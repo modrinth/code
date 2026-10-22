@@ -21,7 +21,6 @@ import { KyrosFilesV1Module } from './kyros/files/v1'
 import { KyrosLogsV1Module } from './kyros/logs/v1'
 import { KyrosUploadSessionsV1Module } from './kyros/upload-sessions/v1'
 import { LabrinthVersionsV2Module, LabrinthVersionsV3Module } from './labrinth'
-import { LabrinthAffiliateInternalModule } from './labrinth/affiliate/internal'
 import { LabrinthAnalyticsInternalModule } from './labrinth/analytics/internal'
 import { LabrinthAnalyticsV3Module } from './labrinth/analytics/v3'
 import { LabrinthAttributionInternalModule } from './labrinth/attribution/internal'
@@ -104,7 +103,6 @@ export const MODULE_REGISTRY = {
 	kyros_files_v1: KyrosFilesV1Module,
 	kyros_logs_v1: KyrosLogsV1Module,
 	kyros_upload_sessions_v1: KyrosUploadSessionsV1Module,
-	labrinth_affiliate_internal: LabrinthAffiliateInternalModule,
 	labrinth_analytics_internal: LabrinthAnalyticsInternalModule,
 	labrinth_analytics_v3: LabrinthAnalyticsV3Module,
 	labrinth_auth_internal: LabrinthAuthInternalModule,

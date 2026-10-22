@@ -2,39 +2,6 @@
   "action.no-permission": {
     "defaultMessage": "Du har inte behörighet."
   },
-  "affiliate.create.button": {
-    "defaultMessage": "Skapa affiliatelänk"
-  },
-  "affiliate.create.header": {
-    "defaultMessage": "Skapar ny affiliatelänk"
-  },
-  "affiliate.create.title.description": {
-    "defaultMessage": "Ge din affiliatelänk ett namn så du vet var personerna kommer ifrån!"
-  },
-  "affiliate.create.title.label": {
-    "defaultMessage": "Affiliatelänkens titel"
-  },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "t.ex. YouTube"
-  },
-  "affiliate.create.user.description": {
-    "defaultMessage": "Användarnamnet av användaren som affiliatelänken skapas för"
-  },
-  "affiliate.create.user.placeholder": {
-    "defaultMessage": "Ange användarnamn..."
-  },
-  "affiliate.createdBy": {
-    "defaultMessage": "Skapad av {user}"
-  },
-  "affiliate.creating.button": {
-    "defaultMessage": "Skapar affiliatelänk..."
-  },
-  "affiliate.revoke": {
-    "defaultMessage": "Upphäv affiliatelänk"
-  },
-  "affiliate.viewAnalytics": {
-    "defaultMessage": "Visa statistik"
-  },
   "app.server-settings.failed-to-load-server": {
     "defaultMessage": "Kunde inte ladda in serverinställningar"
   },
@@ -145,9 +112,6 @@
   },
   "button.add-server-to-instance": {
     "defaultMessage": "Lägg till server till instans"
-  },
-  "button.affiliate-links": {
-    "defaultMessage": "Affiliatelänkar"
   },
   "button.analytics": {
     "defaultMessage": "Statistik"

@@ -2,39 +2,6 @@
   "action.no-permission": {
     "defaultMessage": "権限がありません。"
   },
-  "affiliate.create.button": {
-    "defaultMessage": "アフィリエイトリンクを作成"
-  },
-  "affiliate.create.header": {
-    "defaultMessage": "新しいアフィリエイトコードを作成中"
-  },
-  "affiliate.create.title.description": {
-    "defaultMessage": "流入元が分かる名前を付けてください！"
-  },
-  "affiliate.create.title.label": {
-    "defaultMessage": "アフィリエイトリンクのタイトル"
-  },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "例：YouTube"
-  },
-  "affiliate.create.user.description": {
-    "defaultMessage": "アフィリエイトコードを作成するユーザー名"
-  },
-  "affiliate.create.user.placeholder": {
-    "defaultMessage": "ユーザー名を入力…"
-  },
-  "affiliate.createdBy": {
-    "defaultMessage": "{user}によって作成"
-  },
-  "affiliate.creating.button": {
-    "defaultMessage": "アフィリエイトリンクを作成中…"
-  },
-  "affiliate.revoke": {
-    "defaultMessage": "アフィリエイトリンクを無効化"
-  },
-  "affiliate.viewAnalytics": {
-    "defaultMessage": "アナリティクスを表示"
-  },
   "app.appearance-settings.native-decorations.description": {
     "defaultMessage": "OS標準のタイトルバーとウィンドウ操作ボタンを使用します。反映にはアプリの再起動が必要です。"
   },
@@ -151,9 +118,6 @@
   },
   "button.add-server-to-instance": {
     "defaultMessage": "インスタンスにサーバーを追加"
-  },
-  "button.affiliate-links": {
-    "defaultMessage": "アフィリエイトリンク"
   },
   "button.analytics": {
     "defaultMessage": "統計"
@@ -3299,17 +3263,11 @@
   "profile.button.manage-projects": {
     "defaultMessage": "プロジェクトを管理"
   },
-  "profile.button.remove-affiliate": {
-    "defaultMessage": "アフィリエイトから削除"
-  },
   "profile.button.reset-2fa": {
     "defaultMessage": "二要素認証をリセットする"
   },
   "profile.button.revoke-sessions": {
     "defaultMessage": "すべてのセッションを取り消す"
-  },
-  "profile.button.set-affiliate": {
-    "defaultMessage": "アフィリエイトに設定"
   },
   "profile.button.shared-instances": {
     "defaultMessage": "共有インスタンスを表示"
@@ -3373,9 +3331,6 @@
   },
   "profile.force-password-reset.email-label": {
     "defaultMessage": "アカウントのメールアドレス"
-  },
-  "profile.label.affiliate": {
-    "defaultMessage": "アフィリエイト"
   },
   "profile.label.badges": {
     "defaultMessage": "バッジ"

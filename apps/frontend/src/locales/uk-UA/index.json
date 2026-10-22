@@ -1442,30 +1442,6 @@
   "create.project.visibility-unlisted": {
     "message": "Поза списком"
   },
-  "dashboard.affiliate-links.create.button": {
-    "message": "Створити партнерське посилання"
-  },
-  "dashboard.affiliate-links.empty.no-codes": {
-    "message": "Партнерські коди не знайдено."
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "Помилка під час завантаження партнерських посилань"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "Ваші партнерські посилання"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "Це незворотно відкличе код партнера «{id}» та будь-які наявні посилання з цим кодом, які було оприлюднено, більше не будуть доступні."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "Відкликати"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "Справді бажаєте відкликати своє партнерське посилання «{title}»?"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "Пошук партнерських посилань…"
-  },
   "dashboard.analytics.from-projects": {
     "message": "з {count} {count, plural, one {проєкту} few {проєктів} many {проєктів} other {проєктів}}"
   },
@@ -2683,9 +2659,6 @@
   },
   "layout.action.file-lookup": {
     "message": "Пошук файлів"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "Керувати партнерськими посиланнями"
   },
   "layout.action.manage-server-notices": {
     "message": "Керування сповіщеннями сервера"

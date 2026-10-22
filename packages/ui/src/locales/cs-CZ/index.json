@@ -2,39 +2,6 @@
   "action.no-permission": {
     "defaultMessage": "Nemáte oprávnění."
   },
-  "affiliate.create.button": {
-    "defaultMessage": "Vytvořit affiliate odkaz"
-  },
-  "affiliate.create.header": {
-    "defaultMessage": "Vytváření nového affiliate kódu"
-  },
-  "affiliate.create.title.description": {
-    "defaultMessage": "Pojmenujte svůj affiliate odkaz, abyste věděli, odkud uživatelé přicházejí!"
-  },
-  "affiliate.create.title.label": {
-    "defaultMessage": "Název affiliate odkazu"
-  },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "např. YouTube"
-  },
-  "affiliate.create.user.description": {
-    "defaultMessage": "Uživatelské jméno uživatele, pro kterého se má vytvořit partnerský kód"
-  },
-  "affiliate.create.user.placeholder": {
-    "defaultMessage": "Zadejte uživatelské jméno..."
-  },
-  "affiliate.createdBy": {
-    "defaultMessage": "Vytvořil {user}"
-  },
-  "affiliate.creating.button": {
-    "defaultMessage": "Vytváření affiliate odkazu..."
-  },
-  "affiliate.revoke": {
-    "defaultMessage": "Odvolat affiliate odkaz"
-  },
-  "affiliate.viewAnalytics": {
-    "defaultMessage": "Zobrazit analýzy"
-  },
   "app.server-settings.failed-to-load-server": {
     "defaultMessage": "Načtení nastavení serveru se nezdařilo"
   },
@@ -139,9 +106,6 @@
   },
   "button.add-server-to-instance": {
     "defaultMessage": "Přidat server k instanci"
-  },
-  "button.affiliate-links": {
-    "defaultMessage": "Affiliate odkazy"
   },
   "button.analytics": {
     "defaultMessage": "Analytika"

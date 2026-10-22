@@ -1445,30 +1445,6 @@
   "create.project.visibility-unlisted": {
     "message": "不公開"
   },
-  "dashboard.affiliate-links.create.button": {
-    "message": "建立聯盟連結"
-  },
-  "dashboard.affiliate-links.empty.no-codes": {
-    "message": "找不到聯盟代碼。"
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "載入聯盟連結時發生錯誤"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "你的聯盟連結"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "這將永久撤銷聯盟代碼「{id}」，並且任何使用這個代碼的現有連結將不再有效。"
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "撤銷"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "確定要撤銷「{title}」聯盟連結嗎？"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "搜尋聯盟連結..."
-  },
   "dashboard.analytics.from-projects": {
     "message": "來自 {count} 個{count, plural, other {專案}}"
   },
@@ -2689,9 +2665,6 @@
   },
   "layout.action.file-lookup": {
     "message": "檔案查詢"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "管理聯盟連結"
   },
   "layout.action.manage-server-notices": {
     "message": "管理伺服器通知"

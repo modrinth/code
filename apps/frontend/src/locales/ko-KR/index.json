@@ -1433,30 +1433,6 @@
   "create.project.visibility-unlisted": {
     "message": "일부 공개"
   },
-  "dashboard.affiliate-links.create.button": {
-    "message": "제휴 링크 생성"
-  },
-  "dashboard.affiliate-links.empty.no-codes": {
-    "message": "제휴 코드가 없습니다."
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "제휴 링크 로드 중 오류 발생"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "내 제휴 링크"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "이 작업을 수행하면 제휴 코드 `{id}`가 영구적으로 삭제되며, 이 코드로 공유된 모든 기존 링크는 더 이상 유효하지 않게 됩니다."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "취소"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "'{title}' 제휴 링크를 정말 삭제하시겠습니까?"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "제휴 링크 검색..."
-  },
   "dashboard.analytics.from-projects": {
     "message": "{count} {count, plural, one {프로젝트} other {프로젝트}}로"
   },
@@ -2674,9 +2650,6 @@
   },
   "layout.action.file-lookup": {
     "message": "파일 찾기"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "제휴 링크 관리"
   },
   "layout.action.manage-server-notices": {
     "message": "서버 알림 관리"

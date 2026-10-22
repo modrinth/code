@@ -1439,30 +1439,6 @@
   "create.project.visibility-unlisted": {
     "message": "Скрыт"
   },
-  "dashboard.affiliate-links.create.button": {
-    "message": "Создать ссылку"
-  },
-  "dashboard.affiliate-links.empty.no-codes": {
-    "message": "Партнёрские коды не найдены."
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "Ошибка загрузки партнёрских ссылок"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "Партнёрские ссылки"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "Партнёрский код `{id}` будет удалён навсегда, и все связанные с ним ссылки станут недействительными."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "Удалить"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "Вы точно хотите удалить партнёрскую ссылку «{title}»?"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "Поиск ссылок..."
-  },
   "dashboard.analytics.from-projects": {
     "message": "с {count, plural, one {# проекта} other {# проектов}}"
   },
@@ -2683,9 +2659,6 @@
   },
   "layout.action.file-lookup": {
     "message": "Поиск файла"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "Партнёрские ссылки"
   },
   "layout.action.manage-server-notices": {
     "message": "Оповещения серверов"

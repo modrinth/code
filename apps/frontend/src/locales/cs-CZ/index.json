@@ -1184,24 +1184,6 @@
   "create.project.visibility-unlisted": {
     "message": "Neveřejné"
   },
-  "dashboard.affiliate-links.create.button": {
-    "message": "Vytvořit partnerský odkaz"
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "Error při načítáni partnerských odkazů"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "Vaše partnerské odkazy"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "Tímto trvale zrušíte partnerský kód {id} a všechny již sdílené odkazy s tímto kódem přestanou být platné."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "Odvolat"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "Jste si jistý, že chcete zrušit svůj partnerský odkaz „{title}“?"
-  },
   "dashboard.analytics.from-projects": {
     "message": "{count, plural, one {z # projektu} few {ze # projektů} other {z # projektů}}"
   },

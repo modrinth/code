@@ -746,27 +746,6 @@
   "create.project.visibility-unlisted": {
     "message": "Tidak terdaftar"
   },
-  "dashboard.affiliate-links.create.button": {
-    "message": "Buat tautan afiliasi"
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "Gagal memuat tautan afiliasi"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "Tautan afiliasi Anda"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "Ini akan mencabut kode afiliasi `{id}` secara permanen dan semua tautan yang telah ada dengan kode ini yang telah dibagikan akan menjadi tidak sah."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "Cabut"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "Apakah Anda yakin ingin mencabut tautan afiliasi Anda yang bernama \"{title}\"?"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "Cari tautan afiliasi..."
-  },
   "dashboard.collections.button.create-new": {
     "message": "Buat baru"
   },
@@ -1657,9 +1636,6 @@
   },
   "layout.action.file-lookup": {
     "message": "Pencarian berkas"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "Kelola tautan afiliasi"
   },
   "layout.action.manage-server-notices": {
     "message": "Kelola pemberitahuan server"

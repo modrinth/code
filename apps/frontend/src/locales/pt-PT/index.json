@@ -1214,27 +1214,6 @@
   "create.project.visibility-unlisted": {
     "message": "Não listado"
   },
-  "dashboard.affiliate-links.create.button": {
-    "message": "Criar link de afiliado"
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "Erro a carregar links de afiliado"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "Os teus links de afiliado"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "Isto vai revogar permanentemente o código de afiliado \"{id}\" e quaisquer links partilhados com este código deixarão de ser válidos."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "Revogar"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "Tens a certeza que queres revogar o teu link de afiliado \"{title}\"?"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "Procurar links de afiliado..."
-  },
   "dashboard.collections.button.create-new": {
     "message": "Criar nova"
   },
@@ -2263,9 +2242,6 @@
   },
   "layout.action.file-lookup": {
     "message": "Pesquisa de ficheiros"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "Gerir links de afiliado"
   },
   "layout.action.manage-server-notices": {
     "message": "Gerir notificações do servidor"

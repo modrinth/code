@@ -992,27 +992,6 @@
   "create.project.visibility-unlisted": {
     "message": "Ikke opslået"
   },
-  "dashboard.affiliate-links.create.button": {
-    "message": "Opret affiliate link"
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "Fejl ved indlæsning af affiliate links"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "Dine affiliate links"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "Dette vil permanent fjerne partnerskabs-koden `{id}` og alle eksisterende links med denne kode some er blevet delt vil ikke længere være gyldig."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "Fjern"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "Er du sikker på du vil fjerne din \"{title}\" partnerskabs-link?"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "Søg partnerskabs-links..."
-  },
   "dashboard.analytics.total-downloads": {
     "message": "Totale downloads"
   },
@@ -1915,9 +1894,6 @@
   },
   "layout.action.external-projects": {
     "message": "Eksterne projekter"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "Styr patnerskabs-links"
   },
   "layout.action.manage-server-notices": {
     "message": "Styr din servermeddelelser"

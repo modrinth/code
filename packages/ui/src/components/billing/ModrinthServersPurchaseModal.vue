@@ -66,7 +66,6 @@ const props = defineProps<{
 	>
 	onError: (err: Error) => void
 	onFinalizeNoPaymentChange?: () => Promise<void>
-	affiliateCode?: string | null
 }>()
 
 const modal = useTemplateRef<InstanceType<typeof NewModal>>('modal')
@@ -75,7 +74,6 @@ const selectedInterval = ref<ServerBillingInterval>('quarterly')
 const loading = ref(false)
 const selectedRegion = ref<string>()
 const projectId = ref<string>()
-const affiliateCode = ref(props.affiliateCode ?? null)
 
 const {
 	initializeStripe,
@@ -106,7 +104,6 @@ const {
 	projectId,
 	props.initiatePayment,
 	props.onError,
-	affiliateCode,
 )
 
 const customServer = ref<boolean>(false)

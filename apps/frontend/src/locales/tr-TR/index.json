@@ -1409,30 +1409,6 @@
   "create.project.visibility-unlisted": {
     "message": "Liste dışı"
   },
-  "dashboard.affiliate-links.create.button": {
-    "message": "Ortaklık bağlantısı oluştur"
-  },
-  "dashboard.affiliate-links.empty.no-codes": {
-    "message": "Yönlendirme kodu bulunamadı."
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "Ortaklık bağlantıları yüklenemedi"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "Ortaklık bağlantıların"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "Bu işlem `{id}` ortaklık kodunu kalıcı olarak iptal edecek ve bu kodla paylaşılmış mevcut bağlantıların hiçbiri artık geçerli olmayacaktır."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "İptal et"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "''{title}'' ortaklık bağlantınızı iptal etmek istediğinizden emin misiniz?"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "Ortaklık bağlantılarını ara..."
-  },
   "dashboard.analytics.from-projects": {
     "message": "{count} {count, plural, one {project} other {projects}}'den"
   },
@@ -2650,9 +2626,6 @@
   },
   "layout.action.file-lookup": {
     "message": "Dosya bulma"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "Ortaklık linklerini yönet"
   },
   "layout.action.manage-server-notices": {
     "message": "Sunucu bildirimlerini yönet"

@@ -1385,30 +1385,6 @@
   "create.project.visibility-unlisted": {
     "message": "Olistad"
   },
-  "dashboard.affiliate-links.create.button": {
-    "message": "Skapa affiliatelänk"
-  },
-  "dashboard.affiliate-links.empty.no-codes": {
-    "message": "Inga affiliatekoder hittades."
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "Fel vid laddning av affiliatelänk"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "Dina affiliatelänkar"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "Detta kommer att återkalla affiliatekoden \"{id}\" permanent och alla existerande länkar med denna kod kommer inte att funka."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "Återkalla"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "Är du säker på att du vill återkalla din affiliatelänk \"{title}\"?"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "Sök affiliatelänkar..."
-  },
   "dashboard.analytics.from-projects": {
     "message": "från {count} {count, plural, one {projekt} other {projekt}}"
   },
@@ -2545,9 +2521,6 @@
   },
   "layout.action.file-lookup": {
     "message": "Sök efter fil"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "Hantera affiliatelänk"
   },
   "layout.action.manage-server-notices": {
     "message": "Hantera servernotiser"

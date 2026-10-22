@@ -30,7 +30,6 @@
 			:regions="regions"
 			:refresh-payment-methods="fetchPaymentData"
 			:fetch-stock="fetchStock"
-			:affiliate-code="affiliateCode"
 			plan-stage
 			@purchase-success="handlePurchaseSuccess"
 			@hide="clearPurchaseIntent"
@@ -415,7 +414,6 @@ const purchaseModal = ref<InstanceType<typeof ModrinthServersPurchaseModal> | nu
 type UpgradeModalRef = ComponentPublicInstance<{ open: (id?: string) => void | Promise<void> }>
 const medalUpgradeModal = ref<UpgradeModalRef | null>(null)
 const resubscribeModal = ref<InstanceType<typeof ResubscribeModal> | null>(null)
-const affiliateCode = ref<string | null>(null)
 const selectedCurrency = ref<string>('USD')
 
 const pyroProducts = computed(() => {

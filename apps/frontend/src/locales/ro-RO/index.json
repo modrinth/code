@@ -746,18 +746,6 @@
   "create.project.visibility-unlisted": {
     "message": "Nelistat"
   },
-  "dashboard.affiliate-links.create.button": {
-    "message": "Creează un link de afiliere"
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "Revoca"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "Ești sigur ca dorești sa ștergi linkul de afiliere {title}?"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "Cauta linkuri de afiliere..."
-  },
   "dashboard.collections.button.create-new": {
     "message": "Creați nouă"
   },

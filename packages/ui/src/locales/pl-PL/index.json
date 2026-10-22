@@ -2,39 +2,6 @@
   "action.no-permission": {
     "defaultMessage": "Nie posiadasz uprawnień."
   },
-  "affiliate.create.button": {
-    "defaultMessage": "Utwórz link afiliacyjny"
-  },
-  "affiliate.create.header": {
-    "defaultMessage": "Tworzenie nowego linku afiliacyjnego"
-  },
-  "affiliate.create.title.description": {
-    "defaultMessage": "Nadaj swojemu linkowi afiliacyjnemu nazwę, by wiedzieć, gdzie znajdują go ludzie!"
-  },
-  "affiliate.create.title.label": {
-    "defaultMessage": "Nazwa linku afiliacyjnego"
-  },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "np. YouTube"
-  },
-  "affiliate.create.user.description": {
-    "defaultMessage": "Nazwa użytkownika, któremu ma być utworzony ten kod"
-  },
-  "affiliate.create.user.placeholder": {
-    "defaultMessage": "Wprowadź nazwę użytkownika..."
-  },
-  "affiliate.createdBy": {
-    "defaultMessage": "Stworzony przez {user}"
-  },
-  "affiliate.creating.button": {
-    "defaultMessage": "Tworzenie linku afiliacyjnego..."
-  },
-  "affiliate.revoke": {
-    "defaultMessage": "Usuń link afiliacyjny"
-  },
-  "affiliate.viewAnalytics": {
-    "defaultMessage": "Pokaż dane analityczne"
-  },
   "app.appearance-settings.native-decorations.description": {
     "defaultMessage": "Używaj pasek tytułu i kontrolki okna systemu operacyjnego. Wymaga ponownego uruchomienia aplikacji."
   },
@@ -151,9 +118,6 @@
   },
   "button.add-server-to-instance": {
     "defaultMessage": "Dodaj serwer do instancji"
-  },
-  "button.affiliate-links": {
-    "defaultMessage": "Linki afiliacyjne"
   },
   "button.analytics": {
     "defaultMessage": "Analityka"
@@ -3296,17 +3260,11 @@
   "profile.button.manage-projects": {
     "defaultMessage": "Zarządzaj projektami"
   },
-  "profile.button.remove-affiliate": {
-    "defaultMessage": "Usuń jako partnera"
-  },
   "profile.button.reset-2fa": {
     "defaultMessage": "Zresetuj uwierzytelnianie dwuskładnikowe"
   },
   "profile.button.revoke-sessions": {
     "defaultMessage": "Unieważnij wszystkie sesje"
-  },
-  "profile.button.set-affiliate": {
-    "defaultMessage": "Ustaw jako partnera"
   },
   "profile.button.shared-instances": {
     "defaultMessage": "Pokaż udostępnione instancje"
@@ -3394,9 +3352,6 @@
   },
   "profile.force-password-reset.title": {
     "defaultMessage": "Wymuś zresetowanie hasła dla {username}"
-  },
-  "profile.label.affiliate": {
-    "defaultMessage": "Partner"
   },
   "profile.label.badges": {
     "defaultMessage": "Odznaki"

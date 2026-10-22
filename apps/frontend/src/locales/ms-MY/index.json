@@ -1058,27 +1058,6 @@
   "create.project.visibility-unlisted": {
     "message": "Tidak disenaraikan"
   },
-  "dashboard.affiliate-links.create.button": {
-    "message": "Cipta pautan afiliasi"
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "Ralat semasa memuat pautan afiliasi"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "Pautan afiliasi anda"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "Ini akan membatalkan kod afiliasi `{id}` secara kekal dan sebarang pautan sedia ada dengan kod ini yang telah dikongsi tidak lagi sah."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "Batalkan"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "Adakah anda pasti mahu membatalkan pautan afiliasi anda yang bernama ''{title}''?"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "Cari pautan afiliasi..."
-  },
   "dashboard.analytics.from-projects": {
     "message": "daripada {count} {count, plural, other {projek}}"
   },
@@ -2164,9 +2143,6 @@
   },
   "layout.action.file-lookup": {
     "message": "Carian fail"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "Urus pautan afiliasi"
   },
   "layout.action.manage-server-notices": {
     "message": "Urus notis pelayan"

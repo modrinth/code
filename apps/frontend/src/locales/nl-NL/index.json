@@ -1421,30 +1421,6 @@
   "create.project.visibility-unlisted": {
     "message": "Verborgen"
   },
-  "dashboard.affiliate-links.create.button": {
-    "message": "Maak een affiliate-link"
-  },
-  "dashboard.affiliate-links.empty.no-codes": {
-    "message": "Er zijn geen affiliatecodes gevonden."
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "Fout bij het laden van affiliatelinks"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "Je partnerlinks"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "Hierdoor wordt de affiliatecode `{id}` permanent ingetrokken en zijn alle bestaande links met deze code die zijn gedeeld, niet langer geldig."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "Intrekken"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "Weet je zeker dat je je affiliate-link ''{title}'' wilt intrekken?"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "Zoek affiliatelinks..."
-  },
   "dashboard.analytics.from-projects": {
     "message": "van {count} {count, plural, one {project} other {projects}}"
   },
@@ -2662,9 +2638,6 @@
   },
   "layout.action.file-lookup": {
     "message": "Bestand opzoeken"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "Beheer partner links"
   },
   "layout.action.manage-server-notices": {
     "message": "Beheer server mededelingen"

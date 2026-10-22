@@ -2,39 +2,6 @@
   "action.no-permission": {
     "defaultMessage": "ليس لديك صلاحية."
   },
-  "affiliate.create.button": {
-    "defaultMessage": "إنشاء رابط تسويق بالعمولة"
-  },
-  "affiliate.create.header": {
-    "defaultMessage": "إنشاء رمز تسويق بالعمولة جديد"
-  },
-  "affiliate.create.title.description": {
-    "defaultMessage": "أعطِ رابط الإحالة الخاص بك اسمًا حتى تعرف من أين يأتي الناس!"
-  },
-  "affiliate.create.title.label": {
-    "defaultMessage": "عنوان رابط الإحالة"
-  },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "مثل اليوتيوب"
-  },
-  "affiliate.create.user.description": {
-    "defaultMessage": "اسم المستخدم الذي سيتم من خلاله إنشاء رمز الإحالة الخاص بـ"
-  },
-  "affiliate.create.user.placeholder": {
-    "defaultMessage": "أدخل اسم المستخدم..."
-  },
-  "affiliate.createdBy": {
-    "defaultMessage": "صنعت من قبل {user}"
-  },
-  "affiliate.creating.button": {
-    "defaultMessage": "إنشاء رابط تسويق بالعمولة..."
-  },
-  "affiliate.revoke": {
-    "defaultMessage": "إلغاء رابط الإحالة"
-  },
-  "affiliate.viewAnalytics": {
-    "defaultMessage": "عرض التحليلات"
-  },
   "app.appearance-settings.native-decorations.description": {
     "defaultMessage": "استخدام شريط العنوان وعناصر التحكم في النافذة الخاصة بنظام التشغيل. يتطلب إعادة تشغيل التطبيق."
   },
@@ -151,9 +118,6 @@
   },
   "button.add-server-to-instance": {
     "defaultMessage": "أضف الخادم للنسخة"
-  },
-  "button.affiliate-links": {
-    "defaultMessage": "روابط تابعة"
   },
   "button.analytics": {
     "defaultMessage": "تحليل"
@@ -1944,4 +1908,3 @@
     "defaultMessage": "ماينكرافت: إصدار جافا"
   }
 }
-

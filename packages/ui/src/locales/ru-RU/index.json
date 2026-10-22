@@ -2,39 +2,6 @@
   "action.no-permission": {
     "defaultMessage": "У вас нет разрешения."
   },
-  "affiliate.create.button": {
-    "defaultMessage": "Создать партнёрскую ссылку"
-  },
-  "affiliate.create.header": {
-    "defaultMessage": "Создание партнёрского кода"
-  },
-  "affiliate.create.title.description": {
-    "defaultMessage": "Укажите название для отслеживания источника переходов"
-  },
-  "affiliate.create.title.label": {
-    "defaultMessage": "Название партнёрской ссылки"
-  },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "Например: YouTube"
-  },
-  "affiliate.create.user.description": {
-    "defaultMessage": "Пользователь, для которого будет создан партнёрский код"
-  },
-  "affiliate.create.user.placeholder": {
-    "defaultMessage": "Введите имя..."
-  },
-  "affiliate.createdBy": {
-    "defaultMessage": "Создана {user}"
-  },
-  "affiliate.creating.button": {
-    "defaultMessage": "Создание партнёрской ссылки..."
-  },
-  "affiliate.revoke": {
-    "defaultMessage": "Удалить ссылку"
-  },
-  "affiliate.viewAnalytics": {
-    "defaultMessage": "Посмотреть аналитику"
-  },
   "app.appearance-settings.native-decorations.description": {
     "defaultMessage": "Использовать системное оформление заголовка и кнопок окна. Требуется перезапуск."
   },
@@ -148,9 +115,6 @@
   },
   "button.add-server-to-instance": {
     "defaultMessage": "Добавить сервер в сборку"
-  },
-  "button.affiliate-links": {
-    "defaultMessage": "Партнёрские ссылки"
   },
   "button.analytics": {
     "defaultMessage": "Аналитика"
@@ -3224,17 +3188,11 @@
   "profile.button.manage-projects": {
     "defaultMessage": "Управление проектами"
   },
-  "profile.button.remove-affiliate": {
-    "defaultMessage": "Убрать из партнёров"
-  },
   "profile.button.reset-2fa": {
     "defaultMessage": "Сбросить двухфакторную аутентификацию"
   },
   "profile.button.revoke-sessions": {
     "defaultMessage": "Завершить все сеансы"
-  },
-  "profile.button.set-affiliate": {
-    "defaultMessage": "Сделать партнёром"
   },
   "profile.button.shared-instances": {
     "defaultMessage": "Посмотреть совместные сборки"
@@ -3322,9 +3280,6 @@
   },
   "profile.force-password-reset.title": {
     "defaultMessage": "Принудительный сброс пароля для {username}"
-  },
-  "profile.label.affiliate": {
-    "defaultMessage": "Партнёр"
   },
   "profile.label.badges": {
     "defaultMessage": "Значки"

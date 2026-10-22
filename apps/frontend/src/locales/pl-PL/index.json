@@ -1442,30 +1442,6 @@
   "create.project.visibility-unlisted": {
     "message": "Niewymieniony"
   },
-  "dashboard.affiliate-links.create.button": {
-    "message": "Utwórz link afiliacyjny"
-  },
-  "dashboard.affiliate-links.empty.no-codes": {
-    "message": "Nie znaleziono żadnych kodów afiliacyjnych."
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "Błąd podczas ładowania linków afiliacyjnych"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "Twoje linki afiliacyjne"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "Unieważni to nieodwołalnie kod afiliacyjny `{id}`. Wszystkie udostępnione linki używające tego kodu zostaną unieważnione."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "Unieważnij"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "Czy na pewno chcesz unieważnić link afiliacyjny \"{title}\"?"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "Szukaj linku afiliacyjnego..."
-  },
   "dashboard.analytics.from-projects": {
     "message": "z {count} {count, plural, one {projektu} other {projektów}}"
   },
@@ -2683,9 +2659,6 @@
   },
   "layout.action.file-lookup": {
     "message": "Wyszukiwarka plików"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "Zarządzaj linkami afiliacyjnymi"
   },
   "layout.action.manage-server-notices": {
     "message": "Zarządzaj ogłoszeniami serwera"
