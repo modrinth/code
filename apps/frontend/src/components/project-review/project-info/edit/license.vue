@@ -1,7 +1,7 @@
 <template>
 	<EditModal
 		ref="modal"
-		:section="formatMessage(reviewMessages.license)"
+		section="License"
 		:saving="saving"
 		:can-save="canSave"
 		@cancel="reset"
@@ -9,16 +9,14 @@
 	>
 		<div class="flex min-w-0 flex-col gap-6">
 			<div class="flex min-w-0 flex-col gap-2">
-				<label class="font-semibold text-contrast">
-					{{ formatMessage(messages.select) }}
-				</label>
+				<label class="font-semibold text-contrast"> Select a license </label>
 				<Combobox
 					v-model="selectedLicense"
 					:options="licenseOptions"
 					:search-options="allLicenseOptions"
 					:display-value="licenseDisplayName(currentLicense)"
-					:placeholder="formatMessage(messages.selectPlaceholder)"
-					:search-placeholder="formatMessage(messages.selectPlaceholder)"
+					placeholder="Select license..."
+					search-placeholder="Select license..."
 					:searchable="true"
 					sync-with-selection
 					select-search-text-on-focus
@@ -27,29 +25,24 @@
 					class="w-full"
 				/>
 				<p class="m-0 text-sm text-secondary">
-					{{ formatMessage(messages.selectDescription) }}
+					How users are and aren't allowed to use your project.
 				</p>
 			</div>
 
 			<div v-if="currentLicense.requiresOnlyOrLater" class="flex flex-col gap-2">
-				<label class="font-semibold text-contrast">
-					{{ formatMessage(messages.later) }}
-				</label>
-				<Checkbox
-					v-model="allowOrLater"
-					:disabled="saving"
-					:description="formatMessage(messages.allowLater)"
-				>
-					{{ formatMessage(messages.allowLater) }}
+				<label class="font-semibold text-contrast"> Later editions </label>
+				<Checkbox v-model="allowOrLater" :disabled="saving" description="Allow later editions">
+					Allow later editions
 				</Checkbox>
 				<p class="m-0 text-sm text-secondary">
-					{{ formatMessage(messages.laterDescription) }}
+					The license you selected has an "or later" clause. If you check this box, users may use
+					your project under later editions of the license.
 				</p>
 			</div>
 
 			<div v-if="currentLicense.friendly" class="flex min-w-0 flex-col gap-2">
 				<label for="project-review-license-url" class="font-semibold text-contrast">
-					{{ formatMessage(licenseUrlMessages.url) }}
+					License URL
 				</label>
 				<Input
 					id="project-review-license-url"
@@ -57,44 +50,34 @@
 					type="url"
 					:maxlength="2048"
 					:placeholder="
-						formatMessage(
-							currentLicense.friendly === 'Custom'
-								? licenseUrlMessages.url
-								: licenseUrlMessages.optionalUrl,
-						)
+						currentLicense.friendly === 'Custom' ? 'License URL' : 'License URL (optional)'
 					"
 					:disabled="saving || licenseId === 'LicenseRef-Unknown'"
 					wrapper-class="w-full"
 				/>
 				<p class="m-0 text-sm text-secondary">
 					{{
-						formatMessage(
-							currentLicense.friendly === 'Custom'
-								? licenseUrlMessages.customUrlDescription
-								: licenseUrlMessages.urlDescription,
-						)
+						currentLicense.friendly === 'Custom'
+							? 'The web location of the full license text. You have to provide a link since this is a custom license.'
+							: "The web location of the full license text. If you don't provide a link, the license text will be displayed instead."
 					}}
 				</p>
 			</div>
 
 			<div v-if="currentLicense.friendly === 'Custom'" class="flex min-w-0 flex-col gap-2">
 				<label for="project-review-license-name" class="font-semibold text-contrast">
-					{{ formatMessage(hasSpdxLicense ? messages.spdx : messages.name) }}
+					{{ hasSpdxLicense ? 'SPDX identifier' : 'License name' }}
 				</label>
 				<Input
 					id="project-review-license-name"
 					v-model="currentLicense.short"
 					:maxlength="128"
-					:placeholder="formatMessage(hasSpdxLicense ? messages.spdx : messages.name)"
+					:placeholder="hasSpdxLicense ? 'SPDX identifier' : 'License name'"
 					:disabled="saving"
 					wrapper-class="w-full"
 				/>
-				<Checkbox
-					v-model="hasSpdxLicense"
-					:disabled="saving"
-					:description="formatMessage(messages.hasSpdx)"
-				>
-					{{ formatMessage(messages.hasSpdx) }}
+				<Checkbox v-model="hasSpdxLicense" :disabled="saving" description="Use SPDX identifier">
+					Use SPDX identifier
 				</Checkbox>
 			</div>
 
@@ -106,23 +89,13 @@
 </template>
 
 <script setup lang="ts">
-import {
-	Checkbox,
-	Combobox,
-	type ComboboxOption,
-	defineMessages,
-	injectModrinthClient,
-	Input,
-	useVIntl,
-} from '@modrinth/ui'
+import { Checkbox, Combobox, type ComboboxOption, injectModrinthClient, Input } from '@modrinth/ui'
 import { defaultLicenseIds } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, reactive, ref, useTemplateRef } from 'vue'
 
 import { normalizeProjectUrl } from '~/helpers/project-url'
-import { licenseUrlMessages } from '~/utils/license-messages'
 
-import { projectReviewMessages as reviewMessages } from '../../messages'
 import EditModal from './edit-modal.vue'
 import { useProjectInfoEdit } from './use-project-edit'
 
@@ -132,61 +105,6 @@ interface LicenseChoice {
 	requiresOnlyOrLater?: boolean
 }
 
-const messages = defineMessages({
-	custom: { id: 'project.settings.license.custom', defaultMessage: 'Custom' },
-	allRights: {
-		id: 'project.settings.license.all-rights',
-		defaultMessage: 'All Rights Reserved/No License',
-	},
-	select: {
-		id: 'project.settings.license.select',
-		defaultMessage: 'Select a license',
-	},
-	selectDescription: {
-		id: 'project.settings.license.select-description',
-		defaultMessage: "How users are and aren't allowed to use your project.",
-	},
-	selectPlaceholder: {
-		id: 'project.settings.license.select-placeholder',
-		defaultMessage: 'Select license...',
-	},
-	later: {
-		id: 'project.settings.license.later',
-		defaultMessage: 'Later editions',
-	},
-	laterDescription: {
-		id: 'project.settings.license.later-description',
-		defaultMessage:
-			'The license you selected has an "or later" clause. If you check this box, users may use your project under later editions of the license.',
-	},
-	allowLater: {
-		id: 'project.settings.license.allow-later',
-		defaultMessage: 'Allow later editions',
-	},
-	spdx: {
-		id: 'project.settings.license.spdx',
-		defaultMessage: 'SPDX identifier',
-	},
-	name: { id: 'project.settings.license.name', defaultMessage: 'License name' },
-	hasSpdx: {
-		id: 'project.settings.license.has-spdx',
-		defaultMessage: 'Use SPDX identifier',
-	},
-	missingName: {
-		id: 'project.settings.license.missing-name',
-		defaultMessage: 'Enter a name or SPDX identifier for your custom license.',
-	},
-	missingUrl: {
-		id: 'project.settings.license.missing-url',
-		defaultMessage: 'Enter a URL to the full text of your custom license.',
-	},
-	invalidUrl: {
-		id: 'project.settings.license.invalid-url',
-		defaultMessage: 'Enter a valid HTTP or HTTPS license URL.',
-	},
-})
-
-const { formatMessage } = useVIntl()
 const { project, saving, beginEditing, saveProject } = useProjectInfoEdit()
 const modal = useTemplateRef<InstanceType<typeof EditModal>>('modal')
 const currentLicense = reactive<LicenseChoice>({ friendly: '', short: '' })
@@ -195,8 +113,8 @@ const allowOrLater = ref(false)
 const hasSpdxLicense = ref(true)
 
 function licenseDisplayName(license: LicenseChoice) {
-	if (license.friendly === 'Custom') return formatMessage(messages.custom)
-	if (license.short === 'All-Rights-Reserved') return formatMessage(messages.allRights)
+	if (license.friendly === 'Custom') return 'Custom'
+	if (license.short === 'All-Rights-Reserved') return 'All Rights Reserved/No License'
 	return license.friendly
 }
 
@@ -316,12 +234,12 @@ const urlValid = computed(() => {
 })
 const validationMessage = computed(() => {
 	if (currentLicense.friendly === 'Custom' && !currentLicense.short.trim()) {
-		return formatMessage(messages.missingName)
+		return 'Enter a name or SPDX identifier for your custom license.'
 	}
 	if (currentLicense.friendly === 'Custom' && !normalizedLicenseUrl.value) {
-		return formatMessage(messages.missingUrl)
+		return 'Enter a URL to the full text of your custom license.'
 	}
-	if (!urlValid.value) return formatMessage(messages.invalidUrl)
+	if (!urlValid.value) return 'Enter a valid HTTP or HTTPS license URL.'
 	return ''
 })
 const hasChanges = computed(

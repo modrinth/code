@@ -19,10 +19,10 @@
 			:class="status.type === 'error' ? 'text-red' : 'text-secondary'"
 			role="status"
 		>
-			{{ formatMessage(status.message) }}
+			{{ status.message }}
 		</p>
 		<div v-if="suggestions.length" class="flex flex-wrap items-center gap-2">
-			<span class="text-sm text-secondary">{{ formatMessage(messages.suggestions) }}</span>
+			<span class="text-sm text-secondary">Suggestions:</span>
 			<TagItem
 				v-for="suggestion in suggestions"
 				:key="suggestion"
@@ -39,7 +39,7 @@
 <script setup lang="ts">
 import { CheckIcon } from '@modrinth/assets'
 import { isValidProjectSlug } from '@modrinth/moderation/src/utils'
-import { defineMessages, injectModrinthClient, Input, TagItem, useVIntl } from '@modrinth/ui'
+import { injectModrinthClient, Input, TagItem } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import { refDebounced } from '@vueuse/core'
 import { computed, ref, useId, watch } from 'vue'
@@ -61,33 +61,6 @@ const emit = defineEmits<{
 const input = ref<InstanceType<typeof Input> | null>(null)
 defineExpose({ focus: () => input.value?.focus() })
 
-const { formatMessage } = useVIntl()
-const messages = defineMessages({
-	invalid: {
-		id: 'project-review.controls.slug-invalid',
-		defaultMessage: 'Use 3–64 letters, numbers, periods, underscores, or hyphens.',
-	},
-	unchanged: {
-		id: 'project-review.controls.slug-unchanged',
-		defaultMessage: 'Choose a URL different from the current project URL.',
-	},
-	available: {
-		id: 'project-review.controls.slug-available',
-		defaultMessage: 'This project URL is available.',
-	},
-	suggestions: {
-		id: 'project.slug-suggestions.label',
-		defaultMessage: 'Suggestions:',
-	},
-	taken: {
-		id: 'project-review.controls.slug-taken',
-		defaultMessage: 'This project URL is already taken.',
-	},
-	error: {
-		id: 'project-review.controls.slug-error',
-		defaultMessage: 'Unable to check URL availability. Try again.',
-	},
-})
 const statusId = `${useId()}-status`
 const client = injectModrinthClient()
 const { project, members } = injectProjectReviewPageContext()
@@ -122,14 +95,27 @@ const availability = useQuery(
 )
 const resolvedStatus = computed(() => {
 	if (!slug.value) return undefined
-	if (isSuggestion.value) return { type: 'success', message: messages.available }
-	if (!isValidProjectSlug(slug.value)) return { type: 'error', message: messages.invalid }
+	if (isSuggestion.value) return { type: 'success', message: 'This project URL is available.' }
+	if (!isValidProjectSlug(slug.value))
+		return {
+			type: 'error',
+			message: 'Use 3–64 letters, numbers, periods, underscores, or hyphens.',
+		}
 	if (slug.value === project.value?.slug?.toLowerCase())
-		return { type: 'error', message: messages.unchanged }
+		return {
+			type: 'error',
+			message: 'Choose a URL different from the current project URL.',
+		}
 	if (checkedSlug.value !== slug.value) return undefined
-	if (availability.isError.value) return { type: 'error', message: messages.error }
-	if (availability.data.value === true) return { type: 'success', message: messages.available }
-	if (availability.data.value === false) return { type: 'error', message: messages.taken }
+	if (availability.isError.value)
+		return {
+			type: 'error',
+			message: 'Unable to check URL availability. Try again.',
+		}
+	if (availability.data.value === true)
+		return { type: 'success', message: 'This project URL is available.' }
+	if (availability.data.value === false)
+		return { type: 'error', message: 'This project URL is already taken.' }
 	return undefined
 })
 const status = ref<typeof resolvedStatus.value>()

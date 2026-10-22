@@ -4,17 +4,15 @@
 </template>
 
 <script setup lang="ts">
-import { ConfirmLeaveModal, useVIntl } from '@modrinth/ui'
+import { ConfirmLeaveModal } from '@modrinth/ui'
 import { onBeforeUnmount, onMounted } from 'vue'
 
 import ProjectReview from '~/components/project-review/index.vue'
-import { projectReviewMessages } from '~/components/project-review/messages'
 import {
 	createProjectReviewPageContext,
 	provideProjectReviewPageContext,
 } from '~/providers/project-review'
 
-const { formatMessage } = useVIntl()
 const { confirmLeaveModal, project } = provideProjectReviewPageContext(
 	createProjectReviewPageContext(),
 )
@@ -26,9 +24,7 @@ definePageMeta({
 
 useHead({
 	title: () =>
-		project.value?.name
-			? `${project.value.name} - ${formatMessage(projectReviewMessages.title)}`
-			: formatMessage(projectReviewMessages.title),
+		project.value?.name ? `${project.value.name} - ${'Project Review'}` : 'Project Review',
 })
 useFavicon('review')
 

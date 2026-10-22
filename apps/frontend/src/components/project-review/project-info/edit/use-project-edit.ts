@@ -1,10 +1,5 @@
 import type { Labrinth } from '@modrinth/api-client'
-import {
-	commonMessages,
-	injectModrinthClient,
-	injectNotificationManager,
-	useVIntl,
-} from '@modrinth/ui'
+import { injectModrinthClient, injectNotificationManager } from '@modrinth/ui'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { watch } from 'vue'
 
@@ -17,7 +12,7 @@ export function useProjectInfoEdit() {
 	const client = injectModrinthClient()
 	const queryClient = useQueryClient()
 	const { addNotification } = injectNotificationManager()
-	const { formatMessage } = useVIntl()
+
 	let draftProjectId: string | undefined
 	let session = 0
 
@@ -54,7 +49,7 @@ export function useProjectInfoEdit() {
 		},
 		onError: (error) => {
 			addNotification({
-				title: formatMessage(commonMessages.errorNotificationTitle),
+				title: 'An error occurred',
 				text: error instanceof Error ? error.message : String(error),
 				type: 'error',
 			})

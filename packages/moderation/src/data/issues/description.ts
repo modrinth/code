@@ -134,6 +134,10 @@ export const descriptionReviewPanel = panel({
 		label: 'AI Images',
 		issue: rulesAiImagesIssue,
 		id: 'description-ai-images',
+		issueCardDisplay: {
+			group: 'AI images',
+			label: 'Description',
+		},
 	}),
 	section({
 		label: 'Why is this Description Insufficient?',
@@ -142,21 +146,25 @@ export const descriptionReviewPanel = panel({
 		toggle({
 			label: 'Custom',
 			id: 'description-custom',
+			issueCardDisplay: { label: 'Custom' },
 			issue: insufficientDescriptionIssue,
 		}),
 		toggle({
 			label: 'Fork',
 			id: 'description-fork',
+			issueCardDisplay: { label: 'Fork' },
 			issue: insufficientDescriptionIssue,
 		}),
 		toggle({
 			label: 'Unfinished',
 			id: 'description-unfinished',
+			issueCardDisplay: { label: 'Unfinished' },
 			issue: insufficientDescriptionIssue,
 		}),
 		toggle({
 			label: 'Spoilers',
 			id: 'description-spoilers',
+			issueCardDisplay: { label: 'Spoilers' },
 			issue: insufficientDescriptionIssue,
 		}),
 	),

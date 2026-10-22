@@ -1,14 +1,7 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { moderationSettings } from '@modrinth/moderation'
 import { IssuePriority } from '@modrinth/moderation/src/data/issues'
-import {
-	commonMessages,
-	createContext,
-	defineMessages,
-	injectModrinthClient,
-	injectNotificationManager,
-	useVIntl,
-} from '@modrinth/ui'
+import { injectModrinthClient, injectNotificationManager } from '@modrinth/ui'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { computed, onScopeDispose, ref, watch } from 'vue'
 
@@ -29,8 +22,7 @@ type ProjectStatus = Labrinth.Projects.v2.ProjectStatus
 type ReviewEditorMode = 'reply' | 'note'
 type NewThreadIssues = Labrinth.Threads.v3.NewThreadIssues
 
-export const [injectReviewSubmission, provideReviewSubmission] =
-	createContext<ReturnType<typeof createReviewSubmission>>('ReviewSubmission')
+export { injectReviewSubmission, provideReviewSubmission } from './review-submission-context'
 
 export function createReviewSubmission(
 	messages: ReturnType<typeof createReviewMessages>,
@@ -40,7 +32,7 @@ export function createReviewSubmission(
 ) {
 	const client = injectModrinthClient()
 	const queryClient = useQueryClient()
-	const { formatMessage } = useVIntl()
+
 	const { addNotification } = injectNotificationManager()
 	const auth = useAuthState()
 	const settings = useModerationSettings()
@@ -63,52 +55,9 @@ export function createReviewSubmission(
 		disposed = true
 	})
 
-	const errors = defineMessages({
-		sendIssuesFailed: {
-			id: 'project-review.decision.send-issues-failed',
-			defaultMessage: 'Failed to send issues thread message',
-		},
-		createIssuesFailed: {
-			id: 'project-review.decision.create-issues-failed',
-			defaultMessage: 'Failed to create issues',
-		},
-		issuesMessageTooLong: {
-			id: 'project-review.decision.issues-message-too-long',
-			defaultMessage: 'The issues thread message must be no larger than 65,536 bytes.',
-		},
-		submitFailed: {
-			id: 'project-review.decision.submit-failed',
-			defaultMessage: 'Failed to submit review',
-		},
-		unresolved: {
-			id: 'project-review.decision.unresolved',
-			defaultMessage:
-				'Verify all remaining fixes and remove new findings before approving this project.',
-		},
-		unsaved: {
-			id: 'project-review.disclosures.unsaved',
-			defaultMessage: 'Save or reset your disclosure changes before changing the project status.',
-		},
-		missing: {
-			id: 'project-review.corrections.missing-fields',
-			defaultMessage: 'Complete the required review fields before submitting a review decision.',
-		},
-		changed: {
-			id: 'project-review.corrections.project-changed',
-			defaultMessage: 'The selected project changed. Review it again.',
-		},
-		imageType: {
-			id: 'project-review.reply.image-type',
-			defaultMessage: 'Choose a PNG, JPEG, GIF, or WebP image.',
-		},
-		imageSize: {
-			id: 'project-review.reply.image-size',
-			defaultMessage: 'Images must be smaller than 1 MiB.',
-		},
-	})
-
 	function assertCurrent(id: string) {
-		if (disposed || project.value?.id !== id) throw new Error(formatMessage(errors.changed))
+		if (disposed || project.value?.id !== id)
+			throw new Error('The selected project changed. Review it again.')
 	}
 
 	function selectedIssues(): NewThreadIssues | undefined {
@@ -192,15 +141,14 @@ export function createReviewSubmission(
 		},
 		onError: (error) => {
 			addNotification({
-				title: formatMessage(
+				title:
 					error instanceof ReviewIssuesError
 						? error.mode === 'message'
-							? errors.sendIssuesFailed
-							: errors.createIssuesFailed
+							? 'Failed to send issues thread message'
+							: 'Failed to create issues'
 						: error instanceof ReviewLockError
-							? errors.submitFailed
-							: commonMessages.errorNotificationTitle,
-				),
+							? 'Failed to submit review'
+							: 'An error occurred',
 				text: error instanceof Error ? error.message : String(error),
 				type: 'error',
 			})
@@ -219,8 +167,8 @@ export function createReviewSubmission(
 		mutationFn: async ({ file, id }: { file: File; id: string }) => {
 			const ext = file.type.split('/')[1]
 			if (!['image/png', 'image/jpeg', 'image/gif', 'image/webp'].includes(file.type))
-				throw new Error(formatMessage(errors.imageType))
-			if (file.size > 1024 * 1024) throw new Error(formatMessage(errors.imageSize))
+				throw new Error('Choose a PNG, JPEG, GIF, or WebP image.')
+			if (file.size > 1024 * 1024) throw new Error('Images must be smaller than 1 MiB.')
 			const response = await client.upload<{ id: string; url: string }>('/image', {
 				api: 'labrinth',
 				version: 3,
@@ -233,7 +181,7 @@ export function createReviewSubmission(
 		},
 		onError: (error) =>
 			addNotification({
-				title: formatMessage(commonMessages.errorNotificationTitle),
+				title: 'An error occurred',
 				text: error instanceof Error ? error.message : String(error),
 				type: 'error',
 			}),
@@ -294,7 +242,7 @@ export function createReviewSubmission(
 		let mutationStarted = false
 		try {
 			if (disclosures.hasChanges.value || disclosures.saving.value)
-				throw new Error(formatMessage(errors.unsaved))
+				throw new Error('Save or reset your disclosure changes before changing the project status.')
 			if (
 				panels.validationErrors.value.some(
 					({ issueId, key }) =>
@@ -302,13 +250,16 @@ export function createReviewSubmission(
 				)
 			)
 				throw new Error('Please select tags to remove for inaccurate tags issue.')
-			if (panels.validationErrors.value.length) throw new Error(formatMessage(errors.missing))
+			if (panels.validationErrors.value.length)
+				throw new Error('Complete the required review fields before submitting a review decision.')
 			if (status && ['approved', 'unlisted', 'private'].includes(status) && !canApprove.value)
-				throw new Error(formatMessage(errors.unresolved))
+				throw new Error(
+					'Verify all remaining fixes and remove new findings before approving this project.',
+				)
 			const messageMode = sendIssuesAsThreadMessage.value
 			const message = messageMode ? issuesMessage.value : undefined
 			if (message && new TextEncoder().encode(message).length > 65536)
-				throw new Error(formatMessage(errors.issuesMessageTooLong))
+				throw new Error('The issues thread message must be no larger than 65,536 bytes.')
 			const facetUpdates = status
 				? previousIssues.facetUpdates.value
 				: previousIssues.replacementFacetUpdates.value
@@ -346,7 +297,7 @@ export function createReviewSubmission(
 		} catch (error) {
 			if (!mutationStarted)
 				addNotification({
-					title: formatMessage(commonMessages.errorNotificationTitle),
+					title: 'An error occurred',
 					text: error instanceof Error ? error.message : String(error),
 					type: 'error',
 				})

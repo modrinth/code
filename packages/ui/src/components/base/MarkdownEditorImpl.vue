@@ -635,7 +635,7 @@ function createEditorTheme(disabled = props.disabled) {
 			outline: 'none',
 		},
 		'.cm-content': {
-			minHeight: props.minHeight ? `max(100%, ${props.minHeight}px)` : 'max(100%, 200px)',
+			minHeight: `${props.minHeight ?? 200}px`,
 			padding: '0',
 			caretColor: 'var(--color-contrast)',
 			width: '100%',

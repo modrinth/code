@@ -6,22 +6,19 @@
 	>
 		<Avatar :src="heldBy.avatar_url" :alt="heldBy.username" size="1.75rem" circle no-shadow />
 		<span class="min-w-0 grow break-words text-contrast">
-			<IntlFormatted :message-id="messages.moderating">
-				<template #username>
-					<NuxtLink
-						:to="`/user/${heldBy.username}`"
-						target="_blank"
-						rel="noopener noreferrer"
-						class="font-semibold hover:underline"
-					>
-						{{ heldBy.username }}
-					</NuxtLink>
-				</template>
-			</IntlFormatted>
+			<NuxtLink
+				:to="`/user/${heldBy.username}`"
+				target="_blank"
+				rel="noopener noreferrer"
+				class="font-semibold hover:underline"
+			>
+				{{ heldBy.username }}
+			</NuxtLink>
+			is moderating
 		</span>
 		<IconButton
-			v-tooltip="formatMessage(messages.takeOver)"
-			:label="formatMessage(messages.takeOver)"
+			v-tooltip="'Take over project'"
+			label="Take over project"
 			type="colored"
 			color="orange"
 			size="xs"
@@ -37,7 +34,7 @@
 
 <script setup lang="ts">
 import { LockIcon, SpinnerIcon } from '@modrinth/assets'
-import { Avatar, defineMessages, IconButton, IntlFormatted, useVIntl } from '@modrinth/ui'
+import { Avatar, IconButton } from '@modrinth/ui'
 
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
@@ -47,15 +44,4 @@ defineProps<{
 
 const { lock } = injectProjectReviewPageContext()
 const { heldBy, pending: lockPending } = lock
-const { formatMessage } = useVIntl()
-const messages = defineMessages({
-	moderating: {
-		id: 'project-review.lock.moderating',
-		defaultMessage: '{username} is moderating',
-	},
-	takeOver: {
-		id: 'project-review.lock.take-over',
-		defaultMessage: 'Take over project',
-	},
-})
 </script>

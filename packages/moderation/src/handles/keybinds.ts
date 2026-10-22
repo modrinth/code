@@ -24,6 +24,8 @@ function bindKeybind<T>(keybind: BaseKeybindListener<T>, ctx: T) {
 
 function scopedKeybind(keybind: KeybindListener, ctx: ModerationContext) {
 	switch (ctx.scope) {
+		case 'review-panel-toggle':
+			return keybind.scope === 'review-panel-toggle' ? bindKeybind(keybind, ctx) : undefined
 		case 'project':
 			return keybind.scope === 'project' ? bindKeybind(keybind, ctx) : undefined
 		case 'tech-review':
@@ -76,8 +78,8 @@ export class Keybinds {
 		for (const [index, [id, binding]] of bindings.entries()) {
 			for (const [otherId, other] of bindings.slice(index)) {
 				const sameReviewPage =
-					['project-review', 'review-actions'].includes(binding.scope) &&
-					['project-review', 'review-actions'].includes(other.scope)
+					['project-review', 'review-actions', 'review-panel-toggle'].includes(binding.scope) &&
+					['project-review', 'review-actions', 'review-panel-toggle'].includes(other.scope)
 				if (
 					binding.scope !== other.scope &&
 					binding.scope !== 'global' &&
@@ -126,6 +128,7 @@ export class Keybinds {
 				if (
 					ctx.scope !== 'review-composer' &&
 					ctx.scope !== 'review-actions' &&
+					ctx.scope !== 'review-panel-toggle' &&
 					document.activeElement instanceof HTMLElement
 				) {
 					document.activeElement.blur()

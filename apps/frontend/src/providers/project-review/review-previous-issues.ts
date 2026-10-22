@@ -1,7 +1,6 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { IssuePriority } from '@modrinth/moderation/src/data/issues'
-import { issueTargetLabels } from '@modrinth/moderation/src/data/issues/component-builders/targets'
-import { createContext, useVIntl } from '@modrinth/ui'
+import { createContext } from '@modrinth/ui'
 import { computed, type Ref, watch } from 'vue'
 
 import type { ReviewTarget } from './review'
@@ -13,6 +12,7 @@ import type {
 	ReviewPanelBinding,
 } from './review-panels'
 import type { createReviewSession } from './review-session'
+import { issueTargetLabels } from './review-target-labels'
 
 type ThreadIssue = Labrinth.Threads.v3.ThreadIssue
 type ThreadIssueFacet = Labrinth.Threads.v3.ThreadIssueFacet
@@ -28,7 +28,6 @@ export function createReviewPreviousIssues(
 	panels: ReturnType<typeof createReviewPanels>,
 	messages: ReturnType<typeof createReviewMessages>,
 ) {
-	const { formatMessage } = useVIntl()
 	const issues = computed(() =>
 		wasReviewed.value && project.value?.thread_id === thread.value?.id
 			? (thread.value?.issues ?? [])
@@ -115,7 +114,7 @@ export function createReviewPreviousIssues(
 					? details.title
 					: typeof details.issue_id === 'string'
 						? details.issue_id.replaceAll('-', ' ')
-						: formatMessage(issueTargetLabels[issue.facets[0]?.what.type ?? 'mark_addressed'])),
+						: issueTargetLabels[issue.facets[0]?.what.type ?? 'mark_addressed']),
 			category: '',
 			priority: issue.why.custom
 				? (IssuePriority[issue.why.custom.priority as keyof typeof IssuePriority] ??
@@ -163,7 +162,10 @@ export function createReviewPreviousIssues(
 			if (what.type === 'modify_links') {
 				for (const key of Object.keys(what.value.links)) targets.push({ kind: 'link', key })
 			} else if (what.type === 'modify_gallery_image') {
-				targets.push({ kind: 'gallery-image', key: String(what.value.image_id) })
+				targets.push({
+					kind: 'gallery-image',
+					key: String(what.value.image_id),
+				})
 			} else if (what.type === 'remove_gallery_images') {
 				for (const id of what.value.image_ids)
 					targets.push({ kind: 'gallery-image', key: String(id) })
@@ -299,7 +301,9 @@ export function createReviewPreviousIssues(
 		const selection = issue.why.selection
 		if (selection) {
 			session.write(projectId, 'issues', definition.id, new Set(selection.toggle_ids ?? []))
-			session.write(projectId, 'issue-text', definition.id, { ...selection.text_values })
+			session.write(projectId, 'issue-text', definition.id, {
+				...selection.text_values,
+			})
 			session.write(
 				projectId,
 				'issue-select',

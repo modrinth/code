@@ -1,7 +1,7 @@
 <template>
 	<NewModal
 		ref="modal"
-		:header="formatMessage(messages.editSection, { section })"
+		:header="`Edit ${section}`"
 		:width="width"
 		:disable-close="saving"
 		:on-hide="() => emit('cancel')"
@@ -14,9 +14,7 @@
 		</div>
 		<template #actions>
 			<div class="flex justify-end gap-2">
-				<Button type="quiet" :disabled="saving" @click="modal?.hide()">
-					{{ formatMessage(commonMessages.cancelButton) }}
-				</Button>
+				<Button type="quiet" :disabled="saving" @click="modal?.hide()"> Cancel </Button>
 				<Button
 					type="colored"
 					color="brand"
@@ -24,7 +22,7 @@
 					:disabled="!canSave"
 					@click="emit('save')"
 				>
-					{{ formatMessage(messages.saveProject) }}
+					Save project
 				</Button>
 			</div>
 		</template>
@@ -32,10 +30,8 @@
 </template>
 
 <script setup lang="ts">
-import { Button, commonMessages, NewModal, useVIntl } from '@modrinth/ui'
+import { Button, NewModal } from '@modrinth/ui'
 import { useTemplateRef } from 'vue'
-
-import { projectReviewMessages as messages } from '../../messages'
 
 withDefaults(
 	defineProps<{
@@ -52,7 +48,6 @@ const emit = defineEmits<{
 	save: []
 }>()
 
-const { formatMessage } = useVIntl()
 const modal = useTemplateRef<InstanceType<typeof NewModal>>('modal')
 
 defineExpose({

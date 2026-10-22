@@ -12,15 +12,11 @@
 			class="m-0 p-2 text-sm text-secondary"
 			role="status"
 		>
-			{{ formatMessage(projectReviewMessages.loading) }}
+			Loading...
 		</div>
 		<div v-else-if="wasReviewed && threadQuery.isError.value" class="flex flex-col gap-2 p-2">
-			<p class="m-0 text-sm text-red" role="alert">
-				{{ formatMessage(projectReviewMessages.loadError) }}
-			</p>
-			<Button class="w-fit" @click="() => threadQuery.refetch()">{{
-				formatMessage(projectReviewMessages.retry)
-			}}</Button>
+			<p class="m-0 text-sm text-red" role="alert">Could not load project data</p>
+			<Button class="w-fit" @click="() => threadQuery.refetch()">Retry</Button>
 		</div>
 		<div v-if="issues.length" class="flex flex-col gap-1">
 			<IssueCard
@@ -35,7 +31,7 @@
 			v-else-if="!wasReviewed || (!threadQuery.isPending.value && !threadQuery.isError.value)"
 			class="m-0 p-2 text-sm text-secondary"
 		>
-			{{ formatMessage(reReview ? messages.emptyReReview : messages.empty) }}
+			{{ reReview ? 'No previous issues to re-review.' : 'No issues flagged.' }}
 		</p>
 		<Accordion
 			v-if="reReview && resolvedIssues.length"
@@ -47,7 +43,7 @@
 			<template #button="{ open }">
 				<span class="flex items-center gap-1 text-primary">
 					<span>
-						{{ formatMessage(messages.resolved, { count: resolvedIssues.length }) }}
+						{{ `Auto resolved (${resolvedIssues.length})` }}
 					</span>
 					<DropdownIcon
 						class="size-5 shrink-0 text-primary transition-transform duration-300 motion-reduce:transition-none"
@@ -65,7 +61,7 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { DropdownIcon } from '@modrinth/assets'
 import { IssuePriority } from '@modrinth/moderation/src/data/issues'
-import { Accordion, Button, defineMessages, useVIntl } from '@modrinth/ui'
+import { Accordion, Button } from '@modrinth/ui'
 import { computed } from 'vue'
 
 import { isThreadIssueVerified } from '~/helpers/thread-issues'
@@ -74,11 +70,12 @@ import { injectReviewPanels, type ReviewIssue } from '~/providers/project-review
 import { injectReviewPreviousIssues } from '~/providers/project-review/review-previous-issues'
 import { injectReviewSubmission } from '~/providers/project-review/review-submission'
 
-import { projectReviewMessages } from '../messages'
 import ReviewPanel from '../review-panel/index.vue'
 import IssueCard from './issue-card.vue'
 
-const props = withDefaults(defineProps<{ reReview?: boolean }>(), { reReview: false })
+const props = withDefaults(defineProps<{ reReview?: boolean }>(), {
+	reReview: false,
+})
 const emit = defineEmits<{ add: [] }>()
 const { wasReviewed, threadQuery } = injectProjectReviewPageContext()
 const panels = injectReviewPanels()
@@ -118,20 +115,5 @@ const issues = computed(() => {
 		...previousIssues.appliedIssues.value,
 		...activeIssues.filter(({ id }) => !previousIds.has(id)),
 	].sort(compareIssues)
-})
-const { formatMessage } = useVIntl()
-const messages = defineMessages({
-	resolved: {
-		id: 'project-review.issues.resolved',
-		defaultMessage: 'Auto resolved ({count})',
-	},
-	emptyReReview: {
-		id: 'project-review.issues.empty-re-review',
-		defaultMessage: 'No previous issues to re-review.',
-	},
-	empty: {
-		id: 'project-review.issues.empty',
-		defaultMessage: 'No issues flagged.',
-	},
 })
 </script>

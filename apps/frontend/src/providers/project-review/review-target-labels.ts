@@ -1,0 +1,26 @@
+import type { Labrinth } from '@modrinth/api-client'
+
+export const issueTargetLabels = {
+	mark_addressed: 'Mark addressed',
+	modify_title: 'Change title',
+	modify_slug: 'Change URL slug',
+	modify_summary: 'Change summary',
+	modify_description: 'Change description',
+	modify_license: 'Change license',
+	modify_icon: 'Change icon',
+	remove_icon: 'Remove icon',
+	remove_tags: 'Remove tags',
+	modify_links: 'Change links',
+	add_gallery_images: 'Add gallery images',
+	modify_gallery_image: 'Change gallery image',
+	remove_gallery_images: 'Remove gallery images',
+	add_project_disclosures: 'Add disclosures',
+	remove_project_disclosures: 'Remove disclosures',
+	modify_project_disclosure: 'Change disclosure',
+	modify_project_disclosure_note: 'Change disclosure note',
+	version: 'Change version',
+	modify_team_member_role: 'Change team member role',
+	modify_server_languages: 'Change server languages',
+	modify_server_address: 'Change server address',
+	acknowledge: 'Acknowledge',
+} satisfies Record<Labrinth.Threads.v3.ThreadIssueTarget['type'], string>

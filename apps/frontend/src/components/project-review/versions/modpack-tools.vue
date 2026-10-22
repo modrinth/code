@@ -3,13 +3,13 @@
 		<ModpackScanModal ref="scanModal" :project_id="project.id" />
 		<TeleportOverflowMenu
 			type="quiet"
-			:label="formatMessage(messages.tools)"
+			label="Modpack tools"
 			:options="actions"
 			:icon-only="false"
 			:circular="false"
 			:disabled="isLoading || !!error || pending"
 		>
-			{{ formatMessage(messages.tools) }}
+			Modpack tools
 			<ChevronDownIcon aria-hidden="true" />
 		</TeleportOverflowMenu>
 	</template>
@@ -18,13 +18,10 @@
 <script setup lang="ts">
 import { ChevronDownIcon, FileArchiveIcon, FolderSearchIcon, ScanEyeIcon } from '@modrinth/assets'
 import {
-	commonMessages,
-	defineMessages,
 	injectLoadingState,
 	injectModrinthClient,
 	injectNotificationManager,
 	TeleportOverflowMenu,
-	useVIntl,
 } from '@modrinth/ui'
 import { computed, ref, useTemplateRef } from 'vue'
 
@@ -37,65 +34,27 @@ const emit = defineEmits<{
 }>()
 const { project, versions, versionsQuery, isLoading, error } = injectProjectReviewPageContext()
 const { pending } = injectReviewSubmission()
-const { formatMessage } = useVIntl()
+
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const loadingState = injectLoadingState()
 const scanModal = useTemplateRef<InstanceType<typeof ModpackScanModal>>('scanModal')
 const isCheckingModpackArchives = ref(false)
-const messages = defineMessages({
-	tools: {
-		id: 'project-review.versions.modpack-tools',
-		defaultMessage: 'Modpack tools',
-	},
-	viewC2paInfo: {
-		id: 'project-review.versions.view-c2pa-info',
-		defaultMessage: 'View C2PA Info',
-	},
-	rescanModpack: {
-		id: 'project.actions.rescan-modpack',
-		defaultMessage: 'Rescan modpack',
-	},
-	checkModpackArchives: {
-		id: 'project.actions.check-modpack-archives',
-		defaultMessage: 'Check modpack unzip',
-	},
-	checkingModpackArchives: {
-		id: 'project.actions.checking-modpack-archives',
-		defaultMessage: 'Checking...',
-	},
-	checkModpackArchivesSuccess: {
-		id: 'project.notification.check-modpack-archives.success',
-		defaultMessage:
-			'{count, plural, one {The modpack file can be unzipped.} other {All # modpack files can be unzipped.}}',
-	},
-	checkModpackArchivesFailed: {
-		id: 'project.notification.check-modpack-archives.failed',
-		defaultMessage: 'Some modpack files could not be unzipped',
-	},
-	checkModpackArchivesNoFiles: {
-		id: 'project.notification.check-modpack-archives.no-files',
-		defaultMessage: 'No .mrpack files were found for this project.',
-	},
-})
+
 const c2paUrls = computed(() => [
 	...new Set(versions.value.flatMap((version) => version.files.map((file) => file.url))),
 ])
 const actions = computed(() => [
 	{
 		id: 'rescan-modpack',
-		label: formatMessage(messages.rescanModpack),
+		label: 'Rescan modpack',
 		icon: FolderSearchIcon,
 		tone: 'orange' as const,
 		action: () => scanModal.value?.show(),
 	},
 	{
 		id: 'check-modpack-archives',
-		label: formatMessage(
-			isCheckingModpackArchives.value
-				? messages.checkingModpackArchives
-				: messages.checkModpackArchives,
-		),
+		label: isCheckingModpackArchives.value ? 'Checking...' : 'Check modpack unzip',
 		icon: FileArchiveIcon,
 		tone: 'orange' as const,
 		disabled: isCheckingModpackArchives.value,
@@ -103,7 +62,7 @@ const actions = computed(() => [
 	},
 	{
 		id: 'view-c2pa-info',
-		label: formatMessage(messages.viewC2paInfo),
+		label: 'View C2PA Info',
 		icon: ScanEyeIcon,
 		tone: 'orange' as const,
 		disabled:
@@ -130,8 +89,8 @@ async function checkModpackArchives() {
 
 		if (files.length === 0) {
 			addNotification({
-				title: formatMessage(commonMessages.errorNotificationTitle),
-				text: formatMessage(messages.checkModpackArchivesNoFiles),
+				title: 'An error occurred',
+				text: 'No .mrpack files were found for this project.',
 				type: 'error',
 			})
 			return
@@ -158,7 +117,7 @@ async function checkModpackArchives() {
 
 		if (failures.length > 0) {
 			addNotification({
-				title: formatMessage(messages.checkModpackArchivesFailed),
+				title: 'Some modpack files could not be unzipped',
 				text: failures.map((failure) => `${failure.filename}: ${failure.error}`).join('\n'),
 				type: 'error',
 			})
@@ -166,13 +125,16 @@ async function checkModpackArchives() {
 		}
 
 		addNotification({
-			title: formatMessage(commonMessages.successLabel),
-			text: formatMessage(messages.checkModpackArchivesSuccess, { count: files.length }),
+			title: 'Success',
+			text:
+				files.length === 1
+					? 'The modpack file can be unzipped.'
+					: `All ${files.length} modpack files can be unzipped.`,
 			type: 'success',
 		})
 	} catch (error) {
 		addNotification({
-			title: formatMessage(commonMessages.errorNotificationTitle),
+			title: 'An error occurred',
 			text: error instanceof Error ? error.message : String(error),
 			type: 'error',
 		})
