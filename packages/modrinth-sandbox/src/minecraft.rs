@@ -15,8 +15,8 @@ use tokio::{
 };
 
 use crate::{
-    SandboxChild, SandboxCommand, SandboxHandle, SandboxStdio,
-    sandboxapi::service::SandboxApiChild, util::SandboxArg,
+    SandboxChild, SandboxCommand, SandboxStdio,
+    api::SandboxApiChild, util::SandboxArg,
 };
 
 #[derive(Debug)]

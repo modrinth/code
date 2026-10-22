@@ -55,6 +55,8 @@ async fn main() -> Result<()> {
             app_container_description:
                 "Sandbox for Minecraft instances created by modrinth-sandbox"
                     .into(),
+            on_start: Vec::new(),
+            on_finish: Vec::new(),
         })
         .await
         .wrap_err("spawning process in sandbox")?;

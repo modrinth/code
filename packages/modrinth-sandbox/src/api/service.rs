@@ -838,6 +838,8 @@ impl SandboxApiService {
         };
 
         let path = Path::new(&*decoded);
+        dbg!(path);
+
         if !path.is_file() {
             // This API should only be used for DnD file paths
             // Therefore, it should only ever be called for files that actually exist

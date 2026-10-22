@@ -1,27 +1,20 @@
 use std::{
-    borrow::Cow,
-    collections::BTreeMap,
-    ffi::{CStr, CString, OsStr, OsString},
-    os::fd::{AsRawFd, OwnedFd},
-    path::{Path, PathBuf},
+    borrow::Cow, collections::BTreeMap, ffi::{CStr, CString, OsStr, OsString}, os::fd::{AsRawFd, OwnedFd}, path::{Path, PathBuf}, sync::Arc,
 };
 
 use async_trait::async_trait;
 use derive_more::Debug;
-use eyre::{Result, WrapErr, eyre};
+use eyre::{Result, WrapErr, bail, eyre};
 use libseccomp::{
     ScmpAction, ScmpArgCompare, ScmpCompareOp, ScmpFilterContext, ScmpSyscall,
 };
+use parking_lot::Mutex;
 use uuid::Uuid;
 
 use crate::{
-    SandboxStdio,
-    backend::{
-        Backend, SandboxChild, SandboxChildOp, SandboxCommand, SandboxEnv,
-        linux::{WritableMemoryFile, find_command},
-        unix::UnixChild,
-    },
-    util::SandboxArg,
+    ExposedPath, SandboxStdio, backend::{
+        Backend, SandboxChild, SandboxChildOp, SandboxCommand, SandboxEnv, SandboxHandleOp, linux::{WritableMemoryFile, find_command}, pathset::ReadWritePathSet, unix::UnixChild,
+    }, file_sharing::FileSharing, util::SandboxArg,
 };
 
 #[derive(Debug)]
@@ -143,10 +136,10 @@ const SYSTEM_FILES_RO: &[&str] = &[
     "/sys/module/nvidia_uvm",
 ];
 
-#[derive(Default)]
 struct BubblewrapCommandBuilder {
     arguments: Vec<SandboxArg>,
     bound_paths: Vec<Cow<'static, Path>>,
+    path_set: ReadWritePathSet
 }
 
 #[derive(Debug)]
@@ -178,6 +171,12 @@ impl BubblewrapCommandBuilder {
         path: impl Into<Cow<'static, Path>>,
         follow_symlinks: bool,
     ) {
+        let path = path.into();
+        match bind_type {
+            BindType::Device => self.path_set.add_read_write(path.to_path_buf()),
+            BindType::ReadOnly => self.path_set.add_read_only(path.to_path_buf()),
+            BindType::ReadWrite => self.path_set.add_read_write(path.to_path_buf()),
+        }
         self.bind_if_exists_inner(bind_type, path.into(), follow_symlinks);
     }
 
@@ -238,13 +237,29 @@ fn spawn(
     env: &BubblewrapEnv,
     mut command: SandboxCommand,
 ) -> Result<crate::SandboxChild> {
-    let mut builder = BubblewrapCommandBuilder::default();
+    let mut builder = BubblewrapCommandBuilder {
+        arguments: Default::default(),
+        bound_paths: Default::default(),
+        path_set: ReadWritePathSet::new(true),
+    };
 
     let Some(directories) = directories::BaseDirs::new() else {
         return Err(eyre!("unable to determine base directories"));
     };
 
     let mut environment = command.take_environment();
+
+    let file_sharing_mountpoint = std::env::temp_dir().join(format!("modrinth-file-sharing-{}", Uuid::now_v7()));
+    let file_sharing = match crate::file_sharing::mount(file_sharing_mountpoint, false) {
+        Ok(file_sharing) => Some(file_sharing),
+        Err(err) => {
+            tracing::warn!("Unable to start file sharing, some features may be unavailable: {}", err);
+            None
+        },
+    };
+
+    // let added = self.file_sharing.add(path.to_path_buf(), allow_write)?;
+    // Ok(ExposedPath::Proxied(added))
 
     // Namespaces
     builder.push("--unshare-all");
@@ -356,6 +371,14 @@ fn spawn(
 
     let pulse_path = xdg_runtime_dir.join("pulse");
     builder.create_dir(pulse_path.clone(), 0o700);
+
+    // Bind our file-sharing
+
+    if file_sharing.is_some() {
+        // We could bind it to $XDG_RUNTIME_DIR/modrinth-file-sharing, but it's
+        // simpler just to bind it to the real location on disk
+        builder.bind_if_exists(BindType::ReadWrite, file_sharing_mountpoint, false);
+    }
 
     if let Some(pulse_server) = std::env::var_os("PULSE_SERVER") {
         if let Some(pulse_server_path) =
@@ -576,6 +599,11 @@ instance-id={instance_id}
             instance_dir,
             _dbus_proxy: dbus_proxy,
         }),
+        handle: super::SandboxHandle::Bubblewrap(BubblewrapSandboxHandle {
+            file_sharing,
+            path_set: Arc::new(builder.path_set),
+        }),
+        on_finish: vec![],
     };
 
     for on_start in command.on_start {
@@ -614,6 +642,43 @@ impl SandboxChildOp for BubblewrapChild {
 
     async fn kill(&mut self) -> Result<()> {
         self.child.kill().await
+    }
+}
+
+#[derive(Clone, Debug)]
+pub struct BubblewrapSandboxHandle {
+    file_sharing: Option<FileSharing>,
+    path_set: Arc<ReadWritePathSet>,
+}
+
+impl SandboxHandleOp for BubblewrapSandboxHandle {
+    fn expose_path(
+        &self,
+        path: &Path,
+        allow_write: bool,
+    ) -> eyre::Result<ExposedPath> {
+        let can_access = if allow_write {
+            self.is_path_writeable(path)
+        } else {
+            self.is_path_readable(path)
+        };
+        if can_access {
+            return Ok(ExposedPath::Direct);
+        }
+        let Some(file_sharing) = &self.file_sharing else {
+            bail!("file cannot be shared because file sharing filesystem failed to start");
+        };
+
+        let proxied_path = file_sharing.add(path.to_path_buf(), allow_write)?;
+        Ok(ExposedPath::Proxied(proxied_path))
+    }
+
+    fn is_path_readable(&self, path: &Path) -> bool {
+        self.path_set.can_read(path.to_path_buf())
+    }
+
+    fn is_path_writeable(&self, path: &Path) -> bool {
+        self.path_set.can_write(path.to_path_buf())
     }
 }
 

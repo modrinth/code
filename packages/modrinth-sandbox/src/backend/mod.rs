@@ -4,7 +4,7 @@ use std::{
     collections::{BTreeMap, HashSet},
     ffi::OsString,
     fmt::Debug,
-    path::{Path, PathBuf},
+    path::Path,
 };
 
 use async_trait::async_trait;

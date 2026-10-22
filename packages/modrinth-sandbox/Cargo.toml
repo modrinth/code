@@ -33,6 +33,8 @@ open = { workspace = true }
 urlencoding = { workspace = true }
 sha1 = { workspace = true }
 hex = { workspace = true }
+fuser = { workspace = true }
+indexmap = { workspace = true }
 async_zip = { workspace = true, features = [
   "bzip2",
   "chrono",
@@ -44,8 +46,11 @@ async_zip = { workspace = true, features = [
 
 [dev-dependencies]
 tokio = { workspace = true, features = ["full"] }
-tracing-subscriber = { workspace = true }
+tracing-subscriber = { workspace = true, features = ["chrono", "env-filter"] }
 clap = { workspace = true, features = ["derive"] }
+
+[target.'cfg(unix)'.dependencies]
+rustix = { workspace = true }
 
 [target.'cfg(target_os = "linux")'.dependencies]
 libseccomp =  { workspace = true }
