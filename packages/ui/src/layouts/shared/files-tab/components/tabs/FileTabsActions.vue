@@ -1,6 +1,6 @@
 <template>
 	<div
-		v-if="shown"
+		v-if="shown && overflowing && (!ui.inWorkbench && ui.showNewTabButton.value)"
 		ref="root"
 		class="flex h-full items-center gap-1"
 		:class="ui.inWorkbench ? 'pr-1' : 'pr-3'"

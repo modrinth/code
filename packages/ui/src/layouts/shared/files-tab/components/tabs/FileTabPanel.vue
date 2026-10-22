@@ -6,8 +6,8 @@
 		@dragenter.capture="activate"
 	>
 		<div
-			class="shrink-0 border-0 border-b border-solid border-surface-5 px-2 pb-1"
-			:class="rounded ? 'bg-surface-1 pt-2' : 'bg-surface-2 pt-1'"
+			class="shrink-0 border-0 border-solid border-surface-5 px-2"
+			:class="rounded ? 'border-y bg-surface-1 pt-2 pb-2' : 'border-b bg-surface-2 pt-1 pb-1'"
 		>
 			<FileNavbar
 				:sidebar-open="ui.sidebarOpen.value"

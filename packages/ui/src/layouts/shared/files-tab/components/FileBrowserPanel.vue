@@ -57,7 +57,7 @@
 					isFileActive
 						? 'h-[var(--files-viewer-height)]'
 						: ui.advancedView.value
-							? 'sticky top-[calc(var(--files-sticky-top,0px)_+_var(--files-navbar-height,0px))] z-20 h-10'
+							? 'sticky top-[calc(var(--files-sticky-top,0px)_+_var(--files-navbar-height,0px))] z-20 h-9'
 							: 'h-0'
 				"
 			>

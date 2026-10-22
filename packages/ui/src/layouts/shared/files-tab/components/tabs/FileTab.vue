@@ -1,7 +1,7 @@
 <template>
 	<div
-		class="group flex h-full max-w-[16rem] items-center gap-1.5 pl-3 text-sm"
-		:class="canClose ? 'pr-1' : 'pr-3'"
+		class="group flex h-full max-w-[16rem] items-center gap-1 pl-2.5 text-sm"
+		:class="canClose ? 'pr-1.5' : 'pr-2.5'"
 		:title="location?.path"
 		@auxclick.prevent="(event) => event.button === 1 && close()"
 		@contextmenu.prevent.stop="openMenu"
@@ -13,7 +13,7 @@
 		<button
 			v-if="canClose"
 			type="button"
-			class="relative flex size-6 shrink-0 items-center justify-center rounded-md border-none bg-transparent p-0 text-secondary hover:bg-surface-5 hover:text-contrast focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
+			class="relative flex size-4 shrink-0 items-center justify-center rounded border-none bg-transparent p-0 text-secondary hover:bg-surface-5 hover:text-contrast focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
 			:aria-label="formatMessage(messages.closeTab, { name: label })"
 			@pointerdown.stop
 			@mousedown.stop
@@ -24,7 +24,7 @@
 				v-tooltip="formatMessage(messages.unsavedChanges)"
 				class="size-2 rounded-full bg-brand group-hover:hidden"
 			/>
-			<XIcon class="size-4" :class="{ 'hidden group-hover:block': isDirty }" />
+			<XIcon class="size-3" :class="{ 'hidden group-hover:block': isDirty }" />
 		</button>
 		<span
 			v-else-if="isDirty"

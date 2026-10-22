@@ -1,14 +1,14 @@
 <template>
-	<div v-if="panelBinding && hasControls" class="flex flex-col gap-3">
+	<div v-if="panelBinding && hasControls" :class="inline ? 'contents' : 'flex flex-col gap-3'">
 		<div
 			v-for="(section, index) in panelBinding.panel.sections"
 			:key="`${panelBinding.projectId}:${panelBinding.key}:${index}`"
-			class="flex flex-col gap-2"
+			:class="inline && !section.label ? 'contents' : 'flex w-full flex-col gap-2'"
 		>
 			<p v-if="section.label" class="m-0 font-semibold text-contrast">
 				{{ section.label }}
 			</p>
-			<div class="flex flex-wrap gap-2">
+			<div :class="inline && !section.label ? 'contents' : 'flex flex-wrap gap-2'">
 				<template
 					v-for="control in section.controls"
 					:key="`${control.type}:${control.issueId}:${control.type === 'toggle' ? (control.id ?? '') : control.key}`"
@@ -34,8 +34,8 @@
 							:disabled="control.disabled"
 							:model-value="panels.textValue(panelBinding, control)"
 							:heading-buttons="false"
-							:hide-formatting-buttons="
-								settings.get(moderationSettings.General.HideMarkdownFormattingButtons)
+							:formatting-buttons-visibility="
+								settings.get(moderationSettings.General.MarkdownFormattingButtonsVisibility)
 							"
 							:max-height="240"
 							:min-height="72"
@@ -215,6 +215,8 @@ const props = defineProps<{
 	binding?: ReviewPanelBinding
 	keybindOffset?: number
 	hideTitle?: boolean
+	/** Flows unlabelled sections' controls on from the panel's title, wrapping as needed. */
+	inline?: boolean
 }>()
 const emit = defineEmits<{
 	'dropdown-open': [key: string]

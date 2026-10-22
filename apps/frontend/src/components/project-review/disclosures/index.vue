@@ -1,6 +1,6 @@
 <template>
-	<div v-if="project" class="flex h-full min-h-0 flex-col gap-1 overflow-hidden">
-		<div class="shrink-0 p-2">
+	<div v-if="project" class="flex h-full min-h-0 flex-col gap-2.5">
+		<div class="shrink-0 px-2">
 			<ReviewPanel mode="inline" :target="{ kind: 'disclosures' }" hide-title />
 		</div>
 		<p v-if="isPending" role="status">Loading disclosures…</p>
@@ -15,7 +15,7 @@
 			description="Come back once you've uploaded your versions."
 		/>
 		<template v-else>
-			<div class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 pb-2 pt-3">
+			<div class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 pt-2">
 				<DisclosureCards
 					:editor="disclosures"
 					:project-title="project.name"

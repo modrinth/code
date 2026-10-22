@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="flex flex-col p-1 gap-3 h-full"
+		class="flex flex-col p-1 h-full"
 		:class="[
 			addBorder ? 'border-r border-0 border-solid border-surface-5 pr-2' : '',
 			constrainWidth ? 'w-[24rem]' : 'w-full',
@@ -17,7 +17,8 @@
 			:disabled="ui.isBusy.value"
 			:disabled-tooltip="ui.busyTooltip.value"
 			:is-refreshing="ui.isRefreshing.value"
-			class="py-1"
+			:compact="ui.compactNavigation.value"
+			class="py-1 pb-4"
 			@update:search-query="(value) => (ui.activeView.value.searchQuery.value = value)"
 			@create="ui.showCreateModal"
 			@upload="ui.initiateFileUpload"
@@ -43,7 +44,7 @@
 				</IconButton>
 			</template>
 		</FileActionBar>
-		<FileSearch :loaded-only-notice="ui.searchLoadedOnlyNotice.value" />
+		<FileSearch :loaded-only-notice="ui.searchLoadedOnlyNotice.value" :compact="ui.compactNavigation.value" class="pb-2"/>
 		<div
 			:class="[
 				scrollFileEntries ? 'overflow-y-auto' : '',

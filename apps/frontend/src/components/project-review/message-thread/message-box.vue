@@ -33,8 +33,8 @@
 				placeholder="Reply to thread…"
 				:on-image-upload="uploadImage"
 				:heading-buttons="false"
-				:hide-formatting-buttons="
-					settings.get(moderationSettings.General.HideMarkdownFormattingButtons)
+				:formatting-buttons-visibility="
+					settings.get(moderationSettings.General.MarkdownFormattingButtonsVisibility)
 				"
 				:min-height="1"
 				hide-markdown-hint
@@ -42,12 +42,20 @@
 			/>
 		</div>
 		<div class="flex shrink-0 flex-wrap justify-end gap-2">
-			<Button :disabled="!canSubmit || pending || !draft.trim()" @click="submit('note')">
+			<Button
+				:size="buttonSize"
+				:disabled="!canSubmit || pending || !draft.trim()"
+				@click="submit('note')"
+			>
 				<SpinnerIcon v-if="loadingAction === 'note'" class="animate-spin" aria-hidden="true" />
 				<StickyNotePlusIcon v-else aria-hidden="true" />
 				Private note
 			</Button>
-			<Button :disabled="!canSubmit || pending || !draft.trim()" @click="submit('reply')">
+			<Button
+				:size="buttonSize"
+				:disabled="!canSubmit || pending || !draft.trim()"
+				@click="submit('reply')"
+			>
 				<SpinnerIcon v-if="loadingAction === 'reply'" class="animate-spin" aria-hidden="true" />
 				<ReplyIcon v-else aria-hidden="true" />
 				Reply
@@ -92,6 +100,7 @@ const MINIMUM_HEIGHT = 120
 
 const keybinds = useModerationKeybinds()
 const settings = useModerationSettings()
+const buttonSize = computed(() => settings.value.get(moderationSettings.General.ButtonSize))
 const { project, projectV2 } = injectProjectReviewPageContext()
 
 const panels = injectReviewPanels()

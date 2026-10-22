@@ -1,10 +1,10 @@
 <template>
 	<div
 		ref="interactionScope"
-		class="editable-review-section flex h-full min-h-0 flex-col gap-2.5 overflow-y-auto overflow-x-hidden px-2 pb-2"
+		class="editable-review-section flex h-full min-h-0 flex-col gap-2.5 px-2 pb-2"
 	>
 		<div
-			class="sticky top-0 z-10 flex shrink-0 items-start justify-between gap-4 bg-surface-1 pt-2"
+			class="flex shrink-0 items-start justify-between gap-4"
 		>
 			<ReviewPanel
 				mode="inline"
@@ -12,7 +12,7 @@
 				hide-title
 				:disabled="isLoading || !!error"
 				:interaction-scope="interactionScope"
-				class="!w-auto min-w-0 flex-1 pb-2.5"
+				class="!w-auto min-w-0 flex-1"
 			/>
 			<div class="mt-0.5 flex shrink-0 justify-end gap-1">
 				<template v-if="editing">
@@ -36,7 +36,7 @@
 				/>
 			</div>
 		</div>
-		<div class="min-h-0 flex-1">
+		<div class="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
 			<p v-if="!selection" class="m-0 text-secondary">No project selected</p>
 			<p v-else-if="isLoading" role="status" class="m-0">Loading...</p>
 			<div v-else-if="error" role="alert">
@@ -48,8 +48,8 @@
 					ref="editor"
 					v-model="draft"
 					:disabled="saving"
-					:hide-formatting-buttons="
-						settings.get(moderationSettings.General.HideMarkdownFormattingButtons)
+					:formatting-buttons-visibility="
+						settings.get(moderationSettings.General.MarkdownFormattingButtonsVisibility)
 					"
 				/>
 				<p v-if="validationMessage" class="m-0 text-sm text-red" role="alert">

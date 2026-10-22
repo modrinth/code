@@ -4,23 +4,40 @@
 		v-bind="target ? { mode: 'anchored', as: 'section', target, showFindingBadge: false } : {}"
 		:aria-label="heading"
 		class="review-section"
-		:class="{ 'editable-review-section': !!$slots.right }"
+		:class="[
+			{ 'editable-review-section': !!$slots.right },
+			settings.get(moderationSettings.General.SectionReducedGap) ? 'gap-1 pb-1.5 pt-1.5' : 'gap-2 pb-3 pt-3', 
+		]"
 	>
-		<div class="flex items-center gap-1">
-			<div class="flex flex-1 items-center gap-1">
-				<h3 class="m-0 text-sm font-semibold text-secondary">{{ heading }}</h3>
-				<slot name="heading-after" />
+		<template v-if="showHeader">
+			<div class="flex items-center gap-1">
+				<div class="flex flex-1 items-center gap-1">
+					<h3 class="m-0 text-sm font-semibold text-secondary">{{ heading }}</h3>
+					<slot name="heading-after" />
+				</div>
+				<div
+					v-if="$slots.right || selectedFindingCount > 0 || reReviewFindingCount > 0"
+					class="flex shrink-0 items-center gap-2"
+				>
+					<slot name="right" />
+					<ReReviewFindingsCountBadge :count="reReviewFindingCount" />
+					<FindingsCountBadge :count="selectedFindingCount" />
+				</div>
 			</div>
-			<div
-				v-if="$slots.right || selectedFindingCount > 0 || reReviewFindingCount > 0"
-				class="flex shrink-0 items-center gap-2"
-			>
-				<slot name="right" />
-				<ReReviewFindingsCountBadge :count="reReviewFindingCount" />
-				<FindingsCountBadge :count="selectedFindingCount" />
-			</div>
-		</div>
-		<slot />
+			<slot />
+		</template>
+		<template v-else>
+			<corner-wrap>
+				<template #corner>
+					<div class="flex items-center gap-1">
+						<slot name="right" />
+						<ReReviewFindingsCountBadge :count="reReviewFindingCount" />
+						<FindingsCountBadge :count="selectedFindingCount" />
+					</div>
+				</template>
+				<slot />
+			</corner-wrap>
+		</template>
 	</component>
 </template>
 
@@ -34,6 +51,14 @@ import { injectReviewPreviousIssues } from '~/providers/project-review/review-pr
 import FindingsCountBadge from '../review-panel/findings-count-badge.vue'
 import ReviewPanel from '../review-panel/index.vue'
 import ReReviewFindingsCountBadge from '../review-panel/re-review-findings-count-badge.vue'
+import CornerWrap from "~/components/project-review/project-info/corner-wrap.vue";
+
+import { moderationSettings } from '@modrinth/moderation'
+import { useModerationSettings } from "~/composables/moderation.ts";
+
+const settings = useModerationSettings()
+
+const showHeader = computed(() => settings.value.get(moderationSettings.General.SectionHeadersVisible));
 
 const props = defineProps<{
 	heading: string
@@ -49,10 +74,11 @@ const selectedFindingCount = computed(() => {
 	const binding = props.target ? panels.resolve(props.target) : undefined
 	return binding ? panels.selectedFindingCount(binding) : 0
 })
+
 </script>
 
 <style scoped>
 .review-section {
-	@apply flex flex-col gap-2 border-0 border-t border-solid border-divider px-0.5 pb-3 pt-3;
+	@apply flex flex-col border-0 border-t border-solid border-divider px-0.5;
 }
 </style>

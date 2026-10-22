@@ -8,7 +8,7 @@
 			<button
 				v-if="iconUrl"
 				type="button"
-				class="w-fit cursor-zoom-in rounded-xl border-0 bg-transparent p-0"
+				class="w-fit cursor-zoom-in rounded-xl border-0 bg-transparent p-0 flex"
 				aria-label="View enlarged project icon"
 				@click="viewer?.show(0)"
 			>

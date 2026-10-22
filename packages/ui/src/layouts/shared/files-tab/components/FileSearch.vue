@@ -7,13 +7,14 @@
 			name="file-search"
 			autocomplete="off"
 			:placeholder="formatMessage(messages.placeholder)"
-			size="medium"
+			:size="compact ? 'small' : 'standard'"
 			wrapper-class="w-full"
 			role="combobox"
 			aria-autocomplete="list"
 			:aria-expanded="open"
 			:aria-controls="listId"
 			:aria-activedescendant="open && results.length > 0 ? optionId(highlighted) : undefined"
+			:class="compact ? 'h-[calc(2rem_-_4px)]' : 'h-[calc(2.25rem)]'"
 			@focus="focused = true"
 			@keydown="handleKeydown"
 		/>
@@ -76,8 +77,10 @@ withDefaults(
 	defineProps<{
 		/** Notes that results only cover folders opened so far, for hosts that load lazily. */
 		loadedOnlyNotice?: boolean
+		/** Smaller controls, for tighter spaces. */
+		compact?: boolean
 	}>(),
-	{ loadedOnlyNotice: true },
+	{ loadedOnlyNotice: true, compact: false },
 )
 
 const { formatMessage } = useVIntl()

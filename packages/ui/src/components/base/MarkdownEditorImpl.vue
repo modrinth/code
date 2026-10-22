@@ -222,8 +222,20 @@
 	<div class="block box-border min-w-0 grow w-full p-1">
 		<div class="editor-action-row w-full">
 			<div class="w-full flex justify-between items-center flex-wrap gap-2">
-				<div v-if="!hideFormattingButtons" class="editor-actions">
+				<div class="editor-actions">
+					<IconButton
+						v-if="formattingButtonsVisibility == 'collapsible'"
+						v-tooltip="formatMessage(isFormattingButtonsHidden ? messages.showFormatterButtons : messages.hideFormatterButtons)"
+						:label="formatMessage(isFormattingButtonsHidden ? messages.showFormatterButtons : messages.hideFormatterButtons)"
+						:size="formattingButtonSize ?? 'sm'"
+						:disabled="previewMode || disabled"
+						@click="() => $emit('collapseToggle', isFormattingButtonsHidden = !isFormattingButtonsHidden)"
+					>
+						<ExpandIcon v-if="isFormattingButtonsHidden" />
+						<CollapseIcon v-else />
+					</IconButton>
 					<template
+						v-if="formattingButtonsVisibility == 'visible' || (formattingButtonsVisibility == 'collapsible' && !isFormattingButtonsHidden)"
 						v-for="(buttonGroup, _i) in Object.values(BUTTONS).filter((bg) => bg.display)"
 						:key="_i"
 					>
@@ -232,7 +244,7 @@
 							<IconButton
 								v-tooltip="formatMessage(button.label)"
 								:label="formatMessage(button.label)"
-								size="sm"
+								:size="formattingButtonSize ?? 'sm'"
 								:class="{ 'mobile-hidden-group': !!buttonGroup.hideOnMobile }"
 								:disabled="previewMode || disabled"
 								@click="() => button.action(editor)"
@@ -333,6 +345,8 @@ import {
 	UploadIcon,
 	XIcon,
 	YouTubeIcon,
+	CollapseIcon,
+	ExpandIcon
 } from '@modrinth/assets'
 import { markdownCommands, modrinthMarkdownEditorKeymap } from '@modrinth/utils/codemirror'
 import { renderHighlightedString } from '@modrinth/utils/highlightjs/index'
@@ -360,10 +374,19 @@ import Input from './inputs/Input.vue'
 import InputFrame from './inputs/InputFrame.vue'
 import IntlFormatted from './IntlFormatted.vue'
 import Toggle from './Toggle.vue'
+import type {ButtonProps} from "#ui/components/base/buttons/types.ts";
 
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
+	hideFormatterButtons: {
+		id: 'markdown-editor.hide-formatter-buttons',
+		defaultMessage: 'Hide Formatter Buttons',
+	},
+	showFormatterButtons: {
+		id: 'markdown-editor.show-formatter-buttons',
+		defaultMessage: 'Show Formatter Buttons',
+	},
 	insertButton: {
 		id: 'markdown-editor.insert-button',
 		defaultMessage: 'Insert',
@@ -565,7 +588,9 @@ const props = withDefaults(
 		extensions?: Extension[]
 		disabled?: boolean
 		headingButtons?: boolean
-		hideFormattingButtons?: boolean
+		formattingButtonsVisibility?: 'visible' | 'collapsible' | 'hidden'
+		formattingButtonSize?: ButtonProps['size']
+		isFormattingButtonsHidden?: boolean
 		initialPreview?: boolean
 		hideMarkdownHint?: boolean
 		/**
@@ -582,7 +607,8 @@ const props = withDefaults(
 		modelValue: '',
 		disabled: false,
 		headingButtons: true,
-		hideFormattingButtons: false,
+		formattingButtonsVisibility: 'visible',
+		isFormattingButtonsHidden: false,
 		initialPreview: false,
 		hideMarkdownHint: false,
 		onImageUpload: undefined,
@@ -592,6 +618,8 @@ const props = withDefaults(
 		minHeight: undefined,
 	},
 )
+
+const isFormattingButtonsHidden = ref(props.isFormattingButtonsHidden);
 
 const editorRef = ref<HTMLDivElement>()
 let editor: EditorView | null = null
@@ -620,6 +648,7 @@ function focusEditorFrame(event: MouseEvent) {
 const emit = defineEmits<{
 	'update:modelValue': [value: string]
 	ready: [view: EditorView]
+	collapseToggle: [value: boolean]
 }>()
 const resolvedPlaceholder = computed(
 	() => props.placeholder ?? formatMessage(messages.editorPlaceholder),

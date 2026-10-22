@@ -11,7 +11,6 @@
 				inline-title
 				class="min-w-0 shrink-0"
 				:target="{ kind: 'panel', key: target }"
-				max-width="fit-content"
 			/>
 		</template>
 		<template v-else>
@@ -29,7 +28,6 @@
 				inline-title
 				class="min-w-0 shrink-0"
 				:target="{ kind: 'panel', key: selectedTarget }"
-				max-width="fit-content"
 			/>
 		</template>
 	</div>

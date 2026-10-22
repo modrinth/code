@@ -1,7 +1,7 @@
 <template>
 	<div
 		ref="editorContainer"
-		class="relative flex flex-col overflow-hidden"
+		class="relative flex flex-col overflow-hidden border-0 border-t border-solid border-surface-5"
 		:class="{ 'h-full': props.fillHeight }"
 	>
 		<EditorFindReplace
