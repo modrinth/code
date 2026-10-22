@@ -123,7 +123,7 @@
 		<template #cell-gameVersions="{ row: version }">
 			<div class="flex min-w-0 w-full max-w-[12rem] flex-wrap gap-1">
 				<TagItem
-					v-for="gameVersionGroup in getDisplayGameVersions(version).slice(
+					v-for="gameVersionGroup in version.gameVersionGroups.slice(
 						0,
 						MAX_GAME_VERSION_TAGS,
 					)"
@@ -136,7 +136,7 @@
 					<span class="min-w-0 truncate">{{ gameVersionGroup.label }}</span>
 				</TagItem>
 				<FloatingMenu
-					v-if="getDisplayGameVersions(version).length > MAX_GAME_VERSION_TAGS"
+					v-if="version.gameVersionGroups.length > MAX_GAME_VERSION_TAGS"
 					trigger="hover"
 					placement="bottom"
 					data-no-row-click
@@ -144,13 +144,13 @@
 				>
 					<TagItem class="w-fit max-w-full truncate" tabindex="0">
 						<span class="min-w-0 truncate">
-							+{{ getDisplayGameVersions(version).length - MAX_GAME_VERSION_TAGS }}
+							+{{ version.gameVersionGroups.length - MAX_GAME_VERSION_TAGS }}
 						</span>
 					</TagItem>
 					<template #popper>
 						<div class="flex max-w-[20rem] flex-wrap gap-1">
 							<TagItem
-								v-for="gameVersionGroup in getDisplayGameVersions(version).slice(
+								v-for="gameVersionGroup in version.gameVersionGroups.slice(
 									MAX_GAME_VERSION_TAGS,
 								)"
 								:key="`overflow-version-tag-${gameVersionGroup.label}`"
@@ -328,7 +328,7 @@
 					<div class="flex flex-col justify-center gap-3">
 						<div class="flex flex-row flex-wrap items-center gap-1.5">
 							<TagItem
-								v-for="gameVersionGroup in getDisplayGameVersions(version).slice(
+								v-for="gameVersionGroup in version.gameVersionGroups.slice(
 									0,
 									MAX_GAME_VERSION_TAGS,
 								)"
@@ -342,18 +342,18 @@
 								{{ gameVersionGroup.label }}
 							</TagItem>
 							<FloatingMenu
-								v-if="getDisplayGameVersions(version).length > MAX_GAME_VERSION_TAGS"
+								v-if="version.gameVersionGroups.length > MAX_GAME_VERSION_TAGS"
 								trigger="hover"
 								placement="bottom"
 								class="cursor-default smart-clickable:allow-pointer-events"
 							>
 								<TagItem tabindex="0">
-									+{{ getDisplayGameVersions(version).length - MAX_GAME_VERSION_TAGS }}
+									+{{ version.gameVersionGroups.length - MAX_GAME_VERSION_TAGS }}
 								</TagItem>
 								<template #popper>
 									<div class="flex max-w-[20rem] flex-wrap gap-1">
 										<TagItem
-											v-for="gameVersionGroup in getDisplayGameVersions(version).slice(
+											v-for="gameVersionGroup in version.gameVersionGroups.slice(
 												MAX_GAME_VERSION_TAGS,
 											)"
 											:key="`overflow-version-tag-${gameVersionGroup.label}`"
@@ -526,7 +526,9 @@ type VersionTableColumn =
 	| 'published'
 	| 'downloads'
 	| 'actions'
-type VersionTableRow = DisplayVersion & Record<string, unknown>
+type VersionTableRow = DisplayVersion & {
+	gameVersionGroups: VersionDisplayGroup[]
+} & Record<string, unknown>
 
 const props = withDefaults(
 	defineProps<{
@@ -643,10 +645,6 @@ function hasNoModLoader(loaders: string[]): boolean {
 	)
 }
 
-function getDisplayGameVersions(version: DisplayVersion): VersionDisplayGroup[] {
-	return getVersionGroupsForDisplay(version.game_versions, props.gameVersions)
-}
-
 function getFilterTooltip(filter: string): string {
 	return formatMessage(messages.toggleFilterTooltip, { filter })
 }
@@ -726,10 +724,12 @@ function isAnySelected(value: string, selected: string[]) {
 }
 
 const currentVersions = computed(() =>
-	filteredVersions.value.slice(
-		(currentPage.value - 1) * pageSize.value,
-		currentPage.value * pageSize.value,
-	),
+	filteredVersions.value
+		.slice((currentPage.value - 1) * pageSize.value, currentPage.value * pageSize.value)
+		.map((version) => ({
+			...version,
+			gameVersionGroups: getVersionGroupsForDisplay(version.game_versions, props.gameVersions),
+		})),
 )
 const currentVersionRows = computed<VersionTableRow[]>(
 	() => currentVersions.value as VersionTableRow[],
