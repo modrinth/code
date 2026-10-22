@@ -22,6 +22,7 @@ public class DropFileTransformation {
     public static void register(TransformerMap transformerMap, MinecraftVersionInfo minecraftVersionInfo) {
         // Mojang
         transformerMap.registerMethod("net/minecraft/client/MouseHandler", "onDrop", "(JLjava/util/List;)V", DropFileTransformation::transformNew);
+        transformerMap.registerMethod("net/minecraft/client/MouseHandler", "onDrop", "(JLjava/util/List;I)V", DropFileTransformation::transformNew);
 //        // Mojang (before 1.21.11)
 //        transformerMap.registerMethod("net/minecraft/Util$OS", "openUri", "(Ljava/net/URI;)V", DropFileTransformation::transform);
 //        // Intermediary

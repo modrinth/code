@@ -4,15 +4,16 @@ use std::{
     io::{Error, ErrorKind},
     os::windows::ffi::{OsStrExt, OsStringExt},
     path::{Path, PathBuf},
+    sync::Arc,
 };
 
 use tracing::info;
 use windows::{
     Win32::{
         Foundation::{
-            ERROR_ACCESS_DENIED, ERROR_ALREADY_EXISTS,
-            ERROR_INSUFFICIENT_BUFFER, ERROR_SUCCESS, GetLastError, HANDLE,
-            LocalFree,
+            ERROR_ACCESS_DENIED, ERROR_ALREADY_EXISTS, ERROR_FILE_NOT_FOUND,
+            ERROR_INSUFFICIENT_BUFFER, ERROR_PATH_NOT_FOUND, ERROR_SUCCESS,
+            GetLastError, HANDLE, LocalFree,
         },
         NetworkManagement::WindowsFirewall::{
             NetworkIsolationGetAppContainerConfig,
@@ -23,9 +24,10 @@ use windows::{
             Authorization::{
                 ConvertSidToStringSidW, ConvertStringSidToSidW,
                 EXPLICIT_ACCESS_W, GRANT_ACCESS, GetNamedSecurityInfoW,
-                GetSecurityInfo, NO_MULTIPLE_TRUSTEE, SE_FILE_OBJECT,
-                SE_WINDOW_OBJECT, SetEntriesInAclW, SetNamedSecurityInfoW,
-                SetSecurityInfo, TRUSTEE_IS_GROUP, TRUSTEE_IS_SID,
+                GetSecurityInfo, NO_MULTIPLE_TRUSTEE, REVOKE_ACCESS,
+                SE_FILE_OBJECT, SE_WINDOW_OBJECT, SET_ACCESS, SetEntriesInAclW,
+                SetNamedSecurityInfoW, SetSecurityInfo, TRUSTEE_IS_GROUP,
+                TRUSTEE_IS_SID,
             },
             CONTAINER_INHERIT_ACE, CreateWellKnownSid,
             DACL_SECURITY_INFORMATION, DeriveCapabilitySidsFromName, EqualSid,
@@ -60,13 +62,20 @@ use windows::{
 
 use async_trait::async_trait;
 use derive_more::Debug;
-use eyre::{Context, Result, bail, eyre};
+use eyre::{Context, Result, bail, ensure, eyre};
+use parking_lot::{Mutex, RwLock};
+use uuid::Uuid;
 
 use crate::{
     SandboxArg, SandboxCommand,
-    backend::{Backend, SandboxChild, SandboxEnv},
+    backend::{
+        Backend, ExposedPath, SandboxChild, SandboxEnv, SandboxHandle,
+        SandboxHandleOp, pathset::ReadWritePathSet,
+    },
     helper::MakeHelper,
 };
+
+use super::acl::{AppliedAclLedger, Grant, PermissionType, paths_equal};
 
 #[derive(Debug)]
 pub struct AppContainer;
@@ -122,7 +131,12 @@ fn spawn(
         unsafe { FreeSid(app_container_sid) };
     }
 
-    let app_container_folder = get_app_container_folder(&app_container_sid)?;
+    let app_container_sid_string =
+        app_container_sid_to_string(&app_container_sid)?;
+    let acl_ledger = AppliedAclLedger::open(&app_container_sid_string)
+        .wrap_err("opening AppContainer ACL ledger")?;
+    let app_container_folder =
+        get_app_container_folder(&app_container_sid_string)?;
     let local_state = app_container_folder.join("LocalState");
     let roaming_state = app_container_folder.join("RoamingState");
     let temp_state = app_container_folder.join("TempState");
@@ -242,55 +256,30 @@ fn spawn(
         size: size_of::<SECURITY_CAPABILITIES>(),
     });
 
+	for path in &command.ensure_dirs_exist {
+		std::fs::create_dir_all(path)
+			.wrap_err_with(|| eyre!("creating directory {path:?}"))?;
+	}
+
     let mut readable: HashSet<std::path::PathBuf> = HashSet::default();
     let mut parents_to_add: HashSet<std::path::PathBuf> = HashSet::default();
-    let mut read_paths_to_elevate: HashSet<std::path::PathBuf> =
-        HashSet::default();
-    let mut write_paths_to_elevate: HashSet<std::path::PathBuf> =
-        HashSet::default();
     let mut read_only_paths = command.read_only_paths.clone();
     read_only_paths.push(command.executable.clone());
     read_only_paths.sort_unstable();
     read_only_paths.dedup();
 
-    for allow_read in &read_only_paths {
-        readable.insert(allow_read.clone());
-        if let Some(parent) = allow_read.parent() {
-            parents_to_add.insert(parent.to_path_buf());
-        }
-        if let Err(err) =
-            add_to_acl(&app_container_sid, &allow_read, PermissionType::Read)
-        {
-            if is_access_denied(&err) {
-                tracing::warn!(
-                    "lacking permission to allow reading from {allow_read:?}; will elevate"
-                );
-                read_paths_to_elevate.insert(allow_read.clone());
-            } else {
-                return Err(err).wrap_err_with(|| {
-                    eyre!("allowing sandbox read access to {allow_read:?}")
-                });
-            }
-        }
+    let mut path_set = ReadWritePathSet::new(false);
+    for path in &read_only_paths {
+        path_set.add_read_only(path.clone());
     }
-    for allow_write in &command.read_write_paths {
-        readable.insert(allow_write.clone());
-        if let Some(parent) = allow_write.parent() {
+    for path in &command.read_write_paths {
+        path_set.add_read_write(path.clone());
+    }
+
+    for path in read_only_paths.iter().chain(&command.read_write_paths) {
+        readable.insert(path.clone());
+        if let Some(parent) = path.parent() {
             parents_to_add.insert(parent.to_path_buf());
-        }
-        if let Err(err) =
-            add_to_acl(&app_container_sid, &allow_write, PermissionType::Write)
-        {
-            if is_access_denied(&err) {
-                tracing::warn!(
-                    "Lacking permission to allow writing to {allow_write:?}; will elevate"
-                );
-                write_paths_to_elevate.insert(allow_write.clone());
-            } else {
-                return Err(err).wrap_err_with(|| {
-                    format!("allowing sandbox write access to {allow_write:?}")
-                });
-            }
         }
     }
 
@@ -311,24 +300,61 @@ fn spawn(
             parents.insert(to_add);
         }
     }
-    let mut parents = parents.into_iter().collect::<Vec<_>>();
-    parents.sort();
 
-    let mut parents_to_elevate = Vec::new();
+    let mut instance_grants = Vec::new();
+    for path in &read_only_paths {
+        instance_grants.push(Grant::from_path(path, PermissionType::Read)?);
+    }
+    for path in &command.read_write_paths {
+        instance_grants.push(Grant::from_path(path, PermissionType::Write)?);
+    }
     for path in parents {
-        if let Err(err) = add_to_acl(
-            &app_container_sid,
-            &path,
-            PermissionType::TraverseNoInherit,
-        ) {
+        instance_grants
+            .push(Grant::from_path(&path, PermissionType::Traverse)?);
+    }
+
+    let locked_acl_ledger = acl_ledger
+        .lock()
+        .wrap_err("locking AppContainer ACL ledger")?;
+    let mut prepared = locked_acl_ledger
+        .prepare(instance_grants)
+        .wrap_err("preparing AppContainer ACL instance")?;
+    let mut parents_to_elevate = Vec::new();
+    let mut read_paths_to_elevate = Vec::new();
+    let mut write_paths_to_elevate = Vec::new();
+    let mut remove_paths_to_elevate = Vec::new();
+
+    for grant in prepared.old_effective() {
+        if !prepared
+            .desired_effective()
+            .iter()
+            .any(|desired| paths_equal(&desired.path, &grant.path))
+        {
+            let path = PathBuf::from(&grant.path);
+            if let Err(err) = remove_from_acl(&app_container_sid, &path) {
+                if is_access_denied(&err) {
+                    remove_paths_to_elevate.push(path);
+                } else {
+                    return Err(err).wrap_err_with(|| {
+                        format!("revoking sandbox access from {path:?}")
+                    });
+                }
+            }
+        }
+    }
+
+    for grant in prepared.desired_effective() {
+        let path = PathBuf::from(&grant.path);
+        if let Err(err) = set_acl(&app_container_sid, &path, grant.permission) {
             if is_access_denied(&err) {
-                tracing::warn!(
-                    "Lacking permission to allow traversal of {path:?}; will elevate"
-                );
-                parents_to_elevate.push(path);
+                match grant.permission {
+                    PermissionType::Traverse => parents_to_elevate.push(path),
+                    PermissionType::Read => read_paths_to_elevate.push(path),
+                    PermissionType::Write => write_paths_to_elevate.push(path),
+                }
             } else {
                 return Err(err).wrap_err_with(|| {
-                    format!("allowing sandbox traversal of {path:?}")
+                    format!("granting sandbox access to {path:?}")
                 });
             }
         }
@@ -352,16 +378,11 @@ fn spawn(
     if !parents_to_elevate.is_empty()
         || !read_paths_to_elevate.is_empty()
         || !write_paths_to_elevate.is_empty()
+        || !remove_paths_to_elevate.is_empty()
         || need_set_network_isolation_elevated
     {
-        let mut stringsid = PWSTR::default();
-        unsafe { ConvertSidToStringSidW(app_container_sid, &mut stringsid)? };
-        assert!(!stringsid.is_null());
-        let app_container_osstring =
-            OsString::from_wide(unsafe { stringsid.as_wide() });
-
         let mut arguments = Vec::<SandboxArg>::new();
-        arguments.push(app_container_osstring.into());
+        arguments.push(app_container_sid_string.clone().into());
         arguments.push(if need_set_network_isolation_elevated {
             "true".into()
         } else {
@@ -370,6 +391,7 @@ fn spawn(
         arguments.push(std::env::join_paths(parents_to_elevate)?.into());
         arguments.push(std::env::join_paths(read_paths_to_elevate)?.into());
         arguments.push(std::env::join_paths(write_paths_to_elevate)?.into());
+        arguments.push(std::env::join_paths(remove_paths_to_elevate)?.into());
 
         info!(?arguments, "spawning elevated helper command");
         let mut elevated = super::runas::spawn(env.make_helper, arguments)
@@ -384,6 +406,10 @@ fn spawn(
         );
     }
 
+    prepared
+        .finalize_pruning()
+        .wrap_err("finalizing AppContainer ACL pruning")?;
+
     let (pipes, child) = super::spawn(
         command.executable.clone().into(),
         std::mem::take(&mut command.args),
@@ -397,11 +423,26 @@ fn spawn(
         attribute_list,
     )
     .wrap_err("spawning child")?;
+    let process_identity = child
+        .process_identity()
+        .wrap_err("reading spawned child process identity")?;
+    let acl_instance_id = prepared.id();
+    prepared
+        .activate(process_identity)
+        .wrap_err("activating AppContainer ACL instance")?;
+    drop(prepared);
 
     let mut child = crate::SandboxChild {
         stdin: pipes.stdin,
         stdout: pipes.stdout,
         stderr: pipes.stderr,
+        on_finish: command.on_finish,
+        handle: SandboxHandle::AppContainer(WindowsSandboxHandle {
+            path_set: Arc::new(RwLock::new(path_set)),
+            app_container_sid: Arc::new(app_container_sid_string),
+            acl_instance_id,
+            expose_lock: Arc::new(Mutex::new(())),
+        }),
         imp: SandboxChild::AppContainer(child),
     };
 
@@ -412,12 +453,102 @@ fn spawn(
     Ok(child)
 }
 
+#[derive(Clone)]
+pub struct WindowsSandboxHandle {
+    path_set: Arc<RwLock<ReadWritePathSet>>,
+    app_container_sid: Arc<OsString>,
+    acl_instance_id: Uuid,
+    expose_lock: Arc<Mutex<()>>,
+}
+
+impl std::fmt::Debug for WindowsSandboxHandle {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("WindowsSandboxHandle").finish_non_exhaustive()
+    }
+}
+
+impl SandboxHandleOp for WindowsSandboxHandle {
+    fn expose_path(
+        &self,
+        path: &Path,
+        allow_write: bool,
+    ) -> eyre::Result<ExposedPath> {
+        ensure!(!allow_write, "dynamically exposing writeable paths is unsupported");
+
+        let path = path
+            .canonicalize()
+            .wrap_err_with(|| format!("canonicalizing path {path:?}"))?;
+        ensure!(path.is_file(), "path to expose is not a file: {path:?}");
+
+        if self.path_set.read().can_read(path.clone()) {
+            return Ok(ExposedPath::Direct);
+        }
+
+        let _expose_guard = self.expose_lock.lock();
+        if self.path_set.read().can_read(path.clone()) {
+            return Ok(ExposedPath::Direct);
+        }
+
+        let mut grants = vec![Grant::from_path(&path, PermissionType::Read)?];
+        let mut parent = path.parent();
+        while let Some(path) = parent {
+            grants.push(Grant::from_path(path, PermissionType::Traverse)?);
+            parent = path.parent();
+        }
+
+        let acl_ledger = AppliedAclLedger::open(&self.app_container_sid)
+            .wrap_err("opening AppContainer ACL ledger")?;
+        let changed_grants = acl_ledger
+            .add_grants(self.acl_instance_id, grants)
+            .wrap_err("recording dynamic AppContainer ACL grants")?;
+
+        let sid = self
+            .app_container_sid
+            .encode_wide()
+            .chain([0])
+            .collect::<Vec<_>>();
+        let mut app_container_sid = PSID::default();
+        unsafe {
+            ConvertStringSidToSidW(PCWSTR(sid.as_ptr()), &mut app_container_sid)?
+        };
+        ensure!(
+            !app_container_sid.is_invalid(),
+            "ConvertStringSidToSidW returned invalid SID"
+        );
+        scopeguard::defer! {
+            unsafe { LocalFree(Some(windows::Win32::Foundation::HLOCAL(app_container_sid.0))) };
+        }
+
+        for grant in changed_grants {
+            let grant_path = PathBuf::from(&grant.path);
+            set_acl(&app_container_sid, &grant_path, grant.permission)
+                .wrap_err_with(|| {
+                    format!(
+                        "granting dynamic sandbox {:?} access to {grant_path:?}",
+                        grant.permission
+                    )
+                })?;
+        }
+
+        self.path_set.write().add_read_only(path);
+        Ok(ExposedPath::Direct)
+    }
+
+    fn is_path_readable(&self, path: &Path) -> bool {
+        self.path_set.read().can_read(path.to_path_buf())
+    }
+
+    fn is_path_writeable(&self, path: &Path) -> bool {
+        self.path_set.read().can_write(path.to_path_buf())
+    }
+}
+
 struct OwnedCapability {
     sid_alloc: Vec<u8>,
 }
 
 impl OwnedCapability {
-    pub fn new(known: WELL_KNOWN_SID_TYPE) -> std::io::Result<Self> {
+    pub fn new(known: WELL_KNOWN_SID_TYPE) -> Result<Self> {
         let mut size = 0;
         let result =
             unsafe { CreateWellKnownSid(known, None, None, &mut size) };
@@ -445,7 +576,7 @@ impl OwnedCapability {
     }
 }
 
-fn get_app_container_folder(app_container_sid: &PSID) -> Result<PathBuf> {
+fn app_container_sid_to_string(app_container_sid: &PSID) -> Result<OsString> {
     let mut string_sid = PWSTR::default();
     unsafe { ConvertSidToStringSidW(*app_container_sid, &mut string_sid)? };
     if string_sid.is_null() {
@@ -459,7 +590,16 @@ fn get_app_container_folder(app_container_sid: &PSID) -> Result<PathBuf> {
         };
     }
 
-    let folder = unsafe { GetAppContainerFolderPath(PCWSTR(string_sid.0))? };
+    Ok(OsString::from_wide(unsafe { string_sid.as_wide() }))
+}
+
+fn get_app_container_folder(app_container_sid: &OsStr) -> Result<PathBuf> {
+    let string_sid = app_container_sid
+        .encode_wide()
+        .chain([0])
+        .collect::<Vec<_>>();
+    let folder =
+        unsafe { GetAppContainerFolderPath(PCWSTR(string_sid.as_ptr()))? };
     if folder.is_null() {
         return Err(eyre!("GetAppContainerFolderPath returned a null path"));
     }
@@ -504,7 +644,7 @@ fn create_app_container(
     result
 }
 
-fn try_set_network_isolation(app_container: &PSID) -> std::io::Result<()> {
+fn try_set_network_isolation(app_container: &PSID) -> Result<()> {
     let mut current_count: u32 = 0;
     let mut current_containers: *mut SID_AND_ATTRIBUTES = std::ptr::null_mut();
 
@@ -564,20 +704,19 @@ fn try_set_network_isolation(app_container: &PSID) -> std::io::Result<()> {
     Ok(())
 }
 
-#[derive(Clone, Copy)]
-enum PermissionType {
-    TraverseNoInherit,
-    Write,
-    Read,
+fn is_access_denied(err: &eyre::Report) -> bool {
+    err.downcast_ref::<std::io::Error>().is_some_and(|err| {
+        err.kind() == ErrorKind::PermissionDenied
+            || err.raw_os_error().unwrap_or(0)
+                == HRESULT::from_win32(ERROR_ACCESS_DENIED.0).0
+    }) || err
+        .downcast_ref::<windows::core::Error>()
+        .is_some_and(|err| {
+            err.code() == HRESULT::from_win32(ERROR_ACCESS_DENIED.0)
+        })
 }
 
-fn is_access_denied(err: &std::io::Error) -> bool {
-    err.kind() == ErrorKind::PermissionDenied
-        || err.raw_os_error().unwrap_or(0)
-            == HRESULT::from_win32(ERROR_ACCESS_DENIED.0).0
-}
-
-fn add_writeattributes_to_winsta(app_container: &PSID) -> std::io::Result<()> {
+fn add_writeattributes_to_winsta(app_container: &PSID) -> Result<()> {
     let winsta = unsafe {
         OpenWindowStationW(
             windows::core::w!("winsta0"),
@@ -619,7 +758,7 @@ fn add_writeattributes_to_winsta(app_container: &PSID) -> std::io::Result<()> {
     let err =
         unsafe { SetEntriesInAclW(Some(&[ea]), Some(old_acl), &mut new_acl) };
     if new_acl.is_null() {
-        return Err(Error::new(ErrorKind::Other, "new acl was null"));
+        return Err(Error::new(ErrorKind::Other, "new acl was null").into());
     }
     scopeguard::defer! {
         unsafe { LocalFree(Some(windows::Win32::Foundation::HLOCAL(new_acl as *mut _))) };
@@ -662,11 +801,11 @@ fn add_writeattributes_to_winsta(app_container: &PSID) -> std::io::Result<()> {
     Ok(())
 }
 
-fn add_to_acl(
+fn set_acl(
     app_container: &PSID,
     path: &Path,
     perms: PermissionType,
-) -> std::io::Result<()> {
+) -> Result<()> {
     let encoded_path = path
         .as_os_str()
         .encode_wide()
@@ -692,17 +831,15 @@ fn add_to_acl(
         .into());
     }
     let mut ea = EXPLICIT_ACCESS_W::default();
-    ea.grfAccessMode = GRANT_ACCESS;
+    ea.grfAccessMode = SET_ACCESS;
     ea.grfAccessPermissions = match perms {
-        PermissionType::TraverseNoInherit => {
-            (FILE_GENERIC_READ | FILE_TRAVERSE).0
-        }
+        PermissionType::Traverse => (FILE_GENERIC_READ | FILE_TRAVERSE).0,
         PermissionType::Write => (FILE_ALL_ACCESS).0,
         PermissionType::Read => {
             (FILE_GENERIC_READ | FILE_TRAVERSE | FILE_GENERIC_EXECUTE).0
         }
     };
-    ea.grfInheritance = if matches!(perms, PermissionType::TraverseNoInherit) {
+    ea.grfInheritance = if matches!(perms, PermissionType::Traverse) {
         NO_INHERITANCE
     } else {
         OBJECT_INHERIT_ACE | CONTAINER_INHERIT_ACE
@@ -717,7 +854,7 @@ fn add_to_acl(
     let err =
         unsafe { SetEntriesInAclW(Some(&[ea]), Some(old_acl), &mut new_acl) };
     if new_acl.is_null() {
-        return Err(Error::new(ErrorKind::Other, "new acl was null"));
+        return Err(Error::new(ErrorKind::Other, "new acl was null").into());
     }
     scopeguard::defer! {
         unsafe { LocalFree(Some(windows::Win32::Foundation::HLOCAL(new_acl as *mut _))) };
@@ -805,7 +942,84 @@ fn add_to_acl(
     Ok(())
 }
 
-fn acl_eq(first: *const ACL, second: *const ACL) -> std::io::Result<bool> {
+fn remove_from_acl(app_container: &PSID, path: &Path) -> Result<()> {
+    let encoded_path = path
+        .as_os_str()
+        .encode_wide()
+        .chain([0])
+        .collect::<Vec<_>>();
+    let mut old_acl = std::ptr::null_mut();
+    let err = unsafe {
+        GetNamedSecurityInfoW(
+            PCWSTR(encoded_path.as_ptr()),
+            SE_FILE_OBJECT,
+            DACL_SECURITY_INFORMATION,
+            None,
+            None,
+            Some(&mut old_acl),
+            None,
+            std::ptr::null_mut(),
+        )
+    };
+    if err == ERROR_FILE_NOT_FOUND || err == ERROR_PATH_NOT_FOUND {
+        return Ok(());
+    }
+    if err != ERROR_SUCCESS {
+        return Err(windows::core::Error::from_hresult(HRESULT::from_win32(
+            err.0,
+        ))
+        .into());
+    }
+
+    let mut access = EXPLICIT_ACCESS_W::default();
+    access.grfAccessMode = REVOKE_ACCESS;
+    access.Trustee.MultipleTrusteeOperation = NO_MULTIPLE_TRUSTEE;
+    access.Trustee.pMultipleTrustee = std::ptr::null_mut();
+    access.Trustee.ptstrName = PWSTR(app_container.0 as *mut u16);
+    access.Trustee.TrusteeForm = TRUSTEE_IS_SID;
+    access.Trustee.TrusteeType = TRUSTEE_IS_GROUP;
+
+    let mut new_acl = std::ptr::null_mut();
+    let err = unsafe {
+        SetEntriesInAclW(Some(&[access]), Some(old_acl), &mut new_acl)
+    };
+    if new_acl.is_null() {
+        return Err(Error::new(ErrorKind::Other, "new acl was null").into());
+    }
+    scopeguard::defer! {
+        unsafe { LocalFree(Some(windows::Win32::Foundation::HLOCAL(new_acl.cast()))) };
+    }
+    if err != ERROR_SUCCESS {
+        return Err(windows::core::Error::from_hresult(HRESULT::from_win32(
+            err.0,
+        ))
+        .into());
+    }
+
+    let err = unsafe {
+        SetNamedSecurityInfoW(
+            PCWSTR(encoded_path.as_ptr()),
+            SE_FILE_OBJECT,
+            DACL_SECURITY_INFORMATION,
+            None,
+            None,
+            Some(new_acl),
+            None,
+        )
+    };
+    if err == ERROR_FILE_NOT_FOUND || err == ERROR_PATH_NOT_FOUND {
+        return Ok(());
+    }
+    if err != ERROR_SUCCESS {
+        return Err(windows::core::Error::from_hresult(HRESULT::from_win32(
+            err.0,
+        ))
+        .into());
+    }
+    Ok(())
+}
+
+fn acl_eq(first: *const ACL, second: *const ACL) -> Result<bool> {
     if first.is_null() && second.is_null() {
         return Ok(true);
     }
@@ -876,8 +1090,10 @@ pub fn run_helper(
         Some(traverse_paths),
         Some(read_paths),
         Some(write_paths),
+        Some(remove_paths),
         None,
     ) = (
+        args.next(),
         args.next(),
         args.next(),
         args.next(),
@@ -907,10 +1123,15 @@ pub fn run_helper(
         try_set_network_isolation(&psid)?;
     }
 
+    for path in std::env::split_paths(remove_paths.as_os_str()) {
+        if !path.as_os_str().is_empty() {
+            remove_from_acl(&psid, &path)?;
+        }
+    }
     apply_acl_paths(
         &psid,
         std::env::split_paths(traverse_paths.as_os_str()),
-        PermissionType::TraverseNoInherit,
+        PermissionType::Traverse,
     )?;
     apply_acl_paths(
         &psid,
@@ -930,12 +1151,12 @@ fn apply_acl_paths(
     app_container: &PSID,
     paths: impl IntoIterator<Item = std::path::PathBuf>,
     permission: PermissionType,
-) -> std::io::Result<()> {
+) -> Result<()> {
     for path in paths {
         if path.as_os_str().is_empty() {
             continue;
         }
-        add_to_acl(app_container, &path, permission)?;
+        set_acl(app_container, &path, permission)?;
     }
     Ok(())
 }

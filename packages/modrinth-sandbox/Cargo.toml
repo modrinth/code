@@ -8,8 +8,9 @@ readme = "README.md"
 crate-type = ["rlib", "cdylib", "staticlib"]
 
 [dependencies]
+tempfile = { workspace = true }
 tracing = { workspace = true }
-tokio = { workspace = true, features = ["fs", "process", "rt", "sync"] }
+tokio = { workspace = true, features = ["fs", "io-util", "macros", "net", "process", "rt", "sync"] }
 eyre = { workspace = true }
 async-trait = { workspace = true }
 bitflags = { workspace = true, features = ["serde"] }
@@ -26,8 +27,6 @@ infer = { workspace = true }
 parking_lot = { workspace = true }
 reqwest = { workspace = true }
 url = { workspace = true }
-objc2-app-kit = { workspace = true }
-objc2-foundation = { workspace = true }
 httparse = { workspace = true }
 open = { workspace = true }
 urlencoding = { workspace = true }
@@ -53,11 +52,13 @@ clap = { workspace = true, features = ["derive"] }
 rustix = { workspace = true }
 
 [target.'cfg(target_os = "linux")'.dependencies]
+ashpd = { workspace = true }
 libseccomp =  { workspace = true }
 directories =  { workspace = true }
 
 [target.'cfg(target_os = "macos")'.dependencies]
-tempfile = { workspace = true }
+objc2-app-kit = { workspace = true }
+objc2-foundation = { workspace = true }
 # security-framework =  { workspace = true }
 # security-framework-sys =  { workspace = true }
 
@@ -65,6 +66,8 @@ tempfile = { workspace = true }
 windows =  { workspace = true, features = ["Win32_System_Memory"] }
 # junction =  { workspace = true }
 scopeguard =  { workspace = true }
+winreg = { workspace = true }
+serde_json = { workspace = true }
 
 [lints]
 workspace = true

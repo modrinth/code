@@ -119,7 +119,7 @@ impl SandboxEnv {
     /// what you can configure, such as what program to run, and what files are
     /// exposed in the sandbox.
     pub async fn spawn(&self, command: SandboxCommand) -> Result<SandboxChild> {
-        self.imp.spawn(command).await
+		self.imp.spawn(command).await
     }
 }
 
@@ -133,6 +133,9 @@ impl SandboxEnv {
 ///
 /// - Graphics and audio devices will always be passed to the child process when
 ///   possible.
+/// - On Linux, you aren't allowed to mount any paths from the host under `/tmp`
+///   since Flatpak doesn't support mounting those files. This applies to both
+///   Bubblewrap and Flatpak, so your code stays portable across backends.
 pub struct SandboxCommand {
     /// Path to the executable to run.
     pub executable: PathBuf,

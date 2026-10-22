@@ -60,6 +60,7 @@ impl SandboxEnv for FlatpakEnv {
         &self,
         command: SandboxCommand,
     ) -> Result<crate::SandboxChild> {
+		super::linux::ensure_valid_command(&command).await?;
         spawn(self, command).await
     }
 }
@@ -181,6 +182,12 @@ async fn spawn(
         flags |= SpawnFlags::NO_NETWORK;
     }
 
+	for path in &command.ensure_dirs_exist {
+		fs::create_dir_all(path)
+			.await
+			.wrap_err_with(|| eyre!("creating directory {path:?}"))?;
+	}
+
     let sandbox_expose_fd = command
         .read_write_paths
         .into_iter()
@@ -232,14 +239,6 @@ async fn spawn(
         ..Default::default()
     };
 
-    // Make sure any required dirs exist, create them if not
-    // Do this right before we do the actual spawn, so that we don't create these
-    // if we have an error earlier on
-    for path in &command.ensure_dirs_exist {
-        fs::create_dir_all(path)
-            .await
-            .wrap_err_with(|| eyre!("creating directory {path:?}"))?;
-    }
 
     // make the spawn_exited stream first...
     let mut spawn_exited = env
@@ -305,6 +304,8 @@ async fn spawn(
         stdin,
         stdout,
         stderr,
+		on_finish: command.on_finish,
+		handle: super::SandboxHandle::Flatpak(FlatpakSandboxHandle),
         imp: SandboxChild::Flatpak(FlatpakChild {
             flatpak_pid,
             flatpak_portal: env.flatpak_portal.clone(),
@@ -335,6 +336,28 @@ fn open_dev_null() -> Result<std::fs::File> {
         .write(true)
         .open("/dev/null")
         .wrap_err("opening /dev/null")
+}
+
+/// Flatpak does not support granting additional filesystem access after spawn.
+#[derive(Clone, Debug)]
+pub struct FlatpakSandboxHandle;
+
+impl super::SandboxHandleOp for FlatpakSandboxHandle {
+	fn expose_path(
+		&self,
+		_path: &std::path::Path,
+		_allow_write: bool,
+	) -> Result<crate::ExposedPath> {
+		bail!("exposing additional paths to a running Flatpak sandbox is unsupported")
+	}
+
+	fn is_path_readable(&self, _path: &std::path::Path) -> bool {
+		false
+	}
+
+	fn is_path_writeable(&self, _path: &std::path::Path) -> bool {
+		false
+	}
 }
 
 #[derive(Debug)]

@@ -7,8 +7,10 @@ use crate::state::{
 };
 use crate::worlds::WorldType;
 use dashmap::{DashMap, mapref::entry::Entry};
-use notify::{RecommendedWatcher, RecursiveMode};
-use notify_debouncer_mini::{DebounceEventResult, Debouncer, new_debouncer};
+use notify::{EventKind, RecommendedWatcher, RecursiveMode};
+use notify_debouncer_full::{
+    DebounceEventResult, Debouncer, RecommendedCache, new_debouncer,
+};
 use std::sync::LazyLock;
 use std::{
     collections::{HashMap, HashSet},
@@ -20,7 +22,7 @@ use tokio::sync::{RwLock, mpsc::channel};
 use super::adapters::sqlite::instance_rows;
 
 pub struct FileWatcher {
-    watcher: RwLock<Debouncer<RecommendedWatcher>>,
+    watcher: RwLock<Debouncer<RecommendedWatcher, RecommendedCache>>,
     instance_ids: Arc<RwLock<HashMap<String, String>>>,
 }
 
@@ -99,6 +101,7 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
 
     let file_watcher = new_debouncer(
         Duration::from_secs_f32(1.0),
+        None,
         move |res: DebounceEventResult| {
             tx.blocking_send(res).ok();
         },
@@ -119,11 +122,13 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                     let mut synced_option_files =
                         HashMap::<String, HashSet<String>>::new();
 
-                    for e in &events {
+                    for (e, event_path) in events.iter().flat_map(|event| {
+                        event.paths.iter().map(move |path| (event, path))
+                    }) {
                         let mut instance_path = None;
 
                         let mut found = false;
-                        for component in e.path.components() {
+                        for component in event_path.components() {
                             if found {
                                 instance_path = Some(component.as_os_str());
                                 break;
@@ -144,8 +149,7 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                             else {
                                 continue;
                             };
-                            let first_file_name = e
-                                .path
+                            let first_file_name = event_path
                                 .components()
                                 .skip_while(|x| x.as_os_str() != instance_path)
                                 .nth(1)
@@ -179,13 +183,15 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                     crate::api::instance::queue_game_locale_index();
                                 }
                             }
-                            if first_file_name
+                            let is_crash_report = first_file_name
                                 .as_ref()
                                 .is_some_and(|x| *x == "crash-reports")
-                                && e.path
+                                && event_path
                                     .extension()
                                     .as_ref()
-                                    .is_some_and(|x| *x == "txt")
+                                    .is_some_and(|x| *x == "txt");
+                            if is_crash_report
+                                && matches!(e.kind, EventKind::Create(_))
                             {
                                 crash_task(instance_id);
                             } else if (is_screenshot_event
@@ -210,7 +216,7 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                 } else if first_file_name.as_ref().is_some_and(
                                     |x| {
                                         *x == "saves"
-                                            && e.path
+                                            && event_path
                                                 .file_name()
                                                 .as_ref()
                                                 .is_some_and(|x| {
@@ -220,17 +226,16 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                 ) {
                                     tracing::info!(
                                         "World updated: {}",
-                                        e.path.display()
+                                        event_path.display()
                                     );
-                                    let world = e
-                                        .path
+                                    let world = event_path
                                         .parent()
                                         .unwrap()
                                         .file_name()
                                         .unwrap()
                                         .to_string_lossy()
                                         .to_string();
-                                    if !e.path.is_file() {
+                                    if !event_path.is_file() {
                                         let instance_id = instance_id.clone();
                                         let world = world.clone();
                                         tokio::spawn(async move {
@@ -328,7 +333,7 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                         });
                     }
                 }
-                Err(error) => tracing::warn!("Unable to watch file: {error}"),
+                Err(error) => tracing::warn!("Unable to watch file: {error:?}"),
             }
         }
     });
@@ -407,10 +412,7 @@ pub(crate) async fn watch_instance_folder(
 
     let mut debouncer = watcher.watcher.write().await;
     for full_path in &to_watch {
-        if let Err(e) = debouncer
-            .watcher()
-            .watch(full_path, RecursiveMode::Recursive)
-        {
+        if let Err(e) = debouncer.watch(full_path, RecursiveMode::Recursive) {
             tracing::error!(
                 "Failed to watch directory for watcher {full_path:?}: {e}"
             );
@@ -418,9 +420,8 @@ pub(crate) async fn watch_instance_folder(
         }
     }
 
-    if let Err(e) = debouncer
-        .watcher()
-        .watch(&full_instance_path, RecursiveMode::NonRecursive)
+    if let Err(e) =
+        debouncer.watch(&full_instance_path, RecursiveMode::NonRecursive)
     {
         tracing::error!(
             "Failed to watch root instance directory for watcher {full_instance_path:?}: {e}"
