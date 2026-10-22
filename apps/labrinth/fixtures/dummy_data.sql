@@ -44,11 +44,6 @@ SELECT lpt.joining_loader_id, lpt.joining_project_type_id, 1
 FROM loaders_project_types AS lpt
 WHERE lpt.joining_loader_id IN (7, 8, 9);
 
--- Adds dummies to mrpack_loaders
-INSERT INTO loader_field_enum_values (enum_id, value)
-SELECT id, 'fabric' FROM loader_field_enums WHERE enum_name = 'mrpack_loaders';
-INSERT INTO loader_field_enum_values (enum_id, value)
-SELECT id, 'forge' FROM loader_field_enums WHERE enum_name = 'mrpack_loaders';
 
 INSERT INTO loaders_project_types_games (loader_id, project_type_id, game_id)
 SELECT joining_loader_id, joining_project_type_id, 1
@@ -59,50 +54,6 @@ SELECT joining_loader_id, joining_project_type_id, 1
 FROM loaders_project_types
 WHERE joining_loader_id = 6;
 
--- Dummy-data only optional field, as we don't have any yet
-INSERT INTO loader_fields
-	(field, field_type, optional)
-VALUES
-	('test_fabric_optional', 'integer', TRUE);
-INSERT INTO loader_fields_loaders (loader_id, loader_field_id)
-SELECT l.id, lf.id
-FROM
-	loaders AS l
-	CROSS JOIN loader_fields AS lf
-WHERE lf.field = 'test_fabric_optional' AND l.loader = 'fabric'
-ON CONFLICT DO NOTHING;
-
--- Sample game versions, loaders, categories
--- Game versions is '2'
-INSERT INTO loader_field_enum_values (enum_id, value, metadata, created)
-VALUES
-	(2, '1.3', '{"type":"snapshot","major":false}', '2012-07-25 22:00:00+00'),
-	(2, '1.13.2', '{"type":"release","major":false}', '2018-10-22 11:41:07+00'),
-	(2, '18w43b', '{"type":"snapshot","major":false}', '2018-10-24 15:02:30+00');
-INSERT INTO loader_field_enum_values (enum_id, value, metadata, created)
-VALUES (2, '1.20.1', '{"type":"release","major":false}', '2021-08-18 15:48:58.435729+00');
-INSERT INTO loader_field_enum_values (enum_id, value, metadata, created)
-VALUES (2, '1.20.2', '{"type":"release","major":false}', '2021-08-18 15:48:59.435729+00');
-INSERT INTO loader_field_enum_values (enum_id, value, metadata, created)
-VALUES (2, '1.20.3', '{"type":"release","major":false}', '2021-08-18 15:49:00.435729+00');
-INSERT INTO loader_field_enum_values (enum_id, value, metadata, created)
-VALUES (2, '1.20.4', '{"type":"beta","major":false}', '2021-08-18 15:49:01.435729+00');
-INSERT INTO loader_field_enum_values (enum_id, value, metadata, created)
-VALUES (2, '1.20.5', '{"type":"release","major":true}', '2061-08-18 15:49:02.435729+00');
-
--- Also add 'Ordering_Negative1' and 'Ordering_Positive100' to game versions (to test ordering override)
-INSERT INTO loader_field_enum_values (enum_id, value, metadata, ordering)
-VALUES (2, 'Ordering_Negative1', '{"type":"release","major":false}', -1);
-INSERT INTO loader_field_enum_values (enum_id, value, metadata, ordering)
-VALUES (2, 'Ordering_Positive100', '{"type":"release","major":false}', 100);
-
-INSERT INTO loader_fields_loaders (loader_id, loader_field_id)
-SELECT l.id, lf.id
-FROM
-	loaders AS l
-	CROSS JOIN loader_fields AS lf
-WHERE lf.field IN ('game_versions', 'environment')
-ON CONFLICT DO NOTHING;
 
 INSERT INTO categories (id, category, project_type)
 VALUES
