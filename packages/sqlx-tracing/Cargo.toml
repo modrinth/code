@@ -14,9 +14,9 @@ categories = ["asynchronous", "database", "development-tools::debugging", "devel
 
 [dependencies]
 derive_more = { workspace = true, features = ["deref", "deref_mut"] }
-futures = { version = "0.3" }
-sqlx = { version = "0.8", default-features = false, features = ["derive"] }
-tracing = { version = "0.1" }
+futures = { workspace = true }
+sqlx = { workspace = true, default-features = false, features = ["derive"] }
+tracing = { workspace = true }
 
 [dev-dependencies]
 opentelemetry = "0.30"

@@ -1,0 +1,36 @@
+[package]
+name = "meta-generator"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+default-run = "meta-generator"
+
+[dependencies]
+anyhow = { workspace = true }
+async_zip = { workspace = true, features = ["deflate"] }
+bon = { workspace = true }
+clap = { workspace = true, features = ["derive"] }
+derive_more = { workspace = true, features = ["debug", "deref", "display"] }
+directories = { workspace = true }
+dotenvy = { workspace = true }
+figment = { workspace = true, features = ["env"] }
+futures = { workspace = true }
+hex = { workspace = true }
+indexmap = { workspace = true }
+jiff = { workspace = true, features = ["serde"] }
+minecraft-meta-manifest = { workspace = true }
+minecraft-meta-model = { workspace = true }
+reqwest = { workspace = true, features = ["default"] }
+rust-s3 = { workspace = true }
+secrecy = { workspace = true, features = ["serde"] }
+sentry = { workspace = true, features = ["tracing"] }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+toasty = { workspace = true, features = ["jiff", "postgresql", "serde"] }
+toasty-cli = { workspace = true }
+tokio = { workspace = true, features = ["full"] }
+tracing = { workspace = true }
+tracing-anyhow = { workspace = true }
+tracing-subscriber = { workspace = true, features = ["chrono", "env-filter"] }
+url = { workspace = true, features = ["serde"] }
+uuid = { workspace = true, features = ["v7"] }
