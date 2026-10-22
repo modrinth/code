@@ -5909,6 +5909,7 @@ dependencies = [
  "sqlx",
  "sqlx-tracing",
  "strum",
+ "subtle",
  "thiserror 2.0.17",
  "tikv-jemalloc-ctl",
  "tikv-jemallocator",

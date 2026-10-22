@@ -121,6 +121,7 @@ sqlx = { workspace = true, features = [
 ] }
 sqlx-tracing = { workspace = true, features = ["postgres"] }
 strum = { workspace = true, features = ["derive"] }
+subtle = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true, features = ["rt-multi-thread", "sync"] }
 tokio-stream = { workspace = true }
