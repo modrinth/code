@@ -95,7 +95,7 @@ defineExpose({ show, hide })
 			v-model:resource-pack="resourcePack"
 		/>
 		<template #actions>
-			<div class="flex gap-2 justify-end">
+			<div class="flex flex-wrap gap-2 justify-end">
 				<Button type="outlined" @click="hide()">
 					<XIcon />
 					{{ formatMessage(commonMessages.cancelButton) }}
