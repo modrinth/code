@@ -350,7 +350,7 @@ pub(crate) async fn finalize_project_edit(
         {
             DBThreadIssue::update_facet_flags(
                 facet.id.into(),
-                None,
+                Some(true),
                 Some(true),
                 &mut transaction,
             )
