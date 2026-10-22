@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tDELETE FROM install_job_requests\n\t\tWHERE job_id = ?\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "a8dee31ead799ef55e45aebbbf537dc2520f33ddec5bba5d844e7de2c8ee020e"
+}
