@@ -51,7 +51,10 @@
 					name="search"
 					autocomplete="off"
 					:placeholder="formatMessage(messages.searchFiles)"
-					:class="[hasNav ? 'hidden @[800px]:inline-flex' : 'hidden @[400px]:inline-flex', compact ? 'h-[calc(2rem_-_4px)]' : '']"
+					:class="[
+						hasNav ? 'hidden @[800px]:inline-flex' : 'hidden @[400px]:inline-flex',
+						compact ? 'h-[calc(2rem_-_4px)]' : '',
+					]"
 					size="small"
 					wrapper-class="w-full sm:w-[280px]"
 					@update:model-value="$emit('update:searchQuery', $event)"

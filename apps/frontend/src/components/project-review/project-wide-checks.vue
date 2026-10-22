@@ -1,8 +1,5 @@
 <template>
-	<div
-		v-if="visibleTargets.length"
-		class="flex min-h-0 min-w-0 flex-1 flex-col gap-4 p-0"
-	>
+	<div v-if="visibleTargets.length" class="flex min-h-0 min-w-0 flex-1 flex-col gap-4 p-0">
 		<template v-if="stacked">
 			<ReviewPanel
 				v-for="target in visibleTargets"

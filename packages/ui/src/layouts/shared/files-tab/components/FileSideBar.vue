@@ -44,7 +44,11 @@
 				</IconButton>
 			</template>
 		</FileActionBar>
-		<FileSearch :loaded-only-notice="ui.searchLoadedOnlyNotice.value" :compact="ui.compactNavigation.value" class="pb-2"/>
+		<FileSearch
+			:loaded-only-notice="ui.searchLoadedOnlyNotice.value"
+			:compact="ui.compactNavigation.value"
+			class="pb-2"
+		/>
 		<div
 			:class="[
 				scrollFileEntries ? 'overflow-y-auto' : '',

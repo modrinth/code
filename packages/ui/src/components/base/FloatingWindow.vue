@@ -18,7 +18,12 @@
 				@pointercancel="stopDrag"
 				@dblclick="recenter"
 			>
-				<component :is="icon" v-if="icon" class="size-4 shrink-0 text-secondary" aria-hidden="true" />
+				<component
+					:is="icon"
+					v-if="icon"
+					class="size-4 shrink-0 text-secondary"
+					aria-hidden="true"
+				/>
 				<h2 class="m-0 min-w-0 flex-1 truncate text-base font-semibold text-contrast">
 					{{ title }}
 				</h2>
@@ -163,7 +168,10 @@ useResizeObserver(windowElement, () => {
 	if (!element || dragging) return
 	const width = element.offsetWidth
 	const height = element.offsetHeight
-	if (width !== Math.round(placement.value.width) || height !== Math.round(placement.value.height)) {
+	if (
+		width !== Math.round(placement.value.width) ||
+		height !== Math.round(placement.value.height)
+	) {
 		const { x, y } = clampedPosition(element.offsetLeft, element.offsetTop)
 		placement.value = { x, y, width, height }
 	}

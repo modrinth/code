@@ -58,7 +58,7 @@ export const moderationSettingGroups: SettingGroup[] = [
 			general.ButtonSize,
 			general.PrivateMessageHighlight,
 			general.SectionHeadersVisible,
-			general.SectionReducedGap
+			general.SectionReducedGap,
 		],
 	},
 	{

@@ -45,10 +45,11 @@ const settings = {
 			type: 'enum',
 			id: 'markdown-formatting-buttons-visibility',
 			title: 'Markdown formatting buttons Visibility',
-			description: 'Whether or not the given markdown formatting buttons are visible, collapsible or hidden above all Markdown editors',
+			description:
+				'Whether or not the given markdown formatting buttons are visible, collapsible or hidden above all Markdown editors',
 			default: 'collapsible',
 			entries: [
-				{ label: "Visible", value: 'visible' },
+				{ label: 'Visible', value: 'visible' },
 				{ label: 'Collapsible', value: 'collapsible' },
 				{ label: 'Hidden', value: 'hidden' },
 			],
@@ -78,10 +79,11 @@ const settings = {
 			type: 'enum',
 			id: 'archive-integration',
 			title: 'Archive Integration',
-			description: "Either have Archiver share the Workbench with Mod View or get its own Workbench under its own Panel",
+			description:
+				'Either have Archiver share the Workbench with Mod View or get its own Workbench under its own Panel',
 			default: 'exclusive',
 			entries: [
-				{ label: "Shared", value: 'shared' },
+				{ label: 'Shared', value: 'shared' },
 				{ label: 'Exclusive', value: 'exclusive' },
 			],
 		}),

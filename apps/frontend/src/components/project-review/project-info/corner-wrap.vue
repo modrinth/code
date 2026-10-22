@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 
 const props = withDefaults(defineProps<{ gap?: string }>(), { gap: '2px' })
 
@@ -29,8 +29,14 @@ onBeforeUnmount(() => ro?.disconnect())
 </template>
 
 <style scoped>
-.corner-wrap { position: relative; }
-.corner { position: absolute; top: 0; right: 0; }
+.corner-wrap {
+	position: relative;
+}
+.corner {
+	position: absolute;
+	top: 0;
+	right: 0;
+}
 .spacer {
 	float: right;
 	width: v-bind(w);

@@ -3,9 +3,7 @@
 		ref="interactionScope"
 		class="editable-review-section flex h-full min-h-0 flex-col gap-2.5 px-2 pb-2"
 	>
-		<div
-			class="flex shrink-0 items-start justify-between gap-4"
-		>
+		<div class="flex shrink-0 items-start justify-between gap-4">
 			<ReviewPanel
 				mode="inline"
 				:target="{ kind: 'description' }"

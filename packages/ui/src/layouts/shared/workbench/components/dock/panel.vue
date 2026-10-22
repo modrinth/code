@@ -1,10 +1,7 @@
 <template>
 	<section
 		class="workbench-panel h-full min-h-0 w-full"
-		:class="[
-			panel?.scroll === false ? '' : 'overflow-auto',
-			{ 'p-3': panel?.padded },
-		]"
+		:class="[panel?.scroll === false ? '' : 'overflow-auto', { 'p-3': panel?.padded }]"
 		:inert="regionHidden"
 		:aria-label="panel?.title"
 	>

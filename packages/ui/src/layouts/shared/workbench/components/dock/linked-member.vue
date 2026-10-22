@@ -1,10 +1,7 @@
 <template>
 	<section
 		class="workbench-panel"
-		:class="[
-			member.scroll === false ? '' : 'overflow-auto',
-			{ 'p-3': member.padded },
-		]"
+		:class="[member.scroll === false ? '' : 'overflow-auto', { 'p-3': member.padded }]"
 		:aria-label="member.title"
 	>
 		<SlotOutlet v-if="workbench.slots[slotName]" :slots="workbench.slots" :name="slotName" />

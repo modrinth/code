@@ -3461,6 +3461,9 @@
   "markdown-editor.error-label": {
     "defaultMessage": "Error"
   },
+  "markdown-editor.hide-formatter-buttons": {
+    "defaultMessage": "Hide Formatter Buttons"
+  },
   "markdown-editor.image-modal.description-field.description": {
     "defaultMessage": "Describe the image completely as you would to someone who could not see the image."
   },
@@ -3523,6 +3526,9 @@
   },
   "markdown-editor.preview-toggle.label": {
     "defaultMessage": "Preview"
+  },
+  "markdown-editor.show-formatter-buttons": {
+    "defaultMessage": "Show Formatter Buttons"
   },
   "markdown-editor.toolbar.bold": {
     "defaultMessage": "Bold"

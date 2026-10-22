@@ -6,7 +6,9 @@
 		class="review-section"
 		:class="[
 			{ 'editable-review-section': !!$slots.right },
-			settings.get(moderationSettings.General.SectionReducedGap) ? 'gap-1 pb-1.5 pt-1.5' : 'gap-2 pb-3 pt-3', 
+			settings.get(moderationSettings.General.SectionReducedGap)
+				? 'gap-1 pb-1.5 pt-1.5'
+				: 'gap-2 pb-3 pt-3',
 		]"
 	>
 		<template v-if="showHeader">
@@ -42,8 +44,11 @@
 </template>
 
 <script setup lang="ts">
+import { moderationSettings } from '@modrinth/moderation'
 import { computed } from 'vue'
 
+import CornerWrap from '~/components/project-review/project-info/corner-wrap.vue'
+import { useModerationSettings } from '~/composables/moderation.ts'
 import type { ReviewTarget } from '~/providers/project-review/review'
 import { injectReviewPanels } from '~/providers/project-review/review-panels'
 import { injectReviewPreviousIssues } from '~/providers/project-review/review-previous-issues'
@@ -51,14 +56,12 @@ import { injectReviewPreviousIssues } from '~/providers/project-review/review-pr
 import FindingsCountBadge from '../review-panel/findings-count-badge.vue'
 import ReviewPanel from '../review-panel/index.vue'
 import ReReviewFindingsCountBadge from '../review-panel/re-review-findings-count-badge.vue'
-import CornerWrap from "~/components/project-review/project-info/corner-wrap.vue";
-
-import { moderationSettings } from '@modrinth/moderation'
-import { useModerationSettings } from "~/composables/moderation.ts";
 
 const settings = useModerationSettings()
 
-const showHeader = computed(() => settings.value.get(moderationSettings.General.SectionHeadersVisible));
+const showHeader = computed(() =>
+	settings.value.get(moderationSettings.General.SectionHeadersVisible),
+)
 
 const props = defineProps<{
 	heading: string
@@ -74,7 +77,6 @@ const selectedFindingCount = computed(() => {
 	const binding = props.target ? panels.resolve(props.target) : undefined
 	return binding ? panels.selectedFindingCount(binding) : 0
 })
-
 </script>
 
 <style scoped>

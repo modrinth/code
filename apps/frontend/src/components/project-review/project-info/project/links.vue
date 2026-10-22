@@ -13,7 +13,10 @@
 				class="min-w-0"
 			>
 				<div class="flex flex-col gap-1">
-					<h4 v-if="showHeader" class="m-0 flex items-center gap-2 text-sm font-medium text-secondary">
+					<h4
+						v-if="showHeader"
+						class="m-0 flex items-center gap-2 text-sm font-medium text-secondary"
+					>
 						{{ link.label }}
 						<TagItem
 							v-if="link.key === 'source' && project && licenseRequiresSource(project.license.id)"

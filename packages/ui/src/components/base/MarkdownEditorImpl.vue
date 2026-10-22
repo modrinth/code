@@ -225,32 +225,53 @@
 				<div class="editor-actions">
 					<IconButton
 						v-if="formattingButtonsVisibility == 'collapsible'"
-						v-tooltip="formatMessage(isFormattingButtonsHidden ? messages.showFormatterButtons : messages.hideFormatterButtons)"
-						:label="formatMessage(isFormattingButtonsHidden ? messages.showFormatterButtons : messages.hideFormatterButtons)"
+						v-tooltip="
+							formatMessage(
+								isFormattingButtonsHidden
+									? messages.showFormatterButtons
+									: messages.hideFormatterButtons,
+							)
+						"
+						:label="
+							formatMessage(
+								isFormattingButtonsHidden
+									? messages.showFormatterButtons
+									: messages.hideFormatterButtons,
+							)
+						"
 						:size="formattingButtonSize ?? 'sm'"
 						:disabled="previewMode || disabled"
-						@click="() => $emit('collapseToggle', isFormattingButtonsHidden = !isFormattingButtonsHidden)"
+						@click="
+							() =>
+								$emit('collapseToggle', (isFormattingButtonsHidden = !isFormattingButtonsHidden))
+						"
 					>
 						<ExpandIcon v-if="isFormattingButtonsHidden" />
 						<CollapseIcon v-else />
 					</IconButton>
 					<template
-						v-if="formattingButtonsVisibility == 'visible' || (formattingButtonsVisibility == 'collapsible' && !isFormattingButtonsHidden)"
-						v-for="(buttonGroup, _i) in Object.values(BUTTONS).filter((bg) => bg.display)"
-						:key="_i"
+						v-if="
+							formattingButtonsVisibility == 'visible' ||
+							(formattingButtonsVisibility == 'collapsible' && !isFormattingButtonsHidden)
+						"
 					>
-						<div class="divider"></div>
-						<template v-for="button in buttonGroup.buttons" :key="button.label.id">
-							<IconButton
-								v-tooltip="formatMessage(button.label)"
-								:label="formatMessage(button.label)"
-								:size="formattingButtonSize ?? 'sm'"
-								:class="{ 'mobile-hidden-group': !!buttonGroup.hideOnMobile }"
-								:disabled="previewMode || disabled"
-								@click="() => button.action(editor)"
-							>
-								<component :is="button.icon" />
-							</IconButton>
+						<template
+							v-for="(buttonGroup, _i) in Object.values(BUTTONS).filter((bg) => bg.display)"
+							:key="_i"
+						>
+							<div class="divider"></div>
+							<template v-for="button in buttonGroup.buttons" :key="button.label.id">
+								<IconButton
+									v-tooltip="formatMessage(button.label)"
+									:label="formatMessage(button.label)"
+									:size="formattingButtonSize ?? 'sm'"
+									:class="{ 'mobile-hidden-group': !!buttonGroup.hideOnMobile }"
+									:disabled="previewMode || disabled"
+									@click="() => button.action(editor)"
+								>
+									<component :is="button.icon" />
+								</IconButton>
+							</template>
 						</template>
 					</template>
 				</div>
@@ -329,6 +350,8 @@ import {
 	AlignLeftIcon,
 	BoldIcon,
 	CodeIcon,
+	CollapseIcon,
+	ExpandIcon,
 	Heading1Icon,
 	Heading2Icon,
 	Heading3Icon,
@@ -345,8 +368,6 @@ import {
 	UploadIcon,
 	XIcon,
 	YouTubeIcon,
-	CollapseIcon,
-	ExpandIcon
 } from '@modrinth/assets'
 import { markdownCommands, modrinthMarkdownEditorKeymap } from '@modrinth/utils/codemirror'
 import { renderHighlightedString } from '@modrinth/utils/highlightjs/index'
@@ -364,6 +385,7 @@ import {
 
 import Button from '#ui/components/base/buttons/Button.vue'
 import IconButton from '#ui/components/base/buttons/IconButton.vue'
+import type { ButtonProps } from '#ui/components/base/buttons/types.ts'
 
 import { defineMessages, type MessageDescriptor, useVIntl } from '../../composables/i18n'
 import { commonMessages } from '../../utils/common-messages.ts'
@@ -374,7 +396,6 @@ import Input from './inputs/Input.vue'
 import InputFrame from './inputs/InputFrame.vue'
 import IntlFormatted from './IntlFormatted.vue'
 import Toggle from './Toggle.vue'
-import type {ButtonProps} from "#ui/components/base/buttons/types.ts";
 
 const { formatMessage } = useVIntl()
 
@@ -619,7 +640,7 @@ const props = withDefaults(
 	},
 )
 
-const isFormattingButtonsHidden = ref(props.isFormattingButtonsHidden);
+const isFormattingButtonsHidden = ref(props.isFormattingButtonsHidden)
 
 const editorRef = ref<HTMLDivElement>()
 let editor: EditorView | null = null
