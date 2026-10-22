@@ -59,7 +59,7 @@ impl OperatingSystemExt for Os {
             Os::LinuxArm32 => Os::Linux,
             Os::LinuxArm64 => Os::Linux,
             Os::WindowsArm64 => Os::Windows,
-            _ => self.clone(),
+            _ => *self,
         }
     }
 }

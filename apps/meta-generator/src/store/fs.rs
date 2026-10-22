@@ -149,6 +149,20 @@ impl StoreOps for FsStore {
     }
 }
 
+struct DeleteOnDrop {
+    path: PathBuf,
+}
+
+impl Drop for DeleteOnDrop {
+    fn drop(&mut self) {
+        if let Err(err) = std::fs::remove_file(&self.path)
+            && err.kind() != std::io::ErrorKind::NotFound
+        {
+            warn!(temp_path = ?self.path, ?err, "failed to remove temporary file");
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -218,19 +232,5 @@ mod tests {
         assert!(entries.next_entry().await?.is_none());
         fs::remove_dir_all(root).await?;
         Ok(())
-    }
-}
-
-struct DeleteOnDrop {
-    path: PathBuf,
-}
-
-impl Drop for DeleteOnDrop {
-    fn drop(&mut self) {
-        if let Err(err) = std::fs::remove_file(&self.path)
-            && err.kind() != std::io::ErrorKind::NotFound
-        {
-            warn!(temp_path = ?self.path, ?err, "failed to remove temporary file");
-        }
     }
 }

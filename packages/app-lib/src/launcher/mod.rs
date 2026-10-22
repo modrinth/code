@@ -957,7 +957,7 @@ pub async fn launch_minecraft(
     let version_jar = loader_version
         .as_ref()
         .map_or(version.id.to_string(), |it| {
-            format!("{}-{}", version.id.to_string(), it.id.clone())
+            format!("{}-{}", version.id, it.id)
         });
 
     let mut version_info = download::download_version_info(

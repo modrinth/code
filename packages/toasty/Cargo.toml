@@ -42,7 +42,6 @@ path = "tests/generate_unique_id.rs"
 name = "migration_generate"
 path = "tests/migration_generate.rs"
 
-
 [[test]]
 name = "query_macro"
 path = "tests/query_macro.rs"
