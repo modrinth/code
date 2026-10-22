@@ -326,10 +326,19 @@ pub async fn setup_minecraft_command(
 
         args.push("-Drealms.environment=local".into());
         args.push("-Dminecraft.api.env=sandboxauth".into());
+
+        // used in 26.3 (authlib 10)+
         args.push(format!("-Dminecraft.api.discovery.host=http://127.0.0.1:{}/sandboxauth/discovery", port).into());
+        // used in 1.16 (authlib 2) - 26.2 (authlib 9)
         args.push(format!("-Dminecraft.api.session.host=http://127.0.0.1:{}/sandboxauth/session", port).into());
+        // used in 1.16 (authlib 2) - 26.2 (authlib 9)
         args.push(format!("-Dminecraft.api.services.host=http://127.0.0.1:{}/sandboxauth/services", port).into());
-        args.push(format!("-Dminecraft.api.profiles.host=http://127.0.0.1:{}/sandboxauth/profiles", port).into());
+        // used in 1.21.9 (authlib 7) - 26.2 (authlib 9)
+        args.push("-Dminecraft.api.profiles.host=https://api.mojang.com".into());
+        // used in 1.16 (authlib 2) - 1.20.3 (authlib 5)
+        args.push("-Dminecraft.api.account.host=https://api.mojang.com".into());
+        // used in 1.16 (authlib 2) - 1.20.2 (authlib 4)
+        args.push("-Dminecraft.api.auth.host=https://authserver.mojang.com".into());
     }
 
     args.push(CLASSPATH_JVM_ARGUMENT.into());

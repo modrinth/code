@@ -388,7 +388,14 @@ impl SandboxApiService {
                     Err(error_status) => error_status.write(stream).await,
                 };
             }
+            // todo: /sandboxauth/services/{path} -> https://api.minecraftservices.com/{path}
+            // todo: /sandboxauth/profiles/{path} -> ??/{path}
+            // todo: /sandboxauth/session/{path} -> https://sessionserver.mojang.com/{path}
+
             "/sandboxauth/session/session/minecraft/join" => {
+                // Need special handling for the join request since it puts the
+                // access token in the body instead of in the Authorization header
+                // like all other requests
                 let Ok(mut join_request) =
                     serde_json::from_slice::<MinecraftJoinRequest>(body)
                 else {
