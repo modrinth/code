@@ -1,7 +1,7 @@
 import type { DecompilerMessages } from '#ui/helpers/toolbox/decompile'
 import { decompileFileContent } from '#ui/helpers/toolbox/decompile/impl'
 import { setupAsServer } from '#ui/helpers/toolbox/messenger'
-import { decompileMessengerType, zipHandlerType } from '#ui/helpers/toolbox/workers'
+import { decompileMessengerType, zipHandlerType } from '#ui/helpers/toolbox/workers/registry'
 
 setupAsServer<DecompilerMessages>(
 	decompileMessengerType,

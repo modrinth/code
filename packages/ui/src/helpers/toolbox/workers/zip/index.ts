@@ -16,7 +16,7 @@ import {
 	type ServerMessenger,
 	setupAsServer,
 } from '#ui/helpers/toolbox/messenger'
-import { zipHandlerType } from '#ui/helpers/toolbox/workers'
+import { zipHandlerType } from '#ui/helpers/toolbox/workers/registry'
 import type { ZipMessages } from '#ui/helpers/toolbox/workers/zip/api'
 import {
 	type ArchiveUpdateTypes,

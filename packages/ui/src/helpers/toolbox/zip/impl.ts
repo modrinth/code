@@ -24,7 +24,7 @@ import {
 	type LazyValue,
 } from '#ui/helpers/toolbox/misc'
 import type { Logger } from '#ui/helpers/toolbox/misc/logging'
-import { decompileMessengerType, messengerRegistry } from '#ui/helpers/toolbox/workers'
+import { decompileMessengerType, messengerRegistry } from '#ui/helpers/toolbox/workers/registry'
 import {
 	arrayBufferFromSource,
 	type ArrayBufferSource,
