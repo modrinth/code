@@ -40,8 +40,10 @@
 			>
 				<template v-if="showChevron" #trailing>
 					<ChevronLeftIcon
-						class="pointer-events-none size-5 text-secondary transition-transform duration-150"
+						class="cursor-pointer size-5 text-secondary transition-transform duration-150"
 						:class="isOpen ? (openDirection === 'down' ? 'rotate-90' : '-rotate-90') : '-rotate-90'"
+						@mousedown.prevent
+						@click.stop="handleSearchIconClick"
 					/>
 				</template>
 			</Input>
@@ -1020,6 +1022,15 @@ function handleSearchClick() {
 	if (!isOpen.value) {
 		openDropdown()
 	}
+}
+
+function handleSearchIconClick() {
+	if (isOpen.value) {
+		closeDropdown(false)
+		return
+	}
+
+	openDropdown()
 }
 
 function handleWindowResize() {
