@@ -433,9 +433,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 
 		switch (displayState.value.sortBy) {
 			case 'Name':
-				visibleInstances.sort((a, b) =>
-					a.name.localeCompare(b.name, undefined, { numeric: true }),
-				)
+				visibleInstances.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }))
 				break
 			case 'Loader':
 				visibleInstances.sort((a, b) =>
