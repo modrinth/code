@@ -16,7 +16,7 @@ import unsupportedMessage from '../messages/checklist/messages/versions/unsuppor
 import vanillaAssetsMessage from '../messages/checklist/messages/versions/vanilla-assets.md'
 import { issue, panel, section, select, text, toggle } from './component-builders/builders'
 import { issueLocation } from './component-builders/locations'
-import { sourceRequiredSection } from './license'
+import { sourceRequiredToggle, sourceRequiredExtrasSection } from './license'
 
 export const versionsIncorrectAdditionalFilesIssue = issue({
 	id: 'versions-incorrect-additional-files',
@@ -144,6 +144,8 @@ export const versionsReviewPanel = panel({
 		issue: metadataDependenciesIssue,
 		label: 'Dependencies',
 	}),
+	sourceRequiredToggle,
+	sourceRequiredExtrasSection,
 	section({
 		shown: (ctx) => ctx.selected.issueIds.includes(versionsIncorrectProjectTypeIssue.id),
 	}).content(
@@ -210,6 +212,7 @@ export const versionsReviewPanel = panel({
 			],
 		}),
 	),
+
 	section({
 		shown: (ctx) => ctx.selected.issueIds.includes(versionsUnsupportedIssue.id),
 	}).content(
@@ -220,5 +223,4 @@ export const versionsReviewPanel = panel({
 			required: true,
 		}),
 	),
-	sourceRequiredSection,
 )
