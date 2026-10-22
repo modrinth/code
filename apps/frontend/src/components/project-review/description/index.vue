@@ -16,9 +16,7 @@
 			/>
 			<div class="mt-0.5 flex shrink-0 justify-end gap-1">
 				<template v-if="editing">
-					<Button type="quiet" size="xs" :disabled="saving" @click="resetEditing">
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</Button>
+					<Button type="quiet" size="xs" :disabled="saving" @click="resetEditing"> Cancel </Button>
 					<Button
 						type="colored"
 						color="brand"
@@ -27,27 +25,23 @@
 						:disabled="!valid"
 						@click="save"
 					>
-						{{ formatMessage(commonMessages.saveButton) }}
+						Save
 					</Button>
 				</template>
 				<EditButton
 					v-else-if="project && !isLoading && !error"
-					:section="formatMessage(messages.description)"
+					section="Description"
 					:disabled="saving"
 					@click="startEditing"
 				/>
 			</div>
 		</div>
 		<div class="min-h-0 flex-1">
-			<p v-if="!selection" class="m-0 text-secondary">
-				{{ formatMessage(messages.empty) }}
-			</p>
-			<p v-else-if="isLoading" role="status" class="m-0">
-				{{ formatMessage(messages.loading) }}
-			</p>
+			<p v-if="!selection" class="m-0 text-secondary">No project selected</p>
+			<p v-else-if="isLoading" role="status" class="m-0">Loading...</p>
 			<div v-else-if="error" role="alert">
-				<p class="m-0">{{ formatMessage(messages.loadError) }}</p>
-				<Button @click="refresh">{{ formatMessage(messages.retry) }}</Button>
+				<p class="m-0">Could not load project data</p>
+				<Button @click="refresh">Retry</Button>
 			</div>
 			<div v-else-if="editing" class="flex min-h-full flex-col gap-2">
 				<TemplateMarkdownEditor
@@ -67,28 +61,24 @@
 				class="text-sm leading-tight"
 				:description="project.description"
 			/>
-			<p v-else class="m-0 text-secondary">
-				{{ formatMessage(messages.emptyDescription) }}
-			</p>
+			<p v-else class="m-0 text-secondary">No description</p>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
 import { moderationSettings } from '@modrinth/moderation'
-import { Button, commonMessages, ProjectPageDescription, useVIntl } from '@modrinth/ui'
+import { Button, ProjectPageDescription } from '@modrinth/ui'
 import { useTemplateRef } from 'vue'
 
 import TemplateMarkdownEditor from '~/components/project-review/message-thread/template-markdown-editor.vue'
 import { useModerationSettings } from '~/composables/moderation'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
-import { projectReviewMessages as messages } from '../messages'
 import EditButton from '../project-info/edit/button.vue'
 import { useProjectTextEdit } from '../project-info/edit/use-project-text-edit'
 import ReviewPanel from '../review-panel/index.vue'
 
-const { formatMessage } = useVIntl()
 const settings = useModerationSettings()
 const interactionScope = useTemplateRef<HTMLElement>('interactionScope')
 const { selection, isLoading, error, refresh } = injectProjectReviewPageContext()

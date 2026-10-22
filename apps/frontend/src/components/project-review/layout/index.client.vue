@@ -1,7 +1,7 @@
 <template>
 	<section
 		class="project-review relative flex overflow-hidden bg-bg"
-		:aria-label="formatMessage(messages.title)"
+		aria-label="Project Review"
 		@dblclick="onDividerDoubleClick"
 	>
 		<div class="flex min-h-0 min-w-0 flex-1 flex-col">
@@ -20,25 +20,28 @@
 <script setup lang="ts">
 import 'dockview-vue/dist/styles/dockview.css'
 
-import { useVIntl } from '@modrinth/ui'
 import { onScopeDispose, watch, watchEffect } from 'vue'
 
 import { useModerationKeybinds } from '~/composables/moderation'
 
-import { projectReviewMessages as messages } from '../messages'
 import { injectReviewContext } from '../review-panel/context'
 import { reviewShortcutBlocked, useReviewEventListener, useReviewShortcut } from '../shortcuts'
 import ProjectReviewColumns from './columns.vue'
 import { provideProjectReviewContext } from './context'
+import { reviewPanelLabels } from './labels'
 import { workspacePanelSizes } from './layout-storage'
 import type { ProjectReviewSlots, ProjectReviewTab } from './types'
 import { useProjectReviewLayout } from './use-layout'
 
-const props = defineProps<{ tabs: readonly ProjectReviewTab[]; resetKey: string; ready: boolean }>()
+const props = defineProps<{
+	tabs: readonly ProjectReviewTab[]
+	resetKey: string
+	ready: boolean
+}>()
 const slots = defineSlots<ProjectReviewSlots>()
-const { formatMessage } = useVIntl()
+
 const layout = useProjectReviewLayout(
-	(tab) => formatMessage(messages[tab]),
+	(tab) => reviewPanelLabels[tab],
 	() => props.tabs,
 	() => props.ready,
 )

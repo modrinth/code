@@ -3,8 +3,8 @@
 		<Input
 			v-if="projectIds.length > 6"
 			v-model="search"
-			:placeholder="formatMessage(commonMessages.searchPlaceholder)"
-			:aria-label="formatMessage(commonMessages.searchLabel)"
+			placeholder="Search..."
+			aria-label="Search"
 			size="small"
 		/>
 		<div
@@ -18,31 +18,22 @@
 				</div>
 			</div>
 		</div>
-		<span v-if="indexing" class="text-xs text-secondary">{{
-			formatMessage(messages.searchingProjects)
-		}}</span>
-		<span v-else-if="indexError && search.trim()" class="text-xs text-secondary">{{
-			formatMessage(messages.loadError)
-		}}</span>
+		<span v-if="indexing" class="text-xs text-secondary">Searching projects…</span>
+		<span v-else-if="indexError && search.trim()" class="text-xs text-secondary"
+			>Could not load project data</span
+		>
 		<span v-if="!filteredIds.length && !indexing" class="text-secondary">{{
-			formatMessage(search.trim() ? messages.noMatchingProjects : emptyMessage)
+			search.trim() ? 'No matching projects' : emptyMessage
 		}}</span>
 	</div>
 </template>
 
 <script setup lang="ts">
-import {
-	commonMessages,
-	injectModrinthClient,
-	Input,
-	type MessageDescriptor,
-	useVIntl,
-} from '@modrinth/ui'
+import { injectModrinthClient, Input } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { refDebounced, useVirtualList } from '@vueuse/core'
 import { computed, onScopeDispose, ref, shallowRef, watch } from 'vue'
 
-import { projectReviewMessages as messages } from './messages'
 import {
 	type QueueProjectPreview as ProjectPreview,
 	queueProjectPreviewKey,
@@ -53,11 +44,11 @@ import QueueProjectPreview from './queue-project-preview.vue'
 
 const props = defineProps<{
 	projectIds: string[]
-	emptyMessage: MessageDescriptor
+	emptyMessage: string
 }>()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
-const { formatMessage } = useVIntl()
+
 const search = ref('')
 const debouncedSearch = refDebounced(search, 250)
 const projects = shallowRef(new Map<string, ProjectPreview>())

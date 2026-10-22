@@ -1,31 +1,30 @@
 <template>
-	<div v-if="optionControls.length > 1" :class="multiplePanels ? 'flex flex-col gap-2' : ''">
+	<div v-if="optionControls.length" :class="groupedOptions ? 'flex flex-col gap-2' : ''">
 		<div
 			v-for="row in rows"
 			:key="row.key"
 			class="flex min-w-0 flex-col items-start gap-1"
-			:class="{ 'flex-wrap': !multiplePanels }"
+			:class="{ 'flex-wrap': !groupedOptions }"
 		>
-			<span v-if="multiplePanels" class="shrink-0 items-center text-xs font-medium text-secondary">
+			<span v-if="groupedOptions" class="shrink-0 items-center text-xs font-medium text-secondary">
 				{{ row.label }}
 			</span>
 			<div class="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
 				<Button
 					v-for="entry in selectedOptionsForRow(row)"
-					:key="
-						entry.control.type === 'toggle' ? (entry.control.id ?? 'active') : entry.control.key
-					"
+					:key="entry.control.id ?? 'active'"
 					size="sm"
 					:disabled="pending || disabled || entry.control.disabled"
-					:aria-label="formatMessage(messages.removeOption, { option: optionLabel(entry) })"
+					:aria-label="`Remove ${entry.control.issueCardDisplay.label}`"
 					@click="removeOption(entry)"
 				>
-					{{ multiplePanels ? rowOptionLabel(entry) : optionLabel(entry) }}
+					{{ entry.control.issueCardDisplay.label }}
 					<XIcon class="size-3" aria-hidden="true" />
 				</Button>
 				<MultiSelect
-					:model-value="multiplePanels ? selectedRowValues(row) : optionDraft"
+					:model-value="groupedOptions ? selectedRowValues(row) : optionDraft"
 					:options="optionsForRow(row)"
+					:max-tag-rows="3"
 					:disabled="pending || disabled"
 					:dropdown-width="280"
 					lock-dropdown-horizontal-position
@@ -41,12 +40,12 @@
 					checkbox-position="right"
 					@open="openOptions"
 					@close="closeOptions"
-					@update:model-value="multiplePanels ? updateRow(row, $event) : changeOptions($event)"
+					@update:model-value="groupedOptions ? updateRow(row, $event) : changeOptions($event)"
 				>
 					<template #input-content>
 						<span class="flex items-center gap-1">
 							<PlusIcon class="size-4 shrink-0" aria-hidden="true" />
-							<span class="sr-only">{{ formatMessage(messages.addOption) }}</span>
+							<span class="sr-only">Add issue option</span>
 						</span>
 					</template>
 				</MultiSelect>
@@ -57,15 +56,15 @@
 
 <script setup lang="ts">
 import { PlusIcon, XIcon } from '@modrinth/assets'
-import { Button, defineMessages, MultiSelect, type MultiSelectItem, useVIntl } from '@modrinth/ui'
-import { computed, ref, watch } from 'vue'
+import { Button, MultiSelect, type MultiSelectItem } from '@modrinth/ui'
+import { computed, h, ref, watch } from 'vue'
 
 import {
 	injectReviewPanels,
 	type ReviewIssue,
 	type ReviewIssueControl,
 } from '~/providers/project-review/review-panels'
-import { injectReviewSubmission } from '~/providers/project-review/review-submission'
+import { injectReviewSubmission } from '~/providers/project-review/review-submission-context'
 
 const props = withDefaults(defineProps<{ issue: ReviewIssue; disabled?: boolean }>(), {
 	disabled: false,
@@ -73,23 +72,20 @@ const props = withDefaults(defineProps<{ issue: ReviewIssue; disabled?: boolean 
 const emit = defineEmits<{ remove: [] }>()
 const panels = injectReviewPanels()
 const { pending } = injectReviewSubmission()
-const { formatMessage } = useVIntl()
-const messages = defineMessages({
-	addOption: {
-		id: 'project-review.issues.add-option',
-		defaultMessage: 'Add issue option',
-	},
-	removeOption: {
-		id: 'project-review.issues.remove-option',
-		defaultMessage: 'Remove {option}',
-	},
-	fieldOption: {
-		id: 'project-review.issues.field-option',
-		defaultMessage: '{field}: {option}',
-	},
-})
+
+type ToggleControl = Extract<ReviewIssueControl['control'], { type: 'toggle' }>
+interface IssueCardOption extends ReviewIssueControl {
+	control: ToggleControl & {
+		issueCardDisplay: NonNullable<ToggleControl['issueCardDisplay']>
+	}
+}
 const optionControls = computed(() =>
-	props.issue.controls.filter(({ control }) => control.type === 'toggle'),
+	props.issue.controls.filter(
+		(entry): entry is IssueCardOption =>
+			entry.control.type === 'toggle' &&
+			entry.control.issueCardDisplay !== undefined &&
+			!entry.control.issueCardDisplay.hidden,
+	),
 )
 const selectedOptionValues = computed(() =>
 	optionControls.value
@@ -106,23 +102,25 @@ const selectedOptions = computed(() => {
 			: panels.selected(entry.binding, entry.control),
 	)
 })
-const multiplePanels = computed(
-	() => new Set(optionControls.value.map(({ binding }) => binding.key)).size > 1,
+const groupedOptions = computed(
+	() =>
+		new Set(optionControls.value.map(({ binding }) => binding.key)).size > 1 ||
+		optionControls.value.some(
+			(entry) => entry.control.issueCardDisplay.group !== panelLabel(entry),
+		),
 )
 interface ToggleRow {
 	key: string
 	label: string
-	entries: ReviewIssueControl[]
+	entries: IssueCardOption[]
 }
 
 const rows = computed<ToggleRow[]>(() => {
-	if (!multiplePanels.value) return [{ key: 'all', label: '', entries: optionControls.value }]
+	if (!optionControls.value.length) return []
+	if (!groupedOptions.value) return [{ key: 'all', label: '', entries: optionControls.value }]
 	const groups = new Map<string, ToggleRow>()
 	for (const entry of optionControls.value) {
-		const key =
-			entry.control.type === 'toggle'
-				? (entry.control.issueListGroup ?? entry.control.label)
-				: entry.control.label
+		const key = entry.control.issueCardDisplay.group
 		const row = groups.get(key) ?? { key, label: key, entries: [] }
 		row.entries.push(entry)
 		groups.set(key, row)
@@ -140,55 +138,51 @@ function selectedRowValues(row: ToggleRow) {
 		.map(optionValue)
 }
 
-function optionLabel(entry: ReviewIssueControl) {
-	if (entry.control.type === 'toggle' && entry.control.issueListLabel)
-		return entry.control.issueListLabel
-	if (!multiplePanels.value) return entry.control.label
-	return formatMessage(messages.fieldOption, {
-		field: panelLabel(entry),
-		option: entry.control.label,
-	})
-}
-
-function rowOptionLabel(entry: ReviewIssueControl) {
-	return entry.control.type === 'toggle'
-		? (entry.control.issueListLabel ?? panelLabel(entry))
-		: panelLabel(entry)
-}
-
-function panelLabel(entry: ReviewIssueControl) {
+function panelLabel(entry: IssueCardOption) {
 	return entry.binding.panel.title ?? props.issue.category
 }
 
-function optionValue({ control }: ReviewIssueControl) {
-	return control.type === 'toggle'
-		? control.id === undefined
-			? `active:${props.issue.id}`
-			: `id:${control.id}`
-		: ''
+function optionValue({ control }: IssueCardOption) {
+	return control.id === undefined ? `active:${props.issue.id}` : `id:${control.id}`
 }
-
-const optionItems = computed<MultiSelectItem<string>[]>(() => {
-	return optionControls.value.map((entry) => ({
-		value: optionValue(entry),
-		label: optionLabel(entry),
-		searchTerms: multiplePanels.value ? [entry.control.label] : [],
-		disabled: pending.value || props.disabled || entry.control.disabled,
-	}))
-})
 
 function optionsForRow(row: ToggleRow): MultiSelectItem<string>[] {
-	if (!multiplePanels.value) return optionItems.value
-	return row.entries.map((entry) => ({
-		value: optionValue(entry),
-		label: rowOptionLabel(entry),
-		disabled: pending.value || props.disabled || entry.control.disabled,
-	}))
+	const items: MultiSelectItem<string>[] = []
+	const sections = new Map<string, MultiSelectItem<string>[]>()
+	for (const entry of row.entries) {
+		const { dropdownSection: section, icon, label } = entry.control.issueCardDisplay
+		const option = {
+			value: optionValue(entry),
+			label,
+			icon: icon
+				? () =>
+						h('img', {
+							src: icon,
+							alt: '',
+							class: 'rounded object-contain',
+							loading: 'lazy',
+						})
+				: undefined,
+			searchTerms: [entry.control.label, ...(section ? [section] : [])],
+			disabled: pending.value || props.disabled || entry.control.disabled,
+		}
+		if (section) {
+			const options = sections.get(section) ?? []
+			options.push(option)
+			sections.set(section, options)
+		} else {
+			items.push(option)
+		}
+	}
+	for (const [label, options] of sections) {
+		items.push({ type: 'section-header', label, showSelectionActions: false }, ...options)
+	}
+	return items
 }
 
-function removeOption(entry: ReviewIssueControl) {
+function removeOption(entry: IssueCardOption) {
 	if (pending.value || props.disabled || entry.control.disabled) return
-	if (multiplePanels.value && selectedOptionValues.value.length === 1)
+	if (groupedOptions.value && selectedOptionValues.value.length === 1)
 		panels.addIssue(props.issue.id)
 	panels.write(entry.binding, entry.control, false)
 }
@@ -232,17 +226,28 @@ function changeOptions(values: string[]) {
 }
 
 function openOptions() {
-	if (multiplePanels.value) return
+	if (groupedOptions.value) return
 	optionDraft.value = [...selectedOptionValues.value]
 	optionsOpen.value = true
 }
 
 function closeOptions() {
-	if (multiplePanels.value) return
+	if (groupedOptions.value) return
 	optionsOpen.value = false
 	if (pending.value || props.disabled) return
 	if (!optionDraft.value.length) {
-		emit('remove')
+		if (
+			props.issue.controls.some(
+				({ binding, control }) =>
+					control.type === 'toggle' &&
+					(!control.issueCardDisplay || control.issueCardDisplay.hidden) &&
+					panels.selected(binding, control),
+			)
+		) {
+			updateOptions([])
+		} else {
+			emit('remove')
+		}
 		return
 	}
 	const selected = new Set(selectedOptionValues.value)

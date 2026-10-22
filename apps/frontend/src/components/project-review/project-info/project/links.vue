@@ -1,7 +1,7 @@
 <template>
-	<Section :heading="formatMessage(messages.links)">
+	<Section heading="Links">
 		<template #right>
-			<EditButton :section="formatMessage(messages.links)" @click="editModal?.show()" />
+			<EditButton section="Links" @click="editModal?.show()" />
 		</template>
 		<EditModal :key="project?.id" ref="editModal" />
 		<div v-if="links.length" class="flex flex-col gap-3">
@@ -17,14 +17,14 @@
 						{{ link.label }}
 						<TagItem
 							v-if="link.key === 'source' && project && licenseRequiresSource(project.license.id)"
-							v-tooltip="formatMessage(messages.sourceAvailabilityRequired)"
+							v-tooltip="'License requires source code.'"
 							class="!border-orange !bg-surface-4 !px-1.5 !py-0.5 !text-orange"
 						>
 							<TagCategoryScrollTextIcon />
 						</TagItem>
 					</h4>
 					<span v-if="link.unavailable && !link.removed" class="text-xs text-secondary">
-						{{ formatMessage(messages.linkUnavailable) }}
+						Link unavailable
 					</span>
 					<div v-if="link.url" class="flex min-w-0 items-center gap-1.5">
 						<LinkInfoTooltip
@@ -38,9 +38,9 @@
 								:aria-describedby="tooltipId"
 								:aria-label="
 									link.removed
-										? formatMessage(messages.linkRemoved, { link: link.url })
+										? `Link removed: ${link.url}`
 										: link.unavailable
-											? formatMessage(messages.previousLink, { url: link.url })
+											? `Previous link: ${link.url}`
 											: undefined
 								"
 								target="_blank"
@@ -63,7 +63,7 @@
 				</div>
 			</ReviewPanel>
 		</div>
-		<span v-else>{{ formatMessage(messages.emptyLinks) }}</span>
+		<span v-else>No links</span>
 	</Section>
 </template>
 
@@ -87,26 +87,25 @@ import {
 	WikiIcon,
 } from '@modrinth/assets'
 import { licenseRequiresSource } from '@modrinth/moderation'
-import { injectModrinthClient, TagItem, useVIntl } from '@modrinth/ui'
+import { injectModrinthClient, TagItem } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, ref, useTemplateRef, watch } from 'vue'
 
-import { getProjectNagMessages } from '~/composables/project-nag-validation'
 import { projectQueryOptions, STALE_TIME } from '~/composables/queries/project'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 import { reviewExternalUrl } from '~/providers/project-review/project-links'
 import { injectReviewPanels } from '~/providers/project-review/review-panels'
 
 import LinkInfoTooltip from '../../link-info/tooltip.vue'
-import { projectReviewMessages as messages } from '../../messages'
+import { linkValidationWarnings } from '../../link-info/validation'
 import ReviewPanel from '../../review-panel/index.vue'
 import EditButton from '../edit/button.vue'
 import EditModal from '../edit/links.vue'
 import Section from '../section.vue'
 
-const { project, projectId, projectV2 } = injectProjectReviewPageContext()
+const { project, projectId } = injectProjectReviewPageContext()
 const { previousLinks } = injectReviewPanels()
-const { formatMessage } = useVIntl()
+
 const client = injectModrinthClient()
 const hoveredLink = ref<string>()
 const validation = useQuery(
@@ -165,18 +164,18 @@ const links = computed(() => {
 				'other',
 			]
 	const labels = {
-		site: messages.website,
-		store: messages.store,
-		source: messages.source,
-		issues: messages.issues,
-		discord: isServerProject ? messages.serverDiscord : messages.discord,
-		wiki: messages.wiki,
-		patreon: messages.donationPatreon,
-		bmac: messages.donationBmac,
-		paypal: messages.donationPaypal,
-		github: messages.donationGithub,
-		'ko-fi': messages.donationKoFi,
-		other: messages.donationOther,
+		site: 'Website',
+		store: 'Store',
+		source: 'Source code',
+		issues: 'Issue tracker',
+		discord: isServerProject ? 'Discord' : 'Discord invite',
+		wiki: 'Wiki page',
+		patreon: 'Patreon',
+		bmac: 'Buy Me A Coffee',
+		paypal: 'PayPal',
+		github: 'GitHub Sponsors',
+		'ko-fi': 'Ko-fi',
+		other: 'Other',
 	}
 
 	const currentLinks = project.value?.link_urls ?? {}
@@ -193,25 +192,19 @@ const links = computed(() => {
 			const message = labels[key as keyof typeof labels]
 			const validationMessages =
 				url && !validation.isError.value
-					? getProjectNagMessages(validation.data.value?.nags ?? [], 'link-field', {
-							detailField: key,
-							url,
-							projectType: projectV2.value?.project_type,
-						})
+					? linkValidationWarnings(validation.data.value?.nags ?? [], key, url)
 					: []
 			return url || previousLinks.value.has(key)
 				? [
 						{
 							key,
 							validationMessages,
-							warningText: validationMessages
-								.map((message) => formatMessage(message.message, message.values))
-								.join('\n'),
+							warningText: validationMessages.map((message) => message.text).join('\n'),
 							url: url ?? reviewExternalUrl(previousLinks.value.get(key)),
 							removed: !link?.url,
 							unavailable: !url,
 							icon: linkIcons[key as keyof typeof linkIcons] ?? CurrencyIcon,
-							label: message ? formatMessage(message) : (link?.platform ?? key),
+							label: message ? message : (link?.platform ?? key),
 						},
 					]
 				: []

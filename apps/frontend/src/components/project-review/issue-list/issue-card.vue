@@ -12,15 +12,8 @@
 					:aria-controls="contentId"
 					@click="expanded = !expanded"
 				>
-					<Tooltip
-						v-if="previousIssue && previousIssue.verdict !== 'resolved'"
-						:text="formatMessage(messages.reReview)"
-					>
-						<span
-							class="flex shrink-0 items-center text-orange"
-							role="img"
-							:aria-label="formatMessage(messages.reReview)"
-						>
+					<Tooltip v-if="previousIssue && previousIssue.verdict !== 'resolved'" text="Re-review">
+						<span class="flex shrink-0 items-center text-orange" role="img" aria-label="Re-review">
 							<TagCategoryRefreshCcwIcon class="size-4" aria-hidden="true" />
 						</span>
 					</Tooltip>
@@ -34,10 +27,19 @@
 				<div class="flex items-center gap-1">
 					<Tooltip
 						v-if="reviewMessages.hasIssueOverride(messageKey)"
-						:text="formatMessage(messages.editedTooltip)"
+						text="Issue message has been edited"
 					>
-						<span class="text-xs">{{ formatMessage(messages.edited) }}</span>
+						<span class="text-xs">(Edited)</span>
 					</Tooltip>
+					<p
+						v-if="!resolved && missingRequiredFieldCount"
+						class="m-0 text-sm text-red"
+						role="status"
+					>
+						{{
+							missingRequiredFieldCount === 1 ? 'Missing required field' : 'Missing required fields'
+						}}
+					</p>
 					<slot name="action">
 						<Button
 							v-if="resolved && previousIssue?.verdict !== 'resolved'"
@@ -45,24 +47,25 @@
 							type="quiet"
 							class="-my-1 -mb-2 -mr-1.5"
 							:disabled="pending || disabled"
-							:aria-label="formatMessage(messages.add, { issue: issueTitle })"
+							:aria-label="`Add ${issueTitle}`"
 							@click="restoreIssue()"
 						>
 							<PlusIcon aria-hidden="true" />
-							{{ formatMessage(messages.notResolved) }}
+							Not resolved
 						</Button>
-						<Button
-							v-else-if="!resolved"
-							size="sm"
-							type="quiet"
-							circular
-							class="-my-1 -mb-2 -mr-1.5 size-8"
-							:disabled="pending || disabled"
-							:aria-label="formatMessage(messages.remove, { issue: issueTitle })"
-							@click="removeIssue()"
-						>
-							<XIcon aria-hidden="true" />
-						</Button>
+						<Tooltip v-else-if="!resolved" text="Remove issue">
+							<Button
+								size="sm"
+								type="quiet"
+								circular
+								class="-my-1 -mb-2 -mr-1.5 size-8"
+								:disabled="pending || disabled"
+								aria-label="Remove issue"
+								@click="removeIssue()"
+							>
+								<XIcon aria-hidden="true" />
+							</Button>
+						</Tooltip>
 					</slot>
 				</div>
 			</div>
@@ -76,7 +79,7 @@
 					:id="contentId"
 					class="issue-content"
 					role="group"
-					:aria-label="formatMessage(messages.message, { issue: issueTitle })"
+					:aria-label="`Message for ${issueTitle}`"
 				>
 					<div class="min-h-0 min-w-0">
 						<div class="flex flex-col gap-2">
@@ -87,41 +90,41 @@
 							>
 								<label class="flex min-w-0 flex-col gap-1">
 									<span>
-										{{ formatMessage(messages.customTitle) }}
+										Title
 										<span class="text-red" aria-hidden="true">*</span>
 									</span>
 									<Input
 										:model-value="issue.custom.title"
 										required
 										:aria-invalid="customTitleMissing"
-										:placeholder="formatMessage(messages.customTitlePlaceholder)"
+										placeholder="Enter title..."
 										@update:model-value="
 											panels.updateCustomIssue(issue.id, { title: String($event ?? '') })
 										"
 									/>
 								</label>
 								<div class="flex min-w-0 flex-col gap-1">
-									<span>{{ formatMessage(messages.customPriority) }}</span>
+									<span>Priority</span>
 									<Combobox
 										:model-value="issue.custom.priority"
 										:options="priorityOptions"
-										:aria-label="formatMessage(messages.customPriority)"
+										aria-label="Priority"
 										:disabled="pending || disabled"
 										trigger-class="!text-primary pl-3.5"
 										@update:model-value="panels.updateCustomIssue(issue.id, { priority: $event })"
 									/>
 								</div>
 								<div class="flex min-w-0 flex-col gap-1">
-									<span>{{ formatMessage(messages.actions) }}</span>
+									<span>Actions</span>
 									<MultiSelect
 										:model-value="issue.custom.facets"
 										:options="facetOptions"
 										searchable
-										:max-tag-rows="4"
-										:search-placeholder="formatMessage(messages.searchFacets)"
+										:max-tag-rows="3"
+										search-placeholder="Search actions…"
 										:disabled="pending || disabled"
-										:placeholder="formatMessage(messages.addFacets)"
-										:aria-label="formatMessage(messages.actions)"
+										placeholder="Mark as addressed"
+										aria-label="Actions"
 										@update:model-value="panels.updateCustomIssue(issue.id, { facets: $event })"
 									/>
 								</div>
@@ -135,7 +138,7 @@
 								<Controls v-for="binding in fields" :key="binding.key" :binding="binding" />
 							</fieldset>
 							<div class="flex min-w-0 flex-col gap-1">
-								<span v-if="customMessageInput">{{ formatMessage(messages.issueMessage) }}</span>
+								<span v-if="customMessageInput">Message</span>
 								<div
 									class="relative min-w-0"
 									:class="{ 'issue-message-editor': editingMessage && !customMessageInput }"
@@ -147,9 +150,7 @@
 										:model-value="displayMessage"
 										:disabled="pending || disabled || generating"
 										:heading-buttons="false"
-										:placeholder="
-											issue.custom ? formatMessage(messages.customPlaceholder) : undefined
-										"
+										:placeholder="issue.custom ? 'Enter custom issue message...' : undefined"
 										:hide-formatting-buttons="
 											settings.get(moderationSettings.General.HideMarkdownFormattingButtons)
 										"
@@ -171,7 +172,7 @@
 									>
 										<Tooltip
 											v-if="editingMessage && reviewMessages.hasIssueOverride(messageKey)"
-											:text="formatMessage(messages.reset)"
+											text="Reset message"
 										>
 											<Button
 												size="sm"
@@ -179,7 +180,7 @@
 												circular
 												icon-only
 												class="!size-7"
-												:aria-label="formatMessage(messages.reset)"
+												aria-label="Reset message"
 												:disabled="pending || disabled || generating"
 												@click="reviewMessages.resetIssueMessage(messageKey)"
 											>
@@ -192,18 +193,12 @@
 											:color="editingMessage ? 'brand' : undefined"
 											:circular="!editingMessage"
 											:icon-only="!editingMessage"
-											:aria-label="
-												formatMessage(
-													editingMessage ? commonMessages.doneLabel : commonMessages.editButton,
-												)
-											"
+											:aria-label="editingMessage ? 'Done' : 'Edit'"
 											:disabled="pending || disabled || generating"
 											:class="editingMessage ? '!h-7' : ''"
 											@click="editingMessage = !editingMessage"
 										>
-											<template v-if="editingMessage">{{
-												formatMessage(commonMessages.doneLabel)
-											}}</template>
+											<template v-if="editingMessage">Done</template>
 											<EditIcon v-else aria-hidden="true" />
 										</Button>
 									</div>
@@ -220,7 +215,7 @@
 					size="xs"
 					type="quiet"
 					class="!h-auto !min-h-0 !rounded-full !bg-surface-3 !px-2.5 !py-1 !text-xs !font-medium hover:!bg-surface-4"
-					:aria-label="formatMessage(messages.openPanel, { panel: binding.panel.title })"
+					:aria-label="`Open ${binding.panel.title} review panel`"
 					@click="revealPanel(binding.key)"
 				>
 					<PanelTopIcon
@@ -237,17 +232,10 @@
 					{{ facet.label }}
 				</span>
 			</div>
-			<p
-				v-if="issue.custom && !issue.custom.message.trim() && !resolved"
-				class="m-0 text-xs text-orange"
-				role="status"
-			>
-				{{ formatMessage(messages.customMessageRequired) }}
-			</p>
 		</div>
 		<IssueToggles v-if="!resolved" :issue="issue" :disabled="disabled" @remove="removeIssue" />
 		<p v-if="!resolved && needsToggle" class="m-0 text-xs text-orange" role="status">
-			{{ formatMessage(messages.chooseOption) }}
+			Choose at least one option for this issue.
 		</p>
 	</article>
 </template>
@@ -265,17 +253,7 @@ import {
 } from '@modrinth/assets'
 import { moderationSettings } from '@modrinth/moderation'
 import { IssuePriority } from '@modrinth/moderation/src/data/issues'
-import { issueTargetLabels } from '@modrinth/moderation/src/data/issues/component-builders/targets'
-import {
-	Button,
-	Combobox,
-	commonMessages,
-	defineMessages,
-	Input,
-	MultiSelect,
-	Tooltip,
-	useVIntl,
-} from '@modrinth/ui'
+import { Button, Combobox, Input, MultiSelect, Tooltip } from '@modrinth/ui'
 import { computed, nextTick, ref, useId, watch } from 'vue'
 
 import TemplateMarkdownEditor from '~/components/project-review/message-thread/template-markdown-editor.vue'
@@ -290,6 +268,7 @@ import {
 } from '~/providers/project-review/review-panels'
 import { injectReviewPreviousIssues } from '~/providers/project-review/review-previous-issues'
 import { injectReviewSubmission } from '~/providers/project-review/review-submission'
+import { issueTargetLabels } from '~/providers/project-review/review-target-labels'
 
 import { injectReviewContext } from '../review-panel/context'
 import Controls from '../review-panel/controls/index.vue'
@@ -319,7 +298,7 @@ const previousIssue = computed(() => {
 const issue = computed(() =>
 	'controls' in props.issue ? props.issue : previousIssues.cardIssue(props.issue),
 )
-const issueTitle = computed(() => issue.value.title || formatMessage(messages.customIssue))
+const issueTitle = computed(() => issue.value.title || 'Custom issue')
 const active = computed(() =>
 	panels.activeIssues.value.some((entry) => entry.id === issue.value.id),
 )
@@ -374,79 +353,7 @@ watch(
 		if (disabled) editingMessage.value = false
 	},
 )
-const { formatMessage } = useVIntl()
-const messages = defineMessages({
-	customIssue: { id: 'project-review.issues.custom', defaultMessage: 'Custom issue' },
-	customTitle: { id: 'project-review.issues.custom-title', defaultMessage: 'Title' },
-	customTitlePlaceholder: {
-		id: 'project-review.issues.custom-title-placeholder',
-		defaultMessage: 'Enter title...',
-	},
-	issueMessage: { id: 'project-review.issues.issue-message', defaultMessage: 'Message' },
-	customPriority: { id: 'project-review.issues.custom-priority', defaultMessage: 'Priority' },
-	customPlaceholder: {
-		id: 'project-review.issues.custom-placeholder',
-		defaultMessage: 'Enter custom issue message...',
-	},
-	customMessageRequired: {
-		id: 'project-review.issues.custom-message-required',
-		defaultMessage: 'Enter a message for this custom issue.',
-	},
-	acknowledgeCheckbox: {
-		id: 'project-review.issues.custom-acknowledge-checkbox',
-		defaultMessage: 'Acknowledge checkbox',
-	},
-	acknowledgeReply: {
-		id: 'project-review.issues.custom-acknowledge-reply',
-		defaultMessage: 'Acknowledge reply',
-	},
-	searchFacets: {
-		id: 'project-review.issues.custom-search-facets',
-		defaultMessage: 'Search actions…',
-	},
-	actions: { id: 'project-review.issues.custom-actions', defaultMessage: 'Actions' },
-	addFacets: { id: 'project-review.issues.custom-add-facets', defaultMessage: 'Mark as addressed' },
-	notResolved: {
-		id: 'project-review.issues.not-resolved',
-		defaultMessage: 'Not resolved',
-	},
-	reReview: {
-		id: 'project-review.previous-issues.re-review',
-		defaultMessage: 'Re-review',
-	},
-	openPanel: {
-		id: 'project-review.issues.open-panel',
-		defaultMessage: 'Open {panel} review panel',
-	},
-	edited: {
-		id: 'project-review.issues.edited',
-		defaultMessage: '(Edited)',
-	},
-	editedTooltip: {
-		id: 'project-review.issues.edited-tooltip',
-		defaultMessage: 'Issue message has been edited',
-	},
-	remove: {
-		id: 'project-review.issues.remove',
-		defaultMessage: 'Remove {issue}',
-	},
-	add: {
-		id: 'project-review.issues.add',
-		defaultMessage: 'Add {issue}',
-	},
-	message: {
-		id: 'project-review.issues.message',
-		defaultMessage: 'Message for {issue}',
-	},
-	reset: {
-		id: 'project-review.issues.reset-message',
-		defaultMessage: 'Reset message',
-	},
-	chooseOption: {
-		id: 'project-review.issues.choose-option',
-		defaultMessage: 'Choose at least one option for this issue.',
-	},
-})
+
 const priorityOptions = Object.keys(IssuePriority).map((value) => ({
 	value,
 	label: value.charAt(0).toUpperCase() + value.slice(1).toLowerCase(),
@@ -457,13 +364,12 @@ const facetOptions = computed(() =>
 		.filter((type) => type !== 'modify_server_languages' || panels.hasServer.value)
 		.map((value) => ({
 			value,
-			label: formatMessage(
+			label:
 				value === 'acknowledge_checkbox'
-					? messages.acknowledgeCheckbox
+					? 'Acknowledge checkbox'
 					: value === 'acknowledge_reply'
-						? messages.acknowledgeReply
+						? 'Acknowledge reply'
 						: issueTargetLabels[value as keyof typeof issueTargetLabels],
-			),
 		})),
 )
 const customTitleMissing = computed(() => !!issue.value.custom && !issue.value.custom.title.trim())
@@ -474,7 +380,7 @@ const facetLabels = computed(() => {
 		[]
 	return [...new Set(facets.map(({ what }) => what.type))]
 		.filter((type) => type !== 'mark_addressed')
-		.map((type) => ({ type, label: formatMessage(issueTargetLabels[type]) }))
+		.map((type) => ({ type, label: issueTargetLabels[type] }))
 })
 const displayMessage = computed(() => {
 	if (props.disabled && props.previewMessage !== undefined) return props.previewMessage
@@ -494,6 +400,12 @@ const fields = computed(() => {
 	}
 	return [...bindings.values()]
 })
+const missingRequiredFieldCount = computed(
+	() =>
+		panels.validationErrors.value.filter(
+			({ issueId, key }) => issueId === issue.value.id && key !== 'toggle',
+		).length,
+)
 const needsToggle = computed(() =>
 	panels.validationErrors.value.some(
 		({ issueId, key }) => issueId === issue.value.id && key === 'toggle',

@@ -4,7 +4,7 @@
 			type="quiet"
 			size="sm"
 			:circular="false"
-			:label="formatMessage(label)"
+			:label="label"
 			:aria-expanded="visible"
 			class="opacity-70 hover:opacity-100"
 			@click="toggleSidebar(side)"
@@ -21,16 +21,18 @@ import {
 	PanelRightCloseIcon,
 	PanelRightOpenIcon,
 } from '@modrinth/assets'
-import { IconButton, useVIntl } from '@modrinth/ui'
+import { IconButton } from '@modrinth/ui'
 import type { IDockviewHeaderActionsProps } from 'dockview-vue'
 import { computed } from 'vue'
 
-import { projectReviewMessages as messages } from '../../messages'
 import { injectProjectReviewContext } from '../context'
 
 defineOptions({ inheritAttrs: false })
-const props = defineProps<{ side: 'left' | 'right'; params: IDockviewHeaderActionsProps }>()
-const { formatMessage } = useVIntl()
+const props = defineProps<{
+	side: 'left' | 'right'
+	params: IDockviewHeaderActionsProps
+}>()
+
 const { leftVisible, rightVisible, topLeftGroupId, topRightGroupId, toggleSidebar } =
 	injectProjectReviewContext()
 const visible = computed(() => (props.side === 'left' ? leftVisible.value : rightVisible.value))
@@ -42,7 +44,7 @@ const cornerGroupId = computed(() =>
 	props.side === 'left' ? topLeftGroupId.value : topRightGroupId.value,
 )
 const label = computed(() => {
-	if (props.side === 'left') return visible.value ? messages.hideLeft : messages.showLeft
-	return visible.value ? messages.hideRight : messages.showRight
+	if (props.side === 'left') return visible.value ? 'Hide project details' : 'Show project details'
+	return visible.value ? 'Hide panel' : 'Show panel'
 })
 </script>
