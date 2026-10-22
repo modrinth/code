@@ -2144,6 +2144,8 @@ pub(super) async fn update_content_progress_with_bytes(
     bytes: Option<InstallProgressSecondary>,
 ) -> crate::Result<()> {
     super::control::checkpoint(job_id).await?;
+    let phase_started =
+        job_state.progress.phase != InstallPhaseId::DownloadingContent;
     job_state.progress.phase = InstallPhaseId::DownloadingContent;
     job_state.progress.progress = Some(InstallProgress {
         current,
@@ -2151,6 +2153,11 @@ pub(super) async fn update_content_progress_with_bytes(
         secondary: bytes,
     });
     job_state.progress.details = InstallPhaseDetails::Empty;
+    if !phase_started
+        && let Some(snapshot) = store::update_live_progress(job_id, job_state)
+    {
+        return emit_install_job(&snapshot).await;
+    }
     let record = store::update_state(job_id, job_state, pool).await?;
     emit_install_job(&record.snapshot()).await?;
     Ok(())

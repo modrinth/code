@@ -403,8 +403,10 @@ async fn reinstall_shared_instance(
                 "The shared instance was updated, but its local options.txt could not be restored after removing the previous pack: {error}"
             );
         }
-        crate::api::instance::reconcile_instance_after_pack_update(instance_id)
-            .await?;
+        Box::pin(crate::api::instance::reconcile_instance_after_pack_update(
+            instance_id,
+        ))
+        .await?;
     }
     Ok(())
 }
