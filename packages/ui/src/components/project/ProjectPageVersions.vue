@@ -123,10 +123,7 @@
 		<template #cell-gameVersions="{ row: version }">
 			<div class="flex min-w-0 w-full max-w-[12rem] flex-wrap gap-1">
 				<TagItem
-					v-for="gameVersionGroup in version.gameVersionGroups.slice(
-						0,
-						MAX_GAME_VERSION_TAGS,
-					)"
+					v-for="gameVersionGroup in version.gameVersionGroups.slice(0, MAX_GAME_VERSION_TAGS)"
 					:key="`version-tag-${gameVersionGroup.label}`"
 					v-tooltip="getFilterTooltip(gameVersionGroup.label)"
 					data-no-row-click
@@ -150,9 +147,7 @@
 					<template #popper>
 						<div class="flex max-w-[20rem] flex-wrap gap-1">
 							<TagItem
-								v-for="gameVersionGroup in version.gameVersionGroups.slice(
-									MAX_GAME_VERSION_TAGS,
-								)"
+								v-for="gameVersionGroup in version.gameVersionGroups.slice(MAX_GAME_VERSION_TAGS)"
 								:key="`overflow-version-tag-${gameVersionGroup.label}`"
 								class="w-fit max-w-full truncate"
 								:action="
