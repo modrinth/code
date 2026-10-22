@@ -5,7 +5,7 @@
 	/>
 	<div v-else-if="project" class="flex shrink-0 flex-wrap gap-1.5">
 		<span v-if="sendIssuesAsThreadMessage" class="w-full text-xs text-secondary">
-			{{ formatMessage(messages.messageMode) }}
+			Send issues as thread message
 		</span>
 		<Button
 			v-for="action in actions"
@@ -21,21 +21,17 @@
 				class="animate-spin"
 				aria-hidden="true"
 			/>
-			{{ formatMessage(action.label) }}
+			{{ action.label }}
 		</Button>
-		<TeleportOverflowMenu
-			:label="formatMessage(commonMessages.moreOptionsButton)"
-			:options="overflowActions"
-			:circular="false"
-		>
+		<TeleportOverflowMenu label="More options" :options="overflowActions" :circular="false">
 			<MoreHorizontalIcon aria-hidden="true" />
 			<template #send-to-review>
 				<ScaleIcon aria-hidden="true" />
-				{{ formatMessage(messages.sendToReview) }}
+				Send to review
 			</template>
 			<template #set-to-draft>
 				<FileTextIcon aria-hidden="true" />
-				{{ formatMessage(messages.setToDraft) }}
+				Set to draft
 			</template>
 		</TeleportOverflowMenu>
 	</div>
@@ -50,13 +46,7 @@ import {
 	SpinnerIcon,
 } from '@modrinth/assets'
 import { moderationSettings } from '@modrinth/moderation'
-import {
-	Button,
-	commonMessages,
-	defineMessages,
-	TeleportOverflowMenu,
-	useVIntl,
-} from '@modrinth/ui'
+import { Button, TeleportOverflowMenu } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import { useModerationSettings } from '~/composables/moderation'
@@ -82,53 +72,25 @@ const {
 } = injectReviewSubmission()
 const { generating } = injectReviewMessages()
 const advancingAction = ref<Parameters<typeof submitDecision>[0]>()
-const { formatMessage } = useVIntl()
-const messages = defineMessages({
-	messageMode: {
-		id: 'project-review.decision.message-mode',
-		defaultMessage: 'Send issues as thread message',
-	},
-	sendIssuesMessage: {
-		id: 'project-review.decision.send-issues-message',
-		defaultMessage: 'Send issues thread message',
-	},
-	approve: { id: 'project-review.decision.approve', defaultMessage: 'Approve' },
-	withhold: {
-		id: 'project-review.decision.withhold',
-		defaultMessage: 'Withhold',
-	},
-	reject: { id: 'project-review.decision.reject', defaultMessage: 'Reject' },
-	sendToReview: {
-		id: 'project-review.decision.send-to-review',
-		defaultMessage: 'Send to review',
-	},
-	setToDraft: {
-		id: 'project-review.decision.set-to-draft',
-		defaultMessage: 'Set to draft',
-	},
-	addIssues: {
-		id: 'project-review.decision.add-issues',
-		defaultMessage: 'Add issues on project',
-	},
-})
+
 const actions = computed(() => [
 	{
 		status: ['approved', 'unlisted', 'private'].includes(project.value?.requested_status ?? '')
 			? project.value!.requested_status!
 			: ('approved' as const),
-		label: messages.approve,
+		label: 'Approve',
 		type: 'colored' as const,
 		color: 'green' as const,
 	},
 	{
 		status: 'withheld' as const,
-		label: messages.withhold,
+		label: 'Withhold',
 		type: 'outlined' as const,
 		color: 'orange' as const,
 	},
 	{
 		status: 'rejected' as const,
-		label: messages.reject,
+		label: 'Reject',
 		type: 'outlined' as const,
 		color: 'red' as const,
 	},
@@ -136,12 +98,11 @@ const actions = computed(() => [
 const overflowActions = computed(() => [
 	{
 		id: 'add-issues',
-		label: formatMessage(
-			sendIssuesAsThreadMessage.value ? messages.sendIssuesMessage : messages.addIssues,
-		),
+		label: sendIssuesAsThreadMessage.value ? 'Send issues thread message' : 'Add issues on project',
 		tone: 'orange' as const,
 		icon: PlusIcon,
 		action: () => submitIssues(),
+		hoverFilled: true,
 		disabled:
 			!!heldBy.value ||
 			!canAddIssues.value ||
@@ -150,7 +111,7 @@ const overflowActions = computed(() => [
 	},
 	{
 		id: 'send-to-review',
-		label: formatMessage(messages.sendToReview),
+		label: 'Send to review',
 		tone: 'orange' as const,
 		hoverFilled: true,
 		action: () => submitDecisionAndContinue('processing', false),
@@ -158,7 +119,7 @@ const overflowActions = computed(() => [
 	},
 	{
 		id: 'set-to-draft',
-		label: formatMessage(messages.setToDraft),
+		label: 'Set to draft',
 		tone: 'orange' as const,
 		hoverFilled: true,
 		action: () => submitDecisionAndContinue('draft', false),

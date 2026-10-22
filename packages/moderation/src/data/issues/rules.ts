@@ -94,7 +94,10 @@ export const rulesAiImagesIssue = issue({
 			}))
 		}
 		if (imageIds.length) {
-			actions.push(() => ({ type: 'remove_gallery_images', value: { image_ids: imageIds } }))
+			actions.push(() => ({
+				type: 'remove_gallery_images',
+				value: { image_ids: imageIds },
+			}))
 		}
 		return actions
 	},
@@ -233,61 +236,97 @@ export const rulesReviewPanel = panel({
 			issue: rulesProhibitedContentIssue,
 			label: 'Objectionable',
 			id: 'rules-prohibited-content-objectionable',
+			issueCardDisplay: {
+				label: 'Objectionable',
+			},
 		}),
 		toggle({
 			issue: rulesProhibitedContentIssue,
 			label: 'Discriminatory or Explicit',
 			id: 'rules-prohibited-content-discriminatory',
+			issueCardDisplay: {
+				label: 'Discriminatory or Explicit',
+			},
 		}),
 		toggle({
 			issue: rulesProhibitedContentIssue,
 			label: 'IP Infringement',
 			id: 'rules-prohibited-content-ip-infringement',
+			issueCardDisplay: {
+				label: 'IP Infringement',
+			},
 		}),
 		toggle({
 			issue: rulesProhibitedContentIssue,
 			label: 'Rights Violation',
 			id: 'rules-prohibited-content-legal-rights',
+			issueCardDisplay: {
+				label: 'Rights Violation',
+			},
 		}),
 		toggle({
 			issue: rulesProhibitedContentIssue,
 			label: 'Illegal Activity',
 			id: 'rules-prohibited-content-illegal-activity',
+			issueCardDisplay: {
+				label: 'Illegal Activity',
+			},
 		}),
 		toggle({
 			issue: rulesProhibitedContentIssue,
 			label: 'Harmful or Deceptive',
 			id: 'rules-prohibited-content-harmful',
+			issueCardDisplay: {
+				label: 'Harmful or Deceptive',
+			},
 		}),
 		toggle({
 			issue: rulesProhibitedContentIssue,
 			label: 'Misleading claims',
 			id: 'rules-prohibited-content-misleading',
+			issueCardDisplay: {
+				label: 'Misleading claims',
+			},
 		}),
 		toggle({
 			issue: rulesProhibitedContentIssue,
 			label: 'Impersonation',
 			id: 'rules-prohibited-content-impersonation',
+			issueCardDisplay: {
+				label: 'Impersonation',
+			},
 		}),
 		toggle({
 			issue: rulesProhibitedContentIssue,
 			label: 'False Endorsement',
 			id: 'rules-prohibited-content-false-endorsement',
+			issueCardDisplay: {
+				label: 'False Endorsement',
+			},
 		}),
 		toggle({
 			issue: rulesProhibitedContentIssue,
 			label: 'Profanity',
 			id: 'rules-prohibited-content-profanity',
+			issueCardDisplay: {
+				label: 'Profanity',
+			},
 		}),
 		toggle({
 			issue: rulesProhibitedContentIssue,
 			label: 'Undisclosed Data Upload',
 			id: 'rules-prohibited-content-undisclosed-upload',
+			issueCardDisplay: {
+				label: 'Undisclosed Data Upload',
+			},
 		}),
 		toggle({
 			issue: rulesProhibitedContentIssue,
 			label: 'Mojang Bypass',
 			id: 'rules-prohibited-content-mojang-bypass',
+			issueCardDisplay: {
+				label: 'Mojang Bypass',
+			},
 		}),
 	),
 	section({
@@ -315,6 +354,9 @@ export const rulesReviewPanel = panel({
 			issue: rulesProhibitedContentIssue,
 			label: 'Piracy',
 			id: 'rules-prohibited-content-illegal-activity-piracy',
+			issueCardDisplay: {
+				label: 'Piracy',
+			},
 		}),
 	),
 )

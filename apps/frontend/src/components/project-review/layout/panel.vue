@@ -11,25 +11,24 @@
 				: 'overflow-auto'
 		"
 		:inert="panelHidden"
-		:aria-label="formatMessage(messages[slotName])"
+		:aria-label="reviewPanelLabels[slotName]"
 	>
 		<component :is="content" v-if="content" />
 		<template v-else>
 			<h2 class="m-0 text-lg font-semibold text-contrast">
-				{{ formatMessage(messages[slotName]) }}
+				{{ reviewPanelLabels[slotName] }}
 			</h2>
-			<p class="m-0 text-secondary">{{ formatMessage(messages.empty) }}</p>
+			<p class="m-0 text-secondary">No project selected</p>
 		</template>
 	</section>
 </template>
 
 <script setup lang="ts">
-import { useVIntl } from '@modrinth/ui'
 import type { IDockviewPanelProps } from 'dockview-vue'
 import { computed, ref, watchEffect } from 'vue'
 
-import { projectReviewMessages as messages } from '../messages'
 import { injectProjectReviewContext, provideReviewPanelVisible, provideReviewSlot } from './context'
+import { reviewPanelLabels } from './labels'
 import type { ProjectReviewSlot } from './types'
 
 defineOptions({ inheritAttrs: false })
@@ -39,7 +38,7 @@ const props = defineProps<{
 	params: PanelParams | IDockviewPanelProps<PanelParams>
 }>()
 const { slots, leftVisible, rightVisible } = injectProjectReviewContext()
-const { formatMessage } = useVIntl()
+
 const slotName = computed(() =>
 	'slot' in props.params ? props.params.slot : props.params.params.slot,
 )

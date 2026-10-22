@@ -3,16 +3,16 @@
 		<div class="shrink-0 p-2">
 			<ReviewPanel mode="inline" :target="{ kind: 'disclosures' }" hide-title />
 		</div>
-		<p v-if="isPending" role="status">{{ formatMessage(statusMessages.loading) }}</p>
+		<p v-if="isPending" role="status">Loading disclosures…</p>
 		<div v-else-if="isError" role="alert">
-			<p>{{ formatMessage(statusMessages.loadError) }}</p>
-			<Button @click="refetch()">{{ formatMessage(statusMessages.retry) }}</Button>
+			<p>Could not load disclosures.</p>
+			<Button @click="refetch()">Retry</Button>
 		</div>
 		<EmptyState
 			v-else-if="!canEditDisclosures"
 			type="no-documents"
-			:heading="formatMessage(editorMessages.uploadVersionFirstHeading)"
-			:description="formatMessage(commonMessages.uploadVersionsEmptyStateDescription)"
+			heading="Upload versions before adding disclosures"
+			description="Come back once you've uploaded your versions."
 		/>
 		<template v-else>
 			<div class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 pb-2 pt-3">
@@ -25,7 +25,7 @@
 			</div>
 			<div class="z-10 mt-auto shrink-0">
 				<p v-if="saveError" role="alert" class="text-red">
-					{{ formatMessage(statusMessages.saveError) }}
+					Could not save all disclosure changes. Your edits have been kept. Try saving again.
 				</p>
 				<UnsavedChangesPopup
 					inline
@@ -43,18 +43,15 @@
 </template>
 
 <script setup lang="ts">
-import { Button, commonMessages, EmptyState, UnsavedChangesPopup, useVIntl } from '@modrinth/ui'
+import { Button, EmptyState, UnsavedChangesPopup } from '@modrinth/ui'
 
 import DisclosureCards from '~/components/ui/project-settings/disclosures/DisclosureCards.vue'
-import { disclosureStatusMessages as statusMessages } from '~/components/ui/project-settings/disclosures/messages'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
 import ReviewPanel from '../review-panel/index.vue'
 
-const { formatMessage } = useVIntl()
 const { project, disclosures } = injectProjectReviewPageContext()
 const {
-	messages: editorMessages,
 	savedSnapshot,
 	currentSnapshot,
 	saving,

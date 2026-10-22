@@ -1,7 +1,7 @@
 <template>
 	<TeleportOverflowMenu
 		v-bind="$attrs"
-		:label="formatMessage(commonMessages.moreOptionsButton)"
+		label="More options"
 		:options="menuOptions"
 		type="quiet"
 		size="sm"
@@ -11,15 +11,11 @@
 	</TeleportOverflowMenu>
 	<template v-if="activated">
 		<EditUserModal v-if="isAdmin" ref="editModal" :user="user" :user-id="user.id" />
-		<NewModal
-			v-if="isStaffViewing"
-			ref="detailsModal"
-			:header="formatMessage(messages.detailsTitle)"
-		>
+		<NewModal v-if="isStaffViewing" ref="detailsModal" header="User details">
 			<dl class="m-0 flex flex-col gap-3">
-				<div v-for="detail in userDetails" :key="detail.label.id">
+				<div v-for="detail in userDetails" :key="detail.label">
 					<dt class="font-semibold text-contrast">
-						{{ formatMessage(detail.label) }}
+						{{ detail.label }}
 					</dt>
 					<dd class="m-0 break-words">{{ detail.value }}</dd>
 				</div>
@@ -40,14 +36,11 @@ import {
 } from '@modrinth/assets'
 import {
 	type ButtonMenuOption,
-	commonMessages,
-	defineMessages,
 	injectModrinthClient,
 	NewModal,
 	provideUserProfile,
 	TeleportOverflowMenu,
 	type UserProfileContext,
-	useVIntl,
 } from '@modrinth/ui'
 import EditUserModal from '@modrinth/ui/src/layouts/shared/user-profile/components/edit-user-modal.vue'
 import { isStaff } from '@modrinth/utils'
@@ -57,29 +50,10 @@ import { computed, ref } from 'vue'
 
 defineOptions({ inheritAttrs: false })
 
-const menuMessages = defineMessages({
-	editUserButton: {
-		id: 'profile.button.edit-user',
-		defaultMessage: 'Edit user',
-	},
-	analyticsButton: {
-		id: 'profile.button.analytics',
-		defaultMessage: 'View user analytics',
-	},
-	infoButton: {
-		id: 'profile.button.info',
-		defaultMessage: 'View user details',
-	},
-	sharedInstancesButton: {
-		id: 'profile.button.shared-instances',
-		defaultMessage: 'View shared instances',
-	},
-})
-
 const props = defineProps<{ user: Labrinth.Users.v3.User }>()
 const auth = useAuthState()
 const client = injectModrinthClient()
-const { formatMessage } = useVIntl()
+
 const config = useRuntimeConfig()
 const { copy } = useClipboard()
 const activated = ref(false)
@@ -110,31 +84,11 @@ provideUserProfile({
 
 const editModal = ref<InstanceType<typeof EditUserModal>>()
 const detailsModal = ref<InstanceType<typeof NewModal>>()
-const messages = defineMessages({
-	detailsTitle: { id: 'profile.details.title', defaultMessage: 'User details' },
-	emailVerified: {
-		id: 'profile.details.label.email-verified',
-		defaultMessage: 'Email verified',
-	},
-	providers: {
-		id: 'profile.details.label.auth-providers',
-		defaultMessage: 'Auth providers',
-	},
-	payments: {
-		id: 'profile.details.label.payment-methods',
-		defaultMessage: 'Payment methods',
-	},
-	password: {
-		id: 'profile.details.label.has-password',
-		defaultMessage: 'Has password',
-	},
-	totp: { id: 'profile.details.label.has-totp', defaultMessage: 'Has TOTP' },
-})
 
 const menuOptions = computed<ButtonMenuOption[]>(() => [
 	{
 		id: 'copy-id',
-		label: formatMessage(commonMessages.copyIdButton),
+		label: 'Copy ID',
 		icon: ClipboardCopyIcon,
 		action: () => {
 			void copy(user.value.id)
@@ -142,7 +96,7 @@ const menuOptions = computed<ButtonMenuOption[]>(() => [
 	},
 	{
 		id: 'copy-permalink',
-		label: formatMessage(commonMessages.copyPermalinkButton),
+		label: 'Copy permanent link',
 		icon: ClipboardCopyIcon,
 		action: () => {
 			void copy(`${config.public.siteUrl}/user/${user.value.id}`)
@@ -151,7 +105,7 @@ const menuOptions = computed<ButtonMenuOption[]>(() => [
 	{ type: 'divider', shown: isStaffViewing.value },
 	{
 		id: 'open-info',
-		label: formatMessage(menuMessages.infoButton),
+		label: 'View user details',
 		icon: InfoIcon,
 		action: () => detailsModal.value?.show(),
 		tone: 'orange',
@@ -161,7 +115,7 @@ const menuOptions = computed<ButtonMenuOption[]>(() => [
 	{
 		id: 'open-shared-instances',
 		type: 'link',
-		label: formatMessage(menuMessages.sharedInstancesButton),
+		label: 'View shared instances',
 		icon: BoxesIcon,
 		href: `/admin/shared-instances/${encodeURIComponent(user.value.id)}`,
 		target: '_blank',
@@ -173,7 +127,7 @@ const menuOptions = computed<ButtonMenuOption[]>(() => [
 	{
 		id: 'open-analytics',
 		type: 'link',
-		label: formatMessage(menuMessages.analyticsButton),
+		label: 'View user analytics',
 		icon: ChartIcon,
 		href: `/dashboard/analytics?user=${encodeURIComponent(user.value.id)}`,
 		target: '_blank',
@@ -185,7 +139,7 @@ const menuOptions = computed<ButtonMenuOption[]>(() => [
 	{ type: 'divider', shown: isAdmin.value },
 	{
 		id: 'edit-user',
-		label: formatMessage(menuMessages.editUserButton),
+		label: 'Edit user',
 		icon: EditIcon,
 		action: () => editModal.value?.show(),
 		tone: 'default',
@@ -195,14 +149,13 @@ const menuOptions = computed<ButtonMenuOption[]>(() => [
 ])
 
 const userDetails = computed(() => {
-	const yesNo = (value: unknown) =>
-		formatMessage(value ? commonMessages.yesLabel : commonMessages.noLabel)
+	const yesNo = (value: unknown) => (value ? 'Yes' : 'No')
 	return [
 		...(isAdmin.value
 			? [
-					{ label: commonMessages.emailLabel, value: user.value.email ?? '—' },
+					{ label: 'Email', value: user.value.email ?? '—' },
 					{
-						label: messages.providers,
+						label: 'Auth providers',
 						value:
 							(user.value.auth_providers ?? [])
 								.map((provider) => {
@@ -219,7 +172,7 @@ const userDetails = computed(() => {
 								.join(', ') || '—',
 					},
 					{
-						label: messages.payments,
+						label: 'Payment methods',
 						value:
 							[user.value.payout_data?.paypal_address, user.value.payout_data?.venmo_handle]
 								.filter(Boolean)
@@ -227,9 +180,9 @@ const userDetails = computed(() => {
 					},
 				]
 			: []),
-		{ label: messages.emailVerified, value: yesNo(user.value.email_verified) },
-		{ label: messages.password, value: yesNo(user.value.has_password) },
-		{ label: messages.totp, value: yesNo(user.value.has_totp) },
+		{ label: 'Email verified', value: yesNo(user.value.email_verified) },
+		{ label: 'Has password', value: yesNo(user.value.has_password) },
+		{ label: 'Has TOTP', value: yesNo(user.value.has_totp) },
 	]
 })
 </script>

@@ -35,8 +35,13 @@ export type ResolvedIssueControl = ResolvedIssueControlOptions &
 		| {
 				type: 'toggle'
 				id?: string
-				issueListLabel?: string
-				issueListGroup?: string
+				issueCardDisplay?: {
+					icon?: string
+					label: string
+					group: string
+					dropdownSection?: string
+					hidden: boolean
+				}
 		  }
 		| {
 				type: 'markdown' | 'text' | 'textarea'
@@ -182,6 +187,7 @@ export function createReviewPanels(
 		> & {
 			previousLinks: ReadonlyMap<string, string>
 			previousIssueIds?: readonly string[]
+			showAllIssueControls?: boolean
 		}
 	>,
 	definitions: Record<string, PanelRegistration> = reviewPanels,
@@ -319,10 +325,24 @@ export function createReviewPanels(
 		]
 	})
 
-	const panels = computed(() => {
+	function resolvePanels(preview?: ReviewIssueControl) {
 		const bindings = new Map<string, ReviewPanelBinding>()
 		const projectV3 = project.value
 		if (!projectV3) return bindings
+		const issueIds = preview
+			? [...new Set([...selectedIssueIds.value, preview.control.issueId])]
+			: selectedIssueIds.value
+		const toggleIds = (issueId: string) => {
+			const ids = new Set(selectedToggleIds(projectV3.id, issueId))
+			if (preview?.control.type === 'toggle' && preview.control.issueId === issueId) {
+				for (const id of preview.control.childToggleIds ??
+					(preview.control.id === undefined ? [] : [preview.control.id])) {
+					ids.add(id)
+				}
+			}
+			return [...ids]
+		}
+		const showAllIssueControls = reviewData.value.showAllIssueControls === true
 		const context: ReviewContext = {
 			projectV3,
 			...reviewData.value,
@@ -334,12 +354,10 @@ export function createReviewPanels(
 				textValues(projectV3.id, issueId)[id] ?? textValues(projectV3.id, '')[id] ?? '',
 			selected: {
 				items: {},
-				issueIds: selectedIssueIds.value,
+				issueIds,
 				toggleIds: [
 					...new Set(
-						Object.values(session.read(projectV3.id, 'issues')).flatMap((keys) =>
-							keys instanceof Set ? [...keys] : [],
-						),
+						[...Object.keys(session.read(projectV3.id, 'issues')), ...issueIds].flatMap(toggleIds),
 					),
 				],
 			},
@@ -348,11 +366,16 @@ export function createReviewPanels(
 			panels: itemDefinitions,
 			parents: itemParents,
 			issues: itemIssues,
-		} = expandItemReviewPanels(definitions, context)
+		} = expandItemReviewPanels(definitions, context, showAllIssueControls)
 		for (const [key, panel] of Object.entries(itemDefinitions)) {
 			const previousLink =
 				key.endsWith('-link') && reviewData.value.previousLinks.has(key.slice(0, -'-link'.length))
-			if (resolveWithContext(panel.shown, context) === false && !previousLink) continue
+			if (
+				!showAllIssueControls &&
+				resolveWithContext(panel.shown, context) === false &&
+				!previousLink
+			)
+				continue
 			const resolveNodes = (
 				nodes: readonly PanelNode[],
 				label?: string,
@@ -368,7 +391,7 @@ export function createReviewPanels(
 
 				for (const node of nodes) {
 					if (node.type === 'section') {
-						if (resolveWithContext(node.shown, context) === false) continue
+						if (!showAllIssueControls && resolveWithContext(node.shown, context) === false) continue
 						flush()
 						sections.push(...resolveNodes(node.children, resolveWithContext(node.label, context)))
 						continue
@@ -386,13 +409,12 @@ export function createReviewPanels(
 						getSelectValues: (id, scope = issueId) => contextSelectValues(projectV3.id, scope, id),
 						selected: {
 							items: {},
-							issueIds: selectedIssueIds.value,
-							toggleIds: issue
-								? [...selectedToggleIds(projectV3.id, issueId)]
-								: context.selected.toggleIds,
+							issueIds,
+							toggleIds: issue ? toggleIds(issueId) : context.selected.toggleIds,
 						},
 					}
-					if (resolveWithContext(node.shown, issueContext) === false) continue
+					if (!showAllIssueControls && resolveWithContext(node.shown, issueContext) === false)
+						continue
 					const options: ResolvedIssueControlOptions = {
 						disabled: resolveWithContext(node.disabled, issueContext) === true,
 						issue,
@@ -408,8 +430,22 @@ export function createReviewPanels(
 							...options,
 							type: 'toggle',
 							id: node.id,
-							issueListLabel: resolveWithContext(node.issueListLabel, issueContext),
-							issueListGroup: resolveWithContext(node.issueListGroup, issueContext),
+							issueCardDisplay: node.issueCardDisplay
+								? {
+										icon: resolveWithContext(node.issueCardDisplay.icon, issueContext),
+										dropdownSection: resolveWithContext(
+											node.issueCardDisplay.dropdownSection,
+											issueContext,
+										),
+										label: resolveWithContext(node.issueCardDisplay.label, issueContext),
+										group:
+											resolveWithContext(node.issueCardDisplay.group, issueContext) ??
+											resolveWithContext(panel.title, context) ??
+											issue?.category ??
+											'',
+										hidden: resolveWithContext(node.issueCardDisplay.hidden, issueContext) === true,
+									}
+								: undefined,
 						}
 					} else if (node.type === 'select') {
 						const initial = resolveWithContext(node.initial, issueContext)
@@ -421,7 +457,11 @@ export function createReviewPanels(
 							initial: typeof initial === 'string' ? [initial] : [...(initial ?? [])],
 							placeholder: resolveWithContext(node.placeholder, issueContext),
 							options: resolveWithContext(node.options, issueContext)
-								.filter((option) => resolveWithContext(option.shown, issueContext) !== false)
+								.filter(
+									(option) =>
+										showAllIssueControls ||
+										resolveWithContext(option.shown, issueContext) !== false,
+								)
 								.map((option) => ({
 									value: option.value,
 									label: resolveWithContext(option.label, issueContext),
@@ -486,7 +526,9 @@ export function createReviewPanels(
 			}
 		}
 		return bindings
-	})
+	}
+
+	const panels = computed(() => resolvePanels())
 
 	function resolve(target: ReviewTarget) {
 		if (target.kind === 'panel') return panels.value.get(target.key)
@@ -648,18 +690,26 @@ export function createReviewPanels(
 						priority: control.issue.priority,
 						controls: [],
 					}
-					if (
-						!issue.controls.some(
-							({ control: existing }) =>
-								existing.type === control.type &&
-								(existing.type === 'toggle' && control.type === 'toggle'
-									? existing.id === control.id
-									: existing.type !== 'toggle' &&
-										control.type !== 'toggle' &&
-										existing.key === control.key),
-						)
+					const existing = issue.controls.find(
+						({ control: existing }) =>
+							existing.type === control.type &&
+							(existing.type === 'toggle' && control.type === 'toggle'
+								? existing.id === control.id
+								: existing.type !== 'toggle' &&
+									control.type !== 'toggle' &&
+									existing.key === control.key),
 					)
-						issue.controls.push({ binding, control })
+					if (!existing) issue.controls.push({ binding, control })
+					else if (
+						existing.control.type === 'toggle' &&
+						(!existing.control.issueCardDisplay || existing.control.issueCardDisplay.hidden) &&
+						control.type === 'toggle' &&
+						control.issueCardDisplay &&
+						!control.issueCardDisplay.hidden
+					) {
+						existing.binding = binding
+						existing.control = control
+					}
 					issues.set(issue.id, issue)
 				}
 			}
@@ -744,9 +794,10 @@ export function createReviewPanels(
 		}
 	}
 
-	const activeIssues = computed(() => {
+	function resolveActiveIssues(preview?: ReviewIssueControl) {
 		const projectV3 = project.value
 		if (!projectV3) return []
+		const bindings = preview ? resolvePanels(preview) : panels.value
 		const issues = new Map<string, IssueSelection>()
 		const sharedInputs = {
 			textValues: {} as Record<string, string>,
@@ -777,7 +828,7 @@ export function createReviewPanels(
 				missing: [],
 			})
 		}
-		for (const binding of panels.value.values()) {
+		for (const binding of bindings.values()) {
 			for (const section of binding.panel.sections) {
 				for (const control of section.controls) {
 					if (!control.issue) {
@@ -791,7 +842,19 @@ export function createReviewPanels(
 					if (
 						control.childToggleIds ||
 						control.disabled ||
-						(control.type === 'toggle' && !selected(binding, control))
+						(control.type === 'toggle' &&
+							!(
+								binding.key === preview?.binding.key &&
+								control.issueId === preview.control.issueId &&
+								preview.control.type === 'toggle' &&
+								control.id === preview.control.id
+							) &&
+							!(
+								control.issueId === preview?.control.issueId &&
+								control.id !== undefined &&
+								preview.control.childToggleIds?.includes(control.id)
+							) &&
+							!selected(binding, control))
 					)
 						continue
 					const selection: IssueSelection = issues.get(control.issueId) ?? {
@@ -832,7 +895,9 @@ export function createReviewPanels(
 					...reviewData.value,
 					selected: {
 						items: {},
-						issueIds: selectedIssueIds.value,
+						issueIds: preview
+							? [...new Set([...selectedIssueIds.value, preview.control.issueId])]
+							: selectedIssueIds.value,
 						toggleIds: [...keys],
 					},
 					getMarkdownValue: (key, scope = id) =>
@@ -876,7 +941,9 @@ export function createReviewPanels(
 					},
 				}
 			})
-	})
+	}
+
+	const activeIssues = computed(() => resolveActiveIssues())
 
 	const validationErrors = computed(() => [
 		...activeIssues.value
@@ -929,6 +996,11 @@ export function createReviewPanels(
 		selectValues,
 		missing,
 		write,
+		previewIssue: (entry: ReviewIssueControl) =>
+			resolveActiveIssues(entry).find(({ id }) => id === entry.control.issueId),
+		previewIssueMessage: (entry: ReviewIssueControl) =>
+			resolveActiveIssues(entry).find(({ id }) => id === entry.control.issueId)?.issue.message ??
+			'',
 		activeIssues,
 		validationErrors,
 	}

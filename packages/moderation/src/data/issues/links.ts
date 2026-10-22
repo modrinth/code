@@ -173,19 +173,27 @@ export const issuesReviewPanel = panel({
 	toggle({
 		issue: linksIssue,
 		id: 'issues-link:misused',
+		issueCardDisplay: {
+			label: 'Issue tracker: Misused',
+		},
 		label: 'Misused',
 	}),
 	toggle({
 		issue: linksIssue,
 		id: 'issues-link:inaccessible',
+		issueCardDisplay: {
+			label: 'Issue tracker: Inaccessible',
+		},
 		label: 'Inaccessible',
 	}),
 	toggle({
 		issue: linksIssue,
 		id: 'issues-link:disabled',
 		label: 'Disabled',
-		issueListGroup: 'Inaccessible',
-		issueListLabel: 'Issues: Disabled',
+		issueCardDisplay: {
+			group: 'Inaccessible',
+			label: 'Issues: Disabled',
+		},
 	}),
 	linkSuggestionSection('issues'),
 )
@@ -201,19 +209,23 @@ export const sourceReviewPanel = panel({
 	toggle({
 		issue: linksIssue,
 		id: 'source-link:misused',
+		issueCardDisplay: { label: 'Source code: Misused' },
 		label: 'Misused',
 	}),
 	toggle({
 		issue: linksIssue,
 		id: 'source-link:inaccessible',
+		issueCardDisplay: { label: 'Source code: Inaccessible' },
 		label: 'Inaccessible',
 	}),
 	toggle({
 		issue: linksIssue,
 		id: 'source-link:empty',
 		label: 'Empty Repo',
-		issueListGroup: 'Inaccessible',
-		issueListLabel: 'Source: Empty Repo',
+		issueCardDisplay: {
+			group: 'Inaccessible',
+			label: 'Source: Empty Repo',
+		},
 	}),
 	linkSuggestionSection('source'),
 )
@@ -229,19 +241,23 @@ export const wikiReviewPanel = panel({
 	toggle({
 		issue: linksIssue,
 		id: 'wiki-link:misused',
+		issueCardDisplay: { label: 'Wiki page: Misused' },
 		label: 'Misused',
 	}),
 	toggle({
 		issue: linksIssue,
 		id: 'wiki-link:inaccessible',
+		issueCardDisplay: { label: 'Wiki page: Inaccessible' },
 		label: 'Inaccessible',
 	}),
 	toggle({
 		issue: linksIssue,
 		id: 'wiki-link:disabled',
 		label: 'Disabled',
-		issueListGroup: 'Inaccessible',
-		issueListLabel: 'Wiki: Disabled',
+		issueCardDisplay: {
+			group: 'Inaccessible',
+			label: 'Wiki: Disabled',
+		},
 	}),
 	linkSuggestionSection('wiki'),
 )
@@ -257,19 +273,23 @@ export const discordReviewPanel = panel({
 	toggle({
 		issue: linksIssue,
 		id: 'discord-link:misused',
+		issueCardDisplay: { label: 'Discord invite: Misused' },
 		label: 'Misused',
 	}),
 	toggle({
 		issue: linksIssue,
 		id: 'discord-link:inaccessible',
+		issueCardDisplay: { label: 'Discord invite: Inaccessible' },
 		label: 'Inaccessible',
 	}),
 	toggle({
 		issue: linksIssue,
 		id: 'discord-link:expiring',
 		label: 'Expiring',
-		issueListGroup: 'Inaccessible',
-		issueListLabel: 'Discord: Expiring',
+		issueCardDisplay: {
+			group: 'Inaccessible',
+			label: 'Discord: Expiring',
+		},
 	}),
 	linkSuggestionSection('discord'),
 )
@@ -285,11 +305,13 @@ export const siteReviewPanel = panel({
 	toggle({
 		issue: linksIssue,
 		id: 'site-link:misused',
+		issueCardDisplay: { label: 'Website: Misused' },
 		label: 'Misused',
 	}),
 	toggle({
 		issue: linksIssue,
 		id: 'site-link:inaccessible',
+		issueCardDisplay: { label: 'Website: Inaccessible' },
 		label: 'Inaccessible',
 	}),
 	linkSuggestionSection('site'),
@@ -306,11 +328,13 @@ export const storeReviewPanel = panel({
 	toggle({
 		issue: linksIssue,
 		id: 'store-link:misused',
+		issueCardDisplay: { label: 'Store: Misused' },
 		label: 'Misused',
 	}),
 	toggle({
 		issue: linksIssue,
 		id: 'store-link:inaccessible',
+		issueCardDisplay: { label: 'Store: Inaccessible' },
 		label: 'Inaccessible',
 	}),
 	linkSuggestionSection('store'),
@@ -327,11 +351,13 @@ export const patreonReviewPanel = panel({
 	toggle({
 		issue: linksIssue,
 		id: 'patreon-link:misused',
+		issueCardDisplay: { label: 'Patreon: Misused' },
 		label: 'Misused',
 	}),
 	toggle({
 		issue: linksIssue,
 		id: 'patreon-link:inaccessible',
+		issueCardDisplay: { label: 'Patreon: Inaccessible' },
 		label: 'Inaccessible',
 	}),
 	linkSuggestionSection('patreon'),
@@ -348,11 +374,13 @@ export const bmacReviewPanel = panel({
 	toggle({
 		issue: linksIssue,
 		id: 'bmac-link:misused',
+		issueCardDisplay: { label: 'Buy Me A Coffee: Misused' },
 		label: 'Misused',
 	}),
 	toggle({
 		issue: linksIssue,
 		id: 'bmac-link:inaccessible',
+		issueCardDisplay: { label: 'Buy Me A Coffee: Inaccessible' },
 		label: 'Inaccessible',
 	}),
 	linkSuggestionSection('bmac'),
@@ -369,11 +397,13 @@ export const paypalReviewPanel = panel({
 	toggle({
 		issue: linksIssue,
 		id: 'paypal-link:misused',
+		issueCardDisplay: { label: 'PayPal: Misused' },
 		label: 'Misused',
 	}),
 	toggle({
 		issue: linksIssue,
 		id: 'paypal-link:inaccessible',
+		issueCardDisplay: { label: 'PayPal: Inaccessible' },
 		label: 'Inaccessible',
 	}),
 	linkSuggestionSection('paypal'),
@@ -390,11 +420,13 @@ export const githubReviewPanel = panel({
 	toggle({
 		issue: linksIssue,
 		id: 'github-link:misused',
+		issueCardDisplay: { label: 'GitHub Sponsors: Misused' },
 		label: 'Misused',
 	}),
 	toggle({
 		issue: linksIssue,
 		id: 'github-link:inaccessible',
+		issueCardDisplay: { label: 'GitHub Sponsors: Inaccessible' },
 		label: 'Inaccessible',
 	}),
 	linkSuggestionSection('github'),
@@ -411,11 +443,13 @@ export const koFiReviewPanel = panel({
 	toggle({
 		issue: linksIssue,
 		id: 'ko-fi-link:misused',
+		issueCardDisplay: { label: 'Ko-fi: Misused' },
 		label: 'Misused',
 	}),
 	toggle({
 		issue: linksIssue,
 		id: 'ko-fi-link:inaccessible',
+		issueCardDisplay: { label: 'Ko-fi: Inaccessible' },
 		label: 'Inaccessible',
 	}),
 	linkSuggestionSection('ko-fi'),
@@ -432,11 +466,13 @@ export const otherReviewPanel = panel({
 	toggle({
 		issue: linksIssue,
 		id: 'other-link:misused',
+		issueCardDisplay: { label: 'Other: Misused' },
 		label: 'Misused',
 	}),
 	toggle({
 		issue: linksIssue,
 		id: 'other-link:inaccessible',
+		issueCardDisplay: { label: 'Other: Inaccessible' },
 		label: 'Inaccessible',
 	}),
 	linkSuggestionSection('other'),

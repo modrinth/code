@@ -1,7 +1,7 @@
 <template>
-	<Section :heading="formatMessage(messages.icon)" :target="{ kind: 'icon' }">
+	<Section heading="Icon" :target="{ kind: 'icon' }">
 		<template #right>
-			<EditButton v-if="!editing" :section="formatMessage(messages.icon)" @click="startEditing" />
+			<EditButton v-if="!editing" section="Icon" @click="startEditing" />
 		</template>
 		<IconEdit v-if="editing" :key="projectId" @done="editing = false" />
 		<template v-else-if="project">
@@ -9,10 +9,10 @@
 				v-if="iconUrl"
 				type="button"
 				class="w-fit cursor-zoom-in rounded-xl border-0 bg-transparent p-0"
-				:aria-label="formatMessage(messages.openIcon)"
+				aria-label="View enlarged project icon"
 				@click="viewer?.show(0)"
 			>
-				<Avatar :src="project.icon_url || iconUrl" :alt="project.name" size="5rem" no-shadow />
+				<Avatar :src="project.raw_icon_url || iconUrl" :alt="project.name" size="5rem" no-shadow />
 			</button>
 			<Avatar v-else :alt="project.name" size="5rem" no-shadow />
 			<ImageViewerEditor
@@ -33,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-import { Avatar, ImageViewerEditor, useVIntl } from '@modrinth/ui'
+import { Avatar, ImageViewerEditor } from '@modrinth/ui'
 import { useEventListener } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
 
@@ -41,13 +41,11 @@ import { useModerationKeybinds } from '~/composables/moderation'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
 import ImageViewerActions from '../../image-viewer-actions.vue'
-import { projectReviewMessages as messages } from '../../messages'
 import { useReviewShortcut } from '../../shortcuts'
 import EditButton from '../edit/button.vue'
 import IconEdit from '../edit/icon.vue'
 import Section from '../section.vue'
 
-const { formatMessage } = useVIntl()
 const { project, projectId, pixelated } = injectProjectReviewPageContext()
 const viewer = ref<InstanceType<typeof ImageViewerEditor>>()
 const viewerOpen = ref(false)
