@@ -1,5 +1,6 @@
 use actix_web::guard::GuardContext;
 use actix_web::http::header::X_FORWARDED_FOR;
+use subtle::ConstantTimeEq;
 
 use crate::env::ENV;
 
@@ -8,27 +9,29 @@ pub const MEDAL_KEY_HEADER: &str = "X-Medal-Access-Key";
 pub const EXTERNAL_NOTIFICATION_KEY_HEADER: &str = "External-Notification-Key";
 pub const SUBSCRIPTIONS_KEY_HEADER: &str = "Modrinth-Subscriptions-Key";
 
-pub fn admin_key_guard(ctx: &GuardContext) -> bool {
+/// Checks that the header `name` matches `key`, comparing in constant time to
+/// avoid leaking the key through timing side channels.
+fn header_matches_key(ctx: &GuardContext, name: &str, key: &str) -> bool {
     ctx.head()
         .headers()
-        .get(ADMIN_KEY_HEADER)
-        .is_some_and(|it| it.as_bytes() == ENV.LABRINTH_ADMIN_KEY.as_bytes())
+        .get(name)
+        .is_some_and(|it| it.as_bytes().ct_eq(key.as_bytes()).into())
+}
+
+pub fn admin_key_guard(ctx: &GuardContext) -> bool {
+    header_matches_key(ctx, ADMIN_KEY_HEADER, &ENV.LABRINTH_ADMIN_KEY)
 }
 
 pub fn medal_key_guard(ctx: &GuardContext) -> bool {
-    ctx.head()
-        .headers()
-        .get(MEDAL_KEY_HEADER)
-        .is_some_and(|it| it.as_bytes() == ENV.LABRINTH_MEDAL_KEY.as_bytes())
+    header_matches_key(ctx, MEDAL_KEY_HEADER, &ENV.LABRINTH_MEDAL_KEY)
 }
 
 pub fn external_notification_key_guard(ctx: &GuardContext) -> bool {
-    ctx.head()
-        .headers()
-        .get(EXTERNAL_NOTIFICATION_KEY_HEADER)
-        .is_some_and(|it| {
-            it.as_bytes() == ENV.LABRINTH_EXTERNAL_NOTIFICATION_KEY.as_bytes()
-        })
+    header_matches_key(
+        ctx,
+        EXTERNAL_NOTIFICATION_KEY_HEADER,
+        &ENV.LABRINTH_EXTERNAL_NOTIFICATION_KEY,
+    )
 }
 
 pub fn subscriptions_key_guard(ctx: &GuardContext) -> bool {
@@ -37,12 +40,11 @@ pub fn subscriptions_key_guard(ctx: &GuardContext) -> bool {
         return false;
     }
 
-    ctx.head()
-        .headers()
-        .get(SUBSCRIPTIONS_KEY_HEADER)
-        .is_some_and(|it| {
-            it.as_bytes() == ENV.LABRINTH_SUBSCRIPTIONS_KEY.as_bytes()
-        })
+    header_matches_key(
+        ctx,
+        SUBSCRIPTIONS_KEY_HEADER,
+        &ENV.LABRINTH_SUBSCRIPTIONS_KEY,
+    )
 }
 
 pub fn internal_network_guard(ctx: &GuardContext) -> bool {
