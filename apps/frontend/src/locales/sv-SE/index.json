@@ -971,20 +971,11 @@
   "collection.button.discover-mods": {
     "message": "Upptäck moddar"
   },
-  "collection.button.edit-icon": {
-    "message": "Redigera-ikon"
-  },
   "collection.button.remove-icon": {
     "message": "Ta bort ikon"
   },
   "collection.button.remove-project": {
     "message": "Radera projektet"
-  },
-  "collection.button.replace-icon": {
-    "message": "Ersätt ikon"
-  },
-  "collection.button.select-icon": {
-    "message": "Välj ikon"
   },
   "collection.button.unfollow-project": {
     "message": "Sluta följa projektet"
@@ -1000,9 +991,6 @@
   },
   "collection.description.following": {
     "message": "Auto-genererad samling av projekten du följer."
-  },
-  "collection.editing": {
-    "message": "Redigerar samling"
   },
   "collection.error.not-found": {
     "message": "Samlingen hittades inte"

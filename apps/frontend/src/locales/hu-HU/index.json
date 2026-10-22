@@ -995,20 +995,11 @@
   "collection.button.discover-mods": {
     "message": "Modok böngészése"
   },
-  "collection.button.edit-icon": {
-    "message": "Ikon szerkesztése"
-  },
   "collection.button.remove-icon": {
     "message": "Ikon eltávolítása"
   },
   "collection.button.remove-project": {
     "message": "Projekt eltávolítása"
-  },
-  "collection.button.replace-icon": {
-    "message": "Ikon kicserélése"
-  },
-  "collection.button.select-icon": {
-    "message": "Ikon kiválasztása"
   },
   "collection.button.unfollow-project": {
     "message": "Projekt kikövetése"
@@ -1024,9 +1015,6 @@
   },
   "collection.description.following": {
     "message": "Az összes követett projekt automatikusan generált gyűjteménye."
-  },
-  "collection.editing": {
-    "message": "Gyűjtemény szerkesztése"
   },
   "collection.error.not-found": {
     "message": "Nincs ilyen gyűjtemény"

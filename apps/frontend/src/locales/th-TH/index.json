@@ -587,20 +587,11 @@
   "auth.verify-email.title": {
     "message": "ยืนยันอีเมล"
   },
-  "collection.button.edit-icon": {
-    "message": "แก้ไขไอคอน"
-  },
   "collection.button.remove-icon": {
     "message": "ลบไอคอน"
   },
   "collection.button.remove-project": {
     "message": "ลบโปรเจค"
-  },
-  "collection.button.replace-icon": {
-    "message": "เปลี่ยนไอคอน"
-  },
-  "collection.button.select-icon": {
-    "message": "เลือกรูปไอคอน"
   },
   "collection.button.unfollow-project": {
     "message": "เลิกติดตามโปรเจค"

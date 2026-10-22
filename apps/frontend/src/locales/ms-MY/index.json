@@ -719,20 +719,11 @@
   "collection.aria-label.upload-icon": {
     "message": "Muat naik ikon"
   },
-  "collection.button.edit-icon": {
-    "message": "Sunting ikon"
-  },
   "collection.button.remove-icon": {
     "message": "Alih keluar ikon"
   },
   "collection.button.remove-project": {
     "message": "Alih keluar projek"
-  },
-  "collection.button.replace-icon": {
-    "message": "Ganti ikon"
-  },
-  "collection.button.select-icon": {
-    "message": "Pilih ikon"
   },
   "collection.button.unfollow-project": {
     "message": "Nyahikut projek"
@@ -748,9 +739,6 @@
   },
   "collection.description.following": {
     "message": "Koleksi semua projek yang anda ikuti yang dijana secara automatik."
-  },
-  "collection.editing": {
-    "message": "Menyunting koleksi"
   },
   "collection.error.not-found": {
     "message": "Koleksi tidak dijumpai"

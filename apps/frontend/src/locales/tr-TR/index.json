@@ -971,20 +971,11 @@
   "collection.button.discover-mods": {
     "message": "Modları keşfedin"
   },
-  "collection.button.edit-icon": {
-    "message": "Simgeyi düzenle"
-  },
   "collection.button.remove-icon": {
     "message": "Simgeyi kaldır"
   },
   "collection.button.remove-project": {
     "message": "Projeyi kaldır"
-  },
-  "collection.button.replace-icon": {
-    "message": "Simgeyi değiştir"
-  },
-  "collection.button.select-icon": {
-    "message": "Simge seç"
   },
   "collection.button.unfollow-project": {
     "message": "Projeyi takip etmeyi bırak"
@@ -1000,9 +991,6 @@
   },
   "collection.description.following": {
     "message": "Takip ettiğin projelerden oluşturulmuş otomatik koleksiyon."
-  },
-  "collection.editing": {
-    "message": "Koleksiyon düzenleniyor"
   },
   "collection.error.not-found": {
     "message": "Koleksiyon bulunamadı"
