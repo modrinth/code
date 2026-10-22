@@ -19,6 +19,16 @@ export const WORKBENCH_VARIANTS = ['square', 'rounded'] as const
 
 export type WorkbenchVariant = (typeof WORKBENCH_VARIANTS)[number]
 
+/**
+ * What becomes of popped out panels when the page is opened again: `close` returns them to the
+ * main window, `prompt` returns them while offering to reopen their windows, and `preserve`
+ * reopens their windows (on the next click, when the browser won't open them unprompted).
+ */
+export type WorkbenchPopoutRestore = 'close' | 'prompt' | 'preserve'
+
+/** What the region toggles do: hide their regions, or collapse them to a strip of their tabs. */
+export type WorkbenchToggleAction = 'hide' | 'collapse'
+
 /** Where the region toggles sit: in the layout menu, or also in the corners of the center's tab bars. */
 export type WorkbenchToggleLocation = 'menu' | 'tabs'
 
@@ -38,6 +48,32 @@ export interface WorkbenchPanel {
 	 * wanted now and then. Needs a mode whose panels can be closed.
 	 */
 	closedByDefault?: boolean
+	/**
+	 * Panels of a dock sharing a group start out as tabs of one group, and each group of the dock
+	 * in its own split, below the ones before it. Without one, a panel joins the dock's active group.
+	 * Only decides where panels start, before the user arranges them.
+	 */
+	group?: string
+	/**
+	 * Set on a linked tab, made by the workbench when the user links panels: the panels it shows
+	 * split within it, as if they were one.
+	 */
+	members?: WorkbenchPanel[]
+}
+
+/** Where panels split off from their group go, beside it. */
+export type WorkbenchSplitSide = 'left' | 'right' | 'top' | 'bottom'
+
+/** How a linked tab splits its panels: one above the other, or side by side. */
+export type WorkbenchLinkOrientation = 'vertical' | 'horizontal'
+
+/** Panels the user linked into a single tab, splitting it between them. */
+export interface WorkbenchLink {
+	id: string
+	members: string[]
+	orientation: WorkbenchLinkOrientation
+	/** Each member's share of the tab, in order; even shares without them. */
+	sizes?: number[]
 }
 
 export interface WorkbenchPopoutOptions {
@@ -82,7 +118,7 @@ export const WORKBENCH_MODES = {
 		toolbar: true,
 		cornerToggles: false,
 		headerless: [],
-		tabSelection: false,
+		tabSelection: true,
 	},
 	review: {
 		regions: ['left', 'right'],
@@ -110,6 +146,8 @@ export interface WorkbenchDocuments {
 	tabComponents: Record<string, Component>
 	/** Shown at the end of a group's tab bar, e.g. a list of every open document. */
 	headerActions?: Component
+	/** Whether tab bars offer their add menu, e.g. per the owner's "new tab button" setting. */
+	addMenuShown?: () => boolean
 	/** Opening a new document in a group, offered first by each tab bar's add menu. */
 	create?: {
 		label: () => string

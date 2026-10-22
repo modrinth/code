@@ -57,7 +57,11 @@
 			v-else
 			class="min-h-0 flex-1 overflow-y-auto overscroll-contain p-1 [--files-table-header-top:0px]"
 		>
-			<FileListing :view="view" @navigate="navigate" />
+			<FileTree
+				v-if="ui.browsing.value === 'tree' && !view.searchQuery.value"
+				:root="view.location.value.path"
+			/>
+			<FileListing v-else :view="view" @navigate="navigate" />
 		</div>
 	</div>
 	<FileEditor
@@ -91,6 +95,7 @@ import { infoFrom, parentInfoFrom } from '../../utils'
 import FileEditor from '../editor/FileEditor.vue'
 import FileListing from '../FileListing.vue'
 import FileNavbar from '../FileNavbar.vue'
+import FileTree from '../FileTree.vue'
 
 const props = defineProps<{
 	params: {

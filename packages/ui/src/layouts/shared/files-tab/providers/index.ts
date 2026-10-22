@@ -1,3 +1,4 @@
+export { injectFileBrowserUI } from './file-browser-ui'
 export type {
 	DirectoryResult,
 	DirectoryTree,

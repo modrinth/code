@@ -11,8 +11,10 @@ export const SlotOutlet = defineComponent({
 	props: {
 		slots: { type: Object as PropType<Slots>, required: true },
 		name: { type: String, required: true },
+		/** Props handed to the slot, as a scoped slot's are. */
+		slotProps: { type: Object as PropType<Record<string, unknown>>, default: undefined },
 	},
 	setup(props) {
-		return () => renderSlot(props.slots, props.name)
+		return () => renderSlot(props.slots, props.name, props.slotProps)
 	},
 })

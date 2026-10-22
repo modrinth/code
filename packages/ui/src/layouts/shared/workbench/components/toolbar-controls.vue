@@ -14,6 +14,7 @@
 <script setup lang="ts">
 import {
 	LayoutTemplateIcon,
+	MonitorXIcon,
 	PanelLeftOpenIcon,
 	PanelRightOpenIcon,
 	PanelTopIcon,
@@ -28,8 +29,8 @@ import { injectWorkbench } from '../providers/workbench'
 import type { WorkbenchRegion } from '../types'
 
 /**
- * The layout menu: showing and hiding each region, opening and closing panels, and resetting the
- * layout to its defaults.
+ * The layout menu: showing and hiding each region, opening and closing panels, returning popped
+ * out panels, and resetting the layout to its defaults.
  */
 const { formatMessage } = useVIntl()
 const workbench = injectWorkbench()
@@ -41,6 +42,7 @@ const messages = defineMessages({
 	right: { id: 'workbench.layout-menu.right', defaultMessage: 'Right panel' },
 	bottom: { id: 'workbench.layout-menu.bottom', defaultMessage: 'Bottom panel' },
 	resetLayout: { id: 'workbench.reset-layout', defaultMessage: 'Reset layout' },
+	closePopouts: { id: 'workbench.close-popouts', defaultMessage: 'Close popout windows' },
 })
 
 const regionIcons = {
@@ -67,10 +69,21 @@ const options = computed<ButtonMenuOption[]>(() => [
 		? [{ type: 'divider' as const, id: 'panels-divider' }, ...workbench.panelsMenuOptions.value]
 		: []),
 	{ type: 'divider', id: 'reset-divider' },
+	...(workbench.hasPopouts.value
+		? [
+				{
+					id: 'close-popouts',
+					label: formatMessage(messages.closePopouts),
+					icon: MonitorXIcon,
+					action: () => workbench.closePopouts(),
+				},
+			]
+		: []),
 	{
 		id: 'reset-layout',
 		label: formatMessage(messages.resetLayout),
 		icon: UndoIcon,
+		disabled: workbench.poppingOut.value.length > 0,
 		action: () => workbench.resetLayout(),
 	},
 ])

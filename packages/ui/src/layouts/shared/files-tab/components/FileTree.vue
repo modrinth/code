@@ -84,6 +84,11 @@ const messages = defineMessages({
 	},
 })
 
+const props = defineProps<{
+	/** The folder whose contents the tree shows, the root by default. */
+	root?: string
+}>()
+
 const ui = injectFileBrowserUI()
 const tree = ui.directoryTree
 
@@ -158,7 +163,7 @@ function collectRows(path: string, depth: number): TreeRow[] {
 	return rows
 }
 
-const rows = computed(() => collectRows(ROOT_PATH, 0))
+const rows = computed(() => collectRows(props.root ?? ROOT_PATH, 0))
 
 function setExpanded(path: string, expanded: boolean) {
 	const current = tree.expandedEntries.value
@@ -172,7 +177,21 @@ function toggleExpanded(item: FileItem) {
 	setExpanded(item.path, !expandedPaths.value.has(item.path))
 }
 
+/**
+ * Opens a row's entry. Unless folders are listed in tabs, the tree is how they're browsed, so a
+ * folder only expands or collapses; with trees in tabs, files open in tabs of their own, leaving
+ * the tree's tab as it is.
+ */
 function openDirectory(item: FileItem) {
+	const browsing = ui.browsing.value
+	if (browsing !== 'listing' && item.type === 'directory') {
+		if (isExpandable(item)) toggleExpanded(item)
+		return
+	}
+	if (browsing === 'tree') {
+		ui.revealInTab(item)
+		return
+	}
 	if (isExpandable(item)) setExpanded(item.path, true)
 	ui.navigateTo(item)
 }

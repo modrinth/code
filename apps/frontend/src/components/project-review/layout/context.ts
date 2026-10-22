@@ -11,20 +11,28 @@ export interface ProjectReviewContext {
 	/** How wide the right panel is shown, 0 while hidden. */
 	visibleRightWidth: Ref<number>
 	toggleSidebar: (side: 'left' | 'right') => void
-	/** Shows a side panel, or brings a tab to the front (in its own window, if popped out). */
+	/** Item counts shown in the panels' tabs, e.g. how many issues there are. */
+	counts: ComputedRef<Partial<Record<ProjectReviewSlot, number>>>
+	/** Brings a panel to the front of its group, showing its region (or its window, if popped out). */
 	revealSlot: (slot: ProjectReviewSlot) => void
+	/** Hides a panel shown in view, or else reveals it. */
+	toggleSlot: (slot: ProjectReviewSlot) => void
+	/**
+	 * Toggles the settings: their panel while it's open, or else their floating window, which
+	 * leaves whichever panel is in front where it is.
+	 */
+	toggleSettings: () => void
+	/** Moves the settings out of their floating window into their panel. */
+	settingsAsPanel: () => void
+	/** Moves the settings out of their panel into their floating window. */
+	settingsAsWindow: () => void
 	openTab: (tab: ProjectReviewTab) => void
 	/** Brings the first tab of every group to the front. */
 	resetActiveTabs: () => void
-	resetPanelLayout: () => void
 	selectedTabs: Ref<readonly string[]>
-	hasPopouts: ComputedRef<boolean>
 	detachedTabs: ComputedRef<string[]>
-	poppingOut: ComputedRef<string[]>
 	popoutTab: (tab: ProjectReviewTab) => void
 	dockTab: (tab: ProjectReviewTab) => void
-	/** Returns every popped out tab to the main window. */
-	closeExternalPanels: () => void
 }
 
 export const [injectProjectReviewContext, provideProjectReviewContext] =

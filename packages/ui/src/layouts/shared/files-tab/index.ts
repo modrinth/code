@@ -1,4 +1,5 @@
 export { default as FileWorkbench } from './components/FileWorkbench.vue'
+export { useFileDocuments } from './composables/file-documents'
 export { default as FilePageLayout } from './layout.vue'
 export * from './providers'
 export * from './settings'

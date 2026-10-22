@@ -5,7 +5,7 @@ import { createContext } from '#ui/providers/create-context'
 
 import type { DirectoryView } from '../composables/directory-view'
 import type { FileTabs } from '../composables/file-tabs'
-import type { FilesSidebarToggleLocation } from '../settings'
+import type { FilesBrowsing, FilesSidebarToggleLocation } from '../settings'
 import type { FileItem } from '../types'
 import type {
 	FileContentVariants,
@@ -72,6 +72,12 @@ export interface FileBrowserUIContext extends FileManagerContext {
 	) => void
 	/** Whether the tab strip offers a button for opening a new tab. */
 	showNewTabButton: ComputedRef<boolean>
+	/** The user's "new tab button" setting, which also shows a workbench's add menus. */
+	newTabButton: ComputedRef<boolean>
+	/** How folders are browsed: in tabs listing them, in the sidebar alone, or in tabs of trees. */
+	browsing: ComputedRef<FilesBrowsing>
+	/** Brings forward a tab already on the entry, or opens one for it. */
+	revealInTab: (item: FileInfo) => void
 	/** Where the user keeps the button for showing and hiding the folder tree. */
 	sidebarToggleLocation: ComputedRef<FilesSidebarToggleLocation>
 	setSidebarToggleLocation: (location: FilesSidebarToggleLocation) => void

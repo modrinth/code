@@ -1,7 +1,7 @@
 .dockview-theme-modrinth {
 	--dv-group-view-background-color: var(--surface-2);
 	--dv-tabs-and-actions-container-background-color: var(--surface-3);
-	--dv-tabs-and-actions-container-height: 2.5rem;
+	--dv-tabs-and-actions-container-height: 2.25rem;
 	--dv-tabs-and-actions-container-font-size: 0.875rem;
 	--dv-activegroup-visiblepanel-tab-background-color: var(--surface-2);
 	--dv-activegroup-hiddenpanel-tab-background-color: var(--surface-3);
@@ -18,6 +18,53 @@
 	--dv-drag-over-background-color: var(--color-brand-highlight);
 	--dv-active-sash-color: var(--color-brand);
 	--dv-tabs-container-scrollbar-color: var(--surface-5);
+}
+
+/*
+ * Dockview marks shown split views with a `visible` class, which Tailwind's utility of the same
+ * name would make visible even within a hidden panel (e.g. a workbench nested in an inactive tab).
+ */
+.dv-view.visible {
+	visibility: inherit;
+}
+
+.workbench-root .dv-groupview {
+	position: relative;
+}
+
+.workbench-tab-bar-handle {
+	position: absolute;
+	top: 0;
+	right: 1rem;
+	z-index: 10;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 2.5rem;
+	height: 0.875rem;
+	padding: 0;
+	border: 1px solid var(--surface-5);
+	border-top: none;
+	border-radius: 0 0 0.5rem 0.5rem;
+	background-color: var(--surface-3);
+	color: var(--color-text-default);
+	cursor: pointer;
+	opacity: 0.6;
+}
+
+.workbench-tab-bar-handle:hover,
+.workbench-tab-bar-handle:focus-visible {
+	opacity: 1;
+	color: var(--color-contrast);
+}
+
+.workbench-tab-bar-handle svg {
+	width: 0.875rem;
+	height: 0.875rem;
+}
+
+.workbench-tab-bar-handle.is-pulled-down svg {
+	transform: rotate(180deg);
 }
 
 .dv-tab {
@@ -102,7 +149,7 @@
 	--dv-inactivegroup-hiddenpanel-tab-color: var(--color-text-default);
 	--dv-icon-hover-background-color: var(--surface-3);
 	--dv-tab-divider-color: transparent;
-	--dv-tabs-and-actions-container-height: 32px;
+	--dv-tabs-and-actions-container-height: 28px;
 	--dv-tabs-and-actions-container-font-size: 14px;
 	--dv-drag-over-background-color: color-mix(in srgb, var(--color-text-default) 5%, transparent);
 	--dv-drag-over-border-color: color-mix(in srgb, var(--color-text-default) 10%, transparent);
@@ -113,15 +160,25 @@
 	background-color: var(--surface-1);
 }
 
-.workbench-rounded .workbench-panel {
+.workbench-rounded .workbench-panel,
+.workbench-rounded .workbench-toolbar,
+.workbench-rounded .workbench-collapsed-strip {
 	background-color: var(--surface-1);
+}
+
+.workbench-rounded .workbench-toolbar {
+	border-color: var(--color-divider);
+}
+
+.workbench-square .workbench-collapsed-strip {
+	background-color: var(--surface-3);
 }
 
 .workbench-rounded .dv-tab {
 	height: var(--dv-tabs-and-actions-container-height);
 	padding: 0;
 	border: none;
-	border-radius: 10px;
+	border-radius: 0.5rem;
 }
 
 .workbench-rounded .dv-drop-target-container {
@@ -136,7 +193,7 @@
 	height: auto;
 	min-height: var(--dv-tabs-and-actions-container-height);
 	align-items: flex-start;
-	padding: 12px 6px 0 10px;
+	padding: 9px 6px 9px 6px;
 	gap: 4px;
 }
 
@@ -167,7 +224,7 @@
 
 .workbench-rounded .dv-tab:focus-visible::after,
 .workbench-rounded .dv-tab:has(:focus-visible)::after {
-	border-radius: 10px;
+	border-radius: 0.5rem;
 	box-shadow: 0 0 0 4px var(--color-brand-shadow);
 }
 

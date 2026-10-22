@@ -1,5 +1,11 @@
-import { defineSetting, type SettingGroup, useLocalSettings } from '#ui/components/settings'
+import {
+	defineSetting,
+	type SettingGroup,
+	type SettingsStore,
+	useLocalSettings,
+} from '#ui/components/settings'
 import { defineMessages } from '#ui/composables/i18n'
+import { createContext } from '#ui/providers/create-context'
 
 /** How formatted JSON is indented: with tabs, or with the given number of spaces. */
 export type FilesJsonIndent = 'tab' | '2' | '4'
@@ -8,6 +14,13 @@ export type FilesJsonIndent = 'tab' | '2' | '4'
 export function jsonIndentOf(indent: FilesJsonIndent) {
 	return indent === 'tab' ? '\t' : Number(indent)
 }
+
+/**
+ * How folders are browsed: `listing` opens them in tabs listing their contents, `sidebar` browses
+ * them in the sidebar's tree alone (tabs only showing files), and `tree` opens them in tabs showing
+ * their tree, in place of the sidebar.
+ */
+export type FilesBrowsing = 'listing' | 'sidebar' | 'tree'
 
 /** Where the folder tree's button sits: atop the tree, or in the navigation of each tab. */
 export type FilesSidebarToggleLocation = 'sidebar' | 'navigation'
@@ -32,7 +45,8 @@ const messages = defineMessages({
 	newTabButton: { id: 'files.settings.new-tab-button', defaultMessage: 'New tab button' },
 	newTabButtonDescription: {
 		id: 'files.settings.new-tab-button-description',
-		defaultMessage: 'Show a button for opening a new tab beside the file tabs.',
+		defaultMessage:
+			'Show a button beside the tabs for opening a new tab, or bringing in a panel where the layout allows it.',
 	},
 	formatJson: { id: 'files.settings.format-json', defaultMessage: 'Format JSON files' },
 	formatJsonDescription: {
@@ -48,6 +62,15 @@ const messages = defineMessages({
 	jsonIndentTab: { id: 'files.settings.json-indent.tab', defaultMessage: 'Tabs' },
 	jsonIndentTwo: { id: 'files.settings.json-indent.two', defaultMessage: '2 spaces' },
 	jsonIndentFour: { id: 'files.settings.json-indent.four', defaultMessage: '4 spaces' },
+	browsing: { id: 'files.settings.browsing', defaultMessage: 'Browse folders' },
+	browsingDescription: {
+		id: 'files.settings.browsing-description',
+		defaultMessage:
+			"Open folders in tabs listing their contents, browse them in the sidebar's tree alone with tabs only for files, or open them in tabs showing their tree in place of the sidebar. Kept for each place files are browsed.",
+	},
+	browsingListing: { id: 'files.settings.browsing.listing', defaultMessage: 'Folder listings' },
+	browsingSidebar: { id: 'files.settings.browsing.sidebar', defaultMessage: 'Sidebar only' },
+	browsingTree: { id: 'files.settings.browsing.tree', defaultMessage: 'Folder trees' },
 	sidebarToggle: { id: 'files.settings.sidebar-toggle', defaultMessage: 'Folder tree button' },
 	sidebarToggleSidebar: {
 		id: 'files.settings.sidebar-toggle.sidebar',
@@ -136,3 +159,55 @@ export function useFilesTabSettings() {
 		initOnMounted: true,
 	})
 }
+
+/**
+ * How folders are browsed in one place files are browsed, kept apart from other places' under its
+ * name, and starting out as that place prefers.
+ */
+function filesBrowsingSetting(workspace: string, fallback: FilesBrowsing) {
+	return defineSetting.enum<FilesBrowsing>({
+		id: 'browsing',
+		storageKey: `files-setting:${workspace}:folders`,
+		title: messages.browsing,
+		description: messages.browsingDescription,
+		default: fallback,
+		display: 'chips',
+		entries: [
+			{ value: 'listing', label: messages.browsingListing },
+			{ value: 'sidebar', label: messages.browsingSidebar },
+			{ value: 'tree', label: messages.browsingTree },
+		],
+	})
+}
+
+/** The files layout's settings in one place files are browsed, including those kept per place. */
+export interface FilesWorkspaceSettings {
+	store: SettingsStore
+	browsing: ReturnType<typeof filesBrowsingSetting>
+	groups: SettingGroup[]
+}
+
+/**
+ * The files layout's settings as one place files are browsed (e.g. the archive viewer's page) sees
+ * them: the shared ones, and how folders are browsed there, defaulting as that place prefers.
+ */
+export function useFilesWorkspaceSettings(
+	workspace: string,
+	defaults: { browsing: FilesBrowsing },
+): FilesWorkspaceSettings {
+	const browsing = filesBrowsingSetting(workspace, defaults.browsing)
+	return {
+		store: useLocalSettings([...Object.values(filesTabSettings), browsing], {
+			prefix: 'files-setting:',
+			initOnMounted: true,
+		}),
+		browsing,
+		groups: filesTabSettingGroups.map((group) => ({
+			...group,
+			settings: [browsing, ...group.settings],
+		})),
+	}
+}
+
+export const [injectFilesWorkspaceSettings, provideFilesWorkspaceSettings] =
+	createContext<FilesWorkspaceSettings>('FilePageLayout', 'filesWorkspaceSettings')

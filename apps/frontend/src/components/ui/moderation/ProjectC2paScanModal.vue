@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CoffeeIcon, ExternalIcon } from '@modrinth/assets'
+import { ExternalIcon, FolderArchiveIcon } from '@modrinth/assets'
 import {
 	Button,
 	ButtonLink,
@@ -10,11 +10,12 @@ import {
 } from '@modrinth/ui'
 import { ref, useTemplateRef } from 'vue'
 
+import { archiveViewerUrl } from '~/helpers/archive-viewer'
 import { fileDeclaresAi } from '~/helpers/c2pa.ts'
-import { injectReviewSlicer, slicerFileName } from '~/providers/project-review/review-slicer'
+import { injectReviewArchive } from '~/providers/project-review/review-archive'
 
 const modalRef = useTemplateRef<InstanceType<typeof NewModal>>('modalRef')
-const slicer = injectReviewSlicer(null)
+const archive = injectReviewArchive(null)
 const isScanning = ref(false)
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -100,13 +101,13 @@ async function scanFiles(urls: string[]) {
 	}
 }
 
-function createSlicerUrl(file: { url: string; path: string }) {
-	return `https://slicer.run/?file=${encodeURIComponent(`${slicerFileName(file.url)}/${file.path}`)}&url=${encodeURIComponent(file.url)}`
+function createArchiveUrl(file: { url: string; path: string }) {
+	return archiveViewerUrl({ url: file.url, file: file.path })
 }
 
-function openInSlicerTab(file: { url: string; path: string }) {
-	if (!slicer) return
-	slicer.open([file.url], `${slicerFileName(file.url)}/${file.path}`)
+function openInArchivePanels(file: { url: string; path: string }) {
+	if (!archive) return
+	archive.open(file.url, file.path)
 	hide()
 }
 
@@ -152,8 +153,10 @@ defineExpose({ openC2paModal, hide })
 					>
 						{{ file.path }}
 						<span class="break-all text-xs text-secondary">{{ file.url }}</span>
-						<Button v-if="slicer" @click="openInSlicerTab(file)"> Open <CoffeeIcon /> </Button>
-						<ButtonLink v-else :href="createSlicerUrl(file)" target="_blank">
+						<Button v-if="archive" @click="openInArchivePanels(file)">
+							Open <FolderArchiveIcon />
+						</Button>
+						<ButtonLink v-else :href="createArchiveUrl(file)" target="_blank">
 							Open <ExternalIcon />
 						</ButtonLink>
 					</div>

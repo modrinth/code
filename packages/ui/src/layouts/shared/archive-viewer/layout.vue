@@ -1,87 +1,63 @@
 <template>
 	<div class="flex h-full min-h-0 w-full flex-col">
-		<ArchiveWorkbench
-			v-if="stage === 'ready' && root && handler && source"
-			:key="root.key"
-			:root="root"
-			:handler="handler"
+		<ArchiveSession
+			v-slot="{ opened }"
 			:source="source"
 			:path="path"
-			:storage-key="storageKey"
-			:hidden-regions="hiddenRegions"
-			:popout-url="popoutUrl"
-			@navigate="(value) => emit('update:path', value)"
+			:retain="retain"
+			@update:path="(value) => emit('update:path', value)"
 		>
-			<template #toolbar>
-				<slot name="toolbar" />
+			<ArchiveWorkbench
+				v-if="opened"
+				:storage-key="storageKey"
+				:hidden-regions="hiddenRegions"
+				:popout-url="popoutUrl"
+			>
+				<template #toolbar>
+					<slot name="toolbar" />
+					<ArchiveProgress />
+				</template>
+				<template #toolbar-end>
+					<ArchiveSettings />
+				</template>
+				<template v-if="slots['project-details']" #project-details>
+					<slot name="project-details" />
+				</template>
+				<template v-if="slots.empty" #empty>
+					<slot name="empty" />
+				</template>
+			</ArchiveWorkbench>
+			<template v-else>
 				<div
-					v-if="!fullyLoaded || fetching"
-					class="flex items-center gap-1.5 text-xs text-secondary"
-					role="status"
+					class="flex min-h-10 shrink-0 flex-wrap items-center gap-2 border-0 border-b border-solid border-surface-5 bg-surface-3 px-2 py-1"
 				>
-					<SpinnerIcon class="size-3.5 animate-spin" aria-hidden="true" />
-					{{ formatMessage(fullyLoaded ? messages.fetchingRest : messages.readingNested) }}
-					<span v-if="fetchedLabel" class="tabular-nums">({{ fetchedLabel }})</span>
+					<slot name="toolbar" />
+				</div>
+				<div class="min-h-0 flex-1 overflow-auto p-4">
+					<ArchiveStatus>
+						<template v-if="slots.empty" #empty>
+							<slot name="empty" />
+						</template>
+					</ArchiveStatus>
 				</div>
 			</template>
-			<template #toolbar-end>
-				<ArchiveSettings />
-			</template>
-			<template v-if="slots['project-details']" #project-details>
-				<slot name="project-details" />
-			</template>
-		</ArchiveWorkbench>
-		<template v-else>
-			<div
-				class="flex min-h-10 shrink-0 flex-wrap items-center gap-2 border-0 border-b border-solid border-surface-5 bg-surface-3 px-2 py-1"
-			>
-				<slot name="toolbar" />
-			</div>
-			<div class="min-h-0 flex-1 overflow-auto p-4">
-				<Admonition
-					v-if="stage === 'error'"
-					type="critical"
-					:header="formatMessage(messages.errorTitle, { name: source?.name ?? '' })"
-					:body="error?.message"
-				>
-					<template #actions>
-						<Button @click="retry">
-							<RefreshCwIcon aria-hidden="true" />
-							{{ formatMessage(commonMessages.retryButton) }}
-						</Button>
-					</template>
-				</Admonition>
-				<Admonition
-					v-else-if="stage === 'reading'"
-					type="info"
-					:header="formatMessage(messages.reading, { name: source?.name ?? '' })"
-					:body="formatMessage(messages.readingDescription)"
-					waiting
-				/>
-				<slot v-else name="empty" />
-			</div>
-		</template>
+		</ArchiveSession>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { RefreshCwIcon, SpinnerIcon } from '@modrinth/assets'
-import { computed, toRef, type VNode } from 'vue'
+import type { VNode } from 'vue'
 
-import Admonition from '#ui/components/base/Admonition.vue'
-import { Button } from '#ui/components/base/buttons'
-import { useFormatBytes } from '#ui/composables/format-bytes'
-import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import type { WorkbenchRegion } from '#ui/layouts/shared/workbench/types'
-import { commonMessages } from '#ui/utils/common-messages'
 
 import ArchiveSettings from './components/archive-settings-button.vue'
+import ArchiveProgress from './components/ArchiveProgress.vue'
+import ArchiveSession from './components/ArchiveSession.vue'
+import ArchiveStatus from './components/ArchiveStatus.vue'
 import ArchiveWorkbench from './components/ArchiveWorkbench.vue'
-import { useArchiveLoader } from './composables/archive-loader'
-import { injectArchiveSettings, provideArchiveSettings, useStoredArchiveSettings } from './settings'
 import type { ArchiveSource } from './types'
 
-const props = withDefaults(
+withDefaults(
 	defineProps<{
 		source: ArchiveSource | null
 		/** Path of the entry open within the archive, without a leading slash. */
@@ -116,56 +92,4 @@ const slots = defineSlots<{
 	/** Shown while there's no archive to open. */
 	empty?: () => VNode[]
 }>()
-
-const { formatMessage } = useVIntl()
-const formatBytes = useFormatBytes()
-
-provideArchiveSettings(injectArchiveSettings(null) ?? useStoredArchiveSettings())
-
-const messages = defineMessages({
-	reading: {
-		id: 'archive-viewer.reading',
-		defaultMessage: 'Reading {name}',
-	},
-	readingDescription: {
-		id: 'archive-viewer.reading-description',
-		defaultMessage: "Fetching the archive's index. Files are fetched as they are opened.",
-	},
-	readingNested: {
-		id: 'archive-viewer.reading-nested',
-		defaultMessage: 'Reading nested archives...',
-	},
-	fetchingRest: {
-		id: 'archive-viewer.fetching-rest',
-		defaultMessage: 'Fetching the rest of the archive...',
-	},
-	fetchedProgress: {
-		id: 'archive-viewer.fetched-progress',
-		defaultMessage: '{loaded} of {total} fetched',
-	},
-	errorTitle: {
-		id: 'archive-viewer.error-title',
-		defaultMessage: 'Unable to open {name}',
-	},
-})
-
-const { stage, progress, error, root, handler, fullyLoaded, retry } = useArchiveLoader(
-	toRef(props, 'source'),
-	{ retain: props.retain },
-)
-
-/** Whether the rest of the archive is still being fetched in the background. */
-const fetching = computed(() => {
-	const { loaded, total } = progress.value
-	return total != null && loaded < total
-})
-
-const fetchedLabel = computed(() => {
-	const { loaded, total } = progress.value
-	if (!loaded || !total) return null
-	return formatMessage(messages.fetchedProgress, {
-		loaded: formatBytes(loaded),
-		total: formatBytes(total),
-	})
-})
 </script>

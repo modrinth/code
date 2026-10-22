@@ -1,7 +1,7 @@
 <template>
 	<div
 		:data-workbench-panel="id"
-		class="group flex h-full items-center gap-1.5 text-sm"
+		class="group flex h-full items-center gap-1 text-sm"
 		:class="tabClass"
 		:title="rounded ? undefined : panel?.title"
 		@auxclick.prevent="(event) => event.button === 1 && canClose && close()"
@@ -24,19 +24,18 @@
 			/>
 			<span class="truncate" :class="titleClass">{{ panel?.title }}</span>
 		</template>
-		<IconButton
+		<button
 			v-if="canClose"
-			type="quiet"
-			size="xs"
-			:label="formatMessage(messages.close, { name: panel?.title ?? id })"
-			class="shrink-0 opacity-0 focus-visible:opacity-100 group-hover:opacity-100"
+			type="button"
+			:aria-label="formatMessage(messages.close, { name: panel?.title ?? id })"
+			class="flex size-4 shrink-0 cursor-pointer items-center justify-center rounded border-0 bg-transparent p-0 text-current opacity-0 hover:bg-surface-5 focus-visible:opacity-100 group-hover:opacity-100"
 			:class="{ 'opacity-100': isActive }"
 			@pointerdown.stop
 			@mousedown.stop
 			@click.stop="close"
 		>
-			<XIcon aria-hidden="true" />
-		</IconButton>
+			<XIcon class="size-3" aria-hidden="true" />
+		</button>
 	</div>
 </template>
 
@@ -45,7 +44,6 @@ import { XIcon } from '@modrinth/assets'
 import type { DockviewPanelApi } from 'dockview-vue'
 import { computed, onBeforeUnmount, ref } from 'vue'
 
-import { IconButton } from '#ui/components/base/buttons'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 
 import type { WorkbenchPanelParams } from '../../composables/create-workbench'
@@ -86,15 +84,15 @@ onBeforeUnmount(() => visibility.dispose())
 const tabClass = computed(() =>
 	rounded.value
 		? [
-				'box-border w-full justify-center whitespace-nowrap rounded-[10px] border border-solid px-2.5 font-medium transition-all active:scale-[0.97] motion-reduce:transition-none',
+				'box-border w-full justify-center whitespace-nowrap rounded-lg border border-solid px-2 font-medium transition-all active:scale-[0.97] motion-reduce:transition-none',
 				isActive.value
 					? 'border-green bg-highlight-green text-green'
 					: 'border-transparent bg-transparent text-primary hover:bg-surface-3',
 				{ 'ring-1 ring-inset ring-primary': isSelected.value },
 			]
 		: [
-				'max-w-[14rem] pl-3',
-				canClose.value ? 'pr-1' : 'pr-3',
+				'max-w-[14rem] pl-2.5',
+				canClose.value ? 'pr-1.5' : 'pr-2.5',
 				{ 'bg-surface-3': isSelected.value },
 			],
 )

@@ -74,6 +74,13 @@ export interface FileTabsOptions {
 	 * add the panels that are missing and drop ones for tabs that no longer exist.
 	 */
 	mode?: 'managed' | 'shared'
+	/**
+	 * Whether tabs can show folders, listing their contents. Without (e.g. when folders are browsed
+	 * in the tree instead), tabs only show files and any folder opened goes to `revealDirectory`.
+	 */
+	directories?: MaybeRefOrGetter<boolean>
+	/** Shows a folder that was opened while tabs don't show folders, e.g. in the tree. */
+	revealDirectory?: (location: FileInfo) => void
 }
 
 export interface OpenTabOptions {
@@ -103,6 +110,8 @@ export interface FileTabs {
 	canGoBackIn: (tabId: string) => boolean
 	canGoForwardIn: (tabId: string) => boolean
 	openTab: (location: FileInfo, options?: OpenTabOptions) => void
+	/** Brings forward a tab already on the location, or else opens one for it. */
+	revealTab: (location: FileInfo) => void
 	activateTab: (id: string) => void
 	closeTab: (id: string) => Promise<void>
 	closeOtherTabs: (id: string) => Promise<void>
@@ -322,6 +331,7 @@ export function useFileTabs(options: FileTabsOptions): FileTabs {
 				clearTimeout(pendingTimeout)
 				return
 			}
+			if (divertDirectory(location)) return
 			if (activeTab.value) {
 				pushLocation(activeTab.value, location)
 			} else {
@@ -331,11 +341,34 @@ export function useFileTabs(options: FileTabsOptions): FileTabs {
 		{ flush: 'post' },
 	)
 
+	function directoriesShown() {
+		return toValue(options.directories) ?? true
+	}
+
+	/** Hands a folder to `revealDirectory` while tabs don't show folders, `true` if it did. */
+	function divertDirectory(location: FileInfo) {
+		if (location.type !== 'directory' || directoriesShown()) return false
+		options.revealDirectory?.(location)
+		return true
+	}
+
+	watch(directoriesShown, (shown) => {
+		if (shown) return
+		for (const tab of [...tabs.value]) {
+			if (currentLocation(tab).type === 'directory') removeTab(tab)
+		}
+	})
+
 	/**
 	 * Swaps in a workspace's persisted tabs, or a single tab at the context's location when there
 	 * are none. A location the host was opened at (e.g. a deep link) wins over the restored one.
 	 */
 	function restoreWorkspace(state: FileWorkspaceState | null) {
+		if (!state && !directoriesShown() && contextLocation.value.type === 'directory') {
+			tabs.value = []
+			activeTabId.value = ''
+			return
+		}
 		if (!state) {
 			const tab = createTab(contextLocation.value)
 			tabs.value = [tab]
@@ -343,12 +376,16 @@ export function useFileTabs(options: FileTabsOptions): FileTabs {
 			return
 		}
 
-		tabs.value = state.tabs
-		activeTabId.value = state.activeTabId
+		tabs.value = directoriesShown()
+			? state.tabs
+			: state.tabs.filter((tab) => currentLocation(tab).type !== 'directory')
+		activeTabId.value = tabs.value.some((tab) => tab.id === state.activeTabId)
+			? state.activeTabId
+			: (tabs.value[0]?.id ?? '')
 
 		const location = contextLocation.value
 		const tab = activeTab.value
-		if (!isRootDirectory(location)) {
+		if (!isRootDirectory(location) && !divertDirectory(location)) {
 			if (tab) {
 				pushLocation(tab, location)
 			} else {
@@ -384,6 +421,7 @@ export function useFileTabs(options: FileTabsOptions): FileTabs {
 	}
 
 	async function navigate(location: FileInfo) {
+		if (divertDirectory(location)) return
 		const tab = activeTab.value
 		if (!tab) {
 			openTab(location)
@@ -393,6 +431,8 @@ export function useFileTabs(options: FileTabsOptions): FileTabs {
 			if (!(await confirmLeave(tab))) return
 			pushLocation(tab, location)
 		}
+		const panel = findPanel(tab.id)?.panel
+		if (panel && !panel.api.isActive) panel.api.setActive()
 		applyToContext(location)
 	}
 
@@ -401,6 +441,7 @@ export function useFileTabs(options: FileTabsOptions): FileTabs {
 		if (!tab) return
 		const target = tab.index + delta
 		if (target < 0 || target >= tab.history.length) return
+		if (divertDirectory(tab.history[target])) return
 		if (!(await confirmLeave(tab))) return
 		tab.index = target
 		applyToContext(currentLocation(tab))
@@ -478,7 +519,12 @@ export function useFileTabs(options: FileTabsOptions): FileTabs {
 				}
 				for (const tab of tabs.value) if (!seen.has(tab.id)) addPanel(tab, true)
 			}
-			findPanel(activeTabId.value)?.panel.api.setActive()
+			const active = findPanel(activeTabId.value)?.panel
+			/** In a shared dockview, the active tab doesn't come in front of the host's own panels. */
+			const front = active?.group.activePanel
+			if (active && (managed || !front || front.api.component === FILE_TAB_PANEL_COMPONENT)) {
+				active.api.setActive()
+			}
 		} finally {
 			renderingPanels = false
 		}
@@ -519,7 +565,15 @@ export function useFileTabs(options: FileTabsOptions): FileTabs {
 		applyToContext(activeLocation.value)
 	}
 
+	/** Brings forward a tab already on the location, or else opens one for it. */
+	function revealTab(location: FileInfo) {
+		const existing = tabs.value.find((tab) => isSameInfo(currentLocation(tab), location))
+		if (existing) activateTab(existing.id)
+		else openTab(location)
+	}
+
 	function openTab(location: FileInfo, openOptions?: OpenTabOptions) {
+		if (divertDirectory(location)) return
 		if (!toValue(options.enabled)) {
 			navigate(location)
 			return
@@ -724,6 +778,7 @@ export function useFileTabs(options: FileTabsOptions): FileTabs {
 		canGoBackIn,
 		canGoForwardIn,
 		openTab,
+		revealTab,
 		activateTab,
 		closeTab,
 		closeOtherTabs,

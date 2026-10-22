@@ -12,7 +12,7 @@ import { type Ref, ref } from 'vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { injectNotificationManager } from '#ui/providers/web-notifications'
 
-import type { WorkbenchPopoutOptions } from '../types'
+import type { WorkbenchPopoutOptions, WorkbenchPopoutRestore } from '../types'
 import type { WorkbenchWindows } from './use-windows'
 
 export type PopoutTarget = IDockviewPanel | DockviewGroupPanel
@@ -65,7 +65,8 @@ export function dockPopoutLayout(layout: SerializedDockview): SerializedDockview
 			if (path) return [node, ...path]
 		}
 	}
-	function restoreGroup(group: GroupNode, reference?: string) {
+	function restoreGroup(popoutGroup: GroupNode, reference?: string) {
+		const { hideHeader: _hidden, ...group } = popoutGroup
 		const path = reference ? findGroupPath(result.grid.root, reference) : undefined
 		const existing = path?.at(-1)
 		if (existing && !Array.isArray(existing.data)) {
@@ -193,10 +194,98 @@ async function restorePopout(api: DockviewApi, popout: PopoutLayout) {
 	}
 }
 
+const STYLESHEETS = 'style, link[rel="stylesheet"]'
+
+/**
+ * Keeps a popout window's stylesheets those of the main document, as they're added, changed or
+ * removed (e.g. a theme's, or ones loaded with components first shown later). Dockview copies them
+ * once as the window opens, which would leave the window as the page looked then. The popout
+ * page's own styles, marked `data-workbench-own`, are kept.
+ */
+function mirrorStylesheets(child: Window) {
+	const head = child.document.head
+	const clones = new Map<HTMLElement, HTMLElement>()
+	let scheduled = false
+
+	function cssText(style: HTMLStyleElement) {
+		if (style.textContent) return style.textContent
+		try {
+			return Array.from(style.sheet?.cssRules ?? [], (rule) => rule.cssText).join('\n')
+		} catch {
+			return ''
+		}
+	}
+
+	function cloneOf(source: HTMLElement) {
+		let clone = clones.get(source)
+		if (source instanceof HTMLLinkElement) {
+			if (!(clone instanceof HTMLLinkElement) || clone.href !== source.href) {
+				clone?.remove()
+				clone = child.document.createElement('link')
+				clone.setAttribute('rel', 'stylesheet')
+				clone.setAttribute('href', source.href)
+			}
+			;(clone as HTMLLinkElement).disabled = source.disabled
+		} else {
+			clone ??= child.document.createElement('style')
+			const text = cssText(source as HTMLStyleElement)
+			if (clone.textContent !== text) clone.textContent = text
+		}
+		const media = source.getAttribute('media')
+		if (media === null) clone.removeAttribute('media')
+		else clone.setAttribute('media', media)
+		clones.set(source, clone)
+		return clone
+	}
+
+	function sync() {
+		scheduled = false
+		if (child.closed) return
+		const sources = Array.from(document.head.querySelectorAll<HTMLElement>(STYLESHEETS))
+		const kept = new Set(sources)
+		for (const [source, clone] of clones) {
+			if (kept.has(source)) continue
+			clone.remove()
+			clones.delete(source)
+		}
+		const wanted = sources.map(cloneOf)
+		const placed = Array.from(head.children).filter((element) =>
+			wanted.includes(element as HTMLElement),
+		)
+		if (
+			placed.length === wanted.length &&
+			placed.every((element, index) => element === wanted[index])
+		) {
+			return
+		}
+		for (const clone of wanted) head.appendChild(clone)
+	}
+
+	function schedule() {
+		if (scheduled) return
+		scheduled = true
+		queueMicrotask(sync)
+	}
+
+	for (const element of Array.from(head.querySelectorAll(STYLESHEETS))) {
+		if (!element.hasAttribute('data-workbench-own')) element.remove()
+	}
+	sync()
+	const observer = new MutationObserver(schedule)
+	observer.observe(document.head, {
+		childList: true,
+		subtree: true,
+		characterData: true,
+		attributes: true,
+		attributeFilter: ['href', 'media', 'disabled'],
+	})
+	return () => observer.disconnect()
+}
+
 /**
  * Dresses a popout window like the workbench: a bare copy of the workbench's root (keeping its
- * classes, so its styles apply) around the popout's content, and the main document's theme,
- * kept in sync while the window is open.
+ * classes, so its styles apply) around the popout's content, and the main document's theme and
+ * stylesheets, kept in sync while the window is open.
  */
 function configurePopoutWindow(child: Window, root: HTMLElement | null) {
 	const container = child.document.querySelector<HTMLElement>('.dv-popout-window')
@@ -231,6 +320,7 @@ function configurePopoutWindow(child: Window, root: HTMLElement | null) {
 	}
 
 	syncAppearance()
+	const stopMirroring = mirrorStylesheets(child)
 	const observer = new MutationObserver(syncAppearance)
 	for (const element of [document.documentElement, document.body]) {
 		observer.observe(element, {
@@ -239,7 +329,10 @@ function configurePopoutWindow(child: Window, root: HTMLElement | null) {
 		})
 	}
 	child.focus()
-	return () => observer.disconnect()
+	return () => {
+		observer.disconnect()
+		stopMirroring()
+	}
 }
 
 /** Dockview opens popouts through the main window; this uses the gesture's window, keeping its activation. */
@@ -457,6 +550,8 @@ export interface DockPopoutsOptions {
 	dragPanels?: (id: string) => IDockviewPanel[] | undefined
 	/** Keeps a dragged selection around while it's popped out, until the returned function runs. */
 	keepDrag?: () => () => void
+	/** What becomes of a saved layout's windows as it's loaded. */
+	restoreMode: () => WorkbenchPopoutRestore
 }
 
 export type DockPopouts = ReturnType<typeof createDockPopouts>
@@ -586,20 +681,48 @@ export function createDockPopouts(config: DockPopoutsOptions) {
 		config.onChange()
 	}
 
-	/** Loads a saved layout, trying to reopen its windows, whose panels wait in the main window. */
+	/**
+	 * Reopens a waiting window with the first click (or key press) after the page loads, as the
+	 * browser only opens windows in answer to one; each takes a click of its own.
+	 */
+	function reopenOnGesture() {
+		const next = [...pending.entries()].find(([, entry]) => !entry.opening)
+		if (next) void reopen(next[0])
+		if (![...pending.values()].some((entry) => !entry.opening)) stopReopeningOnGesture()
+	}
+
+	function stopReopeningOnGesture() {
+		window.removeEventListener('pointerdown', reopenOnGesture, true)
+		window.removeEventListener('keydown', reopenOnGesture, true)
+	}
+
+	/**
+	 * Loads a saved layout, whose windows' panels wait in the main window. As the settings choose,
+	 * they stay there, they're offered to be reopened, or their windows are reopened.
+	 */
 	function restore(layout: SerializedDockview) {
 		dismissNotifications()
+		stopReopeningOnGesture()
 		blockedLayout = undefined
 		blockedBaseline = undefined
-		if (!layout.popoutGroups?.length) {
-			api.fromJSON(layout, { reuseExistingPanels: true })
+		const mode = config.restoreMode()
+		if (!layout.popoutGroups?.length || mode === 'close') {
+			api.fromJSON(layout.popoutGroups?.length ? dockPopoutLayout(layout) : layout, {
+				reuseExistingPanels: true,
+			})
 			return
 		}
 		api.fromJSON(dockPopoutLayout(layout), { reuseExistingPanels: true })
 		blockedLayout = layout
 		blockedBaseline = JSON.stringify(api.toJSON())
 		for (const popout of layout.popoutGroups) pending.set(popout, { opening: false })
+		if (mode === 'prompt') {
+			for (const popout of layout.popoutGroups) notifyRestoration(popout)
+			return
+		}
 		for (const popout of layout.popoutGroups) void reopen(popout)
+		window.addEventListener('pointerdown', reopenOnGesture, true)
+		window.addEventListener('keydown', reopenOnGesture, true)
 	}
 
 	function notifyFailure() {
@@ -640,6 +763,29 @@ export function createDockPopouts(config: DockPopoutsOptions) {
 		if (panel) return popout(panel)
 	}
 
+	/**
+	 * Pops several panels out into one window: their group when they're all it holds, or else a
+	 * group they're gathered into beside it first.
+	 */
+	function popoutPanels(ids: string[]) {
+		const panels = ids.flatMap((id) => {
+			const panel = api.getPanel(id)
+			return panel && panel.api.location.type === 'grid' ? [panel] : []
+		})
+		const [first, ...rest] = panels
+		if (!first) return
+		if (!rest.length) return popout(first)
+		const group = first.group
+		const whole =
+			group.panels.length === panels.length && panels.every((panel) => panel.group === group)
+		if (!whole) {
+			for (const panel of panels) sources.set(panel.id, group.id)
+			first.api.moveTo({ group, position: 'right' })
+			for (const panel of rest) panel.api.moveTo({ group: first.group, position: 'center' })
+		}
+		return popout(first.group)
+	}
+
 	/** Returns a popped out panel to the group it came from, or another one in the main window. */
 	function dock(id: string) {
 		const panel = api.getPanel(id)
@@ -662,6 +808,7 @@ export function createDockPopouts(config: DockPopoutsOptions) {
 
 	/** Returns every popped out panel to the main window, dropping any windows waiting to reopen. */
 	function closeAll() {
+		stopReopeningOnGesture()
 		blockedLayout = undefined
 		dismissNotifications()
 		for (const id of [...detached.value]) dock(id)
@@ -710,6 +857,7 @@ export function createDockPopouts(config: DockPopoutsOptions) {
 		}),
 		api.onDidAddPopoutGroup(({ window: child }) => {
 			updateDetached()
+			if (windowCleanups.has(child)) return
 			const unregister = windows.register(child)
 			const removeAppearance = configurePopoutWindow(child, config.root())
 			const hostCleanup = options.onWindow?.(child)
@@ -733,6 +881,7 @@ export function createDockPopouts(config: DockPopoutsOptions) {
 
 	function dispose() {
 		stopWatchingWindows()
+		stopReopeningOnGesture()
 		dismissNotifications()
 		for (const subscription of subscriptions) subscription.dispose()
 		for (const cleanup of windowCleanups.values()) cleanup()
@@ -747,6 +896,7 @@ export function createDockPopouts(config: DockPopoutsOptions) {
 		currentLayout,
 		restore,
 		popoutPanel,
+		popoutPanels,
 		dock,
 		closeAll,
 		reveal,

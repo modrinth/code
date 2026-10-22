@@ -28,10 +28,6 @@
 							<DownloadIcon aria-hidden="true" />
 							{{ formatMessage(commonMessages.downloadButton) }}
 						</ButtonLink>
-						<ButtonLink type="quiet" size="xs" :href="slicerUrl" target="_blank">
-							<ExternalIcon aria-hidden="true" />
-							{{ formatMessage(messages.openInSlicer) }}
-						</ButtonLink>
 					</template>
 				</template>
 				<template v-if="project || source" #project-details>
@@ -42,11 +38,10 @@
 						:versions-loading="versionsLoading"
 						:version="selectedVersion"
 						:file="selectedFile"
-						:slicer-url="slicerUrl"
 						@select-version="selectVersion"
 						@select-file="selectFile"
 					/>
-					<ArchiveExternalDetails v-else-if="source" :source="source" :slicer-url="slicerUrl" />
+					<ArchiveExternalDetails v-else-if="source" :source="source" />
 				</template>
 				<template #empty>
 					<Admonition
@@ -68,8 +63,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
-import { DownloadIcon, ExternalIcon, LeftArrowIcon } from '@modrinth/assets'
+import { DownloadIcon, LeftArrowIcon } from '@modrinth/assets'
 import {
 	Admonition,
 	type ArchiveSource,
@@ -90,6 +84,13 @@ import { computed } from 'vue'
 
 import ArchiveExternalDetails from '~/components/ui/archive-viewer/ArchiveExternalDetails.vue'
 import ArchiveProjectDetails from '~/components/ui/archive-viewer/ArchiveProjectDetails.vue'
+import {
+	archiveNameFrom,
+	archivePathFrom,
+	archiveSourceFrom,
+	isModrinthCdnUrl,
+	primaryFile,
+} from '~/helpers/archive-viewer'
 
 definePageMeta({
 	layout: 'empty',
@@ -109,10 +110,6 @@ const messages = defineMessages({
 	goBack: {
 		id: 'archive.go-back',
 		defaultMessage: 'Go back',
-	},
-	openInSlicer: {
-		id: 'archive.open-in-slicer',
-		defaultMessage: 'Open in Slicer',
 	},
 	external: {
 		id: 'archive.external',
@@ -139,18 +136,6 @@ const messages = defineMessages({
 function queryString(value: unknown) {
 	const first = Array.isArray(value) ? value[0] : value
 	return typeof first === 'string' && first.length > 0 ? first : null
-}
-
-/** Only Modrinth's CDN is fetched from, so a crafted link can't point the viewer elsewhere. */
-function isModrinthCdnUrl(url: string) {
-	try {
-		const { protocol, hostname } = new URL(url)
-		return (
-			protocol === 'https:' && (hostname === 'modrinth.com' || hostname.endsWith('.modrinth.com'))
-		)
-	} catch {
-		return false
-	}
 }
 
 const projectId = computed(() => queryString(route.query.project))
@@ -187,14 +172,6 @@ const isLoading = computed(
 	() => !!projectId.value && (projectQuery.isPending.value || versionsQuery.isPending.value),
 )
 const isError = computed(() => projectQuery.isError.value || versionsQuery.isError.value)
-
-function primaryFile(version: Labrinth.Versions.v3.Version) {
-	return version.files.find((file) => file.primary) ?? version.files[0]
-}
-
-function sourceFrom(file: Labrinth.Versions.v3.VersionFile): ArchiveSource {
-	return { url: file.url, name: file.filename, size: file.size, sha512Hash: file.hashes.sha512 }
-}
 
 const sortedVersions = computed(() =>
 	[...(versionsQuery.data.value ?? [])].sort(
@@ -237,9 +214,9 @@ const selectedFile = computed(() => {
 
 /** The selected version's file, or a requested CDN link no version of the project holds. */
 const source = computed<ArchiveSource | null>(() => {
-	if (selectedFile.value) return sourceFrom(selectedFile.value)
+	if (selectedFile.value) return archiveSourceFrom(selectedFile.value)
 	const url = requestedUrl.value
-	return url ? { url, name: decodeURIComponent(url.split('/').pop() ?? url) } : null
+	return url ? { url, name: archiveNameFrom(url) } : null
 })
 
 useHead({
@@ -254,17 +231,8 @@ useHead({
  * dropped so they can be opened here as is.
  */
 const archivePath = computed(() => {
-	const file = queryString(route.query.file)
 	const name = source.value?.name
-	if (!file) return null
-	return name && file.startsWith(`${name}/`) ? file.slice(name.length + 1) : file
-})
-
-const slicerUrl = computed(() => {
-	if (!source.value) return undefined
-	const params = new URLSearchParams({ url: source.value.url })
-	if (archivePath.value) params.set('file', `${source.value.name}/${archivePath.value}`)
-	return `https://slicer.run/?${params}`
+	return name ? archivePathFrom(queryString(route.query.file), name) : queryString(route.query.file)
 })
 
 function replaceQuery(query: Record<string, string | undefined>) {

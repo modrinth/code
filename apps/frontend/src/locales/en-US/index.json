@@ -743,6 +743,12 @@
   "archive.go-back": {
     "message": "Go back"
   },
+  "archive.link.archive": {
+    "message": "Archive"
+  },
+  "archive.link.open": {
+    "message": "Open in the archive viewer"
+  },
   "archive.load-failed": {
     "message": "Unable to load the project"
   },
@@ -757,9 +763,6 @@
   },
   "archive.nothing-to-show-description": {
     "message": "Open a project with version files, or a file link from the Modrinth CDN."
-  },
-  "archive.open-in-slicer": {
-    "message": "Open in Slicer"
   },
   "archive.project-details.change-version": {
     "message": "Change version"
@@ -3497,6 +3500,9 @@
   "moderation.settings.workflow": {
     "message": "Review workflow and queue"
   },
+  "moderation.tech-review.file.archive": {
+    "message": "Archive"
+  },
   "moderation.tech-review.file.download": {
     "message": "Download"
   },
@@ -3512,14 +3518,11 @@
   "moderation.tech-review.file.no-flags": {
     "message": "No flags"
   },
-  "moderation.tech-review.file.open-slicer": {
-    "message": "Open in Slicer"
+  "moderation.tech-review.file.open-archive": {
+    "message": "Open in the archive viewer"
   },
-  "moderation.tech-review.file.open-slicer-tab": {
-    "message": "Open in Slicer tab"
-  },
-  "moderation.tech-review.file.slicer": {
-    "message": "Slicer"
+  "moderation.tech-review.file.open-archive-panel": {
+    "message": "Open in the review's archive panels"
   },
   "moderation.tech-review.file.view-version": {
     "message": "View version"

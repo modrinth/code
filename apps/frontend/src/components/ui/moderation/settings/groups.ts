@@ -44,7 +44,7 @@ export const moderationSettingGroups: SettingGroup[] = [
 	{
 		id: 'panels',
 		title: messages.panels,
-		settings: [general.LinkInfoPlacement],
+		settings: [general.LinkInfoPlacement, general.ArchiveIntegration, general.MergeRulings],
 	},
 	{
 		id: 'appearance',
@@ -55,14 +55,17 @@ export const moderationSettingGroups: SettingGroup[] = [
 			general.ExpandVersionDependenciesByDefault,
 			general.ExpandVersionChangelogByDefault,
 			general.EnableDelayedHoverMessagePreviews,
+			general.ButtonSize,
 			general.PrivateMessageHighlight,
+			general.SectionHeadersVisible,
+			general.SectionReducedGap
 		],
 	},
 	{
 		id: 'shortcuts',
 		title: messages.shortcuts,
 		settings: [
-			general.HideMarkdownFormattingButtons,
+			general.MarkdownFormattingButtonsVisibility,
 			general.ShowShortcutKeybindHints,
 			general.ShowToggleIssueButtonShortcutHint,
 		],
@@ -72,7 +75,7 @@ export const moderationSettingGroups: SettingGroup[] = [
 		title: messages.projectPages,
 		settings: [
 			general.EnableProjectKeybinds,
-			general.SlicerButtonInVersions,
+			general.ArchiveButtonInVersions,
 			general.AlternativeHostname,
 		],
 	},

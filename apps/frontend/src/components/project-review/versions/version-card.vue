@@ -46,21 +46,21 @@
 					<EditVersionMenu v-if="editable" color="default" size="sm" @edit="emit('edit', $event)" />
 					<Button
 						v-if="version.files.length"
-						v-tooltip="'Open files in Slicer'"
-						aria-label="Open files in Slicer"
-						:loading="loadingSlicerButton === 'version'"
+						v-tooltip="'Open primary file in the archive viewer'"
+						aria-label="Open primary file in the archive viewer"
+						:loading="loadingArchiveButton === 'version'"
 						type="quiet"
 						circular
 						size="sm"
 						icon-only
-						@click="openVersionInSlicer"
+						@click="openVersionInArchive"
 					>
 						<SpinnerIcon
-							v-if="loadingSlicerButton === 'version'"
+							v-if="loadingArchiveButton === 'version'"
 							class="animate-spin motion-reduce:animate-none"
 							aria-hidden="true"
 						/>
-						<CoffeeIcon v-else aria-hidden="true" />
+						<FolderArchiveIcon v-else aria-hidden="true" />
 					</Button>
 					<ButtonLink
 						v-tooltip="'View version'"
@@ -100,13 +100,13 @@
 							label="More options"
 							:options="fileActions(file)"
 						>
-							<template #open-slicer="{ option }">
+							<template #open-archive="{ option }">
 								<SpinnerIcon
-									v-if="loadingSlicerButton === file.url"
+									v-if="loadingArchiveButton === file.url"
 									class="animate-spin motion-reduce:animate-none"
 									aria-hidden="true"
 								/>
-								<CoffeeIcon v-else aria-hidden="true" />
+								<FolderArchiveIcon v-else aria-hidden="true" />
 								{{ option.label }}
 							</template>
 							<MoreVerticalIcon />
@@ -294,10 +294,10 @@
 import type { Labrinth } from '@modrinth/api-client'
 import {
 	ClipboardCopyIcon,
-	CoffeeIcon,
 	DownloadIcon,
 	DropdownIcon,
 	ExternalIcon,
+	FolderArchiveIcon,
 	MoreVerticalIcon,
 	ScanEyeIcon,
 	SearchIcon,
@@ -314,6 +314,7 @@ import {
 	type ButtonMenuOption,
 	CopyCode,
 	type DependencyContext,
+	injectArchiveSession,
 	injectModrinthClient,
 	injectTags,
 	Input,
@@ -332,8 +333,9 @@ import EditVersionMenu from '~/components/ui/create-project-version/EditVersionM
 import { useModerationSettings } from '~/composables/moderation'
 import { projectQueryOptions } from '~/composables/queries/project'
 import { versionQueryOptions } from '~/composables/queries/version'
+import { archiveViewerUrl, primaryFile } from '~/helpers/archive-viewer'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
-import { injectReviewSlicer } from '~/providers/project-review/review-slicer'
+import { injectReviewArchive } from '~/providers/project-review/review-archive'
 import type { EditVersionStage } from '~/providers/version/manage-version-modal'
 
 import {
@@ -387,12 +389,13 @@ const relativeTime = createRelativeTimeFormatter({ style: 'narrow' })
 const client = injectModrinthClient()
 const tags = injectTags(null)
 const { project, members } = injectProjectReviewPageContext()
-const slicer = injectReviewSlicer()
-const { loadingFiles: slicerLoading } = slicer
-const slicerRequest = ref<{ id: number; button: string }>()
-const loadingSlicerButton = computed(() => {
-	const request = slicerRequest.value
-	return slicerLoading.value && request?.id === slicer.openRequests.value
+const archive = injectReviewArchive()
+const archiveSession = injectArchiveSession()
+/** The button that last opened a file, which shows it's loading while the archive is read. */
+const archiveRequest = ref<{ id: number; button: string }>()
+const loadingArchiveButton = computed(() => {
+	const request = archiveRequest.value
+	return archiveSession.stage.value === 'reading' && request?.id === archive.openRequests.value
 		? request.button
 		: undefined
 })
@@ -518,18 +521,14 @@ const filteredDependencies = computed(() => {
 })
 type VersionFile = Labrinth.Versions.v3.Version['files'][number]
 
-function openInSlicer(urls: string[], button: string) {
-	slicer.open(urls)
-	slicerRequest.value = { id: slicer.openRequests.value, button }
+function openInArchive(url: string, button: string) {
+	archive.open(url)
+	archiveRequest.value = { id: archive.openRequests.value, button }
 }
 
-function openVersionInSlicer() {
-	openInSlicer(
-		props.version.files
-			.toSorted((a, b) => Number(b.primary) - Number(a.primary))
-			.map(({ url }) => url),
-		'version',
-	)
+function openVersionInArchive() {
+	const file = primaryFile(props.version)
+	if (file) openInArchive(file.url, 'version')
 }
 
 function fileActions(file: VersionFile): ButtonMenuOption[] {
@@ -541,18 +540,22 @@ function fileActions(file: VersionFile): ButtonMenuOption[] {
 			action: () => emit('scan-ai', file.url),
 		},
 		{
-			id: 'open-slicer',
-			label: 'Open in Slicer',
-			icon: CoffeeIcon,
-			disabled: loadingSlicerButton.value === file.url,
-			action: () => openInSlicer([file.url], file.url),
+			id: 'open-archive',
+			label: 'Open in the archive viewer',
+			icon: FolderArchiveIcon,
+			disabled: loadingArchiveButton.value === file.url,
+			action: () => openInArchive(file.url, file.url),
 			trailingAction: {
-				label: 'Open in Slicer in a new tab',
+				label: 'Open in the archive viewer in a new tab',
 				icon: ExternalIcon,
 				action: (event) => {
 					const element = event.currentTarget as HTMLElement
 					element.ownerDocument.defaultView?.open(
-						`https://slicer.run/?url=${encodeURIComponent(file.url)}`,
+						archiveViewerUrl({
+							project: project.value?.id,
+							version: props.version.id,
+							url: file.url,
+						}),
 						'_blank',
 						'noopener,noreferrer',
 					)

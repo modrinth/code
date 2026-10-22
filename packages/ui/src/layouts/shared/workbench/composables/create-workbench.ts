@@ -27,6 +27,7 @@ import {
 } from 'vue'
 
 import type { ButtonMenuOption } from '#ui/components/base/buttons/types'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
 
 import type { WorkbenchContext } from '../providers/workbench'
 import {
@@ -37,11 +38,16 @@ import {
 	WORKBENCH_REGIONS,
 	type WorkbenchDocuments,
 	type WorkbenchHost,
+	type WorkbenchLink,
+	type WorkbenchLinkOrientation,
 	type WorkbenchMode,
 	type WorkbenchModeName,
 	type WorkbenchPanel,
+	type WorkbenchPopoutRestore,
 	type WorkbenchRegion,
 	type WorkbenchRegionSizes,
+	type WorkbenchSplitSide,
+	type WorkbenchToggleAction,
 	type WorkbenchToggleLocation,
 	type WorkbenchVariant,
 } from '../types'
@@ -54,17 +60,27 @@ import {
 	registerWrappedTabs,
 } from './dock-behaviours'
 import { createDockPopouts, type DockPopouts, usePopoutServices } from './dock-popouts'
+import { registerTabBars } from './tab-bars'
 import { useWorkbenchMenus } from './use-menus'
 import { useWorkbenchSelection } from './use-tab-selection'
 import { useWorkbenchWindows } from './use-windows'
+
+const messages = defineMessages({
+	showTabs: { id: 'workbench.lone-tab.show-tabs', defaultMessage: 'Show tabs' },
+	hideTabs: { id: 'workbench.lone-tab.hide-tabs', defaultMessage: 'Hide tabs' },
+})
 
 export const WORKBENCH_DOCK_COMPONENT = 'workbenchDock'
 export const WORKBENCH_PANEL_COMPONENT = 'workbenchPanel'
 export const WORKBENCH_TAB_COMPONENT = 'workbenchTab'
 
 const STORAGE_PREFIX = 'workbench-layout:'
+const LINK_PREFIX = 'link:'
 const LAYOUT_VERSION = 4
 const SAVE_DELAY = 200
+
+/** How wide (or tall, for the bottom) a collapsed region's strip of tabs is. */
+export const WORKBENCH_COLLAPSED_SIZE = 36
 
 export interface WorkbenchDockParams {
 	host: WorkbenchHost
@@ -82,8 +98,18 @@ interface SavedWorkbenchLayout {
 	popouts?: boolean
 	/** Where the region toggles sit, for modes with a toolbar. */
 	toggles?: WorkbenchToggleLocation
+	/** Whether the region toggles hide their regions or collapse them. */
+	toggleAction?: WorkbenchToggleAction
+	/** Whether groups holding a single tab (outside the center) hide their tab bar. */
+	hideLoneTabs?: boolean
+	/** Panels whose groups' tab bars the user hid. */
+	hiddenBars?: string[]
+	/** What becomes of popped out panels when the page is opened again. */
+	popoutRestore?: WorkbenchPopoutRestore
 	sizes: Partial<Record<WorkbenchRegion, number>>
 	visible: Partial<Record<WorkbenchRegion, boolean>>
+	/** Regions collapsed to a strip of their tabs. */
+	collapsed?: Partial<Record<WorkbenchRegion, boolean>>
 	/** Each dock's arrangements, by the set of workbench panels it held at the time. */
 	docks: Partial<Record<WorkbenchHost, Record<string, SerializedDockview>>>
 	/** Panels moved away from the dock they're declared in. */
@@ -92,6 +118,8 @@ interface SavedWorkbenchLayout {
 	closed: string[]
 	/** Panels the layout has known, so ones closed by default only start closed the first time. */
 	seen?: string[]
+	/** Panels linked into single tabs. */
+	links?: WorkbenchLink[]
 }
 
 export interface WorkbenchOptions {
@@ -174,6 +202,23 @@ function defaultPosition(api: DockviewApi): AddPanelPositionOptions | undefined 
 	return group ? { referenceGroup: group, direction: 'within' } : undefined
 }
 
+/**
+ * Where a panel the layout hasn't placed yet starts: with the placed panels of its `group`, or
+ * else in a group of its own below the dock's others (see `WorkbenchPanel.group`).
+ */
+function startingPosition(
+	api: DockviewApi,
+	panel: WorkbenchPanel,
+	wanted: WorkbenchPanel[],
+): AddPanelPositionOptions | undefined {
+	if (!panel.group) return defaultPosition(api)
+	const sibling = wanted.find(
+		(other) => other.id !== panel.id && other.group === panel.group && api.getPanel(other.id),
+	)
+	if (sibling) return { referencePanel: sibling.id, direction: 'within' }
+	return api.panels.length > 0 ? { direction: 'below' } : defaultPosition(api)
+}
+
 function isRegion(host: WorkbenchHost): host is WorkbenchRegion {
 	return host !== 'center'
 }
@@ -196,6 +241,7 @@ function resolveMode(mode: WorkbenchOptions['mode']): WorkbenchMode {
  * provide its own context from it) before the layout renders.
  */
 export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
+	const { formatMessage } = useVIntl()
 	const mode = resolveMode(options.mode)
 	const sizes: WorkbenchRegionSizes = { ...DEFAULT_WORKBENCH_REGION_SIZES, ...options.sizes }
 	const centerMinimum = options.centerMinimum ?? WORKBENCH_CENTER_MINIMUM
@@ -211,9 +257,13 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 
 	const variant = ref<WorkbenchVariant>(saved?.variant ?? options.variant ?? 'square')
 	const popoutsEnabled = ref(saved?.popouts ?? true)
+	const hideLoneTabBars = ref(saved?.hideLoneTabs ?? false)
+	const hiddenBars = ref<string[]>(saved?.hiddenBars ?? [])
+	const popoutRestore = ref<WorkbenchPopoutRestore>(saved?.popoutRestore ?? 'prompt')
 	const toggleLocation = ref<WorkbenchToggleLocation>(
 		saved?.toggles ?? (mode.cornerToggles ? 'tabs' : 'menu'),
 	)
+	const toggleAction = ref<WorkbenchToggleAction>(saved?.toggleAction ?? 'hide')
 	/** Modes without a toolbar always keep their toggles in the tab bar, having nowhere else for them. */
 	const cornerToggles = computed(() => !mode.toolbar || toggleLocation.value === 'tabs')
 
@@ -227,10 +277,58 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 	/** Set while the page unloads, after its layout was saved, so the teardown doesn't overwrite it. */
 	let leavingPage = false
 
-	const panels = computed(() =>
+	/** The host's panels, before any are linked into single tabs. */
+	const ownPanels = computed(() =>
 		toValue(options.panels).filter(
 			(panel) => panel.region === 'center' || regions.includes(panel.region),
 		),
+	)
+	const links = ref<WorkbenchLink[]>(saved?.links ?? [])
+	/** Links of two or more panels the host still offers, holding only those. */
+	const activeLinks = computed(() =>
+		links.value
+			.map((link) => ({
+				...link,
+				members: link.members.filter((id) => ownPanels.value.some((panel) => panel.id === id)),
+			}))
+			.filter((link) => link.members.length > 1),
+	)
+
+	function linkOf(id: string) {
+		return activeLinks.value.find((link) => link.members.includes(id))
+	}
+
+	/** The panel holding a panel in view: its linked tab, if it's linked, or else itself. */
+	function hostPanelId(id: string) {
+		return linkOf(id)?.id ?? id
+	}
+
+	/** A linked tab, standing in for its members where the first of them was offered. */
+	function linkedTab(link: WorkbenchLink): WorkbenchPanel {
+		const members = link.members.flatMap((id) => {
+			const panel = ownPanels.value.find((candidate) => candidate.id === id)
+			return panel ? [panel] : []
+		})
+		const [first] = members
+		return {
+			id: link.id,
+			title: members.map((member) => member.title).join(' · '),
+			icon: first.icon,
+			region: first.region,
+			group: first.group,
+			scroll: false,
+			minimumHeight: Math.max(0, ...members.map((member) => member.minimumHeight ?? 0)),
+			members,
+		}
+	}
+
+	/** The panels as the docks hold them, with linked panels replaced by their linked tabs. */
+	const panels = computed(() =>
+		ownPanels.value.flatMap((panel) => {
+			const link = linkOf(panel.id)
+			if (!link) return [panel]
+			return link.members[0] === panel.id ? [linkedTab(link)] : []
+		}),
 	)
 	const placements = ref<Record<string, WorkbenchHost>>({ ...saved?.placements })
 	/** Panels starting closed, unless the saved layout already decided whether they're open. */
@@ -243,9 +341,13 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 		mode.closePanels ? [...new Set([...(saved?.closed ?? []), ...closedByDefault()])] : [],
 	)
 
+	/** The dock a panel is in: the one its linked tab is in, if it's linked. */
 	function regionOf(panel: WorkbenchPanel): WorkbenchHost {
-		const placed = mode.movePanels ? placements.value[panel.id] : undefined
-		return placed && (placed === 'center' || regions.includes(placed)) ? placed : panel.region
+		const link = linkOf(panel.id)
+		const id = link?.id ?? panel.id
+		const declared = link ? linkedTab(link).region : panel.region
+		const placed = mode.movePanels ? placements.value[id] : undefined
+		return placed && (placed === 'center' || regions.includes(placed)) ? placed : declared
 	}
 
 	const openPanels = computed(() =>
@@ -308,13 +410,29 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 		]),
 	) as Record<WorkbenchRegion, Ref<boolean>>
 
-	/** How wide (or tall, for the bottom) each region is shown, 0 while hidden. */
-	const regionExtents = Object.fromEntries(
+	/** Regions collapsed to a strip of their tabs, which brings any of them back. */
+	const collapsed = Object.fromEntries(
 		WORKBENCH_REGIONS.map((region) => [
 			region,
-			ref(visible[region].value ? regionSizes[region] : 0),
+			ref(regions.includes(region) && !!saved?.collapsed?.[region]),
 		]),
+	) as Record<WorkbenchRegion, Ref<boolean>>
+
+	/** How wide (or tall) a region is laid out while shown: its size, or its strip's if collapsed. */
+	function shownSize(region: WorkbenchRegion) {
+		return collapsed[region].value ? WORKBENCH_COLLAPSED_SIZE : regionSizes[region]
+	}
+
+	/** How wide (or tall, for the bottom) each region is shown, 0 while hidden. */
+	const regionExtents = Object.fromEntries(
+		WORKBENCH_REGIONS.map((region) => [region, ref(visible[region].value ? shownSize(region) : 0)]),
 	) as Record<WorkbenchRegion, Ref<number>>
+
+	/** Top-right group of each region's dock, whose tab bar holds the button collapsing the region. */
+	const regionCornerGroups = ref<Partial<Record<WorkbenchRegion, string>>>({})
+
+	/** Bumped as docks rearrange, so what's derived from their arrangement (e.g. strips) follows. */
+	const arrangement = ref(0)
 
 	/** The center's top-left and top-right groups, whose tab bars hold the corner region toggles. */
 	const cornerGroups = ref<{ left?: string; right?: string }>({})
@@ -329,6 +447,7 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 		key?: string
 		popouts?: DockPopouts
 		wrappedTabs?: DockviewIDisposable
+		tabBars?: ReturnType<typeof registerTabBars>
 	}
 
 	const docks = new Map<WorkbenchHost, Dock>()
@@ -363,7 +482,9 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 			const panel = grid?.getPanel(region)
 			if (!panel) continue
 			const size = isHorizontal(region) ? panel.api.width : panel.api.height
-			if (visible[region].value && size > 0) regionSizes[region] = size
+			if (visible[region].value && !collapsed[region].value && size > 0) {
+				regionSizes[region] = size
+			}
 			regionExtents[region].value = visible[region].value ? size : 0
 		}
 	}
@@ -384,14 +505,20 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 			variant: variant.value,
 			popouts: popoutsEnabled.value,
 			toggles: toggleLocation.value,
+			toggleAction: toggleAction.value,
+			hideLoneTabs: hideLoneTabBars.value,
+			hiddenBars: hiddenBars.value,
+			popoutRestore: popoutRestore.value,
 			sizes: { ...regionSizes },
 			visible: Object.fromEntries(regions.map((region) => [region, visible[region].value])),
+			collapsed: Object.fromEntries(regions.map((region) => [region, collapsed[region].value])),
 			docks: Object.fromEntries(
 				WORKBENCH_HOSTS.map((host) => [host, Object.fromEntries(savedDockLayouts[host])]),
 			),
 			placements: { ...placements.value },
 			closed: [...closed.value],
-			seen: panels.value.map((panel) => panel.id),
+			seen: [...ownPanels.value, ...panels.value].map((panel) => panel.id),
+			links: links.value,
 		})
 	}
 
@@ -401,22 +528,32 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 		saveTimer = setTimeout(persist, SAVE_DELAY)
 	}
 
+	/** A collapsed region is held at its strip's size; otherwise it can be resized past its minimum. */
+	function regionConstraints(region: WorkbenchRegion) {
+		const fixed = collapsed[region].value ? WORKBENCH_COLLAPSED_SIZE : undefined
+		const minimum = fixed ?? sizes[region].minimum
+		const maximum = fixed ?? Number.MAX_SAFE_INTEGER
+		return isHorizontal(region)
+			? { minimumWidth: minimum, maximumWidth: maximum }
+			: { minimumHeight: minimum, maximumHeight: maximum }
+	}
+
 	function applyRegionSize(region: WorkbenchRegion) {
 		const panel = grid?.getPanel(region)
 		if (!panel) return
-		const size = regionSizes[region]
+		const size = shownSize(region)
+		panel.api.setConstraints(regionConstraints(region))
 		panel.api.setSize(isHorizontal(region) ? { width: size } : { height: size })
 	}
 
 	function addRegion(region: WorkbenchRegion) {
 		if (!grid || grid.getPanel(region)) return
-		const { minimum } = sizes[region]
 		grid.addPanel<WorkbenchDockParams>({
 			id: region,
 			component: WORKBENCH_DOCK_COMPONENT,
 			params: { host: region },
 			position: { direction: region === 'bottom' ? 'below' : region, referencePanel: 'center' },
-			...(isHorizontal(region) ? { minimumWidth: minimum } : { minimumHeight: minimum }),
+			...regionConstraints(region),
 			/*
 			 * Offered space last, so the center (and the branch holding it with the bottom region)
 			 * takes up the workbench being resized, rather than a region growing past its saved size.
@@ -490,7 +627,11 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 	function applyHeaders(host: WorkbenchHost) {
 		const api = docks.get(host)?.api
 		if (!api || !mode.headerless.includes(host)) return
-		for (const group of api.groups) group.header.hidden = true
+		for (const group of api.groups) {
+			if (group.header.hidden) continue
+			group.header.hidden = true
+			group.relayout()
+		}
 	}
 
 	/**
@@ -504,12 +645,7 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 		const wanted = panelsIn(host)
 		const ids = new Set(wanted.map((panel) => panel.id))
 
-		for (const panel of [...api.panels]) {
-			if (ids.has(panel.id) || isDocumentPanel(panel)) continue
-			withOwnRemovals(() => {
-				if (!dock.popouts?.release(panel)) api.removePanel(panel)
-			})
-		}
+		const leaving = api.panels.filter((panel) => !ids.has(panel.id) && !isDocumentPanel(panel))
 		for (const panel of wanted) {
 			const existing = api.getPanel(panel.id)
 			if (existing) {
@@ -519,7 +655,7 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 			const moved = pendingPositions.has(panel.id)
 			const position = moved
 				? usablePosition(api, pendingPositions.get(panel.id))
-				: (dock.popouts?.positionFor(panel.id) ?? defaultPosition(api))
+				: (dock.popouts?.positionFor(panel.id) ?? startingPosition(api, panel, wanted))
 			pendingPositions.delete(panel.id)
 			api.addPanel<WorkbenchPanelParams>({
 				id: panel.id,
@@ -531,6 +667,12 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 				minimumHeight: panel.minimumHeight,
 				inactive: !moved,
 				position,
+			})
+		}
+		/* Dropped once the new ones are in, so those can be placed where the leaving ones were. */
+		for (const panel of leaving) {
+			withOwnRemovals(() => {
+				if (!dock.popouts?.release(panel)) api.removePanel(panel)
 			})
 		}
 		if (!api.activePanel) api.panels[0]?.api.setActive()
@@ -668,6 +810,14 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 		cornerGroups.value = api ? findCornerGroups(api) : {}
 	}
 
+	function updateRegionCornerGroup(region: WorkbenchRegion) {
+		const api = docks.get(region)?.api
+		const group = api ? findCornerGroups(api).right : undefined
+		if (regionCornerGroups.value[region] !== group) {
+			regionCornerGroups.value = { ...regionCornerGroups.value, [region]: group }
+		}
+	}
+
 	/** Brings a dock up once both it and the workbench's panels are ready. */
 	function initializeDock(host: WorkbenchHost) {
 		const dock = docks.get(host)
@@ -679,6 +829,7 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 		syncDockPanels(host)
 		documents?.attach(dock.api, host)
 		if (host === 'center') updateCornerGroups()
+		else updateRegionCornerGroup(host)
 	}
 
 	/**
@@ -730,6 +881,7 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 				onChange: scheduleSave,
 				dragPanels: selection?.getDragPanels,
 				keepDrag: selection?.keepDragForPopout,
+				restoreMode: () => popoutRestore.value,
 			})
 		}
 		dock.disposables.push(
@@ -748,7 +900,24 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 			dock.disposables.push(registerNoSplits(api))
 		}
 		if (selection) dock.disposables.push(selection.register(api))
+		if (!mode.headerless.includes(host)) {
+			dock.tabBars = registerTabBars(api, {
+				hideLone: () => host !== 'center' && hideLoneTabBars.value,
+				hiddenByUser: (group) => group.panels.some((panel) => hiddenBars.value.includes(panel.id)),
+				showHidden: (group) => {
+					const ids = group.panels.map((panel) => panel.id)
+					hiddenBars.value = hiddenBars.value.filter((id) => !ids.includes(id))
+				},
+				label: (hidden) => formatMessage(hidden ? messages.showTabs : messages.hideTabs),
+			})
+			dock.disposables.push(dock.tabBars)
+		}
 		if (host === 'center') dock.disposables.push(api.onDidLayoutChange(updateCornerGroups))
+		else dock.disposables.push(api.onDidLayoutChange(() => updateRegionCornerGroup(host)))
+		dock.disposables.push(
+			api.onDidLayoutChange(() => (arrangement.value += 1)),
+			api.onDidActivePanelChange(() => (arrangement.value += 1)),
+		)
 		docks.set(host, dock)
 		dockVersion.value += 1
 		applyVariant(dock)
@@ -782,6 +951,23 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 		scheduleSave()
 	})
 	watch(toggleLocation, scheduleSave)
+	/** Switching what the toggles do turns regions they'd hidden into collapsed ones, and back. */
+	watch(toggleAction, (action) => {
+		for (const region of regions) {
+			if (action === 'collapse' && !visible[region].value && panelsIn(region).length) {
+				setRegionCollapsed(region, true)
+			} else if (action === 'hide' && visible[region].value && collapsed[region].value) {
+				setRegionVisible(region, false)
+				setRegionCollapsed(region, false)
+			}
+		}
+		scheduleSave()
+	})
+	watch(popoutRestore, scheduleSave)
+	watch([hideLoneTabBars, hiddenBars], () => {
+		for (const dock of docks.values()) dock.tabBars?.update()
+		scheduleSave()
+	})
 	watch(popoutsEnabled, (enabled) => {
 		if (!enabled) closePopouts()
 		scheduleSave()
@@ -797,15 +983,74 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 		scheduleSave()
 	}
 
+	/**
+	 * Collapses a region to a strip of its tabs, or brings it back to its size. A collapsed region
+	 * is shown, so its strip is too.
+	 */
+	function setRegionCollapsed(region: WorkbenchRegion, value: boolean) {
+		if (!regions.includes(region)) return
+		if (value) setRegionVisible(region, true)
+		if (collapsed[region].value === value) return
+		if (value) measureRegions()
+		collapsed[region].value = value
+		applyRegionSize(region)
+		measureRegions()
+		scheduleSave()
+	}
+
+	/** Shows a dock, bringing its region back from being hidden or collapsed. */
 	function showHost(host: WorkbenchHost) {
-		if (isRegion(host)) setRegionVisible(host, true)
+		if (!isRegion(host)) return
+		setRegionVisible(host, true)
+		setRegionCollapsed(host, false)
+	}
+
+	/**
+	 * Brings a hidden or collapsed region back in full; otherwise hides it, or collapses it to its
+	 * tabs, as the settings choose.
+	 */
+	function toggleRegion(region: WorkbenchRegion) {
+		if (!visible[region].value) setRegionVisible(region, true)
+		else if (collapsed[region].value) setRegionCollapsed(region, false)
+		else if (toggleAction.value === 'collapse') setRegionCollapsed(region, true)
+		else setRegionVisible(region, false)
+	}
+
+	/**
+	 * The tabs a dock holds, in order (its workbench panels and documents alike), e.g. for its
+	 * strip while collapsed.
+	 */
+	function dockTabs(host: WorkbenchHost) {
+		void arrangement.value
+		const api = docks.get(host)?.api
+		if (!api) return []
+		return api.groups
+			.filter((group) => group.api.location.type === 'grid')
+			.flatMap((group) =>
+				group.panels.map((panel) => ({
+					id: panel.id,
+					title: panel.title ?? findPanel(panel.id)?.title ?? panel.id,
+					icon: findPanel(panel.id)?.icon,
+					active: group.activePanel === panel,
+				})),
+			)
+	}
+
+	/** Brings a dock's tab to the front, showing the dock (e.g. from its collapsed strip). */
+	function activateTab(host: WorkbenchHost, id: string) {
+		showHost(host)
+		const panel = docks.get(host)?.api.getPanel(id)
+		if (!panel) return
+		panel.group.model.openPanel(panel)
+		panel.api.setActive()
 	}
 
 	/**
 	 * Moves (or reopens) a workbench panel into `host`, at `position` within it or else alongside
 	 * its active group's panels, and shows it.
 	 */
-	function movePanel(id: string, host: WorkbenchHost, position?: AddPanelPositionOptions) {
+	function movePanel(requested: string, host: WorkbenchHost, position?: AddPanelPositionOptions) {
+		const id = hostPanelId(requested)
 		const panel = findPanel(id)
 		if (!panel || (host !== 'center' && !regions.includes(host))) return
 		const from = regionOf(panel)
@@ -823,6 +1068,110 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 		docks.get(host)?.api.getPanel(id)?.api.setActive()
 		if (from !== host) updateDock(from)
 		scheduleSave()
+	}
+
+	/** The panels a dock panel shows: a linked tab's members, or else the panel itself. */
+	function membersOf(id: string) {
+		return activeLinks.value.find((link) => link.id === id)?.members ?? [id]
+	}
+
+	/** Updates every dock a change to the links touched, once they've been set. */
+	function applyLinks(hosts: Iterable<WorkbenchHost>) {
+		for (const host of new Set(hosts)) updateDock(host)
+		scheduleSave()
+	}
+
+	/**
+	 * Links a panel (or linked tab) with another, making them one tab where the first is, split
+	 * between them. Linking with a linked tab brings in all of its panels.
+	 */
+	function linkPanels(id: string, otherId: string) {
+		if (!mode.movePanels) return
+		const target = hostPanelId(id)
+		const other = hostPanelId(otherId)
+		const targetPanel = findPanel(target)
+		const otherPanel = findPanel(other)
+		if (!targetPanel || !otherPanel || target === other) return
+		const hosts = [regionOf(targetPanel), regionOf(otherPanel)]
+		const adding = membersOf(other)
+		const existing = links.value.find((link) => link.id === target)
+		const remaining = links.value
+			.filter((link) => link.id !== other && link.id !== target)
+			.map((link) => ({
+				...link,
+				members: link.members.filter((member) => !adding.includes(member)),
+			}))
+		if (existing) {
+			links.value = [
+				...remaining,
+				{ ...existing, members: [...existing.members, ...adding], sizes: undefined },
+			]
+		} else {
+			const link: WorkbenchLink = {
+				id: `${LINK_PREFIX}${target}`,
+				members: [target, ...adding],
+				orientation: 'vertical',
+			}
+			placements.value = { ...placements.value, [link.id]: regionOf(targetPanel) }
+			closed.value = closed.value.filter((closedId) => closedId !== link.id)
+			pendingPositions.set(link.id, { referencePanel: target, direction: 'within' })
+			links.value = [...remaining, link]
+		}
+		applyLinks(hosts)
+	}
+
+	/** Takes a panel out of its linked tab, beside it; a link left with a single panel is undone. */
+	function unlinkPanel(id: string) {
+		const link = linkOf(id)
+		if (!link) return
+		const tab = findPanel(link.id)
+		const host = tab ? regionOf(tab) : 'center'
+		const members = link.members.filter((member) => member !== id)
+		const released = members.length > 1 ? [id] : link.members
+		for (const member of released) {
+			placements.value = { ...placements.value, [member]: host }
+			pendingPositions.set(member, { referencePanel: link.id, direction: 'within' })
+		}
+		links.value = links.value.flatMap((candidate) => {
+			if (candidate.id !== link.id) return [candidate]
+			return members.length > 1 ? [{ ...candidate, members, sizes: undefined }] : []
+		})
+		applyLinks([host])
+	}
+
+	/** Undoes a link, its panels each becoming a tab of their own where it was. */
+	function unlinkAll(linkId: string) {
+		const link = activeLinks.value.find((candidate) => candidate.id === linkId)
+		if (link) unlinkPanel(link.members[0])
+		if (activeLinks.value.some((candidate) => candidate.id === linkId)) unlinkAll(linkId)
+	}
+
+	function updateLink(linkId: string, change: Partial<WorkbenchLink>) {
+		links.value = links.value.map((link) => (link.id === linkId ? { ...link, ...change } : link))
+		scheduleSave()
+	}
+
+	function setLinkOrientation(linkId: string, orientation: WorkbenchLinkOrientation) {
+		updateLink(linkId, { orientation })
+	}
+
+	function setLinkSizes(linkId: string, sizes: number[]) {
+		updateLink(linkId, { sizes })
+	}
+
+	/**
+	 * Turns the order of a linked tab's panels around, keeping each one's share. The tab stays in
+	 * its dock, though the panel now first may have been offered in another.
+	 */
+	function reverseLink(linkId: string) {
+		const link = links.value.find((candidate) => candidate.id === linkId)
+		const tab = findPanel(linkId)
+		if (!link || !tab) return
+		placements.value = { ...placements.value, [linkId]: regionOf(tab) }
+		updateLink(linkId, {
+			members: [...link.members].reverse(),
+			sizes: link.sizes ? [...link.sizes].reverse() : undefined,
+		})
 	}
 
 	function hostOfDocument(id: string) {
@@ -867,21 +1216,113 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 		if (from) void moveDocumentFrom(from, id, host)
 	}
 
-	function dockPanelOf(id: string) {
+	function dockPanelOf(requested: string) {
+		const id = hostPanelId(requested)
 		const panel = findPanel(id)
 		const dock = panel ? docks.get(regionOf(panel)) : undefined
 		return dock ? { dock, panel: dock.api.getPanel(id) } : undefined
 	}
 
-	/** Splits a panel off into its own group beside the rest of its group, within its dock. */
-	function splitPanel(id: string, side: 'right' | 'bottom') {
-		if (!mode.splitPanels) return
-		const panel = dockPanelOf(id)?.panel
-		if (!panel || panel.group.panels.length < 2) return
-		panel.api.moveTo({ group: panel.group, position: side })
+	/** The dock panels showing the given panels, each once. */
+	function dockPanelsOf(ids: string[]) {
+		const found = ids.flatMap((id) => {
+			const panel = dockPanelOf(id)?.panel
+			return panel ? [panel] : []
+		})
+		return [...new Set(found)]
 	}
 
-	function closePanel(id: string) {
+	/** Whether the panels share a group they don't fill, so they can be split off from it. */
+	function canSplit(ids: string[]) {
+		const found = dockPanelsOf(ids)
+		const group = found[0]?.group
+		return (
+			mode.splitPanels &&
+			!!group &&
+			found.every((panel) => panel.group === group) &&
+			group.panels.length > found.length
+		)
+	}
+
+	/** Splits panels off into a group of their own beside the rest of their group, within its dock. */
+	function splitPanels(ids: string[], side: WorkbenchSplitSide) {
+		if (!canSplit(ids)) return
+		const [first, ...rest] = dockPanelsOf(ids)
+		first.api.moveTo({ group: first.group, position: side })
+		for (const panel of rest) panel.api.moveTo({ group: first.group, position: 'center' })
+		first.api.setActive()
+	}
+
+	/** Hides the tab bar of the panel's group, until it's pulled down again from its handle. */
+	function hideTabBar(id: string) {
+		const group = dockPanelOf(id)?.panel?.group
+		if (!group) return
+		const ids = group.panels.map((panel) => panel.id)
+		hiddenBars.value = [...new Set([...hiddenBars.value, ...ids])]
+	}
+
+	type GridNode = SerializedDockview['grid']['root']
+
+	/**
+	 * The dock's layout, with the outermost split of its groups (in its own window), when it has
+	 * one; a split holding a single other split is looked through.
+	 */
+	function outermostSplit(host: WorkbenchHost) {
+		const dock = docks.get(host)
+		if (!dock) return undefined
+		const layout = dock.api.toJSON()
+		let node: GridNode = layout.grid.root
+		let horizontal = layout.grid.orientation === 'HORIZONTAL'
+		while (Array.isArray(node.data) && node.data.length === 1) {
+			node = node.data[0]
+			horizontal = !horizontal
+		}
+		if (!Array.isArray(node.data)) return undefined
+		const children = node.data
+		/** Groups left hidden by popped out ones, waiting for them to return, keep their place. */
+		const shown = children.filter((child) => child.visible !== false)
+		if (shown.length < 2) return undefined
+		const groups = shown.flatMap((child) => {
+			const data = child.data
+			const group = Array.isArray(data)
+				? undefined
+				: dock.api.groups.find((candidate) => candidate.id === data.id)
+			return group ? [group] : []
+		})
+		/*
+		 * Groups side by side are moved around one by one, which leaves popped out windows open; a
+		 * split of splits is laid out anew, which can only be done without any.
+		 */
+		const movable = groups.length === shown.length
+		if (!movable && dock.api.getPopouts().length) return undefined
+		return { dock, layout, children, groups: movable ? groups : undefined, horizontal }
+	}
+
+	/** Turns the order of a dock's groups around, e.g. to have its last group on top. */
+	function reverseGroups(host: WorkbenchHost) {
+		const split = outermostSplit(host)
+		if (!split) return
+		const { dock, layout, children, groups, horizontal } = split
+		withOwnRemovals(() => {
+			if (groups) {
+				for (let index = 1; index < groups.length; index++) {
+					groups[index].api.moveTo({
+						group: groups[index - 1],
+						position: horizontal ? 'left' : 'top',
+					})
+				}
+			} else {
+				children.reverse()
+				dock.api.fromJSON(layout, { reuseExistingPanels: true })
+			}
+		})
+		updateCornerGroups()
+		scheduleSave()
+	}
+
+	function closePanel(requested: string) {
+		if (linkOf(requested)) unlinkPanel(requested)
+		const id = hostPanelId(requested)
 		const panel = findPanel(id)
 		if (!mode.closePanels || !panel || closed.value.includes(id)) return
 		const api = docks.get(regionOf(panel))?.api
@@ -891,7 +1332,8 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 	}
 
 	/** Shows a panel: opening it if closed, showing its region, or bringing its popout window forward. */
-	function revealPanel(id: string) {
+	function revealPanel(requested: string) {
+		const id = hostPanelId(requested)
 		const panel = findPanel(id)
 		if (!panel) return
 		if (closed.value.includes(id)) {
@@ -914,8 +1356,12 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 		}
 	}
 
-	/** Restores the defaults, with every popout docked and every document back in the center. */
+	/**
+	 * Restores the defaults, with every popout docked and every document back in the center. Regions
+	 * left without panels stay hidden, as they would on a first visit.
+	 */
 	function resetLayout() {
+		if (!isReady.value) return
 		for (const dock of docks.values()) {
 			if (dock.popouts?.restoring() || dock.popouts?.poppingOut.value.length) return
 		}
@@ -923,14 +1369,17 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 		pendingPositions.clear()
 		pendingDocuments.clear()
 		placements.value = {}
+		links.value = []
 		closed.value = mode.closePanels
 			? panels.value.filter((panel) => panel.closedByDefault).map((panel) => panel.id)
 			: []
 		for (const host of WORKBENCH_HOSTS) savedDockLayouts[host].clear()
 		for (const region of regions) {
+			const shown = !options.hiddenRegions?.includes(region) && panelsIn(region).length > 0
 			regionSizes[region] = sizes[region].default
-			visible[region].value = true
-			grid?.getPanel(region)?.api.setVisible(true)
+			collapsed[region].value = false
+			visible[region].value = shown
+			grid?.getPanel(region)?.api.setVisible(shown)
 		}
 		applyRegionSizes()
 		for (const [host, dock] of docks) {
@@ -982,7 +1431,7 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 					return hosts.length === 1 ? (hosts[0].dataset.workbenchHost as WorkbenchHost) : undefined
 				})
 				.find((host): host is WorkbenchRegion => !!host && isRegion(host))
-			if (!region || !visible[region].value) return
+			if (!region || !visible[region].value || collapsed[region].value) return
 			regionSizes[region] = sizes[region].default
 			applyRegionSize(region)
 		}
@@ -1058,8 +1507,18 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 		canUsePopouts: popoutHosts.length > 0,
 		popoutsEnabled,
 		setPopoutsEnabled: (value) => (popoutsEnabled.value = value),
+		hideLoneTabBars,
+		setHideLoneTabBars: (value) => (hideLoneTabBars.value = value),
+		hideTabBar,
+		canHideTabBar: (host) => !mode.headerless.includes(host),
+		reverseGroups,
+		canReverseGroups: (host) => !!outermostSplit(host),
+		popoutRestore,
+		setPopoutRestore: (value) => (popoutRestore.value = value),
 		toggleLocation,
 		setToggleLocation: (value) => (toggleLocation.value = value),
+		toggleAction,
+		setToggleAction: (value) => (toggleAction.value = value),
 		cornerToggles,
 		documents,
 		panels,
@@ -1073,35 +1532,54 @@ export function createWorkbench(options: WorkbenchOptions): WorkbenchContext {
 		hasPopouts,
 		poppingOut,
 		popoutPanel: (id) =>
-			popoutsEnabled.value ? dockPanelOf(id)?.dock.popouts?.popoutPanel(id) : undefined,
-		dockPanel: (id) => dockPanelOf(id)?.dock.popouts?.dock(id),
+			popoutsEnabled.value
+				? dockPanelOf(id)?.dock.popouts?.popoutPanel(hostPanelId(id))
+				: undefined,
+		dockPanel: (id) => dockPanelOf(id)?.dock.popouts?.dock(hostPanelId(id)),
 		closePopouts,
 		canPopout: (id) => {
 			if (!popoutsEnabled.value) return false
 			const found = dockPanelOf(id)
 			return !!found?.dock.popouts && found.panel?.api.location.type === 'grid'
 		},
-		isDetached: (id) => detachedPanels.value.includes(id),
+		isDetached: (id) => detachedPanels.value.includes(hostPanelId(id)),
 		regionOf,
-		isOpen: (id) => !closed.value.includes(id),
-		isShown: (id) => {
+		isOpen: (id) => !closed.value.includes(hostPanelId(id)),
+		isShown: (requested) => {
+			const id = hostPanelId(requested)
 			const panel = findPanel(id)
 			if (!panel || closed.value.includes(id)) return false
 			const host = regionOf(panel)
-			if (isRegion(host) && !visible[host].value) return false
+			if (isRegion(host) && (!visible[host].value || collapsed[host].value)) return false
 			return dockPanelOf(id)?.panel?.api.isVisible ?? false
 		},
 		setRegionVisible,
-		toggleRegion: (region) => setRegionVisible(region, !visible[region].value),
+		toggleRegion,
+		collapsed,
+		setRegionCollapsed,
+		regionCornerGroups,
+		dockTabs,
+		activateTab,
 		movePanel,
 		moveDocument,
 		hostOfDocument,
-		splitPanel,
+		splitPanels,
 		closePanel,
 		revealPanel,
+		links: activeLinks,
+		linkPanels,
+		unlinkPanel,
+		unlinkAll,
+		setLinkOrientation,
+		reverseLink,
+		setLinkSizes,
 		resetActiveTabs,
 		resetLayout,
-		canSplit: (id) => mode.splitPanels && (dockPanelOf(id)?.panel?.group.panels.length ?? 0) > 1,
+		canSplit,
+		popoutPanels: (ids) => {
+			if (!popoutsEnabled.value || !ids.length) return undefined
+			return dockPanelOf(ids[0])?.dock.popouts?.popoutPanels(ids.map(hostPanelId))
+		},
 		onGridReady,
 		onDockReady,
 		onDockDispose,

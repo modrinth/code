@@ -1,5 +1,11 @@
 import { defineMessages } from '@modrinth/ui'
 
+/** Links to the archive viewer from elsewhere, e.g. version lists. */
+export const archiveLinkMessages = defineMessages({
+	archive: { id: 'archive.link.archive', defaultMessage: 'Archive' },
+	openArchive: { id: 'archive.link.open', defaultMessage: 'Open in the archive viewer' },
+})
+
 export const channelMessages = defineMessages({
 	release: { id: 'archive.project-details.channel.release', defaultMessage: 'Release' },
 	beta: { id: 'archive.project-details.channel.beta', defaultMessage: 'Beta' },

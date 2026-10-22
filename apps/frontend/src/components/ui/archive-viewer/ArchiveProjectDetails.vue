@@ -1,5 +1,6 @@
 <template>
 	<ArchiveDetailsSection
+		v-if="!hideProject"
 		:kind="formatMessage(messages.project)"
 		:title="project.name"
 		details-key="project"
@@ -113,17 +114,6 @@
 				>
 					<DownloadIcon aria-hidden="true" />
 				</ButtonLink>
-				<ButtonLink
-					v-if="slicerUrl"
-					v-tooltip="formatMessage(messages.openInSlicer)"
-					type="quiet"
-					size="xs"
-					:href="slicerUrl"
-					target="_blank"
-					:aria-label="formatMessage(messages.openInSlicer)"
-				>
-					<CoffeeIcon aria-hidden="true" />
-				</ButtonLink>
 			</div>
 		</template>
 
@@ -219,7 +209,6 @@
 import type { Labrinth } from '@modrinth/api-client'
 import {
 	CalendarIcon,
-	CoffeeIcon,
 	DownloadIcon,
 	ExternalIcon,
 	GenericListIcon,
@@ -267,7 +256,8 @@ const props = defineProps<{
 	versionsLoading?: boolean
 	version: Labrinth.Versions.v3.Version | null
 	file: Labrinth.Versions.v3.VersionFile | null
-	slicerUrl?: string
+	/** Leaves out the project, for hosts showing it already, keeping the version and its picker. */
+	hideProject?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -286,7 +276,6 @@ const messages = defineMessages({
 	openProject: { id: 'archive.project-details.open-project', defaultMessage: 'Project page' },
 	techReview: { id: 'archive.project-details.tech-review', defaultMessage: 'Tech review' },
 	download: { id: 'archive.project-details.download', defaultMessage: 'Download file' },
-	openInSlicer: { id: 'archive.open-in-slicer', defaultMessage: 'Open in Slicer' },
 	selectVersion: { id: 'archive.select-version', defaultMessage: 'Select a version' },
 	changeVersion: { id: 'archive.project-details.change-version', defaultMessage: 'Change version' },
 	loadingVersions: { id: 'archive.loading-versions', defaultMessage: 'Loading versions...' },

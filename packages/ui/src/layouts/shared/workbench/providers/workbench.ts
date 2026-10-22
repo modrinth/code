@@ -1,5 +1,5 @@
 import type { AddPanelPositionOptions, DockviewReadyEvent, GridviewReadyEvent } from 'dockview-vue'
-import type { ComputedRef, Ref, ShallowRef, Slots } from 'vue'
+import type { Component, ComputedRef, Ref, ShallowRef, Slots } from 'vue'
 
 import type { ButtonMenuOption } from '#ui/components/base/buttons/types'
 import { createContext } from '#ui/providers/create-context'
@@ -7,18 +7,32 @@ import { createContext } from '#ui/providers/create-context'
 import type {
 	WorkbenchDocuments,
 	WorkbenchHost,
+	WorkbenchLink,
+	WorkbenchLinkOrientation,
 	WorkbenchMode,
 	WorkbenchPanel,
+	WorkbenchPopoutRestore,
 	WorkbenchRegion,
+	WorkbenchSplitSide,
+	WorkbenchToggleAction,
 	WorkbenchToggleLocation,
 	WorkbenchVariant,
 } from '../types'
 
+/** A tab of a dock: one of the workbench's panels, or a document. */
+export interface WorkbenchDockTab {
+	id: string
+	title: string
+	icon?: Component
+	/** Whether it's the front tab of its group. */
+	active: boolean
+}
+
 /** The workbench's layout state and the operations on it. */
 export interface WorkbenchContext {
 	/**
-	 * The layout's slots: `panel-{id}` for each panel, `tab` for custom tab content and
-	 * `center-footer` below the center. Set by `WorkbenchLayout` when it renders.
+	 * The layout's slots: `panel-{id}` for each panel, `tab` for custom tab content and the
+	 * toolbar's. Set by `WorkbenchLayout` when it renders.
 	 */
 	slots: Slots
 	/** The workbench's root element, set by `WorkbenchLayout`. */
@@ -31,9 +45,24 @@ export interface WorkbenchContext {
 	/** Whether the user lets panels be popped out, where the mode allows it. */
 	popoutsEnabled: Ref<boolean>
 	setPopoutsEnabled: (enabled: boolean) => void
+	/** Whether groups holding a single tab hide their tab bar, behind a handle pulling it down. */
+	hideLoneTabBars: Ref<boolean>
+	setHideLoneTabBars: (hide: boolean) => void
+	/** Hides the tab bar of a panel's group, behind a handle pulling it down again. */
+	hideTabBar: (id: string) => void
+	canHideTabBar: (host: WorkbenchHost) => boolean
+	/** Turns the order of a dock's groups around. */
+	reverseGroups: (host: WorkbenchHost) => void
+	canReverseGroups: (host: WorkbenchHost) => boolean
+	/** What becomes of popped out panels when the page is opened again. */
+	popoutRestore: Ref<WorkbenchPopoutRestore>
+	setPopoutRestore: (restore: WorkbenchPopoutRestore) => void
 	/** Where the user keeps the region toggles: in the layout menu only, or also in the tab bar. */
 	toggleLocation: Ref<WorkbenchToggleLocation>
 	setToggleLocation: (location: WorkbenchToggleLocation) => void
+	/** Whether the region toggles hide their regions or collapse them to their tabs. */
+	toggleAction: Ref<WorkbenchToggleAction>
+	setToggleAction: (action: WorkbenchToggleAction) => void
 	/** Whether the left and right region toggles show in the corners of the center's tab bars. */
 	cornerToggles: ComputedRef<boolean>
 	documents?: WorkbenchDocuments
@@ -67,7 +96,17 @@ export interface WorkbenchContext {
 	/** Whether the panel is in view: open, in a shown region, and the front tab of its group. */
 	isShown: (id: string) => boolean
 	setRegionVisible: (region: WorkbenchRegion, visible: boolean) => void
+	/** Brings a hidden or collapsed region back, or else hides or collapses it, as the settings choose. */
 	toggleRegion: (region: WorkbenchRegion) => void
+	/** Regions collapsed to a strip of their tabs. */
+	collapsed: Record<WorkbenchRegion, Ref<boolean>>
+	setRegionCollapsed: (region: WorkbenchRegion, collapsed: boolean) => void
+	/** Each region's top-right group, whose tab bar holds the button collapsing the region. */
+	regionCornerGroups: Ref<Partial<Record<WorkbenchRegion, string>>>
+	/** The tabs a dock holds, in order, e.g. for its strip while collapsed. */
+	dockTabs: (host: WorkbenchHost) => WorkbenchDockTab[]
+	/** Brings a dock's tab to the front, showing (and expanding) its dock. */
+	activateTab: (host: WorkbenchHost, id: string) => void
 	/** Moves (or reopens) a panel into a dock, and shows it. */
 	movePanel: (id: string, host: WorkbenchHost, position?: AddPanelPositionOptions) => void
 	/** Moves a document into another dock, once its owner confirms it may be remounted. */
@@ -75,10 +114,27 @@ export interface WorkbenchContext {
 	/** The dock holding a document, if any does. */
 	hostOfDocument: (id: string) => WorkbenchHost | undefined
 	/** Splits a panel off into its own group beside the rest of its group. */
-	splitPanel: (id: string, side: 'right' | 'bottom') => void
+	/** Splits panels of a group off into a group of their own beside it. */
+	splitPanels: (ids: string[], side: WorkbenchSplitSide) => void
 	/** Whether the panel shares its group, so it can be split off. */
-	canSplit: (id: string) => boolean
+	canSplit: (ids: string[]) => boolean
+	/** Pops several panels out together, into one window. */
+	popoutPanels: (ids: string[]) => Promise<void> | undefined
+	/** Closes a panel; a linked one is taken out of its linked tab first. */
 	closePanel: (id: string) => void
+	/** Panels linked into single tabs, each split between its panels. */
+	links: ComputedRef<WorkbenchLink[]>
+	/** Links a panel (or linked tab) with another, as one tab split between them. */
+	linkPanels: (id: string, otherId: string) => void
+	/** Takes a panel out of its linked tab, beside it. */
+	unlinkPanel: (id: string) => void
+	/** Undoes a link, its panels each becoming a tab of their own. */
+	unlinkAll: (linkId: string) => void
+	setLinkOrientation: (linkId: string, orientation: WorkbenchLinkOrientation) => void
+	/** Turns the order of a linked tab's panels around. */
+	reverseLink: (linkId: string) => void
+	/** Keeps the shares of a linked tab its panels were resized to. */
+	setLinkSizes: (linkId: string, sizes: number[]) => void
 	/** Opens the panel if closed, shows its dock or window and brings it to the front of its group. */
 	revealPanel: (id: string) => void
 	/** Brings the first panel of every group to the front. */
@@ -94,7 +150,7 @@ export interface WorkbenchContext {
 	/** The menu of a panel's tab: moving, splitting, popping out and closing it. */
 	openPanelMenu: (event: MouseEvent, id: string) => void
 	/** The menu of a dock's tab bar: opening closed panels there, or hiding the region. */
-	openRegionMenu: (event: MouseEvent, host: WorkbenchHost) => void
+	openRegionMenu: (event: MouseEvent, host: WorkbenchHost, panelId?: string) => void
 	/** Options listing every panel, to open or close each. */
 	panelsMenuOptions: ComputedRef<ButtonMenuOption[]>
 	/** A "Move to" entry for a document's own tab menu, or `null` when it can't be moved. */
@@ -117,6 +173,8 @@ export interface WorkbenchPanelContext {
 	id: string
 	/** Whether the panel is shown, i.e. the active tab of its group, in a shown region. */
 	visible: Readonly<Ref<boolean>>
+	/** The window showing the panel: the main one, or the popout it was moved into. */
+	window: Readonly<ShallowRef<Window>>
 }
 
 export const [injectWorkbenchPanel, provideWorkbenchPanel] = createContext<WorkbenchPanelContext>(

@@ -4,6 +4,7 @@ export { default as WorkbenchLayout } from './layout.vue'
 export {
 	injectWorkbench,
 	injectWorkbenchPanel,
+	provideWorkbench,
 	type WorkbenchContext,
 	type WorkbenchPanelContext,
 } from './providers'

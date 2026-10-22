@@ -147,14 +147,14 @@
 							v-if="
 								!!primaryFile?.url &&
 								isStaff(auth.user) &&
-								modSettings.get(moderationSettings.General.SlicerButtonInVersions)
+								modSettings.get(moderationSettings.General.ArchiveButtonInVersions)
 							"
-							v-tooltip="`Open in Slicer`"
+							v-tooltip="formatMessage(archiveMessages.openArchive)"
 							target="_blank"
-							:href="`https://slicer.run/?url=${encodeURIComponent(primaryFile?.url)}`"
+							:href="archiveViewerUrl({ project: project.id, version: version!.id })"
 						>
 							<ExternalIcon aria-hidden="true" />
-							Slicer
+							{{ formatMessage(archiveMessages.archive) }}
 						</ButtonLink>
 						<ButtonLink
 							v-for="file in promotedFiles.filter(
@@ -539,11 +539,13 @@ import { isStaff } from '@modrinth/utils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { onServerPrefetch } from 'vue'
 
+import { archiveLinkMessages as archiveMessages } from '~/components/ui/archive-viewer/messages'
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
 import ProjectDownloadModal from '~/components/ui/ProjectDownloadModal/index.vue'
 import { getSignInRouteObj } from '~/composables/auth.ts'
 import { projectQueryOptions, STALE_TIME } from '~/composables/queries/project'
 import { versionQueryOptions } from '~/composables/queries/version'
+import { archiveViewerUrl } from '~/helpers/archive-viewer'
 import { createDataPackVersion } from '~/helpers/package.js'
 import { reportVersion } from '~/utils/report-helpers.ts'
 

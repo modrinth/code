@@ -10,21 +10,22 @@
 			:orientation="Orientation.HORIZONTAL"
 			:components="components"
 			:proportional-layout="false"
-			@ready="workbench.onGridReady"
+			@ready="onGridReady"
 		/>
 		<ContextMenu ref="contextMenu" :label="formatMessage(messages.menuLabel)" />
 	</div>
 </template>
 
 <script setup lang="ts">
-import { GridviewVue, Orientation } from 'dockview-vue'
-import { onMounted, ref, type VNode } from 'vue'
+import { type GridviewApi, type GridviewReadyEvent, GridviewVue, Orientation } from 'dockview-vue'
+import { onMounted, ref, shallowRef, type VNode } from 'vue'
 
 import { ContextMenu } from '#ui/components/base/buttons'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 
 import Dock from './components/dock/index.vue'
 import { createWorkbench, WORKBENCH_DOCK_COMPONENT } from './composables/create-workbench'
+import { useDetachedLayout } from './composables/use-detached-layout'
 import { provideWorkbench, type WorkbenchContext } from './providers/workbench'
 import type {
 	WorkbenchDocuments,
@@ -63,8 +64,6 @@ const slots = defineSlots<{
 	'toolbar-end'?: () => VNode[]
 	/** Content of a tab, in place of its icon and title. */
 	tab?: (props: { panel: WorkbenchPanel; active: boolean; selected: boolean }) => VNode[]
-	/** Shown below the center, spanning it. */
-	'center-footer'?: () => VNode[]
 	[panel: `panel-${string}`]: (() => VNode[]) | undefined
 }>()
 
@@ -97,7 +96,21 @@ const root = ref<HTMLElement | null>(null)
 const contextMenu = ref<InstanceType<typeof ContextMenu>>()
 
 workbench.setMenuOpener((event, options) => contextMenu.value?.open(event, options))
-onMounted(() => (workbench.root.value = root.value))
+
+let grid: GridviewApi | undefined
+const gridElement = shallowRef<HTMLElement | null>(null)
+
+function onGridReady(event: GridviewReadyEvent) {
+	grid = event.api
+	workbench.onGridReady(event)
+}
+
+onMounted(() => {
+	workbench.root.value = root.value
+	gridElement.value = root.value?.querySelector<HTMLElement>(':scope > .workbench-grid') ?? null
+})
+
+useDetachedLayout(gridElement, (width, height) => grid?.layout(width, height))
 
 provideWorkbench(workbench)
 

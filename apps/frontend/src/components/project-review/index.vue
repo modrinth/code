@@ -42,48 +42,84 @@
 				</div>
 			</template>
 		</NewModal>
-		<ProjectReviewLayout :tabs="visibleTabs" :reset-key="selection" :ready="layoutReady">
-			<template #left><ProjectInfo /></template>
-			<template #right>
-				<div
-					:key="projectId"
-					class="flex h-full min-h-0 min-w-0 flex-col gap-2.5 [&_.cm-editor]:text-xs"
-				>
+		<ProjectReviewLayout
+			ref="layout"
+			:tabs="visibleTabs"
+			:side-panels="sidePanels"
+			:counts="panelCounts"
+			:reset-key="selection"
+			:ready="layoutReady"
+		>
+			<template #project><ProjectInfo /></template>
+			<template #rulings>
+				<div :key="projectId" class="flex h-full min-h-0 min-w-0 flex-col">
 					<ProjectWideChecks :inert="pending" />
-					<section class="flex min-h-0 min-w-0 flex-1 flex-col">
-						<div class="flex shrink-0 flex-wrap items-center gap-2 pb-2.5">
-							<Tabs v-model:value="activeReviewTab" wrap :tabs="rightPanelTabs" />
-							<div class="ml-auto flex items-center gap-1">
-								<Tooltip v-if="!pending && project" text="Reset issues">
-									<Button
-										type="quiet"
-										size="sm"
-										icon-only
-										:disabled="resetting"
-										aria-label="Reset issues"
-										@click="resetIssuesModal?.show()"
-									>
-										<RotateCounterClockwiseIcon aria-hidden="true" />
-									</Button>
-								</Tooltip>
-								<IssuePicker ref="issuePicker" @selected="activeReviewTab = 'issues'" />
-							</div>
-						</div>
-						<IssueList v-show="activeReviewTab === 'issues'" />
-						<IssueList v-show="activeReviewTab === 're-review'" re-review />
-						<MessageThread v-show="activeReviewTab === 'thread'" ref="messageThread" />
-					</section>
-					<ReviewOutcomeButtons />
 				</div>
 			</template>
+			<template #issues>
+				<ConversationPanel
+					:key="projectId"
+					:hosts-outcome="outcomeHost === 'issues'"
+					class="[&_.cm-editor]:text-xs"
+					@shown="(shown) => setConversationShown('issues', shown)"
+				>
+					<div class="flex shrink-0 items-center justify-end gap-1 pb-2">
+						<Tooltip v-if="!pending && project" text="Reset issues">
+							<Button
+								type="quiet"
+								size="sm"
+								icon-only
+								:disabled="resetting"
+								aria-label="Reset issues"
+								@click="resetIssuesModal?.show()"
+							>
+								<RotateCounterClockwiseIcon aria-hidden="true" />
+							</Button>
+						</Tooltip>
+						<IssuePicker ref="issuePicker" @selected="reveal('issues')" />
+					</div>
+					<IssueList />
+				</ConversationPanel>
+			</template>
+			<template #re-review>
+				<ConversationPanel
+					:key="projectId"
+					:hosts-outcome="outcomeHost === 're-review'"
+					class="[&_.cm-editor]:text-xs"
+					@shown="(shown) => setConversationShown('re-review', shown)"
+				>
+					<IssueList re-review />
+				</ConversationPanel>
+			</template>
+			<template #thread>
+				<ConversationPanel
+					:key="projectId"
+					:hosts-outcome="outcomeHost === 'thread'"
+					@shown="(shown) => setConversationShown('thread', shown)"
+				>
+					<MessageThread />
+				</ConversationPanel>
+			</template>
 			<template #footer><QueueBar /></template>
+			<template #settings="{ floating }"><ReviewSettings :floating="floating" /></template>
 			<template #description><Description :key="projectId" /></template>
 			<template #gallery><Gallery :key="projectId" /></template>
 			<template #disclosures><Disclosures :key="projectId" /></template>
 			<template #permissions><Permissions :key="projectId" /></template>
 			<template #versions><Versions :key="projectId" /></template>
 			<template #tech-review><TechReview :key="projectId" /></template>
-			<template #slicer><Slicer :key="projectId" /></template>
+			<template #archive-source="{ projectShown }">
+				<ArchiveProjectDetails
+					v-if="project"
+					:project="project"
+					:versions="versions"
+					:version="archive.version.value ?? null"
+					:file="archive.file.value ?? null"
+					:hide-project="projectShown"
+					@select-version="archive.selectVersion"
+					@select-file="archive.selectFile"
+				/>
+			</template>
 		</ProjectReviewLayout>
 		<template #fallback>
 			<p class="m-0 p-4 text-secondary" role="status">Loading...</p>
@@ -94,9 +130,10 @@
 <script setup lang="ts">
 import { RotateCounterClockwiseIcon, TrashIcon, XIcon } from '@modrinth/assets'
 import { moderationSettings } from '@modrinth/moderation'
-import { Button, injectLoadingState, NewModal, Tabs, Tooltip } from '@modrinth/ui'
-import { computed, onScopeDispose, ref, watch } from 'vue'
+import { Button, injectLoadingState, NewModal, Tooltip } from '@modrinth/ui'
+import { computed, onScopeDispose, ref, shallowReactive, watch } from 'vue'
 
+import ArchiveProjectDetails from '~/components/ui/archive-viewer/ArchiveProjectDetails.vue'
 import {
 	notifyCopied,
 	useModerationKeybinds,
@@ -105,6 +142,10 @@ import {
 import { isStaff } from '~/helpers/users.js'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 import { previousReviewLinkUrls } from '~/providers/project-review/project-links'
+import {
+	createReviewArchive,
+	provideReviewArchive,
+} from '~/providers/project-review/review-archive'
 import {
 	createReviewMessages,
 	provideReviewMessages,
@@ -118,12 +159,12 @@ import {
 	createReviewSession,
 	provideReviewSession,
 } from '~/providers/project-review/review-session'
-import { createReviewSlicer, provideReviewSlicer } from '~/providers/project-review/review-slicer'
 import {
 	createReviewSubmission,
 	provideReviewSubmission,
 } from '~/providers/project-review/review-submission'
 
+import ConversationPanel from './conversation-panel.vue'
 import Description from './description/index.vue'
 import Disclosures from './disclosures/index.vue'
 import Gallery from './gallery/index.vue'
@@ -131,16 +172,20 @@ import IssueList from './issue-list/index.vue'
 import IssuePicker from './issue-list/issue-picker.vue'
 import { useReReviewIssues } from './issue-list/re-review-issues'
 import ProjectReviewLayout from './layout/index.client.vue'
-import { type ProjectReviewTab, projectReviewTabs } from './layout/types'
+import {
+	type ProjectReviewSidePanel,
+	type ProjectReviewSlot,
+	type ProjectReviewTab,
+	projectReviewTabs,
+} from './layout/types'
 import MessageThread from './message-thread/index.vue'
 import Permissions from './permissions/index.vue'
 import ProjectInfo from './project-info/index.vue'
 import ProjectWideChecks from './project-wide-checks.vue'
 import QueueBar from './queue-bar.vue'
-import ReviewOutcomeButtons from './review-outcome-buttons/index.vue'
 import { createReviewContext, provideReviewContext } from './review-panel/context'
+import ReviewSettings from './review-settings.vue'
 import { createReviewShortcuts, provideReviewShortcuts, reviewShortcutBlocked } from './shortcuts'
-import Slicer from './slicer/index.vue'
 import TechReview from './tech-review/index.vue'
 import Versions from './versions/index.vue'
 
@@ -167,7 +212,7 @@ const {
 	navigation,
 } = injectProjectReviewPageContext()
 const layoutReady = computed(() => !!project.value && !isLoading.value && !navigation.busy.value)
-provideReviewSlicer(createReviewSlicer(projectId, versions))
+const archive = provideReviewArchive(createReviewArchive(projectId, versions))
 const visibleTabs = computed<readonly ProjectReviewTab[]>((previousTabs) => {
 	if (!project.value) {
 		return previousTabs ?? projectReviewTabs.filter((tab) => tab !== 'permissions')
@@ -256,20 +301,60 @@ watch(
 	{ immediate: true },
 )
 const hasPreviousStructuredIssues = computed(() => previousIssues.issues.value.length > 0)
-const activeReviewTab = ref('thread')
+const layout = ref<InstanceType<typeof ProjectReviewLayout>>()
+
+/** The conversation's panels, of which the re-review only shows once there are previous issues. */
+const conversationPanels = computed<ProjectReviewSidePanel[]>(() => [
+	...(hasPreviousStructuredIssues.value ? (['re-review'] as const) : []),
+	'thread',
+	'issues',
+])
+const sidePanels = computed<ProjectReviewSidePanel[]>(() => [
+	'project',
+	'rulings',
+	...conversationPanels.value,
+	'settings',
+])
+const panelCounts = computed<Partial<Record<ProjectReviewSlot, number>>>(() => ({
+	issues: issueCount.value,
+	...(hasPreviousStructuredIssues.value
+		? { 're-review': previousIssues.remainingReReviewIssues.value.length }
+		: {}),
+}))
+
+function reveal(panel: ProjectReviewSlot) {
+	layout.value?.reveal(panel)
+}
+
+/** The conversation panels currently shown, the first of which hosts the outcome buttons. */
+const shownConversation = shallowReactive(new Set<ProjectReviewSidePanel>())
+function setConversationShown(panel: ProjectReviewSidePanel, shown: boolean) {
+	if (shown) shownConversation.add(panel)
+	else shownConversation.delete(panel)
+}
+
+/**
+ * Where the outcome buttons go: below the first conversation panel shown, else the first one
+ * (out of sight), so their shortcuts keep working while the conversation is hidden.
+ */
+const outcomeHost = computed(
+	() =>
+		conversationPanels.value.find((panel) => shownConversation.has(panel)) ??
+		conversationPanels.value[0],
+)
+
 onScopeDispose(
 	reviewContext.registerRoute('re-review', () => {
 		if (!hasPreviousStructuredIssues.value) {
 			void reviewContext.revealPanel('re-review-misc')
 		} else {
-			activeReviewTab.value = 're-review'
+			reveal('re-review')
 		}
 	}),
 )
 const resetIssuesModal = ref<InstanceType<typeof NewModal>>()
 const resetCancelButton = ref<InstanceType<typeof Button>>()
 const issuePicker = ref<InstanceType<typeof IssuePicker>>()
-const messageThread = ref<InstanceType<typeof MessageThread>>()
 const auth = useAuthState()
 const keybinds = useModerationKeybinds()
 
@@ -284,28 +369,10 @@ function revertCustomizations() {
 	resetIssuesModal.value?.hide()
 }
 
-const rightPanelTabs = computed(() => [
-	...(hasPreviousStructuredIssues.value
-		? [
-				{
-					value: 're-review',
-					label: `Re-review (${previousIssues.remainingReReviewIssues.value.length})`,
-				},
-			]
-		: []),
-	{ value: 'thread', label: 'Thread' },
-	{
-		value: 'issues',
-		label: `Issues (${issueCount.value})`,
-	},
-])
-
 watch(
 	[projectId, hasPreviousStructuredIssues],
-	([, hasIssues]) => {
-		activeReviewTab.value = hasIssues ? 're-review' : 'thread'
-	},
-	{ immediate: true },
+	([, hasIssues]) => reveal(hasIssues ? 're-review' : 'thread'),
+	{ flush: 'post' },
 )
 
 watch(projectId, () => {
@@ -313,9 +380,9 @@ watch(projectId, () => {
 })
 
 useShortcut('cycle-conversation', () => {
-	const tabs = ['issues', 'thread', ...(hasPreviousStructuredIssues.value ? ['re-review'] : [])]
-	activeReviewTab.value = tabs[(tabs.indexOf(activeReviewTab.value) + 1) % tabs.length]
-	shortcuts.run('reveal-right')
+	const panels = conversationPanels.value
+	const shown = panels.findIndex((panel) => shownConversation.has(panel))
+	reveal(panels[(shown + 1) % panels.length])
 })
 useShortcut(
 	'new-issue',
@@ -333,7 +400,6 @@ useShortcut(
 	're-review',
 	() => {
 		void reviewContext.revealPanel('re-review')
-		shortcuts.run('reveal-right')
 	},
 	() =>
 		hasPreviousStructuredIssues.value || !!panels.resolve({ kind: 'panel', key: 're-review-misc' }),

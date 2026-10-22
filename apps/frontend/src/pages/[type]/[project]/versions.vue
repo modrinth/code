@@ -59,12 +59,12 @@
 						v-if="
 							!!getPrimaryFile(version) &&
 							isStaff(auth.user) &&
-							modSettings.get(moderationSettings.General.SlicerButtonInVersions)
+							modSettings.get(moderationSettings.General.ArchiveButtonInVersions)
 						"
-						v-tooltip="`Open in Slicer`"
+						v-tooltip="formatMessage(archiveMessages.openArchive)"
 						type="quiet"
 						target="_blank"
-						:href="`https://slicer.run/?url=${encodeURIComponent(createDownloadUrl(version))}`"
+						:href="archiveViewerUrl({ project: project.id, version: version.id })"
 						class="!w-9 !rounded-full !px-0 hover:!bg-button-bg"
 					>
 						<ExternalIcon aria-hidden="true" />
@@ -306,13 +306,16 @@ import {
 	injectProjectPageContext,
 	ProjectPageVersions,
 	TeleportOverflowMenu,
+	useVIntl,
 } from '@modrinth/ui'
 import { isStaff } from '@modrinth/utils'
 import { onMounted, useTemplateRef, watch } from 'vue'
 
+import { archiveLinkMessages as archiveMessages } from '~/components/ui/archive-viewer/messages'
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
 import ProjectC2paScanModal from '~/components/ui/moderation/ProjectC2paScanModal.vue'
 import { getSignInRouteObj } from '~/composables/auth.ts'
+import { archiveViewerUrl } from '~/helpers/archive-viewer'
 import { reportVersion } from '~/utils/report-helpers.ts'
 
 const route = useRoute()
@@ -323,6 +326,7 @@ const tags = useGeneratedState()
 const flags = useFeatureFlags()
 const modSettings = useModerationSettings()
 const auth = await useAuth()
+const { formatMessage } = useVIntl()
 
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()

@@ -156,7 +156,16 @@
 <script setup lang="ts">
 import { FolderArchiveIcon, HistoryIcon, SaveIcon, TrashIcon } from '@modrinth/assets'
 import { type MaybeElement, useLocalStorage, useResizeObserver } from '@vueuse/core'
-import { computed, onMounted, onUnmounted, ref, shallowReactive, toValue, watch } from 'vue'
+import {
+	computed,
+	nextTick,
+	onMounted,
+	onUnmounted,
+	ref,
+	shallowReactive,
+	toValue,
+	watch,
+} from 'vue'
 
 import { type ButtonMenuOption, NewModal } from '#ui/components'
 import { Button, ContextMenu } from '#ui/components/base/buttons'
@@ -192,8 +201,20 @@ import { useFileSelection } from './composables/file-selection'
 import { useFileUndoRedo } from './composables/file-undo-redo'
 import type { FileEditorBridge } from './providers/file-browser-ui'
 import { provideFileBrowserUI } from './providers/file-browser-ui'
-import { type FileInfo, type FileInterpretation, injectFileManager } from './providers/file-manager'
-import { filesTabSettings, jsonIndentOf, useFilesTabSettings } from './settings'
+import {
+	type FileInfo,
+	type FileInterpretation,
+	type FileManagerContext,
+	injectFileManager,
+} from './providers/file-manager'
+import {
+	type FilesBrowsing,
+	filesTabSettings,
+	jsonIndentOf,
+	provideFilesWorkspaceSettings,
+	useFilesTabSettings,
+	useFilesWorkspaceSettings,
+} from './settings'
 import type { FileItem } from './types'
 
 const { formatMessage } = useVIntl()
@@ -274,8 +295,15 @@ const props = withDefaults(
 		 * or moved around. Implies the advanced view.
 		 */
 		workbench?: boolean
+		/**
+		 * Names this place files are browsed, which keeps settings of its own (e.g. how folders are
+		 * browsed) apart from other places'.
+		 */
+		workspace?: string
+		/** How folders are browsed here until the user picks otherwise. */
+		defaultBrowsing?: FilesBrowsing
 	}>(),
-	{ searchLoadedOnlyNotice: true },
+	{ searchLoadedOnlyNotice: true, workspace: 'files', defaultBrowsing: 'listing' },
 )
 
 const { addNotification } = injectNotificationManager()
@@ -391,12 +419,33 @@ const { recordOperation, onKeydown } = useFileUndoRedo(
 	(title, text, type) => addNotification({ title, text, type }),
 )
 
+const workspaceSettings = provideFilesWorkspaceSettings(
+	useFilesWorkspaceSettings(props.workspace, { browsing: props.defaultBrowsing }),
+)
+
+/** How folders are browsed, as listings without the advanced view's sidebar and tabs. */
+const browsing = computed<FilesBrowsing>(() =>
+	advancedView.value ? workspaceSettings.store.get(workspaceSettings.browsing) : 'listing',
+)
+
+/** Shows a folder in the tree, expanding the folders down to it, while tabs don't list folders. */
+function revealDirectory(location: FileInfo) {
+	const segments = location.path.split('/').filter(Boolean)
+	const paths = segments.map((_, index) => `/${segments.slice(0, index + 1).join('/')}`)
+	const expanded = ctx.directoryTree.expandedEntries
+	const missing = paths.filter((path) => !expanded.value.includes(path))
+	if (missing.length > 0) expanded.value = [...expanded.value, ...missing]
+	void nextTick(() => setSidebarOpen(true))
+}
+
 const fileTabs = useFileTabs({
 	ctx,
 	confirmDiscard: confirmDiscardEditors,
 	workspaceId: () => (advancedView.value ? (toValue(ctx.workspaceId) ?? null) : null),
 	enabled: advancedView,
 	mode: props.workbench ? 'shared' : 'managed',
+	directories: () => browsing.value !== 'sidebar',
+	revealDirectory,
 })
 
 const { viewFor } = useDirectoryViews({
@@ -857,85 +906,94 @@ function handleContextMenu(event: MouseEvent, options: ButtonMenuOption[]) {
 // Shared UI state/handlers for FileSideBar, FileBrowserPanel and the dockview-hosted editor
 // tabs. Dockview mounts tab panels itself (teleported, so still Vue descendants), which means
 // prop/emit/ref bindings can't reach them but provide/inject does. See providers/file-browser-ui.ts.
-provideFileBrowserUI({
-	...ctx,
+// Members of the file manager not overridden here are looked up on it when read rather than
+// copied once, so hosts can swap what it browses (see `switchableFileManager`).
+provideFileBrowserUI(
+	Object.assign(Object.create(ctx) as FileManagerContext, {
+		baseId,
+		showDebugInfo: computed(() => props.showDebugInfo ?? false),
+		showRefreshButton: computed(() => props.showRefreshButton ?? false),
+		searchLoadedOnlyNotice: computed(() => props.searchLoadedOnlyNotice),
+		canUseAdvancedView: canUseAdvancedView,
+		advancedView,
+		setAdvancedView,
+		compactNavigation: computed(() => props.compactNavigation ?? false),
+		coloredIcons,
+		setColoredIcons: (value) => (coloredIconsSetting.value = value),
+		compactFolders: computed(() => compactFoldersSetting.value),
+		setCompactFolders: (value) => (compactFoldersSetting.value = value),
+		contentVariantOf,
+		setContentVariant: (tabId, file, variant) =>
+			contentVariantChoices.set(`${tabId}:${file.path}`, variant),
+		interpretationOf: (tabId, file) =>
+			interpretationChoices.get(`${tabId}:${file.path}`) ?? defaultInterpretation(file),
+		jsonIndent: computed(() => jsonIndentOf(filesSettings.get(filesTabSettings.jsonIndent))),
+		setInterpretation: (tabId, file, interpretation) =>
+			interpretationChoices.set(`${tabId}:${file.path}`, interpretation),
+		newTabButton: computed(() => filesSettings.get(filesTabSettings.newTabButton)),
+		showNewTabButton: computed(
+			() => filesSettings.get(filesTabSettings.newTabButton) && browsing.value !== 'sidebar',
+		),
+		browsing,
+		revealInTab: (item) => {
+			if (canOpenInTab(item)) fileTabs.revealTab(item)
+		},
+		sidebarToggleLocation: computed(() => filesSettings.get(filesTabSettings.sidebarToggle)),
+		setSidebarToggleLocation: (location) =>
+			filesSettings.set(filesTabSettings.sidebarToggle, location),
 
-	baseId,
-	showDebugInfo: computed(() => props.showDebugInfo ?? false),
-	showRefreshButton: computed(() => props.showRefreshButton ?? false),
-	searchLoadedOnlyNotice: computed(() => props.searchLoadedOnlyNotice),
-	canUseAdvancedView: canUseAdvancedView,
-	advancedView,
-	setAdvancedView,
-	compactNavigation: computed(() => props.compactNavigation ?? false),
-	coloredIcons,
-	setColoredIcons: (value) => (coloredIconsSetting.value = value),
-	compactFolders: computed(() => compactFoldersSetting.value),
-	setCompactFolders: (value) => (compactFoldersSetting.value = value),
-	contentVariantOf,
-	setContentVariant: (tabId, file, variant) =>
-		contentVariantChoices.set(`${tabId}:${file.path}`, variant),
-	interpretationOf: (tabId, file) =>
-		interpretationChoices.get(`${tabId}:${file.path}`) ?? defaultInterpretation(file),
-	jsonIndent: computed(() => jsonIndentOf(filesSettings.get(filesTabSettings.jsonIndent))),
-	setInterpretation: (tabId, file, interpretation) =>
-		interpretationChoices.set(`${tabId}:${file.path}`, interpretation),
-	showNewTabButton: computed(() => filesSettings.get(filesTabSettings.newTabButton)),
-	sidebarToggleLocation: computed(() => filesSettings.get(filesTabSettings.sidebarToggle)),
-	setSidebarToggleLocation: (location) =>
-		filesSettings.set(filesTabSettings.sidebarToggle, location),
+		inWorkbench: props.workbench ?? false,
+		viewFor,
+		activeView,
+		isEditing,
+		isBusy,
+		busyTooltip,
+		activeLocation,
+		sidebarOpen: computed(() => advancedView.value && sidebarOpen.value),
+		setSidebarOpen,
 
-	inWorkbench: props.workbench ?? false,
-	viewFor,
-	activeView,
-	isEditing,
-	isBusy,
-	busyTooltip,
-	activeLocation,
-	sidebarOpen: computed(() => advancedView.value && sidebarOpen.value),
-	setSidebarOpen,
+		selectedItems,
+		toggleItemSelection,
+		deselectAll,
 
-	selectedItems,
-	toggleItemSelection,
-	deselectAll,
+		fileTabs,
+		fileEditorApi,
+		hasUnsavedChanges,
+		saveFileContent,
+		revertChanges,
+		shareEditorToMclogs,
+		toggleFind,
 
-	fileTabs,
-	fileEditorApi,
-	hasUnsavedChanges,
-	saveFileContent,
-	revertChanges,
-	shareEditorToMclogs,
-	toggleFind,
+		navigateTo,
+		navigateToSegment,
+		handleOpenInNewTab,
+		canOpenInTab,
+		handleEditorClose,
+		handleHomePrefetch,
+		handleItemPrefetch,
 
-	navigateTo,
-	navigateToSegment,
-	handleOpenInNewTab,
-	canOpenInTab,
-	handleEditorClose,
-	handleHomePrefetch,
-	handleItemPrefetch,
+		showCreateModal,
+		showRenameModal,
+		showMoveModal,
+		showDeleteModal,
+		showBulkDeleteModal,
+		showUnzipFromUrlModal,
 
-	showCreateModal,
-	showRenameModal,
-	showMoveModal,
-	showDeleteModal,
-	showBulkDeleteModal,
-	showUnzipFromUrlModal,
+		createItem,
+		renameItem,
+		moveItem,
+		deleteItem,
+		downloadFile,
+		zipFolder: ctx.zipFolder ? zipFolder : undefined,
+		handleExtractItem,
 
-	createItem,
-	renameItem,
-	moveItem,
-	deleteItem,
-	downloadFile,
-	zipFolder: ctx.zipFolder ? zipFolder : undefined,
-	handleExtractItem,
+		uploadFiles,
+		handleDropError,
+		initiateFileUpload,
 
-	uploadFiles,
-	handleDropError,
-	initiateFileUpload,
-
-	handleContextMenu,
-})
+		handleContextMenu,
+	}),
+)
 
 // Keyboard shortcuts
 onMounted(() => {

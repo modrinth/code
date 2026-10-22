@@ -254,6 +254,9 @@
   "archive-viewer.reading-description": {
     "defaultMessage": "Fetching the archive's index. Files are fetched as they are opened."
   },
+  "archive-viewer.reading-index": {
+    "defaultMessage": "Reading the archive..."
+  },
   "archive-viewer.reading-nested": {
     "defaultMessage": "Reading nested archives..."
   },
@@ -310,9 +313,6 @@
   },
   "archive-viewer.settings.page.layout": {
     "defaultMessage": "Layout and files"
-  },
-  "archive-viewer.settings.pages": {
-    "defaultMessage": "Settings pages"
   },
   "archive-viewer.settings.section.entry": {
     "defaultMessage": "Open file or folder"
@@ -2096,6 +2096,21 @@
   "files.search.placeholder": {
     "defaultMessage": "Go to file or folder"
   },
+  "files.settings.browsing": {
+    "defaultMessage": "Browse folders"
+  },
+  "files.settings.browsing-description": {
+    "defaultMessage": "Open folders in tabs listing their contents, browse them in the sidebar's tree alone with tabs only for files, or open them in tabs showing their tree in place of the sidebar. Kept for each place files are browsed."
+  },
+  "files.settings.browsing.listing": {
+    "defaultMessage": "Folder listings"
+  },
+  "files.settings.browsing.sidebar": {
+    "defaultMessage": "Sidebar only"
+  },
+  "files.settings.browsing.tree": {
+    "defaultMessage": "Folder trees"
+  },
   "files.settings.colored-icons": {
     "defaultMessage": "Colored file icons"
   },
@@ -2139,7 +2154,7 @@
     "defaultMessage": "New tab button"
   },
   "files.settings.new-tab-button-description": {
-    "defaultMessage": "Show a button for opening a new tab beside the file tabs."
+    "defaultMessage": "Show a button beside the tabs for opening a new tab, or bringing in a panel where the layout allows it."
   },
   "files.settings.sidebar-toggle": {
     "defaultMessage": "Folder tree button"
@@ -6908,6 +6923,9 @@
   "settings.language.warning": {
     "defaultMessage": "Changing the {platform} language may cause some content to appear in English if a translation is not available. The {platform} is not yet fully translated, so some content may remain in English for certain languages."
   },
+  "settings.pages.label": {
+    "defaultMessage": "Settings pages"
+  },
   "settings.panel.default-value": {
     "defaultMessage": "Default: <value></value>"
   },
@@ -8084,17 +8102,38 @@
   "workbench.add-menu.panels": {
     "defaultMessage": "Panels"
   },
+  "workbench.close-popouts": {
+    "defaultMessage": "Close popout windows"
+  },
+  "workbench.collapsed.expand": {
+    "defaultMessage": "Expand bottom panel"
+  },
+  "workbench.collapsed.label": {
+    "defaultMessage": "Collapsed panels"
+  },
+  "workbench.corner.collapse-panel": {
+    "defaultMessage": "Collapse {name}"
+  },
+  "workbench.corner.collapse-region": {
+    "defaultMessage": "{side, select, left {Collapse left panel} right {Collapse right panel} other {Collapse bottom panel}}"
+  },
+  "workbench.corner.expand-panel": {
+    "defaultMessage": "Expand {name}"
+  },
+  "workbench.corner.expand-region": {
+    "defaultMessage": "{side, select, left {Expand left panel} right {Expand right panel} other {Expand bottom panel}}"
+  },
   "workbench.corner.hide-panel": {
     "defaultMessage": "Hide {name}"
   },
   "workbench.corner.hide-region": {
-    "defaultMessage": "{side, select, left {Hide left panel} other {Hide right panel}}"
+    "defaultMessage": "{side, select, left {Hide left panel} right {Hide right panel} other {Hide bottom panel}}"
   },
   "workbench.corner.show-panel": {
     "defaultMessage": "Show {name}"
   },
   "workbench.corner.show-region": {
-    "defaultMessage": "{side, select, left {Show left panel} other {Show right panel}}"
+    "defaultMessage": "{side, select, left {Show left panel} right {Show right panel} other {Show bottom panel}}"
   },
   "workbench.layout-menu": {
     "defaultMessage": "Layout"
@@ -8111,17 +8150,50 @@
   "workbench.layout-menu.right": {
     "defaultMessage": "Right panel"
   },
+  "workbench.link.resize": {
+    "defaultMessage": "Resize linked panels"
+  },
+  "workbench.lone-tab.hide-tabs": {
+    "defaultMessage": "Hide tabs"
+  },
+  "workbench.lone-tab.show-tabs": {
+    "defaultMessage": "Show tabs"
+  },
+  "workbench.menu.area": {
+    "defaultMessage": "Area"
+  },
   "workbench.menu.close-panel": {
     "defaultMessage": "Close panel"
+  },
+  "workbench.menu.close-selected": {
+    "defaultMessage": "Close {count} tabs"
+  },
+  "workbench.menu.collapse-region": {
+    "defaultMessage": "Collapse to tabs"
   },
   "workbench.menu.dock": {
     "defaultMessage": "Return to the main window"
   },
+  "workbench.menu.expand-region": {
+    "defaultMessage": "Expand"
+  },
+  "workbench.menu.group": {
+    "defaultMessage": "Group"
+  },
+  "workbench.menu.hide-bar": {
+    "defaultMessage": "Hide tab bar"
+  },
   "workbench.menu.hide-region": {
-    "defaultMessage": "Hide this area"
+    "defaultMessage": "Hide"
   },
   "workbench.menu.label": {
     "defaultMessage": "Panel actions"
+  },
+  "workbench.menu.link-selected": {
+    "defaultMessage": "Link {count} tabs"
+  },
+  "workbench.menu.link-with": {
+    "defaultMessage": "Link with"
   },
   "workbench.menu.move-to": {
     "defaultMessage": "Move to"
@@ -8135,6 +8207,9 @@
   "workbench.menu.popout": {
     "defaultMessage": "Open in its own window"
   },
+  "workbench.menu.popout-selected": {
+    "defaultMessage": "Open {count} tabs in their own window"
+  },
   "workbench.menu.region.bottom": {
     "defaultMessage": "Bottom panel"
   },
@@ -8147,11 +8222,44 @@
   "workbench.menu.region.right": {
     "defaultMessage": "Right panel"
   },
-  "workbench.menu.split-down": {
-    "defaultMessage": "Split down"
+  "workbench.menu.reverse-groups": {
+    "defaultMessage": "Reverse group order"
   },
-  "workbench.menu.split-right": {
-    "defaultMessage": "Split right"
+  "workbench.menu.reverse-link": {
+    "defaultMessage": "Reverse linked order"
+  },
+  "workbench.menu.selected": {
+    "defaultMessage": "{count} tabs selected"
+  },
+  "workbench.menu.separate-all": {
+    "defaultMessage": "Separate all"
+  },
+  "workbench.menu.side-by-side": {
+    "defaultMessage": "Side by side"
+  },
+  "workbench.menu.split": {
+    "defaultMessage": "Split"
+  },
+  "workbench.menu.split.above": {
+    "defaultMessage": "Above"
+  },
+  "workbench.menu.split.below": {
+    "defaultMessage": "Below"
+  },
+  "workbench.menu.split.left": {
+    "defaultMessage": "To the left"
+  },
+  "workbench.menu.split.right": {
+    "defaultMessage": "To the right"
+  },
+  "workbench.menu.stacked": {
+    "defaultMessage": "One above the other"
+  },
+  "workbench.menu.take-out": {
+    "defaultMessage": "Take out {name}"
+  },
+  "workbench.menu.toggle-panel": {
+    "defaultMessage": "Toggle panel"
   },
   "workbench.popout.empty": {
     "defaultMessage": "No tabs open in this panel"
@@ -8180,17 +8288,50 @@
   "workbench.settings.group-description": {
     "defaultMessage": "How the panels around the workspace look and behave."
   },
+  "workbench.settings.lone-tabs": {
+    "defaultMessage": "Hide lone tab bars"
+  },
+  "workbench.settings.lone-tabs-description": {
+    "defaultMessage": "Hide the tab bar of panels on their own outside the center, giving them its room. A handle at their top right shows it again. Any tab bar can also be hidden from its menu."
+  },
+  "workbench.settings.popout-restore": {
+    "defaultMessage": "Popped out panels on reopening"
+  },
+  "workbench.settings.popout-restore-description": {
+    "defaultMessage": "When the page is opened again: return popped out panels to the main window, return them while offering to reopen their windows, or reopen their windows (on your next click, if the browser asks for one)."
+  },
+  "workbench.settings.popout-restore.close": {
+    "defaultMessage": "Close and merge"
+  },
+  "workbench.settings.popout-restore.preserve": {
+    "defaultMessage": "Preserve"
+  },
+  "workbench.settings.popout-restore.prompt": {
+    "defaultMessage": "Merge and ask"
+  },
   "workbench.settings.popouts": {
     "defaultMessage": "Pop out panels"
   },
   "workbench.settings.popouts-description": {
     "defaultMessage": "Let panels be moved into windows of their own from their menus."
   },
+  "workbench.settings.toggle-action": {
+    "defaultMessage": "Panel toggles"
+  },
+  "workbench.settings.toggle-action-description": {
+    "defaultMessage": "Whether the buttons for the left, right and bottom panels hide them entirely, or collapse them to a strip of their tabs."
+  },
+  "workbench.settings.toggle-action.collapse": {
+    "defaultMessage": "Collapse"
+  },
+  "workbench.settings.toggle-action.hide": {
+    "defaultMessage": "Hide"
+  },
   "workbench.settings.toggles": {
     "defaultMessage": "Panel toggles in the tab bar"
   },
   "workbench.settings.toggles-description": {
-    "defaultMessage": "Show buttons for the left and right panels at the ends of the tab bar. They can always be shown and hidden from the layout menu."
+    "defaultMessage": "Show buttons for the left and right panels at the ends of the tab bar, and for the bottom panel in its own. They can always be shown and hidden from the layout menu."
   },
   "workbench.settings.variant": {
     "defaultMessage": "Panel style"

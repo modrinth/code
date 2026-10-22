@@ -147,6 +147,20 @@ const keybinds: { [id: string]: KeybindListener } = {
 		enabled: (ctx) => ctx.available('re-review'),
 		action: (ctx) => ctx.run('re-review'),
 	},
+	'review-re-review-misc': {
+		keybind: 'Alt+E',
+		description: 'Open re-review checks',
+		scope: 'review-actions',
+		enabled: (ctx) => ctx.available('re-review-misc'),
+		action: (ctx) => ctx.run('re-review-misc'),
+	},
+	'review-panel-rulings': {
+		keybind: 'C',
+		description: 'Open rulings panel',
+		scope: 'review-actions',
+		enabled: (ctx) => ctx.available('reveal-rulings'),
+		action: (ctx) => ctx.run('reveal-rulings'),
+	},
 	'review-reupload': {
 		keybind: 'Alt+U',
 		description: 'Open reupload checks',
@@ -218,11 +232,12 @@ const keybinds: { [id: string]: KeybindListener } = {
 		scope: 'project-review',
 		action: (ctx) => ctx.openTab('tech-review'),
 	},
-	'review-tab-slicer': {
+	'review-panel-files': {
 		keybind: 'L',
-		description: 'Open slicer tab',
-		scope: 'project-review',
-		action: (ctx) => ctx.openTab('slicer'),
+		description: "Open the archive's files",
+		scope: 'review-actions',
+		enabled: (ctx) => ctx.available('reveal-files'),
+		action: (ctx) => ctx.run('reveal-files'),
 	},
 	'toggle-collapse': {
 		keybind: 'Shift+C',

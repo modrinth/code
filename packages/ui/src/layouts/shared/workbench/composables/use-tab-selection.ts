@@ -59,7 +59,10 @@ export function useWorkbenchSelection(windows: WorkbenchWindows) {
 				event.preventDefault()
 				event.stopPropagation()
 				const group = panel.group
-				const previous = selectedPanels.value.filter((id) => findPanel(id)?.group === group)
+				const selected = selectedPanels.value.filter((id) => findPanel(id)?.group === group)
+				const active = group.activePanel
+				/* Starting a selection takes in the tab in front, as browsers' tab strips do. */
+				const previous = selected.length || !active || active === panel ? selected : [active.id]
 				if (event.shiftKey) {
 					const start = anchor?.group === group ? anchor : (group.activePanel ?? panel)
 					const from = group.panels.indexOf(start)

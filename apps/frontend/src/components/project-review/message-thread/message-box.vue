@@ -3,7 +3,7 @@
 		ref="messageBox"
 		class="relative flex min-h-0 shrink-0 flex-col gap-1.5 border-0 border-t border-solid border-divider py-2.5 pb-px"
 		:style="{
-			height: `${height ?? 300}px`,
+			height: `${height ?? DEFAULT_HEIGHT}px`,
 		}"
 	>
 		<div
@@ -12,7 +12,7 @@
 			aria-orientation="horizontal"
 			aria-label="Resize message box"
 			:aria-valuenow="Math.round(measuredHeight)"
-			:aria-valuemin="180"
+			:aria-valuemin="MINIMUM_HEIGHT"
 			class="message-box-resize absolute -top-2 left-0 z-10 h-4 w-full cursor-row-resize touch-none"
 			:class="{ 'is-resizing': resizeStart }"
 			@pointerdown="startResize"
@@ -54,6 +54,7 @@
 			</Button>
 			<Button
 				v-if="showClearIssues"
+				:size="buttonSize"
 				:disabled="!canSubmit || pending || !draft.trim()"
 				@click="submit('reply', true)"
 			>
@@ -74,7 +75,7 @@ import { ReplyIcon, SpinnerIcon, StickyNotePlusIcon } from '@modrinth/assets'
 import { getMessageTemplates, moderationSettings } from '@modrinth/moderation'
 import { IssuePriority } from '@modrinth/moderation/src/data/issues'
 import { Button } from '@modrinth/ui'
-import { useElementSize } from '@vueuse/core'
+import { useElementSize, useLocalStorage } from '@vueuse/core'
 import { computed, nextTick, ref, watch } from 'vue'
 
 import { useModerationKeybinds, useModerationSettings } from '~/composables/moderation'
@@ -85,6 +86,9 @@ import { injectReviewPreviousIssues } from '~/providers/project-review/review-pr
 import { injectReviewSubmission } from '~/providers/project-review/review-submission'
 
 import TemplateMarkdownEditor from './template-markdown-editor.vue'
+
+const DEFAULT_HEIGHT = 200
+const MINIMUM_HEIGHT = 120
 
 const keybinds = useModerationKeybinds()
 const settings = useModerationSettings()
@@ -145,11 +149,12 @@ watch(
 const editor = ref<InstanceType<typeof TemplateMarkdownEditor>>()
 const messageBox = ref<HTMLElement | null>(null)
 const { height: measuredHeight } = useElementSize(messageBox)
-const height = ref<number | null>(null)
+/** The height the moderator resized the box to, kept between reviews; `null` for the default. */
+const height = useLocalStorage<number | null>('project-review.message-box-height', null)
 const resizeStart = ref<{ y: number; height: number } | null>(null)
 
 function setHeight(value: number) {
-	height.value = Math.max(180, value)
+	height.value = Math.max(MINIMUM_HEIGHT, value)
 }
 function startResize(event: PointerEvent) {
 	if (event.button !== 0) return

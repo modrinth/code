@@ -69,6 +69,24 @@ const settings = {
 			description: 'Show number key shortcut hints on issue toggle buttons.',
 			default: true,
 		}),
+		ArchiveIntegration: setting.asEnum({
+			type: 'enum',
+			id: 'archive-integration',
+			title: 'Archive Integration',
+			description: "Either have Archiver share the Workbench with Mod View or get its own Workbench under its own Panel",
+			default: 'exclusive',
+			entries: [
+				{ label: "Shared", value: 'shared' },
+				{ label: 'Exclusive', value: 'exclusive' },
+			],
+		}),
+		MergeRulings: setting.asToggle({
+			type: 'toggle',
+			id: 'merge-rulings',
+			title: 'Merged Rulings',
+			description: 'Either show Rulings using the selector or show them all at once stacked',
+			default: false,
+		}),
 		ShowFloatingPanelFieldHoverHighlight: setting.asToggle({
 			type: 'toggle',
 			id: 'show-floating-panel-field-hover-highlight',
@@ -189,11 +207,13 @@ const settings = {
 				'Expand the changelog automatically when viewing version details in project review.',
 			default: true,
 		}),
-		SlicerButtonInVersions: setting.asToggle({
 			type: 'toggle',
-			id: 'slicer-button-in-versions',
-			title: 'Show Slicer button in versions table and page',
-			description: 'Show the Slicer button on public version lists and version pages for staff.',
+		ArchiveButtonInVersions: setting.asToggle({
+			type: 'toggle',
+			id: 'archive-button-in-versions',
+			title: 'Show archive viewer button in versions table and page',
+			description:
+				'Show a button opening the archive viewer on public version lists and version pages.',
 			default: false,
 		}),
 		AlternativeHostname: setting.asString({

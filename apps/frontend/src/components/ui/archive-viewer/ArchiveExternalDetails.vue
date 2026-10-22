@@ -18,17 +18,6 @@
 				>
 					<DownloadIcon aria-hidden="true" />
 				</ButtonLink>
-				<ButtonLink
-					v-if="slicerUrl"
-					v-tooltip="formatMessage(messages.openInSlicer)"
-					type="quiet"
-					size="xs"
-					:href="slicerUrl"
-					target="_blank"
-					:aria-label="formatMessage(messages.openInSlicer)"
-				>
-					<CoffeeIcon aria-hidden="true" />
-				</ButtonLink>
 			</div>
 		</template>
 		<p class="m-0 text-sm text-secondary">{{ formatMessage(messages.description) }}</p>
@@ -36,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { CoffeeIcon, DownloadIcon, ExternalIcon } from '@modrinth/assets'
+import { DownloadIcon, ExternalIcon } from '@modrinth/assets'
 import {
 	ArchiveDetailsSection,
 	type ArchiveSource,
@@ -51,7 +40,6 @@ import {
  */
 defineProps<{
 	source: ArchiveSource
-	slicerUrl?: string
 }>()
 
 const { formatMessage } = useVIntl()
@@ -63,6 +51,5 @@ const messages = defineMessages({
 		defaultMessage: "Opened from a link that isn't part of a project's versions.",
 	},
 	download: { id: 'archive.project-details.download', defaultMessage: 'Download file' },
-	openInSlicer: { id: 'archive.open-in-slicer', defaultMessage: 'Open in Slicer' },
 })
 </script>
