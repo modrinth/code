@@ -305,8 +305,7 @@ const messages = defineMessages({
 	},
 	invalidName: {
 		id: 'project.settings.license.custom-name-invalid',
-		defaultMessage:
-			'Custom license names can only contain letters, numbers, periods, and hyphens.',
+		defaultMessage: 'Custom license names can only contain letters, numbers, periods, and hyphens.',
 	},
 	missingUrl: {
 		id: 'project.settings.license.missing-url',
