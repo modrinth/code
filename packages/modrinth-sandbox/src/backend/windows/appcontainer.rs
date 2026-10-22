@@ -62,7 +62,9 @@ use windows::{
 
 use async_trait::async_trait;
 use derive_more::Debug;
-use eyre::{Context, Result, bail, eyre};
+use eyre::{Context, Result, bail, ensure, eyre};
+use parking_lot::{Mutex, RwLock};
+use uuid::Uuid;
 
 use crate::{
     SandboxArg, SandboxCommand,
@@ -424,9 +426,11 @@ fn spawn(
     let process_identity = child
         .process_identity()
         .wrap_err("reading spawned child process identity")?;
+    let acl_instance_id = prepared.id();
     prepared
         .activate(process_identity)
         .wrap_err("activating AppContainer ACL instance")?;
+    drop(prepared);
 
     let mut child = crate::SandboxChild {
         stdin: pipes.stdin,
@@ -434,7 +438,10 @@ fn spawn(
         stderr: pipes.stderr,
         on_finish: command.on_finish,
         handle: SandboxHandle::AppContainer(WindowsSandboxHandle {
-            path_set: Arc::new(path_set),
+            path_set: Arc::new(RwLock::new(path_set)),
+            app_container_sid: Arc::new(app_container_sid_string),
+            acl_instance_id,
+            expose_lock: Arc::new(Mutex::new(())),
         }),
         imp: SandboxChild::AppContainer(child),
     };
@@ -446,26 +453,93 @@ fn spawn(
     Ok(child)
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct WindowsSandboxHandle {
-    path_set: Arc<ReadWritePathSet>,
+    path_set: Arc<RwLock<ReadWritePathSet>>,
+    app_container_sid: Arc<OsString>,
+    acl_instance_id: Uuid,
+    expose_lock: Arc<Mutex<()>>,
+}
+
+impl std::fmt::Debug for WindowsSandboxHandle {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("WindowsSandboxHandle").finish_non_exhaustive()
+    }
 }
 
 impl SandboxHandleOp for WindowsSandboxHandle {
     fn expose_path(
         &self,
-        _path: &Path,
-        _allow_write: bool,
+        path: &Path,
+        allow_write: bool,
     ) -> eyre::Result<ExposedPath> {
-        Err(eyre!("unsupported"))
+        ensure!(!allow_write, "dynamically exposing writeable paths is unsupported");
+
+        let path = path
+            .canonicalize()
+            .wrap_err_with(|| format!("canonicalizing path {path:?}"))?;
+        ensure!(path.is_file(), "path to expose is not a file: {path:?}");
+
+        if self.path_set.read().can_read(path.clone()) {
+            return Ok(ExposedPath::Direct);
+        }
+
+        let _expose_guard = self.expose_lock.lock();
+        if self.path_set.read().can_read(path.clone()) {
+            return Ok(ExposedPath::Direct);
+        }
+
+        let mut grants = vec![Grant::from_path(&path, PermissionType::Read)?];
+        let mut parent = path.parent();
+        while let Some(path) = parent {
+            grants.push(Grant::from_path(path, PermissionType::Traverse)?);
+            parent = path.parent();
+        }
+
+        let acl_ledger = AppliedAclLedger::open(&self.app_container_sid)
+            .wrap_err("opening AppContainer ACL ledger")?;
+        let changed_grants = acl_ledger
+            .add_grants(self.acl_instance_id, grants)
+            .wrap_err("recording dynamic AppContainer ACL grants")?;
+
+        let sid = self
+            .app_container_sid
+            .encode_wide()
+            .chain([0])
+            .collect::<Vec<_>>();
+        let mut app_container_sid = PSID::default();
+        unsafe {
+            ConvertStringSidToSidW(PCWSTR(sid.as_ptr()), &mut app_container_sid)?
+        };
+        ensure!(
+            !app_container_sid.is_invalid(),
+            "ConvertStringSidToSidW returned invalid SID"
+        );
+        scopeguard::defer! {
+            unsafe { LocalFree(Some(windows::Win32::Foundation::HLOCAL(app_container_sid.0))) };
+        }
+
+        for grant in changed_grants {
+            let grant_path = PathBuf::from(&grant.path);
+            set_acl(&app_container_sid, &grant_path, grant.permission)
+                .wrap_err_with(|| {
+                    format!(
+                        "granting dynamic sandbox {:?} access to {grant_path:?}",
+                        grant.permission
+                    )
+                })?;
+        }
+
+        self.path_set.write().add_read_only(path);
+        Ok(ExposedPath::Direct)
     }
 
     fn is_path_readable(&self, path: &Path) -> bool {
-        self.path_set.can_read(path.to_path_buf())
+        self.path_set.read().can_read(path.to_path_buf())
     }
 
     fn is_path_writeable(&self, path: &Path) -> bool {
-        self.path_set.can_write(path.to_path_buf())
+        self.path_set.read().can_write(path.to_path_buf())
     }
 }
 

@@ -20,6 +20,7 @@ use tokio::{
     io::{AsyncReadExt, AsyncWriteExt},
     net::TcpStream,
 };
+use tracing::{error, info, warn};
 use url::Url;
 use uuid::Uuid;
 
@@ -193,7 +194,7 @@ impl SandboxApiService {
 
     async fn run_localhost_server(self: Self) {
         if let Err(err) = self.run_localhost_server_inner().await {
-            tracing::error!("Error running sandboxapi service: {err}");
+            error!("error running sandboxapi service: {err}");
         }
     }
 
@@ -212,7 +213,7 @@ impl SandboxApiService {
 
         let socket_addr =
             SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), self.port);
-        tracing::info!("Starting sandboxapi service on {}", socket_addr);
+        info!("starting sandboxapi service on {}", socket_addr);
         let listener = tokio::net::TcpListener::bind(socket_addr).await?;
 
         loop {
@@ -450,7 +451,7 @@ impl SandboxApiService {
                 {
                     Ok(discovery_result) => discovery_result,
                     Err(err) => {
-                        tracing::error!("Failed to get discovery: {:?}", err);
+                        error!("failed to get discovery: {:?}", err);
                         RequestStatus::InternalServerError.write(stream).await;
                         return;
                     }
@@ -838,12 +839,20 @@ impl SandboxApiService {
         };
 
         let path = Path::new(&*decoded);
+        info!(
+            path = %path.display(),
+            "got request to access dropped file"
+        );
         if !path.is_file() {
             // This API should only be used for DnD file paths
             // Therefore, it should only ever be called for files that actually exist
             // If we're receiving a request for a file that doesn't exist, it's possible
             // that a malicious program is attempting to enumerate files on the computer
             // To prevent this, we return Unauthorized and block the process from further requests
+            warn!(
+                path = %path.display(),
+                "rejecting dropped-file access because the path is not a file"
+            );
             child_state
                 .disallow_request_access
                 .store(true, Ordering::SeqCst);
@@ -854,6 +863,10 @@ impl SandboxApiService {
         let Ok(archive) =
             async_zip::tokio::read::fs::ZipFileReader::new(path).await
         else {
+            warn!(
+                path = %path.display(),
+                "rejecting dropped-file access because the file is not a readable ZIP archive"
+            );
             return Err(RequestStatus::InternalServerError);
         };
 
@@ -888,15 +901,36 @@ impl SandboxApiService {
         }
 
         if !allow {
+            warn!(
+                path = %path.display(),
+                "rejecting dropped-file access because this content type is not allowed"
+            );
             return Err(RequestStatus::Unauthorized);
         }
 
+        info!(
+            path = %path.display(),
+            "dropped file passed content validation"
+        );
         match sandbox_handle.expose_path(path, false) {
-            Ok(ExposedPath::Direct) => Ok(path.to_path_buf()),
-            Ok(ExposedPath::Proxied(proxied)) => Ok(proxied),
-            Err(err) => {
-                tracing::error!("Unable to expose path to sandbox: {err}");
+            Ok(ExposedPath::Direct) => {
+                info!(
+                    path = %path.display(),
+                    "granted sandbox direct access to dropped file"
+                );
                 Ok(path.to_path_buf())
+            }
+            Ok(ExposedPath::Proxied(proxied)) => {
+                info!(
+                    path = %path.display(),
+                    exposed_path = %proxied.display(),
+                    "granted sandbox proxied access to dropped file"
+                );
+                Ok(proxied)
+            }
+            Err(err) => {
+                error!("unable to expose path to sandbox: {err:#}");
+                Err(RequestStatus::InternalServerError)
             }
         }
     }

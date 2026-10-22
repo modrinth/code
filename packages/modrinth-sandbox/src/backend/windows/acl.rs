@@ -176,6 +176,44 @@ impl AppliedAclLedger {
         let mutex = LedgerMutexGuard::acquire(&self.mutex_name)?;
         LockedAclLedger::open(&self.key, mutex)
     }
+
+    pub fn add_grants(
+        &self,
+        instance_id: Uuid,
+        grants: Vec<Grant>,
+    ) -> Result<Vec<Grant>> {
+        let mut ledger = self.lock()?;
+        let old_effective = effective_union(&ledger.state, |_| true);
+        let instance = ledger
+            .state
+            .instances
+            .iter_mut()
+            .find(|instance| instance.id == instance_id)
+            .ok_or_else(|| {
+                io::Error::new(
+                    io::ErrorKind::NotFound,
+                    "active ACL instance not found",
+                )
+            })?;
+        instance.grants.extend(grants);
+        instance.grants = normalize_grants(instance.grants.iter());
+        let desired_effective = effective_union(&ledger.state, |_| true);
+        let changed = desired_effective
+            .iter()
+            .filter(|desired| {
+                old_effective
+                    .iter()
+                    .find(|old| paths_equal(&old.path, &desired.path))
+                    .is_none_or(|old| {
+                        permission_strength(desired.permission)
+                            > permission_strength(old.permission)
+                    })
+            })
+            .cloned()
+            .collect();
+        ledger.persist()?;
+        Ok(changed)
+    }
 }
 
 pub struct LockedAclLedger<'a> {
@@ -258,6 +296,10 @@ pub struct PreparedInstance<'a> {
 }
 
 impl PreparedInstance<'_> {
+    pub fn id(&self) -> Uuid {
+        self.id
+    }
+
     pub fn old_effective(&self) -> &[Grant] {
         &self.old_effective
     }
