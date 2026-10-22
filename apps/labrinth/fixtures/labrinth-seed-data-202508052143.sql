@@ -166,47 +166,6 @@ COPY public.loaders_project_types (joining_loader_id, joining_project_type_id) F
 \.
 
 
-COPY public.loaders_project_types_games (loader_id, project_type_id, game_id) FROM stdin;
-1	1	1
-2	1	1
-3	1	1
-4	1	1
-5	1	1
-6	1	1
-7	5	1
-8	1	1
-9	1	1
-10	1	1
-11	1	1
-12	1	1
-13	1	1
-14	1	1
-15	1	1
-16	6	1
-17	6	1
-18	6	1
-19	6	1
-20	1	1
-21	1	1
-22	1	1
-23	2	1
-20	6	1
-9	3	1
-15	3	1
-21	3	1
-13	3	1
-10	3	1
-11	3	1
-8	3	1
-12	3	1
-14	3	1
-24	1	1
-25	1	1
-26	1	1
-27	1	1
-28	1	1
-29	1	1
-\.
 
 
 COPY public.users (id, github_id, username, email, avatar_url, bio, created, role, badges, balance, discord_id, gitlab_id, google_id, steam_id, microsoft_id, password, email_verified, totp_secret, paypal_country, paypal_email, paypal_id, venmo_handle, stripe_customer_id, raw_avatar_url, allow_friend_requests) FROM stdin;

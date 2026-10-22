@@ -20,7 +20,7 @@ use std::fmt::{Debug, Display};
 use std::hash::Hash;
 use xredis::RedisPool;
 
-pub const PROJECTS_NAMESPACE: &str = "projects:v7";
+pub const PROJECTS_NAMESPACE: &str = "projects:v8";
 pub const PROJECTS_SLUGS_NAMESPACE: &str = "projects_slugs:v6";
 const PROJECTS_DEPENDENCIES_NAMESPACE: &str = "projects_dependencies:v4";
 
@@ -744,22 +744,20 @@ impl DBProject {
                 struct VersionLoaderData {
                     loaders: Vec<String>,
                     project_types: Vec<String>,
-                    games: Vec<String>,
+
                 }
 
-                let loaders_ptypes_games: DashMap<DBProjectId, VersionLoaderData> = sqlx::query!(
+                let loaders_ptypes: DashMap<DBProjectId, VersionLoaderData> = sqlx::query!(
                     "
                     SELECT DISTINCT mod_id,
                         ARRAY_AGG(DISTINCT l.loader) filter (where l.loader is not null) loaders,
-                        ARRAY_AGG(DISTINCT pt.name) filter (where pt.name is not null) project_types,
-                        ARRAY_AGG(DISTINCT g.slug) filter (where g.slug is not null) games
+                        ARRAY_AGG(DISTINCT pt.name) filter (where pt.name is not null) project_types
                     FROM versions v
                     INNER JOIN loaders_versions lv ON v.id = lv.version_id
                     INNER JOIN loaders l ON lv.loader_id = l.id
                     INNER JOIN loaders_project_types lpt ON lpt.joining_loader_id = l.id
                     INNER JOIN project_types pt ON pt.id = lpt.joining_project_type_id
-                    INNER JOIN loaders_project_types_games lptg ON lptg.loader_id = l.id AND lptg.project_type_id = pt.id
-                    INNER JOIN games g ON lptg.game_id = g.id
+
                     WHERE v.id = ANY($1)
                     GROUP BY mod_id
                     ",
@@ -771,7 +769,7 @@ impl DBProject {
                         let version_loader_data = VersionLoaderData {
                             loaders: m.loaders.unwrap_or_default(),
                             project_types: m.project_types.unwrap_or_default(),
-                            games: m.games.unwrap_or_default(),
+
                         };
 
                         (project_id, version_loader_data)
@@ -836,8 +834,7 @@ impl DBProject {
                         let VersionLoaderData {
                             loaders,
                             mut project_types,
-                            games,
-                        } = loaders_ptypes_games.remove(&project_id).map(|x|x.1).unwrap_or_default();
+                        } = loaders_ptypes.remove(&project_id).map(|x|x.1).unwrap_or_default();
                         // Each version is a tuple of (DBVersionId, DateTime<Utc>)
                         let mut versions = versions.remove(&project_id).map(|x| x.1).unwrap_or_default();
                         versions.sort_by_key(|a| a.1);
@@ -898,7 +895,6 @@ impl DBProject {
                             categories: m.categories.unwrap_or_default(),
                             additional_categories: m.additional_categories.unwrap_or_default(),
                             project_types,
-                            games,
                             versions: versions.into_iter().map(|x| x.0).collect(),
                             gallery_items: {
                                 gallery.sort_by_key(|a| a.ordering);
@@ -1039,7 +1035,7 @@ pub struct ProjectQueryResult {
     pub additional_categories: Vec<String>,
     pub versions: Vec<DBVersionId>,
     pub project_types: Vec<String>,
-    pub games: Vec<String>,
+
     pub urls: Vec<LinkUrl>,
     pub gallery_items: Vec<DBGalleryItem>,
     pub thread_id: DBThreadId,

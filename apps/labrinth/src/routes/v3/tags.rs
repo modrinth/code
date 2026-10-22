@@ -4,7 +4,6 @@ use std::collections::HashMap;
 
 use super::ApiError;
 use crate::database::models::categories::{Category, ProjectType, ReportType};
-use crate::database::models::game_item::Game;
 use crate::database::models::loader_item::{Loader, LoaderMetadata};
 use crate::models::exp::minecraft::{Environment, MrpackLoader};
 use crate::models::link_platform::LinkPlatform;
@@ -24,49 +23,12 @@ use serde_json::Value;
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(category_list_route)
         .service(loader_list_route)
-        .service(games_list_route)
         .service(loader_fields_list_route)
         .service(license_list_route)
         .service(license_text_route)
         .service(link_platform_list_route)
         .service(report_type_list_route)
         .service(project_type_list_route);
-}
-
-#[derive(serde::Serialize, serde::Deserialize)]
-pub struct GameData {
-    pub slug: String,
-    pub name: String,
-    pub icon: Option<String>,
-    pub banner: Option<String>,
-}
-
-#[utoipa::path(tag = "tags", responses((status = OK)))]
-#[get("/games")]
-pub async fn games_list_route(
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-) -> Result<HttpResponse, ApiError> {
-    games_list(pool, redis).await
-}
-
-pub async fn games_list(
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-) -> Result<HttpResponse, ApiError> {
-    let results = Game::list(&**pool, &redis)
-        .await
-        .wrap_internal_err("fetching game from Redis")?
-        .into_iter()
-        .map(|x| GameData {
-            slug: x.slug,
-            name: x.name,
-            icon: x.icon_url,
-            banner: x.banner_url,
-        })
-        .collect::<Vec<_>>();
-
-    Ok(HttpResponse::Ok().json(results))
 }
 
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -135,25 +97,18 @@ pub async fn loader_list(
     let mut results = loaders
         .into_iter()
         .map(|loader| {
-            let mut supported_fields = Vec::new();
-            if loader
-                .supported_games
-                .iter()
-                .any(|game| game == "minecraft-java")
-            {
-                supported_fields.extend([
-                    "game_versions".to_owned(),
-                    "environment".to_owned(),
-                ]);
-                if loader.loader == "mrpack" {
-                    supported_fields.push("mrpack_loaders".to_owned());
-                }
-            }
+			let mut supported_fields = vec![
+				"game_versions".to_owned(),
+				"environment".to_owned(),
+			];
+			if loader.loader == "mrpack" {
+				supported_fields.push("mrpack_loaders".to_owned());
+			}
             LoaderData {
                 icon: loader.icon,
                 name: loader.loader,
                 supported_project_types: loader.supported_project_types,
-                supported_games: loader.supported_games,
+				supported_games: vec!["minecraft-java".to_owned()],
                 supported_fields,
                 metadata: loader.metadata,
             }

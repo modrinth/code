@@ -18,7 +18,7 @@ use std::cmp::Ordering;
 use std::collections::HashMap;
 use tracing::error;
 
-pub const VERSIONS_NAMESPACE: &str = "versions:v6";
+pub const VERSIONS_NAMESPACE: &str = "versions:v7";
 const VERSION_FILES_NAMESPACE: &str = "versions_files:v4";
 
 pub async fn cleanup_unused_attribution_files_and_groups(
@@ -646,22 +646,20 @@ impl DBVersion {
                 struct VersionLoaderData {
                     loaders: Vec<String>,
                     project_types: Vec<String>,
-                    games: Vec<String>,
+
                 }
 
-                let loaders_ptypes_games: DashMap<DBVersionId, VersionLoaderData> = sqlx::query!(
+                let loaders_ptypes: DashMap<DBVersionId, VersionLoaderData> = sqlx::query!(
                     "
                     SELECT DISTINCT version_id,
                         ARRAY_AGG(DISTINCT l.loader) filter (where l.loader is not null) loaders,
-                        ARRAY_AGG(DISTINCT pt.name) filter (where pt.name is not null) project_types,
-                        ARRAY_AGG(DISTINCT g.slug) filter (where g.slug is not null) games
+                        ARRAY_AGG(DISTINCT pt.name) filter (where pt.name is not null) project_types
                     FROM versions v
                     INNER JOIN loaders_versions lv ON v.id = lv.version_id
                     INNER JOIN loaders l ON lv.loader_id = l.id
                     INNER JOIN loaders_project_types lpt ON lpt.joining_loader_id = l.id
                     INNER JOIN project_types pt ON pt.id = lpt.joining_project_type_id
-                    INNER JOIN loaders_project_types_games lptg ON lptg.loader_id = l.id AND lptg.project_type_id = pt.id
-                    INNER JOIN games g ON lptg.game_id = g.id
+
                     WHERE v.id = ANY($1)
                     GROUP BY version_id
                     ",
@@ -673,7 +671,7 @@ impl DBVersion {
                         let version_loader_data = VersionLoaderData {
                             loaders: m.loaders.unwrap_or_default(),
                             project_types: m.project_types.unwrap_or_default(),
-                            games: m.games.unwrap_or_default(),
+
                         };
                         (version_id,version_loader_data)
 
@@ -819,8 +817,7 @@ impl DBVersion {
                         let VersionLoaderData {
                             loaders,
                             project_types,
-                            games,
-                        } = loaders_ptypes_games.remove(&version_id).map(|x|x.1).unwrap_or_default();
+                        } = loaders_ptypes.remove(&version_id).map(|x|x.1).unwrap_or_default();
                         let files = files.remove(&version_id).map(|x|x.1).unwrap_or_default();
                         let hashes = hashes.remove(&version_id).map(|x|x.1).unwrap_or_default();
                         let dependencies = dependencies.remove(&version_id).map(|x|x.1).unwrap_or_default();
@@ -895,7 +892,6 @@ impl DBVersion {
                             },
                             loaders,
                             project_types,
-                            games,
                             dependencies,
                             // TODO populate
                             components: exp::VersionQuery::default(),
@@ -1070,7 +1066,7 @@ pub struct VersionQueryResult {
     pub files: Vec<FileQueryResult>,
     pub loaders: Vec<String>,
     pub project_types: Vec<String>,
-    pub games: Vec<String>,
+
     pub dependencies: Vec<DependencyQueryResult>,
     pub components: exp::VersionQuery,
 }

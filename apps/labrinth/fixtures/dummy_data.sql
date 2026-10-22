@@ -39,21 +39,6 @@ WHERE
 	(l.loader IN ('bukkit', 'waterfall') AND pt.name = 'plugin')
 	OR (l.loader = 'datapack' AND pt.name = 'datapack');
 
-INSERT INTO loaders_project_types_games (loader_id, project_type_id, game_id)
-SELECT lpt.joining_loader_id, lpt.joining_project_type_id, 1
-FROM loaders_project_types AS lpt
-WHERE lpt.joining_loader_id IN (7, 8, 9);
-
-
-INSERT INTO loaders_project_types_games (loader_id, project_type_id, game_id)
-SELECT joining_loader_id, joining_project_type_id, 1
-FROM loaders_project_types
-WHERE joining_loader_id = 5;
-INSERT INTO loaders_project_types_games (loader_id, project_type_id, game_id)
-SELECT joining_loader_id, joining_project_type_id, 1
-FROM loaders_project_types
-WHERE joining_loader_id = 6;
-
 
 INSERT INTO categories (id, category, project_type)
 VALUES

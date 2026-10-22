@@ -493,6 +493,7 @@ pub async fn version_edit_helper(
         .await
         .wrap_internal_err("starting database transaction")?;
     let (version_item, user) = version_edit_in_transaction(
+        minecraft_meta.clone(),
         req,
         info,
         pool,
@@ -527,6 +528,7 @@ pub async fn version_edit_helper(
 /// The caller must finalize and invalidate version caches after committing, and
 /// roll back the transaction or a savepoint if the edit fails.
 pub(crate) async fn version_edit_in_transaction(
+    minecraft_meta: web::Data<MinecraftMeta>,
     req: HttpRequest,
     info: (VersionId,),
     pool: web::Data<PgPool>,
@@ -746,7 +748,7 @@ pub(crate) async fn version_edit_in_transaction(
                     )?
                 };
                 let all_loaders = database::models::loader_item::Loader::list(
-                    &mut transaction,
+                    &mut *transaction,
                     &redis,
                 )
                 .await
@@ -789,7 +791,7 @@ pub(crate) async fn version_edit_in_transaction(
                     version_id as database::models::ids::DBVersionId,
                     sqlx::types::Json(component) as _
                 )
-                .execute(&mut transaction)
+                .execute(&mut *transaction)
                 .await
                 .wrap_internal_err("updating Minecraft version component")?;
             }

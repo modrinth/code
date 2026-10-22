@@ -1,4 +1,4 @@
-use crate::routes::v3::tags::{GameData, LoaderData};
+use crate::routes::v3::tags::LoaderData;
 use crate::routes::v3::tags::{CategoryData, MinecraftTagValue};
 use actix_http::StatusCode;
 use actix_web::{
@@ -86,17 +86,4 @@ impl ApiV3 {
         test::read_body_json(resp).await
     }
 
-    async fn get_games(&self) -> ServiceResponse {
-        let req = TestRequest::get()
-            .uri("/v3/games")
-            .append_pat(ADMIN_USER_PAT)
-            .to_request();
-        self.call(req).await
-    }
-
-    pub async fn get_games_deserialized(&self) -> Vec<GameData> {
-        let resp = self.get_games().await;
-        assert_status!(&resp, StatusCode::OK);
-        test::read_body_json(resp).await
-    }
 }

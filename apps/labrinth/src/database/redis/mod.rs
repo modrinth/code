@@ -171,7 +171,6 @@ mod tests {
                 loader: "paper".to_string(),
                 icon: "icon".to_string(),
                 supported_project_types: vec!["plugin".to_string()],
-                supported_games: vec!["minecraft-java".to_string()],
                 metadata: LoaderMetadata { platform },
             };
             let round_tripped = postcard_round_trip(&loader);
@@ -183,7 +182,6 @@ mod tests {
                 round_tripped.supported_project_types,
                 loader.supported_project_types
             );
-            assert_eq!(round_tripped.supported_games, loader.supported_games);
             assert_eq!(round_tripped.metadata.platform, platform);
         }
     }
@@ -195,7 +193,6 @@ mod tests {
             files: Vec::new(),
             loaders: vec!["fabric".to_string()],
             project_types: vec!["mod".to_string()],
-            games: vec!["minecraft-java".to_string()],
             dependencies: Vec::new(),
             components: exp::VersionQuery::default(),
         };
@@ -207,7 +204,6 @@ mod tests {
             additional_categories: Vec::new(),
             versions: vec![DBVersionId(1)],
             project_types: vec!["mod".to_string()],
-            games: vec!["minecraft-java".to_string()],
             urls: Vec::new(),
             gallery_items: Vec::new(),
             thread_id: DBThreadId(1),

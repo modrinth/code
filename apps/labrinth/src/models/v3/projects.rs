@@ -147,6 +147,17 @@ fn minecraft_version_fields(
     fields
 }
 
+fn minecraft_games(java: bool, bedrock: bool) -> Vec<String> {
+    let mut games = Vec::new();
+    if java {
+        games.push("minecraft-java".to_owned());
+    }
+    if bedrock {
+        games.push("minecraft-bedrock".to_owned());
+    }
+    games
+}
+
 impl From<ProjectQueryResult> for Project {
     fn from(data: ProjectQueryResult) -> Self {
         let mut fields: HashMap<String, Vec<serde_json::Value>> =
@@ -167,11 +178,15 @@ impl From<ProjectQueryResult> for Project {
             }
         }
         let m = data.inner;
+        let games = minecraft_games(
+            !m.loaders.is_empty() || m.components.minecraft_java_server.is_some(),
+            m.components.minecraft_bedrock_server.is_some(),
+        );
         Self {
             id: m.id.into(),
             slug: m.slug,
             project_types: data.project_types,
-            games: data.games,
+            games,
             team_id: m.team_id.into(),
             organization: m.organization_id.map(|i| i.into()),
             name: m.name,
@@ -797,7 +812,7 @@ pub struct Version {
     pub version_number: String,
     /// Project types for which this version is compatible with, extracted from Loader
     pub project_types: Vec<String>,
-    /// Games for which this version is compatible with, extracted from Loader/Project types
+    /// Minecraft games supported by this version's components and loaders
     pub games: Vec<String>,
     /// The changelog for this version of the project.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -861,6 +876,10 @@ impl From<VersionQueryResult> for Version {
             })
             .unwrap_or_default();
         let v = data.inner;
+        let games = minecraft_games(
+            !data.loaders.is_empty() || v.components.minecraft_java_server.is_some(),
+            false,
+        );
         Version {
             id: v.id.into(),
             project_id: v.project_id.into(),
@@ -869,7 +888,7 @@ impl From<VersionQueryResult> for Version {
             name: v.name,
             version_number: v.version_number,
             project_types: data.project_types,
-            games: data.games,
+            games,
             changelog: Some(v.changelog),
             date_published: v.date_published,
             downloads: v.downloads as u32,

@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use xredis::RedisPool;
 
 const LOADER_ID: &str = "loader_id:v4";
-const LOADERS_LIST_NAMESPACE: &str = "loaders:v4";
+const LOADERS_LIST_NAMESPACE: &str = "loaders:v5";
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct LoaderMetadata {
@@ -18,7 +18,7 @@ pub struct Loader {
     pub loader: String,
     pub icon: String,
     pub supported_project_types: Vec<String>,
-    pub supported_games: Vec<String>, // slugs
+
     pub metadata: LoaderMetadata,
 }
 
@@ -96,13 +96,11 @@ impl Loader {
             "
             SELECT l.id id, l.loader loader, l.icon icon,
             (l.metadata->>'platform')::boolean AS platform,
-            ARRAY_AGG(DISTINCT pt.name) filter (where pt.name is not null) project_types,
-            ARRAY_AGG(DISTINCT g.slug) filter (where g.slug is not null) games
+            ARRAY_AGG(DISTINCT pt.name) filter (where pt.name is not null) project_types
             FROM loaders l
             LEFT OUTER JOIN loaders_project_types lpt ON joining_loader_id = l.id
             LEFT OUTER JOIN project_types pt ON lpt.joining_project_type_id = pt.id
-            LEFT OUTER JOIN loaders_project_types_games lptg ON lptg.loader_id = lpt.joining_loader_id AND lptg.project_type_id = lpt.joining_project_type_id
-            LEFT OUTER JOIN games g ON lptg.game_id = g.id
+
             GROUP BY l.id;
             ",
         )
@@ -117,9 +115,7 @@ impl Loader {
                 .iter()
                 .map(|x| x.to_string())
                 .collect(),
-            supported_games: x
-                .games
-                .unwrap_or_default(),
+
             metadata: LoaderMetadata {
                 platform: x.platform,
             },
