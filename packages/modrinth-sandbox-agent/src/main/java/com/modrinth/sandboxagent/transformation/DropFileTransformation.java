@@ -20,23 +20,26 @@ import java.util.concurrent.CompletableFuture;
 public class DropFileTransformation {
 
     public static void register(TransformerMap transformerMap, MinecraftVersionInfo minecraftVersionInfo) {
-        // Mojang
-        transformerMap.registerMethod("net/minecraft/client/MouseHandler", "onDrop", "(JLjava/util/List;)V", DropFileTransformation::transformNew);
-        transformerMap.registerMethod("net/minecraft/client/MouseHandler", "onDrop", "(JLjava/util/List;I)V", DropFileTransformation::transformNew);
-//        // Mojang (before 1.21.11)
-//        transformerMap.registerMethod("net/minecraft/Util$OS", "openUri", "(Ljava/net/URI;)V", DropFileTransformation::transform);
-//        // Intermediary
-//        transformerMap.registerMethod("net/minecraft/class_156$class_158", "method_673", "(Ljava/net/URI;)V", DropFileTransformation::transform);
-//        // SRG
-//        transformerMap.registerMethod("net/minecraft/src/C_5322_$C_5330_", "m_137648_", "(Ljava/net/URI;)V", DropFileTransformation::transform);
-//        // Old MCP
-//        transformerMap.registerMethod("net/minecraft/Util$OS", "func_195642_a", "(Ljava/net/URI;)V", DropFileTransformation::transform);
-//
-//        Transformation.registerObfuscated(transformerMap, DropFileTransformation::transform,
-//                minecraftVersionInfo, "/com/modrinth/sandboxagent/method_673.csv");
+        String[] descs = new String[]{"(JLjava/util/List;)V", "(JLjava/util/List;I)V"};
+        for (String desc : descs) {
+            // Mojang
+            transformerMap.registerMethod("net/minecraft/client/MouseHandler", "onDrop", desc, DropFileTransformation::transform);
+
+            // Intermediary
+            transformerMap.registerMethod("net/minecraft/class_312", "method_29616", desc, DropFileTransformation::transform);
+            // SRG
+            transformerMap.registerMethod("net/minecraft/src/C_3397_", "m_91539_", desc, DropFileTransformation::transform);
+            // Old MCP (Intermediary)
+            transformerMap.registerMethod("net/minecraft/client/MouseHelper", "func_238228_a_", desc, DropFileTransformation::transform);
+            // Old MCP (Unobfuscated)
+            transformerMap.registerMethod("net/minecraft/client/MouseHelper", "addPacksToScreen", desc, DropFileTransformation::transform);
+        }
+
+        Transformation.registerObfuscated(transformerMap, DropFileTransformation::transform,
+                minecraftVersionInfo, "/com/modrinth/sandboxagent/method_29616.csv");
     }
 
-    private static boolean transformNew(ListIterator<AbstractInsnNode> it, boolean isStatic) {
+    private static boolean transform(ListIterator<AbstractInsnNode> it, boolean isStatic) {
         it.add(new VarInsnNode(Opcodes.ALOAD, isStatic ? 2 : 3));
         it.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "com/modrinth/sandboxagent/transformation/DropFileTransformation",
                 "accessPaths", "(Ljava/util/List;)Ljava/util/List;"));

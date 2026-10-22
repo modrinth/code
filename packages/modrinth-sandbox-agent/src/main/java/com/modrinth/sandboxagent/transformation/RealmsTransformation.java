@@ -15,28 +15,31 @@ import java.util.concurrent.CompletableFuture;
 public class RealmsTransformation {
 
     public static void register(TransformerMap transformerMap, MinecraftVersionInfo minecraftVersionInfo) {
-        // todo: not working below 1.14
+        String[] descs = new String[]{
+            "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+            "(Ljava/lang/String;Ljava/lang/String;Z)Ljava/lang/String;"
+        };
 
-        register(transformerMap, "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;");
-        register(transformerMap, "(Ljava/lang/String;Ljava/lang/String;Z)Ljava/lang/String;");
+        for (String desc : descs) {
+            // Mojang
+            transformerMap.registerMethod("com/mojang/realmsclient/client/RealmsClient", "url", desc, RealmsTransformation::transform);
+            // Intermediary
+            transformerMap.registerMethod("net/minecraft/class_4341", "method_21007", desc, RealmsTransformation::transform);
+            // Intermediary (new)
+            transformerMap.registerMethod("net/minecraft/class_4341", "method_68464", desc, RealmsTransformation::transform);
+            // SRG
+            transformerMap.registerMethod("net/minecraft/src/C_3223_", "m_87203_", desc, RealmsTransformation::transform);
+            // Old MCP (Intermediary)
+            transformerMap.registerMethod("com/mojang/realmsclient/client/RealmsClient", "func_224907_b", desc, RealmsTransformation::transform);
+        }
+
+        // Note: Prior to 1.14, realms was a separate unobfuscated jar. Thus, the Mojang mapping
+        // will apply to 1.13 and below instead of the obfuscated mappings below (method_68464)
 
         Transformation.registerObfuscated(transformerMap, RealmsTransformation::transform,
                 minecraftVersionInfo, "/com/modrinth/sandboxagent/method_21007.csv");
         Transformation.registerObfuscated(transformerMap, RealmsTransformation::transform,
                 minecraftVersionInfo, "/com/modrinth/sandboxagent/method_68464.csv");
-    }
-
-    private static void register(TransformerMap transformerMap, String desc) {
-        // Mojang
-        transformerMap.registerMethod("com/mojang/realmsclient/client/RealmsClient", "url", desc, RealmsTransformation::transform);
-        // Intermediary
-        transformerMap.registerMethod("net/minecraft/class_4341", "method_21007", desc, RealmsTransformation::transform);
-        // Intermediary (new)
-        transformerMap.registerMethod("net/minecraft/class_4341", "method_68464", desc, RealmsTransformation::transform);
-        // SRG
-        transformerMap.registerMethod("net/minecraft/src/C_3223_", "m_87203_", desc, RealmsTransformation::transform);
-        // Old MCP
-        transformerMap.registerMethod("com/mojang/realmsclient/client/RealmsClient", "func_224907_b", desc, RealmsTransformation::transform);
     }
 
     private static boolean transform(ListIterator<AbstractInsnNode> it, boolean isStatic) {
