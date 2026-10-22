@@ -22,10 +22,10 @@ pub(crate) async fn capture_modpack_server_override(
     source_path: Option<&str>,
 ) -> crate::Result<()> {
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
-        .ok_or_else(|| ErrorKind::InputError("Unknown instance".to_string()))?;
+        .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
     let servers = if let Some(source_path) = source_path {
         let path = instance_dir(&metadata, &state).join(source_path);
         read_servers(&path).await?
@@ -125,12 +125,11 @@ pub(super) async fn reconstruct_modpack_servers(
     metadata: &InstanceMetadata,
     state: &State,
 ) -> crate::Result<()> {
-    let version_id = modpack_version_id(&metadata.link).ok_or_else(|| {
-        ErrorKind::InputError(
-            "This modpack does not have a recoverable Modrinth version."
+    let version_id =
+        modpack_version_id(&metadata.link).ok_or(ErrorKind::InputError(
+            "this modpack does not have a recoverable Modrinth version"
                 .to_string(),
-        )
-    })?;
+        ))?;
     let version = CachedEntry::get_version(
         version_id,
         None,
@@ -138,21 +137,17 @@ pub(super) async fn reconstruct_modpack_servers(
         &state.api_semaphore,
     )
     .await?
-    .ok_or_else(|| {
-        ErrorKind::InputError(format!(
-            "Modpack version {version_id} could not be found"
-        ))
-    })?;
+    .ok_or(ErrorKind::InputError(format!(
+        "modpack version {version_id} could not be found"
+    )))?;
     let primary_file = version
         .files
         .iter()
         .find(|file| file.primary)
         .or_else(|| version.files.first())
-        .ok_or_else(|| {
-            ErrorKind::InputError(format!(
-                "Modpack version {version_id} has no downloadable file"
-            ))
-        })?;
+        .ok_or(ErrorKind::InputError(format!(
+            "modpack version {version_id} has no downloadable file"
+        )))?;
     let download_meta = DownloadMeta {
         reason: DownloadReason::Modpack,
         game_version: metadata.applied_content_set.game_version.clone(),

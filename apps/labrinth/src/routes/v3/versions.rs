@@ -20,13 +20,13 @@ use crate::models::ids::VersionId;
 use crate::models::images::ImageContext;
 use crate::models::pats::Scopes;
 use crate::models::projects::{
-    Dependency, FileType, ProjectStatus, VersionStatus, VersionType,
+    Dependency, FileType, VersionStatus, VersionType,
 };
 use crate::models::projects::{Loader, skip_nulls};
 use crate::models::teams::ProjectPermissions;
 use crate::queue::file_scan::get_files_missing_attribution;
 use crate::queue::session::AuthQueue;
-use crate::routes::internal::delphi;
+
 use crate::search::SearchState;
 use crate::util::error::Context;
 use crate::util::img;
@@ -484,6 +484,59 @@ pub async fn version_edit_helper(
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("starting database transaction")?;
+    let (version_item, user) = version_edit_in_transaction(
+        req,
+        info,
+        pool,
+        redis.clone(),
+        new_version,
+        session_queue,
+        &mut transaction,
+    )
+    .await?;
+
+    super::projects::mutation::finalize_mutation(
+        version_item.inner.project_id,
+        transaction,
+        &redis,
+        Some(&user),
+    )
+    .await?;
+    database::models::DBVersion::clear_cache(&version_item, &redis)
+        .await
+        .wrap_internal_err("clearing cached data from Redis")?;
+    search_state
+        .queue
+        .push_version_changes(
+            version_item.inner.project_id.into(),
+            [VersionId::from(version_item.inner.id)],
+        )
+        .await;
+    Ok(HttpResponse::NoContent().body(""))
+}
+
+/// Applies an edit without finalizing or committing the project mutation.
+/// The caller must finalize and invalidate version caches after committing, and
+/// roll back the transaction or a savepoint if the edit fails.
+pub(crate) async fn version_edit_in_transaction(
+    req: HttpRequest,
+    info: (VersionId,),
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    new_version: EditVersion,
+    session_queue: web::Data<AuthQueue>,
+    transaction: &mut crate::database::PgTransaction<'_>,
+) -> Result<
+    (
+        database::models::version_item::VersionQueryResult,
+        crate::models::users::User,
+    ),
+    ApiError,
+> {
     let user = get_user_from_headers(
         &req,
         &**pool,
@@ -551,11 +604,6 @@ pub async fn version_edit_helper(
                 )));
             }
 
-            let mut transaction = pool
-                .begin()
-                .await
-                .wrap_internal_err("starting database transaction")?;
-
             let new_loader_ids =
                 if let Some(loaders) = &new_version.loaders {
                     let mut loader_ids = Vec::with_capacity(loaders.len());
@@ -563,7 +611,7 @@ pub async fn version_edit_helper(
                         let loader_id =
                             database::models::loader_fields::Loader::get_id(
                                 &loader.0,
-                                &mut transaction,
+                                &mut *transaction,
                                 &redis,
                             )
                             .await
@@ -591,7 +639,7 @@ pub async fn version_edit_helper(
                     name.trim(),
                     version_id as database::models::ids::DBVersionId,
                 )
-                .execute(&mut transaction)
+                .execute(&mut *transaction)
                 .await
                 .wrap_internal_err(
                     "querying database for `version_edit_helper`",
@@ -608,7 +656,7 @@ pub async fn version_edit_helper(
                     number,
                     version_id as database::models::ids::DBVersionId,
                 )
-                .execute(&mut transaction)
+                .execute(&mut *transaction)
                 .await
                 .wrap_internal_err(
                     "querying database for `version_edit_helper`",
@@ -625,7 +673,7 @@ pub async fn version_edit_helper(
                     version_type.as_str(),
                     version_id as database::models::ids::DBVersionId,
                 )
-                .execute(&mut transaction)
+                .execute(&mut *transaction)
                 .await
                 .wrap_internal_err("fetching version type from database")?;
             }
@@ -637,7 +685,7 @@ pub async fn version_edit_helper(
                     ",
                     version_id as database::models::ids::DBVersionId,
                 )
-                .execute(&mut transaction)
+                .execute(&mut *transaction)
                 .await
                 .wrap_internal_err("fetching dependencies from database")?;
 
@@ -654,7 +702,7 @@ pub async fn version_edit_helper(
                 DependencyBuilder::insert_many(
                     builders,
                     version_item.inner.id,
-                    &mut transaction,
+                    &mut *transaction,
                 )
                 .await
                 .wrap_internal_err(
@@ -680,7 +728,7 @@ pub async fn version_edit_helper(
                         ",
                         version_id as database::models::ids::DBVersionId,
                     )
-                    .fetch_all(&mut transaction)
+                    .fetch_all(&mut *transaction)
                     .await
                     .wrap_internal_err(
                         "fetching version loaders from database",
@@ -692,7 +740,7 @@ pub async fn version_edit_helper(
 
                 let available_loader_fields = LoaderField::get_fields(
                     &loader_ids,
-                    &mut transaction,
+                    &mut *transaction,
                     &redis,
                 )
                 .await
@@ -744,7 +792,7 @@ pub async fn version_edit_helper(
                     version_id as database::models::ids::DBVersionId,
                     &loader_field_ids
                 )
-                .execute(&mut transaction)
+                .execute(&mut *transaction)
                 .await
                 .wrap_internal_err(
                     "querying database for `version_edit_helper`",
@@ -753,7 +801,7 @@ pub async fn version_edit_helper(
                 let mut loader_field_enum_values =
                     LoaderFieldEnumValue::list_many_loader_fields(
                         &loader_fields,
-                        &mut transaction,
+                        &mut *transaction,
                         &redis,
                     )
                     .await
@@ -782,7 +830,7 @@ pub async fn version_edit_helper(
                     .wrap_request_err("parsing version field")?;
                     version_fields.push(vf);
                 }
-                VersionField::insert_many(version_fields, &mut transaction)
+                VersionField::insert_many(version_fields, &mut *transaction)
                     .await
                     .wrap_internal_err(
                         "inserting database records for `version_edit_helper`",
@@ -796,7 +844,7 @@ pub async fn version_edit_helper(
                     ",
                     version_id as database::models::ids::DBVersionId,
                 )
-                .execute(&mut transaction)
+                .execute(&mut *transaction)
                 .await
                 .wrap_internal_err("fetching loaders from database")?;
 
@@ -807,11 +855,12 @@ pub async fn version_edit_helper(
                         version_id,
                     })
                     .collect();
-                DBLoaderVersion::insert_many(loader_versions, &mut transaction)
-                    .await
-                    .wrap_internal_err(
-                        "inserting loader versions into database",
-                    )?;
+                DBLoaderVersion::insert_many(
+                    loader_versions,
+                    &mut *transaction,
+                )
+                .await
+                .wrap_internal_err("inserting loader versions into database")?;
             }
 
             if let Some(featured) = &new_version.featured {
@@ -824,7 +873,7 @@ pub async fn version_edit_helper(
                     featured,
                     version_id as database::models::ids::DBVersionId,
                 )
-                .execute(&mut transaction)
+                .execute(&mut *transaction)
                 .await
                 .wrap_internal_err("fetching featured status from database")?;
             }
@@ -839,7 +888,7 @@ pub async fn version_edit_helper(
                     body,
                     version_id as database::models::ids::DBVersionId,
                 )
-                .execute(&mut transaction)
+                .execute(&mut *transaction)
                 .await
                 .wrap_internal_err(
                     "querying database for `version_edit_helper`",
@@ -862,7 +911,7 @@ pub async fn version_edit_helper(
                     *downloads as i32,
                     version_id as database::models::ids::DBVersionId,
                 )
-                .execute(&mut transaction)
+                .execute(&mut *transaction)
                 .await
                 .wrap_internal_err(
                     "querying database for `version_edit_helper`",
@@ -880,7 +929,7 @@ pub async fn version_edit_helper(
                     version_item.inner.project_id
                         as database::models::ids::DBProjectId,
                 )
-                .execute(&mut transaction)
+                .execute(&mut *transaction)
                 .await
                 .wrap_internal_err(
                     "querying database for `version_edit_helper`",
@@ -903,7 +952,7 @@ pub async fn version_edit_helper(
                     status.as_str(),
                     version_id as database::models::ids::DBVersionId,
                 )
-                .execute(&mut transaction)
+                .execute(&mut *transaction)
                 .await
                 .wrap_internal_err(
                     "querying database for `version_edit_helper`",
@@ -942,7 +991,7 @@ pub async fn version_edit_helper(
                         result.id,
                         file_type.file_type.as_ref().map(|x| x.as_str()),
                     )
-                    .execute(&mut transaction)
+                    .execute(&mut *transaction)
                     .await
                     .wrap_internal_err(
                         "querying database for `version_edit_helper`",
@@ -960,7 +1009,7 @@ pub async fn version_edit_helper(
                     ordering.to_owned() as Option<i32>,
                     version_id as database::models::ids::DBVersionId,
                 )
-                .execute(&mut transaction)
+                .execute(&mut *transaction)
                 .await
                 .wrap_internal_err(
                     "querying database for `version_edit_helper`",
@@ -979,35 +1028,13 @@ pub async fn version_edit_helper(
             img::delete_unused_images(
                 context,
                 checkable_strings,
-                &mut transaction,
+                &mut *transaction,
                 &redis,
             )
             .await
             .wrap_api_err("deleting unused images")?;
 
-            transaction
-                .commit()
-                .await
-                .wrap_internal_err("committing database transaction")?;
-            database::models::DBVersion::clear_cache(&version_item, &redis)
-                .await
-                .wrap_internal_err("clearing cached data from Redis")?;
-            database::models::DBProject::clear_cache(
-                version_item.inner.project_id,
-                None,
-                Some(true),
-                &redis,
-            )
-            .await
-            .wrap_internal_err("clearing cached data from Redis")?;
-            search_state
-                .queue
-                .push_version_changes(
-                    version_item.inner.project_id.into(),
-                    [VersionId::from(version_item.inner.id)],
-                )
-                .await;
-            Ok(HttpResponse::NoContent().body(""))
+            Ok((version_item, user))
         } else {
             Err(ApiError::Auth(eyre::eyre!(
                 "You do not have permission to edit this version!",
@@ -1346,15 +1373,6 @@ pub async fn version_delete(
         .wrap_request_err_with(|| {
             "the specified version does not exist!".to_string()
         })?;
-    let project = database::models::DBProject::get_id(
-        version.inner.project_id,
-        &**pool,
-        &redis,
-    )
-    .await
-    .wrap_internal_err("fetching project from database")?
-    .wrap_not_found_err("resource not found")?;
-    let validate_for_review = project.inner.status == ProjectStatus::Processing;
 
     if !user.role.is_admin() {
         let team_member =
@@ -1429,37 +1447,13 @@ pub async fn version_delete(
     .await
     .wrap_internal_err("deleting version from database")?;
 
-    delphi::tech_review_queue::sync_projects(
-        &[version.inner.project_id],
-        delphi::tech_review_queue::TechReviewRemovalReason::FileDeleted,
-        &mut transaction,
-    )
-    .await
-    .wrap_api_err("executing `tech_review_queue::sync_projects`")?;
-
-    if validate_for_review {
-        super::projects::validate::ensure_project_is_valid_for_review(
-            version.inner.project_id,
-            &pool,
-            &mut transaction,
-            &redis,
-        )
-        .await?;
-    }
-
-    transaction
-        .commit()
-        .await
-        .wrap_internal_err("committing database transaction")?;
-
-    database::models::DBProject::clear_cache(
+    super::projects::mutation::finalize_mutation(
         version.inner.project_id,
-        None,
-        Some(true),
+        transaction,
         &redis,
+        Some(&user),
     )
-    .await
-    .wrap_internal_err("clearing cached data from Redis")?;
+    .await?;
     search_state
         .queue
         .push_version_changes(

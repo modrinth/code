@@ -1,7 +1,9 @@
 use super::sources::{self, ArchiveSource, Snapshot};
 use super::{Observation, Origin, is_plain_label, mod_translation_key};
+use crate::ErrorKind;
 use crate::state::State;
 use crate::util::io;
+use anyhow::bail;
 use std::collections::{BTreeMap, HashMap};
 use std::sync::Arc;
 
@@ -60,8 +62,7 @@ impl OriginResolver {
             }
             SnapshotIndex { snapshot, keys }
         })
-        .await
-        .map_err(|error| super::input_error(error.to_string()))?;
+        .await?;
         self.snapshots.insert(id.to_owned(), index);
         Ok(())
     }
@@ -102,7 +103,9 @@ async fn load_archive_keys(
     source: &ArchiveSource,
 ) -> crate::Result<ArchiveKeys> {
     if !super::archive::valid_hash(&source.hash) {
-        return Err(super::input_error("Invalid locale archive hash"));
+        bail!(ErrorKind::InputError(
+            "invalid locale archive hash".to_string()
+        ));
     }
     let path = sources::root(state)
         .join("origin-keys-v1")
@@ -111,8 +114,7 @@ async fn load_archive_keys(
         let cached = tokio::task::spawn_blocking(move || {
             serde_json::from_slice::<ArchiveKeys>(&bytes)
         })
-        .await
-        .map_err(|error| super::input_error(error.to_string()))?;
+        .await?;
         if let Ok(keys) = cached {
             return Ok(keys);
         }
@@ -134,8 +136,7 @@ async fn load_archive_keys(
         }
         keys
     })
-    .await
-    .map_err(|error| super::input_error(error.to_string()))?;
+    .await?;
     if let Err(error) = sources::write_json(&path, &keys).await {
         tracing::warn!(hash = source.hash, %error,
 			"Game setting locales: could not cache origin keys");

@@ -301,6 +301,8 @@ const props = withDefaults(
 		dropdownWidth?: string | number
 		/** Minimum width for the teleported dropdown */
 		dropdownMinWidth?: string | number
+		/** Edge of the trigger to align the dropdown with before viewport clamping. */
+		dropdownAlign?: 'left' | 'right'
 		forceDirection?: 'up' | 'down'
 		noOptionsMessage?: string
 		disableSearchFilter?: boolean
@@ -342,6 +344,7 @@ const props = withDefaults(
 		triggerSize: 'md',
 		triggerInteraction: 'surface',
 		animateDropdown: true,
+		dropdownAlign: 'left',
 		outsideClickIgnore: () => [],
 	},
 )
@@ -399,7 +402,7 @@ const effectiveTriggerEl = computed(() => {
 })
 const outsideClickIgnoreTargets = computed(() => [
 	effectiveTriggerEl,
-	dropdownRef,
+	containerRef,
 	...props.outsideClickIgnore,
 ])
 
@@ -630,13 +633,11 @@ function calculateHorizontalPosition(
 ): number {
 	const minLeft = viewport.offsetLeft + DROPDOWN_VIEWPORT_MARGIN
 	const maxRight = viewport.offsetLeft + viewport.width - DROPDOWN_VIEWPORT_MARGIN
-	let left = triggerRect.left + viewport.offsetLeft
+	const left =
+		(props.dropdownAlign === 'right' ? triggerRect.right - dropdownRect.width : triggerRect.left) +
+		viewport.offsetLeft
 
-	if (left + dropdownRect.width > maxRight) {
-		left = Math.max(minLeft, maxRight - dropdownRect.width)
-	}
-
-	return left
+	return Math.max(minLeft, Math.min(left, maxRight - dropdownRect.width))
 }
 
 function getViewportRect(): ViewportRect {
@@ -1050,7 +1051,7 @@ function startPositionTracking() {
 	listenerWindow.addEventListener('beforeunload', handleWindowClose)
 	listenerWindow.visualViewport?.addEventListener('scroll', handleViewportChange)
 	listenerWindow.visualViewport?.addEventListener('resize', handleViewportChange)
-	stopOutsideClick = onClickOutside(containerRef, () => closeDropdown(false), {
+	stopOutsideClick = onClickOutside(dropdownRef, () => closeDropdown(false), {
 		window: listenerWindow,
 		ignore: outsideClickIgnoreTargets,
 	})
@@ -1121,6 +1122,13 @@ watch(
 		}
 	},
 	{ immediate: true },
+)
+
+watch(
+	() => props.dropdownAlign,
+	() => {
+		if (isOpen.value) void updateDropdownPosition()
+	},
 )
 
 watch(

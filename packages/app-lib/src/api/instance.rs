@@ -3,6 +3,7 @@
 mod content;
 mod export_mrpack;
 mod files;
+pub(crate) use files::InstanceFileWriter;
 pub use files::{
     InstanceFileItem, create_instance_directory, delete_instance_file,
     list_instance_files, read_instance_file, rename_instance_file,
@@ -75,26 +76,29 @@ pub use self::screenshots::{
 };
 pub(crate) use self::shared::{
     CONFIG_BUNDLE_FILE_TYPE, CONFIG_DIRECTORY, CONFIG_FILE_EXTENSIONS,
-    CONFIG_SYNC_ENABLED, MAX_CONFIG_BUNDLE_ENTRIES,
-    read_bounded_config_bundle_entry,
+    CONFIG_FILE_TYPE, CONFIG_SYNC_ENABLED, MAX_CONFIG_BUNDLE_ENTRIES,
+    MAX_SHARED_FILES_TOTAL_SIZE, is_shareable_file_path,
+    is_supported_config_file, read_bounded_config_bundle_entry,
 };
 pub use self::shared::{
     SharedInstanceExternalFilePreview, SharedInstanceInstallPreview,
     SharedInstanceInvite, SharedInstanceInviteInstallPreview,
     SharedInstanceInviteLink, SharedInstanceJoinType,
-    SharedInstancePublishPreview, SharedInstanceUpdateDiff,
-    SharedInstanceUpdateDiffType, SharedInstanceUpdatePreview,
-    SharedInstanceUser, SharedInstanceUsers,
+    SharedInstancePublishFile, SharedInstancePublishPreview,
+    SharedInstanceUpdateDiff, SharedInstanceUpdateDiffType,
+    SharedInstanceUpdatePreview, SharedInstanceUser, SharedInstanceUsers,
     accept_pending_shared_instance_invite,
     accept_shared_instance_invite_for_install,
     can_active_user_use_shared_instances, create_shared_instance_invite_link,
     decline_pending_shared_instance_invite,
     get_shared_instance_install_preview, get_shared_instance_invites,
-    get_shared_instance_publish_preview, get_shared_instance_update_preview,
-    get_shared_instance_users, install_shared_instance,
-    invite_shared_instance_users, publish_shared_instance,
-    remove_shared_instance_users, revoke_shared_instance_invite,
-    unlink_shared_instance, unpublish_shared_instance, update_shared_instance,
+    get_shared_instance_publish_preview,
+    get_shared_instance_publish_support_details,
+    get_shared_instance_update_preview, get_shared_instance_users,
+    install_shared_instance, invite_shared_instance_users,
+    publish_shared_instance, remove_shared_instance_users,
+    revoke_shared_instance_invite, unlink_shared_instance,
+    unpublish_shared_instance, update_shared_instance,
 };
 pub use self::synced_options::game_options::{
     CanonicalValue as GameOptionCanonicalValue, EditableGameSetting,

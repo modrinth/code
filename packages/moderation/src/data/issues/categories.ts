@@ -1,4 +1,5 @@
 import { TagsIcon } from '@modrinth/assets'
+import { capitalizeString } from '@modrinth/utils'
 
 import inaccurateMessage from '../messages/checklist/messages/tags/inaccurate.md'
 import optimizationMisusedMessage from '../messages/checklist/messages/tags/optimization-misused.md'
@@ -45,7 +46,7 @@ export const categoriesInaccurateIssue = issue({
 				? resolutionsMisusedMessage
 				: '',
 			tags.length
-				? `Please remove these tags from your project:  \n\n${tags.map((tag) => `- ${tag}`).join('\n')}`
+				? `Please remove these tags from your project:  \n\n${tags.map((tag) => `- ${capitalizeString(tag)}`).join('\n')}`
 				: '',
 		]
 			.filter((message) => message.trim())
@@ -63,11 +64,15 @@ export const categoriesReviewPanel = panel({
 	shown: ({ projectV3 }) =>
 		projectV3.categories.length > 0 || projectV3.additional_categories.length > 0,
 }).content(
-	toggle({ issue: categoriesInaccurateIssue, label: 'Inaccurate' }),
+	toggle({
+		issue: categoriesInaccurateIssue,
+		label: 'Inaccurate',
+	}),
 	toggle({
 		issue: categoriesInaccurateIssue,
 		label: 'Optimization',
 		id: 'categories-optimization-misused',
+		issueCardDisplay: { label: 'Optimization' },
 		shown: ({ projectV3 }) =>
 			[...projectV3.categories, ...projectV3.additional_categories].includes('optimization'),
 	}),
@@ -75,6 +80,7 @@ export const categoriesReviewPanel = panel({
 		issue: categoriesInaccurateIssue,
 		label: 'Resolutions',
 		id: 'categories-resolutions-misused',
+		issueCardDisplay: { label: 'Resolutions' },
 		shown: ({ projectV3 }) =>
 			projectV3.project_types.includes('resourcepack') &&
 			(projectV3.categories.some((tag) => resolutionTags.has(tag)) ||

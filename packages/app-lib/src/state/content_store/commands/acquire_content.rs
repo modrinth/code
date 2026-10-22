@@ -1,12 +1,14 @@
+use crate::ErrorKind;
 use crate::state::content_store::adapters::downloads;
 use crate::state::content_store::adapters::filesystem;
 use crate::state::content_store::adapters::sqlite as catalog;
 use crate::state::content_store::{
     ContentStore, GetFileResult, StoredFileHandle, StoredFileMetadata,
-    StoredFileStatus, input, validate_digest,
+    StoredFileStatus, validate_digest,
 };
 use crate::util::content_hash::{hash_file, temporary_file};
 use crate::util::fetch::{self, DownloadMeta, FetchProgressFn, FetchSemaphore};
+use anyhow::{Context, bail};
 use sha2::{Digest, Sha512};
 use std::path::Path;
 use tokio::fs::File;
@@ -22,7 +24,9 @@ impl ContentStore {
         progress: Option<&mut FetchProgressFn<'_>>,
     ) -> crate::Result<GetFileResult> {
         let sha512 = sha512.ok_or_else(|| {
-            input("Content download is missing a SHA-512 hash")
+            ErrorKind::ContentStoreError(
+                "content download is missing a SHA-512 hash".into(),
+            )
         })?;
         validate_digest(sha512, 128)?;
         let _acquisition = self.download_lock(sha512).lock().await;
@@ -42,8 +46,8 @@ impl ContentStore {
         )
         .await?;
         if sha512 != download.sha512 {
-            return Err(input(format!(
-                "Downloaded content SHA-512 mismatch: expected {sha512}, got {}",
+            bail!(ErrorKind::ContentStoreError(format!(
+                "downloaded content SHA-512 mismatch: expected {sha512}, got {}",
                 download.sha512,
             )));
         }
@@ -100,7 +104,9 @@ impl ContentStore {
         sources: &[String],
     ) -> crate::Result<StoredFileHandle> {
         if staged.path.parent() != Some(self.staging.as_path()) {
-            return Err(input("Content was not staged in the shared store"));
+            bail!(ErrorKind::ContentStoreError(
+                "content was not staged in the shared store".into()
+            ));
         }
         let fetch::StagedDownload {
             path: temporary,
@@ -127,9 +133,9 @@ impl ContentStore {
         .await?;
         let stored_file = StoredFileMetadata {
             sha512: hash,
-            size: size
-                .try_into()
-                .map_err(|_| input("Content file is too large"))?,
+            size: size.try_into().context(ErrorKind::ContentStoreError(
+                "content file is too large".into(),
+            ))?,
             status: StoredFileStatus::Ready,
             modified_as: filesystem::modified_at_ns(&destination).await?,
             last_used_at: chrono::Utc::now().timestamp(),

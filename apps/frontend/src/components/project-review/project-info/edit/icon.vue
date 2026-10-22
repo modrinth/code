@@ -12,8 +12,8 @@
 				<FileButton
 					:max-size="524288"
 					accept="image/png,image/jpeg,image/gif,image/webp"
-					:prompt="formatMessage(messages.uploadIcon)"
-					:aria-label="formatMessage(messages.uploadIcon)"
+					prompt="Upload icon"
+					aria-label="Upload icon"
 					:disabled="saving"
 					size="sm"
 					@change="selectIcon"
@@ -27,14 +27,12 @@
 					@click="removeIcon"
 				>
 					<TrashIcon aria-hidden="true" />
-					{{ formatMessage(messages.removeIcon) }}
+					Remove icon
 				</Button>
 			</div>
 		</div>
 		<div class="flex justify-end gap-1">
-			<Button type="quiet" size="xs" :disabled="saving" @click="emit('done')">
-				{{ formatMessage(commonMessages.cancelButton) }}
-			</Button>
+			<Button type="quiet" size="xs" :disabled="saving" @click="emit('done')"> Cancel </Button>
 			<Button
 				type="colored"
 				color="brand"
@@ -43,7 +41,7 @@
 				:disabled="saving || (!icon && !deleted)"
 				@click="save"
 			>
-				{{ formatMessage(commonMessages.saveButton) }}
+				Save
 			</Button>
 		</div>
 	</div>
@@ -51,7 +49,7 @@
 
 <script setup lang="ts">
 import { TrashIcon, UploadIcon } from '@modrinth/assets'
-import { Avatar, Button, commonMessages, defineMessages, FileButton, useVIntl } from '@modrinth/ui'
+import { Avatar, Button, FileButton } from '@modrinth/ui'
 import { useObjectUrl } from '@vueuse/core'
 import { onScopeDispose, ref, useTemplateRef } from 'vue'
 
@@ -61,17 +59,7 @@ import { fileDeclaresAi } from '~/helpers/c2pa'
 import { useProjectInfoEdit } from './use-project-edit'
 
 const emit = defineEmits<{ done: [] }>()
-const messages = defineMessages({
-	uploadIcon: {
-		id: 'moderation.project-review.edit.upload-icon',
-		defaultMessage: 'Upload icon',
-	},
-	removeIcon: {
-		id: 'moderation.project-review.edit.remove-icon',
-		defaultMessage: 'Remove icon',
-	},
-})
-const { formatMessage } = useVIntl()
+
 const { project, saving, beginEditing, saveIcon } = useProjectInfoEdit()
 const icon = ref<File>()
 const deleted = ref(false)

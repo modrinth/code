@@ -14,10 +14,8 @@
 
 <script setup lang="ts">
 import { EditIcon } from '@modrinth/assets'
-import { useVIntl } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
-import { projectReviewMessages as messages } from '../../messages'
 import { useReviewInteraction } from '../../shortcuts'
 
 const props = defineProps<{ section: string }>()
@@ -28,8 +26,8 @@ useReviewInteraction({
 	edit: () => button.value?.click(),
 	editable: () => !!button.value && !button.value.disabled,
 })
-const { formatMessage } = useVIntl()
-const label = computed(() => formatMessage(messages.editSection, { section: props.section }))
+
+const label = computed(() => `Edit ${props.section}`)
 </script>
 
 <style scoped>

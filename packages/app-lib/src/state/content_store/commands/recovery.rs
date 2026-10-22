@@ -1,3 +1,4 @@
+use crate::ErrorKind;
 use crate::state::content_store::InstanceFileStatus;
 use crate::state::content_store::adapters::filesystem;
 use crate::state::content_store::adapters::filesystem::symlink_metadata_if_exists;
@@ -9,9 +10,10 @@ use crate::state::content_store::adapters::stored_objects::UnregisteredFiles;
 use crate::state::content_store::domain::{journal_move, journal_noop};
 use crate::state::content_store::model::FileChangeJournal;
 use crate::state::content_store::{
-    ContentStore, FileStorageKind, FileStoragePolicy, input,
+    ContentStore, FileStorageKind, FileStoragePolicy,
 };
 use crate::state::instances as content_rows;
+use anyhow::bail;
 
 impl ContentStore {
     pub(crate) async fn recover(
@@ -134,8 +136,8 @@ impl ContentStore {
             {
                 InstanceFileStatus::Healthy => {}
                 InstanceFileStatus::Conflict => {
-                    return Err(input(format!(
-                        "Cannot recover {}: its contents were changed outside the app",
+                    bail!(ErrorKind::ContentStoreError(format!(
+                        "cannot recover {}: its contents were changed outside the app",
                         before.relative_path
                     )));
                 }
@@ -144,8 +146,8 @@ impl ContentStore {
                         .instance_file_matches(&after_path, &after.sha512)
                         .await?
                     {
-                        return Err(input(format!(
-                            "Cannot recover {}: the toggled content is missing or changed",
+                        bail!(ErrorKind::ContentStoreError(format!(
+                            "cannot recover {}: the toggled content is missing or changed",
                             after.relative_path
                         )));
                     }
@@ -169,8 +171,8 @@ impl ContentStore {
                     {
                         return self.finish_journal(journal).await;
                     }
-                    return Err(input(format!(
-                        "Cannot recover {}: its contents were changed outside the app",
+                    bail!(ErrorKind::ContentStoreError(format!(
+                        "cannot recover {}: its contents were changed outside the app",
                         after.relative_path
                     )));
                 }
@@ -185,8 +187,9 @@ impl ContentStore {
                 let status =
                     self.check_instance_path(&path, &before.sha512).await?;
                 if status == InstanceFileStatus::Conflict {
-                    return Err(input(
-                        "Recovery would overwrite externally changed content",
+                    bail!(ErrorKind::ContentStoreError(
+                        "recovery would overwrite externally changed content"
+                            .into(),
                     ));
                 }
                 if status == InstanceFileStatus::Missing {
@@ -194,10 +197,13 @@ impl ContentStore {
                         .lookup(Some(&before.sha512), None)
                         .await?
                         .ok_or_else(|| {
-                            input("Recovery content needs repair or re-import")
+                            ErrorKind::ContentStoreError(
+                                "recovery content needs repair or re-import"
+                                    .into(),
+                            )
                         })?;
                     let policy = before.storage_kind
-						.ok_or_else(|| input("Recovery content has no previous storage method"))?
+						.ok_or_else(|| ErrorKind::ContentStoreError("recovery content has no previous storage method".into()))?
 						.restore_policy();
                     let storage_kind = self
                         .create_instance_file(&stored_file, &path, policy)

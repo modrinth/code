@@ -8,6 +8,7 @@
 		:as="as"
 		:disabled="disabled"
 		:show-finding-badge="showFindingBadge"
+		@click="reviewContext.retainExternalLink(id, $event)"
 	>
 		<slot />
 		<Popover
@@ -33,7 +34,7 @@
 							:href="guidanceUrl"
 							target="_blank"
 							rel="noopener noreferrer"
-							:aria-label="formatMessage(messages.openReviewGuidance)"
+							aria-label="Open review guidance in new tab"
 							class="flex text-secondary hover:text-contrast"
 						>
 							<InfoIcon class="size-4" aria-hidden="true" />
@@ -64,10 +65,14 @@
 		class="box-border flex w-full flex-col gap-2.5 text-sm text-primary transition-opacity duration-150"
 		:class="inlineActive ? 'opacity-100' : 'opacity-50'"
 		:style="{ maxWidth }"
+		@pointerenter="reviewContext.enter(id)"
+		@pointerleave="reviewContext.leave(id)"
+		@click="reviewContext.retainExternalLink(id, $event)"
 	>
 		<Highlight
 			:active="inlineActive"
 			:enabled="settings.get(moderationSettings.General.ShowInlinePanelHoverHighlight)"
+			layer="behind"
 		>
 			<div v-if="title && !hideTitle" class="flex items-center gap-2">
 				<h2 :id="titleId" class="m-0 text-sm font-semibold text-contrast">
@@ -84,7 +89,7 @@
 						:href="guidanceUrl"
 						target="_blank"
 						rel="noopener noreferrer"
-						:aria-label="formatMessage(messages.openReviewGuidance)"
+						aria-label="Open review guidance in new tab"
 						class="flex text-secondary hover:text-contrast"
 					>
 						<InfoIcon class="size-4" aria-hidden="true" />
@@ -102,7 +107,7 @@
 					@dropdown-close="setInlineDropdownOpen($event, false)"
 				/>
 			</template>
-			<p v-else class="m-0 text-secondary">{{ formatMessage(messages.noReviewActions) }}</p>
+			<p v-else class="m-0 text-secondary">No review actions available for this section</p>
 		</Highlight>
 	</component>
 </template>
@@ -110,16 +115,16 @@
 <script setup lang="ts">
 import { InfoIcon } from '@modrinth/assets'
 import { moderationSettings } from '@modrinth/moderation'
-import { Tooltip, useVIntl } from '@modrinth/ui'
+import { Tooltip } from '@modrinth/ui'
 import { useElementHover } from '@vueuse/core'
 import { computed, nextTick, onScopeDispose, shallowRef, useId, watch } from 'vue'
 
 import { useModerationSettings } from '~/composables/moderation'
+import { useReviewHighlight } from '~/composables/review-highlight'
 import type { ReviewTarget } from '~/providers/project-review/review'
 import { injectReviewPanels } from '~/providers/project-review/review-panels'
 
 import { injectProjectReviewContext, injectReviewSlot } from '../layout/context'
-import { projectReviewMessages as messages } from '../messages'
 import Anchor from './anchor.vue'
 import { flashReviewElement, injectReviewContext, scrollReviewElement } from './context'
 import Controls from './controls/index.vue'
@@ -159,8 +164,9 @@ const {
 	setDropdownOpen,
 } = reviewContext
 const inlineActive = computed(() => activePanelId.value === id)
-const { formatMessage } = useVIntl()
+
 const settings = useModerationSettings()
+const { flashBackground } = useReviewHighlight()
 const panels = injectReviewPanels()
 const titleId = `${id}-title`
 const binding = computed(() => panels.resolve(props.target))
@@ -208,16 +214,14 @@ onScopeDispose(
 				reviewContext.revealInlinePanel(id)
 				element.focus({ preventScroll: true })
 			}
-			flashReviewElement(element)
+			flashReviewElement(element, flashBackground.value)
 		},
 	}),
 )
 const title = computed(() => panel.value?.title)
 const hint = computed(() => panel.value?.hint)
 const guidanceUrl = computed(() => panel.value?.guidanceUrl)
-const accessibleTitle = computed(() =>
-	formatMessage(messages.reviewSection, { section: title.value ?? hint.value ?? '' }),
-)
+const accessibleTitle = computed(() => `Review ${title.value ?? hint.value ?? ''}`)
 
 function setInlineDropdownOpen(key: string, open: boolean) {
 	const next = new Set(inlineDropdowns.value)

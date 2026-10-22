@@ -1,4 +1,5 @@
 use crate::{Error, ErrorKind, Result};
+use anyhow::bail;
 use std::fmt::Display;
 use std::mem;
 use std::net::{Ipv4Addr, Ipv6Addr};
@@ -45,10 +46,9 @@ impl ServerAddress {
                 resolved_port,
                 ..
             } => Ok((resolved_host, *resolved_port)),
-            Self::Unresolved(address) => Err(ErrorKind::InputError(format!(
-                "Unexpected unresolved server address: {address}"
-            ))
-            .into()),
+            Self::Unresolved(address) => bail!(ErrorKind::InputError(format!(
+                "unexpected unresolved server address {address}"
+            ))),
         }
     }
 }
@@ -85,10 +85,10 @@ fn parse_server_address_inner(
         let (Some(colon_index), Some(close_bracket_index)) =
             (address.find(':'), address.rfind(']'))
         else {
-            return Err(format!("Invalid bracketed host/port: {address}"));
+            return Err(format!("invalid bracketed host/port {address}"));
         };
         if close_bracket_index <= colon_index {
-            return Err(format!("Invalid bracketed host/port: {address}"));
+            return Err(format!("invalid bracketed host/port {address}"));
         }
 
         let host = &address[1..close_bracket_index];
@@ -99,13 +99,13 @@ fn parse_server_address_inner(
                 != Some(b':')
             {
                 return Err(format!(
-                    "Only a colon may follow a close bracket: {address}"
+                    "only a colon may follow a close bracket ({address})"
                 ));
             }
             let port_str = &address[close_bracket_index + 2..];
             for c in port_str.chars() {
                 if !c.is_ascii_digit() {
-                    return Err(format!("Port must be numeric: {address}"));
+                    return Err(format!("port must be numeric ({address})"));
                 }
             }
             (host, port_str)
@@ -123,11 +123,11 @@ fn parse_server_address_inner(
     let mut port = None;
     if !port_str.is_empty() {
         if port_str.starts_with('+') {
-            return Err(format!("Unparsable port number: {port_str}"));
+            return Err(format!("unparsable port number {port_str}"));
         }
         port = port_str.parse::<u16>().ok();
         if port.is_none() {
-            return Err(format!("Unparsable port number: {port_str}"));
+            return Err(format!("unparsable port number {port_str}"));
         }
     }
 

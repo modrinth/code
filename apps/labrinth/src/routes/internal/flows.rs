@@ -20,7 +20,7 @@ use crate::queue::email::EmailQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::routes::internal::session::{AuthSession, issue_auth_sessions};
-use crate::util::captcha::check_hcaptcha;
+use crate::util::captcha::check_turnstile;
 use crate::util::error::ApiContext as _;
 use crate::util::error::Context;
 use crate::util::ext::get_image_ext;
@@ -54,7 +54,7 @@ use sha2::Sha256;
 use std::collections::HashMap;
 use std::str::FromStr;
 use thiserror::Error;
-use tracing::{error, info, warn};
+use tracing::{debug, error, info, warn};
 use url::Url;
 use uuid::Uuid;
 use validator::Validate;
@@ -329,6 +329,7 @@ impl TempUser {
             is_subscribed_to_newsletter: sign_up_newsletter,
             eligibility_verified_at: Some(Utc::now()),
             lock: None,
+            restriction: None,
         }
         .insert(transaction)
         .await
@@ -1195,7 +1196,7 @@ pub async fn init(
         None
     };
 
-    info!(
+    debug!(
         ?existing_user_id,
         auth_token_present = %info.auth_token.is_some(),
         "Starting authentication flow"
@@ -1643,7 +1644,7 @@ pub async fn create_oauth_account(
     validate_account_consent(new_account.account_consent)
         .wrap_api_err("validating account consent")?;
 
-    if !check_hcaptcha(&req, &new_account.challenge)
+    if !check_turnstile(&req, &new_account.challenge)
         .await
         .wrap_api_err("checking captcha response")?
     {
@@ -2176,6 +2177,7 @@ impl ReadyAccountRegisterFlow {
             is_subscribed_to_newsletter: register_flow.sign_up_newsletter,
             eligibility_verified_at: Some(Utc::now()),
             lock: None,
+            restriction: None,
         }
         .insert(transaction)
         .await;
@@ -2276,7 +2278,7 @@ pub async fn create_account_with_password(
     validate_account_consent(new_account.account_consent)
         .wrap_api_err("validating account consent")?;
 
-    if !check_hcaptcha(&req, new_account.challenge.as_deref().unwrap_or(""))
+    if !check_turnstile(&req, new_account.challenge.as_deref().unwrap_or(""))
         .await
         .wrap_api_err("checking captcha response")?
     {
@@ -2338,7 +2340,7 @@ pub async fn login_password(
     redis: Data<RedisPool>,
     login: web::Json<Login>,
 ) -> Result<HttpResponse, ApiError> {
-    if !check_hcaptcha(&req, &login.challenge)
+    if !check_turnstile(&req, &login.challenge)
         .await
         .wrap_api_err("checking captcha response")?
     {
@@ -2901,7 +2903,7 @@ pub async fn reset_password_begin(
     reset_password: web::Json<ResetPassword>,
     email: web::Data<EmailQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    if !check_hcaptcha(&req, &reset_password.challenge)
+    if !check_turnstile(&req, &reset_password.challenge)
         .await
         .wrap_api_err("checking captcha response")?
     {

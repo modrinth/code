@@ -157,13 +157,13 @@ pub(super) async fn checkpoint(job_id: Uuid) -> crate::Result<()> {
 
 fn unavailable() -> crate::Error {
     crate::ErrorKind::InputError(
-        "Install job is no longer controllable".to_string(),
+        "install job is no longer controllable".to_string(),
     )
     .into()
 }
 
 fn canceled() -> crate::Error {
-    crate::ErrorKind::InputError("Install was canceled".to_string()).into()
+    crate::ErrorKind::InputError("install was canceled".to_string()).into()
 }
 
 pub(crate) async fn download_step<F: std::future::Future>(

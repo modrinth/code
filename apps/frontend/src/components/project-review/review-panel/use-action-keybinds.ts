@@ -1,30 +1,18 @@
 import type { Ref } from 'vue'
 
+import { useModerationKeybinds } from '~/composables/moderation'
+
 import type { createReviewShortcuts } from '../shortcuts'
 
 export function useActionKeybinds(
 	element: Readonly<Ref<HTMLElement | null>>,
 	shortcuts: ReturnType<typeof createReviewShortcuts>,
 ) {
+	const keybinds = useModerationKeybinds()
 	shortcuts.listen('keydown', (event) => {
-		if (
-			event.defaultPrevented ||
-			event.repeat ||
-			event.isComposing ||
-			event.ctrlKey ||
-			event.metaKey ||
-			(event.shiftKey && event.altKey)
-		) {
+		if (event.defaultPrevented || event.repeat || event.isComposing) {
 			return
 		}
-		const digit = /^[1-9]$/.test(event.key)
-			? event.key
-			: (event.shiftKey || event.altKey) && /^Digit[1-9]$/.test(event.code)
-				? event.code.slice(-1)
-				: undefined
-		if (!digit) return
-		const modifier = event.altKey ? 'Alt+' : event.shiftKey ? 'Shift+' : ''
-		const keybind = `${modifier}${digit}`
 
 		const target = event.target
 		if (
@@ -46,15 +34,28 @@ export function useActionKeybinds(
 		) {
 			return
 		}
-		const button = panel.querySelector<HTMLButtonElement>(
-			`button[data-review-keybind="${keybind}"]`,
-		)
-		if (!button || button.disabled || button.closest('[data-review-panel]') !== panel) return
-
-		event.preventDefault()
-		const focused = panel.ownerDocument.activeElement
-		if (focused instanceof HTMLElement) focused.blur()
-		button.click()
-		button.blur()
+		const toggleButton = (index: number) => {
+			const button = panel.querySelector<HTMLButtonElement>(
+				`button[data-review-toggle-index="${index}"]`,
+			)
+			return button &&
+				!button.disabled &&
+				button.closest('[data-review-panel]') === panel &&
+				button.getClientRects().length > 0
+				? button
+				: undefined
+		}
+		keybinds.value.handle(event, {
+			scope: 'review-panel-toggle',
+			available: (index) => !!toggleButton(index),
+			toggle: (index) => {
+				const button = toggleButton(index)
+				if (!button) return
+				const focused = panel.ownerDocument.activeElement
+				if (focused instanceof HTMLElement) focused.blur()
+				button.click()
+				button.blur()
+			},
+		})
 	})
 }

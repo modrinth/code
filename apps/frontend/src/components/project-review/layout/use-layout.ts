@@ -1,4 +1,4 @@
-import { injectNotificationManager, useVIntl } from '@modrinth/ui'
+import { injectNotificationManager } from '@modrinth/ui'
 import { useIntervalFn } from '@vueuse/core'
 import type {
 	DockviewApi,
@@ -15,7 +15,6 @@ import type {
 import { getGridLocation, LayoutPriority, Orientation } from 'dockview-vue'
 import { onBeforeUnmount, ref, watchEffect } from 'vue'
 
-import { projectReviewMessages } from '../messages'
 import { injectReviewContext } from '../review-panel/context'
 import { injectReviewShortcuts } from '../shortcuts'
 import { registerDragPopouts } from './drag-popout'
@@ -50,7 +49,7 @@ export function useProjectReviewLayout(
 	const detachedTabs = ref<ProjectReviewTab[]>([])
 	const hasPopouts = ref(false)
 	const { addNotification, removeNotification } = injectNotificationManager()
-	const { formatMessage } = useVIntl()
+
 	const poppingOut = ref<string[]>([])
 	const popoutSources = new Map<string, string>()
 	const unavailablePopoutTabs = new Map<
@@ -178,21 +177,19 @@ export function useProjectReviewLayout(
 			id: crypto.randomUUID(),
 			type: 'neutral',
 			containerClass: '!py-1.5 !pr-0.5 !pb-2 !rounded-xl',
-			title: formatMessage(projectReviewMessages.restorePopouts),
-			text: formatMessage(projectReviewMessages.restorePopoutsDescription, {
-				panels,
-			}),
+			title: 'Popout window closed',
+			text: `Panels from this window have been moved to the main window: ${panels}.`,
 			autoCloseMs: null,
 			noIcon: true,
 			buttons: [
 				{
-					label: formatMessage(projectReviewMessages.reopenPopouts),
+					label: 'Reopen window',
 					keepOpen: true,
 					color: 'green',
 					action: () => reopenPopout(popout),
 				},
 				{
-					label: formatMessage(projectReviewMessages.keepPopoutClosed),
+					label: 'Keep closed',
 					keepOpen: true,
 					action: () => keepPopoutClosed(popout),
 				},
@@ -456,7 +453,7 @@ export function useProjectReviewLayout(
 	function notifyPopoutFailure() {
 		addNotification({
 			type: 'error',
-			title: formatMessage(projectReviewMessages.popoutFailed),
+			title: 'Could not open the panel window',
 		})
 	}
 
@@ -502,7 +499,12 @@ export function useProjectReviewLayout(
 					orientation: Orientation.HORIZONTAL,
 					root: {
 						type: 'branch',
-						data: [{ type: 'leaf', data: { id: groupId, views, activeView: views[0] } }],
+						data: [
+							{
+								type: 'leaf',
+								data: { id: groupId, views, activeView: views[0] },
+							},
+						],
 					},
 				},
 			},

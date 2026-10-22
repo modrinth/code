@@ -220,18 +220,18 @@ pub fn app_setup(
     let pool_ref = pool.clone();
     let redis_ref = redis_pool.clone();
     let session_queue_ref = session_queue.clone();
-    scheduler.run(Duration::from_secs(60 * 30), move || {
+    scheduler.run(Duration::from_secs(60 * 5), move || {
         let pool_ref = pool_ref.clone();
         let redis_ref = redis_ref.clone();
         let session_queue_ref = session_queue_ref.clone();
 
         async move {
-            info!("Indexing sessions queue");
-            let result = session_queue_ref.index(&pool_ref, &redis_ref).await;
-            if let Err(e) = result {
-                warn!("Indexing sessions queue failed: {:?}", e);
+            match session_queue_ref.index(&pool_ref, &redis_ref).await {
+                Ok((sessions, pats, oauth_access_tokens)) => info!(
+                    "Flushed auth activity to postgres: updated last_login/IP/user agent for {sessions} sessions, last_used for {pats} PATs and {oauth_access_tokens} OAuth access tokens"
+                ),
+                Err(e) => warn!("Flushing auth activity to postgres failed: {:?}", e),
             }
-            info!("Done indexing sessions queue");
         }
     });
 

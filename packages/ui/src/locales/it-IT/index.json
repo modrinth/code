@@ -5240,12 +5240,6 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "Ripristinando dal backup..."
   },
-  "servers.backups.bulk-bar.aria-label": {
-    "defaultMessage": "{count, plural, one {Operazioni su un backup selezionato} other {Operazioni su # backup selezionati}}"
-  },
-  "servers.backups.bulk-bar.deleting": {
-    "defaultMessage": "Eliminazione di {total} backup..."
-  },
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "{count, plural, one {# backup selezionato} other {# backup selezionati}}"
   },
@@ -5270,50 +5264,11 @@
   "servers.backups.empty.heading": {
     "defaultMessage": "Ancora nessun backup"
   },
-  "servers.backups.filtered-empty.clear-filters": {
-    "defaultMessage": "Rimuovi filtri"
-  },
-  "servers.backups.filtered-empty.description": {
-    "defaultMessage": "Cambia o rimuovi i filtri per mostrare i backup."
-  },
-  "servers.backups.filtered-empty.heading": {
-    "defaultMessage": "Nessun backup trovato"
-  },
   "servers.backups.item.auto": {
     "defaultMessage": "Automatico"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Pianificazione del backup"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "Foto profilo di {username}"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "Assistenza"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Backup manuale"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Rinomina"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Ripristina"
-  },
-  "servers.backups.select-backup-aria": {
-    "defaultMessage": "Seleziona il backup {name}"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Crea backup"
-  },
-  "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "Automatico"
-  },
-  "servers.backups.toolbar.filter-manual": {
-    "defaultMessage": "Manuale"
-  },
-  "servers.backups.toolbar.select-all": {
-    "defaultMessage": "Seleziona tutto"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "Creazione del backup in corso"
@@ -7275,4 +7230,3 @@
     "defaultMessage": "Tipo"
   }
 }
-

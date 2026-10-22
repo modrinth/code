@@ -15,6 +15,7 @@ use notify::{
 use notify_debouncer_mini::{
     DebounceEventResult, Debouncer, new_debouncer_opt,
 };
+use sqlx::SqlitePool;
 use std::path::Path;
 use std::sync::LazyLock;
 use std::{
@@ -89,7 +90,7 @@ impl Watcher for WriteOnlyWatcher {
 static CONTENT_SYNCS: LazyLock<DashMap<String, bool>> =
     LazyLock::new(DashMap::new);
 
-fn queue_content_sync(instance_id: String) {
+fn queue_content_sync(instance_id: String, state: Arc<State>) {
     match CONTENT_SYNCS.entry(instance_id.clone()) {
         Entry::Occupied(mut entry) => {
             *entry.get_mut() = true;
@@ -102,7 +103,6 @@ fn queue_content_sync(instance_id: String) {
     tokio::spawn(async move {
         loop {
             let result: crate::Result<bool> = async {
-                let state = State::get().await?;
                 let Some(instance) = instance_rows::get_instance_by_id(
                     &instance_id,
                     &state.pool,
@@ -170,6 +170,16 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
     tokio::task::spawn(async move {
         let span = tracing::span!(tracing::Level::INFO, "init_watcher");
         tracing::info!(parent: &span, "Initing watcher");
+        let state = match State::get().await {
+            Ok(state) => state,
+            Err(error) => {
+                tracing::error!(
+                    parent: &span,
+                    "File watcher stopped, state failed to initialize: {error}"
+                );
+                return;
+            }
+        };
         while let Some(res) = rx.recv().await {
             let _span = span.enter();
 
@@ -250,7 +260,7 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                     .as_ref()
                                     .is_some_and(|x| *x == "txt")
                             {
-                                crash_task(instance_id);
+                                crash_task(instance_id, state.pool.clone());
                             } else if (is_screenshot_event
                                 && !visited_screenshot_instances
                                     .contains(&instance_id))
@@ -296,16 +306,16 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                     if !e.path.is_file() {
                                         let instance_id = instance_id.clone();
                                         let world = world.clone();
+                                        let pool = state.pool.clone();
                                         tokio::spawn(async move {
-                                            if let Ok(state) = State::get().await
-												&& let Err(e) = attached_world_data::AttachedWorldData::remove_for_world(
-													&instance_id,
-													WorldType::Singleplayer,
-													&world,
-													&state.pool
-												).await {
-													tracing::warn!("Failed to remove AttachedWorldData for '{world}': {e}")
-												}
+                                            if let Err(e) = attached_world_data::AttachedWorldData::remove_for_world(
+												&instance_id,
+												WorldType::Singleplayer,
+												&world,
+												&pool
+											).await {
+												tracing::warn!("Failed to remove AttachedWorldData for '{world}': {e}")
+											}
                                         });
                                     }
                                     Some(InstancePayloadType::WorldUpdated {
@@ -336,7 +346,10 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                             )
                                         });
                                     if sync_content {
-                                        queue_content_sync(emit_instance_id);
+                                        queue_content_sync(
+                                            emit_instance_id,
+                                            Arc::clone(&state),
+                                        );
                                     } else {
                                         tokio::spawn(async move {
                                             if reconcile_screenshots
@@ -497,13 +510,11 @@ pub(crate) async fn watch_instance_folder(
         .insert(instance_path.to_string(), instance_id.to_string());
 }
 
-fn crash_task(instance_id: String) {
+fn crash_task(instance_id: String, pool: SqlitePool) {
     tokio::task::spawn(async move {
         let res = async {
-            let state = State::get().await?;
             let Some(instance) =
-                instance_rows::get_instance_by_id(&instance_id, &state.pool)
-                    .await?
+                instance_rows::get_instance_by_id(&instance_id, &pool).await?
             else {
                 return Ok(());
             };

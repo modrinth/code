@@ -1,5 +1,6 @@
 #![allow(dead_code)]
 
+use crate::ErrorKind;
 use crate::state::instances::{
     ContentSet, ContentSetStatus, ContentSetSyncStatus, ContentSourceKind,
     Instance, InstanceIconBackground, InstanceIconConfig,
@@ -11,6 +12,7 @@ use crate::state::instances::{
 use crate::state::{
     InstanceInstallStage, LauncherFeatureVersion, ModLoader, ReleaseChannel,
 };
+use anyhow::{Context, bail};
 use chrono::{DateTime, TimeZone, Utc};
 use serde::de::DeserializeOwned;
 use sqlx::{Executor, Sqlite, SqlitePool, Transaction};
@@ -147,8 +149,8 @@ impl TryFrom<InstanceLinkRow> for InstanceLink {
                 modpack_project_id: row.modrinth_project_id,
                 modpack_version_id: row.modrinth_version_id,
             }),
-            other => Err(crate::ErrorKind::InputError(format!(
-                "Unknown instance link kind {other}"
+            other => Err(ErrorKind::InputError(format!(
+                "unknown instance link kind {other}"
             ))
             .into()),
         }
@@ -245,12 +247,9 @@ impl TryFrom<InstanceLaunchOverridesRow> for InstanceLaunchOverrides {
     fn try_from(row: InstanceLaunchOverridesRow) -> crate::Result<Self> {
         let data =
             serde_json::from_str::<InstanceLaunchOverridesData>(&row.overrides)
-                .map_err(|err| {
-                    crate::ErrorKind::InputError(format!(
-                        "Invalid launch overrides JSON: {err}"
-                    ))
-                    .as_error()
-                })?;
+                .context(ErrorKind::InputError(
+                    "invalid launch overrides JSON".to_string(),
+                ))?;
 
         Ok(data.into_launch_overrides(row.instance_id))
     }
@@ -358,10 +357,9 @@ impl InstanceMetadataRow {
                 }),
                 (None, None) => None,
                 _ => {
-                    return Err(crate::ErrorKind::InputError(
-                        "Instance icon config is incomplete".to_string(),
-                    )
-                    .into());
+                    bail!(ErrorKind::InputError(
+                        "instance icon config is incomplete".to_string(),
+                    ));
                 }
             };
 
@@ -1138,17 +1136,15 @@ pub(crate) async fn set_instance_group_order(
 
     for group_id in group_ids {
         if !seen_group_ids.insert(group_id.as_str()) {
-            return Err(crate::ErrorKind::InputError(format!(
-                "Duplicate instance group {group_id} in group order"
-            ))
-            .into());
+            bail!(ErrorKind::InputError(format!(
+                "duplicate instance group {group_id} in group order"
+            )));
         }
 
         if !existing_group_id_set.contains(group_id.as_str()) {
-            return Err(crate::ErrorKind::InputError(format!(
-                "Unknown instance group {group_id}"
-            ))
-            .into());
+            bail!(ErrorKind::InputError(format!(
+                "unknown instance group {group_id}"
+            )));
         }
 
         ordered_group_ids.push(group_id.as_str());
@@ -1281,10 +1277,7 @@ pub(crate) async fn set_instance_sync_preference(
     .await?;
 
     if !instance_exists {
-        return Err(crate::ErrorKind::InputError(
-            "Unknown instance".to_string(),
-        )
-        .into());
+        bail!(ErrorKind::InputError("unknown instance".to_string()));
     }
 
     let option_name = option.as_str();
@@ -1729,30 +1722,27 @@ fn instance_link_columns(
 }
 
 fn required(value: Option<String>, column: &str) -> crate::Result<String> {
-    value.ok_or_else(|| {
-        crate::ErrorKind::InputError(format!(
-            "Missing required instance link column {column}"
+    value.ok_or(
+        ErrorKind::InputError(format!(
+            "missing required instance link column {column}"
         ))
-        .into()
-    })
+        .into(),
+    )
 }
 
 fn required_i64(value: Option<i64>, column: &str) -> crate::Result<i64> {
-    value.ok_or_else(|| {
-        crate::ErrorKind::InputError(format!(
-            "Missing required instance metadata column {column}"
+    value.ok_or(
+        ErrorKind::InputError(format!(
+            "missing required instance metadata column {column}"
         ))
-        .into()
-    })
+        .into(),
+    )
 }
 
 fn parse_group_ids(value: String) -> crate::Result<Vec<String>> {
-    serde_json::from_str(&value).map_err(|err| {
-        crate::ErrorKind::InputError(format!(
-            "Invalid instance groups JSON: {err}"
-        ))
-        .into()
-    })
+    serde_json::from_str(&value).context(ErrorKind::InputError(
+        "invalid instance groups JSON".to_string(),
+    ))
 }
 
 fn launch_overrides_from_json(
@@ -1815,10 +1805,9 @@ fn optional_i32(
 ) -> crate::Result<Option<i32>> {
     value
         .map(|value| {
-            value.parse().map_err(|err| {
-                crate::ErrorKind::InputError(format!("Invalid {column}: {err}"))
-                    .into()
-            })
+            value
+                .parse::<i32>()
+                .context(ErrorKind::InputError(format!("invalid {column}")))
         })
         .transpose()
 }
@@ -1826,9 +1815,9 @@ fn optional_i32(
 fn parse_uuid(value: Option<String>, column: &str) -> crate::Result<Uuid> {
     let value = required(value, column)?;
 
-    value.parse().map_err(|err| {
-        crate::ErrorKind::InputError(format!("Invalid {column}: {err}")).into()
-    })
+    value
+        .parse::<Uuid>()
+        .context(ErrorKind::InputError(format!("invalid {column}")))
 }
 
 fn parse_optional_uuid(
@@ -1837,10 +1826,9 @@ fn parse_optional_uuid(
 ) -> crate::Result<Option<Uuid>> {
     value
         .map(|value| {
-            value.parse().map_err(|err| {
-                crate::ErrorKind::InputError(format!("Invalid {column}: {err}"))
-                    .into()
-            })
+            value
+                .parse::<Uuid>()
+                .context(ErrorKind::InputError(format!("invalid {column}")))
         })
         .transpose()
 }
@@ -1860,12 +1848,11 @@ where
         return Ok(None);
     }
 
-    serde_json::from_str(&value).map(Some).map_err(|err| {
-        crate::ErrorKind::InputError(format!(
-            "Invalid launch override JSON in {column}: {err}"
-        ))
-        .into()
-    })
+    serde_json::from_str(&value)
+        .map(Some)
+        .context(ErrorKind::InputError(format!(
+            "invalid launch override JSON in {column}"
+        )))
 }
 
 fn timestamp(value: i64) -> DateTime<Utc> {
@@ -1880,10 +1867,9 @@ fn optional_timestamp(value: i64) -> Option<DateTime<Utc>> {
 
 fn unsigned(value: i64, column: &str) -> crate::Result<u64> {
     if value < 0 {
-        return Err(crate::ErrorKind::InputError(format!(
-            "Expected {column} to be non-negative"
-        ))
-        .into());
+        bail!(ErrorKind::InputError(format!(
+            "expected {column} to be non-negative"
+        )));
     }
 
     Ok(value as u64)

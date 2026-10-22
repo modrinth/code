@@ -22,6 +22,7 @@ use crate::util::fetch::{
     DownloadMeta, DownloadReason, FetchProgressFn, fetch_content_file,
 };
 use crate::util::io;
+use anyhow::{Context, bail};
 use async_zip::base::read::seek::ZipFileReader as SeekZipFileReader;
 use async_zip::base::read::{WithEntry, ZipEntryReader};
 use async_zip::tokio::read::fs::ZipFileReader as FsZipFileReader;
@@ -139,22 +140,20 @@ impl MrpackZipReader {
             CreatePackFile::Bytes(file) => Ok(Self::Memory(
                 SeekZipFileReader::with_tokio(Cursor::new(file.clone()))
                     .await
-                    .map_err(|_| {
-                        crate::Error::from(crate::ErrorKind::InputError(
-                            "Failed to read input modpack zip".to_string(),
-                        ))
-                    })?,
+                    .context(crate::ErrorKind::InputError(
+                        "failed to read input modpack zip".to_string(),
+                    ))?,
             )),
             CreatePackFile::Downloaded(file) => {
                 Ok(Self::File(FsZipFileReader::new(file.path()).await?))
             }
-            CreatePackFile::Path(path) => Ok(Self::File(
-                FsZipFileReader::new(path).await.map_err(|_| {
-                    crate::Error::from(crate::ErrorKind::InputError(
-                        "Failed to read input modpack zip".to_string(),
-                    ))
-                })?,
-            )),
+            CreatePackFile::Path(path) => {
+                Ok(Self::File(FsZipFileReader::new(path).await.context(
+                    crate::ErrorKind::InputError(
+                        "failed to read input modpack zip".to_string(),
+                    ),
+                )?))
+            }
         }
     }
 
@@ -275,9 +274,9 @@ pub(crate) async fn get_external_files_from_mrpack(
             matches!(entry.filename().as_str(), Ok("modrinth.index.json"))
         })
     else {
-        return Err(crate::Error::from(crate::ErrorKind::InputError(
-            "No pack manifest found in mrpack".to_string(),
-        )));
+        bail!(crate::ErrorKind::InputError(
+            "no pack manifest found in mrpack".to_string(),
+        ));
     };
 
     let manifest = zip_reader.read_entry_to_string(manifest_idx).await?;
@@ -295,8 +294,8 @@ pub(crate) async fn get_external_files_from_mrpack(
             if let Some(previous) =
                 destinations.insert(canonical, path.to_string())
             {
-                return Err(crate::state::content_store::input(format!(
-                    "Modpack content paths {previous} and {path} refer to the same file"
+                bail!(crate::ErrorKind::InputError(format!(
+                    "modpack content paths {previous} and {path} refer to the same file"
                 )));
             }
         }
@@ -316,8 +315,8 @@ pub(crate) async fn get_external_files_from_mrpack(
             {
                 // Overrides may replace the same physical path, but must not change its enabled form.
                 if previous != path {
-                    return Err(crate::state::content_store::input(format!(
-                        "Modpack content paths {previous} and {path} refer to the same file"
+                    bail!(crate::ErrorKind::InputError(format!(
+                        "modpack content paths {previous} and {path} refer to the same file"
                     )));
                 }
             }
@@ -579,9 +578,9 @@ async fn install_zipped_mrpack_files_with_reporter_inner(
     let Some(manifest_idx) = zip_reader.file().entries().iter().position(|f| {
         matches!(f.filename().as_str(), Ok("modrinth.index.json"))
     }) else {
-        return Err(crate::Error::from(crate::ErrorKind::InputError(
-            "No pack manifest found in mrpack".to_string(),
-        )));
+        bail!(crate::ErrorKind::InputError(
+            "no pack manifest found in mrpack".to_string(),
+        ));
     };
 
     let mut manifest = String::new();
@@ -589,10 +588,9 @@ async fn install_zipped_mrpack_files_with_reporter_inner(
 
     let pack: PackFormat = serde_json::from_str(&manifest)?;
     if &*pack.game != "minecraft" {
-        return Err(crate::ErrorKind::InputError(
-            "Pack does not support Minecraft".to_string(),
-        )
-        .into());
+        bail!(crate::ErrorKind::InputError(
+            "pack does not support Minecraft".to_string(),
+        ));
     }
 
     reporter
@@ -699,17 +697,13 @@ async fn install_zipped_mrpack_files_with_reporter_inner(
         Some(&pack.version_id),
         &pack.dependencies,
         ignore_lock,
+        &state.directories,
     )
     .await?;
 
-    let metadata =
-        crate::api::instance::get(&instance_id)
-            .await?
-            .ok_or_else(|| {
-                crate::ErrorKind::InputError(format!(
-                    "Unknown instance {instance_id}"
-                ))
-            })?;
+    let metadata = crate::api::instance::get(&instance_id).await?.ok_or(
+        crate::ErrorKind::InputError(format!("unknown instance {instance_id}")),
+    )?;
     let instance_path = metadata.instance.path.clone();
     let download_meta = DownloadMeta {
         reason,
@@ -934,16 +928,15 @@ async fn install_zipped_mrpack_files_with_reporter_inner(
                 ) {
                     let project_type =
                         ProjectType::get_from_parent_folder(&project_path)
-                            .ok_or_else(|| {
-                                crate::state::content_store::input(
-                                    "Unsupported content path",
-                                )
-                            })?;
+                            .ok_or(crate::ErrorKind::InputError(
+                                "unsupported content path".to_string(),
+                            ))?;
                     let file_info =
                         project.hashes.get(&PackFileHash::Sha1).and_then(
                             |hash| content_context.file_infos_by_hash.get(hash),
                         );
-                    let stored_file = file.store_file(state).await?;
+                    let stored_file =
+                        file.store_file(&state.content_store).await?;
                     content_context
                         .reporter
                         .preserve_failure_context(
@@ -1134,11 +1127,7 @@ async fn install_zipped_mrpack_files_with_reporter_inner(
         let relative_override_file_path = relative_override_file_path
 			.strip_prefix("overrides")
 			.or_else(|_| relative_override_file_path.strip_prefix("client-overrides"))
-            .map_err(|_| {
-                crate::Error::from(crate::ErrorKind::OtherError(
-                    format!("Failed to strip override prefix from override file path: {relative_override_file_path}")
-                ))
-            })?;
+            .context(format!("failed to strip override prefix from override file path {relative_override_file_path}"))?;
 
         let managed = crate::state::content_store::is_managed_content_path(
             relative_override_file_path.as_str(),
@@ -1196,7 +1185,7 @@ async fn install_zipped_mrpack_files_with_reporter_inner(
             crate::state::file_modified_at_ns(&io::metadata(&path).await?)?;
 
         {
-            let _permit = state.install_db_semaphore.acquire().await?;
+            let _permit = state.installs.db_semaphore.acquire().await?;
             let record_context =
                 InstallErrorContext::new("record modpack override")
                     .maybe_project_id(project_id.clone())
@@ -1286,6 +1275,7 @@ async fn install_zipped_mrpack_files_with_reporter_inner(
         &instance_id,
         false,
         Some(reporter.clone()),
+        state,
     )
     .await?;
     reporter.clear_context().await?;
@@ -1363,9 +1353,9 @@ pub async fn remove_all_related_files(
     let Some(manifest_idx) = zip_reader.file().entries().iter().position(|f| {
         matches!(f.filename().as_str(), Ok("modrinth.index.json"))
     }) else {
-        return Err(crate::Error::from(crate::ErrorKind::InputError(
-            "No pack manifest found in mrpack".to_string(),
-        )));
+        bail!(crate::ErrorKind::InputError(
+            "no pack manifest found in mrpack".to_string(),
+        ));
     };
 
     let manifest = zip_reader.read_entry_to_string(manifest_idx).await?;
@@ -1373,10 +1363,9 @@ pub async fn remove_all_related_files(
     let pack: PackFormat = serde_json::from_str(&manifest)?;
 
     if &*pack.game != "minecraft" {
-        return Err(crate::ErrorKind::InputError(
-            "Pack does not support Minecraft".to_string(),
-        )
-        .into());
+        bail!(crate::ErrorKind::InputError(
+            "pack does not support Minecraft".to_string(),
+        ));
     }
 
     crate::api::instance::edit(
@@ -1392,14 +1381,9 @@ pub async fn remove_all_related_files(
     // Remove all modrinth projects by their version hashes
     // We need to do a fetch to get the project ids from Modrinth
     let state = State::get().await?;
-    let metadata =
-        crate::api::instance::get(&instance_id)
-            .await?
-            .ok_or_else(|| {
-                crate::ErrorKind::InputError(format!(
-                    "Unknown instance {instance_id}"
-                ))
-            })?;
+    let metadata = crate::api::instance::get(&instance_id).await?.ok_or(
+        crate::ErrorKind::InputError(format!("unknown instance {instance_id}")),
+    )?;
     let instance_full_path =
         crate::api::instance::get_full_path(&instance_id).await?;
     let all_hashes = pack
@@ -1479,11 +1463,7 @@ pub async fn remove_all_related_files(
         let relative_override_file_path = relative_override_file_path
             .strip_prefix("overrides")
             .or_else(|_| relative_override_file_path.strip_prefix("client-overrides"))
-            .map_err(|_| {
-                crate::Error::from(crate::ErrorKind::OtherError(
-                    format!("Failed to strip override prefix from override file path: {relative_override_file_path}")
-				))
-			})?;
+            .context(format!("failed to strip override prefix from override file path {relative_override_file_path}"))?;
         if relative_override_file_path.as_str() == "options.txt" {
             continue;
         }

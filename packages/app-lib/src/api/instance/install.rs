@@ -1,4 +1,5 @@
 use crate::state::{JavaVersion, State};
+use anyhow::Context;
 
 pub async fn get_optimal_jre_key(
     instance_id: &str,
@@ -10,11 +11,9 @@ pub async fn get_optimal_jre_key(
             &state.pool,
         )
         .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::OtherError(format!(
-                "Tried to resolve a nonexistent instance {instance_id}!"
-            ))
-        })?;
+        .context(format!(
+            "tried to resolve a nonexistent instance {instance_id}"
+        ))?;
     let (minecraft, version_index) =
         crate::launcher::resolve_minecraft_manifest(
             &context.applied_content_set.game_version,
@@ -26,6 +25,7 @@ pub async fn get_optimal_jre_key(
         &context.applied_content_set.game_version,
         context.applied_content_set.loader,
         context.applied_content_set.loader_version.as_deref(),
+        &state.directories,
     )
     .await?;
     let version_info = crate::launcher::download::download_version_info(
@@ -41,6 +41,7 @@ pub async fn get_optimal_jre_key(
     crate::launcher::get_java_version_from_launch_context(
         &context,
         &version_info,
+        &state.pool,
     )
     .await
 }

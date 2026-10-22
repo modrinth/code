@@ -5240,12 +5240,6 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "Restaurando da cópia de segurança"
   },
-  "servers.backups.bulk-bar.aria-label": {
-    "defaultMessage": "Ações em massa para {count, plural, one {uma cópia de segurança selecionada} other {# cópias de segurança selecionadas}}"
-  },
-  "servers.backups.bulk-bar.deleting": {
-    "defaultMessage": "Excluindo {total, plural, one {# cópia de segurança} other {# cópias de segurança}}..."
-  },
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "{count, plural, one {# cópia de segurança selecionada} other {# cópias de segurança selecionadas}}"
   },
@@ -5270,50 +5264,11 @@
   "servers.backups.empty.heading": {
     "defaultMessage": "Ainda não há cópias de segurança"
   },
-  "servers.backups.filtered-empty.clear-filters": {
-    "defaultMessage": "Limpar filtros"
-  },
-  "servers.backups.filtered-empty.description": {
-    "defaultMessage": "Tente um filtro diferente ou limpe os filtros para ver todas as cópias de segurança."
-  },
-  "servers.backups.filtered-empty.heading": {
-    "defaultMessage": "Nenhuma cópia de segurança corresponde"
-  },
   "servers.backups.item.auto": {
     "defaultMessage": "Automático"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Agendamento de cópia de segurança"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "Avatar de {username}"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "Suporte"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Cópia de segurança manual"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Renomear"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Restaurar"
-  },
-  "servers.backups.select-backup-aria": {
-    "defaultMessage": "Selecionar cópia de segurança {name}"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Criar cópia de segurança"
-  },
-  "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "Automático"
-  },
-  "servers.backups.toolbar.filter-manual": {
-    "defaultMessage": "Manual"
-  },
-  "servers.backups.toolbar.select-all": {
-    "defaultMessage": "Selecionar tudo"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "Criação de cópia de segurança em andamento"
@@ -7275,4 +7230,3 @@
     "defaultMessage": "Tipo"
   }
 }
-

@@ -45,9 +45,18 @@ const props = withDefaults(
 	defineProps<
 		TooltipBaseProps & {
 			disabled?: boolean
+			animated?: boolean
+			showArrow?: boolean
 		}
 	>(),
-	{ disabled: false, theme: 'tooltip', placement: 'top', allowTransfer: true },
+	{
+		disabled: false,
+		animated: true,
+		showArrow: true,
+		theme: 'tooltip',
+		placement: 'top',
+		allowTransfer: true,
+	},
 )
 
 const slots = defineSlots<{ popper?: () => VNode }>()
@@ -266,7 +275,7 @@ function onFocusOut(event: FocusEvent) {
 		<slot />
 	</div>
 	<Teleport v-if="hosted" :to="teleportTarget">
-		<Transition name="tooltip">
+		<Transition name="tooltip" :css="animated">
 			<div
 				v-if="isOpen"
 				:key="jumpKey"
@@ -285,6 +294,7 @@ function onFocusOut(event: FocusEvent) {
 				<TooltipSlot v-if="content" :content="content" />
 				<template v-else>{{ text }}</template>
 				<div
+					v-if="showArrow"
 					ref="arrowEl"
 					class="tooltip-arrow absolute size-2 border-b border-r border-0 border-solid border-surface-5 bg-surface-3"
 					:style="arrowStyles"

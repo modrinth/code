@@ -4547,29 +4547,17 @@
   "report.not-for.dmca.description": {
     "message": "Lásd a <policy-link>Szerzői jogi irányelvünket</policy-link>."
   },
-  "report.note.ai-images.1": {
-    "message": "Nemrég frissítettük a szabályainkat, amelyek mostantól tiltják a mesterséges intelligenciával generált képeket az ikonokban, galériákban és leírásokban. A készítőknek türelmi időt biztosítunk, hogy eltávolítsák az MI által generált képeket a projektjeikből, mielőtt elkezdjük elfogadni az ezekkel kapcsolatos jelentéseket."
-  },
-  "report.note.check-back-later": {
-    "message": "Nézz vissza később, amikor a türelmi idő lejár. Az ilyen típusú jelentéseket jelenleg nem fogadjuk el."
-  },
   "report.note.copyright.1": {
     "message": "Felhívjuk a figyelmedet, hogy *nem* DMCA-eltávolítási kérelmet nyújtasz be, hanem újratöltött tartalomról szóló bejelentést."
   },
   "report.note.copyright.2": {
     "message": "Ha DMCA-eltávolítási kérelmet (ami jogi lépés) szeretnél benyújtani, kérjük, olvasd el a <copyright-policy-link>Szerzői jogi irányelvünket</copyright-policy-link>."
   },
-  "report.note.fully-ai-generated.1": {
-    "message": "A készítőknek türelmi időt biztosítunk, hogy frissítsék vagy eltávolítsák a teljes egészében MI által generált projektjeiket, mielőtt elkezdjük elfogadni az ezekkel kapcsolatos jelentéseket."
-  },
   "report.note.malicious.1": {
     "message": "A rosszindulatú vagy megtévesztő tartalmakról szóló bejelentéseknek tartalmazniuk kell a magatartásra vonatkozó lényeges bizonyítékokat, például kódmintákat."
   },
   "report.note.malicious.2": {
     "message": "A Microsoft Defender, a VirusTotal vagy az MI rosszindulatú programok észlelése által készített összefoglalók nem minősülnek elegendő bizonyítéknak, ezért nem fogadhatók el."
-  },
-  "report.note.missing-disclosure.1": {
-    "message": "A tartalmi nyilatkozatok egy újonnan bevezetett funkció. A készítőknek türelmi időt biztosítunk, hogy naprakésszé tegyék a nyilatkozataikat, mielőtt elkezdjük elfogadni a hiányzó vagy helytelen nyilatkozatokkal kapcsolatos jelentéseket."
   },
   "report.please-report": {
     "message": "Kérjük, az alábbiakat jelentsd:"
@@ -5537,15 +5525,6 @@
   "settings.pats.modal.create.title": {
     "message": "Személyes elérési token létrehozása"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "Token törlése"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "Ez örökre törölni fogja ezt a tokent (tényleg örökre)."
-  },
-  "settings.pats.modal.delete.title": {
-    "message": "Biztosan törölni akarod ezt a tokent?"
-  },
   "settings.pats.modal.edit.title": {
     "message": "Személyes elérési token szerkesztése"
   },
@@ -5575,9 +5554,6 @@
   },
   "settings.sessions.current-session": {
     "message": "Jelenlegi munkamenet"
-  },
-  "settings.sessions.description": {
-    "message": "Itt találhatók azok az eszközök, amelyek jelenleg be vannak jelentkezve a Modrinth fiókodba. Mindegyikről külön-külön kijelentkezhetsz.\n\nHa nem ismerős bejegyzést látsz, jelentkezz ki az adott eszközről, és azonnal változtasd meg Modrinth fiókod jelszavát."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Legutoljára hozzáférve {ago}"

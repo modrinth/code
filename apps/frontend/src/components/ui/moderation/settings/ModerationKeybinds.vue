@@ -5,6 +5,7 @@ import { defineMessages, Input, useVIntl } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import ModerationKeybind from '~/components/ui/moderation/settings/ModerationKeybind.vue'
+import ModerationKeybindTransfer from '~/components/ui/moderation/settings/ModerationKeybindTransfer.vue'
 import { saveModerationOptions, useModerationKeybinds } from '~/composables/moderation'
 
 defineProps<{
@@ -28,6 +29,10 @@ const messages = defineMessages({
 	items: {
 		id: 'moderation.keybinds.items',
 		defaultMessage: 'Review items and checks',
+	},
+	panelToggles: {
+		id: 'moderation.keybinds.panel-toggles',
+		defaultMessage: 'Panel toggles',
 	},
 	decisions: {
 		id: 'moderation.keybinds.decisions',
@@ -66,6 +71,7 @@ const messages = defineMessages({
 const navigationIds = [
 	'review-toggle-icon',
 	'review-cycle-conversation',
+	'review-cycle-misc',
 	'review-toggle-left',
 	'review-toggle-right',
 ]
@@ -125,6 +131,11 @@ const groups = computed(() => {
 			title: messages.technical,
 			bindings: bindings.value.filter(([, binding]) => binding.scope === 'tech-review'),
 		},
+		{
+			id: 'panel-toggles',
+			title: messages.panelToggles,
+			bindings: bindings.value.filter(([, binding]) => binding.scope === 'review-panel-toggle'),
+		},
 	]
 	return categories.filter((group) => group.bindings.length)
 })
@@ -164,7 +175,10 @@ const conflictLabels = computed(() => {
 
 <template>
 	<div :class="{ 'universal-card': !embedded }">
-		<h2 class="m-0 mb-2.5 text-2xl">{{ formatMessage(messages.keybinds) }}</h2>
+		<div class="mb-2.5 flex flex-wrap items-center gap-2">
+			<h2 class="m-0 text-2xl">{{ formatMessage(messages.keybinds) }}</h2>
+			<ModerationKeybindTransfer />
+		</div>
 		<Input
 			v-model="search"
 			type="search"

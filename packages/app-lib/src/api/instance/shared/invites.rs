@@ -25,7 +25,8 @@ pub async fn invite_shared_instance_users(
     user_ids: Vec<String>,
 ) -> crate::Result<SharedInstanceUsers> {
     let state = State::get().await?;
-    let _shared_instance_lock = state.lock_shared_instance(instance_id).await;
+    let _shared_instance_lock =
+        state.instance_locks.lock_shared(instance_id).await;
     let (metadata, attachment) =
         shared_instance_for_invites(instance_id, user_ids.len(), &state)
             .await?;
@@ -65,7 +66,8 @@ pub async fn create_shared_instance_invite_link(
     replace_invite_id: Option<String>,
 ) -> crate::Result<SharedInstanceInviteLink> {
     let state = State::get().await?;
-    let _shared_instance_lock = state.lock_shared_instance(instance_id).await;
+    let _shared_instance_lock =
+        state.instance_locks.lock_shared(instance_id).await;
     let (metadata, attachment) =
         shared_instance_for_invites(instance_id, 0, &state).await?;
     ensure_owner(&attachment)?;
@@ -84,16 +86,14 @@ pub async fn create_shared_instance_invite_link(
     if max_age_seconds <= 0
         || max_age_seconds > SHARED_INSTANCE_INVITE_MAX_AGE_SECONDS
     {
-        return Err(crate::ErrorKind::InputError(
-            "Invite expiry must be between now and seven days".to_string(),
-        )
-        .into());
+        bail!(crate::ErrorKind::InputError(
+            "invite expiry must be between now and seven days".to_string(),
+        ));
     }
     if max_uses <= 0 {
-        return Err(crate::ErrorKind::InputError(
-            "Invite max uses must be greater than zero".to_string(),
-        )
-        .into());
+        bail!(crate::ErrorKind::InputError(
+            "invite max uses must be greater than zero".to_string(),
+        ));
     }
 
     if let Some(invite_id) = replace_invite_id {
@@ -152,7 +152,8 @@ pub async fn revoke_shared_instance_invite(
     invite_id: String,
 ) -> crate::Result<()> {
     let state = State::get().await?;
-    let _shared_instance_lock = state.lock_shared_instance(instance_id).await;
+    let _shared_instance_lock =
+        state.instance_locks.lock_shared(instance_id).await;
     let Some(attachment) = shared_attachment(instance_id, &state).await? else {
         return Ok(());
     };
@@ -169,7 +170,8 @@ pub async fn remove_shared_instance_users(
     has_pending_recipients: bool,
 ) -> crate::Result<SharedInstanceUsers> {
     let state = State::get().await?;
-    let _shared_instance_lock = state.lock_shared_instance(instance_id).await;
+    let _shared_instance_lock =
+        state.instance_locks.lock_shared(instance_id).await;
     let Some(attachment) = shared_attachment(instance_id, &state).await? else {
         return Ok(SharedInstanceUsers::empty());
     };
@@ -210,10 +212,9 @@ pub async fn accept_pending_shared_instance_invite(
         return Ok(());
     }
 
-    Err(crate::ErrorKind::InputError(
-        "No pending invite found for shared instance".to_string(),
-    )
-    .into())
+    bail!(crate::ErrorKind::InputError(
+        "no pending invite found for shared instance".to_string(),
+    ))
 }
 
 #[tracing::instrument]

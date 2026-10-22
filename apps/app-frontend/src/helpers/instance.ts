@@ -5,7 +5,7 @@
  */
 import type { Labrinth } from '@modrinth/api-client'
 import type { ContentItem, ContentOwner } from '@modrinth/ui'
-import { convertFileSrc, invoke } from '@tauri-apps/api/core'
+import { Channel, convertFileSrc, invoke } from '@tauri-apps/api/core'
 
 import type { InstallJobSnapshot, SharedInstanceUpdateDiff } from './install'
 import type {
@@ -683,7 +683,13 @@ export interface SharedInstancePublishPreview {
 	sharedInstanceId: string
 	latestVersion: number
 	diffs: SharedInstanceUpdateDiff[]
-	configFiles: string[]
+	files: SharedInstancePublishFile[]
+}
+
+export interface SharedInstancePublishFile {
+	path: string
+	size: number
+	blocked: boolean
 }
 
 export interface SharedInstanceInviteLink {
@@ -761,9 +767,20 @@ export async function get_shared_instance_publish_preview(
 
 export async function publish_shared_instance(
 	instanceId: string,
-	configPaths: string[],
+	filePaths: string[],
+	onProgress: (uploadedBytes: number, totalBytes: number) => void,
 ): Promise<SharedInstanceAttachment> {
-	return await invoke('plugin:instance|instance_share_publish', { instanceId, configPaths })
+	return await invoke('plugin:instance|instance_share_publish', {
+		instanceId,
+		filePaths,
+		onProgress: new Channel<[number, number]>(([uploaded, total]) => onProgress(uploaded, total)),
+	})
+}
+
+export async function get_shared_instance_publish_support_details(
+	instanceId: string,
+): Promise<string | null> {
+	return await invoke('plugin:instance|instance_share_publish_support_details', { instanceId })
 }
 
 export async function unlink_shared_instance(instanceId: string): Promise<void> {

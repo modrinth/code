@@ -5,7 +5,8 @@ use crate::models::ids::{
     OAuthAccessTokenId, OAuthClientAuthorizationId, OAuthClientId,
     OAuthRedirectUriId, OrganizationId, PasskeyId, PatId, PayoutId, ProductId,
     ProductPriceId, ProjectId, ReportId, SessionId, TeamId, TeamMemberId,
-    ThreadId, ThreadMessageId, UserSubscriptionId, VersionId,
+    ThreadId, ThreadIssueFacetId, ThreadIssueId, ThreadMessageId,
+    UserSubscriptionId, VersionId,
 };
 use ariadne::ids::base62_impl::to_base62;
 use ariadne::ids::{UserId, random_base62_rng, random_base62_rng_range};
@@ -254,6 +255,15 @@ db_id_interface!(
 db_id_interface!(
     ThreadId,
     generator: generate_thread_id @ "threads",
+);
+db_id_interface!(
+    ThreadIssueFacetId,
+    generator: generate_thread_issue_facet_id @ "threads_issue_facets",
+    bulk_generator: generate_many_thread_issue_facet_ids,
+);
+db_id_interface!(
+    ThreadIssueId,
+    generator: generate_thread_issue_id @ "threads_issues",
 );
 db_id_interface!(
     ThreadMessageId,

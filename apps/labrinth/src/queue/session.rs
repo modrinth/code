@@ -24,7 +24,7 @@ impl Default for AuthQueue {
     }
 }
 
-// Batches session accessing transactions every 30 seconds
+// Batches session accessing transactions every 5 minutes
 impl AuthQueue {
     pub fn new() -> Self {
         AuthQueue {
@@ -66,11 +66,20 @@ impl AuthQueue {
         std::mem::replace(&mut *queue, HashSet::with_capacity(len))
     }
 
-    pub async fn index(&self, pool: &PgPool, redis: &RedisPool) -> Result<()> {
+    pub async fn index(
+        &self,
+        pool: &PgPool,
+        redis: &RedisPool,
+    ) -> Result<(usize, usize, usize)> {
         let session_queue = self.take_sessions().await;
         let pat_queue = Self::take_hashset(&self.pat_queue).await;
         let oauth_access_token_queue =
             Self::take_hashset(&self.oauth_access_token_queue).await;
+        let flushed_counts = (
+            session_queue.len(),
+            pat_queue.len(),
+            oauth_access_token_queue.len(),
+        );
 
         if !session_queue.is_empty()
             || !pat_queue.is_empty()
@@ -169,7 +178,7 @@ impl AuthQueue {
                 .wrap_err("clearing personal access token cache")?;
         }
 
-        Ok(())
+        Ok(flushed_counts)
     }
 }
 

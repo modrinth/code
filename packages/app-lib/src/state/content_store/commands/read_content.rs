@@ -1,3 +1,4 @@
+use crate::ErrorKind;
 use crate::state::content_store::adapters::filesystem;
 use crate::state::content_store::adapters::filesystem::{
     symlink_metadata_if_exists, validate_parent_directories,
@@ -6,10 +7,11 @@ use crate::state::content_store::adapters::sqlite as catalog;
 use crate::state::content_store::{
     ContentStore, FileContent, InstanceFileStorage, ReadableContent,
     StoredFileHandle, StoredFileMetadata, StoredFileRecord, StoredFileStatus,
-    content_file_path, hash_file_with_progress, input, validate_digest,
+    content_file_path, hash_file_with_progress, validate_digest,
     validate_instance_path, validate_relative,
 };
 use crate::state::{InstanceFile, file_modified_at_ns};
+use anyhow::bail;
 use itertools::Itertools;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
@@ -190,7 +192,7 @@ impl ContentStore {
                 return Ok(ReadableContent::Stored(stored_file));
             }
             FileContent::Damaged(_) => {
-                return Err(input(format!(
+                bail!(ErrorKind::ContentStoreError(format!(
                     "{} needs repair or re-import",
                     file.relative_path
                 )));
@@ -202,7 +204,9 @@ impl ContentStore {
         validate_relative(&relative_path)?;
         let path = self.instance_path(instance_path, &relative_path).await?;
         if !filesystem::is_regular_file(&path, false).await? {
-            return Err(input("Only regular content files can be read"));
+            bail!(ErrorKind::ContentStoreError(
+                "only regular content files can be read".into()
+            ));
         }
         Ok(ReadableContent::Local(path))
     }

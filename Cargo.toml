@@ -34,9 +34,11 @@ actix-web = "4.11.0"
 actix-web-prom = "0.10.0"
 actix-ws = "0.3.0"
 aes-gcm = "0.10.3"
+anyhow = "1.0.100"
 arc-swap = "1.7.1"
 argon2 = { version = "0.5.3", features = ["std"] }
 ariadne = { path = "packages/ariadne" }
+async-compression = "0.4.32"
 async-minecraft-ping = { path = "packages/async-minecraft-ping" }
 async-recursion = "1.1.1"
 async-stripe = { version = "0.41.0", default-features = false, features = [
@@ -112,6 +114,7 @@ iana-time-zone = "0.1.64"
 image = { version = "0.25.8", default-features = false, features = ["rayon"] }
 indexmap = "2.11.4"
 indicatif = "0.18.0"
+infer = "0.22.0"
 itertools = "0.14.0"
 jemalloc_pprof = "0.8.1"
 json-patch = { version = "4.1.0", default-features = false }

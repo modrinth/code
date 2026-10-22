@@ -12431,7 +12431,9 @@ dependencies = [
 name = "theseus"
 version = "1.0.0-local"
 dependencies = [
+ "anyhow",
  "ariadne",
+ "async-compression",
  "async-minecraft-ping",
  "async-recursion",
  "async-trait",
@@ -12456,7 +12458,6 @@ dependencies = [
  "either",
  "encoding_rs",
  "enumset",
- "eyre",
  "flate2",
  "fs4",
  "futures",
@@ -12467,6 +12468,7 @@ dependencies = [
  "httpdate",
  "image",
  "indicatif",
+ "infer 0.22.0",
  "itertools 0.14.0",
  "json5",
  "modrinth-content-management",
@@ -12524,6 +12526,7 @@ name = "theseus_gui"
 version = "1.0.0-local"
 dependencies = [
  "aes-gcm",
+ "anyhow",
  "async_zip",
  "base64 0.22.1",
  "chrono",
@@ -12560,7 +12563,6 @@ dependencies = [
  "tauri-plugin-window-state",
  "tempfile",
  "theseus",
- "thiserror 2.0.17",
  "tokio",
  "tokio-util",
  "tracing",

@@ -11,6 +11,56 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-10-21T22:15:59+00:00`,
+		product: 'web',
+		body: `## Changed
+- Updated the design of the settings pages for PATs, sessions, and applications.
+- Use notifications for collection icon too big error instead of browser pop-up.
+
+## Fixed
+- Fixed how publishing checklist insufficient gallery images nag used resource pack copy for shader projects.
+- FIxed timeframe picker in analytics and activity log dropdown.`,
+	},
+	{
+		date: `2026-10-21T22:15:59+00:00`,
+		product: 'hosting',
+		body: `## Added
+- Added a new Backup settings page in the server panel settings modal. You can now turn on or off automatic backups, set the automatic backup cadence and decide how many backup slots are allocated to manual backups vs. automatic backups.
+
+## Changed
+- Redesigned the Backups tab in the server panel. It's now clearer how many backup slots you have left, and how many slots are being allocated to automated backups.`,
+	},
+	{
+		date: `2026-10-21T22:15:59+00:00`,
+		product: 'app',
+		version: '0.22.0',
+		body: `## Added
+- Shared instances can now include any file in the instance, not just config files.
+- A storage allowance meter in the Push update modal, which shows how far over the limit an update is.
+- The download manager now shows shared instance updates as they upload, with progress and upload speed.
+
+## Changed
+- Redesigned the Push update modal with separate Changes and Files tabs.
+- Players joining or updating a shared instance no longer download files they already have.
+- Executables can't be pushed to shared instances, and the Files tab in the Push update modal marks them as "File type not allowed".
+
+## Fixed
+- Fixed \`.DS_Store\` files showing up in the Files tab of an instance.
+- Fixed folders in the shared instance file picker not expanding to show all of their contents.`,
+	},
+	{
+		date: `2026-10-19T16:13:11+00:00`,
+		product: 'app',
+		version: '0.21.11',
+		body: `## Changed
+- Replaced the ended Medal free server promotion in the sidebar with the current Modrinth Hosting promotion.
+
+## Fixed
+- Fixed the Play button not launching the game, or taking several minutes, after Modrinth App had been open for a while.
+- Fixed launcher logs taking up disk space indefinitely. Logs older than 14 days are now deleted when Modrinth App starts.
+- Fixed the app database growing over time by removing cached project and version data that expired more than a week ago.`,
+	},
+	{
 		date: `2026-10-16T17:26:37+00:00`,
 		product: 'app',
 		version: '0.21.10',

@@ -5126,12 +5126,6 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "Restauration de la sauvegarde"
   },
-  "servers.backups.bulk-bar.aria-label": {
-    "defaultMessage": "Actions groupées pour {count, plural, one {une sauvegarde sélectionnée} other {# sauvegardes sélectionnées}}"
-  },
-  "servers.backups.bulk-bar.deleting": {
-    "defaultMessage": "Suppression de {total, plural, one {# sauvegarde} other {# sauvegardes}}..."
-  },
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "{count, plural, one {# sauvegarde sélectionnée} other {# sauvegardes sélectionnées}}"
   },
@@ -5156,50 +5150,11 @@
   "servers.backups.empty.heading": {
     "defaultMessage": "Aucune sauvegarde"
   },
-  "servers.backups.filtered-empty.clear-filters": {
-    "defaultMessage": "Effacer les filtres"
-  },
-  "servers.backups.filtered-empty.description": {
-    "defaultMessage": "Essayez un filtre différent ou effacez les filtres pour voir toutes les sauvegardes."
-  },
-  "servers.backups.filtered-empty.heading": {
-    "defaultMessage": "Aucune sauvegarde ne correspond aux filtres sélectionnés"
-  },
   "servers.backups.item.auto": {
     "defaultMessage": "Auto"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Planification de sauvegarde"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "Avatar de {username}"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "Support"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Sauvegarde manuelle"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Renommer"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Restaurer"
-  },
-  "servers.backups.select-backup-aria": {
-    "defaultMessage": "Sélectionner une sauvegarde {name}"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Sauvegarder"
-  },
-  "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "Auto"
-  },
-  "servers.backups.toolbar.filter-manual": {
-    "defaultMessage": "Manuelle"
-  },
-  "servers.backups.toolbar.select-all": {
-    "defaultMessage": "Tout sélectionner"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "Création d'une sauvegarde en cours"

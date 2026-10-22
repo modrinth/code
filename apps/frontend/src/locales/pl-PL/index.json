@@ -4562,29 +4562,17 @@
   "report.not-for.dmca.description": {
     "message": "Zobacz naszą <policy-link>Politykę dotyczącą praw autorskich</policy-link>."
   },
-  "report.note.ai-images.1": {
-    "message": "Właśnie zaktualizowaliśmy nasze zasady, aby zakazać generowanych przez AI obrazów w ikonach, galeriach i opisach. Dajemy twórcom okres karencji na usunięcie zdjęć AI z ich projektów, zanim zaczniemy akceptować raporty dla nich."
-  },
-  "report.note.check-back-later": {
-    "message": "Sprawdź ponownie później, gdy okres karencji zakończy się. Raporty tego typu nie są obecnie akceptowane."
-  },
   "report.note.copyright.1": {
     "message": "Należy pamiętać, że *nie* przesyłasz wniosku o usunięcie treści na podstawie ustawy DMCA, ale zgłoszenie dotyczące ponownie przesłanej treści."
   },
   "report.note.copyright.2": {
     "message": "Jeśli zamierzałeś złożyć wniosek o usunięcie treści na podstawie ustawy DMCA (co stanowi działanie prawne), zapoznaj się z naszą <copyright-policy-link>Polityką dotyczącą praw autorskich</copyright-policy-link>."
   },
-  "report.note.fully-ai-generated.1": {
-    "message": "Właśnie zaktualizowaliśmy nasze zasady, aby zakazać w pełni generowanych przez AI projektów. Dajemy twórcom okres karencji na aktualizację lub usunięcie w pełni wygenerowanych przez AI projektów, zanim zaczniemy akceptować raporty dla nich."
-  },
   "report.note.malicious.1": {
     "message": "Zgłoszenia szkodliwych lub zwodniczych treści muszą zawierać znaczny dowód, na przykład fragmenty kodu źródłowego."
   },
   "report.note.malicious.2": {
     "message": "Podsumowania z Microsoft Defender, VirusTotal lub narzędzi AI wykrywających złośliwe oprogramowanie nie są uważane jako wystarczający dowód i nie będą akceptowane."
-  },
-  "report.note.missing-disclosure.1": {
-    "message": "Ujawnienia treści są nową funkcją, którą właśnie dodaliśmy. Dajemy twórcom okres karencji na aktualizację ich ujawnień, zanim zaczniemy akceptować raporty o brakujących lub nieprawidłowych informacjach."
   },
   "report.please-report": {
     "message": "Proszę zgłosić:"
@@ -5552,15 +5540,6 @@
   "settings.pats.modal.create.title": {
     "message": "Utwórz klucz dostępu osobistego"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "Usuń klucz"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "Usunie to klucz na zawsze (na serio na zawsze)."
-  },
-  "settings.pats.modal.delete.title": {
-    "message": "Czy na pewno chcesz usunąć ten klucz?"
-  },
   "settings.pats.modal.edit.title": {
     "message": "Edytuj klucz dostępu osobistego"
   },
@@ -5590,9 +5569,6 @@
   },
   "settings.sessions.current-session": {
     "message": "Aktualna sesja"
-  },
-  "settings.sessions.description": {
-    "message": "Tu pokazane są wszystkie urządzenia zalogowane na Twoje konto Modrinth. Możesz wylogować się z każdego indywidualnie.\n\nJeżeli widzisz tu wpis, którego nie rozpoznajesz, natychmiast wyloguj to urządzenie i zmień hasło swojego konta Modrinth."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Ostatnio użyte {ago}"

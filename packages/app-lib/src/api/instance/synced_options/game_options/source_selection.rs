@@ -7,13 +7,15 @@ use super::catalog::*;
 use super::fullscreen::update_app_fullscreen_setting;
 use super::launch_overrides::currently_launcher_owned_keys;
 use super::options_file::{
-    input_error, options_path, read_document, validate_raw_key_value,
+    options_path, read_document, validate_raw_key_value,
 };
 use super::read_instance_changes::custom_setting_id;
+use crate::ErrorKind;
 use crate::state::{
     CanonicalValue, InstanceMetadata, State, load_game_option_preferences,
     load_game_options_sync_state, load_shared_game_options,
 };
+use anyhow::bail;
 use chrono::Utc;
 
 /// Uses the selected instance's `options.txt` as the initial shared settings.
@@ -23,8 +25,9 @@ pub(in crate::api::instance) async fn initialize_from_source_instance(
 ) -> crate::Result<()> {
     let path = options_path(metadata, state);
     if !path.exists() {
-        return Err(input_error(
-            "Launch the source instance once so Minecraft can create options.txt.",
+        bail!(ErrorKind::InputError(
+            "launch the source instance once so Minecraft can create options.txt"
+                .to_string(),
         ));
     }
     let (document, _) = read_document(&path).await?;
@@ -283,8 +286,9 @@ pub(in crate::api::instance) async fn initialize_from_source_instance(
         .await?;
     }
     if !seeded_any {
-        return Err(input_error(
-            "The selected options.txt has no settings that can be safely used as a sync baseline.",
+        bail!(ErrorKind::InputError(
+            "the selected options.txt has no settings that can be safely used as a sync baseline"
+                .to_string(),
         ));
     }
 
@@ -319,7 +323,7 @@ pub(in crate::api::instance) async fn initialize_from_source_instance(
 pub async fn list_sync_sources()
 -> crate::Result<Vec<GameOptionsSourceCandidate>> {
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     let instances = crate::state::list_instances(&state.pool).await?;
     let mut sources = Vec::with_capacity(instances.len());
     for metadata in instances {

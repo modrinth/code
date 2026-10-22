@@ -89,6 +89,14 @@ function setLockStatus(status: DisclosureLockStatus) {
 		v-model="enabled"
 		:disabled="disabled"
 		:toggle-disabled="toggleDisabled"
+		:editing="editing"
+		:on-toggle-editing="onToggleEditing"
+		:on-cancel-editing="onCancelEditing"
+		:on-save-editing="onSaveEditing"
+		:section-can-save="sectionCanSave"
+		:section-saving="sectionSaving"
+		:section-save-error="sectionSaveError"
+		:section-save-disabled-reason="sectionSaveDisabledReason"
 		:icon="icon"
 		:title="title"
 		:description="hideDescription ? undefined : description"
@@ -120,6 +128,7 @@ function setLockStatus(status: DisclosureLockStatus) {
 		</template>
 		<template v-if="variant === 'review' && showModeratorLockControls" #lock-controls>
 			<DisclosureLockControls
+				compact
 				:lock-status="resolvedLockStatus"
 				:disabled="disabled"
 				@set-lock-status="setLockStatus"

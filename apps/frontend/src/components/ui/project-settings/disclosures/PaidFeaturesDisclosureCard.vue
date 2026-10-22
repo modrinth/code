@@ -51,6 +51,7 @@ watch(
 			model.value.features = ['']
 		}
 	},
+	{ immediate: true },
 )
 
 function addFeature() {

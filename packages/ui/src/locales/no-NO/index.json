@@ -2237,18 +2237,6 @@
   "servers.backups.item.auto": {
     "defaultMessage": "Automatisk"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Sikkerhetskopiplan"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Manuell sikkerhetskopiering"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Endre navn"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Gjenopprett"
-  },
   "servers.list-empty.new-server-button": {
     "defaultMessage": "Ny server"
   },
@@ -2775,4 +2763,3 @@
     "defaultMessage": "Du har ulagrede endringer."
   }
 }
-

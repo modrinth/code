@@ -2981,15 +2981,6 @@
   "settings.pats.modal.create.title": {
     "message": "Lumikha ng personal access token"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "Tanggalin itong token"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "Matatanggal ang token na ito ng panghabam-buhay (talagang walang hanggan)."
-  },
-  "settings.pats.modal.delete.title": {
-    "message": "Sigurado ka bang gusto mong tanggalin ang token na ito?"
-  },
   "settings.pats.modal.edit.title": {
     "message": "Baguhin ang personal access token"
   },
@@ -3019,9 +3010,6 @@
   },
   "settings.sessions.current-session": {
     "message": "Kasalukuyang sesyon"
-  },
-  "settings.sessions.description": {
-    "message": "Narito ang lahat ng mga device na kasalukuyang nakalog-in sa iyong Modrinth account. Maaari mong maisaisang malog-out ang bawat isa.\n\nKung makakita ka ng isang hindi mo nakikilala, maglog-out sa device na iyon at agarang palitan ang password ng iyong Modrinth account."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Huling inakses {ago}"

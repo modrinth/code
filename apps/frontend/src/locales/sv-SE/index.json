@@ -3971,9 +3971,6 @@
   "report.not-for.dmca.description": {
     "message": "Se våran <policy-link>Upphovsrättspolicy</policy-link>."
   },
-  "report.note.missing-disclosure.1": {
-    "message": "Innehållsupplysningar är en ny funktion vi nyligen har lagt till. Vi ger skaparna tid att få deras upplysningar aktuella innan vi börjar godkänna anmälningar för saknade eller felaktiga upplysningar."
-  },
   "report.please-report": {
     "message": "Vänligen rapportera:"
   },
@@ -4889,15 +4886,6 @@
   "settings.pats.modal.create.title": {
     "message": "Skapa personlig åtkomstnyckel"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "Ta bort denna token"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "Det här kommer att radera den här nyckeln för evigt (asså för evigt)."
-  },
-  "settings.pats.modal.delete.title": {
-    "message": "Är du saker på att du vill radera den här nyckeln?"
-  },
   "settings.pats.modal.edit.title": {
     "message": "Ändra personlig åtkomstnyckel"
   },
@@ -4927,9 +4915,6 @@
   },
   "settings.sessions.current-session": {
     "message": "Nuvarande session"
-  },
-  "settings.sessions.description": {
-    "message": "Här är alla enheter som är inloggade på ditt Modrinth-konto. Du kan logga ut från var och en individuellt.\n\nOm du ser en enhet som du inte känner igen, logga ut på den enheten och byt lösenordet på ditt Modrinth-konto omedelbart."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Senast åtkommen {ago}"

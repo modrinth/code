@@ -2348,18 +2348,6 @@
   "servers.backups.item.auto": {
     "defaultMessage": "Otomatis"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Jadwal pencadangan"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Pencadangan manual"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Ganti nama"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Pulihkan"
-  },
   "servers.listing.owner-tooltip": {
     "defaultMessage": "Dimiliki oleh {username}"
   },
@@ -2952,4 +2940,3 @@
     "defaultMessage": "Anda memiliki perubahan yang belum tersimpan."
   }
 }
-

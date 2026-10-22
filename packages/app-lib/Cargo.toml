@@ -9,7 +9,9 @@ name = "export_app_events"
 required-features = ["export-ts"]
 
 [dependencies]
+anyhow = { workspace = true }
 ariadne = { workspace = true }
+async-compression = { workspace = true, features = ["tokio", "zstd"] }
 async-minecraft-ping = { workspace = true, features = ["srv"] }
 async-recursion = { workspace = true }
 async-trait = { workspace = true }
@@ -39,7 +41,6 @@ dunce = { workspace = true }
 either = { workspace = true }
 encoding_rs = { workspace = true }
 enumset = { workspace = true }
-eyre = { workspace = true }
 flate2 = { workspace = true }
 fs4 = { workspace = true, features = ["tokio"] }
 futures = { workspace = true, features = ["alloc", "async-await"] }
@@ -50,6 +51,7 @@ hickory-resolver = { workspace = true }
 httpdate = { workspace = true }
 image = { workspace = true, features = ["gif", "jpeg", "png", "webp"] }
 indicatif = { workspace = true, optional = true }
+infer = { workspace = true }
 itertools = { workspace = true }
 json5 = { workspace = true }
 modrinth-content-management = { workspace = true }

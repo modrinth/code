@@ -6,7 +6,9 @@ import { toError } from '@/helpers/errors'
 import {
 	acceptCachedFriend,
 	add_friend,
+	applyFriendStatuses,
 	createPendingFriend,
+	friend_statuses,
 	type FriendCacheUser,
 	friendsQueryKey,
 	type FriendWithUserData,
@@ -127,8 +129,17 @@ export function useFriends(options: {
 		)
 	}
 
-	useAppEvent('friend', () => {
-		void queryClient.invalidateQueries({ queryKey: queryKey.value })
+	useAppEvent('friend', async (event) => {
+		if (event.event === 'friend_request') {
+			void queryClient.invalidateQueries({ queryKey: queryKey.value })
+			return
+		}
+
+		const statuses = await friend_statuses()
+		queryClient.setQueryData<FriendWithUserData[]>(
+			queryKey.value,
+			(cachedFriends) => cachedFriends && applyFriendStatuses(cachedFriends, statuses),
+		)
 	})
 
 	return {

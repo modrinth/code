@@ -2030,21 +2030,6 @@
   "servers.backups.item.auto": {
     "defaultMessage": "Auto"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Backup schedule"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Manual backup"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "I-rename"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "I-restore"
-  },
-  "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "Kusa"
-  },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Mayroon ka nang server?"
   },
@@ -2736,4 +2721,3 @@
     "defaultMessage": "Uri"
   }
 }
-

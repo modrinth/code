@@ -10,11 +10,11 @@
 		<h2 class="m-0 text-2xl font-semibold">
 			{{ formatMessage(commonSettingsMessages.authorizedApps) }}
 		</h2>
-		<p class="mb-4 mt-2">
+		<p class="mb-4 mt-2 leading-tight">
 			{{ formatMessage(messages.description) }}
 		</p>
 		<template v-if="isLoading">
-			<div class="flex flex-col gap-4">
+			<div class="flex flex-col gap-3">
 				<div
 					v-for="i in 2"
 					:key="`authorization-skeleton-${i}`"
@@ -47,7 +47,7 @@
 			:heading="formatMessage(messages.emptyStateHeading)"
 			:description="formatMessage(messages.emptyStateDescription)"
 		/>
-		<div v-else class="flex flex-col gap-4">
+		<div v-else class="flex flex-col gap-3">
 			<AuthorizationCard
 				v-for="authorization in appInfoLookup"
 				:key="authorization.id"

@@ -4517,29 +4517,17 @@
   "report.not-for.dmca.description": {
     "message": "Consultez notre <policy-link>Politique de droits d’auteur</policy-link>."
   },
-  "report.note.ai-images.1": {
-    "message": "Nous venons juste de mettre à jour nos règles pour prohiber les images générées par IA dans les icônes, les galeries et les descriptions. Nous donnons aux créateurs une période de grâce pour retirer ces images de vos projets avant que nous commencions à accepter les signalements à leur sujet."
-  },
-  "report.note.check-back-later": {
-    "message": "Vérifiez plus tard une fois que la période de grâce aura terminé. Les signalements de ce type ne sont actuellement pas acceptés."
-  },
   "report.note.copyright.1": {
     "message": "Veuillez noter que vous ne soumettez pas une demande de retrait DMCA, mais plutôt un signalement de contenu re-téléchargé."
   },
   "report.note.copyright.2": {
     "message": "Si vous souhaitiez déposer une demande de retrait DMCA (qui est une action légale), veuillez consulter notre <copyright-policy-link>Politique de droits d’auteur</copyright-policy-link>."
   },
-  "report.note.fully-ai-generated.1": {
-    "message": "Nous venons juste de mettre à jour nos règles pour prohiber les projets entièrement générés par IA. Nous donnons aux créateurs une période pour mettre à jour ou complètement retirer ces derniers avant que nous commencions à accepter des signalements à leur sujet."
-  },
   "report.note.malicious.1": {
     "message": "Les signalements de contenu malveillant ou trompeur doivent inclure des preuves substantielles du comportement, comme des exemples de code."
   },
   "report.note.malicious.2": {
     "message": "Les résumés de Microsoft Defender, VirusTotal ou la détection de logiciels malveillants par IA ne constituent pas des preuves suffisantes et ne seront pas acceptés."
-  },
-  "report.note.missing-disclosure.1": {
-    "message": "Les déclarations de contenu sont une nouvelle fonctionnalité que nous venons d'ajouter. Nous accordons aux créateurs une période de grâce pour mettre à jour leurs déclarations avant de commencer à accepter les signalements pour déclarations manquantes ou incorrectes."
   },
   "report.please-report": {
     "message": "Veuillez signaler :"
@@ -5507,15 +5495,6 @@
   "settings.pats.modal.create.title": {
     "message": "Créer un jeton d'accès personnel"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "Supprimer ce jeton"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "Ceci supprimera définitivement ce jeton (pour toujours)."
-  },
-  "settings.pats.modal.delete.title": {
-    "message": "Êtes-vous sûr de vouloir supprimer ce jeton ?"
-  },
   "settings.pats.modal.edit.title": {
     "message": "Modifier le jeton d'accès personnel"
   },
@@ -5545,9 +5524,6 @@
   },
   "settings.sessions.current-session": {
     "message": "Session actuelle"
-  },
-  "settings.sessions.description": {
-    "message": "Voici tous les appareils actuellement connectés à votre compte Modrinth. Vous pouvez vous déconnecter de chacun d'eux individuellement.\n\nSi vous voyez une connexion inconnue sur un appareil, déconnectez-vous de celui-ci et changez le mot de passe de votre compte Modrinth immédiatement."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Dernier accès {ago}"

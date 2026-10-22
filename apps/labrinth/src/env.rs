@@ -271,7 +271,7 @@ vars! {
     TREMENDOUS_BALANCE_ALERT_THRESHOLD: u64 = 0u64;
     MURAL_BALANCE_ALERT_THRESHOLD: u64 = 0u64;
 
-    HCAPTCHA_SECRET: String = "none";
+    TURNSTILE_SECRET: String = "none";
 
     SMTP_USERNAME: String = "";
     SMTP_PASSWORD: String = "";
@@ -323,7 +323,6 @@ vars! {
     BREX_API_KEY: String = "none";
 
     DELPHI_URL: String = "";
-    DELPHI_SCAN_TIMEOUT: u64 = 60u64;
 
     SHARED_INSTANCES_URL: String = "";
     SHARED_INSTANCES_KEY: String = "";

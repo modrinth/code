@@ -1,5 +1,5 @@
 import type { AbstractModrinthClient } from '@modrinth/api-client'
-import { provideFileDownload } from '@modrinth/ui'
+import { type FileDownload, provideFileDownload } from '@modrinth/ui'
 import { Channel, invoke } from '@tauri-apps/api/core'
 
 import {
@@ -9,6 +9,29 @@ import {
 
 interface NativeSaveError {
 	message?: string
+}
+
+async function authorizeDownloadUrl(client: AbstractModrinthClient, file: FileDownload) {
+	if (file.type === 'server-backup') {
+		const { token } = await client.kyros.backups_v1.authorizeDownload(
+			file.nodeUrlHost,
+			file.worldId,
+			file.backupId,
+		)
+		return client.kyros.backups_v1.getDownloadUrl(
+			file.nodeUrlHost,
+			file.worldId,
+			file.backupId,
+			token,
+		)
+	}
+
+	const { token } = await client.kyros.files_v1.authorizeFileDownload(
+		file.nodeUrlHost,
+		file.worldId,
+		file.path,
+	)
+	return client.kyros.files_v1.getFileDownloadUrl(file.nodeUrlHost, file.worldId, token)
 }
 
 export function setupFileDownloadProvider(client: AbstractModrinthClient) {
@@ -39,13 +62,8 @@ export function setupFileDownloadProvider(client: AbstractModrinthClient) {
 			})
 
 			try {
-				const { token } = await client.kyros.files_v1.authorizeFileDownload(
-					file.nodeUrlHost,
-					file.worldId,
-					file.path,
-				)
+				const url = await authorizeDownloadUrl(client, file)
 				if (cancelled) return false
-				const url = client.kyros.files_v1.getFileDownloadUrl(file.nodeUrlHost, file.worldId, token)
 				const savedFilename = await invoke<string>('plugin:files|files_save_external', {
 					saveId,
 					request: { url },

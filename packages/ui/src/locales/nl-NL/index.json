@@ -5096,12 +5096,6 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "Terugzetten vanuit een back-up"
   },
-  "servers.backups.bulk-bar.aria-label": {
-    "defaultMessage": "{count, plural, one {Bulkacties voor één geselecteerde back-up} other {Bulkacties voor # geselecteerde back-ups}}"
-  },
-  "servers.backups.bulk-bar.deleting": {
-    "defaultMessage": "{total, plural, one {# back-up} other {# back-ups}} verwijderen..."
-  },
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "{count, plural, one {# back-up geselecteerd} other {# back-ups geselecteerd}}"
   },
@@ -5126,50 +5120,11 @@
   "servers.backups.empty.heading": {
     "defaultMessage": "Nog geen back-ups"
   },
-  "servers.backups.filtered-empty.clear-filters": {
-    "defaultMessage": "Filters verwijderen"
-  },
-  "servers.backups.filtered-empty.description": {
-    "defaultMessage": "Probeer een ander filter of verwijder de filters om alle back-ups te bekijken."
-  },
-  "servers.backups.filtered-empty.heading": {
-    "defaultMessage": "Geen back-ups gevonden"
-  },
   "servers.backups.item.auto": {
     "defaultMessage": "Automatisch"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Back-upschema"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "Avatar van {username}"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "Ondersteuning"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Handmatige back-up"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Hernoemen"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Herstel"
-  },
-  "servers.backups.select-backup-aria": {
-    "defaultMessage": "Selecteer back-up {name}"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Back-up maken"
-  },
-  "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "Automatisch"
-  },
-  "servers.backups.toolbar.filter-manual": {
-    "defaultMessage": "Handmatig"
-  },
-  "servers.backups.toolbar.select-all": {
-    "defaultMessage": "Alles selecteren"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "Back-up wordt gemaakt"

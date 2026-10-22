@@ -1,11 +1,5 @@
 import type { Labrinth } from '@modrinth/api-client'
-import {
-	commonMessages,
-	defineMessages,
-	injectModrinthClient,
-	injectNotificationManager,
-	useVIntl,
-} from '@modrinth/ui'
+import { injectModrinthClient, injectNotificationManager } from '@modrinth/ui'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useDocumentVisibility } from '@vueuse/core'
 import { computed, onMounted, onScopeDispose, type Ref, ref, shallowRef, useId, watch } from 'vue'
@@ -36,7 +30,7 @@ export function useReviewLock(projectId: Ref<string>) {
 	const queryClient = useQueryClient()
 	const auth = useAuthState()
 	const config = useRuntimeConfig()
-	const { formatMessage } = useVIntl()
+
 	const { addNotification, removeNotification } = injectNotificationManager()
 	const instanceId = useId()
 	const mounted = ref(false)
@@ -44,32 +38,6 @@ export function useReviewLock(projectId: Ref<string>) {
 	const session = shallowRef<LockSession>()
 	let generation = 0
 	let renewalTimer: ReturnType<typeof setInterval> | undefined
-	const messages = defineMessages({
-		takenOver: {
-			id: 'project-review.lock.taken-over',
-			defaultMessage: '{username} has taken over moderating this project.',
-		},
-		unverified: {
-			id: 'project-review.lock.unverified',
-			defaultMessage: 'Unable to verify the moderation lock on the project.',
-		},
-		acquireFailed: {
-			id: 'project-review.lock.acquire-failed',
-			defaultMessage: 'Unable to acquire the moderation lock for this project.',
-		},
-		renewFailed: {
-			id: 'project-review.lock.renew-failed',
-			defaultMessage: 'Unable to renew the moderation lock for this project.',
-		},
-		takeOverFailed: {
-			id: 'project-review.lock.take-over-failed',
-			defaultMessage: 'Unable to take over moderating this project.',
-		},
-		unknownModerator: {
-			id: 'project-review.lock.unknown-moderator',
-			defaultMessage: 'Another moderator',
-		},
-	})
 
 	function isCurrent(current: LockSession) {
 		return (
@@ -82,7 +50,8 @@ export function useReviewLock(projectId: Ref<string>) {
 	}
 
 	function assertCurrent(current: LockSession) {
-		if (!isCurrent(current)) throw new ReviewLockError(formatMessage(messages.unverified))
+		if (!isCurrent(current))
+			throw new ReviewLockError('Unable to verify the moderation lock on the project.')
 	}
 
 	function dismissTakeoverNotification(current: LockSession) {
@@ -102,9 +71,7 @@ export function useReviewLock(projectId: Ref<string>) {
 				dismissTakeoverNotification(current)
 				current.notifiedOwner = owner
 				current.takeoverNotificationId = addNotification({
-					title: formatMessage(messages.takenOver, {
-						username: status.locked_by?.username ?? formatMessage(messages.unknownModerator),
-					}),
+					title: `${status.locked_by?.username ?? 'Another moderator'} has taken over moderating this project.`,
 					type: 'warning',
 					autoCloseMs: null,
 					dismissible: true,
@@ -152,13 +119,13 @@ export function useReviewLock(projectId: Ref<string>) {
 			current.errorNotified = true
 			const message =
 				kind === 'override'
-					? messages.takeOverFailed
+					? 'Unable to take over moderating this project.'
 					: kind === 'renew'
-						? messages.renewFailed
-						: messages.acquireFailed
+						? 'Unable to renew the moderation lock for this project.'
+						: 'Unable to acquire the moderation lock for this project.'
 			addNotification({
-				title: formatMessage(commonMessages.errorNotificationTitle),
-				text: formatMessage(message),
+				title: 'An error occurred',
+				text: message,
 				type: 'error',
 			})
 		},
@@ -204,7 +171,7 @@ export function useReviewLock(projectId: Ref<string>) {
 			return undefined
 		return status.is_own_lock
 			? undefined
-			: (status.locked_by ?? { id: '', username: formatMessage(messages.unknownModerator) })
+			: (status.locked_by ?? { id: '', username: 'Another moderator' })
 	})
 
 	watch([statusQuery.data, statusQuery.dataUpdatedAt], ([status]) => {
@@ -293,7 +260,7 @@ export function useReviewLock(projectId: Ref<string>) {
 	async function ensureEligible(id: string) {
 		const current = session.value
 		if (!current || current.projectId !== id)
-			throw new ReviewLockError(formatMessage(messages.unverified))
+			throw new ReviewLockError('Unable to verify the moderation lock on the project.')
 		let status: LockStatus | undefined
 		try {
 			status = await operation.mutateAsync({
@@ -302,10 +269,11 @@ export function useReviewLock(projectId: Ref<string>) {
 				forSubmission: true,
 			})
 		} catch {
-			throw new ReviewLockError(formatMessage(messages.unverified))
+			throw new ReviewLockError('Unable to verify the moderation lock on the project.')
 		}
 		assertCurrent(current)
-		if (!isEligibleStatus(status)) throw new ReviewLockError(formatMessage(messages.unverified))
+		if (!isEligibleStatus(status))
+			throw new ReviewLockError('Unable to verify the moderation lock on the project.')
 	}
 
 	function assertEligible(id: string) {
@@ -315,7 +283,7 @@ export function useReviewLock(projectId: Ref<string>) {
 			!isCurrent(session.value) ||
 			!isEligibleStatus(statusQuery.data.value)
 		)
-			throw new ReviewLockError(formatMessage(messages.unverified))
+			throw new ReviewLockError('Unable to verify the moderation lock on the project.')
 	}
 
 	return {

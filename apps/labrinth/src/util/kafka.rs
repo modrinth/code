@@ -4,19 +4,20 @@ use crate::env::ENV;
 use chrono::{DateTime, Utc};
 use eyre::WrapErr;
 use rdkafka::{
-    ClientConfig, consumer::StreamConsumer, producer::FutureProducer,
+    ClientConfig,
+    consumer::StreamConsumer,
+    message::{Header, OwnedHeaders},
+    producer::FutureProducer,
 };
 use serde::Serialize;
 use uuid::Uuid;
 
 pub const KAFKA_OPERATION_INTERVAL: Duration = Duration::from_secs(5);
 pub const KAFKA_DELIVERY_TIMEOUT: Duration = Duration::from_secs(30);
-pub const DELPHI_FILE_SCAN_TASK: &str = "delphi-file-scan";
 pub const INCREMENTAL_INDEX_SEARCH_TASK: &str = "incremental-index-search";
 
 pub struct KafkaClientState {
     pub client: FutureProducer,
-    pub delphi_file_scan_consumer: StreamConsumer,
     pub incremental_index_search_consumer: StreamConsumer,
 }
 
@@ -33,8 +34,6 @@ impl KafkaClientState {
             .set("broker.address.family", "v4")
             .create()
             .wrap_err("failed to create Kafka producer")?;
-        let delphi_file_scan_consumer = create_consumer(DELPHI_FILE_SCAN_TASK)
-            .wrap_err("failed to create Delphi file scan Kafka consumer")?;
         let incremental_index_search_consumer = create_consumer(
             INCREMENTAL_INDEX_SEARCH_TASK,
         )
@@ -48,7 +47,6 @@ impl KafkaClientState {
 
         Ok(Self {
             client,
-            delphi_file_scan_consumer,
             incremental_index_search_consumer,
         })
     }
@@ -65,6 +63,28 @@ pub fn create_consumer(group_id: &str) -> eyre::Result<StreamConsumer> {
         .set("broker.address.family", "v4")
         .create()
         .wrap_err("failed to create Kafka consumer")
+}
+
+/// Sentry distributed tracing headers for the active span, so consumers can
+/// continue the producer's trace.
+///
+/// Empty outside of a span, since the scope's fallback propagation context
+/// would otherwise join every background publish into one shared trace.
+pub fn sentry_trace_headers() -> OwnedHeaders {
+    sentry::configure_scope(|scope| {
+        if scope.get_span().is_none() {
+            return OwnedHeaders::new();
+        }
+        scope.iter_trace_propagation_headers().fold(
+            OwnedHeaders::new(),
+            |headers, (key, value)| {
+                headers.insert(Header {
+                    key,
+                    value: Some(value.as_str()),
+                })
+            },
+        )
+    })
 }
 
 #[derive(Debug, Serialize)]
@@ -116,5 +136,5 @@ pub struct ServiceMetadata {
 
 pub static SERVICE_METADATA: ServiceMetadata = ServiceMetadata {
     service_name: "labrinth",
-    service_version: env!("CARGO_PKG_VERSION"),
+    service_version: env!("LABRINTH_VERSION"),
 };

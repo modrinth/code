@@ -4085,15 +4085,6 @@
   "settings.pats.modal.create.title": {
     "message": "Cipta token akses peribadi (PAT)"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "Padam token ini"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "Ini akan mengalih keluar token ini selama-lamanya (yang benar-benar selamanya)."
-  },
-  "settings.pats.modal.delete.title": {
-    "message": "Adakah anda pasti mahu memadamkan token ini?"
-  },
   "settings.pats.modal.edit.title": {
     "message": "Sunting token akses peribadi (PAT)"
   },
@@ -4123,9 +4114,6 @@
   },
   "settings.sessions.current-session": {
     "message": "Sesi semasa"
-  },
-  "settings.sessions.description": {
-    "message": "Berikut ialah semua peranti yang sedang dilog masuk dengan akaun Modrinth anda. Anda boleh log keluar daripada setiap satu peranti secara individu.\n\nJika anda melihat entri yang anda tidak kenali, log keluar daripada peranti itu dan tukar kata laluan akaun Modrinth anda dengan segera."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Kali terakhir diakses {ago}"

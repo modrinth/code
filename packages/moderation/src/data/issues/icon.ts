@@ -45,6 +45,11 @@ export const iconReviewPanel = panel({
 		issue: rulesAiImagesIssue,
 		id: 'icon-ai-images',
 		label: 'AI',
+		issueCardDisplay: {
+			icon: ({ projectV3 }) => projectV3.icon_url ?? undefined,
+			group: 'AI images',
+			label: 'Icon',
+		},
 		shown: ({ projectV3 }) => !!projectV3.icon_url,
 	}),
 	toggle({

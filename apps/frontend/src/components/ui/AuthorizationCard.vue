@@ -3,7 +3,7 @@
 		<div class="flex flex-col gap-2 border-0 border-b border-solid border-surface-4 p-4">
 			<div class="flex flex-wrap justify-between gap-3">
 				<div class="flex items-center gap-3">
-					<Avatar :src="authorization.app.icon_url" size="48px" />
+					<Avatar :src="authorization.app.icon_url" size="48px" no-shadow />
 					<div class="flex flex-col gap-0.5">
 						<h2 class="m-0 flex items-center gap-1 text-base font-semibold">
 							{{ authorization.app.name }}

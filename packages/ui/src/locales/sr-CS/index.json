@@ -4988,12 +4988,6 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "Vraćanje iz backupa"
   },
-  "servers.backups.bulk-bar.aria-label": {
-    "defaultMessage": "{count, plural, one {Grupne radnje za jedan izabran backup} other {Grupna radnja za # izabranih backupa}}"
-  },
-  "servers.backups.bulk-bar.deleting": {
-    "defaultMessage": "Brisanje {total, plural, one {# backupa} other {# backupa}}..."
-  },
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "{count, plural, one {# backup izabran} few {# backupa izabrana} other {# backupa izabranih}}"
   },
@@ -5018,50 +5012,11 @@
   "servers.backups.empty.heading": {
     "defaultMessage": "Nema još backupa"
   },
-  "servers.backups.filtered-empty.clear-filters": {
-    "defaultMessage": "Očisti filtere"
-  },
-  "servers.backups.filtered-empty.description": {
-    "defaultMessage": "Isprobaj drugi filter ili ukloni filtere da bi vidio sve backupe."
-  },
-  "servers.backups.filtered-empty.heading": {
-    "defaultMessage": "Nema podudaranja backupa"
-  },
   "servers.backups.item.auto": {
     "defaultMessage": "Automatski"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Zakazan backup"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "Avatar od {username}"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "Podrška"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Manualni backup"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Preimenuj"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Vrati"
-  },
-  "servers.backups.select-backup-aria": {
-    "defaultMessage": "Izaberi backup {name}"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Napravi backup"
-  },
-  "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "Automatski"
-  },
-  "servers.backups.toolbar.filter-manual": {
-    "defaultMessage": "Manualno"
-  },
-  "servers.backups.toolbar.select-all": {
-    "defaultMessage": "Izaberi sve"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "Kreacija backupa u toku"
@@ -6429,4 +6384,3 @@
     "defaultMessage": "Tip"
   }
 }
-

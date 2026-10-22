@@ -1,5 +1,6 @@
+use crate::Result;
 use crate::prelude::tcp_listen_any_loopback;
-use crate::{ErrorKind, Result};
+use anyhow::{Context, anyhow, bail};
 use futures::{SinkExt, StreamExt};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
@@ -43,7 +44,9 @@ impl RpcServerBuilder {
     }
 
     pub async fn launch(self) -> Result<RpcServer> {
-        let socket = tcp_listen_any_loopback().await?;
+        let socket = tcp_listen_any_loopback()
+            .await
+            .context("binding rpc server socket")?;
         let address = socket.local_addr()?;
         let (message_sender, message_receiver) = mpsc::unbounded_channel();
         let waiting_responses = Arc::new(Mutex::new(HashMap::new()));
@@ -110,10 +113,7 @@ impl RpcServer {
         args: Vec<Value>,
     ) -> Result<R> {
         if self.message_sender.is_closed() {
-            return Err(ErrorKind::RpcError(
-                "RPC connection closed".to_string(),
-            )
-            .into());
+            bail!("rpc connection closed");
         }
 
         let id = Uuid::new_v4();
@@ -129,21 +129,17 @@ impl RpcServer {
         };
         if self.message_sender.send(message).is_err() {
             self.waiting_responses.lock().unwrap().remove(&id);
-            return Err(ErrorKind::RpcError(
-                "RPC connection closed while sending".to_string(),
-            )
-            .into());
+            bail!("rpc connection closed while sending");
         }
 
         tracing::debug!("Waiting on result for {id}");
         let Ok(result) = recv.await else {
             self.waiting_responses.lock().unwrap().remove(&id);
-            return Err(ErrorKind::RpcError(
-                "RPC connection closed while waiting for response".to_string(),
-            )
-            .into());
+            bail!("rpc connection closed while waiting for response");
         };
-        result.and_then(|x| Ok(serde_json::from_value(x)?))
+        let value = result.context(format!("calling rpc method {method}"))?;
+        serde_json::from_value(value)
+            .context(format!("parsing rpc method {method} response"))
     }
 }
 
@@ -222,9 +218,7 @@ impl RunningRpcServer {
         {
             let _ = sender.send(match message.body {
                 RpcMessageBody::Respond { response } => Ok(response),
-                RpcMessageBody::Error { error } => {
-                    Err(ErrorKind::RpcError(error).into())
-                }
+                RpcMessageBody::Error { error } => Err(anyhow!(error)),
                 _ => unreachable!(),
             });
             Ok(None)

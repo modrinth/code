@@ -18,6 +18,8 @@ use crate::state::{
     InstanceMetadata, ProjectType, State, SyncedOption, SyncedPackInfo,
 };
 use crate::util::io;
+use crate::{ErrorKind, InvalidPack};
+use anyhow::{Context, bail};
 use bytes::Bytes;
 use std::io::{Cursor, Read};
 use std::path::Path;
@@ -30,9 +32,7 @@ async fn source(
 ) -> crate::Result<(InstanceMetadata, ContentItem)> {
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError("Unknown instance".to_string())
-        })?;
+        .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
     super::super::projects::ensure_metadata_content_unlocked(&metadata)?;
     let option = ProjectType::get_from_parent_folder(project_path)
         .and_then(|project_type| pack_option(project_type).ok());
@@ -40,29 +40,25 @@ async fn source(
         || (!option.is_some_and(option_can_apply_while_running)
             && instance_is_running(&metadata, state).await?)
     {
-        return Err(crate::ErrorKind::InputError(
-            "Close the instance before syncing its packs.".to_string(),
-        )
-        .into());
+        bail!(ErrorKind::InputError(
+            "close the instance before syncing its packs".to_string(),
+        ));
     }
     let item = commands::list_pack_content(instance_id, state)
         .await?
         .into_iter()
         .find(|item| item.file_path == project_path)
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError(
-                "This pack could not be found in the instance.".to_string(),
-            )
-        })?;
+        .ok_or(ErrorKind::InputError(
+            "this pack could not be found in the instance".to_string(),
+        ))?;
     pack_option(item.project_type)?;
     if item
         .source_kind
         .is_some_and(|kind| kind != ContentSourceKind::Local)
     {
-        return Err(crate::ErrorKind::InputError(
-            "Managed content cannot be added to pack syncing.".to_string(),
-        )
-        .into());
+        bail!(ErrorKind::InputError(
+            "managed content cannot be added to pack syncing".to_string(),
+        ));
     }
     Ok((metadata, item))
 }
@@ -77,13 +73,10 @@ pub(super) async fn pack_from_item(
         || item.file_path
             != format!("{}/{}", item.project_type.get_folder(), item.file_name)
     {
-        return Err(crate::ErrorKind::InputError(
-            "Invalid pack file path.".to_string(),
-        )
-        .into());
+        bail!(ErrorKind::InvalidPack(InvalidPack::InvalidPath));
     }
     let file = crate::state::instances::adapters::sqlite::content_rows::get_instance_file_by_relative_path(&metadata.instance.id, &item.file_path, &state.pool).await?
-		.ok_or_else(|| crate::state::content_store::input("The pack is not registered"))?;
+		.ok_or(ErrorKind::InvalidPack(InvalidPack::NotRegistered))?;
     let source = state
         .content_store
         .read_path(&file, &metadata.instance.path)
@@ -104,11 +97,7 @@ pub(super) async fn pack_from_item(
             &state.api_semaphore,
         )
         .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError(
-                "The pack's compatibility could not be verified.".to_string(),
-            )
-        })?
+        .ok_or(ErrorKind::InvalidPack(InvalidPack::UnverifiedCompatibility))?
         .game_versions
     } else {
         vec![metadata.applied_content_set.game_version.clone()]
@@ -155,24 +144,15 @@ pub(super) fn validate_pack(
     bytes: &[u8],
     project_type: ProjectType,
 ) -> crate::Result<()> {
-    let mut archive =
-        zip::ZipArchive::new(Cursor::new(bytes)).map_err(|_| {
-            crate::ErrorKind::InputError(
-                "Choose a valid pack ZIP file.".to_string(),
-            )
-        })?;
+    let mut archive = zip::ZipArchive::new(Cursor::new(bytes))
+        .context(ErrorKind::InvalidPack(InvalidPack::NotZip))?;
     let mut metadata = String::new();
     {
-        let file = archive.by_name("pack.mcmeta").map_err(|_| {
-            crate::ErrorKind::InputError(
-                "Choose a pack ZIP containing pack.mcmeta.".to_string(),
-            )
-        })?;
+        let file = archive
+            .by_name("pack.mcmeta")
+            .context(ErrorKind::InvalidPack(InvalidPack::MissingMetadata))?;
         if file.size() > 1024 * 1024 {
-            return Err(crate::ErrorKind::InputError(
-                "The pack metadata is too large.".to_string(),
-            )
-            .into());
+            bail!(ErrorKind::InvalidPack(InvalidPack::MetadataTooLarge));
         }
         file.take(1024 * 1024 + 1).read_to_string(&mut metadata)?;
     }
@@ -180,12 +160,7 @@ pub(super) fn validate_pack(
     let (prefix, other_prefix) = match project_type {
         ProjectType::ResourcePack => ("assets/", "data/"),
         ProjectType::DataPack => ("data/", "assets/"),
-        _ => {
-            return Err(crate::ErrorKind::InputError(
-                "Unsupported synced content type.".to_string(),
-            )
-            .into());
-        }
+        _ => bail!(ErrorKind::InvalidPack(InvalidPack::UnsupportedType)),
     };
     if !value.get("pack").is_some_and(serde_json::Value::is_object)
         || (!archive.file_names().any(|name| name.starts_with(prefix))
@@ -193,10 +168,7 @@ pub(super) fn validate_pack(
                 .file_names()
                 .any(|name| name.starts_with(other_prefix)))
     {
-        return Err(crate::ErrorKind::InputError(
-            "This file is not a pack of the selected type.".to_string(),
-        )
-        .into());
+        bail!(ErrorKind::InvalidPack(InvalidPack::WrongType));
     }
     Ok(())
 }
@@ -310,11 +282,10 @@ pub(in crate::api::instance) async fn seed_from_instance(
             Ok(candidate) => candidate,
             Err(error)
                 if matches!(
-                    error.raw.as_ref(),
-                    crate::ErrorKind::JSONError(_)
-                        | crate::ErrorKind::InputError(_)
-                        | crate::ErrorKind::StdIOError(_)
-                ) =>
+                    error.downcast_ref(),
+                    Some(ErrorKind::InvalidPack(_))
+                ) || error.is::<serde_json::Error>()
+                    || error.is::<std::io::Error>() =>
             {
                 tracing::warn!(
                     "Skipping pack {} from instance {instance_id} while initializing pack sync: {error}",
@@ -400,8 +371,8 @@ async fn sync_pack_inner(
         match sync_pack_once(instance_id, project_path, automatic).await {
             Err(error)
                 if matches!(
-                    error.raw.as_ref(),
-                    crate::ErrorKind::PackSyncChanged
+                    error.downcast_ref::<crate::ErrorKind>(),
+                    Some(crate::ErrorKind::PackSyncChanged)
                 ) =>
             {
                 tokio::task::yield_now().await;
@@ -419,18 +390,14 @@ async fn sync_pack_once(
     let state = State::get().await?;
     let initial_metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError("Unknown instance".to_owned())
-        })?;
+        .ok_or(ErrorKind::InputError("unknown instance".to_owned()))?;
     let mut preparation =
         super::worker::Preparation::new(&state, &initial_metadata).await;
     let global = get_global_options().await?;
     if automatic {
         let metadata = crate::state::get_instance(instance_id, &state.pool)
             .await?
-            .ok_or_else(|| {
-                crate::ErrorKind::InputError("Unknown instance".to_string())
-            })?;
+            .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
         let option = ProjectType::get_from_parent_folder(project_path)
             .and_then(|project_type| pack_option(project_type).ok());
         if !option.is_some_and(|option| {
@@ -476,7 +443,10 @@ async fn sync_pack_once(
         return Ok(());
     }
     if !participating(&metadata, &pack, global) {
-        return Err(crate::ErrorKind::InputError("Enable pack syncing in app settings and turn off this instance's override first.".to_string()).into());
+        bail!(ErrorKind::InputError(
+            "enable pack syncing in app settings and turn off this instance's override first"
+                .to_string(),
+        ));
     }
     let previous = library
         .instances
@@ -565,25 +535,21 @@ pub async fn upload_synced_pack(
 ) -> crate::Result<()> {
     let option = pack_option(project_type)?;
     if game_versions.is_empty() {
-        return Err(crate::ErrorKind::InputError(
-            "Select the Minecraft versions this pack supports.".to_string(),
-        )
-        .into());
+        bail!(ErrorKind::InputError(
+            "select the Minecraft versions this pack supports".to_string(),
+        ));
     }
     let state = State::get().await?;
     if !get_global_options().await?.get(option) {
-        return Err(crate::ErrorKind::InputError(
-            "Enable pack syncing before adding packs.".to_string(),
-        )
-        .into());
+        bail!(ErrorKind::InputError(
+            "enable pack syncing before adding packs".to_string(),
+        ));
     }
     let file_name = path
         .file_name()
         .and_then(|name| name.to_str())
         .filter(|name| path_util::is_safe_file_name(name))
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError("Invalid pack filename.".to_string())
-        })?
+        .ok_or(ErrorKind::InputError("invalid pack filename".to_string()))?
         .to_string();
     let bytes = Bytes::from(io::read(path).await?);
     let validation_bytes = bytes.clone();
@@ -594,12 +560,11 @@ pub async fn upload_synced_pack(
     let size = bytes.len() as u64;
     let sha1 = crate::util::fetch::sha1_async(bytes.clone()).await?;
     let sha512 = cache_bytes(bytes, &state).await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     if !get_global_options().await?.get(option) {
-        return Err(crate::ErrorKind::InputError(
-            "Pack syncing was disabled while preparing the upload.".to_owned(),
-        )
-        .into());
+        bail!(ErrorKind::InputError(
+            "pack syncing was disabled while preparing the upload".to_owned(),
+        ));
     }
     let mut library = read_library(&state).await?;
     if library
@@ -648,11 +613,12 @@ pub async fn set_synced_pack_enabled(
     enabled: bool,
 ) -> crate::Result<()> {
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     let mut library = read_library(&state).await?;
-    let pack = library.packs.get_mut(pack_id).ok_or_else(|| {
-        crate::ErrorKind::InputError("Unknown synced pack.".to_string())
-    })?;
+    let pack = library
+        .packs
+        .get_mut(pack_id)
+        .ok_or(ErrorKind::InputError("unknown synced pack".to_string()))?;
     pack_option(pack.item.project_type)?;
     pack.item.enabled = enabled;
     apply_all(&mut library, &state).await
@@ -660,11 +626,12 @@ pub async fn set_synced_pack_enabled(
 
 pub async fn remove_synced_pack(pack_id: &str) -> crate::Result<()> {
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     let mut library = read_library(&state).await?;
-    let pack = library.packs.get(pack_id).ok_or_else(|| {
-        crate::ErrorKind::InputError("Unknown synced pack.".to_string())
-    })?;
+    let pack = library
+        .packs
+        .get(pack_id)
+        .ok_or(ErrorKind::InputError("unknown synced pack".to_string()))?;
     pack_option(pack.item.project_type)?;
     library.packs.remove(pack_id);
     apply_removal(pack_id, &mut library, &state).await
@@ -676,32 +643,30 @@ pub async fn desync_pack(
     mode: DesyncServerMode,
 ) -> crate::Result<()> {
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError("Unknown instance".to_string())
-        })?;
+        .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
     super::super::projects::ensure_metadata_content_unlocked(&metadata)?;
     if sync_files_are_protected(&metadata) {
-        return Err(crate::ErrorKind::InputError(
-			"Wait for the instance to finish installing before changing pack syncing.".to_string(),
-		).into());
+        bail!(ErrorKind::InputError(
+            "wait for the instance to finish installing before changing pack syncing"
+                .to_string(),
+        ));
     }
     let mut library = read_library(&state).await?;
-    let pack = library.packs.get(pack_id).ok_or_else(|| {
-        crate::ErrorKind::InputError("Unknown synced pack.".to_string())
-    })?;
+    let pack = library
+        .packs
+        .get(pack_id)
+        .ok_or(ErrorKind::InputError("unknown synced pack".to_string()))?;
     pack_option(pack.item.project_type)?;
     let placement = library
         .instances
         .get_mut(instance_id)
         .and_then(|items| items.get_mut(pack_id))
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError(
-                "This pack is not synced in this instance.".to_string(),
-            )
-        })?;
+        .ok_or(ErrorKind::InputError(
+            "this pack is not synced in this instance".to_string(),
+        ))?;
     placement.excluded = true;
     if mode == DesyncServerMode::RemoveFromOtherInstances {
         library.packs.remove(pack_id);

@@ -1,4 +1,3 @@
-use crate::State;
 use crate::state::content_store::adapters::downloads;
 use crate::state::content_store::adapters::filesystem;
 use crate::state::content_store::adapters::filesystem::symlink_metadata_if_exists;
@@ -6,10 +5,12 @@ use crate::state::content_store::adapters::sqlite as catalog;
 use crate::state::content_store::{
     ContentStore, FileContent, FileStorageKind, FileStoragePolicy,
     InstanceFileStatus, InstanceFileStorage, StoreIssue, StoreVerification,
-    StoredFileHandle, StoredFileMetadata, content_file_path, input,
+    StoredFileHandle, StoredFileMetadata, content_file_path,
 };
 use crate::state::instances;
 use crate::state::{Instance, InstanceFile};
+use crate::{ErrorKind, State};
+use anyhow::bail;
 
 impl ContentStore {
     pub(crate) async fn import_file(
@@ -26,8 +27,8 @@ impl ContentStore {
         {
             repaired = true;
             if self.any_instance_running(state).await? {
-                return Err(input(
-                    "Stop Minecraft instances before re-importing damaged shared content",
+                bail!(ErrorKind::ContentStoreError(
+                    "stop Minecraft instances before re-importing damaged shared content".into(),
                 ));
             }
             filesystem::quarantine_file(&self.root, &stored_file.path, &hash)
@@ -115,9 +116,11 @@ impl ContentStore {
         }
         if !restoration_pending {
             for path in quarantined {
-                let name = path
-                    .file_name()
-                    .ok_or_else(|| input("Invalid quarantined content path"))?;
+                let name = path.file_name().ok_or_else(|| {
+                    ErrorKind::ContentStoreError(
+                        "invalid quarantined content path".into(),
+                    )
+                })?;
                 let backup = self.root.join("recovered-content").join(name);
                 filesystem::move_instance_file(&path, &backup).await?;
                 tracing::warn!(
@@ -147,8 +150,9 @@ impl ContentStore {
         let _files_lock = self.files_lock.lock().await;
         let _lease = self.lease().await;
         if repair && self.any_instance_running(state).await? {
-            return Err(input(
-                "Stop Minecraft instances before repairing shared content",
+            bail!(ErrorKind::ContentStoreError(
+                "stop Minecraft instances before repairing shared content"
+                    .into(),
             ));
         }
         let stored_files = catalog::stored_files(&self.pool).await?;
@@ -191,7 +195,7 @@ impl ContentStore {
                     sources = downloads::repair_sources(
                         &self.pool,
                         &stored_file.sha512,
-                        state,
+                        &state.api_semaphore,
                     )
                     .await;
                 }
@@ -256,8 +260,8 @@ impl ContentStore {
         if downloaded.sha512 != stored_file.sha512
             || downloaded.size != stored_file.size as u64
         {
-            return Err(input(
-                "Repair download has an unexpected hash or size",
+            bail!(ErrorKind::ContentStoreError(
+                "repair download has an unexpected hash or size".into(),
             ));
         }
         let path = self.path(stored_file)?;

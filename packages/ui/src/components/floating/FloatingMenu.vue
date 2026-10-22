@@ -2,7 +2,7 @@
 import {
 	arrow as floatingArrow,
 	autoUpdate,
-	flip,
+	flip as floatingFlip,
 	offset,
 	type Placement,
 	shift,
@@ -24,6 +24,7 @@ const props = withDefaults(
 	defineProps<{
 		trigger?: 'click' | 'hover'
 		placement?: Placement
+		flip?: boolean
 		distance?: number
 		theme?: string
 		disabled?: boolean
@@ -34,11 +35,13 @@ const props = withDefaults(
 	{
 		trigger: 'click',
 		placement: 'bottom',
+		flip: true,
 		distance: 8,
 		theme: 'dropdown',
 		disabled: false,
 		bare: false,
 		arrow: true,
+		panelClass: undefined,
 	},
 )
 
@@ -59,7 +62,7 @@ const teleportTarget = computed(
 )
 const floating = useTemplateRef<HTMLElement>('floating')
 const arrowEl = useTemplateRef<HTMLElement>('arrowEl')
-const expandOrigin = ref(SIDES.bottom.origin)
+const expandOrigin = ref<string>(SIDES.bottom.origin)
 const { floatingStyles, middlewareData, placement, x, y, isPositioned } = useFloating(
 	triggerEl,
 	floating,
@@ -74,12 +77,12 @@ const { floatingStyles, middlewareData, placement, x, y, isPositioned } = useFlo
 			})
 		},
 		open: isOpen,
-		middleware: [
+		middleware: computed(() => [
 			offset(() => props.distance),
-			flip(),
+			...(props.flip ? [floatingFlip()] : []),
 			shift({ padding: 8 }),
 			floatingArrow({ element: arrowEl, padding: 12 }),
-		],
+		]),
 	},
 )
 

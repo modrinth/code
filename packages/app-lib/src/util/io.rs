@@ -1,7 +1,7 @@
 // IO error
 // A wrapper around the tokio IO functions that adds the path to the error message, instead of the uninformative std::io::Error.
 
-use eyre::{Context, ContextCompat, Result, eyre};
+use anyhow::{Context, Result};
 use std::{
     io::{ErrorKind, Write},
     path::Path,
@@ -187,8 +187,6 @@ pub fn is_same_disk(old_dir: &Path, new_dir: &Path) -> Result<bool> {
     {
         use std::os::unix::fs::MetadataExt;
 
-        use eyre::eyre;
-
         // we need to use `symlink_metadata` instead of `metadata`, because
         // if this file is a symlink, we need to query the symlink file itself,
         // rather than the target.
@@ -197,9 +195,9 @@ pub fn is_same_disk(old_dir: &Path, new_dir: &Path) -> Result<bool> {
         // this fixes moving JRE dirs.
 
         let old_meta = std::fs::symlink_metadata(old_dir)
-            .wrap_err_with(|| eyre!("getting meta of old dir {old_dir:?}"))?;
+            .with_context(|| format!("getting meta of old dir {old_dir:?}"))?;
         let new_meta = std::fs::symlink_metadata(new_dir)
-            .wrap_err_with(|| eyre!("getting meta of new dir {new_dir:?}"))?;
+            .with_context(|| format!("getting meta of new dir {new_dir:?}"))?;
 
         Ok(old_meta.dev() == new_meta.dev())
     }
@@ -207,9 +205,9 @@ pub fn is_same_disk(old_dir: &Path, new_dir: &Path) -> Result<bool> {
     #[cfg(windows)]
     {
         let old_dir = canonicalize(old_dir)
-            .wrap_err_with(|| eyre!("canonicalizing {old_dir:?}"))?;
+            .with_context(|| format!("canonicalizing {old_dir:?}"))?;
         let new_dir = canonicalize(new_dir)
-            .wrap_err_with(|| eyre!("canonicalizing {new_dir:?}"))?;
+            .with_context(|| format!("canonicalizing {new_dir:?}"))?;
 
         let old_component = old_dir.components().next();
         let new_component = new_dir.components().next();
@@ -233,9 +231,9 @@ pub async fn rename_or_move(
 
     let to_parent = to
         .parent()
-        .wrap_err_with(|| eyre!("getting parent of `to` dir {to:?}"))?;
-    let same_disk = is_same_disk(from, to_parent).wrap_err_with(|| {
-        eyre!("checking if `to_parent` ({to_parent:?}) and `from` ({from:?}) are on the same disk")
+        .with_context(|| format!("getting parent of `to` dir {to:?}"))?;
+    let same_disk = is_same_disk(from, to_parent).with_context(|| {
+        format!("checking if `to_parent` ({to_parent:?}) and `from` ({from:?}) are on the same disk")
     })?;
 
     if same_disk {
@@ -245,10 +243,10 @@ pub async fn rename_or_move(
                 source: e,
                 path: from.to_string_lossy().to_string(),
             })
-            .wrap_err_with(|| eyre!("moving {from:?} to {to:?} on same disk"))
+            .with_context(|| format!("moving {from:?} to {to:?} on same disk"))
     } else {
         move_recursive(from, to).await.with_context(|| {
-            eyre!("moving {from:?} to {to:?} on different disks")
+            format!("moving {from:?} to {to:?} on different disks")
         })
     }
 }
@@ -258,30 +256,30 @@ async fn move_recursive(from: &Path, to: &Path) -> Result<()> {
     if from.is_file() {
         copy(from, to)
             .await
-            .wrap_err_with(|| eyre!("copying {from:?} to {to:?}"))?;
-        remove_file(from).await.wrap_err_with(|| {
-            eyre!("removing {from:?} after copying to {to:?}")
+            .with_context(|| format!("copying {from:?} to {to:?}"))?;
+        remove_file(from).await.with_context(|| {
+            format!("removing {from:?} after copying to {to:?}")
         })?;
         return Ok(());
     }
 
     create_dir(to)
         .await
-        .wrap_err_with(|| eyre!("creating dir for {to:?}"))?;
+        .with_context(|| format!("creating dir for {to:?}"))?;
 
     let mut dir = read_dir(from)
         .await
-        .wrap_err_with(|| eyre!("reading dir {from:?}"))?;
+        .with_context(|| format!("reading dir {from:?}"))?;
     while let Some(entry) = dir
         .next_entry()
         .await
-        .wrap_err_with(|| eyre!("reading dir entry in {from:?}"))?
+        .with_context(|| format!("reading dir entry in {from:?}"))?
     {
         let new_path = to.join(entry.file_name());
         move_recursive(&entry.path(), &new_path)
             .await
             .with_context(|| {
-                eyre!("moving {:?} to {new_path:?}", entry.path())
+                format!("moving {:?} to {new_path:?}", entry.path())
             })?;
     }
 
@@ -377,4 +375,23 @@ macro_rules! get_resource_file {
     (env $dir_env_name:literal / $file_name:literal) => {
         get_resource_file!(directory: env!($dir_env_name), file: $file_name)
     };
+}
+
+pub fn format_bytes(bytes: u64) -> String {
+    const UNITS: [&str; 5] = ["B", "KiB", "MiB", "GiB", "TiB"];
+    let mut value = bytes as f64;
+    let mut unit = UNITS[0];
+    for next_unit in UNITS.iter().skip(1) {
+        if value < 1024.0 {
+            break;
+        }
+        value /= 1024.0;
+        unit = next_unit;
+    }
+
+    if unit == "B" {
+        format!("{bytes} B")
+    } else {
+        format!("{value:.1} {unit}")
+    }
 }
