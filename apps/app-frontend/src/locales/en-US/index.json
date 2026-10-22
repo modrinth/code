@@ -917,6 +917,9 @@
   "app.instance.worlds.import-world": {
     "message": "Import world"
   },
+  "app.instance.worlds.importing-world": {
+    "message": "Importing..."
+  },
   "app.instance.worlds.no-worlds-description": {
     "message": "Add a server or browse to get started"
   },

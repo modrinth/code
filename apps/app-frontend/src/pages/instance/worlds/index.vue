@@ -42,8 +42,9 @@
 						:disabled="importingWorlds || instance.quarantined"
 						@click="handleImportWorlds"
 					>
-						<ImportIcon class="size-5" />
-						{{ formatMessage(messages.importWorld) }}
+						<SpinnerIcon v-if="importingWorlds" class="size-5 animate-spin" />
+						<ImportIcon v-else class="size-5" />
+						{{ formatMessage(importingWorlds ? messages.importingWorld : messages.importWorld) }}
 					</Button>
 					<Button type="outlined" size="lg" @click="addServerModal?.show()">
 						<PlusIcon class="size-5" />
@@ -128,8 +129,9 @@
 					:disabled="importingWorlds || instance.quarantined"
 					@click="handleImportWorlds"
 				>
-					<ImportIcon class="size-5" />
-					{{ formatMessage(messages.importWorld) }}
+					<SpinnerIcon v-if="importingWorlds" class="size-5 animate-spin" />
+					<ImportIcon v-else class="size-5" />
+					{{ formatMessage(importingWorlds ? messages.importingWorld : messages.importWorld) }}
 				</Button>
 				<Button type="outlined" size="lg" @click="addServerModal?.show()">
 					<PlusIcon class="size-5" />
@@ -144,7 +146,14 @@
 	</ReadyTransition>
 </template>
 <script setup lang="ts">
-import { CompassIcon, ImportIcon, PlusIcon, RefreshCwIcon, SearchIcon } from '@modrinth/assets'
+import {
+	CompassIcon,
+	ImportIcon,
+	PlusIcon,
+	RefreshCwIcon,
+	SearchIcon,
+	SpinnerIcon,
+} from '@modrinth/assets'
 import { Button } from '@modrinth/ui'
 import {
 	commonMessages,
@@ -185,6 +194,7 @@ import {
 	ensureManagedServerWorldExists,
 	get_instance_protocol_version,
 	getServerAddress,
+	getWorldDisplayName,
 	getWorldIdentifier,
 	handleDefaultInstanceUpdateEvent,
 	hasServerQuickPlaySupport,
@@ -224,6 +234,10 @@ const messages = defineMessages({
 	importWorld: {
 		id: 'app.instance.worlds.import-world',
 		defaultMessage: 'Import world',
+	},
+	importingWorld: {
+		id: 'app.instance.worlds.importing-world',
+		defaultMessage: 'Importing...',
 	},
 	worldArchiveFilter: {
 		id: 'app.instance.worlds.world-archive-filter',
@@ -596,11 +610,12 @@ async function importWorlds(paths: string[]) {
 		await refreshAllWorlds()
 		highlightedWorld.value = imported[0]
 
-		const names = imported.map(
-			(path) =>
-				worlds.value.find((world) => world.type === 'singleplayer' && world.path === path)?.name ||
-				path,
-		)
+		const names = imported.map((path) => {
+			const world = worlds.value.find(
+				(world) => world.type === 'singleplayer' && world.path === path,
+			)
+			return world ? getWorldDisplayName(world) : path
+		})
 		addNotification({
 			type: 'success',
 			title: formatMessage(messages.worldsImported),

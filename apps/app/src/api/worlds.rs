@@ -144,8 +144,7 @@ pub async fn backup_world(instance: &str, world: &str) -> Result<u64> {
 
 #[tauri::command]
 pub async fn import_world(instance: &str, source: &str) -> Result<String> {
-    let instance = get_full_path(instance).await?;
-    Ok(worlds::import_world(&instance, Path::new(source)).await?)
+    Ok(worlds::import_world(instance, Path::new(source)).await?)
 }
 
 #[tauri::command]
