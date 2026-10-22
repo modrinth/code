@@ -1076,7 +1076,7 @@ pub async fn thread_send_message_internal(
                         SET thread_message_id = $1
                         WHERE id = $2
                         ",
-                        thread.id.0,
+                        id.0,
                         image_id.0 as i64
                     )
                     .execute(&mut transaction)
