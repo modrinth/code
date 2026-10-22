@@ -74,7 +74,8 @@ impl<'a> TransactionBuilder<'a> {
             TxSource::Db(db) => ConnRef::owned(db.connection().await?),
             TxSource::Connection(conn) => ConnRef::Borrowed(conn),
         };
-        Transaction::begin_with(conn, self.isolation, self.read_only, self.mode).await
+        Transaction::begin_with(conn, self.isolation, self.read_only, self.mode)
+            .await
     }
 }
 
@@ -183,9 +184,10 @@ impl<'a> Transaction<'a> {
     pub async fn commit(mut self) -> Result<()> {
         tracing::debug!("committing transaction");
         match self.savepoint {
-            Some(_) => self
-                .conn
-                .exec_operation(operation::Transaction::ReleaseSavepoint(self.savepoint()).into()),
+            Some(_) => self.conn.exec_operation(
+                operation::Transaction::ReleaseSavepoint(self.savepoint())
+                    .into(),
+            ),
             None => self
                 .conn
                 .exec_operation(operation::Transaction::Commit.into()),
@@ -200,7 +202,8 @@ impl<'a> Transaction<'a> {
         tracing::debug!("rolling back transaction");
         match self.savepoint {
             Some(_) => self.conn.exec_operation(
-                operation::Transaction::RollbackToSavepoint(self.savepoint()).into(),
+                operation::Transaction::RollbackToSavepoint(self.savepoint())
+                    .into(),
             ),
             None => self
                 .conn
@@ -220,22 +223,22 @@ impl Drop for Transaction<'_> {
     fn drop(&mut self) {
         if !self.finalized {
             let op = match self.savepoint {
-                Some(_) => operation::Transaction::RollbackToSavepoint(self.savepoint()),
+                Some(_) => operation::Transaction::RollbackToSavepoint(
+                    self.savepoint(),
+                ),
                 None => operation::Transaction::Rollback,
             };
 
             // Fire-and-forget rollback: send the operation to the background
             // connection task without awaiting the response.
             let (tx, _rx) = oneshot::channel();
-            let _ = self
-                .conn
-                .handle()
-                .in_tx
-                .send(ConnectionOperation::ExecOperation {
+            let _ = self.conn.handle().in_tx.send(
+                ConnectionOperation::ExecOperation {
                     operation: Box::new(op.into()),
                     span: tracing::Span::current(),
                     tx,
-                });
+                },
+            );
         }
     }
 }
@@ -247,7 +250,10 @@ impl<'a> Executor for Transaction<'a> {
             Some(savepoint) => savepoint + 1,
             None => 1,
         };
-        tracing::debug!(depth = depth, "creating nested transaction (savepoint)");
+        tracing::debug!(
+            depth = depth,
+            "creating nested transaction (savepoint)"
+        );
 
         let transaction = Transaction {
             conn: ConnRef::Borrowed(&mut self.conn),
@@ -257,7 +263,10 @@ impl<'a> Executor for Transaction<'a> {
 
         transaction
             .conn
-            .exec_operation(operation::Transaction::Savepoint(transaction.savepoint()).into())
+            .exec_operation(
+                operation::Transaction::Savepoint(transaction.savepoint())
+                    .into(),
+            )
             .await?;
 
         Ok(transaction)
@@ -270,7 +279,10 @@ impl<'a> Executor for Transaction<'a> {
         self.conn.exec_stmt(stmt, true).await
     }
 
-    async fn exec_raw_sql(&mut self, raw: RawSql) -> Result<toasty_core::driver::ExecResponse> {
+    async fn exec_raw_sql(
+        &mut self,
+        raw: RawSql,
+    ) -> Result<toasty_core::driver::ExecResponse> {
         self.conn.exec_raw_sql(raw).await
     }
 

@@ -11,7 +11,9 @@ pub use connect::Connect;
 pub use connection::Connection;
 pub use executor::Executor;
 pub use pool::{Pool, PoolStatus};
-pub use toasty_core::driver::{Capability, ConnectContext, Dialect, Driver, SqlPlaceholder};
+pub use toasty_core::driver::{
+    Capability, ConnectContext, Dialect, Driver, SqlPlaceholder,
+};
 pub use tx::{Transaction, TransactionBuilder};
 
 /// Response from executing a statement, including pagination metadata.
@@ -173,7 +175,10 @@ impl Executor for Db {
         Transaction::begin(ConnRef::owned(conn)).await
     }
 
-    async fn exec_untyped(&mut self, stmt: stmt::Statement) -> Result<ExecResponse> {
+    async fn exec_untyped(
+        &mut self,
+        stmt: stmt::Statement,
+    ) -> Result<ExecResponse> {
         self.exec_stmt(stmt, false).await
     }
 

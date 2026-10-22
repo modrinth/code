@@ -1,5 +1,6 @@
 use toasty_core::{
-    driver::Capability, schema::db::TableId, stmt, stmt::ExprContext, stmt::ValueSet,
+    driver::Capability, schema::db::TableId, stmt, stmt::ExprContext,
+    stmt::ValueSet,
 };
 
 use crate::engine::simplify;
@@ -20,16 +21,25 @@ impl Exec<'_> {
     ///
     /// Each returned predicate has been simplified and is guaranteed
     /// satisfiable.
-    pub(super) fn split_filter(&self, filter: stmt::Expr, table: TableId) -> Vec<stmt::Expr> {
+    pub(super) fn split_filter(
+        &self,
+        filter: stmt::Expr,
+        table: TableId,
+    ) -> Vec<stmt::Expr> {
         let db_table = self.engine.schema.db.table(table);
         let cx = self.engine.expr_cx_for(db_table);
 
         let capability = self.engine.capability;
         match filter {
-            stmt::Expr::Any(any) => Self::split_filter_any_map(*any.expr, cx, capability),
-            stmt::Expr::InList(in_list) => {
-                Self::split_filter_in_list(*in_list.expr, *in_list.list, cx, capability)
+            stmt::Expr::Any(any) => {
+                Self::split_filter_any_map(*any.expr, cx, capability)
             }
+            stmt::Expr::InList(in_list) => Self::split_filter_in_list(
+                *in_list.expr,
+                *in_list.list,
+                cx,
+                capability,
+            ),
             mut other => {
                 simplify::simplify_expr(cx, self.engine.capability, &mut other);
                 if other.is_unsatisfiable() {
@@ -97,7 +107,8 @@ impl Exec<'_> {
             .filter(|v| !v.is_null())
             .filter(|v| seen.insert(v.clone()))
             .filter_map(|v| {
-                let mut pred = stmt::Expr::binary_op(expr.clone(), stmt::BinaryOp::Eq, v);
+                let mut pred =
+                    stmt::Expr::binary_op(expr.clone(), stmt::BinaryOp::Eq, v);
                 simplify::simplify_expr(cx, capability, &mut pred);
                 (!pred.is_unsatisfiable()).then_some(pred)
             })

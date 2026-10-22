@@ -65,5 +65,6 @@ impl Auto for usize {
 }
 
 impl Auto for uuid::Uuid {
-    const STRATEGY: AutoStrategy = AutoStrategy::Uuid(toasty_core::schema::app::UuidVersion::V7);
+    const STRATEGY: AutoStrategy =
+        AutoStrategy::Uuid(toasty_core::schema::app::UuidVersion::V7);
 }

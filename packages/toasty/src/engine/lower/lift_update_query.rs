@@ -42,7 +42,8 @@ impl VisitMut for LiftUpdateQuery {
             assert!(select.returning.is_model());
 
             stmt.filter.add_filter(select.filter.take());
-            stmt.target = stmt::UpdateTarget::Model(select.source.model_id_unwrap());
+            stmt.target =
+                stmt::UpdateTarget::Model(select.source.model_id_unwrap());
         }
 
         stmt::visit_mut::visit_stmt_update_mut(self, stmt);

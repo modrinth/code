@@ -55,7 +55,8 @@ pub type ViaMany<F> = <<F as ViaManyField>::Target as ViaTarget>::Query;
 /// Resolves to the terminal type's [`ViaTarget::Path`]: the model's chainable
 /// `ManyField` for a model terminal, `Path<Origin, List<scalar>>` for a scalar.
 /// Mirrors [`ViaMany`], which aliases the navigation query the same way.
-pub type ViaPath<F, Origin> = <<F as ViaManyField>::Target as ViaTarget>::Path<Origin>;
+pub type ViaPath<F, Origin> =
+    <<F as ViaManyField>::Target as ViaTarget>::Path<Origin>;
 
 /// A type that can be the terminal element of a `#[has_many(via = …)]`
 /// relation.

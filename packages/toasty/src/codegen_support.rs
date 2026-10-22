@@ -16,12 +16,15 @@ pub use crate::schema::inventory;
 pub use crate::{
     Db, Error, Executor, Result, Statement,
     schema::{
-        Auto, Deferred, DiscoverItem, Document, Embed, EmbedCreate, Field, Load, Model, QueryMany,
-        QueryOne, QueryOptionOne, RelationManyField, RelationOneField, Scalar, Scope, ViaMany,
-        ViaManyField, ViaPath, ViaTarget, generate_unique_id,
+        Auto, Deferred, DiscoverItem, Document, Embed, EmbedCreate, Field,
+        Load, Model, QueryMany, QueryOne, QueryOptionOne, RelationManyField,
+        RelationOneField, Scalar, Scope, ViaMany, ViaManyField, ViaPath,
+        ViaTarget, generate_unique_id,
     },
     stmt::CreateMany,
-    stmt::{self, Assign, Expr, IntoExpr, IntoInsert, IntoStatement, List, Path},
+    stmt::{
+        self, Assign, Expr, IntoExpr, IntoInsert, IntoStatement, List, Path,
+    },
     update_target::UpdateTarget,
 };
 #[cfg(feature = "serde")]
@@ -42,12 +45,17 @@ pub type FieldExprTarget<F> = <F as Field>::ExprTarget;
 /// [`RelationOneField::Expr`], preserving optionality for eager and deferred
 /// relations.
 pub type RelationOnePath<F, Origin> =
-    <<F as RelationOneField>::Target as Model>::OneField<Origin, <F as RelationOneField>::Expr>;
+    <<F as RelationOneField>::Target as Model>::OneField<
+        Origin,
+        <F as RelationOneField>::Expr,
+    >;
 
 /// Internal constructors used by generated model field accessors.
 pub trait ModelCodegen: Model {
     /// Construct the field accessor for a singular relation to this model.
-    fn new_one_field<Origin, Target>(path: Path<Origin, Target>) -> Self::OneField<Origin, Target>;
+    fn new_one_field<Origin, Target>(
+        path: Path<Origin, Target>,
+    ) -> Self::OneField<Origin, Target>;
 
     /// Encode referenced fields so the engine can resolve a relation key.
     fn to_relation_expr(&self, fields: &[&str]) -> core::stmt::Expr;
@@ -168,7 +176,9 @@ impl<M: Model> EmbeddedRelationValue<Deferred<M>> for Deferred<M> {
     }
 }
 
-impl<M: Model> EmbeddedRelationValue<Deferred<Option<M>>> for Deferred<Option<M>> {
+impl<M: Model> EmbeddedRelationValue<Deferred<Option<M>>>
+    for Deferred<Option<M>>
+{
     type Model = M;
 
     fn model_ref(&self) -> Option<&M> {
@@ -181,7 +191,10 @@ impl<M: Model> EmbeddedRelationValue<Deferred<Option<M>>> for Deferred<Option<M>
 }
 
 /// Encode a loaded relation's key, leaving unloaded relations unset.
-pub fn embedded_relation_value_expr<F, V>(value: &V, fields: &[&str]) -> core::stmt::Expr
+pub fn embedded_relation_value_expr<F, V>(
+    value: &V,
+    fields: &[&str],
+) -> core::stmt::Expr
 where
     V: EmbeddedRelationValue<F>,
     V::Model: ModelCodegen,
@@ -210,8 +223,10 @@ where
     Target: Model,
 {
     match query.take_via_assoc() {
-        Some(untyped) => stmt::Association::<List<Source>>::from_untyped(untyped)
-            .chain_field::<Target>(field_offset),
+        Some(untyped) => {
+            stmt::Association::<List<Source>>::from_untyped(untyped)
+                .chain_field::<Target>(field_offset)
+        }
         None => stmt::Association::many(query, path),
     }
 }
@@ -231,8 +246,10 @@ where
     Target: Model,
 {
     match query.take_via_assoc() {
-        Some(untyped) => stmt::Association::<List<Source>>::from_untyped(untyped)
-            .chain_field::<Target>(field_offset),
+        Some(untyped) => {
+            stmt::Association::<List<Source>>::from_untyped(untyped)
+                .chain_field::<Target>(field_offset)
+        }
         None => stmt::Association::many_via_one(query, path),
     }
 }

@@ -19,8 +19,11 @@ pub trait Assign<T> {
 
     /// Record one or more assignments into the given [`Assignments`] map at
     /// the specified projection.
-    fn assign(self, assignments: &mut stmt::Assignments, projection: stmt::Projection)
-    where
+    fn assign(
+        self,
+        assignments: &mut stmt::Assignments,
+        projection: stmt::Projection,
+    ) where
         Self: Sized,
     {
         self.into_assignment().kind.apply(assignments, projection);
@@ -61,16 +64,30 @@ enum AssignmentKind {
 }
 
 impl AssignmentKind {
-    fn apply(self, assignments: &mut stmt::Assignments, projection: stmt::Projection) {
+    fn apply(
+        self,
+        assignments: &mut stmt::Assignments,
+        projection: stmt::Projection,
+    ) {
         match self {
             AssignmentKind::Set(expr) => assignments.set(projection, expr),
-            AssignmentKind::Insert(expr) => assignments.insert(projection, expr),
-            AssignmentKind::Remove(expr) => assignments.remove(projection, expr),
-            AssignmentKind::Append(expr) => assignments.append(projection, expr),
+            AssignmentKind::Insert(expr) => {
+                assignments.insert(projection, expr)
+            }
+            AssignmentKind::Remove(expr) => {
+                assignments.remove(projection, expr)
+            }
+            AssignmentKind::Append(expr) => {
+                assignments.append(projection, expr)
+            }
             AssignmentKind::Pop => assignments.pop(projection),
-            AssignmentKind::RemoveAt(expr) => assignments.remove_at(projection, expr),
+            AssignmentKind::RemoveAt(expr) => {
+                assignments.remove_at(projection, expr)
+            }
             AssignmentKind::Add(expr) => assignments.add(projection, expr),
-            AssignmentKind::Subtract(expr) => assignments.subtract(projection, expr),
+            AssignmentKind::Subtract(expr) => {
+                assignments.subtract(projection, expr)
+            }
             AssignmentKind::Patch {
                 path_projection,
                 inner,
@@ -86,7 +103,9 @@ impl AssignmentKind {
                     op.apply(assignments, projection.clone());
                 }
             }
-            AssignmentKind::Unsupported(reason) => assignments.reject_unsupported(reason),
+            AssignmentKind::Unsupported(reason) => {
+                assignments.reject_unsupported(reason)
+            }
         }
     }
 }

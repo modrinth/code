@@ -3,7 +3,10 @@ use toasty_core::stmt;
 use crate::engine::simplify::Simplify;
 
 impl Simplify<'_> {
-    pub(super) fn simplify_stmt_query_when_empty(&mut self, stmt: &mut stmt::Query) {
+    pub(super) fn simplify_stmt_query_when_empty(
+        &mut self,
+        stmt: &mut stmt::Query,
+    ) {
         if stmt.with.is_some() {
             // Just skip if there are any CTEs for now
             return;
@@ -50,10 +53,13 @@ impl Simplify<'_> {
         }
 
         // Get the primary relation from the first table
-        let stmt::TableFactor::Table(primary_table_id) = &source_table.from[0].relation;
+        let stmt::TableFactor::Table(primary_table_id) =
+            &source_table.from[0].relation;
 
         // Check if primary source is empty VALUES
-        if self.table_ref_is_empty_values(&source_table.tables[primary_table_id.0]) {
+        if self
+            .table_ref_is_empty_values(&source_table.tables[primary_table_id.0])
+        {
             // Primary source is empty - result will be empty unless there are
             // LEFT JOINs that could still produce results
             return !source_table

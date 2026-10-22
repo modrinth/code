@@ -57,7 +57,10 @@ fn rewrite(expr: Expr) -> Option<Expr> {
 
 fn assert_parent_filter(expr: Expr) {
     let expr = rewrite(expr).expect("parent-only predicate");
-    let func = eval::Func::from_stmt(expr, vec![Type::Record(vec![Type::I64, Type::I64])]);
+    let func = eval::Func::from_stmt(
+        expr,
+        vec![Type::Record(vec![Type::I64, Type::I64])],
+    );
     let schema = test_schema();
     for (value, expected) in [(42i64, true), (9, false)] {
         let row = Value::record_from_vec(vec![0i64.into(), value.into()]);
@@ -115,7 +118,10 @@ fn parent_filter_rejects_other_dependencies() {
 
 #[test]
 fn local_arguments_do_not_count_as_parent_references() {
-    assert!(rewrite(Expr::any(Expr::map(Expr::list([true]), Expr::arg(0)))).is_none());
+    assert!(
+        rewrite(Expr::any(Expr::map(Expr::list([true]), Expr::arg(0))))
+            .is_none()
+    );
     assert!(
         rewrite(
             ExprLet {

@@ -25,7 +25,10 @@ pub trait Executor: Send + Sync {
 
     /// Execute an untyped statement, returning the full execution response.
     #[doc(hidden)]
-    async fn exec_untyped(&mut self, stmt: toasty_core::stmt::Statement) -> Result<ExecResponse>;
+    async fn exec_untyped(
+        &mut self,
+        stmt: toasty_core::stmt::Statement,
+    ) -> Result<ExecResponse>;
 
     /// Execute user-authored SQL, returning the full execution response.
     #[doc(hidden)]
@@ -78,7 +81,10 @@ impl dyn Executor + '_ {
     /// let users: Vec<User> = executor.exec(stmt).await.unwrap();
     /// # });
     /// ```
-    pub async fn exec<T: Load>(&mut self, stmt: Statement<T>) -> Result<T::Output> {
+    pub async fn exec<T: Load>(
+        &mut self,
+        stmt: Statement<T>,
+    ) -> Result<T::Output> {
         let response = self.exec_untyped(stmt.untyped).await?;
         let value = response.values.collect_as_value().await?;
         T::load(value)

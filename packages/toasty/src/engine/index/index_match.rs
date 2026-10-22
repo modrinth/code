@@ -40,12 +40,18 @@ impl<'stmt> IndexMatch<'stmt> {
                 // which to probe an index. Leave it to the scan/result filter
                 // path instead of treating either operand as an index key.
                 (stmt::Expr::Reference(_), stmt::Expr::Reference(_)) => false,
-                (stmt::Expr::Reference(lhs @ stmt::ExprReference::Column(_)), _) => {
-                    self.match_expr_binary_op_column(cx, lhs, expr, e.op)
-                }
-                (_, stmt::Expr::Reference(rhs @ stmt::ExprReference::Column(_))) => {
+                (
+                    stmt::Expr::Reference(lhs @ stmt::ExprReference::Column(_)),
+                    _,
+                ) => self.match_expr_binary_op_column(cx, lhs, expr, e.op),
+                (
+                    _,
+                    stmt::Expr::Reference(rhs @ stmt::ExprReference::Column(_)),
+                ) => {
                     match e.op.commute() {
-                        Some(op) => self.match_expr_binary_op_column(cx, rhs, expr, op),
+                        Some(op) => {
+                            self.match_expr_binary_op_column(cx, rhs, expr, op)
+                        }
                         // Non-commutative op (e.g. `5 - col`) cannot be normalized
                         // to column-on-left form; it's not an index match.
                         None => false,
@@ -57,16 +63,30 @@ impl<'stmt> IndexMatch<'stmt> {
                 _ => false,
             },
             StartsWith(e) => match &*e.expr {
-                stmt::Expr::Reference(expr_column @ stmt::ExprReference::Column(_)) => {
+                stmt::Expr::Reference(
+                    expr_column @ stmt::ExprReference::Column(_),
+                ) => {
                     // starts_with is a range-like condition: valid on sort key, not partition key
-                    self.match_expr_binary_op_column(cx, expr_column, expr, stmt::BinaryOp::Ge)
+                    self.match_expr_binary_op_column(
+                        cx,
+                        expr_column,
+                        expr,
+                        stmt::BinaryOp::Ge,
+                    )
                 }
                 _ => false,
             },
             Between(e) => match &*e.expr {
-                stmt::Expr::Reference(expr_column @ stmt::ExprReference::Column(_)) => {
+                stmt::Expr::Reference(
+                    expr_column @ stmt::ExprReference::Column(_),
+                ) => {
                     // between is a range condition: valid on sort key, not partition key
-                    self.match_expr_binary_op_column(cx, expr_column, expr, stmt::BinaryOp::Ge)
+                    self.match_expr_binary_op_column(
+                        cx,
+                        expr_column,
+                        expr,
+                        stmt::BinaryOp::Ge,
+                    )
                 }
                 _ => false,
             },
@@ -74,9 +94,14 @@ impl<'stmt> IndexMatch<'stmt> {
             // `IS NOT NULL` is a range, not a key value.
             IsNull(e) if e.negated => false,
             IsNull(e) => match &*e.expr {
-                stmt::Expr::Reference(expr_column @ stmt::ExprReference::Column(_)) => {
-                    self.match_expr_binary_op_column(cx, expr_column, expr, stmt::BinaryOp::Eq)
-                }
+                stmt::Expr::Reference(
+                    expr_column @ stmt::ExprReference::Column(_),
+                ) => self.match_expr_binary_op_column(
+                    cx,
+                    expr_column,
+                    expr,
+                    stmt::BinaryOp::Eq,
+                ),
                 // Not a bare column reference (e.g. a projection into a
                 // `#[document]` column). Not an index match — return false
                 // rather than failing.
@@ -98,7 +123,9 @@ impl<'stmt> IndexMatch<'stmt> {
                                             eq: operand_match.eq,
                                         });
                                     }
-                                    hash_map::Entry::Occupied(mut e) if operand_match.eq => {
+                                    hash_map::Entry::Occupied(mut e)
+                                        if operand_match.eq =>
+                                    {
                                         e.get_mut().eq = true;
                                     }
                                     _ => continue,
@@ -115,7 +142,8 @@ impl<'stmt> IndexMatch<'stmt> {
                 matched
             }
             Or(or_exprs) => {
-                let matched_any_expr = self.match_all_restrictions(cx, or_exprs);
+                let matched_any_expr =
+                    self.match_all_restrictions(cx, or_exprs);
                 let mut matched_operand = false;
 
                 // For OR expressions, we need to ensure that the index match is
@@ -127,7 +155,9 @@ impl<'stmt> IndexMatch<'stmt> {
                         let mut eq = true;
 
                         for or_expr in or_exprs {
-                            if let Some(operand_match) = column.exprs.get(&ByAddress(or_expr)) {
+                            if let Some(operand_match) =
+                                column.exprs.get(&ByAddress(or_expr))
+                            {
                                 eq &= operand_match.eq;
                             } else {
                                 continue 'columns;
@@ -158,8 +188,10 @@ impl<'stmt> IndexMatch<'stmt> {
                 if self.match_restriction(cx, &expr_map.map) {
                     // If the map expression matched, propagate that match to this Any expression
                     for column in &mut self.columns {
-                        if let Some(operand_match) =
-                            column.exprs.get(&ByAddress(&*expr_map.map)).copied()
+                        if let Some(operand_match) = column
+                            .exprs
+                            .get(&ByAddress(&*expr_map.map))
+                            .copied()
                         {
                             column.exprs.insert(
                                 ByAddress(expr),
@@ -205,15 +237,21 @@ impl<'stmt> IndexMatch<'stmt> {
         expr: &'stmt stmt::Expr,
     ) -> bool {
         match lhs {
-            stmt::Expr::Reference(expr_column @ stmt::ExprReference::Column(_)) => {
-                self.match_expr_binary_op_column(cx, expr_column, expr, stmt::BinaryOp::Eq)
-            }
+            stmt::Expr::Reference(
+                expr_column @ stmt::ExprReference::Column(_),
+            ) => self.match_expr_binary_op_column(
+                cx,
+                expr_column,
+                expr,
+                stmt::BinaryOp::Eq,
+            ),
             stmt::Expr::Record(expr_record) => {
                 let mut matched = false;
 
                 for sub_expr in expr_record {
-                    let stmt::Expr::Reference(expr_column @ stmt::ExprReference::Column(_)) =
-                        sub_expr
+                    let stmt::Expr::Reference(
+                        expr_column @ stmt::ExprReference::Column(_),
+                    ) = sub_expr
                     else {
                         todo!()
                     };
@@ -229,7 +267,10 @@ impl<'stmt> IndexMatch<'stmt> {
                     for column in &mut self.columns {
                         for sub_expr in expr_record {
                             if column.exprs.contains_key(&ByAddress(sub_expr)) {
-                                column.exprs.insert(ByAddress(expr), ExprMatch { eq: true });
+                                column.exprs.insert(
+                                    ByAddress(expr),
+                                    ExprMatch { eq: true },
+                                );
 
                                 break;
                             }
@@ -251,7 +292,8 @@ impl<'stmt> IndexMatch<'stmt> {
         op: stmt::BinaryOp,
     ) -> bool {
         let mut matched = false;
-        let resolved_col = cx.resolve_expr_reference(expr_ref).as_column_unwrap();
+        let resolved_col =
+            cx.resolve_expr_reference(expr_ref).as_column_unwrap();
 
         for (i, index_column) in self.index.columns.iter().enumerate() {
             // Check that the path matches an index column
@@ -281,7 +323,8 @@ impl<'stmt> IndexMatch<'stmt> {
             let mut cost = 0;
 
             for column in &self.columns {
-                let Some(expr_match) = column.exprs.get(&ByAddress(filter)) else {
+                let Some(expr_match) = column.exprs.get(&ByAddress(filter))
+                else {
                     break;
                 };
 
@@ -307,7 +350,8 @@ impl<'stmt> IndexMatch<'stmt> {
         use stmt::Expr::*;
 
         match expr {
-            StartsWith(_) | Between(_) | InList(_) | IsNull(_) | Like(_) | Not(_) => {
+            StartsWith(_) | Between(_) | InList(_) | IsNull(_) | Like(_)
+            | Not(_) => {
                 if self
                     .columns
                     .iter()
@@ -324,7 +368,9 @@ impl<'stmt> IndexMatch<'stmt> {
                     .iter()
                     .any(|f| f.exprs.contains_key(&ByAddress(expr)))
                 {
-                    if binary_op.op.is_ne() && !ctx.capability.primary_key_ne_predicate {
+                    if binary_op.op.is_ne()
+                        && !ctx.capability.primary_key_ne_predicate
+                    {
                         ctx.apply_result_filter_on_results = true;
                         return (true.into(), true.into());
                     }
@@ -356,7 +402,8 @@ impl<'stmt> IndexMatch<'stmt> {
                 let mut result_filter_operands = vec![];
 
                 for operand in &expr_and.operands {
-                    let (index_filter, result_filter) = self.partition_filter(ctx, operand);
+                    let (index_filter, result_filter) =
+                        self.partition_filter(ctx, operand);
 
                     if !index_filter.is_true() {
                         index_filter_operands.push(index_filter);
@@ -391,7 +438,8 @@ impl<'stmt> IndexMatch<'stmt> {
                 let mut result_filter_operands = vec![];
 
                 for operand in &expr_or.operands {
-                    let (index_filter, result_filter) = self.partition_filter(ctx, operand);
+                    let (index_filter, result_filter) =
+                        self.partition_filter(ctx, operand);
 
                     if !index_filter.is_true() && !result_filter.is_true() {
                         todo!("expr_or={:#?}", expr_or);
@@ -432,7 +480,8 @@ impl<'stmt> IndexMatch<'stmt> {
                     todo!("expr_any.expr={:#?}", expr_any.expr);
                 };
 
-                let (index_filter, result_filter) = self.partition_filter(ctx, &expr_map.map);
+                let (index_filter, result_filter) =
+                    self.partition_filter(ctx, &expr_map.map);
 
                 // If the map expression can be used as an index filter, reconstruct
                 // the Any with the index filter version

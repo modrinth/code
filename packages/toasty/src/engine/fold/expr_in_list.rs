@@ -29,7 +29,9 @@ pub(super) fn fold_expr_in_list(expr: &mut stmt::ExprInList) -> Option<Expr> {
     rewrite_expr_in_list_with_single_item(expr)
 }
 
-fn rewrite_expr_in_list_with_single_item(expr: &mut stmt::ExprInList) -> Option<Expr> {
+fn rewrite_expr_in_list_with_single_item(
+    expr: &mut stmt::ExprInList,
+) -> Option<Expr> {
     let rhs = match &mut *expr.list {
         Expr::Value(value) => {
             let values = match value {

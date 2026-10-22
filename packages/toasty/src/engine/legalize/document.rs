@@ -32,7 +32,11 @@ use toasty_core::{
 /// Rewrite every projection into a `#[document]` column into the
 /// [`FuncJsonExtract`](stmt::FuncJsonExtract) node the SQL serializer
 /// renders, and strip any residual raising cast (meaningless driver-side).
-pub(super) fn statement(schema: &Schema, capability: &Capability, stmt: &mut stmt::Statement) {
+pub(super) fn statement(
+    schema: &Schema,
+    capability: &Capability,
+    stmt: &mut stmt::Statement,
+) {
     LegalizeDocumentPaths { schema, capability }.visit_mut(stmt);
 }
 
@@ -40,7 +44,11 @@ pub(super) fn statement(schema: &Schema, capability: &Capability, stmt: &mut stm
 /// condition — into its driver-consumable shape: document paths become
 /// [`stmt::FuncJsonExtract`] name paths, and text-compared document leaves
 /// get text operands, exactly as [`statement`] does for full statements.
-pub(super) fn table_expr(schema: &Schema, capability: &Capability, expr: &mut stmt::Expr) {
+pub(super) fn table_expr(
+    schema: &Schema,
+    capability: &Capability,
+    expr: &mut stmt::Expr,
+) {
     LegalizeDocumentPaths { schema, capability }.visit_expr_mut(expr);
 }
 
@@ -53,7 +61,11 @@ struct LegalizeDocumentPaths<'a> {
     // Read only by `leaf_compares_as_text`, whose non-trivial arms are gated
     // on the features below.
     #[cfg_attr(
-        not(any(feature = "jiff", feature = "rust_decimal", feature = "bigdecimal")),
+        not(any(
+            feature = "jiff",
+            feature = "rust_decimal",
+            feature = "bigdecimal"
+        )),
         allow(dead_code)
     )]
     capability: &'a Capability,
@@ -83,9 +95,11 @@ impl LegalizeDocumentPaths<'_> {
         if !matches!(&*cast.expr, stmt::Expr::Reference(_)) {
             return;
         }
-        let Some((path, ty)) =
-            build_json_path(self.schema, embed_id, project.projection.as_slice())
-        else {
+        let Some((path, ty)) = build_json_path(
+            self.schema,
+            embed_id,
+            project.projection.as_slice(),
+        ) else {
             return;
         };
         let base = Box::new(cast.expr.take());
@@ -128,8 +142,13 @@ impl LegalizeDocumentPaths<'_> {
     /// this backend, rewrite the constant `operand` to the leaf's document
     /// text form (the exact text the JSON codec stores — see
     /// [`document_text`]) and retype the extraction as a text read.
-    fn textify_comparison(&self, extract_side: &mut stmt::Expr, operand: &mut stmt::Expr) {
-        let stmt::Expr::Func(stmt::ExprFunc::JsonExtract(func)) = extract_side else {
+    fn textify_comparison(
+        &self,
+        extract_side: &mut stmt::Expr,
+        operand: &mut stmt::Expr,
+    ) {
+        let stmt::Expr::Func(stmt::ExprFunc::JsonExtract(func)) = extract_side
+        else {
             return;
         };
         if !self.leaf_compares_as_text(&func.ty) {
@@ -172,7 +191,9 @@ impl VisitMut for LegalizeDocumentPaths<'_> {
                 self.textify_comparison(&mut binary.rhs, &mut binary.lhs);
             }
             stmt::Expr::InList(in_list) => {
-                let stmt::Expr::Func(stmt::ExprFunc::JsonExtract(func)) = &mut *in_list.expr else {
+                let stmt::Expr::Func(stmt::ExprFunc::JsonExtract(func)) =
+                    &mut *in_list.expr
+                else {
                     return;
                 };
                 if !self.leaf_compares_as_text(&func.ty) {
@@ -234,11 +255,19 @@ fn build_json_path(
 /// writes. `None` for values with no document text form (including `Null`,
 /// which comparisons reach via `IsNull` instead).
 fn document_text(value: &stmt::Value) -> Option<String> {
-    #[cfg(any(feature = "jiff", feature = "rust_decimal", feature = "bigdecimal"))]
+    #[cfg(any(
+        feature = "jiff",
+        feature = "rust_decimal",
+        feature = "bigdecimal"
+    ))]
     {
         value.document_storage_text().map(|text| text.to_string())
     }
-    #[cfg(not(any(feature = "jiff", feature = "rust_decimal", feature = "bigdecimal")))]
+    #[cfg(not(any(
+        feature = "jiff",
+        feature = "rust_decimal",
+        feature = "bigdecimal"
+    )))]
     {
         let _ = value;
         None

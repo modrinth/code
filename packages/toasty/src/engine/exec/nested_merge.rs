@@ -171,7 +171,9 @@ impl Exec<'_> {
                     stmt::Value::List(items) => items,
                     value => vec![value],
                 }),
-                Rows::Stream(value_stream) => Input::Value(value_stream.collect().await?),
+                Rows::Stream(value_stream) => {
+                    Input::Value(value_stream.collect().await?)
+                }
             });
         }
 
@@ -182,7 +184,9 @@ impl Exec<'_> {
                 .iter()
                 .map(|mi| {
                     let Input::Value(values) = &inputs[mi.source] else {
-                        panic!("HashLookup source must be a Value input, not Count")
+                        panic!(
+                            "HashLookup source must be a Value input, not Count"
+                        )
                     };
                     stmt::HashIndex::new(values, &mi.child_projections)
                 })
@@ -192,7 +196,9 @@ impl Exec<'_> {
                 .iter()
                 .map(|mi| {
                     let Input::Value(values) = &inputs[mi.source] else {
-                        panic!("SortLookup source must be a Value input, not Count")
+                        panic!(
+                            "SortLookup source must be a Value input, not Count"
+                        )
                     };
                     stmt::SortedIndex::new(values, &mi.child_projections)
                 })
@@ -285,7 +291,8 @@ impl Exec<'_> {
 
         for nested_child in &level.nested {
             // Find the batch-loaded input
-            let Input::Value(nested_input) = &inputs[nested_child.level.source] else {
+            let Input::Value(nested_input) = &inputs[nested_child.level.source]
+            else {
                 todo!("input={:#?}", inputs[nested_child.level.source])
             };
             let mut nested_rows_projected = vec![];
@@ -313,13 +320,17 @@ impl Exec<'_> {
                     }
                 }
                 MergeQualification::HashLookup { index, lookup_key } => {
-                    let key_val = lookup_key.eval(&self.engine.schema, row_stack)?;
-                    if let Some(row) = indices.hash[*index].find(key_as_slice(&key_val)) {
+                    let key_val =
+                        lookup_key.eval(&self.engine.schema, row_stack)?;
+                    if let Some(row) =
+                        indices.hash[*index].find(key_as_slice(&key_val))
+                    {
                         process(row)?;
                     }
                 }
                 MergeQualification::SortLookup { index, lookup_key } => {
-                    let key_val = lookup_key.eval(&self.engine.schema, row_stack)?;
+                    let key_val =
+                        lookup_key.eval(&self.engine.schema, row_stack)?;
                     let key = key_as_slice(&key_val);
                     for row in indices.sort[*index].find_range(
                         std::ops::Bound::Included(key),
@@ -343,7 +354,10 @@ impl Exec<'_> {
             }
 
             nested.push(if nested_child.single {
-                assert!(nested_rows_projected.len() <= 1, "TODO: error handling");
+                assert!(
+                    nested_rows_projected.len() <= 1,
+                    "TODO: error handling"
+                );
 
                 if let Some(row) = nested_rows_projected.into_iter().next() {
                     row

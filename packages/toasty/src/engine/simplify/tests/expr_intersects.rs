@@ -15,7 +15,10 @@ fn rewrites_value_list_into_or_of_any_op_when_not_native() {
     let schema = test_schema();
     let simplify = Simplify::new(&schema, &Capability::DYNAMODB);
 
-    let mut expr = intersects(Expr::Value(Value::List(vec![Value::I64(1), Value::I64(2)])));
+    let mut expr = intersects(Expr::Value(Value::List(vec![
+        Value::I64(1),
+        Value::I64(2),
+    ])));
     let result = simplify
         .simplify_expr_intersects(&mut expr)
         .expect("expected rewrite");

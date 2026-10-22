@@ -15,7 +15,8 @@ impl Simplify<'_> {
             return None;
         }
 
-        let stmt::Expr::Value(stmt::Value::List(values)) = expr.rhs.as_ref() else {
+        let stmt::Expr::Value(stmt::Value::List(values)) = expr.rhs.as_ref()
+        else {
             return None;
         };
 
@@ -25,7 +26,9 @@ impl Simplify<'_> {
         let path = (*expr.lhs).clone();
         let operands: Vec<stmt::Expr> = values
             .iter()
-            .map(|v| stmt::Expr::any_op(v.clone(), stmt::BinaryOp::Eq, path.clone()))
+            .map(|v| {
+                stmt::Expr::any_op(v.clone(), stmt::BinaryOp::Eq, path.clone())
+            })
             .collect();
         Some(stmt::Expr::or_from_vec(operands))
     }

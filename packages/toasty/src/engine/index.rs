@@ -89,7 +89,8 @@ pub(crate) fn plan_index_path<'a>(
     // Extract literal key values before OR rewrite, while index_filter is still
     // in Expr::Or form. After rewrite it becomes ANY(MAP(...)) and the Or arm
     // in try_extract_key_values would no longer fire.
-    let key_values = try_extract_key_values(&cx, index_match.index, &index_filter);
+    let key_values =
+        try_extract_key_values(&cx, index_match.index, &index_filter);
 
     // For backends that do not support OR in key conditions (e.g. DynamoDB), rewrite
     // any OR in the index filter to canonical ANY(MAP(...)) fan-out form.
@@ -151,11 +152,11 @@ fn try_extract_key_values(
                         // Only wrap scalar values as single-field Records for single-column
                         // indexes. For composite indexes the scalar covers only the partition
                         // key, so we cannot form a full key record.
-                        value if index.columns.len() == 1 => {
-                            Some(stmt::Value::Record(stmt::ValueRecord::from_vec(vec![
-                                value.clone(),
-                            ])))
-                        }
+                        value if index.columns.len() == 1 => Some(
+                            stmt::Value::Record(stmt::ValueRecord::from_vec(
+                                vec![value.clone()],
+                            )),
+                        ),
                         _ => None,
                     })
                     .collect::<Option<Vec<_>>>()?;
@@ -209,7 +210,8 @@ fn extract_key_record(
                 let stmt::Expr::Reference(expr_ref) = &*b.lhs else {
                     return None;
                 };
-                let column = cx.resolve_expr_reference(expr_ref).as_column_unwrap();
+                let column =
+                    cx.resolve_expr_reference(expr_ref).as_column_unwrap();
                 let (idx, _) = index
                     .columns
                     .iter()

@@ -18,7 +18,8 @@ pub(super) fn flatten_relation_path(
     queue.reverse();
 
     while let Some(index) = queue.pop() {
-        let field = &schema.app.model(current_model).as_root_unwrap().fields[index];
+        let field =
+            &schema.app.model(current_model).as_root_unwrap().fields[index];
         let field_id = app::FieldId {
             model: current_model,
             index,

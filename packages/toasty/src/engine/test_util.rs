@@ -17,8 +17,8 @@ pub fn test_schema() -> toasty_core::Schema {
 
 /// Build a schema from the given macro-generated models.
 pub fn test_schema_with(models: &[Model]) -> toasty_core::Schema {
-    let app_schema =
-        app::Schema::from_macro(models.iter().cloned()).expect("schema should build from macro");
+    let app_schema = app::Schema::from_macro(models.iter().cloned())
+        .expect("schema should build from macro");
 
     Builder::new()
         .build(app_schema, &Capability::SQLITE)
@@ -27,8 +27,8 @@ pub fn test_schema_with(models: &[Model]) -> toasty_core::Schema {
 
 /// Build a schema using PostgreSQL capability (for enum type tests).
 pub fn test_schema_postgresql(models: &[Model]) -> toasty_core::Schema {
-    let app_schema =
-        app::Schema::from_macro(models.iter().cloned()).expect("schema should build from macro");
+    let app_schema = app::Schema::from_macro(models.iter().cloned())
+        .expect("schema should build from macro");
 
     Builder::new()
         .build(app_schema, &Capability::POSTGRESQL)

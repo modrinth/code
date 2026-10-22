@@ -40,7 +40,9 @@ impl Exec<'_> {
         for key in keys {
             match self.exec_update_one(action, &returning, key).await? {
                 Rows::Count(n) => total_count += n,
-                other => rows.extend(other.into_value_stream().collect().await?),
+                other => {
+                    rows.extend(other.into_value_stream().collect().await?)
+                }
             }
         }
 

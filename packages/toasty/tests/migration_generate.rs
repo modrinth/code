@@ -67,7 +67,8 @@ fn generate_returns_migration_and_next_snapshot() {
     let hints = diff::RenameHints::new();
     let driver = Sqlite::in_memory();
 
-    let generated = migration::generate(&driver, &previous, &next, &hints).unwrap();
+    let generated =
+        migration::generate(&driver, &previous, &next, &hints).unwrap();
 
     assert_eq!(generated.snapshot.schema.tables[0].name, "users");
     let db::Migration::Sql(sql) = generated.migration;
@@ -113,7 +114,8 @@ fn snapshot_round_trips_bounded_numeric() {
 #[test]
 fn snapshot_round_trips_list_of_unconstrained_numeric() {
     let mut schema = users_schema();
-    schema.tables[0].columns[0].storage_ty = db::Type::List(Box::new(db::Type::Numeric(None)));
+    schema.tables[0].columns[0].storage_ty =
+        db::Type::List(Box::new(db::Type::Numeric(None)));
 
     let (contents, snapshot) = round_trip_snapshot(schema);
 

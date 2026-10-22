@@ -78,7 +78,11 @@ impl LowerStatement<'_, '_> {
         // First, apply any defaults while also tracking all the fields that are set.
         for (index, row) in values.rows.iter_mut().enumerate() {
             self.lower_insert_with_row(index, |lower| {
-                lower.apply_app_level_insertion_defaults(model, row, &mut set_fields);
+                lower.apply_app_level_insertion_defaults(
+                    model,
+                    row,
+                    &mut set_fields,
+                );
             });
         }
 
@@ -117,9 +121,11 @@ impl LowerStatement<'_, '_> {
         index: usize,
         preserve_returning_projection: bool,
     ) {
-        let Some(record) =
-            Self::insert_returning_record_mut(returning, index, preserve_returning_projection)
-        else {
+        let Some(record) = Self::insert_returning_record_mut(
+            returning,
+            index,
+            preserve_returning_projection,
+        ) else {
             return;
         };
 
@@ -129,7 +135,8 @@ impl LowerStatement<'_, '_> {
             for field in &self.model_unwrap().fields {
                 if let app::FieldTy::BelongsTo(rel) = &field.ty {
                     assert!(
-                        field.deferred || Self::belongs_to_fk_is_unset(row, rel),
+                        field.deferred
+                            || Self::belongs_to_fk_is_unset(row, rel),
                         "eager belongs_to in a multi-row insert with a preserved returning projection"
                     );
                 }
@@ -176,7 +183,10 @@ impl LowerStatement<'_, '_> {
     }
 
     /// Make a relation load wait for the database writes that can create its row.
-    pub(super) fn order_relation_load_after_enclosing_inserts(&mut self, load: &stmt::Expr) {
+    pub(super) fn order_relation_load_after_enclosing_inserts(
+        &mut self,
+        load: &stmt::Expr,
+    ) {
         let stmt::Expr::Arg(expr_arg) = load else {
             unreachable!("belongs_to subquery lowers to a sub-statement arg");
         };
@@ -233,9 +243,13 @@ impl LowerStatement<'_, '_> {
                     continue;
                 }
                 let value = field_expr.take();
-                super::relation::assign_belongs_to_key(&rel.foreign_key, value, |field, value| {
-                    expr.entry_mut(field.index).insert(value);
-                });
+                super::relation::assign_belongs_to_key(
+                    &rel.foreign_key,
+                    value,
+                    |field, value| {
+                        expr.entry_mut(field.index).insert(value);
+                    },
+                );
             }
         }
 
@@ -272,7 +286,9 @@ impl LowerStatement<'_, '_> {
                                 app::UuidVersion::V7 => uuid::Uuid::now_v7(),
                             };
                             let primitive = match &target.ty {
-                                stmt::Type::String => stmt::Value::String(id.to_string()),
+                                stmt::Type::String => {
+                                    stmt::Value::String(id.to_string())
+                                }
                                 stmt::Type::Uuid => stmt::Value::Uuid(id),
                                 other => panic!(
                                     "auto-generated UUID cannot be inserted into column of type {other:?}"
@@ -287,7 +303,9 @@ impl LowerStatement<'_, '_> {
                             // right shape (one wrapping per nested embed) so
                             // it can extract `Default` per column.
                             if target.wrap_depth > 0 {
-                                field_expr.insert(target.wrap_expr(stmt::Expr::Default));
+                                field_expr.insert(
+                                    target.wrap_expr(stmt::Expr::Default),
+                                );
                             }
                         }
                     }
@@ -357,7 +375,11 @@ impl LowerStatement<'_, '_> {
         }));
     }
 
-    fn verify_field_constraints(&mut self, model: &app::ModelRoot, expr: &mut stmt::Expr) {
+    fn verify_field_constraints(
+        &mut self,
+        model: &app::ModelRoot,
+        expr: &mut stmt::Expr,
+    ) {
         for field in &model.fields {
             if field.nullable && field.constraints.is_empty() {
                 continue;
@@ -456,11 +478,12 @@ impl<'b> LowerStatement<'_, 'b> {
         &self,
         assignments: &mut stmt::Assignments,
     ) -> Option<stmt::Projection> {
-        let version_id = self.model().and_then(|m| m.version_field()).map(|f| f.id)?;
+        let version_id =
+            self.model().and_then(|m| m.version_field()).map(|f| f.id)?;
 
-        let already_assigned = assignments
-            .keys()
-            .any(|projection| projection.as_slice().first() == Some(&version_id.index));
+        let already_assigned = assignments.keys().any(|projection| {
+            projection.as_slice().first() == Some(&version_id.index)
+        });
         if already_assigned {
             return None;
         }
@@ -479,16 +502,21 @@ impl ApplyInsertScope<'_> {
                     self.apply_expr(expr);
                 }
             }
-            stmt::Expr::BinaryOp(e) if e.op.is_eq() => match (&*e.lhs, &*e.rhs) {
+            stmt::Expr::BinaryOp(e) if e.op.is_eq() => match (&*e.lhs, &*e.rhs)
+            {
                 (
-                    stmt::Expr::Reference(expr_ref @ stmt::ExprReference::Field { .. }),
+                    stmt::Expr::Reference(
+                        expr_ref @ stmt::ExprReference::Field { .. },
+                    ),
                     rhs @ stmt::Expr::Value(..),
                 ) => {
                     self.apply_eq_constraint(expr_ref, rhs);
                 }
                 (
                     lhs @ stmt::Expr::Value(..),
-                    stmt::Expr::Reference(expr_ref @ stmt::ExprReference::Field { .. }),
+                    stmt::Expr::Reference(
+                        expr_ref @ stmt::ExprReference::Field { .. },
+                    ),
                 ) => {
                     self.apply_eq_constraint(expr_ref, lhs);
                 }
@@ -506,8 +534,12 @@ impl ApplyInsertScope<'_> {
                         },
                     ),
                 ) => match (nesting_lhs, nesting_rhs) {
-                    (0, _) if *nesting_rhs > 0 => self.apply_eq_constraint(lhs, rhs_expr),
-                    (_, 0) if *nesting_lhs > 0 => self.apply_eq_constraint(rhs, lhs_expr),
+                    (0, _) if *nesting_rhs > 0 => {
+                        self.apply_eq_constraint(lhs, rhs_expr)
+                    }
+                    (_, 0) if *nesting_lhs > 0 => {
+                        self.apply_eq_constraint(rhs, lhs_expr)
+                    }
                     _ => panic!("exactly one field must reference parent"),
                 },
                 _ => todo!("EXPR = {:#?}", stmt),
@@ -518,7 +550,11 @@ impl ApplyInsertScope<'_> {
         }
     }
 
-    fn apply_eq_constraint(&mut self, expr_ref: &stmt::ExprReference, val: &stmt::Expr) {
+    fn apply_eq_constraint(
+        &mut self,
+        expr_ref: &stmt::ExprReference,
+        val: &stmt::Expr,
+    ) {
         let stmt::ExprReference::Field { nesting, index } = expr_ref else {
             todo!("handle non-field reference");
         };

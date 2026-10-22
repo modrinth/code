@@ -27,9 +27,12 @@ fn extract_scalar_from_simple_insert() {
     // Build: INSERT INTO items (id, name) VALUES ('abc', 'hello')
     let mut stmt = stmt::Statement::Insert(stmt::Insert {
         target: insert_target(&schema, "items"),
-        source: stmt::Query::values(stmt::Values::new(vec![Expr::from(Value::Record(
-            stmt::ValueRecord::from_vec(vec![Value::from("abc"), Value::from("hello")]),
-        ))])),
+        source: stmt::Query::values(stmt::Values::new(vec![Expr::from(
+            Value::Record(stmt::ValueRecord::from_vec(vec![
+                Value::from("abc"),
+                Value::from("hello"),
+            ])),
+        )])),
         upsert: None,
         returning: None,
     });
@@ -70,9 +73,12 @@ fn null_values_not_extracted() {
 
     let mut stmt = stmt::Statement::Insert(stmt::Insert {
         target: insert_target(&schema, "items"),
-        source: stmt::Query::values(stmt::Values::new(vec![Expr::from(Value::Record(
-            stmt::ValueRecord::from_vec(vec![Value::from("abc"), Value::Null]),
-        ))])),
+        source: stmt::Query::values(stmt::Values::new(vec![Expr::from(
+            Value::Record(stmt::ValueRecord::from_vec(vec![
+                Value::from("abc"),
+                Value::Null,
+            ])),
+        )])),
         upsert: None,
         returning: None,
     });
@@ -141,9 +147,12 @@ fn enum_insert_refines_type_to_enum() {
 
     let mut stmt = stmt::Statement::Insert(stmt::Insert {
         target: insert_target(&schema, "tasks"),
-        source: stmt::Query::values(stmt::Values::new(vec![Expr::from(Value::Record(
-            stmt::ValueRecord::from_vec(vec![Value::from("task-1"), Value::from("active")]),
-        ))])),
+        source: stmt::Query::values(stmt::Values::new(vec![Expr::from(
+            Value::Record(stmt::ValueRecord::from_vec(vec![
+                Value::from("task-1"),
+                Value::from("active"),
+            ])),
+        )])),
         upsert: None,
         returning: None,
     });
@@ -177,9 +186,12 @@ fn non_enum_insert_keeps_default_types() {
 
     let mut stmt = stmt::Statement::Insert(stmt::Insert {
         target: insert_target(&schema, "items"),
-        source: stmt::Query::values(stmt::Values::new(vec![Expr::from(Value::Record(
-            stmt::ValueRecord::from_vec(vec![Value::from("item-1"), Value::from(42i64)]),
-        ))])),
+        source: stmt::Query::values(stmt::Values::new(vec![Expr::from(
+            Value::Record(stmt::ValueRecord::from_vec(vec![
+                Value::from("item-1"),
+                Value::from(42i64),
+            ])),
+        )])),
         upsert: None,
         returning: None,
     });
@@ -231,7 +243,10 @@ fn synthesize_multi_step_projection() {
     // Build: Record([Arg(0), Record([Arg(1), Arg(2)])])
     let expr = Expr::Record(stmt::ExprRecord::from_vec(vec![
         Expr::arg(0),
-        Expr::Record(stmt::ExprRecord::from_vec(vec![Expr::arg(1), Expr::arg(2)])),
+        Expr::Record(stmt::ExprRecord::from_vec(vec![
+            Expr::arg(1),
+            Expr::arg(2),
+        ])),
     ]));
 
     // Project with steps [1, 0] — field 1 of outer (inner record), then field 0 (Integer)
@@ -283,7 +298,9 @@ fn synthesize_project_step_out_of_bounds_panics() {
 
     // Record with 1 field, projecting step 5
     let expr = Expr::Project(stmt::ExprProject {
-        base: Box::new(Expr::Record(stmt::ExprRecord::from_vec(vec![Expr::arg(0)]))),
+        base: Box::new(Expr::Record(stmt::ExprRecord::from_vec(vec![
+            Expr::arg(0),
+        ]))),
         projection: stmt::Projection::single(5),
     });
 
@@ -360,7 +377,10 @@ fn merge_column_wins_over_inferred() {
 // ============================================================================
 
 /// Build an InsertTarget::Table for the named table in the schema.
-fn insert_target(schema: &toasty_core::Schema, table_name: &str) -> stmt::InsertTarget {
+fn insert_target(
+    schema: &toasty_core::Schema,
+    table_name: &str,
+) -> stmt::InsertTarget {
     let table = schema
         .db
         .tables
@@ -466,12 +486,14 @@ fn static_value_in_insert_row_is_not_extracted() {
 
     let mut stmt = stmt::Statement::Insert(stmt::Insert {
         target: insert_target(&schema, "items"),
-        source: stmt::Query::values(stmt::Values::new(vec![Expr::Record(stmt::ExprRecord {
-            fields: vec![
-                Expr::Static(Value::from("static-key")),
-                Expr::Value(Value::from("user-name")),
-            ],
-        })])),
+        source: stmt::Query::values(stmt::Values::new(vec![Expr::Record(
+            stmt::ExprRecord {
+                fields: vec![
+                    Expr::Static(Value::from("static-key")),
+                    Expr::Value(Value::from("user-name")),
+                ],
+            },
+        )])),
         upsert: None,
         returning: None,
     });

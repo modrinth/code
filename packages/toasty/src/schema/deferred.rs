@@ -139,7 +139,10 @@ impl<T: Load<Output = T>> Load for Deferred<T> {
         }
     }
 
-    fn reload(target: &mut Self, value: toasty_core::stmt::Value) -> crate::Result<()> {
+    fn reload(
+        target: &mut Self,
+        value: toasty_core::stmt::Value,
+    ) -> crate::Result<()> {
         // The caller already supplied the value as part of the update, so the
         // field becomes loaded regardless of its prior state — no follow-up
         // fetch is needed to read what was just written.
@@ -153,7 +156,8 @@ impl<T: Load<Output = T>> Load for Deferred<T> {
 }
 
 impl<T: Field> Field for Deferred<T> {
-    const REQUIRES_EXPLICIT_COLUMN_TYPE: bool = T::REQUIRES_EXPLICIT_COLUMN_TYPE;
+    const REQUIRES_EXPLICIT_COLUMN_TYPE: bool =
+        T::REQUIRES_EXPLICIT_COLUMN_TYPE;
 
     type ExprTarget = T::ExprTarget;
     type Path<Origin> = T::Path<Origin>;
@@ -163,7 +167,9 @@ impl<T: Field> Field for Deferred<T> {
     const NULLABLE: bool = T::NULLABLE;
     const DEFERRED: bool = true;
 
-    fn new_path<Origin>(path: stmt::Path<Origin, T::ExprTarget>) -> Self::Path<Origin> {
+    fn new_path<Origin>(
+        path: stmt::Path<Origin, T::ExprTarget>,
+    ) -> Self::Path<Origin> {
         T::new_path(path)
     }
 
@@ -186,7 +192,10 @@ impl<T: Field> Field for Deferred<T> {
         T::field_ty(storage_ty)
     }
 
-    fn key_constraint<Origin>(&self, _target: stmt::Path<Origin, Self::Inner>) -> Expr<bool> {
+    fn key_constraint<Origin>(
+        &self,
+        _target: stmt::Path<Origin, Self::Inner>,
+    ) -> Expr<bool> {
         // Foreign keys cannot reference a deferred field.
         unreachable!("Deferred fields cannot be used as foreign keys")
     }
@@ -225,7 +234,9 @@ impl<T: serde_core::Serialize> serde_core::Serialize for Deferred<T> {
 /// transparent [`Serialize`](serde_core::Serialize) impl above. An absent field
 /// is left unloaded, but only via `#[serde(default)]`; see the type-level docs.
 #[cfg(feature = "serde")]
-impl<'de, T: serde_core::Deserialize<'de>> serde_core::Deserialize<'de> for Deferred<T> {
+impl<'de, T: serde_core::Deserialize<'de>> serde_core::Deserialize<'de>
+    for Deferred<T>
+{
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde_core::Deserializer<'de>,

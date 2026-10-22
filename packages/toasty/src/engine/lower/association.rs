@@ -31,7 +31,10 @@ impl<'a> RewriteVia<'a> {
         self.cx.schema()
     }
 
-    fn scope<'scope>(&'scope self, target: impl IntoExprTarget<'scope>) -> RewriteVia<'scope> {
+    fn scope<'scope>(
+        &'scope self,
+        target: impl IntoExprTarget<'scope>,
+    ) -> RewriteVia<'scope> {
         RewriteVia {
             cx: self.cx.scope(target),
         }
@@ -80,20 +83,22 @@ impl<'a> RewriteVia<'a> {
             // A model-terminal via has `terminal == None` — its source already
             // selects whole target records — so this is a no-op there.
             let scalar_terminal =
-                self.schema()
-                    .app
-                    .resolve_field_path(&via.path)
-                    .and_then(|field| match &field.ty {
-                        app::FieldTy::Via(v) => v.terminal.map(|terminal| (v.target, terminal)),
+                self.schema().app.resolve_field_path(&via.path).and_then(
+                    |field| match &field.ty {
+                        app::FieldTy::Via(v) => {
+                            v.terminal.map(|terminal| (v.target, terminal))
+                        }
                         _ => None,
-                    });
+                    },
+                );
 
             if let Some((target, _)) = scalar_terminal {
                 model.id = target;
             }
             if let Some((target, terminal)) = scalar_terminal {
-                select.returning =
-                    stmt::Returning::Project(stmt::Path::field(target, terminal).into_stmt());
+                select.returning = stmt::Returning::Project(
+                    stmt::Path::field(target, terminal).into_stmt(),
+                );
             }
 
             // Create a new scope to indicate we are operating in the
@@ -126,7 +131,9 @@ impl<'a> RewriteVia<'a> {
         // source query itself.
         self.visit_stmt_query_mut(&mut association.source);
 
-        let Some(field) = self.schema().app.resolve_field_path(&association.path) else {
+        let Some(field) =
+            self.schema().app.resolve_field_path(&association.path)
+        else {
             todo!()
         };
 
@@ -151,7 +158,8 @@ impl<'a> RewriteVia<'a> {
     /// Returns an association whose path contains one direct relation step.
     fn unfold_path(&self, association: stmt::Association) -> stmt::Association {
         let stmt::Association { source, path } = association;
-        let source_model_id = source.body.as_select_unwrap().source.model_id_unwrap();
+        let source_model_id =
+            source.body.as_select_unwrap().source.model_id_unwrap();
         let fields = super::relation_path::flatten_relation_path(
             self.schema(),
             source_model_id,
@@ -210,11 +218,18 @@ impl<'a> RewriteVia<'a> {
         // <fk.source...> FROM <source>)` — a single field reference on each
         // side for single-column FKs, a record of references for composite
         // FKs (lowered to a tuple-style IN by the SQL serializer).
-        let target = super::key_field_refs(0, rel.foreign_key.fields.iter().map(|fk| fk.target));
-        let returning = super::key_field_refs(0, rel.foreign_key.fields.iter().map(|fk| fk.source));
+        let target = super::key_field_refs(
+            0,
+            rel.foreign_key.fields.iter().map(|fk| fk.target),
+        );
+        let returning = super::key_field_refs(
+            0,
+            rel.foreign_key.fields.iter().map(|fk| fk.source),
+        );
 
         let mut source = *association.source;
-        source.body.as_select_mut_unwrap().returning = stmt::Returning::Project(returning);
+        source.body.as_select_mut_unwrap().returning =
+            stmt::Returning::Project(returning);
 
         stmt::Expr::in_subquery(target, source).into()
     }

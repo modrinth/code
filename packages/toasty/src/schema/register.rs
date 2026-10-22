@@ -29,7 +29,10 @@ pub struct DiscoverItem {
 }
 
 impl DiscoverItem {
-    pub const fn new(crate_name: &'static str, add_fn: fn(&mut ModelSet)) -> Self {
+    pub const fn new(
+        crate_name: &'static str,
+        add_fn: fn(&mut ModelSet),
+    ) -> Self {
         Self { crate_name, add_fn }
     }
 

@@ -30,26 +30,44 @@ impl Operation {
             Operation::Eval(m) => match m.row_input {
                 Some(row_input) => [(row_input, Always)]
                     .into_iter()
-                    .chain(m.inputs.iter().map(|&input| (input, PerRowOf(row_input))))
+                    .chain(
+                        m.inputs
+                            .iter()
+                            .map(|&input| (input, PerRowOf(row_input))),
+                    )
                     .collect(),
                 None => m.inputs.iter().map(|&input| (input, Always)).collect(),
             },
-            Operation::ExecStatement(m) => m.inputs.iter().map(|&i| (i, Always)).collect(),
+            Operation::ExecStatement(m) => {
+                m.inputs.iter().map(|&i| (i, Always)).collect()
+            }
             Operation::Filter(m) => [(m.input, Always)]
                 .into_iter()
                 .chain(m.args.iter().map(|&a| (a, Always)))
                 .collect(),
-            Operation::FindPkByIndex(m) => m.inputs.iter().map(|&i| (i, Always)).collect(),
+            Operation::FindPkByIndex(m) => {
+                m.inputs.iter().map(|&i| (i, Always)).collect()
+            }
             Operation::GetByKey(m) => vec![(m.input, Always)],
-            Operation::NestedMerge(m) => m.inputs.iter().map(|&i| (i, Always)).collect(),
-            Operation::ReadModifyWrite(m) => m.inputs.iter().map(|&i| (i, Always)).collect(),
+            Operation::NestedMerge(m) => {
+                m.inputs.iter().map(|&i| (i, Always)).collect()
+            }
+            Operation::ReadModifyWrite(m) => {
+                m.inputs.iter().map(|&i| (i, Always)).collect()
+            }
             // The input's cardinality is observed, so the read is
             // unconditional even though no row data is used.
             Operation::Repeat(m) => vec![(m.input, Always)],
-            Operation::QueryPk(m) => m.input.into_iter().map(|i| (i, Always)).collect(),
-            Operation::Scan(m) => m.input.into_iter().map(|i| (i, Always)).collect(),
+            Operation::QueryPk(m) => {
+                m.input.into_iter().map(|i| (i, Always)).collect()
+            }
+            Operation::Scan(m) => {
+                m.input.into_iter().map(|i| (i, Always)).collect()
+            }
             Operation::UpdateByKey(m) => vec![(m.input, Always)],
-            Operation::Upsert(m) => m.inputs.iter().map(|&i| (i, Always)).collect(),
+            Operation::Upsert(m) => {
+                m.inputs.iter().map(|&i| (i, Always)).collect()
+            }
         }
     }
 

@@ -32,7 +32,10 @@ struct Normalize<'a> {
 }
 
 impl Engine {
-    pub(super) fn normalize_stmt(&self, stmt: &mut stmt::Statement) -> Result<()> {
+    pub(super) fn normalize_stmt(
+        &self,
+        stmt: &mut stmt::Statement,
+    ) -> Result<()> {
         let mut normalize = Normalize {
             schema: &self.schema,
             capability: self.capability,
@@ -87,7 +90,9 @@ impl VisitMut for Normalize<'_> {
     fn visit_stmt_query_mut(&mut self, query: &mut stmt::Query) {
         self.normalize_cursor_order(query);
         if self.error.is_none() {
-            self.scoped(|this| stmt::visit_mut::visit_stmt_query_mut(this, query));
+            self.scoped(|this| {
+                stmt::visit_mut::visit_stmt_query_mut(this, query)
+            });
         }
     }
 }

@@ -5,8 +5,8 @@ use toasty_core::{
     driver::Capability,
     schema::{Builder, app, app::FieldId, app::ModelId},
     stmt::{
-        self, Association, Expr, ExprContext, ExprInSubquery, Path, Projection, Query, Returning,
-        SourceModel, Value,
+        self, Association, Expr, ExprContext, ExprInSubquery, Path, Projection,
+        Query, Returning, SourceModel, Value,
     },
 };
 
@@ -45,8 +45,9 @@ struct UserPostSchema {
 
 impl UserPostSchema {
     fn new() -> Self {
-        let app_schema = app::Schema::from_macro([User::schema(), Post::schema()])
-            .expect("schema should build from macro");
+        let app_schema =
+            app::Schema::from_macro([User::schema(), Post::schema()])
+                .expect("schema should build from macro");
 
         let schema = Builder::new()
             .build(app_schema, &Capability::SQLITE)
@@ -115,7 +116,8 @@ fn has_many_via_becomes_in_subquery() {
         path: Path::field(s.user_model, s.user_posts.index),
     };
 
-    let mut query = Query::new_select(s.post_model, Expr::Value(Value::Bool(true)));
+    let mut query =
+        Query::new_select(s.post_model, Expr::Value(Value::Bool(true)));
     if let stmt::ExprSet::Select(select) = &mut query.body
         && let stmt::Source::Model(model) = &mut select.source
     {
@@ -183,7 +185,8 @@ fn multi_step_via_unfolds_into_nested_in_subqueries() {
         path,
     };
 
-    let mut query = Query::new_select(s.user_model, Expr::Value(Value::Bool(true)));
+    let mut query =
+        Query::new_select(s.user_model, Expr::Value(Value::Bool(true)));
     if let stmt::ExprSet::Select(select) = &mut query.body
         && let stmt::Source::Model(model) = &mut select.source
     {
@@ -241,7 +244,8 @@ fn multi_step_via_unfolds_into_nested_in_subqueries() {
         &*inner_in_subquery.expr,
         Expr::Reference(stmt::ExprReference::Field { index, .. }) if *index == s.post_author.index
     ));
-    let stmt::ExprSet::Select(user_select) = &inner_in_subquery.query.body else {
+    let stmt::ExprSet::Select(user_select) = &inner_in_subquery.query.body
+    else {
         panic!("expected inner subquery body to be Select");
     };
     assert!(matches!(
@@ -253,7 +257,9 @@ fn multi_step_via_unfolds_into_nested_in_subqueries() {
 fn find_in_subquery(expr: &Expr) -> Option<&ExprInSubquery> {
     match expr {
         Expr::InSubquery(in_sub) => Some(in_sub),
-        Expr::BinaryOp(b) => find_in_subquery(&b.lhs).or_else(|| find_in_subquery(&b.rhs)),
+        Expr::BinaryOp(b) => {
+            find_in_subquery(&b.lhs).or_else(|| find_in_subquery(&b.rhs))
+        }
         Expr::And(and) => and.operands.iter().find_map(find_in_subquery),
         Expr::Or(or) => or.operands.iter().find_map(find_in_subquery),
         _ => None,

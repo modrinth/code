@@ -40,7 +40,9 @@ impl LowerStatement<'_, '_> {
         let model = self.model_unwrap();
         let single = match &model.fields[field_index].ty {
             app::FieldTy::Via(via) => via.is_one(),
-            _ => unreachable!("build_via_include_subquery called on non-via field"),
+            _ => unreachable!(
+                "build_via_include_subquery called on non-via field"
+            ),
         };
         let nullable = model.fields[field_index].nullable();
         let join = ViaJoin::resolve(schema, model.id, via);
@@ -51,8 +53,12 @@ impl LowerStatement<'_, '_> {
         // the parent's lowered key both here and in the `NestedMerge` group
         // key.
         let (link_field, parent_key_field) = join.link();
-        let link_col = model_level_column_expr(schema, link_field, join.slot(1));
-        let filter = stmt::Expr::eq(link_col.clone(), stmt::Expr::ref_field(1, parent_key_field));
+        let link_col =
+            model_level_column_expr(schema, link_field, join.slot(1));
+        let filter = stmt::Expr::eq(
+            link_col.clone(),
+            stmt::Expr::ref_field(1, parent_key_field),
+        );
 
         // RETURNING `[link_col, value]`. The link column lands in
         // `load_data_select_items` so the qualification resolves to a
@@ -93,7 +99,10 @@ impl LowerStatement<'_, '_> {
         if !single {
             // A `has_many` via yields a list, so map over it (`arg(0)` is the
             // item) and project the target out of each row.
-            return stmt::Expr::map(sub_expr, stmt::Expr::project(stmt::Expr::arg(0), [1usize]));
+            return stmt::Expr::map(
+                sub_expr,
+                stmt::Expr::project(stmt::Expr::arg(0), [1usize]),
+            );
         }
 
         // A single (`has_one`) via yields one `[link_key, target_record]`
@@ -102,7 +111,10 @@ impl LowerStatement<'_, '_> {
         // into `Null` would panic — so strip the link key only on the non-null
         // branch.
         if nullable {
-            super::map_nullable_single(sub_expr, stmt::Expr::project(stmt::Expr::arg(0), [1usize]))
+            super::map_nullable_single(
+                sub_expr,
+                stmt::Expr::project(stmt::Expr::arg(0), [1usize]),
+            )
         } else {
             stmt::Expr::project(sub_expr, [1usize])
         }
@@ -131,7 +143,11 @@ struct ViaJoin {
 }
 
 impl ViaJoin {
-    fn resolve(schema: &toasty_core::Schema, root: app::ModelId, via: &app::Via) -> ViaJoin {
+    fn resolve(
+        schema: &toasty_core::Schema,
+        root: app::ModelId,
+        via: &app::Via,
+    ) -> ViaJoin {
         // For a scalar terminal the path's last step is the projected field,
         // not a relation; the relation chain (which the JOIN walks) is
         // everything before it.
@@ -148,7 +164,8 @@ impl ViaJoin {
         models.push(root);
         for &field_id in &steps {
             debug_assert_eq!(field_id.model, *models.last().unwrap());
-            models.push(schema.app.field(field_id).relation_target_id().unwrap());
+            models
+                .push(schema.app.field(field_id).relation_target_id().unwrap());
             edges.push(Edge::resolve(schema, field_id));
         }
 
@@ -185,7 +202,9 @@ impl ViaJoin {
         // toward the root. `edges[pos]` joins this intermediate (`models[pos]`)
         // to its already-placed neighbour (`models[pos + 1]`).
         for pos in (1..self.edges.len()).rev() {
-            tables.push(stmt::TableRef::Table(schema.table_id_for(self.models[pos])));
+            tables.push(stmt::TableRef::Table(
+                schema.table_id_for(self.models[pos]),
+            ));
 
             let edge = &self.edges[pos];
             joins.push(stmt::Join {
@@ -263,7 +282,10 @@ struct SingleColumnFk<'a> {
     newtype_depth: usize,
 }
 
-fn single_column_fk(schema: &toasty_core::Schema, field_id: app::FieldId) -> SingleColumnFk<'_> {
+fn single_column_fk(
+    schema: &toasty_core::Schema,
+    field_id: app::FieldId,
+) -> SingleColumnFk<'_> {
     fn resolve(field: &mapping::Field) -> Option<SingleColumnFk<'_>> {
         match field {
             mapping::Field::Primitive(primitive) => Some(SingleColumnFk {
@@ -297,7 +319,11 @@ fn single_column_fk(schema: &toasty_core::Schema, field_id: app::FieldId) -> Sin
 /// A raw (storage-level) column reference at table `slot` for a FK field.
 /// Used in JOIN constraints, which compare stored values directly and so need
 /// no storage→model cast.
-fn raw_column(schema: &toasty_core::Schema, slot: usize, field_id: app::FieldId) -> stmt::Expr {
+fn raw_column(
+    schema: &toasty_core::Schema,
+    slot: usize,
+    field_id: app::FieldId,
+) -> stmt::Expr {
     stmt::Expr::column(stmt::ExprReference::column(
         slot,
         single_column_fk(schema, field_id).primitive.column.index,

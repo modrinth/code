@@ -8,7 +8,11 @@ use toasty_core::stmt::{self, BinaryOp, Expr};
 /// decomposition, match elimination, derived-column null check, relation
 /// path lifting) live in `simplify/expr_binary_op.rs` and run after this
 /// fold pass on canonical input.
-pub(super) fn fold_expr_binary_op(op: BinaryOp, lhs: &mut Expr, rhs: &mut Expr) -> Option<Expr> {
+pub(super) fn fold_expr_binary_op(
+    op: BinaryOp,
+    lhs: &mut Expr,
+    rhs: &mut Expr,
+) -> Option<Expr> {
     match (&mut *lhs, &mut *rhs) {
         // Constant folding and null propagation:
         //
@@ -25,18 +29,14 @@ pub(super) fn fold_expr_binary_op(op: BinaryOp, lhs: &mut Expr, rhs: &mut Expr) 
             match op {
                 BinaryOp::Eq => Some((*lhs_val == *rhs_val).into()),
                 BinaryOp::Ne => Some((*lhs_val != *rhs_val).into()),
-                BinaryOp::Lt => {
-                    PartialOrd::partial_cmp(&*lhs_val, &*rhs_val).map(|o| o.is_lt().into())
-                }
-                BinaryOp::Le => {
-                    PartialOrd::partial_cmp(&*lhs_val, &*rhs_val).map(|o| o.is_le().into())
-                }
-                BinaryOp::Gt => {
-                    PartialOrd::partial_cmp(&*lhs_val, &*rhs_val).map(|o| o.is_gt().into())
-                }
-                BinaryOp::Ge => {
-                    PartialOrd::partial_cmp(&*lhs_val, &*rhs_val).map(|o| o.is_ge().into())
-                }
+                BinaryOp::Lt => PartialOrd::partial_cmp(&*lhs_val, &*rhs_val)
+                    .map(|o| o.is_lt().into()),
+                BinaryOp::Le => PartialOrd::partial_cmp(&*lhs_val, &*rhs_val)
+                    .map(|o| o.is_le().into()),
+                BinaryOp::Gt => PartialOrd::partial_cmp(&*lhs_val, &*rhs_val)
+                    .map(|o| o.is_gt().into()),
+                BinaryOp::Ge => PartialOrd::partial_cmp(&*lhs_val, &*rhs_val)
+                    .map(|o| o.is_ge().into()),
                 BinaryOp::Add => lhs_val.checked_add(rhs_val).map(Expr::from),
                 BinaryOp::Sub => lhs_val.checked_sub(rhs_val).map(Expr::from),
             }
@@ -47,7 +47,8 @@ pub(super) fn fold_expr_binary_op(op: BinaryOp, lhs: &mut Expr, rhs: &mut Expr) 
         //  - `x = false` → `not(x)`
         //  - `x != true` → `not(x)`
         //  - `x != false` → `x`
-        (expr, Expr::Value(stmt::Value::Bool(b))) | (Expr::Value(stmt::Value::Bool(b)), expr)
+        (expr, Expr::Value(stmt::Value::Bool(b)))
+        | (Expr::Value(stmt::Value::Bool(b)), expr)
             if op.is_eq() || op.is_ne() =>
         {
             let is_eq_true = (op.is_eq() && *b) || (op.is_ne() && !*b);
@@ -59,9 +60,8 @@ pub(super) fn fold_expr_binary_op(op: BinaryOp, lhs: &mut Expr, rhs: &mut Expr) 
         }
         // Null propagation: `expr <op> null` → `null` (and symmetric).
         // SQL three-valued logic: any comparison with NULL yields NULL.
-        (_, Expr::Value(stmt::Value::Null)) | (Expr::Value(stmt::Value::Null), _) => {
-            Some(Expr::null())
-        }
+        (_, Expr::Value(stmt::Value::Null))
+        | (Expr::Value(stmt::Value::Null), _) => Some(Expr::null()),
         // Canonicalization, `literal <op> col` → `col <op_commuted> literal`.
         // Heavyweight rules can then assume the literal (when present) is on
         // the right. Non-commutative ops (e.g. `Sub`) are left in place.

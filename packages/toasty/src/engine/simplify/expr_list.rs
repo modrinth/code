@@ -5,12 +5,18 @@ impl Simplify<'_> {
     /// Heavyweight `List` rewrites. Cheap canonicalization (collapsing a
     /// list of literal values into `Value::List`) runs in
     /// `fold::expr_list` before this is reached.
-    pub(super) fn simplify_expr_list(&mut self, expr: &mut stmt::ExprList) -> Option<stmt::Expr> {
+    pub(super) fn simplify_expr_list(
+        &mut self,
+        expr: &mut stmt::ExprList,
+    ) -> Option<stmt::Expr> {
         self.simplify_expr_list_insert_stmt(expr)
     }
 
     // TODO: rewrite this
-    fn simplify_expr_list_insert_stmt(&mut self, expr: &mut stmt::ExprList) -> Option<stmt::Expr> {
+    fn simplify_expr_list_insert_stmt(
+        &mut self,
+        expr: &mut stmt::ExprList,
+    ) -> Option<stmt::Expr> {
         // Check if all items are Expr::Stmt with single-row Insert statements
         for item in &expr.items {
             let stmt::Expr::Stmt(expr_stmt) = item else {

@@ -61,9 +61,15 @@ impl LowerStatement<'_, '_> {
 
             if is_insert {
                 record[field.id.index] = match field.ty {
-                    FieldTy::Has(ref rel) if rel.is_many() => stmt::Expr::list_from_vec(vec![]),
-                    FieldTy::Via(ref via) if via.is_many() => stmt::Expr::list_from_vec(vec![]),
-                    FieldTy::Has(_) | FieldTy::Via(_) | FieldTy::BelongsTo(_) => stmt::Expr::null(),
+                    FieldTy::Has(ref rel) if rel.is_many() => {
+                        stmt::Expr::list_from_vec(vec![])
+                    }
+                    FieldTy::Via(ref via) if via.is_many() => {
+                        stmt::Expr::list_from_vec(vec![])
+                    }
+                    FieldTy::Has(_)
+                    | FieldTy::Via(_)
+                    | FieldTy::BelongsTo(_) => stmt::Expr::null(),
                     _ => unreachable!(),
                 };
                 continue;
@@ -145,13 +151,15 @@ impl LowerStatement<'_, '_> {
     ) {
         match returning {
             stmt::Returning::Project(project) => {
-                if let Some(xformed_returning) =
-                    self.constantize_insert_returning_projection(project, source)
+                if let Some(xformed_returning) = self
+                    .constantize_insert_returning_projection(project, source)
                 {
                     *returning = xformed_returning;
                 }
             }
-            stmt::Returning::Expr(expr) => self.constantize_insert_returning_expr(expr, source),
+            stmt::Returning::Expr(expr) => {
+                self.constantize_insert_returning_expr(expr, source)
+            }
             _ => {}
         }
     }
@@ -191,7 +199,10 @@ impl LowerStatement<'_, '_> {
         let mut all_const = true; // Track if ALL referenced columns are constant
 
         stmt::visit::for_each_expr(project, |expr| {
-            if let stmt::Expr::Reference(stmt::ExprReference::Column(expr_column)) = expr {
+            if let stmt::Expr::Reference(stmt::ExprReference::Column(
+                expr_column,
+            )) = expr
+            {
                 assert!(expr_column.nesting == 0, "TODO");
 
                 // Skip if we've already analyzed this column
@@ -287,9 +298,14 @@ impl LowerStatement<'_, '_> {
             // Replace stable column references with their actual expressions.
 
             stmt::visit_mut::for_each_expr_mut(project, |expr| {
-                if let stmt::Expr::Reference(stmt::ExprReference::Column(expr_column)) = expr {
+                if let stmt::Expr::Reference(stmt::ExprReference::Column(
+                    expr_column,
+                )) = expr
+                {
                     // If this column has a stable expression across all rows, inline it
-                    if let Some(new_expr) = columns_are_stable_and_equal[&*expr_column] {
+                    if let Some(new_expr) =
+                        columns_are_stable_and_equal[&*expr_column]
+                    {
                         *expr = new_expr.clone();
                     }
                 }
@@ -299,7 +315,11 @@ impl LowerStatement<'_, '_> {
         }
     }
 
-    fn constantize_insert_returning_expr(&self, expr: &mut stmt::Expr, source: &stmt::Query) {
+    fn constantize_insert_returning_expr(
+        &self,
+        expr: &mut stmt::Expr,
+        source: &stmt::Query,
+    ) {
         // Only handle INSERT with VALUES (not INSERT from SELECT, etc.)
         let stmt::ExprSet::Values(values) = &source.body else {
             return;
@@ -323,7 +343,8 @@ impl LowerStatement<'_, '_> {
                 expr_reference: &stmt::ExprReference,
                 projection: &stmt::Projection,
             ) -> Option<stmt::Expr> {
-                let stmt::ExprReference::Column(expr_column) = expr_reference else {
+                let stmt::ExprReference::Column(expr_column) = expr_reference
+                else {
                     return None;
                 };
 
@@ -400,7 +421,11 @@ impl stmt::Input for ConstantizeReturning<'_> {
         expr_reference: &stmt::ExprReference,
         projection: &stmt::Projection,
     ) -> Option<stmt::Expr> {
-        debug_assert_eq!(0, expr_reference.as_expr_column_unwrap().nesting, "TODO");
+        debug_assert_eq!(
+            0,
+            expr_reference.as_expr_column_unwrap().nesting,
+            "TODO"
+        );
 
         let needle = self
             .cx
@@ -409,7 +434,8 @@ impl stmt::Input for ConstantizeReturning<'_> {
 
         match self.source {
             ConstantizeSource::InsertValues { values, columns } => {
-                let index = columns.iter().position(|column| needle.id == *column)?;
+                let index =
+                    columns.iter().position(|column| needle.id == *column)?;
                 match values {
                     stmt::Expr::Record(row) => {
                         Some(row[index].entry(projection).unwrap().to_expr())
@@ -424,7 +450,10 @@ impl stmt::Input for ConstantizeReturning<'_> {
                 if let Some(assignment) = assignments.get(&[needle.id.index]) {
                     match assignment {
                         stmt::Assignment::Set(expr) => {
-                            assert!(expr.is_const(), "TODO; assignment={assignment:#?}");
+                            assert!(
+                                expr.is_const(),
+                                "TODO; assignment={assignment:#?}"
+                            );
                             Some(expr.clone())
                         }
                         // Relative mutations update a column from its

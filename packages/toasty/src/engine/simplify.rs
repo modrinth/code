@@ -73,9 +73,11 @@ impl VisitMut for Simplify<'_> {
         let maybe_expr = match i {
             Expr::Any(expr) => self.simplify_expr_any(expr),
             Expr::And(expr) => self.simplify_expr_and(expr),
-            Expr::BinaryOp(expr) => {
-                self.simplify_expr_binary_op(expr.op, &mut expr.lhs, &mut expr.rhs)
-            }
+            Expr::BinaryOp(expr) => self.simplify_expr_binary_op(
+                expr.op,
+                &mut expr.lhs,
+                &mut expr.rhs,
+            ),
             Expr::Cast(expr) => self.simplify_expr_cast(expr),
             Expr::Exists(expr) => self.simplify_expr_exists(expr),
             Expr::InList(expr) => self.simplify_expr_in_list(expr),
@@ -128,10 +130,14 @@ impl VisitMut for Simplify<'_> {
 
     fn visit_expr_set_mut(&mut self, i: &mut stmt::ExprSet) {
         match i {
-            stmt::ExprSet::SetOp(expr_set_op) if expr_set_op.operands.is_empty() => {
+            stmt::ExprSet::SetOp(expr_set_op)
+                if expr_set_op.operands.is_empty() =>
+            {
                 todo!("is there anything we do here?");
             }
-            stmt::ExprSet::SetOp(expr_set_op) if expr_set_op.operands.len() == 1 => {
+            stmt::ExprSet::SetOp(expr_set_op)
+                if expr_set_op.operands.len() == 1 =>
+            {
                 let operand = expr_set_op.operands.drain(..).next().unwrap();
                 *i = operand;
             }
@@ -200,7 +206,9 @@ impl VisitMut for Simplify<'_> {
         // the (still table-list-bearing) source while simplifying the join
         // constraint expressions, then put them back.
         let from = match source {
-            stmt::Source::Table(table) if table.from.iter().any(|twj| !twj.joins.is_empty()) => {
+            stmt::Source::Table(table)
+                if table.from.iter().any(|twj| !twj.joins.is_empty()) =>
+            {
                 Some(std::mem::take(&mut table.from))
             }
             _ => None,
@@ -211,8 +219,8 @@ impl VisitMut for Simplify<'_> {
                 let mut scoped = self.scope(&*source);
                 for twj in &mut from {
                     for join in &mut twj.joins {
-                        let (stmt::JoinOp::Inner(expr) | stmt::JoinOp::Left(expr)) =
-                            &mut join.constraint;
+                        let (stmt::JoinOp::Inner(expr)
+                        | stmt::JoinOp::Left(expr)) = &mut join.constraint;
                         scoped.visit_expr_mut(expr);
                     }
                 }
@@ -270,7 +278,10 @@ impl<'a> Simplify<'a> {
         Simplify::with_context(stmt::ExprContext::new(schema), capability)
     }
 
-    pub(crate) fn with_context(cx: stmt::ExprContext<'a>, capability: &'a Capability) -> Self {
+    pub(crate) fn with_context(
+        cx: stmt::ExprContext<'a>,
+        capability: &'a Capability,
+    ) -> Self {
         Simplify {
             cx,
             capability,
@@ -292,25 +303,34 @@ impl<'a> Simplify<'a> {
     }
 
     /// Returns the source model
-    fn flatten_nested_unions(expr_set_op: &mut stmt::ExprSetOp, operands: &mut Vec<stmt::ExprSet>) {
+    fn flatten_nested_unions(
+        expr_set_op: &mut stmt::ExprSetOp,
+        operands: &mut Vec<stmt::ExprSet>,
+    ) {
         assert!(expr_set_op.is_union());
 
         for expr_set in &mut expr_set_op.operands {
             match expr_set {
-                stmt::ExprSet::SetOp(nested_set_op) if nested_set_op.is_union() => {
+                stmt::ExprSet::SetOp(nested_set_op)
+                    if nested_set_op.is_union() =>
+                {
                     Self::flatten_nested_unions(nested_set_op, operands)
                 }
                 // Just drop empty values
                 stmt::ExprSet::Values(values) if values.is_empty() => {}
                 stmt::ExprSet::Select(select) => {
-                    if let Some(stmt::ExprSet::Select(tail)) = operands.last_mut() {
+                    if let Some(stmt::ExprSet::Select(tail)) =
+                        operands.last_mut()
+                    {
                         todo!("merge select={:#?} tail={:#?}", select, tail);
                     }
 
                     operands.push(std::mem::take(expr_set));
                 }
                 stmt::ExprSet::Values(values) => {
-                    if let Some(stmt::ExprSet::Values(tail)) = operands.last_mut() {
+                    if let Some(stmt::ExprSet::Values(tail)) =
+                        operands.last_mut()
+                    {
                         tail.rows.append(&mut values.rows);
                         continue;
                     }

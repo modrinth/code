@@ -101,7 +101,10 @@ impl Builder {
     /// Set the maximum time to wait for a free connection from the pool
     /// before returning an error. Passing `None` disables the timeout,
     /// which is the default.
-    pub fn pool_wait_timeout(&mut self, timeout: Option<Duration>) -> &mut Self {
+    pub fn pool_wait_timeout(
+        &mut self,
+        timeout: Option<Duration>,
+    ) -> &mut Self {
         self.pool.timeouts.wait = timeout;
         self
     }
@@ -109,7 +112,10 @@ impl Builder {
     /// Set the maximum time allowed for establishing a new database
     /// connection. Passing `None` disables the timeout, which is the
     /// default.
-    pub fn pool_create_timeout(&mut self, timeout: Option<Duration>) -> &mut Self {
+    pub fn pool_create_timeout(
+        &mut self,
+        timeout: Option<Duration>,
+    ) -> &mut Self {
         self.pool.timeouts.create = timeout;
         self
     }
@@ -129,7 +135,10 @@ impl Builder {
     ///
     /// Defaults to `Some(60s)`. Pass `None` to disable the sweep and
     /// rely on passive error-driven recovery only.
-    pub fn pool_health_check_interval(&mut self, interval: Option<Duration>) -> &mut Self {
+    pub fn pool_health_check_interval(
+        &mut self,
+        interval: Option<Duration>,
+    ) -> &mut Self {
         self.pool.health_check_interval = interval;
         self
     }
@@ -171,7 +180,10 @@ impl Builder {
     /// (server, load balancer, NAT). 30 minutes works for most clouds.
     ///
     /// Defaults to `None` (no cap).
-    pub fn pool_max_connection_lifetime(&mut self, lifetime: Option<Duration>) -> &mut Self {
+    pub fn pool_max_connection_lifetime(
+        &mut self,
+        lifetime: Option<Duration>,
+    ) -> &mut Self {
         self.pool.max_connection_lifetime = lifetime;
         self
     }
@@ -194,7 +206,10 @@ impl Builder {
     /// queries surface in production logs without enabling debug output.
     ///
     /// Defaults to `Some(1s)`. Pass `None` to disable the escalation.
-    pub fn slow_statement_threshold(&mut self, threshold: Option<Duration>) -> &mut Self {
+    pub fn slow_statement_threshold(
+        &mut self,
+        threshold: Option<Duration>,
+    ) -> &mut Self {
         self.pool.query_log.slow_statement_threshold = threshold;
         self
     }
@@ -209,7 +224,10 @@ impl Builder {
     /// Checked in `recycle`, not in the background.
     ///
     /// Defaults to `None` (no cap).
-    pub fn pool_max_connection_idle_time(&mut self, idle: Option<Duration>) -> &mut Self {
+    pub fn pool_max_connection_idle_time(
+        &mut self,
+        idle: Option<Duration>,
+    ) -> &mut Self {
         self.pool.max_connection_idle_time = idle;
         self
     }
@@ -293,7 +311,10 @@ impl Builder {
         capability.validate()?;
         let schema = self.core.build(self.build_app_schema()?, capability)?;
 
-        tracing::info!(tables = schema.db.tables.len(), "schema built successfully");
+        tracing::info!(
+            tables = schema.db.tables.len(),
+            "schema built successfully"
+        );
 
         let engine = Engine::new(Arc::new(schema), capability);
         let pool = Pool::new(driver, engine.clone(), self.pool.clone())?;

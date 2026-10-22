@@ -114,7 +114,11 @@ impl<T> Update<T> {
     /// let mut update = Update::<List<User>>::new(Query::<List<User>>::all());
     /// update.set(1, toasty_core::stmt::Value::from("Bob"));
     /// ```
-    pub fn set(&mut self, field: impl Into<stmt::Projection>, expr: impl Into<stmt::Expr>) {
+    pub fn set(
+        &mut self,
+        field: impl Into<stmt::Projection>,
+        expr: impl Into<stmt::Expr>,
+    ) {
         self.untyped.assignments.set(field, expr);
     }
 

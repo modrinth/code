@@ -103,7 +103,9 @@ fn pk_lt_column_on_rhs_commutes_to_gt() -> Result<()> {
             stmt::Expr::BinaryOp(stmt::ExprBinaryOp {
                 lhs: Box::new(stmt::Expr::Value(stmt::Value::from(10i64))),
                 op: stmt::BinaryOp::Lt,
-                rhs: Box::new(stmt::Expr::Reference(stmt::ExprReference::column(0, 1))),
+                rhs: Box::new(stmt::Expr::Reference(
+                    stmt::ExprReference::column(0, 1),
+                )),
             }),
         ],
     });
@@ -124,7 +126,9 @@ fn pk_lt_column_on_rhs_commutes_to_gt() -> Result<()> {
                 stmt::Expr::Value(stmt::Value::String("a".to_string())),
             ),
             stmt::Expr::BinaryOp(stmt::ExprBinaryOp {
-                lhs: Box::new(stmt::Expr::Reference(stmt::ExprReference::column(0, 1))),
+                lhs: Box::new(stmt::Expr::Reference(
+                    stmt::ExprReference::column(0, 1),
+                )),
                 op: stmt::BinaryOp::Gt,
                 rhs: Box::new(stmt::Expr::Value(stmt::Value::from(10i64))),
             }),
@@ -305,9 +309,9 @@ fn pk_equality_sets_key_values() -> Result<()> {
 
     let plan = cx.plan_basic_query_with_filter(filter)?;
 
-    let expected = stmt::Value::List(vec![stmt::Value::Record(stmt::ValueRecord::from_vec(
-        vec![stmt::Value::from(1i64)],
-    ))]);
+    let expected = stmt::Value::List(vec![stmt::Value::Record(
+        stmt::ValueRecord::from_vec(vec![stmt::Value::from(1i64)]),
+    )]);
     assert_eq!(plan.key_values, Some(stmt::Expr::Value(expected)));
     Ok(())
 }
@@ -332,8 +336,11 @@ fn pk_or_sets_key_values() -> Result<()> {
 
     let plan = cx.plan_basic_query_with_filter(filter)?;
 
-    let record =
-        |v: i64| stmt::Value::Record(stmt::ValueRecord::from_vec(vec![stmt::Value::from(v)]));
+    let record = |v: i64| {
+        stmt::Value::Record(stmt::ValueRecord::from_vec(vec![
+            stmt::Value::from(v),
+        ]))
+    };
     let expected = stmt::Value::List(vec![record(1), record(2)]);
     assert_eq!(plan.key_values, Some(stmt::Expr::Value(expected)));
     Ok(())
@@ -353,9 +360,13 @@ fn pk_range_does_not_set_key_values() -> Result<()> {
                 stmt::Expr::Value(stmt::Value::String("u1".to_string())),
             ),
             stmt::Expr::BinaryOp(stmt::ExprBinaryOp {
-                lhs: Box::new(stmt::Expr::Reference(stmt::ExprReference::column(0, 1))),
+                lhs: Box::new(stmt::Expr::Reference(
+                    stmt::ExprReference::column(0, 1),
+                )),
                 op: stmt::BinaryOp::Ge,
-                rhs: Box::new(stmt::Expr::Value(stmt::Value::String("s1".to_string()))),
+                rhs: Box::new(stmt::Expr::Value(stmt::Value::String(
+                    "s1".to_string(),
+                ))),
             }),
         ],
     });
@@ -387,12 +398,12 @@ fn composite_pk_full_equality_sets_key_values() -> Result<()> {
 
     let plan = cx.plan_basic_query_with_filter(filter)?;
 
-    let expected = stmt::Value::List(vec![stmt::Value::Record(stmt::ValueRecord::from_vec(
-        vec![
+    let expected = stmt::Value::List(vec![stmt::Value::Record(
+        stmt::ValueRecord::from_vec(vec![
             stmt::Value::String("u1".to_string()),
             stmt::Value::String("s1".to_string()),
-        ],
-    ))]);
+        ]),
+    )]);
     assert_eq!(plan.key_values, Some(stmt::Expr::Value(expected)));
     Ok(())
 }
@@ -469,7 +480,8 @@ fn composite_pk_or_sets_key_values() -> Result<()> {
             stmt::Value::String(status.to_string()),
         ]))
     };
-    let expected = stmt::Value::List(vec![record("u1", "s1"), record("u2", "s2")]);
+    let expected =
+        stmt::Value::List(vec![record("u1", "s1"), record("u2", "s2")]);
     assert_eq!(plan.key_values, Some(stmt::Expr::Value(expected)));
     Ok(())
 }
@@ -611,8 +623,8 @@ fn ddb_test_cx() -> TestCx {
 }
 
 fn ddb_test_cx_composite() -> TestCx {
-    let app_schema =
-        app::Schema::from_macro([Todo::schema()]).expect("schema should build from macro");
+    let app_schema = app::Schema::from_macro([Todo::schema()])
+        .expect("schema should build from macro");
     let schema = Builder::new()
         .build(app_schema, &Capability::DYNAMODB)
         .expect("schema should build");
@@ -623,8 +635,8 @@ fn ddb_test_cx_composite() -> TestCx {
 }
 
 fn sqlite_test_cx_ranked() -> TestCx {
-    let app_schema =
-        app::Schema::from_macro([Ranked::schema()]).expect("schema should build from macro");
+    let app_schema = app::Schema::from_macro([Ranked::schema()])
+        .expect("schema should build from macro");
     let schema = Builder::new()
         .build(app_schema, &Capability::SQLITE)
         .expect("schema should build");
@@ -635,8 +647,8 @@ fn sqlite_test_cx_ranked() -> TestCx {
 }
 
 fn test_cx_with_capability(capability: &'static Capability) -> TestCx {
-    let app_schema =
-        app::Schema::from_macro([User::schema()]).expect("schema should build from macro");
+    let app_schema = app::Schema::from_macro([User::schema()])
+        .expect("schema should build from macro");
     let schema = Builder::new()
         .build(app_schema, capability)
         .expect("schema should build");
@@ -658,7 +670,9 @@ impl TestCx {
         );
         stmt::Statement::Query(stmt::Query {
             with: None,
-            body: stmt::ExprSet::Select(Box::new(stmt::Select::new(source, filter))),
+            body: stmt::ExprSet::Select(Box::new(stmt::Select::new(
+                source, filter,
+            ))),
             single: false,
             order_by: None,
             limit: None,
@@ -666,9 +680,13 @@ impl TestCx {
         })
     }
 
-    fn plan_basic_query_with_filter(&self, filter: stmt::Expr) -> Result<IndexPlan<'_>> {
+    fn plan_basic_query_with_filter(
+        &self,
+        filter: stmt::Expr,
+    ) -> Result<IndexPlan<'_>> {
         let stmt = self.basic_query_with_filter(filter);
-        plan_index_path(&self.schema, self.capability, &stmt)
-            .map(|opt| opt.expect("test expects an index plan, not a scan fallback"))
+        plan_index_path(&self.schema, self.capability, &stmt).map(|opt| {
+            opt.expect("test expects an index plan, not a scan fallback")
+        })
     }
 }

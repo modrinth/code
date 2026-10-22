@@ -62,7 +62,10 @@ impl HirPlanner<'_> {
     /// - Nested level: todo rows filtered by user_id match, projected into a list
     ///
     /// Returns `None` if the statement has no sub-statements with `returning: true`.
-    pub(super) fn plan_nested_merge(&mut self, stmt_id: hir::StmtId) -> Option<mir::NodeId> {
+    pub(super) fn plan_nested_merge(
+        &mut self,
+        stmt_id: hir::StmtId,
+    ) -> Option<mir::NodeId> {
         let stmt_state = &self.hir[stmt_id];
 
         // Return if there is no nested merge to do
@@ -107,12 +110,21 @@ impl NestedMergePlanner<'_> {
         self.stack.pop();
 
         self.mir.insert_with_deps(
-            mir::NestedMerge::new(self.inputs, root, self.hash_indexes, self.sort_indexes),
+            mir::NestedMerge::new(
+                self.inputs,
+                root,
+                self.hash_indexes,
+                self.sort_indexes,
+            ),
             self.deps,
         )
     }
 
-    fn plan_nested_child(&mut self, stmt_id: hir::StmtId, depth: usize) -> NestedChild {
+    fn plan_nested_child(
+        &mut self,
+        stmt_id: hir::StmtId,
+        depth: usize,
+    ) -> NestedChild {
         self.stack.push(stmt_id);
 
         let level = self.plan_nested_level(stmt_id, depth);
@@ -121,36 +133,40 @@ impl NestedMergePlanner<'_> {
 
         let ret = match stmt_state.stmt.as_deref().unwrap() {
             stmt::Statement::Query(query) => {
-                let filter_expr = self.build_filter_for_nested_child(stmt_id, selection, depth);
+                let filter_expr = self
+                    .build_filter_for_nested_child(stmt_id, selection, depth);
 
                 let filter_arg_tys = self.build_filter_arg_tys();
-                let qualification = match try_eq_lookup(&filter_expr, &filter_arg_tys, depth) {
-                    Some((child_projections, lookup_key)) if query.single => {
-                        // has_one / belongs_to: unique key → HashIndex (O(1) lookup).
-                        let index = self.hash_indexes.len();
-                        self.hash_indexes.push(MergeIndex {
-                            source: level.source,
-                            child_projections,
-                        });
-                        MergeQualification::HashLookup { index, lookup_key }
-                    }
-                    Some((child_projections, lookup_key)) => {
-                        // has_many: duplicate keys → SortedIndex (O(log M + k) lookup).
-                        let index = self.sort_indexes.len();
-                        self.sort_indexes.push(MergeIndex {
-                            source: level.source,
-                            child_projections,
-                        });
-                        MergeQualification::SortLookup { index, lookup_key }
-                    }
-                    // Filter does not reduce to a pure equality conjunction, so we
-                    // cannot drive an index lookup. Fall back to a linear scan.
-                    // See `try_eq_lookup` for discussion of how this could be
-                    // improved to use an index with a residual post-filter.
-                    None => {
-                        MergeQualification::Scan(eval::Func::from_stmt(filter_expr, filter_arg_tys))
-                    }
-                };
+                let qualification =
+                    match try_eq_lookup(&filter_expr, &filter_arg_tys, depth) {
+                        Some((child_projections, lookup_key))
+                            if query.single =>
+                        {
+                            // has_one / belongs_to: unique key → HashIndex (O(1) lookup).
+                            let index = self.hash_indexes.len();
+                            self.hash_indexes.push(MergeIndex {
+                                source: level.source,
+                                child_projections,
+                            });
+                            MergeQualification::HashLookup { index, lookup_key }
+                        }
+                        Some((child_projections, lookup_key)) => {
+                            // has_many: duplicate keys → SortedIndex (O(log M + k) lookup).
+                            let index = self.sort_indexes.len();
+                            self.sort_indexes.push(MergeIndex {
+                                source: level.source,
+                                child_projections,
+                            });
+                            MergeQualification::SortLookup { index, lookup_key }
+                        }
+                        // Filter does not reduce to a pure equality conjunction, so we
+                        // cannot drive an index lookup. Fall back to a linear scan.
+                        // See `try_eq_lookup` for discussion of how this could be
+                        // improved to use an index with a residual post-filter.
+                        None => MergeQualification::Scan(
+                            eval::Func::from_stmt(filter_expr, filter_arg_tys),
+                        ),
+                    };
 
                 NestedChild {
                     level,
@@ -171,7 +187,11 @@ impl NestedMergePlanner<'_> {
         ret
     }
 
-    fn plan_nested_level(&mut self, stmt_id: hir::StmtId, depth: usize) -> NestedLevel {
+    fn plan_nested_level(
+        &mut self,
+        stmt_id: hir::StmtId,
+        depth: usize,
+    ) -> NestedLevel {
         let stmt_state = &self.hir[stmt_id];
         let stmt = stmt_state.stmt.as_deref().unwrap();
         let returning = stmt.returning_unwrap();
@@ -187,7 +207,12 @@ impl NestedMergePlanner<'_> {
                     .insert_full(stmt_state.load_data_statement.get().unwrap());
 
                 source = s;
-                self.build_projection_from_expr(stmt_id, expr, depth, &mut nested)
+                self.build_projection_from_expr(
+                    stmt_id,
+                    expr,
+                    depth,
+                    &mut nested,
+                )
             }
             _ => {
                 let node_id = stmt_state.output.get().unwrap();
@@ -219,9 +244,13 @@ impl NestedMergePlanner<'_> {
             .collect()
     }
 
-    fn build_projection_arg_tys(&self, nested_children: &[NestedChild]) -> Vec<stmt::Type> {
+    fn build_projection_arg_tys(
+        &self,
+        nested_children: &[NestedChild],
+    ) -> Vec<stmt::Type> {
         let curr = self.stack.last().unwrap();
-        let mut projection_arg_tys = vec![self.build_exec_statement_ty_for(*curr)];
+        let mut projection_arg_tys =
+            vec![self.build_exec_statement_ty_for(*curr)];
 
         for nested in nested_children {
             projection_arg_tys.push(if nested.single {
@@ -269,75 +298,101 @@ impl NestedMergePlanner<'_> {
         let selection = hir[stmt_id].load_data_select_items.get().unwrap();
         let mut projection = expr.clone();
 
-        visit_mut::walk_expr_scoped_mut(&mut projection, 0, |expr, scope_depth| match expr {
-            stmt::Expr::Arg(expr_arg) if expr_arg.nesting == scope_depth => {
-                let position = expr_arg.position;
-                let stmt_state = &hir[stmt_id];
+        visit_mut::walk_expr_scoped_mut(
+            &mut projection,
+            0,
+            |expr, scope_depth| match expr {
+                stmt::Expr::Arg(expr_arg)
+                    if expr_arg.nesting == scope_depth =>
+                {
+                    let position = expr_arg.position;
+                    let stmt_state = &hir[stmt_id];
 
-                match &stmt_state.args[position] {
-                    hir::Arg::Sub {
-                        stmt_id: child_stmt_id,
-                        ..
-                    } => {
-                        let child_stmt_id = *child_stmt_id;
-                        let child_stmt_state = &hir[child_stmt_id];
-                        let child_stmt = child_stmt_state.stmt.as_deref().unwrap();
-                        if let stmt::Statement::Query(query) = child_stmt
-                            && let stmt::ExprSet::Values(values) = &query.body
-                            && values.is_empty()
-                        {
-                            *expr = if query.single {
-                                stmt::Expr::null()
-                            } else {
-                                stmt::Expr::list_from_vec(vec![])
-                            };
-                            return false;
-                        }
-                        let child_returning = child_stmt.returning_unwrap();
+                    match &stmt_state.args[position] {
+                        hir::Arg::Sub {
+                            stmt_id: child_stmt_id,
+                            ..
+                        } => {
+                            let child_stmt_id = *child_stmt_id;
+                            let child_stmt_state = &hir[child_stmt_id];
+                            let child_stmt =
+                                child_stmt_state.stmt.as_deref().unwrap();
+                            if let stmt::Statement::Query(query) = child_stmt
+                                && let stmt::ExprSet::Values(values) =
+                                    &query.body
+                                && values.is_empty()
+                            {
+                                *expr = if query.single {
+                                    stmt::Expr::null()
+                                } else {
+                                    stmt::Expr::list_from_vec(vec![])
+                                };
+                                return false;
+                            }
+                            let child_returning = child_stmt.returning_unwrap();
 
-                        match child_returning {
-                            stmt::Returning::Expr(returning_expr) if returning_expr.is_const() => {
-                                match child_stmt {
-                                    stmt::Statement::Query(query) if query.single => {
-                                        let stmt::Expr::Value(v) = returning_expr else {
-                                            todo!()
-                                        };
-                                        assert!(!v.is_list());
+                            match child_returning {
+                                stmt::Returning::Expr(returning_expr)
+                                    if returning_expr.is_const() =>
+                                {
+                                    match child_stmt {
+                                        stmt::Statement::Query(query)
+                                            if query.single =>
+                                        {
+                                            let stmt::Expr::Value(v) =
+                                                returning_expr
+                                            else {
+                                                todo!()
+                                            };
+                                            assert!(!v.is_list());
+                                        }
+                                        stmt::Statement::Insert(insert)
+                                            if insert.source.single =>
+                                        {
+                                            let stmt::Expr::Value(v) =
+                                                returning_expr
+                                            else {
+                                                todo!()
+                                            };
+                                            assert!(!v.is_list());
+                                        }
+                                        _ => {}
                                     }
-                                    stmt::Statement::Insert(insert) if insert.source.single => {
-                                        let stmt::Expr::Value(v) = returning_expr else {
-                                            todo!()
-                                        };
-                                        assert!(!v.is_list());
-                                    }
-                                    _ => {}
+
+                                    self.deps.insert(
+                                        child_stmt_state
+                                            .load_data_statement
+                                            .get()
+                                            .unwrap(),
+                                    );
+                                    *expr = returning_expr.clone();
                                 }
+                                _ => {
+                                    let nested_child = self.plan_nested_child(
+                                        child_stmt_id,
+                                        depth + 1,
+                                    );
+                                    nested.push(nested_child);
 
-                                self.deps
-                                    .insert(child_stmt_state.load_data_statement.get().unwrap());
-                                *expr = returning_expr.clone();
-                            }
-                            _ => {
-                                let nested_child = self.plan_nested_child(child_stmt_id, depth + 1);
-                                nested.push(nested_child);
-
-                                *expr = stmt::Expr::arg(nested.len());
+                                    *expr = stmt::Expr::arg(nested.len());
+                                }
                             }
                         }
+                        hir::Arg::Ref { .. } => todo!(),
                     }
-                    hir::Arg::Ref { .. } => todo!(),
+                    false
                 }
-                false
-            }
-            stmt::Expr::Reference(expr_reference) => {
-                let expr_column = expr_reference.as_expr_column_unwrap();
-                debug_assert_eq!(0, expr_column.nesting);
-                let index = selection.get_index_of_expr_reference(*expr_column);
-                *expr = stmt::Expr::arg_project(0, [index]);
-                false
-            }
-            _ => true,
-        });
+                stmt::Expr::Reference(expr_reference) => {
+                    let expr_column = expr_reference.as_expr_column_unwrap();
+                    debug_assert_eq!(0, expr_column.nesting);
+                    let index =
+                        selection.get_index_of_expr_reference(*expr_column);
+                    *expr = stmt::Expr::arg_project(0, [index]);
+                    false
+                }
+                _ => true,
+            },
+        );
 
         let projection_arg_tys = self.build_projection_arg_tys(nested);
         eval::Func::from_stmt(projection, projection_arg_tys)
@@ -350,7 +405,8 @@ impl NestedMergePlanner<'_> {
         depth: usize,
     ) -> stmt::Expr {
         let stmt_state = &self.hir[stmt_id];
-        let stmt::Statement::Query(query) = stmt_state.stmt.as_deref().unwrap() else {
+        let stmt::Statement::Query(query) = stmt_state.stmt.as_deref().unwrap()
+        else {
             unreachable!()
         };
         let select = query.body.as_select_unwrap();
@@ -384,10 +440,14 @@ impl NestedMergePlanner<'_> {
                     .unwrap()
                     .get_index_of_expr_reference(*target_expr_ref);
 
-                *expr = stmt::Expr::arg_project(depth - *nesting, [target_exec_statement_index]);
+                *expr = stmt::Expr::arg_project(
+                    depth - *nesting,
+                    [target_exec_statement_index],
+                );
             }
             stmt::Expr::Reference(expr_reference) => {
-                let index = selection.get_index_of_expr_reference(*expr_reference);
+                let index =
+                    selection.get_index_of_expr_reference(*expr_reference);
                 *expr = stmt::Expr::arg_project(depth, [index]);
             }
             _ => {}
@@ -449,7 +509,8 @@ fn try_eq_lookup(
     let mut lookup_key_exprs = vec![];
 
     for (lhs, rhs) in eq_terms {
-        let (child_proj, parent_expr) = extract_child_parent_eq(lhs, rhs, depth)?;
+        let (child_proj, parent_expr) =
+            extract_child_parent_eq(lhs, rhs, depth)?;
         child_projections.push(child_proj);
         lookup_key_exprs.push(parent_expr);
     }
@@ -485,10 +546,14 @@ fn extract_child_parent_eq(
     depth: usize,
 ) -> Option<(stmt::Projection, stmt::Expr)> {
     match (as_simple_arg_project(lhs), as_simple_arg_project(rhs)) {
-        (Some((l_pos, l_proj)), Some((r_pos, _))) if l_pos == depth && r_pos < depth => {
+        (Some((l_pos, l_proj)), Some((r_pos, _)))
+            if l_pos == depth && r_pos < depth =>
+        {
             Some((l_proj.clone(), rhs.clone()))
         }
-        (Some((l_pos, _)), Some((r_pos, r_proj))) if r_pos == depth && l_pos < depth => {
+        (Some((l_pos, _)), Some((r_pos, r_proj)))
+            if r_pos == depth && l_pos < depth =>
+        {
             Some((r_proj.clone(), lhs.clone()))
         }
         _ => None,
@@ -497,10 +562,14 @@ fn extract_child_parent_eq(
 
 /// Match `Project(Arg { position, nesting: 0 }, projection)` and return
 /// `(position, &projection)`. Returns `None` for any other expression shape.
-fn as_simple_arg_project(expr: &stmt::Expr) -> Option<(usize, &stmt::Projection)> {
+fn as_simple_arg_project(
+    expr: &stmt::Expr,
+) -> Option<(usize, &stmt::Projection)> {
     match expr {
         stmt::Expr::Project(proj) => match proj.base.as_ref() {
-            stmt::Expr::Arg(arg) if arg.nesting == 0 => Some((arg.position, &proj.projection)),
+            stmt::Expr::Arg(arg) if arg.nesting == 0 => {
+                Some((arg.position, &proj.projection))
+            }
             _ => None,
         },
         _ => None,

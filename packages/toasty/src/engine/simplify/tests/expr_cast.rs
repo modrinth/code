@@ -1,6 +1,8 @@
 use super::test_schema_with;
 use crate::engine::simplify::Simplify;
-use toasty_core::stmt::{Expr, ExprCast, ExprReference, Type, Value, ValueObject};
+use toasty_core::stmt::{
+    Expr, ExprCast, ExprReference, Type, Value, ValueObject,
+};
 
 /// Schema fixture for the document-cast tests: a model with a `#[document]`
 /// embed, returning the schema and the embed's model-level type
@@ -40,7 +42,8 @@ fn document_schema() -> (toasty_core::Schema, Type) {
 #[test]
 fn document_lowering_cast_folds_to_named_object() {
     let (schema, profile_ty) = document_schema();
-    let simplify = Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
+    let simplify =
+        Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
 
     // `cast(("Alice", 30) as Object, from Model)` → `{name: "Alice", age: 30}`
     let mut expr = ExprCast {
@@ -68,16 +71,19 @@ fn document_lowering_cast_folds_to_named_object() {
 #[test]
 fn document_raising_cast_folds_to_positional_record() {
     let (schema, profile_ty) = document_schema();
-    let simplify = Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
+    let simplify =
+        Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
 
     // A wire object raises to the embed's positional record: an absent key
     // (`name`) decodes to Null, a key unknown to the schema is dropped.
     let mut expr = ExprCast {
         from: None,
-        expr: Box::new(Expr::Value(Value::Object(ValueObject::from_vec(vec![
-            ("age".to_owned(), Value::I64(30)),
-            ("unknown".to_owned(), Value::from("dropped")),
-        ])))),
+        expr: Box::new(Expr::Value(Value::Object(ValueObject::from_vec(
+            vec![
+                ("age".to_owned(), Value::I64(30)),
+                ("unknown".to_owned(), Value::from("dropped")),
+            ],
+        )))),
         ty: profile_ty,
     };
     let result = simplify.simplify_expr_cast(&mut expr);
@@ -94,10 +100,12 @@ fn document_raising_cast_folds_to_positional_record() {
 #[test]
 fn document_raising_cast_is_idempotent() {
     let (schema, profile_ty) = document_schema();
-    let simplify = Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
+    let simplify =
+        Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
 
     // An engine-computed positional record passes through the raising cast.
-    let record = Value::record_from_vec(vec![Value::from("Alice"), Value::I64(30)]);
+    let record =
+        Value::record_from_vec(vec![Value::from("Alice"), Value::I64(30)]);
     let mut expr = ExprCast {
         from: None,
         expr: Box::new(Expr::Value(record.clone())),
@@ -111,7 +119,8 @@ fn document_raising_cast_is_idempotent() {
 #[test]
 fn document_cast_on_non_const_kept() {
     let (schema, profile_ty) = document_schema();
-    let simplify = Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
+    let simplify =
+        Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
 
     // A non-constant operand cannot fold; the cast survives for a later,
     // post-substitution simplify.
@@ -140,7 +149,8 @@ fn redundant_cast_on_field_eliminated() {
 
     let schema = test_schema_with(&[User::schema()]);
     let model = schema.app.model(User::id());
-    let simplify = Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
+    let simplify =
+        Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
     let simplify = simplify.scope(model.as_root_unwrap());
 
     // `cast(name_field, String) → name_field`
@@ -174,7 +184,8 @@ fn non_redundant_cast_on_field_kept() {
 
     let schema = test_schema_with(&[User::schema()]);
     let model = schema.app.model(User::id());
-    let simplify = Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
+    let simplify =
+        Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
     let simplify = simplify.scope(model.as_root_unwrap());
 
     // `cast(name_field, I64)` — String field cast to I64, not redundant.

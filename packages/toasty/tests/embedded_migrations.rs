@@ -8,7 +8,9 @@ use std::{
 use async_trait::async_trait;
 use toasty::codegen_support::core::{
     Result, Schema,
-    driver::{Capability, ConnectContext, Connection, Driver, ExecResponse, Operation},
+    driver::{
+        Capability, ConnectContext, Connection, Driver, ExecResponse, Operation,
+    },
     schema::{
         db::{AppliedMigration, Migration},
         diff,
@@ -23,7 +25,8 @@ struct TestModel {
 
 static BASE_MIGRATIONS: toasty::migration::MigrationSet =
     toasty::embed_migrations!("tests/fixtures/embedded_migrations/base");
-static DEFAULT_MIGRATIONS: toasty::migration::MigrationSet = toasty::embed_migrations!();
+static DEFAULT_MIGRATIONS: toasty::migration::MigrationSet =
+    toasty::embed_migrations!();
 
 #[derive(Debug, Default)]
 struct MigrationState {
@@ -58,7 +61,10 @@ impl Driver for MigrationDriver {
         &Capability::SQLITE
     }
 
-    async fn connect(&self, _cx: &ConnectContext) -> Result<Box<dyn Connection>> {
+    async fn connect(
+        &self,
+        _cx: &ConnectContext,
+    ) -> Result<Box<dyn Connection>> {
         let state = Arc::new(MigrationState::default());
         self.states.lock().unwrap().push(state.clone());
         Ok(Box::new(MigrationConnection { state }))
@@ -88,7 +94,11 @@ struct MigrationConnection {
 
 #[async_trait]
 impl Connection for MigrationConnection {
-    async fn exec(&mut self, _schema: &Arc<Schema>, _op: Operation) -> Result<ExecResponse> {
+    async fn exec(
+        &mut self,
+        _schema: &Arc<Schema>,
+        _op: Operation,
+    ) -> Result<ExecResponse> {
         unreachable!("migration test does not execute query plans")
     }
 
@@ -108,7 +118,12 @@ impl Connection for MigrationConnection {
             .collect())
     }
 
-    async fn apply_migration(&mut self, id: u64, _name: &str, migration: &Migration) -> Result<()> {
+    async fn apply_migration(
+        &mut self,
+        id: u64,
+        _name: &str,
+        migration: &Migration,
+    ) -> Result<()> {
         self.state.applied.lock().unwrap().push(id);
         self.state
             .sql
@@ -133,7 +148,8 @@ async fn setup_db() -> (toasty::Db, Arc<MigrationState>) {
 }
 
 #[test]
-fn embedded_migrations_can_initialize_static_sets_and_default_to_toasty_directory() {
+fn embedded_migrations_can_initialize_static_sets_and_default_to_toasty_directory()
+ {
     let base = BASE_MIGRATIONS.migrations();
     assert_eq!(base.len(), 1);
     assert_eq!(base[0].id(), 101);
@@ -150,7 +166,8 @@ fn embedded_migrations_can_initialize_static_sets_and_default_to_toasty_director
 async fn embedded_migrations_apply_per_database_and_skip_applied_ids() {
     let (base_db, base_state) = setup_db().await;
     let (log_db, log_state) = setup_db().await;
-    let log = toasty::embed_migrations!("tests/fixtures/embedded_migrations/log");
+    let log =
+        toasty::embed_migrations!("tests/fixtures/embedded_migrations/log");
 
     let base_report = BASE_MIGRATIONS.apply(&base_db).await.unwrap();
     let log_report = log.apply(&log_db).await.unwrap();

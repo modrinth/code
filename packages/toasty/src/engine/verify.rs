@@ -103,7 +103,9 @@ impl stmt::Visit for Verify<'_, '_> {
             )));
         }
 
-        if upsert.action == stmt::UpsertAction::Ignore && !self.capability.upsert_targeted_ignore {
+        if upsert.action == stmt::UpsertAction::Ignore
+            && !self.capability.upsert_targeted_ignore
+        {
             self.record(Error::unsupported_feature(format!(
                 "{} does not support targeted upsert ignore",
                 self.capability.driver_name
@@ -138,14 +140,16 @@ impl stmt::Visit for Verify<'_, '_> {
             }
         }
 
-        if !self.capability.upsert_branch_assignments && upsert.action == stmt::UpsertAction::Update
+        if !self.capability.upsert_branch_assignments
+            && upsert.action == stmt::UpsertAction::Update
         {
             for (projection, _) in &upsert.defaults {
                 let used = upsert
                     .shared
                     .get(projection)
                     .is_some_and(upsert::requires_current_value)
-                    || (!upsert.shared.contains(projection) && !upsert.create.contains(projection));
+                    || (!upsert.shared.contains(projection)
+                        && !upsert.create.contains(projection));
                 if !used {
                     continue;
                 }
@@ -179,27 +183,27 @@ impl stmt::Visit for Verify<'_, '_> {
             }
         }
 
-        if !self.capability.sql() && upsert.action == stmt::UpsertAction::Update {
+        if !self.capability.sql() && upsert.action == stmt::UpsertAction::Update
+        {
             for secondary in model
                 .indices
                 .iter()
                 .filter(|index| index.unique && !index.primary_key)
             {
                 if secondary.fields.iter().any(|field| {
-                    upsert
-                        .shared
-                        .keys()
-                        .any(|projection| projection.as_slice().first() == Some(&field.field.index))
-                        || upsert.create.keys().any(|projection| {
-                            projection.as_slice().first() == Some(&field.field.index)
-                        })
-                        || upsert.defaults.keys().any(|projection| {
-                            projection.as_slice().first() == Some(&field.field.index)
-                        })
-                        || upsert.update.keys().any(|projection| {
-                            projection.as_slice().first() == Some(&field.field.index)
-                        })
-                        || model.fields[field.field.index].auto.is_some()
+                    upsert.shared.keys().any(|projection| {
+                        projection.as_slice().first()
+                            == Some(&field.field.index)
+                    }) || upsert.create.keys().any(|projection| {
+                        projection.as_slice().first()
+                            == Some(&field.field.index)
+                    }) || upsert.defaults.keys().any(|projection| {
+                        projection.as_slice().first()
+                            == Some(&field.field.index)
+                    }) || upsert.update.keys().any(|projection| {
+                        projection.as_slice().first()
+                            == Some(&field.field.index)
+                    }) || model.fields[field.field.index].auto.is_some()
                 }) {
                     self.record(Error::unsupported_feature(format!(
                         "{} upsert does not support updating a unique secondary-index field",
@@ -442,7 +446,8 @@ fn assert_i64_literal(expr: &stmt::Expr, what: &str) {
     assert!(
         matches!(
             expr,
-            stmt::Expr::Value(stmt::Value::I64(_)) | stmt::Expr::Static(stmt::Value::I64(_))
+            stmt::Expr::Value(stmt::Value::I64(_))
+                | stmt::Expr::Static(stmt::Value::I64(_))
         ),
         "{what} must be an I64 literal; got {expr:#?}"
     );
@@ -472,7 +477,11 @@ impl<'a> VerifyExpr<'a, '_> {
     /// model: a `#[document]` embed (`Type::Model`) or an embed collection
     /// (`List(Model)`).
     fn is_document_field(&self, expr: &stmt::Expr) -> bool {
-        let stmt::Expr::Reference(stmt::ExprReference::Field { nesting: 0, index }) = expr else {
+        let stmt::Expr::Reference(stmt::ExprReference::Field {
+            nesting: 0,
+            index,
+        }) = expr
+        else {
             return false;
         };
         let Some(root) = self.schema.app.model(self.model).as_root() else {
@@ -507,7 +516,10 @@ impl<'a> VerifyExpr<'a, '_> {
     /// variant-local position (see [`EmbedTarget::field_at`]).
     fn resolve_expr_path(&self, expr: &stmt::Expr) -> Option<PathTarget<'a>> {
         match expr {
-            stmt::Expr::Reference(stmt::ExprReference::Field { nesting: 0, index }) => self
+            stmt::Expr::Reference(stmt::ExprReference::Field {
+                nesting: 0,
+                index,
+            }) => self
                 .schema
                 .app
                 .model(self.model)
@@ -523,7 +535,9 @@ impl<'a> VerifyExpr<'a, '_> {
                 Some(target)
             }
             stmt::Expr::Variant(variant) => {
-                let PathTarget::Field(field) = self.resolve_expr_path(&variant.base)? else {
+                let PathTarget::Field(field) =
+                    self.resolve_expr_path(&variant.base)?
+                else {
                     return None;
                 };
                 let app::FieldTy::Embedded(embedded) = &field.ty else {
@@ -538,7 +552,11 @@ impl<'a> VerifyExpr<'a, '_> {
     }
 
     /// The target one projection step reaches from `target`.
-    fn resolve_expr_step(&self, target: PathTarget<'a>, step: usize) -> Option<PathTarget<'a>> {
+    fn resolve_expr_step(
+        &self,
+        target: PathTarget<'a>,
+        step: usize,
+    ) -> Option<PathTarget<'a>> {
         use app::FieldTy;
 
         let field = match target {
@@ -546,10 +564,13 @@ impl<'a> VerifyExpr<'a, '_> {
             PathTarget::Document => return Some(PathTarget::Document),
             PathTarget::Field(field) => match &field.ty {
                 FieldTy::Embedded(embedded) => {
-                    EmbedTarget::embed(&self.schema.app, embedded.target)?.field_at(step)
+                    EmbedTarget::embed(&self.schema.app, embedded.target)?
+                        .field_at(step)
                 }
                 FieldTy::BelongsTo(_) | FieldTy::Has(_) | FieldTy::Via(_) => {
-                    let target = field.relation_target_id().expect("relation has a target");
+                    let target = field
+                        .relation_target_id()
+                        .expect("relation has a target");
                     self.schema
                         .app
                         .model(target)
@@ -575,9 +596,16 @@ impl<'a> VerifyExpr<'a, '_> {
     /// the current scope — the shape `resolve_expr_path` validates.
     fn is_scoped_expr_path(&self, expr: &stmt::Expr) -> bool {
         match expr {
-            stmt::Expr::Reference(stmt::ExprReference::Field { nesting: 0, .. }) => true,
-            stmt::Expr::Project(project) => self.is_scoped_expr_path(&project.base),
-            stmt::Expr::Variant(variant) => self.is_scoped_expr_path(&variant.base),
+            stmt::Expr::Reference(stmt::ExprReference::Field {
+                nesting: 0,
+                ..
+            }) => true,
+            stmt::Expr::Project(project) => {
+                self.is_scoped_expr_path(&project.base)
+            }
+            stmt::Expr::Variant(variant) => {
+                self.is_scoped_expr_path(&variant.base)
+            }
             _ => false,
         }
     }
@@ -717,7 +745,9 @@ impl stmt::Visit for VerifyExpr<'_, '_> {
     }
 
     fn visit_expr_is_superset(&mut self, i: &stmt::ExprIsSuperset) {
-        if !self.capability.native_array_set_predicates && !rhs_is_concrete_list(&i.rhs) {
+        if !self.capability.native_array_set_predicates
+            && !rhs_is_concrete_list(&i.rhs)
+        {
             self.record(Error::unsupported_feature(format!(
                 "{} requires a literal list on the right-hand side of is_superset",
                 self.capability.driver_name
@@ -727,7 +757,9 @@ impl stmt::Visit for VerifyExpr<'_, '_> {
     }
 
     fn visit_expr_intersects(&mut self, i: &stmt::ExprIntersects) {
-        if !self.capability.native_array_set_predicates && !rhs_is_concrete_list(&i.rhs) {
+        if !self.capability.native_array_set_predicates
+            && !rhs_is_concrete_list(&i.rhs)
+        {
             self.record(Error::unsupported_feature(format!(
                 "{} requires a literal list on the right-hand side of intersects",
                 self.capability.driver_name
@@ -760,7 +792,10 @@ mod tests {
     use toasty_core::driver::Capability;
     use toasty_core::stmt::{Expr, ExprIsSuperset, ExprList, Value};
 
-    fn verify_with(capability: &'static Capability, stmt: Statement) -> Result<()> {
+    fn verify_with(
+        capability: &'static Capability,
+        stmt: Statement,
+    ) -> Result<()> {
         let schema = test_schema();
         let mut error = None;
         Verify {
@@ -775,7 +810,10 @@ mod tests {
         }
     }
 
-    fn verify_expr_with(capability: &'static Capability, expr: &Expr) -> Option<Error> {
+    fn verify_expr_with(
+        capability: &'static Capability,
+        expr: &Expr,
+    ) -> Option<Error> {
         let schema = test_schema();
         let mut error = None;
         // ModelId is only used by projection-checking visitor methods, which

@@ -8,7 +8,10 @@ use toasty_core::{
 };
 
 impl Exec<'_> {
-    pub(super) async fn exec_query_pk(&mut self, action: &mir::QueryPk) -> Result<ExecResponse> {
+    pub(super) async fn exec_query_pk(
+        &mut self,
+        action: &mir::QueryPk,
+    ) -> Result<ExecResponse> {
         let mut pk_filter = action.pk_filter.clone();
 
         if let Some(input) = action.input {
@@ -43,7 +46,8 @@ impl Exec<'_> {
                     operation::QueryPk {
                         table: action.table,
                         index: action.index,
-                        select: mir::column_ids(action.table, &action.columns).collect(),
+                        select: mir::column_ids(action.table, &action.columns)
+                            .collect(),
                         pk_filter: f,
                         filter: action.row_filter.clone(),
                         limit: action.limit.clone(),

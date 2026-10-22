@@ -76,7 +76,9 @@ pub trait Field: Load<Output = Self> {
     ///
     /// For primitives, returns the path as-is.
     /// For embedded types, wraps the path in a Fields struct.
-    fn new_path<Origin>(path: stmt::Path<Origin, Self::ExprTarget>) -> Self::Path<Origin>
+    fn new_path<Origin>(
+        path: stmt::Path<Origin, Self::ExprTarget>,
+    ) -> Self::Path<Origin>
     where
         Self: Sized;
 
@@ -103,11 +105,13 @@ pub trait Field: Load<Output = Self> {
     fn field_ty(
         storage_ty: Option<toasty_core::schema::db::Type>,
     ) -> toasty_core::schema::app::FieldTy {
-        toasty_core::schema::app::FieldTy::Primitive(toasty_core::schema::app::FieldPrimitive {
-            ty: Self::ty(),
-            storage_ty,
-            serialize: None,
-        })
+        toasty_core::schema::app::FieldTy::Primitive(
+            toasty_core::schema::app::FieldPrimitive {
+                ty: Self::ty(),
+                storage_ty,
+                serialize: None,
+            },
+        )
     }
 
     /// Build a boolean filter expression comparing this field value against
@@ -116,7 +120,10 @@ pub trait Field: Load<Output = Self> {
     ///
     /// For `T`, returns `target.eq(self)`. For `Option<T>`, returns
     /// `target.eq(inner)` when `Some`, or `false` when `None`.
-    fn key_constraint<Origin>(&self, target: stmt::Path<Origin, Self::Inner>) -> Expr<bool>;
+    fn key_constraint<Origin>(
+        &self,
+        target: stmt::Path<Origin, Self::Inner>,
+    ) -> Expr<bool>;
 
     /// Register any models referenced by this field type into the given
     /// [`ModelSet`].
@@ -137,7 +144,9 @@ macro_rules! impl_field_primitive {
             type Update<'a> = ();
             type Inner = Self;
 
-            fn new_path<Origin>(path: stmt::Path<Origin, Self>) -> Self::Path<Origin> {
+            fn new_path<Origin>(
+                path: stmt::Path<Origin, Self>,
+            ) -> Self::Path<Origin> {
                 path
             }
 
@@ -195,14 +204,19 @@ impl Field for Vec<u8> {
     fn field_ty(
         storage_ty: Option<toasty_core::schema::db::Type>,
     ) -> toasty_core::schema::app::FieldTy {
-        toasty_core::schema::app::FieldTy::Primitive(toasty_core::schema::app::FieldPrimitive {
-            ty: toasty_core::stmt::Type::Bytes,
-            storage_ty,
-            serialize: None,
-        })
+        toasty_core::schema::app::FieldTy::Primitive(
+            toasty_core::schema::app::FieldPrimitive {
+                ty: toasty_core::stmt::Type::Bytes,
+                storage_ty,
+                serialize: None,
+            },
+        )
     }
 
-    fn key_constraint<Origin>(&self, target: stmt::Path<Origin, Self::Inner>) -> Expr<bool> {
+    fn key_constraint<Origin>(
+        &self,
+        target: stmt::Path<Origin, Self::Inner>,
+    ) -> Expr<bool> {
         target.eq(self)
     }
 }
@@ -230,7 +244,9 @@ where
     type Update<'a> = ();
     type Inner = Self;
 
-    fn new_path<Origin>(path: stmt::Path<Origin, List<T>>) -> Self::Path<Origin> {
+    fn new_path<Origin>(
+        path: stmt::Path<Origin, List<T>>,
+    ) -> Self::Path<Origin> {
         path
     }
 
@@ -262,14 +278,19 @@ where
 
             embed.discriminant.storage_ty.map(db::Type::list)
         });
-        toasty_core::schema::app::FieldTy::Primitive(toasty_core::schema::app::FieldPrimitive {
-            ty: <Self as super::Load>::ty(),
-            storage_ty,
-            serialize: None,
-        })
+        toasty_core::schema::app::FieldTy::Primitive(
+            toasty_core::schema::app::FieldPrimitive {
+                ty: <Self as super::Load>::ty(),
+                storage_ty,
+                serialize: None,
+            },
+        )
     }
 
-    fn key_constraint<Origin>(&self, _target: stmt::Path<Origin, Self::Inner>) -> Expr<bool> {
+    fn key_constraint<Origin>(
+        &self,
+        _target: stmt::Path<Origin, Self::Inner>,
+    ) -> Expr<bool> {
         unreachable!("Vec<T> fields cannot be used as foreign-key targets");
     }
 
@@ -402,7 +423,8 @@ impl_scalar!(
 impl_scalar!(stmt::IpCidr, stmt::IpInet, stmt::MacAddr6, stmt::MacAddr8);
 
 impl<T: Field> Field for Option<T> {
-    const REQUIRES_EXPLICIT_COLUMN_TYPE: bool = T::REQUIRES_EXPLICIT_COLUMN_TYPE;
+    const REQUIRES_EXPLICIT_COLUMN_TYPE: bool =
+        T::REQUIRES_EXPLICIT_COLUMN_TYPE;
 
     type ExprTarget = Self;
     type Path<Origin> = stmt::Path<Origin, Self>;
@@ -437,7 +459,10 @@ impl<T: Field> Field for Option<T> {
         T::field_ty(storage_ty)
     }
 
-    fn key_constraint<Origin>(&self, target: stmt::Path<Origin, Self::Inner>) -> Expr<bool> {
+    fn key_constraint<Origin>(
+        &self,
+        target: stmt::Path<Origin, Self::Inner>,
+    ) -> Expr<bool> {
         match self {
             Some(value) => T::key_constraint(value, target),
             None => Expr::from_value(toasty_core::stmt::Value::Bool(false)),
@@ -450,7 +475,8 @@ impl<T: Field> Field for Option<T> {
 }
 
 impl<T: Field> Field for std::sync::Arc<T> {
-    const REQUIRES_EXPLICIT_COLUMN_TYPE: bool = T::REQUIRES_EXPLICIT_COLUMN_TYPE;
+    const REQUIRES_EXPLICIT_COLUMN_TYPE: bool =
+        T::REQUIRES_EXPLICIT_COLUMN_TYPE;
 
     type ExprTarget = Self;
     type Path<Origin> = stmt::Path<Origin, Self>;
@@ -480,7 +506,10 @@ impl<T: Field> Field for std::sync::Arc<T> {
         T::field_ty(storage_ty)
     }
 
-    fn key_constraint<Origin>(&self, target: stmt::Path<Origin, Self::Inner>) -> Expr<bool> {
+    fn key_constraint<Origin>(
+        &self,
+        target: stmt::Path<Origin, Self::Inner>,
+    ) -> Expr<bool> {
         T::key_constraint(self, target)
     }
 
@@ -490,7 +519,8 @@ impl<T: Field> Field for std::sync::Arc<T> {
 }
 
 impl<T: Field> Field for std::rc::Rc<T> {
-    const REQUIRES_EXPLICIT_COLUMN_TYPE: bool = T::REQUIRES_EXPLICIT_COLUMN_TYPE;
+    const REQUIRES_EXPLICIT_COLUMN_TYPE: bool =
+        T::REQUIRES_EXPLICIT_COLUMN_TYPE;
 
     type ExprTarget = Self;
     type Path<Origin> = stmt::Path<Origin, Self>;
@@ -520,7 +550,10 @@ impl<T: Field> Field for std::rc::Rc<T> {
         T::field_ty(storage_ty)
     }
 
-    fn key_constraint<Origin>(&self, target: stmt::Path<Origin, Self::Inner>) -> Expr<bool> {
+    fn key_constraint<Origin>(
+        &self,
+        target: stmt::Path<Origin, Self::Inner>,
+    ) -> Expr<bool> {
         T::key_constraint(self, target)
     }
 
@@ -530,7 +563,8 @@ impl<T: Field> Field for std::rc::Rc<T> {
 }
 
 impl<T: Field> Field for Box<T> {
-    const REQUIRES_EXPLICIT_COLUMN_TYPE: bool = T::REQUIRES_EXPLICIT_COLUMN_TYPE;
+    const REQUIRES_EXPLICIT_COLUMN_TYPE: bool =
+        T::REQUIRES_EXPLICIT_COLUMN_TYPE;
 
     type ExprTarget = Self;
     type Path<Origin> = stmt::Path<Origin, Self>;
@@ -560,7 +594,10 @@ impl<T: Field> Field for Box<T> {
         T::field_ty(storage_ty)
     }
 
-    fn key_constraint<Origin>(&self, target: stmt::Path<Origin, Self::Inner>) -> Expr<bool> {
+    fn key_constraint<Origin>(
+        &self,
+        target: stmt::Path<Origin, Self::Inner>,
+    ) -> Expr<bool> {
         T::key_constraint(self, target)
     }
 

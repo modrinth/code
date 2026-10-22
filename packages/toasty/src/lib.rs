@@ -127,7 +127,8 @@ pub use stmt::{Batch, batch};
 /// Database handle, connection pool, executor trait, and transaction support.
 pub mod db;
 pub use db::{
-    Capability, Connection, Db, Dialect, Executor, SqlPlaceholder, Transaction, TransactionBuilder,
+    Capability, Connection, Db, Dialect, Executor, SqlPlaceholder, Transaction,
+    TransactionBuilder,
 };
 
 mod engine;

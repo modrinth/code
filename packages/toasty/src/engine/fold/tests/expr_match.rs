@@ -21,7 +21,9 @@ fn constant_subject_matches_arm() {
 
     let result = fold_expr_match(&mut expr);
 
-    assert!(matches!(result, Some(Expr::Value(Value::String(ref s))) if s == "b"));
+    assert!(
+        matches!(result, Some(Expr::Value(Value::String(ref s))) if s == "b")
+    );
 }
 
 #[test]

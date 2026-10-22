@@ -2,7 +2,10 @@ use toasty_core::{Result, stmt};
 
 /// Converts declarative upsert branches into an insert row and one conflict
 /// assignment map before model fields are lowered to database columns.
-pub(super) fn normalize(insert: &mut stmt::Insert, preserve_defaults: bool) -> Result<()> {
+pub(super) fn normalize(
+    insert: &mut stmt::Insert,
+    preserve_defaults: bool,
+) -> Result<()> {
     let Some(upsert) = &mut insert.upsert else {
         return Ok(());
     };
@@ -92,7 +95,8 @@ fn create_expr_for_assignment(
                     "upsert field defaults only support value assignments",
                 ));
             };
-            let value = apply_assignment(Some(default.eval_const()?), assignment)?;
+            let value =
+                apply_assignment(Some(default.eval_const()?), assignment)?;
             Ok(stmt::Expr::Value(value))
         }
     }
@@ -188,7 +192,9 @@ fn apply_assignment(
 
 fn current_value(current: Option<stmt::Value>) -> Result<stmt::Value> {
     current.ok_or_else(|| {
-        crate::Error::invalid_statement("shared upsert mutations require a field with #[default]")
+        crate::Error::invalid_statement(
+            "shared upsert mutations require a field with #[default]",
+        )
     })
 }
 

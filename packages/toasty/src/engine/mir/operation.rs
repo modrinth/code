@@ -1,8 +1,9 @@
 use crate::engine::effect;
 
 use super::{
-    Alias, Const, DeleteByKey, Eval, ExecStatement, Filter, FindPkByIndex, GetByKey, NestedMerge,
-    Node, QueryPk, ReadModifyWrite, Repeat, Scan, UpdateByKey, Upsert,
+    Alias, Const, DeleteByKey, Eval, ExecStatement, Filter, FindPkByIndex,
+    GetByKey, NestedMerge, Node, QueryPk, ReadModifyWrite, Repeat, Scan,
+    UpdateByKey, Upsert,
 };
 
 /// A step in the query execution plan.
@@ -120,7 +121,9 @@ impl Operation {
             // `classify` walks the statement tree, so a `Query` wrapping a
             // data-modifying CTE (the OCC conditional-write path) classifies
             // as mutating even though its statement kind is a read.
-            Operation::ExecStatement(m) => effect::classify(&m.stmt) == effect::Effect::Mutating,
+            Operation::ExecStatement(m) => {
+                effect::classify(&m.stmt) == effect::Effect::Mutating
+            }
 
             Operation::Alias(_)
             | Operation::Const(_)

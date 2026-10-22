@@ -18,7 +18,10 @@ use toasty_core::{
 /// When the span is disabled by the subscriber's filter, returns the
 /// caller's current span instead so request context still reaches the
 /// worker task's events.
-pub(crate) fn query_span(schema: &Schema, stmt: &stmt::Statement) -> tracing::Span {
+pub(crate) fn query_span(
+    schema: &Schema,
+    stmt: &stmt::Statement,
+) -> tracing::Span {
     let span = tracing::debug_span!(
         target: "toasty::query",
         "query",
@@ -61,13 +64,17 @@ fn stmt_model_id(stmt: &stmt::Statement) -> Option<ModelId> {
             UpdateTarget::Query(query) => query_model_id(query),
             UpdateTarget::Table(_) => None,
         },
-        stmt::Statement::Delete(delete) => delete.from.as_model().map(|source| source.id),
+        stmt::Statement::Delete(delete) => {
+            delete.from.as_model().map(|source| source.id)
+        }
     }
 }
 
 fn query_model_id(query: &stmt::Query) -> Option<ModelId> {
     match &query.body {
-        ExprSet::Select(select) => select.source.as_model().map(|source| source.id),
+        ExprSet::Select(select) => {
+            select.source.as_model().map(|source| source.id)
+        }
         ExprSet::Update(update) => match &update.target {
             UpdateTarget::Model(model_id) => Some(*model_id),
             UpdateTarget::Query(query) => query_model_id(query),

@@ -17,7 +17,8 @@ fn non_empty_query() -> Box<Query> {
 #[test]
 fn exists_empty_query_becomes_false() {
     let schema = test_schema();
-    let simplify = Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
+    let simplify =
+        Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
 
     // `exists(empty_query)` → `false`
     let expr = ExprExists {
@@ -32,7 +33,8 @@ fn exists_empty_query_becomes_false() {
 #[test]
 fn exists_non_empty_query_not_simplified() {
     let schema = test_schema();
-    let simplify = Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
+    let simplify =
+        Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
 
     // `exists(non_empty_query)`, non-empty, not simplified
     let expr = ExprExists {
@@ -46,7 +48,8 @@ fn exists_non_empty_query_not_simplified() {
 #[test]
 fn not_exists_empty_query_becomes_true() {
     let schema = test_schema();
-    let mut simplify = Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
+    let mut simplify =
+        Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
 
     // `not(exists(empty_query))` → `not(false)` → `true`
     let mut expr = Expr::not(Expr::Exists(ExprExists {
@@ -59,7 +62,8 @@ fn not_exists_empty_query_becomes_true() {
 #[test]
 fn not_exists_non_empty_query_not_simplified() {
     let schema = test_schema();
-    let mut simplify = Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
+    let mut simplify =
+        Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
 
     // `not(exists(non_empty_query))`, non-empty, not simplified
     let mut expr = Expr::not(Expr::Exists(ExprExists {

@@ -34,7 +34,9 @@ macro_rules! impl_net_field {
             type Update<'a> = ();
             type Inner = Self;
 
-            fn new_path<Origin>(path: Path<Origin, Self>) -> Self::Path<Origin> {
+            fn new_path<Origin>(
+                path: Path<Origin, Self>,
+            ) -> Self::Path<Origin> {
                 path
             }
 
@@ -50,7 +52,10 @@ macro_rules! impl_net_field {
             ) -> Self::Update<'a> {
             }
 
-            fn key_constraint<Origin>(&self, target: Path<Origin, Self::Inner>) -> Expr<bool> {
+            fn key_constraint<Origin>(
+                &self,
+                target: Path<Origin, Self::Inner>,
+            ) -> Expr<bool> {
                 target.eq(self)
             }
         }

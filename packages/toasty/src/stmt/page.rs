@@ -82,7 +82,10 @@ impl<M: Load> Page<M> {
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn next(&self, executor: &mut dyn Executor) -> Result<Option<Page<M::Output>>> {
+    pub async fn next(
+        &self,
+        executor: &mut dyn Executor,
+    ) -> Result<Option<Page<M::Output>>> {
         match &self.next_cursor {
             Some(cursor) => Ok(Some(
                 Paginate::from(self.query.clone())
@@ -110,7 +113,10 @@ impl<M: Load> Page<M> {
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn prev(&self, executor: &mut dyn Executor) -> Result<Option<Page<M::Output>>> {
+    pub async fn prev(
+        &self,
+        executor: &mut dyn Executor,
+    ) -> Result<Option<Page<M::Output>>> {
         match &self.prev_cursor {
             Some(cursor) => Ok(Some(
                 Paginate::from(self.query.clone())

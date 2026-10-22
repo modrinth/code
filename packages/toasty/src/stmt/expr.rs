@@ -154,7 +154,10 @@ impl Expr<bool> {
     ///     .and(User::fields().age().gt(18));
     /// ```
     pub fn and(self, rhs: impl IntoExpr<bool>) -> Self {
-        Self::from_untyped(stmt::Expr::and(self.untyped, rhs.into_expr().untyped))
+        Self::from_untyped(stmt::Expr::and(
+            self.untyped,
+            rhs.into_expr().untyped,
+        ))
     }
 
     /// Combine an iterator of boolean expressions with logical AND.
@@ -206,7 +209,10 @@ impl Expr<bool> {
     ///     .or(User::fields().name().eq("Bob"));
     /// ```
     pub fn or(self, rhs: impl IntoExpr<bool>) -> Self {
-        Self::from_untyped(stmt::Expr::or(self.untyped, rhs.into_expr().untyped))
+        Self::from_untyped(stmt::Expr::or(
+            self.untyped,
+            rhs.into_expr().untyped,
+        ))
     }
 
     /// Negate this boolean expression.

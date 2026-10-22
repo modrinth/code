@@ -259,7 +259,10 @@ impl HirStatement {
     }
 
     /// Creates and inserts a new [`StatementInfo`] with the given dependencies.
-    pub(super) fn new_statement_info(&mut self, deps: IndexMap<StmtId, DepKind>) -> StmtId {
+    pub(super) fn new_statement_info(
+        &mut self,
+        deps: IndexMap<StmtId, DepKind>,
+    ) -> StmtId {
         self.insert(StatementInfo::new(deps))
     }
 

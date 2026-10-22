@@ -80,7 +80,8 @@ fn two_values_unchanged() {
 #[test]
 fn two_exprs_unchanged() {
     // `in_list(arg(0), list([arg(1), arg(2)]))`, multiple items, not simplified
-    let mut expr = in_list(Expr::arg(0), expr_list(vec![Expr::arg(1), Expr::arg(2)]));
+    let mut expr =
+        in_list(Expr::arg(0), expr_list(vec![Expr::arg(1), Expr::arg(2)]));
     let result = fold_expr_in_list(&mut expr);
 
     assert!(result.is_none());
@@ -153,7 +154,8 @@ fn null_in_single_item_becomes_null() {
 #[test]
 fn null_in_expr_list_becomes_null() {
     // `null in list([arg(0), arg(1)])` → `null`
-    let mut expr = in_list(Expr::null(), expr_list(vec![Expr::arg(0), Expr::arg(1)]));
+    let mut expr =
+        in_list(Expr::null(), expr_list(vec![Expr::arg(0), Expr::arg(1)]));
     let result = fold_expr_in_list(&mut expr);
 
     assert!(result.is_some());

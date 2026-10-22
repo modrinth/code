@@ -82,7 +82,9 @@ impl Simplify<'_> {
                     unreachable!();
                 };
                 let compatible = match &operands[j] {
-                    Expr::InSubquery(other) if self.can_merge_membership(other) => {
+                    Expr::InSubquery(other)
+                        if self.can_merge_membership(other) =>
+                    {
                         let a = first.query.body.as_select_unwrap();
                         let b = other.query.body.as_select_unwrap();
                         first.expr.is_equivalent_to(&other.expr)
@@ -104,7 +106,9 @@ impl Simplify<'_> {
                     unreachable!();
                 };
                 let select = first.query.body.as_select_mut_unwrap();
-                select.add_filter(other.query.body.as_select_unwrap().filter.clone());
+                select.add_filter(
+                    other.query.body.as_select_unwrap().filter.clone(),
+                );
                 // Combining filters can expose further memberships at a deeper
                 // relation hop. Simplify them before subquery extraction.
                 self.scope(&select.source)
@@ -142,15 +146,15 @@ impl Simplify<'_> {
 
         match &select.source {
             Source::Model(source) => {
-                let model = self.cx.schema().app.model(source.id).as_root_unwrap();
+                let model =
+                    self.cx.schema().app.model(source.id).as_root_unwrap();
                 let Some(indices) = fields
                     .iter()
                     .map(|expr| match expr {
-                        Expr::Reference(ExprReference::Field { nesting: 0, index })
-                            if !model.fields[*index].nullable =>
-                        {
-                            Some(*index)
-                        }
+                        Expr::Reference(ExprReference::Field {
+                            nesting: 0,
+                            index,
+                        }) if !model.fields[*index].nullable => Some(*index),
                         _ => None,
                     })
                     .collect::<Option<Vec<_>>>()
@@ -190,10 +194,9 @@ impl Simplify<'_> {
                 table.indices.iter().any(|index| {
                     index.unique
                         && !index.columns.is_empty()
-                        && index
-                            .columns
-                            .iter()
-                            .all(|column| indices.contains(&column.column.index))
+                        && index.columns.iter().all(|column| {
+                            indices.contains(&column.column.index)
+                        })
                 })
             }
         }
@@ -210,7 +213,9 @@ impl Simplify<'_> {
                 .fields
                 .iter()
                 .all(|field| self.non_nullable_key(field)),
-            Expr::Value(value) => !value.is_null() && !matches!(value, stmt::Value::Record(_)),
+            Expr::Value(value) => {
+                !value.is_null() && !matches!(value, stmt::Value::Record(_))
+            }
             // Columns may be nullable through an outer join even when their
             // schema declaration is not. Other expressions need a nullability proof.
             _ => false,
@@ -247,7 +252,9 @@ impl Visit for SafeQuery {
                         && from.joins.is_empty())
             }
         };
-        if !plain_source || !matches!(select.returning, stmt::Returning::Project(_)) {
+        if !plain_source
+            || !matches!(select.returning, stmt::Returning::Project(_))
+        {
             self.0 = false;
             return;
         }
@@ -257,7 +264,11 @@ impl Visit for SafeQuery {
     fn visit_expr(&mut self, expr: &Expr) {
         if matches!(
             expr,
-            Expr::Func(_) | Expr::Stmt(_) | Expr::Default | Expr::Ident(_) | Expr::Error(_)
+            Expr::Func(_)
+                | Expr::Stmt(_)
+                | Expr::Default
+                | Expr::Ident(_)
+                | Expr::Error(_)
         ) {
             self.0 = false;
         } else {
@@ -267,7 +278,8 @@ impl Visit for SafeQuery {
 
     fn visit_expr_reference(&mut self, reference: &ExprReference) {
         let nesting = match reference {
-            ExprReference::Field { nesting, .. } | ExprReference::Model { nesting } => *nesting,
+            ExprReference::Field { nesting, .. }
+            | ExprReference::Model { nesting } => *nesting,
             ExprReference::Column(column) => column.nesting,
         };
         self.0 &= nesting == 0;

@@ -2,8 +2,8 @@ use super::{Effect, classify};
 use toasty_core::schema::app::ModelId;
 use toasty_core::schema::db::TableId;
 use toasty_core::stmt::{
-    self, Assignments, Condition, Delete, Expr, ExprStmt, Filter, Insert, InsertTarget, Query,
-    Source, Statement, Update, UpdateTarget, With,
+    self, Assignments, Condition, Delete, Expr, ExprStmt, Filter, Insert,
+    InsertTarget, Query, Source, Statement, Update, UpdateTarget, With,
 };
 
 fn model() -> ModelId {

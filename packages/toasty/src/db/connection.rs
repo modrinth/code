@@ -48,7 +48,8 @@ impl Connection {
     ) -> crate::Result<ExecResponse> {
         // Created on the caller's task so the span parents to the caller's
         // current span; the worker task enters it while executing.
-        let span = crate::instrument::query_span(&self.shared.engine.schema, &stmt);
+        let span =
+            crate::instrument::query_span(&self.shared.engine.schema, &stmt);
 
         let (tx, rx) = oneshot::channel();
 
@@ -65,7 +66,10 @@ impl Connection {
         rx.instrument(span).await.unwrap()
     }
 
-    pub(crate) async fn exec_operation(&self, operation: Operation) -> crate::Result<ExecResponse> {
+    pub(crate) async fn exec_operation(
+        &self,
+        operation: Operation,
+    ) -> crate::Result<ExecResponse> {
         let (tx, rx) = oneshot::channel();
 
         self.handle()
@@ -80,7 +84,10 @@ impl Connection {
         rx.await.unwrap()
     }
 
-    pub(crate) async fn exec_raw_sql(&self, raw: RawSql) -> crate::Result<ExecResponse> {
+    pub(crate) async fn exec_raw_sql(
+        &self,
+        raw: RawSql,
+    ) -> crate::Result<ExecResponse> {
         let span = crate::instrument::raw_sql_span();
 
         let (tx, rx) = oneshot::channel();
@@ -103,7 +110,9 @@ impl Connection {
     /// the transaction is open. This prevents statements from running on the
     /// connection directly — bypassing the transaction — when they should
     /// have gone through `&mut tx`.
-    pub async fn transaction(&mut self) -> crate::Result<super::Transaction<'_>> {
+    pub async fn transaction(
+        &mut self,
+    ) -> crate::Result<super::Transaction<'_>> {
         <Self as super::Executor>::transaction(self).await
     }
 
@@ -131,7 +140,9 @@ impl Connection {
     }
 
     #[cfg(feature = "migration")]
-    pub(crate) async fn applied_migrations(&self) -> crate::Result<Vec<AppliedMigration>> {
+    pub(crate) async fn applied_migrations(
+        &self,
+    ) -> crate::Result<Vec<AppliedMigration>> {
         let (tx, rx) = oneshot::channel();
         self.handle()
             .in_tx
@@ -178,7 +189,10 @@ impl super::Executor for Connection {
         self.exec_stmt(stmt, false).await
     }
 
-    async fn exec_raw_sql(&mut self, raw: RawSql) -> crate::Result<ExecResponse> {
+    async fn exec_raw_sql(
+        &mut self,
+        raw: RawSql,
+    ) -> crate::Result<ExecResponse> {
         Connection::exec_raw_sql(self, raw).await
     }
 

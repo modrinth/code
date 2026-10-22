@@ -9,11 +9,15 @@ use crate::{
 };
 
 impl Exec<'_> {
-    pub(super) async fn exec_upsert(&mut self, action: &mir::Upsert) -> Result<ExecResponse> {
+    pub(super) async fn exec_upsert(
+        &mut self,
+        action: &mir::Upsert,
+    ) -> Result<ExecResponse> {
         let mut stmt = stmt::Statement::from(action.stmt.clone());
 
         if !action.inputs.is_empty() {
-            let input = self.collect_input(action.inputs.iter().copied()).await?;
+            let input =
+                self.collect_input(action.inputs.iter().copied()).await?;
             stmt.substitute(&input);
             self.engine.simplify_stmt(&mut stmt);
         }

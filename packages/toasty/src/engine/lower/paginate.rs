@@ -3,7 +3,10 @@ use toasty_core::stmt;
 use super::LowerStatement;
 
 impl LowerStatement<'_, '_> {
-    pub(super) fn rewrite_offset_after_as_filter(&self, stmt: &mut stmt::Query) {
+    pub(super) fn rewrite_offset_after_as_filter(
+        &self,
+        stmt: &mut stmt::Query,
+    ) {
         // Only do this for SQL statements
         if !self.capability().sql() {
             return;
@@ -41,14 +44,19 @@ impl LowerStatement<'_, '_> {
                             .iter()
                             .zip(value.fields.iter())
                             .map(|(order_by, eq_value)| {
-                                self.rewrite_cursor_field_as_equality(order_by, eq_value.clone())
+                                self.rewrite_cursor_field_as_equality(
+                                    order_by,
+                                    eq_value.clone(),
+                                )
                             })
                             .collect();
 
-                        operands.push(self.rewrite_offset_after_field_as_filter(
-                            &order_by.exprs[index],
-                            field_value.clone(),
-                        ));
+                        operands.push(
+                            self.rewrite_offset_after_field_as_filter(
+                                &order_by.exprs[index],
+                                field_value.clone(),
+                            ),
+                        );
 
                         stmt::Expr::and_from_vec(operands)
                     })
@@ -57,7 +65,10 @@ impl LowerStatement<'_, '_> {
                 body.filter.add_filter(stmt::Expr::or_from_vec(terms));
             }
             stmt::Expr::Value(value) => {
-                let expr = self.rewrite_offset_after_field_as_filter(&order_by.exprs[0], value);
+                let expr = self.rewrite_offset_after_field_as_filter(
+                    &order_by.exprs[0],
+                    value,
+                );
                 body.filter.add_filter(expr);
             }
             _ => todo!(),
@@ -70,7 +81,9 @@ impl LowerStatement<'_, '_> {
         value: stmt::Value,
     ) -> stmt::Expr {
         let nulls_first = match order_by.order {
-            Some(stmt::Direction::Desc) => !self.capability().sql_nulls_first_on_asc,
+            Some(stmt::Direction::Desc) => {
+                !self.capability().sql_nulls_first_on_asc
+            }
             _ => self.capability().sql_nulls_first_on_asc,
         };
 
@@ -86,12 +99,16 @@ impl LowerStatement<'_, '_> {
             Some(stmt::Direction::Desc) => stmt::BinaryOp::Lt,
             _ => stmt::BinaryOp::Gt,
         };
-        let comparison = stmt::Expr::binary_op(order_by.expr.clone(), op, value);
+        let comparison =
+            stmt::Expr::binary_op(order_by.expr.clone(), op, value);
 
         if nulls_first {
             comparison
         } else {
-            stmt::Expr::or(comparison, stmt::Expr::is_null(order_by.expr.clone()))
+            stmt::Expr::or(
+                comparison,
+                stmt::Expr::is_null(order_by.expr.clone()),
+            )
         }
     }
 

@@ -15,7 +15,9 @@ impl Normalize<'_> {
     /// tie-breakers internal to execution and cursor generation. Physical
     /// column references keep embedded newtype keys scalar after lowering.
     pub(super) fn normalize_cursor_order(&mut self, query: &mut stmt::Query) {
-        if !self.capability.sql() || !matches!(query.limit, Some(stmt::Limit::Cursor(_))) {
+        if !self.capability.sql()
+            || !matches!(query.limit, Some(stmt::Limit::Cursor(_)))
+        {
             return;
         }
 
@@ -42,14 +44,12 @@ impl Normalize<'_> {
 
         let unambiguous = table.indices.iter().any(|index| {
             (index.unique || index.primary_key)
-                && index
-                    .columns
-                    .iter()
-                    .all(|index_column| ordered_columns.contains(&index_column.column))
-                && index
-                    .columns
-                    .iter()
-                    .all(|index_column| !table.column(index_column.column).nullable)
+                && index.columns.iter().all(|index_column| {
+                    ordered_columns.contains(&index_column.column)
+                })
+                && index.columns.iter().all(|index_column| {
+                    !table.column(index_column.column).nullable
+                })
         });
         if unambiguous {
             return;
@@ -77,10 +77,12 @@ fn resolve_order_column(
     expr: &stmt::Expr,
 ) -> Option<ColumnId> {
     if let stmt::Expr::Reference(ExprReference::Column(column)) = expr {
-        return (column.nesting == 0 && column.table == 0).then_some(ColumnId {
-            table: mapping.table,
-            index: column.column,
-        });
+        return (column.nesting == 0 && column.table == 0).then_some(
+            ColumnId {
+                table: mapping.table,
+                index: column.column,
+            },
+        );
     }
 
     let projection = field_projection(expr)?;

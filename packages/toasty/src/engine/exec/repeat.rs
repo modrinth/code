@@ -8,7 +8,10 @@ use toasty_core::{
 };
 
 impl Exec<'_> {
-    pub(super) async fn exec_repeat(&mut self, action: &mir::Repeat) -> Result<ExecResponse> {
+    pub(super) async fn exec_repeat(
+        &mut self,
+        action: &mir::Repeat,
+    ) -> Result<ExecResponse> {
         let ExecResponse {
             values,
             next_cursor,

@@ -91,8 +91,9 @@ impl<M: Model> Insert<M> {
     where
         S: IntoScope<M>,
     {
-        self.untyped.target =
-            stmt::InsertTarget::Scope(Box::new(scope.into_scope().into_untyped_query()));
+        self.untyped.target = stmt::InsertTarget::Scope(Box::new(
+            scope.into_scope().into_untyped_query(),
+        ));
     }
 
     /// Set the value of the field at `field` index in the current record.

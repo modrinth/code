@@ -54,7 +54,8 @@ fn field<M: Model>(index: usize) -> Expr {
 
 fn query(model: ModelId, projection: Expr, filter: Expr) -> Query {
     let mut query = Query::new_select(model, filter);
-    query.body.as_select_mut_unwrap().returning = Returning::Project(projection);
+    query.body.as_select_mut_unwrap().returning =
+        Returning::Project(projection);
     query
 }
 
@@ -77,7 +78,8 @@ fn active() -> Expr {
 fn simplify_filter(expr: Expr) -> Expr {
     let schema = schema();
     let mut query = Query::new_select(Post::id(), expr);
-    Simplify::new(&schema, &Capability::SQLITE).visit_stmt_query_mut(&mut query);
+    Simplify::new(&schema, &Capability::SQLITE)
+        .visit_stmt_query_mut(&mut query);
     query.body.as_select_mut_unwrap().filter.take().into_expr()
 }
 
@@ -124,7 +126,10 @@ fn combines_compound_filters() {
     let compound = Expr::or(name(), active());
     let email = Expr::eq(field::<User>(3), "a@b");
     assert_eq!(
-        simplify_filter(Expr::and(membership(compound), membership(email.clone()))),
+        simplify_filter(Expr::and(
+            membership(compound),
+            membership(email.clone())
+        )),
         membership(Expr::and(email, Expr::or(active(), name())))
     );
 }
@@ -136,7 +141,10 @@ fn combines_filters_containing_nested_subqueries() {
         query(Post::id(), field::<Post>(1), Expr::eq(field::<Post>(0), 42)),
     );
     assert_eq!(
-        simplify_filter(Expr::and(membership(name()), membership(nested.clone()))),
+        simplify_filter(Expr::and(
+            membership(name()),
+            membership(nested.clone())
+        )),
         membership(Expr::and(name(), nested))
     );
 }
@@ -155,7 +163,9 @@ fn simplifies_newly_combined_filters_recursively() {
 
 #[test]
 fn combines_unique_secondary_key() {
-    let by_email = |filter| Expr::in_subquery("a@b", query(User::id(), field::<User>(3), filter));
+    let by_email = |filter| {
+        Expr::in_subquery("a@b", query(User::id(), field::<User>(3), filter))
+    };
     assert_eq!(
         simplify_filter(Expr::and(by_email(name()), by_email(active()))),
         by_email(Expr::and(name(), active()))
@@ -169,10 +179,9 @@ fn combines_complete_composite_key_but_not_partial_key() {
     let key = Expr::record([field::<Item>(0), field::<Item>(1)]);
     let by_key = |filter| {
         Expr::in_subquery(
-            Expr::Value(stmt::Value::Record(stmt::ValueRecord::from_vec(vec![
-                "tenant".into(),
-                1.into(),
-            ]))),
+            Expr::Value(stmt::Value::Record(stmt::ValueRecord::from_vec(
+                vec!["tenant".into(), 1.into()],
+            ))),
             query(Item::id(), key.clone(), filter),
         )
     };
@@ -181,7 +190,9 @@ fn combines_complete_composite_key_but_not_partial_key() {
         by_key(Expr::and(a.clone(), b.clone()))
     );
 
-    let partial = |filter| Expr::in_subquery(1, query(Item::id(), field::<Item>(1), filter));
+    let partial = |filter| {
+        Expr::in_subquery(1, query(Item::id(), field::<Item>(1), filter))
+    };
     let input = Expr::and(partial(a), partial(b));
     assert_eq!(simplify_filter(input.clone()), input);
 }
@@ -189,7 +200,9 @@ fn combines_complete_composite_key_but_not_partial_key() {
 #[test]
 fn preserves_nonunique_and_nullable_projections() {
     for key in [field::<User>(1), field::<User>(4)] {
-        let by_key = |filter| Expr::in_subquery("alice", query(User::id(), key.clone(), filter));
+        let by_key = |filter| {
+            Expr::in_subquery("alice", query(User::id(), key.clone(), filter))
+        };
         let input = Expr::and(by_key(name()), by_key(active()));
         assert_eq!(simplify_filter(input.clone()), input);
     }
@@ -205,7 +218,8 @@ fn preserves_has_many_memberships() {
     };
     let input = Expr::and(child(1), child(2));
     let mut outer = Query::new_select(User::id(), input.clone());
-    Simplify::new(&schema(), &Capability::SQLITE).visit_stmt_query_mut(&mut outer);
+    Simplify::new(&schema(), &Capability::SQLITE)
+        .visit_stmt_query_mut(&mut outer);
     assert_eq!(outer.body.as_select_unwrap().filter.as_expr(), &input);
 }
 
@@ -261,7 +275,8 @@ fn preserves_unstable_and_correlated_filters() {
         let input = Expr::and(membership(name()), membership(filter));
         assert_eq!(simplify_filter(input.clone()), input);
     }
-    let unstable = |filter| Expr::in_subquery(Expr::last_insert_id(), users(filter));
+    let unstable =
+        |filter| Expr::in_subquery(Expr::last_insert_id(), users(filter));
     let input = Expr::and(unstable(name()), unstable(active()));
     assert_eq!(simplify_filter(input.clone()), input);
 }
@@ -327,7 +342,8 @@ fn merges_mixed_relation_path_and_explicit_subquery_before_extraction() {
     let path = Expr::project(field::<Post>(2), [1]);
     let input = Expr::and(Expr::eq(path, "alice"), membership(active()));
     let expected = membership(Expr::and(name(), active()));
-    let engine = crate::engine::Engine::new(schema().into(), &Capability::SQLITE);
+    let engine =
+        crate::engine::Engine::new(schema().into(), &Capability::SQLITE);
     let actual = engine
         .lower_stmt(Query::new_select(Post::id(), input).into())
         .unwrap();
@@ -376,14 +392,16 @@ fn combines_lowered_table_subqueries() {
     let active = column(2);
     let membership = |filter| {
         let mut query = Query::new_select(user_table, filter);
-        query.body.as_select_mut_unwrap().returning = Returning::Project(column(0));
+        query.body.as_select_mut_unwrap().returning =
+            Returning::Project(column(0));
         Expr::in_subquery(column(1), query)
     };
     let mut outer = Query::new_select(
         post_table,
         Expr::and(membership(name.clone()), membership(active.clone())),
     );
-    Simplify::new(&schema, &Capability::SQLITE).visit_stmt_query_mut(&mut outer);
+    Simplify::new(&schema, &Capability::SQLITE)
+        .visit_stmt_query_mut(&mut outer);
     assert_eq!(
         outer.body.as_select_unwrap().filter.as_expr(),
         &membership(Expr::and(name, active))
@@ -401,7 +419,8 @@ fn nullable_filter_context_propagates_through_or_but_not_returning() {
     );
 
     let mut outer = query(Post::id(), input.clone(), input.clone());
-    Simplify::new(&schema(), &Capability::SQLITE).visit_stmt_query_mut(&mut outer);
+    Simplify::new(&schema(), &Capability::SQLITE)
+        .visit_stmt_query_mut(&mut outer);
     assert_eq!(
         outer.body.as_select_unwrap().returning,
         Returning::Project(input)

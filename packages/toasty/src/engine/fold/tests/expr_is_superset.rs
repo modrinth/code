@@ -20,7 +20,8 @@ fn empty_value_list_rhs_becomes_true() {
 #[test]
 fn empty_expr_list_rhs_becomes_true() {
     // `is_superset(arg(0), list([])) → true`
-    let mut expr = is_superset(Expr::arg(0), Expr::List(stmt::ExprList { items: vec![] }));
+    let mut expr =
+        is_superset(Expr::arg(0), Expr::List(stmt::ExprList { items: vec![] }));
     let result = fold_expr_is_superset(&mut expr);
 
     assert_eq!(result, Some(Expr::Value(Value::Bool(true))));

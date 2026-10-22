@@ -116,7 +116,8 @@ fn filter_le() {
 
 #[test]
 fn filter_and() {
-    let expr = filter_expr(toasty::query!(User filter .name == "Alice" and .age > 18));
+    let expr =
+        filter_expr(toasty::query!(User filter .name == "Alice" and .age > 18));
 
     assert_eq!(
         expr,
@@ -129,7 +130,9 @@ fn filter_and() {
 
 #[test]
 fn filter_or() {
-    let expr = filter_expr(toasty::query!(User filter .name == "Alice" or .name == "Bob"));
+    let expr = filter_expr(
+        toasty::query!(User filter .name == "Alice" or .name == "Bob"),
+    );
 
     assert_eq!(
         expr,
@@ -158,8 +161,9 @@ fn filter_not() {
 fn filter_parens_override_precedence() {
     // Without parens: .name == "A" or (.name == "B" and .age > 18)
     // With parens: (.name == "A" or .name == "B") and .age > 18
-    let expr =
-        filter_expr(toasty::query!(User filter (.name == "Alice" or .name == "Bob") and .age > 18));
+    let expr = filter_expr(
+        toasty::query!(User filter (.name == "Alice" or .name == "Bob") and .age > 18),
+    );
 
     // The outer node should be AND (parens made OR bind tighter)
     assert_eq!(
@@ -229,14 +233,16 @@ fn filter_keyword_mixed_case() {
 
 #[test]
 fn and_keyword_uppercase() {
-    let expr = filter_expr(toasty::query!(User filter .name == "a" AND .age > 1));
+    let expr =
+        filter_expr(toasty::query!(User filter .name == "a" AND .age > 1));
 
     assert_struct!(expr, core_stmt::Expr::And({ operands.len(): 2 }));
 }
 
 #[test]
 fn or_keyword_uppercase() {
-    let expr = filter_expr(toasty::query!(User filter .name == "a" OR .name == "b"));
+    let expr =
+        filter_expr(toasty::query!(User filter .name == "a" OR .name == "b"));
 
     assert_struct!(expr, core_stmt::Expr::Or({ operands.len(): 2 }));
 }
@@ -264,7 +270,10 @@ fn complex_and_or_not_with_parens() {
     assert_eq!(
         expr,
         core_stmt::Expr::and(
-            core_stmt::Expr::not(core_stmt::Expr::eq(field_ref(3), bool_val(true))),
+            core_stmt::Expr::not(core_stmt::Expr::eq(
+                field_ref(3),
+                bool_val(true)
+            )),
             core_stmt::Expr::or(
                 core_stmt::Expr::eq(field_ref(1), str_val("Alice")),
                 core_stmt::Expr::ge(field_ref(2), i64_val(21)),
@@ -275,8 +284,9 @@ fn complex_and_or_not_with_parens() {
 
 #[test]
 fn triple_and() {
-    let expr =
-        filter_expr(toasty::query!(User filter .name == "A" and .age > 0 and .active == true));
+    let expr = filter_expr(
+        toasty::query!(User filter .name == "A" and .age > 0 and .active == true),
+    );
 
     // AND flattens: and(and(a, b), c) → and(a, b, c)
     assert_struct!(expr, core_stmt::Expr::And({ operands.len(): 3 }));
@@ -284,8 +294,9 @@ fn triple_and() {
 
 #[test]
 fn triple_or() {
-    let expr =
-        filter_expr(toasty::query!(User filter .name == "A" or .name == "B" or .name == "C"));
+    let expr = filter_expr(
+        toasty::query!(User filter .name == "A" or .name == "B" or .name == "C"),
+    );
 
     // OR flattens: or(or(a, b), c) → or(a, b, c)
     assert_struct!(expr, core_stmt::Expr::Or({ operands.len(): 3 }));
@@ -294,8 +305,9 @@ fn triple_or() {
 #[test]
 fn or_precedence_lower_than_and() {
     // a and b or c → (a and b) or c
-    let expr =
-        filter_expr(toasty::query!(User filter .name == "A" and .age > 0 or .active == false));
+    let expr = filter_expr(
+        toasty::query!(User filter .name == "A" and .age > 0 or .active == false),
+    );
 
     assert_eq!(
         expr,
@@ -373,7 +385,9 @@ fn filter_integer_literal() {
 
 #[test]
 fn filter_different_fields() {
-    let expr = filter_expr(toasty::query!(User filter .id == 1 and .name == "X" and .age > 0));
+    let expr = filter_expr(
+        toasty::query!(User filter .id == 1 and .name == "X" and .age > 0),
+    );
 
     assert_eq!(
         expr,
@@ -393,8 +407,9 @@ fn filter_different_fields() {
 
 #[test]
 fn nested_parens() {
-    let expr =
-        filter_expr(toasty::query!(User filter ((.name == "A" or .name == "B") and .age > 0)));
+    let expr = filter_expr(
+        toasty::query!(User filter ((.name == "A" or .name == "B") and .age > 0)),
+    );
 
     // Outer parens are transparent; inner parens group the OR
     assert_eq!(
@@ -452,7 +467,8 @@ fn filter_in_list_integers() {
 
 #[test]
 fn filter_in_list_strings() {
-    let expr = filter_expr(toasty::query!(User filter .name IN ["Alice", "Bob"]));
+    let expr =
+        filter_expr(toasty::query!(User filter .name IN ["Alice", "Bob"]));
 
     assert_eq!(
         expr,
@@ -483,7 +499,9 @@ fn filter_in_list_external_variable() {
 
 #[test]
 fn filter_in_list_with_and() {
-    let expr = filter_expr(toasty::query!(User filter .id IN [1, 2] and .active == true));
+    let expr = filter_expr(
+        toasty::query!(User filter .id IN [1, 2] and .active == true),
+    );
 
     assert_eq!(
         expr,

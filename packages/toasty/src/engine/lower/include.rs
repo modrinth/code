@@ -67,7 +67,10 @@ struct FieldIncludes {
 
 impl LowerStatement<'_, '_> {
     /// Load relations in a query projection.
-    pub(super) fn process_projected_returning(&mut self, expr: &mut stmt::Expr) {
+    pub(super) fn process_projected_returning(
+        &mut self,
+        expr: &mut stmt::Expr,
+    ) {
         if self.process_projected_field(expr) {
             // A resolved field is terminal. Recursing into a scalar's base
             // would load relations from its containing embed.
@@ -107,7 +110,8 @@ impl LowerStatement<'_, '_> {
             app::FieldTy::Embedded(embedded) => {
                 use stmt::VisitMut;
                 self.visit_expr_mut(expr);
-                super::Simplify::with_context(self.expr_cx, self.capability()).visit_expr_mut(expr);
+                super::Simplify::with_context(self.expr_cx, self.capability())
+                    .visit_expr_mut(expr);
                 self.process_embed(
                     expr,
                     embedded.target,
@@ -126,7 +130,10 @@ impl LowerStatement<'_, '_> {
     }
 
     /// Load complete returned embeds and refresh relations whose keys changed.
-    pub(super) fn process_update_embedded_relations(&mut self, returning: &mut stmt::Returning) {
+    pub(super) fn process_update_embedded_relations(
+        &mut self,
+        returning: &mut stmt::Returning,
+    ) {
         let stmt::Returning::Project(expr) = returning else {
             return;
         };
@@ -168,8 +175,11 @@ impl LowerStatement<'_, '_> {
             );
         }
 
-        for (field_index, field_expr) in returned_fields.iter().zip(&mut record.fields) {
-            let app::FieldTy::Embedded(embedded) = &app_fields[field_index].ty else {
+        for (field_index, field_expr) in
+            returned_fields.iter().zip(&mut record.fields)
+        {
+            let app::FieldTy::Embedded(embedded) = &app_fields[field_index].ty
+            else {
                 continue;
             };
             let embed_path = field_path(record_path, field_index);
@@ -178,7 +188,8 @@ impl LowerStatement<'_, '_> {
                 field_expr,
                 stmt::Expr::Cast(cast) if matches!(cast.ty, stmt::Type::SparseRecord(_))
             ) {
-                let app::Model::EmbeddedStruct(model) = self.schema().app.model(embedded.target)
+                let app::Model::EmbeddedStruct(model) =
+                    self.schema().app.model(embedded.target)
                 else {
                     unreachable!("only structs support partial updates")
                 };
@@ -260,7 +271,8 @@ impl LowerStatement<'_, '_> {
         record: &mut stmt::ExprRecord,
         includes: &[stmt::Include],
     ) {
-        let flat: Vec<FlatInclude> = includes.iter().map(flatten_include).collect();
+        let flat: Vec<FlatInclude> =
+            includes.iter().map(flatten_include).collect();
         let app_fields = &self.model_unwrap().fields;
         let mapping_fields = &self.mapping_unwrap().fields;
         self.process_fields(
@@ -286,7 +298,9 @@ impl LowerStatement<'_, '_> {
         includes: &[FlatInclude],
         host: &stmt::Path,
     ) {
-        for (i, (field, mapping)) in app_fields.iter().zip(mapping_fields).enumerate() {
+        for (i, (field, mapping)) in
+            app_fields.iter().zip(mapping_fields).enumerate()
+        {
             let field_includes = partition_includes(includes, i);
 
             if field.ty.is_relation() {
@@ -351,7 +365,8 @@ impl LowerStatement<'_, '_> {
                 return;
             }
             if !self.cx.is_insert_with_row() {
-                *returning = lazy_slot::loaded_expr(loaded_form(field, mapping));
+                *returning =
+                    lazy_slot::loaded_expr(loaded_form(field, mapping));
             }
         }
 
@@ -394,8 +409,10 @@ impl LowerStatement<'_, '_> {
                 let record = match returning {
                     stmt::Expr::Record(record) => record,
                     stmt::Expr::Match(match_expr) => {
-                        let Some(stmt::Expr::Record(record)) =
-                            match_expr.arms.first_mut().map(|arm| &mut arm.expr)
+                        let Some(stmt::Expr::Record(record)) = match_expr
+                            .arms
+                            .first_mut()
+                            .map(|arm| &mut arm.expr)
                         else {
                             return;
                         };
@@ -475,7 +492,10 @@ impl LowerStatement<'_, '_> {
     /// `Expr::Arg`. This is the `.select(rel_field)` entry point;
     /// `.include(...)` goes through [`build_relation_subquery_inner`] so it
     /// can pass its nested includes and filter down.
-    pub(super) fn build_relation_subquery(&mut self, field_index: usize) -> stmt::Expr {
+    pub(super) fn build_relation_subquery(
+        &mut self,
+        field_index: usize,
+    ) -> stmt::Expr {
         self.build_relation_subquery_inner(
             &self.model_unwrap().fields[field_index],
             &stmt::Path::model(self.model_unwrap().id),
@@ -522,7 +542,11 @@ impl LowerStatement<'_, '_> {
             }
             let nested_projections: Vec<stmt::Projection> =
                 nested.iter().map(|fi| fi.projection.clone()).collect();
-            return self.build_via_include_subquery(field_index, via, &nested_projections);
+            return self.build_via_include_subquery(
+                field_index,
+                via,
+                &nested_projections,
+            );
         }
 
         let (mut stmt, target_model_id) = match &field.ty {
@@ -552,15 +576,21 @@ impl LowerStatement<'_, '_> {
                         .iter()
                         .map(|fk| self.relation_source_field(host, fk.source)),
                 );
-                let target_pk =
-                    super::key_field_refs(0, rel.foreign_key.fields.iter().map(|fk| fk.target));
+                let target_pk = super::key_field_refs(
+                    0,
+                    rel.foreign_key.fields.iter().map(|fk| fk.target),
+                );
 
-                let mut query =
-                    stmt::Query::new_select(rel.target, stmt::Expr::eq(source_fk, target_pk));
+                let mut query = stmt::Query::new_select(
+                    rel.target,
+                    stmt::Expr::eq(source_fk, target_pk),
+                );
                 query.single = true;
                 (query, rel.target)
             }
-            _ => unreachable!("build_include_subquery called on non-relation field"),
+            _ => unreachable!(
+                "build_include_subquery called on non-relation field"
+            ),
         };
 
         // AND the user-supplied filter (if any) onto the join predicate; the
@@ -615,10 +645,13 @@ impl LowerStatement<'_, '_> {
         source_field: app::FieldId,
     ) -> stmt::Expr {
         let local_index = match &record_path.root {
-            stmt::PathRoot::Variant { variant_id, .. } if record_path.projection.is_empty() => {
+            stmt::PathRoot::Variant { variant_id, .. }
+                if record_path.projection.is_empty() =>
+            {
                 // Field IDs are model-wide, but an enum arm uses indexes local
                 // to its variant.
-                let app::Model::EmbeddedEnum(model) = self.schema().app.model(variant_id.model)
+                let app::Model::EmbeddedEnum(model) =
+                    self.schema().app.model(variant_id.model)
                 else {
                     unreachable!()
                 };
@@ -655,7 +688,8 @@ fn partition_includes(includes: &[FlatInclude], i: usize) -> FieldIncludes {
         {
             included = true;
             if rest.is_empty() {
-                top_order_by = fi.query.as_ref().and_then(|query| query.order_by.clone());
+                top_order_by =
+                    fi.query.as_ref().and_then(|query| query.order_by.clone());
                 match query_filter_expr(&fi.query) {
                     Some(f) if !unfiltered_self => {
                         let f = f.clone();
@@ -715,13 +749,14 @@ fn query_has_modifiers(query: &Option<stmt::Query>) -> bool {
 /// `Schema::resolve`). Include lowering walks the IR shape,
 /// not the schema, so LOCAL is what `process_enum_arms` needs.
 fn flatten_path(path: &stmt::Path) -> stmt::Projection {
-    let mut acc = if let stmt::PathRoot::Variant { parent, variant_id } = &path.root {
-        let mut acc = flatten_path(parent);
-        acc.push(variant_id.index);
-        acc
-    } else {
-        stmt::Projection::identity()
-    };
+    let mut acc =
+        if let stmt::PathRoot::Variant { parent, variant_id } = &path.root {
+            let mut acc = flatten_path(parent);
+            acc.push(variant_id.index);
+            acc
+        } else {
+            stmt::Projection::identity()
+        };
     for step in path.projection.as_slice() {
         acc.push(*step);
     }
@@ -734,9 +769,15 @@ fn flatten_path(path: &stmt::Path) -> stmt::Projection {
 /// - Embed (struct or enum) — the embed's pre-computed `default_returning`.
 fn loaded_form(field: &app::Field, mapping: &mapping::Field) -> stmt::Expr {
     match (&field.ty, mapping) {
-        (app::FieldTy::Primitive(_), mapping::Field::Primitive(p)) => p.column_expr.clone(),
-        (app::FieldTy::Embedded(_), mapping::Field::Struct(s)) => s.default_returning.clone(),
-        (app::FieldTy::Embedded(_), mapping::Field::Enum(e)) => e.default_returning.clone(),
+        (app::FieldTy::Primitive(_), mapping::Field::Primitive(p)) => {
+            p.column_expr.clone()
+        }
+        (app::FieldTy::Embedded(_), mapping::Field::Struct(s)) => {
+            s.default_returning.clone()
+        }
+        (app::FieldTy::Embedded(_), mapping::Field::Enum(e)) => {
+            e.default_returning.clone()
+        }
         _ => unreachable!("deferred field has unexpected mapping shape"),
     }
 }

@@ -48,7 +48,10 @@ impl<T> Association<T> {
     ///
     /// Panics if the root of `path` does not match the model id of `S`.
     #[doc(hidden)]
-    pub fn from_source_and_path<S: Model>(source: super::Query<List<S>>, path: Path<S, T>) -> Self {
+    pub fn from_source_and_path<S: Model>(
+        source: super::Query<List<S>>,
+        path: Path<S, T>,
+    ) -> Self {
         assert_eq!(path.untyped.root.as_model_unwrap(), S::id());
 
         Self {
@@ -91,7 +94,10 @@ impl<M: Model> Association<List<M>> {
     /// let path = User::path_field::<List<Todo>>(2);
     /// let _assoc = Association::many(source, path);
     /// ```
-    pub fn many<T: Model>(source: super::Query<List<T>>, path: Path<T, List<M>>) -> Self {
+    pub fn many<T: Model>(
+        source: super::Query<List<T>>,
+        path: Path<T, List<M>>,
+    ) -> Self {
         assert_eq!(path.untyped.root.as_model_unwrap(), T::id());
 
         Self {
@@ -111,7 +117,10 @@ impl<M: Model> Association<List<M>> {
     ///
     /// Panics if the root of `path` does not match the model id of `T`.
     ///
-    pub(crate) fn many_via_one<T: Model>(source: super::Query<List<T>>, path: Path<T, M>) -> Self {
+    pub(crate) fn many_via_one<T: Model>(
+        source: super::Query<List<T>>,
+        path: Path<T, M>,
+    ) -> Self {
         assert_eq!(path.untyped.root.as_model_unwrap(), T::id());
 
         Self {
@@ -221,7 +230,10 @@ impl<M: Model> Association<List<M>> {
     /// to `NewTarget`. Used by macro-generated chain methods on the `Many`
     /// struct — `field_index` must identify a relation field on `M`.
     #[doc(hidden)]
-    pub fn chain_field<NewTarget>(mut self, field_index: usize) -> Association<List<NewTarget>> {
+    pub fn chain_field<NewTarget>(
+        mut self,
+        field_index: usize,
+    ) -> Association<List<NewTarget>> {
         self.untyped.path.projection.push(field_index);
         Association {
             untyped: self.untyped,
@@ -280,7 +292,10 @@ impl<M: Model> Association<M> {
     /// let path = Todo::path_field::<User>(1);
     /// let _assoc = Association::one(source, path);
     /// ```
-    pub fn one<T: Model>(source: super::Query<List<T>>, path: Path<T, M>) -> Self {
+    pub fn one<T: Model>(
+        source: super::Query<List<T>>,
+        path: Path<T, M>,
+    ) -> Self {
         assert_eq!(path.untyped.root.as_model_unwrap(), T::id());
 
         Self {

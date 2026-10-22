@@ -82,9 +82,9 @@ impl<M: Model> CreateMany<M> {
     /// Unlike `exec`, this does not run any database query.
     fn into_expr(self) -> Expr<List<M>> {
         if self.stmts.is_empty() {
-            return Expr::from_untyped(
-                core_stmt::Expr::list(std::iter::empty::<core_stmt::Expr>()),
-            );
+            return Expr::from_untyped(core_stmt::Expr::list(
+                std::iter::empty::<core_stmt::Expr>(),
+            ));
         }
         let mut stmts = self.stmts.into_iter();
         let mut merged = stmts.next().unwrap();

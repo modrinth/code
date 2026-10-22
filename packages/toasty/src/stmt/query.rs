@@ -1,5 +1,6 @@
 use super::{
-    Delete, Expr, IntoExpr, IntoStatement, List, RelationInsert, RelationRemove, Statement, Value,
+    Delete, Expr, IntoExpr, IntoStatement, List, RelationInsert,
+    RelationRemove, Statement, Value,
 };
 use crate::{
     Executor, Result,
@@ -249,7 +250,10 @@ impl<T> Query<T> {
     /// let mut q = Query::<List<User>>::all();
     /// q.set_order_by(User::fields().name().desc());
     /// ```
-    pub fn set_order_by(&mut self, order_by: impl Into<stmt::OrderBy>) -> &mut Self {
+    pub fn set_order_by(
+        &mut self,
+        order_by: impl Into<stmt::OrderBy>,
+    ) -> &mut Self {
         let order_by = order_by.into();
         self.untyped.order_by = Some(order_by);
         self
@@ -532,7 +536,8 @@ impl<M: Model> Query<List<M>> {
     /// ```
     pub fn count(mut self) -> Query<u64> {
         // Set the returning clause to COUNT(*)
-        *self.untyped.returning_mut_unwrap() = Returning::Project(stmt::Expr::count_star());
+        *self.untyped.returning_mut_unwrap() =
+            Returning::Project(stmt::Expr::count_star());
         self.untyped.single = true;
 
         Query::from_untyped(self.untyped)
@@ -588,7 +593,8 @@ impl<M: Model> Query<List<M>> {
         E: IntoExpr<T>,
         T: Load,
     {
-        *self.untyped.returning_mut_unwrap() = Returning::Project(projection.into_expr().untyped);
+        *self.untyped.returning_mut_unwrap() =
+            Returning::Project(projection.into_expr().untyped);
 
         Query::from_untyped(self.untyped)
     }

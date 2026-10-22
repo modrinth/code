@@ -220,7 +220,10 @@ impl Query {
     /// .exec(&mut db)
     /// .await?;
     /// ```
-    pub fn column_types(mut self, types: impl IntoIterator<Item = stmt::Type>) -> Self {
+    pub fn column_types(
+        mut self,
+        types: impl IntoIterator<Item = stmt::Type>,
+    ) -> Self {
         self.ret = RawSqlRet::Types(types.into_iter().collect());
         self
     }
@@ -231,7 +234,12 @@ impl Query {
     /// The executor may be a [`Db`](crate::Db), [`Connection`](crate::Connection),
     /// or [`Transaction`](crate::Transaction).
     pub async fn exec(self, executor: &mut dyn Executor) -> Result<Vec<Value>> {
-        let raw = into_raw_sql(self.sql, self.params, self.ret, executor.capability())?;
+        let raw = into_raw_sql(
+            self.sql,
+            self.params,
+            self.ret,
+            executor.capability(),
+        )?;
         let response = executor.exec_raw_sql(raw).await?;
 
         match response.values.collect_as_value().await? {
@@ -275,7 +283,10 @@ impl Param {
     }
 }
 
-fn infer_typed_value(value: Value, capability: &Capability) -> Result<TypedValue> {
+fn infer_typed_value(
+    value: Value,
+    capability: &Capability,
+) -> Result<TypedValue> {
     let ty = value
         .infer_db_ty(&capability.storage_types)
         .map_err(|err| {

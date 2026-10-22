@@ -6,7 +6,10 @@ impl Simplify<'_> {
     /// Heavyweight AND rewrites. Cheap canonicalization (flatten, drop unit
     /// literals, null propagation, single/empty collapse on canonical input)
     /// runs in `fold::expr_and` before this is reached.
-    pub(super) fn simplify_expr_and(&mut self, expr: &mut stmt::ExprAnd) -> Option<stmt::Expr> {
+    pub(super) fn simplify_expr_and(
+        &mut self,
+        expr: &mut stmt::ExprAnd,
+    ) -> Option<stmt::Expr> {
         self.merge_in_subqueries(&mut expr.operands);
         dedup_operands(&mut expr.operands);
 
@@ -22,10 +25,9 @@ impl Simplify<'_> {
         expr.operands.retain(|operand| {
             if let stmt::Expr::Or(or_expr) = operand {
                 // Remove this OR if any of its operands appears as a direct operand of the AND
-                !or_expr
-                    .operands
-                    .iter()
-                    .any(|op| non_or_operands.iter().any(|e| e.is_equivalent_to(op)))
+                !or_expr.operands.iter().any(|op| {
+                    non_or_operands.iter().any(|e| e.is_equivalent_to(op))
+                })
             } else {
                 true
             }
@@ -91,12 +93,15 @@ impl Simplify<'_> {
                     continue;
                 }
 
-                if op_i.lhs.is_equivalent_to(&op_j.lhs) && op_i.rhs.is_equivalent_to(&op_j.rhs) {
+                if op_i.lhs.is_equivalent_to(&op_j.lhs)
+                    && op_i.rhs.is_equivalent_to(&op_j.rhs)
+                {
                     let lhs = op_i.lhs.clone();
                     let rhs = op_i.rhs.clone();
 
                     // Replace the first operand with equality
-                    expr.operands[i] = Expr::eq(lhs.as_ref().clone(), rhs.as_ref().clone());
+                    expr.operands[i] =
+                        Expr::eq(lhs.as_ref().clone(), rhs.as_ref().clone());
 
                     // Mark all other `Ge`/`Le` bounds on the same (lhs, rhs)
                     // for removal
@@ -122,7 +127,8 @@ impl Simplify<'_> {
 /// list: `a == 1 AND a == 2` → true, `a == 1 AND a != 1` → true.
 fn has_self_contradiction(operands: &[Expr]) -> bool {
     for i in 0..operands.len() {
-        if is_contradicting_eq_constraints(&operands[i..=i], &operands[i + 1..]) {
+        if is_contradicting_eq_constraints(&operands[i..=i], &operands[i + 1..])
+        {
             return true;
         }
     }
@@ -210,7 +216,9 @@ fn is_contradicting_eq_constraints(a: &[Expr], b: &[Expr]) -> bool {
 
             match (o_op, b_op) {
                 (BinaryOp::Eq, BinaryOp::Eq) if o_val != b_val => return true,
-                (BinaryOp::Eq, BinaryOp::Ne) | (BinaryOp::Ne, BinaryOp::Eq) if o_val == b_val => {
+                (BinaryOp::Eq, BinaryOp::Ne) | (BinaryOp::Ne, BinaryOp::Eq)
+                    if o_val == b_val =>
+                {
                     return true;
                 }
                 _ => {}

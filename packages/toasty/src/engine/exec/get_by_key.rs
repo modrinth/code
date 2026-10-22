@@ -8,7 +8,10 @@ use toasty_core::{
 };
 
 impl Exec<'_> {
-    pub(super) async fn exec_get_by_key(&mut self, action: &mir::GetByKey) -> Result<ExecResponse> {
+    pub(super) async fn exec_get_by_key(
+        &mut self,
+        action: &mir::GetByKey,
+    ) -> Result<ExecResponse> {
         let mut seen = ValueSet::new();
         let keys: Vec<_> = self
             .vars
@@ -28,11 +31,13 @@ impl Exec<'_> {
         } else {
             let op = operation::GetByKey {
                 table: action.table,
-                select: mir::column_ids(action.table, &action.columns).collect(),
+                select: mir::column_ids(action.table, &action.columns)
+                    .collect(),
                 keys,
             };
 
-            let res = self.connection.exec(&self.engine.schema, op.into()).await?;
+            let res =
+                self.connection.exec(&self.engine.schema, op.into()).await?;
             res.values
         };
 

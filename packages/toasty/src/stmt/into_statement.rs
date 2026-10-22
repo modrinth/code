@@ -89,7 +89,8 @@ fn batch_from_iter<Q: IntoStatement>(
         })
         .collect();
 
-    let query = stmt::Query::new_single(stmt::Values::from(stmt::Expr::record(exprs)));
+    let query =
+        stmt::Query::new_single(stmt::Values::from(stmt::Expr::record(exprs)));
 
     Statement {
         untyped: query.into(),

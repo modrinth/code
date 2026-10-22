@@ -17,7 +17,8 @@ impl Exec<'_> {
 
         if !action.inputs.is_empty() {
             assert!(action.inputs.len() == 1);
-            let input = self.collect_input(action.inputs.iter().copied()).await?;
+            let input =
+                self.collect_input(action.inputs.iter().copied()).await?;
             filter.substitute(&input);
         }
 

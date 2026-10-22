@@ -107,13 +107,18 @@ enum Consumption {
     Observed,
 }
 
-pub(super) fn annotate_guards(store: &mut Store, execution_order: &[NodeId], completion: NodeId) {
+pub(super) fn annotate_guards(
+    store: &mut Store,
+    execution_order: &[NodeId],
+    completion: NodeId,
+) {
     // Execution position; a guard's condition node must run before the nodes
     // it guards so the condition variable exists when the branch is taken.
     // Pure nodes unreachable from the completion node are absent from the
     // execution order and keep the zero sentinel — never read, since guard
     // subjects are inputs of reachable nodes and inputs are deps.
-    let mut position: IndexVec<NodeId, usize> = IndexVec::from_vec(vec![0; store.node_count()]);
+    let mut position: IndexVec<NodeId, usize> =
+        IndexVec::from_vec(vec![0; store.node_count()]);
     for (i, &id) in execution_order.iter().enumerate() {
         position[id] = i;
     }

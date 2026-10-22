@@ -38,7 +38,10 @@ impl VarStore {
         }
     }
 
-    pub(crate) async fn load(&mut self, node: NodeId) -> crate::Result<ExecResponse> {
+    pub(crate) async fn load(
+        &mut self,
+        node: NodeId,
+    ) -> crate::Result<ExecResponse> {
         let Some(entry) = &mut self.slots[node] else {
             panic!("no stream at slot {node:?}; store={self:#?}")
         };
@@ -86,7 +89,10 @@ impl VarStore {
     /// use. A skipped slot is empty, allowing a guard to depend on a node that
     /// an earlier guard skipped. A stream-backed slot is buffered in place so
     /// the peek does not disturb later loads.
-    pub(crate) async fn peek_non_empty(&mut self, node: NodeId) -> crate::Result<bool> {
+    pub(crate) async fn peek_non_empty(
+        &mut self,
+        node: NodeId,
+    ) -> crate::Result<bool> {
         let Some(entry) = self.slots[node].as_mut() else {
             panic!("no stream at slot {node:?}; store={self:#?}")
         };

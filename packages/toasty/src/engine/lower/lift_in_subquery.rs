@@ -72,7 +72,10 @@ impl<'a> LiftInSubquery<'a> {
         self.visit_mut(stmt);
     }
 
-    fn scope<'scope>(&'scope self, target: impl IntoExprTarget<'scope>) -> LiftInSubquery<'scope> {
+    fn scope<'scope>(
+        &'scope self,
+        target: impl IntoExprTarget<'scope>,
+    ) -> LiftInSubquery<'scope> {
         LiftInSubquery {
             cx: self.cx.scope(target),
             exclude_nulls: self.exclude_nulls,
@@ -95,7 +98,10 @@ impl<'a> LiftInSubquery<'a> {
             .as_record()
             .map_or(std::slice::from_ref(&returning), |record| &record.fields)
         {
-            let stmt::Expr::Reference(stmt::ExprReference::Field { index, .. }) = field else {
+            let stmt::Expr::Reference(stmt::ExprReference::Field {
+                index, ..
+            }) = field
+            else {
                 unreachable!();
             };
             if self.cx.schema().app.field(target.field(*index)).nullable {
@@ -117,7 +123,9 @@ impl VisitMut for LiftInSubquery<'_> {
             stmt::Expr::InSubquery(e) if !e.negated => {
                 lift_in_subquery(&self.cx, &e.expr, &e.query)
             }
-            stmt::Expr::BinaryOp(_) | stmt::Expr::Like(_) | stmt::Expr::IsVariant(_) => {
+            stmt::Expr::BinaryOp(_)
+            | stmt::Expr::Like(_)
+            | stmt::Expr::IsVariant(_) => {
                 try_lift_relation_path_predicate(&self.cx, expr)
             }
             _ => None,
@@ -216,8 +224,11 @@ pub(super) fn lift_in_subquery(
         stmt::Expr::Project(_) | stmt::Expr::Variant(_) => {
             lift_projection_in_subquery(cx, expr, query)
         }
-        stmt::Expr::Reference(expr_reference @ stmt::ExprReference::Field { .. }) => {
-            let field = cx.resolve_expr_reference(expr_reference).as_field_unwrap();
+        stmt::Expr::Reference(
+            expr_reference @ stmt::ExprReference::Field { .. },
+        ) => {
+            let field =
+                cx.resolve_expr_reference(expr_reference).as_field_unwrap();
             lift_relation_in_subquery(cx, &Relation::Field(field), query)
         }
         _ => None,
@@ -245,7 +256,10 @@ enum Relation<'a> {
     },
 }
 
-fn resolve_relation_path<'a>(cx: &ExprContext<'a>, expr: &Expr) -> Option<RelationPath<'a>> {
+fn resolve_relation_path<'a>(
+    cx: &ExprContext<'a>,
+    expr: &Expr,
+) -> Option<RelationPath<'a>> {
     let resolved = relation_expr::resolve(cx, expr)?;
     let relation = match resolved.embedded() {
         Some(belongs_to) => Relation::Embedded {
@@ -274,10 +288,14 @@ fn lift_relation_in_subquery(
 ) -> Option<stmt::Expr> {
     match relation {
         Relation::Field(field) => match &field.ty {
-            FieldTy::BelongsTo(belongs_to) => lift_belongs_to_in_subquery(cx, belongs_to, query),
-            FieldTy::Has(has) => {
-                lift_has_n_in_subquery(has.target, has.pair(&cx.schema().app), query)
+            FieldTy::BelongsTo(belongs_to) => {
+                lift_belongs_to_in_subquery(cx, belongs_to, query)
             }
+            FieldTy::Has(has) => lift_has_n_in_subquery(
+                has.target,
+                has.pair(&cx.schema().app),
+                query,
+            ),
             FieldTy::Via(via) => lift_via_in_subquery(cx, via, query),
             _ => None,
         },
@@ -287,7 +305,10 @@ fn lift_relation_in_subquery(
         } => lift_fk_in_subquery(
             belongs_to.target,
             key_expr.clone(),
-            super::key_field_refs(0, belongs_to.foreign_key.fields.iter().map(|fk| fk.target)),
+            super::key_field_refs(
+                0,
+                belongs_to.foreign_key.fields.iter().map(|fk| fk.target),
+            ),
             query,
         ),
     }
@@ -324,7 +345,9 @@ fn lift_via_in_subquery(
         .last()
         .and_then(|field| cx.schema().app.field(*field).relation_target_id())?;
 
-    if target != via.target || target != query.body.as_select_unwrap().source.model_id_unwrap() {
+    if target != via.target
+        || target != query.body.as_select_unwrap().source.model_id_unwrap()
+    {
         return None;
     }
 
@@ -405,7 +428,8 @@ fn lift_projection_in_subquery(
 
     if let Some(index) = inner_lhs.as_self_field_index()
         && let Relation::Field(field) = relation
-        && let Some(direct) = try_fuse_paired_relations(cx, field, target, index, query)
+        && let Some(direct) =
+            try_fuse_paired_relations(cx, field, target, index, query)
     {
         return Some(direct);
     }
@@ -491,7 +515,9 @@ fn try_fuse_paired_relations(
     let inner_pair = inner_has.pair(&cx.schema().app);
 
     // Both FKs must reference the same PK columns in the same order.
-    if outer_belongs_to.foreign_key.fields.len() != inner_pair.foreign_key.fields.len() {
+    if outer_belongs_to.foreign_key.fields.len()
+        != inner_pair.foreign_key.fields.len()
+    {
         return None;
     }
     for (outer_fk, inner_fk) in outer_belongs_to
@@ -515,7 +541,10 @@ fn try_fuse_paired_relations(
                 .iter()
                 .map(|fk| fk.source),
         ),
-        super::key_field_refs(0, inner_pair.foreign_key.fields.iter().map(|fk| fk.source)),
+        super::key_field_refs(
+            0,
+            inner_pair.foreign_key.fields.iter().map(|fk| fk.source),
+        ),
         query,
     )
 }
@@ -559,25 +588,31 @@ fn resolve_relation_predicate<'a>(
 ) -> Option<(RelationPath<'a>, stmt::Expr)> {
     match expr {
         Expr::BinaryOp(e) => {
-            let comparison = |op: stmt::BinaryOp, subject: &Expr, other: &Expr| {
-                resolve_relation_path_predicate(cx, subject, |target_lhs| {
-                    Expr::binary_op(target_lhs, op, other.clone())
-                })
-            };
-            comparison(e.op, &e.lhs, &e.rhs).or_else(|| comparison(e.op.commute()?, &e.rhs, &e.lhs))
+            let comparison =
+                |op: stmt::BinaryOp, subject: &Expr, other: &Expr| {
+                    resolve_relation_path_predicate(cx, subject, |target_lhs| {
+                        Expr::binary_op(target_lhs, op, other.clone())
+                    })
+                };
+            comparison(e.op, &e.lhs, &e.rhs)
+                .or_else(|| comparison(e.op.commute()?, &e.rhs, &e.lhs))
         }
-        Expr::Like(e) => resolve_relation_path_predicate(cx, &e.expr, |target_lhs| {
-            stmt::ExprLike {
-                expr: Box::new(target_lhs),
-                pattern: e.pattern.clone(),
-                escape: e.escape,
-                case_insensitive: e.case_insensitive,
-            }
-            .into()
-        }),
-        Expr::IsVariant(e) => resolve_relation_path_predicate(cx, &e.expr, |target_lhs| {
-            Expr::is_variant(target_lhs, e.variant)
-        }),
+        Expr::Like(e) => {
+            resolve_relation_path_predicate(cx, &e.expr, |target_lhs| {
+                stmt::ExprLike {
+                    expr: Box::new(target_lhs),
+                    pattern: e.pattern.clone(),
+                    escape: e.escape,
+                    case_insensitive: e.case_insensitive,
+                }
+                .into()
+            })
+        }
+        Expr::IsVariant(e) => {
+            resolve_relation_path_predicate(cx, &e.expr, |target_lhs| {
+                Expr::is_variant(target_lhs, e.variant)
+            })
+        }
         _ => None,
     }
 }
@@ -614,7 +649,8 @@ fn lift_relation_predicate(
     path: &RelationPath<'_>,
     filter: stmt::Expr,
 ) -> Option<stmt::Expr> {
-    let subquery = stmt::Query::new_select(stmt::Source::from(path.target), filter);
+    let subquery =
+        stmt::Query::new_select(stmt::Source::from(path.target), filter);
     lift_relation_in_subquery(cx, &path.relation, &subquery)
 }
 
@@ -633,7 +669,8 @@ fn lift_fk_in_subquery(
     }
 
     let mut subquery = query.clone();
-    subquery.body.as_select_mut_unwrap().returning = stmt::Returning::Project(returning);
+    subquery.body.as_select_mut_unwrap().returning =
+        stmt::Returning::Project(returning);
 
     Some(stmt::Expr::in_subquery(lhs, subquery))
 }
@@ -650,7 +687,9 @@ fn lift_belongs_to_in_subquery(
     belongs_to: &BelongsTo,
     query: &stmt::Query,
 ) -> Option<stmt::Expr> {
-    if belongs_to.target != query.body.as_select_unwrap().source.model_id_unwrap() {
+    if belongs_to.target
+        != query.body.as_select_unwrap().source.model_id_unwrap()
+    {
         return None;
     }
 
@@ -677,8 +716,14 @@ fn lift_belongs_to_in_subquery(
     if lift.fail || !all_fks_matched {
         lift_fk_in_subquery(
             belongs_to.target,
-            super::key_field_refs(0, belongs_to.foreign_key.fields.iter().map(|fk| fk.source)),
-            super::key_field_refs(0, belongs_to.foreign_key.fields.iter().map(|fk| fk.target)),
+            super::key_field_refs(
+                0,
+                belongs_to.foreign_key.fields.iter().map(|fk| fk.source),
+            ),
+            super::key_field_refs(
+                0,
+                belongs_to.foreign_key.fields.iter().map(|fk| fk.target),
+            ),
             query,
         )
     } else {
@@ -704,8 +749,14 @@ fn lift_has_n_in_subquery(
 ) -> Option<stmt::Expr> {
     lift_fk_in_subquery(
         target,
-        super::key_field_refs(0, pair.foreign_key.fields.iter().map(|fk| fk.target)),
-        super::key_field_refs(0, pair.foreign_key.fields.iter().map(|fk| fk.source)),
+        super::key_field_refs(
+            0,
+            pair.foreign_key.fields.iter().map(|fk| fk.target),
+        ),
+        super::key_field_refs(
+            0,
+            pair.foreign_key.fields.iter().map(|fk| fk.source),
+        ),
         query,
     )
 }
@@ -750,8 +801,15 @@ impl Visit for LiftBelongsTo<'_> {
 }
 
 impl LiftBelongsTo<'_> {
-    fn lift_fk_constraint(&mut self, field: FieldId, op: stmt::BinaryOp, expr: &stmt::Expr) {
-        for (i, fk_field) in self.belongs_to.foreign_key.fields.iter().enumerate() {
+    fn lift_fk_constraint(
+        &mut self,
+        field: FieldId,
+        op: stmt::BinaryOp,
+        expr: &stmt::Expr,
+    ) {
+        for (i, fk_field) in
+            self.belongs_to.foreign_key.fields.iter().enumerate()
+        {
             if fk_field.target == field {
                 if self.fk_field_matches[i] {
                     todo!("not handled");

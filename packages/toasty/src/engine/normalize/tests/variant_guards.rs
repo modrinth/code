@@ -58,7 +58,8 @@ fn normalize_stmt(stmt: &mut Statement) {
 /// Normalizes a query on `Object` filtered by `filter` and returns the
 /// normalized filter.
 fn normalize(filter: impl Into<Expr>) -> Expr {
-    let mut stmt = Statement::Query(Query::new_select(Object::id(), filter.into()));
+    let mut stmt =
+        Statement::Query(Query::new_select(Object::id(), filter.into()));
     normalize_stmt(&mut stmt);
     filter_of(&stmt)
 }
@@ -149,7 +150,11 @@ fn nested_selections_guard_every_enclosing_variant() {
     // outer variant holds.
     assert_eq!(
         filter,
-        Expr::and_from_vec(vec![lhs_is_primary(), inner_is_a, Expr::eq(value, 1)])
+        Expr::and_from_vec(vec![
+            lhs_is_primary(),
+            inner_is_a,
+            Expr::eq(value, 1)
+        ])
     );
 }
 
@@ -173,7 +178,8 @@ fn negative_null_check_is_guarded_as_a_whole() {
     );
 
     // `is_none().not()` negates the guarded predicate instead.
-    let filter = normalize(Object::fields().lhs().primary().note().is_none().not());
+    let filter =
+        normalize(Object::fields().lhs().primary().note().is_none().not());
     assert_eq!(
         filter,
         Expr::not(Expr::and(lhs_is_primary(), Expr::is_null(lhs_note())))
@@ -201,7 +207,8 @@ fn negative_membership_is_guarded_as_a_whole() {
 
 #[test]
 fn nested_predicate_is_guarded_at_its_own_boundary() {
-    let filter = normalize(Object::fields().lhs().primary().note().is_none().eq(false));
+    let filter =
+        normalize(Object::fields().lhs().primary().note().is_none().eq(false));
 
     assert_eq!(
         filter,

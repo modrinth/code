@@ -69,7 +69,8 @@ impl Exec<'_> {
 
         // Collect input values and substitute into the statement
         if !action.inputs.is_empty() {
-            let input_values = self.collect_input(action.inputs.iter().copied()).await?;
+            let input_values =
+                self.collect_input(action.inputs.iter().copied()).await?;
             stmt.substitute(&input_values);
 
             self.engine.simplify_stmt(&mut stmt);
@@ -85,7 +86,8 @@ impl Exec<'_> {
 
         // MySQL does not support `RETURNING` on `UPDATE`. Strip the returning
         // and capture an equivalent `SELECT` to run after the UPDATE.
-        let mysql_update_returning = self.process_stmt_update_with_returning_on_mysql(&mut stmt);
+        let mysql_update_returning =
+            self.process_stmt_update_with_returning_on_mysql(&mut stmt);
 
         // Short circuit if we can statically determine there are no results
         if let stmt::Statement::Query(query) = &stmt
@@ -112,14 +114,14 @@ impl Exec<'_> {
             // A conditional write prefixes its result with two `I64` probe
             // counts; the `Returning` variant follows them with the changed
             // rows' columns.
-            ConditionalOutput::Count => Some(vec![stmt::Type::I64, stmt::Type::I64]),
+            ConditionalOutput::Count => {
+                Some(vec![stmt::Type::I64, stmt::Type::I64])
+            }
             ConditionalOutput::Returning => {
                 let mut tys = vec![stmt::Type::I64, stmt::Type::I64];
-                tys.extend(
-                    output_ty
-                        .clone()
-                        .expect("conditional write with RETURNING has output columns"),
-                );
+                tys.extend(output_ty.clone().expect(
+                    "conditional write with RETURNING has output columns",
+                ));
                 Some(tys)
             }
             ConditionalOutput::None if mysql_update_returning.is_some() => {
@@ -143,13 +145,17 @@ impl Exec<'_> {
             ConditionalOutput::None => {
                 if let Some(mysql_update) = mysql_update_returning {
                     res = self
-                        .run_mysql_update_returning_select(mysql_update, output_ty.clone())
+                        .run_mysql_update_returning_select(
+                            mysql_update,
+                            output_ty.clone(),
+                        )
                         .await?;
                 }
             }
             ConditionalOutput::Count | ConditionalOutput::Returning => {
                 let rows = collect_conditional_probe(res.values).await?;
-                let (matched, conditioned) = conditional_probe_counts(&rows[0])?;
+                let (matched, conditioned) =
+                    conditional_probe_counts(&rows[0])?;
 
                 // A conditional write targets a row the caller holds an
                 // instance of: zero matched rows means it has since been
@@ -176,9 +182,11 @@ impl Exec<'_> {
                             .into_iter()
                             .map(|row| {
                                 let stmt::Value::Record(record) = row else {
-                                    return Err(toasty_core::Error::invalid_result(
-                                        "conditional write expected Record",
-                                    ));
+                                    return Err(
+                                        toasty_core::Error::invalid_result(
+                                            "conditional write expected Record",
+                                        ),
+                                    );
                                 };
                                 Ok(stmt::Value::record_from_vec(
                                     record.fields.into_iter().skip(2).collect(),
@@ -269,7 +277,9 @@ impl Exec<'_> {
         &self,
         stmt: &mut stmt::Statement,
     ) -> Option<MySQLUpdateReturning> {
-        if self.engine.capability().returning_from_update || !self.engine.capability().sql() {
+        if self.engine.capability().returning_from_update
+            || !self.engine.capability().sql()
+        {
             return None;
         }
 
@@ -290,8 +300,9 @@ impl Exec<'_> {
             filter: update.filter.clone(),
             distinct: false,
         };
-        let select_stmt =
-            stmt::Statement::Query(stmt::Query::new(stmt::ExprSet::Select(Box::new(select))));
+        let select_stmt = stmt::Statement::Query(stmt::Query::new(
+            stmt::ExprSet::Select(Box::new(select)),
+        ));
 
         Some(MySQLUpdateReturning { select_stmt })
     }
@@ -346,9 +357,10 @@ fn conditional_probe_counts(row: &stmt::Value) -> Result<(i64, i64)> {
     };
 
     match (record.fields.first(), record.fields.get(1)) {
-        (Some(stmt::Value::I64(matched)), Some(stmt::Value::I64(conditioned))) => {
-            Ok((*matched, *conditioned))
-        }
+        (
+            Some(stmt::Value::I64(matched)),
+            Some(stmt::Value::I64(conditioned)),
+        ) => Ok((*matched, *conditioned)),
         _ => Err(toasty_core::Error::invalid_result(format!(
             "conditional write probe columns are not I64; row={row:?}"
         ))),

@@ -5,8 +5,13 @@ impl Simplify<'_> {
     /// Heavyweight `IS NULL` rewrites. Cheap canonicalization (constant
     /// folding, cast stripping) runs in `fold::expr_is_null` before this is
     /// reached.
-    pub(super) fn simplify_expr_is_null(&self, expr: &mut stmt::ExprIsNull) -> Option<stmt::Expr> {
-        let stmt::Expr::Reference(f @ stmt::ExprReference::Field { .. }) = &mut *expr.expr else {
+    pub(super) fn simplify_expr_is_null(
+        &self,
+        expr: &mut stmt::ExprIsNull,
+    ) -> Option<stmt::Expr> {
+        let stmt::Expr::Reference(f @ stmt::ExprReference::Field { .. }) =
+            &mut *expr.expr
+        else {
             return None;
         };
 

@@ -193,7 +193,8 @@ impl ConnectionTask {
             }
             #[cfg(feature = "migration")]
             ConnectionOperation::AppliedMigrations { span, tx } => {
-                let result = self.connection.applied_migrations().instrument(span).await;
+                let result =
+                    self.connection.applied_migrations().instrument(span).await;
                 self.respond(tx, result)
             }
             #[cfg(feature = "migration")]
@@ -263,7 +264,9 @@ impl ConnectionTask {
             let _ = tx.send(result);
             true
         } else {
-            tracing::debug!("connection reported invalid; closing channel and exiting");
+            tracing::debug!(
+                "connection reported invalid; closing channel and exiting"
+            );
             self.in_rx.close();
             self.sweep_waker.wake();
             let _ = tx.send(result);

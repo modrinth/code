@@ -34,7 +34,9 @@ macro_rules! impl_jiff_field {
             type Update<'a> = ();
             type Inner = Self;
 
-            fn new_path<Origin>(path: Path<Origin, Self>) -> Self::Path<Origin> {
+            fn new_path<Origin>(
+                path: Path<Origin, Self>,
+            ) -> Self::Path<Origin> {
                 path
             }
 
@@ -50,7 +52,10 @@ macro_rules! impl_jiff_field {
             ) -> Self::Update<'a> {
             }
 
-            fn key_constraint<Origin>(&self, target: Path<Origin, Self::Inner>) -> Expr<bool> {
+            fn key_constraint<Origin>(
+                &self,
+                target: Path<Origin, Self::Inner>,
+            ) -> Expr<bool> {
                 target.eq(self)
             }
         }
@@ -73,7 +78,8 @@ impl_jiff_field!(jiff::civil::DateTime, DateTime, "jiff::civil::DateTime");
 static PRINTER: ::jiff::fmt::temporal::DateTimePrinter =
     ::jiff::fmt::temporal::DateTimePrinter::new();
 
-static PARSER: ::jiff::fmt::temporal::DateTimeParser = ::jiff::fmt::temporal::DateTimeParser::new();
+static PARSER: ::jiff::fmt::temporal::DateTimeParser =
+    ::jiff::fmt::temporal::DateTimeParser::new();
 
 /// Printing canonicalizes `america/NEW_YORK` to `America/New_York`, so equal
 /// zones store identical text.
@@ -97,9 +103,11 @@ pub(crate) fn time_zone_to_text(tz: &::jiff::tz::TimeZone) -> Result<String> {
 /// zone renamed between tzdb releases fails to load on a host carrying only
 /// the other name.
 fn time_zone_from_text(text: &str) -> Result<::jiff::tz::TimeZone> {
-    PARSER
-        .parse_time_zone(text)
-        .map_err(|e| toasty_core::Error::from_args(format_args!("invalid time zone {text:?}: {e}")))
+    PARSER.parse_time_zone(text).map_err(|e| {
+        toasty_core::Error::from_args(format_args!(
+            "invalid time zone {text:?}: {e}"
+        ))
+    })
 }
 
 impl Load for ::jiff::tz::TimeZone {
@@ -136,7 +144,9 @@ impl Field for ::jiff::tz::TimeZone {
         path
     }
 
-    fn new_list_path<Origin>(path: Path<Origin, List<Self::ExprTarget>>) -> Self::ListPath<Origin> {
+    fn new_list_path<Origin>(
+        path: Path<Origin, List<Self::ExprTarget>>,
+    ) -> Self::ListPath<Origin> {
         path
     }
 
@@ -146,7 +156,10 @@ impl Field for ::jiff::tz::TimeZone {
     ) -> Self::Update<'a> {
     }
 
-    fn key_constraint<Origin>(&self, target: Path<Origin, Self::Inner>) -> Expr<bool> {
+    fn key_constraint<Origin>(
+        &self,
+        target: Path<Origin, Self::Inner>,
+    ) -> Expr<bool> {
         target.eq(self)
     }
 }

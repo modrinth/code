@@ -67,7 +67,10 @@ impl Exec<'_> {
     /// would produce: a `Count` when the write has no `RETURNING`, or a
     /// buffered row stream when it does. Rows are buffered before the caller
     /// commits so nothing is tied to the open transaction.
-    async fn rmw_exec(&mut self, action: &mir::ReadModifyWrite) -> Result<Rows> {
+    async fn rmw_exec(
+        &mut self,
+        action: &mir::ReadModifyWrite,
+    ) -> Result<Rows> {
         // Column types of the write's `RETURNING` rows, or `None` when the
         // write has no returning (it then reports only a row count).
         let output_ty = mir::row_field_types(&action.ty);
@@ -141,7 +144,8 @@ impl Exec<'_> {
         // follow-up `SELECT` that runs inside this same transaction. After this,
         // `write_stmt` carries a native `RETURNING` only on backends that
         // support it (SQLite, PostgreSQL).
-        let mysql_update = self.process_stmt_update_with_returning_on_mysql(&mut write_stmt);
+        let mysql_update =
+            self.process_stmt_update_with_returning_on_mysql(&mut write_stmt);
         let native_returning = write_stmt.returning().is_some();
 
         let write_params = self.engine.prepare_for_driver(&mut write_stmt);
@@ -167,7 +171,10 @@ impl Exec<'_> {
             // The UPDATE ran without RETURNING; the captured SELECT produces the
             // post-update returning values.
             let mut res = self
-                .run_mysql_update_returning_select(mysql_update, output_ty.clone())
+                .run_mysql_update_returning_select(
+                    mysql_update,
+                    output_ty.clone(),
+                )
                 .await?;
             res.values.buffer().await?;
             return Ok(res.values);

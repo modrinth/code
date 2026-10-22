@@ -58,9 +58,11 @@ impl VisitMut for Fold {
 fn fold_one(i: &mut Expr) -> Option<Expr> {
     match i {
         Expr::And(expr) => expr_and::fold_expr_and(expr),
-        Expr::BinaryOp(expr) => {
-            expr_binary_op::fold_expr_binary_op(expr.op, &mut expr.lhs, &mut expr.rhs)
-        }
+        Expr::BinaryOp(expr) => expr_binary_op::fold_expr_binary_op(
+            expr.op,
+            &mut expr.lhs,
+            &mut expr.rhs,
+        ),
         Expr::Cast(expr) => expr_cast::fold_expr_cast(expr),
         Expr::InList(expr) => expr_in_list::fold_expr_in_list(expr),
         Expr::Intersects(expr) => expr_intersects::fold_expr_intersects(expr),

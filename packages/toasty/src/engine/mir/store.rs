@@ -52,7 +52,11 @@ impl Store {
         self.slots.push(Slot::Node(node.into()))
     }
 
-    pub(crate) fn insert_with_deps<I>(&mut self, node: impl Into<Node>, deps: I) -> NodeId
+    pub(crate) fn insert_with_deps<I>(
+        &mut self,
+        node: impl Into<Node>,
+        deps: I,
+    ) -> NodeId
     where
         I: IntoIterator<Item = NodeId>,
     {
@@ -100,7 +104,9 @@ impl ops::Index<NodeId> for Store {
     fn index(&self, index: NodeId) -> &Self::Output {
         match &self.slots[index] {
             Slot::Node(node) => node,
-            Slot::Reserved => panic!("reserved MIR slot {index:?} read before fill"),
+            Slot::Reserved => {
+                panic!("reserved MIR slot {index:?} read before fill")
+            }
         }
     }
 }
@@ -110,7 +116,9 @@ impl ops::IndexMut<NodeId> for Store {
     fn index_mut(&mut self, index: NodeId) -> &mut Self::Output {
         match &mut self.slots[index] {
             Slot::Node(node) => node,
-            Slot::Reserved => panic!("reserved MIR slot {index:?} read before fill"),
+            Slot::Reserved => {
+                panic!("reserved MIR slot {index:?} read before fill")
+            }
         }
     }
 }

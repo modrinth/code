@@ -5,7 +5,10 @@ use toasty_core::stmt;
 impl Simplify<'_> {
     /// Heavyweight `CAST` rewrites. Cheap canonicalization (constant
     /// folding) runs in `fold::expr_cast` before this is reached.
-    pub(super) fn simplify_expr_cast(&self, expr: &mut stmt::ExprCast) -> Option<stmt::Expr> {
+    pub(super) fn simplify_expr_cast(
+        &self,
+        expr: &mut stmt::ExprCast,
+    ) -> Option<stmt::Expr> {
         // Typed model records retain relation slots until relation planning
         // in lowering has assigned their foreign keys.
         if expr.from.is_none()
@@ -13,7 +16,9 @@ impl Simplify<'_> {
             && expr.expr.record_len().is_some()
         {
             let model = self.cx.schema().app.model(model);
-            if model.is_root() || model.fields().iter().any(|field| field.ty.is_belongs_to()) {
+            if model.is_root()
+                || model.fields().iter().any(|field| field.ty.is_belongs_to())
+            {
                 return None;
             }
         }
@@ -43,7 +48,9 @@ impl Simplify<'_> {
         //
         // If the inner expression is a field reference whose primitive type
         // matches the cast target, the cast is a no-op and can be removed.
-        let stmt::Expr::Reference(f @ stmt::ExprReference::Field { .. }) = &*expr.expr else {
+        let stmt::Expr::Reference(f @ stmt::ExprReference::Field { .. }) =
+            &*expr.expr
+        else {
             return None;
         };
 

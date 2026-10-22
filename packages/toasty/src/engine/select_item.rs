@@ -30,7 +30,9 @@ impl SelectItem {
     /// Infer the type of this select item given the expression context.
     pub(crate) fn infer_ty(&self, cx: &stmt::ExprContext<'_>) -> stmt::Type {
         match self {
-            SelectItem::ExprReference(expr_reference) => cx.infer_expr_reference_ty(expr_reference),
+            SelectItem::ExprReference(expr_reference) => {
+                cx.infer_expr_reference_ty(expr_reference)
+            }
             SelectItem::CountStar => stmt::Type::U64,
         }
     }
@@ -38,7 +40,9 @@ impl SelectItem {
     /// Convert this select item into the corresponding expression.
     pub(crate) fn to_expr(self) -> stmt::Expr {
         match self {
-            SelectItem::ExprReference(expr_reference) => stmt::Expr::from(expr_reference),
+            SelectItem::ExprReference(expr_reference) => {
+                stmt::Expr::from(expr_reference)
+            }
             SelectItem::CountStar => stmt::Expr::count_star(),
         }
     }
@@ -86,7 +90,10 @@ impl SelectItems {
 
     /// Returns `Type::List(Type::Record(field_tys))` where each `field_ty` is
     /// inferred from the corresponding select item.
-    pub(crate) fn infer_record_list_ty(&self, cx: &stmt::ExprContext<'_>) -> stmt::Type {
+    pub(crate) fn infer_record_list_ty(
+        &self,
+        cx: &stmt::ExprContext<'_>,
+    ) -> stmt::Type {
         let field_tys = self.0.iter().map(|item| item.infer_ty(cx)).collect();
         stmt::Type::list(stmt::Type::Record(field_tys))
     }
@@ -94,7 +101,9 @@ impl SelectItems {
     /// Extract only the `ExprReference` items from this set.
     ///
     /// Used by the NoSQL path where only column references are valid.
-    pub(crate) fn extract_expr_references(&self) -> indexmap::IndexSet<stmt::ExprReference> {
+    pub(crate) fn extract_expr_references(
+        &self,
+    ) -> indexmap::IndexSet<stmt::ExprReference> {
         self.0
             .iter()
             .map(|item| *item.as_expr_reference_unwrap())

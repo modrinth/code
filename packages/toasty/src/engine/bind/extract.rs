@@ -32,7 +32,9 @@ pub(super) fn extract_values(
             match expr {
                 stmt::Expr::AnyOp(e) => {
                     self.visit_expr_mut(&mut e.lhs);
-                    if let Some(arg) = extract_array_operand(&mut e.rhs, self.params) {
+                    if let Some(arg) =
+                        extract_array_operand(&mut e.rhs, self.params)
+                    {
                         *e.rhs = arg;
                     } else {
                         self.visit_expr_mut(&mut e.rhs);
@@ -41,7 +43,9 @@ pub(super) fn extract_values(
                 }
                 stmt::Expr::AllOp(e) => {
                     self.visit_expr_mut(&mut e.lhs);
-                    if let Some(arg) = extract_array_operand(&mut e.rhs, self.params) {
+                    if let Some(arg) =
+                        extract_array_operand(&mut e.rhs, self.params)
+                    {
                         *e.rhs = arg;
                     } else {
                         self.visit_expr_mut(&mut e.rhs);
@@ -57,15 +61,22 @@ pub(super) fn extract_values(
                 // one param.
                 stmt::Expr::InList(e) => {
                     self.visit_expr_mut(&mut e.expr);
-                    if let stmt::Expr::Value(stmt::Value::List(_)) = e.list.as_ref() {
+                    if let stmt::Expr::Value(stmt::Value::List(_)) =
+                        e.list.as_ref()
+                    {
                         let stmt::Expr::Value(stmt::Value::List(items)) =
-                            std::mem::replace(e.list.as_mut(), stmt::Expr::null())
+                            std::mem::replace(
+                                e.list.as_mut(),
+                                stmt::Expr::null(),
+                            )
                         else {
                             unreachable!()
                         };
                         let items = items
                             .into_iter()
-                            .map(|v| value_to_extracted_expr(v, self.params, false))
+                            .map(|v| {
+                                value_to_extracted_expr(v, self.params, false)
+                            })
                             .collect();
                         *e.list = stmt::Expr::List(stmt::ExprList { items });
                     } else {
@@ -78,10 +89,13 @@ pub(super) fn extract_values(
                 // a `*` appended; BINARY LIKE needs `%`/`_`/`!` escaped and a
                 // `%` appended.  The column expression is visited normally.
                 stmt::Expr::StartsWith(e)
-                    if self.glob_starts_with || self.binary_like_starts_with =>
+                    if self.glob_starts_with
+                        || self.binary_like_starts_with =>
                 {
                     self.visit_expr_mut(&mut e.expr);
-                    let stmt::Expr::Value(stmt::Value::String(prefix)) = e.prefix.as_ref() else {
+                    let stmt::Expr::Value(stmt::Value::String(prefix)) =
+                        e.prefix.as_ref()
+                    else {
                         panic!("starts_with prefix must be a string literal");
                     };
                     let pattern = if self.glob_starts_with {
@@ -139,9 +153,15 @@ pub(super) fn extract_values(
                     });
                     *expr = stmt::Expr::arg(position);
                 }
-                stmt::Expr::Value(value @ (stmt::Value::Record(_) | stmt::Value::List(_))) => {
+                stmt::Expr::Value(
+                    value @ (stmt::Value::Record(_) | stmt::Value::List(_)),
+                ) => {
                     let owned = std::mem::replace(value, stmt::Value::Null);
-                    *expr = value_to_extracted_expr(owned, self.params, self.bind_list_param);
+                    *expr = value_to_extracted_expr(
+                        owned,
+                        self.params,
+                        self.bind_list_param,
+                    );
                 }
                 _ => {}
             }
@@ -169,8 +189,12 @@ fn is_extractable_scalar_expr(expr: &stmt::Expr) -> bool {
 /// we cover both.
 fn is_scalar_list(expr: &stmt::Expr) -> bool {
     match expr {
-        stmt::Expr::List(list) => list.items.iter().all(is_extractable_scalar_expr),
-        stmt::Expr::Value(stmt::Value::List(items)) => items.iter().all(is_extractable_scalar),
+        stmt::Expr::List(list) => {
+            list.items.iter().all(is_extractable_scalar_expr)
+        }
+        stmt::Expr::Value(stmt::Value::List(items)) => {
+            items.iter().all(is_extractable_scalar)
+        }
         _ => false,
     }
 }
@@ -184,7 +208,10 @@ fn is_scalar_list(expr: &stmt::Expr) -> bool {
 /// The element type starts as the value-inferred type of the first non-null
 /// item — or `Ty::Unknown` for empty / all-null lists. The synthesize/check
 /// pass refines it to the column type when one is known.
-fn extract_array_operand(expr: &mut stmt::Expr, params: &mut Vec<Param>) -> Option<stmt::Expr> {
+fn extract_array_operand(
+    expr: &mut stmt::Expr,
+    params: &mut Vec<Param>,
+) -> Option<stmt::Expr> {
     let items: Vec<stmt::Value> = match expr {
         stmt::Expr::Value(stmt::Value::List(_)) => {
             let stmt::Expr::Value(stmt::Value::List(items)) =
@@ -194,8 +221,12 @@ fn extract_array_operand(expr: &mut stmt::Expr, params: &mut Vec<Param>) -> Opti
             };
             items
         }
-        stmt::Expr::List(list) if list.items.iter().all(|i| matches!(i, stmt::Expr::Value(_))) => {
-            let stmt::Expr::List(list) = std::mem::replace(expr, stmt::Expr::null()) else {
+        stmt::Expr::List(list)
+            if list.items.iter().all(|i| matches!(i, stmt::Expr::Value(_))) =>
+        {
+            let stmt::Expr::List(list) =
+                std::mem::replace(expr, stmt::Expr::null())
+            else {
                 unreachable!()
             };
             list.items
@@ -248,7 +279,8 @@ fn value_to_extracted_expr(
                     // mapping's lowering cast). Either way the whole list binds
                     // as one parameter; the synthesize/check pass resolves its
                     // type.
-                    is_extractable_scalar(v) || matches!(v, stmt::Value::Object(_))
+                    is_extractable_scalar(v)
+                        || matches!(v, stmt::Value::Object(_))
                 }) =>
         {
             let value = stmt::Value::List(values);
@@ -279,7 +311,10 @@ fn is_extractable_scalar(value: &stmt::Value) -> bool {
     // never through scalar extraction.
     !matches!(
         value,
-        stmt::Value::Null | stmt::Value::Record(_) | stmt::Value::List(_) | stmt::Value::Object(_)
+        stmt::Value::Null
+            | stmt::Value::Record(_)
+            | stmt::Value::List(_)
+            | stmt::Value::Object(_)
     )
 }
 

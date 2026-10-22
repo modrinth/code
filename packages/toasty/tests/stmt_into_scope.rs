@@ -59,9 +59,11 @@ fn into_scope_preserves_filter_body() {
     // widening — only `single` / `limit` get reset.
     let list_q: Query<List<User>> =
         Query::<List<User>>::all().filter(User::fields().name().eq("alice"));
-    let from_list = untyped_query(IntoScope::<User>::into_scope(list_q.clone()));
+    let from_list =
+        untyped_query(IntoScope::<User>::into_scope(list_q.clone()));
 
-    let from_option = untyped_query(IntoScope::<User>::into_scope(list_q.clone().first()));
+    let from_option =
+        untyped_query(IntoScope::<User>::into_scope(list_q.clone().first()));
     let from_one = untyped_query(IntoScope::<User>::into_scope(list_q.one()));
 
     assert_eq!(from_list.body, from_option.body);

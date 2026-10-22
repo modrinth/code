@@ -35,7 +35,11 @@ impl ExecPlanner<'_> {
         self.flush_if_block(&mut if_block);
     }
 
-    fn plan_node(&mut self, node_id: mir::NodeId, if_block: &mut Vec<mir::NodeId>) {
+    fn plan_node(
+        &mut self,
+        node_id: mir::NodeId,
+        if_block: &mut Vec<mir::NodeId>,
+    ) {
         let guard = self.logical_plan[node_id].guard;
 
         if let Some(&first_node_id) = if_block.first()
@@ -102,7 +106,10 @@ impl ExecPlanner<'_> {
 
     /// Collects loads from variables produced outside the block. The skip arm
     /// releases each load that the `then` arm would have performed.
-    fn collect_skipped_inputs(&self, block: &[mir::NodeId]) -> Vec<mir::NodeId> {
+    fn collect_skipped_inputs(
+        &self,
+        block: &[mir::NodeId],
+    ) -> Vec<mir::NodeId> {
         let in_block: IndexSet<mir::NodeId> = block.iter().copied().collect();
 
         block
@@ -113,7 +120,10 @@ impl ExecPlanner<'_> {
     }
 
     /// Collects variables produced inside the block and consumed outside it.
-    fn collect_skipped_outputs(&self, block: &[mir::NodeId]) -> Vec<(mir::NodeId, usize)> {
+    fn collect_skipped_outputs(
+        &self,
+        block: &[mir::NodeId],
+    ) -> Vec<(mir::NodeId, usize)> {
         block
             .iter()
             .filter_map(|&node_id| {
@@ -123,10 +133,16 @@ impl ExecPlanner<'_> {
             .collect()
     }
 
-    fn external_use_count(&self, block: &[mir::NodeId], node_id: mir::NodeId) -> usize {
+    fn external_use_count(
+        &self,
+        block: &[mir::NodeId],
+        node_id: mir::NodeId,
+    ) -> usize {
         let in_block_loads = block
             .iter()
-            .flat_map(|&consumer_id| self.logical_plan[consumer_id].op.input_loads())
+            .flat_map(|&consumer_id| {
+                self.logical_plan[consumer_id].op.input_loads()
+            })
             .filter(|&load| load == node_id)
             .count();
 

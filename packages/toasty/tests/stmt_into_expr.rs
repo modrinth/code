@@ -285,10 +285,11 @@ fn into_expr_pair() {
     let pair: (i64, bool) = (1, true);
     let expr: Expr<(i64, bool)> = pair.into_expr();
     let core_expr = untyped(expr);
-    let expected = core_stmt::Expr::Record(core_stmt::ExprRecord::from_vec(vec![
-        core_stmt::Expr::Value(core_stmt::Value::I64(1)),
-        core_stmt::Expr::Value(core_stmt::Value::Bool(true)),
-    ]));
+    let expected =
+        core_stmt::Expr::Record(core_stmt::ExprRecord::from_vec(vec![
+            core_stmt::Expr::Value(core_stmt::Value::I64(1)),
+            core_stmt::Expr::Value(core_stmt::Value::Bool(true)),
+        ]));
     assert_eq!(core_expr, expected);
 }
 
@@ -297,11 +298,12 @@ fn into_expr_triple() {
     let triple = (1i64, "hi", true);
     let expr: Expr<(i64, String, bool)> = triple.into_expr();
     let core_expr = untyped(expr);
-    let expected = core_stmt::Expr::Record(core_stmt::ExprRecord::from_vec(vec![
-        core_stmt::Expr::Value(core_stmt::Value::I64(1)),
-        core_stmt::Expr::Value(core_stmt::Value::String("hi".into())),
-        core_stmt::Expr::Value(core_stmt::Value::Bool(true)),
-    ]));
+    let expected =
+        core_stmt::Expr::Record(core_stmt::ExprRecord::from_vec(vec![
+            core_stmt::Expr::Value(core_stmt::Value::I64(1)),
+            core_stmt::Expr::Value(core_stmt::Value::String("hi".into())),
+            core_stmt::Expr::Value(core_stmt::Value::Bool(true)),
+        ]));
     assert_eq!(core_expr, expected);
 }
 
@@ -310,10 +312,11 @@ fn by_ref_pair() {
     let pair = (10i64, false);
     let expr: Expr<(i64, bool)> = pair.by_ref();
     let core_expr = untyped(expr);
-    let expected = core_stmt::Expr::Record(core_stmt::ExprRecord::from_vec(vec![
-        core_stmt::Expr::Value(core_stmt::Value::I64(10)),
-        core_stmt::Expr::Value(core_stmt::Value::Bool(false)),
-    ]));
+    let expected =
+        core_stmt::Expr::Record(core_stmt::ExprRecord::from_vec(vec![
+            core_stmt::Expr::Value(core_stmt::Value::I64(10)),
+            core_stmt::Expr::Value(core_stmt::Value::Bool(false)),
+        ]));
     assert_eq!(core_expr, expected);
 }
 
@@ -323,9 +326,9 @@ fn by_ref_pair() {
 
 #[test]
 fn batch_into_expr_wraps_statement() {
-    let query = core_stmt::Query::new_single(core_stmt::Values::from(core_stmt::Expr::Value(
-        core_stmt::Value::I64(1),
-    )));
+    let query = core_stmt::Query::new_single(core_stmt::Values::from(
+        core_stmt::Expr::Value(core_stmt::Value::I64(1)),
+    ));
     let stmt = toasty::Statement::<i64>::from_untyped_stmt(query.into());
     let batch = toasty::stmt::Batch::from(stmt);
     let expr: Expr<i64> = batch.into_expr();
@@ -337,9 +340,9 @@ fn batch_into_expr_wraps_statement() {
 
 #[test]
 fn batch_by_ref_wraps_statement() {
-    let query = core_stmt::Query::new_single(core_stmt::Values::from(core_stmt::Expr::Value(
-        core_stmt::Value::I64(1),
-    )));
+    let query = core_stmt::Query::new_single(core_stmt::Values::from(
+        core_stmt::Expr::Value(core_stmt::Value::I64(1)),
+    ));
     let stmt = toasty::Statement::<i64>::from_untyped_stmt(query.into());
     let batch = toasty::stmt::Batch::from(stmt);
     let expr: Expr<i64> = batch.by_ref();
@@ -350,9 +353,9 @@ fn batch_by_ref_wraps_statement() {
 
 #[test]
 fn batch_into_expr_and_by_ref_agree() {
-    let query = core_stmt::Query::new_single(core_stmt::Values::from(core_stmt::Expr::Value(
-        core_stmt::Value::Bool(true),
-    )));
+    let query = core_stmt::Query::new_single(core_stmt::Values::from(
+        core_stmt::Expr::Value(core_stmt::Value::Bool(true)),
+    ));
     let stmt = toasty::Statement::<bool>::from_untyped_stmt(query.into());
     let batch = toasty::stmt::Batch::from(stmt);
 

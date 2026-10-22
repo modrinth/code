@@ -8,7 +8,10 @@ use toasty_core::{
 };
 
 impl Exec<'_> {
-    pub(super) async fn exec_filter(&mut self, action: &mir::Filter) -> Result<ExecResponse> {
+    pub(super) async fn exec_filter(
+        &mut self,
+        action: &mir::Filter,
+    ) -> Result<ExecResponse> {
         // Attached args are loaded whether or not any row is read, keeping
         // use counts exact.
         let args = self.collect_input(action.args.iter().copied()).await?;
@@ -32,7 +35,10 @@ impl Exec<'_> {
                 .predicate
                 .eval_bool(&self.engine.schema, &eval_input)?
             {
-                filtered_rows.push(std::mem::replace(&mut eval_input[0], stmt::Value::Null));
+                filtered_rows.push(std::mem::replace(
+                    &mut eval_input[0],
+                    stmt::Value::Null,
+                ));
             }
         }
 

@@ -79,7 +79,10 @@ struct UpdateRelationSource<'a> {
 }
 
 impl LowerStatement<'_, '_> {
-    pub(super) fn plan_stmt_delete_relations(&mut self, mut stmt: &stmt::Delete) {
+    pub(super) fn plan_stmt_delete_relations(
+        &mut self,
+        mut stmt: &stmt::Delete,
+    ) {
         // Cascading deletes are only handled at the application level
         let Some(model) = self.expr_cx.target().as_model() else {
             return;
@@ -115,11 +118,18 @@ impl LowerStatement<'_, '_> {
     }
 
     /// Plan root and embedded record fields through the same relation dispatcher.
-    fn plan_record_relations<S: RelationRecord>(&mut self, fields: &[Field], source: &mut S) {
+    fn plan_record_relations<S: RelationRecord>(
+        &mut self,
+        fields: &[Field],
+        source: &mut S,
+    ) {
         for field in fields {
             if let FieldTy::Embedded(embedded) = &field.ty {
                 let mut value = source.take_source_field(field.id);
-                self.plan_embedded_record_relations(embedded.target, &mut value);
+                self.plan_embedded_record_relations(
+                    embedded.target,
+                    &mut value,
+                );
                 source.set_source_field(field.id, value);
             } else if field.is_relation() {
                 let expr = source.take_source_field(field.id);
@@ -153,7 +163,11 @@ impl LowerStatement<'_, '_> {
 
     /// Resolve the fields of an embedded value, including the active variant's
     /// local record positions, before its columns are expanded.
-    fn plan_embedded_record_relations(&mut self, model: app::ModelId, expr: &mut stmt::Expr) {
+    fn plan_embedded_record_relations(
+        &mut self,
+        model: app::ModelId,
+        expr: &mut stmt::Expr,
+    ) {
         if let stmt::Expr::Cast(cast) = expr
             && cast.from.is_none()
             && cast.ty == stmt::Type::Model(model)
@@ -164,26 +178,29 @@ impl LowerStatement<'_, '_> {
         let Some(len) = expr.record_len() else {
             return;
         };
-        let (fields, offset): (&[Field], _) = match self.schema().app.model(model) {
-            app::Model::Root(_) => return,
-            app::Model::EmbeddedStruct(model) => (&model.fields, 0),
-            app::Model::EmbeddedEnum(model) => {
-                let Some(discriminant) = expr.entry(0) else {
-                    return;
-                };
-                let stmt::Expr::Value(discriminant) = discriminant.to_expr() else {
-                    return;
-                };
-                let Some(variant) = model
-                    .variants
-                    .iter()
-                    .position(|v| v.discriminant == discriminant)
-                else {
-                    return;
-                };
-                (model.variant_fields(variant), 1)
-            }
-        };
+        let (fields, offset): (&[Field], _) =
+            match self.schema().app.model(model) {
+                app::Model::Root(_) => return,
+                app::Model::EmbeddedStruct(model) => (&model.fields, 0),
+                app::Model::EmbeddedEnum(model) => {
+                    let Some(discriminant) = expr.entry(0) else {
+                        return;
+                    };
+                    let stmt::Expr::Value(discriminant) =
+                        discriminant.to_expr()
+                    else {
+                        return;
+                    };
+                    let Some(variant) = model
+                        .variants
+                        .iter()
+                        .position(|v| v.discriminant == discriminant)
+                    else {
+                        return;
+                    };
+                    (model.variant_fields(variant), 1)
+                }
+            };
         if len != fields.len() + offset {
             return;
         }
@@ -199,7 +216,10 @@ impl LowerStatement<'_, '_> {
 
     /// Typed embedded values also occur outside writes, for example in filters.
     /// Keep their relation semantics identical to values assigned to a field.
-    pub(super) fn plan_typed_record_relations(&mut self, expr: &mut stmt::Expr) {
+    pub(super) fn plan_typed_record_relations(
+        &mut self,
+        expr: &mut stmt::Expr,
+    ) {
         let stmt::Expr::Cast(cast) = expr else {
             return;
         };
@@ -219,9 +239,15 @@ impl LowerStatement<'_, '_> {
         }
     }
 
-    fn plan_embedded_assignment(&mut self, model: app::ModelId, assignment: &mut stmt::Assignment) {
+    fn plan_embedded_assignment(
+        &mut self,
+        model: app::ModelId,
+        assignment: &mut stmt::Assignment,
+    ) {
         match assignment {
-            stmt::Assignment::Set(expr) => self.plan_embedded_record_relations(model, expr),
+            stmt::Assignment::Set(expr) => {
+                self.plan_embedded_record_relations(model, expr)
+            }
             stmt::Assignment::Batch(entries) => {
                 for entry in entries {
                     self.plan_embedded_assignment(model, entry);
@@ -323,10 +349,14 @@ impl LowerStatement<'_, '_> {
     ) {
         match &field.ty {
             FieldTy::Has(rel) if rel.is_one() => {
-                self.relation_step(field, |lower| lower.plan_mut_has_one(field, op, source));
+                self.relation_step(field, |lower| {
+                    lower.plan_mut_has_one(field, op, source)
+                });
             }
             FieldTy::Has(rel) if rel.is_many() => {
-                self.relation_step(field, |lower| lower.plan_mut_has_many(field, op, source));
+                self.relation_step(field, |lower| {
+                    lower.plan_mut_has_many(field, op, source)
+                });
             }
             FieldTy::BelongsTo(_) => {
                 self.plan_mut_belongs_to(field, op, source);
@@ -335,7 +365,12 @@ impl LowerStatement<'_, '_> {
         }
     }
 
-    fn plan_mut_has_many(&mut self, field: &Field, op: Mutation, source: &mut dyn RelationSource) {
+    fn plan_mut_has_many(
+        &mut self,
+        field: &Field,
+        op: Mutation,
+        source: &mut dyn RelationSource,
+    ) {
         let has_many = field.ty.as_has_many_unwrap();
         let pair = has_many.pair_id;
         let pair = self.field(pair);
@@ -343,7 +378,12 @@ impl LowerStatement<'_, '_> {
         self.plan_mut_has_n(field, pair, op, source);
     }
 
-    fn plan_mut_has_one(&mut self, field: &Field, op: Mutation, source: &mut dyn RelationSource) {
+    fn plan_mut_has_one(
+        &mut self,
+        field: &Field,
+        op: Mutation,
+        source: &mut dyn RelationSource,
+    ) {
         let has_one = field.ty.as_has_one_unwrap();
         let pair = has_one.pair_id;
         let pair = self.field(pair);
@@ -370,12 +410,16 @@ impl LowerStatement<'_, '_> {
                 });
 
                 self.with_dependencies(deps, |lower| {
-                    lower.plan_mut_has_n_associate_expr(field, pair, expr, source);
+                    lower.plan_mut_has_n_associate_expr(
+                        field, pair, expr, source,
+                    );
                 });
             }
             Mutation::Disassociate { expr } => {
                 debug_assert!(field.ty.is_has_many());
-                self.plan_mut_has_many_disassociate_expr(field, pair, expr, source);
+                self.plan_mut_has_many_disassociate_expr(
+                    field, pair, expr, source,
+                );
             }
         }
     }
@@ -390,11 +434,18 @@ impl LowerStatement<'_, '_> {
         match expr {
             stmt::Expr::List(expr_list) => {
                 for expr in expr_list.items {
-                    self.plan_mut_has_n_associate_expr(field, pair, expr, source);
+                    self.plan_mut_has_n_associate_expr(
+                        field, pair, expr, source,
+                    );
                 }
             }
             stmt::Expr::Stmt(expr_stmt) => {
-                self.plan_mut_has_n_associate_stmt(field, pair, *expr_stmt.stmt, source);
+                self.plan_mut_has_n_associate_stmt(
+                    field,
+                    pair,
+                    *expr_stmt.stmt,
+                    source,
+                );
             }
             stmt::Expr::Value(stmt::Value::List(value_list)) => {
                 for value in value_list {
@@ -433,7 +484,8 @@ impl LowerStatement<'_, '_> {
                 let stmt::ExprSet::Select(select) = &mut query.body else {
                     todo!()
                 };
-                select.returning = stmt::Returning::Project(stmt::Expr::record([1]));
+                select.returning =
+                    stmt::Returning::Project(stmt::Expr::record([1]));
                 query
             }));
         }
@@ -470,7 +522,9 @@ impl LowerStatement<'_, '_> {
         if pair.nullable {
             let mut stmt = selection.update();
 
-            stmt.condition = stmt::Condition::new(self.relation_pair_filter(pair.id, source));
+            stmt.condition = stmt::Condition::new(
+                self.relation_pair_filter(pair.id, source),
+            );
             stmt.assignments.set(pair, stmt::Value::Null);
             self.new_dependency(stmt);
         } else {
@@ -478,7 +532,11 @@ impl LowerStatement<'_, '_> {
         }
     }
 
-    fn plan_mut_has_n_disassociate_all(&mut self, pair: &Field, source: &dyn RelationSource) {
+    fn plan_mut_has_n_disassociate_all(
+        &mut self,
+        pair: &Field,
+        source: &dyn RelationSource,
+    ) {
         let query = self.relation_pair_scope(pair.id, source);
 
         if pair.nullable {
@@ -569,7 +627,8 @@ impl LowerStatement<'_, '_> {
 
             if pair.ty.is_has_one() && !pair.nullable {
                 self.relation_step(field, |planner| {
-                    let delete = planner.relation_pair_scope(pair.id, source).delete();
+                    let delete =
+                        planner.relation_pair_scope(pair.id, source).delete();
                     planner.new_dependency(delete);
                 });
             }
@@ -588,7 +647,10 @@ impl LowerStatement<'_, '_> {
         expr: stmt::Expr,
         source: &mut dyn RelationSource,
     ) {
-        let expr = relation_key_expr(&field.ty.as_belongs_to_unwrap().foreign_key, expr);
+        let expr = relation_key_expr(
+            &field.ty.as_belongs_to_unwrap().foreign_key,
+            expr,
+        );
         let dependencies = self.collect_dependencies(|lower| {
             if let Some(pair_id) = field.pair()
                 && lower.field(pair_id).ty.is_has_one()
@@ -608,7 +670,10 @@ impl LowerStatement<'_, '_> {
 
                         let scope = stmt::Query::new_select(
                             field.id.model,
-                            stmt::Expr::eq(stmt::Expr::ref_self_field(field), expr.clone()),
+                            stmt::Expr::eq(
+                                stmt::Expr::ref_self_field(field),
+                                expr.clone(),
+                            ),
                         );
 
                         if field.nullable {
@@ -642,10 +707,18 @@ impl LowerStatement<'_, '_> {
                     .iter()
                     .all(|f| f.is_value() || f.is_expr_reference()) =>
             {
-                lower.set_relation_field(field, stmt::Expr::Record(record), source);
+                lower.set_relation_field(
+                    field,
+                    stmt::Expr::Record(record),
+                    source,
+                );
             }
             stmt::Expr::Stmt(expr_stmt) => {
-                lower.plan_mut_belongs_to_associate_stmt(field, *expr_stmt.stmt, source);
+                lower.plan_mut_belongs_to_associate_stmt(
+                    field,
+                    *expr_stmt.stmt,
+                    source,
+                );
             }
             _ => todo!("field={field:#?}; expr={expr:#?}"),
         });
@@ -677,18 +750,18 @@ impl LowerStatement<'_, '_> {
 
                 // Previous value of returning does nothing in this
                 // context
-                insert.returning = Some(stmt::Returning::Project(stmt::Expr::record(
-                    belongs_to
-                        .foreign_key
-                        .fields
-                        .iter()
-                        .map(|fk_field| stmt::Expr::ref_self_field(fk_field.target)),
-                )));
+                insert.returning =
+                    Some(stmt::Returning::Project(stmt::Expr::record(
+                        belongs_to.foreign_key.fields.iter().map(|fk_field| {
+                            stmt::Expr::ref_self_field(fk_field.target)
+                        }),
+                    )));
 
                 let target_id = self.new_dependency(insert);
                 let stmt_info = &self.state.hir[target_id];
 
-                let returning = stmt_info.stmt.as_ref().unwrap().returning().expect("bug");
+                let returning =
+                    stmt_info.stmt.as_ref().unwrap().returning().expect("bug");
 
                 let expr = match returning {
                     stmt::Returning::Expr(expr) if expr.is_const() => {
@@ -702,11 +775,13 @@ impl LowerStatement<'_, '_> {
                     }
                     _ => {
                         // Make sure the source statement returns a single record
-                        debug_assert!(match &**stmt_info.stmt.as_ref().unwrap() {
-                            stmt::Statement::Insert(i) => i.source.single,
-                            stmt::Statement::Query(stmt) => stmt.single,
-                            stmt => todo!("stmt={stmt:#?}"),
-                        });
+                        debug_assert!(
+                            match &**stmt_info.stmt.as_ref().unwrap() {
+                                stmt::Statement::Insert(i) => i.source.single,
+                                stmt::Statement::Query(stmt) => stmt.single,
+                                stmt => todo!("stmt={stmt:#?}"),
+                            }
+                        );
                         // The result dependency is needed to get the foreign key.
                         self.new_dependency_arg(self.scope_stmt_id(), target_id)
                     }
@@ -742,7 +817,11 @@ impl LowerStatement<'_, '_> {
     ///
     /// Recursively walks `And` nodes collecting equality constraints for each
     /// key field. Does not descend into `Or` or other non-conjunctive nodes.
-    fn extract_key_expr(&self, key: &[FieldId], query: &stmt::Query) -> Option<stmt::Expr> {
+    fn extract_key_expr(
+        &self,
+        key: &[FieldId],
+        query: &stmt::Query,
+    ) -> Option<stmt::Expr> {
         let cx = self.expr_cx.scope(query);
 
         let stmt::ExprSet::Select(select) = &query.body else {
@@ -750,10 +829,16 @@ impl LowerStatement<'_, '_> {
         };
 
         let mut values: Vec<Option<stmt::Expr>> = vec![None; key.len()];
-        Self::collect_key_constraints(&cx, key, select.filter.as_expr(), &mut values);
+        Self::collect_key_constraints(
+            &cx,
+            key,
+            select.filter.as_expr(),
+            &mut values,
+        );
 
         // All key fields must have been matched
-        let values: Vec<stmt::Expr> = values.into_iter().collect::<Option<Vec<_>>>()?;
+        let values: Vec<stmt::Expr> =
+            values.into_iter().collect::<Option<Vec<_>>>()?;
 
         if values.len() == 1 {
             Some(values.into_iter().next().unwrap())
@@ -819,17 +904,27 @@ impl LowerStatement<'_, '_> {
         match (&*binary.lhs, &*binary.rhs) {
             // Inner field ref (nesting=0) matched against outer field ref (nesting>0)
             (
-                stmt::Expr::Reference(inner @ stmt::ExprReference::Field { nesting: 0, .. }),
-                stmt::Expr::Reference(outer @ stmt::ExprReference::Field { nesting, .. }),
+                stmt::Expr::Reference(
+                    inner @ stmt::ExprReference::Field { nesting: 0, .. },
+                ),
+                stmt::Expr::Reference(
+                    outer @ stmt::ExprReference::Field { nesting, .. },
+                ),
             )
             | (
-                stmt::Expr::Reference(outer @ stmt::ExprReference::Field { nesting, .. }),
-                stmt::Expr::Reference(inner @ stmt::ExprReference::Field { nesting: 0, .. }),
+                stmt::Expr::Reference(
+                    outer @ stmt::ExprReference::Field { nesting, .. },
+                ),
+                stmt::Expr::Reference(
+                    inner @ stmt::ExprReference::Field { nesting: 0, .. },
+                ),
             ) if *nesting > 0 => {
-                let field_ref = cx.resolve_expr_reference(inner).as_field_unwrap();
+                let field_ref =
+                    cx.resolve_expr_reference(inner).as_field_unwrap();
                 if key_field == field_ref.id {
                     let mut ret = *outer;
-                    let stmt::ExprReference::Field { nesting, .. } = &mut ret else {
+                    let stmt::ExprReference::Field { nesting, .. } = &mut ret
+                    else {
                         panic!()
                     };
                     debug_assert!(*nesting > 0);
@@ -842,8 +937,10 @@ impl LowerStatement<'_, '_> {
             // Both nesting=0 refs — not handled
             (stmt::Expr::Reference(_), stmt::Expr::Reference(_)) => None,
             // Field ref matched against a constant value
-            (stmt::Expr::Reference(expr_ref), other) | (other, stmt::Expr::Reference(expr_ref)) => {
-                let field_ref = cx.resolve_expr_reference(expr_ref).as_field_unwrap();
+            (stmt::Expr::Reference(expr_ref), other)
+            | (other, stmt::Expr::Reference(expr_ref)) => {
+                let field_ref =
+                    cx.resolve_expr_reference(expr_ref).as_field_unwrap();
                 if key_field == field_ref.id {
                     if let stmt::Expr::Value(value) = other {
                         Some(value.clone().into())
@@ -860,15 +957,33 @@ impl LowerStatement<'_, '_> {
 
     /// Translate a source model scope to a target model scope for a has_one
     /// relation.
-    fn relation_pair_scope(&self, pair: FieldId, source: &dyn RelationSource) -> stmt::Query {
-        stmt::Query::new_select(pair.model, self.relation_pair_filter(pair, source))
+    fn relation_pair_scope(
+        &self,
+        pair: FieldId,
+        source: &dyn RelationSource,
+    ) -> stmt::Query {
+        stmt::Query::new_select(
+            pair.model,
+            self.relation_pair_filter(pair, source),
+        )
     }
 
-    fn relation_pair_filter(&self, pair: FieldId, source: &dyn RelationSource) -> stmt::Expr {
-        stmt::Expr::in_subquery(stmt::Expr::ref_self_field(pair), source.selection(1))
+    fn relation_pair_filter(
+        &self,
+        pair: FieldId,
+        source: &dyn RelationSource,
+    ) -> stmt::Expr {
+        stmt::Expr::in_subquery(
+            stmt::Expr::ref_self_field(pair),
+            source.selection(1),
+        )
     }
 
-    fn relation_step(&mut self, field: &Field, f: impl FnOnce(&mut LowerStatement)) {
+    fn relation_step(
+        &mut self,
+        field: &Field,
+        f: impl FnOnce(&mut LowerStatement),
+    ) {
         if let Some(pair) = field.pair()
             && self.state.relations.last().copied() == Some(pair)
         {
@@ -880,7 +995,12 @@ impl LowerStatement<'_, '_> {
         self.state.relations.pop();
     }
 
-    fn set_relation_field(&self, field: &Field, expr: stmt::Expr, source: &mut dyn RelationSource) {
+    fn set_relation_field(
+        &self,
+        field: &Field,
+        expr: stmt::Expr,
+        source: &mut dyn RelationSource,
+    ) {
         let app::FieldTy::BelongsTo(belongs_to) = &field.ty else {
             todo!("field={field:#?}")
         };
@@ -924,7 +1044,9 @@ impl RelationSource for UpdateRelationSource<'_> {
     fn set_returning_field(&mut self, field: &Field, expr: stmt::Expr) {
         debug_assert!(self.returning_changed, "TODO");
 
-        let Some(stmt::Returning::Project(stmt::Expr::Cast(expr_cast))) = self.returning else {
+        let Some(stmt::Returning::Project(stmt::Expr::Cast(expr_cast))) =
+            self.returning
+        else {
             todo!("UpdateRelationSource={self:#?}")
         };
 
@@ -975,7 +1097,9 @@ impl RelationSource for InsertRelationSource<'_> {
 
     fn set_returning_field(&mut self, field: &Field, expr: stmt::Expr) {
         let record = match self.returning {
-            Some(stmt::Returning::Project(stmt::Expr::Record(record))) => record,
+            Some(stmt::Returning::Project(stmt::Expr::Record(record))) => {
+                record
+            }
             Some(stmt::Returning::Expr(stmt::Expr::List(rows))) => {
                 rows.items[self.index].as_record_mut_unwrap()
             }
@@ -1022,7 +1146,9 @@ fn relation_mutation(field: &Field, entry: stmt::Assignment) -> Mutation {
         // them to a has-many setter, but the engine has no Append-on-relation
         // lowering.
         stmt::Assignment::Append(_) => {
-            unreachable!("Append assignment on relation field — use stmt::insert for has-many")
+            unreachable!(
+                "Append assignment on relation field — use stmt::insert for has-many"
+            )
         }
         // `stmt::pop` / `stmt::remove_at` target ordered `Vec<scalar>` fields.
         // They have no relation analogue — has-many removal is by relation key,
@@ -1039,7 +1165,9 @@ fn relation_mutation(field: &Field, entry: stmt::Assignment) -> Mutation {
                 "Add / Subtract assignment on relation field — these only apply to scalar numerics"
             )
         }
-        stmt::Assignment::Batch(_) => unreachable!("Batch entries are flattened above"),
+        stmt::Assignment::Batch(_) => {
+            unreachable!("Batch entries are flattened above")
+        }
     }
 }
 
@@ -1071,7 +1199,9 @@ fn flatten_relation_batch(entries: &mut Vec<stmt::Assignment>) {
         };
         let insert = match *expr_stmt.stmt {
             stmt::Statement::Insert(insert) => insert,
-            other => todo!("non-Insert sub-statement in has-many Batch: {other:#?}"),
+            other => {
+                todo!("non-Insert sub-statement in has-many Batch: {other:#?}")
+            }
         };
         match &mut merged {
             None => merged = Some(insert),
@@ -1135,7 +1265,9 @@ impl RelationSource for EmbeddedRelationSource<'_> {
     }
 
     fn set_returning_field(&mut self, _field: &Field, _expr: stmt::Expr) {
-        unreachable!("embedded belongs-to returning slots are filled by include lowering")
+        unreachable!(
+            "embedded belongs-to returning slots are filled by include lowering"
+        )
     }
 
     fn needs_existence_check(&self) -> bool {
@@ -1185,7 +1317,10 @@ fn assign_projected_key(
     }
 }
 
-fn relation_key_expr(foreign_key: &app::ForeignKey, expr: stmt::Expr) -> stmt::Expr {
+fn relation_key_expr(
+    foreign_key: &app::ForeignKey,
+    expr: stmt::Expr,
+) -> stmt::Expr {
     // A loaded model carries its stored fields, including non-primary keys.
     // Ordinary relation expressions already contain the key itself.
     let mut target = match expr {

@@ -6,7 +6,10 @@ impl Simplify<'_> {
     /// Heavyweight OR rewrites. Cheap canonicalization (flatten, true
     /// short-circuit, drop false, null propagation) runs in `fold::expr_or`
     /// before this is reached.
-    pub(super) fn simplify_expr_or(&mut self, expr: &mut stmt::ExprOr) -> Option<stmt::Expr> {
+    pub(super) fn simplify_expr_or(
+        &mut self,
+        expr: &mut stmt::ExprOr,
+    ) -> Option<stmt::Expr> {
         dedup_operands(&mut expr.operands);
 
         // Absorption law, `x or (x and y)` → `x`
@@ -21,10 +24,9 @@ impl Simplify<'_> {
         expr.operands.retain(|operand| {
             if let stmt::Expr::And(and_expr) = operand {
                 // Remove this AND if any of its operands appears as a direct operand of the OR
-                !and_expr
-                    .operands
-                    .iter()
-                    .any(|op| non_and_operands.iter().any(|e| e.is_equivalent_to(op)))
+                !and_expr.operands.iter().any(|op| {
+                    non_and_operands.iter().any(|e| e.is_equivalent_to(op))
+                })
             } else {
                 true
             }
@@ -89,7 +91,10 @@ impl Simplify<'_> {
             .filter(|op| {
                 expr.operands[1..].iter().all(|other| {
                     if let stmt::Expr::And(other_and) = other {
-                        other_and.operands.iter().any(|e| e.is_equivalent_to(op))
+                        other_and
+                            .operands
+                            .iter()
+                            .any(|e| e.is_equivalent_to(op))
                     } else {
                         false
                     }
@@ -105,8 +110,9 @@ impl Simplify<'_> {
         // Remove all common factors from each AND
         for operand in &mut expr.operands {
             if let stmt::Expr::And(and) = operand {
-                and.operands
-                    .retain(|op| !common.iter().any(|c| c.is_equivalent_to(op)));
+                and.operands.retain(|op| {
+                    !common.iter().any(|c| c.is_equivalent_to(op))
+                });
                 // If only one operand left, unwrap the AND
                 if and.operands.len() == 1 {
                     *operand = and.operands.pop().unwrap();

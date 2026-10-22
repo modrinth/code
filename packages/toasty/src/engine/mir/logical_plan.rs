@@ -23,7 +23,8 @@ pub(crate) struct LogicalPlan {
 
 impl LogicalPlan {
     pub(crate) fn new(mut store: Store, completion: NodeId) -> LogicalPlan {
-        let execution_order = compute_operation_execution_order(completion, &store);
+        let execution_order =
+            compute_operation_execution_order(completion, &store);
 
         // Every reserved slot must be filled by the time planning completes —
         // an unfilled slot means a statement was referenced but never planned.
@@ -87,7 +88,10 @@ impl ops::Index<&NodeId> for LogicalPlan {
     }
 }
 
-fn compute_operation_execution_order(node_id: NodeId, mir: &Store) -> Vec<NodeId> {
+fn compute_operation_execution_order(
+    node_id: NodeId,
+    mir: &Store,
+) -> Vec<NodeId> {
     fn visit_operation(
         node_id: NodeId,
         mir: &Store,

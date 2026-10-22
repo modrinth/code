@@ -367,7 +367,6 @@ pub fn error_code(error: &Error) -> &'static str {
         "network_error"
     } else if error.is::<JREError>() {
         "java_error"
-
     } else if error.is::<ZipError>() {
         "archive_error"
     } else if error.is::<serde::de::value::Error>()

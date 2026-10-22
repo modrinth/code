@@ -13,7 +13,8 @@ use toasty_core::{
         app::{FieldId, ModelId},
     },
     stmt::{
-        self, Expr, ExprBinaryOp, ExprContext, ExprInSubquery, Projection, Query, Returning, Value,
+        self, Expr, ExprBinaryOp, ExprContext, ExprInSubquery, Projection,
+        Query, Returning, Value,
     },
 };
 
@@ -55,8 +56,9 @@ struct UserPostSchema {
 
 impl UserPostSchema {
     fn new() -> Self {
-        let app_schema = app::Schema::from_macro([User::schema(), Post::schema()])
-            .expect("schema should build from macro");
+        let app_schema =
+            app::Schema::from_macro([User::schema(), Post::schema()])
+                .expect("schema should build from macro");
 
         let schema = Builder::new()
             .build(app_schema, &Capability::SQLITE)
@@ -146,7 +148,8 @@ fn belongs_to_has_many_fuses_to_direct_fk() {
     );
     let query = Query::new_select(s.post_model, inner_filter);
 
-    let lifted = lift_in_subquery(&scoped_cx, &expr, &query).expect("lift to succeed");
+    let lifted =
+        lift_in_subquery(&scoped_cx, &expr, &query).expect("lift to succeed");
 
     let Expr::InSubquery(ExprInSubquery {
         expr: lhs,
@@ -182,7 +185,9 @@ fn belongs_to_has_many_fuses_to_direct_fk() {
     assert_eq!(*ret_index, s.post_user_id.index);
 
     // The inner filter passes through unchanged: `Post.id == 42`.
-    let Some(Expr::BinaryOp(ExprBinaryOp { op, lhs, rhs })) = &select.filter.expr else {
+    let Some(Expr::BinaryOp(ExprBinaryOp { op, lhs, rhs })) =
+        &select.filter.expr
+    else {
         panic!("expected BinaryOp filter, got {:?}", select.filter.expr);
     };
     assert!(op.is_eq());
@@ -205,7 +210,8 @@ fn project_with_non_relation_base_returns_none() {
 
     // `Project(Ref(Post.id), [0])` — projecting through a scalar PK field, not
     // a relation. The lift can't re-root this; it must return None.
-    let expr = Expr::project(Expr::ref_self_field(s.post_id), Projection::single(0));
+    let expr =
+        Expr::project(Expr::ref_self_field(s.post_id), Projection::single(0));
     let query = Query::new_select(
         s.post_model,
         Expr::eq(

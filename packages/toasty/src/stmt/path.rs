@@ -265,7 +265,11 @@ impl<T, U> Path<T, U> {
     /// # }
     /// let filter = User::fields().id().between(18_i64, 65_i64);
     /// ```
-    pub fn between(self, low: impl IntoExpr<U>, high: impl IntoExpr<U>) -> Expr<bool> {
+    pub fn between(
+        self,
+        low: impl IntoExpr<U>,
+        high: impl IntoExpr<U>,
+    ) -> Expr<bool> {
         let low = low.into_expr().untyped;
         let high = high.into_expr().untyped;
         self.build_filter(move |path| stmt::Expr::between(path, low, high))
@@ -405,7 +409,9 @@ impl<T, U> Path<T, List<U>> {
     {
         // Build a query on the child model filtered by `filter`
         let child_query = super::Query::<List<U>>::all().filter(filter);
-        self.build_filter(move |path| stmt::Expr::in_subquery(path, child_query.untyped))
+        self.build_filter(move |path| {
+            stmt::Expr::in_subquery(path, child_query.untyped)
+        })
     }
 
     /// Build a `NOT IN subquery` expression that tests whether **all** associated
@@ -444,7 +450,9 @@ impl<T, U> Path<T, List<U>> {
     {
         // parent NOT IN (SELECT child_fk FROM child WHERE NOT filter)
         let child_query = super::Query::<List<U>>::all().filter(filter.not());
-        self.build_filter(move |path| stmt::Expr::not_in_subquery(path, child_query.untyped))
+        self.build_filter(move |path| {
+            stmt::Expr::not_in_subquery(path, child_query.untyped)
+        })
     }
 }
 
@@ -468,7 +476,9 @@ where
     /// ```
     pub fn contains(self, value: impl IntoExpr<U>) -> Expr<bool> {
         let value = value.into_expr().untyped;
-        self.build_filter(move |path| stmt::Expr::any_op(value, stmt::BinaryOp::Eq, path))
+        self.build_filter(move |path| {
+            stmt::Expr::any_op(value, stmt::BinaryOp::Eq, path)
+        })
     }
 
     /// Test whether the array contains every element of `values`.
@@ -477,7 +487,9 @@ where
     /// Lowers to `col @> values` (PostgreSQL `@>` operator).
     pub fn is_superset(self, values: impl IntoExpr<List<U>>) -> Expr<bool> {
         let values = values.into_expr().untyped;
-        self.build_filter(move |path| stmt::Expr::array_is_superset(path, values))
+        self.build_filter(move |path| {
+            stmt::Expr::array_is_superset(path, values)
+        })
     }
 
     /// Test whether the array shares at least one element with `values`.
@@ -486,7 +498,9 @@ where
     /// Lowers to `col && values` (PostgreSQL `&&` operator).
     pub fn intersects(self, values: impl IntoExpr<List<U>>) -> Expr<bool> {
         let values = values.into_expr().untyped;
-        self.build_filter(move |path| stmt::Expr::array_intersects(path, values))
+        self.build_filter(move |path| {
+            stmt::Expr::array_intersects(path, values)
+        })
     }
 
     /// Returns the array length.
@@ -684,9 +698,15 @@ where
     /// // Also works on nullable string fields.
     /// let filter = User::fields().nickname().like_with_escape("Al%".to_string(), '\\');
     /// ```
-    pub fn like_with_escape(self, pattern: impl IntoExpr<String>, escape: char) -> Expr<bool> {
+    pub fn like_with_escape(
+        self,
+        pattern: impl IntoExpr<String>,
+        escape: char,
+    ) -> Expr<bool> {
         let pattern = pattern.into_expr().untyped;
-        self.build_filter(move |path| stmt::Expr::like_with_escape(path, pattern, escape))
+        self.build_filter(move |path| {
+            stmt::Expr::like_with_escape(path, pattern, escape)
+        })
     }
 
     /// Test whether this string field matches a case-insensitive SQL `LIKE`
@@ -730,9 +750,15 @@ where
     /// // Match names starting with the literal text "alice%", ignoring case.
     /// let filter = User::fields().name().ilike_with_escape("alice\\%%".to_string(), '\\');
     /// ```
-    pub fn ilike_with_escape(self, pattern: impl IntoExpr<String>, escape: char) -> Expr<bool> {
+    pub fn ilike_with_escape(
+        self,
+        pattern: impl IntoExpr<String>,
+        escape: char,
+    ) -> Expr<bool> {
         let pattern = pattern.into_expr().untyped;
-        self.build_filter(move |path| stmt::Expr::ilike_with_escape(path, pattern, escape))
+        self.build_filter(move |path| {
+            stmt::Expr::ilike_with_escape(path, pattern, escape)
+        })
     }
 }
 

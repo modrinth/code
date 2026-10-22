@@ -64,7 +64,10 @@ pub(crate) struct Engine {
 
 impl Engine {
     /// Creates a new [`Engine`] with the given schema and capability.
-    pub(crate) fn new(schema: Arc<Schema>, capability: &'static Capability) -> Engine {
+    pub(crate) fn new(
+        schema: Arc<Schema>,
+        capability: &'static Capability,
+    ) -> Engine {
         Engine { schema, capability }
     }
 
@@ -121,7 +124,10 @@ impl Engine {
     }
 
     /// Returns a new [`ExprContext`](stmt::ExprContext) for a specific target.
-    fn expr_cx_for<'a>(&'a self, target: impl stmt::IntoExprTarget<'a>) -> stmt::ExprContext<'a> {
+    fn expr_cx_for<'a>(
+        &'a self,
+        target: impl stmt::IntoExprTarget<'a>,
+    ) -> stmt::ExprContext<'a> {
         stmt::ExprContext::new_with_target(&self.schema, target)
     }
 }

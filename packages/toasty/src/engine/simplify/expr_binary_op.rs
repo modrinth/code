@@ -19,7 +19,8 @@ impl Simplify<'_> {
         rhs: &mut stmt::Expr,
     ) -> Option<stmt::Expr> {
         if (op.is_eq() || op.is_ne())
-            && let (Some(lhs_len), Some(rhs_len)) = (lhs.record_len(), rhs.record_len())
+            && let (Some(lhs_len), Some(rhs_len)) =
+                (lhs.record_len(), rhs.record_len())
             && lhs_len != rhs_len
         {
             return Some(op.is_ne().into());
@@ -36,7 +37,8 @@ impl Simplify<'_> {
                 if lhs == rhs && (op.is_eq() || op.is_ne()) =>
             {
                 if lhs.is_field() {
-                    let field = self.cx.resolve_expr_reference(lhs).as_field_unwrap();
+                    let field =
+                        self.cx.resolve_expr_reference(lhs).as_field_unwrap();
                     if !field.nullable() {
                         return Some(op.is_eq().into());
                     }
@@ -48,7 +50,8 @@ impl Simplify<'_> {
             //  - `(a, b) = (x, y)` → `a = x and b = y`
             //  - `(a, b) != (x, y)` → `a != x or b != y`
             (Expr::Record(lhs_rec), Expr::Record(rhs_rec))
-                if (op.is_eq() || op.is_ne()) && lhs_rec.len() == rhs_rec.len() =>
+                if (op.is_eq() || op.is_ne())
+                    && lhs_rec.len() == rhs_rec.len() =>
             {
                 let comparisons: Vec<_> = std::mem::take(&mut lhs_rec.fields)
                     .into_iter()
@@ -76,7 +79,9 @@ impl Simplify<'_> {
                 let comparisons: Vec<_> = std::mem::take(&mut rec.fields)
                     .into_iter()
                     .zip(std::mem::take(&mut val_rec.fields))
-                    .map(|(expr, val)| record_field_comparison(expr, op, Expr::from(val)))
+                    .map(|(expr, val)| {
+                        record_field_comparison(expr, op, Expr::from(val))
+                    })
                     .collect();
 
                 let mut comparison = if op.is_eq() {
@@ -95,15 +100,27 @@ impl Simplify<'_> {
             // Each arm is fully simplified inline. Arms that fold to false/null
             // are pruned. Comparison ops only — distributing arithmetic this
             // way would produce a malformed boolean from a non-boolean term.
-            (Expr::Match(m), _) if !op.is_arithmetic() && m.subject.is_stable() => {
+            (Expr::Match(m), _)
+                if !op.is_arithmetic() && m.subject.is_stable() =>
+            {
                 let match_expr = lhs.take();
                 let other = rhs.take();
-                Some(self.eliminate_match_in_binary_op(op, match_expr, other, true))
+                Some(
+                    self.eliminate_match_in_binary_op(
+                        op, match_expr, other, true,
+                    ),
+                )
             }
-            (_, Expr::Match(m)) if !op.is_arithmetic() && m.subject.is_stable() => {
+            (_, Expr::Match(m))
+                if !op.is_arithmetic() && m.subject.is_stable() =>
+            {
                 let other = lhs.take();
                 let match_expr = rhs.take();
-                Some(self.eliminate_match_in_binary_op(op, match_expr, other, false))
+                Some(
+                    self.eliminate_match_in_binary_op(
+                        op, match_expr, other, false,
+                    ),
+                )
             }
             // Decode-cast stripping on comparisons with a constant. A stored
             // column whose type differs from the model type decodes through
@@ -115,8 +132,11 @@ impl Simplify<'_> {
             // cast shapes are handled during lowering
             // (`lower_expr_binary_op`); this rule fires only on the
             // post-lower column shape.
-            (Expr::Cast(cast), Expr::Value(value)) | (Expr::Value(value), Expr::Cast(cast))
-                if (op.is_eq() || op.is_ne()) && cast.from.is_none() && cast.expr.is_column() =>
+            (Expr::Cast(cast), Expr::Value(value))
+            | (Expr::Value(value), Expr::Cast(cast))
+                if (op.is_eq() || op.is_ne())
+                    && cast.from.is_none()
+                    && cast.expr.is_column() =>
             {
                 self.strip_decode_cast_comparison(op, cast, value)
             }
@@ -125,7 +145,9 @@ impl Simplify<'_> {
             // substitute to key columns. The eligibility check proves that
             // comparing the stored forms preserves decoded equality.
             (Expr::Cast(lhs_cast), Expr::Cast(rhs_cast))
-                if self.can_strip_decode_cast_column_comparison(op, lhs_cast, rhs_cast) =>
+                if self.can_strip_decode_cast_column_comparison(
+                    op, lhs_cast, rhs_cast,
+                ) =>
             {
                 self.strip_decode_cast_column_comparison(op, lhs_cast, rhs_cast)
             }
@@ -140,7 +162,9 @@ impl Simplify<'_> {
             // non-deterministic base would evaluate the base twice and could
             // yield different values each time.
             (Expr::Project(lhs), Expr::Project(rhs))
-                if lhs == rhs && lhs.base.is_stable() && (op.is_eq() || op.is_ne()) =>
+                if lhs == rhs
+                    && lhs.base.is_stable()
+                    && (op.is_eq() || op.is_ne()) =>
             {
                 // TODO: Check if the projected value is nullable
                 Some(Expr::from(op.is_eq()))
@@ -157,7 +181,9 @@ impl Simplify<'_> {
         // If either operand is a column reference into a derived VALUES
         // table where every row has NULL at that column position, the
         // binary op can never produce a non-null result.
-        if self.is_always_null_derived_column(lhs) || self.is_always_null_derived_column(rhs) {
+        if self.is_always_null_derived_column(lhs)
+            || self.is_always_null_derived_column(rhs)
+        {
             return Some(Expr::null());
         }
 
@@ -185,7 +211,9 @@ impl Simplify<'_> {
     ) -> Option<Expr> {
         let expr_reference = cast.expr.as_expr_reference()?;
 
-        let ResolvedRef::Column(column) = self.cx.resolve_expr_reference(expr_reference) else {
+        let ResolvedRef::Column(column) =
+            self.cx.resolve_expr_reference(expr_reference)
+        else {
             return None;
         };
 
@@ -221,14 +249,19 @@ impl Simplify<'_> {
             return false;
         };
 
-        let ResolvedRef::Column(lhs_column) = self.cx.resolve_expr_reference(lhs_reference) else {
+        let ResolvedRef::Column(lhs_column) =
+            self.cx.resolve_expr_reference(lhs_reference)
+        else {
             return false;
         };
-        let ResolvedRef::Column(rhs_column) = self.cx.resolve_expr_reference(rhs_reference) else {
+        let ResolvedRef::Column(rhs_column) =
+            self.cx.resolve_expr_reference(rhs_reference)
+        else {
             return false;
         };
 
-        lhs_column.ty == rhs_column.ty && lhs_column.ty.cast_preserves_equality(&lhs.ty)
+        lhs_column.ty == rhs_column.ty
+            && lhs_column.ty.cast_preserves_equality(&lhs.ty)
     }
 
     /// Rewrites `cast(col_a, T) <eq/ne> cast(col_b, T)` to
@@ -252,7 +285,9 @@ impl Simplify<'_> {
         };
 
         match self.cx.resolve_expr_reference(expr_ref) {
-            ResolvedRef::Derived(derived_ref) => derived_ref.is_column_always_null(),
+            ResolvedRef::Derived(derived_ref) => {
+                derived_ref.is_column_always_null()
+            }
             _ => false,
         }
     }
@@ -293,7 +328,8 @@ impl Simplify<'_> {
         let mut operands = Vec::new();
 
         // Collect arm patterns before consuming the arms (needed for the else guard).
-        let patterns: Vec<_> = match_expr.arms.iter().map(|a| a.pattern.clone()).collect();
+        let patterns: Vec<_> =
+            match_expr.arms.iter().map(|a| a.pattern.clone()).collect();
 
         for arm in match_expr.arms {
             // Unit enum variants return the discriminant subject. The arm's

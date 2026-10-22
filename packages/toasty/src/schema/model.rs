@@ -111,7 +111,9 @@ pub trait Model: Load<Output = Self> + Sized {
 
     /// Construct a [`ManyField`](Self::ManyField) from a path targeting a list
     /// of this model.
-    fn new_many_field<Origin>(path: Path<Origin, List<Self>>) -> Self::ManyField<Origin>;
+    fn new_many_field<Origin>(
+        path: Path<Origin, List<Self>>,
+    ) -> Self::ManyField<Origin>;
 
     /// Map a field name string to its [`FieldId`].
     ///
@@ -124,7 +126,9 @@ pub trait Model: Load<Output = Self> + Sized {
     /// [`PrimaryKey`](Self::PrimaryKey) type — bare PK values via their
     /// `IntoExpr` impl, subqueries that return a PK, or any other
     /// [`Expr`] of the correct type.
-    fn find_by_primary_key(id: Expr<Self::PrimaryKey>) -> Self::Query<List<Self>>;
+    fn find_by_primary_key(
+        id: Expr<Self::PrimaryKey>,
+    ) -> Self::Query<List<Self>>;
 
     /// Wrap a raw statement-level [`Query`](crate::stmt::Query) in this model's
     /// query builder, preserving the result shape `T`. This is the single
@@ -138,7 +142,8 @@ pub trait Model: Load<Output = Self> + Sized {
 
     /// Narrow a list query to an optional single-row query. Used by the
     /// codegen for nullable relation accessors.
-    fn query_first(query: Self::Query<List<Self>>) -> Self::Query<Option<Self>>;
+    fn query_first(query: Self::Query<List<Self>>)
+    -> Self::Query<Option<Self>>;
 }
 
 /// List query builder for model `M` (executes to `Vec<M>`). Names the

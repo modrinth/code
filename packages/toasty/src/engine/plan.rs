@@ -31,7 +31,10 @@ struct ExecPlanner<'a> {
 }
 
 impl Engine {
-    pub(super) fn plan_hir_statement(&self, hir: HirStatement) -> Result<ExecPlan> {
+    pub(super) fn plan_hir_statement(
+        &self,
+        hir: HirStatement,
+    ) -> Result<ExecPlan> {
         // Build the logical plan
         let logical_plan = HirPlanner {
             engine: self,

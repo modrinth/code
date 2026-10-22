@@ -30,7 +30,10 @@ impl<T: Load> Load for Option<T> {
         }
     }
 
-    fn reload(target: &mut Self::Output, value: Value) -> Result<(), crate::Error> {
+    fn reload(
+        target: &mut Self::Output,
+        value: Value,
+    ) -> Result<(), crate::Error> {
         *target = Self::load(value)?;
         Ok(())
     }

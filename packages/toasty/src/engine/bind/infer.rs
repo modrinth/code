@@ -19,7 +19,12 @@ pub(super) fn refine_param_types(
     refine_stmt(stmt, &cx, db_schema, params);
 }
 
-fn refine_stmt(stmt: &stmt::Statement, cx: &Cx<'_>, db_schema: &db::Schema, params: &mut [Param]) {
+fn refine_stmt(
+    stmt: &stmt::Statement,
+    cx: &Cx<'_>,
+    db_schema: &db::Schema,
+    params: &mut [Param],
+) {
     match stmt {
         stmt::Statement::Insert(insert) => {
             let cx = cx.scope(insert);
@@ -91,7 +96,11 @@ fn refine_insert(
         table
             .columns
             .iter()
-            .map(|col_id| ty_from_column(db_table.columns[col_id.index].storage_ty.clone()))
+            .map(|col_id| {
+                ty_from_column(
+                    db_table.columns[col_id.index].storage_ty.clone(),
+                )
+            })
             .collect(),
     );
 
@@ -108,7 +117,12 @@ fn refine_insert(
     }
 }
 
-fn refine_update(update: &stmt::Update, cx: &Cx<'_>, db_schema: &db::Schema, params: &mut [Param]) {
+fn refine_update(
+    update: &stmt::Update,
+    cx: &Cx<'_>,
+    db_schema: &db::Schema,
+    params: &mut [Param],
+) {
     // Refine assignment types from target columns
     if let stmt::UpdateTarget::Table(table_id) = &update.target {
         let db_table = &db_schema.tables[table_id.0];
@@ -120,7 +134,11 @@ fn refine_update(update: &stmt::Update, cx: &Cx<'_>, db_schema: &db::Schema, par
     refine_filter(&update.filter, cx, params);
 }
 
-fn refine_assignments(assignments: &stmt::Assignments, db_table: &db::Table, params: &mut [Param]) {
+fn refine_assignments(
+    assignments: &stmt::Assignments,
+    db_table: &db::Table,
+    params: &mut [Param],
+) {
     for (projection, assignment) in assignments.iter() {
         let steps = projection.as_slice();
         assert_eq!(
@@ -165,7 +183,9 @@ fn refine_assignments(assignments: &stmt::Assignments, db_table: &db::Table, par
                 let expected = ty_from_column(col.storage_ty.clone());
                 check(expr, &expected, params);
             }
-            stmt::Assignment::Insert(_) | stmt::Assignment::Batch(_) => continue,
+            stmt::Assignment::Insert(_) | stmt::Assignment::Batch(_) => {
+                continue;
+            }
         }
     }
 }
@@ -223,7 +243,11 @@ fn refine_filter(filter: &stmt::Filter, cx: &Cx<'_>, params: &mut [Param]) {
 ///
 /// For comparison operators, this also triggers `check()` to push refined
 /// types down into both sides (bidirectional inference).
-pub(super) fn synthesize(expr: &stmt::Expr, cx: &Cx<'_>, params: &mut [Param]) -> Ty {
+pub(super) fn synthesize(
+    expr: &stmt::Expr,
+    cx: &Cx<'_>,
+    params: &mut [Param],
+) -> Ty {
     match expr {
         // Arg — type comes from the extracted param (whatever the current
         // inference state is — `Inferred(...)` from the value, possibly
@@ -233,7 +257,9 @@ pub(super) fn synthesize(expr: &stmt::Expr, cx: &Cx<'_>, params: &mut [Param]) -
         // Column reference — authoritative from schema
         stmt::Expr::Reference(expr_ref @ stmt::ExprReference::Column(_)) => {
             match cx.resolve_expr_reference(expr_ref) {
-                stmt::ResolvedRef::Column(col) => ty_from_column(col.storage_ty.clone()),
+                stmt::ResolvedRef::Column(col) => {
+                    ty_from_column(col.storage_ty.clone())
+                }
                 _ => Ty::Unknown,
             }
         }
@@ -251,7 +277,9 @@ pub(super) fn synthesize(expr: &stmt::Expr, cx: &Cx<'_>, params: &mut [Param]) -
                         );
                         fields.into_iter().nth(step).unwrap()
                     }
-                    other => panic!("cannot project from non-record type: {other:?}"),
+                    other => {
+                        panic!("cannot project from non-record type: {other:?}")
+                    }
                 };
             }
             ty
@@ -459,7 +487,9 @@ pub(super) fn merge(a: &Ty, b: &Ty) -> Ty {
         }
 
         // Records — merge field-by-field
-        (Ty::Record(a_fields), Ty::Record(b_fields)) if a_fields.len() == b_fields.len() => {
+        (Ty::Record(a_fields), Ty::Record(b_fields))
+            if a_fields.len() == b_fields.len() =>
+        {
             Ty::Record(
                 a_fields
                     .iter()
@@ -470,7 +500,9 @@ pub(super) fn merge(a: &Ty, b: &Ty) -> Ty {
         }
 
         // Lists — merge element types
-        (Ty::List(a_elem), Ty::List(b_elem)) => Ty::List(Box::new(merge(a_elem, b_elem))),
+        (Ty::List(a_elem), Ty::List(b_elem)) => {
+            Ty::List(Box::new(merge(a_elem, b_elem)))
+        }
 
         // A `#[document]` collection binds as a `Value::List` (the JSON array's
         // internal shape) while its column storage type is the opaque scalar
@@ -478,7 +510,9 @@ pub(super) fn merge(a: &Ty, b: &Ty) -> Ty {
         // the document column type — the value keeps its list shape, only its
         // type resolves. This lets `check` type a document column like any other.
         (Ty::List(_), col @ Ty::Column(db::Type::Document { .. }))
-        | (col @ Ty::Column(db::Type::Document { .. }), Ty::List(_)) => col.clone(),
+        | (col @ Ty::Column(db::Type::Document { .. }), Ty::List(_)) => {
+            col.clone()
+        }
 
         _ => panic!("cannot merge incompatible types: {a:?} and {b:?}"),
     }

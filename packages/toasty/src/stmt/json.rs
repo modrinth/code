@@ -12,11 +12,16 @@ where
 {
     let json = <String as Load>::load(value)?;
     serde_json::from_str(&json).map_err(|e| {
-        toasty_core::Error::from_args(format_args!("failed to deserialize JSON field: {e}"))
+        toasty_core::Error::from_args(format_args!(
+            "failed to deserialize JSON field: {e}"
+        ))
     })
 }
 
-fn json_field_ty(storage_ty: Option<db::Type>, missing_type_message: &'static str) -> FieldTy {
+fn json_field_ty(
+    storage_ty: Option<db::Type>,
+    missing_type_message: &'static str,
+) -> FieldTy {
     FieldTy::Primitive(FieldPrimitive {
         ty: stmt::Type::String,
         storage_ty: Some(storage_ty.expect(missing_type_message)),
@@ -25,7 +30,8 @@ fn json_field_ty(storage_ty: Option<db::Type>, missing_type_message: &'static st
 }
 
 fn json_expr<T>(value: &(impl serde_core::Serialize + ?Sized)) -> Expr<T> {
-    let json = serde_json::to_string(value).expect("failed to serialize JSON field");
+    let json =
+        serde_json::to_string(value).expect("failed to serialize JSON field");
     Expr::<String>::from_value(StmtValue::from(json)).cast()
 }
 
@@ -178,7 +184,9 @@ where
         path
     }
 
-    fn new_list_path<Origin>(path: Path<Origin, List<Self::ExprTarget>>) -> Self::ListPath<Origin> {
+    fn new_list_path<Origin>(
+        path: Path<Origin, List<Self::ExprTarget>>,
+    ) -> Self::ListPath<Origin> {
         path
     }
 
@@ -203,7 +211,10 @@ where
         )
     }
 
-    fn key_constraint<Origin>(&self, _target: Path<Origin, Self::Inner>) -> Expr<bool> {
+    fn key_constraint<Origin>(
+        &self,
+        _target: Path<Origin, Self::Inner>,
+    ) -> Expr<bool> {
         // JSON columns are not valid foreign-key targets — the comparison
         // would happen at the serialized-string level, which is rarely what
         // the user wants. The trait method exists for every `Field`; we
@@ -387,7 +398,9 @@ impl Field for JsonValue {
         path
     }
 
-    fn new_list_path<Origin>(path: Path<Origin, List<Self::ExprTarget>>) -> Self::ListPath<Origin> {
+    fn new_list_path<Origin>(
+        path: Path<Origin, List<Self::ExprTarget>>,
+    ) -> Self::ListPath<Origin> {
         path
     }
 
@@ -405,8 +418,13 @@ impl Field for JsonValue {
         )
     }
 
-    fn key_constraint<Origin>(&self, _target: Path<Origin, Self::Inner>) -> Expr<bool> {
-        unreachable!("serde_json::Value fields cannot be used as foreign-key targets")
+    fn key_constraint<Origin>(
+        &self,
+        _target: Path<Origin, Self::Inner>,
+    ) -> Expr<bool> {
+        unreachable!(
+            "serde_json::Value fields cannot be used as foreign-key targets"
+        )
     }
 }
 

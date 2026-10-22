@@ -17,7 +17,9 @@ mod get_by_key;
 mod kv;
 
 mod nested_merge;
-pub(crate) use nested_merge::{MergeIndex, MergeQualification, NestedChild, NestedLevel};
+pub(crate) use nested_merge::{
+    MergeIndex, MergeQualification, NestedChild, NestedLevel,
+};
 
 mod plan;
 pub(crate) use plan::{ExecPlan, Step};
@@ -112,9 +114,14 @@ impl Engine {
             if let Err(e) = exec.exec_step(&logical_plan, step).await {
                 tracing::debug!(step = i, action = %step.name(&logical_plan), error = %e, "action failed");
                 if needs_transaction {
-                    tracing::trace!("rolling back plan transaction due to error");
+                    tracing::trace!(
+                        "rolling back plan transaction due to error"
+                    );
                     // Best effort: ignore rollback errors so the original error is returned
-                    let _ = exec.connection.exec(&self.schema, rollback.into()).await;
+                    let _ = exec
+                        .connection
+                        .exec(&self.schema, rollback.into())
+                        .await;
                 }
                 return Err(e);
             }
@@ -126,7 +133,11 @@ impl Engine {
         }
 
         let response = exec.vars.load(returning).await?;
-        tracing::trace!("final result from var {:?}:\n{:#?}", returning, response);
+        tracing::trace!(
+            "final result from var {:?}:\n{:#?}",
+            returning,
+            response
+        );
 
         // With exact use counts, the returning load was the last use of
         // the last live slot (success path only — the loop above returned
@@ -135,7 +146,9 @@ impl Engine {
 
         let value_stream = match response.values {
             Rows::Count(_) => ValueStream::default(),
-            Rows::Value(stmt::Value::List(items)) => ValueStream::from_vec(items),
+            Rows::Value(stmt::Value::List(items)) => {
+                ValueStream::from_vec(items)
+            }
             // TODO have the public API be able to handle single rows
             Rows::Value(value) => ValueStream::from_vec(vec![value]),
             Rows::Stream(value_stream) => value_stream,
@@ -150,7 +163,11 @@ impl Engine {
 }
 
 impl Exec<'_> {
-    async fn exec_step(&mut self, logical_plan: &mir::LogicalPlan, step: &Step) -> Result<()> {
+    async fn exec_step(
+        &mut self,
+        logical_plan: &mir::LogicalPlan,
+        step: &Step,
+    ) -> Result<()> {
         match step {
             Step::Run(node_id) => self.exec_node(logical_plan, *node_id).await,
             Step::If(action) => self.action_if(logical_plan, action).await,
@@ -172,15 +189,21 @@ impl Exec<'_> {
             // A pass-through: the response (stream included) relocates
             // between slots without buffering.
             Operation::Alias(op) => self.vars.load(op.input).await?,
-            Operation::Const(op) => ExecResponse::from_rows(Rows::Value(op.value.clone())),
+            Operation::Const(op) => {
+                ExecResponse::from_rows(Rows::Value(op.value.clone()))
+            }
             Operation::DeleteByKey(op) => self.exec_delete_by_key(op).await?,
             Operation::Eval(op) => self.exec_eval(op).await?,
             Operation::ExecStatement(op) => self.exec_statement(op).await?,
             Operation::Filter(op) => self.exec_filter(op).await?,
-            Operation::FindPkByIndex(op) => self.exec_find_pk_by_index(op).await?,
+            Operation::FindPkByIndex(op) => {
+                self.exec_find_pk_by_index(op).await?
+            }
             Operation::GetByKey(op) => self.exec_get_by_key(op).await?,
             Operation::NestedMerge(op) => self.exec_nested_merge(op).await?,
-            Operation::ReadModifyWrite(op) => self.exec_read_modify_write(op).await?,
+            Operation::ReadModifyWrite(op) => {
+                self.exec_read_modify_write(op).await?
+            }
             Operation::Repeat(op) => self.exec_repeat(op).await?,
             Operation::QueryPk(op) => self.exec_query_pk(op).await?,
             Operation::Scan(op) => self.exec_scan(op).await?,

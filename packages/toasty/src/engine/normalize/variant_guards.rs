@@ -24,7 +24,8 @@
 //! into one subquery.
 
 use toasty_core::stmt::{
-    Expr, ExprAnd, ExprNot, ExprOr, ExprVariant, Query, Statement, Visit, VisitMut,
+    Expr, ExprAnd, ExprNot, ExprOr, ExprVariant, Query, Statement, Visit,
+    VisitMut,
 };
 
 use super::Normalize;
@@ -46,7 +47,8 @@ impl Normalize<'_> {
             match operand {
                 Expr::And(inner) => {
                     for operand in inner.operands {
-                        if is_guard(&operand) && !self.guards.contains(&operand) {
+                        if is_guard(&operand) && !self.guards.contains(&operand)
+                        {
                             self.guards.push(operand.clone());
                         }
                         and.operands.push(operand);
@@ -128,7 +130,9 @@ impl Visit for CollectGuards<'_> {
         self.visit_expr(&i.base);
 
         let guard = Expr::is_variant((*i.base).clone(), i.variant);
-        if !self.existing_guards.contains(&guard) && !self.guards.contains(&guard) {
+        if !self.existing_guards.contains(&guard)
+            && !self.guards.contains(&guard)
+        {
             self.guards.push(guard);
         }
     }

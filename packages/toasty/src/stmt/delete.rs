@@ -71,7 +71,10 @@ impl<T> Delete<T> {
     /// Attach a condition to this delete. The condition is evaluated after the
     /// filter; if it fails, the operation returns an error (unlike a filter
     /// failure, which silently produces count 0).
-    pub fn set_condition(mut self, condition: toasty_core::stmt::Condition) -> Self {
+    pub fn set_condition(
+        mut self,
+        condition: toasty_core::stmt::Condition,
+    ) -> Self {
         self.untyped.condition = condition;
         self
     }

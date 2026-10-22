@@ -47,7 +47,10 @@ use crate::engine::{Engine, HirStatement, hir, simplify::Simplify, upsert};
 ///
 /// The subquery result is bound as `arg(0)`; `present` is the expression for a
 /// non-null row and may reference that binding (e.g. project a field out of it).
-fn map_nullable_single(subquery: stmt::Expr, present: stmt::Expr) -> stmt::Expr {
+fn map_nullable_single(
+    subquery: stmt::Expr,
+    present: stmt::Expr,
+) -> stmt::Expr {
     stmt::Expr::Let(stmt::ExprLet {
         bindings: vec![subquery],
         body: Box::new(stmt::Expr::match_expr(
@@ -62,7 +65,10 @@ fn map_nullable_single(subquery: stmt::Expr, present: stmt::Expr) -> stmt::Expr 
 }
 
 impl Engine {
-    pub(super) fn lower_stmt(&self, stmt: stmt::Statement) -> Result<HirStatement> {
+    pub(super) fn lower_stmt(
+        &self,
+        stmt: stmt::Statement,
+    ) -> Result<HirStatement> {
         let schema = &self.schema;
 
         let mut state = LoweringState {
@@ -104,13 +110,17 @@ impl LoweringState<'_> {
         // BelongsTo→FK) fires inside the lowering walk itself via
         // `LowerStatement::visit_expr_binary_op_mut`.
         association::RewriteVia::new(expr_cx).rewrite(&mut stmt);
-        lift_in_subquery::LiftInSubquery::new(expr_cx, self.engine.capability.sql())
-            .rewrite(&mut stmt);
+        lift_in_subquery::LiftInSubquery::new(
+            expr_cx,
+            self.engine.capability.sql(),
+        )
+        .rewrite(&mut stmt);
         lift_update_query::LiftUpdateQuery::new().rewrite(&mut stmt);
 
         // Combine compatible IN subqueries after relation lifting and before
         // the lowering walk extracts them into separate NoSQL statements.
-        Simplify::with_context(expr_cx, self.engine.capability).visit_mut(&mut stmt);
+        Simplify::with_context(expr_cx, self.engine.capability)
+            .visit_mut(&mut stmt);
 
         let stmt_id = self.hir.new_statement_info(
             self.dependencies
@@ -281,7 +291,8 @@ impl LowerStatement<'_, '_> {
         };
 
         for (column, lowering_idx) in field.columns() {
-            let mut lowering_expr = mapping.model_to_table[lowering_idx].clone();
+            let mut lowering_expr =
+                mapping.model_to_table[lowering_idx].clone();
 
             // Substitute the field reference in the column's lowering
             // template with the lowered value.
@@ -346,8 +357,12 @@ impl LowerStatement<'_, '_> {
             .is_some();
         let unsupported = match &op {
             CollectionOp::Append(_) => None,
-            CollectionOp::Remove(_) if is_document || !cap.vec_remove => Some("stmt::remove"),
-            CollectionOp::Pop if is_document || !cap.vec_pop => Some("stmt::pop"),
+            CollectionOp::Remove(_) if is_document || !cap.vec_remove => {
+                Some("stmt::remove")
+            }
+            CollectionOp::Pop if is_document || !cap.vec_pop => {
+                Some("stmt::pop")
+            }
             CollectionOp::RemoveAt(_) if is_document || !cap.vec_remove_at => {
                 Some("stmt::remove_at")
             }
@@ -379,7 +394,9 @@ impl LowerStatement<'_, '_> {
                 // `model_to_table`; `Append` bypasses that template, so the
                 // cast is applied here.
                 let schema = self.expr_cx.schema();
-                if let Some(doc_ty) = schema.mapping.document_column_ty(prim.column) {
+                if let Some(doc_ty) =
+                    schema.mapping.document_column_ty(prim.column)
+                {
                     let column_ty = &schema.db.column(prim.column).ty;
                     value = stmt::Expr::cast_from(value, doc_ty, column_ty);
                 }
@@ -453,13 +470,28 @@ impl LowerStatement<'_, '_> {
                 self.lower_set_assignment(out, mapping, projection, &mut expr);
             }
             stmt::Assignment::Append(mut expr) => {
-                self.lower_collection_op(out, mapping, projection, CollectionOp::Append(&mut expr));
+                self.lower_collection_op(
+                    out,
+                    mapping,
+                    projection,
+                    CollectionOp::Append(&mut expr),
+                );
             }
             stmt::Assignment::Remove(mut expr) => {
-                self.lower_collection_op(out, mapping, projection, CollectionOp::Remove(&mut expr));
+                self.lower_collection_op(
+                    out,
+                    mapping,
+                    projection,
+                    CollectionOp::Remove(&mut expr),
+                );
             }
             stmt::Assignment::Pop => {
-                self.lower_collection_op(out, mapping, projection, CollectionOp::Pop);
+                self.lower_collection_op(
+                    out,
+                    mapping,
+                    projection,
+                    CollectionOp::Pop,
+                );
             }
             stmt::Assignment::RemoveAt(mut expr) => {
                 self.lower_collection_op(
@@ -470,7 +502,13 @@ impl LowerStatement<'_, '_> {
                 );
             }
             stmt::Assignment::Add(mut expr) => {
-                self.lower_arithmetic_op(out, mapping, projection, ArithmeticOp::Add, &mut expr);
+                self.lower_arithmetic_op(
+                    out,
+                    mapping,
+                    projection,
+                    ArithmeticOp::Add,
+                    &mut expr,
+                );
             }
             stmt::Assignment::Subtract(mut expr) => {
                 self.lower_arithmetic_op(
@@ -484,7 +522,9 @@ impl LowerStatement<'_, '_> {
             stmt::Assignment::Batch(entries) => {
                 let folded = fold_batch(entries);
                 if matches!(folded, stmt::Assignment::Batch(_)) {
-                    todo!("non-composable batch shape on {projection:?}: {folded:#?}")
+                    todo!(
+                        "non-composable batch shape on {projection:?}: {folded:#?}"
+                    )
                 }
                 self.lower_owned_assignment(out, mapping, projection, folded);
             }
@@ -492,7 +532,9 @@ impl LowerStatement<'_, '_> {
                 // `Insert` only applies to has-many relation fields, which
                 // `plan_stmt_update_relations` consumes before table-level
                 // lowering runs.
-                todo!("Insert assignment is not produced for table lowering; got {assignment:#?}")
+                todo!(
+                    "Insert assignment is not produced for table lowering; got {assignment:#?}"
+                )
             }
         }
     }
@@ -519,7 +561,10 @@ fn fold_batch(entries: Vec<stmt::Assignment>) -> stmt::Assignment {
 /// assignment, in execution order. Returns the un-composed pair as a
 /// `Batch` when the combination is not algebraically reducible — the
 /// caller treats a residual `Batch` as an unsupported shape.
-fn compose_assignment(acc: stmt::Assignment, next: stmt::Assignment) -> stmt::Assignment {
+fn compose_assignment(
+    acc: stmt::Assignment,
+    next: stmt::Assignment,
+) -> stmt::Assignment {
     use stmt::Assignment::*;
     match (acc, next) {
         // `Set` clobbers everything that came before it.
@@ -557,7 +602,10 @@ fn compose_assignment(acc: stmt::Assignment, next: stmt::Assignment) -> stmt::As
 /// Concatenate two list-shaped expressions if both are literals (either
 /// `Expr::List` or `Expr::Value(Value::List)`). Returns a residual `Batch`
 /// containing the original pair if either expression is not a literal.
-fn try_concat_list_literals_to_assignment(a: stmt::Expr, b: stmt::Expr) -> stmt::Assignment {
+fn try_concat_list_literals_to_assignment(
+    a: stmt::Expr,
+    b: stmt::Expr,
+) -> stmt::Assignment {
     use stmt::Assignment::{Append, Batch};
     if !is_list_literal(&a) || !is_list_literal(&b) {
         return Batch(vec![Append(a), Append(b)]);
@@ -585,14 +633,18 @@ fn take_list_items(e: stmt::Expr) -> Option<Vec<stmt::Expr>> {
 }
 
 impl LowerStatement<'_, '_> {
-    fn new_dependency(&mut self, stmt: impl Into<stmt::Statement>) -> hir::StmtId {
+    fn new_dependency(
+        &mut self,
+        stmt: impl Into<stmt::Statement>,
+    ) -> hir::StmtId {
         let row_index = match self.cx {
             LoweringContext::Insert(_, row_index) => row_index,
             LoweringContext::Returning(row_index) => row_index,
             _ => None,
         };
 
-        let stmt_id = self.state.lower_stmt(self.expr_cx, row_index, stmt.into());
+        let stmt_id =
+            self.state.lower_stmt(self.expr_cx, row_index, stmt.into());
 
         if let Some(dependencies) = &mut self.collect_dependencies {
             dependencies.insert(stmt_id);
@@ -675,7 +727,12 @@ impl visit_mut::VisitMut for LowerStatement<'_, '_> {
         let mapping = self.mapping_unwrap();
         let assignments = std::mem::take(i);
         for (projection, assignment) in assignments {
-            self.lower_owned_assignment(&mut lowered, mapping, &projection, assignment);
+            self.lower_owned_assignment(
+                &mut lowered,
+                mapping,
+                &projection,
+                assignment,
+            );
         }
         *i = lowered;
     }
@@ -715,7 +772,9 @@ impl visit_mut::VisitMut for LowerStatement<'_, '_> {
             stmt::Expr::BinaryOp(e) => {
                 self.visit_expr_binary_op_mut(e);
 
-                if let Some(lowered) = self.lower_expr_binary_op(e.op, &mut e.lhs, &mut e.rhs) {
+                if let Some(lowered) =
+                    self.lower_expr_binary_op(e.op, &mut e.lhs, &mut e.rhs)
+                {
                     *expr = lowered;
                 }
             }
@@ -724,13 +783,20 @@ impl visit_mut::VisitMut for LowerStatement<'_, '_> {
             // walk lowers the `IsVariant` nodes into discriminant
             // comparisons, since the rewrite pattern-matches on
             // `Expr::IsVariant`.
-            stmt::Expr::Or(e) if expr_or::is_variant_tautology_or(self.expr_cx.schema(), e) => {
+            stmt::Expr::Or(e)
+                if expr_or::is_variant_tautology_or(
+                    self.expr_cx.schema(),
+                    e,
+                ) =>
+            {
                 *expr = true.into();
             }
             stmt::Expr::InList(e) => {
                 self.visit_expr_in_list_mut(e);
 
-                if let Some(lowered) = self.lower_expr_in_list(&mut e.expr, &mut e.list) {
+                if let Some(lowered) =
+                    self.lower_expr_in_list(&mut e.expr, &mut e.list)
+                {
                     *expr = lowered;
                 }
 
@@ -743,7 +809,11 @@ impl visit_mut::VisitMut for LowerStatement<'_, '_> {
                     let stmt::Expr::InList(e) = expr.take() else {
                         unreachable!()
                     };
-                    *expr = stmt::Expr::any_op(*e.expr, stmt::BinaryOp::Eq, *e.list);
+                    *expr = stmt::Expr::any_op(
+                        *e.expr,
+                        stmt::BinaryOp::Eq,
+                        *e.list,
+                    );
                 }
             }
             stmt::Expr::Not(e) if matches!(*e.expr, stmt::Expr::InList(_)) => {
@@ -765,7 +835,11 @@ impl visit_mut::VisitMut for LowerStatement<'_, '_> {
                     let stmt::Expr::AnyOp(any) = *not.expr else {
                         unreachable!()
                     };
-                    *expr = stmt::Expr::all_op(*any.lhs, stmt::BinaryOp::Ne, *any.rhs);
+                    *expr = stmt::Expr::all_op(
+                        *any.lhs,
+                        stmt::BinaryOp::Ne,
+                        *any.rhs,
+                    );
                 }
             }
             stmt::Expr::InSubquery(e) => {
@@ -777,7 +851,8 @@ impl visit_mut::VisitMut for LowerStatement<'_, '_> {
                         e.query.returning_mut_unwrap().as_project_mut_unwrap(),
                     );
 
-                    let returning = e.query.returning_mut_unwrap().as_project_mut_unwrap();
+                    let returning =
+                        e.query.returning_mut_unwrap().as_project_mut_unwrap();
 
                     if !returning.is_record() {
                         *returning = stmt::Expr::record([returning.take()]);
@@ -804,7 +879,10 @@ impl visit_mut::VisitMut for LowerStatement<'_, '_> {
                             .all(|arg| matches!(arg, hir::Arg::Sub { .. })),
                         "TODO: sub-statement references parent scope"
                     );
-                    debug_assert!(target_stmt_info.back_refs.is_empty(), "TODO");
+                    debug_assert!(
+                        target_stmt_info.back_refs.is_empty(),
+                        "TODO"
+                    );
 
                     self.track_dependency(target_id);
 
@@ -826,7 +904,11 @@ impl visit_mut::VisitMut for LowerStatement<'_, '_> {
                     // `Project(Record([column]), [i])`) reach the driver.
                     self.state.engine.simplify_stmt(&mut stmt);
 
-                    let arg = self.new_sub_statement(source_id, target_id, Box::new(stmt));
+                    let arg = self.new_sub_statement(
+                        source_id,
+                        target_id,
+                        Box::new(stmt),
+                    );
 
                     let membership: stmt::Expr = stmt::ExprInList {
                         expr: e.expr,
@@ -848,7 +930,8 @@ impl visit_mut::VisitMut for LowerStatement<'_, '_> {
                     .model(e.variant.model)
                     .as_embedded_enum_unwrap();
                 let has_data = enum_model.has_data_variants();
-                let disc_value = enum_model.variants[e.variant.index].discriminant.clone();
+                let disc_value =
+                    enum_model.variants[e.variant.index].discriminant.clone();
 
                 // Lower the inner expression
                 self.visit_expr_mut(&mut e.expr);
@@ -862,9 +945,10 @@ impl visit_mut::VisitMut for LowerStatement<'_, '_> {
                     // than distributing a `project([0])` over the arms — a
                     // unit variant's arm is the bare discriminant, which
                     // cannot be projected into.
-                    stmt::Expr::Match(decode) if has_data => {
-                        stmt::Expr::eq(*decode.subject, stmt::Expr::Value(disc_value))
-                    }
+                    stmt::Expr::Match(decode) if has_data => stmt::Expr::eq(
+                        *decode.subject,
+                        stmt::Expr::Value(disc_value),
+                    ),
                     // Data-carrying, in value form: project([0]) to extract
                     // the discriminant from the record.
                     lowered_expr if has_data => stmt::Expr::eq(
@@ -872,7 +956,10 @@ impl visit_mut::VisitMut for LowerStatement<'_, '_> {
                         stmt::Expr::Value(disc_value),
                     ),
                     // Unit-only: compare directly
-                    lowered_expr => stmt::Expr::eq(lowered_expr, stmt::Expr::Value(disc_value)),
+                    lowered_expr => stmt::Expr::eq(
+                        lowered_expr,
+                        stmt::Expr::Value(disc_value),
+                    ),
                 };
             }
             stmt::Expr::Variant(e) => {
@@ -897,8 +984,9 @@ impl visit_mut::VisitMut for LowerStatement<'_, '_> {
                 *expr = variant_payload(e.base.take(), &disc_value);
             }
             stmt::Expr::Project(project)
-                if let stmt::Expr::Incoming(stmt::ExprIncoming::Model(model)) =
-                    project.base.as_ref() =>
+                if let stmt::Expr::Incoming(stmt::ExprIncoming::Model(
+                    model,
+                )) = project.base.as_ref() =>
             {
                 let (table, column) = {
                     let mapping = self.schema().mapping_for(*model);
@@ -939,9 +1027,10 @@ impl visit_mut::VisitMut for LowerStatement<'_, '_> {
             stmt::Expr::IsNull(e) => {
                 let negated = e.negated;
                 let head_column = match &*e.expr {
-                    stmt::Expr::Reference(stmt::ExprReference::Field { nesting, index })
-                        if self.cx.is_statement() =>
-                    {
+                    stmt::Expr::Reference(stmt::ExprReference::Field {
+                        nesting,
+                        index,
+                    }) if self.cx.is_statement() => {
                         // The head column whose null-ness is the option's
                         // none-ness: a struct embed's presence column, or an
                         // enum embed's (nullable) discriminant column. A
@@ -951,8 +1040,12 @@ impl visit_mut::VisitMut for LowerStatement<'_, '_> {
                             .fields
                             .get(*index)
                             .and_then(|f| match f {
-                                mapping::Field::Struct(fs) => fs.presence.map(|p| p.index),
-                                mapping::Field::Enum(fe) => Some(fe.discriminant.column.index),
+                                mapping::Field::Struct(fs) => {
+                                    fs.presence.map(|p| p.index)
+                                }
+                                mapping::Field::Enum(fe) => {
+                                    Some(fe.discriminant.column.index)
+                                }
                                 _ => None,
                             })
                             .map(|column| (*nesting, column))
@@ -986,14 +1079,17 @@ impl visit_mut::VisitMut for LowerStatement<'_, '_> {
                     stmt::ExprReference::Column(expr_column) => {
                         if expr_column.nesting > 0 {
                             let source_id = self.scope_stmt_id();
-                            let target_id = self.resolve_stmt_id(expr_column.nesting);
+                            let target_id =
+                                self.resolve_stmt_id(expr_column.nesting);
 
                             // A relation subquery can use a constant assigned by
                             // the enclosing update without reading its returned row.
                             if let Some(update_assignments) =
                                 self.state.update_returning.get(&target_id)
-                                && let Some(stmt::Assignment::Set(assigned_value)) =
-                                    update_assignments.get(&[expr_column.column])
+                                && let Some(stmt::Assignment::Set(
+                                    assigned_value,
+                                )) = update_assignments
+                                    .get(&[expr_column.column])
                                 && assigned_value.is_const()
                             {
                                 *expr = assigned_value.clone();
@@ -1001,7 +1097,10 @@ impl visit_mut::VisitMut for LowerStatement<'_, '_> {
                             }
 
                             // the current scope ID should also be the top of the stack
-                            debug_assert_eq!(self.state.scopes.len(), self.scope_id + 1);
+                            debug_assert_eq!(
+                                self.state.scopes.len(),
+                                self.scope_id + 1
+                            );
 
                             // The statement is not independent. Walk up the
                             // scope stack until the referened target statement
@@ -1012,10 +1111,15 @@ impl visit_mut::VisitMut for LowerStatement<'_, '_> {
                                     break;
                                 }
 
-                                self.state.hir[scope.stmt_id].independent = false;
+                                self.state.hir[scope.stmt_id].independent =
+                                    false;
                             }
 
-                            let position = self.new_ref(source_id, target_id, *expr_reference);
+                            let position = self.new_ref(
+                                source_id,
+                                target_id,
+                                *expr_reference,
+                            );
 
                             // Using ExprArg as a placeholder. It will be rewritten
                             // later.
@@ -1032,7 +1136,8 @@ impl visit_mut::VisitMut for LowerStatement<'_, '_> {
                 // Expr::Stmt subqueries are valid in returning expressions (e.g.,
                 // INCLUDE preloading) and in VALUES bodies of batch queries.
                 debug_assert!(
-                    self.cx.is_returning() || matches!(self.cx, LoweringContext::Statement),
+                    self.cx.is_returning()
+                        || matches!(self.cx, LoweringContext::Statement),
                     "cx={:#?}",
                     self.cx,
                 );
@@ -1051,7 +1156,11 @@ impl visit_mut::VisitMut for LowerStatement<'_, '_> {
                 // run here.
                 self.state.engine.simplify_stmt(&mut *expr_stmt.stmt);
 
-                *expr = self.new_sub_statement(source_id, target_id, expr_stmt.stmt);
+                *expr = self.new_sub_statement(
+                    source_id,
+                    target_id,
+                    expr_stmt.stmt,
+                );
 
                 if self.state.hir[target_id].independent {
                     self.curr_stmt_info()
@@ -1077,7 +1186,11 @@ impl visit_mut::VisitMut for LowerStatement<'_, '_> {
                 // must run here.
                 self.state.engine.simplify_stmt(&mut stmt);
 
-                let arg = self.new_sub_statement(source_id, target_id, Box::new(stmt));
+                let arg = self.new_sub_statement(
+                    source_id,
+                    target_id,
+                    Box::new(stmt),
+                );
 
                 if self.state.hir[target_id].independent {
                     self.curr_stmt_info()
@@ -1143,8 +1256,15 @@ impl visit_mut::VisitMut for LowerStatement<'_, '_> {
             let mut include_paths = std::mem::take(include);
             let is_insert = self.cx.is_insert();
 
-            self.prepare_model_returning_for_context(&mut returning, &mut include_paths, is_insert);
-            self.process_top_level_includes(returning.as_record_mut_unwrap(), &include_paths);
+            self.prepare_model_returning_for_context(
+                &mut returning,
+                &mut include_paths,
+                is_insert,
+            );
+            self.process_top_level_includes(
+                returning.as_record_mut_unwrap(),
+                &include_paths,
+            );
 
             *i = stmt::Returning::Project(returning);
         }
@@ -1224,7 +1344,8 @@ impl visit_mut::VisitMut for LowerStatement<'_, '_> {
                 upsert.target = stmt::UpsertTarget::Columns(columns);
             }
             if upsert.action == stmt::UpsertAction::Update {
-                let version = lower.inject_version_increment(&mut upsert.shared);
+                let version =
+                    lower.inject_version_increment(&mut upsert.shared);
                 if !sql && let Some(projection) = version {
                     upsert.defaults.set(projection, stmt::Value::U64(0));
                 }
@@ -1335,7 +1456,8 @@ impl visit_mut::VisitMut for LowerStatement<'_, '_> {
                 // OR-ing each assigned field's coverage mask together.
                 let mut changed_bits = stmt::PathFieldSet::new();
                 for projection in stmt.assignments.keys() {
-                    if let Some(mf) = mapping.resolve_field_mapping(projection) {
+                    if let Some(mf) = mapping.resolve_field_mapping(projection)
+                    {
                         changed_bits |= mf.field_mask();
                     }
                 }
@@ -1398,9 +1520,15 @@ impl visit_mut::VisitMut for LowerStatement<'_, '_> {
                 .state
                 .update_returning
                 .swap_remove(&update_stmt_id)
-                .expect("update assignments registered while lowering returning");
+                .expect(
+                    "update assignments registered while lowering returning",
+                );
             // Use the lowered assignments (which are now column-indexed)
-            returning::constantize_update_returning(lower.expr_cx, returning, &stmt.assignments);
+            returning::constantize_update_returning(
+                lower.expr_cx,
+                returning,
+                &stmt.assignments,
+            );
         }
 
         self.visit_update_target_mut(&mut stmt.target);
@@ -1462,7 +1590,10 @@ impl<'a, 'b> LowerStatement<'a, 'b> {
                     .resolve_expr_reference(expr_reference)
                     .as_model_unwrap();
 
-                *operand = key_field_refs(nesting, model.primary_key.fields.iter().copied());
+                *operand = key_field_refs(
+                    nesting,
+                    model.primary_key.fields.iter().copied(),
+                );
             }
             stmt::ExprReference::Field { nesting, .. } => {
                 let nesting = *nesting;
@@ -1496,7 +1627,10 @@ impl<'a, 'b> LowerStatement<'a, 'b> {
     /// still scope it (see `relation_expr::resolve`).
     ///
     /// Returns whether the operand was substituted.
-    fn rewrite_embedded_relation_operand(&self, operand: &mut stmt::Expr) -> bool {
+    fn rewrite_embedded_relation_operand(
+        &self,
+        operand: &mut stmt::Expr,
+    ) -> bool {
         if let Some(relation) = relation_expr::resolve(&self.expr_cx, operand)
             && relation.is_endpoint()
             && let Some(key_expr) = relation.key_expr()
@@ -1523,8 +1657,9 @@ impl<'a, 'b> LowerStatement<'a, 'b> {
         }
 
         let (nesting, pk_field_id) = {
-            let stmt::Expr::Reference(expr_ref @ stmt::ExprReference::Model { nesting }) =
-                &*expr.expr
+            let stmt::Expr::Reference(
+                expr_ref @ stmt::ExprReference::Model { nesting },
+            ) = &*expr.expr
             else {
                 return;
             };
@@ -1548,7 +1683,10 @@ impl<'a, 'b> LowerStatement<'a, 'b> {
                 for item in &mut expr_list.items {
                     match item {
                         stmt::Expr::Value(value) => {
-                            assert!(value.is_a(&schema.app, &pk.ty.as_primitive_unwrap().ty));
+                            assert!(value.is_a(
+                                &schema.app,
+                                &pk.ty.as_primitive_unwrap().ty
+                            ));
                         }
                         _ => todo!("{item:#?}"),
                     }
@@ -1556,7 +1694,10 @@ impl<'a, 'b> LowerStatement<'a, 'b> {
             }
             stmt::Expr::Value(stmt::Value::List(values)) => {
                 for value in values {
-                    assert!(value.is_a(&schema.app, &pk.ty.as_primitive_unwrap().ty));
+                    assert!(
+                        value
+                            .is_a(&schema.app, &pk.ty.as_primitive_unwrap().ty)
+                    );
                 }
             }
             _ => todo!("expr={expr:#?}"),
@@ -1572,7 +1713,8 @@ impl<'a, 'b> LowerStatement<'a, 'b> {
         rhs: &mut stmt::Expr,
     ) -> Option<stmt::Expr> {
         match (&mut *lhs, &mut *rhs) {
-            (stmt::Expr::Value(value), other) | (other, stmt::Expr::Value(value))
+            (stmt::Expr::Value(value), other)
+            | (other, stmt::Expr::Value(value))
                 if value.is_null() =>
             {
                 let other = other.take();
@@ -1594,7 +1736,8 @@ impl<'a, 'b> LowerStatement<'a, 'b> {
             // both sides `Expr::Record`, or one side folded to
             // `Expr::Value(Value::Record)`.
             (stmt::Expr::Record(lhs_rec), stmt::Expr::Record(rhs_rec))
-                if (op.is_eq() || op.is_ne()) && lhs_rec.len() == rhs_rec.len() =>
+                if (op.is_eq() || op.is_ne())
+                    && lhs_rec.len() == rhs_rec.len() =>
             {
                 Some(self.combine_record_op(
                     op,
@@ -1602,21 +1745,31 @@ impl<'a, 'b> LowerStatement<'a, 'b> {
                     std::mem::take(&mut rhs_rec.fields),
                 ))
             }
-            (stmt::Expr::Record(rec), stmt::Expr::Value(stmt::Value::Record(val_rec)))
-            | (stmt::Expr::Value(stmt::Value::Record(val_rec)), stmt::Expr::Record(rec))
-                if (op.is_eq() || op.is_ne()) && rec.len() == val_rec.len() =>
-            {
+            (
+                stmt::Expr::Record(rec),
+                stmt::Expr::Value(stmt::Value::Record(val_rec)),
+            )
+            | (
+                stmt::Expr::Value(stmt::Value::Record(val_rec)),
+                stmt::Expr::Record(rec),
+            ) if (op.is_eq() || op.is_ne()) && rec.len() == val_rec.len() => {
                 let val_exprs = std::mem::take(&mut val_rec.fields)
                     .into_iter()
                     .map(stmt::Expr::Value)
                     .collect();
-                Some(self.combine_record_op(op, std::mem::take(&mut rec.fields), val_exprs))
+                Some(self.combine_record_op(
+                    op,
+                    std::mem::take(&mut rec.fields),
+                    val_exprs,
+                ))
             }
-            (stmt::Expr::Cast(expr_cast), other) | (other, stmt::Expr::Cast(expr_cast)) => {
+            (stmt::Expr::Cast(expr_cast), other)
+            | (other, stmt::Expr::Cast(expr_cast)) => {
                 // Expand decodes of embedded values into guarded comparisons so
                 // each cast operand can use the database's stored type.
                 if expr_is_enum_decode(other) {
-                    let comparison = stmt::Expr::binary_op(lhs.clone(), op, rhs.clone());
+                    let comparison =
+                        stmt::Expr::binary_op(lhs.clone(), op, rhs.clone());
                     let mut expanded_comparison = comparison.clone();
                     Simplify::with_context(self.expr_cx, self.capability())
                         .visit_expr_mut(&mut expanded_comparison);
@@ -1629,7 +1782,8 @@ impl<'a, 'b> LowerStatement<'a, 'b> {
                     return None;
                 }
 
-                let target_ty = self.capability().native_type_for(&expr_cast.ty);
+                let target_ty =
+                    self.capability().native_type_for(&expr_cast.ty);
                 self.cast_expr(lhs, &target_ty);
                 self.cast_expr(rhs, &target_ty);
                 None
@@ -1670,16 +1824,25 @@ impl<'a, 'b> LowerStatement<'a, 'b> {
     /// element-level transforms (NULLs, casts) still fire while the
     /// surrounding `IN` is preserved. Otherwise a single binary-op lowering
     /// is applied across both sides.
-    fn lower_in_subquery_operands(&mut self, lhs: &mut stmt::Expr, rhs: &mut stmt::Expr) {
-        if let (stmt::Expr::Record(lhs_rec), stmt::Expr::Record(rhs_rec)) = (&mut *lhs, &mut *rhs)
+    fn lower_in_subquery_operands(
+        &mut self,
+        lhs: &mut stmt::Expr,
+        rhs: &mut stmt::Expr,
+    ) {
+        if let (stmt::Expr::Record(lhs_rec), stmt::Expr::Record(rhs_rec)) =
+            (&mut *lhs, &mut *rhs)
             && lhs_rec.len() == rhs_rec.len()
         {
-            for (l, r) in lhs_rec.fields.iter_mut().zip(rhs_rec.fields.iter_mut()) {
-                let maybe_res = self.lower_expr_binary_op(stmt::BinaryOp::Eq, l, r);
+            for (l, r) in
+                lhs_rec.fields.iter_mut().zip(rhs_rec.fields.iter_mut())
+            {
+                let maybe_res =
+                    self.lower_expr_binary_op(stmt::BinaryOp::Eq, l, r);
                 assert!(maybe_res.is_none(), "TODO");
             }
         } else {
-            let maybe_res = self.lower_expr_binary_op(stmt::BinaryOp::Eq, lhs, rhs);
+            let maybe_res =
+                self.lower_expr_binary_op(stmt::BinaryOp::Eq, lhs, rhs);
             assert!(maybe_res.is_none(), "TODO");
         }
     }
@@ -1723,14 +1886,23 @@ impl<'a, 'b> LowerStatement<'a, 'b> {
         stmt::Expr::or_from_vec(equalities.collect())
     }
 
-    fn lower_mapped_in_list(&mut self, expr: &mut stmt::Expr, map: &mut stmt::ExprMap) {
+    fn lower_mapped_in_list(
+        &mut self,
+        expr: &mut stmt::Expr,
+        map: &mut stmt::ExprMap,
+    ) {
         assert!(map.base.is_arg(), "TODO");
 
-        let lowered = self.lower_expr_binary_op(stmt::BinaryOp::Eq, expr, &mut map.map);
+        let lowered =
+            self.lower_expr_binary_op(stmt::BinaryOp::Eq, expr, &mut map.map);
         assert!(lowered.is_none(), "TODO");
     }
 
-    fn lower_cast_in_list(&mut self, expr: &mut stmt::Expr, list: &mut stmt::Expr) {
+    fn lower_cast_in_list(
+        &mut self,
+        expr: &mut stmt::Expr,
+        list: &mut stmt::Expr,
+    ) {
         let stmt::Expr::Cast(cast) = expr else {
             unreachable!()
         };
@@ -1794,7 +1966,8 @@ impl<'a, 'b> LowerStatement<'a, 'b> {
         target_id: hir::StmtId,
         mut expr_reference: stmt::ExprReference,
     ) -> usize {
-        let stmt::ExprReference::Column(expr_column) = &mut expr_reference else {
+        let stmt::ExprReference::Column(expr_column) = &mut expr_reference
+        else {
             todo!()
         };
 
@@ -1848,7 +2021,9 @@ impl<'a, 'b> LowerStatement<'a, 'b> {
             nesting,
             data_load_input: Cell::new(None),
             returning_input: Cell::new(None),
-            batch_load_index: if let Some(row_index) = self.state.scopes[self.scope_id].row_index {
+            batch_load_index: if let Some(row_index) =
+                self.state.scopes[self.scope_id].row_index
+            {
                 debug_assert_eq!(1, nesting, "TODO");
                 Cell::new(Some(row_index))
             } else {
@@ -1890,7 +2065,11 @@ impl<'a, 'b> LowerStatement<'a, 'b> {
     }
 
     /// Create a new argument on a dependent statement
-    fn new_dependency_arg(&mut self, source_id: hir::StmtId, target_id: hir::StmtId) -> stmt::Expr {
+    fn new_dependency_arg(
+        &mut self,
+        source_id: hir::StmtId,
+        target_id: hir::StmtId,
+    ) -> stmt::Expr {
         let source = &mut self.state.hir[source_id];
         let arg = source.args.len();
         source.args.push(hir::Arg::Sub {
@@ -1932,8 +2111,11 @@ impl<'a, 'b> LowerStatement<'a, 'b> {
             .rewrite(&mut stmt);
             // Combine compatible IN subqueries before the lowering walk
             // extracts them into separate NoSQL statements.
-            Simplify::with_context(child.expr_cx, child.state.engine.capability)
-                .visit_mut(&mut *stmt);
+            Simplify::with_context(
+                child.expr_cx,
+                child.state.engine.capability,
+            )
+            .visit_mut(&mut *stmt);
             // Lowering walk.
             child.visit_stmt_mut(&mut stmt);
             // Post-lower simplify: heavyweight rules on the lowered tree.
@@ -1946,7 +2128,8 @@ impl<'a, 'b> LowerStatement<'a, 'b> {
         // `plan_nested_merge` keys off `returning: true` to discover include
         // subqueries, and the line-399 `Expr::Stmt` arm gets the same flag
         // because it fires during the parent's Returning walk.
-        let saved_cx = std::mem::replace(&mut self.cx, LoweringContext::Returning(None));
+        let saved_cx =
+            std::mem::replace(&mut self.cx, LoweringContext::Returning(None));
         let arg = self.new_sub_statement(source_id, target_id, stmt);
         self.cx = saved_cx;
 
@@ -2024,7 +2207,10 @@ impl<'a, 'b> LowerStatement<'a, 'b> {
     }
 
     /// Plan a sub-statement that is able to reference the parent statement
-    fn scope_statement(&mut self, f: impl FnOnce(&mut LowerStatement<'_, '_>)) -> hir::StmtId {
+    fn scope_statement(
+        &mut self,
+        f: impl FnOnce(&mut LowerStatement<'_, '_>),
+    ) -> hir::StmtId {
         let stmt_id = self.new_statement_info();
         let row_index = match &self.cx {
             LoweringContext::Insert(_, row_index) => *row_index,
@@ -2068,9 +2254,13 @@ impl<'a, 'b> LowerStatement<'a, 'b> {
     ) -> LowerStatement<'child, 'b> {
         let columns = match target {
             stmt::InsertTarget::Scope(_) => {
-                panic!("InsertTarget::Scope should already have been lowered by this point")
+                panic!(
+                    "InsertTarget::Scope should already have been lowered by this point"
+                )
             }
-            stmt::InsertTarget::Model(model_id) => &self.schema().mapping_for(model_id).columns,
+            stmt::InsertTarget::Model(model_id) => {
+                &self.schema().mapping_for(model_id).columns
+            }
             stmt::InsertTarget::Table(insert_table) => &insert_table.columns,
         };
 
@@ -2155,8 +2345,12 @@ impl<'a, 'b> LowerStatement<'a, 'b> {
                 // the LHS of a lifted FK IN-subquery. Collapse the
                 // projection and recurse; the collapsed entry is typically
                 // the column's decode cast, which the Cast arm strips.
-                let Some(entry) = expr_project.base.entry(&expr_project.projection) else {
-                    todo!("cast_expr: cannot collapse projection: {expr_project:#?}")
+                let Some(entry) =
+                    expr_project.base.entry(&expr_project.projection)
+                else {
+                    todo!(
+                        "cast_expr: cannot collapse projection: {expr_project:#?}"
+                    )
                 };
                 *expr = entry.to_expr();
                 self.cast_expr(expr, target_ty);
@@ -2232,7 +2426,10 @@ fn collapse_projections(mut expr: stmt::Expr) -> stmt::Expr {
 /// or, for a value row, the encoded record itself. Slot 0 of an arm's record
 /// (and of a value record) is the discriminant; a unit variant's arm is the
 /// bare discriminant and has an empty payload.
-fn variant_payload(lowered: stmt::Expr, disc_value: &stmt::Value) -> stmt::Expr {
+fn variant_payload(
+    lowered: stmt::Expr,
+    disc_value: &stmt::Value,
+) -> stmt::Expr {
     match collapse_projections(lowered) {
         stmt::Expr::Match(match_expr) => {
             let arm = match_expr
@@ -2242,17 +2439,25 @@ fn variant_payload(lowered: stmt::Expr, disc_value: &stmt::Value) -> stmt::Expr 
                 .expect("enum decode has an arm per variant");
 
             match arm.expr {
-                stmt::Expr::Record(record) => stmt::Expr::record(record.fields.into_iter().skip(1)),
+                stmt::Expr::Record(record) => {
+                    stmt::Expr::record(record.fields.into_iter().skip(1))
+                }
                 _ => stmt::Expr::record(Vec::<stmt::Expr>::new()),
             }
         }
         stmt::Expr::Value(stmt::Value::Record(record))
             if record.fields.first() == Some(disc_value) =>
         {
-            stmt::Expr::record(record.fields.into_iter().skip(1).map(stmt::Expr::Value))
+            stmt::Expr::record(
+                record.fields.into_iter().skip(1).map(stmt::Expr::Value),
+            )
         }
-        stmt::Expr::Value(_) => stmt::Expr::error("value is not the selected variant"),
-        lowered => todo!("variant selection on lowered expression {lowered:#?}"),
+        stmt::Expr::Value(_) => {
+            stmt::Expr::error("value is not the selected variant")
+        }
+        lowered => {
+            todo!("variant selection on lowered expression {lowered:#?}")
+        }
     }
 }
 
@@ -2263,7 +2468,9 @@ pub(super) fn key_field_refs(
     scalar_or_record(fields.map(|field| stmt::Expr::ref_field(nesting, field)))
 }
 
-fn scalar_or_record(mut fields: impl ExactSizeIterator<Item = stmt::Expr>) -> stmt::Expr {
+fn scalar_or_record(
+    mut fields: impl ExactSizeIterator<Item = stmt::Expr>,
+) -> stmt::Expr {
     if fields.len() == 1 {
         fields.next().unwrap()
     } else {
@@ -2286,7 +2493,8 @@ impl stmt::Input for AssignmentInput<'_> {
         expr_reference: &stmt::ExprReference,
         expr_projection: &stmt::Projection,
     ) -> Option<stmt::Expr> {
-        let stmt::ExprReference::Field { nesting: 0, index } = expr_reference else {
+        let stmt::ExprReference::Field { nesting: 0, index } = expr_reference
+        else {
             return None;
         };
 
@@ -2301,7 +2509,8 @@ impl stmt::Input for AssignmentInput<'_> {
         // The assignment value sits at `remaining_steps` below the field;
         // a template projection outside that subtree refers to a sibling
         // this assignment does not cover.
-        let inner_steps = expr_projection.as_slice().strip_prefix(remaining_steps)?;
+        let inner_steps =
+            expr_projection.as_slice().strip_prefix(remaining_steps)?;
 
         if inner_steps.is_empty() {
             Some(self.value.clone())
@@ -2404,7 +2613,9 @@ fn build_update_returning(
 fn in_list_requires_equality_expansion(expr: &stmt::Expr) -> bool {
     match expr {
         stmt::Expr::Match(_) => true,
-        stmt::Expr::Record(record) => record.fields.iter().any(|field| !field.is_column()),
+        stmt::Expr::Record(record) => {
+            record.fields.iter().any(|field| !field.is_column())
+        }
         _ => false,
     }
 }
@@ -2453,7 +2664,9 @@ fn in_list_is_value_list(e: &stmt::ExprInList) -> bool {
     if matches!(*e.expr, stmt::Expr::Record(_)) {
         return false;
     }
-    let scalar = |v: &stmt::Value| !matches!(v, stmt::Value::Record(_) | stmt::Value::List(_));
+    let scalar = |v: &stmt::Value| {
+        !matches!(v, stmt::Value::Record(_) | stmt::Value::List(_))
+    };
     match &*e.list {
         stmt::Expr::Value(stmt::Value::List(items)) => items.iter().all(scalar),
         stmt::Expr::List(list) => list

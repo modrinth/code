@@ -8,7 +8,10 @@ use toasty_core::{
 };
 
 impl Exec<'_> {
-    pub(super) async fn exec_scan(&mut self, action: &mir::Scan) -> Result<ExecResponse> {
+    pub(super) async fn exec_scan(
+        &mut self,
+        action: &mir::Scan,
+    ) -> Result<ExecResponse> {
         let mut row_filter = action.row_filter.clone();
 
         if let Some(input) = action.input {
@@ -34,7 +37,8 @@ impl Exec<'_> {
             )
             .await?;
 
-        let rows: Vec<stmt::Value> = res.values.into_value_stream().collect().await?;
+        let rows: Vec<stmt::Value> =
+            res.values.into_value_stream().collect().await?;
 
         Ok(ExecResponse {
             values: Rows::Stream(stmt::ValueStream::from_vec(rows)),

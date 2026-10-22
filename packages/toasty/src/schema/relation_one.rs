@@ -55,13 +55,22 @@ pub trait RelationOneField: Load<Output = Self> {
     /// `via` carries the fully resolved [`stmt::Path`] of a
     /// `#[has_one(via = a.b)]` multi-step relation, rooted at the declaring
     /// model. A `via` relation has no pair.
-    fn has_one_relation_field_ty(pair: Option<FieldId>, via: Option<stmt::Path>) -> FieldTy {
+    fn has_one_relation_field_ty(
+        pair: Option<FieldId>,
+        via: Option<stmt::Path>,
+    ) -> FieldTy {
         let target = <Self::Target as Model>::id();
         let expr_ty = stmt::Type::Model(target);
         let cardinality = app::Cardinality::One;
 
         match via {
-            Some(path) => FieldTy::Via(app::Via::new(target, expr_ty, cardinality, path, None)),
+            Some(path) => FieldTy::Via(app::Via::new(
+                target,
+                expr_ty,
+                cardinality,
+                path,
+                None,
+            )),
             None => FieldTy::Has(app::Has {
                 target,
                 expr_ty,

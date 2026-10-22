@@ -119,12 +119,16 @@ impl_integer_enum_collection_compat!(
 );
 
 impl<T, const BYTES: u8> CompatibleWith<tag::Int<BYTES>> for Vec<T> where
-    T: crate::schema::Embed + crate::schema::Scalar + CompatibleWith<tag::Int<BYTES>>
+    T: crate::schema::Embed
+        + crate::schema::Scalar
+        + CompatibleWith<tag::Int<BYTES>>
 {
 }
 
 impl<T, const BYTES: u8> CompatibleWith<tag::UInt<BYTES>> for Vec<T> where
-    T: crate::schema::Embed + crate::schema::Scalar + CompatibleWith<tag::UInt<BYTES>>
+    T: crate::schema::Embed
+        + crate::schema::Scalar
+        + CompatibleWith<tag::UInt<BYTES>>
 {
 }
 

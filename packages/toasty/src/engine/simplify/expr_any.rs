@@ -2,7 +2,10 @@ use super::Simplify;
 use toasty_core::stmt::{self, Expr};
 
 impl Simplify<'_> {
-    pub(super) fn simplify_expr_any(&self, expr_any: &stmt::ExprAny) -> Option<Expr> {
+    pub(super) fn simplify_expr_any(
+        &self,
+        expr_any: &stmt::ExprAny,
+    ) -> Option<Expr> {
         // Only simplify when the inner expression is a Map with a constant base
         let stmt::Expr::Map(expr_map) = &*expr_any.expr else {
             return None;
@@ -25,7 +28,9 @@ impl Simplify<'_> {
             let mut operand = (*expr_map.map).clone();
 
             match item {
-                stmt::Value::Record(value_record) => operand.substitute(&value_record.fields[..]),
+                stmt::Value::Record(value_record) => {
+                    operand.substitute(&value_record.fields[..])
+                }
                 item => operand.substitute([item]),
             }
 

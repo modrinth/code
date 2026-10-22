@@ -7,7 +7,10 @@ use toasty_core::{Schema, stmt};
 /// Pure on `(schema, expr)`; pulled out as a free function so the
 /// lowering visitor and the unit tests can both call it without
 /// constructing a full `LowerStatement`.
-pub(super) fn is_variant_tautology_or(schema: &Schema, expr: &stmt::ExprOr) -> bool {
+pub(super) fn is_variant_tautology_or(
+    schema: &Schema,
+    expr: &stmt::ExprOr,
+) -> bool {
     // Find the first IsVariant to use as anchor.
     let Some(first) = expr.operands.iter().find_map(|op| match op {
         stmt::Expr::IsVariant(iv) => Some(iv),
@@ -36,7 +39,9 @@ pub(super) fn is_variant_tautology_or(schema: &Schema, expr: &stmt::ExprOr) -> b
         // two syntactically different (or non-deterministic) subjects
         // could disagree at runtime, so covering all variants of the
         // anchor tells us nothing about them.
-        if !iv.expr.is_equivalent_to(anchor_expr) || iv.variant.model != model_id {
+        if !iv.expr.is_equivalent_to(anchor_expr)
+            || iv.variant.model != model_id
+        {
             return false;
         }
 

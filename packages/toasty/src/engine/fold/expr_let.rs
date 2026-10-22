@@ -32,7 +32,9 @@ pub(super) fn fold_expr_let(expr_let: &mut stmt::ExprLet) -> Option<Expr> {
 /// scopes automatically.
 fn substitute_let_bindings(expr: &mut Expr, bindings: &[Expr]) {
     visit_mut::walk_expr_scoped_mut(expr, 0, |expr, scope_depth| match expr {
-        Expr::Arg(arg) if arg.nesting == scope_depth && arg.position < bindings.len() => {
+        Expr::Arg(arg)
+            if arg.nesting == scope_depth && arg.position < bindings.len() =>
+        {
             *expr = bindings[arg.position].clone();
             false
         }

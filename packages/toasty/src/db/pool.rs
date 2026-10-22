@@ -136,7 +136,10 @@ impl Pool {
     }
 
     /// Retrieves a connection from the pool.
-    pub(crate) async fn get(&self, shared: Arc<super::Shared>) -> crate::Result<super::Connection> {
+    pub(crate) async fn get(
+        &self,
+        shared: Arc<super::Shared>,
+    ) -> crate::Result<super::Connection> {
         let connection = self.inner.get().await.map_err(|e| {
             tracing::debug!(error = %e, "failed to acquire connection from pool");
             toasty_core::Error::connection_pool(e)
@@ -236,7 +239,10 @@ impl deadpool::managed::Manager for Manager {
         if let Some(max) = self.max_connection_lifetime
             && metrics.age() >= max
         {
-            tracing::debug!(?max, "discarding pooled connection past max lifetime");
+            tracing::debug!(
+                ?max,
+                "discarding pooled connection past max lifetime"
+            );
             return Err(deadpool::managed::RecycleError::message(
                 "connection exceeded max lifetime",
             ));
@@ -245,7 +251,10 @@ impl deadpool::managed::Manager for Manager {
         if let Some(max) = self.max_connection_idle_time
             && metrics.last_used() >= max
         {
-            tracing::debug!(?max, "discarding pooled connection past max idle time");
+            tracing::debug!(
+                ?max,
+                "discarding pooled connection past max idle time"
+            );
             return Err(deadpool::managed::RecycleError::message(
                 "connection exceeded max idle time",
             ));
@@ -263,7 +272,9 @@ impl deadpool::managed::Manager for Manager {
                 tx,
             };
             if obj.in_tx.send(ping).is_err() {
-                tracing::debug!("pre-ping channel closed; discarding pooled connection");
+                tracing::debug!(
+                    "pre-ping channel closed; discarding pooled connection"
+                );
                 return Err(deadpool::managed::RecycleError::message(
                     "background task is no longer running",
                 ));
@@ -447,7 +458,9 @@ impl SweepTask {
             }
             Ok(Err(_)) => false, // connection task dropped tx
             Err(_) => {
-                tracing::debug!("sweep ping timed out; discarding pooled connection");
+                tracing::debug!(
+                    "sweep ping timed out; discarding pooled connection"
+                );
                 false
             }
         }

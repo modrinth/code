@@ -29,7 +29,11 @@ impl<T: AsExpr> Func<T> {
         Self { args, ret, expr }
     }
 
-    pub(crate) fn from_stmt_typed(expr: T, args: Vec<stmt::Type>, ret: stmt::Type) -> Self {
+    pub(crate) fn from_stmt_typed(
+        expr: T,
+        args: Vec<stmt::Type>,
+        ret: stmt::Type,
+    ) -> Self {
         Self { args, ret, expr }
     }
 
@@ -45,10 +49,15 @@ impl<T: AsExpr> Func<T> {
     /// Evaluates the function against `input`. `schema` directs the
     /// schema-directed conversions (a `#[document]` embed's record ↔ object
     /// casts); every other operation is schema-free.
-    pub(crate) fn eval(&self, schema: &Schema, input: impl stmt::Input) -> Result<stmt::Value> {
+    pub(crate) fn eval(
+        &self,
+        schema: &Schema,
+        input: impl stmt::Input,
+    ) -> Result<stmt::Value> {
         use stmt::TypedInput;
 
-        let input = TypedInput::new(stmt::ExprContext::new(schema), &self.args, input);
+        let input =
+            TypedInput::new(stmt::ExprContext::new(schema), &self.args, input);
         self.expr.as_expr().eval(input)
     }
 
@@ -57,10 +66,15 @@ impl<T: AsExpr> Func<T> {
         self.eval(schema, stmt::ConstInput::new()).unwrap()
     }
 
-    pub(crate) fn eval_bool(&self, schema: &Schema, input: impl stmt::Input) -> Result<bool> {
+    pub(crate) fn eval_bool(
+        &self,
+        schema: &Schema,
+        input: impl stmt::Input,
+    ) -> Result<bool> {
         use stmt::TypedInput;
 
-        let input = TypedInput::new(stmt::ExprContext::new(schema), &self.args, input);
+        let input =
+            TypedInput::new(stmt::ExprContext::new(schema), &self.args, input);
         self.expr.as_expr().eval_bool(input)
     }
 }

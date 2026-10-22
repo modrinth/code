@@ -8,14 +8,20 @@ use toasty_core::{
 };
 
 impl Exec<'_> {
-    pub(super) async fn exec_eval(&mut self, action: &mir::Eval) -> Result<ExecResponse> {
+    pub(super) async fn exec_eval(
+        &mut self,
+        action: &mir::Eval,
+    ) -> Result<ExecResponse> {
         match action.row_input {
             Some(row_input) => self.exec_eval_map_over(action, row_input).await,
             None => self.exec_eval_compute(action).await,
         }
     }
 
-    async fn exec_eval_compute(&mut self, action: &mir::Eval) -> Result<ExecResponse> {
+    async fn exec_eval_compute(
+        &mut self,
+        action: &mir::Eval,
+    ) -> Result<ExecResponse> {
         // This form evaluates the body once with each complete input.
         // For example, two input nodes produce this call:
         //
@@ -55,7 +61,11 @@ impl Exec<'_> {
         let input_rows = values.collect_as_value().await?;
 
         if input_rows.is_list_empty() {
-            return Ok(self.exec_eval_map_over_empty_input(action, next_cursor, prev_cursor));
+            return Ok(self.exec_eval_map_over_empty_input(
+                action,
+                next_cursor,
+                prev_cursor,
+            ));
         }
 
         let mut input = Vec::with_capacity(1 + action.inputs.len());

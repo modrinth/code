@@ -52,14 +52,16 @@ fn document_update_returning_constantizes() {
         .column_expr
         .clone();
 
-    let profile = Value::record_from_vec(vec![Value::from("new"), Value::I64(99)]);
+    let profile =
+        Value::record_from_vec(vec![Value::from("new"), Value::I64(99)]);
     let mut assignments = stmt::Assignments::new();
     assignments.set(
         *column_id,
         Expr::cast_from(Expr::Value(profile.clone()), doc_ty, &column.ty),
     );
 
-    let mut returning = Returning::Project(Expr::record_from_vec(vec![raising_expr]));
+    let mut returning =
+        Returning::Project(Expr::record_from_vec(vec![raising_expr]));
 
     constantize_update_returning(
         stmt::ExprContext::new_with_target(&schema, table),

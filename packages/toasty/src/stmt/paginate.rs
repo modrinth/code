@@ -79,7 +79,8 @@ impl<M> Paginate<M> {
             "pagination requires no limit clause"
         );
 
-        let per_page = i64::try_from(per_page).expect("per_page exceeds i64::MAX");
+        let per_page =
+            i64::try_from(per_page).expect("per_page exceeds i64::MAX");
         query.untyped.limit = Some(stmt::Limit::Cursor(stmt::LimitCursor {
             page_size: stmt::Value::from(per_page).into(),
             after: None,
@@ -125,7 +126,9 @@ impl<M> Paginate<M> {
     ///     .after(toasty_core::stmt::Value::from(42_i64));
     /// ```
     pub fn after(mut self, key: impl Into<stmt::Expr>) -> Self {
-        let Some(stmt::Limit::Cursor(cursor)) = self.query.untyped.limit.as_mut() else {
+        let Some(stmt::Limit::Cursor(cursor)) =
+            self.query.untyped.limit.as_mut()
+        else {
             panic!("pagination requires a cursor limit clause");
         };
         cursor.after = Some(key.into());
@@ -168,7 +171,9 @@ impl<M> Paginate<M> {
     ///     .before(toasty_core::stmt::Value::from(100_i64));
     /// ```
     pub fn before(mut self, key: impl Into<stmt::Expr>) -> Self {
-        let Some(stmt::Limit::Cursor(cursor)) = self.query.untyped.limit.as_mut() else {
+        let Some(stmt::Limit::Cursor(cursor)) =
+            self.query.untyped.limit.as_mut()
+        else {
             panic!("pagination requires a cursor limit clause");
         };
         cursor.after = Some(key.into());
@@ -210,7 +215,10 @@ impl<M: Load> Paginate<M> {
     ///     .unwrap();
     /// # });
     /// ```
-    pub async fn exec(mut self, executor: &mut dyn Executor) -> Result<super::Page<M::Output>> {
+    pub async fn exec(
+        mut self,
+        executor: &mut dyn Executor,
+    ) -> Result<super::Page<M::Output>> {
         let original_query = self.query.untyped.clone();
 
         // Reverse ORDER BY for backward pagination
@@ -227,7 +235,9 @@ impl<M: Load> Paginate<M> {
             .await?;
 
         // Collect values from response
-        let stmt::Value::List(mut items) = response.values.collect_as_value().await? else {
+        let stmt::Value::List(mut items) =
+            response.values.collect_as_value().await?
+        else {
             return Err(crate::Error::invalid_result(
                 "paginated query expected a list of rows",
             ));
@@ -239,7 +249,8 @@ impl<M: Load> Paginate<M> {
         }
 
         // Load the raw values into model instances
-        let loaded_items: Vec<M::Output> = items.into_iter().map(M::load).collect::<Result<_>>()?;
+        let loaded_items: Vec<M::Output> =
+            items.into_iter().map(M::load).collect::<Result<_>>()?;
 
         // For backward pagination, swap cursors (next becomes prev)
         let (next_cursor, prev_cursor) = if self.reverse {

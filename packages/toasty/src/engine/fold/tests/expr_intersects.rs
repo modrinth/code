@@ -20,7 +20,8 @@ fn empty_value_list_rhs_becomes_false() {
 #[test]
 fn empty_expr_list_rhs_becomes_false() {
     // `intersects(arg(0), list([])) → false`
-    let mut expr = intersects(Expr::arg(0), Expr::List(stmt::ExprList { items: vec![] }));
+    let mut expr =
+        intersects(Expr::arg(0), Expr::List(stmt::ExprList { items: vec![] }));
     let result = fold_expr_intersects(&mut expr);
 
     assert_eq!(result, Some(Expr::Value(Value::Bool(false))));

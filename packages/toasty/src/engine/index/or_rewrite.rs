@@ -67,7 +67,11 @@ fn flatten_to_dnf(expr: stmt::Expr) -> Vec<stmt::Expr> {
 ///   2. If any operand is `Any(Map(...))`, distribute the remaining operands
 ///      into the map predicate and re-queue the resulting `Any`.
 ///   3. No `Or` or `Any` operands: emit as a final DNF conjunction.
-fn process_and(and: stmt::ExprAnd, queue: &mut Vec<stmt::Expr>, branches: &mut Vec<stmt::Expr>) {
+fn process_and(
+    and: stmt::ExprAnd,
+    queue: &mut Vec<stmt::Expr>,
+    branches: &mut Vec<stmt::Expr>,
+) {
     if let Some(pos) = and
         .operands
         .iter()
@@ -90,7 +94,11 @@ fn process_and(and: stmt::ExprAnd, queue: &mut Vec<stmt::Expr>, branches: &mut V
 /// Distribute AND over an `Or` operand at `pos`, re-queuing one `And` per branch.
 ///
 /// `(p AND (a OR b) AND q)` → `(p AND a AND q)` and `(p AND b AND q)` on the queue.
-fn distribute_over_or(and: stmt::ExprAnd, pos: usize, queue: &mut Vec<stmt::Expr>) {
+fn distribute_over_or(
+    and: stmt::ExprAnd,
+    pos: usize,
+    queue: &mut Vec<stmt::Expr>,
+) {
     let mut operands = and.operands;
     let stmt::Expr::Or(or) = operands.remove(pos) else {
         unreachable!()
@@ -113,7 +121,11 @@ fn distribute_over_or(and: stmt::ExprAnd, pos: usize, queue: &mut Vec<stmt::Expr
 /// `AND(p, ANY(MAP(base, pred)))` → `ANY(MAP(base, AND(pred, p)))`.
 ///
 /// This is valid because the non-Any operands do not reference the map's arg variable.
-fn distribute_into_any(and: stmt::ExprAnd, pos: usize, queue: &mut Vec<stmt::Expr>) {
+fn distribute_into_any(
+    and: stmt::ExprAnd,
+    pos: usize,
+    queue: &mut Vec<stmt::Expr>,
+) {
     let mut operands = and.operands;
     let stmt::Expr::Any(any) = operands.remove(pos) else {
         unreachable!()
@@ -157,7 +169,8 @@ fn unify_dnf_branches(branches: Vec<stmt::Expr>) -> stmt::Expr {
 
     for branch in branches {
         let (shape, value) = extract_shape(branch);
-        if let Some((_, values)) = groups.iter_mut().find(|(s, _)| *s == shape) {
+        if let Some((_, values)) = groups.iter_mut().find(|(s, _)| *s == shape)
+        {
             values.push(value);
         } else {
             groups.push((shape, vec![value]));
@@ -229,7 +242,8 @@ fn extract_shape(branch: stmt::Expr) -> (stmt::Expr, stmt::Value) {
             let shape = stmt::Expr::from(stmt::ExprAnd {
                 operands: shape_operands,
             });
-            let record = stmt::Value::Record(stmt::ValueRecord::from_vec(values));
+            let record =
+                stmt::Value::Record(stmt::ValueRecord::from_vec(values));
             (shape, record)
         }
         _ => todo!("unsupported branch type in OR index filter: {branch:#?}"),
@@ -248,7 +262,9 @@ fn assert_no_or_in_any(expr: &stmt::Expr) {
                 any.expr
             );
         }
-        stmt::Expr::And(and) => and.operands.iter().for_each(assert_no_or_in_any),
+        stmt::Expr::And(and) => {
+            and.operands.iter().for_each(assert_no_or_in_any)
+        }
         _ => {}
     }
 }

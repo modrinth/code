@@ -11,7 +11,8 @@ use toasty_core::stmt::{BinaryOp, Expr, ExprAnd, ExprOr};
 #[test]
 fn idempotent_two_identical() {
     let schema = test_schema();
-    let mut simplify = Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
+    let mut simplify =
+        Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
 
     // `and(a, a) → a`
     let mut expr = ExprAnd {
@@ -26,7 +27,8 @@ fn idempotent_two_identical() {
 #[test]
 fn idempotent_three_identical() {
     let schema = test_schema();
-    let mut simplify = Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
+    let mut simplify =
+        Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
 
     // `and(a, a, a) → a`
     let mut expr = ExprAnd {
@@ -41,7 +43,8 @@ fn idempotent_three_identical() {
 #[test]
 fn idempotent_with_different() {
     let schema = test_schema();
-    let mut simplify = Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
+    let mut simplify =
+        Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
 
     // `and(a, b, a) → and(a, b)`
     let mut expr = ExprAnd {
@@ -58,7 +61,8 @@ fn idempotent_with_different() {
 #[test]
 fn absorption_and_or() {
     let schema = test_schema();
-    let mut simplify = Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
+    let mut simplify =
+        Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
 
     // `and(a, or(a, b))` → `a`
     let mut expr = ExprAnd {
@@ -78,7 +82,8 @@ fn absorption_and_or() {
 #[test]
 fn absorption_with_multiple_operands() {
     let schema = test_schema();
-    let mut simplify = Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
+    let mut simplify =
+        Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
 
     // `and(a, b, or(a, c))` → `and(a, b)`
     let mut expr = ExprAnd {
@@ -101,7 +106,8 @@ fn absorption_with_multiple_operands() {
 #[test]
 fn absorption_two_and_three_or() {
     let schema = test_schema();
-    let mut simplify = Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
+    let mut simplify =
+        Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
 
     // `and(a, b, or(a, c, d))` → `and(a, b)`
     let mut expr = ExprAnd {
@@ -126,7 +132,8 @@ fn complement_basic() {
     use toasty_core::stmt::ExprNot;
 
     let schema = test_schema();
-    let mut simplify = Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
+    let mut simplify =
+        Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
 
     // `a and not(a)` → `false` (where a is a non-nullable comparison)
     let a = Expr::eq(Expr::arg(0), Expr::arg(1));
@@ -144,7 +151,8 @@ fn complement_with_other_operands() {
     use toasty_core::stmt::ExprNot;
 
     let schema = test_schema();
-    let mut simplify = Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
+    let mut simplify =
+        Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
 
     // `a and b and not(a)` → `false`
     let a = Expr::eq(Expr::arg(0), Expr::arg(1));
@@ -166,7 +174,8 @@ fn complement_nullable_not_simplified() {
     use toasty_core::stmt::ExprNot;
 
     let schema = test_schema();
-    let mut simplify = Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
+    let mut simplify =
+        Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
 
     // `a and not(a)` where `a` is an arg (nullable) → no change
     let a = Expr::arg(0);
@@ -183,7 +192,8 @@ fn complement_multiple_repetitions() {
     use toasty_core::stmt::ExprNot;
 
     let schema = test_schema();
-    let mut simplify = Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
+    let mut simplify =
+        Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
 
     // `a and a and not(a) and not(a)` → `false`
     let a = Expr::eq(Expr::arg(0), Expr::arg(1));
@@ -206,7 +216,8 @@ fn complement_multiple_repetitions() {
 #[test]
 fn range_to_equality_ge_le() {
     let schema = test_schema();
-    let mut simplify = Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
+    let mut simplify =
+        Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
 
     // `a >= 5 and a <= 5` → `a = 5`
     let mut expr = ExprAnd {
@@ -226,7 +237,8 @@ fn range_to_equality_ge_le() {
 #[test]
 fn range_to_equality_le_ge() {
     let schema = test_schema();
-    let mut simplify = Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
+    let mut simplify =
+        Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
 
     // `a <= 5 and a >= 5` → `a = 5` (opposite order)
     let mut expr = ExprAnd {
@@ -246,7 +258,8 @@ fn range_to_equality_le_ge() {
 #[test]
 fn range_to_equality_different_bounds_not_simplified() {
     let schema = test_schema();
-    let mut simplify = Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
+    let mut simplify =
+        Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
 
     // `a >= 5 and a <= 10` is not simplified (different bounds)
     let mut expr = ExprAnd {
@@ -264,7 +277,8 @@ fn range_to_equality_different_bounds_not_simplified() {
 #[test]
 fn range_to_equality_different_exprs_not_simplified() {
     let schema = test_schema();
-    let mut simplify = Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
+    let mut simplify =
+        Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
 
     // `a >= 5 and b <= 5` is not simplified (different expressions)
     let mut expr = ExprAnd {
@@ -282,7 +296,8 @@ fn range_to_equality_different_exprs_not_simplified() {
 #[test]
 fn range_to_equality_with_other_operands() {
     let schema = test_schema();
-    let mut simplify = Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
+    let mut simplify =
+        Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
 
     // `x and a >= 5 and a <= 5` → `x and a = 5`
     let mut expr = ExprAnd {
@@ -308,7 +323,8 @@ fn range_to_equality_with_other_operands() {
 #[test]
 fn range_to_equality_uneven_repetitions() {
     let schema = test_schema();
-    let mut simplify = Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
+    let mut simplify =
+        Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
 
     // `a >= 5 and a >= 5 and a <= 5` → `a = 5`
     let mut expr = ExprAnd {
@@ -337,12 +353,14 @@ fn range_to_equality_uneven_repetitions() {
 #[test]
 fn prune_or_branch_contradicting_outer_eq() {
     let schema = test_schema();
-    let mut simplify = Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
+    let mut simplify =
+        Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
 
     let disc_eq_1 = Expr::eq(Expr::arg(0), Expr::from(1i64));
     let addr_eq_alice = Expr::eq(Expr::arg(1), Expr::from("alice"));
     let disc_ne_1 = Expr::ne(Expr::arg(0), Expr::from(1i64));
-    let error_eq_alice = Expr::eq(Expr::error("unreachable"), Expr::from("alice"));
+    let error_eq_alice =
+        Expr::eq(Expr::error("unreachable"), Expr::from("alice"));
 
     let mut expr = ExprAnd {
         operands: vec![
@@ -375,7 +393,8 @@ fn prune_or_branch_contradicting_outer_eq() {
 #[test]
 fn prune_or_multiple_contradicting_branches() {
     let schema = test_schema();
-    let mut simplify = Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
+    let mut simplify =
+        Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
 
     let x_eq_1 = Expr::eq(Expr::arg(0), Expr::from(1i64));
     let x_eq_2 = Expr::eq(Expr::arg(0), Expr::from(2i64));
@@ -406,7 +425,8 @@ fn prune_or_multiple_contradicting_branches() {
 #[test]
 fn prune_or_no_contradiction_preserved() {
     let schema = test_schema();
-    let mut simplify = Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
+    let mut simplify =
+        Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
 
     // AND(x == 1, OR(AND(y == 2, a), AND(y == 3, b)))
     // x == 1 doesn't contradict y == 2 or y == 3 — no pruning.
@@ -415,8 +435,14 @@ fn prune_or_no_contradiction_preserved() {
             Expr::eq(Expr::arg(0), Expr::from(1i64)),
             Expr::Or(ExprOr {
                 operands: vec![
-                    Expr::and(Expr::eq(Expr::arg(1), Expr::from(2i64)), Expr::arg(2)),
-                    Expr::and(Expr::eq(Expr::arg(1), Expr::from(3i64)), Expr::arg(3)),
+                    Expr::and(
+                        Expr::eq(Expr::arg(1), Expr::from(2i64)),
+                        Expr::arg(2),
+                    ),
+                    Expr::and(
+                        Expr::eq(Expr::arg(1), Expr::from(3i64)),
+                        Expr::arg(3),
+                    ),
                 ],
             }),
         ],
@@ -427,14 +453,17 @@ fn prune_or_no_contradiction_preserved() {
     // No simplification — 2 operands remain, OR still has 2 branches.
     assert!(result.is_none());
     assert_eq!(expr.operands.len(), 2);
-    assert!(matches!(&expr.operands[1], Expr::Or(or) if or.operands.len() == 2));
+    assert!(
+        matches!(&expr.operands[1], Expr::Or(or) if or.operands.len() == 2)
+    );
 }
 
 /// All OR branches pruned → OR becomes false → AND becomes false.
 #[test]
 fn prune_or_all_branches_contradicted() {
     let schema = test_schema();
-    let mut simplify = Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
+    let mut simplify =
+        Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
 
     // AND(x == 1, OR(AND(x == 2, a), AND(x == 3, b)))
     // Both branches contradict x == 1, so OR → false → AND → false.
@@ -443,8 +472,14 @@ fn prune_or_all_branches_contradicted() {
             Expr::eq(Expr::arg(0), Expr::from(1i64)),
             Expr::Or(ExprOr {
                 operands: vec![
-                    Expr::and(Expr::eq(Expr::arg(0), Expr::from(2i64)), Expr::arg(1)),
-                    Expr::and(Expr::eq(Expr::arg(0), Expr::from(3i64)), Expr::arg(2)),
+                    Expr::and(
+                        Expr::eq(Expr::arg(0), Expr::from(2i64)),
+                        Expr::arg(1),
+                    ),
+                    Expr::and(
+                        Expr::eq(Expr::arg(0), Expr::from(3i64)),
+                        Expr::arg(2),
+                    ),
                 ],
             }),
         ],
@@ -464,7 +499,8 @@ fn prune_or_all_branches_contradicted() {
 #[test]
 fn prune_or_non_and_branch() {
     let schema = test_schema();
-    let mut simplify = Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
+    let mut simplify =
+        Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
 
     let x_eq_1 = Expr::eq(Expr::arg(0), Expr::from(1i64));
     let x_eq_2 = Expr::eq(Expr::arg(0), Expr::from(2i64));
@@ -497,7 +533,8 @@ fn prune_or_non_and_branch() {
 #[test]
 fn prune_or_multiple_constraints() {
     let schema = test_schema();
-    let mut simplify = Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
+    let mut simplify =
+        Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
 
     let x_eq_1 = Expr::eq(Expr::arg(0), Expr::from(1i64));
     let y_eq_2 = Expr::eq(Expr::arg(1), Expr::from(2i64));
@@ -509,8 +546,16 @@ fn prune_or_multiple_constraints() {
             y_eq_2.clone(),
             Expr::Or(ExprOr {
                 operands: vec![
-                    Expr::and_from_vec(vec![x_eq_1.clone(), y_eq_3, Expr::arg(2)]),
-                    Expr::and_from_vec(vec![x_eq_1.clone(), y_eq_2.clone(), Expr::arg(3)]),
+                    Expr::and_from_vec(vec![
+                        x_eq_1.clone(),
+                        y_eq_3,
+                        Expr::arg(2),
+                    ]),
+                    Expr::and_from_vec(vec![
+                        x_eq_1.clone(),
+                        y_eq_2.clone(),
+                        Expr::arg(3),
+                    ]),
                 ],
             }),
         ],
@@ -530,7 +575,8 @@ fn prune_or_multiple_constraints() {
 #[test]
 fn prune_or_no_constraints_no_change() {
     let schema = test_schema();
-    let mut simplify = Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
+    let mut simplify =
+        Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
 
     // AND(OR(a, b), OR(c, d)) — no non-OR constraints to propagate.
     let mut expr = ExprAnd {
@@ -561,7 +607,8 @@ fn prune_or_end_to_end_via_visit() {
     use toasty_core::stmt::{ExprMatch, MatchArm, Value, VisitMut};
 
     let schema = test_schema();
-    let mut simplify = Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
+    let mut simplify =
+        Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
 
     let disc = Expr::arg(0);
     let addr = Expr::arg(1);
@@ -610,7 +657,8 @@ fn prune_or_end_to_end_via_visit() {
 #[test]
 fn idempotent_not_simplified_for_non_deterministic() {
     let schema = test_schema();
-    let mut simplify = Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
+    let mut simplify =
+        Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
 
     // `LAST_INSERT_ID() AND LAST_INSERT_ID()` must retain both operands.
     let mut expr = ExprAnd {
@@ -629,7 +677,8 @@ fn absorption_not_simplified_for_non_deterministic() {
     use toasty_core::stmt::ExprOr;
 
     let schema = test_schema();
-    let mut simplify = Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
+    let mut simplify =
+        Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
 
     // `x AND (x OR y)` would absorb to `x` under PartialEq, but with a
     // non-deterministic `x` the two occurrences are independent draws, so
@@ -654,7 +703,8 @@ fn complement_not_simplified_for_non_deterministic() {
     use toasty_core::stmt::ExprNot;
 
     let schema = test_schema();
-    let mut simplify = Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
+    let mut simplify =
+        Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
 
     // `f() = 1 AND NOT (f() = 1)` — both `f()` calls are independent
     // evaluations, so complement must NOT fire.  (Compare with
@@ -672,7 +722,8 @@ fn complement_not_simplified_for_non_deterministic() {
 #[test]
 fn range_to_equality_not_simplified_for_non_deterministic() {
     let schema = test_schema();
-    let mut simplify = Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
+    let mut simplify =
+        Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
 
     // `f() >= 5 AND f() <= 5` — two independent draws of `f()` bracketed
     // by the same constant do not imply the draws are equal to 5.
@@ -691,7 +742,8 @@ fn range_to_equality_not_simplified_for_non_deterministic() {
 #[test]
 fn contradicting_eq_not_simplified_for_non_deterministic() {
     let schema = test_schema();
-    let mut simplify = Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
+    let mut simplify =
+        Simplify::new(&schema, &toasty_core::driver::Capability::SQLITE);
 
     // `f() == 1 AND f() == 2` — two independent draws can produce 1 and 2
     // respectively, so this is NOT a contradiction.

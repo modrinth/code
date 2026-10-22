@@ -1,5 +1,7 @@
 use toasty::Deferred;
-use toasty::schema::{self, Load, Model, ModelSet, RelationManyField, RelationOneField};
+use toasty::schema::{
+    self, Load, Model, ModelSet, RelationManyField, RelationOneField,
+};
 use toasty::stmt::{Expr, Insert, IntoExpr, IntoInsert, Path};
 use toasty_core::stmt::{self, Value};
 
@@ -62,13 +64,22 @@ impl Model for Dummy {
         panic!("not needed for relation lazy-slot decode tests")
     }
 
-    fn find_by_primary_key(_id: Expr<Self::PrimaryKey>) -> Self::Query<toasty::stmt::List<Self>> {}
+    fn find_by_primary_key(
+        _id: Expr<Self::PrimaryKey>,
+    ) -> Self::Query<toasty::stmt::List<Self>> {
+    }
 
     fn wrap_query<T>(_stmt: toasty::stmt::Query<T>) -> Self::Query<T> {}
 
-    fn query_one(_query: Self::Query<toasty::stmt::List<Self>>) -> Self::Query<Self> {}
+    fn query_one(
+        _query: Self::Query<toasty::stmt::List<Self>>,
+    ) -> Self::Query<Self> {
+    }
 
-    fn query_first(_query: Self::Query<toasty::stmt::List<Self>>) -> Self::Query<Option<Self>> {}
+    fn query_first(
+        _query: Self::Query<toasty::stmt::List<Self>>,
+    ) -> Self::Query<Option<Self>> {
+    }
 }
 
 impl IntoInsert for DummyCreate {
@@ -117,7 +128,8 @@ fn deferred_load_distinguishes_unloaded_and_loaded_null() {
             .is_unloaded()
     );
     for value in [None, Some(42)] {
-        let record = Value::Record(stmt::ValueRecord::from_vec(vec![value.into()]));
+        let record =
+            Value::Record(stmt::ValueRecord::from_vec(vec![value.into()]));
         let loaded = Deferred::<Option<i64>>::load(record).unwrap();
         assert!(!loaded.is_unloaded());
         assert_eq!(loaded.into_inner(), value);
@@ -129,15 +141,17 @@ fn deferred_load_rejects_malformed_values() {
     for value in [
         Value::I64(1),
         Value::Record(stmt::ValueRecord::from_vec(vec![])),
-        Value::Record(stmt::ValueRecord::from_vec(vec![Value::Null, Value::Null])),
+        Value::Record(stmt::ValueRecord::from_vec(vec![
+            Value::Null,
+            Value::Null,
+        ])),
     ] {
         let error = Deferred::<Option<i64>>::load(value).unwrap_err();
-        assert!(
-            error
-                .to_string()
-                .contains("deferred field decoder expected Null or single-field Record")
-        );
+        assert!(error.to_string().contains(
+            "deferred field decoder expected Null or single-field Record"
+        ));
     }
-    let invalid_inner = Value::Record(stmt::ValueRecord::from_vec(vec![Value::Bool(true)]));
+    let invalid_inner =
+        Value::Record(stmt::ValueRecord::from_vec(vec![Value::Bool(true)]));
     assert!(Deferred::<i64>::load(invalid_inner).is_err());
 }

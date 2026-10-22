@@ -30,7 +30,10 @@ pub(crate) struct Eval {
 impl Eval {
     /// Evaluates `body` once over the whole outputs of `inputs`:
     /// `arg(i)` = `inputs[i]`.
-    pub(crate) fn compute(inputs: IndexSet<mir::NodeId>, body: eval::Func) -> Self {
+    pub(crate) fn compute(
+        inputs: IndexSet<mir::NodeId>,
+        body: eval::Func,
+    ) -> Self {
         Eval {
             row_input: None,
             inputs,
@@ -65,15 +68,19 @@ impl Eval {
         // equals the number of scopes around it.
         let ty = stmt::Type::list(body.ret.clone());
         let mut map_body = body.into_expr();
-        visit_mut::walk_expr_scoped_mut(&mut map_body, 0, |expr, scope_depth| {
-            if let stmt::Expr::Arg(arg) = expr
-                && arg.nesting == scope_depth
-                && arg.position >= 1
-            {
-                arg.nesting += 1;
-            }
-            true
-        });
+        visit_mut::walk_expr_scoped_mut(
+            &mut map_body,
+            0,
+            |expr, scope_depth| {
+                if let stmt::Expr::Arg(arg) = expr
+                    && arg.nesting == scope_depth
+                    && arg.position >= 1
+                {
+                    arg.nesting += 1;
+                }
+                true
+            },
+        );
         let expr = stmt::Expr::map(stmt::Expr::arg(0), map_body);
 
         Eval {

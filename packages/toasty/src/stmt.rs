@@ -21,8 +21,8 @@ pub use insert::Insert;
 
 mod assignment;
 pub use assignment::{
-    Assign, Assignment, add, apply, clear, decrement, extend, increment, insert, patch, pop, push,
-    remove, remove_at, set, subtract,
+    Assign, Assignment, add, apply, clear, decrement, extend, increment,
+    insert, patch, pop, push, remove, remove_at, set, subtract,
 };
 
 mod numeric;
@@ -85,7 +85,9 @@ pub use toasty_core::stmt::Decimal;
 pub use toasty_core::stmt::{Date, DateTime, Time, Timestamp, Zoned};
 #[cfg(feature = "net")]
 pub use toasty_core::stmt::{IpCidr, IpInet, MacAddr6, MacAddr8};
-pub use toasty_core::stmt::{OrderBy, OrderByExpr, Projection, Type, Uuid, Value};
+pub use toasty_core::stmt::{
+    OrderBy, OrderByExpr, Projection, Type, Uuid, Value,
+};
 
 use toasty_core::stmt;
 
@@ -213,7 +215,10 @@ impl<T: Load> Statement<T> {
     /// let users: Vec<User> = stmt.exec(&mut db).await.unwrap();
     /// # });
     /// ```
-    pub async fn exec(self, executor: &mut dyn Executor) -> crate::Result<T::Output> {
+    pub async fn exec(
+        self,
+        executor: &mut dyn Executor,
+    ) -> crate::Result<T::Output> {
         executor.exec(self).await
     }
 }
@@ -267,7 +272,10 @@ impl<M> fmt::Debug for Statement<M> {
 /// // Single field — test if a user's id is in a list
 /// let filter = toasty::stmt::in_list(User::fields().id(), [1_i64, 2, 3]);
 /// ```
-pub fn in_list<T>(lhs: impl IntoExpr<T>, rhs: impl IntoExpr<List<T>>) -> Expr<bool> {
+pub fn in_list<T>(
+    lhs: impl IntoExpr<T>,
+    rhs: impl IntoExpr<List<T>>,
+) -> Expr<bool> {
     Expr::from_untyped(stmt::Expr::in_list(
         lhs.into_expr().untyped,
         rhs.into_expr().untyped,

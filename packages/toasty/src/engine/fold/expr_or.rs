@@ -27,7 +27,9 @@ pub(super) fn fold_expr_or(expr: &mut stmt::ExprOr) -> Option<Expr> {
     expr.operands.retain(|operand| !operand.is_false());
 
     // Null propagation: all remaining operands are null literals.
-    if !expr.operands.is_empty() && expr.operands.iter().all(|e| e.is_value_null()) {
+    if !expr.operands.is_empty()
+        && expr.operands.iter().all(|e| e.is_value_null())
+    {
         return Some(Expr::null());
     }
 

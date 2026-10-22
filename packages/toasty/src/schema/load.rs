@@ -52,7 +52,10 @@ pub trait Load {
     ///
     /// The default implementation panics. Types that support reloading (i.e.,
     /// types that implement [`Field`]) should override this.
-    fn reload(target: &mut Self::Output, value: stmt::Value) -> Result<(), Error> {
+    fn reload(
+        target: &mut Self::Output,
+        value: stmt::Value,
+    ) -> Result<(), Error> {
         let _ = (target, value);
         unimplemented!("reload is not supported for this type")
     }
@@ -79,10 +82,14 @@ impl<T: Load<Output = T>> Load for Vec<T> {
 
     fn load(value: stmt::Value) -> Result<Self::Output, Error> {
         match value {
-            stmt::Value::List(items) => items.into_iter().map(T::load).collect(),
+            stmt::Value::List(items) => {
+                items.into_iter().map(T::load).collect()
+            }
             // Records are produced by dynamic batch queries (Vec/array inputs)
             // where each field in the record is one query's result.
-            stmt::Value::Record(record) => record.into_iter().map(T::load).collect(),
+            stmt::Value::Record(record) => {
+                record.into_iter().map(T::load).collect()
+            }
             // Bytes are a compact representation; load each byte individually.
             stmt::Value::Bytes(bytes) => bytes
                 .into_iter()
@@ -92,7 +99,10 @@ impl<T: Load<Output = T>> Load for Vec<T> {
         }
     }
 
-    fn reload(target: &mut Self::Output, value: stmt::Value) -> Result<(), Error> {
+    fn reload(
+        target: &mut Self::Output,
+        value: stmt::Value,
+    ) -> Result<(), Error> {
         *target = Self::load(value)?;
         Ok(())
     }
@@ -108,8 +118,12 @@ impl<M: Load> Load for List<M> {
 
     fn load(value: stmt::Value) -> Result<Self::Output, Error> {
         match value {
-            stmt::Value::List(items) => items.into_iter().map(M::load).collect(),
-            stmt::Value::Record(record) => record.into_iter().map(M::load).collect(),
+            stmt::Value::List(items) => {
+                items.into_iter().map(M::load).collect()
+            }
+            stmt::Value::Record(record) => {
+                record.into_iter().map(M::load).collect()
+            }
             _ => Err(Error::type_conversion(value, "List<M>")),
         }
     }

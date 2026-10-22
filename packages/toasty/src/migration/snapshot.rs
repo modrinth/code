@@ -65,7 +65,8 @@ impl Snapshot {
                     if item.is_array() {
                         let mut placeholder = Item::None;
                         std::mem::swap(item, &mut placeholder);
-                        let mut array = match placeholder.into_array_of_tables() {
+                        let mut array = match placeholder.into_array_of_tables()
+                        {
                             Ok(array) => array,
                             Err(original) => {
                                 *item = original;
@@ -102,8 +103,8 @@ impl FromStr for Snapshot {
     type Err = Error;
 
     fn from_str(s: &str) -> Result<Self> {
-        let snapshot: Snapshot =
-            toml::from_str(s).map_err(|err| Error::from_args(format_args!("{err}")))?;
+        let snapshot: Snapshot = toml::from_str(s)
+            .map_err(|err| Error::from_args(format_args!("{err}")))?;
 
         if snapshot.version != SNAPSHOT_VERSION {
             return Err(Error::from_args(format_args!(
