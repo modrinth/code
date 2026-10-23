@@ -1007,20 +1007,11 @@
   "collection.button.discover-mods": {
     "message": "发现模组"
   },
-  "collection.button.edit-icon": {
-    "message": "编辑图标"
-  },
   "collection.button.remove-icon": {
     "message": "移除图标"
   },
   "collection.button.remove-project": {
     "message": "移除项目"
-  },
-  "collection.button.replace-icon": {
-    "message": "替换图标"
-  },
-  "collection.button.select-icon": {
-    "message": "选择图标"
   },
   "collection.button.unfollow-project": {
     "message": "取消关注项目"
@@ -1036,9 +1027,6 @@
   },
   "collection.description.following": {
     "message": "此收藏夹为自动生成的，包含你关注的所有项目。"
-  },
-  "collection.editing": {
-    "message": "编辑收藏夹"
   },
   "collection.error.not-found": {
     "message": "未找到收藏夹"

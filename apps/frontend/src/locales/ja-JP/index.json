@@ -1004,20 +1004,11 @@
   "collection.button.discover-mods": {
     "message": "Modを探す"
   },
-  "collection.button.edit-icon": {
-    "message": "アイコンを編集"
-  },
   "collection.button.remove-icon": {
     "message": "アイコンを削除"
   },
   "collection.button.remove-project": {
     "message": "プロジェクトを削除"
-  },
-  "collection.button.replace-icon": {
-    "message": "アイコンを置き換え"
-  },
-  "collection.button.select-icon": {
-    "message": "アイコンを選択"
   },
   "collection.button.unfollow-project": {
     "message": "プロジェクトのフォローを解除"
@@ -1033,9 +1024,6 @@
   },
   "collection.description.following": {
     "message": "あなたがフォローしているプロジェクトがすべて含まれた自動生成のコレクションです。"
-  },
-  "collection.editing": {
-    "message": "コレクションを編集中"
   },
   "collection.error.not-found": {
     "message": "コレクションが見つかりません"

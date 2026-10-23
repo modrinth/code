@@ -1007,20 +1007,11 @@
   "collection.button.discover-mods": {
     "message": "探索模組"
   },
-  "collection.button.edit-icon": {
-    "message": "編輯圖示"
-  },
   "collection.button.remove-icon": {
     "message": "移除圖示"
   },
   "collection.button.remove-project": {
     "message": "移除專案"
-  },
-  "collection.button.replace-icon": {
-    "message": "取代圖示"
-  },
-  "collection.button.select-icon": {
-    "message": "選擇圖示"
   },
   "collection.button.unfollow-project": {
     "message": "取消追蹤專案"
@@ -1036,9 +1027,6 @@
   },
   "collection.description.following": {
     "message": "由系統自動產生的收藏，包含你正在追蹤的所有專案。"
-  },
-  "collection.editing": {
-    "message": "編輯收藏"
   },
   "collection.error.not-found": {
     "message": "找不到收藏"

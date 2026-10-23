@@ -944,20 +944,11 @@
   "collection.button.discover-mods": {
     "message": "اكتشف المودات"
   },
-  "collection.button.edit-icon": {
-    "message": "تعديل الأيقونة"
-  },
   "collection.button.remove-icon": {
     "message": "حذف الأيقونة"
   },
   "collection.button.remove-project": {
     "message": "إزالة المشروع"
-  },
-  "collection.button.replace-icon": {
-    "message": "تغيير الأيقونة"
-  },
-  "collection.button.select-icon": {
-    "message": "تحديد الأيقونة"
   },
   "collection.button.unfollow-project": {
     "message": "إلغاء متابعة المشروع"
@@ -973,9 +964,6 @@
   },
   "collection.description.following": {
     "message": "مجموعة تم إنشاؤها تلقائيًا تضمّ جميع المشاريع التي تتابعها."
-  },
-  "collection.editing": {
-    "message": "تعديل المجموعة"
   },
   "collection.error.not-found": {
     "message": "لم يتم العثور على المجموعة"

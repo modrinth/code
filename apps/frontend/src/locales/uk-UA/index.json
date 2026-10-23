@@ -1004,20 +1004,11 @@
   "collection.button.discover-mods": {
     "message": "Знайти моди"
   },
-  "collection.button.edit-icon": {
-    "message": "Редагувати значок"
-  },
   "collection.button.remove-icon": {
     "message": "Прибрати значок"
   },
   "collection.button.remove-project": {
     "message": "Видалити проєкт"
-  },
-  "collection.button.replace-icon": {
-    "message": "Замінити значок"
-  },
-  "collection.button.select-icon": {
-    "message": "Вибрати значок"
   },
   "collection.button.unfollow-project": {
     "message": "Відписатися від проєкту"
@@ -1033,9 +1024,6 @@
   },
   "collection.description.following": {
     "message": "Автоматична добірка з усіх проєктів, які ви відстежуєте."
-  },
-  "collection.editing": {
-    "message": "Редагування добірки"
   },
   "collection.error.not-found": {
     "message": "Добірку не знайдено"

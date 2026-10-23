@@ -815,9 +815,6 @@
   "auth.verify-email.title": {
     "message": "Verifikujte email"
   },
-  "collection.button.edit-icon": {
-    "message": "Ikona za izmenu"
-  },
   "collection.button.remove-project": {
     "message": "Ukloni projekat"
   },
