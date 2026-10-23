@@ -388,10 +388,6 @@ impl SandboxApiService {
                     Err(error_status) => error_status.write(stream).await,
                 };
             }
-            // todo: /sandboxauth/services/{path} -> https://api.minecraftservices.com/{path}
-            // todo: /sandboxauth/profiles/{path} -> ??/{path}
-            // todo: /sandboxauth/session/{path} -> https://sessionserver.mojang.com/{path}
-
             "/sandboxauth/session/session/minecraft/join" => {
                 // Need special handling for the join request since it puts the
                 // access token in the body instead of in the Authorization header
@@ -508,7 +504,7 @@ impl SandboxApiService {
                             };
                         } else {
                             // Create new endpoint string
-                            let new_endpoint_path: Arc<str> = format!("/sandboxauth/service/{service_name}/{endpoint_name}").into();
+                            let new_endpoint_path: Arc<str> = format!("/sandboxauth/discoveredservice/{service_name}/{endpoint_name}").into();
                             let new_endpoint: Arc<str> = format!(
                                 "http://127.0.0.1:{}{}",
                                 self.port, new_endpoint_path
@@ -539,7 +535,24 @@ impl SandboxApiService {
                 return;
             }
             _ => {
-                if path.starts_with("/sandboxauth/service") {
+                if let Some(session_path) = path.strip_prefix("/sandboxauth/session/") {
+                    // Proxy minecraft.api.session.host requests
+                    let Ok(to) = Url::parse(&format!("https://sessionserver.mojang.com/{session_path}")) else {
+                        RequestStatus::BadRequest.write(stream).await;
+                        return;
+                    };
+                    self.proxy_with_replacement(&request, body.to_vec(), to, stream).await;
+                    return;
+                } else if let Some(service_path) = path.strip_prefix("/sandboxauth/services/") {
+                    // Proxy minecraft.api.services.host requests
+                    let Ok(to) = Url::parse(&format!("https://api.minecraftservices.com/{service_path}")) else {
+                        RequestStatus::BadRequest.write(stream).await;
+                        return;
+                    };
+                    self.proxy_with_replacement(&request, body.to_vec(), to, stream).await;
+                    return;
+                } else if path.starts_with("/sandboxauth/discoveredservice") {
+                    // Arbitrary service discovered through discovery.minecraftservices.com (26.3+)
                     let to = self
                         .inner
                         .lock()
