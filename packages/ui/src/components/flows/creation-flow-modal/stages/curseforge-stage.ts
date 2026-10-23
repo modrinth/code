@@ -9,7 +9,7 @@ import { type CreationFlowContextValue, flowTypeHeadingMessages } from '../creat
 
 /** Blocks continuing until a modpack is uploaded, or the selected file of a linked one is resolved. */
 function isForwardBlocked(ctx: CreationFlowContextValue): boolean {
-	if (ctx.finishDisabled.value) return true
+	if (ctx.finishDisabled.value || ctx.curseforgeProcessing.value) return true
 	if (ctx.curseforgeModpackFile.value) return false
 	const modpack = ctx.curseforgeModpack.value
 	return !modpack || modpack.file.id !== ctx.curseforgeFileId.value
@@ -21,10 +21,14 @@ export const stageConfig: StageConfigInput<CreationFlowContextValue> = {
 	stageContent: markRaw(CurseForgeStage),
 	skip: (ctx) => ctx.setupType.value !== 'curseforge' || ctx.flowType === 'instance',
 	cannotNavigateForward: isForwardBlocked,
+	disableClose: (ctx) => ctx.curseforgeProcessing.value,
 	leftButtonConfig: (ctx) => ({
 		label: ctx.formatMessage(commonMessages.backButton),
 		icon: ChevronLeftIcon,
-		onClick: () => ctx.modal.value?.setStage('setup-type'),
+		disabled: ctx.curseforgeProcessing.value,
+		onClick: () => {
+			if (!ctx.curseforgeProcessing.value) ctx.modal.value?.setStage('setup-type')
+		},
 	}),
 	rightButtonConfig: (ctx) => ({
 		label: ctx.formatMessage(commonMessages.continueButton),

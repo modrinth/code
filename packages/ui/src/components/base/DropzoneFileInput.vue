@@ -2,12 +2,15 @@
 	<label
 		ref="dropTargetRef"
 		:class="[
-			'flex flex-col items-center justify-center  cursor-pointer border-2 border-dashed bg-surface-4 text-contrast transition-colors',
+			'flex flex-col items-center justify-center border-2 border-dashed text-contrast transition-colors',
 			size === 'small' ? 'p-5' : size === 'medium' ? 'p-10' : 'p-12',
 			size === 'small' ? 'gap-2' : 'gap-4',
 			size === 'small' ? 'rounded-2xl' : 'rounded-3xl',
-			isDragging ? 'border-purple' : 'border-surface-5',
+			isProcessing ? 'cursor-wait' : 'cursor-pointer',
+			isDragging ? 'border-brand bg-brand-highlight' : 'border-surface-5 bg-surface-4',
 		]"
+		:aria-busy="isProcessing || undefined"
+		:data-dragging="isDragging || undefined"
 		@dragenter="dropTargetProps.onDragenter"
 		@dragover="dropTargetProps.onDragover"
 		@dragleave="dropTargetProps.onDragleave"
@@ -20,18 +23,30 @@
 				size === 'small' ? 'rounded-xl' : 'rounded-2xl',
 			]"
 		>
+			<SpinnerIcon
+				v-if="isProcessing"
+				aria-hidden="true"
+				:class="['animate-spin text-brand', size === 'small' ? 'w-6 h-6' : 'w-8 h-8']"
+			/>
 			<FolderUpIcon
+				v-else
 				aria-hidden="true"
 				:class="['text-brand', size === 'small' ? 'w-6 h-6' : 'w-8 h-8']"
 			/>
 		</div>
 
 		<div class="flex flex-col items-center justify-center gap-1 text-contrast text-center">
-			<div v-if="primaryPrompt" class="text-contrast font-medium text-pretty">
+			<div
+				v-if="primaryPrompt && !isProcessing"
+				:class="['font-medium text-pretty', isDragging ? 'text-brand' : 'text-contrast']"
+			>
 				{{ primaryPrompt }}
 			</div>
-			<span class="text-primary text-sm text-pretty">
-				{{ secondaryPrompt }}
+			<span
+				:class="['text-sm text-pretty', isDragging ? 'text-brand' : 'text-primary']"
+				role="status"
+			>
+				{{ isProcessing ? processingPrompt : secondaryPrompt }}
 			</span>
 		</div>
 
@@ -40,7 +55,7 @@
 			type="file"
 			:multiple="multiple"
 			:accept="accept"
-			:disabled="disabled"
+			:disabled="disabled || isProcessing"
 			class="sr-only"
 			@change="handleChange"
 		/>
@@ -48,9 +63,9 @@
 </template>
 
 <script setup lang="ts">
-import { FolderUpIcon } from '@modrinth/assets'
+import { FolderUpIcon, SpinnerIcon } from '@modrinth/assets'
 import { fileIsValid } from '@modrinth/utils'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import { useFormatBytes } from '../../composables'
 import { useFileDropTarget } from '../../composables/file-drop'
@@ -68,6 +83,7 @@ const props = withDefaults(
 	defineProps<{
 		primaryPrompt?: string | null
 		secondaryPrompt?: string | null
+		processingPrompt?: string
 		multiple?: boolean
 		accept?: string
 		maxSize?: number | null
@@ -78,9 +94,12 @@ const props = withDefaults(
 	{
 		primaryPrompt: 'Drop files here or click to upload',
 		secondaryPrompt: 'Only supported file types will be accepted',
+		processingPrompt: 'Processing...',
 		size: 'large',
 	},
 )
+
+const processing = defineModel<boolean>('processing', { default: false })
 
 const formatBytes = useFormatBytes()
 
@@ -145,11 +164,13 @@ function addFiles(incoming: FileList | File[], shouldNotReset = false) {
 }
 
 const dropTargetRef = ref<HTMLElement | null>(null)
-const { isDragging, dropTargetProps } = useFileDropTarget({
+const { isDragging, isProcessing, dropTargetProps } = useFileDropTarget({
 	target: dropTargetRef,
 	disabled: computed(() => props.disabled ?? false),
 	onFiles: (droppedFiles) => addFiles(droppedFiles),
 })
+
+watch(isProcessing, (value) => (processing.value = value), { flush: 'sync' })
 
 function handleChange(e: Event) {
 	const input = e.target as HTMLInputElement

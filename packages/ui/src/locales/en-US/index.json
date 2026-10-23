@@ -986,6 +986,9 @@
   "creation-flow.curseforge.or-upload": {
     "defaultMessage": "Or upload it yourself"
   },
+  "creation-flow.curseforge.processing-file": {
+    "defaultMessage": "Processing..."
+  },
   "creation-flow.curseforge.remove-file": {
     "defaultMessage": "Remove {filename}"
   },

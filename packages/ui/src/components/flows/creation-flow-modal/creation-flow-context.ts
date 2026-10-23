@@ -220,6 +220,8 @@ export interface CreationFlowContextValue {
 	/** The selected file of the resolved modpack. */
 	curseforgeFileId: Ref<number | null>
 	curseforgeFiles: Ref<Kyros.FlameAnvil.v1.LinkQueryFile[]>
+	/** Whether a dropped CurseForge modpack or server pack file is still being read. */
+	curseforgeProcessing: Ref<boolean>
 	projectInstall: Ref<ProjectInstallSelection | null>
 
 	// Project search state (persisted across stage navigation)
@@ -419,6 +421,7 @@ export function createCreationFlowContext(
 	const curseforgeModpack = ref<Kyros.FlameAnvil.v1.LinkQueryResponse | null>(null)
 	const curseforgeFileId = ref<number | null>(null)
 	const curseforgeFiles = ref<Kyros.FlameAnvil.v1.LinkQueryFile[]>([])
+	const curseforgeProcessing = ref(false)
 	const projectInstall = ref<ProjectInstallSelection | null>(null)
 
 	// Project search state (persisted across stage navigation)
@@ -585,6 +588,7 @@ export function createCreationFlowContext(
 		curseforgeModpack.value = null
 		curseforgeFileId.value = null
 		curseforgeFiles.value = []
+		curseforgeProcessing.value = false
 		projectInstall.value = null
 		projectSearchProjectId.value = undefined
 		projectSearchOptions.value = []
@@ -861,6 +865,7 @@ export function createCreationFlowContext(
 		curseforgeModpack,
 		curseforgeFileId,
 		curseforgeFiles,
+		curseforgeProcessing,
 		projectInstall,
 		projectSearchProjectId,
 		projectSearchOptions,

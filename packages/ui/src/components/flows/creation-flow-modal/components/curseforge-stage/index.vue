@@ -90,7 +90,10 @@
 							</template>
 						</IntlFormatted>
 					</span>
-					<ArchiveInput v-model="ctx.curseforgeServerPackFile.value" />
+					<ArchiveInput
+						v-model="ctx.curseforgeServerPackFile.value"
+						v-model:processing="ctx.curseforgeProcessing.value"
+					/>
 				</div>
 			</template>
 		</template>
@@ -139,7 +142,10 @@
 						)
 					}}
 				</span>
-				<ArchiveInput v-model="ctx.curseforgeModpackFile.value" />
+				<ArchiveInput
+					v-model="ctx.curseforgeModpackFile.value"
+					v-model:processing="ctx.curseforgeProcessing.value"
+				/>
 				<p v-if="!ctx.curseforgeModpackFile.value" class="m-0 leading-6 text-primary">
 					{{ formatMessage(messages.fileDescription) }}
 				</p>
@@ -153,7 +159,10 @@
 						</template>
 					</IntlFormatted>
 				</span>
-				<ArchiveInput v-model="ctx.curseforgeServerPackFile.value" />
+				<ArchiveInput
+					v-model="ctx.curseforgeServerPackFile.value"
+					v-model:processing="ctx.curseforgeProcessing.value"
+				/>
 				<p class="m-0 leading-6 text-primary">
 					{{ formatMessage(messages.serverPackDescription) }}
 				</p>

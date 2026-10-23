@@ -61,6 +61,10 @@ export const curseforgeMessages = defineMessages({
 		id: 'creation-flow.curseforge.upload-prompt',
 		defaultMessage: 'Drag and drop file or click to browse',
 	},
+	processingFile: {
+		id: 'creation-flow.curseforge.processing-file',
+		defaultMessage: 'Processing...',
+	},
 	removeFile: {
 		id: 'creation-flow.curseforge.remove-file',
 		defaultMessage: 'Remove {filename}',
