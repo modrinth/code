@@ -167,24 +167,18 @@
 						<div class="notifs-demo">
 							<h3>{{ formatMessage(commonMessages.notificationsLabel) }}</h3>
 							<div class="notifications">
-								<div
+								<nuxt-link
 									v-for="(notification, index) in notifications"
 									:key="index"
+									:to="`/${notification.project_type}/${notification.slug}`"
+									:title="notification.title"
 									class="notification gradient-border"
 								>
-									<nuxt-link
-										:to="`${notification.project_type}/${notification.slug}`"
-										:title="notification.title"
-									>
-										<Avatar size="md" :src="notification.icon_url" :alt="notification.title" />
-									</nuxt-link>
+									<Avatar size="md" :src="notification.icon_url" :alt="notification.title" />
 									<div>
-										<nuxt-link
-											:to="`${notification.project_type}/${notification.slug}`"
-											class="notif-header"
-										>
+										<span class="notif-header">
 											{{ formatMessage(messages.hasBeenUpdated, { title: notification.title }) }}
-										</nuxt-link>
+										</span>
 										<p class="notif-desc">
 											{{
 												formatMessage(messages.versionReleased, {
@@ -204,7 +198,7 @@
 											</span>
 										</div>
 									</div>
-								</div>
+								</nuxt-link>
 							</div>
 						</div>
 					</div>
