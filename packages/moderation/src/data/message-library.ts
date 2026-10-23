@@ -81,15 +81,6 @@ export const messageLibrary: readonly MessageLibraryEntry[] = [
 		shown: ({ project }) => project.status === 'approved',
 		fields: [{ token: '%STATUS%', label: 'What status is the project being set to?' }],
 	},
-	{
-		label: 'Temporary server',
-		body: temporaryServer,
-		shown: ({ project }) =>
-			!!project.minecraft_server &&
-			['aternos', 'minekeep', 'minehut'].some((host) =>
-				project.minecraft_java_server?.address?.includes(host),
-			),
-	},
 	{ label: 'Account issues', body: account },
 ]
 
