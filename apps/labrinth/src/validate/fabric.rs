@@ -1,10 +1,11 @@
-use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
+use crate::models::minecraft::minecraft_version_date;
 use crate::models::projects::Loader;
 use crate::validate::{
     SupportedGameVersions, ValidationError, ValidationResult,
     validate_pack_formats,
 };
 use eyre::eyre;
+use minecraft_meta_model::model::MinecraftVersion;
 use std::io::Cursor;
 use zip::ZipArchive;
 
@@ -78,14 +79,14 @@ fn has_bta_loader_dependency(requirement: &serde_json::Value) -> bool {
 
 pub(super) fn validate_game_versions(
     loaders: &[Loader],
-    game_versions: &[MinecraftGameVersion],
-    all_game_versions: &[MinecraftGameVersion],
+    game_versions: &[MinecraftVersion],
+    all_game_versions: &[MinecraftVersion],
 ) -> Result<(), ValidationError> {
     let release_date = |name: &str| {
         all_game_versions
         .iter()
-        .find(|version| version.version == name)
-        .map(|version| version.created)
+        .find(|version| version.name.0 == name)
+        .map(minecraft_version_date)
         .ok_or_else(|| {
             eyre!(
               "missing minecraft game version `{name}` required for loader validation"
@@ -98,25 +99,25 @@ pub(super) fn validate_game_versions(
             "fabric" => {
                 let minimum = release_date("18w43b")?;
                 (
-                    game_versions
-                        .iter()
-                        .all(|version| version.created >= minimum),
+                    game_versions.iter().all(|version| {
+                        minecraft_version_date(version) >= minimum
+                    }),
                     "`18w43b` or later",
                 )
             }
             "legacy-fabric" => {
                 let supported = release_date("1.3")?..=release_date("1.13.2")?;
                 (
-                    game_versions
-                        .iter()
-                        .all(|version| supported.contains(&version.created)),
+                    game_versions.iter().all(|version| {
+                        supported.contains(&minecraft_version_date(version))
+                    }),
                     "between `1.3` and `1.13.2`, inclusive",
                 )
             }
             "babric" | "bta-babric" => (
                 game_versions
                     .iter()
-                    .all(|version| version.version == "b1.7.3"),
+                    .all(|version| version.name.0 == "b1.7.3"),
                 "`b1.7.3` only",
             ),
             _ => continue,

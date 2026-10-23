@@ -1,11 +1,14 @@
-use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
 use crate::models::ids::ProjectId;
+use crate::models::minecraft::minecraft_version_date;
 use crate::routes::ApiError;
+use crate::util::MinecraftMeta;
 use crate::util::error::ApiContext as _;
 use crate::util::error::Context as _;
 use crate::{database::PgPool, env::ENV};
 use ariadne::ids::base62_impl::to_base62;
 use chrono::{DateTime, Utc};
+use minecraft_meta_model::model::MinecraftVersion;
+use minecraft_meta_model::upstream::mojang::VersionType;
 use serde::Serialize;
 use xredis::RedisPool;
 
@@ -44,6 +47,7 @@ struct WebhookAuthor {
 }
 
 async fn get_webhook_metadata(
+    minecraft_meta: &MinecraftMeta,
     project_id: ProjectId,
     pool: &PgPool,
     redis: &RedisPool,
@@ -109,23 +113,27 @@ async fn get_webhook_metadata(
             }
         };
 
-        let all_game_versions =
-            MinecraftGameVersion::list(None, None, pool, redis)
-                .await
-                .wrap_internal_err(
-                    "fetching minecraft game version from Redis",
-                )?;
+        let all_game_versions = minecraft_meta
+            .minecraft_versions()
+            .await
+            .wrap_internal_err("fetching minecraft versions for webhook metadata")?;
 
-        let versions = project
-            .aggregate_version_fields
-            .clone()
-            .into_iter()
-            .find_map(|vf| {
-                MinecraftGameVersion::try_from_version_field(&vf).ok()
+        let supported_names = project
+            .minecraft_mod_versions
+            .iter()
+            .flat_map(|component| &component.game_versions)
+            .map(|name| {
+                crate::models::minecraft::legacy_game_version_name(&name.0)
             })
-            .unwrap_or_default();
+            .collect::<std::collections::HashSet<_>>();
+        let versions = all_game_versions
+            .iter()
+            .filter(|version| supported_names.contains(version.name.0.as_str()))
+            .cloned()
+            .collect();
 
-        let formatted_game_versions = get_gv_range(versions, all_game_versions);
+        let formatted_game_versions =
+            get_gv_range(versions, all_game_versions.to_vec());
 
         let mut project_type = project.project_types.pop().unwrap_or_default(); // TODO: Should this grab a not-first?
 
@@ -187,15 +195,17 @@ async fn get_webhook_metadata(
 }
 
 pub async fn send_slack_project_webhook(
+    minecraft_meta: &MinecraftMeta,
     project_id: ProjectId,
     pool: &PgPool,
     redis: &RedisPool,
     webhook_url: &str,
     message: Option<String>,
 ) -> Result<(), ApiError> {
-    let metadata = get_webhook_metadata(project_id, pool, redis)
-        .await
-        .wrap_api_err("fetching webhook metadata")?;
+    let metadata =
+        get_webhook_metadata(minecraft_meta, project_id, pool, redis)
+            .await
+            .wrap_api_err("fetching webhook metadata")?;
 
     if let Some(metadata) = metadata {
         let mut blocks = vec![];
@@ -359,15 +369,17 @@ struct DiscordWebhook {
 }
 
 pub async fn send_discord_webhook(
+    minecraft_meta: &MinecraftMeta,
     project_id: ProjectId,
     pool: &PgPool,
     redis: &RedisPool,
     webhook_url: &str,
     message: Option<String>,
 ) -> Result<(), ApiError> {
-    let metadata = get_webhook_metadata(project_id, pool, redis)
-        .await
-        .wrap_api_err("fetching webhook metadata")?;
+    let metadata =
+        get_webhook_metadata(minecraft_meta, project_id, pool, redis)
+            .await
+            .wrap_api_err("fetching webhook metadata")?;
 
     if let Some(project) = metadata {
         let mut fields = vec![];
@@ -446,18 +458,18 @@ pub async fn send_discord_webhook(
 }
 
 fn get_gv_range(
-    mut game_versions: Vec<MinecraftGameVersion>,
-    mut all_game_versions: Vec<MinecraftGameVersion>,
+    mut game_versions: Vec<MinecraftVersion>,
+    mut all_game_versions: Vec<MinecraftVersion>,
 ) -> Vec<String> {
     // both -> least to greatest
-    game_versions.sort_by_key(|a| a.created);
-    game_versions.dedup_by(|a, b| a.version == b.version);
+    game_versions.sort_by_key(minecraft_version_date);
+    game_versions.dedup_by(|a, b| a.name.0 == b.name.0);
 
-    all_game_versions.sort_by_key(|a| a.created);
+    all_game_versions.sort_by_key(minecraft_version_date);
 
     let all_releases = all_game_versions
         .iter()
-        .filter(|x| &*x.type_ == "release")
+        .filter(|x| x.catalog_entry.0.ty == VersionType::Release)
         .cloned()
         .collect::<Vec<_>>();
 
@@ -467,15 +479,15 @@ fn get_gv_range(
     const MAX_VALUE: usize = 1000000;
 
     for (i, current_version) in game_versions.iter().enumerate() {
-        let current_version = &current_version.version;
+        let current_version = &current_version.name.0;
 
         let index = all_game_versions
             .iter()
-            .position(|x| &*x.version == current_version)
+            .position(|x| &*x.name.0 == current_version)
             .unwrap_or(MAX_VALUE);
         let release_index = all_releases
             .iter()
-            .position(|x| &*x.version == current_version)
+            .position(|x| &*x.name.0 == current_version)
             .unwrap_or(MAX_VALUE);
 
         if i == 0 {
@@ -489,8 +501,10 @@ fn get_gv_range(
                 || (release_index as i32)
                     - (interval_base[interval_base.len() - 1][2] as i32)
                     == 1)
-                && (all_game_versions[interval_base[0][1]].type_ == "release"
-                    || all_game_versions[index].type_ != "release")
+                && (all_game_versions[interval_base[0][1]].catalog_entry.0.ty
+                    == VersionType::Release
+                    || all_game_versions[index].catalog_entry.0.ty
+                        != VersionType::Release)
             {
                 if intervals[current_interval].get(1).is_some() {
                     intervals[current_interval][1] =
@@ -516,21 +530,23 @@ fn get_gv_range(
             let mut last_snapshot: Option<usize> = None;
 
             for j in ((interval[0][1] + 1)..=interval[1][1]).rev() {
-                if all_game_versions[j].type_ == "release" {
+                if all_game_versions[j].catalog_entry.0.ty
+                    == VersionType::Release
+                {
                     new_intervals.push(vec![
                         interval[0].clone(),
                         vec![
                             game_versions
                                 .iter()
                                 .position(|x| {
-                                    x.version == all_game_versions[j].version
+                                    x.name.0 == all_game_versions[j].name.0
                                 })
                                 .unwrap_or(MAX_VALUE),
                             j,
                             all_releases
                                 .iter()
                                 .position(|x| {
-                                    x.version == all_game_versions[j].version
+                                    x.name.0 == all_game_versions[j].name.0
                                 })
                                 .unwrap_or(MAX_VALUE),
                         ],
@@ -543,10 +559,11 @@ fn get_gv_range(
                                     game_versions
                                         .iter()
                                         .position(|x| {
-                                            x.version
+                                            x.name.0
                                                 == all_game_versions
                                                     [last_snapshot]
-                                                    .version
+                                                    .name
+                                                    .0
                                         })
                                         .unwrap_or(MAX_VALUE),
                                     last_snapshot,
@@ -575,11 +592,11 @@ fn get_gv_range(
         if interval.len() == 2 {
             output.push(format!(
                 "{}–{}",
-                &game_versions[interval[0][0]].version,
-                &game_versions[interval[1][0]].version
+                &game_versions[interval[0][0]].name.0,
+                &game_versions[interval[1][0]].name.0
             ))
         } else {
-            output.push(game_versions[interval[0][0]].version.clone())
+            output.push(game_versions[interval[0][0]].name.0.clone())
         }
     }
 

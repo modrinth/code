@@ -65,6 +65,19 @@ pub mod user_id {
     pub const ENEMY: DBUserId = DBUserId(5);
 }
 
+/// Initialize the Minecraft metadata catalog in an isolated test database.
+///
+/// # Errors
+///
+/// Errors if the fixture could not be applied.
+pub async fn add_minecraft_meta_dummy_data(db: &PgPool) -> Result<()> {
+    db.execute(include_str!("../../fixtures/minecraft-meta-dummy-data.sql"))
+        .await
+        .wrap_err("failed to add Minecraft metadata dummy data")?;
+
+    Ok(())
+}
+
 /// Initialize a database with dummy fixture data.
 ///
 /// # Errors

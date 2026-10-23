@@ -1,7 +1,3 @@
-use super::loader_fields::{
-    QueryLoaderField, QueryLoaderFieldEnumValue, QueryVersionField,
-    VersionField,
-};
 use super::{DBUser, ids::*};
 
 use crate::database::{PgTransaction, models};
@@ -24,8 +20,8 @@ use std::fmt::{Debug, Display};
 use std::hash::Hash;
 use xredis::RedisPool;
 
-pub const PROJECTS_NAMESPACE: &str = "projects:v5";
-pub const PROJECTS_SLUGS_NAMESPACE: &str = "projects_slugs:v4";
+pub const PROJECTS_NAMESPACE: &str = "projects:v8";
+pub const PROJECTS_SLUGS_NAMESPACE: &str = "projects_slugs:v6";
 const PROJECTS_DEPENDENCIES_NAMESPACE: &str = "projects_dependencies:v4";
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -649,13 +645,15 @@ impl DBProject {
                     .collect::<Vec<_>>();
 
                 let all_version_ids = DashSet::new();
+                let minecraft_mod_versions: DashMap<DBProjectId, Vec<crate::models::exp::minecraft::ModVersion>> = DashMap::new();
                 let versions: DashMap<DBProjectId, Vec<(DBVersionId, DateTime<Utc>)>> = sqlx::query!(
-                    "
-                    SELECT DISTINCT mod_id, v.id as id, date_published
+                    r#"
+                    SELECT DISTINCT mod_id, v.id as id, date_published,
+                        v.components AS "components: sqlx::types::Json<exp::VersionSerial>"
                     FROM mods m
                     INNER JOIN versions v ON m.id = v.mod_id AND v.status = ANY($3)
                     WHERE m.id = ANY($1) OR m.slug = ANY($2)
-                    ",
+                    "#,
                     &project_ids_parsed,
                     &slugs,
                     &*crate::models::projects::VersionStatus::iterator()
@@ -664,82 +662,28 @@ impl DBProject {
                         .collect::<Vec<String>>()
                 )
                     .fetch(&mut exec)
+                    .map_err(eyre::Report::from)
                     .try_fold(
                         DashMap::new(),
                         |acc: DashMap<DBProjectId, Vec<(DBVersionId, DateTime<Utc>)>>, m| {
+							let result = {
                             let version_id = DBVersionId(m.id);
                             let date_published = m.date_published;
                             all_version_ids.insert(version_id);
+                            if let Some(component) = m.components.0.minecraft_mod {
+                                minecraft_mod_versions.entry(DBProjectId(m.mod_id)).or_default()
+                                    .push(component);
+                            }
                             acc.entry(DBProjectId(m.mod_id))
                                 .or_default()
                                 .push((version_id, date_published));
-                            async move { Ok(acc) }
+								eyre::Ok(acc)
+							};
+                            async move { result }
                         },
                     )
                     .await
                     .wrap_err("fetching project versions")?;
-
-                let loader_field_enum_value_ids = DashSet::new();
-                let version_fields: DashMap<DBProjectId, Vec<QueryVersionField>> = sqlx::query!(
-                    r#"
-                    SELECT v.mod_id, MIN(vf.version_id) AS "version_id!", vf.field_id, vf.int_value, vf.enum_value, vf.string_value
-                    FROM versions v
-                    INNER JOIN version_fields vf ON v.id = vf.version_id
-                    WHERE v.id = ANY($1) AND vf.version_id = ANY($1)
-                    GROUP BY v.mod_id, vf.field_id, vf.int_value, vf.enum_value, vf.string_value
-                    "#,
-                    &all_version_ids.iter().map(|x| x.0).collect::<Vec<_>>()
-                )
-                    .fetch(&mut exec)
-                    .try_fold(
-                        DashMap::new(),
-                        |acc: DashMap<DBProjectId, Vec<QueryVersionField>>, m| {
-                            let qvf = QueryVersionField {
-                                version_id: DBVersionId(m.version_id),
-                                field_id: LoaderFieldId(m.field_id),
-                                int_value: m.int_value,
-                                enum_value: if m.enum_value == -1  { None } else { Some(LoaderFieldEnumValueId(m.enum_value)) },
-                                string_value: m.string_value,
-                            };
-
-                            if m.enum_value != -1 {
-                                loader_field_enum_value_ids.insert(LoaderFieldEnumValueId(m.enum_value));
-                            }
-
-                            acc.entry(DBProjectId(m.mod_id)).or_default().push(qvf);
-                            async move { Ok(acc) }
-                        },
-                    )
-                    .await
-                    .wrap_err("fetching project version fields")?;
-
-                let loader_field_enum_values: Vec<QueryLoaderFieldEnumValue> = sqlx::query!(
-                    r#"
-                    SELECT DISTINCT id, enum_id, value, ordering, created,
-                    metadata->>'type' AS "ty?",
-                    (metadata->>'major')::boolean AS "major?"
-                    FROM loader_field_enum_values lfev
-                    WHERE id = ANY($1)
-                    ORDER BY enum_id, ordering, created DESC
-                    "#,
-                    &loader_field_enum_value_ids
-                        .iter()
-                        .map(|x| x.0)
-                        .collect::<Vec<_>>()
-                )
-                    .fetch(&mut exec)
-                    .map_ok(|m| QueryLoaderFieldEnumValue {
-                        id: LoaderFieldEnumValueId(m.id),
-                        enum_id: LoaderFieldEnumId(m.enum_id),
-                        value: m.value,
-                        ordering: m.ordering,
-                        created: m.created,
-                        ty: m.ty,
-                        major: m.major,
-                    })
-                    .try_collect()
-                    .await
-                    .wrap_err("fetching project loader field enum values")?;
 
                 let mods_gallery: DashMap<DBProjectId, Vec<DBGalleryItem>> = sqlx::query!(
                     "
@@ -800,26 +744,20 @@ impl DBProject {
                 struct VersionLoaderData {
                     loaders: Vec<String>,
                     project_types: Vec<String>,
-                    games: Vec<String>,
-                    loader_loader_field_ids: Vec<LoaderFieldId>,
+
                 }
 
-                let loader_field_ids = DashSet::new();
-                let loaders_ptypes_games: DashMap<DBProjectId, VersionLoaderData> = sqlx::query!(
+                let loaders_ptypes: DashMap<DBProjectId, VersionLoaderData> = sqlx::query!(
                     "
                     SELECT DISTINCT mod_id,
                         ARRAY_AGG(DISTINCT l.loader) filter (where l.loader is not null) loaders,
-                        ARRAY_AGG(DISTINCT pt.name) filter (where pt.name is not null) project_types,
-                        ARRAY_AGG(DISTINCT g.slug) filter (where g.slug is not null) games,
-                        ARRAY_AGG(DISTINCT lfl.loader_field_id) filter (where lfl.loader_field_id is not null) loader_fields
+                        ARRAY_AGG(DISTINCT pt.name) filter (where pt.name is not null) project_types
                     FROM versions v
                     INNER JOIN loaders_versions lv ON v.id = lv.version_id
                     INNER JOIN loaders l ON lv.loader_id = l.id
                     INNER JOIN loaders_project_types lpt ON lpt.joining_loader_id = l.id
                     INNER JOIN project_types pt ON pt.id = lpt.joining_project_type_id
-                    INNER JOIN loaders_project_types_games lptg ON lptg.loader_id = l.id AND lptg.project_type_id = pt.id
-                    INNER JOIN games g ON lptg.game_id = g.id
-                    LEFT JOIN loader_fields_loaders lfl ON lfl.loader_id = l.id
+
                     WHERE v.id = ANY($1)
                     GROUP BY mod_id
                     ",
@@ -828,18 +766,10 @@ impl DBProject {
                     .map_ok(|m| {
                         let project_id = DBProjectId(m.mod_id);
 
-                        // Add loader fields to the set we need to fetch
-                        let loader_loader_field_ids = m.loader_fields.unwrap_or_default().into_iter().map(LoaderFieldId).collect::<Vec<_>>();
-                        for loader_field_id in &loader_loader_field_ids {
-                            loader_field_ids.insert(*loader_field_id);
-                        }
-
-                        // Add loader + loader associated data to the map
                         let version_loader_data = VersionLoaderData {
                             loaders: m.loaders.unwrap_or_default(),
                             project_types: m.project_types.unwrap_or_default(),
-                            games: m.games.unwrap_or_default(),
-                            loader_loader_field_ids,
+
                         };
 
                         (project_id, version_loader_data)
@@ -849,28 +779,6 @@ impl DBProject {
                     .try_collect()
                     .await
                     .wrap_err("fetching project loader metadata")?;
-
-                let loader_fields: Vec<QueryLoaderField> = sqlx::query!(
-                    "
-                    SELECT DISTINCT id, field, field_type, enum_type, min_val, max_val, optional
-                    FROM loader_fields lf
-                    WHERE id = ANY($1)
-                    ",
-                    &loader_field_ids.iter().map(|x| x.0).collect::<Vec<_>>()
-                )
-                    .fetch(&mut exec)
-                    .map_ok(|m| QueryLoaderField {
-                        id: LoaderFieldId(m.id),
-                        field: m.field,
-                        field_type: m.field_type,
-                        enum_type: m.enum_type.map(LoaderFieldEnumId),
-                        min_val: m.min_val,
-                        max_val: m.max_val,
-                        optional: m.optional,
-                    })
-                    .try_collect()
-                    .await
-                    .wrap_err("fetching project loader fields")?;
 
                 let project_rows = sqlx::query!(
                     r#"
@@ -926,19 +834,13 @@ impl DBProject {
                         let VersionLoaderData {
                             loaders,
                             mut project_types,
-                            games,
-                            loader_loader_field_ids,
-                        } = loaders_ptypes_games.remove(&project_id).map(|x|x.1).unwrap_or_default();
+                        } = loaders_ptypes.remove(&project_id).map(|x|x.1).unwrap_or_default();
                         // Each version is a tuple of (DBVersionId, DateTime<Utc>)
                         let mut versions = versions.remove(&project_id).map(|x| x.1).unwrap_or_default();
                         versions.sort_by_key(|a| a.1);
                         let mut gallery = mods_gallery.remove(&project_id).map(|x| x.1).unwrap_or_default();
                         let urls = links.remove(&project_id).map(|x| x.1).unwrap_or_default();
-                        let version_fields = version_fields.remove(&project_id).map(|x| x.1).unwrap_or_default();
-
-                        let loader_fields = loader_fields.iter()
-                            .filter(|x| loader_loader_field_ids.contains(&x.id))
-                            .collect::<Vec<_>>();
+                        let minecraft_mod_versions = minecraft_mod_versions.remove(&project_id).map(|x| x.1).unwrap_or_default();
 
                         let components_serial = m.components.0;
                         exp::compat::correct_project_types(
@@ -993,14 +895,13 @@ impl DBProject {
                             categories: m.categories.unwrap_or_default(),
                             additional_categories: m.additional_categories.unwrap_or_default(),
                             project_types,
-                            games,
                             versions: versions.into_iter().map(|x| x.0).collect(),
                             gallery_items: {
                                 gallery.sort_by_key(|a| a.ordering);
                                 gallery
                             },
                             urls,
-                            aggregate_version_fields: VersionField::from_query_json(version_fields, &loader_fields, &loader_field_enum_values, true),
+                            minecraft_mod_versions,
                             thread_id: DBThreadId(m.thread_id),
                             components,
                         };
@@ -1134,10 +1035,10 @@ pub struct ProjectQueryResult {
     pub additional_categories: Vec<String>,
     pub versions: Vec<DBVersionId>,
     pub project_types: Vec<String>,
-    pub games: Vec<String>,
+
     pub urls: Vec<LinkUrl>,
     pub gallery_items: Vec<DBGalleryItem>,
     pub thread_id: DBThreadId,
-    pub aggregate_version_fields: Vec<VersionField>,
+    pub minecraft_mod_versions: Vec<crate::models::exp::minecraft::ModVersion>,
     pub components: exp::ProjectQuery,
 }

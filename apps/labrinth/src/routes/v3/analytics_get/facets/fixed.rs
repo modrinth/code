@@ -4,6 +4,7 @@ use super::{
     ProjectViewsFacets,
 };
 use crate::util::error::ApiContext as _;
+use crate::util::MinecraftMeta;
 use crate::{
     database::PgPool, models::v3::analytics::DownloadReason, routes::ApiError,
     util::tags::valid_download_tags,
@@ -13,8 +14,9 @@ use xredis::RedisPool;
 pub async fn fetch(
     pool: &PgPool,
     redis: &RedisPool,
+    minecraft_meta: &MinecraftMeta,
 ) -> Result<AnalyticsFacets, ApiError> {
-    let tags = valid_download_tags(pool, redis)
+    let tags = valid_download_tags(pool, redis, minecraft_meta)
         .await
         .wrap_api_err("executing `valid_download_tags`")?;
     let mut loaders = tags.loaders.iter().cloned().collect::<Vec<_>>();

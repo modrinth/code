@@ -1,12 +1,12 @@
 use crate::auth::checks::{is_visible_project, is_visible_version};
-use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
-use crate::database::models::loader_fields::Loader;
+use crate::database::models::loader_item::Loader;
 use crate::database::models::project_item::ProjectQueryResult;
 use crate::database::models::version_item::{
     FileQueryResult, VersionQueryResult,
 };
 use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::models::ids::{ProjectId, VersionId};
+use crate::models::minecraft::legacy_game_version_name;
 use crate::models::pats::Scopes;
 use crate::models::projects::FileType;
 use crate::queue::session::AuthQueue;
@@ -318,15 +318,15 @@ async fn find_version(
 
             // For maven in particular, we will hardcode it to use GameVersions rather than generic loader fields, as this is minecraft-java exclusive
             if !game_versions.is_empty() {
-                let version_game_versions =
-                    x.version_fields.clone().into_iter().find_map(|v| {
-                        MinecraftGameVersion::try_from_version_field(&v).ok()
-                    });
-                if let Some(version_game_versions) = version_game_versions {
-                    bool &= version_game_versions
-                        .iter()
-                        .any(|y| game_versions.contains(&y.version));
-                }
+                bool &= x.inner.components.minecraft_mod.as_ref().is_some_and(
+                    |component| {
+                        component.game_versions.iter().any(|name| {
+                            game_versions.iter().any(|requested| {
+                                requested == legacy_game_version_name(&name.0)
+                            })
+                        })
+                    },
+                );
             }
 
             bool

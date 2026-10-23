@@ -1,24 +1,26 @@
 use crate::database::PgPool;
-use crate::database::models::loader_fields::VersionField;
 use crate::database::models::{project_item, version_item};
 use crate::file_hosting::FileHost;
+use crate::models::exp::minecraft::{Environment, ModVersion, MrpackLoader};
 use crate::models::ids::{ImageId, ProjectId, VersionId};
 use crate::models::projects::{
     Dependency, FileType, Loader, Version, VersionStatus, VersionType,
 };
+use crate::models::v2::projects::LegacySideType;
 use crate::models::v2::projects::LegacyVersion;
 use crate::queue::session::AuthQueue;
 use crate::routes::v3::project_creation::CreateError;
 use crate::routes::v3::version_creation;
 use crate::routes::{v2_reroute, v3};
 use crate::search::SearchState;
+use crate::util::MinecraftMeta;
 use crate::util::kafka::KafkaClientState;
 use actix_multipart::Multipart;
 use actix_web::http::header::ContentDisposition;
 use actix_web::web::Data;
 use actix_web::{HttpRequest, HttpResponse, post, web};
+use minecraft_meta_model::model::MinecraftVersionName;
 use serde::{Deserialize, Serialize};
-use serde_json::json;
 use std::collections::HashMap;
 use validator::Validate;
 use xredis::RedisPool;
@@ -53,8 +55,8 @@ pub struct InitialVersionData {
     )]
     pub dependencies: Vec<Dependency>,
     #[validate(length(min = 1))]
-    pub game_versions: Vec<String>,
-    pub environment: Option<String>,
+    pub game_versions: Vec<MinecraftVersionName>,
+    pub environment: Option<Environment>,
     #[serde(alias = "version_type")]
     pub release_channel: VersionType,
     #[validate(length(min = 1))]
@@ -72,6 +74,28 @@ pub struct InitialVersionData {
 
     // The ordering relative to other versions
     pub ordering: Option<i32>,
+}
+
+pub(super) fn parse_mrpack_loaders(
+    loaders: &[Loader],
+) -> Result<Vec<MrpackLoader>, eyre::Report> {
+    loaders.iter().map(|loader| loader.0.parse()).collect()
+}
+
+pub(super) fn environment_from_sides(
+    client: LegacySideType,
+    server: LegacySideType,
+) -> Environment {
+    use LegacySideType::{Optional, Required, Unsupported};
+    match (client, server) {
+        (Required, Required) => Environment::ClientAndServer,
+        (Required, Unsupported) => Environment::ClientOnly,
+        (Required, Optional) => Environment::ClientOnlyServerOptional,
+        (Unsupported, Required) => Environment::ServerOnly,
+        (Optional, Required) => Environment::ServerOnlyClientOptional,
+        (Optional, Optional) => Environment::ClientOrServer,
+        _ => Environment::Unknown,
+    }
 }
 
 // under `/api/v1/version`
@@ -96,6 +120,7 @@ pub struct InitialVersionData {
 )]
 #[post("/version")]
 pub async fn version_create(
+    minecraft_meta: web::Data<MinecraftMeta>,
     req: HttpRequest,
     payload: Multipart,
     client: Data<PgPool>,
@@ -148,87 +173,23 @@ pub async fn version_create(
                     }
                 }
 
-                // Convert input data to V3 format
-                let mut fields = HashMap::new();
-                fields.insert(
-                    "game_versions".to_string(),
-                    json!(legacy_create.game_versions),
-                );
-
-                // Get all possible side-types for loaders given- we will use these to check if we need to convert/apply side types
-                let loaders =
-                    match v3::tags::loader_list(client.clone(), redis.clone())
-                        .await
-                    {
-                        Ok(loader_response) => {
-                            (v2_reroute::extract_ok_json::<
-                                Vec<v3::tags::LoaderData>,
-                            >(loader_response)
-                            .await)
-                                .unwrap_or_default()
-                        }
-                        Err(_) => vec![],
-                    };
-
-                let loader_fields_aggregate = loaders
-                    .into_iter()
-                    .filter_map(|loader| {
-                        if legacy_create
-                            .loaders
-                            .contains(&Loader(loader.name.clone()))
-                        {
-                            Some(loader.supported_fields)
-                        } else {
-                            None
-                        }
-                    })
-                    .flatten()
-                    .collect::<Vec<_>>();
-
-                // Copies side types of another version of the project.
-                // If no version exists, defaults to an unknown side type.
-                // This is inherently lossy, but not much can be done about it, as side types are no longer associated with projects,
-                // so the 'missing' ones can't be easily accessed, and versions do need to have that field explicitly set.
-
-                // Check if loader_fields_aggregate contains the side types
-                // We assume these four fields are linked together.
-                if loader_fields_aggregate
-                    .iter()
-                    .any(|field| field == "environment")
-                {
-                    let environment =
-                        if let Some(environment) = legacy_create.environment {
-                            json!(environment)
-                        } else {
-                            // If so, we get the field of an example version of the project, and set the side types to match.
-                            get_example_version_fields(
-                                legacy_create.project_id,
-                                client,
-                                &redis,
-                            )
-                            .await?
-                            .into_iter()
-                            .flatten()
-                            .find(|f| f.field_name == "environment")
-                            .map_or(json!("unknown"), |f| {
-                                f.value.serialize_internal()
-                            })
-                        };
-
-                    fields.insert("environment".into(), environment);
-                }
+                let environment = match legacy_create.environment {
+                    Some(environment) => environment,
+                    None => get_example_environment(
+                        legacy_create.project_id,
+                        client,
+                        &redis,
+                    )
+                    .await?
+                    .unwrap_or(Environment::Unknown),
+                };
                 // Handle project type via file extension prediction
                 let mut project_type = None;
                 for file_part in &legacy_create.file_parts {
-                    if let Some(ext) = file_part.split('.').next_back() {
-                        match ext {
-                            "mrpack" | "mrpack-primary" => {
-                                project_type = Some("modpack");
-                                break;
-                            }
-                            // No other type matters
-                            _ => {}
-                        }
+                    if let Some("mrpack" | "mrpack-primary") =
+                        file_part.split('.').next_back()
+                    {
+                        project_type = Some("modpack");
                         break;
                     }
                 }
@@ -253,14 +214,15 @@ pub async fn version_create(
                     }
                 }
 
-                // Modpacks now use the "mrpack" loader, and loaders are converted to loader fields.
-                // Setting of 'project_type' directly is removed, it's loader-based now.
-                if project_type == Some("modpack") {
-                    fields.insert(
-                        "mrpack_loaders".to_string(),
-                        json!(legacy_create.loaders),
-                    );
-                }
+                let component = ModVersion {
+                    game_versions: legacy_create.game_versions,
+                    environment: Some(environment),
+                    mrpack_loaders: if project_type == Some("modpack") {
+                        parse_mrpack_loaders(&legacy_create.loaders)?
+                    } else {
+                        Vec::new()
+                    },
+                };
 
                 let loaders = if project_type == Some("modpack") {
                     vec![Loader("mrpack".to_string())]
@@ -283,7 +245,8 @@ pub async fn version_create(
                     file_types: legacy_create.file_types,
                     uploaded_images: legacy_create.uploaded_images,
                     ordering: legacy_create.ordering,
-                    fields,
+                    minecraft_mod: Some(component),
+                    fields: HashMap::new(),
                 })
             }
         },
@@ -292,6 +255,7 @@ pub async fn version_create(
 
     // Call V3 project creation
     let response = v3::version_creation::version_create(
+        minecraft_meta.clone(),
         req,
         payload,
         client.clone(),
@@ -313,12 +277,11 @@ pub async fn version_create(
     }
 }
 
-// Gets version fields of an example version of a project, if one exists.
-async fn get_example_version_fields(
+async fn get_example_environment(
     project_id: Option<ProjectId>,
     pool: Data<PgPool>,
     redis: &RedisPool,
-) -> Result<Option<Vec<VersionField>>, CreateError> {
+) -> Result<Option<Environment>, CreateError> {
     let Some(project_id) = project_id else {
         return Ok(None);
     };
@@ -336,7 +299,11 @@ async fn get_example_version_fields(
     else {
         return Ok(None);
     };
-    Ok(Some(example_version.version_fields))
+    Ok(example_version
+        .inner
+        .components
+        .minecraft_mod
+        .and_then(|component| component.environment))
 }
 
 // under /api/v1/version/{version_id}
@@ -367,6 +334,7 @@ async fn get_example_version_fields(
 )]
 #[post("/{version_id}/file")]
 pub async fn upload_file_to_version(
+    minecraft_meta: web::Data<MinecraftMeta>,
     req: HttpRequest,
     url_data: web::Path<(VersionId,)>,
     payload: Multipart,
@@ -379,6 +347,7 @@ pub async fn upload_file_to_version(
 ) -> Result<HttpResponse, CreateError> {
     // Returns NoContent, so no need to convert to V2
     let response = v3::version_creation::upload_file_to_version(
+        minecraft_meta.clone(),
         req,
         url_data,
         payload,

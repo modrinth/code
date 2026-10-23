@@ -1,7 +1,7 @@
-use std::collections::HashMap;
-use std::mem;
 
-use crate::database::models::loader_fields::VersionField;
+use std::collections::HashMap;
+
+
 use crate::database::models::project_item::{LinkUrl, ProjectQueryResult};
 use crate::database::models::version_item::VersionQueryResult;
 use crate::models::exp;
@@ -9,10 +9,11 @@ use crate::models::ids::{
     FileId, GalleryImageId, OrganizationId, ProjectId, TeamId, ThreadId,
     VersionId,
 };
+use crate::models::minecraft::legacy_game_version_name;
 use crate::routes::{FileHash, HashAlgorithm};
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
-use itertools::Itertools;
+
 use serde::{Deserialize, Serialize};
 use url::Url;
 use validator::Validate;
@@ -108,47 +109,84 @@ pub struct Project {
     pub fields: HashMap<String, Vec<serde_json::Value>>,
 }
 
-// This is a helper function to convert a list of VersionFields into a HashMap of field name to vecs of values
-// This allows for removal of duplicates
-pub fn from_duplicate_version_fields(
-    version_fields: Vec<VersionField>,
-) -> HashMap<String, Vec<serde_json::Value>> {
-    let mut fields: HashMap<String, Vec<serde_json::Value>> = HashMap::new();
-    for vf in version_fields {
-        // We use a string directly, so we can remove duplicates
-        let serialized = if let Some(inner_array) =
-            vf.value.serialize_internal().as_array()
-        {
-            inner_array.clone()
-        } else {
-            vec![vf.value.serialize_internal()]
-        };
 
-        // Create array if doesnt exist, otherwise push, or if json is an array, extend
-        if let Some(arr) = fields.get_mut(&vf.field_name) {
-            arr.extend(serialized);
-        } else {
-            fields.insert(vf.field_name, serialized);
-        }
+/// Projects typed Minecraft metadata into the flattened compatibility fields.
+fn minecraft_version_fields(
+    component: &exp::minecraft::ModVersion,
+    mrpack: bool,
+) -> HashMap<String, serde_json::Value> {
+    let mut fields = HashMap::from([(
+        "game_versions".to_owned(),
+        serde_json::Value::Array(
+            component
+                .game_versions
+                .iter()
+                .map(|name| {
+                    serde_json::Value::String(
+                        legacy_game_version_name(&name.0).to_owned(),
+                    )
+                })
+                .collect(),
+        ),
+    )]);
+    if let Some(environment) = component.environment {
+        fields.insert("environment".to_owned(), environment.as_str().into());
     }
-
-    // Remove duplicates
-    for v in fields.values_mut() {
-        *v = mem::take(v).into_iter().unique().collect_vec();
+    if mrpack {
+        fields.insert(
+            "mrpack_loaders".to_owned(),
+            serde_json::Value::Array(
+                component
+                    .mrpack_loaders
+                    .iter()
+                    .map(|loader| loader.as_str().into())
+                    .collect(),
+            ),
+        );
     }
     fields
 }
 
+fn minecraft_games(java: bool, bedrock: bool) -> Vec<String> {
+    let mut games = Vec::new();
+    if java {
+        games.push("minecraft-java".to_owned());
+    }
+    if bedrock {
+        games.push("minecraft-bedrock".to_owned());
+    }
+    games
+}
+
 impl From<ProjectQueryResult> for Project {
     fn from(data: ProjectQueryResult) -> Self {
-        let fields =
-            from_duplicate_version_fields(data.aggregate_version_fields);
+        let mut fields: HashMap<String, Vec<serde_json::Value>> =
+            HashMap::new();
+        let mrpack = data.inner.loaders.iter().any(|loader| loader == "mrpack");
+        for component in &data.minecraft_mod_versions {
+            for (name, value) in minecraft_version_fields(component, mrpack) {
+                let values = match value {
+                    serde_json::Value::Array(values) => values,
+                    value => vec![value],
+                };
+                let aggregate = fields.entry(name).or_default();
+                for value in values {
+                    if !aggregate.contains(&value) {
+                        aggregate.push(value);
+                    }
+                }
+            }
+        }
         let m = data.inner;
+        let games = minecraft_games(
+            !m.loaders.is_empty() || m.components.minecraft_java_server.is_some(),
+            m.components.minecraft_bedrock_server.is_some(),
+        );
         Self {
             id: m.id.into(),
             slug: m.slug,
             project_types: data.project_types,
-            games: data.games,
+            games,
             team_id: m.team_id.into(),
             organization: m.organization_id.map(|i| i.into()),
             name: m.name,
@@ -774,7 +812,7 @@ pub struct Version {
     pub version_number: String,
     /// Project types for which this version is compatible with, extracted from Loader
     pub project_types: Vec<String>,
-    /// Games for which this version is compatible with, extracted from Loader/Project types
+    /// Minecraft games supported by this version's components and loaders
     pub games: Vec<String>,
     /// The changelog for this version of the project.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -806,8 +844,7 @@ pub struct Version {
 
     #[serde(flatten)]
     pub components: exp::VersionQuery,
-    // All other fields are loader-specific VersionFields
-    // These are flattened during serialization
+    // Legacy Minecraft compatibility fields are flattened during serialization.
     #[serde(deserialize_with = "skip_nulls")]
     #[serde(flatten)]
     pub fields: HashMap<String, serde_json::Value>,
@@ -826,7 +863,23 @@ where
 
 impl From<VersionQueryResult> for Version {
     fn from(data: VersionQueryResult) -> Version {
+        let fields = data
+            .inner
+            .components
+            .minecraft_mod
+            .as_ref()
+            .map(|component| {
+                minecraft_version_fields(
+                    component,
+                    data.loaders.iter().any(|loader| loader == "mrpack"),
+                )
+            })
+            .unwrap_or_default();
         let v = data.inner;
+        let games = minecraft_games(
+            !data.loaders.is_empty() || v.components.minecraft_java_server.is_some(),
+            false,
+        );
         Version {
             id: v.id.into(),
             project_id: v.project_id.into(),
@@ -835,7 +888,7 @@ impl From<VersionQueryResult> for Version {
             name: v.name,
             version_number: v.version_number,
             project_types: data.project_types,
-            games: data.games,
+            games,
             changelog: Some(v.changelog),
             date_published: v.date_published,
             downloads: v.downloads as u32,
@@ -876,13 +929,7 @@ impl From<VersionQueryResult> for Version {
                 })
                 .collect(),
             loaders: data.loaders.into_iter().map(Loader).collect(),
-            // Only add the internal component of the field for display
-            // "ie": "game_versions",["1.2.3"] instead of "game_versions",ArrayEnum(...)
-            fields: data
-                .version_fields
-                .into_iter()
-                .map(|vf| (vf.field_name, vf.value.serialize_internal()))
-                .collect(),
+            fields,
             components: data.components,
             files_missing_attribution: Vec::new(),
         }

@@ -1,67 +1,34 @@
 use crate::util::error::Context as _;
+use crate::util::MinecraftMeta;
 use std::collections::HashMap;
 
 use super::ApiError;
 use crate::database::models::categories::{Category, ProjectType, ReportType};
-use crate::database::models::loader_fields::{
-    Game, Loader, LoaderField, LoaderFieldEnumValue, LoaderFieldType,
-    LoaderMetadata,
-};
+use crate::database::models::loader_item::{Loader, LoaderMetadata};
+use crate::models::exp::minecraft::{Environment, MrpackLoader};
 use crate::models::link_platform::LinkPlatform;
+use crate::models::minecraft::{
+	legacy_game_version_date, legacy_game_version_name,
+};
 use actix_web::{HttpResponse, get, web};
+use chrono::{DateTime, Utc};
+use minecraft_meta_model::upstream::mojang::VersionType;
 use strum::IntoEnumIterator;
 use xredis::RedisPool;
 
 use crate::database::PgPool;
-use itertools::Itertools;
+
 use serde_json::Value;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(category_list_route)
         .service(loader_list_route)
-        .service(games_list_route)
         .service(loader_fields_list_route)
         .service(license_list_route)
         .service(license_text_route)
         .service(link_platform_list_route)
         .service(report_type_list_route)
         .service(project_type_list_route);
-}
-
-#[derive(serde::Serialize, serde::Deserialize)]
-pub struct GameData {
-    pub slug: String,
-    pub name: String,
-    pub icon: Option<String>,
-    pub banner: Option<String>,
-}
-
-#[utoipa::path(tag = "tags", responses((status = OK)))]
-#[get("/games")]
-pub async fn games_list_route(
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-) -> Result<HttpResponse, ApiError> {
-    games_list(pool, redis).await
-}
-
-pub async fn games_list(
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-) -> Result<HttpResponse, ApiError> {
-    let results = Game::list(&**pool, &redis)
-        .await
-        .wrap_internal_err("fetching game from Redis")?
-        .into_iter()
-        .map(|x| GameData {
-            slug: x.slug,
-            name: x.name,
-            icon: x.icon_url,
-            banner: x.banner_url,
-        })
-        .collect::<Vec<_>>();
-
-    Ok(HttpResponse::Ok().json(results))
 }
 
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -127,32 +94,40 @@ pub async fn loader_list(
         .await
         .wrap_internal_err("fetching loader from Redis")?;
 
-    let loader_fields = LoaderField::get_fields_per_loader(
-        &loaders.iter().map(|x| x.id).collect_vec(),
-        &**pool,
-        &redis,
-    )
-    .await
-    .wrap_internal_err("fetching loader field from Redis")?;
-
     let mut results = loaders
         .into_iter()
-        .map(|x| LoaderData {
-            icon: x.icon,
-            name: x.loader,
-            supported_project_types: x.supported_project_types,
-            supported_games: x.supported_games,
-            supported_fields: loader_fields
-                .get(&x.id)
-                .map(|x| x.iter().map(|x| x.field.clone()).collect_vec())
-                .unwrap_or_default(),
-            metadata: x.metadata,
+        .map(|loader| {
+			let mut supported_fields = vec![
+				"game_versions".to_owned(),
+				"environment".to_owned(),
+			];
+			if loader.loader == "mrpack" {
+				supported_fields.push("mrpack_loaders".to_owned());
+			}
+            LoaderData {
+                icon: loader.icon,
+                name: loader.loader,
+                supported_project_types: loader.supported_project_types,
+				supported_games: vec!["minecraft-java".to_owned()],
+                supported_fields,
+                metadata: loader.metadata,
+            }
         })
         .collect::<Vec<_>>();
 
     results.sort_by_key(|a| a.name.to_lowercase());
 
     Ok(HttpResponse::Ok().json(results))
+}
+
+#[derive(serde::Deserialize, serde::Serialize)]
+pub struct MinecraftTagValue {
+	pub value: String,
+	pub ordering: Option<i32>,
+	pub created: DateTime<Utc>,
+	#[serde(rename = "type")]
+	pub ty: Option<String>,
+	pub major: Option<bool>,
 }
 
 #[derive(serde::Deserialize, serde::Serialize)]
@@ -172,53 +147,96 @@ pub struct LoaderFieldsEnumQuery {
 )]
 #[get("/loader_field")]
 pub async fn loader_fields_list_route(
-    pool: web::Data<PgPool>,
+    minecraft_meta: web::Data<MinecraftMeta>,
     web::Query(query): web::Query<LoaderFieldsEnumQuery>,
-    redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
-    loader_fields_list(pool, web::Query(query), redis).await
+    loader_fields_list(minecraft_meta, web::Query(query)).await
 }
 
 pub async fn loader_fields_list(
-    pool: web::Data<PgPool>,
+    minecraft_meta: web::Data<MinecraftMeta>,
     query: web::Query<LoaderFieldsEnumQuery>,
-    redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
     let query = query.into_inner();
-    let loader_field = LoaderField::get_fields_all(&**pool, &redis)
-        .await
-        .wrap_internal_err("fetching loader field from Redis")?
-        .into_iter()
-        .find(|x| x.field == query.loader_field)
-        .wrap_request_err_with(|| {
-            format!("'{}' was not a valid loader field.", query.loader_field)
-        })?;
-
-    let (LoaderFieldType::Enum(loader_field_enum_id)
-    | LoaderFieldType::ArrayEnum(loader_field_enum_id)) =
-        loader_field.field_type
-    else {
-        return Err(ApiError::Request(eyre::eyre!(format!(
-            "'{}' is not an enumerable field, but an '{}' field.",
-            query.loader_field,
-            loader_field.field_type.to_str()
-        ))));
+    let mut results = match query.loader_field.as_str() {
+		"game_versions" => {
+			let versions = minecraft_meta
+				.minecraft_versions()
+				.await
+				.wrap_internal_err("fetching minecraft-meta game versions")?;
+			versions
+				.iter()
+				.map(|row| {
+					let name = row.name.to_string();
+					let entry = &row.catalog_entry.0;
+					let ty = match entry.ty {
+						VersionType::Release => "release",
+						VersionType::Snapshot => "snapshot",
+						VersionType::OldAlpha => "alpha",
+						VersionType::OldBeta => "beta",
+					};
+					let created = DateTime::<Utc>::from_timestamp(
+						entry.release_time.as_second(),
+						entry.release_time.subsec_nanosecond() as u32,
+					)
+					.ok_or_else(|| ApiError::Internal(eyre::eyre!(
+						"minecraft-meta release timestamp is out of range"
+					)))?;
+					Ok(MinecraftTagValue {
+						value: legacy_game_version_name(&name).to_owned(),
+						ordering: None,
+						created: legacy_game_version_date(&name, created),
+						ty: Some(ty.to_owned()),
+						major: Some(matches!(entry.ty, VersionType::Release)),
+					})
+				})
+				.collect::<Result<Vec<_>, ApiError>>()?
+		}
+		"environment" => Environment::iter()
+			.map(|value| MinecraftTagValue {
+				value: value.as_str().to_owned(),
+				ordering: None,
+				created: DateTime::<Utc>::UNIX_EPOCH,
+				ty: None,
+				major: None,
+			})
+			.collect(),
+		"mrpack_loaders" => MrpackLoader::iter()
+			.map(|value| MinecraftTagValue {
+				value: value.as_str().to_owned(),
+				ordering: None,
+				created: DateTime::<Utc>::UNIX_EPOCH,
+				ty: None,
+				major: None,
+			})
+			.collect(),
+        _ => {
+            return Err(ApiError::Request(eyre::eyre!(
+                "`{}` is not a valid loader field",
+                query.loader_field
+            )));
+        }
     };
 
-    let results: Vec<_> = if let Some(filters) = query.filters {
-        LoaderFieldEnumValue::list_filter(
-            loader_field_enum_id,
-            filters,
-            &**pool,
-            &redis,
-        )
-        .await
-        .wrap_internal_err("fetching loader field enum value from Redis")?
-    } else {
-        LoaderFieldEnumValue::list(loader_field_enum_id, &**pool, &redis)
-            .await
-            .wrap_internal_err("fetching loader field enum value from Redis")?
-    };
+    results.sort_by(|a, b| {
+        b.created
+            .cmp(&a.created)
+            .then_with(|| a.value.cmp(&b.value))
+    });
+    if let Some(filters) = query.filters {
+        results.retain(|value| {
+            filters.iter().all(|(key, expected)| match key.as_str() {
+                "type" => value
+                    .ty
+                    .as_deref()
+                    .is_some_and(|ty| expected.as_str() == Some(ty)),
+                "major" => value
+                    .major
+                    .is_some_and(|major| expected.as_bool() == Some(major)),
+                _ => false,
+            })
+        });
+    }
 
     Ok(HttpResponse::Ok().json(results))
 }

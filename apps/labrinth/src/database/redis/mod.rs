@@ -72,13 +72,9 @@ mod tests {
     use crate::database::models::flow_item::DBFlow;
     use crate::database::models::ids::{
         DBNotificationId, DBProjectId, DBTeamId, DBThreadId, DBUserId,
-        DBVersionId, LoaderFieldEnumId, LoaderFieldEnumValueId, LoaderFieldId,
-        LoaderId,
+        DBVersionId, LoaderId,
     };
-    use crate::database::models::loader_fields::{
-        Loader, LoaderFieldEnumValue, LoaderMetadata, VersionField,
-        VersionFieldValue,
-    };
+    use crate::database::models::loader_item::{Loader, LoaderMetadata};
     use crate::database::models::notification_item::DBNotification;
     use crate::database::models::project_item::{
         DBProject, ProjectQueryResult,
@@ -101,18 +97,6 @@ mod tests {
         let serialized =
             postcard::to_allocvec(value).expect("serializing with postcard");
         postcard::from_bytes(&serialized).expect("deserializing with postcard")
-    }
-
-    fn loader_field_enum_value(ty: &str, major: bool) -> LoaderFieldEnumValue {
-        LoaderFieldEnumValue {
-            id: LoaderFieldEnumValueId(1),
-            enum_id: LoaderFieldEnumId(2),
-            value: "1.21.8".to_string(),
-            ordering: None,
-            created: Utc::now(),
-            ty: Some(ty.to_string()),
-            major: Some(major),
-        }
     }
 
     fn db_project() -> DBProject {
@@ -187,7 +171,6 @@ mod tests {
                 loader: "paper".to_string(),
                 icon: "icon".to_string(),
                 supported_project_types: vec!["plugin".to_string()],
-                supported_games: vec!["minecraft-java".to_string()],
                 metadata: LoaderMetadata { platform },
             };
             let round_tripped = postcard_round_trip(&loader);
@@ -199,97 +182,17 @@ mod tests {
                 round_tripped.supported_project_types,
                 loader.supported_project_types
             );
-            assert_eq!(round_tripped.supported_games, loader.supported_games);
             assert_eq!(round_tripped.metadata.platform, platform);
         }
     }
 
     #[test]
-    fn loader_field_enum_values_round_trip_with_postcard() {
-        let metadata_values = [
-            (None, None),
-            (Some("snapshot"), Some(false)),
-            (Some("alpha"), Some(false)),
-            (Some("beta"), Some(true)),
-            (Some("release"), Some(true)),
-            (Some("beta"), Some(false)),
-            (Some("release"), Some(false)),
-        ];
-
-        for (ty, major) in metadata_values {
-            let enum_value = LoaderFieldEnumValue {
-                id: LoaderFieldEnumValueId(1),
-                enum_id: LoaderFieldEnumId(2),
-                value: "1.21.8".to_string(),
-                ordering: None,
-                created: Utc::now(),
-                ty: ty.map(str::to_string),
-                major,
-            };
-
-            assert_eq!(postcard_round_trip(&enum_value), enum_value);
-        }
-    }
-
-    #[test]
-    fn loader_field_enum_value_keeps_flattened_json_layout() {
-        let enum_value = loader_field_enum_value("release", true);
-        let json = serde_json::to_value(&enum_value)
-            .expect("serializing loader field enum value as JSON");
-
-        assert_eq!(json.get("type"), Some(&serde_json::json!("release")));
-        assert_eq!(json.get("major"), Some(&serde_json::json!(true)));
-        assert!(json.get("metadata").is_none());
-        assert_eq!(
-            serde_json::from_value::<LoaderFieldEnumValue>(json)
-                .expect("deserializing loader field enum value from JSON"),
-            enum_value
-        );
-    }
-
-    #[test]
-    fn non_enum_version_fields_round_trip_with_postcard() {
-        let values = [
-            VersionFieldValue::Integer(5),
-            VersionFieldValue::Text("value".to_string()),
-            VersionFieldValue::Boolean(true),
-            VersionFieldValue::ArrayInteger(vec![1, 2]),
-            VersionFieldValue::ArrayText(vec!["one".to_string()]),
-            VersionFieldValue::ArrayBoolean(vec![true, false]),
-        ];
-
-        for value in values {
-            let field = VersionField {
-                version_id: DBVersionId(1),
-                field_id: LoaderFieldId(2),
-                field_name: "field".to_string(),
-                value,
-            };
-
-            assert_eq!(postcard_round_trip(&field), field);
-        }
-    }
-
-    #[test]
     fn flattened_cache_values_round_trip_with_postcard() {
-        let enum_value = loader_field_enum_value("release", true);
-        postcard_round_trip(&enum_value);
-
         let version = VersionQueryResult {
             inner: db_version(),
             files: Vec::new(),
-            version_fields: vec![VersionField {
-                version_id: DBVersionId(1),
-                field_id: LoaderFieldId(2),
-                field_name: "game_versions".to_string(),
-                value: VersionFieldValue::Enum(
-                    LoaderFieldEnumId(2),
-                    enum_value,
-                ),
-            }],
             loaders: vec!["fabric".to_string()],
             project_types: vec!["mod".to_string()],
-            games: vec!["minecraft-java".to_string()],
             dependencies: Vec::new(),
             components: exp::VersionQuery::default(),
         };
@@ -301,11 +204,10 @@ mod tests {
             additional_categories: Vec::new(),
             versions: vec![DBVersionId(1)],
             project_types: vec!["mod".to_string()],
-            games: vec!["minecraft-java".to_string()],
             urls: Vec::new(),
             gallery_items: Vec::new(),
             thread_id: DBThreadId(1),
-            aggregate_version_fields: Vec::new(),
+            minecraft_mod_versions: Vec::new(),
             components: exp::ProjectQuery::default(),
         };
         postcard_round_trip(&project);

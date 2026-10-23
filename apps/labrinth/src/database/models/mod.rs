@@ -6,10 +6,10 @@ pub mod collection_item;
 pub mod delphi_report_item;
 pub mod flow_item;
 pub mod friend_item;
+
 pub mod ids;
 pub mod image_item;
-pub mod legacy_loader_fields;
-pub mod loader_fields;
+pub mod loader_item;
 pub mod moderation_external_item;
 pub mod moderation_lock_item;
 pub mod moderation_note_item;

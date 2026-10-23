@@ -16,7 +16,6 @@ use clickhouse_crate::Client;
 use util::cors::default_cors;
 use util::gotenberg::GotenbergClient;
 
-use crate::background_task::update_versions;
 use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::env::ENV;
 use crate::queue::billing::{index_billing, index_subscriptions};
@@ -57,6 +56,7 @@ pub struct Pepper {
 pub struct LabrinthConfig {
     pub pool: PgPool,
     pub ro_pool: ReadOnlyPgPool,
+	pub minecraft_meta: web::Data<util::MinecraftMeta>,
     pub redis_pool: RedisPool,
     pub clickhouse: Client,
     pub file_host: web::Data<dyn file_hosting::FileHost>,
@@ -82,6 +82,7 @@ pub struct LabrinthConfig {
 pub fn app_setup(
     pool: PgPool,
     ro_pool: ReadOnlyPgPool,
+	minecraft_meta: web::Data<util::MinecraftMeta>,
     redis_pool: RedisPool,
     search_backend: actix_web::web::Data<dyn search::SearchBackend>,
     clickhouse: &mut Client,
@@ -143,20 +144,6 @@ pub fn app_setup(
                     background_task::release_scheduled(pool_ref).await
                 {
                     warn!("Syncing scheduled releases failed: {e:#}");
-                }
-            }
-        });
-
-        let version_index_interval =
-            Duration::from_secs(ENV.VERSION_INDEX_INTERVAL);
-        let pool_ref = pool.clone();
-        let redis_pool_ref = redis_pool.clone();
-        scheduler.run(version_index_interval, move || {
-            let pool_ref = pool_ref.clone();
-            let redis = redis_pool_ref.clone();
-            async move {
-                if let Err(e) = update_versions(pool_ref, redis).await {
-                    warn!("Version update failed: {e:#}");
                 }
             }
         });
@@ -249,6 +236,7 @@ pub fn app_setup(
     LabrinthConfig {
         pool,
         ro_pool,
+		minecraft_meta,
         redis_pool,
         clickhouse: clickhouse.clone(),
         file_host,
@@ -301,6 +289,7 @@ pub fn app_data_config(
     .app_data(web::Data::new(labrinth_config.redis_pool.clone()))
     .app_data(web::Data::new(labrinth_config.pool.clone()))
     .app_data(web::Data::new(labrinth_config.ro_pool.clone()))
+	.app_data(labrinth_config.minecraft_meta.clone())
     .app_data(labrinth_config.file_host.clone())
     .app_data(web::Data::from(
         labrinth_config.search_state.backend.clone(),
