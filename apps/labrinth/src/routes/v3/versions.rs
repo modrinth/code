@@ -753,18 +753,27 @@ pub(crate) async fn version_edit_in_transaction(
                 )
                 .await
                 .wrap_internal_err("fetching loaders")?;
+                let loader_ids = if let Some(ids) = &new_loader_ids {
+                    ids.clone()
+                } else {
+                    sqlx::query!(
+                        r#"
+                        SELECT loader_id
+                        FROM loaders_versions
+                        WHERE version_id = $1
+                        "#,
+                        version_id as database::models::ids::DBVersionId,
+                    )
+                    .fetch_all(&mut *transaction)
+                    .await
+                    .wrap_internal_err("fetching version loaders from database")?
+                    .into_iter()
+                    .map(|row| database::models::ids::LoaderId(row.loader_id))
+                    .collect::<Vec<_>>()
+                };
                 let selected_loaders = all_loaders
                     .into_iter()
-                    .filter(|loader| {
-                        if let Some(ids) = &new_loader_ids {
-                            ids.contains(&loader.id)
-                        } else {
-                            version_item
-                                .loaders
-                                .iter()
-                                .any(|name| name == &loader.loader)
-                        }
-                    })
+                    .filter(|loader| loader_ids.contains(&loader.id))
                     .collect::<Vec<_>>();
                 if edits_mrpack_loaders
                     && !selected_loaders
