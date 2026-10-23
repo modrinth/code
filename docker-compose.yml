@@ -428,35 +428,6 @@ services:
       interval: 10s
       timeout: 15s
       retries: 10
-  labrinth:
-    profiles:
-      - with-labrinth
-    build:
-      context: .
-      dockerfile: ./apps/labrinth/Dockerfile
-    container_name: labrinth
-    ports:
-      - '127.0.0.1:8000:8000'
-    env_file: ./apps/labrinth/.env.docker-compose
-    volumes:
-      - labrinth-cdn-data:/tmp/modrinth
-    depends_on:
-      postgres_db:
-        condition: service_healthy
-      elasticsearch:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      redpanda:
-        condition: service_healthy
-      clickhouse:
-        condition: service_healthy
-      mail:
-        condition: service_healthy
-    develop:
-      watch:
-        - path: ./apps/labrinth
-          action: rebuild
   delphi:
     profiles:
       - with-delphi
@@ -493,4 +464,3 @@ volumes:
   redis-data:
   redis-insight-data:
   redpanda-data:
-  labrinth-cdn-data:

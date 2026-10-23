@@ -77,7 +77,7 @@ jobs:
         run: nsc cache sccache setup --cache_name default >> "$GITHUB_ENV"
 
       - name: Install build dependencies
-        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends cmake libcurl4-openssl-dev
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends cmake
 
       - name: Build labrinth
         run: cargo build --profile release-labrinth --package labrinth
