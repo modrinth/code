@@ -265,8 +265,8 @@ async function recovery() {
 			text: getErrorMessage(err),
 			type: 'error',
 		})
-		captcha.value?.reset?.()
 	}
+	captcha.value?.reset?.()
 	stopLoading()
 }
 

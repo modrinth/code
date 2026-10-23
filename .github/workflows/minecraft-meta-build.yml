@@ -87,6 +87,6 @@ jobs:
     secrets:
       ARGOCD_DEPLOY_KEY: ${{ secrets.ARGOCD_DEPLOY_KEY }}
     with:
-      application-set: labrinth
+      application-set: minecraft-meta
       branch: ${{ github.ref == 'refs/heads/prod' && 'main' || 'develop' }}
       environment-name: ${{ github.ref == 'refs/heads/prod' && 'production' || 'staging' }}
