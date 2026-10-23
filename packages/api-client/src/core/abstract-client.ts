@@ -369,7 +369,7 @@ export abstract class AbstractModrinthClient extends AbstractUploadClient {
 		options: UploadRequestOptions,
 	): RequestContext {
 		let metadata: UploadMetadata
-		let body: File | Blob | FormData
+		let body: UploadMetadata['file'] | FormData
 
 		if ('formData' in options && options.formData) {
 			metadata = {
@@ -382,6 +382,7 @@ export abstract class AbstractModrinthClient extends AbstractUploadClient {
 			metadata = {
 				isUpload: true,
 				file: options.file,
+				multipartField: options.multipartField,
 				onProgress: options.onProgress,
 			}
 			body = options.file

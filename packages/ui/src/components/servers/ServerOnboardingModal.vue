@@ -19,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Archon } from '@modrinth/api-client'
+import type { Archon, UploadProgress } from '@modrinth/api-client'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { until } from '@vueuse/core'
 import { computed, nextTick, useTemplateRef, watch } from 'vue'
@@ -127,32 +127,28 @@ const install = useMutation({
 			await config.installServerContent(serverId, worldId)
 		} else if (config.setupType.value === 'modpack' && config.modpackFile.value) {
 			const auth = await client.archon.servers_v0.getFilesystemAuth(serverId)
-			config.uploadProgress.value = 0
-			const upload = client.kyros.content_v1.uploadModpackFile(
-				worldId,
-				config.modpackFile.value,
-				config.buildProperties(),
-				{
-					auth,
-					softOverride: false,
-					onProgress: ({ loaded, total }) => {
-						config.uploadProgress.value = total > 0 ? Math.round((loaded / total) * 100) : 0
-					},
-				},
+			const file = config.modpackFile.value
+			await config.trackUpload(
+				(onProgress) =>
+					client.kyros.content_v1.uploadModpackFile(worldId, file, config.buildProperties(), {
+						auth,
+						softOverride: false,
+						onProgress,
+					}).promise,
 			)
-			await upload.promise
 		} else if (config.setupType.value === 'curseforge') {
 			const auth = await client.archon.servers_v0.getFilesystemAuth(serverId)
+			const installModpack = (onUploadProgress?: (progress: UploadProgress) => void) =>
+				installCurseForgeModpack(client, worldId, config, {
+					auth,
+					softOverride: false,
+					onUploadProgress,
+				})
 			if (config.curseforgeModpackFile.value || config.curseforgeServerPackFile.value) {
-				config.uploadProgress.value = 0
+				await config.trackUpload(installModpack)
+			} else {
+				await installModpack()
 			}
-			await installCurseForgeModpack(client, worldId, config, {
-				auth,
-				softOverride: false,
-				onUploadProgress: ({ progress }) => {
-					config.uploadProgress.value = Math.round(progress * 100)
-				},
-			})
 		} else {
 			const selection = config.modpackSelection.value
 			const loader = config.selectedLoader.value
@@ -186,9 +182,6 @@ const install = useMutation({
 			['servers', 'detail', request.serverId],
 			(server) => (server ? { ...server, status: 'installing' } : server),
 		)
-	},
-	onSettled: (_data, _error, { config }) => {
-		config.uploadProgress.value = null
 	},
 })
 

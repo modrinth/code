@@ -1,4 +1,4 @@
-import type { Archon, Kyros, LauncherMeta } from '@modrinth/api-client'
+import type { Archon, Kyros, LauncherMeta, LocalFile, UploadProgress } from '@modrinth/api-client'
 import { useQueryClient } from '@tanstack/vue-query'
 import { computed, type ComputedRef, nextTick, type Ref, ref, type ShallowRef, watch } from 'vue'
 import type { ComponentExposed } from 'vue-component-type-helpers'
@@ -22,6 +22,9 @@ import { stageConfigs } from './stages'
 
 export type FlowType = 'world' | 'server-onboarding' | 'reset-server' | 'instance'
 export type SetupType = 'modpack' | 'curseforge' | 'custom' | 'vanilla'
+
+/** A CurseForge pack picked in the browser, or dropped from disk in the app. */
+export type CurseForgePackFile = File | LocalFile
 export type Gamemode = 'survival' | 'creative' | 'hardcore'
 export type Difficulty = 'peaceful' | 'easy' | 'normal' | 'hard'
 export type LoaderVersionType = 'stable' | 'latest' | 'other'
@@ -62,10 +65,6 @@ export const creationFlowMessages = defineMessages({
 	createInstanceButton: {
 		id: 'creation-flow.button.create-instance',
 		defaultMessage: 'Create instance',
-	},
-	uploadingProgress: {
-		id: 'servers.setup.onboarding.uploading.progress',
-		defaultMessage: 'Uploading ({percent, number}%)',
 	},
 	setupServerButton: {
 		id: 'creation-flow.button.setup-server',
@@ -213,8 +212,8 @@ export interface CreationFlowContextValue {
 	modpackFile: Ref<File | null>
 	modpackFilePath: Ref<string | null>
 	curseforgeUrl: Ref<string>
-	curseforgeModpackFile: Ref<File | null>
-	curseforgeServerPackFile: Ref<File | null>
+	curseforgeModpackFile: Ref<CurseForgePackFile | null>
+	curseforgeServerPackFile: Ref<CurseForgePackFile | null>
 	/** The modpack resolved from `curseforgeUrl`, for the file it was last queried with. */
 	curseforgeModpack: Ref<Kyros.FlameAnvil.v1.LinkQueryResponse | null>
 	/** The selected file of the resolved modpack. */
@@ -239,7 +238,8 @@ export interface CreationFlowContextValue {
 
 	// Loading state (set when finish() is called, cleared on reset)
 	loading: Ref<boolean>
-	uploadProgress: Ref<number | null>
+	/** Progress of the upload shown by the uploading stage, `null` when nothing is uploading. */
+	uploadProgress: Ref<UploadProgress | null>
 	finishDisabled: ComputedRef<boolean>
 	finishDisabledTooltip: ComputedRef<string | undefined>
 	inviteLink: Ref<string | null>
@@ -269,6 +269,11 @@ export interface CreationFlowContextValue {
 	selectProject: (projectId: string, projectType: string, versionId?: string) => Promise<void>
 	installServerContent: (serverId: string, worldId: string) => Promise<void>
 	finish: () => void
+	/**
+	 * Shows the uploading stage while `run` uploads, returning to the final stage if it fails.
+	 * The caller moves on from the uploading stage once it succeeds.
+	 */
+	trackUpload: <T>(run: (onProgress: (progress: UploadProgress) => void) => Promise<T>) => Promise<T>
 	showInvite: (
 		serverId: string,
 		worldId: string,
@@ -416,8 +421,8 @@ export function createCreationFlowContext(
 	const modpackFile = ref<File | null>(null)
 	const modpackFilePath = ref<string | null>(null)
 	const curseforgeUrl = ref('')
-	const curseforgeModpackFile = ref<File | null>(null)
-	const curseforgeServerPackFile = ref<File | null>(null)
+	const curseforgeModpackFile = ref<CurseForgePackFile | null>(null)
+	const curseforgeServerPackFile = ref<CurseForgePackFile | null>(null)
 	const curseforgeModpack = ref<Kyros.FlameAnvil.v1.LinkQueryResponse | null>(null)
 	const curseforgeFileId = ref<number | null>(null)
 	const curseforgeFiles = ref<Kyros.FlameAnvil.v1.LinkQueryFile[]>([])
@@ -436,7 +441,7 @@ export function createCreationFlowContext(
 
 	const hardReset = ref(isInitialSetup)
 	const loading = ref(false)
-	const uploadProgress = ref<number | null>(null)
+	const uploadProgress = ref<UploadProgress | null>(null)
 	const inviteLink = ref<string | null>(null)
 	const inviteLoading = ref(false)
 	const inviteError = ref<string | null>(null)
@@ -752,6 +757,21 @@ export function createCreationFlowContext(
 		}
 	}
 
+	async function trackUpload<T>(
+		run: (onProgress: (progress: UploadProgress) => void) => Promise<T>,
+	): Promise<T> {
+		uploadProgress.value = { loaded: 0, total: 0, progress: 0 }
+		modal.value?.setStage('uploading')
+		try {
+			return await run((progress) => (uploadProgress.value = progress))
+		} catch (error) {
+			modal.value?.setStage('final-config')
+			throw error
+		} finally {
+			uploadProgress.value = null
+		}
+	}
+
 	function showInvite(
 		serverId: string,
 		worldId: string,
@@ -898,6 +918,7 @@ export function createCreationFlowContext(
 		installServerContent: (serverId, worldId) =>
 			installServerContent(client, contextValue, serverId, worldId),
 		finish,
+		trackUpload,
 		showInvite,
 		retryInvite,
 		completeInvite,

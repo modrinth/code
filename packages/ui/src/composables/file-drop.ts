@@ -1,3 +1,4 @@
+import type { LocalFile } from '@modrinth/api-client'
 import type { ComputedRef, Ref } from 'vue'
 import { computed, onMounted, onUnmounted, ref, unref } from 'vue'
 
@@ -10,6 +11,8 @@ export interface UseFileDropTargetOptions {
 	target: Ref<HTMLElement | null | undefined>
 	disabled?: MaybeRef<boolean>
 	onFiles: (files: File[]) => void | Promise<void>
+	/** Receives native drops as local files instead of reading them into memory, where supported. */
+	onLocalFiles?: (files: LocalFile[]) => void | Promise<void>
 	onError?: (error: unknown) => void
 }
 
@@ -67,15 +70,26 @@ export function useFileDropTarget(options: UseFileDropTargetOptions) {
 		)
 	}
 
-	async function processFiles(getFiles: () => File[] | Promise<File[]>) {
+	async function processFiles<T>(
+		getFiles: () => T[] | Promise<T[]>,
+		onFiles: (files: T[]) => void | Promise<void>,
+	) {
 		isProcessing.value = true
+		let files: T[]
 		try {
-			const files = await getFiles()
-			if (files.length > 0) await options.onFiles(files)
+			files = await getFiles()
 		} catch (error) {
 			options.onError?.(error)
+			return
 		} finally {
 			isProcessing.value = false
+		}
+
+		if (files.length === 0) return
+		try {
+			await onFiles(files)
+		} catch (error) {
+			options.onError?.(error)
 		}
 	}
 
@@ -95,11 +109,25 @@ export function useFileDropTarget(options: UseFileDropTargetOptions) {
 		nativeDragging.value = false
 		if (!canDrop || !fileDrop) return
 
-		await processFiles(() => fileDrop.createFilesFromNativePaths(event.paths))
+		const { onLocalFiles } = options
+		const { resolveLocalFiles } = fileDrop
+		if (onLocalFiles && resolveLocalFiles) {
+			await processFiles(() => resolveLocalFiles(event.paths), onLocalFiles)
+		} else {
+			await processFiles(() => fileDrop.createFilesFromNativePaths(event.paths), options.onFiles)
+		}
+	}
+
+	function rejectProcessingDrag(event: DragEvent) {
+		event.preventDefault()
+		if (event.dataTransfer) {
+			event.dataTransfer.dropEffect = 'none'
+		}
 	}
 
 	function handleDragEnter(event: DragEvent) {
-		if (disabled.value || isProcessing.value || !isFileDrag(event)) return
+		if (disabled.value || !isFileDrag(event)) return
+		if (isProcessing.value) return rejectProcessingDrag(event)
 
 		event.preventDefault()
 		domDragCounter.value++
@@ -107,7 +135,8 @@ export function useFileDropTarget(options: UseFileDropTargetOptions) {
 	}
 
 	function handleDragOver(event: DragEvent) {
-		if (disabled.value || isProcessing.value || !isFileDrag(event)) return
+		if (disabled.value || !isFileDrag(event)) return
+		if (isProcessing.value) return rejectProcessingDrag(event)
 
 		event.preventDefault()
 		if (event.dataTransfer) {
@@ -136,7 +165,7 @@ export function useFileDropTarget(options: UseFileDropTargetOptions) {
 		const files = getDroppedFiles(event)
 		if (files.length === 0) return
 
-		await processFiles(() => files)
+		await processFiles(() => files, options.onFiles)
 	}
 
 	let nativeFileDropUnlisten: (() => void) | null = null

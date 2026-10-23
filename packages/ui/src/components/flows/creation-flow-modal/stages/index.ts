@@ -6,6 +6,7 @@ import { stageConfig as finalConfigStageConfig } from './final-config-stage'
 import { stageConfig as importInstanceStageConfig } from './import-instance-stage'
 import { stageConfig as inviteFriendsStageConfig } from './invite-friends-stage'
 import { stageConfig as setupTypeStageConfig } from './setup-type-stage'
+import { stageConfig as uploadingStageConfig } from './uploading-stage'
 
 export const stageConfigs: StageConfigInput<CreationFlowContextValue>[] = [
 	setupTypeStageConfig,
@@ -13,5 +14,6 @@ export const stageConfigs: StageConfigInput<CreationFlowContextValue>[] = [
 	customSetupStageConfig,
 	curseforgeStageConfig,
 	finalConfigStageConfig,
+	uploadingStageConfig,
 	inviteFriendsStageConfig,
 ]

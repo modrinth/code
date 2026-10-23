@@ -2,6 +2,7 @@ import { provideFileDrop } from '@modrinth/ui'
 import { invoke } from '@tauri-apps/api/core'
 
 import { listenNativeDragDrop } from '@/helpers/native-drag-drop'
+import { getLocalFileInfo } from '@/platform/app-lib/files/commands'
 
 function getFileName(path: string) {
 	return path.split(/[\\/]/).pop() || 'file'
@@ -46,6 +47,15 @@ export function setupFileDropProvider() {
 		async createFilesFromNativePaths(paths) {
 			return await Promise.all(
 				paths.map(async (path) => new File([await readDraggedFile(path)], getFileName(path))),
+			)
+		},
+		async resolveLocalFiles(paths) {
+			return await Promise.all(
+				paths.map(async (path) => ({
+					kind: 'local' as const,
+					path,
+					...(await getLocalFileInfo(path)),
+				})),
 			)
 		},
 	})

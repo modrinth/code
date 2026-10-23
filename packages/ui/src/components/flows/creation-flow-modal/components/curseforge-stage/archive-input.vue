@@ -22,11 +22,13 @@
 		size="small"
 		accept=".zip"
 		:multiple="false"
+		local-files
 		:primary-prompt="null"
 		:secondary-prompt="formatMessage(messages.uploadPrompt)"
 		:processing-prompt="formatMessage(messages.processingFile)"
-		class="!rounded-[20px] !border-[1.5px] !border-surface-4 !bg-surface-2 focus-within:outline focus-within:outline-2 focus-within:outline-brand data-[dragging]:!border-brand data-[dragging]:!bg-brand-highlight"
+		class="!rounded-[20px] !border-[1.5px] !border-surface-4 !bg-surface-2 focus-within:outline focus-within:outline-2 focus-within:outline-brand data-[highlighted]:!border-brand data-[highlighted]:!bg-brand-highlight"
 		@change="file = $event[0] ?? null"
+		@local-change="file = $event[0] ?? null"
 	/>
 </template>
 
@@ -37,9 +39,10 @@ import { IconButton } from '#ui/components/base/buttons'
 import DropzoneFileInput from '#ui/components/base/DropzoneFileInput.vue'
 import { useVIntl } from '#ui/composables/i18n'
 
+import type { CurseForgePackFile } from '../../creation-flow-context'
 import { curseforgeMessages as messages } from '../../curseforge'
 
-const file = defineModel<File | null>({ required: true })
+const file = defineModel<CurseForgePackFile | null>({ required: true })
 const processing = defineModel<boolean>('processing', { default: false })
 const { formatMessage } = useVIntl()
 </script>

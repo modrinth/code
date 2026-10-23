@@ -10,6 +10,7 @@ import { getVersion } from '@tauri-apps/api/app'
 
 import { config } from '@/config'
 import { get as getCreds } from '@/helpers/mr_auth'
+import { createLocalFileUploader } from '@/platform/adapters/local-file-upload'
 
 export function createAppClient(): TauriModrinthClient {
 	const appVersion = getVersion()
@@ -19,6 +20,7 @@ export function createAppClient(): TauriModrinthClient {
 		labrinthBaseUrl: config.labrinthBaseUrl,
 		archonBaseUrl: config.archonBaseUrl,
 		sharedInstancesBaseUrl: config.sharedInstancesBaseUrl,
+		localFileUploader: createLocalFileUploader(),
 		features: [
 			new NodeAuthFeature({
 				getAuth: () => nodeAuthState.getAuth?.() ?? null,

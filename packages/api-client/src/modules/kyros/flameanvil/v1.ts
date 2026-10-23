@@ -1,5 +1,5 @@
 import { AbstractModule } from '../../../core/abstract-module'
-import type { UploadHandle, UploadProgress } from '../../../types/upload'
+import type { UploadFile, UploadHandle, UploadProgress } from '../../../types/upload'
 import { getNodeBaseUrl } from '../../../utils/node-url'
 import type { Archon } from '../../archon/types'
 import type { Kyros } from '../types'
@@ -116,7 +116,7 @@ export class KyrosFlameAnvilV1Module extends AbstractModule {
 	public uploadPlayerPack(
 		worldId: string,
 		uploadId: string,
-		file: File | Blob,
+		file: UploadFile,
 		options?: FlameAnvilUploadOptions,
 	): UploadHandle<Kyros.FlameAnvil.v1.SessionResponse> {
 		return this.uploadPack(worldId, uploadId, 'player', file, options)
@@ -130,7 +130,7 @@ export class KyrosFlameAnvilV1Module extends AbstractModule {
 	public uploadServerPack(
 		worldId: string,
 		uploadId: string,
-		file: File | Blob,
+		file: UploadFile,
 		options?: FlameAnvilUploadOptions,
 	): UploadHandle<Kyros.FlameAnvil.v1.SessionResponse> {
 		return this.uploadPack(worldId, uploadId, 'server', file, options)
@@ -158,17 +158,15 @@ export class KyrosFlameAnvilV1Module extends AbstractModule {
 		worldId: string,
 		uploadId: string,
 		side: 'player' | 'server',
-		file: File | Blob,
+		file: UploadFile,
 		options?: FlameAnvilUploadOptions,
 	): UploadHandle<Kyros.FlameAnvil.v1.SessionResponse> {
-		const formData = new FormData()
-		formData.append('file', file, file instanceof File ? file.name : 'file')
-
 		return this.client.upload<Kyros.FlameAnvil.v1.SessionResponse>(
 			`${getSessionPath(worldId)}/${uploadId}/upload/${side}`,
 			{
 				...nodeRequestOptions(options?.auth),
-				formData,
+				file,
+				multipartField: 'file',
 				onProgress: options?.onProgress,
 			},
 		)

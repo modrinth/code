@@ -13,9 +13,15 @@ export type { ApiErrorData, ModrinthErrorResponse } from './errors'
 export { isModrinthErrorResponse } from './errors'
 export type { HttpMethod, RequestContext, RequestOptions, ResponseData } from './request'
 export type {
+	LocalFile,
+	LocalFileUploader,
+	LocalFileUploadRequest,
+	LocalFileUploadResponse,
+	UploadFile,
 	UploadHandle,
 	UploadMetadata,
 	UploadProgress,
 	UploadRequestOptions,
 	UploadState,
 } from './upload'
+export { isLocalFile } from './upload'

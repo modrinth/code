@@ -6878,9 +6878,6 @@
   "servers.setup.onboarding.steps.heading": {
     "defaultMessage": "Setup your server (~2mins)"
   },
-  "servers.setup.onboarding.uploading.progress": {
-    "defaultMessage": "Uploading ({percent, number}%)"
-  },
   "servers.setup.onboarding.welcome.description": {
     "defaultMessage": "Your server is ready. Here's what you need to do to start playing!"
   },

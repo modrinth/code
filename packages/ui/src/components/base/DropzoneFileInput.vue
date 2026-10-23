@@ -2,15 +2,16 @@
 	<label
 		ref="dropTargetRef"
 		:class="[
-			'flex flex-col items-center justify-center border-2 border-dashed text-contrast transition-colors',
+			'flex flex-col items-center justify-center border-2 text-contrast transition-colors',
 			size === 'small' ? 'p-5' : size === 'medium' ? 'p-10' : 'p-12',
 			size === 'small' ? 'gap-2' : 'gap-4',
 			size === 'small' ? 'rounded-2xl' : 'rounded-3xl',
-			isProcessing ? 'cursor-wait' : 'cursor-pointer',
-			isDragging ? 'border-brand bg-brand-highlight' : 'border-surface-5 bg-surface-4',
+			isProcessing ? 'border-solid cursor-default' : 'border-dashed cursor-pointer',
+			isHighlighted ? 'border-brand bg-brand-highlight' : 'border-surface-5 bg-surface-4',
 		]"
 		:aria-busy="isProcessing || undefined"
-		:data-dragging="isDragging || undefined"
+		:data-highlighted="isHighlighted || undefined"
+		@click="isProcessing && $event.preventDefault()"
 		@dragenter="dropTargetProps.onDragenter"
 		@dragover="dropTargetProps.onDragover"
 		@dragleave="dropTargetProps.onDragleave"
@@ -38,12 +39,12 @@
 		<div class="flex flex-col items-center justify-center gap-1 text-contrast text-center">
 			<div
 				v-if="primaryPrompt && !isProcessing"
-				:class="['font-medium text-pretty', isDragging ? 'text-brand' : 'text-contrast']"
+				:class="['font-medium text-pretty', isHighlighted ? 'text-brand' : 'text-contrast']"
 			>
 				{{ primaryPrompt }}
 			</div>
 			<span
-				:class="['text-sm text-pretty', isDragging ? 'text-brand' : 'text-primary']"
+				:class="['text-sm text-pretty', isHighlighted ? 'text-brand' : 'text-primary']"
 				role="status"
 			>
 				{{ isProcessing ? processingPrompt : secondaryPrompt }}
@@ -63,9 +64,10 @@
 </template>
 
 <script setup lang="ts">
+import type { LocalFile } from '@modrinth/api-client'
 import { FolderUpIcon, SpinnerIcon } from '@modrinth/assets'
 import { fileIsValid } from '@modrinth/utils'
-import { computed, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 
 import { useFormatBytes } from '../../composables'
 import { useFileDropTarget } from '../../composables/file-drop'
@@ -77,6 +79,7 @@ const fileInput = ref<HTMLInputElement | null>(null)
 
 const emit = defineEmits<{
 	(e: 'change', files: File[]): void
+	(e: 'local-change', files: LocalFile[]): void
 }>()
 
 const props = withDefaults(
@@ -90,6 +93,8 @@ const props = withDefaults(
 		shouldAlwaysReset?: boolean
 		disabled?: boolean
 		size?: 'small' | 'medium' | 'large'
+		/** Emits native drops as local files through `local-change`, without reading them into memory. */
+		localFiles?: boolean
 	}>(),
 	{
 		primaryPrompt: 'Drop files here or click to upload',
@@ -105,10 +110,10 @@ const formatBytes = useFormatBytes()
 
 const files = ref<File[]>([])
 
-function matchesAccept(file: File, accept?: string): boolean {
+function matchesAccept(file: { name: string; type?: string }, accept?: string): boolean {
 	if (!accept || accept.trim() === '') return true
 
-	const fileType = file.type // e.g. "image/png"
+	const fileType = file.type ?? '' // e.g. "image/png"
 	const fileName = file.name.toLowerCase()
 
 	return accept
@@ -163,14 +168,36 @@ function addFiles(incoming: FileList | File[], shouldNotReset = false) {
 	if (fileInput.value) fileInput.value.value = ''
 }
 
+function addLocalFiles(incoming: LocalFile[]) {
+	const valid = incoming.filter((file) => {
+		if (!matchesAccept(file, props.accept)) {
+			addNotification({
+				title: 'Invalid file',
+				text: `The file "${file.name}" is not a valid file type for this project.`,
+				type: 'error',
+			})
+			return false
+		}
+		return fileIsValid(file, { maxSize: props.maxSize ?? undefined, alertOnInvalid: true }, formatBytes)
+	})
+
+	if (valid.length > 0) {
+		emit('local-change', valid)
+	}
+}
+
 const dropTargetRef = ref<HTMLElement | null>(null)
 const { isDragging, isProcessing, dropTargetProps } = useFileDropTarget({
 	target: dropTargetRef,
 	disabled: computed(() => props.disabled ?? false),
 	onFiles: (droppedFiles) => addFiles(droppedFiles),
+	onLocalFiles: props.localFiles ? addLocalFiles : undefined,
 })
 
+const isHighlighted = computed(() => isDragging.value || isProcessing.value)
+
 watch(isProcessing, (value) => (processing.value = value), { flush: 'sync' })
+onBeforeUnmount(() => (processing.value = false))
 
 function handleChange(e: Event) {
 	const input = e.target as HTMLInputElement
