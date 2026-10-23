@@ -468,9 +468,10 @@ export const telemetryDisclosureReviewPanel = panel({
 				label: 'Telemetry: Opt In',
 				group: 'Missing',
 			},
-			disabled: ({ selected }) =>
-				selected.toggleIds.includes('telemetry-disclosure-missing-opt-out') ||
-				selected.toggleIds.includes('telemetry-disclosure-missing-always'),
+			unselectToggles: [
+				'telemetry-disclosure-missing-opt-out',
+				'telemetry-disclosure-missing-always',
+			],
 		}),
 		toggle({
 			issue: disclosuresIssue,
@@ -480,9 +481,10 @@ export const telemetryDisclosureReviewPanel = panel({
 				label: 'Telemetry: Opt Out',
 				group: 'Missing',
 			},
-			disabled: ({ selected }) =>
-				selected.toggleIds.includes('telemetry-disclosure-missing-opt-in') ||
-				selected.toggleIds.includes('telemetry-disclosure-missing-always'),
+			unselectToggles: [
+				'telemetry-disclosure-missing-opt-in',
+				'telemetry-disclosure-missing-always',
+			],
 		}),
 		toggle({
 			issue: disclosuresIssue,
@@ -492,9 +494,10 @@ export const telemetryDisclosureReviewPanel = panel({
 				label: 'Telemetry: Always Online',
 				group: 'Missing',
 			},
-			disabled: ({ selected }) =>
-				selected.toggleIds.includes('telemetry-disclosure-missing-opt-in') ||
-				selected.toggleIds.includes('telemetry-disclosure-missing-opt-out'),
+			unselectToggles: [
+				'telemetry-disclosure-missing-opt-in',
+				'telemetry-disclosure-missing-opt-out',
+			],
 		}),
 	),
 )
