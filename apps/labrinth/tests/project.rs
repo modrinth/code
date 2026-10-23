@@ -381,7 +381,7 @@ async fn project_redirect_accepts_literal_and_encoded_plus() {
             r#"INSERT INTO project_redirects (slug, target_project_id)
 			VALUES ('redirect+alias', {target}), ('redirect%2balias', {percent_target})"#
         );
-        sqlx::raw_sql(&fixture_sql)
+        sqlx::raw_sql(sqlx::AssertSqlSafe(fixture_sql))
             .execute(&env.db.pool)
             .await
             .unwrap();
@@ -439,7 +439,8 @@ async fn project_redirect_cache_preserves_case_sensitive_ids() {
             r#"INSERT INTO project_redirects (slug, target_project_id)
 			VALUES ('{alias}', {target})"#
         );
-        sqlx::raw_sql(&fixture_sql)
+        assert!(alias.bytes().all(|byte| byte.is_ascii_alphanumeric()));
+        sqlx::raw_sql(sqlx::AssertSqlSafe(fixture_sql))
             .execute(&env.db.pool)
             .await
             .unwrap();

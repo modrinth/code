@@ -101,7 +101,7 @@ impl FileHost for S3Host {
         file_bytes: Bytes,
     ) -> Result<UploadFileData, FileHostingError> {
         let content_sha1 = sha1::Sha1::digest(&file_bytes).encode_hex();
-        let content_sha512 = format!("{:x}", sha2::Sha512::digest(&file_bytes));
+        let content_sha512 = hex::encode(sha2::Sha512::digest(&file_bytes));
         let content_length = file_bytes.len() as u32;
         let bucket = self.get_bucket(file_publicity);
 

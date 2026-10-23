@@ -563,7 +563,7 @@ fn hash_serializable(value: &impl Serialize) -> String {
         .expect("serializing cache key should not fail");
     let mut hasher = Sha256::new();
     hasher.update(bytes);
-    format!("{:x}", hasher.finalize())
+    hex::encode(hasher.finalize())
 }
 
 fn parse_version_id(version_id: &str) -> Option<DBVersionId> {

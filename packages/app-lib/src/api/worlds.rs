@@ -15,25 +15,25 @@ use crate::util::{io, server_ping};
 use crate::{ErrorKind, Result, State, launcher};
 use anyhow::Context;
 use async_minecraft_ping::ServerDescription;
-use async_walkdir::WalkDir;
-use async_zip::{Compression, ZipEntryBuilder};
+
 use chrono::{DateTime, Local, TimeZone, Utc};
 use either::Either;
 use enumset::{EnumSet, EnumSetType};
 use fs4::tokio::AsyncFileExt;
-use futures::StreamExt;
+
 use quartz_nbt::{NbtCompound, NbtTag};
 use regex::{Regex, RegexBuilder};
 use serde::{Deserialize, Serialize};
 use serde_json::value::RawValue;
 use std::cmp::Reverse;
+use std::fs as stdfs;
 use std::io::Cursor;
 use std::path::{Path, PathBuf};
 use std::sync::LazyLock;
 use std::time::Instant;
 use tokio::io::AsyncWriteExt;
 use tokio::task::JoinSet;
-use tokio_util::compat::FuturesAsyncWriteCompatExt;
+use tokio_util::sync::CancellationToken;
 use tracing::Instrument;
 use url::Url;
 
@@ -590,57 +590,93 @@ pub async fn reset_world_icon(instance: &Path, world: &str) -> Result<()> {
 
 pub async fn backup_world(instance: &Path, world: &str) -> Result<u64> {
     let world_dir = get_world_dir(instance, world);
-    let _lock = get_world_session_lock(&world_dir).await?;
+    let lock = get_world_session_lock(&world_dir).await?;
     let backups_dir = instance.join("backups");
+    let world = world.to_owned();
+    let cancel = CancellationToken::new();
+    let _cancel_guard = cancel.clone().drop_guard();
 
-    io::create_dir_all(&backups_dir).await?;
+    tokio::task::spawn_blocking(move || -> Result<u64> {
+        let _lock = lock;
+        stdfs::create_dir_all(&backups_dir)?;
+        let name_base = {
+            let now = Local::now();
+            let formatted_time = now.format("%Y-%m-%d_%H-%M-%S");
+            format!("{formatted_time}_{world}")
+        };
+        let output_path = backups_dir.join(find_available_name(
+            &backups_dir,
+            &name_base,
+            ".zip",
+        ));
+        let mut temporary = tempfile::NamedTempFile::new_in(&backups_dir)?;
+        let mut writer = zip::ZipWriter::new(temporary.as_file_mut());
+        let options = zip::write::SimpleFileOptions::default()
+            .compression_method(zip::CompressionMethod::Deflated)
+            .large_file(true);
+        let mut directories = vec![world_dir.clone()];
+        let mut buffer = vec![0; 256 * 1024];
 
-    let name_base = {
-        let now = Local::now();
-        let formatted_time = now.format("%Y-%m-%d_%H-%M-%S");
-        format!("{formatted_time}_{world}")
-    };
-    let output_path =
-        backups_dir.join(find_available_name(&backups_dir, &name_base, ".zip"));
-
-    let writer = tokio::fs::File::create(&output_path).await?;
-    let mut writer = async_zip::tokio::write::ZipFileWriter::with_tokio(writer);
-
-    let mut walker = WalkDir::new(&world_dir);
-    while let Some(entry) = walker.next().await {
-        let entry = entry.map_err(|e| io::IOError::IOPathError {
-            path: e.path().unwrap().to_string_lossy().to_string(),
-            source: e.into_io().unwrap(),
-        })?;
-        if !entry.file_type().await?.is_file() {
-            continue;
+        while let Some(directory) = directories.pop() {
+            for entry in stdfs::read_dir(&directory)? {
+                if cancel.is_cancelled() {
+                    return Err(std::io::Error::new(
+                        std::io::ErrorKind::Interrupted,
+                        "world backup cancelled",
+                    )
+                    .into());
+                }
+                let entry = entry?;
+                let file_type = entry.file_type()?;
+                if file_type.is_dir() {
+                    directories.push(entry.path());
+                    continue;
+                }
+                if !file_type.is_file() || entry.file_name() == "session.lock" {
+                    continue;
+                }
+                let path = entry.path();
+                let zip_filename = format!(
+                    "{world}/{}",
+                    path.strip_prefix(&world_dir)?
+                        .display()
+                        .to_string()
+                        .replace('\\', "/")
+                );
+                writer.start_file(zip_filename, options)?;
+                let mut source = stdfs::File::open(&path)?;
+                loop {
+                    if cancel.is_cancelled() {
+                        return Err(std::io::Error::new(
+                            std::io::ErrorKind::Interrupted,
+                            "world backup cancelled",
+                        )
+                        .into());
+                    }
+                    let count = std::io::Read::read(&mut source, &mut buffer)?;
+                    if count == 0 {
+                        break;
+                    }
+                    std::io::Write::write_all(&mut writer, &buffer[..count])?;
+                }
+            }
         }
-        if entry.file_name() == "session.lock" {
-            continue;
-        }
-        let zip_filename = format!(
-            "{world}/{}",
-            entry
-                .path()
-                .strip_prefix(&world_dir)?
-                .display()
-                .to_string()
-                .replace('\\', "/")
-        );
-        let mut stream = writer
-            .write_entry_stream(
-                ZipEntryBuilder::new(zip_filename.into(), Compression::Deflate)
-                    .build(),
+
+        writer.finish()?;
+        let size = temporary.as_file().metadata()?.len();
+        if cancel.is_cancelled() {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::Interrupted,
+                "world backup cancelled",
             )
-            .await?
-            .compat_write();
-        let mut source = tokio::fs::File::open(entry.path()).await?;
-        tokio::io::copy(&mut source, &mut stream).await?;
-        stream.into_inner().close().await?;
-    }
-
-    writer.close().await?;
-    Ok(io::metadata(output_path).await?.len())
+            .into());
+        }
+        temporary
+            .persist_noclobber(output_path)
+            .map_err(|error| error.error)?;
+        Ok(size)
+    })
+    .await?
 }
 
 fn find_available_name(dir: &Path, file_name: &str, extension: &str) -> String {
@@ -747,17 +783,18 @@ async fn get_world_session_lock(world: &Path) -> Result<tokio::fs::File> {
         .await?;
     file.write_all("☃".as_bytes()).await?;
     file.sync_all().await?;
-    let locked = file.try_lock_exclusive()?;
-    locked.then_some(file).ok_or_else(|| {
-        io::IOError::IOPathError {
+    match file.try_lock() {
+        Ok(()) => Ok(file),
+        Err(fs4::TryLockError::WouldBlock) => Err(io::IOError::IOPathError {
             source: std::io::Error::new(
                 std::io::ErrorKind::ResourceBusy,
                 "already locked by Minecraft",
             ),
             path: lock_path.to_string_lossy().into_owned(),
         }
-        .into()
-    })
+        .into()),
+        Err(fs4::TryLockError::Error(error)) => Err(error.into()),
+    }
 }
 
 async fn try_get_world_session_lock(
@@ -770,8 +807,11 @@ async fn try_get_world_session_lock(
         .open(world.join("session.lock"))
         .await?;
     file.sync_all().await?;
-    let locked = file.try_lock_exclusive()?;
-    Ok(locked.then_some(file))
+    match file.try_lock() {
+        Ok(()) => Ok(Some(file)),
+        Err(fs4::TryLockError::WouldBlock) => Ok(None),
+        Err(fs4::TryLockError::Error(error)) => Err(error.into()),
+    }
 }
 
 pub async fn add_server_to_instance(
@@ -1077,4 +1117,55 @@ async fn _get_server_status_new(
         enforces_secure_chat: false,
         ping: Some(latency),
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::backup_world;
+    use std::fs;
+    use std::io::Read;
+
+    #[tokio::test]
+    async fn backup_world_preserves_files_and_leaves_only_completed_zip() {
+        let instance = tempfile::tempdir().unwrap();
+        let world = instance.path().join("saves/World");
+        fs::create_dir_all(world.join("region/nested")).unwrap();
+        let level_data = b"world level data\0\xff";
+        let region_data: Vec<u8> =
+            (0..600_000).map(|index| (index % 251) as u8).collect();
+        fs::write(world.join("level.dat"), level_data).unwrap();
+        fs::write(world.join("region/nested/r.0.0.mca"), &region_data).unwrap();
+        fs::write(world.join("session.lock"), b"excluded root lock").unwrap();
+        fs::write(world.join("region/session.lock"), b"excluded nested lock")
+            .unwrap();
+
+        let size = backup_world(instance.path(), "World").await.unwrap();
+
+        let backups: Vec<_> = fs::read_dir(instance.path().join("backups"))
+            .unwrap()
+            .map(|entry| entry.unwrap().path())
+            .collect();
+        assert_eq!(backups.len(), 1, "unexpected partial backup artifacts");
+        assert_eq!(backups[0].extension().unwrap(), "zip");
+        assert_eq!(fs::metadata(&backups[0]).unwrap().len(), size);
+        let mut archive =
+            zip::ZipArchive::new(fs::File::open(&backups[0]).unwrap()).unwrap();
+        assert_eq!(archive.len(), 2);
+        let mut names: Vec<_> = archive
+            .file_names()
+            .map(|name| name.unwrap().into_owned())
+            .collect();
+        names.sort();
+        assert_eq!(names, ["World/level.dat", "World/region/nested/r.0.0.mca"]);
+        for (name, expected) in [
+            ("World/level.dat", level_data.as_slice()),
+            ("World/region/nested/r.0.0.mca", region_data.as_slice()),
+        ] {
+            let mut entry = archive.by_name(name).unwrap();
+            assert_eq!(entry.compression(), zip::CompressionMethod::Deflated);
+            let mut actual = Vec::new();
+            entry.read_to_end(&mut actual).unwrap();
+            assert_eq!(actual, expected);
+        }
+    }
 }
