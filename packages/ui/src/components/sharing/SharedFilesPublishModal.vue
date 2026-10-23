@@ -68,7 +68,7 @@
 			<SharedFilesStorageMeter
 				:used="selectedSize"
 				:limit="STORAGE_LIMIT_BYTES"
-				class="border-0 border-b border-solid border-surface-5 px-6 py-4"
+				class="px-6 py-4"
 			/>
 		</div>
 
