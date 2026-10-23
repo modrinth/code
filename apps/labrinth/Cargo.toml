@@ -123,9 +123,9 @@ sqlx = { workspace = true, features = [
 sqlx-tracing = { workspace = true, features = ["postgres"] }
 strum = { workspace = true, features = ["derive"] }
 thiserror = { workspace = true }
+toasty = { workspace = true, features = ["postgresql"] }
 tokio = { workspace = true, features = ["rt-multi-thread", "sync"] }
 tokio-stream = { workspace = true }
-toasty = { workspace = true, features = ["postgresql"] }
 totp-rs = { workspace = true, features = ["gen_secret"] }
 tracing = { workspace = true }
 tracing-actix-web = { workspace = true }
