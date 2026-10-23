@@ -1,18 +1,22 @@
 use eyre::eyre;
 use xredis::RedisPool;
 
+use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::project_item::ProjectQueryResult;
+use crate::database::models::thread_item::ThreadMessageBuilder;
 use crate::database::models::{
     DBProjectId, DBTeamId, DBThreadIssue, DBThreadIssueFacetId, DBUserId,
     DBVersionId,
 };
 use crate::database::{PgTransaction, models as db_models};
 use crate::models::ids::ProjectId;
+use crate::models::notifications::NotificationBody;
 use crate::models::projects::{Project, ProjectStatus, Version};
 use crate::models::thread_issues::{
     ThreadIssueContext, ThreadIssueTarget, ThreadIssueTeamMember,
     ThreadIssueValueState, ThreadIssueVerdict,
 };
+use crate::models::threads::MessageBody;
 use crate::models::users::User;
 use crate::routes::ApiError;
 use crate::routes::internal::delphi;
@@ -33,11 +37,13 @@ pub(crate) struct SyncedProjectState {
 }
 
 impl SyncedProjectState {
-    pub(crate) fn auto_approval_status(&self) -> Option<ProjectStatus> {
-        if !matches!(
-            self.project.status,
-            ProjectStatus::Rejected | ProjectStatus::Withheld
-        ) || self.has_outstanding_technical_review
+    pub(crate) fn status(&self) -> ProjectStatus {
+        self.project.status
+    }
+
+    fn auto_approval_status(&self) -> Option<ProjectStatus> {
+        if self.has_required_nags
+            || self.has_outstanding_technical_review
             || self.thread_issues.is_empty()
             || self
                 .thread_issues
@@ -55,6 +61,97 @@ impl SyncedProjectState {
                 })
                 .unwrap_or(ProjectStatus::Approved),
         )
+    }
+
+    async fn verify_facets(
+        &self,
+        transaction: &mut PgTransaction<'_>,
+    ) -> Result<(), ApiError> {
+        for facet in self.thread_issues.iter().flat_map(|issue| &issue.facets) {
+            DBThreadIssue::update_facet_flags(
+                facet.id.into(),
+                Some(true),
+                Some(true),
+                transaction,
+            )
+            .await
+            .wrap_internal_err("verifying project moderation issues")?;
+        }
+        Ok(())
+    }
+
+    pub(crate) async fn try_auto_approve(
+        &mut self,
+        transaction: &mut PgTransaction<'_>,
+        redis: &RedisPool,
+    ) -> Result<bool, ApiError> {
+        let Some(new_status) = self.auto_approval_status() else {
+            return Ok(false);
+        };
+        let old_status = self.project.status;
+
+        sqlx::query!(
+            r#"
+			UPDATE mods
+			SET status = $1, approved = COALESCE(approved, NOW())
+			WHERE id = $2
+			"#,
+            new_status.as_str(),
+            self.data.inner.id as DBProjectId,
+        )
+        .execute(&mut *transaction)
+        .await
+        .wrap_internal_err("auto-approving project")?;
+
+        self.verify_facets(transaction).await?;
+
+        ThreadMessageBuilder {
+            author_id: None,
+            body: MessageBody::AutoApproval {
+                old_status,
+                new_status,
+            },
+            thread_id: self.data.thread_id,
+            hide_identity: false,
+        }
+        .insert(transaction)
+        .await
+        .wrap_internal_err("recording project auto-approval")?;
+
+        let notified_members = sqlx::query!(
+            r#"
+			SELECT user_id
+			FROM team_members
+			WHERE team_id = $1 AND accepted
+			"#,
+            self.data.inner.team_id as DBTeamId,
+        )
+        .fetch_all(&mut *transaction)
+        .await
+        .wrap_internal_err("fetching project approval notification recipients")?
+        .into_iter()
+        .map(|row| DBUserId(row.user_id))
+        .collect::<Vec<_>>();
+
+        for body in [
+            NotificationBody::StatusChange {
+                project_id: self.data.inner.id.into(),
+                old_status,
+                new_status,
+            },
+            NotificationBody::ProjectStatusApproved {
+                project_id: self.data.inner.id.into(),
+            },
+        ] {
+            NotificationBuilder { body }
+                .insert_many(notified_members.clone(), transaction, redis)
+                .await
+                .wrap_internal_err("notifying project team of auto-approval")?;
+        }
+
+        self.data.inner.status = new_status;
+        self.project.status = new_status;
+        Ok(true)
     }
 
     pub(crate) fn can_address_facet(
@@ -87,13 +184,32 @@ pub(crate) async fn sync_project_state(
     transaction: &mut PgTransaction<'_>,
     redis: &RedisPool,
 ) -> Result<SyncedProjectState, ApiError> {
-    delphi::tech_review_queue::sync_projects(
+    let exited_projects = delphi::tech_review_queue::sync_projects(
         &[project_id],
         delphi::tech_review_queue::TechReviewRemovalReason::FileDeleted,
         transaction,
     )
     .await
     .wrap_api_err("synchronizing project technical review state")?;
+
+    let mut state = load_project_state(project_id, transaction, redis).await?;
+    if exited_projects.contains(&project_id)
+        && state.status() == ProjectStatus::Processing
+    {
+        state.try_auto_approve(transaction, redis).await?;
+    }
+    Ok(state)
+}
+
+/// Loads project state without reconciling technical review membership.
+/// Explicit review exits must not re-add a project based on its existing scan details.
+pub(crate) async fn load_project_state(
+    project_id: DBProjectId,
+    transaction: &mut PgTransaction<'_>,
+    redis: &RedisPool,
+) -> Result<SyncedProjectState, ApiError> {
+    delphi::tech_review_queue::lock_projects(&[project_id], transaction)
+        .await?;
 
     sqlx::query!("SELECT pg_advisory_xact_lock($1)", project_id.0)
         .fetch_one(&mut *transaction)
@@ -238,6 +354,28 @@ pub(crate) struct PreparedMutations {
     states: Vec<SyncedProjectState>,
 }
 
+pub(crate) async fn prepare_technical_review_exits(
+    project_ids: &[DBProjectId],
+    transaction: &mut PgTransaction<'_>,
+    redis: &RedisPool,
+) -> Result<PreparedMutations, ApiError> {
+    let mut project_ids = project_ids.to_vec();
+    project_ids.sort_by_key(|project_id| project_id.0);
+    project_ids.dedup();
+
+    let mut states = Vec::with_capacity(project_ids.len());
+    for project_id in project_ids {
+        let mut state =
+            load_project_state(project_id, transaction, redis).await?;
+        if state.status() == ProjectStatus::Processing {
+            state.try_auto_approve(transaction, redis).await?;
+        }
+        states.push(state);
+    }
+
+    Ok(PreparedMutations { states })
+}
+
 pub(crate) async fn prepare_mutations(
     project_ids: &[DBProjectId],
     transaction: &mut PgTransaction<'_>,
@@ -346,17 +484,7 @@ pub(crate) async fn finalize_project_edit(
             )));
         }
 
-        for facet in state.thread_issues.iter().flat_map(|issue| &issue.facets)
-        {
-            DBThreadIssue::update_facet_flags(
-                facet.id.into(),
-                Some(true),
-                Some(true),
-                &mut transaction,
-            )
-            .await
-            .wrap_internal_err("verifying project moderation issues")?;
-        }
+        state.verify_facets(&mut transaction).await?;
     }
 
     transaction
