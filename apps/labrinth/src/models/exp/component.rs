@@ -3,9 +3,9 @@ macro_rules! define {
 	(@entity) => { $crate::models::ids::ProjectId };
 	(@entity version) => { $crate::models::ids::VersionId };
 	(@context) => { $crate::models::exp::project::ProjectQueryContext };
-	(@context version) => { () };
+	(@context version) => { $crate::models::exp::version::VersionQueryContext };
 	(@requirements) => { $crate::models::exp::project::ProjectQueryRequirements };
-	(@requirements version) => { () };
+	(@requirements version) => { $crate::models::exp::version::VersionQueryRequirements };
     (
         $(#[$meta:meta])*
 		$vis:vis struct $name:ident $( : $entity:ident )? {
@@ -213,7 +213,7 @@ pub trait ComponentQuery: Sized {
     /// What information does this query type require from the database to
     /// populate itself (excluding the [`ComponentQuery::Component`])?
     ///
-    /// For example, if the [`ComponentQuery::Component`] has a projecet ID,
+    /// For example, if the [`ComponentQuery::Component`] has a project ID,
     /// this will add the project ID to `requirements`. This will require the
     /// fetcher to also fetch this project ID, which will be available in the
     /// [`ComponentQuery::Context`] during [`ComponentQuery::populate`].

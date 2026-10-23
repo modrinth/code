@@ -18,7 +18,7 @@ use std::cmp::Ordering;
 use std::collections::HashMap;
 use tracing::error;
 
-pub const VERSIONS_NAMESPACE: &str = "versions:v7";
+pub const VERSIONS_NAMESPACE: &str = "versions:v8";
 const VERSION_FILES_NAMESPACE: &str = "versions_files:v4";
 
 pub async fn cleanup_unused_attribution_files_and_groups(
@@ -798,7 +798,7 @@ impl DBVersion {
                     .await
                     .unwrap_or_default();
 
-                let res = sqlx::query!(
+                let version_rows = sqlx::query!(
                     r#"
                     SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,
                     v.changelog changelog, v.date_published date_published, v.downloads downloads,
@@ -809,10 +809,23 @@ impl DBVersion {
                     "#,
                     &version_ids
                 )
-                    .fetch(&mut exec)
-                    .map_err(eyre::Report::from)
+                    .fetch_all(&mut exec)
+                    .await
+                    .wrap_err("fetching version rows")?;
+
+                let version_components = version_rows.iter()
+                    .map(|row| (DBVersionId(row.id).into(), &row.components.0))
+                    .collect::<Vec<_>>();
+                let version_query_context = exp::version::fetch_query_context(
+                    &version_components,
+                    &mut exec,
+                    redis,
+                )
+                .await
+                .wrap_err("fetching version query context")?;
+
+                let res = version_rows.into_iter()
                     .try_fold(DashMap::new(), |acc, v| {
-						let result = {
                         let version_id = DBVersionId(v.id);
                         let VersionLoaderData {
                             loaders,
@@ -836,6 +849,9 @@ impl DBVersion {
                             .collect_vec();
 
                         let components_serial = v.components.0;
+                        let components = components_serial.clone()
+                            .into_query(version_id.into(), &version_query_context)
+                            .wrap_err("failed to populate query components")?;
                         let query_version = VersionQueryResult {
                             inner: DBVersion {
                                 id: DBVersionId(v.id),
@@ -893,17 +909,13 @@ impl DBVersion {
                             loaders,
                             project_types,
                             dependencies,
-                            // TODO populate
-                            components: exp::VersionQuery::default(),
+                            components,
                         };
 
                         acc.insert(v.id, query_version);
 							eyre::Ok(acc)
-						};
-                        async move { result }
                     })
-                    .await
-                    .wrap_err("fetching versions")?;
+                    .wrap_err("populating versions")?;
 
                 eyre::Ok(res)
             },
