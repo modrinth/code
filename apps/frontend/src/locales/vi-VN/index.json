@@ -1007,20 +1007,11 @@
   "collection.button.discover-mods": {
     "message": "Khám phá mod"
   },
-  "collection.button.edit-icon": {
-    "message": "Sửa biểu tượng"
-  },
   "collection.button.remove-icon": {
     "message": "Xoá biểu tượng"
   },
   "collection.button.remove-project": {
     "message": "Xoá dự án"
-  },
-  "collection.button.replace-icon": {
-    "message": "Thay thế biểu tượng"
-  },
-  "collection.button.select-icon": {
-    "message": "Chọn biểu tượng"
   },
   "collection.button.unfollow-project": {
     "message": "Bỏ theo dõi dự án"
@@ -1036,9 +1027,6 @@
   },
   "collection.description.following": {
     "message": "Bộ sưu tập được tạo tự động từ tất cả các dự án bạn đang theo dõi."
-  },
-  "collection.editing": {
-    "message": "Đang chỉnh sửa bộ sưu tập"
   },
   "collection.error.not-found": {
     "message": "Không tìm thấy bộ sưu tập"

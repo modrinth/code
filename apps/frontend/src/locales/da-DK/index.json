@@ -707,20 +707,11 @@
   "collection.button.discover-mods": {
     "message": "Udforsk mods"
   },
-  "collection.button.edit-icon": {
-    "message": "Rediger ikon"
-  },
   "collection.button.remove-icon": {
     "message": "Fjern ikon"
   },
   "collection.button.remove-project": {
     "message": "Slet projekt"
-  },
-  "collection.button.replace-icon": {
-    "message": "Udskift ikon"
-  },
-  "collection.button.select-icon": {
-    "message": "Vælg ikon"
   },
   "collection.button.unfollow-project": {
     "message": "Stop med at følge projekt"
@@ -736,9 +727,6 @@
   },
   "collection.description.following": {
     "message": "Auto-genererede samling af alle de projekter, du følger."
-  },
-  "collection.editing": {
-    "message": "Redigere samling"
   },
   "collection.error.not-found": {
     "message": "Samling ikke fundet"

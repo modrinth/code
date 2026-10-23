@@ -1007,20 +1007,11 @@
   "collection.button.discover-mods": {
     "message": "Discover mods"
   },
-  "collection.button.edit-icon": {
-    "message": "Edit icon"
-  },
   "collection.button.remove-icon": {
     "message": "Remove icon"
   },
   "collection.button.remove-project": {
     "message": "Remove project"
-  },
-  "collection.button.replace-icon": {
-    "message": "Replace icon"
-  },
-  "collection.button.select-icon": {
-    "message": "Select icon"
   },
   "collection.button.unfollow-project": {
     "message": "Unfollow project"
@@ -1034,14 +1025,20 @@
   "collection.description": {
     "message": "{description} - View the collection {name} by {username} on Modrinth"
   },
+  "collection.description-placeholder": {
+    "message": "This is a collection of..."
+  },
   "collection.description.following": {
     "message": "Auto-generated collection of all the projects you're following."
   },
-  "collection.editing": {
-    "message": "Editing collection"
+  "collection.edit": {
+    "message": "Edit collection"
   },
   "collection.error.not-found": {
     "message": "Collection not found"
+  },
+  "collection.icon-label": {
+    "message": "Icon"
   },
   "collection.label.created-at": {
     "message": "Created {ago}"
@@ -1057,6 +1054,9 @@
   },
   "collection.label.updated-at": {
     "message": "Updated {ago}"
+  },
+  "collection.name-placeholder": {
+    "message": "Enter collection name..."
   },
   "collection.return-link.dashboard-collections": {
     "message": "Your collections"

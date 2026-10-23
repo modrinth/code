@@ -983,20 +983,11 @@
   "collection.button.discover-mods": {
     "message": "Mods ontdekken"
   },
-  "collection.button.edit-icon": {
-    "message": "Bewerk icoon"
-  },
   "collection.button.remove-icon": {
     "message": "Pictogram verwijderen"
   },
   "collection.button.remove-project": {
     "message": "Verwijder project"
-  },
-  "collection.button.replace-icon": {
-    "message": "Pictogram vervangen"
-  },
-  "collection.button.select-icon": {
-    "message": "Select icon"
   },
   "collection.button.unfollow-project": {
     "message": "Ontvolg project"
@@ -1012,9 +1003,6 @@
   },
   "collection.description.following": {
     "message": "Automatisch gegenereerde collectie van alle projecten die je volgt."
-  },
-  "collection.editing": {
-    "message": "Verzameling bewerken"
   },
   "collection.error.not-found": {
     "message": "Collectie niet gevonden"

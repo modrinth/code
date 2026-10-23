@@ -1001,20 +1001,11 @@
   "collection.button.discover-mods": {
     "message": "Найти моды"
   },
-  "collection.button.edit-icon": {
-    "message": "Изменить иконку"
-  },
   "collection.button.remove-icon": {
     "message": "Удалить иконку"
   },
   "collection.button.remove-project": {
     "message": "Удалить проект"
-  },
-  "collection.button.replace-icon": {
-    "message": "Заменить иконку"
-  },
-  "collection.button.select-icon": {
-    "message": "Выбрать иконку"
   },
   "collection.button.unfollow-project": {
     "message": "Отписаться от проекта"
@@ -1030,9 +1021,6 @@
   },
   "collection.description.following": {
     "message": "Создана автоматически на основе всех отслеживаемых проектов."
-  },
-  "collection.editing": {
-    "message": "Настройка коллекции"
   },
   "collection.error.not-found": {
     "message": "Коллекция не найдена"
