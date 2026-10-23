@@ -5,6 +5,9 @@
 		:files="filesQuery.data.value?.files ?? []"
 		:changes-description="changesDescription"
 		:confirm-label="confirmLabel"
+		:restart-confirm-label="restartConfirmLabel"
+		:requires-restart="requiresRestart"
+		:restart-disabled="!canUsePowerActions"
 		allow-empty
 		:disabled="disabled"
 		:changes-loading="loading"
@@ -23,6 +26,7 @@ import { useQuery } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
 import SharedFilesPublishModal from '#ui/components/sharing/SharedFilesPublishModal.vue'
+import { useServerPermissions } from '#ui/composables/server-permissions'
 import type { ContentDiffItem } from '#ui/layouts/shared/installation-settings/types'
 import { injectAuth, injectModrinthClient } from '#ui/providers'
 
@@ -34,19 +38,22 @@ const props = defineProps<{
 	diffs: ContentDiffItem[]
 	changesDescription?: string
 	confirmLabel?: string
+	restartConfirmLabel?: string
+	requiresRestart?: boolean
 	loading?: boolean
 	error?: boolean
 	disabled?: boolean
 }>()
 
 const emit = defineEmits<{
-	confirm: [paths: string[]]
+	confirm: [paths: string[], restart: boolean]
 	cancel: []
 	retry: []
 }>()
 
 const client = injectModrinthClient()
 const auth = injectAuth()
+const { canUsePowerActions } = useServerPermissions()
 const modal = ref<InstanceType<typeof SharedFilesPublishModal>>()
 const open = ref(false)
 const filesQuery = useQuery(
@@ -71,9 +78,9 @@ function hide() {
 	modal.value?.hide()
 }
 
-function confirm(paths: string[]) {
+function confirm(paths: string[], restart: boolean) {
 	open.value = false
-	emit('confirm', paths)
+	emit('confirm', paths, restart)
 }
 
 function cancel() {

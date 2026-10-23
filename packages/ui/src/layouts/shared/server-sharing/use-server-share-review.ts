@@ -24,6 +24,7 @@ export type ServerShareActionTarget = {
 	worldId: string
 	userId: string | undefined
 	configPaths: string[]
+	restart?: boolean
 	isCurrent: () => boolean
 }
 
@@ -136,6 +137,7 @@ export function useServerShareReview<Action extends string = 'push'>(options?: {
 			serverId,
 			target.worldId,
 			target.configPaths,
+			{ restart: target.restart },
 		)
 		await Promise.all([
 			queryClient.invalidateQueries({ queryKey: ['servers', 'v1', 'detail', serverId] }),
@@ -146,12 +148,21 @@ export function useServerShareReview<Action extends string = 'push'>(options?: {
 		return shared
 	}
 
-	/** Runs `action` for the current world, pushing `configPaths` alongside the world's content. */
-	async function runAction(action: Action, reviewed = false, configPaths: string[] = []) {
+	/**
+	 * Runs `action` for the current world, pushing `configPaths` alongside the world's content.
+	 * `restart` decides whether a push restarts the server to load server-side changes.
+	 */
+	async function runAction(
+		action: Action,
+		reviewed = false,
+		configPaths: string[] = [],
+		restart?: boolean,
+	) {
 		if (pending.value) return
 		const target = currentTarget()
 		if (!target) return
 		target.configPaths = configPaths
+		target.restart = restart
 		await executeAction(action, target, reviewed)
 	}
 

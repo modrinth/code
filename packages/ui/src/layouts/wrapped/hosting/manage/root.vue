@@ -1145,9 +1145,9 @@ watch(
 			return
 		}
 
-		applyInstallationCompletion(current.key)
-		installationServerSnapshot = null
 		dismissInstallation(current.id)
+		installationServerSnapshot = null
+		applyInstallationCompletion(current.key)
 		void invalidateAfterInstall()
 	},
 	{ flush: 'sync' },

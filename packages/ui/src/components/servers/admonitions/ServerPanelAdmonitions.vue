@@ -517,10 +517,11 @@ function onInstallationDismiss() {
 		:server-id="ctx.serverId"
 		:world-id="ctx.worldId.value ?? undefined"
 		:diffs="previewQuery.data.value?.items ?? []"
+		:requires-restart="previewQuery.data.value?.diff.requires_restart"
 		:loading="previewQuery.isFetching.value"
 		:error="previewQuery.isError.value"
 		:disabled="!canSetup || sharePending || previewQuery.isError.value || !previewQuery.data.value"
-		@confirm="(paths) => runAction('push', true, paths)"
+		@confirm="(paths, restart) => runAction('push', true, paths, restart)"
 		@cancel="previewOpen = false"
 		@retry="previewQuery.refetch()"
 	/>

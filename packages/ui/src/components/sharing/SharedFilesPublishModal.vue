@@ -3,6 +3,7 @@
 		ref="modal"
 		:header="formatMessage(messages.header)"
 		:on-hide="handleHide"
+		:fade="requiresRestart ? 'warning' : undefined"
 		max-width="544px"
 		width="544px"
 		no-padding
@@ -77,7 +78,26 @@
 					<XIcon />
 					{{ formatMessage(commonMessages.cancelButton) }}
 				</Button>
-				<Button type="colored" color="brand" :disabled="confirmDisabled" @click="handleConfirm">
+				<SplitButton
+					v-if="requiresRestart"
+					type="colored"
+					color="orange"
+					:disabled="confirmDisabled"
+					:primary-disabled="restartDisabled"
+					:options="restartOptions"
+					:menu-label="formatMessage(messages.moreOptions)"
+					@click="handleConfirm(true)"
+				>
+					<RotateCounterClockwiseIcon />
+					{{ restartConfirmLabel ?? formatMessage(messages.pushAndRestartButton) }}
+				</SplitButton>
+				<Button
+					v-else
+					type="colored"
+					color="brand"
+					:disabled="confirmDisabled"
+					@click="handleConfirm(false)"
+				>
 					<UploadIcon />
 					{{ confirmLabel ?? formatMessage(messages.publishButton) }}
 				</Button>
@@ -87,11 +107,11 @@
 </template>
 
 <script setup lang="ts">
-import { SpinnerIcon, UploadIcon, XIcon } from '@modrinth/assets'
+import { RotateCounterClockwiseIcon, SpinnerIcon, UploadIcon, XIcon } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
-import { Button } from '#ui/components/base/buttons'
+import { Button, type ButtonMenuOption, SplitButton } from '#ui/components/base/buttons'
 import FileTreeSelect, { type FileTreeSelectItem } from '#ui/components/base/FileTreeSelect.vue'
 import Tabs, { type TabsTab, type TabsValue } from '#ui/components/base/Tabs.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
@@ -115,6 +135,10 @@ const props = defineProps<{
 	files: SharedFilesPublishFile[]
 	changesDescription?: string
 	confirmLabel?: string
+	restartConfirmLabel?: string
+	/** Pushing loads server-side changes, so the primary action also restarts the server. */
+	requiresRestart?: boolean
+	restartDisabled?: boolean
 	/** Allows pushing when nothing changed and no files are selected. */
 	allowEmpty?: boolean
 	disabled?: boolean
@@ -125,7 +149,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-	confirm: [paths: string[]]
+	confirm: [paths: string[], restart: boolean]
 	cancel: []
 	'retry-changes': []
 	'retry-files': []
@@ -168,6 +192,14 @@ const confirmDisabled = computed(
 		selectedSize.value > STORAGE_LIMIT_BYTES ||
 		(!props.allowEmpty && props.diffs.length === 0 && selectedFiles.value.length === 0),
 )
+const restartOptions = computed<ButtonMenuOption[]>(() => [
+	{
+		id: 'push-only',
+		label: formatMessage(messages.pushOnlyButton),
+		icon: UploadIcon,
+		action: () => handleConfirm(false),
+	},
+])
 
 /** Opens the review. Pass `keepSelection` to reopen it without losing the picked files. */
 function show(options?: { event?: MouseEvent; keepSelection?: boolean }) {
@@ -202,12 +234,12 @@ function scrollFileTreeToTop() {
 	}
 }
 
-function handleConfirm() {
-	if (confirmDisabled.value) return
+function handleConfirm(restart: boolean) {
+	if (confirmDisabled.value || (restart && props.restartDisabled)) return
 	const paths = selectedFiles.value.map((file) => file.path)
 	closingFromAction.value = true
 	hide()
-	emit('confirm', paths)
+	emit('confirm', paths, restart)
 	closingFromAction.value = false
 }
 
@@ -252,6 +284,18 @@ const messages = defineMessages({
 	publishButton: {
 		id: 'instance.shared-instance.publish-review.publish-button',
 		defaultMessage: 'Push update',
+	},
+	pushAndRestartButton: {
+		id: 'instance.shared-instance.publish-review.push-and-restart-button',
+		defaultMessage: 'Push and restart',
+	},
+	pushOnlyButton: {
+		id: 'instance.shared-instance.publish-review.push-only-button',
+		defaultMessage: 'Push update only',
+	},
+	moreOptions: {
+		id: 'instance.shared-instance.publish-review.more-options',
+		defaultMessage: 'More push options',
 	},
 	addedLabel: {
 		id: 'instance.shared-instance.publish-review.added-label',

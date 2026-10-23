@@ -147,11 +147,7 @@ export function useServerInstallationTracker(options: UseServerInstallationTrack
 				) {
 					continue
 				}
-				if (
-					!optimistic &&
-					!seenActiveIds.value.has(id) &&
-					options.server.value?.status !== 'installing'
-				) {
+				if (!optimistic && !seenActiveIds.value.has(id)) {
 					continue
 				}
 			}
@@ -283,6 +279,7 @@ export function useServerInstallationTracker(options: UseServerInstallationTrack
 			optimistic !== null && snapshotRevision.value > optimistic.startRevision
 		const nextSeenActiveIds = new Set(seenActiveIds.value)
 		const nextDismissedIds = new Set(dismissedIds.value)
+		const serverInstalling = options.server.value?.status === 'installing'
 		let hasAuthoritativeInstallation = false
 		for (const item of items) {
 			if (item.world_id !== options.worldId.value || item.key.type === 'file') continue
@@ -294,6 +291,8 @@ export function useServerInstallationTracker(options: UseServerInstallationTrack
 			if (item.error == null && item.progress != null && item.progress < 100) {
 				nextSeenActiveIds.add(id)
 				nextDismissedIds.delete(id)
+			} else if (serverInstalling && item.error == null && item.progress === 100) {
+				nextSeenActiveIds.add(id)
 			}
 		}
 		seenActiveIds.value = nextSeenActiveIds

@@ -292,6 +292,7 @@ export namespace Archon {
 			export type ShareWorldContentResponse = {
 				shared_instance_id: string
 				version: number | null
+				restarted: boolean
 			}
 
 			export type SharedContentChange<T> =
@@ -315,6 +316,7 @@ export namespace Archon {
 				latest_version: number
 				local_updated_at: string
 				has_changes: boolean
+				requires_restart: boolean
 				diffs: SharedContentDiffEntry[]
 				projects: Record<string, { name: string; icon_url: string | null }>
 				versions: Record<
@@ -939,6 +941,7 @@ export namespace Archon {
 			export type WorldContentInfo = {
 				shared_instance_id: string | null
 				shared_instance_needs_update: boolean
+				requires_restart: boolean
 				modloader: string
 				modloader_version: string
 				game_version: string
@@ -1332,6 +1335,7 @@ export namespace Archon {
 				world_id: string
 				shared_instance_id: string
 				needs_update: boolean
+				requires_restart: boolean
 			}
 
 			export type WorldSharedInstanceDeleteEvent = {

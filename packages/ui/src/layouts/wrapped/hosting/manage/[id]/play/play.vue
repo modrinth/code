@@ -72,12 +72,16 @@
 				previewAction === 'play' ? formatMessage(messages.shareChangesPlayBody) : undefined
 			"
 			:confirm-label="previewAction === 'play' ? formatMessage(messages.pushAndPlay) : undefined"
+			:restart-confirm-label="
+				previewAction === 'play' ? formatMessage(messages.pushRestartAndPlay) : undefined
+			"
+			:requires-restart="previewQuery.data.value?.diff.requires_restart"
 			:loading="previewQuery.isFetching.value"
 			:error="previewQuery.isError.value"
 			:disabled="
 				!canSetup || actionsLocked || previewQuery.isError.value || !previewQuery.data.value
 			"
-			@confirm="(paths) => perform(previewAction, true, paths)"
+			@confirm="(paths, restart) => perform(previewAction, true, paths, restart)"
 			@cancel="previewOpen = false"
 			@retry="previewQuery.refetch()"
 		/>
@@ -283,13 +287,18 @@ async function ensureServerRunning(sameContext: () => boolean) {
 		await new Promise((resolve) => setTimeout(resolve, 500))
 	}
 }
-async function perform(action: Action, reviewed = false, configPaths: string[] = []) {
+async function perform(
+	action: Action,
+	reviewed = false,
+	configPaths: string[] = [],
+	restart?: boolean,
+) {
 	if (!worldId.value || actionsLocked.value) return
 	if (action === 'play' && !reviewed && canSetup.value && needsUpdate.value) {
 		void showPreview(true)
 		return
 	}
-	await runAction(action, reviewed, configPaths)
+	await runAction(action, reviewed, configPaths, restart)
 }
 async function showPreview(playAfter = false) {
 	if (actionsLocked.value) return
@@ -357,6 +366,10 @@ const messages = defineMessages({
 	},
 	invitedPlayersTitle: { id: 'servers.play.players.title', defaultMessage: 'Invited players' },
 	pushAndPlay: { id: 'servers.play.push-and-play', defaultMessage: 'Push update and play' },
+	pushRestartAndPlay: {
+		id: 'servers.play.push-restart-and-play',
+		defaultMessage: 'Push, restart and play',
+	},
 	shareChangesPlayBody: {
 		id: 'servers.play.share-changes-play-body',
 		defaultMessage:

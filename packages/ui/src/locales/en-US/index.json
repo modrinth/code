@@ -2843,8 +2843,17 @@
   "instance.shared-instance.publish-review.loading-files": {
     "defaultMessage": "Loading files…"
   },
+  "instance.shared-instance.publish-review.more-options": {
+    "defaultMessage": "More push options"
+  },
   "instance.shared-instance.publish-review.publish-button": {
     "defaultMessage": "Push update"
+  },
+  "instance.shared-instance.publish-review.push-and-restart-button": {
+    "defaultMessage": "Push and restart"
+  },
+  "instance.shared-instance.publish-review.push-only-button": {
+    "defaultMessage": "Push update only"
   },
   "instance.shared-instance.publish-review.removed-label": {
     "defaultMessage": "Removed"
@@ -6583,6 +6592,9 @@
   },
   "servers.play.push-and-play": {
     "defaultMessage": "Push update and play"
+  },
+  "servers.play.push-restart-and-play": {
+    "defaultMessage": "Push, restart and play"
   },
   "servers.play.refreshing-preview": {
     "defaultMessage": "Refreshing changes…"
