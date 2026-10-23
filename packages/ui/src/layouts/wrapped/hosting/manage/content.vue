@@ -8,6 +8,7 @@ import ReadyTransition from '#ui/components/base/ReadyTransition.vue'
 import { switchCurseForgeModpackFile } from '#ui/components/flows/creation-flow-modal/curseforge'
 import UnknownFileWarningModal from '#ui/components/modal/UnknownFileWarningModal.vue'
 import type { UpdateAllSelection } from '#ui/components/modal/update-all-modal/update-all-modal-types'
+import { serverPlayMigrationMessages } from '#ui/components/servers/play-migration/messages'
 import { useUploadSessionUpload } from '#ui/composables/hosting/kyros-session-upload'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import {
@@ -26,6 +27,7 @@ import {
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
+	injectServerPlayMigration,
 	injectServerSettingsModal,
 } from '#ui/providers'
 import { commonMessages } from '#ui/utils/common-messages'
@@ -148,6 +150,7 @@ const {
 	uploadState,
 	cancelUpload,
 } = injectModrinthServerContext()
+const serverPlayMigration = injectServerPlayMigration(null)
 const contentUploadSession = useUploadSessionUpload({
 	client,
 	scope: 'content',
@@ -907,7 +910,7 @@ onUnmounted(() => {
 })
 
 async function handleSetEnabledFor(item: ContentItem, side: ContentSide, enabled: boolean) {
-	if (contentActionDisabled.value) return
+	if (contentActionDisabled.value || serverPlayMigration?.required.value) return
 	const addon = getAddonForItem(item)
 	if (!addon || (side === 'server' && isPlayerOnlyContent(addon))) return
 	const targetWorldId = worldId.value
@@ -1194,8 +1197,13 @@ function addonToContentItem(addon: AddonWithUiState): ContentItem {
 			: undefined
 	const serverEnabled = !isPlayerOnlyContent(addon) && !addon.disabled_server
 	const playerEnabled = !addon.disabled_player
-	const lockedSides: ContentSide[] = isPlayerOnlyContent(addon) ? ['server'] : []
-	const warning = getEnabledForWarning(addon)
+	const needsMigration = !!serverPlayMigration?.required.value
+	const lockedSides: ContentSide[] = needsMigration
+		? ['server', 'player']
+		: isPlayerOnlyContent(addon)
+			? ['server']
+			: []
+	const warning = needsMigration ? undefined : getEnabledForWarning(addon)
 	return {
 		project: {
 			...(projectMetadata ?? {}),
@@ -1230,11 +1238,13 @@ function addonToContentItem(addon: AddonWithUiState): ContentItem {
 			server: serverEnabled,
 			player: playerEnabled,
 			locked: lockedSides.length > 0,
-			lockedTooltip: isPlayerOnlyContent(addon)
-				? formatMessage(
-						addon.kind === 'resourcepack' ? messages.resourcePackLock : messages.shaderLock,
-					)
-				: undefined,
+			lockedTooltip: needsMigration
+				? formatMessage(serverPlayMigrationMessages.contentLocked)
+				: isPlayerOnlyContent(addon)
+					? formatMessage(
+							addon.kind === 'resourcepack' ? messages.resourcePackLock : messages.shaderLock,
+						)
+					: undefined,
 			disabledSides: lockedSides,
 			warningTooltip: warning?.tooltip,
 			warningKind: warning?.kind,

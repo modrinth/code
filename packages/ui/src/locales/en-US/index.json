@@ -6491,6 +6491,60 @@
   "servers.notice.undismissable": {
     "defaultMessage": "Undismissable"
   },
+  "servers.play-migration.acknowledge": {
+    "defaultMessage": "I understand my server will be reinstalled and restarted."
+  },
+  "servers.play-migration.backup.description": {
+    "defaultMessage": "We’ll make a backup you can restore if anything goes wrong called “{name}”."
+  },
+  "servers.play-migration.backup.name": {
+    "defaultMessage": "Before reinstalling content"
+  },
+  "servers.play-migration.backup.title": {
+    "defaultMessage": "Backup your server"
+  },
+  "servers.play-migration.confirm": {
+    "defaultMessage": "Backup & reinstall"
+  },
+  "servers.play-migration.content-locked": {
+    "defaultMessage": "Get your server ready from the Play tab to choose where content is enabled."
+  },
+  "servers.play-migration.description": {
+    "defaultMessage": "Since your server’s content was installed before this update, we’ll need to make a few changes to get it ready to share with friends!"
+  },
+  "servers.play-migration.in-progress": {
+    "defaultMessage": "Getting your server ready to share with friends. This may take a few minutes."
+  },
+  "servers.play-migration.reinstall.custom-description": {
+    "defaultMessage": "We’ll reinstall your content and enable it for the server, players, or both based on each project’s environment."
+  },
+  "servers.play-migration.reinstall.modpack-description": {
+    "defaultMessage": "We’ll reinstall {modpack} and enable content for the server, players, or both based on each project’s environment."
+  },
+  "servers.play-migration.reinstall.title": {
+    "defaultMessage": "Reinstall your content"
+  },
+  "servers.play-migration.restart.description": {
+    "defaultMessage": "We’ll restart your server which may take a few minutes."
+  },
+  "servers.play-migration.restart.title": {
+    "defaultMessage": "Restart your server"
+  },
+  "servers.play-migration.step.backup": {
+    "defaultMessage": "Backing up your server"
+  },
+  "servers.play-migration.step.reinstall": {
+    "defaultMessage": "Reinstalling your content"
+  },
+  "servers.play-migration.step.restart": {
+    "defaultMessage": "Restarting your server"
+  },
+  "servers.play-migration.title": {
+    "defaultMessage": "Get your server ready"
+  },
+  "servers.play-migration.what-will-happen": {
+    "defaultMessage": "What will happen"
+  },
   "servers.play.busy": {
     "defaultMessage": "Wait for the current server operation to finish."
   },

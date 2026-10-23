@@ -141,7 +141,7 @@ import {
 	UploadIcon,
 } from '@modrinth/assets'
 import { commonMessages, defineMessages, useVIntl } from '@modrinth/ui'
-import { computed, defineAsyncComponent, h, onMounted, ref, watch } from 'vue'
+import { computed, h, markRaw, onMounted, ref, watch } from 'vue'
 
 import { useDebugLogger } from '#ui/composables/debug-logger'
 
@@ -311,16 +311,14 @@ async function search(query: string) {
 		ctx.projectSearchOptions.value = results.hits.map((hit) => ({
 			label: hit.title,
 			value: hit.project_id,
-			icon: defineAsyncComponent(() =>
-				Promise.resolve({
-					setup: () => () =>
-						h('img', {
-							src: hit.icon_url,
-							alt: hit.title,
-							class: 'h-5 w-5 rounded',
-						}),
-				}),
-			),
+			icon: markRaw({
+				setup: () => () =>
+					h('img', {
+						src: hit.icon_url,
+						alt: hit.title,
+						class: 'h-5 w-5 rounded',
+					}),
+			}),
 		}))
 	} catch (error) {
 		debug('project search failed:', error)

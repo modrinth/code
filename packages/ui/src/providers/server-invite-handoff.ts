@@ -15,6 +15,11 @@ export interface ServerInviteBinding {
 	onCancel: (user: InvitePlayersUser) => void
 }
 
+export interface ServerInviteMigrationBinding {
+	modpackName: string | null
+	start: () => Promise<boolean>
+}
+
 /**
  * Lets a root-level modal take over the server play page's invite flow, so the invite
  * players content is rendered inside the modal that is already open instead of a second modal.
@@ -22,8 +27,10 @@ export interface ServerInviteBinding {
 export interface ServerInviteHandoff {
 	requested: Ref<boolean>
 	binding: ShallowRef<ComputedRef<ServerInviteBinding> | null>
+	migration: ShallowRef<ServerInviteMigrationBinding | null>
 	request: () => void
 	provide: (binding: ComputedRef<ServerInviteBinding>) => void
+	provideMigration: (migration: ServerInviteMigrationBinding) => void
 	cancel: () => void
 }
 
@@ -33,9 +40,11 @@ export const [injectServerInviteHandoff, provideServerInviteHandoff] =
 export function createServerInviteHandoff(): ServerInviteHandoff {
 	const requested = ref(false)
 	const binding = shallowRef<ComputedRef<ServerInviteBinding> | null>(null)
+	const migration = shallowRef<ServerInviteMigrationBinding | null>(null)
 
 	function request() {
 		binding.value = null
+		migration.value = null
 		requested.value = true
 	}
 
@@ -43,10 +52,15 @@ export function createServerInviteHandoff(): ServerInviteHandoff {
 		if (requested.value) binding.value = next
 	}
 
+	function provideMigration(next: ServerInviteMigrationBinding) {
+		if (requested.value) migration.value = next
+	}
+
 	function cancel() {
 		requested.value = false
 		binding.value = null
+		migration.value = null
 	}
 
-	return { requested, binding, request, provide, cancel }
+	return { requested, binding, migration, request, provide, provideMigration, cancel }
 }

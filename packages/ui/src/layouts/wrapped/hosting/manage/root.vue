@@ -301,6 +301,18 @@
 			:browse-modpacks="handleBrowseModpacks"
 		/>
 	</Suspense>
+	<ServerPlayMigrationModal
+		ref="serverPlayMigrationModal"
+		:modpack-name="serverPlayMigration.modpackName.value"
+		:disabled="!canSetup || serverPlayMigration.step.value !== 'idle'"
+		@confirm="confirmServerPlayMigration"
+	/>
+	<ServerInviteLinkModal
+		ref="serverInviteLinkModal"
+		:server-id="serverId"
+		:world-id="worldId"
+		:site-url="siteUrl ?? ''"
+	/>
 	<ConfirmLeaveModal
 		ref="confirmLeaveModal"
 		:header="formatMessage(leaveMessages.uploadInProgress)"
@@ -354,8 +366,11 @@ import ConfirmLeaveModal from '#ui/components/modal/ConfirmLeaveModal.vue'
 import ServerPanelAdmonitions from '#ui/components/servers/admonitions/ServerPanelAdmonitions.vue'
 import ServerIcon from '#ui/components/servers/icons/ServerIcon.vue'
 import MedalServerCountdown from '#ui/components/servers/marketing/MedalServerCountdown.vue'
+import { serverPlayMigrationMessages } from '#ui/components/servers/play-migration/messages'
+import ServerPlayMigrationModal from '#ui/components/servers/play-migration/ServerPlayMigrationModal.vue'
 import { PanelServerActionButton } from '#ui/components/servers/server-header'
 import ServerSettingsModal from '#ui/components/servers/ServerSettingsModal.vue'
+import ServerInviteLinkModal from '#ui/components/sharing/server-invite-link/ServerInviteLinkModal.vue'
 import {
 	hasServerPermission,
 	useDebugLogger,
@@ -374,6 +389,7 @@ import type {
 } from '#ui/composables/server-installation-tracker'
 import { useServerManageCoreRuntime } from '#ui/composables/server-manage-core-runtime'
 import { useServerPanelSync } from '#ui/composables/server-panel-sync'
+import { useServerPlayMigration } from '#ui/composables/server-play-migration'
 import { useServerPreferences } from '#ui/composables/server-preferences'
 import type { LogLine } from '#ui/layouts/shared/console'
 import type { ServerSettingsTabId } from '#ui/layouts/shared/server-settings'
@@ -381,7 +397,9 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	injectServerOnboardingFlow,
+	provideServerPlayMigration,
 	provideServerSettingsModal,
+	type ServerPlayMigrationNext,
 } from '#ui/providers'
 import type { ServerStats } from '#ui/providers/server-context'
 import { commonMessages } from '#ui/utils/common-messages'
@@ -544,7 +562,12 @@ const { data: serverContent } = useQuery({
 
 const headerPlatform = computed(() => resolveServerPlatform(serverData.value, serverContent.value))
 
-const { handleWsBackupProgress, busyReasons: backupsBusy } = useServerBackupsQueue(
+const {
+	handleWsBackupProgress,
+	busyReasons: backupsBusy,
+	backups,
+	invalidate: invalidateBackups,
+} = useServerBackupsQueue(
 	computed(() => props.serverId),
 	worldId,
 )
@@ -595,6 +618,39 @@ const {
 	eventGuard: () => isMounted.value,
 	onStateEvent,
 })
+
+const serverPlayMigrationModal = ref<InstanceType<typeof ServerPlayMigrationModal>>()
+const serverPlayMigration = useServerPlayMigration({
+	serverId: props.serverId,
+	worldId,
+	serverFull,
+	content: serverContent,
+	backups,
+	invalidateBackups,
+	installation,
+	powerState: serverPowerState,
+	beginInstallation,
+	cancelOptimisticInstallation,
+	backupName: () => formatMessage(serverPlayMigrationMessages.backupName),
+	prompt: (next) => {
+		pendingServerPlayMigrationNext = next
+		serverPlayMigrationModal.value?.show()
+	},
+	onMigrated: (next) => {
+		if (next === 'invite') serverInviteLinkModal.value?.show()
+		else next()
+	},
+})
+provideServerPlayMigration(serverPlayMigration)
+const serverInviteLinkModal = ref<InstanceType<typeof ServerInviteLinkModal>>()
+let pendingServerPlayMigrationNext: ServerPlayMigrationNext | undefined
+
+function confirmServerPlayMigration() {
+	const next = pendingServerPlayMigrationNext
+	pendingServerPlayMigrationNext = undefined
+	serverPlayMigrationModal.value?.hide()
+	void serverPlayMigration.start(next)
+}
 
 const globalInviteForServer = computed(
 	() =>

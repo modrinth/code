@@ -2,7 +2,7 @@
 	<div class="relative flex flex-col gap-6">
 		<ServerPlayCard
 			:address="serverAddress"
-			:disabled="actionsLocked || !worldId || (!canSetup && !sharedInstanceId)"
+			:disabled="actionsLocked || migrating || !worldId || (!canSetup && !sharedInstanceId)"
 			:pending-action="pendingAction"
 			@play="perform('play')"
 			@download="perform('download')"
@@ -22,11 +22,11 @@
 				:rows="players.rows.value"
 				:loading="players.members.isLoading.value"
 				:can-manage="canSetup"
-				:disabled="players.membershipMutation.isPending.value || actionsLocked"
+				:disabled="players.membershipMutation.isPending.value || actionsLocked || migrating"
 				:show-push-update="!!sharedInstanceId"
-				:push-update-disabled="actionsLocked || !worldId"
+				:push-update-disabled="actionsLocked || migrating || !worldId"
 				:push-update-pending="previewQuery.isFetching.value || pendingAction === 'push'"
-				:invite-disabled="actionsLocked || !worldId"
+				:invite-disabled="actionsLocked || migrating || !worldId"
 				:invite-pending="pendingAction === 'invite'"
 				@push-update="showPreview()"
 				@push-update-hover="shareReview.prefetchFiles()"
@@ -125,7 +125,9 @@ import {
 	injectModrinthServerContext,
 	injectNotificationManager,
 	injectServerInviteHandoff,
+	injectServerPlayMigration,
 	type ServerInviteBinding,
+	type ServerPlayMigrationNext,
 	type ServerPlayTarget,
 } from '#ui/providers'
 import { injectPageContext } from '#ui/providers/page-context'
@@ -170,7 +172,15 @@ const needsUpdate = computed(() => world.value?.content?.shared_instance_needs_u
 const players = useServerPlayers(sharedInstanceId, canSetup)
 const invitePlayersModal = ref<InstanceType<typeof InvitePlayersModal>>()
 const inviteHandoff = injectServerInviteHandoff(null)
+const migration = injectServerPlayMigration(null)
+const migrating = computed(
+	() => !!migration && (migration.step.value !== 'idle' || !migration.ready.value),
+)
 let inviteHandoffStarted = false
+let disposed = false
+onScopeDispose(() => {
+	disposed = true
+})
 const shareReview = useServerShareReview<Action>({
 	execute: performAction,
 	disabled: computed(() => players.linkMutation.isPending.value),
@@ -293,15 +303,35 @@ async function perform(
 	configPaths: string[] = [],
 	restart?: boolean,
 ) {
-	if (!worldId.value || actionsLocked.value) return
+	if (!worldId.value || actionsLocked.value || migrating.value) return
+	if (requireMigration(action, () => perform(action, reviewed, configPaths, restart))) return
 	if (action === 'play' && !reviewed && canSetup.value && needsUpdate.value) {
 		void showPreview(true)
 		return
 	}
 	await runAction(action, reviewed, configPaths, restart)
 }
+function requireMigration(action: Action, resume: () => Promise<void>) {
+	if (!migration?.required.value) return false
+	const next: ServerPlayMigrationNext =
+		action === 'invite'
+			? 'invite'
+			: () => {
+					if (!disposed) void resume()
+				}
+	if (inviteHandoff?.requested.value) {
+		inviteHandoff.provideMigration({
+			modpackName: migration.modpackName.value,
+			start: () => migration.start(next),
+		})
+	} else {
+		migration.prompt(next)
+	}
+	return true
+}
 async function showPreview(playAfter = false) {
-	if (actionsLocked.value) return
+	if (actionsLocked.value || migrating.value) return
+	if (requireMigration('push', () => showPreview(playAfter))) return
 	previewAction.value = playAfter ? 'play' : 'push'
 	await shareReview.showPreview(previewAction.value)
 }
@@ -332,16 +362,16 @@ async function updateInviteLink(settings: InviteLinkSettings) {
 	})
 }
 watch(
-	[worldId, canSetup, () => inviteHandoff?.requested.value],
+	[worldId, canSetup, () => inviteHandoff?.requested.value, () => migration?.ready.value],
 	async () => {
 		if (!inviteHandoff?.requested.value) {
 			inviteHandoffStarted = false
 			return
 		}
-		if (!worldId.value || inviteHandoffStarted) return
+		if (!worldId.value || inviteHandoffStarted || (migration && !migration.ready.value)) return
 		inviteHandoffStarted = true
 		if (canSetup.value) await perform('invite')
-		if (!inviteHandoff.binding.value) inviteHandoff.cancel()
+		if (!inviteHandoff.binding.value && !inviteHandoff.migration.value) inviteHandoff.cancel()
 	},
 	{ immediate: true },
 )

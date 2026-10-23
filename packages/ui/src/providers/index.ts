@@ -22,6 +22,7 @@ export * from './server-context'
 export * from './server-invite-handoff'
 export * from './server-onboarding'
 export * from './server-play'
+export * from './server-play-migration'
 export * from './server-settings-modal'
 export * from './tags'
 export {

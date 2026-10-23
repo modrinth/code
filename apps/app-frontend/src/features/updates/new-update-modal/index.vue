@@ -19,6 +19,8 @@ import {
 	IntlFormatted,
 	InvitePlayersContent,
 	NewModal,
+	ServerPlayMigrationContent,
+	serverPlayMigrationMessages,
 	useVIntl,
 } from '@modrinth/ui'
 import { useEventListener } from '@vueuse/core'
@@ -34,11 +36,14 @@ import { useNewUpdateNotification } from './use-notification'
 const modal = useTemplateRef<InstanceType<typeof NewModal>>('modal')
 const video = useTemplateRef<HTMLVideoElement>('video')
 const inviting = ref(false)
-const stage = ref<'intro' | 'invite'>('intro')
+const stage = ref<'intro' | 'migration' | 'invite'>('intro')
 const inviteHandoff = injectServerInviteHandoff()
 const inviteBinding = computed(() => inviteHandoff.binding.value?.value ?? null)
 const lastBinding = shallowRef<typeof inviteBinding.value>(null)
 const displayBinding = computed(() => inviteBinding.value ?? lastBinding.value)
+const migrationBinding = computed(() => inviteHandoff.migration.value)
+const lastMigrationBinding = shallowRef<typeof migrationBinding.value>(null)
+const displayMigrationBinding = computed(() => migrationBinding.value ?? lastMigrationBinding.value)
 const videoStarted = ref(false)
 const videoPlaying = ref(false)
 const videoLoading = ref(false)
@@ -194,6 +199,27 @@ watch(inviteBinding, async (binding) => {
 		inviting.value = false
 	})
 })
+
+watch(migrationBinding, async (binding) => {
+	if (!binding || !inviting.value) return
+	lastMigrationBinding.value = binding
+	await modal.value?.transitionContent(() => {
+		stage.value = 'migration'
+		inviting.value = false
+	})
+})
+
+async function backToIntro() {
+	inviteHandoff.cancel()
+	await modal.value?.transitionContent(() => {
+		stage.value = 'intro'
+	})
+}
+
+function startMigration() {
+	void displayMigrationBinding.value?.start()
+	hide()
+}
 
 watch(
 	() => inviteHandoff.requested.value,
@@ -364,6 +390,24 @@ defineExpose({ show, hide, notifyForVersion })
 					</Button>
 				</div>
 			</section>
+		</div>
+		<div v-else-if="stage === 'migration' && displayMigrationBinding" class="w-[544px] max-w-full">
+			<div
+				class="flex items-center justify-between gap-4 border-0 border-b border-solid border-surface-5 p-6"
+			>
+				<h2 class="m-0 min-w-0 text-2xl font-semibold text-contrast">
+					{{ formatMessage(serverPlayMigrationMessages.title) }}
+				</h2>
+				<IconButton :label="formatMessage(commonMessages.closeButton)" @click="hide">
+					<XIcon aria-hidden="true" />
+				</IconButton>
+			</div>
+			<ServerPlayMigrationContent
+				class="!w-full p-6"
+				:modpack-name="displayMigrationBinding.modpackName"
+				@back="backToIntro"
+				@confirm="startMigration"
+			/>
 		</div>
 		<div v-else-if="displayBinding" class="w-[544px] max-w-full">
 			<div
