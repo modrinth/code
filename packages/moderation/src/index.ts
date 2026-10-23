@@ -15,7 +15,6 @@ export {
 } from './data/quick-replies/tech-review-quick-replies'
 export { default as moderationSettings } from './data/settings'
 export * from './handles/keybinds'
-export * from './handles/settings'
 export * from './locales'
 export * from './types/keybinds'
 export * from './types/nags'

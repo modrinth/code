@@ -1,3 +1,4 @@
+export * from './code-highlight-theme'
 export * from './debug-logger'
 export * from './dynamic-font-size'
 export * from './file-drop'

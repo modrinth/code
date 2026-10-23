@@ -13,7 +13,10 @@
 				class="min-w-0"
 			>
 				<div class="flex flex-col gap-1">
-					<h4 class="m-0 flex items-center gap-2 text-sm font-medium text-secondary">
+					<h4
+						v-if="showHeader"
+						class="m-0 flex items-center gap-2 text-sm font-medium text-secondary"
+					>
 						{{ link.label }}
 						<TagItem
 							v-if="link.key === 'source' && project && licenseRequiresSource(project.license.id)"
@@ -86,11 +89,12 @@ import {
 	TriangleAlertIcon,
 	WikiIcon,
 } from '@modrinth/assets'
-import { licenseRequiresSource } from '@modrinth/moderation'
+import { licenseRequiresSource, moderationSettings } from '@modrinth/moderation'
 import { injectModrinthClient, TagItem } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, ref, useTemplateRef, watch } from 'vue'
 
+import { useModerationSettings } from '~/composables/moderation'
 import { projectQueryOptions, STALE_TIME } from '~/composables/queries/project'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 import { reviewExternalUrl } from '~/providers/project-review/project-links'
@@ -102,6 +106,12 @@ import ReviewPanel from '../../review-panel/index.vue'
 import EditButton from '../edit/button.vue'
 import EditModal from '../edit/links.vue'
 import Section from '../section.vue'
+
+const settings = useModerationSettings()
+
+const showHeader = computed(() =>
+	settings.value.get(moderationSettings.General.SectionHeadersVisible),
+)
 
 const { project, projectId } = injectProjectReviewPageContext()
 const { previousLinks } = injectReviewPanels()

@@ -1,16 +1,16 @@
 <template>
-	<div
-		v-if="visibleTargets.length"
-		ref="actionsElement"
-		class="relative flex min-h-0 min-w-0 shrink-0 flex-col border-0 border-b border-solid border-divider"
-		:style="{
-			height: `${actionsHeight ?? 218}px`,
-			maxHeight: 'max(80px, calc(100% - 300px))',
-		}"
-	>
-		<div
-			class="-mx-1 flex min-h-0 min-w-0 flex-1 flex-col gap-4 overflow-y-auto overscroll-contain px-2 pb-4 pt-0"
-		>
+	<div v-if="visibleTargets.length" class="flex min-h-0 min-w-0 flex-1 flex-col gap-4 p-0">
+		<template v-if="stacked">
+			<ReviewPanel
+				v-for="target in visibleTargets"
+				:key="target"
+				mode="inline"
+				inline-title
+				class="min-w-0 shrink-0"
+				:target="{ kind: 'panel', key: target }"
+			/>
+		</template>
+		<template v-else>
 			<Tabs
 				:value="selectedTarget"
 				:tabs="tabs"
@@ -22,94 +22,49 @@
 				v-if="selectedTarget !== undefined && visibleTargets.includes(selectedTarget)"
 				:key="selectedTarget"
 				mode="inline"
+				inline-title
 				class="min-w-0 shrink-0"
 				:target="{ kind: 'panel', key: selectedTarget }"
 			/>
-		</div>
-		<div
-			role="separator"
-			tabindex="0"
-			aria-orientation="horizontal"
-			aria-label="Resize project checks"
-			:aria-valuenow="Math.round(measuredHeight)"
-			:aria-valuemin="80"
-			:aria-valuemax="maxActionsHeight"
-			class="actions-resize absolute -bottom-2 left-0 z-10 h-4 w-full cursor-row-resize touch-none"
-			:class="{ 'is-resizing': actionsDrag }"
-			@pointerdown="startActionsResize"
-			@pointermove="resizeActions"
-			@pointerup="stopActionsResize"
-			@pointercancel="stopActionsResize"
-			@lostpointercapture="stopActionsResize"
-			@dblclick.prevent="actionsHeight = null"
-			@keydown.up.prevent="setActionsHeight(measuredHeight - 20)"
-			@keydown.down.prevent="setActionsHeight(measuredHeight + 20)"
-		/>
+		</template>
 	</div>
+	<div v-else class="min-h-0 flex-1" />
 </template>
 
 <script setup lang="ts">
+import { moderationSettings } from '@modrinth/moderation'
 import { type MiscReviewPanelKey, reviewPanels } from '@modrinth/moderation/src/data/issues'
 import { Tabs } from '@modrinth/ui'
-import { useElementSize } from '@vueuse/core'
 import { computed, onScopeDispose, ref, watch } from 'vue'
 
+import { useModerationSettings } from '~/composables/moderation'
 import { injectReviewPanels } from '~/providers/project-review/review-panels'
 
+import { injectProjectReviewContext } from './layout/context'
 import { injectReviewContext } from './review-panel/context'
 import ReviewPanel from './review-panel/index.vue'
-import { injectReviewShortcuts, useReviewShortcut } from './shortcuts'
+import { useReviewShortcut } from './shortcuts'
 
-const actionsElement = ref<HTMLElement | null>(null)
-const { height: measuredHeight } = useElementSize(actionsElement)
-const actionsHeight = ref<number | null>(null)
-const actionsDrag = ref<{ y: number; height: number } | null>(null)
-const maxActionsHeight = ref(400)
-
-function setActionsHeight(height: number) {
-	maxActionsHeight.value = Math.max(
-		80,
-		(actionsElement.value?.parentElement?.clientHeight ?? 700) - 300,
-	)
-	actionsHeight.value = Math.min(maxActionsHeight.value, Math.max(80, height))
-}
-
-function startActionsResize(event: PointerEvent) {
-	if (event.button !== 0) return
-	event.preventDefault()
-	const target = event.currentTarget as HTMLElement
-	target.setPointerCapture(event.pointerId)
-	actionsDrag.value = { y: event.clientY, height: measuredHeight.value }
-}
-
-function resizeActions(event: PointerEvent) {
-	if (actionsDrag.value) {
-		setActionsHeight(actionsDrag.value.height + event.clientY - actionsDrag.value.y)
-	}
-}
-
-function stopActionsResize(event: PointerEvent) {
-	actionsDrag.value = null
-	const target = event.currentTarget as HTMLElement
-	if (target.hasPointerCapture(event.pointerId)) target.releasePointerCapture(event.pointerId)
-}
-
+/**
+ * The rulings, i.e. the project-wide checks (re-review, post-approval, reupload, rule following):
+ * one at a time by tabs, or all of them at once as the settings choose.
+ */
 const { resolve } = injectReviewPanels()
+const settings = useModerationSettings()
+const stacked = computed(() => settings.value.get(moderationSettings.General.MergeRulings))
 type ActionTarget = MiscReviewPanelKey
 const selectedTarget = ref<ActionTarget | undefined>(reviewPanels.misc[0]?.key)
-const shortcuts = injectReviewShortcuts()
+const { revealSlot } = injectProjectReviewContext()
 const { registerRoute } = injectReviewContext()
 for (const { key: target } of reviewPanels.misc) {
-	if (target !== 're-review-misc') {
-		useReviewShortcut(
-			target,
-			() => {
-				selectedTarget.value = target
-				shortcuts.run('reveal-right')
-			},
-			() => visibleTargets.value.includes(target),
-		)
-	}
+	useReviewShortcut(
+		target,
+		() => {
+			selectedTarget.value = target
+			revealSlot('rulings')
+		},
+		() => visibleTargets.value.includes(target),
+	)
 	onScopeDispose(
 		registerRoute(target, () => {
 			selectedTarget.value = target
@@ -129,7 +84,7 @@ useReviewShortcut(
 		const currentIndex =
 			selectedTarget.value === undefined ? -1 : targets.indexOf(selectedTarget.value)
 		selectedTarget.value = targets[(currentIndex + 1) % targets.length]
-		shortcuts.run('reveal-right')
+		revealSlot('rulings')
 	},
 	() => visibleTargets.value.length > 0,
 )
@@ -144,28 +99,3 @@ watch(
 	{ immediate: true },
 )
 </script>
-
-<style scoped>
-.actions-resize::after {
-	content: '';
-	position: absolute;
-	top: calc(50% - 1px);
-	left: 0;
-	width: 100%;
-	height: 1px;
-	pointer-events: none;
-	background-color: var(--color-brand);
-	opacity: 0;
-}
-
-.actions-resize:hover::after {
-	opacity: 1;
-	transition: opacity 0s 0.5s;
-}
-
-.actions-resize:focus-visible::after,
-.actions-resize.is-resizing::after {
-	opacity: 1;
-	transition: none;
-}
-</style>

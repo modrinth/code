@@ -2,6 +2,7 @@
 import Toggle from '#ui/components/base/Toggle.vue'
 import { useVIntl } from '#ui/composables'
 
+import AppearanceSettingsCodeTheme from './components/appearance-settings-code-theme.vue'
 import AppearanceSettingsThemeSelector from './components/appearance-settings-theme-selector.vue'
 import AppearanceSettingRow from './components/AppearanceSettingRow.vue'
 import ProjectLayoutSelector from './components/ProjectLayoutSelector.vue'
@@ -75,6 +76,18 @@ const sidebarPreferenceValues = sidebarPreferences?.value
 					</span>
 				</template>
 			</AppearanceSettingRow>
+		</section>
+
+		<section class="mt-8 border-0 border-t border-solid border-divider pt-6">
+			<div class="flex flex-col gap-1">
+				<h2 class="m-0 text-xl font-semibold text-contrast">
+					{{ formatMessage(messages.codeThemeTitle) }}
+				</h2>
+				<p class="m-0 text-secondary">
+					{{ formatMessage(messages.codeThemeDescription) }}
+				</p>
+			</div>
+			<AppearanceSettingsCodeTheme class="mt-4" />
 		</section>
 
 		<section v-if="projectLayouts" class="mt-8 border-0 border-t border-solid border-divider pt-6">

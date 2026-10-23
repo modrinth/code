@@ -41,12 +41,18 @@ const settings = {
 				'Move to the next project in the queue after successfully approving, withholding, or rejecting a project.',
 			default: true,
 		}),
-		HideMarkdownFormattingButtons: setting.asToggle({
-			type: 'toggle',
-			id: 'hide-markdown-formatting-buttons',
-			title: 'Hide Markdown formatting buttons',
-			description: 'Hide the formatting buttons above all Markdown editors in project review.',
-			default: true,
+		MarkdownFormattingButtonsVisibility: setting.asEnum({
+			type: 'enum',
+			id: 'markdown-formatting-buttons-visibility',
+			title: 'Markdown formatting buttons Visibility',
+			description:
+				'Whether or not the given markdown formatting buttons are visible, collapsible or hidden above all Markdown editors',
+			default: 'collapsible',
+			entries: [
+				{ label: 'Visible', value: 'visible' },
+				{ label: 'Collapsible', value: 'collapsible' },
+				{ label: 'Hidden', value: 'hidden' },
+			],
 		}),
 		EnableDelayedHoverMessagePreviews: setting.asToggle({
 			type: 'toggle',
@@ -68,6 +74,37 @@ const settings = {
 			title: 'Show toggle issue button shortcut hints',
 			description: 'Show number key shortcut hints on issue toggle buttons.',
 			default: true,
+		}),
+		ArchiveIntegration: setting.asEnum({
+			type: 'enum',
+			id: 'archive-integration',
+			title: 'Archive Integration',
+			description:
+				'Either have Archiver share the Workbench with Mod View or get its own Workbench under its own Panel',
+			default: 'exclusive',
+			entries: [
+				{ label: 'Shared', value: 'shared' },
+				{ label: 'Exclusive', value: 'exclusive' },
+			],
+		}),
+		ButtonSize: setting.asEnum({
+			type: 'enum',
+			id: 'button-size',
+			title: 'Button size',
+			description: 'Controls the size of the buttons found within Mod View',
+			default: 'sm',
+			entries: [
+				{ label: 'Extra small', value: 'xs' },
+				{ label: 'Small', value: 'sm' },
+				{ label: 'Large', value: 'md' },
+			],
+		}),
+		MergeRulings: setting.asToggle({
+			type: 'toggle',
+			id: 'merge-rulings',
+			title: 'Merged Rulings',
+			description: 'Either show Rulings using the selector or show them all at once stacked',
+			default: false,
 		}),
 		ShowFloatingPanelFieldHoverHighlight: setting.asToggle({
 			type: 'toggle',
@@ -189,11 +226,26 @@ const settings = {
 				'Expand the changelog automatically when viewing version details in project review.',
 			default: true,
 		}),
-		SlicerButtonInVersions: setting.asToggle({
+		SectionHeadersVisible: setting.asToggle({
 			type: 'toggle',
-			id: 'slicer-button-in-versions',
-			title: 'Show Slicer button in versions table and page',
-			description: 'Show the Slicer button on public version lists and version pages for staff.',
+			id: 'section-headers-visible',
+			title: 'Show the Section headers',
+			description: 'Whether to show Section headers within Mod View Summary Panel',
+			default: true,
+		}),
+		SectionReducedGap: setting.asToggle({
+			type: 'toggle',
+			id: 'section-reduced-gap',
+			title: 'Reduce gap between Sections',
+			description: 'Whether to reduce the gaps between sections within Mod View Summary Panel',
+			default: false,
+		}),
+		ArchiveButtonInVersions: setting.asToggle({
+			type: 'toggle',
+			id: 'archive-button-in-versions',
+			title: 'Show archive viewer button in versions table and page',
+			description:
+				'Show a button opening the archive viewer on public version lists and version pages.',
 			default: false,
 		}),
 		AlternativeHostname: setting.asString({

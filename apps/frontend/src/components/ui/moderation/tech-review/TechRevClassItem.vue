@@ -3,9 +3,9 @@ import {
 	CheckIcon,
 	ChevronDownIcon,
 	ClipboardCopyIcon,
-	CoffeeIcon,
 	CopyIcon,
 	ExternalIcon,
+	FolderArchiveIcon,
 	LoaderCircleIcon,
 } from '@modrinth/assets'
 import {
@@ -18,7 +18,8 @@ import {
 import { capitalizeString, highlightCodeLines } from '@modrinth/utils'
 import { computed, reactive, ref } from 'vue'
 
-import { injectReviewSlicer, slicerFileName } from '~/providers/project-review/review-slicer'
+import { archiveNameFrom, archiveViewerUrl } from '~/helpers/archive-viewer'
+import { injectReviewArchive } from '~/providers/project-review/review-archive'
 
 import { getSeverityBadgeColor, truncateMiddle } from './helpers'
 import TechRevFlagBadges from './TechRevFlagBadges.vue'
@@ -41,7 +42,7 @@ const emit = defineEmits<{
 }>()
 
 const client = injectModrinthClient()
-const slicer = injectReviewSlicer(null)
+const archive = injectReviewArchive(null)
 const { addNotification } = injectNotificationManager()
 const { isPreReviewed, getMarkedFlagsCount } = injectTechReviewDecisions()
 
@@ -130,18 +131,18 @@ function trimSlashes(path: string): string {
 }
 
 /**
- * Resolves the slicer workspace entry for a class group, removing trailing and leading slashes and
- * assuming `.class` when the path has no file extension.
+ * Resolves the archive entry for a class group, starting with the jar it's in, removing trailing
+ * and leading slashes and assuming `.class` when the path has no file extension.
  */
-function slicerEntry(url: string, group: ClassGroup) {
-	const jarPath = trimSlashes(group.jar ? group.jar.replace('#', '/') : slicerFileName(url))
+function archiveEntry(url: string, group: ClassGroup) {
+	const jarPath = trimSlashes(group.jar ? group.jar.replace('#', '/') : archiveNameFrom(url))
 	const filePath = trimSlashes(group.filePath)
 	const hasFileExtension = (filePath.split('/').pop() || '').includes('.')
 	return `${jarPath}/${hasFileExtension ? filePath : `${filePath}.class`}`
 }
 
-function createSlicerLink(url: string, group: ClassGroup) {
-	return `https://slicer.run/?url=${encodeURIComponent(url)}&file=${encodeURIComponent(slicerEntry(url, group))}`
+function createArchiveLink(url: string, group: ClassGroup) {
+	return archiveViewerUrl({ url, file: archiveEntry(url, group) })
 }
 </script>
 
@@ -184,21 +185,21 @@ function createSlicerLink(url: string, group: ClassGroup) {
 						</div>
 					</Transition>
 					<Button
-						v-if="slicer"
-						v-tooltip="'Open file in Slicer tab'"
+						v-if="archive"
+						v-tooltip="'Open file in the archive panels'"
 						type="outlined"
 						circular
 						icon-only
 						@click.stop="
-							slicer.open([file.download_url], slicerEntry(file.download_url, classItem))
+							archive.open(file.download_url, archiveEntry(file.download_url, classItem))
 						"
 					>
-						<CoffeeIcon />
+						<FolderArchiveIcon />
 					</Button>
 					<ButtonLink
-						v-tooltip="'Open file in slicer'"
+						v-tooltip="'Open file in the archive viewer'"
 						type="outlined"
-						:href="createSlicerLink(file.download_url, classItem)"
+						:href="createArchiveLink(file.download_url, classItem)"
 						:target="file.file_id"
 						circular
 						icon-only

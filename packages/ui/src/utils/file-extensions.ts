@@ -1,4 +1,6 @@
 // File extension constants
+import { type FileTypeInfo, getFileTypeInfo, getLanguageFromFile } from '#ui/helpers/toolbox/file'
+
 export const FILE_CODE_EXTENSIONS = [
 	'json',
 	'json5',
@@ -41,6 +43,20 @@ export const FILE_IMAGE_EXTENSIONS = ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'
 
 export const FILE_ARCHIVE_EXTENSIONS = ['zip', 'jar', 'tar', 'gz', 'rar', '7z'] as const
 
+export const FILE_VIDEO_EXTENSIONS = ['mp4', 'webm', 'ogv', 'mov', 'm4v'] as const
+
+/** `ogg` counts as audio, as games mostly use it for sounds. */
+export const FILE_AUDIO_EXTENSIONS = [
+	'mp3',
+	'ogg',
+	'oga',
+	'wav',
+	'flac',
+	'm4a',
+	'aac',
+	'opus',
+] as const
+
 // Type for extension strings
 export type CodeExtension = (typeof FILE_CODE_EXTENSIONS)[number]
 export type TextExtension = (typeof FILE_TEXT_EXTENSIONS)[number]
@@ -75,6 +91,27 @@ export function isImageFile(ext: string): boolean {
 	return (FILE_IMAGE_EXTENSIONS as readonly string[]).includes(ext.toLowerCase())
 }
 
+/** Check if extension is a video file */
+export function isVideoFile(ext: string): boolean {
+	return (FILE_VIDEO_EXTENSIONS as readonly string[]).includes(ext.toLowerCase())
+}
+
+/** Check if extension is an audio file */
+export function isAudioFile(ext: string): boolean {
+	return (FILE_AUDIO_EXTENSIONS as readonly string[]).includes(ext.toLowerCase())
+}
+
+/** How a file plays, from its type when known (e.g. detected from its contents) or else its name. */
+export function mediaKindOf(
+	filename: string,
+	fileInfo: FileTypeInfo | null = getFileTypeInfo(filename),
+): 'video' | 'audio' | null {
+	const ext = getFileExtension(filename)
+	if (isAudioFile(ext) || fileInfo?.mime.startsWith('audio/')) return 'audio'
+	if (isVideoFile(ext) || fileInfo?.mime.startsWith('video/')) return 'video'
+	return null
+}
+
 /**
  * Check if extension is an archive file
  */
@@ -90,18 +127,60 @@ export function isEditableFile(ext: string): boolean {
 }
 
 /**
- * Check if a file can be opened in the file editor
+ * Check if a file can be opened in the file editor, from its type when known (e.g. detected from
+ * its contents) or else from its name. A type detected from its contents as neither text, code nor
+ * an image can't be opened, whatever its extension suggests.
  */
-export function canOpenInFileEditor(filename: string): boolean {
+export function canOpenInFileEditor(
+	filename: string,
+	fileInfo: FileTypeInfo | null = getFileTypeInfo(filename),
+): boolean {
+	const lang = getLanguageFromFile(filename, fileInfo)
+	if (lang != null) return true
+	if (mediaKindOf(filename, fileInfo)) return true
+	if (fileInfo != null) {
+		if (fileInfo.mime.startsWith('text/') || isImageFile(fileInfo.extension ?? '')) {
+			return true
+		}
+		if (fileInfo.method === 'content-analysis') return false
+	}
 	const ext = getFileExtension(filename)
 	return !filename.includes('.') || isEditableFile(ext) || isImageFile(ext)
 }
 
+/** Check if a file can be opened in the file editor, detecting its type from its contents. */
+export async function canOpenDataInFileEditor(
+	filename: string,
+	data: ArrayBuffer | Blob,
+): Promise<boolean> {
+	return canOpenInFileEditor(filename, await getFileTypeInfo(filename, data))
+}
+
 /**
- * Get Ace editor language mode for a file extension
+ * Minecraft's own formats, which the editor highlights by modes of its own. They take precedence
+ * over the type a file is detected as, which only knows them as plain text.
  */
-export function getEditorLanguage(ext: string): string {
-	const lowered = ext.toLowerCase()
+const MINECRAFT_EDITOR_LANGUAGES: Record<string, string> = {
+	log: 'mclog',
+	mcfunction: 'mcfunction',
+}
+
+/**
+ * Get the editor language mode for a file, from its type when known (e.g. detected from its
+ * contents) or else from its name.
+ */
+export function getEditorLanguage(
+	filename: string,
+	fileInfo: FileTypeInfo | null = getFileTypeInfo(filename),
+): string {
+	const minecraftLanguage = MINECRAFT_EDITOR_LANGUAGES[getFileExtension(filename)]
+	if (minecraftLanguage) return minecraftLanguage
+
+	const language = getLanguageFromFile(filename, fileInfo)
+	if (language) return language
+
+	const lowered = getFileExtension(filename)
+
 	switch (lowered) {
 		// Code files
 		case 'json':
@@ -154,8 +233,6 @@ export function getEditorLanguage(ext: string): string {
 		case 'cfg':
 		case 'conf':
 			return 'ini'
-		case 'log':
-			return 'mclog'
 		default:
 			return 'text'
 	}

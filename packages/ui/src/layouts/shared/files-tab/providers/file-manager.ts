@@ -39,13 +39,38 @@ export type FileItemResultFrom<T extends FileTypes> = T extends 'directory'
 		? FileResult
 		: never
 
+/** The content variant asking for a file's stored bytes, rather than any transformed view of them. */
+export const RAW_CONTENT_VARIANT = 'raw'
+
+/**
+ * How a tab shows a file: as it would by default (e.g. decompiled, or as an image), or its stored
+ * bytes as text, as a hex dump, or as formatted JSON.
+ */
+export type FileInterpretation = 'auto' | 'text' | 'hex' | 'json'
+
+/**
+ * Ways a file's contents can be produced besides the default, e.g. which decompiler reads a
+ * class file. Each tab picks one for the file it shows.
+ */
+export interface FileContentVariants {
+	label: string
+	options: { id: string; label: string }[]
+	/** The one used until the tab picks another. */
+	default: string
+}
+
 /**
  * Lazily loaded, cached directory listings used by the sidebar tree. Paths are absolute
  * (`/`, `/config`, `/config/sub`), independent of `currentPath`.
  */
 export interface DirectoryTree {
-	/** Returns the (cached) listing for `path`, starting to load it on first access. */
-	get: <T extends FileTypes>(file: FileInfo<T>) => FileItemResultFrom<T>
+	/**
+	 * Returns the (cached) listing for `path`, starting to load it on first access. Files can be
+	 * read as one of their content variants (see `FileManagerContext.contentVariants`), or as
+	 * their stored bytes with `RAW_CONTENT_VARIANT`, which hosts that transform files (e.g. by
+	 * decompiling them) honour and others can ignore.
+	 */
+	get: <T extends FileTypes>(file: FileInfo<T>, variant?: string) => FileItemResultFrom<T>
 	prefetch: <T extends FileTypes>(file: FileInfo<T>) => void
 	/** Absolute paths of the directories expanded in the tree. Owned by the host so it survives remounts. */
 	expandedEntries: Ref<string[]>
@@ -98,6 +123,17 @@ export interface FileManagerContext {
 	busyWarning?: Ref<string | null> | ComputedRef<string | null>
 	isReadOnly?: (file: FileInfo | null) => boolean
 	readOnlyReason?: Ref<string> | ComputedRef<string>
+	/**
+	 * Whether every entry is read-only (e.g. an archive being inspected), which hides the actions
+	 * that create or upload entries rather than only disabling them.
+	 */
+	readOnly?: boolean
+	/** Whether a file can be opened in the editor; defaults to its extension being viewable. */
+	canOpenInEditor?: (file: FileInfo) => boolean
+	/** The variants a file's contents can be read as, if it has any (e.g. decompilers for class files). */
+	contentVariants?: (file: FileInfo<'file'>) => FileContentVariants | null
+	/** The editor language of a file, for files whose contents differ from what their extension suggests. */
+	editorLanguage?: (file: FileInfo<'file'>) => string | undefined
 
 	extractFile?: (
 		path: string,

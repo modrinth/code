@@ -43,7 +43,7 @@ import { computed, watch } from 'vue'
 
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { infoFrom, parentInfoFrom } from '#ui/layouts/shared/files-tab/utils.ts'
-import { canOpenInFileEditor } from '#ui/utils/file-extensions'
+import { getFileExtension, isArchiveFile } from '#ui/utils/file-extensions'
 
 import { injectFileBrowserUI } from '../providers/file-browser-ui'
 import type { FileItem } from '../types'
@@ -84,6 +84,11 @@ const messages = defineMessages({
 	},
 })
 
+const props = defineProps<{
+	/** The folder whose contents the tree shows, the root by default. */
+	root?: string
+}>()
+
 const ui = injectFileBrowserUI()
 const tree = ui.directoryTree
 
@@ -104,6 +109,30 @@ function isExpandable(item: FileItem) {
 	return item.type === 'directory' && item.count !== 0
 }
 
+function isArchive(item: FileItem) {
+	return isArchiveFile(getFileExtension(item.name))
+}
+
+/**
+ * With compact folders on, folds a chain of folders that each hold just one folder into the
+ * first one's row, named like `a/b/c` and standing for the last. Archives are never folded, so
+ * they keep their own row.
+ */
+function compactChain(item: FileItem): FileItem {
+	if (!ui.compactFolders.value || item.type !== 'directory' || isArchive(item)) return item
+
+	const names = [item.name]
+	let current = item
+	while (current.count === 1) {
+		const children = tree.get(infoFrom(current.path)).data.value
+		const only = children.length === 1 ? children[0] : undefined
+		if (only?.type !== 'directory' || isArchive(only)) break
+		current = only
+		names.push(only.name)
+	}
+	return current === item ? item : { ...current, name: names.join('/') }
+}
+
 const nameCollator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' })
 
 function compareEntries(a: FileItem, b: FileItem) {
@@ -121,7 +150,7 @@ function collectRows(path: string, depth: number): TreeRow[] {
 	}
 
 	const rows: TreeRow[] = []
-	for (const item of [...items].sort(compareEntries)) {
+	for (const item of [...items].sort(compareEntries).map(compactChain)) {
 		const expandable = isExpandable(item)
 		const expanded = expandable && expandedPaths.value.has(item.path)
 		const children = expanded ? collectRows(item.path, depth + 1) : []
@@ -134,7 +163,7 @@ function collectRows(path: string, depth: number): TreeRow[] {
 	return rows
 }
 
-const rows = computed(() => collectRows(ROOT_PATH, 0))
+const rows = computed(() => collectRows(props.root ?? ROOT_PATH, 0))
 
 function setExpanded(path: string, expanded: boolean) {
 	const current = tree.expandedEntries.value
@@ -148,13 +177,27 @@ function toggleExpanded(item: FileItem) {
 	setExpanded(item.path, !expandedPaths.value.has(item.path))
 }
 
+/**
+ * Opens a row's entry. Unless folders are listed in tabs, the tree is how they're browsed, so a
+ * folder only expands or collapses; with trees in tabs, files open in tabs of their own, leaving
+ * the tree's tab as it is.
+ */
 function openDirectory(item: FileItem) {
+	const browsing = ui.browsing.value
+	if (browsing !== 'listing' && item.type === 'directory') {
+		if (isExpandable(item)) toggleExpanded(item)
+		return
+	}
+	if (browsing === 'tree') {
+		ui.revealInTab(item)
+		return
+	}
 	if (isExpandable(item)) setExpanded(item.path, true)
 	ui.navigateTo(item)
 }
 
 function prefetch(item: FileItem) {
-	if (item.type === 'directory' || canOpenInFileEditor(item.name)) {
+	if (ui.canOpenInTab(item)) {
 		tree.prefetch(item)
 	}
 }

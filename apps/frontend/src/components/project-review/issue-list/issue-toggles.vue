@@ -13,7 +13,7 @@
 				<Button
 					v-for="entry in selectedOptionsForRow(row)"
 					:key="entry.control.id ?? 'active'"
-					size="sm"
+					:size="buttonSize"
 					:disabled="pending || disabled || entry.control.disabled"
 					:aria-label="`Remove ${entry.control.issueCardDisplay.label}`"
 					@click="removeOption(entry)"
@@ -56,9 +56,11 @@
 
 <script setup lang="ts">
 import { PlusIcon, XIcon } from '@modrinth/assets'
+import { moderationSettings } from '@modrinth/moderation'
 import { Button, MultiSelect, type MultiSelectItem } from '@modrinth/ui'
 import { computed, h, ref, watch } from 'vue'
 
+import { useModerationSettings } from '~/composables/moderation'
 import {
 	injectReviewPanels,
 	type ReviewIssue,
@@ -72,6 +74,8 @@ const props = withDefaults(defineProps<{ issue: ReviewIssue; disabled?: boolean 
 const emit = defineEmits<{ remove: [] }>()
 const panels = injectReviewPanels()
 const { pending } = injectReviewSubmission()
+const settings = useModerationSettings()
+const buttonSize = computed(() => settings.value.get(moderationSettings.General.ButtonSize))
 
 type ToggleControl = Extract<ReviewIssueControl['control'], { type: 'toggle' }>
 interface IssueCardOption extends ReviewIssueControl {

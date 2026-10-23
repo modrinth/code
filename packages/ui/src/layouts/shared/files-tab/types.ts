@@ -15,11 +15,6 @@ export interface FileItem {
 	readOnly?: boolean
 }
 
-export interface EditingFile {
-	name: string
-	path: string
-}
-
 export type FileSortField = 'name' | 'size' | 'items' | 'created' | 'modified'
 
 export type FileViewFilter = 'all' | 'filesOnly' | 'foldersOnly'

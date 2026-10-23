@@ -151,8 +151,8 @@
 										:disabled="pending || disabled || generating"
 										:heading-buttons="false"
 										:placeholder="issue.custom ? 'Enter custom issue message...' : undefined"
-										:hide-formatting-buttons="
-											settings.get(moderationSettings.General.HideMarkdownFormattingButtons)
+										:formatting-buttons-visibility="
+											settings.get(moderationSettings.General.MarkdownFormattingButtonsVisibility)
 										"
 										:max-height="240"
 										:min-height="96"

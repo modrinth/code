@@ -7,13 +7,14 @@
 			name="file-search"
 			autocomplete="off"
 			:placeholder="formatMessage(messages.placeholder)"
-			size="medium"
+			:size="compact ? 'small' : 'standard'"
 			wrapper-class="w-full"
 			role="combobox"
 			aria-autocomplete="list"
 			:aria-expanded="open"
 			:aria-controls="listId"
 			:aria-activedescendant="open && results.length > 0 ? optionId(highlighted) : undefined"
+			:class="compact ? 'h-[calc(2rem_-_4px)]' : 'h-[calc(2.25rem)]'"
 			@focus="focused = true"
 			@keydown="handleKeydown"
 		/>
@@ -65,7 +66,6 @@ import { computed, nextTick, ref, useId, watch } from 'vue'
 
 import Input from '#ui/components/base/inputs/Input.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { canOpenInFileEditor } from '#ui/utils/file-extensions'
 
 import { injectFileBrowserUI } from '../providers/file-browser-ui'
 import type { FileItem } from '../types'
@@ -77,8 +77,10 @@ withDefaults(
 	defineProps<{
 		/** Notes that results only cover folders opened so far, for hosts that load lazily. */
 		loadedOnlyNotice?: boolean
+		/** Smaller controls, for tighter spaces. */
+		compact?: boolean
 	}>(),
-	{ loadedOnlyNotice: true },
+	{ loadedOnlyNotice: true, compact: false },
 )
 
 const { formatMessage } = useVIntl()
@@ -136,7 +138,7 @@ watch(query, () => (highlighted.value = 0))
 
 /** Opens directories and editable files; any other file reveals its folder instead. */
 function select(entry: FileItem) {
-	const openable = entry.type === 'directory' || canOpenInFileEditor(entry.name)
+	const openable = ui.canOpenInTab(entry)
 	ui.navigateTo(openable ? entry : parentInfoFrom(entry))
 	query.value = ''
 }

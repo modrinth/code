@@ -38,8 +38,10 @@
 		"wrangler": "^4.115.0"
 	},
 	"dependencies": {
+		"@codemirror/autocomplete": "^6.20.0",
 		"@codemirror/commands": "^6.3.2",
 		"@codemirror/language": "^6.9.3",
+		"@codemirror/state": "^6.5.4",
 		"@codemirror/view": "^6.22.1",
 		"@contentauth/c2pa-web": "^0.13.1",
 		"@floating-ui/vue": "^2.0.1",
@@ -58,7 +60,6 @@
 		"@vue-email/render": "^0.0.9",
 		"@vueuse/core": "^11.1.0",
 		"@zip.js/zip.js": "^2.8.34",
-		"ace-builds": "^1.36.2",
 		"ansi-to-html": "^0.7.2",
 		"chart.js": "^4.5.1",
 		"dayjs": "^1.11.7",
@@ -81,7 +82,6 @@
 		"vue-confetti-explosion": "^1.0.2",
 		"vue-router": "*",
 		"vue-typed-virtual-list": "^1.0.10",
-		"vue3-ace-editor": "^2.2.4",
 		"vue3-apexcharts": "^1.5.2",
 		"xss": "^1.0.14"
 	},

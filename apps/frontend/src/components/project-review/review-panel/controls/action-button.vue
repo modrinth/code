@@ -13,13 +13,16 @@
 					}
 				: undefined
 		"
-		class="action-toggle !h-auto min-h-8 max-w-full !gap-1.5 !whitespace-normal !rounded-lg !px-2.5 !font-medium [&>svg]:!text-inherit"
-		:class="{
-			'!brightness-100': modelValue,
-			'!text-primary enabled:hover:!brightness-125': !modelValue,
-			'action-toggle-selected !text-contrast': modelValue || mixed,
-		}"
-		size="sm"
+		class="action-toggle !h-auto max-w-full !gap-1.5 !whitespace-normal !rounded-lg !font-medium [&>svg]:!text-inherit"
+		:class="[
+			SIZE_CLASSES[size],
+			{
+				'!brightness-100': modelValue,
+				'!text-primary enabled:hover:!brightness-125': !modelValue,
+				'action-toggle-selected !text-contrast': modelValue || mixed,
+			},
+		]"
+		:size="size"
 		@click="emit('update:modelValue', !modelValue)"
 	>
 		<MinusIcon v-if="mixed" class="size-4" aria-hidden="true" />
@@ -39,9 +42,11 @@
 
 <script lang="ts" setup>
 import { MinusIcon, TagCategoryRefreshCcwIcon } from '@modrinth/assets'
-import { formatKeybind, type KeybindDefinition } from '@modrinth/moderation'
+import { formatKeybind, type KeybindDefinition, moderationSettings } from '@modrinth/moderation'
 import { Button } from '@modrinth/ui'
 import { computed, onMounted, ref } from 'vue'
+
+import { useModerationSettings } from '~/composables/moderation'
 
 const props = defineProps<{
 	modelValue: boolean
@@ -81,6 +86,16 @@ const ariaKeybind = computed(() => {
 const emit = defineEmits<{
 	'update:modelValue': [boolean]
 }>()
+
+/** Wrapping labels keep the button growing past its size's height, which only sets its least. */
+const SIZE_CLASSES = {
+	xs: 'min-h-7 !px-2 !text-sm',
+	sm: 'min-h-8 !px-2.5',
+	md: 'min-h-9 !px-3',
+}
+
+const settings = useModerationSettings()
+const size = computed(() => settings.value.get(moderationSettings.General.ButtonSize))
 </script>
 
 <style scoped>

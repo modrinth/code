@@ -1,7 +1,7 @@
 <template>
 	<div
-		class="group flex h-full max-w-[16rem] items-center gap-1.5 pl-3 text-sm"
-		:class="canClose ? 'pr-1' : 'pr-3'"
+		class="group flex h-full max-w-[16rem] items-center gap-1 pl-2.5 text-sm"
+		:class="canClose ? 'pr-1.5' : 'pr-2.5'"
 		:title="location?.path"
 		@auxclick.prevent="(event) => event.button === 1 && close()"
 		@contextmenu.prevent.stop="openMenu"
@@ -13,7 +13,7 @@
 		<button
 			v-if="canClose"
 			type="button"
-			class="relative flex size-6 shrink-0 items-center justify-center rounded-md border-none bg-transparent p-0 text-secondary hover:bg-surface-5 hover:text-contrast focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
+			class="relative flex size-4 shrink-0 items-center justify-center rounded border-none bg-transparent p-0 text-secondary hover:bg-surface-5 hover:text-contrast focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
 			:aria-label="formatMessage(messages.closeTab, { name: label })"
 			@pointerdown.stop
 			@mousedown.stop
@@ -24,7 +24,7 @@
 				v-tooltip="formatMessage(messages.unsavedChanges)"
 				class="size-2 rounded-full bg-brand group-hover:hidden"
 			/>
-			<XIcon class="size-4" :class="{ 'hidden group-hover:block': isDirty }" />
+			<XIcon class="size-3" :class="{ 'hidden group-hover:block': isDirty }" />
 		</button>
 		<span
 			v-else-if="isDirty"
@@ -35,11 +35,13 @@
 </template>
 
 <script setup lang="ts">
-import { HomeIcon, XIcon } from '@modrinth/assets'
+import { HomeIcon, SplitIcon, XIcon } from '@modrinth/assets'
 import type { DockviewPanelApi } from 'dockview-vue'
 import { computed } from 'vue'
 
+import type { ButtonMenuOption } from '#ui/components/base/buttons/types'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { injectWorkbench } from '#ui/layouts/shared/workbench/providers/workbench'
 
 import { currentLocation, type FileTabPanelParams } from '../../composables/file-tabs'
 import { injectFileBrowserUI } from '../../providers/file-browser-ui'
@@ -79,6 +81,14 @@ const messages = defineMessages({
 		id: 'files.tabs.close-all-tabs',
 		defaultMessage: 'Close all tabs',
 	},
+	splitRight: {
+		id: 'files.tabs.split-right',
+		defaultMessage: 'Split right',
+	},
+	splitDown: {
+		id: 'files.tabs.split-down',
+		defaultMessage: 'Split down',
+	},
 })
 
 const ui = injectFileBrowserUI()
@@ -103,9 +113,38 @@ const isActive = computed(() => ui.fileTabs.activeTabId.value === tabId)
 const canClose = computed(() => ui.fileTabs.canClose.value)
 const isDirty = computed(() => ui.fileTabs.editors.get(tabId)?.hasUnsavedChanges.value ?? false)
 
+const workbench = injectWorkbench(null)
+
+/** Within a workbench, the tab can also be moved to another dock or split off within its own. */
+function workbenchOptions(): ButtonMenuOption[] {
+	const moveOption = workbench?.documentMoveOption(tabId)
+	if (!moveOption) return []
+	const panelApi = props.params.api
+	const canSplit = panelApi.group.panels.length > 1
+	return [
+		moveOption,
+		{
+			id: 'split-right',
+			label: formatMessage(messages.splitRight),
+			icon: SplitIcon,
+			disabled: !canSplit,
+			action: () => panelApi.moveTo({ group: panelApi.group, position: 'right' }),
+		},
+		{
+			id: 'split-down',
+			label: formatMessage(messages.splitDown),
+			icon: SplitIcon,
+			disabled: !canSplit,
+			action: () => panelApi.moveTo({ group: panelApi.group, position: 'bottom' }),
+		},
+		{ type: 'divider' },
+	]
+}
+
 function openMenu(event: MouseEvent) {
 	const hasOthers = ui.fileTabs.tabs.value.length > 1
 	ui.handleContextMenu(event, [
+		...workbenchOptions(),
 		{
 			id: 'close-tab',
 			label: formatMessage(messages.closeThisTab),

@@ -1,7 +1,7 @@
 <template>
 	<Section heading="Compatibility" :target="{ kind: 'compatibility' }">
 		<dl class="m-0 grid grid-cols-[max-content_minmax(0,1fr)] gap-x-3 gap-y-2.5">
-			<dt class="text-sm font-medium text-secondary">Game versions</dt>
+			<dt class="text-sm font-medium text-secondary">{{ showHeader ? 'Game versions' : '' }}</dt>
 			<dd class="m-0 flex flex-wrap items-start gap-1">
 				<TagItem
 					v-for="version in gameVersions"
@@ -12,7 +12,7 @@
 				<span v-if="compatibilityError">Unavailable</span>
 				<span v-else-if="gameVersions.length === 0">No versions</span>
 			</dd>
-			<dt class="text-sm font-medium text-secondary">Platforms</dt>
+			<dt class="text-sm font-medium text-secondary">{{ showHeader ? 'Platforms' : '' }}</dt>
 			<dd class="m-0 flex flex-wrap items-start gap-1">
 				<TagItem
 					v-for="loader in project?.loaders"
@@ -29,7 +29,9 @@
 				<span v-if="!project?.loaders.length">No platforms</span>
 			</dd>
 			<template v-if="requiresEnvironmentInfo(project?.project_types ?? [])">
-				<dt class="text-sm font-medium text-secondary">Environments</dt>
+				<dt class="text-sm font-medium text-secondary">
+					{{ showHeader ? 'Environments' : '' }}
+				</dt>
 				<dd class="m-0 flex flex-wrap items-start gap-1">
 					<TagItem
 						v-for="environment in project?.environment"
@@ -46,10 +48,11 @@
 
 <script setup lang="ts">
 import { getLoaderIcon } from '@modrinth/assets'
-import { requiresEnvironmentInfo } from '@modrinth/moderation'
+import { moderationSettings, requiresEnvironmentInfo } from '@modrinth/moderation'
 import { injectTags, TagItem } from '@modrinth/ui'
 import { formatVersionsForDisplay } from '@modrinth/utils'
 
+import { useModerationSettings } from '~/composables/moderation'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
 import Section from '../section.vue'
@@ -67,6 +70,12 @@ const environmentLabels = {
 	client_or_server_prefers_both: 'Client and server, best when installed on both',
 	unknown: 'Unknown environment',
 }
+
+const settings = useModerationSettings()
+
+const showHeader = computed(() =>
+	settings.value.get(moderationSettings.General.SectionHeadersVisible),
+)
 
 const { project, projectV2, compatibilityError } = injectProjectReviewPageContext()
 

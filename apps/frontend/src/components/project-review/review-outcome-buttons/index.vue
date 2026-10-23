@@ -11,6 +11,7 @@
 			v-for="action in actions"
 			:key="action.status"
 			class="grow"
+			:size="buttonSize"
 			:type="action.type"
 			:color="action.color"
 			:disabled="!actionAvailable(action.status)"
@@ -23,7 +24,12 @@
 			/>
 			{{ action.label }}
 		</Button>
-		<TeleportOverflowMenu label="More options" :options="overflowActions" :circular="false">
+		<TeleportOverflowMenu
+			:size="buttonSize"
+			label="More options"
+			:options="overflowActions"
+			:circular="false"
+		>
 			<MoreHorizontalIcon aria-hidden="true" />
 			<template #send-to-review>
 				<ScaleIcon aria-hidden="true" />
@@ -60,6 +66,7 @@ import ModerationLockedCard from './moderation-locked-card.vue'
 const { project, navigation, queue, lock } = injectProjectReviewPageContext()
 const { heldBy } = lock
 const settings = useModerationSettings()
+const buttonSize = computed(() => settings.value.get(moderationSettings.General.ButtonSize))
 const {
 	canSubmit,
 	canApprove,

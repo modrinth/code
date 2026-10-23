@@ -60,7 +60,7 @@ const {
 	members: projectMembers,
 	organizationMembers,
 } = injectProjectReviewPageContext()
-const { rightVisible, toggleSidebar } = injectProjectReviewContext()
+const { revealSlot } = injectProjectReviewContext()
 const { data: thread, isError, refetch } = threadQuery
 const auth = useAuthState()
 
@@ -139,7 +139,7 @@ watch(
 	{ flush: 'post' },
 )
 async function openEditor() {
-	if (!rightVisible.value) toggleSidebar('right')
+	revealSlot('thread')
 	isAtBottom.value = true
 	await nextTick()
 	scrollToBottom()

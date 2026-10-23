@@ -157,7 +157,6 @@ import { useFormatBytes } from '#ui/composables'
 import { useFormatDateTime } from '#ui/composables/format-date-time'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
-import { canOpenInFileEditor } from '#ui/utils/file-extensions'
 
 import { useEntryMenu } from '../composables/entry-menu'
 import { FILE_COLUMNS, FILE_COLUMNS_ORDER, type FileColumn } from '../composables/file-columns'
@@ -327,7 +326,7 @@ const formattedCreationDate = computed(() => {
 
 const isEditableFile = computed(() => {
 	if (props.file.type === 'file') {
-		return canOpenInFileEditor(props.file.name)
+		return ui.canOpenInTab(props.file)
 	}
 	return false
 })

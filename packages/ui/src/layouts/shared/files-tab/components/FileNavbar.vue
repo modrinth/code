@@ -3,12 +3,14 @@
 		<nav
 			v-if="breadcrumbs != null"
 			:aria-label="formatMessage(messages.breadcrumbNavigation)"
-			class="m-0 -ml-2 flex min-w-0 flex-shrink items-center p-0"
+			class="m-0 -ml-2 flex min-w-0 flex-shrink p-0"
+			:class="compact ? 'flex-1 items-start' : 'items-center'"
 		>
 			<div class="mr-1 flex shrink-0 items-center">
 				<IconButton
 					v-tooltip="formatMessage(messages.back)"
 					type="quiet"
+					:size="buttonSize"
 					:label="formatMessage(messages.back)"
 					:disabled="!canGoBack"
 					@click="$emit('back')"
@@ -18,6 +20,7 @@
 				<IconButton
 					v-tooltip="formatMessage(messages.forward)"
 					type="quiet"
+					:size="buttonSize"
 					:label="formatMessage(messages.forward)"
 					:disabled="!canGoForward"
 					@click="$emit('forward')"
@@ -27,10 +30,14 @@
 			</div>
 			<ol
 				ref="breadcrumbOuter"
-				class="m-0 flex min-w-0 flex-shrink items-center overflow-hidden p-0"
-				:class="{ 'breadcrumb-fade-mask': isBreadcrumbOverflowing }"
+				class="m-0 flex min-w-0 flex-shrink items-center p-0"
+				:class="
+					compact
+						? 'flex-1'
+						: ['overflow-hidden', { 'breadcrumb-fade-mask': isBreadcrumbOverflowing }]
+				"
 				:style="
-					isBreadcrumbOverflowing
+					isBreadcrumbOverflowing && !compact
 						? { '--scroll-distance': `-${breadcrumbOverflowAmount}px` }
 						: undefined
 				"
@@ -41,16 +48,25 @@
 					ref="breadcrumbInner"
 					name="breadcrumb"
 					tag="span"
-					class="relative flex w-fit items-center"
-					:class="{ 'breadcrumbs-scroll': isBreadcrumbAnimating }"
+					class="relative flex items-center"
+					:class="
+						compact
+							? 'w-full flex-wrap'
+							: ['w-fit', { 'breadcrumbs-scroll': isBreadcrumbAnimating }]
+					"
 					@animationiteration="onBreadcrumbAnimationIteration"
 				>
-					<li :key="`home`" class="relative flex shrink-0 items-center text-sm">
+					<li
+						:key="`home`"
+						class="relative flex shrink-0 items-center"
+						:class="compact ? 'text-xs' : 'text-sm'"
+					>
 						<div class="flex shrink-0 items-center">
 							<Button
 								v-tooltip="formatMessage(messages.backToHome)"
 								:label="formatMessage(messages.backToHome)"
 								type="quiet"
+								:size="buttonSize"
 								class="cursor-pointer whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 								:aria-current="breadcrumbs.length == 0 ? 'location' : undefined"
 								:class="{ '!text-contrast': breadcrumbs.length == 0 }"
@@ -71,11 +87,13 @@
 					<li
 						v-for="(segment, index) in breadcrumbs"
 						:key="`${segment || index}-group`"
-						class="relative flex shrink-0 items-center text-sm"
+						class="relative flex items-center"
+						:class="compact ? 'min-w-0 text-xs' : 'shrink-0 text-sm'"
 					>
-						<div class="flex shrink-0 items-center">
+						<div class="flex items-center" :class="compact ? 'min-w-0' : 'shrink-0'">
 							<Button
 								type="quiet"
+								:size="buttonSize"
 								class="cursor-pointer whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 								:aria-current="index === breadcrumbs.length - 1 ? 'location' : undefined"
 								:class="{ '!text-contrast': index === breadcrumbs.length - 1 }"
@@ -151,6 +169,8 @@ const props = withDefaults(
 		{
 			canGoBack?: boolean
 			canGoForward?: boolean
+			/** Smaller breadcrumbs that wrap onto further lines instead of scrolling when too long. */
+			compact?: boolean
 		} & Properties
 	>(),
 	{
@@ -160,6 +180,7 @@ const props = withDefaults(
 )
 
 const breadcrumbs = computed(() => props.activeLocation.path.split('/').filter(Boolean))
+const buttonSize = computed(() => (props.compact ? 'xs' : 'md'))
 
 defineEmits<{
 	navigate: [index: number]
@@ -191,7 +212,7 @@ function checkBreadcrumbOverflow() {
 function onBreadcrumbMouseEnter() {
 	bcHovered = true
 	bcStopping = false
-	if (isBreadcrumbOverflowing.value) {
+	if (isBreadcrumbOverflowing.value && !props.compact) {
 		isBreadcrumbAnimating.value = true
 	}
 }

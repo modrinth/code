@@ -1,0 +1,289 @@
+.dockview-theme-modrinth {
+	--dv-group-view-background-color: var(--surface-2);
+	--dv-tabs-and-actions-container-background-color: var(--surface-3);
+	--dv-tabs-and-actions-container-height: 2.25rem;
+	--dv-tabs-and-actions-container-font-size: 0.875rem;
+	--dv-activegroup-visiblepanel-tab-background-color: var(--surface-2);
+	--dv-activegroup-hiddenpanel-tab-background-color: var(--surface-3);
+	--dv-inactivegroup-visiblepanel-tab-background-color: var(--surface-2);
+	--dv-inactivegroup-hiddenpanel-tab-background-color: var(--surface-3);
+	--dv-activegroup-visiblepanel-tab-color: var(--color-contrast);
+	--dv-activegroup-hiddenpanel-tab-color: var(--color-text-default);
+	--dv-inactivegroup-visiblepanel-tab-color: var(--color-text-default);
+	--dv-inactivegroup-hiddenpanel-tab-color: var(--color-text-tertiary);
+	--dv-tab-divider-color: var(--surface-5);
+	--dv-separator-border: var(--surface-5);
+	--dv-paneview-header-border-color: var(--surface-5);
+	--dv-icon-hover-background-color: var(--surface-5);
+	--dv-drag-over-background-color: var(--color-brand-highlight);
+	--dv-active-sash-color: var(--color-brand);
+	--dv-tabs-container-scrollbar-color: var(--surface-5);
+}
+
+/*
+ * Dockview marks shown split views with a `visible` class, which Tailwind's utility of the same
+ * name would make visible even within a hidden panel (e.g. a workbench nested in an inactive tab).
+ */
+.dv-view.visible {
+	visibility: inherit;
+}
+
+.workbench-root .dv-groupview {
+	position: relative;
+}
+
+.workbench-tab-bar-handle {
+	position: absolute;
+	top: 0;
+	right: 1rem;
+	z-index: 10;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 2.5rem;
+	height: 0.875rem;
+	padding: 0;
+	border: 1px solid var(--surface-5);
+	border-top: none;
+	border-radius: 0 0 0.5rem 0.5rem;
+	background-color: var(--surface-3);
+	color: var(--color-text-default);
+	cursor: pointer;
+	opacity: 0.6;
+}
+
+.workbench-tab-bar-handle:hover,
+.workbench-tab-bar-handle:focus-visible {
+	opacity: 1;
+	color: var(--color-contrast);
+}
+
+.workbench-tab-bar-handle svg {
+	width: 0.875rem;
+	height: 0.875rem;
+}
+
+.workbench-tab-bar-handle.is-pulled-down svg {
+	transform: rotate(180deg);
+}
+
+.dv-tab {
+	border-width: 0px;
+	border-right-width: 1px;
+	border-style: solid;
+	border-color: var(--surface-5);
+}
+
+.workbench-root,
+.workbench-root .dockview-theme-modrinth {
+	--dv-sash-color: transparent;
+	--dv-active-sash-color: transparent;
+}
+
+.workbench-root .dv-sash:not(.dv-disabled)::after {
+	content: '';
+	position: absolute;
+	pointer-events: none;
+	background-color: var(--color-brand);
+	opacity: 0;
+}
+
+.workbench-root .dv-horizontal > .dv-sash-container > .dv-sash::after {
+	top: 0;
+	left: 50%;
+	width: 1px;
+	height: 100%;
+}
+
+.workbench-root .dv-vertical > .dv-sash-container > .dv-sash::after {
+	top: 50%;
+	left: 0;
+	width: 100%;
+	height: 1px;
+}
+
+.workbench-root .dv-sash:not(.dv-disabled):hover::after {
+	opacity: 1;
+	transition: opacity 0s 0.3s;
+}
+
+.workbench-root .dv-sash:not(.dv-disabled):active::after {
+	opacity: 1;
+	transition: none;
+}
+
+.workbench-square,
+.workbench-square .dockview-theme-modrinth {
+	--dv-separator-border: var(--surface-4);
+}
+
+.workbench-square .workbench-panel {
+	background-color: var(--surface-2);
+}
+
+.workbench-square .dv-tabs-and-actions-container {
+	border-bottom: 1px solid var(--surface-4);
+}
+
+.workbench-square .dv-tab.dv-active-tab {
+	box-shadow: inset 0 -2px 0 var(--color-brand);
+}
+
+.workbench-square .dv-inactive-group .dv-tab.dv-active-tab {
+	box-shadow: inset 0 -2px 0 var(--surface-5);
+}
+
+.workbench-rounded,
+.workbench-rounded .dockview-theme-modrinth {
+	--dv-background-color: var(--surface-1);
+	--dv-group-view-background-color: var(--surface-1);
+	--dv-tabs-and-actions-container-background-color: var(--surface-1);
+	--dv-separator-border: var(--surface-4);
+	--dv-activegroup-visiblepanel-tab-background-color: transparent;
+	--dv-activegroup-hiddenpanel-tab-background-color: transparent;
+	--dv-inactivegroup-visiblepanel-tab-background-color: transparent;
+	--dv-inactivegroup-hiddenpanel-tab-background-color: transparent;
+	--dv-activegroup-visiblepanel-tab-color: var(--color-green);
+	--dv-inactivegroup-visiblepanel-tab-color: var(--color-green);
+	--dv-activegroup-hiddenpanel-tab-color: var(--color-text-default);
+	--dv-inactivegroup-hiddenpanel-tab-color: var(--color-text-default);
+	--dv-icon-hover-background-color: var(--surface-3);
+	--dv-tab-divider-color: transparent;
+	--dv-tabs-and-actions-container-height: 28px;
+	--dv-tabs-and-actions-container-font-size: 14px;
+	--dv-drag-over-background-color: color-mix(in srgb, var(--color-text-default) 5%, transparent);
+	--dv-drag-over-border-color: color-mix(in srgb, var(--color-text-default) 10%, transparent);
+	--dv-drag-over-border: 1px solid var(--dv-drag-over-border-color);
+}
+
+.workbench-rounded {
+	background-color: var(--surface-1);
+}
+
+.workbench-rounded .workbench-panel,
+.workbench-rounded .workbench-toolbar,
+.workbench-rounded .workbench-collapsed-strip {
+	background-color: var(--surface-1);
+}
+
+.workbench-rounded .workbench-toolbar {
+	border-color: var(--color-divider);
+}
+
+.workbench-square .workbench-collapsed-strip {
+	background-color: var(--surface-3);
+}
+
+.workbench-rounded .dv-tab {
+	height: var(--dv-tabs-and-actions-container-height);
+	padding: 0;
+	border: none;
+	border-radius: 0.5rem;
+}
+
+.workbench-rounded .dv-drop-target-container {
+	--dv-transition-duration: 70ms;
+}
+
+.workbench-rounded .dv-drop-target-anchor-line {
+	transition: none;
+}
+
+.workbench-rounded .dv-tabs-and-actions-container {
+	height: auto;
+	min-height: var(--dv-tabs-and-actions-container-height);
+	align-items: flex-start;
+	padding: 9px 6px 9px 6px;
+	gap: 4px;
+}
+
+.workbench-rounded .dv-tabs-container {
+	flex-wrap: wrap;
+	height: auto;
+	overflow: visible;
+	align-content: flex-start;
+	gap: 4px;
+	padding: 2px;
+	border: 1px solid var(--surface-4);
+	border-radius: 0.75rem;
+	box-shadow: var(--shadow-sm, 0 1px 2px 0 rgb(0 0 0 / 0.05));
+}
+
+.workbench-rounded .dv-pre-actions-container,
+.workbench-rounded .dv-left-actions-container,
+.workbench-rounded .dv-right-actions-container {
+	height: calc(var(--dv-tabs-and-actions-container-height) + 6px);
+}
+
+.workbench-rounded .dv-void-container {
+	display: flex;
+	min-width: 0;
+	height: auto;
+	align-self: stretch;
+}
+
+.workbench-rounded .dv-tab:focus-visible::after,
+.workbench-rounded .dv-tab:has(:focus-visible)::after {
+	border-radius: 0.5rem;
+	box-shadow: 0 0 0 4px var(--color-brand-shadow);
+}
+
+.workbench-rounded
+	.dv-tab
+	> .dv-drop-target-dropzone
+	> .dv-drop-target-selection.dv-drop-target-selection-line {
+	position: absolute;
+	width: 2px !important;
+	background-color: var(--color-text-default);
+	border: none;
+	transition: none;
+}
+
+.workbench-rounded .dv-tab > .dv-drop-target-dropzone > .dv-drop-target-left {
+	left: -1px !important;
+	right: auto !important;
+}
+
+.workbench-rounded .dv-tab > .dv-drop-target-dropzone > .dv-drop-target-right {
+	left: auto !important;
+	right: -1px !important;
+}
+
+@property --workbench-panel-scrollbar-color {
+	syntax: '<color>';
+	inherits: true;
+	initial-value: transparent;
+}
+
+/* Rounded panels only show their scrollbars while hovered. */
+.workbench-rounded .workbench-panel {
+	--workbench-panel-scrollbar-color: transparent;
+	transition: --workbench-panel-scrollbar-color 1750ms ease;
+}
+
+.workbench-rounded .workbench-panel:hover {
+	--workbench-panel-scrollbar-color: var(--color-scrollbar);
+	transition-duration: 200ms;
+}
+
+.workbench-rounded .workbench-panel,
+.workbench-rounded .workbench-panel * {
+	scrollbar-color: var(--workbench-panel-scrollbar-color) transparent;
+}
+
+.workbench-rounded .workbench-panel::-webkit-scrollbar-thumb,
+.workbench-rounded .workbench-panel *::-webkit-scrollbar-thumb {
+	background: var(--workbench-panel-scrollbar-color);
+}
+
+@media (hover: none) {
+	.workbench-rounded .workbench-panel {
+		--workbench-panel-scrollbar-color: var(--color-scrollbar);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.workbench-rounded .workbench-panel {
+		transition: none;
+	}
+}

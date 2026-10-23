@@ -1,151 +1,123 @@
 <template>
 	<section
-		class="project-review relative flex overflow-hidden bg-bg"
+		class="project-review relative flex flex-col overflow-hidden bg-surface-1"
 		aria-label="Project Review"
-		@dblclick="onDividerDoubleClick"
 	>
-		<div class="flex min-h-0 min-w-0 flex-1 flex-col">
-			<div class="min-h-0 flex-1 overflow-x-auto">
-				<ProjectReviewColumns
-					class="project-review-dock h-full"
-					:style="{
-						minWidth: `${workspacePanelSizes.center.minimum + (leftVisible ? workspacePanelSizes.left.minimum : 0) + (rightVisible ? workspacePanelSizes.right.minimum : 0)}px`,
-					}"
-				/>
-			</div>
-		</div>
+		<ArchiveSession
+			:source="archive.source.value"
+			:path="archive.path.value"
+			@update:path="archive.setPath"
+		>
+			<ReviewWorkbench
+				v-if="nestedArchive"
+				ref="reviewWorkbench"
+				nested-archive
+				:slots="slots"
+				:tabs="tabs"
+				:side-panels="sidePanels"
+				:counts="counts"
+				:reset-key="resetKey"
+				:ready="ready"
+			/>
+			<FilePageLayout
+				v-else
+				workbench
+				workspace="project-review"
+				default-browsing="sidebar"
+				compact-navigation
+				:sidebar="sidebar"
+			>
+				<template #workspace>
+					<ReviewWorkbench
+						ref="reviewWorkbench"
+						:nested-archive="false"
+						:slots="slots"
+						:tabs="tabs"
+						:side-panels="sidePanels"
+						:counts="counts"
+						:reset-key="resetKey"
+						:ready="ready"
+					/>
+				</template>
+			</FilePageLayout>
+		</ArchiveSession>
 	</section>
 </template>
 
 <script setup lang="ts">
-import 'dockview-vue/dist/styles/dockview.css'
+import { moderationSettings } from '@modrinth/moderation'
+import { ArchiveSession, FilePageLayout } from '@modrinth/ui'
+import { computed, ref, watch } from 'vue'
 
-import { onScopeDispose, watch, watchEffect } from 'vue'
+import { useModerationSettings } from '~/composables/moderation'
+import { injectReviewArchive } from '~/providers/project-review/review-archive'
 
-import { useModerationKeybinds } from '~/composables/moderation'
+import ReviewWorkbench from './review-workbench.vue'
+import type {
+	ProjectReviewSidePanel,
+	ProjectReviewSlot,
+	ProjectReviewSlots,
+	ProjectReviewTab,
+} from './types'
 
-import { injectReviewContext } from '../review-panel/context'
-import { reviewShortcutBlocked, useReviewEventListener, useReviewShortcut } from '../shortcuts'
-import ProjectReviewColumns from './columns.vue'
-import { provideProjectReviewContext } from './context'
-import { reviewPanelLabels } from './labels'
-import { workspacePanelSizes } from './layout-storage'
-import type { ProjectReviewSlots, ProjectReviewTab } from './types'
-import { useProjectReviewLayout } from './use-layout'
-
-const props = defineProps<{
+/**
+ * The review's layout: a workbench of the review's panels and tabs, along with the archive it
+ * shows (by default the latest version's primary file), either spread among those panels or in a
+ * single panel of its own, as the settings choose.
+ */
+defineProps<{
 	tabs: readonly ProjectReviewTab[]
+	sidePanels: readonly ProjectReviewSidePanel[]
+	/** Item counts shown in the panels' tabs, e.g. how many issues there are. */
+	counts?: Partial<Record<ProjectReviewSlot, number>>
 	resetKey: string
 	ready: boolean
 }>()
 const slots = defineSlots<ProjectReviewSlots>()
+const archive = injectReviewArchive()
+const settings = useModerationSettings()
 
-const layout = useProjectReviewLayout(
-	(tab) => reviewPanelLabels[tab],
-	() => props.tabs,
-	() => props.ready,
+/** Whether the whole archive is kept in a single panel, with a layout of its own. */
+const nestedArchive = computed(
+	() => settings.value.get(moderationSettings.General.ArchiveIntegration) === 'exclusive',
 )
-const { leftVisible, rightVisible, visibleRightWidth, onDividerDoubleClick } = layout
-const { heldTab, shortcutTab } = injectReviewContext()
-let heldTabKey: string | undefined
 
-watchEffect(() => {
-	document.body.style.setProperty(
-		'--project-review-right-panel-width',
-		`${visibleRightWidth.value}px`,
-	)
-})
-onScopeDispose(() => {
-	document.body.style.removeProperty('--project-review-right-panel-width')
-})
+const reviewWorkbench = ref<InstanceType<typeof ReviewWorkbench>>()
 
-function releaseHeldTab() {
-	heldTab.value = undefined
-	heldTabKey = undefined
-}
-
-function clearShortcutTab() {
-	releaseHeldTab()
-	shortcutTab.value = undefined
-}
-
-watch(
-	() => props.resetKey,
-	(resetKey, previousResetKey) => {
-		clearShortcutTab()
-		if (resetKey && previousResetKey) layout.resetActiveTabs()
+/** The files layout's sidebar toggle shows and hides the archive's files, wherever they are. */
+const sidebar = {
+	isOpen: () => {
+		const workbench = reviewWorkbench.value?.workbench
+		if (!workbench) return true
+		const tree = workbench.panels.value.find((panel) => panel.id === 'tree')
+		if (!tree || !workbench.isOpen('tree')) return false
+		const host = workbench.regionOf(tree)
+		return host === 'center' || workbench.visible[host].value
 	},
-)
+	setOpen: (open: boolean) => {
+		const workbench = reviewWorkbench.value?.workbench
+		const tree = workbench?.panels.value.find((panel) => panel.id === 'tree')
+		if (!workbench || !tree) return
+		const host = workbench.regionOf(tree)
+		if (open) workbench.revealPanel('tree')
+		else if (host === 'center') workbench.closePanel('tree')
+		else workbench.setRegionVisible(host, false)
+	},
+}
 
-provideProjectReviewContext({ ...layout, slots })
-
-useReviewShortcut('toggle-left', () => layout.toggleSidebar('left'))
-useReviewShortcut('toggle-right', () => layout.toggleSidebar('right'))
-useReviewShortcut('reveal-right', () => layout.revealSlot('right'))
-
-const keybinds = useModerationKeybinds()
-useReviewEventListener('keydown', (event) => {
-	if (reviewShortcutBlocked(event)) return
-	keybinds.value.handle(event, {
-		scope: 'project-review',
-		openTab: (tab) => {
-			if (!props.tabs.includes(tab)) return
-			layout.openTab(tab)
-			heldTab.value = tab
-			shortcutTab.value = tab
-			heldTabKey = event.code || event.key.toLowerCase()
-		},
-	})
+watch(archive.openRequests, () => {
+	const workbench = reviewWorkbench.value
+	workbench?.reveal(workbench.filesPanel)
 })
-useReviewEventListener('keyup', (event) => {
-	if ((event.code || event.key.toLowerCase()) === heldTabKey) releaseHeldTab()
+
+defineExpose({
+	reveal: (slot: ProjectReviewSlot) => reviewWorkbench.value?.reveal(slot),
 })
-useReviewEventListener('blur', clearShortcutTab)
-onScopeDispose(clearShortcutTab)
 </script>
 
 <style scoped>
 .project-review {
 	height: 100dvh;
 	width: 100%;
-}
-
-.project-review :deep(.project-review-dock) {
-	--dv-background-color: var(--color-bg);
-	--dv-separator-border: var(--surface-4);
-	--dv-sash-color: transparent;
-	--dv-active-sash-color: transparent;
-}
-
-.project-review :deep(.dv-sash:not(.dv-disabled)::after) {
-	content: '';
-	position: absolute;
-	pointer-events: none;
-	background-color: var(--color-brand);
-	opacity: 0;
-}
-
-.project-review :deep(.dv-horizontal > .dv-sash-container > .dv-sash::after) {
-	top: 0;
-	left: 50%;
-	width: 1px;
-	height: 100%;
-}
-
-.project-review :deep(.dv-vertical > .dv-sash-container > .dv-sash::after) {
-	top: 50%;
-	left: 0;
-	width: 100%;
-	height: 1px;
-}
-
-.project-review :deep(.dv-sash:not(.dv-disabled):hover::after) {
-	opacity: 1;
-	transition: opacity 0s 0.5s;
-}
-
-.project-review :deep(.dv-sash:not(.dv-disabled):active::after) {
-	opacity: 1;
-	transition: none;
 }
 </style>

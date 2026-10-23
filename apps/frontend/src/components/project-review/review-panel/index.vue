@@ -73,6 +73,7 @@
 			:active="inlineActive"
 			:enabled="settings.get(moderationSettings.General.ShowInlinePanelHoverHighlight)"
 			layer="behind"
+			:class="{ '!flex-row flex-wrap items-center !gap-2': inlineTitle }"
 		>
 			<div v-if="title && !hideTitle" class="flex items-center gap-2">
 				<h2 :id="titleId" class="m-0 text-sm font-semibold text-contrast">
@@ -103,6 +104,7 @@
 					:binding="binding"
 					:target="target"
 					:hide-title="hideTitle"
+					:inline="inlineTitle"
 					@dropdown-open="setInlineDropdownOpen($event, true)"
 					@dropdown-close="setInlineDropdownOpen($event, false)"
 				/>
@@ -141,6 +143,8 @@ const props = withDefaults(
 		disabled?: boolean
 		showFindingBadge?: boolean
 		hideTitle?: boolean
+		/** Shows the controls on the title's line, wrapping onto the next ones, rather than below it. */
+		inlineTitle?: boolean
 		interactionScope?: HTMLElement | null
 	}>(),
 	{ showFindingBadge: true },

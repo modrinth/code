@@ -1,7 +1,7 @@
 <template>
 	<div
 		ref="editorContainer"
-		class="relative flex flex-col overflow-hidden"
+		class="relative flex flex-col overflow-hidden border-0 border-t border-solid border-surface-5"
 		:class="{ 'h-full': props.fillHeight }"
 	>
 		<EditorFindReplace
@@ -18,26 +18,44 @@
 			@replace="replaceOne"
 			@replace-all="replaceAllOccurrences"
 		/>
-		<component
-			:is="props.editorComponent"
-			v-if="!isEditingImage && !isLoading && props.editorComponent"
-			v-model:value="fileContent"
-			:lang="editorLanguage"
-			theme="modrinth"
+		<CodeEditor
+			v-if="!isEditingImage && !mediaPreview && binarySize == null && !isLoading"
+			ref="codeEditor"
+			v-model="fileContent"
+			:language="editorLanguage"
 			:readonly="isEditorReadOnly"
-			:print-margin="false"
-			:style="{ height: props.fillHeight ? undefined : editorHeight, fontSize: '0.875rem' }"
-			class="ace-modrinth"
+			:extensions="editorKeys"
+			:style="{ height: props.fillHeight ? undefined : editorHeight }"
+			class="text-sm"
 			:class="props.fillHeight ? 'min-h-0 flex-1' : 'rounded-[20px]'"
-			@init="onEditorInit"
+			@save="saveFileContent(false)"
 		/>
 		<FileImageViewer
 			v-else-if="isEditingImage && imagePreview"
 			:image-blob="imagePreview"
 			:class="{ '!h-full !rounded-none': props.fillHeight }"
 		/>
+		<FileMediaViewer
+			v-else-if="mediaPreview && props.file"
+			:blob="mediaPreview.blob"
+			:kind="mediaPreview.kind"
+			:name="props.file.name"
+			:class="{ '!h-full !rounded-none': props.fillHeight }"
+		/>
+		<FilePreviewFallback
+			v-else-if="binarySize != null && props.file"
+			:file="props.file"
+			:size="binarySize"
+			:class="{ '!h-full !rounded-none': props.fillHeight }"
+		/>
+		<FileViewControls
+			v-if="props.tabId && props.file"
+			class="absolute bottom-3 right-5 z-10"
+			:tab-id="props.tabId"
+			:file="props.file"
+		/>
 		<div
-			v-else-if="isLoading || !props.editorComponent"
+			v-else-if="isLoading"
 			class="flex items-center justify-center bg-bg-raised"
 			:class="props.fillHeight ? 'min-h-0 flex-1' : 'rounded-[20px]'"
 			:style="{ height: props.fillHeight ? undefined : editorHeight }"
@@ -48,24 +66,65 @@
 </template>
 
 <script setup lang="ts">
+import { keymap } from '@codemirror/view'
 import { SpinnerIcon } from '@modrinth/assets'
-import type { Ace } from 'ace-builds'
-import { type Component, computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import {
+	computed,
+	nextTick,
+	onMounted,
+	onUnmounted,
+	ref,
+	shallowRef,
+	useTemplateRef,
+	watch,
+} from 'vue'
 
+import CodeEditor from '#ui/components/base/CodeEditor.vue'
+import type CodeEditorImpl from '#ui/components/base/CodeEditorImpl.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { injectModrinthClient } from '#ui/providers'
 import { injectNotificationManager } from '#ui/providers/web-notifications'
-import { getEditorLanguage, getFileExtension, isImageFile } from '#ui/utils/file-extensions'
+import {
+	clearFind,
+	type FindMatches,
+	findNextMatch,
+	findPreviousMatch,
+	findText,
+	replaceAllMatches,
+	replaceMatch,
+} from '#ui/utils/codemirror/find'
+import {
+	getEditorLanguage,
+	getFileExtension,
+	isImageFile,
+	mediaKindOf,
+} from '#ui/utils/file-extensions'
 
-import { type FileInfo, injectFileManager } from '../../providers/file-manager'
+import { injectFileBrowserUI } from '../../providers/file-browser-ui'
+import {
+	type FileInfo,
+	type FileInterpretation,
+	injectFileManager,
+} from '../../providers/file-manager'
 import EditorFindReplace from './EditorFindReplace.vue'
 import FileImageViewer from './FileImageViewer.vue'
+import FileMediaViewer from './FileMediaViewer.vue'
+import FilePreviewFallback from './FilePreviewFallback.vue'
+import FileViewControls from './FileViewControls.vue'
 
 const props = defineProps<{
 	file: FileInfo<'file'> | null
-	editorComponent: Component | null
 	/** Fill the parent's height (e.g. a dockview panel) instead of sizing to the window. */
 	fillHeight?: boolean
+	/** Which of the file's content variants to show (see `FileManagerContext.contentVariants`). */
+	variant?: string | null
+	/**
+	 * How to show the file: `auto` picks by its type, while the others show its stored bytes as
+	 * text, as a hex dump or as formatted JSON, read-only.
+	 */
+	interpretation?: FileInterpretation
+	/** The tab showing the file, which offers its view controls in the view's corner. */
+	tabId?: string
 }>()
 
 const emit = defineEmits<{
@@ -75,6 +134,7 @@ const emit = defineEmits<{
 const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
 const ctx = injectFileManager()
+const ui = injectFileBrowserUI(null)
 const client = injectModrinthClient()
 
 const messages = defineMessages({
@@ -114,6 +174,10 @@ const messages = defineMessages({
 		id: 'files.editor.failed-to-share-title',
 		defaultMessage: 'Failed to share file',
 	},
+	hexTruncated: {
+		id: 'files.editor.hex-truncated',
+		defaultMessage: '… {bytes, plural, one {# more byte} other {# more bytes}} not shown',
+	},
 	failedToShareText: {
 		id: 'files.editor.failed-to-share-text',
 		defaultMessage: 'Could not upload to mclo.gs.',
@@ -124,8 +188,12 @@ const fileContent = ref('')
 const originalContent = ref('')
 const isEditingImage = ref(false)
 const imagePreview = ref<Blob | null>(null)
+const mediaPreview = shallowRef<{ blob: Blob; kind: 'video' | 'audio' } | null>(null)
+/** The size of a file whose contents can't be shown, which then shows in their place. */
+const binarySize = ref<number | null>(null)
 const isLoading = ref(false)
-const editorInstance = ref<Ace.Editor | null>(null)
+const codeEditor = useTemplateRef<InstanceType<typeof CodeEditorImpl>>('codeEditor')
+const editorView = computed(() => codeEditor.value?.view ?? null)
 const editorContainer = ref<HTMLElement | null>(null)
 const editorHeight = ref('300px')
 
@@ -151,21 +219,23 @@ onMounted(() => {
 	window.addEventListener('resize', updateEditorHeight)
 })
 
+/** Whether the file is shown other than as itself, which isn't something to edit. */
+const isInterpreted = computed(() => (props.interpretation ?? 'auto') !== 'auto')
+
 const editorLanguage = computed(() => {
-	const ext = getFileExtension(props.file?.name ?? '')
-	return getEditorLanguage(ext)
+	if (props.interpretation === 'json') return 'json'
+	if (isInterpreted.value) return 'text'
+	const hostLanguage = props.file ? ctx.editorLanguage?.(props.file) : undefined
+	return hostLanguage ?? getEditorLanguage(props.file?.name ?? '')
 })
 const isEditorReadOnly = computed(
-	() => (ctx.isBusy?.value ?? false) || (ctx.isReadOnly?.(props.file) ?? false),
+	() =>
+		isInterpreted.value || (ctx.isBusy?.value ?? false) || (ctx.isReadOnly?.(props.file) ?? false),
 )
 
-watch(isEditorReadOnly, (readOnly) => {
-	editorInstance.value?.setReadOnly(readOnly)
-})
-
 watch(
-	() => props.file,
-	async (newFile) => {
+	[() => props.file, () => props.variant, () => props.interpretation, () => ui?.jsonIndent.value],
+	async ([newFile]) => {
 		if (newFile) {
 			closeFind()
 			await loadFileContent(newFile)
@@ -182,7 +252,7 @@ async function loadFileContent(file: FileInfo<'file'>) {
 	try {
 		if (!props.fillHeight) window.scrollTo(0, 0)
 		const extension = getFileExtension(file.name)
-		const result = ctx.directoryTree.get(file)
+		const result = ctx.directoryTree.get(file, props.variant ?? undefined)
 
 		const holder = Promise.withResolvers<ArrayBuffer>()
 
@@ -204,12 +274,20 @@ async function loadFileContent(file: FileInfo<'file'>) {
 
 		const data = await holder.promise
 
-		if (isImageFile(extension)) {
-			const content = new Blob([data])
+		const mediaKind = mediaKindOf(file.name)
+		resetState()
+		if (isInterpreted.value) {
+			const content = interpret(data, props.interpretation!)
+			fileContent.value = content
+			originalContent.value = content
+		} else if (isImageFile(extension)) {
 			isEditingImage.value = true
-			imagePreview.value = content
+			imagePreview.value = new Blob([data])
+		} else if (mediaKind) {
+			mediaPreview.value = { blob: new Blob([data]), kind: mediaKind }
+		} else if (looksBinary(data)) {
+			binarySize.value = data.byteLength
 		} else {
-			isEditingImage.value = false
 			const content = new TextDecoder().decode(data)
 			fileContent.value = content
 			originalContent.value = content
@@ -240,34 +318,88 @@ function resetState() {
 	originalContent.value = ''
 	isEditingImage.value = false
 	imagePreview.value = null
+	mediaPreview.value = null
+	binarySize.value = null
 }
 
-function onEditorInit(editor: Ace.Editor) {
-	editorInstance.value = editor
-	editor.setReadOnly(isEditorReadOnly.value)
+/** How much of a file a hex dump covers, so huge files don't freeze the editor. */
+const HEX_DUMP_LIMIT = 2 * 1024 * 1024
+const HEX_BYTES_PER_LINE = 16
 
-	editor.commands.addCommand({
-		name: 'save',
-		bindKey: { win: 'Ctrl-S', mac: 'Command-S' },
-		exec: () => saveFileContent(false),
-	})
+/** Lines of offset, bytes in hex and the bytes as printable ASCII, like `xxd` prints them. */
+function hexDump(data: ArrayBuffer) {
+	const bytes = new Uint8Array(data, 0, Math.min(data.byteLength, HEX_DUMP_LIMIT))
+	const lines: string[] = []
+	for (let offset = 0; offset < bytes.length; offset += HEX_BYTES_PER_LINE) {
+		const line = bytes.subarray(offset, offset + HEX_BYTES_PER_LINE)
+		const hex = Array.from(line, (byte) => byte.toString(16).padStart(2, '0'))
+			.join(' ')
+			.padEnd(HEX_BYTES_PER_LINE * 3 - 1)
+		const ascii = Array.from(line, (byte) =>
+			byte >= 0x20 && byte < 0x7f ? String.fromCharCode(byte) : '.',
+		).join('')
+		lines.push(`${offset.toString(16).padStart(8, '0')}  ${hex}  ${ascii}`)
+	}
+	if (data.byteLength > HEX_DUMP_LIMIT) {
+		lines.push(formatMessage(messages.hexTruncated, { bytes: data.byteLength - HEX_DUMP_LIMIT }))
+	}
+	return lines.join('\n')
+}
 
-	editor.commands.addCommand({
-		name: 'find',
-		bindKey: { win: 'Ctrl-F', mac: 'Command-F' },
-		exec: () => toggleFind(),
-	})
+/**
+ * Line breaks typed straight into the data rather than escaped (as `\n`). Between values they're
+ * only whitespace, but within strings they make JSON invalid, so they're dropped before parsing.
+ */
+const UNESCAPED_LINE_BREAKS = /[\r\n]+/g
 
-	editor.commands.addCommand({
-		name: 'replace',
-		bindKey: { win: 'Ctrl-H', mac: 'Command-Option-F' },
-		exec: () => {
-			if (isEditorReadOnly.value) return
-			isFindOpen.value = true
-			nextTick(() => findReplaceRef.value?.openReplace())
+/**
+ * The file's stored bytes shown as text, a hex dump, or JSON laid out over lines and indented (as
+ * the settings say) when it parses as JSON, e.g. compacted JSON.
+ */
+function interpret(data: ArrayBuffer, interpretation: FileInterpretation) {
+	if (interpretation === 'hex') return hexDump(data)
+	const text = new TextDecoder().decode(data)
+	if (interpretation !== 'json') return text
+	try {
+		const parsed = JSON.parse(text.replace(UNESCAPED_LINE_BREAKS, ''))
+		return JSON.stringify(parsed, null, ui?.jsonIndent.value ?? '\t')
+	} catch {
+		return text
+	}
+}
+
+/** How much of a file is checked for being binary: enough to cover any text file's start. */
+const BINARY_SNIFF_LENGTH = 8192
+
+/** Text files don't hold NUL bytes, while nearly every binary format does near its start. */
+function looksBinary(data: ArrayBuffer) {
+	return new Uint8Array(data, 0, Math.min(data.byteLength, BINARY_SNIFF_LENGTH)).includes(0)
+}
+
+/** Find and replace open the page's own find bar, in place of the editor's. */
+const editorKeys = [
+	keymap.of([
+		{
+			key: 'Mod-f',
+			preventDefault: true,
+			run: () => {
+				toggleFind()
+				return true
+			},
 		},
-	})
-}
+		{
+			key: 'Mod-h',
+			mac: 'Mod-Alt-f',
+			preventDefault: true,
+			run: () => {
+				if (isEditorReadOnly.value) return false
+				isFindOpen.value = true
+				nextTick(() => findReplaceRef.value?.openReplace())
+				return true
+			},
+		},
+	]),
+]
 
 async function saveFileContent(exit: boolean = false) {
 	if (!props.file) return
@@ -326,10 +458,9 @@ async function shareToMclogs() {
 	}
 }
 
-function countOccurrences(content: string, query: string): number {
-	if (!query) return 0
-	const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-	return (content.match(new RegExp(escaped, 'gi')) ?? []).length
+function showMatches(matches: FindMatches) {
+	findMatchCount.value = matches.total
+	currentFindMatch.value = matches.current
 }
 
 function toggleFind() {
@@ -346,71 +477,35 @@ function closeFind() {
 	inFileFindQuery.value = ''
 	findMatchCount.value = 0
 	currentFindMatch.value = 0
-	editorInstance.value?.find('', { wrap: true })
-	editorInstance.value?.focus()
+	if (editorView.value) {
+		clearFind(editorView.value)
+		editorView.value.focus()
+	}
 }
 
-function replaceOne(query: string) {
-	const editor = editorInstance.value
-	if (!editor || isEditorReadOnly.value || findMatchCount.value === 0) return
-	editor.replace(query)
-	nextTick(() => {
-		const count = countOccurrences(fileContent.value, inFileFindQuery.value)
-		findMatchCount.value = count
-		currentFindMatch.value = count > 0 ? Math.min(currentFindMatch.value, count) : 0
-	})
+function replaceOne(replacement: string) {
+	if (!editorView.value || isEditorReadOnly.value || findMatchCount.value === 0) return
+	showMatches(replaceMatch(editorView.value, replacement))
 }
 
-function replaceAllOccurrences(query: string) {
-	const editor = editorInstance.value
-	if (!editor || isEditorReadOnly.value || findMatchCount.value === 0) return
-	editor.replaceAll(query)
-	nextTick(() => {
-		const count = countOccurrences(fileContent.value, inFileFindQuery.value)
-		findMatchCount.value = count
-		currentFindMatch.value = count > 0 ? 1 : 0
-		if (count > 0) {
-			editor.find(inFileFindQuery.value, { wrap: true, caseSensitive: false })
-		}
-	})
+function replaceAllOccurrences(replacement: string) {
+	if (!editorView.value || isEditorReadOnly.value || findMatchCount.value === 0) return
+	showMatches(replaceAllMatches(editorView.value, replacement))
 }
 
 function handleFindInput() {
-	const editor = editorInstance.value
-	if (!editor) return
-
-	const query = inFileFindQuery.value
-	if (!query) {
-		findMatchCount.value = 0
-		currentFindMatch.value = 0
-		editor.find('', { wrap: true })
-		return
-	}
-
-	const count = countOccurrences(fileContent.value, query)
-	findMatchCount.value = count
-
-	if (count > 0) {
-		editor.find(query, { wrap: true, caseSensitive: false })
-		currentFindMatch.value = 1
-	} else {
-		currentFindMatch.value = 0
-	}
+	if (!editorView.value) return
+	showMatches(findText(editorView.value, inFileFindQuery.value))
 }
 
 function findNext() {
-	const editor = editorInstance.value
-	if (!editor || findMatchCount.value === 0) return
-	editor.findNext()
-	currentFindMatch.value = (currentFindMatch.value % findMatchCount.value) + 1
+	if (!editorView.value || findMatchCount.value === 0) return
+	showMatches(findNextMatch(editorView.value))
 }
 
 function findPrevious() {
-	const editor = editorInstance.value
-	if (!editor || findMatchCount.value === 0) return
-	editor.findPrevious()
-	currentFindMatch.value =
-		((currentFindMatch.value - 2 + findMatchCount.value) % findMatchCount.value) + 1
+	if (!editorView.value || findMatchCount.value === 0) return
+	showMatches(findPreviousMatch(editorView.value))
 }
 
 function close() {
@@ -420,7 +515,6 @@ function close() {
 
 onUnmounted(() => {
 	window.removeEventListener('resize', updateEditorHeight)
-	editorInstance.value = null
 	resetState()
 })
 

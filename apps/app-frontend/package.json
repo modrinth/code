@@ -16,6 +16,7 @@
 	"dependencies": {
 		"@dnd-kit/dom": "^0.5.0",
 		"@dnd-kit/vue": "^0.5.0",
+		"@floating-ui/vue": "^2.0.1",
 		"@modrinth/api-client": "workspace:^",
 		"@modrinth/assets": "workspace:*",
 		"@modrinth/ui": "workspace:*",
@@ -33,9 +34,7 @@
 		"@tauri-apps/plugin-window-state": "^2.2.2",
 		"@types/three": "^0.172.0",
 		"@vueuse/core": "^11.1.0",
-		"ace-builds": "^1.43.5",
 		"dayjs": "^1.11.10",
-		"@floating-ui/vue": "^2.0.1",
 		"fuse.js": "^6.6.2",
 		"intl-messageformat": "^10.7.7",
 		"motion-v": "2.2.1",
@@ -47,7 +46,6 @@
 		"vue-i18n": "^10.0.0",
 		"vue-router": "^4.6.0",
 		"vue-virtual-scroller": "v2.0.0-beta.8",
-		"vue3-ace-editor": "^2.2.4",
 		"vuedraggable": "^4.1.0"
 	},
 	"devDependencies": {

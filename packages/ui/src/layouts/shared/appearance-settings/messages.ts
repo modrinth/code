@@ -22,6 +22,27 @@ export const appearanceSettingsMessages = defineMessages({
 		id: 'settings.display.theme.sync-across-devices.sign-in-tooltip',
 		defaultMessage: 'Sign into Modrinth to sync theme',
 	},
+	codeThemeTitle: {
+		id: 'settings.display.code-theme.title',
+		defaultMessage: 'Code highlighting',
+	},
+	codeThemeDescription: {
+		id: 'settings.display.code-theme.description',
+		defaultMessage:
+			'Pick the code theme used to highlight, style, and color code found within descriptions, changelogs and files. Kept on this device.',
+	},
+	codeThemeDefault: {
+		id: 'settings.display.code-theme.default',
+		defaultMessage: 'Modrinth',
+	},
+	codeThemeSearch: {
+		id: 'settings.display.code-theme.search',
+		defaultMessage: 'Search themes...',
+	},
+	codeThemePreview: {
+		id: 'settings.display.code-theme.preview',
+		defaultMessage: 'Preview',
+	},
 	projectListLayoutsTitle: {
 		id: 'settings.display.project-list-layouts.title',
 		defaultMessage: 'Project list layouts',

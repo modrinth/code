@@ -13,13 +13,13 @@
 	>
 		<div
 			ref="navbarWrapper"
-			class="sticky top-[var(--files-sticky-top,0px)] z-[29] bg-surface-1 py-1 before:pointer-events-none before:top-[calc(-1.5rem_+_1px)] before:absolute before:inset-x-0 before:h-[var(--files-sticky-top,0px)] before:bg-[var(--color-bg,_var(--surface-1))] before:content-['']"
+			class="sticky top-[var(--files-sticky-top,0px)] z-[29] bg-surface-1 py-1 pr-[calc(0.75rem+1px)] before:pointer-events-none before:top-[calc(-1.5rem_+_1px)] before:absolute before:inset-x-0 before:h-[var(--files-sticky-top,0px)] before:bg-[var(--color-bg,_var(--surface-1))] before:content-['']"
 		>
 			<FileNavbar
 				:sidebar-open="sidebarOpen"
 				:active-location="ui.activeLocation.value"
 				:is-editor-find-open="ui.fileEditorApi.value?.isFindOpen.value ?? false"
-				:search-query="ui.searchQuery.value"
+				:search-query="view.searchQuery.value"
 				:show-refresh-button="ui.showRefreshButton.value"
 				:show-install-from-url="ui.showInstallFromUrl"
 				:base-id="ui.baseId"
@@ -28,13 +28,15 @@
 				:small-mode="props.smallMode"
 				:can-go-back="ui.fileTabs.canGoBack.value"
 				:can-go-forward="ui.fileTabs.canGoForward.value"
-				:sidebar-toggleable="ui.advancedView.value"
+				:sidebar-toggleable="ui.advancedView.value && toggleLocation != null"
+				:sidebar-toggle-always="toggleLocation === 'navigation'"
+				:compact="ui.compactNavigation.value"
 				@back="ui.fileTabs.back"
 				@forward="ui.fileTabs.forward"
 				@navigate="ui.navigateToSegment"
 				@navigate-home="() => ui.navigateToSegment(0)"
 				@prefetch-home="ui.handleHomePrefetch"
-				@update:search-query="(value) => (ui.searchQuery.value = value)"
+				@update:search-query="(value) => (view.searchQuery.value = value)"
 				@create="ui.showCreateModal"
 				@upload="ui.initiateFileUpload"
 				@upload-zip="() => {}"
@@ -55,135 +57,46 @@
 					isFileActive
 						? 'h-[var(--files-viewer-height)]'
 						: ui.advancedView.value
-							? 'sticky top-[calc(var(--files-sticky-top,0px)_+_var(--files-navbar-height,0px))] z-20 h-10'
+							? 'sticky top-[calc(var(--files-sticky-top,0px)_+_var(--files-navbar-height,0px))] z-20 h-9'
 							: 'h-0'
 				"
 			>
 				<FileTabs />
 			</div>
 			<FileEmptyWorkspace v-if="!hasTabs" />
-			<FileManagerError
-				v-else-if="!isFileActive && ui.error.value"
-				class="rounded-b-[20px]"
-				:title="formatMessage(messages.errorTitle)"
-				:message="formatMessage(messages.errorMessage)"
-				@refetch="ui.refresh"
-				@home="() => ui.navigateToSegment(0)"
+			<FileListing
+				v-show="hasTabs && !isFileActive"
+				ref="listing"
+				:view="view"
+				:header-sticky-top="tableHeaderStickyTop"
+				@navigate="ui.navigateTo"
 			/>
-			<div v-show="hasTabs && !isFileActive && !ui.error.value" @contextmenu="openFolderMenu">
-				<FileUploadDragAndDrop
-					ref="fileUploadRef"
-					:disabled="ui.isBusy.value"
-					@drop-error="ui.handleDropError"
-					@files-dropped="ui.uploadFiles"
-				>
-					<FileTableHeader
-						:sort-field="ui.sortField.value"
-						:sort-desc="ui.sortDesc.value"
-						:all-selected="ui.allSelected.value"
-						:some-selected="ui.someSelected.value"
-						:is-stuck="isLabelBarStuck"
-						:columns="shownColumns"
-						:enabled-columns="enabledColumns"
-						:details-enabled="detailsEnabled"
-						:columns-adjustable="ui.advancedView.value"
-						:view-settings-enabled="ui.reworkEnabled.value"
-						:advanced-view="ui.advancedView.value"
-						:colored-icons="ui.coloredIcons.value"
-						@sort="ui.handleSort"
-						@toggle-all="ui.toggleSelectAll"
-						@toggle-column="toggleColumn"
-						@toggle-details="detailsEnabled = !detailsEnabled"
-						@toggle-advanced-view="ui.setAdvancedView(!ui.advancedView.value)"
-						@toggle-colored-icons="ui.setColoredIcons(!ui.coloredIcons.value)"
-					/>
-					<ReadyTransition :pending="listingPending">
-						<div
-							v-if="filteredItems.length > 0"
-							ref="virtualListContainer"
-							class="relative w-full"
-							:style="{ minHeight: `${totalHeight}px`, overflowAnchor: 'none' }"
-						>
-							<div class="absolute w-full" :style="{ top: `${visibleTop}px` }">
-								<FileRow
-									v-for="(item, idx) in visibleItems"
-									:key="item.path"
-									:class="`h-[${itemHeight}]`"
-									:file="item"
-									:index="visibleRange.start + idx"
-									:is-last="visibleRange.start + idx === filteredItems.length - 1"
-									:columns="shownColumns"
-									@navigate="ui.navigateTo"
-									@hover="ui.handleItemPrefetch"
-								/>
-							</div>
-						</div>
-						<div
-							v-else-if="ui.items.value.length === 0 && !ui.error.value && !ui.loading.value"
-							class="flex h-full w-full items-center justify-center rounded-b-[20px] bg-surface-2 p-20"
-						>
-							<div class="flex flex-col items-center gap-4 text-center">
-								<FolderOpenIcon class="h-16 w-16 text-secondary" />
-								<h3 class="m-0 text-2xl font-bold text-contrast">
-									{{ formatMessage(messages.emptyFolderTitle) }}
-								</h3>
-								<p class="m-0 text-sm text-secondary">
-									{{ formatMessage(messages.emptyFolderDescription) }}
-								</p>
-							</div>
-						</div>
-					</ReadyTransition>
-				</FileUploadDragAndDrop>
-			</div>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { FolderOpenIcon } from '@modrinth/assets'
 import { useElementSize, useEventListener } from '@vueuse/core'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
-import ReadyTransition from '#ui/components/base/ReadyTransition.vue'
-import { defineMessages, useVIntl } from '#ui/composables'
-import { useStickyObserver } from '#ui/composables/sticky-observer'
-import { findScrollableAncestor, useVirtualScroll } from '#ui/composables/virtual-scroll.ts'
+import { findScrollableAncestor } from '#ui/composables/virtual-scroll.ts'
 import { injectLoadingState } from '#ui/providers/loading-state'
 
 import { useEntryMenu } from '../composables/entry-menu'
-import { useFileColumns } from '../composables/file-columns'
+import { useSidebarToggleLocation } from '../composables/sidebar-toggle'
 import { injectFileBrowserUI } from '../providers/file-browser-ui'
 import { parentInfoFrom } from '../utils'
 import FileEmptyWorkspace from './FileEmptyWorkspace.vue'
-import FileManagerError from './FileManagerError.vue'
+import FileListing from './FileListing.vue'
 import FileNavbar from './FileNavbar.vue'
-import FileRow from './FileRow.vue'
-import FileTableHeader from './FileTableHeader.vue'
 import FileTabs from './tabs/FileTabs.vue'
-import FileUploadDragAndDrop from './upload/FileUploadDragAndDrop.vue'
 
-const { formatMessage } = useVIntl()
-
-const messages = defineMessages({
-	emptyFolderTitle: {
-		id: 'files.layout.empty-folder-title',
-		defaultMessage: 'This folder is empty',
-	},
-	emptyFolderDescription: {
-		id: 'files.layout.empty-folder-description',
-		defaultMessage: 'There are no files or folders.',
-	},
-	errorTitle: {
-		id: 'files.layout.error-title',
-		defaultMessage: 'Unable to load files',
-	},
-	errorMessage: {
-		id: 'files.layout.error-message',
-		defaultMessage: 'The folder may not exist.',
-	},
-})
-
+/**
+ * The files tab laid out within a scrolling page: the navbar, the tab strip and, below it, the
+ * active tab's listing or editor. Hosts using the workbench show each tab's own view instead.
+ */
 const ui = injectFileBrowserUI()
+const view = computed(() => ui.activeView.value)
 
 const props = withDefaults(
 	defineProps<{
@@ -195,17 +108,12 @@ const props = withDefaults(
 )
 
 const sidebarOpen = computed(() => ui.sidebarOpen.value)
+const toggleLocation = useSidebarToggleLocation()
 const isFileActive = computed(() => ui.fileTabs.activeLocation.value.type === 'file')
 /** In the advanced view every tab can be closed, which leaves an empty workspace. */
 const hasTabs = computed(() => ui.fileTabs.tabs.value.length > 0)
 
 const { openMenu } = useEntryMenu()
-
-/** Right-click on the folder's empty space (rows open their own menu and prevent this one). */
-function openFolderMenu(event: MouseEvent) {
-	if (event.defaultPrevented) return
-	openMenu(event, ui.currentDirectory.value)
-}
 
 /** Right-click on a breadcrumb, `depth` segments deep (the last one is the active location). */
 function openBreadcrumbMenu(event: MouseEvent, depth: number) {
@@ -213,11 +121,6 @@ function openBreadcrumbMenu(event: MouseEvent, depth: number) {
 	const segments = location.path.split('/').filter(Boolean)
 	openMenu(event, depth >= segments.length ? location : parentInfoFrom(location, depth))
 }
-
-const filteredItems = computed(() => ui.filteredItems.value)
-
-/** Only the listing fades while a directory loads for the first time; tabs, navbar and sidebar stay put. */
-const listingPending = computed(() => ui.loading.value && ui.items.value.length === 0)
 
 const loadingState = injectLoadingState(null)
 let refreshToken: symbol | null = null
@@ -237,25 +140,7 @@ watch(
 )
 onBeforeUnmount(endRefreshLoading)
 
-// Virtual scroll
-const {
-	listContainer: virtualListContainer,
-	totalHeight,
-	itemHeight,
-	visibleRange,
-	visibleTop,
-	visibleItems,
-	syncScrollState,
-} = useVirtualScroll(filteredItems, {
-	itemHeight: 3.25,
-	itemUnit: 'rem',
-	bufferSize: 5,
-})
-
-const { detailsEnabled, enabledColumns, shownColumns, toggleColumn } = useFileColumns(
-	ui.containerWidth,
-	ui.advancedView,
-)
+const listing = ref<InstanceType<typeof FileListing>>()
 
 const TAB_STRIP_HEIGHT = 40
 /** The tab strip is hidden, along with the tabs feature, while the rework is disabled. */
@@ -271,12 +156,6 @@ const tableHeaderStickyTop = computed(() => {
 		? parseFloat(getComputedStyle(navbarWrapper.value).top) || 0
 		: 0
 	return hostOffset + navbarHeight.value + tabStripHeight.value
-})
-
-const fileUploadRef = ref<InstanceType<typeof FileUploadDragAndDrop>>()
-const fileUploadEl = computed(() => fileUploadRef.value?.$el as HTMLElement | null)
-const { isStuck: isLabelBarStuck } = useStickyObserver(fileUploadEl, undefined, {
-	topOffset: tableHeaderStickyTop,
 })
 
 /** Brings the navbar and file viewer to the top of the scroll area, unless they're already there. */
@@ -379,7 +258,7 @@ watch(isFileActive, setViewerSnapping, { flush: 'post' })
 
 /** The listing stays mounted (hidden) while a file is open, so it has to re-measure when shown again. */
 watch(isFileActive, (active) => {
-	if (!active) nextTick(syncScrollState)
+	if (!active) nextTick(() => listing.value?.syncScrollState())
 })
 onMounted(() => {
 	setViewerSnapping(isFileActive.value)

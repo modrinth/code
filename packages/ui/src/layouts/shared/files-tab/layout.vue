@@ -25,8 +25,10 @@
 	<FileDeleteItemModal ref="deleteItemModal" :item="selectedItem" @delete="handleDeleteItem" />
 	<ContextMenu ref="contextMenuRef" :label="formatMessage(commonMessages.actionsLabel)" />
 
-	<div v-if="hasLoadedOnce" ref="fileViewer">
+	<div v-if="hasLoadedOnce" ref="fileViewer" :class="{ 'h-full min-h-0': $slots.workspace }">
+		<slot v-if="$slots.workspace" name="workspace" />
 		<div
+			v-else
 			class="grid items-start"
 			:class="{ 'cursor-col-resize select-none': isResizingSidebar }"
 			:style="{
@@ -61,11 +63,11 @@
 					/>
 				</div>
 			</template>
-			<div ref="mainColumn" class="min-w-0">
+			<div class="min-w-0">
 				<FileBrowserPanel :small-mode="smallMode" />
 			</div>
 		</div>
-		<template v-if="smallMode && advancedView">
+		<template v-if="smallMode && advancedView && !props.sidebar">
 			<NewModal
 				ref="sidebarModal"
 				:on-hide="() => (sidebarModalOpen = false)"
@@ -154,14 +156,22 @@
 <script setup lang="ts">
 import { FolderArchiveIcon, HistoryIcon, SaveIcon, TrashIcon } from '@modrinth/assets'
 import { type MaybeElement, useLocalStorage, useResizeObserver } from '@vueuse/core'
-import type { Component } from 'vue'
-import { computed, onMounted, onUnmounted, ref, shallowRef, toValue, watch } from 'vue'
+import {
+	computed,
+	nextTick,
+	onMounted,
+	onUnmounted,
+	ref,
+	shallowReactive,
+	toValue,
+	watch,
+} from 'vue'
 
 import { type ButtonMenuOption, NewModal } from '#ui/components'
 import { Button, ContextMenu } from '#ui/components/base/buttons'
 import FloatingActionBar from '#ui/components/base/FloatingActionBar.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { useFileTabs } from '#ui/layouts/shared/files-tab/composables/file-tabs.ts'
+import { currentLocation, useFileTabs } from '#ui/layouts/shared/files-tab/composables/file-tabs.ts'
 import {
 	childPath,
 	infoFrom,
@@ -174,7 +184,7 @@ import { injectFilePicker } from '#ui/providers/file-picker'
 import { injectPageContext } from '#ui/providers/page-context'
 import { injectNotificationManager } from '#ui/providers/web-notifications'
 import { commonMessages } from '#ui/utils/common-messages'
-import { canOpenInFileEditor } from '#ui/utils/file-extensions'
+import { canOpenInFileEditor, getEditorLanguage } from '#ui/utils/file-extensions'
 
 import FileBrowserPanel from './components/FileBrowserPanel.vue'
 import FileSideBar from './components/FileSideBar.vue'
@@ -186,13 +196,25 @@ import FileRenameItemModal from './components/modals/FileRenameItemModal.vue'
 import FileUnsavedChangesModal from './components/modals/FileUnsavedChangesModal.vue'
 import FileUploadConflictModal from './components/modals/FileUploadConflictModal.vue'
 import FileUploadZipUrlModal from './components/modals/FileUploadZipUrlModal.vue'
-import { useFileSearch } from './composables/file-search'
+import { useDirectoryView, useDirectoryViews } from './composables/directory-view'
 import { useFileSelection } from './composables/file-selection'
-import { useFileSorting } from './composables/file-sorting'
 import { useFileUndoRedo } from './composables/file-undo-redo'
 import type { FileEditorBridge } from './providers/file-browser-ui'
 import { provideFileBrowserUI } from './providers/file-browser-ui'
-import { type FileInfo, injectFileManager } from './providers/file-manager'
+import {
+	type FileInfo,
+	type FileInterpretation,
+	type FileManagerContext,
+	injectFileManager,
+} from './providers/file-manager'
+import {
+	type FilesBrowsing,
+	filesTabSettings,
+	jsonIndentOf,
+	provideFilesWorkspaceSettings,
+	useFilesTabSettings,
+	useFilesWorkspaceSettings,
+} from './settings'
 import type { FileItem } from './types'
 
 const { formatMessage } = useVIntl()
@@ -258,8 +280,30 @@ const props = withDefaults(
 		 * `loadedEntries` cover the whole file system can turn it off.
 		 */
 		searchLoadedOnlyNotice?: boolean
+		/** Uses the files tab advanced view (sidebar tree, tabs and column picker) regardless of its feature flag. */
+		advancedView?: boolean
+		/**
+		 * Hands the sidebar's open state to the host, for hosts that place the sidebar themselves
+		 * through the `workspace` slot.
+		 */
+		sidebar?: { isOpen: () => boolean; setOpen: (open: boolean) => void }
+		/** Smaller navigation whose breadcrumbs wrap instead of scrolling, for tighter spaces. */
+		compactNavigation?: boolean
+		/**
+		 * The tabs are hosted by a workbench placed through the `workspace` slot (see
+		 * `FileWorkbench`), where each tab shows its own navigation and listing and can be split
+		 * or moved around. Implies the advanced view.
+		 */
+		workbench?: boolean
+		/**
+		 * Names this place files are browsed, which keeps settings of its own (e.g. how folders are
+		 * browsed) apart from other places'.
+		 */
+		workspace?: string
+		/** How folders are browsed here until the user picks otherwise. */
+		defaultBrowsing?: FilesBrowsing
 	}>(),
-	{ searchLoadedOnlyNotice: true },
+	{ searchLoadedOnlyNotice: true, workspace: 'files', defaultBrowsing: 'listing' },
 )
 
 const { addNotification } = injectNotificationManager()
@@ -267,15 +311,53 @@ const ctx = injectFileManager()
 const filePicker = injectFilePicker(null)
 const pageContext = injectPageContext(null)
 
-const reworkEnabled = computed(() => pageContext?.featureFlags?.filesTabRework?.value ?? false)
+const canUseAdvancedView = computed(
+	() =>
+		props.workbench ||
+		props.advancedView ||
+		(pageContext?.featureFlags?.filesTabRework?.value ?? false),
+)
 
 const advancedViewSetting = useLocalStorage('files-advanced-view', true, { initOnMounted: true })
-const coloredIconsSetting = useLocalStorage('files-colored-icons', reworkEnabled.value, {
+const coloredIconsSetting = useLocalStorage('files-colored-icons', canUseAdvancedView.value, {
 	initOnMounted: true,
+	writeDefaults: false,
 })
 /** The sidebar tree, tabs and column picker; behind the rework flag, then a user preference. */
-const advancedView = computed(() => reworkEnabled.value && advancedViewSetting.value)
+const advancedView = computed(
+	() => props.workbench || (canUseAdvancedView.value && advancedViewSetting.value),
+)
 const coloredIcons = computed(() => coloredIconsSetting.value)
+const compactFoldersSetting = useLocalStorage('files-compact-folders', false, {
+	initOnMounted: true,
+})
+const filesSettings = useFilesTabSettings()
+
+/** The content variant each tab picked for each file it showed, by tab and path. */
+const contentVariantChoices = shallowReactive(new Map<string, string>())
+/** How each tab shows each file it showed, by tab and path. */
+const interpretationChoices = shallowReactive(new Map<string, FileInterpretation>())
+
+/**
+ * JSON files that can't be edited open formatted, as nothing they show then gets saved. Editable
+ * ones open as they're stored, so saving them doesn't reformat them.
+ */
+function defaultInterpretation(file: FileInfo<'file'>): FileInterpretation {
+	if (!filesSettings.get(filesTabSettings.formatJson)) return 'auto'
+	if (!(ctx.readOnly || (ctx.isReadOnly?.(file) ?? false))) return 'auto'
+	const language = ctx.editorLanguage?.(file) ?? getEditorLanguage(file.name)
+	return language === 'json' ? 'json' : 'auto'
+}
+
+function contentVariantOf(tabId: string, file: FileInfo<'file'>) {
+	const variants = ctx.contentVariants?.(file)
+	if (!variants) return null
+	const picked = contentVariantChoices.get(`${tabId}:${file.path}`)
+	const selected = variants.options.some((option) => option.id === picked)
+		? picked!
+		: variants.default
+	return { ...variants, selected }
+}
 
 /** Switching to the simple view drops the extra tabs, so their unsaved changes are confirmed first. */
 async function setAdvancedView(value: boolean) {
@@ -283,15 +365,7 @@ async function setAdvancedView(value: boolean) {
 	advancedViewSetting.value = value
 }
 
-const editorComponent = shallowRef<Component | null>(null)
-import('vue3-ace-editor').then(async (mod) => {
-	await Promise.all([import('#ui/utils/ace-theme'), import('#ui/utils/ace-mode-log.ts')])
-	editorComponent.value = mod.VAceEditor
-})
-
 const baseId = `files-${Math.random().toString(36).slice(2, 9)}`
-
-const items = computed(() => ctx.directoryTree.get(ctx.currentDirectory.value).data.value)
 
 /**
  * Only the very first load hides the viewer. Unmounting it on later navigations would tear down
@@ -325,24 +399,8 @@ const busyTooltip = computed(() =>
 
 const activeLocation = computed(() => fileTabs.activeLocation.value)
 
-// Composables
-const { searchQuery, searchedItems } = useFileSearch(items)
-const {
-	sortField,
-	sortDesc,
-	handleSort,
-	sortedItems: filteredItems,
-	resetSort,
-} = useFileSorting(searchedItems)
-
-const {
-	selectedItems,
-	toggleItemSelection,
-	deselectAll,
-	toggleSelectAll,
-	allSelected,
-	someSelected,
-} = useFileSelection(filteredItems)
+const selection = useFileSelection()
+const { selectedItems, toggleItemSelection, deselectAll } = selection
 
 const selectionReadOnly = computed(() =>
 	[...selectedItems.value.values()].some((file) => ctx.isReadOnly?.(file)),
@@ -361,12 +419,55 @@ const { recordOperation, onKeydown } = useFileUndoRedo(
 	(title, text, type) => addNotification({ title, text, type }),
 )
 
+const workspaceSettings = provideFilesWorkspaceSettings(
+	useFilesWorkspaceSettings(props.workspace, { browsing: props.defaultBrowsing }),
+)
+
+/** How folders are browsed, as listings without the advanced view's sidebar and tabs. */
+const browsing = computed<FilesBrowsing>(() =>
+	advancedView.value ? workspaceSettings.store.get(workspaceSettings.browsing) : 'listing',
+)
+
+/** Shows a folder in the tree, expanding the folders down to it, while tabs don't list folders. */
+function revealDirectory(location: FileInfo) {
+	const segments = location.path.split('/').filter(Boolean)
+	const paths = segments.map((_, index) => `/${segments.slice(0, index + 1).join('/')}`)
+	const expanded = ctx.directoryTree.expandedEntries
+	const missing = paths.filter((path) => !expanded.value.includes(path))
+	if (missing.length > 0) expanded.value = [...expanded.value, ...missing]
+	void nextTick(() => setSidebarOpen(true))
+}
+
 const fileTabs = useFileTabs({
 	ctx,
 	confirmDiscard: confirmDiscardEditors,
 	workspaceId: () => (advancedView.value ? (toValue(ctx.workspaceId) ?? null) : null),
 	enabled: advancedView,
+	mode: props.workbench ? 'shared' : 'managed',
+	directories: () => browsing.value !== 'sidebar',
+	revealDirectory,
 })
+
+const { viewFor } = useDirectoryViews({
+	directoryTree: ctx.directoryTree,
+	selection,
+	locationOf: (tabId) => {
+		const tab = fileTabs.getTab(tabId)
+		return tab ? currentLocation(tab) : undefined
+	},
+	tabIds: () => fileTabs.tabs.value.map((tab) => tab.id),
+})
+
+/** Without an open tab (every tab closed) this views the root, which nothing shows anyway. */
+const fallbackView = useDirectoryView({
+	location: () => fileTabs.activeLocation.value,
+	directoryTree: ctx.directoryTree,
+	selection,
+})
+
+const activeView = computed(() =>
+	fileTabs.activeTab.value ? viewFor(fileTabs.activeTab.value.id) : fallbackView,
+)
 
 const fileEditorApi = fileTabs.activeEditor
 const hasUnsavedChanges = fileTabs.hasUnsavedChanges
@@ -408,8 +509,6 @@ const selectedItem = ref<FileInfo | null>(null)
 
 const unsavedChangesModal = ref<InstanceType<typeof FileUnsavedChangesModal>>()
 
-const mainColumn = ref<MaybeElement>()
-
 const SIDEBAR_MIN_WIDTH = 240
 const SIDEBAR_DEFAULT_WIDTH = 300
 
@@ -425,12 +524,15 @@ const sidebarWidthSetting = useLocalStorage('file-layout-sidebar-width', SIDEBAR
 /** The pullout sidebar used in small mode is transient, so it doesn't touch the saved setting. */
 const sidebarModalOpen = ref(false)
 
-const sidebarOpen = computed(() =>
-	smallMode.value ? sidebarModalOpen.value : sidebarOpenSetting.value,
-)
+const sidebarOpen = computed(() => {
+	if (props.sidebar) return props.sidebar.isOpen()
+	return smallMode.value ? sidebarModalOpen.value : sidebarOpenSetting.value
+})
 
 function setSidebarOpen(value: boolean) {
-	if (smallMode.value) {
+	if (props.sidebar) {
+		props.sidebar.setOpen(value)
+	} else if (smallMode.value) {
 		sidebarModalOpen.value = value
 	} else {
 		sidebarOpenSetting.value = value
@@ -447,15 +549,8 @@ watch(sidebarModalOpen, (value) => {
 
 /** Width of the whole files tab, used to pick between the docked sidebar and the pullout modal. */
 const shellWidth = ref<number>()
-/** Width of the main column, i.e. what `FileBrowserPanel` actually gets next to the sidebar. */
-const containerWidth = ref<number>()
-
 useResizeObserver(fileViewer, (entries) => {
 	shellWidth.value = entries[0].contentRect.width
-})
-
-useResizeObserver(mainColumn, (entries) => {
-	containerWidth.value = entries[0].contentRect.width
 })
 
 const smallMode = computed(() => shellWidth.value == null || shellWidth.value < 1100)
@@ -539,8 +634,13 @@ async function navigateTo(file: FileInfo) {
 	await fileTabs.navigate(file)
 }
 
+function canOpenInTab(item: FileInfo) {
+	if (item.type === 'directory') return true
+	return ctx.canOpenInEditor?.(item) ?? canOpenInFileEditor(item.name)
+}
+
 function handleOpenInNewTab(item: FileInfo) {
-	if (item.type !== 'directory' && !canOpenInFileEditor(item.name)) return
+	if (!canOpenInTab(item)) return
 	fileTabs.openTab(item)
 }
 
@@ -788,7 +888,7 @@ function handleItemPrefetch(item: Pick<FileItem, 'type' | 'path' | 'name'>) {
 		prefetchTimeout = null
 	}
 
-	if (item.type === 'directory' || canOpenInFileEditor(item.name)) {
+	if (canOpenInTab(item)) {
 		prefetchTimeout = setTimeout(() => {
 			ctx.directoryTree.prefetch(item)
 		}, 150)
@@ -806,86 +906,93 @@ function handleContextMenu(event: MouseEvent, options: ButtonMenuOption[]) {
 // Shared UI state/handlers for FileSideBar, FileBrowserPanel and the dockview-hosted editor
 // tabs. Dockview mounts tab panels itself (teleported, so still Vue descendants), which means
 // prop/emit/ref bindings can't reach them but provide/inject does. See providers/file-browser-ui.ts.
-provideFileBrowserUI({
-	...ctx,
+// Members of the file manager not overridden here are looked up on it when read rather than
+// copied once, so hosts can swap what it browses (see `switchableFileManager`).
+provideFileBrowserUI(
+	Object.assign(Object.create(ctx) as FileManagerContext, {
+		baseId,
+		showDebugInfo: computed(() => props.showDebugInfo ?? false),
+		showRefreshButton: computed(() => props.showRefreshButton ?? false),
+		searchLoadedOnlyNotice: computed(() => props.searchLoadedOnlyNotice),
+		canUseAdvancedView: canUseAdvancedView,
+		advancedView,
+		setAdvancedView,
+		compactNavigation: computed(() => props.compactNavigation ?? false),
+		coloredIcons,
+		setColoredIcons: (value) => (coloredIconsSetting.value = value),
+		compactFolders: computed(() => compactFoldersSetting.value),
+		setCompactFolders: (value) => (compactFoldersSetting.value = value),
+		contentVariantOf,
+		setContentVariant: (tabId, file, variant) =>
+			contentVariantChoices.set(`${tabId}:${file.path}`, variant),
+		interpretationOf: (tabId, file) =>
+			interpretationChoices.get(`${tabId}:${file.path}`) ?? defaultInterpretation(file),
+		jsonIndent: computed(() => jsonIndentOf(filesSettings.get(filesTabSettings.jsonIndent))),
+		setInterpretation: (tabId, file, interpretation) =>
+			interpretationChoices.set(`${tabId}:${file.path}`, interpretation),
+		newTabButton: computed(() => filesSettings.get(filesTabSettings.newTabButton)),
+		showNewTabButton: computed(
+			() => filesSettings.get(filesTabSettings.newTabButton) && browsing.value !== 'sidebar',
+		),
+		browsing,
+		revealInTab: (item) => {
+			if (canOpenInTab(item)) fileTabs.revealTab(item)
+		},
+		sidebarToggleLocation: computed(() => filesSettings.get(filesTabSettings.sidebarToggle)),
+		setSidebarToggleLocation: (location) =>
+			filesSettings.set(filesTabSettings.sidebarToggle, location),
 
-	baseId,
-	showDebugInfo: computed(() => props.showDebugInfo ?? false),
-	showRefreshButton: computed(() => props.showRefreshButton ?? false),
-	searchLoadedOnlyNotice: computed(() => props.searchLoadedOnlyNotice),
-	reworkEnabled,
-	advancedView,
-	setAdvancedView,
-	coloredIcons,
-	setColoredIcons: (value) => (coloredIconsSetting.value = value),
+		inWorkbench: props.workbench ?? false,
+		viewFor,
+		activeView,
+		isEditing,
+		isBusy,
+		busyTooltip,
+		activeLocation,
+		sidebarOpen: computed(() => advancedView.value && sidebarOpen.value),
+		setSidebarOpen,
 
-	items,
-	filteredItems,
-	isEditing,
-	isBusy,
-	busyTooltip,
-	activeLocation,
-	sidebarOpen: computed(() => advancedView.value && sidebarOpen.value),
-	setSidebarOpen,
-	containerWidth,
+		selectedItems,
+		toggleItemSelection,
+		deselectAll,
 
-	searchQuery,
-	sortField,
-	sortDesc,
-	handleSort,
+		fileTabs,
+		fileEditorApi,
+		hasUnsavedChanges,
+		saveFileContent,
+		revertChanges,
+		shareEditorToMclogs,
+		toggleFind,
 
-	selectedItems,
-	toggleItemSelection,
-	deselectAll,
-	toggleSelectAll,
-	allSelected,
-	someSelected,
+		navigateTo,
+		navigateToSegment,
+		handleOpenInNewTab,
+		canOpenInTab,
+		handleEditorClose,
+		handleHomePrefetch,
+		handleItemPrefetch,
 
-	editorComponent,
-	fileTabs,
-	fileEditorApi,
-	hasUnsavedChanges,
-	saveFileContent,
-	revertChanges,
-	shareEditorToMclogs,
-	toggleFind,
+		showCreateModal,
+		showRenameModal,
+		showMoveModal,
+		showDeleteModal,
+		showBulkDeleteModal,
+		showUnzipFromUrlModal,
 
-	navigateTo,
-	navigateToSegment,
-	handleOpenInNewTab,
-	handleEditorClose,
-	handleHomePrefetch,
-	handleItemPrefetch,
+		createItem,
+		renameItem,
+		moveItem,
+		deleteItem,
+		downloadFile,
+		zipFolder: ctx.zipFolder ? zipFolder : undefined,
+		handleExtractItem,
 
-	showCreateModal,
-	showRenameModal,
-	showMoveModal,
-	showDeleteModal,
-	showBulkDeleteModal,
-	showUnzipFromUrlModal,
+		uploadFiles,
+		handleDropError,
+		initiateFileUpload,
 
-	createItem,
-	renameItem,
-	moveItem,
-	deleteItem,
-	downloadFile,
-	zipFolder: ctx.zipFolder ? zipFolder : undefined,
-	handleExtractItem,
-
-	uploadFiles,
-	handleDropError,
-	initiateFileUpload,
-
-	handleContextMenu,
-})
-
-// Reset search/sort on path change; selection spans directories, so it is kept
-watch(
-	() => ctx.currentFile.value,
-	() => {
-		searchQuery.value = ''
-		resetSort()
-	},
+		handleContextMenu,
+	}),
 )
 
 // Keyboard shortcuts

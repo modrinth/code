@@ -3,7 +3,7 @@
 		ref="messageBox"
 		class="relative flex min-h-0 shrink-0 flex-col gap-1.5 border-0 border-t border-solid border-divider py-2.5 pb-px"
 		:style="{
-			height: `${height ?? 300}px`,
+			height: `${height ?? DEFAULT_HEIGHT}px`,
 		}"
 	>
 		<div
@@ -12,7 +12,7 @@
 			aria-orientation="horizontal"
 			aria-label="Resize message box"
 			:aria-valuenow="Math.round(measuredHeight)"
-			:aria-valuemin="180"
+			:aria-valuemin="MINIMUM_HEIGHT"
 			class="message-box-resize absolute -top-2 left-0 z-10 h-4 w-full cursor-row-resize touch-none"
 			:class="{ 'is-resizing': resizeStart }"
 			@pointerdown="startResize"
@@ -33,8 +33,8 @@
 				placeholder="Reply to thread…"
 				:on-image-upload="uploadImage"
 				:heading-buttons="false"
-				:hide-formatting-buttons="
-					settings.get(moderationSettings.General.HideMarkdownFormattingButtons)
+				:formatting-buttons-visibility="
+					settings.get(moderationSettings.General.MarkdownFormattingButtonsVisibility)
 				"
 				:min-height="1"
 				hide-markdown-hint
@@ -42,18 +42,27 @@
 			/>
 		</div>
 		<div class="flex shrink-0 flex-wrap justify-end gap-2">
-			<Button :disabled="!canSubmit || pending || !draft.trim()" @click="submit('note')">
+			<Button
+				:size="buttonSize"
+				:disabled="!canSubmit || pending || !draft.trim()"
+				@click="submit('note')"
+			>
 				<SpinnerIcon v-if="loadingAction === 'note'" class="animate-spin" aria-hidden="true" />
 				<StickyNotePlusIcon v-else aria-hidden="true" />
 				Private note
 			</Button>
-			<Button :disabled="!canSubmit || pending || !draft.trim()" @click="submit('reply')">
+			<Button
+				:size="buttonSize"
+				:disabled="!canSubmit || pending || !draft.trim()"
+				@click="submit('reply')"
+			>
 				<SpinnerIcon v-if="loadingAction === 'reply'" class="animate-spin" aria-hidden="true" />
 				<ReplyIcon v-else aria-hidden="true" />
 				Reply
 			</Button>
 			<Button
 				v-if="showClearIssues"
+				:size="buttonSize"
 				:disabled="!canSubmit || pending || !draft.trim()"
 				@click="submit('reply', true)"
 			>
@@ -74,7 +83,7 @@ import { ReplyIcon, SpinnerIcon, StickyNotePlusIcon } from '@modrinth/assets'
 import { getMessageTemplates, moderationSettings } from '@modrinth/moderation'
 import { IssuePriority } from '@modrinth/moderation/src/data/issues'
 import { Button } from '@modrinth/ui'
-import { useElementSize } from '@vueuse/core'
+import { useElementSize, useLocalStorage } from '@vueuse/core'
 import { computed, nextTick, ref, watch } from 'vue'
 
 import { useModerationKeybinds, useModerationSettings } from '~/composables/moderation'
@@ -86,8 +95,12 @@ import { injectReviewSubmission } from '~/providers/project-review/review-submis
 
 import TemplateMarkdownEditor from './template-markdown-editor.vue'
 
+const DEFAULT_HEIGHT = 200
+const MINIMUM_HEIGHT = 120
+
 const keybinds = useModerationKeybinds()
 const settings = useModerationSettings()
+const buttonSize = computed(() => settings.value.get(moderationSettings.General.ButtonSize))
 const { project, projectV2 } = injectProjectReviewPageContext()
 
 const panels = injectReviewPanels()
@@ -145,11 +158,12 @@ watch(
 const editor = ref<InstanceType<typeof TemplateMarkdownEditor>>()
 const messageBox = ref<HTMLElement | null>(null)
 const { height: measuredHeight } = useElementSize(messageBox)
-const height = ref<number | null>(null)
+/** The height the moderator resized the box to, kept between reviews; `null` for the default. */
+const height = useLocalStorage<number | null>('project-review.message-box-height', null)
 const resizeStart = ref<{ y: number; height: number } | null>(null)
 
 function setHeight(value: number) {
-	height.value = Math.max(180, value)
+	height.value = Math.max(MINIMUM_HEIGHT, value)
 }
 function startResize(event: PointerEvent) {
 	if (event.button !== 0) return

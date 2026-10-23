@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref, useId, watch } from 'vue'
+import { computed, nextTick, onMounted, ref, shallowRef, useId, watch } from 'vue'
 
 import type { AnchoredTeleportAnchor } from '../../../utils/use-anchored-teleport'
 import { pointAnchor, useAnchoredTeleport } from '../../../utils/use-anchored-teleport'
@@ -32,7 +32,7 @@ const panelElement = computed(() => panel.value?.element ?? null)
 const placement = ref('bottom-start' as const)
 const distance = ref(0)
 const menuId = `context-menu-${useId()}`
-const currentOptions = ref<ButtonMenuOption[]>([])
+const currentOptions = shallowRef<ButtonMenuOption[]>([])
 
 const options = computed(() => visibleOptions(currentOptions.value))
 const rows = computed(() => options.value.filter(isMenuRow))
@@ -51,7 +51,24 @@ const { focusedIndex, getItems, handleKeydown, reset } = useMenuKeyboard({
 	onTab: () => closeMenu(),
 })
 
+/** The document the menu shows in: the one it was asked for from, e.g. a popout window's. */
+const menuDocument = ref<Document | null>(null)
+const teleportTarget = computed(
+	() => menuDocument.value?.body ?? (typeof document !== 'undefined' ? document.body : 'body'),
+)
+
+function documentOf(event: MouseEvent) {
+	const target = event.target as Node | null
+	return target?.ownerDocument ?? event.view?.document ?? document
+}
+
 async function openMenu(event: MouseEvent, menuOptions: ButtonMenuOption[]) {
+	const eventDocument = documentOf(event)
+	if (isOpen.value && menuDocument.value !== eventDocument) closeMenu()
+	if (menuDocument.value !== eventDocument) {
+		menuDocument.value = eventDocument
+		await nextTick()
+	}
 	currentOptions.value = menuOptions
 	anchor.value = pointAnchor(event.clientX, event.clientY)
 
@@ -66,7 +83,7 @@ async function openMenu(event: MouseEvent, menuOptions: ButtonMenuOption[]) {
 	// focus the panel so keys work without highlighting a row
 	await nextTick()
 	panelElement.value?.focus()
-	window.getSelection()?.removeAllRanges()
+	eventDocument.defaultView?.getSelection()?.removeAllRanges()
 }
 
 function closeMenu() {
@@ -93,7 +110,7 @@ defineExpose({ open: openMenu, close: closeMenu })
 </script>
 
 <template>
-	<Teleport v-if="isClient" to="body">
+	<Teleport v-if="isClient" :to="teleportTarget">
 		<ButtonMenuPanel
 			ref="panel"
 			:open="isOpen"
