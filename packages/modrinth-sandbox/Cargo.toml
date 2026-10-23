@@ -59,12 +59,12 @@ directories =  { workspace = true }
 [target.'cfg(target_os = "macos")'.dependencies]
 objc2-app-kit = { workspace = true }
 objc2-foundation = { workspace = true }
-# security-framework =  { workspace = true }
-# security-framework-sys =  { workspace = true }
+objc2-uniform-type-identifiers = { workspace = true }
+dispatch2 = { workspace = true }
+block2 = { workspace = true }
 
 [target.'cfg(target_os = "windows")'.dependencies]
 windows =  { workspace = true, features = ["Win32_System_Memory"] }
-# junction =  { workspace = true }
 scopeguard =  { workspace = true }
 winreg = { workspace = true }
 serde_json = { workspace = true }

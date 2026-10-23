@@ -3,26 +3,11 @@ package com.modrinth.sandboxagent;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.instrument.ClassFileTransformer;
-import java.lang.instrument.IllegalClassFormatException;
 import java.lang.instrument.Instrumentation;
-import java.net.URI;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.security.ProtectionDomain;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.concurrent.CompletableFuture;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.modrinth.sandboxagent.transformation.AuthTransformation;
-import com.modrinth.sandboxagent.transformation.DropFileTransformation;
-import com.modrinth.sandboxagent.transformation.OpenUriTransformation;
-import com.modrinth.sandboxagent.transformation.RealmsTransformation;
+import com.modrinth.sandboxagent.transformation.*;
 import com.modrinth.sandboxagent.transformer.TransformerMap;
-import org.objectweb.asm.*;
-import org.objectweb.asm.tree.*;
 
 public class SandboxAgent {
 	public static void premain(String agentArgs, Instrumentation inst) {
@@ -43,6 +28,8 @@ public class SandboxAgent {
         DropFileTransformation.register(transformerMap, minecraftVersionInfo);
         // Modifies auth code on older versions of Minecraft to use our proxy
         AuthTransformation.register(transformerMap, minecraftVersionInfo);
+        // Transform various file dialog APIs (SDL, NFD, TFD) to use our api instead
+        FileDialogTransformation.register(transformerMap);
 
 		inst.addTransformer(transformerMap);
 	}

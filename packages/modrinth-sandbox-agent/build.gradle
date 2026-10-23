@@ -28,6 +28,7 @@ dependencies {
     shadow(implementation("org.ow2.asm:asm:9.10.1"))
     shadow(implementation("org.ow2.asm:asm-tree:9.10.1"))
     shadow(implementation("com.google.code.gson:gson:2.14.0"))
+    compileOnly("org.lwjgl:lwjgl-sdl:3.4.3")
 }
 
 shadowJar {

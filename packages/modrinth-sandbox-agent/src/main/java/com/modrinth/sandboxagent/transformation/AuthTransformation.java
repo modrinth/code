@@ -1,12 +1,10 @@
 package com.modrinth.sandboxagent.transformation;
 
 import com.modrinth.sandboxagent.MinecraftVersionInfo;
-import com.modrinth.sandboxagent.SandboxApi;
 import com.modrinth.sandboxagent.transformer.TransformerMap;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.*;
 
-import java.net.URL;
 import java.util.ListIterator;
 
 public class AuthTransformation {

@@ -3268,9 +3268,9 @@ dependencies = [
 
 [[package]]
 name = "dispatch2"
-version = "0.3.0"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "89a09f22a6c6069a18470eb92d2298acf25463f14256d24778e1230d789a2aec"
+checksum = "1e0e367e4e7da84520dedcac1901e4da967309406d1e51017ae1abfb97adbd38"
 dependencies = [
  "bitflags 2.9.4",
  "block2 0.6.2",
@@ -7257,9 +7257,11 @@ dependencies = [
  "async-trait",
  "async_zip",
  "bitflags 2.9.4",
+ "block2 0.6.2",
  "clap 4.5.48",
  "derive_more 2.1.1",
  "directories",
+ "dispatch2",
  "enum_dispatch",
  "eyre",
  "fuser",
@@ -7272,6 +7274,7 @@ dependencies = [
  "libseccomp",
  "objc2-app-kit",
  "objc2-foundation 0.3.2",
+ "objc2-uniform-type-identifiers",
  "open",
  "parking_lot",
  "rand 0.8.5",
@@ -7796,6 +7799,7 @@ dependencies = [
  "objc2-core-video",
  "objc2-foundation 0.3.2",
  "objc2-quartz-core 0.3.2",
+ "objc2-uniform-type-identifiers",
 ]
 
 [[package]]
@@ -8018,6 +8022,17 @@ dependencies = [
  "objc2-foundation 0.3.2",
  "objc2-quartz-core 0.3.2",
  "objc2-user-notifications",
+]
+
+[[package]]
+name = "objc2-uniform-type-identifiers"
+version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7902ac02859fc1f7045f8b598c63f1ae0cc7efeaa06a9bc9f3d9a3c955974fa4"
+dependencies = [
+ "block2 0.6.2",
+ "objc2 0.6.4",
+ "objc2-foundation 0.3.2",
 ]
 
 [[package]]

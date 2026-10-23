@@ -24,7 +24,7 @@ use tracing::{error, info, warn};
 use url::Url;
 use uuid::Uuid;
 
-use crate::{ExposedPath, SandboxHandle};
+use crate::{ExposedPath, SandboxHandle, api::desktop::{OpenFileDialogArgs, OpenFileDialogFilter}};
 
 const DEFAULT_SESSION_JOIN: &'static str =
     "https://sessionserver.mojang.com/session/minecraft/join";
@@ -364,7 +364,7 @@ impl SandboxApiService {
         }
 
         match path {
-            "/sandboxapi/openUri" => {
+            "/sandboxapi/open-uri" => {
                 if request.method != Some("POST") {
                     RequestStatus::MethodNotAllowed.write(stream).await;
                     return;
@@ -372,7 +372,7 @@ impl SandboxApiService {
                 let status = self.handle_request_open_uri(params).await;
                 status.write(stream).await;
             }
-            "/sandboxapi/requestAccess" => {
+            "/sandboxapi/request-access" => {
                 if request.method != Some("GET") {
                     RequestStatus::MethodNotAllowed.write(stream).await;
                     return;
@@ -384,6 +384,28 @@ impl SandboxApiService {
                     Ok(path) => {
                         write_text_response(stream, &path.to_string_lossy())
                             .await
+                    }
+                    Err(error_status) => error_status.write(stream).await,
+                };
+            }
+            "/sandboxapi/open-file-dialog" => {
+                if request.method != Some("GET") {
+                    RequestStatus::MethodNotAllowed.write(stream).await;
+                    return;
+                }
+                match self
+                    .handle_request_open_file_dialog(params, child_state)
+                    .await
+                {
+                    Ok(paths) => {
+                        let mut response = String::new();
+                        for path in paths {
+                            if !response.is_empty() {
+                                response.push('\n');
+                            }
+                            response.push_str(&path.to_string_lossy());
+                        }
+                        write_text_response(stream, &response).await
                     }
                     Err(error_status) => error_status.write(stream).await,
                 };
@@ -504,7 +526,7 @@ impl SandboxApiService {
                             };
                         } else {
                             // Create new endpoint string
-                            let new_endpoint_path: Arc<str> = format!("/sandboxauth/discoveredservice/{service_name}/{endpoint_name}").into();
+                            let new_endpoint_path: Arc<str> = format!("/sandboxauth/discovered-service/{service_name}/{endpoint_name}").into();
                             let new_endpoint: Arc<str> = format!(
                                 "http://127.0.0.1:{}{}",
                                 self.port, new_endpoint_path
@@ -551,7 +573,7 @@ impl SandboxApiService {
                     };
                     self.proxy_with_replacement(&request, body.to_vec(), to, stream).await;
                     return;
-                } else if path.starts_with("/sandboxauth/discoveredservice") {
+                } else if path.starts_with("/sandboxauth/discovered-service") {
                     // Arbitrary service discovered through discovery.minecraftservices.com (26.3+)
                     let to = self
                         .inner
@@ -784,7 +806,8 @@ impl SandboxApiService {
         {
             if key == "uri" {
                 uri = Some(value);
-                break;
+            } else {
+                warn!("unrecognized option for open-uri: {key}");
             }
         }
 
@@ -812,7 +835,7 @@ impl SandboxApiService {
                 if path.is_dir() {
                     tokio::task::spawn(super::desktop::open_dir(path));
                 } else {
-                    tokio::task::spawn(super::desktop::open_file_safe(path));
+                    tokio::task::spawn(super::desktop::launch_file_safe(path));
                 }
             };
             // If the path doesn't exist, do nothing. This prevents enumeration of existing files
@@ -845,7 +868,8 @@ impl SandboxApiService {
         {
             if key == "path" {
                 path = Some(value);
-                break;
+            } else {
+                warn!("unrecognized option for request-access: {key}");
             }
         }
 
@@ -953,6 +977,95 @@ impl SandboxApiService {
                 Err(RequestStatus::InternalServerError)
             }
         }
+    }
+
+    async fn handle_request_open_file_dialog(
+        self: Self,
+        params: &str,
+        child_state: Option<ServiceChildState>,
+    ) -> Result<Vec<PathBuf>, RequestStatus> {
+        let Some(child_state) = child_state else {
+            return Err(RequestStatus::InternalServerError);
+        };
+
+        let Some(sandbox_handle) = child_state.handle else {
+            return Err(RequestStatus::InternalServerError);
+        };
+
+        let mut open_args = OpenFileDialogArgs::default();
+
+        for (key, value) in
+            params.split("&").filter_map(|arg| arg.split_once('='))
+        {
+            let value = value.replace("+", "%20");
+            let Ok(value) = urlencoding::decode(&value) else {
+                return Err(RequestStatus::BadRequest);
+            };
+
+            match key {
+                "title" => {
+                    open_args.title = Some(value.to_string());
+                }
+                "accept_label" => {
+                    open_args.accept_label = Some(value.to_string());
+                }
+                "save" => {
+                    open_args.save = value.parse::<bool>()
+                        .map_err(|_| RequestStatus::BadRequest)?;
+                }
+                "multiple" => {
+                    open_args.multiple = value.parse::<bool>()
+                        .map_err(|_| RequestStatus::BadRequest)?;
+                }
+                "directory" => {
+                    open_args.directory = value.parse::<bool>()
+                        .map_err(|_| RequestStatus::BadRequest)?;
+                }
+                "filter" => {
+                    let (extension, friendly) = value.split_once(',').unwrap_or((&*value, &*value));
+                    open_args.filters.push(OpenFileDialogFilter {
+                        user_friendly_name: friendly.to_string(),
+                        extension: extension.to_string(),
+                    });
+                }
+                "default_location" => {
+                    open_args.default_location = Some(PathBuf::from(&*value));
+                }
+                _ => {
+                    warn!("unrecognized option for open-file-dialog: {key}");
+                }
+            }
+        }
+
+        if open_args.default_location.is_none() {
+            // todo: use default location of process's working directory?
+        }
+
+        let mut paths = match super::desktop::open_file_dialog(open_args).await {
+            Ok(paths) => paths,
+            Err(err) => {
+                error!("failed to open file dialog: {err:#}");
+                return Err(RequestStatus::InternalServerError);
+            },
+        };
+
+        for path in &mut paths {
+            if !sandbox_handle.is_path_writeable(path) {
+                match sandbox_handle.expose_path(path, true) {
+                    Ok(ExposedPath::Direct) => {},
+                    Ok(ExposedPath::Proxied(proxied)) => {
+                        *path = proxied;
+                    },
+                    Err(err) => {
+                        error!("unable to expose path to sandbox: {err:#}");
+                        return Err(RequestStatus::InternalServerError);
+                    },
+                }
+            }
+        }
+
+        dbg!(&paths);
+        Ok(paths)
     }
 }
 

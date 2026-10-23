@@ -9,7 +9,6 @@ import org.objectweb.asm.tree.MethodNode;
 import java.lang.instrument.ClassFileTransformer;
 import java.security.ProtectionDomain;
 import java.util.HashMap;
-import java.util.List;
 
 public class TransformerMap implements ClassFileTransformer {
 
@@ -32,32 +31,35 @@ public class TransformerMap implements ClassFileTransformer {
         ClassReader reader = new ClassReader(classBytes);
         reader.accept(classNode, 0);
 
-        boolean modified = false;
-        for (MethodNode method : classNode.methods) {
-            HashMap<String, MethodTransformer> byDesc = byMethod.get(method.name);
-            if (byDesc == null) {
-                continue;
+        try {
+            boolean modified = false;
+            for (MethodNode method : classNode.methods) {
+                HashMap<String, MethodTransformer> byDesc = byMethod.get(method.name);
+                if (byDesc == null) {
+                    continue;
+                }
+
+                MethodTransformer transformer = byDesc.get(method.desc);
+                if (transformer == null) {
+                    continue;
+                }
+
+                boolean isStatic = (method.access & Opcodes.ACC_STATIC) != 0;
+
+                modified |= transformer.transformMethod(method.instructions.iterator(), isStatic);
             }
 
-            MethodTransformer transformer = byDesc.get(method.desc);
-            if (transformer == null) {
-                continue;
+            if (!modified) {
+                return null;
             }
 
-            boolean isStatic = (method.access & Opcodes.ACC_STATIC) != 0;
-
-            modified |= transformer.transformMethod(method.instructions.iterator(), isStatic);
-        }
-
-        if (!modified) {
+            ClassWriter classWriter = new ClassWriter(reader, ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
+            classNode.accept(classWriter);
+            return classWriter.toByteArray();
+        } catch (Exception e) {
+            System.out.println("Exception while transforming " + className);
+            e.printStackTrace();
             return null;
         }
-
-        ClassWriter classWriter = new ClassWriter(reader, ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
-        classNode.accept(classWriter);
-        return classWriter.toByteArray();
-
-
-
     }
 }
