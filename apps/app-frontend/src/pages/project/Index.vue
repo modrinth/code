@@ -520,8 +520,8 @@ const projectInstallContext = computed(() => {
 	if (serverData) {
 		return {
 			name: serverData.name,
-			loader: serverData.loader ?? '',
-			gameVersion: serverData.mc_version ?? '',
+			loader: serverInstallContent.serverContextPlatform.value.loader ?? '',
+			gameVersion: serverInstallContent.serverContextPlatform.value.gameVersion ?? '',
 			serverId: serverInstallContent.serverIdQuery.value,
 			upstream: serverData.upstream,
 			iconSrc: null,
@@ -916,8 +916,8 @@ async function install(version) {
 					? {}
 					: getTargetInstallPreferences(
 							{
-								gameVersion: serverInstallContent.serverContextServerData.value?.mc_version,
-								loader: serverInstallContent.serverContextServerData.value?.loader,
+								gameVersion: serverInstallContent.serverContextPlatform.value.gameVersion,
+								loader: serverInstallContent.serverContextPlatform.value.loader,
 							},
 							contentType,
 						),

@@ -29,6 +29,7 @@ import {
 	injectServerSettingsModal,
 } from '#ui/providers'
 import { commonMessages } from '#ui/utils/common-messages'
+import { resolveServerPlatform } from '#ui/utils/loaders'
 import { versionChangesGameVersion } from '#ui/utils/version-compatibility'
 
 import type { BrowseInstallPlan } from '../../../shared/browse-tab/composables/install-logic'
@@ -640,10 +641,7 @@ async function resolveStoredServerAddonPlans(plans: BrowseInstallPlan[]) {
 		existingProjectIds: getInstalledProjectIds(),
 		resolvePlan: async (plan, existingProjectIds) => {
 			const target = getTargetInstallPreferences(
-				{
-					gameVersion: server.value?.mc_version,
-					loader: server.value?.loader,
-				},
+				resolveServerPlatform(server.value, contentQuery.data.value),
 				plan.contentType,
 			)
 			const resolved = await client.labrinth.content_v3.resolve({

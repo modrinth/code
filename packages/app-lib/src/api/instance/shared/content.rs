@@ -16,6 +16,8 @@ const CONFIG_VERSION_FETCH_CONCURRENCY: usize = 4;
 
 /// Config files are published as deltas, so a member needs every config
 /// uploaded after `applied_version`, keeping the newest upload of each path.
+/// Configs from before the latest `backtrack_version` change are skipped, as
+/// they may belong to content that is no longer installed.
 pub(super) async fn remote_shared_config_files(
     shared_instance_id: &str,
     applied_version: Option<i32>,
@@ -30,14 +32,33 @@ pub(super) async fn remote_shared_config_files(
         .buffered(CONFIG_VERSION_FETCH_CONCURRENCY)
         .try_collect::<Vec<_>>()
         .await?;
+    let versions = intermediate
+        .iter()
+        .flatten()
+        .chain((first <= latest.version).then_some(latest))
+        .collect::<Vec<_>>();
 
     newest_config_files(
-        intermediate
-            .iter()
-            .flatten()
-            .chain((first <= latest.version).then_some(latest))
-            .map(|version| version.external_files.as_slice()),
+        since_backtrack_version_change(
+            &versions,
+            latest.backtrack_version.as_deref(),
+        )
+        .iter()
+        .map(|version| version.external_files.as_slice()),
     )
+}
+
+fn since_backtrack_version_change<'a>(
+    versions: &'a [&'a InstanceVersionResponse],
+    backtrack_version: Option<&str>,
+) -> &'a [&'a InstanceVersionResponse] {
+    let start = versions
+        .iter()
+        .rposition(|version| {
+            version.backtrack_version.as_deref() != backtrack_version
+        })
+        .map_or(0, |index| index + 1);
+    &versions[start..]
 }
 
 /// Takes each version's external files in ascending version order. A legacy
@@ -430,6 +451,73 @@ mod tests {
         );
         assert!(
             newest_config_files([&[half, other_half, too_large][..]]).is_err()
+        );
+    }
+
+    fn version(
+        version: i32,
+        backtrack_version: Option<&str>,
+    ) -> InstanceVersionResponse {
+        serde_json::from_value(serde_json::json!({
+            "version": version,
+            "ready": true,
+            "backtrack_version": backtrack_version,
+            "game_version": "1.20.1",
+            "loader": "forge",
+            "loader_version": "47.0.0",
+        }))
+        .unwrap()
+    }
+
+    fn version_numbers(versions: &[&InstanceVersionResponse]) -> Vec<i32> {
+        versions.iter().map(|version| version.version).collect()
+    }
+
+    #[test]
+    fn backtracking_stops_at_backtrack_version_change() {
+        let versions = [
+            version(1, None),
+            version(2, Some("123")),
+            version(3, Some("123")),
+        ];
+        let versions = versions.iter().collect::<Vec<_>>();
+
+        assert_eq!(
+            version_numbers(since_backtrack_version_change(
+                &versions,
+                Some("123")
+            )),
+            [2, 3]
+        );
+    }
+
+    #[test]
+    fn backtracking_uses_latest_backtrack_version_change() {
+        let versions = [
+            version(1, Some("123")),
+            version(2, None),
+            version(3, Some("123")),
+            version(4, Some("123")),
+        ];
+        let versions = versions.iter().collect::<Vec<_>>();
+
+        assert_eq!(
+            version_numbers(since_backtrack_version_change(
+                &versions,
+                Some("123")
+            )),
+            [3, 4]
+        );
+    }
+
+    #[test]
+    fn backtracking_is_unchanged_without_backtrack_versions() {
+        let versions = [version(1, None), version(2, None)];
+        let versions = versions.iter().collect::<Vec<_>>();
+
+        assert_eq!(
+            version_numbers(since_backtrack_version_change(&versions, None)),
+            [1, 2]
         );
     }
 

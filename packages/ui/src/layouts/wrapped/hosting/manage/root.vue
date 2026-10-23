@@ -155,11 +155,11 @@
 
 							<template v-else>
 								<PageHeaderMetadataItem
-									v-if="serverData.loader"
+									v-if="headerPlatform.loader"
 									:icon="TagIcon"
-									:icon-props="{ tag: serverData.loader, enforceType: 'loader' }"
+									:icon-props="{ tag: headerPlatform.loader, enforceType: 'loader' }"
 								>
-									{{ formatLoaderLabel(serverData.loader) }} {{ serverData.mc_version }}
+									{{ formatLoaderLabel(headerPlatform.loader) }} {{ headerPlatform.gameVersion }}
 								</PageHeaderMetadataItem>
 								<PageHeaderMetadataItem
 									v-if="serverData.net?.domain && !serverPreferences.hideSubdomainLabel"
@@ -385,7 +385,7 @@ import {
 } from '#ui/providers'
 import type { ServerStats } from '#ui/providers/server-context'
 import { commonMessages } from '#ui/utils/common-messages'
-import { formatLoaderLabel } from '#ui/utils/loaders'
+import { formatLoaderLabel, resolveServerPlatform } from '#ui/utils/loaders'
 
 import ServerOnboardingPanelPage from './[id]/onboarding.vue'
 
@@ -541,6 +541,8 @@ const { data: serverContent } = useQuery({
 		client.archon.content_v1.getAddons(props.serverId, worldId.value!, { from_modpack: false }),
 	enabled: computed(() => worldId.value !== null),
 })
+
+const headerPlatform = computed(() => resolveServerPlatform(serverData.value, serverContent.value))
 
 const { handleWsBackupProgress, busyReasons: backupsBusy } = useServerBackupsQueue(
 	computed(() => props.serverId),
@@ -1075,6 +1077,9 @@ function applyInstallationCompletion(key: ServerInstallationKey) {
 		patch.loader = formatLoaderLabel(platformKey.platform) as Archon.Servers.v0.Loader
 		patch.loader_version = platformKey.platform === 'vanilla' ? null : platformKey.platform_version
 		patch.mc_version = platformKey.game_version
+	} else if (serverContent.value?.modloader && serverContent.value.game_version) {
+		patch.loader = formatLoaderLabel(serverContent.value.modloader) as Archon.Servers.v0.Loader
+		patch.mc_version = serverContent.value.game_version
 	}
 
 	debug('[root.vue] applyInstallationCompletion: patch:', patch)

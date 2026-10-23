@@ -130,6 +130,7 @@ const {
 	isSetupServerContext,
 	effectiveServerWorldId,
 	serverContextServerData,
+	serverContextPlatform,
 	serverContentProjectIds,
 	queuedServerInstallRootProjectIds,
 	queuedServerInstallProjectIds,
@@ -497,10 +498,10 @@ const serverContextFilters = computed(() => {
 	const pt = projectType.value
 
 	if (pt !== 'modpack' && !isSetupServerContext.value) {
-		const gameVersion = serverContextServerData.value.mc_version
+		const gameVersion = serverContextPlatform.value.gameVersion
 		if (gameVersion) filters.push({ type: 'game_version', option: gameVersion })
 
-		const platform = serverContextServerData.value.loader?.toLowerCase()
+		const platform = serverContextPlatform.value.loader?.toLowerCase()
 		if (pt === 'mod' && platform && ['fabric', 'forge', 'quilt', 'neoforge'].includes(platform))
 			filters.push({ type: 'mod_loader', option: platform })
 		if (pt === 'plugin' && platform && ['paper', 'purpur'].includes(platform))
@@ -787,7 +788,7 @@ const selectableProjectTypes = computed(() => {
 					shownForEnvironment('plugin') &&
 					tags.value.loaders.some(
 						(loader) =>
-							loader.name === serverContextServerData.value?.loader?.toLowerCase() &&
+							loader.name === serverContextPlatform.value.loader?.toLowerCase() &&
 							loader.supported_project_types.includes('plugin'),
 					),
 			},
@@ -842,8 +843,8 @@ const installContext = computed(() => {
 	if (isServerContext.value && serverContextServerData.value) {
 		return {
 			name: serverContextServerData.value.name,
-			loader: serverContextServerData.value.loader ?? '',
-			gameVersion: serverContextServerData.value.mc_version ?? '',
+			loader: serverContextPlatform.value.loader ?? '',
+			gameVersion: serverContextPlatform.value.gameVersion ?? '',
 			serverId: serverIdQuery.value,
 			upstream: serverContextServerData.value.upstream,
 			iconSrc: null as string | null,
@@ -913,8 +914,8 @@ function getServerInstallTargetPreferences(contentType: BrowseInstallContentType
 	if (isSetupServerContext.value) return {}
 	return getTargetInstallPreferences(
 		{
-			gameVersion: serverContextServerData.value?.mc_version,
-			loader: serverContextServerData.value?.loader,
+			gameVersion: serverContextPlatform.value.gameVersion,
+			loader: serverContextPlatform.value.loader,
 		},
 		contentType,
 	)

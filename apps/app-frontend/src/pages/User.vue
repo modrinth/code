@@ -182,8 +182,8 @@ const serverContext = computed(() => {
 	if (!server || serverInstallContent.isSetupServerContext.value) return null
 	return {
 		name: server.name,
-		loader: server.loader ?? '',
-		gameVersion: server.mc_version ?? '',
+		loader: serverInstallContent.serverContextPlatform.value.loader ?? '',
+		gameVersion: serverInstallContent.serverContextPlatform.value.gameVersion ?? '',
 		serverId: serverInstallContent.serverIdQuery.value,
 		backUrl: serverInstallContent.serverBackUrl.value,
 		backLabel: serverInstallContent.serverBackLabel.value,
@@ -234,7 +234,7 @@ async function toggleServerProject(project: Labrinth.Projects.v3.Project): Promi
 			providedFilters: [],
 			overriddenProvidedFilterTypes: [],
 			targetPreferences: getTargetInstallPreferences(
-				{ gameVersion: server.mc_version, loader: server.loader },
+				serverInstallContent.serverContextPlatform.value,
 				contentType,
 			),
 			updateChannel: await serverInstallContent.getServerUpdateChannel(),

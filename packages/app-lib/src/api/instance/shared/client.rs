@@ -117,6 +117,7 @@ pub(super) struct InstanceVersionResponse {
     pub(super) ready: bool,
     pub(super) external_files: Vec<ExternalFileResponse>,
     pub(super) modpack_id: Option<String>,
+    pub(super) backtrack_version: Option<String>,
     pub(super) removed_files: Vec<SharedInstanceRemovedFile>,
     pub(super) game_version: String,
     pub(super) loader: ModLoader,
@@ -133,6 +134,8 @@ struct RawInstanceVersionResponse {
     external_files: Vec<ExternalFileResponse>,
     #[serde(default)]
     modpack_id: Option<String>,
+    #[serde(default)]
+    backtrack_version: Option<String>,
     #[serde(default)]
     removed_files: Vec<SharedInstanceRemovedFile>,
     game_version: String,
@@ -155,6 +158,7 @@ impl From<RawInstanceVersionResponse> for InstanceVersionResponse {
             ready: raw.ready,
             external_files: raw.external_files,
             modpack_id: raw.modpack_id,
+            backtrack_version: raw.backtrack_version,
             removed_files: raw.removed_files,
             game_version: raw.game_version,
             loader,

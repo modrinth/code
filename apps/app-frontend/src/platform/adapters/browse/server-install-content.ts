@@ -13,6 +13,8 @@ import {
 	injectServerOnboardingFlow,
 	readStoredServerInstallQueue,
 	resolveServerAddonInstallPlans,
+	resolveServerPlatform,
+	type ServerPlatform,
 	type UpdateChannelPolicy,
 	useServerContextRuntime,
 	useServerPanelSync,
@@ -57,6 +59,7 @@ export interface ServerInstallContentContext {
 	isSetupServerContext: ComputedRef<boolean>
 	effectiveServerWorldId: ComputedRef<string | null>
 	serverContextServerData: Ref<Archon.Servers.v0.Server | null>
+	serverContextPlatform: ComputedRef<ServerPlatform>
 	serverContentProjectIds: Ref<Set<string>>
 	queuedServerInstallRootProjectIds: ComputedRef<Set<string>>
 	queuedServerInstallProjectIds: ComputedRef<Set<string>>
@@ -157,6 +160,10 @@ export function useServerInstallContent(opts: {
 	const serverContextServerData = ref<Archon.Servers.v0.Server | null>(
 		initialServerId ? getCachedServer(initialServerId) : null,
 	)
+	const serverContextContent = ref<Archon.Content.v1.Addons | null>(null)
+	const serverContextPlatform = computed(() =>
+		resolveServerPlatform(serverContextServerData.value, serverContextContent.value),
+	)
 	const serverContentProjectIds = ref<Set<string>>(new Set())
 	const queuedServerInstalls = ref<Map<string, BrowseInstallPlan<InstallableSearchResult>>>(
 		new Map(),
@@ -231,6 +238,7 @@ export function useServerInstallContent(opts: {
 			if (serverIdQuery.value !== serverId || effectiveServerWorldId.value !== worldId) {
 				return
 			}
+			serverContextContent.value = content
 			const ids = new Set(
 				(content.addons ?? [])
 					.map((addon) => addon.project_id)
@@ -277,12 +285,14 @@ export function useServerInstallContent(opts: {
 			if (!sid) {
 				serverContextWorldId.value = null
 				serverContextServerData.value = null
+				serverContextContent.value = null
 				serverContentProjectIds.value = new Set()
 				setQueuedServerInstallPlans(new Map())
 				return
 			}
 
 			if (sid !== prevSid) {
+				serverContextContent.value = null
 				serverContentProjectIds.value = new Set()
 				queuedServerInstalls.value = readStoredServerInstallQueue(sid, wid)
 				serverContextServerData.value = getCachedServer(sid)
@@ -427,8 +437,8 @@ export function useServerInstallContent(opts: {
 	) {
 		const target = getTargetInstallPreferences(
 			{
-				gameVersion: serverContextServerData.value?.mc_version,
-				loader: serverContextServerData.value?.loader,
+				gameVersion: serverContextPlatform.value.gameVersion,
+				loader: serverContextPlatform.value.loader,
 			},
 			plan.contentType,
 		)
@@ -612,6 +622,7 @@ export function useServerInstallContent(opts: {
 		isSetupServerContext,
 		effectiveServerWorldId,
 		serverContextServerData,
+		serverContextPlatform,
 		serverContentProjectIds,
 		queuedServerInstallRootProjectIds,
 		queuedServerInstallProjectIds,

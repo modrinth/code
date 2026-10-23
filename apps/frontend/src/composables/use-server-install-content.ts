@@ -24,6 +24,7 @@ import {
 	readStoredServerInstallQueue,
 	requestInstall,
 	resolveServerAddonInstallPlans,
+	resolveServerPlatform,
 	stripServerRuntimeInstallFilters,
 	stripServerRuntimeInstallOverrides,
 	useServerContextRuntime,
@@ -195,6 +196,10 @@ export function useServerInstallContent({
 		enabled: computed(() => !!currentServerId.value && !!currentWorldId.value),
 	})
 
+	const serverPlatform = computed(() =>
+		resolveServerPlatform(serverData.value, serverContentData.value),
+	)
+
 	function setBrowseSearchState(state: ServerInstallBrowseSearchState) {
 		browseSearchState = state
 	}
@@ -252,12 +257,12 @@ export function useServerInstallContent({
 		)
 		const filters: FilterValue[] = []
 		if (serverData.value && projectType.value?.id !== 'modpack' && !isSetupServerContext.value) {
-			const gameVersion = serverData.value.mc_version
+			const gameVersion = serverPlatform.value.gameVersion
 			if (gameVersion) {
 				filters.push({ type: 'game_version', option: gameVersion })
 			}
 
-			const platform = serverData.value.loader?.toLowerCase()
+			const platform = serverPlatform.value.loader?.toLowerCase()
 
 			const modLoaders = ['fabric', 'forge', 'quilt', 'neoforge']
 			if (projectType.value?.id === 'mod' && platform && modLoaders.includes(platform)) {
@@ -327,8 +332,8 @@ export function useServerInstallContent({
 		if (isSetupServerContext.value) return {}
 		return getTargetInstallPreferences(
 			{
-				gameVersion: serverData.value?.mc_version,
-				loader: serverData.value?.loader,
+				gameVersion: serverPlatform.value.gameVersion,
+				loader: serverPlatform.value.loader,
 			},
 			contentType,
 		)
@@ -689,8 +694,8 @@ export function useServerInstallContent({
 		if (!serverData.value) return null
 		return {
 			name: serverData.value.name,
-			loader: serverData.value.loader ?? '',
-			gameVersion: serverData.value.mc_version ?? '',
+			loader: serverPlatform.value.loader ?? '',
+			gameVersion: serverPlatform.value.gameVersion ?? '',
 			serverId: currentServerId.value,
 			upstream: serverData.value.upstream,
 			iconSrc: serverIcon.value,
