@@ -2560,6 +2560,8 @@ async fn assert_no_technical_review_auto_approval(
 
 #[actix_rt::test]
 async fn test_safe_technical_review_exit_auto_approves_resolved_issues() {
+	use labrinth::database::models::DBUserId;
+	use labrinth::database::models::notification_item::DBNotification;
     use labrinth::routes::internal::delphi::tech_review_queue;
 
     for (requested_status, old_status) in [
@@ -2646,6 +2648,12 @@ async fn test_safe_technical_review_exit_auto_approves_resolved_issues() {
                 assert_status!(&response, StatusCode::OK);
                 let notifications_before: Vec<serde_json::Value> =
                     test::read_body_json(response).await;
+				let stored_notifications_before = DBNotification::get_all_user(
+					DBUserId(USER_USER_ID_PARSED),
+					&**test_env.db.ro_pool,
+				)
+				.await
+				.unwrap();
 
                 let request = if old_status == ProjectStatus::Processing {
                     test::TestRequest::post()
@@ -2735,7 +2743,7 @@ async fn test_safe_technical_review_exit_auto_approves_resolved_issues() {
                             .any(|before| before["id"] == notification["id"])
                     })
                     .collect::<Vec<_>>();
-                assert_eq!(new_notifications.len(), 2);
+				assert_eq!(new_notifications.len(), 1);
                 assert!(new_notifications.iter().any(
 					|notification| notification["body"]
 						== json!({
@@ -2743,12 +2751,28 @@ async fn test_safe_technical_review_exit_auto_approves_resolved_issues() {
 							"old_status": old_status, "new_status": requested_status,
 						})
 				));
-                assert!(new_notifications.iter().any(
-					|notification| notification["body"]
+				let stored_notifications_after = DBNotification::get_all_user(
+					DBUserId(USER_USER_ID_PARSED),
+					&**test_env.db.ro_pool,
+				)
+				.await
+				.unwrap();
+				let new_stored_notifications = stored_notifications_after
+					.iter()
+					.filter(|notification| {
+						!stored_notifications_before
+							.iter()
+							.any(|before| before.id == notification.id)
+					})
+					.collect::<Vec<_>>();
+				assert_eq!(new_stored_notifications.len(), 2);
+				assert!(new_stored_notifications.iter().any(|notification| {
+					serde_json::to_value(&notification.body).unwrap()
 						== json!({
-							"type": "project_status_approved", "project_id": project.project_id,
+							"type": "project_status_approved",
+							"project_id": project.project_id,
 						})
-				));
+				}));
 
                 if old_status != ProjectStatus::Processing {
                     return;
@@ -2788,6 +2812,16 @@ async fn test_safe_technical_review_exit_auto_approves_resolved_issues() {
                 let notifications_repeated: Vec<serde_json::Value> =
                     test::read_body_json(response).await;
                 assert_eq!(notifications_repeated, notifications_after);
+				let stored_notifications_repeated = DBNotification::get_all_user(
+					DBUserId(USER_USER_ID_PARSED),
+					&**test_env.db.ro_pool,
+				)
+				.await
+				.unwrap();
+				assert_eq!(
+					stored_notifications_repeated.len(),
+					stored_notifications_after.len(),
+				);
             },
         )
         .await;
