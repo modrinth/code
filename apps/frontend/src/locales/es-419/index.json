@@ -1007,20 +1007,11 @@
   "collection.button.discover-mods": {
     "message": "Descubrir mods"
   },
-  "collection.button.edit-icon": {
-    "message": "Editar ícono"
-  },
   "collection.button.remove-icon": {
     "message": "Eliminar ícono"
   },
   "collection.button.remove-project": {
     "message": "Eliminar proyecto"
-  },
-  "collection.button.replace-icon": {
-    "message": "Reemplazar ícono"
-  },
-  "collection.button.select-icon": {
-    "message": "Seleccionar ícono"
   },
   "collection.button.unfollow-project": {
     "message": "Dejar de seguir proyecto"
@@ -1036,9 +1027,6 @@
   },
   "collection.description.following": {
     "message": "Colección generada automáticamente de todos los proyectos que sigues."
-  },
-  "collection.editing": {
-    "message": "Editando colección"
   },
   "collection.error.not-found": {
     "message": "Colección no encontrada"

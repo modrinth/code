@@ -497,20 +497,11 @@
   "auth.verify-email.title": {
     "message": "Verifică email-ul"
   },
-  "collection.button.edit-icon": {
-    "message": "Editează pictograma"
-  },
   "collection.button.remove-icon": {
     "message": "Sterge iconita"
   },
   "collection.button.remove-project": {
     "message": "Șterge proiectul"
-  },
-  "collection.button.replace-icon": {
-    "message": "Inlocuieste iconita"
-  },
-  "collection.button.select-icon": {
-    "message": "Selecteaza iconita"
   },
   "collection.button.unfollow-project": {
     "message": "Nu mai urmăriți proiectul"
@@ -523,9 +514,6 @@
   },
   "collection.description.following": {
     "message": "Colecție generată automat cu toate proiectele pe care le urmăriți."
-  },
-  "collection.editing": {
-    "message": "Editează colecția"
   },
   "collection.error.not-found": {
     "message": "Colecția nu a fost găsită"

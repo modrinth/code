@@ -689,20 +689,11 @@
   "auth.verify-email.title": {
     "message": "Verifiser Email"
   },
-  "collection.button.edit-icon": {
-    "message": "Rediger ikon"
-  },
   "collection.button.remove-icon": {
     "message": "Fjern ikon"
   },
   "collection.button.remove-project": {
     "message": "Fjern prosjekt"
-  },
-  "collection.button.replace-icon": {
-    "message": "Erstatt ikon"
-  },
-  "collection.button.select-icon": {
-    "message": "Velg ikon"
   },
   "collection.button.unfollow-project": {
     "message": "Slutt å følge prosjektet"
@@ -718,9 +709,6 @@
   },
   "collection.description.following": {
     "message": "Auto-generated collection of all the projects you're following."
-  },
-  "collection.editing": {
-    "message": "Redigeringssamling"
   },
   "collection.error.not-found": {
     "message": "Samling ikke funnet"
