@@ -197,9 +197,11 @@ function updateRow(row: ToggleRow, values: string[]) {
 		)
 	)
 		panels.addIssue(props.issue.id)
-	for (const entry of row.entries) {
-		if (!panels.selected(entry.binding, entry.control) && next.has(optionValue(entry)))
-			panels.write(entry.binding, entry.control, true)
+	const added = row.entries.filter(
+		(entry) => !panels.selected(entry.binding, entry.control) && next.has(optionValue(entry)),
+	)
+	for (const entry of added) {
+		panels.write(entry.binding, entry.control, true)
 	}
 	for (const entry of row.entries) {
 		if (panels.selected(entry.binding, entry.control) && !next.has(optionValue(entry)))
@@ -210,9 +212,11 @@ function updateRow(row: ToggleRow, values: string[]) {
 function updateOptions(values: string[]) {
 	if (pending.value || props.disabled) return
 	const next = new Set(values)
-	for (const entry of optionControls.value) {
-		if (!panels.selected(entry.binding, entry.control) && next.has(optionValue(entry)))
-			panels.write(entry.binding, entry.control, true)
+	const added = optionControls.value.filter(
+		(entry) => !panels.selected(entry.binding, entry.control) && next.has(optionValue(entry)),
+	)
+	for (const entry of added) {
+		panels.write(entry.binding, entry.control, true)
 	}
 	for (const entry of optionControls.value) {
 		if (panels.selected(entry.binding, entry.control) && !next.has(optionValue(entry)))
@@ -222,7 +226,10 @@ function updateOptions(values: string[]) {
 
 function changeOptions(values: string[]) {
 	optionDraft.value = values
-	if (values.length) updateOptions(values)
+	if (values.length) {
+		updateOptions(values)
+		optionDraft.value = [...selectedOptionValues.value]
+	}
 }
 
 function openOptions() {

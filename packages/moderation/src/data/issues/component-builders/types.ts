@@ -95,6 +95,8 @@ export interface IssueToggle extends IssueControlOptions {
 	 * Without an ID, the toggle activates the issue directly and contributes no selected toggle ID.
 	 */
 	id?: string
+	/** Explicit toggle IDs to clear across issues when enabled. Item panels scope these IDs to the current item. */
+	unselectToggles?: readonly string[]
 }
 
 export type IssueToggleConfig = Omit<IssueToggle, 'type'>
