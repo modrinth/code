@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import {
-	ChevronRightIcon,
 	CodeIcon,
 	CoffeeIcon,
 	InfoIcon,
@@ -228,23 +227,19 @@ defineExpose({ show, hide })
 	<TabbedModal
 		ref="tabbedModal"
 		:tabs="tabs"
+		:header="formatMessage(commonMessages.settingsLabel)"
 		:on-after-hide="handleAfterHide"
 		max-width="928px"
 		width="928px"
 	>
-		<template #title>
-			<span class="flex items-center gap-2 text-lg font-semibold text-primary">
-				<Avatar
-					:src="getInstanceIconUrl(instance.icon_path)"
-					size="24px"
-					:tint-by="props.instance.id"
-					pad-transparent-corners
-				/>
-				{{ instance.name }} <ChevronRightIcon />
-				<span class="font-extrabold text-contrast">{{
-					formatMessage(commonMessages.settingsLabel)
-				}}</span>
-			</span>
+		<template #breadcrumb>
+			<Avatar
+				:src="getInstanceIconUrl(instance.icon_path)"
+				size="24px"
+				:tint-by="props.instance.id"
+				pad-transparent-corners
+			/>
+			<span class="truncate">{{ instance.name }}</span>
 		</template>
 	</TabbedModal>
 </template>

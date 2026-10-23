@@ -34,7 +34,11 @@
 				:style="{ zIndex: stackOverlayZ }"
 				@click="() => (closeOnClickOutside && closable ? hide() : {})"
 			/>
-			<div class="modal-container" :class="{ shown: visible }" :style="{ zIndex: stackContainerZ }">
+			<div
+				class="modal-container"
+				:class="{ shown: visible, 'mobile-sheet': mobileSheet }"
+				:style="{ zIndex: stackContainerZ }"
+			>
 				<div
 					ref="modalBodyRef"
 					role="dialog"
@@ -42,8 +46,14 @@
 					tabindex="-1"
 					:aria-labelledby="headerId"
 					class="modal-body flex flex-col bg-bg-raised rounded-2xl border border-solid border-surface-5 outline-none"
+					:style="sheetDragStyle"
 					v-bind="$attrs"
+					@pointerdown="onSheetPointerDown"
+					@pointermove="onSheetPointerMove"
+					@pointerup="onSheetPointerUp"
+					@pointercancel="onSheetPointerCancel"
 				>
+					<div v-if="mobileSheet" aria-hidden="true" class="sheet-handle" data-sheet-drag-handle />
 					<div
 						v-if="!hideHeader"
 						data-tauri-drag-region
@@ -212,6 +222,8 @@ const props = withDefaults(
 		/** Disables all close actions (close button, ESC key, click outside). */
 		disableClose?: boolean
 		actionsDivider?: boolean
+		/** Displays the modal as a full-width bottom sheet on small screens. */
+		mobileSheet?: boolean
 	}>(),
 	{
 		type: true,
@@ -239,6 +251,7 @@ const props = withDefaults(
 		animateResize: true,
 		disableClose: false,
 		actionsDivider: false,
+		mobileSheet: false,
 	},
 )
 
@@ -542,6 +555,77 @@ function handleWindowClose() {
 	nextTick(() => props.onAfterHide?.())
 }
 
+const SHEET_DRAG_START_PX = 6
+const SHEET_DISMISS_DISTANCE_RATIO = 0.25
+const SHEET_DISMISS_VELOCITY = 0.5
+const SHEET_VELOCITY_WINDOW_MS = 100
+
+const sheetDragOffset = ref<number | null>(null)
+let sheetDrag: {
+	pointerId: number
+	startY: number
+	lastY: number
+	lastTime: number
+	velocity: number
+} | null = null
+
+const sheetDragStyle = computed(() =>
+	sheetDragOffset.value === null
+		? undefined
+		: { translate: `0 ${sheetDragOffset.value}px`, transition: 'none' },
+)
+
+function isSheetLayout() {
+	return props.mobileSheet && getModalWindow().matchMedia('(max-width: 640px)').matches
+}
+
+function onSheetPointerDown(event: PointerEvent) {
+	if (event.button !== 0 || !props.closable || props.disableClose || !isSheetLayout()) return
+	if (!(event.target instanceof Element) || !event.target.closest('[data-sheet-drag-handle]')) {
+		return
+	}
+	sheetDrag = {
+		pointerId: event.pointerId,
+		startY: event.clientY,
+		lastY: event.clientY,
+		lastTime: event.timeStamp,
+		velocity: 0,
+	}
+}
+
+function onSheetPointerMove(event: PointerEvent) {
+	if (!sheetDrag || event.pointerId !== sheetDrag.pointerId) return
+	const offset = Math.max(0, event.clientY - sheetDrag.startY)
+	if (sheetDragOffset.value === null) {
+		if (offset < SHEET_DRAG_START_PX) return
+		modalBodyRef.value?.setPointerCapture(event.pointerId)
+	}
+	const elapsed = event.timeStamp - sheetDrag.lastTime
+	if (elapsed > 0) sheetDrag.velocity = (event.clientY - sheetDrag.lastY) / elapsed
+	sheetDrag.lastY = event.clientY
+	sheetDrag.lastTime = event.timeStamp
+	sheetDragOffset.value = offset
+}
+
+function onSheetPointerUp(event: PointerEvent) {
+	if (!sheetDrag || event.pointerId !== sheetDrag.pointerId) return
+	const velocity =
+		event.timeStamp - sheetDrag.lastTime > SHEET_VELOCITY_WINDOW_MS ? 0 : sheetDrag.velocity
+	const offset = sheetDragOffset.value ?? 0
+	const height = modalBodyRef.value?.offsetHeight ?? 0
+	sheetDrag = null
+	sheetDragOffset.value = null
+	if (offset > height * SHEET_DISMISS_DISTANCE_RATIO || velocity > SHEET_DISMISS_VELOCITY) {
+		hide()
+	}
+}
+
+function onSheetPointerCancel(event: PointerEvent) {
+	if (!sheetDrag || event.pointerId !== sheetDrag.pointerId) return
+	sheetDrag = null
+	sheetDragOffset.value = null
+}
+
 async function scrollToBottom(behavior: ScrollBehavior = 'smooth') {
 	await nextTick()
 	if (!scrollContainer.value) {
@@ -758,6 +842,53 @@ defineOptions({
 		@media screen and (max-width: 640px) {
 			width: calc(100% - 2 * var(--gap-lg));
 		}
+	}
+}
+
+.sheet-handle {
+	display: none;
+}
+
+@media screen and (max-width: 640px) {
+	.modal-container.mobile-sheet,
+	.modal-container.mobile-sheet.shown {
+		transform: none;
+	}
+
+	.modal-container.mobile-sheet > .modal-body {
+		top: 2.5rem;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		width: 100%;
+		max-width: 100%;
+		max-height: none;
+		padding-bottom: env(safe-area-inset-bottom);
+		border-bottom-width: 0;
+		border-radius: 20px 20px 0 0;
+		scale: 1;
+		translate: 0 100%;
+
+		> [data-modal-content] {
+			display: flex;
+			flex: 1 1 auto;
+			flex-direction: column;
+		}
+
+		> .sheet-handle {
+			display: block;
+			flex-shrink: 0;
+			width: 2.25rem;
+			height: 0.25rem;
+			margin: 0.5rem auto 0;
+			border-radius: 0.25rem;
+			background: var(--surface-5);
+			touch-action: none;
+		}
+	}
+
+	.modal-container.mobile-sheet.shown > .modal-body {
+		translate: 0 0;
 	}
 }
 </style>

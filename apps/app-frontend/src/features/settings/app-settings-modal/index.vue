@@ -377,17 +377,13 @@ const messages = defineMessages({
 	<TabbedModal
 		ref="modal"
 		:tabs="availableTabs"
+		:header="formatMessage(commonMessages.settingsLabel)"
 		width="928px"
 		max-width="928px"
 		:before-hide="canLeaveCurrentTab"
 		:before-tab-change="canLeaveCurrentTab"
 		:floating-action-bar-shown="hasUnsavedChanges"
 	>
-		<template #title>
-			<span class="text-2xl font-semibold text-contrast">
-				{{ formatMessage(commonMessages.settingsLabel) }}
-			</span>
-		</template>
 		<template #floating-action-bar>
 			<UnsavedChangesPopup
 				ref="unsavedChangesPopup"

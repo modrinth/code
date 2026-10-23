@@ -3050,6 +3050,15 @@
   "modal.open-in-app.why-use": {
     "defaultMessage": "Why use the Modrinth App"
   },
+  "modal.tabbed.collapse": {
+    "defaultMessage": "Collapse"
+  },
+  "modal.tabbed.collapse-sidebar": {
+    "defaultMessage": "Collapse sidebar"
+  },
+  "modal.tabbed.expand-sidebar": {
+    "defaultMessage": "Expand sidebar"
+  },
   "notification.error.title": {
     "defaultMessage": "An error occurred"
   },

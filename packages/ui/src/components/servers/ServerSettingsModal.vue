@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
-import { ChevronRightIcon } from '@modrinth/assets'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
@@ -228,6 +227,7 @@ defineExpose({ show, hide })
 	<TabbedModal
 		ref="modal"
 		:tabs="tabs"
+		:header="formatMessage(commonMessages.settingsLabel)"
 		:floating-action-bar-shown="saveBannerShown"
 		:max-width="'min(980px, calc(95vw - 2rem))'"
 		:width="'min(980px, calc(95vw - 2rem))'"
@@ -235,13 +235,8 @@ defineExpose({ show, hide })
 		<template #floating-action-bar>
 			<div ref="saveBannerTarget" />
 		</template>
-		<template #title>
-			<span class="flex items-center gap-2 text-lg font-semibold text-primary">
-				{{ server.name || 'Server' }} <ChevronRightIcon />
-				<span class="font-extrabold text-contrast">{{
-					formatMessage(commonMessages.settingsLabel)
-				}}</span>
-			</span>
+		<template #breadcrumb>
+			<span class="truncate">{{ server.name || 'Server' }}</span>
 		</template>
 	</TabbedModal>
 </template>
