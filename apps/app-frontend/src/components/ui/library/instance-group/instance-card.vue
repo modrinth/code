@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { PointerActivationConstraints } from '@dnd-kit/dom'
 import { KeyboardSensor, PointerSensor, useDraggable } from '@dnd-kit/vue'
 import { CheckIcon, DownloadIcon, PlayIcon, SpinnerIcon, StopCircleIcon } from '@modrinth/assets'
 import { defineMessages, IconButton, injectNotificationManager, useVIntl } from '@modrinth/ui'
@@ -23,7 +24,7 @@ const LOADING_INDICATOR_DELAY_MS = 100
 
 const instanceCardSensors = [
 	PointerSensor.configure({
-		preventActivation: () => false,
+		activationConstraints: [new PointerActivationConstraints.Distance({ value: 5 })],
 	}),
 	KeyboardSensor,
 ]
