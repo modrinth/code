@@ -88,6 +88,7 @@ export function getVersionGroupsForDisplay(
 ): VersionDisplayGroup[] {
 	const inputVersions = gameVersions.slice()
 	const allVersions = allGameVersions.slice()
+	const versionTags = new Map(allVersions.map((version) => [version.version, version]))
 
 	const allSnapshots = allVersions.filter((version) => version.version_type === 'snapshot')
 	const allReleases = allVersions.filter((version) => version.version_type === 'release')
@@ -103,20 +104,20 @@ export function getVersionGroupsForDisplay(
 		inputVersions.sort((a, b) => indices[a] - indices[b])
 	}
 
-	const releaseVersions = inputVersions.filter((projVer) =>
-		allReleases.some((gameVer) => gameVer.version === projVer),
+	const releaseVersions = inputVersions.filter(
+		(projVer) => versionTags.get(projVer)?.version_type === 'release',
 	)
 
-	const dateString = allReleases.find((version) => version.version === releaseVersions[0])?.date
+	const dateString = versionTags.get(releaseVersions[0])?.date
 
 	const latestReleaseVersionDate = dateString ? Date.parse(dateString) : 0
-	const latestSnapshot = inputVersions.find((projVer) =>
-		allSnapshots.some(
-			(gameVer) =>
-				gameVer.version === projVer &&
-				(!latestReleaseVersionDate || latestReleaseVersionDate < Date.parse(gameVer.date)),
-		),
-	)
+	const latestSnapshot = inputVersions.find((projVer) => {
+		const gameVer = versionTags.get(projVer)
+		return (
+			gameVer?.version_type === 'snapshot' &&
+			(!latestReleaseVersionDate || latestReleaseVersionDate < Date.parse(gameVer.date))
+		)
+	})
 
 	const allReleasesGrouped = groupVersions(
 		allReleases.map((release) => release.version),
@@ -146,7 +147,10 @@ export function getVersionGroupsForDisplay(
 	)
 
 	const legacyVersionsAsRanges = groupConsecutiveIndices(
-		inputVersions.filter((projVer) => allLegacy.some((gameVer) => gameVer.version === projVer)),
+		inputVersions.filter((projVer) => {
+			const gameVer = versionTags.get(projVer)
+			return gameVer && gameVer.version_type !== 'snapshot' && gameVer.version_type !== 'release'
+		}),
 		allLegacy,
 	)
 
@@ -154,8 +158,8 @@ export function getVersionGroupsForDisplay(
 
 	// show all snapshots if there's no release versions
 	if (releaseVersionsAsRanges.length === 0) {
-		const snapshotVersions = inputVersions.filter((projVer) =>
-			allSnapshots.some((gameVer) => gameVer.version === projVer),
+		const snapshotVersions = inputVersions.filter(
+			(projVer) => versionTags.get(projVer)?.version_type === 'snapshot',
 		)
 		const snapshotVersionsAsRanges =
 			snapshotVersions.length > 3
