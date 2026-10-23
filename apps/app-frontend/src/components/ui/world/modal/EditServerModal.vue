@@ -104,7 +104,7 @@ const titleMessage = defineMessage({
 		/>
 		<HideFromHomeOption v-model="hideFromHome" class="mt-3" />
 		<template #actions>
-			<div class="flex gap-2 justify-end">
+			<div class="flex flex-wrap gap-2 justify-end">
 				<Button type="outlined" @click="hide()">
 					<XIcon />
 					{{ formatMessage(commonMessages.cancelButton) }}
