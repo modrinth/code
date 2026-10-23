@@ -29,9 +29,6 @@
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "취소"
   },
-  "billing.resubscribe-modal.cpus": {
-    "defaultMessage": "{sharedCpus} 공유 CPU 코어"
-  },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "<server-name>{serverName}</server-name> 서버에 다시 구독하려고 합니다. 구독이 재활성화되며, 서버는 중단 없이 계속 실행됩니다."
   },
@@ -44,23 +41,8 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "구독 정보를 불러오는 데 실패했습니다."
   },
-  "billing.resubscribe-modal.interval": {
-    "defaultMessage": "{intervalOption, select, fiveDays {/5일} monthly {/월} quarterly {/3개월} yearly {/년} other {{interval}}}"
-  },
-  "billing.resubscribe-modal.next-charge": {
-    "defaultMessage": "다음 결제일은 <charge-date>{date}</charge-date>입니다."
-  },
-  "billing.resubscribe-modal.plan-label": {
-    "defaultMessage": "플랜"
-  },
-  "billing.resubscribe-modal.ram": {
-    "defaultMessage": "{ramGb}GB 램"
-  },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "재구독"
-  },
-  "billing.resubscribe-modal.storage": {
-    "defaultMessage": "{storageGb}GB 저장소"
   },
   "billing.resubscribe-modal.title": {
     "defaultMessage": "서버 다시 구독"

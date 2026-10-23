@@ -29,9 +29,6 @@
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Annuler"
   },
-  "billing.resubscribe-modal.cpus": {
-    "defaultMessage": "{sharedCpus} CPU partagés"
-  },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "Vous êtes sur le point de vous réabonner à <server-name>{serverName}</server-name>. Votre abonnement sera réactivé et votre serveur pourra continuer à fonctionner sans interruption."
   },
@@ -44,23 +41,8 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Impossible de charger les détails de l'abonnement."
   },
-  "billing.resubscribe-modal.interval": {
-    "defaultMessage": "{intervalOption, select, fiveDays {tous les 5 jours} monthly {par mois} quarterly {par trimestre} yearly {par an} other {{interval}}}"
-  },
-  "billing.resubscribe-modal.next-charge": {
-    "defaultMessage": "Votre prochain paiement sera le <charge-date>{date}</charge-date>."
-  },
-  "billing.resubscribe-modal.plan-label": {
-    "defaultMessage": "Forfait"
-  },
-  "billing.resubscribe-modal.ram": {
-    "defaultMessage": "{ramGb} Go de mémoire RAM"
-  },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Se réabonner"
-  },
-  "billing.resubscribe-modal.storage": {
-    "defaultMessage": "{storageGb} Go de stockage"
   },
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Se réabonner au serveur"

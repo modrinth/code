@@ -20,26 +20,11 @@
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Annuller"
   },
-  "billing.resubscribe-modal.cpus": {
-    "defaultMessage": "{sharedCpus} Delte CPU'er"
-  },
   "billing.resubscribe-modal.error.title": {
     "defaultMessage": "Fejl"
   },
-  "billing.resubscribe-modal.next-charge": {
-    "defaultMessage": "Din næste opkrævning vil være den <charge-date>{date}</charge-date>."
-  },
-  "billing.resubscribe-modal.plan-label": {
-    "defaultMessage": "Plan"
-  },
-  "billing.resubscribe-modal.ram": {
-    "defaultMessage": "{ramGb} GB RAM"
-  },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Genabonner"
-  },
-  "billing.resubscribe-modal.storage": {
-    "defaultMessage": "{storageGb} GB Lagerplads"
   },
   "browse.filter-results": {
     "defaultMessage": "Filtrer resultater..."

@@ -20,9 +20,6 @@
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Batal"
   },
-  "billing.resubscribe-modal.cpus": {
-    "defaultMessage": "{sharedCpus} CPU Bersama"
-  },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "Anda akan segera berlangganan ulang ke <server-name>{serverName}</server-name>. Langganan Anda akan diaktifkan kembali dan server Anda akan terus berjalan tanpa gangguan."
   },
@@ -35,23 +32,8 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Gagal memuat perincian langganan."
   },
-  "billing.resubscribe-modal.interval": {
-    "defaultMessage": "{intervalOption, select, fiveDays {/5 hari} monthly {/bulan} quarterly {/kuartal} yearly {/tahun} other {{interval}}}"
-  },
-  "billing.resubscribe-modal.next-charge": {
-    "defaultMessage": "Tagihan Anda berikutnya akan jatuh tempo pada <charge-date>{date}</charge-date>."
-  },
-  "billing.resubscribe-modal.plan-label": {
-    "defaultMessage": "Langganan"
-  },
-  "billing.resubscribe-modal.ram": {
-    "defaultMessage": "RAM {ramGb} GB"
-  },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Berlangganan kembali"
-  },
-  "billing.resubscribe-modal.storage": {
-    "defaultMessage": "Penyimpanan {storageGb} GB"
   },
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Berlangganan ulang ke Server"

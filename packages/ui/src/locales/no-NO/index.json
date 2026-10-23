@@ -29,9 +29,6 @@
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Avbryt"
   },
-  "billing.resubscribe-modal.cpus": {
-    "defaultMessage": "{sharedCpus} Delte CPU-er"
-  },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "Du er i ferd med å abonnere på <server-name>{serverName}</server-name> på nytt. Abonnementet ditt blir reaktivert, og serveren din fortsetter å kjøre uten avbrudd."
   },
@@ -44,20 +41,8 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Kunne ikke laste inn abonnementsdetaljer."
   },
-  "billing.resubscribe-modal.next-charge": {
-    "defaultMessage": "Din neste betaling skjer <charge-date>{date}</charge-date>."
-  },
-  "billing.resubscribe-modal.plan-label": {
-    "defaultMessage": "Plan"
-  },
-  "billing.resubscribe-modal.ram": {
-    "defaultMessage": "{ramGb} GB RAM"
-  },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Abonner på nytt"
-  },
-  "billing.resubscribe-modal.storage": {
-    "defaultMessage": "{storageGb} GB Lagringsplass"
   },
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Abonner på nytt på server"
