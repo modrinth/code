@@ -6,6 +6,7 @@ import {
 	createContext,
 	defineMessage,
 	getLatestMatchingInstallVersion,
+	newestVersionForChannel,
 	useVIntl,
 } from '@modrinth/ui'
 import { openUrl } from '@tauri-apps/plugin-opener'
@@ -106,11 +107,18 @@ function findPreferredVersion(
 	const projectType = project.project_type ?? 'mod'
 
 	return (
-		versions.find(
-			(v) =>
-				v.game_versions.includes(instance.game_version) &&
-				(projectType === 'mod' ? v.loaders.includes(instance.loader) : true),
-		) ?? versions.find((v) => isVersionCompatible(v, project, instance))
+		newestVersionForChannel(
+			versions.filter(
+				(v) =>
+					v.game_versions.includes(instance.game_version) &&
+					(projectType === 'mod' ? v.loaders.includes(instance.loader) : true),
+			),
+			instance.update_channel,
+		) ??
+		newestVersionForChannel(
+			versions.filter((v) => isVersionCompatible(v, project, instance)),
+			instance.update_channel,
+		)
 	)
 }
 

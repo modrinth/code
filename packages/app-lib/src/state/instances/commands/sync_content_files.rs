@@ -453,7 +453,7 @@ pub(crate) async fn reconcile_instance_renames(
         {
             continue;
         }
-        let mut tx = state.pool.begin().await?;
+        let mut tx = state.pool.begin_with("BEGIN IMMEDIATE").await?;
         sqlite::content_rows::rename_instance_file(
             &instance.id,
             &source.relative_path,

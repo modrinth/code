@@ -74,6 +74,7 @@
 </template>
 
 <script setup lang="ts">
+import type { Archon } from '@modrinth/api-client'
 import { LockIcon, LockOpenIcon, RotateCounterClockwiseIcon, TrashIcon } from '@modrinth/assets'
 import { useQueryClient } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
@@ -272,7 +273,10 @@ async function confirmResetToOnboarding() {
 		} catch (error) {
 			console.error('Failed to clear server logs:', error)
 		}
-		server.value.flows = { intro: true }
+		queryClient.setQueryData<Archon.Servers.v0.Server>(
+			['servers', 'detail', serverId],
+			(current) => (current ? { ...current, flows: { ...current.flows, intro: true } } : current),
+		)
 		await Promise.all([
 			queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] }),
 			queryClient.invalidateQueries({ queryKey: ['servers', 'v1', 'detail', serverId] }),

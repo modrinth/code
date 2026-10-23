@@ -5,16 +5,20 @@ use crate::state::{
     InstanceIconConfig, InstanceInstallStage, InstanceLink, InstanceMetadata,
     ModLoader,
 };
+use anyhow::bail;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
 pub type InstallModpackPreview = CreatePackInstance;
 
+/// Everything about a job except its request, which is stored separately
+/// because it can be several megabytes and is only needed to run the job.
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct InstallJobState {
     pub schema_version: u32,
-    pub request: InstallRequest,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub content_count: Option<u32>,
     pub target: InstallTarget,
     pub cleanup: InstallCleanup,
     pub progress: InstallProgressState,
@@ -32,7 +36,7 @@ pub struct InstallJobState {
 }
 
 impl InstallJobState {
-    pub fn new(request: InstallRequest) -> Self {
+    pub fn new(request: &InstallRequest) -> Self {
         let target = request.target();
         let cleanup = request.cleanup();
         let kind = request.kind();
@@ -40,7 +44,12 @@ impl InstallJobState {
 
         Self {
             schema_version: 1,
-            request,
+            content_count: match request {
+                InstallRequest::BulkUpdateContent { updates, .. } => {
+                    Some(updates.len() as u32)
+                }
+                _ => None,
+            },
             target,
             cleanup,
             progress: InstallProgressState {
@@ -224,7 +233,15 @@ pub struct InstallPostInstallEdit {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct SharedInstanceLinkedServer {
+    pub domain: String,
+    pub region: String,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct SharedInstanceInstallData {
+    #[serde(default)]
+    pub linked_server: Option<SharedInstanceLinkedServer>,
     pub shared_instance_id: String,
     pub manager_id: Option<String>,
     #[serde(default)]
@@ -238,6 +255,8 @@ pub struct SharedInstanceInstallData {
     pub name: String,
     pub version: i32,
     pub modrinth_ids: Vec<String>,
+    #[serde(default)]
+    pub removed_files: Vec<SharedInstanceRemovedFile>,
     #[serde(default)]
     pub external_files: Vec<SharedInstanceExternalFileData>,
     pub modpack: Option<SharedInstanceInstallModpack>,
@@ -256,14 +275,62 @@ pub struct SharedInstanceExternalFileData {
     pub sha1: Option<String>,
 }
 
+#[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum SharedInstanceRemovedFile {
+    Version { version_id: String },
+    Path { parent: String, filename: String },
+}
+
+impl SharedInstanceRemovedFile {
+    pub(crate) fn matches(
+        &self,
+        version_id: Option<&str>,
+        relative_path: &str,
+    ) -> bool {
+        match self {
+            Self::Version {
+                version_id: removed,
+            } => version_id == Some(removed.as_str()),
+            Self::Path { parent, filename } => {
+                let path = relative_path
+                    .strip_suffix(".disabled")
+                    .unwrap_or(relative_path);
+                let filename =
+                    filename.strip_suffix(".disabled").unwrap_or(filename);
+                path == format!("{parent}/{filename}")
+            }
+        }
+    }
+
+    pub(crate) fn validate(&self) -> crate::Result<()> {
+        if let Self::Path { parent, filename } = self
+            && (!matches!(
+                parent.as_str(),
+                "mods"
+                    | "plugins"
+                    | "datapacks"
+                    | "shaderpacks"
+                    | "resourcepacks"
+            ) || !path_util::is_safe_file_name(filename)
+                || ![".jar", ".zip", ".jar.disabled", ".zip.disabled"]
+                    .iter()
+                    .any(|suffix| filename.ends_with(*suffix)))
+        {
+            bail!(crate::ErrorKind::InputError(
+                "invalid removed modpack file path".to_string(),
+            ));
+        }
+        Ok(())
+    }
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct SharedInstanceInstallModpack {
     pub project_id: String,
     pub version_id: String,
     pub title: String,
     pub icon_url: Option<String>,
-    #[serde(default)]
-    pub dependency_count: usize,
 }
 
 impl InstallRequest {

@@ -233,9 +233,6 @@
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "ไม่สามารถลบเนื้อหาได้"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "ไม่สามารถปิดใช้งานเนื้อหาได้"
-  },
   "icon-select.edit": {
     "defaultMessage": "แก้ไขไอคอน"
   },

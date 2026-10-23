@@ -121,10 +121,14 @@ export namespace Archon {
 				| 'addon_enabled'
 				| 'addon_deleted'
 				| 'addon_updated'
+				| 'addon_server_enabled'
+				| 'addon_player_enabled'
+				| 'addon_side_toggle_locked'
 				| 'modpack_changed'
 				| 'modpack_unlinked'
 				| 'server_repaired'
 				| 'server_reset'
+				| 'world_data_reset'
 				| 'server_started'
 				| 'server_stopped'
 				| 'server_restarted'
@@ -285,6 +289,57 @@ export namespace Archon {
 
 	export namespace Content {
 		export namespace v1 {
+			export type ShareWorldContentResponse = {
+				shared_instance_id: string
+				version: number | null
+				restarted: boolean
+			}
+
+			export type SharedContentChange<T> =
+				| { kind: 'added'; after: T }
+				| { kind: 'removed'; before: T }
+				| { kind: 'updated'; before: T; after: T }
+
+			export type SharedContentDiffEntry =
+				| { type: 'project'; project_id: string; change: SharedContentChange<string> }
+				| {
+						type: 'external_file'
+						file_type: string
+						file_name: string
+						kind: 'added' | 'removed' | 'updated'
+				  }
+				| { type: 'modpack' | 'game_version'; change: SharedContentChange<string> }
+				| { type: 'loader'; change: SharedContentChange<{ name: string; version: string | null }> }
+
+			export type SharedInstancePublishDiff = {
+				shared_instance_id: string
+				latest_version: number
+				local_updated_at: string
+				has_changes: boolean
+				requires_restart: boolean
+				diffs: SharedContentDiffEntry[]
+				projects: Record<string, { name: string; icon_url: string | null }>
+				versions: Record<
+					string,
+					{
+						project_id: string
+						name: string
+						version_number: string | null
+					}
+				>
+			}
+
+			export type ShareableFile = {
+				path: string
+				size: number
+				blocked: boolean
+			}
+
+			export type ShareableFilesResponse = {
+				files: ShareableFile[]
+				truncated: boolean
+			}
+
 			export type AddonKind = 'mod' | 'plugin' | 'datapack' | 'shader' | 'resourcepack'
 
 			export type ContentOwnerType = 'user' | 'organization'
@@ -302,6 +357,25 @@ export namespace Archon {
 				environment?: Labrinth.Projects.v3.Environment | null
 			}
 
+			export type AddonManifestEnvironment =
+				| 'client_and_server'
+				| 'client_only'
+				| 'dedicated_server_only'
+
+			export type AddonManifestWarnings = {
+				multiple_mod_entries: number | null
+				malformed: boolean
+			}
+
+			export type AddonManifest = {
+				platform: Modloader
+				name: string | null
+				version: string | null
+				environment: AddonManifestEnvironment | null
+				icon_embedded: boolean
+				warnings: AddonManifestWarnings
+			}
+
 			export type AddonStatus =
 				| 'pending'
 				| 'installed'
@@ -317,11 +391,17 @@ export namespace Archon {
 				filesize: number
 				btime?: string
 				disabled: boolean
+				disabled_server: boolean
+				disabled_player: boolean
+				side_toggle_unlocked: boolean
+				manifest: AddonManifest | null
 				kind: AddonKind
 				from_modpack: boolean
 				status: AddonStatus
 				pack_client_retained: boolean
 				pack_client_depends: boolean
+				/** Whether the sides were guessed when installing its modpack, and should be reviewed. */
+				needs_side_type_review: boolean
 				has_update: string | null
 				name: string | null
 				project_id: string | null
@@ -334,12 +414,26 @@ export namespace Archon {
 				modloader: string | null
 				modloader_version: string | null
 				game_version: string | null
+				/** The least stable channel addon updates are offered from. */
+				update_channel: Archon.Servers.v1.ReleaseChannel
 				modpack: ModpackFields | null
 				installing?: 'loader' | 'modpack'
 				error?: {
 					message: string
 				}
+				/** The number of addons whose sides should be reviewed, regardless of the addon filters. */
+				files_need_side_type_review: number
 				addons: Addon[] | null
+			}
+
+			export type ReviewedAddon = {
+				kind: AddonKind
+				filename: string
+			}
+
+			export type CompleteSideTypeReviewRequest = {
+				/** The addons whose side review is completed, or every addon when absent. */
+				addons?: ReviewedAddon[] | null
 			}
 
 			export type AddAddonRequest = {
@@ -353,6 +447,14 @@ export namespace Archon {
 			export type RemoveAddonRequest = {
 				kind: AddonKind
 				filename: string
+			}
+
+			export type SetAddonEnabledRequest = RemoveAddonRequest & {
+				enabled: boolean
+			}
+
+			export type SetAddonSideToggleLockedRequest = RemoveAddonRequest & {
+				locked: boolean
 			}
 
 			export type UpdateAddonRequest = {
@@ -382,7 +484,28 @@ export namespace Archon {
 				description: string | null
 			}
 
-			export type ModpackSpec = ModpackSpecModrinth | ModpackSpecLocalFile
+			export type CurseForgeModpackLink = {
+				project_id: number
+				file_id: number
+				slug: string
+				name: string
+				/** The display name of the client pack file, usually including the modpack version. */
+				version_name: string
+				summary?: string
+				icon_url?: string
+				author?: string
+				server_pack_file_id?: number
+			}
+
+			export type ModpackSpecCurseForge = {
+				platform: 'curseforge'
+				/** The client pack's filename. */
+				filename: string
+				/** Present when installed from a link rather than uploaded packs. */
+				link?: CurseForgeModpackLink
+			}
+
+			export type ModpackSpec = ModpackSpecModrinth | ModpackSpecLocalFile | ModpackSpecCurseForge
 
 			export type ModpackOwner = {
 				id: string
@@ -787,9 +910,19 @@ export namespace Archon {
 						status: 'unassigned'
 				  }
 
+			export type ReleaseChannel = 'release' | 'beta' | 'alpha'
+
+			export type PatchWorld = {
+				name?: string
+				icon_data?: string
+				update_channel?: ReleaseChannel
+			}
+
 			export type WorldFull = {
 				id: string
 				name: string
+				/** The least stable channel addon updates and dependencies are selected from. */
+				update_channel: ReleaseChannel
 				created_at: string
 				is_active: boolean
 				download_method: WorldDownloadMethod
@@ -806,6 +939,9 @@ export namespace Archon {
 			}
 
 			export type WorldContentInfo = {
+				shared_instance_id: string | null
+				shared_instance_needs_update: boolean
+				requires_restart: boolean
 				modloader: string
 				modloader_version: string
 				game_version: string
@@ -1057,6 +1193,10 @@ export namespace Archon {
 				type: 'server.transfer.start' | 'server.transfer.done'
 				target_node: string
 			}
+			export type ServerIconPatchEvent = {
+				type: 'server.icon.patch'
+				server_icon_hash: string | null
+			}
 
 			export type UsersPatchEvent = { type: 'users.patch' }
 
@@ -1095,8 +1235,24 @@ export namespace Archon {
 				game_version: string
 				platform_version: string | null
 			}
+			export type WorldContentCurseForgeModpackLink = {
+				project_id: number
+				file_id: number
+				slug: string
+				name: string
+				version_name: string
+				summary: string | null
+				icon_url: string | null
+				author: string | null
+				server_pack_file_id: number | null
+			}
 			export type WorldContentModpackSource =
-				| 'CurseForge'
+				| {
+						CurseForge: {
+							filename: string
+							link: WorldContentCurseForgeModpackLink | null
+						}
+				  }
 				| {
 						Modrinth: {
 							version_id: string
@@ -1126,6 +1282,10 @@ export namespace Archon {
 				has_update: string | null
 			}
 			export type WorldContentItem = {
+				disabled_server?: boolean
+				disabled_player?: boolean
+				side_toggle_unlocked?: boolean
+				needs_side_type_review?: boolean
 				parent_directory: string
 				file_sha1: string | null
 				filename: string
@@ -1135,6 +1295,7 @@ export namespace Archon {
 				project_id: string | null
 				pack_client_retained: boolean
 				pack_client_depends: boolean
+				manifest?: Archon.Content.v1.AddonManifest | null
 				status: Archon.Content.v1.AddonStatus
 				filesize: number | null
 				name: string | null
@@ -1154,6 +1315,34 @@ export namespace Archon {
 				}
 				content: WorldContentItem[]
 			}
+			export type WorldContentFileSideEvent = {
+				type: 'world.content.file.side.server.updated' | 'world.content.file.side.client.updated'
+				world_id: string
+				parent_directory: 'mods' | 'plugins' | 'datapacks' | 'resourcepacks' | 'shaderpacks'
+				filename: string
+				enabled: boolean
+			}
+			export type WorldContentFileSideLockEvent = {
+				type: 'world.content.file.side.lock.updated'
+				world_id: string
+				parent_directory: 'mods' | 'plugins' | 'datapacks' | 'resourcepacks' | 'shaderpacks'
+				filename: string
+				locked: boolean
+			}
+
+			export type WorldSharedInstanceUpdateEvent = {
+				type: 'world.shared_instance.update'
+				world_id: string
+				shared_instance_id: string
+				needs_update: boolean
+				requires_restart: boolean
+			}
+
+			export type WorldSharedInstanceDeleteEvent = {
+				type: 'world.shared_instance.delete'
+				world_id: string
+				shared_instance_id: string
+			}
 
 			export type SyncEvent =
 				| ProtocolResetEvent
@@ -1168,12 +1357,17 @@ export namespace Archon {
 				| ServerNetworkPatchEvent
 				| ServerSftpPatchEvent
 				| ServerTransferEvent
+				| ServerIconPatchEvent
 				| UsersPatchEvent
 				| WorldPatchEvent
 				| WorldStartupPatchEvent
 				| WorldContentAddonPatchEvent
 				| WorldContentBaseUpdateEvent
 				| WorldContentUpdateEvent
+				| WorldContentFileSideEvent
+				| WorldContentFileSideLockEvent
+				| WorldSharedInstanceUpdateEvent
+				| WorldSharedInstanceDeleteEvent
 		}
 	}
 
@@ -1299,6 +1493,12 @@ export namespace Archon {
 				filename: string
 			}
 
+			export type InstallProgressCurseForgeModpackKey = {
+				type: 'curse_forge_modpack'
+				/** The client pack's filename. */
+				filename: string
+			}
+
 			export type InstallProgressPlatformKey = {
 				type: 'platform'
 				platform: 'forge' | 'neoforge' | 'fabric' | 'quilt' | 'paper' | 'purpur' | 'vanilla'
@@ -1310,6 +1510,7 @@ export namespace Archon {
 				| InstallProgressFileKey
 				| InstallProgressModrinthModpackKey
 				| InstallProgressLocalModpackKey
+				| InstallProgressCurseForgeModpackKey
 				| InstallProgressPlatformKey
 
 			export type InstallProgressItem = {

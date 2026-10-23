@@ -1,107 +1,160 @@
 import {
 	defineMessages,
+	injectAuth,
+	injectModrinthClient,
 	injectPopupNotificationManager,
 	type PopupNotification,
+	serverListQueryOptions,
 	useVIntl,
 } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
-import { watch } from 'vue'
+import { onScopeDispose, ref, watch } from 'vue'
 
 import { useAppSettings } from '@/composables/use-app-settings'
-import { traceStartupStep } from '@/helpers/startup-debug'
-import { instanceListQueryOptions } from '@/pages/instance/query-options'
+import { debugStartup, traceStartupStep } from '@/helpers/startup-debug'
 
 import {
-	markSyncInstancesUpdateNotificationShown,
-	shouldShowSyncInstancesUpdateNotification,
+	markServerSharingUpdateNotificationShown,
+	shouldShowServerSharingUpdateNotification,
 } from './show-notification'
 
 const messages = defineMessages({
 	title: {
-		id: 'app.sync-instances-update.notification.title',
-		defaultMessage: 'Sync your instances',
+		id: 'app.server-sharing-update.title',
+		defaultMessage: 'Share servers with friends',
 	},
 	description: {
-		id: 'app.sync-instances-update.notification.description',
-		defaultMessage:
-			'Keep game settings, servers, resource packs, and more in sync across your instances.',
+		id: 'app.server-sharing-update.notification.description',
+		defaultMessage: 'Invite friends to play with an instance managed by your server.',
 	},
 	view: {
-		id: 'app.sync-instances-update.notification.view-update',
+		id: 'app.server-sharing-update.notification.view-update',
 		defaultMessage: 'View update',
 	},
 	dismiss: {
-		id: 'app.sync-instances-update.notification.dismiss',
+		id: 'app.server-sharing-update.notification.dismiss',
 		defaultMessage: 'Dismiss',
 	},
 })
 
 export function useNewUpdateNotification(showModal: () => void) {
 	const appSettings = useAppSettings()
+	const auth = injectAuth()
+	const client = injectModrinthClient()
 	const queryClient = useQueryClient()
 	const popupNotificationManager = injectPopupNotificationManager()
 	const { formatMessage } = useVIntl()
+	const invitePath = ref('/hosting/manage')
 	let notificationId: PopupNotification['id'] | null = null
+	let pendingUpdate = false
+	let disposed = false
 
-	function showNotification() {
-		if (
-			popupNotificationManager
-				.getNotifications()
-				.some((notification) => notification.id === notificationId)
-		) {
-			return
+	function removeNotification() {
+		if (notificationId === null) return
+		popupNotificationManager.removeNotification(notificationId)
+		notificationId = null
+	}
+
+	function canNotify() {
+		return (
+			!disposed &&
+			notificationId === null &&
+			(appSettings.getFeatureFlag('show_server_sharing_update_modal') ||
+				(pendingUpdate && shouldShowServerSharingUpdateNotification()))
+		)
+	}
+
+	async function showNotification() {
+		const userId = auth.user.value?.id
+		const session = auth.session_token.value
+		if (!userId || !session || !canNotify()) return
+
+		try {
+			const response = await traceStartupStep('Load servers for update notification', () =>
+				queryClient.fetchQuery({
+					...serverListQueryOptions(client),
+					retry: false,
+				}),
+			)
+			if (
+				auth.user.value?.id !== userId ||
+				auth.session_token.value !== session ||
+				!canNotify() ||
+				response.servers.length === 0
+			) {
+				return
+			}
+
+			const activeServers = response.servers.filter(
+				(server) => server.owner_id === userId && server.status === 'available',
+			)
+			invitePath.value =
+				activeServers.length === 1
+					? `/hosting/manage/${activeServers[0].server_id}/play`
+					: '/hosting/manage'
+
+			if (
+				!appSettings.getFeatureFlag('show_server_sharing_update_modal') &&
+				!markServerSharingUpdateNotificationShown()
+			) {
+				return
+			}
+
+			const notification = popupNotificationManager.addPopupNotification({
+				contentType: 'standard',
+				title: formatMessage(messages.title),
+				text: formatMessage(messages.description),
+				type: 'info',
+				hideIcon: true,
+				autoCloseMs: null,
+				buttons: [
+					{
+						label: formatMessage(messages.dismiss),
+						color: 'standard',
+						action: removeNotification,
+					},
+					{
+						label: formatMessage(messages.view),
+						color: 'brand',
+						action: () => {
+							removeNotification()
+							showModal()
+						},
+					},
+				],
+			})
+			notificationId = notification.id
+		} catch {
+			debugStartup('Could not load servers for update notification')
 		}
-
-		if (!shouldShowSyncInstancesUpdateNotification()) return
-
-		const notification = popupNotificationManager.addPopupNotification({
-			contentType: 'standard',
-			title: formatMessage(messages.title),
-			text: formatMessage(messages.description),
-			type: 'info',
-			hideIcon: true,
-			autoCloseMs: null,
-			buttons: [
-				{
-					label: formatMessage(messages.dismiss),
-					color: 'standard',
-					action: () => popupNotificationManager.removeNotification(notification.id),
-				},
-				{
-					label: formatMessage(messages.view),
-					color: 'brand',
-					action: showModal,
-				},
-			],
-		})
-		notificationId = notification.id
 	}
 
 	async function notifyForVersion(version: string, pendingUpdateToastForVersion: string | null) {
-		const isSyncUpdateVersion = version.startsWith('0.20.')
-		if (isSyncUpdateVersion && pendingUpdateToastForVersion !== version) {
-			markSyncInstancesUpdateNotificationShown()
+		const isServerSharingUpdateVersion = version.startsWith('0.21.')
+		pendingUpdate = isServerSharingUpdateVersion && pendingUpdateToastForVersion === version
+		if (isServerSharingUpdateVersion && !pendingUpdate) {
+			markServerSharingUpdateNotificationShown()
 		}
-		if (
-			appSettings.getFeatureFlag('show_sync_instances_update_modal') ||
-			(isSyncUpdateVersion &&
-				pendingUpdateToastForVersion === version &&
-				(
-					await traceStartupStep('Load instances for update notification', () =>
-						queryClient.fetchQuery(instanceListQueryOptions()),
-					)
-				).length > 0)
-		) {
-			showNotification()
-		}
+		await showNotification()
 	}
 
 	watch(
-		() => appSettings.getFeatureFlag('show_sync_instances_update_modal'),
-		(enabled) => {
-			if (enabled) showNotification()
+		[
+			() => appSettings.getFeatureFlag('show_server_sharing_update_modal'),
+			() => auth.session_token.value,
+			() => auth.user.value?.id,
+		],
+		() => {
+			removeNotification()
+			invitePath.value = '/hosting/manage'
+			void showNotification()
 		},
 	)
 
-	return { notifyForVersion }
+	onScopeDispose(() => {
+		disposed = true
+		removeNotification()
+	})
+
+	return { notifyForVersion, invitePath }
 }

@@ -75,3 +75,24 @@ export function newestEligibleUpdate(
 
 	return null
 }
+
+/**
+ * Picks the newest version on the most stable channels the policy allows, only falling back to
+ * less stable channels when none of the preferred ones have a version.
+ */
+export function newestVersionForChannel<
+	T extends Pick<Labrinth.Versions.v2.Version, 'version_type' | 'date_published'>,
+>(versions: readonly T[], policy: UpdateChannelPolicy): T | undefined {
+	const sortedVersions = [...versions].sort(
+		(a, b) => new Date(b.date_published).getTime() - new Date(a.date_published).getTime(),
+	)
+
+	for (const versionTypes of channelFallbacks(policy)) {
+		const version = sortedVersions.find((version) =>
+			versionTypes.includes(normalizeChannel(version.version_type)),
+		)
+		if (version) return version
+	}
+
+	return undefined
+}

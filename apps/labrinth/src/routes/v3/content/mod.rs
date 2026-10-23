@@ -8,7 +8,7 @@ use crate::database::models::version_item::VersionQueryResult;
 use crate::database::models::{DBProject, DBVersion};
 use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::models::pats::Scopes;
-use crate::models::projects::{DependencyType, Version};
+use crate::models::projects::{DependencyType, Version, VersionType};
 use crate::models::users::User;
 use crate::queue::session::AuthQueue;
 use crate::util::error::ApiContext as _;
@@ -26,7 +26,7 @@ use xredis::RedisPool;
 
 const CONTENT_RESOLVE_CACHE_NAMESPACE: &str = "content_resolve:v4";
 const CONTENT_RESOLVE_CACHE_HEAT_NAMESPACE: &str = "content_resolve_heat:v4";
-const CONTENT_RESOLVE_CACHE_SCHEMA_VERSION: &str = "v3";
+const CONTENT_RESOLVE_CACHE_SCHEMA_VERSION: &str = "v4";
 const CONTENT_RESOLVE_CACHE_HEAT_WINDOW_SECONDS: i64 = 60 * 60 * 24;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
@@ -119,6 +119,7 @@ struct VersionState<'a> {
     id: &'a str,
     project_id: &'a str,
     date_published: String,
+    version_type: modrinth_content_management::VersionType,
     dependencies: Vec<DependencyState>,
     game_versions: Vec<&'a str>,
     loaders: Vec<&'a str>,
@@ -539,6 +540,7 @@ fn hash_version(version: &modrinth_content_management::Version) -> String {
         id: &version.id,
         project_id: &version.project_id,
         date_published: version.date_published.to_rfc3339(),
+        version_type: version.version_type,
         dependencies,
         game_versions,
         loaders,
@@ -595,6 +597,7 @@ fn version_to_resolver(
         id: version.id.to_string(),
         project_id: version.project_id.to_string(),
         date_published: version.date_published,
+        version_type: version_type_to_resolver(version.version_type),
         dependencies: version
             .dependencies
             .into_iter()
@@ -609,6 +612,18 @@ fn version_to_resolver(
             .collect(),
         game_versions,
         loaders: version.loaders.into_iter().map(|loader| loader.0).collect(),
+    }
+}
+
+fn version_type_to_resolver(
+    version_type: VersionType,
+) -> modrinth_content_management::VersionType {
+    match version_type {
+        VersionType::Release => {
+            modrinth_content_management::VersionType::Release
+        }
+        VersionType::Beta => modrinth_content_management::VersionType::Beta,
+        VersionType::Alpha => modrinth_content_management::VersionType::Alpha,
     }
 }
 

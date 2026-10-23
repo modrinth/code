@@ -356,9 +356,6 @@
   "content.card.synced": {
     "defaultMessage": "Синхронизировано между сборками"
   },
-  "content.card.uploaded": {
-    "defaultMessage": "Загружено"
-  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Вы точно хотите обновить {count, plural, one {# проект} few {# проекта} other {# проектов}} до {count, plural, =1 {последней совместимой версии} other {последних совместимых версий}}? Рекомендуется обновлять контент по очереди."
   },
@@ -590,9 +587,6 @@
   "content.managed-card.view-content": {
     "defaultMessage": "Посмотреть контент"
   },
-  "content.metadata-filter.author": {
-    "defaultMessage": "Автор"
-  },
   "content.metadata-filter.environment": {
     "defaultMessage": "Среда"
   },
@@ -617,17 +611,8 @@
   "content.metadata-filter.update.available": {
     "defaultMessage": "Необновлённые"
   },
-  "content.metadata-filter.warning.client-depends": {
-    "defaultMessage": "Клиент зависит от файла"
-  },
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "Контент только для клиента"
-  },
-  "content.metadata-filter.warning.client-retained": {
-    "defaultMessage": "Файл для клиента сохранен"
-  },
-  "content.metadata-filter.warning.none": {
-    "defaultMessage": "Без предупреждений"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "Предупреждения"
@@ -664,9 +649,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Фильтр"
-  },
-  "content.page-layout.filter.author-count": {
-    "defaultMessage": "{count, plural, one {# автор} few {# автора} other {# авторов}}"
   },
   "content.page-layout.loading": {
     "defaultMessage": "Загрузка контента..."
@@ -1526,9 +1508,6 @@
   "files.navbar.home": {
     "defaultMessage": "Начало"
   },
-  "files.navbar.install-curseforge-pack": {
-    "defaultMessage": "Установить сборку из CurseForge"
-  },
   "files.navbar.new-file": {
     "defaultMessage": "Новый файл"
   },
@@ -1664,21 +1643,6 @@
   "files.zip-url-modal.backup-name": {
     "defaultMessage": "Установка сборки из CurseForge"
   },
-  "files.zip-url-modal.cf-header": {
-    "defaultMessage": "Установить сборку из CurseForge"
-  },
-  "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "Не удалось найти сборку модов на CurseForge по этому URL."
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "Сборка модов CurseForge не найдена"
-  },
-  "files.zip-url-modal.enter-link": {
-    "defaultMessage": "Вставьте ссылку"
-  },
-  "files.zip-url-modal.error-cf-url": {
-    "defaultMessage": "URL должен соответствовать URL версии сборки на CurseForge."
-  },
   "files.zip-url-modal.error-url-invalid": {
     "defaultMessage": "URL должен быть корректным."
   },
@@ -1690,24 +1654,6 @@
   },
   "files.zip-url-modal.install-failed-title": {
     "defaultMessage": "Установка не удалась"
-  },
-  "files.zip-url-modal.step-copy-description": {
-    "defaultMessage": "Скопируйте ссылку на страницу версии и вставьте его ниже."
-  },
-  "files.zip-url-modal.step-copy-title": {
-    "defaultMessage": "Скопируйте ссылку"
-  },
-  "files.zip-url-modal.step-find-description": {
-    "defaultMessage": "Найдите необходимую вам сборку на CurseForge."
-  },
-  "files.zip-url-modal.step-find-title": {
-    "defaultMessage": "Найдите сборку"
-  },
-  "files.zip-url-modal.step-select-description": {
-    "defaultMessage": "Перейдите во вкладку \"Файлы\" и выберите версию для установки."
-  },
-  "files.zip-url-modal.step-select-title": {
-    "defaultMessage": "Выберите версию"
   },
   "files.zip-url-modal.unknown-error": {
     "defaultMessage": "Произошла неизвестная ошибка"
@@ -1862,12 +1808,6 @@
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Не удалось удалить контент"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "Не удалось отключить контент"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "Не удалось включить контент"
-  },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "Не удалось обновить контент"
   },
@@ -1882,9 +1822,6 @@
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Не удалось удалить контент"
-  },
-  "hosting.content.failed-to-toggle": {
-    "defaultMessage": "Не удалось переключить {name}"
   },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "Не удалось отвязать сборку"
@@ -2327,12 +2264,6 @@
   "instances.managed-content-modal.enabled": {
     "defaultMessage": "Включен"
   },
-  "instances.managed-content-modal.external-content": {
-    "defaultMessage": "Сторонний"
-  },
-  "instances.managed-content-modal.external-content-description": {
-    "defaultMessage": "Этот файл не с Modrinth."
-  },
   "instances.managed-content-modal.header": {
     "defaultMessage": "Управляемый контент"
   },
@@ -2347,9 +2278,6 @@
   },
   "instances.managed-content-modal.search-placeholder": {
     "defaultMessage": "Поиск по {count, number} {count, plural, one {проекту} other {проектам}}"
-  },
-  "instances.managed-content-modal.warnings": {
-    "defaultMessage": "Предупреждения"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Текущая"
@@ -2434,15 +2362,6 @@
   },
   "label.changes-saved": {
     "defaultMessage": "Изменения сохранены"
-  },
-  "label.client-depends-warning": {
-    "defaultMessage": "Этот мод зависит от клиентского мода и может вызвать проблемы при запуске сервера"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "Это клиентский мод — он может вызвать проблемы при запуске сервера"
-  },
-  "label.client-retained-warning": {
-    "defaultMessage": "Это клиентский мод, который был установлен в качестве зависимости — он может вызвать проблемы при запуске сервера"
   },
   "label.collections": {
     "defaultMessage": "Коллекции"
@@ -5504,15 +5423,6 @@
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "Теперь они находятся здесь!"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "Больше не показывать"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "Настройки сервера перемещены"
-  },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Совместные серверы"
   },
@@ -5782,18 +5692,6 @@
   },
   "servers.settings.support.clear-action-log-title": {
     "defaultMessage": "Очистить журнал действий?"
-  },
-  "servers.setup.onboarding.installation-failed.text": {
-    "defaultMessage": "Произошла непредвиденная ошибка во время установки. Пожалуйста, попробуйте позже."
-  },
-  "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "Установка не удалась"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.text": {
-    "defaultMessage": "Произошла непредвиденная ошибка во время загрузки. Пожалуйста, попробуйте снова позже."
-  },
-  "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "Загрузка сборки не удалась"
   },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "Установить сервер"

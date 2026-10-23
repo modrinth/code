@@ -575,9 +575,9 @@ function showCreateModal(type: 'file' | 'directory') {
 	createItemModal.value?.show()
 }
 
-function showUnzipFromUrlModal(cf: boolean) {
+function showUnzipFromUrlModal() {
 	if (isBusy.value) return
-	uploadZipUrlModal.value?.show(cf)
+	uploadZipUrlModal.value?.show()
 }
 
 function showRenameModal(item: FileItem) {

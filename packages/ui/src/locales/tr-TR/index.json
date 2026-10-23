@@ -359,9 +359,6 @@
   "content.card.synced": {
     "defaultMessage": "Süreçler arası senkronize edildi"
   },
-  "content.card.uploaded": {
-    "defaultMessage": "Yüklendi"
-  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "{count, plural, one {# projeyi} other {# projeyi}} en yeni uyumlu sürümüne güncellemek istediğinden emin misin? İçeriklerin tek tek güncellenmesi önerilir."
   },
@@ -617,9 +614,6 @@
   "content.managed-card.view-content": {
     "defaultMessage": "İçeriği görüntüle"
   },
-  "content.metadata-filter.author": {
-    "defaultMessage": "Yaratıcı"
-  },
   "content.metadata-filter.environment": {
     "defaultMessage": "Ortam"
   },
@@ -644,17 +638,8 @@
   "content.metadata-filter.update.available": {
     "defaultMessage": "Güncelleme mevcut"
   },
-  "content.metadata-filter.warning.client-depends": {
-    "defaultMessage": "İstemci dosyaya bağımlı"
-  },
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "Sadece istemciye özel içerik"
-  },
-  "content.metadata-filter.warning.client-retained": {
-    "defaultMessage": "İstemci dosyası korundu"
-  },
-  "content.metadata-filter.warning.none": {
-    "defaultMessage": "Uyarı yok"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "Uyarılar"
@@ -691,9 +676,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Filtre"
-  },
-  "content.page-layout.filter.author-count": {
-    "defaultMessage": "{count, plural, one {# yapımcı} other {# yapımcı}}"
   },
   "content.page-layout.loading": {
     "defaultMessage": "İçerik yükleniyor..."
@@ -1601,9 +1583,6 @@
   "files.navbar.home": {
     "defaultMessage": "Ana sayfa"
   },
-  "files.navbar.install-curseforge-pack": {
-    "defaultMessage": "CurseForge paketini kur"
-  },
   "files.navbar.new-file": {
     "defaultMessage": "Yeni dosya"
   },
@@ -1739,21 +1718,6 @@
   "files.zip-url-modal.backup-name": {
     "defaultMessage": "CurseForge mod paketi kurulumu"
   },
-  "files.zip-url-modal.cf-header": {
-    "defaultMessage": "Install a CurseForge modpack"
-  },
-  "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "Belirtilen URL'de CurseForge mod paketi bulunamadı."
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "CurseForge mod paketi bulunamadı"
-  },
-  "files.zip-url-modal.enter-link": {
-    "defaultMessage": "Bağlantıyı girin"
-  },
-  "files.zip-url-modal.error-cf-url": {
-    "defaultMessage": "URL, bir CurseForge mod paketi sürüm URL'si olmalıdır."
-  },
   "files.zip-url-modal.error-url-invalid": {
     "defaultMessage": "URL geçerli olmalıdır."
   },
@@ -1765,24 +1729,6 @@
   },
   "files.zip-url-modal.install-failed-title": {
     "defaultMessage": "Kurulum başarısız oldu"
-  },
-  "files.zip-url-modal.step-copy-description": {
-    "defaultMessage": "Sürüm sayfası URL'sini kopyalayın ve aşağıya yapıştırın."
-  },
-  "files.zip-url-modal.step-copy-title": {
-    "defaultMessage": "URL'yi kopyala"
-  },
-  "files.zip-url-modal.step-find-description": {
-    "defaultMessage": "CurseForge'a göz atın ve istediğiniz mod paketini bulun."
-  },
-  "files.zip-url-modal.step-find-title": {
-    "defaultMessage": "Mod paketini bulun"
-  },
-  "files.zip-url-modal.step-select-description": {
-    "defaultMessage": "\"Dosyalar\" sekmesine gidin ve yüklemek istediğiniz sürümü seçin."
-  },
-  "files.zip-url-modal.step-select-title": {
-    "defaultMessage": "Bir sürüm seçin"
   },
   "files.zip-url-modal.unknown-error": {
     "defaultMessage": "Bilinmeyen bir hata oluştu"
@@ -1937,12 +1883,6 @@
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "İçeriği silmek başarısız"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "İçeriği kapatmak başarısız"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "İçeriği açmak başarısız"
-  },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "İçeriği güncelleme başarısız"
   },
@@ -1957,9 +1897,6 @@
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "İçerik çıkarılamadı"
-  },
-  "hosting.content.failed-to-toggle": {
-    "defaultMessage": "{name} durumu değiştirilemedi"
   },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "Mod paketinin bağlantısı koparılamadı"
@@ -2396,12 +2333,6 @@
   "instances.managed-content-modal.enabled": {
     "defaultMessage": "Etkin"
   },
-  "instances.managed-content-modal.external-content": {
-    "defaultMessage": "Harici"
-  },
-  "instances.managed-content-modal.external-content-description": {
-    "defaultMessage": "Bu dosya Modrinth üzerinde yayınlanmamıştır."
-  },
   "instances.managed-content-modal.header": {
     "defaultMessage": "Yönetilen içerik"
   },
@@ -2416,9 +2347,6 @@
   },
   "instances.managed-content-modal.search-placeholder": {
     "defaultMessage": "{count, number} {count, plural, one {projede} other {projede}} ara"
-  },
-  "instances.managed-content-modal.warnings": {
-    "defaultMessage": "Uyarılar"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Şu anki"
@@ -2503,15 +2431,6 @@
   },
   "label.changes-saved": {
     "defaultMessage": "Değişiklikler kaydedildi"
-  },
-  "label.client-depends-warning": {
-    "defaultMessage": "Bu mod, istemci tarafı (client-side) bir moda bağımlıdır ve sunucunuzu başlatırken sorunlara neden olabilir"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "Bu işlemci-tarafı bir mod ve sunucunuzu başlatırken sorunlara yol açabilir"
-  },
-  "label.client-retained-warning": {
-    "defaultMessage": "Bu, bağımlılık olarak yüklenmiş bir istemci tarafı (client-side) modudur ve sunucunuzu başlatırken sorunlara neden olabilir"
   },
   "label.collections": {
     "defaultMessage": "Koleksiyonlar"
@@ -5453,15 +5372,6 @@
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "Artık burada bulunabilirler!"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "Bir daha gösterme"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "Sunucu ayarlarınız taşındı"
-  },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Paylaşımlı sunucular"
   },
@@ -5695,18 +5605,6 @@
   },
   "servers.settings.advanced.sftp.roll-credentials-success-title": {
     "defaultMessage": "SFTP kimlik bilgileri döndürüldü"
-  },
-  "servers.setup.onboarding.installation-failed.text": {
-    "defaultMessage": "Kurulum sırasında beklenmeyen bir hata oluştu. Lütfen daha sonra tekrar deneyin."
-  },
-  "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "Kurulum başarısız oldu"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.text": {
-    "defaultMessage": "Yükleme sırasında beklenmeyen bir hata oluştu. Lütfen daha sonra tekrar deneyin."
-  },
-  "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "Mod paketi yüklemesi başarısız oldu"
   },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "Sunucu kur"

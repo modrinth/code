@@ -161,6 +161,8 @@ fn main() {
                         "install_create_modpack_instance",
                         "install_get_shared_instance_preview",
                         "install_accept_shared_instance_invite",
+                        "install_get_shared_instance_invite_preview",
+                        "install_accept_pending_shared_instance_invite",
                         "install_get_shared_instance_update_preview",
                         "install_shared_instance",
                         "install_update_shared_instance",
@@ -288,6 +290,7 @@ fn main() {
                         "instance_kill",
                         "instance_edit",
                         "instance_edit_icon",
+                        "instance_cache_icon",
                         "instance_edit_generated_icon",
                         "instance_cache_generated_icon",
                         "instance_get_recent_icon_configs",
@@ -386,6 +389,7 @@ fn main() {
                         "progress_bars_list",
                         "get_opening_command",
                         "get_image_thumbnail",
+                        "cache_remote_icon",
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,
@@ -430,6 +434,9 @@ fn main() {
                         "files_save_external",
                         "files_release_external",
                         "file_read_dragged_file",
+                        "file_local_info",
+                        "file_upload_local",
+                        "file_cancel_local_upload",
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,

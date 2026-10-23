@@ -1019,18 +1019,6 @@
   "instance.shared-instance.error.title": {
     "message": "Noget gik galt"
   },
-  "instance.shared-instance.publish-review.added-label": {
-    "message": "Tilføjede"
-  },
-  "instance.shared-instance.publish-review.header": {
-    "message": "Gennemså ændringer"
-  },
-  "instance.shared-instance.publish-review.publish-button": {
-    "message": "Skub opdatering"
-  },
-  "instance.shared-instance.publish-review.removed-label": {
-    "message": "Fjernede"
-  },
   "instance.shared-instance.unavailable.locked-title": {
     "message": "Instans låst"
   },

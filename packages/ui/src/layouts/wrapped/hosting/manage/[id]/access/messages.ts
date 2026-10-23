@@ -200,6 +200,22 @@ export const actionLogActionMessages = defineMessages({
 		id: 'servers.access-page.activity-log-filter.action.addon-deleted',
 		defaultMessage: 'Deleted content',
 	},
+	addon_server_enabled: {
+		id: 'servers.access-page.activity-log-filter.action.addon-server-enabled',
+		defaultMessage: 'Changed server content enablement',
+	},
+	addon_player_enabled: {
+		id: 'servers.access-page.activity-log-filter.action.addon-player-enabled',
+		defaultMessage: 'Changed player content enablement',
+	},
+	addon_side_toggle_locked: {
+		id: 'servers.access-page.activity-log-filter.action.addon-side-toggle-locked',
+		defaultMessage: 'Changed content side toggle lock',
+	},
+	world_data_reset: {
+		id: 'servers.access-page.activity-log-filter.action.world-data-reset',
+		defaultMessage: 'Reset world data',
+	},
 	addon_updated: {
 		id: 'servers.access-page.activity-log-filter.action.addon-updated',
 		defaultMessage: 'Updated content',

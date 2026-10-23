@@ -1,32 +1,73 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue'
+import { computed, reactive, ref, useTemplateRef } from 'vue'
 import { useRoute } from 'vue-router'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import StackedAdmonitions, {
 	type StackedAdmonitionItem,
 } from '#ui/components/base/StackedAdmonitions.vue'
+import CurseForgeFilesReviewModal from '#ui/components/servers/CurseForgeFilesReviewModal.vue'
 import InstallingBanner from '#ui/components/servers/InstallingBanner.vue'
+import { serverPlayMigrationMessages } from '#ui/components/servers/play-migration/messages'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerBackupsQueue } from '#ui/composables/server-backups-queue'
 import { useServerPermissions } from '#ui/composables/server-permissions'
 import type { FileOperation } from '#ui/layouts/shared/files-tab/types'
-import { injectModrinthClient, injectModrinthServerContext } from '#ui/providers'
+import ServerSharePushModal from '#ui/layouts/shared/server-sharing/components/ServerSharePushModal.vue'
+import { useServerShareReview } from '#ui/layouts/shared/server-sharing/use-server-share-review'
+import { useServerPlayerMembers } from '#ui/layouts/wrapped/hosting/manage/[id]/play/use-server-players'
+import {
+	injectModrinthClient,
+	injectModrinthServerContext,
+	injectServerPlayMigration,
+} from '#ui/providers'
 
 import BackupAdmonition, { type BackupAdmonitionEntry } from './BackupAdmonition.vue'
+import CurseForgeFilesAdmonition from './CurseForgeFilesAdmonition.vue'
 import FileOperationAdmonition from './FileOperationAdmonition.vue'
+import ShareUpdateAdmonition from './ShareUpdateAdmonition.vue'
 import UploadAdmonition from './UploadAdmonition.vue'
+
+defineOptions({ inheritAttrs: false })
+
+const props = withDefaults(
+	defineProps<{
+		curseforgeFileWarningCount?: number
+	}>(),
+	{ curseforgeFileWarningCount: 0 },
+)
 
 const emit = defineEmits<{
 	'installation-retry': []
 }>()
 
 const { formatMessage } = useVIntl()
+const curseforgeReviewModal =
+	useTemplateRef<InstanceType<typeof CurseForgeFilesReviewModal>>('curseforgeReviewModal')
 const client = injectModrinthClient()
 const ctx = injectModrinthServerContext()
+const serverPlayMigration = injectServerPlayMigration(null)
 const route = useRoute()
-const { canSetup, canManageBackups, permissionDeniedMessage } = useServerPermissions()
-
+const { canSetup, canManageBackups, canWriteFiles, permissionDeniedMessage } =
+	useServerPermissions()
+const {
+	diffModal,
+	previewOpen,
+	previewQuery,
+	shareActions,
+	sharePreviews,
+	pending: sharePending,
+	showPreview,
+	prefetchFiles,
+	runAction,
+} = useServerShareReview()
+const world = computed(() =>
+	ctx.serverFull.value?.worlds.find((world) => world.id === ctx.worldId.value),
+)
+const sharedInstanceId = computed(() => world.value?.content?.shared_instance_id ?? null)
+const members = useServerPlayerMembers(sharedInstanceId)
+const hasInvitedPlayers = computed(() => (members.data.value?.rows.length ?? 0) > 0)
+const needsShareUpdate = computed(() => world.value?.content?.shared_instance_needs_update ?? false)
 const { activeOperations, backups, progressFor, invalidate } = useServerBackupsQueue(
 	computed(() => ctx.serverId),
 	ctx.worldId,
@@ -45,6 +86,13 @@ const messages = defineMessages({
 		id: 'files.layout.busy-warning',
 		defaultMessage: 'File operations are disabled while the operation is in progress.',
 	},
+})
+
+const playMigrationHeader = computed(() => {
+	const step = serverPlayMigration?.step.value
+	if (step === 'reinstall') return formatMessage(serverPlayMigrationMessages.reinstalling)
+	if (step === 'restart') return formatMessage(serverPlayMigrationMessages.restarting)
+	return formatMessage(serverPlayMigrationMessages.backingUp)
 })
 
 const isOnContentTab = computed(() => route.path.includes('/content'))
@@ -75,6 +123,9 @@ const filesBusyHeader = computed(() =>
 )
 
 const dismissedIds = reactive(new Set<string>())
+const curseforgeFilesWarningId = computed(
+	() => `curseforge-files:${ctx.worldId.value}:${props.curseforgeFileWarningCount}`,
+)
 const cancellingIds = reactive(new Set<string>())
 const uploadCancelling = ref(false)
 
@@ -139,6 +190,9 @@ type ServerAdmonitionItem = StackedAdmonitionItem & {
 		| { kind: 'backup'; entry: BackupAdmonitionEntry }
 		| { kind: 'busy-content' }
 		| { kind: 'busy-files' }
+		| { kind: 'share-update' }
+		| { kind: 'curseforge-files' }
+		| { kind: 'play-migration' }
 	)
 
 const showInstallingBanner = computed(() => {
@@ -174,6 +228,17 @@ function backupPriority(entry: BackupAdmonitionEntry): number {
 const stackItems = computed<ServerAdmonitionItem[]>(() => {
 	const out: ServerAdmonitionItem[] = []
 	let sortIndex = 0
+	const curseforgeWarningId = curseforgeFilesWarningId.value
+	if (props.curseforgeFileWarningCount > 0 && !dismissedIds.has(curseforgeWarningId)) {
+		out.push({
+			id: curseforgeWarningId,
+			type: 'warning',
+			dismissible: true,
+			kind: 'curseforge-files',
+			priority: 1,
+			sortIndex: sortIndex++,
+		})
+	}
 
 	if (showInstallingBanner.value) {
 		const failed = ctx.installation.value?.status === 'failed'
@@ -183,6 +248,17 @@ const stackItems = computed<ServerAdmonitionItem[]>(() => {
 			dismissible: failed,
 			kind: 'installing',
 			priority: 0,
+			sortIndex: sortIndex++,
+		})
+	}
+
+	if (serverPlayMigration && serverPlayMigration.step.value !== 'idle') {
+		out.push({
+			id: 'play-migration',
+			type: 'info',
+			dismissible: false,
+			kind: 'play-migration',
+			priority: 1,
 			sortIndex: sortIndex++,
 		})
 	}
@@ -242,6 +318,17 @@ const stackItems = computed<ServerAdmonitionItem[]>(() => {
 			dismissible: false,
 			kind: 'busy-files',
 			priority: p,
+			sortIndex: sortIndex++,
+		})
+	}
+
+	if (needsShareUpdate.value && canSetup.value && hasInvitedPlayers.value) {
+		out.push({
+			id: 'share-update',
+			type: 'info',
+			dismissible: false,
+			kind: 'share-update',
+			priority: 3,
 			sortIndex: sortIndex++,
 		})
 	}
@@ -334,6 +421,8 @@ async function onDismissAll() {
 		if (!it.dismissible) continue
 		if (it.kind === 'installing') {
 			onInstallationDismiss()
+		} else if (it.kind === 'curseforge-files') {
+			tasks.push(onCurseForgeFilesDismiss(it.id))
 		} else if (it.kind === 'fs-op' && it.op.id) {
 			const { op } = it
 			if (op.state === 'done' || op.state?.startsWith('fail')) {
@@ -344,6 +433,24 @@ async function onDismissAll() {
 		}
 	}
 	await Promise.all(tasks)
+}
+
+function onCurseForgeFilesReviewed() {
+	dismissedIds.add(curseforgeFilesWarningId.value)
+}
+
+/**
+ * Completes the side review of every addon, so the warning stays dismissed across sessions.
+ */
+async function onCurseForgeFilesDismiss(id: string) {
+	dismissedIds.add(id)
+	const worldId = ctx.worldId.value
+	if (!worldId || !canWriteFiles.value) return
+	try {
+		await client.archon.content_v1.completeSideTypeReview(ctx.serverId, worldId)
+	} catch {
+		dismissedIds.delete(id)
+	}
 }
 
 function onFileOpDismiss(item: ServerAdmonitionItem) {
@@ -361,14 +468,31 @@ function onInstallationDismiss() {
 
 <template>
 	<StackedAdmonitions
+		v-bind="$attrs"
 		:items="stackItems"
 		:dismiss-all-enabled="hasBulkDismissableItems"
 		class="w-full"
 		@dismiss-all="onDismissAll"
 	>
 		<template #item="{ item, dismissible }">
+			<CurseForgeFilesAdmonition
+				v-if="item.kind === 'curseforge-files'"
+				:file-count="props.curseforgeFileWarningCount"
+				:dismissible="dismissible"
+				:loading="curseforgeReviewModal?.loading ?? false"
+				@review="curseforgeReviewModal?.show()"
+				@dismiss="onCurseForgeFilesDismiss(item.id)"
+			/>
+			<ShareUpdateAdmonition
+				v-else-if="item.kind === 'share-update'"
+				:disabled="!canSetup || sharePending"
+				:publishing="shareActions > 0"
+				:reviewing="sharePreviews > 0"
+				@review="showPreview"
+				@prefetch="prefetchFiles"
+			/>
 			<InstallingBanner
-				v-if="item.kind === 'installing'"
+				v-else-if="item.kind === 'installing'"
 				:retry-disabled="!canSetup"
 				:retry-disabled-tooltip="permissionDeniedMessage"
 				@dismiss="onInstallationDismiss"
@@ -398,6 +522,13 @@ function onInstallationDismiss() {
 				@retry="onBackupRetry(item.entry)"
 			/>
 			<Admonition
+				v-else-if="item.kind === 'play-migration'"
+				type="info"
+				:header="playMigrationHeader"
+			>
+				{{ formatMessage(serverPlayMigrationMessages.inProgress) }}
+			</Admonition>
+			<Admonition
 				v-else-if="item.kind === 'busy-content'"
 				type="warning"
 				:header="formatMessage(messages.backgroundTaskRunning)"
@@ -413,4 +544,18 @@ function onInstallationDismiss() {
 			</Admonition>
 		</template>
 	</StackedAdmonitions>
+	<ServerSharePushModal
+		ref="diffModal"
+		:server-id="ctx.serverId"
+		:world-id="ctx.worldId.value ?? undefined"
+		:diffs="previewQuery.data.value?.items ?? []"
+		:requires-restart="previewQuery.data.value?.diff.requires_restart"
+		:loading="previewQuery.isFetching.value"
+		:error="previewQuery.isError.value"
+		:disabled="!canSetup || sharePending || previewQuery.isError.value || !previewQuery.data.value"
+		@confirm="(paths, restart) => runAction('push', true, paths, restart)"
+		@cancel="previewOpen = false"
+		@retry="previewQuery.refetch()"
+	/>
+	<CurseForgeFilesReviewModal ref="curseforgeReviewModal" @reviewed="onCurseForgeFilesReviewed" />
 </template>
