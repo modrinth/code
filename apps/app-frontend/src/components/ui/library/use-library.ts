@@ -293,7 +293,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 				const groupedDifference = Number(a.group_ids.length > 0) - Number(b.group_ids.length > 0)
 				if (groupedDifference !== 0) return groupedDifference
 
-				return a.name.localeCompare(b.name)
+				return a.name.localeCompare(b.name, undefined, { numeric: true })
 			})
 	})
 	const groupInstancesModalGroup = computed(() => {
@@ -311,7 +311,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		return instances.value
 			.filter((instance) => !query || instance.name.toLowerCase().includes(query))
 			.slice()
-			.sort((a, b) => a.name.localeCompare(b.name))
+			.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }))
 	})
 	const canCreateGroup = computed(
 		() => normalizedNewGroupName.value.length > 0 && !creatingGroup.value,
@@ -433,7 +433,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 
 		switch (displayState.value.sortBy) {
 			case 'Name':
-				visibleInstances.sort((a, b) => a.name.localeCompare(b.name))
+				visibleInstances.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }))
 				break
 			case 'Loader':
 				visibleInstances.sort((a, b) =>
