@@ -22,5 +22,9 @@ try {
 </script>
 
 <template>
-	<ServersManageFilesPage />
+	<div
+		class="pt-2 [--files-sticky-top:1.5rem] [--files-viewport-height:calc(100vh_-_var(--top-bar-height,3rem))]"
+	>
+		<ServersManageFilesPage />
+	</div>
 </template>

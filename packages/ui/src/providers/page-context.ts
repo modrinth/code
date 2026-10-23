@@ -19,6 +19,8 @@ export interface PageContext {
 	}
 	featureFlags?: {
 		serverRamAsBytesAlwaysOn?: Ref<boolean>
+		/** Enables the files tab's sidebar tree, tabs and column picker while they're in QA. */
+		filesTabRework?: Ref<boolean>
 	}
 	openExternalUrl: (url: string) => void
 }
