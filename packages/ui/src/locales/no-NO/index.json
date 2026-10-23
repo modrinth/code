@@ -2,39 +2,6 @@
   "action.no-permission": {
     "defaultMessage": "Du mangler tillatelse."
   },
-  "affiliate.create.button": {
-    "defaultMessage": "Oppretter ny affiliatkode"
-  },
-  "affiliate.create.header": {
-    "defaultMessage": "Oppretter ny affiliatkode"
-  },
-  "affiliate.create.title.description": {
-    "defaultMessage": "Gi affiliatelenken et navn, slik at du vet hvor trafikken kommer fra!"
-  },
-  "affiliate.create.title.label": {
-    "defaultMessage": "Tittel på affiliatelenken"
-  },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "f.eks. YouTube"
-  },
-  "affiliate.create.user.description": {
-    "defaultMessage": "Brukernavnet til brukeren affiliatkoden skal knyttes til"
-  },
-  "affiliate.create.user.placeholder": {
-    "defaultMessage": "Skriv inn brukernavn..."
-  },
-  "affiliate.createdBy": {
-    "defaultMessage": "Opprettet av {user}"
-  },
-  "affiliate.creating.button": {
-    "defaultMessage": "Oppretter affiliatelenke…"
-  },
-  "affiliate.revoke": {
-    "defaultMessage": "Deaktiver affiliatelenke"
-  },
-  "affiliate.viewAnalytics": {
-    "defaultMessage": "Vis statistikk"
-  },
   "app.appearance-settings.native-decorations.description": {
     "defaultMessage": "Bruk operativsystemets tittellinje og vindukontroller. Krever omstart av appen."
   },
@@ -130,9 +97,6 @@
   },
   "button.add-server-to-instance": {
     "defaultMessage": "Legg til server i instansen"
-  },
-  "button.affiliate-links": {
-    "defaultMessage": "Affiliatelenker"
   },
   "button.analytics": {
     "defaultMessage": "Analyse"

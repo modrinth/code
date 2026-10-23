@@ -995,20 +995,11 @@
   "collection.button.discover-mods": {
     "message": "Modok böngészése"
   },
-  "collection.button.edit-icon": {
-    "message": "Ikon szerkesztése"
-  },
   "collection.button.remove-icon": {
     "message": "Ikon eltávolítása"
   },
   "collection.button.remove-project": {
     "message": "Projekt eltávolítása"
-  },
-  "collection.button.replace-icon": {
-    "message": "Ikon kicserélése"
-  },
-  "collection.button.select-icon": {
-    "message": "Ikon kiválasztása"
   },
   "collection.button.unfollow-project": {
     "message": "Projekt kikövetése"
@@ -1024,9 +1015,6 @@
   },
   "collection.description.following": {
     "message": "Az összes követett projekt automatikusan generált gyűjteménye."
-  },
-  "collection.editing": {
-    "message": "Gyűjtemény szerkesztése"
   },
   "collection.error.not-found": {
     "message": "Nincs ilyen gyűjtemény"
@@ -1432,30 +1420,6 @@
   },
   "create.project.visibility-unlisted": {
     "message": "Nem nyilvános"
-  },
-  "dashboard.affiliate-links.create.button": {
-    "message": "Társulati (affiliate) link létrehozása"
-  },
-  "dashboard.affiliate-links.empty.no-codes": {
-    "message": "Nem találhatók partnerkódok."
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "Hiba történt a társulati linkek betöltésében"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "A társulati linkjeid"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "Ez vissza fogja vonni a(z) `{id}` számú társulati kódod, és bármely létező linket, ami ehhez a kódhoz van kötve, így a ezek a linkek többé nem lesznek érvényesek."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "Visszavonás"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "Biztos vagy benne, hogy visszavonod a \"{title}\" társulati linked?"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "Társulati linkek keresése..."
   },
   "dashboard.analytics.from-projects": {
     "message": "{count} projektből"
@@ -2665,9 +2629,6 @@
   },
   "layout.action.file-lookup": {
     "message": "Fájl keresés"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "Partnerlinkek kezelése"
   },
   "layout.action.manage-server-notices": {
     "message": "Szerver megjegyzések kezelése"

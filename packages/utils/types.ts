@@ -599,11 +599,3 @@ export interface PayoutMethod {
 	interval: PayoutInterval
 	fee: PayoutMethodFee
 }
-
-export type AffiliateLink = {
-	id: string
-	created_at: string
-	created_by: string
-	affiliate: string
-	source_name: string
-}

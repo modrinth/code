@@ -1007,20 +1007,11 @@
   "collection.button.discover-mods": {
     "message": "Scopri le mod"
   },
-  "collection.button.edit-icon": {
-    "message": "Modifica icona"
-  },
   "collection.button.remove-icon": {
     "message": "Rimuovi icona"
   },
   "collection.button.remove-project": {
     "message": "Rimuovi progetto"
-  },
-  "collection.button.replace-icon": {
-    "message": "Sfoglia"
-  },
-  "collection.button.select-icon": {
-    "message": "Scegli icona"
   },
   "collection.button.unfollow-project": {
     "message": "Smetti di seguire il progetto"
@@ -1036,9 +1027,6 @@
   },
   "collection.description.following": {
     "message": "Raccolta di progetti che segui, generata automaticamente."
-  },
-  "collection.editing": {
-    "message": "Modificando la raccolta"
   },
   "collection.error.not-found": {
     "message": "Raccolta non trovata"
@@ -1444,30 +1432,6 @@
   },
   "create.project.visibility-unlisted": {
     "message": "Non in elenco"
-  },
-  "dashboard.affiliate-links.create.button": {
-    "message": "Crea link affiliati"
-  },
-  "dashboard.affiliate-links.empty.no-codes": {
-    "message": "Nessun codice affiliati trovato."
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "Errore nel caricamento dei link affiliati"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "I tuoi link affiliati"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "Questo revocherà permanentemente il codice affiliati `{id}` e tutti i suoi link esistenti non saranno più validi."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "Revoca"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "Vuoi davvero revocare il tuo link affiliati \"{title}\"?"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "Cerca un link affiliati..."
   },
   "dashboard.analytics.from-projects": {
     "message": "da {count, plural, one {# progetto} other {# progetti}}"
@@ -2689,9 +2653,6 @@
   },
   "layout.action.file-lookup": {
     "message": "Trova file"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "Gestisci link affiliati"
   },
   "layout.action.manage-server-notices": {
     "message": "Gestisci avvisi server"

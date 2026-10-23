@@ -944,20 +944,11 @@
   "collection.button.discover-mods": {
     "message": "اكتشف المودات"
   },
-  "collection.button.edit-icon": {
-    "message": "تعديل الأيقونة"
-  },
   "collection.button.remove-icon": {
     "message": "حذف الأيقونة"
   },
   "collection.button.remove-project": {
     "message": "إزالة المشروع"
-  },
-  "collection.button.replace-icon": {
-    "message": "تغيير الأيقونة"
-  },
-  "collection.button.select-icon": {
-    "message": "تحديد الأيقونة"
   },
   "collection.button.unfollow-project": {
     "message": "إلغاء متابعة المشروع"
@@ -973,9 +964,6 @@
   },
   "collection.description.following": {
     "message": "مجموعة تم إنشاؤها تلقائيًا تضمّ جميع المشاريع التي تتابعها."
-  },
-  "collection.editing": {
-    "message": "تعديل المجموعة"
   },
   "collection.error.not-found": {
     "message": "لم يتم العثور على المجموعة"
@@ -1378,30 +1366,6 @@
   },
   "create.project.visibility-unlisted": {
     "message": "غير مدرج"
-  },
-  "dashboard.affiliate-links.create.button": {
-    "message": "إنشاء رابط عمولة"
-  },
-  "dashboard.affiliate-links.empty.no-codes": {
-    "message": "لم يتم العثور على أي أكواد عمولة."
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "حدث خطأ أثناء تحميل روابط العمولة"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "روابط العمولة الخاصة بك"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "سيؤدي هذا إلى إلغاء كود العمولة `{id}` نهائيًا، ولن تعود أي روابط موجودة تمت مشاركتها باستخدام هذا الكود صالحة."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "إلغاء"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "هل أنت متأكد من رغبتك في إلغاء رابط العمولة ''{title}'' الخاص بك؟"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "البحث عن روابط العمولة..."
   },
   "dashboard.analytics.from-projects": {
     "message": "{count, plural, one {من مشروع واحد} two {من مشروعين} few {من # مشاريع} many {من # مشروعًا} other {من # مشروع}}"
@@ -2608,9 +2572,6 @@
   },
   "layout.action.file-lookup": {
     "message": "البحث عن ملف"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "إدارة روابط العمولة"
   },
   "layout.action.manage-server-notices": {
     "message": "إدارة إشعارات الخادم"

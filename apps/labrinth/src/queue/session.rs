@@ -1,3 +1,4 @@
+use crate::database::advisory_lock::AdvisoryLock;
 use crate::database::models::pat_item::DBPersonalAccessToken;
 use crate::database::models::session_item::DBSession;
 use crate::database::models::{
@@ -89,6 +90,14 @@ impl AuthQueue {
                 .begin()
                 .await
                 .wrap_err("starting database transaction")?;
+            sqlx::query!("SET LOCAL lock_timeout = '60s'")
+                .execute(&mut transaction)
+                .await
+                .wrap_err("setting auth queue flush lock timeout")?;
+            AdvisoryLock::AuthQueueFlush
+                .acquire(&mut transaction)
+                .await
+                .wrap_err("acquiring auth queue flush lock")?;
             let mut clear_cache_sessions = Vec::new();
 
             for (id, metadata) in session_queue {

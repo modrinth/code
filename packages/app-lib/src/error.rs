@@ -80,7 +80,7 @@ pub enum ErrorKind {
     NoValueFor(String),
 
     #[error("metadata error: {0}")]
-    MetadataError(#[from] daedalus::Error),
+    MetadataError(#[from] anyhow::Error),
 
     #[error("I/O error: {0}")]
     IOError(#[from] util::io::IOError),
@@ -373,8 +373,6 @@ pub fn error_code(error: &Error) -> &'static str {
         "network_error"
     } else if error.is::<JREError>() {
         "java_error"
-    } else if error.is::<daedalus::Error>() {
-        "metadata_error"
     } else if error.is::<ZipError>() {
         "archive_error"
     } else if error.is::<serde::de::value::Error>()

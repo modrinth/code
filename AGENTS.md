@@ -18,7 +18,6 @@ This is the Modrinth monorepo — it contains all Modrinth projects, both fronte
 | `app`             | Desktop/app shell (Tauri)      |
 | `app-playground`  | Testing playground for app     |
 | `labrinth`        | Backend API service            |
-| `daedalus_client` | Daedalus client implementation |
 | `docs`            | Documentation site (Astro)     |
 
 ### Packages (`packages/`)
@@ -32,7 +31,6 @@ This is the Modrinth monorepo — it contains all Modrinth projects, both fronte
 | `blog`             | Blog system and changelog data                        |
 | `utils`            | Shared utility functions (mostly deprecated)          |
 | `moderation`       | Moderation utilities                                  |
-| `daedalus`         | Daedalus protocol                                     |
 | `tooling-config`   | ESLint, Prettier, TypeScript configs                  |
 | `ariadne`          | Analytics library                                     |
 | `modrinth-log`     | Logging utilities                                     |

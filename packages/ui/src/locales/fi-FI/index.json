@@ -2,39 +2,6 @@
   "action.no-permission": {
     "defaultMessage": "Sinulla ei ole oikeutta."
   },
-  "affiliate.create.button": {
-    "defaultMessage": "Luo kumppanilinkki"
-  },
-  "affiliate.create.header": {
-    "defaultMessage": "Luo uusi kumppanilinkki"
-  },
-  "affiliate.create.title.description": {
-    "defaultMessage": "Anna kumppanilinkillesi nimi, jotta tiedät mistä käyttäjät tulevat!"
-  },
-  "affiliate.create.title.label": {
-    "defaultMessage": "Kumppanilinkin nimi"
-  },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "esim. YouTube"
-  },
-  "affiliate.create.user.description": {
-    "defaultMessage": "Käyttäjän käyttäjänimi jolle luoda kumppanilinkki"
-  },
-  "affiliate.create.user.placeholder": {
-    "defaultMessage": "Anna käyttäjänimi..."
-  },
-  "affiliate.createdBy": {
-    "defaultMessage": "Luonut {user}"
-  },
-  "affiliate.creating.button": {
-    "defaultMessage": "Luodaan kumppanilinkkiä..."
-  },
-  "affiliate.revoke": {
-    "defaultMessage": "Kumoa kumppanilinkki"
-  },
-  "affiliate.viewAnalytics": {
-    "defaultMessage": "Näytä analytiikat"
-  },
   "app.appearance-settings.native-decorations.description": {
     "defaultMessage": "Käytä käyttöjärjestelmän otsikkopalkkia ja ikkunaohjaimia. Vaatii uudelleenkäynnistyksen."
   },
@@ -151,9 +118,6 @@
   },
   "button.add-server-to-instance": {
     "defaultMessage": "Lisää palvelin instanssiin"
-  },
-  "button.affiliate-links": {
-    "defaultMessage": "Kumppanilinkit"
   },
   "button.analytics": {
     "defaultMessage": "Analytiikat"
@@ -1248,4 +1212,3 @@
     "defaultMessage": "Sinulla on tallentamattomia muutoksia."
   }
 }
-

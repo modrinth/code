@@ -281,20 +281,11 @@
   "auth.verify-email.title": {
     "message": "Vahvista sähköposti"
   },
-  "collection.button.edit-icon": {
-    "message": "Muokkaa kuvaketta"
-  },
   "collection.button.remove-icon": {
     "message": "Poista kuvake"
   },
   "collection.button.remove-project": {
     "message": "Poista projekti"
-  },
-  "collection.button.replace-icon": {
-    "message": "Korvaa kuvake"
-  },
-  "collection.button.select-icon": {
-    "message": "Valitse kuvake"
   },
   "collection.button.unfollow-project": {
     "message": "Lopeta projektin seuraaminen"
@@ -310,9 +301,6 @@
   },
   "collection.description.following": {
     "message": "Automattisesti luotu kokoelma kaikista projekteista joita seuraat."
-  },
-  "collection.editing": {
-    "message": "Muokataan kokoelmaa"
   },
   "collection.error.not-found": {
     "message": "Kokoelmaa ei löydy"

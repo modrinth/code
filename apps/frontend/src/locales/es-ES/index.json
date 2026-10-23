@@ -995,20 +995,11 @@
   "collection.button.discover-mods": {
     "message": "Descubrir mods"
   },
-  "collection.button.edit-icon": {
-    "message": "Editar icono"
-  },
   "collection.button.remove-icon": {
     "message": "Eliminar icono"
   },
   "collection.button.remove-project": {
     "message": "Eliminar proyecto"
-  },
-  "collection.button.replace-icon": {
-    "message": "Reemplazar icono"
-  },
-  "collection.button.select-icon": {
-    "message": "Seleccionar icono"
   },
   "collection.button.unfollow-project": {
     "message": "Dejar de seguir proyecto"
@@ -1024,9 +1015,6 @@
   },
   "collection.description.following": {
     "message": "Colección generada automáticamente de todos los proyectos que sigues."
-  },
-  "collection.editing": {
-    "message": "Editando colección"
   },
   "collection.error.not-found": {
     "message": "Colección no encontrada"
@@ -1432,30 +1420,6 @@
   },
   "create.project.visibility-unlisted": {
     "message": "No listado"
-  },
-  "dashboard.affiliate-links.create.button": {
-    "message": "Crear enlace de afiliado"
-  },
-  "dashboard.affiliate-links.empty.no-codes": {
-    "message": "No se encontraron códigos de afiliado."
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "Error al cargar los enlaces de afiliado"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "Tus enlaces de afiliado"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "Esto revocará permanentemente el código de afiliado `{id}` y cualquier enlace existente con este código que se haya compartido dejará de ser válido."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "Revocar"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "¿Estás seguro de que deseas revocar tu enlace de afiliado «{title}»?"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "Buscar enlaces de afiliado..."
   },
   "dashboard.analytics.from-projects": {
     "message": "de {count} {count, plural,one {proyecto} other {proyectos}}"
@@ -2668,9 +2632,6 @@
   },
   "layout.action.file-lookup": {
     "message": "Búsqueda de archivos"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "Manejar enlaces de afiliados"
   },
   "layout.action.manage-server-notices": {
     "message": "Gestionar avisos del servidor"

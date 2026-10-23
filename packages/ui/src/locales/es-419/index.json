@@ -2,39 +2,6 @@
   "action.no-permission": {
     "defaultMessage": "No tienes permiso."
   },
-  "affiliate.create.button": {
-    "defaultMessage": "Crear enlace de afiliado"
-  },
-  "affiliate.create.header": {
-    "defaultMessage": "Creando nuevo código de afiliado"
-  },
-  "affiliate.create.title.description": {
-    "defaultMessage": "¡Dale un nombre a tu enlace de afiliado para que sepas de dónde vienen las personas!"
-  },
-  "affiliate.create.title.label": {
-    "defaultMessage": "Nombre del enlace de afiliado"
-  },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "ej. YouTube"
-  },
-  "affiliate.create.user.description": {
-    "defaultMessage": "El nombre del usuario para el que se está creando el código de afiliado"
-  },
-  "affiliate.create.user.placeholder": {
-    "defaultMessage": "Introduce un nombre de usuario..."
-  },
-  "affiliate.createdBy": {
-    "defaultMessage": "Creado por {user}"
-  },
-  "affiliate.creating.button": {
-    "defaultMessage": "Creando enlace de afiliado..."
-  },
-  "affiliate.revoke": {
-    "defaultMessage": "Revocar enlace de afiliado"
-  },
-  "affiliate.viewAnalytics": {
-    "defaultMessage": "Ver estadísticas"
-  },
   "app.appearance-settings.native-decorations.description": {
     "defaultMessage": "Usa el borde de ventana de tu sistema operativo. Necesita reiniciar la aplicación."
   },
@@ -151,9 +118,6 @@
   },
   "button.add-server-to-instance": {
     "defaultMessage": "Añadir servidor a la instancia"
-  },
-  "button.affiliate-links": {
-    "defaultMessage": "Enlaces de afiliado"
   },
   "button.analytics": {
     "defaultMessage": "Estadísticas"
@@ -3299,17 +3263,11 @@
   "profile.button.manage-projects": {
     "defaultMessage": "Gestionar proyectos"
   },
-  "profile.button.remove-affiliate": {
-    "defaultMessage": "Remover como afiliado"
-  },
   "profile.button.reset-2fa": {
     "defaultMessage": "Restablecer autenticación de dos factores"
   },
   "profile.button.revoke-sessions": {
     "defaultMessage": "Revocar todas las sesiones"
-  },
-  "profile.button.set-affiliate": {
-    "defaultMessage": "Configurar como afiliado"
   },
   "profile.button.shared-instances": {
     "defaultMessage": "Ver instancias compartidas"
@@ -3397,9 +3355,6 @@
   },
   "profile.force-password-reset.title": {
     "defaultMessage": "Forzar restablecimiento de contraseña para {username}"
-  },
-  "profile.label.affiliate": {
-    "defaultMessage": "Afiliado"
   },
   "profile.label.badges": {
     "defaultMessage": "Insignias"

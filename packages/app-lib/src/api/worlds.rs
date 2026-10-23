@@ -934,8 +934,9 @@ pub async fn get_instance_protocol_version(
         return Ok(None);
     }
 
-    let version_jar =
-        loader_version.as_ref().map_or(version.id.clone(), |it| {
+    let version_jar = loader_version
+        .as_ref()
+        .map_or(version.id.to_string(), |it| {
             format!("{}-{}", version.id.clone(), it.id.clone())
         });
 

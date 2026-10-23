@@ -1004,20 +1004,11 @@
   "collection.button.discover-mods": {
     "message": "Знайти моди"
   },
-  "collection.button.edit-icon": {
-    "message": "Редагувати значок"
-  },
   "collection.button.remove-icon": {
     "message": "Прибрати значок"
   },
   "collection.button.remove-project": {
     "message": "Видалити проєкт"
-  },
-  "collection.button.replace-icon": {
-    "message": "Замінити значок"
-  },
-  "collection.button.select-icon": {
-    "message": "Вибрати значок"
   },
   "collection.button.unfollow-project": {
     "message": "Відписатися від проєкту"
@@ -1033,9 +1024,6 @@
   },
   "collection.description.following": {
     "message": "Автоматична добірка з усіх проєктів, які ви відстежуєте."
-  },
-  "collection.editing": {
-    "message": "Редагування добірки"
   },
   "collection.error.not-found": {
     "message": "Добірку не знайдено"
@@ -1441,30 +1429,6 @@
   },
   "create.project.visibility-unlisted": {
     "message": "Поза списком"
-  },
-  "dashboard.affiliate-links.create.button": {
-    "message": "Створити партнерське посилання"
-  },
-  "dashboard.affiliate-links.empty.no-codes": {
-    "message": "Партнерські коди не знайдено."
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "Помилка під час завантаження партнерських посилань"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "Ваші партнерські посилання"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "Це незворотно відкличе код партнера «{id}» та будь-які наявні посилання з цим кодом, які було оприлюднено, більше не будуть доступні."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "Відкликати"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "Справді бажаєте відкликати своє партнерське посилання «{title}»?"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "Пошук партнерських посилань…"
   },
   "dashboard.analytics.from-projects": {
     "message": "з {count} {count, plural, one {проєкту} few {проєктів} many {проєктів} other {проєктів}}"
@@ -2683,9 +2647,6 @@
   },
   "layout.action.file-lookup": {
     "message": "Пошук файлів"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "Керувати партнерськими посиланнями"
   },
   "layout.action.manage-server-notices": {
     "message": "Керування сповіщеннями сервера"

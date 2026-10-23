@@ -2,39 +2,6 @@
   "action.no-permission": {
     "defaultMessage": "Bạn không có quyền."
   },
-  "affiliate.create.button": {
-    "defaultMessage": "Tạo liên kết affiliate"
-  },
-  "affiliate.create.header": {
-    "defaultMessage": "Tạo mã affiliate mới"
-  },
-  "affiliate.create.title.description": {
-    "defaultMessage": "Đặt tên cho liên kết affiliate để bạn biết người dùng đến từ đâu!"
-  },
-  "affiliate.create.title.label": {
-    "defaultMessage": "Tiêu đề liên kết affiliate"
-  },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "vd: YouTube"
-  },
-  "affiliate.create.user.description": {
-    "defaultMessage": "Tên người dùng mà bạn muốn tạo mã affiliate cho"
-  },
-  "affiliate.create.user.placeholder": {
-    "defaultMessage": "Nhập tên người dùng..."
-  },
-  "affiliate.createdBy": {
-    "defaultMessage": "Được tạo bởi {user}"
-  },
-  "affiliate.creating.button": {
-    "defaultMessage": "Đang tạo liên kết affiliate..."
-  },
-  "affiliate.revoke": {
-    "defaultMessage": "Thu hồi liên kết affiliate"
-  },
-  "affiliate.viewAnalytics": {
-    "defaultMessage": "Xem phân tích"
-  },
   "app.appearance-settings.native-decorations.description": {
     "defaultMessage": "Dùng thanh tiêu đề và các nút điều khiển cửa sổ của hệ điều hành. Cần khởi động lại ứng dụng."
   },
@@ -151,9 +118,6 @@
   },
   "button.add-server-to-instance": {
     "defaultMessage": "Thếm máy chủ"
-  },
-  "button.affiliate-links": {
-    "defaultMessage": "Liên kết affiliate"
   },
   "button.analytics": {
     "defaultMessage": "Phân tích"
@@ -3308,17 +3272,11 @@
   "profile.button.manage-projects": {
     "defaultMessage": "Quản lý dự án"
   },
-  "profile.button.remove-affiliate": {
-    "defaultMessage": "Xóa tư cách đối tác liên kết"
-  },
   "profile.button.reset-2fa": {
     "defaultMessage": "Đặt lại xác thực hai yếu tố"
   },
   "profile.button.revoke-sessions": {
     "defaultMessage": "Thu hồi tất cả phiên đăng nhập"
-  },
-  "profile.button.set-affiliate": {
-    "defaultMessage": "Đặt làm đối tác liên kết"
   },
   "profile.button.shared-instances": {
     "defaultMessage": "Xem bản cài đặt được chia sẻ"
@@ -3406,9 +3364,6 @@
   },
   "profile.force-password-reset.title": {
     "defaultMessage": "Buộc đặt lại mật khẩu cho {username}"
-  },
-  "profile.label.affiliate": {
-    "defaultMessage": "Đối tác liên kết"
   },
   "profile.label.badges": {
     "defaultMessage": "Huy hiệu"

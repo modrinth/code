@@ -1007,20 +1007,11 @@
   "collection.button.discover-mods": {
     "message": "发现模组"
   },
-  "collection.button.edit-icon": {
-    "message": "编辑图标"
-  },
   "collection.button.remove-icon": {
     "message": "移除图标"
   },
   "collection.button.remove-project": {
     "message": "移除项目"
-  },
-  "collection.button.replace-icon": {
-    "message": "替换图标"
-  },
-  "collection.button.select-icon": {
-    "message": "选择图标"
   },
   "collection.button.unfollow-project": {
     "message": "取消关注项目"
@@ -1036,9 +1027,6 @@
   },
   "collection.description.following": {
     "message": "此收藏夹为自动生成的，包含你关注的所有项目。"
-  },
-  "collection.editing": {
-    "message": "编辑收藏夹"
   },
   "collection.error.not-found": {
     "message": "未找到收藏夹"
@@ -1444,30 +1432,6 @@
   },
   "create.project.visibility-unlisted": {
     "message": "未列出"
-  },
-  "dashboard.affiliate-links.create.button": {
-    "message": "创建推广链接"
-  },
-  "dashboard.affiliate-links.empty.no-codes": {
-    "message": "未找到推广代码。"
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "加载推广链接时出错"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "你的推广链接"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "这将永久撤销关联代码 `{id}`，任何分享的此代码链接将不再有效。"
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "撤销"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "你确定要撤销你的 ''{title}'' 推广链接吗？"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "搜索推广链接……"
   },
   "dashboard.analytics.from-projects": {
     "message": "来自 {count} {count, plural, other {个项目}}"
@@ -2689,9 +2653,6 @@
   },
   "layout.action.file-lookup": {
     "message": "文件查询"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "管理推广链接"
   },
   "layout.action.manage-server-notices": {
     "message": "管理服务器通知"

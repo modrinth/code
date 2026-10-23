@@ -2,39 +2,6 @@
   "action.no-permission": {
     "defaultMessage": "Nemaš dozvolu."
   },
-  "affiliate.create.button": {
-    "defaultMessage": "Kreiraj partnersku/sponzorisanu vezu"
-  },
-  "affiliate.create.header": {
-    "defaultMessage": "Kreacija novog partnerskog koda"
-  },
-  "affiliate.create.title.description": {
-    "defaultMessage": "Daj svom partnerskom linku ime kako bi znao odakle ljudi dolaze!"
-  },
-  "affiliate.create.title.label": {
-    "defaultMessage": "Naslov partnerske/sponzorisane veze"
-  },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "na primer Youtube"
-  },
-  "affiliate.create.user.description": {
-    "defaultMessage": "Ime korstnika za kojeg kreiraš partnerski link"
-  },
-  "affiliate.create.user.placeholder": {
-    "defaultMessage": "Unesi korisničko ime..."
-  },
-  "affiliate.createdBy": {
-    "defaultMessage": "Kreirano od {user}"
-  },
-  "affiliate.creating.button": {
-    "defaultMessage": "Kreacija partnerskog/sponzorisanog linka..."
-  },
-  "affiliate.revoke": {
-    "defaultMessage": "Opozovi partnerski/sponzorisani link"
-  },
-  "affiliate.viewAnalytics": {
-    "defaultMessage": "Pregled analitike"
-  },
   "app.appearance-settings.native-decorations.description": {
     "defaultMessage": "Koristi naslovnu traku i kontrole prozora tvog operativnog sistema. Restart aplikacije obavezan."
   },
@@ -151,9 +118,6 @@
   },
   "button.add-server-to-instance": {
     "defaultMessage": "Dodaj server instanci"
-  },
-  "button.affiliate-links": {
-    "defaultMessage": "Partnerski/sponzorisani linkovi"
   },
   "button.analytics": {
     "defaultMessage": "Analitike"
@@ -3325,9 +3289,6 @@
   },
   "profile.error.not-found": {
     "defaultMessage": "Korisnik nije pronađen"
-  },
-  "profile.label.affiliate": {
-    "defaultMessage": "Partner"
   },
   "profile.label.badges": {
     "defaultMessage": "Bedževi"

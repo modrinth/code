@@ -2,39 +2,6 @@
   "action.no-permission": {
     "defaultMessage": "Du hast keine Berechtigung."
   },
-  "affiliate.create.button": {
-    "defaultMessage": "Partnerlink erstellen"
-  },
-  "affiliate.create.header": {
-    "defaultMessage": "Neuen Partnercode erstellen"
-  },
-  "affiliate.create.title.description": {
-    "defaultMessage": "Gib deinem Partnerlink einen Namen, damit du weist, von wo Leute kommen!"
-  },
-  "affiliate.create.title.label": {
-    "defaultMessage": "Titel des Partnerlinks"
-  },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "z.B. YouTube"
-  },
-  "affiliate.create.user.description": {
-    "defaultMessage": "Der Benutzername des Benutzers, für den der Affiliate-Code erstellt werden soll"
-  },
-  "affiliate.create.user.placeholder": {
-    "defaultMessage": "Benutzername eingeben..."
-  },
-  "affiliate.createdBy": {
-    "defaultMessage": "Erstellt von {user}"
-  },
-  "affiliate.creating.button": {
-    "defaultMessage": "Erstelle Partnerlink..."
-  },
-  "affiliate.revoke": {
-    "defaultMessage": "Partnerlink widerrufen"
-  },
-  "affiliate.viewAnalytics": {
-    "defaultMessage": "Analysen anzeigen"
-  },
   "app.appearance-settings.native-decorations.description": {
     "defaultMessage": "Nutze die Titelleiste und die Fenstersteuerelemente deines Betriebssystems. Erfordert einen Neustart der App."
   },
@@ -151,9 +118,6 @@
   },
   "button.add-server-to-instance": {
     "defaultMessage": "Server zu Instanz hinzufügen"
-  },
-  "button.affiliate-links": {
-    "defaultMessage": "Partnerlinks"
   },
   "button.analytics": {
     "defaultMessage": "Analytik"
@@ -3308,17 +3272,11 @@
   "profile.button.manage-projects": {
     "defaultMessage": "Projekte verwalten"
   },
-  "profile.button.remove-affiliate": {
-    "defaultMessage": "Als Partner entfernen"
-  },
   "profile.button.reset-2fa": {
     "defaultMessage": "Zwei-Faktor-Authentifizierung zurücksetzen"
   },
   "profile.button.revoke-sessions": {
     "defaultMessage": "Alle Sitzungen widerrufen"
-  },
-  "profile.button.set-affiliate": {
-    "defaultMessage": "Als Partner festlegen"
   },
   "profile.button.shared-instances": {
     "defaultMessage": "Geteilte Instanzen ansehen"
@@ -3406,9 +3364,6 @@
   },
   "profile.force-password-reset.title": {
     "defaultMessage": "Passwortänderung für {username} erzwingen"
-  },
-  "profile.label.affiliate": {
-    "defaultMessage": "Partner"
   },
   "profile.label.badges": {
     "defaultMessage": "Abzeichen"

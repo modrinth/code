@@ -1007,20 +1007,11 @@
   "collection.button.discover-mods": {
     "message": "Khám phá mod"
   },
-  "collection.button.edit-icon": {
-    "message": "Sửa biểu tượng"
-  },
   "collection.button.remove-icon": {
     "message": "Xoá biểu tượng"
   },
   "collection.button.remove-project": {
     "message": "Xoá dự án"
-  },
-  "collection.button.replace-icon": {
-    "message": "Thay thế biểu tượng"
-  },
-  "collection.button.select-icon": {
-    "message": "Chọn biểu tượng"
   },
   "collection.button.unfollow-project": {
     "message": "Bỏ theo dõi dự án"
@@ -1036,9 +1027,6 @@
   },
   "collection.description.following": {
     "message": "Bộ sưu tập được tạo tự động từ tất cả các dự án bạn đang theo dõi."
-  },
-  "collection.editing": {
-    "message": "Đang chỉnh sửa bộ sưu tập"
   },
   "collection.error.not-found": {
     "message": "Không tìm thấy bộ sưu tập"
@@ -1447,30 +1435,6 @@
   },
   "create.project.visibility-unlisted": {
     "message": "Không công khai"
-  },
-  "dashboard.affiliate-links.create.button": {
-    "message": "Tạo link affiliate"
-  },
-  "dashboard.affiliate-links.empty.no-codes": {
-    "message": "Không tìm thấy mã liên kết nào."
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "Lỗi tải link affiliate"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "Link affiliate của bạn"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "Thao tác này sẽ vĩnh viễn thu hồi mã affiliate `{id}`. Mọi liên kết hiện có sử dụng mã này đã được chia sẻ sẽ không còn hiệu lực."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "Thu hồi"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "Bạn có chắc chắn muốn thu hồi link affiliate \"{title}\" không?"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "Tìm kiếm link affiliate..."
   },
   "dashboard.analytics.from-projects": {
     "message": "từ {count} {count, plural, other {dự án}} khác"
@@ -2692,9 +2656,6 @@
   },
   "layout.action.file-lookup": {
     "message": "Tra cứu tệp"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "Quản lý link affiliate"
   },
   "layout.action.manage-server-notices": {
     "message": "Quản lý thông báo máy chủ"

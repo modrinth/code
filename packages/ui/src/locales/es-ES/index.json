@@ -2,39 +2,6 @@
   "action.no-permission": {
     "defaultMessage": "No tienes permiso."
   },
-  "affiliate.create.button": {
-    "defaultMessage": "Crear enlace de afiliado"
-  },
-  "affiliate.create.header": {
-    "defaultMessage": "Creando nuevo código de afiliado"
-  },
-  "affiliate.create.title.description": {
-    "defaultMessage": "¡Ponle un nombre a tu enlace de afiliado para saber de dónde provienen los usuarios!"
-  },
-  "affiliate.create.title.label": {
-    "defaultMessage": "Título del enlace de afiliado"
-  },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "p. ej. YouTube"
-  },
-  "affiliate.create.user.description": {
-    "defaultMessage": "El nombre de usuario del usuario para crear el código de afiliado"
-  },
-  "affiliate.create.user.placeholder": {
-    "defaultMessage": "Introduce un nombre de usuario..."
-  },
-  "affiliate.createdBy": {
-    "defaultMessage": "Creado por {user}"
-  },
-  "affiliate.creating.button": {
-    "defaultMessage": "Creando enlace de afiliado..."
-  },
-  "affiliate.revoke": {
-    "defaultMessage": "Revocar enlace de afiliado"
-  },
-  "affiliate.viewAnalytics": {
-    "defaultMessage": "Ver análisis"
-  },
   "app.appearance-settings.native-decorations.description": {
     "defaultMessage": "Usa la barra de título y los controles del sistema operativo. Requiere un reinicio de la aplicación."
   },
@@ -151,9 +118,6 @@
   },
   "button.add-server-to-instance": {
     "defaultMessage": "Añadir servidor a la instancia"
-  },
-  "button.affiliate-links": {
-    "defaultMessage": "Enlaces de afiliado"
   },
   "button.analytics": {
     "defaultMessage": "Analíticas"
@@ -3284,12 +3248,6 @@
   "profile.button.manage-projects": {
     "defaultMessage": "Gestionar proyectos"
   },
-  "profile.button.remove-affiliate": {
-    "defaultMessage": "Borrar como afiliado"
-  },
-  "profile.button.set-affiliate": {
-    "defaultMessage": "Poner como afiliado"
-  },
   "profile.button.shared-instances": {
     "defaultMessage": "Ver instancias compartidas"
   },
@@ -3346,9 +3304,6 @@
   },
   "profile.error.not-found": {
     "defaultMessage": "Usuario no encontrado"
-  },
-  "profile.label.affiliate": {
-    "defaultMessage": "Afiliado"
   },
   "profile.label.badges": {
     "defaultMessage": "Medallas"

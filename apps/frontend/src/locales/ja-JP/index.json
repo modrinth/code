@@ -1004,20 +1004,11 @@
   "collection.button.discover-mods": {
     "message": "Modを探す"
   },
-  "collection.button.edit-icon": {
-    "message": "アイコンを編集"
-  },
   "collection.button.remove-icon": {
     "message": "アイコンを削除"
   },
   "collection.button.remove-project": {
     "message": "プロジェクトを削除"
-  },
-  "collection.button.replace-icon": {
-    "message": "アイコンを置き換え"
-  },
-  "collection.button.select-icon": {
-    "message": "アイコンを選択"
   },
   "collection.button.unfollow-project": {
     "message": "プロジェクトのフォローを解除"
@@ -1033,9 +1024,6 @@
   },
   "collection.description.following": {
     "message": "あなたがフォローしているプロジェクトがすべて含まれた自動生成のコレクションです。"
-  },
-  "collection.editing": {
-    "message": "コレクションを編集中"
   },
   "collection.error.not-found": {
     "message": "コレクションが見つかりません"
@@ -1441,30 +1429,6 @@
   },
   "create.project.visibility-unlisted": {
     "message": "限定公開"
-  },
-  "dashboard.affiliate-links.create.button": {
-    "message": "アフィリエイトリンクを作成"
-  },
-  "dashboard.affiliate-links.empty.no-codes": {
-    "message": "アフィリエイトコードが見つかりませんでした。"
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "アフィリエイトリンクの読み込みエラー"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "アフィリエイトリンク"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "アフィリエイト コード `{id}` は永久に取り消され、このコードを使用して共有されている既存のリンクは無効になります。"
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "取り消す"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "「{title}」のアフィリエイトリンクを本当に解除しますか？"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "アフィリエイトリンクを検索…"
   },
   "dashboard.analytics.from-projects": {
     "message": "{count} 件のプロジェクトから"
@@ -2614,9 +2578,6 @@
   },
   "layout.action.file-lookup": {
     "message": "ファイル検索"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "アフィリエイトリンクを管理"
   },
   "layout.action.manage-server-notices": {
     "message": "サーバー通知を管理"

@@ -2,39 +2,6 @@
   "action.no-permission": {
     "defaultMessage": "Je hebt geen toestemming."
   },
-  "affiliate.create.button": {
-    "defaultMessage": "Partnerlink aanmaken"
-  },
-  "affiliate.create.header": {
-    "defaultMessage": "Nieuwe partnercode aanmaken"
-  },
-  "affiliate.create.title.description": {
-    "defaultMessage": "Geef je partnerlink een naam, zodat je weet waar mensen vandaan komen!"
-  },
-  "affiliate.create.title.label": {
-    "defaultMessage": "Titel van de partnerlink"
-  },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "bijv. YouTube"
-  },
-  "affiliate.create.user.description": {
-    "defaultMessage": "De gebruikersnaam van de gebruiker voor wie de partnercode moet worden aangemaakt"
-  },
-  "affiliate.create.user.placeholder": {
-    "defaultMessage": "Voer gebruikersnaam in..."
-  },
-  "affiliate.createdBy": {
-    "defaultMessage": "Gemaakt door {user}"
-  },
-  "affiliate.creating.button": {
-    "defaultMessage": "Partnerlink maken..."
-  },
-  "affiliate.revoke": {
-    "defaultMessage": "Partnerlink intrekken"
-  },
-  "affiliate.viewAnalytics": {
-    "defaultMessage": "Statistieken bekijken"
-  },
   "app.appearance-settings.native-decorations.description": {
     "defaultMessage": "Gebruik de titelbalk en vensterbedieningselementen van je besturingssysteem. Hiervoor moet de app opnieuw worden opgestart."
   },
@@ -151,9 +118,6 @@
   },
   "button.add-server-to-instance": {
     "defaultMessage": "Voeg server toevoegen aan instantie"
-  },
-  "button.affiliate-links": {
-    "defaultMessage": "Partnerlinks"
   },
   "button.analytics": {
     "defaultMessage": "Analytica"
@@ -3272,12 +3236,6 @@
   "profile.button.manage-projects": {
     "defaultMessage": "Projecten beheren"
   },
-  "profile.button.remove-affiliate": {
-    "defaultMessage": "Als partner verwijderen"
-  },
-  "profile.button.set-affiliate": {
-    "defaultMessage": "Als partner instellen"
-  },
   "profile.button.shared-instances": {
     "defaultMessage": "Gekoppelde gedeelde instantie"
   },
@@ -3331,9 +3289,6 @@
   },
   "profile.error.not-found": {
     "defaultMessage": "Gebruiker niet gevonden"
-  },
-  "profile.label.affiliate": {
-    "defaultMessage": "Partner"
   },
   "profile.label.badges": {
     "defaultMessage": "Badges"

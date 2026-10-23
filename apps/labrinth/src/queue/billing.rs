@@ -6,7 +6,6 @@ use crate::database::models::products_tax_identifier_item::DBProductsTaxIdentifi
 use crate::database::models::user_item::DBUser;
 use crate::database::models::user_subscription_item::DBUserSubscription;
 use crate::database::models::users_redeemals::UserRedeemal;
-use crate::database::models::users_subscriptions_affiliations::DBUsersSubscriptionsAffiliations;
 use crate::database::models::{
     product_item, user_subscription_item, users_redeemals,
 };
@@ -1015,15 +1014,6 @@ async fn unprovision_subscriptions(
                 .upsert(&mut transaction)
                 .await
                 .wrap_internal_err("updating err in database")?;
-
-            DBUsersSubscriptionsAffiliations::deactivate(
-                subscription.id,
-                &mut transaction,
-            )
-            .await
-            .wrap_internal_err(
-                "failed to deactivate subscription affiliation",
-            )?;
         }
 
         clear_cache_users.push(user.id);

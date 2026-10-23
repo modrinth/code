@@ -39,10 +39,25 @@
 				@clear="handleSearchClear"
 			>
 				<template v-if="showChevron" #trailing>
-					<ChevronLeftIcon
-						class="pointer-events-none size-5 text-secondary transition-transform duration-150"
-						:class="isOpen ? (openDirection === 'down' ? 'rotate-90' : '-rotate-90') : '-rotate-90'"
-					/>
+					<button
+						type="button"
+						tabindex="-1"
+						class="flex size-7 -m-2 shrink-0 cursor-pointer items-center justify-center border-none bg-transparent p-0 text-secondary disabled:cursor-not-allowed"
+						:disabled="disabled"
+						:aria-expanded="isOpen"
+						:aria-haspopup="listbox ? 'listbox' : 'menu'"
+						aria-label="Toggle dropdown"
+						@mousedown.prevent
+						@click.stop="handleSearchChevronClick"
+					>
+						<ChevronLeftIcon
+							class="pointer-events-none size-5 transition-transform duration-150"
+							:class="
+								isOpen ? (openDirection === 'down' ? 'rotate-90' : '-rotate-90') : '-rotate-90'
+							"
+							aria-hidden="true"
+						/>
+					</button>
 				</template>
 			</Input>
 		</div>
@@ -1022,6 +1037,18 @@ function handleSearchClick() {
 	}
 }
 
+function handleSearchChevronClick() {
+	if (props.disabled) return
+
+	const wasOpen = isOpen.value
+	searchTriggerRef.value?.focus()
+	if (wasOpen) {
+		closeDropdown()
+	} else {
+		openDropdown()
+	}
+}
+
 function handleWindowResize() {
 	if (isOpen.value) {
 		scheduleDropdownPositionUpdate()
@@ -1051,10 +1078,17 @@ function startPositionTracking() {
 	listenerWindow.addEventListener('beforeunload', handleWindowClose)
 	listenerWindow.visualViewport?.addEventListener('scroll', handleViewportChange)
 	listenerWindow.visualViewport?.addEventListener('resize', handleViewportChange)
-	stopOutsideClick = onClickOutside(dropdownRef, () => closeDropdown(false), {
-		window: listenerWindow,
-		ignore: outsideClickIgnoreTargets,
-	})
+	stopOutsideClick = onClickOutside(
+		dropdownRef,
+		(event) => {
+			if (containerRef.value && event.composedPath().includes(containerRef.value)) return
+			closeDropdown(false)
+		},
+		{
+			window: listenerWindow,
+			ignore: outsideClickIgnoreTargets,
+		},
+	)
 }
 
 function stopPositionTracking() {

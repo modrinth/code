@@ -1007,20 +1007,11 @@
   "collection.button.discover-mods": {
     "message": "Mods entdecken"
   },
-  "collection.button.edit-icon": {
-    "message": "Icon bearbeiten"
-  },
   "collection.button.remove-icon": {
     "message": "Icon entfernen"
   },
   "collection.button.remove-project": {
     "message": "Projekt entfernen"
-  },
-  "collection.button.replace-icon": {
-    "message": "Icon ersetzen"
-  },
-  "collection.button.select-icon": {
-    "message": "Icon auswählen"
   },
   "collection.button.unfollow-project": {
     "message": "Projekt entfolgen"
@@ -1036,9 +1027,6 @@
   },
   "collection.description.following": {
     "message": "Automatisch generierte Kollektion aller Projekte, denen du folgst."
-  },
-  "collection.editing": {
-    "message": "Kollektion bearbeiten"
   },
   "collection.error.not-found": {
     "message": "Kollektion nicht gefunden"
@@ -1444,30 +1432,6 @@
   },
   "create.project.visibility-unlisted": {
     "message": "Nicht gelistet"
-  },
-  "dashboard.affiliate-links.create.button": {
-    "message": "Partnerlink erstellen"
-  },
-  "dashboard.affiliate-links.empty.no-codes": {
-    "message": "Keine Partnercodes gefunden."
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "Fehler beim Laden von Partnerlinks"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "Deine Partnerlinks"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "Dies wird permanent den Partnercode `{id}` widerrufen und alle existierenden Links, welche ihn nutzen, werden nicht mehr gültig sein."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "Widerrufen"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "Bist du sicher, dass du deinen Partnerlink „{title}“ widerrufen möchtest?"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "Partnerlinks durchsuchen..."
   },
   "dashboard.analytics.from-projects": {
     "message": "von {count} {count, plural, one {Projekt} other {Projekten}}"
@@ -2689,9 +2653,6 @@
   },
   "layout.action.file-lookup": {
     "message": "Dateisuche"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "Partnerlinks verwalten"
   },
   "layout.action.manage-server-notices": {
     "message": "Servermitteilungen verwalten"

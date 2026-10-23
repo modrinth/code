@@ -1,6 +1,5 @@
 use crate::api::Result;
-use daedalus::minecraft::VersionManifest;
-use daedalus::modded::Manifest;
+use theseus::metadata::{Manifest, VersionManifest};
 
 pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("metadata")
@@ -11,13 +10,13 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
         .build()
 }
 
-/// Gets the game versions from daedalus
+/// Gets the game versions from launcher metadata
 #[tauri::command]
 pub async fn metadata_get_game_versions() -> Result<VersionManifest> {
     Ok(theseus::metadata::get_minecraft_versions().await?)
 }
 
-/// Gets the fabric versions from daedalus
+/// Gets the fabric versions from launcher metadata
 #[tauri::command]
 pub async fn metadata_get_loader_versions(loader: &str) -> Result<Manifest> {
     Ok(theseus::metadata::get_loader_versions(loader).await?)

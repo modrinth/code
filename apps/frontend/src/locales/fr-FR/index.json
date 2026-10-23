@@ -1004,20 +1004,11 @@
   "collection.button.discover-mods": {
     "message": "Découvrir des mods"
   },
-  "collection.button.edit-icon": {
-    "message": "Modifier l'icône"
-  },
   "collection.button.remove-icon": {
     "message": "Supprimer l'icône"
   },
   "collection.button.remove-project": {
     "message": "Supprimer le projet"
-  },
-  "collection.button.replace-icon": {
-    "message": "Remplacer l'icône"
-  },
-  "collection.button.select-icon": {
-    "message": "Sélectionnez l'icône"
   },
   "collection.button.unfollow-project": {
     "message": "Ne plus suivre le projet"
@@ -1033,9 +1024,6 @@
   },
   "collection.description.following": {
     "message": "Collection générée automatiquement de tous vos projets favoris."
-  },
-  "collection.editing": {
-    "message": "Édition de la collection"
   },
   "collection.error.not-found": {
     "message": "Collection introuvable"
@@ -1441,30 +1429,6 @@
   },
   "create.project.visibility-unlisted": {
     "message": "Non répertorié"
-  },
-  "dashboard.affiliate-links.create.button": {
-    "message": "Créer un lien affilié"
-  },
-  "dashboard.affiliate-links.empty.no-codes": {
-    "message": "Aucun code d'affiliation trouvé."
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "Erreur lors du chargement des liens d'affiliation"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "Vos liens affiliés"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "Cela révoquera définitivement le code d'affiliation `{id}` et tous les liens existants contenant ce code et qui ont été partagés ne seront plus valides."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "Révoquer"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "Êtes-vous sûr·e de vouloir révoquer votre lien d'affiliation « {title} » ?"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "Rechercher des liens d'affiliation..."
   },
   "dashboard.analytics.from-projects": {
     "message": "de {count} {count, plural, one {projet} other {projets}}"
@@ -2683,9 +2647,6 @@
   },
   "layout.action.file-lookup": {
     "message": "Recherche de fichier"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "Gérer les liens affiliés"
   },
   "layout.action.manage-server-notices": {
     "message": "Gérer les notifications du serveur"

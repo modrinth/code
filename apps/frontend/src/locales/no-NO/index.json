@@ -689,20 +689,11 @@
   "auth.verify-email.title": {
     "message": "Verifiser Email"
   },
-  "collection.button.edit-icon": {
-    "message": "Rediger ikon"
-  },
   "collection.button.remove-icon": {
     "message": "Fjern ikon"
   },
   "collection.button.remove-project": {
     "message": "Fjern prosjekt"
-  },
-  "collection.button.replace-icon": {
-    "message": "Erstatt ikon"
-  },
-  "collection.button.select-icon": {
-    "message": "Velg ikon"
   },
   "collection.button.unfollow-project": {
     "message": "Slutt å følge prosjektet"
@@ -718,9 +709,6 @@
   },
   "collection.description.following": {
     "message": "Auto-generated collection of all the projects you're following."
-  },
-  "collection.editing": {
-    "message": "Redigeringssamling"
   },
   "collection.error.not-found": {
     "message": "Samling ikke funnet"
@@ -922,30 +910,6 @@
   },
   "create.project.visibility-unlisted": {
     "message": "Uoppført"
-  },
-  "dashboard.affiliate-links.create.button": {
-    "message": "Opprett tilknytningslenke"
-  },
-  "dashboard.affiliate-links.empty.no-codes": {
-    "message": "Ingen tilknytte koder funnet."
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "Feil ved lasting av tilknytningslenker"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "Dine tilknytningslenker"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "Dette vil fjerne tilknytningskoden {id} permanent, og alle delte lenker med denne koden vil slutte å virke."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "Slett"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "Er du sikker på at du vil slette tilknytningslenken ''{title}''?"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "Søk i tilknytningslenker..."
   },
   "dashboard.analytics.from-projects": {
     "message": "fra{count} {count, plural, one {projekt} other {projekt}}"
@@ -2020,9 +1984,6 @@
   },
   "layout.action.file-lookup": {
     "message": "Filoppslag"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "Hold styr på tilknytte lenker"
   },
   "layout.action.manage-server-notices": {
     "message": "Hold styr på servervarsler"
