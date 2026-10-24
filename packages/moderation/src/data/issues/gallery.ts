@@ -34,14 +34,7 @@ export const galleryNotRelevantIssue = issue({
 		const imageIds = projectV3.gallery.flatMap((image) =>
 			image.id !== undefined && keys.has(String(image.id)) ? [image.id] : [],
 		)
-		return imageIds.length
-			? [
-					() => ({
-						type: 'remove_gallery_images',
-						value: { image_ids: imageIds },
-					}),
-				]
-			: []
+		return imageIds.length ? [issueTargets.removeGalleryImages(imageIds)] : []
 	},
 	message: (context) => {
 		const entries = selectedGalleryImages(context).map(

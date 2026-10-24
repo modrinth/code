@@ -32,6 +32,7 @@ import serverSideOptOutMessage from '../messages/checklist/messages/rules/server
 import { issue, panel, section, select, toggle } from './component-builders/builders'
 import { selectedGalleryImages } from './component-builders/gallery-images'
 import { IssuePriority } from './component-builders/priority'
+import { issueTargets } from './component-builders/targets'
 import type { IssueAction } from './component-builders/types'
 
 const escapeHtml = md().utils.escapeHtml
@@ -83,21 +84,13 @@ export const rulesAiImagesIssue = issue({
 		)
 		const actions: IssueAction[] = []
 		if (selected.toggleIds.includes('description-ai-images')) {
-			actions.push(() => ({
-				type: 'modify_description',
-				value: { original: projectV3.description },
-			}))
+			actions.push(issueTargets.modifyDescription())
 		}
 		if (selected.toggleIds.includes('icon-ai-images')) {
-			actions.push(() => ({
-				type: 'remove_icon',
-			}))
+			actions.push(issueTargets.removeIcon())
 		}
 		if (imageIds.length) {
-			actions.push(() => ({
-				type: 'remove_gallery_images',
-				value: { image_ids: imageIds },
-			}))
+			actions.push(issueTargets.removeGalleryImages(imageIds))
 		}
 		return actions
 	},
