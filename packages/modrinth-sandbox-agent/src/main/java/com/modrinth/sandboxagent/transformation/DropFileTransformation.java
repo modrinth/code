@@ -7,6 +7,7 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.*;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -72,8 +73,7 @@ public class DropFileTransformation {
                 continue;
             }
 
-            // todo: make true
-            if (true) {//Files.exists(path) && !Files.isReadable(path)) {
+            if (!Files.isReadable(path)) {
                 futureList.add(CompletableFuture.supplyAsync(() -> sandboxApi.tryRequestAccess(path))
                         .thenApply(newPath -> {
                             if (srcType == Path.class) {
