@@ -11,7 +11,7 @@ import demonetizedModpack from './messages/checklist/messages/status-alerts/demo
 import privateProject from './messages/checklist/messages/status-alerts/private-use/project.md'
 import privateServer from './messages/checklist/messages/status-alerts/private-use/server.md'
 import serverUse from './messages/checklist/messages/status-alerts/server-use.md'
-import temporaryServer from './messages/checklist/messages/status-alerts/temporary-server.md'
+// import temporaryServer from './messages/checklist/messages/status-alerts/temporary-server.md'
 
 export interface MessageTemplate {
 	label: string

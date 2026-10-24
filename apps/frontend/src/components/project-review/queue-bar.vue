@@ -95,21 +95,47 @@
 				</div>
 			</div>
 			<div class="flex items-center gap-1">
-				<button type="button" class="queue-action" :disabled="busy" @click="exit">Exit</button>
+				<Tooltip :delay="750">
+					<template #popper>
+						<div class="flex items-center gap-2">
+							<KbdChip keybind="review-exit" tooltip-content />
+						</div>
+					</template>
+					<button type="button" class="queue-action" :disabled="busy" @click="exit">Exit</button>
+				</Tooltip>
 				<span class="mx-1.5 h-5 w-px bg-divider" aria-hidden="true" />
-				<button type="button" class="queue-action" :disabled="disabled || !canGoBack" @click="back">
-					<LeftArrowIcon class="mb-px" />
-					Back
-				</button>
-				<button
-					type="button"
-					class="queue-action"
-					:disabled="disabled || (!inQueue && !completed)"
-					@click="next"
-				>
-					{{ completed ? (remaining.length ? 'Next' : 'Finish') : 'Skip' }}
-					<RightArrowIcon class="mb-px" />
-				</button>
+				<Tooltip :delay="750">
+					<template #popper>
+						<div class="flex items-center gap-2">
+							<KbdChip keybind="review-back" tooltip-content />
+						</div>
+					</template>
+					<button
+						type="button"
+						class="queue-action"
+						:disabled="disabled || !canGoBack"
+						@click="back"
+					>
+						<LeftArrowIcon class="mb-px" />
+						Back
+					</button>
+				</Tooltip>
+				<Tooltip :delay="750">
+					<template #popper>
+						<div class="flex items-center gap-2">
+							<KbdChip keybind="skip-project" tooltip-content />
+						</div>
+					</template>
+					<button
+						type="button"
+						class="queue-action"
+						:disabled="disabled || (!inQueue && !completed)"
+						@click="next"
+					>
+						{{ completed ? (remaining.length ? 'Next' : 'Finish') : 'Skip' }}
+						<RightArrowIcon class="mb-px" />
+					</button>
+				</Tooltip>
 			</div>
 		</nav>
 	</footer>
@@ -155,7 +181,14 @@ import {
 	RotateCounterClockwiseIcon,
 	SettingsIcon,
 } from '@modrinth/assets'
-import { AutoLink, Button, FloatingMenu, TabbedModal, type TabbedModalTab } from '@modrinth/ui'
+import {
+	AutoLink,
+	Button,
+	FloatingMenu,
+	TabbedModal,
+	type TabbedModalTab,
+	Tooltip,
+} from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import ModerationAppearance from '~/components/ui/moderation/settings/ModerationAppearance.vue'
@@ -163,6 +196,7 @@ import ModerationKeybinds from '~/components/ui/moderation/settings/ModerationKe
 import ModerationSettings from '~/components/ui/moderation/settings/ModerationSettings.vue'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
+import KbdChip from './kdb-chip.vue'
 import { injectProjectReviewContext } from './layout/context'
 import QueueProjectList from './queue-project-list.vue'
 import { useReviewShortcut } from './shortcuts'
@@ -221,7 +255,11 @@ const {
 } = navigation
 
 const disabled = computed(() => busy.value || isLoading.value || !queue.hydrated)
-const queueSearches = ref<Record<string, string>>({ Complete: '', Skipped: '', Remaining: '' })
+const queueSearches = ref<Record<string, string>>({
+	Complete: '',
+	Skipped: '',
+	Remaining: '',
+})
 const queueColumns = computed(() => {
 	const current = queue.currentQueue
 	const skippedIds = new Set(current.skipped)
