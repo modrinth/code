@@ -15,6 +15,16 @@ export const setMarkdownUserCountryResolver = (resolver: MarkdownUserCountryReso
 	resolveMarkdownUserCountry = resolver
 }
 
+let youtubeEmbedOrigin: string | null = null
+
+/**
+ * Serves YouTube embeds from `origin` instead of youtube.com. Used by the app, whose webview
+ * sends no `Referer` to YouTube and so gets "Error 153" from the player.
+ */
+export const setYouTubeEmbedOrigin = (origin: string | null) => {
+	youtubeEmbedOrigin = origin
+}
+
 const shouldProxyImgur = () => {
 	try {
 		const country = resolveMarkdownUserCountry()
@@ -82,10 +92,16 @@ export const configuredXss = new FilterXSS({
 	onIgnoreTagAttr: (tag, name, value) => {
 		// Allow iframes from acceptable sources
 		if (tag === 'iframe' && name === 'src') {
-			const allowedSources = [
+			const allowedSources: {
+				url: RegExp
+				allowedParameters: RegExp[]
+				rewrite?: (url: URL) => string | undefined
+			}[] = [
 				{
 					url: /^https?:\/\/(www\.)?youtube(-nocookie)?\.com\/embed\/[a-zA-Z0-9_-]{11}/,
 					allowedParameters: [/start=\d+/, /end=\d+/],
+					rewrite: (url: URL) =>
+						youtubeEmbedOrigin ? `${youtubeEmbedOrigin}${url.pathname}${url.search}` : undefined,
 				},
 				{
 					url: /^https?:\/\/(www\.)?discord\.com\/widget/,
@@ -109,7 +125,8 @@ export const configuredXss = new FilterXSS({
 					})
 
 					url.search = newSearchParams.toString()
-					return `${name}="${escapeAttrValue(url.toString())}"`
+					const src = source.rewrite?.(url) ?? url.toString()
+					return `${name}="${escapeAttrValue(src)}"`
 				}
 			} catch {
 				// ..

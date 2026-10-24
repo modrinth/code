@@ -1,6 +1,7 @@
 import 'overlayscrollbars/overlayscrollbars.css'
 
 import { installTooltipDirective } from '@modrinth/ui'
+import { setYouTubeEmbedOrigin } from '@modrinth/utils'
 import { VueQueryPlugin } from '@tanstack/vue-query'
 import { createApp } from 'vue'
 
@@ -8,6 +9,7 @@ import App from '@/App.vue'
 import { overlayScrollbarsDirective } from '@/directives/overlayScrollbars'
 import { setupErrorReporting } from '@/helpers/error-reporting'
 import { debugStartup, traceStartupStep } from '@/helpers/startup-debug'
+import { getYouTubeEmbedOrigin } from '@/helpers/utils'
 import i18nPlugin from '@/plugins/i18n'
 import i18nDebugPlugin from '@/plugins/i18n-debug'
 import router from '@/routes'
@@ -33,6 +35,11 @@ async function mount() {
 			() => import('@taijased/vue-render-tracker'),
 		)
 		app.use(new VueScanPlugin({ enabled: true, showOverlay: true, log: false, playSound: false }))
+	}
+	try {
+		setYouTubeEmbedOrigin(await getYouTubeEmbedOrigin())
+	} catch (err) {
+		console.warn('Failed to start YouTube embed server', err)
 	}
 	debugStartup('Vue mount started')
 	app.mount('#app')

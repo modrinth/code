@@ -386,6 +386,7 @@ fn main() {
                         "progress_bars_list",
                         "get_opening_command",
                         "get_image_thumbnail",
+                        "get_youtube_embed_origin",
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,

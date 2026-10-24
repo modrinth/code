@@ -52,6 +52,7 @@ pub fn init<R: Runtime>() -> tauri::plugin::TauriPlugin<R> {
             progress_bars_list,
             get_opening_command,
             super::thumbnails::get_image_thumbnail,
+            super::youtube_embed::get_youtube_embed_origin,
         ])
         .build()
 }

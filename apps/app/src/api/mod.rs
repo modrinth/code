@@ -20,6 +20,7 @@ pub mod tags;
 mod thumbnails;
 pub mod users;
 pub mod utils;
+mod youtube_embed;
 
 pub mod ads;
 #[cfg(target_os = "macos")]

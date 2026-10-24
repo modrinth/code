@@ -40,6 +40,10 @@ export async function openPath(path) {
 	return await invoke('plugin:utils|open_path', { path })
 }
 
+export async function getYouTubeEmbedOrigin() {
+	return await invoke('plugin:utils|get_youtube_embed_origin')
+}
+
 export async function highlightInFolder(path) {
 	return await invoke('plugin:utils|highlight_in_folder', { path })
 }
