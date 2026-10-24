@@ -4,6 +4,13 @@ import com.modrinth.sandboxagent.MinecraftVersionInfo;
 import com.modrinth.sandboxagent.SandboxAgent;
 import com.modrinth.sandboxagent.transformer.MethodTransformer;
 import com.modrinth.sandboxagent.transformer.TransformerMap;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
+import org.objectweb.asm.tree.*;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
 
 public class Transformation {
 
@@ -63,6 +70,30 @@ public class Transformation {
         String desc = csv.substring(column3End+1, column4End);
 
         transformerMap.registerMethod(className, method, desc, transformer);
+    }
+
+    public static void overwrite(ListIterator<AbstractInsnNode> it, boolean isStatic, boolean conditional, Class<?> owner, String name, String descriptor) {
+        Type methodType = Type.getMethodType(descriptor);
+        int index = isStatic ? 0 : 1;
+
+        // Load arguments onto stack
+        for (Type argumentType : methodType.getArgumentTypes()) {
+            it.add(new VarInsnNode(argumentType.getOpcode(Opcodes.ILOAD), index));
+            index += argumentType.getSize();
+        }
+
+        // Invoke overwrite method
+        it.add(new MethodInsnNode(Opcodes.INVOKESTATIC, owner.getName().replace('.', '/'), name, descriptor));
+
+        // Add ret logic
+        if (methodType.getReturnType() == Type.BOOLEAN_TYPE && conditional) {
+            final LabelNode after = new LabelNode();
+            it.add(new JumpInsnNode(Opcodes.IFEQ, after)); // If false, jump to after to skip early return
+            it.add(new InsnNode(Opcodes.RETURN));
+            it.add(after);
+        } else {
+            it.add(new InsnNode(methodType.getReturnType().getOpcode(Opcodes.IRETURN)));
+        }
     }
 
 }

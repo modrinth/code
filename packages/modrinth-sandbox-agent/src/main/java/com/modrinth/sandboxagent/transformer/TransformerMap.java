@@ -56,9 +56,9 @@ public class TransformerMap implements ClassFileTransformer {
             ClassWriter classWriter = new ClassWriter(reader, ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
             classNode.accept(classWriter);
             return classWriter.toByteArray();
-        } catch (Exception e) {
+        } catch (Throwable t) {
             System.out.println("Exception while transforming " + className);
-            e.printStackTrace();
+            t.printStackTrace();
             return null;
         }
     }

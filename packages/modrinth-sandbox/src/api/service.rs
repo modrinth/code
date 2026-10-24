@@ -1037,10 +1037,6 @@ impl SandboxApiService {
             }
         }
 
-        if open_args.default_location.is_none() {
-            // todo: use default location of process's working directory?
-        }
-
         let mut paths = match super::desktop::open_file_dialog(open_args).await {
             Ok(paths) => paths,
             Err(err) => {
@@ -1064,7 +1060,6 @@ impl SandboxApiService {
             }
         }
 
-        dbg!(&paths);
         Ok(paths)
     }
 }

@@ -88,18 +88,20 @@ pub async fn open_file_dialog_macos(args: OpenFileDialogArgs) -> eyre::Result<Ve
 
         // Default location
         if let Some(default_location) = &args.default_location {
-            if default_location.is_dir() {
-                let path = objc2_foundation::NSString::from_str(&default_location.to_string_lossy());
-                let url = objc2_foundation::NSURL::fileURLWithPath_isDirectory(&path, true);
-                panel.setDirectoryURL(Some(&url));
-            } else if let Some(parent) = default_location.parent() {
-                let parent_path = objc2_foundation::NSString::from_str(&parent.to_string_lossy());
-                let parent_url = objc2_foundation::NSURL::fileURLWithPath_isDirectory(&parent_path, true);
-                panel.setDirectoryURL(Some(&parent_url));
+            if let Some(trailing) = default_location.as_os_str().as_encoded_bytes().last() {
+                if (trailing == &b'/' || trailing == &b'\\') || default_location.is_dir() {
+                    let path = objc2_foundation::NSString::from_str(&default_location.to_string_lossy());
+                    let url = objc2_foundation::NSURL::fileURLWithPath_isDirectory(&path, true);
+                    panel.setDirectoryURL(Some(&url));
+                } else if let Some(parent) = default_location.parent() {
+                    let parent_path = objc2_foundation::NSString::from_str(&parent.to_string_lossy());
+                    let parent_url = objc2_foundation::NSURL::fileURLWithPath_isDirectory(&parent_path, true);
+                    panel.setDirectoryURL(Some(&parent_url));
 
-                if let Some(file_name) = default_location.file_name() {
-                    let name_field = objc2_foundation::NSString::from_str(&file_name.to_string_lossy());
-                    panel.setNameFieldStringValue(&name_field);
+                    if let Some(file_name) = default_location.file_name() {
+                        let name_field = objc2_foundation::NSString::from_str(&file_name.to_string_lossy());
+                        panel.setNameFieldStringValue(&name_field);
+                    }
                 }
             }
         }
