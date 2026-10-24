@@ -118,11 +118,9 @@ useMutationObserver(element, invalidateWidth, {
 })
 useEventListener(viewport, 'resize', invalidateWidth)
 useEventListener(() => viewport.value?.visualViewport, 'resize', invalidateWidth)
-watch(
-	[() => props.maxWidth, () => appearanceStyle.value.borderWidth],
-	invalidateWidth,
-	{ flush: 'post' },
-)
+watch([() => props.maxWidth, () => appearanceStyle.value.borderWidth], invalidateWidth, {
+	flush: 'post',
+})
 
 function invalidateWidth() {
 	if (widthDirty) return

@@ -74,7 +74,7 @@
 							:flip="false"
 							theme="tooltip"
 							:distance="4"
-							panelClass="!p-0"
+							panel-class="!p-0"
 						>
 							<span tabindex="0" class="cursor-default pb-1 pt-1.5 text-xs">
 								{{ column.label }}
