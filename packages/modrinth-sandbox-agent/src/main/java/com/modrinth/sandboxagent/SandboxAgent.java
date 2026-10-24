@@ -20,16 +20,24 @@ public class SandboxAgent {
         String minecraftVersionJson = readResourceToString("/version.json");
         MinecraftVersionInfo minecraftVersionInfo = new MinecraftVersionInfo(minecraftVersionJson);
 
-        // Replaces Util$OS#openUri with sandbox api call
-        OpenUriTransformation.register(transformerMap, minecraftVersionInfo);
-        // Replaces realms url generation to point to sandbox api
-        RealmsTransformation.register(transformerMap, minecraftVersionInfo);
-        // Requests access to certain files outside the sandbox when drag-dropping
-        DropFileTransformation.register(transformerMap, minecraftVersionInfo);
-        // Modifies auth code on older versions of Minecraft to use our proxy
-        AuthTransformation.register(transformerMap, minecraftVersionInfo);
-        // Transform various file dialog APIs (SDL, NFD, TFD) to use our api instead
-        FileDialogTransformation.register(transformerMap);
+        if (System.getProperty("modrinth.sandboxagent.transform.openuri", "").equals("true")) {
+            // Replaces Util$OS#openUri with sandbox api call
+            OpenUriTransformation.register(transformerMap, minecraftVersionInfo);
+        }
+        if (System.getProperty("modrinth.sandboxagent.transform.dragdrop", "").equals("true")) {
+            // Requests access to certain files outside the sandbox when drag-dropping
+            DropFileTransformation.register(transformerMap, minecraftVersionInfo);
+        }
+        if (System.getProperty("modrinth.sandboxagent.transform.filedialog", "").equals("true")) {
+            // Transform various file dialog APIs (SDL, NFD, TFD) to use our api instead
+            FileDialogTransformation.register(transformerMap);
+        }
+        if (System.getProperty("modrinth.sandboxagent.transform.auth", "").equals("true")) {
+            // Replaces realms url generation to point to sandbox api
+            RealmsTransformation.register(transformerMap, minecraftVersionInfo);
+            // Modifies auth code on older versions of Minecraft to use our proxy
+            AuthTransformation.register(transformerMap, minecraftVersionInfo);
+        }
 
 		inst.addTransformer(transformerMap);
 	}

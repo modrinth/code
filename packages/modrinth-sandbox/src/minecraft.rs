@@ -323,6 +323,16 @@ pub async fn setup_minecraft_command(
         args.push(
             format!("-Dmodrinth.sandboxagent.port={}", port.to_string()).into(),
         );
+        args.push("-Dmodrinth.sandboxagent.transform.auth=true".into());
+
+        // Don't do desktop (openuri, file dialog, etc.) changes on macos
+        // macos's sandbox handles these correctly without any intervention
+        #[cfg(not(target_os = "macos"))]
+        {
+            args.push("-Dmodrinth.sandboxagent.transform.openuri=true".into());
+            args.push("-Dmodrinth.sandboxagent.transform.dragdrop=true".into());
+            args.push("-Dmodrinth.sandboxagent.transform.filedialog=true".into());
+        }
 
         args.push("-Drealms.environment=local".into());
         args.push("-Dminecraft.api.env=sandboxauth".into());
