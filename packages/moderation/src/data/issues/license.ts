@@ -32,31 +32,27 @@ export const licenseNoSourceIssue = issue({
 	suggestedStatus: 'rejected',
 })
 
-export const sourceRequiredSection = section({
+export const sourceRequiredToggle = toggle({
+	issue: licenseNoSourceIssue,
+	label: 'No Source',
 	shown: (ctx) =>
 		!ctx.projectV3.minecraft_server &&
 		promptSourceRequired(ctx.projectV3.license.id, ctx.projectV3.project_types),
+})
+
+export const sourceRequiredExtrasSection = section({
+	label: 'Additional reason for source requirements?',
+	shown: (ctx) => ctx.selected.issueIds.includes(licenseNoSourceIssue.id),
 }).content(
 	toggle({
 		shown: (ctx) => !ctx.projectV3.minecraft_server,
 		issue: licenseNoSourceIssue,
-		label: 'No Source',
-	}),
-	section({
-		label: 'Additional reason for source requirements?',
-		shown: (ctx) =>
-			!ctx.projectV3.minecraft_server && ctx.selected.issueIds.includes(licenseNoSourceIssue.id),
-	}).content(
-		toggle({
-			shown: (ctx) => !ctx.projectV3.minecraft_server,
-			issue: licenseNoSourceIssue,
+		label: 'No Source: Fork',
+		id: 'license-fork',
+		issueCardDisplay: {
 			label: 'No Source: Fork',
-			id: 'license-fork',
-			issueCardDisplay: {
-				label: 'No Source: Fork',
-			},
-		}),
-	),
+		},
+	}),
 )
 
 export const licenseReviewPanel = panel({
@@ -83,5 +79,6 @@ export const licenseReviewPanel = panel({
 			label: 'Invalid Link: Custom License',
 		},
 	}),
-	sourceRequiredSection,
+	sourceRequiredToggle,
+	sourceRequiredExtrasSection,
 )
