@@ -16,7 +16,11 @@
 					<h4 class="m-0 flex items-center gap-2 text-sm font-medium text-secondary">
 						{{ link.label }}
 						<TagItem
-							v-if="link.key === 'source' && project && licenseRequiresSource(project.license.id)"
+							v-if="
+								link.key === 'source' &&
+								project &&
+								promptSourceRequired(project.license.id, project.project_types)
+							"
 							v-tooltip="'License requires source code.'"
 							class="!border-orange !bg-surface-4 !px-1.5 !py-0.5 !text-orange"
 						>
@@ -86,7 +90,7 @@ import {
 	TriangleAlertIcon,
 	WikiIcon,
 } from '@modrinth/assets'
-import { licenseRequiresSource } from '@modrinth/moderation'
+import { promptSourceRequired } from '@modrinth/moderation'
 import { injectModrinthClient, TagItem } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, ref, useTemplateRef, watch } from 'vue'

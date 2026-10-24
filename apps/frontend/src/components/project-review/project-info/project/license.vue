@@ -22,7 +22,7 @@
 					}}
 				</span>
 				<TagItem
-					v-if="licenseRequiresSource(project.license.id)"
+					v-if="promptSourceRequired(project.license.id, project.project_types)"
 					v-tooltip="'License requires source code.'"
 					class="!border-orange !bg-surface-4 !px-1.5 !py-0.5 !text-orange"
 				>
@@ -48,7 +48,7 @@
 
 <script setup lang="ts">
 import { ExternalIcon, TagCategoryScrollTextIcon } from '@modrinth/assets'
-import { licenseRequiresSource } from '@modrinth/moderation'
+import { promptSourceRequired } from '@modrinth/moderation'
 import { TagItem } from '@modrinth/ui'
 import { computed, useTemplateRef } from 'vue'
 

@@ -16,7 +16,7 @@ import unsupportedMessage from '../messages/checklist/messages/versions/unsuppor
 import vanillaAssetsMessage from '../messages/checklist/messages/versions/vanilla-assets.md'
 import { issue, panel, section, select, text, toggle } from './component-builders/builders'
 import { issueLocation } from './component-builders/locations'
-import { sourceRequiredToggle, sourceRequiredExtrasSection } from './license'
+import { sourceRequiredExtrasSection, sourceRequiredToggle } from './license'
 
 export const versionsIncorrectAdditionalFilesIssue = issue({
 	id: 'versions-incorrect-additional-files',

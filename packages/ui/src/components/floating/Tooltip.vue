@@ -42,6 +42,7 @@ const SIDES = {
 
 const props = withDefaults(
 	defineProps<{
+		delay?: number
 		disabled?: boolean
 		animated?: boolean
 		showArrow?: boolean
@@ -53,7 +54,13 @@ const props = withDefaults(
 		content?: TooltipContent | null
 		panelClass?: string
 	}>(),
-	{ disabled: false, animated: true, showArrow: true, theme: 'tooltip', placement: 'top' },
+	{
+		disabled: false,
+		animated: true,
+		showArrow: true,
+		theme: 'tooltip',
+		placement: 'top',
+	},
 )
 
 const slots = useSlots()
@@ -121,6 +128,7 @@ watch(
 	[
 		trigger,
 		() => props.disabled,
+		() => props.delay,
 		() => props.open,
 		() => props.placement,
 		() => props.theme,
@@ -167,6 +175,7 @@ function syncSource() {
 		return
 	}
 	bindTooltipSource(el, {
+		delay: props.delay,
 		placement: props.placement,
 		theme: props.theme,
 		getText: () => props.text ?? null,
