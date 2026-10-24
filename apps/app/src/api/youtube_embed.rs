@@ -1,16 +1,13 @@
-//! Loopback HTTP server that hosts YouTube embeds for the app webview.
-//!
-//! The webview loads the app from a custom scheme (e.g. `tauri://localhost`), so cross-origin
-//! frames get no `Referer` header, which YouTube rejects with "Error 153: Video player
-//! configuration error". Wrapping each embed in a page served over `http://127.0.0.1` gives
-//! the player a valid referrer.
+//! Loopback HTTP server for YouTube embeds. The webview's `tauri://` origin sends no `Referer`,
+//! which YouTube rejects with "Error 153"; serving each embed from a page on `http://127.0.0.1`
+//! gives the player a valid referrer.
 
 use std::net::{Ipv4Addr, SocketAddr};
 use std::time::Duration;
 
 use hyper::body::Incoming;
 use hyper::{Method, Request, Response, StatusCode};
-use hyper_util::rt::{TokioIo, TokioTimer};
+use hyper_util::rt::TokioIo;
 use tokio::net::TcpListener;
 use tokio::sync::OnceCell;
 
@@ -31,30 +28,16 @@ async fn start() -> std::io::Result<String> {
 
     tokio::spawn(async move {
         loop {
-            let socket = match listener.accept().await {
-                Ok((socket, _)) => socket,
-                Err(e) => {
-                    tracing::warn!(
-                        "Failed to accept YouTube embed request: {e}"
-                    );
-                    tokio::time::sleep(Duration::from_secs(1)).await;
-                    continue;
-                }
+            let Ok((socket, _)) = listener.accept().await else {
+                tokio::time::sleep(Duration::from_secs(1)).await;
+                continue;
             };
-
-            tokio::spawn(async move {
-                if let Err(e) = hyper::server::conn::http1::Builder::new()
-                    .header_read_timeout(Duration::from_secs(5))
-                    .timer(TokioTimer::new())
-                    .serve_connection(
-                        TokioIo::new(socket),
-                        hyper::service::service_fn(handle),
-                    )
-                    .await
-                {
-                    tracing::warn!("Failed to serve YouTube embed: {e}");
-                }
-            });
+            tokio::spawn(
+                hyper::server::conn::http1::Builder::new().serve_connection(
+                    TokioIo::new(socket),
+                    hyper::service::service_fn(handle),
+                ),
+            );
         }
     });
 
@@ -70,19 +53,14 @@ async fn handle(
         None
     };
 
-    let Some(embed_url) = embed_url else {
-        return Response::builder()
+    match embed_url {
+        Some(url) => Response::builder()
+            .header("Content-Type", "text/html;charset=utf-8")
+            .body(include_str!("youtube_embed.html").replace("{{src}}", &url)),
+        None => Response::builder()
             .status(StatusCode::NOT_FOUND)
-            .body(String::new());
-    };
-
-    Response::builder()
-        .header("Content-Type", "text/html;charset=utf-8")
-        .header(
-            "Content-Security-Policy",
-            "default-src 'none'; style-src 'unsafe-inline'; frame-src https://www.youtube.com https://www.youtube-nocookie.com",
-        )
-        .body(include_str!("youtube_embed.html").replace("{{src}}", &embed_url))
+            .body(String::new()),
+    }
 }
 
 /// Maps `[/nocookie]/embed/<video id>?start=<s>&end=<s>` to the YouTube embed URL, keeping
