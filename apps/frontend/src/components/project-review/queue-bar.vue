@@ -74,15 +74,20 @@
 							:flip="false"
 							theme="tooltip"
 							:distance="4"
+							panelClass="!p-0"
 						>
 							<span tabindex="0" class="cursor-default pb-1 pt-1.5 text-xs">
 								{{ column.label }}
 								<span class="ml-1 tabular-nums text-primary">{{ column.count }}</span>
 							</span>
 							<template #popper>
-								<div class="flex max-w-80 flex-col gap-2 py-1">
+								<div class="flex max-w-80 flex-col gap-2 p-2.5 pt-3.5">
 									<span class="font-semibold">{{ column.heading }}</span>
-									<QueueProjectList :project-ids="column.projects" :empty-message="column.empty" />
+									<QueueProjectList
+										v-model:search="queueSearches[column.label]"
+										:project-ids="column.projects"
+										:empty-message="column.empty"
+									/>
 								</div>
 							</template>
 						</FloatingMenu>
@@ -216,9 +221,9 @@ const {
 } = navigation
 
 const disabled = computed(() => busy.value || isLoading.value || !queue.hydrated)
+const queueSearches = ref<Record<string, string>>({ Complete: '', Skipped: '', Remaining: '' })
 const queueColumns = computed(() => {
 	const current = queue.currentQueue
-	const completedIds = new Set(current.completed)
 	const skippedIds = new Set(current.skipped)
 	return [
 		{
@@ -226,7 +231,7 @@ const queueColumns = computed(() => {
 			heading: 'Completed projects',
 			empty: 'No completed projects yet',
 			count: current.completed.length,
-			projects: current.projectOrder.filter((id) => completedIds.has(id)),
+			projects: [...current.completed].reverse(),
 		},
 		{
 			label: 'Skipped',
