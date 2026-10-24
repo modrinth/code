@@ -37,6 +37,7 @@ async fn start() -> std::io::Result<String> {
                     tracing::warn!(
                         "Failed to accept YouTube embed request: {e}"
                     );
+                    tokio::time::sleep(Duration::from_secs(1)).await;
                     continue;
                 }
             };
@@ -63,9 +64,11 @@ async fn start() -> std::io::Result<String> {
 async fn handle(
     req: Request<Incoming>,
 ) -> std::result::Result<Response<String>, hyper::http::Error> {
-    let embed_url = (req.method() == Method::GET)
-        .then(|| embed_url(req.uri().path(), req.uri().query()))
-        .flatten();
+    let embed_url = if req.method() == Method::GET {
+        embed_url(req.uri().path(), req.uri().query())
+    } else {
+        None
+    };
 
     let Some(embed_url) = embed_url else {
         return Response::builder()
@@ -75,17 +78,20 @@ async fn handle(
 
     Response::builder()
         .header("Content-Type", "text/html;charset=utf-8")
-        .header("Referrer-Policy", "strict-origin-when-cross-origin")
         .header(
             "Content-Security-Policy",
-            "default-src 'none'; style-src 'unsafe-inline'; frame-src https://www.youtube.com",
+            "default-src 'none'; style-src 'unsafe-inline'; frame-src https://www.youtube.com https://www.youtube-nocookie.com",
         )
         .body(include_str!("youtube_embed.html").replace("{{src}}", &embed_url))
 }
 
-/// Maps `/embed/<video id>?start=<s>&end=<s>` to the YouTube embed URL, keeping only the
-/// parameters the markdown sanitizer allows.
+/// Maps `[/nocookie]/embed/<video id>?start=<s>&end=<s>` to the YouTube embed URL, keeping
+/// only the parameters the markdown sanitizer allows.
 fn embed_url(path: &str, query: Option<&str>) -> Option<String> {
+    let (host, path) = match path.strip_prefix("/nocookie") {
+        Some(path) => ("www.youtube-nocookie.com", path),
+        None => ("www.youtube.com", path),
+    };
     let id = path.strip_prefix("/embed/")?;
     if id.len() != 11
         || !id
@@ -104,7 +110,7 @@ fn embed_url(path: &str, query: Option<&str>) -> Option<String> {
         .map(|(key, value)| format!("{key}={value}"))
         .collect::<Vec<_>>();
 
-    let mut url = format!("https://www.youtube.com/embed/{id}");
+    let mut url = format!("https://{host}/embed/{id}");
     if !params.is_empty() {
         url.push('?');
         url.push_str(&params.join("&amp;"));
