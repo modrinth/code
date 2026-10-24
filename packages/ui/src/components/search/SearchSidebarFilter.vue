@@ -187,6 +187,9 @@
 									</div>
 								</template>
 							</template>
+							<p v-if="visibleOptions.length === 0" class="offline text-center text-sm">
+								{{ formatMessage(messages.noResults) }}
+							</p>
 							<button
 								v-if="filterType.display === 'expandable'"
 								class="flex bg-transparent text-secondary border-none cursor-pointer !w-full items-center gap-2 truncate rounded-xl px-2 py-1 text-sm font-semibold transition-all hover:text-contrast focus-visible:text-contrast active:scale-[0.98]"
@@ -505,6 +508,10 @@ const messages = defineMessages({
 	clearSearchAriaLabel: {
 		id: 'search.filter.option.search.clear.aria_label',
 		defaultMessage: 'Clear search',
+	},
+	noResults: {
+		id: 'search.filter.option.search.no_results',
+		defaultMessage: 'No results found',
 	},
 	showFewer: {
 		id: 'search.filter.option.show_fewer',
