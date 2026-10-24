@@ -425,8 +425,33 @@ async fn project_redirect_accepts_literal_and_encoded_plus() {
 
 #[actix_rt::test]
 async fn project_redirect_cache_preserves_case_sensitive_ids() {
+    use labrinth::env::ENV;
+    use labrinth::util::actix::AppendsMultipart;
+
     with_test_environment_all(None, |env| async move {
-        let project_id = &env.dummy.project_beta.project_id;
+        let project_id = "CaseTest".to_string();
+        let project_id = &project_id;
+        let creation_data = get_public_project_creation_data(
+            "case-sensitive-project",
+            None,
+            None,
+        );
+        let response = env
+            .api
+            .call(
+                test::TestRequest::post()
+                    .uri(&format!("/v3/project/{project_id}"))
+                    .append_header((
+                        "Modrinth-Admin",
+                        ENV.LABRINTH_ADMIN_KEY.clone(),
+                    ))
+                    .append_pat(USER_USER_PAT)
+                    .set_multipart(creation_data.segment_data)
+                    .to_request(),
+            )
+            .await;
+        assert_status!(&response, StatusCode::OK);
+
         let target_id = &env.dummy.project_alpha.project_id;
         let alias = project_id.to_lowercase();
         assert_ne!(
@@ -2560,8 +2585,8 @@ async fn assert_no_technical_review_auto_approval(
 
 #[actix_rt::test]
 async fn test_safe_technical_review_exit_auto_approves_resolved_issues() {
-	use labrinth::database::models::DBUserId;
-	use labrinth::database::models::notification_item::DBNotification;
+    use labrinth::database::models::DBUserId;
+    use labrinth::database::models::notification_item::DBNotification;
     use labrinth::routes::internal::delphi::tech_review_queue;
 
     for (requested_status, old_status) in [
@@ -2648,12 +2673,12 @@ async fn test_safe_technical_review_exit_auto_approves_resolved_issues() {
                 assert_status!(&response, StatusCode::OK);
                 let notifications_before: Vec<serde_json::Value> =
                     test::read_body_json(response).await;
-				let stored_notifications_before = DBNotification::get_all_user(
-					DBUserId(USER_USER_ID_PARSED),
-					&**test_env.db.ro_pool,
-				)
-				.await
-				.unwrap();
+                let stored_notifications_before = DBNotification::get_all_user(
+                    DBUserId(USER_USER_ID_PARSED),
+                    &**test_env.db.ro_pool,
+                )
+                .await
+                .unwrap();
 
                 let request = if old_status == ProjectStatus::Processing {
                     test::TestRequest::post()
@@ -2743,7 +2768,7 @@ async fn test_safe_technical_review_exit_auto_approves_resolved_issues() {
                             .any(|before| before["id"] == notification["id"])
                     })
                     .collect::<Vec<_>>();
-				assert_eq!(new_notifications.len(), 1);
+                assert_eq!(new_notifications.len(), 1);
                 assert!(new_notifications.iter().any(
 					|notification| notification["body"]
 						== json!({
@@ -2751,28 +2776,28 @@ async fn test_safe_technical_review_exit_auto_approves_resolved_issues() {
 							"old_status": old_status, "new_status": requested_status,
 						})
 				));
-				let stored_notifications_after = DBNotification::get_all_user(
-					DBUserId(USER_USER_ID_PARSED),
-					&**test_env.db.ro_pool,
-				)
-				.await
-				.unwrap();
-				let new_stored_notifications = stored_notifications_after
-					.iter()
-					.filter(|notification| {
-						!stored_notifications_before
-							.iter()
-							.any(|before| before.id == notification.id)
-					})
-					.collect::<Vec<_>>();
-				assert_eq!(new_stored_notifications.len(), 2);
-				assert!(new_stored_notifications.iter().any(|notification| {
-					serde_json::to_value(&notification.body).unwrap()
-						== json!({
-							"type": "project_status_approved",
-							"project_id": project.project_id,
-						})
-				}));
+                let stored_notifications_after = DBNotification::get_all_user(
+                    DBUserId(USER_USER_ID_PARSED),
+                    &**test_env.db.ro_pool,
+                )
+                .await
+                .unwrap();
+                let new_stored_notifications = stored_notifications_after
+                    .iter()
+                    .filter(|notification| {
+                        !stored_notifications_before
+                            .iter()
+                            .any(|before| before.id == notification.id)
+                    })
+                    .collect::<Vec<_>>();
+                assert_eq!(new_stored_notifications.len(), 2);
+                assert!(new_stored_notifications.iter().any(|notification| {
+                    serde_json::to_value(&notification.body).unwrap()
+                        == json!({
+                            "type": "project_status_approved",
+                            "project_id": project.project_id,
+                        })
+                }));
 
                 if old_status != ProjectStatus::Processing {
                     return;
@@ -2812,16 +2837,17 @@ async fn test_safe_technical_review_exit_auto_approves_resolved_issues() {
                 let notifications_repeated: Vec<serde_json::Value> =
                     test::read_body_json(response).await;
                 assert_eq!(notifications_repeated, notifications_after);
-				let stored_notifications_repeated = DBNotification::get_all_user(
-					DBUserId(USER_USER_ID_PARSED),
-					&**test_env.db.ro_pool,
-				)
-				.await
-				.unwrap();
-				assert_eq!(
-					stored_notifications_repeated.len(),
-					stored_notifications_after.len(),
-				);
+                let stored_notifications_repeated =
+                    DBNotification::get_all_user(
+                        DBUserId(USER_USER_ID_PARSED),
+                        &**test_env.db.ro_pool,
+                    )
+                    .await
+                    .unwrap();
+                assert_eq!(
+                    stored_notifications_repeated.len(),
+                    stored_notifications_after.len(),
+                );
             },
         )
         .await;
