@@ -255,7 +255,8 @@ export const issueTargets = {
 		(ctx) => ({
 			type: 'remove_project_disclosures',
 			value: {
-				disclosure_types: typeof disclosureTypes === 'function' ? disclosureTypes(ctx) : disclosureTypes,
+				disclosure_types:
+					typeof disclosureTypes === 'function' ? disclosureTypes(ctx) : disclosureTypes,
 			},
 		}),
 	modifyDisclosure:
