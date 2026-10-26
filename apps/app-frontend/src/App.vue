@@ -34,6 +34,7 @@ import {
 	LoadingBar,
 	NotificationPanel,
 	PopupNotificationPanel,
+	provideFileDownload,
 	provideLoadingState,
 	provideModalBehavior,
 	provideModrinthClient,
@@ -64,6 +65,7 @@ import { RouterView, useRoute, useRouter } from 'vue-router'
 import { useRouteLoading } from '@/app/runtime/use-route-loading'
 import AppSidebar from '@/app/shell/sidebar/index.vue'
 import AppTitleBar from '@/app/shell/title-bar/index.vue'
+import { trackExternalFileDownload } from '@/components/ui/download-manager/external-file-downloads'
 import ErrorModal from '@/components/ui/ErrorModal.vue'
 import HostingUpdateRequired from '@/components/ui/HostingUpdateRequired.vue'
 import AddServerToInstanceModal from '@/components/ui/install_flow/AddServerToInstanceModal.vue'
@@ -157,6 +159,7 @@ import {
 	instanceListQueryOptions,
 	screenshotKeys,
 } from '@/pages/instance/query-options'
+import { createFileDownload } from '@/platform/adapters/file-download'
 import { createAppClient } from '@/platform/modrinth-client'
 import {
 	appUpdateState,
@@ -283,6 +286,7 @@ useAppEvent('ads_consent_required', handleAdsConsentRequired, appEvents)
 
 const tauriApiClient = createAppClient()
 provideModrinthClient(tauriApiClient)
+provideFileDownload(createFileDownload(tauriApiClient, trackExternalFileDownload))
 const { data: authenticatedModrinthUser } = useQuery({
 	queryKey: computed(() => ['authenticated-user', 'campaigns', credentials.value?.user?.id]),
 	queryFn: () => tauriApiClient.labrinth.users_v3.getAuthenticated(),
