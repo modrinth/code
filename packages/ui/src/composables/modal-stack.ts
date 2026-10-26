@@ -1,4 +1,7 @@
+import { useScrollLock } from '@vueuse/core'
 import { computed, type Ref, ref } from 'vue'
+
+import { injectAppRoot } from '#ui/providers/app-root.ts'
 
 import { dismissFloatingMenus } from '../providers/floating-menu'
 import { dismissTooltip } from '../providers/tooltip'
@@ -43,6 +46,18 @@ export function useModalStack(getDocument: () => Document = () => document) {
 		return state
 	}
 
+	let isLocked: ReturnType<typeof useScrollLock> | undefined = undefined
+
+	/** The app root lives in the main document, so modals in other documents (pop-outs) leave it scrollable. */
+	function locksAppRoot(state: ModalStackState) {
+		return state === documentStacks.get(document)
+	}
+
+	if (isClient) {
+		const ctx = injectAppRoot(null)!
+		if (ctx) isLocked = useScrollLock(ctx.root)
+	}
+
 	function push() {
 		if (!isClient || activeState) return
 		const state = getState()
@@ -51,6 +66,7 @@ export function useModalStack(getDocument: () => Document = () => document) {
 		state.stack.push(id)
 		state.stackSizeRef.value = state.stack.length
 		activeState = state
+		if (isLocked && locksAppRoot(state)) isLocked.value = true
 	}
 
 	function pop() {
@@ -61,6 +77,7 @@ export function useModalStack(getDocument: () => Document = () => document) {
 			stack.splice(idx, 1)
 			stackSizeRef.value = stack.length
 		}
+		if (stackSizeRef.value <= 0 && isLocked && locksAppRoot(activeState)) isLocked.value = false
 		activeState = undefined
 	}
 

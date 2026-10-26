@@ -11,6 +11,7 @@ export const DEFAULT_FEATURE_FLAGS = {
 	pride_fundraiser: true,
 	i18n_debug: false,
 	localhost_sign_in: false,
+	files_tab_rework: false,
 }
 
 export type FeatureFlag = keyof typeof DEFAULT_FEATURE_FLAGS
