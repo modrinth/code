@@ -8,9 +8,9 @@ import {
 } from '@modrinth/ui'
 import { computed } from 'vue'
 
-import { useLibrary } from '@/components/ui/library/use-library'
+import { isUninstalledSharedInstance, useLibrary } from '@/components/ui/library/use-library'
 
-const { filters, instances } = useLibrary()
+const { filters, libraryInstances } = useLibrary()
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
@@ -20,10 +20,28 @@ const messages = defineMessages({
 	custom: { id: 'app.library.filter.instance-type.custom', defaultMessage: 'Custom' },
 	gameVersion: { id: 'app.library.filter.game-version', defaultMessage: 'Game version' },
 	loader: { id: 'app.library.filter.loader', defaultMessage: 'Loader' },
+	installState: { id: 'app.library.filter.install-state', defaultMessage: 'Install status' },
+	installed: { id: 'app.library.filter.install-state.installed', defaultMessage: 'Installed' },
+	notInstalled: {
+		id: 'app.library.filter.install-state.not-installed',
+		defaultMessage: 'Not installed',
+	},
+	owner: { id: 'app.library.filter.owner', defaultMessage: 'Owner' },
+	ownerMe: { id: 'app.library.filter.owner.me', defaultMessage: 'You' },
+	ownerOthers: { id: 'app.library.filter.owner.others', defaultMessage: 'Others' },
 	filterBy: { id: 'app.library.filter.label', defaultMessage: 'Filter by' },
 	addFilter: { id: 'app.library.filter.add', defaultMessage: 'Add filter' },
 	clearFilters: { id: 'app.library.filter.clear', defaultMessage: 'Clear filters' },
 })
+
+const hasUninstalledInstances = computed(() =>
+	libraryInstances.value.some(isUninstalledSharedInstance),
+)
+const hasSharedInstances = computed(() =>
+	libraryInstances.value.some(
+		(instance) => isUninstalledSharedInstance(instance) || !!instance.shared_instance,
+	),
+)
 
 const filterCategories = computed<DropdownFilterBarCategory[]>(() => [
 	{
@@ -38,21 +56,45 @@ const filterCategories = computed<DropdownFilterBarCategory[]>(() => [
 	{
 		key: 'gameVersion',
 		label: formatMessage(messages.gameVersion),
-		searchable: new Set(instances.value.map((instance) => instance.game_version)).size > 5,
-		options: [...new Set(instances.value.map((instance) => instance.game_version))]
+		searchable: new Set(libraryInstances.value.map((instance) => instance.game_version)).size > 5,
+		options: [...new Set(libraryInstances.value.map((instance) => instance.game_version))]
 			.sort((a, b) => b.localeCompare(a, undefined, { numeric: true }))
 			.map((version) => ({ value: version, label: version })),
 	},
 	{
 		key: 'loader',
 		label: formatMessage(messages.loader),
-		options: [...new Set(instances.value.map((instance) => instance.loader))]
+		options: [...new Set(libraryInstances.value.map((instance) => instance.loader))]
 			.map((loader) => ({
 				value: loader,
 				label: formatLoader(formatMessage, loader),
 			}))
 			.sort((a, b) => a.label.localeCompare(b.label)),
 	},
+	...(hasUninstalledInstances.value || filters.value.installState.length > 0
+		? [
+				{
+					key: 'installState',
+					label: formatMessage(messages.installState),
+					options: [
+						{ value: 'installed', label: formatMessage(messages.installed) },
+						{ value: 'not_installed', label: formatMessage(messages.notInstalled) },
+					],
+				},
+			]
+		: []),
+	...(hasSharedInstances.value || filters.value.owner.length > 0
+		? [
+				{
+					key: 'owner',
+					label: formatMessage(messages.owner),
+					options: [
+						{ value: 'me', label: formatMessage(messages.ownerMe) },
+						{ value: 'others', label: formatMessage(messages.ownerOthers) },
+					],
+				},
+			]
+		: []),
 ])
 </script>
 

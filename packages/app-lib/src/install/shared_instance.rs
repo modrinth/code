@@ -19,7 +19,7 @@ use crate::api::pack::install_from::CreatePackLocation;
 use crate::state::instances::adapters::sqlite::content_rows;
 use crate::state::{
     CachedEntry, ContentSetSyncStatus, ContentSourceKind, InstanceLink,
-    ProjectType, SharedInstanceAttachmentInput, SharedInstanceRole, State,
+    ProjectType, SharedInstanceAttachmentInput, State,
 };
 use crate::util::fetch::{DownloadReason, REQWEST_CLIENT};
 use anyhow::{Context, bail};
@@ -49,7 +49,8 @@ pub(super) async fn attach_pending_shared_instance(
         instance_id,
         SharedInstanceAttachmentInput {
             id: data.shared_instance_id.clone(),
-            role: SharedInstanceRole::Member,
+            role: data.role,
+            restored_from_remote: data.restored_from_remote,
             manager_id: data.manager_id.clone(),
             server_manager_name: data.server_manager_name.clone(),
             server_manager_icon_url: data.server_manager_icon_url.clone(),
@@ -72,7 +73,8 @@ pub(super) async fn finalize_shared_instance_attachment(
         instance_id,
         SharedInstanceAttachmentInput {
             id: data.shared_instance_id.clone(),
-            role: SharedInstanceRole::Member,
+            role: data.role,
+            restored_from_remote: data.restored_from_remote,
             manager_id: data.manager_id.clone(),
             server_manager_name: data.server_manager_name.clone(),
             server_manager_icon_url: data.server_manager_icon_url.clone(),
@@ -645,6 +647,7 @@ async fn apply_shared_instance_content_inner(
             location,
             instance_id.to_string(),
             DownloadReason::Modpack,
+            true,
             &state.pool,
         )
         .await?;

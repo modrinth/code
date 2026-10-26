@@ -127,6 +127,11 @@ pub enum ErrorKind {
     #[error("you are not allowed to share {0}")]
     SharedInstanceFileNotAllowed(String),
 
+    #[error(
+        "a newer version of this shared instance was pushed from another Modrinth App installation"
+    )]
+    SharedInstanceOwnerBehind,
+
     #[error("join handle error: {0}")]
     JoinError(#[from] tokio::task::JoinError),
 
@@ -299,6 +304,7 @@ impl ErrorKind {
             Self::SharedInstanceFileNotAllowed(_) => {
                 "shared_instance_file_not_allowed"
             }
+            Self::SharedInstanceOwnerBehind => "shared_instance_owner_behind",
             Self::HashError(_, _) => "hash_error",
             Self::LoginCanceled => "login_canceled",
             Self::NotLoggedIn => "not_logged_in",

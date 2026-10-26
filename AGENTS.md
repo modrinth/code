@@ -11,14 +11,14 @@ This is the Modrinth monorepo — it contains all Modrinth projects, both fronte
 
 ### Apps (`apps/`)
 
-| App               | Description                    |
-| ----------------- | ------------------------------ |
-| `frontend`        | Main Modrinth website (Nuxt 3) |
-| `app-frontend`    | Desktop/app frontend (Vue 3)   |
-| `app`             | Desktop/app shell (Tauri)      |
-| `app-playground`  | Testing playground for app     |
-| `labrinth`        | Backend API service            |
-| `docs`            | Documentation site (Astro)     |
+| App              | Description                    |
+| ---------------- | ------------------------------ |
+| `frontend`       | Main Modrinth website (Nuxt 3) |
+| `app-frontend`   | Desktop/app frontend (Vue 3)   |
+| `app`            | Desktop/app shell (Tauri)      |
+| `app-playground` | Testing playground for app     |
+| `labrinth`       | Backend API service            |
+| `docs`           | Documentation site (Astro)     |
 
 ### Packages (`packages/`)
 
@@ -64,6 +64,29 @@ Each project may have its own file with detailed instructions:
 
 - [`apps/labrinth/AGENTS.md`](apps/labrinth/AGENTS.md) — Backend API
 - [`apps/frontend/AGENTS.md`](apps/frontend/AGENTS.md) - Frontend Website
+- [`apps/app-frontend/AGENTS.md`](apps/app-frontend/AGENTS.md) — Desktop app frontend
+- [`packages/app-lib/AGENTS.md`](packages/app-lib/AGENTS.md) — Desktop app library (Rust, `theseus`)
+- [`packages/ui/AGENTS.md`](packages/ui/AGENTS.md) — Shared UI components
+- [`packages/api-client/AGENTS.md`](packages/api-client/AGENTS.md) — API client
+
+## Skills
+
+Task-specific instructions live in `.agents/skills/<name>/SKILL.md`. When a task matches one, read its `SKILL.md` before starting:
+
+- `figma-mcp` — implementing a draft Figma design or a draft figma.com link
+- `tanstack-query` — `useQuery`, `useMutation`, cache invalidation, replacing `useAsyncData`
+- `cross-platform-pages` — pages shared between the website and the app
+- `api-module` — adding an endpoint module to `packages/api-client`
+- `i18n-pass` — localizing hard-coded strings
+- `review-changelog` — reviewing a `packages/blog/changelog.ts` entry
+
+## Working on Tasks
+
+- If the message is a question ("why does X happen?", "is this a backend or frontend issue?", "can you check…"), investigate and answer only. Do not edit files until asked to fix or implement.
+- Stay within the scope of the request. Mention related problems you notice instead of fixing them.
+- Fix the cause, not the symptom. Avoid special-case constants or hardcoded lists to make one case work; find where the data or logic should come from.
+- When a fix can't be verified without running the app, say so. If the user reports it still doesn't work, add debug logging and give the exact command to run it before attempting another fix.
+- Trust the user's reports about what they observed in the running app.
 
 ## Code Guidelines
 
@@ -80,6 +103,8 @@ Each project may have its own file with detailed instructions:
 - NEVER use `| head -n X` or `| tail -n X` to truncate output
 - IMPORTANT: Run commands directly without pipes when possible
 - IMPORTANT: If you need to limit output, use command-specific flags (e.g. `git log -n 10` instead of `git log | head -10`)
+- Narrow output at the source instead: `grep -m 20`, `sed -n '40,120p' file`, `git diff --stat`, `gh pr diff --name-only`
+- For long build or lint output (`cargo clippy`, `pnpm prepr:*`), redirect it to a file in `$TMPDIR` and search that file for errors
 - ALWAYS read the full output — never pipe through filters
 
 ### General
@@ -102,4 +127,5 @@ Turborepo configuration, task behavior, and CLI commands can vary between instal
 Read `docs/README.md` inside that installed package first, then read the relevant pages from its `docs/` directory before changing Turborepo configuration or commands. Heed deprecation notices. These bundled docs match the installed package version and are available without network access.
 
 This block is written and re-added by `turbo` before repository-scoped commands when an AI agent is detected. In the Turborepo source repository, its template is defined in `crates/turborepo-cli/src/cli/agent_guidance.rs`. Removing the managed block while updates are enabled means a later qualifying invocation will add it again. Set `"agentGuidance": false` in the root `turbo.json` or `turbo.jsonc` to opt out; this does not remove an existing block. Keep the block committed with your work to avoid an uncommitted change on the next agent invocation.
+
 <!-- END:turborepo-agent-rules -->

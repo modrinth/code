@@ -26,11 +26,12 @@ import { computed, inject, nextTick, onMounted, onUnmounted, ref, watch } from '
 
 import GroupActionButtons from '@/components/ui/library/instance-group/group-action-buttons.vue'
 import InstanceCard from '@/components/ui/library/instance-group/instance-card.vue'
+import UninstalledSharedInstanceCard from '@/components/ui/library/instance-group/uninstalled-shared-instance-card.vue'
 import type {
 	InstanceCard as InstanceCardExposed,
 	InstanceGroup as InstanceGroupType,
 } from '@/components/ui/library/use-library'
-import { useLibrary } from '@/components/ui/library/use-library'
+import { isUninstalledSharedInstance, useLibrary } from '@/components/ui/library/use-library'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { FAVORITES_GROUP_ID, MAX_INSTANCE_GROUP_NAME_LENGTH } from '@/helpers/instance-groups'
 
@@ -634,7 +635,17 @@ watch([gridHeight, () => props.instanceGroup.instances], () => nextTick(syncScro
 							@focusout="handleCardBlur($event, instance.id)"
 							@keydown="handleCardTab($event, index)"
 						>
+							<UninstalledSharedInstanceCard
+								v-if="isUninstalledSharedInstance(instance)"
+								:instance="instance"
+								:instance-group-id="instanceGroup.id"
+								:is-selection-anchor="selectionAnchorInstanceId === instance.id"
+								@toggle-selection="
+									(shiftKey: boolean) => emit('toggle-selection', instance.id, shiftKey)
+								"
+							/>
 							<InstanceCard
+								v-else
 								:ref="(component: unknown) => setInstanceComponent(instance.id, component)"
 								:instance="instance"
 								:instance-group-id="instanceGroup.id"

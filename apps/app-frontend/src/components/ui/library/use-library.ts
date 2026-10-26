@@ -1,9 +1,11 @@
 import type { Labrinth } from '@modrinth/api-client'
 import {
 	ClipboardCopyIcon,
+	DownloadIcon,
 	EditIcon,
 	EyeIcon,
 	FolderOpenIcon,
+	LogOutIcon,
 	MinusIcon,
 	PaletteIcon,
 	PlayIcon,
@@ -11,6 +13,7 @@ import {
 	StarIcon,
 	StopCircleIcon,
 	TrashIcon,
+	UnlinkIcon,
 	UploadIcon,
 } from '@modrinth/assets'
 import {
@@ -21,6 +24,7 @@ import {
 	injectNotificationManager,
 	useVIntl,
 } from '@modrinth/ui'
+import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { open as openDialog } from '@tauri-apps/plugin-dialog'
 import { useEventListener, useStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
@@ -37,10 +41,21 @@ import {
 } from 'vue'
 
 import { trackEvent } from '@/helpers/analytics'
-import { get_project_v3_many } from '@/helpers/cache.js'
+import { get_project_v3_many, get_user, get_user_many } from '@/helpers/cache.js'
 import { toError } from '@/helpers/errors'
-import { install_duplicate_instance } from '@/helpers/install'
-import { edit, edit_icon, remove } from '@/helpers/instance'
+import {
+	install_duplicate_instance,
+	install_get_shared_instance_preview,
+	install_shared_instance,
+	type SharedInstanceInstallPreview,
+} from '@/helpers/install'
+import {
+	edit,
+	edit_icon,
+	leave_remote_shared_instance,
+	remove,
+	unpublish_remote_shared_instance,
+} from '@/helpers/instance'
 import {
 	create_group as createInstanceGroup,
 	delete_group as deleteInstanceGroup,
@@ -52,8 +67,14 @@ import {
 	set_group_memberships as setInstanceGroupMemberships,
 	set_group_order as setInstanceGroupOrder,
 } from '@/helpers/instance-groups'
+import { useSharedInstanceErrors } from '@/helpers/shared-instance-errors'
 import type { GameInstance, InstanceIconConfig } from '@/helpers/types'
 
+import {
+	sharedInstanceLibraryKeys,
+	type UninstalledSharedInstance,
+	useUninstalledSharedInstances,
+} from './use-uninstalled-shared-instances'
 import { librarySearch } from './view-state'
 
 export const librarySortOptions = [
@@ -88,12 +109,27 @@ const libraryLoaderPriority: Record<string, number> = {
 
 export type LibrarySort = (typeof librarySortOptions)[number]
 export type LibraryGroupBy = (typeof libraryGroupOptions)[number]['value']
-export type LibraryFilters = Record<'instanceType' | 'gameVersion' | 'loader', string[]>
+export type LibraryFilters = Record<
+	'instanceType' | 'gameVersion' | 'loader' | 'installState' | 'owner',
+	string[]
+>
+
+export type LibraryInstance = GameInstance | UninstalledSharedInstance
+
+export type SharedInstanceOwner = {
+	name: string
+	avatarUrl: string | null
+}
+
+export const isUninstalledSharedInstance = (
+	instance: LibraryInstance,
+): instance is UninstalledSharedInstance =>
+	'type' in instance && instance.type === 'uninstalled_shared_instance'
 
 export type InstanceGroup = {
 	id: string
 	key: string
-	instances: GameInstance[]
+	instances: LibraryInstance[]
 }
 
 export type LibraryInstanceSelection = {
@@ -131,6 +167,44 @@ type ConfirmDeleteModal = {
 type IconEditorModal = {
 	show: () => void
 }
+
+type SharedInstanceInstallModal = {
+	show: (
+		preview: SharedInstanceInstallPreview,
+		install: () => Promise<void>,
+		creator?: { id: string | null; username: string; avatarUrl: string | null },
+		event?: MouseEvent,
+		options?: { isOwner?: boolean },
+	) => void
+}
+
+type RemoveSharedInstancesModal = {
+	show: (
+		sharedInstances: UninstalledSharedInstance[],
+		confirm: () => Promise<void>,
+		event?: MouseEvent,
+	) => void
+}
+
+export type SharedInstanceRemovalMode = 'unpublish' | 'leave' | 'unpublish_and_leave'
+
+export const getSharedInstanceRemovalMode = (
+	sharedInstances: UninstalledSharedInstance[],
+): SharedInstanceRemovalMode => {
+	const ownsAny = sharedInstances.some((instance) => instance.role === 'owner')
+	const ownsAll = sharedInstances.every((instance) => instance.role === 'owner')
+	if (ownsAll) return 'unpublish'
+	return ownsAny ? 'unpublish_and_leave' : 'leave'
+}
+
+export const sharedInstanceRemovalButtonMessages = defineMessages({
+	unpublish: { id: 'app.library.instance.action.unpublish', defaultMessage: 'Unpublish' },
+	leave: { id: 'app.library.instance.action.leave', defaultMessage: 'Leave' },
+	unpublish_and_leave: {
+		id: 'app.library.instance.action.unpublish-and-leave',
+		defaultMessage: 'Unpublish and leave',
+	},
+})
 
 const instanceActionMessages = defineMessages({
 	play: { id: 'app.library.instance.action.play', defaultMessage: 'Play' },
@@ -183,11 +257,15 @@ const instanceActionMessages = defineMessages({
 		id: 'app.library.instance.action.remove-from-group',
 		defaultMessage: 'Remove from group',
 	},
+	install: { id: 'app.library.instance.action.install', defaultMessage: 'Install' },
 })
 
 function createLibraryState(instances: Ref<GameInstance[]>) {
 	const { handleError } = injectNotificationManager()
 	const { formatMessage } = useVIntl()
+	const { notifySharedInstanceError } = useSharedInstanceErrors()
+	const queryClient = useQueryClient()
+	const uninstalledSharedInstances = useUninstalledSharedInstances(instances)
 
 	const search = librarySearch
 	const filters = useStorage<LibraryFilters>(
@@ -196,6 +274,8 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 			instanceType: [],
 			gameVersion: [],
 			loader: [],
+			installState: [],
+			owner: [],
 		},
 		localStorage,
 		{ mergeDefaults: true },
@@ -233,6 +313,10 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 	)
 	const confirmDeleteModal = ref<ConfirmDeleteModal | null>(null)
 	const iconEditorModal = ref<IconEditorModal | null>(null)
+	const sharedInstanceInstallModal = ref<SharedInstanceInstallModal | null>(null)
+	const removeSharedInstancesModal = ref<RemoveSharedInstancesModal | null>(null)
+	const removingSharedInstances = ref(false)
+	const loadingSharedInstanceIds = ref(new Set<string>())
 	const currentIconEditorInstanceId = ref<string | null>(null)
 	const currentIconEditorInstance = computed(
 		() =>
@@ -381,13 +465,35 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		}
 	})
 
-	const getInstanceType = (instance: GameInstance) => {
+	const getInstanceType = (instance: LibraryInstance) => {
+		if (isUninstalledSharedInstance(instance)) return 'modpack'
 		if (!instance.link) return 'custom'
 		if (serverProjectIds.value.has(instance.link.project_id ?? '')) return 'server'
 		return 'modpack'
 	}
-	const getEffectiveInstanceGroupIds = (instance: GameInstance) =>
-		pendingInstanceGroupIds.value.get(instance.id) ?? instance.group_ids
+	const getInstanceInstallState = (instance: LibraryInstance) =>
+		isUninstalledSharedInstance(instance) ? 'not_installed' : 'installed'
+	const isOwnedByOthers = (instance: LibraryInstance) =>
+		isUninstalledSharedInstance(instance)
+			? instance.role !== 'owner'
+			: instance.shared_instance?.role === 'member'
+	const getSharedInstanceManagerId = (instance: LibraryInstance) => {
+		if (isUninstalledSharedInstance(instance)) return instance.manager_id
+		if (instance.shared_instance?.server_manager_name) return null
+		return instance.shared_instance?.manager_id ?? null
+	}
+	const getEffectiveInstanceGroupIds = (instance: LibraryInstance) =>
+		isUninstalledSharedInstance(instance)
+			? []
+			: (pendingInstanceGroupIds.value.get(instance.id) ?? instance.group_ids)
+	const getInstalledTimestamp = (
+		instance: LibraryInstance,
+		key: 'last_played' | 'created' | 'modified',
+	) => dayjs(isUninstalledSharedInstance(instance) ? 0 : (instance[key] ?? 0))
+	const getTimePlayed = (instance: LibraryInstance) =>
+		isUninstalledSharedInstance(instance)
+			? 0
+			: instance.recent_time_played + instance.submitted_time_played
 	const haveSameGroupIds = (first: string[], second: string[]) =>
 		first.length === second.length && first.every((groupId) => second.includes(groupId))
 
@@ -411,8 +517,58 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		{ flush: 'sync' },
 	)
 
+	const libraryInstances = computed<LibraryInstance[]>(() => [
+		...instances.value,
+		...uninstalledSharedInstances.value,
+	])
+
+	const sharedInstanceOwnerIds = computed(() =>
+		[
+			...new Set(
+				libraryInstances.value.flatMap((instance) => {
+					const managerId = isOwnedByOthers(instance) ? getSharedInstanceManagerId(instance) : null
+					return managerId ? [managerId] : []
+				}),
+			),
+		].sort(),
+	)
+
+	const sharedInstanceOwnersQuery = useQuery({
+		queryKey: computed(() => ['shared-instances', 'owners', ...sharedInstanceOwnerIds.value]),
+		queryFn: async () =>
+			(await get_user_many(sharedInstanceOwnerIds.value)) as Labrinth.Users.v2.User[],
+		enabled: computed(() => sharedInstanceOwnerIds.value.length > 0),
+		placeholderData: keepPreviousData,
+		staleTime: 5 * 60_000,
+	})
+
+	const sharedInstanceOwnersById = computed(
+		() => new Map((sharedInstanceOwnersQuery.data.value ?? []).map((user) => [user.id, user])),
+	)
+
+	const getSharedInstanceOwner = (instance: LibraryInstance): SharedInstanceOwner | null => {
+		if (!isOwnedByOthers(instance)) return null
+
+		if (!isUninstalledSharedInstance(instance) && instance.shared_instance?.server_manager_name) {
+			return {
+				name: instance.shared_instance.server_manager_name,
+				avatarUrl: instance.shared_instance.server_manager_icon_url ?? null,
+			}
+		}
+
+		const managerId = getSharedInstanceManagerId(instance)
+		const owner = managerId ? sharedInstanceOwnersById.value.get(managerId) : undefined
+		return owner ? { name: owner.username, avatarUrl: owner.avatar_url ?? null } : null
+	}
+
 	const filteredInstances = computed(() =>
-		instances.value.filter((instance) => {
+		libraryInstances.value.filter((instance) => {
+			const installStateMatches =
+				filters.value.installState.length === 0 ||
+				filters.value.installState.includes(getInstanceInstallState(instance))
+			const ownerMatches =
+				filters.value.owner.length === 0 ||
+				filters.value.owner.includes(isOwnedByOthers(instance) ? 'others' : 'me')
 			const instanceTypeMatches =
 				filters.value.instanceType.length === 0 ||
 				filters.value.instanceType.includes(getInstanceType(instance))
@@ -422,7 +578,13 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 			const loaderMatches =
 				filters.value.loader.length === 0 || filters.value.loader.includes(instance.loader)
 
-			return instanceTypeMatches && gameVersionMatches && loaderMatches
+			return (
+				installStateMatches &&
+				ownerMatches &&
+				instanceTypeMatches &&
+				gameVersionMatches &&
+				loaderMatches
+			)
 		}),
 	)
 
@@ -448,26 +610,27 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 				)
 				break
 			case 'Last played':
-				visibleInstances.sort((a, b) => dayjs(b.last_played ?? 0).diff(dayjs(a.last_played ?? 0)))
-				break
-			case 'Hours played':
-				visibleInstances.sort(
-					(a, b) =>
-						b.recent_time_played +
-						b.submitted_time_played -
-						(a.recent_time_played + a.submitted_time_played),
+				visibleInstances.sort((a, b) =>
+					getInstalledTimestamp(b, 'last_played').diff(getInstalledTimestamp(a, 'last_played')),
 				)
 				break
+			case 'Hours played':
+				visibleInstances.sort((a, b) => getTimePlayed(b) - getTimePlayed(a))
+				break
 			case 'Date created':
-				visibleInstances.sort((a, b) => dayjs(b.created).diff(dayjs(a.created)))
+				visibleInstances.sort((a, b) =>
+					getInstalledTimestamp(b, 'created').diff(getInstalledTimestamp(a, 'created')),
+				)
 				break
 			case 'Date modified':
-				visibleInstances.sort((a, b) => dayjs(b.modified).diff(dayjs(a.modified)))
+				visibleInstances.sort((a, b) =>
+					getInstalledTimestamp(b, 'modified').diff(getInstalledTimestamp(a, 'modified')),
+				)
 				break
 		}
 
-		const groupedInstances = new Map<string, { name: string; instances: GameInstance[] }>()
-		const addToGroup = (id: string, name: string, instance: GameInstance) => {
+		const groupedInstances = new Map<string, { name: string; instances: LibraryInstance[] }>()
+		const addToGroup = (id: string, name: string, instance: LibraryInstance) => {
 			const group = groupedInstances.get(id) ?? { name, instances: [] }
 			group.instances.push(instance)
 			groupedInstances.set(id, group)
@@ -965,14 +1128,41 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		)
 	}
 
+	watch(libraryInstances, (currentInstances) => {
+		if (selectedLibraryInstances.value.size === 0) return
+
+		const instanceIds = new Set(currentInstances.map((instance) => instance.id))
+		const selections = [...selectedLibraryInstances.value.values()]
+		if (selections.every((selection) => instanceIds.has(selection.instanceId))) return
+
+		setSelectedLibraryInstances(
+			selections.filter((selection) => instanceIds.has(selection.instanceId)),
+		)
+	})
+
+	const uninstalledSharedInstanceIds = computed(
+		() => new Set(uninstalledSharedInstances.value.map((instance) => instance.id)),
+	)
+	const isUninstalledInstanceId = (instanceId: string) =>
+		uninstalledSharedInstanceIds.value.has(instanceId)
+	const selectingUninstalledInstances = computed(() => {
+		const firstSelection = selectedLibraryInstances.value.values().next().value
+		return firstSelection ? isUninstalledInstanceId(firstSelection.instanceId) : null
+	})
+	const canSelectLibraryInstance = (instanceId: string) =>
+		selectingUninstalledInstances.value === null ||
+		selectingUninstalledInstances.value === isUninstalledInstanceId(instanceId)
+
 	const toggleLibraryInstanceSelection = (selection: LibraryInstanceSelection) => {
 		const selectedInstances = new Map(selectedLibraryInstances.value)
 		const selectionKey = getLibraryInstanceSelectionKey(selection)
 
 		if (selectedInstances.has(selectionKey)) {
 			selectedInstances.delete(selectionKey)
-		} else {
+		} else if (canSelectLibraryInstance(selection.instanceId)) {
 			selectedInstances.set(selectionKey, selection)
+		} else {
+			return
 		}
 
 		selectedLibraryInstances.value = selectedInstances
@@ -1378,8 +1568,121 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		])
 	}
 
+	const installUninstalledSharedInstance = async (
+		instance: UninstalledSharedInstance,
+		event?: MouseEvent,
+	) => {
+		const sharedInstanceId = instance.shared_instance_id
+		const isOwner = instance.role === 'owner'
+		if (loadingSharedInstanceIds.value.has(sharedInstanceId)) return
+
+		loadingSharedInstanceIds.value = new Set([...loadingSharedInstanceIds.value, sharedInstanceId])
+		try {
+			const [preview, manager] = await Promise.all([
+				install_get_shared_instance_preview(sharedInstanceId, instance.name),
+				instance.manager_id
+					? (sharedInstanceOwnersById.value.get(instance.manager_id) ??
+						get_user(instance.manager_id, 'bypass').catch(() => null))
+					: null,
+			])
+			if (instance.icon_path) preview.iconUrl = instance.icon_path
+
+			sharedInstanceInstallModal.value?.show(
+				preview,
+				async () => {
+					await install_shared_instance(
+						sharedInstanceId,
+						instance.name,
+						instance.manager_id,
+						null,
+						null,
+						instance.icon_path ?? null,
+					)
+					await queryClient.invalidateQueries({ queryKey: ['instances'] })
+				},
+				manager
+					? { id: manager.id, username: manager.username, avatarUrl: manager.avatar_url ?? null }
+					: undefined,
+				event,
+				{ isOwner },
+			)
+		} catch (error) {
+			notifySharedInstanceError(error)
+		} finally {
+			const nextLoadingIds = new Set(loadingSharedInstanceIds.value)
+			nextLoadingIds.delete(sharedInstanceId)
+			loadingSharedInstanceIds.value = nextLoadingIds
+		}
+	}
+
+	const removeUninstalledSharedInstances = async (sharedInstances: UninstalledSharedInstance[]) => {
+		removingSharedInstances.value = true
+		const results = await Promise.allSettled(
+			sharedInstances.map((instance) =>
+				instance.role === 'owner'
+					? unpublish_remote_shared_instance(instance.shared_instance_id)
+					: leave_remote_shared_instance(instance.shared_instance_id),
+			),
+		)
+		removingSharedInstances.value = false
+		const removedInstances = sharedInstances.filter(
+			(_, index) => results[index].status === 'fulfilled',
+		)
+		for (const result of results) {
+			if (result.status === 'rejected') notifySharedInstanceError(result.reason)
+		}
+
+		const removedSharedInstanceIds = new Set(
+			removedInstances.map((instance) => instance.shared_instance_id),
+		)
+		queryClient.setQueriesData<string[]>(
+			{ queryKey: [...sharedInstanceLibraryKeys.all, 'ids'] },
+			(sharedInstanceIds) =>
+				sharedInstanceIds?.filter(
+					(sharedInstanceId) => !removedSharedInstanceIds.has(sharedInstanceId),
+				),
+		)
+	}
+
+	const requestRemoveUninstalledSharedInstances = (
+		sharedInstances: UninstalledSharedInstance[],
+	) => {
+		if (sharedInstances.length === 0) return
+		removeSharedInstancesModal.value?.show(sharedInstances, () =>
+			removeUninstalledSharedInstances(sharedInstances),
+		)
+	}
+
+	const handleUninstalledSharedInstanceContextMenu = (
+		event: MouseEvent,
+		instance: UninstalledSharedInstance,
+	) => {
+		instanceOptions.value?.open(event, [
+			{
+				id: 'install',
+				label: formatMessage(instanceActionMessages.install),
+				icon: DownloadIcon,
+				tone: 'brand',
+				action: () => void installUninstalledSharedInstance(instance),
+			},
+			{ type: 'divider' },
+			{
+				id: instance.role === 'owner' ? 'unpublish' : 'leave',
+				label: formatMessage(
+					sharedInstanceRemovalButtonMessages[getSharedInstanceRemovalMode([instance])],
+				),
+				icon: instance.role === 'owner' ? UnlinkIcon : LogOutIcon,
+				tone: 'orange',
+				hoverFilledOnly: true,
+				action: () => requestRemoveUninstalledSharedInstances([instance]),
+			},
+		])
+	}
+
 	return {
 		instances,
+		libraryInstances,
+		getSharedInstanceOwner,
 		libraryGroups,
 		libraryGroupsLoaded,
 		search,
@@ -1413,6 +1716,10 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		instanceOptions,
 		confirmDeleteModal,
 		iconEditorModal,
+		sharedInstanceInstallModal,
+		removeSharedInstancesModal,
+		removingSharedInstances,
+		loadingSharedInstanceIds,
 		currentIconEditorInstance,
 		currentDeleteInstances,
 		isSectionCollapsed,
@@ -1433,6 +1740,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		clearLibraryInstanceSelection,
 		setSelectedLibraryInstances,
 		toggleLibraryInstanceSelection,
+		canSelectLibraryInstance,
 		createGroup,
 		createDefaultGroup,
 		completePendingGroupNameEdit,
@@ -1444,6 +1752,9 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		moveGroup,
 		deleteInstance,
 		handleInstanceContextMenu,
+		handleUninstalledSharedInstanceContextMenu,
+		installUninstalledSharedInstance,
+		requestRemoveUninstalledSharedInstances,
 		handleInstanceIconSaved,
 	}
 }

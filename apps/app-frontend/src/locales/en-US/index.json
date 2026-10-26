@@ -632,6 +632,15 @@
   "app.instance.admonitions.shared-instance.changes-header": {
     "message": "Your changes haven't been shared yet"
   },
+  "app.instance.admonitions.shared-instance.owner-update-body": {
+    "message": "You pushed an update to this shared instance from another Modrinth App installation. Download the latest changes to keep managing it from here."
+  },
+  "app.instance.admonitions.shared-instance.owner-update-button": {
+    "message": "Download update"
+  },
+  "app.instance.admonitions.shared-instance.owner-update-header": {
+    "message": "Update available"
+  },
   "app.instance.admonitions.shared-instance.publish-button": {
     "message": "Push update"
   },
@@ -640,6 +649,12 @@
   },
   "app.instance.admonitions.shared-instance.removed-label": {
     "message": "Removed"
+  },
+  "app.instance.admonitions.shared-instance.restored-body": {
+    "message": "This instance was restored from the last version you pushed. Anything you hadn't pushed yet, like config changes or content on your other installation, isn't included."
+  },
+  "app.instance.admonitions.shared-instance.restored-header": {
+    "message": "Only pushed content was downloaded"
   },
   "app.instance.admonitions.shared-instance.review-admonition-header": {
     "message": "Push update"
@@ -1010,6 +1025,15 @@
   "app.library.filter.game-version": {
     "message": "Game version"
   },
+  "app.library.filter.install-state": {
+    "message": "Install status"
+  },
+  "app.library.filter.install-state.installed": {
+    "message": "Installed"
+  },
+  "app.library.filter.install-state.not-installed": {
+    "message": "Not installed"
+  },
   "app.library.filter.instance-type": {
     "message": "Instance type"
   },
@@ -1027,6 +1051,15 @@
   },
   "app.library.filter.loader": {
     "message": "Loader"
+  },
+  "app.library.filter.owner": {
+    "message": "Owner"
+  },
+  "app.library.filter.owner.me": {
+    "message": "You"
+  },
+  "app.library.filter.owner.others": {
+    "message": "Others"
   },
   "app.library.group-by.custom-group": {
     "message": "Custom group"
@@ -1154,6 +1187,12 @@
   "app.library.instance.action.duplicate": {
     "message": "Duplicate instance"
   },
+  "app.library.instance.action.install": {
+    "message": "Install"
+  },
+  "app.library.instance.action.leave": {
+    "message": "Leave"
+  },
   "app.library.instance.action.open-folder": {
     "message": "Open folder"
   },
@@ -1169,6 +1208,12 @@
   "app.library.instance.action.stop": {
     "message": "Stop"
   },
+  "app.library.instance.action.unpublish": {
+    "message": "Unpublish"
+  },
+  "app.library.instance.action.unpublish-and-leave": {
+    "message": "Unpublish and leave"
+  },
   "app.library.instance.action.view-instance": {
     "message": "View instance"
   },
@@ -1181,6 +1226,9 @@
   "app.library.instance.deselect-with-name": {
     "message": "Deselect {name}"
   },
+  "app.library.instance.install-with-name": {
+    "message": "Install {name}"
+  },
   "app.library.instance.installing": {
     "message": "Installing..."
   },
@@ -1189,6 +1237,9 @@
   },
   "app.library.instance.new": {
     "message": "New instance"
+  },
+  "app.library.instance.not-installed": {
+    "message": "Not installed"
   },
   "app.library.instance.open-with-name": {
     "message": "Open {name}"
@@ -1205,8 +1256,20 @@
   "app.library.instance.select-with-name": {
     "message": "Select {name}"
   },
+  "app.library.instance.shared-by": {
+    "message": "Shared by {name}"
+  },
   "app.library.instance.stop": {
     "message": "Stop"
+  },
+  "app.library.leave-shared-instance.modal.admonition-body": {
+    "message": "{count, plural, one {You'll lose access to this shared instance and it will be removed from your library. You'll need a new invite to join it again.} other {You'll lose access to these shared instances and they will be removed from your library. You'll need a new invite to join them again.}}"
+  },
+  "app.library.leave-shared-instance.modal.admonition-header": {
+    "message": "{count, plural, one {Leaving shared instance} other {Leaving # shared instances}}"
+  },
+  "app.library.leave-shared-instance.modal.header": {
+    "message": "{count, plural, one {Leave shared instance} other {Leave # shared instances}}"
   },
   "app.library.search.no-results.title": {
     "message": "No instances match your search."
@@ -1225,6 +1288,9 @@
   },
   "app.library.selection.remove-from-group": {
     "message": "Remove from group"
+  },
+  "app.library.selection.removing-shared-instances": {
+    "message": "Removing selected shared instances"
   },
   "app.library.selection.selected-count": {
     "message": "{count} selected"
@@ -1255,6 +1321,24 @@
   },
   "app.library.title": {
     "message": "Library"
+  },
+  "app.library.unpublish-and-leave-shared-instances.modal.admonition-body": {
+    "message": "{unpublishCount, plural, one {The # shared instance you own will be deleted from Modrinth's servers, and people using it} other {The # shared instances you own will be deleted from Modrinth's servers, and people using them}} will stop receiving updates. You'll lose access to the other {leaveCount} and need a new invite to rejoin. All of them will be removed from your library."
+  },
+  "app.library.unpublish-and-leave-shared-instances.modal.admonition-header": {
+    "message": "Unpublishing and leaving shared instances"
+  },
+  "app.library.unpublish-and-leave-shared-instances.modal.header": {
+    "message": "Unpublish and leave {count} shared instances"
+  },
+  "app.library.unpublish-shared-instance.modal.admonition-body": {
+    "message": "{count, plural, one {This deletes the shared instance from Modrinth's servers. People using it in the Modrinth App will stop receiving updates, and it will be removed from your library.} other {This deletes these shared instances from Modrinth's servers. People using them in the Modrinth App will stop receiving updates, and they will be removed from your library.}}"
+  },
+  "app.library.unpublish-shared-instance.modal.admonition-header": {
+    "message": "{count, plural, one {Unpublishing shared instance} other {Unpublishing # shared instances}}"
+  },
+  "app.library.unpublish-shared-instance.modal.header": {
+    "message": "{count, plural, one {Unpublish shared instance} other {Unpublish # shared instances}}"
   },
   "app.modal.install-to-play.additional-context": {
     "message": "Additional context"
@@ -1294,6 +1378,9 @@
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mod} other {# mods}}"
+  },
+  "app.modal.install-to-play.owner-install-note": {
+    "message": "This downloads the latest version you pushed. Changes on other installations that you haven't pushed won't be included."
   },
   "app.modal.install-to-play.report-description": {
     "message": "Use this form to report instances that may violate our <rules-link>Rules</rules-link> or <terms-link>Terms of Use</terms-link>."
@@ -1354,6 +1441,15 @@
   },
   "app.modal.update-to-play.header": {
     "message": "Update to play"
+  },
+  "app.modal.update-to-play.owner-admonition-header": {
+    "message": "Pushed from another installation"
+  },
+  "app.modal.update-to-play.owner-description": {
+    "message": "These changes were pushed from another Modrinth App installation. Unpushed changes to shared content on this installation will be replaced."
+  },
+  "app.modal.update-to-play.owner-header": {
+    "message": "Update available"
   },
   "app.modal.update-to-play.removed": {
     "message": "Removed"
@@ -4186,6 +4282,12 @@
   },
   "instance.shared-instance.network-error.title": {
     "message": "Network error"
+  },
+  "instance.shared-instance.owner-behind.text": {
+    "message": "A newer version was pushed from another Modrinth App installation. Download it, then try again."
+  },
+  "instance.shared-instance.owner-behind.title": {
+    "message": "Couldn't push update"
   },
   "instance.shared-instance.owner-tooltip": {
     "message": "This instance's content is being shared to other users."

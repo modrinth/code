@@ -790,3 +790,36 @@ export async function unlink_shared_instance(instanceId: string): Promise<void> 
 export async function unpublish_shared_instance(instanceId: string): Promise<void> {
 	return await invoke('plugin:instance|instance_share_unpublish', { instanceId })
 }
+
+export async function unpublish_remote_shared_instance(sharedInstanceId: string): Promise<void> {
+	return await invoke('plugin:instance|instance_share_unpublish_remote', { sharedInstanceId })
+}
+
+export async function dismiss_shared_instance_restored_notice(instanceId: string): Promise<void> {
+	return await invoke('plugin:instance|instance_share_dismiss_restored_notice', { instanceId })
+}
+
+export async function leave_remote_shared_instance(sharedInstanceId: string): Promise<void> {
+	return await invoke('plugin:instance|instance_share_leave_remote', { sharedInstanceId })
+}
+
+export type CachedSharedInstanceSummary = {
+	shared_instance_id: string
+	role: 'owner' | 'member'
+	manager_id: string | null
+	name: string
+	icon_url: string | null
+	game_version: string
+	loader: InstanceLoader
+}
+
+export async function get_cached_shared_instance_library(): Promise<CachedSharedInstanceSummary[]> {
+	return await invoke('plugin:instance|instance_share_get_cached_library')
+}
+
+export async function cache_shared_instance_library(
+	userId: string,
+	instances: CachedSharedInstanceSummary[],
+): Promise<void> {
+	return await invoke('plugin:instance|instance_share_cache_library', { userId, instances })
+}

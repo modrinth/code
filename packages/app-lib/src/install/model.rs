@@ -3,7 +3,7 @@ use crate::api::pack::import::ImportLauncherType;
 use crate::api::pack::install_from::{CreatePackInstance, CreatePackLocation};
 use crate::state::{
     InstanceIconConfig, InstanceInstallStage, InstanceLink, InstanceMetadata,
-    ModLoader,
+    ModLoader, SharedInstanceRole,
 };
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -226,6 +226,10 @@ pub struct InstallPostInstallEdit {
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct SharedInstanceInstallData {
     pub shared_instance_id: String,
+    #[serde(default)]
+    pub role: SharedInstanceRole,
+    #[serde(default)]
+    pub restored_from_remote: bool,
     pub manager_id: Option<String>,
     #[serde(default)]
     pub server_manager_name: Option<String>,

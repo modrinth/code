@@ -20,7 +20,7 @@
 		</div>
 		<div class="ml-auto flex items-center gap-0.5">
 			<Button
-				v-if="displayState.group === 'Group'"
+				v-if="displayState.group === 'Group' && !hasUninstalledSelection"
 				type="quiet"
 				:disabled="busy"
 				@click="createGroupFromSelection"
@@ -29,7 +29,7 @@
 				<span class="bar-label">{{ formatMessage(messages.newGroup) }}</span>
 			</Button>
 			<Button
-				v-if="selectedGroupedInstances.length > 0"
+				v-if="selectedGroupedInstances.length > 0 && !hasUninstalledSelection"
 				type="quiet"
 				:disabled="busy"
 				@click="removeSelectedInstancesFromGroups"
@@ -37,17 +37,34 @@
 				<MinusIcon />
 				<span class="bar-label">{{ formatMessage(messages.removeFromGroup) }}</span>
 			</Button>
-			<div class="mx-1 h-6 w-px bg-surface-5" />
+			<template v-if="!hasUninstalledSelection">
+				<div class="mx-1 h-6 w-px bg-surface-5" />
+				<Button
+					v-tooltip="deleting ? formatMessage(messages.deleting) : undefined"
+					type="quiet"
+					color="red"
+					interaction="filled"
+					:disabled="busy"
+					@click="confirmDeleteModal?.show()"
+				>
+					<TrashIcon />
+					<span class="bar-label">{{ formatMessage(commonMessages.deleteLabel) }}</span>
+				</Button>
+			</template>
 			<Button
-				v-tooltip="deleting ? formatMessage(messages.deleting) : undefined"
+				v-else
+				v-tooltip="removingSharedInstances ? formatMessage(messages.removing) : undefined"
 				type="quiet"
-				color="red"
+				color="orange"
 				interaction="filled"
 				:disabled="busy"
-				@click="confirmDeleteModal?.show()"
+				@click="requestRemoveUninstalledSharedInstances(selectedUninstalledInstances)"
 			>
-				<TrashIcon />
-				<span class="bar-label">{{ formatMessage(commonMessages.deleteLabel) }}</span>
+				<LogOutIcon v-if="removalMode === 'leave'" />
+				<UnlinkIcon v-else />
+				<span class="bar-label">{{
+					formatMessage(sharedInstanceRemovalButtonMessages[removalMode])
+				}}</span>
 			</Button>
 		</div>
 	</FloatingActionBar>
@@ -59,7 +76,7 @@
 </template>
 
 <script setup lang="ts">
-import { MinusIcon, SquarePlusIcon, TrashIcon } from '@modrinth/assets'
+import { LogOutIcon, MinusIcon, SquarePlusIcon, TrashIcon, UnlinkIcon } from '@modrinth/assets'
 import {
 	Button,
 	commonMessages,
@@ -70,7 +87,13 @@ import {
 } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
-import { getLibraryInstanceSelectionKey, useLibrary } from '@/components/ui/library/use-library'
+import {
+	getLibraryInstanceSelectionKey,
+	getSharedInstanceRemovalMode,
+	isUninstalledSharedInstance,
+	sharedInstanceRemovalButtonMessages,
+	useLibrary,
+} from '@/components/ui/library/use-library'
 import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInstanceModal.vue'
 import { toError } from '@/helpers/errors'
 import { remove } from '@/helpers/instance'
@@ -80,12 +103,15 @@ const { formatMessage } = useVIntl()
 const { handleError } = injectNotificationManager()
 const {
 	instances,
+	libraryInstances,
 	selectedLibraryInstances,
 	clearLibraryInstanceSelection,
 	setSelectedLibraryInstances,
 	creatingGroup,
 	createDefaultGroup,
 	displayState,
+	removingSharedInstances,
+	requestRemoveUninstalledSharedInstances,
 } = useLibrary()
 
 const confirmDeleteModal = ref<InstanceType<typeof ConfirmDeleteInstanceModal>>()
@@ -105,7 +131,20 @@ const selectedGroupedInstances = computed(() =>
 		return instance?.group_ids.includes(selection.groupId) ? [{ instance, selection }] : []
 	}),
 )
-const busy = computed(() => deleting.value || removingFromGroup.value || creatingGroup.value)
+const selectedUninstalledInstances = computed(() =>
+	libraryInstances.value
+		.filter(isUninstalledSharedInstance)
+		.filter((instance) => selectedInstanceIds.value.has(instance.id)),
+)
+const hasUninstalledSelection = computed(() => selectedUninstalledInstances.value.length > 0)
+const removalMode = computed(() => getSharedInstanceRemovalMode(selectedUninstalledInstances.value))
+const busy = computed(
+	() =>
+		deleting.value ||
+		removingFromGroup.value ||
+		creatingGroup.value ||
+		removingSharedInstances.value,
+)
 
 const messages = defineMessages({
 	ariaLabel: {
@@ -127,6 +166,10 @@ const messages = defineMessages({
 	removeFromGroup: {
 		id: 'app.library.selection.remove-from-group',
 		defaultMessage: 'Remove from group',
+	},
+	removing: {
+		id: 'app.library.selection.removing-shared-instances',
+		defaultMessage: 'Removing selected shared instances',
 	},
 })
 

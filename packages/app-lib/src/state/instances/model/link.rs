@@ -43,10 +43,13 @@ pub enum InstanceLink {
     },
 }
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(
+    Clone, Copy, Debug, Default, Eq, PartialEq, Serialize, Deserialize,
+)]
 #[serde(rename_all = "snake_case")]
 pub enum SharedInstanceRole {
     Owner,
+    #[default]
     Member,
 }
 
@@ -86,6 +89,10 @@ pub struct SharedInstanceAttachment {
     pub status: ContentSetSyncStatus,
     pub applied_version: Option<i32>,
     pub latest_version: Option<i32>,
+    /// Set when an owner reinstalls their shared instance from the remote, so
+    /// the app can explain that unpushed changes weren't downloaded.
+    #[serde(default)]
+    pub restored_from_remote: bool,
 }
 
 #[derive(Clone, Debug)]
@@ -99,6 +106,7 @@ pub(crate) struct SharedInstanceAttachmentInput {
     pub status: ContentSetSyncStatus,
     pub applied_version: Option<i32>,
     pub latest_version: Option<i32>,
+    pub restored_from_remote: bool,
 }
 
 impl From<SharedInstanceAttachmentInput> for SharedInstanceAttachment {
@@ -113,6 +121,7 @@ impl From<SharedInstanceAttachmentInput> for SharedInstanceAttachment {
             status: input.status,
             applied_version: input.applied_version,
             latest_version: input.latest_version,
+            restored_from_remote: input.restored_from_remote,
         }
     }
 }

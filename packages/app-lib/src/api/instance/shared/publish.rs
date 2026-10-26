@@ -40,6 +40,28 @@ pub async fn unpublish_shared_instance(instance_id: &str) -> crate::Result<()> {
 }
 
 #[tracing::instrument]
+pub async fn unpublish_remote_shared_instance(
+    shared_instance_id: &str,
+) -> crate::Result<()> {
+    let state = State::get().await?;
+    delete_remote_instance(shared_instance_id, &state).await
+}
+
+#[tracing::instrument]
+pub async fn leave_remote_shared_instance(
+    shared_instance_id: &str,
+) -> crate::Result<()> {
+    let state = State::get().await?;
+    let Some(user_id) = linked_modrinth_user_id(&state).await? else {
+        bail!(crate::ErrorKind::InputError(
+            "you must be signed in to leave a shared instance".to_string(),
+        ));
+    };
+
+    remove_remote_users(shared_instance_id, vec![user_id], &state).await
+}
+
+#[tracing::instrument]
 pub async fn unlink_shared_instance(instance_id: &str) -> crate::Result<()> {
     let state = State::get().await?;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
@@ -155,6 +177,8 @@ pub async fn get_shared_instance_publish_preview(
             return Err(shared_instance_unavailable_error(reason));
         }
     };
+    ensure_owner_up_to_date(instance_id, &attachment, version.version, &state)
+        .await?;
     let diffs =
         shared_instance_publish_diffs(&metadata, &version, &snapshot, &state)
             .await?;
@@ -637,6 +661,22 @@ async fn publish_shared_instance_reported(
     report.applied_version = attachment.applied_version;
     report.latest_version = attachment.latest_version;
     ensure_owner(&attachment)?;
+    if attachment.applied_version.is_some()
+        && let SharedInstanceRemoteResponse::Available(version) =
+            get_latest_remote_version_optional_unavailable(
+                &attachment.id,
+                state,
+            )
+            .await?
+    {
+        ensure_owner_up_to_date(
+            instance_id,
+            &attachment,
+            version.version,
+            state,
+        )
+        .await?;
+    }
     tracing::info!(
         instance_id,
         shared_instance_id = %attachment.id,
@@ -680,6 +720,14 @@ async fn publish_shared_instance_reported(
                 &state.pool,
             )
             .await?;
+            if attachment.restored_from_remote {
+                crate::state::set_shared_instance_restored_from_remote(
+                    instance_id,
+                    false,
+                    &state.pool,
+                )
+                .await?;
+            }
             Ok(())
         }
         Err(error) => {
@@ -1499,6 +1547,7 @@ pub(super) async fn shared_instance_for_invites(
                 crate::state::SharedInstanceAttachmentInput {
                     id: remote.id.clone(),
                     role: SharedInstanceRole::Owner,
+                    restored_from_remote: false,
                     manager_id: None,
                     server_manager_name: None,
                     server_manager_icon_url: None,
@@ -1534,6 +1583,33 @@ pub(super) async fn shared_instance_for_invites(
     .await?;
 
     Ok((metadata, attachment))
+}
+
+/// Refuses to publish from an owner's installation that is behind a version
+/// pushed from another installation, since publishing would revert it.
+async fn ensure_owner_up_to_date(
+    instance_id: &str,
+    attachment: &SharedInstanceAttachment,
+    latest_version: i32,
+    state: &State,
+) -> crate::Result<()> {
+    if attachment
+        .applied_version
+        .is_none_or(|applied| applied >= latest_version)
+    {
+        return Ok(());
+    }
+
+    crate::state::set_shared_instance_sync_status(
+        instance_id,
+        ContentSetSyncStatus::UpdateAvailable,
+        attachment.applied_version,
+        Some(latest_version),
+        &state.pool,
+    )
+    .await?;
+    emit_instance(instance_id, InstancePayloadType::Edited).await?;
+    bail!(crate::ErrorKind::SharedInstanceOwnerBehind)
 }
 
 pub(super) fn ensure_owner(

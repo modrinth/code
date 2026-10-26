@@ -1,6 +1,6 @@
 <template>
 	<FullImage
-		v-if="src && !failed"
+		v-if="cachedSrc && !failed"
 		ref="imgComponent"
 		class="avatar shrink-0"
 		:style="`--_size: ${cssSize}`"
@@ -12,8 +12,8 @@
 			raised: raised,
 			pixelated: pixelated,
 		}"
-		:src="src"
-		:raw-src="rawSrc"
+		:src="cachedSrc"
+		:raw-src="rawSrc ?? (cacheIcon && cachedSrc !== src ? src : undefined)"
 		:alt="alt"
 		:loading="loading"
 		@load="onLoad"
@@ -52,6 +52,7 @@
 import { computed, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from 'vue'
 
 import { useDebugLogger } from '../../composables'
+import { useCachedIcon } from '../../composables/use-cached-icon'
 import FullImage from './FullImage.vue'
 
 const debug = useDebugLogger('Avatar')
@@ -84,6 +85,7 @@ const props = withDefaults(
 		loading?: 'eager' | 'lazy'
 		raised?: boolean
 		tintBy?: string | null
+		cacheIcon?: boolean
 	}>(),
 	{
 		src: null,
@@ -96,6 +98,7 @@ const props = withDefaults(
 		loading: 'eager',
 		raised: false,
 		tintBy: null,
+		cacheIcon: false,
 	},
 )
 
@@ -108,17 +111,16 @@ const LEGACY_PRESETS: Record<string, string> = {
 }
 
 const cssSize = computed(() => LEGACY_PRESETS[props.size] ?? props.size)
+const cachedIconSrc = useCachedIcon(() => (props.cacheIcon ? props.src : null))
+const cachedSrc = computed(() => (props.cacheIcon ? cachedIconSrc.value : (props.src ?? undefined)))
 
-watch(
-	() => props.src,
-	() => {
-		clearDetectionTimeout()
-		detectingSource = undefined
-		failed.value = false
-		hasTransparentCorners.value = false
-		hasDetectedCorners.value = false
-	},
-)
+watch(cachedSrc, () => {
+	clearDetectionTimeout()
+	detectingSource = undefined
+	failed.value = false
+	hasTransparentCorners.value = false
+	hasDetectedCorners.value = false
+})
 
 onMounted(() => {
 	const image = img.value

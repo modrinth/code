@@ -63,6 +63,9 @@
 					</ul>
 				</div>
 			</Admonition>
+			<p v-else-if="isOwner" class="m-0 text-primary">
+				{{ formatMessage(messages.ownerInstallNote) }}
+			</p>
 			<p v-else class="m-0 text-primary">
 				<IntlFormatted
 					v-if="creator"
@@ -296,6 +299,7 @@ const creator = ref<SharedInstanceCreator | null>(null)
 const install = ref<() => void | Promise<void>>(() => {})
 const reportMode = ref(false)
 const reportOnly = ref(false)
+const isOwner = ref(false)
 type ReportReason = 'malicious' | 'inappropriate' | 'spam'
 const reportReason = ref<ReportReason>('malicious')
 const additionalContext = ref('')
@@ -465,8 +469,10 @@ function show(
 	installValue: () => void | Promise<void>,
 	creatorValue?: SharedInstanceCreator,
 	event?: MouseEvent,
+	options?: { isOwner?: boolean },
 ) {
 	resetReportState()
+	isOwner.value = options?.isOwner ?? false
 	creator.value = creatorValue ?? null
 	blockTargetUserId.value = creatorValue?.id ?? null
 	install.value = installValue
@@ -478,6 +484,7 @@ function showReport(
 	event?: MouseEvent,
 ) {
 	resetReportState()
+	isOwner.value = false
 	creator.value = null
 	blockTargetUserId.value = blockTargetUserIdValue ?? null
 	reportMode.value = true
@@ -496,6 +503,11 @@ function hide() {
 
 const messages = defineMessages({
 	installToPlay: { id: 'app.modal.install-to-play.header', defaultMessage: 'Install to play' },
+	ownerInstallNote: {
+		id: 'app.modal.install-to-play.owner-install-note',
+		defaultMessage:
+			"This downloads the latest version you pushed. Changes on other installations that you haven't pushed won't be included.",
+	},
 	reportSharedInstance: {
 		id: 'app.modal.install-to-play.report-shared-instance-header',
 		defaultMessage: 'Report shared instance',

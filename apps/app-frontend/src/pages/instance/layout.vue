@@ -65,8 +65,10 @@
 				:shared-instance-expected-user-id="sharedInstanceExpectedUserId"
 				:shared-instance-role="instance.shared_instance?.role"
 				:shared-instance-signed-out="sharedInstanceSignedOut"
+				:shared-instance-update-available="sharedInstanceUpdatePreview?.updateAvailable === true"
 				@published="refreshInstance"
 				@delete="requestInstanceDeletion"
+				@review-update="reviewSharedInstanceUpdate"
 			/>
 		</div>
 		<div :class="['p-6 pt-4', { 'min-h-0 flex-1 overflow-y-auto': isFixedRender }]">
@@ -603,16 +605,20 @@ async function handleSharedInstanceUnavailable(
 	setSharedInstanceUnavailable(reason)
 }
 
-function reviewSharedInstanceUpdate(event?: MouseEvent) {
+async function reviewSharedInstanceUpdate(event?: MouseEvent) {
 	const currentInstance = instance.value
-	const preview = sharedInstanceUpdatePreview.value
-	if (
-		!currentInstance ||
-		currentInstance.shared_instance?.role !== 'member' ||
-		!preview?.updateAvailable
-	) {
-		return
+	if (!currentInstance?.shared_instance) return
+
+	let preview = sharedInstanceUpdatePreview.value
+	if (!preview?.updateAvailable) {
+		try {
+			preview = await refreshSharedInstanceUpdatePreview()
+		} catch (error) {
+			notifySharedInstanceError(error)
+			return
+		}
 	}
+	if (!preview?.updateAvailable || instance.value?.id !== currentInstance.id) return
 
 	sharedInstanceUpdateModal.value?.show(
 		currentInstance,

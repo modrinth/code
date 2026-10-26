@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { PointerActivationConstraints } from '@dnd-kit/dom'
 import { KeyboardSensor, PointerSensor, useDraggable } from '@dnd-kit/vue'
-import { CheckIcon, DownloadIcon, PlayIcon, SpinnerIcon, StopCircleIcon } from '@modrinth/assets'
+import { DownloadIcon, PlayIcon, SpinnerIcon, StopCircleIcon } from '@modrinth/assets'
 import { defineMessages, IconButton, injectNotificationManager, useVIntl } from '@modrinth/ui'
-import { useEventListener, useMagicKeys } from '@vueuse/core'
+import { useEventListener } from '@vueuse/core'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 import InstanceCardView from '@/components/ui/library/instance-group/instance-card-view.vue'
+import InstanceOwnerBadge from '@/components/ui/library/instance-group/instance-owner-badge.vue'
+import InstanceSelectionButton from '@/components/ui/library/instance-group/instance-selection-button.vue'
 import { getLibraryInstanceSelectionKey, useLibrary } from '@/components/ui/library/use-library'
 import { useAppEvent } from '@/composables/use-app-event'
 import { handleSevereError } from '@/composables/use-error.js'
@@ -49,14 +51,14 @@ const messages = defineMessages({
 	stop: { id: 'app.library.instance.stop', defaultMessage: 'Stop' },
 	repair: { id: 'app.library.instance.repair', defaultMessage: 'Repair' },
 	play: { id: 'app.library.instance.play', defaultMessage: 'Play' },
-	select: { id: 'app.library.instance.select', defaultMessage: 'Select instance' },
-	deselect: { id: 'app.library.instance.deselect', defaultMessage: 'Deselect instance' },
 })
 const {
 	displayState,
 	selectedLibraryInstances,
 	isLibraryInstanceSelectionActive,
 	activeDraggedInstanceKeys,
+	canSelectLibraryInstance,
+	getSharedInstanceOwner,
 } = useLibrary()
 
 const props = defineProps<{
@@ -107,8 +109,8 @@ const selectionKey = computed(() =>
 	}),
 )
 const selected = computed(() => selectedLibraryInstances.value.has(selectionKey.value))
-const keys = useMagicKeys()
-const holdingShift = computed(() => keys.shift.value)
+const selectable = computed(() => selected.value || canSelectLibraryInstance(props.instance.id))
+const owner = computed(() => getSharedInstanceOwner(props.instance))
 const isPartOfActiveDrag = computed(() => activeDraggedInstanceKeys.value.has(selectionKey.value))
 const { isDragging } = useDraggable({
 	id: computed(() => `instance:${props.instanceGroupId}:${props.instance.id}`),
@@ -148,7 +150,7 @@ useEventListener(window, 'blur', resetPrimaryPointer)
 
 const activateCard = (event: MouseEvent) => {
 	if (isLibraryInstanceSelectionActive.value || event.shiftKey) {
-		toggleSelection(event)
+		if (selectable.value) toggleSelection(event)
 	} else {
 		void seeInstance()
 	}
@@ -269,6 +271,7 @@ onMounted(() => {
 			'!scale-100': isDragging,
 			'opacity-50': isPartOfActiveDrag,
 			'scale-[0.95]': isPrimaryPointerDown && !isLibraryInstanceSelectionActive,
+			'!cursor-default opacity-50': !selectable,
 		}"
 		:instance="instance"
 		:selected="selected"
@@ -290,6 +293,9 @@ onMounted(() => {
 		@mouseenter="checkProcess"
 		@pointerdown="handlePointerDown"
 	>
+		<template #icon-overlay="{ compact }">
+			<InstanceOwnerBadge v-if="owner" :owner="owner" :compact="compact" />
+		</template>
 		<template #loading="{ compact }">
 			<div
 				v-if="loadingIndicatorVisible"
@@ -362,30 +368,13 @@ onMounted(() => {
 			</div>
 		</template>
 		<template #overlay="{ compact }">
-			<button
-				type="button"
-				class="selection-button group/selection absolute z-[2] flex size-[50px] cursor-pointer items-start pt-4 justify-center border-0 bg-transparent p-0"
-				:class="compact ? '-right-1 -top-1' : 'right-2 top-1.5'"
-				:aria-label="formatMessage(selected ? messages.deselect : messages.select)"
-				:aria-pressed="selected"
-				@click.stop="toggleSelection"
-			>
-				<span
-					v-tooltip="formatMessage(selected ? messages.deselect : messages.select)"
-					class="relative flex items-center justify-center rounded-full opacity-0 transition-opacity duration-200 ease-out group-hover/card:opacity-100 group-hover/selection:brightness-125"
-					:class="{
-						'size-[20px]': compact,
-						'size-[24px]': !compact,
-						'border-0 !opacity-100': selected,
-						'border-2 border-solid border-primary bg-transparent': !selected,
-						'[outline:3px_solid_var(--color-purple)] outline-offset-1':
-							holdingShift && isSelectionAnchor,
-					}"
-				>
-					<span v-if="selected" class="absolute inset-0 rounded-full bg-contrast" />
-					<CheckIcon v-if="selected" class="relative size-4 invert [stroke-width:3]" />
-				</span>
-			</button>
+			<InstanceSelectionButton
+				v-if="selectable"
+				:selected="selected"
+				:compact="compact"
+				:is-selection-anchor="isSelectionAnchor"
+				@toggle="toggleSelection"
+			/>
 		</template>
 	</InstanceCardView>
 </template>

@@ -2,18 +2,20 @@
 import { Avatar, truncatedTooltip } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
+import type { LibraryInstance } from '@/components/ui/library/use-library'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { useImageThumbnail } from '@/composables/use-image-thumbnail'
 import { getInstanceIconUrl } from '@/helpers/instance'
-import type { GameInstance } from '@/helpers/types'
 
 const props = withDefaults(
 	defineProps<{
-		instance: GameInstance
+		instance: LibraryInstance
 		selected?: boolean
+		dimmed?: boolean
 	}>(),
 	{
 		selected: false,
+		dimmed: false,
 	},
 )
 
@@ -26,7 +28,7 @@ const compactMode = computed(() => appSettings.compactInstanceCards)
 const thumbnail = useImageThumbnail(
 	localIcon,
 	() => (compactMode.value ? 96 : 384),
-	() => String(props.instance.modified),
+	() => ('modified' in props.instance ? String(props.instance.modified) : ''),
 )
 const iconSrc = computed(() =>
 	localIcon.value ? thumbnail.value : getInstanceIconUrl(props.instance.icon_path),
@@ -49,19 +51,24 @@ const versionRef = ref<HTMLElement | null>(null)
 	>
 		<div
 			class="relative flex shrink-0 items-center max-w-full overflow-clip"
-			:class="compactMode ? 'size-10 rounded-lg' : 'aspect-square min-w-full rounded-2xl'"
+			:class="[
+				compactMode ? 'size-10 rounded-lg' : 'aspect-square min-w-full rounded-2xl',
+				{ 'bg-surface-1': dimmed },
+			]"
 		>
 			<Avatar
 				class="pointer-events-none outline-none"
-				:class="compactMode ? '!rounded-lg' : '!rounded-2xl'"
+				:class="[compactMode ? '!rounded-lg' : '!rounded-2xl', { 'opacity-25': dimmed }]"
 				size="100%"
 				:src="iconSrc"
+				cache-icon
 				loading="lazy"
 				:tint-by="instance.id"
 				alt=""
 				no-shadow
 				pad-transparent-corners
 			/>
+			<slot name="icon-overlay" :compact="compactMode" />
 			<slot name="loading" :compact="compactMode" />
 			<div
 				class="absolute z-[1] flex items-center justify-center"

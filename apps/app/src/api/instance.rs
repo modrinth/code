@@ -122,6 +122,11 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             instance_share_publish_support_details,
             instance_share_unlink,
             instance_share_unpublish,
+            instance_share_unpublish_remote,
+            instance_share_leave_remote,
+            instance_share_get_cached_library,
+            instance_share_cache_library,
+            instance_share_dismiss_restored_notice,
             instance_export_mrpack,
             instance_get_pack_export_candidates,
         ])
@@ -221,6 +226,7 @@ pub struct SharedInstanceAttachment {
     pub status: String,
     pub applied_version: Option<i32>,
     pub latest_version: Option<i32>,
+    pub restored_from_remote: bool,
 }
 
 impl From<CoreSharedInstanceAttachment> for SharedInstanceAttachment {
@@ -235,6 +241,7 @@ impl From<CoreSharedInstanceAttachment> for SharedInstanceAttachment {
             status: attachment.status.as_str().to_string(),
             applied_version: attachment.applied_version,
             latest_version: attachment.latest_version,
+            restored_from_remote: attachment.restored_from_remote,
         }
     }
 }
@@ -1515,5 +1522,47 @@ pub async fn instance_share_unlink(instance_id: &str) -> Result<()> {
 #[tauri::command]
 pub async fn instance_share_unpublish(instance_id: &str) -> Result<()> {
     theseus::instance::unpublish_shared_instance(instance_id).await?;
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn instance_share_unpublish_remote(
+    shared_instance_id: &str,
+) -> Result<()> {
+    theseus::instance::unpublish_remote_shared_instance(shared_instance_id)
+        .await?;
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn instance_share_get_cached_library()
+-> Result<Vec<theseus::data::CachedSharedInstanceSummary>> {
+    Ok(theseus::instance::get_cached_shared_instance_library().await?)
+}
+
+#[tauri::command]
+pub async fn instance_share_cache_library(
+    user_id: &str,
+    instances: Vec<theseus::data::CachedSharedInstanceSummary>,
+) -> Result<()> {
+    theseus::instance::cache_shared_instance_library(user_id, instances)
+        .await?;
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn instance_share_dismiss_restored_notice(
+    instance_id: &str,
+) -> Result<()> {
+    theseus::instance::dismiss_shared_instance_restored_notice(instance_id)
+        .await?;
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn instance_share_leave_remote(
+    shared_instance_id: &str,
+) -> Result<()> {
+    theseus::instance::leave_remote_shared_instance(shared_instance_id).await?;
     Ok(())
 }

@@ -23,8 +23,9 @@ pub mod worlds;
 
 pub mod data {
     pub use crate::state::{
-        AppliedContentSetPatch, CacheBehaviour, CacheValueType, ContentFile,
-        ContentItem, ContentItemOwner, ContentItemProject, ContentItemVersion,
+        AppliedContentSetPatch, CacheBehaviour, CacheValueType,
+        CachedSharedInstanceSummary, ContentFile, ContentItem,
+        ContentItemOwner, ContentItemProject, ContentItemVersion,
         CreateInstance, Credentials, Dependency, DirectoryInfo, EditInstance,
         Hooks, InstanceIconBackground, InstanceIconConfig,
         InstanceInstallCandidate, InstanceInstallTarget,
