@@ -7,7 +7,6 @@ default-run = "meta-generator"
 
 [dependencies]
 anyhow = { workspace = true }
-async_zip = { workspace = true, features = ["deflate"] }
 bon = { workspace = true }
 clap = { workspace = true, features = ["derive"] }
 derive_more = { workspace = true, features = ["debug", "deref", "display"] }
@@ -34,3 +33,4 @@ tracing-anyhow = { workspace = true }
 tracing-subscriber = { workspace = true, features = ["chrono", "env-filter"] }
 url = { workspace = true, features = ["serde"] }
 uuid = { workspace = true, features = ["v7"] }
+zip = { workspace = true }

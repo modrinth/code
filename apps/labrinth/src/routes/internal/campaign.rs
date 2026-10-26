@@ -3,7 +3,7 @@ use actix_web::{HttpRequest, get, post, web};
 use base64::Engine;
 use chrono::{DateTime, Duration, Utc};
 use eyre::eyre;
-use hmac::{Hmac, Mac};
+use hmac::{Hmac, KeyInit, Mac};
 use reqwest::Method;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};

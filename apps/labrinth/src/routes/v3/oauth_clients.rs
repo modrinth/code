@@ -34,7 +34,7 @@ use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use ariadne::ids::base62_impl::parse_base62;
 use chrono::Utc;
 use itertools::Itertools;
-use rand::{Rng, SeedableRng, distributions::Alphanumeric};
+use rand::{RngExt, SeedableRng, distr::Alphanumeric};
 use rand_chacha::ChaCha20Rng;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
@@ -654,7 +654,7 @@ pub async fn revoke_oauth_authorization(
 }
 
 fn generate_oauth_client_secret() -> String {
-    ChaCha20Rng::from_entropy()
+    ChaCha20Rng::from_rng(&mut rand::rng())
         .sample_iter(&Alphanumeric)
         .take(32)
         .map(char::from)

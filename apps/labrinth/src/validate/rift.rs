@@ -30,6 +30,6 @@ impl super::Validator for RiftValidator {
             ));
         }
 
-        Ok(validate_pack_formats(archive))
+        validate_pack_formats(archive)
     }
 }

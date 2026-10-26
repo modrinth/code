@@ -124,9 +124,11 @@ pub async fn read_any_encoding_to_string(
             })?;
 
     let file_encoding = {
-        let mut encoding_detector = chardetng::EncodingDetector::new();
+        let mut encoding_detector = chardetng::EncodingDetector::new(
+            chardetng::Iso2022JpDetection::Allow,
+        );
         encoding_detector.feed(&file_bytes, true);
-        encoding_detector.guess(None, true)
+        encoding_detector.guess(None, chardetng::Utf8Detection::Allow)
     };
 
     let (file_string, actual_file_encoding, _) =

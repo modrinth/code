@@ -34,7 +34,6 @@ use actix_http::header::LOCATION;
 use actix_web::http::StatusCode;
 use actix_web::web::{Data, Query};
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
-use argon2::password_hash::SaltString;
 use argon2::{Argon2, PasswordHash, PasswordHasher, PasswordVerifier};
 use ariadne::ids::base62_impl::{parse_base62, to_base62};
 use ariadne::ids::random_base62_rng;
@@ -42,10 +41,10 @@ use base64::Engine;
 use base64::engine::general_purpose::URL_SAFE_NO_PAD;
 use chrono::{Duration, Utc};
 use eyre::eyre;
-use hmac::{Hmac, Mac};
+use hmac::{Hmac, KeyInit, Mac};
 use lettre::message::Mailbox;
-use rand::Rng;
-use rand::distributions::Alphanumeric;
+use rand::RngExt;
+use rand::distr::Alphanumeric;
 use rand_chacha::ChaCha20Rng;
 use rand_chacha::rand_core::SeedableRng;
 use reqwest::header::AUTHORIZATION;
@@ -1791,7 +1790,7 @@ pub async fn discord_community_link(
     };
 
     let now = Utc::now().timestamp();
-    let nonce = ChaCha20Rng::from_entropy()
+    let nonce = ChaCha20Rng::from_rng(&mut rand::rng())
         .sample_iter(&Alphanumeric)
         .take(32)
         .map(char::from)
@@ -2142,9 +2141,9 @@ impl ReadyAccountRegisterFlow {
             .wrap_internal_err("generating user ID")?;
 
         let hasher = Argon2::default();
-        let salt = SaltString::generate(&mut ChaCha20Rng::from_entropy());
+        let salt = rand::random::<[u8; 16]>();
         let password_hash = hasher
-            .hash_password(register_flow.password.as_bytes(), &salt)
+            .hash_password_with_salt(register_flow.password.as_bytes(), &salt)
             .wrap_internal_err("hashing password")?
             .to_string();
 
@@ -2445,16 +2444,17 @@ async fn validate_2fa_code(
     pool: &PgPool,
     transaction: &mut PgTransaction<'_>,
 ) -> Result<bool, AuthenticationError> {
-    let totp = totp_rs::TOTP::new(
-        totp_rs::Algorithm::SHA1,
-        6,
-        1,
-        30,
-        totp_rs::Secret::Encoded(secret)
-            .to_bytes()
-            .map_err(|_| AuthenticationError::InvalidCredentials)?,
-    )
-    .map_err(|_| AuthenticationError::InvalidCredentials)?;
+    let totp = totp_rs::Builder::new()
+        .with_algorithm(totp_rs::Algorithm::SHA1)
+        .with_digits(6)
+        .with_skew(1)
+        .with_step_duration(30)
+        .with_secret(
+            totp_rs::Secret::try_from_base32(secret)
+                .map_err(|_| AuthenticationError::InvalidCredentials)?,
+        )
+        .build()
+        .map_err(|_| AuthenticationError::InvalidCredentials)?;
 
     const TOTP_NAMESPACE: &str = "used_totp:v4";
     let mut conn = redis.connect().await?;
@@ -2468,10 +2468,7 @@ async fn validate_2fa_code(
         return Err(AuthenticationError::InvalidCredentials);
     }
 
-    if totp
-        .check_current(input.as_str())
-        .map_err(|_| AuthenticationError::InvalidCredentials)?
-    {
+    if totp.check_current(input.as_str()).is_some() {
         conn.set(&key, "", Some(60)).await?;
 
         Ok(true)
@@ -2620,8 +2617,8 @@ pub async fn begin_2fa_flow(
     .1;
 
     if !user.has_totp.unwrap_or(false) {
-        let string = totp_rs::Secret::generate_secret();
-        let encoded = string.to_encoded();
+        let string = totp_rs::Secret::generate();
+        let encoded = string.to_base32();
 
         let flow = DBFlow::Initialize2FA {
             user_id: user.id.into(),
@@ -2739,7 +2736,7 @@ pub async fn finish_2fa_flow(
         let mut codes = Vec::new();
 
         for _ in 0..6 {
-            let mut rng = ChaCha20Rng::from_entropy();
+            let mut rng = ChaCha20Rng::from_rng(&mut rand::rng());
             let val = random_base62_rng(&mut rng, 11);
 
             sqlx::query!(
@@ -3152,9 +3149,9 @@ pub async fn change_password(
         }
 
         let hasher = Argon2::default();
-        let salt = SaltString::generate(&mut ChaCha20Rng::from_entropy());
+        let salt = rand::random::<[u8; 16]>();
         let password_hash = hasher
-            .hash_password(new_password.as_bytes(), &salt)
+            .hash_password_with_salt(new_password.as_bytes(), &salt)
             .wrap_internal_err("hashing password")?
             .to_string();
 
