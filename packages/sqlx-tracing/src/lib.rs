@@ -8,6 +8,7 @@ use futures::future::BoxFuture;
 mod any_connection;
 mod connection;
 mod pool;
+mod query;
 pub(crate) mod span;
 mod transaction;
 

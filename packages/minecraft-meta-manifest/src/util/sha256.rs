@@ -16,9 +16,7 @@ pub struct Sha256(pub [u8; 32]);
 impl Sha256 {
     #[must_use]
     pub fn from_digest(data: impl AsRef<[u8]>) -> Self {
-        let sha256 = sha2::Sha256::digest(data);
-        let sha256 = sha256.as_array::<32>().expect("should be 32 bytes long");
-        Self(*sha256)
+        Self(sha2::Sha256::digest(data).into())
     }
 }
 

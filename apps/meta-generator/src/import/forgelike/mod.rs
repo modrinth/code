@@ -1,4 +1,9 @@
-use std::{any::type_name, collections::HashSet};
+use std::{
+    any::type_name,
+    collections::HashSet,
+    io::{Cursor, Read},
+    sync::Arc,
+};
 
 use anyhow::{Context, Result, anyhow, ensure};
 use futures::{StreamExt, TryStreamExt, stream};
@@ -163,7 +168,7 @@ impl LegacyInstallProfile {
     }
 }
 
-type ZipFileReader = async_zip::base::read::mem::ZipFileReader;
+type ZipFileReader = zip::ZipArchive<Cursor<Arc<[u8]>>>;
 
 async fn extract_from_installer(
     app: &AppState,
@@ -174,9 +179,12 @@ async fn extract_from_installer(
         .get(installer.sha256)
         .context(info_span!("fetching installer blob"))
         .await?;
-    let zip = ZipFileReader::new(installer_blob)
-        .context(info_span!("opening installer zip for reading"))
-        .await?;
+    let zip = tokio::task::spawn_blocking(move || {
+        ZipFileReader::new(Cursor::new(Arc::from(installer_blob)))
+    })
+    .await
+    .context("joining installer ZIP reader")?
+    .context("opening installer zip for reading")?;
 
     let install_profile =
         read_json::<serde_json::Value>(&zip, "install_profile.json")
@@ -217,12 +225,11 @@ async fn extract_from_installer(
             }
         };
     let modern = legacy_artifact.is_none();
-    let embedded_entries = zip
-        .file()
-        .entries()
+    let entry_names = zip.file_names().collect::<Result<Vec<_>, _>>()?;
+    let embedded_entries = entry_names
         .iter()
-        .map(|entry| entry.filename().as_str())
-        .collect::<Result<HashSet<_>, _>>()?;
+        .map(|name| name.as_ref())
+        .collect::<HashSet<_>>();
     let data_artifacts = data::normalize(
         &mut version,
         installer.loader,
@@ -567,25 +574,23 @@ fn referenced_maven_artifacts(
 }
 
 async fn read_file(zip: &ZipFileReader, path: &str) -> Result<Option<Vec<u8>>> {
-    let index = zip
-        .file()
-        .entries()
-        .iter()
-        .position(|entry| entry.filename().as_str().ok() == Some(path));
-    let Some(index) = index else {
+    let Some(index) = zip.index_for_name(path) else {
         return Ok(None);
     };
-
-    let mut reader = zip
-        .reader_with_entry(index)
-        .context(info_span!("opening installer entry", path))
-        .await?;
-    let mut bytes = Vec::new();
-    reader
-        .read_to_end_checked(&mut bytes)
-        .context(info_span!("reading installer entry", path))
-        .await?;
-    Ok(Some(bytes))
+    let mut zip = zip.clone();
+    let path = path.to_owned();
+    tokio::task::spawn_blocking(move || {
+        let mut reader = zip
+            .by_index(index)
+            .with_context(|| format!("opening installer entry {path}"))?;
+        let mut bytes = Vec::new();
+        reader
+            .read_to_end(&mut bytes)
+            .with_context(|| format!("reading installer entry {path}"))?;
+        Ok(Some(bytes))
+    })
+    .await
+    .context("joining installer entry reader")?
 }
 
 async fn read_json<T: DeserializeOwned>(
@@ -605,6 +610,76 @@ async fn read_json<T: DeserializeOwned>(
 mod tests {
     use super::*;
     use serde_json::json;
+    use std::io::Write;
+
+    fn installer_zip(
+        entries: &[(&str, &[u8])],
+        compression: zip::CompressionMethod,
+    ) -> Vec<u8> {
+        let mut writer = zip::ZipWriter::new(Cursor::new(Vec::new()));
+        let options = zip::write::SimpleFileOptions::default()
+            .compression_method(compression);
+        for (path, bytes) in entries {
+            writer.start_file(*path, options).unwrap();
+            writer.write_all(bytes).unwrap();
+        }
+        writer.finish().unwrap().into_inner()
+    }
+
+    #[tokio::test]
+    async fn reads_installer_entries_concurrently_and_handles_missing_files() {
+        let bytes = installer_zip(
+            &[
+                ("version.json", br#"{"id":"test"}"#),
+                ("maven/library.jar", b"jar"),
+            ],
+            zip::CompressionMethod::Deflated,
+        );
+        let zip = ZipFileReader::new(Cursor::new(Arc::from(bytes))).unwrap();
+        let (version, library) = tokio::join!(
+            read_json::<serde_json::Value>(&zip, "version.json"),
+            read_file(&zip, "maven/library.jar"),
+        );
+        assert_eq!(version.unwrap(), Some(json!({"id": "test"})));
+        assert_eq!(library.unwrap().as_deref(), Some(b"jar".as_slice()));
+        assert!(read_file(&zip, "missing.jar").await.unwrap().is_none());
+        assert!(
+            read_json::<serde_json::Value>(&zip, "missing.json")
+                .await
+                .unwrap()
+                .is_none()
+        );
+    }
+
+    #[tokio::test]
+    async fn rejects_invalid_installer_json() {
+        let bytes = installer_zip(
+            &[("version.json", b"not JSON")],
+            zip::CompressionMethod::Stored,
+        );
+        let zip = ZipFileReader::new(Cursor::new(Arc::from(bytes))).unwrap();
+        assert!(
+            read_json::<serde_json::Value>(&zip, "version.json")
+                .await
+                .is_err()
+        );
+    }
+
+    #[tokio::test]
+    async fn rejects_installer_entry_checksum_mismatch() {
+        let contents = b"embedded library contents";
+        let mut bytes = installer_zip(
+            &[("maven/library.jar", contents)],
+            zip::CompressionMethod::Stored,
+        );
+        let offset = bytes
+            .windows(contents.len())
+            .position(|window| window == contents)
+            .unwrap();
+        bytes[offset] ^= 1;
+        let zip = ZipFileReader::new(Cursor::new(Arc::from(bytes))).unwrap();
+        assert!(read_file(&zip, "maven/library.jar").await.is_err());
+    }
 
     fn library(value: serde_json::Value) -> mojang::Library {
         serde_json::from_value(value).unwrap()

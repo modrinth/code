@@ -213,7 +213,7 @@ pub async fn random_projects_get(
     };
 
     if params.project_type.is_some() {
-        project_ids.shuffle(&mut rand::thread_rng());
+        project_ids.shuffle(&mut rand::rng());
         project_ids.truncate(params.count as usize);
     }
 
