@@ -459,6 +459,7 @@ fn main() {
                         "rename_world",
                         "reset_world_icon",
                         "backup_world",
+                        "import_world",
                         "delete_world",
                         "add_server_to_instance",
                         "ensure_managed_server_in_instance",

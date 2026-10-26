@@ -36,6 +36,16 @@
 					"
 				/>
 				<div class="flex gap-2">
+					<Button
+						type="outlined"
+						size="lg"
+						:disabled="importingWorlds || instance.quarantined"
+						@click="handleImportWorlds"
+					>
+						<SpinnerIcon v-if="importingWorlds" class="size-5 animate-spin" />
+						<ImportIcon v-else class="size-5" />
+						{{ formatMessage(importingWorlds ? messages.importingWorld : messages.importWorld) }}
+					</Button>
 					<Button type="outlined" size="lg" @click="addServerModal?.show()">
 						<PlusIcon class="size-5" />
 						{{ formatMessage(messages.addServer) }}
@@ -113,6 +123,16 @@
 			:description="formatMessage(messages.noWorldsDescription)"
 		>
 			<template #actions>
+				<Button
+					type="outlined"
+					size="lg"
+					:disabled="importingWorlds || instance.quarantined"
+					@click="handleImportWorlds"
+				>
+					<SpinnerIcon v-if="importingWorlds" class="size-5 animate-spin" />
+					<ImportIcon v-else class="size-5" />
+					{{ formatMessage(importingWorlds ? messages.importingWorld : messages.importWorld) }}
+				</Button>
 				<Button type="outlined" size="lg" @click="addServerModal?.show()">
 					<PlusIcon class="size-5" />
 					{{ formatMessage(messages.addServer) }}
@@ -126,7 +146,14 @@
 	</ReadyTransition>
 </template>
 <script setup lang="ts">
-import { CompassIcon, PlusIcon, RefreshCwIcon, SearchIcon } from '@modrinth/assets'
+import {
+	CompassIcon,
+	ImportIcon,
+	PlusIcon,
+	RefreshCwIcon,
+	SearchIcon,
+	SpinnerIcon,
+} from '@modrinth/assets'
 import { Button } from '@modrinth/ui'
 import {
 	commonMessages,
@@ -142,8 +169,10 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { getCurrentWebview } from '@tauri-apps/api/webview'
+import { open } from '@tauri-apps/plugin-dialog'
 import { platform } from '@tauri-apps/plugin-os'
-import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 import AddServerModal from '@/components/ui/world/modal/AddServerModal.vue'
@@ -165,10 +194,12 @@ import {
 	ensureManagedServerWorldExists,
 	get_instance_protocol_version,
 	getServerAddress,
+	getWorldDisplayName,
 	getWorldIdentifier,
 	handleDefaultInstanceUpdateEvent,
 	hasServerQuickPlaySupport,
 	hasWorldQuickPlaySupport,
+	import_world,
 	normalizeServerAddress,
 	type ProtocolVersion,
 	refreshServerData,
@@ -199,6 +230,30 @@ const messages = defineMessages({
 	addServer: {
 		id: 'app.instance.worlds.add-server',
 		defaultMessage: 'Add server',
+	},
+	importWorld: {
+		id: 'app.instance.worlds.import-world',
+		defaultMessage: 'Import world',
+	},
+	importingWorld: {
+		id: 'app.instance.worlds.importing-world',
+		defaultMessage: 'Importing...',
+	},
+	worldArchiveFilter: {
+		id: 'app.instance.worlds.world-archive-filter',
+		defaultMessage: 'Minecraft world',
+	},
+	worldsImported: {
+		id: 'app.instance.worlds.worlds-imported',
+		defaultMessage: 'Successfully imported',
+	},
+	worldWasImported: {
+		id: 'app.instance.worlds.world-was-imported',
+		defaultMessage: '{name} was imported',
+	},
+	worldsWereImported: {
+		id: 'app.instance.worlds.worlds-were-imported',
+		defaultMessage: '{count} worlds were imported',
 	},
 	browseServers: {
 		id: 'app.instance.worlds.browse-servers',
@@ -235,7 +290,7 @@ const messages = defineMessages({
 })
 
 const { formatMessage } = useVIntl()
-const { handleError } = injectNotificationManager()
+const { handleError, addNotification } = injectNotificationManager()
 const { playServerProject } = injectServerInstall()
 const route = useRoute()
 const instancePage = injectInstancePage()
@@ -521,6 +576,59 @@ async function editWorld(path: string, name: string, removeIcon: boolean) {
 	}
 }
 
+const importingWorlds = ref(false)
+
+async function handleImportWorlds() {
+	if (instance.value.quarantined) return
+	const files = await open({
+		multiple: true,
+		filters: [{ name: formatMessage(messages.worldArchiveFilter), extensions: ['zip', 'dat'] }],
+	})
+	if (!files) return
+	const paths = files
+		.map((file) => (file as { path?: string }).path ?? file)
+		.filter((path): path is string => typeof path === 'string')
+	await importWorlds(paths)
+}
+
+async function importWorlds(paths: string[]) {
+	if (paths.length === 0 || importingWorlds.value) return
+	importingWorlds.value = true
+	try {
+		const imported = (
+			await Promise.all(
+				paths.map((path) =>
+					import_world(instance.value.id, path).catch((error) => {
+						handleError(error as Error)
+						return null
+					}),
+				),
+			)
+		).filter((world): world is string => world !== null)
+		if (imported.length === 0) return
+
+		await refreshAllWorlds()
+		highlightedWorld.value = imported[0]
+
+		const names = imported.map((path) => {
+			const world = worlds.value.find(
+				(world) => world.type === 'singleplayer' && world.path === path,
+			)
+			return world ? getWorldDisplayName(world) : path
+		})
+		addNotification({
+			type: 'success',
+			title: formatMessage(messages.worldsImported),
+			text:
+				names.length === 1
+					? formatMessage(messages.worldWasImported, { name: names[0] })
+					: formatMessage(messages.worldsWereImported, { count: names.length }),
+		})
+	} finally {
+		importingWorlds.value = false
+	}
+}
+
 async function deleteWorld(world: SingleplayerWorld) {
 	await delete_world(instance.value.id, world.path).catch(handleError)
 	worlds.value = worlds.value.filter((w) => w.type !== 'singleplayer' || w.path !== world.path)
@@ -714,7 +822,27 @@ async function proceedRemoveWorld(world: World, scope: 'here' | 'all') {
 	worldToRemove.value = null
 }
 
+let unlistenDragDrop: (() => void) | null = null
+
+onMounted(() => {
+	void getCurrentWebview()
+		.onDragDropEvent(async (event) => {
+			if (event.payload.type !== 'drop' || instance.value.quarantined) return
+			await importWorlds(event.payload.paths.filter((path) => !path.endsWith('.mrpack')))
+		})
+		.then((unlisten) => {
+			if (!worldsTabAlive) {
+				unlisten()
+				return
+			}
+
+			unlistenDragDrop = unlisten
+		})
+		.catch(handleError)
+})
+
 onBeforeUnmount(() => {
 	worldsTabAlive = false
+	unlistenDragDrop?.()
 })
 </script>
