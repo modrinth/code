@@ -1,24 +1,13 @@
 <script setup lang="ts">
 import { CheckIcon, InfoIcon, RefreshCwIcon, SaveIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
-import {
-	Avatar,
-	Button,
-	commonMessages,
-	defineMessages,
-	injectNotificationManager,
-	NewModal,
-	useVIntl,
-} from '@modrinth/ui'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 
-import { toError } from '@/helpers/errors'
-import {
-	cache_generated_icon,
-	edit_generated_icon,
-	edit_generated_icon_if_empty,
-	get_recent_icon_configs,
-} from '@/helpers/instance'
-import type { IconBackground, InstanceIconConfig } from '@/helpers/types'
+import Avatar from '#ui/components/base/Avatar.vue'
+import Button from '#ui/components/base/buttons/Button.vue'
+import NewModal from '#ui/components/modal/NewModal.vue'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { injectNotificationManager } from '#ui/providers'
+import { commonMessages } from '#ui/utils/common-messages'
 
 import {
 	type BackgroundId,
@@ -30,20 +19,22 @@ import {
 	type SymbolOption,
 	symbolOptions,
 } from './editor-catalog'
+import type { IconBackground, IconConfig } from './types'
 
 const props = defineProps<{
-	instanceId?: string
-	config?: InstanceIconConfig | null
+	config?: IconConfig | null
+	loadRecents?: () => Promise<IconConfig[]>
+	save: (config: IconConfig, symbolAsset: string) => Promise<string | void>
 }>()
 
 const emit = defineEmits<{
-	saved: [iconPath: string, config: InstanceIconConfig]
+	saved: [result: string | void, config: IconConfig]
 }>()
 
 const { formatMessage } = useVIntl()
 const { handleError } = injectNotificationManager()
 const modal = ref<InstanceType<typeof NewModal> | null>(null)
-const recentConfigs = ref<InstanceIconConfig[]>([])
+const recentConfigs = ref<IconConfig[]>([])
 const saving = ref(false)
 const backgroundScroller = ref<HTMLElement | null>(null)
 const showLeftBackgroundShadow = ref(false)
@@ -68,7 +59,7 @@ const selectedSymbolOption = computed(
 	() => symbolOptions.find((option) => option.id === selectedSymbol.value)!,
 )
 const vanillaSymbolStartIndex = symbolOptions.findIndex((option) => option.category === 'vanilla')
-const selectedConfig = computed<InstanceIconConfig>(() => ({
+const selectedConfig = computed<IconConfig>(() => ({
 	background: { ...selectedBackgroundOption.value.background },
 	symbol: selectedSymbol.value,
 }))
@@ -95,7 +86,13 @@ function onBackgroundWheel(event: WheelEvent) {
 	if (!el || el.scrollWidth <= el.clientWidth) return
 
 	const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY
-	el.scrollLeft += delta
+	const nextScrollLeft = Math.max(
+		0,
+		Math.min(el.scrollLeft + delta, el.scrollWidth - el.clientWidth),
+	)
+	if (nextScrollLeft === el.scrollLeft) return
+	event.preventDefault()
+	el.scrollLeft = nextScrollLeft
 }
 
 function onBackgroundPointerDown(event: PointerEvent) {
@@ -190,7 +187,7 @@ function symbolOption(symbol: string) {
 	return symbolOptions.find((option) => option.id === symbol)
 }
 
-function selectRecent(config: InstanceIconConfig) {
+function selectRecent(config: IconConfig) {
 	const background = backgroundOption(config.background)
 	const symbol = symbolOption(config.symbol)
 	if (!background || !symbol) return
@@ -220,11 +217,11 @@ function surpriseMe() {
 	selectedSymbol.value = configuration.symbol
 }
 
-async function loadRecents() {
+async function refreshRecentConfigs() {
 	try {
-		recentConfigs.value = await get_recent_icon_configs()
+		recentConfigs.value = props.loadRecents ? await props.loadRecents() : []
 	} catch (error) {
-		handleError(toError(error))
+		handleError(error instanceof Error ? error : new Error(String(error)))
 	}
 }
 
@@ -232,19 +229,12 @@ function show() {
 	selectedBackground.value = backgroundOption(props.config?.background)?.id ?? DEFAULT_BACKGROUND_ID
 	selectedSymbol.value = symbolOption(props.config?.symbol ?? '')?.id ?? DEFAULT_SYMBOL_ID
 	modal.value?.show()
-	void loadRecents()
+	void refreshRecentConfigs()
 	nextTick(updateBackgroundScrollShadows)
 }
 
 function hide() {
 	modal.value?.hide()
-}
-
-async function loadSymbolBytes(asset: string): Promise<number[]> {
-	const response = await fetch(asset)
-	if (!response.ok) throw new Error('Failed to load the icon symbol.')
-
-	return Array.from(new Uint8Array(await response.arrayBuffer()))
 }
 
 async function saveIcon() {
@@ -253,50 +243,24 @@ async function saveIcon() {
 	saving.value = true
 	try {
 		const config = selectedConfig.value
-		const symbolBytes = await loadSymbolBytes(selectedSymbolOption.value.asset)
-		const iconPath = props.instanceId
-			? await edit_generated_icon(props.instanceId, config, symbolBytes)
-			: await cache_generated_icon(config, symbolBytes, true)
-		emit('saved', iconPath, config)
+		const result = await props.save(config, selectedSymbolOption.value.asset)
+		emit('saved', result, config)
 		saving.value = false
 		await nextTick()
 		hide()
 	} catch (error) {
-		handleError(toError(error))
+		handleError(error instanceof Error ? error : new Error(String(error)))
 	} finally {
 		saving.value = false
 	}
 }
 
-async function randomizeAndSave() {
-	try {
-		surpriseMe()
-		const config = selectedConfig.value
-		const iconPath = await cache_generated_icon(
-			config,
-			await loadSymbolBytes(selectedSymbolOption.value.asset),
-		)
-		return { iconPath, config }
-	} catch (error) {
-		handleError(toError(error))
-		return null
-	}
+function randomize() {
+	surpriseMe()
+	return { config: selectedConfig.value, symbolAsset: selectedSymbolOption.value.asset }
 }
 
-async function applyGeneratedIcon(instanceId: string, config: InstanceIconConfig) {
-	try {
-		const symbol = symbolOption(config.symbol)
-		if (!backgroundOption(config.background) || !symbol) return false
-
-		await edit_generated_icon_if_empty(instanceId, config, await loadSymbolBytes(symbol.asset))
-		return true
-	} catch (error) {
-		handleError(toError(error))
-		return false
-	}
-}
-
-defineExpose({ show, hide, randomize: randomizeAndSave, randomizeAndSave, applyGeneratedIcon })
+defineExpose({ show, hide, randomize })
 
 const messages = defineMessages({
 	title: {
@@ -420,7 +384,7 @@ const messages = defineMessages({
 							@pointerup="finishBackgroundDrag"
 							@pointercancel="finishBackgroundDrag"
 							@click.capture="onBackgroundClick"
-							@wheel.prevent="onBackgroundWheel"
+							@wheel="onBackgroundWheel"
 							@scroll="updateBackgroundScrollShadows"
 						>
 							<button
