@@ -302,6 +302,18 @@
   "app.content.sync-resource-packs-disabled": {
     "message": "Activa primero la sincronización de paquetes de recursos en la configuración de la aplicación."
   },
+  "app.debug-export.canceling": {
+    "message": "Cancelando exportación..."
+  },
+  "app.debug-export.exporting": {
+    "message": "Exportando..."
+  },
+  "app.debug-export.finishing": {
+    "message": "Terminando..."
+  },
+  "app.debug-export.preparing": {
+    "message": "Preparando archivos..."
+  },
   "app.download-manager.active": {
     "message": "Activos"
   },
@@ -466,6 +478,15 @@
   },
   "app.features-settings.sync-across-devices.title": {
     "message": "Sincronice los ajustes entre dispositivos"
+  },
+  "app.file-download.canceling": {
+    "message": "Cancelando descarga..."
+  },
+  "app.file-download.preparing": {
+    "message": "Preparando descarga..."
+  },
+  "app.file-download.waiting": {
+    "message": "Esperando al servidor..."
   },
   "app.home.jump-back-in.actions.label": {
     "message": "Acciones de la instancia"
@@ -4270,9 +4291,6 @@
   },
   "instance.shared-instance.publish-review.added-label": {
     "message": "Añadido"
-  },
-  "instance.shared-instance.publish-review.header": {
-    "message": "Revisar cambios"
   },
   "instance.shared-instance.publish-review.publish-button": {
     "message": "Lanzar actualización"

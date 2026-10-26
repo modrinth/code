@@ -461,9 +461,6 @@
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} lisätty"
   },
-  "content.diff-modal.config-files-updated": {
-    "defaultMessage": "Muutetut asetustiedostot"
-  },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Lisätyt (riippuvaisuudet)"
   },
@@ -1212,3 +1209,4 @@
     "defaultMessage": "Sinulla on tallentamattomia muutoksia."
   }
 }
+

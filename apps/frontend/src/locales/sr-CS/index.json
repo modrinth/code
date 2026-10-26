@@ -1997,9 +1997,6 @@
   "settings.sessions.action.revoke-session": {
     "message": "Opozovi sesiju"
   },
-  "settings.sessions.created-ago": {
-    "message": "Kreirano {ago}"
-  },
   "settings.sessions.current-session": {
     "message": "Trenutna sesija"
   },

@@ -479,6 +479,15 @@
   "app.features-settings.sync-across-devices.title": {
     "message": "Cihazlar arası özellikleri eşitle"
   },
+  "app.file-download.canceling": {
+    "message": "İndirme İptal Ediliyor"
+  },
+  "app.file-download.preparing": {
+    "message": "İndirme Hazırlanıyor..."
+  },
+  "app.file-download.waiting": {
+    "message": "Sunucu için yanıt bekleniyor."
+  },
   "app.home.jump-back-in.actions.label": {
     "message": "Kurulum eylemleri"
   },
@@ -1321,6 +1330,12 @@
   },
   "app.modal.install-to-play.shared-instance-unknown-files-description": {
     "message": "Bu paylaşımlı örnek Modrinth'te paylaşılmayan dosyalar içeriyor. Yalnızca güvendiğiniz kaynaklardan gelen dosyaları yüklemenizi şiddetle tavsiye ederiz."
+  },
+  "app.modal.install-to-play.unavailable-description": {
+    "message": "Bu sunucunun kullandığı mod paketi verisyonu şuanda indirilemez. Muhtemelen yayınlanmadı veya hala inceleme altında. Sonra tekrar deneyiniz ya da Sunucu sahibi ile iletişime geçiniz."
+  },
+  "app.modal.install-to-play.unavailable-header": {
+    "message": "Bu sunucunun mod paketi hazır değil"
   },
   "app.modal.install-to-play.unknown-files-description": {
     "message": "Bu sunucunun mod paketi Modrinth'te yayınlanmamış doysaları mevcut. Yalnızca güvendiğiniz kaynaklardan dosya indirmenizi önemle tavsiye ederiz."
@@ -2201,6 +2216,9 @@
   "app.settings.game-options.setting.dark-splash.label": {
     "message": "Tek renkli logo"
   },
+  "app.settings.game-options.setting.darkness-pulsing.label": {
+    "message": "Karanlığın nabzı"
+  },
   "app.settings.game-options.setting.debug-gui-scale.label": {
     "message": "Hata ayıklama GUI'ının ölçeği"
   },
@@ -2209,6 +2227,9 @@
   },
   "app.settings.game-options.setting.discrete-mouse-scroll.description": {
     "message": "Her fare tekerleği girişini tek bir kaydırma adımı olarak değerlendirin."
+  },
+  "app.settings.game-options.setting.discrete-mouse-scroll.label": {
+    "message": "Ayrık kaydırma"
   },
   "app.settings.game-options.setting.entity-distance.label": {
     "message": "Varlık mesafesi"
@@ -2276,6 +2297,9 @@
   "app.settings.game-options.setting.hide-splash-texts.label": {
     "message": "Açılış metinlerini gizle"
   },
+  "app.settings.game-options.setting.high-contrast-outline.label": {
+    "message": "Yüksek Kontrastlı Blok Çerçevesi"
+  },
   "app.settings.game-options.setting.high-contrast.label": {
     "message": "Yüksek karşıtlık"
   },
@@ -2290,6 +2314,9 @@
   },
   "app.settings.game-options.setting.inactivity-framerate-limit.label": {
     "message": "Azaltılmış kare hızı"
+  },
+  "app.settings.game-options.setting.invert-horizontal-mouse.label": {
+    "message": "Fareyi Ters Çevir (Yatay)"
   },
   "app.settings.game-options.setting.invert-mouse.label": {
     "message": "Fareyi ters çevir"
@@ -2339,6 +2366,9 @@
   "app.settings.game-options.setting.key-debug-overlay.label": {
     "message": "Hata ayıklama katmanı"
   },
+  "app.settings.game-options.setting.key-debug-profiling-chart.label": {
+    "message": "Performans analizi grafiği"
+  },
   "app.settings.game-options.setting.key-debug-profiling.label": {
     "message": "Profillemeye başla"
   },
@@ -2347,6 +2377,9 @@
   },
   "app.settings.game-options.setting.key-debug-reload-resource-packs.label": {
     "message": "Kaynak paketlerini yeniden yükle"
+  },
+  "app.settings.game-options.setting.key-debug-spectate.label": {
+    "message": "Varlığı İzle"
   },
   "app.settings.game-options.setting.key-debug-switch-game-mode.label": {
     "message": "Oyun modunu değiştir"
@@ -2362,6 +2395,36 @@
   },
   "app.settings.game-options.setting.key-fullscreen.label": {
     "message": "Tam ekranı aç/kapat"
+  },
+  "app.settings.game-options.setting.key-jump.label": {
+    "message": "Zıpla"
+  },
+  "app.settings.game-options.setting.key-pick-item.label": {
+    "message": "Blok Seç"
+  },
+  "app.settings.game-options.setting.key-player-list.label": {
+    "message": "Oyuncu Listesi"
+  },
+  "app.settings.game-options.setting.key-screenshot.label": {
+    "message": "Ekran Görüntüsü"
+  },
+  "app.settings.game-options.setting.key-smooth-camera.label": {
+    "message": "Sinematik Kamerayı Aktif Et"
+  },
+  "app.settings.game-options.setting.key-sneak.label": {
+    "message": "Eğil"
+  },
+  "app.settings.game-options.setting.key-social-interactions.label": {
+    "message": "Sosyal Etkileşimler"
+  },
+  "app.settings.game-options.setting.key-spectator-hotbar.label": {
+    "message": "İzleyici Hızlı Erişim Çubuğu"
+  },
+  "app.settings.game-options.setting.key-spectator-outlines.label": {
+    "message": "İzleyicileri belli et"
+  },
+  "app.settings.game-options.setting.key-sprint.label": {
+    "message": "Koşma"
   },
   "app.settings.game-options.setting.key-use.label": {
     "message": "Eşyayı kullan"
@@ -2450,6 +2513,27 @@
   "app.settings.game-options.setting.sensitivity.label": {
     "message": "Fare hassasiyeti"
   },
+  "app.settings.game-options.setting.touchscreen.label": {
+    "message": "Dokunmatik Ekran Modu"
+  },
+  "app.settings.game-options.setting.use-vbo.label": {
+    "message": "VBO'ları Kullan"
+  },
+  "app.settings.game-options.setting.vignette.label": {
+    "message": "Vinyet"
+  },
+  "app.settings.game-options.setting.weather-radius.label": {
+    "message": "Hava Durumu Çapı"
+  },
+  "app.settings.game-options.setting.weather-volume.label": {
+    "message": "Hava Durumu"
+  },
+  "app.settings.game-options.validation.invalid-value": {
+    "message": "Geçerli Bir Değer Gir"
+  },
+  "app.settings.game-options.validation.no-compatible-instances": {
+    "message": "Profillerinden bazıları bu ayarı kullanamaz"
+  },
   "app.settings.java-installations.location.title": {
     "message": "Java {version, number} konumu"
   },
@@ -2506,6 +2590,12 @@
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "Uygulama dizini"
+  },
+  "app.settings.resource-management.debug-info.export": {
+    "message": "Hata Ayıklama Bilgilerini Dışa Aktar"
+  },
+  "app.settings.resource-management.debug-info.title": {
+    "message": "Hata Ayıklama Bilgisi"
   },
   "app.settings.resource-management.maximum-concurrent-downloads.description": {
     "message": "Uygulamanın bir kerede indirebileceği dosya sayısı. Bağlantınızda indirmeler kararsız ise bu değeri düşürün. Uygulamanın yeniden başlatılması gerekir."
@@ -3583,9 +3673,6 @@
   },
   "instance.shared-instance.publish-review.added-label": {
     "message": "Eklendi"
-  },
-  "instance.shared-instance.publish-review.header": {
-    "message": "Değişiklikleri incele"
   },
   "instance.shared-instance.publish-review.publish-button": {
     "message": "Güncelleme gönder"
