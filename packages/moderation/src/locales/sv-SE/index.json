@@ -111,7 +111,7 @@
     "defaultMessage": "Besök gallerisida"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "Licensen för din {type} kräver att källkoden publiceras. Ange en länk till källkoden, lägg till källkodsfiler eller ändra den valda licensen."
+    "defaultMessage": "Licensen för ditt {type} kräver att källkoden publiceras. Vänligen förse en länk till källkoden, lägg till källkodsfiler eller ändra den valda licensen."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Tillförse källkod"
@@ -242,6 +242,9 @@
   "nags.project-summary-links.title": {
     "defaultMessage": "Ta bort länkar i sammanfattningen"
   },
+  "nags.project-summary-non-english.description": {
+    "defaultMessage": "Din projektsammanfattning måste vara skriven på engelska eller ha en engelsk översättning."
+  },
   "nags.project-summary-non-english.title": {
     "defaultMessage": "Översätt sammanfattningen"
   },
@@ -343,6 +346,60 @@
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Besök länkinställningar"
+  },
+  "project-review.issue-target.add-gallery-images": {
+    "defaultMessage": "Lägg till galleribilder"
+  },
+  "project-review.issue-target.add-project-disclosures": {
+    "defaultMessage": "Lägg till upplysning"
+  },
+  "project-review.issue-target.modify-description": {
+    "defaultMessage": "Ändra beskrivning"
+  },
+  "project-review.issue-target.modify-gallery-image": {
+    "defaultMessage": "Ändra galleribild"
+  },
+  "project-review.issue-target.modify-icon": {
+    "defaultMessage": "Ändra ikon"
+  },
+  "project-review.issue-target.modify-license": {
+    "defaultMessage": "Ändra licens"
+  },
+  "project-review.issue-target.modify-links": {
+    "defaultMessage": "Ändra länkar"
+  },
+  "project-review.issue-target.modify-project-disclosure": {
+    "defaultMessage": "Ändra upplysning"
+  },
+  "project-review.issue-target.modify-project-disclosure-note": {
+    "defaultMessage": "Ändra upplysningsanteckning"
+  },
+  "project-review.issue-target.modify-server-address": {
+    "defaultMessage": "Ändra serveradress"
+  },
+  "project-review.issue-target.modify-server-languages": {
+    "defaultMessage": "Ändra serverspråk"
+  },
+  "project-review.issue-target.modify-summary": {
+    "defaultMessage": "Ändra beskrivning"
+  },
+  "project-review.issue-target.modify-title": {
+    "defaultMessage": "Ändra titel"
+  },
+  "project-review.issue-target.remove-gallery-images": {
+    "defaultMessage": "Ta bort galleribilder"
+  },
+  "project-review.issue-target.remove-icon": {
+    "defaultMessage": "Ta bort ikon"
+  },
+  "project-review.issue-target.remove-project-disclosures": {
+    "defaultMessage": "Ta bort upplysningar"
+  },
+  "project-review.issue-target.remove-tags": {
+    "defaultMessage": "Ta bort taggar"
+  },
+  "project-review.issue-target.version": {
+    "defaultMessage": "Ändra version"
   },
   "project.text-validation.description-matches-summary": {
     "defaultMessage": "Din projektbeskrivning borde ge unik information och inte upprepa projektsammanfattningen."

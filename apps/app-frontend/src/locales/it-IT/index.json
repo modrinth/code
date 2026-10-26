@@ -402,7 +402,7 @@
     "message": "Apri la cartella dei backup"
   },
   "app.export-modal.description-placeholder": {
-    "message": "Inserisci descrizione del pacchetto..."
+    "message": "Inserisci descrizione pacchetto..."
   },
   "app.export-modal.export-button": {
     "message": "Esporta"
@@ -478,6 +478,15 @@
   },
   "app.features-settings.sync-across-devices.title": {
     "message": "Sincronizza tra i dispositivi"
+  },
+  "app.file-download.canceling": {
+    "message": "Annullamento del download…"
+  },
+  "app.file-download.preparing": {
+    "message": "Preparazione del download…"
+  },
+  "app.file-download.waiting": {
+    "message": "In attesa del server…"
   },
   "app.home.jump-back-in.actions.label": {
     "message": "Azioni sull'istanza"
@@ -798,7 +807,7 @@
     "message": "Revoca accesso"
   },
   "app.instance.share.remove-user-modal.remove-button": {
-    "message": "Revoca accesso"
+    "message": "Revoca"
   },
   "app.instance.share.remove-user-modal.user-avatar-alt": {
     "message": "Foto profilo di {username}"
@@ -1322,6 +1331,12 @@
   "app.modal.install-to-play.shared-instance-unknown-files-description": {
     "message": "L'istanza condivisa contiene dei file che non sono su Modrinth. Consigliamo di installare file solo da fonti attendibili."
   },
+  "app.modal.install-to-play.unavailable-description": {
+    "message": "La versione del pacchetto usata non può essere scaricata al momento. Potrebbe essere stata rimossa o essere sotto revisione. Riprova più tardi o contatta il proprietario del server."
+  },
+  "app.modal.install-to-play.unavailable-header": {
+    "message": "Il pacchetto del server non è disponibile"
+  },
   "app.modal.install-to-play.unknown-files-description": {
     "message": "Il pacchetto contiene dei file che non sono su Modrinth. Consigliamo di installare file solo da fonti attendibili."
   },
@@ -1644,7 +1659,7 @@
     "message": "Le variabili d'ambiente impostate all'avvio di un'istanza."
   },
   "app.settings.default-instance-options.environment-variables.placeholder": {
-    "message": "Inserisci le variabili d'ambiente..."
+    "message": "Inserisci variabili d'ambiente..."
   },
   "app.settings.default-instance-options.environment-variables.title": {
     "message": "Variabili d'ambiente"
@@ -1659,7 +1674,7 @@
     "message": "L'altezza della finestra del gioco all'avvio."
   },
   "app.settings.default-instance-options.height.placeholder": {
-    "message": "Inserisci l'altezza..."
+    "message": "Inserisci altezza..."
   },
   "app.settings.default-instance-options.height.title": {
     "message": "Altezza"
@@ -1668,7 +1683,7 @@
     "message": "Gli argomenti passati a Java all'avvio di un'istanza."
   },
   "app.settings.default-instance-options.java-arguments.placeholder": {
-    "message": "Inserisci gli argomenti Java..."
+    "message": "Inserisci argomenti Java..."
   },
   "app.settings.default-instance-options.java-arguments.title": {
     "message": "Argomenti Java"
@@ -1683,7 +1698,7 @@
     "message": "Verrà eseguito dopo la chiusura del gioco."
   },
   "app.settings.default-instance-options.post-exit-hook.placeholder": {
-    "message": "Inserisci il comando post-uscita..."
+    "message": "Inserisci comando post-uscita..."
   },
   "app.settings.default-instance-options.post-exit-hook.title": {
     "message": "Hook post-uscita"
@@ -1692,7 +1707,7 @@
     "message": "Verrà eseguito prima dell'avvio dell'istanza."
   },
   "app.settings.default-instance-options.pre-launch-hook.placeholder": {
-    "message": "Inserisci il comando pre-avvio..."
+    "message": "Inserisci comando pre-avvio..."
   },
   "app.settings.default-instance-options.pre-launch-hook.title": {
     "message": "Hook pre-avvio"
@@ -1701,7 +1716,7 @@
     "message": "La larghezza della finestra del gioco all'avvio."
   },
   "app.settings.default-instance-options.width.placeholder": {
-    "message": "Inserisci la larghezza..."
+    "message": "Inserisci larghezza..."
   },
   "app.settings.default-instance-options.width.title": {
     "message": "Larghezza"
@@ -1710,7 +1725,7 @@
     "message": "Comando utilizzato per avvolgere il processo di avvio di Minecraft."
   },
   "app.settings.default-instance-options.wrapper-hook.placeholder": {
-    "message": "Inserisci il comando del wrapper..."
+    "message": "Inserisci comando wrapper..."
   },
   "app.settings.default-instance-options.wrapper-hook.title": {
     "message": "Hook wrapper"
@@ -2879,6 +2894,12 @@
   "app.settings.resource-management.store.verified": {
     "message": "Verifica completata"
   },
+  "app.settings.sidebar.label.instance-defaults": {
+    "message": "Predefiniti istanza"
+  },
+  "app.settings.sidebar.label.system": {
+    "message": "Sistema"
+  },
   "app.settings.synced-options.choose-sync-source.command-history-description": {
     "message": "Scegli da quale istanza copiare la cronologia comandi. Sarà usata solo per la sincronizzazione iniziale, poi potrai modificarla in qualsiasi istanza."
   },
@@ -3110,14 +3131,62 @@
   "app.settings.tabs.features": {
     "message": "Funzioni"
   },
+  "app.settings.tabs.java-and-memory": {
+    "message": "Java e memoria"
+  },
   "app.settings.tabs.java-installations": {
     "message": "Installazioni Java"
   },
   "app.settings.tabs.language": {
     "message": "Lingua"
   },
+  "app.settings.tabs.launch-hooks": {
+    "message": "Hook di avvio"
+  },
   "app.settings.tabs.privacy": {
     "message": "Privacy"
+  },
+  "app.settings.tabs.resources": {
+    "message": "Risorse"
+  },
+  "app.settings.tabs.syncing": {
+    "message": "Sincronizzazione"
+  },
+  "app.settings.tabs.troubleshooting": {
+    "message": "Risoluzione problemi"
+  },
+  "app.settings.tabs.window": {
+    "message": "Finestra"
+  },
+  "app.settings.troubleshooting.clear-cache": {
+    "message": "Svuota cache"
+  },
+  "app.settings.troubleshooting.clear-cache.confirm.title": {
+    "message": "Svuotare la cache dell'app?"
+  },
+  "app.settings.troubleshooting.report-ad.copied": {
+    "message": "Copiati"
+  },
+  "app.settings.troubleshooting.report-ad.copy": {
+    "message": "Copia info annuncio"
+  },
+  "app.settings.troubleshooting.report-ad.no-ad.text": {
+    "message": "Attendi che l'annuncio carichi, poi riprova."
+  },
+  "app.settings.troubleshooting.report-ad.no-ad.title": {
+    "message": "Nessun annuncio trovato"
+  },
+  "app.settings.troubleshooting.report-ad.title": {
+    "message": "Segnala un annuncio"
+  },
+  "app.shared-instance-publish.preparing": {
+    "message": "Preparazione…"
+  },
+  "app.shared-instance-publish.pushed": {
+    "message": "Aggiornamento inviato"
+  },
+  "app.shared-instance-publish.uploading": {
+    "message": "Invio aggiornamento…"
   },
   "app.sidebar.playing-as": {
     "message": "Accesso effettuato come"
@@ -3558,7 +3627,7 @@
     "message": "Potrebbe essere diverso dal nome utente di Minecraft!"
   },
   "friends.add-friend.username.placeholder": {
-    "message": "Nome utente di Modrinth..."
+    "message": "Inserisci nome utente di Modrinth..."
   },
   "friends.add-friend.username.title": {
     "message": "Con quale utente di Modrinth vuoi stringere amicizia?"
@@ -3959,6 +4028,9 @@
   "instance.server-modal.resource-pack": {
     "message": "Pacchetto di risorse"
   },
+  "instance.settings.defaults.open-app-settings": {
+    "message": "Modifica le impostazioni"
+  },
   "instance.settings.sharing.active-invites.actions": {
     "message": "Azioni"
   },
@@ -3993,10 +4065,16 @@
     "message": "Questa azione è irreversibile"
   },
   "instance.settings.sharing.revoke-invite.confirm": {
-    "message": "Revoca invito"
+    "message": "Revoca"
   },
   "instance.settings.sharing.revoke-invite.header": {
     "message": "Revoca invito"
+  },
+  "instance.settings.sidebar.label.game": {
+    "message": "Gioco"
+  },
+  "instance.settings.sidebar.label.instance": {
+    "message": "Istanza"
   },
   "instance.settings.synced-options.data-override": {
     "message": "Disattiva la sovrascrittura per modificare i dati sincronizzati."
@@ -4071,19 +4149,19 @@
     "message": "Modifica icona"
   },
   "instance.settings.tabs.general.edit-icon.create": {
-    "message": "Crea una icona"
+    "message": "Crea"
   },
   "instance.settings.tabs.general.edit-icon.edit-created": {
-    "message": "Modifica icona"
+    "message": "Modifica"
   },
   "instance.settings.tabs.general.edit-icon.remove": {
-    "message": "Rimuovi icona"
+    "message": "Rimuovi"
   },
   "instance.settings.tabs.general.edit-icon.replace": {
-    "message": "Sfoglia"
+    "message": "Cambia"
   },
   "instance.settings.tabs.general.edit-icon.select": {
-    "message": "Scegli icona"
+    "message": "Scegli"
   },
   "instance.settings.tabs.general.icon": {
     "message": "Icona"
@@ -4114,6 +4192,12 @@
   },
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Seleziona il canale di aggiornamento"
+  },
+  "instance.settings.tabs.hooks.default-settings-description": {
+    "message": "L'istanza userà gli hook di avvio predefiniti a meno che non li sovrascrivi qui."
+  },
+  "instance.settings.tabs.hooks.label": {
+    "message": "Hook di avvio"
   },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Post-uscita"
@@ -4175,11 +4259,14 @@
   "instance.settings.tabs.installation.locked": {
     "message": "Le impostazioni non sono disponibili mentre l'istanza è bloccata."
   },
+  "instance.settings.tabs.java.default-settings-description": {
+    "message": "L'istanza userà le impostazioni di Java e memoria predefinite a meno che non le sovrascrivi qui."
+  },
   "instance.settings.tabs.java.enter-environment-variables": {
-    "message": "Inserisci le variabili d'ambiente..."
+    "message": "Inserisci variabili d'ambiente..."
   },
   "instance.settings.tabs.java.enter-java-arguments": {
-    "message": "Inserisci gli argomenti Java..."
+    "message": "Inserisci argomenti Java..."
   },
   "instance.settings.tabs.java.environment-variables": {
     "message": "Variabili d'ambiente personalizzati"
@@ -4198,6 +4285,9 @@
   },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/percorso/di/java"
+  },
+  "instance.settings.tabs.java.label": {
+    "message": "Java e memoria"
   },
   "instance.settings.tabs.sharing": {
     "message": "Condivisione"
@@ -4259,8 +4349,14 @@
   "instance.settings.tabs.synced-options.shared-settings.description": {
     "message": "Sovrascrivi le impostazioni di sincronizzazione di questa istanza."
   },
+  "instance.settings.tabs.syncing": {
+    "message": "Sincronizzazione"
+  },
   "instance.settings.tabs.window": {
     "message": "Impostazioni della finestra personalizzate"
+  },
+  "instance.settings.tabs.window.default-settings-description": {
+    "message": "L'istanza userà le impostazioni di finestra predefinite a meno che non le sovrascrivi qui."
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Schermo intero"
@@ -4277,6 +4373,9 @@
   "instance.settings.tabs.window.height.enter": {
     "message": "Inserisci altezza..."
   },
+  "instance.settings.tabs.window.label": {
+    "message": "Finestra"
+  },
   "instance.settings.tabs.window.width": {
     "message": "Larghezza"
   },
@@ -4288,6 +4387,9 @@
   },
   "instance.shared-instance.error.title": {
     "message": "Qualcosa è andato storto"
+  },
+  "instance.shared-instance.file-not-allowed.title": {
+    "message": "Tipo di file non consentito"
   },
   "instance.shared-instance.network-error.text": {
     "message": "Impossibile connettersi all'API delle istanze condivise"
@@ -4301,14 +4403,38 @@
   "instance.shared-instance.publish-review.added-label": {
     "message": "Aggiunto"
   },
+  "instance.shared-instance.publish-review.changes-description": {
+    "message": "Controlla le modifiche rilevate dall'ultimo aggiornamento. Queste saranno incluse automaticamente quando le invii."
+  },
+  "instance.shared-instance.publish-review.changes-tab": {
+    "message": "Modifiche"
+  },
+  "instance.shared-instance.publish-review.file-type-not-allowed": {
+    "message": "Non puoi inviare questo tipo di file."
+  },
+  "instance.shared-instance.publish-review.files-description": {
+    "message": "Puoi anche includere file singoli insieme alle modifiche rilevate. Seleziona i file aggiuntivi che vorresti pubblicare."
+  },
+  "instance.shared-instance.publish-review.files-tab": {
+    "message": "File"
+  },
   "instance.shared-instance.publish-review.header": {
-    "message": "Revisione modifiche"
+    "message": "Invia aggiornamento"
   },
   "instance.shared-instance.publish-review.publish-button": {
     "message": "Invia"
   },
   "instance.shared-instance.publish-review.removed-label": {
     "message": "Rimosso"
+  },
+  "instance.shared-instance.publish-review.storage-over-limit": {
+    "message": "{size} oltre il limite. Deseleziona dei file per inviare l'aggiornamento."
+  },
+  "instance.shared-instance.publish-review.storage-title": {
+    "message": "Spazio consentito"
+  },
+  "instance.shared-instance.publish-review.storage-usage": {
+    "message": "{used} di {limit}"
   },
   "instance.shared-instance.tooltip": {
     "message": "I contenuti dell'istanza stanno venendo gestiti da qualcun altro."

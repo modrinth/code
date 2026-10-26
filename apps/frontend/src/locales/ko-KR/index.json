@@ -6,7 +6,7 @@
     "message": "계속"
   },
   "ads-consent.accept": {
-    "message": "모두 수용"
+    "message": "모두 수락"
   },
   "ads-consent.body": {
     "message": "Modrinth는 광고를 통해 운영되며, 크리에이터에게 지급하여 보상합니다. 파트너들은 맞춤형 광고 제공과 성과 측정을 위해 웹사이트에서 쿠키를 저장 또는 접근할 수 있습니다."
@@ -36,13 +36,13 @@
     "message": "국가"
   },
   "analytics.breakdown.dependent-on": {
-    "message": "다음에 종속됨"
+    "message": "다음에 의존됨"
   },
   "analytics.breakdown.dependent-project-download": {
-    "message": "종속 프로젝트"
+    "message": "의존 프로젝트"
   },
   "analytics.breakdown.dependent-project-type": {
-    "message": "종속 프로젝트 유형"
+    "message": "의존 프로젝트 유형"
   },
   "analytics.breakdown.download-reason": {
     "message": "다운로드 사유"
@@ -156,7 +156,7 @@
     "message": "테이블에서 선택한 모든 선을 표시하면 페이지 성능이 저하될 수 있습니다."
   },
   "analytics.chart.render-limit.header": {
-    "message": "그래프에 {count}개의 선을 모두 표시하시겠습니까?"
+    "message": "그래프에 {count}개의 선을 모두 표시할까요?"
   },
   "analytics.chart.table-selection.all": {
     "message": "테이블의 모든 {itemType, select, project {{count, plural, one {프로젝트} other {프로젝트}}} country {{count, plural, one {국가} other {국가}}} monetization {{count, plural, one {수익화 값} other {수익화 값}}} downloadSource {{count, plural, one {다운로드 출처} other {다운로드 출처}}} downloadReason {{count, plural, one {다운로드 사유} other {다운로드 사유}}} member {{count, plural, one {멤버} other {멤버}}} projectVersion {{count, plural, one {프로젝트 버전} other {프로젝트 버전}}} loader {{count, plural, one {로더} other {로더}}} gameVersion {{count, plural, one {게임 버전} other {게임 버전}}} other {{count, plural, one {항목} other {항목}}}} 표시 중"
@@ -171,19 +171,19 @@
     "message": "테이블의 상위 {count}개 {itemType, select, project {{count, plural, one {프로젝트} other {프로젝트}}} country {{count, plural, one {국가} other {국가}}} monetization {{count, plural, one {수익화 값} other {수익화 값}}} downloadSource {{count, plural, one {다운로드 출처} other {다운로드 출처}}} downloadReason {{count, plural, one {다운로드 사유} other {다운로드 사유}}} member {{count, plural, one {멤버} other {멤버}}} projectVersion {{count, plural, one {프로젝트 버전} other {프로젝트 버전}}} loader {{count, plural, one {로더} other {로더}}} gameVersion {{count, plural, one {게임 버전} other {게임 버전}}} other {{count, plural, one {항목} other {항목}}}} 표시 중"
   },
   "analytics.chart.tooltip.dependent-on-project": {
-    "message": "{project}에 종속됨"
+    "message": "{project}에 의존됨"
   },
   "analytics.chart.tooltip.dependent-project-version": {
-    "message": "{dependencyProject}에 종속된 {dependentProject}, {version}"
+    "message": "{dependencyProject}에 의존된 {dependentProject}, {version}"
   },
   "analytics.chart.tooltip.duration.days": {
-    "message": "{count, plural, one {# 일} other {# 일}}"
+    "message": "{count, plural, other {#}}일"
   },
   "analytics.chart.tooltip.duration.hours": {
-    "message": "{count, plural, one {# 시간} other {# 시간}}"
+    "message": "{count, plural, other {#}}시간"
   },
   "analytics.chart.tooltip.duration.minutes": {
-    "message": "{count, plural, one {# 분} other {# 분}}"
+    "message": "{count, plural, other {#}}분"
   },
   "analytics.chart.tooltip.hide-entry": {
     "message": "그래프에서 {name} 숨기기"
@@ -204,7 +204,7 @@
     "message": "그래프에서 {name} 표시하기"
   },
   "analytics.chart.tooltip.total": {
-    "message": "전체"
+    "message": "합계"
   },
   "analytics.chart.view.area": {
     "message": "영역"
@@ -252,7 +252,7 @@
     "message": "적어도 하나의 프로젝트를 선택해 데이터를 보세요"
   },
   "analytics.filter.dependent-project-search-failed-title": {
-    "message": "종속 프로젝트를 불러오지 못했습니다"
+    "message": "의존 프로젝트 불러오기 실패"
   },
   "analytics.filter.game-version-type": {
     "message": "게임 버전 유형"
@@ -336,7 +336,7 @@
     "message": "결과를 불러오는 중..."
   },
   "analytics.options.loading": {
-    "message": "로딩중..."
+    "message": "불러오는 중..."
   },
   "analytics.project-event.project-approved": {
     "message": "프로젝트 승인됨"
@@ -384,7 +384,7 @@
     "message": "모든 프로젝트"
   },
   "analytics.project.count": {
-    "message": "{count, plural, one {프로젝트} other {프로젝트}}"
+    "message": "프로젝트 {count, plural, other {#}}개"
   },
   "analytics.project.icon-alt": {
     "message": "{name} 아이콘"
@@ -465,13 +465,13 @@
     "message": "선택한 범위"
   },
   "analytics.table.duration.days": {
-    "message": "{count, plural, one {# 일} other {# 일}}"
+    "message": "{count, plural, other {#}}일"
   },
   "analytics.table.duration.hours": {
-    "message": "{count, plural, one {# 시간} other {# 시간}}"
+    "message": "{count, plural, other {#}}시간"
   },
   "analytics.table.duration.minutes": {
-    "message": "{count, plural, one {# 분} other {# 분}}"
+    "message": "{count, plural, other {#}}분"
   },
   "analytics.table.empty.no-matching-rows": {
     "message": "일치하는 통계 행이 없습니다"
@@ -489,7 +489,7 @@
     "message": "전체 {total}개 중 {start}~{end} 표시 중"
   },
   "analytics.table.search.placeholder": {
-    "message": "검색중..."
+    "message": "검색..."
   },
   "analytics.threshold.countries-above": {
     "message": "상위 국가들"
@@ -573,7 +573,7 @@
     "message": "다운로드 옵션"
   },
   "app-marketing.download.terms": {
-    "message": "Modrinth App을 다운로드하면, <terms-link>이용 약관</terms-link> 및 <privacy-link>개인정보 처리방침</privacy-link>에 동의하는 것으로 간주됩니다."
+    "message": "Modrinth 앱을 다운로드하면, <terms-link>이용 약관</terms-link> 및 <privacy-link>개인정보 처리방침</privacy-link>에 동의하는 것으로 간주됩니다."
   },
   "app-marketing.download.title": {
     "message": "Modrinth App (베타) 다운로드"
@@ -582,7 +582,7 @@
     "message": "Windows"
   },
   "app-marketing.features.importing.description": {
-    "message": "이전 런처에서 사용하던 모든 게임 인스턴스를 가져오고, Modrinth App에서 바로 시작하세요!"
+    "message": "이전 런처에서 사용하던 모든 게임 인스턴스를 가져오고, Modrinth 앱에서 바로 시작하세요!"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -594,7 +594,7 @@
     "message": "인스턴스 가져오기"
   },
   "app-marketing.features.manage-skins.description": {
-    "message": "앱 내에서 마인크래프트 스킨을 변경할 수 있습니다."
+    "message": "앱 내에서 Mineraft 스킨을 변경할 수 있습니다."
   },
   "app-marketing.features.manage-skins.title": {
     "message": "스킨 선택"
@@ -624,7 +624,7 @@
     "message": "버전"
   },
   "app-marketing.features.open-source.description": {
-    "message": "Modrinth App은 완전히 오픈 소스입니다. <github-link>Github</github-link>에서 소스 코드를 확인하세요!"
+    "message": "Modrinth 앱은 완전히 오픈 소스입니다. <github-link>Github</github-link>에서 소스 코드를 확인하세요!"
   },
   "app-marketing.features.open-source.title": {
     "message": "오픈 소스"
@@ -666,7 +666,7 @@
     "message": "고성능"
   },
   "app-marketing.features.play.description": {
-    "message": "Modrinth App을 통해 여러분이 좋아하는 모드와 모드팩을 다운로드하고 바로 플레이하세요."
+    "message": "Modrinth 앱을 통해 여러분이 좋아하는 모드와 모드팩을 다운로드하고 바로 플레이하세요."
   },
   "app-marketing.features.play.title": {
     "message": "좋아하는 모드를 플레이하세요"
@@ -693,7 +693,7 @@
     "message": "한 번도 경험하지 못했던,"
   },
   "app-marketing.features.website.description": {
-    "message": "Modrinth App은 웹사이트와 완전히 통합되어 있어, 앱에서 좋아하는 프로젝트에 접근할 수 있습니다!"
+    "message": "Modrinth 앱은 웹사이트와 완전히 통합되어 있어, 앱에서 좋아하는 프로젝트에 접근할 수 있습니다!"
   },
   "app-marketing.features.website.title": {
     "message": "웹사이트 통합"
@@ -705,16 +705,16 @@
     "message": "Cobblemon 인스턴스가 ‘콘텐츠’ 페이지에 열려 있는 Modrinth App의 스크린샷."
   },
   "app-marketing.hero.description": {
-    "message": "Modrinth App은 독특한 오픈 소스 런처로, 좋아하는 모드를 플레이하고 최신 상태로 유지하는 모든 기능이 이 깔끔한 패키지 하나에 모두 담겨 있습니다."
+    "message": "Modrinth 앱은 독특한 오픈 소스 런처로, 좋아하는 모드를 플레이하고 최신 상태로 유지하는 모든 기능이 이 깔끔한 패키지 하나에 모두 담겨 있습니다."
   },
   "app-marketing.hero.download-button": {
-    "message": "Modrinth App 다운로드"
+    "message": "Modrinth 앱 다운로드"
   },
   "app-marketing.hero.download-modrinth-app": {
-    "message": "Modrinth App 다운로드"
+    "message": "Modrinth 앱 다운로드"
   },
   "app-marketing.hero.download-modrinth-app-for-os": {
-    "message": "{os}용 Modrinth App 다운로드"
+    "message": "{os}용 Modrinth 앱 다운로드"
   },
   "app-marketing.hero.minecraft-screenshot-alt": {
     "message": "Cobblemon 인스턴스의 메인 메뉴 스크린샷"
@@ -777,7 +777,7 @@
     "message": "Modrinth 회원가입에 필요한 연령 기준을 충족하지 않습니다."
   },
   "auth.create-account.date-of-birth.placeholder": {
-    "message": "당신의 생일을 선택해주세요"
+    "message": "생년월일 선택"
   },
   "auth.create-account.date-of-birth.required.text": {
     "message": "계속하려면 생년월일을 입력해 주세요."
@@ -786,7 +786,7 @@
     "message": "생년월일은 필수 입력 항목입니다"
   },
   "auth.create-account.date-of-birth.under13-helper": {
-    "message": "13세 이상이 아니라면 Modrinth 계정을 만들 수 없습니다."
+    "message": "14세 이상이 아니라면 Modrinth 계정을 만들 수 없습니다."
   },
   "auth.create-account.info-panel.source-code-link": {
     "message": "관련 소스 코드"
@@ -795,7 +795,7 @@
     "message": "저희는 생년월일을 저장하지 않습니다. 회원가입 시 COPPA 준수 여부를 확인하는 용도로만 사용합니다."
   },
   "auth.create-account.page-title": {
-    "message": "회원가입"
+    "message": "계정 생성"
   },
   "auth.create-account.security-check.label": {
     "message": "보안 검사"
@@ -804,13 +804,13 @@
     "message": "Modrinth의 흥미로운 소식을 이메일로 받아보겠습니다"
   },
   "auth.create-account.title": {
-    "message": "회원가입"
+    "message": "계정 생성"
   },
   "auth.create-account.username.label": {
-    "message": "닉네임"
+    "message": "사용자 이름"
   },
   "auth.create-account.username.placeholder": {
-    "message": "닉네임을 입력하세요"
+    "message": "사용자 이름 입력"
   },
   "auth.reauthenticate.2fa.description": {
     "message": "인증 앱에서 받은 6자리 코드나 백업 코드 중 하나를 입력하세요."
@@ -828,10 +828,10 @@
     "message": "재인증"
   },
   "auth.reauthenticate.sign-in-another-way": {
-    "message": "다른 방법으로 로그인 하세요"
+    "message": "다른 방법으로 로그인"
   },
   "auth.reauthenticate.sign-in-with-provider": {
-    "message": "{provider}로 로그인"
+    "message": "{provider}(으)로 로그인"
   },
   "auth.reauthenticate.title": {
     "message": "{name}은(는) 재인증이 필요합니다."
@@ -879,7 +879,10 @@
     "message": "계정 추가"
   },
   "auth.sign-in.choose-account": {
-    "message": "Modrinth App에서 사용할 계정을 선택하세요"
+    "message": "Modrinth 앱에서 사용할 계정 선택"
+  },
+  "auth.sign-in.choose-existing-account": {
+    "message": "기존 계정 사용"
   },
   "auth.sign-in.continue-with-email": {
     "message": "이메일로 계속하기"
@@ -903,16 +906,25 @@
     "message": "Modrinth.com으로 이동"
   },
   "auth.sign-in.launcher.complete.return-button": {
-    "message": "Modrinth App 열기"
+    "message": "Modrinth 앱 열기"
+  },
+  "auth.sign-in.launcher.handoff-failed": {
+    "message": "Modrinth 앱에 로그인하지 못했습니다. 다시 시도하세요."
   },
   "auth.sign-in.launcher.opening.description": {
     "message": "앱이 열리지 않았다면, 아래 버튼을 통해 로그인을 마치세요."
   },
   "auth.sign-in.launcher.opening.title": {
-    "message": "Modrinth App을 실행 중..."
+    "message": "Modrinth 앱을 여는 중..."
+  },
+  "auth.sign-in.launcher.reauthenticate.title": {
+    "message": "Modrinth 앱에 로그인"
   },
   "auth.sign-in.no-account": {
     "message": "계정이 없으신가요?"
+  },
+  "auth.sign-in.reauthenticate.use-different-account": {
+    "message": "다른 계정으로 로그인"
   },
   "auth.sign-in.sign-in-with": {
     "message": "Modrinth 로그인"
@@ -1013,11 +1025,20 @@
   "collection.description": {
     "message": "{description} - Modrinth에서 {username}님이 만든 컬렉션 {name} 보기"
   },
+  "collection.description-placeholder": {
+    "message": "다음의 모음집이에요..."
+  },
   "collection.description.following": {
     "message": "팔로우하는 모든 프로젝트로 자동 생성된 컬렉션입니다."
   },
+  "collection.edit": {
+    "message": "모음집 편집"
+  },
   "collection.error.not-found": {
     "message": "컬렉션을 찾을 수 없습니다"
+  },
+  "collection.icon-label": {
+    "message": "아이콘"
   },
   "collection.label.created-at": {
     "message": "{ago} 전에 생성됨"
@@ -1034,6 +1055,9 @@
   "collection.label.updated-at": {
     "message": "{ago} 전에 업데이트됨"
   },
+  "collection.name-placeholder": {
+    "message": "모음집 이름 입력..."
+  },
   "collection.return-link.dashboard-collections": {
     "message": "내 컬렉션"
   },
@@ -1049,6 +1073,9 @@
   "conversation-thread.action.approve": {
     "message": "승인"
   },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "답글과 함께 승인"
+  },
   "conversation-thread.action.close-report": {
     "message": "티켓 닫기"
   },
@@ -1057,6 +1084,9 @@
   },
   "conversation-thread.action.reject": {
     "message": "거부"
+  },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "답글과 함께 거부"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "스레드 다시 열기"
@@ -1091,6 +1121,9 @@
   "conversation-thread.action.withhold": {
     "message": "보류"
   },
+  "conversation-thread.action.withhold-with-reply": {
+    "message": "답글과 함께 보류"
+  },
   "conversation-thread.closed-thread.description": {
     "message": "이 스레드는 닫혔으며, 더 이상 새로운 메시지를 작성할 수 없습니다."
   },
@@ -1099,6 +1132,12 @@
   },
   "conversation-thread.error.reopening-report": {
     "message": "신고 다시 열기 오류"
+  },
+  "conversation-thread.error.sending-message": {
+    "message": "메시지 전송 오류"
+  },
+  "conversation-thread.image.open-externally": {
+    "message": "외부에서 열기"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "스레드에 답글 게시..."
@@ -1121,11 +1160,26 @@
   "conversation-thread.reply-modal.help-center-note": {
     "message": "운영진에게 문의하려면 <help-center-link>Modrinth 도움말 센터</help-center-link>를 이용하고, 오른쪽 하단에 있는 파란색 말풍선을 클릭하여 지원 센에 문의해 주세요."
   },
+  "conversation-thread.reply.addresses": {
+    "message": "이 답변은 다음 설명 요청에 대한 내용을 포함합니다."
+  },
+  "conversation-thread.reply.changed-thread": {
+    "message": "선택한 스레드가 변경되었습니다. 답변하기 전에 다시 열어 주세요."
+  },
+  "conversation-thread.reply.facet": {
+    "message": "{issue}에 대한 설명"
+  },
+  "conversation-thread.reply.unknown-issue": {
+    "message": "검토 관련 문제"
+  },
   "conversation-thread.resubmit-modal.confirmation.description": {
     "message": "운영진이 보낸 메시지에 답변했는지 확인"
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "운영진의 지적 사항을 적절히 반영했음을 확인합니다."
+  },
+  "conversation-thread.resubmit-modal.description.auto-approval": {
+    "message": "<project-title>{projectTitle}</project-title> 프로젝트를 다시 제출하려고 합니다. 모든 검토 관련 문제가 해결되었다면 자동으로 승인될 수 있습니다. 그렇지 않으면 검토 담당자에게 전달되어 심사를 받게 됩니다."
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "검토를 위해 다시 제출"
@@ -1138,6 +1192,12 @@
   },
   "conversation-thread.resubmit-modal.warning": {
     "message": "운영진의 지적 사항을 반영하지 않고 반복적으로 제출할 경우, 계정이 정지될 수 있습니다."
+  },
+  "conversation-thread.resubmit-required-actions-tooltip": {
+    "message": "다시 제출하려면 위의 필수 조치를 모두 완료해야 합니다."
+  },
+  "conversation-thread.submit-modal.description": {
+    "message": "<project-title>{projectTitle}</project-title> 프로젝트를 검토 담당자의 심사를 받기 위해 제출합니다."
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "보조 파일은 소스 코드와 같은 지원용 리소스를 위한 것이며, 대체 버전이나 변형을 위한 것이 아닙니다."
@@ -1380,7 +1440,7 @@
     "message": "서버 프로젝트 생성"
   },
   "create.project.summary-description": {
-    "message": "당신의 프로젝트를 짧은 문장으로 설명해 주세요."
+    "message": "프로젝트를 한두 문장으로 설명해 주세요."
   },
   "create.project.summary-label": {
     "message": "개요"
@@ -1420,6 +1480,21 @@
   },
   "create.project.visibility-unlisted": {
     "message": "일부 공개"
+  },
+  "create.restricted-alert.description": {
+    "message": "검토 담당자가 회원님의 계정에서 이 권한을 제거했습니다."
+  },
+  "create.restricted-alert.header": {
+    "message": "작업 제한됨"
+  },
+  "create.restricted-alert.view-standing": {
+    "message": "계정 상태 확인"
+  },
+  "create.version.restricted-text": {
+    "message": "검토 담당자가 계정에서 이 권한을 제거했습니다. 자세한 내용은 계정 설정의 ‘계정 상태’에서 확인하세요."
+  },
+  "create.version.restricted-title": {
+    "message": "작업 제한됨"
   },
   "dashboard.analytics.from-projects": {
     "message": "{count} {count, plural, one {프로젝트} other {프로젝트}}로"
@@ -2154,7 +2229,7 @@
     "message": "리셋 후 설치할 모드팩 선택"
   },
   "discover.seo.description": {
-    "message": "Modrinth에서 수천 개의 마인크래프트 {projectType}을 정확하고 빠르게 검색해 보세요. 맞춤형 필터 기능으로 원하는 최고의 마인크래프트 {projectType}을 막힘없이 찾아낼 수 있습니다."
+    "message": "수천 개의 {projectType} 중에서 Modrinth의 빠르고 정확한 검색 결과를 통해 원하는 것을 확인해 보세요. 필터 기능을 사용하여 최고의 Minecraft {projectType}들을 찾을 수 있답니다."
   },
   "discover.seo.title": {
     "message": "{projectType} 검색"
@@ -2334,7 +2409,7 @@
     "message": "현재 구매 시 북미, 유럽, 동남아시아, 호주 지역의 서버를 선택하실 수 있습니다. 앞으로 더 많은 지역이 추가될 예정입니다! 서버 지역 변경을 원하시면 고객 지원으로 문의해 주세요."
   },
   "hosting-marketing.faq.versions-loaders": {
-    "message": "어떤 마인크래프트 버전과 로더를 사용할 수 있나요?"
+    "message": "Minecraft의 어떤 버전과 로더를 사용할 수 있나요?"
   },
   "hosting-marketing.faq.versions-loaders.answer.one": {
     "message": "Modrinth Hosting 서버는 스냅샷 버전을 포함하여 버전 1.2.5부터 모든 버전의 Minecraft: Java Edition을 실행할 수 있습니다."
@@ -2355,10 +2430,10 @@
     "message": "새 서버 시작하기"
   },
   "hosting-marketing.hero.host-with-modrinth": {
-    "message": "당신의 서버를 Modrinth 호스팅으로 시작하세요"
+    "message": "Modrinth 호스팅으로 나의 서버를 호스팅하세요"
   },
   "hosting-marketing.hero.hosting-description": {
-    "message": "Modrinth 호스팅은 마인크래프트 자바에디션 서버를 운영하는 가장 쉬운 방법입니다. Modrinth 플랫폼 내에서 좋아하는 모드와 모드팩을 간편하게 설치하고 바로 플레이하세요."
+    "message": "Modrinth 호스팅은 Minecraft: Java Edition 서버를 호스트하는 가장 쉬운 방법입니다. Modrinth 플랫폼 내에서 좋아하는 모드와 모드팩을 간편하게 설치하고 바로 플레이하세요."
   },
   "hosting-marketing.included.advanced-networking": {
     "message": "고급 네트워킹 관리"
@@ -2409,7 +2484,7 @@
     "message": "Modrinth 호스팅에 내장된 SFTP를 사용하여 서버 파일에 직접 접근하세요."
   },
   "hosting-marketing.included.with-your-server": {
-    "message": "당신의 서버에 기본으로 포함되어 있습니다."
+    "message": "서버에 기본으로 포함됩니다"
   },
   "hosting-marketing.know-what-you-need": {
     "message": "원하시는 구성을 정확히 알고 계신가요?"
@@ -2442,7 +2517,7 @@
     "message": "예기치 않은 에러가 발생하였습니다"
   },
   "hosting-marketing.pick-customized-plan": {
-    "message": "당신이 필요한 사양만 포함된 맞춤형 플랜을 선택하세요."
+    "message": "필요한 사양만 갖춘 맞춤형 플랜을 선택하세요."
   },
   "hosting-marketing.server-for-everyone": {
     "message": "모두에게 어울리는 서버"
@@ -2511,7 +2586,7 @@
     "message": "데이터 및 통계"
   },
   "landing.creator.feature.discovery.description": {
-    "message": "검색, 홈페이지, 디스코드 서버 등을 통해 수천 명의 사용자에게 당신의 프로젝트를 알릴 수 있습니다! 앞으로 더 많은 방법이 추가될 예정이니 기대해 주세요!"
+    "message": "검색, Modrinth 홈페이지, Discord 서버 등 점점 더 다양해지는 방법으로 나의 프로젝트를 알려 보세요!"
   },
   "landing.creator.feature.discovery.title": {
     "message": "탐색"
@@ -2556,7 +2631,7 @@
     "message": "원하는 프로젝트를 쉽고 빠르게 찾으세요"
   },
   "landing.heading.the-place-for-minecraft": {
-    "message": "마인크래프트 {content} 위한 공간"
+    "message": "Minecraft {content} 위한 공간"
   },
   "landing.heading.the-place-for-minecraft.data-packs": {
     "message": "데이터 팩을"
@@ -2610,7 +2685,7 @@
     "message": "개발자를 위해"
   },
   "landing.section.for-creators.tagline": {
-    "message": "당신의 콘텐츠를 전 세계와 공유하세요"
+    "message": "나의 콘텐츠를 전 세계와 공유하세요"
   },
   "landing.section.for-players.description": {
     "message": "마법 같은 바이옴부터 저주받은 던전까지, 게임플레이를 한 단계 더 끌어올려 줄 콘텐츠를 확실하게 찾으실 수 있습니다."
@@ -2619,10 +2694,10 @@
     "message": "플레이어를 위해"
   },
   "landing.section.for-players.tagline": {
-    "message": "{count, number} 개 이상의 프로젝트를 만나보세요"
+    "message": "{count, number}개가 넘는 창작물을 만나보세요"
   },
   "landing.subheading": {
-    "message": "커뮤니티를 위해 구축된 오픈소스 플랫폼을 통해 마인크래프트 콘텐츠를 발견하고, 플레이하고, 공유하세요."
+    "message": "커뮤니티를 위해 구축된 오픈소스 플랫폼을 통해 Minecraft 콘텐츠를 발견하고, 플레이하고, 공유하세요."
   },
   "layout.action.analytics-events": {
     "message": "분석 이벤트"
@@ -2670,7 +2745,7 @@
     "message": "사용자 조회"
   },
   "layout.avatar.alt": {
-    "message": "당신의 아바타"
+    "message": "내 아바타"
   },
   "layout.banner.account-action": {
     "message": "계정 작업 필요"
@@ -2802,7 +2877,7 @@
     "message": "상품"
   },
   "layout.footer.products.app": {
-    "message": "Modrinth App"
+    "message": "Modrinth 앱"
   },
   "layout.footer.products.plus": {
     "message": "Modrinth+"
@@ -2811,7 +2886,7 @@
     "message": "Modrinth 호스팅"
   },
   "layout.footer.resources": {
-    "message": "정보"
+    "message": "리소스"
   },
   "layout.footer.resources.api-docs": {
     "message": "API 문서"
@@ -2850,10 +2925,10 @@
     "message": "메뉴 전환"
   },
   "layout.meta.description": {
-    "message": "Modrinth에서 마인크래프트 모드, 플러그인, 데이터 팩, 셰이더, 리소스 팩, 모드팩을 다운로드하세요. 현대적이고 사용하기 쉬운 인터페이스와 API를 통해 Modrinth에서 프로젝트를 탐색하고 게시하세요."
+    "message": "Modrinth에서 Minecraft 모드, 플러그인, 데이터 팩, 셰이더, 리소스 팩, 모드팩을 다운로드하세요. 현대적이고 사용하기 쉬운 인터페이스와 API를 통해 Modrinth에서 프로젝트를 탐색하고 게시하세요."
   },
   "layout.meta.og-description": {
-    "message": "마인크래프트 콘텐츠를 탐색하고 게시하세요!"
+    "message": "Minecraft 콘텐츠를 탐색하고 게시하세요!"
   },
   "layout.mobile.close-menu": {
     "message": "메뉴 닫기"
@@ -2937,22 +3012,175 @@
     "message": "공유된 콘텐츠가 변경될 때마다 최신 상태 유지"
   },
   "modal.shared-instance.open-in-app.get-app": {
-    "message": "Modrinth App 받기"
+    "message": "Modrinth 앱 받기"
   },
   "modal.shared-instance.open-in-app.managed-by": {
     "message": "관리자:"
   },
   "modal.shared-instance.open-in-app.opening-automatically": {
-    "message": "Modrinth App이 자동으로 열립니다..."
+    "message": "Modrinth 앱이 자동으로 열립니다..."
   },
   "modal.shared-instance.open-in-app.title": {
-    "message": "Modrinth App 실행 중"
+    "message": "Modrinth 앱 여는 중"
   },
   "modal.shared-instance.open-in-app.why-use": {
-    "message": "Modrinth App을 사용해야 하는 이유"
+    "message": "Modrinth 앱을 사용해야 하는 이유"
+  },
+  "moderation.appearance.apply": {
+    "message": "테마 적용"
+  },
+  "moderation.appearance.copied": {
+    "message": "복사됨!"
+  },
+  "moderation.appearance.copy": {
+    "message": "JSON 복사"
+  },
+  "moderation.appearance.copy-error": {
+    "message": "자동으로 복사할 수 없습니다. 아래의 JSON을 선택하고 복사해 주세요."
+  },
+  "moderation.appearance.download": {
+    "message": "JSON 다운로드"
+  },
+  "moderation.appearance.export": {
+    "message": "테마 내보내기"
+  },
+  "moderation.appearance.export-help": {
+    "message": "외형을 JSON으로 복사하거나 다운로드하여 공유하거나 이후 가져올 수 있습니다."
+  },
+  "moderation.appearance.file": {
+    "message": "JSON 파일 선택"
+  },
+  "moderation.appearance.file-error": {
+    "message": "이 파일을 읽을 수 없습니다. 64KB보다 작은 JSON 파일을 선택해 주세요."
+  },
+  "moderation.appearance.import": {
+    "message": "테마 가져오기"
+  },
+  "moderation.appearance.import-help": {
+    "message": "JSON을 붙여 넣거나 파일을 선택하고 적용하여 외관을 미리 봅니다."
+  },
+  "moderation.appearance.invalid": {
+    "message": "잘못된 테마입니다. 유효한 Hex 색상, 0~100 사이의 불투명도, 0~8 사이의 테두리 두께를 포함하여, 7개의 값 모두가 들어간 버전 1 리뷰 외형 내보내기를 사용하세요."
+  },
+  "moderation.appearance.json": {
+    "message": "테마 JSON"
+  },
+  "moderation.c2pa-scan.failed": {
+    "message": "AI 생성 파일을 검사하지 못했습니다."
+  },
+  "moderation.c2pa-scan.no-ai-files": {
+    "message": "AI 생성 파일을 찾을 수 없습니다."
   },
   "moderation.exclude-technical-review": {
     "message": "기술 검토 제외"
+  },
+  "moderation.keybinds.change": {
+    "message": "{setting}: {binding}. 활성화하여 키 바인딩을 변경하세요."
+  },
+  "moderation.keybinds.composer": {
+    "message": "스레드 답변 및 비공개 메모"
+  },
+  "moderation.keybinds.conflict-summary": {
+    "message": "{count, plural, one {#개 작업의 키 바인딩이 중복됩니다.} other {#개 작업의 키 바인딩이 중복됩니다.}} 이러한 단축키를 동시에 사용할 수 있는 경우 충돌이 발생할 수 있습니다. 키 바인딩을 변경하거나, 단축키를 기록하는 동안 Escape 키를 눌러 바인딩을 제거하세요."
+  },
+  "moderation.keybinds.conflicts": {
+    "message": "다음 작업과 중복됨: {actions}"
+  },
+  "moderation.keybinds.decisions": {
+    "message": "검토 결과 및 대기열"
+  },
+  "moderation.keybinds.global": {
+    "message": "호스트 전환 및 URL 복사"
+  },
+  "moderation.keybinds.items": {
+    "message": "검토 항목 및 검사"
+  },
+  "moderation.keybinds.listen": {
+    "message": "키를 누르세요…"
+  },
+  "moderation.keybinds.navigation": {
+    "message": "검토 화면 탐색 및 패널"
+  },
+  "moderation.keybinds.no-results": {
+    "message": "검색어와 일치하는 키 바인딩이 없습니다."
+  },
+  "moderation.keybinds.not-bound": {
+    "message": "할당되지 않음"
+  },
+  "moderation.keybinds.panel-toggles": {
+    "message": "패널 전환"
+  },
+  "moderation.keybinds.project": {
+    "message": "공개 프로젝트 페이지에서 복사"
+  },
+  "moderation.keybinds.recording": {
+    "message": "{setting}: 단축키 입력 대기 중입니다. Escape 키를 누르면 키 바인딩이 해제됩니다."
+  },
+  "moderation.keybinds.reset-default": {
+    "message": "기본값으로 재설정"
+  },
+  "moderation.keybinds.scope-global": {
+    "message": "웹사이트 어디에서나 사용할 수 있습니다."
+  },
+  "moderation.keybinds.scope-project-page": {
+    "message": "프로젝트 페이지 단축키가 활성화된 경우 프로젝트 페이지에서 사용할 수 있습니다."
+  },
+  "moderation.keybinds.scope-tech": {
+    "message": "기술 검토 페이지에서 사용할 수 있습니다."
+  },
+  "moderation.keybinds.search": {
+    "message": "키 바인딩 검색…"
+  },
+  "moderation.keybinds.self-conflict": {
+    "message": "이 작업에 할당된 다른 키 바인딩"
+  },
+  "moderation.keybinds.technical": {
+    "message": "기술 검토 페이지"
+  },
+  "moderation.keybinds.title": {
+    "message": "키 바인딩"
+  },
+  "moderation.keybinds.transfer.apply": {
+    "message": "키 할당 적용"
+  },
+  "moderation.keybinds.transfer.copied": {
+    "message": "복사됨!"
+  },
+  "moderation.keybinds.transfer.copy": {
+    "message": "JSON 복사"
+  },
+  "moderation.keybinds.transfer.copy-error": {
+    "message": "자동으로 복사할 수 없습니다. 아래의 JSON을 선택하고 복사해 주세요."
+  },
+  "moderation.keybinds.transfer.download": {
+    "message": "JSON 다운로드"
+  },
+  "moderation.keybinds.transfer.export": {
+    "message": "키 할당 내보내기"
+  },
+  "moderation.keybinds.transfer.export-help": {
+    "message": "맞춤 키 할당을 JSON으로 복사하거나 다운로드하여 공유하거나 이후 가져올 수 있습니다."
+  },
+  "moderation.keybinds.transfer.file": {
+    "message": "JSON 파일 선택"
+  },
+  "moderation.keybinds.transfer.file-error": {
+    "message": "이 파일을 읽을 수 없습니다. 64KB보다 작은 JSON 파일을 선택해 주세요."
+  },
+  "moderation.keybinds.transfer.import": {
+    "message": "키 할당 가져오기"
+  },
+  "moderation.keybinds.transfer.import-help": {
+    "message": "키 할당 JSON을 붙여 넣거나 파일을 선택하세요. 적용하면 키 할당을 교체하며, 생략된 동작은 기본값으로 돌아갑니다."
+  },
+  "moderation.keybinds.transfer.invalid": {
+    "message": "잘못된 키 할당입니다. 알려진 행동 ID, 키 정의 배열, 그리고 불리언 수정자를 포함하는 버전 1 리뷰 키 할당 내보내기를 사용하세요."
+  },
+  "moderation.keybinds.transfer.json": {
+    "message": "키 할당 JSON"
+  },
+  "moderation.keybinds.transfer.too-large": {
+    "message": "이러한 키 할당은 저장된 검토 설정에서 사용할 수 있는 공간을 초과합니다. 맞춤 키 할당의 수를 줄이고 다시 시도해 보세요."
   },
   "moderation.moderate": {
     "message": "관리"
@@ -2974,6 +3202,150 @@
   },
   "moderation.page.technicalReview": {
     "message": "기술 리뷰"
+  },
+  "moderation.project-review.approvedCount": {
+    "message": "{count}개 승인됨"
+  },
+  "moderation.project-review.archivedCount": {
+    "message": "{count}개 보관됨"
+  },
+  "moderation.project-review.draftCount": {
+    "message": "초안 {count}개"
+  },
+  "moderation.project-review.privateCount": {
+    "message": "비공개 {count}개"
+  },
+  "moderation.project-review.processingCount": {
+    "message": "검토 중 {count}개"
+  },
+  "moderation.project-review.rejectedCount": {
+    "message": "거부됨 {count}개"
+  },
+  "moderation.project-review.scheduledCount": {
+    "message": "예정됨 {count}개"
+  },
+  "moderation.project-review.techReviewFailedCount": {
+    "message": "기술적 검토 실패 {count}개"
+  },
+  "moderation.project-review.unknownCount": {
+    "message": "알 수 없음 {count}개"
+  },
+  "moderation.project-review.unlistedCount": {
+    "message": "일부 공개 {count}개"
+  },
+  "moderation.project-review.withheldCount": {
+    "message": "보류 {count}개"
+  },
+  "moderation.settings.appearance": {
+    "message": "외형"
+  },
+  "moderation.settings.control-label": {
+    "message": "{section}: {setting}"
+  },
+  "moderation.settings.debug": {
+    "message": "디버그 설정"
+  },
+  "moderation.settings.default-value-styled": {
+    "message": "기본: <value></value>"
+  },
+  "moderation.settings.floating-panel-preview": {
+    "message": "플로팅 패널 미리보기"
+  },
+  "moderation.settings.floating-panel-section": {
+    "message": "플로팅 검토 패널"
+  },
+  "moderation.settings.highlight-preview": {
+    "message": "검토 강조 미리보기"
+  },
+  "moderation.settings.highlight-preview.incorrect-formatting": {
+    "message": "잘못된 형식"
+  },
+  "moderation.settings.highlight-preview.missing-information": {
+    "message": "누락된 정보"
+  },
+  "moderation.settings.highlight-preview.non-english": {
+    "message": "영어 외의 언어"
+  },
+  "moderation.settings.highlights-section": {
+    "message": "강조"
+  },
+  "moderation.settings.issue-toggle-preview": {
+    "message": "이슈 전환 미리보기"
+  },
+  "moderation.settings.issue-toggles-section": {
+    "message": "이슈 전환"
+  },
+  "moderation.settings.localhost": {
+    "message": "{hostname}(으)로 설정"
+  },
+  "moderation.settings.no-results": {
+    "message": "검색과 일치하는 설정이 없습니다."
+  },
+  "moderation.settings.none": {
+    "message": "없음"
+  },
+  "moderation.settings.off": {
+    "message": "꺼짐"
+  },
+  "moderation.settings.on": {
+    "message": "켜짐"
+  },
+  "moderation.settings.panels": {
+    "message": "패널"
+  },
+  "moderation.settings.project-pages": {
+    "message": "공개 페이지 및 호스트"
+  },
+  "moderation.settings.reset": {
+    "message": "기본값으로 되설정"
+  },
+  "moderation.settings.review-panel-appearance": {
+    "message": "검토 패널 외형"
+  },
+  "moderation.settings.search": {
+    "message": "설정 검색..."
+  },
+  "moderation.settings.shortcuts": {
+    "message": "에디터 및 단축키 힌트"
+  },
+  "moderation.settings.theme-border": {
+    "message": "테마 주황(25% 불투명도)"
+  },
+  "moderation.settings.theme-default": {
+    "message": "테마 주황"
+  },
+  "moderation.settings.title": {
+    "message": "일반 설정"
+  },
+  "moderation.settings.workflow": {
+    "message": "작업 흐름 및 대기열 검토"
+  },
+  "moderation.tech-review.file.download": {
+    "message": "다운로드"
+  },
+  "moderation.tech-review.file.download-file": {
+    "message": "{filename} 다운로드({size})"
+  },
+  "moderation.tech-review.file.flags": {
+    "message": "플래그"
+  },
+  "moderation.tech-review.file.manual": {
+    "message": "수동 검토"
+  },
+  "moderation.tech-review.file.no-flags": {
+    "message": "플래그 없음"
+  },
+  "moderation.tech-review.file.open-slicer": {
+    "message": "Slicer에서 열기"
+  },
+  "moderation.tech-review.file.open-slicer-tab": {
+    "message": "Slicer 탭에서 열기"
+  },
+  "moderation.tech-review.file.slicer": {
+    "message": "Slicer"
+  },
+  "moderation.tech-review.file.view-version": {
+    "message": "버전 보기"
   },
   "modpack-scan-modal.batch.label": {
     "message": "배치당 {amount}개"
@@ -3387,7 +3759,7 @@
     "message": "검토를 위해 제출"
   },
   "project-moderation-nags.submit-for-review-desc": {
-    "message": "당신의 프로젝트는 프로젝트 멤버만 볼 수 있습니다. 게시하려면 관리자의 검토를 거쳐야 합니다."
+    "message": "프로젝트는 현재 프로젝트 멤버만 볼 수 있어요. 게시하려면 관리자의 검토를 거쳐야 해요."
   },
   "project-moderation-nags.suggestion": {
     "message": "제안"
@@ -3397,6 +3769,9 @@
   },
   "project-moderation-nags.warning": {
     "message": "경고"
+  },
+  "project-review.disclosures.select-ai-uses": {
+    "message": "AI 사용 선택"
   },
   "project-type.collection.plural": {
     "message": "컬렉션"
@@ -3476,6 +3851,9 @@
   "project.actions.edit-project": {
     "message": "프로젝트 수정"
   },
+  "project.actions.open-in-modview": {
+    "message": "모드뷰에서 열기"
+  },
   "project.actions.project-page": {
     "message": "프로젝트 페이지"
   },
@@ -3517,6 +3895,33 @@
   },
   "project.description.title": {
     "message": "설명"
+  },
+  "project.disclosures.load-error": {
+    "message": "고지 사항을 불러올 수 없습니다."
+  },
+  "project.disclosures.loading": {
+    "message": "고지 사항 불러오는 중..."
+  },
+  "project.disclosures.lock-status.cannot-disable": {
+    "message": "비활성화할 수 없음"
+  },
+  "project.disclosures.lock-status.change": {
+    "message": "잠금 상태 변경"
+  },
+  "project.disclosures.lock-status.fully-locked": {
+    "message": "완전히 잠김"
+  },
+  "project.disclosures.lock-status.label": {
+    "message": "잠금 상태"
+  },
+  "project.disclosures.lock-status.unlocked": {
+    "message": "잠금 해제됨"
+  },
+  "project.disclosures.retry": {
+    "message": "재시도"
+  },
+  "project.disclosures.save-error": {
+    "message": "모든 고지 사항 변경점을 저장할 수 없습니다. 수정 사항은 유지되어 있습니다. 다시 저장해 보세요."
   },
   "project.download.base-game-version-incompatible-tooltip": {
     "message": "이 게임 버전은 기본 프로젝트와 호환되지 않습니다."
@@ -3732,10 +4137,13 @@
     "message": "이 프로젝트는 공개되지 않으며, 직접 링크를 통해서만 접근할 수 있습니다.{requestedStatus, select,unlisted { 선택한 <visibility-settings-link>공개 범위 설정</visibility-settings-link>에 따라, 별도의 조치가 필요하지 않을 가능성이 높습니다.} other { 이 프로젝트를 다시 제출하기 전에, 아래 메시지에 나열된 문제를 포함하여 모든 검토 관련 사항을 해결해야 합니다.}}"
   },
   "project.moderation.admonition.withheld.header": {
-    "message": "운영진에 의해 숨겨짐"
+    "message": "운영진에 의해 일부 공개로 변경됨"
   },
   "project.moderation.error.unauthorized": {
     "message": "권한 없음"
+  },
+  "project.moderation.project-changed": {
+    "message": "선택된 프로젝트가 변경되었습니다. 다시 검토해 주세요."
   },
   "project.moderation.thread.approved-warning": {
     "message": "이 스레드는 적극적으로 관리되지는 않지만, 필요한 경우 프로젝트에 관한 정보를 확인하기 위해 검토될 수 있습니다."
@@ -3779,11 +4187,20 @@
   "project.notification.icon-updated.title": {
     "message": "프로젝트 아이콘이 변경됨"
   },
+  "project.notification.review-save-failed.description": {
+    "message": "유효성 검사를 통과하지 못하는 프로젝트 수정 사항은 저장할 수 없습니다."
+  },
+  "project.notification.review-save-failed.title": {
+    "message": "검토로 인해 프로젝트 저장 실패"
+  },
   "project.notification.updated.message": {
     "message": "프로젝트를 수정했습니다."
   },
   "project.notification.updated.title": {
     "message": "프로젝트 수정됨"
+  },
+  "project.review.approved": {
+    "message": "프로젝트가{status, select, unlisted { 일부 공개로} private { 비공개로} other {}} 승인되었습니다."
   },
   "project.settings.back-to-all-projects": {
     "message": "프로젝트 목록으로 돌아가기"
@@ -3815,17 +4232,56 @@
   "project.settings.delete-project.title": {
     "message": "프로젝트 삭제"
   },
+  "project.settings.description.intro": {
+    "message": "여기에 프로젝트에 대한 상세 설명을 기재할 수 있습니다. 설명은 프로젝트의 목적과 기능에 대해 명확하고 진실되게 작성해야 합니다. 전체 요구 사항은 <rules>콘텐츠 규정</rules>의 2.1절을 확인하세요."
+  },
+  "project.settings.description.title": {
+    "message": "설명"
+  },
+  "project.settings.description.updated": {
+    "message": "설명 업데이트 됨"
+  },
+  "project.settings.description.updated-text": {
+    "message": "설명이 업데이트되었습니다."
+  },
+  "project.settings.disclosures.advertising.description.1": {
+    "message": "이 프로젝트에 광고, 스폰서십 또는 다른 작업물의 홍보가 포함된 경우 활성화해야 합니다."
+  },
+  "project.settings.disclosures.advertising.description.2": {
+    "message": "이는 직접적인 금전적 가치가 없는 관련 콘텐츠를 눈에 띄지 않게 홍보하는 경우(예: 자체 설정 메뉴 내에 Modrinth 프로필로 연결되는 링크를 포함하는 것)에는 해당하지 않으며, 프로젝트 페이지 설명란에 포함된 스폰서 배너와 같은 광고에도 적용되지 않습니다."
+  },
   "project.settings.disclosures.advertising.note-placeholder": {
     "message": "예: 사용자의 서버 목록에 Modrinth SMP 서버를 추가합니다."
   },
   "project.settings.disclosures.advertising.title": {
     "message": "광고 포함"
   },
+  "project.settings.disclosures.ai-functionality.description": {
+    "message": "프로젝트가 인게임 챗봇 또는 동적 생성 텍스처와 같은 생성형 AI를 활용하는 기능이 있는 경우 활성화해야 합니다."
+  },
+  "project.settings.disclosures.ai-functionality.note-placeholder": {
+    "message": "예: NPC는 대화 옵션을 위해 생성형 AI를 사용합니다."
+  },
+  "project.settings.disclosures.ai-functionality.title": {
+    "message": "생성형 AI 기능 포함"
+  },
+  "project.settings.disclosures.ai.description": {
+    "message": "프로젝트가 AI로 생성된 애셋 또는 문장이나, 상당한 양의 AI 작성 코드를 포함하는 경우 활성화해야 합니다."
+  },
+  "project.settings.disclosures.ai.description.2": {
+    "message": "이 콘텐츠를 제작하거나 게시하는 과정에서 생성형 AI가 중요한 역할을 했다면, 이를 솔직하게 밝히는 것이 중요합니다. 쉽게 말해, AI를 해당 프로젝트의 공동 저자로 볼 수 있다고 생각하신다면, 그 사실을 이곳에 명시해야 합니다."
+  },
   "project.settings.disclosures.ai.note-placeholder": {
     "message": "예: 중국어 및 아랍어 번역이 AI로 생성되었습니다."
   },
+  "project.settings.disclosures.ai.still-unsure": {
+    "message": "아직 확실하지 않으신가요? 자세한 내용은 <faq-link>AI 공개 및 사용</faq-link> 관련 가이드와 <rules>Modrinth 콘텐츠 규칙</rules> 제6항을 참고하세요."
+  },
   "project.settings.disclosures.ai.title": {
     "message": "AI 생성 콘텐츠 포함"
+  },
+  "project.settings.disclosures.ai.types-description": {
+    "message": "AI로 어떤 콘텐츠가 생성되었나요?"
   },
   "project.settings.disclosures.archived.banner-preview": {
     "message": "배너 미리보기"
@@ -3863,11 +4319,23 @@
   "project.settings.disclosures.derivative.note-label": {
     "message": "이 프로젝트가 원작을 어떻게 기반으로 하는지 설명해주세요"
   },
+  "project.settings.disclosures.derivative.note-placeholder": {
+    "message": "이는 몇 가지 새 바이옴을 추가하고 신규 Minecraft 버전에 포팅한 포크입니다."
+  },
+  "project.settings.disclosures.derivative.open-link": {
+    "message": "링크 방문"
+  },
   "project.settings.disclosures.derivative.title": {
     "message": "파생 콘텐츠 포함"
   },
   "project.settings.disclosures.description": {
     "message": "<rules>Modrinth 콘텐츠 규칙</rules>에 따라 해당하는 콘텐츠 고지 사항을 프로젝트에 추가해야 합니다."
+  },
+  "project.settings.disclosures.description.2": {
+    "message": "프로젝트의 콘텐츠 고지 사항 적용 방법을 모르시나요? <faq-link>콘텐츠 고지 사항 FAQ</faq-link>를 확인해 보세요."
+  },
+  "project.settings.disclosures.info-tooltip": {
+    "message": "클릭하여 이 고지 사항을 어느 때 사용하는지 자세히 알아봅니다."
   },
   "project.settings.disclosures.last-updated": {
     "message": "{date}에 {user}님이 마지막으로 업데이트함"
@@ -3883,6 +4351,9 @@
   },
   "project.settings.disclosures.lock-status.fully-locked.warning": {
     "message": "고지 사항을 수정 또는 삭제해야 하는 경우 <contact-support-link>지원팀에 문의하세요</contact-support-link>."
+  },
+  "project.settings.disclosures.paid-features.description": {
+    "message": "이 프로젝트에 실제 화폐를 소비하여 해금하는 기능이 포함된 경우 활성화해야 합니다."
   },
   "project.settings.disclosures.paid-features.feature-placeholder": {
     "message": "예: Patreon 후원으로 치장품을 얻을 수 있습니다"
@@ -3951,7 +4422,7 @@
     "message": "예: Minecraft 버전 및 모드 로더 정보를 익명으로 수집합니다."
   },
   "project.settings.disclosures.telemetry.description": {
-    "message": "이 프로젝트가 당신, 또는 제삼자에게 사용 데이터를 전송할 경우 활성화해야 합니다."
+    "message": "이 프로젝트가 자신, 또는 제삼자에게 사용 데이터를 전송한다면 활성화해야 해요."
   },
   "project.settings.disclosures.telemetry.title": {
     "message": "원격 측정 포함"
@@ -4007,11 +4478,161 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
+  "project.settings.license.all-rights": {
+    "message": "모든 권리 보유/라이선스 없음"
+  },
+  "project.settings.license.allow-later": {
+    "message": "이후 에디션 허용"
+  },
+  "project.settings.license.custom": {
+    "message": "사용자 지정"
+  },
+  "project.settings.license.custom-name-required": {
+    "message": "사용자 지정 라이선스 이름을 입력하세요."
+  },
+  "project.settings.license.custom-url-description": {
+    "message": "라이선스 전문의 웹 위치입니다. 사용자 지정 라이선스이므로 링크를 제공해야 합니다."
+  },
+  "project.settings.license.intro": {
+    "message": "{type}을(를) 위한 적절한 라이선스를 선택해야 합니다. 저희가 제공하는 목록에서 하나를 선택하거나 사용자 지정 라이선스를 제공할 수 있습니다. 또한 선택한 라이선스에 따라 자체적인 URL을 제공해야 할 수 있습니다. 그렇지 않으면 라이선스 텍스트가 표시됩니다. 자세한 정보는 <guide>라이선스 가이드</guide>를 확인하세요."
+  },
+  "project.settings.license.later": {
+    "message": "이후 에디션"
+  },
+  "project.settings.license.later-description": {
+    "message": "선택한 라이선스에 \"또는 그 이후\" 조항이 있습니다. 이 상자를 체크하면 사용자는 해당 라이선스의 이후 버전 하에서 프로젝트를 이용할 수 있게 됩니다."
+  },
+  "project.settings.license.missing-url": {
+    "message": "사용자 지정 라이선스 전문 URL을 입력하세요."
+  },
+  "project.settings.license.name": {
+    "message": "라이선스 이름"
+  },
+  "project.settings.license.name-description": {
+    "message": "사용자 지정 라이선스의 전체 이름입니다."
+  },
+  "project.settings.license.name-placeholder": {
+    "message": "라이선스 이름"
+  },
+  "project.settings.license.optional-label": {
+    "message": "선택"
+  },
+  "project.settings.license.optional-url": {
+    "message": "라이선스 URL(선택)"
+  },
+  "project.settings.license.select": {
+    "message": "라이선스"
+  },
+  "project.settings.license.select-placeholder": {
+    "message": "라이선스 검색..."
+  },
+  "project.settings.license.title": {
+    "message": "라이선스"
+  },
+  "project.settings.license.updated": {
+    "message": "라이선스 업데이트 됨"
+  },
+  "project.settings.license.updated-text": {
+    "message": "라이선스가 업데이트되었습니다."
+  },
   "project.settings.license.url": {
     "message": "라이선스 URL"
   },
+  "project.settings.license.url-description": {
+    "message": "라이선스 전문의 웹 위치입니다. 링크를 제공하지 않으면 라이선스 텍스트가 대신 표시됩니다."
+  },
   "project.settings.license.url-placeholder": {
     "message": "라이선스 URL"
+  },
+  "project.settings.links.add-link": {
+    "message": "링크 추가"
+  },
+  "project.settings.links.discord": {
+    "message": "Discord 초대"
+  },
+  "project.settings.links.discord-description": {
+    "message": "Discord 서버 초대 링크입니다."
+  },
+  "project.settings.links.donation-link": {
+    "message": "링크"
+  },
+  "project.settings.links.donation-platform": {
+    "message": "플랫폼"
+  },
+  "project.settings.links.donation-url": {
+    "message": "URL"
+  },
+  "project.settings.links.donation-username": {
+    "message": "사용자 이름"
+  },
+  "project.settings.links.donation-username-placeholder": {
+    "message": "{platform} 사용자 이름 입력"
+  },
+  "project.settings.links.donations": {
+    "message": "후원 링크"
+  },
+  "project.settings.links.donations-description": {
+    "message": "사용자가 여러분을 직접 지원할 후원 링크를 추가하세요."
+  },
+  "project.settings.links.issues": {
+    "message": "이슈 추적기"
+  },
+  "project.settings.links.issues-description": {
+    "message": "사용자들이 프로젝트와 관련된 버그, 문제점 및 우려 사항을 보고할 수 있는 공간입니다."
+  },
+  "project.settings.links.link-type": {
+    "message": "링크 유형"
+  },
+  "project.settings.links.remove-donation-link": {
+    "message": "후원 링크 제거"
+  },
+  "project.settings.links.server-discord": {
+    "message": "Discord"
+  },
+  "project.settings.links.server-updated": {
+    "message": "서버 링크가 업데이트되었습니다."
+  },
+  "project.settings.links.server-wiki-description": {
+    "message": "서버에 대한 정보, 문서 및 도움말을 제공하는 페이지입니다."
+  },
+  "project.settings.links.site": {
+    "message": "웹사이트"
+  },
+  "project.settings.links.site-description": {
+    "message": "서버의 공식 웹사이트입니다."
+  },
+  "project.settings.links.source": {
+    "message": "소스 코드"
+  },
+  "project.settings.links.source-description": {
+    "message": "프로젝트의 소스 코드가 포함된 페이지/저장소"
+  },
+  "project.settings.links.store": {
+    "message": "상점"
+  },
+  "project.settings.links.store-description": {
+    "message": "서버의 상점 링크입니다."
+  },
+  "project.settings.links.title": {
+    "message": "링크"
+  },
+  "project.settings.links.updated": {
+    "message": "링크가 업데이트되었습니다."
+  },
+  "project.settings.links.updated-title": {
+    "message": "링크 업데이트됨"
+  },
+  "project.settings.links.url-placeholder": {
+    "message": "유효한 URL 입력"
+  },
+  "project.settings.links.visit-link": {
+    "message": "{url} 방문"
+  },
+  "project.settings.links.wiki": {
+    "message": "위키 페이지"
+  },
+  "project.settings.links.wiki-description": {
+    "message": "프로젝트에 대한 정보, 문서 및 도움말을 제공하는 페이지입니다."
   },
   "project.settings.monetization.description": {
     "message": "Modrinth 프로젝트들은 자동으로 <rewards-program-link>보상 프로그램</rewards-program-link>에 등록됩니다. 수익 창출을 원하지 않거나 법적인 이유로 수익을 창출할 수 없는 경우 여기에서 비활성화할 수 있습니다."
@@ -4030,6 +4651,9 @@
   },
   "project.settings.permissions.attention-needed.title": {
     "message": "알 수 없는 외부 콘텐츠"
+  },
+  "project.settings.permissions.awaiting-review-count": {
+    "message": "검토 대기 중인 항목 {count, plural, =0 {없음} other {#개}}"
   },
   "project.settings.permissions.bad-proof.description": {
     "message": "Modrinth 운영팀이 일부 외부 콘텐츠에 대해 제출하신 권한 증명 정보를 반려했습니다. 아래 반려된 항목을 확인하신 후, 유효한 증명 자료를 다시 제출하거나 해당 콘텐츠를 삭제해 주세요."
@@ -4085,11 +4709,17 @@
   "project.settings.permissions.learn-more": {
     "message": "더보기"
   },
+  "project.settings.permissions.no-permission-count": {
+    "message": "권한 없음 {count}개"
+  },
   "project.settings.permissions.no-results": {
     "message": "검색어와 일치하는 외부 파일이 없습니다."
   },
   "project.settings.permissions.not-allowed.description": {
     "message": "포함된 외부 콘텐츠 중 일부는 Modrinth의 콘텐츠 운영 규정을 위반하여 배포할 수 없으므로 반드시 삭제해야 합니다."
+  },
+  "project.settings.permissions.open-image-in-new-tab": {
+    "message": "새 탭에서 이미지 열기"
   },
   "project.settings.permissions.pending-approval-count": {
     "message": "{count, plural, =0 {승인이 필요한 출처 표기가 없습니다} other {#개의 출처 표기가 승인을 기다리고 있습니다}}"
@@ -4108,6 +4738,9 @@
   },
   "project.settings.permissions.sort.status": {
     "message": "상태별"
+  },
+  "project.settings.permissions.user-action-count": {
+    "message": "사용자 행동 필요 {count}개"
   },
   "project.settings.server.bedrock-address-label": {
     "message": "Bedrock 주소"
@@ -4217,6 +4850,9 @@
   "project.settings.tags.upload-version-first.heading": {
     "message": "태그를 추가하기 전에 버전을 업로드하세요"
   },
+  "project.slug-suggestions.label": {
+    "message": "제안:"
+  },
   "project.versions.copy-id-option": {
     "message": "ID 복사"
   },
@@ -4293,7 +4929,7 @@
     "message": "Modrinth <rules-link>규칙</rules-link> 또는 <terms-link>이용 약관</terms-link>을 위반함"
   },
   "report.for.violation.description": {
-    "message": "악성 코드, 스팸, 사기, 불법적 콘텐츠, 폭력적 또는 오해의 소지가 있습니다."
+    "message": "예를 들어 악성, 스팸, 사기, 폭력, 속임수 또는 불법 콘텐츠 등이 있습니다."
   },
   "report.form-not-for": {
     "message": "다음 경우에는 사용하지 마세요:"
@@ -4313,17 +4949,29 @@
   "report.not-for.dmca.description": {
     "message": "우리의 <policy-link>저작권 정책</policy-link>을 참조하세요."
   },
+  "report.note.ai-images.1b": {
+    "message": "현재 신고 처리 역량을 강화하기 위해 관리 도구를 재구축하고 있는 단계이므로, AI 생성 이미지에 대한 신고는 아직 접수받지 않고 있습니다."
+  },
+  "report.note.check-back-later.b": {
+    "message": "빠른 시일 내에 수락되기를 바랍니다! 기다려 주셔서 감사하며 Modrinth가 안전하고 나아지도록 도와주셔서 감사합니다!"
+  },
   "report.note.copyright.1": {
     "message": "이것은 DMCA 삭제 요청이 아닌 재업로드된 콘텐츠에 대한 신고임을 유의해주시기 바랍니다."
   },
   "report.note.copyright.2": {
     "message": "DMCA 삭제 요청(법적 조치)을 하려는 경우, 대신 저희의 <copyright-policy-link>저작권 정책</copyright-policy-link>을 참조해주시기 바랍니다."
   },
+  "report.note.fully-ai-generated.1b": {
+    "message": "현재 신고 처리 역량을 강화하기 위해 관리 도구를 재구축하고 있는 단계이므로, 완전한 AI 생성 프로젝트에 대한 신고는 아직 접수받지 않고 있습니다."
+  },
   "report.note.malicious.1": {
     "message": "악성 또는 기만적인 콘텐츠에 대한 신고에는 코드 샘플과 같은 행위에 대한 실질적 증거가 포함되어야 합니다."
   },
   "report.note.malicious.2": {
     "message": "마이크로소프트 디펜더, VirusTotal 또는 인공지능 멀웨어 탐지의 요약은 충분한 증거가 아니므로 허용되지 않습니다."
+  },
+  "report.note.missing-disclosure.1b": {
+    "message": "현재 신고 처리 역량을 강화하기 위해 관리 도구를 재구축하고 있는 단계이므로, 누락된 기재 사항 대한 신고는 아직 접수받지 않고 있습니다."
   },
   "report.please-report": {
     "message": "해당 상황에서 신고하세요:"
@@ -4907,6 +5555,21 @@
   "settings.account.security.two-factor.title": {
     "message": "2단계 인증"
   },
+  "settings.account.standing.good": {
+    "message": "계정이 양호한 상태입니다."
+  },
+  "settings.account.standing.reason-label": {
+    "message": "사유:"
+  },
+  "settings.account.standing.restricted.description": {
+    "message": "관리자가 귀하의 계정에서 다음 권한을 제거했습니다:"
+  },
+  "settings.account.standing.restricted.header": {
+    "message": "계정이 제한되었습니다"
+  },
+  "settings.account.standing.title": {
+    "message": "계정 상태"
+  },
   "settings.account.two-factor.backup.intro": {
     "message": "이 백업 코드들을 안전한 곳에 저장해 두세요. 이 백업 코드들은 기기를 사용할 수 없을때 2단계 인증 코드 대용으로 사용할 수 있습니다! 이 코드들을 비밀번호처럼 안전하게 보관하세요."
   },
@@ -4915,6 +5578,9 @@
   },
   "settings.account.two-factor.error.incorrect-code": {
     "message": "입력한 코드가 맞지 않습니다!"
+  },
+  "settings.account.two-factor.field.code.description": {
+    "message": "인증 앱에서의 코드를 입력하거나 백업 코드 중 하나를 사용하세요."
   },
   "settings.account.two-factor.field.code.label": {
     "message": "2단계 인증 코드 입력"
@@ -4973,6 +5639,12 @@
   "settings.applications.description.intro": {
     "message": "애플리케이션을 사용하여 개발한 제품에서 Modrinth 사용자를 인증할 수 있습니다. 자세한 내용은 <docs-link>Modrinth API 문서</docs-link>를 참조하세요."
   },
+  "settings.applications.empty-state.description": {
+    "message": "생성한 애플리케이션이 여기에 나타납나다."
+  },
+  "settings.applications.empty-state.heading": {
+    "message": "애플리케이션 없음"
+  },
   "settings.applications.field.description": {
     "message": "설명"
   },
@@ -5008,6 +5680,9 @@
   },
   "settings.applications.modal.header": {
     "message": "신청정보"
+  },
+  "settings.applications.no-scopes": {
+    "message": "범위 없음"
   },
   "settings.applications.notification.icon-updated.description": {
     "message": "앱 아이콘이 업데이트되었습니다."
@@ -5079,7 +5754,7 @@
     "message": "년"
   },
   "settings.billing.midas.benefits.ad-free": {
-    "message": "Modrinth App 및 modrinth.com에서 광고 없이 브라우징"
+    "message": "Modrinth 앱 및 modrinth.com에서 광고 없이 브라우징"
   },
   "settings.billing.midas.benefits.badge": {
     "message": "프로필에 Modrinth+ 배지"
@@ -5159,6 +5834,9 @@
   "settings.billing.plan.title": {
     "message": "{size} 플랜"
   },
+  "settings.billing.price.includes-tax": {
+    "message": "세금 {amount} 포함"
+  },
   "settings.billing.price.per-interval": {
     "message": "{price} / {interval}"
   },
@@ -5205,7 +5883,7 @@
     "message": "{gb} GB 스왑 메모리"
   },
   "settings.billing.pyro_subscription.description": {
-    "message": "당신의 Modrinth 호스팅 플랜을 관리하세요."
+    "message": "Modrinth 서버 구독을 관리하세요."
   },
   "settings.billing.pyro_subscription.title": {
     "message": "Modrinth Hosting 구독"
@@ -5223,7 +5901,7 @@
     "message": "구독"
   },
   "settings.billing.subscription.description": {
-    "message": "당신의 Modrinth 플랜을 관리하세요."
+    "message": "Modrinth 구독을 관리하세요."
   },
   "settings.billing.subscription.title": {
     "message": "구독"
@@ -5267,6 +5945,12 @@
   "settings.pats.description": {
     "message": "개인 액세스 토큰는 Modrinth API에 액세스하는 데 사용할 수 있습니다. 언제든지 생성하거나 폐기할 수 있습니다. 자세한 내용은 <doc-link>Modrinth API 문서</doc-link>를 참조하세요."
   },
+  "settings.pats.empty-state.description": {
+    "message": "생성한 토큰이 여기에 나타납니다."
+  },
+  "settings.pats.empty-state.heading": {
+    "message": "개인 접근 토큰 없음"
+  },
   "settings.pats.modal.create.action": {
     "message": "PAT 생성"
   },
@@ -5285,11 +5969,26 @@
   "settings.pats.modal.edit.title": {
     "message": "개인 액세스 토큰 편집"
   },
+  "settings.pats.modal.revoke.action": {
+    "message": "이 토큰 취소"
+  },
+  "settings.pats.modal.revoke.description": {
+    "message": "이 토큰은 영원히 무효화되며 토큰을 사용하여 설정한 모든 것은 작동을 멈춥니다. 이는 되돌릴 수 없습니다."
+  },
+  "settings.pats.modal.revoke.title": {
+    "message": "정말로 이 토큰을 취소할까요?"
+  },
+  "settings.pats.token.access-token": {
+    "message": "접근 토큰"
+  },
   "settings.pats.token.action.edit": {
     "message": "토큰 편집"
   },
   "settings.pats.token.action.revoke": {
     "message": "토큰 해지"
+  },
+  "settings.pats.token.disclaimer": {
+    "message": "토큰은 지금만 확인할 수 있으므로 저장하세요. 이 페이지를 떠나면 다시 볼 수 없습니다."
   },
   "settings.pats.token.expired-ago": {
     "message": "{ago}에 만료"
@@ -5303,17 +6002,38 @@
   "settings.pats.token.never-used": {
     "message": "사용한 적 없음"
   },
+  "settings.pats.token.no-permissions": {
+    "message": "권한 없음"
+  },
   "settings.sessions.action.revoke-session": {
     "message": "세션 제거"
   },
   "settings.sessions.created-ago": {
-    "message": "{ago} 에 생성됨"
+    "message": "{ago} 전에 로그인됨"
   },
   "settings.sessions.current-session": {
     "message": "현재 세션"
   },
+  "settings.sessions.description.1": {
+    "message": "현재 Modrinth 계정으로 로그인 된 모든 기기입니다. 여기서 기기 별로 세션을 취소해 로그아웃할 수 있습니다. 만약 알 수 없는 기기가 있다면 즉시 해당 기기에서 로그아웃 후 Modrinth 계정 비밀번호를 변경하세요."
+  },
+  "settings.sessions.description.2": {
+    "message": "표시된 위치는 IP 주소를 기반으로 하므로 대략적인 정보일 수 있습니다. VPN이나 ​​일부 인터넷 서비스 제공업체는 실제 위치를 숨길 수 있습니다."
+  },
+  "settings.sessions.empty-state.description": {
+    "message": "계정에 로그인한 기기가 여기에 나타납니다."
+  },
+  "settings.sessions.empty-state.heading": {
+    "message": "활성화된 세션 없음"
+  },
+  "settings.sessions.ip": {
+    "message": "IP 주소: {ip}"
+  },
   "settings.sessions.last-accessed-ago": {
     "message": "{ago} 에 접근함"
+  },
+  "settings.sessions.modrinth-app": {
+    "message": "Modrinth 앱"
   },
   "settings.sessions.unknown-os": {
     "message": "알 수 없는 운영체제"
@@ -5357,6 +6077,195 @@
   "shared-instance.invite.unavailable.title": {
     "message": "이 초대는 사용할 수 없습니다"
   },
+  "thread-issues.address-failed": {
+    "message": "이슈를 해결됨으로 표시하는 데 실패함"
+  },
+  "thread-issues.address-requirements-unchanged": {
+    "message": "이 문제를 해결됨으로 표시하기 전에 요청된 변경 사항을 수행해야 합니다."
+  },
+  "thread-issues.address-save-failed": {
+    "message": "변경 사항을 저장하지 못했습니다. 이슈를 해결됨으로 표시하기 전에 먼저 유효성 오류를 수정하세요."
+  },
+  "thread-issues.addressed": {
+    "message": "해결됨으로 표시"
+  },
+  "thread-issues.addressed-progress": {
+    "message": "{total, number}개 중 {completed, number}개 해결됨"
+  },
+  "thread-issues.addressed-progress-tooltip": {
+    "message": "이 이슈에 대해 {completed, number}/{total, number} 부분이 해결되었습니다"
+  },
+  "thread-issues.change-facet-first": {
+    "message": "이 이슈를 해결됨으로 표시하기 전에 요청된 변경 사항을 수행해야 합니다."
+  },
+  "thread-issues.facet.acknowledge-checkbox": {
+    "message": "이 요청 승인"
+  },
+  "thread-issues.facet.acknowledge-reply": {
+    "message": "변경 사항을 답장에 설명"
+  },
+  "thread-issues.facet.version.changelog": {
+    "message": "버전 변경사항 변경"
+  },
+  "thread-issues.facet.version.dependencies": {
+    "message": "버전 의존성 변경"
+  },
+  "thread-issues.facet.version.environment": {
+    "message": "버전 환경 변경"
+  },
+  "thread-issues.facet.version.file-type": {
+    "message": "추가 파일 유형 변경"
+  },
+  "thread-issues.facet.version.game-versions": {
+    "message": "지원되는 게임 버전 변경"
+  },
+  "thread-issues.facet.version.remove": {
+    "message": "이 버전 제거"
+  },
+  "thread-issues.facet.version.remove-files": {
+    "message": "요청된 추가 파일 제거"
+  },
+  "thread-issues.hide-addressed": {
+    "message": "해결됨 숨기기"
+  },
+  "thread-issues.hide-issue": {
+    "message": "이슈 숨기기"
+  },
+  "thread-issues.hide-resolved": {
+    "message": "해결됨 숨기기"
+  },
+  "thread-issues.mark-addressed": {
+    "message": "해결됨으로 표시"
+  },
+  "thread-issues.mark-addressed-progress": {
+    "message": "해결됨으로 표시 {completed, number}/{total, number}"
+  },
+  "thread-issues.mark-resolved": {
+    "message": "해결됨으로 표시"
+  },
+  "thread-issues.mark-unresolved": {
+    "message": "미해결로 표시"
+  },
+  "thread-issues.more-actions": {
+    "message": "추가 요구 행동"
+  },
+  "thread-issues.options": {
+    "message": "이슈 옵션"
+  },
+  "thread-issues.reply-to-address": {
+    "message": "해결에 답장"
+  },
+  "thread-issues.resolve-failed": {
+    "message": "이슈를 해결됨으로 표시하는 데 실패함"
+  },
+  "thread-issues.resolved": {
+    "message": "해결됨"
+  },
+  "thread-issues.show-addressed": {
+    "message": "해결됨 보기"
+  },
+  "thread-issues.show-issue": {
+    "message": "이슈 보기"
+  },
+  "thread-issues.show-resolved": {
+    "message": "해결됨 보기"
+  },
+  "thread-issues.target.edit-name": {
+    "message": "이름 편집"
+  },
+  "thread-issues.target.edit-summary": {
+    "message": "요약 편집"
+  },
+  "thread-issues.target.edit-url": {
+    "message": "URL 편집"
+  },
+  "thread-issues.unresolve-failed": {
+    "message": "이슈를 미해결로 표시하는 데 실패함"
+  },
+  "thread.issue-history.flagged": {
+    "message": "이슈 {count, plural, other {#}}개의 플래그를 설정했습니다"
+  },
+  "thread.issue-history.private-note": {
+    "message": "관리자에게만 보임"
+  },
+  "thread.message.auto-approval": {
+    "message": "모든 이슈를 해결했으며 프로젝트 상태가 자동으로 <status>승인됨</status>으로 설정되었습니다."
+  },
+  "thread.message.delete": {
+    "message": "삭제"
+  },
+  "thread.message.deleted-message": {
+    "message": "삭제된 메시지를 게시했습니다."
+  },
+  "thread.message.legacy-project-message": {
+    "message": "이 프로젝트는 Modrinth 중재 스레드가 존재하기 전에 게시되었으므로 중재 기록이 누락되었을 수 있습니다."
+  },
+  "thread.message.moderator": {
+    "message": "관리자"
+  },
+  "thread.message.modrinth-team": {
+    "message": "Modrinth 팀"
+  },
+  "thread.message.more-options": {
+    "message": "더 많은 옵션"
+  },
+  "thread.message.open-image": {
+    "message": "이미지 열기"
+  },
+  "thread.message.preview": {
+    "message": "미리보기"
+  },
+  "thread.message.private-message": {
+    "message": "관리자에게만 보임"
+  },
+  "thread.message.project-owner": {
+    "message": "프로젝트 소유자"
+  },
+  "thread.message.reporter": {
+    "message": "보고서"
+  },
+  "thread.message.reverted-to-draft": {
+    "message": "이 프로젝트를 <status>.</status>(으)로 되돌렸습니다."
+  },
+  "thread.message.review": {
+    "message": "프로젝트를 검토하고 상태를 <status>status</status>(으)로 설정했습니다."
+  },
+  "thread.message.review-with-issues": {
+    "message": "프로젝트를 검토하고 이슈 {count, plural, other{#}}개와 함께 상태를 <status>status</status>(으)로 설정했습니다."
+  },
+  "thread.message.sent-image": {
+    "message": "이미지를 보냈습니다."
+  },
+  "thread.message.sent-message": {
+    "message": "메시지를 보냈습니다."
+  },
+  "thread.message.status-changed": {
+    "message": "프로젝트 상태를 <old-status>status</old-status>에서 <status>.</status>(으)로 변경했습니다."
+  },
+  "thread.message.submitted-for-review": {
+    "message": "프로젝트 검토를 제출했습니다."
+  },
+  "thread.message.system": {
+    "message": "Modrinth"
+  },
+  "thread.message.tech-review-completed": {
+    "message": "기술 검토를 완료하고 프로젝트를 <status>.</status>(으)로 표시했습니다."
+  },
+  "thread.message.tech-review-entered": {
+    "message": "프로젝트가 기술 검토 대기열에 들어갔습니다."
+  },
+  "thread.message.tech-review-exit-file-deleted": {
+    "message": "검토 대기 중인 모든 파일이 사용자에 의해 삭제되었으므로 프로젝트가 기술 검토 대기열에서 벗어났습니다."
+  },
+  "thread.message.tech-review-exited": {
+    "message": "보류 중이던 모든 추적이 해결되었으므로 프로젝트가 기술 검토 대기열에서 벗어났습니다."
+  },
+  "thread.message.thread-closed": {
+    "message": "스레드를 닫았습니다."
+  },
+  "thread.message.thread-reopened": {
+    "message": "스레드를 다시 열었습니다."
+  },
   "ui.latest-news-row.latest-news": {
     "message": "Modrinth의 최신 뉴스"
   },
@@ -5371,6 +6280,21 @@
   },
   "ui.newsletter-button.tooltip": {
     "message": "Modrinth 뉴스레터 구독"
+  },
+  "ui.two-factor-code.authentication-code": {
+    "message": "6자리 인증 코드"
+  },
+  "ui.two-factor-code.backup-code": {
+    "message": "백업 코드"
+  },
+  "ui.two-factor-code.backup-code.placeholder": {
+    "message": "백업 코드 입력"
+  },
+  "ui.two-factor-code.use-authentication-code": {
+    "message": "인증 코드 사용"
+  },
+  "ui.two-factor-code.use-backup-code": {
+    "message": "백업 코드 사용"
   },
   "version.all-versions": {
     "message": "전체 버전"

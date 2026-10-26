@@ -2852,9 +2852,6 @@
   "instance.shared-instance.publish-review.added-label": {
     "message": "مضاف"
   },
-  "instance.shared-instance.publish-review.header": {
-    "message": "مراجعة التغييرات"
-  },
   "instance.shared-instance.publish-review.publish-button": {
     "message": "رفع تحديث"
   },

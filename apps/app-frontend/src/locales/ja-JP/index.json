@@ -320,6 +320,9 @@
   "app.download-manager.attention": {
     "message": "注意が必要"
   },
+  "app.download-manager.bulk-update-content": {
+    "message": "{count, plural, one {# item} other {# items}}項目を更新しています"
+  },
   "app.download-manager.cancel": {
     "message": "インストールをキャンセル"
   },
@@ -475,6 +478,15 @@
   },
   "app.features-settings.sync-across-devices.title": {
     "message": "デバイス間での同期機能を同期する"
+  },
+  "app.file-download.canceling": {
+    "message": "ダウンロードをキャンセル中…"
+  },
+  "app.file-download.preparing": {
+    "message": "ダウンロードの準備中…"
+  },
+  "app.file-download.waiting": {
+    "message": "サーバーを待機中…"
   },
   "app.home.jump-back-in.actions.label": {
     "message": "インスタンスの操作"
@@ -1319,6 +1331,12 @@
   "app.modal.install-to-play.shared-instance-unknown-files-description": {
     "message": "この共有インスタンスには、Modrinthで公開されていないファイルが含まれています。信頼できる提供元からのファイルのみをインストールすることを強くお勧めします。"
   },
+  "app.modal.install-to-play.unavailable-description": {
+    "message": "このサーバーで使用されているModPackのバージョンは、現在ダウンロードできません。公開が停止されているか、審査中の可能性があります。後ほど再度お試しいただくか、サーバーの管理者にお問い合わせください。"
+  },
+  "app.modal.install-to-play.unavailable-header": {
+    "message": "このサーバーのmodpackは利用できません"
+  },
   "app.modal.install-to-play.unknown-files-description": {
     "message": "このサーバーModパックには、Modrinthに公開されていないファイルが含まれています。信頼できるソースからのファイルのみをインストールすることを強く推奨します。"
   },
@@ -1727,8 +1745,14 @@
   "app.settings.game-options.category.accessibility.label": {
     "message": "アクセシビリティ"
   },
+  "app.settings.game-options.category.chat.description": {
+    "message": "チャットの表示と外観"
+  },
   "app.settings.game-options.category.chat.label": {
     "message": "チャット"
+  },
+  "app.settings.game-options.category.controls.description": {
+    "message": "マウスの動きとキー割り当て"
   },
   "app.settings.game-options.category.controls.label": {
     "message": "操作"
@@ -1757,8 +1781,14 @@
   "app.settings.game-options.category.online.label": {
     "message": "オンライン"
   },
+  "app.settings.game-options.category.skin-customization.description": {
+    "message": "スキン設定"
+  },
   "app.settings.game-options.category.skin-customization.label": {
     "message": "スキンのカスタマイズ"
+  },
+  "app.settings.game-options.category.video.description": {
+    "message": "カメラとディスプレイの設定"
   },
   "app.settings.game-options.category.video.label": {
     "message": "ビデオ"
@@ -1766,8 +1796,20 @@
   "app.settings.game-options.choice.all": {
     "message": "すべて"
   },
+  "app.settings.game-options.choice.balanced": {
+    "message": "バランス"
+  },
+  "app.settings.game-options.choice.by-player": {
+    "message": "プレイヤーによる"
+  },
   "app.settings.game-options.choice.chat": {
     "message": "チャット"
+  },
+  "app.settings.game-options.choice.commands-only": {
+    "message": "コマンドのみ"
+  },
+  "app.settings.game-options.choice.constant": {
+    "message": "コンスタント"
   },
   "app.settings.game-options.choice.crosshair": {
     "message": "クロスヘア"
@@ -1787,14 +1829,26 @@
   "app.settings.game-options.choice.fancy": {
     "message": "描画優先"
   },
+  "app.settings.game-options.choice.far": {
+    "message": "遠く"
+  },
   "app.settings.game-options.choice.fast": {
     "message": "処理優先"
+  },
+  "app.settings.game-options.choice.frequent": {
+    "message": "頻繁"
+  },
+  "app.settings.game-options.choice.hidden": {
+    "message": "非表示"
   },
   "app.settings.game-options.choice.hotbar": {
     "message": "ホットバー"
   },
   "app.settings.game-options.choice.left": {
     "message": "左手"
+  },
+  "app.settings.game-options.choice.limited": {
+    "message": "制限付き"
   },
   "app.settings.game-options.choice.max-fps": {
     "message": "最大フレームレート"
@@ -3394,9 +3448,6 @@
   },
   "instance.shared-instance.publish-review.added-label": {
     "message": "追加しました"
-  },
-  "instance.shared-instance.publish-review.header": {
-    "message": "変更内容を確認"
   },
   "instance.shared-instance.publish-review.publish-button": {
     "message": "アップデートをプッシュ"

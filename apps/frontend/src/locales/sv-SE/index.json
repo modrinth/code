@@ -857,6 +857,9 @@
   "auth.sign-in.choose-account": {
     "message": "Välj ett konto att använda i Modrinth App"
   },
+  "auth.sign-in.choose-existing-account": {
+    "message": "Använd ett befintligt konto"
+  },
   "auth.sign-in.continue-with-email": {
     "message": "Fortsätt med e-post"
   },
@@ -877,6 +880,9 @@
   },
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Öppna Modrinth App"
+  },
+  "auth.sign-in.launcher.handoff-failed": {
+    "message": "Kunde inte slutföra inloggningen till Modrinth App. Försök igen."
   },
   "auth.sign-in.launcher.opening.description": {
     "message": "Om appen inte öppnas, använd knappen nedan för att slutföra inloggningen."
@@ -989,11 +995,20 @@
   "collection.description": {
     "message": "{description} - Visa samlingen {name} av {username} på Modrinth"
   },
+  "collection.description-placeholder": {
+    "message": "Det här är en samling av..."
+  },
   "collection.description.following": {
     "message": "Auto-genererad samling av projekten du följer."
   },
+  "collection.edit": {
+    "message": "Ändra samling"
+  },
   "collection.error.not-found": {
     "message": "Samlingen hittades inte"
+  },
+  "collection.icon-label": {
+    "message": "Ikon"
   },
   "collection.label.created-at": {
     "message": "Skapades {ago}"
@@ -1010,6 +1025,9 @@
   "collection.label.updated-at": {
     "message": "Uppdaterad {ago}"
   },
+  "collection.name-placeholder": {
+    "message": "Ange samlingens namn..."
+  },
   "collection.return-link.dashboard-collections": {
     "message": "Dina samlingar"
   },
@@ -1025,6 +1043,9 @@
   "conversation-thread.action.approve": {
     "message": "Godkänn"
   },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "Godkänn med svar"
+  },
   "conversation-thread.action.close-report": {
     "message": "Stäng rapport"
   },
@@ -1033,6 +1054,9 @@
   },
   "conversation-thread.action.reject": {
     "message": "Avslå"
+  },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "Avslå med svar"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Återuppta tråd"
@@ -1067,6 +1091,9 @@
   "conversation-thread.action.withhold": {
     "message": "Tillhandahåll"
   },
+  "conversation-thread.action.withhold-with-reply": {
+    "message": "Tillbakahåll med svar"
+  },
   "conversation-thread.closed-thread.description": {
     "message": "Den här tråden är stängd och nya meddelanden kan inte skickas."
   },
@@ -1075,6 +1102,12 @@
   },
   "conversation-thread.error.reopening-report": {
     "message": "Fel vid öppning av rapport"
+  },
+  "conversation-thread.error.sending-message": {
+    "message": "Kunde inte skicka meddelande"
+  },
+  "conversation-thread.image.open-externally": {
+    "message": "Öppna externt"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Svara tråden..."
@@ -1096,6 +1129,12 @@
   },
   "conversation-thread.reply-modal.help-center-note": {
     "message": "Om du behöver kontakta modereringsteamet, vänligen använd <help-center-link>Modrinth hjälpcenter</help-center-link> och klicka den blåa bubblan nere i det högra hörnet för att kontakta support."
+  },
+  "conversation-thread.reply.facet": {
+    "message": "Förklaring för {issue}"
+  },
+  "conversation-thread.reply.unknown-issue": {
+    "message": "Modereringsfel"
   },
   "conversation-thread.resubmit-modal.confirmation.description": {
     "message": "Bekräfta att jag tagit itu med meddelandena från moderatorerna"
@@ -1372,6 +1411,21 @@
   },
   "create.project.visibility-unlisted": {
     "message": "Olistad"
+  },
+  "create.restricted-alert.description": {
+    "message": "En moderator har tagit bort den här behörigheten från ditt konto."
+  },
+  "create.restricted-alert.header": {
+    "message": "Åtgärd begränsad"
+  },
+  "create.restricted-alert.view-standing": {
+    "message": "Visa kontoställning"
+  },
+  "create.version.restricted-text": {
+    "message": "En moderator har tagit bort den här behörigheten från ditt konto. Se din kontoställning i dina kontoinställningar för detaljer."
+  },
+  "create.version.restricted-title": {
+    "message": "Åtgärd begränsad"
   },
   "dashboard.analytics.from-projects": {
     "message": "från {count} {count, plural, one {projekt} other {projekt}}"
@@ -2810,6 +2864,48 @@
   "modal.shared-instance.open-in-app.why-use": {
     "message": "Varför använda Modrinth App"
   },
+  "moderation.appearance.apply": {
+    "message": "Tillämpa tema"
+  },
+  "moderation.appearance.copied": {
+    "message": "Kopierat!"
+  },
+  "moderation.appearance.copy": {
+    "message": "Kopiera JSON"
+  },
+  "moderation.appearance.download": {
+    "message": "Ladda ner JSON"
+  },
+  "moderation.appearance.export": {
+    "message": "Exportera tema"
+  },
+  "moderation.appearance.file": {
+    "message": "Välj JSON-fil"
+  },
+  "moderation.appearance.file-error": {
+    "message": "Kunde inte läsa den här filen. Välj en JSON-fil mindre än 64 KB."
+  },
+  "moderation.appearance.import": {
+    "message": "Importera tema"
+  },
+  "moderation.c2pa-scan.failed": {
+    "message": "Kunde inte skanna efter AI-genererade filer."
+  },
+  "moderation.c2pa-scan.no-ai-files": {
+    "message": "Inga AI-genererade filer hittades."
+  },
+  "moderation.keybinds.listen": {
+    "message": "Tryck på en tangent…"
+  },
+  "moderation.keybinds.reset-default": {
+    "message": "Återställ till standard"
+  },
+  "moderation.keybinds.scope-global": {
+    "message": "Kan användas var som helst på webbplatsen."
+  },
+  "moderation.keybinds.transfer.download": {
+    "message": "Ladda ner JSON"
+  },
   "moderation.moderate": {
     "message": "Moderera"
   },
@@ -2821,6 +2917,42 @@
   },
   "moderation.page.reports": {
     "message": "Rapporter"
+  },
+  "moderation.project-review.draftCount": {
+    "message": "{count} utkast"
+  },
+  "moderation.project-review.scheduledCount": {
+    "message": "{count} schemalagt"
+  },
+  "moderation.project-review.unknownCount": {
+    "message": "{count} okända"
+  },
+  "moderation.settings.default-value-styled": {
+    "message": "Standard: <value></value>"
+  },
+  "moderation.settings.highlight-preview.missing-information": {
+    "message": "Information saknas"
+  },
+  "moderation.settings.highlight-preview.non-english": {
+    "message": "Inte engelska"
+  },
+  "moderation.settings.off": {
+    "message": "Av"
+  },
+  "moderation.settings.on": {
+    "message": "På"
+  },
+  "moderation.settings.search": {
+    "message": "Sök inställningar…"
+  },
+  "moderation.settings.title": {
+    "message": "Allmänna inställningar"
+  },
+  "moderation.tech-review.file.download": {
+    "message": "Ladda ner"
+  },
+  "moderation.tech-review.file.download-file": {
+    "message": "Ladda ner {filename} ({size})"
   },
   "modpack-scan-modal.delete-all-groups.error": {
     "message": "Kunde inte rensa alla grupper: {error}"
@@ -3092,6 +3224,9 @@
   "project-member-header.success-join": {
     "message": "Du har gått med i projektteamet"
   },
+  "project-moderation-nags.project-submitted-for-review": {
+    "message": "Ditt projekt har skickats in för granskning!"
+  },
   "project-moderation-nags.publishing-checklist": {
     "message": "Publicerings-checklista"
   },
@@ -3235,6 +3370,15 @@
   },
   "project.description.title": {
     "message": "Beskrivning"
+  },
+  "project.disclosures.load-error": {
+    "message": "Kunde inte läsa in upplysningar."
+  },
+  "project.disclosures.loading": {
+    "message": "Läser in upplysningar…"
+  },
+  "project.disclosures.retry": {
+    "message": "Försök igen"
   },
   "project.download.base-game-version-incompatible-tooltip": {
     "message": "Den här spelversionen är inkompatibel med basprojektet."
@@ -3485,6 +3629,9 @@
   "project.settings.disclosures.ai-functionality.title": {
     "message": "Innehåller generativ AI-funktioner"
   },
+  "project.settings.disclosures.ai.description.2": {
+    "message": "Det är viktigt att vara ärlig med om generativ AI har spelat en viktig roll i produktionen eller publiceringen av det här innehållet. Ett enkelt sätt att se på det är om du skulle betrakta AI som en medförfattare till projektet, du bör ange det här."
+  },
   "project.settings.disclosures.ai.note-placeholder": {
     "message": "t.ex. De kinesiska och arabiska översättningarna är AI-genererade."
   },
@@ -3521,6 +3668,9 @@
   "project.settings.disclosures.derivative.note-label": {
     "message": "Förklara hur ditt projekt baseras på orginalverket"
   },
+  "project.settings.disclosures.derivative.open-link": {
+    "message": "Besök länk"
+  },
   "project.settings.disclosures.derivative.title": {
     "message": "Innehåller derivatinnehåll"
   },
@@ -3540,7 +3690,7 @@
     "message": "Den här upplysningen har låsts av moderatorer. Vänligen <contact-support-link>kontakta support</contact-support-link> ifall du tror att det är fel."
   },
   "project.settings.disclosures.lock-status.fully-locked.warning": {
-    "message": "Vänligen <contact-support-link>kontakta support</contact-support-link> ifall den här upplysningen behöver ändras eller tas bort."
+    "message": "Vänligen <contact-support-link>kontakta support</contact-support-link> om den här upplysningen behöver ändras eller tas bort."
   },
   "project.settings.disclosures.paid-features.title": {
     "message": "Innehåller betalda funktioner"
@@ -3550,6 +3700,9 @@
   },
   "project.settings.disclosures.photosensitivity.title": {
     "message": "Ljuskänslighetsvarning"
+  },
+  "project.settings.disclosures.save-blocked.photosensitivity-note": {
+    "message": "Varningsupplysning för ljuskänslighet måste innehålla en beskrivning."
   },
   "project.settings.disclosures.save-blocked.system-interactions-note": {
     "message": "Extern systeminteraktionsupplysning måste ha en beskrivning."
@@ -3641,8 +3794,20 @@
   "project.settings.license.all-rights": {
     "message": "Alla rättigheter förbehållna/Ingen licens"
   },
+  "project.settings.license.allow-later": {
+    "message": "Tillåt senare versioner"
+  },
+  "project.settings.license.custom": {
+    "message": "Anpassad"
+  },
+  "project.settings.license.custom-name-required": {
+    "message": "Ange namnet för din anpassade licens."
+  },
   "project.settings.license.name": {
     "message": "Licensnamn"
+  },
+  "project.settings.license.name-description": {
+    "message": "Det fullständiga namnet på den anpassade licensen."
   },
   "project.settings.license.name-placeholder": {
     "message": "Licensnamn"
@@ -3650,8 +3815,8 @@
   "project.settings.license.optional-label": {
     "message": "valfritt"
   },
-  "project.settings.license.select": {
-    "message": "Licens"
+  "project.settings.license.optional-url": {
+    "message": "Licens-URL (valfritt)"
   },
   "project.settings.license.select-placeholder": {
     "message": "Sök licenser..."
@@ -3766,6 +3931,9 @@
   },
   "project.settings.permissions.no-results": {
     "message": "Inga externa filer matchade din sökning."
+  },
+  "project.settings.permissions.open-image-in-new-tab": {
+    "message": "Öppna bild i ny flik"
   },
   "project.settings.permissions.pending-approval-count": {
     "message": "{count, plural,=0 {Ingen tillskrivning behöver godkännas} one {# tillskrivning behöver godkännas} other {# tillskrivningar behöver godkännas}}"
@@ -4221,7 +4389,7 @@
     "message": "Tillhandahållet av servern"
   },
   "search.filter.locked.server-game-version.title": {
-    "message": "Spel version är tillhandahållet av servern"
+    "message": "Spelversion tillhandahålls av servern"
   },
   "search.filter.locked.server-loader.title": {
     "message": "Läsaren förses av servern"
@@ -4484,6 +4652,21 @@
   "settings.account.security.two-factor.title": {
     "message": "Tvåfaktorsautentisering"
   },
+  "settings.account.standing.good": {
+    "message": "Ditt konto har en god ställning."
+  },
+  "settings.account.standing.reason-label": {
+    "message": "Anledning:"
+  },
+  "settings.account.standing.restricted.description": {
+    "message": "En moderator har tagit bort följande behörigheter från ditt konto:"
+  },
+  "settings.account.standing.restricted.header": {
+    "message": "Ditt konto har begränsats"
+  },
+  "settings.account.standing.title": {
+    "message": "Kontoställning"
+  },
   "settings.account.two-factor.backup.intro": {
     "message": "Ladda ner och spara de här reservkoderna på en säker plats. Du kan använda dem istället för en 2FA-kod ifall du skulle förlora åtkomst till din enhet! Du borde skydda de här koderna som du för dina lösenord."
   },
@@ -4552,6 +4735,12 @@
   },
   "settings.applications.delete.confirm.title": {
     "message": "Är du säker på att du vill radera den här applikationen?"
+  },
+  "settings.applications.empty-state.description": {
+    "message": "Applikationer du skapar kommer visas här."
+  },
+  "settings.applications.empty-state.heading": {
+    "message": "Inga applikationer"
   },
   "settings.applications.field.description": {
     "message": "Beskrivning"
@@ -4872,13 +5061,25 @@
     "message": "Återkalla session"
   },
   "settings.sessions.created-ago": {
-    "message": "Skapad {ago}"
+    "message": "Loggade in {ago}"
   },
   "settings.sessions.current-session": {
     "message": "Nuvarande session"
   },
+  "settings.sessions.description.1": {
+    "message": "De här enheterna är för tillfället inloggade med ditt Modrinth-konto. Du kan logga ut från alla individuellt genom att återkalla deras sessioner. Om du inte känner igen en enhet, logga ut enheten och byt lösenord på ditt Modrinth-konto omedelbart."
+  },
+  "settings.sessions.empty-state.description": {
+    "message": "Enheter som är inloggade på ditt konto kommer att visas här."
+  },
+  "settings.sessions.ip": {
+    "message": "IP-adress: {ip}"
+  },
   "settings.sessions.last-accessed-ago": {
     "message": "Senast åtkommen {ago}"
+  },
+  "settings.sessions.modrinth-app": {
+    "message": "Modrinth App"
   },
   "settings.sessions.unknown-os": {
     "message": "Okänt OS"
@@ -4921,6 +5122,51 @@
   },
   "shared-instance.invite.unavailable.title": {
     "message": "Den här inbjudan är inte tillgänglig"
+  },
+  "thread-issues.facet.version.remove": {
+    "message": "Ta bort den här versionen"
+  },
+  "thread-issues.target.edit-name": {
+    "message": "Ändra namn"
+  },
+  "thread-issues.target.edit-summary": {
+    "message": "Redigera sammanfattning"
+  },
+  "thread-issues.target.edit-url": {
+    "message": "Ändra URL"
+  },
+  "thread.message.moderator": {
+    "message": "Moderator"
+  },
+  "thread.message.more-options": {
+    "message": "Fler alternativ"
+  },
+  "thread.message.open-image": {
+    "message": "Öppna bild"
+  },
+  "thread.message.preview": {
+    "message": "Förhandsvisa"
+  },
+  "thread.message.private-message": {
+    "message": "Endast synlig för moderatorer"
+  },
+  "thread.message.project-owner": {
+    "message": "Projektägare"
+  },
+  "thread.message.sent-image": {
+    "message": "skickade en bild."
+  },
+  "thread.message.sent-message": {
+    "message": "skickade ett meddelande."
+  },
+  "thread.message.status-changed": {
+    "message": "ändrade projektstatusen från <old-status>status</old-status> till <status>.</status>"
+  },
+  "thread.message.system": {
+    "message": "Modrinth"
+  },
+  "thread.message.thread-closed": {
+    "message": "stängde tråden."
   },
   "ui.latest-news-row.latest-news": {
     "message": "Senaste nyheterna från Modrinth"
