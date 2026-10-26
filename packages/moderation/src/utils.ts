@@ -119,6 +119,21 @@ export function anyDisclosureHasText(
 	return disclosures.some((disclosure) => disclosureHasText(disclosure))
 }
 
+export function hasMissingAiUsage(
+	disclosures: readonly Labrinth.Projects.v3.ProjectDisclosureData[],
+	usages: readonly Labrinth.Projects.v3.AiUsage[] = ['code', 'assets', 'text'],
+): boolean {
+	return usages.some(
+		(usage) =>
+			!disclosures.some(
+				(disclosure) =>
+					disclosure.type === 'ai_content' &&
+					!disclosure.deleted_at &&
+					disclosure.uses.includes(usage),
+			),
+	)
+}
+
 export function disclosureHasText(disclosure: Labrinth.Projects.v3.ProjectDisclosureData): boolean {
 	if (disclosure.deleted_at) return false
 	if ('note' in disclosure && disclosure.note?.trim()) return true

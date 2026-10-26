@@ -1,7 +1,25 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { TriangleAlertIcon } from '@modrinth/assets'
 
-import { disclosureExists, disclosureHasText } from '../../utils'
+import {
+	disclosureExists,
+	disclosureHasText,
+	hasMissingAiUsage as hasMissingAiContent,
+} from '../../utils'
+import listItemAdsMessage from '../messages/checklist/messages/disclosures/disclosure-list-items/ads.md'
+import listItemAiMessage from '../messages/checklist/messages/disclosures/disclosure-list-items/ai/ai.md'
+import listItemAiFunctionalityMessage from '../messages/checklist/messages/disclosures/disclosure-list-items/ai/ai-functionality.md'
+import listItemAiAssetsMessage from '../messages/checklist/messages/disclosures/disclosure-list-items/ai/ai-usages/assets.md'
+import listItemAiCodeMessage from '../messages/checklist/messages/disclosures/disclosure-list-items/ai/ai-usages/code.md'
+import listItemAiTextMessage from '../messages/checklist/messages/disclosures/disclosure-list-items/ai/ai-usages/text.md'
+import listItemAiListIntroMessage from '../messages/checklist/messages/disclosures/disclosure-list-items/ai/list-intro.md'
+import listItemArchiveMessage from '../messages/checklist/messages/disclosures/disclosure-list-items/archive.md'
+import listItemDerivativeContentMessage from '../messages/checklist/messages/disclosures/disclosure-list-items/derivative-content.md'
+import listItemPaidFeaturesMessage from '../messages/checklist/messages/disclosures/disclosure-list-items/paid-features.md'
+import listItemPhotosensitivityMessage from '../messages/checklist/messages/disclosures/disclosure-list-items/photosensitivity.md'
+import listItemSystemInteractionsMessage from '../messages/checklist/messages/disclosures/disclosure-list-items/system-interactions.md'
+import listItemTelemetryMessage from '../messages/checklist/messages/disclosures/disclosure-list-items/telemetry.md'
+import formattingListIntroMessage from '../messages/checklist/messages/disclosures/formatting-disclosures/list-intro.md'
 import disclosuresHeaderMessage from '../messages/checklist/messages/disclosures/header.md'
 import disclosuresHeaderListlessMessage from '../messages/checklist/messages/disclosures/header-listless.md'
 import missingAdsMessage from '../messages/checklist/messages/disclosures/missing-disclosures/ads.md'
@@ -21,22 +39,8 @@ import missingTelemetryMessage from '../messages/checklist/messages/disclosures/
 import missingTelemetryAlwaysMessage from '../messages/checklist/messages/disclosures/missing-disclosures/telemetry/consent-model/always.md'
 import missingTelemetryOptInMessage from '../messages/checklist/messages/disclosures/missing-disclosures/telemetry/consent-model/opt-in.md'
 import missingTelemetryOptOutMessage from '../messages/checklist/messages/disclosures/missing-disclosures/telemetry/consent-model/opt-out.md'
-import listItemAdsMessage from '../messages/checklist/messages/disclosures/disclosure-list-items/ads.md'
-import listItemAiMessage from '../messages/checklist/messages/disclosures/disclosure-list-items/ai/ai.md'
-import listItemAiFunctionalityMessage from '../messages/checklist/messages/disclosures/disclosure-list-items/ai/ai-functionality.md'
-import listItemAiAssetsMessage from '../messages/checklist/messages/disclosures/disclosure-list-items/ai/ai-usages/assets.md'
-import listItemAiCodeMessage from '../messages/checklist/messages/disclosures/disclosure-list-items/ai/ai-usages/code.md'
-import listItemAiTextMessage from '../messages/checklist/messages/disclosures/disclosure-list-items/ai/ai-usages/text.md'
-import listItemAiListIntroMessage from '../messages/checklist/messages/disclosures/disclosure-list-items/ai/list-intro.md'
-import listItemArchiveMessage from '../messages/checklist/messages/disclosures/disclosure-list-items/archive.md'
-import listItemDerivativeContentMessage from '../messages/checklist/messages/disclosures/disclosure-list-items/derivative-content.md'
 import misusedListIntroMessage from '../messages/checklist/messages/disclosures/misused-disclosures/list-intro.md'
-import listItemPaidFeaturesMessage from '../messages/checklist/messages/disclosures/disclosure-list-items/paid-features.md'
-import listItemPhotosensitivityMessage from '../messages/checklist/messages/disclosures/disclosure-list-items/photosensitivity.md'
-import listItemSystemInteractionsMessage from '../messages/checklist/messages/disclosures/disclosure-list-items/system-interactions.md'
-import listItemTelemetryMessage from '../messages/checklist/messages/disclosures/disclosure-list-items/telemetry.md'
 import nonEnglishListIntroMessage from '../messages/checklist/messages/disclosures/non-english-disclosures/list-intro.md'
-import formattingListIntroMessage from '../messages/checklist/messages/disclosures/formatting-disclosures/list-intro.md'
 import { issue, panel, section, toggle } from './component-builders/builders'
 import { issueLocation } from './component-builders/locations'
 import { issueTargets } from './component-builders/targets'
@@ -142,7 +146,11 @@ export const disclosuresIssue = issue({
 
 				switch (issueType.type) {
 					case disclosureIssueTypes.missing.type:
-						actions.push(issueTargets.addDisclosures([disclosureType.type]))
+						actions.push(
+							disclosureType === disclosureTypes.aic
+								? issueTargets.modifyDisclosure(disclosureType.type) // missing a part of existing disclosure should modify, suh as for ai usage disclosure
+								: issueTargets.addDisclosures([disclosureType.type]),
+						)
 						break
 					case disclosureIssueTypes.misused.type:
 						actions.push(issueTargets.modifyDisclosure(disclosureType.type))
@@ -374,6 +382,9 @@ function disclosureIssueToggle(
 		shown: ({ disclosures }) => {
 			if (!option) {
 				if (issueType === disclosureIssueTypes.missing) {
+					if (disclosureType === disclosureTypes.aic) {
+						return hasMissingAiContent(disclosures)
+					}
 					return !disclosureExists(disclosures, disclosureType.type)
 				} else if (issueType === disclosureIssueTypes.misused) {
 					return disclosureExists(disclosures, disclosureType.type)
@@ -387,9 +398,11 @@ function disclosureIssueToggle(
 					return disclosure ? disclosureHasText(disclosure) : false
 				}
 			} else if (disclosureType === disclosureTypes.aic) {
-				if (issueType === disclosureIssueTypes.missing) {
-					// TODO: make these only show if the specific use is correct
-					return true
+				if (
+					issueType === disclosureIssueTypes.missing &&
+					(option.type === 'code' || option.type === 'assets' || option.type === 'text')
+				) {
+					return hasMissingAiContent(disclosures, [option.type])
 				} else if (issueType === disclosureIssueTypes.misused) {
 					return true
 				}
