@@ -207,16 +207,16 @@
     "message": "Home and content"
   },
   "app.behavior-settings.hidden-instances.description": {
-    "message": "Instances you've hidden from your library on this device. Hidden instances aren't synced to your other devices."
+    "message": "Instances you've hidden from your library on this device. Hidden instances aren't synced with your Modrinth account."
   },
   "app.behavior-settings.hidden-instances.empty": {
-    "message": "You haven't hidden any instances."
+    "message": "You haven't hidden any instances yet."
   },
   "app.behavior-settings.hidden-instances.more-options": {
     "message": "More options"
   },
-  "app.behavior-settings.hidden-instances.show-in-library": {
-    "message": "Show in library"
+  "app.behavior-settings.hidden-instances.not-installed": {
+    "message": "Not installed"
   },
   "app.behavior-settings.hidden-instances.title": {
     "message": "Hidden instances"
@@ -1187,6 +1187,12 @@
   "app.library.group.unknown": {
     "message": "Unknown group"
   },
+  "app.library.instance-hidden.text": {
+    "message": "You can show it again in Settings > Behavior."
+  },
+  "app.library.instance-hidden.title": {
+    "message": "Hidden from library"
+  },
   "app.library.instance.action.add-content": {
     "message": "Add content"
   },
@@ -1222,6 +1228,9 @@
   },
   "app.library.instance.action.remove-from-group": {
     "message": "Remove from group"
+  },
+  "app.library.instance.action.show-in-library": {
+    "message": "Show in library"
   },
   "app.library.instance.action.stop": {
     "message": "Stop"
@@ -1318,12 +1327,6 @@
   },
   "app.library.selection.selected-count": {
     "message": "{count} selected"
-  },
-  "app.library.shared-instance-hidden.text": {
-    "message": "You can show it again in Settings > Behavior."
-  },
-  "app.library.shared-instance-hidden.title": {
-    "message": "Hidden from library"
   },
   "app.library.sort.date-created": {
     "message": "Date created"

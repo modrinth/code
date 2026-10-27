@@ -2,24 +2,19 @@
 import { StarIcon } from '@modrinth/assets'
 import { ContextMenu, defineMessages, useVIntl } from '@modrinth/ui'
 import { computed, nextTick, onDeactivated, onUnmounted, ref, toRef, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
 import Draggable from 'vuedraggable'
 
-import IconEditorModal from '@/components/ui/instance_settings/InstanceIconEditorModal.vue'
 import GroupInstancesModal from '@/components/ui/library/group-instances-modal.vue'
 import InstanceGroup from '@/components/ui/library/instance-group/index.vue'
 import InstanceGroupDnd from '@/components/ui/library/instance-group/instance-group-dnd.vue'
+import LibraryModals from '@/components/ui/library/library-modals.vue'
 import LibraryToolbar from '@/components/ui/library/library-toolbar/index.vue'
 import LibrarySelectionActionBar from '@/components/ui/library/LibrarySelectionActionBar.vue'
-import RemoveSharedInstancesModal from '@/components/ui/library/remove-shared-instances-modal.vue'
 import {
 	getLibraryInstanceSelectionKey,
 	type InstanceGroup as InstanceGroupType,
-	isUninstalledSharedInstance,
 	provideLibrary,
 } from '@/components/ui/library/use-library'
-import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInstanceModal.vue'
-import SharedInstanceInstallModal from '@/components/ui/shared-instances/shared-instance-install-modal/index.vue'
 import { FAVORITES_GROUP_ID } from '@/helpers/instance-groups'
 import type { GameInstance } from '@/helpers/types'
 
@@ -51,43 +46,12 @@ const {
 	reorderingGroups,
 	reorderGroups,
 	instanceOptions,
-	confirmDeleteModal,
-	iconEditorModal,
-	sharedInstanceInstallModal,
-	removeSharedInstancesModal,
-	currentIconEditorInstance,
-	currentDeleteInstances,
 	clearLibraryInstanceSelection,
-	deleteInstance,
-	handleInstanceIconSaved,
 	selectedLibraryInstances,
 	setSelectedLibraryInstances,
 	toggleLibraryInstanceSelection,
 	canSelectLibraryInstance,
-	libraryInstances,
-	installUninstalledSharedInstance,
 } = provideLibrary(toRef(props, 'instances'))
-
-const route = useRoute()
-const router = useRouter()
-
-watch(
-	() => {
-		const sharedInstanceId = route.query.installSharedInstance
-		if (typeof sharedInstanceId !== 'string') return null
-		return (
-			libraryInstances.value
-				.filter(isUninstalledSharedInstance)
-				.find((instance) => instance.shared_instance_id === sharedInstanceId) ?? null
-		)
-	},
-	(instance) => {
-		if (!instance) return
-		void router.replace({ query: { ...route.query, installSharedInstance: undefined } })
-		void installUninstalledSharedInstance(instance)
-	},
-	{ immediate: true },
-)
 
 let restoreScrollFrame: number | undefined
 let unmounted = false
@@ -270,26 +234,6 @@ function setInstanceOptions(component: unknown) {
 	instanceOptions.value = component as InstanceType<typeof ContextMenu> | null
 }
 
-function setConfirmDeleteModal(component: unknown) {
-	confirmDeleteModal.value = component as InstanceType<typeof ConfirmDeleteInstanceModal> | null
-}
-
-function setIconEditorModal(component: unknown) {
-	iconEditorModal.value = component as InstanceType<typeof IconEditorModal> | null
-}
-
-function setRemoveSharedInstancesModal(component: unknown) {
-	removeSharedInstancesModal.value = component as InstanceType<
-		typeof RemoveSharedInstancesModal
-	> | null
-}
-
-function setSharedInstanceInstallModal(component: unknown) {
-	sharedInstanceInstallModal.value = component as InstanceType<
-		typeof SharedInstanceInstallModal
-	> | null
-}
-
 watch(selectedLibraryInstances, (selectedInstances) => {
 	if (selectedInstances.size === 0) {
 		anchorInstance.value = null
@@ -429,19 +373,7 @@ watch(selectedLibraryInstances, (selectedInstances) => {
 	</InstanceGroupDnd>
 	<LibrarySelectionActionBar />
 	<GroupInstancesModal />
-	<ConfirmDeleteInstanceModal
-		:ref="setConfirmDeleteModal"
-		:instances="currentDeleteInstances"
-		@delete="deleteInstance"
-	/>
-	<IconEditorModal
-		:ref="setIconEditorModal"
-		:instance-id="currentIconEditorInstance?.id"
-		:config="currentIconEditorInstance?.icon_config"
-		@saved="handleInstanceIconSaved"
-	/>
-	<SharedInstanceInstallModal :ref="setSharedInstanceInstallModal" />
-	<RemoveSharedInstancesModal :ref="setRemoveSharedInstancesModal" />
+	<LibraryModals />
 	<ContextMenu :ref="setInstanceOptions" :label="formatMessage(messages.instanceActionsLabel)">
 		<template #remove_from_favorites="{ option }">
 			<StarIcon style="color: var(--color-text-default); fill: var(--color-text-default)" />

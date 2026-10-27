@@ -49,7 +49,7 @@ const {
 	getSharedInstanceOwner,
 	loadingSharedInstanceIds,
 	installUninstalledSharedInstance,
-	hideUninstalledSharedInstance,
+	hideInstance,
 	handleUninstalledSharedInstanceContextMenu,
 } = useLibrary()
 
@@ -150,7 +150,7 @@ const handleKeydown = (event: KeyboardEvent) => {
 					:label="formatMessage(messages.hideFromLibrary)"
 					size="sm"
 					class="border border-solid border-surface-5 !bg-surface-4"
-					@click.stop="hideUninstalledSharedInstance(instance)"
+					@click.stop="hideInstance(instance)"
 				>
 					<XIcon />
 				</IconButton>

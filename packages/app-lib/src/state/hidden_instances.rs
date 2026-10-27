@@ -60,3 +60,20 @@ pub async fn unhide_instance(
 
     Ok(())
 }
+
+pub async fn forget_instance(
+    instance_id: &str,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+) -> crate::Result<()> {
+    sqlx::query!(
+        "
+		DELETE FROM hidden_instances
+		WHERE instance_id = ?
+		",
+        instance_id,
+    )
+    .execute(exec)
+    .await?;
+
+    Ok(())
+}

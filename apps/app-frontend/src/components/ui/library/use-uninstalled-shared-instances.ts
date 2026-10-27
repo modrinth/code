@@ -1,14 +1,19 @@
-import { injectAuth, injectModrinthClient, injectNotificationManager } from '@modrinth/ui'
-import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/vue-query'
+import { injectAuth, injectModrinthClient } from '@modrinth/ui'
+import {
+	type QueryClient,
+	useQueries,
+	useQuery,
+	useQueryClient,
+} from '@tanstack/vue-query'
 import { computed, type Ref, watch } from 'vue'
 
 import {
 	cache_shared_instance_library,
 	type CachedSharedInstanceSummary,
 	get_cached_shared_instance_library,
-	get_hidden_instance_ids,
-	set_instance_hidden,
 } from '@/helpers/instance'
+import { hiddenInstanceIdsQueryOptions } from '@/features/library/hidden-instances/queries'
+import { useHiddenInstances } from '@/features/library/hidden-instances/use-hidden-instances'
 import type { GameInstance, InstanceLoader } from '@/helpers/types'
 
 export type UninstalledSharedInstance = {
@@ -58,52 +63,68 @@ const toCachedSummary = (instance: UninstalledSharedInstance): CachedSharedInsta
 	loader: instance.loader,
 })
 
-export const cachedSharedInstanceLibraryQueryOptions = (userId: Ref<string | null>) => ({
-	queryKey: computed(() => sharedInstanceLibraryKeys.cached(userId.value)),
-	queryFn: async () => (await get_cached_shared_instance_library()).map(fromCachedSummary),
-	enabled: computed(() => !!userId.value),
-	staleTime: Infinity,
+type ModrinthClient = ReturnType<typeof injectModrinthClient>
+
+const sharedInstanceIdsQueryOptions = (client: ModrinthClient, userId: string) => ({
+	queryKey: sharedInstanceLibraryKeys.ids(userId),
+	queryFn: () => client.sharedinstances.instances_v1.getForUser(userId, { include_joined: true }),
+	staleTime: 60_000,
 })
 
-export const hiddenInstanceKeys = {
-	all: ['hidden-instances'] as const,
-	ids: (userId: string | null) => [...hiddenInstanceKeys.all, userId] as const,
+const loadSharedInstance = async (
+	client: ModrinthClient,
+	currentUserId: string,
+	sharedInstanceId: string,
+): Promise<UninstalledSharedInstance | null> => {
+	const [instance, version, users] = await Promise.all([
+		client.sharedinstances.instances_v1.get(sharedInstanceId),
+		client.sharedinstances.instances_v1.getLatestVersion(sharedInstanceId),
+		client.sharedinstances.instances_v1.getUsers(sharedInstanceId),
+	])
+	if (instance.quarantine || !version.ready) return null
+
+	const ownerId = users.users.find((user) => user.join_type === 'owner')?.id ?? null
+	const isOwner = ownerId === currentUserId
+
+	return {
+		type: 'uninstalled_shared_instance',
+		id: getUninstalledSharedInstanceId(sharedInstanceId),
+		shared_instance_id: sharedInstanceId,
+		role: isOwner ? 'owner' : 'member',
+		manager_id: isOwner ? null : ownerId,
+		name: instance.name,
+		icon_path: instance.icon ?? undefined,
+		game_version: version.game_version,
+		loader: version.loader as InstanceLoader,
+	}
 }
 
-export function useHiddenInstances() {
-	const auth = injectAuth()
-	const queryClient = useQueryClient()
-	const { handleError } = injectNotificationManager()
-	const userId = computed(() => auth.user.value?.id ?? null)
+const sharedInstanceDetailQueryOptions = (
+	client: ModrinthClient,
+	userId: string,
+	sharedInstanceId: string,
+) => ({
+	queryKey: sharedInstanceLibraryKeys.detail(userId, sharedInstanceId),
+	queryFn: () => loadSharedInstance(client, userId, sharedInstanceId),
+	staleTime: 60_000,
+})
 
-	const hiddenQuery = useQuery({
-		queryKey: computed(() => hiddenInstanceKeys.ids(userId.value)),
-		queryFn: get_hidden_instance_ids,
-		enabled: computed(() => !!userId.value),
-		staleTime: Infinity,
-	})
-
-	const hiddenIds = computed(() => new Set(hiddenQuery.data.value ?? []))
-
-	const setHiddenMutation = useMutation({
-		mutationFn: ({ instanceId, hidden }: { instanceId: string; hidden: boolean }) =>
-			set_instance_hidden(instanceId, hidden),
-		onMutate: ({ instanceId, hidden }) => {
-			queryClient.setQueryData<string[]>(hiddenInstanceKeys.ids(userId.value), (ids = []) =>
-				hidden
-					? [instanceId, ...ids.filter((id) => id !== instanceId)]
-					: ids.filter((id) => id !== instanceId),
-			)
-		},
-		onError: handleError,
-		onSettled: () =>
-			queryClient.invalidateQueries({ queryKey: hiddenInstanceKeys.ids(userId.value) }),
-	})
-
-	const setHidden = (instanceId: string, hidden: boolean) =>
-		setHiddenMutation.mutateAsync({ instanceId, hidden })
-
-	return { hiddenIds, hiddenIdsLoaded: computed(() => hiddenQuery.isSuccess.value), setHidden }
+export async function prefetchSharedInstanceLibrary(
+	queryClient: QueryClient,
+	client: ModrinthClient,
+	userId: string,
+) {
+	void queryClient.prefetchQuery(hiddenInstanceIdsQueryOptions(userId))
+	const sharedInstanceIds = await queryClient.ensureQueryData(
+		sharedInstanceIdsQueryOptions(client, userId),
+	)
+	await Promise.all(
+		[...new Set(sharedInstanceIds)].map((sharedInstanceId) =>
+			queryClient.prefetchQuery(
+				sharedInstanceDetailQueryOptions(client, userId, sharedInstanceId),
+			),
+		),
+	)
 }
 
 export function useUninstalledSharedInstances(instances: Ref<GameInstance[]>) {
@@ -112,15 +133,19 @@ export function useUninstalledSharedInstances(instances: Ref<GameInstance[]>) {
 	const queryClient = useQueryClient()
 	const userId = computed(() => auth.user.value?.id ?? null)
 
-	const cachedQuery = useQuery(cachedSharedInstanceLibraryQueryOptions(userId))
-
-	const idsQuery = useQuery({
-		queryKey: computed(() => sharedInstanceLibraryKeys.ids(userId.value)),
-		queryFn: () =>
-			client.sharedinstances.instances_v1.getForUser(userId.value!, { include_joined: true }),
+	const cachedQuery = useQuery({
+		queryKey: computed(() => sharedInstanceLibraryKeys.cached(userId.value)),
+		queryFn: async () => (await get_cached_shared_instance_library()).map(fromCachedSummary),
 		enabled: computed(() => !!userId.value),
-		staleTime: 60_000,
+		staleTime: Infinity,
 	})
+
+	const idsQuery = useQuery(
+		computed(() => ({
+			...sharedInstanceIdsQueryOptions(client, userId.value ?? ''),
+			enabled: !!userId.value,
+		})),
+	)
 
 	const installedSharedInstanceIds = computed(
 		() =>
@@ -137,40 +162,11 @@ export function useUninstalledSharedInstances(instances: Ref<GameInstance[]>) {
 		),
 	)
 
-	const loadSharedInstance = async (
-		currentUserId: string,
-		sharedInstanceId: string,
-	): Promise<UninstalledSharedInstance | null> => {
-		const [instance, version, users] = await Promise.all([
-			client.sharedinstances.instances_v1.get(sharedInstanceId),
-			client.sharedinstances.instances_v1.getLatestVersion(sharedInstanceId),
-			client.sharedinstances.instances_v1.getUsers(sharedInstanceId),
-		])
-		if (instance.quarantine || !version.ready) return null
-
-		const ownerId = users.users.find((user) => user.join_type === 'owner')?.id ?? null
-		const isOwner = ownerId === currentUserId
-
-		return {
-			type: 'uninstalled_shared_instance',
-			id: getUninstalledSharedInstanceId(sharedInstanceId),
-			shared_instance_id: sharedInstanceId,
-			role: isOwner ? 'owner' : 'member',
-			manager_id: isOwner ? null : ownerId,
-			name: instance.name,
-			icon_path: instance.icon ?? undefined,
-			game_version: version.game_version,
-			loader: version.loader as InstanceLoader,
-		}
-	}
-
 	const detailQueries = useQueries({
 		queries: computed(() =>
 			uninstalledIds.value.map((sharedInstanceId) => ({
-				queryKey: sharedInstanceLibraryKeys.detail(userId.value, sharedInstanceId),
-				queryFn: () => loadSharedInstance(userId.value!, sharedInstanceId),
+				...sharedInstanceDetailQueryOptions(client, userId.value!, sharedInstanceId),
 				select: (instance: UninstalledSharedInstance | null) => ({ sharedInstanceId, instance }),
-				staleTime: 60_000,
 			})),
 		),
 	})
@@ -231,9 +227,5 @@ export function useUninstalledSharedInstances(instances: Ref<GameInstance[]>) {
 		},
 	)
 
-	const visibleSharedInstances = computed(() =>
-		sharedInstances.value.filter((instance) => !hiddenIds.value.has(instance.id)),
-	)
-
-	return { sharedInstances: visibleSharedInstances, setHidden }
+	return sharedInstances
 }

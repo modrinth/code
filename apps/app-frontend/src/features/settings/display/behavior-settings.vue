@@ -13,7 +13,7 @@ import { onBeforeUnmount, onMounted } from 'vue'
 
 import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { injectAppSettingsModal } from '@/features/settings/app-settings-modal/context'
-import HiddenInstancesSettings from '@/features/settings/display/hidden-instances-settings.vue'
+import HiddenInstancesSettings from '@/features/settings/display/hidden-instances-settings/index.vue'
 import {
 	type AppSettings,
 	appSettingsKeys,
@@ -349,8 +349,6 @@ onBeforeUnmount(() => {
 		</div>
 	</section>
 
-	<HiddenInstancesSettings />
-
 	<section class="mt-8 border-0 border-t border-solid border-divider pt-6">
 		<h2 class="m-0 text-xl font-semibold text-contrast">
 			{{ formatMessage(messages.confirmationsTitle) }}
@@ -384,4 +382,6 @@ onBeforeUnmount(() => {
 			</div>
 		</div>
 	</section>
+
+	<HiddenInstancesSettings />
 </template>

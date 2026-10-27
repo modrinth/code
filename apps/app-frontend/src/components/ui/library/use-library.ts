@@ -41,6 +41,7 @@ import {
 	watchEffect,
 } from 'vue'
 
+import { useHiddenInstances } from '@/features/library/hidden-instances/use-hidden-instances'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_v3_many, get_user, get_user_many } from '@/helpers/cache.js'
 import { toError } from '@/helpers/errors'
@@ -263,26 +264,27 @@ const instanceActionMessages = defineMessages({
 		id: 'app.library.instance.action.hide-from-library',
 		defaultMessage: 'Hide from library',
 	},
-})
-
-const hiddenSharedInstanceMessages = defineMessages({
-	title: {
-		id: 'app.library.shared-instance-hidden.title',
-		defaultMessage: 'Hidden from library',
-	},
-	text: {
-		id: 'app.library.shared-instance-hidden.text',
-		defaultMessage: 'You can show it again in Settings > Behavior.',
+	showInLibrary: {
+		id: 'app.library.instance.action.show-in-library',
+		defaultMessage: 'Show in library',
 	},
 })
 
-function createLibraryState(instances: Ref<GameInstance[]>) {
-	const { handleError, addNotification } = injectNotificationManager()
+type LibraryStateOptions = {
+	onSharedInstanceInstalled?: () => void
+}
+
+function createLibraryState(instances: Ref<GameInstance[]>, options: LibraryStateOptions = {}) {
+	const { handleError } = injectNotificationManager()
 	const { formatMessage } = useVIntl()
 	const { notifySharedInstanceError } = useSharedInstanceErrors()
 	const queryClient = useQueryClient()
-	const { sharedInstances: uninstalledSharedInstances, setHidden: setInstanceHidden } =
-		useUninstalledSharedInstances(instances)
+	const uninstalledSharedInstances = useUninstalledSharedInstances(instances)
+	const {
+		hiddenIds: hiddenInstanceIds,
+		hide: hideInstanceById,
+		show: showInstanceById,
+	} = useHiddenInstances()
 
 	const search = librarySearch
 	const filters = useStorage<LibraryFilters>(
@@ -534,10 +536,24 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		{ flush: 'sync' },
 	)
 
-	const libraryInstances = computed<LibraryInstance[]>(() => [
+	const allLibraryInstances = computed<LibraryInstance[]>(() => [
 		...instances.value,
 		...uninstalledSharedInstances.value,
 	])
+
+	const libraryInstances = computed(() =>
+		allLibraryInstances.value.filter((instance) => !hiddenInstanceIds.value.has(instance.id)),
+	)
+
+	const hiddenLibraryInstances = computed(() => {
+		const instancesById = new Map(
+			allLibraryInstances.value.map((instance) => [instance.id, instance]),
+		)
+		return [...hiddenInstanceIds.value].flatMap((instanceId) => {
+			const instance = instancesById.get(instanceId)
+			return instance ? [instance] : []
+		})
+	})
 
 	const sharedInstanceOwnerIds = computed(() =>
 		[
@@ -1468,12 +1484,12 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		},
 	]
 
-	const handleInstanceContextMenu = (
-		event: MouseEvent,
+	const getInstanceOptions = (
 		item: InstanceCard,
-		instanceGroupId: string,
-	) => {
+		instanceGroupId: string | null = null,
+	): ButtonMenuOption[] => {
 		const removableGroupId =
+			instanceGroupId &&
 			displayState.value.group === 'Group' &&
 			instanceGroupId !== 'group:none' &&
 			instanceGroupId !== FAVORITES_GROUP_ID
@@ -1483,7 +1499,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		const installing = item.instance.install_stage.includes('installing')
 		const canAddContent = !item.instance.quarantined && !item.instance.link && !installing
 
-		instanceOptions.value?.open(event, [
+		return [
 			{
 				id: 'stop',
 				label: formatMessage(instanceActionMessages.stop),
@@ -1570,6 +1586,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 						item.instance.group_ids.filter((groupId) => groupId !== removableGroupId),
 					),
 			},
+			buildVisibilityOption(item.instance),
 			{ type: 'divider' },
 			{
 				id: 'delete',
@@ -1582,7 +1599,15 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 					confirmDeleteModal.value?.show()
 				},
 			},
-		])
+		]
+	}
+
+	const handleInstanceContextMenu = (
+		event: MouseEvent,
+		item: InstanceCard,
+		instanceGroupId: string,
+	) => {
+		instanceOptions.value?.open(event, getInstanceOptions(item, instanceGroupId))
 	}
 
 	const installUninstalledSharedInstance = async (
@@ -1616,6 +1641,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 						instance.icon_path ?? null,
 					)
 					await queryClient.invalidateQueries({ queryKey: ['instances'] })
+					options.onSharedInstanceInstalled?.()
 				},
 				manager
 					? { id: manager.id, username: manager.username, avatarUrl: manager.avatar_url ?? null }
@@ -1670,45 +1696,56 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		)
 	}
 
-	const hideUninstalledSharedInstance = async (instance: UninstalledSharedInstance) => {
-		await setInstanceHidden(instance.id, true)
-		addNotification({
-			title: formatMessage(hiddenSharedInstanceMessages.title),
-			text: formatMessage(hiddenSharedInstanceMessages.text),
-			type: 'success',
-		})
-	}
+	const isInstanceHidden = (instance: LibraryInstance) => hiddenInstanceIds.value.has(instance.id)
+
+	const showInstanceInLibrary = (instance: LibraryInstance) => showInstanceById(instance.id)
+
+	const hideInstance = (instance: LibraryInstance) => hideInstanceById(instance.id)
+
+	const buildVisibilityOption = (instance: LibraryInstance): ButtonMenuLeafOption =>
+		isInstanceHidden(instance)
+			? {
+					id: 'show_in_library',
+					label: formatMessage(instanceActionMessages.showInLibrary),
+					icon: EyeIcon,
+					action: () => void showInstanceInLibrary(instance),
+				}
+			: {
+					id: 'hide',
+					label: formatMessage(instanceActionMessages.hideFromLibrary),
+					icon: EyeOffIcon,
+					action: () => void hideInstance(instance),
+				}
+
+	const getUninstalledSharedInstanceOptions = (
+		instance: UninstalledSharedInstance,
+	): ButtonMenuOption[] => [
+		{
+			id: 'install',
+			label: formatMessage(instanceActionMessages.install),
+			icon: DownloadIcon,
+			tone: 'brand',
+			action: () => void installUninstalledSharedInstance(instance),
+		},
+		buildVisibilityOption(instance),
+		{ type: 'divider' },
+		{
+			id: instance.role === 'owner' ? 'unpublish' : 'leave',
+			label: formatMessage(
+				sharedInstanceRemovalButtonMessages[getSharedInstanceRemovalMode([instance])],
+			),
+			icon: instance.role === 'owner' ? UnlinkIcon : LogOutIcon,
+			tone: 'orange',
+			hoverFilledOnly: true,
+			action: () => requestRemoveUninstalledSharedInstances([instance]),
+		},
+	]
 
 	const handleUninstalledSharedInstanceContextMenu = (
 		event: MouseEvent,
 		instance: UninstalledSharedInstance,
 	) => {
-		instanceOptions.value?.open(event, [
-			{
-				id: 'install',
-				label: formatMessage(instanceActionMessages.install),
-				icon: DownloadIcon,
-				tone: 'brand',
-				action: () => void installUninstalledSharedInstance(instance),
-			},
-			{
-				id: 'hide',
-				label: formatMessage(instanceActionMessages.hideFromLibrary),
-				icon: EyeOffIcon,
-				action: () => void hideUninstalledSharedInstance(instance),
-			},
-			{ type: 'divider' },
-			{
-				id: instance.role === 'owner' ? 'unpublish' : 'leave',
-				label: formatMessage(
-					sharedInstanceRemovalButtonMessages[getSharedInstanceRemovalMode([instance])],
-				),
-				icon: instance.role === 'owner' ? UnlinkIcon : LogOutIcon,
-				tone: 'orange',
-				hoverFilledOnly: true,
-				action: () => requestRemoveUninstalledSharedInstances([instance]),
-			},
-		])
+		instanceOptions.value?.open(event, getUninstalledSharedInstanceOptions(instance))
 	}
 
 	return {
@@ -1786,7 +1823,11 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		handleInstanceContextMenu,
 		handleUninstalledSharedInstanceContextMenu,
 		installUninstalledSharedInstance,
-		hideUninstalledSharedInstance,
+		hideInstance,
+		showInstanceInLibrary,
+		hiddenLibraryInstances,
+		getInstanceOptions,
+		getUninstalledSharedInstanceOptions,
 		requestRemoveUninstalledSharedInstances,
 		handleInstanceIconSaved,
 	}
@@ -1796,8 +1837,8 @@ export type LibraryState = ReturnType<typeof createLibraryState>
 
 const libraryKey: InjectionKey<LibraryState> = Symbol('library')
 
-export function provideLibrary(instances: Ref<GameInstance[]>) {
-	const library = createLibraryState(instances)
+export function provideLibrary(instances: Ref<GameInstance[]>, options?: LibraryStateOptions) {
+	const library = createLibraryState(instances, options)
 	provide(libraryKey, library)
 	return library
 }

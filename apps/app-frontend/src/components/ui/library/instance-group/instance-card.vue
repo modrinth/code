@@ -4,23 +4,15 @@ import { KeyboardSensor, PointerSensor, useDraggable } from '@dnd-kit/vue'
 import { DownloadIcon, PlayIcon, SpinnerIcon, StopCircleIcon } from '@modrinth/assets'
 import { defineMessages, IconButton, injectNotificationManager, useVIntl } from '@modrinth/ui'
 import { useEventListener } from '@vueuse/core'
-import { computed, onMounted, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, ref, watch } from 'vue'
 
 import InstanceCardView from '@/components/ui/library/instance-group/instance-card-view.vue'
 import InstanceOwnerBadge from '@/components/ui/library/instance-group/instance-owner-badge.vue'
 import InstanceSelectionButton from '@/components/ui/library/instance-group/instance-selection-button.vue'
 import { getLibraryInstanceSelectionKey, useLibrary } from '@/components/ui/library/use-library'
-import { useAppEvent } from '@/composables/use-app-event'
-import { handleSevereError } from '@/composables/use-error.js'
-import { trackEvent } from '@/helpers/analytics'
+import { useInstanceActions } from '@/features/instances/use-instance-actions'
 import { install_existing_instance, install_pack_to_existing_instance } from '@/helpers/install'
-import { kill, run } from '@/helpers/instance'
-import { get_by_instance_id } from '@/helpers/process'
 import type { GameInstance } from '@/helpers/types'
-import { showInstanceInFolder } from '@/helpers/utils.js'
-
-type ProcessEvent = 'installing' | 'launched' | 'finished'
 
 const LOADING_INDICATOR_DELAY_MS = 100
 
@@ -72,17 +64,18 @@ const emit = defineEmits<{
 }>()
 
 const instanceCardElement = ref<InstanceType<typeof InstanceCardView> | null>(null)
-const playing = ref(false)
-const loading = ref(false)
-const currentEvent = ref<ProcessEvent | null>(null)
 const isPrimaryPointerDown = ref(false)
-const modLoading = computed(
-	() =>
-		loading.value ||
-		currentEvent.value === 'installing' ||
-		(currentEvent.value === 'launched' && !playing.value),
-)
-const installing = computed(() => props.instance.install_stage.includes('installing'))
+const {
+	playing,
+	modLoading,
+	installing,
+	checkProcess,
+	play,
+	stop,
+	seeInstance,
+	openFolder,
+	addContent,
+} = useInstanceActions(() => props.instance)
 const installed = computed(() => props.instance.install_stage === 'installed')
 const loadingIndicatorRequested = computed(
 	() => !playing.value && (modLoading.value || installing.value),
@@ -122,13 +115,6 @@ const { isDragging } = useDraggable({
 		fromGroup: props.instanceGroupId,
 	})),
 })
-
-const router = useRouter()
-
-const seeInstance = async () => {
-	if (installing.value) return
-	await router.push(`/instance/${encodeURIComponent(props.instance.id)}`)
-}
 
 const toggleSelection = (event?: MouseEvent) => {
 	emit('toggle-selection', event?.shiftKey ?? false)
@@ -172,41 +158,6 @@ const handleCardKeydown = (event: KeyboardEvent) => {
 	}
 }
 
-const checkProcess = async () => {
-	const runningProcesses = (await get_by_instance_id(props.instance.id).catch(handleError)) ?? []
-
-	playing.value = runningProcesses.length > 0
-}
-
-const play = async (event: MouseEvent | null, context: string) => {
-	event?.stopPropagation()
-	if (props.instance.quarantined || installing.value || modLoading.value) return
-	loading.value = true
-	await run(props.instance.id)
-		.catch((err) => handleSevereError(err, { instanceId: props.instance.id }))
-		.finally(() => {
-			trackEvent('InstanceStart', {
-				loader: props.instance.loader,
-				game_version: props.instance.game_version,
-				source: context,
-			})
-		})
-	loading.value = false
-}
-
-const stop = async (event: MouseEvent | null, context: string) => {
-	event?.stopPropagation()
-	playing.value = false
-
-	await kill(props.instance.id).catch(handleError)
-
-	trackEvent('InstanceStop', {
-		loader: props.instance.loader,
-		game_version: props.instance.game_version,
-		source: context,
-	})
-}
-
 const repair = async (event: MouseEvent) => {
 	event.stopPropagation()
 	if (props.instance.quarantined || installing.value || modLoading.value) return
@@ -227,18 +178,6 @@ const repair = async (event: MouseEvent) => {
 	}
 }
 
-const openFolder = async () => {
-	await showInstanceInFolder(props.instance.id)
-}
-
-const addContent = async () => {
-	if (props.instance.quarantined || installing.value || modLoading.value) return
-	await router.push({
-		path: `/browse/${props.instance.loader === 'vanilla' ? 'datapack' : 'mod'}`,
-		query: { i: props.instance.id },
-	})
-}
-
 defineExpose({
 	play,
 	stop,
@@ -251,16 +190,6 @@ defineExpose({
 	},
 })
 
-useAppEvent('process', (event) => {
-	if (event.instance_id === props.instance.id) {
-		currentEvent.value = event.event
-		playing.value = event.event === 'launched'
-	}
-})
-
-onMounted(() => {
-	void checkProcess()
-})
 </script>
 
 <template>
