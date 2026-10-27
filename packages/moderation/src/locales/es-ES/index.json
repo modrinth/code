@@ -422,6 +422,9 @@
   "nags.visit-links-settings.title": {
     "defaultMessage": "Visitar la configuración de enlaces"
   },
+  "project-review.issue-target.modify-links": {
+    "defaultMessage": "Cambiar enlaces"
+  },
   "project.text-validation.description-matches-summary": {
     "defaultMessage": "El resumen de tu proyecto debe proporcionar información única y no repetir el nombre del proyecto."
   },

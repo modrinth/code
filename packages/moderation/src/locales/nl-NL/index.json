@@ -110,6 +110,9 @@
   "nags.gallery.title": {
     "defaultMessage": "Galerijpagina bekijken"
   },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "De licentie van je {type} vereist je om je broncode publiek te maken. Voeg een link naar een broncode toe, voeg bronbestanden toe of verander de geselecteerde licentie."
+  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Bied bron code aan"
   },
@@ -130,6 +133,24 @@
   },
   "nags.invalid-project-summary.title": {
     "defaultMessage": "Samenvatting aanpassen"
+  },
+  "nags.license-url.not-in-allowlist.description": {
+    "defaultMessage": "Je licentie-URL is geen erkende licentielink. Zorg ervoor dat deze direct naar je licentietekst linkt."
+  },
+  "nags.license-url.not-in-allowlist.title": {
+    "defaultMessage": "Controleer je licentielink"
+  },
+  "nags.link-validation.discord-invite": {
+    "defaultMessage": "Je Discord-uitnodiging is ongeldig, verlopen of nodigt gebruikers niet uit voor een server. Vervang deze voor een actieve serveruitnodiging."
+  },
+  "nags.link-validation.discord-invite.title": {
+    "defaultMessage": "Vervang ongeldige Discord-uitnodigingen"
+  },
+  "nags.link-validation.download": {
+    "defaultMessage": "Links die een download starten zijn niet toegestaan. Verwijder zulke links uit je beschrijving."
+  },
+  "nags.link-validation.download.title": {
+    "defaultMessage": "Verwijder downloadlinks"
   },
   "nags.long-headers.description": {
     "defaultMessage": "{count, plural, one {# kop} other {# koppen}} in jouw beschrijving {count, plural, one {is} other {zijn}} te lang. Koppen moeten beknopt zijn en dienen als onderdeeltitels, niet als volledige zinnen."
@@ -343,6 +364,33 @@
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Bezoek linkjes instellingen"
+  },
+  "project-review.issue-target.modify-icon": {
+    "defaultMessage": "Wijzig icon"
+  },
+  "project-review.issue-target.modify-license": {
+    "defaultMessage": "Wijzig licentie"
+  },
+  "project-review.issue-target.modify-links": {
+    "defaultMessage": "Wijzig links"
+  },
+  "project-review.issue-target.modify-project-disclosure": {
+    "defaultMessage": "Wijzig openbaarmaking"
+  },
+  "project-review.issue-target.modify-project-disclosure-note": {
+    "defaultMessage": "Wijzig notitie openbaarmaking"
+  },
+  "project-review.issue-target.modify-server-address": {
+    "defaultMessage": "Wijzig serveradres"
+  },
+  "project-review.issue-target.modify-server-languages": {
+    "defaultMessage": "Wijzig servertalen"
+  },
+  "project-review.issue-target.modify-slug": {
+    "defaultMessage": "Wijzig URL slug"
+  },
+  "project-review.issue-target.modify-summary": {
+    "defaultMessage": "Wijzig samenvatting"
   },
   "project.text-validation.description-matches-summary": {
     "defaultMessage": "De beschrijving van uw project hoort unieke informatie te geven, en hoort niet simpelweg de samenvatting herhalen."

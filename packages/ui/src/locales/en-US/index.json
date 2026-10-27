@@ -2345,6 +2345,219 @@
   "instance.confirm-repair.server-label": {
     "defaultMessage": "server"
   },
+  "instance.icon-editor.background": {
+    "defaultMessage": "Background"
+  },
+  "instance.icon-editor.background.blue": {
+    "defaultMessage": "Blue"
+  },
+  "instance.icon-editor.background.dark-gray": {
+    "defaultMessage": "Dark gray"
+  },
+  "instance.icon-editor.background.dark-green": {
+    "defaultMessage": "Dark green"
+  },
+  "instance.icon-editor.background.gray": {
+    "defaultMessage": "Gray"
+  },
+  "instance.icon-editor.background.green": {
+    "defaultMessage": "Green"
+  },
+  "instance.icon-editor.background.indigo": {
+    "defaultMessage": "Indigo"
+  },
+  "instance.icon-editor.background.lavender": {
+    "defaultMessage": "Lavender"
+  },
+  "instance.icon-editor.background.light-gray": {
+    "defaultMessage": "Light gray"
+  },
+  "instance.icon-editor.background.lime": {
+    "defaultMessage": "Lime"
+  },
+  "instance.icon-editor.background.orange": {
+    "defaultMessage": "Orange"
+  },
+  "instance.icon-editor.background.pink": {
+    "defaultMessage": "Pink"
+  },
+  "instance.icon-editor.background.purple": {
+    "defaultMessage": "Purple"
+  },
+  "instance.icon-editor.background.red": {
+    "defaultMessage": "Red"
+  },
+  "instance.icon-editor.background.rose": {
+    "defaultMessage": "Rose"
+  },
+  "instance.icon-editor.background.yellow": {
+    "defaultMessage": "Yellow"
+  },
+  "instance.icon-editor.description": {
+    "defaultMessage": "Mix and match elements to create a custom icon."
+  },
+  "instance.icon-editor.recents": {
+    "defaultMessage": "Recents"
+  },
+  "instance.icon-editor.save": {
+    "defaultMessage": "Save icon"
+  },
+  "instance.icon-editor.surprise-me": {
+    "defaultMessage": "Randomize"
+  },
+  "instance.icon-editor.symbol": {
+    "defaultMessage": "Symbol"
+  },
+  "instance.icon-editor.symbol.backpack": {
+    "defaultMessage": "Backpack"
+  },
+  "instance.icon-editor.symbol.beacon": {
+    "defaultMessage": "Beacon"
+  },
+  "instance.icon-editor.symbol.blue-shark": {
+    "defaultMessage": "Blue Shark"
+  },
+  "instance.icon-editor.symbol.bookshelf": {
+    "defaultMessage": "Bookshelf"
+  },
+  "instance.icon-editor.symbol.brown-bear": {
+    "defaultMessage": "Brown Bear"
+  },
+  "instance.icon-editor.symbol.cake": {
+    "defaultMessage": "Cake"
+  },
+  "instance.icon-editor.symbol.campfire": {
+    "defaultMessage": "Campfire"
+  },
+  "instance.icon-editor.symbol.chest": {
+    "defaultMessage": "Chest"
+  },
+  "instance.icon-editor.symbol.cogwheel": {
+    "defaultMessage": "Cogwheel"
+  },
+  "instance.icon-editor.symbol.command-block": {
+    "defaultMessage": "Command Block"
+  },
+  "instance.icon-editor.symbol.cooking-pot": {
+    "defaultMessage": "Cooking Pot"
+  },
+  "instance.icon-editor.symbol.couch": {
+    "defaultMessage": "Couch"
+  },
+  "instance.icon-editor.symbol.crafting-table": {
+    "defaultMessage": "Crafting Table"
+  },
+  "instance.icon-editor.symbol.create-wrench": {
+    "defaultMessage": "Wrench"
+  },
+  "instance.icon-editor.symbol.creeper": {
+    "defaultMessage": "Creeper"
+  },
+  "instance.icon-editor.symbol.enchanting-table": {
+    "defaultMessage": "Enchanting Table"
+  },
+  "instance.icon-editor.symbol.ender-chest": {
+    "defaultMessage": "Ender Chest"
+  },
+  "instance.icon-editor.symbol.ender-dragon": {
+    "defaultMessage": "Ender Dragon"
+  },
+  "instance.icon-editor.symbol.engine": {
+    "defaultMessage": "Engine"
+  },
+  "instance.icon-editor.symbol.fabric": {
+    "defaultMessage": "Fabric"
+  },
+  "instance.icon-editor.symbol.forge": {
+    "defaultMessage": "Forge"
+  },
+  "instance.icon-editor.symbol.furnace": {
+    "defaultMessage": "Furnace"
+  },
+  "instance.icon-editor.symbol.gizmo": {
+    "defaultMessage": "Gizmo"
+  },
+  "instance.icon-editor.symbol.globe": {
+    "defaultMessage": "Globe"
+  },
+  "instance.icon-editor.symbol.grass-block": {
+    "defaultMessage": "Grass Block"
+  },
+  "instance.icon-editor.symbol.lantern": {
+    "defaultMessage": "Lantern"
+  },
+  "instance.icon-editor.symbol.moobloom": {
+    "defaultMessage": "Moobloom"
+  },
+  "instance.icon-editor.symbol.mr-pack": {
+    "defaultMessage": "Mr Pack"
+  },
+  "instance.icon-editor.symbol.neoforge": {
+    "defaultMessage": "NeoForge"
+  },
+  "instance.icon-editor.symbol.orb": {
+    "defaultMessage": "Orb"
+  },
+  "instance.icon-editor.symbol.oxygen-distributor": {
+    "defaultMessage": "Oxygen Distributor"
+  },
+  "instance.icon-editor.symbol.pancakes": {
+    "defaultMessage": "Pancakes"
+  },
+  "instance.icon-editor.symbol.pickaxe": {
+    "defaultMessage": "Pickaxe"
+  },
+  "instance.icon-editor.symbol.poke-ball": {
+    "defaultMessage": "Poke Ball"
+  },
+  "instance.icon-editor.symbol.quilt": {
+    "defaultMessage": "Quilt"
+  },
+  "instance.icon-editor.symbol.redstone-block": {
+    "defaultMessage": "Redstone Block"
+  },
+  "instance.icon-editor.symbol.sculk-sensor": {
+    "defaultMessage": "Sculk Sensor"
+  },
+  "instance.icon-editor.symbol.skeleton": {
+    "defaultMessage": "Skeleton"
+  },
+  "instance.icon-editor.symbol.skillet": {
+    "defaultMessage": "Skillet"
+  },
+  "instance.icon-editor.symbol.slime-block": {
+    "defaultMessage": "Slime Block"
+  },
+  "instance.icon-editor.symbol.space-helmet": {
+    "defaultMessage": "Space Helmet"
+  },
+  "instance.icon-editor.symbol.sticky-piston": {
+    "defaultMessage": "Sticky Piston"
+  },
+  "instance.icon-editor.symbol.sword": {
+    "defaultMessage": "Sword"
+  },
+  "instance.icon-editor.symbol.terminal": {
+    "defaultMessage": "Terminal"
+  },
+  "instance.icon-editor.symbol.tiny-potato": {
+    "defaultMessage": "Tiny Potato"
+  },
+  "instance.icon-editor.symbol.tire": {
+    "defaultMessage": "Tire"
+  },
+  "instance.icon-editor.symbol.tnt": {
+    "defaultMessage": "TNT"
+  },
+  "instance.icon-editor.symbol.wrenth-rinth": {
+    "defaultMessage": "Modrinth Wrench"
+  },
+  "instance.icon-editor.symbol.zombie": {
+    "defaultMessage": "Zombie"
+  },
+  "instance.icon-editor.title": {
+    "defaultMessage": "Icon editor"
+  },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "Adventure mode"
   },

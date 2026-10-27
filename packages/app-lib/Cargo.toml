@@ -17,14 +17,7 @@ async-recursion = { workspace = true }
 async-trait = { workspace = true }
 async-tungstenite = { workspace = true, features = ["tokio-runtime", "tokio-rustls-webpki-roots"] }
 async-walkdir = { workspace = true }
-async_zip = { workspace = true, features = [
-  "bzip2",
-  "chrono",
-  "deflate",
-  "deflate64",
-  "tokio-fs",
-  "zstd",
-] }
+
 base64 = { workspace = true }
 bon = { workspace = true }
 bytemuck = { workspace = true, features = ["extern_crate_alloc"] }
@@ -43,7 +36,6 @@ enumset = { workspace = true }
 flate2 = { workspace = true }
 fs4 = { workspace = true, features = ["tokio"] }
 futures = { workspace = true, features = ["alloc", "async-await"] }
-futures-lite = { workspace = true }
 governor = { workspace = true }
 heck = { workspace = true }
 hickory-resolver = { workspace = true }
@@ -78,10 +70,10 @@ reqwest = { workspace = true, features = [
   "gzip",
   "http2",
   "json",
-  "macos-system-configuration",
   "multipart",
-  "rustls-tls-webpki-roots",
+  "rustls",
   "stream",
+  "system-proxy",
 ] }
 rgb = { workspace = true }
 same-file = { workspace = true }

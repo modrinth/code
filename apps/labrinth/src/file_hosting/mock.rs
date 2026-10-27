@@ -34,7 +34,7 @@ impl FileHost for MockHost {
             path.parent().ok_or(FileHostingError::InvalidFilename)?,
         )?;
         let content_sha1 = sha1::Sha1::digest(&file_bytes).encode_hex();
-        let content_sha512 = format!("{:x}", sha2::Sha512::digest(&file_bytes));
+        let content_sha512 = hex::encode(sha2::Sha512::digest(&file_bytes));
 
         std::fs::write(path, &*file_bytes)?;
         Ok(UploadFileData {

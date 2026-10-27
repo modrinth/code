@@ -25,7 +25,7 @@ macro_rules! generate_ids {
         pub async fn $function_name(
             con: &mut PgTransaction<'_>,
         ) -> Result<$return_type> {
-            let mut rng = ChaCha20Rng::from_entropy();
+            let mut rng = ChaCha20Rng::from_rng(&mut rand::rng());
             let length = 8;
             let mut id = random_base62_rng(&mut rng, length);
             let mut retry_count = 0;
@@ -72,8 +72,7 @@ macro_rules! generate_bulk_ids {
                 // We re-acquire a thread-local RNG handle for each uniqueness loop for
                 // the bulk generator future to be `Send + Sync`.
                 let base =
-                    random_base62_rng_range(&mut rand::thread_rng(), 1, 10)
-                        as i64;
+                    random_base62_rng_range(&mut rand::rng(), 1, 10) as i64;
                 let ids =
                     (0..count).map(|x| base + x as i64).collect::<Vec<_>>();
 

@@ -452,9 +452,6 @@
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} adăugat"
   },
-  "content.diff-modal.config-files-updated": {
-    "defaultMessage": "File de configurare schimbate"
-  },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Adăugat (dependentă)"
   },

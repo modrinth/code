@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use rand::Rng;
+use rand::RngExt;
 use reqwest::{Method, StatusCode};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
@@ -285,7 +285,7 @@ impl Client {
                     n += 1;
                     // 1000 + ~500, 2000 + ~1000, 5000 + ~2500
                     let base = (n - 1).pow(2) * 1000 + 1000;
-                    let random = rand::thread_rng().gen_range(0..(base / 2));
+                    let random = rand::rng().random_range(0..(base / 2));
                     tokio::time::sleep(std::time::Duration::from_millis(
                         base + random,
                     ))

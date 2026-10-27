@@ -39,7 +39,7 @@
     "message": "Lataa RPM"
   },
   "app-marketing.download.flathub": {
-    "message": "Lataa: Flathub"
+    "message": "Hanki se Flathubista"
   },
   "app-marketing.download.linux": {
     "message": "Linux"
@@ -54,7 +54,7 @@
     "message": "Lataus vaihtoehdot"
   },
   "app-marketing.download.terms": {
-    "message": "Lataamalla Modrint sovelluksen, sinä hyväksyt meidän <terms-link>Ehdot</terms-link> Ja <privacy-link>Tietosuojakäytännöt</privacy-link>."
+    "message": "Lataamalla Modrinth Appin, hyväksyt<terms-link>Terms</terms-link> sekä <privacy-link>Tietosuojakäytännön</privacy-link>."
   },
   "app-marketing.download.title": {
     "message": "Lataa Modrinth App (Beta)"
@@ -129,13 +129,13 @@
     "message": "Suorituskykyinen"
   },
   "app-marketing.features.play.description": {
-    "message": "Käytä Modrinth sovellusta asentaaksesi ja pelataksesi sinun suosikki modeliila ja modpackeilla."
+    "message": "Käytä Modrinth Appia ladataksesi ja pelataksesi suosikkimodeillasi ja -modipaketeillasi."
   },
   "app-marketing.features.play.title": {
     "message": "Pelaa lempi modeillasi"
   },
   "app-marketing.features.sharing.description": {
-    "message": "Rakenna, jaa, ja pelaa modipaketteja millä tahansa tuhansista modeista ja modipaketeista Modrinthissa."
+    "message": "Rakenna, jaa ja pelaa modipaketteja mitä tahansa täällä Modrinthissa isännöidyistä tuhansista modeista ja modipaketeista."
   },
   "app-marketing.features.sharing.modpack": {
     "message": "Modipaketti"
@@ -150,7 +150,7 @@
     "message": "Erilainen kuin mikään muu launcheri"
   },
   "app-marketing.features.website.description": {
-    "message": "Modrinth App on täysin integroitu sivuston kanssa, jotta saat pääsyn kaikkiin lempi projekteihisi appin kautta!"
+    "message": "Modrinth App on täysin integroitu verkkosivuston kanssa, joten voit käyttää kaikkia suosikkiprojekteja suoraan sovelluksesta!"
   },
   "app-marketing.features.website.title": {
     "message": "Nettisivu integraatio"
@@ -159,10 +159,10 @@
     "message": "jota olet käyttänyt ennen"
   },
   "app-marketing.hero.app-screenshot-alt": {
-    "message": "Kuvakaappaus Modrinth Appista jossa on Cobblemon instanssi auki sisältö sivulle."
+    "message": "Kuvakaappaus Modrinth Appista, jossa Cobblemon-instanssi on avattuna Sisältö-sivulle."
   },
   "app-marketing.hero.description": {
-    "message": "Modrinth App on uniikki, avoimen lähdekoodin launcheri joka antaa sinun pelata lempi modeillasi, ja pitää ne ajantasalla, kaikki yhdessä siistissä pakkauksessa."
+    "message": "Modrinth App on ainutlaatuinen, avoimen lähdekoodin käynnistysohjelma, jonka avulla voit pelata suosikkimodejasi ja pitää ne ajan tasalla,  kaikki yhdessä siistissä paketissa."
   },
   "app-marketing.hero.download-button": {
     "message": "Lataa Modrinth App"
@@ -174,7 +174,7 @@
     "message": "Lataa Modrinth App alustalle {os}"
   },
   "app-marketing.hero.minecraft-screenshot-alt": {
-    "message": "Kuvakaappaus Cobblemon instanssin pää valikko näytöstä."
+    "message": "Kuvakaappaus Cobblemon-instanssin päävalikosta."
   },
   "app-marketing.hero.more-download-options": {
     "message": "Lisää lataus vaihtoehtoja"
@@ -183,7 +183,7 @@
     "message": "Piilota muut paketit"
   },
   "app-marketing.not-recommended": {
-    "message": "Emme suosittele että käytät näitä ellet tiedä mitä teet."
+    "message": "Me emme suosittele sinun käyttää näitä, jos et tiedä mitä olet tekemässä."
   },
   "app-marketing.show-other-packages": {
     "message": "Näytä muut paketit"
@@ -291,7 +291,7 @@
     "message": "Lopeta projektin seuraaminen"
   },
   "collection.delete-modal.description": {
-    "message": "Tämä poistaa pysyvästi tämän kokoelman. Tätä toimea ei voida peruuttaa."
+    "message": "Tämä poistaa kokoelman pysyvästi. Tätä toimintoa ei voi peruuttaa."
   },
   "collection.delete-modal.title": {
     "message": "Oletko varma että haluat poistaa tämän kokoelman?"
@@ -309,13 +309,13 @@
     "message": "Luotu {ago}"
   },
   "collection.label.curated-by": {
-    "message": "Kuratoinut"
+    "message": "Koonnut"
   },
   "collection.label.no-projects": {
-    "message": "Ei vielä projekteja kokelmassa"
+    "message": "Ei projekteja kokoelmassa vielä"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, =0 {No projects yet} other {<stat>{count}</stat> {type}}}"
+    "message": "{count, plural,=0 {Ei projekteja vielä}other {<stat>{count}</stat>{type}}}"
   },
   "collection.label.updated-at": {
     "message": "Päivitetty {ago}"
@@ -335,11 +335,17 @@
   "conversation-thread.action.approve": {
     "message": "Hyväksy"
   },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "Hyväksy vastauksella"
+  },
   "conversation-thread.action.close-with-reply": {
     "message": "Sulje vastauksella"
   },
   "conversation-thread.action.reject": {
     "message": "Hylkää"
+  },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "Hylkää vastauksella"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Avaa keskustelu uudelleen"
@@ -374,8 +380,11 @@
   "conversation-thread.reply-modal.header": {
     "message": "Vastaa keskusteluun"
   },
+  "create-project-version.create-modal.stage.add-files.admonition": {
+    "message": "Lisätiedostot ovat tukiresursseja, kuten lähdekoodi, eivät vaihtoehtoisia versioita tai variaatioita varten."
+  },
   "create.collection.collection-info": {
-    "message": "Sinun uusi kokoelma luodaan julkiseksi kokoelmaksi {count, plural, =0 {no projects} one {# project} other {# projects}}:lla. "
+    "message": "Uusi kokoelmasi luodaan julkisena kokoelmana, joka sisältää {count, plural, =0 {ei projekteja} one {# projektin} other {# projektia}}."
   },
   "create.collection.create-collection": {
     "message": "Luo kokoelma"
@@ -386,8 +395,14 @@
   "create.collection.name-placeholder": {
     "message": "Syötä kokoelman nimi..."
   },
+  "create.collection.summary-description": {
+    "message": "Lause tai pari, jotka kuvaavat kokoelmaasi."
+  },
   "create.collection.summary-label": {
     "message": "Yhteenveto"
+  },
+  "create.collection.summary-placeholder": {
+    "message": "Tämä on kokoelma..."
   },
   "create.collection.title": {
     "message": "Luodaan kokoelmaa"
@@ -425,6 +440,63 @@
   "create.organization.summary-label": {
     "message": "Yhteenveto"
   },
+  "create.organization.summary-placeholder": {
+    "message": "Organisaatio tarkoitettu"
+  },
+  "create.organization.title": {
+    "message": "Luodaan organisaatiota"
+  },
+  "create.organization.url-label": {
+    "message": "URL"
+  },
+  "create.project.create-project": {
+    "message": "Luo projekti"
+  },
+  "create.project.missing-fields-tooltip": {
+    "message": "Puuttuvia kenttiä: {fields}"
+  },
+  "create.project.name-label": {
+    "message": "Nimi"
+  },
+  "create.project.name-placeholder": {
+    "message": "Syötä projektin nimi..."
+  },
+  "create.project.owner-description": {
+    "message": "Aseta projektin omistajaksesi itsesi tai organisaatio johon kuulut."
+  },
+  "create.project.owner-label": {
+    "message": "Omistaja"
+  },
+  "create.project.server-project-title": {
+    "message": "Luodaan palvelin projektia"
+  },
+  "create.project.summary-description": {
+    "message": "Lause tai pari, jotka kuvailevat projektiasi."
+  },
+  "create.project.summary-label": {
+    "message": "Yhteenveto"
+  },
+  "create.project.summary-placeholder": {
+    "message": "Tämä projekti lisää..."
+  },
+  "create.project.title": {
+    "message": "Luodaan projektia..."
+  },
+  "create.project.type-label": {
+    "message": "Tyyppi"
+  },
+  "create.project.type-project": {
+    "message": "Projekti"
+  },
+  "create.project.type-server": {
+    "message": "Palvelin"
+  },
+  "create.project.url-label": {
+    "message": "URL"
+  },
+  "create.project.visibility-description": {
+    "message": "Projektisi näkyvyys sen hyväksymisen jälkeen."
+  },
   "create.project.visibility-private": {
     "message": "Yksityinen"
   },
@@ -432,10 +504,25 @@
     "message": "Julkinen"
   },
   "create.project.visibility-unlisted": {
-    "message": "Piilotettu"
+    "message": "Ei listattu"
   },
   "dashboard.collections.button.create-new": {
     "message": "Luo uusi"
+  },
+  "dashboard.collections.empty.get-started-hint": {
+    "message": "Luo ensimmäinen kokoelmasi niin pääset alkuun!"
+  },
+  "dashboard.collections.empty.no-collections": {
+    "message": "Sinulla ei ole kokoelmia vielä..."
+  },
+  "dashboard.collections.empty.no-match": {
+    "message": "Yksikään kokoelma ei vastaa hakua."
+  },
+  "dashboard.collections.empty.no-match-hint": {
+    "message": "Kokeile muuttaa suodattimia tai hakusanoja."
+  },
+  "dashboard.collections.label.projects-count": {
+    "message": "{count} {countPlural, plural, one {projekti} other {projektit}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "Hae kokoelmistasi"
@@ -455,23 +542,53 @@
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Lataa {formType}"
   },
+  "dashboard.creator-tax-form-modal.confirmation.success": {
+    "message": "{formType}-verolomakkeesi on lähetetty onnistuneesti!"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.support-text": {
+    "message": "Voit nyt nostaa vapaasti. Jos sinulla on kysyttävää tai tarvitset tietojen päivitystä, <support-link>ota yhteyttä tukeen</support-link>."
+  },
   "dashboard.creator-tax-form-modal.confirmation.title": {
-    "message": "Kaikki valmista! 🎉"
+    "message": "Olet valmis! 🎉"
+  },
+  "dashboard.creator-tax-form-modal.entity.description": {
+    "message": "Ulkomainen yksikkö tarkoittaa liiketoimintayksikköä, joka on perustettu Yhdysvaltojen ulkopuolella (esim. ei-yhdysvaltalainen osakeyhtiö, henkilöyhtiö tai LLC)."
+  },
+  "dashboard.creator-tax-form-modal.entity.foreign-entity": {
+    "message": "Ulkomainen yksikkö"
   },
   "dashboard.creator-tax-form-modal.entity.private-individual": {
     "message": "Yksityishenkilö"
   },
+  "dashboard.creator-tax-form-modal.entity.question": {
+    "message": "Oletko yksityishenkilö vai osa ulkomaista yksikköä?"
+  },
   "dashboard.creator-tax-form-modal.header": {
     "message": "Vero lomake"
+  },
+  "dashboard.creator-tax-form-modal.security.description": {
+    "message": "Modrinth käyttää kolmannen osapuolen tarjoajaa Track1099 verolomakkeidesi turvalliseen keräämiseen ja tallentamiseen. <security-link>Lue lisää täältä.</security-link>"
+  },
+  "dashboard.creator-tax-form-modal.security.header": {
+    "message": "Tietoturvakäytännöt"
   },
   "dashboard.creator-tax-form-modal.us-citizen.question": {
     "message": "Oletko Yhdysvaltain kansalainen?"
   },
+  "dashboard.creator-withdraw-modal.complete-tax-form": {
+    "message": "Täytä verolomake"
+  },
+  "dashboard.creator-withdraw-modal.continue-with-limit": {
+    "message": "Jatka rajan kanssa"
+  },
   "dashboard.creator-withdraw-modal.details-label": {
-    "message": "Lisätiedot"
+    "message": "Tiedot"
   },
   "dashboard.creator-withdraw-modal.fee-breakdown-amount": {
     "message": "Määrä"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-exchange-rate": {
+    "message": "Valuuttakurssi"
   },
   "dashboard.creator-withdraw-modal.kyc.private-individual": {
     "message": "Yksityishenkilö"
@@ -485,11 +602,71 @@
   "dashboard.creator-withdraw-modal.paypal-details.paypal-account": {
     "message": "PayPal-tili"
   },
+  "dashboard.creator-withdraw-modal.stage.tax-form": {
+    "message": "Verolomake"
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.body": {
+    "message": "Nostaaksesi koko <b>{available}</b> saatavilla olevan saldosi, täytä alla oleva lomake. Se vaaditaan veroraportointia varten, ja sen tekeminen tarvitaan vain kerran."
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.body-with-limit": {
+    "message": "Sinun on täytettävä W-9- tai W-8-lomake Modrinthin verotietoja varten, jotta pysymme verosäännösten mukaisina."
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.header": {
+    "message": "Verolomake vaaditaan"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.available-denominations-label": {
+    "message": "Saatavilla olevat nimellisarvot"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.balance-worth-hint": {
+    "message": "Saldosi {usdBalance} vastaa tällä hetkellä {localBalance}."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.enter-amount-hint": {
+    "message": "Etsi lahjakortteja tämän arvon läheltä."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.enter-denomination-placeholder": {
+    "message": "Syötä summa"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
+    "message": "Maksutapa"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward": {
+    "message": "Palkinto"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward-placeholder": {
+    "message": "Valitse palkinto"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward-plural": {
+    "message": "Palkinnot"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.search-amount-label": {
+    "message": "Etsi summa"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-hint": {
+    "message": "Valitse nimellisarvo:"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-required": {
+    "message": "Valitse jatkaaksesi nimellisarvo:"
+  },
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header": {
-    "message": "Vavhistamaton sähköposti"
+    "message": "Vahvistamaton sähköposti"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-message": {
+    "message": "Syöttämäsi toimitussähköposti ei liity Modrinth-tiliisi. Modrinth ei voi palauttaa palkintoja, jotka on lähetetty väärään sähköpostiosoitteeseen."
   },
   "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-header": {
     "message": "Matalammat maksut saatavilla"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-message": {
+    "message": "Valitsit USD:n PayPal Internationalille. <direct-paypal-link>Vaihda suoraan PayPaliin</direct-paypal-link> saadaksesi matalammat maksut (≈2% verrattuna ≈6%:iin)."
+  },
+  "dashboard.creator-withdraw-modal.withdraw-button": {
+    "message": "Nosta"
+  },
+  "dashboard.creator-withdraw-modal.withdraw-limit": {
+    "message": "Nosto raja"
+  },
+  "dashboard.creator-withdraw-modal.withdraw-limit-used": {
+    "message": "Olet käyttänyt <b>{withdrawLimit}</b> nostorajasi. Voit nostaa enemmän vasta, kun täytät verolomakkeen."
   },
   "dashboard.head-title": {
     "message": "Hallintapaneeli"
@@ -577,6 +754,18 @@
   },
   "dashboard.revenue.available-now": {
     "message": "Saatavilla nyt"
+  },
+  "dashboard.revenue.balance": {
+    "message": "Summa"
+  },
+  "dashboard.revenue.estimated-tooltip.msg1": {
+    "message": "Arvioitu tulosi saattaa muuttua, kunnes se tulee saataville."
+  },
+  "dashboard.revenue.estimated-tooltip.msg2": {
+    "message": "Klikkaa lukeaksesi, miten Modrinth käsittelee tulosi."
+  },
+  "dashboard.revenue.estimated-with-date": {
+    "message": "Arvioitu {date}"
   },
   "dashboard.revenue.processing": {
     "message": "Prosessoidaan"

@@ -162,11 +162,15 @@ pub(super) fn validate_pack(
         ProjectType::DataPack => ("data/", "assets/"),
         _ => bail!(ErrorKind::InvalidPack(InvalidPack::UnsupportedType)),
     };
+    let mut has_prefix = false;
+    let mut has_other_prefix = false;
+    for name in archive.file_names() {
+        let name = name?;
+        has_prefix |= name.starts_with(prefix);
+        has_other_prefix |= name.starts_with(other_prefix);
+    }
     if !value.get("pack").is_some_and(serde_json::Value::is_object)
-        || (!archive.file_names().any(|name| name.starts_with(prefix))
-            && archive
-                .file_names()
-                .any(|name| name.starts_with(other_prefix)))
+        || (!has_prefix && has_other_prefix)
     {
         bail!(ErrorKind::InvalidPack(InvalidPack::WrongType));
     }

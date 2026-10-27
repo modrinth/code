@@ -875,6 +875,9 @@
   "auth.sign-in.choose-account": {
     "message": "Kies een account om in de Modrinth-app te gebruiken"
   },
+  "auth.sign-in.choose-existing-account": {
+    "message": "Gebruik een bestaand account"
+  },
   "auth.sign-in.continue-with-email": {
     "message": "Doorgaan met e-mail"
   },
@@ -896,6 +899,9 @@
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Modrinth-app openen"
   },
+  "auth.sign-in.launcher.handoff-failed": {
+    "message": "Kon inloggen in de Modrinth App niet afmaken. Probeer opnieuw"
+  },
   "auth.sign-in.launcher.opening.description": {
     "message": "Als de app niet wordt geopend, gebruik dan de knop hieronder om je aan te melden."
   },
@@ -904,6 +910,9 @@
   },
   "auth.sign-in.no-account": {
     "message": "Heb je nog geen account?"
+  },
+  "auth.sign-in.reauthenticate.use-different-account": {
+    "message": "Gebruik een ander account"
   },
   "auth.sign-in.sign-in-with": {
     "message": "Log in bij Modrinth"
@@ -1001,11 +1010,20 @@
   "collection.description": {
     "message": "{description} - Bekijk de collectie {name} gemaakt door {username} op Modrinth"
   },
+  "collection.description-placeholder": {
+    "message": "Dit is een collectie van..."
+  },
   "collection.description.following": {
     "message": "Automatisch gegenereerde collectie van alle projecten die je volgt."
   },
+  "collection.edit": {
+    "message": "Bewaar collectie"
+  },
   "collection.error.not-found": {
     "message": "Collectie niet gevonden"
+  },
+  "collection.icon-label": {
+    "message": "Icoon"
   },
   "collection.label.created-at": {
     "message": "{ago} gemaakt"
@@ -1037,6 +1055,9 @@
   "conversation-thread.action.approve": {
     "message": "Accepteren"
   },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "Accepteren met antwoord"
+  },
   "conversation-thread.action.close-report": {
     "message": "Rapport afsluiten"
   },
@@ -1045,6 +1066,9 @@
   },
   "conversation-thread.action.reject": {
     "message": "Afkeuren"
+  },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "Afkeuren met antwoord"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Heropen thread"
@@ -1079,6 +1103,9 @@
   "conversation-thread.action.withhold": {
     "message": "Terughouden"
   },
+  "conversation-thread.action.withhold-with-reply": {
+    "message": "Terughouden met antwoord"
+  },
   "conversation-thread.closed-thread.description": {
     "message": "Deze thread is gesloten en kan geen nieuwe berichten meer ontvangen."
   },
@@ -1087,6 +1114,9 @@
   },
   "conversation-thread.error.reopening-report": {
     "message": "Fout tijdens het heropenen van rapport"
+  },
+  "conversation-thread.error.sending-message": {
+    "message": "Fout tijdens het versturen van bericht"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Reageer op het thread..."
@@ -1126,6 +1156,9 @@
   },
   "conversation-thread.resubmit-modal.warning": {
     "message": "Herhaaldelijk berichten plaatsen zonder in te gaan op de opmerkingen van de moderators kan leiden tot een opschorting van je account."
+  },
+  "conversation-thread.resubmit-required-actions-tooltip": {
+    "message": "Je moet alle nodige acties hierboven uitvoeren voordat je kan herindienen."
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Aanvullende bestanden zijn bedoeld voor ondersteunende bronnen zoals source code, niet voor alternatieve versies of varianten."
@@ -2192,6 +2225,9 @@
   "error.generic.default.list_item.1": {
     "message": "Controleer of Modrinth een storing heeft op onze <status-link>Status pagina</status-link>."
   },
+  "error.generic.default.list_item.support": {
+    "message": "Als dit blijft gebeuren, wil je misschien ons Modrinth Team laten weten via ons <support-link>support portal</support-link>"
+  },
   "error.generic.default.list_title": {
     "message": "Probeer alstublieft opnieuw in een paar minuten."
   },
@@ -2912,6 +2948,9 @@
   "layout.publish.email-verification-required.title": {
     "message": "E-mailverificatie vereist"
   },
+  "messages.noResults": {
+    "message": "Geen resultaten gevonden!"
+  },
   "modal.shared-instance.open-in-app.benefit.install": {
     "message": "Alles wat ze spelen automatisch installeren"
   },
@@ -2935,6 +2974,33 @@
   },
   "modal.shared-instance.open-in-app.why-use": {
     "message": "Waarom de Modrinth-app gebruiken"
+  },
+  "moderation.appearance.apply": {
+    "message": "Pas thema toe"
+  },
+  "moderation.appearance.copied": {
+    "message": "Gekopieerd!"
+  },
+  "moderation.appearance.copy-error": {
+    "message": "Kon niet automatisch kopiëren. Selecteer en kopieer de JSON hieronder."
+  },
+  "moderation.appearance.download": {
+    "message": "Download JSON"
+  },
+  "moderation.appearance.export": {
+    "message": "Exporteer thema"
+  },
+  "moderation.appearance.file": {
+    "message": "Kies JSON-bestand"
+  },
+  "moderation.appearance.file-error": {
+    "message": "Kon dit bestand niet lezen. Kies een JSON-bestand kleiner dan 64 KB."
+  },
+  "moderation.appearance.import": {
+    "message": "Importeer thema"
+  },
+  "moderation.c2pa-scan.no-ai-files": {
+    "message": "Geen AI-gegenereerde bestanden gevonden."
   },
   "moderation.exclude-technical-review": {
     "message": "TR uitsluiten"
@@ -3346,6 +3412,9 @@
   },
   "project-member-header.success-join": {
     "message": "Je doet mee met het project team"
+  },
+  "project-moderation-nags.project-submitted-for-review": {
+    "message": "Je project is ingediend ter beoordeling!"
   },
   "project-moderation-nags.publishing-checklist": {
     "message": "Controlelijst publiceren"
@@ -5284,9 +5353,6 @@
   },
   "settings.sessions.action.revoke-session": {
     "message": "Sessie beëindigen"
-  },
-  "settings.sessions.created-ago": {
-    "message": "Gemaakt {ago}"
   },
   "settings.sessions.current-session": {
     "message": "Huidige sessie"
