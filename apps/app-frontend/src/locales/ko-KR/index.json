@@ -395,9 +395,6 @@
   "app.download-manager.title": {
     "message": "다운로드 관리자"
   },
-  "app.download-manager.verifying": {
-    "message": "검증 중"
-  },
   "app.error.state-init.open-backups-folder": {
     "message": "백업 폴더 열기"
   },
@@ -2825,9 +2822,6 @@
   "app.settings.resource-management.maximum-concurrent-writes.title": {
     "message": "최대 동시 쓰기 수"
   },
-  "app.settings.resource-management.store.attention": {
-    "message": "아직 일부 파일에 확인이 필요합니다"
-  },
   "app.settings.resource-management.store.cache-limit.description": {
     "message": "추후 설치를 위해 사용되지 않는 콘텐츠를 유지합니다. 많이 유지할 수록 다운로드 시간을 줄일 수 있습니다."
   },
@@ -2855,23 +2849,8 @@
   "app.settings.resource-management.store.description": {
     "message": "게임 설치, 모드, 팩을 인스턴스끼리 재사용하여 공간을 절약합니다."
   },
-  "app.settings.resource-management.store.issues": {
-    "message": "문제 {count, plural, other {#}}개 보기"
-  },
   "app.settings.resource-management.store.nothing-to-clear": {
     "message": "정리할 미사용 콘텐츠가 없습니다."
-  },
-  "app.settings.resource-management.store.repair": {
-    "message": "검증 및 복구"
-  },
-  "app.settings.resource-management.store.repair.running-description": {
-    "message": "이 작업은 실행 중인 모든 인스턴스를 닫습니다."
-  },
-  "app.settings.resource-management.store.repair.verify-description": {
-    "message": "누락되거나 손상된 파일을 확인하고 복구합니다."
-  },
-  "app.settings.resource-management.store.repairing": {
-    "message": "검증 및 복구 중..."
   },
   "app.settings.resource-management.store.shared.label": {
     "message": "공유됨"
@@ -2887,12 +2866,6 @@
   },
   "app.settings.resource-management.store.unused.label": {
     "message": "미사용됨"
-  },
-  "app.settings.resource-management.store.verification-result": {
-    "message": "{checked}개의 파일을 확인했으며 {repaired}개를 복구했습니다."
-  },
-  "app.settings.resource-management.store.verified": {
-    "message": "검증 완료"
   },
   "app.settings.sidebar.label.instance-defaults": {
     "message": "인스턴스 기본 설정"

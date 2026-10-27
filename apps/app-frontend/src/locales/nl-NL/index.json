@@ -395,9 +395,6 @@
   "app.download-manager.title": {
     "message": "Downloadbeheerder"
   },
-  "app.download-manager.verifying": {
-    "message": "Bezig met controleren"
-  },
   "app.error.state-init.open-backups-folder": {
     "message": "Open back-up-map"
   },
@@ -2825,9 +2822,6 @@
   "app.settings.resource-management.maximum-concurrent-writes.title": {
     "message": "Maximaal aantal gelijktijdige schrijfbewerkingen"
   },
-  "app.settings.resource-management.store.attention": {
-    "message": "Sommige bestanden vereisen nog steeds aandacht"
-  },
   "app.settings.resource-management.store.cache-limit.description": {
     "message": "Houd tot deze hoeveelheid ongebruikte content voor toekomstige installaties. Hogere waarden kunnen downloadtijd besparen."
   },
@@ -2855,23 +2849,8 @@
   "app.settings.resource-management.store.description": {
     "message": "Bespaar ruimte door spelinstallaties, mods en pakketten opnieuw te gebruiken voor uw installaties."
   },
-  "app.settings.resource-management.store.issues": {
-    "message": "Bekijk {count, plural, one {# probleem} other {# problemen}}"
-  },
   "app.settings.resource-management.store.nothing-to-clear": {
     "message": "Geen ongebruikte content om te wissen."
-  },
-  "app.settings.resource-management.store.repair": {
-    "message": "Controleer en herstel"
-  },
-  "app.settings.resource-management.store.repair.running-description": {
-    "message": "Dit zal alle lopende instanties sluiten."
-  },
-  "app.settings.resource-management.store.repair.verify-description": {
-    "message": "Controleer op ontbrekende of beschadigde bestanden en repareer ze."
-  },
-  "app.settings.resource-management.store.repairing": {
-    "message": "Controleren en herstellen..."
   },
   "app.settings.resource-management.store.shared.label": {
     "message": "Gedeeld"
@@ -2887,12 +2866,6 @@
   },
   "app.settings.resource-management.store.unused.label": {
     "message": "Eigenaarloos"
-  },
-  "app.settings.resource-management.store.verification-result": {
-    "message": "{checked, plural, one {# bestand} other {# bestanden}} gecontroleerd, {repaired, plural, one {# reparatie} other {# reparaties}} gemaakt."
-  },
-  "app.settings.resource-management.store.verified": {
-    "message": "Verificatie voltooid"
   },
   "app.settings.sidebar.label.instance-defaults": {
     "message": "Standaardwaarden instantie"
