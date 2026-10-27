@@ -36,7 +36,7 @@ const messages = defineMessages({
 	modpackVersionNotPublic: {
 		id: 'nags.modpack-version-not-public.description',
 		defaultMessage:
-			'The selected modpack version is not publicly available. Choose a version that all players can access without signing in, or resolve its visibility and attribution issues.',
+			'The selected modpack version is not publicly available. Choose a version that all players can access.',
 	},
 	countryTitle: { id: 'nags.select-country.title', defaultMessage: 'Select a region' },
 	country: {

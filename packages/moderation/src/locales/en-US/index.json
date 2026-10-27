@@ -237,7 +237,7 @@
     "defaultMessage": "Review feedback"
   },
   "nags.modpack-version-not-public.description": {
-    "defaultMessage": "The selected modpack version is not publicly available. Choose a version that all players can access without signing in, or resolve its visibility and attribution issues."
+    "defaultMessage": "The selected modpack version is not publicly available. Choose a version that all players can access."
   },
   "nags.modpack-version-not-public.title": {
     "defaultMessage": "Select a publicly available modpack version"
