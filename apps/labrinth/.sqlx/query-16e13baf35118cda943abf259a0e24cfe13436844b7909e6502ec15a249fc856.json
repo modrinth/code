@@ -6,32 +6,68 @@
       {
         "ordinal": 0,
         "name": "dependency_id",
-        "type_info": "Int4"
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "dependencies",
+            "name": "id"
+          }
+        }
       },
       {
         "ordinal": 1,
         "name": "version_id",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "dependencies",
+            "name": "dependent_id"
+          }
+        }
       },
       {
         "ordinal": 2,
         "name": "dependency_project_id",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "dependencies",
+            "name": "mod_dependency_id"
+          }
+        }
       },
       {
         "ordinal": 3,
         "name": "dependency_version_id",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "dependencies",
+            "name": "dependency_id"
+          }
+        }
       },
       {
         "ordinal": 4,
         "name": "file_name",
-        "type_info": "Varchar"
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "dependencies",
+            "name": "dependency_file_name"
+          }
+        }
       },
       {
         "ordinal": 5,
         "name": "dependency_type",
-        "type_info": "Varchar"
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "dependencies",
+            "name": "dependency_type"
+          }
+        }
       }
     ],
     "parameters": {

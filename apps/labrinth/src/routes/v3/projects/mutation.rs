@@ -201,6 +201,27 @@ pub(crate) async fn sync_project_state(
     Ok(state)
 }
 
+async fn sync_technical_review(
+    project_ids: &[DBProjectId],
+    transaction: &mut PgTransaction<'_>,
+) -> Result<Vec<DBProjectId>, ApiError> {
+    delphi::tech_review_queue::lock_projects(project_ids, transaction).await?;
+    for project_id in project_ids {
+        sqlx::query!("SELECT pg_advisory_xact_lock($1)", project_id.0)
+            .fetch_one(&mut *transaction)
+            .await
+            .wrap_internal_err("locking project state synchronization")?;
+    }
+
+    delphi::tech_review_queue::sync_projects_with_membership(
+        project_ids,
+        delphi::tech_review_queue::TechReviewRemovalReason::FileDeleted,
+        transaction,
+    )
+    .await
+    .wrap_api_err("synchronizing project technical review state")
+}
+
 /// Loads project state without reconciling technical review membership.
 /// Explicit review exits must not re-add a project based on its existing scan details.
 pub(crate) async fn load_project_state(
@@ -210,12 +231,38 @@ pub(crate) async fn load_project_state(
 ) -> Result<SyncedProjectState, ApiError> {
     delphi::tech_review_queue::lock_projects(&[project_id], transaction)
         .await?;
-
     sqlx::query!("SELECT pg_advisory_xact_lock($1)", project_id.0)
         .fetch_one(&mut *transaction)
         .await
         .wrap_internal_err("locking project state synchronization")?;
 
+    let queued_projects = sqlx::query_scalar!(
+        r#"
+		SELECT project_id AS "project_id!: DBProjectId"
+		FROM delphi_tech_review_queue
+		WHERE project_id = ANY($1::bigint[])
+		"#,
+        &[project_id.0],
+    )
+    .fetch_all(&mut *transaction)
+    .await
+    .wrap_internal_err("fetching synchronized technical review membership")?;
+
+    load_project_state_with_membership(
+        project_id,
+        queued_projects.contains(&project_id),
+        transaction,
+        redis,
+    )
+    .await
+}
+
+async fn load_project_state_with_membership(
+    project_id: DBProjectId,
+    has_outstanding_technical_review: bool,
+    transaction: &mut PgTransaction<'_>,
+    redis: &RedisPool,
+) -> Result<SyncedProjectState, ApiError> {
     let mut projects = db_models::DBProject::get_many_uncached(
         &[ProjectId::from(project_id)],
         &mut *transaction,
@@ -224,29 +271,13 @@ pub(crate) async fn load_project_state(
     .await
     .wrap_internal_err("reloading project for state synchronization")?;
     let data = projects.pop().wrap_not_found_err("resource not found")?;
-    let has_outstanding_technical_review = sqlx::query_scalar!(
-        r#"
-		SELECT EXISTS (
-			SELECT 1 FROM delphi_tech_review_queue WHERE project_id = $1
-		) AS "exists!"
-		"#,
-        project_id.0,
-    )
-    .fetch_one(&mut *transaction)
-    .await
-    .wrap_internal_err("checking outstanding project technical review")?;
-
-    let project_ids = [project_id.0];
-    let version_ids = sqlx::query!(
-        "SELECT id FROM versions WHERE mod_id = ANY($1::bigint[]) ORDER BY id",
-        &project_ids,
-    )
-    .fetch_all(&mut *transaction)
-    .await
-    .wrap_internal_err("fetching all project version IDs")?
-    .into_iter()
-    .map(|row| DBVersionId(row.id))
-    .collect::<Vec<_>>();
+    let version_ids = sqlx::query_scalar!(
+		r#"SELECT id AS "id!: DBVersionId" FROM versions WHERE mod_id = $1 ORDER BY id"#,
+		project_id.0,
+	)
+	.fetch_all(&mut *transaction)
+	.await
+	.wrap_internal_err("fetching all project version IDs")?;
     let versions = db_models::DBVersion::get_many_uncached(
         &version_ids,
         &mut *transaction,
@@ -386,9 +417,21 @@ pub(crate) async fn prepare_mutations(
     project_ids.sort_by_key(|project_id| project_id.0);
     project_ids.dedup();
 
+    let queued_projects = sync_technical_review(&project_ids, transaction)
+        .await?
+        .into_iter()
+        .collect::<std::collections::HashSet<_>>();
     let mut states = Vec::with_capacity(project_ids.len());
     for project_id in project_ids {
-        states.push(sync_project_state(project_id, transaction, redis).await?);
+        states.push(
+            load_project_state_with_membership(
+                project_id,
+                queued_projects.contains(&project_id),
+                transaction,
+                redis,
+            )
+            .await?,
+        );
     }
 
     if project_editor.is_some_and(|user| !user.role.is_mod()) {

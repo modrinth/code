@@ -6,32 +6,68 @@
       {
         "ordinal": 0,
         "name": "id",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "notifications_templates",
+            "name": "id"
+          }
+        }
       },
       {
         "ordinal": 1,
         "name": "channel",
-        "type_info": "Varchar"
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "notifications_templates",
+            "name": "channel"
+          }
+        }
       },
       {
         "ordinal": 2,
         "name": "notification_type",
-        "type_info": "Varchar"
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "notifications_templates",
+            "name": "notification_type"
+          }
+        }
       },
       {
         "ordinal": 3,
         "name": "subject_line",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "notifications_templates",
+            "name": "subject_line"
+          }
+        }
       },
       {
         "ordinal": 4,
         "name": "body_fetch_url",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "notifications_templates",
+            "name": "body_fetch_url"
+          }
+        }
       },
       {
         "ordinal": 5,
         "name": "plaintext_fallback",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "notifications_templates",
+            "name": "plaintext_fallback"
+          }
+        }
       }
     ],
     "parameters": {
