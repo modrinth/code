@@ -87,42 +87,42 @@ pub(crate) async fn sync_project_state(
     transaction: &mut PgTransaction<'_>,
     redis: &RedisPool,
 ) -> Result<SyncedProjectState, ApiError> {
-	let queued_projects =
-		sync_technical_review(&[project_id], transaction).await?;
-	load_project_state(
-		project_id,
-		queued_projects.contains(&project_id),
-		transaction,
-		redis,
-	)
-	.await
+    let queued_projects =
+        sync_technical_review(&[project_id], transaction).await?;
+    load_project_state(
+        project_id,
+        queued_projects.contains(&project_id),
+        transaction,
+        redis,
+    )
+    .await
 }
 
 async fn sync_technical_review(
-	project_ids: &[DBProjectId],
-	transaction: &mut PgTransaction<'_>,
+    project_ids: &[DBProjectId],
+    transaction: &mut PgTransaction<'_>,
 ) -> Result<Vec<DBProjectId>, ApiError> {
-	for project_id in project_ids {
-		sqlx::query!("SELECT pg_advisory_xact_lock($1)", project_id.0)
-			.fetch_one(&mut *transaction)
-			.await
-			.wrap_internal_err("locking project state synchronization")?;
-	}
+    for project_id in project_ids {
+        sqlx::query!("SELECT pg_advisory_xact_lock($1)", project_id.0)
+            .fetch_one(&mut *transaction)
+            .await
+            .wrap_internal_err("locking project state synchronization")?;
+    }
 
-	delphi::tech_review_queue::sync_projects_with_membership(
-		project_ids,
-		delphi::tech_review_queue::TechReviewRemovalReason::FileDeleted,
-		transaction,
-	)
-	.await
-	.wrap_api_err("synchronizing project technical review state")
+    delphi::tech_review_queue::sync_projects_with_membership(
+        project_ids,
+        delphi::tech_review_queue::TechReviewRemovalReason::FileDeleted,
+        transaction,
+    )
+    .await
+    .wrap_api_err("synchronizing project technical review state")
 }
 
 async fn load_project_state(
-	project_id: DBProjectId,
-	has_outstanding_technical_review: bool,
-	transaction: &mut PgTransaction<'_>,
-	redis: &RedisPool,
+    project_id: DBProjectId,
+    has_outstanding_technical_review: bool,
+    transaction: &mut PgTransaction<'_>,
+    redis: &RedisPool,
 ) -> Result<SyncedProjectState, ApiError> {
     let mut projects = db_models::DBProject::get_many_uncached(
         &[ProjectId::from(project_id)],
@@ -132,7 +132,7 @@ async fn load_project_state(
     .await
     .wrap_internal_err("reloading project for state synchronization")?;
     let data = projects.pop().wrap_not_found_err("resource not found")?;
-	let version_ids = sqlx::query_scalar!(
+    let version_ids = sqlx::query_scalar!(
 		r#"SELECT id AS "id!: DBVersionId" FROM versions WHERE mod_id = $1 ORDER BY id"#,
 		project_id.0,
 	)
@@ -256,20 +256,21 @@ pub(crate) async fn prepare_mutations(
     project_ids.sort_by_key(|project_id| project_id.0);
     project_ids.dedup();
 
-	let queued_projects = sync_technical_review(&project_ids, transaction).await?
-		.into_iter()
-		.collect::<std::collections::HashSet<_>>();
+    let queued_projects = sync_technical_review(&project_ids, transaction)
+        .await?
+        .into_iter()
+        .collect::<std::collections::HashSet<_>>();
     let mut states = Vec::with_capacity(project_ids.len());
     for project_id in project_ids {
-		states.push(
-			load_project_state(
-				project_id,
-				queued_projects.contains(&project_id),
-				transaction,
-				redis,
-			)
-			.await?,
-		);
+        states.push(
+            load_project_state(
+                project_id,
+                queued_projects.contains(&project_id),
+                transaction,
+                redis,
+            )
+            .await?,
+        );
     }
 
     if project_editor.is_some_and(|user| !user.role.is_mod()) {
@@ -365,15 +366,15 @@ pub(crate) async fn finalize_project_edit(
             )));
         }
 
-		let facet_ids = state
-			.thread_issues
-			.iter()
-			.flat_map(|issue| &issue.facets)
-			.map(|facet| facet.id.into())
-			.collect::<Vec<_>>();
-		DBThreadIssue::verify_many_facets(&facet_ids, &mut transaction)
-			.await
-			.wrap_internal_err("verifying project moderation issues")?;
+        let facet_ids = state
+            .thread_issues
+            .iter()
+            .flat_map(|issue| &issue.facets)
+            .map(|facet| facet.id.into())
+            .collect::<Vec<_>>();
+        DBThreadIssue::verify_many_facets(&facet_ids, &mut transaction)
+            .await
+            .wrap_internal_err("verifying project moderation issues")?;
     }
 
     transaction

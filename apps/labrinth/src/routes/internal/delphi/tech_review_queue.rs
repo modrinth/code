@@ -215,24 +215,24 @@ pub async fn sync_projects(
 }
 
 pub async fn sync_projects_with_membership(
-	project_ids: &[DBProjectId],
-	removal_reason: TechReviewRemovalReason,
-	txn: &mut PgTransaction<'_>,
+    project_ids: &[DBProjectId],
+    removal_reason: TechReviewRemovalReason,
+    txn: &mut PgTransaction<'_>,
 ) -> Result<Vec<DBProjectId>, ApiError> {
-	sync_projects(project_ids, removal_reason, txn).await?;
-	if project_ids.is_empty() {
-		return Ok(Vec::new());
-	}
+    sync_projects(project_ids, removal_reason, txn).await?;
+    if project_ids.is_empty() {
+        return Ok(Vec::new());
+    }
 
-	sqlx::query_scalar!(
-		r#"
+    sqlx::query_scalar!(
+        r#"
 		SELECT project_id AS "project_id!: DBProjectId"
 		FROM delphi_tech_review_queue
 		WHERE project_id = ANY($1::bigint[])
 		"#,
-		&project_ids.iter().map(|id| id.0).collect::<Vec<_>>(),
-	)
-	.fetch_all(&mut *txn)
-	.await
-	.wrap_internal_err("fetching synchronized technical review membership")
+        &project_ids.iter().map(|id| id.0).collect::<Vec<_>>(),
+    )
+    .fetch_all(&mut *txn)
+    .await
+    .wrap_internal_err("fetching synchronized technical review membership")
 }
