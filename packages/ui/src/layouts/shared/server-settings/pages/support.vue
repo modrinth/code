@@ -70,6 +70,8 @@
 				</Button>
 			</div>
 		</div>
+
+		<BackupRepositoryReparation :server-id="serverId" />
 	</div>
 </template>
 
@@ -84,6 +86,7 @@ import LockServerModal from '#ui/components/servers/LockServerModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useModrinthServersConsole } from '#ui/composables/server-console'
 import { useServerPermissions } from '#ui/composables/server-permissions'
+import BackupRepositoryReparation from '#ui/layouts/shared/server-settings/components/backup-repository-reparation.vue'
 import { injectServerSettings } from '#ui/layouts/shared/server-settings/providers/server-settings'
 import {
 	injectModrinthClient,

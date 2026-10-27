@@ -167,8 +167,10 @@ fn inspect_archive<R: Read + Seek>(
         ));
     }
     *entries -= archive.len();
-    let names: BTreeSet<String> =
-        archive.file_names().map(str::to_owned).collect();
+    let names: BTreeSet<String> = archive
+        .file_names()
+        .map(|name| name.map(|name| name.into_owned()))
+        .collect::<Result<_, _>>()?;
     let mut bundle = LanguageBundle {
         nested_path: nested_path.to_owned(),
         ..Default::default()

@@ -461,9 +461,6 @@
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} dodano"
   },
-  "content.diff-modal.config-files-updated": {
-    "defaultMessage": "Promenjene konfiguracione datoteke"
-  },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Dodano (zavisnost)"
   },
@@ -6345,3 +6342,4 @@
     "defaultMessage": "Tip"
   }
 }
+

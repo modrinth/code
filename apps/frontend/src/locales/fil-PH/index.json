@@ -2966,9 +2966,6 @@
   "settings.sessions.action.revoke-session": {
     "message": "Bawiin ang sesyon"
   },
-  "settings.sessions.created-ago": {
-    "message": "Linikha {ago}"
-  },
   "settings.sessions.current-session": {
     "message": "Kasalukuyang sesyon"
   },

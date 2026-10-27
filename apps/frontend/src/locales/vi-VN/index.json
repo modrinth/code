@@ -1073,6 +1073,9 @@
   "conversation-thread.action.reject": {
     "message": "Từ chối"
   },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "Từ chối với phản hồi"
+  },
   "conversation-thread.action.reopen-thread": {
     "message": "Mở lại luồng"
   },
@@ -1106,6 +1109,9 @@
   "conversation-thread.action.withhold": {
     "message": "Thu hồi"
   },
+  "conversation-thread.action.withhold-with-reply": {
+    "message": "Thu hồi với phản hồi"
+  },
   "conversation-thread.closed-thread.description": {
     "message": "Luồng này đã bị đóng và tin nhắn mới không thể gửi được vào."
   },
@@ -1114,6 +1120,12 @@
   },
   "conversation-thread.error.reopening-report": {
     "message": "Lỗi khi mở lại báo cáo"
+  },
+  "conversation-thread.error.sending-message": {
+    "message": "Lỗi khi gửi tin nhắn"
+  },
+  "conversation-thread.image.open-externally": {
+    "message": "Mở ở bên ngoài"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Đang phản hồi vào luồng..."
@@ -1136,11 +1148,20 @@
   "conversation-thread.reply-modal.help-center-note": {
     "message": "Nếu bạn muốn liên lạc với bên kiểm duyệt, hãy sử dụng trang <help-center-link>Trung Tậm Trợ giúp Modrinth</help-center-link> và bấm biểu tượng tin nhắn màu xanh ở góc phải dưới để liên lạc bên hỗ trợ."
   },
+  "conversation-thread.reply.facet": {
+    "message": "Giải thích cho {issue}"
+  },
+  "conversation-thread.reply.unknown-issue": {
+    "message": "Vấn đề liên quan đến kiểm duyệt"
+  },
   "conversation-thread.resubmit-modal.confirmation.description": {
     "message": "Chắc chắn rằng tôi đã trả lời tin nhắn từ bên kiểm duyệt"
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "Tôi đã chắc chắn rằng tôi đã trả lời đúng cách các bình luận từ bên kiểm duyệt."
+  },
+  "conversation-thread.resubmit-modal.description.auto-approval": {
+    "message": "Bạn đang nộp lại <project-title>{projectTitle}</project-title>. Nếu tất cả các vấn đề liên quan đến kiểm duyệt đã được giải quyết, dự án của bạn sẽ tự động được phê duyệt. Nếu không thì nó sẽ được chuyển đến đội ngũ kiểm duyệt để được xem xét."
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "Gửi lại để kiểm duyệt"
@@ -1153,6 +1174,12 @@
   },
   "conversation-thread.resubmit-modal.warning": {
     "message": "Gửi lại nhiều lần mà không trả lời các bình luận từ bên kiểm duyệt có thể đình chỉ tài khoản của bạn."
+  },
+  "conversation-thread.resubmit-required-actions-tooltip": {
+    "message": "Bạn cần phải hoàn thành tất cả yêu cầu bắt buộc để nộp lại"
+  },
+  "conversation-thread.submit-modal.description": {
+    "message": "Bạn đang nộp <project-title>{projectTitle}</project-title> để được xem xét bởi đội ngũ kiểm duyệt."
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Các tệp bổ trợ dùng cho các tài nguyên hỗ trợ như mã nguồn, không dùng cho các phiên bản hoặc biến thể thay thế."
@@ -4094,9 +4121,6 @@
   "project.settings.license.custom-name-required": {
     "message": "Nhập tên cho giấy phép tùy chỉnh của bạn."
   },
-  "project.settings.license.custom-url-description": {
-    "message": "Địa chỉ web chứa toàn bộ nội dung giấy phép."
-  },
   "project.settings.license.intro": {
     "message": "Việc chọn giấy phép phù hợp cho {type} rất quan trọng. Bạn có thể chọn một giấy phép trong danh sách hoặc cung cấp giấy phép tùy chỉnh. Bạn cũng có thể cung cấp URL tùy chỉnh cho giấy phép đã chọn; nếu không, nội dung giấy phép sẽ được hiển thị. Xem <guide>hướng dẫn về giấy phép</guide> để biết thêm thông tin."
   },
@@ -4120,12 +4144,6 @@
   },
   "project.settings.license.optional-label": {
     "message": "tùy chọn"
-  },
-  "project.settings.license.select": {
-    "message": "Giấy phép"
-  },
-  "project.settings.license.select-placeholder": {
-    "message": "Tìm giấy phép..."
   },
   "project.settings.license.title": {
     "message": "Giấy phép"
@@ -5539,9 +5557,6 @@
   },
   "settings.sessions.action.revoke-session": {
     "message": "Thu hồi phiên"
-  },
-  "settings.sessions.created-ago": {
-    "message": "Đã tạo {ago}"
   },
   "settings.sessions.current-session": {
     "message": "Phiên hiện tại"

@@ -61,9 +61,13 @@ fn detected_encoding_name(bytes: &[u8]) -> String {
     if bytes.starts_with(&[0xEF, 0xBB, 0xBF]) {
         return UTF_8.name().to_string();
     }
-    let mut detector = chardetng::EncodingDetector::new();
+    let mut detector =
+        chardetng::EncodingDetector::new(chardetng::Iso2022JpDetection::Allow);
     detector.feed(bytes, true);
-    detector.guess(None, true).name().to_string()
+    detector
+        .guess(None, chardetng::Utf8Detection::Allow)
+        .name()
+        .to_string()
 }
 
 fn pack_version_id(metadata: &InstanceMetadata) -> Option<&str> {

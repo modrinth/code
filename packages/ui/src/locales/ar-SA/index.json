@@ -461,9 +461,6 @@
   "content.diff-modal.added-count": {
     "defaultMessage": "تمت إضافة {count}"
   },
-  "content.diff-modal.config-files-updated": {
-    "defaultMessage": "ملفات الإعدادات التي تم تعديلها"
-  },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "تمت الإضافة (تَبعية)"
   },
@@ -1908,3 +1905,4 @@
     "defaultMessage": "ماينكرافت: إصدار جافا"
   }
 }
+

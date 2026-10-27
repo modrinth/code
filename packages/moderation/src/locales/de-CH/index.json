@@ -48,7 +48,7 @@
     "defaultMessage": "Wähle passende Sprachen aus"
   },
   "nags.all-tags-selected.description": {
-    "defaultMessage": "Du hast {totalAvailableTags, plural, one {den einen verfügbaren Tag} other {alle # verfügbare Tags}} ausgewählt. Tags sollen den Nutzern helfen, relevante Projekte zu finden. Bitte wähle nur relevante Tags aus."
+    "defaultMessage": "Du hast {totalAvailableTags, plural, one {den einen verfügbaren Tag} other {alle # verfügbaren Tags}} ausgewählt. Tags sollen den Nutzern helfen, relevante Projekte zu finden. Bitte wähle nur relevante Tags aus."
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Wähle akkurate Tags aus"
@@ -135,7 +135,7 @@
     "defaultMessage": "Die Zusammenfassung ändern"
   },
   "nags.license-url.not-in-allowlist.description": {
-    "defaultMessage": "Deine Lizenz-URL ist kein gültiger Lizenzlink. Bitte stelle sicher, dass sie direkt auf deinen Lizenztext verweist."
+    "defaultMessage": "Deine Lizenz-URL ist kein bekannter Lizenzlink. Bitte stelle sicher, dass sie direkt auf deinen Lizenztext verweist."
   },
   "nags.license-url.not-in-allowlist.title": {
     "defaultMessage": "Überprüfe deinen Lizenzlink"
@@ -390,13 +390,13 @@
     "defaultMessage": "Wähle passende Sprachen aus"
   },
   "nags.too-many-tags-server.description": {
-    "defaultMessage": "Du hast {tagCount, plural, one {# Tag} other {# Tags}} ausgewählt. Bitte reduziere die Anzahl auf {maxTagCount} oder weniger, damit dein Projekte in relevanten Suchergebnissen angezeigt wird."
+    "defaultMessage": "Du hast {tagCount, plural, one {# Tag} other {# Tags}} ausgewählt. Bitte reduziere die Anzahl auf {maxTagCount} oder weniger, damit dein Projekt in relevanten Suchergebnissen angezeigt wird."
   },
   "nags.too-many-tags-server.title": {
     "defaultMessage": "Wähle passende Tags"
   },
   "nags.too-many-tags.description": {
-    "defaultMessage": "Du hast {tagCount, plural, one {# Tag} other {# Tags}} ausgewählt. Bitte reduziere die Anzahl auf {maxTagCount} oder weniger, damit dein Projekte in relevanten Suchergebnissen angezeigt wird."
+    "defaultMessage": "Du hast {tagCount, plural, one {# Tag} other {# Tags}} ausgewählt. Bitte reduziere die Anzahl auf {maxTagCount} oder weniger, damit dein Projekt in relevanten Suchergebnissen angezeigt wird."
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Wähle akkurate Tags aus"
@@ -421,6 +421,84 @@
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Link-Einstellungen ansehen"
+  },
+  "project-review.issue-location.disclosures": {
+    "defaultMessage": "Angaben bearbeiten"
+  },
+  "project-review.issue-location.gallery": {
+    "defaultMessage": "Galeriebilder bearbeiten"
+  },
+  "project-review.issue-location.permissions": {
+    "defaultMessage": "Genehmigungen überprüfen"
+  },
+  "project-review.issue-location.versions": {
+    "defaultMessage": "Versionen verwalten"
+  },
+  "project-review.issue-target.acknowledge": {
+    "defaultMessage": "Bestätigen"
+  },
+  "project-review.issue-target.add-gallery-images": {
+    "defaultMessage": "Galeriebilder hinzufügen"
+  },
+  "project-review.issue-target.add-project-disclosures": {
+    "defaultMessage": "Angaben hinzufügen"
+  },
+  "project-review.issue-target.mark-addressed": {
+    "defaultMessage": "Als erledigt markieren"
+  },
+  "project-review.issue-target.modify-description": {
+    "defaultMessage": "Beschreibung ändern"
+  },
+  "project-review.issue-target.modify-gallery-image": {
+    "defaultMessage": "Galeriebild ändern"
+  },
+  "project-review.issue-target.modify-icon": {
+    "defaultMessage": "Icon ändern"
+  },
+  "project-review.issue-target.modify-license": {
+    "defaultMessage": "Lizenz ändern"
+  },
+  "project-review.issue-target.modify-links": {
+    "defaultMessage": "Links ändern"
+  },
+  "project-review.issue-target.modify-project-disclosure": {
+    "defaultMessage": "Angabe ändern"
+  },
+  "project-review.issue-target.modify-project-disclosure-note": {
+    "defaultMessage": "Hinweis zur Angabe ändern"
+  },
+  "project-review.issue-target.modify-server-address": {
+    "defaultMessage": "Serveradresse ändern"
+  },
+  "project-review.issue-target.modify-server-languages": {
+    "defaultMessage": "Serversprachen ändern"
+  },
+  "project-review.issue-target.modify-slug": {
+    "defaultMessage": "URL-Slug ändern"
+  },
+  "project-review.issue-target.modify-summary": {
+    "defaultMessage": "Zusammenfassung ändern"
+  },
+  "project-review.issue-target.modify-team-member-role": {
+    "defaultMessage": "Rolle des Teammitglieds ändern"
+  },
+  "project-review.issue-target.modify-title": {
+    "defaultMessage": "Titel ändern"
+  },
+  "project-review.issue-target.remove-gallery-images": {
+    "defaultMessage": "Galeriebilder entfernen"
+  },
+  "project-review.issue-target.remove-icon": {
+    "defaultMessage": "Icon entfernen"
+  },
+  "project-review.issue-target.remove-project-disclosures": {
+    "defaultMessage": "Angaben entfernen"
+  },
+  "project-review.issue-target.remove-tags": {
+    "defaultMessage": "Tags entfernen"
+  },
+  "project-review.issue-target.version": {
+    "defaultMessage": "Version ändern"
   },
   "project.text-validation.description-matches-summary": {
     "defaultMessage": "Die Beschreibung deines Projekts sollte eigene Informationen enthalten und nicht eine Wiederholung der Zusammenfassung sein."

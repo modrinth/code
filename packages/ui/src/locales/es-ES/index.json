@@ -461,9 +461,6 @@
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} añadido/s"
   },
-  "content.diff-modal.config-files-updated": {
-    "defaultMessage": "Archivos de configuración modificados"
-  },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Añadido (dependencia)"
   },

@@ -461,9 +461,6 @@
   "content.diff-modal.added-count": {
     "defaultMessage": "Đã thêm {count}"
   },
-  "content.diff-modal.config-files-updated": {
-    "defaultMessage": "Tệp cấu hình đã thay đổi"
-  },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Đã thêm (phụ thuộc)"
   },
@@ -7185,3 +7182,4 @@
     "defaultMessage": "Loại"
   }
 }
+

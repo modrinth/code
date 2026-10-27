@@ -143,6 +143,9 @@
   "button.download": {
     "defaultMessage": "Nedlast"
   },
+  "button.download-files": {
+    "defaultMessage": "Last ned filer"
+  },
   "button.downloading": {
     "defaultMessage": "Nedlaster"
   },
@@ -152,11 +155,17 @@
   "button.enable": {
     "defaultMessage": "Aktiver"
   },
+  "button.extract": {
+    "defaultMessage": "Pakk ut"
+  },
   "button.follow": {
     "defaultMessage": "Følg"
   },
   "button.hide-snapshots": {
     "defaultMessage": "Gjøm snapshots"
+  },
+  "button.i-understand": {
+    "defaultMessage": "Jeg skjønner"
   },
   "button.install": {
     "defaultMessage": "Installer"
@@ -176,6 +185,12 @@
   "button.open-folder": {
     "defaultMessage": "Åpne mappe"
   },
+  "button.open-in-browser": {
+    "defaultMessage": "Åpn i nettleser"
+  },
+  "button.open-in-folder": {
+    "defaultMessage": "Åpn i mappe"
+  },
   "button.open-in-modrinth": {
     "defaultMessage": "Åpne i Modrinth"
   },
@@ -187,6 +202,9 @@
   },
   "button.reinstall-modpack": {
     "defaultMessage": "Re-installer modpakka"
+  },
+  "button.remove": {
+    "defaultMessage": "Fjern"
   },
   "button.remove-image": {
     "defaultMessage": "Fjern bilde"
@@ -239,6 +257,9 @@
   "button.stop": {
     "defaultMessage": "Stopp"
   },
+  "button.switch-to-version": {
+    "defaultMessage": "Bytt til versjon"
+  },
   "button.switch-version": {
     "defaultMessage": "Bytt versjonen"
   },
@@ -265,6 +286,15 @@
   },
   "changelog.product.web": {
     "defaultMessage": "Plattform"
+  },
+  "collection-widget.empty-collection": {
+    "defaultMessage": "Denne samlinga er tom."
+  },
+  "collection-widget.loading-projects": {
+    "defaultMessage": "Laster inn prosjekter..."
+  },
+  "collection-widget.no-search-results": {
+    "defaultMessage": "Ingen prosjekter matcher søket ditt."
   },
   "collections.label.private": {
     "defaultMessage": "Privat"
@@ -2727,3 +2757,4 @@
     "defaultMessage": "Du har ulagrede endringer."
   }
 }
+

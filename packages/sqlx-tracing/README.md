@@ -19,13 +19,14 @@
 
 ## Usage
 
-Add `sqlx-tracing` to your `Cargo.toml`:
+This vendored crate targets SQLx 0.9 and requires Rust 1.94 or newer.
+Add it to a workspace member's `Cargo.toml`:
 
 ```toml
 [dependencies]
-sqlx-tracing = "0.1"
-sqlx = { version = "0.8", default-features = false, features = ["derive"] }
-tracing = "0.1"
+sqlx-tracing = { workspace = true }
+sqlx = { workspace = true, features = ["macros"] }
+tracing = { workspace = true }
 ```
 
 Enable the desired database feature:

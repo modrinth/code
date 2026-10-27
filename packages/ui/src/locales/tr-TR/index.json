@@ -458,9 +458,6 @@
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} eklendi"
   },
-  "content.diff-modal.config-files-updated": {
-    "defaultMessage": "Yapılandırma dosyası değiştirildi"
-  },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Eklendi (bağımlılık)"
   },

@@ -461,9 +461,6 @@
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} 件追加されました"
   },
-  "content.diff-modal.config-files-updated": {
-    "defaultMessage": "設定変更"
-  },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "追加 (依存関係)"
   },
@@ -6189,3 +6186,4 @@
     "defaultMessage": "タイプ"
   }
 }
+
