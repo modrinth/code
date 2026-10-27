@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import type { UploadHandle } from '@modrinth/api-client'
+import type { UploadHandle, UploadProgress } from '@modrinth/api-client'
 import { ref } from 'vue'
 
 import { AppearingProgressBar } from '#ui/components/base'
@@ -34,17 +34,25 @@ const uploadedBytes = ref(0)
 const totalBytes = ref(0)
 
 function track<T>(handle: UploadHandle<T>): Promise<T> {
+	return trackProgress((onProgress) => handle.onProgress(onProgress).promise)
+}
+
+/**
+ * Shows the modal while `run` is pending, for uploads that span several requests.
+ */
+function trackProgress<T>(
+	run: (onProgress: (progress: UploadProgress) => void) => Promise<T>,
+): Promise<T> {
 	uploadedBytes.value = 0
 	totalBytes.value = 0
 	modal.value?.show()
-	handle.onProgress(({ loaded, total }) => {
+	return run(({ loaded, total }) => {
 		uploadedBytes.value = loaded
 		totalBytes.value = total
-	})
-	return handle.promise.finally(() => {
+	}).finally(() => {
 		modal.value?.hide()
 	})
 }
 
-defineExpose({ track })
+defineExpose({ track, trackProgress })
 </script>
