@@ -395,9 +395,6 @@
   "app.download-manager.title": {
     "message": "Gerenciador de Downloads"
   },
-  "app.download-manager.verifying": {
-    "message": "Verificando"
-  },
   "app.error.state-init.open-backups-folder": {
     "message": "Abrir pasta das cópias de segurança"
   },
@@ -2825,9 +2822,6 @@
   "app.settings.resource-management.maximum-concurrent-writes.title": {
     "message": "Máximo de escritas simultâneas"
   },
-  "app.settings.resource-management.store.attention": {
-    "message": "Alguns arquivos ainda precisam de atenção"
-  },
   "app.settings.resource-management.store.cache-limit.description": {
     "message": "Mantenha esta quantidade de conteúdo não utilizado para instalações futuras. Manter mais pode poupar tempo de download."
   },
@@ -2855,23 +2849,8 @@
   "app.settings.resource-management.store.description": {
     "message": "Salve espaço reutilizando instalações, mods e pacotes das suas instâncias."
   },
-  "app.settings.resource-management.store.issues": {
-    "message": "Ver {count, plural, one {# problema} other {# problemas}}"
-  },
   "app.settings.resource-management.store.nothing-to-clear": {
     "message": "Nenhum conteúdo não utilizado para limpar."
-  },
-  "app.settings.resource-management.store.repair": {
-    "message": "Verificar e reparar"
-  },
-  "app.settings.resource-management.store.repair.running-description": {
-    "message": "Isso fechará todas as instâncias em execução."
-  },
-  "app.settings.resource-management.store.repair.verify-description": {
-    "message": "Checar por arquivos ausentes ou danificados e repare-os."
-  },
-  "app.settings.resource-management.store.repairing": {
-    "message": "Verificando e reparando..."
   },
   "app.settings.resource-management.store.shared.label": {
     "message": "Compartilhado"
@@ -2887,12 +2866,6 @@
   },
   "app.settings.resource-management.store.unused.label": {
     "message": "Órfão"
-  },
-  "app.settings.resource-management.store.verification-result": {
-    "message": "{checked, plural,  =0 {Nenhum arquivo checado} one {# arquivo checado} other {# arquivos checados}} e {repaired, plural, =0 {nenhum reparo feito} one {# reparo feito} other {# reparos feitos}}."
-  },
-  "app.settings.resource-management.store.verified": {
-    "message": "Verificação concluída"
   },
   "app.settings.sidebar.label.instance-defaults": {
     "message": "Padrões da instância"

@@ -245,7 +245,6 @@ pub(crate) async fn migrate_store(state: &State) -> crate::Result<()> {
             .collect::<Vec<_>>()
     };
     for id in ids {
-        let _turn = state.content_store.legacy_migration_priority.read().await;
         let snapshot = {
             let _guard = state.synced_options.lock().await;
             read_library(state).await?
@@ -442,7 +441,6 @@ async fn cleanup_legacy_cache(state: &State) -> crate::Result<bool> {
     let mut complete = true;
     let mut entries = tokio::fs::read_dir(&legacy).await?;
     while let Some(entry) = entries.next_entry().await? {
-        let _turn = state.content_store.legacy_migration_priority.read().await;
         let _guard = state.synced_options.lock().await;
         let library = read_library(state).await?;
         if !entry.file_type().await?.is_file() {

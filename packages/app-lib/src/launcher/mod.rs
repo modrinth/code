@@ -1256,7 +1256,6 @@ pub async fn launch_minecraft(
         .recover(Some(&instance.id))
         .await
         .context("recovering interrupted content changes")?;
-    // state.content_store.validate_instance(instance).await?;
     if crate::state::instance_has_running_process(&instance.id, state).await? {
         bail!(ErrorKind::LauncherError(format!(
             "instance {} is already running",

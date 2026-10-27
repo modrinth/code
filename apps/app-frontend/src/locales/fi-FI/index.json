@@ -386,9 +386,6 @@
   "app.download-manager.title": {
     "message": "Latausten hallinta"
   },
-  "app.download-manager.verifying": {
-    "message": "Tarkistetaan"
-  },
   "app.error.state-init.open-backups-folder": {
     "message": "Avaa varmuuskopiokansio"
   },
