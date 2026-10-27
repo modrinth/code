@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tSELECT shared_instance_id\n\t\tFROM hidden_shared_instances\n\t\tWHERE user_id = ?\n\t\tORDER BY hidden_at DESC\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "name": "shared_instance_id",
+        "ordinal": 0,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "492780b7576955fc3701475cbb4b823561e91467c31e4c0499e4b9184589696a"
+}

@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tDELETE FROM hidden_shared_instances\n\t\tWHERE user_id = ? AND shared_instance_id = ?\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "3004ddd34b4583bc38a8e3c663f6fc6a80ae021d53ab6d438cfe26459f52d5fe"
+}

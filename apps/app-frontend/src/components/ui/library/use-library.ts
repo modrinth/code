@@ -4,6 +4,7 @@ import {
 	DownloadIcon,
 	EditIcon,
 	EyeIcon,
+	EyeOffIcon,
 	FolderOpenIcon,
 	LogOutIcon,
 	MinusIcon,
@@ -258,14 +259,30 @@ const instanceActionMessages = defineMessages({
 		defaultMessage: 'Remove from group',
 	},
 	install: { id: 'app.library.instance.action.install', defaultMessage: 'Install' },
+	hideFromLibrary: {
+		id: 'app.library.instance.action.hide-from-library',
+		defaultMessage: 'Hide from library',
+	},
+})
+
+const hiddenSharedInstanceMessages = defineMessages({
+	title: {
+		id: 'app.library.shared-instance-hidden.title',
+		defaultMessage: 'Hidden from library',
+	},
+	text: {
+		id: 'app.library.shared-instance-hidden.text',
+		defaultMessage: 'You can show it again in Settings > Behavior.',
+	},
 })
 
 function createLibraryState(instances: Ref<GameInstance[]>) {
-	const { handleError } = injectNotificationManager()
+	const { handleError, addNotification } = injectNotificationManager()
 	const { formatMessage } = useVIntl()
 	const { notifySharedInstanceError } = useSharedInstanceErrors()
 	const queryClient = useQueryClient()
-	const uninstalledSharedInstances = useUninstalledSharedInstances(instances)
+	const { sharedInstances: uninstalledSharedInstances, setHidden: setSharedInstanceHidden } =
+		useUninstalledSharedInstances(instances)
 
 	const search = librarySearch
 	const filters = useStorage<LibraryFilters>(
@@ -1653,6 +1670,15 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		)
 	}
 
+	const hideUninstalledSharedInstance = async (instance: UninstalledSharedInstance) => {
+		await setSharedInstanceHidden(instance.shared_instance_id, true)
+		addNotification({
+			title: formatMessage(hiddenSharedInstanceMessages.title),
+			text: formatMessage(hiddenSharedInstanceMessages.text),
+			type: 'success',
+		})
+	}
+
 	const handleUninstalledSharedInstanceContextMenu = (
 		event: MouseEvent,
 		instance: UninstalledSharedInstance,
@@ -1664,6 +1690,12 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 				icon: DownloadIcon,
 				tone: 'brand',
 				action: () => void installUninstalledSharedInstance(instance),
+			},
+			{
+				id: 'hide',
+				label: formatMessage(instanceActionMessages.hideFromLibrary),
+				icon: EyeOffIcon,
+				action: () => void hideUninstalledSharedInstance(instance),
 			},
 			{ type: 'divider' },
 			{
@@ -1754,6 +1786,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		handleInstanceContextMenu,
 		handleUninstalledSharedInstanceContextMenu,
 		installUninstalledSharedInstance,
+		hideUninstalledSharedInstance,
 		requestRemoveUninstalledSharedInstances,
 		handleInstanceIconSaved,
 	}

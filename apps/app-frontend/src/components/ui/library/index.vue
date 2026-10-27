@@ -2,6 +2,7 @@
 import { StarIcon } from '@modrinth/assets'
 import { ContextMenu, defineMessages, useVIntl } from '@modrinth/ui'
 import { computed, nextTick, onDeactivated, onUnmounted, ref, toRef, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import Draggable from 'vuedraggable'
 
 import IconEditorModal from '@/components/ui/instance_settings/InstanceIconEditorModal.vue'
@@ -14,6 +15,7 @@ import RemoveSharedInstancesModal from '@/components/ui/library/remove-shared-in
 import {
 	getLibraryInstanceSelectionKey,
 	type InstanceGroup as InstanceGroupType,
+	isUninstalledSharedInstance,
 	provideLibrary,
 } from '@/components/ui/library/use-library'
 import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInstanceModal.vue'
@@ -62,7 +64,30 @@ const {
 	setSelectedLibraryInstances,
 	toggleLibraryInstanceSelection,
 	canSelectLibraryInstance,
+	libraryInstances,
+	installUninstalledSharedInstance,
 } = provideLibrary(toRef(props, 'instances'))
+
+const route = useRoute()
+const router = useRouter()
+
+watch(
+	() => {
+		const sharedInstanceId = route.query.installSharedInstance
+		if (typeof sharedInstanceId !== 'string') return null
+		return (
+			libraryInstances.value
+				.filter(isUninstalledSharedInstance)
+				.find((instance) => instance.shared_instance_id === sharedInstanceId) ?? null
+		)
+	},
+	(instance) => {
+		if (!instance) return
+		void router.replace({ query: { ...route.query, installSharedInstance: undefined } })
+		void installUninstalledSharedInstance(instance)
+	},
+	{ immediate: true },
+)
 
 let restoreScrollFrame: number | undefined
 let unmounted = false

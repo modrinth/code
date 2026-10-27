@@ -823,3 +823,14 @@ export async function cache_shared_instance_library(
 ): Promise<void> {
 	return await invoke('plugin:instance|instance_share_cache_library', { userId, instances })
 }
+
+export async function get_hidden_shared_instance_ids(): Promise<string[]> {
+	return await invoke('plugin:instance|instance_share_get_hidden_ids')
+}
+
+export async function set_shared_instance_hidden(
+	sharedInstanceId: string,
+	hidden: boolean,
+): Promise<void> {
+	return await invoke('plugin:instance|instance_share_set_hidden', { sharedInstanceId, hidden })
+}

@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { DownloadIcon, SpinnerIcon } from '@modrinth/assets'
-import { defineMessages, useVIntl } from '@modrinth/ui'
+import { DownloadIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
+import { Button, defineMessages, IconButton, useVIntl } from '@modrinth/ui'
 import { computed } from 'vue'
 
 import InstanceCardView from '@/components/ui/library/instance-group/instance-card-view.vue'
-import InstanceOwnerBadge from '@/components/ui/library/instance-group/instance-owner-badge.vue'
 import InstanceSelectionButton from '@/components/ui/library/instance-group/instance-selection-button.vue'
+import InstanceSharedBadge from '@/components/ui/library/instance-group/instance-shared-badge.vue'
 import { getLibraryInstanceSelectionKey, useLibrary } from '@/components/ui/library/use-library'
 import type { UninstalledSharedInstance } from '@/components/ui/library/use-uninstalled-shared-instances'
 
@@ -25,9 +25,13 @@ const messages = defineMessages({
 		id: 'app.library.instance.install-with-name',
 		defaultMessage: 'Install {name}',
 	},
-	notInstalled: {
-		id: 'app.library.instance.not-installed',
-		defaultMessage: 'Not installed',
+	install: {
+		id: 'app.library.instance.install',
+		defaultMessage: 'Install',
+	},
+	hideFromLibrary: {
+		id: 'app.library.instance.action.hide-from-library',
+		defaultMessage: 'Hide from library',
 	},
 	selectInstance: {
 		id: 'app.library.instance.select-with-name',
@@ -45,6 +49,7 @@ const {
 	getSharedInstanceOwner,
 	loadingSharedInstanceIds,
 	installUninstalledSharedInstance,
+	hideUninstalledSharedInstance,
 	handleUninstalledSharedInstanceContextMenu,
 } = useLibrary()
 
@@ -63,6 +68,7 @@ const selected = computed(() =>
 
 const selectable = computed(() => selected.value || canSelectLibraryInstance(props.instance.id))
 const owner = computed(() => getSharedInstanceOwner(props.instance))
+const isOwner = computed(() => props.instance.role === 'owner')
 
 const toggleSelection = (event?: MouseEvent) => {
 	emit('toggle-selection', event?.shiftKey ?? false)
@@ -120,20 +126,47 @@ const handleKeydown = (event: KeyboardEvent) => {
 		"
 	>
 		<template #icon-overlay="{ compact }">
-			<div class="pointer-events-none absolute inset-0 z-[1] flex items-center justify-center">
+			<div
+				v-if="loading"
+				class="pointer-events-none absolute inset-0 z-[1] flex items-center justify-center"
+			>
 				<SpinnerIcon
-					v-if="loading"
 					class="relative animate-spin text-contrast"
 					:class="compact ? 'size-5' : 'size-[30%]'"
 				/>
-				<DownloadIcon
-					v-else
-					v-tooltip="formatMessage(messages.notInstalled)"
-					class="pointer-events-auto relative text-contrast"
-					:class="compact ? 'size-5' : 'size-[30%]'"
-				/>
 			</div>
-			<InstanceOwnerBadge v-if="owner" :owner="owner" :compact="compact" />
+			<InstanceSharedBadge
+				v-if="isOwner || owner"
+				:owner="owner"
+				:is-owner="isOwner"
+				:compact="compact"
+			/>
+		</template>
+		<template #leading="{ compact }">
+			<div
+				v-if="!loading && !isLibraryInstanceSelectionActive"
+				class="absolute flex origin-bottom-right scale-75 items-center gap-1.5 opacity-0 transition-[opacity,transform] group-hover/card:scale-100 group-hover/card:opacity-100"
+				:class="compact ? 'right-0' : 'bottom-1 right-1'"
+			>
+				<IconButton
+					v-tooltip="formatMessage(messages.hideFromLibrary)"
+					:label="formatMessage(messages.hideFromLibrary)"
+					:size="compact ? 'sm' : 'md'"
+					class="!rounded-full"
+					@click.stop="hideUninstalledSharedInstance(instance)"
+				>
+					<XIcon />
+				</IconButton>
+				<Button
+					type="colored"
+					color="brand"
+					:size="compact ? 'sm' : 'md'"
+					@click.stop="(event: MouseEvent) => installUninstalledSharedInstance(instance, event)"
+				>
+					<DownloadIcon />
+					{{ formatMessage(messages.install) }}
+				</Button>
+			</div>
 		</template>
 		<template #overlay="{ compact }">
 			<InstanceSelectionButton

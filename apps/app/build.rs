@@ -307,6 +307,8 @@ fn main() {
                         "instance_share_leave_remote",
                         "instance_share_get_cached_library",
                         "instance_share_cache_library",
+                        "instance_share_get_hidden_ids",
+                        "instance_share_set_hidden",
                         "instance_share_dismiss_restored_notice",
                         "instance_export_mrpack",
                         "instance_get_pack_export_candidates",

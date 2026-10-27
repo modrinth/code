@@ -206,6 +206,18 @@
   "app.behavior-settings.content.title": {
     "message": "Home and content"
   },
+  "app.behavior-settings.hidden-shared-instances.description": {
+    "message": "Shared instances you've hidden from your library on this device. Hidden instances aren't synced, and you're still a member of them."
+  },
+  "app.behavior-settings.hidden-shared-instances.empty": {
+    "message": "You haven't hidden any shared instances. To hide one, click the × on a shared instance in your library that isn't installed."
+  },
+  "app.behavior-settings.hidden-shared-instances.show-in-library": {
+    "message": "Show in library"
+  },
+  "app.behavior-settings.hidden-shared-instances.title": {
+    "message": "Hidden shared instances"
+  },
   "app.behavior-settings.refocus-on-game-close.description": {
     "message": "Bring Modrinth App to the foreground when Minecraft exits."
   },
@@ -1187,6 +1199,9 @@
   "app.library.instance.action.duplicate": {
     "message": "Duplicate instance"
   },
+  "app.library.instance.action.hide-from-library": {
+    "message": "Hide from library"
+  },
   "app.library.instance.action.install": {
     "message": "Install"
   },
@@ -1226,6 +1241,9 @@
   "app.library.instance.deselect-with-name": {
     "message": "Deselect {name}"
   },
+  "app.library.instance.install": {
+    "message": "Install"
+  },
   "app.library.instance.install-with-name": {
     "message": "Install {name}"
   },
@@ -1237,9 +1255,6 @@
   },
   "app.library.instance.new": {
     "message": "New instance"
-  },
-  "app.library.instance.not-installed": {
-    "message": "Not installed"
   },
   "app.library.instance.open-with-name": {
     "message": "Open {name}"
@@ -1258,6 +1273,12 @@
   },
   "app.library.instance.shared-by": {
     "message": "Shared by {name}"
+  },
+  "app.library.instance.shared-by-prefix": {
+    "message": "Shared by"
+  },
+  "app.library.instance.shared-by-you": {
+    "message": "Shared by you"
   },
   "app.library.instance.stop": {
     "message": "Stop"
@@ -1294,6 +1315,12 @@
   },
   "app.library.selection.selected-count": {
     "message": "{count} selected"
+  },
+  "app.library.shared-instance-hidden.text": {
+    "message": "You can show it again in Settings > Behavior."
+  },
+  "app.library.shared-instance-hidden.title": {
+    "message": "Hidden from library"
   },
   "app.library.sort.date-created": {
     "message": "Date created"

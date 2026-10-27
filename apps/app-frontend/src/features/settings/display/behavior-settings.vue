@@ -13,6 +13,7 @@ import { onBeforeUnmount, onMounted } from 'vue'
 
 import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { injectAppSettingsModal } from '@/features/settings/app-settings-modal/context'
+import HiddenSharedInstancesSettings from '@/features/settings/display/hidden-shared-instances-settings.vue'
 import {
 	type AppSettings,
 	appSettingsKeys,
@@ -347,6 +348,8 @@ onBeforeUnmount(() => {
 			</div>
 		</div>
 	</section>
+
+	<HiddenSharedInstancesSettings />
 
 	<section class="mt-8 border-0 border-t border-solid border-divider pt-6">
 		<h2 class="m-0 text-xl font-semibold text-contrast">
