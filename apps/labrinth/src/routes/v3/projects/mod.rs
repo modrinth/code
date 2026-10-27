@@ -1572,16 +1572,9 @@ async fn submit_project_for_review(
         .wrap_internal_err("failed to remove archival disclosure")?;
     }
 
-    let state =
+    let mut state =
         mutation::sync_project_state(project.inner.id, transaction, redis)
             .await?;
-    let auto_approval_status = if user.role.is_mod() {
-        None
-    } else {
-        state.auto_approval_status()
-    };
-    let auto_approved = auto_approval_status.is_some();
-    let new_status = auto_approval_status.unwrap_or(ProjectStatus::Processing);
 
     sqlx::query!(
         "
@@ -1599,7 +1592,19 @@ async fn submit_project_for_review(
     .await
     .wrap_internal_err("querying database for `project_edit_internal`")?;
 
-    if notify_team_members || auto_approved {
+    if state.status().is_approved()
+        || !user.role.is_mod()
+            && matches!(
+                state.status(),
+                ProjectStatus::Rejected | ProjectStatus::Withheld
+            )
+            && state.try_auto_approve(transaction, redis).await?
+    {
+        return Ok(true);
+    }
+
+    let new_status = ProjectStatus::Processing;
+    if notify_team_members {
         let notified_members = sqlx::query!(
             "
                     SELECT tm.user_id id
@@ -1628,16 +1633,10 @@ async fn submit_project_for_review(
         )?;
 
         NotificationBuilder {
-            body: if auto_approved {
-                NotificationBody::ProjectStatusApproved {
-                    project_id: project.inner.id.into(),
-                }
-            } else {
-                NotificationBody::ProjectStatusNeutral {
-                    project_id: project.inner.id.into(),
-                    old_status: project.inner.status,
-                    new_status,
-                }
+            body: NotificationBody::ProjectStatusNeutral {
+                project_id: project.inner.id.into(),
+                old_status: project.inner.status,
+                new_status,
             },
         }
         .insert_many(notified_members, &mut *transaction, redis)
@@ -1648,21 +1647,10 @@ async fn submit_project_for_review(
     }
 
     ThreadMessageBuilder {
-        author_id: if auto_approved {
-            None
-        } else {
-            Some(user.id.into())
-        },
-        body: if auto_approved {
-            MessageBody::AutoApproval {
-                old_status: project.inner.status,
-                new_status,
-            }
-        } else {
-            MessageBody::StatusChange {
-                new_status,
-                old_status: project.inner.status,
-            }
+        author_id: Some(user.id.into()),
+        body: MessageBody::StatusChange {
+            new_status,
+            old_status: project.inner.status,
         },
         thread_id: project.thread_id,
         hide_identity: false,
@@ -1676,19 +1664,17 @@ async fn submit_project_for_review(
     sqlx::query!(
         "
                 UPDATE mods
-                SET status = $1,
-                    approved = CASE WHEN $3 THEN COALESCE(approved, NOW()) ELSE approved END
+                SET status = $1
                 WHERE (id = $2)
                 ",
         new_status.as_str(),
         project.inner.id as db_ids::DBProjectId,
-		auto_approved,
     )
     .execute(&mut *transaction)
     .await
     .wrap_internal_err("querying database for `project_edit_internal`")?;
 
-    Ok(auto_approved)
+    Ok(false)
 }
 
 pub async fn edit_project_categories(
