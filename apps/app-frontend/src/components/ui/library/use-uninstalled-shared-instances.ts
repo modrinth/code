@@ -7,13 +7,13 @@ import {
 } from '@tanstack/vue-query'
 import { computed, type Ref, watch } from 'vue'
 
+import { hiddenInstanceIdsQueryOptions } from '@/features/library/hidden-instances/queries'
+import { useHiddenInstances } from '@/features/library/hidden-instances/use-hidden-instances'
 import {
 	cache_shared_instance_library,
 	type CachedSharedInstanceSummary,
 	get_cached_shared_instance_library,
 } from '@/helpers/instance'
-import { hiddenInstanceIdsQueryOptions } from '@/features/library/hidden-instances/queries'
-import { useHiddenInstances } from '@/features/library/hidden-instances/use-hidden-instances'
 import type { GameInstance, InstanceLoader } from '@/helpers/types'
 
 export type UninstalledSharedInstance = {
@@ -34,6 +34,8 @@ export const sharedInstanceLibraryKeys = {
 	ids: (userId: string | null) => [...sharedInstanceLibraryKeys.all, 'ids', userId] as const,
 	detail: (userId: string | null, sharedInstanceId: string) =>
 		[...sharedInstanceLibraryKeys.all, 'detail', userId, sharedInstanceId] as const,
+	installPreview: (sharedInstanceId: string) =>
+		[...sharedInstanceLibraryKeys.all, 'install-preview', sharedInstanceId] as const,
 }
 
 const SHARED_INSTANCE_ID_PREFIX = 'shared-instance:'

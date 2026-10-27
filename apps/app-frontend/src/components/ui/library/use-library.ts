@@ -1610,6 +1610,25 @@ function createLibraryState(instances: Ref<GameInstance[]>, options: LibraryStat
 		instanceOptions.value?.open(event, getInstanceOptions(item, instanceGroupId))
 	}
 
+	const sharedInstanceInstallPreviewQueryOptions = (instance: UninstalledSharedInstance) => ({
+		queryKey: sharedInstanceLibraryKeys.installPreview(instance.shared_instance_id),
+		queryFn: async () => {
+			const [preview, manager] = await Promise.all([
+				install_get_shared_instance_preview(instance.shared_instance_id, instance.name),
+				instance.manager_id
+					? (sharedInstanceOwnersById.value.get(instance.manager_id) ??
+						get_user(instance.manager_id, 'bypass').catch(() => null))
+					: null,
+			])
+			return { preview, manager }
+		},
+		staleTime: 60_000,
+	})
+
+	const prefetchUninstalledSharedInstanceInstall = (instance: UninstalledSharedInstance) => {
+		void queryClient.prefetchQuery(sharedInstanceInstallPreviewQueryOptions(instance))
+	}
+
 	const installUninstalledSharedInstance = async (
 		instance: UninstalledSharedInstance,
 		event?: MouseEvent,
@@ -1620,17 +1639,12 @@ function createLibraryState(instances: Ref<GameInstance[]>, options: LibraryStat
 
 		loadingSharedInstanceIds.value = new Set([...loadingSharedInstanceIds.value, sharedInstanceId])
 		try {
-			const [preview, manager] = await Promise.all([
-				install_get_shared_instance_preview(sharedInstanceId, instance.name),
-				instance.manager_id
-					? (sharedInstanceOwnersById.value.get(instance.manager_id) ??
-						get_user(instance.manager_id, 'bypass').catch(() => null))
-					: null,
-			])
-			if (instance.icon_path) preview.iconUrl = instance.icon_path
+			const { preview, manager } = await queryClient.fetchQuery(
+				sharedInstanceInstallPreviewQueryOptions(instance),
+			)
 
 			sharedInstanceInstallModal.value?.show(
-				preview,
+				instance.icon_path ? { ...preview, iconUrl: instance.icon_path } : preview,
 				async () => {
 					await install_shared_instance(
 						sharedInstanceId,
@@ -1823,6 +1837,7 @@ function createLibraryState(instances: Ref<GameInstance[]>, options: LibraryStat
 		handleInstanceContextMenu,
 		handleUninstalledSharedInstanceContextMenu,
 		installUninstalledSharedInstance,
+		prefetchUninstalledSharedInstanceInstall,
 		hideInstance,
 		showInstanceInLibrary,
 		hiddenLibraryInstances,

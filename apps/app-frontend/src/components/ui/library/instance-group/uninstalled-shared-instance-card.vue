@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { DownloadIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
+import { DownloadIcon, XIcon } from '@modrinth/assets'
 import { Button, defineMessages, IconButton, useVIntl } from '@modrinth/ui'
 import { computed } from 'vue'
 
@@ -47,15 +47,11 @@ const {
 	isLibraryInstanceSelectionActive,
 	canSelectLibraryInstance,
 	getSharedInstanceOwner,
-	loadingSharedInstanceIds,
 	installUninstalledSharedInstance,
+	prefetchUninstalledSharedInstanceInstall,
 	hideInstance,
 	handleUninstalledSharedInstanceContextMenu,
 } = useLibrary()
-
-const loading = computed(() =>
-	loadingSharedInstanceIds.value.has(props.instance.shared_instance_id),
-)
 
 const selected = computed(() =>
 	selectedLibraryInstances.value.has(
@@ -121,20 +117,13 @@ const handleKeydown = (event: KeyboardEvent) => {
 		:aria-pressed="isLibraryInstanceSelectionActive ? selected : undefined"
 		@click="activateCard"
 		@keydown="handleKeydown"
+		@mouseenter="prefetchUninstalledSharedInstanceInstall(instance)"
+		@focus="prefetchUninstalledSharedInstanceInstall(instance)"
 		@contextmenu.prevent.stop="
 			(event: MouseEvent) => handleUninstalledSharedInstanceContextMenu(event, instance)
 		"
 	>
 		<template #icon-overlay="{ compact }">
-			<div
-				v-if="loading"
-				class="pointer-events-none absolute inset-0 z-[1] flex items-center justify-center"
-			>
-				<SpinnerIcon
-					class="relative animate-spin text-contrast"
-					:class="compact ? 'size-5' : 'size-[30%]'"
-				/>
-			</div>
 			<InstanceSharedBadge
 				v-if="isOwner || owner"
 				:owner="owner"
@@ -142,7 +131,7 @@ const handleKeydown = (event: KeyboardEvent) => {
 				:compact="compact"
 			/>
 			<div
-				v-if="!compact && !loading && !isLibraryInstanceSelectionActive"
+				v-if="!compact && !isLibraryInstanceSelectionActive"
 				class="absolute bottom-2 right-2 z-[2] flex origin-bottom-right scale-90 items-center gap-1.5 opacity-0 transition-[opacity,transform] group-hover/card:scale-100 group-hover/card:opacity-100"
 			>
 				<IconButton
@@ -168,7 +157,7 @@ const handleKeydown = (event: KeyboardEvent) => {
 		</template>
 		<template #leading="{ compact }">
 			<IconButton
-				v-if="compact && !loading && !isLibraryInstanceSelectionActive"
+				v-if="compact && !isLibraryInstanceSelectionActive"
 				v-tooltip="formatMessage(messages.install)"
 				:label="formatMessage(messages.install)"
 				type="colored"
