@@ -6,7 +6,13 @@
       {
         "ordinal": 0,
         "name": "requests_per_minute",
-        "type_info": "Int4"
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "user_limits",
+            "name": "requests_per_minute"
+          }
+        }
       }
     ],
     "parameters": {

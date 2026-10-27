@@ -6,22 +6,46 @@
       {
         "ordinal": 0,
         "name": "name",
-        "type_info": "Varchar"
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "notifications_types",
+            "name": "name"
+          }
+        }
       },
       {
         "ordinal": 1,
         "name": "delivery_priority",
-        "type_info": "Int4"
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "notifications_types",
+            "name": "delivery_priority"
+          }
+        }
       },
       {
         "ordinal": 2,
         "name": "expose_in_user_preferences",
-        "type_info": "Bool"
+        "type_info": "Bool",
+        "origin": {
+          "Table": {
+            "table": "notifications_types",
+            "name": "expose_in_user_preferences"
+          }
+        }
       },
       {
         "ordinal": 3,
         "name": "expose_in_site_notifications",
-        "type_info": "Bool"
+        "type_info": "Bool",
+        "origin": {
+          "Table": {
+            "table": "notifications_types",
+            "name": "expose_in_site_notifications"
+          }
+        }
       }
     ],
     "parameters": {

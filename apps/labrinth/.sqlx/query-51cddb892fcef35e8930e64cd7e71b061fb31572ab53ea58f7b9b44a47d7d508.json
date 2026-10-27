@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\tSELECT project_id AS \"project_id!: DBProjectId\"\n\t\tFROM delphi_tech_review_queue\n\t\tWHERE project_id = ANY($1::bigint[])\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "project_id!: DBProjectId",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "delphi_tech_review_queue",
+            "name": "project_id"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "51cddb892fcef35e8930e64cd7e71b061fb31572ab53ea58f7b9b44a47d7d508"
+}

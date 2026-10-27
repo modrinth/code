@@ -6,22 +6,46 @@
       {
         "ordinal": 0,
         "name": "mod_id",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "mods_gallery",
+            "name": "mod_id"
+          }
+        }
       },
       {
         "ordinal": 1,
         "name": "image_url",
-        "type_info": "Varchar"
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "mods_gallery",
+            "name": "image_url"
+          }
+        }
       },
       {
         "ordinal": 2,
         "name": "featured",
-        "type_info": "Bool"
+        "type_info": "Bool",
+        "origin": {
+          "Table": {
+            "table": "mods_gallery",
+            "name": "featured"
+          }
+        }
       },
       {
         "ordinal": 3,
         "name": "ordering",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "mods_gallery",
+            "name": "ordering"
+          }
+        }
       }
     ],
     "parameters": {
