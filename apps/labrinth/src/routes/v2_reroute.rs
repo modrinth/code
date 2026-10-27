@@ -215,10 +215,10 @@ pub fn convert_v3_environment_to_v2_side_types(
 
 /// Converts typed Minecraft metadata without going through legacy loader fields.
 pub fn convert_minecraft_environment_to_v2_side_types(
-	environment: Environment,
-	project_type: Option<&str>,
+    environment: Environment,
+    project_type: Option<&str>,
 ) -> (LegacySideType, LegacySideType) {
-	use LegacySideType::{Optional, Required, Unknown, Unsupported};
+    use LegacySideType::{Optional, Required, Unknown, Unsupported};
 
     match project_type {
         Some("plugin") => (Unsupported, Required),
@@ -226,13 +226,18 @@ pub fn convert_minecraft_environment_to_v2_side_types(
         Some("shader") => (Required, Unsupported),
         Some("resourcepack") => (Required, Unsupported),
         _ => match environment {
-			Environment::ClientAndServer | Environment::SingleplayerOnly => (Required, Required),
-			Environment::ClientOnly => (Required, Unsupported),
-			Environment::ClientOnlyServerOptional => (Required, Optional),
-			Environment::ServerOnly | Environment::DedicatedServerOnly => (Unsupported, Required),
-			Environment::ServerOnlyClientOptional => (Optional, Required),
-			Environment::ClientOrServer | Environment::ClientOrServerPrefersBoth => (Optional, Optional),
-			Environment::Unknown => (Unknown, Unknown),
+            Environment::ClientAndServer | Environment::SingleplayerOnly => {
+                (Required, Required)
+            }
+            Environment::ClientOnly => (Required, Unsupported),
+            Environment::ClientOnlyServerOptional => (Required, Optional),
+            Environment::ServerOnly | Environment::DedicatedServerOnly => {
+                (Unsupported, Required)
+            }
+            Environment::ServerOnlyClientOptional => (Optional, Required),
+            Environment::ClientOrServer
+            | Environment::ClientOrServerPrefersBoth => (Optional, Optional),
+            Environment::Unknown => (Unknown, Unknown),
         },
     }
 }

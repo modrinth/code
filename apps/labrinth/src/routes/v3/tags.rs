@@ -1,5 +1,5 @@
-use crate::util::error::Context as _;
 use crate::util::MinecraftMeta;
+use crate::util::error::Context as _;
 use std::collections::HashMap;
 
 use super::ApiError;
@@ -8,7 +8,7 @@ use crate::database::models::loader_item::{Loader, LoaderMetadata};
 use crate::models::exp::minecraft::{Environment, MrpackLoader};
 use crate::models::link_platform::LinkPlatform;
 use crate::models::minecraft::{
-	legacy_game_version_date, legacy_game_version_name,
+    legacy_game_version_date, legacy_game_version_name,
 };
 use actix_web::{HttpResponse, get, web};
 use chrono::{DateTime, Utc};
@@ -97,18 +97,16 @@ pub async fn loader_list(
     let mut results = loaders
         .into_iter()
         .map(|loader| {
-			let mut supported_fields = vec![
-				"game_versions".to_owned(),
-				"environment".to_owned(),
-			];
-			if loader.loader == "mrpack" {
-				supported_fields.push("mrpack_loaders".to_owned());
-			}
+            let mut supported_fields =
+                vec!["game_versions".to_owned(), "environment".to_owned()];
+            if loader.loader == "mrpack" {
+                supported_fields.push("mrpack_loaders".to_owned());
+            }
             LoaderData {
                 icon: loader.icon,
                 name: loader.loader,
                 supported_project_types: loader.supported_project_types,
-				supported_games: vec!["minecraft-java".to_owned()],
+                supported_games: vec!["minecraft-java".to_owned()],
                 supported_fields,
                 metadata: loader.metadata,
             }
@@ -122,12 +120,12 @@ pub async fn loader_list(
 
 #[derive(serde::Deserialize, serde::Serialize)]
 pub struct MinecraftTagValue {
-	pub value: String,
-	pub ordering: Option<i32>,
-	pub created: DateTime<Utc>,
-	#[serde(rename = "type")]
-	pub ty: Option<String>,
-	pub major: Option<bool>,
+    pub value: String,
+    pub ordering: Option<i32>,
+    pub created: DateTime<Utc>,
+    #[serde(rename = "type")]
+    pub ty: Option<String>,
+    pub major: Option<bool>,
 }
 
 #[derive(serde::Deserialize, serde::Serialize)]
@@ -159,57 +157,59 @@ pub async fn loader_fields_list(
 ) -> Result<HttpResponse, ApiError> {
     let query = query.into_inner();
     let mut results = match query.loader_field.as_str() {
-		"game_versions" => {
-			let versions = minecraft_meta
-				.minecraft_versions()
-				.await
-				.wrap_internal_err("fetching minecraft-meta game versions")?;
-			versions
-				.iter()
-				.map(|row| {
-					let name = row.name.to_string();
-					let entry = &row.catalog_entry.0;
-					let ty = match entry.ty {
-						VersionType::Release => "release",
-						VersionType::Snapshot => "snapshot",
-						VersionType::OldAlpha => "alpha",
-						VersionType::OldBeta => "beta",
-					};
-					let created = DateTime::<Utc>::from_timestamp(
-						entry.release_time.as_second(),
-						entry.release_time.subsec_nanosecond() as u32,
-					)
-					.ok_or_else(|| ApiError::Internal(eyre::eyre!(
-						"minecraft-meta release timestamp is out of range"
-					)))?;
-					Ok(MinecraftTagValue {
-						value: legacy_game_version_name(&name).to_owned(),
-						ordering: None,
-						created: legacy_game_version_date(&name, created),
-						ty: Some(ty.to_owned()),
-						major: Some(matches!(entry.ty, VersionType::Release)),
-					})
-				})
-				.collect::<Result<Vec<_>, ApiError>>()?
-		}
-		"environment" => Environment::iter()
-			.map(|value| MinecraftTagValue {
-				value: value.as_str().to_owned(),
-				ordering: None,
-				created: DateTime::<Utc>::UNIX_EPOCH,
-				ty: None,
-				major: None,
-			})
-			.collect(),
-		"mrpack_loaders" => MrpackLoader::iter()
-			.map(|value| MinecraftTagValue {
-				value: value.as_str().to_owned(),
-				ordering: None,
-				created: DateTime::<Utc>::UNIX_EPOCH,
-				ty: None,
-				major: None,
-			})
-			.collect(),
+        "game_versions" => {
+            let versions = minecraft_meta
+                .minecraft_versions()
+                .await
+                .wrap_internal_err("fetching minecraft-meta game versions")?;
+            versions
+                .iter()
+                .map(|row| {
+                    let name = row.name.to_string();
+                    let entry = &row.catalog_entry.0;
+                    let ty = match entry.ty {
+                        VersionType::Release => "release",
+                        VersionType::Snapshot => "snapshot",
+                        VersionType::OldAlpha => "alpha",
+                        VersionType::OldBeta => "beta",
+                    };
+                    let created = DateTime::<Utc>::from_timestamp(
+                        entry.release_time.as_second(),
+                        entry.release_time.subsec_nanosecond() as u32,
+                    )
+                    .ok_or_else(|| {
+                        ApiError::Internal(eyre::eyre!(
+                            "minecraft-meta release timestamp is out of range"
+                        ))
+                    })?;
+                    Ok(MinecraftTagValue {
+                        value: legacy_game_version_name(&name).to_owned(),
+                        ordering: None,
+                        created: legacy_game_version_date(&name, created),
+                        ty: Some(ty.to_owned()),
+                        major: Some(matches!(entry.ty, VersionType::Release)),
+                    })
+                })
+                .collect::<Result<Vec<_>, ApiError>>()?
+        }
+        "environment" => Environment::iter()
+            .map(|value| MinecraftTagValue {
+                value: value.as_str().to_owned(),
+                ordering: None,
+                created: DateTime::<Utc>::UNIX_EPOCH,
+                ty: None,
+                major: None,
+            })
+            .collect(),
+        "mrpack_loaders" => MrpackLoader::iter()
+            .map(|value| MinecraftTagValue {
+                value: value.as_str().to_owned(),
+                ordering: None,
+                created: DateTime::<Utc>::UNIX_EPOCH,
+                ty: None,
+                major: None,
+            })
+            .collect(),
         _ => {
             return Err(ApiError::Request(eyre::eyre!(
                 "`{}` is not a valid loader field",

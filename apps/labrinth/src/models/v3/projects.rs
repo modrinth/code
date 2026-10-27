@@ -1,6 +1,4 @@
-
 use std::collections::HashMap;
-
 
 use crate::database::models::project_item::{LinkUrl, ProjectQueryResult};
 use crate::database::models::version_item::VersionQueryResult;
@@ -109,7 +107,6 @@ pub struct Project {
     pub fields: HashMap<String, Vec<serde_json::Value>>,
 }
 
-
 /// Projects typed Minecraft metadata into the flattened compatibility fields.
 fn minecraft_version_fields(
     component: &exp::minecraft::ModVersion,
@@ -179,7 +176,8 @@ impl From<ProjectQueryResult> for Project {
         }
         let m = data.inner;
         let games = minecraft_games(
-            !m.loaders.is_empty() || m.components.minecraft_java_server.is_some(),
+            !m.loaders.is_empty()
+                || m.components.minecraft_java_server.is_some(),
             m.components.minecraft_bedrock_server.is_some(),
         );
         Self {
@@ -877,7 +875,8 @@ impl From<VersionQueryResult> for Version {
             .unwrap_or_default();
         let v = data.inner;
         let games = minecraft_games(
-            !data.loaders.is_empty() || v.components.minecraft_java_server.is_some(),
+            !data.loaders.is_empty()
+                || v.components.minecraft_java_server.is_some(),
             false,
         );
         Version {

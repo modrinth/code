@@ -6,12 +6,24 @@
       {
         "ordinal": 0,
         "name": "id: DBVersionId",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "versions",
+            "name": "id"
+          }
+        }
       },
       {
         "ordinal": 1,
         "name": "project_id: DBProjectId",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "versions",
+            "name": "mod_id"
+          }
+        }
       }
     ],
     "parameters": {

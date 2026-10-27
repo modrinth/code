@@ -1,4 +1,3 @@
-use actix_web::web;
 use crate::database::PgPool;
 use crate::database::models::version_item;
 use crate::file_hosting::FileHost;
@@ -16,6 +15,7 @@ use crate::search::SearchState;
 use crate::util::MinecraftMeta;
 use crate::util::kafka::KafkaClientState;
 use actix_multipart::Multipart;
+use actix_web::web;
 use actix_web::web::Data;
 use actix_web::{HttpRequest, HttpResponse, post};
 use serde::{Deserialize, Serialize};

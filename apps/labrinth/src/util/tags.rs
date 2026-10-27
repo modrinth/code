@@ -1,7 +1,7 @@
 use crate::database::PgPool;
 use crate::database::models::loader_item::Loader;
-use crate::util::MinecraftMeta;
 use crate::routes::ApiError;
+use crate::util::MinecraftMeta;
 use crate::util::error::Context;
 use arc_swap::ArcSwapOption;
 use std::collections::HashSet;

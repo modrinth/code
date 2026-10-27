@@ -6,182 +6,388 @@
       {
         "ordinal": 0,
         "name": "id",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "id"
+          }
+        }
       },
       {
         "ordinal": 1,
         "name": "email",
-        "type_info": "Varchar"
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "email"
+          }
+        }
       },
       {
         "ordinal": 2,
         "name": "avatar_url",
-        "type_info": "Varchar"
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "avatar_url"
+          }
+        }
       },
       {
         "ordinal": 3,
         "name": "raw_avatar_url",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "raw_avatar_url"
+          }
+        }
       },
       {
         "ordinal": 4,
         "name": "username",
-        "type_info": "Varchar"
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "username"
+          }
+        }
       },
       {
         "ordinal": 5,
         "name": "bio",
-        "type_info": "Varchar"
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "bio"
+          }
+        }
       },
       {
         "ordinal": 6,
         "name": "created",
-        "type_info": "Timestamptz"
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "created"
+          }
+        }
       },
       {
         "ordinal": 7,
         "name": "role",
-        "type_info": "Varchar"
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "role"
+          }
+        }
       },
       {
         "ordinal": 8,
         "name": "badges",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "badges"
+          }
+        }
       },
       {
         "ordinal": 9,
         "name": "campaign_pride_26_last_donated_at",
-        "type_info": "Timestamptz"
+        "type_info": "Timestamptz",
+        "origin": "Expression"
       },
       {
         "ordinal": 10,
         "name": "campaign_pride_26_total_amount_donated_usd",
-        "type_info": "Numeric"
+        "type_info": "Numeric",
+        "origin": "Expression"
       },
       {
         "ordinal": 11,
         "name": "github_id",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "github_id"
+          }
+        }
       },
       {
         "ordinal": 12,
         "name": "discord_id",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "discord_id"
+          }
+        }
       },
       {
         "ordinal": 13,
         "name": "gitlab_id",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "gitlab_id"
+          }
+        }
       },
       {
         "ordinal": 14,
         "name": "google_id",
-        "type_info": "Varchar"
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "google_id"
+          }
+        }
       },
       {
         "ordinal": 15,
         "name": "steam_id",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "steam_id"
+          }
+        }
       },
       {
         "ordinal": 16,
         "name": "microsoft_id",
-        "type_info": "Varchar"
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "microsoft_id"
+          }
+        }
       },
       {
         "ordinal": 17,
         "name": "email_verified",
-        "type_info": "Bool"
+        "type_info": "Bool",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "email_verified"
+          }
+        }
       },
       {
         "ordinal": 18,
         "name": "password",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "password"
+          }
+        }
       },
       {
         "ordinal": 19,
         "name": "totp_secret",
-        "type_info": "Varchar"
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "totp_secret"
+          }
+        }
       },
       {
         "ordinal": 20,
         "name": "paypal_id",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "paypal_id"
+          }
+        }
       },
       {
         "ordinal": 21,
         "name": "paypal_country",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "paypal_country"
+          }
+        }
       },
       {
         "ordinal": 22,
         "name": "paypal_email",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "paypal_email"
+          }
+        }
       },
       {
         "ordinal": 23,
         "name": "venmo_handle",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "venmo_handle"
+          }
+        }
       },
       {
         "ordinal": 24,
         "name": "stripe_customer_id",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "stripe_customer_id"
+          }
+        }
       },
       {
         "ordinal": 25,
         "name": "allow_friend_requests",
-        "type_info": "Bool"
+        "type_info": "Bool",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "allow_friend_requests"
+          }
+        }
       },
       {
         "ordinal": 26,
         "name": "is_subscribed_to_newsletter",
-        "type_info": "Bool"
+        "type_info": "Bool",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "is_subscribed_to_newsletter"
+          }
+        }
       },
       {
         "ordinal": 27,
         "name": "eligibility_verified_at",
-        "type_info": "Timestamptz"
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "eligibility_verified_at"
+          }
+        }
       },
       {
         "ordinal": 28,
         "name": "lock_locked_by?",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "user_locks",
+            "name": "locked_by"
+          }
+        }
       },
       {
         "ordinal": 29,
         "name": "lock_reason?",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "user_locks",
+            "name": "reason"
+          }
+        }
       },
       {
         "ordinal": 30,
         "name": "lock_created?",
-        "type_info": "Timestamptz"
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "user_locks",
+            "name": "created"
+          }
+        }
       },
       {
         "ordinal": 31,
         "name": "restriction_removed_perms?",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "user_restrictions",
+            "name": "removed_perms"
+          }
+        }
       },
       {
         "ordinal": 32,
         "name": "restriction_reason?",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "user_restrictions",
+            "name": "reason"
+          }
+        }
       },
       {
         "ordinal": 33,
         "name": "restriction_private_reason?",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "user_restrictions",
+            "name": "private_reason"
+          }
+        }
       },
       {
         "ordinal": 34,
         "name": "restriction_restricted_by?",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "user_restrictions",
+            "name": "restricted_by"
+          }
+        }
       },
       {
         "ordinal": 35,
         "name": "restriction_updated?",
-        "type_info": "Timestamptz"
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "user_restrictions",
+            "name": "updated"
+          }
+        }
       }
     ],
     "parameters": {

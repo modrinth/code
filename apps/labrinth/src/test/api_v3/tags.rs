@@ -85,5 +85,4 @@ impl ApiV3 {
         assert_status!(&resp, StatusCode::OK);
         test::read_body_json(resp).await
     }
-
 }

@@ -1,6 +1,6 @@
+use crate::util::MinecraftMeta;
 use crate::util::error::ApiContext as _;
 use crate::util::error::Context as _;
-use crate::util::MinecraftMeta;
 use xredis::RedisPool;
 mod fixed;
 

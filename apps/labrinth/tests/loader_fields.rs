@@ -477,39 +477,42 @@ async fn version_edit_uses_authoritative_loaders_for_field_validation() {
 
 #[actix_rt::test]
 async fn version_edit_rejects_incompatible_loader_fields() {
-    with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
-        let api = &test_env.api;
-        let version_id = &test_env.dummy.project_alpha.version_id;
+    with_test_environment(
+        None,
+        |test_env: TestEnvironment<ApiV3>| async move {
+            let api = &test_env.api;
+            let version_id = &test_env.dummy.project_alpha.version_id;
 
-        let response = api
-            .edit_version(
-                version_id,
-                json!({
-                    "loaders": ["bukkit"]
-                }),
-                USER_USER_PAT,
-            )
-            .await;
-        assert_status!(&response, StatusCode::NO_CONTENT);
+            let response = api
+                .edit_version(
+                    version_id,
+                    json!({
+                        "loaders": ["bukkit"]
+                    }),
+                    USER_USER_PAT,
+                )
+                .await;
+            assert_status!(&response, StatusCode::NO_CONTENT);
 
-        let response = api
-            .edit_version(
-                version_id,
-                json!({
-                    "mrpack_loaders": ["fabric"],
-                    "environment": "client_only"
-                }),
-                USER_USER_PAT,
-            )
-            .await;
-        assert_status!(&response, StatusCode::BAD_REQUEST);
-        let body: serde_json::Value = test::read_body_json(response).await;
-        assert_eq!(body["error"], "request_error");
-        assert_eq!(
-            body["description"],
-            "`mrpack_loaders` requires the `mrpack` loader"
-        );
-    })
+            let response = api
+                .edit_version(
+                    version_id,
+                    json!({
+                        "mrpack_loaders": ["fabric"],
+                        "environment": "client_only"
+                    }),
+                    USER_USER_PAT,
+                )
+                .await;
+            assert_status!(&response, StatusCode::BAD_REQUEST);
+            let body: serde_json::Value = test::read_body_json(response).await;
+            assert_eq!(body["error"], "request_error");
+            assert_eq!(
+                body["description"],
+                "`mrpack_loaders` requires the `mrpack` loader"
+            );
+        },
+    )
     .await;
 }
 
@@ -530,14 +533,8 @@ async fn get_loader_fields_variants() {
         assert_eq!(
             game_version_versions,
             [
-                "1.20.5",
-                "1.20.4",
-                "1.20.3",
-                "1.20.2",
-                "1.20.1",
-                "18w43b",
-                "1.13.2",
-                "1.3"
+                "1.20.5", "1.20.4", "1.20.3", "1.20.2", "1.20.1", "18w43b",
+                "1.13.2", "1.3"
             ]
         );
     })

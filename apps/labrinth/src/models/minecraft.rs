@@ -11,7 +11,9 @@ use minecraft_meta_model::{
 };
 use serde_json::Value;
 
-use crate::models::exp::minecraft::{Environment, ModVersionEdit, MrpackLoader};
+use crate::models::exp::minecraft::{
+    Environment, ModVersionEdit, MrpackLoader,
+};
 
 pub fn minecraft_version_date(version: &MinecraftVersion) -> DateTime<Utc> {
     let timestamp = version.catalog_entry.0.release_time;
@@ -55,9 +57,14 @@ pub fn parse_minecraft_fields(
                 edit.environment = Some(if value.is_null() {
                     None
                 } else {
-                    Some(value.as_str()
-                        .ok_or_else(|| eyre!("`environment` must be a string"))?
-                        .parse::<Environment>()?)
+                    Some(
+                        value
+                            .as_str()
+                            .ok_or_else(|| {
+                                eyre!("`environment` must be a string")
+                            })?
+                            .parse::<Environment>()?,
+                    )
                 });
             }
             "mrpack_loaders" => {
@@ -75,11 +82,15 @@ pub fn parse_minecraft_fields(
 }
 
 fn string_array<'a>(value: &'a Value, field: &str) -> Result<Vec<&'a str>> {
-    value.as_array()
+    value
+        .as_array()
         .ok_or_else(|| eyre!("`{field}` must be an array"))?
         .iter()
-        .map(|value| value.as_str()
-            .ok_or_else(|| eyre!("`{field}` must contain only strings")))
+        .map(|value| {
+            value
+                .as_str()
+                .ok_or_else(|| eyre!("`{field}` must contain only strings"))
+        })
         .collect()
 }
 
@@ -100,7 +111,8 @@ pub(crate) const HALL_OF_SHAME: [(&str, &str); 12] = [
 ];
 
 pub(crate) fn legacy_game_version_name(name: &str) -> &str {
-    HALL_OF_SHAME.iter()
+    HALL_OF_SHAME
+        .iter()
         .find_map(|(canonical, legacy)| (*canonical == name).then_some(*legacy))
         .unwrap_or(name)
 }
@@ -115,7 +127,12 @@ pub(crate) static HALL_OF_SHAME_2: LazyLock<[(&str, DateTime<Utc>); 4]> =
             ("13w37b", "2013-09-13T10:54:42+00:00"),
         ]
         .map(|(version, date)| {
-            (version, DateTime::parse_from_rfc3339(date).unwrap().with_timezone(&Utc))
+            (
+                version,
+                DateTime::parse_from_rfc3339(date)
+                    .unwrap()
+                    .with_timezone(&Utc),
+            )
         })
     });
 
@@ -123,7 +140,10 @@ pub(crate) fn legacy_game_version_date(
     name: &str,
     date: DateTime<Utc>,
 ) -> DateTime<Utc> {
-    HALL_OF_SHAME_2.iter()
-        .find_map(|(version, corrected)| (*version == name).then_some(*corrected))
+    HALL_OF_SHAME_2
+        .iter()
+        .find_map(|(version, corrected)| {
+            (*version == name).then_some(*corrected)
+        })
         .unwrap_or(date)
 }

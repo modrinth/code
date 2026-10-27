@@ -6,17 +6,35 @@
       {
         "ordinal": 0,
         "name": "report_id!: DelphiReportId",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "delphi_reports",
+            "name": "id"
+          }
+        }
       },
       {
         "ordinal": 1,
         "name": "file_id!: DBFileId",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "delphi_reports",
+            "name": "file_id"
+          }
+        }
       },
       {
         "ordinal": 2,
         "name": "created",
-        "type_info": "Timestamptz"
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "delphi_reports",
+            "name": "created"
+          }
+        }
       },
       {
         "ordinal": 3,
@@ -34,6 +52,12 @@
                 "malware"
               ]
             }
+          }
+        },
+        "origin": {
+          "Table": {
+            "table": "delphi_reports",
+            "name": "severity"
           }
         }
       }

@@ -6,52 +6,112 @@
       {
         "ordinal": 0,
         "name": "id",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "threads_issues",
+            "name": "id"
+          }
+        }
       },
       {
         "ordinal": 1,
         "name": "thread_id",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "threads_issues",
+            "name": "thread_id"
+          }
+        }
       },
       {
         "ordinal": 2,
         "name": "created_by",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "threads_issues",
+            "name": "created_by"
+          }
+        }
       },
       {
         "ordinal": 3,
         "name": "why",
-        "type_info": "Jsonb"
+        "type_info": "Jsonb",
+        "origin": {
+          "Table": {
+            "table": "threads_issues",
+            "name": "why"
+          }
+        }
       },
       {
         "ordinal": 4,
         "name": "user_addressed",
-        "type_info": "Bool"
+        "type_info": "Bool",
+        "origin": {
+          "Table": {
+            "table": "threads_issue_facets",
+            "name": "user_addressed"
+          }
+        }
       },
       {
         "ordinal": 5,
         "name": "moderator_verified",
-        "type_info": "Bool"
+        "type_info": "Bool",
+        "origin": {
+          "Table": {
+            "table": "threads_issue_facets",
+            "name": "moderator_verified"
+          }
+        }
       },
       {
         "ordinal": 6,
         "name": "created_at",
-        "type_info": "Timestamptz"
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "threads_issues",
+            "name": "created_at"
+          }
+        }
       },
       {
         "ordinal": 7,
         "name": "facet_id!",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "threads_issue_facets",
+            "name": "id"
+          }
+        }
       },
       {
         "ordinal": 8,
         "name": "what: Json<ThreadIssueTarget>",
-        "type_info": "Jsonb"
+        "type_info": "Jsonb",
+        "origin": {
+          "Table": {
+            "table": "threads_issue_facets",
+            "name": "what"
+          }
+        }
       },
       {
         "ordinal": 9,
         "name": "verdict",
-        "type_info": "Varchar"
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "threads_issue_facets",
+            "name": "verdict"
+          }
+        }
       }
     ],
     "parameters": {

@@ -135,7 +135,7 @@ vars! {
     LABRINTH_SUBSCRIPTIONS_KEY: String = "";
     RATE_LIMIT_IGNORE_KEY: String = "";
     DATABASE_URL: String = "postgresql://labrinth:labrinth@localhost/labrinth";
-	MINECRAFT_META_DATABASE_URL: Url;
+    MINECRAFT_META_DATABASE_URL: Url;
 
     // Redis
     REDIS_TOPOLOGY: RedisTopology = RedisTopology::Standalone;

@@ -7,10 +7,11 @@ use minecraft_meta_model::model::{MinecraftVersion, MinecraftVersionName};
 use tokio::sync::{Mutex, RwLock};
 
 use crate::database::MinecraftMetaDb;
-use crate::models::minecraft::{legacy_game_version_name, minecraft_version_date};
+use crate::models::minecraft::{
+    legacy_game_version_name, minecraft_version_date,
+};
 
 const CACHE_EXPIRY: Duration = Duration::from_secs(30 * 60);
-
 
 /// Shared Minecraft metadata refreshed on demand after thirty minutes.
 pub struct MinecraftMeta {
@@ -46,14 +47,18 @@ impl MinecraftMeta {
         let mut cache = self.cache.write().await;
         *cache = Arc::clone(&versions);
         self.expires_at.store(
-            self.clock_origin.elapsed().as_secs().saturating_add(CACHE_EXPIRY.as_secs()),
+            self.clock_origin
+                .elapsed()
+                .as_secs()
+                .saturating_add(CACHE_EXPIRY.as_secs()),
             Ordering::Release,
         );
         Ok(versions)
     }
 
     fn is_expired(&self) -> bool {
-        self.clock_origin.elapsed().as_secs() >= self.expires_at.load(Ordering::Acquire)
+        self.clock_origin.elapsed().as_secs()
+            >= self.expires_at.load(Ordering::Acquire)
     }
 
     pub async fn validate_minecraft_versions(
@@ -76,7 +81,9 @@ impl MinecraftMeta {
     }
 
     async fn load_versions(db: &toasty::Db) -> Result<Arc<[MinecraftVersion]>> {
-        let mut connection = db.connection().await
+        let mut connection = db
+            .connection()
+            .await
             .wrap_err("acquiring minecraft-meta connection")?;
         let mut versions = MinecraftVersion::all()
             .exec(&mut connection)

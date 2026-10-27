@@ -1,6 +1,6 @@
 use crate::models::exp::{
     base,
-	component::{self, Component, ComponentKind},
+    component::{self, Component, ComponentKind},
     minecraft,
 };
 
@@ -11,8 +11,10 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 use validator::Validate;
 
-pub trait VersionComponent: Component<EntityId = crate::models::ids::VersionId> {
-	fn kind() -> VersionComponentKind;
+pub trait VersionComponent:
+    Component<EntityId = crate::models::ids::VersionId>
+{
+    fn kind() -> VersionComponentKind;
 }
 
 macro_rules! define_version_components {
@@ -140,7 +142,7 @@ type Edit<T> = <T as Component>::Edit;
 type Query<T> = <T as Component>::Query;
 
 define_version_components![
-	(minecraft_mod, MinecraftMod): minecraft::ModVersion,
+    (minecraft_mod, MinecraftMod): minecraft::ModVersion,
     (minecraft_java_server, MinecraftJavaServer): minecraft::JavaServerVersion,
 ];
 
@@ -162,12 +164,12 @@ pub async fn fetch_query_context(
 }
 
 component::relations! {
-	pub static VERSION_COMPONENT_RELATIONS: VersionComponentKind = {
-		use VersionComponentKind::*;
+    pub static VERSION_COMPONENT_RELATIONS: VersionComponentKind = {
+        use VersionComponentKind::*;
 
-		[
-			[MinecraftMod].only(),
-			[MinecraftJavaServer].only(),
-		]
-	}
+        [
+            [MinecraftMod].only(),
+            [MinecraftJavaServer].only(),
+        ]
+    }
 }

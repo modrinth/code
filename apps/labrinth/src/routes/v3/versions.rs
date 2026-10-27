@@ -766,7 +766,9 @@ pub(crate) async fn version_edit_in_transaction(
                     )
                     .fetch_all(&mut *transaction)
                     .await
-                    .wrap_internal_err("fetching version loaders from database")?
+                    .wrap_internal_err(
+                        "fetching version loaders from database",
+                    )?
                     .into_iter()
                     .map(|row| database::models::ids::LoaderId(row.loader_id))
                     .collect::<Vec<_>>()
@@ -1102,7 +1104,9 @@ pub(crate) async fn auto_featured_filters(
     let game_versions = minecraft_meta
         .minecraft_versions()
         .await
-        .wrap_internal_err("fetching minecraft versions for automatic featured filters")?;
+        .wrap_internal_err(
+            "fetching minecraft versions for automatic featured filters",
+        )?;
     Ok(game_versions
         .iter()
         .filter(|version| {

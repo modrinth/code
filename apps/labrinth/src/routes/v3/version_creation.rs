@@ -519,15 +519,15 @@ async fn version_create_inner(
     .await?;
 
     let loader_structs = selected_loaders.unwrap_or_default();
-	let all_project_types = loader_structs
-		.iter()
-		.flat_map(|loader| loader.supported_project_types.clone())
-		.collect();
-	let all_games = if loader_structs.is_empty() {
-		Vec::new()
-	} else {
-		vec!["minecraft-java".to_owned()]
-	};
+    let all_project_types = loader_structs
+        .iter()
+        .flat_map(|loader| loader.supported_project_types.clone())
+        .collect();
+    let all_games = if loader_structs.is_empty() {
+        Vec::new()
+    } else {
+        vec!["minecraft-java".to_owned()]
+    };
 
     let response = Version {
         id: builder.version_id.into(),
@@ -1225,7 +1225,7 @@ pub async fn validate_minecraft_component(
     loaders: &[models::loader_item::Loader],
 ) -> eyre::Result<()> {
     eyre::ensure!(
-		!loaders.is_empty(),
+        !loaders.is_empty(),
         "Minecraft fields do not apply to the supplied loaders"
     );
     eyre::ensure!(
@@ -1254,7 +1254,7 @@ pub async fn create_minecraft_component(
             typed.is_none() || fields.is_empty(),
             "cannot combine typed and flattened Minecraft fields"
         );
-		let applies = !loaders.is_empty();
+        let applies = !loaders.is_empty();
         if !applies && typed.is_none() && fields.is_empty() {
             return Ok(None);
         }

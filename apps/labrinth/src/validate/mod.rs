@@ -1,4 +1,3 @@
-use actix_web::web;
 use crate::database::PgTransaction;
 use crate::database::models::loader_item::Loader as DBLoader;
 use crate::database::models::version_item::DependencyBuilder;
@@ -21,6 +20,7 @@ use crate::validate::risugami::RisugamiValidator;
 use crate::validate::shader::{
     CanvasShaderValidator, CoreShaderValidator, ShaderValidator,
 };
+use actix_web::web;
 use bytes::Bytes;
 use chrono::{DateTime, Utc};
 use eyre::WrapErr as _;

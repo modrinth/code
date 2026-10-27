@@ -6,7 +6,8 @@
       {
         "ordinal": 0,
         "name": "pg_try_advisory_xact_lock",
-        "type_info": "Bool"
+        "type_info": "Bool",
+        "origin": "Expression"
       }
     ],
     "parameters": {

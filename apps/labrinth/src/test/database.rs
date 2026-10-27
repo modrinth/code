@@ -197,7 +197,9 @@ impl TemporaryDatabase {
                 if !dummy_data_exists {
                     super::db::add_minecraft_meta_dummy_data(&pool)
                         .await
-                        .expect("Minecraft metadata fixture initialization failed");
+                        .expect(
+                            "Minecraft metadata fixture initialization failed",
+                        );
                     // Add dummy data
                     let name = generate_random_name("test_template_");
                     let db = TemporaryDatabase {

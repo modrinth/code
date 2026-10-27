@@ -17,6 +17,12 @@
               ]
             }
           }
+        },
+        "origin": {
+          "Table": {
+            "table": "delphi_file_scans",
+            "name": "outcome"
+          }
         }
       }
     ],

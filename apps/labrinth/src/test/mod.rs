@@ -55,7 +55,6 @@ pub async fn setup(db: &database::TemporaryDatabase) -> LabrinthConfig {
             .expect("Kafka connection failed"),
     );
 
-
     let minecraft_meta_db =
         crate::database::MinecraftMetaDb::connect_url(&db.database_url)
             .await

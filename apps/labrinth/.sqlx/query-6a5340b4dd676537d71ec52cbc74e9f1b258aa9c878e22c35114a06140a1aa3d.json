@@ -6,17 +6,35 @@
       {
         "ordinal": 0,
         "name": "team_id",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "team_members",
+            "name": "team_id"
+          }
+        }
       },
       {
         "ordinal": 1,
         "name": "user_id",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "team_members",
+            "name": "user_id"
+          }
+        }
       },
       {
         "ordinal": 2,
         "name": "role",
-        "type_info": "Varchar"
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "team_members",
+            "name": "role"
+          }
+        }
       }
     ],
     "parameters": {

@@ -6,7 +6,13 @@
       {
         "ordinal": 0,
         "name": "issue_detail_id!",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "delphi_issue_details_with_statuses",
+            "name": "id"
+          }
+        }
       }
     ],
     "parameters": {

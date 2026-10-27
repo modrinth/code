@@ -6,7 +6,13 @@
       {
         "ordinal": 0,
         "name": "mod_id",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "mod_follows",
+            "name": "mod_id"
+          }
+        }
       }
     ],
     "parameters": {

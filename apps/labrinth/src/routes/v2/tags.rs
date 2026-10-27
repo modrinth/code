@@ -1,11 +1,11 @@
-use crate::util::error::{ApiContext as _, Context as _};
 use crate::util::MinecraftMeta;
+use crate::util::error::{ApiContext as _, Context as _};
 
 use super::ApiError;
-use crate::models::minecraft::{
-	legacy_game_version_date, legacy_game_version_name,
-};
 use crate::database::PgPool;
+use crate::models::minecraft::{
+    legacy_game_version_date, legacy_game_version_name,
+};
 use crate::models::v2::projects::LegacySideType;
 use crate::routes::v2_reroute::capitalize_first;
 use crate::routes::v3::tags::LinkPlatformQueryData;
@@ -187,46 +187,52 @@ pub struct GameVersionQuery {
 )]
 #[get("/game_version")]
 pub async fn game_version_list(
-	minecraft_meta: web::Data<MinecraftMeta>,
-	query: web::Query<GameVersionQuery>,
+    minecraft_meta: web::Data<MinecraftMeta>,
+    query: web::Query<GameVersionQuery>,
 ) -> Result<web::Json<Vec<GameVersionQueryData>>, ApiError> {
-	let versions = minecraft_meta
-		.minecraft_versions()
-		.await
-		.wrap_internal_err("fetching minecraft-meta game versions")?;
-	let mut versions = versions
-		.iter()
-		.map(|row| {
-			let entry = &row.catalog_entry.0;
-			let version_type = match entry.ty {
-				VersionType::Release => "release",
-				VersionType::Snapshot => "snapshot",
-				VersionType::OldAlpha => "alpha",
-				VersionType::OldBeta => "beta",
-			};
-			let date = DateTime::<Utc>::from_timestamp(
-				entry.release_time.as_second(),
-				entry.release_time.subsec_nanosecond() as u32,
-			)
-			.ok_or_else(|| ApiError::Internal(eyre::eyre!(
-				"minecraft-meta release timestamp is out of range"
-			)))?;
-			Ok(GameVersionQueryData {
-				version: legacy_game_version_name(&row.name.to_string()).to_owned(),
-				version_type: version_type.to_owned(),
-				date: legacy_game_version_date(&row.name.to_string(), date),
-				major: matches!(entry.ty, VersionType::Release),
-			})
-		})
-		.collect::<Result<Vec<_>, ApiError>>()?;
-	versions.retain(|version| {
-		query.type_.as_ref().is_none_or(|ty| ty == &version.version_type)
-			&& query.major.is_none_or(|major| major == version.major)
-	});
-	versions.sort_unstable_by(|a, b| {
-		b.date.cmp(&a.date).then_with(|| a.version.cmp(&b.version))
-	});
-	Ok(web::Json(versions))
+    let versions = minecraft_meta
+        .minecraft_versions()
+        .await
+        .wrap_internal_err("fetching minecraft-meta game versions")?;
+    let mut versions = versions
+        .iter()
+        .map(|row| {
+            let entry = &row.catalog_entry.0;
+            let version_type = match entry.ty {
+                VersionType::Release => "release",
+                VersionType::Snapshot => "snapshot",
+                VersionType::OldAlpha => "alpha",
+                VersionType::OldBeta => "beta",
+            };
+            let date = DateTime::<Utc>::from_timestamp(
+                entry.release_time.as_second(),
+                entry.release_time.subsec_nanosecond() as u32,
+            )
+            .ok_or_else(|| {
+                ApiError::Internal(eyre::eyre!(
+                    "minecraft-meta release timestamp is out of range"
+                ))
+            })?;
+            Ok(GameVersionQueryData {
+                version: legacy_game_version_name(&row.name.to_string())
+                    .to_owned(),
+                version_type: version_type.to_owned(),
+                date: legacy_game_version_date(&row.name.to_string(), date),
+                major: matches!(entry.ty, VersionType::Release),
+            })
+        })
+        .collect::<Result<Vec<_>, ApiError>>()?;
+    versions.retain(|version| {
+        query
+            .type_
+            .as_ref()
+            .is_none_or(|ty| ty == &version.version_type)
+            && query.major.is_none_or(|major| major == version.major)
+    });
+    versions.sort_unstable_by(|a, b| {
+        b.date.cmp(&a.date).then_with(|| a.version.cmp(&b.version))
+    });
+    Ok(web::Json(versions))
 }
 
 #[derive(serde::Serialize, utoipa::ToSchema)]

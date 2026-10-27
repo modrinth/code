@@ -1087,19 +1087,19 @@ async fn project_create_inner(
             .flat_map(|v| v.loaders.clone())
             .unique()
             .collect::<Vec<_>>();
-		let project_types = Loader::list(&mut *transaction, redis)
-			.await?
-			.into_iter()
-			.filter(|loader| loaders.contains(&loader.id))
-			.flat_map(|loader| loader.supported_project_types)
-			.collect();
-		let games = if loaders.is_empty()
-			|| project_builder.components.minecraft_server.is_some()
-		{
-			Vec::new()
-		} else {
-			vec!["minecraft-java".to_owned()]
-		};
+        let project_types = Loader::list(&mut *transaction, redis)
+            .await?
+            .into_iter()
+            .filter(|loader| loaders.contains(&loader.id))
+            .flat_map(|loader| loader.supported_project_types)
+            .collect();
+        let games = if loaders.is_empty()
+            || project_builder.components.minecraft_server.is_some()
+        {
+            Vec::new()
+        } else {
+            vec!["minecraft-java".to_owned()]
+        };
 
         let response = crate::models::projects::Project {
             id: project_id,

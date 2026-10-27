@@ -6,12 +6,19 @@
       {
         "ordinal": 0,
         "name": "project_id!: DBProjectId",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "delphi_tech_review_queue",
+            "name": "project_id"
+          }
+        }
       },
       {
         "ordinal": 1,
         "name": "thread_id!: DBThreadId",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": "Expression"
       }
     ],
     "parameters": {

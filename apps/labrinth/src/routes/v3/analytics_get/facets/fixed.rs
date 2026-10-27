@@ -3,8 +3,8 @@ use super::{
     AnalyticsFacets, ProjectDownloadsFacets, ProjectPlaytimeFacets,
     ProjectViewsFacets,
 };
-use crate::util::error::ApiContext as _;
 use crate::util::MinecraftMeta;
+use crate::util::error::ApiContext as _;
 use crate::{
     database::PgPool, models::v3::analytics::DownloadReason, routes::ApiError,
     util::tags::valid_download_tags,
