@@ -281,7 +281,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 	const { formatMessage } = useVIntl()
 	const { notifySharedInstanceError } = useSharedInstanceErrors()
 	const queryClient = useQueryClient()
-	const { sharedInstances: uninstalledSharedInstances, setHidden: setSharedInstanceHidden } =
+	const { sharedInstances: uninstalledSharedInstances, setHidden: setInstanceHidden } =
 		useUninstalledSharedInstances(instances)
 
 	const search = librarySearch
@@ -1671,7 +1671,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 	}
 
 	const hideUninstalledSharedInstance = async (instance: UninstalledSharedInstance) => {
-		await setSharedInstanceHidden(instance.shared_instance_id, true)
+		await setInstanceHidden(instance.id, true)
 		addNotification({
 			title: formatMessage(hiddenSharedInstanceMessages.title),
 			text: formatMessage(hiddenSharedInstanceMessages.text),

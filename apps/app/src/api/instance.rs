@@ -126,8 +126,8 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             instance_share_leave_remote,
             instance_share_get_cached_library,
             instance_share_cache_library,
-            instance_share_get_hidden_ids,
-            instance_share_set_hidden,
+            instance_get_hidden_ids,
+            instance_set_hidden,
             instance_share_dismiss_restored_notice,
             instance_export_mrpack,
             instance_get_pack_export_candidates,
@@ -1553,17 +1553,16 @@ pub async fn instance_share_cache_library(
 }
 
 #[tauri::command]
-pub async fn instance_share_get_hidden_ids() -> Result<Vec<String>> {
-    Ok(theseus::instance::get_hidden_shared_instance_ids().await?)
+pub async fn instance_get_hidden_ids() -> Result<Vec<String>> {
+    Ok(theseus::instance::get_hidden_instance_ids().await?)
 }
 
 #[tauri::command]
-pub async fn instance_share_set_hidden(
-    shared_instance_id: &str,
+pub async fn instance_set_hidden(
+    instance_id: &str,
     hidden: bool,
 ) -> Result<()> {
-    theseus::instance::set_shared_instance_hidden(shared_instance_id, hidden)
-        .await?;
+    theseus::instance::set_instance_hidden(instance_id, hidden).await?;
     Ok(())
 }
 

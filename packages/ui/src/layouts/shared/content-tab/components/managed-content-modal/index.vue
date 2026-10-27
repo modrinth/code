@@ -513,6 +513,7 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 			<Avatar
 				v-if="props.sourceIconUrl"
 				:src="props.sourceIconUrl"
+				cache-icon
 				:alt="props.sourceName"
 				size="3rem"
 				:tint-by="props.sourceName"

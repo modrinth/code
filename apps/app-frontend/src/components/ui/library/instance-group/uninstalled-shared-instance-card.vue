@@ -141,18 +141,15 @@ const handleKeydown = (event: KeyboardEvent) => {
 				:is-owner="isOwner"
 				:compact="compact"
 			/>
-		</template>
-		<template #leading="{ compact }">
 			<div
-				v-if="!loading && !isLibraryInstanceSelectionActive"
-				class="absolute flex origin-bottom-right scale-75 items-center gap-1.5 opacity-0 transition-[opacity,transform] group-hover/card:scale-100 group-hover/card:opacity-100"
-				:class="compact ? 'right-0' : 'bottom-1 right-1'"
+				v-if="!compact && !loading && !isLibraryInstanceSelectionActive"
+				class="absolute bottom-2 right-2 z-[2] flex origin-bottom-right scale-90 items-center gap-1.5 opacity-0 transition-[opacity,transform] group-hover/card:scale-100 group-hover/card:opacity-100"
 			>
 				<IconButton
 					v-tooltip="formatMessage(messages.hideFromLibrary)"
 					:label="formatMessage(messages.hideFromLibrary)"
-					:size="compact ? 'sm' : 'md'"
-					class="!rounded-full"
+					size="sm"
+					class="border border-solid border-surface-5 !bg-surface-4"
 					@click.stop="hideUninstalledSharedInstance(instance)"
 				>
 					<XIcon />
@@ -160,13 +157,28 @@ const handleKeydown = (event: KeyboardEvent) => {
 				<Button
 					type="colored"
 					color="brand"
-					:size="compact ? 'sm' : 'md'"
+					size="sm"
+					class="!rounded-xl !px-2.5"
 					@click.stop="(event: MouseEvent) => installUninstalledSharedInstance(instance, event)"
 				>
 					<DownloadIcon />
 					{{ formatMessage(messages.install) }}
 				</Button>
 			</div>
+		</template>
+		<template #leading="{ compact }">
+			<IconButton
+				v-if="compact && !loading && !isLibraryInstanceSelectionActive"
+				v-tooltip="formatMessage(messages.install)"
+				:label="formatMessage(messages.install)"
+				type="colored"
+				color="brand"
+				size="md"
+				class="origin-bottom scale-75 opacity-0 transition-opacity group-hover/card:scale-100 group-hover/card:opacity-100"
+				@click.stop="(event: MouseEvent) => installUninstalledSharedInstance(instance, event)"
+			>
+				<DownloadIcon />
+			</IconButton>
 		</template>
 		<template #overlay="{ compact }">
 			<InstanceSelectionButton

@@ -1,13 +1,13 @@
 use chrono::Utc;
 
-pub async fn get_hidden_shared_instance_ids(
+pub async fn get_hidden_instance_ids(
     user_id: &str,
     exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
 ) -> crate::Result<Vec<String>> {
     let rows = sqlx::query!(
         "
-		SELECT shared_instance_id
-		FROM hidden_shared_instances
+		SELECT instance_id
+		FROM hidden_instances
 		WHERE user_id = ?
 		ORDER BY hidden_at DESC
 		",
@@ -16,24 +16,24 @@ pub async fn get_hidden_shared_instance_ids(
     .fetch_all(exec)
     .await?;
 
-    Ok(rows.into_iter().map(|row| row.shared_instance_id).collect())
+    Ok(rows.into_iter().map(|row| row.instance_id).collect())
 }
 
-pub async fn hide_shared_instance(
+pub async fn hide_instance(
     user_id: &str,
-    shared_instance_id: &str,
+    instance_id: &str,
     exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
 ) -> crate::Result<()> {
     let hidden_at = Utc::now().timestamp();
 
     sqlx::query!(
         "
-		INSERT INTO hidden_shared_instances (user_id, shared_instance_id, hidden_at)
+		INSERT INTO hidden_instances (user_id, instance_id, hidden_at)
 		VALUES (?, ?, ?)
-		ON CONFLICT (user_id, shared_instance_id) DO NOTHING
+		ON CONFLICT (user_id, instance_id) DO NOTHING
 		",
         user_id,
-        shared_instance_id,
+        instance_id,
         hidden_at,
     )
     .execute(exec)
@@ -42,18 +42,18 @@ pub async fn hide_shared_instance(
     Ok(())
 }
 
-pub async fn unhide_shared_instance(
+pub async fn unhide_instance(
     user_id: &str,
-    shared_instance_id: &str,
+    instance_id: &str,
     exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
 ) -> crate::Result<()> {
     sqlx::query!(
         "
-		DELETE FROM hidden_shared_instances
-		WHERE user_id = ? AND shared_instance_id = ?
+		DELETE FROM hidden_instances
+		WHERE user_id = ? AND instance_id = ?
 		",
         user_id,
-        shared_instance_id,
+        instance_id,
     )
     .execute(exec)
     .await?;

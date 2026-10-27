@@ -76,6 +76,7 @@
 						<AutoLink :to="creatorProfileLink" class="font-medium text-contrast hover:underline">
 							<Avatar
 								:src="creator.avatarUrl"
+								cache-icon
 								:alt="creator.username"
 								:tint-by="creator.username"
 								size="24px"

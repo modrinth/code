@@ -11,6 +11,7 @@ pub use files::{
 };
 mod get;
 mod groups;
+mod hidden;
 mod icon;
 mod install;
 mod lifecycle;
@@ -40,6 +41,7 @@ pub use self::groups::{
     create_group, delete_group, list_groups, rename_group,
     set_group_memberships, set_group_order,
 };
+pub use self::hidden::{get_hidden_instance_ids, set_instance_hidden};
 pub use self::icon::{
     cache_generated_icon, cache_remote_icon, edit_generated_icon,
     edit_generated_icon_if_empty, edit_icon, get_recent_icon_configs,
@@ -92,17 +94,15 @@ pub use self::shared::{
     can_active_user_use_shared_instances, create_shared_instance_invite_link,
     decline_pending_shared_instance_invite,
     dismiss_shared_instance_restored_notice,
-    get_cached_shared_instance_library, get_hidden_shared_instance_ids,
-    get_shared_instance_install_preview, get_shared_instance_invites,
-    get_shared_instance_publish_preview,
+    get_cached_shared_instance_library, get_shared_instance_install_preview,
+    get_shared_instance_invites, get_shared_instance_publish_preview,
     get_shared_instance_publish_support_details,
     get_shared_instance_update_preview, get_shared_instance_users,
     install_shared_instance, invite_shared_instance_users,
     leave_remote_shared_instance, publish_shared_instance,
     remove_shared_instance_users, revoke_shared_instance_invite,
-    set_shared_instance_hidden, unlink_shared_instance,
-    unpublish_remote_shared_instance, unpublish_shared_instance,
-    update_shared_instance,
+    unlink_shared_instance, unpublish_remote_shared_instance,
+    unpublish_shared_instance, update_shared_instance,
 };
 pub use self::synced_options::game_options::{
     CanonicalValue as GameOptionCanonicalValue, EditableGameSetting,

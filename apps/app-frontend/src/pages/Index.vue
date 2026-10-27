@@ -13,6 +13,7 @@ import RecentWorldsList from '@/components/ui/world/RecentWorldsList.vue'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { traceStartupStep } from '@/helpers/startup-debug'
 import { instanceListQueryOptions } from '@/pages/instance/query-options'
+import { skipCreateInstanceOnboarding } from '@/platform/app-lib/onboarding-checklist/commands'
 import { injectOnboardingChecklist } from '@/providers/onboarding-checklist'
 import { useRootBreadcrumb } from '@/shared/breadcrumbs'
 
@@ -53,6 +54,10 @@ useRootBreadcrumb({
 	visual: { type: 'icon', component: PlayIcon },
 })
 
+function skipWelcomeScreen() {
+	skipCreateInstanceOnboarding().catch(handleError)
+}
+
 const instancesQuery = useQuery(instanceListQueryOptions())
 const instances = computed(() => instancesQuery.data.value ?? [])
 if (hasCreatedInstance.value) {
@@ -89,7 +94,7 @@ function openPageContextMenu(event: MouseEvent) {
 </script>
 
 <template>
-	<WelcomeScreen v-if="isReady && !hasCreatedInstance" />
+	<WelcomeScreen v-if="isReady && !hasCreatedInstance" @skip="skipWelcomeScreen" />
 	<div
 		v-else-if="isReady"
 		data-library-page-background

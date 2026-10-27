@@ -201,7 +201,6 @@ pub use self::invites::{
 };
 pub use self::library::{
     cache_shared_instance_library, get_cached_shared_instance_library,
-    get_hidden_shared_instance_ids, set_shared_instance_hidden,
 };
 pub use self::publish::{
     get_shared_instance_publish_preview, leave_remote_shared_instance,

@@ -147,7 +147,10 @@ fn main() {
             .plugin(
                 "onboarding-checklist",
                 InlinedPlugin::new()
-                    .commands(&["get_onboarding_checklist"])
+                    .commands(&[
+                        "get_onboarding_checklist",
+                        "skip_create_instance_onboarding",
+                    ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,
                     ),
@@ -307,8 +310,8 @@ fn main() {
                         "instance_share_leave_remote",
                         "instance_share_get_cached_library",
                         "instance_share_cache_library",
-                        "instance_share_get_hidden_ids",
-                        "instance_share_set_hidden",
+                        "instance_get_hidden_ids",
+                        "instance_set_hidden",
                         "instance_share_dismiss_restored_notice",
                         "instance_export_mrpack",
                         "instance_get_pack_export_candidates",

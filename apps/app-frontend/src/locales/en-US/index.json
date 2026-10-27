@@ -206,17 +206,20 @@
   "app.behavior-settings.content.title": {
     "message": "Home and content"
   },
-  "app.behavior-settings.hidden-shared-instances.description": {
-    "message": "Shared instances you've hidden from your library on this device. Hidden instances aren't synced, and you're still a member of them."
+  "app.behavior-settings.hidden-instances.description": {
+    "message": "Instances you've hidden from your library on this device. Hidden instances aren't synced to your other devices."
   },
-  "app.behavior-settings.hidden-shared-instances.empty": {
-    "message": "You haven't hidden any shared instances. To hide one, click the × on a shared instance in your library that isn't installed."
+  "app.behavior-settings.hidden-instances.empty": {
+    "message": "You haven't hidden any instances."
   },
-  "app.behavior-settings.hidden-shared-instances.show-in-library": {
+  "app.behavior-settings.hidden-instances.more-options": {
+    "message": "More options"
+  },
+  "app.behavior-settings.hidden-instances.show-in-library": {
     "message": "Show in library"
   },
-  "app.behavior-settings.hidden-shared-instances.title": {
-    "message": "Hidden shared instances"
+  "app.behavior-settings.hidden-instances.title": {
+    "message": "Hidden instances"
   },
   "app.behavior-settings.refocus-on-game-close.description": {
     "message": "Bring Modrinth App to the foreground when Minecraft exits."
@@ -3680,8 +3683,14 @@
   "app.welcome-screen.import-prompt": {
     "message": "Escaping another launcher?"
   },
+  "app.welcome-screen.more-options": {
+    "message": "More options"
+  },
   "app.welcome-screen.quick-create-hint": {
     "message": "Press <shortcut>N</shortcut> to quick create an instance"
+  },
+  "app.welcome-screen.skip": {
+    "message": "Skip"
   },
   "app.welcome-screen.title": {
     "message": "Welcome to Modrinth"

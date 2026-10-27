@@ -6,8 +6,8 @@ import {
 	cache_shared_instance_library,
 	type CachedSharedInstanceSummary,
 	get_cached_shared_instance_library,
-	get_hidden_shared_instance_ids,
-	set_shared_instance_hidden,
+	get_hidden_instance_ids,
+	set_instance_hidden,
 } from '@/helpers/instance'
 import type { GameInstance, InstanceLoader } from '@/helpers/types'
 
@@ -27,15 +27,18 @@ export const sharedInstanceLibraryKeys = {
 	all: ['shared-instances', 'library'] as const,
 	cached: (userId: string | null) => [...sharedInstanceLibraryKeys.all, 'cached', userId] as const,
 	ids: (userId: string | null) => [...sharedInstanceLibraryKeys.all, 'ids', userId] as const,
-	hidden: (userId: string | null) =>
-		[...sharedInstanceLibraryKeys.all, 'hidden', userId] as const,
 	detail: (userId: string | null, sharedInstanceId: string) =>
 		[...sharedInstanceLibraryKeys.all, 'detail', userId, sharedInstanceId] as const,
 }
 
+const SHARED_INSTANCE_ID_PREFIX = 'shared-instance:'
+
+export const getUninstalledSharedInstanceId = (sharedInstanceId: string) =>
+	`${SHARED_INSTANCE_ID_PREFIX}${sharedInstanceId}`
+
 const fromCachedSummary = (summary: CachedSharedInstanceSummary): UninstalledSharedInstance => ({
 	type: 'uninstalled_shared_instance',
-	id: `shared-instance:${summary.shared_instance_id}`,
+	id: getUninstalledSharedInstanceId(summary.shared_instance_id),
 	shared_instance_id: summary.shared_instance_id,
 	role: summary.role,
 	manager_id: summary.manager_id,
@@ -62,15 +65,20 @@ export const cachedSharedInstanceLibraryQueryOptions = (userId: Ref<string | nul
 	staleTime: Infinity,
 })
 
-export function useHiddenSharedInstances() {
+export const hiddenInstanceKeys = {
+	all: ['hidden-instances'] as const,
+	ids: (userId: string | null) => [...hiddenInstanceKeys.all, userId] as const,
+}
+
+export function useHiddenInstances() {
 	const auth = injectAuth()
 	const queryClient = useQueryClient()
 	const { handleError } = injectNotificationManager()
 	const userId = computed(() => auth.user.value?.id ?? null)
 
 	const hiddenQuery = useQuery({
-		queryKey: computed(() => sharedInstanceLibraryKeys.hidden(userId.value)),
-		queryFn: get_hidden_shared_instance_ids,
+		queryKey: computed(() => hiddenInstanceKeys.ids(userId.value)),
+		queryFn: get_hidden_instance_ids,
 		enabled: computed(() => !!userId.value),
 		staleTime: Infinity,
 	})
@@ -78,23 +86,22 @@ export function useHiddenSharedInstances() {
 	const hiddenIds = computed(() => new Set(hiddenQuery.data.value ?? []))
 
 	const setHiddenMutation = useMutation({
-		mutationFn: ({ sharedInstanceId, hidden }: { sharedInstanceId: string; hidden: boolean }) =>
-			set_shared_instance_hidden(sharedInstanceId, hidden),
-		onMutate: ({ sharedInstanceId, hidden }) => {
-			const key = sharedInstanceLibraryKeys.hidden(userId.value)
-			queryClient.setQueryData<string[]>(key, (ids = []) =>
+		mutationFn: ({ instanceId, hidden }: { instanceId: string; hidden: boolean }) =>
+			set_instance_hidden(instanceId, hidden),
+		onMutate: ({ instanceId, hidden }) => {
+			queryClient.setQueryData<string[]>(hiddenInstanceKeys.ids(userId.value), (ids = []) =>
 				hidden
-					? [sharedInstanceId, ...ids.filter((id) => id !== sharedInstanceId)]
-					: ids.filter((id) => id !== sharedInstanceId),
+					? [instanceId, ...ids.filter((id) => id !== instanceId)]
+					: ids.filter((id) => id !== instanceId),
 			)
 		},
 		onError: handleError,
 		onSettled: () =>
-			queryClient.invalidateQueries({ queryKey: sharedInstanceLibraryKeys.hidden(userId.value) }),
+			queryClient.invalidateQueries({ queryKey: hiddenInstanceKeys.ids(userId.value) }),
 	})
 
-	const setHidden = (sharedInstanceId: string, hidden: boolean) =>
-		setHiddenMutation.mutateAsync({ sharedInstanceId, hidden })
+	const setHidden = (instanceId: string, hidden: boolean) =>
+		setHiddenMutation.mutateAsync({ instanceId, hidden })
 
 	return { hiddenIds, hiddenIdsLoaded: computed(() => hiddenQuery.isSuccess.value), setHidden }
 }
@@ -146,7 +153,7 @@ export function useUninstalledSharedInstances(instances: Ref<GameInstance[]>) {
 
 		return {
 			type: 'uninstalled_shared_instance',
-			id: `shared-instance:${sharedInstanceId}`,
+			id: getUninstalledSharedInstanceId(sharedInstanceId),
 			shared_instance_id: sharedInstanceId,
 			role: isOwner ? 'owner' : 'member',
 			manager_id: isOwner ? null : ownerId,
@@ -209,21 +216,23 @@ export function useUninstalledSharedInstances(instances: Ref<GameInstance[]>) {
 		)
 	})
 
-	const { hiddenIds, hiddenIdsLoaded, setHidden } = useHiddenSharedInstances()
+	const { hiddenIds, hiddenIdsLoaded, setHidden } = useHiddenInstances()
 
 	watch(
 		() => idsQuery.isSuccess.value && hiddenIdsLoaded.value,
 		(ready) => {
 			if (!ready) return
-			const uninstalled = new Set(uninstalledIds.value)
-			for (const sharedInstanceId of hiddenIds.value) {
-				if (!uninstalled.has(sharedInstanceId)) void setHidden(sharedInstanceId, false)
+			const uninstalled = new Set(uninstalledIds.value.map(getUninstalledSharedInstanceId))
+			for (const instanceId of hiddenIds.value) {
+				if (instanceId.startsWith(SHARED_INSTANCE_ID_PREFIX) && !uninstalled.has(instanceId)) {
+					void setHidden(instanceId, false)
+				}
 			}
 		},
 	)
 
 	const visibleSharedInstances = computed(() =>
-		sharedInstances.value.filter((instance) => !hiddenIds.value.has(instance.shared_instance_id)),
+		sharedInstances.value.filter((instance) => !hiddenIds.value.has(instance.id)),
 	)
 
 	return { sharedInstances: visibleSharedInstances, setHidden }

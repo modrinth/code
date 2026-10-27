@@ -79,7 +79,7 @@ pub use self::mr_auth::*;
 mod legacy_converter;
 
 pub mod attached_world_data;
-pub mod hidden_shared_instances;
+pub mod hidden_instances;
 pub mod server_join_log;
 
 enum StartupPhase {
