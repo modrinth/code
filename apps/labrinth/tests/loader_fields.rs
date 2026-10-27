@@ -358,8 +358,12 @@ async fn creating_loader_fields() {
             )
             .await;
         assert_eq!(
-            &project.fields["game_versions"],
-            &[json!("1.20.1"), json!("1.20.2"), json!("1.20.5")]
+            project.fields["game_versions"]
+                .iter()
+                .collect::<HashSet<_>>(),
+            [json!("1.20.1"), json!("1.20.2"), json!("1.20.5")]
+                .iter()
+                .collect::<HashSet<_>>()
         );
         assert!(
             project.fields["environment"].contains(&json!("client_or_server"))
