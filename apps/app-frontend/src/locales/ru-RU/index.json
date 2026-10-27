@@ -395,9 +395,6 @@
   "app.download-manager.title": {
     "message": "Управление загрузками"
   },
-  "app.download-manager.verifying": {
-    "message": "Проверка"
-  },
   "app.error.state-init.open-backups-folder": {
     "message": "Открыть папку резервных копий"
   },
@@ -2789,9 +2786,6 @@
   "app.settings.resource-management.maximum-concurrent-writes.title": {
     "message": "Лимит одновременных записей"
   },
-  "app.settings.resource-management.store.attention": {
-    "message": "Остались проблемные файлы"
-  },
   "app.settings.resource-management.store.cache-limit.description": {
     "message": "Хранить указанный объём лишнего контента для будущих установок. Это может ускорить скачивание."
   },
@@ -2819,23 +2813,8 @@
   "app.settings.resource-management.store.description": {
     "message": "Экономьте место, используя общие файлы игры и контент в сборках."
   },
-  "app.settings.resource-management.store.issues": {
-    "message": "Посмотреть {count, plural, one {# проблему} few {# проблемы} other {# проблем}}"
-  },
   "app.settings.resource-management.store.nothing-to-clear": {
     "message": "В хранилище нет лишнего контента."
-  },
-  "app.settings.resource-management.store.repair": {
-    "message": "Проверить и исправить"
-  },
-  "app.settings.resource-management.store.repair.running-description": {
-    "message": "Все активные сборки будут закрыты."
-  },
-  "app.settings.resource-management.store.repair.verify-description": {
-    "message": "Проверить целостность файлов и исправить найденные проблемы."
-  },
-  "app.settings.resource-management.store.repairing": {
-    "message": "Проверка и исправление..."
   },
   "app.settings.resource-management.store.shared.label": {
     "message": "Общий"
@@ -2851,12 +2830,6 @@
   },
   "app.settings.resource-management.store.unused.label": {
     "message": "Лишний"
-  },
-  "app.settings.resource-management.store.verification-result": {
-    "message": "Проверено файлов: {checked, plural, other {#}}, исправлено: {repaired, plural, other {#}}."
-  },
-  "app.settings.resource-management.store.verified": {
-    "message": "Проверка завершена"
   },
   "app.settings.synced-options.choose-sync-source.command-history-description": {
     "message": "Выберете, из какой сборки копировать историю команд. Эта история нужна только для первоначальной синхронизации, после чего её можно изменить."

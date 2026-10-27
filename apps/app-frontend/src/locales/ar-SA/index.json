@@ -341,9 +341,6 @@
   "app.download-manager.title": {
     "message": "مدير التحميل"
   },
-  "app.download-manager.verifying": {
-    "message": "يتم التحقق"
-  },
   "app.error.state-init.open-backups-folder": {
     "message": "فتح مجلد النسخ الاحتياطية"
   },

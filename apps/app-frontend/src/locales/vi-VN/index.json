@@ -395,9 +395,6 @@
   "app.download-manager.title": {
     "message": "Trình quản lý tải xuống"
   },
-  "app.download-manager.verifying": {
-    "message": "Đang xác minh"
-  },
   "app.error.state-init.open-backups-folder": {
     "message": "Mở thư mục sao lưu"
   },
@@ -2810,9 +2807,6 @@
   "app.settings.resource-management.maximum-concurrent-writes.title": {
     "message": "Số lượt ghi đồng thời tối đa"
   },
-  "app.settings.resource-management.store.attention": {
-    "message": "Một số tệp vẫn cần xử lý"
-  },
   "app.settings.resource-management.store.cache-limit.description": {
     "message": "Giữ tối đa lượng nội dung không dùng này cho các lần cài sau. Giữ nhiều hơn có thể tiết kiệm thời gian tải xuống."
   },
@@ -2840,23 +2834,8 @@
   "app.settings.resource-management.store.description": {
     "message": "Tiết kiệm dung lượng bằng cách tái sử dụng tệp trò chơi, mod và gói giữa các bản cài đặt."
   },
-  "app.settings.resource-management.store.issues": {
-    "message": "Xem {count, plural, one {# vấn đề} other {# vấn đề}}"
-  },
   "app.settings.resource-management.store.nothing-to-clear": {
     "message": "Không có nội dung không dùng để xóa."
-  },
-  "app.settings.resource-management.store.repair": {
-    "message": "Xác minh và sửa chữa"
-  },
-  "app.settings.resource-management.store.repair.running-description": {
-    "message": "Thao tác này sẽ đóng mọi bản cài đặt đang chạy."
-  },
-  "app.settings.resource-management.store.repair.verify-description": {
-    "message": "Kiểm tra các tệp bị thiếu hoặc hỏng và sửa chúng."
-  },
-  "app.settings.resource-management.store.repairing": {
-    "message": "Đang xác minh và sửa chữa…"
   },
   "app.settings.resource-management.store.shared.label": {
     "message": "Dùng chung"
@@ -2872,12 +2851,6 @@
   },
   "app.settings.resource-management.store.unused.label": {
     "message": "Không còn được sử dụng"
-  },
-  "app.settings.resource-management.store.verification-result": {
-    "message": "Đã kiểm tra {checked, plural, one {# tệp} other {# tệp}} và thực hiện {repaired, plural, one {# lần sửa} other {# lần sửa}}."
-  },
-  "app.settings.resource-management.store.verified": {
-    "message": "Xác minh hoàn tất"
   },
   "app.settings.synced-options.choose-sync-source.command-history-description": {
     "message": "Chọn bản cài đặt để sao chép lịch sử lệnh. Lịch sử này chỉ được dùng cho lần đồng bộ đầu tiên và sau đó bạn có thể chỉnh sửa từ bất kỳ bản cài đặt nào."

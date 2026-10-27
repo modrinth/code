@@ -395,9 +395,6 @@
   "app.download-manager.title": {
     "message": "Hämtningshanterare"
   },
-  "app.download-manager.verifying": {
-    "message": "Verifierar"
-  },
   "app.error.state-init.open-backups-folder": {
     "message": "Öppna mappen för säkerhetskopior"
   },
@@ -2510,17 +2507,8 @@
   "app.settings.resource-management.store.description": {
     "message": "Spara på lagringsutrymme genom att återanvända spelinstallationer, moddar och paket mellan dina instanser."
   },
-  "app.settings.resource-management.store.issues": {
-    "message": "Visa {count, plural, one {# fel} other {# fel}}"
-  },
   "app.settings.resource-management.store.nothing-to-clear": {
     "message": "Inget innehåll att rensa."
-  },
-  "app.settings.resource-management.store.repair": {
-    "message": "Verifiera och reparera"
-  },
-  "app.settings.resource-management.store.repairing": {
-    "message": "Verifierar och reparerar…"
   },
   "app.settings.resource-management.store.shared.label": {
     "message": "Delat"
@@ -2530,9 +2518,6 @@
   },
   "app.settings.resource-management.store.unique.label": {
     "message": "Unikt"
-  },
-  "app.settings.resource-management.store.verified": {
-    "message": "Verifiering slutförd"
   },
   "app.settings.synced-options.choose-sync-source.data-packs-title": {
     "message": "Välj källa för datapaket"

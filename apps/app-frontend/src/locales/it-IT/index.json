@@ -395,9 +395,6 @@
   "app.download-manager.title": {
     "message": "Gestore di download"
   },
-  "app.download-manager.verifying": {
-    "message": "Verifica"
-  },
   "app.error.state-init.open-backups-folder": {
     "message": "Apri la cartella dei backup"
   },
@@ -2810,9 +2807,6 @@
   "app.settings.resource-management.maximum-concurrent-writes.title": {
     "message": "Massimo di scritture simultanee"
   },
-  "app.settings.resource-management.store.attention": {
-    "message": "Alcuni file richiedono attenzione"
-  },
   "app.settings.resource-management.store.cache-limit.description": {
     "message": "Memorizzane fino a questo limite. Risparmia tempo sul download delle installazioni future."
   },
@@ -2840,23 +2834,8 @@
   "app.settings.resource-management.store.description": {
     "message": "Risparmia spazio riutilizzando le installazioni, le mod e i pacchetti tra le istanze."
   },
-  "app.settings.resource-management.store.issues": {
-    "message": "Mostra {count, plural, one {# problema} other {# problemi}}"
-  },
   "app.settings.resource-management.store.nothing-to-clear": {
     "message": "Nessun contenuto inutilizzato da rimuovere."
-  },
-  "app.settings.resource-management.store.repair": {
-    "message": "Verifica e ripara"
-  },
-  "app.settings.resource-management.store.repair.running-description": {
-    "message": "Le istanze in esecuzione saranno chiuse."
-  },
-  "app.settings.resource-management.store.repair.verify-description": {
-    "message": "Controlla per file mancanti o danneggiati e riparali."
-  },
-  "app.settings.resource-management.store.repairing": {
-    "message": "Verifica e riparazione…"
   },
   "app.settings.resource-management.store.shared.label": {
     "message": "Condivisi"
@@ -2872,12 +2851,6 @@
   },
   "app.settings.resource-management.store.unused.label": {
     "message": "Inutilizzati"
-  },
-  "app.settings.resource-management.store.verification-result": {
-    "message": "{checked, plural, one {Controllato #} other {Controllati #}} file e fatto {repaired, plural, one {# riparazione} other {# riparazioni}}."
-  },
-  "app.settings.resource-management.store.verified": {
-    "message": "Verifica completata"
   },
   "app.settings.synced-options.choose-sync-source.command-history-description": {
     "message": "Scegli da quale istanza copiare la cronologia comandi. Sarà usata solo per la sincronizzazione iniziale, poi potrai modificarla in qualsiasi istanza."

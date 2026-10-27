@@ -305,9 +305,6 @@
   "app.download-manager.title": {
     "message": "Pengelola unduhan"
   },
-  "app.download-manager.verifying": {
-    "message": "Memverifikasi"
-  },
   "app.error.state-init.open-backups-folder": {
     "message": "Buka folder cadangan"
   },

@@ -13,7 +13,6 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { invoke } from '@tauri-apps/api/core'
 import { computed, ref, watch } from 'vue'
 
-
 type StoreUsage = {
 	unique_bytes: number
 	shared_bytes: number

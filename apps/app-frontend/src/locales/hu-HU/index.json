@@ -383,9 +383,6 @@
   "app.download-manager.title": {
     "message": "Letöltéskezelő"
   },
-  "app.download-manager.verifying": {
-    "message": "Ellenőrzés..."
-  },
   "app.error.state-init.open-backups-folder": {
     "message": "A biztonsági mentések mappájának megnyitása"
   },
@@ -2789,9 +2786,6 @@
   "app.settings.resource-management.maximum-concurrent-writes.title": {
     "message": "Maximális egyidejű írási műveletek"
   },
-  "app.settings.resource-management.store.attention": {
-    "message": "Néhány fájl még figyelmet igényel"
-  },
   "app.settings.resource-management.store.cache-limit.description": {
     "message": "Tarts meg legfeljebb ennyi nem használt tartalmat a későbbi telepítésekhez. Több megtartása csökkentheti a letöltési időt."
   },
@@ -2819,23 +2813,8 @@
   "app.settings.resource-management.store.description": {
     "message": "Szabadíts fel helyet azzal, hogy újrahasználod a játék-telepítéseket, modokat, és csomagokat a példányaid között."
   },
-  "app.settings.resource-management.store.issues": {
-    "message": "{count, plural, one {Probléma} other {# probléma}} megtekintése"
-  },
   "app.settings.resource-management.store.nothing-to-clear": {
     "message": "Nincsen törlendő felhasználatlan tartalom."
-  },
-  "app.settings.resource-management.store.repair": {
-    "message": "Ellenőrzés és javítás"
-  },
-  "app.settings.resource-management.store.repair.running-description": {
-    "message": "Ez bezárja az összes futó példányt."
-  },
-  "app.settings.resource-management.store.repair.verify-description": {
-    "message": "Megkeresi a hiányzó vagy hibás fájlokat és megpróbálja megjavítani őket."
-  },
-  "app.settings.resource-management.store.repairing": {
-    "message": "Ellenőrzés és javítás…"
   },
   "app.settings.resource-management.store.shared.label": {
     "message": "Megosztott"
@@ -2851,12 +2830,6 @@
   },
   "app.settings.resource-management.store.unused.label": {
     "message": "Árván maradt"
-  },
-  "app.settings.resource-management.store.verification-result": {
-    "message": "{checked} fájl ellenőrizve és {repaired} javítás elvégezve."
-  },
-  "app.settings.resource-management.store.verified": {
-    "message": "Sikeres ellenőrzés"
   },
   "app.settings.synced-options.choose-sync-source.command-history-description": {
     "message": "Válaszd ki, hogy melyik példányból másolja át a parancselőzményeidet. Az előzményeket csak a kezdeti szinkronizáláshoz használja, ezt követően bármelyik példányból szerkesztheted őket."

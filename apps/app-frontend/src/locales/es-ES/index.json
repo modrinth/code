@@ -383,9 +383,6 @@
   "app.download-manager.title": {
     "message": "Gestor de descargas"
   },
-  "app.download-manager.verifying": {
-    "message": "Verificando"
-  },
   "app.error.state-init.open-backups-folder": {
     "message": "Abrir carpeta de copias de seguridad"
   },
@@ -2789,9 +2786,6 @@
   "app.settings.resource-management.maximum-concurrent-writes.title": {
     "message": "Escrituras simultáneas máximas"
   },
-  "app.settings.resource-management.store.attention": {
-    "message": "Algunos archivos todavía necesitan atención"
-  },
   "app.settings.resource-management.store.cache-limit.description": {
     "message": "Mantenerse al día de este contenido no utilizado para futuras instalaciones. Mantener más puede ahorrar tiempo de descarga."
   },
@@ -2819,23 +2813,8 @@
   "app.settings.resource-management.store.description": {
     "message": "Ahorra espacio reutilizando instalaciones, mods y paquetes de juegos a través de tus instancias."
   },
-  "app.settings.resource-management.store.issues": {
-    "message": "Mirar {count, plural, one {# issue} other {# issues}}"
-  },
   "app.settings.resource-management.store.nothing-to-clear": {
     "message": "No hay contenido sin usar para limpiar."
-  },
-  "app.settings.resource-management.store.repair": {
-    "message": "Verificar y reparar"
-  },
-  "app.settings.resource-management.store.repair.running-description": {
-    "message": "Esto cerrará cualquier instancia en ejecución."
-  },
-  "app.settings.resource-management.store.repair.verify-description": {
-    "message": "Comprobar si faltan o dañan archivos y repararlos."
-  },
-  "app.settings.resource-management.store.repairing": {
-    "message": "Verificando y reparando…"
   },
   "app.settings.resource-management.store.shared.label": {
     "message": "Compartido"
@@ -2851,12 +2830,6 @@
   },
   "app.settings.resource-management.store.unused.label": {
     "message": "Huérfano"
-  },
-  "app.settings.resource-management.store.verification-result": {
-    "message": "¡Verificado {checked, plural, one {# archivo} other {# archivos}} ¡y hecho {repaired, plural, one {# reparacion} other {# reparaciones}}."
-  },
-  "app.settings.resource-management.store.verified": {
-    "message": "Verificación completa"
   },
   "app.settings.synced-options.choose-sync-source.command-history-description": {
     "message": "Elija desde qué instancia copiar su historial de comandos. Este historial solo se utiliza para la sincronización inicial, y puede editarlo desde cualquier instancia posterior."

@@ -395,9 +395,6 @@
   "app.download-manager.title": {
     "message": "Menedżer pobierania"
   },
-  "app.download-manager.verifying": {
-    "message": "Weryfikowanie"
-  },
   "app.error.state-init.open-backups-folder": {
     "message": "Otwórz folder kopii zapasowych"
   },
@@ -2798,9 +2795,6 @@
   "app.settings.resource-management.maximum-concurrent-writes.title": {
     "message": "Maksymalna liczba równoczesnych operacji na dysku"
   },
-  "app.settings.resource-management.store.attention": {
-    "message": "Niektóre pliki nadal wymagają uwagi"
-  },
   "app.settings.resource-management.store.cache-limit.description": {
     "message": "Zachowaj do tej bardzo nieużywanej zawartości dla przyszłych instalacji. Zachowywanie więcej może zaoszczędzić czas pobierania."
   },
@@ -2828,23 +2822,8 @@
   "app.settings.resource-management.store.description": {
     "message": "Oszczędzaj miejsce poprzez ponowne użycie instalacji gry, modów i paczek w swoich instancjach."
   },
-  "app.settings.resource-management.store.issues": {
-    "message": "{count, plural, one {# godzina} few {# godziny} other {# godzin}}"
-  },
   "app.settings.resource-management.store.nothing-to-clear": {
     "message": "Brak niewykorzystanej zawartości do usunięcia."
-  },
-  "app.settings.resource-management.store.repair": {
-    "message": "Zweryfikuj i napraw"
-  },
-  "app.settings.resource-management.store.repair.running-description": {
-    "message": "Spowoduje to zamknięcie wszystkich uruchomionych instancji."
-  },
-  "app.settings.resource-management.store.repair.verify-description": {
-    "message": "Sprawdź, czy nie ma brakujących lub uszkodzonych plików i napraw je."
-  },
-  "app.settings.resource-management.store.repairing": {
-    "message": "Weryfikacja i naprawa…"
   },
   "app.settings.resource-management.store.shared.label": {
     "message": "Współdzielone"
@@ -2860,12 +2839,6 @@
   },
   "app.settings.resource-management.store.unused.label": {
     "message": "Nieużywany"
-  },
-  "app.settings.resource-management.store.verification-result": {
-    "message": "Sprawdzono {checked, plural, one {# plik} few {# pliki} other {# plików}} i wykonano {repaired, plural, one {# naprawę} few {# naprawy} other {# napraw}}."
-  },
-  "app.settings.resource-management.store.verified": {
-    "message": "Weryfikacja zakończona"
   },
   "app.settings.synced-options.choose-sync-source.command-history-description": {
     "message": "Wybierz instancję, z której zostanie skopiowana historia poleceń. Posłuży ona jako punkt wyjścia do synchronizacji. Później możesz ją edytować w dowolnej instancji."

@@ -395,9 +395,6 @@
   "app.download-manager.title": {
     "message": "Gestionnaire de téléchargement"
   },
-  "app.download-manager.verifying": {
-    "message": "Vérification en cours"
-  },
   "app.error.state-init.open-backups-folder": {
     "message": "Ouvrir le dossier de sauvegardes"
   },
@@ -2807,9 +2804,6 @@
   "app.settings.resource-management.maximum-concurrent-writes.title": {
     "message": "Nombre maximal d'écritures simultanées"
   },
-  "app.settings.resource-management.store.attention": {
-    "message": "Certains fichiers doivent être vérifiés"
-  },
   "app.settings.resource-management.store.cache-limit.description": {
     "message": "Garder cette quantité de contenu inutilisé pour les futures installations. En garder davantage peut réduire le temps de téléchargement."
   },
@@ -2837,23 +2831,8 @@
   "app.settings.resource-management.store.description": {
     "message": "Économisez de l'espace en réutilisant les installations de jeux, les mods et les packs entre vos instances."
   },
-  "app.settings.resource-management.store.issues": {
-    "message": "Voir {count, plural, one {# problème} other {# problèmes}}"
-  },
   "app.settings.resource-management.store.nothing-to-clear": {
     "message": "Pas de contenu inutilisé à effacer."
-  },
-  "app.settings.resource-management.store.repair": {
-    "message": "Vérifier et réparer"
-  },
-  "app.settings.resource-management.store.repair.running-description": {
-    "message": "Cette action fermera toute instance en cours d'exécution."
-  },
-  "app.settings.resource-management.store.repair.verify-description": {
-    "message": "Recherchez les fichiers manquants ou endommagés et réparez-les."
-  },
-  "app.settings.resource-management.store.repairing": {
-    "message": "Vérification et réparation en cours…"
   },
   "app.settings.resource-management.store.shared.label": {
     "message": "Partagé"
@@ -2869,12 +2848,6 @@
   },
   "app.settings.resource-management.store.unused.label": {
     "message": "Orphelin"
-  },
-  "app.settings.resource-management.store.verification-result": {
-    "message": "{checked, plural, one {# fichier a été vérifié} other {# fichiers ont étés vérifiés}} et {repaired, plural, one {# a été réparé} other {# ont été réparés}}."
-  },
-  "app.settings.resource-management.store.verified": {
-    "message": "Vérification terminée"
   },
   "app.settings.synced-options.choose-sync-source.command-history-description": {
     "message": "Choisissez l'instance à partir de laquelle copier votre historique de commandes. Cet historique n'est utilisé que pour la synchronisation initiale. Vous pourrez le modifier depuis n'importe quelle instance par la suite."

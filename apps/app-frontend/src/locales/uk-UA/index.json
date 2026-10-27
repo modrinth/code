@@ -395,9 +395,6 @@
   "app.download-manager.title": {
     "message": "Менеджер завантажень"
   },
-  "app.download-manager.verifying": {
-    "message": "Перевірка"
-  },
   "app.error.state-init.open-backups-folder": {
     "message": "Відкрити теку резервних копій"
   },
@@ -2801,9 +2798,6 @@
   "app.settings.resource-management.maximum-concurrent-writes.title": {
     "message": "Максимум одночасних записів"
   },
-  "app.settings.resource-management.store.attention": {
-    "message": "Деякі файли потребують уваги"
-  },
   "app.settings.resource-management.store.cache-limit.description": {
     "message": "Зберігати такий обсяг невикористовуваного вмісту для майбутніх установлень. Зберігання більшого обсягу може заощадити час на завантаження."
   },
@@ -2831,23 +2825,8 @@
   "app.settings.resource-management.store.description": {
     "message": "Заощаджуйте місце, повторно використовуючи наявні інсталяції ігор, модів та пакетів між вашими примірниками."
   },
-  "app.settings.resource-management.store.issues": {
-    "message": "Переглянути {count, plural, one {# проблему} few {# проблеми} many {# проблем} other {# проблем}}"
-  },
   "app.settings.resource-management.store.nothing-to-clear": {
     "message": "Немає невикористаного вмісту для очищення."
-  },
-  "app.settings.resource-management.store.repair": {
-    "message": "Перевірити й виправити"
-  },
-  "app.settings.resource-management.store.repair.running-description": {
-    "message": "Це закриє всі запущені примірники."
-  },
-  "app.settings.resource-management.store.repair.verify-description": {
-    "message": "Перевірити наявність відсутніх або пошкоджених файлів та відновити їх."
-  },
-  "app.settings.resource-management.store.repairing": {
-    "message": "Перевірка та виправлення…"
   },
   "app.settings.resource-management.store.shared.label": {
     "message": "Спільні"
@@ -2863,12 +2842,6 @@
   },
   "app.settings.resource-management.store.unused.label": {
     "message": "Залишений"
-  },
-  "app.settings.resource-management.store.verification-result": {
-    "message": "Перевірено {checked, plural, one {# файл} few {# файли} many {# файлів} other {# файлу}} та виконано {repaired, plural, one {# виправлення} few {# виправленя} many {# виправлень} other {# виправлення}}."
-  },
-  "app.settings.resource-management.store.verified": {
-    "message": "Перевірку завершено"
   },
   "app.settings.synced-options.choose-sync-source.command-history-description": {
     "message": "Виберіть із якого примірника копіювати вашу історію команд. Її буде використано лише для первинної синхронізації, опісля ви можете редагувати її з будь-якого примірника."

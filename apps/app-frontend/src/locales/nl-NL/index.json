@@ -383,9 +383,6 @@
   "app.download-manager.title": {
     "message": "Downloadbeheerder"
   },
-  "app.download-manager.verifying": {
-    "message": "Bezig met controleren"
-  },
   "app.error.state-init.open-backups-folder": {
     "message": "Open back-up-map"
   },
@@ -2728,9 +2725,6 @@
   },
   "app.settings.resource-management.maximum-concurrent-writes.title": {
     "message": "Maximaal aantal gelijktijdige schrijfbewerkingen"
-  },
-  "app.settings.resource-management.store.verified": {
-    "message": "Verificatie voltooid"
   },
   "app.settings.synced-options.choose-sync-source.no-instances-found": {
     "message": "Geen instanties gevonden"
