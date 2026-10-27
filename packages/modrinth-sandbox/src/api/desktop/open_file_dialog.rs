@@ -30,6 +30,10 @@ pub async fn open_file_dialog(args: OpenFileDialogArgs) -> eyre::Result<Vec<Path
     {
         open_file_dialog_macos(args).await
     }
+    #[cfg(not(target_os = "macos"))]
+    {
+        Err(eyre::eyre!("unsupported file dialog"))
+    }
 }
 
 #[cfg(target_os = "macos")]
