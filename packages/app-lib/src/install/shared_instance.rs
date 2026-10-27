@@ -288,7 +288,12 @@ async fn apply_shared_instance_update_inner(
 
     if plan.configuration_changed {
         crate::api::instance::prepare_instance_update(instance_id).await?;
-        remove_existing_shared_instance_content(instance_id, state).await?;
+        remove_existing_shared_instance_content(
+            instance_id,
+            !data.role.is_member(),
+            state,
+        )
+        .await?;
         apply_shared_instance_content(
             job_id,
             job_state,
@@ -734,6 +739,7 @@ async fn apply_shared_instance_content_inner(
 
 pub(super) async fn remove_existing_shared_instance_content(
     instance_id: &str,
+    include_local_content: bool,
     state: &State,
 ) -> crate::Result<()> {
     let metadata = crate::state::instances::commands::get_instance_metadata(
@@ -749,7 +755,10 @@ pub(super) async fn remove_existing_shared_instance_content(
     .await?;
     let managed_ids = entries
         .into_iter()
-        .filter(|entry| entry.source_kind.is_shared_instance_managed())
+        .filter(|entry| {
+            include_local_content
+                || entry.source_kind.is_shared_instance_managed()
+        })
         .filter_map(|entry| entry.file_id)
         .collect::<HashSet<_>>();
     for file in
