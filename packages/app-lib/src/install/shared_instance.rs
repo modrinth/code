@@ -177,7 +177,12 @@ impl SharedInstanceApplyPlan {
             });
         }
 
-        let current = current_shared_instance_content(metadata, state).await?;
+        let current = current_shared_instance_content(
+            metadata,
+            !data.role.is_member(),
+            state,
+        )
+        .await?;
         let desired = desired_shared_instance_content(data, state).await?;
         let project_removals = current
             .projects
@@ -439,13 +444,21 @@ pub(super) fn shared_instance_update_requires_full_apply(
 
 async fn current_shared_instance_content(
     metadata: &crate::state::InstanceMetadata,
+    include_local_content: bool,
     state: &State,
 ) -> crate::Result<CurrentSharedInstanceContent> {
     let entries = content_rows::get_content_entries(
         &metadata.applied_content_set.id,
         &state.pool,
     )
-    .await?;
+    .await?
+    .into_iter()
+    .filter(|entry| {
+        entry.source_kind == ContentSourceKind::SharedInstance
+            || (include_local_content
+                && entry.source_kind == ContentSourceKind::Local)
+    })
+    .collect::<Vec<_>>();
     let files =
         content_rows::get_instance_files(&metadata.instance.id, &state.pool)
             .await?
@@ -454,7 +467,6 @@ async fn current_shared_instance_content(
             .collect::<HashMap<_, _>>();
     let version_ids_without_project = entries
         .iter()
-        .filter(|entry| entry.source_kind == ContentSourceKind::SharedInstance)
         .filter(|entry| entry.project_id.is_none())
         .filter_map(|entry| entry.version_id.clone())
         .collect::<Vec<_>>();
@@ -464,10 +476,6 @@ async fn current_shared_instance_content(
     let mut content = CurrentSharedInstanceContent::default();
 
     for entry in entries {
-        if entry.source_kind != ContentSourceKind::SharedInstance {
-            continue;
-        }
-
         let Some(file_id) = entry.file_id.as_ref() else {
             continue;
         };

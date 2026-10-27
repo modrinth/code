@@ -684,7 +684,7 @@ const startInstance = async (context: string) => {
 
 		if (instance.value?.id !== instanceId) return
 
-		if (preview?.updateAvailable && sharedInstanceUpdateModal.value) {
+		if (isSharedInstanceMember && preview?.updateAvailable && sharedInstanceUpdateModal.value) {
 			sharedInstanceUpdateModal.value.show(instance.value, preview, async () => {
 				await refreshInstance()
 				await launchInstance(context)

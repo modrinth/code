@@ -75,7 +75,6 @@ pub async fn cache_remote_icon(source: &str) -> crate::Result<PathBuf> {
     let source_hash =
         sha1_async(Bytes::copy_from_slice(source.as_bytes())).await?;
     let mapping = icons.join(format!("remote-{source_hash}.txt"));
-    let mut cached_path = None;
     if let Ok(metadata) = tokio::fs::metadata(&mapping).await
         && let Ok(filename) = tokio::fs::read_to_string(&mapping).await
         && is_cached_icon_filename(&filename)
@@ -87,40 +86,43 @@ pub async fn cache_remote_icon(source: &str) -> crate::Result<PathBuf> {
                 .ok()
                 .and_then(|modified| modified.elapsed().ok())
                 .is_some_and(|age| age < REMOTE_ICON_MAX_AGE);
-            if fresh {
-                return Ok(io::canonicalize(path)?);
+            if !fresh {
+                let source = source.to_string();
+                tokio::spawn(async move {
+                    if let Err(error) =
+                        refresh_remote_icon(&source, &mapping).await
+                    {
+                        tracing::warn!(
+                            source,
+                            %error,
+                            "Could not refresh cached icon"
+                        );
+                    }
+                });
             }
-            cached_path = Some(path);
+            return Ok(io::canonicalize(path)?);
         }
     }
 
+    refresh_remote_icon(source, &mapping).await
+}
+
+async fn refresh_remote_icon(
+    source: &str,
+    mapping: &Path,
+) -> crate::Result<PathBuf> {
+    let state = State::get().await?;
     let _permit = REMOTE_ICON_DOWNLOADS.acquire().await?;
-    let refreshed = async {
-        let bytes = download_remote_icon(source).await?;
-        let path = cache_icon(bytes, &state).await?;
-        let filename = path
-            .file_name()
-            .ok_or(ErrorKind::InputError(
-                "cached icon has no filename".to_string(),
-            ))?
-            .to_string_lossy();
-        write_atomic(&mapping, filename.as_bytes(), &state.io_semaphore)
-            .await?;
-        Ok::<_, crate::Error>(path)
-    }
-    .await;
-
-    match refreshed {
-        Ok(path) => Ok(path),
-        Err(error) => {
-            if let Some(path) = cached_path {
-                tracing::warn!(source, %error, "Could not refresh cached icon");
-                Ok(io::canonicalize(path)?)
-            } else {
-                Err(error)
-            }
-        }
-    }
+    let bytes = download_remote_icon(source).await?;
+    let path = cache_icon(bytes, &state).await?;
+    let filename = path
+        .file_name()
+        .ok_or(ErrorKind::InputError(
+            "cached icon has no filename".to_string(),
+        ))?
+        .to_string_lossy();
+    write_atomic(mapping, filename.as_bytes(), &state.io_semaphore).await?;
+    Ok(path)
 }
 
 async fn download_remote_icon(source: &str) -> crate::Result<Bytes> {

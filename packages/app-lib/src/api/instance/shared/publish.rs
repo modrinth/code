@@ -1598,9 +1598,13 @@ async fn ensure_owner_up_to_date(
         return Ok(());
     }
 
+    let status = match attachment.status {
+        ContentSetSyncStatus::Stale => ContentSetSyncStatus::Stale,
+        _ => ContentSetSyncStatus::UpdateAvailable,
+    };
     crate::state::set_shared_instance_sync_status(
         instance_id,
-        ContentSetSyncStatus::UpdateAvailable,
+        status,
         attachment.applied_version,
         Some(latest_version),
         &state.pool,
