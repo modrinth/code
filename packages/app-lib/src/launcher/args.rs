@@ -59,11 +59,7 @@ pub fn get_class_paths(
                 return None;
             }
 
-            Some(get_lib_path(
-                libraries_path,
-                &library.name,
-                false,
-            ))
+            Some(get_lib_path(libraries_path, &library.name, false))
         }))
         .process_results(|iter| {
             iter.unique().join(classpath_separator(java_arch))
