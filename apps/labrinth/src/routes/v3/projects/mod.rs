@@ -1473,6 +1473,7 @@ pub async fn project_edit_internal(
             team_member.as_ref().is_none_or(|member| !member.accepted),
             sync_archival_disclosure,
             &mut transaction,
+            &pool,
             &redis,
         )
         .await?;
@@ -1484,6 +1485,7 @@ pub async fn project_edit_internal(
         project_item.inner.slug.clone(),
         submit_for_review,
         transaction,
+        &pool,
         &redis,
         Some(&user),
     )
@@ -1542,6 +1544,7 @@ async fn submit_project_for_review(
     notify_team_members: bool,
     sync_archival_disclosure: bool,
     transaction: &mut PgTransaction<'_>,
+    pool: &PgPool,
     redis: &RedisPool,
 ) -> Result<bool, ApiError> {
     let archival_disclosure =
@@ -1572,9 +1575,13 @@ async fn submit_project_for_review(
         .wrap_internal_err("failed to remove archival disclosure")?;
     }
 
-    let mut state =
-        mutation::sync_project_state(project.inner.id, transaction, redis)
-            .await?;
+    let mut state = mutation::sync_project_state(
+        project.inner.id,
+        transaction,
+        pool,
+        redis,
+    )
+    .await?;
 
     sqlx::query!(
         "
@@ -2322,6 +2329,7 @@ pub async fn projects_edit(
     mutation::finalize_mutations(
         &changed_project_ids,
         transaction,
+        &pool,
         &redis,
         Some(&user),
     )
@@ -2577,6 +2585,7 @@ pub async fn project_icon_edit_internal(
     mutation::finalize_mutation(
         project_item.inner.id,
         transaction,
+        &pool,
         &redis,
         Some(&user),
     )
@@ -2727,6 +2736,7 @@ pub async fn delete_project_icon_internal(
     mutation::finalize_mutation(
         project_item.inner.id,
         transaction,
+        &pool,
         &redis,
         Some(&user),
     )
@@ -2986,6 +2996,7 @@ pub async fn add_gallery_item_internal(
     mutation::finalize_mutation(
         project_item.inner.id,
         transaction,
+        &pool,
         &redis,
         Some(&user),
     )
@@ -3221,6 +3232,7 @@ pub async fn edit_gallery_item_internal(
     mutation::finalize_mutation(
         project_item.inner.id,
         transaction,
+        &pool,
         &redis,
         Some(&user),
     )
@@ -3368,6 +3380,7 @@ pub async fn delete_gallery_item_internal(
     mutation::finalize_mutation(
         project_item.inner.id,
         transaction,
+        &pool,
         &redis,
         Some(&user),
     )
@@ -3658,6 +3671,7 @@ pub async fn project_delete_internal(
             original_slug,
             false,
             transaction,
+            &pool,
             &redis,
             Some(&user),
         )

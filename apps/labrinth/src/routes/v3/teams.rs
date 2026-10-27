@@ -808,6 +808,7 @@ pub async fn add_team_member(
     super::projects::mutation::finalize_mutations(
         &affected_project_ids,
         transaction,
+        &pool,
         &redis,
         Some(&current_user),
     )
@@ -1040,6 +1041,7 @@ pub async fn edit_team_member(
     super::projects::mutation::finalize_mutations(
         &affected_project_ids,
         transaction,
+        &pool,
         &redis,
         Some(&current_user),
     )
@@ -1260,6 +1262,7 @@ pub async fn transfer_ownership(
         super::projects::mutation::finalize_mutations(
             &affected_project_ids,
             transaction,
+            &pool,
             &redis,
             Some(&current_user),
         )
@@ -1460,6 +1463,7 @@ pub async fn remove_team_member(
         super::projects::mutation::finalize_mutations(
             &affected_project_ids,
             transaction,
+            &pool,
             &redis,
             Some(&current_user),
         )

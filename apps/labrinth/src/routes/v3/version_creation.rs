@@ -188,6 +188,7 @@ pub async fn version_create(
         let prepared = super::projects::mutation::prepare_mutations(
             &[project_id],
             &mut transaction,
+            &client,
             &redis,
             Some(&user),
         )
@@ -709,6 +710,7 @@ pub async fn upload_file_to_version(
         let prepared = super::projects::mutation::prepare_mutations(
             &[project_id],
             &mut transaction,
+            &client,
             &redis,
             Some(&user),
         )

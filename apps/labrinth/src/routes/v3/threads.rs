@@ -646,6 +646,7 @@ pub async fn thread_issues_create(
     super::projects::mutation::finalize_mutation(
         project_id,
         transaction,
+        &pool,
         &redis,
         None,
     )
@@ -740,6 +741,7 @@ pub async fn thread_issue_facet_edit(
         let state = super::projects::mutation::load_project_state(
             project_id,
             &mut transaction,
+            &pool,
             &redis,
         )
         .await?;
@@ -770,6 +772,7 @@ pub async fn thread_issue_facet_edit(
         super::projects::mutation::finalize_mutation(
             project_id,
             transaction,
+            &pool,
             &redis,
             project_editor,
         )
@@ -825,6 +828,7 @@ pub async fn thread_issue_delete(
         super::projects::mutation::finalize_mutation(
             project_id,
             transaction,
+            &pool,
             &redis,
             None,
         )

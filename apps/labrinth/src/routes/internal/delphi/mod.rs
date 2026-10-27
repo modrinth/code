@@ -323,6 +323,7 @@ async fn ingest_report_deserialized(
         crate::routes::v3::projects::mutation::prepare_technical_review_exits(
             &exited_projects,
             &mut transaction,
+            &pool,
             &redis,
         )
         .await?;

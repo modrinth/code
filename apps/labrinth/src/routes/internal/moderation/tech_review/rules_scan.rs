@@ -401,7 +401,7 @@ pub async fn scan_rules(
     let _ = sender.send(Bytes::from_static(b": connected\n\n"));
 
     actix_web::rt::spawn(async move {
-        match run_scan(transaction, &sender, &redis).await {
+        match run_scan(transaction, &sender, &pool, &redis).await {
             Ok(summary) => {
                 let event = RuleScanEvent {
                     phase: "complete",
@@ -461,6 +461,7 @@ pub async fn scan_rules(
 async fn run_scan(
     mut transaction: PgTransaction<'static>,
     sender: &mpsc::UnboundedSender<Bytes>,
+    pool: &PgPool,
     redis: &RedisPool,
 ) -> Result<ScanSummary> {
     let project_ids = sqlx::query!(
@@ -797,6 +798,7 @@ async fn run_scan(
         crate::routes::v3::projects::mutation::prepare_technical_review_exits(
             &exited_projects,
             &mut transaction,
+            pool,
             redis,
         )
         .await?;
