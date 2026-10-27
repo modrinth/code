@@ -117,7 +117,7 @@ const handleKeydown = (event: KeyboardEvent) => {
 			/>
 			<div
 				v-if="!compact && !isLibraryInstanceSelectionActive"
-				class="absolute bottom-2 right-2 z-[2] flex origin-bottom-right scale-90 items-center gap-1.5 opacity-0 transition-[opacity,transform] group-hover/card:scale-100 group-hover/card:opacity-100"
+				class="absolute bottom-2 right-2 z-[2] flex origin-bottom-right scale-90 items-center gap-1.5 opacity-0 transition-[opacity,transform] group-hover/card:scale-100 group-hover/card:opacity-100 group-focus-visible/card:scale-100 group-focus-visible/card:opacity-100 group-has-[:focus-visible]/card:scale-100 group-has-[:focus-visible]/card:opacity-100"
 			>
 				<IconButton
 					v-tooltip="formatMessage(libraryInstanceMessages.hideFromLibrary)"
@@ -148,7 +148,7 @@ const handleKeydown = (event: KeyboardEvent) => {
 				type="colored"
 				color="brand"
 				size="md"
-				class="origin-bottom scale-75 opacity-0 transition-opacity group-hover/card:scale-100 group-hover/card:opacity-100"
+				class="origin-bottom scale-75 opacity-0 transition-opacity group-hover/card:scale-100 group-hover/card:opacity-100 group-focus-visible/card:scale-100 group-focus-visible/card:opacity-100 group-has-[:focus-visible]/card:scale-100 group-has-[:focus-visible]/card:opacity-100"
 				@click.stop="(event: MouseEvent) => install(instance, { event })"
 			>
 				<DownloadIcon />

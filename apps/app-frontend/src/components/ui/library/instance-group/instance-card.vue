@@ -264,7 +264,7 @@ defineExpose({
 						type="colored"
 						color="brand"
 						:size="compact ? 'md' : 'lg'"
-						class="origin-bottom scale-75 opacity-0 transition-opacity group-hover/card:scale-100 group-hover/card:opacity-100"
+						class="origin-bottom scale-75 opacity-0 transition-opacity group-hover/card:scale-100 group-hover/card:opacity-100 group-focus-visible/card:scale-100 group-focus-visible/card:opacity-100 group-has-[:focus-visible]/card:scale-100 group-has-[:focus-visible]/card:opacity-100"
 						@click="(e) => repair(e)"
 					>
 						<DownloadIcon />
@@ -281,7 +281,7 @@ defineExpose({
 						type="colored"
 						color="brand"
 						:size="compact ? 'md' : 'lg'"
-						class="origin-bottom scale-75 opacity-0 transition-opacity group-hover/card:scale-100 group-hover/card:opacity-100"
+						class="origin-bottom scale-75 opacity-0 transition-opacity group-hover/card:scale-100 group-hover/card:opacity-100 group-focus-visible/card:scale-100 group-focus-visible/card:opacity-100 group-has-[:focus-visible]/card:scale-100 group-has-[:focus-visible]/card:opacity-100"
 						@click="(e) => play(e, 'InstanceCard')"
 						@mouseenter="checkProcess"
 					>

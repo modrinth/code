@@ -34,7 +34,7 @@ const holdingShift = computed(() => keys.shift.value)
 	>
 		<span
 			v-tooltip="formatMessage(selected ? messages.deselect : messages.select)"
-			class="relative flex items-center justify-center rounded-full opacity-0 transition-opacity duration-200 ease-out group-hover/card:opacity-100 group-hover/selection:brightness-125"
+			class="relative flex items-center justify-center rounded-full opacity-0 transition-opacity duration-200 ease-out group-hover/card:opacity-100 group-focus-visible/card:opacity-100 group-has-[:focus-visible]/card:opacity-100 group-hover/selection:brightness-125"
 			:class="{
 				'size-[20px]': compact,
 				'size-[24px]': !compact,

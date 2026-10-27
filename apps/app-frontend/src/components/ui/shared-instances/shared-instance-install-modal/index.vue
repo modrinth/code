@@ -139,14 +139,14 @@
 				</div>
 			</Transition>
 			<Admonition
-				v-if="!reportMode && hasExternalFiles"
+				v-if="!reportMode && showExternalFilesWarning"
 				type="warning"
 				:header="formatMessage(messages.unknownFilesWarning)"
 			>
 				{{ formatMessage(messages.unknownFilesDescription) }}
 			</Admonition>
 
-			<div v-if="!reportMode && hasExternalFiles" class="relative w-full">
+			<div v-if="!reportMode && showExternalFilesWarning" class="relative w-full">
 				<div
 					ref="externalFileTable"
 					class="max-h-[242px] overflow-y-auto rounded-2xl"
@@ -193,15 +193,15 @@
 				</Transition>
 			</div>
 
-			<p v-if="!reportMode && hasExternalFiles" class="m-0 text-primary">
+			<p v-if="!reportMode && showExternalFilesWarning" class="m-0 text-primary">
 				{{ formatMessage(messages.reviewedFiles) }}
 			</p>
 			<div v-if="!reportMode" class="flex w-full items-center justify-between gap-2">
-				<Button type="quiet" color="red" @click="reportMode = true">
+				<Button v-if="!isOwner" type="quiet" color="red" @click="reportMode = true">
 					<ReportIcon />{{ formatMessage(commonMessages.reportButton) }}
 				</Button>
-				<div class="flex items-center gap-2">
-					<template v-if="hasExternalFiles">
+				<div class="ml-auto flex items-center gap-2">
+					<template v-if="showExternalFilesWarning">
 						<Button type="quiet" color="orange" @click="accept">
 							{{ formatMessage(messages.installAnyway) }}
 						</Button>
@@ -324,7 +324,9 @@ const {
 	checkScrollState: checkTableScrollState,
 	forceCheck: forceCheckTableScroll,
 } = useScrollIndicator(externalFileTable)
-const hasExternalFiles = computed(() => Boolean(preview.value?.externalFiles.length))
+const showExternalFilesWarning = computed(
+	() => !isOwner.value && Boolean(preview.value?.externalFiles.length),
+)
 const externalFileRows = computed<ExternalFileRow[]>(() =>
 	(preview.value?.externalFiles ?? [])
 		.map((file, index) => ({
