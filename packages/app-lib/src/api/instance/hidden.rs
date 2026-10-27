@@ -1,16 +1,16 @@
+use crate::ErrorKind;
 use crate::state::{ModrinthCredentials, State, hidden_instances};
 
 #[tracing::instrument]
 pub async fn get_hidden_instance_ids() -> crate::Result<Vec<String>> {
     let state = State::get().await?;
-    let Some(credentials) =
-        ModrinthCredentials::get_active(&state.pool).await?
+    let Some(user_id) =
+        ModrinthCredentials::get_active_user_id(&state.pool).await?
     else {
         return Ok(Vec::new());
     };
 
-    hidden_instances::get_hidden_instance_ids(&credentials.user_id, &state.pool)
-        .await
+    hidden_instances::get_hidden_instance_ids(&user_id, &state.pool).await
 }
 
 #[tracing::instrument]
@@ -19,25 +19,15 @@ pub async fn set_instance_hidden(
     hidden: bool,
 ) -> crate::Result<()> {
     let state = State::get().await?;
-    let Some(credentials) =
-        ModrinthCredentials::get_active(&state.pool).await?
-    else {
-        return Ok(());
-    };
+    let user_id = ModrinthCredentials::get_active_user_id(&state.pool)
+        .await?
+        .ok_or(ErrorKind::NotLoggedIn)?;
 
-    if hidden {
-        hidden_instances::hide_instance(
-            &credentials.user_id,
-            instance_id,
-            &state.pool,
-        )
-        .await
-    } else {
-        hidden_instances::unhide_instance(
-            &credentials.user_id,
-            instance_id,
-            &state.pool,
-        )
-        .await
-    }
+    hidden_instances::set_instance_hidden(
+        &user_id,
+        instance_id,
+        hidden,
+        &state.pool,
+    )
+    .await
 }

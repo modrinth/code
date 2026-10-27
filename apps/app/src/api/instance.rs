@@ -1544,11 +1544,9 @@ pub async fn instance_share_get_cached_library()
 
 #[tauri::command]
 pub async fn instance_share_cache_library(
-    user_id: &str,
     instances: Vec<theseus::data::CachedSharedInstanceSummary>,
 ) -> Result<()> {
-    theseus::instance::cache_shared_instance_library(user_id, instances)
-        .await?;
+    theseus::instance::cache_shared_instance_library(instances).await?;
     Ok(())
 }
 

@@ -1,8 +1,7 @@
 import { injectNotificationManager } from '@modrinth/ui'
-import { computed, onMounted, ref, toValue, type MaybeRefOrGetter } from 'vue'
+import { computed, type MaybeRefOrGetter, onMounted, ref, toValue } from 'vue'
 import { useRouter } from 'vue-router'
 
-import type { InstanceCard } from '@/components/ui/library/use-library'
 import { useAppEvent } from '@/composables/use-app-event'
 import { handleSevereError } from '@/composables/use-error.js'
 import { trackEvent } from '@/helpers/analytics'
@@ -12,6 +11,16 @@ import type { GameInstance } from '@/helpers/types'
 import { showInstanceInFolder } from '@/helpers/utils.js'
 
 type ProcessEvent = 'installing' | 'launched' | 'finished'
+
+export type InstanceCard = {
+	instance: GameInstance
+	playing: boolean
+	play: (event: MouseEvent | null, context: string) => Promise<void>
+	stop: (event: MouseEvent | null, context: string) => Promise<void>
+	addContent: () => Promise<void>
+	seeInstance: () => Promise<void>
+	openFolder: () => Promise<void>
+}
 
 export function useInstanceActions(
 	instanceSource: MaybeRefOrGetter<GameInstance>,

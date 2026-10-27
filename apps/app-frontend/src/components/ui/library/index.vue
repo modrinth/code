@@ -7,7 +7,6 @@ import Draggable from 'vuedraggable'
 import GroupInstancesModal from '@/components/ui/library/group-instances-modal.vue'
 import InstanceGroup from '@/components/ui/library/instance-group/index.vue'
 import InstanceGroupDnd from '@/components/ui/library/instance-group/instance-group-dnd.vue'
-import LibraryModals from '@/components/ui/library/library-modals.vue'
 import LibraryToolbar from '@/components/ui/library/library-toolbar/index.vue'
 import LibrarySelectionActionBar from '@/components/ui/library/LibrarySelectionActionBar.vue'
 import {
@@ -373,7 +372,6 @@ watch(selectedLibraryInstances, (selectedInstances) => {
 	</InstanceGroupDnd>
 	<LibrarySelectionActionBar />
 	<GroupInstancesModal />
-	<LibraryModals />
 	<ContextMenu :ref="setInstanceOptions" :label="formatMessage(messages.instanceActionsLabel)">
 		<template #remove_from_favorites="{ option }">
 			<StarIcon style="color: var(--color-text-default); fill: var(--color-text-default)" />

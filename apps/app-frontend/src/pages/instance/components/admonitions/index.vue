@@ -38,8 +38,8 @@ import { computed, ref, watch } from 'vue'
 
 import { toError } from '@/helpers/errors'
 import type { SharedInstanceUnavailableReason } from '@/helpers/install'
-import { dismiss_shared_instance_restored_notice } from '@/helpers/instance'
 import type { GameInstance } from '@/helpers/types'
+import { dismissSharedInstanceRestoredNotice } from '@/platform/app-lib/shared-instances/commands'
 
 import InstanceAdmonitionsSharedInstanceOwnerUpdate from './shared-instance-owner-update.vue'
 import InstanceAdmonitionsSharedInstanceRestored from './shared-instance-restored.vue'
@@ -103,7 +103,7 @@ const showSharedInstanceRestoredAdmonition = computed(
 
 async function dismissRestoredNotice() {
 	restoredNoticeDismissed.value = true
-	await dismiss_shared_instance_restored_notice(props.instance.id).catch((error) => {
+	await dismissSharedInstanceRestoredNotice(props.instance.id).catch((error) => {
 		restoredNoticeDismissed.value = false
 		handleError(toError(error))
 	})

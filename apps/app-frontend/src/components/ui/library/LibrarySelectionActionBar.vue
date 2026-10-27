@@ -58,7 +58,7 @@
 				color="orange"
 				interaction="filled"
 				:disabled="busy"
-				@click="requestRemoveUninstalledSharedInstances(selectedUninstalledInstances)"
+				@click="requestRemoveSharedInstances(selectedUninstalledInstances, $event)"
 			>
 				<LogOutIcon v-if="removalMode === 'leave'" />
 				<UnlinkIcon v-else />
@@ -87,14 +87,14 @@ import {
 } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
-import {
-	getLibraryInstanceSelectionKey,
-	getSharedInstanceRemovalMode,
-	isUninstalledSharedInstance,
-	sharedInstanceRemovalButtonMessages,
-	useLibrary,
-} from '@/components/ui/library/use-library'
+import { getLibraryInstanceSelectionKey, useLibrary } from '@/components/ui/library/use-library'
 import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInstanceModal.vue'
+import { isUninstalledSharedInstance } from '@/features/library/library-instance'
+import { injectSharedInstanceActions } from '@/features/library/shared-instances/actions-context'
+import {
+	getSharedInstanceRemovalMode,
+	sharedInstanceRemovalButtonMessages,
+} from '@/features/library/shared-instances/removal'
 import { toError } from '@/helpers/errors'
 import { remove } from '@/helpers/instance'
 import { set_group_memberships as setInstanceGroupMemberships } from '@/helpers/instance-groups'
@@ -110,9 +110,9 @@ const {
 	creatingGroup,
 	createDefaultGroup,
 	displayState,
-	removingSharedInstances,
-	requestRemoveUninstalledSharedInstances,
 } = useLibrary()
+const { removing: removingSharedInstances, requestRemove: requestRemoveSharedInstances } =
+	injectSharedInstanceActions()
 
 const confirmDeleteModal = ref<InstanceType<typeof ConfirmDeleteInstanceModal>>()
 const deleting = ref(false)

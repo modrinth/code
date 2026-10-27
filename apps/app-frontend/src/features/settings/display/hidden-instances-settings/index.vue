@@ -1,19 +1,15 @@
 <script setup lang="ts">
 import { defineMessages, injectAuth, useVIntl } from '@modrinth/ui'
-import { useQuery } from '@tanstack/vue-query'
-import { computed } from 'vue'
 
-import LibraryModals from '@/components/ui/library/library-modals.vue'
-import { isUninstalledSharedInstance, provideLibrary } from '@/components/ui/library/use-library'
-import { injectAppSettingsModal } from '@/features/settings/app-settings-modal/context'
-import { instanceListQueryOptions } from '@/pages/instance/query-options'
+import { useHiddenLibraryInstances } from '@/features/library/hidden-instances/use-hidden-library-instances'
+import { isUninstalledSharedInstance } from '@/features/library/library-instance'
+import { useSharedInstanceOwners } from '@/features/library/shared-instances/use-shared-instance-owners'
 
 import HiddenInstalledInstanceRow from './installed-row.vue'
 import HiddenSharedInstanceRow from './shared-row.vue'
 
 const { formatMessage } = useVIntl()
 const auth = injectAuth()
-const settingsModal = injectAppSettingsModal()
 
 const messages = defineMessages({
 	title: {
@@ -31,11 +27,8 @@ const messages = defineMessages({
 	},
 })
 
-const instancesQuery = useQuery(instanceListQueryOptions())
-const instances = computed(() => instancesQuery.data.value ?? [])
-const { hiddenLibraryInstances } = provideLibrary(instances, {
-	onSharedInstanceInstalled: () => settingsModal.close(),
-})
+const hiddenInstances = useHiddenLibraryInstances()
+const { getSharedInstanceOwner } = useSharedInstanceOwners(hiddenInstances)
 </script>
 
 <template>
@@ -44,11 +37,12 @@ const { hiddenLibraryInstances } = provideLibrary(instances, {
 			{{ formatMessage(messages.title) }}
 		</h2>
 		<p class="m-0 mt-1">{{ formatMessage(messages.description) }}</p>
-		<div v-if="hiddenLibraryInstances.length > 0" class="mt-4 flex flex-col gap-2">
-			<template v-for="instance in hiddenLibraryInstances" :key="instance.id">
+		<div v-if="hiddenInstances.length > 0" class="mt-4 flex flex-col gap-2">
+			<template v-for="instance in hiddenInstances" :key="instance.id">
 				<HiddenSharedInstanceRow
 					v-if="isUninstalledSharedInstance(instance)"
 					:instance="instance"
+					:owner="getSharedInstanceOwner(instance)"
 				/>
 				<HiddenInstalledInstanceRow v-else :instance="instance" />
 			</template>
@@ -56,6 +50,5 @@ const { hiddenLibraryInstances } = provideLibrary(instances, {
 		<p v-else class="m-0 mx-auto mt-6 text-center text-sm text-secondary">
 			{{ formatMessage(messages.empty) }}
 		</p>
-		<LibraryModals />
 	</section>
 </template>

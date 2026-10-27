@@ -9,19 +9,20 @@ import {
 	TeleportOverflowMenu,
 	useVIntl,
 } from '@modrinth/ui'
-
 import { computed } from 'vue'
 
 import InstanceSharedBadge from '@/components/ui/library/instance-group/instance-shared-badge.vue'
 import {
 	isUninstalledSharedInstance,
 	type LibraryInstance,
-	useLibrary,
-} from '@/components/ui/library/use-library'
+	type SharedInstanceOwner,
+} from '@/features/library/library-instance'
+import { libraryInstanceMessages } from '@/features/library/messages'
 import { getInstanceIconUrl } from '@/helpers/instance'
 
 const props = defineProps<{
 	instance: LibraryInstance
+	owner?: SharedInstanceOwner | null
 	options: ButtonMenuOption[]
 	loading?: boolean
 }>()
@@ -30,12 +31,10 @@ const emit = defineEmits<{
 	activate: [event?: MouseEvent]
 }>()
 
-const { getSharedInstanceOwner } = useLibrary()
 const notInstalled = computed(() => isUninstalledSharedInstance(props.instance))
 const isOwner = computed(
 	() => isUninstalledSharedInstance(props.instance) && props.instance.role === 'owner',
 )
-const owner = computed(() => getSharedInstanceOwner(props.instance))
 
 const handleKeydown = (event: KeyboardEvent) => {
 	if (event.target !== event.currentTarget) return
@@ -55,15 +54,6 @@ const messages = defineMessages({
 		id: 'app.behavior-settings.hidden-instances.not-installed',
 		defaultMessage: 'Not installed',
 	},
-	installing: { id: 'app.library.instance.installing', defaultMessage: 'Installing...' },
-	openInstance: {
-		id: 'app.library.instance.open-with-name',
-		defaultMessage: 'Open {name}',
-	},
-	installInstance: {
-		id: 'app.library.instance.install-with-name',
-		defaultMessage: 'Install {name}',
-	},
 })
 </script>
 
@@ -73,9 +63,14 @@ const messages = defineMessages({
 		role="button"
 		tabindex="0"
 		:aria-label="
-			formatMessage(notInstalled ? messages.installInstance : messages.openInstance, {
-				name: instance.name,
-			})
+			formatMessage(
+				notInstalled
+					? libraryInstanceMessages.installWithName
+					: libraryInstanceMessages.openWithName,
+				{
+					name: instance.name,
+				},
+			)
 		"
 		@click="(event: MouseEvent) => emit('activate', event)"
 		@keydown="handleKeydown"
@@ -97,7 +92,7 @@ const messages = defineMessages({
 			/>
 			<InstanceSharedBadge
 				v-if="notInstalled && (isOwner || owner)"
-				:owner="owner"
+				:owner="owner ?? null"
 				:is-owner="isOwner"
 				compact
 				class="!left-1 !top-1"
@@ -108,7 +103,7 @@ const messages = defineMessages({
 			>
 				<div class="absolute inset-0 bg-surface-1 opacity-30" />
 				<SpinnerIcon
-					v-tooltip="formatMessage(messages.installing)"
+					v-tooltip="formatMessage(libraryInstanceMessages.installing)"
 					class="relative size-5 animate-spin text-contrast"
 				/>
 			</div>

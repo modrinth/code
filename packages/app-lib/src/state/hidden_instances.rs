@@ -19,7 +19,20 @@ pub async fn get_hidden_instance_ids(
     Ok(rows.into_iter().map(|row| row.instance_id).collect())
 }
 
-pub async fn hide_instance(
+pub async fn set_instance_hidden(
+    user_id: &str,
+    instance_id: &str,
+    hidden: bool,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+) -> crate::Result<()> {
+    if hidden {
+        hide_instance(user_id, instance_id, exec).await
+    } else {
+        unhide_instance(user_id, instance_id, exec).await
+    }
+}
+
+async fn hide_instance(
     user_id: &str,
     instance_id: &str,
     exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
@@ -42,7 +55,7 @@ pub async fn hide_instance(
     Ok(())
 }
 
-pub async fn unhide_instance(
+async fn unhide_instance(
     user_id: &str,
     instance_id: &str,
     exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,

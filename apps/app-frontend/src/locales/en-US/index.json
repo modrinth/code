@@ -1211,9 +1211,6 @@
   "app.library.instance.action.hide-from-library": {
     "message": "Hide from library"
   },
-  "app.library.instance.action.install": {
-    "message": "Install"
-  },
   "app.library.instance.action.leave": {
     "message": "Leave"
   },
@@ -1286,8 +1283,8 @@
   "app.library.instance.shared-by": {
     "message": "Shared by {name}"
   },
-  "app.library.instance.shared-by-prefix": {
-    "message": "Shared by"
+  "app.library.instance.shared-by-owner": {
+    "message": "Shared by <owner>{name}</owner>"
   },
   "app.library.instance.shared-by-you": {
     "message": "Shared by you"
@@ -1356,7 +1353,7 @@
     "message": "Library"
   },
   "app.library.unpublish-and-leave-shared-instances.modal.admonition-body": {
-    "message": "{unpublishCount, plural, one {The # shared instance you own will be deleted from Modrinth's servers, and people using it} other {The # shared instances you own will be deleted from Modrinth's servers, and people using them}} will stop receiving updates. You'll lose access to the other {leaveCount} and need a new invite to rejoin. All of them will be removed from your library."
+    "message": "{unpublishCount, plural, one {The # shared instance you own will be deleted from Modrinth's servers, and people using it} other {The # shared instances you own will be deleted from Modrinth's servers, and people using them}} will stop receiving updates. {leaveCount, plural, one {You'll lose access to the other shared instance and need a new invite to rejoin it.} other {You'll lose access to the other # shared instances and need a new invite to rejoin them.}} All of them will be removed from your library."
   },
   "app.library.unpublish-and-leave-shared-instances.modal.admonition-header": {
     "message": "Unpublishing and leaving shared instances"

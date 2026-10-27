@@ -19,6 +19,13 @@
 		@load="onLoad"
 		@error="onError"
 	/>
+	<span
+		v-else-if="cachedIconPending"
+		class="avatar shrink-0"
+		:style="`--_size: ${cssSize}`"
+		:class="{ circle: circle, 'no-shadow': noShadow, raised: raised }"
+		aria-hidden="true"
+	/>
 	<svg
 		v-else
 		class="avatar shrink-0"
@@ -111,7 +118,9 @@ const LEGACY_PRESETS: Record<string, string> = {
 }
 
 const cssSize = computed(() => LEGACY_PRESETS[props.size] ?? props.size)
-const cachedIconSrc = useCachedIcon(() => (props.cacheIcon ? props.src : null))
+const { src: cachedIconSrc, pending: cachedIconPending } = useCachedIcon(() =>
+	props.cacheIcon ? props.src : null,
+)
 const cachedSrc = computed(() => (props.cacheIcon ? cachedIconSrc.value : (props.src ?? undefined)))
 
 watch(cachedSrc, () => {

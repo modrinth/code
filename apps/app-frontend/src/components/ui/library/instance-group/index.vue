@@ -31,8 +31,9 @@ import type {
 	InstanceCard as InstanceCardExposed,
 	InstanceGroup as InstanceGroupType,
 } from '@/components/ui/library/use-library'
-import { isUninstalledSharedInstance, useLibrary } from '@/components/ui/library/use-library'
+import { useLibrary } from '@/components/ui/library/use-library'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
+import { isUninstalledSharedInstance } from '@/features/library/library-instance'
 import { FAVORITES_GROUP_ID, MAX_INSTANCE_GROUP_NAME_LENGTH } from '@/helpers/instance-groups'
 
 const INSTANCE_GRID_OBSERVER_ACTIVATION_DELAY = 500

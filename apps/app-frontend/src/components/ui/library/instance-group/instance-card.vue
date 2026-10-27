@@ -11,6 +11,7 @@ import InstanceOwnerBadge from '@/components/ui/library/instance-group/instance-
 import InstanceSelectionButton from '@/components/ui/library/instance-group/instance-selection-button.vue'
 import { getLibraryInstanceSelectionKey, useLibrary } from '@/components/ui/library/use-library'
 import { useInstanceActions } from '@/features/instances/use-instance-actions'
+import { libraryInstanceMessages } from '@/features/library/messages'
 import { install_existing_instance, install_pack_to_existing_instance } from '@/helpers/install'
 import type { GameInstance } from '@/helpers/types'
 
@@ -26,20 +27,7 @@ const instanceCardSensors = [
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const messages = defineMessages({
-	selectInstance: {
-		id: 'app.library.instance.select-with-name',
-		defaultMessage: 'Select {name}',
-	},
-	deselectInstance: {
-		id: 'app.library.instance.deselect-with-name',
-		defaultMessage: 'Deselect {name}',
-	},
-	openInstance: {
-		id: 'app.library.instance.open-with-name',
-		defaultMessage: 'Open {name}',
-	},
 	loading: { id: 'app.library.instance.loading', defaultMessage: 'Instance is loading...' },
-	installing: { id: 'app.library.instance.installing', defaultMessage: 'Installing...' },
 	stop: { id: 'app.library.instance.stop', defaultMessage: 'Stop' },
 	repair: { id: 'app.library.instance.repair', defaultMessage: 'Repair' },
 	play: { id: 'app.library.instance.play', defaultMessage: 'Play' },
@@ -189,7 +177,6 @@ defineExpose({
 		return playing.value
 	},
 })
-
 </script>
 
 <template>
@@ -211,10 +198,15 @@ defineExpose({
 		tabindex="0"
 		:aria-label="
 			isLibraryInstanceSelectionActive
-				? formatMessage(selected ? messages.deselectInstance : messages.selectInstance, {
-						name: instance.name,
-					})
-				: formatMessage(messages.openInstance, { name: instance.name })
+				? formatMessage(
+						selected
+							? libraryInstanceMessages.deselectWithName
+							: libraryInstanceMessages.selectWithName,
+						{
+							name: instance.name,
+						},
+					)
+				: formatMessage(libraryInstanceMessages.openWithName, { name: instance.name })
 		"
 		:aria-pressed="isLibraryInstanceSelectionActive ? selected : undefined"
 		@click="activateCard"
@@ -232,7 +224,9 @@ defineExpose({
 			>
 				<div class="absolute inset-0 bg-surface-1 opacity-30" />
 				<SpinnerIcon
-					v-tooltip="formatMessage(modLoading ? messages.loading : messages.installing)"
+					v-tooltip="
+						formatMessage(modLoading ? messages.loading : libraryInstanceMessages.installing)
+					"
 					class="relative animate-spin text-contrast"
 					:class="compact ? 'size-5' : 'size-[30%]'"
 					tabindex="-1"

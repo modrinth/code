@@ -89,8 +89,6 @@ pub struct SharedInstanceAttachment {
     pub status: ContentSetSyncStatus,
     pub applied_version: Option<i32>,
     pub latest_version: Option<i32>,
-    /// Set when an owner reinstalls their shared instance from the remote, so
-    /// the app can explain that unpushed changes weren't downloaded.
     #[serde(default)]
     pub restored_from_remote: bool,
 }

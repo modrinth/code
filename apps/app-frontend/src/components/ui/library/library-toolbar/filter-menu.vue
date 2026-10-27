@@ -8,7 +8,8 @@ import {
 } from '@modrinth/ui'
 import { computed } from 'vue'
 
-import { isUninstalledSharedInstance, useLibrary } from '@/components/ui/library/use-library'
+import { useLibrary } from '@/components/ui/library/use-library'
+import { isUninstalledSharedInstance } from '@/features/library/library-instance'
 
 const { filters, libraryInstances } = useLibrary()
 const { formatMessage } = useVIntl()

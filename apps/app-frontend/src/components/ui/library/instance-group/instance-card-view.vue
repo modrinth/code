@@ -2,9 +2,9 @@
 import { Avatar, truncatedTooltip } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
-import type { LibraryInstance } from '@/components/ui/library/use-library'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { useImageThumbnail } from '@/composables/use-image-thumbnail'
+import type { LibraryInstance } from '@/features/library/library-instance'
 import { getInstanceIconUrl } from '@/helpers/instance'
 
 const props = withDefaults(

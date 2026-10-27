@@ -5,15 +5,17 @@ import { injectIconCache } from '#ui/providers/icon-cache'
 export function useCachedIcon(source: MaybeRefOrGetter<string | null | undefined>) {
 	const cache = injectIconCache(null)
 	const input = computed(() => toValue(source) ?? undefined)
+	if (!cache) return { src: input, pending: computed(() => false) }
+
 	const isCacheable = (value: string | undefined): value is string =>
-		!!cache && !!value?.startsWith('https://')
+		!!value?.startsWith('https://')
 	const resolved = shallowRef<{ source: string; url: string }>()
 
 	watch(
 		input,
 		async (value, _, onCleanup) => {
-			if (!isCacheable(value) || !cache) return
-			const cached = cache.peekIcon?.(value)
+			if (!isCacheable(value)) return
+			const cached = cache.peekIcon(value)
 			if (cached) {
 				resolved.value = { source: value, url: cached }
 				return
@@ -33,9 +35,12 @@ export function useCachedIcon(source: MaybeRefOrGetter<string | null | undefined
 		{ immediate: true },
 	)
 
-	return computed(() => {
+	const pending = computed(() => isCacheable(input.value) && resolved.value?.source !== input.value)
+	const src = computed(() => {
 		const value = input.value
 		if (!isCacheable(value)) return value
-		return resolved.value?.source === value ? resolved.value.url : undefined
+		return pending.value ? undefined : resolved.value?.url
 	})
+
+	return { src, pending }
 }

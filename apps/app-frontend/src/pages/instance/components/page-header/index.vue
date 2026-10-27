@@ -205,19 +205,12 @@ import {
 } from '@modrinth/ui'
 import { computed } from 'vue'
 
+import { libraryInstanceMessages } from '@/features/library/messages'
 import type { GameInstance } from '@/helpers/types'
 
 import InstanceHeaderServerMetadata from './instance-page-header-server-metadata.vue'
 
 const messages = defineMessages({
-	hideFromLibrary: {
-		id: 'app.library.instance.action.hide-from-library',
-		defaultMessage: 'Hide from library',
-	},
-	showInLibrary: {
-		id: 'app.library.instance.action.show-in-library',
-		defaultMessage: 'Show in library',
-	},
 	createShortcut: {
 		id: 'instance.action.create-shortcut',
 		defaultMessage: 'Create shortcut',
@@ -400,13 +393,13 @@ const moreActions = computed<ButtonMenuOption[]>(() => {
 			props.hiddenFromLibrary
 				? {
 						id: 'show-in-library',
-						label: formatMessage(messages.showInLibrary),
+						label: formatMessage(libraryInstanceMessages.showInLibrary),
 						icon: EyeIcon,
 						action: () => emit('toggleHidden'),
 					}
 				: {
 						id: 'hide-from-library',
-						label: formatMessage(messages.hideFromLibrary),
+						label: formatMessage(libraryInstanceMessages.hideFromLibrary),
 						icon: EyeOffIcon,
 						action: () => emit('toggleHidden'),
 					},

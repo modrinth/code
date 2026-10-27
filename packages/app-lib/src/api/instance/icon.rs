@@ -5,8 +5,7 @@ use crate::state::instances::adapters::sqlite::instance_rows;
 use crate::state::{
     EditInstance, InstanceIconBackground, InstanceIconConfig, State,
 };
-use crate::util::content_hash::temporary_file;
-use crate::util::fetch::{sha1_async, write};
+use crate::util::fetch::{sha1_async, write_atomic};
 use crate::util::io;
 use anyhow::{Context, bail};
 use bytes::Bytes;
@@ -15,7 +14,6 @@ use image::{DynamicImage, ImageFormat, ImageReader, Rgba, RgbaImage};
 use std::fs::File as StdFile;
 use std::io::{BufRead, BufReader, Cursor, Seek};
 use std::path::{Path, PathBuf};
-use tokio::io::AsyncWriteExt;
 
 const INSTANCE_ICON_MAX_BYTES: usize = 4 * 1024 * 1024;
 const INSTANCE_ICON_MAX_DIMENSION: u32 = 512;
@@ -79,11 +77,8 @@ pub async fn cache_remote_icon(source: &str) -> crate::Result<PathBuf> {
     let mapping = icons.join(format!("remote-{source_hash}.txt"));
     let mut cached_path = None;
     if let Ok(metadata) = tokio::fs::metadata(&mapping).await
-        && metadata.len() <= 44
         && let Ok(filename) = tokio::fs::read_to_string(&mapping).await
-        && filename.len() == 44
-        && filename.ends_with(".png")
-        && filename.as_bytes()[..40].iter().all(u8::is_ascii_hexdigit)
+        && is_cached_icon_filename(&filename)
     {
         let path = icons.join(filename);
         if tokio::fs::try_exists(&path).await? {
@@ -109,7 +104,8 @@ pub async fn cache_remote_icon(source: &str) -> crate::Result<PathBuf> {
                 "cached icon has no filename".to_string(),
             ))?
             .to_string_lossy();
-        write(&mapping, filename.as_bytes(), &state.io_semaphore).await?;
+        write_atomic(&mapping, filename.as_bytes(), &state.io_semaphore)
+            .await?;
         Ok::<_, crate::Error>(path)
     }
     .await;
@@ -152,6 +148,12 @@ async fn download_remote_icon(source: &str) -> crate::Result<Bytes> {
         bytes.extend_from_slice(&chunk);
     }
     Ok(Bytes::from(bytes))
+}
+
+fn is_cached_icon_filename(filename: &str) -> bool {
+    filename.strip_suffix(".png").is_some_and(|hash| {
+        hash.len() == 40 && hash.bytes().all(|byte| byte.is_ascii_hexdigit())
+    })
 }
 
 pub async fn edit_generated_icon(
@@ -407,21 +409,14 @@ async fn write_cached_icon(
     }
 
     let hash = sha1_async(bytes.clone()).await?;
-    let directory = state.directories.caches_dir().join("icons");
-    let path = directory.join(format!("{hash}.png"));
-    if let Ok(metadata) = tokio::fs::metadata(&path).await
-        && metadata.is_file()
-        && metadata.len() == bytes.len() as u64
-    {
-        return Ok(io::canonicalize(path)?);
+    let path = state
+        .directories
+        .caches_dir()
+        .join("icons")
+        .join(format!("{hash}.png"));
+    if !tokio::fs::try_exists(&path).await? {
+        write_atomic(&path, &bytes, &state.io_semaphore).await?;
     }
-    let _permit = state.io_semaphore.0.acquire().await?;
-    tokio::fs::create_dir_all(&directory).await?;
-    let (mut file, temporary) = temporary_file(Some(&directory)).await?;
-    file.write_all(&bytes).await?;
-    file.flush().await?;
-    drop(file);
-    tokio::fs::rename(&temporary, &path).await?;
 
     Ok(io::canonicalize(path)?)
 }

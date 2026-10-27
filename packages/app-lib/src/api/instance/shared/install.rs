@@ -29,7 +29,8 @@ pub async fn install_shared_instance(
     )
     .await?;
 
-    if data.server_manager_name.is_none()
+    if data.manager_id.is_none()
+        && data.server_manager_name.is_none()
         && is_remote_shared_instance_owner(
             shared_instance_id,
             data.linked_user_id.as_deref(),
@@ -39,8 +40,6 @@ pub async fn install_shared_instance(
     {
         data.role = SharedInstanceRole::Owner;
         data.restored_from_remote = true;
-        data.manager_id = None;
-        data.server_manager_name = None;
         data.server_manager_icon_url = None;
     }
 
@@ -340,6 +339,13 @@ pub async fn update_shared_instance(
             "instance is not attached to a shared instance".to_string(),
         ),
     )?;
+    if !attachment.role.is_member() && attachment.applied_version.is_none() {
+        bail!(crate::ErrorKind::InputError(
+            "unpublished shared instances have no updates to download"
+                .to_string(),
+        ));
+    }
+
     let version =
         get_latest_attached_remote_version(instance_id, &attachment, &state)
             .await?;

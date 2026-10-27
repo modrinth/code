@@ -34,11 +34,8 @@ import {
 } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
-import {
-	getSharedInstanceRemovalMode,
-	sharedInstanceRemovalButtonMessages,
-} from '@/components/ui/library/use-library'
-import type { UninstalledSharedInstance } from '@/components/ui/library/use-uninstalled-shared-instances'
+import { getSharedInstanceRemovalMode, sharedInstanceRemovalButtonMessages } from './removal'
+import type { UninstalledSharedInstance } from './types'
 
 const { formatMessage } = useVIntl()
 const modal = ref<InstanceType<typeof NewModal>>()
@@ -117,7 +114,7 @@ const messages = defineMessages({
 	unpublishAndLeaveBody: {
 		id: 'app.library.unpublish-and-leave-shared-instances.modal.admonition-body',
 		defaultMessage:
-			"{unpublishCount, plural, one {The # shared instance you own will be deleted from Modrinth's servers, and people using it} other {The # shared instances you own will be deleted from Modrinth's servers, and people using them}} will stop receiving updates. You'll lose access to the other {leaveCount} and need a new invite to rejoin. All of them will be removed from your library.",
+			"{unpublishCount, plural, one {The # shared instance you own will be deleted from Modrinth's servers, and people using it} other {The # shared instances you own will be deleted from Modrinth's servers, and people using them}} will stop receiving updates. {leaveCount, plural, one {You'll lose access to the other shared instance and need a new invite to rejoin it.} other {You'll lose access to the other # shared instances and need a new invite to rejoin them.}} All of them will be removed from your library.",
 	},
 })
 

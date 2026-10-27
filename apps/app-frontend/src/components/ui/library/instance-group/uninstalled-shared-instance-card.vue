@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import { DownloadIcon, XIcon } from '@modrinth/assets'
-import { Button, defineMessages, IconButton, useVIntl } from '@modrinth/ui'
+import { Button, IconButton, useVIntl } from '@modrinth/ui'
 import { computed } from 'vue'
 
 import InstanceCardView from '@/components/ui/library/instance-group/instance-card-view.vue'
 import InstanceSelectionButton from '@/components/ui/library/instance-group/instance-selection-button.vue'
 import InstanceSharedBadge from '@/components/ui/library/instance-group/instance-shared-badge.vue'
 import { getLibraryInstanceSelectionKey, useLibrary } from '@/components/ui/library/use-library'
-import type { UninstalledSharedInstance } from '@/components/ui/library/use-uninstalled-shared-instances'
+import { useHiddenInstances } from '@/features/library/hidden-instances/use-hidden-instances'
+import { libraryInstanceMessages } from '@/features/library/messages'
+import { injectSharedInstanceActions } from '@/features/library/shared-instances/actions-context'
+import type { UninstalledSharedInstance } from '@/features/library/shared-instances/types'
 
 const props = defineProps<{
 	instance: UninstalledSharedInstance
@@ -20,38 +23,15 @@ const emit = defineEmits<{
 }>()
 
 const { formatMessage } = useVIntl()
-const messages = defineMessages({
-	installInstance: {
-		id: 'app.library.instance.install-with-name',
-		defaultMessage: 'Install {name}',
-	},
-	install: {
-		id: 'app.library.instance.install',
-		defaultMessage: 'Install',
-	},
-	hideFromLibrary: {
-		id: 'app.library.instance.action.hide-from-library',
-		defaultMessage: 'Hide from library',
-	},
-	selectInstance: {
-		id: 'app.library.instance.select-with-name',
-		defaultMessage: 'Select {name}',
-	},
-	deselectInstance: {
-		id: 'app.library.instance.deselect-with-name',
-		defaultMessage: 'Deselect {name}',
-	},
-})
 const {
 	selectedLibraryInstances,
 	isLibraryInstanceSelectionActive,
 	canSelectLibraryInstance,
 	getSharedInstanceOwner,
-	installUninstalledSharedInstance,
-	prefetchUninstalledSharedInstanceInstall,
-	hideInstance,
 	handleUninstalledSharedInstanceContextMenu,
 } = useLibrary()
+const { install, prefetchInstall } = injectSharedInstanceActions()
+const { hide } = useHiddenInstances()
 
 const selected = computed(() =>
 	selectedLibraryInstances.value.has(
@@ -74,7 +54,7 @@ const activateCard = (event: MouseEvent) => {
 	if (isLibraryInstanceSelectionActive.value || event.shiftKey) {
 		if (selectable.value) toggleSelection(event)
 	} else {
-		void installUninstalledSharedInstance(props.instance, event)
+		install(props.instance, { event })
 	}
 }
 
@@ -86,7 +66,7 @@ const handleKeydown = (event: KeyboardEvent) => {
 		if (isLibraryInstanceSelectionActive.value) {
 			toggleSelection()
 		} else {
-			void installUninstalledSharedInstance(props.instance)
+			install(props.instance)
 		}
 	} else if (event.key === ' ' && isLibraryInstanceSelectionActive.value) {
 		event.preventDefault()
@@ -109,16 +89,21 @@ const handleKeydown = (event: KeyboardEvent) => {
 		tabindex="0"
 		:aria-label="
 			isLibraryInstanceSelectionActive
-				? formatMessage(selected ? messages.deselectInstance : messages.selectInstance, {
-						name: instance.name,
-					})
-				: formatMessage(messages.installInstance, { name: instance.name })
+				? formatMessage(
+						selected
+							? libraryInstanceMessages.deselectWithName
+							: libraryInstanceMessages.selectWithName,
+						{
+							name: instance.name,
+						},
+					)
+				: formatMessage(libraryInstanceMessages.installWithName, { name: instance.name })
 		"
 		:aria-pressed="isLibraryInstanceSelectionActive ? selected : undefined"
 		@click="activateCard"
 		@keydown="handleKeydown"
-		@mouseenter="prefetchUninstalledSharedInstanceInstall(instance)"
-		@focus="prefetchUninstalledSharedInstanceInstall(instance)"
+		@mouseenter="prefetchInstall(instance)"
+		@focus="prefetchInstall(instance)"
 		@contextmenu.prevent.stop="
 			(event: MouseEvent) => handleUninstalledSharedInstanceContextMenu(event, instance)
 		"
@@ -135,11 +120,11 @@ const handleKeydown = (event: KeyboardEvent) => {
 				class="absolute bottom-2 right-2 z-[2] flex origin-bottom-right scale-90 items-center gap-1.5 opacity-0 transition-[opacity,transform] group-hover/card:scale-100 group-hover/card:opacity-100"
 			>
 				<IconButton
-					v-tooltip="formatMessage(messages.hideFromLibrary)"
-					:label="formatMessage(messages.hideFromLibrary)"
+					v-tooltip="formatMessage(libraryInstanceMessages.hideFromLibrary)"
+					:label="formatMessage(libraryInstanceMessages.hideFromLibrary)"
 					size="sm"
 					class="border border-solid border-surface-5 !bg-surface-4"
-					@click.stop="hideInstance(instance)"
+					@click.stop="hide(instance.id)"
 				>
 					<XIcon />
 				</IconButton>
@@ -148,23 +133,23 @@ const handleKeydown = (event: KeyboardEvent) => {
 					color="brand"
 					size="sm"
 					class="!rounded-xl !px-2.5"
-					@click.stop="(event: MouseEvent) => installUninstalledSharedInstance(instance, event)"
+					@click.stop="(event: MouseEvent) => install(instance, { event })"
 				>
 					<DownloadIcon />
-					{{ formatMessage(messages.install) }}
+					{{ formatMessage(libraryInstanceMessages.install) }}
 				</Button>
 			</div>
 		</template>
 		<template #leading="{ compact }">
 			<IconButton
 				v-if="compact && !isLibraryInstanceSelectionActive"
-				v-tooltip="formatMessage(messages.install)"
-				:label="formatMessage(messages.install)"
+				v-tooltip="formatMessage(libraryInstanceMessages.install)"
+				:label="formatMessage(libraryInstanceMessages.install)"
 				type="colored"
 				color="brand"
 				size="md"
 				class="origin-bottom scale-75 opacity-0 transition-opacity group-hover/card:scale-100 group-hover/card:opacity-100"
-				@click.stop="(event: MouseEvent) => installUninstalledSharedInstance(instance, event)"
+				@click.stop="(event: MouseEvent) => install(instance, { event })"
 			>
 				<DownloadIcon />
 			</IconButton>

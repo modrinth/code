@@ -15,12 +15,12 @@ import { useRouter } from 'vue-router'
 
 import NavButton from '@/components/ui/NavButton.vue'
 import { useAppEvent } from '@/composables/use-app-event'
-import { useHiddenInstances } from '@/features/library/hidden-instances/use-hidden-instances'
 import { handleSevereError } from '@/composables/use-error.js'
 import {
 	QUICK_INSTANCE_LIMIT_MAX,
 	useQuickInstanceLimit,
 } from '@/composables/use-quick-instance-limit.ts'
+import { useHiddenInstances } from '@/features/library/hidden-instances/use-hidden-instances'
 import { trackEvent } from '@/helpers/analytics'
 import { getInstanceIconUrl, kill, run } from '@/helpers/instance'
 import { get_all } from '@/helpers/process'

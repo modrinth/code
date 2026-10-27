@@ -91,6 +91,8 @@ import { useInstanceMetadataRefresh } from '@/composables/use-instance-metadata-
 import { useQuickInstanceLimit } from '@/composables/use-quick-instance-limit.ts'
 import { isDarkTheme, useTheme } from '@/composables/use-theme.ts'
 import { config } from '@/config'
+import InstanceActionModals from '@/features/instances/instance-actions/instance-action-modals.vue'
+import SharedInstanceModals from '@/features/library/shared-instances/shared-instance-modals.vue'
 import { provideMinecraftAccounts } from '@/features/minecraft-accounts/context'
 import AppSettingsModal from '@/features/settings/app-settings-modal/index.vue'
 import { provideSettingsActions } from '@/features/settings/settings-actions'
@@ -2014,6 +2016,8 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			@saved="onCreationIconSaved"
 		/>
 		<UnknownPackWarningModal ref="unknownPackWarningModal" />
+		<InstanceActionModals ref="instanceActionModals" />
+		<SharedInstanceModals ref="sharedInstanceModals" />
 		<div
 			class="app-grid-navbar bg-bg-raised flex flex-col p-[0.5rem] pt-0 gap-[0.25rem] w-[--left-bar-width]"
 		>

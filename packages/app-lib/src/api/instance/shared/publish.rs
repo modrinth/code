@@ -1585,8 +1585,6 @@ pub(super) async fn shared_instance_for_invites(
     Ok((metadata, attachment))
 }
 
-/// Refuses to publish from an owner's installation that is behind a version
-/// pushed from another installation, since publishing would revert it.
 async fn ensure_owner_up_to_date(
     instance_id: &str,
     attachment: &SharedInstanceAttachment,
