@@ -6,6 +6,7 @@ export const hiddenInstanceKeys = {
 }
 
 export const hiddenInstanceIdsQueryOptions = (userId: string | null) => ({
+	networkMode: 'always' as const,
 	queryKey: hiddenInstanceKeys.ids(userId),
 	queryFn: getHiddenInstanceIds,
 	staleTime: Infinity,

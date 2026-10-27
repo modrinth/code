@@ -45,6 +45,7 @@ const {
 	error: storeUsageError,
 } = useQuery({
 	queryKey: storeUsageKey,
+	networkMode: 'always',
 	queryFn: async () => {
 		const [usage] = await Promise.all([
 			invoke<StoreUsage>('plugin:settings|store_usage'),
@@ -67,6 +68,7 @@ watch(storeUsageError, (error) => {
 const runningProcessesKey = ['processes', 'running'] as const
 const { data: runningProcesses, error: runningProcessesError } = useQuery({
 	queryKey: runningProcessesKey,
+	networkMode: 'always',
 	queryFn: getRunningProcesses,
 })
 const hasRunningInstances = computed(() => (runningProcesses.value?.length ?? 0) > 0)
@@ -212,6 +214,7 @@ const categories = computed(() => {
 })
 
 const actionMutation = useMutation({
+	networkMode: 'always',
 	mutationFn: async (action: 'clear' | 'repair') => {
 		if (action === 'repair') {
 			const verification = verifyStore()
@@ -235,6 +238,7 @@ function runAction(action: 'clear' | 'repair') {
 }
 
 const cacheLimitMutation = useMutation({
+	networkMode: 'always',
 	mutationFn: (bytes: number) => invoke('plugin:settings|store_set_cache_limit', { bytes }),
 	onSuccess: (_result, bytes) => {
 		queryClient.setQueryData<StoreUsage>(storeUsageKey, (usage) =>

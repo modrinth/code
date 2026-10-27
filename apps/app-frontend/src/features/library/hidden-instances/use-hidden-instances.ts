@@ -41,6 +41,7 @@ export function useHiddenInstances() {
 	const hiddenIds = computed(() => new Set(hiddenQuery.data.value ?? []))
 
 	const setHiddenMutation = useMutation({
+		networkMode: 'always' as const,
 		mutationFn: ({ instanceId, hidden }: { instanceId: string; hidden: boolean }) =>
 			setInstanceHidden(instanceId, hidden),
 		onMutate: async ({ instanceId, hidden }) => {

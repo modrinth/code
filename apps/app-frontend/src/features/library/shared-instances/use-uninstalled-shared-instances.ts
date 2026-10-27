@@ -19,6 +19,7 @@ export function useUninstalledSharedInstances(instances: MaybeRefOrGetter<GameIn
 	const userId = computed(() => auth.user.value?.id ?? null)
 
 	const cachedQuery = useQuery({
+		networkMode: 'always' as const,
 		queryKey: computed(() => sharedInstanceLibraryKeys.cached(userId.value)),
 		queryFn: async () => (await getCachedSharedInstanceLibrary()).map(fromCachedSummary),
 		enabled: computed(() => !!userId.value),

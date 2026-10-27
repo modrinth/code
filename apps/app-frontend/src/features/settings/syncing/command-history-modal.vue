@@ -29,6 +29,7 @@ const CommandHistoryEditor = defineAsyncComponent(async () => {
 	return editor.VAceEditor
 })
 const saveMutation = useMutation({
+	networkMode: 'always',
 	mutationFn: set_command_history,
 	onSuccess: (history) => {
 		queryClient.setQueryData(syncedOptionsKeys.commandHistory, history)

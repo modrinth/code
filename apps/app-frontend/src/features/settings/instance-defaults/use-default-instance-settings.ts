@@ -19,6 +19,7 @@ export function useDefaultInstanceSettings<T extends object>(
 	const settingsQuery = useQuery(appSettingsQueryOptions())
 	const settings = ref<T | null>(null) as Ref<T | null>
 	const mutation = useMutation({
+		networkMode: 'always',
 		mutationKey: appSettingsKeys.update,
 		scope: { id: 'app-settings' },
 		mutationFn: async (changes: Partial<AppSettings>) => {

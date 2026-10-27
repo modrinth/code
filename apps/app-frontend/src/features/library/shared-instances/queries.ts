@@ -100,6 +100,7 @@ export const sharedInstanceDetailQueryOptions = (
 })
 
 export const sharedInstanceOwnersQueryOptions = (ownerIds: string[]) => ({
+	networkMode: 'always' as const,
 	queryKey: sharedInstanceLibraryKeys.owners(ownerIds),
 	queryFn: async () => (await get_user_many(ownerIds)) as Labrinth.Users.v2.User[],
 	staleTime: 5 * 60_000,

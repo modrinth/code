@@ -21,6 +21,7 @@ export const syncedOptionsKeys = {
 export function globalSyncedOptionsQueryOptions() {
 	return queryOptions({
 		queryKey: syncedOptionsKeys.global,
+		networkMode: 'always',
 		queryFn: get_global_synced_options,
 	})
 }
@@ -28,6 +29,7 @@ export function globalSyncedOptionsQueryOptions() {
 export function initializedSyncedOptionsQueryOptions() {
 	return queryOptions({
 		queryKey: syncedOptionsKeys.initialized,
+		networkMode: 'always',
 		queryFn: get_initialized_synced_options,
 	})
 }
@@ -35,6 +37,7 @@ export function initializedSyncedOptionsQueryOptions() {
 export function gameOptionsSyncSourcesQueryOptions() {
 	return queryOptions({
 		queryKey: syncedOptionsKeys.gameSources,
+		networkMode: 'always',
 		queryFn: list_game_options_sync_sources,
 		staleTime: 0,
 	})
@@ -43,6 +46,7 @@ export function gameOptionsSyncSourcesQueryOptions() {
 export function syncedServersQueryOptions() {
 	return queryOptions({
 		queryKey: syncedOptionsKeys.servers,
+		networkMode: 'always',
 		queryFn: list_synced_servers,
 	})
 }
@@ -50,6 +54,7 @@ export function syncedServersQueryOptions() {
 export function commandHistoryQueryOptions() {
 	return queryOptions({
 		queryKey: syncedOptionsKeys.commandHistory,
+		networkMode: 'always',
 		queryFn: get_command_history,
 	})
 }

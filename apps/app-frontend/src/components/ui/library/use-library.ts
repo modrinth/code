@@ -272,6 +272,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 
 	const serverProjectsQuery = useQuery({
 		queryKey: computed(() => ['library', 'server-projects', ...linkedProjectIds.value]),
+		networkMode: 'always',
 		queryFn: async () => {
 			const projects = (await get_project_v3_many(
 				linkedProjectIds.value,
