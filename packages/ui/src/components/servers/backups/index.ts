@@ -1,6 +1,8 @@
 export { default as BackupCreateModal } from './BackupCreateModal.vue'
 export { default as BackupDeleteModal } from './BackupDeleteModal.vue'
 export { default as BackupItem } from './BackupItem.vue'
+export { default as BackupPreviewList } from './BackupPreviewList.vue'
 export { default as BackupRenameModal } from './BackupRenameModal.vue'
 export { default as BackupRestoreModal } from './BackupRestoreModal.vue'
+export { default as BackupRotationModal } from './BackupRotationModal.vue'
 export { default as BackupWarning } from './BackupWarning.vue'

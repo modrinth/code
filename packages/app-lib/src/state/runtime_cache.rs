@@ -1,10 +1,12 @@
-use super::content_store::{input, normalize};
-use crate::State;
+use super::content_store::normalize;
+use crate::launcher::profile::ResolvedVersion as VersionInfo;
 use crate::state::instances::adapters::sqlite::instance_rows;
 use crate::state::{
     DirectoryInfo, InstanceLaunchContext, JavaVersion, ModLoader,
 };
-use daedalus::minecraft::{AssetsIndex, LoggingConfiguration, VersionInfo};
+use crate::{ErrorKind, State};
+use anyhow::bail;
+use minecraft_meta_manifest::minecraft::{AssetsIndex, LoggingConfiguration};
 use serde::de::DeserializeOwned;
 use std::collections::{HashMap, HashSet};
 use std::fs;
@@ -65,8 +67,9 @@ impl RuntimeStorage {
         match fs::symlink_metadata(&root) {
             Ok(metadata) if metadata.is_dir() => {}
             Ok(_) => {
-                return Err(input(
-                    "Runtime storage must be a directory, not a symlink",
+                bail!(ErrorKind::InputError(
+                    "runtime storage must be a directory, not a symlink"
+                        .to_string(),
                 ));
             }
             Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
@@ -246,9 +249,9 @@ impl References {
                 .loader_version
                 .as_deref()
                 .filter(|version| !matches!(*version, "latest" | "stable"))
-                .ok_or_else(|| {
-                    input("The installed loader version is unresolved")
-                })?;
+                .ok_or(ErrorKind::InputError(
+                    "the installed loader version is unresolved".to_string(),
+                ))?;
             format!("{}-{loader}", content.game_version)
         };
         let version_dir = dirs.version_dir(&version_id);
@@ -258,8 +261,11 @@ impl References {
         self.tree(&dirs.version_natives_dir(&version_id), owner);
         for library in &version.libraries {
             self.file(
-                dirs.libraries_dir()
-                    .join(daedalus::get_path_from_artifact(&library.name)?),
+                dirs.libraries_dir().join(
+                    minecraft_meta_manifest::util::get_path_from_artifact(
+                        &library.name,
+                    )?,
+                ),
                 owner,
             );
         }
@@ -284,12 +290,7 @@ impl References {
         let index: AssetsIndex = read_json(&index_path)?;
         self.file(index_path, owner);
         for (name, asset) in index.objects {
-            if asset.hash.len() != 40
-                || !asset.hash.bytes().all(|byte| byte.is_ascii_hexdigit())
-            {
-                return Err(input("Invalid Minecraft asset hash"));
-            }
-            self.file(dirs.object_dir(&asset.hash), owner);
+            self.file(dirs.object_dir(&asset.hash.to_string()), owner);
             self.file(dirs.legacy_assets_dir().join(name), owner);
         }
         let major = version
@@ -332,8 +333,9 @@ pub(crate) async fn remove_file(
         if !directory.starts_with(root)
             || tokio::fs::symlink_metadata(directory).await?.is_symlink()
         {
-            return Err(input(
-                "Runtime cache path is outside the managed storage directory",
+            bail!(ErrorKind::InputError(
+                "runtime cache path is outside the managed storage directory"
+                    .to_string(),
             ));
         }
         if directory == root {
@@ -349,7 +351,9 @@ pub(crate) async fn remove_file(
         Err(error) => return Err(error.into()),
     };
     if metadata.is_dir() != file.directory {
-        return Err(input("Runtime cache entry changed during cleanup"));
+        bail!(ErrorKind::InputError(
+            "runtime cache entry changed during cleanup".to_string()
+        ));
     }
     if file.directory {
         tokio::fs::remove_dir_all(path).await?;

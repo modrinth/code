@@ -7,7 +7,6 @@ import type { InstallJobStatus } from '@/generated/app-events/InstallJobStatus'
 import type { InstallPhaseId } from '@/generated/app-events/InstallPhaseId'
 import type { InstallProgress } from '@/generated/app-events/InstallProgress'
 import type { InstallProgressSecondary } from '@/generated/app-events/InstallProgressSecondary'
-import type { SharedInstanceUnavailableReason } from '@/generated/app-events/SharedInstanceUnavailableReason'
 import type { AppEvents } from '@/providers/app-events'
 
 import type { InstanceIconConfig, InstanceLink, InstanceLoader } from './types'
@@ -20,8 +19,9 @@ export type {
 	InstallPhaseId,
 	InstallProgress,
 	InstallProgressSecondary,
-	SharedInstanceUnavailableReason,
 }
+
+export type SharedInstanceUnavailableReason = 'deleted' | 'access_revoked' | 'quarantined'
 
 export interface PackLocationVersionId {
 	type: 'fromVersionId'
@@ -122,8 +122,13 @@ export interface SharedInstanceUpdateDiff {
 	disabled?: boolean
 }
 
-export const SHARED_INSTANCE_UNAVAILABLE_ERROR_CODE = 'shared_instance_unavailable'
+const SHARED_INSTANCE_UNAVAILABLE_ERROR_CODES: Record<string, SharedInstanceUnavailableReason> = {
+	shared_instance_deleted: 'deleted',
+	shared_instance_access_revoked: 'access_revoked',
+	shared_instance_quarantined: 'quarantined',
+}
 export const SHARED_INSTANCES_API_ERROR_CODE = 'shared_instances_api_error'
+export const SHARED_INSTANCE_FILE_NOT_ALLOWED_ERROR_CODE = 'shared_instance_file_not_allowed'
 
 function isRecord(value: unknown): value is Record<string, unknown> {
 	return typeof value === 'object' && value !== null
@@ -137,15 +142,15 @@ export function isSharedInstancesApiError(error: unknown) {
 	return isRecord(error) && error.code === SHARED_INSTANCES_API_ERROR_CODE
 }
 
+export function isSharedInstanceFileNotAllowedError(error: unknown) {
+	return isRecord(error) && error.code === SHARED_INSTANCE_FILE_NOT_ALLOWED_ERROR_CODE
+}
+
 export function getSharedInstanceUnavailableReason(
 	error: unknown,
 ): SharedInstanceUnavailableReason | null {
-	if (!isRecord(error) || error.code !== SHARED_INSTANCE_UNAVAILABLE_ERROR_CODE) return null
-	return error.reason === 'deleted' ||
-		error.reason === 'access_revoked' ||
-		error.reason === 'quarantined'
-		? error.reason
-		: null
+	if (!isRecord(error) || typeof error.code !== 'string') return null
+	return SHARED_INSTANCE_UNAVAILABLE_ERROR_CODES[error.code] ?? null
 }
 
 export function getErrorMessage(error: unknown): string {

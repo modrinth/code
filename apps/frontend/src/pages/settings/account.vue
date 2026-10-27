@@ -380,6 +380,30 @@
 				</div>
 			</div>
 		</NewModal>
+		<section id="account-standing" class="universal-card">
+			<h2 class="text-2xl">{{ formatMessage(messages.accountStandingTitle) }}</h2>
+			<Admonition
+				v-if="removedScopes.length > 0"
+				type="warning"
+				:header="formatMessage(messages.accountStandingRestrictedHeader)"
+			>
+				<div class="flex flex-col gap-2">
+					<span>{{ formatMessage(messages.accountStandingRestrictedDescription) }}</span>
+					<ul class="m-0 pl-5">
+						<li v-for="scope in removedScopes" :key="scope.id">
+							{{ formatMessage(scope.label) }}
+						</li>
+					</ul>
+					<span v-if="auth.user.restriction?.reason">
+						<span class="font-semibold">{{
+							formatMessage(messages.accountStandingReasonLabel)
+						}}</span>
+						{{ auth.user.restriction.reason }}
+					</span>
+				</div>
+			</Admonition>
+			<p v-else class="m-0">{{ formatMessage(messages.accountStandingGood) }}</p>
+		</section>
 		<section class="universal-card">
 			<h2 class="text-2xl">{{ formatMessage(messages.accountSecurityTitle) }}</h2>
 
@@ -521,6 +545,7 @@ import {
 	commonMessages,
 	ConfirmModal,
 	defineMessages,
+	getRemovedScopes,
 	injectNotificationManager,
 	Input,
 	IntlFormatted,
@@ -536,7 +561,7 @@ import GoogleIcon from 'assets/icons/auth/sso-google.svg'
 import MicrosoftIcon from 'assets/icons/auth/sso-microsoft.svg'
 import SteamIcon from 'assets/icons/auth/sso-steam.svg'
 import QrcodeVue from 'qrcode.vue'
-import { nextTick, watch } from 'vue'
+import { computed, nextTick, watch } from 'vue'
 
 import PasskeySettings from '~/components/ui/auth/PasskeySettings.vue'
 import TwoFactorAuthCodeInput from '~/components/ui/auth/TwoFactorAuthCodeInput.vue'
@@ -553,7 +578,29 @@ const auth = await useAuth()
 
 const { formatMessage } = useVIntl()
 
+const removedScopes = computed(() => getRemovedScopes(auth.value.user?.restriction?.removed_perms))
+
 const messages = defineMessages({
+	accountStandingTitle: {
+		id: 'settings.account.standing.title',
+		defaultMessage: 'Account standing',
+	},
+	accountStandingGood: {
+		id: 'settings.account.standing.good',
+		defaultMessage: 'Your account is in good standing.',
+	},
+	accountStandingRestrictedHeader: {
+		id: 'settings.account.standing.restricted.header',
+		defaultMessage: 'Your account has been restricted',
+	},
+	accountStandingRestrictedDescription: {
+		id: 'settings.account.standing.restricted.description',
+		defaultMessage: 'A moderator has removed the following permissions from your account:',
+	},
+	accountStandingReasonLabel: {
+		id: 'settings.account.standing.reason-label',
+		defaultMessage: 'Reason:',
+	},
 	deleteAccountConfirmTitle: {
 		id: 'settings.account.delete.confirm.title',
 		defaultMessage: 'Are you sure you want to delete your account?',

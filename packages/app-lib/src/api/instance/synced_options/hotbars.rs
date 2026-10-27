@@ -59,12 +59,9 @@ pub(super) async fn hotbar_family(
         .versions
         .iter()
         .find(|item| item.id == "1.20.5")
-        .ok_or_else(|| {
-            ErrorKind::LauncherError(
-                "Minecraft 1.20.5 is missing from the version manifest"
-                    .to_string(),
-            )
-        })?;
+        .ok_or(ErrorKind::LauncherError(
+            "Minecraft 1.20.5 is missing from the version manifest".to_string(),
+        ))?;
     Ok(
         if manifest.versions[version_index].release_time >= cutoff.release_time
         {

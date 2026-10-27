@@ -93,7 +93,7 @@ const buttonClass = computed(() => {
 const contentClass = computed(() => (isApp.value ? 'mt-2 mb-3' : 'mb-4 mx-3'))
 const innerPanelClass = computed(() => (isApp.value ? 'ml-2 mr-3' : 'p-1'))
 const selectedProjectClass = computed(() =>
-	isApp.value ? 'bg-surface-1 border border-solid border-surface-3' : 'bg-surface-2',
+	isApp.value ? 'bg-surface-4 border border-solid border-surface-5' : 'bg-surface-2',
 )
 
 function hasProvidedFilter(filterId: string): boolean {
@@ -221,6 +221,7 @@ function getFilterOpenByDefault(filterId: string): boolean {
 				:provided-filters="[]"
 				:filter-type="filterType"
 				:project-type="ctx.projectType.value"
+				:dropdown-direction="isApp ? 'up' : undefined"
 				:class="filterClass"
 				:button-class="buttonClass"
 				:content-class="contentClass"
@@ -252,6 +253,7 @@ function getFilterOpenByDefault(filterId: string): boolean {
 				:provided-filters="ctx.providedFilters?.value ?? []"
 				:filter-type="filter"
 				:project-type="ctx.projectType.value"
+				:dropdown-direction="isApp ? 'up' : undefined"
 				:result-count="ctx.totalHits.value"
 				:loading="ctx.loading.value"
 				:refreshing="ctx.refreshing.value"

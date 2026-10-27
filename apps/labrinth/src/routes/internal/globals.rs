@@ -35,8 +35,8 @@ static GLOBALS: LazyLock<Globals> = LazyLock::new(|| Globals {
     tax_compliance_thresholds: [(2025, 600), (2026, 2000)]
         .into_iter()
         .collect(),
-    captcha_enabled: !ENV.HCAPTCHA_SECRET.is_empty()
-        && ENV.HCAPTCHA_SECRET != "none",
+    captcha_enabled: !ENV.TURNSTILE_SECRET.is_empty()
+        && ENV.TURNSTILE_SECRET != "none",
 });
 
 struct TaxComplianceCache {

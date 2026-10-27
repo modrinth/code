@@ -11,7 +11,7 @@
 			/>
 		</template>
 
-		<template v-if="isOfficialAccount || showAffiliateBadge || user.lock" #badges>
+		<template v-if="isOfficialAccount || user.lock || showRestrictedBadge" #badges>
 			<PageHeaderBadgeItem
 				v-if="isOfficialAccount"
 				:icon="BadgeCheckIcon"
@@ -22,19 +22,20 @@
 				{{ formatMessage(messages.officialAccount) }}
 			</PageHeaderBadgeItem>
 			<PageHeaderBadgeItem
-				v-if="showAffiliateBadge"
-				:icon="AffiliateIcon"
-				class="border-brand-highlight bg-brand-highlight text-brand"
-			>
-				{{ formatMessage(messages.affiliateLabel) }}
-			</PageHeaderBadgeItem>
-			<PageHeaderBadgeItem
 				v-if="user.lock"
 				:icon="LockIcon"
 				:tooltip="user.lock.reason"
 				class="border-highlight-red bg-highlight-red !text-red"
 			>
 				{{ formatMessage(messages.lockedLabel) }}
+			</PageHeaderBadgeItem>
+			<PageHeaderBadgeItem
+				v-if="showRestrictedBadge"
+				:icon="ShieldAlertIcon"
+				:tooltip="user.restriction?.private_reason ?? user.restriction?.reason ?? undefined"
+				class="border-highlight-orange bg-highlight-orange !text-orange"
+			>
+				{{ formatMessage(messages.restrictedLabel) }}
 			</PageHeaderBadgeItem>
 		</template>
 
@@ -99,7 +100,6 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import {
-	AffiliateIcon,
 	BadgeCheckIcon,
 	BanIcon,
 	BoxesIcon,
@@ -147,10 +147,6 @@ const messages = defineMessages({
 		id: 'profile.button.edit-user',
 		defaultMessage: 'Edit user',
 	},
-	affiliateLabel: {
-		id: 'profile.label.affiliate',
-		defaultMessage: 'Affiliate',
-	},
 	analyticsButton: {
 		id: 'profile.button.analytics',
 		defaultMessage: 'View user analytics',
@@ -191,14 +187,6 @@ const messages = defineMessages({
 		id: 'profile.label.download-count',
 		defaultMessage: '{count, plural, one {download} other {downloads}}',
 	},
-	removeAffiliateButton: {
-		id: 'profile.button.remove-affiliate',
-		defaultMessage: 'Remove as affiliate',
-	},
-	setAffiliateButton: {
-		id: 'profile.button.set-affiliate',
-		defaultMessage: 'Set as affiliate',
-	},
 	lockedLabel: {
 		id: 'profile.label.locked',
 		defaultMessage: 'Locked',
@@ -210,6 +198,18 @@ const messages = defineMessages({
 	unlockButton: {
 		id: 'profile.button.unlock',
 		defaultMessage: 'Unlock account',
+	},
+	restrictedLabel: {
+		id: 'profile.label.restricted',
+		defaultMessage: 'Restricted',
+	},
+	restrictButton: {
+		id: 'profile.button.restrict',
+		defaultMessage: 'Restrict user',
+	},
+	editRestrictionsButton: {
+		id: 'profile.button.edit-restrictions',
+		defaultMessage: 'Edit restrictions',
 	},
 	revokeSessionsButton: {
 		id: 'profile.button.revoke-sessions',
@@ -229,8 +229,6 @@ const props = withDefaults(
 		editProfileLink?: string | (() => void)
 		isModrinthUser?: boolean
 		isOfficialAccount?: boolean
-		showAffiliateBadge?: boolean
-		isAffiliate?: boolean
 		isSelf?: boolean
 		isAdmin?: boolean
 		isStaff?: boolean
@@ -245,8 +243,6 @@ const props = withDefaults(
 		editProfileLink: '/settings/profile',
 		isModrinthUser: false,
 		isOfficialAccount: false,
-		showAffiliateBadge: false,
-		isAffiliate: false,
 		isSelf: false,
 		isAdmin: false,
 		isStaff: false,
@@ -264,16 +260,18 @@ const emit = defineEmits<{
 	copyId: []
 	copyPermalink: []
 	openBilling: []
-	toggleAffiliate: []
 	openInfo: []
 	openSharedInstances: []
 	openAnalytics: []
 	editUser: []
 	toggleLock: []
+	restrict: []
 	revokeSessions: []
 	forcePasswordReset: []
 	reset2fa: []
 }>()
+
+const showRestrictedBadge = computed(() => props.isStaff && !!props.user.restriction)
 
 const { formatMessage } = useVIntl()
 const formatNumber = useFormatNumber()
@@ -356,17 +354,6 @@ const moreActions = computed<ButtonMenuOption[]>(() => [
 		shown: props.showStaffActions && props.isAdmin,
 	},
 	{
-		id: 'toggle-affiliate',
-		label: props.isAffiliate
-			? formatMessage(messages.removeAffiliateButton)
-			: formatMessage(messages.setAffiliateButton),
-		icon: AffiliateIcon,
-		action: () => emit('toggleAffiliate'),
-		shown: props.showStaffActions && props.isAdmin,
-		remainOpen: true,
-		tone: 'green',
-	},
-	{
 		id: 'open-billing',
 		label: formatMessage(messages.billingButton),
 		icon: CurrencyIcon,
@@ -386,6 +373,16 @@ const moreActions = computed<ButtonMenuOption[]>(() => [
 		action: () => emit('toggleLock'),
 		tone: 'red',
 		shown: props.showStaffActions && props.isAdmin && props.user.role === 'developer',
+	},
+	{
+		id: 'restrict',
+		label: formatMessage(
+			props.user.restriction ? messages.editRestrictionsButton : messages.restrictButton,
+		),
+		icon: ShieldAlertIcon,
+		action: () => emit('restrict'),
+		tone: 'red',
+		shown: props.showStaffActions && props.isStaff && props.user.role === 'developer',
 	},
 	{
 		id: 'revoke-sessions',

@@ -152,6 +152,23 @@ impl Scopes {
             | Scopes::PERFORM_ANALYTICS
     }
 
+    /// these scopes can be removed by a user restriction
+    pub fn removable() -> Scopes {
+        Scopes::PROJECT_CREATE
+            | Scopes::PROJECT_WRITE
+            | Scopes::PROJECT_DELETE
+            | Scopes::VERSION_CREATE
+            | Scopes::VERSION_WRITE
+            | Scopes::VERSION_DELETE
+            | Scopes::ORGANIZATION_CREATE
+            | Scopes::ORGANIZATION_WRITE
+            | Scopes::ORGANIZATION_DELETE
+            | Scopes::COLLECTION_CREATE
+            | Scopes::COLLECTION_WRITE
+            | Scopes::COLLECTION_DELETE
+            | Scopes::USER_WRITE
+    }
+
     pub fn is_restricted(&self) -> bool {
         self.intersects(Self::restricted())
     }

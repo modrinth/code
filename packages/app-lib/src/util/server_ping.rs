@@ -1,6 +1,6 @@
-use crate::ErrorKind;
 use crate::error::Result;
 use crate::util::protocol_version::ProtocolVersion;
+use anyhow::{anyhow, bail};
 use serde::{Deserialize, Serialize};
 use serde_json::value::RawValue;
 use std::time::Duration;
@@ -30,7 +30,7 @@ fn cap_length(
     context: &'static str,
 ) -> Result<usize> {
     if length > max_length {
-        return Err(ErrorKind::InputError(context.to_string()).into());
+        bail!(context);
     }
 
     Ok(length)
@@ -88,15 +88,15 @@ pub async fn get_server_status(
                 protocol => modern::status(address, original_address, protocol.map(|v| v.version)).await,
             }
         } => res,
-        _ = tokio::time::sleep(SERVER_STATUS_TIMEOUT) => Err(ErrorKind::OtherError(
-            format!("Ping of {}:{} timed out", original_address.0, original_address.1)
-        ).into())
+        _ = tokio::time::sleep(SERVER_STATUS_TIMEOUT) => Err(anyhow!(
+            "ping of {}:{} timed out", original_address.0, original_address.1
+        ))
     }
 }
 
 mod modern {
     use super::ServerStatus;
-    use crate::ErrorKind;
+    use anyhow::{Context, bail};
     use std::time::Instant;
     use tokio::io::{AsyncReadExt, AsyncWriteExt};
     use tokio::net::{TcpStream, ToSocketAddrs};
@@ -106,10 +106,16 @@ mod modern {
         original_address: (&str, u16),
         protocol_version: Option<u32>,
     ) -> crate::Result<ServerStatus> {
-        let mut stream = TcpStream::connect(address).await?;
+        let mut stream = TcpStream::connect(address)
+            .await
+            .context("connecting to server")?;
         stream.set_nodelay(true)?;
-        handshake(&mut stream, original_address, protocol_version).await?;
-        let mut result = status_body(&mut stream).await?;
+        handshake(&mut stream, original_address, protocol_version)
+            .await
+            .context("sending handshake")?;
+        let mut result = status_body(&mut stream)
+            .await
+            .context("reading status response")?;
         result.ping = ping(&mut stream).await.ok();
         Ok(result)
     }
@@ -165,10 +171,7 @@ mod modern {
         let mut packet_stream = stream.take(packet_length as u64);
         let packet_id = varint::read(&mut packet_stream).await?;
         if packet_id != 0x00 {
-            return Err(ErrorKind::InputError(
-                "Unexpected status response".to_string(),
-            )
-            .into());
+            bail!("unexpected status response packet id {packet_id}");
         }
         let response_length = cap_varint_length(
             varint::read(&mut packet_stream).await?,
@@ -182,7 +185,8 @@ mod modern {
             tokio::io::copy(&mut packet_stream, &mut tokio::io::sink()).await?;
         }
 
-        Ok(serde_json::from_slice(&json_response)?)
+        serde_json::from_slice(&json_response)
+            .context("parsing status response json")
     }
 
     /// Ensures the length of a varint as stated by a server is not longer than a
@@ -200,7 +204,7 @@ mod modern {
         context: &'static str,
     ) -> crate::Result<usize> {
         if length < 0 {
-            return Err(ErrorKind::InputError(context.to_string()).into());
+            bail!(context);
         }
 
         super::cap_length(length as usize, max_length, context)
@@ -218,10 +222,7 @@ mod modern {
         stream.read_exact(&mut response_prefix).await?;
         let response_magic = stream.read_i64().await?;
         if response_prefix != [0x09, 0x01] || response_magic != ping_magic {
-            return Err(ErrorKind::InputError(
-                "Unexpected ping response".to_string(),
-            )
-            .into());
+            bail!("unexpected ping response");
         }
 
         Ok(start_time.elapsed().as_millis() as i64)
@@ -284,7 +285,7 @@ mod modern {
 mod legacy {
     use super::ServerStatus;
     use crate::worlds::{ServerPlayers, ServerVersion};
-    use crate::{Error, ErrorKind};
+    use anyhow::{Context, bail};
     use serde_json::value::to_raw_value;
     use tokio::io::{AsyncReadExt, AsyncWriteExt};
     use tokio::net::{TcpStream, ToSocketAddrs};
@@ -315,29 +316,43 @@ mod legacy {
             );
         }
 
-        let mut stream = TcpStream::connect(address).await?;
-        stream.write_all(&packet).await?;
-        stream.flush().await?;
+        let mut stream = TcpStream::connect(address)
+            .await
+            .context("connecting to server")?;
+        stream
+            .write_all(&packet)
+            .await
+            .context("sending legacy status request")?;
+        stream
+            .flush()
+            .await
+            .context("sending legacy status request")?;
 
-        let packet_id = stream.read_u8().await?;
+        let packet_id = stream
+            .read_u8()
+            .await
+            .context("reading legacy status response")?;
         if packet_id != 0xff {
-            return Err(Error::from(ErrorKind::InputError(
-                "Unexpected legacy status response".to_string(),
-            )));
+            bail!("unexpected legacy status response packet id {packet_id}");
         }
 
         let data_length = super::cap_length(
-            stream.read_u16().await? as usize,
+            stream
+                .read_u16()
+                .await
+                .context("reading legacy status response")?
+                as usize,
             super::MAX_LEGACY_STATUS_UTF16_LENGTH,
             "invalid legacy status response length",
         )?;
-        let data_byte_length = data_length.checked_mul(2).ok_or_else(|| {
-            ErrorKind::InputError(
-                "invalid legacy status response length".to_string(),
-            )
-        })?;
+        let data_byte_length = data_length
+            .checked_mul(2)
+            .context("invalid legacy status response length")?;
         let mut data = vec![0u8; data_byte_length];
-        stream.read_exact(&mut data).await?;
+        stream
+            .read_exact(&mut data)
+            .await
+            .context("reading legacy status response")?;
 
         drop(stream);
 

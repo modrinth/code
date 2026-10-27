@@ -1,7 +1,9 @@
+use crate::ErrorKind;
 use crate::state::{
     CacheValue, CachedEmbeddedContentMetadata, CachedEntry, ContentFile,
     EmbeddedContentMetadata, Instance, ModLoader, ProjectType, State,
 };
+use anyhow::Context;
 use bytes::Bytes;
 use futures::stream::{self, StreamExt};
 use serde_json::Value as JsonValue;
@@ -37,11 +39,11 @@ pub(crate) async fn infer_project_type_path(
 ) -> crate::Result<ProjectType> {
     let path = path.to_path_buf();
     tokio::task::spawn_blocking(move || {
-        let mut archive = ZipArchive::new(File::open(path)?).map_err(|_| {
-            crate::ErrorKind::InputError(
-                "Unable to infer project type for input file".to_string(),
-            )
-        })?;
+        let mut archive = ZipArchive::new(File::open(path)?).context(
+            ErrorKind::InputError(
+                "unable to infer project type for input file".to_string(),
+            ),
+        )?;
         infer_project_type(&mut archive)
     })
     .await?
@@ -50,11 +52,11 @@ pub(crate) async fn infer_project_type_path(
 pub(crate) fn infer_project_type_bytes(
     bytes: &Bytes,
 ) -> crate::Result<ProjectType> {
-    let mut archive = ZipArchive::new(Cursor::new(&**bytes)).map_err(|_| {
-        crate::ErrorKind::InputError(
-            "Unable to infer project type for input file".to_string(),
-        )
-    })?;
+    let mut archive = ZipArchive::new(Cursor::new(&**bytes)).context(
+        ErrorKind::InputError(
+            "unable to infer project type for input file".to_string(),
+        ),
+    )?;
     infer_project_type(&mut archive)
 }
 
@@ -62,12 +64,10 @@ fn inspect_content_file(
     path: &Path,
     loader: ModLoader,
 ) -> crate::Result<ArchiveInspection> {
-    let file = File::open(path).map_err(|error| {
-        crate::ErrorKind::OtherError(format!(
-            "Could not open content archive {}: {error}",
-            path.display()
-        ))
-    })?;
+    let file = File::open(path).context(format!(
+        "could not open content archive {}",
+        path.display()
+    ))?;
     inspect_content_archive(file, Some(loader))
 }
 
@@ -75,11 +75,10 @@ fn inspect_content_archive<R: Read + Seek>(
     reader: R,
     loader: Option<ModLoader>,
 ) -> crate::Result<ArchiveInspection> {
-    let mut archive = ZipArchive::new(reader).map_err(|_| {
-        crate::ErrorKind::InputError(
-            "Unable to infer project type for input file".to_string(),
-        )
-    })?;
+    let mut archive =
+        ZipArchive::new(reader).context(ErrorKind::InputError(
+            "unable to infer project type for input file".to_string(),
+        ))?;
     let project_type = infer_project_type(&mut archive)?;
     let (metadata, icon) = match project_type {
         ProjectType::Mod => inspect_mod(&mut archive, loader),
@@ -95,6 +94,13 @@ fn inspect_content_archive<R: Read + Seek>(
 fn infer_project_type<R: Read + Seek>(
     archive: &mut ZipArchive<R>,
 ) -> crate::Result<ProjectType> {
+    let mut has_data = false;
+    let mut has_shaders = false;
+    for name in archive.file_names() {
+        let name = name?;
+        has_data |= name.starts_with("data/");
+        has_shaders |= name.starts_with("shaders/");
+    }
     if has_entry(archive, "fabric.mod.json")
         || has_entry(archive, "quilt.mod.json")
         || has_entry(archive, "META-INF/neoforge.mods.toml")
@@ -103,19 +109,16 @@ fn infer_project_type<R: Read + Seek>(
     {
         Ok(ProjectType::Mod)
     } else if has_entry(archive, "pack.mcmeta") {
-        if archive.file_names().any(|name| name.starts_with("data/")) {
+        if has_data {
             Ok(ProjectType::DataPack)
         } else {
             Ok(ProjectType::ResourcePack)
         }
-    } else if archive
-        .file_names()
-        .any(|name| name.starts_with("shaders/"))
-    {
+    } else if has_shaders {
         Ok(ProjectType::ShaderPack)
     } else {
-        Err(crate::ErrorKind::InputError(
-            "Unable to infer project type for input file".to_string(),
+        Err(ErrorKind::InputError(
+            "unable to infer project type for input file".to_string(),
         )
         .into())
     }

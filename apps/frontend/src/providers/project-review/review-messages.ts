@@ -3,7 +3,7 @@ import { expandVariables } from '@modrinth/moderation/src/utils'
 import { createContext } from '@modrinth/ui'
 import { computed, reactive, type Ref, watch } from 'vue'
 
-import type { createReviewPanels } from './review-panels'
+import type { createReviewPanels, ReviewIssueControl } from './review-panels'
 
 export const [injectReviewMessages, provideReviewMessages] =
 	createContext<ReturnType<typeof createReviewMessages>>('ProjectReviewMessages')
@@ -32,6 +32,15 @@ export function createReviewMessages(
 		if (custom) return custom.message
 		return overrides.get(id) ?? issueMessages.value.get(id) ?? defaults.get(id) ?? ''
 	}
+	function previewIssueMessage(entry: ReviewIssueControl) {
+		if (panels.selected(entry.binding, entry.control)) return issueMessage(entry.control.issueId)
+		const override = overrides.get(entry.control.issueId)
+		if (override !== undefined) return override
+		const current = project.value
+		const legacy = projectV2.value
+		if (!current || !legacy || current.id !== legacy.id) return ''
+		return expandVariables(panels.previewIssueMessage(entry).trim(), legacy, current)
+	}
 	function editIssueMessage(id: string, message: string) {
 		if (panels.customIssues.value.some((issue) => issue.id === id)) {
 			panels.updateCustomIssue(id, { message })
@@ -45,7 +54,10 @@ export function createReviewMessages(
 	function resetIssueMessage(id: string) {
 		overrides.delete(id)
 		const custom = panels.customIssues.value.find((issue) => issue.id === id)?.custom
-		if (custom) panels.updateCustomIssue(id, { message: custom.previous?.why.message ?? '' })
+		if (custom)
+			panels.updateCustomIssue(id, {
+				message: custom.previous?.why.message ?? '',
+			})
 	}
 	function hasIssueOverride(id: string) {
 		const custom = panels.customIssues.value.find((issue) => issue.id === id)?.custom
@@ -67,6 +79,7 @@ export function createReviewMessages(
 	return {
 		generating,
 		issueMessage,
+		previewIssueMessage,
 		setIssueDefault: (id: string, message: string) => {
 			defaults.set(id, message)
 		},

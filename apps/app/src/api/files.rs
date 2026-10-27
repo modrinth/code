@@ -1,14 +1,15 @@
 use crate::api::Result;
-use async_zip::base::read::seek::ZipFileReader;
+use anyhow::{Context, anyhow};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::io::Cursor;
+use std::io::{Cursor, Read};
 use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 use tauri::{Manager, Runtime};
 use tauri_plugin_dialog::DialogExt;
 use tauri_plugin_http::reqwest;
+use theseus::ErrorKind;
 use tokio::io::AsyncWriteExt;
 use tokio_util::sync::CancellationToken;
 
@@ -62,10 +63,7 @@ pub struct ExtractDryRunResult {
 pub async fn file_read_dragged_file(path: String) -> Result<Vec<u8>> {
     let metadata = tokio::fs::metadata(&path).await?;
     if !metadata.is_file() {
-        return Err(theseus::Error::from(theseus::ErrorKind::OtherError(
-            "Dropped path is not a file".to_string(),
-        ))
-        .into());
+        return Err(anyhow!("dropped path is not a file").into());
     }
 
     Ok(tokio::fs::read(path).await?)
@@ -86,27 +84,35 @@ pub async fn file_extract_zip(
         .map_or("", |(parent, _)| parent);
     let file_bytes =
         theseus::instance::read_instance_file(instance_id, file_path).await?;
-    let zip_reader = ZipFileReader::with_tokio(Cursor::new(file_bytes))
-        .await
-        .map_err(|error| {
-        theseus::Error::from(theseus::ErrorKind::OtherError(format!(
-            "Failed to read zip file: {error}"
-        )))
-    })?;
+    let (mut zip_reader, names) = tokio::task::spawn_blocking(move || {
+        let mut archive = zip::ZipArchive::new(Cursor::new(file_bytes))
+            .context("failed to read zip file")?;
+        let mut names = Vec::new();
+        for index in 0..archive.len() {
+            let entry = archive
+                .by_index_raw(index)
+                .context("failed to read archive entry")?;
+            let name = entry
+                .name()
+                .context(ErrorKind::InputError(
+                    "invalid archive entry name".to_string(),
+                ))?
+                .into_owned();
+            names.push((index, name));
+        }
+        Ok::<_, anyhow::Error>((archive, names))
+    })
+    .await
+    .context("failed to read zip file")??;
     let mut entries = Vec::new();
-    for (index, entry) in zip_reader.file().entries().iter().enumerate() {
-        let name = entry.filename().as_str().map_err(|error| {
-            theseus::Error::from(theseus::ErrorKind::InputError(
-                error.to_string(),
-            ))
-        })?;
+    for (index, name) in names {
         if name.ends_with('/') {
             continue;
         }
         if name.starts_with('/') || name.contains('\\') {
-            return Err(theseus::Error::from(theseus::ErrorKind::InputError(
-                "Invalid archive path".to_string(),
-            ))
+            return Err(ErrorKind::InputError(
+                "invalid archive path".to_string(),
+            )
             .into());
         }
         let target = if parent.is_empty() {
@@ -132,26 +138,28 @@ pub async fn file_extract_zip(
             conflicting_files,
         }));
     }
-    let mut zip_reader = zip_reader;
+
     for (index, path, resolved) in entries {
         if !override_conflicts && resolved.exists() {
             continue;
         }
-        let mut bytes = Vec::new();
-        let mut reader =
-            zip_reader.reader_with_entry(index).await.map_err(|error| {
-                theseus::Error::from(theseus::ErrorKind::OtherError(
-                    error.to_string(),
-                ))
-            })?;
-        reader
-            .read_to_end_checked(&mut bytes)
-            .await
-            .map_err(|error| {
-                theseus::Error::from(theseus::ErrorKind::OtherError(
-                    error.to_string(),
-                ))
-            })?;
+        let entry_path = path.clone();
+        let (archive, bytes) = tokio::task::spawn_blocking(move || {
+            let mut bytes = Vec::new();
+            {
+                let mut reader =
+                    zip_reader.by_index(index).with_context(|| {
+                        format!("failed to read archive entry {entry_path}")
+                    })?;
+                reader.read_to_end(&mut bytes).with_context(|| {
+                    format!("failed to read archive entry {entry_path}")
+                })?;
+            }
+            Ok::<_, anyhow::Error>((zip_reader, bytes))
+        })
+        .await
+        .with_context(|| format!("failed to read archive entry {path}"))??;
+        zip_reader = archive;
         theseus::instance::write_instance_file(
             instance_id,
             &path,
@@ -248,11 +256,8 @@ pub async fn file_save_as<R: Runtime>(
         });
 
     if let Some(dest) = rx.await.unwrap_or(None) {
-        let dest_path = std::path::PathBuf::try_from(dest).map_err(|e| {
-            theseus::Error::from(theseus::ErrorKind::OtherError(format!(
-                "Invalid save path: {e}"
-            )))
-        })?;
+        let dest_path =
+            std::path::PathBuf::try_from(dest).context("invalid save path")?;
         theseus::instance::save_instance_file_as(
             instance_id,
             file_path,

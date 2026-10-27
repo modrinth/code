@@ -62,7 +62,7 @@ impl super::Validator for FabricValidator {
             ));
         }
 
-        Ok(validate_pack_formats(archive))
+        validate_pack_formats(archive)
     }
 }
 

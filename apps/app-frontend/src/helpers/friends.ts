@@ -168,19 +168,35 @@ export async function transformFriends(
 
 	return friends.map((friend) => {
 		const user = users.find((x: User) => x.id === friend.id || x.id === friend.friend_id)
-		const status = friendStatuses.find(
-			(x) => x.user_id === friend.id || x.user_id === friend.friend_id,
-		)
 		return {
 			id: friend.id,
 			friend_id: friend.friend_id,
-			status: status?.profile_name ?? null,
-			last_updated: status && status.last_update ? dayjs(status.last_update) : null,
+			...friendStatusFields(friend, friendStatuses),
 			created: dayjs(friend.created),
 			avatar: user?.avatar_url ?? '',
 			username: user?.username ?? '',
-			online: !!status,
 			accepted: friend.accepted,
 		}
 	})
+}
+
+export function applyFriendStatuses(
+	friends: FriendWithUserData[],
+	friendStatuses: UserStatus[],
+): FriendWithUserData[] {
+	return friends.map((friend) => ({ ...friend, ...friendStatusFields(friend, friendStatuses) }))
+}
+
+function friendStatusFields(
+	friend: Pick<FriendWithUserData, 'id' | 'friend_id'>,
+	friendStatuses: UserStatus[],
+) {
+	const status = friendStatuses.find(
+		(x) => x.user_id === friend.id || x.user_id === friend.friend_id,
+	)
+	return {
+		status: status?.profile_name ?? null,
+		last_updated: status && status.last_update ? dayjs(status.last_update) : null,
+		online: !!status,
+	}
 }

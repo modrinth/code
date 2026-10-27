@@ -1,3 +1,4 @@
+use crate::ErrorKind;
 use crate::install::{
     ContentUpdateSelection, InstallErrorContext, InstallPhaseDetails,
     InstallPhaseId, InstallProgress, InstallProgressReporter,
@@ -12,7 +13,9 @@ use crate::state::{
     Version,
 };
 use crate::util::fetch::DownloadReason;
+use anyhow::bail;
 use futures::stream::{self, StreamExt};
+use sqlx::SqlitePool;
 use std::cmp::Reverse;
 use std::collections::{HashMap, HashSet};
 use std::future::Future;
@@ -101,11 +104,9 @@ pub(crate) async fn update_project(
     let update = updates
         .into_iter()
         .find(|update| update.relative_path == project_path)
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError(
-                "This project cannot be updated!".to_string(),
-            )
-        })?;
+        .ok_or(ErrorKind::InputError(
+            "this project cannot be updated".to_string(),
+        ))?;
 
     apply_content_update(instance_id, project_path, &update, state).await
 }
@@ -375,7 +376,7 @@ pub(crate) async fn plan_bulk_update(
     state: &State,
 ) -> crate::Result<BulkUpdatePlan> {
     let shared_instance_member =
-        is_shared_instance_member(instance_id, state).await?;
+        is_shared_instance_member(instance_id, &state.pool).await?;
     let updateable_paths = bulk_updateable_project_paths(
         instance_id,
         shared_instance_member,
@@ -385,11 +386,9 @@ pub(crate) async fn plan_bulk_update(
     let content_set =
         content_rows::get_applied_content_set(instance_id, &state.pool)
             .await?
-            .ok_or_else(|| {
-                crate::ErrorKind::InputError(format!(
-                    "Instance {instance_id} has no applied content set"
-                ))
-            })?;
+            .ok_or(ErrorKind::InputError(format!(
+                "instance {instance_id} has no applied content set"
+            )))?;
     let installed =
         installed_projects(instance_id, &content_set, state).await?;
     let updateable_paths = if shared_instance_member {
@@ -413,29 +412,24 @@ pub(crate) async fn plan_bulk_update(
         if !updateable_paths.contains(&selection.project_path)
             || !paths.insert(&selection.project_path)
         {
-            return Err(crate::state::content_store::input(
-                "Selected content cannot be updated",
+            bail!(ErrorKind::InputError(
+                "selected content cannot be updated".to_string(),
             ));
         }
         let project = installed
             .iter()
             .find(|project| project.relative_path == selection.project_path)
-            .ok_or_else(|| {
-                crate::state::content_store::input(
-                    "Selected content is no longer installed",
-                )
-            })?;
-        let project_id = project.project_id.clone().ok_or_else(|| {
-            crate::state::content_store::input(
-                "Selected content has no Modrinth project",
-            )
-        })?;
+            .ok_or(ErrorKind::InputError(
+                "selected content is no longer installed".to_string(),
+            ))?;
+        let project_id =
+            project.project_id.clone().ok_or(ErrorKind::InputError(
+                "selected content has no Modrinth project".to_string(),
+            ))?;
         let current_version_id =
-            project.version_id.clone().ok_or_else(|| {
-                crate::state::content_store::input(
-                    "Selected content has no Modrinth version",
-                )
-            })?;
+            project.version_id.clone().ok_or(ErrorKind::InputError(
+                "selected content has no Modrinth version".to_string(),
+            ))?;
         updates.push(ContentUpdate {
             project_id,
             relative_path: selection.project_path.clone(),
@@ -492,16 +486,15 @@ pub(crate) async fn plan_bulk_update(
         .map(|version| (version.id.clone(), version))
         .collect::<HashMap<_, _>>();
     for update in &updates {
-        let version = versions_by_id
-            .get(&update.update_version_id)
-            .ok_or_else(|| {
-                crate::state::content_store::input(
-                    "Update version no longer exists",
-                )
-            })?;
+        let version = versions_by_id.get(&update.update_version_id).ok_or(
+            ErrorKind::InputError(
+                "update version no longer exists".to_string(),
+            ),
+        )?;
         if version.project_id != update.project_id {
-            return Err(crate::state::content_store::input(
-                "Cannot update content to a different Modrinth project",
+            bail!(ErrorKind::InputError(
+                "cannot update content to a different Modrinth project"
+                    .to_string(),
             ));
         }
     }
@@ -576,13 +569,11 @@ pub(crate) async fn plan_bulk_update(
     let project_updates = updates_by_project
         .into_values()
         .map(|(update, duplicate_paths)| {
-            let version = versions_by_id
-                .get(&update.update_version_id)
-                .ok_or_else(|| {
-                    crate::state::content_store::input(
-                        "Update version no longer exists",
-                    )
-                })?;
+            let version = versions_by_id.get(&update.update_version_id).ok_or(
+                ErrorKind::InputError(
+                    "update version no longer exists".to_string(),
+                ),
+            )?;
             Ok(PlannedProjectUpdate {
                 project_id: update.project_id,
                 relative_path: update.relative_path,
@@ -633,9 +624,7 @@ async fn installed_projects(
 ) -> crate::Result<Vec<InstalledProject>> {
     let instance = instance_rows::get_instance_by_id(instance_id, &state.pool)
         .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError("Unknown instance".to_string())
-        })?;
+        .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
     let entries =
         content_rows::get_content_entries(&content_set.id, &state.pool).await?;
     let entries_by_file_id = entries
@@ -700,11 +689,10 @@ fn installed_project_from_row(
 
 async fn is_shared_instance_member(
     instance_id: &str,
-    state: &State,
+    pool: &SqlitePool,
 ) -> crate::Result<bool> {
     let Some(metadata) =
-        instance_rows::get_instance_metadata_by_id(instance_id, &state.pool)
-            .await?
+        instance_rows::get_instance_metadata_by_id(instance_id, pool).await?
     else {
         return Ok(false);
     };
@@ -880,9 +868,10 @@ fn selected_file_size(version: &Version) -> crate::Result<u64> {
         .find(|file| file.primary)
         .or_else(|| version.files.first())
         .map(|file| u64::from(file.size))
-        .ok_or_else(|| {
-            crate::state::content_store::input("Update version has no files")
-        })
+        .ok_or(
+            ErrorKind::InputError("update version has no files".to_string())
+                .into(),
+        )
 }
 
 fn validate_update_project(
@@ -890,10 +879,9 @@ fn validate_update_project(
     project_id: &str,
 ) -> crate::Result<()> {
     if downloaded.project_id != project_id {
-        return Err(crate::ErrorKind::InputError(
-            "Cannot update content to a different Modrinth project".to_string(),
-        )
-        .into());
+        bail!(ErrorKind::InputError(
+            "cannot update content to a different Modrinth project".to_string(),
+        ));
     }
     Ok(())
 }

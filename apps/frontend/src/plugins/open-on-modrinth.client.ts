@@ -1,4 +1,5 @@
 import { moderationSettings } from '@modrinth/moderation'
+import { isStaff } from '@modrinth/utils'
 
 import {
 	notifyCopied,
@@ -30,13 +31,14 @@ function getAlternativeOrigin(hostname: string | null | undefined): string | nul
 	}
 }
 
-export default defineNuxtPlugin(() => {
+export default defineNuxtPlugin(async () => {
 	const config = useRuntimeConfig()
 	const keybinds = useModerationKeybinds()
 	const settings = useModerationSettings()
+	const auth = await useAuth()
 
 	window.addEventListener('keydown', (event) => {
-		if (event.repeat) {
+		if (event.repeat || !isStaff(auth.value.user)) {
 			return
 		}
 

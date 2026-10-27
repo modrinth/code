@@ -1,6 +1,3 @@
-mod affiliate_code_clicks;
-mod affiliate_code_conversions;
-mod affiliate_code_revenue;
 mod project_downloads;
 mod project_playtime;
 mod project_revenue;
@@ -8,22 +5,8 @@ mod project_views;
 
 use serde::{Deserialize, Serialize};
 
-use crate::models::ids::{AffiliateCodeId, ProjectId};
+use crate::models::ids::ProjectId;
 
-pub(crate) use affiliate_code_clicks::fetch as fetch_affiliate_code_clicks;
-pub use affiliate_code_clicks::{
-    AffiliateCodeClicks, AffiliateCodeClicksField, AffiliateCodeClicksFilters,
-};
-pub(crate) use affiliate_code_conversions::fetch as fetch_affiliate_code_conversions;
-pub use affiliate_code_conversions::{
-    AffiliateCodeConversions, AffiliateCodeConversionsField,
-    AffiliateCodeConversionsFilters,
-};
-pub(crate) use affiliate_code_revenue::fetch as fetch_affiliate_code_revenue;
-pub use affiliate_code_revenue::{
-    AffiliateCodeRevenue, AffiliateCodeRevenueField,
-    AffiliateCodeRevenueFilters,
-};
 #[cfg(test)]
 pub(crate) use project_downloads::normalize_download_source;
 pub use project_downloads::{
@@ -59,16 +42,6 @@ pub struct ReturnMetrics {
     /// How much payout revenue a project has generated.
     pub project_revenue:
         Option<Metrics<ProjectRevenueField, ProjectRevenueFilters>>,
-    /// How many times an affiliate code has been clicked.
-    pub affiliate_code_clicks:
-        Option<Metrics<AffiliateCodeClicksField, AffiliateCodeClicksFilters>>,
-    /// How many times a product has been purchased with an affiliate code.
-    pub affiliate_code_conversions: Option<
-        Metrics<AffiliateCodeConversionsField, AffiliateCodeConversionsFilters>,
-    >,
-    /// How much payout revenue an affiliate code has generated.
-    pub affiliate_code_revenue:
-        Option<Metrics<AffiliateCodeRevenueField, AffiliateCodeRevenueFilters>>,
 }
 
 /// See [`ReturnMetrics`].
@@ -99,11 +72,10 @@ pub struct Metrics<BucketBy, FilterBy> {
 
 /// Metrics collected in a single time slice.
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
-#[serde(untagged)] // the presence of `source_project`, `source_affiliate_code` determines the kind
+#[serde(untagged)]
 pub enum AnalyticsData {
     /// Project metrics.
     Project(ProjectAnalytics),
-    AffiliateCode(AffiliateCodeAnalytics),
 }
 
 /// Project metrics.
@@ -130,25 +102,4 @@ pub enum ProjectMetrics {
     Playtime(ProjectPlaytime),
     /// [`ReturnMetrics::project_revenue`].
     Revenue(ProjectRevenue),
-}
-
-/// Affiliate code metrics.
-#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
-pub struct AffiliateCodeAnalytics {
-    /// What affiliate code these metrics are for.
-    pub source_affiliate_code: AffiliateCodeId,
-    /// Metrics collected.
-    #[serde(flatten)]
-    pub metrics: AffiliateCodeMetrics,
-}
-
-/// Affiliate code metrics of a specific kind.
-///
-/// If a field is not included in [`Metrics::bucket_by`], it will be [`None`].
-#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
-#[serde(rename_all = "snake_case", tag = "metric_kind")]
-pub enum AffiliateCodeMetrics {
-    Clicks(AffiliateCodeClicks),
-    Conversions(AffiliateCodeConversions),
-    Revenue(AffiliateCodeRevenue),
 }

@@ -105,7 +105,15 @@ pub struct SharedInstancePublishPreview {
     pub shared_instance_id: String,
     pub latest_version: i32,
     pub diffs: Vec<SharedInstanceUpdateDiff>,
-    pub config_files: Vec<String>,
+    pub files: Vec<SharedInstancePublishFile>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SharedInstancePublishFile {
+    pub path: String,
+    pub size: u64,
+    pub blocked: bool,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

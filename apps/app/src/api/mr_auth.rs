@@ -1,12 +1,13 @@
 use crate::api::Result;
-use crate::api::TheseusSerializableError;
 use crate::api::oauth_utils;
 use crate::api::oauth_utils::auth_code_reply::AuthReplySession;
 use crate::api::oauth_utils::auth_seal::AuthSeal;
+use anyhow::Context;
 use tauri::Manager;
 use tauri::Runtime;
 use tauri::plugin::TauriPlugin;
 use tauri_plugin_opener::OpenerExt;
+use theseus::ErrorKind;
 use theseus::prelude::*;
 use url::Url;
 
@@ -45,19 +46,10 @@ pub async fn modrinth_login<R: Runtime>(
 
     app.opener()
         .open_url(auth_request_uri, None::<&str>)
-        .map_err(|e| {
-            TheseusSerializableError::Theseus(
-                theseus::ErrorKind::OtherError(format!(
-                    "Failed to open auth request URI: {e}"
-                ))
-                .into(),
-            )
-        })?;
+        .context("failed to open auth request URI")?;
 
     let Some(auth_code) = reply.wait().await? else {
-        return Err(TheseusSerializableError::Theseus(
-            theseus::ErrorKind::OtherError("Login canceled".into()).into(),
-        ));
+        return Err(ErrorKind::LoginCanceled.into());
     };
     let session_token = seal.open(&auth_code)?;
     let credentials = mr_auth::authenticate_finish_flow(&session_token).await?;
@@ -106,12 +98,8 @@ fn auth_request_url(
     nonce: &str,
     add_account: bool,
 ) -> Result<String> {
-    let mut url = Url::parse(begin_url).map_err(|error| -> theseus::Error {
-        theseus::ErrorKind::OtherError(format!(
-            "Failed to build auth request URI: {error}"
-        ))
-        .into()
-    })?;
+    let mut url =
+        Url::parse(begin_url).context("failed to build auth request URI")?;
     {
         let mut query = url.query_pairs_mut();
         query.append_pair("launcher", "true");

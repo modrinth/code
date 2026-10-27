@@ -1004,20 +1004,11 @@
   "collection.button.discover-mods": {
     "message": "Odkrywaj mody"
   },
-  "collection.button.edit-icon": {
-    "message": "Edytuj ikonę"
-  },
   "collection.button.remove-icon": {
     "message": "Usuń ikonę"
   },
   "collection.button.remove-project": {
     "message": "Usuń projekt"
-  },
-  "collection.button.replace-icon": {
-    "message": "Zamień ikonę"
-  },
-  "collection.button.select-icon": {
-    "message": "Wybierz ikonę"
   },
   "collection.button.unfollow-project": {
     "message": "Przestań obserwować projekt"
@@ -1033,9 +1024,6 @@
   },
   "collection.description.following": {
     "message": "Automatycznie wygenerowana kolekcja wszystkich projektów, które obserwujesz."
-  },
-  "collection.editing": {
-    "message": "Edytowanie kolekcji"
   },
   "collection.error.not-found": {
     "message": "Nie znaleziono kolekcji"
@@ -1070,6 +1058,9 @@
   "conversation-thread.action.approve": {
     "message": "Zatwierdź"
   },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "Zatwierdź z odpowiedzią "
+  },
   "conversation-thread.action.close-report": {
     "message": "Zamknij zgłoszenie"
   },
@@ -1078,6 +1069,9 @@
   },
   "conversation-thread.action.reject": {
     "message": "Odrzuć"
+  },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "Odrzuć z odpowiedzią"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Otwórz ponownie wątek "
@@ -1112,6 +1106,9 @@
   "conversation-thread.action.withhold": {
     "message": "Wstrzymaj"
   },
+  "conversation-thread.action.withhold-with-reply": {
+    "message": "Wstrzymaj z odpowiedzią"
+  },
   "conversation-thread.closed-thread.description": {
     "message": "Ten wątek jest zamknięty i nie można wysyłać do niego nowych wiadomości."
   },
@@ -1120,6 +1117,9 @@
   },
   "conversation-thread.error.reopening-report": {
     "message": "Błąd podczas ponownego otwierania zgłoszenia"
+  },
+  "conversation-thread.error.sending-message": {
+    "message": "Błąd podczas wysyłania wiadomości"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Odpowiedz na wątek..."
@@ -1142,11 +1142,20 @@
   "conversation-thread.reply-modal.help-center-note": {
     "message": "Jeżeli musisz skontaktować się z zespołem moderatorów, odwiedź <help-center-link>centrum pomocy Modrinth</help-center-link> i kliknij w niebieskie kółko, by skontaktować się z obsługą."
   },
+  "conversation-thread.reply.changed-thread": {
+    "message": "Wybrany wątek uległ zmianie. Otwórz go ponownie, zanim na niego odpowiesz."
+  },
+  "conversation-thread.reply.facet": {
+    "message": "Wyjaśnienie {issue}"
+  },
   "conversation-thread.resubmit-modal.confirmation.description": {
     "message": "Potwierdzenie, że komentarze od zespołu moderacji zostały zaadresowane"
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "Potwierdzam, że komentarze od zespołu moderacji zostały zaadresowane."
+  },
+  "conversation-thread.resubmit-modal.description.auto-approval": {
+    "message": "Przesyłasz ponownie <project-title>{projectTitle}</project-title>. Jeśli wszystkie problemy zgłoszone przez moderatorów zostały rozwiązane, projekt może zostać zatwierdzony automatycznie. W przeciwnym razie zostanie on wysłany do moderatorów do przeglądu."
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "Ponowne wysyłanie do przeglądu"
@@ -1159,6 +1168,12 @@
   },
   "conversation-thread.resubmit-modal.warning": {
     "message": "Powtórne wysyłanie projektu do sprawdzenia bez zaadresowania komentarzy moderatorów może skutkować zawieszeniem konta."
+  },
+  "conversation-thread.resubmit-required-actions-tooltip": {
+    "message": "Musisz wykonać wszystkie powyższe wymagane działania, aby ponownie przesłać projekt do przeglądu"
+  },
+  "conversation-thread.submit-modal.description": {
+    "message": "Wysyłasz <project-title>{projectTitle}</project-title> do przeglądu przez naszych moderatorów."
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Pliki uzupełniające to np. kod źródłowy, a nie alternatywne wersje lub wariacje."
@@ -1441,30 +1456,6 @@
   },
   "create.project.visibility-unlisted": {
     "message": "Niewymieniony"
-  },
-  "dashboard.affiliate-links.create.button": {
-    "message": "Utwórz link afiliacyjny"
-  },
-  "dashboard.affiliate-links.empty.no-codes": {
-    "message": "Nie znaleziono żadnych kodów afiliacyjnych."
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "Błąd podczas ładowania linków afiliacyjnych"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "Twoje linki afiliacyjne"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "Unieważni to nieodwołalnie kod afiliacyjny `{id}`. Wszystkie udostępnione linki używające tego kodu zostaną unieważnione."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "Unieważnij"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "Czy na pewno chcesz unieważnić link afiliacyjny \"{title}\"?"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "Szukaj linku afiliacyjnego..."
   },
   "dashboard.analytics.from-projects": {
     "message": "z {count} {count, plural, one {projektu} other {projektów}}"
@@ -2684,9 +2675,6 @@
   "layout.action.file-lookup": {
     "message": "Wyszukiwarka plików"
   },
-  "layout.action.manage-affiliates": {
-    "message": "Zarządzaj linkami afiliacyjnymi"
-  },
   "layout.action.manage-server-notices": {
     "message": "Zarządzaj ogłoszeniami serwera"
   },
@@ -2999,8 +2987,47 @@
   "modal.shared-instance.open-in-app.why-use": {
     "message": "Czemu warto używać Modrinth App"
   },
+  "moderation.c2pa-scan.failed": {
+    "message": "Nie udało się wykonać skanu szukającego plików wygenerowanych przez AI."
+  },
+  "moderation.c2pa-scan.no-ai-files": {
+    "message": "Nie znaleziono żadnych plików wygenerowanych przez AI."
+  },
   "moderation.exclude-technical-review": {
     "message": "Wyklucz RT"
+  },
+  "moderation.keybinds.change": {
+    "message": "{setting}: {binding}. Aktywuj, aby zmienić przypisanie."
+  },
+  "moderation.keybinds.composer": {
+    "message": "Odpowiedzi na wątki i prywatne notatki"
+  },
+  "moderation.keybinds.listen": {
+    "message": "Wciśnij klawisz..."
+  },
+  "moderation.keybinds.no-results": {
+    "message": "Żaden skrót klawiszowy nie pasuje do twojego wyszukiwania."
+  },
+  "moderation.keybinds.not-bound": {
+    "message": "Nie przypisane"
+  },
+  "moderation.keybinds.project": {
+    "message": "Kopiowanie z publicznej strony projektu"
+  },
+  "moderation.keybinds.recording": {
+    "message": "{setting}: Nasłuchiwanie klawisza. Wciśnij Escape, aby wyczyścić ten klawisz."
+  },
+  "moderation.keybinds.reset-default": {
+    "message": "Przywróć do domyślnych"
+  },
+  "moderation.keybinds.scope-global": {
+    "message": "Może zostać użyte gdziekolwiek na stronie."
+  },
+  "moderation.keybinds.scope-project-page": {
+    "message": "Użyte na stronach projektu, gdy skróty klawiszowe są włączone."
+  },
+  "moderation.keybinds.search": {
+    "message": "Wyszukaj skróty klawiszowe..."
   },
   "moderation.moderate": {
     "message": "Moderuj"
@@ -3022,6 +3049,12 @@
   },
   "moderation.page.technicalReview": {
     "message": "Przegląd techniczny"
+  },
+  "moderation.project-review.approvedCount": {
+    "message": "{count} zaakceptowane"
+  },
+  "moderation.project-review.archivedCount": {
+    "message": "{count} "
   },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} na stronę"
@@ -3409,6 +3442,9 @@
   },
   "project-member-header.success-join": {
     "message": "Zaakceptowano zaproszenie do zespołu"
+  },
+  "project-moderation-nags.project-submitted-for-review": {
+    "message": "Twój projekt został przesłany do sprawdzenia!"
   },
   "project-moderation-nags.publishing-checklist": {
     "message": "Lista kontrolna publikacji"
@@ -4118,9 +4154,6 @@
   "project.settings.license.custom-name-required": {
     "message": "Podaj nazwę niestandardowej licencji."
   },
-  "project.settings.license.custom-url-description": {
-    "message": "Lokalizacja strony pełnego tekstu licencji."
-  },
   "project.settings.license.intro": {
     "message": "Ważne jest, aby wybrać odpowiednią licencję dla Twojego {type}. Możesz wybrać jedną z naszej listy lub podać niestandardową licencję. Możesz również podać niestandardowy adres URL wybranej licencji; w przeciwnym razie zostanie wyświetlony tekst licencji. Sprawdź <guide>poradnik o licencjach</guide>, by dowiedzieć się więcej."
   },
@@ -4144,12 +4177,6 @@
   },
   "project.settings.license.optional-label": {
     "message": "opcjonalne"
-  },
-  "project.settings.license.select": {
-    "message": "Licencja"
-  },
-  "project.settings.license.select-placeholder": {
-    "message": "Szukaj licencji..."
   },
   "project.settings.license.title": {
     "message": "Licencja"
@@ -4562,29 +4589,17 @@
   "report.not-for.dmca.description": {
     "message": "Zobacz naszą <policy-link>Politykę dotyczącą praw autorskich</policy-link>."
   },
-  "report.note.ai-images.1": {
-    "message": "Właśnie zaktualizowaliśmy nasze zasady, aby zakazać generowanych przez AI obrazów w ikonach, galeriach i opisach. Dajemy twórcom okres karencji na usunięcie zdjęć AI z ich projektów, zanim zaczniemy akceptować raporty dla nich."
-  },
-  "report.note.check-back-later": {
-    "message": "Sprawdź ponownie później, gdy okres karencji zakończy się. Raporty tego typu nie są obecnie akceptowane."
-  },
   "report.note.copyright.1": {
     "message": "Należy pamiętać, że *nie* przesyłasz wniosku o usunięcie treści na podstawie ustawy DMCA, ale zgłoszenie dotyczące ponownie przesłanej treści."
   },
   "report.note.copyright.2": {
     "message": "Jeśli zamierzałeś złożyć wniosek o usunięcie treści na podstawie ustawy DMCA (co stanowi działanie prawne), zapoznaj się z naszą <copyright-policy-link>Polityką dotyczącą praw autorskich</copyright-policy-link>."
   },
-  "report.note.fully-ai-generated.1": {
-    "message": "Właśnie zaktualizowaliśmy nasze zasady, aby zakazać w pełni generowanych przez AI projektów. Dajemy twórcom okres karencji na aktualizację lub usunięcie w pełni wygenerowanych przez AI projektów, zanim zaczniemy akceptować raporty dla nich."
-  },
   "report.note.malicious.1": {
     "message": "Zgłoszenia szkodliwych lub zwodniczych treści muszą zawierać znaczny dowód, na przykład fragmenty kodu źródłowego."
   },
   "report.note.malicious.2": {
     "message": "Podsumowania z Microsoft Defender, VirusTotal lub narzędzi AI wykrywających złośliwe oprogramowanie nie są uważane jako wystarczający dowód i nie będą akceptowane."
-  },
-  "report.note.missing-disclosure.1": {
-    "message": "Ujawnienia treści są nową funkcją, którą właśnie dodaliśmy. Dajemy twórcom okres karencji na aktualizację ich ujawnień, zanim zaczniemy akceptować raporty o brakujących lub nieprawidłowych informacjach."
   },
   "report.please-report": {
     "message": "Proszę zgłosić:"
@@ -5552,15 +5567,6 @@
   "settings.pats.modal.create.title": {
     "message": "Utwórz klucz dostępu osobistego"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "Usuń klucz"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "Usunie to klucz na zawsze (na serio na zawsze)."
-  },
-  "settings.pats.modal.delete.title": {
-    "message": "Czy na pewno chcesz usunąć ten klucz?"
-  },
   "settings.pats.modal.edit.title": {
     "message": "Edytuj klucz dostępu osobistego"
   },
@@ -5585,14 +5591,8 @@
   "settings.sessions.action.revoke-session": {
     "message": "Unieważnij sesję"
   },
-  "settings.sessions.created-ago": {
-    "message": "Utworzony {ago}"
-  },
   "settings.sessions.current-session": {
     "message": "Aktualna sesja"
-  },
-  "settings.sessions.description": {
-    "message": "Tu pokazane są wszystkie urządzenia zalogowane na Twoje konto Modrinth. Możesz wylogować się z każdego indywidualnie.\n\nJeżeli widzisz tu wpis, którego nie rozpoznajesz, natychmiast wyloguj to urządzenie i zmień hasło swojego konta Modrinth."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Ostatnio użyte {ago}"
@@ -5772,7 +5772,7 @@
     "message": "Projekty na Modrinth są automatycznie dostępne przez repozytorium Maven do użytku z narzędziami takimi jak <gradle-link>Gradle</gradle-link>. By dowiedzieć się więcej o API Maven Modrinth, <article-link>kliknij tutaj</article-link>."
   },
   "version.section.content.dev-info.maven-note": {
-    "message": "Uwaga: Jeśli jest to możliwe, zalecanie jest używanie repozytorium Maven od twórcy projektu, ponieważ może zawierać przejściowe informacje o zależnościach, o których nie wie API Maven Modrinth. Możesz także skończyć z duplikatami niektórych zależności mieszając repozytoria Maven z i spoza Modrinth, ponieważ identyfikatory grup będą się różnić."
+    "message": "Uwaga: Jeśli jest to możliwe, zalecane jest używanie repozytorium Maven od twórcy projektu, ponieważ może zawierać informacje o zależnościach, o których nie wie API Maven Modrinth. Możesz także skończyć z duplikatami niektórych zależności mieszając repozytoria Maven z i spoza Modrinth, ponieważ identyfikatory grup będą się różnić."
   },
   "version.section.content.dev-info.version-id": {
     "message": "Identyfikator wersji:"

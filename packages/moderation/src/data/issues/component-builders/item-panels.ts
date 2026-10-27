@@ -48,6 +48,7 @@ function itemContext(
 export function expandItemReviewPanels(
 	definitions: Record<string, PanelRegistration>,
 	context: ReviewContext,
+	showAllIssueControls = false,
 ) {
 	const panels: Record<string, Panel> = {}
 	const parents = new Map<string, string>()
@@ -72,7 +73,7 @@ export function expandItemReviewPanels(
 			continue
 		}
 		for (const item of definition.items(context)) {
-			if (resolve(item.panel.shown, context) === false) continue
+			if (!showAllIssueControls && resolve(item.panel.shown, context) === false) continue
 			const itemKey = `${key}:${item.key}`
 			if (items.has(itemKey)) throw new Error(`Duplicate review panel "${itemKey}"`)
 			items.set(itemKey, item)
@@ -209,13 +210,23 @@ export function expandItemReviewPanels(
 			}
 			if (node.type !== 'toggle') return [scoped]
 			if (scoped.type === 'toggle') {
-				scoped.issueListLabel = (ctx) =>
-					resolve(node.issueListLabel, scopedContext(ctx, item)) ??
-					resolve(item.panel.title, scopedContext(ctx, item)) ??
-					item.key
-				scoped.issueListGroup = (ctx) =>
-					resolve(node.issueListGroup, scopedContext(ctx, item)) ??
-					resolve(node.label, scopedContext(ctx, item))
+				scoped.unselectToggles = node.unselectToggles?.map((id) => `${item.key}:${id}`)
+			}
+			if (scoped.type === 'toggle' && node.issueCardDisplay !== undefined) {
+				const display = node.issueCardDisplay
+				scoped.issueCardDisplay = {
+					icon: (ctx) => resolve(display.icon, scopedContext(ctx, item)),
+					dropdownSection:
+						display.dropdownSection === undefined
+							? undefined
+							: (ctx) => resolve(display.dropdownSection, scopedContext(ctx, item)) ?? '',
+					label: (ctx) => resolve(display.label, scopedContext(ctx, item)),
+					group: (ctx) =>
+						resolve(display.group, scopedContext(ctx, item)) ??
+						resolve(item.panel.title, scopedContext(ctx, item)) ??
+						item.key,
+					hidden: (ctx) => resolve(display.hidden, scopedContext(ctx, item)),
+				}
 			}
 			return [scoped]
 		})

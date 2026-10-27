@@ -18,6 +18,65 @@ services:
       interval: 3s
       timeout: 5s
       retries: 3
+  postgres_minecraft_meta:
+    image: postgres:15-alpine
+    container_name: labrinth-postgres-minecraft-meta
+    volumes:
+      - db-launcher-meta-data:/var/lib/postgresql/data
+    ports:
+      - '127.0.0.1:5433:5432'
+    environment:
+      POSTGRES_USER: launchermeta
+      POSTGRES_PASSWORD: launchermeta
+      POSTGRES_HOST_AUTH_METHOD: trust
+      PGUSER: launchermeta
+    healthcheck:
+      test: ['CMD', 'pg_isready', '-U', 'launchermeta']
+      interval: 3s
+      timeout: 5s
+      retries: 3
+  minecraft-meta-s3:
+    image: docker.io/rustfs/rustfs:1.0.1
+    container_name: labrinth-minecraft-meta-s3
+    user: '0:0'
+    ports:
+      - '127.0.0.1:9000:9000'
+      - '127.0.0.1:9001:9001'
+    environment:
+      RUSTFS_VOLUMES: /data
+      RUSTFS_ADDRESS: 0.0.0.0:9000
+      RUSTFS_CONSOLE_ADDRESS: 0.0.0.0:9001
+      RUSTFS_CONSOLE_ENABLE: 'true'
+      RUSTFS_ACCESS_KEY: minecraftmeta
+      RUSTFS_SECRET_KEY: minecraftmeta-local
+      RUSTFS_OBS_LOG_DIRECTORY: /data/logs
+    volumes:
+      - minecraft-meta-s3-data:/data
+    healthcheck:
+      test: ['CMD', 'curl', '--fail', 'http://localhost:9000/health']
+      interval: 3s
+      timeout: 5s
+      retries: 10
+  minecraft-meta-s3-init:
+    profiles:
+      - minecraft-meta-init
+    image: docker.io/amazon/aws-cli:2.34.0
+    container_name: labrinth-minecraft-meta-s3-init
+    environment:
+      AWS_ACCESS_KEY_ID: minecraftmeta
+      AWS_SECRET_ACCESS_KEY: minecraftmeta-local
+      AWS_DEFAULT_REGION: us-east-1
+      AWS_ENDPOINT_URL: http://minecraft-meta-s3:9000
+      AWS_PAGER: ''
+    depends_on:
+      minecraft-meta-s3:
+        condition: service_healthy
+    entrypoint: ['sh', '-ec']
+    command:
+      - |
+        aws s3api head-bucket --bucket minecraft-meta-public || aws s3api create-bucket --bucket minecraft-meta-public
+        aws s3api head-bucket --bucket minecraft-meta-private || aws s3api create-bucket --bucket minecraft-meta-private
+        aws s3api put-bucket-policy --bucket minecraft-meta-public --policy '{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":"*","Action":"s3:GetObject","Resource":"arn:aws:s3:::minecraft-meta-public/*"}]}'
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:9.4.4
     container_name: labrinth-elasticsearch
@@ -369,35 +428,6 @@ services:
       interval: 10s
       timeout: 15s
       retries: 10
-  labrinth:
-    profiles:
-      - with-labrinth
-    build:
-      context: .
-      dockerfile: ./apps/labrinth/Dockerfile
-    container_name: labrinth
-    ports:
-      - '127.0.0.1:8000:8000'
-    env_file: ./apps/labrinth/.env.docker-compose
-    volumes:
-      - labrinth-cdn-data:/tmp/modrinth
-    depends_on:
-      postgres_db:
-        condition: service_healthy
-      elasticsearch:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      redpanda:
-        condition: service_healthy
-      clickhouse:
-        condition: service_healthy
-      mail:
-        condition: service_healthy
-    develop:
-      watch:
-        - path: ./apps/labrinth
-          action: rebuild
   delphi:
     profiles:
       - with-delphi
@@ -429,7 +459,8 @@ networks:
 volumes:
   elasticsearch-data:
   db-data:
+  db-launcher-meta-data:
+  minecraft-meta-s3-data:
   redis-data:
   redis-insight-data:
   redpanda-data:
-  labrinth-cdn-data:

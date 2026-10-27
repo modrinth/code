@@ -1,8 +1,10 @@
 use super::{
     InstanceFileStorage, StoredFileMetadata,
-    adapters::verified_files::VerifiedFiles, input,
+    adapters::verified_files::VerifiedFiles,
 };
+use crate::ErrorKind;
 use crate::state::DirectoryInfo;
+use anyhow::bail;
 use fs4::tokio::AsyncFileExt;
 use sqlx::SqlitePool;
 use std::collections::hash_map::DefaultHasher;
@@ -38,10 +40,15 @@ impl ContentStore {
             .write(true)
             .open(settings_dir.join("store.lock"))
             .await?;
-        if !file.try_lock_exclusive()? {
-            return Err(input(
-                "Another Modrinth process is using this application directory",
-            ));
+        match file.try_lock() {
+            Ok(()) => {}
+            Err(fs4::TryLockError::WouldBlock) => {
+                bail!(ErrorKind::ContentStoreError(
+					"another Modrinth process is using this application directory"
+						.into(),
+				));
+            }
+            Err(fs4::TryLockError::Error(error)) => return Err(error.into()),
         }
         Ok(file)
     }

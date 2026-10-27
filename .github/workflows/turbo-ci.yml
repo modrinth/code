@@ -63,6 +63,7 @@ jobs:
         run: |
           if [ "$INTERNAL" = 'true' ]; then
             docker compose --profile clustered-redis up --wait $UNUSED_SERVICES
+            docker compose run --rm minecraft-meta-s3-init
           fi
 
       - name: Setup Node
@@ -112,7 +113,7 @@ jobs:
       - name: Setup cargo-sqlx
         uses: taiki-e/cache-cargo-install-action@417450f3c33ee20393705369577571770643d4c7 # v3.0.7
         with:
-          tool: sqlx-cli@0.8.6
+          tool: sqlx-cli@0.9.0
           locked: false
           no-default-features: true
           features: rustls,postgres
@@ -171,7 +172,9 @@ jobs:
 
       - name: Start services (fork)
         if: steps.check-labrinth.outputs.needs_services == 'true'
-        run: docker compose --profile clustered-redis up --wait $UNUSED_SERVICES
+        run: |
+          docker compose --profile clustered-redis up --wait $UNUSED_SERVICES
+          docker compose run --rm minecraft-meta-s3-init
 
       - name: Wait for services
         wait: [services]

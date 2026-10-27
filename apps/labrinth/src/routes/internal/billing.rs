@@ -5,11 +5,9 @@ use crate::database::models::charge_item::DBCharge;
 use crate::database::models::ids::DBUserSubscriptionId;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::products_tax_identifier_item::product_info_by_product_price_id;
-use crate::database::models::users_subscriptions_affiliations::DBUsersSubscriptionsAffiliations;
 use crate::database::models::users_subscriptions_credits::DBUserSubscriptionCredit;
 use crate::database::models::{
-    DBAffiliateCodeId, charge_item, generate_charge_id, product_item,
-    user_subscription_item,
+    charge_item, generate_charge_id, product_item, user_subscription_item,
 };
 use crate::database::{PgPool, PgTransaction};
 use crate::env::ENV;
@@ -18,7 +16,6 @@ use crate::models::billing::{
     Product, ProductMetadata, ProductPrice, SubscriptionMetadata,
     SubscriptionStatus, UserSubscription,
 };
-use crate::models::ids::AffiliateCodeId;
 use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
 use crate::models::users::Badges;
@@ -881,14 +878,6 @@ pub async fn edit_subscription(
             ..
         } if open_charge.status == ChargeStatus::Failed => {
             if cancelled {
-                DBUsersSubscriptionsAffiliations::deactivate(
-                    subscription.id,
-                    &mut transaction,
-                )
-                .await
-                .wrap_internal_err(
-                    "updating users subscriptions affiliations in database",
-                )?;
                 open_charge.status = ChargeStatus::Cancelled;
             } else {
                 // Forces another resubscription attempt
@@ -908,14 +897,6 @@ pub async fn edit_subscription(
         ) =>
         {
             open_charge.status = if cancelled {
-                DBUsersSubscriptionsAffiliations::deactivate(
-                    subscription.id,
-                    &mut transaction,
-                )
-                .await
-                .wrap_internal_err(
-                    "executing `DBUsersSubscriptionsAffiliations::deactivate`",
-                )?;
                 ChargeStatus::Cancelled
             } else {
                 ChargeStatus::Open
@@ -1706,7 +1687,6 @@ pub enum ChargeRequestType {
 pub struct PaymentRequestMetadata {
     #[serde(flatten)]
     pub kind: PaymentRequestMetadataKind,
-    pub affiliate_code: Option<AffiliateCodeId>,
 }
 
 #[derive(Deserialize, Serialize, utoipa::ToSchema)]
@@ -2513,25 +2493,6 @@ pub async fn stripe_webhook(
                             .wrap_internal_err(
                                 "upserting subscription charge",
                             )?;
-
-                            if let Some(affiliate_code) = metadata
-                                .payment_metadata
-                                .as_ref()
-                                .and_then(|m| m.affiliate_code)
-                            {
-                                DBUsersSubscriptionsAffiliations {
-                                    subscription_id: subscription.id,
-                                    affiliate_code: DBAffiliateCodeId::from(
-                                        affiliate_code,
-                                    ),
-                                    deactivated_at: None,
-                                }
-                                .insert(&mut transaction)
-                                .await
-                                .wrap_internal_err(
-                                    "inserting subscription affiliation into database",
-                                )?;
-                            }
                         };
 
                         subscription.status = SubscriptionStatus::Provisioned;
@@ -2539,7 +2500,7 @@ pub async fn stripe_webhook(
                             .upsert(&mut transaction)
                             .await
                             .wrap_internal_err(
-                                "updating affiliate code id in database",
+                                "updating subscription in database",
                             )?;
                     }
 

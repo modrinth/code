@@ -35,7 +35,7 @@
 				<label class="text-md font-semibold text-contrast">{{
 					formatMessage(messages.securityCheckLabel)
 				}}</label>
-				<HCaptcha ref="captcha" v-model="token" />
+				<Turnstile ref="captcha" v-model="token" />
 			</div>
 
 			<Button
@@ -106,7 +106,7 @@ import {
 import { useQuery } from '@tanstack/vue-query'
 import type { LocationQueryValue } from 'vue-router'
 
-import HCaptcha from '@/components/ui/auth/HCaptcha.vue'
+import Turnstile from '@/components/ui/auth/Turnstile.vue'
 
 interface AuthGlobalsResponse {
 	captcha_enabled?: boolean
@@ -265,8 +265,8 @@ async function recovery() {
 			text: getErrorMessage(err),
 			type: 'error',
 		})
-		captcha.value?.reset?.()
 	}
+	captcha.value?.reset?.()
 	stopLoading()
 }
 

@@ -77,7 +77,7 @@ jobs:
         run: nsc cache sccache setup --cache_name default >> "$GITHUB_ENV"
 
       - name: Install build dependencies
-        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends cmake libcurl4-openssl-dev
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends cmake
 
       - name: Build labrinth
         run: cargo build --profile release-labrinth --package labrinth
@@ -116,3 +116,15 @@ jobs:
       application-set: labrinth
       branch: ${{ github.ref == 'refs/heads/prod' && 'main' || 'develop' }}
       environment-name: ${{ github.ref == 'refs/heads/prod' && 'production' || 'staging' }}
+
+  deploy-pinned:
+    needs: [docker-build]
+    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
+    uses: SparkUniverse/workflows/.github/workflows/argo-update.yaml@main
+    secrets:
+      ARGOCD_DEPLOY_KEY: ${{ secrets.ARGOCD_DEPLOY_KEY }}
+    with:
+      application-set: labrinth
+      image-tag: gh${{ github.run_id }}
+      pin: ${{ github.head_ref }}
+      require-pin: true

@@ -53,16 +53,25 @@ export const postApprovalReviewPanel = panel({
 			issue: postApprovalMetadataIssueIssue,
 			label: 'Missing Dependencies',
 			id: 'post-approval-dependencies',
+			issueCardDisplay: {
+				label: 'Missing Dependencies',
+			},
 		}),
 		toggle({
 			issue: postApprovalMetadataIssueIssue,
 			label: 'Game versions',
 			id: 'post-approval-mc-versions',
+			issueCardDisplay: {
+				label: 'Game versions',
+			},
 		}),
 		toggle({
 			issue: postApprovalMetadataIssueIssue,
 			label: 'Loaders',
 			id: 'post-approval-loaders',
+			issueCardDisplay: {
+				label: 'Loaders',
+			},
 		}),
 		section({
 			shown: ({ selected }) => selected.toggleIds.includes('post-approval-dependencies'),
@@ -104,6 +113,7 @@ export const postApprovalReviewPanel = panel({
 			issue: postApprovalMetadataIssueIssue,
 			label: 'Inconsistent Licensing',
 			id: 'post-approval-license',
+			issueCardDisplay: { label: 'Inconsistent Licensing' },
 		}),
 	),
 )

@@ -1,5 +1,6 @@
 use crate::ErrorKind;
 use crate::util::fetch::INSECURE_REQWEST_CLIENT;
+use anyhow::Context;
 use base64::Engine;
 use base64::prelude::{BASE64_STANDARD, BASE64_URL_SAFE_NO_PAD};
 use chrono::{DateTime, Duration, TimeZone, Utc};
@@ -8,9 +9,9 @@ use futures::TryStreamExt;
 use heck::ToTitleCase;
 use p256::ecdsa::signature::Signer;
 use p256::ecdsa::{Signature, SigningKey, VerifyingKey};
+use p256::elliptic_curve::Generate;
 use p256::pkcs8::{DecodePrivateKey, EncodePrivateKey, LineEnding};
-use rand::Rng;
-use rand::rngs::OsRng;
+use rand::RngExt;
 use reqwest::header::HeaderMap;
 use reqwest::{Response, StatusCode};
 use serde::de::DeserializeOwned;
@@ -20,12 +21,13 @@ use serde_json::json;
 use sha2::Digest;
 use std::borrow::Cow;
 use std::collections::HashMap;
+use std::error::Error;
 use std::future::Future;
 use std::hash::{BuildHasherDefault, DefaultHasher};
-use std::io;
 use std::ops::Deref;
 use std::sync::Arc;
 use std::time::Instant;
+use std::{io, iter};
 use tokio::runtime::{Handle, RuntimeFlavor};
 use tokio::sync::Mutex;
 use tokio::task;
@@ -84,7 +86,76 @@ struct OAuthErrorResponse {
     error: String,
 }
 
+#[derive(Deserialize)]
+struct XboxErrorResponse {
+    #[serde(rename = "XErr")]
+    xerr: u64,
+}
+
 impl MinecraftAuthenticationError {
+    pub(crate) fn code(&self) -> &'static str {
+        match self {
+            Self::DeserializeResponse {
+                step: MinecraftAuthStep::RefreshOAuthToken,
+                ..
+            } => "minecraft_auth_token_expired",
+            Self::DeserializeResponse {
+                step: MinecraftAuthStep::SisuAuthenticate,
+                ..
+            } => "minecraft_auth_clock_out_of_sync",
+            Self::DeserializeResponse {
+                step: MinecraftAuthStep::MinecraftToken,
+                status_code: StatusCode::TOO_MANY_REQUESTS,
+                ..
+            } => "minecraft_auth_rate_limited",
+            Self::DeserializeResponse {
+                step: MinecraftAuthStep::MinecraftToken,
+                status_code,
+                ..
+            } if status_code.is_server_error() => {
+                "minecraft_auth_service_unavailable"
+            }
+            Self::Request { source, .. } if source.is_request() => {
+                let connection_refused = iter::successors(
+                    Some(source as &(dyn Error + 'static)),
+                    |&error| error.source(),
+                )
+                .any(|error| {
+                    error.downcast_ref::<io::Error>().is_some_and(|error| {
+                        error.kind() == io::ErrorKind::ConnectionRefused
+                    })
+                });
+
+                if connection_refused {
+                    "minecraft_auth_connection_refused"
+                } else {
+                    "minecraft_auth_network"
+                }
+            }
+            Self::DeserializeResponse { step, raw, .. } => {
+                match serde_json::from_str::<XboxErrorResponse>(raw)
+                    .map(|response| response.xerr)
+                {
+                    Ok(2148916222) => "minecraft_auth_age_verification",
+                    Ok(2148916227) => "minecraft_auth_banned",
+                    Ok(2148916229) => "minecraft_auth_restricted",
+                    Ok(2148916233) => "minecraft_auth_no_xbox_profile",
+                    Ok(2148916234) => "minecraft_auth_terms_not_accepted",
+                    Ok(2148916235) => "minecraft_auth_region_unavailable",
+                    Ok(2148916236 | 2148916237) => {
+                        "minecraft_auth_adult_verification"
+                    }
+                    Ok(2148916238) => "minecraft_auth_underage",
+                    _ if matches!(step, MinecraftAuthStep::XstsAuthorize) => {
+                        "minecraft_auth_xsts_rejected"
+                    }
+                    _ => "minecraft_auth_error",
+                }
+            }
+            _ => "minecraft_auth_error",
+        }
+    }
+
     fn is_invalid_grant(&self) -> bool {
         matches!(
             self,
@@ -134,7 +205,7 @@ pub async fn login_begin(
                 auth_request_uri: redirect_uri.value.msa_oauth_redirect,
             });
         }
-        Err(err) => return Err(crate::ErrorKind::from(err).into()),
+        Err(err) => return Err(err.into()),
     }
 }
 
@@ -185,7 +256,7 @@ pub async fn login_finish(
     let online_profile = credentials
         .online_profile()
         .await
-        .ok_or(io::Error::other("Failed to fetch player profile"))?;
+        .ok_or(ErrorKind::NoMinecraftProfile)?;
     credentials.offline_profile = MinecraftProfile {
         id: online_profile.id,
         name: online_profile.name.clone(),
@@ -475,22 +546,20 @@ impl Credentials {
             match res {
                 Ok(_) => Ok(Some(creds)),
                 Err(err) => {
-                    if let ErrorKind::MinecraftAuthenticationError(
-                        MinecraftAuthenticationError::Request {
-                            ref source,
-                            ..
-                        },
-                    ) = *err.raw
+                    let auth_error =
+                        err.downcast_ref::<MinecraftAuthenticationError>();
+
+                    if let Some(MinecraftAuthenticationError::Request {
+                        source,
+                        ..
+                    }) = auth_error
                         && (source.is_connect() || source.is_timeout())
                     {
                         return Ok(Some(creds));
                     }
 
-                    if matches!(
-                        &*err.raw,
-                        ErrorKind::MinecraftAuthenticationError(source)
-                            if source.is_invalid_grant()
-                    ) {
+                    if auth_error.is_some_and(|error| error.is_invalid_grant())
+                    {
                         Self::remove(creds.offline_profile.id, exec).await?;
 
                         if let Some((_, mut user)) =
@@ -925,7 +994,7 @@ async fn sisu_authenticate(
         .headers
         .get("X-SessionId")
         .and_then(|x| x.to_str().ok())
-        .ok_or_else(|| MinecraftAuthenticationError::NoSessionId)?
+        .ok_or(MinecraftAuthenticationError::NoSessionId)?
         .to_string();
 
     Ok((
@@ -1150,7 +1219,7 @@ async fn minecraft_token(
         .and_then(|x| x.get(0))
         .and_then(|x| x.get("uhs"))
         .and_then(|x| x.as_str().map(String::from))
-        .ok_or_else(|| MinecraftAuthenticationError::NoUserHash)?;
+        .ok_or(MinecraftAuthenticationError::NoUserHash)?;
 
     let token = token.token;
 
@@ -1341,16 +1410,13 @@ impl MinecraftProfile {
 
     /// Returns the currently selected skin for this profile.
     pub fn current_skin(&self) -> crate::Result<&MinecraftSkin> {
-        Ok(self
-            .skins
+        self.skins
             .iter()
             .find(|skin| {
                 skin.state == MinecraftCharacterExpressionState::Active
             })
             // There should always be one active skin, even when the player uses their default skin
-            .ok_or_else(|| {
-                ErrorKind::OtherError("No active skin found".into())
-            })?)
+            .context("no active skin found")
     }
 
     /// Returns the currently selected cape for this profile.
@@ -1511,23 +1577,23 @@ pub struct DeviceTokenKey {
 fn generate_key() -> Result<DeviceTokenKey, MinecraftAuthenticationError> {
     let uuid = Uuid::new_v4();
 
-    let signing_key = SigningKey::random(&mut OsRng);
+    let signing_key = SigningKey::generate_from_rng(&mut rand::rng());
     let public_key = VerifyingKey::from(&signing_key);
 
-    let encoded_point = public_key.to_encoded_point(false);
+    let encoded_point = public_key.to_sec1_point(false);
 
     Ok(DeviceTokenKey {
         id: uuid,
         key: signing_key,
         x: BASE64_URL_SAFE_NO_PAD.encode(
-            encoded_point.x().ok_or_else(|| {
-                MinecraftAuthenticationError::ReadingPublicKey
-            })?,
+            encoded_point
+                .x()
+                .ok_or(MinecraftAuthenticationError::ReadingPublicKey)?,
         ),
         y: BASE64_URL_SAFE_NO_PAD.encode(
-            encoded_point.y().ok_or_else(|| {
-                MinecraftAuthenticationError::ReadingPublicKey
-            })?,
+            encoded_point
+                .y()
+                .ok_or(MinecraftAuthenticationError::ReadingPublicKey)?,
         ),
     })
 }
@@ -1575,8 +1641,7 @@ async fn send_signed_request<T: DeserializeOwned>(
     let mut sig_buffer = Vec::new();
     sig_buffer.extend_from_slice(&1_i32.to_be_bytes()[..]);
     sig_buffer.extend_from_slice(&(time as u64).to_be_bytes()[..]);
-    sig_buffer.extend_from_slice(&ecdsa_sig.r().to_bytes());
-    sig_buffer.extend_from_slice(&ecdsa_sig.s().to_bytes());
+    sig_buffer.extend_from_slice(&ecdsa_sig.to_bytes());
 
     let signature = BASE64_STANDARD.encode(&sig_buffer);
 
@@ -1635,8 +1700,8 @@ fn get_date_header(headers: &HeaderMap) -> DateTime<Utc> {
 
 #[tracing::instrument]
 fn generate_oauth_challenge() -> String {
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
 
-    let bytes: Vec<u8> = (0..64).map(|_| rng.r#gen::<u8>()).collect();
+    let bytes: Vec<u8> = (0..64).map(|_| rng.random::<u8>()).collect();
     bytes.iter().map(|byte| format!("{byte:02x}")).collect()
 }

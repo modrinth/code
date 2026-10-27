@@ -73,12 +73,11 @@ fn main() -> std::io::Result<()> {
     // <https://docs.sentry.io/platforms/rust/guides/actix-web/>
     // DSN is from SENTRY_DSN env variable.
     // Has no effect if not set.
-    let sentry = sentry::init(sentry::ClientOptions {
-        release: sentry::release_name!(),
-        traces_sample_rate: ENV.SENTRY_TRACES_SAMPLE_RATE,
-        environment: Some((&ENV.SENTRY_ENVIRONMENT).into()),
-        ..Default::default()
-    });
+    let mut sentry_options = sentry::ClientOptions::new()
+        .traces_sample_rate(ENV.SENTRY_TRACES_SAMPLE_RATE)
+        .environment(ENV.SENTRY_ENVIRONMENT.as_str());
+    sentry_options.release = sentry::release_name!();
+    let sentry = sentry::init(sentry_options);
     if sentry.is_enabled() {
         info!("Enabled Sentry integration");
         unsafe {
@@ -184,8 +183,6 @@ async fn app() -> std::io::Result<()> {
 
     let gotenberg_client = GotenbergClient::from_env(redis_pool.clone())
         .expect("Failed to create Gotenberg client");
-    let muralpay = labrinth::queue::payouts::create_muralpay_client()
-        .expect("Failed to create MuralPay client");
 
     if let Some(task) = args.run_background_task {
         info!("Running task {task:?} and exiting");
@@ -200,7 +197,6 @@ async fn app() -> std::io::Result<()> {
             stripe_client,
             anrok_client.clone(),
             email_queue,
-            muralpay,
         )
         .await
         .map_err(std::io::Error::other)?;
@@ -216,7 +212,7 @@ async fn app() -> std::io::Result<()> {
         .build()
         .expect("Failed to create prometheus metrics middleware");
 
-    database::register_and_set_metrics(&pool, &prometheus.registry)
+    database::register_and_set_metrics(&pool, &ro_pool, &prometheus.registry)
         .await
         .expect("Failed to register database metrics");
     redis_pool
@@ -484,7 +480,8 @@ fn add_error_content(response: &mut Response) {
             "application/json".to_string(),
             Content::new(Some(utoipa::openapi::Ref::from_schema_name(
                 "ApiError",
-            ))),
+            )))
+            .into(),
         );
     }
 }

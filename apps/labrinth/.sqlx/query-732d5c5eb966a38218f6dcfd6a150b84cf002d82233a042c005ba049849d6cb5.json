@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\t\t\tUPDATE user_restrictions\n\t\t\t\tSET restricted_by = $1\n\t\t\t\tWHERE restricted_by = $2\n\t\t\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "732d5c5eb966a38218f6dcfd6a150b84cf002d82233a042c005ba049849d6cb5"
+}

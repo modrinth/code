@@ -6,10 +6,10 @@ mod sources;
 mod storage;
 
 use super::catalog::{is_never_sync_key, setting_by_file_key};
-use super::options_file::{
-    GameOptionsDocument, input_error, options_path, read_document,
-};
+use super::options_file::{GameOptionsDocument, options_path, read_document};
+use crate::ErrorKind;
 use crate::state::{InstanceMetadata, State};
+use anyhow::bail;
 use archive::{ArchiveIndex, Translations};
 use serde::{Deserialize, Serialize};
 use sources::{ArchiveSource, Snapshot};
@@ -80,7 +80,7 @@ struct Candidate {
 
 pub(crate) fn queue_game_locale_index() {
     if let Some(state) = State::get_if_initialized() {
-        state.game_locale_indexer.notify.notify_one();
+        state.synced_options.locales.notify.notify_one();
     } else {
         tracing::warn!(
             "Game setting locales: cannot queue indexing before state initialization"
@@ -90,16 +90,17 @@ pub(crate) fn queue_game_locale_index() {
 
 pub(crate) fn start_game_locale_indexer(state: Arc<State>) {
     if state
-        .game_locale_indexer
+        .synced_options
+        .locales
         .started
         .swap(true, Ordering::AcqRel)
     {
         return;
     }
-    state.game_locale_indexer.notify.notify_one();
+    state.synced_options.locales.notify.notify_one();
     tokio::spawn(async move {
         loop {
-            state.game_locale_indexer.notify.notified().await;
+            state.synced_options.locales.notify.notified().await;
             tokio::time::sleep(std::time::Duration::from_millis(300)).await;
             if let Err(error) = index_installed_sources(&state).await {
                 tracing::warn!(%error, "Game setting locales: indexing failed");
@@ -348,7 +349,9 @@ pub async fn get_game_setting_locale_labels(
     refresh_sources: bool,
 ) -> crate::Result<GameSettingLocaleLabels> {
     if option_ids.len() > 16_384 {
-        return Err(input_error("Too many requested game-setting labels"));
+        bail!(ErrorKind::InputError(
+            "too many requested game-setting labels".to_string()
+        ));
     }
     let requested: std::collections::HashSet<_> = option_ids
         .into_iter()
@@ -363,7 +366,9 @@ pub async fn get_game_setting_locale_labels(
     }
     let locale = minecraft_locale(locale);
     if !archive::valid_locale(&locale) {
-        return Err(input_error("Invalid Minecraft locale"));
+        bail!(ErrorKind::InputError(
+            "invalid Minecraft locale".to_string()
+        ));
     }
     let state = State::get().await?;
     if refresh_sources {

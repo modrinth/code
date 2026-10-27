@@ -1,22 +1,26 @@
+use crate::ErrorKind;
+use crate::State;
 use crate::event::emit::{emit_instance, emit_process};
 use crate::event::{InstancePayloadType, ProcessPayloadType};
 #[cfg(feature = "tauri")]
 use crate::event::{LogEvent, LogPayload};
 use crate::util::io::IOError;
 use crate::util::rpc::RpcServer;
+use anyhow::Context;
 use chrono::{DateTime, NaiveDateTime, TimeZone, Utc};
 use dashmap::DashMap;
 use quick_xml::Reader;
 use quick_xml::events::Event;
 use serde::Deserialize;
 use serde::Serialize;
+use sqlx::SqlitePool;
 use std::collections::VecDeque;
 use std::fmt::Debug;
 use std::fs::OpenOptions;
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::process::ExitStatus;
-use std::sync::LazyLock;
+use std::sync::{Arc, LazyLock};
 use std::time::Instant;
 use tempfile::TempDir;
 use tokio::io::{AsyncBufReadExt, BufReader};
@@ -81,7 +85,7 @@ pub fn remove_log_buffer(instance_id: &str) {
 }
 
 async fn clear_persisted_process(
-    state: &crate::State,
+    pool: &SqlitePool,
     process: Option<(i64, i64)>,
 ) {
     let Some((pid, start_time)) = process else {
@@ -92,11 +96,41 @@ async fn clear_persisted_process(
         pid,
         start_time,
     )
-    .execute(&state.pool)
+    .execute(pool)
     .await
     {
         tracing::warn!("Failed to clear persisted process {pid}: {error}");
     }
+}
+
+/// Looks up the start time, in Unix seconds, of each listed PID that is still running.
+///
+/// Only the listed processes are refreshed, on a blocking thread, so callers holding
+/// content locks are not stalled by a full system scan.
+pub(crate) async fn running_process_start_times(
+    pids: Vec<i64>,
+) -> crate::Result<std::collections::HashMap<i64, i64>> {
+    Ok(tokio::task::spawn_blocking(move || {
+        let pids = pids
+            .into_iter()
+            .filter_map(|pid| u32::try_from(pid).ok())
+            .map(sysinfo::Pid::from_u32)
+            .collect::<Vec<_>>();
+        let mut system = sysinfo::System::new();
+        system.refresh_processes_specifics(
+            sysinfo::ProcessesToUpdate::Some(&pids),
+            false,
+            sysinfo::ProcessRefreshKind::nothing(),
+        );
+        pids.iter()
+            .filter_map(|pid| {
+                system.process(*pid).map(|process| {
+                    (i64::from(pid.as_u32()), process.start_time() as i64)
+                })
+            })
+            .collect()
+    })
+    .await?)
 }
 
 pub(crate) async fn instance_has_running_process(
@@ -125,21 +159,21 @@ pub(crate) async fn instance_has_running_process(
     if processes.is_empty() {
         return Ok(false);
     }
-    let system = sysinfo::System::new_all();
+    let start_times = running_process_start_times(
+        processes.iter().map(|process| process.pid).collect(),
+    )
+    .await?;
     let mut running = false;
     for process in processes {
-        let process_is_running = u32::try_from(process.pid)
-            .ok()
-            .and_then(|pid| system.process(sysinfo::Pid::from_u32(pid)))
-            .is_some_and(|system_process| {
-                let started_at = system_process.start_time() as i64;
+        let process_is_running =
+            start_times.get(&process.pid).is_some_and(|started_at| {
                 started_at.abs_diff(process.start_time) <= 2
             });
         if process_is_running {
             running = true;
         } else {
             clear_persisted_process(
-                state,
+                &state.pool,
                 Some((process.pid, process.start_time)),
             )
             .await;
@@ -178,6 +212,7 @@ impl ProcessManager {
         xml_logging: bool,
         main_class_keep_alive: TempDir,
         rpc_server: RpcServer,
+        state: &Arc<State>,
         post_process_init: impl AsyncFnOnce(
             &ProcessMetadata,
             &RpcServer,
@@ -241,13 +276,6 @@ impl ProcessManager {
             _main_class_keep_alive: main_class_keep_alive,
         };
 
-        let state = match crate::State::get().await {
-            Ok(state) => state,
-            Err(error) => {
-                let _ = process.child.kill().await;
-                return Err(error);
-            }
-        };
         let persisted_process = child_pid.map(|pid| {
             (i64::from(pid), process.metadata.start_time.timestamp())
         });
@@ -285,7 +313,7 @@ impl ProcessManager {
             post_process_init(&process.metadata, &process.rpc_server).await
         {
             tracing::error!("Failed to run post-process init: {e}");
-            clear_persisted_process(&state, persisted_process).await;
+            clear_persisted_process(&state.pool, persisted_process).await;
             let _ = process.child.kill().await;
             return Err(e);
         }
@@ -297,6 +325,7 @@ impl ProcessManager {
 
             let instance_id = metadata.instance_id.clone();
             let instance_path = metadata.instance_path.clone();
+            let pool = state.pool.clone();
             tokio::spawn(async move {
                 Process::process_output(
                     &instance_id,
@@ -304,6 +333,7 @@ impl ProcessManager {
                     stdout,
                     log_path_clone,
                     xml_logging,
+                    &pool,
                 )
                 .await;
             });
@@ -314,6 +344,7 @@ impl ProcessManager {
 
             let instance_id = metadata.instance_id.clone();
             let instance_path = metadata.instance_path.clone();
+            let pool = state.pool.clone();
             tokio::spawn(async move {
                 Process::process_output(
                     &instance_id,
@@ -321,6 +352,7 @@ impl ProcessManager {
                     stderr,
                     log_path_clone,
                     xml_logging,
+                    &pool,
                 )
                 .await;
             });
@@ -335,6 +367,7 @@ impl ProcessManager {
             post_exit_env_vars,
             metadata.uuid,
             persisted_process,
+            Arc::clone(state),
         ));
 
         emit_process(
@@ -432,6 +465,7 @@ impl Process {
         reader: R,
         log_path: impl AsRef<Path>,
         xml_logging: bool,
+        pool: &SqlitePool,
     ) where
         R: tokio::io::AsyncRead + Unpin,
     {
@@ -463,22 +497,17 @@ impl Process {
 
                     Ok(Event::Start(e)) => {
                         match e.name().as_ref() {
-                            b"log4j:Event" => {
+                            "log4j:Event" => {
                                 // Reset for new event
                                 current_event = Log4jEvent::default();
                                 in_event = true;
 
                                 // Extract attributes
                                 for attr in e.attributes().flatten() {
-                                    let key = String::from_utf8_lossy(
-                                        attr.key.into_inner(),
-                                    )
-                                    .to_string();
-                                    let value =
-                                        String::from_utf8_lossy(&attr.value)
-                                            .to_string();
+                                    let key = attr.key.into_inner();
+                                    let value = attr.value.into_owned();
 
-                                    match key.as_str() {
+                                    match key {
                                         "logger" => {
                                             current_event.logger_name =
                                                 Some(value)
@@ -498,11 +527,11 @@ impl Process {
                                     }
                                 }
                             }
-                            b"log4j:Message" => {
+                            "log4j:Message" => {
                                 in_message = true;
                                 current_content = String::new();
                             }
-                            b"log4j:Throwable" => {
+                            "log4j:Throwable" => {
                                 in_throwable = true;
                                 current_content = String::new();
                             }
@@ -511,12 +540,12 @@ impl Process {
                     }
                     Ok(Event::End(e)) => {
                         match e.name().as_ref() {
-                            b"log4j:Message" => {
+                            "log4j:Message" => {
                                 in_message = false;
                                 current_event.message =
                                     Some(current_content.clone());
                             }
-                            b"log4j:Throwable" => {
+                            "log4j:Throwable" => {
                                 in_throwable = false;
                                 current_event.throwable =
                                     if current_content.is_empty() {
@@ -558,7 +587,7 @@ impl Process {
                                     &current_event,
                                 );
                             }
-                            b"log4j:Event" => {
+                            "log4j:Event" => {
                                 in_event = false;
                                 // If no throwable was present, write the log entry at the end of the event
                                 if current_event.message.is_some()
@@ -592,6 +621,7 @@ impl Process {
 											instance_id,
 											&timestamp,
 											message,
+											pool,
                                         ).await {
                                             tracing::error!("Failed to handle server join logging: {e}");
                                         }
@@ -608,14 +638,13 @@ impl Process {
                     }
                     Ok(Event::Text(mut e)) => {
                         if in_message || in_throwable {
-                            if let Ok(text) = e.xml_content() {
-                                current_content.push_str(&text);
-                            }
+                            let text = e.xml11_content();
+                            current_content.push_str(&text);
                         } else if !in_event
                             && !e.inplace_trim_end()
                             && !e.inplace_trim_start()
-                            && let Ok(text) = e.xml_content()
                         {
+                            let text = e.xml11_content();
                             if let Err(e) = Process::append_to_log_file(
                                 &log_path,
                                 &format!("{text}\n"),
@@ -628,12 +657,9 @@ impl Process {
                             Self::emit_legacy_log(instance_id, &text);
                         }
                     }
-                    Ok(Event::CData(e)) => {
-                        if (in_message || in_throwable)
-                            && let Ok(text) = e.xml_content()
-                        {
-                            current_content.push_str(&text);
-                        }
+                    Ok(Event::CData(e)) if in_message || in_throwable => {
+                        let text = e.xml11_content();
+                        current_content.push_str(&text);
                     }
                     _ => (),
                 }
@@ -656,6 +682,7 @@ impl Process {
                     if let Err(e) = Self::maybe_handle_old_server_join_logging(
                         instance_id,
                         line.trim_ascii_end(),
+                        pool,
                     )
                     .await
                     {
@@ -769,29 +796,30 @@ impl Process {
         instance_id: &str,
         timestamp: &str,
         message: &str,
+        pool: &SqlitePool,
     ) -> crate::Result<()> {
         let timestamp = timestamp
             .parse::<i64>()
             .map(|x| x / 1000)
-            .map_err(|x| {
-                crate::ErrorKind::OtherError(format!(
-                    "Failed to parse timestamp: {x}"
-                ))
-            })
+            .context("failed to parse timestamp")
             .and_then(|x| {
-                Utc.timestamp_opt(x, 0).single().ok_or_else(|| {
-                    crate::ErrorKind::OtherError(
-                        "Failed to convert timestamp to DateTime".to_string(),
-                    )
-                })
+                Utc.timestamp_opt(x, 0)
+                    .single()
+                    .context("failed to convert timestamp to DateTime")
             })?;
-        Self::parse_and_insert_server_join(instance_id, message, timestamp)
-            .await
+        Self::parse_and_insert_server_join(
+            instance_id,
+            message,
+            timestamp,
+            pool,
+        )
+        .await
     }
 
     async fn maybe_handle_old_server_join_logging(
         instance_id: &str,
         line: &str,
+        pool: &SqlitePool,
     ) -> crate::Result<()> {
         if let Some((timestamp, message)) = line.split_once(" [CLIENT] [INFO] ")
         {
@@ -801,11 +829,21 @@ impl Process {
                     .map(|x| x.to_utc())
                     .single()
                     .unwrap_or_else(Utc::now);
-            Self::parse_and_insert_server_join(instance_id, message, timestamp)
-                .await
+            Self::parse_and_insert_server_join(
+                instance_id,
+                message,
+                timestamp,
+                pool,
+            )
+            .await
         } else {
-            Self::parse_and_insert_server_join(instance_id, line, Utc::now())
-                .await
+            Self::parse_and_insert_server_join(
+                instance_id,
+                line,
+                Utc::now(),
+                pool,
+            )
+            .await
         }
     }
 
@@ -813,6 +851,7 @@ impl Process {
         instance_id: &str,
         message: &str,
         timestamp: DateTime<Utc>,
+        pool: &SqlitePool,
     ) -> crate::Result<()> {
         let Some(host_port_string) = message.strip_prefix("Connecting to ")
         else {
@@ -826,14 +865,13 @@ impl Process {
             return Ok(());
         };
 
-        let state = crate::State::get().await?;
         crate::state::server_join_log::JoinLogEntry {
             instance_id: instance_id.to_owned(),
             host: host.to_string(),
             port,
             join_time: timestamp,
         }
-        .upsert(&state.pool)
+        .upsert(pool)
         .await?;
         {
             let instance_id = instance_id.to_owned();
@@ -864,33 +902,24 @@ impl Process {
         post_exit_env_vars: Vec<(String, String)>,
         uuid: Uuid,
         persisted_process: Option<(i64, i64)>,
+        state: Arc<State>,
     ) -> crate::Result<()> {
         async fn update_playtime(
             last_updated_playtime: &mut Instant,
             instance_id: &str,
             force_update: bool,
+            pool: &SqlitePool,
         ) {
             let elapsed = last_updated_playtime.elapsed().as_secs();
             if elapsed == 0 || (!force_update && elapsed < 60) {
                 return;
             }
 
-            let state = match crate::State::get().await {
-                Ok(state) => state,
-                Err(e) => {
-                    tracing::warn!(
-                        "Failed to get state for playtime update on instance {}: {}",
-                        instance_id,
-                        e
-                    );
-                    return;
-                }
-            };
             if let Err(e) =
                 crate::state::instances::commands::add_instance_recent_playtime(
                     instance_id,
                     elapsed,
-                    &state.pool,
+                    pool,
                 )
                 .await
             {
@@ -907,7 +936,6 @@ impl Process {
         let mc_exit_status;
         let mut last_updated_playtime = Instant::now();
 
-        let state = crate::State::get().await?;
         loop {
             if let Some(process) = state.process_manager.try_wait(uuid)? {
                 if let Some(t) = process {
@@ -923,12 +951,17 @@ impl Process {
             tokio::time::sleep(tokio::time::Duration::from_millis(50)).await;
 
             // Auto-update playtime every minute
-            update_playtime(&mut last_updated_playtime, &instance_id, false)
-                .await;
+            update_playtime(
+                &mut last_updated_playtime,
+                &instance_id,
+                false,
+                &state.pool,
+            )
+            .await;
         }
 
         state.process_manager.remove(uuid);
-        clear_persisted_process(&state, persisted_process).await;
+        clear_persisted_process(&state.pool, persisted_process).await;
         let sync_instance_id = instance_id.clone();
         tokio::spawn(async move {
             if let Err(error) =
@@ -951,7 +984,13 @@ impl Process {
         .await?;
 
         // Now fully complete- update playtime one last time
-        update_playtime(&mut last_updated_playtime, &instance_id, true).await;
+        update_playtime(
+            &mut last_updated_playtime,
+            &instance_id,
+            true,
+            &state.pool,
+        )
+        .await;
 
         // Publish play time update
         // Allow failure, it will be stored locally and sent next time
@@ -984,9 +1023,13 @@ impl Process {
             tracing::warn!("Failed to write exit status to log file: {}", e);
         }
 
-        let _ = state.discord_rpc.clear_to_default(true).await;
+        let _ = state
+            .presence
+            .discord_rpc
+            .clear_to_default(true, &state.pool, &state.process_manager)
+            .await;
 
-        let _ = state.friends_socket.update_status(None).await;
+        let _ = state.presence.friends_socket.update_status(None).await;
 
         #[cfg(feature = "tauri")]
         {
@@ -1005,11 +1048,9 @@ impl Process {
             // This behaviour may be changed in the future
             if let Some(hook) = post_exit_command {
                 let mut cmd = shlex::split(&hook)
-                    .ok_or_else(|| {
-                        crate::ErrorKind::LauncherError(format!(
-                            "Invalid post-exit command: {hook}",
-                        ))
-                    })?
+                    .ok_or(ErrorKind::LauncherError(format!(
+                        "invalid post-exit command {hook}",
+                    )))?
                     .into_iter();
 
                 if let Some(command) = cmd.next() {
@@ -1023,5 +1064,23 @@ impl Process {
         }
 
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::running_process_start_times;
+
+    #[tokio::test]
+    async fn reads_start_time_of_running_process() {
+        let pid = i64::from(std::process::id());
+        let start_times = running_process_start_times(vec![pid, i64::MAX])
+            .await
+            .unwrap();
+
+        let started_at = start_times[&pid];
+        let now = chrono::Utc::now().timestamp();
+        assert!(started_at > 0 && started_at <= now);
+        assert_eq!(start_times.len(), 1);
     }
 }

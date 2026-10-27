@@ -13,7 +13,10 @@ use tokio::sync::Mutex;
 
 use crate::{
     models::ids::{ProjectId, VersionId},
-    util::kafka::{KAFKA_OPERATION_INTERVAL, KafkaClientState, KafkaEvent},
+    util::kafka::{
+        KAFKA_OPERATION_INTERVAL, KafkaClientState, KafkaEvent,
+        sentry_trace_headers,
+    },
 };
 
 pub const SEARCH_PROJECT_INDEX_QUEUE_TOPIC: &str =
@@ -101,7 +104,8 @@ impl IncrementalSearchQueue {
             let payload = serde_json::to_vec(&event)?;
             let record = FutureRecord::to(SEARCH_PROJECT_INDEX_QUEUE_TOPIC)
                 .key(&key)
-                .payload(&payload);
+                .payload(&payload)
+                .headers(sentry_trace_headers());
 
             if let Err((err, _)) = self
                 .kafka_client

@@ -1,13 +1,14 @@
 //! Writes synced settings and launcher overrides before Minecraft starts.
 
 use super::options_file::{
-    GameOptionsDocument, input_error, options_path, read_document, sha1_bytes,
+    GameOptionsDocument, options_path, read_document, sha1_bytes,
     validate_raw_key_value,
 };
 use super::write_shared_settings::{
     apply_shared_settings_to_instance, remember_processed_sha,
     sync_is_active_for_instance,
 };
+use crate::ErrorKind;
 use crate::state::{InstanceMetadata, State};
 use crate::util::io;
 use std::collections::HashSet;
@@ -25,10 +26,10 @@ pub(super) fn currently_launcher_owned_keys(
 /// Writes canonical settings to `options.txt` before launch.
 pub async fn sync_before_launch(instance_id: &str) -> crate::Result<()> {
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
-        .ok_or_else(|| input_error("Unknown instance"))?;
+        .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
     if sync_is_active_for_instance(&metadata, &state).await? {
         let _ =
             apply_shared_settings_to_instance(&metadata, &state, false).await?;
@@ -47,10 +48,10 @@ pub async fn apply_launcher_overrides(
         return Ok(());
     }
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
-        .ok_or_else(|| input_error("Unknown instance"))?;
+        .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
     let path = options_path(&metadata, &state);
     let (mut document, input_bytes) = if path.exists() {
         read_document(&path).await?

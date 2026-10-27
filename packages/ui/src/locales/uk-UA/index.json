@@ -2,39 +2,6 @@
   "action.no-permission": {
     "defaultMessage": "Недостатньо прав."
   },
-  "affiliate.create.button": {
-    "defaultMessage": "Створити партнерське посилання"
-  },
-  "affiliate.create.header": {
-    "defaultMessage": "Створити новий код партнера"
-  },
-  "affiliate.create.title.description": {
-    "defaultMessage": "Дайте своєму партнерському посиланню назву, щоб ви знали, звідки люди приходять!"
-  },
-  "affiliate.create.title.label": {
-    "defaultMessage": "Заголовок партнерського посилання"
-  },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "як-от YouTube"
-  },
-  "affiliate.create.user.description": {
-    "defaultMessage": "Ім’я користувача особи, для якої створити код партнера"
-  },
-  "affiliate.create.user.placeholder": {
-    "defaultMessage": "Уведіть ім’я користувача…"
-  },
-  "affiliate.createdBy": {
-    "defaultMessage": "Створено {user}"
-  },
-  "affiliate.creating.button": {
-    "defaultMessage": "Створення партнерського посилання…"
-  },
-  "affiliate.revoke": {
-    "defaultMessage": "Відкликати партнерське посилання"
-  },
-  "affiliate.viewAnalytics": {
-    "defaultMessage": "Переглянути аналітику"
-  },
   "app.appearance-settings.native-decorations.description": {
     "defaultMessage": "Використовувати рядок заголовка й елементи керування вашої операційної системи. Потребує перезапуску застосунку."
   },
@@ -151,9 +118,6 @@
   },
   "button.add-server-to-instance": {
     "defaultMessage": "Додати сервер до примірника"
-  },
-  "button.affiliate-links": {
-    "defaultMessage": "Партнерські посилання"
   },
   "button.analytics": {
     "defaultMessage": "Аналітика"
@@ -414,7 +378,7 @@
     "defaultMessage": "Оновити {count, plural, one {# проєкт} few {# проєкти} other {# проєктів}}"
   },
   "content.confirm-deletion.admonition-body": {
-    "defaultMessage": "Видалення мода може назавжди вплинути на ваш світ і спричинити втрату вмісту або несподівані проблеми під час його повторного завантаження."
+    "defaultMessage": "Видаливши мод, ви можете зіпсувати свій світ і втратити частину вмісту або натрапити на проблеми, коли знову його запустите."
   },
   "content.confirm-deletion.admonition-header": {
     "defaultMessage": "Попередження щодо видалення"
@@ -495,7 +459,7 @@
     "defaultMessage": "Додано {count}"
   },
   "content.diff-modal.config-files-updated": {
-    "defaultMessage": "Змінені конфігураційні файли"
+    "defaultMessage": "Змінені файли"
   },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Додано (залежності)"
@@ -1231,6 +1195,9 @@
   },
   "external-files.permissions-card.file-count": {
     "defaultMessage": "{count, plural, one {# файл} few {# файли} many {# файлів} other {# файлу}}"
+  },
+  "external-files.permissions-card.file-database-id": {
+    "defaultMessage": "ID бази даних"
   },
   "external-files.permissions-card.included-files": {
     "defaultMessage": "Уключені файли:"
@@ -3248,6 +3215,9 @@
   "profile.button.create-project": {
     "defaultMessage": "Створити проєкт"
   },
+  "profile.button.edit-user": {
+    "defaultMessage": "Змінити користувача"
+  },
   "profile.button.force-password-reset": {
     "defaultMessage": "Примусово скинути пароль"
   },
@@ -3260,17 +3230,11 @@
   "profile.button.manage-projects": {
     "defaultMessage": "Керувати проєктами"
   },
-  "profile.button.remove-affiliate": {
-    "defaultMessage": "Видалити як партнера"
-  },
   "profile.button.reset-2fa": {
     "defaultMessage": "Скинути двофакторну автентифікацію"
   },
   "profile.button.revoke-sessions": {
     "defaultMessage": "Завершити всі сеанси"
-  },
-  "profile.button.set-affiliate": {
-    "defaultMessage": "Призначити партнером"
   },
   "profile.button.shared-instances": {
     "defaultMessage": "Переглянути спільні примірники"
@@ -3358,9 +3322,6 @@
   },
   "profile.force-password-reset.title": {
     "defaultMessage": "Примусове скидання паролю для користувача {username}"
-  },
-  "profile.label.affiliate": {
-    "defaultMessage": "Партнер"
   },
   "profile.label.badges": {
     "defaultMessage": "Значки"
@@ -4127,6 +4088,15 @@
   "project.settings.disclosures.title": {
     "defaultMessage": "Маркування"
   },
+  "project.settings.environment.bulk.apply-button": {
+    "defaultMessage": "Застосувати до всіх версій"
+  },
+  "project.settings.environment.bulk.description": {
+    "defaultMessage": "Це замінить середовище на кожній версії цього проєкту."
+  },
+  "project.settings.environment.bulk.title": {
+    "defaultMessage": "Застосувати середовище для всіх версій"
+  },
   "project.settings.environment.client_and_server.description": {
     "defaultMessage": "Має деяку функціональність як на стороні клієнта, так і на стороні сервера."
   },
@@ -4153,6 +4123,9 @@
   },
   "project.settings.environment.client_only.title": {
     "defaultMessage": "Лише на стороні клієнта"
+  },
+  "project.settings.environment.modal.title": {
+    "defaultMessage": "Змінити середовище проєкту"
   },
   "project.settings.environment.notice.missing-env.description": {
     "defaultMessage": "Вашому проєктові бракує метаданих середовища. Виберіть потрібні нижче."
@@ -5192,12 +5165,6 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "Відновлення з резервної копії"
   },
-  "servers.backups.bulk-bar.aria-label": {
-    "defaultMessage": "{count, plural, one {Групові дії для однієї вибраної резервної копії} other {Групові дії для # вибраних резервних копій}}"
-  },
-  "servers.backups.bulk-bar.deleting": {
-    "defaultMessage": "Видалення {total, plural, one {# резервоної копії} few {# резервних копій} many {# резервних копій} other {# резервних копій}}…"
-  },
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "{count, plural, one {# резервну копію вибрано} few {# резевні копії вибрано} many {# резевних копій вибрано} other {# резевних копій вибрано}}"
   },
@@ -5222,50 +5189,23 @@
   "servers.backups.empty.heading": {
     "defaultMessage": "Резервних копій ще немає"
   },
-  "servers.backups.filtered-empty.clear-filters": {
-    "defaultMessage": "Очистити фільтр"
+  "servers.backups.interval.every-hours": {
+    "defaultMessage": "Кожні {hours} год"
   },
-  "servers.backups.filtered-empty.description": {
-    "defaultMessage": "Спробуйте інший фільтр або очистіть фільтри, щоб переглянути всі резервні копії."
+  "servers.backups.interval.hours": {
+    "defaultMessage": "{hours} год"
   },
-  "servers.backups.filtered-empty.heading": {
-    "defaultMessage": "Немає відповідних резервних копій"
+  "servers.backups.interval.weekly": {
+    "defaultMessage": "Щотижня"
   },
   "servers.backups.item.auto": {
     "defaultMessage": "Автоматично"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Розклад резервного копіювання"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "Аватар {username}"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "Підтримка"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Ручне резервне копіювання"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Перейменувати"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Відновлення"
-  },
-  "servers.backups.select-backup-aria": {
-    "defaultMessage": "Вибрати резервну копію {name}"
+  "servers.backups.load-error.description": {
+    "defaultMessage": "Ми не змогли завантажити резервні копії вашого сервера."
   },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Створити резервну копію"
-  },
-  "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "Авто"
-  },
-  "servers.backups.toolbar.filter-manual": {
-    "defaultMessage": "Уручну"
-  },
-  "servers.backups.toolbar.select-all": {
-    "defaultMessage": "Вибрати все"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "Триває створення резервної копії"
@@ -6531,7 +6471,7 @@
     "defaultMessage": "Збереження інвентарю"
   },
   "tag.category.kitchen-sink": {
-    "defaultMessage": "Усе підряд"
+    "defaultMessage": "Усе й одразу"
   },
   "tag.category.kitpvp": {
     "defaultMessage": "Комплект PvP"
@@ -6699,7 +6639,7 @@
     "defaultMessage": "Міста"
   },
   "tag.category.transportation": {
-    "defaultMessage": "Пересування"
+    "defaultMessage": "Рух"
   },
   "tag.category.tweaks": {
     "defaultMessage": "Поліпшення"

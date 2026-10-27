@@ -1,8 +1,12 @@
 <template>
 	<div
 		v-if="tabs.length > 0"
-		class="inline-flex w-fit items-center gap-1 rounded-xl border border-solid border-surface-5 p-0.5 shadow-sm"
-		:class="wrap ? 'h-auto max-w-full flex-wrap' : 'h-[38px] overflow-x-auto'"
+		class="inline-flex w-fit items-center gap-1 border border-solid border-surface-5 shadow-sm"
+		:class="[
+			wrap ? 'h-auto max-w-full flex-wrap' : 'overflow-x-auto',
+			size === 'large' ? 'rounded-[14px] p-[3px]' : 'rounded-xl p-0.5',
+			!wrap && (size === 'large' ? 'h-[42px]' : 'h-[38px]'),
+		]"
 		role="tablist"
 	>
 		<button
@@ -10,14 +14,20 @@
 			:key="tab.value"
 			ref="tabButtons"
 			type="button"
-			class="flex min-h-6 shrink-0 cursor-pointer items-center justify-center gap-2 rounded-[10px] border border-solid px-2.5 text-sm font-medium outline-none transition-all active:scale-[0.97] focus-visible:ring-4 focus-visible:ring-brand-shadow disabled:cursor-not-allowed disabled:opacity-50"
+			class="flex min-h-6 shrink-0 cursor-pointer items-center justify-center gap-2 border border-solid outline-none transition-all active:scale-[0.97] focus-visible:ring-4 focus-visible:ring-brand-shadow disabled:cursor-not-allowed disabled:opacity-50"
 			:class="[
 				wrap ? 'h-8' : 'h-full',
+				size === 'large'
+					? 'rounded-xl px-3 text-base font-semibold'
+					: 'rounded-[10px] px-2.5 text-sm font-medium',
 				tab.value === value
 					? color === 'gray'
 						? 'border-surface-5 bg-surface-4 text-contrast'
 						: 'border-green bg-highlight-green text-green'
-					: 'border-transparent bg-transparent text-primary hover:bg-surface-4',
+					: [
+							'border-transparent bg-transparent hover:bg-surface-4',
+							size === 'large' ? 'text-contrast' : 'text-primary',
+						],
 			]"
 			role="tab"
 			:disabled="disabled"
@@ -61,6 +71,7 @@ const props = defineProps<{
 	tabs: TabsTab[]
 	wrap?: boolean
 	color?: 'green' | 'gray'
+	size?: 'default' | 'large'
 	disabled?: boolean
 }>()
 

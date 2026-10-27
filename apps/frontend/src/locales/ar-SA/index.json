@@ -782,6 +782,9 @@
   "auth.create-account.date-of-birth.required.title": {
     "message": "تاريخ الميلاد مطلوب"
   },
+  "auth.create-account.date-of-birth.under13-helper": {
+    "message": "لا يمكنك صناعه حساب علي Modrinth إلا إذا كنت فوق 13 سنه."
+  },
   "auth.create-account.info-panel.source-code-link": {
     "message": "شفرة المصدر ذات الصلة"
   },
@@ -944,20 +947,11 @@
   "collection.button.discover-mods": {
     "message": "اكتشف المودات"
   },
-  "collection.button.edit-icon": {
-    "message": "تعديل الأيقونة"
-  },
   "collection.button.remove-icon": {
     "message": "حذف الأيقونة"
   },
   "collection.button.remove-project": {
     "message": "إزالة المشروع"
-  },
-  "collection.button.replace-icon": {
-    "message": "تغيير الأيقونة"
-  },
-  "collection.button.select-icon": {
-    "message": "تحديد الأيقونة"
   },
   "collection.button.unfollow-project": {
     "message": "إلغاء متابعة المشروع"
@@ -973,9 +967,6 @@
   },
   "collection.description.following": {
     "message": "مجموعة تم إنشاؤها تلقائيًا تضمّ جميع المشاريع التي تتابعها."
-  },
-  "collection.editing": {
-    "message": "تعديل المجموعة"
   },
   "collection.error.not-found": {
     "message": "لم يتم العثور على المجموعة"
@@ -1010,11 +1001,17 @@
   "conversation-thread.action.approve": {
     "message": "موافقة"
   },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "الموافقة مع الرد"
+  },
   "conversation-thread.action.close-with-reply": {
     "message": "الإغلاق مع الرد"
   },
   "conversation-thread.action.reject": {
     "message": "رفض"
+  },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "الرفض مع الرد"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "إعادة فتح سلسلة المحادثة"
@@ -1049,6 +1046,9 @@
   "conversation-thread.action.withhold": {
     "message": "حجب"
   },
+  "conversation-thread.action.withhold-with-reply": {
+    "message": "الحجب مع الرد"
+  },
   "conversation-thread.closed-thread.description": {
     "message": "هذه السلسلة مغلقة، ولا يمكن إرسال رسائل جديدة إليها."
   },
@@ -1057,6 +1057,9 @@
   },
   "conversation-thread.error.reopening-report": {
     "message": "حدث خطأ أثناء إعادة فتح البلاغ"
+  },
+  "conversation-thread.error.sending-message": {
+    "message": "حدث خطأ أثناء إرسال الرسالة"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "الرد على سلسلة المحادثة..."
@@ -1378,30 +1381,6 @@
   },
   "create.project.visibility-unlisted": {
     "message": "غير مدرج"
-  },
-  "dashboard.affiliate-links.create.button": {
-    "message": "إنشاء رابط عمولة"
-  },
-  "dashboard.affiliate-links.empty.no-codes": {
-    "message": "لم يتم العثور على أي أكواد عمولة."
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "حدث خطأ أثناء تحميل روابط العمولة"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "روابط العمولة الخاصة بك"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "سيؤدي هذا إلى إلغاء كود العمولة `{id}` نهائيًا، ولن تعود أي روابط موجودة تمت مشاركتها باستخدام هذا الكود صالحة."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "إلغاء"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "هل أنت متأكد من رغبتك في إلغاء رابط العمولة ''{title}'' الخاص بك؟"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "البحث عن روابط العمولة..."
   },
   "dashboard.analytics.from-projects": {
     "message": "{count, plural, one {من مشروع واحد} two {من مشروعين} few {من # مشاريع} many {من # مشروعًا} other {من # مشروع}}"
@@ -2608,9 +2587,6 @@
   },
   "layout.action.file-lookup": {
     "message": "البحث عن ملف"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "إدارة روابط العمولة"
   },
   "layout.action.manage-server-notices": {
     "message": "إدارة إشعارات الخادم"

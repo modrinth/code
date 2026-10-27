@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type Archon, type Labrinth, pingWebSocketUrl } from '@modrinth/api-client'
+import type { Archon, Labrinth } from '@modrinth/api-client'
 import {
 	CheckCircleIcon,
 	ChevronRightIcon,
@@ -10,13 +10,23 @@ import {
 } from '@modrinth/assets'
 import { useQueryClient } from '@tanstack/vue-query'
 import type Stripe from 'stripe'
-import { computed, nextTick, onBeforeUnmount, ref, toRef, useTemplateRef, watch } from 'vue'
+import {
+	computed,
+	nextTick,
+	onBeforeUnmount,
+	onMounted,
+	ref,
+	toRef,
+	useTemplateRef,
+	watch,
+} from 'vue'
 
 import { Button } from '#ui/components/base/buttons'
 import { injectNotificationManager } from '#ui/providers/web-notifications.ts'
 
 import { useDebugLogger } from '../../composables/debug-logger'
 import { defineMessage, type MessageDescriptor, useVIntl } from '../../composables/i18n'
+import { useRegionPings } from '../../composables/region-pings'
 import { useStripe } from '../../composables/stripe'
 import { commonMessages } from '../../utils'
 import ModalLoadingIndicator from '../modal/ModalLoadingIndicator.vue'
@@ -30,11 +40,6 @@ const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
 const queryClient = useQueryClient()
 const debug = useDebugLogger('ModrinthServersPurchaseModal')
-
-export type RegionPing = {
-	region: string
-	ping: number
-}
 
 // Type alias for billing interval that matches both the local and api-client types
 export type ServerBillingInterval = 'monthly' | 'quarterly' | 'yearly'
@@ -51,10 +56,7 @@ const props = defineProps<{
 	existingPlan?: Labrinth.Billing.Internal.Product
 	existingSubscription?: Labrinth.Billing.Internal.UserSubscription
 	refreshPaymentMethods: () => Promise<void>
-	fetchStock: (
-		region: Archon.Servers.v1.Region,
-		request: Archon.Servers.v0.StockRequest,
-	) => Promise<number>
+	fetchStock: (memoryMb: number[]) => Promise<Archon.Servers.v1.StockResponse>
 	initiatePayment: (
 		body: Labrinth.Billing.Internal.InitiatePaymentRequest,
 	) => Promise<
@@ -64,7 +66,6 @@ const props = defineProps<{
 	>
 	onError: (err: Error) => void
 	onFinalizeNoPaymentChange?: () => Promise<void>
-	affiliateCode?: string | null
 }>()
 
 const modal = useTemplateRef<InstanceType<typeof NewModal>>('modal')
@@ -73,7 +74,6 @@ const selectedInterval = ref<ServerBillingInterval>('quarterly')
 const loading = ref(false)
 const selectedRegion = ref<string>()
 const projectId = ref<string>()
-const affiliateCode = ref(props.affiliateCode ?? null)
 
 const {
 	initializeStripe,
@@ -104,7 +104,6 @@ const {
 	projectId,
 	props.initiatePayment,
 	props.onError,
-	affiliateCode,
 )
 
 const customServer = ref<boolean>(false)
@@ -151,80 +150,55 @@ const currentRegion = computed(() => {
 	return props.regions.find((region) => region.shortcode === selectedRegion.value)
 })
 
-const regionPings = ref<RegionPing[]>([])
+const { regionPings, startRegionPings, startPingRefresh } = useRegionPings()
+let stopPingRefresh: (() => void) | null = null
 
-const currentPing = computed(() => {
-	return regionPings.value.find((ping) => ping.region === currentRegion.value?.shortcode)?.ping
-})
+const currentPing = computed(() =>
+	currentRegion.value ? regionPings.value[currentRegion.value.shortcode] : undefined,
+)
 
 const currentStep = ref<Step>()
 
-const PING_COUNT = 5
-const PING_INTERVAL = 200
-const MAX_PING_TIME = 1000
+const stock = ref<Archon.Servers.v1.StockResponse>()
 
-const initialIndex: Record<string, number> = {
-	'eu-lim': 31,
-}
+let stockRequestId = 0
 
-let regionPingAbortController: AbortController | null = null
+const stockMemorySizes = computed(() => [
+	...new Set(
+		props.availableProducts.flatMap((product) =>
+			product.metadata.type === 'pyro' || product.metadata.type === 'medal'
+				? [product.metadata.ram]
+				: [],
+		),
+	),
+])
 
-function setRegionPing(region: Archon.Servers.v1.Region, ping: number) {
-	regionPings.value = regionPings.value.filter((entry) => entry.region !== region.shortcode)
-	regionPings.value.push({
-		region: region.shortcode,
-		ping,
-	})
-}
+async function loadStock() {
+	const requestId = ++stockRequestId
+	stock.value = undefined
 
-function stopRegionPings() {
-	regionPingAbortController?.abort()
-	regionPingAbortController = null
-	regionPings.value = []
-}
-
-function startRegionPings() {
-	regionPingAbortController?.abort()
-	regionPings.value = []
-
-	const controller = new AbortController()
-	regionPingAbortController = controller
-
-	for (const region of props.regions) {
-		void runRegionPing(region, initialIndex[region.shortcode] ?? 1, controller.signal)
+	let result: Archon.Servers.v1.StockResponse
+	try {
+		result = await props.fetchStock(stockMemorySizes.value)
+	} catch (err) {
+		debug('Failed to fetch stock:', err)
+		props.onError(err as Error)
+		result = { regions: [], total: {} }
 	}
+
+	if (requestId !== stockRequestId) return
+	stock.value = result
+	startRegionPings(result.regions)
 }
 
-function ensureRegionPings() {
-	if (regionPingAbortController && !regionPingAbortController.signal.aborted) return
-	startRegionPings()
-}
-
-async function runRegionPing(region: Archon.Servers.v1.Region, index: number, signal: AbortSignal) {
-	if (signal.aborted) return
-
-	const ping = await pingWebSocketUrl(`wss://${region.shortcode}${index}.${region.zone}/pingtest`, {
-		count: PING_COUNT,
-		intervalMs: PING_INTERVAL,
-		settleDelayMs: MAX_PING_TIME,
-		timeoutMs: PING_COUNT * PING_INTERVAL + MAX_PING_TIME + 1000,
-		signal,
-	})
-
-	if (signal.aborted) return
-
-	if (ping > 0) {
-		setRegionPing(region, ping)
-	} else {
-		setRegionPing(region, -1)
+onMounted(async () => {
+	try {
+		const result = await props.fetchStock(stockMemorySizes.value)
+		startRegionPings(result.regions)
+	} catch (err) {
+		debug('Failed to fetch ping URLs:', err)
 	}
-}
-
-function startRegionPingsIfNeeded() {
-	if (currentStep.value === 'region') {
-		ensureRegionPings()
-	}
-}
+})
 
 const currentStepIndex = computed(() =>
 	currentStep.value ? visibleSteps.value.indexOf(currentStep.value) : -1,
@@ -344,7 +318,6 @@ async function setStep(step: Step | undefined, skipValidation = false) {
 
 	if (await beforeProceed(step)) {
 		currentStep.value = step
-		startRegionPingsIfNeeded()
 		await nextTick()
 
 		await afterProceed(step)
@@ -402,7 +375,9 @@ function begin(
 	currentStep.value = skipPlanStep
 		? (visibleSteps.value[1] ?? visibleSteps.value[0])
 		: visibleSteps.value[0]
-	startRegionPingsIfNeeded()
+	void loadStock()
+	stopPingRefresh?.()
+	stopPingRefresh = startPingRefresh()
 	skipPaymentMethods.value = true
 	projectId.value = project
 	modal.value?.show()
@@ -416,12 +391,18 @@ const emit = defineEmits<{
 	(e: 'hide' | 'purchase-success'): void
 }>()
 
+function stopStockAndPingRefresh() {
+	stockRequestId++
+	stopPingRefresh?.()
+	stopPingRefresh = null
+}
+
 function handleHide() {
-	stopRegionPings()
+	stopStockAndPingRefresh()
 	emit('hide')
 }
 
-onBeforeUnmount(stopRegionPings)
+onBeforeUnmount(stopStockAndPingRefresh)
 
 function handleChooseCustom() {
 	customServer.value = true
@@ -493,13 +474,12 @@ function goToBreadcrumbStep(id: string) {
 				v-model:region="selectedRegion"
 				v-model:plan="selectedPlan"
 				:regions="regions"
-				:pings="regionPings"
+				:stock="stock"
 				:custom="customServer"
 				:hide-region-selection="hideRegionSelection"
 				:available-products="availableProducts"
 				:currency="currency"
 				:interval="selectedInterval"
-				:fetch-stock="fetchStock"
 			/>
 			<PaymentMethodSelector
 				v-else-if="currentStep === 'payment' && selectedPlan && selectedInterval"

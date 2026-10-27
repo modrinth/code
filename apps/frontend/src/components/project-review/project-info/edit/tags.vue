@@ -1,24 +1,13 @@
 <!-- eventually extract content from project settings to be a component so it can be shared here. -->
 <script setup lang="ts">
-import {
-	Checkbox,
-	defineMessages,
-	EmptyState,
-	formatCategory,
-	formatCategoryHeader,
-	formatProjectTypeSentence,
-	FormattedTag,
-	type MessageDescriptor,
-	sortProjectTypes,
-	TagItem,
-	useVIntl,
-} from '@modrinth/ui'
+import { Checkbox, EmptyState, sortProjectTypes, TagItem } from '@modrinth/ui'
 import { capitalizeString, sortedCategories } from '@modrinth/utils'
 import { computed, ref, useTemplateRef } from 'vue'
 
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
-import { projectReviewMessages as reviewMessages } from '../../messages'
+import { categoryHeader, categoryName } from '../tag-labels'
+import { projectTypeLabels } from '../type-labels'
 import EditModal from './edit-modal.vue'
 import { useProjectInfoEdit } from './use-project-edit'
 
@@ -42,79 +31,6 @@ const SHARED_CATEGORY_PROJECT_TYPES: Record<string, string> = {
 	datapack: 'mod',
 }
 
-const messages = defineMessages({
-	uploadVersionFirstHeading: {
-		id: 'project.settings.tags.upload-version-first.heading',
-		defaultMessage: 'Upload versions before adding tags',
-	},
-	uploadVersionFirstDescription: {
-		id: 'project.settings.tags.upload-version-first.description',
-		defaultMessage: 'Upload a version before selecting project tags.',
-	},
-	categoriesDescription: {
-		id: 'project.settings.tags.categories-description',
-		defaultMessage: 'Select all categories that reflect the themes or function of your {type}.',
-	},
-	featuresDescription: {
-		id: 'project.settings.tags.features-description',
-		defaultMessage: 'Select all of the features that your {type} makes use of.',
-	},
-	resolutionsDescription: {
-		id: 'project.settings.tags.resolutions-description',
-		defaultMessage: 'Select the resolution(s) of textures in your {type}.',
-	},
-	performanceImpactDescription: {
-		id: 'project.settings.tags.performance-impact-description',
-		defaultMessage:
-			'Select the realistic performance impact of your {type}. Select multiple if the {type} is configurable to different levels of performance impact.',
-	},
-	featuredTags: {
-		id: 'project.settings.tags.featured-tags',
-		defaultMessage: 'Featured tags',
-	},
-	featuredTagsDescription: {
-		id: 'project.settings.tags.featured-tags-select-description',
-		defaultMessage:
-			'Select your most relevant tags. These are displayed before the rest of your tags.',
-	},
-	selectAtLeastOneCategory: {
-		id: 'project.settings.tags.select-at-least-one-category',
-		defaultMessage: 'Select at least one category in order to feature a category.',
-	},
-	featuredTagsRequired: {
-		id: 'project.settings.tags.featured-tags-required',
-		defaultMessage: 'You must have at least one featured tag.',
-	},
-})
-
-const groupTitleMessages: Record<string, MessageDescriptor> = defineMessages({
-	categories: {
-		id: 'project.settings.tags.group-title.categories',
-		defaultMessage: '{showType, select, yes {{types} categories} other {Categories}}',
-	},
-	features: {
-		id: 'project.settings.tags.group-title.features',
-		defaultMessage: '{showType, select, yes {{types} features} other {Features}}',
-	},
-	resolutions: {
-		id: 'project.settings.tags.group-title.resolutions',
-		defaultMessage: '{showType, select, yes {{types} resolutions} other {Resolutions}}',
-	},
-	'performance impact': {
-		id: 'project.settings.tags.group-title.performance-impact',
-		defaultMessage:
-			'{showType, select, yes {{types} performance impact} other {Performance impact}}',
-	},
-})
-
-const groupDescriptionMessages: Record<string, MessageDescriptor> = {
-	categories: messages.categoriesDescription,
-	features: messages.featuresDescription,
-	resolutions: messages.resolutionsDescription,
-	'performance impact': messages.performanceImpactDescription,
-}
-
-const { formatMessage, locale } = useVIntl()
 const tags = useGeneratedState()
 const { projectV2 } = injectProjectReviewPageContext()
 const { project, saving, beginEditing, saveProject } = useProjectInfoEdit()
@@ -128,9 +44,9 @@ const projectTypes = computed(() => {
 	if (isServerProject.value) return ['minecraft_java_server']
 	return sortProjectTypes(new Set(project.value?.project_types ?? ['mod']))
 })
-const formatCategoryName = (categoryName: string) => formatCategory(formatMessage, categoryName)
+const formatCategoryName = (category: string) => categoryName(category)
 const allCategories = computed(
-	() => sortedCategories(tags.value, formatCategoryName, locale.value) as Category[],
+	() => sortedCategories(tags.value, formatCategoryName, 'en-US') as Category[],
 )
 const projectTypesByCategoryList = computed(() => {
 	const lists = new Map<string, string[]>()
@@ -141,34 +57,37 @@ const projectTypesByCategoryList = computed(() => {
 	return lists
 })
 const projectTypeListFormatter = computed(
-	() => new Intl.ListFormat(locale.value, { style: 'long', type: 'conjunction' }),
+	() => new Intl.ListFormat('en-US', { style: 'long', type: 'conjunction' }),
 )
 
 function formatProjectTypeName(type: string) {
-	return formatProjectTypeSentence(
-		formatMessage,
-		type === 'minecraft_java_server' ? 'server' : type,
-	)
+	return (projectTypeLabels[type] ?? 'Project').toLowerCase()
 }
 
 function formatGroupTitle(header: string, types: string[]) {
-	const message = groupTitleMessages[header]
-	if (!message) return formatCategoryHeader(formatMessage, header)
-	const showType = projectTypes.value.length > 1
-	return formatMessage(message, {
-		showType: showType ? 'yes' : 'other',
-		types: showType
-			? capitalizeString(projectTypeListFormatter.value.format(types.map(formatProjectTypeName)))
-			: '',
-	})
+	const title = categoryHeader(header)
+	if (
+		projectTypes.value.length <= 1 ||
+		!['categories', 'features', 'resolutions', 'performance impact'].includes(header)
+	)
+		return title
+	return `${capitalizeString(projectTypeListFormatter.value.format(types.map(formatProjectTypeName)))} ${header}`
 }
 
 function formatGroupDescription(header: string, types: string[]) {
-	const message = groupDescriptionMessages[header]
-	if (!message) return undefined
-	return formatMessage(message, {
-		type: formatProjectTypeName(types.length > 1 ? 'project' : types[0]),
-	})
+	const type = formatProjectTypeName(types.length > 1 ? 'project' : types[0])
+	switch (header) {
+		case 'categories':
+			return `Select all categories that reflect the themes or function of your ${type}.`
+		case 'features':
+			return `Select all of the features that your ${type} makes use of.`
+		case 'resolutions':
+			return `Select the resolution(s) of textures in your ${type}.`
+		case 'performance impact':
+			return `Select the realistic performance impact of your ${type}. Select multiple if the ${type} is configurable to different levels of performance impact.`
+		default:
+			return undefined
+	}
 }
 
 function withPokemonFirst(categories: Category[]) {
@@ -275,7 +194,7 @@ defineExpose({ show })
 <template>
 	<EditModal
 		ref="modal"
-		:section="formatMessage(reviewMessages.tags)"
+		section="Tags"
 		:saving="saving"
 		:can-save="canSave"
 		width="60rem"
@@ -285,8 +204,8 @@ defineExpose({ show })
 		<EmptyState
 			v-if="!canSelectTags"
 			type="no-documents"
-			:heading="formatMessage(messages.uploadVersionFirstHeading)"
-			:description="formatMessage(messages.uploadVersionFirstDescription)"
+			heading="Upload versions before adding tags"
+			description="Upload a version before selecting project tags."
 		/>
 		<div v-else class="flex flex-col gap-4">
 			<div
@@ -310,7 +229,7 @@ defineExpose({ show })
 						@update:model-value="toggleTag(category.name)"
 					>
 						<span aria-hidden="true">
-							<FormattedTag :tag="category.name" enforce-type="category" />
+							{{ categoryName(category.name) }}
 						</span>
 					</Checkbox>
 				</div>
@@ -318,16 +237,14 @@ defineExpose({ show })
 
 			<div class="rounded-2xl border border-solid border-surface-4 bg-surface-3 p-4">
 				<div class="mb-1 flex items-center gap-2">
-					<h3 class="m-0 text-lg font-semibold text-contrast">
-						{{ formatMessage(messages.featuredTags) }}
-					</h3>
+					<h3 class="m-0 text-lg font-semibold text-contrast">Featured tags</h3>
 					<TagItem> {{ featuredTags.length }}/{{ MAX_FEATURED_TAGS }} </TagItem>
 				</div>
 				<p class="mb-3 mt-0 text-sm text-secondary">
-					{{ formatMessage(messages.featuredTagsDescription) }}
+					Select your most relevant tags. These are displayed before the rest of your tags.
 				</p>
 				<p v-if="selectedTags.length === 0" class="m-0 text-secondary">
-					{{ formatMessage(messages.selectAtLeastOneCategory) }}
+					Select at least one category in order to feature a category.
 				</p>
 				<div v-else class="grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-4">
 					<Checkbox
@@ -341,12 +258,12 @@ defineExpose({ show })
 						@update:model-value="toggleFeatured(name)"
 					>
 						<span aria-hidden="true">
-							<FormattedTag :tag="name" enforce-type="category" />
+							{{ categoryName(name) }}
 						</span>
 					</Checkbox>
 				</div>
 				<p v-if="featuredTags.length === 0" class="mb-0 mt-3 text-sm text-red" role="alert">
-					{{ formatMessage(messages.featuredTagsRequired) }}
+					You must have at least one featured tag.
 				</p>
 			</div>
 		</div>

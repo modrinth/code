@@ -2,7 +2,6 @@ use super::ids::*;
 use crate::database::PgTransaction;
 use crate::models::notifications::{
     NotificationBody, NotificationChannel, NotificationDeliveryStatus,
-    NotificationType,
 };
 use chrono::{DateTime, Utc};
 use eyre::{Result, WrapErr};
@@ -44,97 +43,6 @@ impl NotificationBuilder {
         self.insert_many(vec![user], transaction, redis)
             .await
             .wrap_err("inserting notification")?;
-        Ok(())
-    }
-
-    pub async fn insert_many_payout_notifications(
-        users: Vec<DBUserId>,
-        dates_available: Vec<DateTime<Utc>>,
-        transaction: &mut PgTransaction<'_>,
-        redis: &RedisPool,
-    ) -> Result<()> {
-        let notification_ids =
-            generate_many_notification_ids(users.len(), &mut *transaction)
-                .await
-                .wrap_err(
-                    "generating notification ids for payout notifications",
-                )?;
-
-        let users_raw_ids = users.iter().map(|x| x.0).collect::<Vec<_>>();
-        let notification_ids =
-            notification_ids.iter().map(|x| x.0).collect::<Vec<_>>();
-
-        // Use RETURNING to get back only the notification_ids and user_ids
-        // that were actually inserted (i.e. those with sum >= 100).
-        // This is necessary because insert_many_deliveries references
-        // notifications(id) via a foreign key, passing notification_ids
-        // that were filtered out by the WHERE clause would cause a
-        // FK constraint violation and fail the entire transaction.
-        let inserted_rows = sqlx::query!(
-            "
-            WITH
-              period_payouts AS (
-                SELECT
-                  ids.notification_id,
-                  ids.user_id,
-                  ids.date_available,
-                  FLOOR(COALESCE(SUM(pv.amount), 0.0) * 100) :: BIGINT sum -- Convert to cents
-                  FROM UNNEST($1::bigint[], $2::bigint[], $3::timestamptz[]) AS ids(notification_id, user_id, date_available)
-                LEFT JOIN payouts_values pv ON pv.user_id = ids.user_id AND pv.date_available = ids.date_available
-                GROUP BY ids.user_id, ids.notification_id, ids.date_available
-              )
-            INSERT INTO notifications (
-                id, user_id, body
-            )
-            SELECT
-              notification_id id,
-              user_id,
-              JSONB_BUILD_OBJECT(
-                'type', 'payout_available',
-                'date_available', to_jsonb(date_available),
-                'amount', to_jsonb(sum)
-              ) body
-            FROM period_payouts
-            WHERE sum >= 100
-            RETURNING id, user_id
-            ",
-            &notification_ids[..],
-            &users_raw_ids[..],
-            &dates_available[..],
-        )
-        .fetch_all(&mut *transaction)
-        .await
-        .wrap_err("inserting payout notifications")?;
-
-        if inserted_rows.is_empty() {
-            return Ok(());
-        }
-
-        let inserted_notification_ids: Vec<i64> =
-            inserted_rows.iter().map(|r| r.id).collect();
-        let inserted_user_raw_ids: Vec<i64> =
-            inserted_rows.iter().map(|r| r.user_id).collect();
-        let inserted_users: Vec<DBUserId> = inserted_user_raw_ids
-            .iter()
-            .map(|&id| DBUserId(id))
-            .collect();
-
-        let notification_types = inserted_notification_ids
-            .iter()
-            .map(|_| NotificationType::PayoutAvailable.as_str())
-            .collect::<Vec<_>>();
-
-        NotificationBuilder::insert_many_deliveries(
-            transaction,
-            redis,
-            &inserted_notification_ids,
-            &inserted_user_raw_ids,
-            &notification_types,
-            &inserted_users,
-        )
-        .await
-        .wrap_err("inserting payout notification deliveries")?;
-
         Ok(())
     }
 

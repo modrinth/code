@@ -2,16 +2,13 @@
 import { DownloadIcon, ExternalIcon, GridIcon } from '@modrinth/assets'
 import {
 	ButtonLink,
-	defineMessages,
 	IconButton,
 	type ImageViewerEditorMetadata,
 	injectNotificationManager,
-	useVIntl,
 } from '@modrinth/ui'
 import { ref } from 'vue'
 
 import ImageViewerInfo from './image-viewer-info.vue'
-import { projectReviewMessages } from './messages'
 
 const props = defineProps<{
 	src: string
@@ -19,22 +16,8 @@ const props = defineProps<{
 }>()
 const pixelated = defineModel<boolean>('pixelated', { default: false })
 const downloading = ref(false)
-const { formatMessage } = useVIntl()
+
 const { handleError } = injectNotificationManager()
-const messages = defineMessages({
-	enablePixelated: {
-		id: 'project-review.image.enable-pixelated',
-		defaultMessage: 'Enable pixel-art rendering',
-	},
-	disablePixelated: {
-		id: 'project-review.image.disable-pixelated',
-		defaultMessage: 'Disable pixel-art rendering',
-	},
-	download: {
-		id: 'project-review.image.download',
-		defaultMessage: 'Download image',
-	},
-})
 
 async function downloadImage() {
 	if (downloading.value) return
@@ -61,8 +44,8 @@ async function downloadImage() {
 
 <template>
 	<IconButton
-		v-tooltip="formatMessage(pixelated ? messages.disablePixelated : messages.enablePixelated)"
-		:label="formatMessage(pixelated ? messages.disablePixelated : messages.enablePixelated)"
+		v-tooltip="pixelated ? 'Disable pixel-art rendering' : 'Enable pixel-art rendering'"
+		:label="pixelated ? 'Disable pixel-art rendering' : 'Enable pixel-art rendering'"
 		:type="pixelated ? 'colored' : 'quiet'"
 		:color="pixelated ? 'brand' : undefined"
 		:aria-pressed="pixelated"
@@ -71,8 +54,8 @@ async function downloadImage() {
 		<GridIcon aria-hidden="true" />
 	</IconButton>
 	<IconButton
-		v-tooltip="formatMessage(messages.download)"
-		:label="formatMessage(messages.download)"
+		v-tooltip="'Download image'"
+		label="Download image"
 		type="quiet"
 		:loading="downloading"
 		@click="downloadImage"
@@ -80,10 +63,10 @@ async function downloadImage() {
 		<DownloadIcon aria-hidden="true" />
 	</IconButton>
 	<ButtonLink
-		v-tooltip="formatMessage(projectReviewMessages.openImageInNewTab)"
+		v-tooltip="'Open image in new tab'"
 		type="quiet"
 		class="!w-9 !rounded-full !p-0"
-		:aria-label="formatMessage(projectReviewMessages.openImageInNewTab)"
+		aria-label="Open image in new tab"
 		:href="src"
 		target="_blank"
 	>

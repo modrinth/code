@@ -12,15 +12,17 @@ use super::reconciliation::{
     list_source_screenshots, reconcile_source_screenshots,
     scan_source_screenshots,
 };
-use crate::State;
 use crate::event::InstancePayloadType;
 use crate::event::emit::emit_instance;
 use crate::state::instances::adapters::sqlite::{
     instance_rows::{self, InstanceScreenshotSource},
     screenshot_rows,
 };
+use crate::state::{DirectoryInfo, InstanceLocks};
 use crate::util::fetch::sha1_file_async;
 use crate::util::io::{self, IOError};
+use crate::{ErrorKind, State};
+use anyhow::{Context, bail};
 
 const SCREENSHOTS_DIRECTORY: &str = "screenshots";
 const SCREENSHOT_SCAN_CONCURRENCY: usize = 8;
@@ -58,9 +60,7 @@ pub async fn list_screenshots(
     let source =
         instance_rows::get_instance_screenshot_source(instance_id, &state.pool)
             .await?
-            .ok_or_else(|| {
-                crate::ErrorKind::InputError("Unknown instance".to_string())
-            })?;
+            .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
 
     list_source_screenshots(&state, source).await
 }
@@ -104,12 +104,12 @@ async fn list_source_screenshot_sets(
 }
 
 async fn lock_instance_screenshots<'a>(
-    state: &State,
+    instance_locks: &InstanceLocks,
     instance_ids: impl IntoIterator<Item = &'a str>,
 ) -> Vec<OwnedMutexGuard<()>> {
     let mut locks = Vec::new();
     for instance_id in instance_ids {
-        locks.push(state.lock_instance_screenshots(instance_id).await);
+        locks.push(instance_locks.lock_screenshots(instance_id).await);
     }
     locks
 }
@@ -123,7 +123,8 @@ pub async fn delete_screenshots(keys: &[ScreenshotKey]) -> crate::Result<()> {
         .collect::<Vec<_>>();
     instance_ids.sort_unstable();
     instance_ids.dedup();
-    let _locks = lock_instance_screenshots(&state, instance_ids).await;
+    let _locks =
+        lock_instance_screenshots(&state.instance_locks, instance_ids).await;
 
     for key in keys {
         io::remove_file(get_screenshot_path(key).await?).await?;
@@ -144,10 +145,9 @@ pub async fn export_screenshots(
 ) -> crate::Result<()> {
     ensure_unique_keys(keys)?;
     if keys.is_empty() {
-        return Err(crate::ErrorKind::InputError(
-            "At least one screenshot must be selected".to_string(),
-        )
-        .into());
+        bail!(ErrorKind::InputError(
+            "at least one screenshot must be selected".to_string(),
+        ));
     }
 
     let state = State::get().await?;
@@ -165,9 +165,7 @@ pub async fn export_screenshots(
                     &state.pool,
                 )
                 .await?
-                .ok_or_else(|| {
-                    crate::ErrorKind::InputError("Unknown instance".to_string())
-                })?;
+                .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
                 sources.insert(key.instance_id.clone(), source);
                 &sources[&key.instance_id]
             }
@@ -228,16 +226,16 @@ pub async fn move_screenshots(
         .collect::<Vec<_>>();
     instance_ids.sort_unstable();
     instance_ids.dedup();
-    let _locks = lock_instance_screenshots(&state, instance_ids).await;
+    let _locks =
+        lock_instance_screenshots(&state.instance_locks, instance_ids).await;
     let target_source = instance_rows::get_instance_screenshot_source(
         target_instance_id,
         &state.pool,
     )
     .await?
-    .ok_or_else(|| {
-        crate::ErrorKind::InputError("Unknown target instance".to_string())
-    })?;
-    let target_dir = source_screenshots_dir(&state, &target_source).await?;
+    .ok_or(ErrorKind::InputError("unknown target instance".to_string()))?;
+    let target_dir =
+        source_screenshots_dir(&state.directories, &target_source).await?;
     io::create_dir_all(&target_dir).await?;
     ensure_directory_is_not_symlink(&target_dir).await?;
 
@@ -252,20 +250,15 @@ pub async fn move_screenshots(
             available_target_path(&target_dir, &key.file_name).await?;
         io::rename_or_move(&source_path, &target_path)
             .await
-            .map_err(|error| {
-                crate::ErrorKind::InputError(format!(
-                    "Could not move screenshot: {error}"
-                ))
-            })?;
+            .context(ErrorKind::InputError(
+                "could not move screenshot".to_string(),
+            ))?;
         let file_name = target_path
             .file_name()
             .and_then(|file_name| file_name.to_str())
-            .ok_or_else(|| {
-                crate::ErrorKind::InputError(
-                    "Could not determine moved screenshot file name"
-                        .to_string(),
-                )
-            })?
+            .ok_or(ErrorKind::InputError(
+                "could not determine moved screenshot file name".to_string(),
+            ))?
             .to_string();
         screenshot_rows::move_screenshot(
             &key.instance_id,
@@ -295,10 +288,9 @@ pub async fn get_screenshot_path(
         &state.pool,
     )
     .await?
-    .ok_or_else(|| {
-        crate::ErrorKind::InputError("Unknown instance".to_string())
-    })?;
-    let screenshots_dir = source_screenshots_dir(&state, &source).await?;
+    .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
+    let screenshots_dir =
+        source_screenshots_dir(&state.directories, &source).await?;
     let canonical_dir = tokio::fs::canonicalize(&screenshots_dir)
         .await
         .map_err(|error| IOError::with_path(error, &screenshots_dir))?;
@@ -308,21 +300,19 @@ pub async fn get_screenshot_path(
         .map_err(|error| IOError::with_path(error, &requested_path))?;
 
     if !metadata.is_file() || metadata.file_type().is_symlink() {
-        return Err(crate::ErrorKind::InputError(
-            "Screenshot must be a regular file".to_string(),
-        )
-        .into());
+        bail!(ErrorKind::InputError(
+            "screenshot must be a regular file".to_string(),
+        ));
     }
 
     let canonical_path = tokio::fs::canonicalize(&requested_path)
         .await
         .map_err(|error| IOError::with_path(error, &requested_path))?;
     if !canonical_path.starts_with(&canonical_dir) {
-        return Err(crate::ErrorKind::InputError(
-            "Screenshot path is outside the instance screenshots directory"
+        bail!(ErrorKind::InputError(
+            "screenshot path is outside the instance screenshots directory"
                 .to_string(),
-        )
-        .into());
+        ));
     }
 
     Ok(canonical_path)
@@ -341,29 +331,23 @@ pub async fn save_edited_screenshot(
         &state.pool,
     )
     .await?
-    .ok_or_else(|| {
-        crate::ErrorKind::InputError("Unknown instance".to_string())
-    })?;
-    let _lock = state.lock_instance_screenshots(&source.id).await;
+    .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
+    let _lock = state.instance_locks.lock_screenshots(&source.id).await;
 
-    let scanned = scan_source_screenshots(&state, &source).await?;
+    let scanned = scan_source_screenshots(&state.directories, &source).await?;
     let current =
         reconcile_source_screenshots(&state, &source, scanned).await?;
     let source_screenshot = current
         .iter()
         .find(|screenshot| screenshot.file_name == key.file_name)
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError("Unknown screenshot".to_string())
-        })?;
+        .ok_or(ErrorKind::InputError("unknown screenshot".to_string()))?;
     let source_row = screenshot_rows::get_screenshot_by_key(
         &key.instance_id,
         &key.file_name,
         &state.pool,
     )
     .await?
-    .ok_or_else(|| {
-        crate::ErrorKind::InputError("Unknown screenshot".to_string())
-    })?;
+    .ok_or(ErrorKind::InputError("unknown screenshot".to_string()))?;
 
     let source_path = source_screenshot.path.clone();
     let (source_dimensions, edited_dimensions, png_bytes) =
@@ -375,11 +359,9 @@ pub async fn save_edited_screenshot(
                 image::ImageFormat::Png,
             )
             .into_dimensions()
-            .map_err(|error| {
-                crate::ErrorKind::InputError(format!(
-                    "Could not read screenshot dimensions: {error}"
-                ))
-            })?;
+            .context(ErrorKind::InputError(
+                "could not read screenshot dimensions".to_string(),
+            ))?;
             let edited_dimensions = validate_png_dimensions(&png_bytes)?;
             Ok::<_, crate::Error>((
                 source_dimensions,
@@ -391,14 +373,14 @@ pub async fn save_edited_screenshot(
     if edited_dimensions.0 > source_dimensions.0
         || edited_dimensions.1 > source_dimensions.1
     {
-        return Err(crate::ErrorKind::InputError(format!(
-            "Edited screenshot dimensions cannot exceed {}x{}",
+        bail!(ErrorKind::InputError(format!(
+            "edited screenshot dimensions cannot exceed {}x{}",
             source_dimensions.0, source_dimensions.1,
-        ))
-        .into());
+        )));
     }
 
-    let screenshots_dir = source_screenshots_dir(&state, &source).await?;
+    let screenshots_dir =
+        source_screenshots_dir(&state.directories, &source).await?;
     let (target_path, copy_group) = match mode {
         ScreenshotEditSaveMode::CreateCopy => (
             available_target_path(&screenshots_dir, &source_row.file_name)
@@ -412,21 +394,18 @@ pub async fn save_edited_screenshot(
     let target_file_name = target_path
         .file_name()
         .and_then(|file_name| file_name.to_str())
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError(
-                "Could not determine edited screenshot file name".to_string(),
-            )
-        })?
+        .ok_or(ErrorKind::InputError(
+            "could not determine edited screenshot file name".to_string(),
+        ))?
         .to_string();
 
     io::write(&target_path, png_bytes).await?;
     if !copy_group {
         let (file_size, content_hash) = sha1_file_async(&target_path).await?;
-        let file_size = i64::try_from(file_size).map_err(|_| {
-            crate::ErrorKind::InputError(
-                "Screenshot is too large to index".to_string(),
-            )
-        })?;
+        let file_size =
+            i64::try_from(file_size).context(ErrorKind::InputError(
+                "screenshot is too large to index".to_string(),
+            ))?;
         let mut source_row = source_row.clone();
         source_row.content_hash = content_hash;
         source_row.file_size = file_size;
@@ -434,17 +413,15 @@ pub async fn save_edited_screenshot(
         screenshot_rows::update_screenshot(&source_row, &mut tx).await?;
         tx.commit().await?;
     }
-    let scanned = scan_source_screenshots(&state, &source).await?;
+    let scanned = scan_source_screenshots(&state.directories, &source).await?;
     let reconciled =
         reconcile_source_screenshots(&state, &source, scanned).await?;
     let mut saved = reconciled
         .into_iter()
         .find(|screenshot| screenshot.file_name == target_file_name)
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError(
-                "Could not index edited screenshot".to_string(),
-            )
-        })?;
+        .ok_or(ErrorKind::InputError(
+            "could not index edited screenshot".to_string(),
+        ))?;
 
     if copy_group {
         let result: crate::Result<()> = async {
@@ -477,24 +454,20 @@ pub async fn save_edited_screenshot(
         &state.pool,
     )
     .await?
-    .ok_or_else(|| {
-        crate::ErrorKind::InputError(
-            "Could not load edited screenshot".to_string(),
-        )
-    })?;
+    .ok_or(ErrorKind::InputError(
+        "could not load edited screenshot".to_string(),
+    ))?;
     if !copy_group {
         let mut tx = state.pool.begin_with("BEGIN IMMEDIATE").await?;
         if saved_row.created_at != source_row.created_at {
             saved_row.created_at = source_row.created_at;
             screenshot_rows::update_screenshot(&saved_row, &mut tx).await?;
-            saved.created_at =
-                DateTime::from_timestamp_millis(source_row.created_at)
-                    .ok_or_else(|| {
-                        crate::ErrorKind::InputError(
-                            "Screenshot creation time is out of range"
-                                .to_string(),
-                        )
-                    })?;
+            saved.created_at = DateTime::from_timestamp_millis(
+                source_row.created_at,
+            )
+            .ok_or(ErrorKind::InputError(
+                "screenshot creation time is out of range".to_string(),
+            ))?;
         }
         tx.commit().await?;
     }
@@ -511,10 +484,10 @@ pub async fn save_edited_screenshot(
 }
 
 pub(super) async fn source_screenshots_dir(
-    state: &State,
+    directories: &DirectoryInfo,
     source: &InstanceScreenshotSource,
 ) -> crate::Result<PathBuf> {
-    let instance_dir = state.directories.instances_dir().join(&source.path);
+    let instance_dir = directories.instances_dir().join(&source.path);
     let canonical_instance_dir =
         tokio::fs::canonicalize(&instance_dir)
             .await
@@ -538,18 +511,14 @@ pub(super) async fn source_screenshots_dir(
 async fn ensure_directory_is_not_symlink(path: &Path) -> crate::Result<()> {
     match tokio::fs::symlink_metadata(path).await {
         Ok(metadata) if metadata.file_type().is_symlink() => {
-            Err(crate::ErrorKind::InputError(
-                "Instance screenshots directory cannot be a symbolic link"
+            bail!(ErrorKind::InputError(
+                "instance screenshots directory cannot be a symbolic link"
                     .to_string(),
-            )
-            .into())
+            ))
         }
-        Ok(metadata) if !metadata.is_dir() => {
-            Err(crate::ErrorKind::InputError(
-                "Instance screenshots path must be a directory".to_string(),
-            )
-            .into())
-        }
+        Ok(metadata) if !metadata.is_dir() => bail!(ErrorKind::InputError(
+            "instance screenshots path must be a directory".to_string(),
+        )),
         Ok(_) => Ok(()),
         Err(error) if error.kind() == std::io::ErrorKind::NotFound => Ok(()),
         Err(error) => Err(IOError::with_path(error, path).into()),
@@ -595,12 +564,9 @@ fn validate_png_dimensions(bytes: &[u8]) -> crate::Result<(u32, u32)> {
         reader.finish()?;
         Ok(dimensions)
     };
-    validate().map_err(|error| {
-        crate::ErrorKind::InputError(format!(
-            "Could not decode screenshot as PNG: {error}"
-        ))
-        .into()
-    })
+    validate().context(ErrorKind::InputError(
+        "could not decode screenshot as PNG".to_string(),
+    ))
 }
 
 fn ensure_unique_keys(keys: &[ScreenshotKey]) -> crate::Result<()> {
@@ -609,10 +575,9 @@ fn ensure_unique_keys(keys: &[ScreenshotKey]) -> crate::Result<()> {
         return Ok(());
     }
 
-    Err(crate::ErrorKind::InputError(
-        "Screenshot selection contains duplicates".to_string(),
-    )
-    .into())
+    bail!(ErrorKind::InputError(
+        "screenshot selection contains duplicates".to_string(),
+    ))
 }
 
 fn validate_file_name(file_name: &str) -> crate::Result<()> {
@@ -623,10 +588,9 @@ fn validate_file_name(file_name: &str) -> crate::Result<()> {
             && components.next().is_none();
 
     if !is_single_file || !has_png_extension(path) {
-        return Err(crate::ErrorKind::InputError(
-            "Invalid screenshot file name".to_string(),
-        )
-        .into());
+        bail!(ErrorKind::InputError(
+            "invalid screenshot file name".to_string(),
+        ));
     }
 
     Ok(())

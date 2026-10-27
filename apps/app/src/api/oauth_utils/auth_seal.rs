@@ -14,15 +14,16 @@
 
 use aes_gcm::aead::Aead;
 use aes_gcm::{Aes256Gcm, KeyInit, Nonce};
+use anyhow::{Context, anyhow};
 use base64::Engine;
 use base64::engine::general_purpose::URL_SAFE_NO_PAD;
 use hkdf::Hkdf;
 use p256::PublicKey;
 use p256::SecretKey;
 use p256::ecdh::diffie_hellman;
+use p256::elliptic_curve::Generate;
 use p256::pkcs8::{DecodePublicKey, EncodePublicKey};
-use rand::RngCore;
-use rand::rngs::OsRng;
+use rand::Rng;
 use sha2::Sha256;
 
 const SEAL_VERSION: u8 = 2;
@@ -37,9 +38,10 @@ pub struct AuthSeal {
 
 impl AuthSeal {
     pub fn generate() -> Self {
-        let secret = SecretKey::random(&mut OsRng);
+        let mut rng = rand::rng();
+        let secret = SecretKey::generate_from_rng(&mut rng);
         let mut nonce_bytes = [0u8; 16];
-        OsRng.fill_bytes(&mut nonce_bytes);
+        rng.fill_bytes(&mut nonce_bytes);
 
         Self {
             secret,
@@ -52,15 +54,11 @@ impl AuthSeal {
     }
 
     pub fn public_key(&self) -> Result<String, theseus::Error> {
-        let der =
-            self.secret
-                .public_key()
-                .to_public_key_der()
-                .map_err(|error| {
-                    theseus::ErrorKind::OtherError(format!(
-                        "Failed to encode auth public key: {error}"
-                    ))
-                })?;
+        let der = self
+            .secret
+            .public_key()
+            .to_public_key_der()
+            .context("failed to encode auth public key")?;
 
         Ok(URL_SAFE_NO_PAD.encode(der.as_bytes()))
     }
@@ -144,6 +142,5 @@ fn is_session_token(token: &str) -> bool {
 }
 
 fn invalid_sealed_session() -> theseus::Error {
-    theseus::ErrorKind::OtherError("Invalid sealed app sign-in session".into())
-        .into()
+    anyhow!("invalid sealed app sign-in session")
 }

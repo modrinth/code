@@ -267,7 +267,7 @@ pub(super) async fn execute(
         created: Utc::now(),
         // after the payout has been successfully executed,
         // we wait for Mural's confirmation that the funds have been delivered
-        // done in `SyncPayoutStatuses` background task
+        // done by the `sync-payout-statuses` task in modrinth-billing
         status: PayoutStatus::InTransit,
         amount: net_usd.get(),
         fee: Some(total_fee_usd.get()),

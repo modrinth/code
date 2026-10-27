@@ -1,5 +1,8 @@
 //! Theseus settings management interface
 
+use crate::ErrorKind;
+use anyhow::bail;
+
 pub use crate::state::content_store::{StoreUsage, StoreVerification};
 pub use crate::{
     State,
@@ -45,10 +48,9 @@ pub async fn store_verify_with_progress(
             processes.iter().any(|process| process.uuid == running.uuid)
         }) {
             if tokio::time::Instant::now() >= deadline {
-                return Err(crate::ErrorKind::InputError(
-                    "Timed out closing running instances".into(),
-                )
-                .as_error());
+                bail!(ErrorKind::InputError(
+                    "timed out closing running instances".into(),
+                ));
             }
             tokio::time::sleep(std::time::Duration::from_millis(50)).await;
         }
@@ -63,7 +65,7 @@ pub async fn store_verify_with_progress(
 #[tracing::instrument]
 pub async fn get() -> crate::Result<Settings> {
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     let mut settings = Settings::get(&state.pool).await?;
     if crate::state::game_options_sync_is_enabled(&state.pool).await?
         && let Some(fullscreen) =
@@ -80,7 +82,7 @@ pub async fn get() -> crate::Result<Settings> {
 #[tracing::instrument]
 pub async fn set(settings: Settings) -> crate::Result<()> {
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     let current_settings = Settings::get(&state.pool).await?;
     let game_options_sync_enabled =
         crate::state::game_options_sync_is_enabled(&state.pool).await?;

@@ -20,8 +20,8 @@ use actix_web::http::header::{CACHE_CONTROL, LOCATION, PRAGMA};
 use actix_web::web::{Data, Query};
 use actix_web::{HttpRequest, HttpResponse, get, post, web};
 use chrono::{DateTime, Duration};
-use rand::distributions::Alphanumeric;
-use rand::{Rng, SeedableRng};
+use rand::distr::Alphanumeric;
+use rand::{RngExt, SeedableRng};
 use rand_chacha::ChaCha20Rng;
 use serde::{Deserialize, Serialize};
 use xredis::RedisPool;
@@ -434,7 +434,7 @@ fn authenticate_client_token_request(
 }
 
 fn generate_access_token() -> String {
-    let random = ChaCha20Rng::from_entropy()
+    let random = ChaCha20Rng::from_rng(&mut rand::rng())
         .sample_iter(&Alphanumeric)
         .take(60)
         .map(char::from)

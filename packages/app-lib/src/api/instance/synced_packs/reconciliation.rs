@@ -3,6 +3,7 @@ use super::{
     PackLibrary, PackPlacement, SyncedPack, pack_option, pack_path, same_path,
     version_compatible,
 };
+use crate::ErrorKind;
 use crate::event::{InstancePayloadType, emit::emit_instance};
 use crate::state::content_store::{StoredFileHandle, file_path_on_disk};
 use crate::state::instances::commands;
@@ -12,6 +13,7 @@ use crate::state::{
     SyncedPackInfo, Version,
 };
 use crate::util::fetch;
+use anyhow::bail;
 use modrinth_content_management::ResolutionPreferences;
 use std::collections::BTreeMap;
 
@@ -258,11 +260,9 @@ async fn prepare_pack(
 			Some(CacheBehaviour::MustRevalidate),
 			&state.pool,
 			&state.api_semaphore,
-		).await?.ok_or_else(|| {
-			crate::ErrorKind::InputError(
-				"Pack versions are temporarily unavailable; keeping the installed pack.".to_owned(),
-			)
-		})?;
+		).await?.ok_or(ErrorKind::InputError(
+			"pack versions are temporarily unavailable; keeping the installed pack".to_owned(),
+		))?;
         versions
             .into_iter()
             .filter(|version| {
@@ -291,10 +291,7 @@ async fn prepare_pack(
     let file_name = file
         .map_or(pack.item.file_name.as_str(), |file| file.filename.as_str());
     if !path_util::is_safe_file_name(file_name) {
-        return Err(crate::ErrorKind::InputError(
-            "Invalid pack filename.".to_owned(),
-        )
-        .into());
+        bail!(ErrorKind::InputError("invalid pack filename".to_owned()));
     }
     if local_conflict(items, pack, previous, &pack_path(pack, file_name)) {
         prepared.conflict = true;
@@ -312,7 +309,7 @@ async fn prepare_pack(
             None,
         )
         .await?;
-        downloaded.store_file(state).await?
+        downloaded.store_file(&state.content_store).await?
     } else {
         read_stored_file(pack, state).await?
     };
@@ -419,10 +416,9 @@ async fn apply_pack(
         })
         .cloned();
     if matching.as_ref().is_some_and(|item| !local(item)) {
-        return Err(crate::ErrorKind::InputError(
-            "This pack is managed in this instance.".to_string(),
-        )
-        .into());
+        bail!(ErrorKind::InputError(
+            "this pack is managed in this instance".to_string(),
+        ));
     }
     if let Some(item) = matching {
         let is_source = previous
@@ -512,10 +508,7 @@ async fn apply_pack(
     let file_name = file
         .map_or(pack.item.file_name.as_str(), |file| file.filename.as_str());
     if !path_util::is_safe_file_name(file_name) {
-        return Err(crate::ErrorKind::InputError(
-            "Invalid pack filename.".to_string(),
-        )
-        .into());
+        bail!(ErrorKind::InputError("invalid pack filename".to_string()));
     }
     let target_path = pack_path(pack, file_name);
     if previous
@@ -530,9 +523,10 @@ async fn apply_pack(
                 })
         })
     {
-        return Err(crate::ErrorKind::InputError(
-			"A local copy of this pack already exists. Sync it from the content tab to include it.".to_string(),
-		).into());
+        bail!(ErrorKind::InputError(
+            "a local copy of this pack already exists; sync it from the content tab to include it"
+                .to_string(),
+        ));
     }
     let target_base = target_path.trim_end_matches(".disabled");
     for path in [target_base.to_string(), format!("{target_base}.disabled")] {
@@ -545,18 +539,15 @@ async fn apply_pack(
                 false
             };
             if !owned {
-                return Err(crate::ErrorKind::InputError(
-                    "An existing pack would be replaced.".to_string(),
-                )
-                .into());
+                bail!(ErrorKind::InputError(
+                    "an existing pack would be replaced".to_string(),
+                ));
             }
         }
     }
-    let stored_file = prepared.stored_file.take().ok_or_else(|| {
-        crate::ErrorKind::InputError(
-            "Pack contents were not prepared.".to_owned(),
-        )
-    })?;
+    let stored_file = prepared.stored_file.take().ok_or(
+        ErrorKind::InputError("pack contents were not prepared".to_owned()),
+    )?;
     let mut pending = previous.clone().unwrap_or_default();
     pending.pending = true;
     library
@@ -836,9 +827,11 @@ async fn apply_instance_inner(
                 Ok(prepared) => prepared,
                 Err(error)
                     if matches!(
-                        error.raw.as_ref(),
-                        crate::ErrorKind::PackSyncChanged
-                            | crate::ErrorKind::Ratelimited { .. }
+                        error.downcast_ref::<crate::ErrorKind>(),
+                        Some(
+                            crate::ErrorKind::PackSyncChanged
+                                | crate::ErrorKind::RateLimited { .. }
+                        )
                     ) =>
                 {
                     return Err(error);
@@ -1009,9 +1002,7 @@ async fn capture_after_change(instance_id: &str) -> crate::Result<()> {
     let state = State::get().await?;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError("Unknown instance".to_owned())
-        })?;
+        .ok_or(ErrorKind::InputError("unknown instance".to_owned()))?;
     let mut preparation =
         super::worker::Preparation::new(&state, &metadata).await;
     let mut library = preparation.library().await?;
@@ -1068,8 +1059,8 @@ pub(crate) async fn reconcile_after_content_change(instance_id: &str) {
         match capture_after_change(instance_id).await {
             Err(error)
                 if matches!(
-                    error.raw.as_ref(),
-                    crate::ErrorKind::PackSyncChanged
+                    error.downcast_ref::<crate::ErrorKind>(),
+                    Some(crate::ErrorKind::PackSyncChanged)
                 ) =>
             {
                 tokio::task::yield_now().await;
@@ -1197,9 +1188,7 @@ pub(in crate::api::instance) async fn decorate_content(
     };
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError("Unknown instance".to_string())
-        })?;
+        .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
     let global = get_global_options().await?;
     let instances = crate::state::list_instances(&state.pool).await?;
     for item in items {

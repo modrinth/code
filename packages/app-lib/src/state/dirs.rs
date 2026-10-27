@@ -1,9 +1,10 @@
 //! Theseus directory information
 pub(crate) mod move_app_directory;
-use crate::LoadingBarType;
 use crate::event::emit::{emit_loading, init_loading};
 use crate::state::{Settings, State};
 use crate::util::fetch::IoSemaphore;
+use crate::{ErrorKind, LoadingBarType};
+use anyhow::Context;
 use std::path::PathBuf;
 use tokio::fs;
 
@@ -44,15 +45,15 @@ impl DirectoryInfo {
         app_identifier: &str,
     ) -> crate::Result<Self> {
         let settings_dir = Self::initial_settings_dir_path(app_identifier)
-            .ok_or(crate::ErrorKind::FSError(
-                "Could not find valid settings dir".to_string(),
+            .ok_or(ErrorKind::FSError(
+                "could not find valid settings dir".to_string(),
             ))?;
 
-        fs::create_dir_all(&settings_dir).await.map_err(|err| {
-            crate::ErrorKind::FSError(format!(
-                "Error creating Theseus config directory: {err}"
-            ))
-        })?;
+        fs::create_dir_all(&settings_dir)
+            .await
+            .context(ErrorKind::FSError(
+                "error creating Theseus config directory".to_string(),
+            ))?;
 
         let config_dir =
             config_dir.map_or_else(|| settings_dir.clone(), PathBuf::from);
@@ -222,9 +223,7 @@ impl DirectoryInfo {
     ) -> crate::Result<()> {
         Self::try_move_launcher_directory(settings, pool, app_identifier)
             .await
-            .map_err(|error| {
-                crate::ErrorKind::DirectoryMoveError(error.to_string()).into()
-            })
+            .context(ErrorKind::DirectoryMoveFailed)
     }
 
     async fn try_move_launcher_directory(
@@ -233,11 +232,9 @@ impl DirectoryInfo {
         app_identifier: &str,
     ) -> crate::Result<()> {
         let initial = DirectoryInfo::initial_settings_dir_path(app_identifier)
-            .ok_or_else(|| {
-                crate::ErrorKind::FSError(
-                    "Could not find the app directory".to_string(),
-                )
-            })?;
+            .ok_or(ErrorKind::FSError(
+                "could not find the app directory".to_string(),
+            ))?;
         let destination = settings
             .custom_dir
             .as_ref()

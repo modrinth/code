@@ -2,6 +2,7 @@ use crate::state::{InstanceMetadata, State};
 use parking_lot::Mutex;
 use serde_json::Value;
 use std::collections::HashMap;
+use std::io::{BufReader, Read};
 use std::path::{Path, PathBuf};
 use std::sync::LazyLock;
 use std::time::{Instant, SystemTime};
@@ -96,21 +97,34 @@ async fn read_zip_json_uncached(
     path: &Path,
     name: &str,
 ) -> crate::Result<(Option<Value>, usize)> {
-    let zip = async_zip::tokio::read::fs::ZipFileReader::new(path).await?;
-    let Some(index) = zip.file().entries().iter().position(|entry| {
-        entry.filename().as_str().is_ok_and(|value| value == name)
-    }) else {
-        return Ok((None, 0));
-    };
-    if zip.file().entries()[index].uncompressed_size() > 1024 * 1024 {
-        return Ok((None, 0));
-    }
-    let mut bytes = Vec::new();
-    zip.reader_with_entry(index)
-        .await?
-        .read_to_end_checked(&mut bytes)
-        .await?;
-    Ok((Some(serde_json::from_slice(&bytes)?), bytes.len()))
+    let path = path.to_path_buf();
+    let name = name.to_owned();
+    tokio::task::spawn_blocking(move || -> crate::Result<_> {
+        let mut zip =
+            zip::ZipArchive::new(BufReader::new(std::fs::File::open(path)?))?;
+        let mut selected = None;
+        for index in 0..zip.len() {
+            if zip
+                .by_index_raw(index)?
+                .name()
+                .is_ok_and(|value| value == name)
+            {
+                selected = Some(index);
+                break;
+            }
+        }
+        let Some(index) = selected else {
+            return Ok((None, 0));
+        };
+        let mut entry = zip.by_index(index)?;
+        if entry.size() > 1024 * 1024 {
+            return Ok((None, 0));
+        }
+        let mut bytes = Vec::new();
+        entry.read_to_end(&mut bytes)?;
+        Ok((Some(serde_json::from_slice(&bytes)?), bytes.len()))
+    })
+    .await?
 }
 
 pub(super) async fn game_format(

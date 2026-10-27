@@ -1,11 +1,11 @@
 <template>
-	<Section :heading="formatMessage(messages.details)">
+	<Section heading="Details">
 		<template #right>
-			<EditButton :section="formatMessage(messages.details)" @click="editModal?.show()" />
+			<EditButton section="Details" @click="editModal?.show()" />
 		</template>
 		<EditModal :key="project?.id" ref="editModal" />
 		<dl v-if="project" class="m-0 grid grid-cols-[5.5rem_minmax(0,1fr)] gap-x-3 gap-y-2">
-			<dt class="font-medium">{{ formatMessage(messages.project) }}</dt>
+			<dt class="font-medium">Project</dt>
 			<dd class="m-0 flex min-w-0 items-center gap-1">
 				<Tooltip class="flex shrink-0">
 					<template #popper>
@@ -31,7 +31,7 @@
 				</NuxtLink>
 			</dd>
 			<template v-if="project.status === 'processing' && project.requested_status">
-				<dt class="font-medium">{{ formatMessage(messages.requesting) }}</dt>
+				<dt class="font-medium">Requesting</dt>
 				<dd class="m-0">
 					<ProjectStatusBadge
 						:status="project.requested_status"
@@ -39,7 +39,7 @@
 					/>
 				</dd>
 			</template>
-			<dt class="font-medium">{{ formatMessage(messages.projectType) }}</dt>
+			<dt class="font-medium">Type</dt>
 			<dd class="m-0 flex flex-col gap-1">
 				<div
 					v-for="type in projectTypes"
@@ -51,64 +51,76 @@
 						:class="{
 							underline: projectTypes.length > 1 && type.id === primaryProjectType,
 						}"
-						>{{ formatMessage(getProjectTypeTitleMessage(type.id), { count: 1 }) }}</span
+						>{{ projectTypeLabels[type.id] ?? 'Project' }}</span
 					>
 				</div>
 			</dd>
-			<dt class="font-medium">{{ formatMessage(messages.created) }}</dt>
+			<dt class="font-medium">Created</dt>
 			<dd class="m-0">
 				<time v-tooltip="formatDateTime(project.published)" :datetime="project.published">{{
 					relativeTime(project.published)
 				}}</time>
 			</dd>
-			<dt class="font-medium">{{ formatMessage(messages.updated) }}</dt>
+			<dt class="font-medium">Updated</dt>
 			<dd class="m-0">
 				<time v-tooltip="formatDateTime(project.updated)" :datetime="project.updated">{{
 					relativeTime(project.updated)
 				}}</time>
 			</dd>
 			<template v-if="project.queued">
-				<dt class="font-medium">{{ formatMessage(messages.submitted) }}</dt>
+				<dt class="font-medium">Submitted</dt>
 				<dd class="m-0 flex flex-wrap items-center gap-x-1.5">
 					<time v-tooltip="formatDateTime(project.queued)" :datetime="project.queued">{{
 						relativeTime(project.queued)
 					}}</time>
 					<template v-if="submissionCount">
 						<BulletDivider aria-hidden="true" />
-						<span>{{ formatMessage(messages.submissions, { count: submissionCount }) }}</span>
+						<span>{{
+							submissionCount === 1
+								? `${submissionCount} submission`
+								: `${submissionCount} submissions`
+						}}</span>
 					</template>
 				</dd>
 			</template>
-			<dt class="font-medium">{{ formatMessage(messages.downloads) }}</dt>
+			<dt class="font-medium">Downloads</dt>
 			<dd class="m-0">{{ formatNumber(project.downloads) }}</dd>
-			<dt class="font-medium">{{ formatMessage(messages.monetization) }}</dt>
+			<dt class="font-medium">Monetization</dt>
 			<dd class="m-0">
-				{{ formatMessage(messages.monetizationValue, { status: monetizationStatus }) }}
+				{{
+					monetizationStatus === 'monetized'
+						? 'Enabled'
+						: monetizationStatus === 'demonetized'
+							? 'Disabled'
+							: monetizationStatus === 'forceDemonetized'
+								? 'Force disabled'
+								: 'Unknown'
+				}}
 			</dd>
 
-			<dt class="mt-0.5 self-start font-medium">{{ formatMessage(messages.actions) }}</dt>
+			<dt class="mt-0.5 self-start font-medium">Actions</dt>
 			<dd class="m-0 flex flex-wrap items-center gap-2">
 				<Button
-					v-tooltip="formatMessage(messages.copyValue, { value: project.id })"
+					v-tooltip="`Copy: ${project.id}`"
 					type="outlined"
 					class="!text-primary"
 					size="sm"
-					:aria-label="formatMessage(commonMessages.copyIdButton)"
+					aria-label="Copy ID"
 					@click="copyProjectId(project.id)"
 				>
-					{{ formatMessage(messages.projectId) }}
+					Project ID
 					<CheckIcon v-if="projectIdCopied" aria-hidden="true" />
 					<CopyIcon v-else aria-hidden="true" />
 				</Button>
 				<Button
-					v-tooltip="formatMessage(messages.copyValue, { value: permalink })"
+					v-tooltip="`Copy: ${permalink}`"
 					type="outlined"
 					class="!text-primary"
 					size="xs"
-					:aria-label="formatMessage(commonMessages.copyPermalinkButton)"
+					aria-label="Copy permanent link"
 					@click="copyPermalink(permalink)"
 				>
-					{{ formatMessage(messages.permalink) }}
+					Perma link
 					<CheckIcon v-if="permalinkCopied" aria-hidden="true" />
 					<CopyIcon v-else aria-hidden="true" />
 				</Button>
@@ -121,7 +133,7 @@
 					class="!text-primary"
 					size="xs"
 				>
-					{{ formatMessage(commonMessages.analyticsButton) }}
+					Analytics
 					<ExternalIcon aria-hidden="true" />
 				</ButtonLink>
 			</dd>
@@ -135,17 +147,11 @@ import {
 	BulletDivider,
 	Button,
 	ButtonLink,
-	commonMessages,
 	getProjectStatusColor,
 	getProjectStatusIcon,
 	getProjectTypeIcon,
-	getProjectTypeTitleMessage,
 	ProjectStatusBadge,
 	Tooltip,
-	useFormatDateTime,
-	useFormatNumber,
-	useRelativeTime,
-	useVIntl,
 } from '@modrinth/ui'
 import { getPrimaryProjectType } from '@modrinth/utils'
 import { useClipboard, useMagicKeys } from '@vueuse/core'
@@ -153,10 +159,11 @@ import { computed, useTemplateRef } from 'vue'
 
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
-import { projectReviewMessages as messages } from '../../messages'
+import { createDateFormatter, createRelativeTimeFormatter, formatNumber } from '../../format'
 import EditButton from '../edit/button.vue'
 import EditModal from '../edit/details.vue'
 import Section from '../section.vue'
+import { projectTypeLabels } from '../type-labels'
 
 const { project, projectV2, submissionCount, members, organizationMembers } =
 	injectProjectReviewPageContext()
@@ -166,8 +173,12 @@ const permalink = computed(
 	() =>
 		`${shiftHeld.value ? 'https://modrinth.com' : config.public.siteUrl}/project/${project.value?.id}`,
 )
-const { copy: copyProjectId, copied: projectIdCopied } = useClipboard({ copiedDuring: 2000 })
-const { copy: copyPermalink, copied: permalinkCopied } = useClipboard({ copiedDuring: 2000 })
+const { copy: copyProjectId, copied: projectIdCopied } = useClipboard({
+	copiedDuring: 2000,
+})
+const { copy: copyPermalink, copied: permalinkCopied } = useClipboard({
+	copiedDuring: 2000,
+})
 const editModal = useTemplateRef<InstanceType<typeof EditModal>>('editModal')
 const monetizationStatus = computed(() =>
 	project.value?.monetization_status === 'force-demonetized'
@@ -198,8 +209,10 @@ const projectTypes = computed(() => {
 		)
 		.map((type) => ({ id: type, icon: getProjectTypeIcon(type) }))
 })
-const { formatMessage } = useVIntl()
-const relativeTime = useRelativeTime({ style: 'narrow' })
-const formatDateTime = useFormatDateTime({ dateStyle: 'long', timeStyle: 'short' })
-const formatNumber = useFormatNumber()
+
+const relativeTime = createRelativeTimeFormatter({ style: 'narrow' })
+const formatDateTime = createDateFormatter({
+	dateStyle: 'long',
+	timeStyle: 'short',
+})
 </script>

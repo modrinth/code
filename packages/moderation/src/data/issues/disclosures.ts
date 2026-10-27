@@ -231,7 +231,10 @@ export const aiDisclosureReviewPanel = panel({
 		issue: disclosuresIssue,
 		id: 'ai-disclosure-missing',
 		label: 'Missing',
-		issueListLabel: 'AI Usage',
+		issueCardDisplay: {
+			label: 'AI Usage',
+			group: 'Missing',
+		},
 	}),
 	toggle({
 		issue: disclosuresIssue,
@@ -239,7 +242,10 @@ export const aiDisclosureReviewPanel = panel({
 		shown: ({ disclosures }) =>
 			disclosures.some((disclosure) => disclosure.type === 'ai_content' && !disclosure.deleted_at),
 		label: 'Misused',
-		issueListLabel: 'AI Usage',
+		issueCardDisplay: {
+			label: 'AI Usage',
+			group: 'Misused',
+		},
 	}),
 	section({
 		label: 'Type of missing disclosure?',
@@ -249,22 +255,28 @@ export const aiDisclosureReviewPanel = panel({
 			issue: disclosuresIssue,
 			id: 'ai-disclosure-missing-code',
 			label: 'Code',
-			issueListLabel: 'AI Usage: Code',
-			issueListGroup: 'Missing',
+			issueCardDisplay: {
+				label: 'AI Usage: Code',
+				group: 'Missing',
+			},
 		}),
 		toggle({
 			issue: disclosuresIssue,
 			id: 'ai-disclosure-missing-assets',
 			label: 'Assets',
-			issueListLabel: 'AI Usage: Assets',
-			issueListGroup: 'Missing',
+			issueCardDisplay: {
+				label: 'AI Usage: Assets',
+				group: 'Missing',
+			},
 		}),
 		toggle({
 			issue: disclosuresIssue,
 			id: 'ai-disclosure-missing-text',
 			label: 'Text',
-			issueListLabel: 'AI Usage: Text',
-			issueListGroup: 'Missing',
+			issueCardDisplay: {
+				label: 'AI Usage: Text',
+				group: 'Missing',
+			},
 		}),
 	),
 	section({
@@ -284,8 +296,10 @@ export const aiDisclosureReviewPanel = panel({
 						disclosure.uses.includes('code'),
 				),
 			label: 'Code',
-			issueListLabel: 'AI Usage: Code',
-			issueListGroup: 'Misused',
+			issueCardDisplay: {
+				label: 'AI Usage: Code',
+				group: 'Misused',
+			},
 		}),
 		toggle({
 			issue: disclosuresIssue,
@@ -298,8 +312,10 @@ export const aiDisclosureReviewPanel = panel({
 						disclosure.uses.includes('assets'),
 				),
 			label: 'Assets',
-			issueListLabel: 'AI Usage: Assets',
-			issueListGroup: 'Misused',
+			issueCardDisplay: {
+				label: 'AI Usage: Assets',
+				group: 'Misused',
+			},
 		}),
 		toggle({
 			issue: disclosuresIssue,
@@ -312,8 +328,10 @@ export const aiDisclosureReviewPanel = panel({
 						disclosure.uses.includes('text'),
 				),
 			label: 'Text',
-			issueListLabel: 'AI Usage: Text',
-			issueListGroup: 'Misused',
+			issueCardDisplay: {
+				label: 'AI Usage: Text',
+				group: 'Misused',
+			},
 		}),
 	),
 )
@@ -329,7 +347,10 @@ export const aiFunctionalityDisclosureReviewPanel = panel({
 		issue: disclosuresIssue,
 		id: 'ai-functionality-disclosure-missing',
 		label: 'Missing',
-		issueListLabel: 'AI Functionality',
+		issueCardDisplay: {
+			label: 'AI Functionality',
+			group: 'Missing',
+		},
 	}),
 	toggle({
 		issue: disclosuresIssue,
@@ -339,7 +360,10 @@ export const aiFunctionalityDisclosureReviewPanel = panel({
 				(disclosure) => disclosure.type === 'ai_functionality' && !disclosure.deleted_at,
 			),
 		label: 'Misused',
-		issueListLabel: 'AI Functionality',
+		issueCardDisplay: {
+			label: 'AI Functionality',
+			group: 'Misused',
+		},
 	}),
 )
 
@@ -354,7 +378,10 @@ export const adsDisclosureReviewPanel = panel({
 		issue: disclosuresIssue,
 		id: 'ads-disclosure-missing',
 		label: 'Missing',
-		issueListLabel: 'Advertisements',
+		issueCardDisplay: {
+			label: 'Advertisements',
+			group: 'Missing',
+		},
 	}),
 	toggle({
 		issue: disclosuresIssue,
@@ -364,7 +391,10 @@ export const adsDisclosureReviewPanel = panel({
 				(disclosure) => disclosure.type === 'advertisements' && !disclosure.deleted_at,
 			),
 		label: 'Misused',
-		issueListLabel: 'Advertisements',
+		issueCardDisplay: {
+			label: 'Advertisements',
+			group: 'Misused',
+		},
 	}),
 )
 
@@ -379,7 +409,10 @@ export const paidFeaturesDisclosureReviewPanel = panel({
 		issue: disclosuresIssue,
 		id: 'paid-features-disclosure-missing',
 		label: 'Missing',
-		issueListLabel: 'Paid Features',
+		issueCardDisplay: {
+			label: 'Paid Features',
+			group: 'Missing',
+		},
 	}),
 	toggle({
 		issue: disclosuresIssue,
@@ -389,7 +422,10 @@ export const paidFeaturesDisclosureReviewPanel = panel({
 				(disclosure) => disclosure.type === 'paid_features' && !disclosure.deleted_at,
 			),
 		label: 'Misused',
-		issueListLabel: 'Paid Features',
+		issueCardDisplay: {
+			label: 'Paid Features',
+			group: 'Misused',
+		},
 	}),
 )
 
@@ -404,7 +440,10 @@ export const telemetryDisclosureReviewPanel = panel({
 		issue: disclosuresIssue,
 		id: 'telemetry-disclosure-missing',
 		label: 'Missing',
-		issueListLabel: 'Telemetry',
+		issueCardDisplay: {
+			label: 'Telemetry',
+			group: 'Missing',
+		},
 	}),
 	toggle({
 		issue: disclosuresIssue,
@@ -412,7 +451,10 @@ export const telemetryDisclosureReviewPanel = panel({
 		shown: ({ disclosures }) =>
 			disclosures.some((disclosure) => disclosure.type === 'telemetry' && !disclosure.deleted_at),
 		label: 'Misused',
-		issueListLabel: 'Telemetry',
+		issueCardDisplay: {
+			label: 'Telemetry',
+			group: 'Misused',
+		},
 	}),
 	section({
 		label: 'What is the telemetry’s consent model?',
@@ -422,31 +464,40 @@ export const telemetryDisclosureReviewPanel = panel({
 			issue: disclosuresIssue,
 			id: 'telemetry-disclosure-missing-opt-in',
 			label: 'Opt In',
-			issueListLabel: 'Telemetry: Opt In',
-			issueListGroup: 'Missing',
-			disabled: ({ selected }) =>
-				selected.toggleIds.includes('telemetry-disclosure-missing-opt-out') ||
-				selected.toggleIds.includes('telemetry-disclosure-missing-always'),
+			issueCardDisplay: {
+				label: 'Telemetry: Opt In',
+				group: 'Missing',
+			},
+			unselectToggles: [
+				'telemetry-disclosure-missing-opt-out',
+				'telemetry-disclosure-missing-always',
+			],
 		}),
 		toggle({
 			issue: disclosuresIssue,
 			id: 'telemetry-disclosure-missing-opt-out',
 			label: 'Opt Out',
-			issueListLabel: 'Telemetry: Opt Out',
-			issueListGroup: 'Missing',
-			disabled: ({ selected }) =>
-				selected.toggleIds.includes('telemetry-disclosure-missing-opt-in') ||
-				selected.toggleIds.includes('telemetry-disclosure-missing-always'),
+			issueCardDisplay: {
+				label: 'Telemetry: Opt Out',
+				group: 'Missing',
+			},
+			unselectToggles: [
+				'telemetry-disclosure-missing-opt-in',
+				'telemetry-disclosure-missing-always',
+			],
 		}),
 		toggle({
 			issue: disclosuresIssue,
 			id: 'telemetry-disclosure-missing-always',
 			label: 'Always Online',
-			issueListLabel: 'Telemetry: Always Online',
-			issueListGroup: 'Missing',
-			disabled: ({ selected }) =>
-				selected.toggleIds.includes('telemetry-disclosure-missing-opt-in') ||
-				selected.toggleIds.includes('telemetry-disclosure-missing-opt-out'),
+			issueCardDisplay: {
+				label: 'Telemetry: Always Online',
+				group: 'Missing',
+			},
+			unselectToggles: [
+				'telemetry-disclosure-missing-opt-in',
+				'telemetry-disclosure-missing-opt-out',
+			],
 		}),
 	),
 )
@@ -462,7 +513,10 @@ export const derivativeContentDisclosureReviewPanel = panel({
 		issue: disclosuresIssue,
 		id: 'derivative-content-disclosure-missing',
 		label: 'Missing',
-		issueListLabel: 'Derivative Content',
+		issueCardDisplay: {
+			label: 'Derivative Content',
+			group: 'Missing',
+		},
 	}),
 	toggle({
 		issue: disclosuresIssue,
@@ -472,7 +526,10 @@ export const derivativeContentDisclosureReviewPanel = panel({
 				(disclosure) => disclosure.type === 'derivative_work' && !disclosure.deleted_at,
 			),
 		label: 'Misused',
-		issueListLabel: 'Derivative Content',
+		issueCardDisplay: {
+			label: 'Derivative Content',
+			group: 'Misused',
+		},
 	}),
 )
 
@@ -487,7 +544,10 @@ export const photosensitivityDisclosureReviewPanel = panel({
 		issue: disclosuresIssue,
 		id: 'photosensitivity-disclosure-missing',
 		label: 'Missing',
-		issueListLabel: 'Photosensitivity',
+		issueCardDisplay: {
+			label: 'Photosensitivity',
+			group: 'Missing',
+		},
 	}),
 	toggle({
 		issue: disclosuresIssue,
@@ -497,7 +557,10 @@ export const photosensitivityDisclosureReviewPanel = panel({
 				(disclosure) => disclosure.type === 'epilepsy_triggers' && !disclosure.deleted_at,
 			),
 		label: 'Misused',
-		issueListLabel: 'Photosensitivity',
+		issueCardDisplay: {
+			label: 'Photosensitivity',
+			group: 'Misused',
+		},
 	}),
 )
 
@@ -512,7 +575,10 @@ export const systemInteractionsDisclosureReviewPanel = panel({
 		issue: disclosuresIssue,
 		id: 'system-interactions-disclosure-missing',
 		label: 'Missing',
-		issueListLabel: 'System Interactions',
+		issueCardDisplay: {
+			label: 'System Interactions',
+			group: 'Missing',
+		},
 	}),
 	toggle({
 		issue: disclosuresIssue,
@@ -522,7 +588,10 @@ export const systemInteractionsDisclosureReviewPanel = panel({
 				(disclosure) => disclosure.type === 'system_interactions' && !disclosure.deleted_at,
 			),
 		label: 'Misused',
-		issueListLabel: 'System Interactions',
+		issueCardDisplay: {
+			label: 'System Interactions',
+			group: 'Misused',
+		},
 	}),
 )
 
@@ -537,7 +606,10 @@ export const archiveDisclosureReviewPanel = panel({
 		issue: disclosuresIssue,
 		id: 'archive-disclosure-missing',
 		label: 'Missing',
-		issueListLabel: 'Archive',
+		issueCardDisplay: {
+			label: 'Archive',
+			group: 'Missing',
+		},
 	}),
 	toggle({
 		issue: disclosuresIssue,
@@ -545,7 +617,10 @@ export const archiveDisclosureReviewPanel = panel({
 		shown: ({ disclosures }) =>
 			disclosures.some((disclosure) => disclosure.type === 'archived' && !disclosure.deleted_at),
 		label: 'Misused',
-		issueListLabel: 'Archive',
+		issueCardDisplay: {
+			label: 'Archive',
+			group: 'Misused',
+		},
 	}),
 )
 

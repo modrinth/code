@@ -121,7 +121,7 @@
 									>
 										<div>
 											<span class="font-semibold text-primary"
-												>{{ formatMessage(commonMessages.sortByLabel) }}:
+												>{{ formatMessage(commonMessages.sortByLabel) }}
 											</span>
 											<span class="font-semibold text-secondary">{{ selected }}</span>
 										</div>

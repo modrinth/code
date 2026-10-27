@@ -1,13 +1,15 @@
+use crate::ErrorKind;
 use crate::state::content_store::adapters::sqlite as catalog;
 use crate::state::content_store::adapters::{downloads, filesystem};
 use crate::state::content_store::{
-    FileStorageKind, InstanceFileStatus, content_file_path, input,
+    FileStorageKind, InstanceFileStatus, content_file_path,
 };
 use crate::state::dirs::move_app_directory::{
     relocate_tree, remove_migrated_tree,
 };
 use crate::state::instances::adapters::sqlite::instance_rows;
 use crate::state::{Instance, InstanceFile, InstanceInstallStage, State};
+use anyhow::bail;
 use futures::{StreamExt, stream};
 use std::io::{Read, Write};
 use std::path::Path;
@@ -25,14 +27,17 @@ struct PreparedCopy {
 async fn prepare_copy(path: &Path) -> crate::Result<PreparedCopy> {
     let path = path.to_path_buf();
     tokio::task::spawn_blocking(move || -> crate::Result<PreparedCopy> {
-        let parent =
-            path.parent().ok_or_else(|| input("Invalid content path"))?;
+        let parent = path.parent().ok_or_else(|| {
+            ErrorKind::ContentStoreError("invalid content path".into())
+        })?;
         let mut source = std::fs::File::open(&path)?;
         let metadata = source.metadata()?;
         if !metadata.is_file()
             || std::fs::symlink_metadata(&path)?.file_type().is_symlink()
         {
-            return Err(input("Managed content is not a regular file"));
+            bail!(ErrorKind::ContentStoreError(
+                "managed content is not a regular file".into()
+            ));
         }
         filesystem::require_staging_space(parent, metadata.len())?;
         let (mut output, temporary) =
@@ -204,7 +209,7 @@ async fn migrate_file_copy(
     let copy_ms = started.elapsed().as_millis() as u64;
     let waiting = Instant::now();
     let _turn = store.legacy_migration_priority.read().await;
-    let _instance = state.lock_instance_content(&instance.id).await;
+    let _instance = state.instance_locks.lock_content(&instance.id).await;
     let _files = store.files_lock.lock().await;
     let lock_wait_ms = waiting.elapsed().as_millis() as u64;
     let Some(instance) =
@@ -250,19 +255,23 @@ async fn migrate_file_copy(
     }
     if prepared.hashes.sha512 != binding.blob_sha512 {
         if binding.storage_kind != FileStorageKind::Hardlink {
-            return Err(input(
-                "Changed instance content must be re-imported before migration",
+            bail!(ErrorKind::ContentStoreError(
+                "changed instance content must be re-imported before migration"
+                    .into(),
             ));
         }
         if store.any_instance_running(state).await? {
-            return Err(input(
-                "Stop Minecraft instances before repairing shared content",
+            bail!(ErrorKind::ContentStoreError(
+                "stop Minecraft instances before repairing shared content"
+                    .into(),
             ));
         }
         let stored = catalog::find_file(&state.pool, &binding.blob_sha512)
             .await?
             .ok_or_else(|| {
-                input("Managed content has no stored file record")
+                ErrorKind::ContentStoreError(
+                    "managed content has no stored file record".into(),
+                )
             })?;
         if store.is_healthy(&stored, true).await? {
             if let Some(healthy) =
@@ -276,13 +285,14 @@ async fn migrate_file_copy(
                 sources = downloads::repair_sources(
                     &state.pool,
                     &stored.sha512,
-                    state,
+                    &state.api_semaphore,
                 )
                 .await;
             }
             if sources.is_empty() {
-                return Err(input(
-                    "Damaged shared content must be re-imported before migration",
+                bail!(ErrorKind::ContentStoreError(
+                    "damaged shared content must be re-imported before migration"
+                        .into(),
                 ));
             }
             store.repair_stored_file(&stored, &sources, state).await?;
@@ -292,13 +302,16 @@ async fn migrate_file_copy(
             .await?
             != InstanceFileStatus::Healthy
         {
-            return Err(input(
-                "Damaged instance content could not be repaired before migration",
+            bail!(ErrorKind::ContentStoreError(
+                "damaged instance content could not be repaired before migration"
+                    .into(),
             ));
         }
         return Ok(false);
     }
-    let parent = path.parent().ok_or_else(|| input("Invalid content path"))?;
+    let parent = path.parent().ok_or_else(|| {
+        ErrorKind::ContentStoreError("invalid content path".into())
+    })?;
     let bytes = prepared.hashes.size;
     let temporary = prepared.temporary;
     let publishing = Instant::now();
@@ -329,9 +342,9 @@ fn replace_file_copy(
     temporary: tempfile::TempPath,
     destination: &std::path::Path,
 ) -> std::io::Result<()> {
-    let mut temporary = tempfile::TempPath::from_path(
+    let mut temporary = tempfile::TempPath::try_from_path(
         temporary.keep().map_err(|error| error.error)?,
-    );
+    )?;
     #[cfg(windows)]
     let original = {
         use std::os::windows::fs::OpenOptionsExt;

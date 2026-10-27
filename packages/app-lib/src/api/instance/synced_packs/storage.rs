@@ -1,11 +1,13 @@
 use super::{PackLibrary, SyncedPack};
+use crate::ErrorKind;
 use crate::state::content_store::{
-    StoredFileHandle, content_file_path, hash_file, input, validate_digest,
+    StoredFileHandle, content_file_path, hash_file, validate_digest,
     validate_instance_path, validate_relative,
 };
 use crate::state::instances::adapters::sqlite::{content_rows, instance_rows};
 use crate::state::{CachedEntry, State};
 use crate::util::io;
+use anyhow::bail;
 use bytes::Bytes;
 use std::path::PathBuf;
 
@@ -73,8 +75,8 @@ pub(super) async fn write_library(
 			).await {
 				Ok(Some(stored_file)) => stored_file,
 				Ok(None) | Err(_) if deferred => continue,
-				Ok(None) => return Err(input(
-					"A synced pack needs repair or re-import before its library can be saved",
+				Ok(None) => bail!(ErrorKind::InputError(
+					"a synced pack needs repair or re-import before its library can be saved".to_string(),
 				)),
 				Err(error) => return Err(error),
 			};
@@ -101,7 +103,7 @@ pub(super) async fn write_library(
 				.await?;
 			tokio::fs::rename(&temporary, &destination).await?;
 			renamed = true;
-			state.pack_sync_worker.revision
+			state.synced_options.packs.revision
 				.fetch_add(1, std::sync::atomic::Ordering::Release);
 		}
 		crate::state::content_store::sync_directory(&directory(state)).await?;
@@ -189,9 +191,10 @@ pub(super) async fn read_stored_file(
             tracing::debug!("Local synced-pack recovery deferred: {error}")
         }
     }
-    let version = pack.item.version.as_ref().ok_or_else(|| {
-        input("The synced pack is missing or damaged; repair or re-import it")
-    })?;
+    let version = pack.item.version.as_ref().ok_or(ErrorKind::InputError(
+        "the synced pack is missing or damaged; repair or re-import it"
+            .to_string(),
+    ))?;
     let version = CachedEntry::get_version(
         &version.id,
         None,
@@ -199,9 +202,10 @@ pub(super) async fn read_stored_file(
         &state.api_semaphore,
     )
     .await?
-    .ok_or_else(|| {
-        input("The synced pack's original version is unavailable; re-import it")
-    })?;
+    .ok_or(ErrorKind::InputError(
+        "the synced pack's original version is unavailable; re-import it"
+            .to_string(),
+    ))?;
     let file = version
         .files
         .iter()
@@ -209,11 +213,10 @@ pub(super) async fn read_stored_file(
             Some(hash) => file.hashes.get("sha512") == Some(hash),
             None => file.hashes.get("sha1") == Some(&pack.sha1),
         })
-        .ok_or_else(|| {
-            input(
-                "The synced pack's original file is unavailable; re-import it",
-            )
-        })?;
+        .ok_or(ErrorKind::InputError(
+            "the synced pack's original file is unavailable; re-import it"
+                .to_string(),
+        ))?;
     state
         .content_store
         .require_staging_space(u64::from(file.size))?;
@@ -233,7 +236,7 @@ pub(super) async fn read_stored_file(
 
 pub(crate) async fn migrate_store(state: &State) -> crate::Result<()> {
     let ids = {
-        let _guard = state.lock_synced_options().await;
+        let _guard = state.synced_options.lock().await;
         read_library(state)
             .await?
             .packs
@@ -244,7 +247,7 @@ pub(crate) async fn migrate_store(state: &State) -> crate::Result<()> {
     for id in ids {
         let _turn = state.content_store.legacy_migration_priority.read().await;
         let snapshot = {
-            let _guard = state.lock_synced_options().await;
+            let _guard = state.synced_options.lock().await;
             read_library(state).await?
         };
         let Some(expected) = snapshot.packs.get(&id) else {
@@ -252,7 +255,7 @@ pub(crate) async fn migrate_store(state: &State) -> crate::Result<()> {
         };
         let recovered =
             recover_legacy_pack(Some(&id), expected, &snapshot, state).await;
-        let _guard = state.lock_synced_options().await;
+        let _guard = state.synced_options.lock().await;
         let mut library = read_library(state).await?;
         let Some(previous) = library.packs.get(&id).cloned() else {
             continue;
@@ -292,7 +295,7 @@ pub(crate) async fn migrate_store(state: &State) -> crate::Result<()> {
         }
     }
     let cache_complete = cleanup_legacy_cache(state).await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     if tokio::fs::try_exists(directory(state)).await? {
         crate::state::content_store::sync_directory(&directory(state)).await?;
     }
@@ -396,8 +399,8 @@ async fn recover_legacy_pack(
             }
         }
     }
-    Err(input(format!(
-        "Synced pack {} is missing or damaged; restore or re-import it to finish migration",
+    bail!(ErrorKind::InputError(format!(
+        "synced pack {} is missing or damaged; restore or re-import it to finish migration",
         pack.item.file_name
     )))
 }
@@ -423,8 +426,9 @@ async fn import_matching_pack(
     }
     let stored_file = state.content_store.store_file(source).await?;
     if stored_file.metadata.sha512 != sha512 {
-        return Err(input(
-            "The synced pack changed while it was being migrated; retry after closing the instance",
+        bail!(ErrorKind::InputError(
+            "the synced pack changed while it was being migrated; retry after closing the instance"
+                .to_string(),
         ));
     }
     Ok(Some(stored_file))
@@ -439,7 +443,7 @@ async fn cleanup_legacy_cache(state: &State) -> crate::Result<bool> {
     let mut entries = tokio::fs::read_dir(&legacy).await?;
     while let Some(entry) = entries.next_entry().await? {
         let _turn = state.content_store.legacy_migration_priority.read().await;
-        let _guard = state.lock_synced_options().await;
+        let _guard = state.synced_options.lock().await;
         let library = read_library(state).await?;
         if !entry.file_type().await?.is_file() {
             continue;

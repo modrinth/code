@@ -1,4 +1,5 @@
 use super::client::*;
+use super::content::remote_shared_config_files;
 use super::diff::*;
 use super::publish::*;
 use super::types::*;
@@ -23,6 +24,7 @@ pub async fn install_shared_instance(
         instance_icon_url,
         name,
         version,
+        None,
         &state,
     )
     .await?;
@@ -142,7 +144,12 @@ pub(super) async fn shared_instance_install_preview_from_version(
     let external_files = version
         .external_files
         .iter()
-        .filter(|file| file.file_type != CONFIG_BUNDLE_FILE_TYPE)
+        .filter(|file| {
+            !matches!(
+                file.file_type.as_str(),
+                CONFIG_BUNDLE_FILE_TYPE | CONFIG_FILE_TYPE
+            )
+        })
         .map(|file| SharedInstanceExternalFilePreview {
             file_name: file.file_name.clone(),
             file_type: file.file_type.clone(),
@@ -174,9 +181,7 @@ pub async fn get_shared_instance_update_preview(
     let state = State::get().await?;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError("Unknown instance".to_string())
-        })?;
+        .ok_or(crate::ErrorKind::InputError("unknown instance".to_string()))?;
     let Some(attachment) = metadata.shared_instance.clone() else {
         return Ok(None);
     };
@@ -214,7 +219,15 @@ pub async fn get_shared_instance_update_preview(
         .applied_version
         .is_none_or(|current| current < version.version);
     let diffs = if update_available {
-        shared_instance_update_diffs(&metadata, &version, &state).await?
+        let config_files = remote_shared_config_files(
+            &attachment.id,
+            attachment.applied_version,
+            &version,
+            &state,
+        )
+        .await?;
+        shared_instance_update_diffs(&metadata, &version, &config_files, &state)
+            .await?
     } else {
         Vec::new()
     };
@@ -234,9 +247,7 @@ pub(crate) async fn check_shared_instance_availability_before_launch(
 ) -> crate::Result<()> {
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError("Unknown instance".to_string())
-        })?;
+        .ok_or(crate::ErrorKind::InputError("unknown instance".to_string()))?;
     let Some(attachment) = metadata.shared_instance else {
         return Ok(());
     };
@@ -276,20 +287,17 @@ pub async fn update_shared_instance(
     let state = State::get().await?;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError("Unknown instance".to_string())
-        })?;
-    let attachment = metadata.shared_instance.clone().ok_or_else(|| {
+        .ok_or(crate::ErrorKind::InputError("unknown instance".to_string()))?;
+    let attachment = metadata.shared_instance.clone().ok_or(
         crate::ErrorKind::InputError(
-            "Instance is not attached to a shared instance".to_string(),
-        )
-    })?;
+            "instance is not attached to a shared instance".to_string(),
+        ),
+    )?;
     if !attachment.role.is_member() {
-        return Err(crate::ErrorKind::InputError(
-            "Only shared instance members can update from shared instances"
+        bail!(crate::ErrorKind::InputError(
+            "only shared instance members can update from shared instances"
                 .to_string(),
-        )
-        .into());
+        ));
     }
 
     let version =
@@ -303,6 +311,7 @@ pub async fn update_shared_instance(
         None,
         metadata.instance.name,
         version,
+        attachment.applied_version,
         &state,
     )
     .await?;
@@ -326,7 +335,8 @@ pub(super) async fn ensure_ready_remote_version_for_invite(
                 shared_instance_id = %attachment.id,
                 "Shared instance has no ready version before invite; publishing current content"
             );
-            publish_shared_instance_inner(instance_id, &[], state).await
+            publish_shared_instance_inner(instance_id, &[], &|_, _| {}, state)
+                .await
         }
         SharedInstanceRemoteResponse::Unavailable(reason) => {
             handle_unavailable_shared_instance_if_current_user(
@@ -360,12 +370,11 @@ pub(super) async fn get_latest_remote_member_version(
             return Err(shared_instance_unavailable_error(reason));
         }
 
-        return Err(crate::ErrorKind::OtherError(format!(
-            "{}: {}",
+        bail!(
+            "{} ({})",
             shared_instance_unavailable_message(reason),
             attachment.id
-        ))
-        .into());
+        );
     }
 
     let version = match get_latest_remote_version_optional_unavailable(
@@ -388,12 +397,11 @@ pub(super) async fn get_latest_remote_member_version(
                 return Err(shared_instance_unavailable_error(reason));
             }
 
-            return Err(crate::ErrorKind::OtherError(format!(
-                "{}: {}",
+            bail!(
+                "{} ({})",
                 shared_instance_unavailable_message(reason),
                 attachment.id
-            ))
-            .into());
+            );
         }
     };
 
@@ -471,13 +479,13 @@ pub(super) fn shared_instance_unavailable_message(
 ) -> &'static str {
     match reason {
         SharedInstanceUnavailableReason::Deleted => {
-            "Shared instance was deleted"
+            "shared instance was deleted"
         }
         SharedInstanceUnavailableReason::AccessRevoked => {
-            "Shared instance access was revoked"
+            "shared instance access was revoked"
         }
         SharedInstanceUnavailableReason::Quarantined => {
-            "Shared instance was quarantined"
+            "shared instance was quarantined"
         }
     }
 }
@@ -485,24 +493,24 @@ pub(super) fn shared_instance_unavailable_message(
 fn shared_instance_external_file_data(
     file: ExternalFileResponse,
 ) -> crate::Result<SharedInstanceExternalFileData> {
-    let file_size = file.file_size.ok_or_else(|| {
-        crate::ErrorKind::InputError(format!(
-            "Shared instance external file {} is missing its size",
+    let file_size =
+        file.file_size.ok_or(crate::ErrorKind::InputError(format!(
+            "shared instance external file {} is missing its size",
             file.file_name
-        ))
-    })?;
-    let file_size = u64::try_from(file_size).map_err(|_| {
+        )))?;
+    let file_size = u64::try_from(file_size).context(
         crate::ErrorKind::InputError(format!(
-            "Shared instance external file {} has an invalid size",
+            "shared instance external file {} has an invalid size",
             file.file_name
-        ))
-    })?;
+        )),
+    )?;
 
     Ok(SharedInstanceExternalFileData {
         file_name: file.file_name,
         file_type: file.file_type,
         url: file.url,
         file_size,
+        sha1: file.sha1,
     })
 }
 
@@ -514,14 +522,21 @@ pub(super) async fn shared_instance_install_data(
     instance_icon_url: Option<String>,
     name: String,
     version: InstanceVersionResponse,
+    applied_version: Option<i32>,
     state: &State,
 ) -> crate::Result<SharedInstanceInstallData> {
     if !version.ready {
-        return Err(crate::ErrorKind::InputError(
-            "Shared instance version is not ready to install".to_string(),
-        )
-        .into());
+        bail!(crate::ErrorKind::InputError(
+            "shared instance version is not ready to install".to_string(),
+        ));
     }
+    let config_files = remote_shared_config_files(
+        shared_instance_id,
+        applied_version,
+        &version,
+        state,
+    )
+    .await?;
 
     let name = shared_instance_name(name);
     let linked_user_id = linked_modrinth_user_id(state).await?;
@@ -547,6 +562,13 @@ pub(super) async fn shared_instance_install_data(
         external_files: version
             .external_files
             .into_iter()
+            .filter(|file| {
+                !matches!(
+                    file.file_type.as_str(),
+                    CONFIG_BUNDLE_FILE_TYPE | CONFIG_FILE_TYPE
+                )
+            })
+            .chain(config_files)
             .map(shared_instance_external_file_data)
             .collect::<crate::Result<Vec<_>>>()?,
         modpack,

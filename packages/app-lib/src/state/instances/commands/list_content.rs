@@ -1,7 +1,6 @@
 use super::sync_content_files::{
     project_type_for_file, sync_instance_content_files,
 };
-use crate::State;
 use crate::pack::install_from::{PackFileHash, PackFormat};
 use crate::state::content_store::content_file_path;
 use crate::state::instances::adapters::sqlite;
@@ -17,7 +16,8 @@ use crate::state::{
     VersionV3,
 };
 use crate::util::fetch::{DownloadMeta, DownloadReason, FetchSemaphore};
-use async_zip::tokio::read::fs::ZipFileReader;
+use crate::{ErrorKind, State};
+use anyhow::{Context, bail};
 use dashmap::DashMap;
 use sqlx::SqlitePool;
 use std::collections::{HashMap, HashSet};
@@ -55,9 +55,7 @@ pub(crate) async fn list_content_sets(
 ) -> crate::Result<Vec<ContentSet>> {
     let instance = sqlite::instance_rows::get_instance_by_id(instance_id, pool)
         .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError("Unknown instance".to_string())
-        })?;
+        .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
 
     sqlite::content_rows::get_content_sets_for_instance(&instance.id, pool)
         .await
@@ -470,11 +468,9 @@ pub(crate) async fn get_linked_modpack_info(
         } else {
             (project, all_versions)
         };
-    let project = project.ok_or_else(|| {
-        crate::ErrorKind::InputError(format!(
-            "Linked modpack project {project_id} not found"
-        ))
-    })?;
+    let project = project.ok_or(ErrorKind::InputError(format!(
+        "linked modpack project {project_id} not found"
+    )))?;
     let owner = if let Some(org_id) = &project.organization {
         let org = CachedEntry::get_organization(
             org_id,
@@ -630,26 +626,21 @@ async fn resolve_content_scope_with_instance(
 ) -> crate::Result<ResolvedContentScope> {
     let instance = sqlite::instance_rows::get_instance_by_id(instance_id, pool)
         .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError("Unknown instance".to_string())
-        })?;
+        .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
     let content_set = match content_set_id {
         Some(content_set_id) => {
             let content_set =
                 sqlite::content_rows::get_content_set(content_set_id, pool)
                     .await?
-                    .ok_or_else(|| {
-                        crate::ErrorKind::InputError(format!(
-                            "Unknown content set {content_set_id}"
-                        ))
-                    })?;
+                    .ok_or(ErrorKind::InputError(format!(
+                        "unknown content set {content_set_id}"
+                    )))?;
 
             if content_set.instance_id != instance.id {
-                return Err(crate::ErrorKind::InputError(format!(
-					"Content set {content_set_id} does not belong to instance {}",
-					instance.id
-				))
-				.into());
+                bail!(ErrorKind::InputError(format!(
+                    "content set {content_set_id} does not belong to instance {}",
+                    instance.id
+                )));
             }
 
             content_set
@@ -657,12 +648,10 @@ async fn resolve_content_scope_with_instance(
         None => {
             sqlite::content_rows::get_applied_content_set(&instance.id, pool)
                 .await?
-                .ok_or_else(|| {
-                    crate::ErrorKind::InputError(format!(
-                        "Instance {} has no applied content set",
-                        instance.id
-                    ))
-                })?
+                .ok_or(ErrorKind::InputError(format!(
+                    "instance {} has no applied content set",
+                    instance.id
+                )))?
         }
     };
 
@@ -1447,21 +1436,17 @@ async fn get_modpack_identifiers(
     let version =
         CachedEntry::get_version(version_id, None, pool, fetch_semaphore)
             .await?
-            .ok_or_else(|| {
-                crate::ErrorKind::InputError(format!(
-                    "Modpack version {version_id} not found"
-                ))
-            })?;
+            .ok_or(ErrorKind::InputError(format!(
+                "modpack version {version_id} not found"
+            )))?;
     let primary_file = version
         .files
         .iter()
         .find(|file| file.primary)
         .or_else(|| version.files.first())
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError(format!(
-                "No files found for modpack version {version_id}"
-            ))
-        })?;
+        .ok_or(ErrorKind::InputError(format!(
+            "no files found for modpack version {version_id}"
+        )))?;
     let download_meta = DownloadMeta {
         reason: DownloadReason::Modpack,
         game_version: content_set.game_version.clone(),
@@ -1477,80 +1462,108 @@ async fn get_modpack_identifiers(
         None,
     )
     .await?;
-    let zip_reader =
-        ZipFileReader::new(mrpack_file.path()).await.map_err(|_| {
-            crate::ErrorKind::InputError(
-                "Failed to read modpack zip".to_string(),
-            )
-        })?;
-    let manifest_idx = zip_reader
-        .file()
-        .entries()
-        .iter()
-        .position(|file| {
-            matches!(file.filename().as_str(), Ok("modrinth.index.json"))
-        })
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError(
-                "No modrinth.index.json found in mrpack".to_string(),
-            )
-        })?;
-    let mut manifest = String::new();
-    let mut entry_reader = zip_reader.reader_with_entry(manifest_idx).await?;
-    entry_reader.read_to_string_checked(&mut manifest).await?;
-    let pack: PackFormat = serde_json::from_str(&manifest)?;
-    let mut hashes = pack
-        .files
-        .iter()
-        .filter_map(|file| file.hashes.get(&PackFileHash::Sha1).cloned())
-        .collect::<Vec<_>>();
-    let project_ids = pack
-        .files
-        .iter()
-        .filter_map(|file| {
-            file.downloads.iter().find_map(|url| {
-                let parts = url.split('/').collect::<Vec<_>>();
-                let data_idx = parts.iter().position(|part| *part == "data")?;
-                parts.get(data_idx + 1).map(|part| part.to_string())
-            })
-        })
-        .collect::<HashSet<_>>()
-        .into_iter()
-        .collect::<Vec<_>>();
-    let override_entries = zip_reader
-        .file()
-        .entries()
-        .iter()
-        .enumerate()
-        .filter_map(|(index, entry)| {
-            let filename = entry.filename().as_str().ok()?;
-            let is_override = (filename.starts_with("overrides/")
-                || filename.starts_with("client-overrides/")
-                || filename.starts_with("server-overrides/"))
-                && !filename.ends_with('/');
-            is_override.then_some(index)
-        })
-        .collect::<Vec<_>>();
+    let mrpack_path = mrpack_file.path().to_path_buf();
+    let cancel = tokio_util::sync::CancellationToken::new();
+    let _cancel_guard = cancel.clone().drop_guard();
+    let (hashes, project_ids) =
+        tokio::task::spawn_blocking(move || -> crate::Result<_> {
+            use std::io::{BufReader, Read};
 
-    let mut buffer = vec![0_u8; 256 * 1024];
-    for index in override_entries {
-        let mut reader = zip_reader.reader_with_entry(index).await?;
-        let crc32 = reader.entry().crc32();
-        let mut hasher = sha1_smol::Sha1::new();
-        loop {
-            let read =
-                futures_lite::io::AsyncReadExt::read(&mut reader, &mut buffer)
-                    .await?;
-            if read == 0 {
-                break;
+            let mut archive = zip::ZipArchive::new(BufReader::new(
+                std::fs::File::open(mrpack_path)?,
+            ))
+            .context(ErrorKind::InputError(
+                "failed to read modpack zip".to_string(),
+            ))?;
+            let mut manifest_idx = None;
+            for index in 0..archive.len() {
+                if cancel.is_cancelled() {
+                    return Err(std::io::Error::new(
+                        std::io::ErrorKind::Interrupted,
+                        "modpack hashing cancelled",
+                    )
+                    .into());
+                }
+                if archive
+                    .by_index_raw(index)?
+                    .name()
+                    .is_ok_and(|name| name == "modrinth.index.json")
+                {
+                    manifest_idx = Some(index);
+                    break;
+                }
             }
-            hasher.update(&buffer[..read]);
-        }
-        if reader.compute_hash() != crc32 {
-            return Err(async_zip::error::ZipError::CRC32CheckError.into());
-        }
-        hashes.push(hasher.hexdigest());
-    }
+            let manifest_idx = manifest_idx.ok_or(ErrorKind::InputError(
+                "no modrinth.index.json found in mrpack".to_string(),
+            ))?;
+            let mut manifest = String::new();
+            archive
+                .by_index(manifest_idx)?
+                .read_to_string(&mut manifest)?;
+            let pack: PackFormat = serde_json::from_str(&manifest)?;
+            let mut hashes = pack
+                .files
+                .iter()
+                .filter_map(|file| {
+                    file.hashes.get(&PackFileHash::Sha1).cloned()
+                })
+                .collect::<Vec<_>>();
+            let project_ids = pack
+                .files
+                .iter()
+                .filter_map(|file| {
+                    file.downloads.iter().find_map(|url| {
+                        let parts = url.split('/').collect::<Vec<_>>();
+                        let data_idx =
+                            parts.iter().position(|part| *part == "data")?;
+                        parts.get(data_idx + 1).map(|part| part.to_string())
+                    })
+                })
+                .collect::<HashSet<_>>()
+                .into_iter()
+                .collect::<Vec<_>>();
+            let mut buffer = vec![0_u8; 256 * 1024];
+            for index in 0..archive.len() {
+                if cancel.is_cancelled() {
+                    return Err(std::io::Error::new(
+                        std::io::ErrorKind::Interrupted,
+                        "modpack hashing cancelled",
+                    )
+                    .into());
+                }
+                let is_override = {
+                    let entry = archive.by_index_raw(index)?;
+                    entry.name().is_ok_and(|filename| {
+                        (filename.starts_with("overrides/")
+                            || filename.starts_with("client-overrides/")
+                            || filename.starts_with("server-overrides/"))
+                            && !filename.ends_with('/')
+                    })
+                };
+                if !is_override {
+                    continue;
+                }
+                let mut reader = archive.by_index(index)?;
+                let mut hasher = sha1_smol::Sha1::new();
+                loop {
+                    if cancel.is_cancelled() {
+                        return Err(std::io::Error::new(
+                            std::io::ErrorKind::Interrupted,
+                            "modpack hashing cancelled",
+                        )
+                        .into());
+                    }
+                    let read = reader.read(&mut buffer)?;
+                    if read == 0 {
+                        break;
+                    }
+                    hasher.update(&buffer[..read]);
+                }
+                hashes.push(hasher.hexdigest());
+            }
+            Ok((hashes, project_ids))
+        })
+        .await??;
 
     CachedEntry::cache_modpack_files(
         version_id,

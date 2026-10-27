@@ -6,7 +6,7 @@
 		@pointerleave="leaveLink"
 		@pointerover.stop
 		@pointermove.stop
-		@focusin="show"
+		@focusin="enterFocus"
 		@focusout="leaveFocus"
 	>
 		<slot :tooltip-id="open ? tooltipId : undefined" />
@@ -18,11 +18,11 @@
 			role="tooltip"
 			:style="floatingStyles"
 			class="z-[101] box-border w-96 max-w-[calc(100vw-1rem)] overflow-y-auto rounded-xl border border-solid border-surface-5 bg-surface-2 shadow-lg"
-			@pointerenter="cancelClose"
+			@pointerenter="enterPanel"
 			@pointerleave="scheduleClose"
 			@pointerover.stop
 			@pointermove.stop
-			@focusin="cancelClose"
+			@focusin="enterFocus"
 			@focusout="leaveFocus"
 		>
 			<LinkInfo :url="url" :enabled="hovered" :validation-messages="validationMessages" />
@@ -32,15 +32,19 @@
 
 <script setup lang="ts">
 import { autoUpdate, flip, offset, shift, size, useFloating } from '@floating-ui/vue'
-import { type FieldValidationMessage, moderationSettings } from '@modrinth/moderation'
+import { moderationSettings } from '@modrinth/moderation'
 import { computed, onScopeDispose, ref, useId, watch } from 'vue'
 
 import { useModerationSettings } from '~/composables/moderation'
 
 import { useReviewEventListener } from '../shortcuts'
 import LinkInfo from './index.vue'
+import type { LinkValidationWarning } from './validation'
 
-const props = defineProps<{ url: string; validationMessages?: FieldValidationMessage[] }>()
+const props = defineProps<{
+	url: string
+	validationMessages?: LinkValidationWarning[]
+}>()
 const emit = defineEmits<{ hover: [hovered: boolean] }>()
 const settings = useModerationSettings()
 const anchor = ref<HTMLElement>()
@@ -50,6 +54,7 @@ const hovered = ref(false)
 const tooltipId = useId()
 let openTimer: ReturnType<typeof setTimeout> | undefined
 let closeTimer: ReturnType<typeof setTimeout> | undefined
+let hoveredSinceFocus = false
 
 const { floatingStyles } = useFloating(anchor, panel, {
 	placement: computed(() =>
@@ -85,9 +90,15 @@ function enterLink(event: PointerEvent) {
 	if (event.pointerType === 'touch') return
 	hovered.value = true
 	emit('hover', true)
-	cancelClose()
+	enterPanel(event)
 	clearTimeout(openTimer)
 	openTimer = setTimeout(show, 200)
+}
+
+function enterPanel(event: PointerEvent) {
+	if (event.pointerType === 'touch') return
+	hoveredSinceFocus = true
+	cancelClose()
 }
 
 function leaveLink() {
@@ -106,10 +117,15 @@ function leaveFocus(event: FocusEvent) {
 	if (!contains(event.relatedTarget)) scheduleClose()
 }
 
+function enterFocus() {
+	hoveredSinceFocus = false
+	show()
+}
+
 function scheduleClose() {
 	cancelClose()
 	closeTimer = setTimeout(() => {
-		if (contains(anchor.value?.ownerDocument.activeElement ?? null)) return
+		if (!hoveredSinceFocus && contains(anchor.value?.ownerDocument.activeElement ?? null)) return
 		close()
 	}, 200)
 }
@@ -119,6 +135,7 @@ function close() {
 	cancelClose()
 	open.value = false
 	hovered.value = false
+	hoveredSinceFocus = false
 	emit('hover', false)
 }
 

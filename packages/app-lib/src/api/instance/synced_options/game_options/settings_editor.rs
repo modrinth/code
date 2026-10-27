@@ -8,13 +8,14 @@ use super::instance_support::{
     describe_instance_support, find_common_local_value,
     load_participating_instances, summary_revision,
 };
-use super::options_file::input_error;
 use super::write_shared_settings::sync_all_participating_instances;
+use crate::ErrorKind;
 use crate::state::{
     CanonicalValue, GameOptionKind, State, StoredOption,
     game_options_sync_is_enabled, load_game_option_preferences,
     load_game_options_sync_state, load_shared_game_options,
 };
+use anyhow::bail;
 use chrono::Utc;
 
 fn validation_issue(
@@ -194,7 +195,7 @@ pub(super) async fn load_settings_editor(
 
 pub async fn get_config() -> crate::Result<GameSettingsEditorState> {
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     load_settings_editor(&state).await
 }
 
@@ -203,7 +204,7 @@ pub async fn preview_changes(
     request: UpdateGameSettingsRequest,
 ) -> crate::Result<GameSettingsEditorState> {
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     if request.expected_catalog_revision != CATALOG_REVISION {
         return load_settings_editor(&state).await;
     }
@@ -276,10 +277,11 @@ pub async fn save_changes(
     request: UpdateGameSettingsRequest,
 ) -> crate::Result<SaveGameSettingsResult> {
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     if !game_options_sync_is_enabled(&state.pool).await? {
-        return Err(input_error(
-            "Turn on game-settings sync before editing shared values.",
+        bail!(ErrorKind::InputError(
+            "turn on game-settings sync before editing shared values"
+                .to_string(),
         ));
     }
     let current_editor = load_settings_editor(&state).await?;
@@ -313,8 +315,8 @@ pub async fn save_changes(
             .iter()
             .find(|setting| setting.option_id == change.option_id)
         else {
-            return Err(input_error(format!(
-                "Unknown game setting {}",
+            bail!(ErrorKind::InputError(format!(
+                "unknown game setting {}",
                 change.option_id
             )));
         };
@@ -343,8 +345,8 @@ pub async fn save_changes(
         };
         if resulting_enabled {
             if resulting_value.is_none() {
-                return Err(input_error(format!(
-                    "Choose a value before enabling {}",
+                bail!(ErrorKind::InputError(format!(
+                    "choose a value before enabling {}",
                     setting.option_id
                 )));
             }
@@ -365,7 +367,7 @@ pub async fn save_changes(
             if compatibility.total_participating > 0
                 && compatibility.will_receive == 0
             {
-                return Err(input_error(format!(
+                bail!(ErrorKind::InputError(format!(
                     "{} is not compatible with any participating instance",
                     setting.option_id
                 )));

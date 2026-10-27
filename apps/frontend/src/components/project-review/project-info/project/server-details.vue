@@ -1,33 +1,33 @@
 <template>
-	<Section :heading="formatMessage(messages.serverDetails)" :target="{ kind: 'server' }">
+	<Section heading="Server details" :target="{ kind: 'server' }">
 		<template #right>
-			<EditButton :section="formatMessage(messages.serverDetails)" @click="editModal?.show()" />
+			<EditButton section="Server details" @click="editModal?.show()" />
 		</template>
 		<EditModal :key="project?.id" ref="editModal" />
 		<dl v-if="project" class="m-0 grid grid-cols-[max-content_minmax(0,1fr)] gap-x-3 gap-y-2.5">
-			<dt class="font-medium">{{ formatMessage(messages.serverAddress) }}</dt>
+			<dt class="font-medium">Address</dt>
 			<dd class="m-0 flex items-center gap-1.5 break-all text-primary">
 				<CopyCode
 					v-if="project.minecraft_java_server?.address"
 					:text="project.minecraft_java_server.address"
 					class="!-my-0.5"
 				/>
-				<span v-else>{{ formatMessage(messages.noServerAddress) }}</span>
+				<span v-else>No address.</span>
 				<TriangleAlertIcon
 					v-if="isTemporaryHost"
-					v-tooltip="formatMessage(messages.serverAddressTemporaryHost)"
-					:aria-label="formatMessage(messages.serverAddressTemporaryHost)"
+					v-tooltip="'This address uses a temporary server host.'"
+					aria-label="This address uses a temporary server host."
 					class="size-4 shrink-0 text-orange"
 				/>
 			</dd>
-			<dt class="font-medium">{{ formatMessage(messages.serverRegion) }}</dt>
+			<dt class="font-medium">Region</dt>
 			<dd class="m-0 text-primary">
 				<TagItem v-if="region" class="!border-surface-4 !bg-surface-3 !text-secondary">
 					{{ region }}
 				</TagItem>
 				<span v-else>—</span>
 			</dd>
-			<dt class="font-medium">{{ formatMessage(messages.serverLanguages) }}</dt>
+			<dt class="font-medium">Languages</dt>
 			<dd class="m-0 flex flex-wrap items-start gap-1">
 				<TagItem
 					v-for="language in languages"
@@ -36,37 +36,37 @@
 				>
 					{{ language.name }}
 				</TagItem>
-				<span v-if="languages.length === 0">{{ formatMessage(messages.noServerLanguages) }}</span>
+				<span v-if="languages.length === 0">No languages.</span>
 			</dd>
 
-			<dt class="font-medium">{{ formatMessage(messages.serverContent) }}</dt>
+			<dt class="font-medium">Content</dt>
 			<dd class="m-0 min-w-0">
 				<TagItem
 					v-if="content?.kind === 'vanilla'"
 					class="!border-surface-4 !bg-surface-3 !text-secondary"
 				>
-					{{ formatMessage(messages.vanilla) }}
+					Vanilla
 				</TagItem>
 				<TagItem v-else-if="isMrpack" class="!border-surface-4 !bg-surface-3 !text-secondary">
-					{{ formatMessage(messages.mrpack) }}
+					.mrpack
 				</TagItem>
 				<TagItem
 					v-else-if="content?.kind === 'modpack'"
 					class="!border-surface-4 !bg-surface-3 !text-secondary"
 				>
-					{{ formatMessage(messages.modpack) }}
+					Modpack
 				</TagItem>
 				<span v-else>—</span>
 			</dd>
 			<template v-if="content?.kind === 'vanilla'">
-				<dt class="font-medium">{{ formatMessage(messages.gameVersions) }}</dt>
+				<dt class="font-medium">Game versions</dt>
 				<dd class="m-0 flex flex-wrap items-start gap-1">
 					<TagItem
 						v-if="content.recommended_game_version"
 						class="!border-surface-4 !bg-surface-3 !text-secondary"
 					>
 						{{ content.recommended_game_version }}
-						{{ formatMessage(messages.recommended) }}
+						(Recommended)
 					</TagItem>
 					<TagItem
 						v-for="version in supportedVersions"
@@ -108,10 +108,10 @@
 								rel="noopener noreferrer"
 								class="truncate hover:underline"
 							>
-								{{ formatMessage(messages.modpackVersion, { version: modpackVersionLabel }) }}
+								{{ `Version ${modpackVersionLabel}` }}
 							</NuxtLink>
 							<span v-else class="truncate">
-								{{ formatMessage(messages.modpackVersion, { version: modpackVersionLabel }) }}
+								{{ `Version ${modpackVersionLabel}` }}
 							</span>
 							<template v-if="modpackAuthorId">
 								<BulletDivider aria-hidden="true" />
@@ -141,10 +141,7 @@ import {
 	CopyCode,
 	injectModrinthClient,
 	injectTags,
-	SERVER_LANGUAGES,
-	SERVER_REGIONS,
 	TagItem,
-	useVIntl,
 } from '@modrinth/ui'
 import { formatVersionsForDisplay } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
@@ -153,15 +150,15 @@ import { computed, useTemplateRef } from 'vue'
 import { versionQueryOptions } from '~/composables/queries/version'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
-import { projectReviewMessages as messages } from '../../messages'
 import EditButton from '../edit/button.vue'
 import EditModal from '../edit/server-details.vue'
 import Section from '../section.vue'
+import { SERVER_LANGUAGES, SERVER_REGIONS } from '../server-labels'
 
 const { project } = injectProjectReviewPageContext()
 const editModal = useTemplateRef<InstanceType<typeof EditModal>>('editModal')
 const client = injectModrinthClient()
-const { formatMessage } = useVIntl()
+
 const tags = injectTags(null)
 const isTemporaryHost = computed(() =>
 	isTempHostAddress(project.value?.minecraft_java_server?.address ?? ''),
@@ -207,14 +204,14 @@ const modpackVersionLabel = computed(() => {
 const languages = computed(() =>
 	(project.value?.minecraft_server?.languages ?? []).map((code) => {
 		const message = SERVER_LANGUAGES[code as keyof typeof SERVER_LANGUAGES]
-		return { code, name: message ? formatMessage(message) : code }
+		return { code, name: message ? message : code }
 	}),
 )
 const region = computed(() => {
 	const code = project.value?.minecraft_server?.region
 	if (!code) return null
 	const message = SERVER_REGIONS[code as keyof typeof SERVER_REGIONS]
-	return message ? formatMessage(message) : code
+	return message ? message : code
 })
 const supportedVersions = computed(() => {
 	const vanilla = content.value

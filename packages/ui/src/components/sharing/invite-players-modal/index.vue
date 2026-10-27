@@ -7,7 +7,7 @@
 		no-padding
 		noblur
 	>
-		<div class="flex max-h-[calc(100vh-8rem)] min-h-0 flex-col">
+		<div class="flex max-h-[calc(100vh-12rem)] min-h-0 flex-col">
 			<div class="shrink-0 border-0 border-b border-solid border-surface-5 p-6">
 				<div class="flex items-start gap-2">
 					<Combobox

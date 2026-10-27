@@ -38,9 +38,10 @@ export const galleryNags = {
 	},
 	'upload-gallery-image': {
 		title: messages.uploadTitle,
-		description: ({ projectType }) => {
-			if (projectType === 'resourcepack') return messages.uploadResourcePack
-			if (projectType === 'shader') return messages.uploadShader
+		description: ({ nag, projectType }) => {
+			const galleryProjectType = nag.details?.project_type ?? projectType
+			if (galleryProjectType === 'resourcepack') return messages.uploadResourcePack
+			if (galleryProjectType === 'shader') return messages.uploadShader
 			return messages.upload
 		},
 		destination: 'gallery',

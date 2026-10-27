@@ -162,7 +162,8 @@ fn add_file_hash_map_response_extension(operation: &mut Option<Operation>) {
 }
 
 fn add_file_hash_map_response_extension_to_response(response: &mut Response) {
-    let Some(content) = response.content.get_mut("application/json") else {
+    let Some(RefOr::T(content)) = response.content.get_mut("application/json")
+    else {
         return;
     };
     let Some(RefOr::T(Schema::Object(schema))) = content.schema.as_mut() else {

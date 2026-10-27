@@ -4,11 +4,7 @@
 			v-if="avatarUrl"
 			type="button"
 			class="shrink-0 cursor-zoom-in rounded-full border-0 bg-transparent p-0"
-			:aria-label="
-				formatMessage(messages.openMemberAvatar, {
-					username: member.user.username,
-				})
-			"
+			:aria-label="`View enlarged avatar for ${member.user.username}`"
 			@click="viewer?.show(0)"
 		>
 			<Avatar
@@ -39,11 +35,7 @@
 					class="truncate font-medium text-primary hover:underline"
 					>{{ member.user.username }}</NuxtLink
 				>
-				<CrownIcon
-					v-if="member.is_owner"
-					class="size-3 shrink-0"
-					:aria-label="formatMessage(messages.owner)"
-				/>
+				<CrownIcon v-if="member.is_owner" class="size-3 shrink-0" aria-label="Owner" />
 			</div>
 			<p class="m-0 text-xs">{{ member.role }}</p>
 			<ProjectStatusStats :stats="stats" />
@@ -58,21 +50,20 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { CrownIcon } from '@modrinth/assets'
-import { Avatar, ImageViewerEditor, useVIntl } from '@modrinth/ui'
+import { Avatar, ImageViewerEditor } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import ProjectStatusStats from '~/components/ProjectStatusStats.vue'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
 import ImageViewerActions from '../../image-viewer-actions.vue'
-import { projectReviewMessages as messages } from '../../messages'
 import MemberActions from './member-actions.vue'
 
 const props = defineProps<{
 	member: Labrinth.Projects.v3.TeamMember
 	stats: { status: string; count: number }[]
 }>()
-const { formatMessage } = useVIntl()
+
 const viewer = ref<InstanceType<typeof ImageViewerEditor>>()
 const { pixelated } = injectProjectReviewPageContext()
 const avatarUrl = computed(() => props.member.user.raw_avatar_url || props.member.user.avatar_url)

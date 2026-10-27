@@ -33,15 +33,15 @@
 						class="flex flex-wrap items-center gap-x-6 gap-y-2 pl-2.5"
 					>
 						<h2 class="m-0 flex items-center gap-2 text-sm font-semibold text-secondary">
-							{{ formatMessage(messages.versions) }}
+							Versions
 							<span class="text-contrast">{{ versions.length }}</span>
 						</h2>
 						<span class="flex items-center gap-2 text-sm font-semibold text-secondary">
-							{{ formatMessage(messages.files) }}
+							Files
 							<span class="text-contrast">{{ fileCount }}</span>
 						</span>
 						<span class="flex items-center gap-2 text-sm font-semibold text-secondary">
-							{{ formatMessage(messages.withheld) }}
+							Withheld
 							<span :class="withheldCount ? 'text-orange' : 'text-contrast'">{{
 								withheldCount
 							}}</span>
@@ -58,23 +58,19 @@
 						>
 							<ListChevronsDownUpIcon v-if="allExpanded" aria-hidden="true" />
 							<ListChevronsUpDownIcon v-else aria-hidden="true" />
-							{{ formatMessage(allExpanded ? messages.collapseAll : messages.expandAll) }}
+							{{ allExpanded ? 'Collapse all' : 'Expand all' }}
 						</Button>
 					</div>
 				</div>
-				<p v-if="!selection" class="m-0 text-secondary">
-					{{ formatMessage(messages.empty) }}
-				</p>
+				<p v-if="!selection" class="m-0 text-secondary">No project selected</p>
 				<div v-else-if="error || versionsQuery.isError.value" role="alert">
-					<p class="m-0">{{ formatMessage(messages.loadError) }}</p>
-					<Button @click="retry">{{ formatMessage(messages.retry) }}</Button>
+					<p class="m-0">Could not load project data</p>
+					<Button @click="retry">Retry</Button>
 				</div>
 				<p v-else-if="isLoading || versionsQuery.isPending.value" role="status" class="m-0">
-					{{ formatMessage(messages.loading) }}
+					Loading...
 				</p>
-				<p v-else-if="!versions.length" class="m-0 text-secondary">
-					{{ formatMessage(messages.emptyVersions) }}
-				</p>
+				<p v-else-if="!versions.length" class="m-0 text-secondary">No versions</p>
 				<template v-else>
 					<VersionCard
 						v-for="version in versions"
@@ -94,22 +90,22 @@
 
 <script setup lang="ts">
 import { ListChevronsDownUpIcon, ListChevronsUpDownIcon } from '@modrinth/assets'
-import { Button, useVIntl } from '@modrinth/ui'
+import { moderationSettings } from '@modrinth/moderation'
+import { Button } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, useTemplateRef } from 'vue'
 
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
 import ProjectC2paScanModal from '~/components/ui/moderation/ProjectC2paScanModal.vue'
+import { useModerationSettings } from '~/composables/moderation'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 import { injectReviewPanels } from '~/providers/project-review/review-panels'
 import type { ManageVersionHost } from '~/providers/version/manage-version-modal'
 
-import { projectReviewMessages as messages } from '../messages'
 import ReviewPanel from '../review-panel/index.vue'
 import ModpackTools from './modpack-tools.vue'
 import VersionCard from './version-card.vue'
 
-const { formatMessage } = useVIntl()
 const { resolve } = injectReviewPanels()
 const interactionScope = useTemplateRef<HTMLElement>('interactionScope')
 const { selection, projectV2, versions, versionsQuery, isLoading, error, refresh } =
@@ -146,8 +142,16 @@ const editorHost = computed<ManageVersionHost | undefined>(() => {
 	}
 })
 const expanded = ref<Set<string> | null>(null)
+const settings = useModerationSettings()
 const expandedIds = computed(
-	() => expanded.value ?? new Set(versions.value[0] ? [versions.value[0].id] : []),
+	() =>
+		expanded.value ??
+		new Set(
+			settings.value.get(moderationSettings.General.ExpandVersionDetailsByDefault) &&
+				versions.value[0]
+				? [versions.value[0].id]
+				: [],
+		),
 )
 const fileCount = computed(() =>
 	versions.value.reduce((count, version) => count + version.files.length, 0),

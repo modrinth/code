@@ -68,7 +68,7 @@ import ErrorModal from '@/components/ui/ErrorModal.vue'
 import HostingUpdateRequired from '@/components/ui/HostingUpdateRequired.vue'
 import AddServerToInstanceModal from '@/components/ui/install_flow/AddServerToInstanceModal.vue'
 import UnknownPackWarningModal from '@/components/ui/install_flow/UnknownPackWarningModal.vue'
-import IconEditorModal from '@/components/ui/instance_settings/icon-editor-modal/index.vue'
+import IconEditorModal from '@/components/ui/instance_settings/InstanceIconEditorModal.vue'
 import MinecraftAuthErrorModal from '@/components/ui/minecraft-auth-error-modal/MinecraftAuthErrorModal.vue'
 import MinecraftRequiredModal from '@/components/ui/minecraft-required-modal/MinecraftRequiredModal.vue'
 import InstallToPlayModal from '@/components/ui/modal/InstallToPlayModal.vue'
@@ -1155,11 +1155,7 @@ async function signIn(flow = 'sign-in', addAccount = false) {
 		await login(flow, addAccount)
 		await fetchCredentials()
 	} catch (error) {
-		if (
-			typeof error === 'object' &&
-			typeof error['message'] === 'string' &&
-			error.message.includes('Login canceled')
-		) {
+		if (error?.code === 'login_canceled') {
 			// user closed the login window
 		} else {
 			handleError(error)

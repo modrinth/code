@@ -40,6 +40,13 @@ pub mod tech_review_queue;
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(
         web::scope("/delphi")
+            .app_data(
+                web::JsonConfig::default()
+                    .limit(10 * 1024 * 1024)
+                    .error_handler(|err, _req| {
+                        ApiError::Request(eyre!("{err}")).into()
+                    }),
+            )
             .service(ingest_report)
             .service(_run)
             .service(get_file)
@@ -318,49 +325,6 @@ async fn ingest_report_deserialized(
     Ok(())
 }
 
-pub async fn run(
-    exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-    run_parameters: DelphiRunParameters,
-    identifier: Uuid,
-    http: &reqwest::Client,
-) -> Result<HttpResponse, ApiError> {
-    let file_data = sqlx::query!(
-        r#"
-        SELECT
-            version_id AS "version_id: crate::database::models::DBVersionId",
-            versions.mod_id AS "project_id: crate::database::models::DBProjectId",
-            files.url AS "url"
-        FROM files INNER JOIN versions ON files.version_id = versions.id
-        WHERE files.id = $1
-        "#,
-        run_parameters.file_id.0 as i64
-    )
-    .fetch_one(exec)
-    .await.wrap_internal_err("fetching file from database")?;
-
-    tracing::debug!(
-        "Running Delphi for project {}, version {}, file {}",
-        file_data.project_id.0,
-        file_data.version_id.0,
-        run_parameters.file_id.0
-    );
-
-    http.post(&ENV.DELPHI_URL)
-        .json(&serde_json::json!({
-            "url": file_data.url,
-            "project_id": ProjectId(file_data.project_id.0 as u64),
-            "version_id": VersionId(file_data.version_id.0 as u64),
-            "file_id": run_parameters.file_id,
-            "identifier": identifier,
-        }))
-        .send()
-        .await
-        .and_then(|res| res.error_for_status())
-        .wrap_internal_err("requesting a Delphi scan")?;
-
-    Ok(HttpResponse::NoContent().finish())
-}
-
 /// Run Delphi.
 #[utoipa::path(
 	context_path = "/delphi",
@@ -387,21 +351,14 @@ pub async fn _run(
     .await
     .wrap_auth_err("authenticating API request")?;
 
-    let mut transaction = pool
-        .begin()
-        .await
-        .wrap_internal_err("beginning Delphi scan enqueue transaction")?;
-    crate::queue::delphi_scan::force_enqueue_file(
-        &mut transaction,
+    crate::queue::delphi_scan::publish_file_scan(
         &kafka_client,
         DBFileId(run_parameters.file_id.0 as i64),
+        true,
+        true,
     )
     .await
     .wrap_internal_err("enqueueing Delphi file scan")?;
-    transaction
-        .commit()
-        .await
-        .wrap_internal_err("committing Delphi scan enqueue transaction")?;
 
     Ok(HttpResponse::NoContent().finish())
 }

@@ -15,6 +15,31 @@ import type {
 	ProjectDisclosureData,
 } from './types'
 
+export const DISCLOSURE_FORM_KEYS = {
+	ai_content: 'ai',
+	ai_functionality: 'aiFunctionality',
+	advertisements: 'advertising',
+	paid_features: 'paidFeatures',
+	telemetry: 'telemetry',
+	derivative_work: 'derivative',
+	epilepsy_triggers: 'photosensitivity',
+	system_interactions: 'systemInteractions',
+	archived: 'archived',
+} as const satisfies Record<DisclosureType, keyof Omit<DisclosureFormState, 'lockStatuses'>>
+
+export function copyDisclosureFormSection(
+	target: DisclosureFormState,
+	source: DisclosureFormState,
+	type: DisclosureType,
+): DisclosureFormState {
+	const key = DISCLOSURE_FORM_KEYS[type]
+	return {
+		...target,
+		[key]: JSON.parse(JSON.stringify(source[key])),
+		lockStatuses: { ...target.lockStatuses, [type]: source.lockStatuses[type] },
+	}
+}
+
 function findDisclosure<T extends DisclosureType>(
 	disclosures: ProjectDisclosureData[],
 	type: T,

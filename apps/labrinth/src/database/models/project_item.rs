@@ -12,7 +12,6 @@ use crate::models::link_platform::LinkPlatform;
 use crate::models::projects::{
     MonetizationStatus, ProjectStatus, SideTypesMigrationReviewStatus,
 };
-use crate::util::kafka::KafkaClientState;
 use ariadne::ids::base62_impl::parse_base62;
 use chrono::{DateTime, Utc};
 use dashmap::{DashMap, DashSet};
@@ -66,6 +65,8 @@ impl LinkUrl {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct DBGalleryItem {
+    #[serde(default)]
+    pub id: Option<i32>,
     pub image_url: String,
     pub raw_image_url: String,
     pub featured: bool,
@@ -193,7 +194,7 @@ impl ProjectBuilder {
         transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
         file_host: &dyn FileHost,
-        kafka_client: &KafkaClientState,
+        delphi_scan_files: &mut Vec<DBFileId>,
     ) -> Result<DBProjectId> {
         let project_struct = DBProject {
             id: self.project_id,
@@ -245,7 +246,7 @@ impl ProjectBuilder {
         for mut version in self.initial_versions {
             version.project_id = self.project_id;
             version
-                .insert(transaction, redis, file_host, kafka_client)
+                .insert(transaction, redis, file_host, delphi_scan_files)
                 .await
                 .wrap_err("inserting initial project version")?;
         }
@@ -742,7 +743,7 @@ impl DBProject {
 
                 let mods_gallery: DashMap<DBProjectId, Vec<DBGalleryItem>> = sqlx::query!(
                     "
-                    SELECT DISTINCT mod_id, mg.image_url, mg.raw_image_url, mg.featured, mg.name, mg.description, mg.created, mg.ordering
+                    SELECT DISTINCT mod_id, mg.id gallery_id, mg.image_url, mg.raw_image_url, mg.featured, mg.name, mg.description, mg.created, mg.ordering
                     FROM mods_gallery mg
                     INNER JOIN mods m ON mg.mod_id = m.id
                     WHERE m.id = ANY($1) OR m.slug = ANY($2)
@@ -754,6 +755,7 @@ impl DBProject {
                         acc.entry(DBProjectId(m.mod_id))
                             .or_default()
                             .push(DBGalleryItem {
+                                id: Some(m.gallery_id),
                                 image_url: m.image_url,
                                 raw_image_url: m.raw_image_url,
                                 featured: m.featured.unwrap_or(false),

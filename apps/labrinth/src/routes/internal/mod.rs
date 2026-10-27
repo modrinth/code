@@ -1,5 +1,4 @@
 pub mod admin;
-pub mod affiliate;
 pub mod analytics_event;
 pub mod attribution;
 pub mod billing;
@@ -43,7 +42,6 @@ pub fn config(cfg: &mut web::ServiceConfig) {
                     .configure(analytics_event::config),
             )
             .service(web::scope("/moderation").configure(moderation::config))
-            .service(web::scope("/affiliate").configure(affiliate::config))
             .service(web::scope("/campaign").configure(campaign::config))
             .service(web::scope("/search-management").configure(search::config))
             .service(web::scope("/globals").configure(globals::config))
@@ -68,7 +66,6 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 		description = include_str!("../../api_internal_description.md"),
 	),
 	paths(
-		admin::count_download,
 		blocked_users::block_status,
 		privacy::invite_privacy_status,
 		admin::force_reindex,
@@ -143,15 +140,11 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 		moderation::external_license::update_license,
 		admin::user_credentials::force_password_reset,
 		admin::user_credentials::reset_2fa,
+		moderation::user_restrictions::restrict_user,
+		moderation::user_restrictions::unrestrict_user,
 		admin::user_lock::lock_user,
 		admin::user_lock::unlock_user,
 		admin::user_sessions::revoke_user_sessions,
-		affiliate::ingest_click,
-		affiliate::get_all,
-		affiliate::create,
-		affiliate::get,
-		affiliate::delete,
-		affiliate::patch,
 		campaign::tiltify_webhook,
 		campaign::pride_26,
 		search::tasks,

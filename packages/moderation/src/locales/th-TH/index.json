@@ -1,6 +1,12 @@
 {
+  "nags.add-description.description": {
+    "defaultMessage": "ต้องมีคำอธิบายที่ระบุเนื้อหา วัตถุประสงค์ และความน่าสนใจของโครงการของคุณอย่างชัดเจน"
+  },
   "nags.add-description.title": {
     "defaultMessage": "เพิ่มคำอธิบาย"
+  },
+  "nags.add-icon.description": {
+    "defaultMessage": "การเพิ่มไอคอนที่มีเอกลักษณ์ เกี่ยวข้อง และน่าสนใจ จะช่วยให้โครงการของคุณเป็นที่จดจำและโดดเด่นยิ่งขึ้น"
   },
   "nags.add-icon.title": {
     "defaultMessage": "เพิ่มไอคอน"
@@ -14,14 +20,68 @@
   "nags.add-license-details.description": {
     "defaultMessage": "ใส่ลิงก์เว็บที่ใช้งานได้จริง พร้อมกับใส่ชื่อหรือรหัส SPDX ของไลเซนส์"
   },
+  "nags.add-license-details.title": {
+    "defaultMessage": "โปรดเพิ่มรายละเอียดใบอนุญาต"
+  },
+  "nags.add-links-server.description": {
+    "defaultMessage": "กรุณาเพิ่มลิงก์ที่เกี่ยวข้องไปยังแหล่งข้อมูลภายนอก เช่น เว็บไซต์ ร้านค้า หรือลิงก์เชิญ Discord ถาวร"
+  },
+  "nags.add-links-server.title": {
+    "defaultMessage": "เพิ่มการเชื่อมโยงภายนอก"
+  },
+  "nags.add-links.description": {
+    "defaultMessage": "กรุณาเพิ่มลิงก์ที่เกี่ยวข้องไปยังแหล่งข้อมูลภายนอก เช่น ซอร์สโค้ด ตัวติดตามปัญหา หรือลิงก์เชิญ Discord ถาวร"
+  },
   "nags.add-links.title": {
     "defaultMessage": "เพิ่มลิงก์ภายนอก"
+  },
+  "nags.adjacent-headers.description": {
+    "defaultMessage": "ห้ามวางหัวข้อที่มีระดับเดียวกันติดกันโดยเด็ดขาด"
+  },
+  "nags.adjacent-headers.title": {
+    "defaultMessage": "ลบหัวข้อที่อยู่ติดกันออก"
+  },
+  "nags.all-languages.description": {
+    "defaultMessage": "คุณได้เลือกตัวเลือกภาษาที่มีอยู่ทั้งหมดแล้ว โปรดระบุเฉพาะภาษาที่เซิร์ฟเวอร์ของคุณรองรับใช้งานจริงเท่านั้น"
+  },
+  "nags.all-languages.title": {
+    "defaultMessage": "โปรดเลือกภาษาที่ถูกต้อง"
+  },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "คุณได้เลือกทั้งหมด {totalAvailableTags, plural, one {# available tag} other {# available tags}}. แท็กควรใช้เพื่อช่วยให้ผู้ใช้ค้นหาโครงการที่เกี่ยวข้อง กรุณาเลือกเฉพาะแท็กที่เหมาะสมเท่านั้น"
+  },
+  "nags.all-tags-selected.title": {
+    "defaultMessage": "โปรดเลือกแท็กที่ถูกต้อง"
+  },
+  "nags.check-disclosures.description": {
+    "defaultMessage": "โปรดระบุรายละเอียดการเปิดเผยเนื้อหาที่เกี่ยวข้องกับ {type} เพื่อให้แน่ใจว่าผู้ใช้ได้รับทราบข้อมูลที่สำคัญทั้งหมด"
+  },
+  "nags.check-disclosures.title": {
+    "defaultMessage": "ตรวจสอบการเปิดเผยเนื้อหา"
+  },
+  "nags.description-ends-with-header.description": {
+    "defaultMessage": "คำอธิบายโครงการของคุณไม่ควรจบด้วยหัวข้อที่ไม่มีข้อความตามมา"
+  },
+  "nags.description-ends-with-header.title": {
+    "defaultMessage": "ลบส่วนท้ายของหัวข้อออก"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "คำอธิบายโครงการของคุณสั้นเกินไป โปรดเพิ่มรายละเอียดเพิ่มเติม เพื่อบรรยายเนื้อหา วัตถุประสงค์ และจุดเด่นของโครงการให้ชัดเจน"
   },
   "nags.description-too-short.title": {
     "defaultMessage": "เพิ่มคำอธิบาย"
   },
+  "nags.disclosures-special-formatting.description": {
+    "defaultMessage": "ส่วนเปิดเผยเนื้อหาไม่ควรมีโค้ด HTML เนื่องจากรองรับการแสดงผลได้เฉพาะ Markdown แบบอินไลน์ และข้อความธรรมดาเท่านั้น"
+  },
+  "nags.disclosures-special-formatting.title": {
+    "defaultMessage": "แก้ไขรูปแบบการเปิดเผยเนื้อหา"
+  },
   "nags.edit-description.title": {
     "defaultMessage": "แก้ไขคำอธิบาย"
+  },
+  "nags.edit-gallery.title": {
+    "defaultMessage": "แก้ไขแกลเลอรี"
   },
   "nags.edit-summary.title": {
     "defaultMessage": "แก้ไขสรุป"
@@ -29,20 +89,428 @@
   "nags.edit-tags.title": {
     "defaultMessage": "แก้ไขแท็ก"
   },
+  "nags.edit-title.title": {
+    "defaultMessage": "แก้ไขชื่อ"
+  },
+  "nags.feature-gallery-image.description": {
+    "defaultMessage": "รูปภาพแกลเลอรีที่แสดงเป็นพิเศษ มักจะเป็นสิ่งแรกที่ผู้ใช้เห็นและสร้างความประทับใจให้แก่โครงการของคุณ"
+  },
+  "nags.feature-gallery-image.title": {
+    "defaultMessage": "เพิ่มรูปภาพเด่นจากแกลเลอรี"
+  },
+  "nags.gallery-text-non-standard.description": {
+    "defaultMessage": "ไม่อนุญาตให้ใช้ตัวอักษรที่ไม่ใช่มาตรฐาน เช่น \"Fancy text\" หรือ \"Zalgo\" ในชื่อหรือคำอธิบายรูปภาพแกลเลอรี"
+  },
+  "nags.gallery-text-profanity.description": {
+    "defaultMessage": "ชื่อและคำอธิบายรูปภาพในแกลเลอรีของคุณห้ามมีคำหยาบคายมากเกินไป ตรวจพบ: \"{value}\""
+  },
+  "nags.gallery-text-slur.description": {
+    "defaultMessage": "ชื่อและคำอธิบายรูปภาพในแกลเลอรีของคุณต้องไม่มีคำที่ส่อเสียดหรือหยาบคาย ตรวจพบ: \"{value}\""
+  },
   "nags.gallery.title": {
     "defaultMessage": "ดูหน้าแกลเลอรี่"
+  },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "ใบอนุญาตประเภท {type} ของโครงการต้องมีการเผยแพร่ซอร์สโค้ด กรุณาเพิ่มลิงก์ซอร์สโค้ด เพิ่มไฟล์ต้นฉบับ หรือเปลี่ยนใบอนุญาตที่เลือก"
+  },
+  "nags.gpl-license-source-required.title": {
+    "defaultMessage": "ระบุซอร์สโค้ด"
+  },
+  "nags.invalid-gallery-text.title": {
+    "defaultMessage": "แก้ไขข้อความรูปภาพในแกลเลอรี"
+  },
+  "nags.invalid-license-url.description.malformed": {
+    "defaultMessage": "ที่อยู่ URL ของใบอนุญาตของคุณมีรูปแบบไม่ถูกต้อง กรุณาระบุ URL ที่ถูกต้องของข้อความใบอนุญาต"
   },
   "nags.invalid-license-url.title": {
     "defaultMessage": "เพิ่มลิงก์ไลเซนส์ที่ถูกต้อง"
   },
+  "nags.invalid-project-description.title": {
+    "defaultMessage": "แก้ไขคำอธิบาย"
+  },
+  "nags.invalid-project-name.title": {
+    "defaultMessage": "แก้ไขชื่อโครงการ"
+  },
+  "nags.invalid-project-summary.title": {
+    "defaultMessage": "แก้ไขบทสรุป"
+  },
+  "nags.license-url.not-in-allowlist.description": {
+    "defaultMessage": "ที่อยู่ URL ของใบอนุญาตของคุณไม่ใช่ลิงก์ใบอนุญาตที่รู้จัก กรุณาตรวจสอบให้แน่ใจว่าลิงก์นั้นชี้ตรงไปยังข้อความใบอนุญาต"
+  },
+  "nags.license-url.not-in-allowlist.title": {
+    "defaultMessage": "ตรวจสอบลิงก์ใบอนุญาตของคุณ"
+  },
+  "nags.link-validation.discord-invite": {
+    "defaultMessage": "คำเชิญ Discord ของคุณไม่ถูกต้อง หมดอายุแล้ว หรือไม่ได้นำผู้ใช้ไปยังเซิร์ฟเวอร์ โปรดเปลี่ยนด้วยลิงก์เชิญเซิร์ฟเวอร์ที่ใช้งานได้จริง"
+  },
+  "nags.link-validation.discord-invite.title": {
+    "defaultMessage": "แทนที่คำเชิญ Discord ที่ไม่ถูกต้อง"
+  },
+  "nags.link-validation.download": {
+    "defaultMessage": "ไม่อนุญาตให้มีลิงก์ที่เป็นการดาวน์โหลด โปรดลบลิงก์ดังกล่าวออกจากคำอธิบายของคุณ"
+  },
+  "nags.link-validation.download.title": {
+    "defaultMessage": "ลบลิงก์ที่ใช้ในการดาวน์โหลดออก"
+  },
+  "nags.link-validation.duplicate": {
+    "defaultMessage": "ลิงก์ {linkField, select, issues {issue tracker} source {source code} wiki {wiki} discord {Discord invite} site {website} store {store} license {license} description {description} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {donation}} ถูกใช้งานในที่ {otherLinkField, select, issues {Issue tracker} source {Source code} wiki {Wiki} discord {Discord invite} site {Website} store {Store} license {License} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {another field}} ด้วยเช่นกัน ควรแสดงรายการลิงก์ดังกล่าวเพียงครั้งเดียว"
+  },
+  "nags.link-validation.duplicate.title": {
+    "defaultMessage": "ลบลิงก์ที่ซ้ำซ้อนออก"
+  },
+  "nags.link-validation.external-blocklist-match": {
+    "defaultMessage": "ลิงก์ {linkField} ของคุณไม่ได้รับอนุญาต กรุณาลบลิงก์นี้ออก หรือแทนที่ด้วยสิ่งอื่นที่เหมาะสมสำหรับประเภทลิงก์ {linkField}"
+  },
+  "nags.link-validation.external-blocklist-match.title": {
+    "defaultMessage": "แทนที่ลิงก์ที่ไม่ถูกต้อง"
+  },
+  "nags.link-validation.global-blocklist-match": {
+    "defaultMessage": "ลิงก์ {linkField, select, issues {issue tracker} source {source code} wiki {wiki} discord {Discord invite} site {website} store {store} license {license} description {description} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {donation}} ใช้โดเมนที่ถูกห้าม กรุณาลบหรือแทนที่ลิงก์นี้"
+  },
+  "nags.link-validation.global-blocklist-match.title": {
+    "defaultMessage": "ลบลิงก์ที่ถูกห้ามออก"
+  },
+  "nags.link-validation.ip-address": {
+    "defaultMessage": "ลิงก์ {linkField, select, issues {issue tracker} source {source code} wiki {wiki} discord {Discord invite} site {website} store {store} license {license} description {description} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {donation}} ใช้ที่อยู่ IP โปรดใช้ URL ที่มีชื่อโดเมนแทน"
+  },
+  "nags.link-validation.ip-address.title": {
+    "defaultMessage": "ลบลิงก์ที่เป็นที่อยู่ IP ออก"
+  },
+  "nags.link-validation.malformed": {
+    "defaultMessage": "ลิงก์ {linkField, select, issues {issue tracker} source {source code} wiki {wiki} discord {Discord invite} site {website} store {store} license {license} description {description} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {donation}} ไม่ถูกต้อง กรุณาใส่ URL แบบ HTTPS ที่สมบูรณ์"
+  },
+  "nags.link-validation.malformed.title": {
+    "defaultMessage": "แก้ไขลิงก์ที่ไม่ถูกต้องให้เรียบร้อย"
+  },
+  "nags.link-validation.not-in-allowlist": {
+    "defaultMessage": "ลิงก์ {linkField, select, issues {issue tracker} source {source code} wiki {wiki} discord {Discord invite} site {website} store {store} license {license} description {description} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {donation}} อาจไม่เหมาะสมสำหรับประเภทลิงก์ที่เลือก โปรดตรวจสอบให้แน่ใจว่ามีความเหมาะสมตามวัตถุประสงค์ที่ตั้งไว้"
+  },
+  "nags.link-validation.not-in-allowlist.title": {
+    "defaultMessage": "ตรวจสอบความถูกต้องของลิงก์"
+  },
+  "nags.link-validation.source-repository": {
+    "defaultMessage": "ลิงก์ซอร์สโค้ดของคุณต้องชี้ไปยังคลังเก็บโค้ด บนแพลตฟอร์มที่รองรับ หรือบริการ Gitea/Forgejo ที่โฮสต์ด้วยตัวเอง"
+  },
+  "nags.link-validation.source-repository.title": {
+    "defaultMessage": "เชื่อมโยงไปยังคลังซอร์สโค้ด"
+  },
+  "nags.link-validation.title": {
+    "defaultMessage": "ตรวจสอบลิงก์นี้"
+  },
+  "nags.link-validation.unverifiable": {
+    "defaultMessage": "ลิงก์ {linkField, select, issues {issue tracker} source {source code} wiki {wiki} discord {Discord invite} site {website} store {store} license {license} description {description} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {donation}} ไม่สามารถตรวจสอบได้ โปรดตรวจสอบว่าลิงก์นี้ออนไลน์และเข้าถึงได้"
+  },
+  "nags.link-validation.unverifiable.title": {
+    "defaultMessage": "ตรวจสอบสถานะความพร้อมใช้งานของลิงก์"
+  },
+  "nags.link-validation.wrong-field": {
+    "defaultMessage": "ลิงก์ {linkField, select, issues {issue tracker} source {source code} wiki {wiki} discord {Discord invite} site {website} store {store} license {license} description {description} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {donation}} ไม่ถูกต้องสำหรับลิงก์ประเภท {linkField, select, issues {issue tracker} source {source code} wiki {wiki} discord {Discord invite} site {website} store {store} license {license} description {description} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {donation}} กรุณาลบหรือแทนที่ด้วยลิงก์ที่ถูกต้อง"
+  },
+  "nags.link-validation.wrong-field.title": {
+    "defaultMessage": "แก้ไขลิงก์ที่ไม่ถูกต้องให้เรียบร้อย"
+  },
+  "nags.long-headers.description": {
+    "defaultMessage": "ส่วนหัว {count, plural, one{# header} other{# headers}} ในคำอธิบายของคุณ {count, plural, one {is} other {are}} ยาวเกินไป ส่วนหัวควรมีความกระชับและทำหน้าที่เป็นชื่อส่วน ไม่ใช่ประโยคเต็ม"
+  },
+  "nags.long-headers.title": {
+    "defaultMessage": "ย่อหัวข้อให้สั้นลง"
+  },
+  "nags.minecraft-title-clause.description": {
+    "defaultMessage": "โครงการต้องไม่ใช้แบรนด์ของ Minecraft หรือใส่คำว่า \"Minecraft\" เป็นส่วนสำคัญในชื่อเลย"
+  },
+  "nags.minecraft-title-clause.title": {
+    "defaultMessage": "หลีกเลี่ยงการละเมิดเครื่องหมายการค้า"
+  },
+  "nags.missing-alt-text.description": {
+    "defaultMessage": "รูปภาพบางส่วนของคุณขาดคำอธิบาย Alt Text ซึ่งมีความสำคัญต่อการเข้าถึงข้อมูล โดยเฉพาะอย่างยิ่งสำหรับผู้พิการทางสายตา"
+  },
   "nags.missing-alt-text.title": {
     "defaultMessage": "เพิ่มคำอธิบายรูปภาพ"
+  },
+  "nags.moderation.title": {
+    "defaultMessage": "เยี่ยมชมเธรดการกลั่นกรอง"
+  },
+  "nags.moderator-feedback.description": {
+    "defaultMessage": "โปรดทบทวนและแก้ไขข้อกังวลทั้งหมดจากทีมดูแลระบบ ก่อนส่งใหม่อีก"
+  },
+  "nags.moderator-feedback.title": {
+    "defaultMessage": "ตรวจสอบความคิดเห็น"
+  },
+  "nags.multiple-resolution-tags.description": {
+    "defaultMessage": "คุณได้เลือก {count, plural, one {# resolution tag} other {# resolution tags}} ( {tags}) แล้ว โดยปกติแล้วแพ็กทรัพยากรควรมีแท็กที่ตรงกับความละเอียดหลักเพียงอย่างเดียว"
+  },
+  "nags.multiple-resolution-tags.title": {
+    "defaultMessage": "โปรดเลือกความละเอียดที่ถูกต้อง"
+  },
+  "nags.project-description-content.title": {
+    "defaultMessage": "ตรวจสอบคำอธิบาย"
+  },
+  "nags.project-description-non-english.description": {
+    "defaultMessage": "คำอธิบายโครงการของคุณต้องเขียนเป็นภาษาอังกฤษ หรือมีคำแปลภาษาอังกฤษรวมอยู่ด้วย"
+  },
+  "nags.project-description-non-english.title": {
+    "defaultMessage": "แปลคำอธิบาย"
+  },
+  "nags.project-description-non-standard-text.description": {
+    "defaultMessage": "ไม่อนุญาตให้ใช้ตัวอักษรที่ไม่ใช่มาตรฐาน เช่น \"Fancy text\" หรือ \"Zalgo\" มากเกินไปในคำอธิบายโครงการของคุณ"
+  },
+  "nags.project-description-profanity.description": {
+    "defaultMessage": "คำอธิบายโครงการของคุณห้ามมีคำหยาบคายมากเกินไป ตรวจพบ: \"{value}\""
+  },
+  "nags.project-description-slur.description": {
+    "defaultMessage": "คำอธิบายโครงการของคุณต้องไม่มีคำที่ส่อเสียดหรือหยาบคาย ตรวจพบ: \"{value}\""
+  },
+  "nags.project-description-spam.description": {
+    "defaultMessage": "ไม่อนุญาตให้ใช้ตัวอักษร คำ หรือวลีที่ทำซ้ำกัน เพื่อเติมเต็มคำอธิบายโครงการ"
+  },
+  "nags.project-description-spam.title": {
+    "defaultMessage": "ลบสแปมในส่วนคำอธิบายออก"
+  },
+  "nags.project-name-non-standard-text.description": {
+    "defaultMessage": "ไม่อนุญาตให้ใช้ตัวอักษรที่ไม่ใช่มาตรฐาน เช่น \"Fancy text\" หรือ \"Zalgo\" ในชื่อโครงการ"
+  },
+  "nags.project-name-profanity.description": {
+    "defaultMessage": "ชื่อโครงการของคุณห้ามมีคำหยาบคาย ตรวจพบ: \"{value}\""
+  },
+  "nags.project-name-slur.description": {
+    "defaultMessage": "ชื่อโครงการของคุณต้องไม่มีคำที่ส่อเสียดหรือหยาบคาย ตรวจพบ: \"{value}\""
+  },
+  "nags.project-name-version.title": {
+    "defaultMessage": "แก้ไขชื่อโครงการ"
+  },
+  "nags.project-summary-content.title": {
+    "defaultMessage": "ตรวจสอบบทสรุป"
+  },
+  "nags.project-summary-links.description": {
+    "defaultMessage": "ไม่ควรใส่ลิงก์ URL หรือ IP ในส่วนสรุป ตรวจพบ: \"{value}\""
+  },
+  "nags.project-summary-links.title": {
+    "defaultMessage": "ลบลิงก์ออกจากบทสรุป"
+  },
+  "nags.project-summary-non-english.description": {
+    "defaultMessage": "บทสรุปโครงการของคุณต้องเขียนเป็นภาษาอังกฤษ หรือมีคำแปลภาษาอังกฤษรวมอยู่ด้วย"
+  },
+  "nags.project-summary-non-english.title": {
+    "defaultMessage": "แปลบทสรุป"
+  },
+  "nags.project-summary-non-standard-text.description": {
+    "defaultMessage": "ไม่อนุญาตให้ใช้ตัวอักษรที่ไม่ใช่มาตรฐาน เช่น \"Fancy text\" หรือ \"Zalgo\" ในบทสรุป"
+  },
+  "nags.project-summary-profanity.description": {
+    "defaultMessage": "บทสรุปโครงการของคุณห้ามมีคำหยาบคาย ตรวจพบ: \"{value}\""
+  },
+  "nags.project-summary-slur.description": {
+    "defaultMessage": "บทสรุปโครงการของคุณต้องไม่มีคำที่ส่อเสียดหรือหยาบคาย ตรวจพบ: \"{value}\""
+  },
+  "nags.project-summary-spam.description": {
+    "defaultMessage": "ไม่อนุญาตให้ใช้ตัวอักษร คำ หรือวลีที่ทำซ้ำกัน เพื่อเติมเต็มบทสรุปโครงการ"
+  },
+  "nags.project-summary-spam.title": {
+    "defaultMessage": "ลบสแปมออกจากบทสรุป"
+  },
+  "nags.review-permissions.description": {
+    "defaultMessage": "โปรดตรวจสอบให้แน่ใจว่าคุณได้แสดงหลักฐานการอนุญาตในการเผยแพร่เนื้อหาภายนอกใด ๆ ใน Modpack ของคุณแล้ว"
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "ตรวจสอบสิทธิ์ของเนื้อหา"
+  },
+  "nags.select-compatibility.description": {
+    "defaultMessage": "โปรดเลือกเวอร์ชันที่เซิร์ฟเวอร์ของคุณรองรับ เลือก Modpack หรืออัปโหลดด้วยตัวเองได้เลย"
+  },
+  "nags.select-compatibility.title": {
+    "defaultMessage": "เลือกความเข้ากันได้"
+  },
+  "nags.select-country.description": {
+    "defaultMessage": "แจ้งให้ผู้เล่นทราบว่าเซิร์ฟเวอร์ของคุณตั้งอยู่ในภูมิภาคใด"
+  },
+  "nags.select-country.title": {
+    "defaultMessage": "โปรดเลือกภูมิภาค"
+  },
+  "nags.select-environment.description": {
+    "defaultMessage": "ระบุสภาพแวดล้อมที่โครงการของคุณสามารถทำงานได้"
+  },
+  "nags.select-environment.title": {
+    "defaultMessage": "โปรดเลือกสภาพแวดล้อม"
+  },
+  "nags.select-language.description": {
+    "defaultMessage": "ระบุภาษาหรือภาษาที่เซิร์ฟเวอร์ของคุณรองรับ"
+  },
+  "nags.select-language.title": {
+    "defaultMessage": "เลือกภาษา"
+  },
+  "nags.select-license.description": {
+    "defaultMessage": "โปรดเลือกใบอนุญาตที่ {type} ของคุณถูกเผยแพร่ภายใต้"
   },
   "nags.select-license.title": {
     "defaultMessage": "เลือกไลเซนส์"
   },
+  "nags.select-tags.description": {
+    "defaultMessage": "โปรดเลือกแท็กที่เหมาะสมกับโครงการของคุณ เพื่อช่วยให้ผู้ใช้ที่ถูกต้องค้นพบ"
+  },
   "nags.select-tags.title": {
     "defaultMessage": "เลือกแท็ก"
+  },
+  "nags.server.title": {
+    "defaultMessage": "เยี่ยมชมการตั้งค่าเซิร์ฟเวอร์"
+  },
+  "nags.settings.disclosures.title": {
+    "defaultMessage": "เยี่ยมชมการตั้งค่าข้อเปิดเผยข้อมูล"
+  },
+  "nags.settings.license.title": {
+    "defaultMessage": "เยี่ยมชมการตั้งค่าใบอนุญาต"
+  },
+  "nags.settings.links.title": {
+    "defaultMessage": "เยี่ยมชมการตั้งค่าลิงก์"
+  },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "เยี่ยมชมการตั้งค่าสิทธิ์"
+  },
+  "nags.settings.tags.title": {
+    "defaultMessage": "เยี่ยมชมการตั้งค่าแท็ก"
+  },
+  "nags.settings.title": {
+    "defaultMessage": "เยี่ยมชมการตั้งค่าทั่วไป"
+  },
+  "nags.settings.versions.title": {
+    "defaultMessage": "เยี่ยมชมการตั้งค่าเวอร์ชัน"
+  },
+  "nags.summary-special-formatting.description": {
+    "defaultMessage": "บทสรุปของคุณไม่ควรมี Markdown หรือ HTML เนื่องจากสามารถแสดงได้เฉพาะข้อความธรรมดาเท่านั้น"
+  },
+  "nags.summary-special-formatting.title": {
+    "defaultMessage": "แก้ไขรูปแบบบทสรุป"
+  },
+  "nags.summary-too-short.title": {
+    "defaultMessage": "ขยายบทสรุป"
+  },
+  "nags.too-many-languages.description": {
+    "defaultMessage": "คุณได้เลือก {languageCount, plural, one{# language} other{# languages}} กรุณาระบุเฉพาะภาษาที่เซิร์ฟเวอร์ของคุณรองรับและใช้งานอยู่เท่านั้น"
+  },
+  "nags.too-many-languages.title": {
+    "defaultMessage": "โปรดเลือกภาษาให้ถูกต้อง"
+  },
+  "nags.too-many-tags-server.description": {
+    "defaultMessage": "คุณได้เลือก {tagCount, plural, one {# tag} other {# tags}} แล้ว โปรดลดให้เหลือไม่เกิน {maxTagCount} เพื่อให้แน่ใจว่าโครงการของคุณจะปรากฏในผลการค้นหาที่เกี่ยวข้อง"
+  },
+  "nags.too-many-tags-server.title": {
+    "defaultMessage": "โปรดเลือกแท็กให้ถูกต้อง"
+  },
+  "nags.too-many-tags.description": {
+    "defaultMessage": "คุณได้เลือก {tagCount, plural, one {# tag} other {# tags}} แล้ว โปรดลดให้เหลือไม่เกิน {maxTagCount} เพื่อให้แน่ใจว่าโครงการของคุณจะปรากฏในผลการค้นหาที่เกี่ยวข้อง"
+  },
+  "nags.too-many-tags.title": {
+    "defaultMessage": "โปรดเลือกแท็กให้ถูกต้อง"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "ต้องมีรูปภาพในแกลเลอรีอย่างน้อยหนึ่งรูปเพื่อแสดงเนื้อหาของ {type}"
+  },
+  "nags.upload-gallery-image.description-resourcepack": {
+    "defaultMessage": "ต้องมีรูปภาพในแกลเลอรีอย่างน้อยหนึ่งรูปเพื่อแสดงเนื้อหาของแพ็กทรัพยากรของคุณ ยกเว้นแพ็กเสียงหรือแพ็กการแปล หากนี่คือลักษณะของแพ็กคุณ โปรดเลือกแท็กที่เหมาะสม"
+  },
+  "nags.upload-gallery-image.description-shader": {
+    "defaultMessage": "ต้องมีรูปภาพในแกลเลอรีอย่างน้อยสามรูป เพื่อแสดงเนื้อหาของ Shader ของคุณภายใต้สถานการณ์และเงื่อนไขที่หลากหลาย"
+  },
+  "nags.upload-gallery-image.title": {
+    "defaultMessage": "อัปโหลดรูปภาพสำหรับแกลเลอรี"
+  },
+  "nags.upload-version.description": {
+    "defaultMessage": "โครงการจะต้องมีเวอร์ชันอย่างน้อยหนึ่งเวอร์ชันเพื่อส่งให้ตรวจสอบ"
+  },
+  "nags.upload-version.title": {
+    "defaultMessage": "อัปโหลดเวอร์ชัน"
+  },
+  "nags.visit-links-settings.title": {
+    "defaultMessage": "เยี่ยมชมการตั้งค่าลิงก์"
+  },
+  "project-review.issue-location.disclosures": {
+    "defaultMessage": "แก้ไขข้อเปิดเผยข้อมูล"
+  },
+  "project-review.issue-location.gallery": {
+    "defaultMessage": "แก้ไขรูปภาพในแกลเลอรี"
+  },
+  "project-review.issue-location.permissions": {
+    "defaultMessage": "ตรวจสอบสิทธิ์การอนุญาต"
+  },
+  "project-review.issue-location.versions": {
+    "defaultMessage": "จัดการเวอร์ชัน"
+  },
+  "project-review.issue-target.acknowledge": {
+    "defaultMessage": "รับทราบ"
+  },
+  "project-review.issue-target.add-gallery-images": {
+    "defaultMessage": "เพิ่มรูปภาพสำหรับแกลเลอรี"
+  },
+  "project-review.issue-target.add-project-disclosures": {
+    "defaultMessage": "เพิ่มข้อเปิดเผยข้อมูล"
+  },
+  "project-review.issue-target.mark-addressed": {
+    "defaultMessage": "ทำเครื่องหมายว่าจัดการเรียบร้อยแล้ว"
+  },
+  "project-review.issue-target.modify-description": {
+    "defaultMessage": "เปลี่ยนคำอธิบาย"
+  },
+  "project-review.issue-target.modify-gallery-image": {
+    "defaultMessage": "เปลี่ยนรูปภาพในแกลเลอรี"
+  },
+  "project-review.issue-target.modify-icon": {
+    "defaultMessage": "เปลี่ยนไอคอน"
+  },
+  "project-review.issue-target.modify-license": {
+    "defaultMessage": "เปลี่ยนใบอนุญาต"
+  },
+  "project-review.issue-target.modify-links": {
+    "defaultMessage": "เปลี่ยนลิงก์"
+  },
+  "project-review.issue-target.modify-project-disclosure": {
+    "defaultMessage": "เปลี่ยนข้อเปิดเผยข้อมูล"
+  },
+  "project-review.issue-target.modify-project-disclosure-note": {
+    "defaultMessage": "เปลี่ยนบันทึกข้อเปิดเผยข้อมูล"
+  },
+  "project-review.issue-target.modify-server-address": {
+    "defaultMessage": "เปลี่ยนที่อยู่เซิร์ฟเวอร์"
+  },
+  "project-review.issue-target.modify-server-languages": {
+    "defaultMessage": "เปลี่ยนภาษาของเซิร์ฟเวอร์"
+  },
+  "project-review.issue-target.modify-slug": {
+    "defaultMessage": "เปลี่ยนส่วนของ URL"
+  },
+  "project-review.issue-target.modify-summary": {
+    "defaultMessage": "เปลี่ยนบทสรุป"
+  },
+  "project-review.issue-target.modify-team-member-role": {
+    "defaultMessage": "เปลี่ยนบทบาทของสมาชิกในทีม"
+  },
+  "project-review.issue-target.modify-title": {
+    "defaultMessage": "เปลี่ยนชื่อเรื่อง title"
+  },
+  "project-review.issue-target.remove-gallery-images": {
+    "defaultMessage": "ลบรูปภาพในแกลเลอรีออก"
+  },
+  "project-review.issue-target.remove-icon": {
+    "defaultMessage": "ลบไอคอนออก"
+  },
+  "project-review.issue-target.remove-project-disclosures": {
+    "defaultMessage": "ลบข้อเปิดเผยข้อมูล"
+  },
+  "project-review.issue-target.remove-tags": {
+    "defaultMessage": "ลบแท็ก"
+  },
+  "project-review.issue-target.version": {
+    "defaultMessage": "เปลี่ยนเวอร์ชัน"
+  },
+  "project.text-validation.description-matches-summary": {
+    "defaultMessage": "คำอธิบายโครงการของคุณควรให้ข้อมูลที่เป็นเอกลักษณ์และไม่ซ้ำกับบทสรุปของโครงการ"
+  },
+  "project.text-validation.summary-matches-title": {
+    "defaultMessage": "บทสรุปโครงการของคุณควรให้ข้อมูลที่เป็นเอกลักษณ์และไม่ซ้ำกับชื่อโครงการ"
+  },
+  "project.text-validation.summary-too-short": {
+    "defaultMessage": "บทสรุปของคุณสั้นเกินไป กรุณาเพิ่มประโยคหรือสองสามประโยคเพื่ออธิบายโครงการของคุณ"
+  },
+  "project.text-validation.title-version-number": {
+    "defaultMessage": "ชื่อโครงการไม่ควรมีตัวเลขเวอร์ชัน"
   }
 }
 

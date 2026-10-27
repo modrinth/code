@@ -26,10 +26,6 @@ pub async fn enqueue_tech_review_files_for_new_delphi_version(
         return Ok(());
     }
 
-    let mut transaction = pool
-        .begin()
-        .await
-        .wrap_err("beginning Delphi tech review rescan transaction")?;
     let file_ids = sqlx::query_scalar!(
         r#"
 		SELECT DISTINCT file.id AS "file_id!: DBFileId"
@@ -39,22 +35,17 @@ pub async fn enqueue_tech_review_files_for_new_delphi_version(
 		ORDER BY file.id
 		"#,
     )
-    .fetch_all(&mut transaction)
+    .fetch_all(pool)
     .await
     .wrap_err("fetching technical review files for Delphi rescan")?;
 
     for file_id in &file_ids {
-        delphi_scan::enqueue_file(&mut transaction, kafka_client, *file_id)
+        delphi_scan::publish_file_scan(kafka_client, *file_id, false, false)
             .await
             .wrap_err_with(|| {
                 format!("enqueueing file `{file_id:?}` for Delphi rescan")
             })?;
     }
-
-    transaction
-        .commit()
-        .await
-        .wrap_err("committing Delphi tech review rescan enqueue")?;
 
     info!(
         %delphi_version,

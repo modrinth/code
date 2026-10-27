@@ -2046,6 +2046,7 @@ const projectHeaderMoreActions = computed(() => {
 				query: { project: projectId },
 			},
 			tone: 'orange',
+			shown: !!auth.value.user && isStaff,
 		},
 		{
 			id: 'tech-review',

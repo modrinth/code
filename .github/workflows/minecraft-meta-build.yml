@@ -1,0 +1,92 @@
+name: Minecraft Meta Build
+
+on:
+  push:
+    branches:
+      - 'main'
+      - 'prod'
+    paths:
+      - .github/workflows/minecraft-meta-build.yml
+      - 'apps/meta-generator/**'
+      - 'packages/minecraft-meta-manifest/**'
+      - 'packages/minecraft-meta-model/**'
+      - 'packages/modrinth-log/**'
+      - Cargo.toml
+      - Cargo.lock
+  pull_request:
+    types: [opened, synchronize]
+    paths:
+      - .github/workflows/minecraft-meta-build.yml
+      - 'apps/meta-generator/**'
+      - 'packages/minecraft-meta-manifest/**'
+      - 'packages/minecraft-meta-model/**'
+      - 'packages/modrinth-log/**'
+      - Cargo.toml
+      - Cargo.lock
+  merge_group:
+    types: [checks_requested]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/prod' }}
+
+env:
+  INTERNAL: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
+
+jobs:
+  build:
+    name: Build meta-generator
+    runs-on: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && 'namespace-profile-medium-amd64' || 'ubuntu-latest' }}
+    steps:
+      - name: Check out code
+        if: env.INTERNAL != 'true'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Check out code (Namespace)
+        if: env.INTERNAL == 'true'
+        uses: namespacelabs/nscloud-checkout-action@66f2dc6f6c42a8ac6c4e53473c4840006822831e # v9.0.1
+
+      - name: Setup Rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@166cdcfd11aee3cb47222f9ddb555ce30ddb9659 # v1.17.0
+        with:
+          rustflags: ''
+          cache: false
+
+      - name: Setup mold
+        uses: rui314/setup-mold@9c9c13bf4c3f1adef0cc596abc155580bcb04444 # v1 / Mold 2.41.0
+
+      - name: Build meta-generator
+        run: cargo build --locked --release --package meta-generator
+
+      - name: Stage Docker context
+        run: |
+          mkdir -p apps/meta-generator/docker-stage
+          cp target/release/meta-generator apps/meta-generator/docker-stage/meta-generator
+
+      - name: Upload Docker context
+        if: env.INTERNAL == 'true'
+        uses: namespace-actions/upload-artifact@f6ccaacc655aec41b93af180d1d7eef21af862d2 # v1.0.3
+        with:
+          name: minecraft-meta-docker-context
+          retention-days: 1
+          path: apps/meta-generator/docker-stage
+
+  docker-build:
+    needs: [build]
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
+    uses: SparkUniverse/workflows/.github/workflows/docker-build.yaml@main
+    with:
+      image-name: minecraft-meta
+      dockerfile-path: apps/meta-generator/Dockerfile
+      artifacts-name: minecraft-meta-docker-context
+
+  deploy:
+    needs: [docker-build]
+    if: ${{ github.ref == 'refs/heads/prod' }}
+    uses: SparkUniverse/workflows/.github/workflows/argo-update.yaml@main
+    secrets:
+      ARGOCD_DEPLOY_KEY: ${{ secrets.ARGOCD_DEPLOY_KEY }}
+    with:
+      application-set: minecraft-meta
+      branch: ${{ github.ref == 'refs/heads/prod' && 'main' || 'develop' }}
+      environment-name: ${{ github.ref == 'refs/heads/prod' && 'production' || 'staging' }}

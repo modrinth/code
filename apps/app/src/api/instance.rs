@@ -1,4 +1,5 @@
 use crate::api::Result;
+use anyhow::Context;
 use dashmap::DashMap;
 use path_util::SafeRelativeUtf8UnixPathBuf;
 use serde::{Deserialize, Serialize};
@@ -7,7 +8,6 @@ use std::path::{Path, PathBuf};
 use tauri::{AppHandle, Manager, Runtime};
 use tauri_plugin_fs::FsExt;
 use tauri_plugin_opener::OpenerExt;
-use theseus::DownloadReason;
 use theseus::data::{
     AppliedContentSetPatch, ContentItem, Dependency,
     EditInstance as CoreEditInstance, InstanceInstallCandidate,
@@ -21,6 +21,7 @@ use theseus::instance::InstallProjectWithDependenciesRequest;
 use theseus::instance::QuickPlayType;
 use theseus::prelude::*;
 use theseus::server_address::ServerAddress;
+use theseus::{DownloadReason, ErrorKind};
 
 pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("instance")
@@ -118,6 +119,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             instance_share_remove_users,
             instance_share_get_publish_preview,
             instance_share_publish,
+            instance_share_publish_support_details,
             instance_share_unlink,
             instance_share_unpublish,
             instance_export_mrpack,
@@ -442,32 +444,22 @@ impl InstanceLink {
                 instance_ids,
                 active_instance_id,
             } => Ok(CoreInstanceLink::ModrinthHosting {
-                server_id: server_id.parse().map_err(|err| {
-                    theseus::Error::from(theseus::ErrorKind::InputError(
-                        format!("Invalid server id: {err}"),
-                    ))
-                })?,
+                server_id: server_id.parse().context(ErrorKind::InputError(
+                    "invalid server id".to_string(),
+                ))?,
                 instance_ids: instance_ids
                     .into_iter()
                     .map(|id| {
-                        id.parse().map_err(|err| {
-                            theseus::Error::from(
-                                theseus::ErrorKind::InputError(format!(
-                                    "Invalid hosted instance id: {err}"
-                                )),
-                            )
-                        })
+                        id.parse().context(ErrorKind::InputError(
+                            "invalid hosted instance id".to_string(),
+                        ))
                     })
-                    .collect::<std::result::Result<Vec<_>, _>>()?,
+                    .collect::<anyhow::Result<Vec<_>>>()?,
                 active_instance_id: active_instance_id
                     .map(|id| {
-                        id.parse().map_err(|err| {
-                            theseus::Error::from(
-                                theseus::ErrorKind::InputError(format!(
-                                    "Invalid active instance id: {err}"
-                                )),
-                            )
-                        })
+                        id.parse().context(ErrorKind::InputError(
+                            "invalid active instance id".to_string(),
+                        ))
                     })
                     .transpose()?,
             }),
@@ -1488,12 +1480,29 @@ pub async fn instance_share_get_publish_preview(
 #[tauri::command]
 pub async fn instance_share_publish(
     instance_id: &str,
-    config_paths: Vec<String>,
+    file_paths: Vec<String>,
+    on_progress: tauri::ipc::Channel<(u64, u64)>,
 ) -> Result<SharedInstanceAttachment> {
+    Ok(theseus::instance::publish_shared_instance(
+        instance_id,
+        file_paths,
+        &|uploaded, total| {
+            let _ = on_progress.send((uploaded, total));
+        },
+    )
+    .await?
+    .into())
+}
+
+#[tauri::command]
+pub async fn instance_share_publish_support_details(
+    instance_id: &str,
+) -> Result<Option<String>> {
     Ok(
-        theseus::instance::publish_shared_instance(instance_id, config_paths)
-            .await?
-            .into(),
+        theseus::instance::get_shared_instance_publish_support_details(
+            instance_id,
+        )
+        .await?,
     )
 }
 

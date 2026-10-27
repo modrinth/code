@@ -280,27 +280,6 @@ export namespace Labrinth {
 		}
 	}
 
-	export namespace Affiliate {
-		export namespace Internal {
-			export type AffiliateCode = {
-				id: string
-				created_at: string | null
-				created_by: string | null
-				affiliate: string
-				source_name: string
-			}
-
-			export type CreateRequest = {
-				affiliate?: string
-				source_name: string
-			}
-
-			export type PatchRequest = {
-				source_name: string
-			}
-		}
-	}
-
 	export namespace Attribution {
 		export namespace Internal {
 			export type AttributionPermissionKind =
@@ -505,12 +484,6 @@ export namespace Labrinth {
 				project_downloads?: Metrics<ProjectDownloadsField, ProjectDownloadsFilters>
 				project_playtime?: Metrics<ProjectPlaytimeField, ProjectPlaytimeFilters>
 				project_revenue?: Metrics<ProjectRevenueField, ProjectRevenueFilters>
-				affiliate_code_clicks?: Metrics<AffiliateCodeClicksField, AffiliateCodeClicksFilters>
-				affiliate_code_conversions?: Metrics<
-					AffiliateCodeConversionsField,
-					AffiliateCodeConversionsFilters
-				>
-				affiliate_code_revenue?: Metrics<AffiliateCodeRevenueField, AffiliateCodeRevenueFilters>
 			}
 
 			export type Metrics<BucketBy, FilterBy> = {
@@ -548,12 +521,6 @@ export namespace Labrinth {
 
 			export type DownloadReason = 'standalone' | 'dependency' | 'modpack' | 'update'
 
-			export type AffiliateCodeClicksField = 'affiliate_code_id'
-
-			export type AffiliateCodeConversionsField = 'affiliate_code_id'
-
-			export type AffiliateCodeRevenueField = 'affiliate_code_id'
-
 			export type ProjectViewsFilters = {
 				domain?: string[]
 				site_path?: string[]
@@ -582,18 +549,6 @@ export namespace Labrinth {
 
 			export type ProjectRevenueFilters = {
 				user_id?: string[]
-			}
-
-			export type AffiliateCodeClicksFilters = {
-				affiliate_code_id?: string[]
-			}
-
-			export type AffiliateCodeConversionsFilters = {
-				affiliate_code_id?: string[]
-			}
-
-			export type AffiliateCodeRevenueFilters = {
-				affiliate_code_id?: string[]
 			}
 
 			export type FetchResponse = {
@@ -659,7 +614,7 @@ export namespace Labrinth {
 						status_to: Projects.v2.ProjectStatus
 				  }
 
-			export type AnalyticsData = ProjectAnalytics | AffiliateCodeAnalytics
+			export type AnalyticsData = ProjectAnalytics
 
 			export type ProjectAnalytics = {
 				source_project: string
@@ -702,27 +657,6 @@ export namespace Labrinth {
 
 			export type ProjectRevenue = {
 				user_id?: string
-				revenue: string
-			}
-
-			export type AffiliateCodeAnalytics = {
-				source_affiliate_code: string
-			} & AffiliateCodeMetrics
-
-			export type AffiliateCodeMetrics =
-				| ({ metric_kind: 'clicks' } & AffiliateCodeClicks)
-				| ({ metric_kind: 'conversions' } & AffiliateCodeConversions)
-				| ({ metric_kind: 'revenue' } & AffiliateCodeRevenue)
-
-			export type AffiliateCodeClicks = {
-				clicks: number
-			}
-
-			export type AffiliateCodeConversions = {
-				conversions: number
-			}
-
-			export type AffiliateCodeRevenue = {
 				revenue: string
 			}
 		}
@@ -1777,6 +1711,14 @@ export namespace Labrinth {
 				reason: string
 				created: string
 			}
+
+			export type UserRestriction = {
+				removed_perms: number
+				reason: string | null
+				private_reason?: string
+				restricted_by?: string
+				updated: string
+			}
 		}
 
 		export namespace v2 {
@@ -1909,6 +1851,7 @@ export namespace Labrinth {
 				allow_friend_requests?: boolean
 				moderation_notes?: Common.ModerationNote | null
 				lock?: Common.UserLock
+				restriction?: Common.UserRestriction
 				github_id?: number
 				discord_id?: string
 				steam_id?: string
@@ -2448,7 +2391,12 @@ export namespace Labrinth {
 						icon_url: string | null
 				  }
 
-			export type ProjectsSort = 'oldest' | 'newest' | 'most_external_deps' | 'least_external_deps'
+			export type ProjectsSort =
+				| 'oldest'
+				| 'newest'
+				| 'oldest_initial'
+				| 'most_external_deps'
+				| 'least_external_deps'
 
 			export type ProjectsRequest = {
 				count?: number
@@ -2469,6 +2417,7 @@ export namespace Labrinth {
 				status: Projects.v2.ProjectStatus
 				requested_status: Projects.v2.ProjectStatus | null
 				queued: string | null
+				initial_queued: string | null
 				published: string
 				updated: string
 				project_types: string[]
@@ -2534,6 +2483,12 @@ export namespace Labrinth {
 			export type ProjectJudgement = FlameJudgement | UnknownJudgement
 
 			export type ProjectJudgements = Record<string, ProjectJudgement>
+
+			export type RestrictUserRequest = {
+				removed_perms: number
+				reason?: string | null
+				private_reason?: string | null
+			}
 		}
 	}
 
@@ -2658,6 +2613,7 @@ export namespace Labrinth {
 			homePageProjects?: Projects.v2.Project[]
 			homePageSearch?: Search.v2.SearchResults
 			homePageNotifs?: Search.v2.SearchResults
+			prideProjectIds?: string[]
 			products?: Billing.Internal.Product[]
 
 			countries: ISO3166.Country[]

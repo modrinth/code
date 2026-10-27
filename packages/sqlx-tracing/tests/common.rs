@@ -11,7 +11,7 @@ pub async fn should_trace<'c, DB, E>(
 ) where
     DB: sqlx::Database,
     E: sqlx::Executor<'c, Database = DB>,
-    for<'q> DB::Arguments<'q>: 'q + sqlx::IntoArguments<'q, DB>,
+    DB::Arguments: sqlx::IntoArguments<DB>,
     (i32,): Send + Unpin + for<'r> sqlx::FromRow<'r, DB::Row>,
 {
     let scope = format!("should_{name}_{system}");

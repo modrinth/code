@@ -114,6 +114,7 @@ pub static MIGRATOR: Migrator = sqlx::migrate!();
 
 pub async fn register_and_set_metrics(
     pool: &PgPool,
+    ro_pool: &ReadOnlyPgPool,
     registry: &Registry,
 ) -> Result<(), prometheus::Error> {
     let pg_pool_size =
@@ -122,15 +123,28 @@ pub async fn register_and_set_metrics(
         "labrinth_pg_pool_idle",
         "Number of idle Postgres connections",
     )?;
+    let pg_ro_pool_size = IntGauge::new(
+        "labrinth_pg_ro_pool_size",
+        "Size of read-only Postgres pool",
+    )?;
+    let pg_ro_pool_idle = IntGauge::new(
+        "labrinth_pg_ro_pool_idle",
+        "Number of idle read-only Postgres connections",
+    )?;
 
     registry.register(Box::new(pg_pool_size.clone()))?;
     registry.register(Box::new(pg_pool_idle.clone()))?;
+    registry.register(Box::new(pg_ro_pool_size.clone()))?;
+    registry.register(Box::new(pg_ro_pool_idle.clone()))?;
 
     let pool_ref = pool.clone();
+    let ro_pool_ref = ro_pool.clone();
     tokio::spawn(async move {
         loop {
             pg_pool_size.set(pool_ref.size() as i64);
             pg_pool_idle.set(pool_ref.num_idle() as i64);
+            pg_ro_pool_size.set(ro_pool_ref.size() as i64);
+            pg_ro_pool_idle.set(ro_pool_ref.num_idle() as i64);
 
             tokio::time::sleep(Duration::from_secs(5)).await;
         }
