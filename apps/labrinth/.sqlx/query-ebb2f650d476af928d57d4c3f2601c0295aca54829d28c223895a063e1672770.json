@@ -6,62 +6,124 @@
       {
         "ordinal": 0,
         "name": "id!",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "oauth_clients",
+            "name": "id"
+          }
+        }
       },
       {
         "ordinal": 1,
         "name": "name!",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "oauth_clients",
+            "name": "name"
+          }
+        }
       },
       {
         "ordinal": 2,
         "name": "icon_url?",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "oauth_clients",
+            "name": "icon_url"
+          }
+        }
       },
       {
         "ordinal": 3,
         "name": "raw_icon_url?",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "oauth_clients",
+            "name": "raw_icon_url"
+          }
+        }
       },
       {
         "ordinal": 4,
         "name": "max_scopes!",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "oauth_clients",
+            "name": "max_scopes"
+          }
+        }
       },
       {
         "ordinal": 5,
         "name": "secret_hash!",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "oauth_clients",
+            "name": "secret_hash"
+          }
+        }
       },
       {
         "ordinal": 6,
         "name": "created!",
-        "type_info": "Timestamptz"
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "oauth_clients",
+            "name": "created"
+          }
+        }
       },
       {
         "ordinal": 7,
         "name": "created_by!",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "oauth_clients",
+            "name": "created_by"
+          }
+        }
       },
       {
         "ordinal": 8,
         "name": "url?",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "oauth_clients",
+            "name": "url"
+          }
+        }
       },
       {
         "ordinal": 9,
         "name": "description?",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "oauth_clients",
+            "name": "description"
+          }
+        }
       },
       {
         "ordinal": 10,
         "name": "uri_ids?",
-        "type_info": "Int8Array"
+        "type_info": "Int8Array",
+        "origin": "Expression"
       },
       {
         "ordinal": 11,
         "name": "uri_vals?",
-        "type_info": "TextArray"
+        "type_info": "TextArray",
+        "origin": "Expression"
       }
     ],
     "parameters": {
@@ -70,14 +132,14 @@
       ]
     },
     "nullable": [
-      false,
-      false,
       true,
       true,
-      false,
-      false,
-      false,
-      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
       true,
       true,
       null,

@@ -8,7 +8,7 @@ use crate::database::models::{
     DBProjectId, DBTeamId, DBThreadIssue, DBThreadIssueFacetId, DBUserId,
     DBVersionId,
 };
-use crate::database::{PgTransaction, models as db_models};
+use crate::database::{PgPool, PgTransaction, models as db_models};
 use crate::models::ids::ProjectId;
 use crate::models::notifications::NotificationBody;
 use crate::models::projects::{Project, ProjectStatus, Version};
@@ -182,6 +182,7 @@ impl SyncedProjectState {
 pub(crate) async fn sync_project_state(
     project_id: DBProjectId,
     transaction: &mut PgTransaction<'_>,
+    pool: &PgPool,
     redis: &RedisPool,
 ) -> Result<SyncedProjectState, ApiError> {
     let exited_projects = delphi::tech_review_queue::sync_projects(
@@ -192,7 +193,8 @@ pub(crate) async fn sync_project_state(
     .await
     .wrap_api_err("synchronizing project technical review state")?;
 
-    let mut state = load_project_state(project_id, transaction, redis).await?;
+    let mut state =
+        load_project_state(project_id, transaction, pool, redis).await?;
     if exited_projects.contains(&project_id)
         && state.status() == ProjectStatus::Processing
     {
@@ -206,6 +208,7 @@ pub(crate) async fn sync_project_state(
 pub(crate) async fn load_project_state(
     project_id: DBProjectId,
     transaction: &mut PgTransaction<'_>,
+    pool: &PgPool,
     redis: &RedisPool,
 ) -> Result<SyncedProjectState, ApiError> {
     delphi::tech_review_queue::lock_projects(&[project_id], transaction)
@@ -298,11 +301,14 @@ pub(crate) async fn load_project_state(
     })
     .collect::<Vec<_>>();
     let has_required_nags = validate_project(
-        &project,
-        &versions,
-        &available_categories,
-        &disclosures,
+        project.clone(),
+        versions.clone(),
+        available_categories,
+        disclosures.clone(),
+        pool,
+        redis,
     )
+    .await?
     .iter()
     .any(|nag| nag.severity == ProjectNagSeverity::Required);
 
@@ -332,21 +338,29 @@ pub(crate) async fn load_project_state(
 pub(crate) async fn finalize_mutation(
     project_id: DBProjectId,
     transaction: PgTransaction<'_>,
+    pool: &PgPool,
     redis: &RedisPool,
     project_editor: Option<&User>,
 ) -> Result<(), ApiError> {
-    finalize_mutations(&[project_id], transaction, redis, project_editor).await
+    finalize_mutations(&[project_id], transaction, pool, redis, project_editor)
+        .await
 }
 
 pub(crate) async fn finalize_mutations(
     project_ids: &[DBProjectId],
     mut transaction: PgTransaction<'_>,
+    pool: &PgPool,
     redis: &RedisPool,
     project_editor: Option<&User>,
 ) -> Result<(), ApiError> {
-    let prepared =
-        prepare_mutations(project_ids, &mut transaction, redis, project_editor)
-            .await?;
+    let prepared = prepare_mutations(
+        project_ids,
+        &mut transaction,
+        pool,
+        redis,
+        project_editor,
+    )
+    .await?;
     prepared.commit(transaction, redis).await
 }
 
@@ -357,6 +371,7 @@ pub(crate) struct PreparedMutations {
 pub(crate) async fn prepare_technical_review_exits(
     project_ids: &[DBProjectId],
     transaction: &mut PgTransaction<'_>,
+    pool: &PgPool,
     redis: &RedisPool,
 ) -> Result<PreparedMutations, ApiError> {
     let mut project_ids = project_ids.to_vec();
@@ -366,7 +381,7 @@ pub(crate) async fn prepare_technical_review_exits(
     let mut states = Vec::with_capacity(project_ids.len());
     for project_id in project_ids {
         let mut state =
-            load_project_state(project_id, transaction, redis).await?;
+            load_project_state(project_id, transaction, pool, redis).await?;
         if state.status() == ProjectStatus::Processing {
             state.try_auto_approve(transaction, redis).await?;
         }
@@ -379,6 +394,7 @@ pub(crate) async fn prepare_technical_review_exits(
 pub(crate) async fn prepare_mutations(
     project_ids: &[DBProjectId],
     transaction: &mut PgTransaction<'_>,
+    pool: &PgPool,
     redis: &RedisPool,
     project_editor: Option<&User>,
 ) -> Result<PreparedMutations, ApiError> {
@@ -388,7 +404,9 @@ pub(crate) async fn prepare_mutations(
 
     let mut states = Vec::with_capacity(project_ids.len());
     for project_id in project_ids {
-        states.push(sync_project_state(project_id, transaction, redis).await?);
+        states.push(
+            sync_project_state(project_id, transaction, pool, redis).await?,
+        );
     }
 
     if project_editor.is_some_and(|user| !user.role.is_mod()) {
@@ -438,10 +456,12 @@ pub(crate) async fn finalize_project_edit(
     original_slug: Option<String>,
     submit_for_review: bool,
     mut transaction: PgTransaction<'_>,
+    pool: &PgPool,
     redis: &RedisPool,
     project_editor: Option<&User>,
 ) -> Result<(), ApiError> {
-    let state = sync_project_state(project_id, &mut transaction, redis).await?;
+    let state =
+        sync_project_state(project_id, &mut transaction, pool, redis).await?;
 
     let entered_review = state.project.status == ProjectStatus::Processing
         && original_status != ProjectStatus::Processing;

@@ -1116,6 +1116,7 @@ pub async fn delete_file(
         super::projects::mutation::finalize_mutation(
             row.project_id,
             transaction,
+            &pool,
             &redis,
             Some(&user),
         )

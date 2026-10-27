@@ -1267,6 +1267,7 @@ pub async fn submit_report(
             crate::routes::v3::projects::mutation::prepare_mutations(
                 &[project_id],
                 &mut txn,
+                &pool,
                 &redis,
                 Some(&user),
             )
@@ -1291,7 +1292,7 @@ pub async fn submit_report(
 
     if prepared.is_none() && removed.rows_affected() > 0 {
         prepared = Some(crate::routes::v3::projects::mutation::prepare_technical_review_exits(
-			&[project_id], &mut txn, &redis,
+			&[project_id], &mut txn, &pool, &redis,
 		).await?);
     }
 
@@ -1483,6 +1484,7 @@ pub async fn update_issue_details(
         crate::routes::v3::projects::mutation::prepare_technical_review_exits(
             &exited_projects,
             &mut txn,
+            &pool,
             &redis,
         )
         .await?;
@@ -1623,6 +1625,7 @@ pub async fn update_global_issue_details(
         crate::routes::v3::projects::mutation::prepare_technical_review_exits(
             &exited_projects,
             &mut txn,
+            &pool,
             &redis,
         )
         .await?;

@@ -6,42 +6,90 @@
       {
         "ordinal": 0,
         "name": "user_id",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "moderation_notes",
+            "name": "user_id"
+          }
+        }
       },
       {
         "ordinal": 1,
         "name": "organization_id",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "moderation_notes",
+            "name": "organization_id"
+          }
+        }
       },
       {
         "ordinal": 2,
         "name": "last_modified",
-        "type_info": "Timestamptz"
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "moderation_notes",
+            "name": "last_modified"
+          }
+        }
       },
       {
         "ordinal": 3,
         "name": "created_at",
-        "type_info": "Timestamptz"
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "moderation_notes",
+            "name": "created_at"
+          }
+        }
       },
       {
         "ordinal": 4,
         "name": "last_author",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "moderation_notes",
+            "name": "last_author"
+          }
+        }
       },
       {
         "ordinal": 5,
         "name": "version",
-        "type_info": "Int4"
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "moderation_notes",
+            "name": "version"
+          }
+        }
       },
       {
         "ordinal": 6,
         "name": "notes",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "moderation_notes",
+            "name": "notes"
+          }
+        }
       },
       {
         "ordinal": 7,
         "name": "user_rating",
-        "type_info": "Int4"
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "moderation_notes",
+            "name": "user_rating"
+          }
+        }
       }
     ],
     "parameters": {
