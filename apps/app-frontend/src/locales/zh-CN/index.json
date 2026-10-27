@@ -395,9 +395,6 @@
   "app.download-manager.title": {
     "message": "下载管理"
   },
-  "app.download-manager.verifying": {
-    "message": "正在验证"
-  },
   "app.error.state-init.open-backups-folder": {
     "message": "打开备份文件夹"
   },
@@ -2825,9 +2822,6 @@
   "app.settings.resource-management.maximum-concurrent-writes.title": {
     "message": "最大并发写入数"
   },
-  "app.settings.resource-management.store.attention": {
-    "message": "有些文件仍然需要注意"
-  },
   "app.settings.resource-management.store.cache-limit.description": {
     "message": "保留这些未使用的内容以备未来安装。\n保留更多可以节省下载时间。"
   },
@@ -2855,23 +2849,8 @@
   "app.settings.resource-management.store.description": {
     "message": "通过在多个实例之间复用游戏安装、模组和各类包来节省空间。"
   },
-  "app.settings.resource-management.store.issues": {
-    "message": "查看 {count, plural, other {# 个问题}}"
-  },
   "app.settings.resource-management.store.nothing-to-clear": {
     "message": "没有未使用的内容要清除。"
-  },
-  "app.settings.resource-management.store.repair": {
-    "message": "验证并修复"
-  },
-  "app.settings.resource-management.store.repair.running-description": {
-    "message": "这将关闭所有运行中的实例。"
-  },
-  "app.settings.resource-management.store.repair.verify-description": {
-    "message": "检查丢失或损坏的文件并予以修复。"
-  },
-  "app.settings.resource-management.store.repairing": {
-    "message": "验证并修复……"
   },
   "app.settings.resource-management.store.shared.label": {
     "message": "已分享"
@@ -2887,12 +2866,6 @@
   },
   "app.settings.resource-management.store.unused.label": {
     "message": "未使用"
-  },
-  "app.settings.resource-management.store.verification-result": {
-    "message": "已检查 {checked, plural, other {# 个文件}}，并进行了 {repaired, plural, other {# 次修复}}。"
-  },
-  "app.settings.resource-management.store.verified": {
-    "message": "验证完成"
   },
   "app.settings.sidebar.label.instance-defaults": {
     "message": "实例默认值"

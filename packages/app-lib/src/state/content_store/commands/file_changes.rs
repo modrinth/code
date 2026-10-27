@@ -9,9 +9,8 @@ use crate::state::content_store::model::{
     FileChangeJournal, FileChangeRequest, FileState,
 };
 use crate::state::content_store::{
-    ContentStore, FileStorageKind, FileStoragePolicy, InstanceFileStatus,
-    InstanceFileStorage, StoredFileHandle, content_file_path,
-    file_path_on_disk,
+    ContentStore, FileStorageKind, InstanceFileStatus, InstanceFileStorage,
+    StoredFileHandle, content_file_path, file_path_on_disk,
 };
 use crate::state::instances as content_rows;
 use crate::state::{Instance, InstanceFile};
@@ -22,7 +21,6 @@ pub(crate) struct PendingFileChange {
     journal: FileChangeJournal,
     pub(crate) stored_file: Option<StoredFileHandle>,
     _previous_file_lease: Option<StoredFileHandle>,
-    pub(crate) safe_to_defer: bool,
 }
 
 impl ContentStore {
@@ -177,7 +175,6 @@ impl ContentStore {
             journal,
             stored_file: stored_file.cloned(),
             _previous_file_lease: previous_lease,
-            safe_to_defer: false,
         })
     }
 
@@ -229,7 +226,6 @@ impl ContentStore {
             journal,
             stored_file: None,
             _previous_file_lease: None,
-            safe_to_defer: false,
         })
     }
 
@@ -273,7 +269,6 @@ impl PendingFileChange {
             } else {
                 store.finish_journal(&self.journal).await?;
             }
-            self.safe_to_defer = true;
         }
         result
     }
@@ -354,15 +349,8 @@ impl PendingFileChange {
                 )
                 .await?;
             *mutation_started = true;
-            after.storage_kind = Some(
-                store
-                    .create_instance_file(
-                        stored_file,
-                        &path,
-                        FileStoragePolicy::Shared,
-                    )
-                    .await?,
-            );
+            after.storage_kind =
+                Some(store.create_instance_file(stored_file, &path).await?);
         }
         Ok(())
     }

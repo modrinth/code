@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { LoaderCircleIcon, ShieldCheckIcon, TrashIcon } from '@modrinth/assets'
+import { LoaderCircleIcon, TrashIcon } from '@modrinth/assets'
 import {
-	Admonition,
 	Button,
 	defineMessages,
 	injectNotificationManager,
@@ -14,15 +13,6 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { invoke } from '@tauri-apps/api/core'
 import { computed, ref, watch } from 'vue'
 
-import {
-	storeVerificationReport as report,
-	verifyingStore,
-	verifyStore,
-} from '@/components/ui/download-manager/store-verification'
-import { useAppEvent } from '@/composables/use-app-event'
-import { injectAppSettingsModal } from '@/features/settings/app-settings-modal/context'
-import { get_all as getRunningProcesses } from '@/helpers/process'
-
 type StoreUsage = {
 	unique_bytes: number
 	shared_bytes: number
@@ -33,7 +23,6 @@ type StoreUsage = {
 }
 
 const { handleError } = injectNotificationManager()
-const settingsModal = injectAppSettingsModal()
 const { formatMessage } = useVIntl()
 const formatBytes = useFormatBytes()
 const gibibyte = 1024 ** 3
@@ -64,27 +53,11 @@ watch(
 watch(storeUsageError, (error) => {
 	if (error) handleError(error)
 })
-const runningProcessesKey = ['processes', 'running'] as const
-const { data: runningProcesses, error: runningProcessesError } = useQuery({
-	queryKey: runningProcessesKey,
-	queryFn: getRunningProcesses,
-})
-const hasRunningInstances = computed(() => (runningProcesses.value?.length ?? 0) > 0)
-watch(runningProcessesError, (error) => {
-	if (error) handleError(error)
-})
-useAppEvent('process', () => queryClient.invalidateQueries({ queryKey: runningProcessesKey }))
 const busy = computed(
-	() =>
-		calculating.value ||
-		actionMutation.isPending.value ||
-		cacheLimitMutation.isPending.value ||
-		verifyingStore.value,
+	() => calculating.value || clearMutation.isPending.value || cacheLimitMutation.isPending.value,
 )
-const clearing = computed(
-	() => actionMutation.isPending.value && actionMutation.variables.value === 'clear',
-)
-const clearedBytes = computed(() => actionMutation.data.value ?? null)
+const clearing = computed(() => clearMutation.isPending.value)
+const clearedBytes = computed(() => clearMutation.data.value ?? null)
 const totalBytes = computed(
 	() => (storeUsage.value?.unique_bytes ?? 0) + (storeUsage.value?.private_copy_bytes ?? 0),
 )
@@ -126,22 +99,6 @@ const messages = defineMessages({
 		id: 'app.settings.resource-management.store.clearing',
 		defaultMessage: 'Clearing…',
 	},
-	repair: {
-		id: 'app.settings.resource-management.store.repair',
-		defaultMessage: 'Verify and repair',
-	},
-	repairing: {
-		id: 'app.settings.resource-management.store.repairing',
-		defaultMessage: 'Verifying and repairing…',
-	},
-	repairDescription: {
-		id: 'app.settings.resource-management.store.repair.verify-description',
-		defaultMessage: 'Check for missing or damaged files and repair them.',
-	},
-	repairRunningDescription: {
-		id: 'app.settings.resource-management.store.repair.running-description',
-		defaultMessage: 'This will close any running instances.',
-	},
 	clearDescription: {
 		id: 'app.settings.resource-management.store.clear.description',
 		defaultMessage: 'Delete unused downloaded content',
@@ -166,23 +123,6 @@ const messages = defineMessages({
 	nothingToClear: {
 		id: 'app.settings.resource-management.store.nothing-to-clear',
 		defaultMessage: 'No unused content to clear.',
-	},
-	verified: {
-		id: 'app.settings.resource-management.store.verified',
-		defaultMessage: 'Verification complete',
-	},
-	attention: {
-		id: 'app.settings.resource-management.store.attention',
-		defaultMessage: 'Some files still need attention',
-	},
-	result: {
-		id: 'app.settings.resource-management.store.verification-result',
-		defaultMessage:
-			'Checked {checked, plural, one {# file} other {# files}} and made {repaired, plural, one {# repair} other {# repairs}}.',
-	},
-	issues: {
-		id: 'app.settings.resource-management.store.issues',
-		defaultMessage: 'View {count, plural, one {# issue} other {# issues}}',
 	},
 })
 
@@ -211,27 +151,16 @@ const categories = computed(() => {
 	]
 })
 
-const actionMutation = useMutation({
-	mutationFn: async (action: 'clear' | 'repair') => {
-		if (action === 'repair') {
-			const verification = verifyStore()
-			settingsModal.close()
-			await verification
-			return null
-		}
-		return invoke<number>('plugin:settings|store_cleanup')
-	},
-	onMutate: () => {
-		report.value = null
-	},
+const clearMutation = useMutation({
+	mutationFn: () => invoke<number>('plugin:settings|store_cleanup'),
 	onSuccess: () => queryClient.invalidateQueries({ queryKey: storeUsageKey }),
 	onError: handleError,
 })
 
-function runAction(action: 'clear' | 'repair') {
+function clearUnused() {
 	if (busy.value) return
-	actionMutation.reset()
-	actionMutation.mutate(action)
+	clearMutation.reset()
+	clearMutation.mutate()
 }
 
 const cacheLimitMutation = useMutation({
@@ -322,32 +251,12 @@ function saveCacheLimit() {
 
 		<div class="flex flex-wrap items-center gap-2">
 			<Button
-				v-tooltip="
-					formatMessage(
-						hasRunningInstances ? messages.repairRunningDescription : messages.repairDescription,
-					)
-				"
-				:type="hasRunningInstances ? 'colored' : 'base'"
-				:color="hasRunningInstances ? 'orange' : undefined"
-				:disabled="busy || !storeUsage || storeUsage.object_count === 0"
-				:loading="verifyingStore"
-				@click="runAction('repair')"
-			>
-				<LoaderCircleIcon
-					v-if="verifyingStore"
-					class="motion-safe:animate-spin"
-					aria-hidden="true"
-				/>
-				<ShieldCheckIcon v-else aria-hidden="true" />
-				{{ formatMessage(verifyingStore ? messages.repairing : messages.repair) }}
-			</Button>
-			<Button
 				v-tooltip="formatMessage(messages.clearDescription)"
 				type="colored"
 				color="red"
 				:disabled="busy || !storeUsage || storeUsage.unused_cache_bytes === 0"
 				:loading="clearing"
-				@click="runAction('clear')"
+				@click="clearUnused"
 			>
 				<LoaderCircleIcon v-if="clearing" class="motion-safe:animate-spin" aria-hidden="true" />
 				<TrashIcon v-else aria-hidden="true" />
@@ -356,32 +265,7 @@ function saveCacheLimit() {
 		</div>
 
 		<div aria-live="polite" class="empty:hidden">
-			<Admonition
-				v-if="report"
-				:type="report.issues.length ? 'warning' : 'success'"
-				:header="formatMessage(report.issues.length ? messages.attention : messages.verified)"
-			>
-				<p class="m-0">
-					{{
-						formatMessage(messages.result, { checked: report.checked, repaired: report.repaired })
-					}}
-				</p>
-				<details v-if="report.issues.length" class="mt-2">
-					<summary class="cursor-pointer font-semibold">
-						{{ formatMessage(messages.issues, { count: report.issues.length }) }}
-					</summary>
-					<ul class="mb-0 flex flex-col gap-2 pl-5">
-						<li
-							v-for="(issue, index) in report.issues"
-							:key="`${issue.sha512}-${index}`"
-							class="break-words"
-						>
-							{{ issue.message }}
-						</li>
-					</ul>
-				</details>
-			</Admonition>
-			<p v-else-if="clearedBytes !== null" class="m-0 text-sm text-green">
+			<p v-if="clearedBytes !== null" class="m-0 text-sm text-green">
 				{{
 					clearedBytes > 0
 						? formatMessage(messages.cleared, { size: formatBytes(clearedBytes, 1) })

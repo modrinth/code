@@ -392,9 +392,6 @@
   "app.download-manager.title": {
     "message": "Nedlastingsbehandler"
   },
-  "app.download-manager.verifying": {
-    "message": "Verifiserer"
-  },
   "app.error.state-init.open-backups-folder": {
     "message": "Åpne backups-mappe"
   },

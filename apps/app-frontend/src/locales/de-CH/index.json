@@ -395,9 +395,6 @@
   "app.download-manager.title": {
     "message": "Download-Manager"
   },
-  "app.download-manager.verifying": {
-    "message": "Wird überprüft"
-  },
   "app.error.state-init.open-backups-folder": {
     "message": "Sicherungsordner öffnen"
   },
@@ -2825,9 +2822,6 @@
   "app.settings.resource-management.maximum-concurrent-writes.title": {
     "message": "Maximale gleichzeitige Schreibvorgänge"
   },
-  "app.settings.resource-management.store.attention": {
-    "message": "Einige Dateien benötigen noch Aufmerksamkeit"
-  },
   "app.settings.resource-management.store.cache-limit.description": {
     "message": "Behalte bis zu dieser Menge ungenutzte Inhalte für zukünftige Installationen bei. Wenn du mehr behältst, sparst du eventuell Downloadzeit."
   },
@@ -2855,23 +2849,8 @@
   "app.settings.resource-management.store.description": {
     "message": "Spare Platz, indem du Spielinstallationen, Mods und Pakete für alle deine Instanzen wiederverwendest."
   },
-  "app.settings.resource-management.store.issues": {
-    "message": "{count, plural, one {# Problem} other {# Probleme}} anzeigen"
-  },
   "app.settings.resource-management.store.nothing-to-clear": {
     "message": "Keine ungenutzten Inhalte zum Löschen."
-  },
-  "app.settings.resource-management.store.repair": {
-    "message": "Überprüfen und reparieren"
-  },
-  "app.settings.resource-management.store.repair.running-description": {
-    "message": "Dies schließt alle laufenden Instanzen."
-  },
-  "app.settings.resource-management.store.repair.verify-description": {
-    "message": "Überprüfe, ob Dateien fehlen oder beschädigt sind, und repariere diese."
-  },
-  "app.settings.resource-management.store.repairing": {
-    "message": "Wird überprüft und repariert…"
   },
   "app.settings.resource-management.store.shared.label": {
     "message": "Geteilt"
@@ -2887,12 +2866,6 @@
   },
   "app.settings.resource-management.store.unused.label": {
     "message": "Nicht zugeordnet"
-  },
-  "app.settings.resource-management.store.verification-result": {
-    "message": "{checked, plural, one {# Datei} other {# Dateien}} überprüft und {repaired, plural, one {# Reparatur} other {# Reparaturen}} durchgeführt."
-  },
-  "app.settings.resource-management.store.verified": {
-    "message": "Verifizierung erfolgreich"
   },
   "app.settings.sidebar.label.instance-defaults": {
     "message": "Instanz-Standardwerte"
