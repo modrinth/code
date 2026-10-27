@@ -24,7 +24,10 @@ impl super::Validator for ShaderValidator {
         &self,
         archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
     ) -> Result<ValidationResult, ValidationError> {
-        if !archive.file_names().any(|x| x.starts_with("shaders/")) {
+        if !crate::validate::validated_file_names(archive)?
+            .into_iter()
+            .any(|x| x.starts_with("shaders/"))
+        {
             return Ok(ValidationResult::Warning(
                 "No shaders folder present for OptiFine/Iris shader.",
             ));
@@ -59,7 +62,10 @@ impl super::Validator for CanvasShaderValidator {
             ));
         };
 
-        if !archive.file_names().any(|x| x.contains("/pipelines/")) {
+        if !crate::validate::validated_file_names(archive)?
+            .into_iter()
+            .any(|x| x.contains("/pipelines/"))
+        {
             return Ok(ValidationResult::Warning(
                 "No pipeline shaders folder present for canvas shaders.",
             ));
@@ -106,8 +112,8 @@ impl super::Validator for CoreShaderValidator {
         if match file {
             MaybeProtectedZipFile::Unprotected(archive) => {
                 archive.by_name("pack.mcmeta").is_ok()
-                    && archive
-                        .file_names()
+                    && crate::validate::validated_file_names(archive)?
+                        .into_iter()
                         .any(|x| x.starts_with("assets/minecraft/shaders/"))
             }
             MaybeProtectedZipFile::MaybeProtected { data, .. } => {

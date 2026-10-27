@@ -34,7 +34,6 @@ export const useStripe = (
 		| null
 	>,
 	onError: (err: Error) => void,
-	affiliateCode?: Ref<string | null>,
 ) => {
 	const debug = useDebugLogger('Stripe')
 
@@ -224,7 +223,6 @@ export const useStripe = (
 								project_id: project.value,
 							}
 						: {},
-					...(affiliateCode?.value ? { affiliate_code: affiliateCode.value } : {}),
 				},
 			}
 

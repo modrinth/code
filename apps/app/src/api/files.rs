@@ -1,9 +1,8 @@
 use crate::api::Result;
 use anyhow::{Context, anyhow};
-use async_zip::base::read::seek::ZipFileReader;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::io::Cursor;
+use std::io::{Cursor, Read};
 use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
@@ -85,14 +84,28 @@ pub async fn file_extract_zip(
         .map_or("", |(parent, _)| parent);
     let file_bytes =
         theseus::instance::read_instance_file(instance_id, file_path).await?;
-    let zip_reader = ZipFileReader::with_tokio(Cursor::new(file_bytes))
-        .await
-        .context("failed to read zip file")?;
+    let (mut zip_reader, names) = tokio::task::spawn_blocking(move || {
+        let mut archive = zip::ZipArchive::new(Cursor::new(file_bytes))
+            .context("failed to read zip file")?;
+        let mut names = Vec::new();
+        for index in 0..archive.len() {
+            let entry = archive
+                .by_index_raw(index)
+                .context("failed to read archive entry")?;
+            let name = entry
+                .name()
+                .context(ErrorKind::InputError(
+                    "invalid archive entry name".to_string(),
+                ))?
+                .into_owned();
+            names.push((index, name));
+        }
+        Ok::<_, anyhow::Error>((archive, names))
+    })
+    .await
+    .context("failed to read zip file")??;
     let mut entries = Vec::new();
-    for (index, entry) in zip_reader.file().entries().iter().enumerate() {
-        let name = entry.filename().as_str().context(ErrorKind::InputError(
-            "invalid archive entry name".to_string(),
-        ))?;
+    for (index, name) in names {
         if name.ends_with('/') {
             continue;
         }
@@ -125,20 +138,28 @@ pub async fn file_extract_zip(
             conflicting_files,
         }));
     }
-    let mut zip_reader = zip_reader;
+
     for (index, path, resolved) in entries {
         if !override_conflicts && resolved.exists() {
             continue;
         }
-        let mut bytes = Vec::new();
-        let mut reader = zip_reader
-            .reader_with_entry(index)
-            .await
-            .context(format!("failed to read archive entry {path}"))?;
-        reader
-            .read_to_end_checked(&mut bytes)
-            .await
-            .context(format!("failed to read archive entry {path}"))?;
+        let entry_path = path.clone();
+        let (archive, bytes) = tokio::task::spawn_blocking(move || {
+            let mut bytes = Vec::new();
+            {
+                let mut reader =
+                    zip_reader.by_index(index).with_context(|| {
+                        format!("failed to read archive entry {entry_path}")
+                    })?;
+                reader.read_to_end(&mut bytes).with_context(|| {
+                    format!("failed to read archive entry {entry_path}")
+                })?;
+            }
+            Ok::<_, anyhow::Error>((zip_reader, bytes))
+        })
+        .await
+        .with_context(|| format!("failed to read archive entry {path}"))??;
+        zip_reader = archive;
         theseus::instance::write_instance_file(
             instance_id,
             &path,

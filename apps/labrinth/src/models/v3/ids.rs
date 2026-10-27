@@ -41,6 +41,5 @@ base62_id!(ThreadIssueId);
 base62_id!(ThreadMessageId);
 base62_id!(UserSubscriptionId);
 base62_id!(VersionId);
-base62_id!(AffiliateCodeId);
 base62_id!(AnalyticsEventId);
 base62_id!(PasskeyId);

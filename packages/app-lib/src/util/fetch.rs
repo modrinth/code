@@ -2,6 +2,7 @@
 use super::io::{self, IOError};
 use crate::event::LoadingBarId;
 use crate::event::emit::emit_loading;
+use crate::state::content_store::ContentStore;
 use crate::util::content_hash::{ContentHasher, temporary_file};
 use crate::{ErrorKind, LabrinthError};
 use anyhow::{Context, bail};
@@ -10,7 +11,7 @@ use chrono::{DateTime, TimeDelta, Utc};
 use governor::clock::{Clock, DefaultClock};
 use governor::{DefaultDirectRateLimiter, Quota, RateLimiter};
 use parking_lot::Mutex;
-use rand::Rng;
+use rand::RngExt;
 use reqwest::Method;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
@@ -165,8 +166,8 @@ impl FenceInner {
             .checked_mul(self.block_factor)
             .unwrap_or(Self::BLOCK_DURATION_MAX_BASE);
 
-        let delta_seconds = (max - min).as_seconds_f64()
-            * rand::thread_rng().gen_range(0.0..=1.0);
+        let delta_seconds =
+            (max - min).as_seconds_f64() * rand::rng().random_range(0.0..=1.0);
         let duration =
             min + TimeDelta::milliseconds((delta_seconds * 1000.0) as i64);
 
@@ -427,12 +428,12 @@ impl DownloadedFile {
 
     pub(crate) async fn store_file(
         &self,
-        state: &crate::State,
+        content_store: &ContentStore,
     ) -> crate::Result<crate::state::content_store::StoredFileHandle> {
         match &self.path {
             DownloadedFilePath::Stored(stored_file) => Ok(stored_file.clone()),
             DownloadedFilePath::Temporary(_) => {
-                state.content_store.store_file(self.path()).await
+                content_store.store_file(self.path()).await
             }
         }
     }

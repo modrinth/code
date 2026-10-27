@@ -2,12 +2,36 @@ import { setting } from '../types/settings.ts'
 
 const settings = {
 	General: {
+		GalleryColumns: setting.asEnum({
+			type: 'enum',
+			id: 'gallery-columns',
+			title: 'Gallery columns',
+			description:
+				'Number of gallery columns to display in project review, regardless of panel width.',
+			default: '3',
+			entries: [
+				{ label: '1', value: '1' },
+				{ label: '2', value: '2' },
+				{ label: '3', value: '3' },
+				{ label: '4', value: '4' },
+				{ label: '5', value: '5' },
+				{ label: '6', value: '6' },
+			],
+		}),
+		ShowAllIssueControls: setting.asToggle({
+			type: 'toggle',
+			id: 'show-all-issue-controls',
+			title: 'Always show issue controls',
+			description:
+				'Show all issue controls in the issues menu regardless of visibility conditions.',
+			default: false,
+		}),
 		SendIssuesAsThreadMessage: setting.asToggle({
 			type: 'toggle',
 			id: 'send-issues-as-thread-message',
 			title: 'Send issues as thread message',
 			description: 'Send selected issues as a thread message instead of creating tracked issues.',
-			default: true,
+			default: false,
 		}),
 		AutoGoNextOnReviewOutcome: setting.asToggle({
 			type: 'toggle',
@@ -22,6 +46,13 @@ const settings = {
 			id: 'hide-markdown-formatting-buttons',
 			title: 'Hide Markdown formatting buttons',
 			description: 'Hide the formatting buttons above all Markdown editors in project review.',
+			default: true,
+		}),
+		EnableDelayedHoverMessagePreviews: setting.asToggle({
+			type: 'toggle',
+			id: 'enable-delayed-hover-message-previews',
+			title: 'Enable delayed hover message previews',
+			description: 'Show issue card previews when hovering over issue toggle buttons.',
 			default: true,
 		}),
 		ShowShortcutKeybindHints: setting.asToggle({
@@ -41,9 +72,9 @@ const settings = {
 		ShowFloatingPanelFieldHoverHighlight: setting.asToggle({
 			type: 'toggle',
 			id: 'show-floating-panel-field-hover-highlight',
-			title: 'Highlight fields for floating review panels',
+			title: 'Highlight review sections',
 			description:
-				'Highlight the reviewed field when hovering over it or its floating review panel.',
+				'Highlight the review section when hovering over it or its floating review panel.',
 			default: true,
 		}),
 		ShowInlinePanelHoverHighlight: setting.asToggle({
@@ -53,6 +84,69 @@ const settings = {
 			description:
 				'Add a background highlight to inline review panels when hovering over or interacting with them.',
 			default: true,
+		}),
+		ReviewHighlightColor: setting.asColor({
+			type: 'color',
+			id: 'review-highlight-color',
+			title: 'Color',
+			description: 'Color for reviewed fields, inline review panels, and navigation flashes.',
+			default: '',
+		}),
+		ReviewHighlightOpacity: setting.asNumber({
+			type: 'number',
+			id: 'review-highlight-opacity',
+			title: 'Opacity',
+			description:
+				'Background opacity for review highlights. Navigation flashes use twice this opacity, up to 100%.',
+			default: 3,
+			min: 0,
+			max: 100,
+			step: 1,
+			unit: '%',
+		}),
+		IssueToggleColor: setting.asColor({
+			type: 'color',
+			id: 'issue-toggle-color',
+			title: 'Selected color',
+			description:
+				'Color for selected and partially selected issue buttons, with a 25% background tint.',
+			default: '',
+		}),
+		FloatingReviewPanelBorderColor: setting.asColor({
+			type: 'color',
+			id: 'floating-review-panel-border-color',
+			title: 'Border color',
+			description: 'Border color for floating review panels.',
+			default: '',
+		}),
+		FloatingReviewPanelBackground: setting.asColor({
+			type: 'color',
+			id: 'floating-review-panel-background',
+			title: 'Background',
+			description: 'Background tint color for floating review panels.',
+			default: '',
+		}),
+		FloatingReviewPanelBackgroundOpacity: setting.asNumber({
+			type: 'number',
+			id: 'floating-review-panel-background-opacity',
+			title: 'Opacity',
+			description: 'Background tint opacity for floating review panels.',
+			default: 3,
+			min: 0,
+			max: 100,
+			step: 1,
+			unit: '%',
+		}),
+		FloatingReviewPanelBorderWidth: setting.asNumber({
+			type: 'number',
+			id: 'floating-review-panel-border-width',
+			title: 'Border width',
+			description: 'Border width for floating review panels. Set to 0 to hide the border.',
+			default: 1,
+			min: 0,
+			max: 8,
+			step: 1,
+			unit: 'px',
 		}),
 		LinkInfoPlacement: setting.asEnum({
 			type: 'enum',
@@ -70,6 +164,29 @@ const settings = {
 			id: 'private-message-highlight',
 			title: 'Highlight private messages and issue history',
 			description: 'Add a background highlight to private messages and issue history in threads.',
+			default: true,
+		}),
+		ExpandVersionDetailsByDefault: setting.asToggle({
+			type: 'toggle',
+			id: 'expand-version-details-by-default',
+			title: 'Expand version details by default',
+			description: 'Expand the latest version’s Details section automatically in project review.',
+			default: true,
+		}),
+		ExpandVersionDependenciesByDefault: setting.asToggle({
+			type: 'toggle',
+			id: 'expand-version-dependencies-by-default',
+			title: 'Expand version dependencies by default',
+			description:
+				'Expand dependencies automatically when viewing version details in project review.',
+			default: true,
+		}),
+		ExpandVersionChangelogByDefault: setting.asToggle({
+			type: 'toggle',
+			id: 'expand-version-changelog-by-default',
+			title: 'Expand version changelog by default',
+			description:
+				'Expand the changelog automatically when viewing version details in project review.',
 			default: true,
 		}),
 		SlicerButtonInVersions: setting.asToggle({

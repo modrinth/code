@@ -6,55 +6,29 @@
 		:class="{ 'pointer-events-none': loading }"
 		:aria-hidden="loading"
 	>
-		<component
-			:is="metric.link ? RouterLink : 'div'"
+		<ServerStatCard
 			v-for="(metric, index) in metrics"
 			:key="index"
-			:to="metric.link && !loading ? metric.link : undefined"
-			class="relative isolate min-h-[145px] w-full overflow-hidden rounded-[20px] bg-surface-3 p-5"
-			:class="
-				metric.link && !loading
-					? 'cursor-pointer transition-transform duration-100 hover:brightness-125 active:scale-95'
-					: ''
-			"
+			:title="metric.title"
+			:icon="metric.icon"
+			:value="metric.value"
+			:secondary="metric.secondary"
+			:to="loading ? null : metric.link"
 		>
-			<div class="relative z-10 flex flex-col gap-2">
-				<div class="flex items-center justify-between">
-					<span class="stat-drop-shadow flex items-center gap-2 font-medium text-lg text-primary">
-						{{ metric.title }}
-					</span>
-					<span class="relative">
-						<component :is="metric.icon" class="stat-drop-shadow relative z-10 size-8" />
-						<!-- <div
-							class="absolute -right-4 -top-4 -z-10 size-14 rounded-full bg-surface-3 opacity-50 blur-lg"
-						/> -->
-					</span>
+			<template v-if="metric.showGraph" #background>
+				<div class="chart-space absolute bottom-0 left-0 right-0">
+					<VueApexCharts
+						v-if="isClient && !loading && metric.chartOptions"
+						type="area"
+						height="142"
+						:options="metric.chartOptions"
+						:series="metric.series!"
+						class="chart"
+						:class="chartsReady.has(index) ? 'opacity-100' : 'opacity-0'"
+					/>
 				</div>
-				<span class="stat-drop-shadow text-4xl font-bold text-contrast">
-					{{ metric.value
-					}}<span
-						v-if="metric.secondary"
-						class="ml-1 text-sm font-normal stat-drop-shadow text-secondary"
-						>{{ metric.secondary }}</span
-					>
-				</span>
-				<!-- <div
-					class="absolute -left-8 -top-4 -z-10 h-28 w-56 rounded-full bg-surface-3 opacity-50 blur-lg"
-				/> -->
-			</div>
-
-			<div v-if="metric.showGraph" class="chart-space absolute bottom-0 left-0 right-0">
-				<VueApexCharts
-					v-if="isClient && !loading && metric.chartOptions"
-					type="area"
-					height="142"
-					:options="metric.chartOptions"
-					:series="metric.series!"
-					class="chart"
-					:class="chartsReady.has(index) ? 'opacity-100' : 'opacity-0'"
-				/>
-			</div>
-		</component>
+			</template>
+		</ServerStatCard>
 	</div>
 </template>
 
@@ -62,11 +36,12 @@
 import { CpuIcon, DatabaseIcon, FolderOpenIcon } from '@modrinth/assets'
 import { useStorage } from '@vueuse/core'
 import { computed, defineAsyncComponent, onMounted, ref, shallowRef, watch } from 'vue'
-import { RouterLink } from 'vue-router'
 
 import { useFormatBytes } from '#ui/composables'
 import { injectModrinthServerContext, injectPageContext } from '#ui/providers'
 import type { ServerStats } from '#ui/providers/server-context'
+
+import ServerStatCard from './ServerStatCard.vue'
 
 const VueApexCharts = defineAsyncComponent(() => import('vue3-apexcharts'))
 
@@ -259,10 +234,6 @@ watch(
 </script>
 
 <style scoped>
-.stat-drop-shadow {
-	filter: drop-shadow(0 4px 6px var(--surface-3));
-}
-
 .chart-space {
 	height: 142px;
 	width: calc(100% + 40px);

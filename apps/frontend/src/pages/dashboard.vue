@@ -33,12 +33,6 @@
 						icon: ChartIcon,
 					},
 					{
-						link: '/dashboard/affiliate-links',
-						label: formatMessage(commonMessages.affiliateLinksButton),
-						icon: AffiliateIcon,
-						shown: !!isAffiliate,
-					},
-					{
 						link: '/dashboard/revenue',
 						label: formatMessage(messages.revenue),
 						icon: CurrencyIcon,
@@ -78,7 +72,6 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import {
-	AffiliateIcon,
 	BellIcon as NotificationsIcon,
 	ChartIcon,
 	CurrencyIcon,
@@ -97,7 +90,6 @@ import {
 	injectModrinthClient,
 	useVIntl,
 } from '@modrinth/ui'
-import { UserBadge } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 import { useLocalStorage } from '@vueuse/core'
 
@@ -109,10 +101,6 @@ const dismissedDiscordRoleBannerUsers = useLocalStorage<string[]>(
 	'dashboard-discord-role-banner-dismissed-users',
 	[],
 )
-
-const isAffiliate = computed(() => {
-	return auth.value.user && auth.value.user.badges & UserBadge.AFFILIATE
-})
 
 const { formatMessage } = useVIntl()
 

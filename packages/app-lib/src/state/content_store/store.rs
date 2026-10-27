@@ -40,11 +40,15 @@ impl ContentStore {
             .write(true)
             .open(settings_dir.join("store.lock"))
             .await?;
-        if !file.try_lock_exclusive()? {
-            bail!(ErrorKind::ContentStoreError(
-                "another Modrinth process is using this application directory"
-                    .into(),
-            ));
+        match file.try_lock() {
+            Ok(()) => {}
+            Err(fs4::TryLockError::WouldBlock) => {
+                bail!(ErrorKind::ContentStoreError(
+					"another Modrinth process is using this application directory"
+						.into(),
+				));
+            }
+            Err(fs4::TryLockError::Error(error)) => return Err(error.into()),
         }
         Ok(file)
     }

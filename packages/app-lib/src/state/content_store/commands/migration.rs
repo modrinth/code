@@ -209,7 +209,7 @@ async fn migrate_file_copy(
     let copy_ms = started.elapsed().as_millis() as u64;
     let waiting = Instant::now();
     let _turn = store.legacy_migration_priority.read().await;
-    let _instance = state.lock_instance_content(&instance.id).await;
+    let _instance = state.instance_locks.lock_content(&instance.id).await;
     let _files = store.files_lock.lock().await;
     let lock_wait_ms = waiting.elapsed().as_millis() as u64;
     let Some(instance) =
@@ -285,7 +285,7 @@ async fn migrate_file_copy(
                 sources = downloads::repair_sources(
                     &state.pool,
                     &stored.sha512,
-                    state,
+                    &state.api_semaphore,
                 )
                 .await;
             }
@@ -342,9 +342,9 @@ fn replace_file_copy(
     temporary: tempfile::TempPath,
     destination: &std::path::Path,
 ) -> std::io::Result<()> {
-    let mut temporary = tempfile::TempPath::from_path(
+    let mut temporary = tempfile::TempPath::try_from_path(
         temporary.keep().map_err(|error| error.error)?,
-    );
+    )?;
     #[cfg(windows)]
     let original = {
         use std::os::windows::fs::OpenOptionsExt;

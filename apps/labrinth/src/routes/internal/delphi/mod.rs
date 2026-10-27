@@ -40,6 +40,13 @@ pub mod tech_review_queue;
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(
         web::scope("/delphi")
+            .app_data(
+                web::JsonConfig::default()
+                    .limit(10 * 1024 * 1024)
+                    .error_handler(|err, _req| {
+                        ApiError::Request(eyre!("{err}")).into()
+                    }),
+            )
             .service(ingest_report)
             .service(_run)
             .service(get_file)
@@ -347,6 +354,7 @@ pub async fn _run(
     crate::queue::delphi_scan::publish_file_scan(
         &kafka_client,
         DBFileId(run_parameters.file_id.0 as i64),
+        true,
         true,
     )
     .await

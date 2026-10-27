@@ -8,6 +8,7 @@ import {
 	PlayIcon,
 	TrashIcon,
 	UpdatedIcon,
+	UploadIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
@@ -106,7 +107,11 @@ const instanceLink = computed(() =>
 				>
 					<component
 						:is="
-							job.kind === 'external-file' || job.kind === 'debug-export' ? DownloadIcon : BoxIcon
+							job.kind === 'shared-instance-publish'
+								? UploadIcon
+								: job.kind === 'external-file' || job.kind === 'debug-export'
+									? DownloadIcon
+									: BoxIcon
 						"
 						class="size-6 text-primary"
 						aria-hidden="true"

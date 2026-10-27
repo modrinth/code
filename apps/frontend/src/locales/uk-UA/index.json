@@ -1004,20 +1004,11 @@
   "collection.button.discover-mods": {
     "message": "Знайти моди"
   },
-  "collection.button.edit-icon": {
-    "message": "Редагувати значок"
-  },
   "collection.button.remove-icon": {
     "message": "Прибрати значок"
   },
   "collection.button.remove-project": {
     "message": "Видалити проєкт"
-  },
-  "collection.button.replace-icon": {
-    "message": "Замінити значок"
-  },
-  "collection.button.select-icon": {
-    "message": "Вибрати значок"
   },
   "collection.button.unfollow-project": {
     "message": "Відписатися від проєкту"
@@ -1033,9 +1024,6 @@
   },
   "collection.description.following": {
     "message": "Автоматична добірка з усіх проєктів, які ви відстежуєте."
-  },
-  "collection.editing": {
-    "message": "Редагування добірки"
   },
   "collection.error.not-found": {
     "message": "Добірку не знайдено"
@@ -1070,6 +1058,9 @@
   "conversation-thread.action.approve": {
     "message": "Підтвердити"
   },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "Підтвердити з відповіддю"
+  },
   "conversation-thread.action.close-report": {
     "message": "Закрити скаргу"
   },
@@ -1078,6 +1069,9 @@
   },
   "conversation-thread.action.reject": {
     "message": "Відхилити"
+  },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "Відхилити з відповіддю"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Знову відкрити потік"
@@ -1112,6 +1106,9 @@
   "conversation-thread.action.withhold": {
     "message": "Утримуватися"
   },
+  "conversation-thread.action.withhold-with-reply": {
+    "message": "Утримуватися з відповіддю"
+  },
   "conversation-thread.closed-thread.description": {
     "message": "Цю тему зачинено, і в нього не можна надсилати нові повідомлення."
   },
@@ -1120,6 +1117,12 @@
   },
   "conversation-thread.error.reopening-report": {
     "message": "Помилка повторного відкриття звіту"
+  },
+  "conversation-thread.error.sending-message": {
+    "message": "Помилка надсилання повідомлення"
+  },
+  "conversation-thread.image.open-externally": {
+    "message": "Відкрити в зовнішній програмі"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Відповісти до потоку…"
@@ -1141,6 +1144,12 @@
   },
   "conversation-thread.reply-modal.help-center-note": {
     "message": "Якщо вам потрібно зв’язатися з командою модераторів, скористайтеся <help-center-link>довідковим центром Modrinth</help-center-link> і натисніть синю підказку в нижньому правому куті, щоб зв’язатися зі службою підтримки."
+  },
+  "conversation-thread.reply.changed-thread": {
+    "message": "Обрана гілка змінилася. Відкрийте її знову, перш ніж відповісти."
+  },
+  "conversation-thread.reply.facet": {
+    "message": "Пояснення щодо: {issue}"
   },
   "conversation-thread.resubmit-modal.confirmation.description": {
     "message": "Підтверджую, що я розглянув повідомлення від модераторів"
@@ -1441,30 +1450,6 @@
   },
   "create.project.visibility-unlisted": {
     "message": "Поза списком"
-  },
-  "dashboard.affiliate-links.create.button": {
-    "message": "Створити партнерське посилання"
-  },
-  "dashboard.affiliate-links.empty.no-codes": {
-    "message": "Партнерські коди не знайдено."
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "Помилка під час завантаження партнерських посилань"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "Ваші партнерські посилання"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "Це незворотно відкличе код партнера «{id}» та будь-які наявні посилання з цим кодом, які було оприлюднено, більше не будуть доступні."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "Відкликати"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "Справді бажаєте відкликати своє партнерське посилання «{title}»?"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "Пошук партнерських посилань…"
   },
   "dashboard.analytics.from-projects": {
     "message": "з {count} {count, plural, one {проєкту} few {проєктів} many {проєктів} other {проєктів}}"
@@ -2684,9 +2669,6 @@
   "layout.action.file-lookup": {
     "message": "Пошук файлів"
   },
-  "layout.action.manage-affiliates": {
-    "message": "Керувати партнерськими посиланнями"
-  },
   "layout.action.manage-server-notices": {
     "message": "Керування сповіщеннями сервера"
   },
@@ -2999,8 +2981,38 @@
   "modal.shared-instance.open-in-app.why-use": {
     "message": "Навіщо використовувати Modrinth App"
   },
+  "moderation.appearance.copied": {
+    "message": "Скопійовано!"
+  },
+  "moderation.appearance.copy": {
+    "message": "Скопіювати JSON"
+  },
+  "moderation.appearance.copy-error": {
+    "message": "Не вдалося скопіювати автоматично. Виділіть і скопіюйте JSON нижче."
+  },
+  "moderation.appearance.download": {
+    "message": "Завантажити JSON"
+  },
+  "moderation.c2pa-scan.failed": {
+    "message": "Не вдалося сканувати файли на наявність ШІ."
+  },
+  "moderation.c2pa-scan.no-ai-files": {
+    "message": "Не знайдено файлів, згенерованих ШІ."
+  },
   "moderation.exclude-technical-review": {
     "message": "Виключити технічні розгляди"
+  },
+  "moderation.keybinds.change": {
+    "message": "{setting}: {binding}. Активуйте, щоб змінити прив'язку."
+  },
+  "moderation.keybinds.composer": {
+    "message": "Відповіді в гілці та особисті нотатки"
+  },
+  "moderation.keybinds.conflicts": {
+    "message": "Перетинається з: {actions}"
+  },
+  "moderation.keybinds.listen": {
+    "message": "Натисніть клавішу…"
   },
   "moderation.moderate": {
     "message": "Проглядати"
@@ -3022,6 +3034,9 @@
   },
   "moderation.page.technicalReview": {
     "message": "Технічний огляд"
+  },
+  "moderation.project-review.draftCount": {
+    "message": "Чернеток: {count}"
   },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} на сторінку"
@@ -3409,6 +3424,9 @@
   },
   "project-member-header.success-join": {
     "message": "Ви доєдналися до команди проєкту"
+  },
+  "project-moderation-nags.project-submitted-for-review": {
+    "message": "Проєкт відправлено на перевірку!"
   },
   "project-moderation-nags.publishing-checklist": {
     "message": "Контрольний список для публікації"
@@ -4121,9 +4139,6 @@
   "project.settings.license.custom-name-required": {
     "message": "Уведіть назву власної ліцензії."
   },
-  "project.settings.license.custom-url-description": {
-    "message": "Розташування повного тексту ліцензії."
-  },
   "project.settings.license.intro": {
     "message": "Важливо вказати правильну ліцензію для: {type}. Ви можете вибрати її з нашого списку або вказати власну ліцензію. Також можна вказати URL для вибраної ліцензії, інакше показуватиметься текст ліцензії. Перегляньте наш <guide>посібник із ліцензування</guide>, щоб дізнатися більше."
   },
@@ -4147,12 +4162,6 @@
   },
   "project.settings.license.optional-label": {
     "message": "необов’язково"
-  },
-  "project.settings.license.select": {
-    "message": "Ліцензія"
-  },
-  "project.settings.license.select-placeholder": {
-    "message": "Шукати ліцензії…"
   },
   "project.settings.license.title": {
     "message": "Ліцензія"
@@ -4559,29 +4568,17 @@
   "report.not-for.dmca.description": {
     "message": "Перегляньте нашу <policy-link>Політику авторських прав</policy-link>."
   },
-  "report.note.ai-images.1": {
-    "message": "Ми нещодавно оновили наші правила, які тепер забороняють використання ШІ-зображень для значків, галереї та опису. Ми впровадили перехідний період, протягом якого автори можуть прибрати ШІ-зображення зі своїх проєктів, перш ніж почнемо приймати скарги щодо них."
-  },
-  "report.note.check-back-later": {
-    "message": "Поверніться, коли перехідний період завершиться. Наразі ми не приймаємо скарги цього типу."
-  },
   "report.note.copyright.1": {
     "message": "Зверніть увагу, що ви не відправляєте запит на видалення згідно з DMCA, радше скаргу за повторно завантажений уміст."
   },
   "report.note.copyright.2": {
     "message": "Якщо ви хотіли подати запит на видалення вмісту через порушення DMCA (що є юридичною дією), ознайомтеся з нашою <copyright-policy-link>Політикою авторських прав</copyright-policy-link>."
   },
-  "report.note.fully-ai-generated.1": {
-    "message": "Ми нещодавно оновили наші правила, які тепер забороняють проєкти, повністю згенеровані ШІ. Ми впровадили перехідний період, протягом якого автори можуть оновити або прибрати такі проєкти, перш ніж почнемо приймати скарги щодо них."
-  },
   "report.note.malicious.1": {
     "message": "Скарги на зловмисний або оманливий уміст мають містити вагомі докази такої поведінки, як наприклад, зразки коду."
   },
   "report.note.malicious.2": {
     "message": "Звіти від Microsoft Defender, VirusTotal, або ШІ-детекторів зловмисного ПЗ не вважаються вагомими доказами та не приймаються."
-  },
-  "report.note.missing-disclosure.1": {
-    "message": "Маркування вмісту – це нова функція, яку ми додали нещодавно. Ми надаємо авторам пільговий період для оновлення своїх маркувань, перш ніж ми почнемо приймати скарги на відсутні або неправильні маркування."
   },
   "report.please-report": {
     "message": "На що скаржитися:"
@@ -5549,15 +5546,6 @@
   "settings.pats.modal.create.title": {
     "message": "Створити особистий токен доступу"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "Видалити цей токен"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "Це видалить цей токен назавжди (тобто справді навіки)."
-  },
-  "settings.pats.modal.delete.title": {
-    "message": "Справді бажаєте видалити цей токен?"
-  },
   "settings.pats.modal.edit.title": {
     "message": "Редагування особистого токену доступу"
   },
@@ -5582,14 +5570,8 @@
   "settings.sessions.action.revoke-session": {
     "message": "Завершити сеанс"
   },
-  "settings.sessions.created-ago": {
-    "message": "Створено {ago}"
-  },
   "settings.sessions.current-session": {
     "message": "Поточний сеанс"
-  },
-  "settings.sessions.description": {
-    "message": "Тут зазначені всі пристрої, на яких виконано вхід у ваш обліковий запис Modrinth. Ви можете вийти з кожного окремо.\n\nЯкщо бачите пристрій, котрий не впізнаєте, — негайно вийдіть з нього та змініть пароль до облікового запису."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Остання активність {ago}"

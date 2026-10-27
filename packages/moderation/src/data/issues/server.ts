@@ -110,6 +110,9 @@ export const serverReviewPanel = panel({
 				issue: reuploadCustomPackVerificationIssue,
 				label: 'List overrides?',
 				id: 'server-list',
+				issueCardDisplay: {
+					label: 'Server details: List overrides?',
+				},
 			}),
 			section({
 				shown: ({ selected }) => selected.toggleIds.includes('server-list'),

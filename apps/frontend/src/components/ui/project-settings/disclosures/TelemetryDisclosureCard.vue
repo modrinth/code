@@ -70,6 +70,7 @@ watch(
 			model.value.entries = ['']
 		}
 	},
+	{ immediate: true },
 )
 
 function addEntry() {

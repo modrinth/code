@@ -3,8 +3,16 @@
 		type="outlined"
 		:disabled="disabled"
 		:aria-pressed="mixed ? 'mixed' : modelValue"
-		:aria-keyshortcuts="keybind"
-		:data-review-keybind="keybind"
+		:aria-keyshortcuts="ariaKeybind"
+		:data-review-toggle-index="toggleIndex"
+		:style="
+			color
+				? {
+						'--action-color': color,
+						'--action-highlight': `color-mix(in srgb, ${color} 25%, transparent)`,
+					}
+				: undefined
+		"
 		class="action-toggle !h-auto min-h-8 max-w-full !gap-1.5 !whitespace-normal !rounded-lg !px-2.5 !font-medium [&>svg]:!text-inherit"
 		:class="{
 			'!brightness-100': modelValue,
@@ -24,25 +32,51 @@
 			class="action-toggle-keybind ml-1 flex h-5 min-w-5 shrink-0 items-center justify-center gap-0.5 rounded px-1 font-sans text-[11px] font-medium leading-none"
 			aria-hidden="true"
 		>
-			<ArrowBigUpIcon v-if="keybind.startsWith('Shift+')" class="!size-3" />
-			{{ keybind.replace('Shift+', '').replaceAll('+', ' ') }}
+			{{ keybindLabel }}
 		</kbd>
 	</Button>
 </template>
 
 <script lang="ts" setup>
-import { ArrowBigUpIcon, MinusIcon, TagCategoryRefreshCcwIcon } from '@modrinth/assets'
+import { MinusIcon, TagCategoryRefreshCcwIcon } from '@modrinth/assets'
+import { formatKeybind, type KeybindDefinition } from '@modrinth/moderation'
 import { Button } from '@modrinth/ui'
+import { computed, onMounted, ref } from 'vue'
 
-defineProps<{
+const props = defineProps<{
 	modelValue: boolean
 	mixed?: boolean
 	reReview?: boolean
 	label: string
+	color?: string
 	disabled?: boolean
-	keybind?: string
+	keybind?: KeybindDefinition
+	toggleIndex?: number
 	showKeybindHint?: boolean
 }>()
+
+const isMac = ref(false)
+onMounted(() => {
+	isMac.value = navigator.platform.toUpperCase().includes('MAC')
+})
+const keybindLabel = computed(() =>
+	props.keybind ? formatKeybind(props.keybind, isMac.value) : undefined,
+)
+const ariaKeybind = computed(() => {
+	const definition = props.keybind
+	if (!definition) return undefined
+	const portableMod =
+		definition.mod || (definition.ctrl && (definition.meta || definition.meta === undefined))
+	return [
+		(portableMod ? !isMac.value : definition.ctrl) ? 'Control' : undefined,
+		(portableMod ? isMac.value : definition.meta) ? 'Meta' : undefined,
+		definition.shift ? 'Shift' : undefined,
+		definition.alt ? 'Alt' : undefined,
+		definition.key === ' ' ? 'Space' : definition.key,
+	]
+		.filter(Boolean)
+		.join('+')
+})
 
 const emit = defineEmits<{
 	'update:modelValue': [boolean]

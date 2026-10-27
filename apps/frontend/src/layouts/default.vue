@@ -477,14 +477,6 @@
 							shown: isAdmin(auth.user),
 						},
 						{
-							id: 'affiliates',
-							label: 'Affiliate links',
-							icon: AffiliateIcon,
-							type: 'link',
-							to: '/admin/affiliates',
-							shown: isAdmin(auth.user),
-						},
-						{
 							id: 'analytics-events',
 							label: 'Analytics events',
 							icon: ChartIcon,
@@ -741,7 +733,7 @@
 					</template>
 					<template v-else>
 						<SearchIcon aria-hidden="true" class="smaller" />
-						{{ formatMessage(navMenuMessages.search) }}
+						<span>{{ formatMessage(navMenuMessages.search) }}</span>
 					</template>
 				</Button>
 				<template v-if="auth.user">
@@ -814,7 +806,6 @@
 </template>
 <script setup>
 import {
-	AffiliateIcon,
 	ArrowBigUpDashIcon,
 	ArrowLeftRightIcon,
 	BellIcon,
@@ -883,7 +874,7 @@ import {
 	UserRoleIcon,
 	useVIntl,
 } from '@modrinth/ui'
-import { isAdmin, isStaff, UserBadge } from '@modrinth/utils'
+import { isAdmin, isStaff } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 
 import { getTaxThreshold } from '@/providers/creator-withdraw.ts'
@@ -1107,10 +1098,6 @@ const messages = defineMessages({
 	manageServerNotices: {
 		id: 'layout.action.manage-server-notices',
 		defaultMessage: 'Manage server notices',
-	},
-	manageAffiliates: {
-		id: 'layout.action.manage-affiliates',
-		defaultMessage: 'Manage affiliate links',
 	},
 	analyticsEvents: {
 		id: 'layout.action.analytics-events',
@@ -1413,14 +1400,6 @@ const userMenuOptions = computed(() => {
 			icon: ChartIcon,
 			type: 'link',
 			to: '/dashboard/analytics',
-		},
-		{
-			id: 'affiliate-links',
-			label: formatMessage(commonMessages.affiliateLinksButton),
-			icon: AffiliateIcon,
-			type: 'link',
-			to: '/dashboard/affiliate-links',
-			shown: Boolean(user.badges & UserBadge.AFFILIATE),
 		},
 		{
 			id: 'revenue',

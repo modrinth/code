@@ -1,18 +1,13 @@
 <template>
-	<Section :heading="formatMessage(messages.projectTitle)" :target="{ kind: 'title' }">
+	<Section heading="Title" :target="{ kind: 'title' }">
 		<template #right>
-			<EditButton
-				v-if="!editing"
-				:section="formatMessage(messages.projectTitle)"
-				:disabled="saving"
-				@click="startEditing"
-			/>
+			<EditButton v-if="!editing" section="Title" :disabled="saving" @click="startEditing" />
 		</template>
 		<div v-if="editing" class="flex flex-col gap-1.5">
 			<Input
 				ref="input"
 				v-model="draft"
-				:aria-label="formatMessage(messages.projectTitle)"
+				aria-label="Title"
 				:maxlength="64"
 				:disabled="saving"
 				wrapper-class="w-full"
@@ -21,9 +16,7 @@
 				{{ validationMessage }}
 			</p>
 			<div class="flex justify-end gap-1">
-				<Button type="quiet" size="xs" :disabled="saving" @click="resetEditing">
-					{{ formatMessage(commonMessages.cancelButton) }}
-				</Button>
+				<Button type="quiet" size="xs" :disabled="saving" @click="resetEditing"> Cancel </Button>
 				<Button
 					type="colored"
 					color="brand"
@@ -32,25 +25,46 @@
 					:disabled="saving || !valid"
 					@click="save"
 				>
-					{{ formatMessage(commonMessages.saveButton) }}
+					Save
 				</Button>
 			</div>
 		</div>
 		<h1 v-else-if="project" class="m-0 flex min-w-0 items-center gap-2 text-xl">
-			<Tooltip class="flex shrink-0">
-				<template #popper>
-					<ProjectStatusBadge
-						:status="project.status"
+			<div class="flex shrink-0 items-center gap-0.5">
+				<Tooltip class="flex shrink-0">
+					<template #popper>
+						<ProjectStatusBadge
+							:status="project.status"
+							:style="{ color: `var(--color-${getProjectStatusColor(project.status)})` }"
+						/>
+					</template>
+					<component
+						:is="getProjectStatusIcon(project.status)"
+						class="size-4 shrink-0"
 						:style="{ color: `var(--color-${getProjectStatusColor(project.status)})` }"
+						aria-hidden="true"
 					/>
+				</Tooltip>
+				<template v-if="project.status === 'processing' && project.requested_status">
+					<RightArrowIcon class="size-4 shrink-0 text-secondary" aria-hidden="true" />
+					<Tooltip class="flex shrink-0">
+						<template #popper>
+							<ProjectStatusBadge
+								:status="project.requested_status"
+								:style="{
+									color: `var(--color-${getProjectStatusColor(project.requested_status)})`,
+								}"
+							/>
+						</template>
+						<component
+							:is="getProjectStatusIcon(project.requested_status)"
+							class="size-4 shrink-0"
+							:style="{ color: `var(--color-${getProjectStatusColor(project.requested_status)})` }"
+							aria-hidden="true"
+						/>
+					</Tooltip>
 				</template>
-				<component
-					:is="getProjectStatusIcon(project.status)"
-					class="size-4 shrink-0"
-					:style="{ color: `var(--color-${getProjectStatusColor(project.status)})` }"
-					aria-hidden="true"
-				/>
-			</Tooltip>
+			</div>
 			<NuxtLink
 				:to="projectUrl"
 				target="_blank"
@@ -64,26 +78,23 @@
 </template>
 
 <script setup lang="ts">
+import { RightArrowIcon } from '@modrinth/assets'
 import {
 	Button,
-	commonMessages,
 	getProjectStatusColor,
 	getProjectStatusIcon,
 	Input,
 	ProjectStatusBadge,
 	Tooltip,
-	useVIntl,
 } from '@modrinth/ui'
 import { computed, useTemplateRef } from 'vue'
 
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
-import { projectReviewMessages as messages } from '../../messages'
 import EditButton from '../edit/button.vue'
 import { useProjectTextEdit } from '../edit/use-project-text-edit'
 import Section from '../section.vue'
 
-const { formatMessage } = useVIntl()
 const { projectV2 } = injectProjectReviewPageContext()
 const input = useTemplateRef<InstanceType<typeof Input>>('input')
 const {

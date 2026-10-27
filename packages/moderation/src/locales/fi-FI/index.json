@@ -9,7 +9,7 @@
     "defaultMessage": "Lisää kuvake"
   },
   "nags.add-java-address.description": {
-    "defaultMessage": "Lisää IP osoite ja portti jota Java Edition pelaajat voivat käyttää liittyäksesi sinun palvelimelle."
+    "defaultMessage": "Lisää IP-osoite ja portti, jota Java Edition -pelaajat voivat käyttää liittyäkseen palvelimellesi."
   },
   "nags.add-java-address.title": {
     "defaultMessage": "Lisää Java-osoite"

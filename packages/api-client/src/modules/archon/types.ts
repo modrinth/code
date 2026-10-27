@@ -699,17 +699,6 @@ export namespace Archon {
 				offset?: number
 			}
 
-			export type StockRequest = {
-				cpu?: number
-				memory_mb?: number
-				swap_mb?: number
-				storage_mb?: number
-			}
-
-			export type StockResponse = {
-				available: number
-			}
-
 			export type JWTAuth = {
 				url: string // e.g., "node-xyz.modrinth.com/modrinth/v0/fs"
 				token: string // JWT token for filesystem access
@@ -769,6 +758,8 @@ export namespace Archon {
 				tags: string[]
 				location: ServerLocation
 				worlds: WorldFull[]
+				/** IDs of the server's backup repositories. Only returned to support agents. */
+				repository_ids?: number[]
 			}
 
 			export type SftpCredentials = {
@@ -832,6 +823,28 @@ export namespace Archon {
 				lat: number
 				lon: number
 				zone: string
+			}
+
+			export type MemorySizeStock = {
+				/** Number of servers of this memory size that fit in the region */
+				available: number
+				/** Hostnames of the nodes which fit at least one server of this memory size */
+				hostnames: string[]
+			}
+
+			export type RegionStock = {
+				/** Shortcode of the region */
+				region: string
+				/** Stock of each requested memory size, keyed by memory size in MB */
+				stock: Record<number, MemorySizeStock>
+				/** WebSocket URLs of random nodes in the region, to measure the latency to it */
+				ping_urls: string[]
+			}
+
+			export type StockResponse = {
+				regions: RegionStock[]
+				/** Number of servers that fit across all regions, keyed by memory size in MB */
+				total: Record<number, number>
 			}
 		}
 	}
@@ -953,12 +966,150 @@ export namespace Archon {
 				status: BackupStatus
 				locked: boolean
 				automated: boolean
+				rotates_at?: string
 				history: BackupQueueOperation[]
 			}
 
 			export type BackupsQueueResponse = {
 				active_operations: ActiveOperation[]
 				backups: BackupQueueBackup[]
+			}
+
+			export type WorldBackupOptions = {
+				split_automatic: number
+				split_manual: number
+				limit: number
+				interval: number
+			}
+
+			export type BackupsQueueWithOptionsResponse = BackupsQueueResponse & {
+				options: WorldBackupOptions
+				next_auto_backup_at: string | null
+			}
+
+			export type PatchWorldBackupOptions = {
+				split_automatic?: number
+				split_manual?: number
+				interval?: number
+			}
+
+			export type PatchWorldBackupOptionsResponse = {
+				applied: boolean
+				backup_ids?: string[]
+			}
+		}
+	}
+
+	export namespace BackupRepositories {
+		export namespace Internal {
+			export type OperationType =
+				| 'check'
+				| 'check-read-data'
+				| 'repair-index'
+				| 'repair-packs'
+				| 'repair-snapshots'
+				| 'prune'
+				| 'restore-hidden-versions'
+
+			/** Operations started in an existing run. Checks start a new run instead. */
+			export type RunnableOperationType = Exclude<OperationType, 'check' | 'check-read-data'>
+
+			/**
+			 * `completed` when the operation ran, regardless of what it found, or `failed` when it
+			 * couldn't run.
+			 */
+			export type OperationStatus = 'pending' | 'ongoing' | 'completed' | 'failed'
+
+			export type StartReparationQuery = {
+				/** Whether the run's check reads all pack data, which is much slower. */
+				read?: boolean
+			}
+
+			export type RepairCheckOutput = {
+				type: 'check'
+				exit_code: number | null
+				num_errors: number
+				broken_packs: string[]
+				suggest_repair_index: boolean
+				suggest_prune: boolean
+				/** The first reported errors, capped to keep the result small. */
+				errors: string[]
+				/** Whether more errors were reported than included in `errors`. */
+				errors_truncated: boolean
+			}
+
+			export type RepairSnapshot = {
+				id: string
+				time: string
+				original?: string
+				tags: string[]
+			}
+
+			export type RepairOutput =
+				| RepairCheckOutput
+				| {
+						type: 'snapshots'
+						snapshots: RepairSnapshot[]
+				  }
+				| {
+						type: 'command'
+						exit_code: number | null
+						output_tail: string
+				  }
+
+			/** Results of a completed `repair-snapshots` operation. */
+			export type RepairSnapshotsResults = {
+				repair: RepairOutput
+				remapped_backups: {
+					backup_id: string
+					original_snapshot_id: string
+					snapshot_id: string
+				}[]
+				missing_snapshot_backups: string[]
+			}
+
+			/** Results of a `restore-hidden-versions` operation. Only the destination is set while it runs. */
+			export type RestoreHiddenVersionsResults = {
+				destination_repository_id: number
+				packs?: number
+				hidden_packs?: number
+				snapshots?: number
+				hidden_snapshots?: number
+				bytes?: number
+				copied_objects?: number
+				skipped_objects?: number
+				missing_objects?: string[]
+				repair_index?: RepairOutput
+				imported_backups?: number
+				matched_backups?: number
+			}
+
+			export type ReparationOperation = {
+				id: number
+				operation_type: OperationType
+				status: OperationStatus
+				params: Record<string, unknown>
+				/**
+				 * A {@link RepairOutput} for checks, `repair-index`, `repair-packs` and `prune`, a
+				 * {@link RepairSnapshotsResults} for `repair-snapshots`, and a
+				 * {@link RestoreHiddenVersionsResults} for `restore-hidden-versions`.
+				 */
+				results: RepairOutput | RepairSnapshotsResults | RestoreHiddenVersionsResults | null
+				error: string | null
+				node_id: string | null
+				created_by: string | null
+				created_at: string
+				started_at: string | null
+				completed_at: string | null
+			}
+
+			export type ReparationRun = {
+				id: number
+				repository_id: number
+				server_id: string | null
+				created_by: string | null
+				created_at: string
+				operations: ReparationOperation[]
 			}
 		}
 	}

@@ -39,10 +39,25 @@
 				@clear="handleSearchClear"
 			>
 				<template v-if="showChevron" #trailing>
-					<ChevronLeftIcon
-						class="pointer-events-none size-5 text-secondary transition-transform duration-150"
-						:class="isOpen ? (openDirection === 'down' ? 'rotate-90' : '-rotate-90') : '-rotate-90'"
-					/>
+					<button
+						type="button"
+						tabindex="-1"
+						class="flex size-7 -m-2 shrink-0 cursor-pointer items-center justify-center border-none bg-transparent p-0 text-secondary disabled:cursor-not-allowed"
+						:disabled="disabled"
+						:aria-expanded="isOpen"
+						:aria-haspopup="listbox ? 'listbox' : 'menu'"
+						aria-label="Toggle dropdown"
+						@mousedown.prevent
+						@click.stop="handleSearchChevronClick"
+					>
+						<ChevronLeftIcon
+							class="pointer-events-none size-5 transition-transform duration-150"
+							:class="
+								isOpen ? (openDirection === 'down' ? 'rotate-90' : '-rotate-90') : '-rotate-90'
+							"
+							aria-hidden="true"
+						/>
+					</button>
 				</template>
 			</Input>
 		</div>
@@ -301,6 +316,8 @@ const props = withDefaults(
 		dropdownWidth?: string | number
 		/** Minimum width for the teleported dropdown */
 		dropdownMinWidth?: string | number
+		/** Edge of the trigger to align the dropdown with before viewport clamping. */
+		dropdownAlign?: 'left' | 'right'
 		forceDirection?: 'up' | 'down'
 		noOptionsMessage?: string
 		disableSearchFilter?: boolean
@@ -342,6 +359,7 @@ const props = withDefaults(
 		triggerSize: 'md',
 		triggerInteraction: 'surface',
 		animateDropdown: true,
+		dropdownAlign: 'left',
 		outsideClickIgnore: () => [],
 	},
 )
@@ -399,7 +417,7 @@ const effectiveTriggerEl = computed(() => {
 })
 const outsideClickIgnoreTargets = computed(() => [
 	effectiveTriggerEl,
-	dropdownRef,
+	containerRef,
 	...props.outsideClickIgnore,
 ])
 
@@ -630,13 +648,11 @@ function calculateHorizontalPosition(
 ): number {
 	const minLeft = viewport.offsetLeft + DROPDOWN_VIEWPORT_MARGIN
 	const maxRight = viewport.offsetLeft + viewport.width - DROPDOWN_VIEWPORT_MARGIN
-	let left = triggerRect.left + viewport.offsetLeft
+	const left =
+		(props.dropdownAlign === 'right' ? triggerRect.right - dropdownRect.width : triggerRect.left) +
+		viewport.offsetLeft
 
-	if (left + dropdownRect.width > maxRight) {
-		left = Math.max(minLeft, maxRight - dropdownRect.width)
-	}
-
-	return left
+	return Math.max(minLeft, Math.min(left, maxRight - dropdownRect.width))
 }
 
 function getViewportRect(): ViewportRect {
@@ -1021,6 +1037,18 @@ function handleSearchClick() {
 	}
 }
 
+function handleSearchChevronClick() {
+	if (props.disabled) return
+
+	const wasOpen = isOpen.value
+	searchTriggerRef.value?.focus()
+	if (wasOpen) {
+		closeDropdown()
+	} else {
+		openDropdown()
+	}
+}
+
 function handleWindowResize() {
 	if (isOpen.value) {
 		scheduleDropdownPositionUpdate()
@@ -1050,10 +1078,17 @@ function startPositionTracking() {
 	listenerWindow.addEventListener('beforeunload', handleWindowClose)
 	listenerWindow.visualViewport?.addEventListener('scroll', handleViewportChange)
 	listenerWindow.visualViewport?.addEventListener('resize', handleViewportChange)
-	stopOutsideClick = onClickOutside(containerRef, () => closeDropdown(false), {
-		window: listenerWindow,
-		ignore: outsideClickIgnoreTargets,
-	})
+	stopOutsideClick = onClickOutside(
+		dropdownRef,
+		(event) => {
+			if (containerRef.value && event.composedPath().includes(containerRef.value)) return
+			closeDropdown(false)
+		},
+		{
+			window: listenerWindow,
+			ignore: outsideClickIgnoreTargets,
+		},
+	)
 }
 
 function stopPositionTracking() {
@@ -1121,6 +1156,13 @@ watch(
 		}
 	},
 	{ immediate: true },
+)
+
+watch(
+	() => props.dropdownAlign,
+	() => {
+		if (isOpen.value) void updateDropdownPosition()
+	},
 )
 
 watch(

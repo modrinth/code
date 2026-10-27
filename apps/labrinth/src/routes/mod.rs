@@ -4,13 +4,11 @@ use crate::auth::{
 use crate::database::PgPool;
 use crate::database::models::DBProject;
 use crate::database::models::DBProjectId;
-use crate::env::ENV;
 use crate::models::ids::ProjectId;
 use crate::models::pats::Scopes;
 use crate::queue::session::AuthQueue;
 use crate::util::cors::default_cors;
 use crate::util::error::{ApiContext, Context};
-use actix_cors::Cors;
 use actix_files::Files;
 use actix_web::http::{StatusCode, header};
 use actix_web::{FromRequest, HttpRequest, HttpResponse, web};
@@ -27,7 +25,6 @@ pub mod v2;
 pub mod v2_reroute;
 pub mod v3;
 
-pub mod analytics;
 mod index;
 mod maven;
 mod not_found;
@@ -537,10 +534,7 @@ pub fn root_config(cfg: &mut web::ServiceConfig) {
             .wrap(default_cors())
             .service(index::index_get)
             .service(index::build_get)
-            .service(Files::new(
-                "/",
-                concat!(env!("CARGO_MANIFEST_DIR"), "/assets"),
-            )),
+            .service(Files::new("/", "assets/")),
     );
 }
 
@@ -554,30 +548,6 @@ pub fn public_config(cfg: &mut web::ServiceConfig) {
         web::scope("/updates")
             .wrap(default_cors())
             .configure(updates::config),
-    );
-    cfg.service(
-        web::scope("/analytics")
-            .wrap(
-                Cors::default()
-                    .allowed_origin_fn(|origin, _req_head| {
-                        let allowed_origins = &ENV.ANALYTICS_ALLOWED_ORIGINS;
-                        allowed_origins.contains(&"*".to_string())
-                            || allowed_origins.contains(
-                                &origin
-                                    .to_str()
-                                    .unwrap_or_default()
-                                    .to_string(),
-                            )
-                    })
-                    .allowed_methods(vec!["GET", "POST"])
-                    .allowed_headers(vec![
-                        actix_web::http::header::AUTHORIZATION,
-                        actix_web::http::header::ACCEPT,
-                        actix_web::http::header::CONTENT_TYPE,
-                    ])
-                    .max_age(3600),
-            )
-            .configure(analytics::config),
     );
 }
 

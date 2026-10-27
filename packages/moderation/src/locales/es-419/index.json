@@ -422,6 +422,84 @@
   "nags.visit-links-settings.title": {
     "defaultMessage": "Ver configuración de enlaces"
   },
+  "project-review.issue-location.disclosures": {
+    "defaultMessage": "Editar divulgaciones"
+  },
+  "project-review.issue-location.gallery": {
+    "defaultMessage": "Editar imágenes de la galería"
+  },
+  "project-review.issue-location.permissions": {
+    "defaultMessage": "Revisar permisos"
+  },
+  "project-review.issue-location.versions": {
+    "defaultMessage": "Gestionar versiones"
+  },
+  "project-review.issue-target.acknowledge": {
+    "defaultMessage": "Reconocer"
+  },
+  "project-review.issue-target.add-gallery-images": {
+    "defaultMessage": "Agregar imágenes a la galería"
+  },
+  "project-review.issue-target.add-project-disclosures": {
+    "defaultMessage": "Agregar divulgaciones"
+  },
+  "project-review.issue-target.mark-addressed": {
+    "defaultMessage": "Marcar como abordado"
+  },
+  "project-review.issue-target.modify-description": {
+    "defaultMessage": "Cambiar descripción"
+  },
+  "project-review.issue-target.modify-gallery-image": {
+    "defaultMessage": "Cambiar imagen de la galería"
+  },
+  "project-review.issue-target.modify-icon": {
+    "defaultMessage": "Cambiar ícono"
+  },
+  "project-review.issue-target.modify-license": {
+    "defaultMessage": "Cambiar licencia"
+  },
+  "project-review.issue-target.modify-links": {
+    "defaultMessage": "Cambiar enlaces"
+  },
+  "project-review.issue-target.modify-project-disclosure": {
+    "defaultMessage": "Cambiar divulgación"
+  },
+  "project-review.issue-target.modify-project-disclosure-note": {
+    "defaultMessage": "Cambiar nota de divulgación"
+  },
+  "project-review.issue-target.modify-server-address": {
+    "defaultMessage": "Cambiar dirección del servidor"
+  },
+  "project-review.issue-target.modify-server-languages": {
+    "defaultMessage": "Cambiar idiomas del servidor"
+  },
+  "project-review.issue-target.modify-slug": {
+    "defaultMessage": "Cambiar slug de la URL"
+  },
+  "project-review.issue-target.modify-summary": {
+    "defaultMessage": "Cambiar resumen"
+  },
+  "project-review.issue-target.modify-team-member-role": {
+    "defaultMessage": "Cambiar rol de miembro del equipo"
+  },
+  "project-review.issue-target.modify-title": {
+    "defaultMessage": "Cambiar título"
+  },
+  "project-review.issue-target.remove-gallery-images": {
+    "defaultMessage": "Eliminar imágenes de la galería"
+  },
+  "project-review.issue-target.remove-icon": {
+    "defaultMessage": "Eliminar divulgaciones"
+  },
+  "project-review.issue-target.remove-project-disclosures": {
+    "defaultMessage": "Eliminar etiquetas"
+  },
+  "project-review.issue-target.remove-tags": {
+    "defaultMessage": "Eliminar etiquetas"
+  },
+  "project-review.issue-target.version": {
+    "defaultMessage": "Cambiar versión"
+  },
   "project.text-validation.description-matches-summary": {
     "defaultMessage": "El resumen de tu proyecto debe proporcionar información única y no repetir el nombre del proyecto."
   },

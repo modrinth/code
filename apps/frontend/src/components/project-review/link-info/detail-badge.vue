@@ -20,28 +20,34 @@
 </template>
 
 <script setup lang="ts">
-import { TagItem, useFormatBytes, useFormatDateTime, useRelativeTime, useVIntl } from '@modrinth/ui'
+import { TagItem } from '@modrinth/ui'
 import { computed } from 'vue'
 
+import {
+	createDateFormatter,
+	createRelativeTimeFormatter,
+	formatBytes,
+	formatNumber,
+} from '../format'
 import { detailIcon } from './detail-icons'
-import { messages } from './messages'
+import { linkInfoLabels } from './labels'
 import type { Detail } from './types'
 
 const props = defineProps<{ entry: Detail }>()
-const { formatMessage, locale } = useVIntl()
-const formatBytes = useFormatBytes()
-const relativeTime = useRelativeTime({ numeric: 'always' })
-const formatDateTime = useFormatDateTime({ dateStyle: 'long', timeStyle: 'short' })
+
+const relativeTime = createRelativeTimeFormatter({ numeric: 'always' })
+const formatDateTime = createDateFormatter({
+	dateStyle: 'long',
+	timeStyle: 'short',
+})
 
 const value = computed(() => {
 	const entry = props.entry
-	if (typeof entry.value === 'object') return formatMessage(messages[entry.value.message])
+	if (typeof entry.value === 'object') return linkInfoLabels[entry.value.message]
 	if (entry.format === 'date') return relativeTime(entry.value as string) || String(entry.value)
 	if (entry.format === 'bytes' && typeof entry.value === 'number') return formatBytes(entry.value)
-	if (typeof entry.value === 'number')
-		return new Intl.NumberFormat(locale.value).format(entry.value)
-	if (typeof entry.value === 'boolean')
-		return formatMessage(entry.value ? messages.enabled : messages.disabled)
+	if (typeof entry.value === 'number') return formatNumber(entry.value)
+	if (typeof entry.value === 'boolean') return entry.value ? 'Enabled' : 'Disabled'
 	return entry.value
 })
 
@@ -49,10 +55,7 @@ const tooltip = computed(() => {
 	const entry = props.entry
 	const date =
 		entry.format === 'date' && typeof entry.value === 'string' ? new Date(entry.value) : undefined
-	const description = formatMessage(messages.detailTooltip, {
-		label: formatMessage(messages[entry.label]),
-		value: date && !Number.isNaN(date.getTime()) ? formatDateTime(date) : value.value,
-	})
-	return entry.warning ? `${description}\n${formatMessage(messages[entry.warning])}` : description
+	const description = `${linkInfoLabels[entry.label]}: ${date && !Number.isNaN(date.getTime()) ? formatDateTime(date) : value.value}`
+	return entry.warning ? `${description}\n${linkInfoLabels[entry.warning]}` : description
 })
 </script>

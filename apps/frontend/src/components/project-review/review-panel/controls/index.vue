@@ -39,9 +39,7 @@
 							"
 							:max-height="240"
 							:min-height="72"
-							:placeholder="
-								control.placeholder ?? formatMessage(controlMessages.markdownPlaceholder)
-							"
+							:placeholder="control.placeholder ?? 'Explain what needs to change…'"
 							hide-markdown-hint
 							@update:model-value="writeControl(control, $event)"
 						/>
@@ -49,7 +47,7 @@
 							v-else-if="control.type === 'text' && control.key === 'correct-slug'"
 							:ref="(field) => setFieldRef(fieldKey(control), field)"
 							:model-value="panels.textValue(panelBinding, control)"
-							:placeholder="control.placeholder || formatMessage(controlMessages.textPlaceholder)"
+							:placeholder="control.placeholder || 'Enter text…'"
 							:disabled="control.disabled"
 							:label="control.label"
 							:required="control.required"
@@ -59,7 +57,7 @@
 							v-else-if="control.type === 'text'"
 							:ref="(field) => setFieldRef(fieldKey(control), field)"
 							:model-value="panels.textValue(panelBinding, control)"
-							:placeholder="control.placeholder || formatMessage(controlMessages.textPlaceholder)"
+							:placeholder="control.placeholder || 'Enter text…'"
 							:disabled="control.disabled"
 							:aria-label="control.label"
 							:aria-required="control.required"
@@ -69,7 +67,7 @@
 							v-else-if="control.type === 'textarea'"
 							:ref="(field) => setFieldRef(fieldKey(control), field)"
 							:model-value="panels.textValue(panelBinding, control)"
-							:placeholder="control.placeholder || formatMessage(controlMessages.textPlaceholder)"
+							:placeholder="control.placeholder || 'Enter text…'"
 							:disabled="control.disabled"
 							:aria-label="control.label"
 							:aria-required="control.required"
@@ -82,7 +80,8 @@
 							v-else-if="control.type === 'select' && control.multiple"
 							:model-value="panels.selectValues(panelBinding, control)"
 							:options="control.options"
-							:placeholder="control.placeholder ?? formatMessage(controlMessages.select)"
+							:max-tag-rows="3"
+							:placeholder="control.placeholder ?? 'Select an option'"
 							:disabled="control.disabled"
 							:aria-label="control.label"
 							:aria-required="control.required"
@@ -97,11 +96,11 @@
 							:options="[
 								{
 									value: '',
-									label: control.placeholder ?? formatMessage(controlMessages.select),
+									label: control.placeholder ?? 'Select an option',
 								},
 								...control.options,
 							]"
-							:placeholder="control.placeholder ?? formatMessage(controlMessages.select)"
+							:placeholder="control.placeholder ?? 'Select an option'"
 							:disabled="control.disabled"
 							:aria-label="control.label"
 							:aria-required="control.required"
@@ -116,18 +115,20 @@
 							class="m-0 ml-0.5 text-xs text-orange"
 							role="status"
 						>
-							{{ formatMessage(controlMessages.required) }}
+							Complete this required field.
 						</p>
 					</div>
-					<Tooltip
+					<MessagePreview
 						v-else
-						:disabled="!control.tooltip"
-						:text="control.tooltip"
+						:entry="{ binding: panelBinding, control }"
+						:disabled="control.disabled"
 						class="min-w-0 max-w-full"
 					>
 						<ActionButton
 							:label="control.label"
+							:color="settings.get(moderationSettings.General.IssueToggleColor)"
 							:keybind="keybinds.get(control)"
+							:toggle-index="toggleIndexes.get(control)"
 							:show-keybind-hint="
 								settings.get(moderationSettings.General.ShowToggleIssueButtonShortcutHint)
 							"
@@ -137,7 +138,7 @@
 							:mixed="panels.mixed(panelBinding, control)"
 							@update:model-value="toggleAction(control, $event)"
 						/>
-					</Tooltip>
+					</MessagePreview>
 				</template>
 				<Tooltip
 					v-if="
@@ -152,7 +153,7 @@
 						:href="panelBinding.panel.guidanceUrl"
 						target="_blank"
 						rel="noopener noreferrer"
-						:aria-label="formatMessage(messages.openReviewGuidance)"
+						aria-label="Open review guidance in new tab"
 						class="flex text-secondary hover:text-contrast"
 					>
 						<InfoIcon class="size-4" aria-hidden="true" />
@@ -163,7 +164,7 @@
 	</div>
 	<div v-else class="flex items-center gap-2 text-secondary">
 		<p class="m-0 text-base">
-			{{ formatMessage(panelBinding ? messages.noIssues : messages.noReviewActions) }}
+			{{ panelBinding ? 'No issues.' : 'No review actions available for this section' }}
 		</p>
 		<Tooltip
 			v-if="panelBinding && (!panelBinding.panel.title || hideTitle) && panelBinding.panel.hint"
@@ -174,7 +175,7 @@
 				:href="panelBinding.panel.guidanceUrl"
 				target="_blank"
 				rel="noopener noreferrer"
-				:aria-label="formatMessage(messages.openReviewGuidance)"
+				aria-label="Open review guidance in new tab"
 				class="flex text-secondary hover:text-contrast"
 			>
 				<InfoIcon class="size-4" aria-hidden="true" />
@@ -186,15 +187,7 @@
 <script setup lang="ts">
 import { InfoIcon } from '@modrinth/assets'
 import { moderationSettings } from '@modrinth/moderation'
-import {
-	Combobox,
-	defineMessages,
-	Input,
-	MultiSelect,
-	Textarea,
-	Tooltip,
-	useVIntl,
-} from '@modrinth/ui'
+import { Combobox, Input, MultiSelect, Textarea, Tooltip } from '@modrinth/ui'
 import {
 	type ComponentPublicInstance,
 	computed,
@@ -205,7 +198,7 @@ import {
 } from 'vue'
 
 import TemplateMarkdownEditor from '~/components/project-review/message-thread/template-markdown-editor.vue'
-import { useModerationSettings } from '~/composables/moderation'
+import { useModerationKeybinds, useModerationSettings } from '~/composables/moderation'
 import type { ReviewTarget } from '~/providers/project-review/review'
 import {
 	injectReviewPanels,
@@ -213,8 +206,8 @@ import {
 } from '~/providers/project-review/review-panels'
 import { injectReviewPreviousIssues } from '~/providers/project-review/review-previous-issues'
 
-import { projectReviewMessages as messages } from '../../messages'
 import ActionButton from './action-button.vue'
+import MessagePreview from './message-preview.vue'
 import SlugInput from './slug-input.vue'
 
 const props = defineProps<{
@@ -228,25 +221,7 @@ const emit = defineEmits<{
 	'dropdown-close': [key: string]
 }>()
 const id = useId()
-const controlMessages = defineMessages({
-	textPlaceholder: {
-		id: 'project-review.controls.text-placeholder',
-		defaultMessage: 'Enter text…',
-	},
-	markdownPlaceholder: {
-		id: 'project-review.controls.markdown-placeholder',
-		defaultMessage: 'Explain what needs to change…',
-	},
-	select: {
-		id: 'project-review.controls.select',
-		defaultMessage: 'Select an option',
-	},
-	required: {
-		id: 'project-review.controls.required-value',
-		defaultMessage: 'Complete this required field.',
-	},
-})
-const { formatMessage } = useVIntl()
+
 const panels = injectReviewPanels()
 const previousIssues = injectReviewPreviousIssues()
 const settings = useModerationSettings()
@@ -355,20 +330,25 @@ function toggleControls(binding?: ReviewPanelBinding) {
 		) ?? []
 	)
 }
-const keybinds = computed(
+const toggleIndexes = computed(
 	() =>
 		new Map(
 			toggleControls(panelBinding.value).map((control, index) => [
 				control,
-				actionKeybind(index + (props.keybindOffset ?? 0)),
+				index + (props.keybindOffset ?? 0),
 			]),
 		),
 )
-function actionKeybind(index: number) {
-	if (index >= 27) return undefined
-	const modifier = index >= 18 ? 'Alt+' : index >= 9 ? 'Shift+' : ''
-	return `${modifier}${(index % 9) + 1}`
-}
+const configuredKeybinds = useModerationKeybinds()
+const keybinds = computed(() => {
+	const bindings = new Map([...configuredKeybinds.value])
+	return new Map(
+		[...toggleIndexes.value].map(([control, index]) => {
+			const definition = bindings.get(`review-panel-toggle-${index + 1}`)?.keybind[0]
+			return [control, definition]
+		}),
+	)
+})
 
 const hasControls = computed(() =>
 	panelBinding.value?.panel.sections.some((section) => section.controls.length > 0),

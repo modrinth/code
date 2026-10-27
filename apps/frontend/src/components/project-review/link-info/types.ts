@@ -1,8 +1,8 @@
 import type { AbstractModrinthClient } from '@modrinth/api-client'
 
-import type { messages } from './messages'
+import type { linkInfoLabels } from './labels'
 
-export type Label = keyof typeof messages
+export type Label = keyof typeof linkInfoLabels
 export type Detail = {
 	label: Label
 	value: string | number | boolean | { message: Label }

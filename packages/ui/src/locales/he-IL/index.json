@@ -2,39 +2,6 @@
   "action.no-permission": {
     "defaultMessage": "אין לך רשות."
   },
-  "affiliate.create.button": {
-    "defaultMessage": "צור קישור שותפות"
-  },
-  "affiliate.create.header": {
-    "defaultMessage": "יוצר קישור שותפות חדש"
-  },
-  "affiliate.create.title.description": {
-    "defaultMessage": "תביא לקישור השותפות שלך שם כדי שתדע מאיפה אנשים באים!"
-  },
-  "affiliate.create.title.label": {
-    "defaultMessage": "כותרת של הקישור שותפות"
-  },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "למשל יוטיוב"
-  },
-  "affiliate.create.user.description": {
-    "defaultMessage": "השם משתמש של המשתמש ליצירת קוד השותפות בשבילו"
-  },
-  "affiliate.create.user.placeholder": {
-    "defaultMessage": "הכנס שם משתמש..."
-  },
-  "affiliate.createdBy": {
-    "defaultMessage": "נוצר על ידי {user}"
-  },
-  "affiliate.creating.button": {
-    "defaultMessage": "יוצר קישור שותפות..."
-  },
-  "affiliate.revoke": {
-    "defaultMessage": "לבטל קישור שותפות"
-  },
-  "affiliate.viewAnalytics": {
-    "defaultMessage": "צפה ניתוחים"
-  },
   "app.appearance-settings.native-decorations.description": {
     "defaultMessage": ""
   },
@@ -88,9 +55,6 @@
   },
   "button.add-server-to-instance": {
     "defaultMessage": "הוסף שרת להתקנה"
-  },
-  "button.affiliate-links": {
-    "defaultMessage": "קישורי שותפות"
   },
   "button.analytics": {
     "defaultMessage": "אנליטיקה"

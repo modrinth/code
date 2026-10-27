@@ -13,21 +13,6 @@ pub fn convert_to_ip_v6(src: &str) -> Result<Ipv6Addr, AddrParseError> {
     })
 }
 
-pub fn strip_ip(ip: Ipv6Addr) -> u64 {
-    if let Some(ip) = ip.to_ipv4_mapped() {
-        let octets = ip.octets();
-        u64::from_be_bytes([
-            octets[0], octets[1], octets[2], octets[3], 0, 0, 0, 0,
-        ])
-    } else {
-        let octets = ip.octets();
-        u64::from_be_bytes([
-            octets[0], octets[1], octets[2], octets[3], octets[4], octets[5],
-            octets[6], octets[7],
-        ])
-    }
-}
-
 pub fn client_ip(req: &HttpRequest) -> Option<String> {
     if ENV.CLOUDFLARE_INTEGRATION
         && let Some(header) = req.headers().get("CF-Connecting-IP")

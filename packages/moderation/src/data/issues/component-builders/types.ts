@@ -72,18 +72,31 @@ interface IssueControlOptions {
 	disabled?: WithContext<boolean>
 }
 
+export interface IssueCardDisplayConfig {
+	/** Optional image URL displayed in the dropdown option's icon slot. */
+	icon?: WithContext<string | undefined>
+	/** Text displayed for this option in the issue card. */
+	label: WithContext<string>
+	/** Defaults to the toggle's panel label. */
+	group?: WithContext<string>
+	/** Optional dropdown heading; selected chips keep their own labels. */
+	dropdownSection?: WithContext<string>
+	/** Hides a configured card option without affecting the review panel or selection state. Defaults to false. */
+	hidden?: WithContext<boolean>
+}
+
 export interface IssueToggle extends IssueControlOptions {
 	type: 'toggle'
 	issue: Issue
-	/** Optional label for this toggle in the issue list. */
-	issueListLabel?: WithContext<string>
-	/** Optional issue-list row for this toggle. Defaults to the toggle label. */
-	issueListGroup?: WithContext<string>
+	/** Opts this toggle into the issue card's options with an explicit label. Omit for panel-only issue activation. */
+	issueCardDisplay?: IssueCardDisplayConfig
 	/**
 	 * Identifies a selection within its issue. Reuse the ID across panels to share selection state.
 	 * Without an ID, the toggle activates the issue directly and contributes no selected toggle ID.
 	 */
 	id?: string
+	/** Explicit toggle IDs to clear across issues when enabled. Item panels scope these IDs to the current item. */
+	unselectToggles?: readonly string[]
 }
 
 export type IssueToggleConfig = Omit<IssueToggle, 'type'>

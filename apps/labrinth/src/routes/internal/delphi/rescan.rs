@@ -40,7 +40,7 @@ pub async fn enqueue_tech_review_files_for_new_delphi_version(
     .wrap_err("fetching technical review files for Delphi rescan")?;
 
     for file_id in &file_ids {
-        delphi_scan::publish_file_scan(kafka_client, *file_id, false)
+        delphi_scan::publish_file_scan(kafka_client, *file_id, false, false)
             .await
             .wrap_err_with(|| {
                 format!("enqueueing file `{file_id:?}` for Delphi rescan")

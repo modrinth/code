@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import type { Archon, Labrinth } from '@modrinth/api-client'
-import { InfoIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
+import { InfoIcon, XIcon } from '@modrinth/assets'
 import { computed, onMounted, ref, watch } from 'vue'
 
 import { useFormatPrice } from '../../composables'
 import { defineMessages, useVIntl } from '../../composables/i18n'
+import { useRegionPings } from '../../composables/region-pings'
 import { getPriceForInterval, monthsInInterval } from '../../utils/product-utils.ts'
 import { regionOverrides } from '../../utils/regions.ts'
 import IntlFormatted from '../base/IntlFormatted.vue'
 import Slider from '../base/Slider.vue'
 import ModalLoadingIndicator from '../modal/ModalLoadingIndicator.vue'
-import type { RegionPing, ServerBillingInterval } from './ModrinthServersPurchaseModal.vue'
+import type { ServerBillingInterval } from './ModrinthServersPurchaseModal.vue'
 import ServersRegionButton from './ServersRegionButton.vue'
 import ServersSpecs from './ServersSpecs.vue'
 
@@ -19,11 +20,7 @@ const formatPrice = useFormatPrice()
 
 const props = defineProps<{
 	regions: Archon.Servers.v1.Region[]
-	pings: RegionPing[]
-	fetchStock: (
-		region: Archon.Servers.v1.Region,
-		request: Archon.Servers.v0.StockRequest,
-	) => Promise<number>
+	stock?: Archon.Servers.v1.StockResponse
 	custom: boolean
 	hideRegionSelection?: boolean
 	currency: string
@@ -31,8 +28,11 @@ const props = defineProps<{
 	availableProducts: Labrinth.Billing.Internal.Product[]
 }>()
 
-const loading = ref(false)
-const checkingCustomStock = ref(false)
+const PING_WAIT_TIMEOUT = 5000
+
+const { regionPings, waitForRegionPings } = useRegionPings()
+
+const loading = ref(true)
 const selectedPlan = defineModel<Labrinth.Billing.Internal.Product>('plan')
 const selectedRegion = defineModel<string>('region')
 
@@ -42,13 +42,32 @@ const selectedPrice = computed(() => {
 	return amount ? amount / monthsInInterval[props.interval] : undefined
 })
 
-const regionOrder: string[] = Object.keys(regionOverrides)
+const regionOrder = ref<string[]>(Object.keys(regionOverrides))
 
 const sortedRegions = computed(() => {
 	return props.regions.slice().sort((a, b) => {
-		return regionOrder.indexOf(a.shortcode) - regionOrder.indexOf(b.shortcode)
+		return regionOrder.value.indexOf(a.shortcode) - regionOrder.value.indexOf(b.shortcode)
 	})
 })
+
+function successfulPing(region: string): number {
+	const ping = regionPings.value[region]
+	return ping !== undefined && ping > 0 ? ping : Infinity
+}
+
+/**
+ * Orders the regions by ping once, so the cards don't move around while late pings come in.
+ */
+function sortRegionsByPing() {
+	regionOrder.value = sortedRegions.value
+		.slice()
+		.sort((a, b) => {
+			const pingA = successfulPing(a.shortcode)
+			const pingB = successfulPing(b.shortcode)
+			return pingA === pingB ? 0 : pingA - pingB
+		})
+		.map((region) => region.shortcode)
+}
 
 const visibleRegions = computed(() => {
 	if (!loading.value) {
@@ -65,16 +84,17 @@ const visibleRegions = computed(() => {
 
 const selectedRam = ref<number>(-1)
 
+function productRam(product: Labrinth.Billing.Internal.Product): number {
+	const metadata = product.metadata
+	return metadata.type === 'pyro' || metadata.type === 'medal' ? metadata.ram : 0
+}
+
+function regionStock(region: string, ramMb: number): number {
+	return props.stock?.regions.find((entry) => entry.region === region)?.stock[ramMb]?.available ?? 0
+}
+
 const ramOptions = computed(() => {
-	return props.availableProducts
-		.map((product) => {
-			const metadata = product.metadata
-			if (metadata.type === 'pyro' || metadata.type === 'medal') {
-				return metadata.ram / 1024
-			}
-			return 0
-		})
-		.filter((x) => x > 0)
+	return props.availableProducts.map((product) => productRam(product) / 1024).filter((x) => x > 0)
 })
 
 const minRam = computed(() => {
@@ -86,13 +106,8 @@ const maxRam = computed(() => {
 
 const lowestProduct = computed(() => {
 	return (
-		props.availableProducts.find((product) => {
-			const metadata = product.metadata
-			return (
-				(metadata.type === 'pyro' || metadata.type === 'medal') &&
-				metadata.ram / 1024 === minRam.value
-			)
-		}) ?? props.availableProducts[0]
+		props.availableProducts.find((product) => productRam(product) / 1024 === minRam.value) ??
+		props.availableProducts[0]
 	)
 })
 
@@ -110,43 +125,10 @@ const selectedPlanSpecs = computed(() => {
 })
 
 function updateRamStock(regionToCheck: string, newRam: number) {
-	if (newRam > 0) {
-		checkingCustomStock.value = true
-		const plan = props.availableProducts.find((product) => {
-			const metadata = product.metadata
-			return (
-				(metadata.type === 'pyro' || metadata.type === 'medal') && metadata.ram / 1024 === newRam
-			)
-		})
-		if (plan) {
-			const region = sortedRegions.value.find((region) => region.shortcode === regionToCheck)
-			if (region) {
-				const metadata = plan.metadata
-				if (metadata.type === 'pyro' || metadata.type === 'medal') {
-					props
-						.fetchStock(region, {
-							cpu: metadata.cpu,
-							memory_mb: metadata.ram,
-							swap_mb: metadata.swap,
-							storage_mb: metadata.storage,
-						})
-						.then((stock: number) => {
-							if (stock > 0) {
-								selectedPlan.value = plan
-							} else {
-								selectedPlan.value = undefined
-							}
-						})
-						.finally(() => {
-							checkingCustomStock.value = false
-						})
-				} else {
-					checkingCustomStock.value = false
-				}
-			} else {
-				checkingCustomStock.value = false
-			}
-		}
+	if (newRam <= 0) return
+	const plan = props.availableProducts.find((product) => productRam(product) === newRam * 1024)
+	if (plan) {
+		selectedPlan.value = regionStock(regionToCheck, productRam(plan)) > 0 ? plan : undefined
 	}
 }
 
@@ -162,8 +144,24 @@ watch(selectedRegion, (newRegion: string | undefined) => {
 	}
 })
 
-const currentStock = ref<{ [region: string]: number }>({})
-const bestPing = ref<string>()
+const currentStock = computed<Record<string, number>>(() => {
+	const product = props.custom ? lowestProduct.value : (selectedPlan.value ?? lowestProduct.value)
+	const ramMb = product ? productRam(product) : 0
+	return Object.fromEntries(
+		props.regions.map((region) => [region.shortcode, regionStock(region.shortcode, ramMb)]),
+	)
+})
+
+const bestPing = computed(() => {
+	const best = props.regions.reduce<Archon.Servers.v1.Region | undefined>(
+		(best, region) =>
+			successfulPing(region.shortcode) < (best ? successfulPing(best.shortcode) : Infinity)
+				? region
+				: best,
+		undefined,
+	)
+	return best?.shortcode
+})
 
 const messages = defineMessages({
 	prompt: {
@@ -189,69 +187,42 @@ const messages = defineMessages({
 	},
 })
 
-async function updateStock() {
-	currentStock.value = {}
-
-	const getStockRequest = (
-		product: Labrinth.Billing.Internal.Product,
-	): Archon.Servers.v0.StockRequest => {
-		const metadata = product.metadata
-		if (metadata.type === 'pyro' || metadata.type === 'medal') {
-			return {
-				cpu: metadata.cpu,
-				memory_mb: metadata.ram,
-				swap_mb: metadata.swap,
-				storage_mb: metadata.storage,
-			}
-		}
-		return { cpu: 0, memory_mb: 0, swap_mb: 0, storage_mb: 0 }
+/**
+ * Selects the first region with stock, which is the one with the best ping once the regions are sorted by ping.
+ */
+function selectInitialRegion() {
+	const stockedRegion =
+		selectedRegion.value ??
+		sortedRegions.value.find((region) => currentStock.value[region.shortcode] > 0)?.shortcode
+	selectedRegion.value = stockedRegion
+	if (props.custom && stockedRegion) {
+		updateRamStock(stockedRegion, minRam.value)
 	}
+}
 
-	const capacityChecks = sortedRegions.value.map((region) =>
-		props.fetchStock(
-			region,
-			selectedPlan.value
-				? getStockRequest(selectedPlan.value)
-				: getStockRequest(lowestProduct.value),
-		),
-	)
-	const results = await Promise.all(capacityChecks)
-	results.forEach((result, index) => {
-		currentStock.value[sortedRegions.value[index].shortcode] = result
+function whenStockLoaded(): Promise<void> {
+	if (props.stock) return Promise.resolve()
+	return new Promise((resolve) => {
+		watch(
+			() => props.stock,
+			() => resolve(),
+			{ once: true },
+		)
 	})
 }
 
-onMounted(() => {
-	// auto select region with lowest ping
-	loading.value = true
-	bestPing.value = [...props.pings].sort((a, b) => {
-		if (a.ping <= 0) return 1
-		if (b.ping <= 0) return -1
-		return a.ping - b.ping
-	})[0]?.region
+onMounted(async () => {
 	selectedRam.value = minRam.value
 	if (!props.hideRegionSelection) {
 		selectedRegion.value = undefined
 	}
-	checkingCustomStock.value = true
-	updateStock().then(() => {
-		const firstWithStock = sortedRegions.value.find(
-			(region) => currentStock.value[region.shortcode] > 0,
-		)
-		let stockedRegion = selectedRegion.value
-		if (!stockedRegion) {
-			stockedRegion = props.hideRegionSelection
-				? firstWithStock?.shortcode
-				: bestPing.value && currentStock.value[bestPing.value] > 0
-					? bestPing.value
-					: firstWithStock?.shortcode
-		}
-		selectedRegion.value = stockedRegion
-		if (props.custom && stockedRegion) {
-			updateRamStock(stockedRegion, minRam.value)
-		}
-		loading.value = false
-	})
+	await whenStockLoaded()
+	if (!props.hideRegionSelection) {
+		await waitForRegionPings(PING_WAIT_TIMEOUT)
+		sortRegionsByPing()
+	}
+	selectInitialRegion()
+	loading.value = false
 })
 </script>
 
@@ -264,14 +235,14 @@ onMounted(() => {
 			<h2 class="mt-0 mb-4 text-xl font-bold text-contrast">
 				{{ formatMessage(messages.prompt) }}
 			</h2>
-			<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+			<div class="grid grid-cols-1 sm:grid-cols-2 auto-rows-fr gap-4">
 				<ServersRegionButton
 					v-for="region in visibleRegions"
 					:key="region.shortcode"
 					v-model="selectedRegion"
 					:region="region"
 					:out-of-stock="currentStock[region.shortcode] === 0"
-					:ping="pings.find((p) => p.region === region.shortcode)?.ping"
+					:ping="regionPings[region.shortcode]"
 					:best-ping="bestPing === region.shortcode"
 				/>
 			</div>
@@ -309,10 +280,7 @@ onMounted(() => {
 					>
 				</p>
 				<div class="bg-bg rounded-xl p-4 mt-2 text-secondary h-14">
-					<div v-if="checkingCustomStock" class="flex gap-2 items-center">
-						<SpinnerIcon class="size-5 shrink-0 animate-spin" /> Checking availability...
-					</div>
-					<div v-else-if="selectedPlanSpecs">
+					<div v-if="selectedPlanSpecs">
 						<ServersSpecs
 							class="!flex-row justify-between"
 							:ram="selectedPlanSpecs.ram"

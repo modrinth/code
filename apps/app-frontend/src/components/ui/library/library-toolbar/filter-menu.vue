@@ -38,7 +38,7 @@ const filterCategories = computed<DropdownFilterBarCategory[]>(() => [
 	{
 		key: 'gameVersion',
 		label: formatMessage(messages.gameVersion),
-		searchable: true,
+		searchable: new Set(instances.value.map((instance) => instance.game_version)).size > 5,
 		options: [...new Set(instances.value.map((instance) => instance.game_version))]
 			.sort((a, b) => b.localeCompare(a, undefined, { numeric: true }))
 			.map((version) => ({ value: version, label: version })),

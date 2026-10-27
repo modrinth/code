@@ -815,9 +815,6 @@
   "auth.verify-email.title": {
     "message": "Verifikujte email"
   },
-  "collection.button.edit-icon": {
-    "message": "Ikona za izmenu"
-  },
   "collection.button.remove-project": {
     "message": "Ukloni projekat"
   },
@@ -1976,15 +1973,6 @@
   "settings.pats.modal.create.title": {
     "message": "Kreiraj lični pristupni token"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "Obriši ovaj token"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "Ovo će zauvek ukloniti ovaj token (ozbiljno — zauvek)."
-  },
-  "settings.pats.modal.delete.title": {
-    "message": "Jesi li siguran da želiš obrisati ovaj token?"
-  },
   "settings.pats.modal.edit.title": {
     "message": "Izmeni lični pristupni token"
   },
@@ -2009,14 +1997,8 @@
   "settings.sessions.action.revoke-session": {
     "message": "Opozovi sesiju"
   },
-  "settings.sessions.created-ago": {
-    "message": "Kreirano {ago}"
-  },
   "settings.sessions.current-session": {
     "message": "Trenutna sesija"
-  },
-  "settings.sessions.description": {
-    "message": "Ovo su svi uređaji koji su trenutno prijavljeni na tvoj Modrinth račun. Možeš se odjaviti sa svakog pojedinačno.\n\nAko vidiš unos koji ne prepoznaješ, odjavi se sa tog uređaja i odmah promeni lozinku za svoj Modrinth nalog."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Posljednji pristup {ago}"

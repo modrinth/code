@@ -5,10 +5,10 @@ use std::time::Duration;
 
 use actix_web::web;
 use queue::{
-    analytics::AnalyticsQueue, email::EmailQueue, payouts::PayoutsQueue,
-    session::AuthQueue, socket::ActiveSockets,
+    email::EmailQueue, payouts::PayoutsQueue, session::AuthQueue,
+    socket::ActiveSockets,
 };
-use tracing::{debug, info, warn};
+use tracing::{info, warn};
 use xredis::RedisPool;
 
 extern crate clickhouse as clickhouse_crate;
@@ -65,7 +65,6 @@ pub struct LabrinthConfig {
     pub search_state: web::Data<search::SearchState>,
     pub session_queue: web::Data<AuthQueue>,
     pub payouts_queue: web::Data<PayoutsQueue>,
-    pub analytics_queue: Arc<AnalyticsQueue>,
     pub active_sockets: web::Data<ActiveSockets>,
     pub rate_limiter: web::Data<AsyncRateLimiter>,
     pub stripe_client: stripe::Client,
@@ -163,23 +162,6 @@ pub fn app_setup(
         });
 
         let pool_ref = pool.clone();
-        let client_ref = clickhouse.clone();
-        let redis_pool_ref = redis_pool.clone();
-        scheduler.run(Duration::from_secs(60 * 60 * 6), move || {
-            let pool_ref = pool_ref.clone();
-            let client_ref = client_ref.clone();
-            let redis_ref = redis_pool_ref.clone();
-            async move {
-                if let Err(e) =
-                    background_task::payouts(pool_ref, client_ref, redis_ref)
-                        .await
-                {
-                    warn!("Payout task failed: {e:#}");
-                }
-            }
-        });
-
-        let pool_ref = pool.clone();
         let redis_ref = redis_pool.clone();
         let stripe_client_ref = stripe_client.clone();
         let anrok_client_ref = anrok_client.clone();
@@ -220,45 +202,20 @@ pub fn app_setup(
     let pool_ref = pool.clone();
     let redis_ref = redis_pool.clone();
     let session_queue_ref = session_queue.clone();
-    scheduler.run(Duration::from_secs(60 * 30), move || {
+    scheduler.run(Duration::from_secs(60 * 5), move || {
         let pool_ref = pool_ref.clone();
         let redis_ref = redis_ref.clone();
         let session_queue_ref = session_queue_ref.clone();
 
         async move {
-            info!("Indexing sessions queue");
-            let result = session_queue_ref.index(&pool_ref, &redis_ref).await;
-            if let Err(e) = result {
-                warn!("Indexing sessions queue failed: {:?}", e);
+            match session_queue_ref.index(&pool_ref, &redis_ref).await {
+                Ok((sessions, pats, oauth_access_tokens)) => info!(
+                    "Flushed auth activity to postgres: updated last_login/IP/user agent for {sessions} sessions, last_used for {pats} PATs and {oauth_access_tokens} OAuth access tokens"
+                ),
+                Err(e) => warn!("Flushing auth activity to postgres failed: {:?}", e),
             }
-            info!("Done indexing sessions queue");
         }
     });
-
-    let analytics_queue = Arc::new(AnalyticsQueue::new());
-    {
-        let client_ref = clickhouse.clone();
-        let analytics_queue_ref = analytics_queue.clone();
-        let pool_ref = pool.clone();
-        let redis_ref = redis_pool.clone();
-        scheduler.run(Duration::from_secs(15), move || {
-            let client_ref = client_ref.clone();
-            let analytics_queue_ref = analytics_queue_ref.clone();
-            let pool_ref = pool_ref.clone();
-            let redis_ref = redis_ref.clone();
-
-            async move {
-                debug!("Indexing analytics queue");
-                let result = analytics_queue_ref
-                    .index(client_ref, &redis_ref, &pool_ref)
-                    .await;
-                if let Err(e) = result {
-                    warn!("Indexing analytics queue failed: {:?}", e);
-                }
-                debug!("Done indexing analytics queue");
-            }
-        });
-    }
 
     let ip_salt = Pepper {
         pepper: ariadne::ids::Base62Id(ariadne::ids::random_base62(11))
@@ -300,7 +257,6 @@ pub fn app_setup(
         search_state,
         session_queue,
         payouts_queue: web::Data::new(PayoutsQueue::new()),
-        analytics_queue,
         active_sockets,
         rate_limiter: limiter,
         stripe_client,
@@ -356,7 +312,6 @@ pub fn app_data_config(
     .app_data(labrinth_config.payouts_queue.clone())
     .app_data(labrinth_config.email_queue.clone())
     .app_data(web::Data::new(labrinth_config.ip_salt.clone()))
-    .app_data(web::Data::new(labrinth_config.analytics_queue.clone()))
     .app_data(web::Data::new(labrinth_config.clickhouse.clone()))
     .app_data(labrinth_config.active_sockets.clone())
     .app_data(labrinth_config.archon_client.clone())

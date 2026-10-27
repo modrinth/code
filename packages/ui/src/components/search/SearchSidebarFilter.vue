@@ -73,6 +73,7 @@
 				v-if="filterType.display === 'depends-on-project'"
 				v-model:selected-filters="selectedFilters"
 				:project-type="projectType"
+				:dropdown-direction="dropdownDirection"
 				:inner-panel-class="innerPanelClass"
 				:selected-project-class="selectedProjectClass"
 				:result-count="resultCount"
@@ -270,6 +271,7 @@ const overriddenProvidedFilterTypes = defineModel<string[]>('overriddenProvidedF
 const props = defineProps<{
 	filterType: FilterType
 	projectType: string
+	dropdownDirection?: 'up' | 'down'
 	buttonClass?: string
 	contentClass?: string
 	innerPanelClass?: string

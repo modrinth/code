@@ -875,6 +875,9 @@
   "auth.sign-in.choose-account": {
     "message": "Kies een account om in de Modrinth-app te gebruiken"
   },
+  "auth.sign-in.choose-existing-account": {
+    "message": "Gebruik een bestaand account"
+  },
   "auth.sign-in.continue-with-email": {
     "message": "Doorgaan met e-mail"
   },
@@ -896,6 +899,9 @@
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Modrinth-app openen"
   },
+  "auth.sign-in.launcher.handoff-failed": {
+    "message": "Kon inloggen in de Modrinth App niet afmaken. Probeer opnieuw"
+  },
   "auth.sign-in.launcher.opening.description": {
     "message": "Als de app niet wordt geopend, gebruik dan de knop hieronder om je aan te melden."
   },
@@ -904,6 +910,9 @@
   },
   "auth.sign-in.no-account": {
     "message": "Heb je nog geen account?"
+  },
+  "auth.sign-in.reauthenticate.use-different-account": {
+    "message": "Gebruik een ander account"
   },
   "auth.sign-in.sign-in-with": {
     "message": "Log in bij Modrinth"
@@ -983,20 +992,11 @@
   "collection.button.discover-mods": {
     "message": "Mods ontdekken"
   },
-  "collection.button.edit-icon": {
-    "message": "Bewerk icoon"
-  },
   "collection.button.remove-icon": {
     "message": "Pictogram verwijderen"
   },
   "collection.button.remove-project": {
     "message": "Verwijder project"
-  },
-  "collection.button.replace-icon": {
-    "message": "Pictogram vervangen"
-  },
-  "collection.button.select-icon": {
-    "message": "Select icon"
   },
   "collection.button.unfollow-project": {
     "message": "Ontvolg project"
@@ -1010,14 +1010,20 @@
   "collection.description": {
     "message": "{description} - Bekijk de collectie {name} gemaakt door {username} op Modrinth"
   },
+  "collection.description-placeholder": {
+    "message": "Dit is een collectie van..."
+  },
   "collection.description.following": {
     "message": "Automatisch gegenereerde collectie van alle projecten die je volgt."
   },
-  "collection.editing": {
-    "message": "Verzameling bewerken"
+  "collection.edit": {
+    "message": "Bewaar collectie"
   },
   "collection.error.not-found": {
     "message": "Collectie niet gevonden"
+  },
+  "collection.icon-label": {
+    "message": "Icoon"
   },
   "collection.label.created-at": {
     "message": "{ago} gemaakt"
@@ -1049,6 +1055,9 @@
   "conversation-thread.action.approve": {
     "message": "Accepteren"
   },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "Accepteren met antwoord"
+  },
   "conversation-thread.action.close-report": {
     "message": "Rapport afsluiten"
   },
@@ -1057,6 +1066,9 @@
   },
   "conversation-thread.action.reject": {
     "message": "Afkeuren"
+  },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "Afkeuren met antwoord"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Heropen thread"
@@ -1091,6 +1103,9 @@
   "conversation-thread.action.withhold": {
     "message": "Terughouden"
   },
+  "conversation-thread.action.withhold-with-reply": {
+    "message": "Terughouden met antwoord"
+  },
   "conversation-thread.closed-thread.description": {
     "message": "Deze thread is gesloten en kan geen nieuwe berichten meer ontvangen."
   },
@@ -1099,6 +1114,9 @@
   },
   "conversation-thread.error.reopening-report": {
     "message": "Fout tijdens het heropenen van rapport"
+  },
+  "conversation-thread.error.sending-message": {
+    "message": "Fout tijdens het versturen van bericht"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Reageer op het thread..."
@@ -1138,6 +1156,9 @@
   },
   "conversation-thread.resubmit-modal.warning": {
     "message": "Herhaaldelijk berichten plaatsen zonder in te gaan op de opmerkingen van de moderators kan leiden tot een opschorting van je account."
+  },
+  "conversation-thread.resubmit-required-actions-tooltip": {
+    "message": "Je moet alle nodige acties hierboven uitvoeren voordat je kan herindienen."
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Aanvullende bestanden zijn bedoeld voor ondersteunende bronnen zoals source code, niet voor alternatieve versies of varianten."
@@ -1420,30 +1441,6 @@
   },
   "create.project.visibility-unlisted": {
     "message": "Verborgen"
-  },
-  "dashboard.affiliate-links.create.button": {
-    "message": "Maak een affiliate-link"
-  },
-  "dashboard.affiliate-links.empty.no-codes": {
-    "message": "Er zijn geen affiliatecodes gevonden."
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "Fout bij het laden van affiliatelinks"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "Je partnerlinks"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "Hierdoor wordt de affiliatecode `{id}` permanent ingetrokken en zijn alle bestaande links met deze code die zijn gedeeld, niet langer geldig."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "Intrekken"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "Weet je zeker dat je je affiliate-link ''{title}'' wilt intrekken?"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "Zoek affiliatelinks..."
   },
   "dashboard.analytics.from-projects": {
     "message": "van {count} {count, plural, one {project} other {projects}}"
@@ -2228,6 +2225,9 @@
   "error.generic.default.list_item.1": {
     "message": "Controleer of Modrinth een storing heeft op onze <status-link>Status pagina</status-link>."
   },
+  "error.generic.default.list_item.support": {
+    "message": "Als dit blijft gebeuren, wil je misschien ons Modrinth Team laten weten via ons <support-link>support portal</support-link>"
+  },
   "error.generic.default.list_title": {
     "message": "Probeer alstublieft opnieuw in een paar minuten."
   },
@@ -2663,9 +2663,6 @@
   "layout.action.file-lookup": {
     "message": "Bestand opzoeken"
   },
-  "layout.action.manage-affiliates": {
-    "message": "Beheer partner links"
-  },
   "layout.action.manage-server-notices": {
     "message": "Beheer server mededelingen"
   },
@@ -2951,6 +2948,9 @@
   "layout.publish.email-verification-required.title": {
     "message": "E-mailverificatie vereist"
   },
+  "messages.noResults": {
+    "message": "Geen resultaten gevonden!"
+  },
   "modal.shared-instance.open-in-app.benefit.install": {
     "message": "Alles wat ze spelen automatisch installeren"
   },
@@ -2974,6 +2974,33 @@
   },
   "modal.shared-instance.open-in-app.why-use": {
     "message": "Waarom de Modrinth-app gebruiken"
+  },
+  "moderation.appearance.apply": {
+    "message": "Pas thema toe"
+  },
+  "moderation.appearance.copied": {
+    "message": "Gekopieerd!"
+  },
+  "moderation.appearance.copy-error": {
+    "message": "Kon niet automatisch kopiëren. Selecteer en kopieer de JSON hieronder."
+  },
+  "moderation.appearance.download": {
+    "message": "Download JSON"
+  },
+  "moderation.appearance.export": {
+    "message": "Exporteer thema"
+  },
+  "moderation.appearance.file": {
+    "message": "Kies JSON-bestand"
+  },
+  "moderation.appearance.file-error": {
+    "message": "Kon dit bestand niet lezen. Kies een JSON-bestand kleiner dan 64 KB."
+  },
+  "moderation.appearance.import": {
+    "message": "Importeer thema"
+  },
+  "moderation.c2pa-scan.no-ai-files": {
+    "message": "Geen AI-gegenereerde bestanden gevonden."
   },
   "moderation.exclude-technical-review": {
     "message": "TR uitsluiten"
@@ -3385,6 +3412,9 @@
   },
   "project-member-header.success-join": {
     "message": "Je doet mee met het project team"
+  },
+  "project-moderation-nags.project-submitted-for-review": {
+    "message": "Je project is ingediend ter beoordeling!"
   },
   "project-moderation-nags.publishing-checklist": {
     "message": "Controlelijst publiceren"
@@ -4340,29 +4370,17 @@
   "report.not-for.dmca.description": {
     "message": "Zie onze <policy-link>Auteursrechtbeleid</policy-link>."
   },
-  "report.note.ai-images.1": {
-    "message": "We hebben zojuist onze regels bijgewerkt om AI-gegenereerde afbeeldingen te verbieden in pictogrammen, galerijen en beschrijvingen. We geven makers een vrijwaringsperiode om AI-afbeeldingen uit hun projecten te verwijderen voordat we rapporten voor hen gaan accepteren."
-  },
-  "report.note.check-back-later": {
-    "message": "Kom later terug zodra de genadeperiode is afgelopen. Rapporten van dit type worden op dit moment niet geaccepteerd."
-  },
   "report.note.copyright.1": {
     "message": "Houd er rekening mee dat je *geen* DMCA-verzoek tot verwijdering indient, maar een melding van opnieuw geüploade inhoud."
   },
   "report.note.copyright.2": {
     "message": "Als je in plaats hiervan een DMCA-verzoek tot verwijdering (een juridische procedure) wilde indienen, raadpleeg dan ons <copyright-policy-link>auteursrechtbeleid</copyright-policy-link>."
   },
-  "report.note.fully-ai-generated.1": {
-    "message": "We hebben zojuist onze regels bijgewerkt om AI-gegenereerde projecten volledig te verbieden. We geven makers een vrijwaringsperiode om door AI-gegenereerde projecten volledig bij te werken of op te nemen voordat we rapporten voor hen accepteren."
-  },
   "report.note.malicious.1": {
     "message": "Rapporten voor malware en niet geaccepteerde content moeten bewijs hebben zoals code voorbeelden."
   },
   "report.note.malicious.2": {
     "message": "Samenvattingen van Microsoft Defender, VirusTotal, of AI malware is geen goede vorm van bewijs en zal niet geaccepteerd worden."
-  },
-  "report.note.missing-disclosure.1": {
-    "message": "Content onthullingen zijn een nieuwe functie die we zojuist hebben toegevoegd. We geven de makers een vrijwaringsperiode om hun onthullingen up-to-date te krijgen voordat we rapporten voor ontbrekende of onjuiste onthullingen gaan accepteren."
   },
   "report.please-report": {
     "message": "Graag rapporteer:"
@@ -5312,15 +5330,6 @@
   "settings.pats.modal.create.title": {
     "message": "Persoonlijke toegangstoken aanmaken"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "Verwijder deze token"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "Dit zal deze token voor altijd verwijderen (echt voor altijd)."
-  },
-  "settings.pats.modal.delete.title": {
-    "message": "Weet u zeker dat u deze token wilt verwijderen?"
-  },
   "settings.pats.modal.edit.title": {
     "message": "Persoonlijke toegangstoken bewerken"
   },
@@ -5345,14 +5354,8 @@
   "settings.sessions.action.revoke-session": {
     "message": "Sessie beëindigen"
   },
-  "settings.sessions.created-ago": {
-    "message": "Gemaakt {ago}"
-  },
   "settings.sessions.current-session": {
     "message": "Huidige sessie"
-  },
-  "settings.sessions.description": {
-    "message": "Hier vind je alle apparaten die momenteel zijn aangemeld bij je Modrinth-account. Je kunt je op elk apparaat afzonderlijk afmelden.\n\nAls je een vermelding ziet die je niet herkent, meld je dan af op dat apparaat en wijzig onmiddellijk het wachtwoord van je Modrinth-account."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Laatst geopend {ago}"

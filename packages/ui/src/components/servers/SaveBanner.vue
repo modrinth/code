@@ -3,26 +3,27 @@
 		<FloatingActionBar :shown="props.isVisible" :inline="!!saveBanner">
 			<p class="m-0 font-semibold text-sm md:text-base">You have unsaved changes.</p>
 			<div class="ml-auto flex gap-2">
-				<Button type="quiet" :disabled="props.isUpdating" @click="props.reset"
+				<Button type="quiet" :disabled="props.isUpdating || saved" @click="handleReset"
 					><HistoryIcon /> Reset</Button
 				>
 				<span v-tooltip="saveDisabledTooltip" class="flex">
 					<Button
 						:type="props.restart ? 'base' : 'colored'"
 						:color="props.restart ? undefined : 'brand'"
-						:disabled="props.isUpdating || props.hasErrors"
-						@click="props.save"
+						:disabled="props.isUpdating || props.hasErrors || saved"
+						@click="handleSave"
 					>
 						<SpinnerIcon v-if="props.isUpdating" class="animate-spin" />
+						<CheckIcon v-else-if="saved" />
 						<SaveIcon v-else />
-						{{ props.isUpdating ? 'Saving...' : 'Save' }}
+						{{ saveButtonLabel }}
 					</Button>
 				</span>
 				<span v-if="props.restart" v-tooltip="saveDisabledTooltip" class="flex">
 					<Button
 						type="colored"
 						color="brand"
-						:disabled="props.isUpdating || isTransitioning || props.hasErrors"
+						:disabled="props.isUpdating || isTransitioning || props.hasErrors || saved"
 						@click="saveAndPower"
 					>
 						<SpinnerIcon v-if="props.isUpdating || isTransitioning" class="animate-spin" />
@@ -35,8 +36,8 @@
 </template>
 
 <script setup lang="ts">
-import { HistoryIcon, SaveIcon, SpinnerIcon } from '@modrinth/assets'
-import { computed, onBeforeUnmount, watch } from 'vue'
+import { CheckIcon, HistoryIcon, SaveIcon, SpinnerIcon } from '@modrinth/assets'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 
 import { Button } from '#ui/components/base/buttons'
 import FloatingActionBar from '#ui/components/base/FloatingActionBar.vue'
@@ -63,12 +64,38 @@ const saveDisabledTooltip = computed(() =>
 	props.hasErrors ? formatMessage(resolveErrorsMessage) : undefined,
 )
 
+const savedMessage = defineMessage({
+	id: 'hosting.save-banner.saved',
+	defaultMessage: 'Saved',
+})
+
 const saveBanner = injectServerSettings(null)?.saveBanner
+
+const saveRequested = ref(false)
+const saved = ref(false)
+
+const saveButtonLabel = computed(() => {
+	if (props.isUpdating) return 'Saving...'
+	if (saved.value) return formatMessage(savedMessage)
+	return 'Save'
+})
+
+function handleSave() {
+	saveRequested.value = true
+	return props.save()
+}
+
+function handleReset() {
+	saveRequested.value = false
+	props.reset()
+}
 
 watch(
 	() => props.isVisible,
 	(shown) => {
 		if (saveBanner) saveBanner.shown.value = shown
+		saved.value = !shown && saveRequested.value
+		saveRequested.value = false
 	},
 	{ immediate: true },
 )
@@ -96,7 +123,7 @@ const powerButtonLabel = computed(() => {
 const saveAndPower = async () => {
 	if (props.hasErrors) return
 	try {
-		if ((await props.save()) === false) return
+		if ((await handleSave()) === false) return
 	} catch {
 		return
 	}

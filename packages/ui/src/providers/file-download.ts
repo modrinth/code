@@ -1,14 +1,24 @@
 import { createContext } from './create-context'
 
-export interface FileDownload {
-	type: 'server-file'
+interface ServerDownloadBase {
 	filename: string
 	serverId: string
 	serverName: string
 	nodeUrlHost: string
 	worldId: string
+}
+
+export interface ServerFileDownload extends ServerDownloadBase {
+	type: 'server-file'
 	path: string
 }
+
+export interface ServerBackupDownload extends ServerDownloadBase {
+	type: 'server-backup'
+	backupId: string
+}
+
+export type FileDownload = ServerFileDownload | ServerBackupDownload
 
 export interface FileDownloadProvider {
 	download: (file: FileDownload) => Promise<boolean>

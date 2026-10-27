@@ -34,6 +34,9 @@ export const reReviewReviewPanel = panel({
 		issue: reReviewIgnoredIssue,
 		label: 'Multiple times in a row',
 		id: 're-review-warning',
+		issueCardDisplay: {
+			label: 'Multiple times in a row',
+		},
 		shown: (ctx) => ctx.selected.issueIds.includes(reReviewIgnoredIssue.id),
 	}),
 )

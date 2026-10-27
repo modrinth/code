@@ -719,20 +719,11 @@
   "collection.aria-label.upload-icon": {
     "message": "Muat naik ikon"
   },
-  "collection.button.edit-icon": {
-    "message": "Sunting ikon"
-  },
   "collection.button.remove-icon": {
     "message": "Alih keluar ikon"
   },
   "collection.button.remove-project": {
     "message": "Alih keluar projek"
-  },
-  "collection.button.replace-icon": {
-    "message": "Ganti ikon"
-  },
-  "collection.button.select-icon": {
-    "message": "Pilih ikon"
   },
   "collection.button.unfollow-project": {
     "message": "Nyahikut projek"
@@ -748,9 +739,6 @@
   },
   "collection.description.following": {
     "message": "Koleksi semua projek yang anda ikuti yang dijana secara automatik."
-  },
-  "collection.editing": {
-    "message": "Menyunting koleksi"
   },
   "collection.error.not-found": {
     "message": "Koleksi tidak dijumpai"
@@ -785,11 +773,17 @@
   "conversation-thread.action.approve": {
     "message": "Luluskan"
   },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "Luluskan dengan balasan"
+  },
   "conversation-thread.action.close-with-reply": {
     "message": "Tutup dengan balasan"
   },
   "conversation-thread.action.reject": {
     "message": "Tolak"
+  },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "Tolak dengan balasan"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Buka semula bebenang"
@@ -824,11 +818,17 @@
   "conversation-thread.action.withhold": {
     "message": "Tahan"
   },
+  "conversation-thread.action.withhold-with-reply": {
+    "message": "Tahan dengan balasan"
+  },
   "conversation-thread.error.closing-report": {
     "message": "Ralat semasa menutup laporan"
   },
   "conversation-thread.error.reopening-report": {
     "message": "Ralat semasa membuka semula laporan"
+  },
+  "conversation-thread.error.sending-message": {
+    "message": "Ralat semasa menghantar mesej"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Balas bebenang..."
@@ -1057,27 +1057,6 @@
   },
   "create.project.visibility-unlisted": {
     "message": "Tidak disenaraikan"
-  },
-  "dashboard.affiliate-links.create.button": {
-    "message": "Cipta pautan afiliasi"
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "Ralat semasa memuat pautan afiliasi"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "Pautan afiliasi anda"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "Ini akan membatalkan kod afiliasi `{id}` secara kekal dan sebarang pautan sedia ada dengan kod ini yang telah dikongsi tidak lagi sah."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "Batalkan"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "Adakah anda pasti mahu membatalkan pautan afiliasi anda yang bernama ''{title}''?"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "Cari pautan afiliasi..."
   },
   "dashboard.analytics.from-projects": {
     "message": "daripada {count} {count, plural, other {projek}}"
@@ -2164,9 +2143,6 @@
   },
   "layout.action.file-lookup": {
     "message": "Carian fail"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "Urus pautan afiliasi"
   },
   "layout.action.manage-server-notices": {
     "message": "Urus notis pelayan"
@@ -4085,15 +4061,6 @@
   "settings.pats.modal.create.title": {
     "message": "Cipta token akses peribadi (PAT)"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "Padam token ini"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "Ini akan mengalih keluar token ini selama-lamanya (yang benar-benar selamanya)."
-  },
-  "settings.pats.modal.delete.title": {
-    "message": "Adakah anda pasti mahu memadamkan token ini?"
-  },
   "settings.pats.modal.edit.title": {
     "message": "Sunting token akses peribadi (PAT)"
   },
@@ -4118,14 +4085,8 @@
   "settings.sessions.action.revoke-session": {
     "message": "Batalkan sesi"
   },
-  "settings.sessions.created-ago": {
-    "message": "Dicipta {ago}"
-  },
   "settings.sessions.current-session": {
     "message": "Sesi semasa"
-  },
-  "settings.sessions.description": {
-    "message": "Berikut ialah semua peranti yang sedang dilog masuk dengan akaun Modrinth anda. Anda boleh log keluar daripada setiap satu peranti secara individu.\n\nJika anda melihat entri yang anda tidak kenali, log keluar daripada peranti itu dan tukar kata laluan akaun Modrinth anda dengan segera."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Kali terakhir diakses {ago}"

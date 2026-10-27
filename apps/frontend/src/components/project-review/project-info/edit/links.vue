@@ -1,7 +1,7 @@
 <template>
 	<EditModal
 		ref="modal"
-		:section="formatMessage(reviewMessages.links)"
+		section="Links"
 		:saving="saving"
 		:can-save="canSave"
 		width="52rem"
@@ -17,14 +17,14 @@
 					<TeleportOverflowMenu
 						v-if="section.id === 'donations' && section.rows.length > 0"
 						:options="donationPlatformOptions"
-						:label="formatMessage(messages.addLink)"
+						label="Add link"
 						:disabled="saving || donationPlatformOptions.length === 0"
 						:icon-only="false"
 						type="outlined"
 						placement="bottom-end"
 					>
 						<PlusIcon aria-hidden="true" />
-						{{ formatMessage(messages.addLink) }}
+						Add link
 					</TeleportOverflowMenu>
 				</div>
 				<Table
@@ -37,11 +37,14 @@
 						<span class="ml-3.5">{{ column.label }}</span>
 					</template>
 					<template #empty-state>
-						<EmptyState :description="formatMessage(messages.donationsDescription)" class="my-4">
+						<EmptyState
+							description="Add donation links for users to support you directly."
+							class="my-4"
+						>
 							<template #actions>
 								<TeleportOverflowMenu
 									:options="donationPlatformOptions"
-									:label="formatMessage(messages.addLink)"
+									label="Add link"
 									:disabled="saving || donationPlatformOptions.length === 0"
 									:icon-only="false"
 									type="outlined"
@@ -49,7 +52,7 @@
 									class="-mt-4"
 								>
 									<PlusIcon aria-hidden="true" />
-									{{ formatMessage(messages.addLink) }}
+									Add link
 								</TeleportOverflowMenu>
 							</template>
 						</EmptyState>
@@ -66,13 +69,11 @@
 								:model-value="row.value"
 								:type="row.donation?.mode === 'username' ? 'text' : 'url'"
 								:placeholder="
-									row.donation
-										? donationPlaceholder(row.donation)
-										: formatMessage(messages.urlPlaceholder)
+									row.donation ? donationPlaceholder(row.donation) : 'Enter a valid URL'
 								"
 								:maxlength="2048"
 								:disabled="saving"
-								:aria-describedby="row.inputId + '-help'"
+								:aria-describedby="`${row.inputId}-help`"
 								autocapitalize="none"
 								autocomplete="off"
 								:spellcheck="false"
@@ -90,16 +91,10 @@
 								@update:value="changeDonationMode(row.donation, $event)"
 							/>
 							<IconButton
-								v-tooltip="
-									visitUrl(row.url)
-										? formatMessage(messages.visitLink, {
-												url: visitUrl(row.url),
-											})
-										: null
-								"
+								v-tooltip="visitUrl(row.url) ? `Visit ${visitUrl(row.url)}` : null"
 								type="base"
 								class="shrink-0"
-								:label="formatMessage(messages.visitLink, { url: visitUrl(row.url) })"
+								:label="`Visit ${visitUrl(row.url)}`"
 								:disabled="!visitUrl(row.url)"
 								@mousedown.stop
 								@click.stop="visitLink(row.url)"
@@ -108,22 +103,22 @@
 							</IconButton>
 							<IconButton
 								v-if="row.donation"
-								v-tooltip="formatMessage(messages.removeDonation)"
+								v-tooltip="'Remove donation link'"
 								type="base"
 								class="shrink-0"
-								:label="formatMessage(messages.removeDonation)"
+								label="Remove donation link"
 								:disabled="saving"
 								@click.stop="removeDonation(row.donation)"
 							>
 								<XIcon />
 							</IconButton>
 						</div>
-						<span :id="row.inputId + '-help'" class="sr-only">{{ row.description }}</span>
+						<span :id="`${row.inputId}-help`" class="sr-only">{{ row.description }}</span>
 					</template>
 				</Table>
 			</section>
 			<p v-if="!urlsValid" class="m-0 text-sm text-red" role="alert">
-				{{ formatMessage(messages.invalidUrl) }}
+				Enter valid HTTP or HTTPS URLs before saving.
 			</p>
 		</div>
 	</EditModal>
@@ -133,7 +128,6 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { ExternalIcon, PlusIcon, XIcon } from '@modrinth/assets'
 import {
-	defineMessages,
 	EmptyState,
 	IconButton,
 	Input,
@@ -142,7 +136,6 @@ import {
 	Tabs,
 	type TabsValue,
 	TeleportOverflowMenu,
-	useVIntl,
 } from '@modrinth/ui'
 import { computed, nextTick, reactive, ref, useTemplateRef } from 'vue'
 
@@ -155,7 +148,6 @@ import {
 } from '~/helpers/donation-links'
 import { normalizeProjectUrl } from '~/helpers/project-url'
 
-import { projectReviewMessages as reviewMessages } from '../../messages'
 import EditModal from './edit-modal.vue'
 import { useProjectInfoEdit } from './use-project-edit'
 
@@ -177,101 +169,6 @@ type LinkTableRow = {
 	donation?: DonationRow
 }
 
-const messages = defineMessages({
-	issues: {
-		id: 'project.settings.links.issues',
-		defaultMessage: 'Issue tracker',
-	},
-	issuesDescription: {
-		id: 'project.settings.links.issues-description',
-		defaultMessage: 'A place for users to report bugs, issues, and concerns about your project.',
-	},
-	source: {
-		id: 'project.settings.links.source',
-		defaultMessage: 'Source code',
-	},
-	sourceDescription: {
-		id: 'project.settings.links.source-description',
-		defaultMessage: 'A page/repository containing the source code for your project',
-	},
-	wiki: { id: 'project.settings.links.wiki', defaultMessage: 'Wiki page' },
-	wikiDescription: {
-		id: 'project.settings.links.wiki-description',
-		defaultMessage: 'A page containing information, documentation, and help for the project.',
-	},
-	discord: {
-		id: 'project.settings.links.discord',
-		defaultMessage: 'Discord invite',
-	},
-	discordDescription: {
-		id: 'project.settings.links.discord-description',
-		defaultMessage: 'An invitation link to your Discord server.',
-	},
-	site: { id: 'project.settings.links.site', defaultMessage: 'Website' },
-	siteDescription: {
-		id: 'project.settings.links.site-description',
-		defaultMessage: "Your server's official website.",
-	},
-	store: { id: 'project.settings.links.store', defaultMessage: 'Store' },
-	storeDescription: {
-		id: 'project.settings.links.store-description',
-		defaultMessage: "A link to your server's store or shop.",
-	},
-	linkType: {
-		id: 'project.settings.links.link-type',
-		defaultMessage: 'Link type',
-	},
-	donationPlatform: {
-		id: 'project.settings.links.donation-platform',
-		defaultMessage: 'Platform',
-	},
-	donationLink: {
-		id: 'project.settings.links.donation-link',
-		defaultMessage: 'Link',
-	},
-	donations: {
-		id: 'project.settings.links.donations',
-		defaultMessage: 'Donation links',
-	},
-	addLink: {
-		id: 'project.settings.links.add-link',
-		defaultMessage: 'Add link',
-	},
-	removeDonation: {
-		id: 'project.settings.links.remove-donation-link',
-		defaultMessage: 'Remove donation link',
-	},
-	donationsDescription: {
-		id: 'project.settings.links.donations-description',
-		defaultMessage: 'Add donation links for users to support you directly.',
-	},
-	urlPlaceholder: {
-		id: 'project.settings.links.url-placeholder',
-		defaultMessage: 'Enter a valid URL',
-	},
-	donationUsernamePlaceholder: {
-		id: 'project.settings.links.donation-username-placeholder',
-		defaultMessage: 'Enter your {platform} username',
-	},
-	donationUrl: {
-		id: 'project.settings.links.donation-url',
-		defaultMessage: 'URL',
-	},
-	donationUsername: {
-		id: 'project.settings.links.donation-username',
-		defaultMessage: 'Username',
-	},
-	visitLink: {
-		id: 'project.settings.links.visit-link',
-		defaultMessage: 'Visit {url}',
-	},
-	invalidUrl: {
-		id: 'project.settings.links.invalid-url',
-		defaultMessage: 'Enter valid HTTP or HTTPS URLs before saving.',
-	},
-})
-
-const { formatMessage } = useVIntl()
 const tags = useGeneratedState()
 const { project, saving, beginEditing, saveProject } = useProjectInfoEdit()
 const modal = useTemplateRef<InstanceType<typeof EditModal>>('modal')
@@ -293,19 +190,31 @@ const visibleFields = computed<EditableLinkField[]>(() =>
 		: ['issues', 'source', 'wiki', 'discord'],
 )
 const fieldMessages = computed(() => ({
-	issues: { title: messages.issues, description: messages.issuesDescription },
-	source: { title: messages.source, description: messages.sourceDescription },
-	wiki: { title: messages.wiki, description: messages.wikiDescription },
-	discord: {
-		title: messages.discord,
-		description: messages.discordDescription,
+	issues: {
+		title: 'Issue tracker',
+		description: 'A place for users to report bugs, issues, and concerns about your project.',
 	},
-	site: { title: messages.site, description: messages.siteDescription },
-	store: { title: messages.store, description: messages.storeDescription },
+	source: {
+		title: 'Source code',
+		description: 'A page/repository containing the source code for your project',
+	},
+	wiki: {
+		title: 'Wiki page',
+		description: 'A page containing information, documentation, and help for the project.',
+	},
+	discord: {
+		title: 'Discord invite',
+		description: 'An invitation link to your Discord server.',
+	},
+	site: { title: 'Website', description: "Your server's official website." },
+	store: {
+		title: 'Store',
+		description: "A link to your server's store or shop.",
+	},
 }))
 const donationModeTabs = computed(() => [
-	{ value: 'username', label: formatMessage(messages.donationUsername) },
-	{ value: 'url', label: formatMessage(messages.donationUrl) },
+	{ value: 'username', label: 'Username' },
+	{ value: 'url', label: 'URL' },
 ])
 const donationPlatformOptions = computed(() =>
 	tags.value.donationPlatforms
@@ -319,22 +228,22 @@ const donationPlatformOptions = computed(() =>
 const linkColumns = computed<TableColumn<'name' | 'url'>[]>(() => [
 	{
 		key: 'name',
-		label: formatMessage(messages.linkType),
+		label: 'Link type',
 		width: '12rem',
 		cellClass: 'pr-3 py-3',
 	},
 	{
 		key: 'url',
-		label: formatMessage(messages.donationUrl),
+		label: 'URL',
 		cellClass: 'py-3 pl-1',
 	},
 ])
 const linkRows = computed<LinkTableRow[]>(() => [
 	...visibleFields.value.map((field) => ({
 		id: field,
-		inputId: 'project-review-link-' + field,
-		name: formatMessage(fieldMessages.value[field].title),
-		description: formatMessage(fieldMessages.value[field].description),
+		inputId: `project-review-link-${field}`,
+		name: fieldMessages.value[field].title,
+		description: fieldMessages.value[field].description,
 		value: currentLinks[field],
 		url: currentLinks[field],
 		field,
@@ -342,10 +251,10 @@ const linkRows = computed<LinkTableRow[]>(() => [
 	...(isServerProject.value
 		? []
 		: donationLinks.value.map((donation) => ({
-				id: 'donation-' + donation.key,
-				inputId: 'project-review-donation-' + donation.key,
+				id: `donation-${donation.key}`,
+				inputId: `project-review-donation-${donation.key}`,
 				name: donationPlatformTitle(donation),
-				description: formatMessage(messages.donationsDescription),
+				description: 'Add donation links for users to support you directly.',
 				value: donation.input,
 				url: donation.url,
 				donation,
@@ -354,7 +263,7 @@ const linkRows = computed<LinkTableRow[]>(() => [
 const linkSections = computed(() => [
 	{
 		id: 'links',
-		title: formatMessage(reviewMessages.links),
+		title: 'Links',
 		columns: linkColumns.value,
 		rows: linkRows.value.filter((row) => row.field),
 	},
@@ -363,12 +272,10 @@ const linkSections = computed(() => [
 		: [
 				{
 					id: 'donations',
-					title: formatMessage(messages.donations),
+					title: 'Donation links',
 					columns: linkColumns.value.map((column) => ({
 						...column,
-						label: formatMessage(
-							column.key === 'name' ? messages.donationPlatform : messages.donationLink,
-						),
+						label: column.key === 'name' ? 'Platform' : 'Link',
 					})),
 					rows: linkRows.value.filter((row) => row.donation),
 				},
@@ -425,10 +332,8 @@ function donationPlatformTitle(row: DonationRow) {
 }
 
 function donationPlaceholder(row: DonationRow) {
-	if (row.mode !== 'username') return formatMessage(messages.urlPlaceholder)
-	return formatMessage(messages.donationUsernamePlaceholder, {
-		platform: donationPlatformTitle(row),
-	})
+	if (row.mode !== 'username') return 'Enter a valid URL'
+	return `Enter your ${donationPlatformTitle(row)} username`
 }
 
 function visitUrl(value: string) {

@@ -225,10 +225,22 @@ impl EmailQueue {
                         .await
                         .wrap_internal_err("fetching user from database")?;
 
-                let Some(mailbox) = maybe_user
-                    .and_then(|user| user.email)
-                    .and_then(|email| email.parse().ok())
-                else {
+                let Some(user) = maybe_user else {
+                    return Ok((
+                        notification.id,
+                        NotificationDeliveryStatus::SkippedPreferences,
+                    ));
+                };
+
+                // user email is new email at this point, pull old email from the notification body
+                let mailbox = match &notification.body {
+                    NotificationBody::EmailChanged { to_email, .. } => {
+                        to_email.parse().ok()
+                    }
+                    _ => user.email.and_then(|email| email.parse().ok()),
+                };
+
+                let Some(mailbox) = mailbox else {
                     return Ok((
                         notification.id,
                         NotificationDeliveryStatus::SkippedPreferences,

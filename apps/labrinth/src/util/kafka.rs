@@ -136,5 +136,5 @@ pub struct ServiceMetadata {
 
 pub static SERVICE_METADATA: ServiceMetadata = ServiceMetadata {
     service_name: "labrinth",
-    service_version: env!("CARGO_PKG_VERSION"),
+    service_version: env!("LABRINTH_VERSION"),
 };

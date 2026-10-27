@@ -1007,20 +1007,11 @@
   "collection.button.discover-mods": {
     "message": "Descubrir mods"
   },
-  "collection.button.edit-icon": {
-    "message": "Editar ícono"
-  },
   "collection.button.remove-icon": {
     "message": "Eliminar ícono"
   },
   "collection.button.remove-project": {
     "message": "Eliminar proyecto"
-  },
-  "collection.button.replace-icon": {
-    "message": "Reemplazar ícono"
-  },
-  "collection.button.select-icon": {
-    "message": "Seleccionar ícono"
   },
   "collection.button.unfollow-project": {
     "message": "Dejar de seguir proyecto"
@@ -1036,9 +1027,6 @@
   },
   "collection.description.following": {
     "message": "Colección generada automáticamente de todos los proyectos que sigues."
-  },
-  "collection.editing": {
-    "message": "Editando colección"
   },
   "collection.error.not-found": {
     "message": "Colección no encontrada"
@@ -1073,6 +1061,9 @@
   "conversation-thread.action.approve": {
     "message": "Aprovar"
   },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "Aprovar con respuesta"
+  },
   "conversation-thread.action.close-report": {
     "message": "Cerrar informe"
   },
@@ -1081,6 +1072,9 @@
   },
   "conversation-thread.action.reject": {
     "message": "Rechazar"
+  },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "Rechazar con respuesta"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Reabrir hilo"
@@ -1115,6 +1109,9 @@
   "conversation-thread.action.withhold": {
     "message": "Retener"
   },
+  "conversation-thread.action.withhold-with-reply": {
+    "message": "Retener con respuesta"
+  },
   "conversation-thread.closed-thread.description": {
     "message": "Este hilo está cerrado y no se pueden enviar nuevos mensajes."
   },
@@ -1123,6 +1120,12 @@
   },
   "conversation-thread.error.reopening-report": {
     "message": "Error al reabrir el reporte"
+  },
+  "conversation-thread.error.sending-message": {
+    "message": "Error al enviar el mensaje"
+  },
+  "conversation-thread.image.open-externally": {
+    "message": "Abrir externamente"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Responder al hilo..."
@@ -1145,6 +1148,18 @@
   "conversation-thread.reply-modal.help-center-note": {
     "message": "Si necesitas ponerte en contacto con el equipo de moderación, por favor utiliza el <help-center-link>Centro de ayuda de Modrinth</help-center-link> y haz clic en la burbuja azúl en la esquina inferior derecha para contactar soporte."
   },
+  "conversation-thread.reply.addresses": {
+    "message": "Esta respuesta aborda las siguientes explicaciones solicitadas:"
+  },
+  "conversation-thread.reply.changed-thread": {
+    "message": "El hilo seleccionado cambió. Vuelve a abrirlo antes de responder."
+  },
+  "conversation-thread.reply.facet": {
+    "message": "Explicación de {issue}"
+  },
+  "conversation-thread.reply.unknown-issue": {
+    "message": "Problema de moderación"
+  },
   "conversation-thread.resubmit-modal.confirmation.description": {
     "message": "Confirma que has atendido las observaciones de los moderadores"
   },
@@ -1162,6 +1177,12 @@
   },
   "conversation-thread.resubmit-modal.warning": {
     "message": "Envíos repetidos sin atender las observaciones de los moderadores pueden resultar en la suspensión de la cuenta."
+  },
+  "conversation-thread.resubmit-required-actions-tooltip": {
+    "message": "Debes completar todas las acciones requeridas arriba para volver a enviar"
+  },
+  "conversation-thread.submit-modal.description": {
+    "message": "Estás enviando <project-title>{projectTitle}</project-title> para que lo revisen los moderadores."
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Los archivos complementarios sirven para recursos de apoyo, como código fuente, no para versiones o variantes alternativas."
@@ -1445,29 +1466,20 @@
   "create.project.visibility-unlisted": {
     "message": "No listado"
   },
-  "dashboard.affiliate-links.create.button": {
-    "message": "Crear enlace de afiliado"
+  "create.restricted-alert.description": {
+    "message": "Un moderador eliminó este permiso de tu cuenta."
   },
-  "dashboard.affiliate-links.empty.no-codes": {
-    "message": "No se encontraron códigos de afiliado."
+  "create.restricted-alert.header": {
+    "message": "Acción restringida"
   },
-  "dashboard.affiliate-links.error.title": {
-    "message": "Error al cargar los enlaces de afiliado"
+  "create.restricted-alert.view-standing": {
+    "message": "Ver estado de la cuenta"
   },
-  "dashboard.affiliate-links.header": {
-    "message": "Tus enlaces de afiliado"
+  "create.version.restricted-text": {
+    "message": "Un moderador eliminó este permiso de tu cuenta. Consulta el Estado de la cuenta en la configuración de tu cuenta para obtener más detalles."
   },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "Esto revocará de forma permanente el código de afiliado `{id}` y cualquier enlace existente con este código que se haya compartido ya no será válido."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "Revocar"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "¿Estás seguro de que quieres revocar tu enlace de afiliado ''{title}''?"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "Buscar enlaces de afiliado..."
+  "create.version.restricted-title": {
+    "message": "Acción restringida"
   },
   "dashboard.analytics.from-projects": {
     "message": "de {count} {count, plural,one {proyecto} other {proyectos}}"
@@ -2252,6 +2264,9 @@
   "error.generic.default.list_item.1": {
     "message": "Revisa si Modrinth está caído en nuestra <status-link>Página de estado</status-link>."
   },
+  "error.generic.default.list_item.support": {
+    "message": "Si esto sigue ocurriendo, quizás quieras informar al equipo de Modrinth a través de nuestro <support-link>portal de soporte</support-link>."
+  },
   "error.generic.default.list_title": {
     "message": "Vuelve a intentarlo en unos minutos."
   },
@@ -2687,9 +2702,6 @@
   "layout.action.file-lookup": {
     "message": "Buscar archivo"
   },
-  "layout.action.manage-affiliates": {
-    "message": "Gestionar enlaces de afiliado"
-  },
   "layout.action.manage-server-notices": {
     "message": "Gestionar notificaciones del servidor"
   },
@@ -3002,8 +3014,77 @@
   "modal.shared-instance.open-in-app.why-use": {
     "message": "Por qué usar la App de Modrinth"
   },
+  "moderation.c2pa-scan.failed": {
+    "message": "Error al escanear en busca de archivos generados por IA."
+  },
+  "moderation.c2pa-scan.no-ai-files": {
+    "message": "No se encontraron archivos generados por IA."
+  },
   "moderation.exclude-technical-review": {
     "message": "Excluir RT"
+  },
+  "moderation.keybinds.change": {
+    "message": "{setting}: {binding}. Activar para cambiar la combinación."
+  },
+  "moderation.keybinds.composer": {
+    "message": "Respuestas del hilo y notas privadas"
+  },
+  "moderation.keybinds.conflict-summary": {
+    "message": "{count, plural, one {# acción tiene combinaciones superpuestas.} other {# acciones tienen combinaciones superpuestas.}} Estos atajos pueden competir cuando estén disponibles al mismo tiempo. Cambia una combinación o presiona Esc mientras grabas para eliminarla."
+  },
+  "moderation.keybinds.conflicts": {
+    "message": "Se superpone con: {actions}"
+  },
+  "moderation.keybinds.decisions": {
+    "message": "Revisar resultados y cola"
+  },
+  "moderation.keybinds.global": {
+    "message": "Cambiar de hosts y copiar URL"
+  },
+  "moderation.keybinds.items": {
+    "message": "Revisar elementos y comprobaciones"
+  },
+  "moderation.keybinds.listen": {
+    "message": "Presiona una tecla..."
+  },
+  "moderation.keybinds.navigation": {
+    "message": "Revisar navegación y paneles"
+  },
+  "moderation.keybinds.no-results": {
+    "message": "No hay combinaciones de teclas que coincidan con tu búsqueda."
+  },
+  "moderation.keybinds.not-bound": {
+    "message": "Sin asignar"
+  },
+  "moderation.keybinds.project": {
+    "message": "Copiar desde páginas públicas del proyecto"
+  },
+  "moderation.keybinds.recording": {
+    "message": "{setting}: esperando una tecla o botón. Pulse Escape para borrar este atajo."
+  },
+  "moderation.keybinds.reset-default": {
+    "message": "Restablecer por defecto"
+  },
+  "moderation.keybinds.scope-global": {
+    "message": "Se puede utilizar en cualquier lugar del sitio web."
+  },
+  "moderation.keybinds.scope-project-page": {
+    "message": "Utilizado en páginas del proyecto cuando los accesos directos a páginas del proyecto están habilitados."
+  },
+  "moderation.keybinds.scope-tech": {
+    "message": "Utilizado en las páginas de revisión tecnológica."
+  },
+  "moderation.keybinds.search": {
+    "message": "Buscar atajos…"
+  },
+  "moderation.keybinds.self-conflict": {
+    "message": "Otro atajo para esta acción"
+  },
+  "moderation.keybinds.technical": {
+    "message": "Páginas de revisión técnica"
+  },
+  "moderation.keybinds.title": {
+    "message": "Atajos"
   },
   "moderation.moderate": {
     "message": "Moderar"
@@ -3025,6 +3106,15 @@
   },
   "moderation.page.technicalReview": {
     "message": "Revisión técnica"
+  },
+  "moderation.project-review.approvedCount": {
+    "message": "{count} Aprobado"
+  },
+  "moderation.project-review.archivedCount": {
+    "message": "{count} Archivados"
+  },
+  "moderation.project-review.draftCount": {
+    "message": "{count} Borradores"
   },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} por página"
@@ -3412,6 +3502,9 @@
   },
   "project-member-header.success-join": {
     "message": "Te has unido al equipo del proyecto"
+  },
+  "project-moderation-nags.project-submitted-for-review": {
+    "message": "¡Tu proyecto ha sido enviado para revisión!"
   },
   "project-moderation-nags.publishing-checklist": {
     "message": "Lista de verificación para la publicación"
@@ -4124,9 +4217,6 @@
   "project.settings.license.custom-name-required": {
     "message": "Ingresa un nombre para tu licencia personalizada."
   },
-  "project.settings.license.custom-url-description": {
-    "message": "La ubicación web del texto completo de la licencia."
-  },
   "project.settings.license.intro": {
     "message": "Es importante elegir una licencia adecuada para tu {type}. Puedes elegir una de nuestra lista o proporcionar una licencia personalizada. También puede proporcionar una URL personalizada a su licencia elegida; de lo contrario, se mostrará el texto de la licencia. Consulte nuestra <guide>guía de licencias</guide> para obtener más información."
   },
@@ -4150,12 +4240,6 @@
   },
   "project.settings.license.optional-label": {
     "message": "opcional"
-  },
-  "project.settings.license.select": {
-    "message": "Licencia"
-  },
-  "project.settings.license.select-placeholder": {
-    "message": "Buscar licencias..."
   },
   "project.settings.license.title": {
     "message": "Licencia"
@@ -4287,7 +4371,7 @@
     "message": "El equipo de moderación de Modrinth ha rechazado la información de permisos que proporcionaste para algún contenido externo. Por favor, revise los elementos rechazados a continuación y proporcione pruebas aceptables o elimine el contenido."
   },
   "project.settings.permissions.bad-proof.title": {
-    "message": "Algunas pruebas fueron rechazadas."
+    "message": "Algunas pruebas fueron rechazadas"
   },
   "project.settings.permissions.collapse-all": {
     "message": "Colapsar todo"
@@ -4568,29 +4652,17 @@
   "report.not-for.dmca.description": {
     "message": "Consulta nuestra <policy-link>Política de derechos de autor</policy-link>."
   },
-  "report.note.ai-images.1": {
-    "message": "Acabamos de actualizar nuestras reglas para prohibir imágenes generadas por AIs en iconos, galerías y descripciones. Estamos dando a los creadores un período de gracia para eliminar imágenes hechas con IA de sus proyectos antes de empezar a aceptar reportes sobre ello."
-  },
-  "report.note.check-back-later": {
-    "message": "Vuelve a comprobar más tarde una vez finalizado el período de gracia. Los reportes de este tipo no están siendo aceptados en este momento."
-  },
   "report.note.copyright.1": {
     "message": "Ten en cuenta que *no* estás enviando una solicitud de retirada DMCA, sino reportando contenido re-subido."
   },
   "report.note.copyright.2": {
     "message": "Si lo que querías era presentar una solicitud de retirada DMCA (que es una acción legal), consulta nuestra <copyright-policy-link>Política de derechos de autor</copyright-policy-link>."
   },
-  "report.note.fully-ai-generated.1": {
-    "message": "Acabamos de actualizar nuestras reglas para prohibir proyectos totalmente generados por AI. Estamos dando a los creadores un período de gracia para actualizar o eliminar completamente los proyectos generados por AIs antes de empezar a aceptar reportes sobre ello."
-  },
   "report.note.malicious.1": {
     "message": "Los reportes de contenido malicioso o engañoso deben incluir evidencia sustancial de este comportamiento, como muestras de código."
   },
   "report.note.malicious.2": {
     "message": "Los resúmenes de Microsoft Defender, VirusTotal o la detección de malware por IA no son pruebas suficientes y no serán aceptados."
-  },
-  "report.note.missing-disclosure.1": {
-    "message": "Las divulgaciones de contenido son una nueva característica que acabamos de añadir. Estamos dando a los creadores un período de gracia para que se actualicen sus divulgaciones antes de empezar a aceptar los informes de divulgaciones faltantes o incorrectas."
   },
   "report.please-report": {
     "message": "Por favor, informa:"
@@ -5558,15 +5630,6 @@
   "settings.pats.modal.create.title": {
     "message": "Crear token de acceso personal"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "Eliminar este token"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "Esto eliminará este token para siempre (sí, de verdad, para siempre)."
-  },
-  "settings.pats.modal.delete.title": {
-    "message": "¿Estás seguro de que quieres eliminar este token?"
-  },
   "settings.pats.modal.edit.title": {
     "message": "Editar token de acceso personal"
   },
@@ -5591,14 +5654,8 @@
   "settings.sessions.action.revoke-session": {
     "message": "Revocar sesión"
   },
-  "settings.sessions.created-ago": {
-    "message": "Creado {ago}"
-  },
   "settings.sessions.current-session": {
     "message": "Sesión actual"
-  },
-  "settings.sessions.description": {
-    "message": "Aquí están todos los dispositivos que actualmente están conectados a tu cuenta de Modrinth. Puedes cerrar la sesión en cada uno de ellos por separado.\n\nSi ves alguno que no reconoces, cierra la sesión en ese dispositivo y cambia la contraseña de tu cuenta de Modrinth de inmediato."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Último acceso {ago}"

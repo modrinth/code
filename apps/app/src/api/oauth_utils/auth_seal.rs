@@ -21,9 +21,9 @@ use hkdf::Hkdf;
 use p256::PublicKey;
 use p256::SecretKey;
 use p256::ecdh::diffie_hellman;
+use p256::elliptic_curve::Generate;
 use p256::pkcs8::{DecodePublicKey, EncodePublicKey};
-use rand::RngCore;
-use rand::rngs::OsRng;
+use rand::Rng;
 use sha2::Sha256;
 
 const SEAL_VERSION: u8 = 2;
@@ -38,9 +38,10 @@ pub struct AuthSeal {
 
 impl AuthSeal {
     pub fn generate() -> Self {
-        let secret = SecretKey::random(&mut OsRng);
+        let mut rng = rand::rng();
+        let secret = SecretKey::generate_from_rng(&mut rng);
         let mut nonce_bytes = [0u8; 16];
-        OsRng.fill_bytes(&mut nonce_bytes);
+        rng.fill_bytes(&mut nonce_bytes);
 
         Self {
             secret,

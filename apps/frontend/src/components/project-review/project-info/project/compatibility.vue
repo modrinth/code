@@ -1,7 +1,7 @@
 <template>
-	<Section :heading="formatMessage(messages.compatibility)" :target="{ kind: 'compatibility' }">
+	<Section heading="Compatibility" :target="{ kind: 'compatibility' }">
 		<dl class="m-0 grid grid-cols-[max-content_minmax(0,1fr)] gap-x-3 gap-y-2.5">
-			<dt class="text-sm font-medium text-secondary">{{ formatMessage(messages.gameVersions) }}</dt>
+			<dt class="text-sm font-medium text-secondary">Game versions</dt>
 			<dd class="m-0 flex flex-wrap items-start gap-1">
 				<TagItem
 					v-for="version in gameVersions"
@@ -9,12 +9,10 @@
 					class="!border-surface-4 !bg-surface-3 !text-secondary"
 					>{{ version }}</TagItem
 				>
-				<span v-if="compatibilityError">{{ formatMessage(messages.unavailable) }}</span>
-				<span v-else-if="gameVersions.length === 0">{{
-					formatMessage(messages.emptyVersions)
-				}}</span>
+				<span v-if="compatibilityError">Unavailable</span>
+				<span v-else-if="gameVersions.length === 0">No versions</span>
 			</dd>
-			<dt class="text-sm font-medium text-secondary">{{ formatMessage(messages.platforms) }}</dt>
+			<dt class="text-sm font-medium text-secondary">Platforms</dt>
 			<dd class="m-0 flex flex-wrap items-start gap-1">
 				<TagItem
 					v-for="loader in project?.loaders"
@@ -26,24 +24,20 @@
 						v-if="loader !== 'mrpack' && getLoaderIcon(loader)"
 						aria-hidden="true"
 					/>
-					{{ formatLoader(formatMessage, loader) }}
+					{{ loaderName(loader) }}
 				</TagItem>
-				<span v-if="!project?.loaders.length">{{ formatMessage(messages.emptyPlatforms) }}</span>
+				<span v-if="!project?.loaders.length">No platforms</span>
 			</dd>
 			<template v-if="requiresEnvironmentInfo(project?.project_types ?? [])">
-				<dt class="text-sm font-medium text-secondary">
-					{{ formatMessage(messages.environments) }}
-				</dt>
+				<dt class="text-sm font-medium text-secondary">Environments</dt>
 				<dd class="m-0 flex flex-wrap items-start gap-1">
 					<TagItem
 						v-for="environment in project?.environment"
 						:key="environment"
 						class="max-w-full !text-wrap !border-surface-4 !bg-surface-3 !text-secondary"
-						>{{ formatMessage(ENVIRONMENTS_COPY[environment].title) }}</TagItem
+						>{{ environmentLabels[environment] }}</TagItem
 					>
-					<span v-if="!project?.environment?.length">{{
-						formatMessage(messages.emptyEnvironments)
-					}}</span>
+					<span v-if="!project?.environment?.length">No environments</span>
 				</dd>
 			</template>
 		</dl>
@@ -53,16 +47,29 @@
 <script setup lang="ts">
 import { getLoaderIcon } from '@modrinth/assets'
 import { requiresEnvironmentInfo } from '@modrinth/moderation'
-import { ENVIRONMENTS_COPY, formatLoader, injectTags, TagItem, useVIntl } from '@modrinth/ui'
+import { injectTags, TagItem } from '@modrinth/ui'
 import { formatVersionsForDisplay } from '@modrinth/utils'
 
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
-import { projectReviewMessages as messages } from '../../messages'
 import Section from '../section.vue'
+import { loaderName } from '../tag-labels'
+
+const environmentLabels = {
+	client_only: 'Client-side only',
+	server_only: 'Server-side only, works in singleplayer too',
+	singleplayer_only: 'Singleplayer only',
+	dedicated_server_only: 'Server-side only',
+	client_and_server: 'Client and server, required on both',
+	client_only_server_optional: 'Client and server, optional on server',
+	server_only_client_optional: 'Client and server, optional on client',
+	client_or_server: 'Client and server, optional on both',
+	client_or_server_prefers_both: 'Client and server, best when installed on both',
+	unknown: 'Unknown environment',
+}
 
 const { project, projectV2, compatibilityError } = injectProjectReviewPageContext()
-const { formatMessage } = useVIntl()
+
 const tags = injectTags(null)
 const gameVersions = computed(() => {
 	const versions = projectV2.value?.game_versions ?? []

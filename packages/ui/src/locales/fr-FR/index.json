@@ -2,39 +2,6 @@
   "action.no-permission": {
     "defaultMessage": "Vous n'avez pas la permission."
   },
-  "affiliate.create.button": {
-    "defaultMessage": "Créer un lien affilié"
-  },
-  "affiliate.create.header": {
-    "defaultMessage": "Création d'un nouveau code d'affiliation"
-  },
-  "affiliate.create.title.description": {
-    "defaultMessage": "Donnez un nom au lien d'affiliation pour savoir d'où viennent les gens !"
-  },
-  "affiliate.create.title.label": {
-    "defaultMessage": "Titre du lien affilié"
-  },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "par exemple, YouTube"
-  },
-  "affiliate.create.user.description": {
-    "defaultMessage": "Pseudo de l'utilisateur à qui est destiné le code d'affiliation"
-  },
-  "affiliate.create.user.placeholder": {
-    "defaultMessage": "Entrez un pseudo..."
-  },
-  "affiliate.createdBy": {
-    "defaultMessage": "Créé par {user}"
-  },
-  "affiliate.creating.button": {
-    "defaultMessage": "Création du lien en cours..."
-  },
-  "affiliate.revoke": {
-    "defaultMessage": "Révoquer le lien d'affiliation"
-  },
-  "affiliate.viewAnalytics": {
-    "defaultMessage": "Voir les statistiques"
-  },
   "app.appearance-settings.native-decorations.description": {
     "defaultMessage": "Utiliser la barre de titre et les commandes de fenêtre de votre système d'exploitation. Nécessite le redémarrage de l'application."
   },
@@ -151,9 +118,6 @@
   },
   "button.add-server-to-instance": {
     "defaultMessage": "Ajouter le serveur à l'instance"
-  },
-  "button.affiliate-links": {
-    "defaultMessage": "Liens affiliés"
   },
   "button.analytics": {
     "defaultMessage": "Statistiques"
@@ -368,6 +332,9 @@
   "collections.label.private": {
     "defaultMessage": "Privé"
   },
+  "color-picker.hex-value": {
+    "defaultMessage": "Valeur hexadécimale {label}"
+  },
   "console.actions.collapse": {
     "defaultMessage": "Réduire"
   },
@@ -496,9 +463,6 @@
   },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} ajoutés"
-  },
-  "content.diff-modal.config-files-updated": {
-    "defaultMessage": "Fichiers de configuration modifiés"
   },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Ajouté (dépendance)"
@@ -2051,6 +2015,9 @@
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Serveur réinitialisé à l'intégration"
   },
+  "hosting.save-banner.saved": {
+    "defaultMessage": "Sauvegardé"
+  },
   "hosting.specs.burst": {
     "defaultMessage": "Jusqu'à {cpus} processeurs"
   },
@@ -3275,23 +3242,41 @@
   "profile.button.create-project": {
     "defaultMessage": "Créer un projet"
   },
+  "profile.button.edit-restrictions": {
+    "defaultMessage": "Modifier les restrictions"
+  },
+  "profile.button.edit-user": {
+    "defaultMessage": "Modifier l'utilisateur"
+  },
+  "profile.button.force-password-reset": {
+    "defaultMessage": "Forcer la réinitialisation du mot de passe"
+  },
   "profile.button.info": {
     "defaultMessage": "Voir les détails de l'utilisateur"
+  },
+  "profile.button.lock": {
+    "defaultMessage": "Verrouiller le compte"
   },
   "profile.button.manage-projects": {
     "defaultMessage": "Gérer les projets"
   },
-  "profile.button.remove-affiliate": {
-    "defaultMessage": "Retirer l'affiliation"
+  "profile.button.reset-2fa": {
+    "defaultMessage": "Réinitialiser l'authentification à deux facteurs"
   },
-  "profile.button.set-affiliate": {
-    "defaultMessage": "Se mettre comme affilié"
+  "profile.button.restrict": {
+    "defaultMessage": "Restreindre l'utilisateur"
+  },
+  "profile.button.revoke-sessions": {
+    "defaultMessage": "Révoquer toutes les sessions"
   },
   "profile.button.shared-instances": {
     "defaultMessage": "Voir les instances partagées"
   },
   "profile.button.unblock": {
     "defaultMessage": "Débloquer"
+  },
+  "profile.button.unlock": {
+    "defaultMessage": "Déverrouiller le compte"
   },
   "profile.collection.projects-count": {
     "defaultMessage": "{count, plural,one {# projet} other {# projets}}"
@@ -3344,14 +3329,23 @@
   "profile.force-password-reset.admonition-body": {
     "defaultMessage": "Le mot de passe de {username} sera immédiatement supprimé, et la session sera fermée sur tous les appareils. Un lien permettant de définir un nouveau mot de passe sera envoyé à l’adresse e-mail ci-dessous. Si vous modifiez l’adresse e-mail, elle remplacera celle associée au compte. Le lien expirera au bout de 24 heures et pourra être utilisé même si le compte est verrouillé."
   },
+  "profile.force-password-reset.admonition-title": {
+    "defaultMessage": "Le mot de passe actuel cessera de fonctionner"
+  },
   "profile.force-password-reset.button": {
     "defaultMessage": "Réinitialiser le mot de passe"
   },
   "profile.force-password-reset.email-label": {
     "defaultMessage": "Adresse email du compte"
   },
-  "profile.label.affiliate": {
-    "defaultMessage": "Affilié"
+  "profile.force-password-reset.email-placeholder": {
+    "defaultMessage": "Laisser vide pour utiliser l'e-mail du compte"
+  },
+  "profile.force-password-reset.error-description": {
+    "defaultMessage": "Une erreur s'est produite lors de la réinitialisation du mot de passe, veuillez réessayer."
+  },
+  "profile.force-password-reset.success-title": {
+    "defaultMessage": "Mot de passe réinitialisé"
   },
   "profile.label.badges": {
     "defaultMessage": "Badges"
@@ -3364,6 +3358,9 @@
   },
   "profile.label.joined": {
     "defaultMessage": "Rejoint"
+  },
+  "profile.label.locked": {
+    "defaultMessage": "Verrouillé"
   },
   "profile.label.no-collections": {
     "defaultMessage": "Cet utilisateur n'a pas de collection !"
@@ -3395,11 +3392,29 @@
   "profile.reset-2fa.button": {
     "defaultMessage": "Réinitialiser l'A2F"
   },
+  "profile.reset-2fa.error-description": {
+    "defaultMessage": "Une erreur s'est produite lors de la réinitialisation de l'authentification à double facteur. Veuillez réessayer."
+  },
   "profile.reset-2fa.error-title": {
     "defaultMessage": "Échec de la réinitialisation de l’authentification à deux facteurs"
   },
+  "profile.reset-2fa.success-description": {
+    "defaultMessage": "L'authentification à double facteur de {username} a été retirée."
+  },
   "profile.reset-2fa.success-title": {
     "defaultMessage": "Authentification à deux facteurs réinitialisée"
+  },
+  "profile.reset-2fa.title": {
+    "defaultMessage": "Réinitialiser l'authentification à double facteur pour {username}"
+  },
+  "profile.restrict-user.admonition-title": {
+    "defaultMessage": "Les permissions sélectionnées vont être retirées"
+  },
+  "profile.restrict-user.private-reason-placeholder": {
+    "defaultMessage": "Optionnel"
+  },
+  "profile.restrict-user.reason-placeholder": {
+    "defaultMessage": "Optionnel"
   },
   "profile.unblock-user.error-description": {
     "defaultMessage": "Une erreur s'est produite pendant le déblocage de cet utilisateur. Veuillez réessayer."
@@ -3412,6 +3427,9 @@
   },
   "profile.unblock-user.success-title": {
     "defaultMessage": "Utilisateur débloqué"
+  },
+  "profile.unlock-user.success-title": {
+    "defaultMessage": "Compte débloqué"
   },
   "project-card.date.published.tooltip": {
     "defaultMessage": "Publié {date}"
@@ -4066,6 +4084,15 @@
   },
   "project.settings.disclosures.title": {
     "defaultMessage": "Mentions"
+  },
+  "project.settings.environment.bulk.apply-button": {
+    "defaultMessage": "Appliquer à toutes les versions"
+  },
+  "project.settings.environment.bulk.description": {
+    "defaultMessage": "Ceci va remplacer l'environnement de toutes les versions de ce projet."
+  },
+  "project.settings.environment.bulk.title": {
+    "defaultMessage": "Appliquer l'environnement à toutes les versions"
   },
   "project.settings.environment.client_and_server.description": {
     "defaultMessage": "Dispose de certaines fonctionnalités à la fois côté client et côté serveur, même si ce n'est que partiellement."
@@ -5126,12 +5153,6 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "Restauration de la sauvegarde"
   },
-  "servers.backups.bulk-bar.aria-label": {
-    "defaultMessage": "Actions groupées pour {count, plural, one {une sauvegarde sélectionnée} other {# sauvegardes sélectionnées}}"
-  },
-  "servers.backups.bulk-bar.deleting": {
-    "defaultMessage": "Suppression de {total, plural, one {# sauvegarde} other {# sauvegardes}}..."
-  },
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "{count, plural, one {# sauvegarde sélectionnée} other {# sauvegardes sélectionnées}}"
   },
@@ -5156,50 +5177,41 @@
   "servers.backups.empty.heading": {
     "defaultMessage": "Aucune sauvegarde"
   },
-  "servers.backups.filtered-empty.clear-filters": {
-    "defaultMessage": "Effacer les filtres"
+  "servers.backups.history.auto-badge": {
+    "defaultMessage": "Auto"
   },
-  "servers.backups.filtered-empty.description": {
-    "defaultMessage": "Essayez un filtre différent ou effacez les filtres pour voir toutes les sauvegardes."
+  "servers.backups.history.column.created": {
+    "defaultMessage": "Créé"
   },
-  "servers.backups.filtered-empty.heading": {
-    "defaultMessage": "Aucune sauvegarde ne correspond aux filtres sélectionnés"
+  "servers.backups.history.column.created-by": {
+    "defaultMessage": "Créé par"
+  },
+  "servers.backups.history.column.name": {
+    "defaultMessage": "Nom"
+  },
+  "servers.backups.history.creator-avatar-alt": {
+    "defaultMessage": "avatar de {username}"
+  },
+  "servers.backups.history.creator.support": {
+    "defaultMessage": "Support"
+  },
+  "servers.backups.history.rename": {
+    "defaultMessage": "Renommer"
+  },
+  "servers.backups.history.restore": {
+    "defaultMessage": "Restaurer"
+  },
+  "servers.backups.interval.hours": {
+    "defaultMessage": "{hours} h"
   },
   "servers.backups.item.auto": {
     "defaultMessage": "Auto"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Planification de sauvegarde"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "Avatar de {username}"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "Support"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Sauvegarde manuelle"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Renommer"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Restaurer"
-  },
-  "servers.backups.select-backup-aria": {
-    "defaultMessage": "Sélectionner une sauvegarde {name}"
+  "servers.backups.rotation-modal.confirm": {
+    "defaultMessage": "Sauvegarder et supprimer"
   },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Sauvegarder"
-  },
-  "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "Auto"
-  },
-  "servers.backups.toolbar.filter-manual": {
-    "defaultMessage": "Manuelle"
-  },
-  "servers.backups.toolbar.select-all": {
-    "defaultMessage": "Tout sélectionner"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "Création d'une sauvegarde en cours"
@@ -5437,6 +5449,9 @@
   },
   "servers.listing.using-project-label": {
     "defaultMessage": "Avec {projectTitle}"
+  },
+  "servers.lock.modal.reason-label": {
+    "defaultMessage": "Raison"
   },
   "servers.manage.checking-for-new-servers": {
     "defaultMessage": "Recherche de nouveaux serveurs en cours..."
@@ -5680,6 +5695,9 @@
   },
   "servers.region.north-america-west": {
     "defaultMessage": "Ouest de l'Amérique du Nord"
+  },
+  "servers.region.ping.latency": {
+    "defaultMessage": "{ping} ms"
   },
   "servers.region.prompt": {
     "defaultMessage": "Où souhaitez-vous que votre serveur soit situé ?"
@@ -6829,6 +6847,15 @@
   },
   "update-all-modal.view": {
     "defaultMessage": "Voir"
+  },
+  "user-restrictions.group.collections": {
+    "defaultMessage": "Collections"
+  },
+  "user-restrictions.group.profile": {
+    "defaultMessage": "Profil"
+  },
+  "user-restrictions.group.versions": {
+    "defaultMessage": "Versions"
   },
   "user.profile.badge.alpha.about.1": {
     "defaultMessage": "Cet utilisateur existe depuis Modrinth Alpha, qui s'est terminé en novembre 2020."

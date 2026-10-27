@@ -5,13 +5,13 @@ use crate::util;
 use crate::util::io::IOError;
 use crate::util::jre::JREError;
 use async_tungstenite::tungstenite;
-use async_zip::error::ZipError;
 use data_url::DataUrlError;
-use hickory_resolver::ResolveError;
+use hickory_resolver::net::NetError;
 use serde::{Deserialize, Serialize};
 use sqlx::migrate::MigrateError;
 use std::path::StripPrefixError;
 use std::time::Duration;
+use zip::result::ZipError;
 
 #[derive(Serialize, Deserialize, Debug, thiserror::Error)]
 #[error("{description}")]
@@ -80,7 +80,7 @@ pub enum ErrorKind {
     NoValueFor(String),
 
     #[error("metadata error: {0}")]
-    MetadataError(#[from] daedalus::Error),
+    MetadataError(#[from] anyhow::Error),
 
     #[error("I/O error: {0}")]
     IOError(#[from] util::io::IOError),
@@ -124,6 +124,9 @@ pub enum ErrorKind {
     #[error("shared instances api request failed")]
     SharedInstancesApiError,
 
+    #[error("you are not allowed to share {0}")]
+    SharedInstanceFileNotAllowed(String),
+
     #[error("join handle error: {0}")]
     JoinError(#[from] tokio::task::JoinError),
 
@@ -149,7 +152,7 @@ pub enum ErrorKind {
     EventError(#[from] crate::event::EventError),
 
     #[error("zip error: {0}")]
-    ZipError(#[from] async_zip::error::ZipError),
+    ZipError(#[from] ZipError),
 
     #[error("file watching error: {0}")]
     NotifyError(#[from] notify::Error),
@@ -168,7 +171,7 @@ pub enum ErrorKind {
     SqlxMigrate(#[from] sqlx::migrate::MigrateError),
 
     #[error("error resolving DNS: {0}")]
-    DNSError(#[from] hickory_resolver::ResolveError),
+    DNSError(#[from] NetError),
 
     #[error("an online profile for {user_name} is not available")]
     OnlineMinecraftProfileUnavailable { user_name: String },
@@ -293,6 +296,9 @@ impl ErrorKind {
                 }
             },
             Self::SharedInstancesApiError => "shared_instances_api_error",
+            Self::SharedInstanceFileNotAllowed(_) => {
+                "shared_instance_file_not_allowed"
+            }
             Self::HashError(_, _) => "hash_error",
             Self::LoginCanceled => "login_canceled",
             Self::NotLoggedIn => "not_logged_in",
@@ -362,13 +368,11 @@ pub fn error_code(error: &Error) -> &'static str {
         "api_error"
     } else if error.is::<reqwest::Error>()
         || error.is::<tungstenite::Error>()
-        || error.is::<ResolveError>()
+        || error.is::<NetError>()
     {
         "network_error"
     } else if error.is::<JREError>() {
         "java_error"
-    } else if error.is::<daedalus::Error>() {
-        "metadata_error"
     } else if error.is::<ZipError>() {
         "archive_error"
     } else if error.is::<serde::de::value::Error>()

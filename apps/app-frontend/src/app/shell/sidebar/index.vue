@@ -15,7 +15,7 @@ import { injectOnboardingChecklist } from '@/providers/onboarding-checklist'
 
 import Promotion from './promotion.vue'
 
-defineProps<{
+const props = defineProps<{
 	credentials: ModrinthCredentials | null | undefined
 	hasPlus: boolean
 	showAd: boolean
@@ -37,6 +37,9 @@ const friends = ref<InstanceType<typeof FriendsList> | null>(null)
 const scrollContainer = ref<HTMLElement | null>(null)
 const scrollViewport = ref<HTMLElement | null>(null)
 const upgradeHeight = ref(0)
+const promotionPaddingStyle = computed(() =>
+	props.showAd ? { paddingBottom: `calc(1rem + ${upgradeHeight.value}px)` } : undefined,
+)
 const { showTopFade, showBottomFade, checkScrollState } = useScrollIndicator(scrollViewport)
 
 let removeScrollbarListener: (() => void) | undefined
@@ -103,7 +106,11 @@ const messages = defineMessages({
 					@login-minecraft="accounts?.login()"
 					@login-modrinth="emit('login-modrinth')"
 				/>
-				<div id="sidebar-teleport-target" class="sidebar-teleport-content contents"></div>
+				<div
+					id="sidebar-teleport-target"
+					class="sidebar-teleport-content empty:hidden"
+					:style="promotionPaddingStyle"
+				></div>
 				<div class="sidebar-default-content hidden" :class="{ 'sidebar-enabled': visible }">
 					<div
 						v-show="hasLoggedIntoMinecraft"
@@ -131,9 +138,7 @@ const messages = defineMessages({
 					<PrideFundraiserBanner
 						class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid"
 					/>
-					<NewsSidebar
-						:style="showAd ? { paddingBottom: `calc(1rem + ${upgradeHeight}px)` } : undefined"
-					/>
+					<NewsSidebar :style="promotionPaddingStyle" />
 				</div>
 			</div>
 			<div

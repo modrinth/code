@@ -2,39 +2,6 @@
   "action.no-permission": {
     "defaultMessage": "Du mangler tillatelse."
   },
-  "affiliate.create.button": {
-    "defaultMessage": "Oppretter ny affiliatkode"
-  },
-  "affiliate.create.header": {
-    "defaultMessage": "Oppretter ny affiliatkode"
-  },
-  "affiliate.create.title.description": {
-    "defaultMessage": "Gi affiliatelenken et navn, slik at du vet hvor trafikken kommer fra!"
-  },
-  "affiliate.create.title.label": {
-    "defaultMessage": "Tittel på affiliatelenken"
-  },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "f.eks. YouTube"
-  },
-  "affiliate.create.user.description": {
-    "defaultMessage": "Brukernavnet til brukeren affiliatkoden skal knyttes til"
-  },
-  "affiliate.create.user.placeholder": {
-    "defaultMessage": "Skriv inn brukernavn..."
-  },
-  "affiliate.createdBy": {
-    "defaultMessage": "Opprettet av {user}"
-  },
-  "affiliate.creating.button": {
-    "defaultMessage": "Oppretter affiliatelenke…"
-  },
-  "affiliate.revoke": {
-    "defaultMessage": "Deaktiver affiliatelenke"
-  },
-  "affiliate.viewAnalytics": {
-    "defaultMessage": "Vis statistikk"
-  },
   "app.appearance-settings.native-decorations.description": {
     "defaultMessage": "Bruk operativsystemets tittellinje og vindukontroller. Krever omstart av appen."
   },
@@ -131,9 +98,6 @@
   "button.add-server-to-instance": {
     "defaultMessage": "Legg til server i instansen"
   },
-  "button.affiliate-links": {
-    "defaultMessage": "Affiliatelenker"
-  },
   "button.analytics": {
     "defaultMessage": "Analyse"
   },
@@ -179,6 +143,9 @@
   "button.download": {
     "defaultMessage": "Nedlast"
   },
+  "button.download-files": {
+    "defaultMessage": "Last ned filer"
+  },
   "button.downloading": {
     "defaultMessage": "Nedlaster"
   },
@@ -188,11 +155,17 @@
   "button.enable": {
     "defaultMessage": "Aktiver"
   },
+  "button.extract": {
+    "defaultMessage": "Pakk ut"
+  },
   "button.follow": {
     "defaultMessage": "Følg"
   },
   "button.hide-snapshots": {
     "defaultMessage": "Gjøm snapshots"
+  },
+  "button.i-understand": {
+    "defaultMessage": "Jeg skjønner"
   },
   "button.install": {
     "defaultMessage": "Installer"
@@ -212,6 +185,12 @@
   "button.open-folder": {
     "defaultMessage": "Åpne mappe"
   },
+  "button.open-in-browser": {
+    "defaultMessage": "Åpn i nettleser"
+  },
+  "button.open-in-folder": {
+    "defaultMessage": "Åpn i mappe"
+  },
   "button.open-in-modrinth": {
     "defaultMessage": "Åpne i Modrinth"
   },
@@ -223,6 +202,9 @@
   },
   "button.reinstall-modpack": {
     "defaultMessage": "Re-installer modpakka"
+  },
+  "button.remove": {
+    "defaultMessage": "Fjern"
   },
   "button.remove-image": {
     "defaultMessage": "Fjern bilde"
@@ -275,6 +257,9 @@
   "button.stop": {
     "defaultMessage": "Stopp"
   },
+  "button.switch-to-version": {
+    "defaultMessage": "Bytt til versjon"
+  },
   "button.switch-version": {
     "defaultMessage": "Bytt versjonen"
   },
@@ -301,6 +286,15 @@
   },
   "changelog.product.web": {
     "defaultMessage": "Plattform"
+  },
+  "collection-widget.empty-collection": {
+    "defaultMessage": "Denne samlinga er tom."
+  },
+  "collection-widget.loading-projects": {
+    "defaultMessage": "Laster inn prosjekter..."
+  },
+  "collection-widget.no-search-results": {
+    "defaultMessage": "Ingen prosjekter matcher søket ditt."
   },
   "collections.label.private": {
     "defaultMessage": "Privat"
@@ -2236,18 +2230,6 @@
   },
   "servers.backups.item.auto": {
     "defaultMessage": "Automatisk"
-  },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Sikkerhetskopiplan"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Manuell sikkerhetskopiering"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Endre navn"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Gjenopprett"
   },
   "servers.list-empty.new-server-button": {
     "defaultMessage": "Ny server"

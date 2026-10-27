@@ -162,11 +162,15 @@ pub(super) fn validate_pack(
         ProjectType::DataPack => ("data/", "assets/"),
         _ => bail!(ErrorKind::InvalidPack(InvalidPack::UnsupportedType)),
     };
+    let mut has_prefix = false;
+    let mut has_other_prefix = false;
+    for name in archive.file_names() {
+        let name = name?;
+        has_prefix |= name.starts_with(prefix);
+        has_other_prefix |= name.starts_with(other_prefix);
+    }
     if !value.get("pack").is_some_and(serde_json::Value::is_object)
-        || (!archive.file_names().any(|name| name.starts_with(prefix))
-            && archive
-                .file_names()
-                .any(|name| name.starts_with(other_prefix)))
+        || (!has_prefix && has_other_prefix)
     {
         bail!(ErrorKind::InvalidPack(InvalidPack::WrongType));
     }
@@ -560,7 +564,7 @@ pub async fn upload_synced_pack(
     let size = bytes.len() as u64;
     let sha1 = crate::util::fetch::sha1_async(bytes.clone()).await?;
     let sha512 = cache_bytes(bytes, &state).await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     if !get_global_options().await?.get(option) {
         bail!(ErrorKind::InputError(
             "pack syncing was disabled while preparing the upload".to_owned(),
@@ -613,7 +617,7 @@ pub async fn set_synced_pack_enabled(
     enabled: bool,
 ) -> crate::Result<()> {
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     let mut library = read_library(&state).await?;
     let pack = library
         .packs
@@ -626,7 +630,7 @@ pub async fn set_synced_pack_enabled(
 
 pub async fn remove_synced_pack(pack_id: &str) -> crate::Result<()> {
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     let mut library = read_library(&state).await?;
     let pack = library
         .packs
@@ -643,7 +647,7 @@ pub async fn desync_pack(
     mode: DesyncServerMode,
 ) -> crate::Result<()> {
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
         .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;

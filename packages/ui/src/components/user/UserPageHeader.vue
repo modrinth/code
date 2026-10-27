@@ -11,10 +11,7 @@
 			/>
 		</template>
 
-		<template
-			v-if="isOfficialAccount || showAffiliateBadge || user.lock || showRestrictedBadge"
-			#badges
-		>
+		<template v-if="isOfficialAccount || user.lock || showRestrictedBadge" #badges>
 			<PageHeaderBadgeItem
 				v-if="isOfficialAccount"
 				:icon="BadgeCheckIcon"
@@ -23,13 +20,6 @@
 				class="border-brand-highlight bg-brand-highlight !text-brand"
 			>
 				{{ formatMessage(messages.officialAccount) }}
-			</PageHeaderBadgeItem>
-			<PageHeaderBadgeItem
-				v-if="showAffiliateBadge"
-				:icon="AffiliateIcon"
-				class="border-brand-highlight bg-brand-highlight text-brand"
-			>
-				{{ formatMessage(messages.affiliateLabel) }}
 			</PageHeaderBadgeItem>
 			<PageHeaderBadgeItem
 				v-if="user.lock"
@@ -110,7 +100,6 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import {
-	AffiliateIcon,
 	BadgeCheckIcon,
 	BanIcon,
 	BoxesIcon,
@@ -158,10 +147,6 @@ const messages = defineMessages({
 		id: 'profile.button.edit-user',
 		defaultMessage: 'Edit user',
 	},
-	affiliateLabel: {
-		id: 'profile.label.affiliate',
-		defaultMessage: 'Affiliate',
-	},
 	analyticsButton: {
 		id: 'profile.button.analytics',
 		defaultMessage: 'View user analytics',
@@ -201,14 +186,6 @@ const messages = defineMessages({
 	profileDownloadCountLabel: {
 		id: 'profile.label.download-count',
 		defaultMessage: '{count, plural, one {download} other {downloads}}',
-	},
-	removeAffiliateButton: {
-		id: 'profile.button.remove-affiliate',
-		defaultMessage: 'Remove as affiliate',
-	},
-	setAffiliateButton: {
-		id: 'profile.button.set-affiliate',
-		defaultMessage: 'Set as affiliate',
 	},
 	lockedLabel: {
 		id: 'profile.label.locked',
@@ -252,8 +229,6 @@ const props = withDefaults(
 		editProfileLink?: string | (() => void)
 		isModrinthUser?: boolean
 		isOfficialAccount?: boolean
-		showAffiliateBadge?: boolean
-		isAffiliate?: boolean
 		isSelf?: boolean
 		isAdmin?: boolean
 		isStaff?: boolean
@@ -268,8 +243,6 @@ const props = withDefaults(
 		editProfileLink: '/settings/profile',
 		isModrinthUser: false,
 		isOfficialAccount: false,
-		showAffiliateBadge: false,
-		isAffiliate: false,
 		isSelf: false,
 		isAdmin: false,
 		isStaff: false,
@@ -287,7 +260,6 @@ const emit = defineEmits<{
 	copyId: []
 	copyPermalink: []
 	openBilling: []
-	toggleAffiliate: []
 	openInfo: []
 	openSharedInstances: []
 	openAnalytics: []
@@ -380,17 +352,6 @@ const moreActions = computed<ButtonMenuOption[]>(() => [
 		action: () => emit('editUser'),
 		tone: 'green',
 		shown: props.showStaffActions && props.isAdmin,
-	},
-	{
-		id: 'toggle-affiliate',
-		label: props.isAffiliate
-			? formatMessage(messages.removeAffiliateButton)
-			: formatMessage(messages.setAffiliateButton),
-		icon: AffiliateIcon,
-		action: () => emit('toggleAffiliate'),
-		shown: props.showStaffActions && props.isAdmin,
-		remainOpen: true,
-		tone: 'green',
 	},
 	{
 		id: 'open-billing',

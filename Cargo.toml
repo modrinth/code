@@ -3,12 +3,13 @@ resolver = "2"
 members = [
   "apps/app",
   "apps/app-playground",
-  "apps/daedalus_client",
   "apps/labrinth",
+  "apps/meta-generator",
   "packages/app-lib",
   "packages/ariadne",
   "packages/component-derive",
-  "packages/daedalus",
+  "packages/minecraft-meta-manifest",
+  "packages/minecraft-meta-model",
   "packages/modrinth-content-management",
   "packages/modrinth-log",
   "packages/modrinth-maxmind",
@@ -16,108 +17,110 @@ members = [
   "packages/neverbounce",
   "packages/path-util",
   "packages/serde-binhum",
+  "packages/toasty",
   "packages/xredis",
 ]
 
 [workspace.package]
 edition = "2024"
-rust-version = "1.90.0"
+rust-version = "1.95.0"
 repository = "https://github.com/modrinth/code"
 
 [workspace.dependencies]
-actix-cors = "0.7.1"
-actix-files = "0.6.8"
-actix-http = "3.11.2"
-actix-multipart = "0.7.2"
-actix-rt = "2.11.0"
-actix-web = "4.11.0"
+actix-cors = "0.7.2"
+actix-files = "0.7.2"
+actix-http = "3.19.0"
+actix-multipart = "0.8.5"
+actix-rt = "2.15.0"
+actix-web = "4.17.0"
 actix-web-prom = "0.10.0"
-actix-ws = "0.3.0"
-aes-gcm = "0.10.3"
-anyhow = "1.0.100"
-arc-swap = "1.7.1"
-argon2 = { version = "0.5.3", features = ["std"] }
+actix-ws = "0.4.0"
+aes-gcm = "0.11.1"
+anyhow = "1.0.104"
+arc-swap = "1.9.3"
+argon2 = { version = "0.6.0" }
 ariadne = { path = "packages/ariadne" }
+async-compression = "0.4.32"
 async-minecraft-ping = { path = "packages/async-minecraft-ping" }
-async-recursion = "1.1.1"
+async-recursion = "1.2.0"
 async-stripe = { version = "0.41.0", default-features = false, features = [
   "runtime-tokio-hyper-rustls",
 ] }
-async-trait = "0.1.89"
-async-tungstenite = { version = "0.31.0", default-features = false, features = ["futures-03-sink"] }
-async-walkdir = "2.1.0"
-async_zip = "0.0.18"
+async-trait = "0.1.92"
+async-tungstenite = { version = "0.35.0", default-features = false, features = ["futures-03-sink"] }
+async-walkdir = "2.2.0"
 aws-sdk-s3 = { version = "=1.122.0", default-features = false, features = [
   "default-https-client",
   "rt-tokio",
   "rustls",
 ] }
-base64 = "0.22.1"
-bitflags = "2.9.4"
+base64 = "0.23.1"
+bitflags = "2.13.2"
 blocklist = { version = "1.0.0" }
-bon = "3.9.3"
-bytemuck = "1.24.0"
-bytes = "1.10.1"
-cel = { version = "0.14.0", default-features = false, features = ["json", "regex"] }
+bon = "3.10.2"
+bytemuck = "1.25.2"
+bytes = "1.12.1"
+cel = { version = "0.15.0", default-features = false, features = ["json", "regex"] }
 censor = "0.3.0"
-chardetng = "0.1.17"
-chrono = "0.4.42"
-chumsky = "0.9.3"
-cidre = { version = "0.15.0", default-features = false, features = ["macos_15_0"] }
-clap = "4.5.48"
-clickhouse = "0.14.0"
+chardetng = "1.0.0"
+chrono = "0.4.45"
+chumsky = "0.13.0"
+cidre = { version = "0.29.0", default-features = false, features = ["macos_15_0"] }
+clap = "4.6.7"
+clickhouse = "0.15.3"
 color-eyre = "0.6.5"
 color-thief = "0.2.2"
 component-derive = { path = "packages/component-derive" }
-const_format = "0.2.34"
+const_format = "0.2.36"
 core-foundation = "0.10.1"
-core-graphics = "0.24.0"
-daedalus = { path = "packages/daedalus" }
-darling = { version = "0.23" }
-dashmap = "6.1.0"
+core-graphics = "0.25.0"
+darling = { version = "0.24" }
+dashmap = "6.2.1"
 data-url = "0.3.2"
 deadpool-redis = { git = "https://github.com/modrinth/deadpool", rev = "c7209b086829572f368f1194aba54bdea8dc540b", version = "0.23.0" }
 derive_more = "2.1.1"
 dioxus-devtools = "0.7.10"
 directories = "6.0.0"
-dirs = "6.0.0"
-discord-rich-presence = "1.0.0"
+dirs = "7.0.0"
+discord-rich-presence = "1.1.0"
 dotenv-build = "0.1.1"
 dotenvy = "0.15.7"
 dunce = "1.0.5"
-either = "1.15.0"
-encoding_rs = "0.8.35"
-enumset = "1.1.10"
-eyre = "0.6.12"
-flate2 = "1.1.4"
-fs4 = { version = "0.13.1", default-features = false }
-futures = "0.3.31"
-futures-lite = "2.6.1"
-futures-util = "0.3.31"
+either = "1.19.0"
+encoding_rs = "0.8.42"
+enumset = "1.1.14"
+eyre = "0.6.14"
+figment = { version = "0.10.19" }
+flate2 = "1.1.10"
+fs4 = { version = "1.1.0", default-features = false }
+futures = "0.3.34"
+futures-util = "0.3.34"
 governor = "0.10.4"
 heck = "0.5.0"
 hex = "0.4.3"
-hickory-resolver = "0.25.2"
-hkdf = "0.12.4"
-hmac = "0.12.1"
+hickory-resolver = "0.26.3"
+hkdf = "0.13.0"
+hmac = "0.13.0"
 httpdate = "1.0.3"
-hyper = "1.7.0"
-hyper-rustls = { version = "0.27.7", default-features = false, features = [
+hyper = "1.12.0"
+hyper-rustls = { version = "0.27.10", default-features = false, features = [
   "aws-lc-rs",
   "http1",
   "native-tokio",
   "tls12",
 ] }
-hyper-util = "0.1.17"
-iana-time-zone = "0.1.64"
-image = { version = "0.25.8", default-features = false, features = ["rayon"] }
-indexmap = "2.11.4"
-indicatif = "0.18.0"
-itertools = "0.14.0"
-jemalloc_pprof = "0.8.1"
-json-patch = { version = "4.1.0", default-features = false }
-json5 = "1.3.1"
-lettre = { version = "0.11.19", default-features = false, features = [
+hyper-util = "0.1.21"
+iana-time-zone = "0.1.65"
+image = { version = "0.25.10", default-features = false, features = ["rayon"] }
+indexmap = "2.14.2"
+indicatif = "0.18.6"
+infer = "0.22.0"
+itertools = "0.15.0"
+jemalloc_pprof = "0.9.0"
+jiff = { version = "0.2.37" }
+json-patch = { version = "4.2.0", default-features = false }
+json5 = "1.3.3"
+lettre = { version = "0.11.23", default-features = false, features = [
   "aws-lc-rs",
   "builder",
   "hostname",
@@ -130,61 +133,62 @@ lettre = { version = "0.11.19", default-features = false, features = [
 ] }
 lingua = "=1.8.0"
 linkify = "0.11.0"
-lz4_flex = { version = "0.11.5", default-features = false, features = [
+lz4_flex = { version = "0.14.0", default-features = false, features = [
   "checked-decode",
   "safe-decode",
   "safe-encode",
   "std",
 ] }
-maxminddb = "0.26.0"
-md5 = "0.8.0"
+maxminddb = "0.32.0"
+minecraft-meta-manifest = { path = "packages/minecraft-meta-manifest" }
+minecraft-meta-model = { path = "packages/minecraft-meta-model" }
 modrinth-content-management = { path = "packages/modrinth-content-management" }
 modrinth-log = { path = "packages/modrinth-log" }
 modrinth-util = { path = "packages/modrinth-util" }
 muralpay = { path = "packages/muralpay" }
 murmur2 = "0.1.0"
-native-dialog = "0.9.2"
+native-dialog = "0.9.7"
 neverbounce = { path = "packages/neverbounce" }
 notify = { version = "8.2.0", default-features = false }
 notify-debouncer-mini = { version = "0.7.0", default-features = false }
 objc2-app-kit = { version = "0.3.2", default-features = false }
-p256 = "0.13.2"
+p256 = "0.14.0"
 parking_lot = "0.12.5"
 paste = "1.0.15"
 path-util = { path = "packages/path-util" }
 pathdiff = "0.2.3"
-phf = { version = "0.13.1", features = ["macros"] }
-png = "0.18.0"
+phf = { version = "0.14.0", features = ["macros"] }
+png = "0.18.1"
 postcard = { version = "1.1.3", default-features = false, features = ["alloc"] }
-postcard-bindgen = "0.8.0"
+postcard-bindgen = "0.9.1"
 proc-macro2 = { version = "1.0" }
 prometheus = "0.14.0"
-psl = "2.1.145"
+psl = "2.1.243"
 pulldown-cmark = { version = "0.13.4", default-features = false }
 quartz_nbt = "0.2.9"
-quick-xml = "0.38.3"
+quick-xml = "0.42.0"
 quote = { version = "1.0" }
-rand = "=0.8.5"  # Locked on 0.8 until argon2 and p256 update to 0.9
-rand_chacha = "=0.3.1"  # Locked on 0.3 until we can update rand to 0.9
-rdkafka = { version = "0.36.2", features = ["cmake-build"] }
-redis = "1.4.1"
-regex = "1.12.2"
-reqwest = { version = "0.12.24", default-features = false }
-rgb = "0.8.52"
-rust_decimal = { version = "1.39.0", features = ["serde-with-float", "serde-with-str"] }
-rust_iso3166 = "0.1.14"
-rust-s3 = { version = "0.37.0", default-features = false, features = [
+rand = "=0.10.3"
+rand_chacha = "=0.10.0"
+rdkafka = { version = "0.39.0", features = ["cmake-build"] }
+redis = "1.7.1"
+regex = "1.13.1"
+reqwest = { version = "0.13.5", default-features = false, features = ["form", "query"] }
+rgb = "0.8.53"
+rust_decimal = { version = "1.43.0", features = ["serde-with-float", "serde-with-str"] }
+rust_iso3166 = "0.2.0"
+rust-s3 = { version = "0.38.0", default-features = false, features = [
   "fail-on-err",
   "tags",
   "tokio-rustls-tls",
 ] }
-rustls = "0.23.32"
+rustls = "0.23.46"
 rustrict = { version = "0.7.39", default-features = false, features = ["censor"] }
-rusty-money = "0.4.1"
+rusty-money = "0.5.1"
 same-file = "1.0.6"
-scalar_api_reference = { version = "0.2.2", default-features = false }
+scalar_api_reference = { version = "0.2.16", default-features = false }
 secrecy = "0.10.3"
-sentry = { version = "0.45.0", default-features = false, features = [
+sentry = { version = "0.49.3", default-features = false, features = [
   "backtrace",
   "contexts",
   "debug-images",
@@ -192,82 +196,86 @@ sentry = { version = "0.45.0", default-features = false, features = [
   "reqwest",
   "rustls",
 ] }
-serde = "1.0.228"
+serde = "1.0.229"
 serde-binhum = { path = "packages/serde-binhum" }
 serde_bytes = "0.11.19"
 serde_cbor = "0.11.2"
 serde_ini = "0.2.0"
-serde_json = "1.0.145"
-serde_with = "3.15.0"
-sha1 = "0.10.6"
+serde_json = "1.0.154"
+serde_path_to_error = { version = "0.1.20" }
+serde_with = "3.24.0"
+sha1 = "0.11.0"
 sha1_smol = { version = "1.0.1", features = ["std"] }
-sha2 = "0.10.9"
-shlex = "1.3.0"
-smallvec = "1.15.1"
-spdx = "0.12.0"
-sqlx = { version = "0.8.6", default-features = false }
+sha2 = "0.11.1"
+shlex = "2.0.1"
+smallvec = "1.16.3"
+spdx = "0.13.6"
+sqlx = { version = "0.9.0", default-features = false }
 sqlx-tracing = { path = "packages/sqlx-tracing" }
-strum = "0.27.2"
-syn = { version = "2.0" }
-sysinfo = { version = "0.37.2", default-features = false }
-tar = "0.4.44"
-tauri = "2.11.5"
-tauri-build = "2.6.3"
-tauri-plugin-deep-link = "2.4.3"
-tauri-plugin-dialog = "2.4.0"
-tauri-plugin-fs = "2.4.5"
-tauri-plugin-http = "2.5.7"
-tauri-plugin-opener = "2.5.0"
-tauri-plugin-os = "2.3.1"
-tauri-plugin-single-instance = "2.3.4"
+strum = "0.28.0"
+syn = { version = "3.0" }
+sysinfo = { version = "0.38.4", default-features = false }
+tar = "0.4.46"
+tauri = "=2.11.5"
+tauri-build = "=2.6.3"
+tauri-plugin-deep-link = "=2.4.3"
+tauri-plugin-dialog = "=2.4.0"
+tauri-plugin-fs = "=2.4.5"
+tauri-plugin-http = "=2.5.7"
+tauri-plugin-opener = "=2.5.0"
+tauri-plugin-os = "=2.3.1"
+tauri-plugin-single-instance = "=2.3.4"
 tauri-plugin-updater = { git = "https://github.com/modrinth/plugins-workspace", rev = "0d30f2aa28ec668ce187d527da1c475da3c01cbc", default-features = false, features = [
   "rustls-tls",
   "zip",
 ] }
-tauri-plugin-window-state = "2.4.0"
-tempfile = "3.23.0"
+tauri-plugin-window-state = "=2.4.0"
+tempfile = "3.27.0"
 theseus = { path = "packages/app-lib" }
-thiserror = "2.0.17"
-tikv-jemalloc-ctl = "0.6.0"
-tikv-jemallocator = "0.6.0"
-tokio = "1.47.1"
-tokio-stream = "0.1.17"
-tokio-util = "0.7.16"
-toml = "0.9.8"
-totp-rs = "5.7.0"
-tracing = "0.1.41"
-tracing-actix-web = { version = "0.7.19", default-features = false }
+thiserror = "2.0.21"
+tikv-jemalloc-ctl = "0.7.0"
+tikv-jemallocator = "0.7.0"
+toasty = { version = "0.11.0" }
+toasty-cli = { version = "0.11.0" }
+tokio = "1.54.0"
+tokio-stream = "0.1.19"
+tokio-util = "0.7.20"
+toml = "1.1.8"
+totp-rs = "6.0.0"
+tracing = "0.1.44"
+tracing-actix-web = { version = "0.7.25", default-features = false }
+tracing-anyhow = { version = "0.1.0" }
 tracing-ecs = "0.5.0"
 tracing-error = "0.2.1"
-tracing-subscriber = "0.3.20"
+tracing-subscriber = "0.3.23"
 ts-rs = "12.0.1"
-typed-path = "0.12.0"
-unicode-normalization = "0.1.24"
-unicode-segmentation = "1.12.0"
-url = "2.5.7"
+typed-path = "0.13.0"
+unicode-normalization = "0.1.26"
+unicode-segmentation = "1.13.3"
+url = "2.5.8"
 urlencoding = "2.1.3"
-utoipa = { version = "5.4.0", features = ["actix_extras", "chrono", "decimal"] }
-uuid = "1.18.1"
-validator = "0.20.0"
+utoipa = { version = "6.0.0", features = ["actix_extras", "chrono", "decimal"] }
+uuid = "1.28.0"
+validator = "0.21.0"
 webauthn-rs = "0.5.5"
 webauthn-rs-proto = "0.5.5"
 webp = { version = "0.3.1", default-features = false }
-webview2-com = "0.38.0"  # Should be updated in lockstep with wry
-whoami = "1.6.1"
-windows = "=0.61.3"  # Locked on 0.61 until we can update windows-core to 0.62
-windows-core = "=0.61.2"  # Locked on 0.61 until webview2-com updates to 0.62
-winreg = "0.55.0"
+webview2-com = "=0.38.2"  # Must match the bindings used by the pinned Tauri/Wry
+whoami = "2.1.3"
+windows = "=0.61.3"  # Must match the bindings used by the pinned Tauri/Wry
+windows-core = "=0.61.2"
+winreg = "0.56.0"
 woothee = "0.13.0"
 xredis = { path = "packages/xredis" }
 yaserde = "0.12.0"
-zbus = "5.11.0"
-zip = { version = "6.0.0", default-features = false, features = [
+zbus = "6.0.0"
+zip = { version = "9.0.5", default-features = false, features = [
   "bzip2",
   "deflate",
   "deflate64",
   "zstd",
 ] }
-zxcvbn = "3.1.0"
+zxcvbn = "3.1.1"
 
 [workspace.lints.clippy]
 bool_to_int_with_if = "warn"
@@ -320,6 +328,8 @@ tauri-macros = { git = "https://github.com/tauri-apps/tauri", rev = "7cc68e74ff6
 tauri-runtime = { git = "https://github.com/tauri-apps/tauri", rev = "7cc68e74ff6981f5c50a52a67d56c5eb2d227188" }
 tauri-runtime-wry = { git = "https://github.com/tauri-apps/tauri", rev = "7cc68e74ff6981f5c50a52a67d56c5eb2d227188" }
 tauri-utils = { git = "https://github.com/tauri-apps/tauri", rev = "7cc68e74ff6981f5c50a52a67d56c5eb2d227188" }
+# Toasty's unused SQLite driver conflicts with SQLx's native SQLite bindings.
+toasty = { path = "packages/toasty" }
 
 [profile.dev.package.sqlx-macros]
 opt-level = 3
