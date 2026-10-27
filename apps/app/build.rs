@@ -329,7 +329,6 @@ fn main() {
                         "store_usage",
                         "store_cleanup",
                         "store_set_cache_limit",
-                        "store_verify",
                         "cancel_directory_change",
                     ])
                     .default_permission(

@@ -395,9 +395,6 @@
   "app.download-manager.title": {
     "message": "Správce stahování"
   },
-  "app.download-manager.verifying": {
-    "message": "Ověřování"
-  },
   "app.error.state-init.open-backups-folder": {
     "message": "Otevřít složku zaloh"
   },

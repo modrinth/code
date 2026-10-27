@@ -383,9 +383,6 @@
   "app.download-manager.title": {
     "message": "Gestor de transferências"
   },
-  "app.download-manager.verifying": {
-    "message": "A verificar"
-  },
   "app.error.state-init.open-backups-folder": {
     "message": "Abrir a pasta de cópias de segurança"
   },
@@ -1258,12 +1255,6 @@
   },
   "app.settings.resource-management.store.nothing-to-clear": {
     "message": "Não há conteúdo não utilizado para eliminar."
-  },
-  "app.settings.resource-management.store.repair": {
-    "message": "Verificar e reparar"
-  },
-  "app.settings.resource-management.store.repairing": {
-    "message": "A verificar e a reparar…"
   },
   "app.settings.resource-management.store.shared.label": {
     "message": "Partilhado"
