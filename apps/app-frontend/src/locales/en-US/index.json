@@ -395,9 +395,6 @@
   "app.download-manager.title": {
     "message": "Download manager"
   },
-  "app.download-manager.verifying": {
-    "message": "Verifying"
-  },
   "app.error.state-init.open-backups-folder": {
     "message": "Open backups folder"
   },
@@ -2825,9 +2822,6 @@
   "app.settings.resource-management.maximum-concurrent-writes.title": {
     "message": "Maximum concurrent writes"
   },
-  "app.settings.resource-management.store.attention": {
-    "message": "Some files still need attention"
-  },
   "app.settings.resource-management.store.cache-limit.description": {
     "message": "Keep up to this much unused content for future installs. Keeping more can save download time."
   },
@@ -2855,23 +2849,8 @@
   "app.settings.resource-management.store.description": {
     "message": "Save space by reusing game installs, mods and packs across your instances."
   },
-  "app.settings.resource-management.store.issues": {
-    "message": "View {count, plural, one {# issue} other {# issues}}"
-  },
   "app.settings.resource-management.store.nothing-to-clear": {
     "message": "No unused content to clear."
-  },
-  "app.settings.resource-management.store.repair": {
-    "message": "Verify and repair"
-  },
-  "app.settings.resource-management.store.repair.running-description": {
-    "message": "This will close any running instances."
-  },
-  "app.settings.resource-management.store.repair.verify-description": {
-    "message": "Check for missing or damaged files and repair them."
-  },
-  "app.settings.resource-management.store.repairing": {
-    "message": "Verifying and repairing…"
   },
   "app.settings.resource-management.store.shared.label": {
     "message": "Shared"
@@ -2887,12 +2866,6 @@
   },
   "app.settings.resource-management.store.unused.label": {
     "message": "Orphaned"
-  },
-  "app.settings.resource-management.store.verification-result": {
-    "message": "Checked {checked, plural, one {# file} other {# files}} and made {repaired, plural, one {# repair} other {# repairs}}."
-  },
-  "app.settings.resource-management.store.verified": {
-    "message": "Verification complete"
   },
   "app.settings.sidebar.label.instance-defaults": {
     "message": "Instance defaults"

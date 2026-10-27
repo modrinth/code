@@ -164,6 +164,16 @@ export namespace Labrinth {
 				total: number
 			}
 
+			export type ResubscribePreview = {
+				subtotal: number
+				tax: number
+				total: number
+				currency_code: string
+				interval: PriceDuration | null
+				due: string
+				payment_method: unknown
+			}
+
 			export type AddPaymentMethodFlowResponse = {
 				client_secret: string
 			}

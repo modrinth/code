@@ -11,10 +11,13 @@ use std::path::PathBuf;
 
 pub type InstallModpackPreview = CreatePackInstance;
 
+/// Everything about a job except its request, which is stored separately
+/// because it can be several megabytes and is only needed to run the job.
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct InstallJobState {
     pub schema_version: u32,
-    pub request: InstallRequest,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub content_count: Option<u32>,
     pub target: InstallTarget,
     pub cleanup: InstallCleanup,
     pub progress: InstallProgressState,
@@ -32,7 +35,7 @@ pub struct InstallJobState {
 }
 
 impl InstallJobState {
-    pub fn new(request: InstallRequest) -> Self {
+    pub fn new(request: &InstallRequest) -> Self {
         let target = request.target();
         let cleanup = request.cleanup();
         let kind = request.kind();
@@ -40,7 +43,12 @@ impl InstallJobState {
 
         Self {
             schema_version: 1,
-            request,
+            content_count: match request {
+                InstallRequest::BulkUpdateContent { updates, .. } => {
+                    Some(updates.len() as u32)
+                }
+                _ => None,
+            },
             target,
             cleanup,
             progress: InstallProgressState {
