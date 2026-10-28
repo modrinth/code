@@ -6,6 +6,9 @@ use minecraft_meta_manifest::{
 use url::Url;
 
 pub(crate) trait LibraryExt {
+    /// Whether this library declares platform-specific native classifiers.
+    fn is_native(&self) -> bool;
+
     /// Native classification does not depend on classifier download metadata.
     fn native_classifier(&self, java_arch: &str) -> Option<String>;
 
@@ -17,6 +20,12 @@ pub(crate) trait LibraryExt {
 }
 
 impl LibraryExt for Library {
+    fn is_native(&self) -> bool {
+        self.natives
+            .as_ref()
+            .is_some_and(|natives| !natives.is_empty())
+    }
+
     /// Native classification does not depend on classifier download metadata.
     fn native_classifier(&self, java_arch: &str) -> Option<String> {
         let natives = self.natives.as_ref()?;
