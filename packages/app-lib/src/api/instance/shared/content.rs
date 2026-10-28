@@ -25,7 +25,9 @@ pub(super) async fn remote_shared_config_files(
 ) -> crate::Result<Vec<ExternalFileResponse>> {
     use futures::{StreamExt, TryStreamExt};
 
-    let first = applied_version.map_or(1, |version| version.saturating_add(1));
+    // The first published version is 0, after the backend's unready
+    // placeholder version -1.
+    let first = applied_version.map_or(0, |version| version.saturating_add(1));
     let intermediate = futures::stream::iter(first..latest.version)
         .map(|version| get_remote_version(shared_instance_id, version, state))
         .buffered(CONFIG_VERSION_FETCH_CONCURRENCY)
