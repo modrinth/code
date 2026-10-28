@@ -3,7 +3,11 @@ import type { App, Directive } from 'vue'
 import { ref } from 'vue'
 
 export type TooltipPlacement = Placement
-export type TooltipProps = string | { text: string; delay?: number } | null | undefined
+export type TooltipProps =
+	| string
+	| { text: string; delay?: number; class?: string }
+	| null
+	| undefined
 export type TooltipDirective = Directive<HTMLElement, TooltipProps>
 export type TooltipContent = () => unknown
 
@@ -276,6 +280,7 @@ export function installTooltipDirective(app: App) {
 			placement: tooltipPlacement(modifiers),
 			getText: () => tooltipText(value),
 			delay: tooltipDelay(value),
+			panelClass: typeof value === 'string' ? undefined : value?.class,
 		})
 	}
 }

@@ -36,6 +36,11 @@ pub(super) enum SharedInstanceRemoteResponse<T> {
 
 #[derive(Clone, Debug, Deserialize)]
 pub(super) struct RemoteInstanceResponse {
+    pub(super) name: String,
+    pub(super) icon: Option<String>,
+    #[serde(default)]
+    pub(super) linked_server:
+        Option<crate::install::model::SharedInstanceLinkedServer>,
     #[serde(default)]
     pub(super) quarantine: bool,
 }
@@ -90,7 +95,11 @@ pub(super) struct InstanceInviteInfoResponse {
     #[serde(default)]
     pub(super) instance_icon: Option<String>,
     #[serde(default)]
+    pub(super) inviter: Option<SharedInstanceInviteCreator>,
+    #[serde(default)]
     pub(super) managers: Vec<InstanceInviteManagerResponse>,
+    #[serde(default)]
+    pub(super) version: Option<InstanceVersionResponse>,
 }
 
 #[derive(Clone, Debug, Deserialize)]
@@ -101,25 +110,84 @@ pub(super) enum InstanceInviteManagerResponse {
 }
 
 #[derive(Clone, Debug, Deserialize)]
+#[serde(from = "RawInstanceVersionResponse")]
 pub(super) struct InstanceVersionResponse {
     pub(super) version: i32,
-    #[serde(default)]
     pub(super) modrinth_ids: Vec<String>,
     pub(super) ready: bool,
-    #[serde(default)]
     pub(super) external_files: Vec<ExternalFileResponse>,
-    #[serde(default)]
     pub(super) modpack_id: Option<String>,
+    pub(super) backtrack_version: Option<String>,
+    pub(super) removed_files: Vec<SharedInstanceRemovedFile>,
     pub(super) game_version: String,
     pub(super) loader: ModLoader,
     pub(super) loader_version: String,
+}
+
+#[derive(Deserialize)]
+struct RawInstanceVersionResponse {
+    version: i32,
+    #[serde(default)]
+    modrinth_ids: Vec<String>,
+    ready: bool,
+    #[serde(default)]
+    external_files: Vec<ExternalFileResponse>,
+    #[serde(default)]
+    modpack_id: Option<String>,
+    #[serde(default)]
+    backtrack_version: Option<String>,
+    #[serde(default)]
+    removed_files: Vec<SharedInstanceRemovedFile>,
+    game_version: String,
+    loader: String,
+    loader_version: String,
+}
+
+impl From<RawInstanceVersionResponse> for InstanceVersionResponse {
+    /// Servers without a client loader (vanilla, Paper, Purpur) are installed
+    /// as Fabric so players can add client-side mods on top.
+    fn from(raw: RawInstanceVersionResponse) -> Self {
+        let (loader, loader_version) = match ModLoader::from_string(&raw.loader)
+        {
+            ModLoader::Vanilla => (ModLoader::Fabric, String::new()),
+            loader => (loader, raw.loader_version),
+        };
+        Self {
+            version: raw.version,
+            modrinth_ids: raw.modrinth_ids,
+            ready: raw.ready,
+            external_files: raw.external_files,
+            modpack_id: raw.modpack_id,
+            backtrack_version: raw.backtrack_version,
+            removed_files: raw.removed_files,
+            game_version: raw.game_version,
+            loader,
+            loader_version,
+        }
+    }
+}
+
+impl InstanceVersionResponse {
+    pub(super) fn validate_removed_files(&self) -> crate::Result<()> {
+        if self.modpack_id.as_deref().is_none_or(str::is_empty)
+            && !self.removed_files.is_empty()
+        {
+            bail!(ErrorKind::InputError(
+                "removed modpack files require a modpack id".to_string(),
+            ));
+        }
+        for removed in &self.removed_files {
+            removed.validate()?;
+        }
+        Ok(())
+    }
 }
 
 #[derive(Clone, Debug, Deserialize)]
 pub(super) struct ExternalFileResponse {
     pub(super) file_name: String,
     pub(super) file_type: String,
-    pub(super) url: String,
+    pub(super) url: Option<String>,
     #[serde(default)]
     pub(super) file_size: Option<i64>,
     #[serde(default)]
@@ -241,7 +309,7 @@ pub(super) async fn update_remote_instance(
 pub(super) async fn get_remote_instance_access(
     shared_instance_id: &str,
     state: &State,
-) -> crate::Result<SharedInstanceRemoteResponse<()>> {
+) -> crate::Result<SharedInstanceRemoteResponse<RemoteInstanceResponse>> {
     let operation = "get_instance";
     let method = Method::GET;
     let path = format!("/instances/{shared_instance_id}");
@@ -277,7 +345,7 @@ pub(super) async fn get_remote_instance_access(
         ));
     }
 
-    Ok(SharedInstanceRemoteResponse::Available(()))
+    Ok(SharedInstanceRemoteResponse::Available(instance))
 }
 
 pub(super) async fn update_remote_instance_icon(
@@ -327,6 +395,32 @@ pub(super) async fn get_remote_users(
     Ok(users.into_shared_users())
 }
 
+pub(super) async fn get_remote_server_icon(
+    instance_id: &str,
+    etag: Option<&str>,
+    state: &State,
+) -> crate::Result<reqwest::Response> {
+    let credentials =
+        ModrinthCredentials::get_and_refresh(&state.pool, &state.api_semaphore)
+            .await?
+            .ok_or(crate::ErrorKind::NotLoggedIn)?;
+    let _permit = state.api_semaphore.0.acquire().await?;
+    let base_url = service_base_url();
+    let path = format!("/instances/{instance_id}/server-icon");
+    let mut request = shared_instances_client(base_url)
+        .get(service_url(base_url, &path))
+        .bearer_auth(credentials.session)
+        .timeout(std::time::Duration::from_secs(15));
+    if let Some(etag) = etag {
+        request = request.header(reqwest::header::IF_NONE_MATCH, etag);
+    }
+    request
+        .send()
+        .await
+        .map_err(|error| error.without_url())
+        .context(ErrorKind::SharedInstancesApiError)
+}
+
 pub(super) async fn get_latest_remote_version(
     shared_instance_id: &str,
     state: &State,
@@ -338,25 +432,6 @@ pub(super) async fn get_latest_remote_version(
     .await?
     {
         SharedInstanceRemoteResponse::Available(version) => Ok(version),
-        SharedInstanceRemoteResponse::Unavailable(
-            reason @ SharedInstanceUnavailableReason::AccessRevoked,
-        ) => {
-            if !accept_pending_remote_invite(shared_instance_id, state).await? {
-                return Err(shared_instance_unavailable_error(reason));
-            }
-
-            match get_latest_remote_version_optional_unavailable(
-                shared_instance_id,
-                state,
-            )
-            .await?
-            {
-                SharedInstanceRemoteResponse::Available(version) => Ok(version),
-                SharedInstanceRemoteResponse::Unavailable(reason) => {
-                    Err(shared_instance_unavailable_error(reason))
-                }
-            }
-        }
         SharedInstanceRemoteResponse::Unavailable(reason) => {
             Err(shared_instance_unavailable_error(reason))
         }
@@ -554,7 +629,7 @@ pub(super) async fn get_shared_instance_invite_info(
 ) -> crate::Result<InstanceInviteInfoResponse> {
     let operation = "get_instance_invite";
     let method = Method::GET;
-    let path = format!("/invites/{invite_id}");
+    let path = format!("/invites/{invite_id}?version=true");
     let log_path = "/invites/:invite_id";
     let response = send_request_with_auth_and_log_path(
         operation,

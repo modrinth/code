@@ -461,12 +461,6 @@
   "app.instance.share.locked.wrong-account-heading": {
     "message": "Krivi nalog"
   },
-  "app.instance.share.members.empty": {
-    "message": "Niti jedan korisnik se nije pridružio"
-  },
-  "app.instance.share.members.no-filter-results": {
-    "message": "Nijedan korisnik ne odgovara tvojim filterima."
-  },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "Neće više primat ažuriranja za ovu instancu"
   },

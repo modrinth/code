@@ -5,6 +5,7 @@
 		:resolve-viewer="resolveViewer"
 		:show-copy-id-action="flags.developerMode"
 		:show-advanced-debug-info="flags.advancedDebugInfo"
+		:force-server-play-migration="flags.debugServerPlayMigration"
 		:stripe-publishable-key="config.public.stripePublishableKey as string"
 		:site-url="config.public.siteUrl as string"
 		:products="products"
@@ -28,15 +29,29 @@
 				})
 			}
 		"
+		@server-play-migration-tagged="showServerSharingUpdate"
 	>
 		<template #default="{ onReinstall, onReinstallFailed }">
 			<NuxtPage :route="route" @reinstall="onReinstall" @reinstall-failed="onReinstallFailed" />
+			<ServerSharingUpdateModal
+				ref="serverSharingUpdateModal"
+				:site-url="config.public.siteUrl as string"
+				video-src="https://cdn.modrinth.com/media/server-play-demo.webm"
+				poster-src="https://cdn.modrinth.com/media/server-play-demo.webp"
+				web
+			/>
 		</template>
 	</ServersManageRootLayout>
 </template>
 
 <script setup lang="ts">
-import { injectModrinthClient, ServersManageRootLayout } from '@modrinth/ui'
+import {
+	createServerInviteHandoff,
+	injectModrinthClient,
+	provideServerInviteHandoff,
+	ServerSharingUpdateModal,
+	ServersManageRootLayout,
+} from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 
 import { reloadNuxtApp } from '#app'
@@ -50,6 +65,31 @@ const serverId = route.params.id as string
 
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
+
+provideServerInviteHandoff(createServerInviteHandoff())
+
+const SERVER_SHARING_UPDATE_SHOWN_KEY = 'server-sharing-update-shown'
+const serverSharingUpdateModal = useTemplateRef<InstanceType<typeof ServerSharingUpdateModal>>(
+	'serverSharingUpdateModal',
+)
+
+const serverSharingUpdatePending = ref(false)
+
+function showServerSharingUpdate() {
+	serverSharingUpdatePending.value = true
+}
+
+watch([serverSharingUpdatePending, serverSharingUpdateModal], ([pending, modal]) => {
+	if (!pending || !modal) return
+	serverSharingUpdatePending.value = false
+	try {
+		if (localStorage.getItem(SERVER_SHARING_UPDATE_SHOWN_KEY) === 'true') return
+		localStorage.setItem(SERVER_SHARING_UPDATE_SHOWN_KEY, 'true')
+	} catch {
+		return
+	}
+	modal.show(`/hosting/manage/${serverId}/play`)
+})
 
 if (serverId) {
 	try {

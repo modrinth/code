@@ -19,8 +19,11 @@ import {
 	CreationFlowModal,
 	defineMessages,
 	formatProjectTypeSentence,
+	getProjectVersionFilterQuery,
 	injectModrinthClient,
 	injectUserPreferences,
+	isServerContentEnvironmentProjectType,
+	NavTabs,
 	PROJECT_DEP_MARKER_QUERY,
 	provideBrowseManager,
 	SelectedProjectsFloatingBar,
@@ -40,6 +43,7 @@ import LogoAnimated from '~/components/brand/LogoAnimated.vue'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import { projectQueryOptions, warmProjectCheckCaches } from '~/composables/queries/project'
 import { versionQueryOptions } from '~/composables/queries/version'
+import { useDiscoverProjectTypeLinks } from '~/composables/use-discover-project-type-links'
 import type {
 	ServerInstallModalHandle,
 	ServerInstallSearchResult,
@@ -58,6 +62,7 @@ const { updatePreferences } = injectUserPreferences()
 const queryClient = useQueryClient()
 
 const filtersMenuOpen = ref(false)
+const { projectTypeLinks, isServerContext } = useDiscoverProjectTypeLinks()
 const route = useRoute()
 
 const cosmetics = useCosmetics()
@@ -177,12 +182,13 @@ const onboardingModalRef = ref<ServerInstallModalHandle | null>(null)
 const {
 	currentServerId,
 	fromContext,
+	isSetupServerContext,
 	serverData,
 	serverContentData,
 	serverFilters,
 	serverHideInstalled,
-	serverContentServerOnly,
-	showServerOnlyToggle,
+	serverEnvironment,
+	showServerEnvironment,
 	serverEnvironmentOverride,
 	hideSelectedServerInstalls,
 	installingProjectIds,
@@ -203,6 +209,23 @@ const {
 	onboardingModalRef,
 	debug,
 })
+
+watch(
+	[serverEnvironment, currentType, showServerEnvironment],
+	([environment, type, show]) => {
+		if (!show) return
+		const allowed = type !== 'modpack' && isServerContentEnvironmentProjectType(environment, type)
+		if (allowed && (route.query.env ?? null) === environment) return
+		navigateTo(
+			{
+				path: allowed ? route.path : '/discover/mods',
+				query: { ...route.query, env: environment ?? undefined },
+			},
+			{ replace: true },
+		)
+	},
+	{ immediate: true },
+)
 
 function getServerModpackContent(project: Labrinth.Search.v3.ResultSearchProject) {
 	const content = project.minecraft_java_server?.content
@@ -351,27 +374,31 @@ function getCardActions(
 	}
 
 	if (serverData.value) {
-		const isQueued = queuedServerInstallProjectIds.value.has(result.project_id)
-		const isQueuedRoot = queuedServerInstallRootProjectIds.value.has(result.project_id)
+		const isQueued =
+			!isSetupServerContext.value && queuedServerInstallProjectIds.value.has(result.project_id)
+		const isQueuedRoot =
+			!isSetupServerContext.value && queuedServerInstallRootProjectIds.value.has(result.project_id)
 		const isInstalled =
-			projectResult.installed ||
-			optimisticallyInstalledProjectIds.value.has(result.project_id) ||
-			(serverContentData.value &&
-				(serverContentData.value.addons ?? []).find((x) => x.project_id === result.project_id)) ||
-			serverData.value.upstream?.project_id === result.project_id
+			!isSetupServerContext.value &&
+			(projectResult.installed ||
+				optimisticallyInstalledProjectIds.value.has(result.project_id) ||
+				(serverContentData.value &&
+					(serverContentData.value.addons ?? []).find((x) => x.project_id === result.project_id)) ||
+				serverData.value.upstream?.project_id === result.project_id)
 		const isInstalling = installingProjectIds.value.has(result.project_id)
 		const isInstallingSelection = isInstallingQueuedServerInstalls.value
+		const showAsInstalling = isInstalling || (isInstallingSelection && isQueuedRoot)
 		const validatingInstall =
 			isInstalling && currentProjectType !== 'modpack' && !isInstallingSelection
 		const installLabel = isInstalled
 			? formatMessage(commonMessages.installedLabel)
 			: isQueued
-				? isInstalling || isInstallingSelection
+				? showAsInstalling
 					? validatingInstall
 						? formatMessage(commonMessages.validatingLabel)
 						: formatMessage(commonMessages.installingLabel)
 					: formatMessage(commonMessages.selectedLabel)
-				: isInstalling || isInstallingSelection
+				: showAsInstalling
 					? validatingInstall
 						? formatMessage(commonMessages.validatingLabel)
 						: formatMessage(commonMessages.installingLabel)
@@ -381,16 +408,11 @@ function getCardActions(
 			{
 				key: 'install',
 				label: installLabel,
-				icon:
-					isInstalling || isInstallingSelection
-						? SpinnerIcon
-						: isQueued || isInstalled
-							? CheckIcon
-							: DownloadIcon,
-				iconClass: isInstalling || isInstallingSelection ? 'animate-spin' : undefined,
+				icon: showAsInstalling ? SpinnerIcon : isQueued || isInstalled ? CheckIcon : DownloadIcon,
+				iconClass: showAsInstalling ? 'animate-spin' : undefined,
 				disabled:
 					!!isInstalled || isInstalling || isInstallingSelection || (isQueued && !isQueuedRoot),
-				color: isQueued && !isInstalling && !isInstallingSelection ? 'green' : 'brand',
+				color: isQueued && !showAsInstalling ? 'green' : 'brand',
 				type: 'outlined',
 				onClick: () => serverInstall(projectResult),
 			},
@@ -464,10 +486,10 @@ const searchState = useBrowseSearch({
 	providedFilters: serverFilters,
 	environmentOverride: serverEnvironmentOverride,
 	search,
-	persistentQueryParams: ['sid', 'wid', 'shi', 'so', 'from'],
+	persistentQueryParams: ['sid', 'wid', 'shi', 'env', 'from'],
 	getExtraQueryParams: () => ({
 		shi: serverHideInstalled.value ? 'true' : undefined,
-		so: showServerOnlyToggle.value && serverContentServerOnly.value ? 'true' : undefined,
+		env: (showServerEnvironment.value && serverEnvironment.value) || undefined,
 	}),
 	maxResultsOptions: currentMaxResultsOptions,
 	displayMode: resultsDisplayMode,
@@ -543,10 +565,18 @@ provideBrowseManager({
 	tags,
 	projectType: projectTypeId,
 	...searchState,
-	getProjectLink: (result: Labrinth.Search.v3.ResultSearchProject) =>
-		withHostingContext(
-			`/${projectType.value?.id ?? 'project'}/${result.slug ? result.slug : result.project_id}`,
-		),
+	getProjectLink: (result: Labrinth.Search.v3.ResultSearchProject) => ({
+		path: `/${projectType.value?.id ?? 'project'}/${result.slug ? result.slug : result.project_id}`,
+		query: {
+			...hostingContextQuery.value,
+			...getProjectVersionFilterQuery({
+				contentType: projectTypeId.value,
+				selectedFilters: searchState.currentFilters.value,
+				providedFilters: serverFilters.value,
+				overriddenProvidedFilterTypes: searchState.overriddenProvidedFilterTypes.value,
+			}),
+		},
+	}),
 	getServerProjectLink: (result: Labrinth.Search.v3.ResultSearchProject) =>
 		withHostingContext(`/server/${result.slug ?? result.project_id}`),
 	selectableProjectTypes: computed(() => []),
@@ -566,10 +596,9 @@ provideBrowseManager({
 			queuedServerInstallCount.value > 0,
 	),
 	hideSelectedLabel: computed(() => formatMessage(commonMessages.hideSelectedContentLabel)),
-	serverOnly: serverContentServerOnly,
-	showServerOnly: showServerOnlyToggle,
-	serverOnlyLabel: computed(() => formatMessage(commonMessages.serverOnlyLabel)),
-	hiddenFilterTypes: computed(() => (showServerOnlyToggle.value ? ['environment'] : [])),
+	serverEnvironment,
+	showServerEnvironment,
+	hiddenFilterTypes: computed(() => (showServerEnvironment.value ? ['environment'] : [])),
 	advancedFiltersCollapsed,
 	dismissedPhotosensitivityFilterWarning,
 	displayMode: resultsDisplayMode,
@@ -609,6 +638,8 @@ const { isStuck: isInstallHeaderStuck } = useStickyObserver(
 	>
 		<BrowseInstallHeader divider bottom-padding />
 	</div>
+
+	<NavTabs v-if="isServerContext" :links="projectTypeLinks" replace animate-collapse class="flex" />
 
 	<SelectedProjectsFloatingBar v-if="installContext" :install-context="installContext" />
 
@@ -650,7 +681,7 @@ const { isStuck: isInstallHeaderStuck } = useStickyObserver(
 	</div>
 
 	<CreationFlowModal
-		v-if="currentServerId && projectType?.id === 'modpack'"
+		v-if="currentServerId && fromContext !== 'onboarding'"
 		ref="onboardingModalRef"
 		:type="fromContext === 'reset-server' ? 'reset-server' : 'server-onboarding'"
 		:available-loaders="['vanilla', 'fabric', 'neoforge', 'forge', 'quilt', 'paper', 'purpur']"

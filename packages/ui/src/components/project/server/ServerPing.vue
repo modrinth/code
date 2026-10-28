@@ -46,7 +46,7 @@ const pingClass = computed(() => {
 </script>
 <template>
 	<TagItem
-		v-if="ping || statusOnline"
+		v-if="ping !== undefined || statusOnline"
 		class="border !border-solid !font-medium w-max"
 		:class="pingClass"
 	>

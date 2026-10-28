@@ -554,9 +554,6 @@
   "files.zip-url-modal.install-button": {
     "defaultMessage": "Installer"
   },
-  "files.zip-url-modal.step-select-title": {
-    "defaultMessage": "Vælg en version"
-  },
   "form.label.address-line": {
     "defaultMessage": "Adresse"
   },

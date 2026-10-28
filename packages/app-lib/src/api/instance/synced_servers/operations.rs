@@ -215,7 +215,25 @@ pub(in crate::api::instance) async fn reconcile_servers(
             .as_ref()
             .is_some_and(|value| value.source_revision == revision)
         {
-            return Ok(());
+            let projections =
+                load_projection_entries(&metadata.instance.id, state).await?;
+            let records = compose_records(metadata, state).await?;
+            if projections.len() == records.len()
+                && projections.iter().zip(&records).enumerate().all(
+                    |(position, (projection, record))| {
+                        let owner = match record.source {
+                            ServerSource::UserSynced => ProjectionOwner::Synced,
+                            _ => ProjectionOwner::Instance,
+                        };
+                        projection.id == record.id
+                            && projection.owner == owner
+                            && projection.data == record.data
+                            && projection.position == position as i64
+                    },
+                )
+            {
+                return Ok(());
+            }
         }
         return compose_instance(metadata, state).await;
     }
@@ -429,6 +447,9 @@ async fn list_local_server_records(
 }
 
 /// Keeps an automatically added server local, even before server sync is enabled.
+///
+/// A previously managed server with a different address is treated as the same
+/// server, so an address change replaces it instead of adding a second entry.
 pub(crate) async fn ensure_managed_server(
     metadata: &InstanceMetadata,
     data: NbtCompound,
@@ -437,10 +458,26 @@ pub(crate) async fn ensure_managed_server(
     let _guard = state.synced_options.lock().await;
     let path = instance_dir(metadata, state).join(SERVERS_FILE);
     let syncing = participating(metadata, state).await?;
-    let records = list_server_records_locked(metadata, state).await?;
+    let mut records = list_server_records_locked(metadata, state).await?;
+    let mut locals = load_local(&metadata.instance.id, state).await?;
     let address = normalized_server_address(&data);
     let name = server_identity_name(&data);
-    let existing_index = records
+    let mut stale_local = locals.iter().position(|server| {
+        server.source == ServerSource::LinkedServerProject
+            && normalized_server_address(&server.data) != address
+    });
+    let stale_index = stale_local.and_then(|local_index| {
+        let stale = &locals[local_index];
+        let stale_address = normalized_server_address(&stale.data);
+        records.iter().position(|record| {
+            if syncing {
+                record.id == stale.id
+            } else {
+                normalized_server_address(&record.data) == stale_address
+            }
+        })
+    });
+    let mut existing_index = records
         .iter()
         .position(|record| {
             normalized_server_address(&record.data) == address
@@ -451,6 +488,21 @@ pub(crate) async fn ensure_managed_server(
                 normalized_server_address(&record.data) == address
             })
         });
+    let mut stale_removed = false;
+    if let Some(index) = existing_index
+        && let Some(local_index) = stale_local.take()
+    {
+        locals.remove(local_index);
+        if let Some(stale) = stale_index {
+            records.remove(stale);
+            if stale < index {
+                existing_index = Some(index - 1);
+            }
+        }
+        stale_removed = true;
+    } else if existing_index.is_none() {
+        existing_index = stale_index;
+    }
     let existing = existing_index.map(|index| &records[index]);
     let position = existing_index.unwrap_or_else(|| {
         records
@@ -468,20 +520,25 @@ pub(crate) async fn ensure_managed_server(
                 );
                 existing_data.insert("hidden", 0_i8);
             }
+            if normalized_server_address(&existing_data) != address {
+                existing_data.insert("ip", server_address(&data));
+            }
             existing_data
         })
         .unwrap_or(data);
     let excluded_synced_server_id = existing
         .filter(|record| record.source == ServerSource::UserSynced)
         .map(|record| record.id.clone());
-    let mut locals = load_local(&metadata.instance.id, state).await?;
-    if let Some(local) = locals
-        .iter_mut()
-        .find(|server| normalized_server_address(&server.data) == address)
-    {
+    let local_index = locals
+        .iter()
+        .position(|server| normalized_server_address(&server.data) == address)
+        .or(stale_local);
+    if let Some(local_index) = local_index {
+        let local = &mut locals[local_index];
         let excluded_synced_server_id = excluded_synced_server_id
             .or_else(|| local.excluded_synced_server_id.clone());
-        if existing.is_some_and(|record| record.data == data)
+        if !stale_removed
+            && existing.is_some_and(|record| record.data == data)
             && local.data == data
             && local.position == position as i64
             && local.excluded_synced_server_id == excluded_synced_server_id
@@ -506,7 +563,8 @@ pub(crate) async fn ensure_managed_server(
         if effective(metadata, state).await? {
             compose_instance(metadata, state).await?;
         }
-    } else if existing.is_none_or(|record| record.data != data) {
+    } else if stale_removed || existing.is_none_or(|record| record.data != data)
+    {
         let mut servers = records
             .into_iter()
             .map(|record| record.data)

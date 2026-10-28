@@ -341,9 +341,6 @@
   "content.card.synced": {
     "defaultMessage": "Sincronizado entre instâncias"
   },
-  "content.card.uploaded": {
-    "defaultMessage": "Carregado"
-  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Você tem certeza que deseja atualizar {count, plural, one {# projeto} other {# projetos}} para a última versão compatível? É recomendável atualizar o conteúdo um por um."
   },

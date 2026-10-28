@@ -341,9 +341,6 @@
   "content.card.synced": {
     "defaultMessage": "Синхронізовано з примірниками"
   },
-  "content.card.uploaded": {
-    "defaultMessage": "Вивантажено"
-  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Справді бажаєте оновити {count, plural, one {# проєкт до його} few {# проєкти до їхньої} other {# проєктів до їхньої}} останньої сумісної версії? Ми радимо оновлювати вміст поодинці."
   },
@@ -599,9 +596,6 @@
   "content.managed-card.view-content": {
     "defaultMessage": "Переглянути вміст"
   },
-  "content.metadata-filter.author": {
-    "defaultMessage": "Автор"
-  },
   "content.metadata-filter.environment": {
     "defaultMessage": "Середовище"
   },
@@ -626,17 +620,8 @@
   "content.metadata-filter.update.available": {
     "defaultMessage": "Доступне оновлення"
   },
-  "content.metadata-filter.warning.client-depends": {
-    "defaultMessage": "Клієнт залежить від файлу"
-  },
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "Вміст лише для клієнта"
-  },
-  "content.metadata-filter.warning.client-retained": {
-    "defaultMessage": "Файл клієнта збережено"
-  },
-  "content.metadata-filter.warning.none": {
-    "defaultMessage": "Без попереджень"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "Попередження"
@@ -670,9 +655,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Фільтр"
-  },
-  "content.page-layout.filter.author-count": {
-    "defaultMessage": "{count, plural, one {# автор} few {# автора} other {# авторів}}"
   },
   "content.page-layout.loading": {
     "defaultMessage": "Завантаження вмісту…"
@@ -1541,9 +1523,6 @@
   "files.navbar.home": {
     "defaultMessage": "Головна"
   },
-  "files.navbar.install-curseforge-pack": {
-    "defaultMessage": "Установити збірку CurseForge"
-  },
   "files.navbar.new-file": {
     "defaultMessage": "Новий файл"
   },
@@ -1679,21 +1658,6 @@
   "files.zip-url-modal.backup-name": {
     "defaultMessage": "Установлення збірки CurseForge"
   },
-  "files.zip-url-modal.cf-header": {
-    "defaultMessage": "Установити збірку CurseForge"
-  },
-  "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "Не вдалося знайти збірку CurseForge за цим посиланням."
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "Збірку CurseForge не знайдено"
-  },
-  "files.zip-url-modal.enter-link": {
-    "defaultMessage": "Укажіть посилання"
-  },
-  "files.zip-url-modal.error-cf-url": {
-    "defaultMessage": "Посилання має вести на версію збірки CurseForge."
-  },
   "files.zip-url-modal.error-url-invalid": {
     "defaultMessage": "Посилання має бути дійсним."
   },
@@ -1705,24 +1669,6 @@
   },
   "files.zip-url-modal.install-failed-title": {
     "defaultMessage": "Не вдалося встановити"
-  },
-  "files.zip-url-modal.step-copy-description": {
-    "defaultMessage": "Скопіюйте посилання на сторінку версії та вкажіть його нижче."
-  },
-  "files.zip-url-modal.step-copy-title": {
-    "defaultMessage": "Скопіюйте посилання"
-  },
-  "files.zip-url-modal.step-find-description": {
-    "defaultMessage": "Перейдіть на CurseForge і знайдіть бажану збірку."
-  },
-  "files.zip-url-modal.step-find-title": {
-    "defaultMessage": "Знайдіть збірку"
-  },
-  "files.zip-url-modal.step-select-description": {
-    "defaultMessage": "Перейдіть у вкладку «Файли» й виберіть версію, яку хочете встановити."
-  },
-  "files.zip-url-modal.step-select-title": {
-    "defaultMessage": "Виберіть версію"
   },
   "files.zip-url-modal.unknown-error": {
     "defaultMessage": "Виникла невідома помилка"
@@ -1877,12 +1823,6 @@
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Не вдалося видалити вміст"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "Не вдалося вимкнути вміст"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "Не вдалося ввімкнути вміст"
-  },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "Не вдалося оновити вміст"
   },
@@ -1897,9 +1837,6 @@
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Не вдалося видалити вміст"
-  },
-  "hosting.content.failed-to-toggle": {
-    "defaultMessage": "Не вдалося перемкнути {name}"
   },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "Не вдалося відв’язати збірку"
@@ -2345,12 +2282,6 @@
   "instances.managed-content-modal.enabled": {
     "defaultMessage": "Увімкнено"
   },
-  "instances.managed-content-modal.external-content": {
-    "defaultMessage": "Зовнішнє"
-  },
-  "instances.managed-content-modal.external-content-description": {
-    "defaultMessage": "Цей файл не опубліковано на Modrinth."
-  },
   "instances.managed-content-modal.header": {
     "defaultMessage": "Керований уміст"
   },
@@ -2365,9 +2296,6 @@
   },
   "instances.managed-content-modal.search-placeholder": {
     "defaultMessage": "Пошук {count, number} {count, plural,one {проєкт} other {проєкти}}"
-  },
-  "instances.managed-content-modal.warnings": {
-    "defaultMessage": "Попередження"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Поточна"
@@ -2452,15 +2380,6 @@
   },
   "label.changes-saved": {
     "defaultMessage": "Зміни збережено"
-  },
-  "label.client-depends-warning": {
-    "defaultMessage": "Цей мод залежить від клієнтського мода, що може спричинити проблеми під час запуску сервера"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "Це клієнтський мод, який може викликати проблеми під час запуску сервера"
-  },
-  "label.client-retained-warning": {
-    "defaultMessage": "Це клієнтський мод, який був встановлений як залежність і може спричинити проблеми під час запуску сервера"
   },
   "label.collections": {
     "defaultMessage": "Добірки"
@@ -5555,15 +5474,6 @@
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "Тепер їх можна знайти тут!"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "Не показувати знову"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "Налаштування вашого сервера переміщено"
-  },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Спільні сервери"
   },
@@ -5834,18 +5744,6 @@
   "servers.settings.support.clear-action-log-title": {
     "defaultMessage": "Очистити журнал дій?"
   },
-  "servers.setup.onboarding.installation-failed.text": {
-    "defaultMessage": "Під час установлення сталася несподівана помилка. Спробуйте ще раз пізніше."
-  },
-  "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "Не вдалося встановити"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.text": {
-    "defaultMessage": "Під час вивантаження сталася несподівана помилка. Спробуйте ще раз пізніше."
-  },
-  "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "Не вдалося вивантажити збірку"
-  },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "Налаштування сервера"
   },
@@ -5869,9 +5767,6 @@
   },
   "servers.setup.onboarding.steps.heading": {
     "defaultMessage": "Налаштування вашого сервера (~2хв)"
-  },
-  "servers.setup.onboarding.uploading.progress": {
-    "defaultMessage": "Вивантаження ({percent, number}%)"
   },
   "servers.setup.onboarding.welcome.description": {
     "defaultMessage": "Ваш сервер готовий. Ось що вам потрібно зробити, щоб почати грати!"

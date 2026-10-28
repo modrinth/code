@@ -341,9 +341,6 @@
   "content.card.synced": {
     "defaultMessage": "已跨實例同步"
   },
-  "content.card.uploaded": {
-    "defaultMessage": "上傳內容"
-  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "確定要將這 {count, plural, other {# 個專案}}更新至最新的相容版本嗎？建議你逐一進行更新。"
   },
@@ -599,9 +596,6 @@
   "content.managed-card.view-content": {
     "defaultMessage": "查看內容"
   },
-  "content.metadata-filter.author": {
-    "defaultMessage": "作者"
-  },
   "content.metadata-filter.environment": {
     "defaultMessage": "環境"
   },
@@ -626,17 +620,8 @@
   "content.metadata-filter.update.available": {
     "defaultMessage": "有可用的更新"
   },
-  "content.metadata-filter.warning.client-depends": {
-    "defaultMessage": "用戶端相依於檔案"
-  },
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "用戶端內容"
-  },
-  "content.metadata-filter.warning.client-retained": {
-    "defaultMessage": "用戶端檔案已保留"
-  },
-  "content.metadata-filter.warning.none": {
-    "defaultMessage": "沒有警告"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "警告"
@@ -673,9 +658,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "篩選條件"
-  },
-  "content.page-layout.filter.author-count": {
-    "defaultMessage": "{count, plural, other {# 位作者}}"
   },
   "content.page-layout.loading": {
     "defaultMessage": "正在載入內容..."
@@ -1586,9 +1568,6 @@
   "files.navbar.home": {
     "defaultMessage": "首頁"
   },
-  "files.navbar.install-curseforge-pack": {
-    "defaultMessage": "安裝 CurseForge 整合包"
-  },
   "files.navbar.new-file": {
     "defaultMessage": "新增檔案"
   },
@@ -1724,21 +1703,6 @@
   "files.zip-url-modal.backup-name": {
     "defaultMessage": "安裝 CurseForge 整合包"
   },
-  "files.zip-url-modal.cf-header": {
-    "defaultMessage": "安裝 CurseForge 整合包"
-  },
-  "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "在該網址找不到 CurseForge 整合包"
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "找不到 CurseForge 整合包"
-  },
-  "files.zip-url-modal.enter-link": {
-    "defaultMessage": "輸入連結"
-  },
-  "files.zip-url-modal.error-cf-url": {
-    "defaultMessage": "網址必須是 CurseForge 整合包版本網址"
-  },
   "files.zip-url-modal.error-url-invalid": {
     "defaultMessage": "網址必須有效"
   },
@@ -1750,24 +1714,6 @@
   },
   "files.zip-url-modal.install-failed-title": {
     "defaultMessage": "安裝失敗"
-  },
-  "files.zip-url-modal.step-copy-description": {
-    "defaultMessage": "複製版本頁面網址並貼到下方"
-  },
-  "files.zip-url-modal.step-copy-title": {
-    "defaultMessage": "複製網址"
-  },
-  "files.zip-url-modal.step-find-description": {
-    "defaultMessage": "瀏覽 CurseForge 並找到您想要的整合包"
-  },
-  "files.zip-url-modal.step-find-title": {
-    "defaultMessage": "尋找整合包"
-  },
-  "files.zip-url-modal.step-select-description": {
-    "defaultMessage": "前往「檔案」分頁並選擇要安裝的版本"
-  },
-  "files.zip-url-modal.step-select-title": {
-    "defaultMessage": "選擇版本"
   },
   "files.zip-url-modal.unknown-error": {
     "defaultMessage": "發生未知錯誤"
@@ -1922,12 +1868,6 @@
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "無法刪除內容"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "無法停用內容"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "無法啟用內容"
-  },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "無法更新內容"
   },
@@ -1942,9 +1882,6 @@
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "無法移除內容"
-  },
-  "hosting.content.failed-to-toggle": {
-    "defaultMessage": "無法切換「{name}」"
   },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "無法取消連結模組包"
@@ -2390,12 +2327,6 @@
   "instances.managed-content-modal.enabled": {
     "defaultMessage": "已啟用"
   },
-  "instances.managed-content-modal.external-content": {
-    "defaultMessage": "外部"
-  },
-  "instances.managed-content-modal.external-content-description": {
-    "defaultMessage": "這個檔案未在 Modrinth 上發布。"
-  },
   "instances.managed-content-modal.header": {
     "defaultMessage": "受管理內容"
   },
@@ -2410,9 +2341,6 @@
   },
   "instances.managed-content-modal.search-placeholder": {
     "defaultMessage": "搜尋 {count, number} {count, plural, other {個專案}}"
-  },
-  "instances.managed-content-modal.warnings": {
-    "defaultMessage": "警告"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "目前"
@@ -2497,15 +2425,6 @@
   },
   "label.changes-saved": {
     "defaultMessage": "變更已儲存"
-  },
-  "label.client-depends-warning": {
-    "defaultMessage": "這個模組相依於用戶端模組，啟動伺服器時可能會導致問題"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "此為用戶端模組，啟動伺服器時可能會導致問題"
-  },
-  "label.client-retained-warning": {
-    "defaultMessage": "這是一個作為相依項安裝的用戶端模組，啟動伺服器時可能會導致問題"
   },
   "label.collections": {
     "defaultMessage": "收藏"
@@ -5696,15 +5615,6 @@
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "現在可以在這裡找到伺服器設定！"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "不再顯示"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "你的伺服器設定已移動位置"
-  },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "共享伺服器"
   },
@@ -5987,18 +5897,6 @@
   "servers.settings.support.clear-action-log-title": {
     "defaultMessage": "要清除動作紀錄嗎？"
   },
-  "servers.setup.onboarding.installation-failed.text": {
-    "defaultMessage": "安裝時發生非預期的錯誤。請稍後再試。"
-  },
-  "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "無法安裝"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.text": {
-    "defaultMessage": "上傳時發生非預期的錯誤。請稍後再試。"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "無法上傳模組包"
-  },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "設定伺服器"
   },
@@ -6022,9 +5920,6 @@
   },
   "servers.setup.onboarding.steps.heading": {
     "defaultMessage": "設定伺服器（約需 2 分鐘）"
-  },
-  "servers.setup.onboarding.uploading.progress": {
-    "defaultMessage": "正在上傳 ({percent, number}%}"
   },
   "servers.setup.onboarding.welcome.description": {
     "defaultMessage": "你的伺服器已準備就緒。以下是開始遊戲前需要完成的操作！"

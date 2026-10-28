@@ -1,8 +1,18 @@
 import type { Labrinth } from '@modrinth/api-client'
 
+import {
+	newestVersionForChannel,
+	type UpdateChannelPolicy,
+} from '#ui/layouts/shared/content-tab/utils/update-channels'
 import type { FilterValue } from '#ui/utils/search'
 
-export type BrowseInstallContentType = 'modpack' | 'mod' | 'plugin' | 'datapack'
+export type BrowseInstallContentType =
+	| 'modpack'
+	| 'mod'
+	| 'plugin'
+	| 'datapack'
+	| 'resourcepack'
+	| 'shader'
 export type BrowseInstallAddonContentType = Exclude<BrowseInstallContentType, 'modpack'>
 
 /**
@@ -300,6 +310,10 @@ export interface ResolveInstallPlanOptions<
 	project: TProject
 	contentType: BrowseInstallContentType
 	targetPreferences?: BrowseInstallPreferences
+	/**
+	 * Release channel of the install target. Omitting it allows every version type.
+	 */
+	updateChannel?: UpdateChannelPolicy
 	getProjectVersions: (projectId: string) => Promise<Labrinth.Versions.v2.Version[]>
 }
 
@@ -471,6 +485,20 @@ export function getSelectedInstallPreferences(
 }
 
 /**
+ * Builds the project versions page filter query (`g` for game versions, `l` for loaders) from the
+ * current browse selection, so opening a project from browse pre-filters its versions.
+ *
+ * Both keys are always present so they replace browse's own `g`/`l` params, which mean different things.
+ */
+export function getProjectVersionFilterQuery(options: SelectedInstallPreferencesOptions) {
+	const preferences = getSelectedInstallPreferences(options)
+	return {
+		g: preferences.gameVersions ?? [],
+		l: preferences.loaders ?? [],
+	}
+}
+
+/**
  * Converts server/instance metadata into fallback install preferences.
  */
 export function getTargetInstallPreferences(
@@ -486,7 +514,10 @@ export function getTargetInstallPreferences(
 		loaders:
 			contentType === 'datapack'
 				? ['datapack']
-				: loader && shouldUseTargetRuntime
+				: loader &&
+					  shouldUseTargetRuntime &&
+					  contentType !== 'resourcepack' &&
+					  contentType !== 'shader'
 					? [loader]
 					: undefined,
 	})
@@ -544,15 +575,18 @@ export function mergeInstallPreferences(
 }
 
 /**
- * Finds the newest version matching the given preferences.
+ * Finds the newest version matching the given preferences, preferring the most stable channels the
+ * update channel allows. The default `alpha` channel accepts every version type.
  */
 export function getLatestMatchingInstallVersion(
 	versions: readonly Labrinth.Versions.v2.Version[],
 	preferences: BrowseInstallPreferences,
+	updateChannel: UpdateChannelPolicy = 'alpha',
 ) {
-	return [...versions]
-		.filter((version) => versionMatchesPreferences(version, preferences))
-		.sort((a, b) => new Date(b.date_published).getTime() - new Date(a.date_published).getTime())[0]
+	return newestVersionForChannel(
+		versions.filter((version) => versionMatchesPreferences(version, preferences)),
+		updateChannel,
+	)
 }
 
 /**
@@ -576,7 +610,11 @@ export async function resolveInstallPlan<TProject extends BrowseInstallProject>(
 	let lastError: Error | null = null
 
 	for (const candidate of candidates) {
-		const version = getLatestMatchingInstallVersion(versions, candidate.preferences)
+		const version = getLatestMatchingInstallVersion(
+			versions,
+			candidate.preferences,
+			options.updateChannel,
+		)
 
 		if (version) {
 			return {
@@ -960,7 +998,14 @@ function isStoredBrowseInstallProject(value: unknown): value is BrowseInstallPro
 }
 
 function isStoredBrowseInstallContentType(value: unknown): value is BrowseInstallContentType {
-	return value === 'modpack' || value === 'mod' || value === 'plugin' || value === 'datapack'
+	return (
+		value === 'modpack' ||
+		value === 'mod' ||
+		value === 'plugin' ||
+		value === 'datapack' ||
+		value === 'resourcepack' ||
+		value === 'shader'
+	)
 }
 
 function isStoredBrowseInstallPreferences(value: unknown): value is BrowseInstallPreferences {

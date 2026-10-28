@@ -296,9 +296,6 @@
   "app.download-manager.pause": {
     "message": "השהה את ההתקנה"
   },
-  "app.download-manager.show": {
-    "message": "משימות"
-  },
   "app.download-manager.tasks": {
     "message": "משימות"
   },
@@ -676,12 +673,6 @@
   },
   "app.instance.share.locked.wrong-account-heading": {
     "message": "משתמש לא נכון"
-  },
-  "app.instance.share.members.empty": {
-    "message": "עדיין שום משתמש נכנס"
-  },
-  "app.instance.share.members.no-filter-results": {
-    "message": "שום משתמש לא תואם לסינון שלך."
   },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "ההתקנה המשותפת הזו לא תקבל יותר עדכונים"

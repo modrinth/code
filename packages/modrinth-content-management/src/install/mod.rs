@@ -8,7 +8,7 @@ use crate::shared::{ContentType, Error};
 pub use model::{
     Dependency, DependencyType, ResolutionPreferences, ResolveContentPlan,
     ResolveContentRequest, ResolvedContent, SkippedContent, SkippedReason,
-    Version,
+    Version, VersionType,
 };
 pub use provider::ContentMetadataProvider;
 
@@ -67,6 +67,7 @@ async fn resolve_primary_version<P: ContentMetadataProvider>(
         request.content_type,
         &request.selected,
         &request.target,
+        request.update_channel,
     )
     .ok_or_else(|| Error::NoCompatibleVersion(request.project_id.clone()))
 }
@@ -76,6 +77,7 @@ struct InstallResolver<'a, P> {
     content_type: ContentType,
     selected: &'a ResolutionPreferences,
     target: &'a ResolutionPreferences,
+    update_channel: Option<VersionType>,
     existing_project_ids: HashSet<String>,
     planned_project_versions: HashMap<String, String>,
     visited_versions: HashSet<String>,
@@ -96,6 +98,7 @@ impl<'a, P: ContentMetadataProvider> InstallResolver<'a, P> {
             content_type: request.content_type,
             selected: &request.selected,
             target: &request.target,
+            update_channel: request.update_channel,
             existing_project_ids: request
                 .existing_project_ids
                 .iter()
@@ -222,6 +225,7 @@ impl<'a, P: ContentMetadataProvider> InstallResolver<'a, P> {
             self.content_type,
             self.selected,
             self.target,
+            self.update_channel,
         );
 
         if version.is_none() {
@@ -242,19 +246,39 @@ fn select_newest_matching_version(
     content_type: ContentType,
     selected: &ResolutionPreferences,
     target: &ResolutionPreferences,
+    update_channel: Option<VersionType>,
 ) -> Option<Version> {
     versions.sort_by_key(|version| Reverse(version.date_published));
     let merged = selected.merge(target);
 
-    versions
-        .iter()
-        .find(|version| version_matches(version, content_type, &merged))
-        .or_else(|| {
-            versions
-                .iter()
-                .find(|version| version_matches(version, content_type, target))
+    newest_in_channel(&versions, update_channel, |version| {
+        version_matches(version, content_type, &merged)
+    })
+    .or_else(|| {
+        newest_in_channel(&versions, update_channel, |version| {
+            version_matches(version, content_type, target)
         })
-        .cloned()
+    })
+    .cloned()
+}
+
+/// Finds the newest matching version within the update channel, widening the channel one step at
+/// a time until something matches. Expects `versions` sorted newest first.
+fn newest_in_channel(
+    versions: &[Version],
+    update_channel: Option<VersionType>,
+    matches: impl Fn(&Version) -> bool,
+) -> Option<&Version> {
+    let channel = update_channel.unwrap_or(VersionType::Alpha);
+
+    VersionType::ALL
+        .into_iter()
+        .filter(|allowed| *allowed >= channel)
+        .find_map(|allowed| {
+            versions.iter().find(|version| {
+                version.version_type <= allowed && matches(version)
+            })
+        })
 }
 
 trait MergePreferences {

@@ -19,6 +19,7 @@ import { onBeforeRouteLeave } from 'vue-router'
 import Admonition from '#ui/components/base/Admonition.vue'
 import AutoLink from '#ui/components/base/AutoLink.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
+import BulletDivider from '#ui/components/base/BulletDivider.vue'
 import { Button } from '#ui/components/base/buttons'
 import Chips from '#ui/components/base/Chips.vue'
 import Combobox from '#ui/components/base/Combobox.vue'
@@ -47,6 +48,14 @@ const debug = useDebugLogger('InstallationSettingsLayout')
 const skipNonEssentialWarnings = computed(() => ctx.skipNonEssentialWarnings?.value ?? false)
 const availablePlatforms = computed(() =>
 	Array.isArray(ctx.availablePlatforms) ? ctx.availablePlatforms : ctx.availablePlatforms.value,
+)
+
+const isExternalModpackLink = computed(() => {
+	const link = ctx.modpack.value?.link
+	return typeof link === 'string' && link.startsWith('http')
+})
+const showInlineModpackVersion = computed(
+	() => !!ctx.modpack.value?.filename && !!ctx.modpack.value.versionNumber,
 )
 
 const confirmLeaveModal = ref<InstanceType<typeof ConfirmLeaveModal>>()
@@ -617,7 +626,12 @@ const messages = defineMessages({
 						class="flex items-center gap-2.5 rounded-[20px] p-3"
 						:class="ctx.isApp ? 'bg-surface-3' : 'bg-surface-2'"
 					>
-						<AutoLink :to="ctx.modpack.value.link" class="shrink-0">
+						<AutoLink
+							:to="ctx.modpack.value.link"
+							:target="isExternalModpackLink ? '_blank' : undefined"
+							:rel="isExternalModpackLink ? 'noopener noreferrer' : undefined"
+							class="shrink-0"
+						>
 							<Avatar
 								:src="ctx.modpack.value.iconUrl"
 								:alt="ctx.modpack.value.title"
@@ -630,17 +644,31 @@ const messages = defineMessages({
 							<div class="flex min-w-0 flex-col">
 								<AutoLink
 									:to="ctx.modpack.value.link"
+									:target="isExternalModpackLink ? '_blank' : undefined"
+									:rel="isExternalModpackLink ? 'noopener noreferrer' : undefined"
 									class="truncate font-semibold text-contrast"
 									:class="ctx.modpack.value.link ? 'hover:underline' : ''"
 								>
 									{{ ctx.modpack.value.title }}
 								</AutoLink>
-								<span v-if="ctx.modpack.value.filename" class="truncate text-sm text-secondary">
-									{{ ctx.modpack.value.filename }}
-								</span>
+								<div
+									v-if="ctx.modpack.value.filename"
+									class="flex min-w-0 items-center gap-1.5 text-sm text-secondary"
+								>
+									<span class="truncate">{{ ctx.modpack.value.filename }}</span>
+									<template v-if="showInlineModpackVersion">
+										<BulletDivider class="!mx-0 shrink-0" />
+										<span class="shrink-0 whitespace-nowrap">
+											{{ ctx.modpack.value.versionNumber }}
+										</span>
+									</template>
+								</div>
 							</div>
 							<div
-								v-if="ctx.modpack.value.owner || ctx.modpack.value.versionNumber"
+								v-if="
+									ctx.modpack.value.owner ||
+									(ctx.modpack.value.versionNumber && !showInlineModpackVersion)
+								"
 								class="flex items-center gap-2 text-sm text-secondary"
 							>
 								<AutoLink
@@ -661,10 +689,19 @@ const messages = defineMessages({
 									/>
 									<span class="font-medium">{{ ctx.modpack.value.owner.name }}</span>
 								</AutoLink>
-								<template v-if="ctx.modpack.value.owner && ctx.modpack.value.versionNumber">
+								<template
+									v-if="
+										ctx.modpack.value.owner &&
+										ctx.modpack.value.versionNumber &&
+										!showInlineModpackVersion
+									"
+								>
 									&middot;
 								</template>
-								<span v-if="ctx.modpack.value.versionNumber" class="font-medium">
+								<span
+									v-if="ctx.modpack.value.versionNumber && !showInlineModpackVersion"
+									class="font-medium"
+								>
 									{{ ctx.modpack.value.versionNumber }}
 								</span>
 							</div>
