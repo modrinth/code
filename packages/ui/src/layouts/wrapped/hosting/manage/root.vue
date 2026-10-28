@@ -51,6 +51,20 @@
 			:icon="LockIcon"
 			icon-color="orange"
 			:action="suspendedAction"
+		>
+			<template v-if="isSiteAdmin" #actions>
+				<Button size="xl" class="flex-1" @click="liftSuspensionModal?.show()">
+					<LockOpenIcon class="size-4" />
+					Lift suspension
+				</Button>
+			</template>
+		</ErrorInformationCard>
+		<LiftSuspensionModal
+			v-if="isSiteAdmin"
+			ref="liftSuspensionModal"
+			:server-id="serverId"
+			:server-name="serverData.name"
+			@lifted="reloadPage"
 		/>
 	</div>
 	<div
@@ -351,6 +365,7 @@ import {
 	LinkIcon,
 	LoaderCircleIcon,
 	LockIcon,
+	LockOpenIcon,
 	MoreVerticalIcon,
 	ServerIcon as ServerAssetIcon,
 	SettingsIcon,
@@ -368,7 +383,7 @@ import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
-import { IconButton, TeleportOverflowMenu } from '#ui/components/base/buttons'
+import { Button, IconButton, TeleportOverflowMenu } from '#ui/components/base/buttons'
 import ErrorInformationCard from '#ui/components/base/ErrorInformationCard.vue'
 import IntlFormatted from '#ui/components/base/IntlFormatted.vue'
 import NavTabs from '#ui/components/base/NavTabs.vue'
@@ -383,6 +398,7 @@ import { Tooltip } from '#ui/components/floating'
 import ConfirmLeaveModal from '#ui/components/modal/ConfirmLeaveModal.vue'
 import ServerPanelAdmonitions from '#ui/components/servers/admonitions/ServerPanelAdmonitions.vue'
 import ServerIcon from '#ui/components/servers/icons/ServerIcon.vue'
+import LiftSuspensionModal from '#ui/components/servers/LiftSuspensionModal.vue'
 import MedalServerCountdown from '#ui/components/servers/marketing/MedalServerCountdown.vue'
 import { PanelServerActionButton } from '#ui/components/servers/server-header'
 import ServerSettingsModal from '#ui/components/servers/ServerSettingsModal.vue'
@@ -529,6 +545,9 @@ function dismissSettingsHint() {
 }
 
 const serverSettingsModal = ref<InstanceType<typeof ServerSettingsModal> | null>(null)
+const liftSuspensionModal = ref<InstanceType<typeof LiftSuspensionModal> | null>(null)
+const viewerRole = ref<string | null>(null)
+const isSiteAdmin = computed(() => viewerRole.value === 'admin')
 const confirmLeaveModal = ref<InstanceType<typeof ConfirmLeaveModal>>()
 const formatDateTime = useFormatDateTime({ dateStyle: 'long', timeStyle: 'short' })
 
@@ -1403,6 +1422,13 @@ const cleanup = () => {
 
 onMounted(() => {
 	isMounted.value = true
+
+	void props
+		.resolveViewer()
+		.then(({ userRole }) => {
+			viewerRole.value = userRole
+		})
+		.catch((error) => console.error('Failed to resolve viewer:', error))
 
 	if (serverData.value) {
 		initializeServer()

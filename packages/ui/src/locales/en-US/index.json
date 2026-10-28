@@ -5018,11 +5018,23 @@
   "servers.access-page.activity-log-filter.action.server-restarted": {
     "defaultMessage": "Restarted server"
   },
+  "servers.access-page.activity-log-filter.action.server-resuspended": {
+    "defaultMessage": "Server suspended again"
+  },
   "servers.access-page.activity-log-filter.action.server-started": {
     "defaultMessage": "Started server"
   },
   "servers.access-page.activity-log-filter.action.server-stopped": {
     "defaultMessage": "Stopped server"
+  },
+  "servers.access-page.activity-log-filter.action.server-suspended": {
+    "defaultMessage": "Server suspended"
+  },
+  "servers.access-page.activity-log-filter.action.server-suspension-lifted": {
+    "defaultMessage": "Suspension temporarily lifted"
+  },
+  "servers.access-page.activity-log-filter.action.server-unsuspended": {
+    "defaultMessage": "Server unsuspended"
   },
   "servers.access-page.activity-log-filter.action.sftp-credentials-rolled": {
     "defaultMessage": "Rotated SFTP credentials"
@@ -5399,6 +5411,12 @@
   "servers.audit-log.event.server-restarted": {
     "defaultMessage": "Restarted server"
   },
+  "servers.audit-log.event.server-resuspended": {
+    "defaultMessage": "Ended suspension lift early, server suspended again"
+  },
+  "servers.audit-log.event.server-resuspended-expired": {
+    "defaultMessage": "Suspension lift expired, server suspended again"
+  },
   "servers.audit-log.event.server-started": {
     "defaultMessage": "Started server"
   },
@@ -5407,6 +5425,18 @@
   },
   "servers.audit-log.event.server-subdomain-changed": {
     "defaultMessage": "Changed server subdomain to <subdomain></subdomain>"
+  },
+  "servers.audit-log.event.server-suspended": {
+    "defaultMessage": "{reason, select, moderated {Server suspended by moderation action} paymentfailed {Server suspended due to a failed payment} cancelled {Server suspended due to a cancelled subscription} other {Server suspended}}"
+  },
+  "servers.audit-log.event.server-suspension-lifted": {
+    "defaultMessage": "Temporarily lifted suspension until <until></until>"
+  },
+  "servers.audit-log.event.server-suspension-lifted-restricted": {
+    "defaultMessage": "Temporarily lifted suspension until <until></until> with power actions blocked"
+  },
+  "servers.audit-log.event.server-unsuspended": {
+    "defaultMessage": "Server unsuspended"
   },
   "servers.audit-log.event.sftp-credentials-rolled": {
     "defaultMessage": "Rotated SFTP credentials"

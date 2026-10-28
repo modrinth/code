@@ -18,6 +18,14 @@
 					@proceed="confirmResetToOnboarding"
 				/>
 				<LockServerModal ref="lockServerModal" :server-id="serverId" :server-name="server.name" />
+				<ConfirmModal
+					ref="resuspendModal"
+					title="Unlift suspension now?"
+					:description="`This ends the temporary lift of ${server.name}'s suspension early. The server will be suspended again right away.`"
+					proceed-label="Unlift now"
+					:markdown="false"
+					@proceed="resuspend"
+				/>
 			</div>
 		</Teleport>
 
@@ -53,6 +61,32 @@
 			</div>
 		</div>
 
+		<div v-if="suspensionLift" class="flex flex-col gap-2.5">
+			<span class="text-lg font-semibold text-contrast">Suspension lifted</span>
+			<div class="flex flex-wrap items-center gap-3">
+				<Button
+					type="colored"
+					color="red"
+					:disabled="isResuspending"
+					:loading="isResuspending"
+					@click="resuspendModal?.show()"
+				>
+					<LockIcon class="size-5" />
+					Unlift now
+				</Button>
+				<span v-tooltip="formatDateTime(suspensionLift.until)" class="text-primary">
+					Suspended again {{ liftEndsIn }}
+				</span>
+			</div>
+			<span class="text-secondary">
+				{{
+					suspensionLift.restrict_power
+						? 'Power actions are blocked while the suspension is lifted.'
+						: 'Power actions are allowed while the suspension is lifted.'
+				}}
+			</span>
+		</div>
+
 		<div class="flex flex-col gap-2.5">
 			<span class="text-lg font-semibold text-contrast">
 				{{ formatMessage(messages.resetToOnboardingButton) }}
@@ -78,11 +112,14 @@
 <script setup lang="ts">
 import { LockIcon, LockOpenIcon, RotateCounterClockwiseIcon, TrashIcon } from '@modrinth/assets'
 import { useQueryClient } from '@tanstack/vue-query'
+import { useNow } from '@vueuse/core'
 import { computed, ref } from 'vue'
 
 import { Button } from '#ui/components/base/buttons'
 import { ConfirmModal } from '#ui/components/modal'
 import LockServerModal from '#ui/components/servers/LockServerModal.vue'
+import { useFormatDateTime } from '#ui/composables/format-date-time'
+import { useRelativeTime } from '#ui/composables/how-ago'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useModrinthServersConsole } from '#ui/composables/server-console'
 import { useServerPermissions } from '#ui/composables/server-permissions'
@@ -191,6 +228,17 @@ const clearActionLogTooltip = computed(() =>
 	canResetServer.value ? undefined : permissionDeniedMessage.value,
 )
 
+const resuspendModal = ref<InstanceType<typeof ConfirmModal>>()
+const isResuspending = ref(false)
+const formatRelativeTime = useRelativeTime()
+const formatDateTime = useFormatDateTime({ dateStyle: 'medium', timeStyle: 'short' })
+const now = useNow({ interval: 30_000 })
+const suspensionLift = computed(() => server.value?.suspension_lift ?? null)
+const liftEndsIn = computed(() => {
+	void now.value
+	return suspensionLift.value ? formatRelativeTime(suspensionLift.value.until) : ''
+})
+
 const resetToOnboardingModal = ref<InstanceType<typeof ConfirmModal>>()
 const isResettingToOnboarding = ref(false)
 const supportResetToOnboardingDisabled = computed(
@@ -260,6 +308,36 @@ async function toggleServerLock() {
 			title: formatMessage(messages.unlockErrorTitle),
 			text: formatMessage(messages.unlockErrorText),
 		})
+	}
+}
+
+async function resuspend() {
+	if (!isSiteAdmin.value || isResuspending.value) return
+
+	const name = server.value.name
+	try {
+		isResuspending.value = true
+		await client.archon.servers_internal.resuspend(serverId)
+		await Promise.all([
+			queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] }),
+			queryClient.invalidateQueries({
+				queryKey: ['servers', 'action-log', 'v1', 'infinite', serverId],
+			}),
+		])
+		addNotification({
+			type: 'success',
+			title: 'Server suspended',
+			text: `${name} has been suspended again.`,
+		})
+		serverSettings.closeModal?.()
+	} catch (error) {
+		addNotification({
+			type: 'error',
+			title: 'Failed to unlift the suspension',
+			text: error instanceof Error ? error.message : undefined,
+		})
+	} finally {
+		isResuspending.value = false
 	}
 }
 

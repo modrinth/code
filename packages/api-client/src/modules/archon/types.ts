@@ -111,6 +111,10 @@ export namespace Archon {
 				| 'changed_server_subdomain'
 				| 'server_reallocated'
 				| 'server_plan_changed'
+				| 'server_suspended'
+				| 'server_unsuspended'
+				| 'server_suspension_lifted'
+				| 'server_resuspended'
 				| 'user_invited'
 				| 'user_invite_revoked'
 				| 'user_permission_modified'
@@ -589,6 +593,18 @@ export namespace Archon {
 			export type LockServerRequest = {
 				reason: string
 			}
+
+			export type LiftSuspensionRequest = {
+				/** How long to lift the suspension for, in minutes from now. */
+				minutes: number
+				/** Whether to prevent the server from starting while the suspension is lifted. */
+				restrict_power: boolean
+			}
+
+			export type LiftSuspensionResponse = {
+				lifted_until: string
+				restrict_power: boolean
+			}
 		}
 
 		export namespace v0 {
@@ -644,6 +660,8 @@ export namespace Archon {
 				used_backup_quota: number
 				status: Status
 				suspension_reason: SuspensionReason | null
+				/** Set while support temporarily lifts the server's suspension. */
+				suspension_lift?: SuspensionLift | null
 				loader: Loader | null
 				loader_version: string | null
 				mc_version: string | null
@@ -660,6 +678,13 @@ export namespace Archon {
 				locked_since: string | null
 
 				medal_expires?: string
+			}
+
+			export type SuspensionLift = {
+				/** When the server is suspended again. */
+				until: string
+				/** Whether the server is prevented from starting while the suspension is lifted. */
+				restrict_power: boolean
 			}
 
 			export type UserScope = number
