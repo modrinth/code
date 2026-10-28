@@ -812,6 +812,12 @@
   "auth.create-account.username.placeholder": {
     "message": "Enter username"
   },
+  "auth.oauth.opening.description": {
+    "message": "Complete your sign in on {provider}"
+  },
+  "auth.oauth.opening.title": {
+    "message": "Opening {provider}..."
+  },
   "auth.reauthenticate.2fa.description": {
     "message": "Enter the 6-digit code from your authenticator app, or one of your backup codes."
   },
@@ -2995,6 +3001,9 @@
   },
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Upgrade to Modrinth+"
+  },
+  "layout.nav.use-signed-out": {
+    "message": "Use signed out"
   },
   "layout.publish.email-verification-required.description": {
     "message": "You must verify your email before publishing on Modrinth."

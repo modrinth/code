@@ -1,14 +1,16 @@
 <template>
 	<LauncherOpening
-		v-if="subtleLauncherRedirectUri || launcherDeeplink"
-		:localhost-url="subtleLauncherRedirectUri"
-		:deeplink-url="launcherDeeplink"
+		v-if="launcherHandoff"
+		:localhost-url="launcherHandoff.localhostUrl ?? undefined"
+		:deeplink-url="launcherHandoff.deeplinkUrl ?? undefined"
 	/>
-	<div
-		v-else
-		class="universal-card mx-auto flex w-full max-w-[27rem] flex-col gap-6 border border-solid border-surface-5 !p-6"
-	>
-		<template v-if="flow">
+	<AuthCard v-else>
+		<OpeningAuthProvider
+			v-if="openingProviderName"
+			:provider="openingProviderName"
+			@cancel="cancelProviderOpening"
+		/>
+		<template v-else-if="flow">
 			<div class="flex flex-col gap-4" :aria-busy="twoFactorPending">
 				<div class="flex w-full flex-col gap-1.5">
 					<label for="two-factor-code">
@@ -22,7 +24,7 @@
 					<TwoFactorAuthCodeInput
 						id="two-factor-code"
 						ref="twoFactorInput"
-						v-model="twoFactorCodeModel"
+						v-model="twoFactorCode"
 						class="mx-auto mt-3"
 						allow-backup-code
 						autofocus
@@ -32,7 +34,7 @@
 						:aria-describedby="
 							twoFactorError ? 'two-factor-description two-factor-error' : 'two-factor-description'
 						"
-						@complete="onTwoFactorSignIn"
+						@complete="begin2FASignIn"
 					/>
 				</div>
 				<Admonition v-if="twoFactorError" id="two-factor-error" type="critical" role="alert">
@@ -50,7 +52,7 @@
 						<AccountChoiceList
 							:accounts="accounts"
 							:add-account-label="formatMessage(messages.addAccountLabel)"
-							@select="emit('select', $event)"
+							@select="onSelectLauncherAccount"
 							@add="addingAccount = true"
 						/>
 					</div>
@@ -78,7 +80,7 @@
 									provider: focusedOauthProvider.name,
 								})
 							"
-							@click="onOAuthProviderClick(focusedOauthProvider.id)"
+							@click="onOAuthProviderClick(focusedOauthProvider.id, $event)"
 						>
 							<component :is="focusedOauthProvider.icon" />
 							{{
@@ -92,7 +94,7 @@
 							type="colored"
 							color="brand"
 							class="!w-full !justify-center"
-							@click="onPasskeySignIn"
+							@click="beginPasskeySignin"
 						>
 							<UserKeyIcon />
 							{{ formatMessage(messages.continueWithPasskey) }}
@@ -106,23 +108,23 @@
 								class="sr-only"
 								type="text"
 								autocomplete="username"
-								:value="emailModel"
+								:value="email"
 								tabindex="-1"
 							/>
 
 							<PasswordSignInForm
-								v-model:password="passwordModel"
-								v-model:token="tokenModel"
+								v-model:password="password"
+								v-model:token="token"
 								input-id="launcher-reauth-password"
 								:submit-label="formatMessage(commonMessages.continueButton)"
 								:captcha-enabled="globals?.captcha_enabled"
-								:show-captcha="Boolean(passwordModel)"
-								:on-submit="onPasswordSignIn"
-								:on-set-captcha-ref="onSetCaptchaRef"
+								:show-captcha="Boolean(password)"
+								:on-submit="beginPasswordSignIn"
+								:on-set-captcha-ref="setCaptchaRef"
 							/>
 						</section>
 
-						<Button class="!w-full !justify-center" @click="onCancelReauthenticate">
+						<Button class="!w-full !justify-center" @click="cancelReauth">
 							{{ formatMessage(messages.useDifferentAccount) }}
 						</Button>
 					</div>
@@ -146,7 +148,7 @@
 							:aria-label="
 								formatMessage(messages.continueWithProvider, { provider: provider.name })
 							"
-							@click="onOAuthProviderClick(provider.id)"
+							@click="onOAuthProviderClick(provider.id, $event)"
 						>
 							<component :is="provider.icon" />
 							<span>{{ provider.name }}</span>
@@ -164,8 +166,8 @@
 							}"
 							role="button"
 							tabindex="0"
-							@click="onPasskeySignIn"
-							@keydown.enter="onPasskeySignIn"
+							@click="beginPasskeySignin"
+							@keydown.enter="beginPasskeySignin"
 						>
 							<UserKeyIcon />
 							<span class="ml-1">{{ formatMessage(messages.continueWithPasskey) }}</span>
@@ -184,7 +186,7 @@
 						<label for="email" hidden>{{ formatMessage(commonMessages.emailUsernameLabel) }}</label>
 						<Input
 							id="email"
-							v-model="emailModel"
+							v-model="email"
 							:icon="MailIcon"
 							type="text"
 							inputmode="email"
@@ -194,14 +196,14 @@
 						/>
 
 						<PasswordSignInForm
-							v-model:password="passwordModel"
-							v-model:token="tokenModel"
+							v-model:password="password"
+							v-model:token="token"
 							input-id="password"
 							:submit-label="formatMessage(messages.continueWithEmail)"
 							:captcha-enabled="globals?.captcha_enabled"
-							:show-captcha="Boolean(emailModel && passwordModel)"
-							:on-submit="onPasswordSignIn"
-							:on-set-captcha-ref="onSetCaptchaRef"
+							:show-captcha="Boolean(email && password)"
+							:on-submit="beginPasswordSignIn"
+							:on-set-captcha-ref="setCaptchaRef"
 						/>
 
 						<div class="flex flex-wrap items-center justify-center gap-2.5 !text-base">
@@ -215,7 +217,11 @@
 								{{ formatMessage(messages.forgotPasswordLabel) }}
 							</NuxtLink>
 							<div class="h-1.5 w-1.5 rounded-full bg-surface-5" />
+							<button v-if="embedded" type="button" class="inline text-link" @click="openSignUp">
+								{{ formatMessage(messages.createAccountLabel) }}
+							</button>
 							<NuxtLink
+								v-else
 								class="inline text-link"
 								:to="{
 									path: '/auth/sign-up',
@@ -237,22 +243,12 @@
 				</template>
 			</div>
 		</template>
-	</div>
+	</AuthCard>
 </template>
 
 <script setup lang="ts">
+import { MailIcon, UserKeyIcon } from '@modrinth/assets'
 import {
-	DiscordColorIcon,
-	GitHubColorIcon,
-	GitLabColorIcon,
-	GoogleColorIcon,
-	MailIcon,
-	MicrosoftColorIcon,
-	SteamColorIcon,
-	UserKeyIcon,
-} from '@modrinth/assets'
-import {
-	type AccountChoice,
 	AccountChoiceList,
 	Admonition,
 	Avatar,
@@ -263,146 +259,112 @@ import {
 	Input,
 	useVIntl,
 } from '@modrinth/ui'
-import { useStorage } from '@vueuse/core'
 import { computed, nextTick, ref, watch } from 'vue'
-import type { LocationQuery } from 'vue-router'
 
+import AuthCard from '@/components/ui/auth/AuthCard.vue'
 import LauncherOpening from '@/components/ui/auth/LauncherOpening.vue'
+import OpeningAuthProvider from '@/components/ui/auth/OpeningAuthProvider.vue'
 import PasswordSignInForm from '@/components/ui/auth/PasswordSignInForm.vue'
 import TwoFactorAuthCodeInput from '@/components/ui/auth/TwoFactorAuthCodeInput.vue'
-import {
-	LAST_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
-	PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
-	type StoredAccountAuthMethod,
-} from '@/composables/accounts.ts'
+import { useLastSignInAuthMethod } from '@/composables/accounts.ts'
 import { getAuthUrl } from '@/composables/auth.ts'
+import { isAuthEmbedded, useAuthNavigation } from '@/composables/auth-modal.ts'
+import { useProviderOpening } from '@/composables/external-auth.ts'
 import {
 	isLauncherProtocolV2,
 	LAUNCHER_REAUTH_ACCOUNT_STORAGE_KEY,
 } from '@/composables/launcher-auth.ts'
-
-const oauthProviders = [
-	{ id: 'discord', name: 'Discord', icon: DiscordColorIcon },
-	{ id: 'github', name: 'GitHub', icon: GitHubColorIcon },
-	{ id: 'microsoft', name: 'Microsoft', icon: MicrosoftColorIcon },
-	{ id: 'google', name: 'Google', icon: GoogleColorIcon },
-	{ id: 'steam', name: 'Steam', icon: SteamColorIcon },
-	{ id: 'gitlab', name: 'GitLab', icon: GitLabColorIcon },
-] as const
-
-type AuthProvider = (typeof oauthProviders)[number]['id'] | 'passkey'
-
-interface AuthGlobals {
-	captcha_enabled?: boolean
-	[key: string]: unknown
-}
-
-interface LauncherReauthAccount {
-	id: string
-	username: string
-	avatarUrl?: string | null
-	authMethod?: StoredAccountAuthMethod | null
-}
-
-interface Props {
-	subtleLauncherRedirectUri?: string
-	launcherDeeplink?: string
-	reauthAccount?: LauncherReauthAccount | null
-	flow?: string
-	redirectTarget?: string
-	routeQuery?: LocationQuery
-	globals?: AuthGlobals | null
-	onPasswordSignIn?: () => void
-	onTwoFactorSignIn?: (code: string) => void
-	twoFactorPending?: boolean
-	twoFactorError?: boolean
-	onPasskeySignIn?: () => void
-	onCancelReauthenticate?: () => void
-	onSetCaptchaRef?: ((captchaRef: unknown) => void) | undefined
-	accounts?: AccountChoice[]
-}
+import { type OAuthProviderId, oauthProviders } from '@/composables/oauth-providers.ts'
+import { useSignIn } from '@/composables/sign-in.ts'
 
 const {
-	subtleLauncherRedirectUri = '',
-	launcherDeeplink = '',
-	reauthAccount = null,
-	flow = '',
-	redirectTarget = '',
-	routeQuery = {},
-	globals = null,
-	onPasswordSignIn = () => {},
-	onTwoFactorSignIn = () => {},
-	twoFactorPending = false,
-	twoFactorError = false,
-	onPasskeySignIn = () => {},
-	onCancelReauthenticate = () => {},
-	onSetCaptchaRef = undefined,
-	accounts = [],
-} = defineProps<Props>()
+	launcherHandoff,
+	flow,
+	twoFactorCode,
+	twoFactorPending,
+	twoFactorError,
+	accounts,
+	reauthAccount,
+	redirectTarget,
+	routeQuery,
+	globals,
+	email,
+	password,
+	token,
+	beginPasswordSignIn,
+	begin2FASignIn,
+	beginPasskeySignin,
+	setCaptchaRef,
+	cancelReauth,
+	onSelectLauncherAccount,
+} = useSignIn()
 
 const addingAccount = ref(false)
 
-const emit = defineEmits<{
-	select: [account: AccountChoice]
-}>()
-
-const emailModel = defineModel<string>('email', { default: '' })
-const passwordModel = defineModel<string>('password', { default: '' })
-const tokenModel = defineModel<string>('token', { default: '' })
-
 function cancelAddAccount() {
 	addingAccount.value = false
-	emailModel.value = ''
-	passwordModel.value = ''
-	tokenModel.value = ''
+	email.value = ''
+	password.value = ''
+	token.value = ''
 }
-const twoFactorCodeModel = defineModel<string>('twoFactorCode', { default: '' })
+
 const twoFactorInput = ref<InstanceType<typeof TwoFactorAuthCodeInput>>()
 
-watch(
-	() => twoFactorPending,
-	async (pending) => {
-		if (!pending && twoFactorError) {
-			await nextTick()
-			twoFactorInput.value?.focus()
-		}
-	},
-)
+watch(twoFactorPending, async (pending) => {
+	if (!pending && twoFactorError.value) {
+		await nextTick()
+		twoFactorInput.value?.focus()
+	}
+})
 
-const lastSignInOAuthProvider = useStorage<AuthProvider | null>(
-	LAST_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
-	null,
-	undefined,
-	{ initOnMounted: true },
-)
-const pendingSignInOAuthProvider = useStorage<AuthProvider | null>(
-	PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
-	null,
-	undefined,
-	{ initOnMounted: true },
-)
+const lastSignInOAuthProvider = useLastSignInAuthMethod()
 const focusedOauthProvider = computed(() =>
-	oauthProviders.find((provider) => provider.id === reauthAccount?.authMethod),
+	oauthProviders.find((provider) => provider.id === reauthAccount.value?.authMethod),
 )
 const focusedReauthAccount = computed(() => {
-	if (!reauthAccount?.authMethod) return null
+	const account = reauthAccount.value
+	if (!account?.authMethod) {
+		return null
+	}
 	if (
-		reauthAccount.authMethod === 'password' ||
-		reauthAccount.authMethod === 'passkey' ||
+		account.authMethod === 'password' ||
+		account.authMethod === 'passkey' ||
 		focusedOauthProvider.value
 	) {
-		return reauthAccount
+		return account
 	}
 	return null
 })
 const requestsAppSession = computed(
-	() => isLauncherProtocolV2({ query: routeQuery }) && !reauthAccount,
+	() => isLauncherProtocolV2({ query: routeQuery.value }) && !reauthAccount.value,
 )
+const { openingProviderName, beginProviderHandoff, cancelProviderOpening } = useProviderOpening()
+const { go } = useAuthNavigation()
+const embedded = isAuthEmbedded()
 
-const onOAuthProviderClick = (provider: AuthProvider) => {
-	pendingSignInOAuthProvider.value = provider
-	if (!reauthAccount || !import.meta.client) return
-	window.sessionStorage.setItem(LAUNCHER_REAUTH_ACCOUNT_STORAGE_KEY, reauthAccount.id)
+function openSignUp() {
+	void go({
+		path: '/auth/sign-up',
+		query: routeQuery.value,
+	})
+}
+
+const onOAuthProviderClick = (provider: OAuthProviderId, event: MouseEvent) => {
+	beginProviderHandoff(
+		provider,
+		event,
+		getAuthUrl(provider, redirectTarget, requestsAppSession.value),
+		{
+			skip: Boolean(routeQuery.value.launcher || requestsAppSession.value),
+			prepare() {
+				const account = reauthAccount.value
+				if (!account || !import.meta.client) {
+					return
+				}
+				window.sessionStorage.setItem(LAUNCHER_REAUTH_ACCOUNT_STORAGE_KEY, account.id)
+			},
+		},
+	)
 }
 
 const { formatMessage } = useVIntl()
