@@ -2,6 +2,7 @@ import { ListBulletedIcon } from '@modrinth/assets'
 import { md } from '@modrinth/utils'
 
 import aiGeneratedMessage from '../messages/checklist/messages/rules/ai-generated.md'
+import aiGeneratedForkMessage from '../messages/checklist/messages/rules/ai-generated-fork.md'
 import aiImagesMessage from '../messages/checklist/messages/rules/ai-images.md'
 import aiImagesTargetedMessage from '../messages/checklist/messages/rules/ai-images-targeted.md'
 import cheatOrHackAdvertisingMessage from '../messages/checklist/messages/rules/cheat-or-hack-advertising.md'
@@ -68,8 +69,11 @@ export const rulesAiGeneratedIssue = issue({
 	priority: IssuePriority.Alerts,
 	title: 'AI-generated content',
 	category: 'Project wide',
-	message: aiGeneratedMessage,
-	suggestedStatus: 'flagged',
+	message: ({ selected }) =>
+		selected.toggleIds.includes('rules-ai-fork') ? aiGeneratedForkMessage : aiGeneratedMessage,
+	actions: [issueTargets.acknowledge('reply')],
+	suggestedStatus: ({ selected }) =>
+		selected.toggleIds.includes('rules-ai-fork') ? 'rejected' : 'flagged',
 })
 
 export const rulesAiImagesIssue = issue({
@@ -219,6 +223,20 @@ export const rulesReviewPanel = panel({
 		toggle({
 			issue: rulesProhibitedContentIssue,
 			label: 'Prohibited Content',
+		}),
+	),
+	section({
+		label: 'Which rules does this project violate?',
+		shown: ({ selected }) => selected.issueIds.includes(rulesAiGeneratedIssue.id),
+	}).content(
+		toggle({
+			issue: rulesAiGeneratedIssue,
+			label: 'AI Fork',
+			id: 'rules-ai-fork',
+			issueCardDisplay: {
+				label: 'AI Fork',
+				group: 'AI Fork',
+			},
 		}),
 	),
 	section({
