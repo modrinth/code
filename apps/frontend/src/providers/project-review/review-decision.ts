@@ -32,6 +32,16 @@ export async function applyReviewDecision(
 	onMessageSent: () => void,
 ): Promise<void> {
 	const threads = client.labrinth.threads_v3
+	const approving =
+		decision.status !== undefined && ['approved', 'unlisted', 'private'].includes(decision.status)
+	async function updateFacets() {
+		for (const facet of decision.facetUpdates) {
+			assertCurrent()
+			await threads.editIssueFacet(facet.id, facet.data)
+		}
+	}
+	assertCurrent()
+	if (approving) await updateFacets()
 	assertCurrent()
 	// Send thread messages after the status change so they appear below its message in the thread.
 	if (decision.status) {
@@ -69,9 +79,6 @@ export async function applyReviewDecision(
 			throw new ReviewIssuesError('message', error)
 		}
 	}
-	for (const facet of decision.facetUpdates) {
-		assertCurrent()
-		await threads.editIssueFacet(facet.id, facet.data)
-	}
+	if (!approving) await updateFacets()
 	assertCurrent()
 }
