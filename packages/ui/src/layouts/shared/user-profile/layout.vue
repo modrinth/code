@@ -1189,7 +1189,11 @@ async function toggleLock(): Promise<void> {
 	const lockedUser = user.value
 	try {
 		await client.labrinth.moderation_internal.unlockUser(lockedUser.id)
-		await queryClient.invalidateQueries({ queryKey: ['user', props.userId] })
+		await Promise.all(
+			[...new Set([props.userId, lockedUser.id])].map((id) =>
+				queryClient.invalidateQueries({ queryKey: ['user', id] }),
+			),
+		)
 		notificationManager.addNotification({
 			type: 'success',
 			title: formatMessage(messages.unlockUserSuccessTitle),
