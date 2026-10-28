@@ -11,7 +11,7 @@
 		:on-create-collection="openCollectionCreateModal"
 	>
 		<template v-if="showCreatorStats" #header-details="{ user }">
-			<CreatorStatusStats :id="user.id" kind="user" class="!mt-0" />
+			<CreatorStatusStats :id="user.id" kind="user" class="!mt-0 !text-base" />
 		</template>
 		<template #sidebar>
 			<AdPlaceholder v-if="!auth.user" />
