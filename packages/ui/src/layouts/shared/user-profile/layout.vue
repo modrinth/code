@@ -260,6 +260,9 @@
 					@force-password-reset="forcePasswordResetModal?.show()"
 					@reset2fa="reset2faModal?.show()"
 				>
+					<template v-if="$slots['header-details']" #badges>
+						<slot name="header-details" :user="user" />
+					</template>
 					<template v-if="isModrinthUser" #summary>
 						<IntlFormatted :message-id="messages.officialAccountBio">
 							<template #support-link>

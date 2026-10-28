@@ -54,6 +54,15 @@
 				:title="reportItemTitle"
 				:title-to="reportItemTitleTo"
 				:owner="itemOwner"
+				:stats-owner="
+					report.item_type === 'user' && report.user
+						? {
+								kind: 'user',
+								id: report.user.id,
+								name: report.user.username,
+							}
+						: null
+				"
 				:circle="report.item_type === 'user'"
 				:pad-transparent-corners="report.item_type === 'shared-instance'"
 			>
@@ -888,6 +897,7 @@ async function banSharedInstanceOwner(owner: SharedInstanceReportUser) {
 		await client.sharedinstances.moderation_v1.blacklistUsers({
 			user_ids: [owner.id],
 		})
+		await queryClient.invalidateQueries({ queryKey: ['shared-instance-blacklist', 'v1', owner.id] })
 
 		if (sharedInstanceDetails.value) {
 			sharedInstanceDetails.value = {

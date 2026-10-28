@@ -86,12 +86,19 @@
 										icon: ServerIcon,
 									}
 								: null,
-							isStaff(auth.user) ? { type: 'heading', label: 'Staff' } : null,
+							isStaff(auth.user) ? { type: 'heading', label: 'Moderation' } : null,
 							isStaff(auth.user)
 								? {
 										link: '/settings/moderation',
-										label: 'Moderation',
-										icon: ScaleIcon,
+										label: 'Settings',
+										icon: SettingsIcon,
+									}
+								: null,
+							isStaff(auth.user)
+								? {
+										link: '/settings/moderation/keybinds',
+										label: 'Keybinds',
+										icon: KeyboardIcon,
 									}
 								: null,
 						].filter(Boolean)
@@ -107,11 +114,12 @@ import {
 	CardIcon,
 	GridIcon,
 	HeartHandshakeIcon,
+	KeyboardIcon,
 	KeyIcon,
 	LanguagesIcon,
 	MonitorSmartphoneIcon,
 	PaintbrushIcon,
-	ScaleIcon,
+	SettingsIcon,
 	ServerIcon,
 	ShieldIcon,
 	ToggleRightIcon,

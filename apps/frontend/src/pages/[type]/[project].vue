@@ -511,7 +511,7 @@
 						:user-link="(username) => `/user/${username}`"
 						class="card flex-card"
 					>
-						<template v-if="isStaff(auth.user)" #organization-details>
+						<template v-if="showCreatorStats" #organization-details>
 							<ProjectStatusStats
 								v-if="
 									!creatorStats.organizationLoading.value && !creatorStats.organizationError.value
@@ -519,7 +519,7 @@
 								:stats="creatorStats.organizationStats.value"
 							/>
 						</template>
-						<template v-if="isStaff(auth.user)" #member-details="{ member }">
+						<template v-if="showCreatorStats" #member-details="{ member }">
 							<ProjectStatusStats
 								v-if="!creatorStats.membersLoading.value && !creatorStats.membersError.value"
 								:stats="creatorStats.memberStats.value[member.user.id] ?? []"
@@ -1703,10 +1703,15 @@ const members = computed(() => {
 	return owner ? [owner, ...rest] : rest
 })
 
+const showCreatorStats = computed(
+	() =>
+		isStaff(auth.value.user) &&
+		modSettings.value.get(moderationSettings.General.ShowCreatorStatsOnPublicPages),
+)
 const creatorStats = useCreatorProjectStats(
 	computed(() => members.value.map((member) => member.user.id)),
 	computed(() => organization.value?.id ?? ''),
-	computed(() => isStaff(auth.value.user)),
+	showCreatorStats,
 )
 
 const isMember = computed(
