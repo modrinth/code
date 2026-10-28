@@ -304,3 +304,6 @@ id_type!(DelphiReportIssueId as i64);
 id_type!(DelphiReportIssueDetailsId as i64);
 id_type!(DelphiRuleId as i64);
 id_type!(SharedInstanceId as i64);
+id_type!(ModerationFlagRuleId as i64);
+id_type!(ModerationFlagId as i64);
+id_type!(ModerationFlagRunId as i64);

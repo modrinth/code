@@ -11,6 +11,7 @@ pub mod image_item;
 pub mod legacy_loader_fields;
 pub mod loader_fields;
 pub mod moderation_external_item;
+pub mod moderation_flag_item;
 pub mod moderation_lock_item;
 pub mod moderation_note_item;
 pub mod notification_item;
@@ -62,5 +63,9 @@ pub use thread_item::{DBThread, DBThreadMessage};
 pub use user_item::DBUser;
 pub use version_item::DBVersion;
 
+pub use moderation_flag_item::{
+    DBModerationFlag, DBModerationFlagRule, DBModerationFlagRun, FlagRunOutput,
+    FlagRunStatus,
+};
 pub use moderation_lock_item::{DBModerationLock, ModerationLockWithUser};
 pub use moderation_note_item::DBModerationNote;
