@@ -395,9 +395,6 @@
   "app.download-manager.title": {
     "message": "ตัวจัดการการดาวน์โหลด"
   },
-  "app.download-manager.verifying": {
-    "message": "กำลังตรวจสอบ"
-  },
   "app.error.state-init.open-backups-folder": {
     "message": "เปิดโฟลเดอร์สำรอง"
   },
@@ -706,9 +703,6 @@
   },
   "app.settings.resource-management.store.description": {
     "message": "ประหยัดพื้นที่ด้วยการนำชุดติดตั้งเกม ม็อด และแพ็กที่เคยใช้แล้วมาใช้ซ้ำกับหลายๆ โลกม็อดแพ็คของคุณ"
-  },
-  "app.settings.resource-management.store.repair.running-description": {
-    "message": "การดำเนินการนี้จะปิดชุดเซิร์ฟเวอร์ที่กำลังทำงานอยู่ทั้งหมด"
   },
   "app.settings.synced-options.choose-sync-source.no-instances-found": {
     "message": "ไม่พบชุดเซิร์ฟเวอร์ใดๆ"

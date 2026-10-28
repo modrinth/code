@@ -29,9 +29,6 @@
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Abbrechen"
   },
-  "billing.resubscribe-modal.cpus": {
-    "defaultMessage": "{sharedCpus} geteilte CPUs"
-  },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "Du bist dabei, dein Abonnement für <server-name>{serverName}</server-name> zu verlängern. Dein Abonnement wird reaktiviert und dein Server läuft ohne Unterbrechung weiter."
   },
@@ -44,23 +41,8 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Details zum Abonnement konnten nicht geladen werden."
   },
-  "billing.resubscribe-modal.interval": {
-    "defaultMessage": "{intervalOption, select, fiveDays {/5 Tage} monthly {/Monat} quarterly {/Vierteljahr} yearly {/Jahr} other {{interval}}}"
-  },
-  "billing.resubscribe-modal.next-charge": {
-    "defaultMessage": "Deine nächste Abrechnung erfolgt am <charge-date>{date}</charge-date>."
-  },
-  "billing.resubscribe-modal.plan-label": {
-    "defaultMessage": "Plan"
-  },
-  "billing.resubscribe-modal.ram": {
-    "defaultMessage": "{ramGb} GB RAM"
-  },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Erneut abonnieren"
-  },
-  "billing.resubscribe-modal.storage": {
-    "defaultMessage": "{storageGb} GB Speicherplatz"
   },
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Server erneut abonnieren"
@@ -7476,4 +7458,3 @@
     "defaultMessage": "Typ"
   }
 }
-

@@ -1,6 +1,12 @@
 <template>
 	<ServersUpgradeModalWrapper ref="upgradeModal" />
-	<ResubscribeModal ref="pyroResubscribeModal" @resubscribe="handlePyroResubscribeConfirm" />
+	<ResubscribeModal
+		ref="pyroResubscribeModal"
+		:payment-methods="paymentMethods"
+		:regions="regions"
+		:on-add-payment-method="addPaymentMethod"
+		@resubscribe="handlePyroResubscribeConfirm"
+	/>
 	<section class="universal-card">
 		<h2>{{ formatMessage(messages.subscriptionTitle) }}</h2>
 		<p>{{ formatMessage(messages.subscriptionDescription) }}</p>
@@ -1057,6 +1063,11 @@ const { data: serverFullList } = useQuery({
 	queryFn: () => client.archon.servers_v1.list(),
 })
 
+const { data: regions } = useQuery({
+	queryKey: ['servers', 'regions'],
+	queryFn: () => client.archon.servers_v1.getRegions(),
+})
+
 const midasProduct = ref(products.find((x) => x.metadata?.type === 'midas'))
 const midasSubscription = computed(() =>
 	subscriptions.value?.find(
@@ -1372,22 +1383,13 @@ const resubscribePyro = async (subscriptionId, wasSuspended) => {
 
 function openPyroResubscribeModal(subscription) {
 	const charge = getPyroCharge(subscription)
-	const product = getPyroProduct(subscription)
-	const interval = charge?.subscription_interval || subscription?.interval
-	const productPrice = getProductPrice(product, interval)
 
 	pyroResubscribeModal.value?.show({
 		subscriptionId: subscription?.id ?? '',
 		wasSuspended: charge?.due ? new Date(charge.due).getTime() < Date.now() : false,
 		serverName: subscription?.serverInfo?.name ?? 'this server',
-		planName: `${getProductSize(product)} plan`,
-		ramGb: product?.metadata?.ram ? product.metadata.ram / 1024 : undefined,
-		storageGb: product?.metadata?.storage ? product.metadata.storage / 1024 : undefined,
-		sharedCpus: product?.metadata?.cpu ? product.metadata.cpu / 2 : undefined,
-		priceCents: charge?.amount ?? productPrice?.prices?.intervals?.[interval],
-		currencyCode: charge?.currency_code ?? productPrice?.currency_code,
-		interval,
-		nextChargeDate: charge?.due,
+		plan: getPyroProduct(subscription),
+		regionShortcode: subscription?.metadata?.region,
 	})
 }
 

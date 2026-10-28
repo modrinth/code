@@ -557,6 +557,12 @@ async fn prepare_thread_issue_mutation(
     project_id: database::models::DBProjectId,
     transaction: &mut database::PgTransaction<'_>,
 ) -> Result<(), ApiError> {
+    crate::routes::internal::delphi::tech_review_queue::lock_projects(
+        &[project_id],
+        transaction,
+    )
+    .await?;
+
     sqlx::query!("SELECT pg_advisory_xact_lock($1)", project_id.0)
         .fetch_one(&mut *transaction)
         .await
@@ -640,6 +646,7 @@ pub async fn thread_issues_create(
     super::projects::mutation::finalize_mutation(
         project_id,
         transaction,
+        &pool,
         &redis,
         None,
     )
@@ -731,9 +738,10 @@ pub async fn thread_issue_facet_edit(
         )));
     }
     if edit.user_addressed == Some(true) {
-        let state = super::projects::mutation::sync_project_state(
+        let state = super::projects::mutation::load_project_state(
             project_id,
             &mut transaction,
+            &pool,
             &redis,
         )
         .await?;
@@ -764,6 +772,7 @@ pub async fn thread_issue_facet_edit(
         super::projects::mutation::finalize_mutation(
             project_id,
             transaction,
+            &pool,
             &redis,
             project_editor,
         )
@@ -819,6 +828,7 @@ pub async fn thread_issue_delete(
         super::projects::mutation::finalize_mutation(
             project_id,
             transaction,
+            &pool,
             &redis,
             None,
         )
@@ -1076,7 +1086,7 @@ pub async fn thread_send_message_internal(
                         SET thread_message_id = $1
                         WHERE id = $2
                         ",
-                        thread.id.0,
+                        id.0,
                         image_id.0 as i64
                     )
                     .execute(&mut transaction)

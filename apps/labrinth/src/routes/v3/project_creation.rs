@@ -384,6 +384,7 @@ pub async fn project_create_internal(
         let prepared = super::projects::mutation::prepare_mutations(
             &[project_id.into()],
             &mut transaction,
+            &client,
             &redis,
             Some(&current_user),
         )
@@ -471,6 +472,7 @@ pub async fn project_create_with_id(
         let prepared = super::projects::mutation::prepare_mutations(
             &[project_id.into()],
             &mut transaction,
+            &client,
             &redis,
             Some(&current_user),
         )
