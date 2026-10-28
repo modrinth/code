@@ -1,3 +1,4 @@
+/*
 UPDATE versions v
 SET components = jsonb_set(
 	v.components,
@@ -15,3 +16,4 @@ DROP TABLE loader_field_enum_values;
 DROP TABLE loader_field_enums;
 DROP TABLE loaders_project_types_games;
 DROP TABLE games;
+*/

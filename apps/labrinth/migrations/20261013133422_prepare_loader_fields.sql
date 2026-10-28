@@ -1,3 +1,4 @@
+/*
 DO $$
 BEGIN
 	IF EXISTS (
@@ -115,3 +116,4 @@ WHERE (target.components->'minecraft_mod' IS NULL OR target.components->'minecra
 		OR EXISTS (SELECT 1 FROM loaders_versions lv WHERE lv.version_id = target.id)
 	)
 	AND (target.components->'minecraft_java_server' IS NULL OR target.components->'minecraft_java_server' = 'null'::jsonb);
+*/
