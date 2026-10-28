@@ -248,9 +248,19 @@ pub(crate) async fn switch_project_version_with_dependencies(
     .ok_or(ErrorKind::InputError(format!(
         "unable to install version id {version_id}, not found"
     )))?;
-    let content_type = ProjectType::get_from_loaders(version.loaders.clone())
-        .map(ContentType::from)
-        .unwrap_or(ContentType::Mod);
+    let primary_file_name = version
+        .files
+        .iter()
+        .find(|file| file.primary)
+        .or_else(|| version.files.first())
+        .map(|file| file.filename.as_str())
+        .unwrap_or_default();
+    let content_type = ProjectType::get_from_version_file(
+        version.loaders.clone(),
+        primary_file_name,
+    )
+    .map(ContentType::from)
+    .unwrap_or(ContentType::Mod);
     let plan = resolve_install_plan(
         instance_id,
         InstanceInstallProjectRequest {
@@ -433,8 +443,11 @@ pub(crate) async fn download_project_version_with_progress(
         progress,
     )
     .await?;
-    let project_type = ProjectType::get_from_loaders(version.loaders.clone())
-        .ok_or(ErrorKind::InputError(format!(
+    let project_type = ProjectType::get_from_version_file(
+        version.loaders.clone(),
+        &file.filename,
+    )
+    .ok_or(ErrorKind::InputError(format!(
         "unable to infer project type for version {version_id}"
     )))?;
     let project_id = version.project_id.clone();
