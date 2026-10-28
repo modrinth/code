@@ -26,6 +26,7 @@ export type BackupAdmonitionEntry = {
 	name?: string
 	timestamp?: string
 	error?: string | null
+	migration?: { restoring: boolean }
 }
 
 defineProps<{
@@ -87,11 +88,11 @@ function isTerminal(item: BackupAdmonitionEntry) {
 }
 
 function canRetry(item: BackupAdmonitionEntry) {
-	return item.state === 'failed' || item.state === 'timed_out'
+	return !item.migration && (item.state === 'failed' || item.state === 'timed_out')
 }
 
 function canCancel(item: BackupAdmonitionEntry) {
-	return isQueued(item) || isInProgress(item)
+	return (isQueued(item) || isInProgress(item)) && !item.migration?.restoring
 }
 
 function hasErrorDetail(item: BackupAdmonitionEntry) {
@@ -99,6 +100,61 @@ function hasErrorDetail(item: BackupAdmonitionEntry) {
 }
 
 const messages = defineMessages({
+	migrationQueuedTitle: {
+		id: 'servers.backups.admonition.migration-queued.title',
+		defaultMessage: 'Server update queued',
+	},
+	migrationQueuedDescription: {
+		id: 'servers.backups.admonition.migration-queued.description',
+		defaultMessage: 'Your server will be backed up and its content updated shortly.',
+	},
+	migrationBackingUpTitle: {
+		id: 'servers.backups.admonition.migration-backing-up.title',
+		defaultMessage: 'Backing up your server',
+	},
+	migrationBackingUpDescription: {
+		id: 'servers.backups.admonition.migration-backing-up.description',
+		defaultMessage: 'Creating {backupName} before updating your content.',
+	},
+	migrationUpdatingTitle: {
+		id: 'servers.backups.admonition.migration-updating.title',
+		defaultMessage: 'Updating server content',
+	},
+	migrationUpdatingDescription: {
+		id: 'servers.backups.admonition.migration-updating.description',
+		defaultMessage:
+			'Reinstalling your content and enabling it for the server, players, or both. This may take a couple of minutes.',
+	},
+	migrationBackupFailedDescription: {
+		id: 'servers.backups.admonition.migration-backup-failed.description',
+		defaultMessage:
+			'Something went wrong while creating {backupName}, so your content was left untouched. Please try again from the Play tab.',
+	},
+	migrationFailedTitle: {
+		id: 'servers.backups.admonition.migration-failed.title',
+		defaultMessage: 'Server update failed',
+	},
+	migrationFailedDescription: {
+		id: 'servers.backups.admonition.migration-failed.description',
+		defaultMessage:
+			'Something went wrong while updating your content. You can restore {backupName} from your backups or contact support.',
+	},
+	migrationCancelledTitle: {
+		id: 'servers.backups.admonition.migration-cancelled.title',
+		defaultMessage: 'Server update cancelled',
+	},
+	migrationCancelledDescription: {
+		id: 'servers.backups.admonition.migration-cancelled.description',
+		defaultMessage: 'Your server’s content was left untouched.',
+	},
+	migrationCompletedTitle: {
+		id: 'servers.backups.admonition.migration-completed.title',
+		defaultMessage: 'Server content updated',
+	},
+	migrationCompletedDescription: {
+		id: 'servers.backups.admonition.migration-completed.description',
+		defaultMessage: 'Your server is ready to share with friends.',
+	},
 	fallbackName: {
 		id: 'servers.backups.admonition.fallback-name',
 		defaultMessage: 'Your backup',
@@ -242,9 +298,33 @@ const restoreDescriptions: Record<UiPhase, MessageDescriptor> = {
 	completed: messages.restoreSuccessfulDescription,
 }
 
+function migrationMessages(
+	phase: UiPhase,
+	restoring: boolean,
+): [MessageDescriptor, MessageDescriptor] {
+	switch (phase) {
+		case 'queued':
+			return [messages.migrationQueuedTitle, messages.migrationQueuedDescription]
+		case 'in_progress':
+			return restoring
+				? [messages.migrationUpdatingTitle, messages.migrationUpdatingDescription]
+				: [messages.migrationBackingUpTitle, messages.migrationBackingUpDescription]
+		case 'failed':
+		case 'timed_out':
+			return restoring
+				? [messages.migrationFailedTitle, messages.migrationFailedDescription]
+				: [messages.migrationFailedTitle, messages.migrationBackupFailedDescription]
+		case 'cancelled':
+			return [messages.migrationCancelledTitle, messages.migrationCancelledDescription]
+		case 'completed':
+			return [messages.migrationCompletedTitle, messages.migrationCompletedDescription]
+	}
+}
+
 function getTitle(item: BackupAdmonitionEntry): string {
 	const phase = resolveUiPhase(item)
 	if (phase == null) return ''
+	if (item.migration) return formatMessage(migrationMessages(phase, item.migration.restoring)[0])
 	const table = item.type === 'create' ? createTitles : restoreTitles
 	return formatMessage(table[phase])
 }
@@ -252,8 +332,11 @@ function getTitle(item: BackupAdmonitionEntry): string {
 function getDescription(item: BackupAdmonitionEntry): string {
 	const phase = resolveUiPhase(item)
 	if (phase == null) return ''
-	const table = item.type === 'create' ? createDescriptions : restoreDescriptions
 	const backupName = item.name ?? formatMessage(messages.fallbackName)
+	if (item.migration) {
+		return formatMessage(migrationMessages(phase, item.migration.restoring)[1], { backupName })
+	}
+	const table = item.type === 'create' ? createDescriptions : restoreDescriptions
 	return formatMessage(table[phase], { backupName })
 }
 </script>

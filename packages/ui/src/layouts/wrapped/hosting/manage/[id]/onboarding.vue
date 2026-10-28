@@ -1,5 +1,5 @@
 <template>
-	<div class="mx-auto flex w-fit flex-col items-start gap-4 mt-16 max-w-[500px]">
+	<div class="mx-auto flex w-fit max-w-[500px] shrink-0 flex-col items-start gap-4">
 		<div class="flex flex-col gap-2 w-full">
 			<h2 class="m-0 text-2xl font-semibold text-contrast">
 				{{ formatMessage(messages.welcomeTitle) }}
@@ -28,7 +28,7 @@
 								class="my-2 flex-1 w-0.5 rounded-full bg-surface-5"
 							/>
 						</div>
-						<div :class="['flex flex-col gap-1 pt-2', i < steps.length - 1 ? 'pb-[44px]' : '']">
+						<div class="flex flex-col gap-1 pt-2" :class="i < steps.length - 1 ? 'pb-4' : ''">
 							<span class="text-base font-semibold text-contrast">
 								{{ i + 1 }}. {{ step.title }}
 							</span>
@@ -42,63 +42,43 @@
 		</div>
 
 		<div class="w-full">
-			<Button v-if="uploading" size="xl" class="ml-auto" disabled>
-				<SpinnerIcon class="animate-spin" />
-				{{ formatMessage(messages.uploadingProgress, { percent: uploadPercent }) }}
-			</Button>
 			<Button
-				v-else
 				v-tooltip="!canSetup ? permissionDeniedMessage : undefined"
 				type="colored"
 				color="brand"
 				size="xl"
 				class="ml-auto"
-				:disabled="!canSetup"
-				@click="openModal"
+				:disabled="!canSetup || !worldId"
+				@click="openModal()"
 			>
 				{{ formatMessage(messages.setupServerButton) }} <RightArrowIcon />
 			</Button>
 		</div>
-
-		<CreationFlowModal
-			ref="modalRef"
-			type="server-onboarding"
-			:available-loaders="['vanilla', 'fabric', 'neoforge', 'forge', 'quilt', 'paper', 'purpur']"
-			:show-snapshot-toggle="true"
-			:search-projects="searchModpacks"
-			:get-project-versions="getProjectVersions"
-			:finish-disabled="!canSetup"
-			:finish-disabled-tooltip="!canSetup ? permissionDeniedMessage : undefined"
-			@hide="() => {}"
-			@browse-modpacks="onBrowseModpacks"
-			@create="onCreate"
-		/>
 	</div>
 </template>
 
 <script setup lang="ts">
-import type { Archon } from '@modrinth/api-client'
-import { GlobeIcon, PackageIcon, RightArrowIcon, SpinnerIcon, UsersIcon } from '@modrinth/assets'
-import {
-	defineMessages,
-	injectModrinthClient,
-	injectNotificationManager,
-	useServerPermissions,
-	useVIntl,
-} from '@modrinth/ui'
-import { useQueryClient } from '@tanstack/vue-query'
-import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
+import { GlobeIcon, PackageIcon, RightArrowIcon, UsersIcon } from '@modrinth/assets'
+import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-import type { CreationFlowContextValue } from '#ui/components'
-import { CreationFlowModal } from '#ui/components'
 import { Button } from '#ui/components/base/buttons'
-import { injectModrinthServerContext } from '#ui/providers'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { useServerPermissions } from '#ui/composables/server-permissions'
+import { injectModrinthServerContext, injectNotificationManager } from '#ui/providers'
+import {
+	injectServerOnboardingFlow,
+	type ServerOnboardingRequest,
+} from '#ui/providers/server-onboarding'
 
-const client = injectModrinthClient()
-const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
+const { handleError } = injectNotificationManager()
 const { canSetup, permissionDeniedMessage } = useServerPermissions()
+const { serverId, worldId } = injectModrinthServerContext()
+const flow = injectServerOnboardingFlow()
+const route = useRoute()
+const router = useRouter()
+const props = defineProps<{ siteUrl: string }>()
 
 const messages = defineMessages({
 	welcomeTitle: {
@@ -113,29 +93,9 @@ const messages = defineMessages({
 		id: 'servers.setup.onboarding.steps.heading',
 		defaultMessage: 'Setup your server (~2mins)',
 	},
-	uploadingProgress: {
-		id: 'servers.setup.onboarding.uploading.progress',
-		defaultMessage: 'Uploading ({percent, number}%)',
-	},
 	setupServerButton: {
 		id: 'servers.setup.onboarding.setup-server.button',
 		defaultMessage: 'Setup server',
-	},
-	modpackUploadFailedTitle: {
-		id: 'servers.setup.onboarding.modpack-upload-failed.title',
-		defaultMessage: 'Modpack upload failed',
-	},
-	modpackUploadFailedText: {
-		id: 'servers.setup.onboarding.modpack-upload-failed.text',
-		defaultMessage: 'An unexpected error occurred while uploading. Please try again later.',
-	},
-	installationFailedTitle: {
-		id: 'servers.setup.onboarding.installation-failed.title',
-		defaultMessage: 'Installation failed',
-	},
-	installationFailedText: {
-		id: 'servers.setup.onboarding.installation-failed.text',
-		defaultMessage: 'An unexpected error occurred while installing. Please try again later.',
 	},
 	chooseWhatToPlayTitle: {
 		id: 'servers.setup.onboarding.step.choose.title',
@@ -162,206 +122,34 @@ const messages = defineMessages({
 	inviteFriendsDescription: {
 		id: 'servers.setup.onboarding.step.invite-friends.description',
 		defaultMessage:
-			"Share your server with friends by copying the address and letting them know which mods they'll need to join.",
+			'Invite friends to your server with a link and let them join in one click from the Modrinth App.',
 	},
 })
 
-async function searchModpacks(query: string, limit: number = 10) {
-	return client.labrinth.projects_v2.search({
-		query: query || undefined,
-		facets: [['project_type:modpack'], ['client_side:required'], ['server_side:required']],
-		limit,
-	})
-}
-
-async function getProjectVersions(projectId: string) {
-	const versions = await client.labrinth.versions_v3.getProjectVersions(projectId)
-	return versions.map((v) => ({ id: v.id }))
-}
-const { serverId, worldId, server } = injectModrinthServerContext()
-const route = useRoute()
-const router = useRouter()
-const queryClient = useQueryClient()
-
-const props = withDefaults(
-	defineProps<{
-		browseModpacks?: (args: {
-			serverId: string
-			worldId: string | null
-			from: 'onboarding'
-		}) => void | Promise<void>
-	}>(),
-	{
-		browseModpacks: undefined,
-	},
-)
-
-const modalRef = ref<InstanceType<typeof CreationFlowModal> | null>(null)
-
-const uploading = ref(false)
-const uploadedBytes = ref(0)
-const totalBytes = ref(0)
-const uploadPercent = computed(() =>
-	totalBytes.value > 0 ? Math.round((uploadedBytes.value / totalBytes.value) * 100) : 0,
-)
-
-const openModal = () => {
-	if (!canSetup.value) return
-	modalRef.value?.show()
-}
-
-onBeforeUnmount(() => modalRef.value?.hide())
-
-function onBrowseModpacks() {
-	if (!canSetup.value) return
-
-	if (props.browseModpacks) {
-		props.browseModpacks({
-			serverId,
-			worldId: worldId.value,
-			from: 'onboarding',
-		})
-		return
+async function openModal(project?: ServerOnboardingRequest['project']) {
+	if (!canSetup.value || !worldId.value) return
+	try {
+		await flow.open({ serverId, worldId: worldId.value, siteUrl: props.siteUrl, project })
+	} catch (error) {
+		handleError(error as Error)
 	}
-
-	router.push({
-		path: '/discover/modpacks',
-		query: { sid: serverId, from: 'onboarding', wid: worldId.value },
-	})
 }
 
 onMounted(async () => {
-	if (!canSetup.value && route.query.resumeModal) {
-		router.replace({ query: {} })
-		return
-	}
-
-	if (route.query.resumeModal === 'setup-type') {
-		router.replace({ query: {} })
-		openModal()
-		return
-	}
-
-	if (route.query.resumeModal === 'modpack') {
-		const mpPid = route.query.mp_pid as string | undefined
-		const mpVid = route.query.mp_vid as string | undefined
-		const mpName = route.query.mp_name as string | undefined
-
-		router.replace({ query: {} })
-		openModal()
-		await nextTick()
-
-		const ctx = modalRef.value?.ctx
-		if (ctx && mpPid && mpVid) {
-			ctx.setupType.value = 'modpack'
-			ctx.modpackSelection.value = {
-				projectId: mpPid,
-				versionId: mpVid,
-				name: mpName ?? '',
-			}
-			ctx.modal.value?.setStage('final-config')
-		} else {
-			ctx?.setSetupType('modpack')
-		}
+	const resumeStage = route.query.resumeModal
+	if (!resumeStage) return
+	const projectId = route.query.mp_pid as string | undefined
+	const versionId = route.query.mp_vid as string | undefined
+	const name = route.query.mp_name as string | undefined
+	await router.replace({ query: {} })
+	if (resumeStage === 'setup-type' || resumeStage === 'modpack') {
+		await openModal(
+			resumeStage === 'modpack' && projectId && versionId
+				? { projectId, versionId, name: name ?? '' }
+				: undefined,
+		)
 	}
 })
-
-async function finalizeSetup() {
-	modalRef.value?.hide()
-	server.value.flows = { intro: false }
-	client.archon.servers_v1.endIntro(serverId).then(() => {
-		queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
-	})
-	await router.push(`/hosting/manage/${serverId}/`)
-}
-
-/** Map UI loader names to API Modloader values */
-function toApiLoader(loader: string): Archon.Content.v1.Modloader {
-	if (loader === 'neoforge') return 'neo_forge'
-	return loader as Archon.Content.v1.Modloader
-}
-
-const onCreate = async (config: CreationFlowContextValue) => {
-	if (!canSetup.value) {
-		config.loading.value = false
-		return
-	}
-
-	// Handle mrpack file upload
-	if (config.setupType.value === 'modpack' && config.modpackFile.value) {
-		modalRef.value?.hide()
-		uploading.value = true
-		uploadedBytes.value = 0
-		totalBytes.value = config.modpackFile.value.size
-
-		try {
-			const handle = client.kyros.content_v1.uploadModpackFile(
-				worldId.value!,
-				config.modpackFile.value,
-				config.buildProperties(),
-				{
-					softOverride: true,
-					onProgress: ({ loaded, total }) => {
-						uploadedBytes.value = loaded
-						totalBytes.value = total
-					},
-				},
-			)
-			await handle.promise
-			server.value.status = 'installing'
-			await finalizeSetup()
-		} catch {
-			addNotification({
-				title: formatMessage(messages.modpackUploadFailedTitle),
-				text: formatMessage(messages.modpackUploadFailedText),
-				type: 'error',
-			})
-			config.loading.value = false
-			uploading.value = false
-		}
-		return
-	}
-
-	let request: Archon.Content.v1.InstallWorldContent
-
-	const properties = config.buildProperties()
-
-	if (config.setupType.value === 'modpack' && config.modpackSelection.value) {
-		request = {
-			content_variant: 'modpack',
-			spec: {
-				platform: 'modrinth',
-				project_id: config.modpackSelection.value.projectId,
-				version_id: config.modpackSelection.value.versionId,
-			},
-			soft_override: false,
-			properties,
-		}
-	} else {
-		const loader = config.selectedLoader.value
-		request = {
-			content_variant: 'bare',
-			loader: loader ? toApiLoader(loader) : 'vanilla',
-			version: config.selectedLoaderVersion.value ?? '',
-			game_version: config.selectedGameVersion.value ?? undefined,
-			soft_override: false,
-			properties,
-		}
-	}
-
-	try {
-		await client.archon.content_v1.installContent(serverId, worldId.value!, request)
-		server.value.status = 'installing'
-		await finalizeSetup()
-	} catch {
-		addNotification({
-			title: formatMessage(messages.installationFailedTitle),
-			text: formatMessage(messages.installationFailedText),
-			type: 'error',
-		})
-		config.loading.value = false
-	}
-}
 
 const steps = computed(() => [
 	{

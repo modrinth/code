@@ -1,7 +1,7 @@
 <template>
 	<NewModal ref="modal" :header="formatMessage(messages.header)" fade="danger" max-width="500px">
 		<Admonition type="critical" :header="formatMessage(messages.admonitionHeader)">
-			<IntlFormatted :message-id="messages.admonitionBody" :values="{ code: inviteCode }">
+			<IntlFormatted :message-id="messages.admonitionBody" :values="{ code: `/${inviteId}` }">
 				<template #monospace="{ children }">
 					<code class="font-mono"><component :is="() => children" /></code>
 				</template>
@@ -14,7 +14,7 @@
 					<XIcon />
 					{{ formatMessage(commonMessages.cancelButton) }}
 				</Button>
-				<Button type="colored" color="red" @click="confirm">
+				<Button type="colored" color="red" :disabled="busy" @click="$emit('confirm')">
 					<XIcon />
 					{{ formatMessage(messages.revokeButton) }}
 				</Button>
@@ -25,34 +25,19 @@
 
 <script setup lang="ts">
 import { XIcon } from '@modrinth/assets'
-import {
-	Admonition,
-	Button,
-	commonMessages,
-	defineMessages,
-	IntlFormatted,
-	NewModal,
-	useVIntl,
-} from '@modrinth/ui'
 import { ref } from 'vue'
+
+import { Admonition, Button } from '#ui/components/base'
+import IntlFormatted from '#ui/components/base/IntlFormatted.vue'
+import NewModal from '#ui/components/modal/NewModal.vue'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { commonMessages } from '#ui/utils/common-messages'
+
+defineProps<{ inviteId: string; busy: boolean }>()
+defineEmits<{ confirm: [] }>()
 
 const { formatMessage } = useVIntl()
 const modal = ref<InstanceType<typeof NewModal>>()
-const inviteCode = ref('')
-
-const emit = defineEmits<{
-	revoke: [inviteCode: string]
-}>()
-
-function show(code: string) {
-	inviteCode.value = code
-	modal.value?.show()
-}
-
-function confirm() {
-	modal.value?.hide()
-	emit('revoke', inviteCode.value)
-}
 
 const messages = defineMessages({
 	header: {
@@ -74,5 +59,8 @@ const messages = defineMessages({
 	},
 })
 
-defineExpose({ show })
+defineExpose({
+	show: () => modal.value?.show(),
+	hide: () => modal.value?.hide(),
+})
 </script>

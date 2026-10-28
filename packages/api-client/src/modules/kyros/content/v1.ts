@@ -1,10 +1,30 @@
 import { AbstractModule } from '../../../core/abstract-module'
 import type { UploadHandle, UploadProgress } from '../../../types/upload'
+import { getNodeBaseUrl } from '../../../utils/node-url'
 import type { Archon } from '../../archon/types'
 
 export class KyrosContentV1Module extends AbstractModule {
 	public getModuleID(): string {
 		return 'kyros_content_v1'
+	}
+
+	/** GET /v1/worlds/:world_id/content/embedded-icon */
+	public async getEmbeddedAddonIcon(
+		worldId: string,
+		parentDirectory: 'mods' | 'plugins',
+		filename: string,
+	): Promise<Blob> {
+		return this.client.request<Blob>(`/worlds/${worldId}/content/embedded-icon`, {
+			api: '',
+			version: 'v1',
+			method: 'GET',
+			responseType: 'blob',
+			params: {
+				parent_directory: parentDirectory,
+				filename,
+			},
+			useNodeAuth: true,
+		})
 	}
 
 	/**
@@ -45,6 +65,7 @@ export class KyrosContentV1Module extends AbstractModule {
 		options?: {
 			softOverride?: boolean
 			onProgress?: (progress: UploadProgress) => void
+			auth?: Archon.Servers.v0.JWTAuth
 		},
 	): UploadHandle<void> {
 		const formData = new FormData()
@@ -52,7 +73,7 @@ export class KyrosContentV1Module extends AbstractModule {
 		formData.append('properties', JSON.stringify(properties))
 
 		return this.client.upload<void>(`/worlds/${worldId}/content/upload-modpack-file`, {
-			api: '',
+			api: options?.auth ? getNodeBaseUrl(options.auth.url) : '',
 			version: 'v1',
 			formData,
 			params:
@@ -60,7 +81,9 @@ export class KyrosContentV1Module extends AbstractModule {
 					? { soft_override: String(options.softOverride) }
 					: undefined,
 			onProgress: options?.onProgress,
-			useNodeAuth: true,
+			...(options?.auth
+				? { headers: { Authorization: `Bearer ${options.auth.token}` }, skipAuth: true }
+				: { useNodeAuth: true }),
 		})
 	}
 }

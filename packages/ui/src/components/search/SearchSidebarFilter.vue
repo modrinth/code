@@ -100,6 +100,34 @@
 						/>
 					</label>
 				</div>
+				<div
+					v-else-if="filterType.display === 'radio'"
+					role="radiogroup"
+					:class="innerPanelClass ? innerPanelClass : ''"
+					class="flex flex-col gap-1"
+				>
+					<button
+						v-for="option in filterType.options"
+						:key="`${filterType.id}-radio-${option.id}`"
+						role="radio"
+						:aria-checked="isIncluded(option)"
+						class="flex border-none cursor-pointer items-center gap-2 rounded-xl px-2 py-2 [@media(hover:hover)]:py-1 text-sm font-semibold transition-all active:scale-[0.98]"
+						:class="
+							isIncluded(option)
+								? 'bg-transparent text-contrast'
+								: 'bg-transparent text-secondary hover:bg-button-bg hover:text-contrast focus-visible:bg-button-bg focus-visible:text-contrast'
+						"
+						@click="!isIncluded(option) && setFilter(option, 'include')"
+					>
+						<RadioButtonCheckedIcon
+							v-if="isIncluded(option)"
+							class="h-5 w-5 shrink-0 text-brand"
+							aria-hidden="true"
+						/>
+						<RadioButtonIcon v-else class="h-5 w-5 shrink-0" aria-hidden="true" />
+						<span class="truncate">{{ option.formatted_name ?? option.id }}</span>
+					</button>
+				</div>
 				<template v-else>
 					<Input
 						v-if="filterType.searchable"
@@ -240,7 +268,15 @@
 </template>
 
 <script setup lang="ts">
-import { BanIcon, DropdownIcon, LockOpenIcon, SearchIcon, UpdatedIcon } from '@modrinth/assets'
+import {
+	BanIcon,
+	DropdownIcon,
+	LockOpenIcon,
+	RadioButtonCheckedIcon,
+	RadioButtonIcon,
+	SearchIcon,
+	UpdatedIcon,
+} from '@modrinth/assets'
 import { computed, ref, watch } from 'vue'
 
 import { Button } from '#ui/components/base/buttons'

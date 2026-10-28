@@ -64,6 +64,12 @@ pub async fn edit_icon(
     apply_instance_icon(instance_id, icon_path, None, &state).await
 }
 
+pub async fn cache_icon_bytes(icon_bytes: Vec<u8>) -> crate::Result<String> {
+    let state = State::get().await?;
+    let icon_path = cache_icon(Bytes::from(icon_bytes), &state).await?;
+    Ok(icon_path.to_string_lossy().to_string())
+}
+
 pub async fn cache_remote_icon(source: &str) -> crate::Result<PathBuf> {
     if !source.starts_with("https://") {
         bail!(ErrorKind::InputError(
